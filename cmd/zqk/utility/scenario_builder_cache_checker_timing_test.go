@@ -70,7 +70,7 @@ func TestCacheCheckerTiming_RaceCondition(t *testing.T) {
 	testObjects := []map[string]any{
 		{
 			objects.FieldKeyKind:     "account",
-			objects.FieldKeyID:       "ACC-1785920548450214015-3df55bd1",
+			objects.FieldKeyID:       "ACC-TEST-USER",
 			objects.FieldKeyTitle:    "Test User",
 			objects.FieldKeyUsername: "test-user",
 			objects.FieldKeyStatus:   scenarioBuilderStatusActive,
@@ -81,7 +81,7 @@ func TestCacheCheckerTiming_RaceCondition(t *testing.T) {
 			objects.FieldKeyTitle:      "Test Workstream",
 			objects.FieldKeyStatus:     scenarioBuilderStatusActive,
 			objects.FieldKeyEntryPoint: "main",                             // Required field
-			objects.FieldKeyOwnerRef:   "ACC-1785920548450214015-3df55bd1", // References account created in same batch
+			objects.FieldKeyOwnerRef:   "ACC-TEST-USER", // References account created in same batch
 		},
 	}
 
@@ -197,7 +197,7 @@ func TestCacheCheckerTiming_CorrectBehavior(t *testing.T) {
 	testObjects := []map[string]any{
 		{
 			objects.FieldKeyKind:     "account",
-			objects.FieldKeyID:       "ACC-1785920548450214015-3df55bd1",
+			objects.FieldKeyID:       "ACC-TEST-USER",
 			objects.FieldKeyTitle:    "Test User",
 			objects.FieldKeyUsername: "test-user",
 			objects.FieldKeyStatus:   scenarioBuilderStatusActive,
@@ -208,7 +208,7 @@ func TestCacheCheckerTiming_CorrectBehavior(t *testing.T) {
 			objects.FieldKeyTitle:      "Test Workstream",
 			objects.FieldKeyStatus:     scenarioBuilderStatusActive,
 			objects.FieldKeyEntryPoint: "main", // Required field
-			objects.FieldKeyOwnerRef:   "ACC-1785920548450214015-3df55bd1",
+			objects.FieldKeyOwnerRef:   "ACC-TEST-USER",
 		},
 	}
 

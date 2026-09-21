@@ -137,13 +137,13 @@ func TestList_audit_event_created_at_range_returns_events_via_date_range_walk(t 
 		{
 			objects.FieldKeyID: "AUD-DW-001", objects.FieldKeyKind: "audit_event", objects.FieldKeyCreatedAt: "2030-02-10T12:00:00Z",
 			objects.FieldKeyStatus: objects.ObjectStatusCompleted, objects.FieldKeyEventType: "object_creation", objects.FieldKeyOperation: "op1",
-			objects.FieldKeyCreatedBy: "ACC-1785920548450214012-68b850c0", objects.FieldKeyUpdatedAt: "2030-02-10T12:00:00Z", objects.FieldKeyUpdatedBy: "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyCreatedBy: "ACC-SYSTEM", objects.FieldKeyUpdatedAt: "2030-02-10T12:00:00Z", objects.FieldKeyUpdatedBy: "ACC-SYSTEM",
 			objects.FieldKeyOriginSystem: validation.DefaultOriginSystem, objects.FieldKeyOriginProject: validation.DefaultOriginProject,
 		},
 		{
 			objects.FieldKeyID: "AUD-DW-002", objects.FieldKeyKind: "audit_event", objects.FieldKeyCreatedAt: "2030-02-11T12:00:00Z",
 			objects.FieldKeyStatus: objects.ObjectStatusCompleted, objects.FieldKeyEventType: "object_creation", objects.FieldKeyOperation: "op2",
-			objects.FieldKeyCreatedBy: "ACC-1785920548450214012-68b850c0", objects.FieldKeyUpdatedAt: "2030-02-11T12:00:00Z", objects.FieldKeyUpdatedBy: "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyCreatedBy: "ACC-SYSTEM", objects.FieldKeyUpdatedAt: "2030-02-11T12:00:00Z", objects.FieldKeyUpdatedBy: "ACC-SYSTEM",
 			objects.FieldKeyOriginSystem: validation.DefaultOriginSystem, objects.FieldKeyOriginProject: validation.DefaultOriginProject,
 		},
 	}
@@ -265,13 +265,13 @@ func TestAggregateAuditEvents_ThenCleanupArchive_UpdatesStatus(t *testing.T) {
 		{
 			objects.FieldKeyID: "AUD-CLEAN-001", objects.FieldKeyKind: "audit_event", objects.FieldKeyCreatedAt: "2030-02-10T12:00:00Z",
 			objects.FieldKeyStatus: objects.ObjectStatusCompleted, objects.FieldKeyEventType: "object_creation", objects.FieldKeyOperation: "op1",
-			objects.FieldKeyCreatedBy: "ACC-1785920548450214012-68b850c0", objects.FieldKeyUpdatedAt: "2030-02-10T12:00:00Z", objects.FieldKeyUpdatedBy: "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyCreatedBy: "ACC-SYSTEM", objects.FieldKeyUpdatedAt: "2030-02-10T12:00:00Z", objects.FieldKeyUpdatedBy: "ACC-SYSTEM",
 			objects.FieldKeyOriginSystem: validation.DefaultOriginSystem, objects.FieldKeyOriginProject: validation.DefaultOriginProject,
 		},
 		{
 			objects.FieldKeyID: "AUD-CLEAN-002", objects.FieldKeyKind: "audit_event", objects.FieldKeyCreatedAt: "2030-02-11T12:00:00Z",
 			objects.FieldKeyStatus: objects.ObjectStatusCompleted, objects.FieldKeyEventType: "object_creation", objects.FieldKeyOperation: "op2",
-			objects.FieldKeyCreatedBy: "ACC-1785920548450214012-68b850c0", objects.FieldKeyUpdatedAt: "2030-02-11T12:00:00Z", objects.FieldKeyUpdatedBy: "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyCreatedBy: "ACC-SYSTEM", objects.FieldKeyUpdatedAt: "2030-02-11T12:00:00Z", objects.FieldKeyUpdatedBy: "ACC-SYSTEM",
 			objects.FieldKeyOriginSystem: validation.DefaultOriginSystem, objects.FieldKeyOriginProject: validation.DefaultOriginProject,
 		},
 	}

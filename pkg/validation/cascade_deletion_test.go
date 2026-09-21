@@ -38,9 +38,9 @@ func TestCascadeDeletion_CriteriaNullify(t *testing.T) {
 		objects.FieldKeyTitle:         "Test Criteria",
 		objects.FieldKeyCategory:      "functional",
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
 	createObjectFile(t, criteriaDir, "CRIT-001.yaml", criteria)
 
@@ -53,9 +53,9 @@ func TestCascadeDeletion_CriteriaNullify(t *testing.T) {
 		objects.FieldKeyTitle:         "Test Case",
 		objects.FieldKeyCriteriaRefs:  []string{"CRIT-001", "CRIT-002"}, // CRIT-002 doesn't exist (tests missing ref handling)
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
 	testPath := createObjectFile(t, testDir, "TEST-001.yaml", testCase)
 
@@ -69,9 +69,9 @@ func TestCascadeDeletion_CriteriaNullify(t *testing.T) {
 		objects.FieldKeyCriteriaRefs:  []string{"CRIT-001"},
 		objects.FieldKeyGoalRefs:      []string{"GOAL-001"}, // Required field
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
 	reqPath := createObjectFile(t, reqDir, "REQ-001.yaml", requirement)
 
@@ -87,9 +87,9 @@ func TestCascadeDeletion_CriteriaNullify(t *testing.T) {
 		objects.FieldKeyStatus:        objects.ObjectStatusActive,
 		objects.FieldKeyTitle:         "Test Goal",
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
 	createObjectFile(t, goalDir, "GOAL-001.yaml", goal)
 
@@ -131,9 +131,9 @@ func TestCascadeDeletion_RequiredReferenceRestrict(t *testing.T) {
 		objects.FieldKeyStatus:        objects.ObjectStatusActive,
 		objects.FieldKeyTitle:         "Required Goal",
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
 	createObjectFile(t, goalDir, "GOAL-002.yaml", goal)
 
@@ -147,9 +147,9 @@ func TestCascadeDeletion_RequiredReferenceRestrict(t *testing.T) {
 		objects.FieldKeyGoalRefs:      []string{"GOAL-002"}, // Required field (min_length: 1)
 		objects.FieldKeyCriteriaRefs:  []string{"CRIT-001"}, // Also required (min_length: 1)
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
 	createObjectFile(t, reqDir, "REQ-002.yaml", requirement)
 
@@ -166,9 +166,9 @@ func TestCascadeDeletion_RequiredReferenceRestrict(t *testing.T) {
 		objects.FieldKeyTitle:         ConstMagic30cc1766,
 		objects.FieldKeyCategory:      "functional",
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
 	createObjectFile(t, criteriaDir, "CRIT-001.yaml", criteria)
 
@@ -201,9 +201,9 @@ func TestCascadeDeletion_SingleReferenceSetNull(t *testing.T) {
 		objects.FieldKeyStatus:        objects.ObjectStatusActive,
 		objects.FieldKeyTitle:         ConstMagic04554a4d,
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
 	createObjectFile(t, strategicPlanDir, ConstMagic619b9687, strategicPlan)
 
@@ -216,9 +216,9 @@ func TestCascadeDeletion_SingleReferenceSetNull(t *testing.T) {
 		objects.FieldKeyTitle:         ConstMagicc6892214,
 		"strategic_plan_ref":          "STRAT-PLAN-003", // Single optional reference
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
 	milestonePath := createObjectFile(t, milestoneDir, "MIL-003.yaml", milestone)
 
@@ -258,9 +258,9 @@ func TestCascadeDeletion_MultiLevelCascade(t *testing.T) {
 		objects.FieldKeyStatus:        objects.ObjectStatusActive,
 		objects.FieldKeyTitle:         ConstMagic5ae7cf8c,
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
 	createObjectFile(t, strategicPlanDir, ConstMagicdf0fab09, sp)
 
@@ -274,9 +274,9 @@ func TestCascadeDeletion_MultiLevelCascade(t *testing.T) {
 		"strategic_plan_ref":          "STRAT-PLAN-004",
 		objects.FieldKeyGoalRefs:      []string{"GOAL-004"},
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
 	milPath := createObjectFile(t, milestoneDir, "MIL-004.yaml", mil)
 
@@ -288,9 +288,9 @@ func TestCascadeDeletion_MultiLevelCascade(t *testing.T) {
 		objects.FieldKeyStatus:        objects.ObjectStatusActive,
 		objects.FieldKeyTitle:         ConstMagicabb6bf12,
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
 	goalPath := createObjectFile(t, goalDir, "GOAL-004.yaml", goal)
 
@@ -304,9 +304,9 @@ func TestCascadeDeletion_MultiLevelCascade(t *testing.T) {
 		objects.FieldKeyGoalRefs:      []string{"GOAL-004"},
 		objects.FieldKeyCriteriaRefs:  []string{"CRIT-001"}, // Required
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
 	reqPath := createObjectFile(t, reqDir, "REQ-004.yaml", req)
 
@@ -323,9 +323,9 @@ func TestCascadeDeletion_MultiLevelCascade(t *testing.T) {
 		objects.FieldKeyTitle:         ConstMagic30cc1766,
 		objects.FieldKeyCategory:      "functional",
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
 	createObjectFile(t, criteriaDir, "CRIT-001.yaml", criteria)
 
@@ -338,9 +338,9 @@ func TestCascadeDeletion_MultiLevelCascade(t *testing.T) {
 		objects.FieldKeyTitle:           ConstMagic18606553,
 		objects.FieldKeyRequirementRefs: []string{"REQ-004"},
 		objects.FieldKeyCreatedAt:       time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:       "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:       "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:       time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:       "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:       "ACC-SYSTEM",
 	}
 	bliPath := createObjectFile(t, backlogDir, "BLI-005.yaml", bli)
 
@@ -392,9 +392,9 @@ func TestCascadeDeletion_ConcurrentCascade(t *testing.T) {
 			objects.FieldKeyTitle:         fmt.Sprintf("Criteria %d", i+1),
 			objects.FieldKeyCategory:      "functional",
 			objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-			objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 			objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-			objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 		}
 		createObjectFile(t, criteriaDir, fmt.Sprintf("%s.yaml", criteriaID), criteria)
 	}
@@ -418,9 +418,9 @@ func TestCascadeDeletion_ConcurrentCascade(t *testing.T) {
 			objects.FieldKeyTitle:         fmt.Sprintf("Test Case %d", i+1),
 			objects.FieldKeyCriteriaRefs:  criteriaRefs,
 			objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-			objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 			objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-			objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 		}
 		createObjectFile(t, testDir, fmt.Sprintf("%s.yaml", testID), testCase)
 	}

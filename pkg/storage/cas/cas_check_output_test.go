@@ -40,7 +40,7 @@ func TestCAS_CheckCommandOutput(t *testing.T) {
 
 	ctx := pkgctx.NewSystemContext()
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	}
 
 	// Create a CAS object
@@ -146,7 +146,7 @@ func TestCAS_CheckCommandDistinguishesCAS(t *testing.T) {
 
 	ctx := pkgctx.NewSystemContext()
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	}
 
 	storage.CreateCASVisible(t, fileStorage, ctx, secCtx, casObj, "")

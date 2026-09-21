@@ -58,7 +58,7 @@ func createTestAuditEvent(t *testing.T, projectRoot string, storageProvider stor
 			GetMetadataDurationField(): 1.5,
 		},
 		CreatedAt: createdAt.Format(time.RFC3339),
-		CreatedBy: "ACC-1785920548450214012-68b850c0",
+		CreatedBy: "ACC-SYSTEM",
 	}
 
 	err := storagepkg.CreateAuditEventWithBuilder(ctx, projectRoot, secCtx, storageProvider, options)
@@ -105,7 +105,7 @@ func TestQueryAuditEvents_Success(t *testing.T) {
 		TargetKind: "backlog_item",
 		TargetID:   "BLI-001",
 		CreatedAt:  now.Format(time.RFC3339),
-		CreatedBy:  "ACC-1785920548450214012-68b850c0",
+		CreatedBy:  "ACC-SYSTEM",
 	}
 	err = storagepkg.CreateAuditEventWithBuilder(ctx, testRoot, secCtx, storageProvider, nonSchedulerOptions)
 	if err != nil {

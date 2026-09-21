@@ -64,7 +64,7 @@ func TestCAS_CascadeDelete_WithDependents_CascadeFalse(t *testing.T) {
 	// Cascade may hard-delete critical dependents (e.g. backlog_item).
 	ctx := storage.WithTestHardDelete(pkgctx.NewSystemContext())
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	}
 
 	// Create a CAS object (audit_event) - simpler than scheduler_job
@@ -73,9 +73,9 @@ func TestCAS_CascadeDelete_WithDependents_CascadeFalse(t *testing.T) {
 		objects.FieldKeyKind:          "audit_event",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyCreatedAt:     "2030-01-18T10:00:00Z",
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     "2030-01-18T10:00:00Z",
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyOriginSystem:  "test",
 		objects.FieldKeyOriginProject: "test",
 		objects.FieldKeyStatus:        objects.ObjectStatusCompleted,
@@ -153,7 +153,7 @@ func TestCAS_CascadeDelete_WithDependents_CascadeTrue(t *testing.T) {
 
 	ctx := storage.WithTestHardDelete(pkgctx.NewSystemContext())
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	}
 
 	// Create a CAS object (audit_event)
@@ -162,9 +162,9 @@ func TestCAS_CascadeDelete_WithDependents_CascadeTrue(t *testing.T) {
 		objects.FieldKeyKind:          "audit_event",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyCreatedAt:     "2030-01-18T10:00:00Z",
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     "2030-01-18T10:00:00Z",
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyOriginSystem:  "test",
 		objects.FieldKeyOriginProject: "test",
 		objects.FieldKeyStatus:        objects.ObjectStatusCompleted,
@@ -259,7 +259,7 @@ func TestCAS_CascadeDelete_CASDependentOfNonCAS(t *testing.T) {
 	})
 
 	ctx := storage.WithTestHardDelete(pkgctx.NewSystemContext())
-	secCtx := &pkgctx.SecurityContext{AccountID: "ACC-1785920548450214012-68b850c0"}
+	secCtx := &pkgctx.SecurityContext{AccountID: "ACC-SYSTEM"}
 
 	parent := map[string]any{
 		objects.FieldKeyID:            "BLI-parent-cas-dep",
@@ -275,9 +275,9 @@ func TestCAS_CascadeDelete_CASDependentOfNonCAS(t *testing.T) {
 		objects.FieldKeyKind:          "audit_event",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyCreatedAt:     "2030-01-18T10:00:00Z",
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     "2030-01-18T10:00:00Z",
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyOriginSystem:  "test",
 		objects.FieldKeyOriginProject: "test",
 		objects.FieldKeyStatus:        objects.ObjectStatusCompleted,
@@ -320,7 +320,7 @@ func TestCAS_CascadeDelete_MultiLevel(t *testing.T) {
 	})
 
 	ctx := storage.WithTestHardDelete(pkgctx.NewSystemContext())
-	secCtx := &pkgctx.SecurityContext{AccountID: "ACC-1785920548450214012-68b850c0"}
+	secCtx := &pkgctx.SecurityContext{AccountID: "ACC-SYSTEM"}
 
 	root := map[string]any{
 		objects.FieldKeyID:            "BLI-cascade-root",
@@ -399,7 +399,7 @@ func TestCAS_CascadeDelete_NoDependents(t *testing.T) {
 
 	ctx := storage.WithCLIOperation(pkgctx.NewSystemContext())
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	}
 
 	// Create a CAS object (audit_event) with no dependents
@@ -408,9 +408,9 @@ func TestCAS_CascadeDelete_NoDependents(t *testing.T) {
 		objects.FieldKeyKind:          "audit_event",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyCreatedAt:     "2030-01-18T10:00:00Z",
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     "2030-01-18T10:00:00Z",
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyOriginSystem:  "test",
 		objects.FieldKeyOriginProject: "test",
 		objects.FieldKeyStatus:        objects.ObjectStatusCompleted,

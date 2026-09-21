@@ -14,7 +14,7 @@ const (
 	errNoSkillMsg    = "no known skill for %s"
 	errHashMismatch  = "integrity check failed: hash mismatch"
 	testRefSkillName = "Targeted Validation" // kernel identity, not arbitrary magic
-	refSkillID       = "ASK-" + "1782593752920560000" + "-" + "99708cd6"
+	refSkillID       = "ASK-TARGETED-VALIDATION"
 )
 
 // Skill represents a kernel skill object used to build integrity proofs.

@@ -152,7 +152,7 @@ func TestMeshLeaseSupervision_Integration(t *testing.T) {
 	skillLease := map[string]any{
 		objects.FieldKeyID:                leaseID,
 		objects.FieldKeyKind:              objects.KindZqkSession,
-		objects.FieldKeyAccountID:         "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyAccountID:         "ACC-SYSTEM",
 		objects.FieldKeyTitle:             "Test Compute Lease",
 		objects.FieldKeyStatus:            objects.ObjectStatusActive,
 		objects.FieldKeyProviderKernelRef: providerKernelID,
@@ -322,7 +322,7 @@ func TestMeshLeaseSupervision_QuotasAndRevocation(t *testing.T) {
 	skillLease := map[string]any{
 		objects.FieldKeyID:                leaseID,
 		objects.FieldKeyKind:              objects.KindZqkSession,
-		objects.FieldKeyAccountID:         "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyAccountID:         "ACC-SYSTEM",
 		objects.FieldKeyTitle:             "Test Quota Lease",
 		objects.FieldKeyStatus:            objects.ObjectStatusActive,
 		objects.FieldKeyProviderKernelRef: providerKernelID,
@@ -429,7 +429,7 @@ func TestMeshLeaseSupervision_QuotasAndRevocation(t *testing.T) {
 	skillLease2 := map[string]any{
 		objects.FieldKeyID:                leaseID2,
 		objects.FieldKeyKind:              objects.KindZqkSession,
-		objects.FieldKeyAccountID:         "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyAccountID:         "ACC-SYSTEM",
 		objects.FieldKeyTitle:             "Test Revocation Lease",
 		objects.FieldKeyStatus:            objects.ObjectStatusActive,
 		objects.FieldKeyProviderKernelRef: providerKernelID,

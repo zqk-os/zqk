@@ -13,7 +13,7 @@ import (
 func TestMigrateLegacyBacklogItemYAML(t *testing.T) {
 	legacyYAML := `
 created_at: "2026-06-23T14:41:43Z"
-created_by: ACC-1785920548450214012-68b850c0
+created_by: ACC-SYSTEM
 description: Core migration testing backlog item.
 estimated_effort: 2 days
 goal_refs:
@@ -28,7 +28,7 @@ schema_version: 2.0.0
 status: in_progress
 title: Migrate Backlog Items to DNA
 updated_at: "2026-08-14T08:21:32Z"
-updated_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-SYSTEM
 version_context: default
 `
 	bli, err := MigrateLegacyBacklogItem([]byte(legacyYAML))
@@ -58,7 +58,7 @@ version_context: default
 	if prov.ParentHash != DefaultGenesisParentHash {
 		t.Errorf("ParentHash mismatch: got %q, want %q", prov.ParentHash, DefaultGenesisParentHash)
 	}
-	if prov.AgentID != "ACC-1785920548450214012-68b850c0" {
+	if prov.AgentID != "ACC-SYSTEM" {
 		t.Errorf("AgentID mismatch: got %q", prov.AgentID)
 	}
 	if prov.Hash == "" {

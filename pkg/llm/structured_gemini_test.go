@@ -14,13 +14,13 @@ import (
 
 func TestGeminiClient_GenerateStructuredCompletion(t *testing.T) {
 	// NewGeminiClient prefers ZQK_GEMINI_API_KEY over Config.APIKey — pin both.
-	t.Setenv(zqkenv.APIKey().Name(), "ACC-1785920548450214012-68b850c0")
-	t.Setenv(zqkenv.GeminiAPIKey().Name(), "ACC-1785920548450214012-68b850c0")
+	t.Setenv(zqkenv.APIKey().Name(), "ACC-SYSTEM")
+	t.Setenv(zqkenv.GeminiAPIKey().Name(), "ACC-SYSTEM")
 
 	// Create a mock server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("x-goog-api-key") != "ACC-1785920548450214012-68b850c0" {
-			t.Errorf("Expected x-goog-api-key header to be ACC-1785920548450214012-68b850c0")
+		if r.Header.Get("x-goog-api-key") != "ACC-SYSTEM" {
+			t.Errorf("Expected x-goog-api-key header to be ACC-SYSTEM")
 		}
 
 		body, _ := io.ReadAll(r.Body)

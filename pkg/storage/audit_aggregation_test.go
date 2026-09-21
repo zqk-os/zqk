@@ -331,7 +331,7 @@ func TestAuditAggregationService_QueryAuditEventsInWindow(t *testing.T) {
 
 	ctx := WithCLIOperation(pkgctx.NewSystemContext())
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	}
 
 	// Create some audit events across different times
@@ -345,9 +345,9 @@ func TestAuditAggregationService_QueryAuditEventsInWindow(t *testing.T) {
 			objects.FieldKeyKind:          "audit_event",
 			objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 			objects.FieldKeyCreatedAt:     time1.Format(time.RFC3339),
-			objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 			objects.FieldKeyUpdatedAt:     time1.Format(time.RFC3339),
-			objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 			objects.FieldKeyOriginSystem:  "test",
 			objects.FieldKeyOriginProject: "test",
 			objects.FieldKeyStatus:        objects.ObjectStatusCompleted,
@@ -359,9 +359,9 @@ func TestAuditAggregationService_QueryAuditEventsInWindow(t *testing.T) {
 			objects.FieldKeyKind:          "audit_event",
 			objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 			objects.FieldKeyCreatedAt:     time2.Format(time.RFC3339),
-			objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 			objects.FieldKeyUpdatedAt:     time2.Format(time.RFC3339),
-			objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 			objects.FieldKeyOriginSystem:  "test",
 			objects.FieldKeyOriginProject: "test",
 			objects.FieldKeyStatus:        objects.ObjectStatusFailed,
@@ -373,9 +373,9 @@ func TestAuditAggregationService_QueryAuditEventsInWindow(t *testing.T) {
 			objects.FieldKeyKind:          "audit_event",
 			objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 			objects.FieldKeyCreatedAt:     time3.Format(time.RFC3339),
-			objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 			objects.FieldKeyUpdatedAt:     time3.Format(time.RFC3339),
-			objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 			objects.FieldKeyOriginSystem:  "test",
 			objects.FieldKeyOriginProject: "test",
 			objects.FieldKeyStatus:        objects.ObjectStatusCompleted,

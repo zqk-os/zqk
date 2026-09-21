@@ -45,7 +45,7 @@ func TestCAS_LifecycleValidation(t *testing.T) {
 
 	ctx := pkgctx.NewSystemContext()
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	}
 
 	// Create a milestone first (required for lifecycle transition)
@@ -160,7 +160,7 @@ func TestCAS_ReferenceValidation(t *testing.T) {
 
 	ctx := pkgctx.NewSystemContext()
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	}
 
 	// Create referenced object first (objective required for scenario; promote off draft plane).
@@ -249,7 +249,7 @@ func TestCAS_GetObjectFilePathForReferenceValidation(t *testing.T) {
 
 	ctx := pkgctx.NewSystemContext()
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	}
 
 	// Create an object

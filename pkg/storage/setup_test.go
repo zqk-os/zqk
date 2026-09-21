@@ -24,7 +24,7 @@ func TestMain(m *testing.M) {
 		_ = zqkenv.TestMetricsRecording().Set("1")
 	}
 	_ = os.Setenv(zqkenv.AdminBrandKey("TEST_INIT_API_KEY"), "mock_token")
-	_ = zqkenv.APIKey().Set("ACC-1785920548450214012-68b850c0")
+	_ = zqkenv.APIKey().Set("ACC-SYSTEM")
 	// TestMain has no *testing.T, so these are process-scoped; the key list is shared with the
 	// t.Setenv call sites via zqkenv so no test hardcodes the socket path.
 	zqkenv.ApplyIsolatedStorageEnv(zqkenv.OSEnvSetter)

@@ -88,7 +88,7 @@ func TestFlattenUpdatePaths(t *testing.T) {
 			name: "skips metadata",
 			updates: map[string]any{
 				objects.FieldKeyUpdatedAt: "2030-01-01T00:00:00Z",
-				objects.FieldKeyUpdatedBy: "ACC-1785920548450214012-68b850c0",
+				objects.FieldKeyUpdatedBy: "ACC-SYSTEM",
 				objects.FieldKeyTitle:     "t",
 			},
 			want: []string{"title"},

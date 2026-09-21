@@ -123,7 +123,7 @@ func TestEntryMapsFromEntries(t *testing.T) {
 			objects.FieldKeyObjectRef:    "backlog_item:BLI-001",
 			objects.FieldKeyChangeType:   "update",
 			objects.FieldKeyCreatedAt:    "2030-02-01T12:00:00Z",
-			objects.FieldKeyCreatedBy:    "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyCreatedBy:    "ACC-SYSTEM",
 			objects.FieldKeyChangedPaths: []any{"status", "title"},
 		},
 	}
@@ -159,9 +159,9 @@ func TestCompactChangeJournalWindow(t *testing.T) {
 
 	t.Run("builds dictionary and writes one artifact", func(t *testing.T) {
 		entries := []map[string]any{
-			{objects.FieldKeyID: "CHA-1", objects.FieldKeyObjectRef: "backlog_item:BLI-001", objects.FieldKeyChangeType: "update", objects.FieldKeyCreatedAt: "2030-02-01T10:00:00Z", objects.FieldKeyCreatedBy: "ACC-1785920548450214012-68b850c0", objects.FieldKeyChangedPaths: []any{"status"}},
-			{objects.FieldKeyID: "CHA-2", objects.FieldKeyObjectRef: "backlog_item:BLI-002", objects.FieldKeyChangeType: "update", objects.FieldKeyCreatedAt: "2030-02-01T11:00:00Z", objects.FieldKeyCreatedBy: "ACC-1785920548450214012-68b850c0", objects.FieldKeyChangedPaths: []any{"status", "title"}},
-			{objects.FieldKeyID: "CHA-3", objects.FieldKeyObjectRef: "backlog_item:BLI-003", objects.FieldKeyChangeType: "update", objects.FieldKeyCreatedAt: "2030-02-01T12:00:00Z", objects.FieldKeyCreatedBy: "ACC-1785920548450214012-68b850c0", objects.FieldKeyChangedPaths: []any{"status"}},
+			{objects.FieldKeyID: "CHA-1", objects.FieldKeyObjectRef: "backlog_item:BLI-001", objects.FieldKeyChangeType: "update", objects.FieldKeyCreatedAt: "2030-02-01T10:00:00Z", objects.FieldKeyCreatedBy: "ACC-SYSTEM", objects.FieldKeyChangedPaths: []any{"status"}},
+			{objects.FieldKeyID: "CHA-2", objects.FieldKeyObjectRef: "backlog_item:BLI-002", objects.FieldKeyChangeType: "update", objects.FieldKeyCreatedAt: "2030-02-01T11:00:00Z", objects.FieldKeyCreatedBy: "ACC-SYSTEM", objects.FieldKeyChangedPaths: []any{"status", "title"}},
+			{objects.FieldKeyID: "CHA-3", objects.FieldKeyObjectRef: "backlog_item:BLI-003", objects.FieldKeyChangeType: "update", objects.FieldKeyCreatedAt: "2030-02-01T12:00:00Z", objects.FieldKeyCreatedBy: "ACC-SYSTEM", objects.FieldKeyChangedPaths: []any{"status"}},
 		}
 		result, err := CompactChangeJournalWindow(entries, dir, windowStart, windowEnd, logger)
 		if err != nil {

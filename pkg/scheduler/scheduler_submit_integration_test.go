@@ -45,9 +45,9 @@ func TestScheduler_SubmitJob_CreatesJob(t *testing.T) {
 		objects.FieldKeyRetryCount:        0,
 		objects.FieldKeyRetryDelaySeconds: 5,
 		objects.FieldKeyCreatedAt:         zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ),
-		objects.FieldKeyCreatedBy:         "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:         "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:         zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ),
-		objects.FieldKeyUpdatedBy:         "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:         "ACC-SYSTEM",
 		objects.FieldKeyOriginProject:     "zqk",
 		objects.FieldKeyOriginSystem:      "zqk",
 	}
@@ -144,9 +144,9 @@ func TestScheduler_SubmitJob_WithSchedulerRunning(t *testing.T) {
 		objects.FieldKeyCommandArgs:       []string{"test"},
 		objects.FieldKeyRetryCount:        0,
 		objects.FieldKeyCreatedAt:         zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ),
-		objects.FieldKeyCreatedBy:         "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:         "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:         zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ),
-		objects.FieldKeyUpdatedBy:         "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:         "ACC-SYSTEM",
 		objects.FieldKeyOriginProject:     "zqk",
 		objects.FieldKeyOriginSystem:      "zqk",
 	}

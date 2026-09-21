@@ -21,7 +21,7 @@ func (m *mockOverrideStorage) Create(ctx context.Context, secCtx *pkgctx.Securit
 func TestEnforceOverrideFriction(t *testing.T) {
 	cmd := NewCommandBuilder("test").Build()
 	ctx := context.Background()
-	secCtx := &pkgctx.SecurityContext{AccountID: "ACC-1785920548450214012-68b850c0"}
+	secCtx := &pkgctx.SecurityContext{AccountID: "ACC-SYSTEM"}
 	store := &mockOverrideStorage{}
 
 	reason := "This is a long descriptive reason containing at least five words and thirty characters to bypass the lifecycle rules."

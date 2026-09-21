@@ -55,9 +55,9 @@ func TestObjectWriteBehindWorker_SecurityContext(t *testing.T) {
 		objects.FieldKeyStatus:        objects.ObjectStatusExploring,
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyCreatedAt:     zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
 
 	// Create object (enqueued to write-behind buffer)
@@ -130,9 +130,9 @@ func TestObjectWriteBehindWorker_ApplyOperationsWithSystemContext(t *testing.T) 
 		objects.FieldKeyStatus:        objects.ObjectStatusExploring,
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyCreatedAt:     zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
 	createCtx := pkgctx.WithCacheUpdate(ctx, id1, "backlog_item", "")
 	if err := st.Create(createCtx, secCtx, obj1); err != nil {
@@ -148,9 +148,9 @@ func TestObjectWriteBehindWorker_ApplyOperationsWithSystemContext(t *testing.T) 
 		objects.FieldKeyStatus:        objects.ObjectStatusExploring,
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyCreatedAt:     zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
 	createCtx2 := pkgctx.WithCacheUpdate(ctx, id2, "backlog_item", "")
 	if err := st.Create(createCtx2, secCtx, obj2); err != nil {
@@ -173,9 +173,9 @@ func TestObjectWriteBehindWorker_ApplyOperationsWithSystemContext(t *testing.T) 
 		objects.FieldKeyStatus:        objects.ObjectStatusExploring,
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyCreatedAt:     zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
 	createCtx3 := pkgctx.WithCacheUpdate(ctx, id3, "backlog_item", "")
 	if err := st.Create(createCtx3, secCtx, obj3); err != nil {
@@ -245,9 +245,9 @@ func TestObjectWriteBehindWorker_NoNilPointerDereference(t *testing.T) {
 			objects.FieldKeyStatus:        objects.ObjectStatusExploring,
 			objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 			objects.FieldKeyCreatedAt:     zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ),
-			objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 			objects.FieldKeyUpdatedAt:     zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ),
-			objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 		}
 		createCtx := pkgctx.WithCacheUpdate(ctx, id, "backlog_item", "")
 		if err := st.Create(createCtx, secCtx, obj); err != nil {

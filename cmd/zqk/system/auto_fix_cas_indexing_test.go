@@ -66,9 +66,9 @@ schema_version: "` + objects.DefaultSchemaVersion + `"
 title: Test Criteria
 category: test
 created_at: "2026-01-14T00:00:00Z"
-created_by: ACC-1785920548450214012-68b850c0
+created_by: ACC-SYSTEM
 updated_at: "2026-01-14T00:00:00Z"
-updated_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-SYSTEM
 namespace_id: zqk:kernel
 `
 
@@ -232,9 +232,9 @@ schema_version: "` + objects.DefaultSchemaVersion + `"
 title: Test Criteria 2
 category: test
 created_at: "2026-01-14T00:00:00Z"
-created_by: ACC-1785920548450214012-68b850c0
+created_by: ACC-SYSTEM
 updated_at: "2026-01-14T00:00:00Z"
-updated_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-SYSTEM
 namespace_id: zqk:kernel
 `
 

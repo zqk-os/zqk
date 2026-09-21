@@ -24,7 +24,7 @@ func minimalBacklogItemForWriteBehind(id string) map[string]any {
 	return map[string]any{
 		objects.FieldKeyID: id, objects.FieldKeyKind: "backlog_item", objects.FieldKeyTitle: "Write-behind test",
 		objects.FieldKeyStatus: objects.ObjectStatusExploring, objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
-		objects.FieldKeyCreatedAt: now, objects.FieldKeyCreatedBy: "ACC-1785920548450214012-68b850c0", objects.FieldKeyUpdatedAt: now, objects.FieldKeyUpdatedBy: "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedAt: now, objects.FieldKeyCreatedBy: "ACC-SYSTEM", objects.FieldKeyUpdatedAt: now, objects.FieldKeyUpdatedBy: "ACC-SYSTEM",
 	}
 }
 

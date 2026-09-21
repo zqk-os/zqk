@@ -42,8 +42,8 @@ recovered_jobs: 0
 cron_restarts: 0
 created_at: "2026-01-04T20:15:14Z"
 updated_at: "2026-01-04T20:15:14Z"
-created_by: ACC-1785920548450214012-68b850c0
-updated_by: ACC-1785920548450214012-68b850c0
+created_by: ACC-SYSTEM
+updated_by: ACC-SYSTEM
 `
 
 	if err := fileutil.WriteFile(testFile, []byte(originalContent), paths.FilePerm644); err != nil { //nolint:gosec // Test files - 0600 is acceptable
@@ -83,8 +83,8 @@ recovered_jobs: 0
 cron_restarts: 0
 created_at: "2026-01-04T20:15:14Z"
 updated_at: "2026-01-04T20:15:14Z"
-created_by: ACC-1785920548450214012-68b850c0
-updated_by: ACC-1785920548450214012-68b850c0
+created_by: ACC-SYSTEM
+updated_by: ACC-SYSTEM
 `
 
 	if err := fileutil.WriteFile(testFile, []byte(modifiedContent), paths.FilePerm644); err != nil { //nolint:gosec // Test files - 0600 is acceptable

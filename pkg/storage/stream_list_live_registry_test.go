@@ -94,7 +94,7 @@ func TestListStreamSegmentsIgnoresGhostsAfterDeletedTruncated(t *testing.T) {
 		_ = store.Shutdown(ctx)
 	})
 
-	sec := &pkgctx.SecurityContext{AccountID: "ACC-1785920548450214012-68b850c0"}
+	sec := &pkgctx.SecurityContext{AccountID: "ACC-SYSTEM"}
 	sctx := pkgctx.NewStorageContext()
 	result, err := store.List(context.Background(), sec, sctx, ListFilter{Kind: kind, Limit: 10})
 	if err != nil {

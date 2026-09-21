@@ -51,7 +51,7 @@ func TestCAS_BucketedStorage_AuditEvent(t *testing.T) {
 
 	ctx := pkgctx.NewSystemContext()
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	}
 
 	// Create metrics events in different months to test bucketing
@@ -68,9 +68,9 @@ func TestCAS_BucketedStorage_AuditEvent(t *testing.T) {
 			objects.FieldKeyKind:            "base_metric",
 			objects.FieldKeySchemaVersion:   objects.DefaultSchemaVersion,
 			objects.FieldKeyCreatedAt:       now.Format(time.RFC3339),
-			objects.FieldKeyCreatedBy:       "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyCreatedBy:       "ACC-SYSTEM",
 			objects.FieldKeyUpdatedAt:       now.Format(time.RFC3339),
-			objects.FieldKeyUpdatedBy:       "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyUpdatedBy:       "ACC-SYSTEM",
 			objects.FieldKeyOriginSystem:    validation.DefaultOriginSystem,
 			objects.FieldKeyOriginProject:   validation.DefaultOriginProject,
 			objects.FieldKeyStatus:          objects.ObjectStatusImplemented,
@@ -87,9 +87,9 @@ func TestCAS_BucketedStorage_AuditEvent(t *testing.T) {
 			objects.FieldKeyKind:            "base_metric",
 			objects.FieldKeySchemaVersion:   objects.DefaultSchemaVersion,
 			objects.FieldKeyCreatedAt:       now.AddDate(0, -1, 0).Format(time.RFC3339),
-			objects.FieldKeyCreatedBy:       "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyCreatedBy:       "ACC-SYSTEM",
 			objects.FieldKeyUpdatedAt:       now.AddDate(0, -1, 0).Format(time.RFC3339),
-			objects.FieldKeyUpdatedBy:       "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyUpdatedBy:       "ACC-SYSTEM",
 			objects.FieldKeyOriginSystem:    validation.DefaultOriginSystem,
 			objects.FieldKeyOriginProject:   validation.DefaultOriginProject,
 			objects.FieldKeyStatus:          objects.ObjectStatusImplemented,
@@ -106,9 +106,9 @@ func TestCAS_BucketedStorage_AuditEvent(t *testing.T) {
 			objects.FieldKeyKind:            "base_metric",
 			objects.FieldKeySchemaVersion:   objects.DefaultSchemaVersion,
 			objects.FieldKeyCreatedAt:       now.AddDate(0, -2, 0).Format(time.RFC3339),
-			objects.FieldKeyCreatedBy:       "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyCreatedBy:       "ACC-SYSTEM",
 			objects.FieldKeyUpdatedAt:       now.AddDate(0, -2, 0).Format(time.RFC3339),
-			objects.FieldKeyUpdatedBy:       "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyUpdatedBy:       "ACC-SYSTEM",
 			objects.FieldKeyOriginSystem:    validation.DefaultOriginSystem,
 			objects.FieldKeyOriginProject:   validation.DefaultOriginProject,
 			objects.FieldKeyStatus:          objects.ObjectStatusImplemented,
@@ -258,7 +258,7 @@ func TestCAS_BucketedStorage_OnTheFlyCreation(t *testing.T) {
 
 	ctx := pkgctx.NewSystemContext()
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	}
 
 	// Create metrics events with different created_at dates to test automatic bucketing
@@ -291,9 +291,9 @@ func TestCAS_BucketedStorage_OnTheFlyCreation(t *testing.T) {
 			objects.FieldKeyKind:            "base_metric",
 			objects.FieldKeySchemaVersion:   objects.DefaultSchemaVersion,
 			objects.FieldKeyCreatedAt:       tc.createdAt.Format(time.RFC3339),
-			objects.FieldKeyCreatedBy:       "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyCreatedBy:       "ACC-SYSTEM",
 			objects.FieldKeyUpdatedAt:       tc.createdAt.Format(time.RFC3339),
-			objects.FieldKeyUpdatedBy:       "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyUpdatedBy:       "ACC-SYSTEM",
 			objects.FieldKeyOriginSystem:    validation.DefaultOriginSystem,
 			objects.FieldKeyOriginProject:   validation.DefaultOriginProject,
 			objects.FieldKeyStatus:          objects.ObjectStatusImplemented,
@@ -398,7 +398,7 @@ func TestCAS_BucketedStorage_Update(t *testing.T) {
 
 	ctx := pkgctx.NewSystemContext()
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	}
 
 	// Create an metrics event
@@ -409,9 +409,9 @@ func TestCAS_BucketedStorage_Update(t *testing.T) {
 		objects.FieldKeyKind:            "base_metric",
 		objects.FieldKeySchemaVersion:   objects.DefaultSchemaVersion,
 		objects.FieldKeyCreatedAt:       now.Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:       "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:       "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:       now.Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:       "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:       "ACC-SYSTEM",
 		objects.FieldKeyOriginSystem:    validation.DefaultOriginSystem,
 		objects.FieldKeyOriginProject:   validation.DefaultOriginProject,
 		objects.FieldKeyStatus:          objects.ObjectStatusImplemented,
@@ -459,7 +459,7 @@ func TestCAS_BucketedStorage_Update(t *testing.T) {
 	// Update the event
 	event[objects.FieldKeyCollectionCount] = 2
 	event[objects.FieldKeyUpdatedAt] = now.Add(1 * time.Hour).Format(time.RFC3339)
-	event[objects.FieldKeyUpdatedBy] = "ACC-1785920548450214012-68b850c0"
+	event[objects.FieldKeyUpdatedBy] = "ACC-SYSTEM"
 
 	err = fileStorage.Update(ctx, secCtx, "BAS-001", event)
 	if err != nil {

@@ -25,18 +25,11 @@ const accountRefPrefix = "acc-"
 // prototypeAccountIDMarkers are substrings in an ACC-* suffix that mark a prototype/test account.
 var prototypeAccountIDMarkers = []string{"proto", "test", "mock", "dev", "sbox", "pvt"}
 
-// defaultPrototypeAccountRefs are the fixture accounts shipped by the bootstrap seed whose IDs
-// carry no "proto"/"test" marker, so the heuristic below cannot catch them. They are a
-// *replaceable default*, not a fixed truth: deployments override or extend the set with
+// defaultPrototypeAccountRefs is empty: well-known fixture IDs carry a "test"/"proto"
+// marker (ACC-TEST-USER, ACC-TEST-AGENT) and are caught by prototypeAccountIDMarkers.
+// Deployments that still seed opaque IDs register them with
 // [RegisterPrototypeAccountRefs] or the PROTOTYPE_ACCOUNT_REFS env list.
-//
-// TRACK: the durable fix is resolving the ref against the
-// account index (a prototype or ghost account is one that does not resolve to a real, non-fixture
-// account object) instead of matching IDs the kernel has memorized.
-var defaultPrototypeAccountRefs = []string{
-	"ACC-" + "1785920548450214015" + "-" + "3df55bd1", // seeded fixture: test-user
-	"ACC-" + "1785920548450214016" + "-" + "ace2aae1", // seeded fixture: test-agent
-}
+var defaultPrototypeAccountRefs = []string{}
 
 var (
 	prototypeAccountRefsMu   sync.RWMutex

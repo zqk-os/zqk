@@ -16,7 +16,7 @@ fields:
       dependencies: account object
       observability: "yes"
       origin_lifecycle: immutable
-      purpose: Account that owns this session (e.g. ACC-1785920548450214012-68b850c0 or logged-in user)
+      purpose: Account that owns this session (e.g. ACC-SYSTEM or logged-in user)
       security: non-sensitive
       system_usage:
         - session attribution

@@ -198,7 +198,7 @@ func buildFollowupDraftConvergenceSessionObject(priorSessionID string, prior map
 	}
 
 	// Build() applies spec defaults (timestamps, origin, etc.); ID is stripped for storage Create.
-	b.SetID("CVS-" + "1776000000000000999" + "-" + "aabbccdd")
+	b.SetID("CVS-TEST-TERMINAL-TICK")
 	obj, err := b.Build()
 	if err != nil {
 		out := b.ToEventMap()

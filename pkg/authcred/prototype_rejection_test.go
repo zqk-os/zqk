@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	hashTestUser2    = "ACC-1785920548450214015-3df55bd1"
-	hashTestAgent2   = "ACC-1785920548450214016-ace2aae1"
+	hashTestUser2    = "ACC-TEST-USER"
+	hashTestAgent2   = "ACC-TEST-AGENT"
 	validHexSuffix2  = "ACC-1785920548450214015-deadbeef1234"
 	validStandardID2 = "ACC-999"
 )
@@ -113,7 +113,7 @@ func TestValidateOwnerRefProduction_DeterministicErrorUnit(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error for prototype hash")
 	}
-	expected := "owner_ref \"ACC-1785920548450214015-3df55bd1\" is a prototype/test account and is not allowed in production"
+	expected := "owner_ref \"ACC-TEST-USER\" is a prototype/test account and is not allowed in production"
 	if err.Error() != expected {
 		t.Errorf("got  %q\nwant %q", err.Error(), expected)
 	}

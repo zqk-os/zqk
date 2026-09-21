@@ -23,7 +23,7 @@ import (
 )
 
 // highRiskBashPolicyID is the kernel POL whose body lists extra high-risk bash tokens.
-const highRiskBashPolicyID = "POL-CODE-" + "1784813784308316000" + "-" + "9ec597bf"
+const highRiskBashPolicyID = "POL-CODE-HIGH-RISK-BASH-001"
 
 // fileSandboxRoot is where write/read/bash file I/O lands. Isolated ATK
 // worktrees set AGENT_WORKTREE_ROOT so the kernel PROJECT_ROOT (sessions,

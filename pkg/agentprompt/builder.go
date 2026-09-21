@@ -16,7 +16,7 @@ import (
 )
 
 // OnboardingPromptTemplateID is the canonical ID for the onboarding prompt
-const OnboardingPromptTemplateID = "PROMPT-" + "1775443238169278000" + "-" + "3db7d1ea"
+const OnboardingPromptTemplateID = "PROMPT-ONBOARDING"
 
 // BuildOnboardingPrompt builds a vectorized, topologically sorted onboarding prompt.
 func BuildOnboardingPrompt(ctx context.Context, sp storage.ObjectStorageProvider, budget int) (string, error) {
@@ -282,7 +282,7 @@ func BuildTaskPrompt(ctx context.Context, sp storage.ObjectStorageProvider, secC
 }
 
 // SentinelPromptTemplateID is the canonical ID for the CAP Sentinel prompt template.
-const SentinelPromptTemplateID = "PROMPT-" + "1783091834904015000" + "-" + "066e0f7d"
+const SentinelPromptTemplateID = "PROMPT-SENTINEL"
 
 // defaultSentinelTokenBudget is a conservative budget for small local LLMs (Qwen, Ollama 7B, etc.).
 // Larger models (Llama 70B, hosted APIs) should pass a higher TokenBudget via SentinelPromptOptions.
