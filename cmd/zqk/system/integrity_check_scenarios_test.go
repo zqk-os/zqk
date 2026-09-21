@@ -14,6 +14,7 @@ import (
 	"github.com/spf13/cobra"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/migration/parser"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -344,7 +345,7 @@ func TestIntegrityCheck_RegistryLocationValidation(t *testing.T) {
 
 	// Test bucketed object with registry in wrong location
 	t.Run("BucketedObject_WrongRegistryLocation", func(t *testing.T) {
-		auditBaseDir := filepath.Join(testRoot, paths.ProcessAuditDir)
+		auditBaseDir := datacell.StreamCurrentKindDir(testRoot, objects.KindAuditEvent)
 		bucketDir := filepath.Join(auditBaseDir, month)
 		if err := fileutil.MkdirAll(bucketDir, paths.DirPerm755); err != nil {
 			t.Fatalf("Failed to create bucket directory: %v", err)

@@ -27,7 +27,6 @@ func TestProcessDirectoryDerivation(t *testing.T) {
 		"ProcessInternalObjectSpecsDir": ProcessInternalObjectSpecsDir,
 		"ProcessPoliciesDir":            ProcessPoliciesDir,
 		"ProcessPlanningDir":            ProcessPlanningDir,
-		"ProcessAuditDir":               ProcessAuditDir,
 		"ProcessAccountsDir":            ProcessAccountsDir,
 		"ProcessBacklogDir":             ProcessBacklogDir,
 		"ProcessGoalsDir":               ProcessGoalsDir,

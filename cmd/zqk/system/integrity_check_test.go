@@ -16,6 +16,7 @@ import (
 	"github.com/spf13/cobra"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/migration/parser"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -522,7 +523,7 @@ func TestIntegrityCheck_AuditEventGeneration(t *testing.T) {
 	})
 
 	// Create audit directory
-	auditDir := filepath.Join(testRoot, paths.ProcessAuditDir, time.Now().Format("2006-01"))
+	auditDir := filepath.Join(datacell.StreamCurrentKindDir(testRoot, objects.KindAuditEvent), time.Now().Format("2006-01"))
 	if err := fileutil.MkdirAll(auditDir, paths.DirPerm755); err != nil {
 		t.Fatalf("Failed to create audit directory: %v", err)
 	}

@@ -18,6 +18,7 @@ import (
 
 	cli "github.com/zqk-os/zqk/internal/cli"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/migration/parser"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -782,7 +783,7 @@ status: exploring
 	}
 
 	// Audit events are written asynchronously via the coordinator; poll for directory/entries
-	auditDir := filepath.Join(projectRoot, paths.ProcessAuditDir)
+	auditDir := datacell.StreamCurrentKindDir(projectRoot, objects.KindAuditEvent)
 	var entries []fileutil.DirEntry
 	for deadline := time.Now().Add(2 * time.Second); time.Now().Before(deadline); {
 		//nolint:errcheck // Test cleanup - errors are acceptable
@@ -948,7 +949,7 @@ func TestCheckAuditEventCreation(t *testing.T) {
 		t.Fatalf("Failed to create file storage: %v", err)
 	}
 
-	auditBase := filepath.Join(projectRoot, paths.ProcessAuditDir)
+	auditBase := datacell.StreamCurrentKindDir(projectRoot, objects.KindAuditEvent)
 	if err := fileutil.MkdirAll(auditBase, paths.DirPerm755); err != nil {
 		t.Fatalf("Failed to create audit dir: %v", err)
 	}

@@ -13,6 +13,7 @@ import (
 
 	"github.com/zqk-os/zqk/internal/cli"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/pipeline"
@@ -33,7 +34,7 @@ func TestAsyncValidation_HashRegistryCacheDeadlock(t *testing.T) {
 	tmpDir := proj.Root
 
 	// Create test directory structure for bucketed objects
-	auditDir := filepath.Join(tmpDir, paths.ProcessAuditDir, "2026-01")
+	auditDir := filepath.Join(datacell.StreamCurrentKindDir(tmpDir, objects.KindAuditEvent), "2026-01")
 	if err := fileutil.MkdirAll(auditDir, paths.DirPerm755); err != nil {
 		t.Fatalf("Failed to create audit directory: %v", err)
 	}
@@ -88,7 +89,7 @@ created_by: "ACC-SYSTEM"
 	// This mimics the exact code path that caused the deadlock
 	validationFunc := func(stdCtx context.Context, objectID, objectKind, filePath string, content []byte) (*validation.ValidationState, error) {
 		// Simulate the exact code path from async_check.go that caused the deadlock
-		kindDir := filepath.Join(tmpDir, paths.ProcessAuditDir)
+		kindDir := datacell.StreamCurrentKindDir(tmpDir, objects.KindAuditEvent)
 		fileDir := filepath.Dir(filePath)
 		isBucketed := kindDir != emptyValue && fileDir != kindDir
 
@@ -178,7 +179,7 @@ func TestAsyncValidation_HashRegistryCacheConcurrentAccess(t *testing.T) {
 	cmd := createTestCommandWithContext(t, tmpDir)
 
 	// Create test directory structure
-	auditDir := filepath.Join(tmpDir, paths.ProcessAuditDir, "2026-01")
+	auditDir := filepath.Join(datacell.StreamCurrentKindDir(tmpDir, objects.KindAuditEvent), "2026-01")
 	if err := fileutil.MkdirAll(auditDir, paths.DirPerm755); err != nil {
 		t.Fatalf("Failed to create audit directory: %v", err)
 	}
@@ -356,7 +357,7 @@ func TestAsyncValidation_MultipleBucketedObjects(t *testing.T) {
 	tmpDir := proj.Root
 
 	// Create test directory structure
-	auditDir := filepath.Join(tmpDir, paths.ProcessAuditDir, "2026-01")
+	auditDir := filepath.Join(datacell.StreamCurrentKindDir(tmpDir, objects.KindAuditEvent), "2026-01")
 	if err := fileutil.MkdirAll(auditDir, paths.DirPerm755); err != nil {
 		t.Fatalf("Failed to create audit directory: %v", err)
 	}
@@ -414,7 +415,7 @@ created_by: "ACC-SYSTEM"
 
 	// Create validation function
 	validationFunc := func(stdCtx context.Context, objectID, objectKind, filePath string, content []byte) (*validation.ValidationState, error) {
-		kindDir := filepath.Join(tmpDir, paths.ProcessAuditDir)
+		kindDir := datacell.StreamCurrentKindDir(tmpDir, objects.KindAuditEvent)
 		fileDir := filepath.Dir(filePath)
 		isBucketed := kindDir != emptyValue && fileDir != kindDir
 

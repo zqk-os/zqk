@@ -17,6 +17,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/storage/audit"
 	"github.com/zqk-os/zqk/pkg/testkit"
 	"github.com/zqk-os/zqk/pkg/zqktime"
 
@@ -77,7 +78,7 @@ func TestBatchInternalUpdate_ConcurrentDeadlockDetection(t *testing.T) {
 	ctx := pkgctx.NewSystemContext()
 
 	// Create test directory for audit events (simulating internal objects)
-	auditDir := filepath.Join(testRoot, paths.ProcessAuditDir, "2026-01")
+	auditDir := filepath.Join(audit.KindDir(testRoot), "2026-01")
 	if err := fileutil.MkdirAll(auditDir, paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create audit directory: %v", err)
 	}
@@ -223,7 +224,7 @@ func TestBatchInternalUpdate_SequentialNoDeadlock(t *testing.T) {
 	secCtx := pkgctx.NewSecurityContext("ACC-TEST", []string{"admin"}, []string{"read:*", "write:*"})
 	ctx := pkgctx.NewSystemContext()
 
-	auditDir := filepath.Join(testRoot, paths.ProcessAuditDir, "2026-01")
+	auditDir := filepath.Join(audit.KindDir(testRoot), "2026-01")
 	if err := fileutil.MkdirAll(auditDir, paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create audit directory: %v", err)
 	}

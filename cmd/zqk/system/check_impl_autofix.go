@@ -931,7 +931,7 @@ func markAllInternalObjectsAsRecentlyUpdated(ctx *cli.Context) {
 	}
 
 	// Mark all audit events in the current month as recently updated
-	auditDir := filepath.Join(projectRoot, paths.ProcessAuditDir, month)
+	auditDir := datacell.StreamCurrentKindDir(projectRoot, objects.KindAuditEvent)
 	if entries, err := fileutil.ReadDir(auditDir); err == nil {
 		for _, entry := range entries {
 			if entry.IsDir() {

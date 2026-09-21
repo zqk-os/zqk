@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
@@ -38,7 +39,7 @@ func TestHashRegistryLocationForBucketedObjects(t *testing.T) {
 
 	// Test audit_event (bucketed object)
 	month := "2025-12"
-	auditDir := filepath.Join(projectRoot, paths.ProcessAuditDir, month)
+	auditDir := filepath.Join(datacell.StreamCurrentKindDir(projectRoot, objects.KindAuditEvent), month)
 	if err := fileutil.MkdirAll(auditDir, paths.DirPerm755); err != nil {
 		t.Fatalf("Failed to create audit dir: %v", err)
 	}
@@ -77,7 +78,7 @@ created_at: "2025-12-29T16:00:00Z"
 	}
 
 	// Verify parent directory does NOT have a registry (or if it does, it doesn't have this hash)
-	parentDir := filepath.Join(projectRoot, paths.ProcessAuditDir)
+	parentDir := datacell.StreamCurrentKindDir(projectRoot, objects.KindAuditEvent)
 	parentRegistryFile := filepath.Join(parentDir, ".audit_event.hashes")
 	if _, err := fileutil.Stat(parentRegistryFile); err == nil {
 		// Parent registry exists - verify it doesn't have AUD-999
