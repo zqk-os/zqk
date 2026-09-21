@@ -95,6 +95,7 @@ test-unit:
 		./pkg/objects/... ./pkg/specorigination/... ./pkg/specbuilder/builders/... \
 		./pkg/validation/... ./pkg/tpm/... ./pkg/testdiscovery/... ./pkg/testkit/... \
 		./pkg/workflow/whatsnext \
+		./pkg/scheduler/... \
 		./cmd/zqk/app ./cmd/zqk/test ./cmd/zqk/docman ./cmd/zqk/automation \
 		./cmd/zqk/new ./cmd/zqk/inbox ./cmd/zqk/learn ./cmd/zqk/matrix ./cmd/zqk/mcp \
 		./cmd/zqk/mcp-simple ./cmd/zqk/mesh ./cmd/zqk/feed ./cmd/zqk/convergence \
@@ -119,7 +120,7 @@ test-unit-all:
 		./pkg/kernelcas ./pkg/lifecycle/... ./pkg/lockhealth/... ./pkg/observability/... \
 		./pkg/paths/... ./pkg/pipeline/... ./pkg/tray/... ./pkg/vds/... ./pkg/walutil/... \
 		./pkg/contextevents/... ./pkg/quality/... ./pkg/stampmemo/... ./pkg/zqkenv/... \
-		./pkg/objects/... ./pkg/validation/... ./cmd/zqk/test
+		./pkg/objects/... ./pkg/validation/... ./pkg/scheduler/... ./cmd/zqk/test
 
 test-integration: all
 	$(BRAND_ENV_PREFIX)_SHARED_TEST_BIN="$$(pwd)/$(BIN)" sh scripts/open-core/test-public-release-gates.sh
