@@ -43,11 +43,9 @@ jobs:
             ./pkg/contextevents/... ./pkg/quality/...
 
       - name: Generate Coverage Summary
+        if: always()
         run: |
-          echo "## Code Coverage Summary" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          go tool cover -func=coverage.out | tail -n 25 >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
+          python3 scripts/open-core/generate-coverage-summary.py coverage.out "Code Coverage Report"
 
       - name: Upload Coverage Artifact
         uses: actions/upload-artifact@v4

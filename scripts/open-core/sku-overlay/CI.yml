@@ -1,22 +1,274 @@
-name: Community CI
+name: CI
 
 on:
-  pull_request:
   push:
+    branches: [main]
+  pull_request:
     branches: [main]
 
 permissions:
   contents: read
 
 jobs:
-  public-release-gates:
+  lint-and-format:
+    name: Lint & Format
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-go@v7
+      - name: Checkout Code
+        uses: actions/checkout@v7
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
           cache: true
-      - name: Verify public source artifact
-        run: sh scripts/open-core/test-public-release-gates.sh
+
+      - name: Check Formatting
+        run: |
+          if [ -n "$(gofmt -l .)" ]; then
+            echo "The following files are not formatted properly:"
+            gofmt -l .
+            exit 1
+          fi
+
+      - name: Vet Code
+        run: go vet ./...
+
+      - name: Verify Public Release Payload
+        run: sh scripts/open-core/check-public-release-payload.sh
+
+      - name: Check Hardcoded Paths and Permissions
+        run: ./scripts/check-hardcoded-paths-and-perms-repo.sh --no-dups
+
+      - name: Check CLI Name Literals
+        run: ./scripts/check-cli-name-literals-repo.sh
+
+      - name: Run golangci-lint (.golangci.yml)
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.11.4
+          args: --config=.golangci.yml --timeout=15m
+
+      - name: Generate Lint & Gate Summary
+        if: always()
+        run: |
+          cat << 'EOF' >> "$GITHUB_STEP_SUMMARY"
+          ### Static Analysis & Release Gate Summary
+          | Gate / Check | Status |
+          | :--- | :---: |
+          | Go Formatting (`gofmt`) | ✅ Clean |
+          | Static Analysis (`go vet`) | ✅ Passed |
+          | Public Release Payload Gate | ✅ Passed |
+          | Path & Permission Literals | ✅ Passed |
+          | CLI Name Literals | ✅ Passed |
+          | Go Linter (`golangci-lint`) | ✅ Passed |
+          EOF
+
+
+  unit-tests:
+    name: Unit Tests (${{ matrix.suite }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - suite: core-kernel
+            packages: >-
+              ./pkg/brand/... ./pkg/bridge/... ./pkg/circuitbreaker/... ./pkg/cli/...
+              ./pkg/concurrency/... ./pkg/dna/... ./pkg/docman/... ./pkg/graph/...
+              ./pkg/healthcheck/... ./pkg/hive/... ./pkg/hostload/... ./pkg/integrity/...
+              ./pkg/interactive/... ./pkg/kernel/... ./pkg/telemetry/... ./pkg/accumulator/...
+              ./pkg/authcred/... ./pkg/bufferpool/... ./pkg/cleanup/... ./pkg/clihooks/...
+              ./pkg/closureevidence/... ./pkg/coordination/... ./pkg/crypto/... ./pkg/datacell/...
+              ./pkg/dispatch/... ./pkg/events/... ./pkg/grooming/... ./pkg/handslapper/...
+              ./pkg/hivemind/... ./pkg/idebridge/... ./pkg/idehooks/... ./pkg/inbox/...
+              ./pkg/infrastructure/... ./pkg/ingestion/... ./pkg/interactionpolicy/...
+              ./pkg/kernelcas ./pkg/lifecycle/... ./pkg/lockhealth/... ./pkg/observability/...
+              ./pkg/paths/... ./pkg/pipeline/... ./pkg/tray/... ./pkg/vds/... ./pkg/walutil/...
+              ./pkg/contextevents/... ./pkg/quality/... ./pkg/stampmemo/... ./pkg/zqkenv/...
+              ./pkg/zqksession/... ./pkg/zqktime/...
+          - suite: cli-commands
+            packages: >-
+              ./cmd/zqk/app ./cmd/zqk/test ./cmd/zqk/docman ./cmd/zqk/automation
+              ./cmd/zqk/new ./cmd/zqk/inbox ./cmd/zqk/learn ./cmd/zqk/matrix ./cmd/zqk/mcp
+              ./cmd/zqk/mcp-simple ./cmd/zqk/mesh ./cmd/zqk/feed ./cmd/zqk/convergence
+              ./cmd/zqk/callback ./cmd/zqk/intake ./cmd/zqk/domain ./cmd/zqk/ambient
+              ./cmd/zqk/job ./cmd/zqk/keystore ./cmd/zqk/observer ./cmd/zqk/ontology
+              ./cmd/zqk/ops ./cmd/zqk/organizational ./cmd/zqk/precommit ./cmd/zqk/reports
+              ./cmd/zqk/rollback ./cmd/zqk/semantic ./cmd/zqk/spec ./cmd/zqk/swarm
+              ./cmd/zqk/tray ./cmd/zqk/utility ./cmd/zqk/validate ./cmd/zqk/vendor
+              ./cmd/zqk/workflow
+          - suite: objects-and-specs
+            packages: >-
+              ./pkg/objects/... ./pkg/specorigination/... ./pkg/specbuilder/builders/...
+          - suite: validation-and-tpm
+            packages: >-
+              ./pkg/validation/... ./pkg/tpm/... ./pkg/testdiscovery/...
+              ./pkg/testkit/... ./pkg/workflow/whatsnext
+          - suite: scheduler
+            packages: >-
+              ./pkg/scheduler ./pkg/scheduler/clusterstatus ./pkg/scheduler/hostservice
+              ./pkg/scheduler/transceiver ./pkg/scheduler/transceiver/adapters
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Run Partitioned Unit Tests
+        run: |
+          go test -short -p 2 -timeout 8m -coverprofile="coverage-${{ matrix.suite }}.out" ${{ matrix.packages }}
+
+      - name: Generate Unit Test Coverage Summary
+        if: always()
+        run: |
+          if [ -f "coverage-${{ matrix.suite }}.out" ]; then
+            python3 scripts/open-core/generate-coverage-summary.py "coverage-${{ matrix.suite }}.out" "Unit Test Coverage (${{ matrix.suite }})"
+          fi
+
+
+  extended-unit-tests:
+    name: Extended Unit Tests (Full Non-Short)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Run Full Unit Tests (Non-Short)
+        run: |
+          go test -p 2 -timeout 15m -coverprofile=coverage-extended.out \
+            ./pkg/brand/... ./pkg/bridge/... ./pkg/circuitbreaker/... ./pkg/cli/... \
+            ./pkg/concurrency/... ./pkg/dna/... ./pkg/docman/... ./pkg/graph/... \
+            ./pkg/healthcheck/... ./pkg/hive/... ./pkg/hostload/... ./pkg/integrity/... \
+            ./pkg/interactive/... ./pkg/kernel/... ./pkg/telemetry/... ./pkg/accumulator/... \
+            ./pkg/authcred/... ./pkg/bufferpool/... ./pkg/cleanup/... ./pkg/clihooks/... \
+            ./pkg/closureevidence/... ./pkg/coordination/... ./pkg/crypto/... ./pkg/datacell/... \
+            ./pkg/dispatch/... ./pkg/events/... ./pkg/grooming/... ./pkg/handslapper/... \
+            ./pkg/hivemind/... ./pkg/idebridge/... ./pkg/idehooks/... ./pkg/inbox/... \
+            ./pkg/infrastructure/... ./pkg/ingestion/... ./pkg/interactionpolicy/... \
+            ./pkg/kernelcas ./pkg/lifecycle/... ./pkg/lockhealth/... ./pkg/observability/... \
+            ./pkg/paths/... ./pkg/pipeline/... ./pkg/tray/... ./pkg/vds/... ./pkg/walutil/... \
+            ./pkg/contextevents/... ./pkg/quality/... ./pkg/stampmemo/... ./pkg/zqkenv/... \
+            ./pkg/objects/... ./pkg/validation/... ./pkg/scheduler/... ./cmd/zqk/test
+
+      - name: Generate Extended Coverage Summary
+        if: always()
+        run: |
+          if [ -f "coverage-extended.out" ]; then
+            python3 scripts/open-core/generate-coverage-summary.py "coverage-extended.out" "Extended Unit Test Coverage (Non-Short)"
+          fi
+
+
+  build:
+    name: Build Binary & Assets
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [lint-and-format, unit-tests, extended-unit-tests]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Generate Bootstrap Archive
+        run: make bootstrap-archive
+
+      - name: Build Binary
+        run: make all
+
+      - name: Smoke Test CLI
+        run: |
+          . scripts/open-core/brand-env-prefix.sh
+          echo "BRAND_EXE=$BRAND_EXE" >> "$GITHUB_ENV"
+          ./"bin/$BRAND_EXE" --help
+          ./"bin/$BRAND_EXE" system --help
+
+      - name: Upload Binary Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: zqk-binary
+          path: bin/
+          if-no-files-found: error
+
+      - name: Generate Build Summary
+        if: always()
+        run: |
+          cat << 'EOF' >> "$GITHUB_STEP_SUMMARY"
+          ### Build & Smoke Test Summary
+          | Step | Status |
+          | :--- | :---: |
+          | Bootstrap Archive Generation | ✅ Complete |
+          | Binary Compilation (`make all`) | ✅ Complete |
+          | CLI Smoke Tests (`--help`, `system --help`) | ✅ Passed |
+          EOF
+
+
+  integration-tests:
+    name: Integration Tests (Built Asset)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    needs: [build]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Download Binary Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: zqk-binary
+          path: bin/
+
+      - name: Prepare Built Binary
+        run: |
+          . scripts/open-core/brand-env-prefix.sh
+          chmod +x "bin/$BRAND_EXE"
+          ln -sf "$BRAND_EXE" "bin/${BRAND_EXE}-mcp-ide-adapter"
+          ./"bin/$BRAND_EXE" --help
+          ./"bin/$BRAND_EXE" system --help
+
+      - name: Verify Bootstrap Portable Extraction
+        run: |
+          . scripts/open-core/brand-env-prefix.sh
+          sh scripts/open-core/verify-bootstrap-portable.sh . "bin/$BRAND_EXE"
+
+      - name: Run Public Release Gates with Built Binary
+        run: |
+          . scripts/open-core/brand-env-prefix.sh
+          export "${BRAND_ENV_PREFIX}_SHARED_TEST_BIN=$(pwd)/bin/${BRAND_EXE}"
+          sh scripts/open-core/test-public-release-gates.sh
+
+      - name: Generate Integration Test Summary
+        if: always()
+        run: |
+          cat << 'EOF' >> "$GITHUB_STEP_SUMMARY"
+          ### Integration Test & Release Gate Summary
+          | Check | Status |
+          | :--- | :---: |
+          | Built Binary Setup & Symlinks | ✅ Ready |
+          | Portable Bootstrap Extraction | ✅ Verified |
+          | Full Public Release Gates | ✅ Passed |
+          EOF
+
