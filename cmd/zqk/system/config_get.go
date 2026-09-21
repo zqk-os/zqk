@@ -49,10 +49,7 @@ func runConfigGet(cmd *cobra.Command, args []string) error {
 }
 
 func loadProjectConfig(projectRoot string) (map[string]any, error) {
-	for _, rel := range []string{
-		filepath.Join(paths.ProjectDataDir, paths.ConfigDir, "config.yaml"),
-		filepath.Join(paths.ProjectDataDir, "config.yaml"),
-	} {
+	for _, rel := range paths.ProjectYAMLConfigRelatives() {
 		p := filepath.Join(projectRoot, rel)
 		data, err := fileutil.ReadFile(p)
 		if err != nil {

@@ -32,9 +32,7 @@ func requireBootstrapPresent(t *testing.T, root string) {
 	objectSpecs := filepath.Join(root, paths.ProcessInternalObjectSpecsDir)
 	configsDir := filepath.Join(root, paths.ProcessInternalConfigsDir)
 	cliSpecs := filepath.Join(root, paths.CLICommandSpecsDir)
-	configDir := filepath.Join(root, paths.ProjectDataDir, paths.ConfigDir)
-	canonicalConfig := filepath.Join(configDir, paths.ProjectConfigFile)
-	legacyConfig := filepath.Join(root, paths.ProjectDataDir, paths.ProjectConfigFile)
+	canonicalConfig := filepath.Join(root, paths.ConfigDir, paths.ZqkConfigFileName)
 
 	// _internal: at least one object spec (may be in subdirs like kernel/, pm/, qa/)
 	var hasSpec bool
@@ -65,12 +63,9 @@ func requireBootstrapPresent(t *testing.T, root string) {
 		t.Errorf("bootstrap incomplete: %s missing id_prefixes or kind_mappings config", paths.ProcessInternalDir)
 	}
 
-	// Project config: canonical and legacy
+	// Project config: config/zqk.yaml
 	if _, err := fileutil.Stat(canonicalConfig); fileutil.IsNotExist(err) {
-		t.Errorf("bootstrap incomplete: %s not created", filepath.Join(paths.ProjectDataDir, paths.ConfigDir, paths.ProjectConfigFile))
-	}
-	if _, err := fileutil.Stat(legacyConfig); fileutil.IsNotExist(err) {
-		t.Errorf("bootstrap incomplete: %s not created", filepath.Join(paths.ProjectDataDir, paths.ProjectConfigFile))
+		t.Errorf("bootstrap incomplete: %s not created", filepath.Join(paths.ConfigDir, paths.ZqkConfigFileName))
 	}
 
 	// .zqk/cli/specs: required when binary has embedded archive (skip if missing)
@@ -165,9 +160,9 @@ func TestInit_Greenfield(t *testing.T) {
 		t.Errorf("%s directory was not created", paths.ProcessDir)
 	}
 
-	configPath := filepath.Join(projectDataDir, "config.yaml")
+	configPath := filepath.Join(tmpDir, paths.ConfigDir, paths.ZqkConfigFileName)
 	if _, err := fileutil.Stat(configPath); fileutil.IsNotExist(err) {
-		t.Error("config.yaml was not created")
+		t.Error("config/zqk.yaml was not created")
 	}
 
 	// Verify subdirectories

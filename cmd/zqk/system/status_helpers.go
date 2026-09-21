@@ -62,7 +62,7 @@ func getProjectRoot(ctx *cli.Context) (string, error) {
 // getProjectName extracts project name from config or directory
 func getProjectName(projectRoot string) string {
 	projectName := filepath.Base(projectRoot)
-	configPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.ProjectConfigFile)
+	configPath := paths.FirstProjectYAMLConfig(projectRoot)
 	if configData, err := fileutil.ReadFile(configPath); err == nil {
 		if name := extractProjectName(string(configData)); name != emptyValue {
 			projectName = name

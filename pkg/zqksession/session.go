@@ -369,10 +369,7 @@ var idleTimeouts stampmemo.Table[time.Duration] // keyed by projectRoot; stamp i
 
 // GetIdleTimeout reads the configured session idle timeout.
 func GetIdleTimeout(projectRoot string) time.Duration {
-	files := []string{
-		filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, paths.ProjectConfigFile),
-		filepath.Join(projectRoot, paths.ProjectDataDir, paths.ProjectConfigFile),
-	}
+	files := paths.ProjectYAMLConfigPaths(projectRoot)
 	d, _ := idleTimeouts.Load(projectRoot, stampmemo.OfAll(files...), func() (time.Duration, error) {
 		return readIdleTimeout(files), nil
 	})

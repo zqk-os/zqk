@@ -54,7 +54,7 @@ import (
 
 const EmptyValue = ""
 
-// projectConfigBootstrapYAML matches a subset of .zqk/config/config.yaml read during init for branding.
+// projectConfigBootstrapYAML matches a subset of config/zqk.yaml read during init for branding.
 // Struct tags carry YAML keys so we avoid map index literals that collide with object kind names in drift scans.
 type projectConfigBootstrapYAML struct {
 	Brand           *brandConfigBootstrapYAML `yaml:"brand,omitempty"`
@@ -613,7 +613,7 @@ func init() {
 	// can use the configured executable name.
 	//
 	// Priority:
-	// 1) brand.executable_name in project config (.zqk/config/config.yaml) if project root is discoverable
+	// 1) brand.executable_name in config/zqk.yaml if project root is discoverable
 	// 2) actual executable name (os.Args[0])
 	// 3) default ("zqk")
 	execName := "zqk"
@@ -623,30 +623,31 @@ func init() {
 	projectRoot := cli.ResolveProjectRoot(".")
 	namespacePrefix := strings.ToLower(execName)
 	if projectRoot != EmptyValue {
-		configPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, paths.ProjectConfigFile)
-		if data, err := fileutil.ReadFile(configPath); err == nil {
-			var cfg projectConfigBootstrapYAML
-			if err := yaml.Unmarshal(data, &cfg); err == nil {
-				if b := cfg.Brand; b != nil {
-					if b.ExecutableName != EmptyValue {
-						execName = b.ExecutableName
+		for _, configPath := range paths.ProjectYAMLConfigPaths(projectRoot) {
+			if data, err := fileutil.ReadFile(configPath); err == nil {
+				var cfg projectConfigBootstrapYAML
+				if err := yaml.Unmarshal(data, &cfg); err == nil {
+					if b := cfg.Brand; b != nil {
+						if b.ExecutableName != EmptyValue {
+							execName = b.ExecutableName
+						}
+						if b.ProductName != EmptyValue {
+							brand.SetProductName(b.ProductName)
+						}
+						if b.NamespacePrefix != EmptyValue {
+							namespacePrefix = b.NamespacePrefix
+						}
 					}
-					if b.ProductName != EmptyValue {
-						brand.SetProductName(b.ProductName)
+					// Also support top-level keys for backward compatibility.
+					if cfg.ExecutableName != EmptyValue {
+						execName = cfg.ExecutableName
 					}
-					if b.NamespacePrefix != EmptyValue {
-						namespacePrefix = b.NamespacePrefix
+					if cfg.ProductName != EmptyValue {
+						brand.SetProductName(cfg.ProductName)
 					}
-				}
-				// Also support top-level keys for backward compatibility.
-				if cfg.ExecutableName != EmptyValue {
-					execName = cfg.ExecutableName
-				}
-				if cfg.ProductName != EmptyValue {
-					brand.SetProductName(cfg.ProductName)
-				}
-				if cfg.NamespacePrefix != EmptyValue {
-					namespacePrefix = cfg.NamespacePrefix
+					if cfg.NamespacePrefix != EmptyValue {
+						namespacePrefix = cfg.NamespacePrefix
+					}
 				}
 			}
 		}
@@ -741,11 +742,8 @@ func rootPreRunInitFileLogging(cmd *cobra.Command, projectRoot string, isHelpCom
 			profile = profileMCP
 		} else {
 			// Check config file for profile and logging.level
-			// Try .zqk/config/config.yaml first, then .zqk/config.yaml (same order as GetErrorLogOutput)
-			for _, rel := range []string{
-				filepath.Join(paths.ProjectDataDir, paths.ConfigDir, paths.ProjectConfigFile),
-				filepath.Join(paths.ProjectDataDir, paths.ProjectConfigFile),
-			} {
+			// Check config/zqk.yaml first (legacy .zqk/config copies are fallbacks).
+			for _, rel := range paths.ProjectYAMLConfigRelatives() {
 				configPath := filepath.Join(projectRoot, rel)
 				data, err := fileutil.ReadFile(configPath)
 				if err != nil {

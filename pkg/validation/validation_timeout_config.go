@@ -1,7 +1,6 @@
 package validation
 
 import (
-	"path/filepath"
 	"time"
 
 	"gopkg.in/yaml.v3"
@@ -12,7 +11,7 @@ import (
 )
 
 // ValidationTimeoutConfig holds per-object validation timeout and system-check stuck threshold.
-// Loaded from .zqk/config/config.yaml under validation.per_object_timeout and validation.stuck_timeout_seconds.
+// Loaded from config/zqk.yaml under validation.per_object_timeout and validation.stuck_timeout_seconds.
 //
 // Budgets are fail-fast: a healthy object validates in milliseconds. Multi-second kind
 // overrides paper over lock contention and must not be the default (see SYSTEM_CHECK_RESOLUTION.md).
@@ -46,7 +45,7 @@ func DefaultValidationTimeoutConfig() *ValidationTimeoutConfig {
 }
 
 // LoadValidationTimeoutConfig loads timeout configuration from file.
-// Uses the same config file as tier config: .zqk/config/config.yaml under validation.per_object_timeout.
+// Uses the same config file as tier config: config/zqk.yaml under validation.per_object_timeout.
 func LoadValidationTimeoutConfig(configPath string) (*ValidationTimeoutConfig, error) {
 	if configPath == emptyValue {
 		configPath = findValidationConfigFile()
@@ -136,7 +135,7 @@ func (c *ValidationTimeoutConfig) TimeoutForKind(kind string) time.Duration {
 	return time.Duration(seconds) * time.Second
 }
 
-// findValidationConfigFile locates .zqk/config/config.yaml (same as tier config).
+// findValidationConfigFile locates config/zqk.yaml (legacy .zqk/config copies are fallbacks).
 func findValidationConfigFile() string {
-	return paths.FirstExistingFromCwd(filepath.Join(paths.ProjectDataDir, paths.ConfigDir, paths.ProjectConfigFile))
+	return paths.FirstExistingFromCwdAny(paths.ProjectYAMLConfigRelatives())
 }

@@ -2,7 +2,6 @@ package loader
 
 import (
 	"maps"
-	"path/filepath"
 	"time"
 
 	"gopkg.in/yaml.v3"
@@ -91,7 +90,7 @@ func DefaultLoaderTimeoutConfigMap() map[string]LoaderTimeoutConfig {
 var loaderTimeouts stampmemo.Table[map[string]LoaderTimeoutConfig] // keyed "global"; stamp is project config.yaml
 
 // LoadLoaderTimeoutConfig loads component loader timeouts from the project config file.
-// Path: .zqk/config/config.yaml under "component_loaders". Missing or invalid file returns defaults.
+// Path: config/zqk.yaml under "component_loaders". Missing or invalid file returns defaults.
 // Profile/thematic overrides are not applied here; call MergeLoaderTimeoutOverrides after with profile data.
 func LoadLoaderTimeoutConfig(configPath string) (map[string]LoaderTimeoutConfig, error) {
 	if configPath == emptyValue {
@@ -206,5 +205,5 @@ func intFromOverride(v any) int {
 }
 
 func findLoaderConfigFile() string {
-	return paths.FirstExistingFromCwd(filepath.Join(paths.ProjectDataDir, paths.ConfigDir, paths.ProjectConfigFile))
+	return paths.FirstExistingFromCwdAny(paths.ProjectYAMLConfigRelatives())
 }

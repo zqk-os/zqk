@@ -24,7 +24,7 @@ import (
 var reBucketDateDir = regexp.MustCompile(`^(\d{4}-\d{2}(-\d{2})?|[a-z0-9])$`)
 
 // validationTimeoutForKind returns the per-object validation timeout for a kind.
-// Uses config from .zqk/config/config.yaml validation.per_object_timeout (default_seconds, kind_overrides).
+// Uses config from config/zqk.yaml validation.per_object_timeout (default_seconds, kind_overrides).
 func validationTimeoutForKind(kind string) time.Duration {
 	return GetGlobalValidationTimeoutConfig().TimeoutForKind(kind)
 }

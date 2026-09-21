@@ -8,7 +8,7 @@ The CLI uses a layered context system with precedence:
 
 1. **System Defaults** (lowest precedence) - Built-in defaults
 2. **User Config** (`~/.zqk/config.yaml`) - User-level preferences
-3. **Project Config** (`.zqk/config.yaml`) - Project-specific settings
+3. **Project Config** (`config/zqk.yaml`) - Project-specific settings
 4. **Command Flags** (highest precedence) - Command-line arguments
 
 ### Context Profiles
@@ -36,7 +36,7 @@ verbose: false
 profile: ai-agent
 ```
 
-#### Project Config (`.zqk/config.yaml`)
+#### Project Config (`config/zqk.yaml`)
 ```yaml
 format: table
 priority_plan: PRI-208

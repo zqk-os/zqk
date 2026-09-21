@@ -372,7 +372,7 @@ func DefaultPathAliases() map[string]string {
 		"zqk":                                   ProjectDataDir,
 		".zqk":                                  ProjectDataDir,
 		"streams":                               filepath.Join(ProjectDataDir, StreamsDir),
-		"config":                                filepath.Join(ProjectDataDir, ConfigDir),
+		"config":                                ConfigDir,
 		"cache":                                 filepath.Join(ProjectDataDir, CacheDir),
 		"logs":                                  filepath.Join(ProjectDataDir, LogsDir),
 		"state":                                 filepath.Join(ProjectDataDir, StateDir),

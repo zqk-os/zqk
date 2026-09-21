@@ -54,11 +54,17 @@ const (
 	StudioNestedWorktreesDir = ".worktrees"
 
 	// Common subdirectories under ProjectDataDir
-	CacheDir  = "cache"
-	LogsDir   = "logs"
+	CacheDir = "cache"
+	LogsDir  = "logs"
+	// ConfigDir is the directory name "config".
+	// Joined with projectRoot it is the committed product config tree (SSOT).
+	// Joined with ProjectDataDir it is leftover kernel lite-files (.zqk/config).
+	// Do not add new YAML there.
+	// TRACK: docs/onboarding/COMMUNITY_FIRST_RUN.md — move agent/idle/chat/git-identity
+	// lite-files to StateDir when: no reader still joins ProjectDataDir+ConfigDir for YAML.
 	ConfigDir = "config"
 
-	// Canonical configuration files under ConfigDir ("config")
+	// Canonical configuration files under ConfigDir ("config") at project root.
 	ZqkConfigFileName      = "zqk.yaml"
 	ZqkLocalConfigFileName = "zqk-local.yaml"
 	ZqkTestConfigFileName  = "zqk-test.yaml"
@@ -166,7 +172,7 @@ const (
 	PathsConfigFile           = "paths_config.yaml"
 	NamespacesConfigFile      = "namespaces_config.yaml"
 	ScannerConfigFile         = "scanner_config.yaml"
-	CommandTimeoutsConfigFile = "command_timeouts.yaml" // Under ConfigDir or repo config/
+	CommandTimeoutsConfigFile = "command_timeouts.yaml" // Under repo-root ConfigDir
 	MCPLogsDir                = "logs"                  // Under MCPDir
 	MCPTraceLogPrefix         = "mcp-trace-"
 	LogEventsPrefix           = "log-events-"

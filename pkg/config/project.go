@@ -1,8 +1,6 @@
 package config
 
 import (
-	"path/filepath"
-
 	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -14,10 +12,7 @@ import (
 var legacyProjectYAML stampmemo.Table[map[string]any]
 
 func legacyProjectConfig(projectRoot string) map[string]any {
-	files := []string{
-		filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, paths.ProjectConfigFile),
-		filepath.Join(projectRoot, paths.ProjectDataDir, paths.ProjectConfigFile),
-	}
+	files := paths.ProjectYAMLConfigPaths(projectRoot)
 	cfg, _ := legacyProjectYAML.Load(projectRoot, stampmemo.OfAll(files...), func() (map[string]any, error) {
 		for _, p := range files {
 			data, err := fileutil.ReadFile(p)

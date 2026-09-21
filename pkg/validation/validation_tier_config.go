@@ -2,7 +2,6 @@ package validation
 
 import (
 	"fmt"
-	"path/filepath"
 
 	"gopkg.in/yaml.v3"
 
@@ -121,7 +120,7 @@ func GetGlobalValidationTierConfig() *ValidationTierConfig {
 
 // findValidationTierConfig searches for validation tier config file
 func findValidationTierConfig() string {
-	return paths.FirstExistingFromCwd(filepath.Join(paths.ProjectDataDir, paths.ConfigDir, paths.ProjectConfigFile))
+	return paths.FirstExistingFromCwdAny(paths.ProjectYAMLConfigRelatives())
 }
 
 // GetTierForRule returns the tier for a validation rule

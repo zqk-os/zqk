@@ -21,9 +21,9 @@ var (
 	discoveredPaths stampmemo.Table[string]
 	// resolvedFindPaths is keyed by cwd+pathKey. Stamp is cwd.
 	resolvedFindPaths stampmemo.Table[string]
-	// timeoutConfigs is keyed "global". Stamp is .zqk/config/config.yaml.
+	// timeoutConfigs is keyed "global". Stamp is config/zqk.yaml (legacy kernel copies fallback).
 	timeoutConfigs stampmemo.Table[*ValidationTimeoutConfig]
-	// tierConfigs is keyed "global". Stamp is .zqk/config/config.yaml.
+	// tierConfigs is keyed "global". Stamp is config/zqk.yaml (legacy kernel copies fallback).
 	tierConfigs stampmemo.Table[*ValidationTierConfig]
 )
 

@@ -28,7 +28,7 @@ func TestIdempotentRestoreConfig_Idempotent(t *testing.T) {
 
 	// Verify all expected files exist after both runs
 	expected := []string{
-		filepath.Join(paths.ProjectDataDir, paths.ProjectConfigFile),
+		filepath.Join(paths.ConfigDir, paths.ZqkConfigFileName),
 		filepath.Join(paths.ProjectDataDir, "wipe_guard.yaml"),
 	}
 	for _, f := range expected {
@@ -159,7 +159,7 @@ func TestRestoreConfig_OverwritesExisting(t *testing.T) {
 
 	// Pre-existing config with different content
 	existingConfig := map[string]string{
-		filepath.Join(paths.ProjectDataDir, paths.ProjectConfigFile): "# old custom config\nproject:\n  name: legacy",
+		filepath.Join(paths.ConfigDir, paths.ZqkConfigFileName): "# old custom config\nproject:\n  name: legacy",
 	}
 	for rel, content := range existingConfig {
 		fullPath := filepath.Join(root, rel)
@@ -177,7 +177,7 @@ func TestRestoreConfig_OverwritesExisting(t *testing.T) {
 	}
 
 	// Config file should now contain restored (templated) content, not the old custom one
-	configPath := filepath.Join(root, paths.ProjectDataDir, paths.ProjectConfigFile)
+	configPath := filepath.Join(root, paths.ConfigDir, paths.ZqkConfigFileName)
 	content, err := fileutil.ReadFile(configPath) //nolint:gosec // test path
 	if err != nil {
 		t.Fatalf("failed to read config: %v", err)

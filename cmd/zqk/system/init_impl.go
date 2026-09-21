@@ -352,7 +352,7 @@ func runGreenfieldInit(projectRoot, projectName, template string, force bool, lo
 		logging.Fluent(logger).Warn("Failed to seed starter kernel graph").WithError(err).Log()
 	}
 
-	// Create project config in .zqk/config/config.yaml and .zqk/config.yaml
+	// Create project YAML SSOT at config/zqk.yaml
 	if err := writeProjectConfigFiles(projectDataDir, projectName, template, force); err != nil {
 		return errfmt.Errorf(initErrCreateConfigFileFmt, err)
 	}
@@ -441,12 +441,10 @@ func runLegacyInit(projectRoot, projectName, template string, force bool, logger
 		logging.Fluent(logger).Info("Added missing directories to existing " + paths.ProcessDir + " structure").Log()
 	}
 
-	// Create or update config file in .zqk/config/config.yaml and .zqk/config.yaml
-	canonicalConfig := filepath.Join(projectDataDir, paths.ConfigDir, paths.ProjectConfigFile)
-	legacyConfig := filepath.Join(projectDataDir, paths.ProjectConfigFile)
+	// Create or update config file in config/zqk.yaml
+	canonicalConfig := filepath.Join(projectRoot, paths.ConfigDir, paths.ZqkConfigFileName)
 	_, errCanonical := fileutil.Stat(canonicalConfig)
-	_, errLegacy := fileutil.Stat(legacyConfig)
-	if fileutil.IsNotExist(errCanonical) || fileutil.IsNotExist(errLegacy) {
+	if fileutil.IsNotExist(errCanonical) {
 		if err := writeProjectConfigFiles(projectDataDir, projectName, template, false); err != nil {
 			return errfmt.Errorf(initErrCreateConfigFileFmt, err)
 		}
@@ -460,16 +458,16 @@ func runLegacyInit(projectRoot, projectName, template string, force bool, logger
 		}
 	}
 
-	if fileutil.IsNotExist(errCanonical) || fileutil.IsNotExist(errLegacy) {
+	if fileutil.IsNotExist(errCanonical) {
 		logging.Fluent(logger).Info("Created config file").
-			Path(filepath.Join(paths.ProjectDataDir, paths.ConfigDir, paths.ProjectConfigFile)).
+			Path(filepath.Join(paths.ConfigDir, paths.ZqkConfigFileName)).
 			Log()
 	} else if force {
 		if err := writeProjectConfigFiles(projectDataDir, projectName, template, true); err != nil {
 			return errfmt.Newf("failed to update config file").Wrap(err)
 		}
 		logging.Fluent(logger).Info("Updated config file (--force)").
-			Path(filepath.Join(paths.ProjectDataDir, paths.ConfigDir, paths.ProjectConfigFile)).
+			Path(filepath.Join(paths.ConfigDir, paths.ZqkConfigFileName)).
 			Log()
 	} else {
 		logging.Fluent(logger).Info("Config file already exists, skipping (use --force to overwrite)").Log()

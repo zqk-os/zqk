@@ -24,7 +24,7 @@ const (
 	LayerSystem ContextLayer = iota
 	// LayerUser represents user-level configuration (~/.zqk/config/config.yaml)
 	LayerUser
-	// LayerProject represents project-level configuration (.zqk/config/config.yaml)
+	// LayerProject represents project-level configuration (config/zqk.yaml)
 	LayerProject
 	// LayerCommand represents command-line flags (highest precedence)
 	LayerCommand
@@ -305,7 +305,7 @@ func (cm *ContextManager) LoadContext(initCtx *pkgctx.CliInitializationContext) 
 		// User config is optional, continue if missing
 	}
 
-	// Load project config (.zqk/config/config.yaml)
+	// Load project config (config/zqk.yaml)
 	if projectRoot != emptyValue {
 		if err := cm.loadProjectConfig(projectRoot); err != nil {
 			// Project config is optional, continue if missing
@@ -454,9 +454,9 @@ func (cm *ContextManager) loadUserConfig() error {
 	return nil
 }
 
-// loadProjectConfig loads project-level configuration from .zqk/config/config.yaml
+// loadProjectConfig loads project-level configuration from config/zqk.yaml
 func (cm *ContextManager) loadProjectConfig(projectRoot string) error {
-	configPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, paths.ProjectConfigFile)
+	configPath := paths.FirstProjectYAMLConfig(projectRoot)
 	cfg, err := cm.loadConfigFile(configPath)
 	if err != nil {
 		return err

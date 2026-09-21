@@ -2,7 +2,6 @@ package storage
 
 import (
 	"fmt"
-	"path/filepath"
 	"time"
 
 	"gopkg.in/yaml.v3"
@@ -34,9 +33,9 @@ type aggregationRuleYAML struct {
 	PreserveSamples int      `yaml:"preserve_samples"`
 }
 
-// LoadAggregationConfig loads audit aggregation configuration from .zqk/config/config.yaml
+// LoadAggregationConfig loads audit aggregation configuration from config/zqk.yaml.
 func LoadAggregationConfig(projectRoot string) (*AuditAggregationConfig, error) {
-	configPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, paths.ProjectConfigFile)
+	configPath := paths.FirstProjectYAMLConfig(projectRoot)
 	cfg, err := aggregationConfigs.Load(projectRoot, stampmemo.Of(configPath), func() (AuditAggregationConfig, error) {
 		parsed, loadErr := readAggregationConfig(configPath)
 		if parsed == nil {
@@ -49,6 +48,9 @@ func LoadAggregationConfig(projectRoot string) (*AuditAggregationConfig, error) 
 }
 
 func readAggregationConfig(configPath string) (*AuditAggregationConfig, error) {
+	if configPath == "" {
+		return DefaultAggregationConfig(), nil
+	}
 	// Check if config file exists
 	if _, err := fileutil.Stat(configPath); fileutil.IsNotExist(err) {
 		// No config file - return defaults

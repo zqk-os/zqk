@@ -3,8 +3,8 @@
 # pattern (substring). First match wins. Duration uses Go format: 10m, 30s, 1h30m.
 # See: docs/architecture/CLI_PERFORMANCE_AND_CONSISTENCY.md
 #
-# Load order: .zqk/config/command_timeouts.yaml (override) then this file (default).
-# Copy to .zqk/config/command_timeouts.yaml to customize per project.
+// Load order: this file (committed default). A leftover .zqk/config/command_timeouts.yaml
+# is still read as fallback if this file is missing. Do not add new copies under .zqk/config.
 #
 # Exception (not in this file): "mcp serve", "mcp daemon", and "mcp proxy" timeouts are
 # read from .zqk/mcp/config.yaml (mcp_server.idle_timeout). That keeps MCP server lifecycle

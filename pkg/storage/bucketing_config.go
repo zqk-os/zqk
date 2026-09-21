@@ -56,7 +56,7 @@ type BucketingConfig struct {
 }
 
 // BucketingConfigRegistry manages bucketing configurations per object kind.
-// YAML is stamp-invalidated from .zqk/config/config.yaml.
+// YAML is stamp-invalidated from config/zqk.yaml (legacy .zqk/config copies fallback).
 type BucketingConfigRegistry struct {
 	configPath string
 }
@@ -65,11 +65,11 @@ var bucketingConfigs stampmemo.Table[map[string]*BucketingConfig] // keyed by co
 
 // NewBucketingConfigRegistry creates a new bucketing config registry
 func NewBucketingConfigRegistry(projectRoot string) *BucketingConfigRegistry {
-	configPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, paths.ProjectConfigFile)
+	configPath := paths.FirstProjectYAMLConfig(projectRoot)
 	return &BucketingConfigRegistry{configPath: configPath}
 }
 
-// Load loads bucketing configurations from .zqk/config/config.yaml.
+// Load loads bucketing configurations from config/zqk.yaml.
 func (bcr *BucketingConfigRegistry) Load() error {
 	_, err := bucketingConfigs.Load(bcr.configPath, stampmemo.Of(bcr.configPath), bcr.readConfigs)
 	if err != nil {

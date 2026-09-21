@@ -9,7 +9,7 @@ This package provides object validation for zqk: instance validation (schema, li
 - **ID validator**: Validates object IDs against configurable prefixes and patterns; loads config from file or graph (`id_validator*.go`, `id_prefixes_config.go`, `namespaces_config.go`).
 - **Instance validator**: Lifecycle and state transition validation (`instance_validator.go`).
 - **Async validator**: Queue-based validation with workers, cache, and configurable timeouts (`async_validator*.go`, `validation_timeout_config.go`).
-- **Tier and timeout config**: Validation tiers and per-object timeouts via `.zqk/config` (`validation_tier_config.go`, `validation_timeout_config.go`).
+- **Tier and timeout config**: Validation tiers and per-object timeouts via `config/zqk.yaml` (`validation_tier_config.go`, `validation_timeout_config.go`).
 - **Ontology and namespace**: Registry and discovery for ontologies and namespaces (`ontology_registry.go`, `namespace_registry.go`, `namespace_discovery.go`).
 
 ## Usage
@@ -42,7 +42,7 @@ asyncVal.Enqueue(ctx, task)
 
 - **ID prefixes and namespaces**: `.zqk/config/id_prefixes.yaml`, namespaces config; see `id_prefixes_config.go`, `namespaces_config.go`.
 - **Validation tiers**: `validation_tier_config.go`; tier overrides per kind.
-- **Per-object timeout**: `.zqk/config/config.yaml` `validation.per_object_timeout` (default_seconds **5**, empty kind_overrides by default — fail-fast); see `validation_timeout_config.go`. `stuck_timeout_seconds` default **30**.
+- **Per-object timeout**: `config/zqk.yaml` `validation.per_object_timeout` (default_seconds **5**, empty kind_overrides by default — fail-fast); see `validation_timeout_config.go`. `stuck_timeout_seconds` default **30**.
 - **Async validator timeouts and buffer**: `AsyncValidatorConfig` in `async_validator_config.go` — `WorkerStopTimeout` (default 60s), `CacheSaveTimeout` (default 20s), `ProgressChannelSize` (default 10000). Pass as optional last arg to `NewAsyncValidator(..., opts...)` to override.
 
 ## Related

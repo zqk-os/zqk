@@ -8,4 +8,4 @@ Start here:
 2. `./bin/zqk system agent-onboard --format json`
 3. `./bin/zqk workflow whats-next --format json`
 
-Kernel data stays under `.zqk/`. Brand is `config/zqk.yaml` / `config/zqk-local.yaml`.
+Kernel data stays under `.zqk/`. Project YAML SSOT is `config/zqk.yaml` / `config/zqk-local.yaml`.

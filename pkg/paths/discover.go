@@ -45,3 +45,14 @@ func FirstExistingFromCwd(rel string) string {
 	})
 	return hit
 }
+
+// FirstExistingFromCwdAny returns the first existing candidate, trying each
+// relative path in order (cwd toward filesystem root per name).
+func FirstExistingFromCwdAny(rels []string) string {
+	for _, rel := range rels {
+		if hit := FirstExistingFromCwd(rel); hit != "" {
+			return hit
+		}
+	}
+	return ""
+}

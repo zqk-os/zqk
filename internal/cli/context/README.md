@@ -57,7 +57,7 @@ See context processing mode specifications for detailed examples.
 Default precedence (lowest to highest):
 1. System Defaults
 2. User Config (`~/.zqk/config/config.yaml`)
-3. Project Config (`.zqk/config/config.yaml`)
+3. Project Config (`config/zqk.yaml`)
 4. Command Flags
 
 ## Context Profiles

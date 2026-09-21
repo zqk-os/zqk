@@ -22,6 +22,9 @@ func TestDefaultPathAliases_IncludesOperationalRoots(t *testing.T) {
 	if got, want := m["object_drafts"], filepath.Join(ProjectDataDir, ObjectDraftsDir); got != want {
 		t.Errorf(`aliases["object_drafts"] = %q, want %q`, got, want)
 	}
+	if got, want := m["config"], ConfigDir; got != want {
+		t.Errorf(`aliases["config"] = %q, want %q`, got, want)
+	}
 	if got, want := m[PathAliasDatacellFeatureFlags], filepath.Join(ProjectDataDir, ConfigDir, FeatureFlagsFile); got != want {
 		t.Errorf(`aliases[PathAliasDatacellFeatureFlags] = %q, want %q`, got, want)
 	}
