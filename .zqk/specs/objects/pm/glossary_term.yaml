@@ -1,7 +1,7 @@
 schema_version: 2.0.0
 ontology: glossary_term
 extends: base_object
-visibility: internal
+visibility: public
 description: 'Operational glossary term: a context-scoped definition for agents and tooling.\nUse for shared vocabulary (e.g. \"new system object\", \"process data\") so agents\nand automation use consistent definitions. Link to existing alias/synonym objects\nvia alias_refs. context_scope, category, agent_prompts, and machine_hints are\nrequired; defaults are auto-resolved at create if omitted.\nsemantic_tags classifies usage: e.g. ontology, epistemology, inference, display,\nnavigation, predicate_definition (for terms that define glossary_term_relation predicates).\nLifecycle: glossary_term_lifecycle.yaml.\n'
 traits:
   - base_object_traits
