@@ -64,7 +64,7 @@ func seatWorkerLane(personaRef, agentID string) string {
 // 1. Direct environment variable override (e.g. ZQK_WORKER_LANE, ZQK_SEAT_WORKER_LANE)
 // 2. Mapped environment variables (e.g. ZQK_WORKER_LANES)
 // 3. Local seat configuration in peer_seats.json (rec.Lane or rec.WorkerLane)
-// 4. Project configuration files (worker_lanes.json/yaml, zqk-settings.yaml, config.yaml)
+// 4. Project configuration files (worker_lanes.json/yaml, config/zqk.yaml, config.yaml)
 // 5. Dynamic persona derivation (PER-ORCH-<NAME> -> <name>)
 // 6. Deterministic agent ID hash fallback (8 hex characters)
 // 7. Fallback to seatWorkerLaneUnknown ("seat")
@@ -91,7 +91,7 @@ func seatWorkerLaneWithRoot(projectRoot, personaRef, agentID string) string {
 		}
 	}
 
-	// 4. Configuration files (worker_lanes.json/yaml, zqk-settings.yaml, config.yaml)
+	// 4. Configuration files (worker_lanes.json/yaml, config/zqk.yaml, config.yaml)
 	if root != "" {
 		if lane := loadConfiguredWorkerLane(root, personaRef, agentID); lane != "" {
 			return sanitizeLaneName(lane)
@@ -191,10 +191,10 @@ func loadConfiguredWorkerLane(root, personaRef, agentID string) string {
 		filepath.Join(root, paths.ProjectDataDir, paths.ConfigDir, "worker_lanes.json"),
 		filepath.Join(root, paths.ProjectDataDir, paths.ConfigDir, "worker_lanes.yaml"),
 		filepath.Join(root, paths.ConfigDir, "worker_lanes.yaml"),
-		filepath.Join(root, paths.ProjectDataDir, paths.ConfigDir, paths.BrandSettingsFilename),
-		filepath.Join(root, paths.BrandSettingsFilename),
-		filepath.Join(root, paths.ProjectDataDir, paths.ConfigDir, paths.ConfigYAMLFileName),
+		filepath.Join(root, paths.ConfigDir, paths.ZqkLocalConfigFileName),
 		filepath.Join(root, paths.ConfigDir, paths.ZqkConfigFileName),
+		filepath.Join(root, paths.ProjectDataDir, paths.ConfigDir, paths.ConfigYAMLFileName),
+		filepath.Join(root, paths.ProjectDataDir, paths.ConfigDir, paths.ZqkConfigFileName),
 	}
 
 	var fallbackDefault string
