@@ -63,3 +63,23 @@ func TestResolveCredentialPath_prefersExistingTestRootFile(t *testing.T) {
 		t.Fatalf("got %q want %q", got, isolateCred)
 	}
 }
+
+func TestReadCredentialToken_cachesUntilMtimeChanges(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "credentials")
+	if err := fileutil.WriteSecureFile(path, []byte("ACC-ONE\n")); err != nil {
+		t.Fatal(err)
+	}
+	if got := ReadCredentialToken(path); got != "ACC-ONE" {
+		t.Fatalf("first read=%q", got)
+	}
+	if got := ReadCredentialToken(path); got != "ACC-ONE" {
+		t.Fatalf("cached read=%q", got)
+	}
+	if err := fileutil.WriteSecureFile(path, []byte("ACC-TWO\n")); err != nil {
+		t.Fatal(err)
+	}
+	if got := ReadCredentialToken(path); got != "ACC-TWO" {
+		t.Fatalf("after rewrite=%q", got)
+	}
+}

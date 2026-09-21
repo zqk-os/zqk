@@ -1260,16 +1260,8 @@ func normalizeSpecsDirIfProjectRoot(specsDir string) string {
 
 // specsDirHasBaseSpec returns true if the directory contains base_object.yaml (directly or in kernel/dna subdirectories).
 func specsDirHasBaseSpec(specsDir string) bool {
-	if _, err := fileutil.Stat(filepath.Join(specsDir, baseObjectSpecName)); err == nil {
-		return true
-	}
-	if _, err := fileutil.Stat(filepath.Join(specsDir, "kernel", baseObjectSpecName)); err == nil {
-		return true
-	}
-	if _, err := fileutil.Stat(filepath.Join(specsDir, "dna", baseObjectSpecName)); err == nil {
-		return true
-	}
-	return false
+	_, err := paths.FindObjectSpecFile(specsDir, KindBaseObject)
+	return err == nil
 }
 
 // findSpecsDir attempts to find the object specs directory

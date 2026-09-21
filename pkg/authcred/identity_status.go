@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+	"sync"
 	"time"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
@@ -12,6 +13,8 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
+
+var lastIdentityFP sync.Map // path -> fingerprint (identity without UpdatedAt)
 
 // Identity snapshot schema (lite file, not CAS).
 const (
@@ -57,7 +60,7 @@ func IdentityStatusPath(projectRoot string) string {
 	if projectRoot == "" {
 		return ""
 	}
-	return filepath.Join(projectRoot, paths.ProjectDataDir, paths.StateDir, paths.IdentityStatusFile)
+	return filepath.Join(paths.StateDirPath(projectRoot), paths.IdentityStatusFile)
 }
 
 // SnapshotFromSecurityContext builds a status payload. username/title are optional extras.
@@ -91,10 +94,40 @@ func SnapshotFromSecurityContext(secCtx *pkgctx.SecurityContext, extras map[stri
 	return snap
 }
 
+func identityFingerprint(snap IdentityStatus) string {
+	var b strings.Builder
+	b.WriteString(snap.AccountID)
+	b.WriteByte('\x00')
+	b.WriteString(snap.Username)
+	b.WriteByte('\x00')
+	b.WriteString(snap.Title)
+	b.WriteByte('\x00')
+	b.WriteString(snap.PersonaID)
+	b.WriteByte('\x00')
+	b.WriteString(snap.Lane)
+	b.WriteByte('\x00')
+	if snap.WriteStar {
+		b.WriteByte('1')
+	} else {
+		b.WriteByte('0')
+	}
+	b.WriteByte('\x00')
+	b.WriteString(strings.Join(snap.Roles, ","))
+	b.WriteByte('\x00')
+	b.WriteString(strings.Join(snap.Permissions, ","))
+	return b.String()
+}
+
 // WriteIdentityStatus persists the snapshot. Best-effort: never fails the caller.
+// Unchanged identity (same ACC/roles/persona/lane) skips the disk rewrite so
+// AuthMiddleware is not a write on every CLI invocation.
 func WriteIdentityStatus(projectRoot string, snap IdentityStatus) {
 	path := IdentityStatusPath(projectRoot)
 	if path == "" {
+		return
+	}
+	fp := identityFingerprint(snap)
+	if prev, ok := lastIdentityFP.Load(path); ok && prev.(string) == fp {
 		return
 	}
 	if err := fileutil.EnsureDir(filepath.Dir(path)); err != nil {
@@ -104,7 +137,10 @@ func WriteIdentityStatus(projectRoot string, snap IdentityStatus) {
 	if err != nil {
 		return
 	}
-	_ = fileutil.WriteStandardFile(path, append(data, '\n'))
+	if err := fileutil.WriteStandardFile(path, append(data, '\n')); err != nil {
+		return
+	}
+	lastIdentityFP.Store(path, fp)
 }
 
 // ReadIdentityStatus loads the last snapshot if present.

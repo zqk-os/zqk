@@ -1,9 +1,10 @@
 package authcred
 
 import (
-	"encoding/json"
 	"path/filepath"
+	"slices"
 	"strings"
+	"sync"
 
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -94,7 +95,11 @@ type roleFile struct {
 }
 
 func loadRoleRecords(projectRoot string) []RoleRecord {
-	rolesDir := filepath.Join(projectRoot, paths.ProcessRolesDir)
+	if recs, ok := cachedRoleRecords(projectRoot); ok {
+		return recs
+	}
+	rolesDir := paths.RolesDirPath(projectRoot)
+	indexPath := paths.RoleIndexPath(projectRoot)
 	seen := map[string]struct{}{}
 	var out []RoleRecord
 	appendRole := func(rec RoleRecord) {
@@ -112,36 +117,87 @@ func loadRoleRecords(projectRoot string) []RoleRecord {
 		out = append(out, rec)
 	}
 
-	indexPath := filepath.Join(rolesDir, ".role.index")
-	if data, err := fileutil.ReadFile(indexPath); err == nil {
-		var idx accountIndexFile
-		if json.Unmarshal(data, &idx) == nil && idx.Mappings != nil {
-			for id, hashName := range idx.Mappings {
-				yamlPath := filepath.Join(rolesDir, hashName+".yaml")
-				if rec, ok := readRoleFile(yamlPath); ok {
-					if rec.ID == "" {
-						rec.ID = id
-					}
-					appendRole(rec)
+	indexLoaded := false
+	if mappings := casMappings(projectRoot, indexPath); mappings != nil {
+		indexLoaded = true
+		for id := range mappings {
+			raw, ok := casYAML(projectRoot, id, indexPath, rolesDir)
+			if !ok {
+				continue
+			}
+			if rec, parsed := parseRoleFile(raw); parsed {
+				if rec.ID == "" {
+					rec.ID = id
 				}
+				appendRole(rec)
 			}
 		}
 	}
 
-	entries, err := fileutil.ReadDir(rolesDir)
-	if err != nil {
-		return out
-	}
-	for _, ent := range entries {
-		name := ent.Name()
-		if ent.IsDir() || !strings.HasSuffix(name, ".yaml") || strings.HasPrefix(name, ".") {
-			continue
+	if !indexLoaded {
+		entries, err := fileutil.ReadDir(rolesDir)
+		if err != nil {
+			return out
 		}
-		if rec, ok := readRoleFile(filepath.Join(rolesDir, name)); ok {
-			appendRole(rec)
+		for _, ent := range entries {
+			name := ent.Name()
+			if ent.IsDir() || !strings.HasSuffix(name, ".yaml") || strings.HasPrefix(name, ".") {
+				continue
+			}
+			if rec, ok := readRoleFile(filepath.Join(rolesDir, name)); ok {
+				appendRole(rec)
+			}
 		}
 	}
+	storeRoleRecords(projectRoot, indexPath, out)
 	return out
+}
+
+type roleCatalogSnap struct {
+	mu         sync.Mutex
+	indexMtime int64
+	loaded     bool
+	records    []RoleRecord
+}
+
+var roleCatalogs sync.Map // projectRoot -> *roleCatalogSnap
+
+func roleCatalog(projectRoot string) *roleCatalogSnap {
+	if existing, ok := roleCatalogs.Load(projectRoot); ok {
+		return existing.(*roleCatalogSnap)
+	}
+	fresh := &roleCatalogSnap{}
+	actual, _ := roleCatalogs.LoadOrStore(projectRoot, fresh)
+	return actual.(*roleCatalogSnap)
+}
+
+func cachedRoleRecords(projectRoot string) ([]RoleRecord, bool) {
+	indexPath := paths.RoleIndexPath(projectRoot)
+	info, err := fileutil.Stat(indexPath)
+	if err != nil {
+		return nil, false
+	}
+	mtime := info.ModTime().UnixNano()
+	snap := roleCatalog(projectRoot)
+	snap.mu.Lock()
+	defer snap.mu.Unlock()
+	if snap.indexMtime != mtime || !snap.loaded {
+		return nil, false
+	}
+	return slices.Clone(snap.records), true
+}
+
+func storeRoleRecords(projectRoot, indexPath string, records []RoleRecord) {
+	info, err := fileutil.Stat(indexPath)
+	if err != nil {
+		return
+	}
+	snap := roleCatalog(projectRoot)
+	snap.mu.Lock()
+	snap.indexMtime = info.ModTime().UnixNano()
+	snap.loaded = true
+	snap.records = slices.Clone(records)
+	snap.mu.Unlock()
 }
 
 func readRoleFile(path string) (RoleRecord, bool) {
@@ -149,6 +205,10 @@ func readRoleFile(path string) (RoleRecord, bool) {
 	if err != nil {
 		return RoleRecord{}, false
 	}
+	return parseRoleFile(raw)
+}
+
+func parseRoleFile(raw []byte) (RoleRecord, bool) {
 	var f roleFile
 	if err := yaml.Unmarshal(raw, &f); err != nil {
 		return RoleRecord{}, false

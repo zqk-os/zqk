@@ -55,4 +55,31 @@ func TestDefaultPathAliases_IncludesOperationalRoots(t *testing.T) {
 	if got, want := m[PathAliasMeshPeerAckAwait], filepath.Join(ProjectDataDir, StateDir, MeshStateSubdir, PeerAckAwaitsFile); got != want {
 		t.Errorf(`aliases[PathAliasMeshPeerAckAwait] = %q, want %q`, got, want)
 	}
+	if got, want := m[PathAliasPersonas], ProcessPersonasDir; got != want {
+		t.Errorf(`aliases[PathAliasPersonas] = %q, want %q`, got, want)
+	}
+	if got, want := m[PathAliasPersonaIndex], filepath.Join(ProcessPersonasDir, PersonaIndexFile); got != want {
+		t.Errorf(`aliases[PathAliasPersonaIndex] = %q, want %q`, got, want)
+	}
+	if got, want := m[PathAliasAccounts], ProcessAccountsDir; got != want {
+		t.Errorf(`aliases[PathAliasAccounts] = %q, want %q`, got, want)
+	}
+	if got, want := m[PathAliasAccountIndex], filepath.Join(ProcessAccountsDir, AccountIndexFile); got != want {
+		t.Errorf(`aliases[PathAliasAccountIndex] = %q, want %q`, got, want)
+	}
+	if got, want := m[PathAliasRoles], ProcessRolesDir; got != want {
+		t.Errorf(`aliases[PathAliasRoles] = %q, want %q`, got, want)
+	}
+	if got, want := m[PathAliasRoleIndex], filepath.Join(ProcessRolesDir, RoleIndexFile); got != want {
+		t.Errorf(`aliases[PathAliasRoleIndex] = %q, want %q`, got, want)
+	}
+	if got, want := m[PathAliasKeystore], ProcessKeystoreDir; got != want {
+		t.Errorf(`aliases[PathAliasKeystore] = %q, want %q`, got, want)
+	}
+	if got, want := m[PathAliasObjectSpecs], ProcessInternalObjectSpecsDir; got != want {
+		t.Errorf(`aliases[PathAliasObjectSpecs] = %q, want %q`, got, want)
+	}
+	if got, want := m[PathAliasAuthStrategies], ProcessAuthStrategiesDir; got != want {
+		t.Errorf(`aliases[PathAliasAuthStrategies] = %q, want %q`, got, want)
+	}
 }

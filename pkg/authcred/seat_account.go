@@ -1,9 +1,9 @@
 package authcred
 
 import (
-	"encoding/json"
-	"path/filepath"
+	"slices"
 	"strings"
+	"sync"
 
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -15,10 +15,6 @@ import (
 // map a persona/role to a seated account.
 const DefaultSwarmWorkerAccount = "ACC-1785920548450214011-dabd3692"
 
-type accountIndexFile struct {
-	Mappings map[string]string `json:"mappings"`
-}
-
 type accountPersonaFields struct {
 	ID          string   `yaml:"id"`
 	Status      string   `yaml:"status"`
@@ -27,6 +23,7 @@ type accountPersonaFields struct {
 	Persona     string   `yaml:"persona"`
 	PersonaRefs []string `yaml:"persona_refs"`
 	Roles       []string `yaml:"roles"`
+	Permissions []string `yaml:"permissions"`
 }
 
 // CanonicalAccountID resolves ACC-* passthrough or legacy account:username → ACC-*.
@@ -160,40 +157,30 @@ func AccountCASPath(projectRoot, accountID string) string {
 	if projectRoot == "" || !strings.HasPrefix(accountID, "ACC-") {
 		return ""
 	}
-	indexPath := filepath.Join(projectRoot, paths.ProcessDir, "accounts", ".account.index")
-	data, err := fileutil.ReadFile(indexPath)
-	if err != nil {
+	hashName, ok := casHash(projectRoot, accountID, paths.AccountIndexPath(projectRoot))
+	if !ok {
 		return ""
 	}
-	var idx accountIndexFile
-	if err := json.Unmarshal(data, &idx); err != nil || idx.Mappings == nil {
-		return ""
-	}
-	hashName, ok := idx.Mappings[accountID]
-	if !ok || strings.TrimSpace(hashName) == "" {
-		return ""
-	}
-	return filepath.Join(projectRoot, paths.ProcessDir, "accounts", hashName+".yaml")
+	return paths.AccountYAMLPath(projectRoot, hashName)
 }
 
 func loadActiveAccounts(projectRoot string) []accountPersonaFields {
-	indexPath := filepath.Join(projectRoot, paths.ProcessDir, "accounts", ".account.index")
-	data, err := fileutil.ReadFile(indexPath)
-	if err != nil {
+	if cached, ok := cachedActiveAccounts(projectRoot); ok {
+		return cached
+	}
+	indexPath := paths.AccountIndexPath(projectRoot)
+	mappings := casMappings(projectRoot, indexPath)
+	if mappings == nil {
 		return nil
 	}
-	var idx accountIndexFile
-	if err := json.Unmarshal(data, &idx); err != nil || idx.Mappings == nil {
-		return nil
-	}
-	out := make([]accountPersonaFields, 0, len(idx.Mappings))
-	for accountID, hashName := range idx.Mappings {
+	accountsDir := paths.AccountsDirPath(projectRoot)
+	out := make([]accountPersonaFields, 0, len(mappings))
+	for accountID := range mappings {
 		if !strings.HasPrefix(accountID, "ACC-") {
 			continue
 		}
-		yamlPath := filepath.Join(projectRoot, paths.ProcessDir, "accounts", hashName+".yaml")
-		raw, err := fileutil.ReadFile(yamlPath)
-		if err != nil {
+		raw, ok := casYAML(projectRoot, accountID, indexPath, accountsDir)
+		if !ok {
 			continue
 		}
 		var acc accountPersonaFields
@@ -208,5 +195,53 @@ func loadActiveAccounts(projectRoot string) []accountPersonaFields {
 		}
 		out = append(out, acc)
 	}
+	storeActiveAccounts(projectRoot, indexPath, out)
 	return out
+}
+
+type accountCatalogSnap struct {
+	mu         sync.Mutex
+	indexMtime int64
+	loaded     bool
+	accounts   []accountPersonaFields
+}
+
+var accountCatalogs sync.Map
+
+func accountCatalog(projectRoot string) *accountCatalogSnap {
+	if existing, ok := accountCatalogs.Load(projectRoot); ok {
+		return existing.(*accountCatalogSnap)
+	}
+	fresh := &accountCatalogSnap{}
+	actual, _ := accountCatalogs.LoadOrStore(projectRoot, fresh)
+	return actual.(*accountCatalogSnap)
+}
+
+func cachedActiveAccounts(projectRoot string) ([]accountPersonaFields, bool) {
+	indexPath := paths.AccountIndexPath(projectRoot)
+	info, err := fileutil.Stat(indexPath)
+	if err != nil {
+		return nil, false
+	}
+	mtime := info.ModTime().UnixNano()
+	snap := accountCatalog(projectRoot)
+	snap.mu.Lock()
+	defer snap.mu.Unlock()
+	if snap.indexMtime != mtime || !snap.loaded {
+		return nil, false
+	}
+	return slices.Clone(snap.accounts), true
+}
+
+func storeActiveAccounts(projectRoot, indexPath string, accounts []accountPersonaFields) {
+	info, err := fileutil.Stat(indexPath)
+	if err != nil {
+		return
+	}
+	snap := accountCatalog(projectRoot)
+	snap.mu.Lock()
+	snap.indexMtime = info.ModTime().UnixNano()
+	snap.loaded = true
+	snap.accounts = slices.Clone(accounts)
+	snap.mu.Unlock()
 }

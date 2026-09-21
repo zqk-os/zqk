@@ -115,6 +115,93 @@ func ScriptsDirPath(projectRoot string) string {
 	return ResolvePathFromCacheOrConstant(projectRoot, "scripts", ScriptsDir)
 }
 
+func casYAMLPath(kindDir, hashName string) string {
+	if kindDir == "" || hashName == "" {
+		return ""
+	}
+	return filepath.Join(kindDir, hashName+YAMLExtension)
+}
+
+// PersonasDirPath returns the process personas CAS directory.
+func PersonasDirPath(projectRoot string) string {
+	return ResolvePathFromCacheOrConstant(projectRoot, PathAliasPersonas, ProcessPersonasDir)
+}
+
+// PersonaIndexPath returns the persona listing-index file.
+func PersonaIndexPath(projectRoot string) string {
+	return ResolvePathFromCacheOrConstant(projectRoot, PathAliasPersonaIndex, filepath.Join(ProcessPersonasDir, PersonaIndexFile))
+}
+
+// PersonaYAMLPath returns the CAS yaml path for a persona hash from the listing index.
+func PersonaYAMLPath(projectRoot, hashName string) string {
+	return casYAMLPath(PersonasDirPath(projectRoot), hashName)
+}
+
+// AccountsDirPath returns the process accounts CAS directory.
+func AccountsDirPath(projectRoot string) string {
+	return ResolvePathFromCacheOrConstant(projectRoot, PathAliasAccounts, ProcessAccountsDir)
+}
+
+// AccountIndexPath returns the account listing-index file.
+func AccountIndexPath(projectRoot string) string {
+	return ResolvePathFromCacheOrConstant(projectRoot, PathAliasAccountIndex, filepath.Join(ProcessAccountsDir, AccountIndexFile))
+}
+
+// AccountYAMLPath returns the CAS yaml path for an account hash from the listing index.
+func AccountYAMLPath(projectRoot, hashName string) string {
+	return casYAMLPath(AccountsDirPath(projectRoot), hashName)
+}
+
+// RolesDirPath returns the process roles CAS directory.
+func RolesDirPath(projectRoot string) string {
+	return ResolvePathFromCacheOrConstant(projectRoot, PathAliasRoles, ProcessRolesDir)
+}
+
+// RoleIndexPath returns the role listing-index file.
+func RoleIndexPath(projectRoot string) string {
+	return ResolvePathFromCacheOrConstant(projectRoot, PathAliasRoleIndex, filepath.Join(ProcessRolesDir, RoleIndexFile))
+}
+
+// RoleYAMLPath returns the CAS yaml path for a role hash from the listing index.
+func RoleYAMLPath(projectRoot, hashName string) string {
+	return casYAMLPath(RolesDirPath(projectRoot), hashName)
+}
+
+// KeystoreDirPath returns the process keystore directory.
+func KeystoreDirPath(projectRoot string) string {
+	return ResolvePathFromCacheOrConstant(projectRoot, PathAliasKeystore, ProcessKeystoreDir)
+}
+
+// ObjectSpecsDir returns the object-spec tree (domain buckets or flat).
+func ObjectSpecsDir(projectRoot string) string {
+	return ResolvePathFromCacheOrConstant(projectRoot, PathAliasObjectSpecs, ProcessInternalObjectSpecsDir)
+}
+
+func credentialsRel() string {
+	return filepath.Join(ProjectDataDir, CredentialsFile)
+}
+
+// CredentialsPath returns the project-local credentials file.
+func CredentialsPath(projectRoot string) string {
+	if projectRoot == "" {
+		return ""
+	}
+	return filepath.Join(projectRoot, credentialsRel())
+}
+
+// ProjectDataDirPath returns the brand data directory under projectRoot.
+func ProjectDataDirPath(projectRoot string) string {
+	if projectRoot == "" {
+		return ""
+	}
+	return filepath.Join(projectRoot, ProjectDataDir)
+}
+
+// AuthStrategiesDirPath returns the process auth_strategy CAS directory.
+func AuthStrategiesDirPath(projectRoot string) string {
+	return ResolvePathFromCacheOrConstant(projectRoot, PathAliasAuthStrategies, ProcessAuthStrategiesDir)
+}
+
 // WorktreeLocalConfigRel is the git-relative seated-kernel wedge written by
 // BootstrapWorktreeConfig (config/<ZqkLocalConfigFileName>).
 func WorktreeLocalConfigRel() string {

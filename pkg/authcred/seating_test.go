@@ -37,6 +37,10 @@ status: active
 	if m.AccountID != "ACC-SEAT-001" || m.KeyID != "KEY-TEST-001" {
 		t.Fatalf("match=%+v", m)
 	}
+	again, err := ResolveSecret(root, secret)
+	if err != nil || again.AccountID != "ACC-SEAT-001" {
+		t.Fatalf("cached ResolveSecret=%+v err=%v", again, err)
+	}
 
 	if _, err := ResolveSecret(root, "wrong"); err == nil {
 		t.Fatal("expected miss")
@@ -215,4 +219,19 @@ func containsEnv(ss []string, want string) bool {
 		}
 	}
 	return false
+}
+
+func TestLooksLikeSessionToken(t *testing.T) {
+	if !LooksLikeSessionToken("ZS-123") || !LooksLikeSessionToken("ZQK-123") {
+		t.Fatal("canonical and synonym session ids")
+	}
+	if LooksLikeSessionToken("ACC-1") || LooksLikeSessionToken("zqk-secret") {
+		t.Fatal("account and opaque secret are not sessions")
+	}
+	if LooksLikeIssuedSecret("ZS-123") || LooksLikeIssuedSecret("ZQK-123") || LooksLikeIssuedSecret("ACC-1") {
+		t.Fatal("session and ACC ids are not issued secrets")
+	}
+	if !LooksLikeIssuedSecret(SecretPrefix + "opaque") {
+		t.Fatal("opaque issued secret")
+	}
 }
