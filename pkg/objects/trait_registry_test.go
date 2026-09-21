@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -527,5 +528,51 @@ func TestTraitRegistry_StripRedundantIncludedTraits(t *testing.T) {
 		if got[i] != want[i] {
 			t.Fatalf("got %v want %v", got, want)
 		}
+	}
+}
+
+func TestLoadTraitsFromDirectory_reloadsWhenStampMoves(t *testing.T) {
+	t.Parallel()
+	dir := t.TempDir()
+	write := func(name, body string) {
+		t.Helper()
+		if err := fileutil.WriteFile(filepath.Join(dir, name), []byte(body), paths.FilePerm644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	write("alpha.yaml", `name: stampmemo_alpha
+description: first
+category: standard
+object_level: true
+field_level: false
+status: active
+`)
+	first := NewTraitRegistry()
+	if err := first.LoadTraitsFromDirectory(dir); err != nil {
+		t.Fatal(err)
+	}
+	if !first.IsValidTrait("stampmemo_alpha") {
+		t.Fatal("expected alpha after first load")
+	}
+	write("beta.yaml", `name: stampmemo_beta
+description: second
+category: standard
+object_level: true
+field_level: false
+status: active
+`)
+	later := time.Now().Add(2 * time.Second)
+	if err := fileutil.Chtimes(dir, later, later); err != nil {
+		t.Fatal(err)
+	}
+	if err := fileutil.Chtimes(filepath.Join(dir, "beta.yaml"), later, later); err != nil {
+		t.Fatal(err)
+	}
+	second := NewTraitRegistry()
+	if err := second.LoadTraitsFromDirectory(dir); err != nil {
+		t.Fatal(err)
+	}
+	if !second.IsValidTrait("stampmemo_beta") {
+		t.Fatal("expected beta after stamp move")
 	}
 }

@@ -11,8 +11,11 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
+
+var traitDirs stampmemo.Table[[]*TraitDefinition] // keyed by traits directory (closed per project)
 
 // TraitStatusReactive is the object-level admission flag for status-event listeners.
 // TRACK: BLI-1786411312347141000-5f3d9063
@@ -573,6 +576,42 @@ func ExtractFieldTraits(fieldDef map[string]any) []string {
 
 // LoadTraitsFromDirectory loads trait definitions from YAML files in a directory and its subdirectories
 func (tr *TraitRegistry) LoadTraitsFromDirectory(traitsDir string) error {
+	defs, err := traitDirs.Load(traitsDir, yamlTreeStamp(traitsDir), func() ([]*TraitDefinition, error) {
+		return readTraitDir(traitsDir)
+	})
+	if err != nil {
+		return err
+	}
+	tr.traits = make(map[string]*TraitDefinition, len(defs))
+	tr.conflicts = make(map[string][]string)
+	tr.dependencies = make(map[string][]string)
+	tr.standardTraits = nil
+	for _, def := range defs {
+		cloned := cloneTraitDefinition(def)
+		tr.RegisterTrait(cloned)
+		if cloned.Category == "standard" {
+			tr.standardTraits = append(tr.standardTraits, cloned.Name)
+		}
+	}
+	return nil
+}
+
+func yamlTreeStamp(dir string) stampmemo.Stamp {
+	cands := []string{dir}
+	_ = filepath.WalkDir(dir, func(path string, d os.DirEntry, err error) error {
+		if err != nil || d == nil || d.IsDir() {
+			return nil
+		}
+		if strings.HasSuffix(d.Name(), ".yaml") {
+			cands = append(cands, path)
+		}
+		return nil
+	})
+	return stampmemo.OfAll(cands...)
+}
+
+func readTraitDir(traitsDir string) ([]*TraitDefinition, error) {
+	var defs []*TraitDefinition
 	walkErr := filepath.WalkDir(traitsDir, func(path string, d os.DirEntry, err error) error {
 		if err != nil || d == nil {
 			return nil
@@ -580,25 +619,69 @@ func (tr *TraitRegistry) LoadTraitsFromDirectory(traitsDir string) error {
 		if d.IsDir() || !strings.HasSuffix(d.Name(), ".yaml") {
 			return nil
 		}
-		trait, err := tr.loadTraitFromFile(path)
-		if err != nil {
-			// Log error but continue loading other traits
+		trait, parseErr := parseTraitFile(path)
+		if parseErr != nil {
 			return nil
 		}
-		tr.RegisterTrait(trait)
-		if trait.Category == "standard" {
-			tr.standardTraits = append(tr.standardTraits, trait.Name)
-		}
+		defs = append(defs, trait)
 		return nil
 	})
 	if walkErr != nil {
-		return errfmt.Errorf("failed to read traits directory %s: %w", traitsDir, walkErr)
+		return nil, errfmt.Errorf("failed to read traits directory %s: %w", traitsDir, walkErr)
 	}
-	return nil
+	return defs, nil
 }
 
-// loadTraitFromFile loads a trait definition from a YAML file
-func (tr *TraitRegistry) loadTraitFromFile(filePath string) (*TraitDefinition, error) {
+func cloneTraitDefinition(t *TraitDefinition) *TraitDefinition {
+	if t == nil {
+		return nil
+	}
+	out := *t
+	out.Requires = append([]string(nil), t.Requires...)
+	out.Conflicts = append([]string(nil), t.Conflicts...)
+	out.Includes = append([]string(nil), t.Includes...)
+	out.Config = cloneAnyMap(t.Config)
+	return &out
+}
+
+func cloneAnyMap(in map[string]any) map[string]any {
+	if in == nil {
+		return nil
+	}
+	out := make(map[string]any, len(in))
+	for k, v := range in {
+		switch x := v.(type) {
+		case map[string]any:
+			out[k] = cloneAnyMap(x)
+		case []any:
+			out[k] = cloneAnySlice(x)
+		default:
+			out[k] = v
+		}
+	}
+	return out
+}
+
+func cloneAnySlice(in []any) []any {
+	if in == nil {
+		return nil
+	}
+	out := make([]any, len(in))
+	for i, v := range in {
+		switch x := v.(type) {
+		case map[string]any:
+			out[i] = cloneAnyMap(x)
+		case []any:
+			out[i] = cloneAnySlice(x)
+		default:
+			out[i] = v
+		}
+	}
+	return out
+}
+
+// parseTraitFile loads a trait definition from a YAML file
+func parseTraitFile(filePath string) (*TraitDefinition, error) {
 	data, err := fileutil.ReadFile(filePath)
 	if err != nil {
 		return nil, errfmt.Errorf("failed to read trait file %s: %w", filePath, err)
