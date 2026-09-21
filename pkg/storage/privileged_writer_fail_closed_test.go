@@ -22,10 +22,11 @@ func TestPrivilegedWriterFailClosed_Create(t *testing.T) {
 
 	// Create an object
 	obj := map[string]any{
-		objects.FieldKeyKind:   "backlog_item",
-		objects.FieldKeyID:     "BLI-1234567890123456789-abcdef12",
-		objects.FieldKeyStatus: objects.ObjectStatusExploring,
-		objects.FieldKeyTitle:  "Test BLI",
+		objects.FieldKeyKind:        "backlog_item",
+		objects.FieldKeyID:          "BLI-1234567890123456789-abcdef12",
+		objects.FieldKeyStatus:      objects.ObjectStatusExploring,
+		objects.FieldKeyTitle:       "Test BLI",
+		objects.FieldKeyDescription: "Substantive description for privileged writer fail closed test.",
 	}
 
 	ctx := kernelcas.WithCommit(WithCLIOperation(pkgctx.WithPromoteOnCreate(context.Background())))

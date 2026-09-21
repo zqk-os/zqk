@@ -1,10 +1,10 @@
 package cas_test
 
 import (
-	"context"
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/zqk-os/zqk/pkg/storage"
 
@@ -48,12 +48,12 @@ func TestCAS_CascadeDelete_WithDependents_CascadeFalse(t *testing.T) {
 		t.Fatalf("Failed to create FileObjectStorage: %v", err)
 	}
 
-	defer func() { _ = fileStorage.Shutdown(context.Background()) }()
 	t.Cleanup(func() {
 		opts := storage.TempProjectTeardown(testRoot, fileStorage)
 		if err := storage.RunProjectTestTeardown(opts); err != nil {
 			t.Logf("teardown: %v", err)
 		}
+		storage.ScrubProjectRootForTempCleanup(baseTempDir, 50, 25*time.Millisecond)
 	})
 
 	// Verify CAS is enabled for audit_event
@@ -143,12 +143,12 @@ func TestCAS_CascadeDelete_WithDependents_CascadeTrue(t *testing.T) {
 		t.Fatalf("Failed to create FileObjectStorage: %v", err)
 	}
 
-	defer func() { _ = fileStorage.Shutdown(context.Background()) }()
 	t.Cleanup(func() {
 		opts := storage.TempProjectTeardown(testRoot, fileStorage)
 		if err := storage.RunProjectTestTeardown(opts); err != nil {
 			t.Logf("teardown: %v", err)
 		}
+		storage.ScrubProjectRootForTempCleanup(baseTempDir, 50, 25*time.Millisecond)
 	})
 
 	ctx := storage.WithTestHardDelete(pkgctx.NewSystemContext())
@@ -250,12 +250,12 @@ func TestCAS_CascadeDelete_CASDependentOfNonCAS(t *testing.T) {
 		t.Fatalf("Failed to create FileObjectStorage: %v", err)
 	}
 
-	defer func() { _ = fileStorage.Shutdown(context.Background()) }()
 	t.Cleanup(func() {
 		opts := storage.TempProjectTeardown(testRoot, fileStorage)
 		if err := storage.RunProjectTestTeardown(opts); err != nil {
 			t.Logf("teardown: %v", err)
 		}
+		storage.ScrubProjectRootForTempCleanup(baseTempDir, 50, 25*time.Millisecond)
 	})
 
 	ctx := storage.WithTestHardDelete(pkgctx.NewSystemContext())
@@ -311,12 +311,12 @@ func TestCAS_CascadeDelete_MultiLevel(t *testing.T) {
 		t.Fatalf("Failed to create FileObjectStorage: %v", err)
 	}
 
-	defer func() { _ = fileStorage.Shutdown(context.Background()) }()
 	t.Cleanup(func() {
 		opts := storage.TempProjectTeardown(testRoot, fileStorage)
 		if err := storage.RunProjectTestTeardown(opts); err != nil {
 			t.Logf("teardown: %v", err)
 		}
+		storage.ScrubProjectRootForTempCleanup(baseTempDir, 50, 25*time.Millisecond)
 	})
 
 	ctx := storage.WithTestHardDelete(pkgctx.NewSystemContext())
@@ -389,12 +389,12 @@ func TestCAS_CascadeDelete_NoDependents(t *testing.T) {
 		t.Fatalf("Failed to create FileObjectStorage: %v", err)
 	}
 
-	defer func() { _ = fileStorage.Shutdown(context.Background()) }()
 	t.Cleanup(func() {
 		opts := storage.TempProjectTeardown(testRoot, fileStorage)
 		if err := storage.RunProjectTestTeardown(opts); err != nil {
 			t.Logf("teardown: %v", err)
 		}
+		storage.ScrubProjectRootForTempCleanup(baseTempDir, 50, 25*time.Millisecond)
 	})
 
 	ctx := storage.WithCLIOperation(pkgctx.NewSystemContext())

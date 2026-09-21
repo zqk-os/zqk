@@ -35,7 +35,6 @@ func setupSearchTest(t *testing.T) (string, *storage.FileObjectStorage, *pkgctx.
 		t.Fatalf("Failed to create storage: %v", err)
 	}
 
-	defer func() { _ = fos.Shutdown(context.Background()) }()
 	t.Cleanup(func() {
 		opts := storage.TempProjectTeardown(tmpDir, fos)
 		if err := storage.RunProjectTestTeardown(opts); err != nil {

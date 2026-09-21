@@ -17,7 +17,7 @@ func TestAgentTaskCreateRoundTrip(t *testing.T) {
 	f, err := NewFileObjectStorageForTest(root)
 
 	require.NoError(t, err)
-	defer func() { _ = f.Shutdown(context.Background()) }()
+	t.Cleanup(func() { _ = RunProjectTestTeardown(TempProjectTeardown(root, f)) })
 
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()

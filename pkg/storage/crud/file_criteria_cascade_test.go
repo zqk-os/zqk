@@ -35,7 +35,7 @@ func TestCriteriaCascadeDeletionDirection(t *testing.T) {
 		t.Fatalf("failed to create storage: %v", err)
 	}
 
-	defer func() { _ = fos.Shutdown(context.Background()) }()
+	t.Cleanup(func() { _ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(tmpDir, fos)) })
 
 	// Load field registry for testing
 	objects.PrewarmGlobalsForProjectRoot(tmpDir)

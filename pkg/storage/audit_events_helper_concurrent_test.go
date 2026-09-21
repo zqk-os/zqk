@@ -32,6 +32,13 @@ func TestCreateAuditEventWithBuilder_Concurrent(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create storage factory: %v", err)
 	}
+	t.Cleanup(func() {
+		var fos *FileObjectStorage
+		if s, ok := storageFactory.GetStorage().(*FileObjectStorage); ok {
+			fos = s
+		}
+		_ = RunProjectTestTeardown(TempProjectTeardown(projectRoot, fos))
+	})
 	storageProvider := storageFactory.GetStorage()
 
 	secCtx := pkgctx.NewSystemSecurityContext()
@@ -102,6 +109,13 @@ func TestCreateAuditEventWithBuilder_ConcurrentIDGeneration(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create storage factory: %v", err)
 	}
+	t.Cleanup(func() {
+		var fos *FileObjectStorage
+		if s, ok := storageFactory.GetStorage().(*FileObjectStorage); ok {
+			fos = s
+		}
+		_ = RunProjectTestTeardown(TempProjectTeardown(projectRoot, fos))
+	})
 	storageProvider := storageFactory.GetStorage()
 
 	secCtx := pkgctx.NewSystemSecurityContext()
@@ -170,6 +184,13 @@ func TestCreateAuditEventWithBuilder_SessionID(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create storage factory: %v", err)
 	}
+	t.Cleanup(func() {
+		var fos *FileObjectStorage
+		if s, ok := storageFactory.GetStorage().(*FileObjectStorage); ok {
+			fos = s
+		}
+		_ = RunProjectTestTeardown(TempProjectTeardown(projectRoot, fos))
+	})
 	storageProvider := storageFactory.GetStorage()
 	secCtx := pkgctx.NewSystemSecurityContext()
 

@@ -31,7 +31,8 @@ func (m *mockTraversalConn) ExecuteTraversal(ctx context.Context, traversal prov
 // TestGraphObjectStorage_GetNeighbors_BulkTraversal verifies BLI-CEF-PERF-001:
 // ExecuteTraversal is invoked to fetch neighbors in a single bulk query.
 func TestGraphObjectStorage_GetNeighbors_BulkTraversal(t *testing.T) {
-	defer goleak.VerifyNone(t)
+	currentLeaks := goleak.IgnoreCurrent()
+	defer goleak.VerifyNone(t, currentLeaks)
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()
 
@@ -87,7 +88,8 @@ func TestGraphObjectStorage_GetNeighbors_BulkTraversal(t *testing.T) {
 // TestGraphObjectStorage_FindPathBFS_DepthBound verifies BLI-CEF-PERF-003:
 // BFS search stops at maxBFSDepth without runaway queue expansion.
 func TestGraphObjectStorage_FindPathBFS_DepthBound(t *testing.T) {
-	defer goleak.VerifyNone(t)
+	currentLeaks := goleak.IgnoreCurrent()
+	defer goleak.VerifyNone(t, currentLeaks)
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()
 

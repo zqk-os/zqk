@@ -33,7 +33,6 @@ func TestFileObjectStorage_Create_WithBlockedIOQueue(t *testing.T) {
 		t.Fatalf("failed to create storage: %v", err)
 	}
 
-	defer func() { _ = fos.Shutdown(context.Background()) }()
 	t.Cleanup(func() {
 		opts := storage.TempProjectTeardown(tmpDir, fos)
 		if err := storage.RunProjectTestTeardown(opts); err != nil {
@@ -95,7 +94,7 @@ func TestFileObjectStorage_Create_HonestContextCancellationUnderContention(t *te
 	if err != nil {
 		t.Fatalf("failed to create storage: %v", err)
 	}
-	defer func() { _ = fos.Shutdown(context.Background()) }()
+	t.Cleanup(func() { _ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(tmpDir, fos)) })
 
 	secCtx := pkgctx.NewSecurityContext("ACC-TEST", []string{"admin"}, []string{"read:*", "write:*"})
 

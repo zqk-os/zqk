@@ -24,11 +24,7 @@ paths:
     process: "alpha/process"
     streams: ".zqk/streams_alt"
 `
-	configDir := filepath.Join(zqkDir, paths.ConfigDir)
-	if err := fileutil.EnsureDir(configDir); err != nil {
-		t.Fatal(err)
-	}
-	settingsPath := filepath.Join(configDir, paths.BrandSettingsFilename)
+	settingsPath := filepath.Join(root, paths.BrandSettingsFilename)
 	if err := fileutil.WriteSecureFile(settingsPath, []byte(settingsYAML)); err != nil {
 		t.Fatal(err)
 	}
