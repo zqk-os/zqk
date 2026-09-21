@@ -7,6 +7,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -17,6 +18,13 @@ type scanTestsPackageTimeoutsConfig struct {
 		MinSeconds int    `yaml:"min_seconds"`
 	} `yaml:"packages"`
 }
+
+type packageTimeoutRule struct {
+	Pattern    string
+	MinSeconds int
+}
+
+var scanTimeouts stampmemo.Table[[]packageTimeoutRule] // keyed by projectRoot; stamp is override+default YAML
 
 // GetMinTimeoutSecondsForPackage returns the minimum job/test timeout in seconds for the given package path.
 // Used by scheduler job generation and SuggestedTimeoutForPackage. Reads from
@@ -45,17 +53,25 @@ func GetMinTimeoutSecondsForPackage(projectRoot, packagePath string) int {
 	return defaultMinTimeoutSecondsForPackage(normalized)
 }
 
-func loadScanTestsPackageTimeouts(projectRoot string) []struct {
-	Pattern    string
-	MinSeconds int
-} {
+func scanTestsTimeoutPaths(projectRoot string) (override, fallback string) {
+	override = filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, paths.ScanTestsPackageTimeoutsConfigFile)
+	fallback = filepath.Join(projectRoot, "config", paths.ScanTestsPackageTimeoutsConfigFile)
+	return override, fallback
+}
+
+func loadScanTestsPackageTimeouts(projectRoot string) []packageTimeoutRule {
 	if projectRoot == "" {
 		return nil
 	}
-	for _, base := range []string{
-		filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, paths.ScanTestsPackageTimeoutsConfigFile),
-		filepath.Join(projectRoot, "config", paths.ScanTestsPackageTimeoutsConfigFile),
-	} {
+	override, fallback := scanTestsTimeoutPaths(projectRoot)
+	rules, _ := scanTimeouts.Load(projectRoot, stampmemo.OfAll(override, fallback), func() ([]packageTimeoutRule, error) {
+		return readScanTestsPackageTimeouts(override, fallback), nil
+	})
+	return rules
+}
+
+func readScanTestsPackageTimeouts(paths ...string) []packageTimeoutRule {
+	for _, base := range paths {
 		data, err := fileutil.ReadFile(base)
 		if err != nil {
 			continue
@@ -64,15 +80,9 @@ func loadScanTestsPackageTimeouts(projectRoot string) []struct {
 		if err := yaml.Unmarshal(data, &cfg); err != nil {
 			continue
 		}
-		var out []struct {
-			Pattern    string
-			MinSeconds int
-		}
+		out := make([]packageTimeoutRule, 0, len(cfg.Packages))
 		for _, p := range cfg.Packages {
-			out = append(out, struct {
-				Pattern    string
-				MinSeconds int
-			}{Pattern: p.Pattern, MinSeconds: p.MinSeconds})
+			out = append(out, packageTimeoutRule{Pattern: p.Pattern, MinSeconds: p.MinSeconds})
 		}
 		return out
 	}
