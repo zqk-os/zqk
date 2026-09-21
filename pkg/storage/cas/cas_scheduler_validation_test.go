@@ -158,16 +158,11 @@ func TestCAS_ValidationCacheFilePath(t *testing.T) {
 
 	defer func() { _ = fileStorage.Shutdown(context.Background()) }()
 	t.Cleanup(func() {
-		q := caspkg.GetListingIndexWriteQueueForProjectRoot(testRoot)
-		if q != nil {
-			_ = q.FlushAll(5 * time.Second)
-			_ = q.Shutdown()
+		opts := storage.TempProjectTeardown(testRoot, fileStorage)
+		if err := storage.RunProjectTestTeardown(opts); err != nil {
+			t.Logf("project test teardown: %v", err)
 		}
-		_ = storage.FlushAllListingIndexesForProjectRoot(testRoot)
-		_ = storage.WaitForWALProcessing(testRoot, 15*time.Second)
-		shutdownCtx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-		defer cancel()
-		_ = fileStorage.Shutdown(shutdownCtx)
+		storage.ScrubProjectRootForTempCleanup(baseTempDir, 50, 25*time.Millisecond)
 	})
 
 	// Verify CAS is enabled for backlog_item

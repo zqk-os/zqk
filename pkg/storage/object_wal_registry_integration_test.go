@@ -15,6 +15,12 @@ import (
 func TestObjectWAL_SharedAcquire_CompactDoesNotLeakFDs(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv(zqkenv.TestRoot().Name(), tmpDir)
+	t.Cleanup(func() {
+		opts := TempProjectTeardown(tmpDir, nil)
+		if err := RunProjectTestTeardown(opts); err != nil {
+			t.Logf("project test teardown: %v", err)
+		}
+	})
 
 	wal1, err := AcquireObjectWAL(tmpDir)
 	if err != nil {
@@ -85,8 +91,12 @@ func TestTryCompactWAL_ReusesSameWALPointer(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewFileObjectStorage: %v", err)
 	}
+	defer func() { _ = st.Shutdown(context.Background()) }()
 	t.Cleanup(func() {
-		_ = st.Shutdown(context.Background())
+		opts := TempProjectTeardown(tmpDir, st)
+		if err := RunProjectTestTeardown(opts); err != nil {
+			t.Logf("project test teardown: %v", err)
+		}
 	})
 	if st.wal == nil {
 		t.Fatal("expected WAL")

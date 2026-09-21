@@ -61,6 +61,12 @@ func TestChangeJournal_LifetimeCounters(t *testing.T) {
 		t.Fatalf("Failed to create FileObjectStorage: %v", err)
 	}
 	defer func() { _ = fileStorage.Shutdown(context.Background()) }()
+	t.Cleanup(func() {
+		opts := TempProjectTeardown(tmpDir, fileStorage)
+		if err := RunProjectTestTeardown(opts); err != nil {
+			t.Logf("project test teardown: %v", err)
+		}
+	})
 
 	secCtx := pkgctx.NewSecurityContext("ACC-TEST", []string{"admin"}, []string{})
 

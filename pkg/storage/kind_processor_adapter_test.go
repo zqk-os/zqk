@@ -69,6 +69,13 @@ func TestKindProcessorRegistry_StorageIntegration(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewFileObjectStorageForTest: %v", err)
 	}
+	defer func() { _ = fos.Shutdown(context.Background()) }()
+	t.Cleanup(func() {
+		opts := TempProjectTeardown(testRoot, fos)
+		if err := RunProjectTestTeardown(opts); err != nil {
+			t.Logf("project test teardown: %v", err)
+		}
+	})
 
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()
