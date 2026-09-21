@@ -48,4 +48,3 @@ func IndexYAMLNames(dir string) map[string]string {
 	})
 	return idx
 }
-

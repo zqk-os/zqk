@@ -68,4 +68,3 @@ func TestIndexYAMLNames_skipsHexHashCASFiles(t *testing.T) {
 		t.Fatalf("backlog_item.yaml got %q", idx["backlog_item.yaml"])
 	}
 }
-
