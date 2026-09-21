@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/brand"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
@@ -24,7 +25,18 @@ var MCPServeArgs = []string{"mcp", "serve"}
 //  5. project-local bin/<executable> and stable images
 //  6. PATH lookup of brand.ExecutableName()
 //  7. brand.ExecutableName() as a PATH name (not a cwd-relative ./bin guess)
+var productCLIs stampmemo.Table[string] // keyed by projectRoot + BIN/STABLE env (closed per process)
+
 func ResolveProductCLI(projectRoot string) string {
+	root := strings.TrimSpace(projectRoot)
+	key := root + "\x00" + strings.TrimSpace(zqkenv.Bin().Get()) + "\x00" + strings.TrimSpace(zqkenv.StableBinaryPath().Get())
+	path, _ := productCLIs.Load(key, stampmemo.OfAll(ProductCLICandidates(root)...), func() (string, error) {
+		return resolveProductCLI(root), nil
+	})
+	return path
+}
+
+func resolveProductCLI(projectRoot string) string {
 	if bin := strings.TrimSpace(zqkenv.Bin().Get()); bin != emptyValue && existingFile(bin) {
 		return bin
 	}

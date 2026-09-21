@@ -17,6 +17,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -34,18 +35,16 @@ type FeatureFlags struct {
 	filePath string
 }
 
-var (
-	globalFeatureFlags *FeatureFlags
-	featureFlagsOnce   sync.Once
-)
+var featureFlagSets stampmemo.Table[*FeatureFlags] // keyed by projectRoot; stamp is the flags file
 
-// GetGlobalFeatureFlags returns the global feature flags instance
 func GetGlobalFeatureFlags(projectRoot string) *FeatureFlags {
-	featureFlagsOnce.Do(func() {
-		globalFeatureFlags = NewFeatureFlags(projectRoot)
-		_ = globalFeatureFlags.Load() //nolint:errcheck // Load errors use default flags
+	path := datacell.FeatureFlagsPath(projectRoot)
+	ff, _ := featureFlagSets.Load(projectRoot, stampmemo.Of(path), func() (*FeatureFlags, error) {
+		flags := NewFeatureFlags(projectRoot)
+		_ = flags.Load() //nolint:errcheck // Load errors use default flags
+		return flags, nil
 	})
-	return globalFeatureFlags
+	return ff
 }
 
 // NewFeatureFlags creates a new feature flags manager

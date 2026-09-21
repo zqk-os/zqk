@@ -21,11 +21,17 @@ var (
 	discoveredPaths stampmemo.Table[string]
 	// resolvedFindPaths is keyed by cwd+pathKey. Stamp is cwd.
 	resolvedFindPaths stampmemo.Table[string]
+	// timeoutConfigs is keyed "global". Stamp is .zqk/config/config.yaml.
+	timeoutConfigs stampmemo.Table[*ValidationTimeoutConfig]
+	// tierConfigs is keyed "global". Stamp is .zqk/config/config.yaml.
+	tierConfigs stampmemo.Table[*ValidationTierConfig]
 )
 
 func resetDiscoveredPaths() {
 	discoveredPaths.Reset()
 	resolvedFindPaths.Reset()
+	timeoutConfigs.Delete(globalConfigKey)
+	tierConfigs.Delete(globalConfigKey)
 	paths.ResetCwdDiscovery()
 }
 

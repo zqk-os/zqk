@@ -3,12 +3,12 @@ package validation
 import (
 	"fmt"
 	"path/filepath"
-	"sync"
 
 	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -22,11 +22,6 @@ type ValidationTierConfig struct {
 	// This allows custom tier assignment for different validation rules
 	RuleToTierMapping map[string]int `yaml:"rule_to_tier_mapping"`
 }
-
-var (
-	globalTierConfig     *ValidationTierConfig
-	globalTierConfigOnce sync.Once
-)
 
 // DefaultValidationTierConfig returns the default tier configuration
 func DefaultValidationTierConfig() *ValidationTierConfig {
@@ -114,41 +109,19 @@ func LoadValidationTierConfig(configPath string) (*ValidationTierConfig, error) 
 
 // GetGlobalValidationTierConfig returns the singleton instance of the tier config
 func GetGlobalValidationTierConfig() *ValidationTierConfig {
-	globalTierConfigOnce.Do(func() {
-		config, err := LoadValidationTierConfig("")
-		if err != nil {
-			globalTierConfig = DefaultValidationTierConfig()
-		} else {
-			globalTierConfig = config
-		}
+	path := findValidationTierConfig()
+	cfg, err := tierConfigs.Load(globalConfigKey, stampmemo.Of(path), func() (*ValidationTierConfig, error) {
+		return LoadValidationTierConfig(path)
 	})
-	return globalTierConfig
+	if err != nil || cfg == nil {
+		return DefaultValidationTierConfig()
+	}
+	return cfg
 }
 
 // findValidationTierConfig searches for validation tier config file
 func findValidationTierConfig() string {
-	// Look for .zqk/config/config.yaml
-	cwd, err := fileutil.Getwd()
-	if err != nil {
-		return ""
-	}
-
-	// Check current directory and parent directories
-	current := cwd
-	for {
-		configPath := filepath.Join(current, paths.ProjectDataDir, paths.ConfigDir, paths.ProjectConfigFile)
-		if _, err := fileutil.Stat(configPath); err == nil {
-			return configPath
-		}
-
-		parent := filepath.Dir(current)
-		if parent == current {
-			break
-		}
-		current = parent
-	}
-
-	return ""
+	return paths.FirstExistingFromCwd(filepath.Join(paths.ProjectDataDir, paths.ConfigDir, paths.ProjectConfigFile))
 }
 
 // GetTierForRule returns the tier for a validation rule

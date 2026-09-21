@@ -4,17 +4,14 @@ import (
 	"maps"
 	"path/filepath"
 	"strings"
-	"sync"
 
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/zqk-os/zqk/pkg/concurrency"
-	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 )
 
 // ProfileType represents the type of profile
@@ -40,7 +37,6 @@ const (
 	errInvalidProfileKindFmt  = "invalid profile kind: %s (expected 'profile')"
 	errLoadParentProfileFmt   = "failed to load parent profile %s: %w"
 	errProfileTypeMismatchFmt = "profile type mismatch: %s extends %s but types differ (%s vs %s)"
-	dotDotPathSegment         = ".."
 	emptyPath                 = ""
 )
 
@@ -69,8 +65,7 @@ type ProfileMetadata struct {
 // ProfileLoader loads and resolves unified profiles with inheritance
 type ProfileLoader struct {
 	profilesDir string
-	cache       map[string]*UnifiedProfile // Cache for loaded profiles (name -> profile)
-	mu          sync.RWMutex               // Protects cache
+	cache       stampmemo.Table[*UnifiedProfile] // keyed by profile name (closed profile tree)
 }
 
 // NewProfileLoader creates a new unified profile loader
@@ -80,42 +75,15 @@ func NewProfileLoader(profilesDir string) *ProfileLoader {
 	}
 	return &ProfileLoader{
 		profilesDir: profilesDir,
-		cache:       make(map[string]*UnifiedProfile),
 	}
 }
 
 // LoadProfileWithInheritance loads a profile and resolves its inheritance chain
 func (pl *ProfileLoader) LoadProfileWithInheritance(profileName string) (*UnifiedProfile, error) {
-	var cached *UnifiedProfile
-	var fromCache bool
-	_ = concurrency.RunInRLock(&pl.mu, func() error {
-		if c, ok := pl.cache[profileName]; ok {
-			cached = c
-			fromCache = true
-		}
-		return nil
+	path := pl.resolveProfilePath(profileName)
+	return pl.cache.Load(profileName, stampmemo.Of(path), func() (*UnifiedProfile, error) {
+		return pl.loadProfileWithInheritanceRecursive(profileName, make(map[string]bool))
 	})
-	if fromCache {
-		return cached, nil
-	}
-
-	visited := make(map[string]bool)
-	profile, err := pl.loadProfileWithInheritanceRecursive(profileName, visited)
-	if err != nil {
-		return nil, err
-	}
-
-	var final *UnifiedProfile
-	_ = concurrency.RunInLock(&pl.mu, func() error {
-		if c, ok := pl.cache[profileName]; ok {
-			final = c
-			return nil
-		}
-		pl.cache[profileName] = profile
-		final = profile
-		return nil
-	})
-	return final, nil
 }
 
 // loadProfileWithInheritanceRecursive recursively loads profile and resolves inheritance
@@ -215,59 +183,9 @@ func (pl *ProfileLoader) resolveProfilePath(profileName string) string {
 
 // findProfilesDir attempts to find the profile specs directory
 func findProfilesDir() string {
-	// Try common locations
-	possiblePaths := []string{
-		paths.ProcessInternalProfileSpecsDir,
-		filepath.Join(dotDotPathSegment, paths.ProcessInternalProfileSpecsDir),
-		filepath.Join(dotDotPathSegment, dotDotPathSegment, paths.ProcessInternalProfileSpecsDir),
-	}
-
-	wd, err := fileutil.Getwd()
-	if err != nil {
-		return emptyPath
-	}
-
-	for _, path := range possiblePaths {
-		absPath := filepath.Join(wd, path)
-		if info, err := fileutil.Stat(absPath); err == nil && info.IsDir() {
-			return absPath
-		}
-	}
-
-	// Walk up directory tree looking for project root
-	dir := wd
-	for {
-		profilesDir := filepath.Join(dir, paths.ProcessInternalProfileSpecsDir)
-		if info, err := fileutil.Stat(profilesDir); err == nil && info.IsDir() {
-			return profilesDir
-		}
-
-		// Check if we're at project root
-		if _, err := fileutil.Stat(filepath.Join(dir, paths.ProjectDataDir)); err == nil {
-			// Try profile_specs at this level
-			if info, err := fileutil.Stat(profilesDir); err == nil && info.IsDir() {
-				return profilesDir
-			}
-		}
-
-		// Move up one directory
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			break // Reached filesystem root
-		}
-		dir = parent
-	}
-
-	return emptyPath
+	return paths.FirstExistingFromCwd(paths.ProcessInternalProfileSpecsDir)
 }
 
-// ClearCache clears the profile cache, forcing reload of all profiles on next access
 func (pl *ProfileLoader) ClearCache() {
-	_ = concurrency.RunInLockWithLogger(
-		&pl.mu, LockNameConfigLoaderClearCache, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
-		func() error {
-			pl.cache = make(map[string]*UnifiedProfile)
-			return nil
-		},
-	)
+	pl.cache.Reset()
 }
