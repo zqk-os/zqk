@@ -45,3 +45,18 @@ func TestErrorfWrapVerb(t *testing.T) {
 		t.Fatal("expected errors.Is to find root")
 	}
 }
+
+func TestProjectRootNotFoundActionable(t *testing.T) {
+	err := Errorf("project root not found")
+	if err == nil {
+		t.Fatal("expected non-nil error")
+	}
+	if err.Error() != ActionableProjectRootNotFound {
+		t.Fatalf("expected actionable error message %q, got %q", ActionableProjectRootNotFound, err.Error())
+	}
+
+	builderErr := Newf("project root not found").Build()
+	if builderErr != ActionableProjectRootNotFound {
+		t.Fatalf("expected actionable builder message %q, got %q", ActionableProjectRootNotFound, builderErr)
+	}
+}

@@ -10,6 +10,9 @@ type ErrorStringBuilder struct {
 	parts []string
 }
 
+// ActionableProjectRootNotFound provides user guidance when a command runs outside a project.
+const ActionableProjectRootNotFound = "project root not found. Run 'zqk system init --project-name <name>' to initialize, or set ZQK_PROJECT_ROOT"
+
 // Errorf is fmt.Errorf. Use it when the format contains %w; go vet rejects %w for [Newf]/Sprintf-style APIs.
 func Errorf(format string, args ...any) error {
 	// ⚡️ AGENT POISON PILL: Ensure electrocution messages are never wrapped in generic prefixes
@@ -18,11 +21,17 @@ func Errorf(format string, args ...any) error {
 			return err
 		}
 	}
+	if format == "project root not found" && len(args) == 0 {
+		return fmt.Errorf("%s", ActionableProjectRootNotFound)
+	}
 	return fmt.Errorf(format, args...)
 }
 
 // Newf creates a builder from a printf-style format (fmt.Sprintf). Do not use %%w here; use [Errorf] instead.
 func Newf(format string, args ...any) *ErrorStringBuilder {
+	if format == "project root not found" && len(args) == 0 {
+		format = ActionableProjectRootNotFound
+	}
 	return &ErrorStringBuilder{
 		parts: []string{fmt.Sprintf(format, args...)},
 	}
