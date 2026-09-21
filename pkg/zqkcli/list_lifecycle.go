@@ -9,7 +9,6 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/appledouble"
@@ -84,13 +83,8 @@ func listLifecycleDefinitionsForAll(cmd *cobra.Command, proc *cli.Processor, sto
 			return nil
 		}
 
-		data, readErr := fileutil.ReadFile(path)
-		if readErr != nil {
-			return nil
-		}
-
-		var lifecycleDef map[string]any
-		if parseErr := yaml.Unmarshal(data, &lifecycleDef); parseErr != nil {
+		lifecycleDef, loadErr := loadYAMLDoc(path)
+		if loadErr != nil {
 			return nil
 		}
 
@@ -232,41 +226,26 @@ func listLifecycleDefinitions(cmd *cobra.Command, proc *cli.Processor, storagePr
 			return nil
 		}
 
-		// Read lifecycle file
-		data, readErr := fileutil.ReadFile(path)
-		if readErr != nil {
+		lifecycleDef, loadErr := loadYAMLDoc(path)
+		if loadErr != nil {
 			profile := proc.Context().Profile
 			if profile == emptyValue {
 				profile = string(pkgctx.ProfileSystem)
+			}
+			event := "parse_lifecycle_file"
+			if fileutil.IsNotExist(loadErr) {
+				event = "read_lifecycle_file"
 			}
 			emitInternalListErrorViaCoordinator(
 				proc.OperationContext(),
 				projectRoot,
 				storageProvider,
-				"read_lifecycle_file",
-				fmt.Sprintf("Failed to read lifecycle file: %s", path),
-				readErr,
+				event,
+				fmt.Sprintf("Failed to load lifecycle file: %s", path),
+				loadErr,
 				profile,
 			)
-			return nil // Skip files we can't read
-		}
-
-		var lifecycleDef map[string]any
-		if parseErr := yaml.Unmarshal(data, &lifecycleDef); parseErr != nil {
-			profile := proc.Context().Profile
-			if profile == emptyValue {
-				profile = string(pkgctx.ProfileSystem)
-			}
-			emitInternalListErrorViaCoordinator(
-				proc.OperationContext(),
-				projectRoot,
-				storageProvider,
-				"parse_lifecycle_file",
-				fmt.Sprintf("Failed to parse lifecycle file: %s", path),
-				parseErr,
-				profile,
-			)
-			return nil // Skip files we can't parse
+			return nil
 		}
 
 		// Extract object_type (which is the kind this lifecycle applies to)

@@ -9,7 +9,6 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/appledouble"
@@ -88,14 +87,8 @@ func listObjectSpecsForAll(cmd *cobra.Command, proc *cli.Processor, storageProvi
 			return nil
 		}
 
-		// Read spec file
-		data, readErr := fileutil.ReadFile(path)
-		if readErr != nil {
-			return nil
-		}
-
-		var specDef map[string]any
-		if parseErr := yaml.Unmarshal(data, &specDef); parseErr != nil {
+		specDef, loadErr := loadYAMLDoc(path)
+		if loadErr != nil {
 			return nil
 		}
 
