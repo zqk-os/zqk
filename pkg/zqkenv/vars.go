@@ -31,6 +31,7 @@ const _sfxAgentMaxVerificationAttempts = "AGENT_MAX_VERIFICATION_ATTEMPTS"
 const _sfxAgentSyncMaxStagnantTicks = "AGENT_SYNC_MAX_STAGNANT_TICKS"
 const _sfxAPIKey = "API_KEY"
 const _sfxAggregationMetricCreationTimeout = "AGGREGATION_METRIC_CREATION_TIMEOUT"
+const _sfxAllowForegroundGoTest = "ALLOW_FOREGROUND_GO_TEST"
 const _sfxBin = "BIN"
 const _sfxBulkBenchSize = "BULK_BENCH_SIZE"
 const _sfxLocalCIDir = "LOCAL_CI_DIR"
@@ -707,6 +708,12 @@ func TestMode() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxTestMode)} }
 // This names a *location*: the project root to resolve against, not a permission flag.
 func TestRoot() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxTestRoot)} }
 
+// AllowForegroundGoTest returns the environment variable name for ALLOW_FOREGROUND_GO_TEST
+// (brand-prefixed). It grants exactly one thing: permission to run `go test` in the foreground
+// without the agent guard panicking. It changes no paths and no behavior, which is the point —
+// it is safe to export into a long-lived shell.
+func AllowForegroundGoTest() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxAllowForegroundGoTest)} }
+
 // SharedTestBin returns the environment variable name for SHARED_TEST_BIN (brand-prefixed).
 func SharedTestBin() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxSharedTestBin)} }
 
@@ -782,6 +789,11 @@ const _sfxZqkShimBypassTraceability = "SHIM_BYPASS_TRACEABILITY" //nolint:gosec
 func ZqkShimBypassTraceability() EnvVar {
 	return EnvVar{Key: brand.EnvVar(_sfxZqkShimBypassTraceability)}
 }
+
+// ZqkShimBypassPolCode009 is a deprecated alias for ZqkShimBypassTraceability (retained for backward compatibility).
+const _sfxZqkShimBypassPolCode009 = "ZQK_SHIM_BYPASS_POLCODE009" //nolint:gosec
+
+func ZqkShimBypassPolCode009() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxZqkShimBypassPolCode009)} }
 
 const _sfxBreakGlassReason = "BREAK_GLASS_REASON"
 
@@ -925,6 +937,7 @@ func MCPRunDeadlockReproduction() EnvVar { return EnvVar{Key: "MCP_RUN_DEADLOCK_
 
 // Aliases for prefix-less internal vars that need a specific ZQK-equivalent function
 func ZQKCLITestUpdateHelpGolden() EnvVar { return EnvVar{Key: "ZQKCLI_TEST_UPDATE_HELP_GOLDEN"} }
+func ZQKAllowForegroundGoTest() EnvVar   { return EnvVar{Key: "ZQK_ALLOW_FOREGROUND_GO_TEST"} }
 func ZqkEnv() EnvVar                     { return Env() }
 func ZQKProjectRoot() EnvVar             { return EnvVar{Key: DefaultBrandKey("PROJECT_ROOT")} }
 func ZQKTestRoot() EnvVar                { return EnvVar{Key: DefaultBrandKey("TEST_ROOT")} }
