@@ -146,17 +146,12 @@ func (av *AsyncValidator) Start() error {
 func (av *AsyncValidator) Stop() error {
 	var stopErr error
 	av.stopOnce.Do(func() {
-		var wasRunning bool
 		var workerTimeout, cacheTimeout time.Duration
 		if err := concurrency.RunInLockWithLogger(
 			&av.mu,
 			LockNameAsyncValidatorStopInit,
 			lockLoggerSystem(),
 			func() error {
-				if !av.running {
-					return nil
-				}
-				wasRunning = true
 				av.cancel()
 				av.running = false
 
@@ -175,10 +170,6 @@ func (av *AsyncValidator) Stop() error {
 			},
 		); err != nil {
 			logging.Fluent(av.logger).Error(ErrMsgInitStopSeq, err).Log()
-		}
-
-		if !wasRunning {
-			return
 		}
 
 		stopErr = runAsyncValidatorStopPipeline(workerTimeout, cacheTimeout, av)

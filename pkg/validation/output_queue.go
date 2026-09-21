@@ -403,7 +403,7 @@ func (ow *OutputWriter) run() {
 	for {
 		select {
 		case <-ow.ctx.Done():
-			// Flush all handlers before exiting
+			ow.drainQueue(batchSize)
 			ow.flushAll()
 			return
 		default:
@@ -413,6 +413,7 @@ func (ow *OutputWriter) run() {
 				// Queue empty - check if we should exit
 				select {
 				case <-ow.ctx.Done():
+					ow.drainQueue(batchSize)
 					ow.flushAll()
 					return
 				default:
@@ -422,37 +423,49 @@ func (ow *OutputWriter) run() {
 				}
 			}
 
-			// Process batch without holding any locks (outer lock already released)
-			// Inner loop: no locks needed since no other thread can modify the batch
-			for _, packet := range batch {
-				// Route to appropriate handler (no lock held)
-				handler := ow.handlers[packet.ChannelID]
-				if handler != nil {
-					if err := handler.Write(packet.Data); err != nil {
-						if ow.logger != nil {
-							logging.Fluent(ow.logger).Warn(ConstMagic6f10ed29).
-								String("channel", packet.ChannelID).
-								WithError(err).
-								Log()
-						}
-					}
+			ow.processBatch(batch)
+		}
+	}
+}
 
-					if packet.FlushHint {
-						if err := handler.Flush(); err != nil {
-							if ow.logger != nil {
-								logging.Fluent(ow.logger).Warn(ConstMagicf3349cce).
-									String("channel", packet.ChannelID).
-									WithError(err).
-									Log()
-							}
-						}
-					}
-				} else if ow.logger != nil {
-					logging.Fluent(ow.logger).Debug(ConstMagic5211ff9e).
+func (ow *OutputWriter) drainQueue(batchSize int) {
+	for {
+		batch, ok := ow.queue.DequeueBatch(batchSize)
+		if !ok || len(batch) == 0 {
+			break
+		}
+		ow.processBatch(batch)
+	}
+}
+
+func (ow *OutputWriter) processBatch(batch []OutputPacket) {
+	for _, packet := range batch {
+		// Route to appropriate handler (no lock held)
+		handler := ow.handlers[packet.ChannelID]
+		if handler != nil {
+			if err := handler.Write(packet.Data); err != nil {
+				if ow.logger != nil {
+					logging.Fluent(ow.logger).Warn(ConstMagic6f10ed29).
 						String("channel", packet.ChannelID).
+						WithError(err).
 						Log()
 				}
 			}
+
+			if packet.FlushHint {
+				if err := handler.Flush(); err != nil {
+					if ow.logger != nil {
+						logging.Fluent(ow.logger).Warn(ConstMagicf3349cce).
+							String("channel", packet.ChannelID).
+							WithError(err).
+							Log()
+					}
+				}
+			}
+		} else if ow.logger != nil {
+			logging.Fluent(ow.logger).Debug(ConstMagic5211ff9e).
+				String("channel", packet.ChannelID).
+				Log()
 		}
 	}
 }
