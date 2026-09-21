@@ -40,7 +40,7 @@ func TestWriteSystemObjectAndRegisterHash_Integrity(t *testing.T) {
 kind: audit_event
 schema_version: "` + objects.DefaultSchemaVersion + `"
 created_at: "2030-01-04T20:00:00Z"
-created_by: ACC-1785920548450214012-68b850c0
+created_by: ACC-SYSTEM
 status: completed
 event_type: scheduler_job_started
 operation: "Scheduler job SCH-001 (cache_refresh) started"
@@ -211,7 +211,7 @@ func TestWriteSystemObjectAndRegisterHash_FileSystemDelay(t *testing.T) {
 kind: audit_event
 schema_version: "` + objects.DefaultSchemaVersion + `"
 created_at: "2030-01-04T20:00:00Z"
-created_by: ACC-1785920548450214012-68b850c0
+created_by: ACC-SYSTEM
 status: completed
 `)
 
@@ -323,7 +323,7 @@ func TestSchedulerAuditEvent_HashIntegrity(t *testing.T) {
 kind: audit_event
 schema_version: "` + objects.DefaultSchemaVersion + `"
 created_at: "2030-01-04T20:00:00Z"
-created_by: ACC-1785920548450214012-68b850c0
+created_by: ACC-SYSTEM
 status: completed
 event_type: scheduler_job_completed
 operation: "Scheduler job SCH-001 (cache_refresh) completed successfully in 1.5s"
@@ -412,15 +412,15 @@ func TestAggregationMetric_HashIntegrity(t *testing.T) {
 		objects.FieldKeyLastSeen:               "2030-01-04T01:00:00Z",
 		objects.FieldKeySchemaVersion:          objects.DefaultSchemaVersion,
 		objects.FieldKeyCreatedAt:              "2030-01-04T20:00:00Z",
-		objects.FieldKeyCreatedBy:              "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:              "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:              "2030-01-04T20:00:00Z",
-		objects.FieldKeyUpdatedBy:              "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:              "ACC-SYSTEM",
 	}
 
 	// Create object via storage (same path aggregation metrics use)
 	ctx := pkgctx.NewSystemContext()
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 		Roles:     []string{"admin"},
 	}
 
@@ -493,7 +493,7 @@ func TestSystemObjectHashIntegrity_EndToEnd(t *testing.T) {
 kind: audit_event
 schema_version: "` + objects.DefaultSchemaVersion + `"
 created_at: "2030-01-04T20:00:00Z"
-created_by: ACC-1785920548450214012-68b850c0
+created_by: ACC-SYSTEM
 status: completed
 event_type: scheduler_job_started
 `)

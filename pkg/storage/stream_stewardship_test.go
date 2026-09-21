@@ -260,7 +260,7 @@ func TestPostRetentionStreamStewardship_runtimeDeltaBackfill_fixture(t *testing.
 		objects.FieldKeyStatus: objects.ObjectStatusActive, objects.FieldKeyJobType: "cache_prewarm", objects.FieldKeyTriggerType: "timer",
 		objects.FieldKeyScheduleExpression: "*/5 * * * *", objects.FieldKeyCategory: "maintenance",
 		objects.FieldKeyExecutionMode: "reusable", objects.FieldKeyEnabled: true,
-		objects.FieldKeyCreatedAt: "2030-01-01T00:00:00Z", objects.FieldKeyCreatedBy: "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedAt: "2030-01-01T00:00:00Z", objects.FieldKeyCreatedBy: "ACC-SYSTEM",
 		objects.FieldKeyOriginProject: "zqk", objects.FieldKeyOriginSystem: "zqk",
 	}
 	ctx := pkgctx.NewSystemContext()

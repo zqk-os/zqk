@@ -93,7 +93,7 @@ func TestLogLevel_Parsing(t *testing.T) {
 			tt.jobData[objects.FieldKeyKind] = "scheduler_job"
 			tt.jobData[objects.FieldKeySchemaVersion] = objects.DefaultSchemaVersion
 			tt.jobData[objects.FieldKeyCreatedAt] = "2026-01-05T00:00:00Z"
-			tt.jobData[objects.FieldKeyCreatedBy] = "ACC-1785920548450214012-68b850c0"
+			tt.jobData[objects.FieldKeyCreatedBy] = "ACC-SYSTEM"
 			tt.jobData[objects.FieldKeyOriginSystem] = validation.DefaultOriginSystem
 			tt.jobData[objects.FieldKeyOriginProject] = validation.DefaultOriginProject
 			tt.jobData[objects.FieldKeyStatus] = "active"
@@ -249,7 +249,7 @@ func TestLogLevel_Validation(t *testing.T) {
 		objects.FieldKeyTriggerType:   "manual",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyCreatedAt:     "2026-01-05T00:00:00Z",
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyOriginSystem:  validation.DefaultOriginSystem,
 		objects.FieldKeyOriginProject: validation.DefaultOriginProject,
 		objects.FieldKeyStatus:        "active",

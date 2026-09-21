@@ -39,7 +39,7 @@ func TestBulkCheckPath_POL_DEBUG_001_Issue(t *testing.T) {
 
 	ctx := pkgctx.NewSystemContext()
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	}
 
 	fileStorage, err := storage.NewFileObjectStorageForTest(testRoot)
@@ -85,9 +85,9 @@ func TestBulkCheckPath_POL_DEBUG_001_Issue(t *testing.T) {
 		objects.FieldKeyCategory:      "code_quality",
 		objects.FieldKeyBody:          "**Policy for testing bulk check path.\nThis policy has all required fields to verify bulk check uses fresh data.**",
 		objects.FieldKeyCreatedAt:     zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyNamespaceID:   "zqk:kernel",
 		objects.FieldKeyOriginProject: "zqk",
 		objects.FieldKeyOriginSystem:  "zqk",
@@ -194,7 +194,7 @@ func TestBulkCheckPath_MultipleObjects(t *testing.T) {
 
 	ctx := pkgctx.NewSystemContext()
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	}
 
 	fileStorage, err := storage.NewFileObjectStorageForTest(testRoot)
@@ -241,9 +241,9 @@ func TestBulkCheckPath_MultipleObjects(t *testing.T) {
 			objects.FieldKeyCategory:      "code_quality",
 			objects.FieldKeyBody:          "Body content for policy 1",
 			objects.FieldKeyCreatedAt:     zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ),
-			objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 			objects.FieldKeyUpdatedAt:     zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ),
-			objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 			objects.FieldKeyNamespaceID:   "zqk:kernel",
 			objects.FieldKeyOriginProject: "zqk",
 			objects.FieldKeyOriginSystem:  "zqk",
@@ -259,9 +259,9 @@ func TestBulkCheckPath_MultipleObjects(t *testing.T) {
 			objects.FieldKeyCategory:      "security",
 			objects.FieldKeyBody:          "Body content for policy 2",
 			objects.FieldKeyCreatedAt:     zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ),
-			objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 			objects.FieldKeyUpdatedAt:     zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ),
-			objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 			objects.FieldKeyNamespaceID:   "zqk:kernel",
 			objects.FieldKeyOriginProject: "zqk",
 			objects.FieldKeyOriginSystem:  "zqk",

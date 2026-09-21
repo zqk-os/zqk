@@ -60,7 +60,7 @@ func TestCLI_AgainstTestScenario(t *testing.T) {
 		t.Skip("Skipping integration test in short mode")
 	}
 	prefix := "ZQK"
-	t.Setenv(prefix+"_ADMIN_TEST_INIT_API_KEY", "ACC-1785920548450214012-68b850c0")
+	t.Setenv(prefix+"_ADMIN_TEST_INIT_API_KEY", "ACC-SYSTEM")
 	t.Setenv(prefix+"_ADMIN_TEST_INIT_BYPASS_AUTH", "1")
 	// End-to-end CLI test using an isolated copy from test-scenarios (SetupScenarioTestEnvironment).
 	// Use a checked-in scenario as the immutable source of truth and work

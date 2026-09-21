@@ -33,7 +33,7 @@ func TestCAS_AuditAggregation(t *testing.T) {
 	}
 
 	defer func() { _ = fileStorage.Shutdown(context.Background()) }()
-	secCtx := &pkgctx.SecurityContext{AccountID: "ACC-1785920548450214012-68b850c0"}
+	secCtx := &pkgctx.SecurityContext{AccountID: "ACC-SYSTEM"}
 	_ = storage.InitializeGlobalBufferWithConfig(testRoot, secCtx)
 	t.Cleanup(func() {
 		opts := storage.TempProjectTeardown(testRoot, fileStorage)
@@ -68,9 +68,9 @@ func TestCAS_AuditAggregation(t *testing.T) {
 			objects.FieldKeyKind:          "audit_event",
 			objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 			objects.FieldKeyCreatedAt:     windowStart.Add(30 * time.Minute).Format(time.RFC3339),
-			objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 			objects.FieldKeyUpdatedAt:     windowStart.Add(30 * time.Minute).Format(time.RFC3339),
-			objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 			objects.FieldKeyOriginSystem:  validation.DefaultOriginSystem,
 			objects.FieldKeyOriginProject: validation.DefaultOriginProject,
 			objects.FieldKeyStatus:        objects.ObjectStatusCompleted,
@@ -84,9 +84,9 @@ func TestCAS_AuditAggregation(t *testing.T) {
 			objects.FieldKeyKind:          "audit_event",
 			objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 			objects.FieldKeyCreatedAt:     windowStart.Add(60 * time.Minute).Format(time.RFC3339),
-			objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 			objects.FieldKeyUpdatedAt:     windowStart.Add(60 * time.Minute).Format(time.RFC3339),
-			objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 			objects.FieldKeyOriginSystem:  validation.DefaultOriginSystem,
 			objects.FieldKeyOriginProject: validation.DefaultOriginProject,
 			objects.FieldKeyStatus:        objects.ObjectStatusCompleted,
@@ -100,9 +100,9 @@ func TestCAS_AuditAggregation(t *testing.T) {
 			objects.FieldKeyKind:          "audit_event",
 			objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 			objects.FieldKeyCreatedAt:     windowStart.Add(90 * time.Minute).Format(time.RFC3339),
-			objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 			objects.FieldKeyUpdatedAt:     windowStart.Add(90 * time.Minute).Format(time.RFC3339),
-			objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 			objects.FieldKeyOriginSystem:  validation.DefaultOriginSystem,
 			objects.FieldKeyOriginProject: validation.DefaultOriginProject,
 			objects.FieldKeyStatus:        objects.ObjectStatusCompleted,
@@ -213,7 +213,7 @@ func TestCAS_ReportGeneration(t *testing.T) {
 
 	ctx := pkgctx.NewSystemContext()
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	}
 	storageCtx := pkgctx.GetStorageContext()
 

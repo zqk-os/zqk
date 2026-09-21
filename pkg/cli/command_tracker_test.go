@@ -30,9 +30,9 @@ func TestCommandExecutionTracker(t *testing.T) {
 	}
 
 	// Test SetActor
-	tracker.SetActor("ACC-1785920548450214012-68b850c0", []string{"admin"})
-	if tracker.ActorID != "ACC-1785920548450214012-68b850c0" {
-		t.Errorf("Expected ActorID 'ACC-1785920548450214012-68b850c0', got '%s'", tracker.ActorID)
+	tracker.SetActor("ACC-SYSTEM", []string{"admin"})
+	if tracker.ActorID != "ACC-SYSTEM" {
+		t.Errorf("Expected ActorID 'ACC-SYSTEM', got '%s'", tracker.ActorID)
 	}
 
 	// Test RecordObjectCreated

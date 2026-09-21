@@ -57,7 +57,7 @@ func TestRuntimeDeltaOnlyUpdate_SkipsCASRewrite_UsesOverlay(t *testing.T) {
 		objects.FieldKeyStatus: objects.ObjectStatusActive, objects.FieldKeyJobType: "cache_prewarm", objects.FieldKeyTriggerType: "timer",
 		objects.FieldKeyScheduleExpression: "*/5 * * * *", objects.FieldKeyCategory: "maintenance",
 		objects.FieldKeyExecutionMode: "reusable", objects.FieldKeyEnabled: true,
-		objects.FieldKeyCreatedAt: "2030-01-01T00:00:00Z", objects.FieldKeyCreatedBy: "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedAt: "2030-01-01T00:00:00Z", objects.FieldKeyCreatedBy: "ACC-SYSTEM",
 		objects.FieldKeyOriginProject: "zqk", objects.FieldKeyOriginSystem: "zqk",
 	}
 	if err := str.Create(ctx, secCtx, job); err != nil {
@@ -106,7 +106,7 @@ func TestRuntimeDeltaStructuralUpdate_ClearsOverlay(t *testing.T) {
 		objects.FieldKeyStatus: objects.ObjectStatusActive, objects.FieldKeyJobType: "cache_prewarm", objects.FieldKeyTriggerType: "timer",
 		objects.FieldKeyScheduleExpression: "*/5 * * * *", objects.FieldKeyCategory: "maintenance",
 		objects.FieldKeyExecutionMode: "reusable", objects.FieldKeyEnabled: true,
-		objects.FieldKeyCreatedAt: "2030-01-01T00:00:00Z", objects.FieldKeyCreatedBy: "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedAt: "2030-01-01T00:00:00Z", objects.FieldKeyCreatedBy: "ACC-SYSTEM",
 		objects.FieldKeyOriginProject: "zqk", objects.FieldKeyOriginSystem: "zqk",
 	}
 	if err := str.Create(ctx, secCtx, job); err != nil {
@@ -144,7 +144,7 @@ func TestRuntimeDeltaFullPayload_WithOnlyRuntimeFieldChange_SkipsCASRewrite(t *t
 		objects.FieldKeyExecutionMode:      "reusable",
 		objects.FieldKeyEnabled:            true,
 		objects.FieldKeyCreatedAt:          "2030-01-01T00:00:00Z",
-		objects.FieldKeyCreatedBy:          "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:          "ACC-SYSTEM",
 		objects.FieldKeyOriginProject:      "zqk",
 		objects.FieldKeyOriginSystem:       "zqk",
 	}

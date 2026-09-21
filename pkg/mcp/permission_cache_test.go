@@ -161,7 +161,7 @@ func TestHasObjectAccessFast(t *testing.T) {
 	pc := NewPermissionCache(mockLoader)
 
 	// Build cache for test user
-	secCtx := pkgctx.NewSecurityContext("ACC-1785920548450214015-3df55bd1", []string{"developer"}, []string{"read:*", "access:team-alpha"})
+	secCtx := pkgctx.NewSecurityContext("ACC-TEST-USER", []string{"developer"}, []string{"read:*", "access:team-alpha"})
 	err := pc.BuildPermissionCache(secCtx)
 	if err != nil {
 		t.Fatalf("failed to build permission cache: %v", err)
@@ -267,7 +267,7 @@ func TestHasObjectAccessFast_CacheHit(t *testing.T) {
 	mockLoader := newMockSpecLoader()
 	pc := NewPermissionCache(mockLoader)
 
-	secCtx := pkgctx.NewSecurityContext("ACC-1785920548450214015-3df55bd1", []string{"developer"}, []string{"read:*", "access:team-alpha"})
+	secCtx := pkgctx.NewSecurityContext("ACC-TEST-USER", []string{"developer"}, []string{"read:*", "access:team-alpha"})
 	err := pc.BuildPermissionCache(secCtx)
 	if err != nil {
 		t.Fatalf("failed to build permission cache: %v", err)
@@ -300,7 +300,7 @@ func TestUserActivationDeactivation(t *testing.T) {
 	mockLoader := newMockSpecLoader()
 	pc := NewPermissionCache(mockLoader)
 
-	secCtx := pkgctx.NewSecurityContext("ACC-1785920548450214015-3df55bd1", []string{"developer"}, []string{"read:*", "access:team-alpha"})
+	secCtx := pkgctx.NewSecurityContext("ACC-TEST-USER", []string{"developer"}, []string{"read:*", "access:team-alpha"})
 	err := pc.BuildPermissionCache(secCtx)
 	if err != nil {
 		t.Fatalf("failed to build permission cache: %v", err)
@@ -358,7 +358,7 @@ func TestInvalidateObjectAccess(t *testing.T) {
 	mockLoader := newMockSpecLoader()
 	pc := NewPermissionCache(mockLoader)
 
-	secCtx := pkgctx.NewSecurityContext("ACC-1785920548450214015-3df55bd1", []string{"developer"}, []string{"read:*", "access:team-alpha"})
+	secCtx := pkgctx.NewSecurityContext("ACC-TEST-USER", []string{"developer"}, []string{"read:*", "access:team-alpha"})
 	err := pc.BuildPermissionCache(secCtx)
 	if err != nil {
 		t.Fatalf("failed to build permission cache: %v", err)
@@ -399,7 +399,7 @@ func TestInvalidateUserCache(t *testing.T) {
 	mockLoader := newMockSpecLoader()
 	pc := NewPermissionCache(mockLoader)
 
-	secCtx := pkgctx.NewSecurityContext("ACC-1785920548450214015-3df55bd1", []string{"developer"}, []string{"read:*", "access:team-alpha"})
+	secCtx := pkgctx.NewSecurityContext("ACC-TEST-USER", []string{"developer"}, []string{"read:*", "access:team-alpha"})
 	err := pc.BuildPermissionCache(secCtx)
 	if err != nil {
 		t.Fatalf("failed to build permission cache: %v", err)
@@ -509,7 +509,7 @@ func TestBuildPermissionCache_InactiveUser(t *testing.T) {
 	mockLoader := newMockSpecLoader()
 	pc := NewPermissionCache(mockLoader)
 
-	secCtx := pkgctx.NewSecurityContext("ACC-1785920548450214015-3df55bd1", []string{"developer"}, []string{"read:*", "access:team-alpha"})
+	secCtx := pkgctx.NewSecurityContext("ACC-TEST-USER", []string{"developer"}, []string{"read:*", "access:team-alpha"})
 
 	// Deactivate user before building cache
 	err := pc.DeactivateUser(secCtx.AccountID)
@@ -551,7 +551,7 @@ func TestRefreshUserPermissions(t *testing.T) {
 	mockLoader := newMockSpecLoader()
 	pc := NewPermissionCache(mockLoader)
 
-	secCtx := pkgctx.NewSecurityContext("ACC-1785920548450214015-3df55bd1", []string{"developer"}, []string{"read:*", "access:team-alpha"})
+	secCtx := pkgctx.NewSecurityContext("ACC-TEST-USER", []string{"developer"}, []string{"read:*", "access:team-alpha"})
 	err := pc.BuildPermissionCache(secCtx)
 	if err != nil {
 		t.Fatalf("failed to build permission cache: %v", err)
@@ -591,7 +591,7 @@ func TestClearCache(t *testing.T) {
 	mockLoader := newMockSpecLoader()
 	pc := NewPermissionCache(mockLoader)
 
-	secCtx := pkgctx.NewSecurityContext("ACC-1785920548450214015-3df55bd1", []string{"developer"}, []string{"read:*", "access:team-alpha"})
+	secCtx := pkgctx.NewSecurityContext("ACC-TEST-USER", []string{"developer"}, []string{"read:*", "access:team-alpha"})
 	err := pc.BuildPermissionCache(secCtx)
 	if err != nil {
 		t.Fatalf("failed to build permission cache: %v", err)
@@ -633,7 +633,7 @@ func TestPermissionCache_LifetimeCounters(t *testing.T) {
 	mockLoader := newMockSpecLoader()
 	pc := NewPermissionCache(mockLoader)
 
-	secCtx := pkgctx.NewSecurityContext("ACC-1785920548450214015-3df55bd1-counters", []string{"developer"}, []string{"read:*"})
+	secCtx := pkgctx.NewSecurityContext("ACC-TEST-USER-counters", []string{"developer"}, []string{"read:*"})
 	_ = pc.BuildPermissionCache(secCtx)
 
 	obj := map[string]any{
@@ -667,7 +667,7 @@ func TestPermissionCache_LifetimeCounters(t *testing.T) {
 	}
 
 	// Invalidate user -> invalidations increases by 2 total
-	pc.InvalidateUserCache("ACC-1785920548450214015-3df55bd1-counters")
+	pc.InvalidateUserCache("ACC-TEST-USER-counters")
 	_, _, iAfter4 := pc.GetPermissionCacheStats()
 	if iAfter4 != iBefore+2 {
 		t.Errorf("expected invalidations to increase by 2 total, got before=%d after=%d", iBefore, iAfter4)

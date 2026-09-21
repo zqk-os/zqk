@@ -15,8 +15,8 @@ var testACCs = struct {
 	validHex      string
 	validStandard string
 }{
-	hashTestUser:  "ACC-1785920548450214015-3df55bd1",
-	hashTestAgent: "ACC-1785920548450214016-ace2aae1",
+	hashTestUser:  "ACC-TEST-USER",
+	hashTestAgent: "ACC-TEST-AGENT",
 	validHex:      "ACC-1785920548450214015-deadbeef1234",
 	validStandard: "ACC-999",
 }
@@ -177,7 +177,7 @@ func TestValidateOwnerRefProduction_DeterministicError(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error for known prototype hash, got nil")
 	}
-	expected := "owner_ref \"ACC-1785920548450214015-3df55bd1\" is a prototype/test account and is not allowed in production"
+	expected := "owner_ref \"ACC-TEST-USER\" is a prototype/test account and is not allowed in production"
 	if err.Error() != expected {
 		t.Errorf("error message mismatch:\ngot  %q\nwant %q", err.Error(), expected)
 	}

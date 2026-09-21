@@ -33,7 +33,7 @@ func draftPlaneDocEntry(id, title, status string) map[string]any {
 		objects.FieldKeyRequirementRefs:   []string{},
 		objects.FieldKeySchemaVersion:     objects.DefaultSchemaVersion,
 		objects.FieldKeyCreatedAt:         zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ),
-		objects.FieldKeyCreatedBy:         "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:         "ACC-SYSTEM",
 	}
 }
 
@@ -46,7 +46,7 @@ func draftPlaneBacklogItem(id, title, status string) map[string]any {
 		objects.FieldKeyDescription:   "conceptual draft-plane list omit test",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyCreatedAt:     zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 	}
 }
 
@@ -379,7 +379,7 @@ func TestCreate_policyActiveCoercedToDraftPlane(t *testing.T) {
 		objects.FieldKeyBody:          "body",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyCreatedAt:     zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 	}
 	if err := fileStorage.Create(ctx, secCtx, obj); err != nil {
 		t.Fatalf("Create policy: %v", err)
@@ -431,7 +431,7 @@ func TestErrIfDraftCreateWouldDualPlane(t *testing.T) {
 		objects.FieldKeyBody:          "body",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyCreatedAt:     zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 	}
 	if err := fileStorage.Create(ctx, secCtx, obj); err != nil {
 		t.Fatalf("promote Create: %v", err)

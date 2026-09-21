@@ -68,7 +68,7 @@ func createTestAuditEventActivity(t *testing.T, projectRoot string, storageProvi
 			GetMetadataDurationField(): 1.5,
 		},
 		CreatedAt: createdAt.Format(time.RFC3339),
-		CreatedBy: "ACC-1785920548450214012-68b850c0",
+		CreatedBy: "ACC-SYSTEM",
 		OnError:   errorCallback,
 	}
 

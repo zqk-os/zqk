@@ -38,7 +38,7 @@ func TestCountWithFilters_NoDeadlockWhenFilesExceedWorkerBuffer(t *testing.T) {
 	})
 
 	ctx := pkgctx.NewSystemContext()
-	secCtx := &pkgctx.SecurityContext{AccountID: "ACC-1785920548450214012-68b850c0"}
+	secCtx := &pkgctx.SecurityContext{AccountID: "ACC-SYSTEM"}
 	ns := validation.DefaultNamespaceKernel
 
 	const n = 20 // > 4*2

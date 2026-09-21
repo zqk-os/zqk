@@ -41,8 +41,8 @@ fi
 	storage := &mockStorage{data: make(map[string]map[string]any)}
 
 	// Seed the mock storage with the sentinel prompt template
-	storage.data["PROMPT-1783091834904015000-066e0f7d"] = map[string]any{
-		objects.FieldKeyID:         "PROMPT-1783091834904015000-066e0f7d",
+	storage.data["PROMPT-SENTINEL"] = map[string]any{
+		objects.FieldKeyID:         "PROMPT-SENTINEL",
 		objects.FieldKeyTitle:      "CAP Sentinel Native Prompt",
 		objects.FieldKeyPromptBody: "AGENT DIRECTIVE:",
 	}

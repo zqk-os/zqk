@@ -327,7 +327,7 @@ func TestCAS_ComponentLevel_Update(t *testing.T) {
 
 	ctx := pkgctx.NewSystemContext()
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	}
 
 	objectID := "BLI-002"
@@ -421,7 +421,7 @@ func TestCAS_ComponentLevel_Delete(t *testing.T) {
 	// backlog_item is kernel-critical; need explicit hard-delete allow.
 	ctx := storage.WithTestHardDelete(pkgctx.NewSystemContext())
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	}
 
 	objectID := "BLI-003"
@@ -511,7 +511,7 @@ func TestCAS_ComponentLevel_Move(t *testing.T) {
 
 	ctx := pkgctx.NewSystemContext()
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	}
 
 	objectID := "BLI-004"

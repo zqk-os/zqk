@@ -64,9 +64,9 @@ func TestAsyncValidator_CascadeDependencies(t *testing.T) {
 		objects.FieldKeyStatus:        "active",
 		objects.FieldKeyTitle:         ConstMagic04554a4d,
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
 	createObjectFile(t, strategicPlanDir, ConstMagicf8bc63fe, strategicPlan)
 
@@ -79,9 +79,9 @@ func TestAsyncValidator_CascadeDependencies(t *testing.T) {
 		objects.FieldKeyTitle:         "Test Milestone",
 		"strategic_plan_ref":          "STRAT-PLAN-001",
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
 	createObjectFile(t, milestoneDir, "MIL-001.yaml", milestone)
 
@@ -94,9 +94,9 @@ func TestAsyncValidator_CascadeDependencies(t *testing.T) {
 		objects.FieldKeyTitle:         "Test Goal",
 		objects.FieldKeyMilestoneRefs: []string{"MIL-001"},
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
 	createObjectFile(t, goalDir, "GOAL-001.yaml", goal)
 
@@ -109,9 +109,9 @@ func TestAsyncValidator_CascadeDependencies(t *testing.T) {
 		objects.FieldKeyTitle:         ConstMagic416ec496,
 		objects.FieldKeyGoalRefs:      []string{"GOAL-001"},
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
 	createObjectFile(t, backlogDir, "BLI-001.yaml", backlogItem)
 
@@ -185,9 +185,9 @@ func TestAsyncValidator_MissingDependencies(t *testing.T) {
 		objects.FieldKeyTitle:         ConstMagic1c2ffb9e,
 		objects.FieldKeyGoalRefs:      []string{"GOAL-999"}, // Non-existent goal
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
 	filePath := createObjectFile(t, backlogDir, "BLI-002.yaml", backlogItem)
 
@@ -247,9 +247,9 @@ func TestAsyncValidator_DeepDependencyChain(t *testing.T) {
 		objects.FieldKeyStatus:        "active",
 		objects.FieldKeyTitle:         ConstMagic162cdfdc,
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
 	createObjectFile(t, dirs["strategic_plan"], ConstMagic880f563a, sp)
 
@@ -262,9 +262,9 @@ func TestAsyncValidator_DeepDependencyChain(t *testing.T) {
 		objects.FieldKeyTitle:         ConstMagic5a816c7d,
 		"strategic_plan_ref":          "STRAT-PLAN-002",
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
 	createObjectFile(t, dirs["milestone"], "MIL-002.yaml", mil)
 
@@ -277,9 +277,9 @@ func TestAsyncValidator_DeepDependencyChain(t *testing.T) {
 		objects.FieldKeyTitle:         "Deep Chain Goal",
 		objects.FieldKeyMilestoneRefs: []string{"MIL-002"},
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
 	createObjectFile(t, dirs["goal"], "GOAL-002.yaml", goal)
 
@@ -292,9 +292,9 @@ func TestAsyncValidator_DeepDependencyChain(t *testing.T) {
 		objects.FieldKeyTitle:         ConstMagic06260a5f,
 		objects.FieldKeyGoalRefs:      []string{"GOAL-002"},
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
 	createObjectFile(t, dirs["requirement"], "REQ-002.yaml", req)
 
@@ -307,9 +307,9 @@ func TestAsyncValidator_DeepDependencyChain(t *testing.T) {
 		objects.FieldKeyTitle:           ConstMagic09b0be1b,
 		objects.FieldKeyRequirementRefs: []string{"REQ-002"},
 		objects.FieldKeyCreatedAt:       time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:       "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:       "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:       time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:       "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:       "ACC-SYSTEM",
 	}
 	createObjectFile(t, dirs["backlog_item"], "BLI-003.yaml", bli)
 
@@ -400,9 +400,9 @@ func TestAsyncValidator_ConcurrentCascadeValidation(t *testing.T) {
 			objects.FieldKeyStatus:        "active",
 			objects.FieldKeyTitle:         fmt.Sprintf("Milestone %s", chainID),
 			objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-			objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 			objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-			objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 		}
 		milPath := createObjectFile(t, milestoneDir, fmt.Sprintf("MIL-%s.yaml", chainID), mil)
 
@@ -415,9 +415,9 @@ func TestAsyncValidator_ConcurrentCascadeValidation(t *testing.T) {
 			objects.FieldKeyTitle:         fmt.Sprintf("Goal %s", chainID),
 			objects.FieldKeyMilestoneRefs: []string{fmt.Sprintf("MIL-%s", chainID)},
 			objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-			objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 			objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-			objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 		}
 		goalPath := createObjectFile(t, goalDir, fmt.Sprintf("GOAL-%s.yaml", chainID), goal)
 
@@ -430,9 +430,9 @@ func TestAsyncValidator_ConcurrentCascadeValidation(t *testing.T) {
 			objects.FieldKeyTitle:         fmt.Sprintf("Backlog Item %s", chainID),
 			objects.FieldKeyGoalRefs:      []string{fmt.Sprintf("GOAL-%s", chainID)},
 			objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-			objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 			objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-			objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 		}
 		bliPath := createObjectFile(t, backlogDir, fmt.Sprintf("BLI-%s.yaml", chainID), bli)
 
@@ -527,9 +527,9 @@ func TestAsyncValidator_DependencyUpdateCascade(t *testing.T) {
 		objects.FieldKeyStatus:        "active",
 		objects.FieldKeyTitle:         "Original Goal",
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
 	goalPath := createObjectFile(t, goalDir, "GOAL-003.yaml", goal)
 
@@ -542,9 +542,9 @@ func TestAsyncValidator_DependencyUpdateCascade(t *testing.T) {
 		objects.FieldKeyTitle:         ConstMagicdce36e2d,
 		objects.FieldKeyGoalRefs:      []string{"GOAL-003"},
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
 	bliPath := createObjectFile(t, backlogDir, "BLI-004.yaml", bli)
 

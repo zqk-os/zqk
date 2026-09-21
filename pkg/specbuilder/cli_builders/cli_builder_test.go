@@ -13,7 +13,7 @@ import (
 
 func TestCLIBuilder_WrapsZQK(t *testing.T) {
 	t.Setenv(zqkenv.TestBypassAuth().Name(), "1")
-	t.Setenv(zqkenv.APIKey().Name(), "ACC-1785920548450214012-68b850c0")
+	t.Setenv(zqkenv.APIKey().Name(), "ACC-SYSTEM")
 	// Execute the equivalent of `./bin/zqk object list policy`
 	// Note: since this is run in the package dir, we reference the zqk binary relatively
 	// or we can use "go run ../../../cmd/zqk"
@@ -29,7 +29,7 @@ func TestCLIBuilder_WrapsZQK(t *testing.T) {
 	builder := NewCLIBuilder(spec, nil).
 		WithEnv(zqkenv.SubprocessEnvironWithTestRootAndExtras(testRoot,
 			zqkenv.TestBypassAuth().Name()+"=1",
-			zqkenv.APIKey().Name()+"=ACC-1785920548450214012-68b850c0",
+			zqkenv.APIKey().Name()+"=ACC-SYSTEM",
 			"ZQK_SESSION_ID=",
 			"ZQK_CONVERGENCE_SESSION_ID=",
 		)).

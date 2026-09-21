@@ -91,7 +91,7 @@ fields:
 			objects.FieldKeyObjectRef:    "backlog_item:BLI-001",
 			objects.FieldKeyChangeType:   "update",
 			objects.FieldKeyCreatedAt:    "2030-02-01T10:00:00Z",
-			objects.FieldKeyCreatedBy:    "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyCreatedBy:    "ACC-SYSTEM",
 			objects.FieldKeyChangedPaths: []any{"status"},
 		},
 		{
@@ -100,7 +100,7 @@ fields:
 			objects.FieldKeyObjectRef:    "backlog_item:BLI-002",
 			objects.FieldKeyChangeType:   "update",
 			objects.FieldKeyCreatedAt:    "2030-02-01T11:00:00Z",
-			objects.FieldKeyCreatedBy:    "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyCreatedBy:    "ACC-SYSTEM",
 			objects.FieldKeyChangedPaths: []any{"title"},
 		},
 		{
@@ -109,7 +109,7 @@ fields:
 			objects.FieldKeyObjectRef:    "backlog_item:BLI-003",
 			objects.FieldKeyChangeType:   "update",
 			objects.FieldKeyCreatedAt:    "2030-02-02T10:00:00Z",
-			objects.FieldKeyCreatedBy:    "ACC-1785920548450214012-68b850c0",
+			objects.FieldKeyCreatedBy:    "ACC-SYSTEM",
 			objects.FieldKeyChangedPaths: []any{"status"},
 		},
 	}

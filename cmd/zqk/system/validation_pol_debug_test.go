@@ -35,7 +35,7 @@ func TestValidation_POL_DEBUG_001_ExactReplica(t *testing.T) {
 
 	ctx := pkgctx.NewSystemContext()
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	}
 
 	fileStorage, err := storage.NewFileObjectStorageForTest(testRoot)
@@ -85,9 +85,9 @@ func TestValidation_POL_DEBUG_001_ExactReplica(t *testing.T) {
 		objects.FieldKeyDescription:   "Policy governing the approach to debugging issues in the ZQK system. When encountering hangs, crashes, unexpected behavior, or performance issues, developers must write tests first to isolate and reproduce the issue before attempting fixes. This prevents wasted time, improves efficiency, and ensures issues are properly understood before resolution.",
 		"enforcement_level":           "required",
 		objects.FieldKeyCreatedAt:     "2026-01-01T00:00:00Z",
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     "2026-01-02T00:00:00Z",
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyOriginProject: validation.DefaultOriginProject,
 		objects.FieldKeyOriginSystem:  validation.DefaultOriginSystem,
 		objects.FieldKeyNamespaceID:   "zqk:kernel",

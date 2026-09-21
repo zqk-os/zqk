@@ -9,7 +9,7 @@ import (
 
 // Test identifiers reused across test cases.
 const (
-	testSkillID       = "ASK-1782593752920560000-99708cd6"
+	testSkillID       = "ASK-TARGETED-VALIDATION"
 	testSkillName     = "Targeted Validation" // kernel identity, not arbitrary magic
 	validATK          = "ATK-1234567890-test"
 	invalidIDPrefix   = "BLI-1234567890-test"

@@ -33,7 +33,7 @@ func TestAcceleratedObjectCount_FunctionalAcceptance(t *testing.T) {
 	})
 
 	ctx := pkgctx.NewSystemContext()
-	secCtx := &pkgctx.SecurityContext{AccountID: "ACC-1785920548450214012-68b850c0"}
+	secCtx := &pkgctx.SecurityContext{AccountID: "ACC-SYSTEM"}
 	ns := validation.DefaultNamespaceKernel
 
 	const objectCount = 15
@@ -92,7 +92,7 @@ func TestAcceleratedObjectCount_BoundaryAndErrorHandling(t *testing.T) {
 	})
 
 	ctx := pkgctx.NewSystemContext()
-	secCtx := &pkgctx.SecurityContext{AccountID: "ACC-1785920548450214012-68b850c0"}
+	secCtx := &pkgctx.SecurityContext{AccountID: "ACC-SYSTEM"}
 
 	// 1. Organizational kinds with zqk:kernel namespace filter must immediately return 0 without error
 	orgCount, err := store.Count(ctx, secCtx, storage.ListFilter{
@@ -147,7 +147,7 @@ func TestAcceleratedObjectCount_IntegrationAndConformance(t *testing.T) {
 		}
 	})
 
-	secCtx := &pkgctx.SecurityContext{AccountID: "ACC-1785920548450214012-68b850c0"}
+	secCtx := &pkgctx.SecurityContext{AccountID: "ACC-SYSTEM"}
 	ctx := pkgctx.NewSystemContext()
 
 	// Seed objects with mixed statuses

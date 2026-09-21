@@ -35,7 +35,7 @@ func TestValidationStaleData_AfterUpdate(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, nil)
 	testRoot := proj.Root
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	}
 	var fileStorage *storage.FileObjectStorage
 	t.Cleanup(func() {
@@ -89,9 +89,9 @@ func TestValidationStaleData_AfterUpdate(t *testing.T) {
 		objects.FieldKeyCategory:      "code_quality",
 		objects.FieldKeyBody:          "Test policy body content",
 		objects.FieldKeyCreatedAt:     "2026-01-02T00:00:00Z",
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     "2026-01-02T00:00:00Z",
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyOriginProject: validation.DefaultOriginProject,
 		objects.FieldKeyOriginSystem:  validation.DefaultOriginSystem,
 		objects.FieldKeyNamespaceID:   "zqk:kernel",
@@ -222,7 +222,7 @@ func TestValidationStaleData_EnumValidation(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, nil)
 	testRoot := proj.Root
 	secCtx := &pkgctx.SecurityContext{
-		AccountID: "ACC-1785920548450214012-68b850c0",
+		AccountID: "ACC-SYSTEM",
 	}
 	var fileStorage *storage.FileObjectStorage
 	t.Cleanup(func() {
@@ -276,9 +276,9 @@ func TestValidationStaleData_EnumValidation(t *testing.T) {
 		objects.FieldKeyCategory:      "code_quality",
 		objects.FieldKeyBody:          "Test policy body",
 		objects.FieldKeyCreatedAt:     "2026-01-02T00:00:00Z",
-		objects.FieldKeyCreatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     "2026-01-02T00:00:00Z",
-		objects.FieldKeyUpdatedBy:     "ACC-1785920548450214012-68b850c0",
+		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyOriginProject: validation.DefaultOriginProject,
 		objects.FieldKeyOriginSystem:  validation.DefaultOriginSystem,
 		objects.FieldKeyNamespaceID:   "zqk:kernel",

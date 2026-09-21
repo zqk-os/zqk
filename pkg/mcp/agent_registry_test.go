@@ -49,17 +49,17 @@ func TestValidateAgentRegistrationWithClientInfo(t *testing.T) {
 		{
 			name:       "found by account_id",
 			clientID:   "test-client",
-			accountID:  "ACC-1785920548450214016-ace2aae1",
+			accountID:  "ACC-TEST-AGENT",
 			clientName: "test-client",
 			config: createTestServerConfigForRegistry(false, map[string]AgentConfig{
-				"ACC-1785920548450214016-ace2aae1": {
-					AccountID: "ACC-1785920548450214016-ace2aae1",
+				"ACC-TEST-AGENT": {
+					AccountID: "ACC-TEST-AGENT",
 					Roles:     []string{"test_agent"},
 					Profile:   "ai-agent",
 				},
 			}),
 			wantConfig: &AgentConfig{
-				AccountID: "ACC-1785920548450214016-ace2aae1",
+				AccountID: "ACC-TEST-AGENT",
 				Roles:     []string{"test_agent"},
 				Profile:   "ai-agent",
 			},
@@ -72,13 +72,13 @@ func TestValidateAgentRegistrationWithClientInfo(t *testing.T) {
 			clientName: "test-client",
 			config: createTestServerConfigForRegistry(false, map[string]AgentConfig{
 				"client:test_agent": {
-					AccountID: "ACC-1785920548450214016-ace2aae1",
+					AccountID: "ACC-TEST-AGENT",
 					Roles:     []string{"test_agent"},
 					Profile:   "ai-agent",
 				},
 			}),
 			wantConfig: &AgentConfig{
-				AccountID: "ACC-1785920548450214016-ace2aae1",
+				AccountID: "ACC-TEST-AGENT",
 				Roles:     []string{"test_agent"},
 				Profile:   "ai-agent",
 			},
@@ -90,8 +90,8 @@ func TestValidateAgentRegistrationWithClientInfo(t *testing.T) {
 			accountID:  "",
 			clientName: "ai-agent",
 			config: createTestServerConfigForRegistry(true, map[string]AgentConfig{
-				"ACC-1785920548450214016-ace2aae1": {
-					AccountID: "ACC-1785920548450214016-ace2aae1",
+				"ACC-TEST-AGENT": {
+					AccountID: "ACC-TEST-AGENT",
 					Roles:     []string{"test_agent"},
 				},
 			}),
@@ -105,8 +105,8 @@ func TestValidateAgentRegistrationWithClientInfo(t *testing.T) {
 			accountID:  "",
 			clientName: "ide-seat-01",
 			config: createTestServerConfigForRegistry(true, map[string]AgentConfig{
-				"ACC-1785920548450214016-ace2aae1": {
-					AccountID: "ACC-1785920548450214016-ace2aae1",
+				"ACC-TEST-AGENT": {
+					AccountID: "ACC-TEST-AGENT",
 					Roles:     []string{"test_agent"},
 				},
 			}),
@@ -322,11 +322,11 @@ func TestEnforceAgentRegistry(t *testing.T) {
 			name:       "enforce account_id",
 			clientInfo: map[string]any{sessionFieldClientID: "test"},
 			agentConfig: &AgentConfig{
-				AccountID: "ACC-1785920548450214016-ace2aae1",
+				AccountID: "ACC-TEST-AGENT",
 			},
 			want: map[string]any{
 				sessionFieldClientID: "test",
-				clientInfoAccountID:  "ACC-1785920548450214016-ace2aae1",
+				clientInfoAccountID:  "ACC-TEST-AGENT",
 			},
 			description: "Should enforce account_id from registry",
 		},
@@ -346,13 +346,13 @@ func TestEnforceAgentRegistry(t *testing.T) {
 			name:       "enforce both account_id and roles",
 			clientInfo: map[string]any{sessionFieldClientID: "test", "existing": "value"},
 			agentConfig: &AgentConfig{
-				AccountID: "ACC-1785920548450214016-ace2aae1",
+				AccountID: "ACC-TEST-AGENT",
 				Roles:     []string{"test_agent"},
 			},
 			want: map[string]any{
 				sessionFieldClientID:  "test",
 				"existing":            "value",
-				clientInfoAccountID:   "ACC-1785920548450214016-ace2aae1",
+				clientInfoAccountID:   "ACC-TEST-AGENT",
 				objects.FieldKeyRoles: []any{"test_agent"},
 			},
 			description: "Should enforce both account_id and roles",
@@ -361,10 +361,10 @@ func TestEnforceAgentRegistry(t *testing.T) {
 			name:       "override existing account_id",
 			clientInfo: map[string]any{clientInfoAccountID: "wrong", sessionFieldClientID: "test"},
 			agentConfig: &AgentConfig{
-				AccountID: "ACC-1785920548450214016-ace2aae1",
+				AccountID: "ACC-TEST-AGENT",
 			},
 			want: map[string]any{
-				clientInfoAccountID:  "ACC-1785920548450214016-ace2aae1",
+				clientInfoAccountID:  "ACC-TEST-AGENT",
 				sessionFieldClientID: "test",
 			},
 			description: "Should override existing account_id",

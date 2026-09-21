@@ -198,7 +198,7 @@ func TestPollAndSpawnSwarmTasks(t *testing.T) {
 	}
 	secCtx := pkgctx.GetSecurityContext(capturedCtxCopy)
 	assert.NotNil(t, secCtx, "security context should be present")
-	assert.Equal(t, "ACC-1785920548450214011-dabd3692", secCtx.AccountID, "should have correct account ID")
+	assert.Equal(t, "ACC-SWARM-WORKER", secCtx.AccountID, "should have correct account ID")
 }
 
 type mockLLMClient struct {
@@ -305,7 +305,7 @@ func TestSwarmWorkerRunLoop(t *testing.T) {
 	s := &Scheduler{
 		storage: mockStorage,
 		logger:  logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem)),
-		secCtx:  pkgctx.NewSecurityContext("ACC-1785920548450214012-68b850c0", []string{"system"}, []string{"*"}),
+		secCtx:  pkgctx.NewSecurityContext("ACC-SYSTEM", []string{"system"}, []string{"*"}),
 	}
 
 	llmClient := &mockLLMClient{

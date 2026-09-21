@@ -155,7 +155,7 @@ func TestSignAndVerifyEntry_Success(t *testing.T) {
 		Argv:        []string{"cache", "clear", "--force"},
 	}
 
-	accountID := "ACC-1785920548450214012-68b850c0"
+	accountID := "ACC-SYSTEM"
 	if err := SignEntry(&entry, privKey, accountID); err != nil {
 		t.Fatalf("SignEntry failed: %v", err)
 	}

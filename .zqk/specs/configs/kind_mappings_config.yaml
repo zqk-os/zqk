@@ -203,7 +203,7 @@ backends:
     file: null
     graph: null
 created_at: 2026-07-01T18:00:00Z
-created_by: ACC-1785920548450214012-68b850c0
+created_by: ACC-SYSTEM
 description: |
     Configuration for dynamic kind-to-directory mappings.
     This allows the system to discover and map object kinds to their storage directories
@@ -328,5 +328,5 @@ skip_specs:
     - occupancy
     - remaining_open
 updated_at: 2026-07-01T18:00:00Z
-updated_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-SYSTEM
 version: 1.0.0

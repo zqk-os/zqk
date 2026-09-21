@@ -70,9 +70,9 @@ change_type: create
 object_ref: backlog_item:BLI-900
 title: Test Change Journal Entry
 created_at: "2026-01-02T15:00:00Z"
-created_by: ACC-1785920548450214012-68b850c0
+created_by: ACC-SYSTEM
 updated_at: "2026-01-02T15:00:00Z"
-updated_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-SYSTEM
 namespace_id: zqk:kernel
 origin_project: zqk
 origin_system: zqk
@@ -225,9 +225,9 @@ change_type: create
 object_ref: backlog_item:BLI-900
 title: Test Change Journal Entry 2
 created_at: "2026-01-02T15:00:00Z"
-created_by: ACC-1785920548450214012-68b850c0
+created_by: ACC-SYSTEM
 updated_at: "2026-01-02T15:00:00Z"
-updated_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-SYSTEM
 namespace_id: zqk:kernel
 origin_project: zqk
 origin_system: zqk
@@ -381,9 +381,9 @@ policy_type: standard
 category: code_quality
 body: Test policy body
 created_at: "2026-01-02T15:00:00Z"
-created_by: ACC-1785920548450214012-68b850c0
+created_by: ACC-SYSTEM
 updated_at: "2026-01-02T15:00:00Z"
-updated_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-SYSTEM
 namespace_id: zqk:kernel
 origin_project: zqk
 origin_system: zqk

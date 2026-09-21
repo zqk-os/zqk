@@ -92,9 +92,9 @@ status: active
 title: Stale Policy
 description: This is a stale policy file with the same ID but missing required fields.
 created_at: "2026-01-01T00:00:00Z"
-created_by: ACC-1785920548450214012-68b850c0
+created_by: ACC-SYSTEM
 updated_at: "2026-01-01T00:00:00Z"
-updated_by: ACC-1785920548450214012-68b850c0
+updated_by: ACC-SYSTEM
 origin_project: %s
 origin_system: %s
 policy_type: operational

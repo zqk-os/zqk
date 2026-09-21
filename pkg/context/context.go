@@ -59,15 +59,14 @@ func IsMCPServerServing() bool {
 }
 
 // Account ID constants for system and common accounts.
-// TRACK: ACC-* full cutover (no account:* primary ids).
+// These well-known IDs are durable across kernels (not CAS nanos-hex).
 const (
 	// SystemAccountID is the account ID used for system operations
 	// This account is used when objects are created by automated processes
-	SystemAccountID = "ACC-" + "1785920548450214012" + "-" + "68b850c0"
+	SystemAccountID = "ACC-SYSTEM"
 
-	// FounderAccountID is the account ID for the founder account
-	// This account has admin and founder roles
-	FounderAccountID = "ACC-" + "1785920548450214005" + "-" + "60837d47"
+	// FounderAccountID is the well-known admin account used by bootstrap founder role.
+	FounderAccountID = "ACC-ADMIN"
 
 	// TestHarnessAccountID is used only in tests for SecurityContext attribution.
 	TestHarnessAccountID = "ACC-TEST-HARNESS"
