@@ -36,12 +36,11 @@ def parse_coverage(coverprofile_path):
                 continue
 
             file_path = loc.split(":")[0]
-            # Strip standard module prefix
+            # Strip the public module prefix from go cover lines.
             clean_path = file_path
-            for prefix in ("github.com/zqk-os/zqk/", "github.com/lanceman/zqk/"):
-                if clean_path.startswith(prefix):
-                    clean_path = clean_path[len(prefix):]
-                    break
+            prefix = "github.com/zqk-os/zqk/"
+            if clean_path.startswith(prefix):
+                clean_path = clean_path[len(prefix):]
 
             pkg_name = os.path.dirname(clean_path) or clean_path
 
