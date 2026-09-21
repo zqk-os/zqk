@@ -16,8 +16,8 @@ type Capturer interface {
 	CaptureScreen(ctx context.Context, outputPath string) error
 }
 
-// commandRunner abstracts os/exec for testing.
-type commandRunner interface {
+// CommandRunner abstracts os/exec for testing.
+type CommandRunner interface {
 	Run(ctx context.Context, name string, args ...string) error
 }
 
@@ -30,12 +30,17 @@ func (d *defaultRunner) Run(ctx context.Context, name string, args ...string) er
 
 // MacCapturer implements Capturer for macOS using the native screencapture utility.
 type MacCapturer struct {
-	runner commandRunner
+	runner CommandRunner
 }
 
 // NewMacCapturer creates a new MacCapturer using the system command runner.
 func NewMacCapturer() *MacCapturer {
 	return &MacCapturer{runner: &defaultRunner{}}
+}
+
+// NewMacCapturerWithRunner creates a new MacCapturer with a custom runner.
+func NewMacCapturerWithRunner(runner CommandRunner) *MacCapturer {
+	return &MacCapturer{runner: runner}
 }
 
 // CaptureWindow captures a specific window by ID.

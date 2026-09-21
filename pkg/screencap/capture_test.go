@@ -25,7 +25,7 @@ func TestMacCapturer(t *testing.T) {
 
 	t.Run("CaptureWindow", func(t *testing.T) {
 		runner := &mockRunner{}
-		capturer := &MacCapturer{runner: runner}
+		capturer := NewMacCapturerWithRunner(runner)
 
 		err := capturer.CaptureWindow(ctx, "12345", "output.png")
 		if err != nil {
@@ -45,7 +45,7 @@ func TestMacCapturer(t *testing.T) {
 
 	t.Run("CaptureRegion", func(t *testing.T) {
 		runner := &mockRunner{}
-		capturer := &MacCapturer{runner: runner}
+		capturer := NewMacCapturerWithRunner(runner)
 
 		err := capturer.CaptureRegion(ctx, 10, 20, 100, 200, "region.png")
 		if err != nil {
@@ -65,7 +65,7 @@ func TestMacCapturer(t *testing.T) {
 
 	t.Run("CaptureScreen", func(t *testing.T) {
 		runner := &mockRunner{}
-		capturer := &MacCapturer{runner: runner}
+		capturer := NewMacCapturerWithRunner(runner)
 
 		err := capturer.CaptureScreen(ctx, "screen.png")
 		if err != nil {
