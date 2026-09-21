@@ -12,7 +12,7 @@ import (
 )
 
 // Cap stage prompt_template ids (kernel objects). Shared preamble is prepended
-// on every lap so agents re-imprint CAP posture — TRACK: BLI-1786390039711686000-e718d458 /
+// on every lap so agents re-imprint CAP posture — TRACK: /
 // REQ-CAP-STAGE-PROMPTS-001 / CRIT-CAP-STAGE-PROMPTS-001.
 const (
 	CapStagePreambleTemplateID        = "PROMPT-CAP-STAGE-PREAMBLE"

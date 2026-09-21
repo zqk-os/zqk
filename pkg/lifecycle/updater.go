@@ -140,7 +140,7 @@ func (u *Updater) apply(ctx context.Context, req TransitionRequest) error {
 //
 // Elevation is stamped with break_glass: DECIDE refuses break_glass on critical kinds
 // unless the actor is elevated. The updater runs as the system account.
-// TRACK: BLI-1785784867143912000-635942fb
+// TRACK: follow-up in kernel backlog
 // First-class promote recipe: docs/architecture/LIFECYCLE_STATUS_ROLES.md § First-class promote.
 func completionOverrideContext(ctx context.Context, secCtx *pkgctx.SecurityContext, req TransitionRequest) context.Context {
 	if req.ToStatus != statusComplete {

@@ -14,7 +14,7 @@ import (
 )
 
 // Resolved sidecar layout (not CAS): .zqk/resolved/<kind>/<2hex>/<id>.json
-// TRACK: BLI-1785909672838827000-9fca84f5
+// TRACK: follow-up in kernel backlog
 const (
 	ResolvedSidecarSchemaVersion = "1"
 	ResolvedDir                  = "resolved"

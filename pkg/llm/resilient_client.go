@@ -11,7 +11,7 @@ import (
 
 // ResilientClient wraps primary and secondary clients to handle request timeout and fallback.
 // When secondary is nil, StaticMockClient is used after retries (offline mock fallback).
-// TRACK: BLI-1783631888120135000-843bc301
+// TRACK: follow-up in kernel backlog
 type ResilientClient struct {
 	primary           Client
 	secondary         Client

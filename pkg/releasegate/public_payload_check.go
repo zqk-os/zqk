@@ -16,7 +16,7 @@ import (
 )
 
 // PayloadVerificationOptions configures the public release payload verification.
-// TRACK: BLI-1789626190967619000-62a5dcf4 / BLI-1789626536698746000-70f7a7bc
+// TRACK: /
 type PayloadVerificationOptions struct {
 	ReleaseDir       string
 	Version          string

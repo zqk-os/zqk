@@ -259,7 +259,7 @@ func (c *memgraphConnection) UpdateNode(ctx context.Context, id string, updates 
 	// For now, we'll skip label removal as it requires more complex Cypher
 
 	// FieldUnset: SET-merge cannot drop keys; REMOVE the property on the node.
-	// TRACK: BLI-1785439369431933000-f0cccd6c
+	// TRACK: follow-up in kernel backlog
 	for _, key := range updates.RemoveProperties {
 		query += safeCypher(memgraphRemoveNodePropFmt, key)
 	}

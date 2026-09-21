@@ -442,7 +442,7 @@ func (cas *ContentAddressableStorage) Read(objectID string) ([]byte, error) {
 // Delete old file if hash changed. ID change retires oldID — do not use
 // RemoveOrphanCASHashFileSync: refuseOrphanCASHashDelete treats the old blob
 // as the sole survivor for the peeked old id (the new blob peeks as newID).
-// TRACK: BLI-1785723654802038000-b14064bc
+// TRACK: follow-up in kernel backlog
 
 //nolint:errcheck // best-effort cleanup
 
@@ -456,7 +456,7 @@ func (cas *ContentAddressableStorage) Read(objectID string) ([]byte, error) {
 // Invalidate old ID and register new ID→path so object-id-cache cannot keep the
 // deleted hash under the previous id. Prefer InvalidateAndUpdate when a handler
 // is wired; always fire post-sync for the new mapping.
-// TRACK: BLI-1785723654802038000-b14064bc
+// TRACK: follow-up in kernel backlog
 
 func (cas *ContentAddressableStorage) Delete(objectID string) error {
 	// Get hash and bucket key from index (bucket key from bucket strategy at create time)

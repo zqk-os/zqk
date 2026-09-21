@@ -1,6 +1,6 @@
 // Stream stewardship: post-retention maintenance for stream-backed kinds (registry compaction,
 // segment GC, runtime-delta backfill/overlay GC). REQ-STREAM-001; see STREAM_STORAGE.md,
-// STREAM_KIND_STEWARDSHIP.md, and glossary object stream stewardship (GLS-1774059548288204000-31cf7bc6).
+// STREAM_KIND_STEWARDSHIP.md, and glossary object stream stewardship ().
 package storage
 
 import (
@@ -41,7 +41,7 @@ func PostRetentionStreamStewardship(projectRoot string, cycleID string, logger l
 
 // PostRetentionStreamStewardshipFiltered is like PostRetentionStreamStewardship but when kindFilter is
 // non-nil, only kinds present in the filter are stewarded (dedicated retention KINDS=… jobs).
-// TRACK: BLI-1785905541906569000-074e24d7
+// TRACK: follow-up in kernel backlog
 func PostRetentionStreamStewardshipFiltered(projectRoot string, cycleID string, logger logging.Logger, kindFilter map[string]bool) {
 	if projectRoot == emptyValue {
 		return

@@ -121,7 +121,7 @@ func DefaultConfig(ctx context.Context) *Config {
 	secondaryBaseURL := zqkenv.Get("LLM_SECONDARY_BASE_URL").OrDefault("")
 	secondaryAPIKey := zqkenv.Get("LLM_SECONDARY_API_KEY").OrDefault("")
 	secondaryChatModel := zqkenv.Get("LLM_SECONDARY_CHAT_MODEL").OrDefault("")
-	// TRACK: BLI-1783631888120135000-843bc301 — timeout / secondary / mock fallback via env.
+	// TRACK: timeout / secondary / mock fallback via env.
 
 	apiKey := ""
 	if secCtx != nil {

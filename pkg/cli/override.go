@@ -113,7 +113,7 @@ func EnforceOverrideFriction(
 	// storage refuses IsLifecycleBreakGlass ∧ critical ∧ !AllowCoreObjectDelete with a
 	// misleading "break_glass requires --reason-code" error (KMP DECIDE). Status
 	// identified is the preliminary origin (draft plane) — no lifecycle bypass needed.
-	// TRACK: BLI-1785784867143912000-635942fb
+	// TRACK: follow-up in kernel backlog
 	createCtx := pkgctx.WithCacheUpdate(createBase, "", "technical_debt", "")
 	if err := store.Create(createCtx, secCtx, debtObj); err != nil {
 		fmt.Fprintln(cmd.ErrOrStderr(), color.RedString(fmt.Sprintf("⚠️ WARNING: Failed to record technical debt in storage: %v", err)))

@@ -129,7 +129,7 @@ type precondDecideRule struct {
 //
 // Unrecognized strings still fail-open (legacy); overlay DSL remains the
 // fail-closed path for other English. See docs/architecture/LIFECYCLE_SHOCKWAVE_MAP.md Plane A.
-// TRACK: BLI-1787565256503969000-f5604378 — storage-save compose ops are a
+// TRACK: storage-save compose ops are a
 // second plane; do not silently unify YAML prose dispatch with kernelcas/compose.
 // TRACK: PRI-CEF-PIP-KERNEL-DRIVE-001 / BLI-CEF-PIP-TEAR-SNOWFLAKE-001 —
 // from a PIP-* loader (or compose DECIDE) instead.

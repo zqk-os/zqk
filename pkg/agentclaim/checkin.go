@@ -122,7 +122,7 @@ func ArmCheckin(projectRoot, taskID, holder, kind string, cadence time.Duration)
 func RenewCheckin(projectRoot, taskID string) error {
 	timer, err := LoadCheckin(projectRoot, taskID)
 	if err != nil {
-		// Explicit graceful degradation path (BLI-1788548256672449000-41a5bc43)
+		// Explicit graceful degradation path ()
 		// If kernel storage is unresponsive, back off, read from local WAL/cache, and flag degraded mode.
 		var cachedTimer *CheckinTimer
 		if cachedRaw, ok := walCache.Load(taskID); ok {

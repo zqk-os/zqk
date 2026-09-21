@@ -8,7 +8,7 @@ import "github.com/zqk-os/zqk/pkg/objects"
 //
 // YAML SSOT: .zqk/specs/lifecycles/convergence_session_lifecycle.yaml
 // Builder: pkg/specbuilder/bldr_lifecycle_v1/convergence_session_builder.go
-// TRACK: BLI-1786686769839541000-f5a3260f — remove this comment when admission is the default operator expectation.
+// TRACK: remove this comment when admission is the default operator expectation.
 func DraftToActivePreconditions() []string {
 	return []string{
 		objects.FieldKeyHypothesis + " is set",

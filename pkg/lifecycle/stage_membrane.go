@@ -12,8 +12,8 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
-// TRACK: REQ-1787077442888310000-37c38636 / CRIT-1787077444216854000-dd978c3c /
-// CRIT-1787077446494473000-d4278167 — archive promote (and park lateral exits)
+// TRACK: / /
+// archive promote (and park lateral exits)
 // execute lifecycle shockwave policy (cluster vs prune). Raw status Update and
 // non-archive promote hops are not on this path.
 
@@ -437,7 +437,7 @@ func rejectSharedLaneIfLive(
 	return nil
 }
 
-// rejectArchivedBacklogUnderLivePlan enforces RUL-1782235658105562000-b27c8dfc
+// rejectArchivedBacklogUnderLivePlan enforces
 // state ceiling: a backlog_item may hop to archived only if its priority_plan
 // is already archived or is a member of this same archive hop. Goal/milestone
 // lineage trunks still do not hop; the execution container is not a silent

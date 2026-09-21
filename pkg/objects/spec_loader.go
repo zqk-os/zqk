@@ -53,7 +53,7 @@ type Spec struct {
 	StorageProfile string `yaml:"storage_profile,omitempty"`
 	// KernelCritical marks kinds that must not be silently hard-deleted and require break_glass for
 	// lifecycle Force. nil means inherit from parent; after resolve, EffectiveKernelCritical applies
-	// defaults (cas_entity → true, stream/light_file → false). TRACK: BLI-1785784863457357000-dda098ed
+	// defaults (cas_entity → true, stream/light_file → false). TRACK
 	KernelCritical *bool          `yaml:"kernel_critical,omitempty"`
 	Traits         []string       `yaml:"traits"`
 	ExcludeTraits  []string       `yaml:"exclude_traits,omitempty"`

@@ -15,7 +15,7 @@ type DataPoint struct {
 }
 
 // TSDB defines the interface for time series database operations.
-// TRACK: BLI-1783822950016030000-81da5812
+// TRACK: follow-up in kernel backlog
 type TSDB interface {
 	Write(ctx context.Context, metric string, point DataPoint) error
 	Read(ctx context.Context, metric string, start, end time.Time) ([]DataPoint, error)

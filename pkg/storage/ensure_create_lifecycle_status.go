@@ -19,7 +19,7 @@ import (
 // CAS directly — system/agent payloads that are already shovel-ready must never land as
 // draft-plane ghosts.
 //
-// TRACK: BLI-1785639926306245000-cf2ac4b1 — draft-first create / promote membrane.
+// TRACK: draft-first create / promote membrane.
 func ensureCreateLifecycleStatus(ctx context.Context, obj map[string]any, promoteOnCreate bool) {
 	kind, _ := obj[objects.FieldKeyKind].(string)
 	if kind == "" {
@@ -85,7 +85,7 @@ func ensureCreateLifecycleStatus(ctx context.Context, obj map[string]any, promot
 	}
 	// Origin is already shovel_ready (glossary_term, scheduler_job, …). Status coerce cannot
 	// park on the draft plane until those lifecycles gain a preliminary origin.
-	// TRACK: BLI-1785639926306245000-cf2ac4b1
+	// TRACK: follow-up in kernel backlog
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	StorageLog(logger).Warn("create at non-preliminary lifecycle origin; membrane park incomplete").
 		Kind(kind).

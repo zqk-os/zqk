@@ -10,7 +10,7 @@ import (
 
 // CLI shortcut tokens that are object subcommand groups (not schema kinds by themselves).
 // Used for tip text when resolution still fails; synonyms in pkg/kindsynonyms cover the happy path.
-// TRACK: BLI-1785907446155489000-2d7f745b
+// TRACK: follow-up in kernel backlog
 var cliObjectShortcutTips = map[string]struct {
 	CanonicalKind string
 	ShortcutCmd   string
@@ -83,7 +83,7 @@ func ResolveAndValidateKindsCommaSeparated(projectRoot, kindArg string) ([]strin
 }
 
 // FormatCLIShortcutHelpLine documents shortcut groups vs schema kinds (help demarcation).
-// TRACK: BLI-1785907446155489000-2d7f745b
+// TRACK: follow-up in kernel backlog
 func FormatCLIShortcutHelpLine() string {
 	return fmt.Sprintf(
 		"Shortcut groups (not kind names for list/count): object splan|pplan|wstrans|evoman|draft. "+

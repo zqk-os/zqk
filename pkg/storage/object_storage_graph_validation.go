@@ -20,7 +20,7 @@ import (
 func (g *GraphObjectStorage) validateObject(ctx context.Context, obj map[string]any, kind, currentState string) error {
 	// 1. Spec validation using GoValidator
 	// BLI-621 / KMP: --force skips lifecycle only with audited break_glass reason for critical kinds.
-	// TRACK: BLI-1785784867143912000-635942fb
+	// TRACK: follow-up in kernel backlog
 	if pkgctx.IsLifecycleBreakGlass(ctx) && IsCoreKernelKind(kind) {
 		if !pkgctx.GetAllowCoreObjectDelete(ctx) && zqkenv.TestRoot().Get() == "" {
 			return errfmt.Errorf("break_glass requires --reason-code for critical kind %s (Kernel Mutation Pipeline DECIDE)", kind)
@@ -29,13 +29,13 @@ func (g *GraphObjectStorage) validateObject(ctx context.Context, obj map[string]
 	// Break-glass and trusted shockwave writes still validate lifecycle. The
 	// validator skips auto-only *edges* under those overrides; skipping here
 	// dropped criteria/complete holds and allowed false-complete BLIs.
-	// TRACK: BLI-1785784867143912000-635942fb
+	// TRACK: follow-up in kernel backlog
 	options := &validation.ValidationOptions{
 		CurrentState:          currentState,
 		ValidateLifecycle:     true,
 		ValidateSemanticTypes: true,
 		// Same contract as file validation: evidence checks this storage tree.
-		// TRACK: BLI-1787131824765736000-312b6c71
+		// TRACK: follow-up in kernel backlog
 		ProjectRoot: g.projectRoot,
 	}
 	options.ObjectLookup = func(id string) (map[string]any, error) {

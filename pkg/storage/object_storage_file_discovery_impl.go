@@ -113,7 +113,7 @@ func (f *FileObjectStorage) EnsureCASIndexFromPath(id, kind, filePath string) bo
 		return false
 	}
 	// Skip stale cache paths whose CAS blob was already replaced (see EnsureCASIndexFromPaths).
-	// TRACK: BLI-1785723654802038000-b14064bc
+	// TRACK: follow-up in kernel backlog
 	if !casHashFileExistsAt(kindDir, filePath, hash) {
 		return false
 	}
@@ -160,7 +160,7 @@ func (f *FileObjectStorage) EnsureCASIndexFromPaths(kind string, idToFilePath ma
 
 	// Prefer in-memory/disk index when it already matches cache paths so warm does not
 	// Stat+rewrite every blob on every system check (multi-second stall).
-	// TRACK: BLI-1785895580100186000-c5539372
+	// TRACK: follow-up in kernel backlog
 	current := cas.GetIndex().SnapshotMappings()
 	currentBuckets := cas.GetIndex().SnapshotBucketKeys()
 

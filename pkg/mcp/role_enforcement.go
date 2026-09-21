@@ -171,7 +171,7 @@ func enforceRoleEnforcement(clientInfo map[string]any, config *ServerConfig, pro
 			// Normalize account ID for display (handle both account:username and account-username formats)
 			displayAccountID := accountID
 			if strings.HasPrefix(accountID, "account-") && !strings.HasPrefix(accountID, "account:") {
-				// Convert account-ide-seat-01 -> ACC-1785920548450214001-7b3cc2de for display
+				// Convert account-ide-seat-01 -> for display
 				username := strings.TrimPrefix(accountID, "account-")
 				displayAccountID = fmt.Sprintf("account:%s", username)
 			}

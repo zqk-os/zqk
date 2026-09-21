@@ -236,7 +236,7 @@ func CreateAuditEventWithBuilder(
 		// to increment occurrence_count: SortBy + Limit=1 still opens every
 		// stream segment (thousands of files / hundreds of MB) and pegs
 		// long-lived MCP/scheduler daemons at multi-core CPU.
-		// TRACK: BLI-1785905541906569000-074e24d7
+		// TRACK: follow-up in kernel backlog
 		StorageLog(logger).Debug(LogEventStorageAuditDuplicateMergeSkippedPerformance).
 			String(logKeyAuditID, auditID).
 			String(logKeyEventType, options.EventType).

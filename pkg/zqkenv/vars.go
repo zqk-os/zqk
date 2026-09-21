@@ -207,7 +207,7 @@ func AgentGitEmail() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxAgentGitEmail)
 func AgentID() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxAgentID)} }
 
 // AgentSyncMaxLoops returns the env var for AGENT_SYNC_MAX_LOOPS (brand-prefixed).
-// Sync-loop outer poll guard; default 100. TRACK: BLI-1783631896775129000-de3fef87
+// Sync-loop outer poll guard; default 100. TRACK
 func AgentSyncMaxLoops() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxAgentSyncMaxLoops)} }
 
 // LocalCIDir returns the environment variable name for LOCAL_CI_DIR (brand-prefixed).
@@ -217,14 +217,14 @@ func LocalCIDir() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxLocalCIDir)} }
 func LocalCIArchiveKeep() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxLocalCIArchiveKeep)} }
 
 // AgentMaxVerificationAttempts returns AGENT_MAX_VERIFICATION_ATTEMPTS (brand-prefixed).
-// Per-step verification retry cap; default 3. TRACK: BLI-1783631896775129000-de3fef87
+// Per-step verification retry cap; default 3. TRACK
 func AgentMaxVerificationAttempts() EnvVar {
 	return EnvVar{Key: brand.EnvVar(_sfxAgentMaxVerificationAttempts)}
 }
 
 // AgentSyncMaxStagnantTicks returns AGENT_SYNC_MAX_STAGNANT_TICKS (brand-prefixed).
 // Abort when task progress fingerprint is unchanged this many ticks; default 10.
-// TRACK: BLI-1783631896775129000-de3fef87
+// TRACK: follow-up in kernel backlog
 func AgentSyncMaxStagnantTicks() EnvVar {
 	return EnvVar{Key: brand.EnvVar(_sfxAgentSyncMaxStagnantTicks)}
 }
@@ -359,7 +359,7 @@ func EnablePublicCandidateTest() EnvVar {
 }
 
 // PublicCandidateDir is the disposable export dest for sync-public-candidate.sh.
-// Never the live TPM checkout (zqk-public-candidate). TRACK: BLI-1789619419231762000-7f87694b
+// Never the live TPM checkout (zqk-public-candidate). TRACK
 func PublicCandidateDir() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxPublicCandidateDir)} }
 
 // PublicCandidateAllowClobber is human break-glass to rm -rf the well-known product sibling.

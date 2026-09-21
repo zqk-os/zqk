@@ -232,7 +232,7 @@ func (s *Server) handleToolCallWithContext(ctx context.Context, rawName string, 
 		})
 
 		// Detach from mid-flight request cancel (IDE). Already-cancelled ctx fails fast.
-		// Bound by shutdown + MaxToolCallDuration. TRACK: BLI-1784969955962654000-dc689643
+		// Bound by shutdown + MaxToolCallDuration. TRACK
 		var execCtx context.Context
 		var cancel context.CancelFunc
 		if ctx.Err() != nil {

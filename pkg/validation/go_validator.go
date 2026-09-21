@@ -157,7 +157,7 @@ func (gv *GoValidator) Validate(ctx context.Context, obj map[string]any, kind st
 	gv.applySpecDefaults(obj, spec)
 
 	// Fail closed: never persist checklist prose as a real title (e.g. "required at creation").
-	// TRACK: BLI-1786416746751313000-51f73731 — fail closed on checklist prose titles.
+	// TRACK: fail closed on checklist prose titles.
 	if title, _ := obj[objects.FieldKeyTitle].(string); isDocumentationTitleProse(title) {
 		result.Errors = append(result.Errors, ValidationError{
 			Field:   objects.FieldKeyTitle,
@@ -202,7 +202,7 @@ func (gv *GoValidator) Validate(ctx context.Context, obj map[string]any, kind st
 	// Work-envelope wall clock: clamp in-place unless lifecycle break-glass /
 	// trusted shockwave — same skip as auto-only status edges. Do not surface
 	// clamp or leftover detector as user diagnostics (POL-CODE-ACTIONABLE-DIAGNOSTICS-001).
-	// TRACK: BLI-KERNEL-WORK-ENVELOPE-001 / PRI-1785885772223315000-0649f401
+	// TRACK: BLI-KERNEL-WORK-ENVELOPE-001 /
 	objectID, _ := obj[objects.FieldKeyID].(string)
 	result.Warnings = append(result.Warnings, applyWorkEnvelopeWallClockPolicy(
 		lifecycleOverrideSkipsAutoOnlyEdge(ctx, objectID), obj)...)
@@ -750,7 +750,7 @@ func (gv *GoValidator) validateLifecycleState(ctx context.Context, kind, status,
 	if currentState != emptyValue && currentState != status {
 		// Auto-only edges (BLI/PRI → complete) may skip IsValidTransition under
 		// audited break-glass or trusted shockwave. Criteria/complete preconditions
-		// still run. TRACK: BLI-1785784867143912000-635942fb
+		// still run. TRACK
 		if !edgeOverride {
 			validTransition, err := gv.lifecycleLoader.IsValidTransition(kind, currentState, status)
 			if err != nil {
@@ -793,7 +793,7 @@ func (gv *GoValidator) validateLifecycleState(ctx context.Context, kind, status,
 }
 
 // appendUnmetLifecyclePreconditions evaluates YAML transition or status-hold preconditions.
-// TRACK: BLI-1785439365092316000-2c09c364 — Plane A exam; dispatch lives in go_validator_preconditions.go.
+// TRACK: Plane A exam; dispatch lives in go_validator_preconditions.go.
 func (gv *GoValidator) appendUnmetLifecyclePreconditions(
 	errors []ValidationError,
 	kind, currentState, status string,
@@ -978,7 +978,7 @@ func (gv *GoValidator) isRefActive(refID string, obj map[string]any, options *Va
 // checkCommitHashesGitMutationEvidence requires non-merge product commits that
 // mention this BLI id. When already holding status=complete, skip (grandfather
 // historical completes); transitions into complete always enforce.
-// TRACK: BLI-1787131824765736000-312b6c71
+// TRACK: follow-up in kernel backlog
 func (gv *GoValidator) checkCommitHashesGitMutationEvidence(obj map[string]any, options *ValidationOptions) bool {
 	if options != nil {
 		cur := strings.ToLower(strings.TrimSpace(options.CurrentState))

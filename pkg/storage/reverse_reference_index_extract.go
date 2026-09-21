@@ -21,7 +21,7 @@ func extractReferenceIDsFromObject(obj map[string]any) []string {
 	}
 	yamlParser := parser.NewYAMLParser()
 	refFields := yamlParser.ExtractReferenceFields(obj)
-	// Attribution / keystore identity fields (not *_ref suffix) — TRACK: BLI-1785905134201010000-07393484
+	// Attribution / keystore identity fields (not *_ref suffix) — TRACK
 	for _, fieldName := range []string{objects.FieldKeyCreatedBy, objects.FieldKeyUpdatedBy, objects.FieldKeyAccountID} {
 		if v, ok := obj[fieldName]; ok && v != nil {
 			refFields[fieldName] = v

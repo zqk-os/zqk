@@ -16,7 +16,7 @@ import (
 // safety net until the reverse index is field+role keyed.
 //
 // reverse-index SaveCache/load settles; prefer cache hits for hot path.
-// TRACK: BLI-1785723654802038000-b14064bc — merge list even when index non-empty
+// TRACK: merge list even when index non-empty
 // (partial index returned archived-only deps and blocked PRI-SYM-005 promote).
 func DependentsForID(ctx context.Context, sp ObjectStorageProvider, id string) []string {
 	if id == "" {

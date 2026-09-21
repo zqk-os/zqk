@@ -7,7 +7,7 @@ import (
 )
 
 // TokenTracker tracks and validates the token budget per swarm step.
-// TRACK: BLI-1783631892661332000-b2cd615e
+// TRACK: follow-up in kernel backlog
 type TokenTracker struct {
 	ContextWindow int
 	Threshold     float64

@@ -3,7 +3,7 @@
 // On-disk path is defined by [github.com/zqk-os/zqk/pkg/datacell.FeatureFlagsPath] (runtime organism layout).
 // Broader data-cell work: docs/architecture/DATA_CELL_RUNTIME_ORGANISM.md, BLI-1775890418242630000.
 // Team vocabulary: a **lite file** is this style of bounded project-local JSON with CLI integration;
-// glossary_term GLS-1776253895684744000-7799fa3e.
+// glossary_term .
 package featureflags
 
 import (

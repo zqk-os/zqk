@@ -9,7 +9,7 @@ import "github.com/zqk-os/zqk/pkg/objects"
 // Draft plane is a location, not a lifecycle status. Filters such as
 // status=draft or status=conceptual must not surface conceptual/exploring
 // objects that have not left the draft plane.
-// TRACK: BLI-1786689721908382000-6402a858
+// TRACK: follow-up in kernel backlog
 func (f *FileObjectStorage) omitDraftPlaneOnlyFromList(result *QueryResult) {
 	if result == nil || len(result.Objects) == 0 {
 		return

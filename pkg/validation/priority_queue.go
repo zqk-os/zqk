@@ -51,7 +51,7 @@ func (pq *PriorityQueue) Enqueue(task *ValidationTask) {
 		LockNamePriorityQueueEnqueue,
 		lockLoggerSystem(),
 		func() error {
-			// TRACK: BLI-1787554904533036000-fa71ce34 — O(1) fast path for chronological enqueues
+			// TRACK: O(1) fast path for chronological enqueues
 			n := len(pq.tasks[priority])
 			if n == 0 || !task.EnqueuedAt.Before(pq.tasks[priority][n-1].EnqueuedAt) {
 				pq.tasks[priority] = append(pq.tasks[priority], task)

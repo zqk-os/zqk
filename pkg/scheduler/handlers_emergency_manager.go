@@ -19,7 +19,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-// TRACK: BLI-1783831583919580000-8b543560 — out-of-band CAP / steward emergency monitor.
+// TRACK: out-of-band CAP / steward emergency monitor.
 
 const (
 	emergencyManagerStateFile   = "emergency_manager_last.json"

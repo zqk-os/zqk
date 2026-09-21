@@ -54,7 +54,7 @@ func RepoStableBinaryPath(projectRoot string) string {
 
 // StableBinaryCandidates returns workshop then repo stable paths (same inode after promote).
 // Long-lived daemons / MCP / host units should prefer these over tip bin/<exe>.
-// TRACK: TDE-1785808957221945000-fcd15e47 — avoid tip/stable split-brain at runtime.
+// TRACK: avoid tip/stable split-brain at runtime.
 func StableBinaryCandidates(projectRoot string) []string {
 	if projectRoot == "" {
 		return nil

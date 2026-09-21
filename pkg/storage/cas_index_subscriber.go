@@ -9,7 +9,7 @@ import (
 
 // CASIndexInvalidationSubscriber listens for mutation events on the InvalidationShockwaveBus
 // and immediately updates the in-memory CAS index for the corresponding kind.
-// TRACK: BLI-1789165691528268000-7bb48f71
+// TRACK: follow-up in kernel backlog
 type CASIndexInvalidationSubscriber struct {
 	cas *filecas.ContentAddressableStorage
 }

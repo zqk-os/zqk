@@ -58,7 +58,7 @@ func shouldUseObjectDraftPlane(kind, status string) bool {
 	// Must match pkg/storage.shouldUseObjectDraftPlane for non-stream kinds:
 	// lifecycle preliminary (exploring/identified/draft/…) parks on the draft plane.
 	// The previous draft|draft_pending literal left backlog_item exploring on CAS.
-	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+	// TRACK: draft-plane create / promote membrane.
 	if kind == "" || status == "" {
 		return false
 	}

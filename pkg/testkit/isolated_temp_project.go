@@ -75,7 +75,7 @@ func PrepareIsolatedTempProject(t *testing.T, opts *IsolatedTempProjectOptions) 
 	root := t.TempDir()
 	t.Setenv(zqkenv.TestRoot().Name(), root)
 	// Clear inherited ZQK_PROJECT_ROOT (e.g. Local CI worktree) so TestRoot wins for all
-	// paths that prefer PROJECT_ROOT. TRACK: TDE-1785808957221945000-fcd15e47.
+	// paths that prefer PROJECT_ROOT. TRACK: .
 	t.Setenv(zqkenv.ProjectRoot().Name(), "")
 	t.Setenv(zqkenv.InTest().Name(), "true")
 	zqkenv.ApplyIsolatedStorageEnv(t.Setenv)
@@ -184,7 +184,7 @@ func seedSchemaPlaneStep(testRoot string) NamedTestStep {
 			//
 			// Argument order is (destination, source). Reversing it copies the empty temp
 			// root over the repository's real schema plane; see
-			// BLI-1787555794519027000-8ba84e8a for the patch that did exactly that.
+			// for the patch that did exactly that.
 			return testenvroot.BootstrapRoot(testRoot, projectRoot)
 		},
 	}

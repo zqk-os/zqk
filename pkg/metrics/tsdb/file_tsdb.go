@@ -11,7 +11,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-// TRACK: BLI-1783822950016030000-81da5812 — FileTSDB wires chunked timeseries prototype for embedded telemetry.
+// TRACK: FileTSDB wires chunked timeseries prototype for embedded telemetry.
 
 const (
 	fileTSDBChunkDuration = time.Hour

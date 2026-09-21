@@ -9,7 +9,7 @@ import (
 // defaultLLMHTTPTimeout is used only when Config.Timeout is unset.
 // Local Ollama DefaultConfig is 900s; the old 3m floor caused
 // "Client.Timeout exceeded while awaiting headers" then static_mock.
-// TRACK: BLI-1783761336286408000-ca1625db
+// TRACK: follow-up in kernel backlog
 const defaultLLMHTTPTimeout = 3 * time.Minute
 
 func llmHTTPTimeout(timeout time.Duration) time.Duration {

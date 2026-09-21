@@ -1,7 +1,7 @@
 // Package datacell implements one slice of the data cell model: the runtime organism — small,
 // project-local JSON/YAML the CLI edits (feature flags, tray shortcuts, built-in hook profile,
 // optional runtime manifest). These paths are examples of **lite file** storage (bounded JSON, not
-// .zqk/process CAS objects); see glossary_term GLS-1776253895684744000-7799fa3e. [StorageProfile] constants and [ParseStorageProfile] describe the
+// .zqk/process CAS objects); see glossary_term . [StorageProfile] constants and [ParseStorageProfile] describe the
 // physical profile names used in object_specs (storage_profile) and the spec index. [CellKindDescriptor]
 // is the v1 identity view (one cell per kind; CellID == Kind). Load from the spec index via package
 // datacellregistry (avoids an import cycle: objects already imports datacell). CLI: zqk system data-cells.

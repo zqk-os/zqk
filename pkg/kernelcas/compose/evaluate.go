@@ -91,7 +91,7 @@ func applyDecideRule(ctx context.Context, out *DecideOutcome, in MutationInput, 
 			// Fail closed without audited reason / AllowCoreObjectDelete / elevated delete.
 			// Do NOT treat ZQK_TEST_ROOT as a Decide bypass — that made
 			// TestDecide_eraseCriticalRefusesWithoutReason flake under scheduler
-			// (plan=break_glass instead of refuse). TRACK: BLI-1785723654802038000-b14064bc
+			// (plan=break_glass instead of refuse). TRACK
 			elevated := pkgctx.MayHardDeleteCoreWithoutReason(pkgctx.GetSecurityContext(ctx))
 			allowed := pkgctx.GetAllowCoreObjectDelete(ctx) || strings.TrimSpace(in.Reason) != "" || elevated
 			if !allowed {
@@ -123,7 +123,7 @@ func applyDecideRule(ctx context.Context, out *DecideOutcome, in MutationInput, 
 	case OpLifecyclePreconditions:
 		// Attached for observability / materialize. Transition and status-hold
 		// tokens are evaluated by GoValidator.dispatchPrecondition on the storage
-		// save path (Plane A). TRACK: BLI-1785439365092316000-2c09c364
+		// save path (Plane A). TRACK
 	default:
 		// Object-shape overlay rules are evaluated on the object during validation, not here.
 	}

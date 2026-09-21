@@ -16,7 +16,7 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-// TRACK: BLI-1785827958281378000-c0366ecd — shared draft-plane match for sweep + promote.
+// TRACK: shared draft-plane match for sweep + promote.
 
 // ObjectDraftPlaneMatchOptions filters draft-plane candidates (shared by sweep and promote).
 type ObjectDraftPlaneMatchOptions struct {

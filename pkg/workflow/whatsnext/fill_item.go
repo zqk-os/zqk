@@ -31,7 +31,7 @@ const (
 // Fill commands are cheap or scheduler-shaped. Do not put a foreground
 // `system check --details` here — that is the idle-tick thread bomb.
 // Draft plane is a location (object_drafts under the project data dir), not lifecycle status=draft.
-// TRACK: BLI-1786689721908382000-6402a858
+// TRACK: follow-up in kernel backlog
 
 func productCLI() string {
 	return paths.CLIName()

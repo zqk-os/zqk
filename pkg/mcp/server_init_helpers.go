@@ -105,7 +105,7 @@ func (s *Server) resolveAccountIDFromRegistry(clientName string, clientInfo map[
 	}
 
 	// Try common patterns. Prefer ACC-* / canonicalized legacy account:username.
-	// TRACK: BLI-1785905136581480000-1f317f44
+	// TRACK: follow-up in kernel backlog
 	possibleAccountIDs := []string{
 		clientName,
 		strings.ToLower(clientName),

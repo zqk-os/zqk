@@ -12,7 +12,7 @@ import (
 
 // SeatingCredentialsDir is the relative path under project root for seat secrets.
 // Plaintext is local-only (gitignored); CAS stores fingerprints only.
-// TRACK: BLI-1785905292370531000-b758a11c — move to sealed vault when available.
+// TRACK: move to sealed vault when available.
 const SeatingCredentialsDir = "seating/credentials" //nolint:gosec
 
 // SeatCredentialPath returns .zqk/seating/credentials/<account_id>.

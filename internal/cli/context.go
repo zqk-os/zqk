@@ -24,7 +24,7 @@ const (
 // withInnerContext runs fn with the embedded *context.Context when c is non-nil and c.Context
 // is non-nil; otherwise returns zero. Centralizes the nil guard for wrapper methods—keep fn short
 // so each method’s behavior stays visible at the call site. See docs/architecture/WRAPPER_INNER_CONTEXT_GUARD_PATTERN.md
-// (glossary GLS-1775965558831066000-25c5083a); scripts/check-cli-inner-guard.sh enforces a single guard string.
+// (glossary ); scripts/check-cli-inner-guard.sh enforces a single guard string.
 func withInnerContext[T any](c *Context, fn func(*context.Context) T, zero T) T {
 	if c == nil || c.Context == nil {
 		return zero

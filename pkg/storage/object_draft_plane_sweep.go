@@ -8,7 +8,7 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-// TRACK: BLI-1785827957031623000-b08b9791 — draft-plane sweeper easy button.
+// TRACK: draft-plane sweeper easy button.
 
 // ObjectDraftPlaneSweepOptions filters draft-plane candidates for inventory/delete.
 type ObjectDraftPlaneSweepOptions struct {

@@ -19,7 +19,7 @@ const agentWorktreeTempBucket = "zqk-worktrees"
 // **not** under projectRoot. Default: $TMPDIR/zqk-worktrees/<repo-key>/<taskID>.
 // Override base with env AgentWorktreeRoot (brand-prefixed); in-project
 // overrides are ignored so Studio load cannot fork-bomb the kernel tree.
-// Kernel: POL-AGENT-WORKTREE-ISOLATION-001. TRACK: BLI-1783831585418122000-c57cd667
+// Kernel: POL-AGENT-WORKTREE-ISOLATION-001. TRACK
 // AgentWorktreeContainer is the parent directory that holds per-task worktrees.
 func AgentWorktreeContainer(projectRoot string) string {
 	absRoot, err := filepath.Abs(strings.TrimSpace(projectRoot))

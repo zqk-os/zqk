@@ -23,7 +23,7 @@ type GeminiClient struct {
 }
 
 // NewGeminiClient creates a new Gemini API client.
-// TRACK: BLI-1783761336286408000-ca1625db — Gemini uses APISpec builder (telemetry + resiliency).
+// TRACK: Gemini uses APISpec builder (telemetry + resiliency).
 func NewGeminiClient(ctx context.Context, config *Config) *GeminiClient {
 	if config == nil {
 		config = DefaultConfig(ctx)

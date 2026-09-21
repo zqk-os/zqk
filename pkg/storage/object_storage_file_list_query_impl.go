@@ -61,7 +61,7 @@ func (f *FileObjectStorage) Exists(ctx context.Context, secCtx *pkgctx.SecurityC
 	// This handles cases where account IDs are passed in filename format instead of ID format
 	normalizedID := id
 	if strings.HasPrefix(id, "account-") && !strings.HasPrefix(id, "account:") {
-		// Convert account-ide-seat-01 -> ACC-1785920548450214001-7b3cc2de
+		// Convert account-ide-seat-01 ->
 		username := strings.TrimPrefix(id, "account-")
 		normalizedID = fmt.Sprintf("account:%s", username)
 	}
@@ -384,7 +384,7 @@ func (f *FileObjectStorage) Count(ctx context.Context, secCtx *pkgctx.SecurityCo
 		return f.countFiles(ctx, kindDir, usesBucketing)
 	}
 
-	// Optimization for default namespace filter (TDE-1788055418678191000-32664603):
+	// Optimization for default namespace filter ()
 	// Bare "zqk object count" injects namespace_id="zqk:kernel" for workspace isolation.
 	// When that is the only filter, all standard process objects belong to this namespace.
 	// Route to fast index count instead of forcing an O(N) YAML parse across thousands of files.

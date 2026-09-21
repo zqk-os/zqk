@@ -172,7 +172,7 @@ func NoteObjectIDCachePending(projectRoot, op, id, kind, filePath, reason string
 	}
 	// Burst pending ⇒ next system check must refresh object-id-cache and
 	// invalidate those pending validation IDs (not wipe the whole validation cache).
-	// TRACK: BLI-1785895580100186000-c5539372
+	// TRACK: follow-up in kernel backlog
 	if pendingN >= SignificantCacheChangePendingThreshold {
 		NoteSignificantCacheChangeDetail(projectRoot, SignificantChangeReasonPendingBurst, pendingN, 0)
 	}

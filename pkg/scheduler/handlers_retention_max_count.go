@@ -23,7 +23,7 @@ func isHighVolumeKind(kind string) bool {
 }
 
 // skipArchiveForOldestIDsPath is true when archive BulkUpdate would fight the OldestIDs
-// cleanup/enforce path (empty protect_statuses on HV kinds). TRACK: BLI-1785905541906569000-074e24d7
+// cleanup/enforce path (empty protect_statuses on HV kinds). TRACK
 func skipArchiveForOldestIDsPath(kind string, protectStatuses []string) bool {
 	return isHighVolumeKind(kind) && len(protectStatuses) == 0
 }
@@ -39,7 +39,7 @@ func (h *RetentionToleranceHandler) enforceMaxCountViaHVNoProtect(
 ) (totalDeleted int, handled bool) {
 	var idsToDelete []string
 	// Prefer stream registry for stream-backed kinds (CAS/HV often miss or under-count them).
-	// TRACK: BLI-1785905541906569000-074e24d7
+	// TRACK: follow-up in kernel backlog
 	if storagepkg.StreamStorageEnabledForKind(kind) && h.projectRoot != emptyValue {
 		idsToDelete = storagepkg.OldestStreamIDsFromPersistentRegistry(h.projectRoot, kind, toDelete)
 		if len(idsToDelete) > 0 {
@@ -251,7 +251,7 @@ func (h *RetentionToleranceHandler) enforceMaxCount(
 			// Stream registry is authoritative for stream-backed kinds; a project-wide HV
 			// cache can be "populated" while under-counting agent_instruction (etc.), which
 			// previously skipped max_count (count<=max) and left tens of thousands of AGIs.
-			// TRACK: BLI-1785905541906569000-074e24d7
+			// TRACK: follow-up in kernel backlog
 			if storagepkg.StreamStorageEnabledForKind(kind) {
 				if regN := len(storagepkg.ListStreamIDsFromPersistentRegistry(h.projectRoot, kind)); regN > count {
 					count = regN

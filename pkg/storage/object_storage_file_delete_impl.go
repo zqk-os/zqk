@@ -37,7 +37,7 @@ func (f *FileObjectStorage) Delete(ctx context.Context, secCtx *pkgctx.SecurityC
 
 	// Intent must arrive from the caller. Minting it here from the actor's privilege is what made
 	// the guard below unable to refuse the 2026-08-24 retention sweep, which was elevated by
-	// construction. TRACK: BLI-1785723654802038000-b14064bc
+	// construction. TRACK
 	return kernelcas.RunErase(ctx, nil, &kernelcas.Mutation{
 		Kind:       kind,
 		ID:         id,

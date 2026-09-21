@@ -300,7 +300,7 @@ func (g *GraphObjectStorage) ensureObjectID(_ context.Context, obj map[string]an
 		prefix := NormalizeCASIDPrefix(prefixes[0])
 
 		// Generate unique timestamp-based ID with random component
-		// Format: PREFIX-timestamp-random (e.g., BAS-1768909936457275000-a1b2c3d4)
+		// Format: PREFIX-timestamp-random (e.g., )
 		baseTime := time.Now().UnixNano()
 		randomBytes := make([]byte, 4)
 		if _, err := rand.Read(randomBytes); err != nil {
