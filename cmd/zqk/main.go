@@ -10,6 +10,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
+	_ "github.com/zqk-os/zqk/pkg/zqkenv/agentguard"
 )
 
 // init ensures the pure-Go DNS resolver is used instead of cgo's getaddrinfo.
