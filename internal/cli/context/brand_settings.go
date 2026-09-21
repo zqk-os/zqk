@@ -87,7 +87,8 @@ func (s *BrandSettings) ProjectRoot(dir string) string {
 		pRoot = s.KernelState.ProjectRoot
 	}
 	if pRoot == emptyValue {
-		// If dir is config or .zqk/config, the project root is dir/.. or dir/../..
+		// If dir is product config/, project root is parent. If dir is still
+		// named config under ProjectDataDir, project root is two levels up.
 		if filepath.Base(dir) == "config" {
 			if filepath.Base(filepath.Dir(dir)) == paths.ProjectDataDir {
 				return filepath.Dir(filepath.Dir(dir))

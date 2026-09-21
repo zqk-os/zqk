@@ -212,7 +212,7 @@ func Run(opts Options) (*Result, error) {
 	if err != nil {
 		res.Stages[StagePrimeKernel] = StageResult{Status: StageFailed, Error: err.Error()}
 		res.Status = ResultBlocked
-		res.NextSteps = []string{"Fix .zqk/config write permissions, then re-run"}
+		res.NextSteps = []string{"Fix .zqk/agent-runtime write permissions, then re-run"}
 		return res, nil
 	}
 	res.SyncReport = rel

@@ -430,8 +430,7 @@ func (cm *ContextManager) loadSystemDefaults() {
 	}
 }
 
-// loadUserConfig loads user-level configuration from ~/.zqk/config/config.yaml
-// Falls back to legacy ~/.zqk/config/config.yaml for backward compatibility.
+// loadUserConfig loads user-level configuration from ~/.zqk/config/config.yaml.
 func (cm *ContextManager) loadUserConfig() error {
 	homeDir, err := fileutil.UserHomeDir()
 	if err != nil {
@@ -442,13 +441,6 @@ func (cm *ContextManager) loadUserConfig() error {
 	cfg, err := cm.loadConfigFile(primaryPath)
 	if err != nil {
 		return err
-	}
-	// Backward-compat: if primary config is empty, try legacy path.
-	if len(cfg) == 0 {
-		legacyPath := filepath.Join(homeDir, paths.ProjectDataDir, paths.ConfigDir, "config.yaml")
-		if legacyCfg, _ := cm.loadConfigFile(legacyPath); len(legacyCfg) > 0 {
-			cfg = legacyCfg
-		}
 	}
 	cm.userConfig = cfg
 	return nil

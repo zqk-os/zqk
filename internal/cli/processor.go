@@ -63,7 +63,7 @@ const (
 //
 // Context Precedence Order (lowest to highest):
 //  1. System Defaults - Built-in defaults (e.g., format="table", verbose=false)
-//  2. User Config - ~/.zqk/config.yaml (user-level preferences)
+//  2. User Config - ~/.zqk/config/config.yaml (user-level preferences)
 //  3. Project Config - config/zqk.yaml (project-specific settings)
 //  4. Command Flags - Command-line arguments (highest precedence)
 //
@@ -104,7 +104,7 @@ func resolveProcessorProjectRoot(cliCtx *Context) string {
 //
 // The processor loads context with proper precedence:
 //  1. System defaults are loaded first
-//  2. User config (~/.zqk/config.yaml) is loaded and merged
+//  2. User config (~/.zqk/config/config.yaml) is loaded and merged
 //  3. Project config (config/zqk.yaml) is loaded and merged
 //  4. Command flags are extracted and merged (highest precedence)
 //

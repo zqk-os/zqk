@@ -7,7 +7,7 @@ This package provides shared utilities and context management for the ZQK CLI.
 The CLI uses a layered context system with precedence:
 
 1. **System Defaults** (lowest precedence) - Built-in defaults
-2. **User Config** (`~/.zqk/config.yaml`) - User-level preferences
+2. **User Config** (`~/.zqk/config/config.yaml`) - User-level preferences
 3. **Project Config** (`config/zqk.yaml`) - Project-specific settings
 4. **Command Flags** (highest precedence) - Command-line arguments
 
@@ -29,7 +29,7 @@ format := ctx.Format // Respects all precedence layers
 
 ### Configuration Files
 
-#### User Config (`~/.zqk/config.yaml`)
+#### User Config (`~/.zqk/config/config.yaml`)
 ```yaml
 format: json
 verbose: false

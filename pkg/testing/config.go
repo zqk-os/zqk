@@ -133,20 +133,12 @@ func writeTestSettingsFile(testRoot string) error {
 	return fileutil.WriteFile(path, data, paths.FilePerm644) //nolint:gosec // test file
 }
 
-// WriteTestConfig writes a test configuration file to .zqk/config.yaml
-// This allows the CLI to automatically use test data when running in test mode
-func WriteTestConfig(testRoot string, config map[string]any) error {
+// WriteTestConfig ensures the test project data directory exists.
+// Project YAML belongs at <testRoot>/config/zqk.yaml, not under .zqk/.
+func WriteTestConfig(testRoot string, _ map[string]any) error {
 	dataDir := filepath.Join(testRoot, paths.ProjectDataDir)
 	if err := fileutil.MkdirAll(dataDir, paths.DirPerm755); err != nil {
 		return errfmt.Newf("failed to create project data directory").Wrap(err)
 	}
-
-	configPath := filepath.Join(dataDir, paths.ConfigDir, paths.ProjectConfigFile)
-
-	// For now, we'll use a simple approach - the test config will be detected
-	// via environment variable. In the future, we could write YAML here.
-	// For now, just ensure the directory exists
-	_ = configPath
-
 	return nil
 }
