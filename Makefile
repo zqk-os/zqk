@@ -89,7 +89,8 @@ test-unit:
 		./pkg/infrastructure/... ./pkg/ingestion/... ./pkg/interactionpolicy/... \
 		./pkg/kernelcas ./pkg/lifecycle/... ./pkg/lockhealth/... ./pkg/observability/... \
 		./pkg/paths/... ./pkg/pipeline/... ./pkg/tray/... ./pkg/vds/... ./pkg/walutil/... \
-		./pkg/workflow/whatsnext ./pkg/specorigination/... ./pkg/specbuilder/builders/...
+		./pkg/workflow/whatsnext ./pkg/specorigination/... ./pkg/specbuilder/builders/... \
+		./pkg/contextevents/... ./pkg/quality/...
 
 test-integration: all
 	$(BRAND_ENV_PREFIX)_SHARED_TEST_BIN="$$(pwd)/$(BIN)" sh scripts/open-core/test-public-release-gates.sh
