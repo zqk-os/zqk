@@ -29,7 +29,7 @@
         "staleness_check_dirs": {
           "type": "array",
           "items": { "type": "string" },
-          "description": "Paths (relative to project root) checked for mtime when deciding if path alias cache is stale. Defaults if unset: [.zqk, .zqk/config]"
+          "description": "Paths (relative to project root) checked for mtime when deciding if path alias cache is stale. Defaults if unset: [.zqk, .zqk/agent-runtime]"
         },
         "aliases": {
           "type": "object",

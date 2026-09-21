@@ -66,7 +66,7 @@ func (h *TimeoutHook) getTimeoutForCommand(normalizedCmd string, args []string) 
 		return timeout
 	}
 
-	// Pattern-based timeouts from config/command_timeouts.yaml (or .zqk/config override)
+	// Pattern-based timeouts from config/command_timeouts.yaml
 	if timeout := h.getTimeoutFromCommandTimeoutsConfig(normalizedCmd, maxTimeout); timeout > 0 {
 		return timeout
 	}

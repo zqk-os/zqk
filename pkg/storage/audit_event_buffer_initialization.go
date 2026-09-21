@@ -27,7 +27,7 @@ var (
 )
 
 // GetGlobalAuditEventBuffer returns the global audit event buffer instance
-// It loads configuration from .zqk/config.yaml if projectRoot is available.
+// It loads configuration from config/zqk.yaml if projectRoot is available.
 // Reads of globalBuffer are guarded by bufferMu so they synchronize with
 // InitializeGlobalBufferWithConfig (which may replace the buffer).
 func GetGlobalAuditEventBuffer() *AuditEventBuffer {

@@ -76,7 +76,7 @@ Flags:
       --include-ids                  Include individual object IDs in status breakdown tables
       --layer int                    Filter results to only show objects in the specified compliance layer (0=integrity, 1=needs_fixes, 2=ready, 3=complete, -1=all) (default -1)
       --metrics-file string          Write performance metrics to JSON file
-      --notify string[="@primary"]   Wake this agent seat if draft-plane / error-status / blocking / warning / informational thresholds trip after the check; omit value to use primary orchestrator (see .zqk/config/primary_orchestrator.json)
+      --notify string[="@primary"]   Wake this agent seat if draft-plane / error-status / blocking / warning / informational thresholds trip after the check; omit value to use primary orchestrator (see .zqk/agent-runtime/primary_orchestrator.json)
   -o, --output string                Write output to file
   -q, --quiet                        Suppress non-essential output
       --refresh-cache                Rebuild object-id cache and validation-related caches; honored with --fast (fast still skips refs only). Also auto-applied when a significant CAS/cache change marker is present

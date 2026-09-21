@@ -40,7 +40,7 @@ asyncVal.Enqueue(ctx, task)
 
 ## Configuration
 
-- **ID prefixes and namespaces**: `.zqk/config/id_prefixes.yaml`, namespaces config; see `id_prefixes_config.go`, `namespaces_config.go`.
+- **ID prefixes and namespaces**: `.zqk/specs/configs/id_prefixes_config.yaml`, namespaces config; see `id_prefixes_config.go`, `namespaces_config.go`.
 - **Validation tiers**: `validation_tier_config.go`; tier overrides per kind.
 - **Per-object timeout**: `config/zqk.yaml` `validation.per_object_timeout` (default_seconds **5**, empty kind_overrides by default — fail-fast); see `validation_timeout_config.go`. `stuck_timeout_seconds` default **30**.
 - **Async validator timeouts and buffer**: `AsyncValidatorConfig` in `async_validator_config.go` — `WorkerStopTimeout` (default 60s), `CacheSaveTimeout` (default 20s), `ProgressChannelSize` (default 10000). Pass as optional last arg to `NewAsyncValidator(..., opts...)` to override.

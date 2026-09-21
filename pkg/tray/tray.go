@@ -7,7 +7,7 @@
 // auditable object (e.g. for org-wide sharing) would be a separate design; until then, use YAML +
 // schema + optional doc_entry links from backlog items.
 //
-// Related: pkg/clihooks — built-in hook profile (JSON under .zqk/config/) with optional tray_entry per hook.
+// Related: pkg/clihooks — built-in hook profile (JSON under .zqk/agent-runtime/) with optional tray_entry per hook.
 // External automation contract: docs/architecture/CLI_EXTERNAL_HOOK_PROTOCOL.md
 //
 // Optional manifest path: [github.com/zqk-os/zqk/pkg/datacell.TrayYAMLPath]. See docs/architecture/DATA_CELL_RUNTIME_ORGANISM.md.
