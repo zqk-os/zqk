@@ -103,5 +103,65 @@ func TestRegistry_GetAndTranslate(t *testing.T) {
 		if _, ok := err.(ErrNoTranslator); !ok {
 			t.Errorf("expected ErrNoTranslator, got %T", err)
 		}
+		if err.Error() == "" {
+			t.Error("expected non-empty error message from ErrNoTranslator")
+		}
 	})
+	t.Run("register_empty_key", func(t *testing.T) {
+		Register(&dummyEmptyTranslator{})
+	})
+	t.Run("json_schema_edge_cases", func(t *testing.T) {
+		tr := Get(FormatJSONSchema)
+		// Empty input
+		res, err := tr.Translate(nil, nil)
+		if err != nil || len(res.Objects) != 0 {
+			t.Errorf("expected empty result for nil input, got %+v, %v", res, err)
+		}
+		// Invalid JSON
+		res, err = tr.Translate([]byte("{invalid-json"), nil)
+		if err != nil || len(res.Objects) != 0 {
+			t.Errorf("expected empty result for invalid JSON, got %+v, %v", res, err)
+		}
+		// Empty definitions
+		res, err = tr.Translate([]byte(`{"definitions":{}}`), nil)
+		if err != nil || len(res.Objects) != 0 {
+			t.Errorf("expected empty result for empty definitions, got %+v, %v", res, err)
+		}
+	})
+	t.Run("openapi_edge_cases", func(t *testing.T) {
+		tr := Get(FormatOpenAPI)
+		// Empty input
+		res, err := tr.Translate(nil, nil)
+		if err != nil || len(res.Objects) != 0 {
+			t.Errorf("expected empty result for nil input, got %+v, %v", res, err)
+		}
+		// Invalid JSON object
+		res, err = tr.Translate([]byte(`{"components": invalid}`), nil)
+		if err != nil || len(res.Objects) != 0 {
+			t.Errorf("expected empty result for invalid JSON, got %+v, %v", res, err)
+		}
+		// Invalid YAML
+		res, err = tr.Translate([]byte(":\ninvalid: ["), nil)
+		if err != nil || len(res.Objects) != 0 {
+			t.Errorf("expected empty result for invalid YAML, got %+v, %v", res, err)
+		}
+		// Empty schemas
+		res, err = tr.Translate([]byte("openapi: 3.0.0\ncomponents:\n  schemas: {}\n"), nil)
+		if err != nil || len(res.Objects) != 0 {
+			t.Errorf("expected empty result for empty schemas, got %+v, %v", res, err)
+		}
+		// Definitions fallback in JSON
+		rawJSON := []byte(`{"definitions":{"Legacy":{"type":"object"}}}`)
+		res, err = tr.Translate(rawJSON, nil)
+		if err != nil || len(res.Objects) == 0 {
+			t.Errorf("expected translated objects from definitions fallback, got %+v, %v", res, err)
+		}
+	})
+}
+
+type dummyEmptyTranslator struct{}
+
+func (d *dummyEmptyTranslator) SourceFormat() string { return "" }
+func (d *dummyEmptyTranslator) Translate(_ []byte, _ *TranslateOptions) (*TranslateResult, error) {
+	return nil, nil
 }

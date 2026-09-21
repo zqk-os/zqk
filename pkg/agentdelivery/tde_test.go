@@ -48,3 +48,21 @@ func TestTDEEnforcer_InvalidTDE(t *testing.T) {
 		t.Fatal("expected mock to not be called")
 	}
 }
+
+func TestTDEEnforcer_Name(t *testing.T) {
+	e := &TDEEnforcer{}
+	if e.Name() != "tde_enforcer" {
+		t.Fatalf("expected 'tde_enforcer', got %s", e.Name())
+	}
+}
+
+func TestMCPDeliverer(t *testing.T) {
+	d := NewMCPDeliverer(nil, "http://remote:8080", "eval_tool")
+	if d.Name() != "mcp" {
+		t.Fatalf("expected 'mcp', got %s", d.Name())
+	}
+	_, err := d.Deliver(context.Background(), Prompt{})
+	if err == nil {
+		t.Fatal("expected error when transport is nil")
+	}
+}

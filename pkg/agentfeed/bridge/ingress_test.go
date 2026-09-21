@@ -133,9 +133,70 @@ func TestSignalAdapter_ParseEnvelope(t *testing.T) {
 	}
 }
 
-func TestToSteerInput_requiresText(t *testing.T) {
+func TestTelegramAdapter_DirectPayloadAndErrors(t *testing.T) {
 	t.Parallel()
-	if _, err := ToSteerInput("/repo", IngressMessage{}); err == nil {
-		t.Fatal("expected error")
+	// Direct payload without nested message
+	payload := []byte(`{
+		"text": "direct telegram message",
+		"message_id": 88,
+		"from": {"id": 99, "username": "direct_user"},
+		"chat": {"id": 444}
+	}`)
+	msg, err := Parse("telegram", payload)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if msg.Text != "direct telegram message" || msg.FromUser != "direct_user" || msg.ExternalID != "88" || msg.ThreadID != "444" {
+		t.Fatalf("unexpected msg: %+v", msg)
+	}
+
+	// Telegram missing text error
+	if _, err := Parse("telegram", []byte(`{"message_id": 1}`)); err == nil {
+		t.Fatal("expected error for telegram missing text")
+	}
+
+	// Telegram invalid JSON error
+	if _, err := Parse("telegram", []byte(`{invalid}`)); err == nil {
+		t.Fatal("expected error for invalid JSON")
+	}
+}
+
+func TestSignalAdapter_DirectPayloadAndErrors(t *testing.T) {
+	t.Parallel()
+	// Direct payload without envelope
+	payload := []byte(`{
+		"text": "direct signal text",
+		"source": "+1234567890",
+		"timestamp": 12345
+	}`)
+	msg, err := Parse("signal", payload)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if msg.Text != "direct signal text" || msg.FromUser != "+1234567890" || msg.ExternalID != "12345" {
+		t.Fatalf("unexpected msg: %+v", msg)
+	}
+
+	// Signal missing text error
+	if _, err := Parse("signal", []byte(`{"source": "+1"}`)); err == nil {
+		t.Fatal("expected error for signal missing text")
+	}
+
+	// Signal invalid JSON error
+	if _, err := Parse("signal", []byte(`{not-json}`)); err == nil {
+		t.Fatal("expected error for signal invalid JSON")
+	}
+}
+
+func TestTeamsAdapter_Errors(t *testing.T) {
+	t.Parallel()
+	// Teams missing text error
+	if _, err := Parse("teams", []byte(`{"id": "123"}`)); err == nil {
+		t.Fatal("expected error for teams missing text")
+	}
+
+	// Teams invalid JSON error
+	if _, err := Parse("teams", []byte(`{bad-json}`)); err == nil {
+		t.Fatal("expected error for teams invalid JSON")
 	}
 }
