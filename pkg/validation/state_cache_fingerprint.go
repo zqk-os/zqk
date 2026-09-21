@@ -7,9 +7,9 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
-	"sync"
 
 	"github.com/zqk-os/zqk/pkg/appledouble"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -28,16 +28,7 @@ func runningExecutableFingerprint() string {
 	return fmt.Sprintf("%s:%d:%d", exe, info.Size(), info.ModTime().UnixNano())
 }
 
-type cachedFileFingerprint struct {
-	modTimeNano int64
-	size        int64
-	dataHash    []byte
-}
-
-var (
-	fileFingerprintMu    sync.RWMutex
-	fileFingerprintCache = make(map[string]cachedFileFingerprint)
-)
+var fileContentHashes stampmemo.Table[[]byte] // keyed by checker/lifecycle path (closed glob set)
 
 // computeValidationCodeChecksum fingerprints the running executable plus
 // checker/lifecycle sources so system check reloads when the verdict logic
@@ -57,38 +48,26 @@ func computeValidationCodeChecksum(projectRoot string) string {
 
 	for _, relPath := range validationFingerprintRelPaths(projectRoot) {
 		fullPath := filepath.Join(projectRoot, filepath.FromSlash(relPath))
-		info, err := fileutil.Stat(fullPath)
-		if err != nil {
+		stamp := stampmemo.Of(fullPath)
+		if stamp == 0 {
 			continue
 		}
 		anyMaterial = true
 		hasher.Write([]byte(relPath))
 		hasher.Write([]byte(lineSeparator))
 
-		modNano := info.ModTime().UnixNano()
-		size := info.Size()
-
-		fileFingerprintMu.RLock()
-		cached, found := fileFingerprintCache[fullPath]
-		fileFingerprintMu.RUnlock()
-
-		if found && cached.modTimeNano == modNano && cached.size == size {
-			hasher.Write(cached.dataHash)
-		} else {
+		sum, err := fileContentHashes.Load(fullPath, stamp, func() ([]byte, error) {
 			data, err := fileutil.ReadFile(fullPath)
 			if err != nil {
-				continue
+				return nil, err
 			}
 			h := sha256.Sum256(data)
-			fileFingerprintMu.Lock()
-			fileFingerprintCache[fullPath] = cachedFileFingerprint{
-				modTimeNano: modNano,
-				size:        size,
-				dataHash:    h[:],
-			}
-			fileFingerprintMu.Unlock()
-			hasher.Write(h[:])
+			return h[:], nil
+		})
+		if err != nil {
+			continue
 		}
+		hasher.Write(sum)
 		hasher.Write([]byte(lineSeparator))
 	}
 
