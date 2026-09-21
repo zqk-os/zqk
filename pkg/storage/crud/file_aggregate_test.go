@@ -50,7 +50,6 @@ func setupAggregateTest(t *testing.T) (string, *storage.FileObjectStorage, *pkgc
 		t.Fatalf("failed to create storage: %v", err)
 	}
 
-	defer func() { _ = fos.Shutdown(context.Background()) }()
 	secCtx := pkgctx.NewSecurityContext("ACC-TEST", []string{"admin"}, []string{"read:*", "write:*"})
 	t.Cleanup(func() {
 		opts := storage.TempProjectTeardown(tmpDir, fos)

@@ -19,11 +19,17 @@ func TestAuditAggregationService_ConcurrentAggregateEvents(t *testing.T) {
 	tmpDir := t.TempDir()
 	CopyObjectSpecsFromModuleOrSkip(t, tmpDir)
 
-	// Create storage (will use process directory)
 	storageFactory, err := NewStorageFactory(context.Background(), tmpDir)
 	if err != nil {
 		t.Fatalf("Failed to create storage factory: %v", err)
 	}
+	t.Cleanup(func() {
+		var fos *FileObjectStorage
+		if s, ok := storageFactory.GetStorage().(*FileObjectStorage); ok {
+			fos = s
+		}
+		_ = RunProjectTestTeardown(TempProjectTeardown(tmpDir, fos))
+	})
 	storageProvider := storageFactory.GetStorage()
 
 	// Create aggregation service
@@ -84,11 +90,17 @@ func TestChangeJournalAggregationService_ConcurrentAggregateEntries(t *testing.T
 	tmpDir := t.TempDir()
 	CopyObjectSpecsFromModuleOrSkip(t, tmpDir)
 
-	// Create storage (will use process directory)
 	storageFactory, err := NewStorageFactory(context.Background(), tmpDir)
 	if err != nil {
 		t.Fatalf("Failed to create storage factory: %v", err)
 	}
+	t.Cleanup(func() {
+		var fos *FileObjectStorage
+		if s, ok := storageFactory.GetStorage().(*FileObjectStorage); ok {
+			fos = s
+		}
+		_ = RunProjectTestTeardown(TempProjectTeardown(tmpDir, fos))
+	})
 	storageProvider := storageFactory.GetStorage()
 
 	// Create aggregation service
@@ -153,8 +165,11 @@ func TestCreateChangeJournalEntryWithBuilder_Concurrent(t *testing.T) {
 	}
 	storageProvider := storageFactory.GetStorage()
 	t.Cleanup(func() {
-		_ = storageProvider.Shutdown(context.Background())
-		_ = storageFactory.Shutdown(context.Background())
+		var fos *FileObjectStorage
+		if s, ok := storageProvider.(*FileObjectStorage); ok {
+			fos = s
+		}
+		_ = RunProjectTestTeardown(TempProjectTeardown(tmpDir, fos))
 	})
 
 	secCtx := pkgctx.NewSystemSecurityContext()

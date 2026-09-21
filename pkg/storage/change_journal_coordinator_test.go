@@ -301,6 +301,4 @@ func TestChangeJournal_CoordinatorIntegration_AllChangeTypes(t *testing.T) {
 	if got != len(changeTypes) {
 		t.Errorf("Expected %d change types, got %d (received: %v)", len(changeTypes), got, snapshot)
 	}
-	// Release .zqk handles before t.TempDir cleanup (macOS directory-not-empty).
-	_ = fileStorage.Shutdown(context.Background())
 }

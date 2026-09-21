@@ -46,7 +46,12 @@ func TestFileObjectStorage_UpdateLeavesExactlyOneCASBlob(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() { _ = fos.Shutdown(context.Background()) })
+	t.Cleanup(func() {
+		opts := storage.TempProjectTeardown(root, fos)
+		if err := storage.RunProjectTestTeardown(opts); err != nil {
+			t.Logf("teardown: %v", err)
+		}
+	})
 
 	secCtx := pkgctx.NewSecurityContext("ACC-TEST", []string{"admin"}, []string{"read:*", "write:*"})
 	ctx := pkgctx.WithPromoteOnCreate(context.Background())

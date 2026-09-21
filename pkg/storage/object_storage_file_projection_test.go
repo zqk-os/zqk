@@ -143,7 +143,10 @@ func TestFileFirstProjectionStorage_BasicLifecycle(t *testing.T) {
 
 	fileStorage, err := GetFileObjectStorage(tempDir)
 	require.NoError(t, err)
-	t.Cleanup(func() { _ = fileStorage.Shutdown(context.Background()) })
+	t.Cleanup(func() {
+		opts := TempProjectTeardown(tempDir, fileStorage)
+		_ = RunProjectTestTeardown(opts)
+	})
 
 	mockProj := newMockProjectionProvider()
 	storage := NewFileFirstProjectionStorage(fileStorage, mockProj)
@@ -203,7 +206,10 @@ func TestFileFirstProjectionStorage_CASMutateKeepsGraphLockstep(t *testing.T) {
 
 	fileStorage, err := GetFileObjectStorage(tempDir)
 	require.NoError(t, err)
-	t.Cleanup(func() { _ = fileStorage.Shutdown(context.Background()) })
+	t.Cleanup(func() {
+		opts := TempProjectTeardown(tempDir, fileStorage)
+		_ = RunProjectTestTeardown(opts)
+	})
 
 	mockProj := newMockProjectionProvider()
 	storage := NewFileFirstProjectionStorage(fileStorage, mockProj)
@@ -233,7 +239,10 @@ func TestFileFirstProjectionStorage_RebuildProjectionFromSSOT(t *testing.T) {
 
 	fileStorage, err := GetFileObjectStorage(tempDir)
 	require.NoError(t, err)
-	t.Cleanup(func() { _ = fileStorage.Shutdown(context.Background()) })
+	t.Cleanup(func() {
+		opts := TempProjectTeardown(tempDir, fileStorage)
+		_ = RunProjectTestTeardown(opts)
+	})
 
 	mockProj := newMockProjectionProvider()
 	storage := NewFileFirstProjectionStorage(fileStorage, mockProj)
@@ -272,7 +281,10 @@ func TestFileFirstProjectionStorage_ProjectionFailClosed(t *testing.T) {
 
 	fileStorage, err := GetFileObjectStorage(tempDir)
 	require.NoError(t, err)
-	t.Cleanup(func() { _ = fileStorage.Shutdown(context.Background()) })
+	t.Cleanup(func() {
+		opts := TempProjectTeardown(tempDir, fileStorage)
+		_ = RunProjectTestTeardown(opts)
+	})
 
 	failing := &failingProjection{err: errfmt.Errorf("projection boom")}
 	store := NewFileFirstProjectionStorage(fileStorage, failing)

@@ -50,7 +50,8 @@ func TestQueueShutdownCoordinator_InitiateShutdown(t *testing.T) {
 }
 
 func TestQueueShutdownCoordinator_DrainAll(t *testing.T) {
-	defer goleak.VerifyNone(t)
+	currentLeaks := goleak.IgnoreCurrent()
+	defer goleak.VerifyNone(t, currentLeaks)
 	coordinator := storage.NewQueueShutdownCoordinatorForTest(nil, true)
 
 	queue1 := storage.NewMockQueueShutdownHandler("queue1", false)
@@ -85,7 +86,8 @@ func TestQueueShutdownCoordinator_DrainAll(t *testing.T) {
 }
 
 func TestQueueShutdownCoordinator_DrainAll_Timeout(t *testing.T) {
-	defer goleak.VerifyNone(t)
+	currentLeaks := goleak.IgnoreCurrent()
+	defer goleak.VerifyNone(t, currentLeaks)
 	coordinator := storage.NewQueueShutdownCoordinatorForTest(&storage.ShutdownConfig{
 		Timeout:       50 * time.Millisecond,
 		ForceShutdown: true,
@@ -115,7 +117,8 @@ func TestQueueShutdownCoordinator_DrainAll_Timeout(t *testing.T) {
 // TestQueueShutdownCoordinator_DrainAll_ContextCancelled verifies BLI-CEF-CON-002:
 // cancellation stops DrainAll immediately and does not leak goroutines.
 func TestQueueShutdownCoordinator_DrainAll_ContextCancelled(t *testing.T) {
-	defer goleak.VerifyNone(t)
+	currentLeaks := goleak.IgnoreCurrent()
+	defer goleak.VerifyNone(t, currentLeaks)
 	coordinator := storage.NewQueueShutdownCoordinatorForTest(nil, true)
 
 	queue := storage.NewMockQueueShutdownHandler("cancelled_queue", false)

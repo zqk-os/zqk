@@ -15,6 +15,10 @@ func TestPriorityPlanSecurityGate_CompleteRefusesNonTerminalChildren(t *testing.
 	if err != nil {
 		t.Fatalf("NewFileObjectStorageForTest: %v", err)
 	}
+	t.Cleanup(func() {
+		opts := TempProjectTeardown(testRoot, fos)
+		_ = RunProjectTestTeardown(opts)
+	})
 
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()
@@ -78,6 +82,10 @@ func TestPriorityPlanSecurityGate_InProgressRefusesNonShovelReadyChildren(t *tes
 	if err != nil {
 		t.Fatalf("NewFileObjectStorageForTest: %v", err)
 	}
+	t.Cleanup(func() {
+		opts := TempProjectTeardown(testRoot, fos)
+		_ = RunProjectTestTeardown(opts)
+	})
 
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()

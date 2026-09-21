@@ -14,7 +14,7 @@ jobs:
   coverage:
     name: Test Coverage
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     steps:
       - name: Checkout Code
         uses: actions/checkout@v7
@@ -27,20 +27,8 @@ jobs:
 
       - name: Run Tests with Coverage
         run: |
-          go test -short -p 2 -timeout 5m -coverprofile=coverage.out -covermode=atomic \
-            ./pkg/brand/... ./pkg/bridge/... ./pkg/circuitbreaker/... ./pkg/cli/... \
-            ./pkg/concurrency/... ./pkg/dna/... ./pkg/docman/... ./pkg/graph/... \
-            ./pkg/healthcheck/... ./pkg/hive/... ./pkg/hostload/... ./pkg/integrity/... \
-            ./pkg/interactive/... ./pkg/kernel/... ./pkg/telemetry/... ./pkg/accumulator/... \
-            ./pkg/authcred/... ./pkg/bufferpool/... ./pkg/cleanup/... ./pkg/clihooks/... \
-            ./pkg/closureevidence/... ./pkg/coordination/... ./pkg/crypto/... ./pkg/datacell/... \
-            ./pkg/dispatch/... ./pkg/events/... ./pkg/grooming/... ./pkg/handslapper/... \
-            ./pkg/hivemind/... ./pkg/idebridge/... ./pkg/idehooks/... ./pkg/inbox/... \
-            ./pkg/infrastructure/... ./pkg/ingestion/... ./pkg/interactionpolicy/... \
-            ./pkg/kernelcas ./pkg/lifecycle/... ./pkg/lockhealth/... ./pkg/observability/... \
-            ./pkg/paths/... ./pkg/pipeline/... ./pkg/tray/... ./pkg/vds/... ./pkg/walutil/... \
-            ./pkg/workflow/whatsnext ./pkg/specorigination/... ./pkg/specbuilder/builders/... \
-            ./pkg/contextevents/... ./pkg/quality/...
+          go test -short -p 2 -timeout 15m -coverprofile=coverage.out -covermode=atomic \
+            ./pkg/... ./cmd/... ./internal/... ./ext/...
 
       - name: Generate Coverage Summary
         if: always()

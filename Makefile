@@ -78,49 +78,10 @@ build: all
 build-all: all
 
 test-unit:
-	go test -short -p 2 -timeout 8m \
-		./pkg/brand/... ./pkg/bridge/... ./pkg/circuitbreaker/... ./pkg/cli/... \
-		./pkg/concurrency/... ./pkg/dna/... ./pkg/docman/... ./pkg/graph/... \
-		./pkg/healthcheck/... ./pkg/hive/... ./pkg/hostload/... ./pkg/integrity/... \
-		./pkg/interactive/... ./pkg/kernel/... ./pkg/telemetry/... ./pkg/accumulator/... \
-		./pkg/authcred/... ./pkg/bufferpool/... ./pkg/cleanup/... ./pkg/clihooks/... \
-		./pkg/closureevidence/... ./pkg/coordination/... ./pkg/crypto/... ./pkg/datacell/... \
-		./pkg/dispatch/... ./pkg/events/... ./pkg/grooming/... ./pkg/handslapper/... \
-		./pkg/hivemind/... ./pkg/idebridge/... ./pkg/idehooks/... ./pkg/inbox/... \
-		./pkg/infrastructure/... ./pkg/ingestion/... ./pkg/interactionpolicy/... \
-		./pkg/kernelcas ./pkg/lifecycle/... ./pkg/lockhealth/... ./pkg/observability/... \
-		./pkg/paths/... ./pkg/pipeline/... ./pkg/tray/... ./pkg/vds/... ./pkg/walutil/... \
-		./pkg/contextevents/... ./pkg/quality/... ./pkg/stampmemo/... ./pkg/zqkenv/... \
-		./pkg/zqksession/... ./pkg/zqktime/... \
-		./pkg/objects/... ./pkg/specorigination/... ./pkg/specbuilder/builders/... \
-		./pkg/validation/... ./pkg/tpm/... ./pkg/testdiscovery/... ./pkg/testkit/... \
-		./pkg/workflow/whatsnext \
-		./pkg/scheduler/... \
-		./cmd/zqk/app ./cmd/zqk/test ./cmd/zqk/docman ./cmd/zqk/automation \
-		./cmd/zqk/new ./cmd/zqk/inbox ./cmd/zqk/learn ./cmd/zqk/matrix ./cmd/zqk/mcp \
-		./cmd/zqk/mcp-simple ./cmd/zqk/mesh ./cmd/zqk/feed ./cmd/zqk/convergence \
-		./cmd/zqk/callback ./cmd/zqk/intake ./cmd/zqk/domain ./cmd/zqk/ambient \
-		./cmd/zqk/job ./cmd/zqk/keystore ./cmd/zqk/observer ./cmd/zqk/ontology \
-		./cmd/zqk/ops ./cmd/zqk/organizational ./cmd/zqk/precommit ./cmd/zqk/reports \
-		./cmd/zqk/rollback ./cmd/zqk/semantic ./cmd/zqk/spec ./cmd/zqk/swarm \
-		./cmd/zqk/tray ./cmd/zqk/utility ./cmd/zqk/validate ./cmd/zqk/vendor \
-		./cmd/zqk/workflow
+	go test -short -p 2 -timeout 15m ./pkg/... ./cmd/... ./internal/... ./ext/...
 
 test-unit-all:
-	go test -p 2 -timeout 15m \
-		./pkg/brand/... ./pkg/bridge/... ./pkg/circuitbreaker/... ./pkg/cli/... \
-		./pkg/concurrency/... ./pkg/dna/... ./pkg/docman/... ./pkg/graph/... \
-		./pkg/healthcheck/... ./pkg/hive/... ./pkg/hostload/... ./pkg/integrity/... \
-		./pkg/interactive/... ./pkg/kernel/... ./pkg/telemetry/... ./pkg/accumulator/... \
-		./pkg/authcred/... ./pkg/bufferpool/... ./pkg/cleanup/... ./pkg/clihooks/... \
-		./pkg/closureevidence/... ./pkg/coordination/... ./pkg/crypto/... ./pkg/datacell/... \
-		./pkg/dispatch/... ./pkg/events/... ./pkg/grooming/... ./pkg/handslapper/... \
-		./pkg/hivemind/... ./pkg/idebridge/... ./pkg/idehooks/... ./pkg/inbox/... \
-		./pkg/infrastructure/... ./pkg/ingestion/... ./pkg/interactionpolicy/... \
-		./pkg/kernelcas ./pkg/lifecycle/... ./pkg/lockhealth/... ./pkg/observability/... \
-		./pkg/paths/... ./pkg/pipeline/... ./pkg/tray/... ./pkg/vds/... ./pkg/walutil/... \
-		./pkg/contextevents/... ./pkg/quality/... ./pkg/stampmemo/... ./pkg/zqkenv/... \
-		./pkg/objects/... ./pkg/validation/... ./pkg/scheduler/... ./cmd/zqk/test
+	go test -p 2 -timeout 20m ./pkg/... ./cmd/... ./internal/... ./ext/...
 
 test-integration: all
 	$(BRAND_ENV_PREFIX)_SHARED_TEST_BIN="$$(pwd)/$(BIN)" sh scripts/open-core/test-public-release-gates.sh

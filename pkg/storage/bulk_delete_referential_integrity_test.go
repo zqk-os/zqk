@@ -12,10 +12,8 @@
 package storage
 
 import (
-	"context"
 	"strings"
 	"testing"
-	"time"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -37,12 +35,9 @@ func bulkDeleteRefIntegrityFixture(t *testing.T) (f *FileObjectStorage, referenc
 	if err != nil {
 		t.Fatalf("NewFileObjectStorage: %v", err)
 	}
-	// Bounded context, not t.Context(): that one is already cancelled during cleanup, and Shutdown
-	// then blocks in WaitGroupManager.Wait until the test timeout kills the whole package.
 	t.Cleanup(func() {
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-		_ = f.Shutdown(ctx)
+		opts := TempProjectTeardown(root, f)
+		_ = RunProjectTestTeardown(opts)
 	})
 
 	ctx := WithCLIOperation(pkgctx.NewSystemContext())

@@ -137,3 +137,13 @@ func afterReverseReferenceIndexMutation() {
 	ensureReverseReferenceIndexLoaded(root)
 	scheduleReverseReferenceIndexPersist(root)
 }
+
+// StopReverseReferenceIndexPersistForTest cancels pending debounce timer and unbinds root for tests.
+func StopReverseReferenceIndexPersistForTest(projectRoot string) {
+	if old := revRefPersistTimer.Swap(nil); old != nil {
+		_ = old.Stop()
+	}
+	if projectRoot != emptyValue && reverseReferenceBoundProjectRoot() == projectRoot {
+		revRefBoundRoot.Store(emptyValue)
+	}
+}

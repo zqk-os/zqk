@@ -91,6 +91,7 @@ func TestStorageFactory_ModeResolution(t *testing.T) {
 
 	factoryDefault, err := NewStorageFactory(ctx, tempDir)
 	require.NoError(t, err)
+	defer func() { _ = factoryDefault.Shutdown(ctx) }()
 	defaultStorage := UnwrapToFileObjectStorage(factoryDefault.GetStorage())
 	require.NotNil(t, defaultStorage, "StorageFactory should default to FileObjectStorage even if graph is enabled")
 	_, isHybrid := factoryDefault.GetStorage().(*HybridObjectStorage)
@@ -107,6 +108,7 @@ func TestStorageFactory_ModeResolution(t *testing.T) {
 	t.Setenv(zqkenv.StorageModeHybridLegacy().Name(), "1")
 	factoryHybrid1, err := NewStorageFactory(ctx, tempDir)
 	require.NoError(t, err)
+	defer func() { _ = factoryHybrid1.Shutdown(ctx) }()
 	h1 := factoryHybrid1.GetStorage()
 	if m, ok := h1.(*MeshObjectStorage); ok && m != nil {
 		h1 = m.local
@@ -119,6 +121,7 @@ func TestStorageFactory_ModeResolution(t *testing.T) {
 	t.Setenv(zqkenv.StorageMode().Name(), "hybrid_legacy")
 	factoryHybrid2, err := NewStorageFactory(ctx, tempDir)
 	require.NoError(t, err)
+	defer func() { _ = factoryHybrid2.Shutdown(ctx) }()
 	h2 := factoryHybrid2.GetStorage()
 	if m, ok := h2.(*MeshObjectStorage); ok && m != nil {
 		h2 = m.local
@@ -130,6 +133,7 @@ func TestStorageFactory_ModeResolution(t *testing.T) {
 	t.Setenv(zqkenv.StorageMode().Name(), "file+projection")
 	factoryProj, err := NewStorageFactory(ctx, tempDir)
 	require.NoError(t, err)
+	defer func() { _ = factoryProj.Shutdown(ctx) }()
 	p := factoryProj.GetStorage()
 	if m, ok := p.(*MeshObjectStorage); ok && m != nil {
 		p = m.local
@@ -145,10 +149,12 @@ func TestGetFileObjectStorage(t *testing.T) {
 	s, err := GetFileObjectStorage(tempDir)
 	require.NoError(t, err)
 	require.NotNil(t, s)
+	defer func() { _ = s.Shutdown(context.Background()) }()
 
 	sTest, err := GetFileObjectStorageForTest(tempDir)
 	require.NoError(t, err)
 	require.NotNil(t, sTest)
+	defer func() { _ = sTest.Shutdown(context.Background()) }()
 }
 
 // tdd refresh

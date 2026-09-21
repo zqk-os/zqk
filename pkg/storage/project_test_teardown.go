@@ -147,12 +147,14 @@ func TempProjectTeardown(projectRoot string, fileStorage *FileObjectStorage) Pro
 // RunProjectTestTeardown runs the standard pipeline once.
 func RunProjectTestTeardown(opts ProjectTestTeardownOptions) error {
 	opts = applyGitWorktreeTeardownGuard(opts.WithDefaults())
+	StopReverseReferenceIndexPersistForTest(opts.ProjectRoot)
 	pl := StandardProjectTestTeardownPipeline(opts)
 	pctx := &pipeline.Context{Ctx: pkgctx.NewSystemContext(), Outcome: make(map[string]any)}
 	_, err := pl.Run(pctx, opts)
 	ShutdownAsyncValidationStrategies()
 	ShutdownHashRegistriesForProjectTesting(opts.ProjectRoot)
 	ShutdownAllAuditBuffersForTesting()
+	StopReverseReferenceIndexPersistForTest(opts.ProjectRoot)
 	// Reset global singletons to prevent cross-test contamination when ZQK_TEST_ROOT changes
 	objects.ResetGlobalFieldRegistryForTesting()
 	objects.ResetGlobalKindMapperForTesting()

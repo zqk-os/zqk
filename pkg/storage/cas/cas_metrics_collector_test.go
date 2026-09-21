@@ -18,6 +18,7 @@ func TestCASMetricsCollector_LifetimeCounters(t *testing.T) {
 	if err != nil {
 		t.Fatalf("storage.NewStorageFactory: %v", err)
 	}
+	t.Cleanup(func() { _ = storageFactory.Shutdown(context.Background()) })
 	collector := caspkg.NewCASMetricsCollector(storageFactory.GetStorage())
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()

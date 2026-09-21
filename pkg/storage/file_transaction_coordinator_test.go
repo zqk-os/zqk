@@ -66,7 +66,8 @@ func (s *mockLockStrategy) Name() string {
 
 // TestFileTransactionCoordinator_AcquireAndRelease tests standard happy path locking and unlocking.
 func TestFileTransactionCoordinator_AcquireAndRelease(t *testing.T) {
-	defer goleak.VerifyNone(t)
+	currentLeaks := goleak.IgnoreCurrent()
+	defer goleak.VerifyNone(t, currentLeaks)
 	strategy := newMockLockStrategy()
 	coord := NewFileTransactionCoordinator("/test/project", strategy)
 
@@ -103,7 +104,8 @@ func TestFileTransactionCoordinator_AcquireAndRelease(t *testing.T) {
 // TestFileTransactionCoordinator_AcquireFailureRollback tests BLI-CEF-CON-001:
 // on lock failure, previously acquired locks are released safely under coordinator mutex.
 func TestFileTransactionCoordinator_AcquireFailureRollback(t *testing.T) {
-	defer goleak.VerifyNone(t)
+	currentLeaks := goleak.IgnoreCurrent()
+	defer goleak.VerifyNone(t, currentLeaks)
 	strategy := newMockLockStrategy()
 	// Set failure on the second file in sorted order
 	strategy.failOnPath = "/test/project/fileB.json.txn.lock"
@@ -134,7 +136,8 @@ func TestFileTransactionCoordinator_AcquireFailureRollback(t *testing.T) {
 
 // TestFileTransactionCoordinator_ConcurrentTransactions tests concurrency safety under multiple goroutines.
 func TestFileTransactionCoordinator_ConcurrentTransactions(t *testing.T) {
-	defer goleak.VerifyNone(t)
+	currentLeaks := goleak.IgnoreCurrent()
+	defer goleak.VerifyNone(t, currentLeaks)
 	tempDir := t.TempDir()
 	strategy := newMockLockStrategy()
 	coord := NewFileTransactionCoordinator(tempDir, strategy)

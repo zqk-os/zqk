@@ -18,6 +18,7 @@ func TestChangeJournalAggregationService_aggregateEntries_Empty(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewStorageFactory: %v", err)
 	}
+	t.Cleanup(func() { _ = storageFactory.Shutdown(context.Background()) })
 	svc := NewChangeJournalAggregationService(storageFactory.GetStorage())
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()
@@ -46,6 +47,7 @@ func TestChangeJournalAggregationService_aggregateEntries_SingleEntry(t *testing
 	if err != nil {
 		t.Fatalf("NewStorageFactory: %v", err)
 	}
+	t.Cleanup(func() { _ = storageFactory.Shutdown(context.Background()) })
 	svc := NewChangeJournalAggregationService(storageFactory.GetStorage())
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()
@@ -78,6 +80,7 @@ func TestChangeJournalAggregationService_aggregateEntries_MultipleChangeTypes(t 
 	if err != nil {
 		t.Fatalf("NewStorageFactory: %v", err)
 	}
+	t.Cleanup(func() { _ = storageFactory.Shutdown(context.Background()) })
 	svc := NewChangeJournalAggregationService(storageFactory.GetStorage())
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()
@@ -176,6 +179,7 @@ func TestChangeJournalAggregationService_QueryOldAggregatedEntries_Empty(t *test
 	if err != nil {
 		t.Fatalf("NewStorageFactory: %v", err)
 	}
+	t.Cleanup(func() { _ = storageFactory.Shutdown(context.Background()) })
 	svc := NewChangeJournalAggregationService(storageFactory.GetStorage())
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()
@@ -198,6 +202,7 @@ func TestChangeJournalAggregationService_QueryOldEntriesByAge_Empty(t *testing.T
 	if err != nil {
 		t.Fatalf("NewStorageFactory: %v", err)
 	}
+	t.Cleanup(func() { _ = storageFactory.Shutdown(context.Background()) })
 	svc := NewChangeJournalAggregationService(storageFactory.GetStorage())
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()
@@ -228,6 +233,7 @@ func TestChangeJournalAggregationService_CleanupAggregatedEntries_EmptyArchive(t
 	if err != nil {
 		t.Fatalf("NewStorageFactory: %v", err)
 	}
+	t.Cleanup(func() { _ = storageFactory.Shutdown(context.Background()) })
 	svc := NewChangeJournalAggregationService(storageFactory.GetStorage())
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()
@@ -263,6 +269,7 @@ func TestChangeJournalAggregationService_AggregateChangeJournalEntries_Integrati
 	if err != nil {
 		t.Fatalf("NewStorageFactory: %v", err)
 	}
+	t.Cleanup(func() { _ = storageFactory.Shutdown(context.Background()) })
 	storageProvider := storageFactory.GetStorage()
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()
@@ -311,6 +318,7 @@ func TestChangeJournalAggregationService_LifetimeCounters(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewStorageFactory: %v", err)
 	}
+	t.Cleanup(func() { _ = storageFactory.Shutdown(context.Background()) })
 	svc := NewChangeJournalAggregationService(storageFactory.GetStorage())
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()
@@ -340,6 +348,7 @@ func TestChangeJournalAggregationService_QueryOldAggregatedEntries_ThenCleanupAr
 	if err != nil {
 		t.Fatalf("NewStorageFactory: %v", err)
 	}
+	t.Cleanup(func() { _ = storageFactory.Shutdown(context.Background()) })
 	svc := NewChangeJournalAggregationService(storageFactory.GetStorage())
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()
@@ -369,6 +378,7 @@ func TestChangeJournalAggregationService_aggregateEntries_NilAndEmptyContext(t *
 	if err != nil {
 		t.Fatalf("NewStorageFactory: %v", err)
 	}
+	t.Cleanup(func() { _ = storageFactory.Shutdown(context.Background()) })
 	svc := NewChangeJournalAggregationService(storageFactory.GetStorage())
 	secCtx := pkgctx.NewSystemSecurityContext()
 	windowStart := time.Now().Add(-time.Hour)
