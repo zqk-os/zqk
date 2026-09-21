@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
@@ -16,11 +17,11 @@ func TestDocmanVerify_CLI(t *testing.T) {
 
 	docPath := "docs/architecture/verify_sample.md"
 	fullDoc := filepath.Join(tmpDir, docPath)
-	if err := fileutil.MkdirAll(filepath.Dir(fullDoc), 0755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(fullDoc), paths.DirPerm755); err != nil {
 		t.Fatalf("mkdir failed: %v", err)
 	}
 	initialContent := "# Verify Sample\nContent line for verification test."
-	if err := fileutil.WriteFile(fullDoc, []byte(initialContent), 0644); err != nil {
+	if err := fileutil.WriteFile(fullDoc, []byte(initialContent), paths.FilePerm644); err != nil {
 		t.Fatalf("write file failed: %v", err)
 	}
 
@@ -54,7 +55,7 @@ func TestDocmanVerify_CLI(t *testing.T) {
 
 	// 3. Tamper with file to introduce cryptographic drift
 	tamperedContent := "# Verify Sample\nTampered content!"
-	if err := fileutil.WriteFile(fullDoc, []byte(tamperedContent), 0644); err != nil {
+	if err := fileutil.WriteFile(fullDoc, []byte(tamperedContent), paths.FilePerm644); err != nil {
 		t.Fatalf("write tampered file failed: %v", err)
 	}
 

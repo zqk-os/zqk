@@ -3,6 +3,8 @@ package handslapper
 import (
 	"context"
 	"testing"
+
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestMonitorCommand(t *testing.T) {
@@ -35,7 +37,7 @@ func TestMonitorCommand(t *testing.T) {
 		},
 		{
 			name:      "Allowed with Entitlement",
-			cmd:       "ZQK_BYPASS_HANDSLAPPER=1 grep -rn VIS-001 docs/",
+			cmd:       zqkenv.BypassHandslapper().Name() + "=1 grep -rn VIS-001 docs/",
 			expectErr: false,
 		},
 		{

@@ -6,6 +6,7 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage/filecas"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
@@ -25,7 +26,7 @@ func TestCASMutexLockHierarchyStress(t *testing.T) {
 	defer fileutil.RemoveAll(tempDir)
 
 	kindDir := filepath.Join(tempDir, "criteria")
-	require.NoError(t, fileutil.MkdirAll(kindDir, 0755))
+	require.NoError(t, fileutil.MkdirAll(kindDir, paths.DirPerm755))
 
 	cas := filecas.NewContentAddressableStorage(kindDir, "criteria")
 

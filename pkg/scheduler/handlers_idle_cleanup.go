@@ -47,11 +47,11 @@ func (h *IdleCleanupHandler) Execute(ctx context.Context, job *ScheduledJob) err
 	removed += h.pruneLegacyGitWorktrees(ctx, slog)
 
 	// Terminate idle agents and stalled background builds (pid stamp files).
-	files, err := fileutil.ReadDir(filepath.Join(h.projectRoot, ".zqk", "run"))
+	files, err := fileutil.ReadDir(filepath.Join(h.projectRoot, paths.ProjectDataDir, "run"))
 	if err == nil {
 		for _, f := range files {
 			if strings.HasSuffix(f.Name(), ".pid") {
-				pidPath := filepath.Join(h.projectRoot, ".zqk", "run", f.Name())
+				pidPath := filepath.Join(h.projectRoot, paths.ProjectDataDir, "run", f.Name())
 				if stat, err := fileutil.Stat(pidPath); err == nil {
 					if time.Since(stat.ModTime()) > legacyWorktreeStaleAfter {
 						slog.Info("Terminating stalled process from pid file").String("pid_file", pidPath).Log()
@@ -72,7 +72,7 @@ func (h *IdleCleanupHandler) pruneAgentWorktreeDir(ctx context.Context, gitSvc *
 	removed := 0
 	for _, dir := range []string{
 		paths.AgentWorktreeContainer(h.projectRoot),
-		filepath.Join(h.projectRoot, ".zqk", "worktrees"),
+		filepath.Join(h.projectRoot, paths.ProjectDataDir, paths.WorktreesSubdir),
 	} {
 		removed += h.pruneAgentWorktreeEntries(ctx, gitSvc, slog, dir)
 	}
@@ -157,7 +157,7 @@ func (h *IdleCleanupHandler) pruneLegacyGitWorktrees(ctx context.Context, slog *
 	if err != nil {
 		return 0
 	}
-	agentPrefix := filepath.Join(h.projectRoot, ".zqk", "worktrees") + string(fileutil.PathSeparator)
+	agentPrefix := filepath.Join(h.projectRoot, paths.ProjectDataDir, paths.WorktreesSubdir) + string(fileutil.PathSeparator)
 	isolatedPrefix := paths.AgentWorktreeContainer(h.projectRoot) + string(fileutil.PathSeparator)
 	removed := 0
 	var currentWT string

@@ -3,13 +3,13 @@ package loader
 import (
 	"maps"
 	"path/filepath"
-	"sync"
 	"time"
 
 	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/pkg/kindnames"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -88,10 +88,7 @@ func DefaultLoaderTimeoutConfigMap() map[string]LoaderTimeoutConfig {
 	}
 }
 
-var (
-	globalLoaderConfig     map[string]LoaderTimeoutConfig
-	globalLoaderConfigOnce sync.Once
-)
+var loaderTimeouts stampmemo.Table[map[string]LoaderTimeoutConfig] // keyed "global"; stamp is project config.yaml
 
 // LoadLoaderTimeoutConfig loads component loader timeouts from the project config file.
 // Path: .zqk/config/config.yaml under "component_loaders". Missing or invalid file returns defaults.
@@ -183,15 +180,14 @@ func GetLoaderTimeoutConfig(loaderName string) LoaderTimeoutConfig {
 // GetGlobalLoaderTimeoutConfigMap returns the singleton loader timeout config map (from default file).
 // Profile/thematic overrides are not applied; use MergeLoaderTimeoutOverrides in the context layer with profile data.
 func GetGlobalLoaderTimeoutConfigMap() map[string]LoaderTimeoutConfig {
-	globalLoaderConfigOnce.Do(func() {
-		m, err := LoadLoaderTimeoutConfig(emptyValue)
-		if err != nil {
-			globalLoaderConfig = DefaultLoaderTimeoutConfigMap()
-		} else {
-			globalLoaderConfig = m
-		}
+	path := findLoaderConfigFile()
+	m, err := loaderTimeouts.Load("global", stampmemo.Of(path), func() (map[string]LoaderTimeoutConfig, error) {
+		return LoadLoaderTimeoutConfig(path)
 	})
-	return globalLoaderConfig
+	if err != nil || m == nil {
+		return DefaultLoaderTimeoutConfigMap()
+	}
+	return m
 }
 
 // intFromOverride extracts an int from a profile override value (may be int or float64 from YAML/JSON).
@@ -210,21 +206,5 @@ func intFromOverride(v any) int {
 }
 
 func findLoaderConfigFile() string {
-	cwd, err := fileutil.Getwd()
-	if err != nil {
-		return emptyValue
-	}
-	current := cwd
-	for {
-		configPath := filepath.Join(current, paths.ProjectDataDir, paths.ConfigDir, paths.ProjectConfigFile)
-		if _, err := fileutil.Stat(configPath); err == nil {
-			return configPath
-		}
-		parent := filepath.Dir(current)
-		if parent == current {
-			break
-		}
-		current = parent
-	}
-	return emptyValue
+	return paths.FirstExistingFromCwd(filepath.Join(paths.ProjectDataDir, paths.ConfigDir, paths.ProjectConfigFile))
 }

@@ -113,7 +113,7 @@ func (s *Server) SendCriticalError(err error, severity, category, message string
 
 	// Persist critical error to cap_failure_tracker.json for failure observability
 	if s.initCtx != nil && s.initCtx.ProjectRoot != "" {
-		trackerPath := filepath.Join(s.initCtx.ProjectRoot, paths.ProjectDataDir, "state", "cap_failure_tracker.json")
+		trackerPath := filepath.Join(s.initCtx.ProjectRoot, paths.ProjectDataDir, paths.StateDir, "cap_failure_tracker.json")
 		// Ensure directory exists
 		_ = fileutil.EnsureDir(filepath.Dir(trackerPath))
 

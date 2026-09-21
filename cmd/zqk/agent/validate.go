@@ -2,12 +2,14 @@ package agent
 
 import (
 	"github.com/spf13/cobra"
+
 	"github.com/zqk-os/zqk/cmd/zqk/validate"
+	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 )
 
 func NewValidateCmd() *cobra.Command {
-	cmd := validate.NewValidateAgentCmd()
-	cmd.Use = "validate"
-	cmd.Short = "Validate codebase and optionally verify cryptographic stamp"
+	cmd := bldr_cli_cmd_v1.NewAgentValidateCommandBuilder()
+	cmd.RunE = cli.WithProcessor(validate.RunValidateAgent)
 	return cmd
 }

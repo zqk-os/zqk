@@ -2,14 +2,12 @@ package objects
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/zqk-os/zqk/pkg/appledouble"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
@@ -69,36 +67,24 @@ func (sdg *SpecDependencyGraph) BuildGraph() error {
 		return errfmt.Errorf("spec loader not provided")
 	}
 
-	// First pass: collect all specs recursively
-	walkErr := filepath.WalkDir(sdg.loader.specsDir, func(path string, d os.DirEntry, err error) error {
-		if err != nil || d == nil {
-			return nil
+	idx := sdg.loader.specNameIndex()
+	seen := make(map[string]bool, len(idx))
+	for name, path := range idx {
+		if !strings.HasSuffix(name, ".yaml") || seen[path] {
+			continue
 		}
-		if d.IsDir() || !strings.HasSuffix(d.Name(), ".yaml") {
-			return nil
-		}
-		// Skip macOS AppleDouble/resource-fork files (._*)
-		if appledouble.SkipNameInReadDir(d.Name()) {
-			return nil
-		}
-
+		seen[path] = true
 		info, err := sdg.parseSpecInfo(path)
 		if err != nil {
-			// Log warning but skip files that can't be parsed
 			eventLogger := logging.NewEventLogger(pkgctx.NewSystemContext())
 			eventLogger.LogWarning("Failed to parse spec info",
 				logging.String("file", path),
 				logging.Error(err))
-			return nil
+			continue
 		}
-
 		if info.Ontology != emptyValue {
 			sdg.specs[info.Ontology] = info
 		}
-		return nil
-	})
-	if walkErr != nil {
-		return errfmt.Newf("failed to walk spec directory").Wrap(walkErr)
 	}
 
 	// Second pass: build edges (extends and composes — parent/mixin before child)

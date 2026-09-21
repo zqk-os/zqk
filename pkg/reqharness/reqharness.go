@@ -18,6 +18,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -325,7 +326,7 @@ func SaveRequirements(path string, reqs []Requirement) error {
 	if len(reqs) == 0 {
 		return fmt.Errorf(msgRefuseSave, path)
 	}
-	if err := fileutil.MkdirAll(filepath.Dir(path), 0o750); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(path), paths.DirPerm750); err != nil {
 		return fmt.Errorf(msgMkdir, path, err)
 	}
 	b, err := json.MarshalIndent(reqs, "", "  ")

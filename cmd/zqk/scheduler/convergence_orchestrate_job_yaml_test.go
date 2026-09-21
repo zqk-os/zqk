@@ -88,11 +88,11 @@ func TestConvergenceOrchestrateJobYAMLStructure(t *testing.T) {
 	if !ok {
 		t.Fatalf("command_args[1] must be string, got %T", args[1])
 	}
-	if !strings.Contains(script, "cvs_convergence_orchestrate.sh") {
-		t.Errorf("embedded script must invoke cvs_convergence_orchestrate.sh:\n%s", script)
+	if !strings.Contains(script, "scheduler convergence measure") {
+		t.Errorf("embedded script must invoke scheduler convergence measure:\n%s", script)
 	}
-	if !strings.Contains(script, "--no-fail-on-gates") {
-		t.Errorf("embedded script must pass --no-fail-on-gates for scheduled runs:\n%s", script)
+	if !strings.Contains(script, "--skip-rollup-gates") {
+		t.Errorf("embedded script must pass --skip-rollup-gates for scheduled runs:\n%s", script)
 	}
 }
 
@@ -105,10 +105,29 @@ func TestConvergenceOrchestrateJobYAML_CLIValidate(t *testing.T) {
 		t.Skip("bin/zqk not built; run: go build -o bin/zqk ./cmd/zqk")
 	}
 	yamlPath := filepath.Join(projectRoot, filepath.FromSlash(convergenceOrchestrateJobRel))
-	cmd := execwrap.Command(zqkBin, "object", "create", "scheduler_job", "--file", yamlPath, "--dry-run")
+	cmd := execwrap.Command(zqkBin, "object", "create", "scheduler_job", "--file", yamlPath, "--promote", "--dry-run")
 	zqkenv.WireExecForIsolatedProject(cmd, projectRoot)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("zqk object create scheduler_job --dry-run failed: %v\n%s", err, string(out))
+	}
+}
+
+func findProjectRootForTest(t *testing.T) string {
+	t.Helper()
+	dir, err := fileutil.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get current directory: %v", err)
+	}
+
+	for {
+		if _, err := fileutil.Stat(filepath.Join(dir, "go.mod")); err == nil {
+			return dir
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			t.Fatalf("Could not find project root (go.mod)")
+		}
+		dir = parent
 	}
 }

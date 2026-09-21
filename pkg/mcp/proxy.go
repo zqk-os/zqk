@@ -18,6 +18,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // ProxyDaemon acts as a middleman between stdio (IDE) and a TCP MCP daemon.
@@ -433,7 +434,7 @@ func (p *ProxyDaemon) replyDaemonUnavailable(msg []byte, format *MessageFormat) 
 		ID:      req.ID,
 		Error: map[string]any{
 			objects.FieldKeyCode: -32001,
-			"message":            "MCP daemon unavailable at " + p.tcpAddr + "; run: zqk mcp daemon --tcp " + p.tcpAddr,
+			"message":            "MCP daemon unavailable at " + p.tcpAddr + paths.RewriteCanonicalCLIInvocations("; run: zqk mcp daemon --tcp ") + p.tcpAddr,
 		},
 	}
 	resp, err := json.Marshal(payload)

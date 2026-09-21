@@ -74,7 +74,7 @@ func AppendRequest(projectRoot, command, requestID string, args []any) (string, 
 	}
 	line = append(line, '\n')
 
-	f, err := fileutil.OpenFile(path, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, 0o600)
+	f, err := fileutil.OpenFile(path, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, paths.FilePerm600)
 	if err != nil {
 		return "", errfmt.Errorf("idebridge: open control jsonl: %w", err)
 	}

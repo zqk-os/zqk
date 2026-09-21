@@ -6,13 +6,14 @@ import (
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestDetectVendors_IDE(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
-	if err := fileutil.MkdirAll(filepath.Join(root, ".ide"), 0o755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Join(root, ".ide"), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	got := DetectVendors(root)
@@ -33,7 +34,7 @@ func TestDetectVendors_IDE(t *testing.T) {
 func TestDetectVendors_BareAgentsDirNotDetected(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
-	if err := fileutil.MkdirAll(filepath.Join(root, ".agents"), 0o755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Join(root, ".agents"), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	got := DetectVendors(root)
@@ -57,7 +58,7 @@ func TestDetectVendors_EmptyIsVectorB(t *testing.T) {
 func TestRun_DetectOnly(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
-	if err := fileutil.MkdirAll(filepath.Join(root, ".ide"), 0o755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Join(root, ".ide"), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	res, err := Run(Options{ProjectRoot: root, DetectOnly: true, SessionOK: true})
@@ -75,7 +76,7 @@ func TestRun_DetectOnly(t *testing.T) {
 func TestRun_DryRunDoesNotSeatOrWrite(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
-	if err := fileutil.MkdirAll(filepath.Join(root, ".ide"), 0o755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Join(root, ".ide"), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	seated := false
@@ -144,7 +145,7 @@ func TestRun_PrimeAndSmoke(t *testing.T) {
 func TestRun_HeadlessSkipsIDERulesEvenIfIDEPresent(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
-	if err := fileutil.MkdirAll(filepath.Join(root, ".ide"), 0o755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Join(root, ".ide"), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	res, err := Run(Options{
@@ -184,7 +185,7 @@ func TestWriteVendorConfigs_SkipsExistingUnlessForce(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	path := filepath.Join(root, ".iderules")
-	if err := fileutil.WriteFile(path, []byte("studio-dense rules"), 0o644); err != nil {
+	if err := fileutil.WriteFile(path, []byte("studio-dense rules"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	vendors := []Vendor{{

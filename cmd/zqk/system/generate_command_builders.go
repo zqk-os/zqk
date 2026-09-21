@@ -17,7 +17,7 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-const defaultCLISpecsDirRel = ".zqk/cli/specs"
+var defaultCLISpecsDirRel = paths.CLICommandSpecsDir
 
 // NewGenerateCommandBuildersCmd creates a command to generate command builder files from YAML specs
 func NewGenerateCommandBuildersCmd() *cobra.Command {
@@ -35,15 +35,14 @@ func NewGenerateCommandBuildersCmd() *cobra.Command {
 		"This command reads YAML command DNA under .zqk/cli/specs (default) and generates",
 		"corresponding Go builder files following the versioned builder pattern.",
 		"",
-		"Do not point --specs-dir at process CAS trees — command DNA lives only under",
-		".zqk/cli/specs (paths_config command_specs). --include-process-command-specs is",
-		"retained as an escape hatch for any leftover CSPEC-* instances elsewhere.",
+		"Do not point --specs-dir at process CAS trees — command DNA lives only under "+paths.CLICommandSpecsDir+" (paths_config command_specs).",
+		"--include-process-command-specs is retained as an escape hatch for any leftover CSPEC-* instances elsewhere.",
 		"",
 		"The generated builders use the CommandBuilder/CRUDCommandBuilder pattern and",
 		"can be used to create cobra.Command instances programmatically.",
 	).
 		AddExample("Generate builders from CLI DNA (default)", "%s system generate-command-builders --overwrite").
-		AddExample("Generate builders from an explicit DNA directory", "%s system generate-command-builders --specs-dir .zqk/cli/specs --overwrite").
+		AddExample("Generate builders from an explicit DNA directory", "%s system generate-command-builders --specs-dir "+paths.CLICommandSpecsDir+" --overwrite").
 		AddExample("Generate builders to a specific output directory", "%s system generate-command-builders --output-dir pkg/cli").
 		AddExample("Include leftover process CAS command_spec instances (escape hatch)", "%s system generate-command-builders --include-process-command-specs --overwrite").
 		ExcludeCommonFlags()
@@ -168,7 +167,7 @@ func NewGenerateCommandBuildersCmd() *cobra.Command {
 
 	helpBuilder.ApplyToCommand(cmd)
 
-	cmd.Flags().StringVar(&specsDir, "specs-dir", "", "Directory containing YAML command DNA (default: <project>/.zqk/cli/specs)")
+	cmd.Flags().StringVar(&specsDir, "specs-dir", "", fmt.Sprintf("Directory containing YAML command DNA (default: <project>/%s)", paths.CLICommandSpecsDir))
 	cmd.Flags().StringVar(&outputDir, "output-dir", "", "Output directory for generated builder files (default: <project>/pkg/cli)")
 	cmd.Flags().BoolVar(&overwrite, "overwrite", false, "Overwrite existing command builder files")
 	cmd.Flags().BoolVar(&includeProcessCommandSpecs, "include-process-command-specs", false, "Also generate from process CAS command_spec instances (CSPEC-*); off by default")

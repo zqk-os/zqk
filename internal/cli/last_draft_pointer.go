@@ -119,7 +119,7 @@ func ResolveLastDraftFile(projectRoot, scope, expectedKind string) (string, erro
 	st, err := fileutil.Stat(abs)
 	if err != nil {
 		if fileutil.IsNotExist(err) {
-			return "", errfmt.Errorf("last draft file missing: %s (run `zqk new` again or use --file)", abs)
+			return "", errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("last draft file missing: %s (run `zqk new` again or use --file)", abs)))
 		}
 		return "", err
 	}
@@ -132,11 +132,11 @@ func ResolveLastDraftFile(projectRoot, scope, expectedKind string) (string, erro
 func lastDraftRerunHint(scope, canonicalKind string) string {
 	switch scope {
 	case LastDraftScopeObject:
-		return fmt.Sprintf("zqk new object %s", canonicalKind)
+		return paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("zqk new object %s", canonicalKind))
 	case LastDraftScopeInternal:
-		return fmt.Sprintf("zqk new internal %s", canonicalKind)
+		return paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("zqk new internal %s", canonicalKind))
 	default:
-		return fmt.Sprintf("zqk new (scope %s)", scope)
+		return paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("zqk new (scope %s)", scope))
 	}
 }
 

@@ -17,9 +17,9 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"sync"
 
 	"github.com/zqk-os/zqk/pkg/config"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 
 	"gopkg.in/yaml.v3"
 
@@ -75,11 +75,12 @@ var highVolumeKindsDefault = func() map[string]bool {
 	return m
 }()
 
-var (
-	highVolumeKindsOnce   sync.Once
-	streamStorageKindsMap map[string]bool
-	highVolumeKindsMap    map[string]bool
-)
+type hvKindMaps struct {
+	stream map[string]bool
+	all    map[string]bool
+}
+
+var hvKindMemo stampmemo.Table[hvKindMaps] // keyed "global"; stamp is high_volume_kinds.yaml
 
 func loadHighVolumeKindMaps() (stream map[string]bool, all map[string]bool) {
 	configPath := findHighVolumeKindsConfig()
@@ -114,50 +115,27 @@ func loadHighVolumeKindMaps() (stream map[string]bool, all map[string]bool) {
 	return stream, all
 }
 
-func ensureHighVolumeKindMaps() {
-	highVolumeKindsOnce.Do(func() {
-		streamStorageKindsMap, highVolumeKindsMap = loadHighVolumeKindMaps()
+func loadMemoizedHighVolumeKindMaps() hvKindMaps {
+	path := findHighVolumeKindsConfig()
+	maps, _ := hvKindMemo.Load("global", stampmemo.Of(path), func() (hvKindMaps, error) {
+		stream, all := loadHighVolumeKindMaps()
+		return hvKindMaps{stream: stream, all: all}, nil
 	})
+	return maps
 }
 
-// getStreamStorageEnabledKinds returns kinds with storage: stream in high_volume_kinds.yaml.
 func getStreamStorageEnabledKinds() map[string]bool {
-	ensureHighVolumeKindMaps()
-	return streamStorageKindsMap
+	return loadMemoizedHighVolumeKindMaps().stream
 }
 
-// getHighVolumeKinds returns all kinds listed in high_volume_kinds.yaml (any storage value).
-// Used for HV event cache membership and retention OldestIDs/Count fast paths.
 func getHighVolumeKinds() map[string]bool {
-	ensureHighVolumeKindMaps()
-	return highVolumeKindsMap
+	return loadMemoizedHighVolumeKindMaps().all
 }
 
 // findHighVolumeKindsConfig walks up from cwd looking for the project root and returns
 // the path to .zqk/specs/configs/high_volume_kinds.yaml, or "" if not found.
 func findHighVolumeKindsConfig() string {
-	wd, err := fileutil.Getwd()
-	if err != nil {
-		return ""
-	}
-	dir := wd
-	markers := []string{paths.ProcessInternalConfigsDir, paths.ProjectDataDir, "go.mod"}
-	for {
-		for _, marker := range markers {
-			if _, err := fileutil.Stat(filepath.Join(dir, marker)); err == nil {
-				candidate := filepath.Join(dir, paths.ProcessInternalConfigsDir, paths.HighVolumeKindsConfigFile)
-				if _, err := fileutil.Stat(candidate); err == nil {
-					return candidate
-				}
-			}
-		}
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			break
-		}
-		dir = parent
-	}
-	return ""
+	return paths.FirstExistingFromCwd(filepath.Join(paths.ProcessInternalConfigsDir, paths.HighVolumeKindsConfigFile))
 }
 
 // StreamStorageEnabledForKind returns true when stream storage is enabled for the kind.

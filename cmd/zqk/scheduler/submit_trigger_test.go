@@ -121,10 +121,10 @@ func TestSubmitJobPersistsEnvironmentVariables(t *testing.T) {
 	testRoot, cliCtx, cmd := setupTestEnvironment(t)
 	registerSubmitFlags(cmd)
 
-	if err := cmd.Flags().Set("env", "ZQK_LLM_PROVIDER=openai"); err != nil {
+	if err := cmd.Flags().Set("env", zqkenv.LLMProvider().Name()+"=openai"); err != nil {
 		t.Fatalf("Failed to set env provider: %v", err)
 	}
-	if err := cmd.Flags().Set("env", "ZQK_LLM_API_KEY=ollama"); err != nil {
+	if err := cmd.Flags().Set("env", zqkenv.LLMAPIKey().Name()+"=ollama"); err != nil {
 		t.Fatalf("Failed to set env api key: %v", err)
 	}
 
@@ -148,12 +148,12 @@ func TestSubmitJobPersistsEnvironmentVariables(t *testing.T) {
 	var found bool
 	for _, job := range result.Objects {
 		raw, ok := job[objects.FieldKeyEnvironmentVariables].(map[string]any)
-		if !ok || raw["ZQK_LLM_PROVIDER"] != "openai" {
+		if !ok || raw[zqkenv.LLMProvider().Name()] != "openai" {
 			continue
 		}
 		found = true
-		if raw["ZQK_LLM_API_KEY"] != "ollama" {
-			t.Errorf("ZQK_LLM_API_KEY = %v, want ollama", raw["ZQK_LLM_API_KEY"])
+		if raw[zqkenv.LLMAPIKey().Name()] != "ollama" {
+			t.Errorf("%s = %v, want ollama", zqkenv.LLMAPIKey().Name(), raw[zqkenv.LLMAPIKey().Name()])
 		}
 	}
 	if !found {
@@ -206,10 +206,10 @@ func TestEnqueueJobTriggerRequest_SetsCLISubmitOrigin(t *testing.T) {
 	t.Setenv(zqkenv.TestRoot().Name(), testRoot)
 	// Write PID file for running scheduler daemon
 	pidFile := paths.SchedulerPIDFilePath(testRoot)
-	if err := os.MkdirAll(filepath.Dir(pidFile), 0750); err != nil {
+	if err := os.MkdirAll(filepath.Dir(pidFile), paths.DirPerm750); err != nil {
 		t.Fatalf("mkdir scheduler dir: %v", err)
 	}
-	if err := os.WriteFile(pidFile, []byte(fmt.Sprintf("%d", os.Getpid())), 0600); err != nil {
+	if err := os.WriteFile(pidFile, []byte(fmt.Sprintf("%d", os.Getpid())), paths.FilePerm600); err != nil {
 		t.Fatalf("write pid file: %v", err)
 	}
 

@@ -33,8 +33,8 @@ func TestParseFilesystemSnapshotScope(t *testing.T) {
 func TestRunFilesystemProjectSnapshot_ScopeZqk(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
-	_ = fileutil.MkdirAll(filepath.Join(root, paths.ProjectDataDir, "logs", "d"), paths.DirPerm750)
-	_ = fileutil.WriteFile(filepath.Join(root, paths.ProjectDataDir, "logs", "d", "a.jsonl"), []byte("x"), paths.FilePerm600)
+	_ = fileutil.MkdirAll(filepath.Join(root, paths.ProjectDataDir, paths.LogsDir, "d"), paths.DirPerm750)
+	_ = fileutil.WriteFile(filepath.Join(root, paths.ProjectDataDir, paths.LogsDir, "d", "a.jsonl"), []byte("x"), paths.FilePerm600)
 	_ = fileutil.MkdirAll(filepath.Join(root, "pkg", "p"), paths.DirPerm750)
 	_ = fileutil.WriteFile(filepath.Join(root, "pkg", "p", "z.go"), []byte("p"), paths.FilePerm600)
 

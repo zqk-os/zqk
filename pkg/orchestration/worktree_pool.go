@@ -9,6 +9,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -57,7 +58,7 @@ func (p *WorktreePool) Acquire(ctx context.Context, agentID string, leaseDuratio
 	handleID := fmt.Sprintf("wt-%d-%d", time.Now().UnixNano(), seq)
 	wtPath := filepath.Join(p.baseDir, handleID)
 
-	if err := fileutil.MkdirAll(wtPath, 0750); err != nil {
+	if err := fileutil.MkdirAll(wtPath, paths.DirPerm750); err != nil {
 		return nil, fmt.Errorf("failed to create worktree directory: %w", err)
 	}
 

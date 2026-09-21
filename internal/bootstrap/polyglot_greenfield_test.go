@@ -59,7 +59,7 @@ func TestPolyglotGreenfieldInit(t *testing.T) {
 
 			// Seed ecosystem marker file
 			markerPath := filepath.Join(projectRoot, tc.markerFile)
-			if err := fileutil.WriteFile(markerPath, []byte(tc.markerData), 0644); err != nil {
+			if err := fileutil.WriteFile(markerPath, []byte(tc.markerData), paths.FilePerm644); err != nil {
 				t.Fatalf("failed to write ecosystem marker file: %v", err)
 			}
 
@@ -130,15 +130,15 @@ func TestBootstrapPortableScript(t *testing.T) {
 
 	cmd := exec.CommandContext(ctx, "/bin/sh", scriptPath, moduleRoot)
 	cmd.Dir = moduleRoot
-	cmd.Env = append(os.Environ(), "ZQK_ALLOW_FOREGROUND_GO_TEST=1")
+	cmd.Env = append(os.Environ(), "CGO_ENABLED=0")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("verify-bootstrap-portable.sh failed: %v\nOutput:\n%s", err, string(out))
 	}
 }
 
-// TestCommunityBinaryBuildCGOZero verifies that cmd/zqk-community builds cleanly with CGO_ENABLED=0.
-func TestCommunityBinaryBuildCGOZero(t *testing.T) {
+// TestProductBinaryBuildCGOZero verifies that ./cmd/zqk builds cleanly with CGO_ENABLED=0.
+func TestProductBinaryBuildCGOZero(t *testing.T) {
 	t.Parallel()
 	moduleRoot, err := findModuleRoot()
 	if err != nil || moduleRoot == "" {
@@ -148,13 +148,14 @@ func TestCommunityBinaryBuildCGOZero(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
-	tmpBin := filepath.Join(t.TempDir(), "zqk-community-probe")
-	cmd := exec.CommandContext(ctx, "go", "build", "-o", tmpBin, "./cmd/zqk-community")
+	const targetPkg = "./cmd/zqk"
+	tmpBin := filepath.Join(t.TempDir(), "zqk-cgo-probe")
+	cmd := exec.CommandContext(ctx, "go", "build", "-o", tmpBin, targetPkg)
 	cmd.Dir = moduleRoot
 	cmd.Env = append(os.Environ(), "CGO_ENABLED=0")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		t.Fatalf("CGO_ENABLED=0 build of cmd/zqk-community failed: %v\nOutput:\n%s", err, string(out))
+		t.Fatalf("CGO_ENABLED=0 build of %s failed: %v\nOutput:\n%s", targetPkg, err, string(out))
 	}
 
 	if st, err := fileutil.Stat(tmpBin); err != nil || st.Size() == 0 {

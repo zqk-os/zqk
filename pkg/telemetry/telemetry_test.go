@@ -6,13 +6,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestStreamCompaction(t *testing.T) {
 	dir := t.TempDir()
 	oldFile := filepath.Join(dir, "segment.chunk")
-	if err := fileutil.WriteFile(oldFile, []byte("chunk"), 0644); err != nil {
+	if err := fileutil.WriteFile(oldFile, []byte("chunk"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	past := time.Now().Add(-48 * time.Hour)

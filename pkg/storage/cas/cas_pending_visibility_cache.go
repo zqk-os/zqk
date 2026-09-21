@@ -58,7 +58,7 @@ func GetCASPendingVisibilityCache(projectRoot string) *CASPendingVisibilityCache
 	if abs, err := filepath.Abs(projectRoot); err == nil {
 		projectRoot = abs
 	}
-	targetPath := filepath.Join(projectRoot, ".zqk", "cas_pending_visibility.json")
+	targetPath := filepath.Join(projectRoot, paths.ProjectDataDir, "cas_pending_visibility.json")
 
 	globalPendingCacheMu.Lock()
 	defer globalPendingCacheMu.Unlock()

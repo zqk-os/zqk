@@ -5,15 +5,11 @@ package authcred
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/paths"
-	"github.com/zqk-os/zqk/pkg/utils/fileutil"
-	"gopkg.in/yaml.v3"
 )
 
 const (
@@ -56,65 +52,59 @@ func ResolveSecret(projectRoot, secret string) (Match, error) {
 		return Match{}, errfmt.Errorf("empty credential")
 	}
 	want := NormalizeCredentialHash(HashAPIKey(secret))
-	dir := filepath.Join(projectRoot, paths.ProcessKeystoreDir)
-	entries, err := fileutil.ReadDir(dir)
+	recs, err := ListKeystoreRecords(projectRoot)
 	if err != nil {
 		return Match{}, errfmt.Newf("keystore unavailable").Wrap(err)
 	}
-	for _, e := range entries {
-		if e.IsDir() || !strings.HasSuffix(e.Name(), ".yaml") {
-			continue
-		}
-		data, readErr := fileutil.ReadFile(filepath.Join(dir, e.Name()))
-		if readErr != nil {
-			continue
-		}
-		var entry map[string]any
-		if yaml.Unmarshal(data, &entry) != nil {
-			continue
-		}
-		kt, _ := entry[objects.FieldKeyKeyType].(string)
+	for _, rec := range recs {
+		kt := rec.KeyType()
 		if kt != keyTypeAPIKey && kt != keyTypePersonalAccessToken {
 			continue
 		}
-		if revoked, ok := entry[objects.FieldKeyRevoked].(bool); ok && revoked {
+		if rec.Revoked() {
 			continue
 		}
-		if expiresAt, ok := entry[objects.FieldKeyExpiresAt].(string); ok && expiresAt != "" {
+		if expiresAt := rec.ExpiresAt(); expiresAt != "" {
 			if t, parseErr := time.Parse(time.RFC3339, expiresAt); parseErr == nil && time.Now().UTC().After(t) {
 				continue
 			}
 		}
-		stored, _ := entry[objects.FieldKeyCredentialHash].(string)
-		if NormalizeCredentialHash(stored) != want {
+		if NormalizeCredentialHash(rec.CredentialHash()) != want {
 			continue
 		}
-		accountID, _ := entry[objects.FieldKeyAccountID].(string)
+		accountID := rec.AccountID()
 		if accountID == "" {
 			continue
 		}
-		keyID, _ := entry[objects.FieldKeyID].(string)
-		if keyID == "" {
-			keyID = strings.TrimSuffix(e.Name(), ".yaml")
-		}
-		return Match{AccountID: accountID, KeyID: keyID}, nil
+		return Match{AccountID: accountID, KeyID: rec.KeyID}, nil
 	}
 	return Match{}, errfmt.Errorf("credential not found in keystore")
 }
 
-// LooksLikeIssuedSecret reports whether raw is an opaque issued key (not ACC-/ZQK-).
+// LooksLikeIssuedSecret reports whether raw is an opaque issued key
+// (not ACC-*, session ZS-/ZQK-*, or retired account: form).
 func LooksLikeIssuedSecret(raw string) bool {
 	raw = strings.TrimSpace(raw)
 	if raw == "" {
 		return false
 	}
-	if strings.HasPrefix(raw, "ACC-") || strings.HasPrefix(raw, "ZQK-") {
+	if LooksLikeSessionToken(raw) {
+		return false
+	}
+	if strings.HasPrefix(raw, "ACC-") {
 		return false
 	}
 	if strings.HasPrefix(raw, "account:") {
 		return false
 	}
 	return true
+}
+
+// LooksLikeSessionToken reports ZS-* (canonical session) or the ZQK-* synonym
+// written by older login paths into credentials.
+func LooksLikeSessionToken(raw string) bool {
+	raw = strings.TrimSpace(raw)
+	return strings.HasPrefix(raw, "ZS-") || strings.HasPrefix(raw, "ZQK-")
 }
 
 // TokenFingerprintMeta builds an account.tokens[] entry (fingerprint only; never raw secret).

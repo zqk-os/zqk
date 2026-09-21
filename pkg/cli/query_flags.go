@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // Logger is a minimal interface for logging errors
@@ -108,8 +109,8 @@ func normalizeFieldsFlagValues(raw []string) ([]string, error) {
 			if strings.HasPrefix(cleanName, "-") {
 				return nil, fmt.Errorf(
 					"invalid --fields key %q (top-level YAML keys cannot start with '-'); "+
-						"if you meant command help, put -h before flags that consume the next argument (e.g. \"zqk object list -h backlog_item\")",
-					cleanName,
+						"if you meant command help, put -h before flags that consume the next argument (e.g. %q)",
+					cleanName, paths.CLIUsage("object", "list", "-h", "backlog_item"),
 				)
 			}
 			if _, ok := seen[cleanName]; ok {

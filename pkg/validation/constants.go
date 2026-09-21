@@ -1,6 +1,9 @@
 package validation
 
-import "github.com/zqk-os/zqk/pkg/shovelready"
+import (
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/shovelready"
+)
 
 // Validation cache and state cache constants.
 // Use these instead of magic strings so updates and discovery are in one place.
@@ -34,11 +37,11 @@ const (
 	PathInstanceValidator              = "pkg/validation/instance_validator.go"
 )
 
-const (
-	PathCriteriaLifecycleYAML           = ".zqk/specs/lifecycles/qa/criteria_lifecycle.yaml"
-	PathConvergenceSessionLifecycleYAML = ".zqk/specs/lifecycles/kernel/convergence_session_lifecycle.yaml"
-	PathBacklogItemLifecycleYAML        = ".zqk/specs/lifecycles/pm/backlog_item_lifecycle.yaml"
-	PathPriorityPlanLifecycleYAML       = ".zqk/specs/lifecycles/pm/priority_plan_lifecycle.yaml"
+var (
+	PathCriteriaLifecycleYAML           = paths.ProcessInternalLifecyclesDir + "/qa/criteria_lifecycle.yaml"
+	PathConvergenceSessionLifecycleYAML = paths.ProcessInternalLifecyclesDir + "/kernel/convergence_session_lifecycle.yaml"
+	PathBacklogItemLifecycleYAML        = paths.ProcessInternalLifecyclesDir + "/pm/backlog_item_lifecycle.yaml"
+	PathPriorityPlanLifecycleYAML       = paths.ProcessInternalLifecyclesDir + "/pm/priority_plan_lifecycle.yaml"
 )
 
 // ValidationCodeChecksumFiles are named paths always unioned into the checker
@@ -70,8 +73,8 @@ var ValidationCodeChecksumGlobs = []string{
 	"cmd/zqk/system/spec_auto_fixer*.go",
 	"pkg/validation/*.go",
 	"pkg/migration/parser/*.go",
-	".zqk/specs/lifecycles/*/*.yaml",
-	".zqk/specs/lifecycles/*.yaml",
+	paths.ProcessInternalLifecyclesDir + "/*/*.yaml",
+	paths.ProcessInternalLifecyclesDir + "/*.yaml",
 }
 
 const (

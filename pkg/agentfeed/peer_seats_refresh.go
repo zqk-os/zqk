@@ -87,7 +87,7 @@ func SavePeerSeats(projectRoot string, f PeerSeatsFile) error {
 		f.SchemaVersion = "1"
 	}
 	path := paths.PeerSeatsPath(root)
-	if err := fileutil.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(path), paths.DirPerm755); err != nil {
 		return errfmt.Newf("mkdir peer seats dir").Wrap(err)
 	}
 	b, err := json.MarshalIndent(f, "", "  ")

@@ -75,11 +75,11 @@ func (a *AuditStream) Publish(ctx context.Context, record AuditRecord) {
 	if err != nil {
 		logging.FluentEvent(logging.GetLogger()).Error("Failed to marshal audit record", err).Log()
 	} else {
-		walDir := filepath.Join(a.projectRoot, paths.ProjectDataDir, "logs", "audit")
+		walDir := filepath.Join(a.projectRoot, paths.ProjectDataDir, paths.LogsDir, "audit")
 		if err := fileutil.EnsureDir(walDir); err != nil {
 			logging.FluentEvent(logging.GetLogger()).Error("Failed to create audit WAL directory", err).Log()
 		} else {
-			if f, err := fileutil.OpenFile(filepath.Join(walDir, "wal.jsonl"), fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, 0644); err == nil {
+			if f, err := fileutil.OpenFile(filepath.Join(walDir, "wal.jsonl"), fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, paths.FilePerm644); err == nil {
 				if _, err := f.Write(append(b, '\n')); err != nil {
 					logging.FluentEvent(logging.GetLogger()).Error("Failed to write to audit WAL", err).Log()
 				}

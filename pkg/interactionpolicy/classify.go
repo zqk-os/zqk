@@ -1,8 +1,11 @@
 package interactionpolicy
 
 import (
+	"path/filepath"
 	"regexp"
 	"strings"
+
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 var (
@@ -21,7 +24,7 @@ func ClassifyShell(cmd string) string {
 	// Tripwire only: nested studio worktrees are forbidden
 	// (POL-AGENT-WORKTREE-ISOLATION-001). Legal adds live under
 	// $TMPDIR/zqk-worktrees and must not classify (and must not error).
-	if reGitWorktreeAdd.MatchString(c) && strings.Contains(c, ".zqk/worktrees") {
+	if reGitWorktreeAdd.MatchString(c) && strings.Contains(c, filepath.Join(paths.ProjectDataDir, paths.WorktreesSubdir)) {
 		return EventGitWorktreeAdd
 	}
 	if reGoTest.MatchString(c) {

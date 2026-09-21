@@ -216,7 +216,7 @@ func runInit(_ *cobra.Command, projectName, template string, force bool, snapsho
 	if withMaintenanceJobs {
 		result, err := EnsureRetentionJobsInProject(projectRoot, logger, nil)
 		if err != nil {
-			return errfmt.Newf("init --with-maintenance-jobs failed; run 'zqk system ensure-retention-jobs' after fixing the error").Wrap(err)
+			return errfmt.Newf("%s", paths.RewriteCanonicalCLIInvocations("init --with-maintenance-jobs failed; run 'zqk system ensure-retention-jobs' after fixing the error")).Wrap(err)
 		}
 		if result != nil && !result.AlreadySatisfied {
 			logging.Fluent(logger).Info("Maintenance jobs ensured").
@@ -376,7 +376,7 @@ func runGreenfieldInit(projectRoot, projectName, template string, force bool, lo
 	if _, err := migration.EnsureBundledObjectSpecsMigrated(context.Background(), projectRoot, logger); err != nil {
 		logging.Fluent(logger).Warn("Bundled object_spec migration did not complete").
 			WithError(err).
-			String("note", "Run from repo after fixing storage, or use zqk spec list (file fallback)").
+			String("note", paths.RewriteCanonicalCLIInvocations("Run from repo after fixing storage, or use zqk spec list (file fallback)")).
 			Log()
 	}
 
@@ -502,7 +502,7 @@ func runLegacyInit(projectRoot, projectName, template string, force bool, logger
 	if _, err := migration.EnsureBundledObjectSpecsMigrated(context.Background(), projectRoot, logger); err != nil {
 		logging.Fluent(logger).Warn("Bundled object_spec migration did not complete").
 			WithError(err).
-			String("note", "Run from repo after fixing storage, or use zqk spec list (file fallback)").
+			String("note", paths.RewriteCanonicalCLIInvocations("Run from repo after fixing storage, or use zqk spec list (file fallback)")).
 			Log()
 	}
 
@@ -883,9 +883,9 @@ func readDiscoveryDraft(projectRoot string) *discoveryDraft {
 
 func saveDiscoveryDraft(projectRoot string, draft *discoveryDraft) {
 	draftPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.CacheDir, "wizard_draft.json")
-	_ = fileutil.MkdirAll(filepath.Dir(draftPath), 0755)
+	_ = fileutil.MkdirAll(filepath.Dir(draftPath), paths.DirPerm755)
 	if data, err := json.Marshal(draft); err == nil {
-		_ = fileutil.WriteFile(draftPath, data, 0644)
+		_ = fileutil.WriteFile(draftPath, data, paths.FilePerm644)
 	}
 }
 
@@ -1119,7 +1119,7 @@ func runLegacyDiscoverWizard(projectRoot string, logger logging.Logger) error {
 			Int("count", c.count).
 			Log()
 	}
-	logging.Fluent(logger).Info("To register hashes and validate discovered objects, run: zqk system check --auto-fix").Log()
+	logging.Fluent(logger).Info(paths.RewriteCanonicalCLIInvocations("To register hashes and validate discovered objects, run: zqk system check --auto-fix")).Log()
 	return nil
 }
 
@@ -1229,7 +1229,7 @@ func injectAgentBootProtocol(projectRoot string, isLegacy bool, logger logging.L
 	ruleFiles := []string{".iderules", ".clinerules", ".windsurfrules"}
 	for _, file := range ruleFiles {
 		path := filepath.Join(projectRoot, file)
-		f, err := fileutil.OpenFile(path, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, 0644)
+		f, err := fileutil.OpenFile(path, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, paths.FilePerm644)
 		if err != nil {
 			logging.Fluent(logger).Warn("Could not open rule file for appending").String("file", file).WithError(err).Log()
 			continue

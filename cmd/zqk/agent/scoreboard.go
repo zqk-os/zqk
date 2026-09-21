@@ -11,8 +11,7 @@ import (
 
 // NewScoreboardCmd creates the agent scoreboard command
 func NewScoreboardCmd() *cobra.Command {
-	bldr := bldr_cli_cmd_v1.NewAgentScoreboardCommandBuilder()
-	cmd := bldr.Build(nil)
+	cmd := bldr_cli_cmd_v1.NewAgentScoreboardCommandBuilder()
 	cmd.RunE = runScoreboard
 	return cmd
 }

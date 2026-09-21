@@ -40,9 +40,7 @@ fi
 # Maintenance job templates so init --with-maintenance-jobs works in greenfield (no repo scripts to copy from)
 if [ -d "$SCRIPTS_SCHEDULER_JOBS_DIR" ]; then
 	mkdir -p "$STAGING/scripts/scheduler_jobs"
-	for f in retention_tolerance_catchall.yaml audit_event_aggregation_default.yaml onboarding_roadmap_seed.yaml cleanup_on_demand.yaml; do
-		[ -f "$SCRIPTS_SCHEDULER_JOBS_DIR/$f" ] && cp "$SCRIPTS_SCHEDULER_JOBS_DIR/$f" "$STAGING/scripts/scheduler_jobs/"
-	done
+	cp -r "$SCRIPTS_SCHEDULER_JOBS_DIR"/*.yaml "$STAGING/scripts/scheduler_jobs/" 2>/dev/null || true
 fi
 # Default policy pack templates (seeded by system init)
 DEFAULT_POLICIES_DIR="${REPO_ROOT}/scripts/default_policies"
@@ -103,7 +101,7 @@ SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-946684800}"
 TOUCH_TS="$(date -u -r "$SOURCE_DATE_EPOCH" '+%Y%m%d%H%M.%S' 2>/dev/null || date -u '+%Y%m%d%H%M.%S')"
 find "$STAGING" -exec touch -h -t "$TOUCH_TS" {} + 2>/dev/null || true
 
-export GZIP="-n"
+unset GZIP 2>/dev/null || true
 (cd "$STAGING" && find . | sort | tar -cf - -T - | gzip -n > "$ARCHIVE_TMP")
 # Traceability: list all paths in the archive (REQ-9011)
 tar tzf "$ARCHIVE_TMP" | sort > "$MANIFEST_TMP"

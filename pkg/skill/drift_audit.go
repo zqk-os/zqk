@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -21,7 +22,7 @@ type Auditor struct {
 
 func NewDriftAuditor(projectRoot string) *Auditor {
 	return &Auditor{
-		PrimaryDir:   filepath.Join(projectRoot, ".zqk", "skills"),
+		PrimaryDir:   filepath.Join(projectRoot, paths.ProjectDataDir, paths.SkillsSubdir),
 		SecondaryDir: filepath.Join(projectRoot, "skills"),
 	}
 }

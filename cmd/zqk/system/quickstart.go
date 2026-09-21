@@ -73,11 +73,11 @@ func runQuickstart(cmd *cobra.Command, args []string) error {
 				fmt.Sprintf("4. Verify health: %s system check", exe),
 			},
 			"starter_policies": []string{
-				"POL-CODE-001: Spec-driven architecture",
-				"POL-CODE-007: Structured logging framework",
-				"POL-CODE-009: Test-driven development (TDD)",
-				"POL-AGENT-001: CLI-only process modifications",
-				"POL-AGENT-TPM-001: Hourglass multi-seat delegation",
+				"Spec-driven architecture",
+				"Structured logging",
+				"Test-driven development (TDD)",
+				"CLI-only process modifications",
+				"Hourglass multi-seat delegation",
 			},
 			objects.FieldKeyMcpConfig: map[string]any{
 				"claude_desktop": map[string]any{

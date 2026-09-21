@@ -2,13 +2,13 @@ package storage
 
 import (
 	"context"
-	"sync"
 	"time"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	"github.com/zqk-os/zqk/pkg/storage/audit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -68,8 +68,8 @@ type AuditEventOptions = audit.EventOptions
 // Exported so coordinator routers can normalize inferred event types.
 var (
 	AllowedAuditEventTypes        map[string]struct{}
-	allowedAuditEventTypesOnce    sync.Once
 	allowedAuditEventTypeFallback string
+	allowedAuditTypes             stampmemo.Table[allowedAuditEventTypeInfo]
 )
 
 // Cached storage providers per projectRoot to avoid expensive factory creation on every audit event
@@ -146,13 +146,20 @@ func loadAllowedAuditEventTypeInfo() allowedAuditEventTypeInfo {
 	return allowedAuditEventTypeInfo{allowed: allowed, fallback: fallback}
 }
 
+func auditEventSpecPath() string {
+	dir := paths.FirstExistingFromCwd(paths.ProcessInternalObjectSpecsDir)
+	return paths.FindDomainFile(dir, paths.ObjectSpecFileName("audit_event"))
+}
+
 func getAllowedAuditEventTypes() map[string]struct{} {
-	allowedAuditEventTypesOnce.Do(func() {
-		info := loadAllowedAuditEventTypeInfo()
-		AllowedAuditEventTypes = info.allowed
-		allowedAuditEventTypeFallback = info.fallback
+	path := auditEventSpecPath()
+	info, _ := allowedAuditTypes.Load(path, stampmemo.Of(path), func() (allowedAuditEventTypeInfo, error) {
+		loaded := loadAllowedAuditEventTypeInfo()
+		AllowedAuditEventTypes = loaded.allowed
+		allowedAuditEventTypeFallback = loaded.fallback
+		return loaded, nil
 	})
-	return AllowedAuditEventTypes
+	return info.allowed
 }
 
 func getAuditEventTypeFallback() string {

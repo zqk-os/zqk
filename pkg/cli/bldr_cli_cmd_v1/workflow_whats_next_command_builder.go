@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // NewWorkflowWhatsNextCommandBuilder creates a new workflow_whats_next command
@@ -13,7 +14,7 @@ func NewWorkflowWhatsNextCommandBuilder() *cobra.Command {
 	help := clipkg.DynamicHelpBuilder("Composite PRI + backlog + CVS + compressed convergence measure")
 	help.WithDescriptionLines("Single JSON snapshot for agent session start: current priority plan (when discoverable),")
 	help.WithDescriptionLines("backlog counts for that plan, active/paused convergence sessions (summary), and an optional")
-	help.WithDescriptionLines("compressed block from the same pipeline as `zqk scheduler convergence measure`.")
+	help.WithDescriptionLines(paths.RewriteCanonicalCLIInvocations("compressed block from the same pipeline as `zqk scheduler convergence measure`."))
 	help.WithDescriptionLines("")
 	help.WithDescriptionLines("Prefer this over ad-hoc shell wrappers: one binary, same working directory semantics.")
 	help.WithDescriptionLines("")

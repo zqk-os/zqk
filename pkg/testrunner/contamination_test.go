@@ -6,22 +6,23 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/testrunner"
 )
 
 func TestContaminationSnapshotAndDiff(t *testing.T) {
 	tempDir := t.TempDir()
-	planeDir := filepath.Join(tempDir, ".zqk", "specs")
-	if err := os.MkdirAll(planeDir, 0o755); err != nil {
+	planeDir := filepath.Join(tempDir, paths.ProjectDataDir, paths.SpecsSubdir)
+	if err := os.MkdirAll(planeDir, paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create plane dir: %v", err)
 	}
 
 	f1 := filepath.Join(planeDir, "spec1.yaml")
-	if err := os.WriteFile(f1, []byte("content: 1"), 0o644); err != nil {
+	if err := os.WriteFile(f1, []byte("content: 1"), paths.FilePerm644); err != nil {
 		t.Fatalf("write f1: %v", err)
 	}
 
-	snap1, err := testrunner.SnapshotPlane(tempDir, ".zqk/specs")
+	snap1, err := testrunner.SnapshotPlane(tempDir, paths.ProcessInternalDir)
 	if err != nil {
 		t.Fatalf("snapshot1: %v", err)
 	}
@@ -36,16 +37,16 @@ func TestContaminationSnapshotAndDiff(t *testing.T) {
 	}
 
 	// 2. Mutate file
-	if err := os.WriteFile(f1, []byte("content: 2"), 0o644); err != nil {
+	if err := os.WriteFile(f1, []byte("content: 2"), paths.FilePerm644); err != nil {
 		t.Fatalf("mutate f1: %v", err)
 	}
 	// Add file
 	f2 := filepath.Join(planeDir, "spec2.yaml")
-	if err := os.WriteFile(f2, []byte("content: added"), 0o644); err != nil {
+	if err := os.WriteFile(f2, []byte("content: added"), paths.FilePerm644); err != nil {
 		t.Fatalf("write f2: %v", err)
 	}
 
-	snap2, err := testrunner.SnapshotPlane(tempDir, ".zqk/specs")
+	snap2, err := testrunner.SnapshotPlane(tempDir, paths.ProcessInternalDir)
 	if err != nil {
 		t.Fatalf("snapshot2: %v", err)
 	}
@@ -64,18 +65,18 @@ func TestContaminationSnapshotAndDiff(t *testing.T) {
 
 func TestRunWithContaminationCheck(t *testing.T) {
 	tempDir := t.TempDir()
-	planeDir := filepath.Join(tempDir, ".zqk", "specs")
-	if err := os.MkdirAll(planeDir, 0o755); err != nil {
+	planeDir := filepath.Join(tempDir, paths.ProjectDataDir, paths.SpecsSubdir)
+	if err := os.MkdirAll(planeDir, paths.DirPerm755); err != nil {
 		t.Fatalf("mkdir: %v", err)
 	}
 	f1 := filepath.Join(planeDir, "spec1.yaml")
-	if err := os.WriteFile(f1, []byte("name: initial"), 0o644); err != nil {
+	if err := os.WriteFile(f1, []byte("name: initial"), paths.FilePerm644); err != nil {
 		t.Fatalf("write f1: %v", err)
 	}
 
 	opts := testrunner.ContaminationCheckOptions{
 		ProjectRoot: tempDir,
-		PlanePath:   ".zqk/specs",
+		PlanePath:   paths.ProcessInternalDir,
 	}
 
 	// Non-mutating command (e.g. echo)

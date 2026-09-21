@@ -1,6 +1,7 @@
 package community_test
 
 import (
+	"github.com/zqk-os/zqk/pkg/paths"
 	"go/parser"
 	"go/token"
 	"os"
@@ -129,7 +130,7 @@ func TestOpenAPIClientSDK_BoundaryAndErrorHandling(t *testing.T) {
 	// Sub-test 2: Malformed / non-dictionary YAML
 	t.Run("MalformedSpecYAML", func(t *testing.T) {
 		badYaml := filepath.Join(tmpDir, "bad.yaml")
-		if err := os.WriteFile(badYaml, []byte("just a string, not a valid openapi dict\n"), 0o644); err != nil {
+		if err := os.WriteFile(badYaml, []byte("just a string, not a valid openapi dict\n"), paths.FilePerm644); err != nil {
 			t.Fatalf("failed to write bad.yaml: %v", err)
 		}
 		cmd := exec.Command("python3", genScript, "--spec", badYaml, "--out-dir", filepath.Join(tmpDir, "out2"))
@@ -143,7 +144,7 @@ func TestOpenAPIClientSDK_BoundaryAndErrorHandling(t *testing.T) {
 	t.Run("SpecMissingPaths", func(t *testing.T) {
 		noPathsYaml := filepath.Join(tmpDir, "nopaths.yaml")
 		content := "openapi: 3.0.0\ninfo:\n  title: Empty\n  version: 1.0.0\npaths: {}\n"
-		if err := os.WriteFile(noPathsYaml, []byte(content), 0o644); err != nil {
+		if err := os.WriteFile(noPathsYaml, []byte(content), paths.FilePerm644); err != nil {
 			t.Fatalf("failed to write nopaths.yaml: %v", err)
 		}
 		cmd := exec.Command("python3", genScript, "--spec", noPathsYaml, "--out-dir", filepath.Join(tmpDir, "out3"))
@@ -168,7 +169,7 @@ paths:
         '200':
           description: ok
 `
-		if err := os.WriteFile(noOpIdYaml, []byte(content), 0o644); err != nil {
+		if err := os.WriteFile(noOpIdYaml, []byte(content), paths.FilePerm644); err != nil {
 			t.Fatalf("failed to write noopid.yaml: %v", err)
 		}
 		cmd := exec.Command("python3", genScript, "--spec", noOpIdYaml, "--out-dir", filepath.Join(tmpDir, "out4"))
@@ -215,7 +216,7 @@ func TestOpenAPIClientSDK_IntegrationAndConformance(t *testing.T) {
 
 	// Verify mode on corrupted/missing output fails cleanly
 	corruptedDir := filepath.Join(tmpDir, "corrupted")
-	if err := os.MkdirAll(corruptedDir, 0o755); err != nil {
+	if err := os.MkdirAll(corruptedDir, paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create corrupted dir: %v", err)
 	}
 	vFailCmd := exec.Command("bash", filepath.Join(repoRoot, "scripts", "generate-openapi-clients.sh"), "--verify", corruptedDir)

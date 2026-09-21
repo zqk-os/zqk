@@ -77,13 +77,11 @@ func runMetricsFeed(cmd *cobra.Command, args []string) error {
 	logClusters := whatsnext.ParseHumanLogClusters(projectRoot)
 	clusterStr := whatsnext.FormatHumanLogClusterDigest(logClusters)
 
-	summaryMsg := fmt.Sprintf("METRICS_DIGEST: High Failure: %d, Slow: %d, Timeouts: %d, Churn: %d. Run `zqk system metrics --summary` for details.%s",
-		len(analysis.HighFailureRateCommands),
+	summaryMsg := paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("METRICS_DIGEST: High Failure: %d, Slow: %d, Timeouts: %d, Churn: %d. Run `zqk system metrics --summary` for details.%s", len(analysis.HighFailureRateCommands),
 		len(analysis.SlowCommands),
 		len(analysis.FrequentTimeouts),
 		len(analysis.ChurnIndicators),
-		clusterStr,
-	)
+		clusterStr))
 
 	amb := whatsnext.LoadKernelAmbience(projectRoot)
 	if amb.Available {
@@ -111,10 +109,10 @@ func runMetricsFeed(cmd *cobra.Command, args []string) error {
 	rollup.TopWarnClusters = logClusters.Warns
 
 	// Persist to .zqk/state/ambient/metrics-rollup.json for ambient stream consumers
-	rollupPath := filepath.Join(projectRoot, paths.ProjectDataDir, "state", "ambient", "metrics-rollup.json")
+	rollupPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.StateDir, "ambient", "metrics-rollup.json")
 	_ = fileutil.MkdirAll(filepath.Dir(rollupPath), paths.DirPerm755)
 	if b, err := json.MarshalIndent(rollup, "", "  "); err == nil {
-		_ = fileutil.WriteFile(rollupPath, b, 0644)
+		_ = fileutil.WriteFile(rollupPath, b, paths.FilePerm644)
 	}
 
 	res, err := agentfeed.AppendEvent(agentfeed.AppendEventInput{

@@ -9,11 +9,12 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // DefaultConfigPath is the path relative to project root when no job override is set.
-const DefaultConfigPath = ".zqk/cleanup/config.yaml"
+var DefaultConfigPath = filepath.Join(paths.ProjectDataDir, paths.CleanupSubdir, "config.yaml")
 
 const (
 	cleanupStepFieldType    = "type"

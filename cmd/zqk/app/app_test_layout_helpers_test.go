@@ -210,7 +210,7 @@ func setupIntegrationTestWithSpecsApp(t *testing.T, scenarioName string) (testRo
 	// TestRoot enables membrane local write (privilegedWriterLocalWriteAllowed).
 	t.Cleanup(func() {
 		_ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(testRoot, nil))
-		_ = fileutil.RemoveAll(filepath.Join(testRoot, ".zqk"))
+		_ = fileutil.RemoveAll(filepath.Join(testRoot, paths.ProjectDataDir))
 		if orig != app.EmptyValue {
 			_ = zqkenv.TestRoot().Set(orig)
 		} else {

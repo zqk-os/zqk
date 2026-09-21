@@ -17,6 +17,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // ConvergenceEngine loop interval
@@ -138,10 +139,11 @@ func (s *Scheduler) evaluateActiveConvergenceSessions(ctx context.Context) {
 
 		SchedulerDaemonLog(s.logger).Debug("convergence_engine: autonomously evaluating active session").String("session_id", id).Log()
 
-		cmd := s.executor.CommandContext(ctx, "bash", "scripts/cvs_convergence_orchestrate.sh", id, "--no-fail-on-gates")
+		cliBin := resolveSchedulerCLIBinary(s.projectRoot)
+		cmd := s.executor.CommandContext(ctx, cliBin, "scheduler", "convergence", "measure", "--session-id", id, "--format", "json", "--skip-rollup-gates")
 		cmd.SetDir(s.projectRoot)
 		// Inherit env, set ZQK_PROJECT_ROOT
-		env := append(os.Environ(), "ZQK_PROJECT_ROOT="+s.projectRoot)
+		env := append(os.Environ(), zqkenv.ProjectRoot().Name()+"="+s.projectRoot)
 		cmd.SetEnv(env)
 
 		var buf bytes.Buffer
@@ -173,7 +175,7 @@ func (s *Scheduler) evaluateActiveConvergenceSessions(ctx context.Context) {
 
 		if rollupStatus == "" {
 			// Fallback: read the file produced by the script
-			rollupPath := filepath.Join(s.projectRoot, paths.ProjectDataDir, "logs", "drift", "cvs_rollup_latest.json")
+			rollupPath := filepath.Join(s.projectRoot, paths.ProjectDataDir, paths.LogsDir, "drift", "cvs_rollup_latest.json")
 			if data, err := fileutil.ReadFile(rollupPath); err == nil {
 				if err := json.Unmarshal(data, &result); err == nil {
 					if rs, ok := result["rollup_status"].(string); ok {

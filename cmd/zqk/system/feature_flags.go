@@ -16,6 +16,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/when"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
@@ -107,8 +108,7 @@ func setFeatureFlag(cmd *cobra.Command, flags *featureflags.FeatureFlags, name s
 	hasConfigWrite := hasPermission(secCtx, "write:config")
 
 	if !hasSystemWrite && !hasConfigWrite {
-		return errfmt.Errorf("insufficient permissions: feature flag changes require write:system or write:config permission. "+
-			"Current account: %s. Use 'zqk system whoami' to check your permissions", secCtx.AccountID)
+		return errfmt.Errorf("insufficient permissions: feature flag changes require write:system or write:config permission. "+paths.RewriteCanonicalCLIInvocations("Current account: %s. Use 'zqk system whoami' to check your permissions"), secCtx.AccountID)
 	}
 
 	// Get current value for audit (fast - in-memory)

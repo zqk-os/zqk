@@ -37,10 +37,10 @@ func diagf(format string, args ...any) {
 	if path == "" {
 		return
 	}
-	if err := fileutil.MkdirAll(filepath.Dir(path), 0o750); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(path), paths.DirPerm750); err != nil {
 		return
 	}
-	f, err := fileutil.OpenFile(path, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, 0o600)
+	f, err := fileutil.OpenFile(path, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, paths.FilePerm600)
 	if err != nil {
 		return
 	}

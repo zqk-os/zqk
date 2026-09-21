@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -28,7 +29,7 @@ func NewShardedFileLockStrategy(shardCount int, lockDir string) *ShardedFileLock
 		shardCount = defaultShardCount
 	}
 	if lockDir == "" {
-		lockDir = filepath.Join(".", ".zqk", "locks", "shards")
+		lockDir = filepath.Join(".", paths.ProjectDataDir, "locks", "shards")
 	}
 
 	return &ShardedFileLockStrategy{
@@ -67,7 +68,7 @@ func (s *ShardedFileLockStrategy) LockPathForKey(key string) string {
 // AcquireShardLock acquires a lock on the shard corresponding to the given resource key.
 func (s *ShardedFileLockStrategy) AcquireShardLock(key string, timeout time.Duration) (LockHandle, error) {
 	// Ensure lock directory exists
-	if err := fileutil.MkdirAll(s.lockDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(s.lockDir, paths.DirPerm755); err != nil {
 		return nil, errfmt.Newf(ConstMiscFailedToAcquireLock).Wrap(err)
 	}
 

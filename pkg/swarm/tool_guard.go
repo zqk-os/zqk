@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/zqk-os/zqk/pkg/llm"
 	"github.com/zqk-os/zqk/pkg/objects"
 )
@@ -14,26 +15,19 @@ import (
 // hourglassOnlyTools are IDE/seat-worker verbs that qwen invents as MCP calls.
 // The seat-worker runs agent next after write evidence; swarm MCP does not.
 var hourglassOnlyTools = map[string]struct{}{
-	"agent_next":                    {},
-	"zqk_agent_next":                {},
-	"chat_send":                     {},
-	"zqk_chat_send":                 {},
-	"get_current_backlog_item":      {},
-	"zqk_get_current_backlog_item":  {},
-	"get_current_priority_plan":     {},
-	"zqk_get_current_priority_plan": {},
-	objects.FieldKeyNextAction:      {},
-	"zqk_next_action":               {},
+	"agent_next":                {},
+	"chat_send":                 {},
+	"get_current_backlog_item":  {},
+	"get_current_priority_plan": {},
+	objects.FieldKeyNextAction:  {},
 }
 
 // inventedMutationTools are write-adjacent names qwen invents instead of
 // write_code / write_file. Steering here keeps them off the "tool not found"
 // loop that then parks for missing mutation evidence.
 var inventedMutationTools = map[string]struct{}{
-	"replace_code":     {},
-	"zqk_replace_code": {},
-	"commit":           {},
-	"zqk_commit":       {},
+	"replace_code": {},
+	"commit":       {},
 }
 
 var inventedObjectListKinds = map[string]struct{}{
@@ -66,7 +60,7 @@ func guardSwarmToolCall(call llm.ToolCall) (result string, handled bool) {
 		return InventedObjectListKindGuidance(), true
 	case isObjectListTool(name) && oversizedObjectList(call.Arguments):
 		return OversizedObjectListGuidance(), true
-	case name == "zqk_mcp_call_tool" && mcpCallInnerIsNotATool(call.Arguments):
+	case toolSuffixIs(name, "mcp_call_tool") && mcpCallInnerIsNotATool(call.Arguments):
 		return MCPCallInnerNotAToolGuidance(mcpCallInnerName(call.Arguments)), true
 	case isMCPCatalogTool(name):
 		return MCPCatalogToolGuidance(), true
@@ -95,21 +89,19 @@ func inventedRepoPath(p string) bool {
 	if p == "" {
 		return false
 	}
-	lower := strings.ToLower(p)
-	base := strings.ToLower(filepath.Base(p))
-	if strings.Contains(lower, "yourrepo") || strings.Contains(lower, "helloworld") {
-		return true
-	}
-	if base == "main.go" && (p == "main.go" || strings.HasPrefix(lower, "src/")) {
-		return true
-	}
-	if strings.HasSuffix(lower, ".py") && !strings.HasPrefix(lower, "scripts/") {
-		return true
-	}
 	if kernelObjectIDPath(filepath.Base(p)) {
 		return true
 	}
-	return false
+	return isTutorialPlaceholderPath(strings.ToLower(p), strings.ToLower(filepath.Base(p)))
+}
+
+// isTutorialPlaceholderPath matches generic LLM tutorial paths (training-data
+// leftovers), not vendor seats or brand-specific filenames.
+func isTutorialPlaceholderPath(lower, base string) bool {
+	if strings.Contains(lower, "yourrepo") || strings.Contains(lower, "helloworld") {
+		return true
+	}
+	return base == "main.go" && strings.HasPrefix(lower, "src/")
 }
 
 func kernelObjectIDPath(base string) bool {
@@ -131,10 +123,10 @@ var kernelIDPathPrefixes = []string{
 func InventedRepoPathGuidance(p string) string {
 	pref := DefaultToolPrefix()
 	return fmt.Sprintf(
-		"GUIDANCE: %q is not a path in this zqk Go module. Real trees are cmd/, pkg/, scripts/, docs/. "+
+		"GUIDANCE: %q is not a path in this repository. "+
 			"Kernel ids (WFL-/ATK-/BLI-/PRI-…) are %sobject_get targets, not files. "+
-			"Use %sread_code on an existing file (start with cmd/zqk or pkg/).",
-		p, pref, pref,
+			"Use %sread_code on an existing file (locate with %sobserver_search first).",
+		p, pref, pref, pref,
 	)
 }
 
@@ -154,9 +146,16 @@ func namedToolInSet(name string, set map[string]struct{}) bool {
 	if _, ok := set[n]; ok {
 		return true
 	}
-	stripped := strings.TrimPrefix(n, DefaultToolPrefix())
-	_, ok := set[stripped]
-	return ok
+	for _, pref := range []string{DefaultToolPrefix(), brand.LegacyMCPToolPrefix} {
+		pref = strings.ToLower(strings.TrimSpace(pref))
+		if pref == "" || !strings.HasPrefix(n, pref) {
+			continue
+		}
+		if _, ok := set[strings.TrimPrefix(n, pref)]; ok {
+			return true
+		}
+	}
+	return false
 }
 
 func isObjectUpdateTool(name string) bool {

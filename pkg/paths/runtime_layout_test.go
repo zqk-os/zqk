@@ -36,6 +36,12 @@ func TestRuntimeLayoutPaths_fallbackWithoutCache(t *testing.T) {
 	if got := StateDirPath(root); got != filepath.Join(root, ProjectDataDir, StateDir) {
 		t.Fatalf("StateDirPath=%q", got)
 	}
+	if got := SessionStateRel(); got != filepath.ToSlash(filepath.Join(ProjectDataDir, StateDir, SessionStateFile)) {
+		t.Fatalf("SessionStateRel=%q", got)
+	}
+	if got := SessionStatePath(root); got != filepath.Join(root, ProjectDataDir, StateDir, SessionStateFile) {
+		t.Fatalf("SessionStatePath=%q", got)
+	}
 	if got := ObserverTipsPath(root); got != filepath.Join(root, ProjectDataDir, StateDir, ObserverTipsFile) {
 		t.Fatalf("ObserverTipsPath=%q", got)
 	}
@@ -50,6 +56,33 @@ func TestRuntimeLayoutPaths_fallbackWithoutCache(t *testing.T) {
 	}
 	if got := ScriptsDirPath(root); got != filepath.Join(root, ScriptsDir) {
 		t.Fatalf("ScriptsDirPath=%q", got)
+	}
+	if got := PersonasDirPath(root); got != filepath.Join(root, ProcessPersonasDir) {
+		t.Fatalf("PersonasDirPath=%q", got)
+	}
+	if got := PersonaIndexPath(root); got != filepath.Join(root, ProcessPersonasDir, PersonaIndexFile) {
+		t.Fatalf("PersonaIndexPath=%q", got)
+	}
+	if got := AccountsDirPath(root); got != filepath.Join(root, ProcessAccountsDir) {
+		t.Fatalf("AccountsDirPath=%q", got)
+	}
+	if got := RolesDirPath(root); got != filepath.Join(root, ProcessRolesDir) {
+		t.Fatalf("RolesDirPath=%q", got)
+	}
+	if got := KeystoreDirPath(root); got != filepath.Join(root, ProcessKeystoreDir) {
+		t.Fatalf("KeystoreDirPath=%q", got)
+	}
+	if got := ObjectSpecsDir(root); got != filepath.Join(root, ProcessInternalObjectSpecsDir) {
+		t.Fatalf("ObjectSpecsDir=%q", got)
+	}
+	if got := CredentialsPath(root); got != filepath.Join(root, ProjectDataDir, CredentialsFile) {
+		t.Fatalf("CredentialsPath=%q", got)
+	}
+	if got := ProjectDataDirPath(root); got != filepath.Join(root, ProjectDataDir) {
+		t.Fatalf("ProjectDataDirPath=%q", got)
+	}
+	if got := AuthStrategiesDirPath(root); got != filepath.Join(root, ProcessAuthStrategiesDir) {
+		t.Fatalf("AuthStrategiesDirPath=%q", got)
 	}
 	if got := WorktreeLocalConfigRel(); got != filepath.ToSlash(filepath.Join(ConfigDir, ZqkLocalConfigFileName)) {
 		t.Fatalf("WorktreeLocalConfigRel=%q", got)
@@ -74,6 +107,8 @@ func TestRuntimeLayoutPaths_honorPathCache(t *testing.T) {
 		PathAliasMeshPeerAckAwait: "custom/awaits.json",
 		"scripts":                 "tooling/scripts",
 		"logs":                    "custom/logs",
+		PathAliasPersonas:         "custom/personas",
+		PathAliasPersonaIndex:     filepath.Join("custom/personas", PersonaIndexFile),
 	})
 	if got := MCPDirPath(root); got != filepath.Join(root, "custom/mcp") {
 		t.Fatalf("cached MCPDirPath=%q", got)
@@ -89,5 +124,11 @@ func TestRuntimeLayoutPaths_honorPathCache(t *testing.T) {
 	}
 	if got := LogsDirPath(root); got != filepath.Join(root, "custom/logs") {
 		t.Fatalf("cached LogsDirPath=%q", got)
+	}
+	if got := PersonasDirPath(root); got != filepath.Join(root, "custom/personas") {
+		t.Fatalf("cached PersonasDirPath=%q", got)
+	}
+	if got := PersonaIndexPath(root); got != filepath.Join(root, "custom/personas", PersonaIndexFile) {
+		t.Fatalf("cached PersonaIndexPath=%q", got)
 	}
 }

@@ -462,7 +462,7 @@ func TestObjectWAL_CrashRecoveryMidWriteReplay(t *testing.T) {
 	walPath := GetWALPath(tmpDir)
 	_ = w.Close() // Close FD to simulate process termination
 
-	f, err := fileutil.OpenFile(walPath, fileutil.O_WRONLY|fileutil.O_APPEND, 0644)
+	f, err := fileutil.OpenFile(walPath, fileutil.O_WRONLY|fileutil.O_APPEND, paths.FilePerm644)
 	if err != nil {
 		t.Fatalf("OpenFile walPath: %v", err)
 	}

@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // NewWorkflowWorkflowCommandBuilder creates a new workflow_workflow command
@@ -20,7 +21,7 @@ func NewWorkflowWorkflowCommandBuilder() *cobra.Command {
 	help.WithDescriptionLines("CVS rows + compressed convergence measure) — preferred entry point for agent session start.")
 	help.WithDescriptionLines("")
 	help.WithDescriptionLines("Test-bundle convergence measurement and CVS/agent handoff live under")
-	help.WithDescriptionLines("`zqk scheduler convergence measure` (and `overseer` for coordinator trees).")
+	help.WithDescriptionLines(paths.RewriteCanonicalCLIInvocations("`zqk scheduler convergence measure` (and `overseer` for coordinator trees)."))
 	help.AddExample("Get next recommended action", "%s workflow next")
 	help.AddExample("Get machine-readable recommendation", "%s workflow next --format json")
 	help.AddExample("Composite snapshot for agents (PRI + backlog + CVS + measure)", "%s workflow whats-next --format json")

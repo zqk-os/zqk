@@ -29,11 +29,11 @@ func TestEmitAndListPending(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	lcDir := filepath.Join(root, paths.ProcessInternalLifecyclesDir)
-	if err := fileutil.MkdirAll(lcDir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(lcDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	body := "object_type: priority_plan\nstatuses:\n  - value: active\n    stay_in_status:\n      - at least one team_configuration_ref or persona_refs\n"
-	if err := fileutil.WriteFile(filepath.Join(lcDir, "priority_plan_lifecycle.yaml"), []byte(body), 0o644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(lcDir, "priority_plan_lifecycle.yaml"), []byte(body), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	if err := EmitForKind(root, "priority_plan", "test"); err != nil {

@@ -10,6 +10,7 @@ import (
 
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
@@ -22,7 +23,7 @@ func TestRunInteractiveWizard(t *testing.T) {
 sed -i.bak 's/title:.*/title: Mocked Title/' "$1"
 sed -i.bak 's/description:.*/description: Mocked Description/' "$1"
 `
-	if err := fileutil.WriteFile(editorPath, []byte(editorScript), 0755); err != nil {
+	if err := fileutil.WriteFile(editorPath, []byte(editorScript), paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create mock editor: %v", err)
 	}
 

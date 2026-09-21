@@ -181,7 +181,7 @@ func (h *EmergencyManagerHandler) readCAPFailureTracker() (capFailureSnapshot, e
 }
 
 func (h *EmergencyManagerHandler) readLastCAPSuccessFromEvents() (time.Time, bool) {
-	p := filepath.Join(h.projectRoot, paths.ProjectDataDir, "logs", "scheduler", CapOrchestratorJobID, CapOrchestratorJobID+".events.jsonl")
+	p := filepath.Join(h.projectRoot, paths.ProjectDataDir, paths.LogsDir, "scheduler", CapOrchestratorJobID, CapOrchestratorJobID+".events.jsonl")
 	b, err := fileutil.ReadFile(p)
 	if err != nil {
 		return time.Time{}, false
@@ -242,10 +242,10 @@ func (h *EmergencyManagerHandler) writeReport(report emergencyManagerReport) {
 
 func (h *EmergencyManagerHandler) appendEmergencyChat(reason string, snap capFailureSnapshot) {
 	eventPath := datacell.AgentChatChannelEventsJSONLPath(h.projectRoot)
-	if err := fileutil.MkdirAll(filepath.Dir(eventPath), 0755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(eventPath), paths.DirPerm755); err != nil {
 		return
 	}
-	f, err := fileutil.OpenFile(eventPath, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, 0644)
+	f, err := fileutil.OpenFile(eventPath, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, paths.FilePerm644)
 	if err != nil {
 		return
 	}

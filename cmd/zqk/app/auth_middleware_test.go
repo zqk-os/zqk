@@ -69,40 +69,25 @@ func TestAuthMiddleware_RejectsUnboundAPIKey(t *testing.T) {
 	}
 }
 
-func TestAuthMiddleware_RejectsLegacyAccountColon(t *testing.T) {
-	cmd := &cobra.Command{Use: "test"}
-	home := t.TempDir()
-	t.Setenv(zqkenv.OSHome().Name(), home)
-	t.Setenv(zqkenv.APIKey().Name(), "account:system")
-	t.Setenv(zqkenv.TestBypassAuth().Name(), "0")
-	projectRoot := t.TempDir()
-	createSchemas(t, projectRoot)
-
-	err := AuthMiddleware(cmd, projectRoot)
-	if err == nil {
-		t.Fatal("expected reject for account:*")
-	}
-	if !strings.Contains(err.Error(), "legacy account:*") {
-		t.Fatalf("unexpected err: %v", err)
-	}
-}
-
 func TestAuthMiddleware_RejectsNonACCForm(t *testing.T) {
-	cmd := &cobra.Command{Use: "test"}
 	home := t.TempDir()
 	t.Setenv(zqkenv.OSHome().Name(), home)
-	t.Setenv(zqkenv.APIKey().Name(), "test-api-key")
 	t.Setenv(zqkenv.TestBypassAuth().Name(), "0")
-
 	projectRoot := t.TempDir()
 	createSchemas(t, projectRoot)
 
-	err := AuthMiddleware(cmd, projectRoot)
-	if err == nil {
-		t.Fatal("expected reject for non-ACC id")
-	}
-	if !strings.Contains(err.Error(), "invalid API key") && !strings.Contains(err.Error(), "ACC-*") && !strings.Contains(err.Error(), "account index missing") {
-		t.Fatalf("unexpected err: %v", err)
+	for _, cred := range []string{"test-api-key", "account:system"} {
+		t.Run(cred, func(t *testing.T) {
+			cmd := &cobra.Command{Use: "test"}
+			t.Setenv(zqkenv.APIKey().Name(), cred)
+			err := AuthMiddleware(cmd, projectRoot)
+			if err == nil {
+				t.Fatal("expected reject for non-ACC id")
+			}
+			if !strings.Contains(err.Error(), "invalid API key") && !strings.Contains(err.Error(), "ACC-*") && !strings.Contains(err.Error(), "account index missing") {
+				t.Fatalf("unexpected err: %v", err)
+			}
+		})
 	}
 }
 

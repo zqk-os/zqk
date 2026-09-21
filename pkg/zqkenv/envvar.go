@@ -32,7 +32,7 @@ func (e EnvVar) Get() string {
 		return val
 	}
 	if pfx := brand.EnvPrefix(); pfx != brand.DefaultEnvPrefix && strings.HasPrefix(e.Key, pfx+"_") {
-		fallbackKey := brand.DefaultEnvPrefix + "_" + strings.TrimPrefix(e.Key, pfx+"_")
+		fallbackKey := DefaultBrandKey(strings.TrimPrefix(e.Key, pfx+"_"))
 		if val := os.Getenv(fallbackKey); val != "" {
 			return val
 		}

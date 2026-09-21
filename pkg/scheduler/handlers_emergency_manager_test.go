@@ -16,12 +16,12 @@ import (
 func TestEmergencyManager_DetectsConsecutiveFailures(t *testing.T) {
 	root := t.TempDir()
 	stateDir := filepath.Join(root, paths.ProjectDataDir, paths.StateDir)
-	if err := fileutil.MkdirAll(stateDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(stateDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	fail := capFailureSnapshot{ConsecutiveFailures: 5, LastFailure: "2026-08-05T12:00:00Z", LastStage: "cap_stage_review"}
 	b, _ := json.Marshal(fail)
-	if err := fileutil.WriteFile(filepath.Join(stateDir, capFailureTrackerFile), b, 0600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(stateDir, capFailureTrackerFile), b, paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 
@@ -57,12 +57,12 @@ func TestEmergencyManager_DetectsConsecutiveFailures(t *testing.T) {
 func TestEmergencyManager_StashWhenAllowed(t *testing.T) {
 	root := t.TempDir()
 	stateDir := filepath.Join(root, paths.ProjectDataDir, paths.StateDir)
-	if err := fileutil.MkdirAll(stateDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(stateDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	fail := capFailureSnapshot{ConsecutiveFailures: 4, LastFailure: "2026-08-05T12:00:00Z"}
 	b, _ := json.Marshal(fail)
-	_ = fileutil.WriteFile(filepath.Join(stateDir, capFailureTrackerFile), b, 0600)
+	_ = fileutil.WriteFile(filepath.Join(stateDir, capFailureTrackerFile), b, paths.FilePerm600)
 
 	h := NewEmergencyManagerHandler(root, logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).(*EmergencyManagerHandler)
 	stashed := false
@@ -92,10 +92,10 @@ func TestEmergencyManager_StashWhenAllowed(t *testing.T) {
 func TestEmergencyManager_HealthyNoAction(t *testing.T) {
 	root := t.TempDir()
 	stateDir := filepath.Join(root, paths.ProjectDataDir, paths.StateDir)
-	_ = fileutil.MkdirAll(stateDir, 0755)
+	_ = fileutil.MkdirAll(stateDir, paths.DirPerm755)
 	fail := capFailureSnapshot{ConsecutiveFailures: 0}
 	b, _ := json.Marshal(fail)
-	_ = fileutil.WriteFile(filepath.Join(stateDir, capFailureTrackerFile), b, 0600)
+	_ = fileutil.WriteFile(filepath.Join(stateDir, capFailureTrackerFile), b, paths.FilePerm600)
 
 	h := NewEmergencyManagerHandler(root, logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).(*EmergencyManagerHandler)
 	h.gitStatusDirty = func() (bool, error) { return true, nil }

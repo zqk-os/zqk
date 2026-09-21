@@ -17,6 +17,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/llm"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -70,7 +71,7 @@ func NewIntakeCmd() *cobra.Command {
 	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewIntakeCommandBuilder(), &cobra.Command{
 		Use:   useIntakeCommand,
 		Short: shortIntakeCommand,
-		Long: `Intake parses raw contextual text or key-value pairs into structured ZQK objects
+		Long: paths.RewriteCanonicalCLIInvocations(`Intake parses raw contextual text or key-value pairs into structured ZQK objects
 using the configured ambient semantic engine (LLM). It natively supports bulk operations.
 Every synthesized object must carry a non-empty description (base_object
 description gate) — objects without one are rejected fail-closed and the
@@ -78,7 +79,7 @@ intake run aborts rather than persisting incomplete objects.
 
 Examples:
   zqk intake "We need a new sqlite connection and a metrics exporter"
-  cat meeting_notes.md | zqk intake`,
+  cat meeting_notes.md | zqk intake`),
 		RunE: cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 			ctx := proc.OperationContext()
 			log := proc.Logger()

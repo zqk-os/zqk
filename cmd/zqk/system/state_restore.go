@@ -9,6 +9,7 @@ import (
 
 	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	"gopkg.in/yaml.v3"
 
 	"github.com/spf13/cobra"
@@ -21,7 +22,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/kernelcas"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -45,10 +45,10 @@ func NewStateRestoreCmd() *cobra.Command {
 
 	helpBuilder.ApplyToCommand(cmd)
 	cli.AddCommonFlags(cmd)
-	cmd.Flags().String("input", ".zqk-state/system-state.csnap", "Path to read the compressed snapshot")
+	cmd.Flags().String("input", filepath.Join(paths.DefaultProjectStateDir, "system-state.csnap"), "Path to read the compressed snapshot")
 	// Default false: prune=true wiped core process YAML (workstreams/criteria/…) when the
 	// snapshot lagged the live tree. Prefer restore-merge; opt into prune explicitly.
-	cmd.Flags().Bool("prune", false, "Prune YAML under .zqk/process not present in the snapshot (skips core kernel kinds; default off)")
+	cmd.Flags().Bool("prune", false, "Prune YAML under "+paths.ProcessDir+" not present in the snapshot (skips core kernel kinds; default off)")
 	cmd.Flags().Bool("confirm-prune", false, "Required with --prune to actually delete non-core orphans (Kernel Mutation Pipeline)")
 
 	return cmd

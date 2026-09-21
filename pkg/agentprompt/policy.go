@@ -7,6 +7,7 @@ import (
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
@@ -67,12 +68,12 @@ func (p *PolicyEnforcement) GeneratePromptSection() string {
 // GeneratePromptSectionRefs is the default policy section: links, not copied bodies.
 func (p *PolicyEnforcement) GeneratePromptSectionRefs() string {
 	if len(p.ActivePolicies) == 0 {
-		return "## Policy Compliance\nBound by the active policy catalog. Resolve with `zqk object list policy --filter status=active` or `zqk object get <POL-id>`.\n"
+		return paths.RewriteCanonicalCLIInvocations("## Policy Compliance\nBound by the active policy catalog. Resolve with `zqk object list policy --filter status=active` or `zqk object get <POL-id>`.\n")
 	}
 
 	var sb strings.Builder
 	sb.WriteString("## Policy Compliance\n")
-	sb.WriteString("You are bound by these policies. Resolve bodies with `zqk object get <POL-id>`. Do not treat this list as a copy of policy text.\n\n")
+	sb.WriteString(paths.RewriteCanonicalCLIInvocations("You are bound by these policies. Resolve bodies with `zqk object get <POL-id>`. Do not treat this list as a copy of policy text.\n\n"))
 
 	for _, policy := range p.ActivePolicies {
 		title, _ := policy[objects.FieldKeyTitle].(string)

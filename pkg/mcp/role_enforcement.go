@@ -6,12 +6,10 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"gopkg.in/yaml.v3"
-
+	"github.com/zqk-os/zqk/pkg/authcred"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
-	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // NotificationSender is an interface for sending notifications
@@ -266,202 +264,46 @@ func getAccountRolesAndPermissions(accountID, projectRoot string) (roles, permis
 	if projectRoot == emptyValue {
 		return nil, nil, errfmt.Errorf("project root not available")
 	}
-
-	// Determine account filename
-	// Accounts use account-{username}.yaml format
-	var filename string
-	if strings.HasPrefix(accountID, "account:") {
-		username := strings.TrimPrefix(accountID, "account:")
-		filename = fmt.Sprintf("account-%s.yaml", username)
-	} else {
-		// Try to infer from ID
-		filename = fmt.Sprintf("%s.yaml", accountID)
+	if canon := authcred.CanonicalAccountID(projectRoot, accountID); canon != "" {
+		accountID = canon
 	}
-
-	// Try accounts directory
-	accountPath := filepath.Join(projectRoot, paths.ProcessAccountsDir, filename)
-	if _, err := fileutil.Stat(accountPath); fileutil.IsNotExist(err) {
-		// Account not found
+	acc, err := authcred.LookupBoundAccount(projectRoot, accountID)
+	if err != nil {
 		return nil, nil, errfmt.Errorf("account not found: %s", accountID)
 	}
-
-	// Read account file
-	data, err := fileutil.ReadFile(accountPath)
-	if err != nil {
-		return nil, nil, errfmt.Newf("failed to read account file").Wrap(err)
-	}
-
-	// Parse YAML
-	var account struct {
-		Roles       []string `yaml:"roles"`
-		Permissions []string `yaml:"permissions"`
-	}
-	if err := yaml.Unmarshal(data, &account); err != nil {
-		return nil, nil, errfmt.Newf("failed to parse account file").Wrap(err)
-	}
-
-	return account.Roles, account.Permissions, nil
+	return acc.Roles, acc.Permissions, nil
 }
 
-// getPermissionsFromRoles loads role objects and extracts their permissions
-// Returns union of all permissions from all roles
 func getPermissionsFromRoles(roleIDs []string, projectRoot string) ([]string, error) {
 	if projectRoot == emptyValue {
 		return nil, errfmt.Errorf("project root not available")
 	}
-
-	rolesDir := filepath.Join(projectRoot, paths.ProcessRolesDir)
-	if _, err := fileutil.Stat(rolesDir); fileutil.IsNotExist(err) {
-		return nil, errfmt.Errorf("roles directory not found")
-	}
-
-	// Collect all permissions from all roles (union)
-	allPermissions := make(map[string]bool)
-
-	for _, roleID := range roleIDs {
-		// Try to find role file (format: ROL-XXX.yaml or role-{roleID}.yaml)
-		var rolePath string
-
-		// Try ROL-XXX.yaml format first
-		if strings.HasPrefix(roleID, "ROL-") {
-			rolePath = filepath.Join(rolesDir, roleID+".yaml")
-		} else {
-			// Try role-{roleID}.yaml format
-			rolePath = filepath.Join(rolesDir, fmt.Sprintf("role-%s.yaml", roleID))
-		}
-
-		// Check if file exists
-		if _, err := fileutil.Stat(rolePath); fileutil.IsNotExist(err) {
-			// Try to find by role_id field
-			entries, err := fileutil.ReadDir(rolesDir)
-			if err != nil {
-				continue
-			}
-
-			found := false
-			for _, entry := range entries {
-				if !strings.HasSuffix(entry.Name(), ".yaml") {
-					continue
-				}
-
-				checkPath := filepath.Join(rolesDir, entry.Name())
-				data, err := fileutil.ReadFile(checkPath)
-				if err != nil {
-					continue
-				}
-
-				var role struct {
-					RoleID string `yaml:"role_id"`
-				}
-				if err := yaml.Unmarshal(data, &role); err != nil {
-					continue
-				}
-
-				if role.RoleID == roleID {
-					rolePath = checkPath
-					found = true
-					break
-				}
-			}
-
-			if !found {
-				// Role not found - skip
-				continue
-			}
-		}
-
-		// Read and parse role file (may have been read already during search, but read again for permissions)
-		data, err := fileutil.ReadFile(rolePath)
-		if err != nil {
-			continue
-		}
-
-		var role struct {
-			Permissions []string `yaml:"permissions"`
-		}
-		if err := yaml.Unmarshal(data, &role); err != nil {
-			// Log parsing error but continue to next role
-			continue
-		}
-
-		// Add permissions to set (union)
-		if len(role.Permissions) == 0 {
-			// Role has no permissions defined - this is a problem
-			continue
-		}
-		for _, perm := range role.Permissions {
-			if perm != emptyValue {
-				allPermissions[perm] = true
-			}
-		}
-	}
-
-	// Convert map to slice
-	result := make([]string, 0, len(allPermissions))
-	for perm := range allPermissions {
-		result = append(result, perm)
-	}
-
-	// If we were given roles but found no permissions, that's an error
+	result := authcred.PermissionsForAssignedRoles(authcred.NewDiskSeatDirectory(projectRoot), roleIDs)
 	if len(roleIDs) > 0 && len(result) == 0 {
 		return nil, errfmt.Errorf("no permissions found for roles %v - roles may not exist or have no permissions defined", roleIDs)
 	}
-
 	return result, nil
 }
 
-// validateRolesAgainstSystem validates that roles exist in the system
-// This checks against role objects in the system
 func validateRolesAgainstSystem(roles []string, projectRoot string) error {
 	if projectRoot == emptyValue {
-		// Can't validate without project root
 		return nil
 	}
-
-	rolesDir := filepath.Join(projectRoot, paths.ProcessRolesDir)
-	if _, err := fileutil.Stat(rolesDir); fileutil.IsNotExist(err) {
-		// Roles directory doesn't exist - skip validation
+	catalog := authcred.NewDiskSeatDirectory(projectRoot).Roles()
+	if len(catalog) == 0 {
 		return nil
 	}
-
-	// Load all role files
-	entries, err := fileutil.ReadDir(rolesDir)
-	if err != nil {
-		// Can't read directory - skip validation
-		return nil
-	}
-
-	// Build map of valid role IDs
-	validRoles := make(map[string]bool)
-	for _, entry := range entries {
-		if !strings.HasSuffix(entry.Name(), ".yaml") {
-			continue
-		}
-
-		rolePath := filepath.Join(rolesDir, entry.Name())
-		data, err := fileutil.ReadFile(rolePath)
-		if err != nil {
-			continue
-		}
-
-		var role struct {
-			RoleID string `yaml:"role_id"`
-		}
-		if err := yaml.Unmarshal(data, &role); err != nil {
-			continue
-		}
-
-		if role.RoleID != emptyValue {
-			validRoles[role.RoleID] = true
-		}
-	}
-
-	// Validate provided roles
 	for _, role := range roles {
-		if !validRoles[role] {
+		ok := false
+		for _, rec := range catalog {
+			if rec.Matches(role) {
+				ok = true
+				break
+			}
+		}
+		if !ok {
 			return errfmt.Errorf("role '%s' does not exist in the system", role)
 		}
 	}
-
 	return nil
 }

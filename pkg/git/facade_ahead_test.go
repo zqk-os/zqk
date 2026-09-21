@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -37,7 +38,7 @@ func TestCountAheadUpstream(t *testing.T) {
 		}
 	}
 	run("init")
-	if err := fileutil.WriteFile(filepath.Join(work, "a"), []byte("1"), 0o644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(work, "a"), []byte("1"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	run("add", "a")
@@ -51,7 +52,7 @@ func TestCountAheadUpstream(t *testing.T) {
 		t.Fatalf("synced ahead=%d", n)
 	}
 
-	if err := fileutil.WriteFile(filepath.Join(work, "b"), []byte("2"), 0o644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(work, "b"), []byte("2"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	run("add", "b")

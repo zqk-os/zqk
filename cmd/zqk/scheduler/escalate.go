@@ -66,7 +66,7 @@ func runEscalate(cmd *cobra.Command, _ []string) error {
 	webhookURL := schedulerpkg.ResolveSlackWebhookURL(projectRoot)
 	inboxDir := ""
 	if projectRoot != "" {
-		inboxDir = filepath.Join(projectRoot, paths.ProjectDataDir, "inbox", "human")
+		inboxDir = filepath.Join(projectRoot, paths.ProjectDataDir, paths.InboxSubdir, "human")
 	}
 
 	severity := schedulerpkg.EscalationSeverityWarning
@@ -81,7 +81,7 @@ func runEscalate(cmd *cobra.Command, _ []string) error {
 		Issues:           issues,
 		SuggestedActions: suggestedActions,
 		Context: map[string]any{
-			"event_source": "zqk scheduler escalate",
+			"event_source": paths.CLIUsage("scheduler", "escalate"),
 			"project_root": projectRoot,
 		},
 	}

@@ -14,6 +14,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
 
+	"github.com/zqk-os/zqk/pkg/brand"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -23,10 +24,10 @@ import (
 // BinaryDetector detects and verifies the migration binary
 type BinaryDetector struct {
 	binaryName          string
-	searchPaths         []string
-	requireVerification bool
 	expectedHash        string
 	expectedVersion     string
+	requireVerification bool
+	searchPaths         []string
 	versionConstraint   *VersionConstraint // Version compatibility constraint
 	trustedSigners      []string
 }
@@ -35,17 +36,25 @@ type BinaryDetector struct {
 func NewBinaryDetector() *BinaryDetector {
 	//nolint:errcheck // Executable path - error acceptable
 	execPath, _ := fileutil.Executable()
+	baseName := brand.ExecutableName()
+	if baseName == "" {
+		baseName = "zqk"
+	}
+	productName := brand.ProductName()
+	if productName == "" {
+		productName = "ZQK"
+	}
 	return &BinaryDetector{
-		binaryName:          "zqk-migrate",
+		binaryName:          baseName + "-migrate",
 		requireVerification: true,
 		searchPaths: []string{
 			filepath.Dir(execPath), // Same directory as main binary
 			"",                     // PATH
 			"/usr/local/bin",
-			"/opt/zqk/bin",
+			filepath.Join("/opt", baseName, "bin"),
 		},
 		trustedSigners: []string{
-			"Developer ID Application: ZQK",
+			"Developer ID Application: " + productName,
 		},
 	}
 }

@@ -11,11 +11,12 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/concurrency"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // TimingJSONRelativePath is written under the current working directory (typically project root).
-const TimingJSONRelativePath = ".zqk/test_timings.json"
+var TimingJSONRelativePath = filepath.Join(paths.ProjectDataDir, "test_timings.json")
 
 // TestTiming tracks test execution durations for timeout estimation
 type TestTiming struct {

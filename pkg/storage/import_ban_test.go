@@ -16,7 +16,6 @@ func TestPkgStorageMustNotImportCLI(t *testing.T) {
 		"github.com/zqk-os/zqk/internal/cli",
 		"github.com/zqk-os/zqk/pkg/cli",
 		"github.com/zqk-os/zqk/cmd/zqk",
-		"github.com/zqk-os/zqk/cmd/zqk-community",
 	}
 	_, thisFile, _, ok := runtime.Caller(0)
 	if !ok {

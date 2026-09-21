@@ -28,10 +28,20 @@ var (
 
 	// CLICommandSpecsDir is the canonical file-authored command DNA directory.
 	CLICommandSpecsDir = ProjectDataDir + "/cli/specs"
+
+	// ProjectStateDir is the root directory name for compressed snapshot state (.zqk-state).
+	ProjectStateDir = "." + brand.NamespacePrefix() + "-state"
+
+	// AgentPacksDir holds regenerable per-vendor boot packs.
+	AgentPacksDir = ProjectDataDir + "/agent_packs"
 )
 
 const (
-	configYAMLFileName = "config.yaml"
+	ConfigYAMLFileName = "config.yaml"
+	configYAMLFileName = ConfigYAMLFileName
+
+	// DefaultProjectStateDir is the literal directory name for project state snapshots (".zqk-state").
+	DefaultProjectStateDir = ".zqk-state"
 
 	// GitWorktreeMetadataEntry is the file or directory name Git places at the root of a work tree.
 	// Tests and teardown use it to avoid stripping or scrubbing a real checkout.
@@ -62,13 +72,29 @@ const (
 	// MeshStateSubdir holds local mesh runtime state under ProjectDataDir/state/ (peer seats, peer-ack awaits).
 	MeshStateSubdir = "mesh"
 	// SwarmInitSubdir holds swarm-init run artifacts under MeshStateSubdir (date-bucketed).
-	SwarmInitSubdir       = "swarm_init"
-	MetricsDir            = "metrics"
-	StateDir              = "state"
+	SwarmInitSubdir = "swarm_init"
+	MetricsDir      = "metrics"
+	StateDir        = "state"
+	// SessionStateFile is the persisted CLI session id under StateDir.
+	SessionStateFile = "session"
+	// CredentialsFile is the home-dir session token filename under ProjectDataDir.
+	CredentialsFile       = "credentials"
 	StreamCurrentSubdir   = "stream_current" // Runtime deltas for stream-backed kinds (no CAS hash); see HIGH_VOLUME_STORAGE_DEPRECATION.md
 	CallbackDir           = "callback-logs"
 	MigrationSnapshotsDir = "migration-snapshots"
 	WalDir                = "wal"
+	ProcessSubdir         = "process"
+	SpecsSubdir           = "specs"
+	SkillsSubdir          = "skills"
+	IdesSubdir            = "ides"
+	InboxSubdir           = "inbox"
+	SchedulerSubdir       = "scheduler"
+	StreamsSubdir         = "streams"
+	WorktreesSubdir       = "worktrees"
+	RunSubdir             = "run"
+	DraftsSubdir          = "drafts"
+	CleanupSubdir         = "cleanup"
+	AgentPacksSubdir      = "agent_packs"
 
 	// Logs subdirs: reports (object-count-report, etc.) live under logs/reports/
 	LogsReportsSubdir = "reports"
@@ -209,6 +235,16 @@ const (
 	PreCommitDir         = "pre-commit"
 	PreCommitResultsFile = "results.json" // aggregated file read by hook: .zqk/pre-commit/results.json
 
+	// Local CI directory and file constants (under .zqk/ci)
+	LocalCIDir            = "ci"
+	LocalCIWorkdirName    = "workdir"
+	LocalCITreesDir       = "trees"
+	LocalCIArchivesDir    = "archives"
+	LocalCIArchiveGitDir  = "git"
+	LocalCISourceSHAFile  = "SOURCE_SHA"
+	LocalCIPromotedAtFile = "PROMOTED_AT"
+	LocalCICurrentEnvFile = "CURRENT.env"
+
 	// DraftsDir is under ProjectDataDir: default output for `zqk new` (editable YAML before object create).
 	DraftsDir = "drafts"
 	// LastDraftPointerFile records the most recently written draft path for implicit `object create` / tooling.
@@ -233,6 +269,10 @@ const (
 	ProcessPlanningDir                     = ".zqk/process/planning"
 	ProcessAuditDir                        = ".zqk/process/audit"
 	ProcessAccountsDir                     = ".zqk/process/accounts"
+	ProcessPersonasDir                     = ".zqk/process/personas"
+	AccountIndexFile                       = ".account.index"
+	PersonaIndexFile                       = ".persona.index"
+	RoleIndexFile                          = ".role.index"
 	ProcessAuthStrategiesDir               = ".zqk/process/auth_strategies"
 	ProcessBacklogDir                      = ".zqk/process/backlog_items"
 	ProcessTestCasesDir                    = ".zqk/process/test_cases"
@@ -313,4 +353,6 @@ const (
 	DirPerm755  fs.FileMode = 0o755
 	FilePerm600 fs.FileMode = 0o600
 	FilePerm644 fs.FileMode = 0o644
+	FilePerm755 fs.FileMode = 0o755 // e.g. executable scripts, binaries, test runners
+	FilePerm700 fs.FileMode = 0o700 // e.g. private executable scripts, key material
 )

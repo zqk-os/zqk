@@ -19,6 +19,19 @@ func NewAgentFeedLifecycleBuilder() *AgentFeedLifecycleBuilder {
 		BaseLifecycleBuilder: lifecycle_builders.NewBaseLifecycleBuilder("agent_feed", "v1_0_0"),
 	}
 
+	// Configure the lifecycle
+	builder.
+		SetPercentComplete(objects.PercentCompleteConfig{
+			Method: "status_defaults",
+			DefaultByStatus: map[string]any{
+				"active":     50,
+				"archived":   100,
+				"conceptual": 0,
+				"error":      0,
+				"originated": 10,
+			},
+		})
+
 	// Add statuses and transitions
 	builder.addAgentFeedLifecycleData()
 

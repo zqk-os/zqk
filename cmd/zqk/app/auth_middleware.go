@@ -2,10 +2,8 @@ package app
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -16,10 +14,10 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
-	"gopkg.in/yaml.v3"
 )
 
 // AuthMiddleware intercepts commands to enforce Identity/Role RBAC checks.
@@ -56,24 +54,17 @@ func AuthMiddleware(cmd *cobra.Command, projectRoot string) error {
 		}
 	}
 
-	if isTest {
+	if isTest || zqkenv.DevCodegen().Get() == "1" || zqkenv.Codegen().Get() == "1" {
 		secCtx := pkgctx.NewTestSecurityContext()
 		cmd.SetContext(pkgctx.WithSecurityContext(ctx, secCtx))
 		return nil
 	}
 
 	apiKey := zqkenv.APIKey().Get()
-	var credentialsToken string
-	credPath := authcred.ResolveCredentialPath(projectRoot)
-	if credPath != "" {
-		data, err := fileutil.ReadFile(credPath)
-		if err == nil {
-			credentialsToken = strings.TrimSpace(string(data))
-		}
-	}
+	credentialsToken := authcred.ReadCredentialToken(authcred.ResolveCredentialPath(projectRoot))
 
 	if apiKey == "" && credentialsToken == "" {
-		return errfmt.Errorf("unauthorized: missing token in ~/.zqk/credentials or %s", zqkenv.APIKey())
+		return errfmt.Errorf("unauthorized: missing token in ~/%s/credentials or %s", paths.ProjectDataDir, zqkenv.APIKey())
 	}
 
 	// Fail-closed uninitialized kernel hint: if projectRoot is empty or uninitialized,
@@ -82,26 +73,11 @@ func AuthMiddleware(cmd *cobra.Command, projectRoot string) error {
 	if projectRoot == "" {
 		return errfmt.Errorf("kernel not initialized: run '%s system init' to initialize project kernel", exe)
 	}
-	if _, statErr := fileutil.Stat(filepath.Join(projectRoot, paths.ProjectDataDir)); statErr != nil {
+	if _, statErr := fileutil.Stat(paths.ProjectDataDirPath(projectRoot)); statErr != nil {
 		return errfmt.Errorf("kernel not initialized: run '%s system init' to initialize project kernel", exe)
 	}
-
-	// Parse token/key, load Identity/Role schemas (account.yaml, role.yaml), and validate access
-	accountSchemaPath := filepath.Join(projectRoot, paths.ProcessInternalObjectSpecsDir, "kernel", "account.yaml")
-	if _, statErr := fileutil.Stat(accountSchemaPath); statErr != nil {
-		accountSchemaPath = filepath.Join(projectRoot, paths.ProcessInternalObjectSpecsDir, "account.yaml")
-	}
-	roleSchemaPath := filepath.Join(projectRoot, paths.ProcessInternalObjectSpecsDir, "kernel", "role.yaml")
-	if _, statErr := fileutil.Stat(roleSchemaPath); statErr != nil {
-		roleSchemaPath = filepath.Join(projectRoot, paths.ProcessInternalObjectSpecsDir, "role.yaml")
-	}
-
-	if _, statErr := fileutil.Stat(accountSchemaPath); statErr != nil {
-		return errfmt.Errorf("kernel not initialized: run '%s system init' to initialize project kernel (failed to load account schema: %v)", exe, statErr)
-	}
-
-	if _, statErr := fileutil.Stat(roleSchemaPath); statErr != nil {
-		return errfmt.Errorf("kernel not initialized: run '%s system init' to initialize project kernel (failed to load role schema: %v)", exe, statErr)
+	if specErr := authcred.RequireRBACSpecs(projectRoot); specErr != nil {
+		return errfmt.Errorf("kernel not initialized: run '%s system init' to initialize project kernel (failed to load account schema: %v)", exe, specErr)
 	}
 
 	// Inject SecurityContext for the CLI processor
@@ -110,42 +86,12 @@ func AuthMiddleware(cmd *cobra.Command, projectRoot string) error {
 		accountID = credentialsToken
 	}
 
-	if strings.HasPrefix(accountID, "ZQK-") {
-		sp, err := cli.GetObjectStorageForCommand(cmd, projectRoot)
-		if err != nil || sp == nil {
-			return errfmt.Errorf("unauthorized: storage not available to validate session: %v", err)
+	if authcred.LooksLikeSessionToken(accountID) {
+		acc, err := resolveSessionAccountID(ctx, cmd, projectRoot, accountID)
+		if err != nil {
+			return err
 		}
-		systemSecCtx := pkgctx.NewSystemSecurityContext()
-		sessionID := accountID
-		var explicitPersona string
-		if idx := strings.Index(sessionID, "|"); idx != -1 {
-			explicitPersona = sessionID[idx:]
-			sessionID = sessionID[:idx]
-		}
-		sessionObj, readErr := sp.Read(ctx, systemSecCtx, sessionID)
-		if readErr != nil {
-			if errors.Is(readErr, storage.ErrObjectNotFound) {
-				// Cursor/MCP often inherit a dead ZQK-* session stuffed into
-				// ~/.zqk/credentials or ZQK_API_KEY; fall back to persisted file.
-				if fileSID := strings.TrimSpace(ReadPersistedSessionID(projectRoot)); fileSID != "" && fileSID != sessionID {
-					if retry, err2 := sp.Read(ctx, systemSecCtx, fileSID); err2 == nil {
-						sessionObj = retry
-						readErr = nil
-					}
-				}
-			}
-			if readErr != nil {
-				if errors.Is(readErr, storage.ErrObjectNotFound) {
-					return errfmt.Errorf("unauthorized: session %s not found", sessionID)
-				}
-				return errfmt.Errorf("unauthorized: session %s not found: %w", sessionID, readErr)
-			}
-		}
-		if accID, exists := sessionObj[objects.FieldKeyAccountID].(string); exists && accID != "" {
-			accountID = accID + explicitPersona
-		} else {
-			return errfmt.Errorf("unauthorized: session %s has no account_id", sessionID)
-		}
+		accountID = acc
 	} else if authcred.LooksLikeIssuedSecret(accountID) {
 		// POL-AGENT-API-KEY-001: opaque secrets resolve via keystore fingerprint.
 		match, resolveErr := authcred.ResolveSecret(projectRoot, accountID)
@@ -168,25 +114,72 @@ func AuthMiddleware(cmd *cobra.Command, projectRoot string) error {
 	return nil
 }
 
-type IndexFile struct {
-	Mappings map[string]string `json:"mappings"`
+type sessionAccountHit struct {
+	sessionID string
+	accountID string
 }
 
-type AccountObj struct {
-	Roles       []string `yaml:"roles"`
-	PersonaRef  string   `yaml:"persona_ref"`
-	PersonaRefs []string `yaml:"persona_refs"`
-	Persona     string   `yaml:"persona"`
+// sessionAccounts is keyed by project root (one live token per project).
+// Session ids live in the value, not the key — an unbounded ZS-/ZQK-* stream
+// would leak in a long-lived MCP daemon. See pkg/stampmemo.
+var sessionAccounts stampmemo.Table[sessionAccountHit]
+
+func resolveSessionAccountID(ctx context.Context, cmd *cobra.Command, projectRoot, token string) (string, error) {
+	sessionID := token
+	var explicitPersona string
+	if idx := strings.Index(sessionID, "|"); idx != -1 {
+		explicitPersona = sessionID[idx:]
+		sessionID = sessionID[:idx]
+	}
+	stamp := stampmemo.OfAll(
+		paths.SessionStatePath(projectRoot),
+		authcred.ResolveCredentialPath(projectRoot),
+	)
+	load := func() (sessionAccountHit, error) {
+		accID, err := readSessionAccountID(ctx, cmd, projectRoot, sessionID)
+		if err != nil {
+			return sessionAccountHit{}, err
+		}
+		return sessionAccountHit{sessionID: sessionID, accountID: accID}, nil
+	}
+	hit, err := sessionAccounts.Load(projectRoot, stamp, load)
+	if err == nil && hit.sessionID != sessionID {
+		sessionAccounts.Delete(projectRoot)
+		hit, err = sessionAccounts.Load(projectRoot, stamp, load)
+	}
+	if err != nil {
+		return "", err
+	}
+	return hit.accountID + explicitPersona, nil
 }
 
-type RoleObj struct {
-	RoleID      string   `yaml:"role_id"`
-	ID          string   `yaml:"id"`
-	Permissions []string `yaml:"permissions"`
-}
-
-type PersonaObj struct {
-	VocabularySchemeRefs []string `yaml:"vocabulary_scheme_refs"`
+func readSessionAccountID(ctx context.Context, cmd *cobra.Command, projectRoot, sessionID string) (string, error) {
+	sp, err := cli.GetObjectStorageForCommand(cmd, projectRoot)
+	if err != nil || sp == nil {
+		return "", errfmt.Errorf("unauthorized: storage not available to validate session: %v", err)
+	}
+	systemSecCtx := pkgctx.NewSystemSecurityContext()
+	sessionObj, readErr := sp.Read(ctx, systemSecCtx, sessionID)
+	if readErr != nil {
+		if errors.Is(readErr, storage.ErrObjectNotFound) {
+			if fileSID := strings.TrimSpace(ReadPersistedSessionID(projectRoot)); fileSID != "" && fileSID != sessionID {
+				if retry, err2 := sp.Read(ctx, systemSecCtx, fileSID); err2 == nil {
+					sessionObj = retry
+					readErr = nil
+				}
+			}
+		}
+		if readErr != nil {
+			if errors.Is(readErr, storage.ErrObjectNotFound) {
+				return "", errfmt.Errorf("unauthorized: session %s not found", sessionID)
+			}
+			return "", errfmt.Errorf("unauthorized: session %s not found: %w", sessionID, readErr)
+		}
+	}
+	if accID, exists := sessionObj[objects.FieldKeyAccountID].(string); exists && accID != "" {
+		return accID, nil
+	}
+	return "", errfmt.Errorf("unauthorized: session %s has no account_id", sessionID)
 }
 
 func resolveSecurityContext(projectRoot string, rawAccountID string) (*pkgctx.SecurityContext, error) {
@@ -217,91 +210,22 @@ func resolveSecurityContext(projectRoot string, rawAccountID string) (*pkgctx.Se
 		return secCtx, nil
 	}
 
-	// POL-AGENT-ACCOUNT-LOGIN-001 / CRI-ACCOUNT-RBAC-READY: ACC-* only (legacy account:* retired).
-	if strings.HasPrefix(accountID, "account:") {
-		return nil, errfmt.Errorf("unauthorized: legacy account:* ids are retired; authenticate as ACC-* (POL-AGENT-ACCOUNT-LOGIN-001)")
-	}
 	if !strings.HasPrefix(accountID, "ACC-") {
 		return nil, errfmt.Errorf("unauthorized: account id must use ACC-* form (got %q); see POL-AGENT-ACCOUNT-LOGIN-001", accountID)
 	}
 
-	accountKey := accountID
-
-	var activeVocabularySchemes []string
-	if explicitPersona != "" {
-		personaIndexPat := filepath.Join(projectRoot, paths.ProcessDir, "personas", ".persona.index")
-		var personaIndex IndexFile
-		if personaIndexData, err := fileutil.ReadFile(personaIndexPat); err == nil {
-			if err := json.Unmarshal(personaIndexData, &personaIndex); err == nil {
-				if hashName, ok := personaIndex.Mappings[explicitPersona]; ok {
-					personaYamlPath := filepath.Join(projectRoot, paths.ProcessDir, "personas", hashName+".yaml")
-					if personaYamlData, err := fileutil.ReadFile(personaYamlPath); err == nil {
-						var pObj PersonaObj
-						if err := yaml.Unmarshal(personaYamlData, &pObj); err == nil {
-							activeVocabularySchemes = pObj.VocabularySchemeRefs
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// Read account index
-	accountIndexPat := filepath.Join(projectRoot, paths.ProcessDir, "accounts", ".account.index")
-	var accountIndex IndexFile
-	accountIndexData, err := fileutil.ReadFile(accountIndexPat)
+	acc, err := authcred.LookupBoundAccount(projectRoot, accountID)
 	if err != nil {
-		return nil, errfmt.Errorf("unauthorized: account index missing; cannot verify role+persona binding for %s (CRI-ACCOUNT-RBAC-READY)", accountID)
+		return nil, err
 	}
-
-	if err := json.Unmarshal(accountIndexData, &accountIndex); err != nil {
-		return nil, errfmt.Errorf("failed to parse account index: %w", err)
-	}
-
-	// Find the hash path for the account
-	hashName, ok := accountIndex.Mappings[accountID]
-	if !ok {
-		hashName, ok = accountIndex.Mappings[accountKey]
-	}
-	if !ok {
-		return nil, errfmt.Errorf("unauthorized: account %s not found in account index (POL-AGENT-ACCOUNT-LOGIN-001)", accountID)
-	}
-
-	var roles []string
-	var boundPersona string
-	accountYamlPath := filepath.Join(projectRoot, paths.ProcessDir, "accounts", hashName+".yaml")
-	accountYamlData, err := fileutil.ReadFile(accountYamlPath)
-	if err != nil {
-		return nil, errfmt.Errorf("unauthorized: failed to read account %s: %w", accountID, err)
-	}
-	var accObj AccountObj
-	if err := yaml.Unmarshal(accountYamlData, &accObj); err != nil {
-		return nil, errfmt.Errorf("unauthorized: failed to parse account %s: %w", accountID, err)
-	}
-	roles = accObj.Roles
-	boundPersona = firstNonEmpty(explicitPersona, accObj.PersonaRef, accObj.Persona, firstString(accObj.PersonaRefs))
+	roles := acc.Roles
+	boundPersona := firstNonEmpty(explicitPersona, acc.PersonaRef, acc.Persona, firstString(acc.PersonaRefs))
 
 	if len(roles) == 0 || boundPersona == "" {
 		return nil, errfmt.Errorf("unauthorized: account %s is not RBAC-ready (need roles + persona_ref; CRI-ACCOUNT-RBAC-READY)", accountID)
 	}
 
-	if boundPersona != "" && len(activeVocabularySchemes) == 0 {
-		personaIndexPat := filepath.Join(projectRoot, paths.ProcessDir, "personas", ".persona.index")
-		var personaIndex IndexFile
-		if personaIndexData, err := fileutil.ReadFile(personaIndexPat); err == nil {
-			if err := json.Unmarshal(personaIndexData, &personaIndex); err == nil {
-				if pHash, ok := personaIndex.Mappings[boundPersona]; ok {
-					personaYamlPath := filepath.Join(projectRoot, paths.ProcessDir, "personas", pHash+".yaml")
-					if personaYamlData, err := fileutil.ReadFile(personaYamlPath); err == nil {
-						var pObj PersonaObj
-						if err := yaml.Unmarshal(personaYamlData, &pObj); err == nil {
-							activeVocabularySchemes = pObj.VocabularySchemeRefs
-						}
-					}
-				}
-			}
-		}
-	}
+	activeVocabularySchemes := authcred.VocabularySchemesForPersona(projectRoot, boundPersona)
 
 	// Role permissions + aliases come from role objects (SeatDirectory), not a code table.
 	permissions := authcred.PermissionsForAssignedRoles(authcred.NewDiskSeatDirectory(projectRoot), roles)

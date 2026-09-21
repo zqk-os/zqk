@@ -30,7 +30,10 @@ type PeerSeatRecord struct {
 	PersonaRef string `json:"persona_ref,omitempty"`
 	// Duty is coordinator | worker. Empty → inferred from wake membrane.
 	Duty string `json:"duty,omitempty"`
-	Note string `json:"note,omitempty"`
+	// Lane or WorkerLane specifies the designated swarm execution lane for this seat.
+	Lane       string `json:"lane,omitempty"`
+	WorkerLane string `json:"worker_lane,omitempty"`
+	Note       string `json:"note,omitempty"`
 }
 
 // NormalizeSeatDuty returns SeatKindCoordinator, SeatKindWorker, or "".
@@ -186,6 +189,26 @@ func SeatPersonaRef(projectRoot, agentID string) string {
 		return ""
 	}
 	return strings.TrimSpace(rec.PersonaRef)
+}
+
+// SeatLane returns peer_seats[agentID].lane (or worker_lane). Empty if unset or unknown.
+func SeatLane(projectRoot, agentID string) string {
+	id := strings.TrimSpace(agentID)
+	if id == "" || strings.TrimSpace(projectRoot) == "" {
+		return ""
+	}
+	f, err := LoadPeerSeats(projectRoot)
+	if err != nil {
+		return ""
+	}
+	rec, ok := f.Seats[id]
+	if !ok {
+		return ""
+	}
+	if l := strings.TrimSpace(rec.Lane); l != "" {
+		return l
+	}
+	return strings.TrimSpace(rec.WorkerLane)
 }
 
 // ResolvePeerPID returns pid for toAgentID from seat map, else 0.

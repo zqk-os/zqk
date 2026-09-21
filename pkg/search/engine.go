@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -32,7 +33,7 @@ func NewEngine(projectRoot string) *Engine {
 
 // CachePath returns the persistent on-disk path for the cached trigram index.
 func (e *Engine) CachePath() string {
-	return filepath.Join(e.projectRoot, ".zqk", "cache", "trigram.idx")
+	return filepath.Join(e.projectRoot, paths.ProjectDataDir, paths.CacheDir, "trigram.idx")
 }
 
 // BuildTrigramIndex explicitly builds and caches an in-memory and on-disk trigram index.

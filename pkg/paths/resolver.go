@@ -63,6 +63,17 @@ const (
 	PathAliasMeshState        = "mesh_state"
 	PathAliasMeshPeerSeats    = "mesh_peer_seats"
 	PathAliasMeshPeerAckAwait = "mesh_peer_ack_awaits"
+
+	// Process CAS kind dirs (GetKindDir alias keys) and listing indexes.
+	PathAliasPersonas       = "personas"
+	PathAliasPersonaIndex   = "persona_index"
+	PathAliasAccounts       = "accounts"
+	PathAliasAccountIndex   = "account_index"
+	PathAliasRoles          = "roles"
+	PathAliasRoleIndex      = "role_index"
+	PathAliasKeystore       = "keystore"
+	PathAliasObjectSpecs    = "object_specs"
+	PathAliasAuthStrategies = "auth_strategies"
 )
 
 // copySnapshot returns a mutable copy of the current alias map for projectRoot. Must be called from within RunInRLock(&pathAliasMu, ...).
@@ -389,6 +400,15 @@ func DefaultPathAliases() map[string]string {
 		"process_policies":                      ProcessPoliciesDir,
 		"process_goals":                         ProcessGoalsDir,
 		"agent_skills":                          ProcessAgentSkillsDir,
+		PathAliasPersonas:                       ProcessPersonasDir,
+		PathAliasPersonaIndex:                   filepath.Join(ProcessPersonasDir, PersonaIndexFile),
+		PathAliasAccounts:                       ProcessAccountsDir,
+		PathAliasAccountIndex:                   filepath.Join(ProcessAccountsDir, AccountIndexFile),
+		PathAliasRoles:                          ProcessRolesDir,
+		PathAliasRoleIndex:                      filepath.Join(ProcessRolesDir, RoleIndexFile),
+		PathAliasKeystore:                       ProcessKeystoreDir,
+		PathAliasObjectSpecs:                    ProcessInternalObjectSpecsDir,
+		PathAliasAuthStrategies:                 ProcessAuthStrategiesDir,
 	}
 }
 

@@ -14,7 +14,7 @@ import (
 func writePeerSeats(t *testing.T, root string, seats map[string]PeerSeatRecord) {
 	t.Helper()
 	dir := filepath.Join(root, paths.ProjectDataDir, paths.StateDir, paths.MeshStateSubdir)
-	if err := fileutil.MkdirAll(dir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	f := PeerSeatsFile{SchemaVersion: "1", Seats: seats}
@@ -22,7 +22,7 @@ func writePeerSeats(t *testing.T, root string, seats map[string]PeerSeatRecord) 
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(paths.PeerSeatsPath(root), b, 0o644); err != nil {
+	if err := fileutil.WriteFile(paths.PeerSeatsPath(root), b, paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 }

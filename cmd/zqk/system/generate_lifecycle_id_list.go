@@ -153,7 +153,7 @@ func runGenerateLifecycleIDList(cmd *cobra.Command, outputFile string) error {
 	fmt.Fprintf(out, "Generated lifecycle ID list: %s\n", outputFile)
 	fmt.Fprintf(out, "Found %d lifecycle objects with old ID format\n", len(oldIDs))
 	fmt.Fprintf(out, "\nTo migrate these IDs, run:\n")
-	fmt.Fprintf(out, "  zqk system migrate lifecycle-id-migration.yaml\n")
+	fmt.Fprintf(out, "%s", paths.RewriteCanonicalCLIInvocations("  zqk system migrate lifecycle-id-migration.yaml\n"))
 
 	return nil
 }

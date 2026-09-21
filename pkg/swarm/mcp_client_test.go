@@ -147,13 +147,13 @@ func TestNormalizeToolName(t *testing.T) {
 
 func TestIsEagerTool_writeCodeIsEager(t *testing.T) {
 	t.Parallel()
-	if !isEagerTool("zqk_write_code") {
-		t.Fatal("zqk_write_code must be eager so AgentX sees path/content instead of fuzzy-matching write_file")
+	if !isEagerTool("zqk_write_code") || !isEagerTool("acme_write_code") {
+		t.Fatal("write_code must be eager under any brand prefix")
 	}
 	if !isEagerTool("zqk_observer_search") {
-		t.Fatal("zqk_observer_search must be eager so doers see AST search without mcp_list_tools")
+		t.Fatal("observer_search must be eager so doers see AST search without mcp_list_tools")
 	}
-	if isEagerTool("zqk_mcp_call_tool") {
+	if isEagerTool("zqk_mcp_call_tool") || isEagerTool("acme_mcp_call_tool") {
 		t.Fatal("meta tools are injected, not classified eager")
 	}
 }
@@ -176,17 +176,18 @@ func TestMCPChildEnviron_keepsProjectRootSetsWorktree(t *testing.T) {
 
 func TestExecuteToolCall_mcpCallToolRejectsShellName(t *testing.T) {
 	t.Parallel()
-	ex := &MCPExecutor{allTools: map[string]llm.ToolDefinition{"zqk_read_code": {}}}
+	meta := DefaultToolPrefix() + "mcp_call_tool"
+	ex := &MCPExecutor{allTools: map[string]llm.ToolDefinition{DefaultToolPrefix() + "read_code": {}}}
 	_, err := ex.ExecuteToolCall(context.Background(), llm.ToolCall{
-		Name:      "zqk_mcp_call_tool",
+		Name:      meta,
 		Arguments: `{"tool_name":"go mod tidy","arguments":{}}`,
 	})
 	if err == nil || !strings.Contains(err.Error(), "not a tool name") {
 		t.Fatalf("want shell-name reject, got %v", err)
 	}
 	_, err = ex.ExecuteToolCall(context.Background(), llm.ToolCall{
-		Name:      "zqk_mcp_call_tool",
-		Arguments: `{"tool_name":"zqk_create_directory","arguments":{}}`,
+		Name:      "acme_mcp_call_tool",
+		Arguments: `{"tool_name":"acme_create_directory","arguments":{}}`,
 	})
 	if err == nil || !strings.Contains(err.Error(), "not registered") {
 		t.Fatalf("want unregistered exact reject, got %v", err)

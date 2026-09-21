@@ -16,6 +16,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -83,10 +84,18 @@ type MultiKindConfig struct {
 	Kinds       []string `yaml:"kinds"`
 }
 
-var (
-	globalKindMappingsConfig     *KindMappingsConfig
-	globalKindMappingsConfigOnce sync.Once
-)
+var kindMappings stampmemo.Table[*KindMappingsConfig] // keyed "global"; stamp is the YAML file
+
+func defaultKindMappingsConfig() *KindMappingsConfig {
+	return &KindMappingsConfig{
+		Backends:        make(map[string]BackendConfig),
+		KindToDirectory: make(map[string]string),
+		DirectoryToKind: make(map[string]string),
+		SkipDirectories: []string{"_internal", "_external", "architecture", "ontology", "planning", "audit"},
+		SkipSpecs:       []string{KindBaseObject, KindAuditable, KindWorkInterval, KindWorkUnit, KindOccupancy, KindRemainingOpen},
+		currentBackend:  defaultBackendType,
+	}
+}
 
 // LoadKindMappingsConfig loads the kind mappings configuration from file
 func LoadKindMappingsConfig(configPath string) (*KindMappingsConfig, error) {
@@ -152,30 +161,25 @@ func (c *KindMappingsConfig) validate() {
 // GetGlobalKindMappingsConfig returns the singleton instance of the config
 // backendType can be "file", "graph", or "" (defaults to "file" for backward compatibility)
 func GetGlobalKindMappingsConfig(backendType ...string) *KindMappingsConfig {
-	globalKindMappingsConfigOnce.Do(func() {
-		config, err := LoadKindMappingsConfig("")
-		if err != nil {
-			// If config file doesn't exist, create a default config
-			// This maintains backward compatibility
-			globalKindMappingsConfig = &KindMappingsConfig{
-				Backends:        make(map[string]BackendConfig),
-				KindToDirectory: make(map[string]string),
-				DirectoryToKind: make(map[string]string),
-				SkipDirectories: []string{"_internal", "_external", "architecture", "ontology", "planning", "audit"},
-				SkipSpecs:       []string{KindBaseObject, KindAuditable, KindWorkInterval, KindWorkUnit, KindOccupancy, KindRemainingOpen},
-				currentBackend:  defaultBackendType, // Default to file backend
-			}
-		} else {
-			globalKindMappingsConfig = config
-			// Set current backend type
-			if len(backendType) > 0 && backendType[0] != emptyValue {
-				globalKindMappingsConfig.currentBackend = backendType[0]
-			} else {
-				globalKindMappingsConfig.currentBackend = defaultBackendType // Default
-			}
+	path := findKindMappingsConfig()
+	cfg, err := kindMappings.Load("global", stampmemo.Of(path), func() (*KindMappingsConfig, error) {
+		config, err := LoadKindMappingsConfig(path)
+		if err != nil || config == nil {
+			return defaultKindMappingsConfig(), nil
 		}
+		return config, nil
 	})
-	return globalKindMappingsConfig
+	if err != nil || cfg == nil {
+		cfg = defaultKindMappingsConfig()
+	}
+	if cfg.currentBackend == emptyValue {
+		if len(backendType) > 0 && backendType[0] != emptyValue {
+			cfg.currentBackend = backendType[0]
+		} else {
+			cfg.currentBackend = defaultBackendType
+		}
+	}
+	return cfg
 }
 
 // SetBackendType sets the current backend type for the config
@@ -493,55 +497,5 @@ func (c *KindMappingsConfig) IsOnDemandKind(kind string) bool {
 // findKindMappingsConfig finds the kind mappings config file
 // Uses paths configuration instead of hardcoded paths
 func findKindMappingsConfig() string {
-	// Try to use validation package's paths config (avoid circular dependency by using direct path lookup)
-	// We'll use a simple approach that doesn't require importing validation package
-	configsRel := filepath.Join(paths.ProcessInternalConfigsDir, paths.KindMappingsConfigFile)
-	possiblePaths := []string{
-		configsRel,
-		filepath.Join("..", configsRel),
-		filepath.Join("..", "..", configsRel),
-	}
-
-	wd, err := fileutil.Getwd()
-	if err != nil {
-		return ""
-	}
-
-	for _, path := range possiblePaths {
-		absPath := filepath.Join(wd, path)
-		if _, err := fileutil.Stat(absPath); err == nil {
-			return absPath
-		}
-	}
-
-	// Walk up directory tree looking for markers (similar to paths_config logic)
-	dir := wd
-	markers := []string{paths.ProcessInternalDir, paths.ProjectDataDir, "go.mod"}
-
-	for {
-		// Check if this directory has a marker
-		hasMarker := false
-		for _, marker := range markers {
-			markerPath := filepath.Join(dir, marker)
-			if _, err := fileutil.Stat(markerPath); err == nil {
-				hasMarker = true
-				break
-			}
-		}
-
-		if hasMarker {
-			potentialPath := filepath.Join(dir, paths.ProcessInternalConfigsDir, paths.KindMappingsConfigFile)
-			if _, err := fileutil.Stat(potentialPath); err == nil {
-				return potentialPath
-			}
-		}
-
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			break
-		}
-		dir = parent
-	}
-
-	return ""
+	return paths.FirstExistingFromCwd(filepath.Join(paths.ProcessInternalConfigsDir, paths.KindMappingsConfigFile))
 }

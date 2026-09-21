@@ -3,6 +3,8 @@ package vds
 import (
 	"fmt"
 	"strings"
+
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // ChecklistReport is the culture/orientation payload (no chunk evaluation).
@@ -45,18 +47,18 @@ func BuildChecklist(spine *SpineProfile, cust *Customization, gls GlossaryRefs) 
 			CultureGlossaryLine(gls),
 			PolicyID + " applies to every project that uses this spine.",
 			"Chat cannot mark work done.",
-			"Prefer zqk workflow vds evaluate before claiming stage advance.",
+			"Prefer " + paths.CLIUsage("workflow", "vds", "evaluate") + " before claiming stage advance.",
 		},
 		ChunkContract: []string{
 			"chunk_id", "stage", "claim", "rubric_ref", "dsl_checks", "evidence_refs", "independent_verify",
 		},
 		HowToEvaluate: []string{
-			"zqk workflow vds init                    # scaffold chunks file if missing",
-			"zqk workflow vds checklist --format json # stages + culture (this command)",
-			"zqk workflow vds evaluate --file docs/quality/vds_chunks.yaml --format json",
-			"zqk workflow vds evaluate --format agent-prompt   # pasteable brief",
-			"zqk workflow vds project --provider <id> --write|--check  # kernel → vendor export (config)",
-			"zqk workflow vds project --list   # configured vendor_providers",
+			paths.CLIInvocation("workflow vds init                    # scaffold chunks file if missing"),
+			paths.CLIInvocation("workflow vds checklist --format json # stages + culture (this command)"),
+			paths.CLIInvocation("workflow vds evaluate --file docs/quality/vds_chunks.yaml --format json"),
+			paths.CLIInvocation("workflow vds evaluate --format agent-prompt   # pasteable brief"),
+			paths.CLIInvocation("workflow vds project --provider <id> --write|--check  # kernel → vendor export (config)"),
+			paths.CLIInvocation("workflow vds project --list   # configured vendor_providers"),
 			"Add --run-commands only when you intend to execute lint/scan from customization",
 		},
 	}
@@ -128,7 +130,7 @@ func RenderAgentBrief(r *Report) string {
 			fmt.Fprintf(&b, "- %s\n", a)
 		}
 	}
-	b.WriteString("\n```\nzqk workflow vds evaluate --format json\n```\n")
+	b.WriteString("\n```\n" + paths.CLIUsage("workflow", "vds", "evaluate", "--format", "json") + "\n```\n")
 	return b.String()
 }
 

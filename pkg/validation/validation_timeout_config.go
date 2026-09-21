@@ -2,12 +2,12 @@ package validation
 
 import (
 	"path/filepath"
-	"sync"
 	"time"
 
 	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -33,11 +33,6 @@ type ValidationTimeoutConfig struct {
 	// StuckTimeoutSeconds is how long (seconds) with no progress before declaring validation stuck (0 = use default).
 	StuckTimeoutSeconds int `yaml:"stuck_timeout_seconds"`
 }
-
-var (
-	globalTimeoutConfig     *ValidationTimeoutConfig
-	globalTimeoutConfigOnce sync.Once
-)
 
 // DefaultValidationTimeoutConfig returns fail-fast timeout configuration.
 // Kind overrides stay empty: project config may add them; code must not re-inject
@@ -119,15 +114,14 @@ func (c *ValidationTimeoutConfig) StuckTimeout() time.Duration {
 
 // GetGlobalValidationTimeoutConfig returns the singleton timeout config.
 func GetGlobalValidationTimeoutConfig() *ValidationTimeoutConfig {
-	globalTimeoutConfigOnce.Do(func() {
-		config, err := LoadValidationTimeoutConfig("")
-		if err != nil {
-			globalTimeoutConfig = DefaultValidationTimeoutConfig()
-		} else {
-			globalTimeoutConfig = config
-		}
+	path := findValidationConfigFile()
+	cfg, err := timeoutConfigs.Load(globalConfigKey, stampmemo.Of(path), func() (*ValidationTimeoutConfig, error) {
+		return LoadValidationTimeoutConfig(path)
 	})
-	return globalTimeoutConfig
+	if err != nil || cfg == nil {
+		return DefaultValidationTimeoutConfig()
+	}
+	return cfg
 }
 
 // TimeoutForKind returns the per-object validation timeout for the given kind.
@@ -144,21 +138,5 @@ func (c *ValidationTimeoutConfig) TimeoutForKind(kind string) time.Duration {
 
 // findValidationConfigFile locates .zqk/config/config.yaml (same as tier config).
 func findValidationConfigFile() string {
-	cwd, err := fileutil.Getwd()
-	if err != nil {
-		return ""
-	}
-	current := cwd
-	for {
-		configPath := filepath.Join(current, paths.ProjectDataDir, paths.ConfigDir, paths.ProjectConfigFile)
-		if _, err := fileutil.Stat(configPath); err == nil {
-			return configPath
-		}
-		parent := filepath.Dir(current)
-		if parent == current {
-			break
-		}
-		current = parent
-	}
-	return ""
+	return paths.FirstExistingFromCwd(filepath.Join(paths.ProjectDataDir, paths.ConfigDir, paths.ProjectConfigFile))
 }

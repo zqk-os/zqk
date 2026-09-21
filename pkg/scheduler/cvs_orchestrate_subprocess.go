@@ -4,13 +4,10 @@ import (
 	"context"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
-
-	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 func stripSchedulerEnvKey(env []string, key string) []string {
@@ -45,16 +42,18 @@ func subprocessEnvForCVSOrchestrateRollupOnly(projectRoot string, rollupOutOptio
 	return env
 }
 
-func convergenceOrchestrateScriptPath(projectRoot string) string {
-	return filepath.Join(projectRoot, paths.ScriptsDir, convergenceOrchestrateScriptFile)
-}
-
 func newCVSOrchestrateRollupOnlyCommand(ctx context.Context, projectRoot, sessionID, rollupOutFromJob string) *exec.Cmd {
-	//nolint:gosec
+	cliBin := resolveSchedulerCLIBinary(projectRoot)
 	cmd := execwrap.CommandContext(ctx,
-		convergenceOrchestrateScriptPath(projectRoot),
+		cliBin,
+		"scheduler",
+		"convergence",
+		"measure",
+		"--session-id",
 		sessionID,
-		convergenceOrchestrateArgNoFailOnGates,
+		"--format",
+		"json",
+		"--skip-rollup-gates",
 	)
 	cmd.Dir = projectRoot
 	cmd.Env = subprocessEnvForCVSOrchestrateRollupOnly(projectRoot, rollupOutFromJob)

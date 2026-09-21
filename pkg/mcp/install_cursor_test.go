@@ -10,6 +10,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/brand"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -31,10 +32,10 @@ func TestInstallToIDE_skipsEmptyGeminiConfig(t *testing.T) {
 	t.Parallel()
 	dir := t.TempDir()
 	path := filepath.Join(dir, ".gemini", "config", "mcp_config.json")
-	if err := fileutil.MkdirAll(filepath.Dir(path), 0o750); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(path), paths.DirPerm750); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(path, []byte(""), 0o600); err != nil {
+	if err := fileutil.WriteFile(path, []byte(""), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 	if err := InstallToIDE("Global Daemon (AGY/Windsurf) ("+path+")", path, "/bin/zqk", t.TempDir(), testMCPLogger()); err != nil {
@@ -80,11 +81,11 @@ func TestInstallToIDE_CursorMcpJSONIncludesStdioType(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	binDir := filepath.Join(root, "bin")
-	if err := fileutil.MkdirAll(binDir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(binDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	target := filepath.Join(binDir, brand.ExecutableName())
-	if err := fileutil.WriteFile(target, []byte("#!/bin/sh\n"), 0o755); err != nil {
+	if err := fileutil.WriteFile(target, []byte("#!/bin/sh\n"), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	cfgPath := filepath.Join(root, ".cursor", "mcp.json")

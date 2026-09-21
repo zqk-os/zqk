@@ -9,6 +9,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -109,14 +110,19 @@ type AgentConfig struct {
 	Required  bool     `yaml:"required"`   // If true, agent must be in registry to connect
 }
 
+var mcpConfigs stampmemo.Table[*ServerConfig] // keyed by projectRoot; stamp is .zqk/mcp/config.yaml
+
 // LoadMCPConfig loads MCP server configuration from .zqk/mcp/config.yaml
 // Returns default config if file doesn't exist or can't be read
 func LoadMCPConfig(projectRoot string) (*ServerConfig, error) {
 	configPath := paths.MCPConfigPath(projectRoot)
+	return mcpConfigs.Load(projectRoot, stampmemo.Of(configPath), func() (*ServerConfig, error) {
+		return readMCPConfig(projectRoot, configPath)
+	})
+}
 
-	// Check if config file exists
+func readMCPConfig(projectRoot, configPath string) (*ServerConfig, error) {
 	if _, err := fileutil.Stat(configPath); fileutil.IsNotExist(err) {
-		// Return default config with safe defaults for greenfield (no init) scenarios
 		defaultAliasMode := true
 		cfg := &ServerConfig{}
 		cfg.MCPServer.Tools.AliasMode = &defaultAliasMode

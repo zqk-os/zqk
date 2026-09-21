@@ -16,6 +16,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/nildecode"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/scheduler"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -258,7 +259,7 @@ func TestConvergenceLifecycleBundle_RemediateThenGreenTwoIterations(t *testing.T
 	if err != nil {
 		t.Fatalf("marshal line2: %v", err)
 	}
-	f, err := fileutil.OpenFile(healthPath, fileutil.O_APPEND|fileutil.O_WRONLY, 0o600)
+	f, err := fileutil.OpenFile(healthPath, fileutil.O_APPEND|fileutil.O_WRONLY, paths.FilePerm600)
 	if err != nil {
 		t.Fatalf("open health append: %v", err)
 	}
@@ -664,7 +665,7 @@ func TestConvergenceLifecycleBundle_RemediateToExitThreeIterations(t *testing.T)
 	if err != nil {
 		t.Fatalf("marshal: %v", err)
 	}
-	f, err := fileutil.OpenFile(healthPath, fileutil.O_APPEND|fileutil.O_WRONLY, 0o600)
+	f, err := fileutil.OpenFile(healthPath, fileutil.O_APPEND|fileutil.O_WRONLY, paths.FilePerm600)
 	if err != nil {
 		t.Fatalf("open append: %v", err)
 	}

@@ -1,6 +1,7 @@
 package rollback
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/rollback"
 )
 
@@ -86,7 +88,7 @@ func runApply(cmd *cobra.Command, args []string) error {
 	}
 	if err := rollback.Apply(ctx, projectRoot, pointID, provider); err != nil {
 		if strings.Contains(err.Error(), "not found") {
-			return errfmt.Errorf("%w (if pruned, use: zqk rollback reconstruct --scope-id <kind:id:toStatus> --timestamp <RFC3339>)", err)
+			return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("%v (if pruned, use: zqk rollback reconstruct --scope-id <kind:id:toStatus> --timestamp <RFC3339>)", err)))
 		}
 		return err
 	}

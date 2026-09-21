@@ -78,7 +78,7 @@ func WritePackageConcurrencyLimitsPatch(projectRoot string, bundles []*TestBundl
 		_ = fileutil.Remove(tmpPath)
 		return errfmt.Newf("close temp package concurrency limits").Wrap(err)
 	}
-	if err := fileutil.Chmod(tmpPath, 0o600); err != nil {
+	if err := fileutil.Chmod(tmpPath, paths.FilePerm600); err != nil {
 		_ = fileutil.Remove(tmpPath)
 		return errfmt.Newf("chmod temp package concurrency limits").Wrap(err)
 	}

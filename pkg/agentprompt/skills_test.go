@@ -10,6 +10,7 @@ import (
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/skill"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -22,7 +23,7 @@ func TestGeneratePromptSection_refsNotBodies(t *testing.T) {
 			objects.FieldKeyTitle:               "ZQK Expert Operating Protocol",
 			objects.FieldKeyInstructionsSummary: "[orchestration-boot] boot",
 			objects.FieldKeyInstructions:        "Never edit .zqk/process YAML by hand.\nUse VDS evaluate.",
-			objects.FieldKeyFilePath:            ".zqk/skills/zqk-expert",
+			objects.FieldKeyFilePath:            filepath.Join(paths.ProjectDataDir, paths.SkillsSubdir, "zqk-expert"),
 		},
 	}}
 	out := s.GeneratePromptSection()
@@ -109,12 +110,12 @@ func TestSyncASKTwins(t *testing.T) {
 	secCtx := pkgctx.NewSystemSecurityContext()
 
 	tempDir := t.TempDir()
-	skillsDir := filepath.Join(tempDir, ".zqk", "skills")
-	_ = fileutil.MkdirAll(skillsDir, 0755)
-	_ = fileutil.MkdirAll(filepath.Join(skillsDir, "test-expert"), 0755)
+	skillsDir := filepath.Join(tempDir, paths.ProjectDataDir, paths.SkillsSubdir)
+	_ = fileutil.MkdirAll(skillsDir, paths.DirPerm755)
+	_ = fileutil.MkdirAll(filepath.Join(skillsDir, "test-expert"), paths.DirPerm755)
 
 	// Create a dummy .skill zip/file
-	_ = fileutil.WriteFile(filepath.Join(skillsDir, "foo.skill"), []byte("dummy"), 0644)
+	_ = fileutil.WriteFile(filepath.Join(skillsDir, "foo.skill"), []byte("dummy"), paths.FilePerm644)
 
 	sp := &testMockSP{
 		objects: make(map[string]map[string]any),
@@ -178,13 +179,13 @@ func TestLoadRelevantSkillsOpts_SealVerification(t *testing.T) {
 	secCtx := pkgctx.NewSystemSecurityContext()
 
 	tempDir := t.TempDir()
-	skillDir := filepath.Join(tempDir, ".zqk", "skills", "test-expert")
-	_ = fileutil.MkdirAll(skillDir, 0755)
+	skillDir := filepath.Join(tempDir, paths.ProjectDataDir, paths.SkillsSubdir, "test-expert")
+	_ = fileutil.MkdirAll(skillDir, paths.DirPerm755)
 
 	seal := skill.GenerateSealData("\nbody", "1.0.0", "test", time.Now())
 	validContent := "---\n" + seal + "\n---\nbody"
 
-	_ = fileutil.WriteFile(filepath.Join(skillDir, "SKILL.md"), []byte(validContent), 0644)
+	_ = fileutil.WriteFile(filepath.Join(skillDir, "SKILL.md"), []byte(validContent), paths.FilePerm644)
 
 	sp := &testMockSP{
 		objects: map[string]map[string]any{
@@ -208,7 +209,7 @@ func TestLoadRelevantSkillsOpts_SealVerification(t *testing.T) {
 
 	// Test fail-closed
 	invalidContent := "---\nseal_hash: invalid\n---\nbody"
-	_ = fileutil.WriteFile(filepath.Join(skillDir, "SKILL.md"), []byte(invalidContent), 0644)
+	_ = fileutil.WriteFile(filepath.Join(skillDir, "SKILL.md"), []byte(invalidContent), paths.FilePerm644)
 
 	_, err = LoadRelevantSkillsOpts(ctx, sp, secCtx, opt)
 	if err == nil {
@@ -227,7 +228,7 @@ func TestLoadRelevantSkillsOpts_MissingFileFailClosed(t *testing.T) {
 				objects.FieldKeyKind:                objects.KindAgentSkill,
 				objects.FieldKeyID:                  "ASK-MISSING",
 				objects.FieldKeyInstructionsSummary: "missing file",
-				objects.FieldKeyFilePath:            filepath.Join(".zqk", "skills", "gone"),
+				objects.FieldKeyFilePath:            filepath.Join(paths.ProjectDataDir, paths.SkillsSubdir, "gone"),
 			},
 		},
 	}
@@ -244,14 +245,14 @@ func TestLoadRelevantSkillsOpts_MissingFileFailClosed(t *testing.T) {
 	}
 
 	// Relative path under ProjectRoot succeeds when sealed.
-	skillDir := filepath.Join(root, ".zqk", "skills", "gone")
-	if err := fileutil.MkdirAll(skillDir, 0755); err != nil {
+	skillDir := filepath.Join(root, paths.ProjectDataDir, paths.SkillsSubdir, "gone")
+	if err := fileutil.MkdirAll(skillDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	body := "\nbody"
 	seal := skill.GenerateSealData(body, "1.0.0", "test", time.Now())
 	content := "---\n" + seal + "\n---" + body
-	if err := fileutil.WriteFile(filepath.Join(skillDir, "SKILL.md"), []byte(content), 0644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(skillDir, "SKILL.md"), []byte(content), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	res, err := LoadRelevantSkillsOpts(ctx, sp, secCtx, SkillLoadOptions{

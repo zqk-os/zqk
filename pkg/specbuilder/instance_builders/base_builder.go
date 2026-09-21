@@ -15,6 +15,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqktime"
 )
@@ -39,8 +40,8 @@ const (
 	metricDefaultOriginValue = "zqk"
 	metricDefaultStatus      = "implemented"
 
-	baseBuilderDirectoryPerm fileutil.FileMode = 0o755
-	baseBuilderFilePerm      fileutil.FileMode = 0o600
+	baseBuilderDirectoryPerm fileutil.FileMode = paths.DirPerm755
+	baseBuilderFilePerm      fileutil.FileMode = paths.FilePerm600
 
 	fieldTypeEnum       = "enum"
 	fieldTypeInteger    = "integer"

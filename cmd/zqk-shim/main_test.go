@@ -33,7 +33,8 @@ func TestIsMutatingOperation(t *testing.T) {
 	}
 }
 
-func TestValidatePOLCODE009_BypassRequiresBreakGlass(t *testing.T) {
+func TestValidateCommitTraceability_BypassRequiresBreakGlass(t *testing.T) {
+	bypassKey := zqkenv.ZqkShimBypassTraceability().Name()
 	tests := []struct {
 		name        string
 		env         map[string]string
@@ -43,16 +44,16 @@ func TestValidatePOLCODE009_BypassRequiresBreakGlass(t *testing.T) {
 		{
 			name: "bypass without break glass is rejected",
 			env: map[string]string{
-				zqkenv.ZqkShimBypassPolCode009().Name(): "1",
+				bypassKey: "1",
 			},
 			wantErr:     true,
-			errContains: "unvalidated POL-CODE-009 bypass rejected: human break-glass requires explicit justification",
+			errContains: "unvalidated shim traceability bypass rejected: human break-glass requires explicit justification",
 		},
 		{
 			name: "bypass with short break glass reason is rejected",
 			env: map[string]string{
-				zqkenv.ZqkShimBypassPolCode009().Name(): "1",
-				zqkenv.BreakGlassReason().Name():        "too short",
+				bypassKey:                        "1",
+				zqkenv.BreakGlassReason().Name(): "too short",
 			},
 			wantErr:     true,
 			errContains: "justification too short",
@@ -60,27 +61,27 @@ func TestValidatePOLCODE009_BypassRequiresBreakGlass(t *testing.T) {
 		{
 			name: "bypass with valid break glass reason (>= 30 chars) succeeds",
 			env: map[string]string{
-				zqkenv.ZqkShimBypassPolCode009().Name(): "1",
-				zqkenv.BreakGlassReason().Name():        "emergency hotfix for outage approved by lead engineer",
+				bypassKey:                        "1",
+				zqkenv.BreakGlassReason().Name(): "emergency hotfix for outage approved by lead engineer",
 			},
 			wantErr: false,
 		},
 		{
 			name: "git prefixed bypass with valid break glass reason succeeds",
 			env: map[string]string{
-				"GIT_ZQK_SHIM_BYPASS_POLCODE009": "1",
-				"ZQK_BREAK_GLASS_REASON":         "emergency hotfix for outage approved by lead engineer",
+				"GIT_" + zqkenv.DefaultBrandKey("SHIM_BYPASS_TRACEABILITY"): "1",
+				zqkenv.BreakGlassReason().Name():                            "emergency hotfix for outage approved by lead engineer",
 			},
 			wantErr: false,
 		},
 		{
 			name: "bypass with whitespace-only break glass is rejected",
 			env: map[string]string{
-				zqkenv.ZqkShimBypassPolCode009().Name(): "1",
-				zqkenv.BreakGlassReason().Name():        "                                  ",
+				bypassKey:                        "1",
+				zqkenv.BreakGlassReason().Name(): "                                  ",
 			},
 			wantErr:     true,
-			errContains: "human break-glass requires explicit justification in ZQK_BREAK_GLASS_REASON",
+			errContains: "human break-glass requires explicit justification in " + zqkenv.BreakGlassReason().Name(),
 		},
 	}
 
@@ -89,7 +90,7 @@ func TestValidatePOLCODE009_BypassRequiresBreakGlass(t *testing.T) {
 			getenv := func(key string) string {
 				return tt.env[key]
 			}
-			err := validatePOLCODE009WithEnv("/nonexistent/fake/root", getenv)
+			err := validateCommitTraceabilityWithEnv("/nonexistent/fake/root", getenv)
 			if tt.wantErr {
 				if err == nil {
 					t.Errorf("expected error, got nil")

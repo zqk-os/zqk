@@ -11,8 +11,8 @@ import (
 
 func TestDestinationCacheKey_sameFilePathDedupesLogicalNames(t *testing.T) {
 	root := "/project"
-	p1 := filepath.Join(root, paths.ProjectDataDir, "logs", "components", "foo-events.json")
-	p2 := filepath.Join(root, paths.ProjectDataDir, "logs", "components", "bar", "..", "foo-events.json")
+	p1 := filepath.Join(root, paths.ProjectDataDir, paths.LogsDir, "components", "foo-events.json")
+	p2 := filepath.Join(root, paths.ProjectDataDir, paths.LogsDir, "components", "bar", "..", "foo-events.json")
 
 	a := &pkgctx.LogDestination{FilePath: p1, Name: "component_foo"}
 	b := &pkgctx.LogDestination{FilePath: p2, Name: "component_bar"}

@@ -168,10 +168,7 @@ func finalizeCLIObjectCreate(cmd *cobra.Command, proc *cli.Processor, objData ma
 			Kind(kind).
 			ObjectID(objID).
 			Log()
-		fmt.Fprintln(cmd.ErrOrStderr(), color.YellowString(fmt.Sprintf(
-			"Warning: Object '%s' is readable, but CAS index refresh lagged (%v). If another process cannot get it yet, run: zqk system sync-cas-index --file <hash.yaml>",
-			objID, flushErr,
-		)))
+		fmt.Fprintln(cmd.ErrOrStderr(), color.YellowString(paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("Warning: Object '%s' is readable, but CAS index refresh lagged (%v). If another process cannot get it yet, run: zqk system sync-cas-index --file <hash.yaml>", objID, flushErr))))
 	}
 
 	proc.TriggerCacheFreshnessCheck("create", []string{kind})
@@ -216,7 +213,7 @@ func emitCreateRepairDraft(cmd *cobra.Command, proc *cli.Processor, objData map[
 		objects.FieldKeyID:     objID,
 		objects.FieldKeyKind:   kind,
 		"object":               objData,
-		"repair_hint":          fmt.Sprintf("Edit draft if needed, then: zqk object create %s  (uses last-draft). If a CAS hash file exists: zqk system sync-cas-index --file <path>", kind),
+		"repair_hint":          paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("Edit draft if needed, then: zqk object create %s  (uses last-draft). If a CAS hash file exists: zqk system sync-cas-index --file <path>", kind)),
 	}
 	format := cli.GetFormat(cmd)
 	if format == cli.FormatJSON || format == cli.FormatYAML || format == cli.FormatJSONRPC || format == cli.FormatStream {
@@ -259,10 +256,7 @@ func writeCreateRepairDraft(projectRoot, kind, objID string, objData map[string]
 	}
 	ts := zqktime.NowLayoutUTC(zqktime.LayoutLogRotateStamp)
 	out := filepath.Join(dir, fmt.Sprintf("create-repair-%s-%s-%s.yaml", kind, safeID, ts))
-	header := fmt.Sprintf(
-		"# Create repair draft — not yet in the membrane (TRACK: [REDACTED-ID])\n# Retry: zqk object create %s\n# Or: zqk system sync-cas-index --file <cas-hash.yaml> if the file exists\n\n",
-		kind,
-	)
+	header := paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("# Create repair draft — not yet in the membrane (TRACK: [REDACTED-ID])\n# Retry: zqk object create %s\n# Or: zqk system sync-cas-index --file <cas-hash.yaml> if the file exists\n\n", kind))
 	if err := fileutil.WriteSecureFile(out, append([]byte(header), raw...)); err != nil {
 		return "", errfmt.Newf("write create repair draft").Wrap(err)
 	}
@@ -356,6 +350,12 @@ func guardManualStatusOnCreate(cmd *cobra.Command, proc *cli.Processor, kind str
 	statusStr, ok := statusVal.(string)
 	if !ok || strings.TrimSpace(statusStr) == "" {
 		return nil
+	}
+
+	if cmd.Flags().Lookup("promote") != nil {
+		if promote, _ := cmd.Flags().GetBool("promote"); promote {
+			return nil
+		}
 	}
 
 	override := false

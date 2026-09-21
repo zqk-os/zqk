@@ -13,6 +13,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqktime"
 )
@@ -96,7 +97,7 @@ func runRecordChange(cmd *cobra.Command, args []string) error {
 			ObjectID(id).
 			String("change_type", changeType).
 			Log()
-		msg := fmt.Sprintf("Organizational change recorded: %s\nRun 'zqk organizational analyze-impact --change %s' to analyze impact.\n", id, id)
+		msg := paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("Organizational change recorded: %s\nRun 'zqk organizational analyze-impact --change %s' to analyze impact.\n", id, id))
 		return cli.WriteOutput(cmd, []byte(msg))
 	})(cmd, args)
 }

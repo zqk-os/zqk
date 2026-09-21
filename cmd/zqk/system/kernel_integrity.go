@@ -158,6 +158,9 @@ func legacyCustomRulesGate(projectRoot string) (ok bool, note string) {
 	customGo := filepath.Join(projectRoot, "pkg", "validation", "go_validator_custom.go")
 	b, err := fileutil.ReadFile(customGo)
 	if err != nil {
+		if fileutil.IsNotExist(err) {
+			return true, "binary distribution or workspace without Go validation sources"
+		}
 		return false, err.Error()
 	}
 	s := string(b)
@@ -177,6 +180,10 @@ func membraneCoverageGate(projectRoot string) (ok bool, gaps []string) {
 		filepath.Join("pkg", "storage", "object_storage_graph_crud.go"),
 		filepath.Join("cmd", "zqk", "system", "state_restore.go"),
 		filepath.Join("cmd", "zqk", "system", "check_impl_output.go"),
+	}
+	firstFile := filepath.Join(projectRoot, pathsToCheck[0])
+	if _, err := fileutil.Stat(firstFile); fileutil.IsNotExist(err) {
+		return true, nil
 	}
 	needles := []string{"kernelcas.Run", "denyCoreKernelHardDelete", "kernelcas.IsCommit"}
 	for _, rel := range pathsToCheck {

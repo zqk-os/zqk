@@ -5,9 +5,13 @@ import (
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
+
+// credTokens is keyed by credentials path. Stamp is that file.
+var credTokens stampmemo.Table[string]
 
 // ResolveCredentialPath picks the credentials file for AuthMiddleware.
 // Isolated ZQK_TEST_ROOT (not the live projectRoot) never falls back to $HOME
@@ -21,7 +25,7 @@ func ResolveCredentialPath(projectRoot string) string {
 	projectRoot = strings.TrimSpace(projectRoot)
 
 	if testRoot != "" {
-		cand := filepath.Join(testRoot, paths.ProjectDataDir, "credentials")
+		cand := paths.CredentialsPath(testRoot)
 		if fileutil.IsRegularFile(cand) {
 			return cand
 		}
@@ -30,7 +34,7 @@ func ResolveCredentialPath(projectRoot string) string {
 		}
 	}
 	if projectRoot != "" {
-		local := filepath.Join(projectRoot, paths.ProjectDataDir, "credentials")
+		local := paths.CredentialsPath(projectRoot)
 		if fileutil.IsRegularFile(local) {
 			return local
 		}
@@ -39,7 +43,7 @@ func ResolveCredentialPath(projectRoot string) string {
 	if err != nil || strings.TrimSpace(home) == "" {
 		return ""
 	}
-	return filepath.Join(home, paths.ProjectDataDir, "credentials")
+	return filepath.Join(home, paths.ProjectDataDir, paths.CredentialsFile)
 }
 
 func sameTree(a, b string) bool {
@@ -60,4 +64,21 @@ func canonDir(p string) string {
 		return ev
 	}
 	return abs
+}
+
+// ReadCredentialToken returns the trimmed credentials-file payload, retained
+// until that file's mtime changes. Missing files yield "".
+func ReadCredentialToken(path string) string {
+	path = strings.TrimSpace(path)
+	if path == "" {
+		return ""
+	}
+	token, _ := credTokens.Load(path, stampmemo.Of(path), func() (string, error) {
+		data, err := fileutil.ReadFile(path)
+		if err != nil {
+			return "", nil
+		}
+		return strings.TrimSpace(string(data)), nil
+	})
+	return token
 }

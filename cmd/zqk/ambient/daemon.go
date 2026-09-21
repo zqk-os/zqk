@@ -22,9 +22,9 @@ import (
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-const (
-	ambientPIDFileRel = ".zqk/state/ambient/daemon.pid"
-	ambientLogFileRel = ".zqk/logs/ambient-daemon.log"
+var (
+	ambientPIDFileRel = filepath.Join(paths.ProjectDataDir, paths.StateDir, "ambient", "daemon.pid")
+	ambientLogFileRel = filepath.Join(paths.ProjectDataDir, paths.LogsDir, "ambient-daemon.log")
 )
 
 func ambientPIDFilePath(projectRoot string) string {
@@ -83,7 +83,7 @@ func runAmbientDaemon(cmd *cobra.Command, args []string) error {
 	}
 
 	currentPID := os.Getpid()
-	if err := fileutil.WriteFile(pidPath, []byte(strconv.Itoa(currentPID)), 0644); err != nil {
+	if err := fileutil.WriteFile(pidPath, []byte(strconv.Itoa(currentPID)), paths.FilePerm644); err != nil {
 		return fmt.Errorf("failed to write ambient daemon PID: %w", err)
 	}
 	defer func() {

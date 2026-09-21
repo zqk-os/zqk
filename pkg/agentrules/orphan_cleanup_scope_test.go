@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -15,7 +16,11 @@ const orphanCleanupScript = "scripts/cleanup_orphan_test_processes.sh"
 // so this test exercises the shipped line rather than a copy that can drift away from it.
 func daemonPgrepPattern(t *testing.T) *regexp.Regexp {
 	t.Helper()
-	data, err := fileutil.ReadFile(filepath.Join(repoRoot(t), orphanCleanupScript))
+	p := filepath.Join(repoRoot(t), orphanCleanupScript)
+	if _, err := fileutil.Stat(p); err != nil {
+		t.Skipf("%s absent (studio script)", orphanCleanupScript)
+	}
+	data, err := fileutil.ReadFile(p)
 	if err != nil {
 		t.Fatalf("read %s: %v", orphanCleanupScript, err)
 	}
@@ -47,7 +52,7 @@ func TestOrphanCleanupDoesNotClassifySchedulerSubcommandsAsDaemons(t *testing.T)
 
 	// Long-lived processes: killing these when truly abandoned is the point of the script.
 	daemonArgv := []string{
-		"/Users/x/zqk/.zqk/bin/zqk-stable scheduler start --foreground",
+		filepath.Join("/Users/x/zqk", paths.ProjectDataDir, "bin", "zqk-stable") + " scheduler start --foreground",
 		"./bin/zqk-stable scheduler daemon",
 		"bin/zqk scheduler start",
 	}
@@ -89,7 +94,11 @@ func TestOrphanCleanupDoesNotClassifySchedulerSubcommandsAsDaemons(t *testing.T)
 // bundles it had in flight, and a killed bundle writes no health.jsonl outcome — the package simply
 // never reports, which reads as "still running" rather than as a failure.
 func TestOrphanCleanupExemptsDaemonSupervisedWork(t *testing.T) {
-	data, err := fileutil.ReadFile(filepath.Join(repoRoot(t), orphanCleanupScript))
+	p := filepath.Join(repoRoot(t), orphanCleanupScript)
+	if _, err := fileutil.Stat(p); err != nil {
+		t.Skipf("%s absent (studio script)", orphanCleanupScript)
+	}
+	data, err := fileutil.ReadFile(p)
 	if err != nil {
 		t.Fatalf("read %s: %v", orphanCleanupScript, err)
 	}

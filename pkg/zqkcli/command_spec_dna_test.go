@@ -12,6 +12,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -57,10 +58,10 @@ func findSpecByID(t *testing.T, specsDir, id string) *cli.CommandSpec {
 func TestInternalCommandSurfaceMatchesYAMLSpecs(t *testing.T) {
 	t.Parallel()
 	root := findProjectRootForDNATest(t)
-	specDir := filepath.Join(root, ".zqk/cli/specs")
-	// Historical CSPEC-internal-* DNA may be absent until internal file DNA is fully migrated.
+	specDir := filepath.Join(root, paths.CLICommandSpecsDir)
+
 	if !specIDExists(specDir, "CSPEC-internal-bulk_command") {
-		t.Skip(".zqk/cli/specs missing CSPEC-internal-* DNA (internal command DNA not in this checkout)")
+		t.Skipf("%s missing CSPEC-internal-* DNA (internal command DNA not in this checkout)", paths.CLICommandSpecsDir)
 	}
 
 	bulkSpec := findSpecByID(t, specDir, "CSPEC-internal-bulk_command")

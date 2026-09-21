@@ -7,6 +7,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // TestCLIManual_FunctionalAcceptance validates that the CLI User Manual exists,
@@ -117,11 +118,11 @@ func TestCLIManual_FunctionalAcceptance(t *testing.T) {
 
 	// Verify environment variables
 	requiredEnvs := []string{
-		"ZQK_PROJECT_ROOT",
-		"ZQK_CONTEXT_PROFILE",
-		"ZQK_LOG_LEVEL",
-		"ZQK_TIMEOUT",
-		"ZQK_ALLOW_DEGRADED",
+		zqkenv.ProjectRoot().Name(),
+		zqkenv.ContextProfile().Name(),
+		zqkenv.LogLevel().Name(),
+		zqkenv.Timeout().Name(),
+		zqkenv.AllowDegraded().Name(),
 	}
 	for _, envVar := range requiredEnvs {
 		if !strings.Contains(content, envVar) {

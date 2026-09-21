@@ -53,7 +53,7 @@ const (
 //
 // NewCoordinationChannel creates a new coordination channel
 func NewCoordinationChannel(projectRoot string) CoordinationChannelInterface {
-	eventsDir := filepath.Join(projectRoot, paths.ProjectDataDir, "scheduler", "events")
+	eventsDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.SchedulerSubdir, "events")
 	eventLog := filepath.Join(eventsDir, "coordination-bus.jsonl")
 	legacyEventLog := filepath.Join(eventsDir, "events.log")
 	if err := migrateLegacyEventLog(legacyEventLog, eventLog); err != nil {

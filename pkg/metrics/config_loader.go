@@ -10,6 +10,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -48,8 +49,17 @@ type SamplerConfigFile struct {
 	OptIn  []string `yaml:"opt_in"`  // Object kinds that require explicit opt-in
 }
 
+var samplerConfigs stampmemo.Table[*SamplerConfigFile] // keyed by config path
+var samplerConfigPaths stampmemo.Table[string]         // keyed by projectRoot; stamp is candidate files
+
 // LoadSamplerConfig loads sampler configuration from a YAML file
 func LoadSamplerConfig(configPath string) (*SamplerConfigFile, error) {
+	return samplerConfigs.Load(configPath, stampmemo.Of(configPath), func() (*SamplerConfigFile, error) {
+		return readSamplerConfig(configPath)
+	})
+}
+
+func readSamplerConfig(configPath string) (*SamplerConfigFile, error) {
 	data, err := fileutil.ReadFile(configPath)
 	if err != nil {
 		return nil, errfmt.Newf("failed to read sampler config").Wrap(err)
@@ -63,21 +73,21 @@ func LoadSamplerConfig(configPath string) (*SamplerConfigFile, error) {
 	return &config, nil
 }
 
+func samplerConfigCandidates(projectRoot string) (legacy, alt string) {
+	legacy = filepath.Join(projectRoot, paths.ProcessInternalConfigsDir, "metrics_sampler_config"+paths.YAMLExtension)
+	alt = filepath.Join(projectRoot, paths.ProjectDataDir, paths.MetricsDir, paths.SamplerConfigFile)
+	return legacy, alt
+}
+
 // FindSamplerConfigFile finds the sampler configuration file in the project
 func FindSamplerConfigFile(projectRoot string) (string, error) {
-	// Try standard location (legacy path)
-	configPath := filepath.Join(projectRoot, paths.ProcessInternalConfigsDir, "metrics_sampler_config"+paths.YAMLExtension)
-	if _, err := fileutil.Stat(configPath); err == nil {
-		return configPath, nil
-	}
-
-	// Try alternative location
-	configPath = filepath.Join(projectRoot, paths.ProjectDataDir, paths.MetricsDir, paths.SamplerConfigFile)
-	if _, err := fileutil.Stat(configPath); err == nil {
-		return configPath, nil
-	}
-
-	return "", errfmt.Errorf("sampler config file not found")
+	legacy, alt := samplerConfigCandidates(projectRoot)
+	return samplerConfigPaths.Load(projectRoot, stampmemo.OfAll(legacy, alt), func() (string, error) {
+		if hit := stampmemo.FirstExisting([]string{legacy, alt}); hit != "" {
+			return hit, nil
+		}
+		return "", errfmt.Errorf("sampler config file not found")
+	})
 }
 
 // ApplySamplerConfig applies sampler configuration to a registry

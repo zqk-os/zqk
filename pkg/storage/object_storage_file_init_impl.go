@@ -71,7 +71,13 @@ func NewFileObjectStorage(projectRoot string, opts ...*FileObjectStorageOptions)
 	}).Run()
 
 	if _, err := fileutil.Stat(processDir); err != nil {
-		return nil, errfmt.Newf(ConstStreamProcessDirectoryNotFound).Wrap(err)
+		if fileutil.IsNotExist(err) {
+			if mkErr := fileutil.MkdirAll(processDir, paths.DirPerm755); mkErr != nil {
+				return nil, errfmt.Newf(ConstStreamProcessDirectoryNotFound).Wrap(mkErr)
+			}
+		} else {
+			return nil, errfmt.Newf(ConstStreamProcessDirectoryNotFound).Wrap(err)
+		}
 	}
 
 	// Stream-backed kinds resolve segment dirs via paths.ResolvePathStrict (prefix:streams/<kind>).

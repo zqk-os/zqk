@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 	"gopkg.in/yaml.v3"
@@ -24,6 +25,9 @@ type brandSettingsAliasesFile struct {
 		ProjectRoot string `yaml:"project_root"`
 	} `yaml:"kernel_state"`
 }
+
+// parsedBrandFiles is keyed by the settings file path (one per root). Stamp is that file.
+var parsedBrandFiles stampmemo.Table[[]brandSettingsAliasesFile]
 
 func configCandidates(projectRoot string) []string {
 	return []string{
@@ -46,51 +50,80 @@ func testCandidates(projectRoot string) []string {
 	}
 }
 
-// BrandSettingsPath returns the primary configuration file path for projectRoot.
-// All configuration originates from config/** with environment overrides.
-func BrandSettingsPath(projectRoot string) string {
-	for _, p := range configCandidates(projectRoot) {
-		if _, err := fileutil.Stat(p); err == nil {
-			return p
+func testRootMatches(projectRoot string) bool {
+	testRoot := strings.TrimSpace(zqkenv.TestRoot().Get())
+	if testRoot == "" || projectRoot == "" {
+		return false
+	}
+	absTest, err1 := filepath.Abs(testRoot)
+	absProject, err2 := filepath.Abs(projectRoot)
+	return err1 == nil && err2 == nil && absTest == absProject
+}
+
+func settingsCandidates(projectRoot string) []string {
+	if testRootMatches(projectRoot) {
+		return testCandidates(projectRoot)
+	}
+	return configCandidates(projectRoot)
+}
+
+func parsedBrandSettings(projectRoot string) []brandSettingsAliasesFile {
+	cands := settingsCandidates(projectRoot)
+	list, _ := parsedBrandFiles.Load(projectRoot, stampmemo.OfAll(cands...), func() ([]brandSettingsAliasesFile, error) {
+		var out []brandSettingsAliasesFile
+		for _, path := range cands {
+			data, err := fileutil.ReadFile(path)
+			if err != nil {
+				continue
+			}
+			var s brandSettingsAliasesFile
+			if yaml.Unmarshal(data, &s) != nil {
+				continue
+			}
+			out = append(out, s)
 		}
+		return out, nil
+	})
+	return list
+}
+
+// BrandSettingsPath returns the primary configuration file path for projectRoot.
+func BrandSettingsPath(projectRoot string) string {
+	if hit := stampmemo.FirstExisting(configCandidates(projectRoot)); hit != "" {
+		return hit
 	}
 	return filepath.Join(projectRoot, ConfigDir, ZqkConfigFileName)
 }
 
+// SettingsPathForRoot is the settings file LoadBrandSettings should open
+// (test-settings when TEST_ROOT matches projectRoot).
+func SettingsPathForRoot(projectRoot string) string {
+	if testRootMatches(projectRoot) {
+		if hit := stampmemo.FirstExisting(testCandidates(projectRoot)); hit != "" {
+			return hit
+		}
+		return testCandidates(projectRoot)[0]
+	}
+	return BrandSettingsPath(projectRoot)
+}
+
 // LoadBrandSettingsProjectRoot reads paths.project_root or kernel_state.project_root from configuration.
-// Returns empty string if missing, invalid, or empty.
 func LoadBrandSettingsProjectRoot(projectRoot string) string {
 	if projectRoot == emptyValue {
 		return ""
 	}
-	candidates := configCandidates(projectRoot)
-	testRoot := zqkenv.TestRoot().Get()
-	if testRoot != emptyValue {
-		absTest, err1 := filepath.Abs(testRoot)
-		absProject, err2 := filepath.Abs(projectRoot)
-		if err1 == nil && err2 == nil && absTest == absProject {
-			candidates = testCandidates(projectRoot)
-		}
-	}
-	for _, path := range candidates {
-		data, err := fileutil.ReadFile(path)
-		if err != nil {
-			continue
-		}
-		var s brandSettingsAliasesFile
-		if err := yaml.Unmarshal(data, &s); err != nil {
-			continue
-		}
+	for _, s := range parsedBrandSettings(projectRoot) {
 		p := strings.TrimSpace(s.KernelState.ProjectRoot)
 		if p == "" {
 			p = strings.TrimSpace(s.Paths.ProjectRoot)
 		}
-		if p != "" {
-			if filepath.IsAbs(p) {
-				return filepath.Clean(p)
-			}
-			return filepath.Clean(filepath.Join(projectRoot, p))
+		if p == "" {
+			continue
 		}
+		if filepath.IsAbs(p) {
+			return filepath.Clean(p)
+		}
+		return filepath.Clean(filepath.Join(projectRoot, p))
 	}
 	return ""
 }
@@ -100,26 +133,8 @@ func LoadBrandCLIBinaryPath(projectRoot string) string {
 	if projectRoot == emptyValue {
 		return ""
 	}
-	candidates := configCandidates(projectRoot)
-	testRoot := zqkenv.TestRoot().Get()
-	if testRoot != emptyValue {
-		absTest, err1 := filepath.Abs(testRoot)
-		absProject, err2 := filepath.Abs(projectRoot)
-		if err1 == nil && err2 == nil && absTest == absProject {
-			candidates = testCandidates(projectRoot)
-		}
-	}
-	for _, path := range candidates {
-		data, err := fileutil.ReadFile(path)
-		if err != nil {
-			continue
-		}
-		var s brandSettingsAliasesFile
-		if err := yaml.Unmarshal(data, &s); err != nil {
-			continue
-		}
-		p := strings.TrimSpace(s.CLI.BinaryPath)
-		if p != "" {
+	for _, s := range parsedBrandSettings(projectRoot) {
+		if p := strings.TrimSpace(s.CLI.BinaryPath); p != "" {
 			return p
 		}
 	}
@@ -127,53 +142,14 @@ func LoadBrandCLIBinaryPath(projectRoot string) string {
 }
 
 // LoadBrandPathAliases reads paths.aliases from configuration.
-// Missing or invalid files return nil (callers merge onto defaults).
 func LoadBrandPathAliases(projectRoot string) map[string]string {
 	if projectRoot == emptyValue {
 		return nil
 	}
-	candidates := configCandidates(projectRoot)
-	testRoot := zqkenv.TestRoot().Get()
-	if testRoot != emptyValue {
-		absTest, err1 := filepath.Abs(testRoot)
-		absProject, err2 := filepath.Abs(projectRoot)
-		if err1 == nil && err2 == nil && absTest == absProject {
-			candidates = testCandidates(projectRoot)
-		}
-	}
-	for _, path := range candidates {
-		data, err := fileutil.ReadFile(path)
-		if err != nil {
-			continue
-		}
-		var s brandSettingsAliasesFile
-		if err := yaml.Unmarshal(data, &s); err != nil {
-			continue
-		}
+	for _, s := range parsedBrandSettings(projectRoot) {
 		if len(s.Paths.Aliases) > 0 {
 			return s.Paths.Aliases
 		}
 	}
 	return nil
-}
-
-func settingsPathForRoot(projectRoot string) string {
-	testRoot := zqkenv.TestRoot().Get()
-	if testRoot != emptyValue {
-		absTest, err1 := filepath.Abs(testRoot)
-		absProject, err2 := filepath.Abs(projectRoot)
-		if err1 == nil && err2 == nil && absTest == absProject {
-			return resolveTestBrandSettingsPath(projectRoot)
-		}
-	}
-	return BrandSettingsPath(projectRoot)
-}
-
-func resolveTestBrandSettingsPath(projectRoot string) string {
-	for _, p := range testCandidates(projectRoot) {
-		if _, err := fileutil.Stat(p); err == nil {
-			return p
-		}
-	}
-	return testCandidates(projectRoot)[0]
 }

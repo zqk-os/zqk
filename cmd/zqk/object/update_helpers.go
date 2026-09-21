@@ -22,6 +22,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objectget"
 	"github.com/zqk-os/zqk/pkg/objectidcache"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/validation"
@@ -133,7 +134,7 @@ func validateFileHash(filePath string) error {
 
 	// Compare hash in filename with actual content hash
 	if filenameHash != actualHash {
-		return errfmt.Errorf("file provided via --file has hash mismatch: filename has %s, content has %s (file may be corrupted). Use 'zqk utility fix-hashes --force <file>' to fix", filenameHash, actualHash)
+		return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("file provided via --file has hash mismatch: filename has %s, content has %s (file may be corrupted). Use 'zqk utility fix-hashes --force <file>' to fix", filenameHash, actualHash)))
 	}
 
 	return nil

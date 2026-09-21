@@ -1,9 +1,11 @@
 package cli
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 func TestIsNumericCASCommandStem(t *testing.T) {
@@ -41,20 +43,20 @@ func TestResolveCommandBuilderName_PrefersUseOverNumericCSPEC(t *testing.T) {
 func TestResolveCommandBuilderName_NestedDNAUsesPathStem(t *testing.T) {
 	t.Parallel()
 	spec := map[string]any{objects.FieldKeyName: "install"}
-	got := ResolveCommandBuilderName(spec, "/repo/.zqk/cli/specs/scheduler/service/install_command.yaml")
+	got := ResolveCommandBuilderName(spec, filepath.Join("/repo", paths.CLICommandSpecsDir, "scheduler/service/install_command.yaml"))
 	if got != "scheduler_service_install" {
 		t.Fatalf("got %q want scheduler_service_install", got)
 	}
 	// Shallow group DNA must path-qualify so object/list and scheduler/list do not collide.
-	got = ResolveCommandBuilderName(map[string]any{objects.FieldKeyName: "list"}, "/repo/.zqk/cli/specs/scheduler/list_command.yaml")
+	got = ResolveCommandBuilderName(map[string]any{objects.FieldKeyName: "list"}, filepath.Join("/repo", paths.CLICommandSpecsDir, "scheduler/list_command.yaml"))
 	if got != "scheduler_list" {
 		t.Fatalf("got %q want scheduler_list", got)
 	}
-	got = ResolveCommandBuilderName(map[string]any{objects.FieldKeyName: "list"}, "/repo/.zqk/cli/specs/object/list_command.yaml")
+	got = ResolveCommandBuilderName(map[string]any{objects.FieldKeyName: "list"}, filepath.Join("/repo", paths.CLICommandSpecsDir, "object/list_command.yaml"))
 	if got != "object_list" {
 		t.Fatalf("got %q want object_list", got)
 	}
-	got = ResolveCommandBuilderName(map[string]any{objects.FieldKeyName: "count"}, "/repo/.zqk/cli/specs/object/count_command.yaml")
+	got = ResolveCommandBuilderName(map[string]any{objects.FieldKeyName: "count"}, filepath.Join("/repo", paths.CLICommandSpecsDir, "object/count_command.yaml"))
 	if got != "object_count" {
 		t.Fatalf("got %q want object_count", got)
 	}

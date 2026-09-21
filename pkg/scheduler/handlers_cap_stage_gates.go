@@ -575,12 +575,15 @@ func (h *CapOrchestratorHandler) capEvidenceStorage() storagepkg.ObjectStoragePr
 	if fs := storagepkg.UnwrapToFileObjectStorage(h.storage); fs != nil {
 		return fs
 	}
+	if h.storage != nil {
+		return h.storage
+	}
 	if h.projectRoot != "" {
 		if fs, err := storagepkg.NewFileObjectStorage(h.projectRoot, &storagepkg.FileObjectStorageOptions{SkipGlobalWiring: true}); err == nil && fs != nil {
 			return fs
 		}
 	}
-	return h.storage
+	return nil
 }
 
 // verifiedStageReceipt accepts receipts only when artifact_ids Get and were touched since stage entry.
@@ -776,8 +779,8 @@ func (h *CapOrchestratorHandler) maybeWakeOnStageHold(stage, reason string) {
 	h.wakeAgentAndScheduleHourglass(planID, "tpm")
 	// Append hold-specific detail so operators see the gate reason, not only assignment text.
 	eventPath := datacell.AgentChatChannelEventsJSONLPath(h.projectRoot)
-	if err := fileutil.MkdirAll(filepath.Dir(eventPath), 0755); err == nil {
-		if f, err := fileutil.OpenFile(eventPath, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, 0644); err == nil {
+	if err := fileutil.MkdirAll(filepath.Dir(eventPath), paths.DirPerm755); err == nil {
+		if f, err := fileutil.OpenFile(eventPath, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, paths.FilePerm644); err == nil {
 			_ = json.NewEncoder(f).Encode(map[string]any{
 				"timestamp": now.Format(time.RFC3339),
 				"sender":    "cap_orchestrator",

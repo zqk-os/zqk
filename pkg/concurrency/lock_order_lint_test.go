@@ -3,6 +3,7 @@ package concurrency_test
 import (
 	"bytes"
 	"fmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"go/ast"
 	"go/parser"
 	"go/printer"
@@ -32,7 +33,7 @@ func inverted() {
 	mu2.Unlock()
 }
 `
-	err := os.WriteFile(filepath.Join(tmpDir, "bad.go"), []byte(badCode), 0644) //nolint:gosec
+	err := os.WriteFile(filepath.Join(tmpDir, "bad.go"), []byte(badCode), paths.FilePerm644) //nolint:gosec
 	if err != nil {
 		t.Fatal(err)
 	}

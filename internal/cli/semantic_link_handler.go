@@ -6,6 +6,7 @@ import (
 	"io"
 
 	"github.com/zqk-os/zqk/pkg/observer"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // SemanticLinkFormatHandler parses object references and outputs an execution map of zqk object get commands.
@@ -37,12 +38,12 @@ func (h *SemanticLinkFormatHandler) Format(data any) ([]byte, error) {
 	for _, id := range ids {
 		if len(astIds) > 0 {
 			if _, ok := astIds[id]; ok {
-				executionMap[id] = "zqk object get " + id
+				executionMap[id] = paths.RewriteCanonicalCLIInvocations("zqk object get ") + id
 			} else {
 				executionMap[id] = "BROKEN LINK: " + id + " (Flagged by AST Observer)"
 			}
 		} else {
-			executionMap[id] = "zqk object get " + id
+			executionMap[id] = paths.RewriteCanonicalCLIInvocations("zqk object get ") + id
 		}
 	}
 

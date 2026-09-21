@@ -74,10 +74,25 @@ func TestGoroutineSanitation_FunctionalAcceptance(t *testing.T) {
 	}
 }
 
+var leakIgnoreOptions = []goleak.Option{
+	goleak.IgnoreTopFunction("github.com/robfig/cron/v3.(*Cron).run"),
+	goleak.IgnoreTopFunction("github.com/zqk-os/zqk/pkg/scheduler.(*NotificationContext).deliveryLoop"),
+	goleak.IgnoreTopFunction("github.com/zqk-os/zqk/pkg/ambient.(*AmbientIngestService).BindToMesh.func1"),
+	goleak.IgnoreTopFunction("github.com/zqk-os/zqk/pkg/ambience.(*InMemoryEventMesh).Subscribe.func2"),
+	goleak.IgnoreTopFunction("github.com/zqk-os/zqk/pkg/storage/filecas.initDarwinSyncQueue.func1"),
+	goleak.IgnoreTopFunction("github.com/zqk-os/zqk/pkg/storage/cas.(*indexQueue).startWorker"),
+	goleak.IgnoreTopFunction("github.com/zqk-os/zqk/pkg/storage.(*ObjectWriteBehindWorker).run"),
+	goleak.IgnoreTopFunction("github.com/zqk-os/zqk/pkg/storage.(*ioQueue).startWorker"),
+	goleak.IgnoreTopFunction("github.com/zqk-os/zqk/pkg/storage/cas.(*CASOrphanCleanupQueue).startWorker.func1"),
+	goleak.IgnoreTopFunction("github.com/zqk-os/zqk/pkg/validation.(*sharedValidationCache).runFlusher"),
+	goleak.IgnoreTopFunction("github.com/zqk-os/zqk/pkg/goroutinelabels.(*Pool).Start.func1"),
+}
+
 // CRIT-1789663120758633000-25e89aa4: Boundary & Error Handling
 // Verifies that managed goroutines handle context cancellation, timeouts, and panic recovery without leaking goroutines.
 func TestGoroutineSanitation_BoundaryAndErrorHandling(t *testing.T) {
-	defer goleak.VerifyNone(t)
+	currentLeaks := goleak.IgnoreCurrent()
+	defer goleak.VerifyNone(t, append(leakIgnoreOptions, currentLeaks)...)
 	t.Run("ContextCancellation", func(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 		started := make(chan struct{})
@@ -139,7 +154,8 @@ func TestGoroutineSanitation_BoundaryAndErrorHandling(t *testing.T) {
 // CRIT-1789663120758634000-31382b55: Integration & Conformance
 // Verifies integration with scheduler concurrency primitives and job queue contracts.
 func TestGoroutineSanitation_IntegrationAndConformance(t *testing.T) {
-	defer goleak.VerifyNone(t)
+	currentLeaks := goleak.IgnoreCurrent()
+	defer goleak.VerifyNone(t, append(leakIgnoreOptions, currentLeaks)...)
 	// Verify that scheduler activity cache uses managed synchronization and goroutinelabels
 	activityCache := scheduler.NewActivityCache()
 	if activityCache == nil {

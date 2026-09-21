@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // NewIssuesBundleHealthCommandBuilder creates a new issues_bundle_health command
@@ -16,7 +17,7 @@ func NewIssuesBundleHealthCommandBuilder() *cobra.Command {
 	help.WithDescriptionLines("fingerprint, the last line in the scanned file wins — so a newer pass (possibly under a new")
 	help.WithDescriptionLines("job id) shows as green even if issues.json was never cleared.")
 	help.WithDescriptionLines("")
-	help.WithDescriptionLines("Use together with: zqk scheduler test-failures list, zqk scheduler test-failures health.")
+	help.WithDescriptionLines(paths.RewriteCanonicalCLIInvocations("Use together with: zqk scheduler test-failures list, zqk scheduler test-failures health."))
 	help.AddExample("Compare issues.json to bundle health", "%s scheduler issues-bundle-health")
 	help.ExcludeFlag("format")
 	help.ExcludeFlag("output")

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	schedpkg "github.com/zqk-os/zqk/pkg/scheduler"
 )
 
@@ -22,7 +23,7 @@ func formatConvergenceDesiredEndStateRecommendation(cvs, sug map[string]any, sna
 
 	b.WriteString("**Signals (this run):**\n")
 	if len(rollupCore) == 0 {
-		b.WriteString("- **rollup_status_core:** missing — re-run `zqk scheduler convergence measure` with a current `zqk` binary.\n")
+		b.WriteString(paths.RewriteCanonicalCLIInvocations("- **rollup_status_core:** missing — re-run `zqk scheduler convergence measure` with a current `zqk` binary.\n"))
 	} else {
 		if rs, ok := rollupCore["rollup_status"].(string); ok && strings.TrimSpace(rs) != "" {
 			fmt.Fprintf(&b, "- **rollup_status:** `%s`\n", strings.TrimSpace(rs))
@@ -77,7 +78,7 @@ func formatConvergenceDesiredEndStateRecommendation(cvs, sug map[string]any, sna
 	}
 
 	if snap != nil && len(snap.FailingFingerprintsNow) > 0 {
-		focus = append(focus, "**Bundles:** Fix failing fingerprints (targeted `zqk scheduler scan-tests` / package scope) until Latest measurement is green.")
+		focus = append(focus, paths.RewriteCanonicalCLIInvocations("**Bundles:** Fix failing fingerprints (targeted `zqk scheduler scan-tests` / package scope) until Latest measurement is green."))
 	}
 	if snap != nil && len(snap.FailingFingerprintsNow) == 0 && !snap.ReadyForSessionCompletion {
 		if rfsRequired {
@@ -119,7 +120,7 @@ func formatConvergenceDesiredEndStateRecommendation(cvs, sug map[string]any, sna
 		}
 	}
 	if rollupOK && bundlesOK && len(focus) == 0 {
-		focus = append(focus, "**Contract:** Rollup and bundle-health gates look clear. **Primary next work:** walk **Desired end state** and acceptance criteria; when satisfied per process rules, update **`status`** / **`current_phase`** via `zqk object update`. Green measurement does not replace missing contract items.")
+		focus = append(focus, paths.RewriteCanonicalCLIInvocations("**Contract:** Rollup and bundle-health gates look clear. **Primary next work:** walk **Desired end state** and acceptance criteria; when satisfied per process rules, update **`status`** / **`current_phase`** via `zqk object update`. Green measurement does not replace missing contract items."))
 	}
 	if len(focus) == 0 {
 		focus = append(focus, "**Next:** Use **Desired end state** as the checklist; align **`status`** and **`current_phase`** with process rules; use rollup and Latest measurement as supporting evidence.")

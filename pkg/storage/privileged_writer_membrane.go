@@ -6,6 +6,7 @@ import (
 
 	"context"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/brand"
@@ -28,6 +29,9 @@ const privilegedWriterSocketBasename = "privileged-writer"
 // Override with PRIVILEGED_WRITER_SOCKET. TRACK: BLI-CAS-HAND-DUP-CHECK-001
 func DefaultPrivilegedWriterSocketPath() string {
 	name := brand.NamespacePrefix() + "-" + privilegedWriterSocketBasename + socketFileExtension
+	if runtime.GOOS == "windows" {
+		return filepath.Join(fileutil.TempDir(), name)
+	}
 	return filepath.Join("/tmp", name)
 }
 

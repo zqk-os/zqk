@@ -57,7 +57,7 @@ func (h *SnapshotTestHelper) RestoreSnapshot(t *testing.T) error {
 	// For now, this is a placeholder that documents the pattern
 
 	t.Logf("Snapshot restoration would be performed here")
-	t.Logf("Command: zqk system init --from-snapshot %s --wipe --force", h.SnapshotPath)
+	t.Logf(paths.RewriteCanonicalCLIInvocations("Command: zqk system init --from-snapshot %s --wipe --force"), h.SnapshotPath)
 
 	h.IsRestored = true
 	return nil

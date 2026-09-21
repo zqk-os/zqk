@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // NewTestFailuresCommandBuilder creates a new test_failures command
@@ -21,17 +22,17 @@ func NewTestFailuresCommandBuilder() *cobra.Command {
 	help.WithDescriptionLines("Failed bundle event lines include test_failures and suggested_rerun_commands (copy-paste go test")
 	help.WithDescriptionLines("lines). Subcommands list and rerun consider both callbacks and test-bundle events.")
 	help.WithDescriptionLines("")
-	help.WithDescriptionLines("Convergence measurement (health rollup, CVS handoff) lives under `zqk scheduler convergence`")
+	help.WithDescriptionLines(paths.RewriteCanonicalCLIInvocations("Convergence measurement (health rollup, CVS handoff) lives under `zqk scheduler convergence`"))
 	help.WithDescriptionLines("(measure, overseer), not under test-failures.")
 	help.AddExample("List failing tests (callbacks + test-bundle events)", "%s scheduler test-failures list")
 	help.AddExample("List failures for a specific package", "%s scheduler test-failures list --package ./pkg/storage")
 	help.AddExample("Re-run only failing tests (creates scheduler jobs)", "%s scheduler test-failures rerun")
 	help.AddExample("Summarize test-bundle health from health.jsonl", "%s scheduler test-failures health")
 	help.AddExample("Convergence measure for automation (JSON)", "%s scheduler convergence measure --format json")
-	help.AddExample("Convergence JSON without literal gate scripts (faster; full gates + matrix in cvs_outcome_rollup.py)", "%s scheduler convergence measure --format json --skip-rollup-gates")
+	help.AddExample("Convergence JSON without literal gate scripts (faster)", "%s scheduler convergence measure --format json --skip-rollup-gates")
 	help.AddExample("Convergence measure with suggested CVS fields for object update", "%s scheduler convergence measure --format json --session-id CVS-001")
 	help.AddExample("Convergence with phase router alignment (current CVS phase + flow variant)", "%s scheduler convergence measure --format json --session-id CVS-001 --current-phase c5_verify --flow-variant scheduler_fast")
-	help.AddExample("Object update payload only (pipe to file for zqk object update --file)", "%s scheduler convergence measure --format json --session-id CVS-001 | jq '.suggested_convergence_session_fields.object_update_body'")
+	help.AddExample(paths.RewriteCanonicalCLIInvocations("Object update payload only (pipe to file for zqk object update --file)"), "%s scheduler convergence measure --format json --session-id CVS-001 | jq '.suggested_convergence_session_fields.object_update_body'")
 	help.AddExample("Include iteration tombstone (before_state_snapshot) in object update payload", "%s scheduler convergence measure --format json --session-id CVS-001 --stamp-tombstone | jq '.suggested_convergence_session_fields.object_update_body'")
 	help.AddExample("Finalize: merge predictions with retrospective debrief into object update payload", "%s scheduler convergence measure --format json --session-id CVS-001 --finalize-debrief | jq '.suggested_convergence_session_fields.object_update_body.predictions'")
 	help.AddExample("Handoff: operator debrief notes on the CVS for the next convergence session", "%s scheduler convergence measure --format json --session-id CVS-001 --debrief-notes 'Next: focus pkg/scheduler first; watch retention bundle timeouts.' | jq '.suggested_convergence_session_fields.object_update_body.debrief_notes'")

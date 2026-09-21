@@ -1,6 +1,7 @@
 package community
 
 import (
+	"github.com/zqk-os/zqk/pkg/paths"
 	"os"
 	"path/filepath"
 	"strings"
@@ -35,8 +36,8 @@ func TestShellEnv_FunctionalAcceptance(t *testing.T) {
 			name:       "fish_injection",
 			shell:      ShellFish,
 			configFile: filepath.Join(tmpDir, "config.fish"),
-			binDir:     "/Users/test/.zqk/bin",
-			expectRule: "fish_add_path /Users/test/.zqk/bin",
+			binDir:     filepath.Join("/Users/test", paths.ProjectDataDir, "bin"),
+			expectRule: "fish_add_path " + filepath.Join("/Users/test", paths.ProjectDataDir, "bin"),
 		},
 		{
 			name:       "posix_injection",
@@ -57,7 +58,7 @@ func TestShellEnv_FunctionalAcceptance(t *testing.T) {
 
 			// Pre-populate config file with user settings
 			initialContent := "# User configuration\nalias ll='ls -la'\n"
-			if err := os.WriteFile(tc.configFile, []byte(initialContent), 0644); err != nil {
+			if err := os.WriteFile(tc.configFile, []byte(initialContent), paths.FilePerm644); err != nil {
 				t.Fatalf("failed creating test config: %v", err)
 			}
 

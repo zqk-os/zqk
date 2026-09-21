@@ -36,7 +36,7 @@ func TestCleanupConfigHandler_Execute_missingConfig(t *testing.T) {
 
 func TestCleanupConfigHandler_Execute_emptySteps(t *testing.T) {
 	dir := t.TempDir()
-	cleanupDir := filepath.Join(dir, paths.ProjectDataDir, "cleanup")
+	cleanupDir := filepath.Join(dir, paths.ProjectDataDir, paths.CleanupSubdir)
 	if err := fileutil.MkdirAll(cleanupDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
@@ -53,7 +53,7 @@ func TestCleanupConfigHandler_Execute_emptySteps(t *testing.T) {
 
 func TestCleanupConfigHandler_Execute_truncateFiles(t *testing.T) {
 	dir := t.TempDir()
-	cleanupDir := filepath.Join(dir, paths.ProjectDataDir, "cleanup")
+	cleanupDir := filepath.Join(dir, paths.ProjectDataDir, paths.CleanupSubdir)
 	if err := fileutil.MkdirAll(cleanupDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
@@ -108,17 +108,17 @@ func TestParseDuration(t *testing.T) {
 
 func TestCleanupConfigHandler_Execute_ResourceHygieneSteps(t *testing.T) {
 	dir := t.TempDir()
-	cleanupDir := filepath.Join(dir, paths.ProjectDataDir, "cleanup")
+	cleanupDir := filepath.Join(dir, paths.ProjectDataDir, paths.CleanupSubdir)
 	if err := fileutil.MkdirAll(cleanupDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
-	cacheDir := filepath.Join(dir, paths.ProjectDataDir, "cache")
+	cacheDir := filepath.Join(dir, paths.ProjectDataDir, paths.CacheDir)
 	if err := fileutil.MkdirAll(cacheDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 
 	oldTmp := filepath.Join(cacheDir, ".tmp-durable-12345")
-	_ = fileutil.WriteFile(oldTmp, []byte("temp"), 0o600)
+	_ = fileutil.WriteFile(oldTmp, []byte("temp"), paths.FilePerm600)
 	oldTime := time.Now().Add(-2 * time.Hour)
 	_ = os.Chtimes(oldTmp, oldTime, oldTime)
 

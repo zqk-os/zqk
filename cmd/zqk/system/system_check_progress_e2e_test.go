@@ -68,9 +68,9 @@ func TestSystemCheck_ProgressUpdates_E2E(t *testing.T) {
 	_ = execwrap.Command("cp", "-r", filepath.Join(moduleRoot, paths.ProcessInternalLifecyclesDir), filepath.Join(projectRoot, paths.ProcessInternalDir)).Run()
 	_ = execwrap.Command("cp", "-r", filepath.Join(moduleRoot, paths.ProcessDir, "pipeline_definitions"), filepath.Join(projectRoot, paths.ProcessDir)).Run()
 	_ = fileutil.EnsureDir(filepath.Join(projectRoot, paths.ProjectDataDir, filepath.Dir(paths.CLISpecsDir)))
-	_ = fileutil.EnsureDir(filepath.Join(projectRoot, paths.ProjectDataDir, "process", "zqk_session"))
-	_ = fileutil.WriteFile(filepath.Join(projectRoot, ".zqk", "credentials"), []byte("ZQK-TEST-SESSION\n"), 0644)
-	_ = fileutil.WriteFile(filepath.Join(projectRoot, paths.ProjectDataDir, "process", "zqk_session", "ZQK-TEST-SESSION.yaml"), []byte("id: ZQK-TEST-SESSION\nkind: zqk_session\nstatus: active\naccount_id: ACC-TEST-123\n"), 0644)
+	_ = fileutil.EnsureDir(filepath.Join(projectRoot, paths.ProjectDataDir, paths.ProcessSubdir, "zqk_session"))
+	_ = fileutil.WriteFile(filepath.Join(projectRoot, paths.ProjectDataDir, "credentials"), []byte("ZQK-TEST-SESSION\n"), paths.FilePerm644)
+	_ = fileutil.WriteFile(filepath.Join(projectRoot, paths.ProjectDataDir, paths.ProcessSubdir, "zqk_session", "ZQK-TEST-SESSION.yaml"), []byte("id: ZQK-TEST-SESSION\nkind: zqk_session\nstatus: active\naccount_id: ACC-TEST-123\n"), paths.FilePerm644)
 
 	_ = execwrap.Command("cp", "-r", filepath.Join(moduleRoot, paths.ProjectDataDir, paths.CLISpecsDir), filepath.Join(projectRoot, paths.ProjectDataDir, filepath.Dir(paths.CLISpecsDir))).Run()
 

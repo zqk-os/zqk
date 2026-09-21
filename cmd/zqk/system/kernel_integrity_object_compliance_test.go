@@ -7,13 +7,14 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestLoadObjectComplianceSnapshot_Trend(t *testing.T) {
 	root := t.TempDir()
-	preCommit := filepath.Join(root, ".zqk", "pre-commit")
-	if err := fileutil.MkdirAll(preCommit, 0o755); err != nil {
+	preCommit := filepath.Join(root, paths.ProjectDataDir, "pre-commit")
+	if err := fileutil.MkdirAll(preCommit, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	checkPath := filepath.Join(preCommit, "system-check.json")
@@ -32,7 +33,7 @@ func TestLoadObjectComplianceSnapshot_Trend(t *testing.T) {
 			},
 		}
 		b, _ := json.Marshal(payload)
-		if err := fileutil.WriteFile(checkPath, b, 0o644); err != nil {
+		if err := fileutil.WriteFile(checkPath, b, paths.FilePerm644); err != nil {
 			t.Fatal(err)
 		}
 		// Ensure distinct mtimes across samples.
@@ -63,7 +64,7 @@ func TestLoadObjectComplianceSnapshot_Trend(t *testing.T) {
 		},
 	}
 	b, _ := json.Marshal(payload)
-	if err := fileutil.WriteFile(checkPath, b, 0o644); err != nil {
+	if err := fileutil.WriteFile(checkPath, b, paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	now := time.Now()
@@ -80,12 +81,12 @@ func TestLoadObjectComplianceSnapshot_Trend(t *testing.T) {
 
 func TestLoadObjectComplianceSnapshot_SkipsEmptySummary(t *testing.T) {
 	root := t.TempDir()
-	preCommit := filepath.Join(root, ".zqk", "pre-commit")
-	if err := fileutil.MkdirAll(preCommit, 0o755); err != nil {
+	preCommit := filepath.Join(root, paths.ProjectDataDir, "pre-commit")
+	if err := fileutil.MkdirAll(preCommit, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	empty := []byte(`{"summary":{"total_objects":0,"blocking_issues":0,"total_issues":0}}`)
-	if err := fileutil.WriteFile(filepath.Join(preCommit, "system-check.json"), empty, 0o644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(preCommit, "system-check.json"), empty, paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	snap := loadObjectComplianceSnapshot(root)

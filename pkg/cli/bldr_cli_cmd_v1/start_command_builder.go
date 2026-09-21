@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // NewStartCommandBuilder creates a new start command
@@ -21,7 +22,7 @@ func NewStartCommandBuilder() *cobra.Command {
 	help.WithDescriptionLines("  - Create audit events for job execution")
 	help.WithDescriptionLines("")
 	help.WithDescriptionLines("Default: runs in the background (detached process). Use --foreground to attach and stream logs.")
-	help.WithDescriptionLines("If the daemon exits (crash or stop), run zqk scheduler start again to bring it back.")
+	help.WithDescriptionLines(paths.RewriteCanonicalCLIInvocations("If the daemon exits (crash or stop), run zqk scheduler start again to bring it back."))
 	help.AddExample("Start scheduler daemon", "%s scheduler start")
 	help.ExcludeFlag("format")
 	help.ExcludeFlag("output")

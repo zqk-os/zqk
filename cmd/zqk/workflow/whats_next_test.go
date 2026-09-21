@@ -285,14 +285,14 @@ func TestWhatsNextWorkerAgentIDSelectsSeatedPlan(t *testing.T) {
 func writeWhatsNextPeerSeats(t *testing.T, root string, seats map[string]agentfeed.PeerSeatRecord) {
 	t.Helper()
 	dir := filepath.Join(root, paths.ProjectDataDir, paths.StateDir, paths.MeshStateSubdir)
-	if err := fileutil.MkdirAll(dir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	raw, err := json.Marshal(agentfeed.PeerSeatsFile{SchemaVersion: "1", Seats: seats})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(filepath.Join(dir, paths.PeerSeatsFile), raw, 0o644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(dir, paths.PeerSeatsFile), raw, paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 }

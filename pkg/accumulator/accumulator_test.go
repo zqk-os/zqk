@@ -12,6 +12,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -29,6 +30,7 @@ type MockAccumulator struct {
 	name         string
 	itemStatuses map[string]string
 	scanCount    uint32
+	scanBlockCh  chan struct{}
 }
 
 func NewMockAccumulator(name string) *MockAccumulator {
@@ -92,6 +94,13 @@ func (m *MockAccumulator) BuildPayload() SamplePayload {
 }
 
 func (m *MockAccumulator) ScanFromStorage(ctx context.Context, sp storage.ObjectStorageProvider) error {
+	if m.scanBlockCh != nil {
+		select {
+		case <-m.scanBlockCh:
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+	}
 	atomic.AddUint32(&m.scanCount, 1)
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -135,7 +144,7 @@ func TestAccumulator_BuilderAndEngineConfig(t *testing.T) {
 		t.Errorf("expected tolerance 30s, got %v", spec.StalenessTolerance)
 	}
 
-	expectedPath := filepath.Join(tmpDir, ".zqk", "state", "test_metrics_lite.json")
+	expectedPath := filepath.Join(tmpDir, paths.ProjectDataDir, paths.StateDir, "test_metrics_lite.json")
 	if engine.StoragePath() != expectedPath {
 		t.Errorf("expected storage path %q, got %q", expectedPath, engine.StoragePath())
 	}
@@ -305,6 +314,9 @@ func TestAccumulator_StalenessCircuitBreaker(t *testing.T) {
 func TestAccumulator_DebounceConcurrency(t *testing.T) {
 	tmpDir := t.TempDir()
 	acc := NewMockAccumulator("debounce_test")
+	blockCh := make(chan struct{})
+	acc.scanBlockCh = blockCh
+	defer close(blockCh)
 
 	engine, err := NewBuilder[SamplePayload](acc).
 		WithProjectRoot(tmpDir).
@@ -338,8 +350,8 @@ func TestAccumulator_DebounceConcurrency(t *testing.T) {
 // TestAccumulator_WALSubscription satisfies CRIT-1789551839272714000-27a0ccc0 incremental WAL ingestion.
 func TestAccumulator_WALSubscription(t *testing.T) {
 	tmpDir := t.TempDir()
-	walDir := filepath.Join(tmpDir, ".zqk", "state")
-	if err := fileutil.MkdirAll(walDir, 0755); err != nil {
+	walDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.StateDir)
+	if err := fileutil.MkdirAll(walDir, paths.DirPerm755); err != nil {
 		t.Fatalf("mkdir state dir: %v", err)
 	}
 
@@ -407,7 +419,7 @@ func TestEngine_DualFormatDeserialization(t *testing.T) {
 		Name:               "mock_view",
 		SchemaVersion:      "1.0.0",
 		ProjectRoot:        tempDir,
-		StoragePath:        filepath.Join(tempDir, ".zqk", "state", "mock_view_lite.json"),
+		StoragePath:        filepath.Join(tempDir, paths.ProjectDataDir, paths.StateDir, "mock_view_lite.json"),
 		StalenessTolerance: 2 * time.Minute,
 	}
 
@@ -417,7 +429,7 @@ func TestEngine_DualFormatDeserialization(t *testing.T) {
 		t.Fatalf("new engine: %v", err)
 	}
 
-	if err := os.MkdirAll(filepath.Dir(spec.StoragePath), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(spec.StoragePath), paths.DirPerm755); err != nil {
 		t.Fatalf("mkdir state: %v", err)
 	}
 
@@ -436,7 +448,7 @@ func TestEngine_DualFormatDeserialization(t *testing.T) {
 		t.Fatalf("marshal legacy flat: %v", err)
 	}
 
-	if err := os.WriteFile(spec.StoragePath, legacyFlatJSON, 0644); err != nil {
+	if err := os.WriteFile(spec.StoragePath, legacyFlatJSON, paths.FilePerm644); err != nil {
 		t.Fatalf("write legacy flat file: %v", err)
 	}
 
@@ -474,7 +486,7 @@ func TestEngine_DualFormatDeserialization(t *testing.T) {
 		t.Fatalf("marshal envelope: %v", err)
 	}
 
-	if err := os.WriteFile(spec.StoragePath, envelopeJSON, 0644); err != nil {
+	if err := os.WriteFile(spec.StoragePath, envelopeJSON, paths.FilePerm644); err != nil {
 		t.Fatalf("write envelope file: %v", err)
 	}
 

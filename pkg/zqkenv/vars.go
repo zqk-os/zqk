@@ -31,9 +31,10 @@ const _sfxAgentMaxVerificationAttempts = "AGENT_MAX_VERIFICATION_ATTEMPTS"
 const _sfxAgentSyncMaxStagnantTicks = "AGENT_SYNC_MAX_STAGNANT_TICKS"
 const _sfxAPIKey = "API_KEY"
 const _sfxAggregationMetricCreationTimeout = "AGGREGATION_METRIC_CREATION_TIMEOUT"
-const _sfxAllowForegroundGoTest = "ALLOW_FOREGROUND_GO_TEST"
 const _sfxBin = "BIN"
 const _sfxBulkBenchSize = "BULK_BENCH_SIZE"
+const _sfxLocalCIDir = "LOCAL_CI_DIR"
+const _sfxLocalCIArchiveKeep = "LOCAL_CI_ARCHIVE_KEEP"
 
 const _sfxCacheDiagnosticEnabled = "CACHE_DIAGNOSTIC_ENABLED"
 const _sfxCacheDiagnosticObjects = "CACHE_DIAGNOSTIC_OBJECTS"
@@ -208,6 +209,12 @@ func AgentID() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxAgentID)} }
 // AgentSyncMaxLoops returns the env var for AGENT_SYNC_MAX_LOOPS (brand-prefixed).
 // Sync-loop outer poll guard; default 100. TRACK: BLI-1783631896775129000-de3fef87
 func AgentSyncMaxLoops() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxAgentSyncMaxLoops)} }
+
+// LocalCIDir returns the environment variable name for LOCAL_CI_DIR (brand-prefixed).
+func LocalCIDir() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxLocalCIDir)} }
+
+// LocalCIArchiveKeep returns the environment variable name for LOCAL_CI_ARCHIVE_KEEP (brand-prefixed).
+func LocalCIArchiveKeep() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxLocalCIArchiveKeep)} }
 
 // AgentMaxVerificationAttempts returns AGENT_MAX_VERIFICATION_ATTEMPTS (brand-prefixed).
 // Per-step verification retry cap; default 3. TRACK: BLI-1783631896775129000-de3fef87
@@ -697,18 +704,11 @@ func TestMode() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxTestMode)} }
 
 // TestRoot returns the environment variable name for TEST_ROOT (brand-prefixed).
 //
-// This names a *location*: the project root to resolve against. Do not use it to express the
-// *permission* to do something (see AllowForegroundGoTest). Conflating the two has cost this repo
-// twice — once as falsely-green delete guards (see storage.denyCoreKernelHardDelete) and once as an
-// agent guard whose own bypass advice relocated the CLI's project root, so following the advice
-// broke every later command in that shell with an unrelated-looking account schema error.
+// This names a *location*: the project root to resolve against, not a permission flag.
 func TestRoot() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxTestRoot)} }
 
-// AllowForegroundGoTest returns the environment variable name for ALLOW_FOREGROUND_GO_TEST
-// (brand-prefixed). It grants exactly one thing: permission to run `go test` in the foreground
-// without the agent guard panicking. It changes no paths and no behavior, which is the point —
-// it is safe to export into a long-lived shell.
-func AllowForegroundGoTest() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxAllowForegroundGoTest)} }
+// SharedTestBin returns the environment variable name for SHARED_TEST_BIN (brand-prefixed).
+func SharedTestBin() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxSharedTestBin)} }
 
 // SharedTestBin returns the environment variable name for SHARED_TEST_BIN (brand-prefixed).
 func SharedTestBin() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxSharedTestBin)} }
@@ -743,7 +743,6 @@ const (
 	_rawEnvPath                  = "PATH"
 	_rawEnvUser                  = "USER"
 	_rawEnvUsername              = "USERNAME"
-	_rawZqkGraphEnabledLegacy    = "ZQK_GRAPH_ENABLED"
 )
 
 // AutofixBatchChunkSize returns the env var for autofix transactional chunk size (unprefixed; scheduler/automation contract).
@@ -765,7 +764,7 @@ func POSIXUser() EnvVar { return EnvVar{Key: _rawEnvUser} }
 func POSIXUsername() EnvVar { return EnvVar{Key: _rawEnvUsername} }
 
 // ZqkGraphEnabledLegacy returns the legacy ZQK_GRAPH_ENABLED toggle (tests / older tooling).
-func ZqkGraphEnabledLegacy() EnvVar { return EnvVar{Key: _rawZqkGraphEnabledLegacy} }
+func ZqkGraphEnabledLegacy() EnvVar { return EnvVar{Key: DefaultBrandKey("GRAPH_ENABLED")} }
 
 const _sfxSchedulerDaemonMode = "SCHEDULER_DAEMON_MODE"
 
@@ -780,17 +779,12 @@ const _sfxWatchdogTimeout = "WATCHDOG_TIMEOUT"
 
 func WatchdogTimeout() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxWatchdogTimeout)} }
 
-const _sfxZqkShimBypassTraceability = "SHIM_BYPASS_TRACEABILITY"
+const _sfxZqkShimBypassTraceability = "SHIM_BYPASS_TRACEABILITY" //nolint:gosec
 
 // ZqkShimBypassTraceability returns the canonical environment variable name for bypassing shim commit traceability.
 func ZqkShimBypassTraceability() EnvVar {
 	return EnvVar{Key: brand.EnvVar(_sfxZqkShimBypassTraceability)}
 }
-
-// ZqkShimBypassPolCode009 is a deprecated alias for ZqkShimBypassTraceability (retained for backward compatibility).
-const _sfxZqkShimBypassPolCode009 = "ZQK_SHIM_BYPASS_POLCODE009" //nolint:gosec
-
-func ZqkShimBypassPolCode009() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxZqkShimBypassPolCode009)} }
 
 const _sfxBreakGlassReason = "BREAK_GLASS_REASON"
 
@@ -934,7 +928,9 @@ func MCPRunDeadlockReproduction() EnvVar { return EnvVar{Key: "MCP_RUN_DEADLOCK_
 
 // Aliases for prefix-less internal vars that need a specific ZQK-equivalent function
 func ZQKCLITestUpdateHelpGolden() EnvVar { return EnvVar{Key: "ZQKCLI_TEST_UPDATE_HELP_GOLDEN"} }
-func ZQKAllowForegroundGoTest() EnvVar   { return EnvVar{Key: "ZQK_ALLOW_FOREGROUND_GO_TEST"} }
-func ZqkEnv() EnvVar                     { return EnvVar{Key: "ZQK_ENV"} }
-func ZQKProjectRoot() EnvVar             { return EnvVar{Key: brand.DefaultEnvPrefix + "_PROJECT_ROOT"} }
-func ZQKTestRoot() EnvVar                { return EnvVar{Key: brand.DefaultEnvPrefix + "_TEST_ROOT"} }
+func ZqkEnv() EnvVar                     { return Env() }
+func ZQKProjectRoot() EnvVar             { return EnvVar{Key: DefaultBrandKey("PROJECT_ROOT")} }
+func ZQKTestRoot() EnvVar                { return EnvVar{Key: DefaultBrandKey("TEST_ROOT")} }
+func WorkerLane() EnvVar                 { return EnvVar{Key: brand.EnvVar("WORKER_LANE")} }
+func SeatWorkerLane() EnvVar             { return EnvVar{Key: brand.EnvVar("SEAT_WORKER_LANE")} }
+func WorkerLanes() EnvVar                { return EnvVar{Key: brand.EnvVar("WORKER_LANES")} }

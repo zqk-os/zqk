@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/scheduler/hostservice"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -26,7 +27,7 @@ func TestRegistryUpsertFindOrphans(t *testing.T) {
 	dir := t.TempDir()
 	missing := filepath.Join(dir, "gone")
 	present := filepath.Join(dir, "alive")
-	if err := fileutil.MkdirAll(present, 0o755); err != nil {
+	if err := fileutil.MkdirAll(present, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	reg := &hostservice.Registry{}

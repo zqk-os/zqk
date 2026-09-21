@@ -9,6 +9,7 @@ import (
 
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/migration/parser"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -110,7 +111,7 @@ func checkIntegrityCAS(ctx *cli.Context, obj *parser.ParsedObject, filePath, kin
 			Category:    "integrity",
 			Message:     fmt.Sprintf("CAS index hash mismatch - filename has %s, index has %s (index may be corrupted)", expectedHash[:16], hash[:16]),
 			AutoFixable: true,
-			FixCommand:  fmt.Sprintf("zqk system cleanup-duplicates %s --hash-duplicates", kind),
+			FixCommand:  paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("zqk system cleanup-duplicates %s --hash-duplicates", kind)),
 		})
 		return issues, autoFixed
 	}

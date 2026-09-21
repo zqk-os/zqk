@@ -8,6 +8,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/graph/provider"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // IntentPrediction represents an anticipated action or object based on historical behavior.
@@ -63,7 +64,7 @@ func (e *IntentPredictionHeuristicsEngine) PredictFromRecentMessages(ctx context
 			// Heuristic 1: If user just created a "goal" via CLI, they will likely need to create a "requirement" next.
 			if kind == "cli_command" {
 				cmdPayload, _ := props["payload_command"].(string)
-				if strings.Contains(cmdPayload, "zqk object create goal") {
+				if strings.Contains(paths.CLIInvocation(cmdPayload), "object create goal") {
 					predictions = append(predictions, IntentPrediction{
 						TargetAction: "create_requirement",
 						TargetObject: "requirement",

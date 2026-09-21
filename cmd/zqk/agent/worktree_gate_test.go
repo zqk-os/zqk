@@ -5,6 +5,8 @@ import (
 	"errors"
 	"path/filepath"
 	"testing"
+
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 func TestIsAgentWorktree(t *testing.T) {
@@ -13,13 +15,13 @@ func TestIsAgentWorktree(t *testing.T) {
 		root string
 		want bool
 	}{
-		{"/repo/.zqk/worktrees/ATK-1", true},
+		{filepath.Join("/repo", paths.ProjectDataDir, paths.WorktreesSubdir, "ATK-1"), true},
 		{"/tmp/zqk-worktrees/repo-abcd/ATK-1", true},
-		{"/repo/.zqk/worktrees/ATK-1/subdir", true},
+		{filepath.Join("/repo", paths.ProjectDataDir, paths.WorktreesSubdir, "ATK-1", "subdir"), true},
 		{"/tmp/ATK-1", true},
 		{"/private/tmp/ATK-99", true},
 		{"/repo", false},
-		{"/repo/.zqk/local-ci/workdir", false},
+		{filepath.Join("/repo", paths.ProjectDataDir, "local-ci", "workdir"), false},
 	}
 	for _, tc := range cases {
 		if got := isAgentWorktree(tc.root); got != tc.want {
@@ -28,13 +30,16 @@ func TestIsAgentWorktree(t *testing.T) {
 	}
 }
 
-func TestAgentWorktreeMainRepo(t *testing.T) {
+func TestAgentWorktreeMainRepo_doesNotHopParents(t *testing.T) {
 	t.Parallel()
-	wt := filepath.Join("/Users/x/proj", ".zqk", "worktrees", "ATK-1")
-	got := agentWorktreeMainRepo(wt)
-	want := "/Users/x/proj"
-	if got != want {
-		t.Fatalf("got %q want %q", got, want)
+	wt := filepath.Join("/tmp/zqk-worktrees/repo-abcd/ATK-1")
+	got, err := agentWorktreeMainRepo(wt)
+	if err == nil {
+		t.Fatalf("isolated path without seated kernel must not resolve; got %q", got)
+	}
+	hop := filepath.Dir(filepath.Dir(filepath.Dir(wt)))
+	if got == hop {
+		t.Fatalf("three Dir hops leaked: %q", got)
 	}
 }
 
@@ -52,5 +57,12 @@ func TestWorktreeBuildCheck_Hook(t *testing.T) {
 	err := worktreeBuildCheck(context.Background(), "/tmp/wt")
 	if !called || err == nil {
 		t.Fatalf("hook not applied: called=%v err=%v", called, err)
+	}
+}
+
+func TestDefaultWorktreeBuildCheck_delegatesToAdapter(t *testing.T) {
+	t.Parallel()
+	if err := defaultWorktreeBuildCheck(context.Background(), t.TempDir()); err != nil {
+		t.Fatalf("non-Go worktree must skip via adapter, not fail: %v", err)
 	}
 }

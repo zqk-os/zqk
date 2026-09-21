@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 
 	"github.com/spf13/cobra"
@@ -32,143 +33,144 @@ import (
 func NewValidateAgentCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewAgentValidateCommandBuilder()
 	cmd.Use = "agent"
-	cmd.RunE = cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-		projectRoot := proc.ProjectRoot()
-		if projectRoot == "" {
-			return errfmt.Errorf("project root is required")
-		}
+	cmd.RunE = cli.WithProcessor(RunValidateAgent)
+	return cmd
+}
 
-		var flags clipkg.FlagBag
-		stamp := flags.String(cmd, "stamp")
-		localFallback := flags.Bool(cmd, "local-fallback")
-		if err := flags.Err(); err != nil {
-			return err
-		}
-		if stamp != "" {
-			var claims map[string]interface{}
-			if localFallback {
-				pubKey, err := agent.GetAuthorizedPublicKey()
-				if err != nil {
-					return errfmt.Errorf("failed to get authorized public key: %w", err)
-				}
-				claims, err = agent.VerifyStamp(stamp, pubKey)
-				if err != nil {
-					return errfmt.Errorf("cryptographic stamp verification failed: %w", err)
-				}
-			} else {
-				pubKeyEnv := zqkenv.AgentPubKey().Get()
-				if pubKeyEnv == "" {
-					return errfmt.Errorf("%s must be set to verify cryptographic stamp", zqkenv.AgentPubKey())
-				}
-				claimsStruct, err := crypto.VerifyStamp(stamp, pubKeyEnv)
-				if err != nil {
-					return errfmt.Errorf("cryptographic stamp verification failed: %w", err)
-				}
-				claims = map[string]interface{}{
-					"AgentID": claimsStruct.AgentID,
-					"Commit":  claimsStruct.Commit,
-				}
+// RunValidateAgent is the shared processor for `zqk agent validate` and `zqk validate agent`.
+func RunValidateAgent(cmd *cobra.Command, args []string, proc *cli.Processor) error {
+	projectRoot := proc.ProjectRoot()
+	if projectRoot == "" {
+		return errfmt.Errorf("project root is required")
+	}
+
+	var flags clipkg.FlagBag
+	stamp := flags.String(cmd, "stamp")
+	localFallback := flags.Bool(cmd, "local-fallback")
+	if err := flags.Err(); err != nil {
+		return err
+	}
+	if stamp != "" {
+		var claims map[string]interface{}
+		if localFallback {
+			pubKey, err := agent.GetAuthorizedPublicKey()
+			if err != nil {
+				return errfmt.Errorf("failed to get authorized public key: %w", err)
 			}
-			agentID, _ := claims["AgentID"].(string)
-			commit, _ := claims["Commit"].(string)
-			if agentID == "" && claims["agent_id"] != nil {
-				agentID = claims["agent_id"].(string)
+			claims, err = agent.VerifyStamp(stamp, pubKey)
+			if err != nil {
+				return errfmt.Errorf("cryptographic stamp verification failed: %w", err)
 			}
-			if commit == "" && claims["commit"] != nil {
-				commit = claims["commit"].(string)
+		} else {
+			pubKeyEnv := zqkenv.AgentPubKey().Get()
+			if pubKeyEnv == "" {
+				return errfmt.Errorf("%s must be set to verify cryptographic stamp", zqkenv.AgentPubKey())
 			}
-			cmd.Printf("✅ Verified cryptographic stamp for agent %s (commit: %s)\n", agentID, commit)
+			claimsStruct, err := crypto.VerifyStamp(stamp, pubKeyEnv)
+			if err != nil {
+				return errfmt.Errorf("cryptographic stamp verification failed: %w", err)
+			}
+			claims = map[string]interface{}{
+				"AgentID": claimsStruct.AgentID,
+				"Commit":  claimsStruct.Commit,
+			}
 		}
-
-		cmd.Println("🔍 Scanning for modified Go files...")
-		changedFiles, err := findChangedGoFiles(projectRoot)
-		if err != nil {
-			return errfmt.Newf("failed to scan changed files").Wrap(err)
+		agentID, _ := claims["AgentID"].(string)
+		commit, _ := claims["Commit"].(string)
+		if agentID == "" && claims["agent_id"] != nil {
+			agentID = claims["agent_id"].(string)
 		}
-
-		if len(changedFiles) == 0 {
-			cmd.Println("❌ No Go files changed. If this task modifies kernel objects, you must use a different verification_strategy or explicitly verify the objects.")
-			return errfmt.Errorf("validation failed: no code changes detected")
+		if commit == "" && claims["commit"] != nil {
+			commit = claims["commit"].(string)
 		}
+		cmd.Printf("✅ Verified cryptographic stamp for agent %s (commit: %s)\n", agentID, commit)
+	}
 
-		// Enforce target artifact/package changes if ZQK_TASK_ARTIFACTS is set
-		if targetArtsEnv := zqkenv.TaskArtifacts().Get(); targetArtsEnv != "" {
-			targetArts := strings.Split(targetArtsEnv, ",")
-			hasTargetChange := false
-			for _, changedFile := range changedFiles {
-				// Get path relative to projectRoot
-				relFile, err := filepath.Rel(projectRoot, changedFile)
-				if err != nil {
+	cmd.Println("🔍 Scanning for modified Go files...")
+	changedFiles, err := findChangedGoFiles(projectRoot)
+	if err != nil {
+		return errfmt.Newf("failed to scan changed files").Wrap(err)
+	}
+
+	if len(changedFiles) == 0 {
+		cmd.Println("❌ No Go files changed. If this task modifies kernel objects, you must use a different verification_strategy or explicitly verify the objects.")
+		return errfmt.Errorf("validation failed: no code changes detected")
+	}
+
+	// Enforce target artifact/package changes if ZQK_TASK_ARTIFACTS is set
+	if targetArtsEnv := zqkenv.TaskArtifacts().Get(); targetArtsEnv != "" {
+		targetArts := strings.Split(targetArtsEnv, ",")
+		hasTargetChange := false
+		for _, changedFile := range changedFiles {
+			// Get path relative to projectRoot
+			relFile, err := filepath.Rel(projectRoot, changedFile)
+			if err != nil {
+				continue
+			}
+			for _, art := range targetArts {
+				art = strings.TrimSpace(art)
+				if art == "" {
 					continue
 				}
-				for _, art := range targetArts {
-					art = strings.TrimSpace(art)
-					if art == "" {
-						continue
-					}
-					// If the artifact is a directory, check if the changed file is inside it
-					// If it's a file, check if it matches exactly
-					if strings.HasPrefix(relFile, art) || strings.Contains(filepath.ToSlash(relFile), filepath.ToSlash(art)) {
-						hasTargetChange = true
-						break
-					}
-				}
-				if hasTargetChange {
+				// If the artifact is a directory, check if the changed file is inside it
+				// If it's a file, check if it matches exactly
+				if strings.HasPrefix(relFile, art) || strings.Contains(filepath.ToSlash(relFile), filepath.ToSlash(art)) {
+					hasTargetChange = true
 					break
 				}
 			}
-			if !hasTargetChange {
-				cmd.Printf("❌ Validation Rejected: No changes detected in required target artifacts/packages: %s\n", targetArtsEnv)
-				return errfmt.Errorf("validation failed: no changes detected in required target artifacts: %s. You must write/modify the required code files to complete the task.", targetArtsEnv)
-			}
-			cmd.Printf("✅ Verified: Changes detected in target artifacts: %s\n", targetArtsEnv)
-		}
-
-		cmd.Println("🔍 Ingesting and checking AST violations...")
-		for _, file := range changedFiles {
-			if err := checkASTViolations(file); err != nil {
-				return errfmt.Newf("compliance violation").Wrap(err)
+			if hasTargetChange {
+				break
 			}
 		}
-
-		cmd.Println("🔍 Verifying matrix compliance (POL-AGENT-003)...")
-		if err := verifyVettingMatrix(projectRoot, changedFiles); err != nil {
-			return err
+		if !hasTargetChange {
+			cmd.Printf("❌ Validation Rejected: No changes detected in required target artifacts/packages: %s\n", targetArtsEnv)
+			return errfmt.Errorf("validation failed: no changes detected in required target artifacts: %s. You must write/modify the required code files to complete the task.", targetArtsEnv)
 		}
+		cmd.Printf("✅ Verified: Changes detected in target artifacts: %s\n", targetArtsEnv)
+	}
 
-		pkgs := getImpactedPackages(projectRoot, changedFiles)
-		cmd.Printf("📦 Impacted packages:\n")
-		for _, p := range pkgs {
-			cmd.Printf("  - %s\n", p)
+	cmd.Println("🔍 Ingesting and checking AST violations...")
+	for _, file := range changedFiles {
+		if err := checkASTViolations(file); err != nil {
+			return errfmt.Newf("compliance violation").Wrap(err)
 		}
+	}
 
-		// Compilation and targeted tests have been removed to obey the mandate.
-		// All validation must go through the scheduler via test-bundles.
-		cmd.Println("✅ Validation analysis complete. Preparing test bundles...")
+	cmd.Println("🔍 Verifying matrix compliance (POL-AGENT-003)...")
+	if err := verifyVettingMatrix(projectRoot, changedFiles); err != nil {
+		return err
+	}
 
-		// Asynchronously queue background test-bundles
-		cmd.Println("⏳ Queueing test-bundles for background exhaustive verification...")
-		exe, err := fileutil.Executable()
-		if err == nil {
-			commaPkgs := strings.Join(pkgs, ",")
-			scanCmd := execwrap.Command(exe, "scheduler", "scan-tests", "--package", commaPkgs)
-			scanCmd.Dir = projectRoot
-			if err := scanCmd.Start(); err == nil {
-				goroutinelabels.NewGoroutine("scan_tests_wait", "waiting for background scan-tests process").
-					StartSimple(func() {
-						_ = scanCmd.Wait()
-					})
-				cmd.Println("✅ Background verification queued successfully.")
-			} else {
-				cmd.Printf("⚠️ Background verification queue failed: %v\n", err)
-			}
+	pkgs := getImpactedPackages(projectRoot, changedFiles)
+	cmd.Printf("📦 Impacted packages:\n")
+	for _, p := range pkgs {
+		cmd.Printf("  - %s\n", p)
+	}
+
+	// Compilation and targeted tests have been removed to obey the mandate.
+	// All validation must go through the scheduler via test-bundles.
+	cmd.Println("✅ Validation analysis complete. Preparing test bundles...")
+
+	// Asynchronously queue background test-bundles
+	cmd.Println("⏳ Queueing test-bundles for background exhaustive verification...")
+	exe, err := fileutil.Executable()
+	if err == nil {
+		commaPkgs := strings.Join(pkgs, ",")
+		scanCmd := execwrap.Command(exe, "scheduler", "scan-tests", "--package", commaPkgs)
+		scanCmd.Dir = projectRoot
+		if err := scanCmd.Start(); err == nil {
+			goroutinelabels.NewGoroutine("scan_tests_wait", "waiting for background scan-tests process").
+				StartSimple(func() {
+					_ = scanCmd.Wait()
+				})
+			cmd.Println("✅ Background verification queued successfully.")
+		} else {
+			cmd.Printf("⚠️ Background verification queue failed: %v\n", err)
 		}
+	}
 
-		return nil
-	})
-	cmd.Flags().String("stamp", "", "Cryptographic stamp to verify")
-	cmd.Flags().Bool("local-fallback", false, "Use local offline fallback to verify stamp")
-	return cmd
+	return nil
 }
 
 func findChangedGoFiles(projectRoot string) ([]string, error) {
@@ -232,6 +234,10 @@ func checkASTViolations(filePath string) error {
 		if fileutil.IsNotExist(err) {
 			return nil
 		}
+		return err
+	}
+
+	if err := checkCommandCtorPattern(filePath, node); err != nil {
 		return err
 	}
 
@@ -402,7 +408,7 @@ func verifyVettingMatrix(projectRoot string, changedFiles []string) error {
 			vettedVal := strings.TrimSpace(rec[vettedIdx])
 			refactoredVal := strings.TrimSpace(rec[refactoredIdx])
 			if vettedVal != "yes" || refactoredVal != "yes" {
-				return errfmt.Errorf("file %s is modified but its row in %s is not marked as fully_vetted=yes and fully_refactored_dry=yes (got fully_vetted=%s, fully_refactored_dry=%s). You must run 'zqk matrix update --file-path %s --set fully_vetted=yes --set fully_refactored_dry=yes' first.", filePath, filepath.Base(csvPath), vettedVal, refactoredVal, filePath)
+				return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("file %s is modified but its row in %s is not marked as fully_vetted=yes and fully_refactored_dry=yes (got fully_vetted=%s, fully_refactored_dry=%s). You must run 'zqk matrix update --file-path %s --set fully_vetted=yes --set fully_refactored_dry=yes' first.", filePath, filepath.Base(csvPath), vettedVal, refactoredVal, filePath)))
 			}
 		}
 	}

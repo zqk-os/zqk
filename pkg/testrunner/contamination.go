@@ -137,7 +137,7 @@ func RunWithContaminationCheck(ctx context.Context, opts ContaminationCheckOptio
 		return 2, ContaminationDiff{}, err
 	}
 
-	cmd := exec.CommandContext(ctx, command[0], command[1:]...)
+	cmd := exec.CommandContext(ctx, command[0], command[1:]...) //nolint:gosec // test runner exec
 	cmd.Dir = opts.ProjectRoot
 	cmd.Stdout = stdout
 	cmd.Stderr = stderr

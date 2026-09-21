@@ -14,15 +14,3 @@ const (
 	wireLegacyBacklogItemIDs       = "backlog_item_ids"
 	wireLegacyConvergenceSessionID = "convergence_session_id"
 )
-
-// Semantic event_type / source values produced by repo pipelines (callers append via Append).
-const (
-	// EventTypeTestBundleMatrixVerifyOK is emitted when verify-test-bundle-matrix passes in quality.RunTestBundleMatrixPipeline.
-	EventTypeTestBundleMatrixVerifyOK = "test_bundle_matrix_verify_ok"
-	// SourceTestBundleMatrixPipeline identifies pkg/quality.RunTestBundleMatrixPipeline.
-	SourceTestBundleMatrixPipeline = "test_bundle_matrix_pipeline"
-	// WirePayloadBundlePrefix is payload map key for TestBundleMatrixOptions.BundlePrefix when non-empty.
-	WirePayloadBundlePrefix = "bundle_prefix"
-	// WirePayloadStrictVerify is payload map key for TestBundleMatrixOptions.StrictVerify.
-	WirePayloadStrictVerify = "strict_verify"
-)

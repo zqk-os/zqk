@@ -67,7 +67,7 @@ func NewStorageFactory(ctx context.Context, projectRoot string) (*StorageFactory
 	isHybridLegacy := modeEnv == "hybrid_legacy" || config.SystemStorageModeHybridLegacy().OrDefault(false)
 
 	useMockGraph := config.StorageMockGraph().OrDefault(false)
-	sockPath := filepath.Join(projectRoot, paths.ProjectDataDir, "scheduler", "rpcpool.sock")
+	sockPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.SchedulerSubdir, "rpcpool.sock")
 	socketAlive := false
 	if _, statErr := fileutil.Stat(sockPath); statErr == nil {
 		if conn, err := net.Dial("unix", sockPath); err == nil {

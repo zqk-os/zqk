@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // NewObjectBulkUpdateCommandBuilder creates a new object_bulk_update command
@@ -32,7 +33,7 @@ func NewObjectBulkUpdateCommandBuilder() *cobra.Command {
 	help.WithDescriptionLines("      status: validated")
 	help.WithDescriptionLines("")
 	help.WithDescriptionLines("When using --file, the object kind is required as the first argument (e.g.")
-	help.WithDescriptionLines("`zqk object bulk update backlog_item --file updates.yaml`).")
+	help.WithDescriptionLines(paths.RewriteCanonicalCLIInvocations("`zqk object bulk update backlog_item --file updates.yaml`)."))
 	help.WithDescriptionLines("--file is mutually exclusive with --filter and --set.")
 	help.WithDescriptionLines("")
 	help.WithDescriptionLines("Optional --fields restricts each updated object in the success payload to those top-level keys")

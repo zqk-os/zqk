@@ -229,7 +229,7 @@ func ResolveSlackWebhookURL(projectRoot string) string {
 
 	// 2. Check .zqk/config/escalation.json
 	if projectRoot != "" {
-		configPath := filepath.Join(projectRoot, paths.ProjectDataDir, "config", "escalation.json")
+		configPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, "escalation.json")
 		if data, err := fileutil.ReadFile(configPath); err == nil {
 			var config struct {
 				SlackWebhookURL string `json:"slack_webhook_url"`
@@ -240,12 +240,12 @@ func ResolveSlackWebhookURL(projectRoot string) string {
 		}
 
 		// 3. Check .zqk/config/agent_git_identity.env
-		identityPath := filepath.Join(projectRoot, paths.ProjectDataDir, "config", "agent_git_identity.env")
+		identityPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, "agent_git_identity.env")
 		if data, err := fileutil.ReadFile(identityPath); err == nil {
 			for _, line := range strings.Split(string(data), "\n") {
 				line = strings.TrimSpace(line)
-				if strings.HasPrefix(line, "ZQK_AGENT_WEBHOOK_SLACK_ALL_AGENT_FARM=") {
-					val := strings.TrimSpace(strings.TrimPrefix(line, "ZQK_AGENT_WEBHOOK_SLACK_ALL_AGENT_FARM="))
+				if strings.HasPrefix(line, zqkenv.AgentWebhookSlackAllAgentFarm().Name()+"=") {
+					val := strings.TrimSpace(strings.TrimPrefix(line, zqkenv.AgentWebhookSlackAllAgentFarm().Name()+"="))
 					if val != "" {
 						return strings.Trim(val, "\"'")
 					}
@@ -264,8 +264,8 @@ func ResolveSlackWebhookURL(projectRoot string) string {
 		if data, err := fileutil.ReadFile(envPath); err == nil {
 			for _, line := range strings.Split(string(data), "\n") {
 				line = strings.TrimSpace(line)
-				if strings.HasPrefix(line, "ZQK_AGENT_WEBHOOK_SLACK_ALL_AGENT_FARM=") {
-					val := strings.TrimSpace(strings.TrimPrefix(line, "ZQK_AGENT_WEBHOOK_SLACK_ALL_AGENT_FARM="))
+				if strings.HasPrefix(line, zqkenv.AgentWebhookSlackAllAgentFarm().Name()+"=") {
+					val := strings.TrimSpace(strings.TrimPrefix(line, zqkenv.AgentWebhookSlackAllAgentFarm().Name()+"="))
 					if val != "" {
 						return strings.Trim(val, "\"'")
 					}
@@ -361,7 +361,7 @@ func (p *CommandEscalationProvider) Escalate(ctx context.Context, notice Escalat
 	if promptDir == "" {
 		promptDir = fileutil.TempDir()
 	}
-	stateDir := filepath.Join(promptDir, paths.ProjectDataDir, "state")
+	stateDir := filepath.Join(promptDir, paths.ProjectDataDir, paths.StateDir)
 	_ = fileutil.EnsureDir(stateDir) //nolint:errcheck
 
 	promptFile := filepath.Join(stateDir, "cap_escalation_prompt.txt")

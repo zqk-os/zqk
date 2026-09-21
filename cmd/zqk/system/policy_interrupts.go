@@ -13,6 +13,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/policyinterrupt"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
@@ -99,13 +100,13 @@ func runPolicyInterruptsList(cmd *cobra.Command, _ []string) error {
 			if rec.SuggestedAction != emptyValue {
 				out += "   action: " + rec.SuggestedAction + "\n"
 			} else {
-				out += "   action: zqk system policy-interrupts ack --dedupe-key " + rec.DedupeKey + "\n"
+				out += paths.RewriteCanonicalCLIInvocations("   action: zqk system policy-interrupts ack --dedupe-key ") + rec.DedupeKey + "\n"
 			}
 			if idx < len(interrupts)-1 {
 				out += "\n"
 			}
 		}
-		out += "\nEasy button: zqk system policy-interrupts ack --all\n"
+		out += paths.RewriteCanonicalCLIInvocations("\nEasy button: zqk system policy-interrupts ack --all\n")
 		out += "  (or --all --prefix qa-disparity- for disparity backlog only)\n"
 		return cli.WriteOutput(cmd, []byte(out))
 	}
@@ -265,7 +266,7 @@ func NewPolicyInterruptsEmitCmd() *cobra.Command {
 			DedupeKey:        dk,
 			PolicyID:         polID,
 			Message:          msg,
-			SuggestedAction:  "zqk system policy-interrupts ack --dedupe-key " + dk,
+			SuggestedAction:  paths.CLIUsage("system", "policy-interrupts", "ack", "--dedupe-key", dk),
 			ExpiresAtRFC3339: exp,
 			OriginOperation:  cmd.CommandPath(),
 			OriginActorID:    pkgctx.SystemAccountID,

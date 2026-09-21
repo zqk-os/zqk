@@ -12,6 +12,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/testscan"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -106,13 +107,13 @@ func scanAndScheduleTests(cliCtx *cli.Context, cmd *cobra.Command) error {
 	setupBundles, _ := cmd.Flags().GetBool("setup-bundles")
 	out := cli.CommandOutputWriter(cmd, ctx)
 	if logger != nil {
-		logger.Warn("zqk scheduler scan-tests is deprecated; migrate to zqk test discover and zqk test run",
+		logger.Warn(paths.CLIUsage("scheduler", "scan-tests")+" is deprecated; migrate to "+paths.CLIUsage("test", "discover")+" and "+paths.CLIUsage("test", "run"),
 			logging.String("deprecation_code", "DEP-SCAN-TESTS-001"),
-			logging.String("alternative", "zqk test run"),
+			logging.String("alternative", paths.CLIUsage("test", "run")),
 		)
 	}
 	if out != nil {
-		_, _ = out.Write([]byte("⚠️  DEPRECATION NOTICE: 'zqk scheduler scan-tests' and disk test-bundles are deprecated. Use 'zqk test discover' and 'zqk test run' for universal test_case orchestration.\n"))
+		_, _ = out.Write([]byte("⚠️  DEPRECATION NOTICE: '" + paths.CLIUsage("scheduler", "scan-tests") + "' and disk test-bundles are deprecated. Use '" + paths.CLIUsage("test", "discover") + "' and '" + paths.CLIUsage("test", "run") + "' for universal test_case orchestration.\n"))
 	}
 
 	// Handle bundle listing
@@ -192,7 +193,7 @@ func resolveScanTestsSourceRoot(studioRoot string, cmd *cobra.Command) (string, 
 		}
 		return abs, nil
 	}
-	candidate := filepath.Join(studioRoot, ".zqk", "local-ci", "workdir")
+	candidate := filepath.Join(studioRoot, paths.ProjectDataDir, "local-ci", "workdir")
 	if st, err := fileutil.Stat(filepath.Join(candidate, "go.mod")); err == nil && !st.IsDir() {
 		abs, err := filepath.Abs(candidate)
 		if err != nil {

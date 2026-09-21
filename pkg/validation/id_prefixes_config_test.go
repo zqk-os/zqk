@@ -9,9 +9,9 @@ import (
 )
 
 // TestGlobalIDPrefixesConfigReload tests that the global config can be reloaded
-// This is important because GetGlobalIDPrefixesConfig() uses sync.Once, which means
-// it only loads once. If the config is loaded before the actual config file exists,
-// it will use the default config and never reload.
+// This is important because GetGlobalIDPrefixesConfig() memos by file stamp, which means
+// a miss before the file exists stays the default until ResetGlobalIDPrefixesConfig or
+// the discovered path's stamp moves.
 // NOTE: Cannot use t.Parallel() - this test changes working directory which conflicts with parallel execution
 func TestGlobalIDPrefixesConfigReload(t *testing.T) {
 	restoreIDValidatorGlobals(t)

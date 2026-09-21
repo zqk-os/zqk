@@ -28,12 +28,12 @@ import (
 func writeMeshLeaseDaemonStub(t *testing.T, projectRoot string) {
 	t.Helper()
 	binDir := filepath.Join(projectRoot, binDirName)
-	if err := fileutil.MkdirAll(binDir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(binDir, paths.DirPerm755); err != nil {
 		t.Fatalf("mkdir bin: %v", err)
 	}
 	stub := filepath.Join(binDir, zqkBinaryName)
 	script := "#!/bin/sh\n# mesh lease supervision test stub\nsleep 120\n"
-	if err := fileutil.WriteFile(stub, []byte(script), 0o755); err != nil {
+	if err := fileutil.WriteFile(stub, []byte(script), paths.DirPerm755); err != nil {
 		t.Fatalf("write daemon stub: %v", err)
 	}
 }
@@ -57,7 +57,7 @@ func cleanupMeshLeaseSubprocesses(t *testing.T) {
 func ensureMeshSpecsGenerated(t *testing.T, root string) {
 	t.Helper()
 	specsDir := filepath.Join(root, paths.ProcessInternalObjectSpecsDir)
-	if err := fileutil.MkdirAll(specsDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(specsDir, paths.DirPerm755); err != nil {
 		t.Fatalf("ensureMeshSpecsGenerated mkdir: %v", err)
 	}
 	if err := builders.NewSpecGenerator(specsDir).GenerateAllSpecs(); err != nil {
@@ -166,7 +166,7 @@ func TestMeshLeaseSupervision_Integration(t *testing.T) {
 
 	// Force the stream segment directly!
 	time.Sleep(200 * time.Millisecond)
-	streamDir := filepath.Join(providerRoot, ".zqk", "streams", "zqk_session")
+	streamDir := filepath.Join(providerRoot, paths.ProjectDataDir, paths.StreamsSubdir, "zqk_session")
 	if files, err := fileutil.ReadDir(streamDir); err == nil {
 		for _, file := range files {
 			if strings.HasSuffix(file.Name(), ".json") {
@@ -174,7 +174,7 @@ func TestMeshLeaseSupervision_Integration(t *testing.T) {
 				if data, err := fileutil.ReadFile(segmentPath); err == nil {
 					t.Logf("Before stream patch: %s", string(data))
 					modified := strings.ReplaceAll(string(data), "\"status\":\"conceptual\"", "\"status\":\"active\"")
-					_ = fileutil.WriteFile(segmentPath, []byte(modified), 0644)
+					_ = fileutil.WriteFile(segmentPath, []byte(modified), paths.FilePerm644)
 					t.Logf("After stream patch: %s", modified)
 				}
 			}
@@ -339,7 +339,7 @@ func TestMeshLeaseSupervision_QuotasAndRevocation(t *testing.T) {
 
 	// Force the stream segment directly!
 	time.Sleep(200 * time.Millisecond)
-	streamDir := filepath.Join(providerRoot, ".zqk", "streams", "zqk_session")
+	streamDir := filepath.Join(providerRoot, paths.ProjectDataDir, paths.StreamsSubdir, "zqk_session")
 	if files, err := fileutil.ReadDir(streamDir); err == nil {
 		for _, file := range files {
 			if strings.HasSuffix(file.Name(), ".json") {
@@ -347,7 +347,7 @@ func TestMeshLeaseSupervision_QuotasAndRevocation(t *testing.T) {
 				if data, err := fileutil.ReadFile(segmentPath); err == nil {
 					t.Logf("Before stream patch: %s", string(data))
 					modified := strings.ReplaceAll(string(data), "\"status\":\"conceptual\"", "\"status\":\"active\"")
-					_ = fileutil.WriteFile(segmentPath, []byte(modified), 0644)
+					_ = fileutil.WriteFile(segmentPath, []byte(modified), paths.FilePerm644)
 					t.Logf("After stream patch: %s", modified)
 				}
 			}
@@ -443,14 +443,14 @@ func TestMeshLeaseSupervision_QuotasAndRevocation(t *testing.T) {
 	storage.CreateCASVisible(t, providerStorage, ctx, secCtx, skillLease2, objects.ObjectStatusActive)
 
 	time.Sleep(200 * time.Millisecond)
-	streamDir2 := filepath.Join(providerRoot, ".zqk", "streams", "zqk_session")
+	streamDir2 := filepath.Join(providerRoot, paths.ProjectDataDir, paths.StreamsSubdir, "zqk_session")
 	if files, err := fileutil.ReadDir(streamDir2); err == nil {
 		for _, file := range files {
 			if strings.HasSuffix(file.Name(), ".json") {
 				segmentPath := filepath.Join(streamDir2, file.Name())
 				if data, err := fileutil.ReadFile(segmentPath); err == nil {
 					modified := strings.ReplaceAll(string(data), "\"status\":\"conceptual\"", "\"status\":\"active\"")
-					_ = fileutil.WriteFile(segmentPath, []byte(modified), 0644)
+					_ = fileutil.WriteFile(segmentPath, []byte(modified), paths.FilePerm644)
 				}
 			}
 		}

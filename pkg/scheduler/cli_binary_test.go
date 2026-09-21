@@ -17,10 +17,10 @@ func TestResolveSchedulerDaemonBinary_prefersStableOverZqk(t *testing.T) {
 	if err := fileutil.EnsureDir(filepath.Dir(stable)); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(stable, []byte{0}, 0o755); err != nil {
+	if err := fileutil.WriteFile(stable, []byte{0}, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(zqk, []byte{0}, 0o755); err != nil {
+	if err := fileutil.WriteFile(zqk, []byte{0}, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 
@@ -39,14 +39,14 @@ func TestResolveSchedulerDaemonBinary_prefersStableOverZqk(t *testing.T) {
 func TestResolveSchedulerDaemonBinary_schedulerDaemonBinOverride(t *testing.T) {
 	root := t.TempDir()
 	override := filepath.Join(root, "my-daemon")
-	if err := fileutil.WriteFile(override, []byte{0}, 0o755); err != nil {
+	if err := fileutil.WriteFile(override, []byte{0}, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	stable := filepath.Join(root, binDirName, zqkSchedulerBinaryName)
 	if err := fileutil.EnsureDir(filepath.Dir(stable)); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(stable, []byte{0}, 0o755); err != nil {
+	if err := fileutil.WriteFile(stable, []byte{0}, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 
@@ -69,10 +69,10 @@ func TestResolveSchedulerDaemonBinary_zqkBinOverridesStable(t *testing.T) {
 	if err := fileutil.EnsureDir(filepath.Dir(stable)); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(stable, []byte{0}, 0o755); err != nil {
+	if err := fileutil.WriteFile(stable, []byte{0}, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(zqk, []byte{0}, 0o755); err != nil {
+	if err := fileutil.WriteFile(zqk, []byte{0}, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 
@@ -100,10 +100,10 @@ func TestResolveSchedulerDaemonBinary_prefersZqkStable(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := fileutil.WriteFile(zqkStable, []byte{0}, 0o755); err != nil {
+	if err := fileutil.WriteFile(zqkStable, []byte{0}, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(zqkScheduler, []byte{0}, 0o755); err != nil {
+	if err := fileutil.WriteFile(zqkScheduler, []byte{0}, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 
@@ -129,7 +129,7 @@ func TestResolveSchedulerCLIBinary_communityEdition(t *testing.T) {
 	if err := fileutil.EnsureDir(filepath.Dir(zcom)); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(zcom, []byte{0}, 0o755); err != nil {
+	if err := fileutil.WriteFile(zcom, []byte{0}, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 
@@ -158,7 +158,7 @@ func TestResolveSchedulerDaemonBinary_communityEdition(t *testing.T) {
 	if err := fileutil.EnsureDir(filepath.Dir(zcom)); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(zcom, []byte{0}, 0o755); err != nil {
+	if err := fileutil.WriteFile(zcom, []byte{0}, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 

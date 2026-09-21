@@ -176,7 +176,7 @@ func checkPolicyInterruptGateInRoot(projectRoot string) error {
 		String("message", msg).
 		String("dedupe_key", latest.DedupeKey).
 		String("policy_id", latest.PolicyID).
-		String("action", "Run: zqk system policy-interrupts ack --dedupe-key "+latest.DedupeKey).
+		String("action", paths.RewriteCanonicalCLIInvocations("Run: zqk system policy-interrupts ack --dedupe-key ")+latest.DedupeKey).
 		Log()
 	return errfmt.Errorf("critical policy interrupt requires acknowledgement: %s", latest.DedupeKey)
 }
@@ -253,7 +253,7 @@ func checkSchedulerDaemonStatus(projectRoot string, cmd *cobra.Command, _ *cli.C
 			logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 			logging.Fluent(logger).Warn("Scheduler daemon is down. Operations will be queued to WAL.").
 				String("impact", "Side-effects and lifecycles will execute when daemon returns").
-				String("action", "Start with: zqk scheduler start").
+				String("action", paths.RewriteCanonicalCLIInvocations("Start with: zqk scheduler start")).
 				Log()
 		}
 	}

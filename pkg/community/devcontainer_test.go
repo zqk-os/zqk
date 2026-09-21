@@ -2,6 +2,7 @@ package community_test
 
 import (
 	"encoding/json"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -126,16 +127,16 @@ func TestDevcontainer_BoundaryAndErrorHandling(t *testing.T) {
 	// Sub-test 2: Malformed JSON syntax
 	t.Run("MalformedJSON", func(t *testing.T) {
 		badDir := filepath.Join(tmpDir, "bad_json")
-		if err := os.MkdirAll(badDir, 0o755); err != nil {
+		if err := os.MkdirAll(badDir, paths.DirPerm755); err != nil {
 			t.Fatalf("failed to create dir: %v", err)
 		}
-		if err := os.WriteFile(filepath.Join(badDir, "devcontainer.json"), []byte("{not_json: true}\n"), 0o644); err != nil {
+		if err := os.WriteFile(filepath.Join(badDir, "devcontainer.json"), []byte("{not_json: true}\n"), paths.FilePerm644); err != nil {
 			t.Fatalf("failed to write file: %v", err)
 		}
-		if err := os.WriteFile(filepath.Join(badDir, "Dockerfile"), []byte("FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04\nUSER vscode\n"), 0o644); err != nil {
+		if err := os.WriteFile(filepath.Join(badDir, "Dockerfile"), []byte("FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04\nUSER vscode\n"), paths.FilePerm644); err != nil {
 			t.Fatalf("failed to write Dockerfile: %v", err)
 		}
-		if err := os.WriteFile(filepath.Join(badDir, "post-create.sh"), []byte("#!/bin/bash\n"), 0o755); err != nil {
+		if err := os.WriteFile(filepath.Join(badDir, "post-create.sh"), []byte("#!/bin/bash\n"), paths.DirPerm755); err != nil {
 			t.Fatalf("failed to write post-create.sh: %v", err)
 		}
 
@@ -149,7 +150,7 @@ func TestDevcontainer_BoundaryAndErrorHandling(t *testing.T) {
 	// Sub-test 3: Missing required port 8443
 	t.Run("MissingPort8443", func(t *testing.T) {
 		noPortDir := filepath.Join(tmpDir, "no_port")
-		if err := os.MkdirAll(noPortDir, 0o755); err != nil {
+		if err := os.MkdirAll(noPortDir, paths.DirPerm755); err != nil {
 			t.Fatalf("failed to create dir: %v", err)
 		}
 		invalidJSON := `{
@@ -164,13 +165,13 @@ func TestDevcontainer_BoundaryAndErrorHandling(t *testing.T) {
     }
   }
 }`
-		if err := os.WriteFile(filepath.Join(noPortDir, "devcontainer.json"), []byte(invalidJSON), 0o644); err != nil {
+		if err := os.WriteFile(filepath.Join(noPortDir, "devcontainer.json"), []byte(invalidJSON), paths.FilePerm644); err != nil {
 			t.Fatalf("failed to write file: %v", err)
 		}
-		if err := os.WriteFile(filepath.Join(noPortDir, "Dockerfile"), []byte("FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04\nUSER vscode\n"), 0o644); err != nil {
+		if err := os.WriteFile(filepath.Join(noPortDir, "Dockerfile"), []byte("FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04\nUSER vscode\n"), paths.FilePerm644); err != nil {
 			t.Fatalf("failed to write Dockerfile: %v", err)
 		}
-		if err := os.WriteFile(filepath.Join(noPortDir, "post-create.sh"), []byte("#!/bin/bash\n"), 0o755); err != nil {
+		if err := os.WriteFile(filepath.Join(noPortDir, "post-create.sh"), []byte("#!/bin/bash\n"), paths.DirPerm755); err != nil {
 			t.Fatalf("failed to write post-create.sh: %v", err)
 		}
 

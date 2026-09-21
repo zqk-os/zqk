@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/specialization"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
@@ -39,9 +40,9 @@ func CollectEdgeSignals(projectRoot string) []EdgeSignal {
 	}
 	if projectRoot != "" {
 		// Optional operator-declared headless marker (does not invent organ binaries).
-		marker := filepath.Join(projectRoot, ".zqk", "config", "headless_edge.json")
+		marker := filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, "headless_edge.json")
 		if pathExists(marker) {
-			signals = append(signals, EdgeSignal{ID: "headless_edge_marker", Present: true, Detail: ".zqk/config/headless_edge.json"})
+			signals = append(signals, EdgeSignal{ID: "headless_edge_marker", Present: true, Detail: filepath.Join(paths.ProjectDataDir, paths.ConfigDir, "headless_edge.json")})
 		}
 	}
 	return signals

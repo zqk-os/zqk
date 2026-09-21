@@ -124,7 +124,7 @@ func buildCommandEnvironment(secCtx *pkgctx.SecurityContext, projectRoot string,
 	env = append(env, fmt.Sprintf("%s=1", zqkenv.IsParentZqk()))
 
 	// Disable interactive prompts and editors in MCP subprocesses
-	env = append(env, "ZQK_NON_INTERACTIVE=1", "NO_COLOR=1", "EDITOR=false")
+	env = append(env, zqkenv.NonInteractive().Name()+"=1", "NO_COLOR=1", "EDITOR=false")
 
 	return env
 }

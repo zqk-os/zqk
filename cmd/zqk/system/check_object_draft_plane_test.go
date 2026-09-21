@@ -21,10 +21,10 @@ func TestWriteObjectDraftPlaneSummary(t *testing.T) {
 
 	id := "DOC-check-draft-01"
 	p := storage.ObjectDraftPlanePath(root, "doc_entry", id)
-	if err := fileutil.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(p), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(p, []byte("id: "+id+"\n"), 0o644); err != nil {
+	if err := fileutil.WriteFile(p, []byte("id: "+id+"\n"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	buf.Reset()

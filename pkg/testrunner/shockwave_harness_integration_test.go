@@ -10,6 +10,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/testkit"
 	"github.com/zqk-os/zqk/pkg/testrunner"
@@ -60,7 +61,6 @@ import (
 //   - BLI-WORLD completes -> shockwave CAS-decrements PRI-HW-001 remaining_open_count from 1 -> 0.
 //   - Terminal Shockwave 4: PRI-HW-001 auto-transitions to complete!
 func TestShockwaveHarness_EndToEnd_HelloWorld(t *testing.T) {
-	t.Setenv(zqkenv.ZQKAllowForegroundGoTest().Key, "1")
 	t.Setenv(zqkenv.TestBypassGitevidence().Key, "1")
 
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{
@@ -294,7 +294,7 @@ func TestShockwaveHarness_EndToEnd_HelloWorld(t *testing.T) {
 	// PHASE 1: Task 1 (Agent generates "Hello" in sample.txt)
 	// =========================================================================
 	t.Log("=== Phase 1: Task 1 - Writing Hello to sample.txt ===")
-	if err := os.WriteFile(sampleFile, []byte("Hello\n"), 0o600); err != nil {
+	if err := os.WriteFile(sampleFile, []byte("Hello\n"), paths.FilePerm600); err != nil {
 		t.Fatalf("failed to write sample.txt: %v", err)
 	}
 
@@ -370,7 +370,7 @@ func TestShockwaveHarness_EndToEnd_HelloWorld(t *testing.T) {
 	// =========================================================================
 	t.Log("=== Phase 2: Task 2 - Appending World to sample.txt ===")
 	//nolint:gosec
-	f, err := os.OpenFile(sampleFile, os.O_APPEND|os.O_WRONLY, 0o600)
+	f, err := os.OpenFile(sampleFile, os.O_APPEND|os.O_WRONLY, paths.FilePerm600)
 	if err != nil {
 		t.Fatalf("failed to open sample.txt for appending: %v", err)
 	}

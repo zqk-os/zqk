@@ -63,6 +63,7 @@ const (
 // .zqk/cli/specs/system/sync_glossary_from_specs_command.yaml
 func NewSyncGlossaryFromSpecsCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewSystemSyncGlossaryFromSpecsCommandBuilder()
+	cli.RequireSession(cmd, false)
 	cmd.Args = cobra.NoArgs
 	cmd.RunE = runSyncGlossaryFromSpecs
 	return cmd

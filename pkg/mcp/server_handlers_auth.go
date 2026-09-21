@@ -368,29 +368,13 @@ func (s *Server) validateKeystoreKey(_ context.Context, keyID, projectRoot strin
 // Lists .zqk/process/keystore/*.yaml, parses each, and returns the first match.
 // Returns (entry, keyID, nil) or (nil, "", err) if not found.
 func (s *Server) findKeystoreEntryByAccountAndType(projectRoot, accountID, keyType string) (map[string]any, string, error) {
-	keystoreDir := filepath.Join(projectRoot, paths.ProcessKeystoreDir)
-	entries, err := fileutil.ReadDir(keystoreDir)
+	recs, err := authcred.ListKeystoreRecords(projectRoot)
 	if err != nil {
 		return nil, "", err
 	}
-	for _, e := range entries {
-		if e.IsDir() || !strings.HasSuffix(e.Name(), ".yaml") {
-			continue
-		}
-		keyID := strings.TrimSuffix(e.Name(), ".yaml")
-		keyFile := filepath.Join(keystoreDir, e.Name())
-		data, err := fileutil.ReadFile(keyFile)
-		if err != nil {
-			continue
-		}
-		var entry map[string]any
-		if err := yaml.Unmarshal(data, &entry); err != nil {
-			continue
-		}
-		entryAccountID, _ := entry[clientInfoAccountID].(string)
-		entryKeyType, _ := entry[objects.FieldKeyKeyType].(string)
-		if entryAccountID == accountID && entryKeyType == keyType {
-			return entry, keyID, nil
+	for _, rec := range recs {
+		if rec.AccountID() == accountID && rec.KeyType() == keyType {
+			return rec.Entry, rec.KeyID, nil
 		}
 	}
 	return nil, "", errfmt.Errorf("no keystore entry for account %s with key_type %s", accountID, keyType)
@@ -405,29 +389,14 @@ type keystoreEntryWithID struct {
 // listKeystoreEntriesByKeyTypes lists keystore entries whose key_type is in keyTypes.
 // Reads .zqk/process/keystore/*.yaml and returns matching entries with their key IDs.
 func (s *Server) listKeystoreEntriesByKeyTypes(projectRoot string, keyTypes map[string]bool) ([]keystoreEntryWithID, error) {
-	keystoreDir := filepath.Join(projectRoot, paths.ProcessKeystoreDir)
-	entries, err := fileutil.ReadDir(keystoreDir)
+	recs, err := authcred.ListKeystoreRecords(projectRoot)
 	if err != nil {
 		return nil, err
 	}
 	var result []keystoreEntryWithID
-	for _, e := range entries {
-		if e.IsDir() || !strings.HasSuffix(e.Name(), ".yaml") {
-			continue
-		}
-		keyID := strings.TrimSuffix(e.Name(), ".yaml")
-		keyFile := filepath.Join(keystoreDir, e.Name())
-		data, err := fileutil.ReadFile(keyFile)
-		if err != nil {
-			continue
-		}
-		var entry map[string]any
-		if err := yaml.Unmarshal(data, &entry); err != nil {
-			continue
-		}
-		entryKeyType, _ := entry[objects.FieldKeyKeyType].(string)
-		if keyTypes[entryKeyType] {
-			result = append(result, keystoreEntryWithID{Entry: entry, KeyID: keyID})
+	for _, rec := range recs {
+		if keyTypes[rec.KeyType()] {
+			result = append(result, keystoreEntryWithID{Entry: rec.Entry, KeyID: rec.KeyID})
 		}
 	}
 	return result, nil
@@ -445,25 +414,21 @@ func normalizeCredentialHashForPAT(stored string) string {
 
 // loadKeystoreEntry loads a keystore entry by ID
 func (s *Server) loadKeystoreEntry(keyID, projectRoot string) (map[string]any, error) {
-	keystoreDir := filepath.Join(projectRoot, paths.ProcessKeystoreDir)
-	keyFile := filepath.Join(keystoreDir, fmt.Sprintf("%s.yaml", keyID))
-
-	data, err := fileutil.ReadFile(keyFile)
+	recs, err := authcred.ListKeystoreRecords(projectRoot)
 	if err != nil {
 		return nil, errfmt.Newf("failed to read keystore entry").Wrap(err)
 	}
-
-	var entry map[string]any
-	if err := yaml.Unmarshal(data, &entry); err != nil {
-		return nil, errfmt.Newf("failed to parse keystore entry").Wrap(err)
+	for _, rec := range recs {
+		if rec.KeyID == keyID || rec.FileID == keyID {
+			return rec.Entry, nil
+		}
 	}
-
-	return entry, nil
+	return nil, errfmt.Errorf("failed to read keystore entry")
 }
 
 // updateKeystoreEntry updates a keystore entry
 func (s *Server) updateKeystoreEntry(keyID, projectRoot string, updates map[string]any) error {
-	keystoreDir := filepath.Join(projectRoot, paths.ProcessKeystoreDir)
+	keystoreDir := paths.KeystoreDirPath(projectRoot)
 	keyFile := filepath.Join(keystoreDir, fmt.Sprintf("%s.yaml", keyID))
 
 	// Read existing entry
@@ -495,7 +460,7 @@ func (s *Server) updateKeystoreEntry(keyID, projectRoot string, updates map[stri
 	if err := fileutil.WriteFile(keyFile, updatedData, paths.FilePerm600); err != nil {
 		return errfmt.Newf("failed to write keystore entry").Wrap(err)
 	}
-
+	authcred.InvalidateKeystore(projectRoot)
 	return nil
 }
 
@@ -570,17 +535,9 @@ func (s *Server) loadAccountObject(accountID, projectRoot string) (map[string]an
 	if canon := authcred.CanonicalAccountID(projectRoot, accountID); canon != "" {
 		accountID = canon
 	}
-	accountPath := authcred.AccountCASPath(projectRoot, accountID)
-	if accountPath == emptyValue {
+	data, ok := authcred.AccountYAML(projectRoot, accountID)
+	if !ok {
 		return nil, errfmt.Errorf("account not found: %s", accountID)
-	}
-	if _, err := fileutil.Stat(accountPath); fileutil.IsNotExist(err) {
-		return nil, errfmt.Errorf("account not found: %s", accountID)
-	}
-
-	data, err := fileutil.ReadFile(accountPath)
-	if err != nil {
-		return nil, errfmt.Newf("failed to read account file").Wrap(err)
 	}
 
 	var account map[string]any
@@ -593,33 +550,22 @@ func (s *Server) loadAccountObject(accountID, projectRoot string) (map[string]an
 
 // loadAccountByEmail loads an account object by email
 func (s *Server) loadAccountByEmail(email, projectRoot string) (map[string]any, error) {
-	accountsDir := filepath.Join(projectRoot, paths.ProcessAccountsDir)
-	entries, err := fileutil.ReadDir(accountsDir)
-	if err != nil {
-		return nil, errfmt.Newf("failed to read accounts directory").Wrap(err)
-	}
-
-	for _, entry := range entries {
-		if !strings.HasSuffix(entry.Name(), ".yaml") {
-			continue
-		}
-		accountPath := filepath.Join(accountsDir, entry.Name())
-		data, err := fileutil.ReadFile(accountPath)
-		if err != nil {
-			continue
-		}
-
+	var found map[string]any
+	authcred.WalkAccountYAML(projectRoot, func(_ string, data []byte) bool {
 		var account map[string]any
 		if err := yaml.Unmarshal(data, &account); err != nil {
-			continue
+			return true
 		}
-
 		if accountEmail, ok := account[objects.FieldKeyEmail].(string); ok && accountEmail == email {
-			return account, nil
+			found = account
+			return false
 		}
+		return true
+	})
+	if found == nil {
+		return nil, errfmt.Errorf("account not found for email: %s", email)
 	}
-
-	return nil, errfmt.Errorf("account not found for email: %s", email)
+	return found, nil
 }
 
 // extractRolesFromAccount is a convenience wrapper around ExtractRolesFromAccount.
@@ -642,17 +588,7 @@ func (s *Server) loadEnabledAuthStrategies(_ context.Context) (map[string]bool, 
 		return nil, errfmt.Errorf("project root not available")
 	}
 
-	strategiesDir := filepath.Join(projectRoot, paths.ProcessAuthStrategiesDir)
 	strategies := make(map[string]bool)
-
-	// Read all auth strategy files
-	entries, err := fileutil.ReadDir(strategiesDir)
-	if err != nil {
-		// Directory doesn't exist - return empty map (no strategies enabled)
-		return strategies, nil
-	}
-
-	// Get configured strategy IDs from config (if specified)
 	configStrategyIDs := make(map[string]bool)
 	if s.config != nil && len(s.config.MCPServer.Security.AuthStrategies) > 0 {
 		for _, id := range s.config.MCPServer.Security.AuthStrategies {
@@ -660,41 +596,13 @@ func (s *Server) loadEnabledAuthStrategies(_ context.Context) (map[string]bool, 
 		}
 	}
 
-	for _, entry := range entries {
-		if !strings.HasSuffix(entry.Name(), ".yaml") {
-			continue
-		}
-
-		strategyPath := filepath.Join(strategiesDir, entry.Name())
-		data, err := fileutil.ReadFile(strategyPath)
-		if err != nil {
-			continue
-		}
-
-		var strategy struct {
-			ID      string `yaml:"id"`
-			Type    string `yaml:"strategy_type"`
-			Enabled bool   `yaml:"enabled"`
-			Status  string `yaml:"status"`
-		}
-		if err := yaml.Unmarshal(data, &strategy); err != nil {
-			continue
-		}
-
-		// Check if strategy is enabled and active
-		// Use lifecycle definition to determine if status is active (non-terminal, non-archived, non-error)
+	for _, strategy := range authcred.ListAuthStrategyRecords(projectRoot) {
 		if !s.isStrategyStatusActive(strategy.Status) {
 			continue
 		}
-
-		// If config specifies strategy IDs, only include those
-		if len(configStrategyIDs) > 0 {
-			if !configStrategyIDs[strategy.ID] {
-				continue
-			}
+		if len(configStrategyIDs) > 0 && !configStrategyIDs[strategy.ID] {
+			continue
 		}
-
-		// Strategy must be enabled in its object
 		if strategy.Enabled {
 			strategies[strategy.Type] = true
 		}

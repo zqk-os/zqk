@@ -2,10 +2,12 @@ package storage
 
 import (
 	"context"
+	"fmt"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/kernelcas"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // Core kernel kinds must not be hard-deleted without an explicit allow context.
@@ -60,8 +62,5 @@ func denyCoreKernelHardDelete(ctx context.Context, secCtx *pkgctx.SecurityContex
 	// The message no longer offers an elevated account as a way through, because elevation is no
 	// longer a way through. Naming one would send the reader to a door that does not open — the
 	// mistake the agent guard made by advertising a bypass that relocated the project root.
-	return errfmt.Errorf(
-		"hard delete refused for core kind %s (%s): promote/archive with aggregation, compression, and lineage instead of erasing CAS; break-glass: zqk object delete %s --reason-code \"…\" (min 30 chars). Elevation (%s / %s / admin / system account) does not substitute for a declared reason on core kinds: in-process callers must set pkgctx.WithAllowCoreObjectDelete, and tests storage.WithTestHardDelete",
-		kind, id, id, pkgctx.PermissionDeleteAll, pkgctx.PermissionDeleteCore,
-	)
+	return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("hard delete refused for core kind %s (%s): promote/archive with aggregation, compression, and lineage instead of erasing CAS; break-glass: zqk object delete %s --reason-code \"…\" (min 30 chars). Elevation (%s / %s / admin / system account) does not substitute for a declared reason on core kinds: in-process callers must set pkgctx.WithAllowCoreObjectDelete, and tests storage.WithTestHardDelete", kind, id, id, pkgctx.PermissionDeleteAll, pkgctx.PermissionDeleteCore)))
 }

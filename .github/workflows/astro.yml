@@ -32,6 +32,8 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    outputs:
+      has_site: ${{ steps.detect-package-manager.outputs.has_site }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -43,37 +45,45 @@ jobs:
             echo "command=install" >> $GITHUB_OUTPUT
             echo "runner=yarn" >> $GITHUB_OUTPUT
             echo "lockfile=yarn.lock" >> $GITHUB_OUTPUT
+            echo "has_site=true" >> $GITHUB_OUTPUT
             exit 0
           elif [ -f "${{ github.workspace }}/package.json" ]; then
             echo "manager=npm" >> $GITHUB_OUTPUT
             echo "command=ci" >> $GITHUB_OUTPUT
             echo "runner=npx --no-install" >> $GITHUB_OUTPUT
             echo "lockfile=package-lock.json" >> $GITHUB_OUTPUT
+            echo "has_site=true" >> $GITHUB_OUTPUT
             exit 0
           else
-            echo "Unable to determine package manager"
-            exit 1
+            echo "No package.json or yarn.lock found in ${{ github.workspace }}; skipping Astro site build."
+            echo "has_site=false" >> $GITHUB_OUTPUT
+            exit 0
           fi
       - name: Setup Node
+        if: steps.detect-package-manager.outputs.has_site == 'true'
         uses: actions/setup-node@v7
         with:
           node-version: "24"
           cache: ${{ steps.detect-package-manager.outputs.manager }}
           cache-dependency-path: ${{ env.BUILD_PATH }}/${{ steps.detect-package-manager.outputs.lockfile }}
       - name: Setup Pages
+        if: steps.detect-package-manager.outputs.has_site == 'true'
         id: pages
         uses: actions/configure-pages@v6
       - name: Install dependencies
+        if: steps.detect-package-manager.outputs.has_site == 'true'
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
         working-directory: ${{ env.BUILD_PATH }}
       - name: Build with Astro
+        if: steps.detect-package-manager.outputs.has_site == 'true'
         run: |
           ${{ steps.detect-package-manager.outputs.runner }} astro build \
             --site "${{ steps.pages.outputs.origin }}" \
             --base "${{ steps.pages.outputs.base_path }}"
         working-directory: ${{ env.BUILD_PATH }}
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v5
+        if: steps.detect-package-manager.outputs.has_site == 'true'
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ${{ env.BUILD_PATH }}/dist
 
@@ -82,9 +92,10 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     needs: build
+    if: needs.build.outputs.has_site == 'true'
     runs-on: ubuntu-latest
     name: Deploy
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@v4

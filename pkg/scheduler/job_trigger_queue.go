@@ -1044,7 +1044,7 @@ func (q *JobTriggerQueue) drainAndProcessTriggerBatch(ctx context.Context, sched
 			triggerQueueKeyMessage:    "Missing expected test-bundle jobs from trigger queue batch",
 			triggerQueueKeyCount:      len(missingIDs),
 			triggerQueueKeyJobIDs:     missingIDs,
-			"hint":                    "Run `zqk scheduler scan-tests --setup-bundles --overwrite` to recreate bundles/jobs, then re-run scan-tests.",
+			"hint":                    paths.RewriteCanonicalCLIInvocations("Run `zqk scheduler scan-tests --setup-bundles --overwrite` to recreate bundles/jobs, then re-run scan-tests."),
 		})
 		if len(missingIDs) >= ExcessiveMissingTestBundleThreshold {
 			scheduler.EmitTriggerQueueEvent(map[string]any{

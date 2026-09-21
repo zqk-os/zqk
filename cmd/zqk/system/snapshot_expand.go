@@ -415,7 +415,7 @@ func buildSnapshotExpandEventData(
 
 	auditMetadata := map[string]any{
 		objects.FieldKeySource:  "cli",
-		objects.FieldKeyCommand: "zqk system snapshot-expand",
+		objects.FieldKeyCommand: paths.CLIUsage("system", "snapshot-expand"),
 		"snapshot":              snapshot,
 		"timestamp":             timestampStr,
 	}

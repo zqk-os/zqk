@@ -31,10 +31,10 @@ func TestDocmanRegister_ShippedOnly(t *testing.T) {
 	}
 	for rel, content := range docs {
 		full := filepath.Join(tmpDir, rel)
-		if err := fileutil.MkdirAll(filepath.Dir(full), 0755); err != nil {
+		if err := fileutil.MkdirAll(filepath.Dir(full), paths.DirPerm755); err != nil {
 			t.Fatalf("mkdir failed: %v", err)
 		}
-		if err := fileutil.WriteFile(full, []byte(content), 0644); err != nil {
+		if err := fileutil.WriteFile(full, []byte(content), paths.FilePerm644); err != nil {
 			t.Fatalf("write file failed: %v", err)
 		}
 	}

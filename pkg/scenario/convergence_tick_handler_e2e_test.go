@@ -10,6 +10,7 @@ import (
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/scheduler"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -236,7 +237,7 @@ func TestConvergenceSessionTickHandler_SpawnsFollowupDraftWhenTerminalAndEnv(t *
 	_ = storage.FlushAllListingIndexesForProjectRoot(projectRoot)
 
 	// Prefer marker file (spawn records id even when list index lags); fall back to list scan.
-	spawnDir := filepath.Join(projectRoot, ".zqk", "scheduler", "terminal_followup_spawn")
+	spawnDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.SchedulerSubdir, "terminal_followup_spawn")
 	var spawnedID string
 	if entries, err := fileutil.ReadDir(spawnDir); err == nil {
 		for _, e := range entries {

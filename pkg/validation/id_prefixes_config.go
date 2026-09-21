@@ -3,17 +3,16 @@ package validation
 import (
 	"path/filepath"
 	"strings"
-	"sync"
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/zqk-os/zqk/pkg/concurrency"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/kindnames"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -55,32 +54,14 @@ type DefaultStrategyConfig struct {
 	Example string `yaml:"example,omitempty"`
 }
 
-var (
-	globalIDPrefixesConfig     *IDPrefixesConfig
-	globalIDPrefixesConfigMu   sync.Mutex
-	globalIDPrefixesConfigPath string //nolint:unused // Reserved for future config change detection
-)
-
-// ResetGlobalIDPrefixesConfig resets the global config singleton, forcing it to reload
-// This is useful when the config file changes or when testing
+// ResetGlobalIDPrefixesConfig drops the process-wide prefixes memo (tests that chdir).
 func ResetGlobalIDPrefixesConfig() {
-	if err := concurrency.RunInLockWithLogger(
-		&globalIDPrefixesConfigMu,
-		LockNameIdPrefixesResetConfig,
-		lockLoggerSystem(),
-		func() error {
-			globalIDPrefixesConfig = nil
-			globalIDPrefixesConfigPath = "" // Reset path to force reload
-			return nil
-		},
-	); err !=
-
-		// LoadIDPrefixesConfig loads the ID prefixes configuration from file
-		// Logs error events for aggregation/analysis when load fails
-		nil {
-		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgSwallowedError, err).Log()
-	}
+	idPrefixConfigs.Delete(globalConfigKey)
+	resetDiscoveredPaths()
 }
+
+// LoadIDPrefixesConfig loads the ID prefixes configuration from file
+// Logs error events for aggregation/analysis when load fails
 
 func LoadIDPrefixesConfig(configPath string) (*IDPrefixesConfig, error) {
 	eventLogger := logging.NewEventLogger(pkgctx.NewSystemContext())
@@ -145,56 +126,27 @@ func LoadIDPrefixesConfig(configPath string) (*IDPrefixesConfig, error) {
 // Returns default config if file doesn't exist (for backward compatibility)
 // This function now supports reloading when ResetGlobalIDPrefixesConfig() is called
 func GetGlobalIDPrefixesConfig() *IDPrefixesConfig {
-	var config *IDPrefixesConfig
-	if err := concurrency.RunInLockWithLogger(
-		&globalIDPrefixesConfigMu,
-		LockNameIdPrefixesGetConfig,
-		lockLoggerSystem(),
-		func() error {
-			// Check if we need to reload (config is nil or was reset)
-			if globalIDPrefixesConfig == nil {
-				eventLogger := logging.NewEventLogger(pkgctx.NewSystemContext())
-				configPath := findIDPrefixesConfig()
-				var loadedConfig *IDPrefixesConfig
-				var err error
-				if configPath != emptyValue {
-					// Use the path we found
-					loadedConfig, err = LoadIDPrefixesConfig(configPath)
-				} else {
-					// Try to find it again (in case working directory changed)
-					loadedConfig, err = LoadIDPrefixesConfig("")
-				}
-				if err != nil {
-					// If config file doesn't exist, create a default config with common prefixes
-					// This ensures tests and systems without config files still work
-					// Log the fallback to default for aggregation/analysis
-					// LoadIDPrefixesConfig already logged the error, but log the fallback decision
-					eventLogger.LogWarning(ConstMagicb022a312, logging.String("event", "config_load"),
-						logging.String("config_type", ConstMagic9d718edf),
-						logging.String("config_file", configPath),
-						logging.String(ConstMagic5a9c8e34, "true"))
-					globalIDPrefixesConfig = getDefaultIDPrefixesConfig()
-					globalIDPrefixesConfigPath = "" // Mark as using default
-				} else {
-					globalIDPrefixesConfig = loadedConfig
-					if configPath == emptyValue {
-						configPath = findIDPrefixesConfig() // Get path if we didn't have it
-					}
-					globalIDPrefixesConfigPath = configPath // Remember the path we loaded from
-				}
-			}
-			config = globalIDPrefixesConfig
-			return nil
-		},
-	); err != nil {
-		logging.Fluent(logging.
-
-			// getDefaultIDPrefixesConfig returns a default config with common prefixes
-			// Used when config file doesn't exist (for backward compatibility)
-			GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgSwallowedError, err).Log()
+	configPath := findIDPrefixesConfig()
+	cfg, err := idPrefixConfigs.Load(globalConfigKey, stampmemo.Of(configPath), func() (*IDPrefixesConfig, error) {
+		eventLogger := logging.NewEventLogger(pkgctx.NewSystemContext())
+		loaded, loadErr := LoadIDPrefixesConfig(configPath)
+		if loadErr != nil {
+			eventLogger.LogWarning(ConstMagicb022a312, logging.String("event", "config_load"),
+				logging.String("config_type", ConstMagic9d718edf),
+				logging.String("config_file", configPath),
+				logging.String(ConstMagic5a9c8e34, "true"))
+			return getDefaultIDPrefixesConfig(), nil
+		}
+		return loaded, nil
+	})
+	if err != nil || cfg == nil {
+		return getDefaultIDPrefixesConfig()
 	}
-	return config
+	return cfg
 }
+
+// getDefaultIDPrefixesConfig returns a default config with common prefixes
+// Used when config file doesn't exist (for backward compatibility)
 
 func getDefaultIDPrefixesConfig() *IDPrefixesConfig {
 	return &IDPrefixesConfig{

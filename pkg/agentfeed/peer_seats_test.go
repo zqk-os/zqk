@@ -13,7 +13,7 @@ func TestCoordinatorSeatID_dutyThenMCP(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	dir := filepath.Join(root, paths.ProjectDataDir, paths.StateDir, paths.MeshStateSubdir)
-	if err := fileutil.MkdirAll(dir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	payload := PeerSeatsFile{
@@ -28,7 +28,7 @@ func TestCoordinatorSeatID_dutyThenMCP(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(filepath.Join(dir, paths.PeerSeatsFile), raw, 0o644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(dir, paths.PeerSeatsFile), raw, paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	if got := CoordinatorSeatID(root); got != "peer-operator-1" {

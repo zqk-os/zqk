@@ -12,11 +12,12 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // getSchemaResourcesFromSpec loads schema resources from MCP spec
-// Uses spec-driven builder pattern: attempts to load from storage (mcp_spec objects) first,
+// First tries database, then persisted spec via selectStoredMCPSpec,
 // then tries spec files, fails hard if not found
 func getSchemaResourcesFromSpec(server *Server) ([]ResourceSpec, error) {
 	selection, err := selectStoredMCPSpec(pkgctx.NewSystemContext(), server, "schema_resources")
@@ -29,7 +30,7 @@ func getSchemaResourcesFromSpec(server *Server) ([]ResourceSpec, error) {
 
 	// Try to load from spec file (externalized configuration)
 	specPaths := []string{
-		".zqk/mcp_specs/schema_resources.yaml",
+		filepath.Join(paths.ProjectDataDir, "mcp_specs", "schema_resources.yaml"),
 		filepath.Join(datacell.ProcessPrimaryDir("."), "mcp_specs", "schema_resources.yaml"),
 		"mcp_specs/schema_resources.yaml",
 	}

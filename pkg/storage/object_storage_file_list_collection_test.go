@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -57,7 +58,7 @@ func TestCollectFilePaths_UnrecognizedDirectory(t *testing.T) {
 	}
 
 	// Create a dummy yaml file
-	if err := fileutil.WriteFile(filepath.Join(kindDir, "test.yaml"), []byte("foo: bar"), 0644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(kindDir, "test.yaml"), []byte("foo: bar"), paths.FilePerm644); err != nil {
 		t.Fatalf("write file: %v", err)
 	}
 

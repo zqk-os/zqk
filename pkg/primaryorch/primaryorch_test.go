@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
@@ -62,12 +63,12 @@ func TestWakePrimary_ScriptAdapter(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	scripts := filepath.Join(root, "scripts")
-	if err := fileutil.MkdirAll(scripts, 0755); err != nil {
+	if err := fileutil.MkdirAll(scripts, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	logPath := filepath.Join(root, "wake.log")
 	script := filepath.Join(scripts, "wake-vendor.sh")
-	if err := fileutil.WriteFile(script, []byte("#!/bin/bash\necho \"$@\" >> \""+logPath+"\"\n"), 0755); err != nil {
+	if err := fileutil.WriteFile(script, []byte("#!/bin/bash\necho \"$@\" >> \""+logPath+"\"\n"), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	if err := WriteBinding(root, Binding{
@@ -94,12 +95,12 @@ func TestWakePrimary_UnknownAdapter(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	p := ConfigPath(root)
-	if err := fileutil.MkdirAll(filepath.Dir(p), 0755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(p), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	cfg := map[string]string{objects.FieldKeyAgentID: "x", "adapter": "telepathy"}
 	raw, _ := json.Marshal(cfg)
-	if err := fileutil.WriteFile(p, raw, 0600); err != nil {
+	if err := fileutil.WriteFile(p, raw, paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 	_, err := WakePrimary(context.Background(), root, WakeRequest{Message: "x"})

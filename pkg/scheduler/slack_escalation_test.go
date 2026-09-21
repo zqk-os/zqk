@@ -27,8 +27,8 @@ func TestSlackEscalation_FunctionalAcceptance(t *testing.T) {
 
 	// 1. Test URL resolution priority and quote stripping
 	t.Run("resolve_from_agent_git_identity", func(t *testing.T) {
-		cfgDir := filepath.Join(tmpDir, paths.ProjectDataDir, "config")
-		if err := fileutil.MkdirAll(cfgDir, 0o755); err != nil {
+		cfgDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.ConfigDir)
+		if err := fileutil.MkdirAll(cfgDir, paths.DirPerm755); err != nil {
 			t.Fatalf("failed to create config dir: %v", err)
 		}
 		identityPath := filepath.Join(cfgDir, "agent_git_identity.env")
@@ -49,8 +49,8 @@ ZQK_AGENT_WEBHOOK_SLACK_ALL_AGENT_FARM="https://hooks.slack.com/services/T00/B00
 
 	t.Run("resolve_from_escalation_json", func(t *testing.T) {
 		workDir := t.TempDir()
-		cfgDir := filepath.Join(workDir, paths.ProjectDataDir, "config")
-		if err := fileutil.MkdirAll(cfgDir, 0o755); err != nil {
+		cfgDir := filepath.Join(workDir, paths.ProjectDataDir, paths.ConfigDir)
+		if err := fileutil.MkdirAll(cfgDir, paths.DirPerm755); err != nil {
 			t.Fatalf("failed to create config dir: %v", err)
 		}
 		jsonPath := filepath.Join(cfgDir, "escalation.json")
@@ -216,7 +216,7 @@ func TestSlackEscalation_BoundaryAndErrorHandling(t *testing.T) {
 	// 4. Multi-provider resilience (webhook fails, inbox succeeds)
 	t.Run("multi_provider_resilience", func(t *testing.T) {
 		tmpDir := t.TempDir()
-		inboxDir := filepath.Join(tmpDir, paths.ProjectDataDir, "inbox", "human")
+		inboxDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.InboxSubdir, "human")
 
 		failingWebhook := &WebhookEscalationProvider{
 			WebhookURL: "http://127.0.0.1:1/invalid-unreachable",
@@ -261,7 +261,7 @@ func TestSlackEscalation_IntegrationAndConformance(t *testing.T) {
 
 	t.Setenv(zqkenv.AgentWebhookSlackAllAgentFarm().Key, server.URL)
 
-	inboxDir := filepath.Join(tmpDir, paths.ProjectDataDir, "inbox", "human")
+	inboxDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.InboxSubdir, "human")
 	humanProvider := &MultiEscalationProvider{
 		Providers: []EscalationProvider{
 			&WebhookEscalationProvider{WebhookURL: server.URL},

@@ -18,6 +18,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/llm"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/observer"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
@@ -161,7 +162,7 @@ func runChatResponder(cmd *cobra.Command, args []string, proc *cli.Processor) er
 	// Aggregate new messages to respond to
 	var newChatText string
 	if isIdle {
-		newChatText = "[SYSTEM_IDLE_PREVENTION_EVENT]\nAgents have been idle for over 15 minutes. Run zqk workflow whats-next --format json --skip-measure. Do fill_item.command_hint if present. Do not remint ORCHESTRATE_PLAN on terminal-only ATKs. Do not trigger orchestration from chat."
+		newChatText = paths.RewriteCanonicalCLIInvocations("[SYSTEM_IDLE_PREVENTION_EVENT]\nAgents have been idle for over 15 minutes. Run zqk workflow whats-next --format json --skip-measure. Do fill_item.command_hint if present. Do not remint ORCHESTRATE_PLAN on terminal-only ATKs. Do not trigger orchestration from chat.")
 		_ = cli.WriteOutput(cmd, []byte("Idle detected. Generating nudge response...\n"))
 	} else {
 		var sb strings.Builder

@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // NewNewObjectCommandBuilder creates a new new_object command.
@@ -15,7 +16,7 @@ func NewNewObjectCommandBuilder() *cobra.Command {
 	help.WithDescriptionLines("Persists kind+title onto .zqk/object_drafts/ as {id}.yaml (no CAS until a successful promote).")
 	help.WithDescriptionLines("Default: stay on the draft plane (title-only is rarely promote-ready). Pass --promote to enqueue background promote.")
 	help.WithDescriptionLines("Requirement, goal, and milestone mints auto-run workflow gen-trace-pipeline unless --skip-trace-pipeline.")
-	help.WithDescriptionLines("For printable YAML scaffolds (edit offline), use: zqk object template <kind>")
+	help.WithDescriptionLines(paths.RewriteCanonicalCLIInvocations("For printable YAML scaffolds (edit offline), use: zqk object template <kind>"))
 	help.AddExample("Mint a backlog item onto the draft plane", "%s new object backlog_item --title \"Explore draft plane\"")
 	help.AddExample("Mint a requirement and scaffold CRIT/TST/BLI", "%s new object requirement --title \"Description required at CAS\"")
 	help.AddExample("Mint and enqueue background promote", "%s new object agent_task --title \"Ready spike\" --promote")

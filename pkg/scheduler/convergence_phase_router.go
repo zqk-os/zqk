@@ -3,6 +3,7 @@ package scheduler
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"strings"
 )
 
@@ -60,7 +61,7 @@ var phaseRoutingProfiles = map[string]phaseRoutingProfile{
 		ID: "code_quality_go_matrix",
 		ExtraNotes: func(*TestBundleConvergenceSnapshot) []string {
 			return []string{
-				"Profile code_quality_go_matrix: matrix rows, FieldKey/ZQK-env repo gates, scan-tests bundles; use scripts/cvs_outcome_rollup.py for surfaces beyond CLI rollup.",
+				"Profile code_quality_go_matrix: matrix rows, FieldKey/ZQK-env repo gates, scan-tests bundles; use matrix report for surfaces beyond CLI rollup.",
 			}
 		},
 	},
@@ -72,12 +73,12 @@ var phaseRoutingProfiles = map[string]phaseRoutingProfile{
 			}
 		},
 	},
-	// Nested / matrix-only C6: CODEBASE_VETTING_MATRIX fully_vetted per VETTING_RUBRIC; bundles are secondary.
+	// Nested / matrix-only C6: matrix fully vetted per rubric; bundles are secondary.
 	"vetting_matrix_c6": {
 		ID: "vetting_matrix_c6",
 		ExtraNotes: func(*TestBundleConvergenceSnapshot) []string {
 			return []string{
-				"Profile vetting_matrix_c6: C6 human checklist for .go rows in CODEBASE_VETTING_MATRIX.csv; use scripts/cvs_outcome_rollup.py for pending_go_rows; test-bundle rollup alone does not prove matrix completion.",
+				"Profile vetting_matrix_c6: checklist for matrix rows; use matrix report for pending rows; test-bundle rollup alone does not prove matrix completion.",
 			}
 		},
 	},
@@ -85,9 +86,7 @@ var phaseRoutingProfiles = map[string]phaseRoutingProfile{
 	"expertise_docs_and_alpha_prep": {
 		ID: "expertise_docs_and_alpha_prep",
 		ExtraNotes: func(*TestBundleConvergenceSnapshot) []string {
-			return []string{
-				"Profile expertise_docs_and_alpha_prep: land docs under docs/architecture/ with a single index; link PRI/backlog; archive redundant reports to docs/archive/; use targeted zqk scheduler scan-tests so health.jsonl advances — full matrix only when blast radius warrants it.",
-			}
+			return []string{paths.RewriteCanonicalCLIInvocations("Profile expertise_docs_and_alpha_prep: land docs under docs/architecture/ with a single index; link PRI/backlog; archive redundant reports to docs/archive/; use targeted zqk scheduler scan-tests so health.jsonl advances — full matrix only when blast radius warrants it.")}
 		},
 	},
 	// Backlog-scoped delivery (tutorial/docs/hands-on); session thresholds may disable bundle-health as completion gate.

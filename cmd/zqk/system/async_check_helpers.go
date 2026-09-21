@@ -590,7 +590,9 @@ func determineCheckTarget(checkCtx *AsyncCheckContext, args []string) error {
 		return err
 	}
 	var allKinds []string
-	if objectIDCache.IsPopulatedForProject(checkCtx.ProjectRoot) {
+	if idx := objects.TryLoadSpecIndexForProjectRoot(checkCtx.ProjectRoot); idx != nil {
+		allKinds = objects.GetAllKindsFromIndex(idx)
+	} else if objectIDCache.IsPopulatedForProject(checkCtx.ProjectRoot) {
 		allKinds = objectIDCache.GetKinds()
 	}
 	if len(allKinds) == 0 {
@@ -612,6 +614,9 @@ func determineCheckTarget(checkCtx *AsyncCheckContext, args []string) error {
 			isKind = true
 			break
 		}
+	}
+	if !isKind && objects.GetDirectoryFromKind(args[0]) != "" {
+		isKind = true
 	}
 
 	if isKind {
@@ -886,7 +891,13 @@ func discoverAndEnqueueObjectsImpl(checkCtx *AsyncCheckContext) error {
 			}
 		}
 	}
-	if useCacheDiscovery && !useStorageDiscoveryForTargetIDs {
+	useCacheForDiscovery := useCacheDiscovery && !useStorageDiscoveryForTargetIDs
+	if useCacheForDiscovery && checkCtx.TargetKind != emptyValue {
+		if storagepkg.IsHighVolumeKindForCache(checkCtx.TargetKind) || len(objectIDCache.GetEntriesByKind(checkCtx.TargetKind)) == 0 {
+			useCacheForDiscovery = false
+		}
+	}
+	if useCacheForDiscovery {
 		if checkCtx.Logger != nil {
 			logging.Fluent(checkCtx.Logger).Info("Using object ID cache for discovery (skipping storage list)").
 				Int("kind_count", len(kinds)).

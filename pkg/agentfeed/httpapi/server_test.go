@@ -20,12 +20,12 @@ import (
 func writeStubWakeScripts(t *testing.T, root string) {
 	t.Helper()
 	dir := paths.ScriptsDirPath(root)
-	if err := fileutil.MkdirAll(dir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
 		t.Fatalf("mkdir scripts: %v", err)
 	}
 	for _, name := range []string{"wake-agy.sh", "wake-peer-tpm-02.sh"} {
 		p := filepath.Join(dir, name)
-		if err := fileutil.WriteFile(p, []byte("#!/bin/sh\nexit 0\n"), 0o755); err != nil {
+		if err := fileutil.WriteFile(p, []byte("#!/bin/sh\nexit 0\n"), paths.DirPerm755); err != nil {
 			t.Fatalf("write %s: %v", name, err)
 		}
 	}

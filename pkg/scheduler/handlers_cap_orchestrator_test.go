@@ -12,6 +12,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/primaryorch"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -69,7 +70,7 @@ EOF
 fi
 exit 1
 `
-	if err := fileutil.WriteFile(mockExe, []byte(script), 0755); err != nil {
+	if err := fileutil.WriteFile(mockExe, []byte(script), paths.DirPerm755); err != nil {
 		t.Fatalf("write mock: %v", err)
 	}
 
@@ -112,7 +113,7 @@ EOF
 fi
 exit 1
 `
-	if err := fileutil.WriteFile(mockZqk, []byte(script), 0755); err != nil {
+	if err := fileutil.WriteFile(mockZqk, []byte(script), paths.DirPerm755); err != nil {
 		t.Fatalf("failed to write mock zqk: %v", err)
 	}
 
@@ -140,14 +141,14 @@ func TestWakeAgentAndScheduleHourglass_TriggersWakeAgyForTPM(t *testing.T) {
 
 	// Bind primary orchestrator to a script adapter (agy-style vendor wake).
 	scriptsDir := filepath.Join(tempDir, "scripts")
-	if err := fileutil.MkdirAll(scriptsDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(scriptsDir, paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create scripts dir: %v", err)
 	}
 
 	wakeLog := filepath.Join(tempDir, "wake.log")
 	wakeScript := filepath.Join(scriptsDir, "wake-agy.sh")
 	scriptContent := fmt.Sprintf("#!/bin/bash\necho \"$@\" >> %s\n", wakeLog)
-	if err := fileutil.WriteFile(wakeScript, []byte(scriptContent), 0755); err != nil {
+	if err := fileutil.WriteFile(wakeScript, []byte(scriptContent), paths.DirPerm755); err != nil {
 		t.Fatalf("failed to write mock wake-agy.sh: %v", err)
 	}
 	if err := primaryorch.WriteBinding(tempDir, primaryorch.Binding{
@@ -227,7 +228,7 @@ fi
 
 exit 0
 `
-	if err := fileutil.WriteFile(mockExe, []byte(script), 0755); err != nil {
+	if err := fileutil.WriteFile(mockExe, []byte(script), paths.DirPerm755); err != nil {
 		t.Fatalf("failed to write mock exe: %v", err)
 	}
 
@@ -308,7 +309,7 @@ EOF
 fi
 exit 1
 `
-	if err := fileutil.WriteFile(mockExe, []byte(script), 0755); err != nil {
+	if err := fileutil.WriteFile(mockExe, []byte(script), paths.DirPerm755); err != nil {
 		t.Fatalf("write mock: %v", err)
 	}
 	mStorage := &mockCapStorage{created: make([]map[string]any, 0)}
@@ -347,7 +348,7 @@ EOF
 fi
 exit 1
 `
-	if err := fileutil.WriteFile(mockExe, []byte(script), 0755); err != nil {
+	if err := fileutil.WriteFile(mockExe, []byte(script), paths.DirPerm755); err != nil {
 		t.Fatalf("failed to write mock exe: %v", err)
 	}
 
@@ -575,10 +576,10 @@ func TestCapOrchestratorHandler_hasOpenTaskForPlan_DraftPlane(t *testing.T) {
 
 	const draftID = "ATK-DRAFT-0001"
 	draftPath := storagepkg.ObjectDraftPlanePath(tempDir, objects.KindAgentTask, draftID)
-	if err := fileutil.MkdirAll(filepath.Dir(draftPath), 0o755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(draftPath), paths.DirPerm755); err != nil {
 		t.Fatalf("mkdir draft plane: %v", err)
 	}
-	if err := fileutil.WriteFile(draftPath, []byte("id: "+draftID+"\n"), 0o644); err != nil {
+	if err := fileutil.WriteFile(draftPath, []byte("id: "+draftID+"\n"), paths.FilePerm644); err != nil {
 		t.Fatalf("write draft: %v", err)
 	}
 
@@ -646,7 +647,7 @@ fi
 echo "{}"
 exit 0
 `
-	if err := fileutil.WriteFile(mockExe, []byte(script), 0755); err != nil {
+	if err := fileutil.WriteFile(mockExe, []byte(script), paths.DirPerm755); err != nil {
 		t.Fatalf("failed to write mock exe: %v", err)
 	}
 
@@ -770,7 +771,7 @@ EOF
 fi
 exit 0
 `
-	if err := fileutil.WriteFile(mockExe, []byte(script), 0755); err != nil {
+	if err := fileutil.WriteFile(mockExe, []byte(script), paths.DirPerm755); err != nil {
 		t.Fatalf("write mock: %v", err)
 	}
 	mStorage := &mockCapStorage{
@@ -809,7 +810,7 @@ EOF
 fi
 exit 0
 `
-	if err := fileutil.WriteFile(mockExe, []byte(script), 0755); err != nil {
+	if err := fileutil.WriteFile(mockExe, []byte(script), paths.DirPerm755); err != nil {
 		t.Fatalf("write mock: %v", err)
 	}
 	mStorage := &mockCapStorage{
@@ -845,7 +846,7 @@ EOF
 fi
 exit 0
 `, objects.FieldKeyID, objects.FieldKeyStatus, objects.FieldKeyPersonaRefs)
-	if err := fileutil.WriteFile(mockExe, []byte(script), 0755); err != nil {
+	if err := fileutil.WriteFile(mockExe, []byte(script), paths.DirPerm755); err != nil {
 		t.Fatalf("write mock: %v", err)
 	}
 	mStorage := &mockCapStorage{

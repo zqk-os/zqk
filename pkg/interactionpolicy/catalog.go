@@ -1,5 +1,7 @@
 package interactionpolicy
 
+import "github.com/zqk-os/zqk/pkg/paths"
+
 // Step is the kernel pong: a coherent next action for the seated persona.
 type Step struct {
 	Event       string `json:"event"`
@@ -15,21 +17,22 @@ type catalogEntry struct {
 
 // catalog is the fast ping-pong reflex when CAS is unavailable.
 // CLI overlays GuidingStep from the policy body (OverlayFromPolicy).
+// CommandHint values are product-CLI suffixes; branded at stepsForEvent.
 // TRACK: BLI-1787035087372193000-c022117d
 var catalog = []catalogEntry{
 	{
 		events: []string{EventGoTest},
 		step: Step{
 			PolicyID:    PolicyAdminMembrane,
-			GuidingStep: "You ran tests. Persist SCH id + log path on the ATK via zqk object update. Do not set status=implemented from chat. Worker must not call zqk agent next (coordinator owns it).",
-			CommandHint: "zqk object update <ATK-id> --field evidence_refs=...",
+			GuidingStep: "You ran tests. Persist SCH id + log path on the ATK via object update. Do not set status=implemented from chat. Worker must not call agent next (coordinator owns it).",
+			CommandHint: "object update <ATK-id> --field evidence_refs=...",
 		},
 	},
 	{
 		events: []string{EventGitCommit},
 		step: Step{
 			PolicyID:    PolicyAdminMembrane,
-			GuidingStep: "After commit in an ATK worktree, merge to integration/pri-* then tear down the worktree before zqk agent next.",
+			GuidingStep: "After commit in an ATK worktree, merge to integration/pri-* then tear down the worktree before agent next.",
 			CommandHint: "git worktree remove <path>",
 		},
 	},
@@ -38,22 +41,22 @@ var catalog = []catalogEntry{
 		step: Step{
 			PolicyID:    PolicyAdminMembrane,
 			GuidingStep: "ATK worktrees must not be under the studio project (POL-AGENT-WORKTREE-ISOLATION-001). Use paths.AgentWorktreeDir / $TMPDIR/zqk-worktrees.",
-			CommandHint: "zqk agent orchestrate (kernel sets isolated worktree path)",
+			CommandHint: "agent orchestrate (kernel sets isolated worktree path)",
 		},
 	},
 	{
 		events: []string{EventAgentOrchestrate},
 		step: Step{
 			PolicyID:    PolicyAdminMembrane,
-			GuidingStep: "Run zqk agent prepare-context with --persona-ref before orchestrate (WFL-SUBAGENT-DISPATCH).",
-			CommandHint: "zqk agent prepare-context --persona-ref PER-* <ATK-id>",
+			GuidingStep: "Run agent prepare-context with --persona-ref before orchestrate (WFL-SUBAGENT-DISPATCH).",
+			CommandHint: "agent prepare-context --persona-ref PER-* <ATK-id>",
 		},
 	},
 	{
 		events: []string{EventAgentExecute},
 		step: Step{
 			PolicyID:    PolicyAdminMembrane,
-			GuidingStep: "execute is the coder. Do not zqk agent next from this worktree; coordinator transitions after merge-up.",
+			GuidingStep: "execute is the coder. Do not call agent next from this worktree; coordinator transitions after merge-up.",
 		},
 	},
 	{
@@ -72,7 +75,7 @@ var catalog = []catalogEntry{
 		step: Step{
 			PolicyID:    PolicyTPMProcessAdmin,
 			GuidingStep: "Inbox has unacked swarm mail. feed ack as this seat. Hourglass only when the body names a live ATK or a COMMS-CHECK nonce. Do not hourglass park, skip, peer_ack, or scheduler-callback wakes.",
-			CommandHint: "zqk feed ack --agent-id <seat> --persona-ref <persona> --in-reply-to <AFE>",
+			CommandHint: "feed ack --agent-id <seat> --persona-ref <persona> --in-reply-to <AFE>",
 		},
 	},
 	{
@@ -88,15 +91,15 @@ var catalog = []catalogEntry{
 		step: Step{
 			PolicyID:    PolicyTPMGroomAhead,
 			GuidingStep: "Unsealed intake only: seated priority_plan (PRI-*, Gantt matrix column) is not execution-locked and has exploring/validated BLIs. Promote those to planned. Do not mint onto in_progress/complete priority_plans. TPM must not claim orch-bound work.",
-			CommandHint: "zqk object list backlog_item --filter priority_plan_ref=<PRI>",
+			CommandHint: "object list backlog_item --filter priority_plan_ref=<PRI>",
 		},
 	},
 	{
 		events: []string{EventStratplanAhead},
 		step: Step{
 			PolicyID:    PolicyTPMGroomAhead,
-			GuidingStep: "Lead priority_plan (PRI-*, Gantt matrix column) planned count is 0 because that PRI is executing or already done — not because intake needs restuffing. Do not break the seal (no mint, no demote to planned). If align-latest.json is fresh (<30m), do not re-run align; shape the next unlocked priority_plan still in grooming and classify draft plane. Else persist a new align cache. Keep active_order honest to mission/vision/strategic_plan. Objectify via gen-trace-pipeline (POL-AGENT-TPM-TRACE-PIPELINE-001): do not hand-mint 1:1 REQ→CRIT. " + HintTracePipeline,
-			CommandHint: HintAlignRefresh,
+			GuidingStep: "Lead priority_plan (PRI-*, Gantt matrix column) planned count is 0 because that PRI is executing or already done — not because intake needs restuffing. Do not break the seal (no mint, no demote to planned). If align-latest.json is fresh (<30m), do not re-run align; shape the next unlocked priority_plan still in grooming and classify draft plane. Else persist a new align cache. Keep active_order honest to mission/vision/strategic_plan. Objectify via gen-trace-pipeline (POL-AGENT-TPM-TRACE-PIPELINE-001): do not hand-mint 1:1 REQ→CRIT. " + hintTracePipelineSuffix,
+			CommandHint: hintAlignRefreshSuffix,
 		},
 	},
 	{
@@ -104,15 +107,15 @@ var catalog = []catalogEntry{
 		step: Step{
 			PolicyID:    PolicyCommsRemedy,
 			GuidingStep: "Channel is sick — not an idle-coder problem. Stop ATK completion on that seat. Repair seating and re-run COMMS-CHECK until life and work pass.",
-			CommandHint: "zqk feed doctor --refresh-seats",
+			CommandHint: "feed doctor --refresh-seats",
 		},
 	},
 	{
 		events: []string{EventLifecycleBlocked},
 		step: Step{
 			PolicyID:    PolicyInteractionMeta,
-			GuidingStep: "Promote/transition was blocked. Satisfy the printed preconditions (fields, refs, percent_complete) then re-run zqk object promote. That message is the guiding step.",
-			CommandHint: "zqk object promote <id>",
+			GuidingStep: "Promote/transition was blocked. Satisfy the printed preconditions (fields, refs, percent_complete) then re-run object promote. That message is the guiding step.",
+			CommandHint: "object promote <id>",
 		},
 	},
 }
@@ -124,6 +127,10 @@ func stepsForEvent(event string) []Step {
 			if ev == event {
 				s := e.step
 				s.Event = event
+				s.GuidingStep = paths.RewriteCanonicalCLIInvocations(s.GuidingStep)
+				if s.CommandHint != "" && s.CommandHint != HintPushAhead {
+					s.CommandHint = paths.CLIInvocation(s.CommandHint)
+				}
 				out = append(out, s)
 				break
 			}

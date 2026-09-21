@@ -78,7 +78,7 @@ func TestProjectRootFromProcessDir(t *testing.T) {
 	projectRoot := "/Users/test/workspace/repo"
 
 	// Canonical .zqk/process path
-	zqkProcess := filepath.Join(projectRoot, paths.ProjectDataDir, "process")
+	zqkProcess := filepath.Join(projectRoot, paths.ProjectDataDir, paths.ProcessSubdir)
 	if got := projectRootFromProcessDir(zqkProcess); got != projectRoot {
 		t.Fatalf("zqkProcess: got %q, want %q", got, projectRoot)
 	}

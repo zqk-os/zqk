@@ -14,6 +14,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
 	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/strutil"
@@ -163,8 +164,7 @@ func stopScheduler(ctx *cli.Context, cmd *cobra.Command) error {
 				}
 				if cmd != nil {
 					if errOutput := cli.WriteOutput(cmd, []byte(fmt.Sprintf(
-						"Daemon (PID %d) still running after %v wait (SIGTERM). PID file was kept so you can run stop again.\n"+
-							"Next: zqk scheduler stop --wait --max-wait <longer>, or zqk scheduler stop --force if stuck. Common causes: storage/hash drain, in-flight jobs, metrics flush.\n",
+						"Daemon (PID %d) still running after %v wait (SIGTERM). PID file was kept so you can run stop again.\n"+paths.RewriteCanonicalCLIInvocations("Next: zqk scheduler stop --wait --max-wait <longer>, or zqk scheduler stop --force if stuck. Common causes: storage/hash drain, in-flight jobs, metrics flush.\n"),
 						pid, maxWait))); errOutput != nil {
 						schedulerpkg.SLog(logger).Debug("Failed to write stop timeout warning").WithError(errOutput).Log()
 					}
@@ -181,7 +181,7 @@ func stopScheduler(ctx *cli.Context, cmd *cobra.Command) error {
 				if err := cli.WriteOutput(cmd, []byte(fmt.Sprintf(schedulerStopSigtermMsgFmt, pid))); err != nil {
 					return err
 				}
-				if err := cli.WriteOutput(cmd, []byte("Shutdown is in progress; check: zqk scheduler status. To wait: zqk scheduler stop --wait. To force: zqk scheduler stop --force.\n")); err != nil {
+				if err := cli.WriteOutput(cmd, []byte(paths.RewriteCanonicalCLIInvocations("Shutdown is in progress; check: zqk scheduler status. To wait: zqk scheduler stop --wait. To force: zqk scheduler stop --force.\n"))); err != nil {
 					return err
 				}
 			}

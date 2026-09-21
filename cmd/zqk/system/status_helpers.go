@@ -200,7 +200,7 @@ func getSystemHealthData(projectRoot string) map[string]any {
 
 	if projectRoot == emptyValue || !paths.IsValidProjectRoot(projectRoot) {
 		healthData[objects.FieldKeyStatus] = "uninitialized"
-		healthData["error"] = "project root not found or uninitialized; run 'zqk system init'"
+		healthData["error"] = paths.RewriteCanonicalCLIInvocations("project root not found or uninitialized; run 'zqk system init'")
 		healthData["check_failed"] = true
 		healthData["scheduler"] = map[string]any{"running": false}
 		return healthData
@@ -370,7 +370,7 @@ func buildStatusData(cmd *cobra.Command, ctx *cli.Context, verbose bool) (map[st
 	}
 
 	// Read CAP review result gate status from .zqk/state/cap_review_result.json
-	capReviewPath := filepath.Join(projectRoot, paths.ProjectDataDir, "state", "cap_review_result.json")
+	capReviewPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.StateDir, "cap_review_result.json")
 	if raw, err := fileutil.ReadFile(capReviewPath); err == nil {
 		var capReview map[string]any
 		if json.Unmarshal(raw, &capReview) == nil {

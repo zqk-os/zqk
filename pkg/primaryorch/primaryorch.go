@@ -224,7 +224,7 @@ func (AgentChatAdapter) Wake(ctx context.Context, projectRoot string, b Binding,
 		return WakeResult{}, errfmt.Newf("primaryorch: agent_chat mkdir").Wrap(err)
 	}
 	eventPath := datacell.AgentChatChannelEventsJSONLPath(projectRoot)
-	f, err := fileutil.OpenFile(eventPath, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, 0644)
+	f, err := fileutil.OpenFile(eventPath, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, paths.FilePerm644)
 	if err != nil {
 		return WakeResult{}, errfmt.Newf("primaryorch: agent_chat open").Wrap(err)
 	}
@@ -260,7 +260,7 @@ func (InboxAdapter) Wake(ctx context.Context, projectRoot string, b Binding, req
 		leaf = b.AgentID
 	}
 	leaf = sanitizePathSegment(leaf)
-	dir := filepath.Join(projectRoot, paths.ProjectDataDir, "inbox", leaf)
+	dir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.InboxSubdir, leaf)
 	if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
 		return WakeResult{}, err
 	}
@@ -270,7 +270,7 @@ func (InboxAdapter) Wake(ctx context.Context, projectRoot string, b Binding, req
 	}
 	path := filepath.Join(dir, name)
 	body := req.Message + "\n"
-	if err := fileutil.WriteFile(path, []byte(body), 0644); err != nil {
+	if err := fileutil.WriteFile(path, []byte(body), paths.FilePerm644); err != nil {
 		return WakeResult{}, errfmt.Newf("primaryorch: inbox write").Wrap(err)
 	}
 	return WakeResult{AgentID: b.AgentID, Adapter: AdapterInbox, DeliveredTo: "inbox:" + path}, nil

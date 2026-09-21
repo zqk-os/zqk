@@ -83,7 +83,7 @@ func runTestFailuresConvergenceOverseer(cliCtx *cli.Context, cmd *cobra.Command)
 		"arbitrated_next_action_markdown": arbitrated,
 		"related_object_refs_cycle":       nil,
 		"max_tree_depth":                  convergerollup.DefaultOverseerCVSTreeMaxDepth,
-		"evaluation_note":                 "Full vetting matrix / drift baselines: scripts/cvs_outcome_rollup.py. Tree is BFS deduplicated by CVS id.",
+		"evaluation_note":                 "Tree is BFS deduplicated by CVS id.",
 	}
 	if len(cyclePath) > 0 {
 		out["related_object_refs_cycle"] = cyclePath

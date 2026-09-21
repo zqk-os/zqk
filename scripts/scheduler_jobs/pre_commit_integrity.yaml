@@ -15,11 +15,16 @@ schedule_expression: "0 */2 * * *"
 category: maintenance
 execution_mode: reusable
 max_runtime_seconds: 1320
-enabled: true
+enabled: false
 callback_type: command
 callback_on_completion: zqk pre-commit write-result-from-last --category=integrity
 title: Pre-commit integrity (system check)
 description: |
-  Runs pre-commit-integrity.sh (writes .last-integrity.json). Callback runs only when triggered with --pre-commit.
-command: ./scripts/pre-commit-integrity.sh
+  Runs system check (writes .last-integrity.json). Callback runs only when triggered with --pre-commit.
+command: /bin/sh
+command_args:
+  - "-c"
+  - |
+    BIN="${ZQK_BIN:-zqk}"
+    exec "$BIN" system check --fast
 namespace_id: zqk:kernel

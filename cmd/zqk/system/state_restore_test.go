@@ -12,7 +12,7 @@ import (
 
 func TestStateRestoreStorageUnwrap(t *testing.T) {
 	tmpDir := t.TempDir()
-	if err := fileutil.MkdirAll(filepath.Join(tmpDir, paths.ProcessDir), 0o755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Join(tmpDir, paths.ProcessDir), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	factory, err := storage.NewStorageFactory(t.Context(), tmpDir)

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/paths"
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
@@ -52,7 +53,7 @@ func runSnapshot(cmd *cobra.Command, args []string) error {
 		timestamp := time.Now().UnixMilli()
 
 		// Ensure the snapshots directory exists
-		snapshotDir := filepath.Join(projectRoot, ".zqk-state", "snapshots")
+		snapshotDir := filepath.Join(projectRoot, paths.ProjectStateDir, "snapshots")
 		outputPath := filepath.Join(snapshotDir, fmt.Sprintf("snap_%d.csnap", timestamp))
 
 		// Execute the underlying state-commit command

@@ -3,7 +3,6 @@ package objects
 import (
 	"context"
 	"fmt"
-	"os"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -24,8 +23,8 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
 	yamlspec "github.com/zqk-os/zqk/pkg/specbuilder/yaml"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
-	"github.com/zqk-os/zqk/pkg/when"
 )
 
 // Spec represents a loaded object specification with resolved inheritance.
@@ -115,33 +114,31 @@ type specShard struct {
 }
 
 // SpecLoader loads and resolves object specifications with inheritance.
-// Uses sharded locking to reduce contention when multiple goroutines load different specs concurrently.
+// Spec memos are stamp-invalidated (pkg/stampmemo); keys are the closed spec tree.
 // Optional EnsureReady(ctx) uses the component loader pattern (pkg/loader) to warm base specs once with timeout.
 type SpecLoader struct {
 	specsDir        string
 	dependencyGraph *SpecDependencyGraph                  // Optional: for load order validation
-	shards          []*specShard                          // Sharded caches (reduces lock contention)
-	shardCount      int                                   // Number of shards (power of 2 for fast modulo)
+	specsByPath     stampmemo.Table[*Spec]                // keyed by abs spec path (closed spec tree)
+	specsByOntology stampmemo.Table[*Spec]                // keyed by ontology (closed spec tree)
+	ontologies      stampmemo.Table[string]               // keyed by abs spec path
+	fileBytes       stampmemo.Table[[]byte]               // keyed by abs spec path; stamp is generation
+	specIndex       stampmemo.Table[map[string]string]    // keyed by specsDir; basename/ontology → abs path
+	fieldRefs       stampmemo.Table[map[string]any]       // keyed by ref name (closed field-ref set)
 	builderRegistry atomic.Pointer[builderRegistryHolder] // Optional: for version-aware loading (atomic load/store; no mutex)
 	globalMu        sync.RWMutex                          // Protects specsDir updates in ensure-ready (see doEnsureReady)
 	metrics         *SpecLoaderMetrics                    // Metrics for lock operations
 	logger          concurrency.LockLogger                // Logger for lock operations
 	readyRunner     *loader.Runner                        // Optional: one-shot "ensure ready" (warm base specs)
 	readyRunnerOnce sync.Once
-	cacheBuffer     *SpecCacheUpdateBuffer // Unused (removed batching - sync.Map.Store() is already optimized)
 	// cacheRevision increments on ClearCache / InvalidateSpec / InvalidateSpecByFile so callers
 	// can correlate derived materializations (spec index, kind lists) with invalidation (see SPEC_ORIGIN_PLANE.md).
 	cacheRevision atomic.Uint64
 	// specStorage backs spec reads (CRIT-9031 / SpecStorageProvider). When nil, readSpecFile uses os.ReadFile.
 	specStorage SpecStorageProvider
-	// specPathIndex maps spec names and ontologies to absolute paths in subdirectories
-	specPathIndex sync.Map
-	// fieldRefCache caches resolved field reference definitions
-	fieldRefCache sync.Map
 }
 
-// NewSpecLoader creates a new spec loader
-// Uses sharded locking (64 shards) to reduce contention when loading specs concurrently
+// NewSpecLoader creates a new spec loader.
 //
 // If specsDir is empty, the object-specs directory is discovered via findSpecsDir().
 // If specsDir is a project root (caller passed the repo/workspace root rather than
@@ -156,30 +153,12 @@ func NewSpecLoader(specsDir string) *SpecLoader {
 		specsDir = normalizeSpecsDirIfProjectRoot(specsDir)
 	}
 
-	// Use 64 shards (power of 2) for better distribution and reduced lock contention
-	// Increased from 16 to 64 to handle high concurrency (14k+ objects) better
-	// Each shard uses sync.Map for lock-free cache reads (cache hits are hot path)
-	shardCount := 64
-	shards := make([]*specShard, shardCount)
-	for i := range shardCount {
-		shards[i] = &specShard{
-			// sync.Map initialized as zero value (ready to use)
-		}
-	}
-
 	loader := &SpecLoader{
-		specsDir:   specsDir,
-		shards:     shards,
-		shardCount: shardCount,
-		metrics:    GetGlobalSpecLoaderMetrics(),
-		logger:     &specLoaderLockLogger{logger: logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))},
+		specsDir: specsDir,
+		metrics:  GetGlobalSpecLoaderMetrics(),
+		logger:   &specLoaderLockLogger{logger: logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))},
 	}
-	// Initialize dependency graph for validation
 	loader.dependencyGraph = NewSpecDependencyGraph(loader)
-	// Removed write-behind buffer: sync.Map.Store() is already optimized for concurrent access.
-	// Batching doesn't reduce Store() calls (no deduplication), and adds channel/worker overhead.
-	// If Store() is truly blocking, batching won't help - we still call it the same number of times.
-	loader.cacheBuffer = nil
 	if specsDir != emptyValue {
 		if p, err := NewFileSpecStorageProvider(specsDir); err == nil {
 			loader.specStorage = p
@@ -260,19 +239,6 @@ func (l *specLoaderLockLogger) Warn(msg string, fields ...concurrency.LockField)
 		entry = entry.WithFields(logFields...)
 	}
 	entry.Log()
-}
-
-// getShard returns the shard for a given ontology
-// Uses simple hash of ontology string for distribution
-func (sl *SpecLoader) getShard(ontology string) *specShard {
-	// Simple hash function for distribution
-	hash := 0
-	for _, c := range ontology {
-		hash = hash*31 + int(c)
-	}
-	// Use bitwise AND for fast modulo (shardCount must be power of 2)
-	shardIndex := hash & (sl.shardCount - 1)
-	return sl.shards[shardIndex]
 }
 
 // SetBuilderRegistry sets the builder registry for version-aware loading
@@ -412,22 +378,14 @@ func (sl *SpecLoader) ValidateTraitContracts(specs []*Spec) []ValidationError {
 	return allErrors
 }
 
-// indexSpecSubdirectories walks sl.specsDir and indexes all *.yaml specs by filename and ontology
-func (sl *SpecLoader) indexSpecSubdirectories() {
+func (sl *SpecLoader) specNameIndex() map[string]string {
 	if sl == nil || sl.specsDir == emptyValue {
-		return
-	}
-	_ = filepath.WalkDir(sl.specsDir, func(path string, d os.DirEntry, err error) error {
-		if err != nil || d == nil {
-			return nil
-		}
-		if !d.IsDir() && strings.HasSuffix(d.Name(), ".yaml") {
-			sl.specPathIndex.Store(d.Name(), path)
-			ontology := strings.TrimSuffix(d.Name(), ".yaml")
-			sl.specPathIndex.Store(ontology, path)
-		}
 		return nil
+	}
+	idx, _ := sl.specIndex.Load(sl.specsDir, paths.DomainTreeStamp(sl.specsDir), func() (map[string]string, error) {
+		return paths.IndexYAMLNames(sl.specsDir), nil
 	})
+	return idx
 }
 
 // resolveSpecFilePath resolves a spec file path directly, or via recursive index across subdirectories
@@ -438,33 +396,24 @@ func (sl *SpecLoader) resolveSpecFilePath(specFile string) string {
 	if filepath.IsAbs(specFile) {
 		return specFile
 	}
-	// 1. Direct join
-	direct := filepath.Join(sl.specsDir, specFile)
-	if _, err := fileutil.Stat(direct); err == nil {
-		return direct
+	if hit := paths.FindDomainFile(sl.specsDir, specFile); hit != "" {
+		return hit
 	}
-
-	// 2. Check specPathIndex cache
+	if base := filepath.Base(specFile); base != specFile {
+		if hit := paths.FindDomainFile(sl.specsDir, base); hit != "" {
+			return hit
+		}
+	}
+	idx := sl.specNameIndex()
 	base := filepath.Base(specFile)
-	if val, ok := sl.specPathIndex.Load(base); ok {
-		return val.(string)
+	if hit := idx[base]; hit != "" {
+		return hit
 	}
 	ontology := strings.TrimSuffix(base, ".yaml")
-	if val, ok := sl.specPathIndex.Load(ontology); ok {
-		return val.(string)
+	if hit := idx[ontology]; hit != "" {
+		return hit
 	}
-
-	// 3. Scan subdirectories of sl.specsDir
-	sl.indexSpecSubdirectories()
-
-	if val, ok := sl.specPathIndex.Load(base); ok {
-		return val.(string)
-	}
-	if val, ok := sl.specPathIndex.Load(ontology); ok {
-		return val.(string)
-	}
-
-	return direct
+	return filepath.Join(sl.specsDir, specFile)
 }
 
 // loadFieldReference loads and parses a field definition from built_ins/fields/ or fields/
@@ -472,36 +421,44 @@ func (sl *SpecLoader) loadFieldReference(ref string) map[string]any {
 	if ref == emptyValue {
 		return nil
 	}
-	if cached, ok := sl.fieldRefCache.Load(ref); ok {
-		return cached.(map[string]any)
-	}
+	cands := sl.fieldRefCandidates(ref)
+	parsed, _ := sl.fieldRefs.Load(ref, stampmemo.OfAll(cands...), func() (map[string]any, error) {
+		for _, absPath := range cands {
+			data, err := fileutil.ReadFile(absPath)
+			if err != nil {
+				continue
+			}
+			var parsed map[string]any
+			if err := yaml.Unmarshal(data, &parsed); err == nil {
+				return parsed, nil
+			}
+		}
+		return nil, nil
+	})
+	return parsed
+}
 
-	// Candidate paths
-	candidatePaths := []string{
+func (sl *SpecLoader) fieldRefCandidates(ref string) []string {
+	base := filepath.Base(ref)
+	cands := []string{
 		ref,
 		ref + ".yaml",
 		filepath.Join(sl.specsDir, ref),
 		filepath.Join(sl.specsDir, ref+".yaml"),
 		filepath.Join(sl.specsDir, "built_ins", "fields", ref+".yaml"),
-		filepath.Join(sl.specsDir, "built_ins", "fields", filepath.Base(ref)+".yaml"),
+		filepath.Join(sl.specsDir, "built_ins", "fields", base+".yaml"),
 		filepath.Join(sl.specsDir, "fields", ref+".yaml"),
-		filepath.Join(sl.specsDir, "fields", filepath.Base(ref)+".yaml"),
+		filepath.Join(sl.specsDir, "fields", base+".yaml"),
 	}
-
-	for _, p := range candidatePaths {
-		absPath := p
-		if !filepath.IsAbs(absPath) {
-			absPath = filepath.Join(sl.specsDir, p)
+	out := make([]string, 0, len(cands))
+	for _, p := range cands {
+		if filepath.IsAbs(p) {
+			out = append(out, p)
+			continue
 		}
-		if data, err := fileutil.ReadFile(absPath); err == nil {
-			var parsed map[string]any
-			if err2 := yaml.Unmarshal(data, &parsed); err2 == nil {
-				sl.fieldRefCache.Store(ref, parsed)
-				return parsed
-			}
-		}
+		out = append(out, filepath.Join(sl.specsDir, p))
 	}
-	return nil
+	return out
 }
 
 // resolveFieldReferences scans spec.ResolvedFields for $ref / ref references, resolves them, and merges definitions
@@ -541,119 +498,6 @@ func (sl *SpecLoader) resolveFieldReferences(spec *Spec) {
 	}
 }
 
-// LoadSpecWithInheritance loads a spec and resolves its inheritance chain
-// Results are cached by path and ontology to avoid reloading the same spec (and double ReadFile on first load)
-func (sl *SpecLoader) LoadSpecWithInheritance(specFile string) (*Spec, error) {
-	// Resolve spec file path (normalize for path cache)
-	specPath := sl.resolveSpecFilePath(specFile)
-	if abs, err := filepath.Abs(specPath); err == nil {
-		specPath = abs // normalize for path cache key
-	}
-
-	// OPTIMIZED: Check path cache first to avoid double ReadFile (getOntologyFromFile + loadSpecWithInheritanceRecursive)
-	pathShard := sl.getShard(specPath)
-	if pathVal, ok := pathShard.pathCache.Load(specPath); ok {
-		cached := pathVal.(*cachedSpec)
-		if stat, err := fileutil.Stat(specPath); err == nil {
-			if stat.ModTime().Equal(cached.mtime) || stat.ModTime().Before(cached.mtime) {
-				return cached.spec, nil
-			}
-		}
-	}
-
-	// Get ontology for cache key (read file once; may hit ontologyCache)
-	ontology := sl.getOntologyFromFile(specPath)
-	if ontology == emptyValue {
-		// Fallback: use filename without extension as cache key
-		base := filepath.Base(specFile)
-		ontology = base[:len(base)-len(filepath.Ext(base))]
-	}
-
-	// Get shard for this ontology (reduces contention)
-	shard := sl.getShard(ontology)
-
-	// OPTIMIZED: Lock-free cache read using sync.Map (hot path - cache hits)
-	// Once cached, reads are completely lock-free - no contention
-	cachedVal, exists := shard.cache.Load(ontology)
-	if exists {
-		cached := cachedVal.(*cachedSpec)
-		// Check if file has been modified (I/O outside any lock)
-		if stat, err := fileutil.Stat(specPath); err == nil {
-			if stat.ModTime().Equal(cached.mtime) || stat.ModTime().Before(cached.mtime) {
-				// File hasn't changed, return cached spec (LOCK-FREE PATH)
-				return cached.spec, nil
-			}
-			// File was modified - need to reload (will update cache below)
-		}
-	}
-
-	// Load spec (will recursively load parents)
-	// Pass ontology to avoid re-reading file for circular detection
-	visited := make(map[string]bool) // Track visited specs for circular detection
-	spec, err := sl.loadSpecWithInheritanceRecursive(specFile, visited, ontology, 0)
-	if err != nil {
-		return nil, err
-	}
-
-	// Get file modification time for staleness detection
-	var mtime time.Time
-	stat, statErr := fileutil.Stat(specPath)
-	when.When(func() bool { return statErr == nil }).Then(func() {
-		mtime = stat.ModTime()
-	}).OrElse(func() {
-		mtime = time.Now()
-	}).Run()
-
-	cached := &cachedSpec{spec: spec, mtime: mtime}
-
-	// OPTIMIZED: Lock-free double-checked pattern using sync.Map
-	// Another goroutine might have loaded it while we were loading
-	cachedAfterLoadVal, existsAfterLoad := shard.cache.Load(ontology)
-	if existsAfterLoad {
-		cachedAfterLoad := cachedAfterLoadVal.(*cachedSpec)
-		// Check if our loaded version is newer than cached
-		stat, statErr := fileutil.Stat(specPath)
-		when.When(func() bool { return statErr == nil && stat.ModTime().After(cachedAfterLoad.mtime) }).Then(func() {
-			// Queue cache updates instead of blocking on Store()
-			sl.queueCacheUpdate(shard, CacheUpdateSpec, ontology, cached)
-			sl.queueCacheUpdate(pathShard, CacheUpdatePath, specPath, cached)
-		}).OrElse(func() {
-			spec = cachedAfterLoad.spec
-		}).Run()
-		return spec, nil
-	}
-
-	// Queue cache updates instead of blocking on Store() (write-behind pattern reduces sync.Map contention)
-	sl.queueCacheUpdate(shard, CacheUpdateSpec, ontology, cached)
-	sl.queueCacheUpdate(pathShard, CacheUpdatePath, specPath, cached)
-	return spec, nil
-}
-
-// queueCacheUpdate applies cache updates directly using sync.Map.Store()
-// sync.Map is optimized for concurrent access - no batching needed
-func (sl *SpecLoader) queueCacheUpdate(shard *specShard, updateType CacheUpdateType, key string, value any) {
-	switch updateType {
-	case CacheUpdateSpec:
-		shard.cache.Store(key, value)
-	case CacheUpdatePath:
-		shard.pathCache.Store(key, value)
-	case CacheUpdateOntology:
-		shard.ontologyCache.Store(key, value)
-	case CacheUpdateFileContent:
-		shard.fileContentCache.Store(key, value)
-	}
-}
-
-// getShardByPath returns the shard for a given file path (for path-based caches like fileContentCache).
-func (sl *SpecLoader) getShardByPath(filePath string) *specShard {
-	hash := 0
-	for _, c := range filePath {
-		hash = hash*31 + int(c)
-	}
-	shardIndex := hash & (sl.shardCount - 1)
-	return sl.shards[shardIndex]
-}
-
 // maxSpecInheritanceDepth limits recursion to prevent hang from cycles or bugs (see GENERATE_BUILDERS_SAMPLE_ANALYSIS.md)
 const maxSpecInheritanceDepth = 30
 
@@ -677,31 +521,12 @@ func (sl *SpecLoader) loadSpecWithInheritanceRecursive(specFile string, visited 
 	if depth > maxSpecInheritanceDepth {
 		return nil, errfmt.Errorf("spec inheritance depth exceeded %d (possible cycle or bug): %s", maxSpecInheritanceDepth, specFile)
 	}
-	// Resolve spec file path to absolute for cache key consistency
-	specPath := sl.resolveSpecFilePath(specFile)
-	if abs, err := filepath.Abs(specPath); err == nil {
-		specPath = abs
-	}
+	specPath := sl.absSpecPath(specFile)
 
-	// If ontology not provided, read it from file (for parent specs)
 	if ontology == emptyValue {
 		ontology = sl.getOntologyFromFile(specPath)
 	}
 
-	// Check if this spec is already fully merged and cached
-	if ontology != emptyValue {
-		shard := sl.getShard(ontology)
-		if cachedVal, exists := shard.cache.Load(ontology); exists {
-			cached := cachedVal.(*cachedSpec)
-			if stat, err := fileutil.Stat(specPath); err == nil {
-				if stat.ModTime().Equal(cached.mtime) || stat.ModTime().Before(cached.mtime) {
-					return cached.spec, nil
-				}
-			}
-		}
-	}
-
-	// Check for circular inheritance
 	if ontology != emptyValue {
 		if visited[ontology] {
 			return nil, errfmt.Errorf("circular inheritance detected: %s", ontology)
@@ -709,23 +534,9 @@ func (sl *SpecLoader) loadSpecWithInheritanceRecursive(specFile string, visited 
 		visited[ontology] = true
 	}
 
-	// Load the spec file: use fileContentCache if getOntologyFromFile already read it (avoids second ReadFile)
-	pathShard := sl.getShardByPath(specPath)
-	var data []byte
-	if cached, ok := pathShard.fileContentCache.Load(specPath); ok {
-		entry := cached.(*fileContentEntry)
-		if stat, err := fileutil.Stat(specPath); err == nil && !stat.ModTime().After(entry.mtime) {
-			data = entry.data
-		}
-	}
-	if data == nil {
-		rd, mtime, err := sl.readSpecFile(context.Background(), specPath)
-		if err != nil {
-			return nil, errfmt.Errorf("failed to read spec file %s: %w", specPath, err)
-		}
-		data = rd
-		// Queue cache update instead of blocking on Store()
-		sl.queueCacheUpdate(pathShard, CacheUpdateFileContent, specPath, &fileContentEntry{data: data, mtime: mtime})
+	data, err := sl.readCachedBytes(specPath)
+	if err != nil {
+		return nil, errfmt.Errorf("failed to read spec file %s: %w", specPath, err)
 	}
 
 	// Validate against JSON schema if $schema is present (optional validation)
@@ -736,7 +547,7 @@ func (sl *SpecLoader) loadSpecWithInheritanceRecursive(specFile string, visited 
 	if !config.ValidationSkipSpecSchemaValidation().OrDefault(false) && yaml.Unmarshal(data, &tempSpec) == nil {
 		if schemaRef := tempSpec.Schema; schemaRef != emptyValue {
 			// Try to find schemas directory relative to project root
-			schemasDir := ".zqk/cli/specs/schemas"
+			schemasDir := filepath.Join(paths.ProjectDataDir, "cli", "specs", "schemas")
 			// Try to resolve from specsDir
 			if sl.specsDir != emptyValue {
 				dir := sl.specsDir
@@ -796,8 +607,7 @@ func (sl *SpecLoader) loadSpecWithInheritanceRecursive(specFile string, visited 
 	// If this spec extends another, load and merge parent
 	if spec.Extends != emptyValue && spec.Extends != "null" {
 		parentFile := spec.Extends + ".yaml"
-		// Pass empty ontology - will be read from file for parent
-		parentSpec, err := sl.loadSpecWithInheritanceRecursive(parentFile, visited, "", depth+1)
+		parentSpec, err := sl.loadSpecCached(parentFile, visited, depth+1)
 		if err != nil {
 			return nil, errfmt.Errorf("failed to load parent spec %s: %w", parentFile, err)
 		}
@@ -892,16 +702,10 @@ func (sl *SpecLoader) LoadSpecByVersion(ontology, instanceVersion string) (*Spec
 	// IMPORTANT: Clear cache before resolving inheritance to ensure parent specs are loaded fresh
 	// This prevents stale cached parent specs from being used (e.g., with old validation patterns)
 	if spec.Extends != emptyValue && spec.Extends != "null" {
-		// OPTIMIZED: Lock-free invalidation using sync.Map.Delete
-		parentShard := sl.getShard(spec.Extends)
-		// Invalidate any cached parent specs that might be used during inheritance resolution
-		// This ensures we get fresh specs with updated patterns from config/spec files
-		parentShard.cache.Delete(spec.Extends)
+		sl.invalidateOntology(spec.Extends)
 	}
 	for _, mixin := range spec.Composes {
-		if mixin != emptyValue && mixin != "null" {
-			sl.getShard(mixin).cache.Delete(mixin)
-		}
+		sl.invalidateOntology(mixin)
 	}
 
 	visited := make(map[string]bool)
@@ -983,20 +787,14 @@ func (sl *SpecLoader) resolveSpecInheritance(spec *Spec, visited map[string]bool
 		// Fall back to YAML file if builder didn't work
 		if parentSpec == nil {
 			parentFile := spec.Extends + ".yaml"
-			// CRITICAL: Invalidate cached parent spec to ensure we load fresh (important for dynamic patterns)
-			// This is essential for white-labeling - patterns must be read dynamically from config, not from cache
-			parentShard := sl.getShard(spec.Extends)
-			// OPTIMIZED: Lock-free invalidation using sync.Map.Delete
-			parentShard.cache.Delete(spec.Extends)
-			// Also invalidate any parent's parents (e.g., if base_object extends auditable, invalidate both)
+			sl.invalidateOntology(spec.Extends)
 			if parentFile == KindBaseObject+".yaml" || parentFile == KindWorkInterval+".yaml" || parentFile == KindWorkUnit+".yaml" || parentFile == KindOccupancy+".yaml" || parentFile == KindRemainingOpen+".yaml" {
-				auditableShard := sl.getShard(KindAuditable)
-				auditableShard.cache.Delete(KindAuditable)
-				sl.getShard(KindBaseObject).cache.Delete(KindBaseObject)
-				sl.getShard(KindWorkInterval).cache.Delete(KindWorkInterval)
-				sl.getShard(KindWorkUnit).cache.Delete(KindWorkUnit)
-				sl.getShard(KindOccupancy).cache.Delete(KindOccupancy)
-				sl.getShard(KindRemainingOpen).cache.Delete(KindRemainingOpen)
+				sl.invalidateOntology(KindAuditable)
+				sl.invalidateOntology(KindBaseObject)
+				sl.invalidateOntology(KindWorkInterval)
+				sl.invalidateOntology(KindWorkUnit)
+				sl.invalidateOntology(KindOccupancy)
+				sl.invalidateOntology(KindRemainingOpen)
 			}
 			parentSpec, err = sl.loadSpecWithInheritanceRecursive(parentFile, visited, "", depth+1)
 			if err != nil {
@@ -1041,52 +839,6 @@ func applyTraitExclusions(spec *Spec) {
 	spec.ResolvedTraits = filtered
 }
 
-// getOntologyFromFile extracts ontology from a spec file without full parsing
-// Results are cached to avoid re-reading files
-func (sl *SpecLoader) getOntologyFromFile(filePath string) string {
-	// Use file path hash to determine shard (different from ontology-based sharding)
-	// This ensures ontology cache lookups don't contend with spec cache lookups
-	hash := 0
-	for _, c := range filePath {
-		hash = hash*31 + int(c)
-	}
-	shardIndex := hash & (sl.shardCount - 1)
-	shard := sl.shards[shardIndex]
-
-	// OPTIMIZED: Lock-free cache read using sync.Map (hot path)
-	cachedVal, exists := shard.ontologyCache.Load(filePath)
-	if exists {
-		return cachedVal.(string)
-	}
-
-	// Read and parse file (I/O outside lock)
-	data, mtime, err := sl.readSpecFile(context.Background(), filePath)
-	if err != nil {
-		return ""
-	}
-
-	var partial struct {
-		Ontology string `yaml:"ontology"`
-	}
-	if err := yaml.Unmarshal(data, &partial); err != nil {
-		return ""
-	}
-
-	// OPTIMIZED: Lock-free double-checked pattern using sync.Map
-	// Another goroutine might have loaded it while we were reading
-	cachedAfterReadVal, existsAfterRead := shard.ontologyCache.Load(filePath)
-	if existsAfterRead {
-		return cachedAfterReadVal.(string)
-	}
-
-	// Cache the ontology and raw file content so loadSpecWithInheritanceRecursive can use it
-	// (avoids second ReadFile for the same path - hot path optimization per OBJECT_OPERATIONS_PERFORMANCE.md)
-	// Queue cache updates instead of blocking on Store()
-	sl.queueCacheUpdate(shard, CacheUpdateOntology, filePath, partial.Ontology)
-	sl.queueCacheUpdate(shard, CacheUpdateFileContent, filePath, &fileContentEntry{data: data, mtime: mtime})
-	return partial.Ontology
-}
-
 var (
 	globalSpecLoader *SpecLoader
 	specLoaderOnce   sync.Once
@@ -1106,24 +858,13 @@ func (sl *SpecLoader) DiscoverOntologies() ([]string, error) {
 	if sl == nil || sl.specsDir == emptyValue {
 		return nil, nil
 	}
-	sl.indexSpecSubdirectories()
+	idx := sl.specNameIndex()
 	var ontologies []string
-	seen := make(map[string]bool)
-	walkErr := filepath.WalkDir(sl.specsDir, func(path string, d os.DirEntry, err error) error {
-		if err != nil || d == nil {
-			return nil
+	for name := range idx {
+		if strings.HasSuffix(name, ".yaml") {
+			continue
 		}
-		if !d.IsDir() && strings.HasSuffix(d.Name(), ".yaml") {
-			name := strings.TrimSuffix(d.Name(), ".yaml")
-			if !seen[name] {
-				seen[name] = true
-				ontologies = append(ontologies, name)
-			}
-		}
-		return nil
-	})
-	if walkErr != nil {
-		return nil, errfmt.Newf("failed to walk specs directory").Wrap(walkErr)
+		ontologies = append(ontologies, name)
 	}
 	sort.Strings(ontologies)
 	return ontologies, nil
@@ -1167,70 +908,6 @@ func (sl *SpecLoader) bumpSpecCacheRevision() {
 	sl.cacheRevision.Add(1)
 }
 
-// ClearCache clears the spec cache, forcing reload of all specs on next access
-// This is useful when specs are updated and you want to ensure fresh validation
-// OPTIMIZED: Uses sync.Map.Range for lock-free iteration, then Delete for each entry
-// For better performance, use InvalidateSpec() to invalidate specific entries.
-func (sl *SpecLoader) ClearCache() {
-	// Clear all shards (lock-free iteration using sync.Map.Range)
-	for _, shard := range sl.shards {
-		// Clear spec cache (lock-free)
-		shard.cache.Range(func(key, value any) bool {
-			shard.cache.Delete(key)
-			return true
-		})
-		// Clear ontology cache (lock-free)
-		shard.ontologyCache.Range(func(key, value any) bool {
-			shard.ontologyCache.Delete(key)
-			return true
-		})
-		// Clear path cache (avoids stale path-based hits after full clear)
-		shard.pathCache.Range(func(key, value any) bool {
-			shard.pathCache.Delete(key)
-			return true
-		})
-		// Clear file content cache (raw bytes per path)
-		shard.fileContentCache.Range(func(key, value any) bool {
-			shard.fileContentCache.Delete(key)
-			return true
-		})
-	}
-	sl.bumpSpecCacheRevision()
-}
-
-// InvalidateSpec invalidates a specific spec entry by ontology
-// OPTIMIZED: Lock-free deletion using sync.Map.Delete
-// Use this instead of ClearCache() when you know which spec changed
-func (sl *SpecLoader) InvalidateSpec(ontology string) {
-	shard := sl.getShard(ontology)
-	// Lock-free deletion (sync.Map.Delete is thread-safe)
-	shard.cache.Delete(ontology)
-	sl.bumpSpecCacheRevision()
-}
-
-// InvalidateSpecByFile invalidates a spec entry by file path
-// This is useful when you know a file changed but not the ontology
-func (sl *SpecLoader) InvalidateSpecByFile(filePath string) {
-	absPath := filePath
-	if !filepath.IsAbs(filePath) {
-		absPath = filepath.Join(sl.specsDir, filePath)
-	}
-	if abs, err := filepath.Abs(absPath); err == nil {
-		absPath = abs
-	}
-	pathShard := sl.getShardByPath(absPath)
-	// Clear path-based caches so next load re-reads the file
-	if ontologyVal, ok := pathShard.ontologyCache.Load(absPath); ok {
-		ontology := ontologyVal.(string)
-		shard := sl.getShard(ontology)
-		shard.cache.Delete(ontology)
-	}
-	pathShard.pathCache.Delete(absPath)
-	pathShard.ontologyCache.Delete(absPath)
-	pathShard.fileContentCache.Delete(absPath)
-	sl.bumpSpecCacheRevision()
-}
-
 // FindSpecsDir returns the object specs directory (.zqk/specs/objects or equivalent).
 // Used by SpecLoader and by scheduler cache prewarm to discover spec files.
 func FindSpecsDir() string {
@@ -1260,63 +937,33 @@ func normalizeSpecsDirIfProjectRoot(specsDir string) string {
 
 // specsDirHasBaseSpec returns true if the directory contains base_object.yaml (directly or in kernel/dna subdirectories).
 func specsDirHasBaseSpec(specsDir string) bool {
-	if _, err := fileutil.Stat(filepath.Join(specsDir, baseObjectSpecName)); err == nil {
-		return true
-	}
-	if _, err := fileutil.Stat(filepath.Join(specsDir, "kernel", baseObjectSpecName)); err == nil {
-		return true
-	}
-	if _, err := fileutil.Stat(filepath.Join(specsDir, "dna", baseObjectSpecName)); err == nil {
-		return true
-	}
-	return false
+	_, err := paths.FindObjectSpecFile(specsDir, KindBaseObject)
+	return err == nil
 }
 
-// findSpecsDir attempts to find the object specs directory
+var discoveredSpecsDirs stampmemo.Table[string] // keyed by cwd+\0+testRoot (closed per process)
+
 func findSpecsDir() string {
-	// When running in tests, use test root only if it has a valid spec tree (base_object.yaml).
-	// SetupTestEnvironment creates an empty .zqk/specs/objects; without
-	// base_object.yaml LoadFields() would fail. Fall through to repo specs when test root
-	// has no base_object so tests that don't copy specs still pass (OBJECT_OPERATIONS_PERFORMANCE.md).
-	if testRoot := zqkenv.TestRoot().Get(); testRoot != emptyValue {
+	wd, err := fileutil.Getwd()
+	if err != nil {
+		wd = ""
+	}
+	testRoot := zqkenv.TestRoot().Get()
+	dir, _ := discoveredSpecsDirs.Load(wd+"\x00"+testRoot, stampmemo.Of(wd), func() (string, error) {
+		return locateSpecsDir(wd, testRoot), nil
+	})
+	return dir
+}
+
+func locateSpecsDir(wd, testRoot string) string {
+	if testRoot != emptyValue {
 		specsDir := filepath.Join(testRoot, paths.ProcessInternalObjectSpecsDir)
 		if info, err := fileutil.Stat(specsDir); err == nil && info.IsDir() && specsDirHasBaseSpec(specsDir) {
 			return specsDir
 		}
 	}
-	// Try common locations
-	possiblePaths := []string{
-		paths.ProcessInternalObjectSpecsDir,
-		filepath.Join("..", paths.ProcessInternalObjectSpecsDir),
-		filepath.Join("..", "..", paths.ProcessInternalObjectSpecsDir),
+	if hit := paths.FirstExistingFromCwd(paths.ProcessInternalObjectSpecsDir); hit != emptyValue && specsDirHasBaseSpec(hit) {
+		return hit
 	}
-
-	wd, err := fileutil.Getwd()
-	if err != nil {
-		return ""
-	}
-
-	for _, path := range possiblePaths {
-		absPath := filepath.Join(wd, path)
-		if info, err := fileutil.Stat(absPath); err == nil && info.IsDir() && specsDirHasBaseSpec(absPath) {
-			return absPath
-		}
-	}
-
-	// Walk up directory tree; require base_object.yaml so we use the real repo spec tree (not an empty .zqk/process from a nested .zqk).
-	dir := wd
-	for {
-		potentialPath := filepath.Join(dir, paths.ProcessInternalObjectSpecsDir)
-		if info, err := fileutil.Stat(potentialPath); err == nil && info.IsDir() && specsDirHasBaseSpec(potentialPath) {
-			return potentialPath
-		}
-
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			break
-		}
-		dir = parent
-	}
-
 	return ""
 }

@@ -2,9 +2,11 @@ package scheduler
 
 import (
 	"context"
+	"path/filepath"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
@@ -19,7 +21,7 @@ func NewLogRotatorHandler(projectRoot string, logger logging.Logger) LogRotatorH
 }
 
 func (h *LogRotatorHandler) Execute(ctx context.Context, job *ScheduledJob) error {
-	rotator := NewLogRotator(h.projectRoot+"/.zqk/logs", h.logger)
+	rotator := NewLogRotator(filepath.Join(h.projectRoot, paths.ProjectDataDir, paths.LogsDir), h.logger)
 	if err := rotator.Rotate(ctx, 7*24*time.Hour); err != nil {
 		return err
 	}

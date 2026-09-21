@@ -50,7 +50,7 @@ func TestCASOrphanGuard_CheckPackageIntegrity_detectsOrphans(t *testing.T) {
 	// Create a temp repo structure with an orphan reference.
 	dir := t.TempDir()
 	processDir := filepath.Join(dir, paths.ProcessDir, "backlog")
-	if err := fileutil.MkdirAll(processDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(processDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 
@@ -61,7 +61,7 @@ title: Alpha
 goal_refs:
   - GOL-MISSING
 `
-	if err := fileutil.WriteFile(filepath.Join(processDir, "alpha.yaml"), []byte(objA), 0644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(processDir, "alpha.yaml"), []byte(objA), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -93,7 +93,7 @@ func TestCASOrphanGuard_CheckPackageIntegrity_cleanTree(t *testing.T) {
 	t.Parallel()
 	dir := t.TempDir()
 	processDir := filepath.Join(dir, paths.ProcessDir, "goals")
-	if err := fileutil.MkdirAll(processDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(processDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 
@@ -103,7 +103,7 @@ kind: goal
 title: Test Goal
 `
 	bliDir := filepath.Join(dir, paths.ProcessDir, "backlog")
-	if err := fileutil.MkdirAll(bliDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(bliDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	bliYAML := `id: BLI-001
@@ -112,10 +112,10 @@ title: Test BLI
 goal_refs:
   - GOL-001
 `
-	if err := fileutil.WriteFile(filepath.Join(processDir, "goal.yaml"), []byte(goalYAML), 0644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(processDir, "goal.yaml"), []byte(goalYAML), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(filepath.Join(bliDir, "bli.yaml"), []byte(bliYAML), 0644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(bliDir, "bli.yaml"), []byte(bliYAML), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -134,7 +134,7 @@ func TestCASOrphanGuard_CheckPackageIntegrity_skipsInternalDir(t *testing.T) {
 	t.Parallel()
 	dir := t.TempDir()
 	internalDir := filepath.Join(dir, paths.ProcessInternalDir)
-	if err := fileutil.MkdirAll(internalDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(internalDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 
@@ -143,7 +143,7 @@ func TestCASOrphanGuard_CheckPackageIntegrity_skipsInternalDir(t *testing.T) {
 kind: schema
 parent_ref: DOES-NOT-EXIST
 `
-	if err := fileutil.WriteFile(filepath.Join(internalDir, "schema.yaml"), []byte(internal), 0644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(internalDir, "schema.yaml"), []byte(internal), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 

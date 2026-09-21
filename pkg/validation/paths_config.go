@@ -3,14 +3,11 @@ package validation
 import (
 	"path/filepath"
 	"strings"
-	"sync"
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/zqk-os/zqk/pkg/concurrency"
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
-	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -28,29 +25,13 @@ type SearchStrategyConfig struct {
 	Markers       []string `yaml:"markers"`
 }
 
-var (
-	globalPathsConfig   *PathsConfig
-	globalPathsConfigMu sync.Mutex
-)
-
-// ResetGlobalPathsConfig resets the global paths config singleton, forcing it to reload
-// This is useful when the config file changes or when testing
+// ResetGlobalPathsConfig drops the process-wide paths memo (tests that chdir).
 func ResetGlobalPathsConfig() {
-	if err := concurrency.RunInLockWithLogger(
-		&globalPathsConfigMu,
-		LockNamePathsResetConfig,
-		lockLoggerSystem(),
-		func() error {
-			globalPathsConfig = nil
-			return nil
-		},
-	); err != nil {
-		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.
-
-			// LoadPathsConfig loads the paths configuration from file
-			ProfileSystem))).Error(ConstMagic297bf952, err).Log()
-	}
+	pathsConfigs.Delete(globalConfigKey)
+	resetDiscoveredPaths()
 }
+
+// LoadPathsConfig loads the paths configuration from file
 
 func LoadPathsConfig(configPath string) (*PathsConfig, error) {
 	if configPath == emptyValue {
@@ -80,35 +61,18 @@ func LoadPathsConfig(configPath string) (*PathsConfig, error) {
 
 // GetGlobalPathsConfig returns the singleton instance of the paths config
 func GetGlobalPathsConfig() *PathsConfig {
-	var config *PathsConfig
-	if err := concurrency.RunInLockWithLogger(
-		&globalPathsConfigMu,
-		LockNamePathsGetConfig,
-		lockLoggerSystem(),
-		func() error {
-			// Check if we need to reload (config is nil or was reset)
-			if globalPathsConfig == nil {
-				loadedConfig, err := LoadPathsConfig("")
-				if err != nil {
-					globalPathsConfig = getDefaultPathsConfig()
-				} else {
-					globalPathsConfig = loadedConfig
-				}
-			}
-			config = globalPathsConfig
-			return nil
-		},
-	); err != nil {
-		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.
-
-			// Fallback to default if locking fails and we don't have a config yet
-			ProfileSystem))).Error(ConstMagic31a779e6, err).Log()
-
-		if config == nil {
-			config = getDefaultPathsConfig()
+	configPath := findPathsConfig()
+	cfg, err := pathsConfigs.Load(globalConfigKey, stampmemo.Of(configPath), func() (*PathsConfig, error) {
+		loaded, loadErr := LoadPathsConfig(configPath)
+		if loadErr != nil {
+			return getDefaultPathsConfig(), nil
 		}
+		return loaded, nil
+	})
+	if err != nil || cfg == nil {
+		return getDefaultPathsConfig()
 	}
-	return config
+	return cfg
 }
 
 // getDefaultPathsConfig returns default path configuration
@@ -153,14 +117,17 @@ func (c *PathsConfig) FindPath(pathKey string) string {
 	if !ok {
 		return ""
 	}
-
-	// Try relative paths first
-	if foundPath := c.findPathInRelativePaths(pathKey, path); foundPath != emptyValue {
-		return foundPath
+	wd, err := fileutil.Getwd()
+	if err != nil {
+		return ""
 	}
-
-	// Walk up directory tree looking for markers
-	return c.findPathByWalkingUp(pathKey, path)
+	found, _ := resolvedFindPaths.Load(wd+"\x00"+pathKey, stampmemo.Of(wd), func() (string, error) {
+		if foundPath := c.findPathInRelativePaths(pathKey, path); foundPath != emptyValue {
+			return foundPath, nil
+		}
+		return c.findPathByWalkingUp(pathKey, path), nil
+	})
+	return found
 }
 
 // findPathInRelativePaths searches for path in relative paths from current working directory

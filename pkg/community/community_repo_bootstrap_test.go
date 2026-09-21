@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"gopkg.in/yaml.v3"
 )
@@ -26,8 +27,8 @@ func TestStandaloneCleanCommunityRepo_FunctionalAcceptance(t *testing.T) {
 		"cmd/zqk/system/sync_agents.go",
 		"cmd/zqk/system/evolve.go",
 		"cmd/zqk/system/materialize_agent_chat_channel.go",
-		".zqk/process",
-		".zqk/specs",
+		filepath.Join(paths.ProjectDataDir, paths.ProcessSubdir),
+		filepath.Join(paths.ProjectDataDir, paths.SpecsSubdir),
 		"docs/commercial",
 		"docs/marketing",
 		".agents",
@@ -49,7 +50,7 @@ func TestStandaloneCleanCommunityRepo_BoundaryAndErrorHandling(t *testing.T) {
 
 	tmp := t.TempDir()
 	dirtyFile := filepath.Join(tmp, "secret.key")
-	if err := fileutil.WriteFile(dirtyFile, []byte("PRIVATE_KEY"), 0600); err != nil {
+	if err := fileutil.WriteFile(dirtyFile, []byte("PRIVATE_KEY"), paths.FilePerm600); err != nil {
 		t.Fatalf("failed to write dirty file: %v", err)
 	}
 
@@ -67,10 +68,7 @@ func TestStandaloneCleanCommunityRepo_BoundaryAndErrorHandling(t *testing.T) {
 func TestStandaloneCleanCommunityRepo_IntegrationAndConformance(t *testing.T) {
 	candidateDir := publicCandidateFixture(t)
 
-	binPath := filepath.Join(candidateDir, "bin", "zqk-community")
-	if !fileutil.Exists(binPath) {
-		binPath = filepath.Join(candidateDir, "bin", "zqk")
-	}
+	binPath := filepath.Join(candidateDir, "bin", "zqk")
 
 	if fileutil.Exists(binPath) {
 		stat, err := fileutil.Stat(binPath)

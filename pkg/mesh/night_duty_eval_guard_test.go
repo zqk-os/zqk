@@ -13,6 +13,9 @@ func TestNightDutyEvalScriptGuard(t *testing.T) {
 	// by a get-only copy (which lacked list-first logic and caused CAS stubs).
 
 	scriptPath := filepath.Join("..", "..", "scripts", "mesh", "night-duty-eval.py")
+	if !fileutil.Exists(scriptPath) {
+		t.Skip("night-duty-eval.py not present in open-core distribution, skipping guard")
+	}
 	content, err := fileutil.ReadFile(scriptPath)
 	if err != nil {
 		t.Fatalf("Failed to read night-duty-eval.py: %v", err)
@@ -35,6 +38,9 @@ func TestNightDutyEvalScriptGuard(t *testing.T) {
 
 func TestNightDutyLatchHygieneGuard(t *testing.T) {
 	scriptPath := filepath.Join("..", "..", "scripts", "mesh", "night-duty-tick.sh")
+	if !fileutil.Exists(scriptPath) {
+		t.Skip("night-duty-tick.sh not present in open-core distribution, skipping guard")
+	}
 	content, err := fileutil.ReadFile(scriptPath)
 	if err != nil {
 		t.Fatalf("Failed to read night-duty-tick.sh: %v", err)

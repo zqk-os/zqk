@@ -364,9 +364,7 @@ func startScheduler(ctx *cli.Context, cmd *cobra.Command) error {
 	// When jobs_paused is true, timer and immediate jobs do not run (maintenance, object-count-report, etc.).
 	// Log prominently so it is obvious; user updates config when the time is right.
 	if config.JobsPaused {
-		logging.Fluent(logging.GetLoggerFromProfile(profile)).Error(
-			"JOBS PAUSED (jobs_paused=true): Timer and immediate jobs will NOT run. Maintenance (aggregation, retention), object-count-report, and other scheduled jobs are paused. Only manually triggered jobs will run. To resume: zqk scheduler config --no-jobs-paused",
-			errfmt.Errorf("jobs_paused=true in .zqk/scheduler/config.yaml")).
+		logging.Fluent(logging.GetLoggerFromProfile(profile)).Error(paths.RewriteCanonicalCLIInvocations("JOBS PAUSED (jobs_paused=true): Timer and immediate jobs will NOT run. Maintenance (aggregation, retention), object-count-report, and other scheduled jobs are paused. Only manually triggered jobs will run. To resume: zqk scheduler config --no-jobs-paused"), errfmt.Errorf("jobs_paused=true in .zqk/scheduler/config.yaml")).
 			Log()
 	}
 
@@ -408,7 +406,7 @@ func startScheduler(ctx *cli.Context, cmd *cobra.Command) error {
 		GetPool() provider.ConnectionPool
 	}); ok {
 		if pool := p.GetPool(); pool != nil {
-			sockPath := filepath.Join(projectRoot, paths.ProjectDataDir, "scheduler", "rpcpool.sock")
+			sockPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.SchedulerSubdir, "rpcpool.sock")
 			if err := rpcpool.StartServer(sockPath, pool); err != nil {
 				schedulerpkg.SLog(logger).Warn("Failed to start RPC pool proxy server").WithError(err).Log()
 			} else {
@@ -479,11 +477,11 @@ func startScheduler(ctx *cli.Context, cmd *cobra.Command) error {
 		},
 	}
 	if config.JobsPaused {
-		startPayload["jobs_paused_action"] = "zqk scheduler config --no-jobs-paused to resume"
+		startPayload["jobs_paused_action"] = paths.CLIUsage("scheduler", "config", "--no-jobs-paused") + " to resume"
 	}
 	startMsg := "Starting scheduler daemon"
 	if config.JobsPaused {
-		startMsg = "Starting scheduler daemon (JOBS PAUSED: timer/immediate disabled; zqk scheduler config --no-jobs-paused to resume)"
+		startMsg = "Starting scheduler daemon (JOBS PAUSED: timer/immediate disabled; " + paths.CLIUsage("scheduler", "config", "--no-jobs-paused") + " to resume)"
 	}
 	emitSchedulerStartEventViaCoordinator(
 		pkgctx.NewSystemContext(),
@@ -603,7 +601,7 @@ func startScheduler(ctx *cli.Context, cmd *cobra.Command) error {
 	{
 		logger := logging.GetLoggerFromProfile(profile)
 		if result, err := system.EnsureRetentionJobsInProject(projectRoot, logger, storageProvider); err != nil {
-			schedulerpkg.SLog(logger).Warn("Ensure maintenance jobs failed; run 'zqk system ensure-retention-jobs' so critical maintenance runs").
+			schedulerpkg.SLog(logger).Warn(paths.RewriteCanonicalCLIInvocations("Ensure maintenance jobs failed; run 'zqk system ensure-retention-jobs' so critical maintenance runs")).
 				WithError(err).
 				Log()
 		} else if !result.AlreadySatisfied {

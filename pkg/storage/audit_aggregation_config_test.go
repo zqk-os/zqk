@@ -35,7 +35,7 @@ func TestLoadAggregationConfig_Default(t *testing.T) {
 func TestLoadAggregationConfig_FromFile(t *testing.T) {
 	tmpDir := t.TempDir()
 	// Use the correct path that LoadAggregationConfig expects (.zqk/config/config.yaml)
-	configDir := filepath.Join(tmpDir, paths.ProjectDataDir, "config")
+	configDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.ConfigDir)
 	if err := fileutil.MkdirAll(configDir, paths.DirPerm755); err != nil {
 		t.Fatalf("Failed to create config directory: %v", err)
 	}
@@ -100,7 +100,7 @@ audit:
 func TestLoadAggregationConfig_Disabled(t *testing.T) {
 	tmpDir := t.TempDir()
 	// Use the correct path that LoadAggregationConfig expects (.zqk/config/config.yaml)
-	configDir := filepath.Join(tmpDir, paths.ProjectDataDir, "config")
+	configDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.ConfigDir)
 	if err := fileutil.MkdirAll(configDir, paths.DirPerm755); err != nil {
 		t.Fatalf("Failed to create config directory: %v", err)
 	}
@@ -129,7 +129,7 @@ audit:
 func TestLoadAggregationConfig_InvalidWindowSize(t *testing.T) {
 	tmpDir := t.TempDir()
 	// Use the same path LoadAggregationConfig expects: .zqk/config/config.yaml
-	configDir := filepath.Join(tmpDir, paths.ProjectDataDir, "config")
+	configDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.ConfigDir)
 	if err := fileutil.MkdirAll(configDir, paths.DirPerm755); err != nil {
 		t.Fatalf("Failed to create config directory: %v", err)
 	}

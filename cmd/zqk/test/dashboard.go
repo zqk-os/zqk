@@ -23,6 +23,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/walutil"
 )
@@ -270,7 +271,7 @@ type DashboardLitePayload struct {
 
 // LiteFilePath returns the canonical on-disk path for the materialized test dashboard lite-file.
 func LiteFilePath(projectRoot string) string {
-	return filepath.Join(projectRoot, ".zqk", "state", "test_dashboard_lite.json")
+	return filepath.Join(projectRoot, paths.ProjectDataDir, paths.StateDir, "test_dashboard_lite.json")
 }
 
 // LoadFromLiteFile loads the materialized dashboard projection from disk without hitting the storage layer.
@@ -385,7 +386,7 @@ func (s *DashboardState) ValidateTPMDefinitionOfDone(out, errOut ioWriter) error
 				_, _ = fmt.Fprintf(errOut, "   - %s\n", u)
 			}
 		}
-		_, _ = fmt.Fprintf(errOut, "\nTip: Run 'zqk test bind' to see recommended parent bindings and repair broken chains.\n")
+		_, _ = fmt.Fprintf(errOut, "%s", paths.RewriteCanonicalCLIInvocations("\nTip: Run 'zqk test bind' to see recommended parent bindings and repair broken chains.\n"))
 		return fmt.Errorf("traceability DoD check failed: %d broken lineage chains, %d unbound test criteria", len(brokenList), len(unboundList))
 	}
 
@@ -1155,7 +1156,7 @@ func (s *DashboardState) Render(w ioWriter, isWatch bool, viewMode string) error
 		if len(activeTCsList) > 0 {
 			buf.WriteString(fmt.Sprintf("  %s %s\n\n",
 				yellow("🔥 ACTIVE WORKING SET:"),
-				bold(fmt.Sprintf("%d in-flight / unverified chains remaining [switch view with: zqk test dashboard --view active]", len(activeTCsList))),
+				bold(paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("%d in-flight / unverified chains remaining [switch view with: zqk test dashboard --view active]", len(activeTCsList)))),
 			))
 		}
 
@@ -1188,7 +1189,7 @@ func (s *DashboardState) Render(w ioWriter, isWatch bool, viewMode string) error
 		if len(regressionTCsList) > 0 {
 			buf.WriteString(fmt.Sprintf("  %s %s\n\n",
 				green("🛡️  REGRESSION TESTING POOL:"),
-				bold(fmt.Sprintf("%d verified chains green & passing [pruned from active view — inspect with: zqk test dashboard --view regression or --all]", len(regressionTCsList))),
+				bold(paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("%d verified chains green & passing [pruned from active view — inspect with: zqk test dashboard --view regression or --all]", len(regressionTCsList)))),
 			))
 		}
 	}

@@ -4,21 +4,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 	"sync"
 	"sync/atomic"
-	"time"
 
 	"gopkg.in/yaml.v3"
 
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/loader"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
@@ -26,32 +23,6 @@ import (
 // ErrLifecycleStatusUnknown means the kind's lifecycle loaded but status (after
 // built-in aliases and status_mapping) is not a Status entry.
 var ErrLifecycleStatusUnknown = errors.New("lifecycle status unknown")
-
-// LifecycleIOConfig holds configuration for lifecycle I/O operations
-// Matches RetryConfig pattern from pkg/storage/operation_helper.go
-// Defined locally to avoid import cycle (pkg/storage imports pkg/objects)
-type LifecycleIOConfig struct {
-	// Retry configuration (matches RetryConfig from operation_helper.go)
-	RetryMaxAttempts   int
-	RetryInitialDelay  time.Duration
-	RetryMaxDelay      time.Duration
-	RetryBackoffFactor float64
-
-	// I/O timeout
-	IOTimeout time.Duration
-}
-
-// DefaultLifecycleIOConfig returns default configuration for lifecycle I/O operations
-// Values match defaults from pkg/storage/operation_helper.go RetryConfig
-func DefaultLifecycleIOConfig() *LifecycleIOConfig {
-	return &LifecycleIOConfig{
-		RetryMaxAttempts:   3,
-		RetryInitialDelay:  100 * time.Millisecond,
-		RetryMaxDelay:      5 * time.Second,
-		RetryBackoffFactor: 2.0,
-		IOTimeout:          5 * time.Second,
-	}
-}
 
 // Lifecycle represents a lifecycle definition loaded from YAML.
 // Location is the path reference (prefix: or abs:) for the backing file so it can be re-used and resolved where necessary.
@@ -147,17 +118,12 @@ type PercentCompleteConfig struct {
 	MilestoneBased  map[string]any `yaml:"milestone_based,omitempty"`
 }
 
-// cachedLifecycle stores a lifecycle with its file modification time for staleness detection
-type cachedLifecycle struct {
-	lifecycle *Lifecycle
-	mtime     time.Time // File modification time when cached
-}
-
 // LifecycleLoader loads lifecycle definitions from YAML files.
 // Optional EnsureReady(ctx) uses the component loader pattern (pkg/loader) to warm base lifecycle once with timeout.
 type LifecycleLoader struct {
-	lifecyclesDir   atomic.Value // string
-	cache           sync.Map     // kind -> *cachedLifecycle
+	lifecyclesDir   atomic.Value                       // string
+	cache           stampmemo.Table[*Lifecycle]        // keyed by kind (closed lifecycle tree); stamp is the YAML file
+	yamlIndex       stampmemo.Table[map[string]string] // keyed by lifecyclesDir; basename → abs path
 	readyRunner     *loader.Runner
 	readyRunnerOnce sync.Once
 }
@@ -236,36 +202,23 @@ func (ll *LifecycleLoader) doEnsureReady(ctx context.Context) error { //nolint:u
 // findLifecyclePath resolves the path to {kind}_lifecycle.yaml directly or in subdirectories
 func (ll *LifecycleLoader) findLifecyclePath(currentDir, kind string) string {
 	lifecycleFile := fmt.Sprintf("%s_lifecycle.yaml", kind)
-	direct := filepath.Join(currentDir, lifecycleFile)
-	if _, err := fileutil.Stat(direct); err == nil {
-		return direct
+	if hit := paths.FindLifecycleFile(currentDir, kind); hit != "" {
+		return hit
 	}
-	for _, domain := range []string{"dna", "kernel", "pm", "qa", "agent", "platform"} {
-		candidate := filepath.Join(currentDir, domain, lifecycleFile)
-		if _, err := fileutil.Stat(candidate); err == nil {
-			return candidate
-		}
+	if hit := ll.indexedYAML(currentDir)[lifecycleFile]; hit != "" {
+		return hit
 	}
-	var found string
-	_ = filepath.WalkDir(currentDir, func(path string, d os.DirEntry, err error) error {
-		if err != nil || d == nil || found != "" {
-			return nil
-		}
-		if d.IsDir() {
-			name := d.Name()
-			if name == ".git" || name == "node_modules" || name == "bin" || name == ".zqk" || name == "docs" || name == "pkg" || name == "cmd" {
-				return filepath.SkipDir
-			}
-		}
-		if !d.IsDir() && d.Name() == lifecycleFile {
-			found = path
-		}
+	return filepath.Join(currentDir, lifecycleFile)
+}
+
+func (ll *LifecycleLoader) indexedYAML(dir string) map[string]string {
+	if ll == nil || dir == emptyValue {
 		return nil
-	})
-	if found != "" {
-		return found
 	}
-	return direct
+	idx, _ := ll.yamlIndex.Load(dir, paths.DomainTreeStamp(dir), func() (map[string]string, error) {
+		return paths.IndexYAMLNames(dir), nil
+	})
+	return idx
 }
 
 // LoadLifecycle loads a lifecycle definition for a given object kind
@@ -273,67 +226,30 @@ func (ll *LifecycleLoader) findLifecyclePath(currentDir, kind string) string {
 func (ll *LifecycleLoader) LoadLifecycle(kind string) (*Lifecycle, error) {
 	currentDir := ll.getLifecyclesDir()
 	lifecyclePath := ll.findLifecyclePath(currentDir, kind)
-
-	if cachedVal, ok := ll.cache.Load(kind); ok {
-		cached := cachedVal.(*cachedLifecycle)
-		stat, err := ll.statFileWithTimeout(pkgctx.NewSystemContext(), lifecyclePath, 2*time.Second)
-		if err == nil && stat != nil {
-			if stat.ModTime().Equal(cached.mtime) || stat.ModTime().Before(cached.mtime) {
-				return cached.lifecycle, nil
-			}
-		}
+	stamp := stampmemo.Of(lifecyclePath)
+	if stamp == 0 {
+		lifecyclePath = ll.findLifecyclePath(currentDir, KindBaseObject)
+		stamp = stampmemo.Of(lifecyclePath)
 	}
-
-	ctx := pkgctx.NewSystemContext()
-	data, err := ll.readFileWithTimeout(ctx, lifecyclePath, 5*time.Second)
-	if err != nil {
-		if fileutil.IsNotExist(err) {
-			baseLifecyclePath := ll.findLifecyclePath(currentDir, KindBaseObject)
-			baseData, baseErr := ll.readFileWithTimeout(ctx, baseLifecyclePath, 5*time.Second)
-			if baseErr == nil {
-				data = baseData
-				lifecyclePath = baseLifecyclePath
-			} else {
-				return nil, errfmt.Errorf("failed to read lifecycle file %s: %w (fallback also failed: %v)", lifecyclePath, err, baseErr)
-			}
-		} else {
+	return ll.cache.Load(kind, stamp, func() (*Lifecycle, error) {
+		data, err := fileutil.ReadFile(lifecyclePath)
+		if err != nil {
 			return nil, errfmt.Errorf("failed to read lifecycle file %s: %w", lifecyclePath, err)
 		}
-	}
-
-	var lifecycle Lifecycle
-	if err := yaml.Unmarshal(data, &lifecycle); err != nil {
-		return nil, errfmt.Errorf("failed to parse lifecycle file %s: %w", lifecyclePath, err)
-	}
-
-	if lifecycle.Extends != emptyValue {
-		parentLifecycle, err := ll.loadLifecycleWithExtends(lifecycle.Extends, make(map[string]bool))
-		if err != nil {
-			return nil, errfmt.Errorf("failed to load parent lifecycle %s: %w", lifecycle.Extends, err)
+		var lifecycle Lifecycle
+		if err := yaml.Unmarshal(data, &lifecycle); err != nil {
+			return nil, errfmt.Errorf("failed to parse lifecycle file %s: %w", lifecyclePath, err)
 		}
-		lifecycle = ll.mergeLifecycles(parentLifecycle, &lifecycle)
-	}
-
-	lifecycle.Location = pathRefForFile(lifecyclePath)
-
-	var mtime time.Time
-	stat, err := ll.statFileWithTimeout(ctx, lifecyclePath, 2*time.Second)
-	if err == nil && stat != nil {
-		mtime = stat.ModTime()
-	} else {
-		mtime = time.Now()
-	}
-
-	newCached := &cachedLifecycle{lifecycle: &lifecycle, mtime: mtime}
-	if actual, loaded := ll.cache.LoadOrStore(kind, newCached); loaded {
-		cachedAfter := actual.(*cachedLifecycle)
-		statAfter, statErr := ll.statFileWithTimeout(pkgctx.NewSystemContext(), lifecyclePath, 2*time.Second)
-		if statErr == nil && statAfter != nil && !statAfter.ModTime().After(cachedAfter.mtime) {
-			return cachedAfter.lifecycle, nil
+		if lifecycle.Extends != emptyValue {
+			parentLifecycle, err := ll.loadLifecycleWithExtends(lifecycle.Extends, make(map[string]bool))
+			if err != nil {
+				return nil, errfmt.Errorf("failed to load parent lifecycle %s: %w", lifecycle.Extends, err)
+			}
+			lifecycle = ll.mergeLifecycles(parentLifecycle, &lifecycle)
 		}
-		ll.cache.Store(kind, newCached)
-	}
-	return &lifecycle, nil
+		lifecycle.Location = pathRefForFile(lifecyclePath)
+		return &lifecycle, nil
+	})
 }
 
 var (
@@ -351,12 +267,11 @@ func GetGlobalLifecycleLoader() *LifecycleLoader {
 	return globalLifecycleLoader
 }
 
-// ClearCache clears the lifecycle cache, forcing reload of all lifecycles on next access
-// This is useful when lifecycle definitions are updated and you want to ensure fresh validation
-// Note: This uses a write lock and blocks all readers. For better performance,
-// use InvalidateLifecycle() to invalidate specific entries.
+// ClearCache drops every lifecycle memo because the key space was explicitly invalidated.
+// This is not a size cap — see pkg/stampmemo.
 func (ll *LifecycleLoader) ClearCache() {
-	ll.cache.Clear()
+	ll.cache.Reset()
+	ll.yamlIndex.Reset()
 }
 
 // InvalidateLifecycle invalidates a specific lifecycle entry by kind
@@ -663,106 +578,14 @@ func pathRefForFile(filePath string) string {
 func findLifecyclesDir() string {
 	if testRoot := zqkenv.TestRoot().Get(); testRoot != emptyValue {
 		lcDir := filepath.Join(testRoot, paths.ProcessInternalLifecyclesDir)
-		if info, err := fileutil.Stat(lcDir); err == nil && info.IsDir() && lifecyclesDirHasBaseLifecycle(lcDir) {
+		if stampmemo.Of(lcDir) != 0 && lifecyclesDirHasBaseLifecycle(lcDir) {
 			return lcDir
 		}
 	}
-	lc := paths.ProcessInternalLifecyclesDir
-	// Try common locations
-	possibleDirs := []string{
-		lc,
-		filepath.Join("..", "..", lc),
-		filepath.Join("..", "..", "..", lc),
+	if hit := paths.FirstExistingFromCwd(paths.ProcessInternalLifecyclesDir); hit != emptyValue {
+		return hit
 	}
-
-	ctx := pkgctx.NewSystemContext()
-	// Use established RetryConfig pattern (matches pkg/storage/operation_helper.go)
-	// Fewer attempts for directory discovery (faster failure)
-	config := &LifecycleIOConfig{
-		RetryMaxAttempts:   2,
-		RetryInitialDelay:  50 * time.Millisecond,
-		RetryMaxDelay:      200 * time.Millisecond,
-		RetryBackoffFactor: 2.0,
-		IOTimeout:          2 * time.Second,
-	}
-
-	for _, dir := range possibleDirs {
-		var lastErr error
-		delay := config.RetryInitialDelay
-
-		// Execute Stat with retry logic (per architecture requirements)
-	retryLoop:
-		for attempt := 0; attempt < config.RetryMaxAttempts; attempt++ {
-			// Check context cancellation
-			if ctx.Err() != nil {
-				break retryLoop // Continue to next directory
-			}
-
-			// Non-blocking Stat with timeout (per IO + Async On-Demand pattern)
-			type statResult struct {
-				info fileutil.FileInfo
-				err  error
-			}
-			resultChan := make(chan statResult, 1)
-
-			goroutinelabels.NewGoroutine("lifecycle_loader_find_dir", fmt.Sprintf("checking directory %s (attempt %d/%d)", dir, attempt+1, config.RetryMaxAttempts)).
-				WithContext(ctx).
-				StartSimple(func() {
-					info, err := fileutil.Stat(dir)
-					resultChan <- statResult{info: info, err: err}
-				})
-
-			// Wait for result with timeout
-			select {
-			case result := <-resultChan:
-				if result.err == nil && result.info != nil && result.info.IsDir() {
-					// Success - found directory
-					return dir
-				}
-				lastErr = result.err
-				// File not found is expected for wrong directories - not retryable
-				if fileutil.IsNotExist(result.err) {
-					break retryLoop // Continue to next directory
-				}
-				// Check if error is retryable
-				if !isRetryableFileError(result.err) {
-					break retryLoop // Continue to next directory
-				}
-			case <-time.After(config.IOTimeout):
-				// Stat timeout - retryable error
-				lastErr = errfmt.Errorf("stat operation timed out after %v", config.IOTimeout)
-			case <-ctx.Done():
-				// Context cancelled - continue to next directory
-				break retryLoop
-			}
-
-			// If we found the directory, break out of retry loop
-			if lastErr == nil {
-				break retryLoop
-			}
-
-			// Last attempt, don't wait
-			if attempt == config.RetryMaxAttempts-1 {
-				break retryLoop
-			}
-
-			// Wait before retry with exponential backoff (per architecture pattern)
-			select {
-			case <-ctx.Done():
-				break retryLoop
-			case <-time.After(delay):
-				// Continue to next attempt
-			}
-
-			// Exponential backoff
-			delay = time.Duration(float64(delay) * config.RetryBackoffFactor)
-			if delay > config.RetryMaxDelay {
-				delay = config.RetryMaxDelay
-			}
-		}
-	}
-
-	return paths.ProcessInternalLifecyclesDir // Default
+	return paths.ProcessInternalLifecyclesDir
 }
 
 // normalizeLifecyclesDirIfProjectRoot normalizes a project root to its internal lifecycles dir.
@@ -819,8 +642,7 @@ func (ll *LifecycleLoader) loadLifecycleWithExtends(lifecycleName string, visite
 	}
 
 	lifecyclePath := ll.findLifecyclePath(ll.getLifecyclesDir(), kind)
-	ctx := pkgctx.NewSystemContext()
-	data, err := ll.readFileWithTimeout(ctx, lifecyclePath, 5*time.Second)
+	data, err := fileutil.ReadFile(lifecyclePath)
 	if err != nil {
 		return nil, errfmt.Errorf("failed to read lifecycle file %s: %w", lifecyclePath, err)
 	}
@@ -960,136 +782,4 @@ func (ll *LifecycleLoader) mergeLifecycles(parent, child *Lifecycle) Lifecycle {
 	}
 
 	return merged
-}
-
-// readFileWithTimeout reads a file asynchronously with a timeout and retry logic
-// Follows async I/O best practices: non-blocking goroutine + timeout + retry with exponential backoff
-// Per concurrency-patterns-v1.0.md and established RetryConfig pattern from pkg/storage/operation_helper.go
-func (ll *LifecycleLoader) readFileWithTimeout(ctx context.Context, filePath string, timeout time.Duration) ([]byte, error) {
-	// Use established RetryConfig pattern (matches pkg/storage/operation_helper.go)
-	config := DefaultLifecycleIOConfig()
-	config.IOTimeout = timeout // Use provided timeout
-
-	var lastErr error
-	delay := config.RetryInitialDelay
-
-	// Execute ReadFile with retry logic (per architecture requirements)
-	for attempt := 0; attempt < config.RetryMaxAttempts; attempt++ {
-		// Check context cancellation
-		if ctx.Err() != nil {
-			return nil, errfmt.Newf("read operation cancelled").Wrap(ctx.Err())
-		}
-
-		// Non-blocking ReadFile with timeout (per IO + Async On-Demand pattern)
-		type readResult struct {
-			data []byte
-			err  error
-		}
-		resultChan := make(chan readResult, 1)
-
-		// Execute ReadFile in goroutine to prevent blocking
-		goroutinelabels.NewGoroutine("lifecycle_loader_read_file", fmt.Sprintf("reading lifecycle file %s with timeout (attempt %d/%d)", filepath.Base(filePath), attempt+1, config.RetryMaxAttempts)).
-			WithContext(ctx).
-			StartSimple(func() {
-				data, err := fileutil.ReadFile(filePath)
-				resultChan <- readResult{data: data, err: err}
-			})
-
-		// Wait for result with timeout (non-blocking IO pattern)
-		select {
-		case result := <-resultChan:
-			if result.err == nil {
-				// Success - return immediately
-				return result.data, nil
-			}
-			lastErr = result.err
-			// Check if error is retryable (timeout errors are retryable)
-			if !isRetryableFileError(result.err) {
-				return nil, result.err
-			}
-		case <-time.After(config.IOTimeout):
-			// ReadFile timeout - retryable error
-			lastErr = errfmt.Errorf("read operation timed out after %v", config.IOTimeout)
-		case <-ctx.Done():
-			// Context cancelled - non-retryable
-			return nil, errfmt.Newf("read operation cancelled").Wrap(ctx.Err())
-		}
-
-		// If we got data successfully, break out of retry loop
-		if lastErr == nil {
-			break
-		}
-
-		// Last attempt, don't wait
-		if attempt == config.RetryMaxAttempts-1 {
-			break
-		}
-
-		// Wait before retry with exponential backoff (per architecture pattern)
-		select {
-		case <-ctx.Done():
-			return nil, errfmt.Newf("read operation cancelled").Wrap(ctx.Err())
-		case <-time.After(delay):
-			// Continue to next attempt
-		}
-
-		// Exponential backoff
-		delay = time.Duration(float64(delay) * config.RetryBackoffFactor)
-		if delay > config.RetryMaxDelay {
-			delay = config.RetryMaxDelay
-		}
-	}
-
-	// Check if we failed after all retries
-	if lastErr != nil {
-		return nil, errfmt.Errorf("read operation failed after %d attempts: %w", config.RetryMaxAttempts, lastErr)
-	}
-
-	return nil, errfmt.Newf("read operation failed").Wrap(lastErr)
-}
-
-// statFileWithTimeout stats a local lifecycle YAML. LoadLifecycle cache-hit used to
-// spawn a labeled goroutine + time.After per Stat; system-check CPU attributed that
-// to pthread_cond / usleep while validating thousands of objects.
-func (ll *LifecycleLoader) statFileWithTimeout(ctx context.Context, filePath string, timeout time.Duration) (fileutil.FileInfo, error) {
-	_ = timeout
-	if err := ctx.Err(); err != nil {
-		return nil, errfmt.Newf("stat operation cancelled").Wrap(err)
-	}
-	info, err := fileutil.Stat(filePath)
-	if err != nil {
-		return nil, err
-	}
-	return info, nil
-}
-
-// isRetryableFileError determines if a file I/O error is retryable
-// Per architecture: timeout errors and temporary errors are retryable
-// Permission errors and file not found are NOT retryable
-func isRetryableFileError(err error) bool {
-	if err == nil {
-		return false
-	}
-
-	// File not found is NOT retryable (file doesn't exist, won't exist on retry)
-	if fileutil.IsNotExist(err) {
-		return false
-	}
-
-	// Permission errors are NOT retryable (won't change on retry)
-	if fileutil.IsPermission(err) {
-		return false
-	}
-
-	errStr := err.Error()
-	// Timeout errors are retryable
-	if strings.Contains(errStr, "timeout") || strings.Contains(errStr, "deadline") {
-		return true
-	}
-	// Temporary errors are retryable
-	if strings.Contains(errStr, "temporary") {
-		return true
-	}
-	// By default, don't retry (safer)
-	return false
 }

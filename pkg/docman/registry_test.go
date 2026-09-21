@@ -95,10 +95,10 @@ func TestRegistry_GetExistingEntriesAndCreate(t *testing.T) {
 	// Create a dummy markdown file
 	docRelPath := "docs/architecture/design.md"
 	docAbsPath := filepath.Join(tmpDir, docRelPath)
-	if err := fileutil.MkdirAll(filepath.Dir(docAbsPath), 0755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(docAbsPath), paths.DirPerm755); err != nil {
 		t.Fatalf("mkdir failed: %v", err)
 	}
-	if err := fileutil.WriteFile(docAbsPath, []byte("# System Design\n\n## Overview\n\nHigh level architecture."), 0644); err != nil {
+	if err := fileutil.WriteFile(docAbsPath, []byte("# System Design\n\n## Overview\n\nHigh level architecture."), paths.FilePerm644); err != nil {
 		t.Fatalf("write file failed: %v", err)
 	}
 
@@ -139,10 +139,10 @@ func TestRegistry_UpdateExistingEntries(t *testing.T) {
 
 	docRelPath := "docs/guide.md"
 	docAbsPath := filepath.Join(tmpDir, docRelPath)
-	if err := fileutil.MkdirAll(filepath.Dir(docAbsPath), 0755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(docAbsPath), paths.DirPerm755); err != nil {
 		t.Fatalf("mkdir failed: %v", err)
 	}
-	if err := fileutil.WriteFile(docAbsPath, []byte("# Guide Content"), 0644); err != nil {
+	if err := fileutil.WriteFile(docAbsPath, []byte("# Guide Content"), paths.FilePerm644); err != nil {
 		t.Fatalf("write file failed: %v", err)
 	}
 
@@ -180,10 +180,10 @@ func TestRegistry_RegisterAll_ContextCancellation(t *testing.T) {
 
 	for i := 1; i <= 5; i++ {
 		docPath := filepath.Join(tmpDir, "docs", fmt.Sprintf("doc_%d.md", i))
-		if err := fileutil.MkdirAll(filepath.Dir(docPath), 0755); err != nil {
+		if err := fileutil.MkdirAll(filepath.Dir(docPath), paths.DirPerm755); err != nil {
 			t.Fatalf("mkdir failed: %v", err)
 		}
-		if err := fileutil.WriteFile(docPath, []byte("# Title\nContent"), 0644); err != nil {
+		if err := fileutil.WriteFile(docPath, []byte("# Title\nContent"), paths.FilePerm644); err != nil {
 			t.Fatalf("write file failed: %v", err)
 		}
 	}
@@ -207,10 +207,10 @@ func TestDocmanRegisterMeaningfulActivity(t *testing.T) {
 
 	for i := 1; i <= 3; i++ {
 		docPath := filepath.Join(tmpDir, "docs", fmt.Sprintf("doc_%d.md", i))
-		if err := fileutil.MkdirAll(filepath.Dir(docPath), 0755); err != nil {
+		if err := fileutil.MkdirAll(filepath.Dir(docPath), paths.DirPerm755); err != nil {
 			t.Fatalf("mkdir failed: %v", err)
 		}
-		if err := fileutil.WriteFile(docPath, []byte(fmt.Sprintf("# Title %d\nContent", i)), 0644); err != nil {
+		if err := fileutil.WriteFile(docPath, []byte(fmt.Sprintf("# Title %d\nContent", i)), paths.FilePerm644); err != nil {
 			t.Fatalf("write file failed: %v", err)
 		}
 	}
@@ -250,10 +250,10 @@ func TestRegistry_RegisterSubtrees(t *testing.T) {
 
 	for relPath, content := range files {
 		fullPath := filepath.Join(tmpDir, relPath)
-		if err := fileutil.MkdirAll(filepath.Dir(fullPath), 0755); err != nil {
+		if err := fileutil.MkdirAll(filepath.Dir(fullPath), paths.DirPerm755); err != nil {
 			t.Fatalf("mkdir failed: %v", err)
 		}
-		if err := fileutil.WriteFile(fullPath, []byte(content), 0644); err != nil {
+		if err := fileutil.WriteFile(fullPath, []byte(content), paths.FilePerm644); err != nil {
 			t.Fatalf("write file failed: %v", err)
 		}
 	}

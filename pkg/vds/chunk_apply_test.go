@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -29,7 +30,7 @@ chunks:
     evidence_refs: [e]
     independent_verify: yes
 `
-	if err := fileutil.WriteFile(path, []byte(src), 0o644); err != nil {
+	if err := fileutil.WriteFile(path, []byte(src), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	n, err := ApplyIndependentVerifyYes(path, []string{"a", "b", "missing"})
@@ -57,7 +58,7 @@ chunks:
 
 func TestPredPathExists(t *testing.T) {
 	dir := t.TempDir()
-	if err := fileutil.WriteFile(filepath.Join(dir, "here.txt"), []byte("x"), 0o644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(dir, "here.txt"), []byte("x"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	ok := EvalPredicate(t.Context(), "path_exists:here.txt", Chunk{}, EvalOptions{ProjectRoot: dir})

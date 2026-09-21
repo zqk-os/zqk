@@ -10,6 +10,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	yamlspec "github.com/zqk-os/zqk/pkg/specbuilder/yaml"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -30,7 +31,7 @@ func GenerateCommandBuilderFromYAML(yamlPath, outputDir string) error {
 	}
 
 	if schemaRef, ok := tempSpec["$schema"].(string); ok && schemaRef != emptyValue {
-		validator := yamlspec.NewSchemaValidator(".zqk/cli/specs/schemas")
+		validator := yamlspec.NewSchemaValidator(filepath.Join(paths.CLICommandSpecsDir, "schemas"))
 		_ = validator.ValidateYAML(yamlPath, schemaRef)
 	}
 
@@ -38,7 +39,7 @@ func GenerateCommandBuilderFromYAML(yamlPath, outputDir string) error {
 
 	commandName := ResolveCommandBuilderName(tempSpec, yamlPath)
 	if commandName == "" {
-		return errfmt.Errorf("refusing to generate command builder with empty or numeric-CAS name from %s (use DNA under .zqk/cli/specs with name/use, or a non-numeric CSPEC id)", yamlPath)
+		return errfmt.Errorf("refusing to generate command builder with empty or numeric-CAS name from %s (use DNA under %s with name/use, or a non-numeric CSPEC id)", yamlPath, paths.CLICommandSpecsDir)
 	}
 
 	versionDir := filepath.Join(outputDir, defaultVersionPackage)

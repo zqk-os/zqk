@@ -2,6 +2,7 @@ package agentfeed
 
 import (
 	"fmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"os"
 	"strings"
 )
@@ -60,8 +61,7 @@ func wakePasteFormat(attnPrefix, eventID, agentID string) string {
 	if eventID != "" {
 		wake += " " + eventID
 	}
-	return fmt.Sprintf("%s — %s — zqk workflow whats-next --format json --skip-measure --agent-id %s (substance on feed)",
-		attnPrefix, wake, agentID)
+	return paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("%s — %s — zqk workflow whats-next --format json --skip-measure --agent-id %s (substance on feed)", attnPrefix, wake, agentID))
 }
 
 // WakePasteStub builds a short chat-paste line (wake/ack). Substance lives on the feed.

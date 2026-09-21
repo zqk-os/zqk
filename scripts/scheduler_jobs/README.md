@@ -105,25 +105,6 @@ zqk system ensure-retention-jobs
 zqk internal create scheduler_job --file scripts/scheduler_jobs/audit_event_aggregation_default.yaml
 ```
 
-## test_bundle_matrix_regen_daily.yaml
-
-Daily (cron **`15 6 * * *`**) regen of **`docs/quality/TEST_BUNDLE_MATRIX.csv`** via **`zqk system test-bundle-matrix`** (native `pkg/pipeline`). **Disabled by default** (`enabled: false`); enable when you want the matrix refreshed on a schedule without manual runs.
-
-**Create:**
-
-```bash
-zqk object create scheduler_job --file scripts/scheduler_jobs/test_bundle_matrix_regen_daily.yaml
-```
-
-**If the job id already exists**, update fields from the file with **`zqk object update`** or delete and recreate—see `.zqk/process/` CLI rules.
-
-**Manual trigger (after enabling):**
-
-```bash
-zqk scheduler trigger SCH-test-bundle-matrix-regen
-```
-
-Set **`ZQK_BIN`** if `zqk` is not on PATH; **`ZQK_PROJECT_ROOT`** defaults to `.` for the shell wrapper.
 
 ## convergence_orchestrate.yaml
 

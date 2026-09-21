@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -15,6 +16,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
@@ -47,7 +49,7 @@ func NewSubmitCmd() *cobra.Command {
 		"- Execution metrics",
 	).
 		AddExample("Submit a simple command", "%s scheduler submit \"echo hello world\"").
-		AddExample("Submit a command with arguments", "%s scheduler submit \"zqk system aggregate-audit\" --window 24h --delete").
+		AddExample("Submit a command with arguments", "%s scheduler submit \""+paths.CLIUsage("system", "aggregate-audit")+"\" --window 24h --delete").
 		AddExample("Submit with timeout and working directory", "%s scheduler submit \"make build\" --max-runtime 600 --workdir /path/to/project").
 		AddExample("Submit with environment variables", "%s scheduler submit \"npm test\" --env \"NODE_ENV=test\" --env \"CI=true\"").
 		AddExample("Submit with retry on failure", "%s scheduler submit \"curl https://api.example.com/data\" --retry 3").
@@ -130,7 +132,7 @@ func runSubmit(cmd *cobra.Command, args []string) error {
 				projectRoot = cliCtx.ProjectRoot
 			}
 			if projectRoot != emptyValue {
-				diagnosticsDir = fmt.Sprintf("%s/.zqk/diagnostics", projectRoot)
+				diagnosticsDir = filepath.Join(projectRoot, paths.ProjectDataDir, "diagnostics")
 			}
 		}
 		if diagnosticsDir != emptyValue {
@@ -323,8 +325,8 @@ func submitJob(cliCtx *cli.Context, cmd *cobra.Command, args []string) error {
 				AddIf(len(commandArgs) > 0, " "+strings.Join(commandArgs, " "))
 			out.AddLine("").AddLineWithIndentf(2, "Timeout: %d seconds", timeout).
 				BlankLine().
-				AddLinef("View status: zqk scheduler activity --job-id %s", jobID).
-				AddLinef("View history: zqk scheduler history --job-id %s", jobID)
+				AddLinef(paths.RewriteCanonicalCLIInvocations("View status: zqk scheduler activity --job-id %s"), jobID).
+				AddLinef(paths.RewriteCanonicalCLIInvocations("View history: zqk scheduler history --job-id %s"), jobID)
 			if err := cli.WriteOutput(cmd, []byte(out.Build())); err != nil {
 				return err
 			}
@@ -385,8 +387,8 @@ func submitJob(cliCtx *cli.Context, cmd *cobra.Command, args []string) error {
 		out.AddLineWithIndentf(2, "Retries: %d (delay: %d seconds)", retryCount, retryDelay)
 	}
 	out.BlankLine().
-		AddLinef("View status: zqk scheduler activity --job-id %s", jobID).
-		AddLinef("View history: zqk scheduler history --job-id %s", jobID)
+		AddLinef(paths.RewriteCanonicalCLIInvocations("View status: zqk scheduler activity --job-id %s"), jobID).
+		AddLinef(paths.RewriteCanonicalCLIInvocations("View history: zqk scheduler history --job-id %s"), jobID)
 
 	return cli.WriteOutput(cmd, []byte(out.Build()))
 }

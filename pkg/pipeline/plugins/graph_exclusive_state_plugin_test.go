@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 func TestGraphExclusiveStatePlugin_Execute(t *testing.T) {
@@ -20,7 +21,7 @@ func TestGraphExclusiveStatePlugin_Execute(t *testing.T) {
 			name: "valid payload",
 			payload: map[string]any{
 				"state":              "active",
-				objects.FieldKeyPath: ".zqk-state/system-state.csnap",
+				objects.FieldKeyPath: paths.DefaultProjectStateDir + "/system-state.csnap",
 			},
 			wantErr: false,
 		},

@@ -94,7 +94,7 @@ func TestConfigRootFallback(t *testing.T) {
 	zqkContent := `system:
   storage_mode: "file"
 `
-	if err := os.WriteFile(filepath.Join(tmpDir, paths.ZqkConfigFileName), []byte(zqkContent), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(tmpDir, paths.ZqkConfigFileName), []byte(zqkContent), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write root zqk.yaml: %v", err)
 	}
 
@@ -127,10 +127,10 @@ func TestFirstRun_PolyglotWorkspaceErgonomics(t *testing.T) {
 	logger := logging.GetLoggerFromProfile("human")
 
 	// Simulate a Python / TypeScript project
-	if err := fileutil.WriteFile(filepath.Join(tmpDir, "package.json"), []byte(`{"name":"polyglot-app"}`), 0644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(tmpDir, "package.json"), []byte(`{"name":"polyglot-app"}`), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(filepath.Join(tmpDir, "pyproject.toml"), []byte(`[project]`+"\n"+`name = "polyglot-app"`), 0644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(tmpDir, "pyproject.toml"), []byte(`[project]`+"\n"+`name = "polyglot-app"`), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -183,7 +183,7 @@ func TestFirstRun_BoundaryAndErrorHandling(t *testing.T) {
 	// Verify boundary condition where projectRoot is an existing regular file rather than a directory
 	tmpDir := t.TempDir()
 	filePath := filepath.Join(tmpDir, "blocked_by_file")
-	if err := os.WriteFile(filePath, []byte("plain file"), 0644); err != nil {
+	if err := os.WriteFile(filePath, []byte("plain file"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -250,13 +250,13 @@ func TestCommunitySourceOverlay_IntegrityAndProcessPreservation(t *testing.T) {
 
 	// Test non-destructive overlay into temp directory with existing process object
 	tmpDest := t.TempDir()
-	procDir := filepath.Join(tmpDest, ".zqk", "process")
-	if err := os.MkdirAll(procDir, 0755); err != nil {
+	procDir := filepath.Join(tmpDest, paths.ProjectDataDir, paths.ProcessSubdir)
+	if err := os.MkdirAll(procDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	sentinelPath := filepath.Join(procDir, "sentinel.yaml")
 	sentinelContent := []byte("sentinel: preserved\n")
-	if err := os.WriteFile(sentinelPath, sentinelContent, 0644); err != nil {
+	if err := os.WriteFile(sentinelPath, sentinelContent, paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -269,15 +269,15 @@ func TestCommunitySourceOverlay_IntegrityAndProcessPreservation(t *testing.T) {
 	// Verify sentinel was preserved untouched
 	saved, err := os.ReadFile(sentinelPath)
 	if err != nil || string(saved) != string(sentinelContent) {
-		t.Errorf(".zqk/process was corrupted or deleted by overlay! err=%v, content=%s", err, string(saved))
+		t.Errorf("%s was corrupted or deleted by overlay! err=%v, content=%s", paths.ProcessDir, err, string(saved))
 	}
 
 	// Verify required overlay assets were copied
 	expectedCopied := []string{
 		filepath.Join(tmpDest, "Makefile"),
-		filepath.Join(tmpDest, "cmd", "zqk-community", "main.go"),
+		filepath.Join(tmpDest, "cmd", "zqk", "main.go"),
 		filepath.Join(tmpDest, "scripts", "build-bootstrap-archive.sh"),
-		filepath.Join(tmpDest, ".zqk", "specs", "spec_index.json"),
+		filepath.Join(tmpDest, paths.ProjectDataDir, paths.SpecsSubdir, "spec_index.json"),
 	}
 	for _, ef := range expectedCopied {
 		if !fileutil.Exists(ef) {
@@ -301,7 +301,7 @@ func TestCommunitySourceOverlay_IntegrityAndProcessPreservation(t *testing.T) {
 	// Verify apply-community-source.sh preserves destination-owned README.md
 	destReadmePath := filepath.Join(tmpDest, "README.md")
 	customReadme := []byte("# Custom Dest Community README\n")
-	if err := os.WriteFile(destReadmePath, customReadme, 0644); err != nil {
+	if err := os.WriteFile(destReadmePath, customReadme, paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	cmd2 := exec.Command(overlayScript, tmpDest)
@@ -335,8 +335,9 @@ func TestCommunitySourceOverlay_IntegrityAndProcessPreservation(t *testing.T) {
 		t.Fatalf("failed to read sync-public-candidate.sh: %v", err)
 	}
 	syncStr := string(syncData)
-	if !strings.Contains(syncStr, ".zqk/specs") {
-		t.Errorf("sync-public-candidate.sh must include .zqk/specs")
+	specsPath := filepath.Join(paths.ProjectDataDir, paths.SpecsSubdir)
+	if !strings.Contains(syncStr, specsPath) {
+		t.Errorf("sync-public-candidate.sh must include %s", specsPath)
 	}
 	if strings.Contains(syncStr, "\"Makefile\"") {
 		t.Errorf("sync-public-candidate.sh INCLUDES must not contain Makefile")

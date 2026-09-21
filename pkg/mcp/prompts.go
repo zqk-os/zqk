@@ -68,8 +68,8 @@ func RegisterOnboardingPrompts(server *Server) {
 		filepath.Join(projectRoot, paths.ProjectDataDir, "mcp_specs", "onboarding_prompts.yaml"),
 		filepath.Join(datacell.CellCASPrimaryDir(projectRoot, "mcp_specs"), "onboarding_prompts.yaml"),
 		filepath.Join(projectRoot, "mcp_specs/onboarding_prompts.yaml"),
-		".zqk/mcp/specs/onboarding_prompts.yaml",
-		".zqk/mcp_specs/onboarding_prompts.yaml",
+		filepath.Join(paths.ProjectDataDir, paths.MCPDir, "specs", "onboarding_prompts.yaml"),
+		filepath.Join(paths.ProjectDataDir, "mcp_specs", "onboarding_prompts.yaml"),
 		filepath.Join(datacell.ProcessPrimaryDir("."), "mcp_specs", "onboarding_prompts.yaml"),
 		"mcp_specs/onboarding_prompts.yaml",
 	}

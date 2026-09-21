@@ -4,13 +4,17 @@ import (
 	"path/filepath"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-const exampleChunksYAML = `# Verifiable Decomposition Spine — working chunks
+func exampleChunksYAML() string {
+	evalJSON := paths.CLIUsage("workflow", "vds", "evaluate", "--format", "json")
+	evalBrief := paths.CLIUsage("workflow", "vds", "evaluate", "--format", "agent-prompt")
+	return `# Verifiable Decomposition Spine — working chunks
 # Policy: POL-WORKFLOW-VDS
-# Evaluate: zqk workflow vds evaluate --format json
-# Brief:    zqk workflow vds evaluate --format agent-prompt
+# Evaluate: ` + evalJSON + `
+# Brief:    ` + evalBrief + `
 #
 # Each chunk must stand alone. Chat is never evidence.
 
@@ -28,11 +32,12 @@ chunks:
     gate_design: yes
     independent_verify: pending
 `
+}
 
 // InitChunksFile writes the default chunks scaffold if missing (or force).
 func InitChunksFile(projectRoot string, force bool) (path string, created bool, err error) {
 	path = filepath.Join(projectRoot, DefaultChunksRel)
-	if err := fileutil.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(path), paths.DirPerm755); err != nil {
 		return path, false, errfmt.Errorf("vds: mkdir: %w", err)
 	}
 	if !force {
@@ -40,7 +45,7 @@ func InitChunksFile(projectRoot string, force bool) (path string, created bool, 
 			return path, false, nil
 		}
 	}
-	if err := fileutil.WriteFile(path, []byte(exampleChunksYAML), 0o644); err != nil {
+	if err := fileutil.WriteFile(path, []byte(exampleChunksYAML()), paths.FilePerm644); err != nil {
 		return path, false, errfmt.Errorf("vds: write chunks: %w", err)
 	}
 	return path, true, nil

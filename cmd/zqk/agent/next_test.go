@@ -37,7 +37,7 @@ func TestAgentNext_FailClosedOnWorktreeExists(t *testing.T) {
 
 	// Create a dummy worktree directory
 	worktreeDir := paths.AgentWorktreeDir(root, taskID)
-	err = fileutil.MkdirAll(worktreeDir, 0755)
+	err = fileutil.MkdirAll(worktreeDir, paths.DirPerm755)
 	if err != nil {
 		t.Fatalf("failed to create worktree dir: %v", err)
 	}

@@ -332,6 +332,8 @@ func TestCAS_BuiltinTamperDetection_MtimeCheck(t *testing.T) {
 
 // TestCAS_BuiltinTamperDetection_DocEntry tests tamper detection for doc_entry objects
 func TestCAS_BuiltinTamperDetection_DocEntry(t *testing.T) {
+	// Do not t.Parallel: storage.DisableStreamStorageForTest mutates global env.
+	storage.DisableStreamStorageForTest(t)
 	// Create test root in a path that contains "test-scenarios" to enable CAS
 	baseTempDir := t.TempDir()
 	testRoot := filepath.Join(baseTempDir, "test-scenarios", "cas-builtin-doc-entry")
@@ -341,11 +343,7 @@ func TestCAS_BuiltinTamperDetection_DocEntry(t *testing.T) {
 		t.Fatalf("Failed to create test directory: %v", err)
 	}
 
-	// Create object_specs directory (required for validation)
-	specsDir := filepath.Join(processDir, "_internal", "object_specs")
-	if err := fileutil.MkdirAll(specsDir, paths.DirPerm755); err != nil {
-		t.Fatalf("Failed to create specs directory: %v", err)
-	}
+	storage.MustEnsureProcessSpecsLayoutForTest(t, testRoot)
 
 	fileStorage, err := storage.NewFileObjectStorageForTest(testRoot)
 	if err != nil {
@@ -427,6 +425,8 @@ created_by: ACC-1785920548450214012-68b850c0`)
 	if err := fileutil.Chtimes(filePath, recentTime, recentTime); err != nil {
 		t.Fatalf("Failed to update mtime: %v", err)
 	}
+
+	storage.GetGlobalParseCache().Clear()
 
 	// Attempt to read - should detect tampering
 	_, err = fileStorage.Read(ctx, secCtx, "DOC-001")

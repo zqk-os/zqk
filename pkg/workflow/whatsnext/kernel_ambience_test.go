@@ -113,8 +113,8 @@ func TestTruncateAndFixtureHelpers(t *testing.T) {
 func TestEnrichStrategicAlignment_andSeatMode(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
-	dir := filepath.Join(root, paths.ProjectDataDir, "state", "ambient")
-	if err := fileutil.MkdirAll(dir, 0o755); err != nil {
+	dir := filepath.Join(root, paths.ProjectDataDir, paths.StateDir, "ambient")
+	if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	payload := map[string]any{
@@ -129,7 +129,7 @@ func TestEnrichStrategicAlignment_andSeatMode(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(filepath.Join(dir, "align-latest.json"), b, 0o644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(dir, "align-latest.json"), b, paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	amb := KernelAmbience{Available: true, ObjectComplianceOK: true}
@@ -160,8 +160,8 @@ func TestEnrichStrategicAlignment_andSeatMode(t *testing.T) {
 func TestLoadKernelAmbience_fromCacheAndDrafts(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
-	logDir := filepath.Join(root, paths.ProjectDataDir, "logs")
-	if err := fileutil.MkdirAll(logDir, 0o755); err != nil {
+	logDir := filepath.Join(root, paths.ProjectDataDir, paths.LogsDir)
+	if err := fileutil.MkdirAll(logDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	payload := map[string]any{
@@ -174,14 +174,14 @@ func TestLoadKernelAmbience_fromCacheAndDrafts(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(filepath.Join(logDir, "system-check.json"), b, 0o644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(logDir, "system-check.json"), b, paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	draft := filepath.Join(root, paths.ProjectDataDir, paths.ObjectDraftsDir, "backlog_item", "aa")
-	if err := fileutil.MkdirAll(draft, 0o755); err != nil {
+	if err := fileutil.MkdirAll(draft, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteFile(filepath.Join(draft, "BLI-test.yaml"), []byte("id: BLI-test\nkind: backlog_item\n"), 0o644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(draft, "BLI-test.yaml"), []byte("id: BLI-test\nkind: backlog_item\n"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 

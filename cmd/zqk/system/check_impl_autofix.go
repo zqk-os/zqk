@@ -311,7 +311,7 @@ func processIssueForAutoFix(fixCtx *AutoFixContext, issue Issue, registry storag
 		// or `zqk object delete --unlink-references` — never silent unlink of the file.
 		if strings.Contains(issue.Message, "Duplicate object ID") && issue.AutoFixable {
 			if fixCtx.AutoFix || fixCtx.Force {
-				return fmt.Sprintf("refused to auto-delete purported duplicate %s (%s); use cleanup-duplicates quarantine or zqk object delete --unlink-references", filepath.Base(fixCtx.FilePath), fixCtx.Kind)
+				return paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("refused to auto-delete purported duplicate %s (%s); use cleanup-duplicates quarantine or zqk object delete --unlink-references", filepath.Base(fixCtx.FilePath), fixCtx.Kind))
 			}
 		}
 

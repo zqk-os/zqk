@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -16,12 +17,12 @@ func TestVerifier_VerifyAndAutoSeal(t *testing.T) {
 	tmpDir := t.TempDir()
 	relDoc := "docs/architecture/test_doc.md"
 	fullDocPath := filepath.Join(tmpDir, relDoc)
-	if err := os.MkdirAll(filepath.Dir(fullDocPath), 0750); err != nil {
+	if err := os.MkdirAll(filepath.Dir(fullDocPath), paths.DirPerm750); err != nil {
 		t.Fatalf("failed to create dir: %v", err)
 	}
 
 	content := "# Architecture Title\nOriginal content line."
-	if err := fileutil.WriteFile(fullDocPath, []byte(content), 0644); err != nil {
+	if err := fileutil.WriteFile(fullDocPath, []byte(content), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write doc: %v", err)
 	}
 
@@ -79,7 +80,7 @@ func TestVerifier_VerifyAndAutoSeal(t *testing.T) {
 
 	// Tamper file content to create drift
 	tamperedContent := "# Architecture Title\nTampered line."
-	if err := fileutil.WriteFile(fullDocPath, []byte(tamperedContent), 0644); err != nil {
+	if err := fileutil.WriteFile(fullDocPath, []byte(tamperedContent), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to tamper doc: %v", err)
 	}
 

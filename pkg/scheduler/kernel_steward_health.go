@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/agentprompt"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -18,7 +19,7 @@ func gatherHealthSignals(projectRoot string) agentprompt.KernelHealthSignals {
 	var signals agentprompt.KernelHealthSignals
 
 	// Read health.jsonl from the scheduler state directory.
-	healthPath := filepath.Join(projectRoot, ".zqk", "scheduler", "health.jsonl")
+	healthPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.SchedulerSubdir, "health.jsonl")
 	f, err := fileutil.Open(healthPath)
 	if err != nil {
 		// File absent is normal; return zero signals.

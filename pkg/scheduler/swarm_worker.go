@@ -13,12 +13,14 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/agentclaim"
 	"github.com/zqk-os/zqk/pkg/agentfeed"
+	"github.com/zqk-os/zqk/pkg/agentprompt"
 	"github.com/zqk-os/zqk/pkg/authcred"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	goroutinelabels "github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/llm"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/swarm"
 )
@@ -49,6 +51,10 @@ var SwarmNewLLMClient = func(ctx context.Context, c *llm.Config) llm.Client {
 	return llm.NewQwenClient(ctx, c)
 }
 var SwarmNewMCPExecutor = func(ctx context.Context, path string) (swarm.Executor, error) { return swarm.NewMCPExecutor(ctx, path) }
+
+func resolveSwarmMCPPath(projectRoot string) string {
+	return paths.MCPServeCommandLine("", projectRoot)
+}
 
 func (s *Scheduler) watchSwarmTasks(ctx context.Context) {
 	getSwarmWorkerPool().Start(ctx)
@@ -187,7 +193,7 @@ func (s *Scheduler) pollAndSpawnSwarmTasks(ctx context.Context) {
 				return nil
 			}
 
-			executor, err := SwarmNewMCPExecutor(workerCtx, "./bin/zqk-mcp")
+			executor, err := SwarmNewMCPExecutor(workerCtx, resolveSwarmMCPPath(s.projectRoot))
 			if err != nil {
 				failTask(fmt.Errorf("MCP EXECUTOR INIT FAILED: %w", err))
 				return nil
@@ -206,9 +212,11 @@ func (s *Scheduler) pollAndSpawnSwarmTasks(ctx context.Context) {
 				taskInstr = instrStr
 			}
 
+			workClass := agentprompt.ClassifyWorkClass(taskTitle, taskDesc, taskInstr)
 			systemPrompt, err := swarm.RenderSystemPrompt(swarm.QwenSystemData{
 				WorkerID:     taskID,
-				Capabilities: []string{"coding", "review"},
+				Capabilities: workClass.PromptCapabilities(),
+				WorkClass:    string(workClass),
 			})
 			if err != nil {
 				failTask(fmt.Errorf("FAILED TO RENDER SYSTEM PROMPT: %w", err))
@@ -310,22 +318,13 @@ func (s *Scheduler) resolveLLMClientForTask(ctx context.Context, task map[string
 
 	s.logger.Info(fmt.Sprintf("Found provider profile: %s (model: %s, endpoint: %s)", title, modelID, endpointType))
 
-	provider := "openai"
-	lowerEndpoint := strings.ToLower(endpointType)
-	lowerModel := strings.ToLower(modelID)
-	if strings.Contains(lowerEndpoint, "gemini") || strings.Contains(lowerModel, "gemini") {
-		provider = "gemini"
-	} else if strings.Contains(lowerEndpoint, "qwen") || strings.Contains(lowerModel, "qwen") {
-		provider = "qwen"
+	provider := llm.ProviderIDFor(endpointType, modelID)
+	if provider == "" {
+		provider = strings.TrimSpace(zqkenv.LLMProvider().Get())
 	}
 
 	// Resolve API key
 	apiKey := zqkenv.LLMAPIKey().Get()
-	if provider == "gemini" {
-		if key := zqkenv.GeminiAPIKey().Get(); key != "" {
-			apiKey = key
-		}
-	}
 
 	if modelID == "" {
 		modelID = fallbackChatModel()
@@ -340,22 +339,11 @@ func (s *Scheduler) resolveLLMClientForTask(ctx context.Context, task map[string
 	}
 	applyCodeDraftSampling(cfg)
 
-	if provider == "gemini" {
-		return llm.NewGeminiClient(ctx, cfg), modelID
-	} else if provider == "qwen" {
-		return llm.NewQwenClient(ctx, cfg), modelID
-	}
 	return llm.NewClient(ctx, cfg), modelID
 }
 
 func fallbackChatModel() string {
-	if m := zqkenv.LLMChatModel().Get(); m != "" {
-		return m
-	}
-	if strings.Contains(zqkenv.LLMBaseURL().Get(), "11434") {
-		return "qwen3.8:latest"
-	}
-	return "gpt-4o-mini"
+	return strings.TrimSpace(zqkenv.LLMChatModel().Get())
 }
 
 func applyCodeDraftSampling(cfg *llm.Config) {

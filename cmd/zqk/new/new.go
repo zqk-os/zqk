@@ -1,6 +1,7 @@
 package newcmd
 
 import (
+	"fmt"
 	"github.com/zqk-os/zqk/pkg/quick"
 	"path/filepath"
 	"strings"
@@ -27,9 +28,12 @@ import (
 
 const (
 	emptyValue          = ""
-	commandSpecFilePerm = 0o644
-	newRootIntro        = "Mint instances (`new object --title`) onto the draft plane; command DNA: `new command-spec`; YAML scaffolds: zqk object template <kind>. Bundles/object-specs still use .zqk/drafts/."
+	commandSpecFilePerm = paths.FilePerm644
 )
+
+func newRootIntro() string {
+	return "Mint instances (`new object --title`) onto the draft plane; command DNA: `new command-spec`; YAML scaffolds: `" + paths.CLIUsage("object", "template") + " <kind>`. Bundles/object-specs still use .zqk/drafts/."
+}
 
 // NewNewCmd is the `zqk new` command tree. Root long/short help and subcommands are spec-driven;
 // see .zqk/cli/specs/new/root_command.yaml and sibling *_command.yaml files;
@@ -38,17 +42,17 @@ func NewNewCmd() *cobra.Command {
 	root := bldr_cli_cmd_v1.NewNewRootCommandBuilder()
 	// retire stale internal-create help until new_* builders regenerate from specs.
 	root.Long = strings.ReplaceAll(root.Long,
-		"zqk internal create <kind>",
-		"zqk object create <kind> --internal",
+		paths.CLIUsage("internal", "create")+" <kind>",
+		paths.CLIUsage("object", "create")+" <kind> --internal",
 	)
 	root.Long = strings.ReplaceAll(root.Long,
 		"(privileged kinds; same last-draft pointer)",
 		"(elevated kinds; Enterprise license or zqk-admin)",
 	)
 	if root.Long != "" {
-		root.Long = newRootIntro + "\n\n" + root.Long
+		root.Long = newRootIntro() + "\n\n" + root.Long
 	} else {
-		root.Long = newRootIntro
+		root.Long = newRootIntro()
 	}
 	root.PersistentPreRunE = runNewKindValidatePreRun
 	root.AddCommand(newObjectCmd())
@@ -103,10 +107,10 @@ func runNewObject(cmd *cobra.Command, args []string) (err error) {
 	}
 
 	if kind == objects.KindCommandSpec {
-		return errfmt.Errorf("command_spec is file-authored CLI DNA; use `zqk new command-spec <command-path> --short ... --description ...`")
+		return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations("command_spec is file-authored CLI DNA; use `zqk new command-spec <command-path> --short ... --description ...`"))
 	}
 	if title == emptyValue {
-		return errfmt.Errorf("title is required (pass --title, --file, or --content). For printable YAML only: zqk object template %s", kind)
+		return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("title is required (pass --title, --file, or --content). For printable YAML only: zqk object template %s", kind)))
 	}
 
 	projectRoot := cli.ResolveProjectRoot(".")

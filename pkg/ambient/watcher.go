@@ -10,6 +10,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -37,7 +38,7 @@ func NewFSWatcher(rootPath string, eventHub EventHub) (*FSWatcher, error) {
 // isIgnoredDirName returns true if a directory name should never be walked or watched.
 func isIgnoredDirName(name string) bool {
 	switch name {
-	case ".git", "node_modules", ".idea", ".vscode", "vendor", ".zqk", ".zqk-state", ".tmp":
+	case ".git", "node_modules", ".idea", ".vscode", "vendor", paths.ProjectDataDir, paths.DefaultProjectStateDir, ".tmp":
 		return true
 	default:
 		return false
@@ -49,16 +50,16 @@ func isIgnoredDirName(name string) bool {
 func isIgnoredFSPath(path string) bool {
 	clean := filepath.ToSlash(path)
 	return strings.Contains(clean, "/.git/") ||
-		strings.Contains(clean, "/.zqk/") ||
-		strings.Contains(clean, "/.zqk-state/") ||
+		strings.Contains(clean, "/"+paths.ProjectDataDir+"/") ||
+		strings.Contains(clean, "/"+paths.DefaultProjectStateDir+"/") ||
 		strings.Contains(clean, "/node_modules/") ||
 		strings.Contains(clean, "/vendor/") ||
 		strings.Contains(clean, "/.idea/") ||
 		strings.Contains(clean, "/.vscode/") ||
 		strings.HasSuffix(clean, "/.DS_Store") ||
 		strings.HasSuffix(clean, "/.git") ||
-		strings.HasSuffix(clean, "/.zqk") ||
-		strings.HasSuffix(clean, "/.zqk-state")
+		strings.HasSuffix(clean, "/"+paths.ProjectDataDir) ||
+		strings.HasSuffix(clean, "/"+paths.DefaultProjectStateDir)
 }
 
 // Start begins watching the directory tree.

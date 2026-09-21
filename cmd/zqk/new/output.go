@@ -24,7 +24,7 @@ func writeDraft(cmd *cobra.Command, outFlag, defaultBaseName string, content []b
 		if root == emptyValue {
 			root = "."
 		}
-		dir := filepath.Join(root, paths.ProjectDataDir, "drafts")
+		dir := filepath.Join(root, paths.ProjectDataDir, paths.DraftsSubdir)
 		if err := fileutil.EnsureDir(dir); err != nil {
 			return errfmt.Newf("create drafts dir").Wrap(err)
 		}

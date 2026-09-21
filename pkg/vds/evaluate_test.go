@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -64,7 +65,7 @@ func TestEvaluate_schedulerTestsNeedJobAndLog(t *testing.T) {
 		Claim:             "tests green",
 		RubricRef:         "CRIT-1",
 		DSLChecks:         []string{"tests_ok_per_customization"},
-		EvidenceRefs:      []string{"SCH-run-foo", ".zqk/logs/scheduler/test-bundles/foo.log"},
+		EvidenceRefs:      []string{"SCH-run-foo", filepath.Join(paths.ProjectDataDir, paths.LogsDir, paths.SchedulerSubdir, "test-bundles", "foo.log")},
 		GateImplement:     "yes",
 		IndependentVerify: "yes",
 	}}

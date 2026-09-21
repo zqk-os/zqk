@@ -13,6 +13,7 @@ import (
 	"github.com/zqk-os/zqk/internal/cli"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/paths"
 	traypkg "github.com/zqk-os/zqk/pkg/tray"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -20,8 +21,8 @@ import (
 func setupTestProjectWithTrayYAML(t *testing.T, entries []traypkg.Entry) string {
 	t.Helper()
 	tmpDir := t.TempDir()
-	zqkDir := filepath.Join(tmpDir, ".zqk")
-	if err := os.MkdirAll(zqkDir, 0o755); err != nil {
+	zqkDir := filepath.Join(tmpDir, paths.ProjectDataDir)
+	if err := os.MkdirAll(zqkDir, paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create .zqk dir: %v", err)
 	}
 
@@ -39,7 +40,7 @@ func setupTestProjectWithTrayYAML(t *testing.T, entries []traypkg.Entry) string 
 	}
 
 	trayPath := datacell.TrayYAMLPath(tmpDir)
-	if err := fileutil.WriteFile(trayPath, buf.Bytes(), 0o644); err != nil {
+	if err := fileutil.WriteFile(trayPath, buf.Bytes(), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write tray.yaml: %v", err)
 	}
 
@@ -175,7 +176,7 @@ func TestModifyingSignedEntry_FailsClosed(t *testing.T) {
 	if err := enc.Encode(&cfg); err != nil {
 		t.Fatalf("encode tampered config: %v", err)
 	}
-	if err := fileutil.WriteFile(trayPath, buf.Bytes(), 0o644); err != nil {
+	if err := fileutil.WriteFile(trayPath, buf.Bytes(), paths.FilePerm644); err != nil {
 		t.Fatalf("write tampered %s: %v", trayPath, err)
 	}
 

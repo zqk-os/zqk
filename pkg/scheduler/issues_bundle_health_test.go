@@ -12,7 +12,7 @@ import (
 
 func TestCompareIssuesToBundleHealth_StaleIssueGreenLatest(t *testing.T) {
 	root := t.TempDir()
-	if err := fileutil.EnsureDir(filepath.Join(root, paths.ProjectDataDir, "scheduler")); err != nil {
+	if err := fileutil.EnsureDir(filepath.Join(root, paths.ProjectDataDir, paths.SchedulerSubdir)); err != nil {
 		t.Fatal(err)
 	}
 	healthDir := JobLogsTestBundlesDir(root)
@@ -40,7 +40,7 @@ func TestCompareIssuesToBundleHealth_StaleIssueGreenLatest(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	issuesPath := filepath.Join(root, paths.ProjectDataDir, "scheduler", "issues.json")
+	issuesPath := filepath.Join(root, paths.ProjectDataDir, paths.SchedulerSubdir, "issues.json")
 	payload := IssuesPayload{
 		Status:    issuesStatusIssues,
 		UpdatedAt: "2026-03-29T01:30:00Z",

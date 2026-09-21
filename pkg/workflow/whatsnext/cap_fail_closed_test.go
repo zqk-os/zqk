@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -47,8 +48,8 @@ func TestCAPFailClosedEvidence(t *testing.T) {
 	}
 
 	// 3. Tampering detection
-	stateFile := filepath.Join(tmpDir, ".zqk", "state", capCycleFileName)
-	_ = fileutil.WriteFile(stateFile, []byte("cap_stage_review"), 0o644)
+	stateFile := filepath.Join(tmpDir, paths.ProjectDataDir, paths.StateDir, capCycleFileName)
+	_ = fileutil.WriteFile(stateFile, []byte("cap_stage_review"), paths.FilePerm644)
 	if !CapCycleTamperDetected(tmpDir) {
 		t.Errorf("expected tamper detection when stateFile does not match journal")
 	}

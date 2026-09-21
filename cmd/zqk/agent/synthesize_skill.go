@@ -1,6 +1,7 @@
 package agent
 
 import (
+	"context"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -26,17 +27,12 @@ type SynthesizeSkillOptions struct {
 }
 
 func NewSynthesizeSkillCmd() *cobra.Command {
-	cmd := bldr_cli_cmd_v1.NewAgentSynthesizeSkillCommandBuilder()
-
-	// The generated builder uses viper flags but doesn't bind to our opts struct automatically.
-	// We'll extract them in the RunE.
 	var opts SynthesizeSkillOptions
-	runE := cmd.RunE
-	cmd.RunE = func(c *cobra.Command, args []string) error {
-		opts.Capability, _ = c.Flags().GetString("capability")
-		opts.Provider, _ = c.Flags().GetString("provider")
-		return runE(c, args)
-	}
+
+	cmd := bldr_cli_cmd_v1.NewAgentSynthesizeSkillCommandBuilder()
+	cmd.Flags().StringVar(&opts.Capability, "capability", "", "Name of the capability to synthesize (e.g. 'codebase-indexing')")
+	cmd.Flags().StringVar(&opts.Provider, "provider", "anthropic", "Provider framework to integrate with")
+	_ = cmd.MarkFlagRequired("capability")
 
 	cli.BindAsyncProgress(cmd, func(c *cobra.Command, _ []string) error {
 		return runSynthesizeSkill(c, opts)
@@ -51,6 +47,17 @@ type synthesizeSkillPayload struct {
 	opts      SynthesizeSkillOptions
 	skillPath string
 	testCase  map[string]any
+}
+
+// synthesizeSkillCommitContext is the storage Create ctx for COMMIT.
+// Same intent as `object create --promote`: keep a non-preliminary status and
+// write CAS. Bare cmd.Context() is not enough — a CLI-marked create without
+// this flag coerces proposed → conceptual and parks on the draft plane.
+func synthesizeSkillCommitContext(opCtx context.Context) context.Context {
+	if opCtx == nil {
+		opCtx = pkgctx.NewSystemContext()
+	}
+	return pkgctx.WithPromoteOnCreate(opCtx)
 }
 
 func runSynthesizeSkill(cmd *cobra.Command, opts SynthesizeSkillOptions) error {
@@ -82,7 +89,7 @@ func runSynthesizeSkill(cmd *cobra.Command, opts SynthesizeSkillOptions) error {
 			in := payload.(*synthesizeSkillPayload)
 
 			skillSlug := strings.ToLower(strings.ReplaceAll(in.opts.Capability, " ", "-"))
-			skillDir := filepath.Join(projectRoot, paths.ProjectDataDir, "skills", skillSlug)
+			skillDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.SkillsSubdir, skillSlug)
 			if err := fileutil.EnsureDir(skillDir); err != nil {
 				return nil, err
 			}
@@ -117,7 +124,7 @@ func runSynthesizeSkill(cmd *cobra.Command, opts SynthesizeSkillOptions) error {
 			in := payload.(*synthesizeSkillPayload)
 			sp := proc.Storage()
 			secCtx := proc.SecurityContext()
-			ctx := cmd.Context()
+			ctx := synthesizeSkillCommitContext(proc.OperationContext())
 
 			skillObj := map[string]any{
 				objects.FieldKeyKind:                objects.KindAgentSkill,

@@ -1,6 +1,7 @@
 package bldr_trait_v1
 
 import (
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/specbuilder/trait_builders"
 )
 
@@ -18,7 +19,7 @@ func NewAutoStatusTransitionableBuilder() *AutoStatusTransitionableBuilder {
 
 	// Configure the trait
 	builder.
-		SetDescription("Object-level trait for lifecycle-driven status advancement.\\nObjects with this trait can be advanced using `zqk object update <id> --auto-status`,\\nwhich derives the next status from lifecycle order and valid transitions.\\n").
+		SetDescription(paths.RewriteCanonicalCLIInvocations("Object-level trait for lifecycle-driven status advancement.\\nObjects with this trait can be advanced using `zqk object update <id> --auto-status`,\\nwhich derives the next status from lifecycle order and valid transitions.\\n")).
 		SetCategory("behavior").
 		SetObjectLevel(false).
 		SetFieldLevel(false)

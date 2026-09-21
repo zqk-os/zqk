@@ -43,7 +43,7 @@ func NewWALSpine(ctx context.Context, endpoint string, creds string) (infrastruc
 		return nil, errfmt.Newf("create WAL directory").Wrap(err)
 	}
 
-	f, err := fileutil.OpenFile(path, fileutil.O_CREATE|fileutil.O_RDWR|fileutil.O_APPEND, 0600)
+	f, err := fileutil.OpenFile(path, fileutil.O_CREATE|fileutil.O_RDWR|fileutil.O_APPEND, paths.FilePerm600)
 	if err != nil {
 		return nil, errfmt.Newf("open WAL file").Wrap(err)
 	}

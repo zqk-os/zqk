@@ -48,7 +48,7 @@ func (se *SemanticEnhancer) Enhance(ctx context.Context, result *ExtractResult) 
 
 	process.TouchMeaningfulActivity()
 	logger := logging.GetLogger()
-	includeTests := zqkenv.Get("ZQK_OBSERVER_INCLUDE_TESTS").BoolOrDefault(false)
+	includeTests := zqkenv.ObserverIncludeTests().BoolOrDefault(false)
 
 	// Filter eligible entities first to know total count
 	var eligibleIndices []int
@@ -89,7 +89,7 @@ func (se *SemanticEnhancer) Enhance(ctx context.Context, result *ExtractResult) 
 		})
 
 	// Limit concurrency: configurable via ZQK_OBSERVER_CONCURRENCY, default 6
-	concurrencyLimit := zqkenv.Get("ZQK_OBSERVER_CONCURRENCY").IntOrDefault(6)
+	concurrencyLimit := zqkenv.ObserverConcurrency().IntOrDefault(6)
 	if concurrencyLimit <= 0 {
 		concurrencyLimit = 6
 	}
@@ -124,7 +124,7 @@ func (se *SemanticEnhancer) Enhance(ctx context.Context, result *ExtractResult) 
 					strings.Join(entity.DependsOn, ", "),
 				)
 
-				skipIntent := zqkenv.Get("ZQK_OBSERVER_SKIP_INTENT").BoolOrDefault(false)
+				skipIntent := zqkenv.ObserverSkipIntent().BoolOrDefault(false)
 				var intent string
 				if !skipIntent {
 					var err error

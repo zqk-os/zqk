@@ -14,6 +14,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/workflow/whatsnext"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 // leadPlanDispatch is idle auto-dispatch: orch when live ATKs exist, else kernel fill.
@@ -24,15 +25,8 @@ type leadPlanDispatch struct {
 	FillSubmitted string
 }
 
-func fillSubmitCommand(kind string) string {
-	switch kind {
-	case whatsnext.FillKindGhostRef:
-		return "system check autofix dangling"
-	case whatsnext.FillKindCheckCache:
-		return "system check --format json -o .zqk/logs/system-check.json"
-	default:
-		return ""
-	}
+func schedulerCallbackNotify(cli, logFile string) string {
+	return cli + " callback notify --log-file " + logFile
 }
 
 func fillSubmitMarkPath(root, kind string) string {
@@ -63,42 +57,41 @@ func recentFillSubmit(root, kind string) (bool, string) {
 
 func writeFillSubmitMark(root, kind, detail string) error {
 	path := fillSubmitMarkPath(root, kind)
-	if err := fileutil.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(path), paths.DirPerm755); err != nil {
 		return errfmt.Errorf("fill mark dir: %w", err)
 	}
 	payload, err := json.Marshal(map[string]string{
 		"schema":             "zqk_kernel_fill_submit_v1",
 		objects.FieldKeyKind: kind,
-		"dispatched_at":      time.Now().UTC().Format(time.RFC3339),
+		"dispatched_at":      zqktime.NowRFC3339UTC(),
 		"detail":             detail,
 	})
 	if err != nil {
 		return err
 	}
-	return fileutil.WriteFile(path, append(payload, '\n'), 0o600)
+	return fileutil.WriteFile(path, append(payload, '\n'), paths.FilePerm600)
 }
 
 func submitKernelFill(ctx context.Context, root string, fill *whatsnext.FillItem) (string, error) {
-	if fill == nil {
+	if fill == nil || !fill.AutoSubmit {
 		return "", nil
 	}
-	sub := strings.TrimSpace(fillSubmitCommand(fill.Kind))
+	sub := strings.TrimSpace(fill.SubmitArgs)
 	if sub == "" {
 		return "", nil
 	}
 	if skip, msg := recentFillSubmit(root, fill.Kind); skip {
 		return msg, nil
 	}
-	zqkPath := filepath.Join(root, "bin", "zqk")
-	fillCmd := zqkPath + " " + sub
-	logDir := filepath.Join(root, paths.ProjectDataDir, "logs", "agent-ops")
-	if err := fileutil.MkdirAll(logDir, 0o755); err != nil {
+	cli := paths.ResolveProductCLI(root)
+	fillCmd := cli + " " + sub
+	logDir := filepath.Join(root, paths.ProjectDataDir, paths.LogsDir, "agent-ops")
+	if err := fileutil.MkdirAll(logDir, paths.DirPerm755); err != nil {
 		return "", errfmt.Errorf("fill callback dir: %w", err)
 	}
 	cb := filepath.Join(logDir, "fill-"+safePlanFileName(fill.Kind)+".callback.json")
-	hourglass := filepath.Join(root, "scripts", "agent-ops", "scheduler-job-callback.py") +
-		" --log " + cb
-	cmd := execwrap.CommandContext(ctx, zqkPath,
+	hourglass := schedulerCallbackNotify(cli, cb)
+	cmd := execwrap.CommandContext(ctx, cli,
 		"scheduler", "submit", fillCmd,
 		"--title", "KERNEL FILL "+fill.Kind,
 		"--max-runtime", "1800",

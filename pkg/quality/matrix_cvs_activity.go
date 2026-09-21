@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
@@ -16,11 +17,9 @@ func BuildMatrixActivityLogEntry(matrixAlias, csvPath string, bulk bool, updated
 	base := filepath.Base(csvPath)
 	var notes string
 	if bulk {
-		notes = fmt.Sprintf("matrix update %q (%s): %d row(s) with fields %s (zqk matrix update).",
-			matrixAlias, base, updatedCount, summarizeUpdateKeys(updates))
+		notes = paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("matrix update %q (%s): %d row(s) with fields %s (zqk matrix update).", matrixAlias, base, updatedCount, summarizeUpdateKeys(updates)))
 	} else {
-		notes = fmt.Sprintf("matrix update %q (%s): %s (zqk matrix update).",
-			matrixAlias, base, summarizeUpdateKeys(updates))
+		notes = paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("matrix update %q (%s): %s (zqk matrix update).", matrixAlias, base, summarizeUpdateKeys(updates)))
 	}
 	return map[string]any{
 		"timestamp":           zqktime.NowRFC3339UTC(),

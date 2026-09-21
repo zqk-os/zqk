@@ -1,13 +1,12 @@
 package authcred
 
 import (
-	"encoding/json"
-	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
-	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	"gopkg.in/yaml.v3"
 )
 
@@ -93,8 +92,26 @@ type roleFile struct {
 	Permissions []string `yaml:"permissions"`
 }
 
+// roleRecords is keyed by project root. Stamp is the role YAML dir.
+var roleRecords stampmemo.Table[[]RoleRecord]
+
 func loadRoleRecords(projectRoot string) []RoleRecord {
-	rolesDir := filepath.Join(projectRoot, paths.ProcessRolesDir)
+	if projectRoot == "" {
+		return nil
+	}
+	stamp := stampmemo.Of(paths.RoleIndexPath(projectRoot))
+	if stamp == 0 {
+		return collectRoleRecords(projectRoot)
+	}
+	recs, _ := roleRecords.Load(projectRoot, stamp, func() ([]RoleRecord, error) {
+		return collectRoleRecords(projectRoot), nil
+	})
+	return slices.Clone(recs)
+}
+
+func collectRoleRecords(projectRoot string) []RoleRecord {
+	rolesDir := paths.RolesDirPath(projectRoot)
+	indexPath := paths.RoleIndexPath(projectRoot)
 	seen := map[string]struct{}{}
 	var out []RoleRecord
 	appendRole := func(rec RoleRecord) {
@@ -112,43 +129,34 @@ func loadRoleRecords(projectRoot string) []RoleRecord {
 		out = append(out, rec)
 	}
 
-	indexPath := filepath.Join(rolesDir, ".role.index")
-	if data, err := fileutil.ReadFile(indexPath); err == nil {
-		var idx accountIndexFile
-		if json.Unmarshal(data, &idx) == nil && idx.Mappings != nil {
-			for id, hashName := range idx.Mappings {
-				yamlPath := filepath.Join(rolesDir, hashName+".yaml")
-				if rec, ok := readRoleFile(yamlPath); ok {
-					if rec.ID == "" {
-						rec.ID = id
-					}
-					appendRole(rec)
+	indexLoaded := false
+	if mappings := casMappings(projectRoot, indexPath); mappings != nil {
+		indexLoaded = true
+		for id := range mappings {
+			raw, ok := casYAML(projectRoot, id, indexPath, rolesDir)
+			if !ok {
+				continue
+			}
+			if rec, parsed := parseRoleFile(raw); parsed {
+				if rec.ID == "" {
+					rec.ID = id
 				}
+				appendRole(rec)
 			}
 		}
 	}
 
-	entries, err := fileutil.ReadDir(rolesDir)
-	if err != nil {
-		return out
-	}
-	for _, ent := range entries {
-		name := ent.Name()
-		if ent.IsDir() || !strings.HasSuffix(name, ".yaml") || strings.HasPrefix(name, ".") {
-			continue
-		}
-		if rec, ok := readRoleFile(filepath.Join(rolesDir, name)); ok {
-			appendRole(rec)
-		}
+	if !indexLoaded {
+		_ = forEachYAMLFile(rolesDir, func(_ string, data []byte) {
+			if rec, ok := parseRoleFile(data); ok {
+				appendRole(rec)
+			}
+		})
 	}
 	return out
 }
 
-func readRoleFile(path string) (RoleRecord, bool) {
-	raw, err := fileutil.ReadFile(path)
-	if err != nil {
-		return RoleRecord{}, false
-	}
+func parseRoleFile(raw []byte) (RoleRecord, bool) {
 	var f roleFile
 	if err := yaml.Unmarshal(raw, &f); err != nil {
 		return RoleRecord{}, false

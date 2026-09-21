@@ -23,12 +23,13 @@ const (
 	archivePrefixCleanupConfig                     = "cleanup_config/"
 	internalSubdir                                 = paths.ProcessInternalDir
 	scriptsSubdir                                  = "scripts"
-	cleanupConfigSubdir                            = ".zqk/cleanup"
-	bootstrapDirPerm             fileutil.FileMode = 0o755
-	bootstrapFilePerm            fileutil.FileMode = 0o600
+	bootstrapDirPerm             fileutil.FileMode = paths.DirPerm755
+	bootstrapFilePerm            fileutil.FileMode = paths.FilePerm600
 	// maxFileSize limits extracted file size to avoid decompression-bomb DoS (gosec G110)
 	maxFileSize = 50 << 20 // 50 MiB per file
 )
+
+var cleanupConfigSubdir = paths.ProjectDataDir + "/cleanup"
 
 // ExtractTo extracts the embedded bootstrap archive into the project.
 // projectRoot is the repo root. Archive entries are mapped as follows:

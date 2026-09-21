@@ -170,11 +170,7 @@ func NewExecuteCmd() *cobra.Command {
 		// Initialize MCP Executor
 		mcpPath := opts.McpPath
 		if mcpPath == "" {
-			binPath := zqkenv.Bin().Get()
-			if binPath == "" {
-				binPath = "./bin/zqk"
-			}
-			mcpPath = binPath + " mcp serve"
+			mcpPath = paths.MCPServeCommandLine("", proc.ProjectRoot())
 		}
 
 		workDir := zqkenv.AgentWorktreeRoot().Get()
@@ -231,7 +227,7 @@ func NewExecuteCmd() *cobra.Command {
 	cmd.Flags().StringVar(&opts.TaskID, "task-id", "", "Associated task ID (optional)")
 	cmd.Flags().StringVar(&opts.Prompt, "prompt", "", "Prompt to execute (optional if task ID provided)")
 	cmd.Flags().StringVar(&opts.SystemPrompt, "system-prompt", "", "System prompt (defaults to autonomous coding prompt)")
-	cmd.Flags().StringVar(&opts.McpPath, "mcp-path", "", "Path to the MCP server command (e.g. 'bin/zqk mcp serve')")
+	cmd.Flags().StringVar(&opts.McpPath, "mcp-path", "", "Path to the MCP server command (product CLI plus mcp serve)")
 
 	return cmd
 }

@@ -9,6 +9,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
@@ -40,7 +41,7 @@ func runDiscover(cmd *cobra.Command, args []string) error {
 		}
 
 		if len(listResult.Objects) == 0 {
-			msg := "No domain registries found.\nUse 'zqk object create domain_registry --file <yaml>' to register a domain.\n"
+			msg := paths.RewriteCanonicalCLIInvocations("No domain registries found.\nUse 'zqk object create domain_registry --file <yaml>' to register a domain.\n")
 			return cli.WriteOutput(cmd, []byte(msg))
 		}
 

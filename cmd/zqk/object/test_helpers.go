@@ -308,15 +308,15 @@ func (te *TestEnvironment) CreateCLICommand(args ...string) *exec.Cmd {
 	return cmd
 }
 
-// EnvWithTestRoot returns os.Environ() with ZQK_TEST_ROOT set to testRoot (replacing any existing).
-// It also strips ZQK_PROJECT_ROOT so subprocess resolution matches [zqkenv.SubprocessEnvironWithTestRoot].
+// EnvWithTestRoot returns os.Environ() with TEST_ROOT set to testRoot (replacing any existing).
+// It also strips PROJECT_ROOT so subprocess resolution matches [zqkenv.SubprocessEnvironWithTestRoot].
 // Use this for any exec.Cmd that invokes the CLI so parallel tests do not share the wrong root.
 func EnvWithTestRoot(testRoot string) []string {
 	env := zqkenv.SubprocessEnvironWithTestRoot(testRoot)
-	env = append(env, "ZQK_TEST_BYPASS_AUTH=1")
-	env = append(env, "ZQK_API_KEY="+pkgctx.TestHarnessAccountID)
-	env = append(env, "ZQK_ADMIN_TEST_BYPASS_AUTH=1")
-	env = append(env, "ZQK_ADMIN_API_KEY="+pkgctx.TestHarnessAccountID)
+	env = append(env, zqkenv.TestBypassAuth().Name()+"=1")
+	env = append(env, zqkenv.APIKey().Name()+"="+pkgctx.TestHarnessAccountID)
+	env = append(env, zqkenv.AdminAssignment("TEST_BYPASS_AUTH", "1"))
+	env = append(env, zqkenv.AdminBrandKey("API_KEY")+"="+pkgctx.TestHarnessAccountID)
 	return env
 }
 
@@ -406,7 +406,7 @@ func copyCliSpecsTree(srcRoot, dstRoot string) error {
 				if err := fileutil.EnsureDir(filepath.Dir(out)); err != nil {
 					return err
 				}
-				return os.Symlink(target, out)
+				return os.Symlink(target, out) //nolint:gosec
 			}
 			info, statErr := fileutil.Stat(path)
 			if statErr == nil && info.IsDir() {

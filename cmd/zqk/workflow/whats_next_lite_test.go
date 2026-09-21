@@ -10,6 +10,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/accumulator"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/workflow/whatsnext"
 )
@@ -27,8 +28,8 @@ func TestWhatsNextCommand_SyncSweepFlagRegistered(t *testing.T) {
 
 func TestRunWhatsNextLite_ZeroCostHotPathLatency(t *testing.T) {
 	tmpDir := t.TempDir()
-	stateDir := filepath.Join(tmpDir, ".zqk", "state")
-	if err := os.MkdirAll(stateDir, 0755); err != nil {
+	stateDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.StateDir)
+	if err := os.MkdirAll(stateDir, paths.DirPerm755); err != nil {
 		t.Fatalf("mkdir failed: %v", err)
 	}
 
@@ -83,7 +84,7 @@ func TestRunWhatsNextLite_ZeroCostHotPathLatency(t *testing.T) {
 	if err != nil {
 		t.Fatalf("marshal envelope failed: %v", err)
 	}
-	if err := fileutil.WriteFile(litePath, data, 0644); err != nil {
+	if err := fileutil.WriteFile(litePath, data, paths.FilePerm644); err != nil {
 		t.Fatalf("write lite file failed: %v", err)
 	}
 

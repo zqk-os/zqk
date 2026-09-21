@@ -188,14 +188,14 @@ func requireCommitsMergedToIntegration(ctx context.Context, projectRoot, taskID,
 	return nil
 }
 
-var docsEvalFindingsPathRe = regexp.MustCompile(`docs/quality/cef-runs/[^\s]+/findings/[A-Za-z0-9_.-]+\.jsonl`)
+var docsEvalFindingsPathRe = regexp.MustCompile(`[^\s]+/findings/[A-Za-z0-9_.-]+\.jsonl`)
 
-// verifyDocsEvalNextEvidence enforces SUCCESS_GATE-shaped proof for CEF/docs ATKs:
+// verifyDocsEvalNextEvidence enforces SUCCESS_GATE-shaped proof for docs/eval ATKs:
 // at least one findings JSONL path from the description exists with a real finding_id.
 func verifyDocsEvalNextEvidence(projectRoot, description string) error {
 	pathsFound := docsEvalFindingsPathRe.FindAllString(description, -1)
 	if len(pathsFound) == 0 {
-		return errfmt.Errorf("FAIL-CLOSED: docs_eval ATK description has no docs/quality/cef-runs/.../findings/*.jsonl path to verify")
+		return errfmt.Errorf("FAIL-CLOSED: docs_eval ATK description has no .../findings/*.jsonl path to verify")
 	}
 	root := strings.TrimSpace(projectRoot)
 	if root == "" {

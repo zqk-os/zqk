@@ -4,10 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net"
-	"net/url"
-
-	"github.com/zqk-os/zqk/pkg/config"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -35,13 +31,13 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/workflow/whatsnext"
 	"github.com/zqk-os/zqk/pkg/zqksession"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 const (
 	seatWorkerOutputFieldStatus = "status"
 	seatWorkerOutputStatusOK    = "ok"
 	orchestratePlanDirective    = agentfeed.OrchestratePlanPrefix
-	localLLMAPIKey              = "ollama"
 	// seatWorkerMaxEventAttempts caps AgentX retries for one ATK (or one feed
 	// event when the steer has no ATK). A reminted AFE for the same ATK must
 	// not reset the budget.
@@ -304,23 +300,11 @@ func runAgentSeatWorker(cmd *cobra.Command, _ []string) error {
 	})(cmd, nil)
 }
 
-// seatWorkerMCPServePath prefers the running binary so MCP tool names and
-// mutation-evidence prefixes stay on the same executable. bin/zqk is last
-// resort when this process has no resolvable path (tests).
+// seatWorkerMCPServePath resolves the branded product CLI plus `mcp serve`.
+// Running-binary preference lives in paths.ResolveProductCLI so tool prefixes
+// stay on the same executable without assuming bin/zqk or a zqk-mcp sidecar.
 func seatWorkerMCPServePath(root string) string {
-	if self, err := fileutil.Executable(); err == nil {
-		if trimmed := strings.TrimSpace(self); trimmed != "" {
-			return trimmed + " mcp serve"
-		}
-	}
-	if binPath := strings.TrimSpace(zqkenv.Bin().Get()); binPath != "" {
-		return binPath + " mcp serve"
-	}
-	stable := filepath.Join(root, "bin", "zqk-stable")
-	if _, err := fileutil.Stat(stable); err == nil {
-		return stable + " mcp serve"
-	}
-	return filepath.Join(root, "bin", "zqk") + " mcp serve"
+	return paths.MCPServeCommandLine("", root)
 }
 
 // handleNonCommsWithAgentX peer-acks the steer then runs a bounded swarm.Engine pass
@@ -343,7 +327,7 @@ func handleNonCommsWithAgentX(
 			return err
 		}
 		result, submitErr := triggerPlanOrchestration(ctx, sp, secCtx, root, planID)
-		writeSeatWorkerResult(root, seatWorkerEngineID(personaRef, agentID), result)
+		writeSeatWorkerResult(root, seatWorkerEngineIDWithRoot(root, personaRef, agentID), result)
 		if submitErr != nil {
 			if strings.Contains(submitErr.Error(), "orchestrator can only operate on active or in_progress priority plans") {
 				return ackSeatWorkerSkip(root, agentID, personaRef, sessionID, item.EventID, submitErr.Error())
@@ -398,8 +382,8 @@ func handleNonCommsWithAgentX(
 		return nil
 	}
 
-	// Coding ATKs isolate into a git worktree. Docs-eval / CEF ATKs must not:
-	// worktrees reset to origin/main and hide untracked cef-runs + studio docs.
+	// Coding ATKs isolate into a git worktree. Docs-eval ATKs run on the main
+	// project root so documentation and evaluation artifacts remain accessible.
 	execRoot := root
 	workClass := agentprompt.ClassifyWorkClass(body)
 	if sp != nil {
@@ -410,7 +394,7 @@ func handleNonCommsWithAgentX(
 		}
 	}
 	if workClass.IsDocsEval() {
-		logging.Fluent(logger).Info("seat-worker AgentX using studio exec root").
+		logging.Fluent(logger).Info("seat-worker AgentX using project root").
 			String("event_id", item.EventID).
 			String("task_id", taskID).
 			String("work_class", string(workClass)).
@@ -450,11 +434,11 @@ func handleNonCommsWithAgentX(
 		config.Temperature = &zero
 	}
 	client := llm.NewClient(runCtx, config)
-	engineID := seatWorkerEngineID(personaRef, agentID)
+	engineID := seatWorkerEngineIDWithRoot(root, personaRef, agentID)
 	// Count alone is too weak: live seats "completed" after system_status /
 	// object_list. Coding ATKs require a successful write_code or write_file,
-	// and that write must actually build and pass its package tests.
-	var writtenGoFiles []string
+	// and the toolchain adapter must accept those writes (Go: vet + test).
+	var writtenFiles []string
 	engine := swarm.NewEngine(client, executor, swarm.PreserveToolSchemas, engineID).
 		WithRunIdentity(sessionID, prompts.TaskID).
 		WithMaxSteps(prompts.MaxSteps).
@@ -462,11 +446,11 @@ func handleNonCommsWithAgentX(
 		RequireAnySuccessfulTools(swarm.MutationEvidenceTools()...).
 		VerifyCompletionWith(func(ctx context.Context, history []swarm.ToolCallRecord) (string, error) {
 			if prompts.WorkClass.IsDocsEval() {
-				// Docs-eval / CEF tasks write evaluation JSONL/markdown under docs/quality/, not Go source code.
+				// Docs-eval tasks write evaluation JSONL or markdown documents, not source code.
 				return "", nil
 			}
-			writtenGoFiles = goFilesWritten(history, execRoot)
-			return verifyGoWorkAsCompletion(ctx, execRoot, history)
+			writtenFiles = seatWorkerCompletionGate.WrittenFiles(history, execRoot)
+			return verifyWorkAsCompletion(ctx, execRoot, history)
 		}, seatWorkerMaxRepairs)
 	if swarm.ApplyCodeDraftHarness(engine, config.ChatModel) {
 		logging.Fluent(logger).Warn("seat-worker using code-draft harness (write-only tools)").
@@ -502,8 +486,8 @@ func handleNonCommsWithAgentX(
 		}
 		// The run is being abandoned, so its half-finished code must not stay in
 		// the tree for the next agent or human to trip over.
-		if len(writtenGoFiles) > 0 {
-			if revertErr := revertSeatWrites(ctx, root, writtenGoFiles); revertErr != nil {
+		if len(writtenFiles) > 0 {
+			if revertErr := revertSeatWrites(ctx, root, writtenFiles); revertErr != nil {
 				logging.Fluent(logger).Warn("seat-worker revert failed").
 					String("event_id", item.EventID).
 					WithError(errfmt.Newf("revert").Wrap(revertErr)).
@@ -511,7 +495,7 @@ func handleNonCommsWithAgentX(
 			} else {
 				logging.Fluent(logger).Info("seat-worker reverted rejected writes").
 					String("event_id", item.EventID).
-					Int("files", len(writtenGoFiles)).
+					Int("files", len(writtenFiles)).
 					Log()
 			}
 		}
@@ -599,13 +583,9 @@ func buildSeatWorkerAgentXPrompts(
 	workClass := agentprompt.ClassifyWorkClass(steer, prepared.Title, prepared.Prompt)
 	out.WorkClass = workClass
 	out.ExecRoot = root
-	caps := []string{"coding", "review"}
-	if workClass.IsDocsEval() {
-		caps = []string{"docs_eval", "cef"}
-	}
 	systemPrompt, err := swarm.RenderSystemPrompt(swarm.QwenSystemData{
 		WorkerID:     agentID,
-		Capabilities: caps,
+		Capabilities: workClass.PromptCapabilities(),
 		WorkClass:    string(workClass),
 	})
 	if err != nil {
@@ -793,19 +773,17 @@ func triggerPlanOrchestration(ctx context.Context, sp storage.ObjectStorageProvi
 	// terminal-only. Per-item orch skips implemented ATKs and mints
 	// replacements for error debris instead of reusing dead IDs.
 	// Idle auto-dispatch is gated separately in dispatchLeadPlanFromWhatsNext.
-	zqkPath := filepath.Join(root, "bin", "zqk")
+	cli := paths.ResolveProductCLI(root)
 	// Do not pass --persona-id: that filter drops BLIs assigned to coder/reviewer
 	// seats and the job exits routed with dispatched_items=0.
-	orchCmd := zqkPath + " agent orchestrate " + planID
-	logDir := filepath.Join(root, paths.ProjectDataDir, "logs", "agent-ops")
-	if err := fileutil.MkdirAll(logDir, 0o755); err != nil {
+	orchCmd := cli + " agent orchestrate " + planID
+	logDir := filepath.Join(root, paths.ProjectDataDir, paths.LogsDir, "agent-ops")
+	if err := fileutil.MkdirAll(logDir, paths.DirPerm755); err != nil {
 		return "", errfmt.Errorf("orchestrate callback dir: %w", err)
 	}
 	cb := filepath.Join(logDir, "orch-"+safePlanFileName(planID)+".callback.json")
-	// tee-only is not a seat wake.
-	hourglass := filepath.Join(root, "scripts", "agent-ops", "scheduler-job-callback.py") +
-		" --log " + cb
-	cmd := execwrap.CommandContext(ctx, zqkPath,
+	hourglass := schedulerCallbackNotify(cli, cb)
+	cmd := execwrap.CommandContext(ctx, cli,
 		"scheduler", "submit", orchCmd,
 		"--title", "ORCHESTRATE "+planID,
 		"--max-runtime", "7200",
@@ -861,51 +839,42 @@ func recentPlanOrchSubmit(root, planID string) (bool, string) {
 
 func writePlanOrchSubmitMark(root, planID, detail string) error {
 	path := planOrchSubmitMarkPath(root, planID)
-	if err := fileutil.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(path), paths.DirPerm755); err != nil {
 		return errfmt.Errorf("plan orch mark dir: %w", err)
 	}
 	payload, err := json.Marshal(map[string]string{
 		"schema":        "zqk_plan_orch_submit_v1",
 		"plan_id":       planID,
-		"dispatched_at": time.Now().UTC().Format(time.RFC3339),
+		"dispatched_at": zqktime.NowRFC3339UTC(),
 		"detail":        detail,
 	})
 	if err != nil {
 		return err
 	}
-	return fileutil.WriteFile(path, append(payload, '\n'), 0o600)
+	return fileutil.WriteFile(path, append(payload, '\n'), paths.FilePerm600)
 }
 
-// withLocalLLMEnv ensures local LLM settings from the process environment (or the
-// loopback API-key default) are present in a child env block.
+// withLocalLLMEnv copies configured LLM settings into a child env block.
+// Vendor defaults (models, ports, dummy keys) belong in pkg/adapters, not here.
 func withLocalLLMEnv(environ []string) []string {
 	out := append([]string(nil), environ...)
-	baseURL := zqkenv.LLMBaseURL().Get()
-	if baseURL == "" {
-		baseURL = zqkenv.Get("LLM_BASE_URL").OrDefault("")
-	}
 	out = withEnvValue(out, zqkenv.LLMProvider().Name(), zqkenv.LLMProvider().Get())
-	out = withEnvValue(out, zqkenv.LLMBaseURL().Name(), baseURL)
-	chatModel := zqkenv.LLMChatModel().Get()
-	if chatModel == "" {
-		chatModel = zqkenv.Get("LLM_CHAT_MODEL").OrDefault("")
-	}
-	if chatModel == "" && strings.Contains(baseURL, "11434") {
-		chatModel = "qwen3.8:latest"
-	}
-	out = withEnvValue(out, zqkenv.LLMChatModel().Name(), chatModel)
-	timeout := zqkenv.Get("LLM_TIMEOUT").OrDefault("")
-	if timeout == "" && strings.Contains(baseURL, "11434") {
-		timeout = "900"
-	}
+	out = withEnvValue(out, zqkenv.LLMBaseURL().Name(), firstNonEmptyEnv(zqkenv.LLMBaseURL().Get(), zqkenv.Get("LLM_BASE_URL").OrDefault("")))
+	out = withEnvValue(out, zqkenv.LLMChatModel().Name(), firstNonEmptyEnv(zqkenv.LLMChatModel().Get(), zqkenv.Get("LLM_CHAT_MODEL").OrDefault("")))
+	timeout := firstNonEmptyEnv(zqkenv.Get("LLM_TIMEOUT").OrDefault(""), zqkenv.LLMTimeout().Get())
 	out = withEnvValue(out, "LLM_TIMEOUT", timeout)
-	out = withEnvValue(out, "ZQK_LLM_TIMEOUT", timeout)
-	if apiKey := localLLMAPIKeyValue(); apiKey != "" {
-		out = withEnvValue(out, zqkenv.LLMAPIKey().Name(), apiKey)
-	} else {
-		out = withEnvValue(out, zqkenv.LLMAPIKey().Name(), zqkenv.LLMAPIKey().Get())
-	}
+	out = withEnvValue(out, zqkenv.LLMTimeout().Name(), timeout)
+	out = withEnvValue(out, zqkenv.LLMAPIKey().Name(), zqkenv.LLMAPIKey().Get())
 	return out
+}
+
+func firstNonEmptyEnv(vals ...string) string {
+	for _, v := range vals {
+		if strings.TrimSpace(v) != "" {
+			return v
+		}
+	}
+	return ""
 }
 
 func withEnvValue(environ []string, key, value string) []string {
@@ -923,25 +892,8 @@ func withEnvValue(environ []string, key, value string) []string {
 	return append(out, prefix+value)
 }
 
-func localLLMAPIKeyValue() string {
-	if existing := strings.TrimSpace(zqkenv.LLMAPIKey().Get()); existing != "" {
-		return existing
-	}
-	baseURL := strings.TrimSpace(config.LLMBaseURL().OrDefault(""))
-	parsedURL, err := url.Parse(baseURL)
-	if err != nil {
-		return ""
-	}
-	host := parsedURL.Hostname()
-	ip := net.ParseIP(host)
-	if host == "localhost" || (ip != nil && ip.IsLoopback()) {
-		return localLLMAPIKey
-	}
-	return ""
-}
-
 func writeSeatWorkerResult(root, engineID, result string) {
 	logDir := filepath.Join(root, paths.ProjectDataDir, paths.LogsDir, "agent-seat-worker")
-	_ = fileutil.MkdirAll(logDir, 0o755)
-	_ = fileutil.WriteFile(filepath.Join(logDir, engineID+".log"), []byte(result), 0o644)
+	_ = fileutil.MkdirAll(logDir, paths.DirPerm755)
+	_ = fileutil.WriteFile(filepath.Join(logDir, engineID+".log"), []byte(result), paths.FilePerm644)
 }

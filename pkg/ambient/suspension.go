@@ -6,6 +6,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
@@ -32,7 +33,7 @@ func SuspendContext(projectRoot, agentID string, state map[string]any, logger lo
 	}
 
 	filename := agentID + storage.CompressedSnapshotFileExtension
-	filePath := filepath.Join(projectRoot, ".zqk-state", "suspended_agents", filename)
+	filePath := filepath.Join(projectRoot, paths.ProjectStateDir, "suspended_agents", filename)
 
 	if err := storage.WriteCompressedSnapshot(cs, filePath); err != nil {
 		logging.Fluent(logger).Error("Failed to write compressed snapshot", err).
@@ -60,7 +61,7 @@ func WakeContext(projectRoot, agentID string, logger logging.Logger) (map[string
 	}
 
 	filename := agentID + storage.CompressedSnapshotFileExtension
-	filePath := filepath.Join(projectRoot, ".zqk-state", "suspended_agents", filename)
+	filePath := filepath.Join(projectRoot, paths.ProjectStateDir, "suspended_agents", filename)
 
 	cs, err := storage.ReadCompressedSnapshot(filePath)
 	if err != nil {

@@ -118,9 +118,7 @@ func TestCalculateProjectMetrics_WithCommitData(t *testing.T) {
 	}
 
 	for _, item := range testItems {
-		if err := storageProvider.Create(ctx, secCtx, item); err != nil {
-			t.Fatalf("failed to create test item %s: %v", item[objects.FieldKeyID], err)
-		}
+		storage.CreateCASVisible(t, storageProvider, ctx, secCtx, item, item[objects.FieldKeyStatus].(string))
 	}
 
 	// Create code references with commit data

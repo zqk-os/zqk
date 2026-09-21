@@ -4,15 +4,14 @@
 // When placed in a PATH directory ahead of the genuine executables (e.g. ~/.zqk/shims),
 // zqk-shim transparently:
 //  1. Resolves the real system binary while skipping the shim directory to avoid infinite loops.
-//  2. Enforces POL-CODE-009 on mutating operations (git commit, gh pr create) ensuring the
-//     active branch possesses bidirectional traceability to an active workstream in the kernel.
+//  2. Enforces commit/PR traceability on mutating operations (git commit, gh pr create):
+//     the active branch must name an active workstream in the kernel.
 //  3. Injects cryptographic agent provenance stamps into pull request bodies (gh pr create).
 //  4. Proxies execution to the underlying binary, preserving standard input/output interactivity.
 //
-// Bypass environment variables (e.g. ZQK_SHIM_BYPASS_POLCODE009) allow tests and emergency
-// operations to bypass policy checks, but are fail-closed: naked bypass flags are rejected
-// unless accompanied by an auditable human break-glass justification (ZQK_BREAK_GLASS_REASON)
-// of at least 30 characters.
+// Bypass uses the brand-prefixed SHIM_BYPASS_TRACEABILITY key (and GIT_/GH_ wrappers).
+// Naked bypass is fail-closed: it is rejected unless accompanied by an auditable
+// human break-glass justification (BREAK_GLASS_REASON, brand-prefixed) of at least 30 characters.
 package main
 
 import (
@@ -62,10 +61,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	// 2. POL-CODE-009 Enforcement Gate
+	// 2. Commit/PR traceability gate
 	if isMutatingOperation(cmdName, args) {
-		if err := validatePOLCODE009(); err != nil {
-			logger.Error("POL-CODE-009 Violation", err)
+		if err := validateCommitTraceability(); err != nil {
+			logger.Error("commit traceability violation", err)
 			os.Exit(1)
 		}
 	}
@@ -74,7 +73,7 @@ func main() {
 	ctx := pkgctx.NewSystemContext()
 
 	// Emit telemetry directly if in e2e test because full logging framework isn't initialized
-	val := zqkenv.ZqkShimBypassPolCode009().Get()
+	val := zqkenv.ZqkShimBypassTraceability().Get()
 	if val == "1" {
 		if ok, _ := hasBreakGlassOverride(os.Getenv); ok {
 			_, _ = os.Stderr.WriteString("cli_exec_start\n")
@@ -127,7 +126,7 @@ func hasBreakGlassOverride(getenv func(string) string) (bool, string) {
 	}
 	reason := strings.TrimSpace(getenv(zqkenv.BreakGlassReason().Name()))
 	if reason == "" {
-		reason = strings.TrimSpace(getenv("ZQK_BREAK_GLASS_REASON"))
+		reason = strings.TrimSpace(getenv(zqkenv.DefaultBrandKey("BREAK_GLASS_REASON")))
 	}
 	if reason == "" {
 		reason = strings.TrimSpace(getenv("BREAK_GLASS_REASON"))
@@ -138,32 +137,38 @@ func hasBreakGlassOverride(getenv func(string) string) (bool, string) {
 	return false, reason
 }
 
-func validatePOLCODE009() error {
-	return validatePOLCODE009WithEnv(cli.ResolveProjectRoot("."), os.Getenv)
+func validateCommitTraceability() error {
+	return validateCommitTraceabilityWithEnv(cli.ResolveProjectRoot("."), os.Getenv)
 }
 
-func validatePOLCODE009WithEnv(projectRoot string, getenv func(string) string) error {
+func shimTraceabilityBypassRequested(getenv func(string) string) bool {
+	key := zqkenv.ZqkShimBypassTraceability().Name()
+	def := zqkenv.DefaultBrandKey("SHIM_BYPASS_TRACEABILITY")
+	for _, k := range []string{key, def, "GIT_" + key, "GH_" + key, "GIT_" + def, "GH_" + def} {
+		if getenv(k) == "1" {
+			return true
+		}
+	}
+	return false
+}
+
+func validateCommitTraceabilityWithEnv(projectRoot string, getenv func(string) string) error {
 	if getenv == nil {
 		getenv = os.Getenv
 	}
-	bypassRequested := getenv(zqkenv.ZqkShimBypassPolCode009().Name()) == "1" ||
-		getenv("ZQK_SHIM_BYPASS_POLCODE009") == "1" ||
-		getenv("GIT_ZQK_SHIM_BYPASS_POLCODE009") == "1" ||
-		getenv("GH_ZQK_SHIM_BYPASS_POLCODE009") == "1"
-
-	if bypassRequested {
+	if shimTraceabilityBypassRequested(getenv) {
 		ok, reason := hasBreakGlassOverride(getenv)
 		if ok {
 			return nil
 		}
 		if reason == "" {
-			return fmt.Errorf("unvalidated POL-CODE-009 bypass rejected: human break-glass requires explicit justification in %s (min %d chars)", zqkenv.BreakGlassReason().Name(), minBreakGlassReasonLen)
+			return fmt.Errorf("unvalidated shim traceability bypass rejected: human break-glass requires explicit justification in %s (min %d chars)", zqkenv.BreakGlassReason().Name(), minBreakGlassReasonLen)
 		}
-		return fmt.Errorf("unvalidated POL-CODE-009 bypass rejected: human break-glass justification too short (%d chars, min %d required)", len(reason), minBreakGlassReasonLen)
+		return fmt.Errorf("unvalidated shim traceability bypass rejected: human break-glass justification too short (%d chars, min %d required)", len(reason), minBreakGlassReasonLen)
 	}
 
 	if projectRoot == "" {
-		// Not in a ZQK project, bypass
+		// Not in a kernel project, skip the gate
 		return nil
 	}
 
@@ -265,10 +270,10 @@ func resolveTrustedAgentPrivateKey(projectRoot, agentID string, getenv func(stri
 		}
 	}
 
-	// 2. Check ambient ZQK_AGENT_PRIVATE_KEY
+	// 2. Check ambient agent private key
 	ambientKey := strings.TrimSpace(getenv(zqkenv.AgentPrivateKey().Name()))
 	if ambientKey == "" {
-		ambientKey = strings.TrimSpace(getenv("ZQK_AGENT_PRIVATE_KEY"))
+		ambientKey = strings.TrimSpace(getenv(zqkenv.DefaultBrandKey("AGENT_PRIVATE_KEY")))
 	}
 	if ambientKey != "" {
 		// Keys must not be trusted from ambient env in default path.
