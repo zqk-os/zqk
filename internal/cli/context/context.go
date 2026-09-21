@@ -12,9 +12,12 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/when"
 )
+
+var yamlConfigFiles stampmemo.Table[map[string]any] // keyed by config path (user + project YAML)
 
 // ContextLayer represents the precedence layer for configuration
 type ContextLayer int
@@ -459,6 +462,16 @@ func (cm *ContextManager) loadProjectConfig(projectRoot string) error {
 
 // loadConfigFile loads a YAML configuration file
 func (cm *ContextManager) loadConfigFile(path string) (map[string]any, error) {
+	cfg, err := yamlConfigFiles.Load(path, stampmemo.Of(path), func() (map[string]any, error) {
+		return readYAMLConfigFile(path)
+	})
+	if err != nil {
+		return nil, err
+	}
+	return cloneYAMLMap(cfg), nil
+}
+
+func readYAMLConfigFile(path string) (map[string]any, error) {
 	data, err := fileutil.ReadFile(path)
 	if fileutil.IsNotExist(err) {
 		return make(map[string]any), nil
@@ -471,8 +484,46 @@ func (cm *ContextManager) loadConfigFile(path string) (map[string]any, error) {
 	if err := yaml.Unmarshal(data, &config); err != nil {
 		return nil, errfmt.Errorf("failed to parse config file %s: %w", path, err)
 	}
-
+	if config == nil {
+		config = make(map[string]any)
+	}
 	return config, nil
+}
+
+func cloneYAMLMap(in map[string]any) map[string]any {
+	if in == nil {
+		return make(map[string]any)
+	}
+	out := make(map[string]any, len(in))
+	for k, v := range in {
+		switch x := v.(type) {
+		case map[string]any:
+			out[k] = cloneYAMLMap(x)
+		case []any:
+			out[k] = cloneYAMLSlice(x)
+		default:
+			out[k] = v
+		}
+	}
+	return out
+}
+
+func cloneYAMLSlice(in []any) []any {
+	if in == nil {
+		return nil
+	}
+	out := make([]any, len(in))
+	for i, v := range in {
+		switch x := v.(type) {
+		case map[string]any:
+			out[i] = cloneYAMLMap(x)
+		case []any:
+			out[i] = cloneYAMLSlice(x)
+		default:
+			out[i] = v
+		}
+	}
+	return out
 }
 
 // createContextFromMap creates a Context from a map of values

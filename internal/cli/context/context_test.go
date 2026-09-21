@@ -3,6 +3,7 @@ package context
 import (
 	"path/filepath"
 	"testing"
+	"time"
 
 	pkgcli "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
@@ -236,5 +237,32 @@ func TestContext_WithPathResolver(t *testing.T) {
 	}
 	if cleared.PathResolver().ProjectRoot() != "/tmp/p" {
 		t.Fatalf("ProjectRoot after clear: %q", cleared.PathResolver().ProjectRoot())
+	}
+}
+
+func TestLoadConfigFile_reloadsWhenStampMoves(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "config.yaml")
+	cm := NewContextManager()
+	first, err := cm.loadConfigFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(first) != 0 {
+		t.Fatalf("expected empty missing file, got %#v", first)
+	}
+	if err := fileutil.WriteFile(path, []byte("format: json\n"), paths.FilePerm644); err != nil {
+		t.Fatal(err)
+	}
+	later := time.Now().Add(2 * time.Second)
+	if err := fileutil.Chtimes(path, later, later); err != nil {
+		t.Fatal(err)
+	}
+	second, err := cm.loadConfigFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, _ := second["format"].(string); got != "json" {
+		t.Fatalf("expected reload after stamp move, got %#v", second)
 	}
 }
