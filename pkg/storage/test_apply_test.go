@@ -18,6 +18,12 @@ func TestApplyMaturationReport(t *testing.T) {
 	}
 
 	defer func() { _ = fs.Shutdown(context.Background()) }()
+	t.Cleanup(func() {
+		opts := TempProjectTeardown(tmpDir, fs)
+		if err := RunProjectTestTeardown(opts); err != nil {
+			t.Logf("project test teardown: %v", err)
+		}
+	})
 
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()
