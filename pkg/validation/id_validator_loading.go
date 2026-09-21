@@ -20,7 +20,19 @@ import (
 	"github.com/zqk-os/zqk/pkg/loader"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 )
+
+type specIDFile struct {
+	Ontology   string
+	Kind       string
+	IDTemplate string
+	IDPrefixes []string
+	IDPattern  string
+	skip       bool
+}
+
+var specIDFiles stampmemo.Table[specIDFile] // keyed by spec path (closed kind-file set)
 
 // getPatternsRunner returns the shared loader.Runner for ID patterns (lazily created).
 func (v *IDValidator) getPatternsRunner() *loader.Runner {
@@ -241,21 +253,15 @@ func (v *IDValidator) getLogger() *logging.EventLogger {
 	return logger
 }
 
-func (v *IDValidator) parseSpecFile(path string) (*IDPatternConfig, error) {
-	eventLogger := v.getLogger()
-
+func readSpecIDFile(path string) (specIDFile, error) {
 	data, err := fileutil.ReadFile(path)
 	if err != nil {
-		logging.FluentEvent(eventLogger).Warn(ConstMagic2da1f67e).
-			File(path).
-			WithError(err).
-			Log()
-		return nil, err
+		return specIDFile{}, err
 	}
 
 	var spec struct {
 		Ontology   string   `yaml:"ontology"`
-		Kind       string   `yaml:"kind"` // Also support 'kind' field (used in some specs)
+		Kind       string   `yaml:"kind"`
 		IDTemplate string   `yaml:"id_template"`
 		IDPrefixes []string `yaml:"id_prefixes"`
 		Fields     struct {
@@ -266,13 +272,45 @@ func (v *IDValidator) parseSpecFile(path string) (*IDPatternConfig, error) {
 			} `yaml:"id"`
 		} `yaml:"fields"`
 	}
-
 	if err := yaml.Unmarshal(data, &spec); err != nil {
-		logging.FluentEvent(eventLogger).Warn(ConstMagic4656ccb1).
+		return specIDFile{}, err
+	}
+
+	ontology := spec.Ontology
+	if ontology == emptyValue {
+		ontology = spec.Kind
+	}
+	header := specIDFile{
+		Ontology:   spec.Ontology,
+		Kind:       spec.Kind,
+		IDTemplate: spec.IDTemplate,
+		IDPrefixes: append([]string(nil), spec.IDPrefixes...),
+		IDPattern:  spec.Fields.ID.Validation.Pattern,
+		skip:       ontology == emptyValue,
+	}
+	return header, nil
+}
+
+func (v *IDValidator) parseSpecFile(path string) (*IDPatternConfig, error) {
+	eventLogger := v.getLogger()
+
+	spec, err := specIDFiles.Load(path, stampmemo.Of(path), func() (specIDFile, error) {
+		return readSpecIDFile(path)
+	})
+	if err != nil {
+		logging.FluentEvent(eventLogger).Warn(ConstMagic2da1f67e).
 			File(path).
 			WithError(err).
 			Log()
 		return nil, err
+	}
+	spec.IDPrefixes = append([]string(nil), spec.IDPrefixes...)
+
+	if spec.skip {
+		logging.FluentEvent(eventLogger).Debug(ConstMagicac36e605).
+			File(filepath.Base(path)).
+			Log()
+		return nil, nil
 	}
 
 	// Use ontology if present, otherwise fall back to kind
@@ -319,11 +357,11 @@ func (v *IDValidator) parseSpecFile(path string) (*IDPatternConfig, error) {
 	}
 
 	// Extract pattern from id field validation
-	if spec.Fields.ID.Validation.Pattern != emptyValue {
-		config.Pattern = spec.Fields.ID.Validation.Pattern
+	if spec.IDPattern != emptyValue {
+		config.Pattern = spec.IDPattern
 		// Extract prefixes from pattern if not already set
 		if len(config.Prefixes) == 0 {
-			config.Prefixes = extractPrefixesFromPattern(spec.Fields.ID.Validation.Pattern)
+			config.Prefixes = extractPrefixesFromPattern(spec.IDPattern)
 		}
 	}
 

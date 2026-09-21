@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -681,5 +682,39 @@ func TestNamespaceRegistry_LoadSubordinateNamespaces(t *testing.T) {
 	// Check that all expected subordinates were found
 	for missing := range expectedSubordinates {
 		t.Errorf(ConstMagic7088b332, missing)
+	}
+}
+
+func TestLoadNamespaces_reloadsWhenStampMoves(t *testing.T) {
+	t.Parallel()
+	dir := t.TempDir()
+	write := func(name, body string) {
+		t.Helper()
+		if err := fileutil.WriteFile(filepath.Join(dir, name), []byte(body), paths.FilePerm644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	write("stampmemo_ns_a.yaml", "kind: stampmemo_ns_a\nnamespace_id: domain:alpha\n")
+	first := NewNamespaceRegistry(dir)
+	if err := first.LoadNamespaces(); err != nil {
+		t.Fatal(err)
+	}
+	if got := first.GetNamespaceForKind("stampmemo_ns_a"); got != "domain:alpha" {
+		t.Fatalf("got %q", got)
+	}
+	write("stampmemo_ns_b.yaml", "kind: stampmemo_ns_b\nnamespace_id: domain:beta\n")
+	later := time.Now().Add(2 * time.Second)
+	if err := fileutil.Chtimes(dir, later, later); err != nil {
+		t.Fatal(err)
+	}
+	if err := fileutil.Chtimes(filepath.Join(dir, "stampmemo_ns_b.yaml"), later, later); err != nil {
+		t.Fatal(err)
+	}
+	second := NewNamespaceRegistry(dir)
+	if err := second.LoadNamespaces(); err != nil {
+		t.Fatal(err)
+	}
+	if got := second.GetNamespaceForKind("stampmemo_ns_b"); got != "domain:beta" {
+		t.Fatalf("expected overlay reload, got %q", got)
 	}
 }
