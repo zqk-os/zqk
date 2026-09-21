@@ -60,15 +60,23 @@ func LoadValidationTierConfig(configPath string) (*ValidationTierConfig, error) 
 	if configPath == emptyValue {
 		configPath = findValidationTierConfig()
 		if configPath == emptyValue {
-			// Return default config if file not found
 			return DefaultValidationTierConfig(), nil
 		}
 	}
 
+	cfg, err := tierConfigs.Load(configPath, stampmemo.Of(configPath), func() (*ValidationTierConfig, error) {
+		return parseValidationTierConfigFile(configPath), nil
+	})
+	if err != nil || cfg == nil {
+		return DefaultValidationTierConfig(), nil
+	}
+	return cloneValidationTierConfig(cfg), nil
+}
+
+func parseValidationTierConfigFile(configPath string) *ValidationTierConfig {
 	data, err := fileutil.ReadFile(configPath)
 	if err != nil {
-		// Return default config if file can't be read
-		return DefaultValidationTierConfig(), nil
+		return DefaultValidationTierConfig()
 	}
 
 	var config struct {
@@ -78,15 +86,13 @@ func LoadValidationTierConfig(configPath string) (*ValidationTierConfig, error) 
 	}
 
 	if err := yaml.Unmarshal(data, &config); err != nil {
-		// Return default config if file can't be parsed
-		return DefaultValidationTierConfig(), nil
+		return DefaultValidationTierConfig()
 	}
 
 	if config.Validation.TierConfig == nil {
-		return DefaultValidationTierConfig(), nil
+		return DefaultValidationTierConfig()
 	}
 
-	// Merge with defaults for missing fields
 	tierConfig := config.Validation.TierConfig
 	if len(tierConfig.BlockingTiers) == 0 {
 		tierConfig.BlockingTiers = DefaultValidationTierConfig().BlockingTiers
@@ -94,7 +100,6 @@ func LoadValidationTierConfig(configPath string) (*ValidationTierConfig, error) 
 	if len(tierConfig.RuleToTierMapping) == 0 {
 		tierConfig.RuleToTierMapping = DefaultValidationTierConfig().RuleToTierMapping
 	} else {
-		// Merge with defaults
 		defaultMapping := DefaultValidationTierConfig().RuleToTierMapping
 		for rule, tier := range defaultMapping {
 			if _, exists := tierConfig.RuleToTierMapping[rule]; !exists {
@@ -103,15 +108,12 @@ func LoadValidationTierConfig(configPath string) (*ValidationTierConfig, error) 
 		}
 	}
 
-	return tierConfig, nil
+	return tierConfig
 }
 
-// GetGlobalValidationTierConfig returns the singleton instance of the tier config
+// GetGlobalValidationTierConfig returns the tier config for the discovered file.
 func GetGlobalValidationTierConfig() *ValidationTierConfig {
-	path := findValidationTierConfig()
-	cfg, err := tierConfigs.Load(globalConfigKey, stampmemo.Of(path), func() (*ValidationTierConfig, error) {
-		return LoadValidationTierConfig(path)
-	})
+	cfg, err := LoadValidationTierConfig(findValidationTierConfig())
 	if err != nil || cfg == nil {
 		return DefaultValidationTierConfig()
 	}

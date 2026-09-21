@@ -54,9 +54,19 @@ func LoadValidationTimeoutConfig(configPath string) (*ValidationTimeoutConfig, e
 		}
 	}
 
+	cfg, err := timeoutConfigs.Load(configPath, stampmemo.Of(configPath), func() (*ValidationTimeoutConfig, error) {
+		return parseValidationTimeoutConfigFile(configPath), nil
+	})
+	if err != nil || cfg == nil {
+		return DefaultValidationTimeoutConfig(), nil
+	}
+	return cloneValidationTimeoutConfig(cfg), nil
+}
+
+func parseValidationTimeoutConfigFile(configPath string) *ValidationTimeoutConfig {
 	data, err := fileutil.ReadFile(configPath)
 	if err != nil {
-		return DefaultValidationTimeoutConfig(), nil
+		return DefaultValidationTimeoutConfig()
 	}
 
 	var config struct {
@@ -67,7 +77,7 @@ func LoadValidationTimeoutConfig(configPath string) (*ValidationTimeoutConfig, e
 	}
 
 	if err := yaml.Unmarshal(data, &config); err != nil {
-		return DefaultValidationTimeoutConfig(), nil
+		return DefaultValidationTimeoutConfig()
 	}
 
 	tc := DefaultValidationTimeoutConfig()
@@ -100,7 +110,7 @@ func LoadValidationTimeoutConfig(configPath string) (*ValidationTimeoutConfig, e
 		tc.KindOverrides = make(map[string]int)
 	}
 
-	return tc, nil
+	return tc
 }
 
 // StuckTimeout returns the duration after which validation is declared stuck (no progress).
@@ -111,12 +121,9 @@ func (c *ValidationTimeoutConfig) StuckTimeout() time.Duration {
 	return 30 * time.Second
 }
 
-// GetGlobalValidationTimeoutConfig returns the singleton timeout config.
+// GetGlobalValidationTimeoutConfig returns the timeout config for the discovered file.
 func GetGlobalValidationTimeoutConfig() *ValidationTimeoutConfig {
-	path := findValidationConfigFile()
-	cfg, err := timeoutConfigs.Load(globalConfigKey, stampmemo.Of(path), func() (*ValidationTimeoutConfig, error) {
-		return LoadValidationTimeoutConfig(path)
-	})
+	cfg, err := LoadValidationTimeoutConfig(findValidationConfigFile())
 	if err != nil || cfg == nil {
 		return DefaultValidationTimeoutConfig()
 	}

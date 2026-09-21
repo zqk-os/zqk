@@ -341,9 +341,8 @@ func (w *ConfigFileWatcher) SetupDefaultWatchers() {
 		return nil
 	})
 
-	// Register namespaces config (if reset function exists)
 	w.RegisterFile("namespaces_config.yaml", "config_namespaces_changed", func() error {
-		// TODO: Add ResetGlobalNamespacesConfig() if it exists
+		validation.ResetGlobalNamespacesConfig()
 		return nil
 	})
 }

@@ -87,7 +87,7 @@ func DefaultLoaderTimeoutConfigMap() map[string]LoaderTimeoutConfig {
 	}
 }
 
-var loaderTimeouts stampmemo.Table[map[string]LoaderTimeoutConfig] // keyed "global"; stamp is project config.yaml
+var loaderTimeouts stampmemo.Table[map[string]LoaderTimeoutConfig] // keyed by config/zqk.yaml path (closed set)
 
 // LoadLoaderTimeoutConfig loads component loader timeouts from the project config file.
 // Path: config/zqk.yaml under "component_loaders". Missing or invalid file returns defaults.
@@ -100,16 +100,26 @@ func LoadLoaderTimeoutConfig(configPath string) (map[string]LoaderTimeoutConfig,
 		}
 	}
 
+	m, err := loaderTimeouts.Load(configPath, stampmemo.Of(configPath), func() (map[string]LoaderTimeoutConfig, error) {
+		return parseLoaderTimeoutConfigFile(configPath), nil
+	})
+	if err != nil || m == nil {
+		return DefaultLoaderTimeoutConfigMap(), nil
+	}
+	return maps.Clone(m), nil
+}
+
+func parseLoaderTimeoutConfigFile(configPath string) map[string]LoaderTimeoutConfig {
 	data, err := fileutil.ReadFile(configPath)
 	if err != nil {
-		return DefaultLoaderTimeoutConfigMap(), nil
+		return DefaultLoaderTimeoutConfigMap()
 	}
 
 	var root struct {
 		ComponentLoaders map[string]loaderTimeoutConfigFile `yaml:"component_loaders"`
 	}
 	if err := yaml.Unmarshal(data, &root); err != nil {
-		return DefaultLoaderTimeoutConfigMap(), nil
+		return DefaultLoaderTimeoutConfigMap()
 	}
 
 	defaults := DefaultLoaderTimeoutConfigMap()
@@ -133,7 +143,7 @@ func LoadLoaderTimeoutConfig(configPath string) (map[string]LoaderTimeoutConfig,
 		}
 		out[name] = c
 	}
-	return out, nil
+	return out
 }
 
 // MergeLoaderTimeoutOverrides applies profile or thematic overrides on top of base config.
@@ -179,10 +189,7 @@ func GetLoaderTimeoutConfig(loaderName string) LoaderTimeoutConfig {
 // GetGlobalLoaderTimeoutConfigMap returns the singleton loader timeout config map (from default file).
 // Profile/thematic overrides are not applied; use MergeLoaderTimeoutOverrides in the context layer with profile data.
 func GetGlobalLoaderTimeoutConfigMap() map[string]LoaderTimeoutConfig {
-	path := findLoaderConfigFile()
-	m, err := loaderTimeouts.Load("global", stampmemo.Of(path), func() (map[string]LoaderTimeoutConfig, error) {
-		return LoadLoaderTimeoutConfig(path)
-	})
+	m, err := LoadLoaderTimeoutConfig(findLoaderConfigFile())
 	if err != nil || m == nil {
 		return DefaultLoaderTimeoutConfigMap()
 	}

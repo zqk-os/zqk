@@ -150,6 +150,7 @@ func runSyncIDPrefixesFromSpecs(cmd *cobra.Command, _ []string) error {
 		if err := fileutil.WriteSecureFile(configFile, output); err != nil {
 			return errfmt.Newf("failed to write config file").Wrap(err)
 		}
+		validation.ResetGlobalIDPrefixesConfig()
 	}
 
 	return outputSyncIDPrefixesReport(cmd, rep)

@@ -56,7 +56,7 @@ type DefaultStrategyConfig struct {
 
 // ResetGlobalIDPrefixesConfig drops the process-wide prefixes memo (tests that chdir).
 func ResetGlobalIDPrefixesConfig() {
-	idPrefixConfigs.Delete(globalConfigKey)
+	idPrefixConfigs.Reset()
 	resetDiscoveredPaths()
 }
 
@@ -64,14 +64,11 @@ func ResetGlobalIDPrefixesConfig() {
 // Logs error events for aggregation/analysis when load fails
 
 func LoadIDPrefixesConfig(configPath string) (*IDPrefixesConfig, error) {
-	eventLogger := logging.NewEventLogger(pkgctx.NewSystemContext())
-
 	if configPath == emptyValue {
-		// Try to find config file in standard location
 		configPath = findIDPrefixesConfig()
 		if configPath == emptyValue {
+			eventLogger := logging.NewEventLogger(pkgctx.NewSystemContext())
 			err := errfmt.Errorf(ConstMagic00fb6dac)
-			// Log structured error event - framework automatically creates event for aggregation
 			logging.FluentEvent(eventLogger).Error(ConstMagic060ff5a9, err).
 				String("event", "config_load").
 				String("config_type", ConstMagic9d718edf).
@@ -82,15 +79,25 @@ func LoadIDPrefixesConfig(configPath string) (*IDPrefixesConfig, error) {
 		}
 	}
 
+	cfg, err := idPrefixConfigs.Load(configPath, stampmemo.Of(configPath), func() (*IDPrefixesConfig, error) {
+		return parseIDPrefixesConfigFile(configPath)
+	})
+	if err != nil {
+		return nil, err
+	}
+	return cloneIDPrefixesConfig(cfg), nil
+}
+
+func parseIDPrefixesConfigFile(configPath string) (*IDPrefixesConfig, error) {
+	eventLogger := logging.NewEventLogger(pkgctx.NewSystemContext())
+
 	data, err := fileutil.ReadFile(configPath)
 	if err != nil {
 		loadErr := errfmt.Newf(ConstMagic148fda1b).Wrap(err)
-		// Determine error type for better aggregation
 		errorType := "read_error"
 		if strings.Contains(loadErr.Error(), "permission") {
 			errorType = ConstMagice8ee8388
 		}
-		// Log structured error event - framework automatically creates event for aggregation
 		logging.FluentEvent(eventLogger).Error(ConstMagic060ff5a9, loadErr).
 			String("event", "config_load").
 			String("config_type", ConstMagic9d718edf).
@@ -104,9 +111,7 @@ func LoadIDPrefixesConfig(configPath string) (*IDPrefixesConfig, error) {
 	var config IDPrefixesConfig
 	if err := yaml.Unmarshal(data, &config); err != nil {
 		parseErr := errfmt.Newf(ConstMagic026f9b38).Wrap(err)
-		// Extract parse error details for analysis
 		parseDetails := parseErr.Error()
-		// Log structured error event - framework automatically creates event for aggregation
 		logging.FluentEvent(eventLogger).Error(ConstMagic01d5ac58, parseErr).
 			String("event", "config_load").
 			String("config_type", ConstMagic9d718edf).
@@ -121,25 +126,18 @@ func LoadIDPrefixesConfig(configPath string) (*IDPrefixesConfig, error) {
 	return &config, nil
 }
 
-// GetGlobalIDPrefixesConfig returns the singleton instance of the config
+// GetGlobalIDPrefixesConfig returns the ID prefixes config for the discovered file.
 // All mappings are externalized to id_prefixes_config.yaml
 // Returns default config if file doesn't exist (for backward compatibility)
-// This function now supports reloading when ResetGlobalIDPrefixesConfig() is called
 func GetGlobalIDPrefixesConfig() *IDPrefixesConfig {
 	configPath := findIDPrefixesConfig()
-	cfg, err := idPrefixConfigs.Load(globalConfigKey, stampmemo.Of(configPath), func() (*IDPrefixesConfig, error) {
-		eventLogger := logging.NewEventLogger(pkgctx.NewSystemContext())
-		loaded, loadErr := LoadIDPrefixesConfig(configPath)
-		if loadErr != nil {
-			eventLogger.LogWarning(ConstMagicb022a312, logging.String("event", "config_load"),
-				logging.String("config_type", ConstMagic9d718edf),
-				logging.String("config_file", configPath),
-				logging.String(ConstMagic5a9c8e34, "true"))
-			return getDefaultIDPrefixesConfig(), nil
-		}
-		return loaded, nil
-	})
+	cfg, err := LoadIDPrefixesConfig(configPath)
 	if err != nil || cfg == nil {
+		eventLogger := logging.NewEventLogger(pkgctx.NewSystemContext())
+		eventLogger.LogWarning(ConstMagicb022a312, logging.String("event", "config_load"),
+			logging.String("config_type", ConstMagic9d718edf),
+			logging.String("config_file", configPath),
+			logging.String(ConstMagic5a9c8e34, "true"))
 		return getDefaultIDPrefixesConfig()
 	}
 	return cfg
