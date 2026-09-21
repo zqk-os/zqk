@@ -135,6 +135,7 @@ const (
 	CapacityAdvertisement = "capacity_advertisement"
 	ComputeAdvertisement  = "compute_advertisement"
 	EconomicPolicy        = "economic_policy"
+	SkillLease            = "skill_lease"
 
 	RiskBlocker = "risk_blocker"
 
