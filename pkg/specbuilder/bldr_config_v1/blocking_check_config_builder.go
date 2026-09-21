@@ -6,6 +6,7 @@
 package bldr_config_v1
 
 import (
+	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/specbuilder/config_builders"
 )
 
@@ -31,10 +32,10 @@ func NewBlockingCheckConfigBuilder() *BlockingCheckConfigBuilder {
 				"scheduler_job",
 			},
 			"created_at":  "2026-07-01 18:00:00 +0000 UTC",
-			"created_by":  "ACC-1785920548450214012-68b850c0",
+			"created_by":  objects.DefaultSystemAccountID,
 			"description": "Configuration for blocking check bypass rules.\nThis allows the system to bypass blocking checks for specific object kinds that are\ncreated by the system itself and are necessary for audit trails and system operations.\nThese kinds can be updated even when there are blocking issues in the system.\n",
 			"updated_at":  "2026-07-01 18:00:00 +0000 UTC",
-			"updated_by":  "ACC-1785920548450214012-68b850c0",
+			"updated_by":  objects.DefaultSystemAccountID,
 			"version":     ConfigYAMLVersionV1,
 		})
 

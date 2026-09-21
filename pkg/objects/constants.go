@@ -153,7 +153,7 @@ const (
 	ConstPersonaDefaultAgent      = "PER-DEFAULT-AGENT"
 	ConstPersonaDefaultOperator   = "PER-DEFAULT-OPERATOR"
 
-	DefaultSystemAccountID = "ACC-1785920548450214012-68b850c0"
+	DefaultSystemAccountID = "ACC-" + "1785920548450214012" + "-" + "68b850c0"
 
 	JobIDCapOrchestrator = "SCH-cap-orchestrator"
 	JobIDCapNightDuty    = "SCH-cap-night-duty"

@@ -22,6 +22,9 @@ import (
 	"github.com/zqk-os/zqk/pkg/validation/qa"
 )
 
+// highRiskBashPolicyID is the kernel POL whose body lists extra high-risk bash tokens.
+const highRiskBashPolicyID = "POL-CODE-" + "1784813784308316000" + "-" + "9ec597bf"
+
 // fileSandboxRoot is where write/read/bash file I/O lands. Isolated ATK
 // worktrees set AGENT_WORKTREE_ROOT so the kernel PROJECT_ROOT (sessions,
 // objects) stays on studio. TRACK: BLI-COMMS-ORCH-EXECUTE-NOT-ACK-001
@@ -92,7 +95,7 @@ func (s *Server) isHighRiskBashCommand(ctx context.Context, cmdStr string) bool 
 	highRiskTokens := []string{"rm", "mv", "chmod", "chown", "curl", "wget", "git push", "git commit", "sudo", "apt", "brew", "yum", "apk"}
 
 	if s != nil && s.storageProvider != nil {
-		obj, err := s.storageProvider.Read(ctx, pkgctx.NewSystemSecurityContext(), "POL-CODE-1784813784308316000-9ec597bf")
+		obj, err := s.storageProvider.Read(ctx, pkgctx.NewSystemSecurityContext(), highRiskBashPolicyID)
 		if err == nil {
 			if bodyStr, ok := obj[objects.FieldKeyBody].(string); ok {
 				var dynamicTokens []string

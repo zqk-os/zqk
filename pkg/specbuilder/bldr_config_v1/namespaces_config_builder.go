@@ -6,6 +6,7 @@
 package bldr_config_v1
 
 import (
+	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/specbuilder/config_builders"
 )
 
@@ -26,7 +27,7 @@ func NewNamespacesConfigBuilder() *NamespacesConfigBuilder {
 		SetConfig(map[string]any{
 			"$schema":           "../../../.zqk/cli/specs/schemas/namespaces_config.schema.json",
 			"created_at":        "2026-07-01 18:00:00 +0000 UTC",
-			"created_by":        "ACC-1785920548450214012-68b850c0",
+			"created_by":        objects.DefaultSystemAccountID,
 			"default_namespace": "zqk:kernel",
 			"description":       "Configuration for default namespace mappings for object kinds.\nThis allows the system to assign namespaces to objects without hardcoding\nkind-to-namespace mappings in source code.\n\nAll brand names, namespace layers, and validation patterns are configurable\nto support white-labeling. Change these values to rebrand the system.\n",
 			"inference_rules": []any{
@@ -148,7 +149,7 @@ func NewNamespacesConfigBuilder() *NamespacesConfigBuilder {
 			"project_origin": "zqk",
 			"system_origin":  "zqk",
 			"updated_at":     "2026-07-01 18:00:00 +0000 UTC",
-			"updated_by":     "ACC-1785920548450214012-68b850c0",
+			"updated_by":     objects.DefaultSystemAccountID,
 			"version":        ConfigYAMLVersionV1,
 		})
 

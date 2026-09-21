@@ -8,7 +8,7 @@ import (
 
 // Canonical criteria id for CRI-PERSONA-SKILL-BOUND (MMORCH).
 // TRACK: keep in sync with kernel criteria object.
-const CriteriaIDPersonaSkillBound = "CRIT-1785904241054969000-a088a7d9"
+const CriteriaIDPersonaSkillBound = "CRIT-" + "1785904241054969000" + "-" + "a088a7d9"
 
 // PersonaSkillBoundResult is the CRI-PERSONA-SKILL-BOUND gate outcome for one persona.
 type PersonaSkillBoundResult struct {

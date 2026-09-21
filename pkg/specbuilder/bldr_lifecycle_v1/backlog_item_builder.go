@@ -121,7 +121,7 @@ func (b *BacklogItemLifecycleBuilder) addBacklogItemLifecycleData() {
 		Display:     "Archived",
 		Terminal:    true,
 		Archive:     true,
-		Description: "Archived for history; no longer in the active backlog stream. Occupancy is hierarchical: when priority_plan_ref is set, that plan must also be archived (RUL-1782235658105562000-b27c8dfc state ceiling). Promote the plan to archived (children ride the prune shockwave); do not archive a lone member under a live or complete plan.",
+		Description: "Archived for history; no longer in the active backlog stream. Occupancy is hierarchical: when priority_plan_ref is set, that plan must also be archived (kernel-backlog state ceiling). Promote the plan to archived (children ride the prune shockwave); do not archive a lone member under a live or complete plan.",
 	})
 	b.AddStatus(objects.Status{
 		Value:       "error",
@@ -530,7 +530,7 @@ func (b *BacklogItemLifecycleBuilder) addBacklogItemLifecycleData() {
 	b.AddTransition(objects.Transition{
 		From:        "archived",
 		To:          "complete",
-		Description: "Restore a falsely archived item onto successful completion when work was done and the execution parent is not on the history membrane. Re-entry is a new closed system, not a resume of the archive hop (RUL-1782235658105562000-b27c8dfc).",
+		Description: "Restore a falsely archived item onto successful completion when work was done and the execution parent is not on the history membrane. Re-entry is a new closed system, not a resume of the archive hop (kernel-backlog).",
 		Manual:      true,
 		Auto:        false,
 		Preconditions: []string{

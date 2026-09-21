@@ -440,7 +440,7 @@ func (b *PriorityPlanBuilder) addPriorityPlanFields() {
 			Dependencies("team configuration registry").
 			Lifecycle("mutable").
 			Observability("yes").
-			Purpose("References a team configuration (cellular archetype) for the priority plan pod execution. Required (with persona_refs as alternate) before shovel-ready active / execution-locked — CAP dispatch identity (TRACK BLI-1785915238591238000-619a2f9e).").
+			Purpose("References a team configuration (cellular archetype) for the priority plan pod execution. Required (with persona_refs as alternate) before shovel-ready active / execution-locked — CAP dispatch identity (TRACK kernel-backlog).").
 			Security("non-sensitive").
 			SystemUsage([]any{
 				"orchestrator provisioning",

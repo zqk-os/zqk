@@ -6,6 +6,7 @@
 package bldr_config_v1
 
 import (
+	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/specbuilder/config_builders"
 )
 
@@ -25,12 +26,12 @@ func NewSchedulerLogsConfigBuilder() *SchedulerLogsConfigBuilder {
 	builder.
 		SetConfig(map[string]any{
 			"created_at": "2026-07-01 18:00:00 +0000 UTC",
-			"created_by": "ACC-1785920548450214012-68b850c0",
+			"created_by": objects.DefaultSystemAccountID,
 			"job_logs": map[string]any{
 				"max_lines": 500,
 			},
 			"updated_at": "2026-07-01 18:00:00 +0000 UTC",
-			"updated_by": "ACC-1785920548450214012-68b850c0",
+			"updated_by": objects.DefaultSystemAccountID,
 		})
 
 	return builder

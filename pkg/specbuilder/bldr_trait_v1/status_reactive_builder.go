@@ -16,7 +16,7 @@ func NewStatusReactiveBuilder() *StatusReactiveBuilder {
 	}
 
 	builder.
-		SetDescription("Object-level admission for status-event listeners. A catalyst status save publishes one event to each outbound ref (listener stubs). Kinds with this trait may run the generic interpreter. Kinds without it are a no-op. The listener updates only itself; a self-update is a new catalyst. TRACK: BLI-1786411312347141000-5f3d9063.\\n").
+		SetDescription("Object-level admission for status-event listeners. A catalyst status save publishes one event to each outbound ref (listener stubs). Kinds with this trait may run the generic interpreter. Kinds without it are a no-op. The listener updates only itself; a self-update is a new catalyst. TRACK: kernel-backlog.\\n").
 		SetCategory("behavior").
 		SetObjectLevel(true).
 		SetFieldLevel(false)

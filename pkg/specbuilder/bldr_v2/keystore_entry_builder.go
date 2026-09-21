@@ -76,7 +76,7 @@ func (b *KeystoreEntryBuilder) addKeystoreEntryFields() {
 			Validation("Must be a valid hash string").
 			Build()).
 		WithAccess(builders.NewAccessBuilder().
-			Requires("role:admin", "ACC-1785920548450214012-68b850c0").
+			Requires("role:admin", objects.DefaultSystemAccountID).
 			Build()).
 		WithValidation(builders.NewValidationBuilder().
 			Required(true).
@@ -261,7 +261,7 @@ func (b *KeystoreEntryBuilder) addKeystoreEntryFields() {
 			Validation("Must be a valid salt string").
 			Build()).
 		WithAccess(builders.NewAccessBuilder().
-			Requires("role:admin", "ACC-1785920548450214012-68b850c0").
+			Requires("role:admin", objects.DefaultSystemAccountID).
 			Build()).
 		WithValidation(builders.NewValidationBuilder().
 			Required(false).

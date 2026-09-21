@@ -26,7 +26,7 @@ func NewSchedulerMaintenanceConfigBuilder() *SchedulerMaintenanceConfigBuilder {
 	builder.
 		SetConfig(map[string]any{
 			"created_at": "2026-07-01 18:00:00 +0000 UTC",
-			"created_by": "ACC-1785920548450214012-68b850c0",
+			"created_by": objects.DefaultSystemAccountID,
 			"jobs_paused_schedule_exempt_job_ids": []any{
 				"SCH-evag",
 				"SCH-cache-prewarm",
@@ -135,7 +135,7 @@ func NewSchedulerMaintenanceConfigBuilder() *SchedulerMaintenanceConfigBuilder {
 				},
 			},
 			"updated_at": "2026-07-03 18:00:00 +0000 UTC",
-			"updated_by": "ACC-1785920548450214012-68b850c0",
+			"updated_by": objects.DefaultSystemAccountID,
 		})
 
 	return builder

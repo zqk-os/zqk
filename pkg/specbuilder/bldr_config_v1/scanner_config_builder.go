@@ -6,6 +6,7 @@
 package bldr_config_v1
 
 import (
+	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/specbuilder/config_builders"
 )
 
@@ -26,7 +27,7 @@ func NewScannerConfigBuilder() *ScannerConfigBuilder {
 		SetConfig(map[string]any{
 			"$schema":     "../../../.zqk/cli/specs/schemas/scanner_config.schema.json",
 			"created_at":  "2026-07-01 18:00:00 +0000 UTC",
-			"created_by":  "ACC-1785920548450214012-68b850c0",
+			"created_by":  objects.DefaultSystemAccountID,
 			"description": "Configuration for file scanner exclusion patterns.\nThis allows the system to exclude directories and files during scanning without\nhardcoding exclusion lists in source code.\n",
 			"exclude_directories": []any{
 				"_internal",
@@ -78,7 +79,7 @@ func NewScannerConfigBuilder() *ScannerConfigBuilder {
 				},
 			},
 			"updated_at": "2026-07-01 18:00:00 +0000 UTC",
-			"updated_by": "ACC-1785920548450214012-68b850c0",
+			"updated_by": objects.DefaultSystemAccountID,
 			"version":    ConfigYAMLVersionV1,
 		})
 
