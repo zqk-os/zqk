@@ -32,7 +32,7 @@ func BootPayload() string {
 - **Summary-as-Terminal Failure Mode Prohibition:** In the autonomous CAP loop, merging a PR, promoting binaries, or rendering an artifact summary is a MILESTONE TRANSITION, NOT a stopping condition.
 - **NEVER yield control or go idle at summary milestones.** In this agent platform, stopping tool calls immediately transitions the agent into `+"`"+`waiting_for_input`+"`"+` (idle), halting autonomous loop flow.
 - **Strict Post-Merge Self-Continuation Protocol:**
-  1. Merge PR & promote stable binary (`+"`"+`./scripts/install.sh && ./bin/zqk mcp restart`+"`"+`).
+  1. Merge PR & promote stable binary (`+"`"+paths.RewriteCanonicalCLIInvocations(`./scripts/install.sh && ./bin/zqk mcp restart`)+"`"+`).
   2. Query `+"`"+paths.RewriteCanonicalCLIInvocations(`./bin/zqk workflow whats-next`)+"`"+`.
   3. Immediately create/checkout the next integration branch (`+"`"+`git checkout -b integration/<pri-id> origin/main`+"`"+`).
   4. Claim or shape the first BLI (`+"`"+paths.RewriteCanonicalCLIInvocations(`zqk agent claim-work ...`)+"`"+` or kernel object creation).
