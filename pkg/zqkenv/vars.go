@@ -710,8 +710,6 @@ func TestRoot() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxTestRoot)} }
 // SharedTestBin returns the environment variable name for SHARED_TEST_BIN (brand-prefixed).
 func SharedTestBin() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxSharedTestBin)} }
 
-// SharedTestBin returns the environment variable name for SHARED_TEST_BIN (brand-prefixed).
-func SharedTestBin() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxSharedTestBin)} }
 
 // TestVerbose returns the environment variable name for TEST_VERBOSE (brand-prefixed).
 func TestVerbose() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxTestVerbose)} }

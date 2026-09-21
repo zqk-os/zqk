@@ -167,13 +167,10 @@ const (
 	NamespacesConfigFile      = "namespaces_config.yaml"
 	ScannerConfigFile         = "scanner_config.yaml"
 	CommandTimeoutsConfigFile = "command_timeouts.yaml" // Under ConfigDir or repo config/
-	// ScanTestsPackageTimeoutsConfigFile is the config for minimum job/test timeouts per package (scheduler scan-tests).
-	// Under ConfigDir or repo config/. Load order: .zqk/config/ (override) then config/ (default).
-	ScanTestsPackageTimeoutsConfigFile = "scan_tests_package_timeouts.yaml"
-	MCPLogsDir                         = "logs" // Under MCPDir
-	MCPTraceLogPrefix                  = "mcp-trace-"
-	LogEventsPrefix                    = "log-events-"
-	ComponentsLogDir                   = "components" // Under LogsDir
+	MCPLogsDir                = "logs"                  // Under MCPDir
+	MCPTraceLogPrefix         = "mcp-trace-"
+	LogEventsPrefix           = "log-events-"
+	ComponentsLogDir          = "components" // Under LogsDir
 
 	// AuditStreamsDir: legacy name; audit_event streams now live under StreamsDir ( .zqk/streams/audit_event/ ). Kept for migration or external reference.
 	AuditStreamsDir = "audit_streams"

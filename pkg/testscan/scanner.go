@@ -423,6 +423,7 @@ func (s *Scanner) ScheduleBundles(bundles []*TestBundle, maxParallel int) []*Tes
 // logic as scheduler job timeout: sum of estimated durations (from timing data or
 // package defaults), 1.5x buffer, package minimums, and cap at 1 hour.
 // Package path can be with or without "./" prefix. Returns 0 and non-nil error on failure.
+// Package minimums are the in-code floors in GetMinTimeoutSecondsForPackage.
 func SuggestedTimeoutForPackage(projectRoot, packagePath string) (seconds int, err error) {
 	normalizedPath := strings.TrimPrefix(packagePath, "./")
 	scanner := NewScanner(projectRoot)
