@@ -13,7 +13,7 @@ import (
 )
 
 // loadShippedCommandTimeouts reads the repo's config/command_timeouts.yaml, which is the default
-// consulted when a project has no .zqk/config override.
+// consulted when a project has no config/command_timeouts.yaml of its own.
 func loadShippedCommandTimeouts(t *testing.T) commandTimeoutsConfig {
 	t.Helper()
 	path := filepath.Join("..", "..", "config", paths.CommandTimeoutsConfigFile)

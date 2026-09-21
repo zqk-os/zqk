@@ -173,8 +173,8 @@ func TestBucketingConfigRegistry_GetBucketPathForDate(t *testing.T) {
 
 func TestBucketingConfigRegistry_LoadFromFile(t *testing.T) {
 	tmpDir := t.TempDir()
-	// Use the correct path that BucketingConfigRegistry expects (.zqk/config/config.yaml)
-	configPath := filepath.Join(tmpDir, paths.ProjectDataDir, paths.ConfigDir, "config.yaml")
+	// Use the path BucketingConfigRegistry expects: config/zqk.yaml
+	configPath := filepath.Join(tmpDir, paths.ConfigDir, paths.ZqkConfigFileName)
 	_ = fileutil.MkdirAll(filepath.Dir(configPath), paths.DirPerm755)
 
 	// Create config file

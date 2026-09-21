@@ -13,7 +13,7 @@ import (
 func TestGetErrorLogOutput(t *testing.T) {
 	t.Parallel()
 	dir := t.TempDir()
-	configDir := filepath.Join(dir, paths.ProjectDataDir, paths.ConfigDir)
+	configDir := filepath.Join(dir, paths.ConfigDir)
 	if err := fileutil.MkdirAll(configDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
@@ -25,7 +25,7 @@ func TestGetErrorLogOutput(t *testing.T) {
 	})
 
 	t.Run("logging.error_log_output separate", func(t *testing.T) {
-		cfgPath := filepath.Join(configDir, paths.ProjectConfigFile)
+		cfgPath := filepath.Join(configDir, paths.ZqkConfigFileName)
 		cfg := map[string]any{"logging": map[string]any{"error_log_output": "separate"}}
 		data, _ := yaml.Marshal(cfg)
 		if err := fileutil.WriteFile(cfgPath, data, paths.FilePerm644); err != nil {
@@ -37,7 +37,7 @@ func TestGetErrorLogOutput(t *testing.T) {
 	})
 
 	t.Run("logging.error_log_output combined", func(t *testing.T) {
-		cfgPath := filepath.Join(configDir, paths.ProjectConfigFile)
+		cfgPath := filepath.Join(configDir, paths.ZqkConfigFileName)
 		cfg := map[string]any{"logging": map[string]any{"error_log_output": "combined"}}
 		data, _ := yaml.Marshal(cfg)
 		if err := fileutil.WriteFile(cfgPath, data, paths.FilePerm644); err != nil {

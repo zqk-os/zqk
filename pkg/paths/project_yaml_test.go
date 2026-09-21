@@ -7,20 +7,20 @@ import (
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-func TestFirstProjectYAMLConfig_prefersRepoConfig(t *testing.T) {
+func TestFirstProjectYAMLConfig_usesRepoConfig(t *testing.T) {
 	root := t.TempDir()
 	repo := filepath.Join(root, ConfigDir, ZqkConfigFileName)
-	legacy := filepath.Join(root, ProjectDataDir, ConfigDir, ProjectConfigFile)
+	leftover := filepath.Join(root, ProjectDataDir, ConfigDir, ProjectConfigFile)
 	if err := fileutil.EnsureDir(filepath.Dir(repo)); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.EnsureDir(filepath.Dir(legacy)); err != nil {
+	if err := fileutil.EnsureDir(filepath.Dir(leftover)); err != nil {
 		t.Fatal(err)
 	}
 	if err := fileutil.WriteStandardFile(repo, []byte("project:\n  name: repo\n")); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.WriteStandardFile(legacy, []byte("project:\n  name: kernel\n")); err != nil {
+	if err := fileutil.WriteStandardFile(leftover, []byte("project:\n  name: kernel\n")); err != nil {
 		t.Fatal(err)
 	}
 	got := FirstProjectYAMLConfig(root)
@@ -37,22 +37,28 @@ func TestFirstProjectYAMLConfig_prefersRepoConfig(t *testing.T) {
 	}
 }
 
-func TestFirstExistingFromCwdAny_prefersRepoConfig(t *testing.T) {
+func TestFirstProjectYAMLConfig_ignoresLeftoverKernelConfig(t *testing.T) {
+	root := t.TempDir()
+	leftover := filepath.Join(root, ProjectDataDir, ConfigDir, ProjectConfigFile)
+	if err := fileutil.EnsureDir(filepath.Dir(leftover)); err != nil {
+		t.Fatal(err)
+	}
+	if err := fileutil.WriteStandardFile(leftover, []byte("project:\n  name: kernel\n")); err != nil {
+		t.Fatal(err)
+	}
+	if got := FirstProjectYAMLConfig(root); got != "" {
+		t.Fatalf("FirstProjectYAMLConfig() = %q, want empty (leftover .zqk/config is not project YAML)", got)
+	}
+}
+
+func TestFirstExistingFromCwdAny_usesRepoConfig(t *testing.T) {
 	root := t.TempDir()
 	repoRel := filepath.Join(ConfigDir, ZqkConfigFileName)
-	legacyRel := filepath.Join(ProjectDataDir, ConfigDir, ProjectConfigFile)
 	repo := filepath.Join(root, repoRel)
-	legacy := filepath.Join(root, legacyRel)
 	if err := fileutil.EnsureDir(filepath.Dir(repo)); err != nil {
 		t.Fatal(err)
 	}
-	if err := fileutil.EnsureDir(filepath.Dir(legacy)); err != nil {
-		t.Fatal(err)
-	}
 	if err := fileutil.WriteStandardFile(repo, []byte("ok: true\n")); err != nil {
-		t.Fatal(err)
-	}
-	if err := fileutil.WriteStandardFile(legacy, []byte("ok: false\n")); err != nil {
 		t.Fatal(err)
 	}
 	old, err := fileutil.Getwd()

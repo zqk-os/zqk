@@ -8,7 +8,7 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-// legacyProjectYAML is keyed by project root (closed set). Stamp is the legacy config file.
+// projectYAML is keyed by project root. Stamp is config/zqk.yaml.
 var legacyProjectYAML stampmemo.Table[map[string]any]
 
 func legacyProjectConfig(projectRoot string) map[string]any {

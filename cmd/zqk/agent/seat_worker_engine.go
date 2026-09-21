@@ -187,8 +187,6 @@ func loadConfiguredWorkerLane(root, personaRef, agentID string) string {
 		filepath.Join(root, paths.ConfigDir, "worker_lanes.yaml"),
 		filepath.Join(root, paths.ConfigDir, paths.ZqkLocalConfigFileName),
 		filepath.Join(root, paths.ConfigDir, paths.ZqkConfigFileName),
-		filepath.Join(root, paths.ProjectDataDir, paths.ConfigDir, paths.ConfigYAMLFileName),
-		filepath.Join(root, paths.ProjectDataDir, paths.ConfigDir, paths.ZqkConfigFileName),
 	}
 
 	var fallbackDefault string

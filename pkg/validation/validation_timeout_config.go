@@ -135,7 +135,7 @@ func (c *ValidationTimeoutConfig) TimeoutForKind(kind string) time.Duration {
 	return time.Duration(seconds) * time.Second
 }
 
-// findValidationConfigFile locates config/zqk.yaml (legacy .zqk/config copies are fallbacks).
+// findValidationConfigFile locates config/zqk.yaml.
 func findValidationConfigFile() string {
 	return paths.FirstExistingFromCwdAny(paths.ProjectYAMLConfigRelatives())
 }

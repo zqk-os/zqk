@@ -214,8 +214,7 @@ func (h *TimeoutHook) getTimeoutForCommand(normalizedCmd string, args []string) 
 	return maxTimeout
 }
 
-// loadCommandTimeoutsConfig reads the effective command_timeouts.yaml: config/
-// is SSOT. A leftover .zqk/config/ copy is fallback only. Returns nil if neither is found.
+// loadCommandTimeoutsConfig reads config/command_timeouts.yaml. Returns nil if missing.
 // commandTimeouts is keyed by project root. Stamp is the timeouts YAML pair.
 var commandTimeouts stampmemo.Table[*commandTimeoutsConfig]
 
@@ -226,7 +225,6 @@ func (h *TimeoutHook) loadCommandTimeoutsConfig() *commandTimeoutsConfig {
 	}
 	files := []string{
 		filepath.Join(projectRoot, paths.ConfigDir, paths.CommandTimeoutsConfigFile),
-		filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, paths.CommandTimeoutsConfigFile),
 	}
 	cfg, _ := commandTimeouts.Load(projectRoot, stampmemo.OfAll(files...), func() (*commandTimeoutsConfig, error) {
 		for _, base := range files {
@@ -261,7 +259,7 @@ func findMatchingRule(normalizedCmd string, cfg *commandTimeoutsConfig) *command
 }
 
 // getTimeoutFromCommandTimeoutsConfig returns a timeout if the normalized command matches any rule
-// in config/command_timeouts.yaml (legacy .zqk/config/ copy is fallback). First match wins. Returns 0 if no match.
+// in config/command_timeouts.yaml. First match wins. Returns 0 if no match.
 func (h *TimeoutHook) getTimeoutFromCommandTimeoutsConfig(normalizedCmd string, maxTimeout time.Duration) time.Duration {
 	cfg := h.loadCommandTimeoutsConfig()
 	if cfg == nil {

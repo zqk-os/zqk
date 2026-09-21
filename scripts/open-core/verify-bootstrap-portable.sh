@@ -23,7 +23,7 @@ go test ./internal/bootstrap -count=1 -timeout 60s \
 
 # Optional: binary exists and is not "initialized" against the repo.
 if [ -n "$BIN_HINT" ] && [ -x "$REPO_ROOT/$BIN_HINT" ]; then
-  if [ -d "$REPO_ROOT/.zqk" ] && { [ -f "$REPO_ROOT/.zqk/agent-runtime/agent_workspace_sync.json" ] || [ -f "$REPO_ROOT/.zqk/config/project.json" ]; }; then
+  if [ -d "$REPO_ROOT/.zqk" ] && [ -f "$REPO_ROOT/.zqk/agent-runtime/agent_workspace_sync.json" ]; then
     echo "WARN: repo looks like an initialized ZQK project (.zqk/agent-runtime)." >&2
     echo "      Community source trees should stay uninitialized; use a separate project dir." >&2
   fi

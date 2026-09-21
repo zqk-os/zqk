@@ -34,13 +34,13 @@ func TestLoadAggregationConfig_Default(t *testing.T) {
 
 func TestLoadAggregationConfig_FromFile(t *testing.T) {
 	tmpDir := t.TempDir()
-	// Use the correct path that LoadAggregationConfig expects (.zqk/config/config.yaml)
-	configDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.ConfigDir)
+	// Use the path LoadAggregationConfig expects: config/zqk.yaml
+	configDir := filepath.Join(tmpDir, paths.ConfigDir)
 	if err := fileutil.MkdirAll(configDir, paths.DirPerm755); err != nil {
 		t.Fatalf("Failed to create config directory: %v", err)
 	}
 
-	configPath := filepath.Join(configDir, "config.yaml")
+	configPath := filepath.Join(configDir, paths.ZqkConfigFileName)
 	configYAML := `
 audit:
   aggregation:
@@ -99,13 +99,13 @@ audit:
 
 func TestLoadAggregationConfig_Disabled(t *testing.T) {
 	tmpDir := t.TempDir()
-	// Use the correct path that LoadAggregationConfig expects (.zqk/config/config.yaml)
-	configDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.ConfigDir)
+	// Use the path LoadAggregationConfig expects: config/zqk.yaml
+	configDir := filepath.Join(tmpDir, paths.ConfigDir)
 	if err := fileutil.MkdirAll(configDir, paths.DirPerm755); err != nil {
 		t.Fatalf("Failed to create config directory: %v", err)
 	}
 
-	configPath := filepath.Join(configDir, "config.yaml")
+	configPath := filepath.Join(configDir, paths.ZqkConfigFileName)
 	configYAML := `
 audit:
   aggregation:
@@ -128,13 +128,13 @@ audit:
 
 func TestLoadAggregationConfig_InvalidWindowSize(t *testing.T) {
 	tmpDir := t.TempDir()
-	// Use the same path LoadAggregationConfig expects: .zqk/config/config.yaml
-	configDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.ConfigDir)
+	// Use the same path LoadAggregationConfig expects: config/zqk.yaml
+	configDir := filepath.Join(tmpDir, paths.ConfigDir)
 	if err := fileutil.MkdirAll(configDir, paths.DirPerm755); err != nil {
 		t.Fatalf("Failed to create config directory: %v", err)
 	}
 
-	configPath := filepath.Join(configDir, "config.yaml")
+	configPath := filepath.Join(configDir, paths.ZqkConfigFileName)
 	configYAML := `
 audit:
   aggregation:

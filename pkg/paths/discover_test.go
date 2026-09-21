@@ -9,7 +9,7 @@ import (
 
 func TestFirstExistingFromCwd(t *testing.T) {
 	root := t.TempDir()
-	rel := filepath.Join(ProjectDataDir, ConfigDir, ProjectConfigFile)
+	rel := filepath.Join(ConfigDir, ZqkConfigFileName)
 	want := filepath.Join(root, rel)
 	if err := fileutil.EnsureDir(filepath.Dir(want)); err != nil {
 		t.Fatal(err)

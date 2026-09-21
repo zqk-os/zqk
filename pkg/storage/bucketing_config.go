@@ -56,7 +56,7 @@ type BucketingConfig struct {
 }
 
 // BucketingConfigRegistry manages bucketing configurations per object kind.
-// YAML is stamp-invalidated from config/zqk.yaml (legacy .zqk/config copies fallback).
+// YAML is stamp-invalidated from config/zqk.yaml.
 type BucketingConfigRegistry struct {
 	configPath string
 }

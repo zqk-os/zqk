@@ -99,7 +99,7 @@ func TestLoadValidationTierConfig(t *testing.T) {
 	t.Parallel()
 	// Create a temporary config file
 	tmpDir := t.TempDir()
-	configPath := filepath.Join(tmpDir, paths.ProjectDataDir, paths.ConfigDir, "config.yaml")
+	configPath := filepath.Join(tmpDir, paths.ConfigDir, paths.ZqkConfigFileName)
 	if err := fileutil.MkdirAll(filepath.Dir(configPath), paths.DirPerm755); err != nil {
 		t.Fatalf(ConstMagicec23442c, err)
 	}

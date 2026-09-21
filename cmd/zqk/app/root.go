@@ -742,7 +742,7 @@ func rootPreRunInitFileLogging(cmd *cobra.Command, projectRoot string, isHelpCom
 			profile = profileMCP
 		} else {
 			// Check config file for profile and logging.level
-			// Check config/zqk.yaml first (legacy .zqk/config copies are fallbacks).
+			// Check config/zqk.yaml.
 			for _, rel := range paths.ProjectYAMLConfigRelatives() {
 				configPath := filepath.Join(projectRoot, rel)
 				data, err := fileutil.ReadFile(configPath)

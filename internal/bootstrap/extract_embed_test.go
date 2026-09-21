@@ -26,7 +26,7 @@ func TestExtractEmbeddedToTempProject(t *testing.T) {
 		t.Fatalf("module root: %v", err)
 	}
 	// Guard: source tree must not become the project under test.
-	repoMarker := filepath.Join(moduleRoot, paths.ProjectDataDir, paths.ConfigDir, "project.json")
+	repoMarker := filepath.Join(moduleRoot, paths.ProjectDataDir, paths.ConfigDir)
 	hadRepoProject := false
 	if _, err := fileutil.Stat(repoMarker); err == nil {
 		hadRepoProject = true

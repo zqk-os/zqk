@@ -7,13 +7,10 @@ import (
 )
 
 // ProjectYAMLConfigRelatives is lookup order for committed project YAML.
-// <project_root>/config/zqk.yaml is SSOT. Copies under ProjectDataDir are
-// legacy fallbacks only — do not add new keys there.
+// <project_root>/config/zqk.yaml is the only project-tree location.
 func ProjectYAMLConfigRelatives() []string {
 	return []string{
 		filepath.Join(ConfigDir, ZqkConfigFileName),
-		filepath.Join(ProjectDataDir, ConfigDir, ProjectConfigFile),
-		filepath.Join(ProjectDataDir, ProjectConfigFile),
 	}
 }
 

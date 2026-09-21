@@ -33,7 +33,6 @@ func configCandidates(projectRoot string) []string {
 	return []string{
 		filepath.Join(projectRoot, ConfigDir, ZqkLocalConfigFileName),
 		filepath.Join(projectRoot, ConfigDir, ZqkConfigFileName),
-		filepath.Join(projectRoot, ProjectDataDir, ConfigDir, BrandSettingsFilename),
 		filepath.Join(projectRoot, BrandSettingsFilename),
 	}
 }
@@ -43,8 +42,6 @@ func testCandidates(projectRoot string) []string {
 		filepath.Join(projectRoot, ConfigDir, ZqkTestConfigFileName),
 		filepath.Join(projectRoot, ConfigDir, ZqkLocalConfigFileName),
 		filepath.Join(projectRoot, ConfigDir, ZqkConfigFileName),
-		filepath.Join(projectRoot, ProjectDataDir, ConfigDir, TestSettingsFilename),
-		filepath.Join(projectRoot, ProjectDataDir, ConfigDir, ZqkTestSettingsFilename),
 		filepath.Join(projectRoot, TestSettingsFilename),
 		filepath.Join(projectRoot, ZqkTestSettingsFilename),
 	}
