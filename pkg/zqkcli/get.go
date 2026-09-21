@@ -9,7 +9,6 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
@@ -152,20 +151,14 @@ func getLifecycleDefinition(cmd *cobra.Command, proc *cli.Processor, projectRoot
 		}
 	}
 
-	// Read and parse the lifecycle file
-	data, err := fileutil.ReadFile(lifecyclePath)
+	lifecycleDef, err := loadYAMLDoc(lifecyclePath)
 	if err != nil {
-		logging.FluentEvent(proc.Logger()).Error(fmt.Sprintf("Failed to read lifecycle file: %s", lifecyclePath), err).
+		logging.FluentEvent(proc.Logger()).Error(fmt.Sprintf("Failed to load lifecycle file: %s", lifecyclePath), err).
 			Path(lifecyclePath).
 			Log()
-		return errfmt.Newf("failed to read lifecycle file").Wrap(err)
-	}
-
-	var lifecycleDef map[string]any
-	if err := yaml.Unmarshal(data, &lifecycleDef); err != nil {
-		logging.FluentEvent(proc.Logger()).Error(fmt.Sprintf("Failed to parse lifecycle file: %s", lifecyclePath), err).
-			Path(lifecyclePath).
-			Log()
+		if fileutil.IsNotExist(err) {
+			return errfmt.Newf("failed to read lifecycle file").Wrap(err)
+		}
 		return errfmt.Newf("failed to parse lifecycle file").Wrap(err)
 	}
 
@@ -252,20 +245,14 @@ func getObjectSpec(cmd *cobra.Command, proc *cli.Processor, projectRoot string, 
 		}
 	}
 
-	// Read and parse the spec file
-	data, err := fileutil.ReadFile(specPath)
+	specDef, err := loadYAMLDoc(specPath)
 	if err != nil {
-		logging.FluentEvent(proc.Logger()).Error(fmt.Sprintf("Failed to read spec file: %s", specPath), err).
+		logging.FluentEvent(proc.Logger()).Error(fmt.Sprintf("Failed to load spec file: %s", specPath), err).
 			Path(specPath).
 			Log()
-		return errfmt.Newf("failed to read spec file").Wrap(err)
-	}
-
-	var specDef map[string]any
-	if err := yaml.Unmarshal(data, &specDef); err != nil {
-		logging.FluentEvent(proc.Logger()).Error(fmt.Sprintf("Failed to parse spec file: %s", specPath), err).
-			Path(specPath).
-			Log()
+		if fileutil.IsNotExist(err) {
+			return errfmt.Newf("failed to read spec file").Wrap(err)
+		}
 		return errfmt.Newf("failed to parse spec file").Wrap(err)
 	}
 
