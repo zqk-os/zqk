@@ -95,6 +95,9 @@ func (sl *SpecLoader) ClearCache() {
 	sl.specsByOntology.Reset()
 	sl.ontologies.Reset()
 	sl.fileBytes.Reset()
+	sl.specIndex.Reset()
+	sl.fieldRefs.Reset()
+	discoveredSpecsDirs.Reset()
 	sl.bumpSpecCacheRevision()
 }
 

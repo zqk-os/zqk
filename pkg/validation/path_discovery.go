@@ -3,6 +3,7 @@ package validation
 import (
 	"strconv"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -25,6 +26,7 @@ var (
 func resetDiscoveredPaths() {
 	discoveredPaths.Reset()
 	resolvedFindPaths.Reset()
+	paths.ResetCwdDiscovery()
 }
 
 func rememberDiscoveredPath(relativePath string, isDir bool, loadFn func() string) string {

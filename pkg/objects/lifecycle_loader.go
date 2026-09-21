@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -122,8 +121,9 @@ type PercentCompleteConfig struct {
 // LifecycleLoader loads lifecycle definitions from YAML files.
 // Optional EnsureReady(ctx) uses the component loader pattern (pkg/loader) to warm base lifecycle once with timeout.
 type LifecycleLoader struct {
-	lifecyclesDir   atomic.Value                // string
-	cache           stampmemo.Table[*Lifecycle] // keyed by kind (closed lifecycle tree); stamp is the YAML file
+	lifecyclesDir   atomic.Value                       // string
+	cache           stampmemo.Table[*Lifecycle]        // keyed by kind (closed lifecycle tree); stamp is the YAML file
+	yamlIndex       stampmemo.Table[map[string]string] // keyed by lifecyclesDir; basename → abs path
 	readyRunner     *loader.Runner
 	readyRunnerOnce sync.Once
 }
@@ -202,30 +202,23 @@ func (ll *LifecycleLoader) doEnsureReady(ctx context.Context) error { //nolint:u
 // findLifecyclePath resolves the path to {kind}_lifecycle.yaml directly or in subdirectories
 func (ll *LifecycleLoader) findLifecyclePath(currentDir, kind string) string {
 	lifecycleFile := fmt.Sprintf("%s_lifecycle.yaml", kind)
-	direct := filepath.Join(currentDir, lifecycleFile)
 	if hit := paths.FindLifecycleFile(currentDir, kind); hit != "" {
 		return hit
 	}
-	var found string
-	_ = filepath.WalkDir(currentDir, func(path string, d os.DirEntry, err error) error {
-		if err != nil || d == nil || found != "" {
-			return nil
-		}
-		if d.IsDir() {
-			name := d.Name()
-			if name == ".git" || name == "node_modules" || name == "bin" || name == ".zqk" || name == "docs" || name == "pkg" || name == "cmd" {
-				return filepath.SkipDir
-			}
-		}
-		if !d.IsDir() && d.Name() == lifecycleFile {
-			found = path
-		}
-		return nil
-	})
-	if found != "" {
-		return found
+	if hit := ll.indexedYAML(currentDir)[lifecycleFile]; hit != "" {
+		return hit
 	}
-	return direct
+	return filepath.Join(currentDir, lifecycleFile)
+}
+
+func (ll *LifecycleLoader) indexedYAML(dir string) map[string]string {
+	if ll == nil || dir == emptyValue {
+		return nil
+	}
+	idx, _ := ll.yamlIndex.Load(dir, paths.DomainTreeStamp(dir), func() (map[string]string, error) {
+		return paths.IndexYAMLNames(dir), nil
+	})
+	return idx
 }
 
 // LoadLifecycle loads a lifecycle definition for a given object kind
@@ -278,6 +271,7 @@ func GetGlobalLifecycleLoader() *LifecycleLoader {
 // This is not a size cap — see pkg/stampmemo.
 func (ll *LifecycleLoader) ClearCache() {
 	ll.cache.Reset()
+	ll.yamlIndex.Reset()
 }
 
 // InvalidateLifecycle invalidates a specific lifecycle entry by kind
@@ -584,17 +578,14 @@ func pathRefForFile(filePath string) string {
 func findLifecyclesDir() string {
 	if testRoot := zqkenv.TestRoot().Get(); testRoot != emptyValue {
 		lcDir := filepath.Join(testRoot, paths.ProcessInternalLifecyclesDir)
-		if info, err := fileutil.Stat(lcDir); err == nil && info.IsDir() && lifecyclesDirHasBaseLifecycle(lcDir) {
+		if stampmemo.Of(lcDir) != 0 && lifecyclesDirHasBaseLifecycle(lcDir) {
 			return lcDir
 		}
 	}
-	lc := paths.ProcessInternalLifecyclesDir
-	for _, dir := range []string{lc, filepath.Join("..", "..", lc), filepath.Join("..", "..", "..", lc)} {
-		if info, err := fileutil.Stat(dir); err == nil && info.IsDir() {
-			return dir
-		}
+	if hit := paths.FirstExistingFromCwd(paths.ProcessInternalLifecyclesDir); hit != emptyValue {
+		return hit
 	}
-	return lc
+	return paths.ProcessInternalLifecyclesDir
 }
 
 // normalizeLifecyclesDirIfProjectRoot normalizes a project root to its internal lifecycles dir.

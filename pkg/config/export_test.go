@@ -6,4 +6,5 @@ import "sync"
 func resetForTesting() {
 	globalConfig = nil
 	configOnce = sync.Once{}
+	rootConfigs.Reset()
 }

@@ -45,6 +45,26 @@ func TestFindObjectSpecFile_domainFallback(t *testing.T) {
 	}
 }
 
+func TestFindDomainFile_seesCreateAfterMiss(t *testing.T) {
+	root := t.TempDir()
+	specs := filepath.Join(root, "objects")
+	fileName := "audit_event.yaml"
+	if hit := FindDomainFile(specs, fileName); hit != "" {
+		t.Fatalf("expected miss, got %q", hit)
+	}
+	want := filepath.Join(specs, "kernel", fileName)
+	if err := fileutil.EnsureDir(filepath.Dir(want)); err != nil {
+		t.Fatal(err)
+	}
+	if err := fileutil.WriteStandardFile(want, []byte("ontology: audit_event\n")); err != nil {
+		t.Fatal(err)
+	}
+	got := FindDomainFile(specs, fileName)
+	if got != want {
+		t.Fatalf("got %q want %q", got, want)
+	}
+}
+
 func TestFindLifecycleFile_domainFallback(t *testing.T) {
 	root := t.TempDir()
 	lc := filepath.Join(root, "lifecycles")

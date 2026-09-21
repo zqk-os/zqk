@@ -3,7 +3,6 @@ package objects
 import (
 	"context"
 	"fmt"
-	"os"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -124,6 +123,8 @@ type SpecLoader struct {
 	specsByOntology stampmemo.Table[*Spec]                // keyed by ontology (closed spec tree)
 	ontologies      stampmemo.Table[string]               // keyed by abs spec path
 	fileBytes       stampmemo.Table[[]byte]               // keyed by abs spec path; stamp is generation
+	specIndex       stampmemo.Table[map[string]string]    // keyed by specsDir; basename/ontology → abs path
+	fieldRefs       stampmemo.Table[map[string]any]       // keyed by ref name (closed field-ref set)
 	builderRegistry atomic.Pointer[builderRegistryHolder] // Optional: for version-aware loading (atomic load/store; no mutex)
 	globalMu        sync.RWMutex                          // Protects specsDir updates in ensure-ready (see doEnsureReady)
 	metrics         *SpecLoaderMetrics                    // Metrics for lock operations
@@ -135,10 +136,6 @@ type SpecLoader struct {
 	cacheRevision atomic.Uint64
 	// specStorage backs spec reads (CRIT-9031 / SpecStorageProvider). When nil, readSpecFile uses os.ReadFile.
 	specStorage SpecStorageProvider
-	// specPathIndex maps spec names and ontologies to absolute paths in subdirectories
-	specPathIndex sync.Map
-	// fieldRefCache caches resolved field reference definitions
-	fieldRefCache sync.Map
 }
 
 // NewSpecLoader creates a new spec loader.
@@ -381,22 +378,14 @@ func (sl *SpecLoader) ValidateTraitContracts(specs []*Spec) []ValidationError {
 	return allErrors
 }
 
-// indexSpecSubdirectories walks sl.specsDir and indexes all *.yaml specs by filename and ontology
-func (sl *SpecLoader) indexSpecSubdirectories() {
+func (sl *SpecLoader) specNameIndex() map[string]string {
 	if sl == nil || sl.specsDir == emptyValue {
-		return
-	}
-	_ = filepath.WalkDir(sl.specsDir, func(path string, d os.DirEntry, err error) error {
-		if err != nil || d == nil {
-			return nil
-		}
-		if !d.IsDir() && strings.HasSuffix(d.Name(), ".yaml") {
-			sl.specPathIndex.Store(d.Name(), path)
-			ontology := strings.TrimSuffix(d.Name(), ".yaml")
-			sl.specPathIndex.Store(ontology, path)
-		}
 		return nil
+	}
+	idx, _ := sl.specIndex.Load(sl.specsDir, paths.DomainTreeStamp(sl.specsDir), func() (map[string]string, error) {
+		return paths.IndexYAMLNames(sl.specsDir), nil
 	})
+	return idx
 }
 
 // resolveSpecFilePath resolves a spec file path directly, or via recursive index across subdirectories
@@ -407,33 +396,24 @@ func (sl *SpecLoader) resolveSpecFilePath(specFile string) string {
 	if filepath.IsAbs(specFile) {
 		return specFile
 	}
-	// 1. Direct join
-	direct := filepath.Join(sl.specsDir, specFile)
-	if _, err := fileutil.Stat(direct); err == nil {
-		return direct
+	if hit := paths.FindDomainFile(sl.specsDir, specFile); hit != "" {
+		return hit
 	}
-
-	// 2. Check specPathIndex cache
+	if base := filepath.Base(specFile); base != specFile {
+		if hit := paths.FindDomainFile(sl.specsDir, base); hit != "" {
+			return hit
+		}
+	}
+	idx := sl.specNameIndex()
 	base := filepath.Base(specFile)
-	if val, ok := sl.specPathIndex.Load(base); ok {
-		return val.(string)
+	if hit := idx[base]; hit != "" {
+		return hit
 	}
 	ontology := strings.TrimSuffix(base, ".yaml")
-	if val, ok := sl.specPathIndex.Load(ontology); ok {
-		return val.(string)
+	if hit := idx[ontology]; hit != "" {
+		return hit
 	}
-
-	// 3. Scan subdirectories of sl.specsDir
-	sl.indexSpecSubdirectories()
-
-	if val, ok := sl.specPathIndex.Load(base); ok {
-		return val.(string)
-	}
-	if val, ok := sl.specPathIndex.Load(ontology); ok {
-		return val.(string)
-	}
-
-	return direct
+	return filepath.Join(sl.specsDir, specFile)
 }
 
 // loadFieldReference loads and parses a field definition from built_ins/fields/ or fields/
@@ -441,36 +421,44 @@ func (sl *SpecLoader) loadFieldReference(ref string) map[string]any {
 	if ref == emptyValue {
 		return nil
 	}
-	if cached, ok := sl.fieldRefCache.Load(ref); ok {
-		return cached.(map[string]any)
-	}
+	cands := sl.fieldRefCandidates(ref)
+	parsed, _ := sl.fieldRefs.Load(ref, stampmemo.OfAll(cands...), func() (map[string]any, error) {
+		for _, absPath := range cands {
+			data, err := fileutil.ReadFile(absPath)
+			if err != nil {
+				continue
+			}
+			var parsed map[string]any
+			if err := yaml.Unmarshal(data, &parsed); err == nil {
+				return parsed, nil
+			}
+		}
+		return nil, nil
+	})
+	return parsed
+}
 
-	// Candidate paths
-	candidatePaths := []string{
+func (sl *SpecLoader) fieldRefCandidates(ref string) []string {
+	base := filepath.Base(ref)
+	cands := []string{
 		ref,
 		ref + ".yaml",
 		filepath.Join(sl.specsDir, ref),
 		filepath.Join(sl.specsDir, ref+".yaml"),
 		filepath.Join(sl.specsDir, "built_ins", "fields", ref+".yaml"),
-		filepath.Join(sl.specsDir, "built_ins", "fields", filepath.Base(ref)+".yaml"),
+		filepath.Join(sl.specsDir, "built_ins", "fields", base+".yaml"),
 		filepath.Join(sl.specsDir, "fields", ref+".yaml"),
-		filepath.Join(sl.specsDir, "fields", filepath.Base(ref)+".yaml"),
+		filepath.Join(sl.specsDir, "fields", base+".yaml"),
 	}
-
-	for _, p := range candidatePaths {
-		absPath := p
-		if !filepath.IsAbs(absPath) {
-			absPath = filepath.Join(sl.specsDir, p)
+	out := make([]string, 0, len(cands))
+	for _, p := range cands {
+		if filepath.IsAbs(p) {
+			out = append(out, p)
+			continue
 		}
-		if data, err := fileutil.ReadFile(absPath); err == nil {
-			var parsed map[string]any
-			if err2 := yaml.Unmarshal(data, &parsed); err2 == nil {
-				sl.fieldRefCache.Store(ref, parsed)
-				return parsed
-			}
-		}
+		out = append(out, filepath.Join(sl.specsDir, p))
 	}
-	return nil
+	return out
 }
 
 // resolveFieldReferences scans spec.ResolvedFields for $ref / ref references, resolves them, and merges definitions
@@ -870,24 +858,13 @@ func (sl *SpecLoader) DiscoverOntologies() ([]string, error) {
 	if sl == nil || sl.specsDir == emptyValue {
 		return nil, nil
 	}
-	sl.indexSpecSubdirectories()
+	idx := sl.specNameIndex()
 	var ontologies []string
-	seen := make(map[string]bool)
-	walkErr := filepath.WalkDir(sl.specsDir, func(path string, d os.DirEntry, err error) error {
-		if err != nil || d == nil {
-			return nil
+	for name := range idx {
+		if strings.HasSuffix(name, ".yaml") {
+			continue
 		}
-		if !d.IsDir() && strings.HasSuffix(d.Name(), ".yaml") {
-			name := strings.TrimSuffix(d.Name(), ".yaml")
-			if !seen[name] {
-				seen[name] = true
-				ontologies = append(ontologies, name)
-			}
-		}
-		return nil
-	})
-	if walkErr != nil {
-		return nil, errfmt.Newf("failed to walk specs directory").Wrap(walkErr)
+		ontologies = append(ontologies, name)
 	}
 	sort.Strings(ontologies)
 	return ontologies, nil
@@ -964,51 +941,29 @@ func specsDirHasBaseSpec(specsDir string) bool {
 	return err == nil
 }
 
-// findSpecsDir attempts to find the object specs directory
+var discoveredSpecsDirs stampmemo.Table[string] // keyed by cwd+\0+testRoot (closed per process)
+
 func findSpecsDir() string {
-	// When running in tests, use test root only if it has a valid spec tree (base_object.yaml).
-	// SetupTestEnvironment creates an empty .zqk/specs/objects; without
-	// base_object.yaml LoadFields() would fail. Fall through to repo specs when test root
-	// has no base_object so tests that don't copy specs still pass (OBJECT_OPERATIONS_PERFORMANCE.md).
-	if testRoot := zqkenv.TestRoot().Get(); testRoot != emptyValue {
+	wd, err := fileutil.Getwd()
+	if err != nil {
+		wd = ""
+	}
+	testRoot := zqkenv.TestRoot().Get()
+	dir, _ := discoveredSpecsDirs.Load(wd+"\x00"+testRoot, stampmemo.Of(wd), func() (string, error) {
+		return locateSpecsDir(wd, testRoot), nil
+	})
+	return dir
+}
+
+func locateSpecsDir(wd, testRoot string) string {
+	if testRoot != emptyValue {
 		specsDir := filepath.Join(testRoot, paths.ProcessInternalObjectSpecsDir)
 		if info, err := fileutil.Stat(specsDir); err == nil && info.IsDir() && specsDirHasBaseSpec(specsDir) {
 			return specsDir
 		}
 	}
-	// Try common locations
-	possiblePaths := []string{
-		paths.ProcessInternalObjectSpecsDir,
-		filepath.Join("..", paths.ProcessInternalObjectSpecsDir),
-		filepath.Join("..", "..", paths.ProcessInternalObjectSpecsDir),
+	if hit := paths.FirstExistingFromCwd(paths.ProcessInternalObjectSpecsDir); hit != emptyValue && specsDirHasBaseSpec(hit) {
+		return hit
 	}
-
-	wd, err := fileutil.Getwd()
-	if err != nil {
-		return ""
-	}
-
-	for _, path := range possiblePaths {
-		absPath := filepath.Join(wd, path)
-		if info, err := fileutil.Stat(absPath); err == nil && info.IsDir() && specsDirHasBaseSpec(absPath) {
-			return absPath
-		}
-	}
-
-	// Walk up directory tree; require base_object.yaml so we use the real repo spec tree (not an empty .zqk/process from a nested .zqk).
-	dir := wd
-	for {
-		potentialPath := filepath.Join(dir, paths.ProcessInternalObjectSpecsDir)
-		if info, err := fileutil.Stat(potentialPath); err == nil && info.IsDir() && specsDirHasBaseSpec(potentialPath) {
-			return potentialPath
-		}
-
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			break
-		}
-		dir = parent
-	}
-
 	return ""
 }

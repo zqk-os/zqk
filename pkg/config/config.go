@@ -171,10 +171,10 @@ var (
 )
 
 func Get() *ZqkConfig {
-	configOnce.Do(func() {
-		globalConfig = loadConfig()
-	})
-	return globalConfig
+	if globalConfig != nil {
+		return globalConfig
+	}
+	return loadConfig()
 }
 
 func loadConfig() *ZqkConfig {

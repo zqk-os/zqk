@@ -40,14 +40,29 @@ func ObjectSpecPathCandidates(specsDir, kind string) []string {
 	return DomainPathCandidates(specsDir, ObjectSpecFileName(kind))
 }
 
+// DomainTreeStamp is the newest mtime of dir and its domain buckets.
+// Adding a file in kernel/ does not bump dir's mtime; stamp the buckets too.
+func DomainTreeStamp(dir string) stampmemo.Stamp {
+	if dir == "" {
+		return 0
+	}
+	cands := make([]string, 0, 1+len(ObjectSpecDomainDirs))
+	cands = append(cands, dir)
+	for _, domain := range ObjectSpecDomainDirs {
+		cands = append(cands, filepath.Join(dir, domain))
+	}
+	return stampmemo.OfAll(cands...)
+}
+
 // FindDomainFile returns the first existing candidate for fileName under dir.
-// Missing files are "".
+// Missing files are "". Stamp is the candidate files so a later create is seen.
 func FindDomainFile(dir, fileName string) string {
 	if dir == "" || fileName == "" {
 		return ""
 	}
-	hit, _ := domainFiles.Load(dir+"\x00"+fileName, stampmemo.Of(dir), func() (string, error) {
-		return stampmemo.FirstExisting(DomainPathCandidates(dir, fileName)), nil
+	cands := DomainPathCandidates(dir, fileName)
+	hit, _ := domainFiles.Load(dir+"\x00"+fileName, stampmemo.OfAll(cands...), func() (string, error) {
+		return stampmemo.FirstExisting(cands), nil
 	})
 	return hit
 }

@@ -6,12 +6,10 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
-	"time"
 
 	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -84,33 +82,15 @@ func (tr *TraitRegistry) ensureInitialized() {
 		}
 		// Load traits from files (if available)
 		traitsDir := findTraitsDir()
-		if traitsDir != emptyValue {
-			// Use a goroutine with timeout to prevent blocking indefinitely
-			done := make(chan error, 1)
-			goroutinelabels.NewGoroutine("objects", "load traits from directory").StartSimple(func() {
-				done <- tr.LoadTraitsFromDirectory(traitsDir)
-			})
-
-			// Wait with timeout (5 seconds max)
-			select {
-			case err := <-done:
-				if err != nil || len(tr.traits) == 0 {
-					// If loading from files fails or directory is empty, fall back to hardcoded traits
-					// This ensures backward compatibility and supports tests with unpopulated layouts
-					tr.registerStandardTraits()
-				} else {
-					// Mark standard traits for GetStandardTraits()
-					tr.identifyStandardTraits()
-				}
-			case <-time.After(5 * time.Second):
-				// Timeout - fall back to hardcoded traits
-				// This prevents indefinite blocking on filesystem issues
-				tr.registerStandardTraits()
-			}
-		} else {
-			// Fall back to hardcoded traits if traits directory not found
+		if traitsDir == emptyValue {
 			tr.registerStandardTraits()
+			return
 		}
+		if err := tr.LoadTraitsFromDirectory(traitsDir); err != nil || len(tr.traits) == 0 {
+			tr.registerStandardTraits()
+			return
+		}
+		tr.identifyStandardTraits()
 	})
 }
 
@@ -715,41 +695,7 @@ func (tr *TraitRegistry) identifyStandardTraits() {
 // findTraitsDir finds the traits directory relative to the project root
 // Uses the same pattern as findSpecsDir for consistency
 func findTraitsDir() string {
-	// Try common locations
-	possiblePaths := []string{
-		paths.ProcessInternalTraitsDir,
-		filepath.Join("..", paths.ProcessInternalTraitsDir),
-		filepath.Join("..", "..", paths.ProcessInternalTraitsDir),
-	}
-
-	wd, err := fileutil.Getwd()
-	if err != nil {
-		return ""
-	}
-
-	for _, path := range possiblePaths {
-		absPath := filepath.Join(wd, path)
-		if info, err := fileutil.Stat(absPath); err == nil && info.IsDir() {
-			return absPath
-		}
-	}
-
-	// Walk up directory tree
-	dir := wd
-	for {
-		potentialPath := filepath.Join(dir, paths.ProcessInternalTraitsDir)
-		if info, err := fileutil.Stat(potentialPath); err == nil && info.IsDir() {
-			return potentialPath
-		}
-
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			break
-		}
-		dir = parent
-	}
-
-	return ""
+	return paths.FirstExistingFromCwd(paths.ProcessInternalTraitsDir)
 }
 
 func traitExpandsAway(t *TraitDefinition) bool {
