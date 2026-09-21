@@ -55,9 +55,8 @@ jobs:
             echo "has_site=true" >> $GITHUB_OUTPUT
             exit 0
           else
-            echo "No package.json or yarn.lock found in ${{ github.workspace }}; skipping Astro site build."
-            echo "has_site=false" >> $GITHUB_OUTPUT
-            exit 0
+            echo "Error: No package.json or yarn.lock found in ${{ github.workspace }}; cannot build Astro site." >&2
+            exit 1
           fi
       - name: Setup Node
         if: steps.detect-package-manager.outputs.has_site == 'true'
