@@ -158,6 +158,13 @@ func TestCAS_ValidationCacheFilePath(t *testing.T) {
 
 	defer func() { _ = fileStorage.Shutdown(context.Background()) }()
 	t.Cleanup(func() {
+		q := caspkg.GetListingIndexWriteQueueForProjectRoot(testRoot)
+		if q != nil {
+			_ = q.FlushAll(5 * time.Second)
+			_ = q.Shutdown()
+		}
+		_ = storage.FlushAllListingIndexesForProjectRoot(testRoot)
+		_ = storage.WaitForWALProcessing(testRoot, 15*time.Second)
 		opts := storage.TempProjectTeardown(testRoot, fileStorage)
 		if err := storage.RunProjectTestTeardown(opts); err != nil {
 			t.Logf("project test teardown: %v", err)

@@ -11,12 +11,12 @@ describe('Marketing Site', () => {
 
   it('shows install path', () => {
     render(<App />);
-    expect(screen.getByText(/curl/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/curl/i)[0]).toBeInTheDocument();
   });
 
   it('shows 5-minute value', () => {
     render(<App />);
-    expect(screen.getByText(/5-minute/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/5-minute/i)[0]).toBeInTheDocument();
   });
 
   it('shows where to get help', () => {

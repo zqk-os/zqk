@@ -20,9 +20,10 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 )
 
-const (
+const emptyValue = ""
+
+var (
 	cpuProfileDuration = 30 * time.Second
-	emptyValue         = ""
 )
 
 var (

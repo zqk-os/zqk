@@ -1,45 +1,55 @@
-# ZQK (`zqk@zqkos.com`)
+# ZQK OS (`zqk@zqkos.com`)
 
-> **The Operating System for AI + Human Hybrid Teams**
+> **The Cellular Knowledge Operating System for Autonomous Agent Swarms**
 
-ZQK (Zen Quantum Kernel) is an open-core, distributed Knowledge Operating System (KOS) built in Go, engineered to give autonomous AI agent swarms and human developers a shared, queryable, and governed knowledge graph.
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Go Report Card](https://goreportcard.com/badge/github.com/zqk-os/zqk)](https://goreportcard.com/report/github.com/zqk-os/zqk)
 
-**Your AI agents are coding blind. ZQK gives them project awareness, memory, and guardrails.**
+ZQK (Zen Quantum Kernel) is an open-core, distributed **Cellular Knowledge Operating System (Cellular OS)** built in Go. It treats autonomous multi-agent systems as a biological computing substrate: where individual kernels operate like sovereign cells, transactional membranes isolate memory planes, and an active knowledge graph serves as the operational nervous system.
 
-This tree is the **community** product. Command examples use the default executable token and are rewritten at install from `brand.executable_name`. Kernel data stays under **`.zqk/`**.
+**Your AI agents are coding blind.** Dumping uncurated conversation logs into fragile vector swamps or letting agents edit repositories raw leads to catastrophic context decay. ZQK provides **cellular isolation**, **epistemic hygiene**, and **self-healing biological guardrails** so agent swarms govern themselves.
+
+This repository hosts **ZQK Core**, the open-core community microkernel.
 
 ---
 
-## ⚡ Quickstart (5 minutes)
+## 🧬 Biological Systems Architecture
 
-There is **no brew formula and no public GitHub release** yet. Build from this checkout.
+Rather than treating multi-agent work as loose prompt scripts or terminal splits, ZQK introduces four foundational biological primitives:
+
+1. **The Cell (Sovereign Local Node):** Each ZQK kernel is an authoritative domain expert over its local environment and private knowledge graph. No bloated, uncurated global vector lakes.
+2. **The Membrane (Deterministic Boundaries):** A strict multi-plane state machine (`PlaneDraft` $\rightarrow$ `PlaneStaged` $\rightarrow$ `PlanePromoted`) ensuring that zero unverified agent mutations touch working code.
+3. **The Nervous System (Active Operational Graph):** An active, real-time state bus driving task execution, lineage, and dependency trees—not a passive data dump.
+4. **The Organism (Inter-Cellular Mesh):** Domain-expert kernels communicating over a typed P2P wire protocol to achieve compound objectives without central micromanagement.
+
+---
+
+## ⚡ Quickstart (5 Minutes)
 
 👉 **[Community First-Run Guide (Human + Agent)](./docs/onboarding/COMMUNITY_FIRST_RUN.md)**
 
-**1. Build the CLI**
+### 1. Build the Microkernel
 ```sh
-make          # → ./bin/zqk  (or ./bin/<brand.executable_name>)
+make          # → ./bin/zqk
 ./bin/zqk --version
 ```
 
-**2. Initialize your project (Polyglot: Python, TS, Rust, Go, Docs)**
+### 2. Seed a Sovereign Cell (Polyglot: Go, Python, TS, Rust)
 ```sh
-# In this checkout (already initialized): skip init.
-# Greenfield:
 mkdir my-project && cd my-project
 /path/to/this-repo/bin/zqk system init --project-name my-project
 /path/to/this-repo/bin/zqk quickstart
 ```
 
-Do **not** `export ZQK_PROJECT_ROOT` in your shell profile. It silently attaches later commands to that checkout instead of the directory you are in.
+*Note: Do **not** `export ZQK_PROJECT_ROOT` in your shell profile. ZQK automatically discovers the nearest `.zqk/` cellular membrane in your working tree.*
 
-**3. Seat your AI agent**
+### 3. Seat Your AI Agent (Cursor, Claude Code, Windsurf, Cline)
 ```sh
 ./bin/zqk system agent-onboard --format json
 ./bin/zqk system start-here
 ```
 
-**4. Connect via Model Context Protocol (MCP)**
+### 4. Connect via Model Context Protocol (MCP)
 ```sh
 ./bin/zqk mcp install
 ./bin/zqk mcp ensure --tcp 127.0.0.1:8443
@@ -48,88 +58,60 @@ Do **not** `export ZQK_PROJECT_ROOT` in your shell profile. It silently attaches
 
 ---
 
-### ⚡ Core Architecture
+## 🏛️ The 3-Tier Layering Model
 
-- **Distributed Knowledge Kernel:** Built on a cellular, spec-driven architecture where project artifacts, policies, and goals are managed as graph nodes.
-- **Dual-Storage & CAS:** Combines Git-native YAML with Content-Addressable Storage (CAS) for cryptographic integrity, synchronized to a high-throughput MemGraph/Neo4j backend.
-- **GraphRAG Engine:** Native multi-hop traversal, semantic proximity queries, and vector search for deep AI reasoning.
-- **MCP Server & RBAC:** Exposes system commands to AI agents via the Model Context Protocol standard under strict role-based access control.
-- **DAG Pipeline Executor:** Composable workflow engine with automatic rollback semantics, retry stages, and rate-limiting.
-
----
-
-## 🎁 What You Get
-
-- **AI Agent Guardrails:** Enforceable policies that agents verify *before* modifying code.
-- **Autonomous Project Context:** Agents discover goals, requirements, and architectural decisions without manual prompting.
-- **Native Code Search:** Fast in-process AST and trigram search via `./bin/zqk grep` (alias `zgrep`).
-- **Polyglot & Zero-Dependency:** Seamless greenfield initialization across Python, TypeScript, Rust, and Go.
-- **Local-First & Offline-Ready:** Zero cloud dependency required—runs locally with Git and filesystem storage.
-- **Full Traceability:** Every line of code and commit links directly back to project backlog items and requirements.
+| Layer | System Tier | Responsibilities |
+| :--- | :--- | :--- |
+| **Layer 3** | **Domain Workflows & Applications** | Software Engineering Profile, Security Ops Enclaves, Custom Enterprise Swarms |
+| **Layer 2** | **The Kernel Standard Library (Core DNA)** | `Intent` (Objective), `WorkUnit` (BLI), `InvariantGate` (Verification), `LineageNode` (ADR) |
+| **Layer 1** | **Microkernel Runtime Engine** | Graph State Bus, Multi-Plane Isolation (`Draft` vs `Promoted`), Deterministic Scheduler, IPC Protocol |
 
 ---
 
-## ⚙️ How It Works
+## ⚖️ Open-Core Boundary: Single Cell vs. Organism Mesh
 
-ZQK uses the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) to expose your project's knowledge kernel to your AI tools. When you connect Cursor, Claude, or any MCP-compatible agent to ZQK, the agent uses structured tools to discover context, claim tasks, run tests, and verify completion criteria before shipping.
+ZQK follows the classical operating system boundary: **POSIX/Kernel primitives are 100% open-source; distributed multi-tenant mesh clustering and fleet governance are commercial.**
 
----
-
-## 🏗️ Architecture & Development
-
-- **Knowledge Kernel:** Distributed, spec-driven object store backed by content-addressable storage.
-- **Workflow Engine:** Deterministic state machine managing tasks, plans, and peer-agent handoffs.
-- **CLI & MCP Mesh:** Standardized interfaces for seamless human and agent pairing.
-
-### 🚀 Getting Started Guides
-
-- **[Community First-Run Guide](./docs/onboarding/COMMUNITY_FIRST_RUN.md)** — Recommended starting point for all new users and agents.
-- **[First-Run Object Tutorial](./docs/onboarding/FIRST_RUN_OBJECT_TUTORIAL.md)** — Step-by-step tutorial on creating and managing kernel objects.
-- **[Agents on this SKU](./docs/onboarding/AI_AGENT_ONBOARDING.md)** — This tree does not ship the studio process pack.
-- **[Architecture (this SKU)](./docs/architecture/README.md)** — Pointer only. Studio architecture dump is not shipped.
-
-**Onboarding as curriculum (system objects):** Templates live under **[scripts/onboarding_roadmap/README.md](./scripts/onboarding_roadmap/README.md)**. This SKU does **not** ship `make alpha-help` or `zqk-ts`. Scheduler **is** shipped: `./bin/zqk scheduler start|stop|status`.
-
-### Getting started (clean machine golden path)
-
-From an empty project directory, using the binary you built in this repo:
-
-```bash
-/path/to/this-repo/bin/zqk system init --project-name my-project
-/path/to/this-repo/bin/zqk object list
-/path/to/this-repo/bin/zqk workflow whats-next --format json
-```
-
-Expected outcomes:
-
-- `system init` creates `.zqk/` and `.zqk/process/` scaffolding.
-- `object list` succeeds (kinds with rows after a seeded init).
-- `./bin/zqk scheduler start` is optional. First-run CRUD does not require it.
-
-If you run init a second time in the same directory:
-
-- default `zqk system init` returns a clear "already initialized" error with next steps.
-- use `zqk system init --legacy --discover` to inspect/populate an existing project without destructive overwrite.
-- use `zqk system init --force` only when you explicitly want overwrite behavior.
-
-### Docs that exist in this tree
-
-- [Community first-run](./docs/onboarding/COMMUNITY_FIRST_RUN.md)
-- [Quickstart / MCP](./docs/onboarding/QUICKSTART.md)
-- [First-run object tutorial](./docs/onboarding/FIRST_RUN_OBJECT_TUTORIAL.md)
-- [Architecture](./docs/architecture/README.md)
-- [Contributing](./CONTRIBUTING.md)
-- [Security policy](./SECURITY.md)
-
-### License
-
-Open-core / Community: [Apache License 2.0](LICENSE) (see `NOTICE`). Enterprise modules are not in this tree.
+| Dimension | ZQK Core (Open-Source Community) | ZQK Enterprise Mesh (ZQK Studio) |
+| :--- | :--- | :--- |
+| **Scope** | Single Autonomous Cell (Local Kernel) | Multi-Node Mesh Orchestration & Fleet Governance |
+| **State & Engine** | Go microkernel, local hybrid file + graph store, local validation | Cross-cell routing, multi-tenant directory, global trust topology |
+| **Task Lifecycle** | Self-contained task loop, local self-healing, deterministic planes | Fleet-wide apoptotic quarantine, cross-cell task delegation |
+| **Codegen & Specs** | Core DNA schemas, public object parser, manual/template bindings | Proprietary Spec-Driven Codegen Engine, automated AST synthesis |
+| **Governance & Ops** | Single-node CLI dashboard, Git CAS integrity gates | Enterprise RBAC, cross-cell compliance audit trails, global telemetry |
 
 ---
 
-### 📬 Connect & Inquiries
+## 🎁 Core Capabilities
+
+- **Cellular Epistemic Hygiene:** Cryptographic provenance (`parent_hash`, `agent_id`, `signature`) attached to all mutations.
+- **Autonomous Project Awareness:** Agents query the graph to discover objectives, constraints, and architecture without manual prompting.
+- **Native Code Search:** High-performance in-process AST and trigram search via `./bin/zqk grep` (alias `zgrep`).
+- **Local-First & Offline-Ready:** Pure Go with filesystem & embedded graph storage—zero external cloud dependency required.
+- **Deterministic Traceability:** Every commit and diff links back to verified invariants and backlog work units.
+
+---
+
+## 📚 Documentation & Guides
+
+- **[Community First-Run Guide](./docs/onboarding/COMMUNITY_FIRST_RUN.md)** — Recommended starting point for humans and agents.
+- **[First-Run Object Tutorial](./docs/onboarding/FIRST_RUN_OBJECT_TUTORIAL.md)** — Creating and managing kernel objects.
+- **[Quickstart & MCP Setup](./docs/onboarding/QUICKSTART.md)** — Connecting Cursor, Claude Code, and other LLMs.
+- **[Architecture Guide](./docs/architecture/README.md)** — Deep dive into the cellular microkernel architecture.
+- **[Contributing](./CONTRIBUTING.md)** — Development guidelines and PR policies.
+- **[Security Policy](./SECURITY.md)** — Vulnerability reporting and fail-closed security guarantees.
+
+---
+
+## 📬 Connect & Community
 
 - **Website:** [zqkos.com](https://zqkos.com)
 - **Public Contact:** [zqk@zqkos.com](mailto:zqk@zqkos.com)
 - **Schedule a Call:** [Book a ZQK Inquiry](https://calendar.app.google/VhhrKgXqrukr48Kg7)
 - **GitHub:** [zqk-os/zqk](https://github.com/zqk-os/zqk)
+
+---
+
+## 📄 License
+
+Open-Core Community Kernel: [Apache License 2.0](LICENSE) (see `NOTICE`). Enterprise modules and fleet mesh tooling are maintained separately under ZQK Studio (`github.com/zqk-os/zqke`).
