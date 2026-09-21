@@ -1,0 +1,46 @@
+name: Bug report
+description: Something in the community kernel does not match documented behavior.
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for product bugs. Questions about first-run belong in a discussion or the first-run guide.
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected
+      description: What should have happened.
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual
+      description: What happened instead. Include command output when you can.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction
+      description: Smallest steps from a clean clone or `system init` into a temp directory.
+      placeholder: |
+        git clone …
+        make
+        ./bin/zqk system init --project-name demo
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Binary
+      description: Output of `./bin/zqk --version` (or the branded executable name).
+    validations:
+      required: true
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      description: OS, Go version, and whether this was a clone vs installed archive.
