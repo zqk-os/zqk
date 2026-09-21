@@ -335,9 +335,8 @@ func (w *ConfigFileWatcher) SetupDefaultWatchers() {
 		return nil
 	})
 
-	// Register kind mappings config (if reset function exists)
 	w.RegisterFile("kind_mappings_config.yaml", "config_kind_mappings_changed", func() error {
-		// TODO: Add ResetGlobalKindMappingsConfig() if it exists
+		objects.ResetGlobalKindMappingsConfig()
 		return nil
 	})
 

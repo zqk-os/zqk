@@ -148,8 +148,7 @@ func (sb *ScenarioBuilder) copyBootstrapConfigFiles(targetInternalDir string) er
 			return nil
 		},
 		"kind_mappings_config.yaml": func() error {
-			// Reset kind mappings config if it has a reset function
-			// (check if objects package has similar reset)
+			objects.ResetGlobalKindMappingsConfig()
 			return nil
 		},
 		"namespaces_config.yaml": func() error {

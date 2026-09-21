@@ -4,6 +4,7 @@ import (
 	"errors"
 	"maps"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 	"sync"
@@ -84,7 +85,7 @@ type MultiKindConfig struct {
 	Kinds       []string `yaml:"kinds"`
 }
 
-var kindMappings stampmemo.Table[*KindMappingsConfig] // keyed "global"; stamp is the YAML file
+var kindMappings stampmemo.Table[*KindMappingsConfig] // keyed by kind_mappings_config.yaml path (closed set)
 
 func defaultKindMappingsConfig() *KindMappingsConfig {
 	return &KindMappingsConfig{
@@ -97,6 +98,64 @@ func defaultKindMappingsConfig() *KindMappingsConfig {
 	}
 }
 
+func cloneKindMappingsConfig(in *KindMappingsConfig) *KindMappingsConfig {
+	if in == nil {
+		return nil
+	}
+	// Fresh mutex: KindMappingsConfig embeds sync.RWMutex and cannot be value-copied (copylocks).
+	out := &KindMappingsConfig{
+		Version:         in.Version,
+		Description:     in.Description,
+		Backends:        cloneBackendConfigs(in.Backends),
+		SkipDirectories: slices.Clone(in.SkipDirectories),
+		SkipSpecs:       slices.Clone(in.SkipSpecs),
+		InferenceRules: InferenceRules{
+			DirectoryPatterns: slices.Clone(in.InferenceRules.DirectoryPatterns),
+			KindPatterns:      slices.Clone(in.InferenceRules.KindPatterns),
+		},
+		OnDemandKinds:   slices.Clone(in.OnDemandKinds),
+		KindToDirectory: maps.Clone(in.KindToDirectory),
+		DirectoryToKind: maps.Clone(in.DirectoryToKind),
+		MultiKindDirs:   cloneMultiKindDirs(in.MultiKindDirs),
+		currentBackend:  in.currentBackend,
+	}
+	return out
+}
+
+func cloneBackendConfigs(in map[string]BackendConfig) map[string]BackendConfig {
+	if in == nil {
+		return nil
+	}
+	out := make(map[string]BackendConfig, len(in))
+	for k, v := range in {
+		out[k] = BackendConfig{
+			KindToDirectory: maps.Clone(v.KindToDirectory),
+			DirectoryToKind: maps.Clone(v.DirectoryToKind),
+			MultiKindDirs:   cloneMultiKindDirs(v.MultiKindDirs),
+		}
+	}
+	return out
+}
+
+func cloneMultiKindDirs(in map[string]MultiKindConfig) map[string]MultiKindConfig {
+	if in == nil {
+		return nil
+	}
+	out := make(map[string]MultiKindConfig, len(in))
+	for k, v := range in {
+		out[k] = MultiKindConfig{
+			DefaultKind: v.DefaultKind,
+			Kinds:       slices.Clone(v.Kinds),
+		}
+	}
+	return out
+}
+
+// ResetGlobalKindMappingsConfig drops the process-wide kind mappings memo (tests and file watchers).
+func ResetGlobalKindMappingsConfig() {
+	kindMappings.Reset()
+}
+
 // LoadKindMappingsConfig loads the kind mappings configuration from file
 func LoadKindMappingsConfig(configPath string) (*KindMappingsConfig, error) {
 	start := time.Now()
@@ -107,7 +166,6 @@ func LoadKindMappingsConfig(configPath string) (*KindMappingsConfig, error) {
 	}()
 
 	if configPath == emptyValue {
-		// Try to find config file in standard location
 		configPath = findKindMappingsConfig()
 		if configPath == emptyValue {
 			err := errors.New(errConfigNotFound)
@@ -116,23 +174,27 @@ func LoadKindMappingsConfig(configPath string) (*KindMappingsConfig, error) {
 		}
 	}
 
+	cfg, err := kindMappings.Load(configPath, stampmemo.Of(configPath), func() (*KindMappingsConfig, error) {
+		return parseKindMappingsConfigFile(configPath)
+	})
+	if err != nil {
+		return nil, err
+	}
+	return cloneKindMappingsConfig(cfg), nil
+}
+
+func parseKindMappingsConfigFile(configPath string) (*KindMappingsConfig, error) {
 	data, err := fileutil.ReadFile(configPath)
 	if err != nil {
-		err = errfmt.Errorf(errReadConfigFmt, err)
-		metrics.RecordConfigLoad(time.Since(start), err)
-		return nil, err
+		return nil, errfmt.Errorf(errReadConfigFmt, err)
 	}
 
 	var config KindMappingsConfig
 	if err := yaml.Unmarshal(data, &config); err != nil {
-		err = errfmt.Errorf(errParseConfigFmt, err)
-		metrics.RecordConfigLoad(time.Since(start), err)
-		return nil, err
+		return nil, errfmt.Errorf(errParseConfigFmt, err)
 	}
 
-	// Validate and set defaults
 	config.validate()
-
 	return &config, nil
 }
 
@@ -158,17 +220,11 @@ func (c *KindMappingsConfig) validate() {
 	}
 }
 
-// GetGlobalKindMappingsConfig returns the singleton instance of the config
+// GetGlobalKindMappingsConfig returns a clone of the memoized kind mappings config.
 // backendType can be "file", "graph", or "" (defaults to "file" for backward compatibility)
 func GetGlobalKindMappingsConfig(backendType ...string) *KindMappingsConfig {
 	path := findKindMappingsConfig()
-	cfg, err := kindMappings.Load("global", stampmemo.Of(path), func() (*KindMappingsConfig, error) {
-		config, err := LoadKindMappingsConfig(path)
-		if err != nil || config == nil {
-			return defaultKindMappingsConfig(), nil
-		}
-		return config, nil
-	})
+	cfg, err := LoadKindMappingsConfig(path)
 	if err != nil || cfg == nil {
 		cfg = defaultKindMappingsConfig()
 	}

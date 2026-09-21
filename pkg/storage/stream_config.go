@@ -12,6 +12,7 @@
 package storage
 
 import (
+	"maps"
 	"os"
 	"path/filepath"
 	"sort"
@@ -80,10 +81,9 @@ type hvKindMaps struct {
 	all    map[string]bool
 }
 
-var hvKindMemo stampmemo.Table[hvKindMaps] // keyed "global"; stamp is high_volume_kinds.yaml
+var hvKindMemo stampmemo.Table[hvKindMaps] // keyed by high_volume_kinds.yaml path (closed set)
 
-func loadHighVolumeKindMaps() (stream map[string]bool, all map[string]bool) {
-	configPath := findHighVolumeKindsConfig()
+func loadHighVolumeKindMapsFrom(configPath string) (stream map[string]bool, all map[string]bool) {
 	if configPath == emptyValue {
 		return streamStorageKindsDefault, highVolumeKindsDefault
 	}
@@ -115,13 +115,20 @@ func loadHighVolumeKindMaps() (stream map[string]bool, all map[string]bool) {
 	return stream, all
 }
 
-func loadMemoizedHighVolumeKindMaps() hvKindMaps {
-	path := findHighVolumeKindsConfig()
-	maps, _ := hvKindMemo.Load("global", stampmemo.Of(path), func() (hvKindMaps, error) {
-		stream, all := loadHighVolumeKindMaps()
+func loadHighVolumeKindMaps() (stream map[string]bool, all map[string]bool) {
+	return loadHighVolumeKindMapsFrom(findHighVolumeKindsConfig())
+}
+
+func memoizedHighVolumeKindMaps(path string) hvKindMaps {
+	cached, _ := hvKindMemo.Load(path, stampmemo.Of(path), func() (hvKindMaps, error) {
+		stream, all := loadHighVolumeKindMapsFrom(path)
 		return hvKindMaps{stream: stream, all: all}, nil
 	})
-	return maps
+	return hvKindMaps{stream: maps.Clone(cached.stream), all: maps.Clone(cached.all)}
+}
+
+func loadMemoizedHighVolumeKindMaps() hvKindMaps {
+	return memoizedHighVolumeKindMaps(findHighVolumeKindsConfig())
 }
 
 func getStreamStorageEnabledKinds() map[string]bool {
