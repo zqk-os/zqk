@@ -47,7 +47,6 @@ func TestOfflineQueuingForLifecycleEvents(t *testing.T) {
 kind: backlog_item
 title: Test Backlog Item
 description: A test backlog item description that is long enough to pass CAS boundary validation.
-status: exploring
 problem_statement: This is a valid problem statement of sufficient length for validation.
 acceptance_considerations: Narrative only; gates are criteria_refs.
 goal_refs:
@@ -141,8 +140,8 @@ goal_refs:
 	for _, req := range requests {
 		if req.IsLifecycleTrigger &&
 			req.LifecycleKind == "backlog_item" &&
-			req.LifecycleFrom == "exploring" &&
-			req.LifecycleTo == "validated" {
+			req.LifecycleFrom == "conceptual" &&
+			req.LifecycleTo == "originated" {
 			found = true
 			bliID, _ := req.LifecycleData[objects.FieldKeyID].(string)
 			if bliID != "BLI-1234567890123456000-abcdef12" {
@@ -153,7 +152,7 @@ goal_refs:
 	}
 
 	if !found {
-		t.Errorf("Expected lifecycle trigger request (exploring -> validated) not found in queue: %+v", requests)
+		t.Errorf("Expected lifecycle trigger request (conceptual -> originated) not found in queue: %+v", requests)
 	}
 
 	// 5. Start the scheduler daemon (hard lifetime bound + Cleanup stop --force) and verify drain.

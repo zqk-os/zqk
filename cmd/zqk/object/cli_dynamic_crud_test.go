@@ -71,7 +71,6 @@ func TestDynamicCLICreate(t *testing.T) {
 				objects.FieldKeyID:            testID,
 				objects.FieldKeyKind:          kind,
 				objects.FieldKeyTitle:         fmt.Sprintf("Test %s", kind),
-				objects.FieldKeyStatus:        getInitialStatus(kind),
 				objects.FieldKeySchemaVersion: objectSchemaV2,
 			}
 

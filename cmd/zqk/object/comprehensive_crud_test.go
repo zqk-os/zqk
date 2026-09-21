@@ -16,9 +16,10 @@ func TestAllKindsCRUD(t *testing.T) {
 	if testing.Short() {
 		t.Skip("comprehensive all-kinds CRUD is slow (many kinds × CLI); run without -short")
 	}
+	testEnv := SetupTestEnvironment(t)
 	fieldRegistry := objects.GetGlobalFieldRegistry()
-	if err := fieldRegistry.LoadFields(); err != nil {
-		t.Fatalf("failed to load field registry: %v", err)
+	if err := fieldRegistry.Reload(); err != nil {
+		t.Fatalf("failed to reload field registry: %v", err)
 	}
 	kinds, err := fieldRegistry.GetAllKinds()
 	if err != nil {
@@ -29,8 +30,6 @@ func TestAllKindsCRUD(t *testing.T) {
 	}
 	ctx := pkgctx.NewSystemContext()
 	secCtx := pkgctx.NewSystemSecurityContext()
-
-	testEnv := SetupTestEnvironment(t)
 
 	RunComprehensiveKindTests(t, kinds, func(t *testing.T, kind string) {
 		testKindCRUD(t, testEnv, ctx, secCtx, kind, fieldRegistry)

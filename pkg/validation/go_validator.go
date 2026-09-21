@@ -1268,12 +1268,35 @@ func (gv *GoValidator) checkBranchNameIsAncestorOfTrunk(obj map[string]any, opti
 	return gitevidence.ValidateBranchAncestorOfTrunk(root, branchName) == nil
 }
 
+func isStandardMetadataField(key string) bool {
+	switch key {
+	case objects.FieldKeyID,
+		objects.FieldKeyKind,
+		objects.FieldKeySchemaVersion,
+		objects.FieldKeyCreatedAt,
+		objects.FieldKeyCreatedBy,
+		objects.FieldKeyUpdatedAt,
+		objects.FieldKeyUpdatedBy,
+		objects.FieldKeyNamespaceID,
+		"version_context":
+		return true
+	default:
+		return false
+	}
+}
+
 func (gv *GoValidator) validateUnknownFields(kind string, obj map[string]any, spec *objects.Spec) []ValidationError {
 	if spec == nil || spec.ResolvedFields == nil {
 		return nil
 	}
 	var errs []ValidationError
-	for key := range obj {
+	for key, val := range obj {
+		if isStandardMetadataField(key) {
+			continue
+		}
+		if val == nil || val == "<UNSET>" || reflect.TypeOf(val).Name() == "fieldUnsetMarker" {
+			continue
+		}
 		if _, ok := spec.ResolvedFields[key]; !ok {
 			if objects.IsCompositionFieldAllowed(kind, key, spec) {
 				continue

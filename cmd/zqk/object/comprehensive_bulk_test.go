@@ -14,9 +14,10 @@ func TestAllKindsBulkOperations(t *testing.T) {
 	if testing.Short() {
 		t.Skip("comprehensive all-kinds bulk ops is slow; run without -short")
 	}
+	tmpDir, cliBinary := setupCLITestEnvironmentForComprehensive(t)
 	fieldRegistry := objects.GetGlobalFieldRegistry()
-	if err := fieldRegistry.LoadFields(); err != nil {
-		t.Fatalf("failed to load field registry: %v", err)
+	if err := fieldRegistry.Reload(); err != nil {
+		t.Fatalf("failed to reload field registry: %v", err)
 	}
 
 	kinds, err := fieldRegistry.GetAllKinds()
@@ -29,7 +30,6 @@ func TestAllKindsBulkOperations(t *testing.T) {
 
 	ctx := pkgctx.NewSystemContext()
 	secCtx := pkgctx.NewSystemSecurityContext()
-	tmpDir, cliBinary := setupCLITestEnvironmentForComprehensive(t)
 
 	RunComprehensiveKindTests(t, kinds, func(t *testing.T, kind string) {
 		if kind == "zqk_session" {

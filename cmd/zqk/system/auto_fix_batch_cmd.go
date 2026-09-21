@@ -93,10 +93,13 @@ const (
 	autoFixMetricStatusImplemented    = "implemented"
 	autoFixTraceStatusFixedPrepared   = "fixed_prepared"
 	autoFixTraceStatusSkippedNoChange = "skipped_no_change"
-	autoFixGlossarySpecsDir           = paths.ProcessInternalObjectSpecsDir
-	autoFixGlossaryLifeDir            = paths.ProcessInternalLifecyclesDir
-	autoFixGlossaryConfigDir          = paths.ProcessInternalConfigsDir
 	autoFixProcessingLockFile         = "autofix-processing.lock"
+)
+
+var (
+	autoFixGlossarySpecsDir  = paths.ProcessInternalObjectSpecsDir
+	autoFixGlossaryLifeDir   = paths.ProcessInternalLifecyclesDir
+	autoFixGlossaryConfigDir = paths.ProcessInternalConfigsDir
 )
 
 // NewAutoFixProcessPendingCmd creates the auto-fix-process-pending command (process all AUTOFIX-*.json in .zqk/autofix/).

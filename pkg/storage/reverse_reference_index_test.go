@@ -125,6 +125,33 @@ func TestReverseReferenceIndex_LoadSaveRoundTrip(t *testing.T) {
 	}
 }
 
+// TestReverseReferenceIndex_LoadCache_ProjectRootEquivalence tests LoadCache with equivalent relative/clean paths.
+func TestReverseReferenceIndex_LoadCache_ProjectRootEquivalence(t *testing.T) {
+	tmpDir := t.TempDir()
+	index := NewReverseReferenceIndex()
+	index.AddReference("BLI-101", "PRI-202")
+
+	if err := index.SaveCache(tmpDir); err != nil {
+		t.Fatalf("SaveCache: %v", err)
+	}
+
+	// Load with equivalent path (trailing slash and dot component)
+	equivPath := filepath.Join(tmpDir, "sub", "..") + string(filepath.Separator)
+	index2 := NewReverseReferenceIndex()
+	loaded, err := index2.LoadCache(equivPath)
+	if err != nil {
+		t.Fatalf("LoadCache: %v", err)
+	}
+	if !loaded {
+		t.Fatal("LoadCache returned false for equivalent project root path")
+	}
+
+	deps := index2.GetDependents("PRI-202")
+	if len(deps) != 1 || deps[0] != "BLI-101" {
+		t.Errorf("expected [BLI-101], got %v", deps)
+	}
+}
+
 // TestReverseReferenceIndex_BuildFromScan tests BuildFromScan with YAML files containing _ref fields.
 func TestReverseReferenceIndex_BuildFromScan(t *testing.T) {
 	tmpDir := t.TempDir()

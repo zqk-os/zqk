@@ -220,6 +220,9 @@ func EvaluatePhiLead(plans []*PlanNode, targetPersonaIDs []string) (*PlanNode, [
 
 	var matched []*PlanNode
 	for _, p := range plans {
+		if strings.TrimSpace(p.Title) == "" {
+			continue
+		}
 		if !objects.PlanStatusEligibleForWhatsNext(objects.KindPriorityPlan, p.Status) {
 			continue
 		}
@@ -597,6 +600,9 @@ func (v *WhatsNextMaterializedView) BuildPayloadLocked() *WhatsNextLitePayload {
 
 	activePlans := make([]WhatsNextPriorityPlan, 0, len(ranked))
 	for _, p := range ranked {
+		if strings.TrimSpace(p.Title) == "" {
+			continue
+		}
 		activePlans = append(activePlans, WhatsNextPriorityPlan{
 			ID:     p.ID,
 			Title:  p.Title,

@@ -72,9 +72,14 @@ def generate_markdown(title, packages, files, total_stmts, covered_stmts):
     total_pct = (covered_stmts / total_stmts * 100.0) if total_stmts else 0.0
     circle, label = status_indicator(total_pct)
 
+    high_pkgs = sum(1 for _, (tot, cov) in packages.items() if (cov / tot * 100.0 if tot else 0.0) >= 80.0)
+    med_pkgs = sum(1 for _, (tot, cov) in packages.items() if 50.0 <= (cov / tot * 100.0 if tot else 0.0) < 80.0)
+    low_pkgs = sum(1 for _, (tot, cov) in packages.items() if (cov / tot * 100.0 if tot else 0.0) < 50.0)
+
     lines = []
     lines.append(f"### {title}")
-    lines.append(f"**Total Coverage:** `{total_pct:.1f}%` ({covered_stmts}/{total_stmts} statements) &nbsp; {circle} {label}\n")
+    lines.append(f"**Total Statement Coverage:** `{total_pct:.1f}%` ({covered_stmts}/{total_stmts} statements) &nbsp; {circle} {label}")
+    lines.append(f"**Package Distribution:** {len(packages)} total &nbsp;|&nbsp; 🟢 High (≥80%): {high_pkgs} &nbsp;|&nbsp; 🟡 Medium (50–79%): {med_pkgs} &nbsp;|&nbsp; 🔴 Low (<50%): {low_pkgs}\n")
     lines.append("| Package | Statements | Covered | Coverage | Status | Level |")
     lines.append("| :--- | :---: | :---: | :---: | :---: | :---: |")
 

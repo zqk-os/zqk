@@ -154,10 +154,14 @@ func ClassifyPath(path string) PathClass {
 		return ClassOther
 	}
 	clean := filepath.ToSlash(path)
-	if strings.Contains(clean, "/.zqk/process") || strings.HasPrefix(clean, ".zqk/process") {
+	pDataDir := projectDataDirName()
+	if strings.Contains(clean, "/"+pDataDir+"/process") || strings.HasPrefix(clean, pDataDir+"/process") ||
+		strings.Contains(clean, "/.zqk/process") || strings.HasPrefix(clean, ".zqk/process") {
 		return ClassProcess
 	}
-	if strings.Contains(clean, "/.zqk-state") || strings.HasPrefix(clean, ".zqk-state") ||
+	if strings.Contains(clean, "/"+pDataDir+"-state") || strings.HasPrefix(clean, pDataDir+"-state") ||
+		strings.Contains(clean, "/"+pDataDir+"/state") || strings.HasPrefix(clean, pDataDir+"/state") ||
+		strings.Contains(clean, "/.zqk-state") || strings.HasPrefix(clean, ".zqk-state") ||
 		strings.Contains(clean, "/.zqk/state") || strings.HasPrefix(clean, ".zqk/state") {
 		return ClassState
 	}

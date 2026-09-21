@@ -54,7 +54,6 @@ func TestCreateWithForce(t *testing.T) {
 		objects.FieldKeyID:            testID,
 		objects.FieldKeyKind:          pplanKindBacklogItem,
 		objects.FieldKeyTitle:         "Updated Title",
-		objects.FieldKeyStatus:        objects.ObjectStatusValidated,
 		objects.FieldKeyGoalRefs:      []string{"G-123"},
 		objects.FieldKeySchemaVersion: objectSchemaV2,
 	}

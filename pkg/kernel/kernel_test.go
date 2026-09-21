@@ -34,6 +34,14 @@ func (m *MockMCPServer) ListTools(ctx context.Context) (*mcp.ToolsListResult, er
 // MockStorage implements storage.ObjectStorageProvider for testing
 type MockStorage struct {
 	storage.ObjectStorageProvider
+	ShutdownFunc func(ctx context.Context) error
+}
+
+func (m *MockStorage) Shutdown(ctx context.Context) error {
+	if m.ShutdownFunc != nil {
+		return m.ShutdownFunc(ctx)
+	}
+	return nil
 }
 
 func TestKernel_ExecuteMCPTool(t *testing.T) {
@@ -94,3 +102,63 @@ func TestKernel_ListMCPTools(t *testing.T) {
 		t.Errorf("unexpected tools: %+v", res.Tools)
 	}
 }
+
+type testExtension struct {
+	name        string
+	initCalled  bool
+	closeCalled bool
+}
+
+func (e *testExtension) Name() string { return e.name }
+func (e *testExtension) Init(ctx context.Context, k kernel.KnowledgeKernel) error {
+	e.initCalled = true
+	return nil
+}
+func (e *testExtension) Shutdown(ctx context.Context) error {
+	e.closeCalled = true
+	return nil
+}
+
+func TestKernel_ExtensionLifecycle(t *testing.T) {
+	mockServer := &MockMCPServer{}
+	mockStorage := &MockStorage{}
+
+	k := kernel.NewKernelWithOptions(mockStorage, mockServer, "/test/workspace")
+	if k.ProjectRoot() != "/test/workspace" {
+		t.Errorf("expected project root /test/workspace, got %s", k.ProjectRoot())
+	}
+
+	ext := &testExtension{name: "studio-plugin"}
+	if err := k.RegisterExtension(ext); err != nil {
+		t.Fatalf("RegisterExtension failed: %v", err)
+	}
+	if !ext.initCalled {
+		t.Error("expected Init to be called on RegisterExtension")
+	}
+
+	// Duplicate registration must fail
+	if err := k.RegisterExtension(ext); err == nil {
+		t.Error("expected error on duplicate registration, got nil")
+	}
+
+	// Lookup
+	retrieved, ok := k.GetExtension("studio-plugin")
+	if !ok || retrieved != ext {
+		t.Errorf("expected to retrieve extension, got %v, ok=%v", retrieved, ok)
+	}
+
+	// List
+	names := k.ListExtensions()
+	if len(names) != 1 || names[0] != "studio-plugin" {
+		t.Errorf("expected [studio-plugin], got %v", names)
+	}
+
+	// Shutdown
+	if err := k.Shutdown(context.Background()); err != nil {
+		t.Fatalf("Shutdown failed: %v", err)
+	}
+	if !ext.closeCalled {
+		t.Error("expected Shutdown to be called on extension")
+	}
+}
+

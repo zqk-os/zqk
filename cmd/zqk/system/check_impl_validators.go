@@ -97,6 +97,7 @@ func checkInstanceValidationWithValidatorAndData(ctx *cli.Context, stdCtx stdcon
 	// Resolve storageProvider early for lookup
 	projectRoot := ctx.ProjectRoot
 	projectRoot = ProjectRootOrResolve(projectRoot)
+	storage.BindReverseReferenceIndexProjectRoot(projectRoot)
 	if storageProvider == nil {
 		storageProvider = getStorageProviderForCache(projectRoot)
 	}

@@ -85,7 +85,77 @@ func normalizeHumanLogMessage(payload string) string {
 		}
 		msgWords = append(msgWords, w)
 	}
-	return strings.TrimSpace(strings.Join(msgWords, " "))
+	msg := strings.TrimSpace(strings.Join(msgWords, " "))
+
+	// Disambiguate generic log prefixes using structured attributes.
+	if isGenericLogMessage(msg) {
+		errVal := extractLogField(payload, "error")
+		jobID := extractLogField(payload, "job_id")
+		switch {
+		case jobID != "" && errVal != "":
+			msg = jobID + ": " + errVal
+		case errVal != "":
+			msg = errVal
+		case jobID != "":
+			msg = jobID + " failed"
+		}
+	}
+
+	if len(msg) > 120 {
+		msg = msg[:117] + "..."
+	}
+	return msg
+}
+
+func isGenericLogMessage(msg string) bool {
+	switch msg {
+	case "Operation failed", "Command execution failed", "scheduler_job_execution", "system_check", "":
+		return true
+	default:
+		return false
+	}
+}
+
+func extractLogField(payload, key string) string {
+	target := key + "="
+	idx := strings.Index(payload, target)
+	if idx == -1 {
+		return ""
+	}
+	val := payload[idx+len(target):]
+	if len(val) == 0 {
+		return ""
+	}
+	if val[0] == '"' {
+		end := strings.Index(val[1:], "\"")
+		if end != -1 {
+			return val[1 : end+1]
+		}
+		return strings.Trim(val, "\"")
+	}
+	words := strings.Split(val, " ")
+	var resultWords []string
+	for _, w := range words {
+		if isLogKeyWord(w) {
+			break
+		}
+		resultWords = append(resultWords, w)
+	}
+	return strings.TrimSpace(strings.Join(resultWords, " "))
+}
+
+func isLogKeyWord(w string) bool {
+	eq := strings.Index(w, "=")
+	if eq <= 0 {
+		return false
+	}
+	key := w[:eq]
+	for _, ch := range key {
+		if !(ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0' && ch <= '9' || ch == '_' || ch == '-') {
+			return false
+		}
+	}
+	return true
 }
 
 func rankClusters(counts map[string]int, limit int) []IssueCluster {

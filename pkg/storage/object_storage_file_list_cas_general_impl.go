@@ -60,25 +60,48 @@ func (f *FileObjectStorage) listCASPathGeneral(ctx context.Context, secCtx *pkgc
 			idSet[id] = true
 		}
 	} else {
+		refFilterIDs := crud.ReferenceValuesFromListFilter(filter.Filters)
+		if len(refFilterIDs) > 0 && f.projectRoot != emptyValue {
+			ensureReverseReferenceIndexLoaded(f.projectRoot)
+		}
+		revIndex := GetGlobalReverseReferenceIndex()
+		var candidateRefIDs map[string]bool
+		if len(refFilterIDs) > 0 && revIndex != nil && revIndex.IsReady() {
+			candidateRefIDs = make(map[string]bool)
+			for _, refID := range refFilterIDs {
+				for _, depID := range revIndex.GetDependents(refID) {
+					candidateRefIDs[depID] = true
+				}
+			}
+		}
+
 		for _, id := range casIDs {
-			idSet[id] = true
+			if candidateRefIDs == nil || candidateRefIDs[id] {
+				idSet[id] = true
+			}
 		}
 		if !StreamStorageEnabledForKind(filter.Kind) && len(casIDs) == 0 {
 			when.When(func() bool { return f.usesBucketedStorage(filter.Kind, kindDir) }).Then(func() {
 				idToPath = f.ScanIDBasedFilesRecursive(kindDir, filter.Kind)
 				for id := range idToPath {
-					idSet[id] = true
+					if candidateRefIDs == nil || candidateRefIDs[id] {
+						idSet[id] = true
+					}
 				}
 			}).OrElse(func() {
 				idBasedFiles := f.scanIDBasedFiles(kindDir, filter.Kind)
 				for _, id := range idBasedFiles {
-					idSet[id] = true
+					if candidateRefIDs == nil || candidateRefIDs[id] {
+						idSet[id] = true
+					}
 				}
 			}).Run()
 		}
 		if StreamStorageEnabledForKind(filter.Kind) {
 			for _, id := range f.listStreamIDsForKind(filter.Kind) {
-				idSet[id] = true
+				if candidateRefIDs == nil || candidateRefIDs[id] {
+					idSet[id] = true
+				}
 			}
 		}
 		// Draft-plane IDs are intentionally omitted from normal List: only objects that

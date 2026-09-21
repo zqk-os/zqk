@@ -350,7 +350,7 @@ func seedReferenceAccountViaCLI(t *testing.T, cliBinary, testRoot string) {
 	if err := fileutil.WriteFile(tmpFile, data, paths.FilePerm644); err != nil { //nolint:gosec // test temp file
 		t.Fatalf("seed ref account write: %v", err)
 	}
-	cmd := execwrap.Command(cliBinary, cliNounObject, cliVerbCreate, objects.KindAccount, cliFlagFile, tmpFile, "--relaxed", "--force")
+	cmd := execwrap.Command(cliBinary, cliNounObject, cliVerbCreate, objects.KindAccount, cliFlagFile, tmpFile, "--relaxed", "--force", "--promote")
 	wireExecForTest(cmd, testRoot)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
@@ -385,7 +385,7 @@ func seedReferencePolicyForTests(t *testing.T, testRoot string) {
 	}
 	defer func() { _ = fs.Shutdown(context.Background()) }()
 	policyObj := map[string]any{
-		objects.FieldKeyID:            "POL-EXAMPLE-001",
+		objects.FieldKeyID:            "POL-CODE-001",
 		objects.FieldKeyKind:          objects.KindPolicy,
 		objects.FieldKeyTitle:         "Reference policy for metric tests",
 		objects.FieldKeyBody:          "Test policy body for code quality metric tests.",
@@ -1820,7 +1820,7 @@ func setKindSpecificFieldsForCLIExtended(obj map[string]any, kind string, index 
 		setBaseMetricTimeAndType(obj, index)
 		obj[objects.FieldKeyMetricType] = cliMetricTypeSystem
 		obj[objects.FieldKeyMetricCategory] = "compliance"
-		obj[objects.FieldKeyPolicyRef] = "POL-EXAMPLE-001"
+		obj[objects.FieldKeyPolicyRef] = "POL-CODE-001"
 		obj[objects.FieldKeyMeasurementPeriod] = "daily"
 	case objects.KindDepartment:
 		obj[objects.FieldKeyDepartmentName] = fmt.Sprintf("Dept%d", index+1)
