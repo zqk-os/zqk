@@ -43,6 +43,32 @@ func TestOf_missingIsZero(t *testing.T) {
 	}
 }
 
+func TestTable_PeekSkipsLoadAndInFlight(t *testing.T) {
+	var tab Table[string]
+	loads := 0
+	load := func() (string, error) {
+		loads++
+		return "v", nil
+	}
+	if _, ok := tab.Peek("k", 1); ok {
+		t.Fatal("empty table must miss")
+	}
+	got, err := tab.Load("k", 1, load)
+	if err != nil || got != "v" || loads != 1 {
+		t.Fatalf("load: got=%q loads=%d err=%v", got, loads, err)
+	}
+	peeked, ok := tab.Peek("k", 1)
+	if !ok || peeked != "v" || loads != 1 {
+		t.Fatalf("peek hit: got=%q ok=%v loads=%d", peeked, ok, loads)
+	}
+	if _, ok := tab.Peek("k", 2); ok {
+		t.Fatal("peek at new stamp must miss without loading")
+	}
+	if loads != 1 {
+		t.Fatalf("peek must not load, loads=%d", loads)
+	}
+}
+
 func TestTable_ResetDropsMemo(t *testing.T) {
 	var loads int
 	var tab Table[string]

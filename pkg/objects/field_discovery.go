@@ -4,10 +4,8 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/zqk-os/zqk/pkg/concurrency"
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -29,15 +27,18 @@ type FieldInfo struct {
 
 // FieldRegistry provides cached field information for all object kinds.
 // Preferred pattern (CLI_PERFORMANCE §2): load once (PrewarmGlobalsForProjectRoot, in background),
-// cache here (singleton, fr.loaded + fr.cache), hot path uses GetFieldsForKindIfLoaded so it never blocks on LoadFields.
-// It identifies common fields (inherited) vs specialized fields per kind
+// memo via stampmemo keyed by specs dir / SpecCacheRevision. Hot path uses
+// GetFieldsForKindIfLoaded (Peek — never waits on LoadFields).
 type FieldRegistry struct {
-	specLoader   *SpecLoader
-	cache        map[string]*KindFields // kind -> field information
-	commonFields []FieldInfo            // Fields common to all objects
-	mu           sync.RWMutex
-	loaded       bool
+	specLoader *SpecLoader
 }
+
+type fieldRegistrySnapshot struct {
+	cache        map[string]*KindFields
+	commonFields []FieldInfo
+}
+
+var fieldRegistryMemos stampmemo.Table[fieldRegistrySnapshot]
 
 // KindFields contains field information for a specific object kind
 type KindFields struct {
@@ -49,38 +50,48 @@ type KindFields struct {
 
 // NewFieldRegistry creates a new field registry
 func NewFieldRegistry(specLoader *SpecLoader) *FieldRegistry {
-	return &FieldRegistry{
-		specLoader:   specLoader,
-		cache:        make(map[string]*KindFields),
-		commonFields: []FieldInfo{},
+	return &FieldRegistry{specLoader: specLoader}
+}
+
+func (fr *FieldRegistry) memoKey() string {
+	if fr == nil {
+		return findSpecsDir()
 	}
+	if fr.specLoader != nil && fr.specLoader.specsDir != emptyValue {
+		return fr.specLoader.specsDir
+	}
+	return findSpecsDir()
+}
+
+func (fr *FieldRegistry) memoStamp() stampmemo.Stamp {
+	if fr != nil && fr.specLoader != nil {
+		return stampmemo.Stamp(fr.specLoader.SpecCacheRevision())
+	}
+	return 0
+}
+
+func (fr *FieldRegistry) snapshot() (fieldRegistrySnapshot, bool) {
+	return fieldRegistryMemos.Peek(fr.memoKey(), fr.memoStamp())
 }
 
 // LoadFields loads and caches field information for all object kinds
 // Identifies common fields (from base_object, auditable) and specialized fields
 func (fr *FieldRegistry) LoadFields() error {
-	var alreadyLoaded bool
-	err := concurrency.RunInLockWithLogger(
-		&fr.mu, LockNameFieldRegistryLoadCheck, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
-		func() error {
-			alreadyLoaded = fr.loaded
-			return nil
-		},
-	)
+	_, err := fieldRegistryMemos.Load(fr.memoKey(), fr.memoStamp(), fr.readFields)
 	if err != nil {
-		return err
+		fieldRegistryMemos.Delete(fr.memoKey())
 	}
+	return err
+}
 
-	if alreadyLoaded {
-		return nil // Already loaded
-	}
-
-	// Note: commonFields will be built during processing, no need to copy-out
-
+func (fr *FieldRegistry) readFields() (fieldRegistrySnapshot, error) {
 	// First, identify common fields from base_object and auditable (I/O outside lock).
 	// Use fr.specLoader; if it fails (e.g. created before ZQK_TEST_ROOT was set), retry with
 	// a loader from findSpecsDir() so tests and subprocesses that set ZQK_TEST_ROOT late still work.
 	loader := fr.specLoader
+	if loader == nil {
+		loader = NewSpecLoader(findSpecsDir())
+	}
 	baseSpec, err := loader.LoadSpecWithInheritance("base_object.yaml")
 	if err != nil {
 		if specsDir := findSpecsDir(); specsDir != emptyValue {
@@ -88,7 +99,7 @@ func (fr *FieldRegistry) LoadFields() error {
 			baseSpec, err = loader.LoadSpecWithInheritance("base_object.yaml")
 		}
 		if err != nil {
-			return errfmt.Newf("failed to load base_object spec").Wrap(err)
+			return fieldRegistrySnapshot{}, errfmt.Newf("failed to load base_object spec").Wrap(err)
 		}
 	}
 
@@ -140,17 +151,17 @@ func (fr *FieldRegistry) LoadFields() error {
 	// Discover all spec files dynamically by scanning the specs directory
 	specsDir := findSpecsDir()
 	if specsDir == emptyValue {
-		return errfmt.Errorf("could not find specs directory")
+		return fieldRegistrySnapshot{}, errfmt.Errorf("could not find specs directory")
 	}
 
 	// Verify directory exists
 	if _, err := fileutil.Stat(specsDir); err != nil {
-		return errfmt.Newf("failed to read specs directory").Wrap(err)
+		return fieldRegistrySnapshot{}, errfmt.Newf("failed to read specs directory").Wrap(err)
 	}
 
 	ontologies, err := loader.DiscoverOntologies()
 	if err != nil {
-		return errfmt.Newf("failed to discover ontologies").Wrap(err)
+		return fieldRegistrySnapshot{}, errfmt.Newf("failed to discover ontologies").Wrap(err)
 	}
 
 	// Build cache outside lock (copy-out/process pattern)
@@ -266,43 +277,19 @@ func (fr *FieldRegistry) LoadFields() error {
 		cache[kind] = kindFields
 	}
 
-	// Copy-in: Update cache with lock
-	err = concurrency.RunInLockWithLogger(
-		&fr.mu, LockNameFieldRegistryLoadUpdate, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
-		func() error {
-			// Double-check after re-acquiring lock
-			if fr.loaded {
-				return nil
-			}
-			// Update cache and commonFields
-			fr.commonFields = commonFields
-			for k, v := range cache {
-				fr.cache[k] = v
-			}
-			fr.loaded = true
-			return nil
-		},
-	)
-	return err
+	return fieldRegistrySnapshot{cache: cache, commonFields: commonFields}, nil
 }
 
 // GetFieldsForKindIfLoaded returns field info for kind only if the registry is already loaded.
 // Does not call LoadFields(). Use on hot paths (e.g. object update, create) to avoid loading
 // all 83 specs and spiking memory/latency (PRE_CHANGE_CHECKLIST §3).
 func (fr *FieldRegistry) GetFieldsForKindIfLoaded(kind string) (*KindFields, bool) {
-	var loaded bool
-	var kindFields *KindFields
-	var exists bool
-	_ = concurrency.RunInRLock(&fr.mu, func() error {
-		loaded = fr.loaded
-		if loaded {
-			var ok bool
-			kindFields, ok = fr.cache[kind]
-			exists = ok
-		}
-		return nil
-	})
-	if !loaded || !exists {
+	snap, ok := fr.snapshot()
+	if !ok {
+		return nil, false
+	}
+	kindFields, exists := snap.cache[kind]
+	if !exists {
 		return nil, false
 	}
 	return kindFields, true
@@ -310,35 +297,19 @@ func (fr *FieldRegistry) GetFieldsForKindIfLoaded(kind string) (*KindFields, boo
 
 // GetFieldsForKind returns field information for a specific object kind
 // Returns all fields (common + specialized), sorted by name.
-// Uses RunInRLock (no logger in critical section) to avoid lock-order deadlock with
-// logging when many goroutines call this (e.g. template generation under contention).
 // NOTE: Call GetFieldsForKindIfLoaded on create/update hot path to avoid LoadFields().
 func (fr *FieldRegistry) GetFieldsForKind(kind string) (*KindFields, error) {
-	var loaded bool
-	_ = concurrency.RunInRLock(&fr.mu, func() error {
-		loaded = fr.loaded
-		return nil
-	})
-
-	if !loaded {
-		if err := fr.LoadFields(); err != nil {
-			return nil, err
-		}
+	if err := fr.LoadFields(); err != nil {
+		return nil, err
 	}
-
-	var kindFields *KindFields
-	var exists bool
-	_ = concurrency.RunInRLock(&fr.mu, func() error {
-		var ok bool
-		kindFields, ok = fr.cache[kind]
-		exists = ok
-		return nil
-	})
-
+	snap, ok := fr.snapshot()
+	if !ok {
+		return nil, errfmt.Errorf("unknown object kind: %s", kind)
+	}
+	kindFields, exists := snap.cache[kind]
 	if !exists {
 		return nil, errfmt.Errorf("unknown object kind: %s", kind)
 	}
-
 	return kindFields, nil
 }
 
@@ -350,97 +321,45 @@ func (fr *FieldRegistry) TryReloadFromFindSpecsDir() bool {
 	if specsDir == emptyValue {
 		return false
 	}
-	_ = concurrency.RunInLockWithLogger(
-		&fr.mu, LockNameFieldRegistryTryReload, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
-		func() error {
-			fr.specLoader = NewSpecLoader(specsDir)
-			fr.loaded = false
-			fr.cache = make(map[string]*KindFields)
-			fr.commonFields = nil
-			return nil
-		},
-	)
+	fieldRegistryMemos.Delete(fr.memoKey())
+	fr.specLoader = NewSpecLoader(specsDir)
 	return true
 }
 
 // GetAllKinds returns a list of all object kinds that have field information
 func (fr *FieldRegistry) GetAllKinds() ([]string, error) {
-	var loaded bool
-	_ = concurrency.RunInRLockWithLogger(
-		&fr.mu, LockNameFieldRegistryGetAllCheckLoaded, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
-		func() error {
-			loaded = fr.loaded
-			return nil
-		},
-	)
-
-	if !loaded {
-		if err := fr.LoadFields(); err != nil {
-			return nil, err
-		}
+	if err := fr.LoadFields(); err != nil {
+		return nil, err
 	}
-
-	var kinds []string
-	_ = concurrency.RunInRLockWithLogger(
-		&fr.mu, LockNameFieldRegistryGetAllCopy, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
-		func() error {
-			kinds = make([]string, 0, len(fr.cache))
-			for kind := range fr.cache {
-				kinds = append(kinds, kind)
-			}
-			return nil
-		},
-	)
+	snap, ok := fr.snapshot()
+	if !ok {
+		return nil, nil
+	}
+	kinds := make([]string, 0, len(snap.cache))
+	for kind := range snap.cache {
+		kinds = append(kinds, kind)
+	}
 	sort.Strings(kinds)
 	return kinds, nil
 }
 
 // GetCommonFields returns fields common to all object kinds
 func (fr *FieldRegistry) GetCommonFields() ([]FieldInfo, error) {
-	var loaded bool
-	_ = concurrency.RunInRLockWithLogger(
-		&fr.mu, LockNameFieldDiscoveryGetCommonCheckLoaded, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
-		func() error {
-			loaded = fr.loaded
-			return nil
-		},
-	)
-
-	if !loaded {
-		if err := fr.LoadFields(); err != nil {
-			return nil, err
-		}
+	if err := fr.LoadFields(); err != nil {
+		return nil, err
 	}
-
-	var commonFields []FieldInfo
-	_ = concurrency.RunInRLockWithLogger(
-		&fr.mu, LockNameFieldDiscoveryGetCommonCopy, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
-		func() error {
-			// Return a copy to prevent external modification
-			commonFields = make([]FieldInfo, len(fr.commonFields))
-			copy(commonFields, fr.commonFields)
-			return nil
-		},
-	)
+	snap, ok := fr.snapshot()
+	if !ok {
+		return nil, nil
+	}
+	commonFields := make([]FieldInfo, len(snap.commonFields))
+	copy(commonFields, snap.commonFields)
 	return commonFields, nil
 }
 
-// Reload clears the cache and reloads field information
+// Reload drops the memo and reloads field information
 func (fr *FieldRegistry) Reload() error {
-	err := concurrency.RunInLockWithLogger(
-		&fr.mu, LockNameFieldRegistryReload, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
-		func() error {
-			fr.cache = make(map[string]*KindFields)
-			fr.commonFields = []FieldInfo{}
-			fr.loaded = false
-			return nil
-		},
-	)
-	if err != nil {
-		return err
-	}
-
-	// LoadFields() will acquire its own lock
+	fieldRegistryMemos.Delete(fr.memoKey())
 	return fr.LoadFields()
 }
 
@@ -643,5 +562,6 @@ func GetGlobalFieldRegistry() *FieldRegistry {
 func ResetGlobalFieldRegistryForTesting() {
 	globalFieldRegistryMu.Lock()
 	defer globalFieldRegistryMu.Unlock()
+	fieldRegistryMemos.Reset()
 	globalFieldRegistry = nil
 }

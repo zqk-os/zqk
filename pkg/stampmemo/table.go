@@ -63,6 +63,26 @@ func (t *Table[T]) Load(key string, stamp Stamp, loadFn func() (T, error)) (T, e
 	return t.slot(key).load(stamp, loadFn)
 }
 
+// Peek returns the retained value if key is already loaded at this stamp.
+// It never runs loadFn. If a Load is in progress it returns false immediately
+// so hot paths can stay non-blocking (GetFieldsForKindIfLoaded).
+func (t *Table[T]) Peek(key string, stamp Stamp) (T, bool) {
+	var zero T
+	v, ok := t.m.Load(key)
+	if !ok {
+		return zero, false
+	}
+	e := v.(*entry[T])
+	if !e.mu.TryLock() {
+		return zero, false
+	}
+	defer e.mu.Unlock()
+	if !e.loaded || e.stamp != stamp || e.err != nil {
+		return zero, false
+	}
+	return e.val, true
+}
+
 // Delete drops the memo for key after an out-of-band write (mtime may not have
 // moved yet). It is not required when the stamp already changed.
 func (t *Table[T]) Delete(key string) {

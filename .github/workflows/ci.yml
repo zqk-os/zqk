@@ -51,7 +51,61 @@ jobs:
           args: --config=.golangci.yml --timeout=15m
 
   unit-tests:
-    name: Unit Tests
+    name: Unit Tests (${{ matrix.suite }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - suite: core-kernel
+            packages: >-
+              ./pkg/brand/... ./pkg/bridge/... ./pkg/circuitbreaker/... ./pkg/cli/...
+              ./pkg/concurrency/... ./pkg/dna/... ./pkg/docman/... ./pkg/graph/...
+              ./pkg/healthcheck/... ./pkg/hive/... ./pkg/hostload/... ./pkg/integrity/...
+              ./pkg/interactive/... ./pkg/kernel/... ./pkg/telemetry/... ./pkg/accumulator/...
+              ./pkg/authcred/... ./pkg/bufferpool/... ./pkg/cleanup/... ./pkg/clihooks/...
+              ./pkg/closureevidence/... ./pkg/coordination/... ./pkg/crypto/... ./pkg/datacell/...
+              ./pkg/dispatch/... ./pkg/events/... ./pkg/grooming/... ./pkg/handslapper/...
+              ./pkg/hivemind/... ./pkg/idebridge/... ./pkg/idehooks/... ./pkg/inbox/...
+              ./pkg/infrastructure/... ./pkg/ingestion/... ./pkg/interactionpolicy/...
+              ./pkg/kernelcas ./pkg/lifecycle/... ./pkg/lockhealth/... ./pkg/observability/...
+              ./pkg/paths/... ./pkg/pipeline/... ./pkg/tray/... ./pkg/vds/... ./pkg/walutil/...
+              ./pkg/contextevents/... ./pkg/quality/... ./pkg/stampmemo/... ./pkg/zqkenv/...
+              ./pkg/zqksession/... ./pkg/zqktime/...
+          - suite: cli-commands
+            packages: >-
+              ./cmd/zqk/app ./cmd/zqk/test ./cmd/zqk/docman ./cmd/zqk/automation
+              ./cmd/zqk/new ./cmd/zqk/inbox ./cmd/zqk/learn ./cmd/zqk/matrix ./cmd/zqk/mcp
+              ./cmd/zqk/mcp-simple ./cmd/zqk/mesh ./cmd/zqk/feed ./cmd/zqk/convergence
+              ./cmd/zqk/callback ./cmd/zqk/intake ./cmd/zqk/domain ./cmd/zqk/ambient
+              ./cmd/zqk/job ./cmd/zqk/keystore ./cmd/zqk/observer ./cmd/zqk/ontology
+              ./cmd/zqk/ops ./cmd/zqk/organizational ./cmd/zqk/precommit ./cmd/zqk/reports
+              ./cmd/zqk/rollback ./cmd/zqk/semantic ./cmd/zqk/spec ./cmd/zqk/swarm
+              ./cmd/zqk/tray ./cmd/zqk/utility ./cmd/zqk/validate ./cmd/zqk/vendor
+              ./cmd/zqk/workflow
+          - suite: objects-and-specs
+            packages: >-
+              ./pkg/objects/... ./pkg/specorigination/... ./pkg/specbuilder/builders/...
+          - suite: validation-and-tpm
+            packages: >-
+              ./pkg/validation/... ./pkg/tpm/... ./pkg/testdiscovery/...
+              ./pkg/testkit/... ./pkg/workflow/whatsnext
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Run Partitioned Unit Tests
+        run: go test -short -p 2 -timeout 8m ${{ matrix.packages }}
+
+  extended-unit-tests:
+    name: Extended Unit Tests (Full Non-Short)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -64,9 +118,9 @@ jobs:
           go-version-file: go.mod
           cache: true
 
-      - name: Run Unit Tests
+      - name: Run Full Unit Tests (Non-Short)
         run: |
-          go test -short -p 2 -timeout 5m \
+          go test -p 2 -timeout 12m \
             ./pkg/brand/... ./pkg/bridge/... ./pkg/circuitbreaker/... ./pkg/cli/... \
             ./pkg/concurrency/... ./pkg/dna/... ./pkg/docman/... ./pkg/graph/... \
             ./pkg/healthcheck/... ./pkg/hive/... ./pkg/hostload/... ./pkg/integrity/... \
@@ -78,14 +132,14 @@ jobs:
             ./pkg/infrastructure/... ./pkg/ingestion/... ./pkg/interactionpolicy/... \
             ./pkg/kernelcas ./pkg/lifecycle/... ./pkg/lockhealth/... ./pkg/observability/... \
             ./pkg/paths/... ./pkg/pipeline/... ./pkg/tray/... ./pkg/vds/... ./pkg/walutil/... \
-            ./pkg/workflow/whatsnext ./pkg/specorigination/... ./pkg/specbuilder/builders/... \
-            ./pkg/contextevents/... ./pkg/quality/...
+            ./pkg/contextevents/... ./pkg/quality/... ./pkg/stampmemo/... ./pkg/zqkenv/... \
+            ./pkg/objects/... ./pkg/validation/... ./cmd/zqk/test
 
   build:
     name: Build Binary & Assets
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    needs: [lint-and-format, unit-tests]
+    needs: [lint-and-format, unit-tests, extended-unit-tests]
     steps:
       - name: Checkout Code
         uses: actions/checkout@v7
