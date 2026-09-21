@@ -191,8 +191,6 @@ description: Verify that community repository possesses a complete starter graph
 priority: critical
 validation_method: automated_test
 status: awaiting_verification
-test_case_refs:
-  - TST-STARTER-COMMUNITY-001
 created_by: %s
 updated_by: %s
 created_at: %s
@@ -211,13 +209,36 @@ description: Verify that community repository possesses a complete starter graph
 category: Integration
 status: active
 priority: critical
-path_or_id: cmd/zqk/system/init_starter_graph_test.go:TestSeedStarterKernelGraph
+path_or_id: cmd/zqk/system/init_starter_graph_test.go:TestInit_Greenfield_StarterKernelGraph
 requirement_refs:
   - REQ-STARTER-COMMUNITY-001
 criteria_refs:
   - CRIT-STARTER-COMMUNITY-001
 backlog_item_refs:
   - BLI-STARTER-COMMUNITY-001
+created_by: %s
+updated_by: %s
+created_at: %s
+updated_at: %s
+`, accID, accID, now, now),
+		},
+		{
+			kind: objects.KindMilestone,
+			id:   "MIL-STARTER-COMMUNITY-001",
+			content: fmt.Sprintf(`id: MIL-STARTER-COMMUNITY-001
+kind: milestone
+schema_version: 2.0.0
+namespace_id: zqk:kernel
+title: Community launch starter kernel verification
+description: Verify starter kernel graph and whats-next execution pipeline
+status: in_progress
+estimated_effort: 1h
+goal_refs:
+  - GOAL-STARTER-COMMUNITY-001
+workstream_refs:
+  - WS-STARTER-COMMUNITY-001
+criteria_refs:
+  - CRIT-STARTER-COMMUNITY-001
 created_by: %s
 updated_by: %s
 created_at: %s
@@ -240,6 +261,8 @@ priority_tier: P0
 status: planned
 estimated_effort: 1h
 priority_plan_ref: PRI-STARTER-COMMUNITY-001
+milestone_refs:
+  - MIL-STARTER-COMMUNITY-001
 requirement_refs:
   - REQ-STARTER-COMMUNITY-001
 criteria_refs:
