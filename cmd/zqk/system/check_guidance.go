@@ -142,7 +142,7 @@ func FormatCheckExecutionError(cmd *cobra.Command, args []string, err error) err
 	}
 
 	if strings.Contains(errStr, "CAP journal is stale") {
-		return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("%v\n\nActionable Guidance:\n  • The scheduler CAP daemon is inactive or stalled.\n  • Recycle background daemons: ./scripts/recycle-stable-daemons.sh\n  • Verify scheduler status: zqk scheduler status", err)))
+		return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("%v\n\nActionable Guidance:\n  • The scheduler CAP daemon is inactive or stalled.\n  • Restart background daemons: zqk scheduler restart\n  • Verify scheduler status: zqk scheduler status", err)))
 	}
 
 	return err

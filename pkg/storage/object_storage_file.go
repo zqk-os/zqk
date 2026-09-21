@@ -400,6 +400,11 @@ func (f *FileObjectStorage) GetKindDir(kind string) string {
 	if dirName == emptyValue {
 		return ""
 	}
+	// Process instances of object_spec must reside under .zqk/process/object_specs,
+	// never in the static schema directory (.zqk/specs/objects).
+	if kind == objects.KindObjectSpec || dirName == "object_specs" {
+		return filepath.Join(f.processDir, dirName)
+	}
 	if rel := paths.GetPathAlias(f.projectRoot, dirName); rel != emptyValue {
 		return filepath.Join(f.projectRoot, rel)
 	}

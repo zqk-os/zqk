@@ -110,7 +110,11 @@ func TestZeroGhostRefs(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, "./bin/zqk-stable", "workflow", "whats-next", "--format", "json", "--skip-measure")
+	bin := "./bin/zqk-stable"
+	if _, err := os.Stat(filepath.Join(root, "bin", "zqk-stable")); err != nil {
+		bin = "./bin/zqk"
+	}
+	cmd := exec.CommandContext(ctx, bin, "workflow", "whats-next", "--format", "json", "--skip-measure")
 	cmd.Dir = root
 	var cleanEnv []string
 	for _, env := range os.Environ() {

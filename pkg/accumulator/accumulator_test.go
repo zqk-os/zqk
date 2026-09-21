@@ -345,11 +345,7 @@ func TestAccumulator_DebounceConcurrency(t *testing.T) {
 	closeOnce.Do(func() { close(blockCh) })
 
 	// Wait for the in-flight background reconciler to finish before test cleanup removes tmpDir
-	deadline := time.Now().Add(5 * time.Second)
-	for time.Now().Before(deadline) && engine.IsReconciling() {
-		time.Sleep(10 * time.Millisecond)
-	}
-	if engine.IsReconciling() {
+	if !engine.WaitUntilIdle(5 * time.Second) {
 		t.Fatal("reconciler did not finish within deadline")
 	}
 }

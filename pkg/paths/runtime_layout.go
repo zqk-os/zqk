@@ -46,7 +46,7 @@ func StableBinaryPath(projectRoot string) string {
 	return filepath.Join(WorkshopBinDirPath(projectRoot), StableBinaryName())
 }
 
-// RepoStableBinaryPath returns bin/<brand>-stable (install-zqk-stable.sh dual dest).
+// RepoStableBinaryPath returns bin/<brand>-stable (install.sh dual dest).
 func RepoStableBinaryPath(projectRoot string) string {
 	binDir := ResolvePathFromCacheOrConstant(projectRoot, PathAliasRepoBin, RepoBinDir)
 	return filepath.Join(binDir, StableBinaryName())

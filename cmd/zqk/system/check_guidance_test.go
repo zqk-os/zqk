@@ -138,7 +138,7 @@ func TestFormatCheckExecutionError(t *testing.T) {
 	// 1. Stale CAP journal error
 	capErr := errors.New("CAP journal is stale: no updates in over 4 hours")
 	res := FormatCheckExecutionError(cmd, []string{"all"}, capErr)
-	if !strings.Contains(res.Error(), "recycle-stable-daemons.sh") {
+	if !strings.Contains(res.Error(), "zqk scheduler restart") {
 		t.Errorf("expected daemon recycling guidance in: %s", res.Error())
 	}
 
