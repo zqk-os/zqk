@@ -97,6 +97,9 @@ func TestIsGoTestBinary(t *testing.T) {
 	if !isGoTestBinary("/tmp/foo.test") {
 		t.Fatal("expected .test suffix")
 	}
+	if !IsGoTestBinary("/tmp/foo.test") {
+		t.Fatal("exported IsGoTestBinary must match")
+	}
 	if isGoTestBinary("/tmp/zqk") {
 		t.Fatal("plain binary should not match")
 	}
