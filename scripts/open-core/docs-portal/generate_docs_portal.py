@@ -55,6 +55,7 @@ def get_category_info(rel_path: str):
     category_map = {
         "onboarding": ("Onboarding & First-Run", "onboarding"),
         "architecture": ("Architecture & Foundation", "architecture"),
+        "development": ("Maintenance & Development", "development"),
         "howto": ("How-To Guides", "howto"),
         "tutorials": ("Tutorials", "tutorials"),
         "manual": ("Reference Manual", "manual"),
@@ -267,6 +268,13 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
           </ul>
         </div>
         <div class="sidebar-section">
+          <h3>Maintenance & Development</h3>
+          <ul>
+            <li><a href="{root_rel}docs/development/README.html">Development Overview</a></li>
+            <li><a href="{root_rel}docs/development/POLICY_GOVERNANCE_AND_DURABILITY.html">Policy Governance & Durability</a></li>
+          </ul>
+        </div>
+        <div class="sidebar-section">
           <h3>Operations & Guides</h3>
           <ul>
             <li><a href="{root_rel}docs/howto/README.html">How-To Overview</a></li>
@@ -472,6 +480,16 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
             <li><a href="docs/architecture/CLI_COMMAND_TAXONOMY_STANDARDS.html">CLI Command Taxonomy & Standards</a></li>
             <li><a href="docs/architecture/TIERED_STORAGE_AND_ARCHIVAL_LIFECYCLE.html">Tiered Storage & Capsule Archival</a></li>
             <li><a href="docs/architecture/TRAY_COMMAND_CRYPTOGRAPHIC_SECURITY.html">Tray Cryptographic Security</a></li>
+          </ul>
+        </div>
+        <div class="quad-box">
+          <h3>🔧 Maintenance & Development</h3>
+          <p>Foundational engineering conventions, policy durability models, and AST gates.</p>
+          <ul>
+            <li><a href="docs/development/README.html">Maintenance & Development Overview</a></li>
+            <li><a href="docs/development/POLICY_GOVERNANCE_AND_DURABILITY.html">Policy Governance & Durability</a></li>
+            <li><a href="docs/architecture/CLI_COMMAND_TAXONOMY_STANDARDS.html">CLI Taxonomy Standards</a></li>
+            <li><a href="docs/howto/SCHEDULER_AND_MAINTENANCE.html">Scheduler & Maintenance Jobs</a></li>
           </ul>
         </div>
         <div class="quad-box">

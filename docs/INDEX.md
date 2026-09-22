@@ -16,5 +16,7 @@ Start in **onboarding**.
 | **[Tutorials](./tutorials/README.md)** | Learn-by-doing (Divio) |
 | **[How-to](./howto/README.md)** | Task recipes (Divio) |
 | **[Scheduler and maintenance](./howto/SCHEDULER_AND_MAINTENANCE.md)** | Daemon, kernel survival jobs vs optional source-code lint/policy/integrity |
+| **[Maintenance & Development](./development/README.md)** | Engineering guides, policy durability, and maintenance conventions |
+| **[Policy Governance & Durability](./development/POLICY_GOVERNANCE_AND_DURABILITY.md)** | Durability tiers, cryptographic seeds, AST linters, and conventions |
 | **[Manual](./manual/README.md)** | Reference (Divio) |
 | **[Explanation](./explanation/README.md)** | Why the kernel is shaped this way (Divio) |
