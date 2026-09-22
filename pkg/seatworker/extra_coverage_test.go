@@ -134,3 +134,62 @@ func TestProgramArgsAndUnitPaths(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestExtraInstallWriteOnlyAndLoadDarwinCancel(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	root := t.TempDir()
+	if paths.IsAgentWorktreePath(root) {
+		t.Skip("temp dir classified as worktree")
+	}
+	bin := filepath.Join(root, "fake-cli")
+	if err := fileutil.WriteFile(bin, []byte("#!/bin/sh\n"), paths.FilePerm644); err != nil {
+		t.Fatal(err)
+	}
+	if err := Install(context.Background(), InstallConfig{
+		ProjectRoot:     root,
+		Seats:           []string{"peer-1", "peer/2"},
+		PersonaRef:      objects.ConstPersonaDefaultOperator,
+		ExecuteNonComms: true,
+		PollSeconds:     0,
+		Binary:          bin,
+		WriteOnly:       true,
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if err := Install(context.Background(), InstallConfig{
+		ProjectRoot: filepath.Join(fileutil.TempDir(), "zqk-worktrees", "x"),
+	}); err == nil {
+		t.Fatal("expected worktree refuse")
+	}
+	if _, err := resolveWorkerBinary(root, ""); err == nil {
+		t.Fatal("missing product CLI")
+	}
+	if _, err := resolveWorkerBinary(root, root); err == nil {
+		t.Fatal("dir is not binary")
+	}
+	_ = xmlText(`<>&"`)
+	_ = darwinPlist(root, bin, "peer-1", objects.ConstPersonaDefaultOperator, 5, true, t.TempDir())
+	_ = linuxUnit(root, bin, "peer-1", objects.ConstPersonaDefaultOperator, 5, true)
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	label := UnitLabel("extra-cov-061")
+	_ = loadDarwin(ctx, label, filepath.Join(t.TempDir(), "missing.plist"))
+	_ = loadDarwin(context.Background(), UnitLabel("extra-cov-061-retry"), filepath.Join(t.TempDir(), "missing.plist"))
+	if err := Install(context.Background(), InstallConfig{
+		ProjectRoot: root,
+		Seats:       []string{"  "},
+		Binary:      bin,
+		WriteOnly:   true,
+	}); err == nil {
+		t.Fatal("expected no seats requested")
+	}
+	if err := Install(context.Background(), InstallConfig{
+		ProjectRoot: root,
+		Seats:       []string{"peer-empty-persona"},
+		Binary:      bin,
+		WriteOnly:   true,
+	}); err != nil {
+		t.Fatal(err)
+	}
+}

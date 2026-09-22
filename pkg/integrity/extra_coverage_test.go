@@ -2,6 +2,7 @@
 package integrity
 
 import (
+	"github.com/zqk-os/zqk/pkg/paths"
 	"os"
 	"path/filepath"
 	"testing"
@@ -86,10 +87,10 @@ func TestVerifySkillHash_UnknownID(t *testing.T) {
 func TestCollectWorkspaceEvidence_Hints(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
-	if err := os.Mkdir(filepath.Join(root, "subdir"), 0o755); err != nil {
+	if err := os.Mkdir(filepath.Join(root, "subdir"), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(root, "file.txt"), []byte("ok"), 0o600); err != nil {
+	if err := os.WriteFile(filepath.Join(root, "file.txt"), []byte("ok"), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 	got, err := CollectWorkspaceEvidence(root, []EvidenceHint{

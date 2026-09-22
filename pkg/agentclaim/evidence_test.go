@@ -1,4 +1,4 @@
-// BLI-STARTER-COMMUNITY-017 / PRI-STARTER-COMMUNITY-048
+// BLI-STARTER-COMMUNITY-017 / PRI-STARTER-COMMUNITY-047
 // Git-evidence gate: trunk-tip freshness must fail closed unless the test bypass is set.
 package agentclaim
 

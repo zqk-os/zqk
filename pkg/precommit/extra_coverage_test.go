@@ -108,7 +108,7 @@ func TestAggregate_SkipsStagingAndNonJSON(t *testing.T) {
 	if err := fileutil.WriteFile(filepath.Join(dir, "notes.txt"), []byte("ignore"), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.Mkdir(filepath.Join(dir, "subdir"), 0o755); err != nil {
+	if err := os.Mkdir(filepath.Join(dir, "subdir"), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	got, err := Aggregate(root)

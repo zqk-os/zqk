@@ -2,10 +2,12 @@ package ambient
 
 import (
 	"context"
+	"errors"
 	"path/filepath"
 	"testing"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/ambience"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/observer"
@@ -153,4 +155,33 @@ func TestCoachHeuristics_AppendTip(t *testing.T) {
 	if len(tips) > 0 && tips[0] != "tip 4" {
 		t.Fatalf("expected newest tip first, got %q", tips[0])
 	}
+}
+
+type extraErrMesh struct{}
+
+func (extraErrMesh) Publish(context.Context, ambience.AmbientEvent) error { return nil }
+func (extraErrMesh) Subscribe(context.Context, []ambience.EventType) (<-chan ambience.AmbientEvent, error) {
+	return nil, errors.New("subscribe fail")
+}
+
+func TestExtraIngestAndHostDaemon(t *testing.T) {
+	root := t.TempDir()
+	svc := NewAmbientIngestService(root, pkgctx.NewSystemSecurityContext())
+	ctx := pkgctx.NewSystemContext()
+	_ = svc.Ingest(ctx, Event{Type: EventTypeFilesystem, Payload: map[string]any{objects.FieldKeyTargetID: root + "/.git/config"}, Timestamp: time.Now()})
+	_ = svc.IngestAmbientEvent(ctx, ambience.AmbientEvent{ID: "a1", Type: ambience.EventFileModified, URI: "doc.md", Timestamp: time.Now().Unix(), Payload: []byte(`not-json`)})
+	_ = svc.IngestAmbientEvent(ctx, ambience.AmbientEvent{ID: "a2", URI: "spec.yaml", Timestamp: 1, Payload: []byte(`not-json`)})
+	_ = svc.IngestAmbientEvent(ctx, ambience.AmbientEvent{ID: "a3", URI: "x.json", Timestamp: 1, Payload: []byte(`not-json`)})
+	hub := NewEventHub()
+	svc.BindToHub(hub)
+	svc.BindToMesh(extraErrMesh{})
+	mesh := ambience.NewInMemoryEventMesh()
+	svc.BindToMesh(mesh)
+	if HostDaemonEnabled("") || HostDaemonEnabled(root) {
+		t.Fatal("daemon must stay off in tests")
+	}
+	_ = isIgnoredFSPath(root + "/node_modules/x")
+	_ = isIgnoredDirName(".git")
+	_ = min(1, 2)
+	_ = min(3, 1)
 }

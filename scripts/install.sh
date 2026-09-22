@@ -114,6 +114,7 @@ install_binary() {
   local ver="$1"
   local ver_num="${ver#v}"
   local archive="zqk_${ver_num}_${OS}_${ARCH}.tar.gz"
+  local comm_archive="zqk-community_${ver_num}_${OS}_${ARCH}.tar.gz"
 
   echo "📥 Downloading ZQK ${ver} (${OS}/${ARCH})..."
 
@@ -127,9 +128,20 @@ install_binary() {
   if curl -sSLf "${base_url}/${archive}" -o "${archive_path}" 2>/dev/null && \
      curl -sSLf "${base_url}/checksums.txt" -o "${checksums_path}" 2>/dev/null; then
     : # downloaded from public release URL
+  elif curl -sSLf "${base_url}/${comm_archive}" -o "${archive_path}" 2>/dev/null && \
+     curl -sSLf "${base_url}/checksums.txt" -o "${checksums_path}" 2>/dev/null; then
+    : # downloaded community-prefixed archive from public release URL
   elif [ -n "$GITHUB_TOKEN" ] || command -v gh >/dev/null 2>&1; then
-    _download_private "$ver" "$archive" "${archive_path}"
-    _download_private "$ver" "checksums.txt" "${checksums_path}"
+    if ! _download_private "$ver" "$archive" "${archive_path}"; then
+      if ! _download_private "$ver" "$comm_archive" "${archive_path}"; then
+        echo "Neither ${archive} nor ${comm_archive} found in release ${ver}" >&2
+        exit 1
+      fi
+    fi
+    _download_private "$ver" "checksums.txt" "${checksums_path}" || {
+      echo "Checksums file not found in release ${ver}" >&2
+      exit 1
+    }
   else
     echo "Binary release not found for ${ver}. Try ZQK_INSTALL_METHOD=source or set GITHUB_TOKEN." >&2
     exit 1
@@ -141,7 +153,12 @@ install_binary() {
   echo "📦 Extracting..."
   tar -xzf "${archive_path}" -C "$TMPDIR"
   local extract_dir="${TMPDIR}/zqk_${ver_num}_${OS}_${ARCH}"
+  [ -d "$extract_dir" ] || extract_dir="${TMPDIR}/zqk-community_${ver_num}_${OS}_${ARCH}"
   [ -d "$extract_dir" ] || extract_dir="${TMPDIR}"  # goreleaser flat layout fallback
+
+  if [ -f "$extract_dir/zqk-community" ] && [ ! -f "$extract_dir/zqk" ]; then
+    cp "$extract_dir/zqk-community" "$extract_dir/zqk"
+  fi
 
   _place_binary "$extract_dir/zqk" "$extract_dir/zqk-mcp"
 }
@@ -204,8 +221,7 @@ except Exception:
     fi
   fi
 
-  echo "Asset ${asset_name} not found in release ${ver}" >&2
-  exit 1
+  return 1
 }
 
 # ---------------------------------------------------------------------------
