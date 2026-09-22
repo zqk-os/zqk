@@ -70,3 +70,18 @@ func cloneBoundAccount(acc BoundAccount) BoundAccount {
 	acc.Permissions = slices.Clone(acc.Permissions)
 	return acc
 }
+
+// HasAccountInIndex reports whether the given accountID exists in the project's account index.
+func HasAccountInIndex(projectRoot, accountID string) bool {
+	accountID = strings.TrimSpace(accountID)
+	if projectRoot == "" || accountID == "" {
+		return false
+	}
+	indexPath := paths.AccountIndexPath(projectRoot)
+	mappings := casMappings(projectRoot, indexPath)
+	if mappings == nil {
+		return false
+	}
+	_, ok := mappings[accountID]
+	return ok
+}

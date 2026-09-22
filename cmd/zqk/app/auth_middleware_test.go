@@ -378,3 +378,61 @@ func TestAuthMiddleware_NoHardcodedSystemFallback(t *testing.T) {
 		t.Fatalf("security context was unexpectedly set to system account: %#v", sec)
 	}
 }
+
+func TestAuthMiddleware_ForeignHomeCredentialsFallsBackToLocalSystemAccount(t *testing.T) {
+	cmd := &cobra.Command{Use: "status"}
+	cmd.SetContext(context.Background())
+	home := t.TempDir()
+	t.Setenv(zqkenv.OSHome().Name(), home)
+	t.Setenv(zqkenv.APIKey().Name(), "")
+	t.Setenv(zqkenv.TestRoot().Name(), "")
+	t.Setenv(zqkenv.TestBypassAuth().Name(), "0")
+
+	// Write foreign account to ~/.zqk/credentials
+	credDir := filepath.Join(home, paths.ProjectDataDir)
+	if err := fileutil.EnsureDir(credDir); err != nil {
+		t.Fatal(err)
+	}
+	if err := fileutil.WriteSecureFile(filepath.Join(credDir, paths.CredentialsFile), []byte("ACC-FOREIGN-STUDIO-ID\n")); err != nil {
+		t.Fatal(err)
+	}
+
+	projectRoot := t.TempDir()
+	createSchemas(t, projectRoot)
+
+	// In project, write ACC-SYSTEM into account index
+	accountsDir := filepath.Join(projectRoot, paths.ProcessDir, "accounts")
+	if err := fileutil.EnsureDir(accountsDir); err != nil {
+		t.Fatal(err)
+	}
+	hashName := "systemhash001"
+	body := "id: ACC-SYSTEM\nkind: account\nusername: system\nstatus: active\n"
+	if err := fileutil.WriteStandardFile(filepath.Join(accountsDir, hashName+".yaml"), []byte(body)); err != nil {
+		t.Fatal(err)
+	}
+	index := `{"mappings":{"ACC-SYSTEM":"` + hashName + `"}}`
+	if err := fileutil.WriteStandardFile(filepath.Join(accountsDir, ".account.index"), []byte(index)); err != nil {
+		t.Fatal(err)
+	}
+
+	err := AuthMiddleware(cmd, projectRoot)
+	if err != nil {
+		t.Fatalf("expected foreign home credentials to fall back to local system account, got: %v", err)
+	}
+
+	sec := pkgctx.GetSecurityContext(cmd.Context())
+	if sec == nil || sec.AccountID != pkgctx.SystemAccountID {
+		t.Fatalf("expected system account security context, got %#v", sec)
+	}
+
+	// Verify self-healed project-local credentials file was written
+	localCred := paths.CredentialsPath(projectRoot)
+	if !fileutil.Exists(localCred) {
+		t.Fatalf("expected project-local credentials file to be written at %s", localCred)
+	}
+	token := authcred.ReadCredentialToken(localCred)
+	if token != pkgctx.SystemAccountID {
+		t.Fatalf("expected local credentials to have %s, got %s", pkgctx.SystemAccountID, token)
+	}
+}
+

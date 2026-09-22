@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -60,13 +61,6 @@ func AuthMiddleware(cmd *cobra.Command, projectRoot string) error {
 		return nil
 	}
 
-	apiKey := zqkenv.APIKey().Get()
-	credentialsToken := authcred.ReadCredentialToken(authcred.ResolveCredentialPath(projectRoot))
-
-	if apiKey == "" && credentialsToken == "" {
-		return errfmt.Errorf("unauthorized: missing token in ~/%s/credentials or %s", paths.ProjectDataDir, zqkenv.APIKey())
-	}
-
 	// Fail-closed uninitialized kernel hint: if projectRoot is empty or uninitialized,
 	// guide the user to run system init instead of failing with missing account schema.
 	exe := brand.ExecutableName()
@@ -80,30 +74,56 @@ func AuthMiddleware(cmd *cobra.Command, projectRoot string) error {
 		return errfmt.Errorf("kernel not initialized: run '%s system init' to initialize project kernel (failed to load account schema: %v)", exe, specErr)
 	}
 
+	apiKey := zqkenv.APIKey().Get()
+	credPath := authcred.ResolveCredentialPath(projectRoot)
+	credentialsToken := authcred.ReadCredentialToken(credPath)
+
+	if apiKey == "" && credentialsToken == "" {
+		return errfmt.Errorf("unauthorized: missing token in ~/%s/credentials or %s", paths.ProjectDataDir, zqkenv.APIKey())
+	}
+
 	// Inject SecurityContext for the CLI processor
 	accountID := apiKey
 	if accountID == "" {
 		accountID = credentialsToken
 	}
 
-	if authcred.LooksLikeSessionToken(accountID) {
-		acc, err := resolveSessionAccountID(ctx, cmd, projectRoot, accountID)
+	resolvedAccountID := accountID
+	if authcred.LooksLikeSessionToken(resolvedAccountID) {
+		acc, err := resolveSessionAccountID(ctx, cmd, projectRoot, resolvedAccountID)
 		if err != nil {
 			return err
 		}
-		accountID = acc
-	} else if authcred.LooksLikeIssuedSecret(accountID) {
+		resolvedAccountID = acc
+	} else if authcred.LooksLikeIssuedSecret(resolvedAccountID) {
 		// POL-AGENT-API-KEY-001: opaque secrets resolve via keystore fingerprint.
-		match, resolveErr := authcred.ResolveSecret(projectRoot, accountID)
+		match, resolveErr := authcred.ResolveSecret(projectRoot, resolvedAccountID)
 		if resolveErr != nil {
 			return errfmt.Errorf("unauthorized: invalid API key (not an ACC-* id and no keystore match); see POL-AGENT-API-KEY-001")
 		}
-		accountID = match.AccountID
+		resolvedAccountID = match.AccountID
 	}
 
-	secCtx, err := resolveSecurityContext(projectRoot, accountID)
+	secCtx, err := resolveSecurityContext(projectRoot, resolvedAccountID)
 	if err != nil {
-		return err
+		// Fallback to local system account ONLY if the credentials came from a global/home file
+		// (~/<brand>/credentials) and that foreign account does not exist in this project,
+		// but this project has its own ACC-SYSTEM (COMMUNITY_FIRST_RUN: Leftover ~/.zqk/credentials must not block an empty directory).
+		if apiKey == "" && credPath != paths.CredentialsPath(projectRoot) && authcred.HasAccountInIndex(projectRoot, pkgctx.SystemAccountID) {
+			if sysCtx, sysErr := resolveSecurityContext(projectRoot, pkgctx.SystemAccountID); sysErr == nil {
+				secCtx = sysCtx
+				err = nil
+				// Self-heal: persist the working local credentials file so future invocations hit the project credentials directly.
+				localCred := paths.CredentialsPath(projectRoot)
+				if !fileutil.Exists(localCred) {
+					_ = fileutil.EnsureDir(filepath.Dir(localCred))
+					_ = fileutil.WriteSecureFile(localCred, []byte(pkgctx.SystemAccountID+"\n"))
+				}
+			}
+		}
+		if err != nil {
+			return err
+		}
 	}
 
 	// WARNING: We cannot use context.WithValue on cmd.Context() directly if it's already set by cobra,
