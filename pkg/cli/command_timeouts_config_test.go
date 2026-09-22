@@ -153,3 +153,23 @@ func TestCommandTimeouts_agentSwarmRulesAgreeOnScale(t *testing.T) {
 		}
 	}
 }
+
+func TestCommandTimeouts_ambientDaemonMatchesEstablishedDaemonPattern(t *testing.T) {
+	cfg := loadShippedCommandTimeouts(t)
+
+	rule := findMatchingRule("ambient daemon", &cfg)
+	if rule == nil {
+		t.Fatal("no timeout rule found for 'ambient daemon'")
+	}
+	to := parseRuleDuration(t, "timeout", "ambient daemon", rule.Timeout)
+	if to < 4*time.Hour {
+		t.Errorf("ambient daemon has timeout %v, want >= 4h", to)
+	}
+	idle := parseRuleDuration(t, "idle_shutdown_duration", "ambient daemon", rule.IdleShutdownDuration)
+	if idle != 15*time.Minute {
+		t.Errorf("ambient daemon has idle_shutdown_duration %v, want 15m", idle)
+	}
+	if !rule.ChildMaxTimeoutExempt {
+		t.Errorf("ambient daemon must have child_max_timeout_exempt=true")
+	}
+}

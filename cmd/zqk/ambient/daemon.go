@@ -71,8 +71,7 @@ func newDaemonCmd() *cobra.Command {
 }
 
 func runAmbientDaemon(cmd *cobra.Command, args []string) error {
-	reconnect := cli.DisconnectTimeoutMonitor()
-	defer reconnect()
+	cli.TouchMeaningfulActivity()
 
 	projectRoot := cli.ResolveProjectRoot(".")
 	if projectRoot == "" {
@@ -114,6 +113,7 @@ func runAmbientDaemon(cmd *cobra.Command, args []string) error {
 
 	// Invalidate object cache on filesystem events
 	hub.Subscribe(ambient.EventTypeFilesystem, func(c context.Context, event ambient.Event) error {
+		cli.TouchMeaningfulActivity()
 		payloadMap, ok := event.Payload.(map[string]any)
 		if !ok {
 			return nil
@@ -223,7 +223,7 @@ func StartDaemon(projectRoot string, out interface{ Write([]byte) (int, error) }
 		return fmt.Errorf("failed to open ambient log file: %w", err)
 	}
 
-	daemonCmd := execwrap.Command(exe, "ambient", "daemon", "--timeout", "0")
+	daemonCmd := execwrap.Command(exe, "ambient", "daemon")
 	daemonCmd.Dir = projectRoot
 	daemonCmd.Stdout = logFile
 	daemonCmd.Stderr = logFile

@@ -263,3 +263,9 @@ rules:
     idle_shutdown_duration: 1h
     child_max_timeout_exempt: true
 
+  # Ambient daemon: background filesystem watcher & heuristics monitor; shuts down on idle.
+  - pattern: "ambient daemon"
+    timeout: 4h
+    idle_shutdown_duration: 15m
+    child_max_timeout_exempt: true
+
