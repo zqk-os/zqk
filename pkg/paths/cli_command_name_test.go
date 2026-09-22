@@ -7,7 +7,6 @@ import (
 )
 
 func TestCLIUsage_usesLiveExecutable(t *testing.T) {
-	t.Parallel()
 	prev := brand.ExecutableName()
 	t.Cleanup(func() { brand.SetExecutableName(prev) })
 	brand.SetExecutableName("acme-cli")
@@ -18,7 +17,6 @@ func TestCLIUsage_usesLiveExecutable(t *testing.T) {
 }
 
 func TestCLIInvocation_rebrandsProductCommandsOnly(t *testing.T) {
-	t.Parallel()
 	prev := brand.ExecutableName()
 	t.Cleanup(func() { brand.SetExecutableName(prev) })
 	brand.SetExecutableName("acme-cli")
@@ -38,7 +36,6 @@ func TestCLIInvocation_rebrandsProductCommandsOnly(t *testing.T) {
 }
 
 func TestRewriteCanonicalCLIInvocations_inProse(t *testing.T) {
-	t.Parallel()
 	prev := brand.ExecutableName()
 	t.Cleanup(func() { brand.SetExecutableName(prev) })
 	brand.SetExecutableName("acme-cli")
