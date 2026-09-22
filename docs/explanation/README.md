@@ -1,10 +1,10 @@
-# Explanation (this SKU)
+# Explanation
 
-Why this tree is shaped the way it is:
+Why the ZQK Knowledge Kernel is architected this way:
 
-- Community vs studio: [architecture/README.md](../architecture/README.md)
-- Kernel primacy and process data: [CONTRIBUTING.md](../../CONTRIBUTING.md)
-- Open-core boundary and publication hold: [GOVERNANCE.md](../../GOVERNANCE.md)
-- Why lint timers are not required: [Scheduler and maintenance](../howto/SCHEDULER_AND_MAINTENANCE.md)
+- Core architecture and cellular design: [Architecture Overview](../architecture/README.md)
+- Kernel primacy and process data: [Contributing Guide](../../CONTRIBUTING.md)
+- Open-core governance and boundary: [Open-Core Governance](../../GOVERNANCE.md)
+- Daemon scheduler and maintenance lifecycle: [Scheduler and Maintenance](../howto/SCHEDULER_AND_MAINTENANCE.md)
 
-This directory is the Divio **explanation** quadrant. Studio architecture essays are not shipped here.
+This directory contains architectural and philosophical rationales for ZQK's design choices.

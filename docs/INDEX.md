@@ -10,7 +10,7 @@ Start in **onboarding**.
 | **[Quickstart](./onboarding/QUICKSTART.md)** | Same text as `./bin/zqk system start-here` |
 | **[First-run object tutorial](./onboarding/FIRST_RUN_OBJECT_TUTORIAL.md)** | Create / get / update a `question` |
 | **[AI Agent Onboarding](./onboarding/AI_AGENT_ONBOARDING.md)** | Directives and workflow discipline for autonomous agents |
-| **[Architecture](./architecture/README.md)** | Core system architecture and downstream Studio consumption model |
+| **[Architecture](./architecture/README.md)** | Core system architecture, Knowledge Kernel, and daemon topology |
 | **[Contributing](../CONTRIBUTING.md)** | How to work in this tree |
 | **[Governance](../GOVERNANCE.md)** | Open-core boundary, decision-making, publication hold |
 | **[Tutorials](./tutorials/README.md)** | Learn-by-doing (Divio) |

@@ -9,11 +9,11 @@
 3. **[First-run object tutorial](./FIRST_RUN_OBJECT_TUTORIAL.md)** — create / get / update a small `question`.
 4. **[Edge / headless](./EDGE_HEADLESS_FIRST_RUN.md)** — appliances and `--headless` (optional).
 
-## Not first-run
+## Architecture & Advanced Protocols
 
-- **[AI Agent Onboarding](./AI_AGENT_ONBOARDING.md)** — directives and conventions for autonomous AI agents operating on ZQK Core.
-- ZQK Core is the canonical upstream kernel; ZQK Studio consumes Core directly as an upstream dependency without bifurcation.
-- Scheduler **is** shipped: `./bin/zqk scheduler start|stop|status`. CRUD works without it.
+- **[AI Agent Onboarding](./AI_AGENT_ONBOARDING.md)** — Directives and conventions for autonomous AI agents operating on ZQK Core.
+- **[Core Architecture](../architecture/README.md)** — Foundational architecture, Knowledge Kernel, and daemon topology.
+- **[Scheduler & Maintenance](../howto/SCHEDULER_AND_MAINTENANCE.md)** — Daemon operation: `./bin/zqk scheduler start|stop|status`. Standard CRUD commands work offline without daemons.
 
 ## Session start
 

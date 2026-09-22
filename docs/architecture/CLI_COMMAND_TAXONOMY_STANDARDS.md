@@ -115,7 +115,7 @@ This standard is verified by the automated test suite in `cmd/zqk/system/validat
 
 - **Priority Plan:** `PRI-CLI-TAXONOMY-OVERHAUL-001`
 - **Backlog Items Verified:**
-  - `BLI-1789798199209192000-4b7ef477` (Harmonized CLI Taxonomy & 100% Spec Coverage)
+  - `BLI-CLI-TAXONOMY-HARMONIZE-001` (Harmonized CLI Taxonomy & 100% Spec Coverage)
   - `BLI-CLI-AGENT-FEED-001` (Unify Swarm & Feed Families)
   - `BLI-CLI-CONVERGENCE-001` (Convergence Management Parent)
   - `BLI-CLI-DEPRECATE-PURGE-001` (Purge Obsolete Commands & Specs)

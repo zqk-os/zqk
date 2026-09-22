@@ -26,34 +26,15 @@ The child process (`execwrap.CommandContext`) executes the binary with inherited
 
 To prevent Confused Deputy exploits while preserving frictionless developer experience for harmless commands, ZQK establishes a **3-tier security boundary**:
 
-```
-                  ┌────────────────────────────────────────┐
-                  │          zqk tray run <name>           │
-                  └──────────────────┬─────────────────────┘
-                                     │
-                        Is it a built-in default?
-                       (embedded in compiled binary)
-                                    / \
-                            YES    /   \   NO (from .zqk/tray.yaml)
-                            ┌─────┘     └─────┐
-                            ▼                 ▼
-                     [TRUSTED: PASS]   Does argv contain HIGH-STAKES
-                                       mutations or BREAK-GLASS flags?
-                                       (--override, --force, object delete,
-                                        policy, account, keystore)
-                                              / \
-                                      NO     /   \   YES
-                                     ┌──────┘     └──────┐
-                                     ▼                   ▼
-                              [READ-ONLY /        Is it CRYPTOGRAPHICALLY
-                               SAFE MUTATION:     SIGNED in tray.yaml?
-                                    PASS]               / \
-                                                YES    /   \   NO
-                                               ┌──────┘     └──────┐
-                                               ▼                   ▼
-                                         [VERIFY SIG:        [FAIL CLOSED:
-                                            PASS]           BLOCKED: REQUIRES
-                                                            SIGNATURE OR GOVERNOR]
+```mermaid
+flowchart TD
+  Start["zqk tray run &lt;name&gt;"] --> Q1{"Is it a built-in default?<br/>(embedded in compiled binary)"}
+  Q1 -- Yes --> Pass1["TRUSTED: PASS"]
+  Q1 -- No (from .zqk/tray.yaml) --> Q2{"Does argv contain HIGH-STAKES<br/>mutations or BREAK-GLASS flags?<br/>(--override, --force, object delete, policy, account, keystore)"}
+  Q2 -- No --> Pass2["READ-ONLY / SAFE MUTATION: PASS"]
+  Q2 -- Yes --> Q3{"Is it CRYPTOGRAPHICALLY SIGNED<br/>in tray.yaml?"}
+  Q3 -- Yes --> Pass3["VERIFY SIGNATURE: PASS"]
+  Q3 -- No --> FailClosed["FAIL CLOSED: BLOCKED<br/>(Requires Signature or Governor)"]
 ```
 
 ### Tier 1: Fail-Closed Indirect Execution Barrier
@@ -71,9 +52,13 @@ To prevent Confused Deputy exploits while preserving frictionless developer expe
   ```
 - **Canonical Digest Algorithm**:
   1. Concatenate the normalized entry name and canonical JSON representation of the `argv` array:
-     $$\text{Payload} = \text{CanonicalJSON}(\{ \text{"name"}: \text{entry.Name}, \text{"argv"}: \text{entry.Argv} \})$$
+     ```
+     Payload = CanonicalJSON({ "name": entry.Name, "argv": entry.Argv })
+     ```
   2. Compute SHA-256 digest:
-     $$\text{Digest} = \text{SHA256}(\text{Payload})$$
+     ```
+     Digest = SHA256(Payload)
+     ```
   3. Sign digest using the operator's ECDSA private key from `.zqk/keystore/`.
 - **Manifest Serialization**:
   ```yaml

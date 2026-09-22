@@ -84,9 +84,6 @@ When you no longer need the example object, delete it per project policy (`zqk o
 - **Scheduler daemon not running:** Start it with `zqk scheduler start`. Do not treat `--allow-degraded` as the default fix — that flag means partial or degraded results are intentionally accepted (see `docs/architecture/SCHEDULER_DEGRADED_MODE_GUARDRAILS.md`).
 - **Long-running tests:** Prefer `zqk scheduler scan-tests` for package gates; see project scheduler docs and `PRE_CHANGE_CHECKLIST.md` section 6 for scope.
 
-## See also
-
-- [AI Agent Onboarding Guide](./AI_AGENT_ONBOARDING.md) — agent directives, hermeticity, and workflow discipline on ZQK Core.
-- [architecture/README.md](../architecture/README.md) — Core system architecture and downstream Studio consumption model.
-- [scripts/onboarding_roadmap/README.md](../../scripts/onboarding_roadmap/README.md) — full **onboarding curriculum** as objects (milestone-first order); advanced-tutorial pattern.
-- [COMMUNITY_FIRST_RUN.md](./COMMUNITY_FIRST_RUN.md) — first-run setup, MCP installation, and kernel verification.
+- [AI Agent Onboarding Guide](./AI_AGENT_ONBOARDING.md) — Agent directives and workflow discipline on ZQK Core.
+- [Architecture Overview](../architecture/README.md) — Core system architecture, Knowledge Kernel, and daemon topology.
+- [Community First-Run Guide](./COMMUNITY_FIRST_RUN.md) — First-run setup, MCP installation, and kernel verification.

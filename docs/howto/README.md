@@ -1,10 +1,8 @@
-# How-to (this SKU)
-
-Task recipes for operators on this checkout:
-
-- Headless / appliance first-run: [EDGE_HEADLESS_FIRST_RUN.md](../onboarding/EDGE_HEADLESS_FIRST_RUN.md)
-- MCP pairing: [QUICKSTART.md](../onboarding/QUICKSTART.md)
-- Scheduler and maintenance jobs: [SCHEDULER_AND_MAINTENANCE.md](./SCHEDULER_AND_MAINTENANCE.md)
-- Checks: `./bin/zqk system check` and `./bin/zqk workflow whats-next --format json`
-
-This directory is the Divio **how-to** quadrant. Studio howto dumps are not shipped here.
+# How-To Guides
+ 
+ Practical operational recipes for working with ZQK:
+ 
+ - [Headless / Edge First-Run](../onboarding/EDGE_HEADLESS_FIRST_RUN.md) — Set up ZQK on appliances or remote headless nodes.
+ - [MCP Pairing & Configuration](../onboarding/QUICKSTART.md) — Connect IDE assistants via Model Context Protocol.
+ - [Scheduler and Maintenance Daemons](./SCHEDULER_AND_MAINTENANCE.md) — Configure, operate, and monitor background kernel daemons.
+ - [Object Inspection & Health Checks](../onboarding/FIRST_RUN_OBJECT_TUTORIAL.md) — Run health checks and query system state.

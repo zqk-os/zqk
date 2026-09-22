@@ -86,12 +86,12 @@ mkdir my-project && cd my-project
 
 ZQK follows the classical operating system boundary: **POSIX/Kernel primitives are 100% open-source; distributed multi-tenant mesh clustering and fleet governance are commercial.**
 
-| Dimension | ZQK Core (Open-Source Community) | ZQK Enterprise Mesh (ZQK Studio) |
+| Dimension | ZQK Core (Open-Source Community) | Enterprise Fleet Mesh |
 | :--- | :--- | :--- |
 | **Scope** | Single Autonomous Cell (Local Kernel) | Multi-Node Mesh Orchestration & Fleet Governance |
 | **State & Engine** | Go microkernel, local hybrid file + graph store, local validation | Cross-cell routing, multi-tenant directory, global trust topology |
 | **Task Lifecycle** | Self-contained task loop, local self-healing, deterministic planes | Fleet-wide apoptotic quarantine, cross-cell task delegation |
-| **Codegen & Specs** | Core DNA schemas, public object parser, manual/template bindings | Proprietary Spec-Driven Codegen Engine, automated AST synthesis |
+| **Codegen & Specs** | Core DNA schemas, public object parser, manual/template bindings | Fleet Spec-Driven Codegen Engine, automated AST synthesis |
 | **Governance & Ops** | Single-node CLI dashboard, Git CAS integrity gates | Enterprise RBAC, cross-cell compliance audit trails, global telemetry |
 
 ---
@@ -128,4 +128,4 @@ ZQK follows the classical operating system boundary: **POSIX/Kernel primitives a
 
 ## 📄 License
 
-Open-Core Community Kernel: [Apache License 2.0](LICENSE) (see `NOTICE`). Enterprise modules and fleet mesh tooling are maintained separately under ZQK Studio (`github.com/zqk-os/zqke`).
+Open-Core Community Kernel: [Apache License 2.0](LICENSE) (see `NOTICE`). Enterprise modules and multi-node fleet mesh capabilities are licensed separately.

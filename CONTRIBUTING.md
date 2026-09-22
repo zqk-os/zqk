@@ -54,8 +54,8 @@ feat(scheduler): align test concurrency limiter with dispatch budget
 - Isolate global test concurrency limiter from package wait timeouts
 - Record regression tests in global_test_concurrency_test.go
 
-BLI-1789867616595840000-3fda4ca8
-PRI-1789867611559561000-14e832b4
+BLI-SCHEDULER-CONCURRENCY-001
+PRI-SCHEDULER-REORG-001
 ```
 
 ---
