@@ -149,3 +149,26 @@ func TestStatusChecker_IsSatisfied(t *testing.T) {
 		t.Error("BLI complete is work_done, not satisfiable")
 	}
 }
+
+func TestStatusChecker_IsArchiveAndIsSystem(t *testing.T) {
+	checker := GetGlobalStatusChecker()
+	if !checker.IsArchive(KindBacklogItem, ObjectStatusArchived) {
+		t.Error("expected backlog_item archived to be archive")
+	}
+	if checker.IsArchive(KindBacklogItem, ObjectStatusInProgress) {
+		t.Error("expected backlog_item in_progress not to be archive")
+	}
+	if checker.IsArchive("nonexistent_kind", "some_status") {
+		t.Error("expected false for nonexistent kind/status")
+	}
+
+	if !checker.IsSystem(KindBacklogItem, ObjectStatusError) {
+		t.Error("expected backlog_item error to be system")
+	}
+	if checker.IsSystem(KindBacklogItem, ObjectStatusInProgress) {
+		t.Error("expected backlog_item in_progress not to be system")
+	}
+	if checker.IsSystem("nonexistent_kind", "some_status") {
+		t.Error("expected false for nonexistent kind/status")
+	}
+}

@@ -77,59 +77,39 @@ func TestTierToPriority(t *testing.T) {
 	}
 }
 
-func TestIsLegitimatePriority(t *testing.T) {
-	tests := []struct {
-		priority string
-		want     bool
-	}{
-		{"critical", true},
-		{"CRITICAL", true},
-		{"high", true},
-		{"High", true},
-		{"medium", true},
-		{"MEDIUM", true},
-		{"low", true},
-		{"Low", true},
-		{"urgent", false},
-		{"p1", false},
-		{"", false},
+func TestCanonicalPriorityAndTier(t *testing.T) {
+	// CanonicalPriority
+	if p, ok := CanonicalPriority("p0"); !ok || p != PriorityCritical {
+		t.Errorf("CanonicalPriority(p0) = (%q, %v)", p, ok)
+	}
+	if p, ok := CanonicalPriority("high"); !ok || p != PriorityHigh {
+		t.Errorf("CanonicalPriority(high) = (%q, %v)", p, ok)
+	}
+	if p, ok := CanonicalPriority("medium"); !ok || p != PriorityMedium {
+		t.Errorf("CanonicalPriority(medium) = (%q, %v)", p, ok)
+	}
+	if p, ok := CanonicalPriority("low"); !ok || p != PriorityLow {
+		t.Errorf("CanonicalPriority(low) = (%q, %v)", p, ok)
+	}
+	if _, ok := CanonicalPriority("invalid"); ok {
+		t.Error("expected ok=false for invalid priority")
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.priority, func(t *testing.T) {
-			got := IsLegitimatePriority(tt.priority)
-			if got != tt.want {
-				t.Errorf("IsLegitimatePriority(%q) = %v, want %v", tt.priority, got, tt.want)
-			}
-		})
+	// CanonicalPriorityTier
+	if tier, ok := CanonicalPriorityTier("critical"); !ok || tier != PriorityTierP0 {
+		t.Errorf("CanonicalPriorityTier(critical) = (%q, %v)", tier, ok)
 	}
-}
-
-func TestIsLegitimatePriorityTier(t *testing.T) {
-	tests := []struct {
-		tier string
-		want bool
-	}{
-		{"P0", true},
-		{"p0", true},
-		{"P1", true},
-		{"p1", true},
-		{"P2", true},
-		{"p2", true},
-		{"P3", true},
-		{"p3", true},
-		{"P4", false},
-		{"critical", false},
-		{"", false},
+	if tier, ok := CanonicalPriorityTier("high"); !ok || tier != PriorityTierP1 {
+		t.Errorf("CanonicalPriorityTier(high) = (%q, %v)", tier, ok)
 	}
-
-	for _, tt := range tests {
-		t.Run(tt.tier, func(t *testing.T) {
-			got := IsLegitimatePriorityTier(tt.tier)
-			if got != tt.want {
-				t.Errorf("IsLegitimatePriorityTier(%q) = %v, want %v", tt.tier, got, tt.want)
-			}
-		})
+	if tier, ok := CanonicalPriorityTier("medium"); !ok || tier != PriorityTierP2 {
+		t.Errorf("CanonicalPriorityTier(medium) = (%q, %v)", tier, ok)
+	}
+	if tier, ok := CanonicalPriorityTier("low"); !ok || tier != PriorityTierP3 {
+		t.Errorf("CanonicalPriorityTier(low) = (%q, %v)", tier, ok)
+	}
+	if _, ok := CanonicalPriorityTier("invalid"); ok {
+		t.Error("expected ok=false for invalid tier")
 	}
 }
 
