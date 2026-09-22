@@ -13,6 +13,7 @@ import (
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // 1. Mock Storage Provider for Deep15
@@ -99,8 +100,8 @@ func TestDeep15_ServerLifecycleBuilder_LoadMCPSpecs(t *testing.T) {
 
 	// Case 4: Storage error -> MCPSpecStorageUnavailable, falls back to file system (.zqk/mcp/specs/)
 	tmpDir4 := t.TempDir()
-	specsDir4 := filepath.Join(tmpDir4, ".zqk", "mcp", "specs")
-	if err := os.MkdirAll(specsDir4, 0755); err != nil {
+	specsDir4 := filepath.Join(tmpDir4, paths.ProjectDataDir, "mcp", "specs")
+	if err := os.MkdirAll(specsDir4, paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create specs dir: %v", err)
 	}
 	validYamlContent := `name: file_spec_deep15
@@ -110,7 +111,7 @@ tools:
     description: Tool from yaml
     command: echo
 `
-	if err := os.WriteFile(filepath.Join(specsDir4, "spec1.yaml"), []byte(validYamlContent), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(specsDir4, "spec1.yaml"), []byte(validYamlContent), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write yaml: %v", err)
 	}
 

@@ -14,6 +14,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/infrastructure"
 	"github.com/zqk-os/zqk/pkg/infrastructure/crypto"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
@@ -238,7 +239,7 @@ func (failSigner) PublicKey() string           { return "pk-fail-signer" }
 
 func writeExec(t *testing.T, path, body string) {
 	t.Helper()
-	if err := os.WriteFile(path, []byte(body), 0o755); err != nil {
+	if err := os.WriteFile(path, []byte(body), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 }

@@ -15,6 +15,7 @@ import (
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // 1. Server getters/setters and format permission tests
@@ -219,28 +220,28 @@ func TestDeep5_ResourceMIMEAdapters_Comprehensive(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	jsonPath1 := filepath.Join(tmpDir, "test1.json")
-	_ = os.WriteFile(jsonPath1, []byte(`{"title": "Test JSON", "description": "JSON Desc", "version": "1.0"}`), 0644)
+	_ = os.WriteFile(jsonPath1, []byte(`{"title": "Test JSON", "description": "JSON Desc", "version": "1.0"}`), paths.FilePerm644)
 
 	jsonPath2 := filepath.Join(tmpDir, "test2.json")
-	_ = os.WriteFile(jsonPath2, []byte(`{"Title": "Alt Title", "Description": "Alt Desc", "Name": "alt_name"}`), 0644)
+	_ = os.WriteFile(jsonPath2, []byte(`{"Title": "Alt Title", "Description": "Alt Desc", "Name": "alt_name"}`), paths.FilePerm644)
 
 	jsonPath3 := filepath.Join(tmpDir, "test3.json")
-	_ = os.WriteFile(jsonPath3, []byte(`{"name": "json_name"}`), 0644)
+	_ = os.WriteFile(jsonPath3, []byte(`{"name": "json_name"}`), paths.FilePerm644)
 
 	jsonInvalid := filepath.Join(tmpDir, "invalid.json")
-	_ = os.WriteFile(jsonInvalid, []byte(`{not json`), 0644)
+	_ = os.WriteFile(jsonInvalid, []byte(`{not json`), paths.FilePerm644)
 
 	yamlPath1 := filepath.Join(tmpDir, "test1.yaml")
-	_ = os.WriteFile(yamlPath1, []byte("title: Test YAML\ndescription: YAML Desc\nauthor: alice\n"), 0644)
+	_ = os.WriteFile(yamlPath1, []byte("title: Test YAML\ndescription: YAML Desc\nauthor: alice\n"), paths.FilePerm644)
 
 	yamlPath2 := filepath.Join(tmpDir, "test2.yaml")
-	_ = os.WriteFile(yamlPath2, []byte("Title: YAML Alt Title\nDescription: YAML Alt Desc\nName: yaml_alt\n"), 0644)
+	_ = os.WriteFile(yamlPath2, []byte("Title: YAML Alt Title\nDescription: YAML Alt Desc\nName: yaml_alt\n"), paths.FilePerm644)
 
 	yamlPath3 := filepath.Join(tmpDir, "test3.yaml")
-	_ = os.WriteFile(yamlPath3, []byte("name: yaml_name\n"), 0644)
+	_ = os.WriteFile(yamlPath3, []byte("name: yaml_name\n"), paths.FilePerm644)
 
 	yamlInvalid := filepath.Join(tmpDir, "invalid.yaml")
-	_ = os.WriteFile(yamlInvalid, []byte("[\ninvalid: yaml"), 0644)
+	_ = os.WriteFile(yamlInvalid, []byte("[\ninvalid: yaml"), paths.FilePerm644)
 
 	// JSONAdapter
 	ja := &JSONAdapter{}

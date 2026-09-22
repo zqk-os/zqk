@@ -12,6 +12,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // 1. Tools comprehensive tests
@@ -200,9 +201,9 @@ func TestDeep4_Install_Comprehensive(t *testing.T) {
 	}
 
 	cursorDir := filepath.Join(tmpDir, ".cursor")
-	_ = os.MkdirAll(cursorDir, 0755)
+	_ = os.MkdirAll(cursorDir, paths.DirPerm755)
 	configFile := filepath.Join(cursorDir, "mcp.json")
-	_ = os.WriteFile(configFile, []byte(`{"mcpServers":{}}`), 0644)
+	_ = os.WriteFile(configFile, []byte(`{"mcpServers":{}}`), paths.FilePerm644)
 
 	logger := logging.NewLogger(io.Discard, logging.InfoLevel, logging.NewTextFormatter(context.Background()))
 	err := InstallToIDE("cursor", configFile, "/usr/local/bin/zqk", tmpDir, logger)
