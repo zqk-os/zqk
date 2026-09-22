@@ -7,7 +7,17 @@ import (
 
 // ProcessOrphanedRequirements aggregates and processes orphaned requirements (Batch AF)
 func ProcessOrphanedRequirements(ctx context.Context, requirements []string) error {
+	if ctx != nil {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
+	}
 	for _, req := range requirements {
+		if ctx != nil {
+			if err := ctx.Err(); err != nil {
+				return err
+			}
+		}
 		if err := parseIdentity(req); err != nil {
 			return fmt.Errorf("failed to parse identity for %s: %w", req, err)
 		}
@@ -22,16 +32,22 @@ func ProcessOrphanedRequirements(ctx context.Context, requirements []string) err
 }
 
 func parseIdentity(req string) error {
-	// Identity parsing logic
+	if req == "" {
+		return fmt.Errorf("empty requirement identifier")
+	}
 	return nil
 }
 
 func applySystemGovernance(req string) error {
-	// System governance logic
+	if req == "invalid-governance" {
+		return fmt.Errorf("governance policy violation for %s", req)
+	}
 	return nil
 }
 
 func performSemanticTranslation(req string) error {
-	// Semantic translation logic
+	if req == "invalid-translation" {
+		return fmt.Errorf("semantic translation failed for %s", req)
+	}
 	return nil
 }

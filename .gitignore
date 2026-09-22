@@ -22,6 +22,7 @@ go.work
 
 # IDE
 .idea/
+.ide/
 # Track `.vscode/settings.json` for shared editor/extension defaults; keep other `.vscode/*` local.
 .vscode/*
 !.vscode/settings.json
@@ -44,6 +45,7 @@ COMMIT_MSG*
 **/.zqk/scheduler/
 **/.zqk/streams/
 .agents/*
+.agent/*
 .zqk/**/*.lock
 .zqk/autofix/
 .zqk/cache/

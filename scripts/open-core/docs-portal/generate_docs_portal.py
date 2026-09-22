@@ -117,9 +117,38 @@ def render_markdown_to_html(content: str, current_html_rel: str, link_map: dict)
             )
             # Transform fenced mermaid code blocks to <pre class="mermaid">
             # markdown fenced_code generates: <pre><code class="language-mermaid">...</code></pre>
+            def _mermaid_replacer(match):
+                code_text = match.group(1)
+                return f'<pre class="mermaid">{html.unescape(code_text)}</pre>'
+
             rendered = re.sub(
                 r'<pre><code class="(?:language-)?mermaid">([\s\S]*?)</code></pre>',
-                r'<pre class="mermaid">\1</pre>',
+                _mermaid_replacer,
+                rendered
+            )
+
+            # Transform GitHub-style blockquote alerts: > [!IMPORTANT], > [!NOTE], etc.
+            def _alert_replacer(match):
+                alert_type = match.group(1).lower()
+                alert_title = match.group(1).capitalize()
+                body = match.group(2).strip()
+                # If body ends with </p>, ensure it remains clean
+                if body.endswith("</p>"):
+                    body = body[:-4].strip()
+                if body.startswith("<p>"):
+                    body = body[3:].strip()
+                icon_svg = {
+                    "note": '<svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>',
+                    "tip": '<svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.21c-.04-.29-.19-.594-.412-.916a4.701 4.701 0 0 0-.58-.729l-.217-.256C3.12 7.64 2.5 6.74 2.5 5.25 2.5 2.31 4.75 0 8 0s5.5 2.31 5.5 5.25c0 1.49-.62 2.39-1.278 3.164l-.217.256c-.18.213-.377.46-.58.729-.221.322-.372.625-.412.916a.75.75 0 0 1-1.484-.21c.084-.594.337-1.079.621-1.49.204-.292.45-.584.673-.848l.214-.253c.56-.679.984-1.32.984-2.304 0-2.06-1.637-3.75-4-3.75ZM6 11.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Zm.75 2.25a.75.75 0 0 0 0 1.5h2.5a.75.75 0 0 0 0-1.5h-2.5Z"></path></svg>',
+                    "important": '<svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H9.06l-2.573 2.573A1.458 1.458 0 0 1 4 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2.5a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm6.25 2.75a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5a.75.75 0 0 1 .75-.75Zm0 7a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>',
+                    "warning": '<svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>',
+                    "caution": '<svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M4.47.047A.75.75 0 0 1 5 0h6a.75.75 0 0 1 .53.22l4.25 4.25c.141.14.22.331.22.53v6a.75.75 0 0 1-.22.53l-4.25 4.25A.75.75 0 0 1 11 16H5a.75.75 0 0 1-.53-.22L.22 11.53A.75.75 0 0 1 0 11V5a.75.75 0 0 1 .22-.53L4.47.047Zm.53 1.28L1.5 4.82v6.36l3.5 3.5h6l3.5-3.5V4.82L11.5 1.33H5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 7.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>'
+                }.get(alert_type, '')
+                return f'<div class="alert alert-{alert_type}"><div class="alert-title">{icon_svg}<span>{alert_title}</span></div><div class="alert-body"><p>{body}</p></div></div>'
+
+            rendered = re.sub(
+                r'<blockquote>\s*<p>\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\](?:\s*<br\s*/?>|\s*</p>\s*<p>|\s*\n)?([\s\S]*?)</blockquote>',
+                _alert_replacer,
                 rendered
             )
             return rendered
@@ -240,6 +269,12 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
     with open(os.path.join(target_dir, "README.md"), "w", encoding="utf-8") as f:
         f.write(portal_readme_content)
 
+    # CNAME and .nojekyll for GitHub Pages deployment
+    with open(os.path.join(target_dir, "CNAME"), "w", encoding="utf-8") as f:
+        f.write("docs.zqk.dev\n")
+    with open(os.path.join(target_dir, ".nojekyll"), "w", encoding="utf-8") as f:
+        f.write("")
+
     pages = []
     category_counts = {}
 
@@ -317,6 +352,7 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
     mermaid.initialize({{
       startOnLoad: true,
+      securityLevel: 'loose',
       theme: 'dark',
       themeVariables: {{
         darkMode: true,
@@ -414,6 +450,7 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
     mermaid.initialize({{
       startOnLoad: true,
+      securityLevel: 'loose',
       theme: 'dark',
       themeVariables: {{
         darkMode: true,
@@ -940,6 +977,78 @@ body {
 .mermaid svg {
   max-width: 100% !important;
   height: auto !important;
+}
+
+/* GitHub Alert Callouts */
+.alert {
+  border-left: 4px solid var(--border-color);
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+}
+
+.alert-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+}
+
+.alert-title svg {
+  flex-shrink: 0;
+}
+
+.alert-body {
+  color: var(--text-main);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.alert-body p:last-child {
+  margin-bottom: 0;
+}
+
+.alert-note {
+  border-left-color: #2f81f7;
+  background: rgba(56, 139, 253, 0.08);
+}
+.alert-note .alert-title {
+  color: #58a6ff;
+}
+
+.alert-tip {
+  border-left-color: #3fb950;
+  background: rgba(63, 185, 80, 0.08);
+}
+.alert-tip .alert-title {
+  color: #3fb950;
+}
+
+.alert-important {
+  border-left-color: #a371f7;
+  background: rgba(163, 113, 247, 0.08);
+}
+.alert-important .alert-title {
+  color: #bc8cff;
+}
+
+.alert-warning {
+  border-left-color: #d29922;
+  background: rgba(210, 153, 34, 0.08);
+}
+.alert-warning .alert-title {
+  color: #d29922;
+}
+
+.alert-caution {
+  border-left-color: #f85149;
+  background: rgba(248, 81, 73, 0.08);
+}
+.alert-caution .alert-title {
+  color: #f85149;
 }
 """
     with open(os.path.join(assets_dir, "style.css"), "w", encoding="utf-8") as f:

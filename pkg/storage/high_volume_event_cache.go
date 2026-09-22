@@ -138,6 +138,13 @@ func GetGlobalHighVolumeEventCache() *HighVolumeEventCache {
 	return globalHighVolumeEventCache
 }
 
+// ResetGlobalHighVolumeEventCacheForTesting resets the global high-volume event cache instance for tests.
+func ResetGlobalHighVolumeEventCacheForTesting() {
+	StopHighVolumeEventCachePersistForTest(emptyValue)
+	globalHighVolumeEventCache = nil
+	highVolumeCacheOnce = sync.Once{}
+}
+
 // NewHighVolumeEventCache creates a new high-volume event cache
 func NewHighVolumeEventCache() *HighVolumeEventCache {
 	return &HighVolumeEventCache{

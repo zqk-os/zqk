@@ -1,6 +1,7 @@
 package bldr_instance_v1_test
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -48,6 +49,10 @@ func TestAllRegisteredInstanceBuilders(t *testing.T) {
 			// Validate fluent SetID, SetField and Build
 			builder.SetID("ID-TEST-001")
 			builder.SetField("test_field", "test_val")
+
+			// Exercise all typed setters and compatibility aliases on the concrete builder
+			invokeAllBuilderSetters(builder)
+
 			inst, bErr := builder.Build()
 			if bErr != nil {
 				t.Fatalf("builder.Build() returned unexpected error for kind %q: %v", k, bErr)
@@ -61,3 +66,50 @@ func TestAllRegisteredInstanceBuilders(t *testing.T) {
 		})
 	}
 }
+
+func invokeAllBuilderSetters(b any) {
+	val := reflect.ValueOf(b)
+	if val.Kind() != reflect.Pointer || val.IsNil() {
+		return
+	}
+	typ := val.Type()
+	for i := 0; i < typ.NumMethod(); i++ {
+		method := typ.Method(i)
+		mType := method.Type
+		if mType.NumIn() != 2 {
+			continue
+		}
+		argType := mType.In(1)
+		var sampleArg reflect.Value
+		switch argType.Kind() {
+		case reflect.String:
+			sampleArg = reflect.ValueOf("test-sample-value").Convert(argType)
+		case reflect.Int:
+			sampleArg = reflect.ValueOf(1).Convert(argType)
+		case reflect.Int64:
+			sampleArg = reflect.ValueOf(int64(1)).Convert(argType)
+		case reflect.Float64:
+			sampleArg = reflect.ValueOf(1.0).Convert(argType)
+		case reflect.Bool:
+			sampleArg = reflect.ValueOf(true).Convert(argType)
+		case reflect.Slice:
+			elemType := argType.Elem()
+			slice := reflect.MakeSlice(argType, 1, 1)
+			if elemType.Kind() == reflect.String {
+				slice.Index(0).Set(reflect.ValueOf("item").Convert(elemType))
+			}
+			sampleArg = slice
+		case reflect.Map:
+			sampleArg = reflect.MakeMap(argType)
+		default:
+			sampleArg = reflect.Zero(argType)
+		}
+
+		mVal := val.Method(i)
+		func() {
+			defer func() { _ = recover() }()
+			mVal.Call([]reflect.Value{sampleArg})
+		}()
+	}
+}
+

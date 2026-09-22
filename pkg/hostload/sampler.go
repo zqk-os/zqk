@@ -52,10 +52,14 @@ func (s *osSampler) Snapshot() Snapshot {
 		return Snapshot{NCPU: ncpu, Load1: 0, IdleFraction: 1, SampledAt: now}
 	}
 	load1, loadOK := readLoadAvg()
+	idle, total, tickOK := readCPUTicks()
+	return s.snapshotFromSample(now, ncpu, load1, loadOK, idle, total, tickOK)
+}
+
+func (s *osSampler) snapshotFromSample(now time.Time, ncpu int, load1 float64, loadOK bool, idle, total uint64, tickOK bool) Snapshot {
 	if !loadOK {
 		load1 = -1
 	}
-	idle, total, tickOK := readCPUTicks()
 	idleFrac := -1.0
 	s.mu.Lock()
 	defer s.mu.Unlock()

@@ -22,6 +22,12 @@ INSTALL_DIR="${ZQK_INSTALL_DIR:-/usr/local/bin}"
 # INSTALL_METHOD: auto | binary | goinstall | source
 INSTALL_METHOD="${ZQK_INSTALL_METHOD:-auto}"
 
+# Auto-detect GITHUB_TOKEN via gh CLI if not explicitly set
+if [ -z "$GITHUB_TOKEN" ] && command -v gh >/dev/null 2>&1; then
+  GITHUB_TOKEN="$(gh auth token 2>/dev/null || true)"
+fi
+GITHUB_TOKEN="$(printf '%s' "$GITHUB_TOKEN" | tr -d '\r\n')"
+
 # ---------------------------------------------------------------------------
 # 1. Detect OS and Architecture
 # ---------------------------------------------------------------------------
@@ -40,24 +46,39 @@ fi
 # 2. Resolve 'latest' version tag (unauthenticated for public repo)
 # ---------------------------------------------------------------------------
 resolve_latest() {
+  local tag=""
   if [ -n "$GITHUB_TOKEN" ]; then
-    curl -sSL -H "Authorization: token $GITHUB_TOKEN" \
+    tag=$(curl -sSL -H "Authorization: Bearer $GITHUB_TOKEN" \
       -H "Accept: application/vnd.github.v3+json" \
       "https://api.github.com/repos/${REPO}/releases/latest" 2>/dev/null \
-      | grep '"tag_name"' | cut -d'"' -f4 | head -1
+      | grep '"tag_name"' | cut -d'"' -f4 | head -1)
+    if [ -z "$tag" ]; then
+      tag=$(curl -sSL -H "Authorization: Bearer $GITHUB_TOKEN" \
+        -H "Accept: application/vnd.github.v3+json" \
+        "https://api.github.com/repos/${REPO}/releases" 2>/dev/null \
+        | grep '"tag_name"' | cut -d'"' -f4 | head -1)
+    fi
   else
-    # Public unauthenticated endpoint
-    curl -sSL "https://api.github.com/repos/${REPO}/releases/latest" 2>/dev/null \
-      | grep '"tag_name"' | cut -d'"' -f4 | head -1
+    tag=$(curl -sSL -H "Accept: application/vnd.github.v3+json" \
+      "https://api.github.com/repos/${REPO}/releases/latest" 2>/dev/null \
+      | grep '"tag_name"' | cut -d'"' -f4 | head -1)
+    if [ -z "$tag" ]; then
+      tag=$(curl -sSL -H "Accept: application/vnd.github.v3+json" \
+        "https://api.github.com/repos/${REPO}/releases" 2>/dev/null \
+        | grep '"tag_name"' | cut -d'"' -f4 | head -1)
+    fi
   fi
+  printf '%s' "$tag"
 }
 
 # Verify exactly one archive against checksums.txt. Multi-platform manifests list
 # files we did not download; do not skip unmatched checksum lines.
 _verify_archive_sha256() {
-  sums="$1"
-  archive="$2"
-  name=$(basename "$archive")
+  local sums="$1"
+  local archive_path="$2"
+  local name
+  name=$(basename "$archive_path")
+  local expected
   expected=$(awk -v n="$name" '
     {
       f=$NF
@@ -69,10 +90,11 @@ _verify_archive_sha256() {
     echo "No SHA256 for ${name} in checksums.txt" >&2
     exit 1
   }
+  local actual=""
   if command -v sha256sum >/dev/null 2>&1; then
-    actual=$(sha256sum "$archive" | awk '{print $1}')
+    actual=$(sha256sum "$archive_path" | awk '{print $1}')
   elif command -v shasum >/dev/null 2>&1; then
-    actual=$(shasum -a 256 "$archive" | awk '{print $1}')
+    actual=$(shasum -a 256 "$archive_path" | awk '{print $1}')
   else
     echo "Neither sha256sum nor shasum found; cannot verify checksum." >&2
     exit 1
@@ -92,49 +114,114 @@ install_binary() {
   local ver="$1"
   local ver_num="${ver#v}"
   local archive="zqk_${ver_num}_${OS}_${ARCH}.tar.gz"
+  local comm_archive="zqk-community_${ver_num}_${OS}_${ARCH}.tar.gz"
 
   echo "📥 Downloading ZQK ${ver} (${OS}/${ARCH})..."
 
   TMPDIR="$(mktemp -d)"
   trap 'rm -rf "$TMPDIR"' EXIT
 
-  if [ -n "$GITHUB_TOKEN" ]; then
-    # Private repo: use asset API
-    _download_private "$ver" "$archive" "${TMPDIR}/${archive}"
-    _download_private "$ver" "checksums.txt" "${TMPDIR}/checksums.txt"
-  else
-    # Public repo: direct release asset URL
-    local base_url="https://github.com/${REPO}/releases/download/${ver}"
-    curl -sSLf "${base_url}/${archive}" -o "${TMPDIR}/${archive}" || {
-      echo "Binary release not found for ${ver}. Try ZQK_INSTALL_METHOD=source." >&2; exit 1
-    }
-    curl -sSLf "${base_url}/checksums.txt" -o "${TMPDIR}/checksums.txt" || {
-      echo "checksums.txt not found for ${ver}; refusing to install." >&2
+  local archive_path="${TMPDIR}/${archive}"
+  local checksums_path="${TMPDIR}/checksums.txt"
+
+  local base_url="https://github.com/${REPO}/releases/download/${ver}"
+  if curl -sSLf "${base_url}/${archive}" -o "${archive_path}" 2>/dev/null && \
+     curl -sSLf "${base_url}/checksums.txt" -o "${checksums_path}" 2>/dev/null; then
+    : # downloaded from public release URL
+  elif curl -sSLf "${base_url}/${comm_archive}" -o "${archive_path}" 2>/dev/null && \
+     curl -sSLf "${base_url}/checksums.txt" -o "${checksums_path}" 2>/dev/null; then
+    : # downloaded community-prefixed archive from public release URL
+  elif [ -n "$GITHUB_TOKEN" ] || command -v gh >/dev/null 2>&1; then
+    if ! _download_private "$ver" "$archive" "${archive_path}"; then
+      if ! _download_private "$ver" "$comm_archive" "${archive_path}"; then
+        echo "Neither ${archive} nor ${comm_archive} found in release ${ver}" >&2
+        exit 1
+      fi
+    fi
+    _download_private "$ver" "checksums.txt" "${checksums_path}" || {
+      echo "Checksums file not found in release ${ver}" >&2
       exit 1
     }
+  else
+    echo "Binary release not found for ${ver}. Try ZQK_INSTALL_METHOD=source or set GITHUB_TOKEN." >&2
+    exit 1
   fi
 
   echo "🔒 Verifying checksum..."
-  _verify_archive_sha256 "${TMPDIR}/checksums.txt" "${TMPDIR}/${archive}"
+  _verify_archive_sha256 "${checksums_path}" "${archive_path}"
 
   echo "📦 Extracting..."
-  tar -xzf "${TMPDIR}/${archive}" -C "$TMPDIR"
+  tar -xzf "${archive_path}" -C "$TMPDIR"
   local extract_dir="${TMPDIR}/zqk_${ver_num}_${OS}_${ARCH}"
+  [ -d "$extract_dir" ] || extract_dir="${TMPDIR}/zqk-community_${ver_num}_${OS}_${ARCH}"
   [ -d "$extract_dir" ] || extract_dir="${TMPDIR}"  # goreleaser flat layout fallback
+
+  if [ -f "$extract_dir/zqk-community" ] && [ ! -f "$extract_dir/zqk" ]; then
+    cp "$extract_dir/zqk-community" "$extract_dir/zqk"
+  fi
 
   _place_binary "$extract_dir/zqk" "$extract_dir/zqk-mcp"
 }
 
 _download_private() {
   local ver="$1" asset_name="$2" out="$3"
-  local asset_url
-  asset_url=$(curl -sSL -H "Authorization: token $GITHUB_TOKEN" \
-    -H "Accept: application/vnd.github.v3+json" \
-    "https://api.github.com/repos/${REPO}/releases/tags/${ver}" \
-    | grep -A1 "\"name\": \"${asset_name}\"" | grep '"url"' | cut -d'"' -f4 | head -1)
-  [ -n "$asset_url" ] || { echo "Asset ${asset_name} not found in release ${ver}" >&2; exit 1; }
-  curl -sSL -H "Authorization: token $GITHUB_TOKEN" \
-    -H "Accept: application/octet-stream" "$asset_url" -o "$out"
+
+  # Fast path: use gh CLI if available
+  if command -v gh >/dev/null 2>&1; then
+    if gh release download "$ver" -p "$asset_name" --output "$out" --repo "$REPO" --clobber >/dev/null 2>&1; then
+      return 0
+    fi
+  fi
+
+  # Fallback: GitHub Releases REST API
+  if [ -n "$GITHUB_TOKEN" ]; then
+    local token
+    token="$(printf '%s' "$GITHUB_TOKEN" | tr -d '\r\n')"
+    local release_json
+    release_json=$(curl -sSL -H "Authorization: Bearer $token" \
+      -H "Accept: application/vnd.github.v3+json" \
+      "https://api.github.com/repos/${REPO}/releases/tags/${ver}" 2>/dev/null)
+
+    local asset_url=""
+    if command -v python3 >/dev/null 2>&1; then
+      asset_url=$(printf '%s' "$release_json" | python3 -c '
+import sys, json
+try:
+    d = json.load(sys.stdin)
+    for a in d.get("assets", []):
+        if a.get("name") == sys.argv[1]:
+            print(a.get("url", ""))
+            break
+except Exception:
+    pass
+' "$asset_name" 2>/dev/null || true)
+    fi
+
+    if [ -z "$asset_url" ]; then
+      asset_url=$(printf '%s' "$release_json" | awk -v name="$asset_name" '
+        BEGIN { RS="{"; FS="," }
+        $0 ~ ("\"name\":[ ]*\"" name "\"") {
+          for (i=1; i<=NF; i++) {
+            if ($i ~ /"url":/) {
+              gsub(/.*"url":[ ]*"/, "", $i)
+              gsub(/".*/, "", $i)
+              print $i
+              exit
+            }
+          }
+        }
+      ')
+    fi
+
+    if [ -n "$asset_url" ]; then
+      if curl -sSL -H "Authorization: Bearer $token" \
+        -H "Accept: application/octet-stream" "$asset_url" -o "$out"; then
+        return 0
+      fi
+    fi
+  fi
+
+  return 1
 }
 
 # ---------------------------------------------------------------------------
