@@ -16,12 +16,12 @@ import (
 // (CRIT-1789708521365161000-969fc6a6).
 func TestDocsPortal_FunctionalAcceptance(t *testing.T) {
 	root := paths.ResolveProjectRoot(".")
-	scriptPath := filepath.Join(root, "scripts", "generate-docs-portal.sh")
+	scriptPath := filepath.Join(root, "scripts", "open-core", "docs-portal", "generate-docs-portal.sh")
 	if !fileutil.Exists(scriptPath) {
 		t.Fatalf("expected generate-docs-portal.sh script at %s", scriptPath)
 	}
 
-	pyScriptPath := filepath.Join(root, "scripts", "generate_docs_portal.py")
+	pyScriptPath := filepath.Join(root, "scripts", "open-core", "docs-portal", "generate_docs_portal.py")
 	if !fileutil.Exists(pyScriptPath) {
 		t.Fatalf("expected generate_docs_portal.py script at %s", pyScriptPath)
 	}
@@ -74,7 +74,7 @@ func TestDocsPortal_FunctionalAcceptance(t *testing.T) {
 // and error handling for missing or invalid inputs (CRIT-1789708521365162000-933653ab).
 func TestDocsPortal_BoundaryAndErrorHandling(t *testing.T) {
 	root := paths.ResolveProjectRoot(".")
-	scriptPath := filepath.Join(root, "scripts", "generate-docs-portal.sh")
+	scriptPath := filepath.Join(root, "scripts", "open-core", "docs-portal", "generate-docs-portal.sh")
 
 	// Verification mode failure on nonexistent tarball
 	cmd := exec.Command("bash", scriptPath, "--verify", "/nonexistent/path/docs.tar.gz")
@@ -111,7 +111,7 @@ func TestDocsPortal_BoundaryAndErrorHandling(t *testing.T) {
 // can invoke documentation portal generation (CRIT-1789708521365163000-559def00).
 func TestDocsPortal_IntegrationAndConformance(t *testing.T) {
 	root := paths.ResolveProjectRoot(".")
-	scriptPath := filepath.Join(root, "scripts", "generate-docs-portal.sh")
+	scriptPath := filepath.Join(root, "scripts", "open-core", "docs-portal", "generate-docs-portal.sh")
 
 	fi, err := os.Stat(scriptPath)
 	if err != nil {
@@ -121,7 +121,7 @@ func TestDocsPortal_IntegrationAndConformance(t *testing.T) {
 		t.Errorf("expected generate-docs-portal.sh to be executable")
 	}
 
-	pyScript := filepath.Join(root, "scripts", "generate_docs_portal.py")
+	pyScript := filepath.Join(root, "scripts", "open-core", "docs-portal", "generate_docs_portal.py")
 	contentBytes, err := os.ReadFile(pyScript)
 	if err != nil {
 		t.Fatalf("failed to read generate_docs_portal.py: %v", err)

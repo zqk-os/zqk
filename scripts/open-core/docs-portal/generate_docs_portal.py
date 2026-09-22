@@ -34,6 +34,9 @@ ZQK_LOGO_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" 
   <path d="M72.51,61.93 L92.00,61.93 L92.00,64.95 L72.51,64.95Z" fill="#00e676" filter="url(#cursor-glow)"/>
 </svg>"""
 
+ZQK_HEADER_LOGO_SVG = ZQK_LOGO_SVG.replace('width="100%" height="100%"', 'width="28" height="28" class="logo-mark"')
+
+
 def get_html_relpath(rel_md_path: str) -> str:
     """Converts a markdown file relative path into an HTML relative path preserving folders."""
     if rel_md_path.endswith(".md"):
@@ -325,7 +328,7 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
     <div class="nav-container">
       <div class="brand">
         <a href="{root_rel}index.html" class="logo">
-          <img src="{root_rel}assets/zqk-logo.svg" alt="ZQK" width="28" height="28" class="logo-mark">
+          {ZQK_HEADER_LOGO_SVG}
           <span class="logo-text">ZQK <span class="logo-accent">Core</span></span>
         </a>
         <span class="badge-tag">{html.escape(item["category"])}</span>
@@ -422,8 +425,8 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
     <div class="nav-container">
       <div class="brand">
         <a href="index.html" class="logo">
-          <img src="assets/zqk-logo.svg" alt="ZQK" width="28" height="28" class="logo-mark">
-          <span class="logo-text">ZQK <span class="logo-accent">Core</span></span>
+          {ZQK_HEADER_LOGO_SVG}
+          <span class="logo-text">ZQK <span class="logo-accent">Core</span> <span style="font-size: 0.82rem; color: #8b949e; font-weight: normal; margin-left: 6px;">Community Docs</span></span>
         </a>
       </div>
       <div class="search-box">
@@ -438,9 +441,9 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
     </aside>
     <article class="doc-body">
       <div class="hero-box">
-        <h1>Zen Quantum Kernel (ZQK) Core Documentation</h1>
+        <h1>ZQK Community Docs</h1>
         <p class="hero-desc">
-          The foundational, sovereign Knowledge Kernel for human-agent software engineering.
+          The Cellular Knowledge Operating System for autonomous AI agent swarms and human engineering teams.
         </p>
         <div class="portal-stat-badge">
           <strong>{len(pages)}</strong> official open-core documentation guides and specifications
@@ -969,7 +972,35 @@ document.addEventListener('click', function(e) {{
 
     print(f"✅ ZQK Core docs portal successfully generated ({len(pages)} articles).")
 
+def verify_tarball(tarball_path: str) -> bool:
+    """Verifies that the generated documentation tarball contains valid structure."""
+    if not os.path.exists(tarball_path):
+        print(f"Error: tarball does not exist: {tarball_path}", file=sys.stderr)
+        return False
+    try:
+        import tarfile
+        with tarfile.open(tarball_path, "r:gz") as tar:
+            names = tar.getnames()
+            has_index = any(n.endswith("index.html") for n in names)
+            has_style = any("assets/style.css" in n for n in names)
+            if has_index and has_style:
+                print(f"Tarball {tarball_path} verified: valid structure (contains index.html and assets/style.css)")
+                return True
+            else:
+                print(f"Error: tarball missing required index.html or assets/style.css", file=sys.stderr)
+                return False
+    except Exception as e:
+        print(f"Error reading tarball {tarball_path}: {e}", file=sys.stderr)
+        return False
+
 def main():
+    if len(sys.argv) > 1 and sys.argv[1] == "--verify":
+        if len(sys.argv) < 3:
+            print("Error: --verify requires tarball path", file=sys.stderr)
+            sys.exit(1)
+        ok = verify_tarball(sys.argv[2])
+        sys.exit(0 if ok else 1)
+
     script_dir = os.path.dirname(os.path.abspath(__file__))
     # Try git rev-parse first, fallback to ../../.. relative to this script
     try:
