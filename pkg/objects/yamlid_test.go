@@ -44,4 +44,29 @@ func TestReadIDAndKindFromYAMLFile(t *testing.T) {
 	if id != "BLI-999" || kind != "backlog_item" {
 		t.Errorf("ReadIDAndKindFromYAMLFile() = %q, %q; want BLI-999, backlog_item", id, kind)
 	}
+
+	gotIDOnly := ReadIDFromYAMLFile(path)
+	if gotIDOnly != "BLI-999" {
+		t.Errorf("ReadIDFromYAMLFile() = %q; want BLI-999", gotIDOnly)
+	}
+}
+
+func TestStringField(t *testing.T) {
+	t.Parallel()
+	if StringField(nil, "key") != "" {
+		t.Error("expected empty string for nil map")
+	}
+	m := map[string]any{
+		"title": "My Title",
+		"count": 42,
+	}
+	if got := StringField(m, "title"); got != "My Title" {
+		t.Errorf("StringField(m, 'title') = %q, want 'My Title'", got)
+	}
+	if got := StringField(m, "count"); got != "" {
+		t.Errorf("StringField(m, 'count') = %q, want empty string for non-string", got)
+	}
+	if got := StringField(m, "missing"); got != "" {
+		t.Errorf("StringField(m, 'missing') = %q, want empty string for missing key", got)
+	}
 }

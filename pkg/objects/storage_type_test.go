@@ -60,3 +60,18 @@ func TestStorageType_IsBypassKind(t *testing.T) {
 		t.Errorf("IsBypassKind(\"\") = true, want false")
 	}
 }
+
+func TestStorageType_ResolveStorageProfile(t *testing.T) {
+	if profile := ResolveStorageProfile(""); profile != "" {
+		t.Errorf("expected empty for empty kind, got %q", profile)
+	}
+	if profile := ResolveStorageProfile(KindAuditEvent); profile != "stream" {
+		t.Errorf("expected stream for audit_event, got %q", profile)
+	}
+	if profile := ResolveStorageProfile(KindBacklogItem); profile != "cas_entity" {
+		t.Errorf("expected cas_entity for backlog_item, got %q", profile)
+	}
+	if profile := ResolveStorageProfile("nonexistent_kind_xyz"); profile != "" {
+		t.Errorf("expected empty for unknown kind, got %q", profile)
+	}
+}

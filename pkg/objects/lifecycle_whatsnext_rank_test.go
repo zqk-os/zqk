@@ -114,4 +114,68 @@ func TestPlanSeatedPersonaBonus(t *testing.T) {
 	if got := PlanSeatedPersonaBonus(pids, shared); got != -whatsNextSharedPersonaPenalty {
 		t.Fatalf("shared=%d", got)
 	}
+
+	// []any persona refs branch
+	sharedAny := map[string]any{FieldKeyPersonaRefs: []any{"PER-ORCH-ALPHA", "PER-ORCH-BETA"}}
+	if got := PlanSeatedPersonaBonus(pids, sharedAny); got != -whatsNextSharedPersonaPenalty {
+		t.Fatalf("sharedAny=%d", got)
+	}
+}
+
+func TestPlanStatusEligibleAndExecutionFacing(t *testing.T) {
+	t.Parallel()
+	if !PlanStatusEligibleForWhatsNext(KindPriorityPlan, "in_progress") {
+		t.Error("in_progress should be eligible for whats next")
+	}
+	if !PlanStatusEligibleForWhatsNext(KindPriorityPlan, "active") {
+		t.Error("active should be eligible for whats next")
+	}
+	if !PlanStatusEligibleForWhatsNext(KindPriorityPlan, "paused") {
+		t.Error("paused should be eligible for whats next")
+	}
+	if PlanStatusEligibleForWhatsNext(KindPriorityPlan, "complete") {
+		t.Error("complete should NOT be eligible for whats next")
+	}
+
+	if !PlanStatusExecutionFacing(KindPriorityPlan, "in_progress") {
+		t.Error("in_progress should be execution facing")
+	}
+	if !PlanStatusExecutionFacing(KindPriorityPlan, "active") {
+		t.Error("active should be execution facing")
+	}
+	if PlanStatusExecutionFacing(KindPriorityPlan, "complete") {
+		t.Error("complete should NOT be execution facing")
+	}
+}
+
+func TestPlanActiveOrderPenalty_Variants(t *testing.T) {
+	t.Parallel()
+	if got := PlanActiveOrderPenalty(KindPriorityPlan, nil); got != whatsNextUnsetOrderPenalty {
+		t.Errorf("nil obj penalty: got %d, want %d", got, whatsNextUnsetOrderPenalty)
+	}
+	if got := PlanActiveOrderPenalty(KindPriorityPlan, map[string]any{FieldKeyStatus: "active"}); got != whatsNextUnsetOrderPenalty {
+		t.Errorf("unset order penalty: got %d, want %d", got, whatsNextUnsetOrderPenalty)
+	}
+	if got := PlanActiveOrderPenalty(KindPriorityPlan, map[string]any{FieldKeyStatus: "active", FieldKeyActiveOrder: int64(5)}); got != 5 {
+		t.Errorf("int64 order penalty: got %d, want 5", got)
+	}
+	if got := PlanActiveOrderPenalty(KindPriorityPlan, map[string]any{FieldKeyStatus: "active", FieldKeyActiveOrder: float64(7)}); got != 7 {
+		t.Errorf("float64 order penalty: got %d, want 7", got)
+	}
+	if got := PlanActiveOrderPenalty(KindPriorityPlan, map[string]any{FieldKeyStatus: "active", FieldKeyActiveOrder: -1}); got != whatsNextUnsetOrderPenalty {
+		t.Errorf("negative order penalty: got %d, want %d", got, whatsNextUnsetOrderPenalty)
+	}
+	if got := PlanActiveOrderPenalty(KindPriorityPlan, map[string]any{FieldKeyStatus: "active", FieldKeyActiveOrder: "not_a_num"}); got != whatsNextUnsetOrderPenalty {
+		t.Errorf("string order penalty: got %d, want %d", got, whatsNextUnsetOrderPenalty)
+	}
+}
+
+func TestBacklogCountsAsExecutionFuel_Blocked(t *testing.T) {
+	t.Parallel()
+	if !BacklogCountsAsExecutionFuel("blocked") {
+		t.Error("blocked backlog item should count as execution fuel")
+	}
+	if BacklogCountsAsExecutionFuel("complete") {
+		t.Error("complete backlog item should not count as execution fuel")
+	}
 }
