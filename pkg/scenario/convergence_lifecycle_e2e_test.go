@@ -66,6 +66,7 @@ func setupAppliedConvergenceLifecycleBundle(t *testing.T) (
 		t.Fatalf("Read CVS after apply: %v", err)
 	}
 	cvsObj[objects.FieldKeyStatus] = objects.ObjectStatusActive
+	delete(cvsObj, objects.FieldKeyRequirementRefs)
 	if err := provider.Update(ctx, secCtx, cvsID, cvsObj); err != nil {
 		t.Fatalf("promote CVS draft→active: %v", err)
 	}

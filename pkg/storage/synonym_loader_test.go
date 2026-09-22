@@ -37,7 +37,11 @@ type testSettingsShape struct {
 }
 
 func writeMinimalTestSettingsFile(testRoot string) error {
-	path := filepath.Join(testRoot, paths.TestSettingsFilename)
+	configDir := filepath.Join(testRoot, paths.ConfigDir)
+	if err := fileutil.EnsureDir(configDir); err != nil {
+		return err
+	}
+	path := filepath.Join(configDir, paths.ZqkTestConfigFileName)
 	body := testSettingsShape{
 		Version: paths.DefaultBrandSettingsVersion,
 		Paths:   map[string]any{},

@@ -58,7 +58,11 @@ type testSettingsYAMLShapeScheduler struct {
 }
 
 func writeMinimalTestSettingsYAMLScheduler(testRoot string) error {
-	p := filepath.Join(testRoot, paths.TestSettingsFilename)
+	configDir := filepath.Join(testRoot, paths.ConfigDir)
+	if err := fileutil.EnsureDir(configDir); err != nil {
+		return err
+	}
+	p := filepath.Join(configDir, paths.ZqkTestConfigFileName)
 	body := testSettingsYAMLShapeScheduler{
 		Version: paths.DefaultBrandSettingsVersion,
 		Paths:   map[string]any{},
@@ -89,7 +93,7 @@ func newSchedulerTestStorage(t *testing.T) (string, *storage.FileObjectStorage) 
 	return testRoot, store
 }
 
-// setupSchedulerTestEnvironmentRoot mirrors pkg/testing.SetupTestEnvironment: project layout + test-settings.yaml only.
+// setupSchedulerTestEnvironmentRoot mirrors pkg/testing.SetupTestEnvironment: project layout + config/zqk-test.yaml only.
 func setupSchedulerTestEnvironmentRoot(testRoot string) (string, error) {
 	absRoot, err := filepath.Abs(testRoot)
 	if err != nil {
@@ -126,7 +130,7 @@ func layoutSchedulerTestRootFull(t *testing.T, testRoot string) {
 		t.Fatalf("test project layout: %v", err)
 	}
 	if err := writeMinimalTestSettingsYAMLScheduler(absRoot); err != nil {
-		t.Fatalf("test-settings.yaml: %v", err)
+		t.Fatalf("config/zqk-test.yaml: %v", err)
 	}
 }
 

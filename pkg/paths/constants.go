@@ -223,13 +223,6 @@ const (
 	// Contains one line: absolute path or path relative to workspace. See PROJECT_ROOT_USE_AND_SCHEDULER_ALIGNMENT.md.
 	CurrentRootFile = "current_root"
 
-	// TestSettingsFilename is the settings file used when ZQK_TEST_ROOT is set. Tests load this file
-	// instead of project configuration (config/zqk.yaml) so project data is never touched. SetupTestEnvironment creates it.
-	TestSettingsFilename = "test-settings.yaml"
-	// ZqkTestSettingsFilename is an alternate test-root settings file.
-	// Loaded when TestSettingsFilename is absent so isolated zqk-ts + ZQK_TS_TEST_ROOT projects can ship one file.
-	ZqkTestSettingsFilename = "zqk-test-settings.yaml"
-
 	// Pre-commit: all state under .zqk/pre-commit/ (category files + single results.json for the hook)
 	PreCommitDir         = "pre-commit"
 	PreCommitResultsFile = "results.json" // aggregated file read by hook: .zqk/pre-commit/results.json

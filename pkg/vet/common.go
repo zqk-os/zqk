@@ -54,8 +54,36 @@ func collectGitFiles(root string) ([]string, error) {
 	return files, err
 }
 
-// collectGoFiles gathers relevant Go files in the repository (under pkg/, cmd/, internal/, scripts/).
-func collectGoFiles(root string) ([]string, error) {
+// isPathExempt checks if path matches any entry in exemptions.
+// Supports exact match, prefix match (with trailing slash or /*), and glob pattern matching.
+func isPathExempt(path string, exemptions []string) bool {
+	path = filepath.ToSlash(path)
+	for _, ex := range exemptions {
+		ex = filepath.ToSlash(ex)
+		if path == ex {
+			return true
+		}
+		if strings.HasSuffix(ex, "/") && strings.HasPrefix(path, ex) {
+			return true
+		}
+		if strings.HasSuffix(ex, "/*") {
+			prefix := strings.TrimSuffix(ex, "/*")
+			if strings.HasPrefix(path, prefix+"/") || path == prefix {
+				return true
+			}
+		}
+		if matched, _ := filepath.Match(ex, path); matched {
+			return true
+		}
+		if matched, _ := filepath.Match(ex, filepath.Base(path)); matched {
+			return true
+		}
+	}
+	return false
+}
+
+// collectGoFiles gathers relevant Go files in the repository.
+func collectGoFiles(root string, scanDirs []string) ([]string, error) {
 	cmd := execwrap.Command("git", "-C", root, "ls-files", "-z", "--cached", "--others", "--exclude-standard", "--", "*.go")
 	out, err := cmd.Output()
 	if err == nil {
@@ -64,7 +92,7 @@ func collectGoFiles(root string) ([]string, error) {
 			if p == "" {
 				continue
 			}
-			if strings.HasPrefix(p, "pkg/") || strings.HasPrefix(p, "cmd/") || strings.HasPrefix(p, "internal/") || strings.HasPrefix(p, "scripts/") {
+			if matchesScanDirs(p, scanDirs) {
 				files = append(files, p)
 			}
 		}
@@ -88,11 +116,25 @@ func collectGoFiles(root string) ([]string, error) {
 		}
 		if strings.HasSuffix(path, ".go") {
 			rel, _ := filepath.Rel(root, path)
-			if strings.HasPrefix(rel, "pkg/") || strings.HasPrefix(rel, "cmd/") || strings.HasPrefix(rel, "internal/") || strings.HasPrefix(rel, "scripts/") {
+			rel = filepath.ToSlash(rel)
+			if matchesScanDirs(rel, scanDirs) {
 				files = append(files, rel)
 			}
 		}
 		return nil
 	})
 	return files, err
+}
+
+func matchesScanDirs(rel string, scanDirs []string) bool {
+	if len(scanDirs) == 0 {
+		return !strings.HasPrefix(rel, "vendor/")
+	}
+	for _, dir := range scanDirs {
+		dir = filepath.ToSlash(dir)
+		if strings.HasPrefix(rel, dir) {
+			return true
+		}
+	}
+	return false
 }

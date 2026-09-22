@@ -26,7 +26,11 @@ type testSettingsYAMLShapeDomain struct {
 }
 
 func writeMinimalTestSettingsYAMLDomain(testRoot string) error {
-	p := filepath.Join(testRoot, paths.TestSettingsFilename)
+	configDir := filepath.Join(testRoot, paths.ConfigDir)
+	if err := fileutil.EnsureDir(configDir); err != nil {
+		return err
+	}
+	p := filepath.Join(configDir, paths.ZqkTestConfigFileName)
 	body := testSettingsYAMLShapeDomain{
 		Version: clctx.DefaultBrandSettingsVersion,
 		Paths:   map[string]any{},

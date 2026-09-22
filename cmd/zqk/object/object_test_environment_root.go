@@ -16,7 +16,11 @@ type testSettingsYAMLShapeObject struct {
 }
 
 func writeMinimalTestSettingsYAMLObject(testRoot string) error {
-	p := filepath.Join(testRoot, paths.TestSettingsFilename)
+	configDir := filepath.Join(testRoot, paths.ConfigDir)
+	if err := fileutil.EnsureDir(configDir); err != nil {
+		return err
+	}
+	p := filepath.Join(configDir, paths.ZqkTestConfigFileName)
 	body := testSettingsYAMLShapeObject{
 		Version: clctx.DefaultBrandSettingsVersion,
 		Paths:   map[string]any{},
@@ -28,7 +32,7 @@ func writeMinimalTestSettingsYAMLObject(testRoot string) error {
 	return fileutil.WriteSecureFile(p, data) //nolint:gosec // test file
 }
 
-// setupObjectTestEnvironmentRoot mirrors pkg/testing.SetupTestEnvironment (layout + test-settings only).
+// setupObjectTestEnvironmentRoot mirrors pkg/testing.SetupTestEnvironment (layout + config/zqk-test.yaml only).
 func setupObjectTestEnvironmentRoot(testRoot string) (string, error) {
 	absRoot, err := filepath.Abs(testRoot)
 	if err != nil {

@@ -122,7 +122,7 @@ func BadCLI() string {
 		t.Fatal(err)
 	}
 
-	findings, err := CheckCLINames(tempDir, []string{filePath})
+	findings, err := CheckCLINames(tempDir, []string{filePath}, nil)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

@@ -81,7 +81,7 @@ func runInit(_ *cobra.Command, projectName, template string, force bool, snapsho
 			if err == nil {
 				for _, entry := range entries {
 					name := entry.Name()
-					if name != ".git" && name != ".zqk-test-settings.yaml" && name != "zqk-test-settings.yaml" {
+					if name != ".git" && !strings.HasPrefix(name, paths.ProjectDataDir) {
 						legacy = true
 						logging.Fluent(logger).Info("Detected existing codebase; automatically enabling legacy mode for painless drop-in").Log()
 						break
@@ -166,7 +166,7 @@ func runInit(_ *cobra.Command, projectName, template string, force bool, snapsho
 	}
 
 	if err := clicontext.EnsureTestRootBrandSettingsFiles(projectRoot); err != nil {
-		logging.Fluent(logger).Warn("Failed to write test-root brand settings (zqk-test-settings.yaml / test-settings.yaml); scheduler may fail until they exist").
+		logging.Fluent(logger).Warn("Failed to write test-root config (config/zqk-test.yaml); scheduler may fail until it exists").
 			WithError(err).
 			Log()
 	}

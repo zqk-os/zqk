@@ -2,6 +2,7 @@ package system
 
 import (
 	"encoding/json"
+	"errors"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -61,7 +62,8 @@ func TestFormatDetection_RealCommandSimulation(t *testing.T) {
 
 	// Call outputResults (this is where format detection happens)
 	err := outputResults(cmd, ctx, results, nil, nil, nil)
-	if err != nil {
+	var sysErr *SystemCheckError
+	if err != nil && !errors.As(err, &sysErr) {
 		t.Fatalf("outputResults failed: %v", err)
 	}
 

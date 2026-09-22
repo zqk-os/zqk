@@ -42,24 +42,31 @@ func CheckPayload(root string, cfg *GatesConfig) ([]Finding, error) {
 	}
 
 	// 3. Verify module declaration in go.mod
+	reqMod := pl.RequiredModulePath
+	if reqMod == "" {
+		reqMod = "github.com/zqk-os/zqk"
+	}
 	goModBytes, err := os.ReadFile(filepath.Join(root, "go.mod"))
 	if err == nil {
-		if !strings.Contains(string(goModBytes), "module github.com/zqk-os/zqk") {
+		if !strings.Contains(string(goModBytes), "module "+reqMod) {
 			findings = append(findings, Finding{
 				CheckID:  "payload/invalid-module-path",
 				Suite:    "payload",
 				File:     "go.mod",
-				Message:  "go.mod does not declare module github.com/zqk-os/zqk",
+				Message:  "go.mod does not declare module " + reqMod,
 				Severity: SeverityError,
 			})
 		}
 	}
 
 	// 4. Sensitive files check
-	sensitivePatterns := []string{
-		".zqk/process/**", "docs/process/**",
-		".zqk/keystore/**", ".zqk/state/**", "config/zqk-local.yaml",
-		"*.pem", "*.key", "*.p12", "*.pfx",
+	sensitivePatterns := pl.SensitivePatterns
+	if len(sensitivePatterns) == 0 {
+		sensitivePatterns = []string{
+			".zqk/process/**", "docs/process/**",
+			".zqk/keystore/**", ".zqk/state/**", "config/zqk-local.yaml",
+			"*.pem", "*.key", "*.p12", "*.pfx",
+		}
 	}
 	sensitiveFiles, _ := checkSensitiveTrackedFiles(root, sensitivePatterns)
 	for _, f := range sensitiveFiles {
@@ -73,6 +80,11 @@ func CheckPayload(root string, cfg *GatesConfig) ([]Finding, error) {
 	}
 
 	// 5. Prohibited pattern scanning using git grep
+	globalGrepExempts := pl.GlobalGrepExemptions
+	if len(globalGrepExempts) == 0 {
+		globalGrepExempts = []string{"pkg/vet/*", "config/gates.yaml"}
+	}
+
 	for _, r := range pl.ProhibitedPatterns {
 		var pathspecs []string
 		for _, sc := range r.Scope {
@@ -89,8 +101,9 @@ func CheckPayload(root string, cfg *GatesConfig) ([]Finding, error) {
 		for _, ex := range r.Exemptions {
 			pathspecs = append(pathspecs, ":!"+ex)
 		}
-		// Always exempt pkg/vet/* and config/gates.yaml from self-matches
-		pathspecs = append(pathspecs, ":!pkg/vet/*", ":!config/gates.yaml")
+		for _, ex := range globalGrepExempts {
+			pathspecs = append(pathspecs, ":!"+ex)
+		}
 
 		matches, err := runGitGrep(root, r.Pattern, pathspecs)
 		if err == nil {

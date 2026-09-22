@@ -14,18 +14,20 @@ import (
 func CheckPathsAndPerms(root string, cfg *GatesConfig) ([]Finding, error) {
 	var findings []Finding
 
-	files, err := collectGoFiles(root)
+	files, err := collectGoFiles(root, cfg.Hygiene.GoScanDirs)
 	if err != nil {
 		return nil, err
 	}
 
 	fset := token.NewFileSet()
 
+	forbiddenList := cfg.Hygiene.ForbiddenPathLiterals
+	if len(forbiddenList) == 0 {
+		forbiddenList = []string{".zqk", ".zqk/"}
+	}
+
 	for _, rel := range files {
-		if shouldSkipPathFile(rel) {
-			continue
-		}
-		if isExempt(rel, cfg.Hygiene.Exemptions) {
+		if isPathExempt(rel, cfg.Hygiene.Exemptions) {
 			continue
 		}
 
@@ -92,22 +94,26 @@ func CheckPathsAndPerms(root string, cfg *GatesConfig) ([]Finding, error) {
 				}
 			}
 
-			// Check hardcoded paths like ".zqk"
+			// Check configurable forbidden path literals
 			if cfg.Hygiene.CheckPaths {
 				for _, arg := range call.Args {
 					lit, ok := arg.(*ast.BasicLit)
 					if ok && lit.Kind == token.STRING {
 						val, _ := strconv.Unquote(lit.Value)
-						if val == ".zqk" || strings.HasPrefix(val, ".zqk/") {
-							pos := fset.Position(lit.Pos())
-							findings = append(findings, Finding{
-								CheckID:  "hygiene/hardcoded-path",
-								Suite:    "hygiene",
-								File:     rel,
-								Line:     pos.Line,
-								Message:  "hardcoded \".zqk\" path literal used; use paths constants",
-								Severity: SeverityError,
-							})
+						for _, fp := range forbiddenList {
+							prefix := strings.TrimSuffix(fp, "/") + "/"
+							if val == fp || strings.HasPrefix(val, prefix) {
+								pos := fset.Position(lit.Pos())
+								findings = append(findings, Finding{
+									CheckID:  "hygiene/hardcoded-path",
+									Suite:    "hygiene",
+									File:     rel,
+									Line:     pos.Line,
+									Message:  "hardcoded \"" + fp + "\" path literal used; use paths constants",
+									Severity: SeverityError,
+								})
+								break
+							}
 						}
 					}
 				}
@@ -118,38 +124,6 @@ func CheckPathsAndPerms(root string, cfg *GatesConfig) ([]Finding, error) {
 	}
 
 	return findings, nil
-}
-
-func shouldSkipPathFile(rel string) bool {
-	switch {
-	case strings.HasSuffix(rel, "_test.go"):
-		return true
-	case strings.HasPrefix(rel, "vendor/"):
-		return true
-	case strings.HasPrefix(rel, ".git/"):
-		return true
-	case strings.HasPrefix(rel, "pkg/paths/"):
-		return true
-	case strings.HasPrefix(rel, "pkg/brand/"):
-		return true
-	case strings.HasPrefix(rel, "scripts/check_path_and_perm_literals/"):
-		return true
-	case strings.HasPrefix(rel, "pkg/specbuilder/bldr_"):
-		return true
-	case strings.HasPrefix(rel, "pkg/cli/bldr_cli_cmd_v1/"):
-		return true
-	case strings.HasPrefix(rel, "pkg/utils/fileutil/"):
-		return true
-	case strings.HasPrefix(rel, "scripts/prepare_cas_updates/"):
-		return true
-	case strings.HasPrefix(rel, "scripts/legacy-decommission/"):
-		return true
-	case strings.HasPrefix(rel, "pkg/vet/"):
-		return true
-	case strings.Contains(rel, "tools_sandbox"):
-		return true
-	}
-	return false
 }
 
 func getCallFunctionName(call *ast.CallExpr) string {
@@ -175,25 +149,4 @@ func isMagicPerm(expr ast.Expr) bool {
 		return false
 	}
 	return val == 0755 || val == 0644 || val == 0600 || val == 0700 || val == 0750
-}
-
-func isExempt(path string, exemptions []string) bool {
-	for _, ex := range exemptions {
-		if path == ex {
-			return true
-		}
-		if matched, _ := filepath.Match(ex, path); matched {
-			return true
-		}
-		if matched, _ := filepath.Match(ex, filepath.Base(path)); matched {
-			return true
-		}
-		if strings.HasSuffix(ex, "/*") {
-			prefix := strings.TrimSuffix(ex, "/*")
-			if strings.HasPrefix(path, prefix+"/") {
-				return true
-			}
-		}
-	}
-	return false
 }

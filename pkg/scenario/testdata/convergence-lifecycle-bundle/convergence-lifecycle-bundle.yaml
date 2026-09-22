@@ -73,7 +73,7 @@ objects:
       path: docs/architecture/CONVERGENCE_PHASE_ROUTER_AND_COORDINATOR_DESIGN.md
       group: architecture
       category: convergence
-      status: published
+      status: conceptual
       content_searchable: true
       requirement_refs: [REQ-CLF-001]
   convergence_sessions:
@@ -97,7 +97,6 @@ objects:
         next_action from snapshot; confirm trigger queue and activity before closing.
       flow_variant: test_bundle_health_v1
       automation_hooks: evaluation_surface=test_bundle_health_jsonl; snapshot=scheduler_test_failures_convergence_v1
-      requirement_refs: [REQ-CLF-001]
   backlog_items:
     - id_hint: BLI-CLF-001
       title: Implement convergence phase router and coordinator hooks

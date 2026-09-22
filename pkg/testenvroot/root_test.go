@@ -19,7 +19,7 @@ func TestSetup(t *testing.T) {
 	}
 
 	// Verify test settings file created
-	settingsFile := filepath.Join(tmp, paths.TestSettingsFilename)
+	settingsFile := filepath.Join(tmp, paths.ConfigDir, paths.ZqkTestConfigFileName)
 	if _, err := os.Stat(settingsFile); err != nil {
 		t.Fatalf("test settings file was not created: %v", err)
 	}

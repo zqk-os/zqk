@@ -104,7 +104,7 @@ func (r *Runner) runHygiene(files []string) ([]Finding, error) {
 	}
 
 	if r.Config.Hygiene.CheckCLINames {
-		cliFindings, err := CheckCLINames(r.Root, files)
+		cliFindings, err := CheckCLINames(r.Root, files, r.Config)
 		if err != nil {
 			return nil, err
 		}

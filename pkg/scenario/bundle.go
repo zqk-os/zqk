@@ -59,12 +59,13 @@ type BundleObjects struct {
 
 // GoalTemplate describes a goal object to be created from a bundle (required by requirement.goal_refs).
 type GoalTemplate struct {
-	IDHint    string `yaml:"id_hint,omitempty" json:"id_hint,omitempty"`
-	ID        string `yaml:"id,omitempty" json:"id,omitempty"`
-	Title     string `yaml:"title" json:"title"`
-	Status    string `yaml:"status,omitempty" json:"status,omitempty"`
-	Authority string `yaml:"authority,omitempty" json:"authority,omitempty"` // required by spec at creation
-	Target    string `yaml:"target,omitempty" json:"target,omitempty"`       // required by spec at creation
+	IDHint      string `yaml:"id_hint,omitempty" json:"id_hint,omitempty"`
+	ID          string `yaml:"id,omitempty" json:"id,omitempty"`
+	Title       string `yaml:"title" json:"title"`
+	Description string `yaml:"description,omitempty" json:"description,omitempty"`
+	Status      string `yaml:"status,omitempty" json:"status,omitempty"`
+	Authority   string `yaml:"authority,omitempty" json:"authority,omitempty"` // required by spec at creation
+	Target      string `yaml:"target,omitempty" json:"target,omitempty"`       // required by spec at creation
 }
 
 // RequirementTemplate describes a requirement object to be created from a bundle.

@@ -19,7 +19,11 @@ type testSettingsYAMLShapeGit struct {
 }
 
 func writeMinimalTestSettingsYAMLGit(testRoot string) error {
-	p := filepath.Join(testRoot, paths.TestSettingsFilename)
+	configDir := filepath.Join(testRoot, paths.ConfigDir)
+	if err := fileutil.EnsureDir(configDir); err != nil {
+		return err
+	}
+	p := filepath.Join(configDir, paths.ZqkTestConfigFileName)
 	body := testSettingsYAMLShapeGit{
 		Version: paths.DefaultBrandSettingsVersion,
 		Paths:   map[string]any{},
@@ -46,7 +50,7 @@ func layoutGitIntegrationTestRoot(t *testing.T, testRoot string) {
 		t.Fatalf("test project layout: %v", err)
 	}
 	if err := writeMinimalTestSettingsYAMLGit(absRoot); err != nil {
-		t.Fatalf("test-settings.yaml: %v", err)
+		t.Fatalf("config/zqk-test.yaml: %v", err)
 	}
 }
 

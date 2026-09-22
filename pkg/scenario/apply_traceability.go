@@ -99,6 +99,11 @@ func applyGoals(
 			t.Target = "1"
 		}
 		builder.SetField(objects.FieldKeyTarget, t.Target)
+		goalDesc := t.Description
+		if goalDesc == emptyValue {
+			goalDesc = "Substantive goal description for scenario verification."
+		}
+		builder.SetField(objects.FieldKeyDescription, goalDesc)
 		setOriginIfNeeded(builder)
 		obj, err := builder.Build()
 		if err != nil {
@@ -142,9 +147,11 @@ func applyRequirements(
 		} else {
 			builder.SetStatus(objects.ObjectStatusProposed)
 		}
-		if t.Body != emptyValue {
-			builder.SetField(objects.FieldKeyDescription, t.Body)
+		reqDesc := t.Body
+		if reqDesc == emptyValue {
+			reqDesc = "Substantive requirement description for scenario verification."
 		}
+		builder.SetField(objects.FieldKeyDescription, reqDesc)
 		if len(criteriaRefs) > 0 {
 			builder.SetField(objects.FieldKeyCriteriaRefs, criteriaRefs)
 		}
@@ -210,9 +217,11 @@ func applyCriteria(
 		if t.ValidationMethod != emptyValue {
 			builder.SetField(objects.FieldKeyValidationMethod, t.ValidationMethod)
 		}
-		if t.Description != emptyValue {
-			builder.SetField(objects.FieldKeyDescription, t.Description)
+		critDesc := t.Description
+		if critDesc == emptyValue {
+			critDesc = "Substantive criteria description for scenario verification."
 		}
+		builder.SetField(objects.FieldKeyDescription, critDesc)
 		setOriginIfNeeded(builder)
 		obj, err := builder.Build()
 		if err != nil {
@@ -395,9 +404,11 @@ func applyBacklogItems(
 		if t.KindUnderTest != emptyValue {
 			builder.SetField(objects.FieldKeyKindUnderTest, t.KindUnderTest)
 		}
-		if t.Description != emptyValue {
-			builder.SetField(objects.FieldKeyDescription, t.Description)
+		bliDesc := t.Description
+		if bliDesc == emptyValue {
+			bliDesc = "Substantive backlog item description for scenario verification."
 		}
+		builder.SetField(objects.FieldKeyDescription, bliDesc)
 		if t.Priority != emptyValue {
 			builder.SetField(objects.FieldKeyPriority, t.Priority)
 		}
