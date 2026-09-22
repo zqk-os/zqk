@@ -1,0 +1,15 @@
+Analyzes command metrics and pushes a digest to agent_feed so seats can
+self-direct.
+
+  Push metrics digest
+  zqk system metrics feed
+
+Usage:
+  zqk system metrics feed [flags]
+
+Flags:
+      --agent-id string   Agent ID for the feed sender (default "kernel-metrics-feeder")
+      --notify            Queue IDE proof of life (notify) (default true)
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

@@ -1,0 +1,16 @@
+Deletes quarantined files older than --older-than. Use --dry-run to see what
+would be removed.
+
+See .zqk/process/system-health/QUARANTINE_AND_ANALYSIS.md for what goes in
+quarantine.
+
+Usage:
+  zqk system cleanup-quarantine [flags]
+
+Flags:
+      --dry-run               Show what would be removed without deleting
+      --older-than duration   Remove files older than this (default: 720h = 30 days) (default 720h0m0s)
+      --verbose               Show each file removed or would be removed
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

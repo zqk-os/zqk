@@ -1,0 +1,48 @@
+Bulk update object specifications to use base trait groups and manage field
+lifecycle.
+
+
+
+This command helps maintain consistency across object specs by:
+
+- Replacing explicit trait lists with base trait groups (base_object_traits,
+base_auditable_traits)
+
+- Managing field lifecycle (define a new field; aliases add/create, then modify,
+deprecate, archive, delete)
+
+- Tracking field versioning and breaking changes
+
+- Validating changes before applying
+
+- Refreshing .zqk/specs/spec_index.json after successful writes (same path as
+generate-spec-index)
+
+  Preview what would be updated (dry-run)
+  zqk system update-specs --dry-run
+  Update all specs that extend base_object to use base_object_traits
+  zqk system update-specs --trait-groups
+  Update specific spec files
+  zqk system update-specs --files backlog_item.yaml,goal.yaml
+  Define a new field (add and create are synonyms)
+  zqk system update-specs backlog_item --field new_field --operation define --reason "Adding new field for feature X"
+  Field operation then run REQ-019 field-vetting on the written spec
+  zqk system update-specs goal --field priority --operation define --validate --reason "…"
+
+Usage:
+  zqk system update-specs [flags]
+
+Flags:
+      --breaking-change          Mark change as breaking
+      --dry-run                  Preview changes without applying them
+      --field string             Field name to operate on (for field operations)
+      --files stringArray        Specific spec files to update (comma-separated)
+      --migration-notes string   Migration guidance for breaking changes
+      --operation string         Field operation: define (new field; aliases add, create), modify, deprecate, archive, delete
+      --reason string            Reason for the change
+      --replaced-by string       Field that replaces this one (for deprecate/delete)
+      --trait-groups             Update specs to use base trait groups
+      --validate                 Validate specs after updating (trait/file batch) or after a field operation (same REQ-019 path as check --validate-specs)
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

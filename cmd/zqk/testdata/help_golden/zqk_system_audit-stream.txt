@@ -1,0 +1,7 @@
+Stream real-time audit events
+
+Usage:
+  zqk system audit-stream [flags]
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

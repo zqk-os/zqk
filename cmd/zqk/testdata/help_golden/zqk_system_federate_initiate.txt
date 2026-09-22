@@ -1,0 +1,7 @@
+initiate command
+
+Usage:
+  zqk system federate initiate [flags]
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

@@ -1,0 +1,13 @@
+Prints an interactive walkthrough for bootstrapping and developing with ZQK.
+
+Usage:
+  zqk system quickstart [flags]
+
+Aliases:
+  quickstart, quick-start, start-here
+
+Flags:
+      --format string   Output format (text|json) (default "text")
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

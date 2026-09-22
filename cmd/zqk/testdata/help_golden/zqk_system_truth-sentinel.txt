@@ -1,0 +1,13 @@
+Monitor the Knowledge Kernel WAL and perform real-time QA audits.
+
+--once --ids audits listed objects then exits (no WAL daemon).
+
+Usage:
+  zqk system truth-sentinel [flags]
+
+Flags:
+      --ids stringArray   Object ids to audit when --once is set
+      --once              Audit --ids then exit (do not watch the WAL)
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

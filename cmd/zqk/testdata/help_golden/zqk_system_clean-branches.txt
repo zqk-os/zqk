@@ -1,0 +1,12 @@
+Prune stale merged feature branches locally and remotely
+
+Usage:
+  zqk system clean-branches [flags]
+
+Flags:
+      --inactive-hours int    Minimum hours of inactivity required before deletion (default 24)
+      --quarantine-days int   Retention limit in days for soft-deleted quarantine refs/archive/ branches (default 90)
+      --targets strings       Target branches to check against (default [origin/main,origin/integration/v1.1,origin/integration/v1.2,origin/integration/v1.3,origin/integration/v1.4])
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

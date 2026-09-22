@@ -1,0 +1,27 @@
+Run the staged spec origination pipeline for one object kind, materializing kind
+mappings, identifiers, indexes, builders, and validation evidence from canonical
+object-spec DNA.
+
+  Preview a new kind membrane
+  zqk system spec-origination --ontology mcp_spec
+  Materialize the kind, indexes, field keys, and trigger steps
+  zqk system spec-origination --ontology mcp_spec --dry-run=false --materialize-field-keys --apply-trigger
+
+Usage:
+  zqk system spec-origination [flags]
+
+Flags:
+      --apply-trigger                 Run glossary, instance-builder, and path-cache trigger steps
+      --dry-run                       Validate and report the origination plan without writing materialized artifacts (default true)
+  -f, --format string                 Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+      --materialize-field-keys        Regenerate pkg/objects/field_keys.go from the current spec plane
+      --ontology string               Object kind stem under .zqk/specs/objects
+  -o, --output string                 Write output to file
+  -q, --quiet                         Suppress non-essential output
+      --skip-finalize-validation      Record final spec validation errors without failing the pipeline
+      --skip-materialize-spec-index   Do not refresh the materialized spec index
+      --timeout duration              Timeout for command execution (0 = auto-calculate)
+  -v, --verbose                       Verbose output
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

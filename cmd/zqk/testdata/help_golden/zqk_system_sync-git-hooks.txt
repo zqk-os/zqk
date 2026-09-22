@@ -1,0 +1,44 @@
+Synchronize git hook templates to a target git hooks directory.
+
+
+
+Sync installs missing hooks, refreshes hooks whose content drifted from the
+
+template, and repairs hooks that lost their executable bit. Git silently
+
+ignores a hook it cannot execute, so a hook can look installed and still never
+
+run; sync treats that as out of sync.
+
+
+
+Use --disable to turn a hook off and --enable to turn it back on. Disabling
+
+renames the hook to <hook>.disabled, which is the standard way to park a git
+
+hook, and sync leaves disabled hooks alone instead of reinstalling them.
+
+  Sync git hooks from tools/git-hooks to .git/hooks
+  zqk system sync-git-hooks
+  Run dry-run report without making modifications
+  zqk system sync-git-hooks --dry-run
+  Show which hooks are installed and whether they are enabled
+  zqk system sync-git-hooks --list
+  Turn off the pre-commit hook
+  zqk system sync-git-hooks --disable pre-commit
+  Turn the pre-commit hook back on
+  zqk system sync-git-hooks --enable pre-commit
+
+Usage:
+  zqk system sync-git-hooks [flags]
+
+Flags:
+      --disable string   Turn off a hook by name (e.g. pre-commit)
+      --dry-run          Report only, exit with error if out of sync
+      --enable string    Turn a previously disabled hook back on
+      --list             List installed hooks with their enabled or disabled state
+      --source string    Source directory containing git hook templates (default "tools/git-hooks")
+      --target string    Target directory to install git hooks (default ".git/hooks")
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

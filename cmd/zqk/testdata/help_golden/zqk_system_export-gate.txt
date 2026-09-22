@@ -1,0 +1,28 @@
+Audit an open-core community target directory to ensure proprietary internal
+scripts, vendor-specific state, credentials, and forbidden patterns are not
+leaked.
+
+  Audit current repo as community export candidate
+  zqk system export-gate
+  Audit specific distribution target directory
+  zqk system export-gate --target=/tmp/community-export
+
+Usage:
+  zqk system export-gate [flags]
+
+Aliases:
+  export-gate, police-export, verify-export
+
+Flags:
+      --columns string                   Override column widths for table output (format: field:width)
+  -f, --format string                    Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+      --ignore-scheduler-down            Ignore scheduler down warning/lockdown
+  -o, --output string                    Write output to file
+      --prohibited-pattern stringArray   Additional prohibited path patterns to check
+  -q, --quiet                            Suppress non-essential output
+      --target string                    Target directory path to audit (default ".")
+      --timeout duration                 Timeout for command execution (0 = auto-calculate)
+  -v, --verbose                          Verbose output
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

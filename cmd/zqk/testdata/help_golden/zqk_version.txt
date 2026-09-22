@@ -1,0 +1,13 @@
+Display version information including executable name, build datetime, and git
+commit.
+
+Same behavior as `utility version`; provided at the top level for
+discoverability and scripting.
+
+  Show version (top-level)
+  zqk version
+  Same output via utility group
+  zqk utility version
+
+Usage:
+  zqk version

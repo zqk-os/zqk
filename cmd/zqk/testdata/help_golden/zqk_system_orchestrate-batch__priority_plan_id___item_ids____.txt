@@ -1,0 +1,7 @@
+Replaces bash script orchestration with generic, native CLI logic. Builds the required cascade per the system object granularity framework.
+
+Usage:
+  zqk system orchestrate-batch [priority_plan_id] [item_ids...] [flags]
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

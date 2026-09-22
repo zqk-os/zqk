@@ -1,0 +1,20 @@
+Scans the .zqk/process/ object tree, migrates any legacy UUID identities to
+deterministic CAS (Content-Addressable Storage) SHA256 hashes, and safely cleans
+up orphaned object files.
+
+This command helps transition legacy object IDs to the new stable CAS storage
+scheme.
+
+  Migrate all legacy items
+  zqk system migrate-cas
+  Migrate but keep old files (not recommended)
+  zqk system migrate-cas --remove-old-files=false
+
+Usage:
+  zqk system migrate-cas [flags]
+
+Flags:
+      --remove-old-files   Remove old ID-based files after migration (default true)
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

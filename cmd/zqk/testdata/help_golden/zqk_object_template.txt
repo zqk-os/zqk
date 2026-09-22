@@ -1,0 +1,35 @@
+Canonical draft path: generate YAML, edit, then object create --file.
+(Alternatives: zqk quick … for text/markdown; zqk new … for scenario drafts.)
+
+Generate a blank YAML template for creating an object of the specified kind.
+
+
+
+The template includes all required fields with placeholder values and optional
+fields
+
+with their default values (if any). This is useful for creating objects manually
+or
+
+as a starting point for automation.
+
+  Generate template for backlog item
+  zqk template backlog_item
+  Generate template and save to file
+  zqk template backlog_item --output item.yaml
+  Generate template without optional fields
+  zqk template backlog_item --include-optional=false
+  Generate template without comments
+  zqk template backlog_item --include-comments=false
+
+Usage:
+  zqk object template [flags]
+
+Flags:
+      --include-comments   Include field descriptions as comments (default: true) (default true)
+      --include-optional   Include optional fields in template (default: true) (default true)
+  -o, --output string      Write output to file
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --internal         Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)
