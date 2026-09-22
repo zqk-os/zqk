@@ -112,6 +112,7 @@ _verify_archive_sha256() {
 # ---------------------------------------------------------------------------
 install_binary() {
   local ver="$1"
+  local ver_num="${ver#v}"
   local archive="zqk_${ver_num}_${OS}_${ARCH}.tar.gz"
   local comm_archive="zqk-community_${ver_num}_${OS}_${ARCH}.tar.gz"
 
@@ -132,9 +133,15 @@ install_binary() {
     : # downloaded community-prefixed archive from public release URL
   elif [ -n "$GITHUB_TOKEN" ] || command -v gh >/dev/null 2>&1; then
     if ! _download_private "$ver" "$archive" "${archive_path}"; then
-      _download_private "$ver" "$comm_archive" "${archive_path}"
+      if ! _download_private "$ver" "$comm_archive" "${archive_path}"; then
+        echo "Neither ${archive} nor ${comm_archive} found in release ${ver}" >&2
+        exit 1
+      fi
     fi
-    _download_private "$ver" "checksums.txt" "${checksums_path}"
+    _download_private "$ver" "checksums.txt" "${checksums_path}" || {
+      echo "Checksums file not found in release ${ver}" >&2
+      exit 1
+    }
   else
     echo "Binary release not found for ${ver}. Try ZQK_INSTALL_METHOD=source or set GITHUB_TOKEN." >&2
     exit 1
@@ -214,8 +221,7 @@ except Exception:
     fi
   fi
 
-  echo "Asset ${asset_name} not found in release ${ver}" >&2
-  exit 1
+  return 1
 }
 
 # ---------------------------------------------------------------------------

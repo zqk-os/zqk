@@ -1,231 +1,347 @@
 #!/bin/sh
-# ZQK (zqk.dev) Official POSIX Shell Installer
-# Usage: curl -sSL https://zqk.dev/install.sh | sh
-
+# ZQK Installer — supports public release download, go install, and build-from-source.
+#
+# Public OSS install (no token required — once repo is public):
+#   curl -sSL https://raw.githubusercontent.com/zqk-os/zqk/main/scripts/install.sh | sh
+#
+# Private / pre-release install (requires GITHUB_TOKEN):
+#   export GITHUB_TOKEN="ghp_..."
+#   curl -sSL https://raw.githubusercontent.com/zqk-os/zqk/main/scripts/install.sh | sh -s -- v2.7.0
+#
+# Build from source (Go 1.21+ required — no token, no binary release needed):
+#   ZQK_INSTALL_METHOD=source ./scripts/install.sh
+#
+# go install (module must be public):
+#   ZQK_INSTALL_METHOD=goinstall ./scripts/install.sh
 set -e
 
-# --- Configuration & Defaults ---
-REPO_OWNER="zqk-os"
-REPO_NAME="zqk"
-BINARY_NAME="zqk"
+VERSION="${1:-latest}"
+REPO="${ZQK_REPO:-zqk-os/zqk}"
+MODULE="${ZQK_MODULE:-github.com/zqk-os/zqk}"
 INSTALL_DIR="${ZQK_INSTALL_DIR:-/usr/local/bin}"
-GITHUB_RELEASE_URL="https://github.com/${REPO_OWNER}/${REPO_NAME}/releases"
+# INSTALL_METHOD: auto | binary | goinstall | source
+INSTALL_METHOD="${ZQK_INSTALL_METHOD:-auto}"
 
-# Styling output
-BOLD='\033[1m'
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-YELLOW='\033[1;33m'
-RED='\033[0;31m'
-NC='\033[0m' # No Color
+# Auto-detect GITHUB_TOKEN via gh CLI if not explicitly set
+if [ -z "$GITHUB_TOKEN" ] && command -v gh >/dev/null 2>&1; then
+  GITHUB_TOKEN="$(gh auth token 2>/dev/null || true)"
+fi
+GITHUB_TOKEN="$(printf '%s' "$GITHUB_TOKEN" | tr -d '\r\n')"
 
-info() {
-    printf "${BLUE}==>${NC} ${BOLD}%s${NC}\n" "$1"
-}
+# ---------------------------------------------------------------------------
+# 1. Detect OS and Architecture
+# ---------------------------------------------------------------------------
+OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
+ARCH="$(uname -m)"
+case "$ARCH" in
+  x86_64)        ARCH="amd64" ;;
+  aarch64|arm64) ARCH="arm64" ;;
+  *) echo "Unsupported architecture: $ARCH" >&2; exit 1 ;;
+esac
+if [ "$OS" != "darwin" ] && [ "$OS" != "linux" ]; then
+  echo "Unsupported OS: $OS" >&2; exit 1
+fi
 
-success() {
-    printf "${GREEN}==>${NC} ${BOLD}%s${NC}\n" "$1"
-}
-
-warn() {
-    printf "${YELLOW}WARNING:${NC} %s\n" "$1"
-}
-
-error() {
-    printf "${RED}ERROR:${NC} %s\n" "$1" >&2
-    exit 1
-}
-
-# --- Utility Checks ---
-command_exists() {
-    command -v "$1" >/dev/null 2>&1
-}
-
-detect_downloader() {
-    if command_exists curl; then
-        DOWNLOADER="curl"
-    elif command_exists wget; then
-        DOWNLOADER="wget"
-    else
-        error "Either 'curl' or 'wget' is required to run this installer script."
+# ---------------------------------------------------------------------------
+# 2. Resolve 'latest' version tag (unauthenticated for public repo)
+# ---------------------------------------------------------------------------
+resolve_latest() {
+  local tag=""
+  if [ -n "$GITHUB_TOKEN" ]; then
+    tag=$(curl -sSL -H "Authorization: Bearer $GITHUB_TOKEN" \
+      -H "Accept: application/vnd.github.v3+json" \
+      "https://api.github.com/repos/${REPO}/releases/latest" 2>/dev/null \
+      | grep '"tag_name"' | cut -d'"' -f4 | head -1)
+    if [ -z "$tag" ]; then
+      tag=$(curl -sSL -H "Authorization: Bearer $GITHUB_TOKEN" \
+        -H "Accept: application/vnd.github.v3+json" \
+        "https://api.github.com/repos/${REPO}/releases" 2>/dev/null \
+        | grep '"tag_name"' | cut -d'"' -f4 | head -1)
     fi
-}
-
-download_file() {
-    url="$1"
-    destination="$2"
-    if [ "$DOWNLOADER" = "curl" ]; then
-        curl -sSL -o "$destination" "$url"
-    elif [ "$DOWNLOADER" = "wget" ]; then
-        wget -q -O "$destination" "$url"
+  else
+    tag=$(curl -sSL -H "Accept: application/vnd.github.v3+json" \
+      "https://api.github.com/repos/${REPO}/releases/latest" 2>/dev/null \
+      | grep '"tag_name"' | cut -d'"' -f4 | head -1)
+    if [ -z "$tag" ]; then
+      tag=$(curl -sSL -H "Accept: application/vnd.github.v3+json" \
+        "https://api.github.com/repos/${REPO}/releases" 2>/dev/null \
+        | grep '"tag_name"' | cut -d'"' -f4 | head -1)
     fi
+  fi
+  printf '%s' "$tag"
 }
 
-download_stdout() {
-    url="$1"
-    if [ "$DOWNLOADER" = "curl" ]; then
-        curl -sSL "$url"
-    elif [ "$DOWNLOADER" = "wget" ]; then
-        wget -qO- "$url"
-    fi
-}
-
-# --- System Detection ---
-detect_os() {
-    os="$(uname -s | tr '[:upper:]' '[:lower:]')"
-    case "$os" in
-        linux)
-            OS="linux"
-            ;;
-        darwin)
-            OS="darwin"
-            ;;
-        *)
-            error "Unsupported operating system: $os. ZQK binaries are provided for Linux and macOS."
-            ;;
-    esac
-}
-
-detect_arch() {
-    arch="$(uname -m)"
-    case "$arch" in
-        x86_64|amd64)
-            ARCH="amd64"
-            ;;
-        aarch64|arm64)
-            ARCH="arm64"
-            ;;
-        *)
-            error "Unsupported architecture: $arch. ZQK binaries are compiled for x86_64 and aarch64 (ARM64)."
-            ;;
-    esac
-}
-
-# --- Version Resolution ---
-get_latest_version() {
-    if [ -n "$ZQK_VERSION" ]; then
-        VERSION="$ZQK_VERSION"
-        return
-    fi
-
-    info "Fetching latest release version from GitHub..."
-    latest_tag=$(download_stdout "https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases/latest" | \
-        grep '"tag_name":' | \
-        sed -E 's/.*"([^"]+)".*/\1/')
-
-    if [ -z "$latest_tag" ]; then
-        # Fallback if GitHub API rate limit is exceeded
-        latest_tag=$(download_stdout "${GITHUB_RELEASE_URL}/latest" | \
-            grep -o 'tag/[^"]*' | \
-            head -n 1 | \
-            cut -d'/' -f2)
-    fi
-
-    if [ -z "$latest_tag" ]; then
-        error "Failed to resolve latest release version from GitHub."
-    fi
-
-    VERSION="$latest_tag"
-}
-
-# --- Checksum Verification ---
 # Verify exactly one archive against checksums.txt. Multi-platform manifests list
 # files we did not download; do not skip unmatched checksum lines.
-verify_checksum() {
-    tarball="$1"
-    checksums_file="$2"
-    name=$(basename "$tarball")
+_verify_archive_sha256() {
+  local sums="$1"
+  local archive_path="$2"
+  local name
+  name=$(basename "$archive_path")
+  local expected
+  expected=$(awk -v n="$name" '
+    {
+      f=$NF
+      sub(/^\*/, "", f)
+      if (f == n) { print $1; found=1; exit }
+    }
+    END { if (!found) exit 1 }
+  ' "$sums") || {
+    echo "No SHA256 for ${name} in checksums.txt" >&2
+    exit 1
+  }
+  local actual=""
+  if command -v sha256sum >/dev/null 2>&1; then
+    actual=$(sha256sum "$archive_path" | awk '{print $1}')
+  elif command -v shasum >/dev/null 2>&1; then
+    actual=$(shasum -a 256 "$archive_path" | awk '{print $1}')
+  else
+    echo "Neither sha256sum nor shasum found; cannot verify checksum." >&2
+    exit 1
+  fi
+  expected=$(printf '%s' "$expected" | tr 'A-F' 'a-f')
+  actual=$(printf '%s' "$actual" | tr 'A-F' 'a-f')
+  if [ "$expected" != "$actual" ]; then
+    echo "Checksum mismatch for ${name}" >&2
+    exit 1
+  fi
+}
 
-    expected=$(awk -v n="$name" '
-        {
-            f=$NF
-            sub(/^\*/, "", f)
-            if (f == n) { print $1; found=1; exit }
+# ---------------------------------------------------------------------------
+# Helper: install binary from GitHub Releases (public or private)
+# ---------------------------------------------------------------------------
+install_binary() {
+  local ver="$1"
+  local ver_num="${ver#v}"
+  local archive="zqk_${ver_num}_${OS}_${ARCH}.tar.gz"
+  local comm_archive="zqk-community_${ver_num}_${OS}_${ARCH}.tar.gz"
+
+  echo "📥 Downloading ZQK ${ver} (${OS}/${ARCH})..."
+
+  TMPDIR="$(mktemp -d)"
+  trap 'rm -rf "$TMPDIR"' EXIT
+
+  local archive_path="${TMPDIR}/${archive}"
+  local checksums_path="${TMPDIR}/checksums.txt"
+
+  local base_url="https://github.com/${REPO}/releases/download/${ver}"
+  if curl -sSLf "${base_url}/${archive}" -o "${archive_path}" 2>/dev/null && \
+     curl -sSLf "${base_url}/checksums.txt" -o "${checksums_path}" 2>/dev/null; then
+    : # downloaded from public release URL
+  elif curl -sSLf "${base_url}/${comm_archive}" -o "${archive_path}" 2>/dev/null && \
+     curl -sSLf "${base_url}/checksums.txt" -o "${checksums_path}" 2>/dev/null; then
+    : # downloaded community-prefixed archive from public release URL
+  elif [ -n "$GITHUB_TOKEN" ] || command -v gh >/dev/null 2>&1; then
+    if ! _download_private "$ver" "$archive" "${archive_path}"; then
+      if ! _download_private "$ver" "$comm_archive" "${archive_path}"; then
+        echo "Neither ${archive} nor ${comm_archive} found in release ${ver}" >&2
+        exit 1
+      fi
+    fi
+    _download_private "$ver" "checksums.txt" "${checksums_path}" || {
+      echo "Checksums file not found in release ${ver}" >&2
+      exit 1
+    }
+  else
+    echo "Binary release not found for ${ver}. Try ZQK_INSTALL_METHOD=source or set GITHUB_TOKEN." >&2
+    exit 1
+  fi
+
+  echo "🔒 Verifying checksum..."
+  _verify_archive_sha256 "${checksums_path}" "${archive_path}"
+
+  echo "📦 Extracting..."
+  tar -xzf "${archive_path}" -C "$TMPDIR"
+  local extract_dir="${TMPDIR}/zqk_${ver_num}_${OS}_${ARCH}"
+  [ -d "$extract_dir" ] || extract_dir="${TMPDIR}/zqk-community_${ver_num}_${OS}_${ARCH}"
+  [ -d "$extract_dir" ] || extract_dir="${TMPDIR}"  # goreleaser flat layout fallback
+
+  if [ -f "$extract_dir/zqk-community" ] && [ ! -f "$extract_dir/zqk" ]; then
+    cp "$extract_dir/zqk-community" "$extract_dir/zqk"
+  fi
+
+  _place_binary "$extract_dir/zqk" "$extract_dir/zqk-mcp"
+}
+
+_download_private() {
+  local ver="$1" asset_name="$2" out="$3"
+
+  # Fast path: use gh CLI if available
+  if command -v gh >/dev/null 2>&1; then
+    if gh release download "$ver" -p "$asset_name" --output "$out" --repo "$REPO" --clobber >/dev/null 2>&1; then
+      return 0
+    fi
+  fi
+
+  # Fallback: GitHub Releases REST API
+  if [ -n "$GITHUB_TOKEN" ]; then
+    local token
+    token="$(printf '%s' "$GITHUB_TOKEN" | tr -d '\r\n')"
+    local release_json
+    release_json=$(curl -sSL -H "Authorization: Bearer $token" \
+      -H "Accept: application/vnd.github.v3+json" \
+      "https://api.github.com/repos/${REPO}/releases/tags/${ver}" 2>/dev/null)
+
+    local asset_url=""
+    if command -v python3 >/dev/null 2>&1; then
+      asset_url=$(printf '%s' "$release_json" | python3 -c '
+import sys, json
+try:
+    d = json.load(sys.stdin)
+    for a in d.get("assets", []):
+        if a.get("name") == sys.argv[1]:
+            print(a.get("url", ""))
+            break
+except Exception:
+    pass
+' "$asset_name" 2>/dev/null || true)
+    fi
+
+    if [ -z "$asset_url" ]; then
+      asset_url=$(printf '%s' "$release_json" | awk -v name="$asset_name" '
+        BEGIN { RS="{"; FS="," }
+        $0 ~ ("\"name\":[ ]*\"" name "\"") {
+          for (i=1; i<=NF; i++) {
+            if ($i ~ /"url":/) {
+              gsub(/.*"url":[ ]*"/, "", $i)
+              gsub(/".*/, "", $i)
+              print $i
+              exit
+            }
+          }
         }
-        END { if (!found) exit 1 }
-    ' "$checksums_file") || error "No SHA256 for ${name} in checksums.txt"
-
-    if command_exists sha256sum; then
-        actual=$(sha256sum "$tarball" | awk '{print $1}')
-    elif command_exists shasum; then
-        actual=$(shasum -a 256 "$tarball" | awk '{print $1}')
-    else
-        error "Neither 'sha256sum' nor 'shasum' found; cannot verify binary integrity."
+      ')
     fi
 
-    expected=$(printf '%s' "$expected" | tr 'A-F' 'a-f')
-    actual=$(printf '%s' "$actual" | tr 'A-F' 'a-f')
-    if [ "$expected" != "$actual" ]; then
-        error "Checksum mismatch for ${name}"
+    if [ -n "$asset_url" ]; then
+      if curl -sSL -H "Authorization: Bearer $token" \
+        -H "Accept: application/octet-stream" "$asset_url" -o "$out"; then
+        return 0
+      fi
     fi
+  fi
+
+  return 1
 }
 
-# --- Main Installation Routine ---
-main() {
-    info "Installing ZQK Microkernel CLI..."
-
-    detect_downloader
-    detect_os
-    detect_arch
-    get_latest_version
-
-    # Strip leading 'v' for the binary archive filename (e.g., v0.1.0-alpha.1 -> 0.1.0-alpha.1)
-    VERSION_NO_V="${VERSION#v}"
-
-    # Match GoReleaser output naming conventions
-    TARBALL_NAME="${BINARY_NAME}_${VERSION_NO_V}_${OS}_${ARCH}.tar.gz"
-    DOWNLOAD_URL="${GITHUB_RELEASE_URL}/download/${VERSION}/${TARBALL_NAME}"
-    CHECKSUMS_URL="${GITHUB_RELEASE_URL}/download/${VERSION}/${BINARY_NAME}_${VERSION_NO_V}_checksums.txt"
-
-    TMP_DIR="$(mktemp -d 2>/dev/null || mktemp -d -t 'zqk_install')"
-    trap 'rm -rf "$TMP_DIR"' EXIT INT TERM
-
-    info "Target Platform: ${OS}-${ARCH}"
-    info "Version:         ${VERSION}"
-    info "Downloading binary archive..."
-
-    download_file "$DOWNLOAD_URL" "${TMP_DIR}/${TARBALL_NAME}" || error "Failed to download release archive from ${DOWNLOAD_URL}"
-
-    info "Downloading SHA256 checksums..."
-    download_file "$CHECKSUMS_URL" "${TMP_DIR}/checksums.txt" || error "checksums.txt not found at ${CHECKSUMS_URL}; refusing to install."
-    info "Verifying SHA256 integrity..."
-    verify_checksum "${TMP_DIR}/${TARBALL_NAME}" "${TMP_DIR}/checksums.txt"
-
-    info "Extracting payload..."
-    tar -xzf "${TMP_DIR}/${TARBALL_NAME}" -C "$TMP_DIR"
-
-    # Handle directory write permissions
-    if [ ! -d "$INSTALL_DIR" ]; then
-        if [ -w "$(dirname "$INSTALL_DIR")" ]; then
-            mkdir -p "$INSTALL_DIR"
-        else
-            info "Requesting superuser privileges to create directory ${INSTALL_DIR}..."
-            sudo mkdir -p "$INSTALL_DIR"
-        fi
-    fi
-
-    info "Installing binary to ${INSTALL_DIR}/${BINARY_NAME}..."
-    if [ -w "$INSTALL_DIR" ]; then
-        mv "${TMP_DIR}/${BINARY_NAME}" "${INSTALL_DIR}/${BINARY_NAME}"
-        chmod +x "${INSTALL_DIR}/${BINARY_NAME}"
-    else
-        info "Requesting superuser privileges to install binary to ${INSTALL_DIR}..."
-        sudo mv "${TMP_DIR}/${BINARY_NAME}" "${INSTALL_DIR}/${BINARY_NAME}"
-        sudo chmod +x "${INSTALL_DIR}/${BINARY_NAME}"
-    fi
-
-    success "ZQK ${VERSION} successfully installed to ${INSTALL_DIR}/${BINARY_NAME}!"
-
-    # Path Verification Warning
-    case ":$PATH:" in
-        *":${INSTALL_DIR}:"*) ;;
-        *)
-            warn "${INSTALL_DIR} is not currently in your system PATH."
-            warn "Add it to your profile with: export PATH=\"\$PATH:${INSTALL_DIR}\""
-            ;;
-    esac
-
-    printf "\nRun '${BOLD}zqk --help${NC}' to get started.\n"
+# ---------------------------------------------------------------------------
+# Helper: go install (requires public module or GONOSUMCHECK)
+# ---------------------------------------------------------------------------
+install_go() {
+  local ver="$1"
+  command -v go >/dev/null 2>&1 || { echo "Go toolchain not found. Install from https://go.dev/dl/" >&2; exit 1; }
+  local pkg="${MODULE}/cmd/zqk@${ver}"
+  echo "🔧 Installing via go install ${pkg}..."
+  go install "$pkg"
+  local gobin
+  gobin="$(go env GOPATH)/bin"
+  if [ -f "${gobin}/zqk" ]; then
+    _place_binary "${gobin}/zqk" ""
+  else
+    echo "go install succeeded; zqk is in $(go env GOPATH)/bin — add it to your PATH." >&2
+  fi
 }
 
-main "$@"
+# ---------------------------------------------------------------------------
+# Helper: build from source (< 2 min on modern hardware with Go installed)
+# ---------------------------------------------------------------------------
+install_source() {
+  command -v go >/dev/null 2>&1 || { echo "Go toolchain not found. Install from https://go.dev/dl/" >&2; exit 1; }
+  command -v git >/dev/null 2>&1 || { echo "git not found." >&2; exit 1; }
+  local src_dir
+  src_dir="$(mktemp -d)/zqk-src"
+  echo "📦 Cloning ${REPO} (shallow)..."
+  git clone --depth=1 "https://github.com/${REPO}.git" "$src_dir"
+  echo "🔧 Building..."
+  make -C "$src_dir" zqk
+  if [ -f "${src_dir}/bin/zqk" ]; then
+    _place_binary "${src_dir}/bin/zqk" ""
+  elif [ -f "${src_dir}/zqk" ]; then
+    _place_binary "${src_dir}/zqk" ""
+  else
+    echo "❌ Built binary not found in ${src_dir}/bin/zqk" >&2
+    exit 1
+  fi
+  rm -rf "$src_dir"
+}
+
+# ---------------------------------------------------------------------------
+# Helper: place binary into INSTALL_DIR
+# ---------------------------------------------------------------------------
+_place_binary() {
+  local bin="$1" mcp_bin="$2"
+  if [ ! -w "$INSTALL_DIR" ]; then
+    echo "🔑 Installing to ${INSTALL_DIR} (requires sudo)..."
+    sudo install -m 755 "$bin" "${INSTALL_DIR}/zqk"
+    [ -f "$mcp_bin" ] && sudo install -m 755 "$mcp_bin" "${INSTALL_DIR}/zqk-mcp"
+  else
+    echo "📂 Installing to ${INSTALL_DIR}..."
+    install -m 755 "$bin" "${INSTALL_DIR}/zqk"
+    [ -f "$mcp_bin" ] && install -m 755 "$mcp_bin" "${INSTALL_DIR}/zqk-mcp"
+  fi
+  # Remove macOS quarantine flag
+  if [ "$OS" = "darwin" ] && command -v xattr >/dev/null 2>&1; then
+    if [ ! -w "$INSTALL_DIR" ]; then
+      sudo xattr -d com.apple.quarantine "${INSTALL_DIR}/zqk" 2>/dev/null || true
+    else
+      xattr -d com.apple.quarantine "${INSTALL_DIR}/zqk" 2>/dev/null || true
+    fi
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# 3. Main dispatch
+# ---------------------------------------------------------------------------
+echo "🚀 ZQK Installer — method=${INSTALL_METHOD} version=${VERSION}"
+
+case "$INSTALL_METHOD" in
+  source)
+    install_source
+    ;;
+  goinstall)
+    [ "$VERSION" = "latest" ] && VERSION="latest"
+    install_go "$VERSION"
+    ;;
+  binary)
+    if [ "$VERSION" = "latest" ]; then
+      VERSION="$(resolve_latest)"
+      [ -n "$VERSION" ] || { echo "Could not resolve latest version. Specify a version: ./install.sh v2.7.0" >&2; exit 1; }
+    fi
+    install_binary "$VERSION"
+    ;;
+  auto|*)
+    # Auto: try binary (public) → go install → source
+    if [ "$VERSION" = "latest" ]; then
+      VERSION="$(resolve_latest 2>/dev/null)" || true
+    fi
+    if [ -n "$VERSION" ] && [ "$VERSION" != "latest" ]; then
+      install_binary "$VERSION" 2>/dev/null && DONE=1 || true
+    fi
+    if [ -z "$DONE" ]; then
+      echo "Binary release not available — trying go install..."
+      install_go "latest" 2>/dev/null && DONE=1 || true
+    fi
+    if [ -z "$DONE" ]; then
+      echo "go install not available — building from source (requires git + Go)..."
+      install_source
+    fi
+    ;;
+esac
+
+# ---------------------------------------------------------------------------
+# 4. Post-install verification and quick-start hint
+# ---------------------------------------------------------------------------
+if command -v zqk >/dev/null 2>&1 || [ -f "${INSTALL_DIR}/zqk" ]; then
+  ZQK_BIN="${INSTALL_DIR}/zqk"
+  ZQK_VER="$("$ZQK_BIN" version 2>/dev/null || echo 'installed')"
+  echo ""
+  echo "✅ ZQK ${ZQK_VER} installed to ${INSTALL_DIR}/zqk"
+  echo ""
+  echo "Quick start (< 2 min):"
+  echo "  mkdir my-project && cd my-project"
+  echo "  zqk system init --project-name my-project"
+  echo "  zqk workflow whats-next          # discover mission + next tasks"
+  echo "  zqk mcp proxy --tcp 127.0.0.1:7777 # expose MCP securely on loopback"
+  echo ""
+  echo "Docs: https://github.com/${REPO}#readme"
+fi
