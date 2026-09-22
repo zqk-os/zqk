@@ -64,6 +64,26 @@ func (s *scoreStore) Update(_ context.Context, _ *storage.SecurityContext, id st
 	return nil
 }
 
+func TestFitnessAssessor_CompareCapsAndMoreShadow(t *testing.T) {
+	t.Parallel()
+	a := NewFitnessAssessor(storage.NewNoopObjectStorage())
+	ctx := context.Background()
+	score, err := a.Compare(ctx, "c1", nil, nil)
+	if err != nil || score != 0.5 {
+		t.Fatalf("%v %v", score, err)
+	}
+	shadow := []infrastructure.Event{{ObjectID: "1"}, {ObjectID: "2"}, {ObjectID: "3"}}
+	real := []infrastructure.Event{{ObjectID: "1"}}
+	score, err = a.Compare(ctx, "c2", shadow, real)
+	if err != nil || score < 0.5 {
+		t.Fatalf("%v %v", score, err)
+	}
+	score, err = a.Compare(ctx, "c3", shadow, nil)
+	if err != nil || score > 1.0 {
+		t.Fatalf("cap %v %v", score, err)
+	}
+}
+
 func TestExtraReputationAndFissionMonitor(t *testing.T) {
 	ctx := context.Background()
 	spine := &pulseSpine{}

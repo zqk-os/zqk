@@ -387,12 +387,14 @@ func (s *Server) eliciteAuthentication(ctx context.Context, clientID string, cli
 // eliciteAccountID creates an elicitation error for account ID
 func (s *Server) eliciteAccountID(ctx context.Context, clientID string, clientInfo map[string]any, initParams InitializeParams) (map[string]any, string, error) {
 	availableAccountIDs := make([]any, 0)
-	for accountKey, agentConfig := range s.config.MCPServer.Security.AgentRegistry {
-		displayAccountID := agentConfig.AccountID
-		if displayAccountID == emptyValue {
-			displayAccountID = accountKey
+	if s.config != nil {
+		for accountKey, agentConfig := range s.config.MCPServer.Security.AgentRegistry {
+			displayAccountID := agentConfig.AccountID
+			if displayAccountID == emptyValue {
+				displayAccountID = accountKey
+			}
+			availableAccountIDs = append(availableAccountIDs, displayAccountID)
 		}
-		availableAccountIDs = append(availableAccountIDs, displayAccountID)
 	}
 
 	sessionID, sessionErr := s.createAuthenticationSession(ctx, clientID, initParams.ClientInfo.Name, "")

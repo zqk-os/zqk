@@ -3,6 +3,8 @@ package zqkenv
 import (
 	"os"
 	"strings"
+
+	"github.com/zqk-os/zqk/pkg/brand"
 )
 
 // EnforceForegroundGoTestGuard panics if an agent executes foreground go test without bypass.
@@ -34,13 +36,14 @@ func EnforceForegroundGoTestGuard() {
 // neither this guard nor the variable that caused it. Guarded by
 // TestForegroundGoTestPanicRecommendsAPermissionNotAPath.
 func foregroundGoTestPanicMessage() string {
+	exe := brand.ExecutableName()
 	return "⚡️ BZZZT! AGENT ELECTROCUTED: FOREGROUND TEST EXECUTION DETECTED\n" +
 		"Target Persona: [PRE-SESSION/OS-LEVEL]\n" +
-		"User Mandate Violation: All tests MUST be submitted as a scheduler_job (e.g., zqk scheduler scan-tests).\n" +
+		"User Mandate Violation: All tests MUST be submitted as a scheduler_job (e.g., " + exe + " scheduler scan-tests).\n" +
 		"Direct 'go test' execution is strictly forbidden.\n" +
 		"Bypass (Make/CI): run under make (MAKEFLAGS), or set " + AllowForegroundGoTest().Name() + "=1.\n" +
 		"Do NOT set " + TestRoot().Name() + " for this: it relocates the project root, so every later\n" +
-		"zqk command in the same shell resolves against that directory and fails."
+		exe + " command in the same shell resolves against that directory and fails."
 }
 
 // IsGoTestBinary reports whether path looks like a `go test` compiled binary
