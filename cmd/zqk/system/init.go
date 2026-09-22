@@ -273,9 +273,22 @@ updated_at: %s
 	}
 
 	if hash, err := cas.GetIndex().GetHash(accID); err == nil && hash != "" {
+		credPath := paths.CredentialsPath(projectRoot)
+		if !fileutil.Exists(credPath) {
+			_ = fileutil.EnsureDir(filepath.Dir(credPath))
+			_ = fileutil.WriteSecureFile(credPath, []byte(accID+"\n"))
+		}
 		return nil
 	}
-	return cas.Create(accID, []byte(content))
+	if err := cas.Create(accID, []byte(content)); err != nil {
+		return err
+	}
+	credPath := paths.CredentialsPath(projectRoot)
+	if !fileutil.Exists(credPath) {
+		_ = fileutil.EnsureDir(filepath.Dir(credPath))
+		_ = fileutil.WriteSecureFile(credPath, []byte(accID+"\n"))
+	}
+	return nil
 }
 
 func buildProjectConfigContent(projectName, template string) string {
