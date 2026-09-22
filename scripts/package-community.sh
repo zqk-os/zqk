@@ -75,6 +75,11 @@ for platform in "${PLATFORMS[@]}"; do
       go build -trimpath -ldflags "$LDFLAGS" -o "${STAGE_DIR}/${BIN_NAME}" "$BIN_PATH"
   done
 
+  # Also provide "zqk" alias alongside "zqk-community" so unpacked archives have ./zqk immediately
+  if [ -f "${STAGE_DIR}/zqk-community" ] && [ ! -f "${STAGE_DIR}/zqk" ]; then
+    cp "${STAGE_DIR}/zqk-community" "${STAGE_DIR}/zqk"
+  fi
+
   # Include essential files
   [ -f "${REPO_ROOT}/LICENSE" ] && cp "${REPO_ROOT}/LICENSE" "$STAGE_DIR/"
   [ -f "${REPO_ROOT}/README.md" ] && cp "${REPO_ROOT}/README.md" "$STAGE_DIR/"
@@ -95,6 +100,8 @@ for platform in "${PLATFORMS[@]}"; do
 
   # Create archive
   (cd "$DIST_DIR" && find "$ARCHIVE_NAME" | sort | tar -cf - -T - | gzip -n > "${ARCHIVE_NAME}.tar.gz")
+  # Also create standard zqk_ archive alias for installer and release parity
+  (cd "$DIST_DIR" && cp "${ARCHIVE_NAME}.tar.gz" "zqk_${VER_NUM}_${GOOS}_${GOARCH}.tar.gz")
   if [[ "$GOOS" == "darwin" && -f "${REPO_ROOT}/scripts/notarize-and-sign-darwin.sh" ]]; then
     bash "${REPO_ROOT}/scripts/notarize-and-sign-darwin.sh" "${DIST_DIR}/${ARCHIVE_NAME}.tar.gz"
     bash "${REPO_ROOT}/scripts/notarize-and-sign-darwin.sh" --verify "${DIST_DIR}/${ARCHIVE_NAME}.tar.gz"
