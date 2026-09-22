@@ -30,4 +30,25 @@ func TestProcessOrphanedRequirements_ExtraCoverage(t *testing.T) {
 	if err := performSemanticTranslation("REQ-DIRECT"); err != nil {
 		t.Fatalf("expected nil, got %v", err)
 	}
+
+	// Error branches in ProcessOrphanedRequirements
+	if err := ProcessOrphanedRequirements(ctx, []string{""}); err == nil {
+		t.Error("expected error for empty req identity")
+	}
+	if err := ProcessOrphanedRequirements(ctx, []string{"invalid-governance"}); err == nil {
+		t.Error("expected error for invalid governance")
+	}
+	if err := ProcessOrphanedRequirements(ctx, []string{"invalid-translation"}); err == nil {
+		t.Error("expected error for invalid translation")
+	}
+
+	// Context cancellation
+	canceledCtx, cancel := context.WithCancel(context.Background())
+	cancel()
+	if err := ProcessOrphanedRequirements(canceledCtx, nil); err == nil {
+		t.Error("expected error for canceled context before loop")
+	}
+	if err := ProcessOrphanedRequirements(canceledCtx, []string{"REQ-1"}); err == nil {
+		t.Error("expected error for canceled context in loop")
+	}
 }

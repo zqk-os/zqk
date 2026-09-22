@@ -296,7 +296,7 @@ func TestExtraCoverage_Generator(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
 
-	bliDir := filepath.Join(tmpDir, paths.ProjectDataDir, "process", "backlog_items")
+	bliDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.ProcessSubdir, "backlog_items")
 	_ = fileutil.MkdirAll(bliDir, paths.DirPerm755)
 
 	gen := NewGenerator(validation.NewIDValidator(""), tmpDir)
