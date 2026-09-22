@@ -1,12 +1,14 @@
-// BLI-STARTER-COMMUNITY-059 / PRI-STARTER-COMMUNITY-059 coverage elevation
+// BLI-STARTER-COMMUNITY-044 / PRI-STARTER-COMMUNITY-044 coverage elevation
 package reporter
 
 import (
+	"encoding/json"
+	"os"
 	"path/filepath"
 	"testing"
 )
 
-func TestExtraReporterValidationMarkdownAndWriteErrors(t *testing.T) {
+func TestExtraReporterRecordsAndFormats(t *testing.T) {
 	r := NewReporter()
 	r.Start()
 	r.RecordObjectScanned()
@@ -14,27 +16,43 @@ func TestExtraReporterValidationMarkdownAndWriteErrors(t *testing.T) {
 	r.RecordDocumentCreated()
 	r.RecordEntityCreated()
 	r.RecordEdgeCreated()
-	r.RecordError("write", "ID-1", "kind", "boom", "a.yaml")
-	r.RecordWarning("slow")
-	r.RecordUnresolvedReference("REF-1")
-	r.RecordOrphanedEntity("ENT-1")
-	r.RecordDuplicateID("DUP-1")
+	r.RecordError("parse", "BLI-1", "backlog_item", "boom", "a.yaml")
+	r.RecordWarning("watch this")
+	r.RecordUnresolvedReference("MIL-9")
+	r.RecordOrphanedEntity("ENT-9")
+	r.RecordDuplicateID("BLI-1")
 	r.RecordInvalidEdgeType("weird")
-	r.RecordMissingRequiredField("ID-2", "kind", "title", "b.yaml")
+	r.RecordMissingRequiredField("BLI-2", "backlog_item", "title", "b.yaml")
 	r.Finish()
-	_ = r.GetReport()
+	rep := r.GetReport()
+	if rep.ObjectsScanned != 1 || len(rep.Errors) != 1 || len(rep.Warnings) != 1 {
+		t.Fatalf("report = %#v", rep)
+	}
 
 	dir := t.TempDir()
-	if err := r.GenerateJSON(filepath.Join(dir, "report.json")); err != nil {
+	jsonPath := filepath.Join(dir, "r.json")
+	if err := r.GenerateJSON(jsonPath); err != nil {
 		t.Fatal(err)
 	}
-	if err := r.GenerateMarkdown(filepath.Join(dir, "report.md")); err != nil {
+	raw, err := os.ReadFile(jsonPath)
+	if err != nil {
 		t.Fatal(err)
 	}
-	if err := r.GenerateJSON("/no/such/dir/report.json"); err == nil {
-		t.Fatal("expected json write error")
+	var decoded MigrationReport
+	if err := json.Unmarshal(raw, &decoded); err != nil {
+		t.Fatal(err)
 	}
-	if err := r.GenerateMarkdown("/no/such/dir/report.md"); err == nil {
-		t.Fatal("expected markdown write error")
+	mdPath := filepath.Join(dir, "r.md")
+	if err := r.GenerateMarkdown(mdPath); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(mdPath); err != nil {
+		t.Fatal(err)
+	}
+	if err := r.GenerateJSON(filepath.Join(dir, "missing", "no.json")); err == nil {
+		t.Fatal("expected json write err")
+	}
+	if err := r.GenerateMarkdown(filepath.Join(dir, "missing", "no.md")); err == nil {
+		t.Fatal("expected md write err")
 	}
 }
