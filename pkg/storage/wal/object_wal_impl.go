@@ -733,9 +733,8 @@ func ReadLastSeqFromTail(projectRoot string) (int64, error) {
 		if len(bytes.TrimSpace(line)) == 0 {
 			continue
 		}
-		var rec WALRecord
-		if err := json.Unmarshal(line, &rec); err == nil && rec.Seq > lastSeq {
-			lastSeq = rec.Seq
+		if seq := getMaxSeqFromLine(line); seq > lastSeq {
+			lastSeq = seq
 		}
 	}
 	return lastSeq, scanner.Err()

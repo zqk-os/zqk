@@ -418,3 +418,57 @@ func TestExtraCoverage_WaitForWALProcessingEventDriven(t *testing.T) {
 		t.Error("expected timeout error when appliedSeq < maxSeq")
 	}
 }
+
+func TestExtraCoverage_ReadLastSeqFromTail(t *testing.T) {
+	// Empty project root
+	seq, err := ReadLastSeqFromTail("")
+	if err == nil || seq != 0 {
+		t.Errorf("expected error and seq 0 on empty projectRoot, got seq=%d err=%v", seq, err)
+	}
+
+	// Missing file returns error
+	tmpDir := t.TempDir()
+	seq, err = ReadLastSeqFromTail(tmpDir)
+	if err == nil {
+		t.Errorf("expected error on missing file, got seq=%d", seq)
+	}
+
+	walDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.WalDir)
+	_ = fileutil.MkdirAll(walDir, paths.DirPerm755)
+	walPath := filepath.Join(walDir, objectWALFileName)
+
+	// Write compact v2 single records and a v2 batch record
+	rec1 := &WALRecord{Op: "create", Kind: "doc_entry", ID: "doc-1", Seq: 12}
+	line1, err := marshalCompactRecord(rec1)
+	if err != nil {
+		t.Fatalf("marshalCompactRecord: %v", err)
+	}
+
+	batchRecs := []*WALRecord{
+		{Op: "update", Kind: "bli", ID: "bli-1", Seq: 15},
+		{Op: "update", Kind: "bli", ID: "bli-2", Seq: 25},
+	}
+	batchBytes, err := marshalCompactBatch(batchRecs)
+	if err != nil {
+		t.Fatalf("marshalCompactBatch: %v", err)
+	}
+
+	var content []byte
+	content = append(content, line1...)
+	content = append(content, '\n', '\n') // includes empty line to verify trimming
+	content = append(content, batchBytes...)
+	content = append(content, '\n')
+
+	if err := fileutil.WriteFile(walPath, content, paths.FilePerm644); err != nil {
+		t.Fatalf("WriteFile: %v", err)
+	}
+
+	seq, err = ReadLastSeqFromTail(tmpDir)
+	if err != nil {
+		t.Fatalf("ReadLastSeqFromTail failed: %v", err)
+	}
+	if seq != 25 {
+		t.Errorf("expected last seq 25, got %d", seq)
+	}
+}
+
