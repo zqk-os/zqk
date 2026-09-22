@@ -16,18 +16,27 @@ type GatesConfig struct {
 }
 
 type HygieneConfig struct {
-	CheckPaths    bool     `yaml:"check_paths"`
-	CheckPerms    bool     `yaml:"check_perms"`
-	CheckDups     bool     `yaml:"check_dups"`
-	CheckCLINames bool     `yaml:"check_cli_names"`
-	Exemptions    []string `yaml:"exemptions"`
+	CheckPaths            bool     `yaml:"check_paths"`
+	CheckPerms            bool     `yaml:"check_perms"`
+	CheckDups             bool     `yaml:"check_dups"`
+	CheckCLINames         bool     `yaml:"check_cli_names"`
+	ForbiddenPathLiterals []string `yaml:"forbidden_path_literals"`
+	GoScanDirs            []string `yaml:"go_scan_dirs"`
+	Exemptions            []string `yaml:"exemptions"`
+	CLIExemptFunctions    []string `yaml:"cli_exempt_functions"`
+	CLIExemptFiles        []string `yaml:"cli_exempt_files"`
 }
 
 type TreePoliceConfig struct {
 	ForbiddenPaths             []string `yaml:"forbidden_paths"`
 	ForbiddenFiles             []string `yaml:"forbidden_files"`
+	ArchivedDocDirs            []string `yaml:"archived_doc_dirs"`
+	ArchivedDocNames           []string `yaml:"archived_doc_names"`
+	AllowedScripts             []string `yaml:"allowed_scripts"`
+	AllowedScriptPrefixes      []string `yaml:"allowed_script_prefixes"`
 	ForbiddenPatterns          []string `yaml:"forbidden_patterns"`
 	ForbiddenScriptReferences []string `yaml:"forbidden_script_references"`
+	GrepExemptions             []string `yaml:"grep_exemptions"`
 }
 
 type TokenRule struct {
@@ -39,9 +48,12 @@ type TokenRule struct {
 }
 
 type PayloadConfig struct {
-	RequiredArtifacts  []string    `yaml:"required_artifacts"`
-	ForbiddenArtifacts []string    `yaml:"forbidden_artifacts"`
-	ProhibitedPatterns []TokenRule `yaml:"prohibited_patterns"`
+	RequiredModulePath   string      `yaml:"required_module_path"`
+	RequiredArtifacts    []string    `yaml:"required_artifacts"`
+	ForbiddenArtifacts   []string    `yaml:"forbidden_artifacts"`
+	SensitivePatterns    []string    `yaml:"sensitive_patterns"`
+	GlobalGrepExemptions []string    `yaml:"global_grep_exemptions"`
+	ProhibitedPatterns   []TokenRule `yaml:"prohibited_patterns"`
 }
 
 // LoadConfig loads GatesConfig from a yaml file. If path is empty, looks for config/gates.yaml in projectRoot.
@@ -68,10 +80,14 @@ func DefaultConfig() *GatesConfig {
 	return &GatesConfig{
 		Version: "1.0.0",
 		Hygiene: HygieneConfig{
-			CheckPaths:    true,
-			CheckPerms:    true,
-			CheckCLINames: true,
-			Exemptions:    []string{"*_test.go"},
+			CheckPaths:            true,
+			CheckPerms:            true,
+			CheckCLINames:         true,
+			ForbiddenPathLiterals: []string{".zqk", ".zqk/"},
+			GoScanDirs:            []string{"pkg/", "cmd/", "internal/", "scripts/"},
+			Exemptions:            []string{"*_test.go", "vendor/*", ".git/*", "pkg/paths/*", "pkg/brand/*", "pkg/vet/*"},
+			CLIExemptFunctions:    []string{"CLIUsage", "CLIInvocation", "RewriteCanonicalCLIInvocations"},
+			CLIExemptFiles:        []string{"*_test.go", "pkg/paths/cli_command_name.go", "pkg/vet/*"},
 		},
 		TreePolice: TreePoliceConfig{
 			ForbiddenPaths: []string{
@@ -81,11 +97,23 @@ func DefaultConfig() *GatesConfig {
 			ForbiddenFiles: []string{
 				"ack.txt", "remaining.txt", "issues.json", "scripts/open-core/community-bounded-includes.txt",
 			},
+			ArchivedDocDirs:       []string{"docs"},
+			ArchivedDocNames:      []string{"archive", "_archive"},
+			AllowedScripts:        []string{"package-community.sh", "install.sh", "generate-openvex.sh"},
+			AllowedScriptPrefixes: []string{"scripts/open-core/"},
+			GrepExemptions:        []string{"scripts/open-core/police-community-tree.sh", "pkg/vet/*", "config/gates.yaml"},
 		},
 		Payload: PayloadConfig{
+			RequiredModulePath: "github.com/zqk-os/zqk",
 			RequiredArtifacts: []string{
 				"README.md", "LICENSE", "NOTICE", "SECURITY.md", "go.mod", "config/zqk.yaml",
 			},
+			SensitivePatterns: []string{
+				".zqk/process/**", "docs/process/**",
+				".zqk/keystore/**", ".zqk/state/**", "config/zqk-local.yaml",
+				"*.pem", "*.key", "*.p12", "*.pfx",
+			},
+			GlobalGrepExemptions: []string{"pkg/vet/*", "config/gates.yaml"},
 		},
 	}
 }

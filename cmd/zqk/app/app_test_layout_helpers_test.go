@@ -28,7 +28,11 @@ type testSettingsYAMLShapeApp struct {
 }
 
 func writeMinimalTestSettingsYAMLApp(testRoot string) error {
-	p := filepath.Join(testRoot, paths.TestSettingsFilename)
+	configDir := filepath.Join(testRoot, paths.ConfigDir)
+	if err := fileutil.EnsureDir(configDir); err != nil {
+		return err
+	}
+	p := filepath.Join(configDir, paths.ZqkTestConfigFileName)
 	body := testSettingsYAMLShapeApp{
 		Version: clctx.DefaultBrandSettingsVersion,
 		Paths:   map[string]any{},
@@ -41,7 +45,7 @@ func writeMinimalTestSettingsYAMLApp(testRoot string) error {
 }
 
 // setupAppTestEnvironmentRoot mirrors [github.com/zqk-os/zqk/pkg/testing.SetupTestEnvironment]:
-// project layout + test-settings.yaml only.
+// project layout + config/zqk-test.yaml only.
 func setupAppTestEnvironmentRoot(testRoot string) (string, error) {
 	absRoot, err := filepath.Abs(testRoot)
 	if err != nil {

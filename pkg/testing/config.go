@@ -105,7 +105,7 @@ func SetupTestEnvironment(testRoot string) (string, error) {
 		return emptyValue, errfmt.Newf("failed to create test project layout").Wrap(err)
 	}
 
-	// Write test-settings.yaml so code using ZQK_TEST_ROOT loads this instead of project config/zqk.yaml
+	// Write config/zqk-test.yaml so code using ZQK_TEST_ROOT loads this instead of project config/zqk.yaml
 	if err := writeTestSettingsFile(absRoot); err != nil {
 		return emptyValue, errfmt.Newf("failed to write test settings").Wrap(err)
 	}
@@ -113,15 +113,19 @@ func SetupTestEnvironment(testRoot string) (string, error) {
 	return absRoot, nil
 }
 
-// testSettingsShape is the minimal shape for test-settings.yaml (same schema as brand_settings).
+// testSettingsShape is the minimal shape for config/zqk-test.yaml.
 type testSettingsShape struct {
 	Version string         `yaml:"version"`
 	Paths   map[string]any `yaml:"paths"`
 }
 
-// writeTestSettingsFile writes test-settings.yaml at testRoot so LoadBrandSettings uses it when ZQK_TEST_ROOT is set.
+// writeTestSettingsFile writes config/zqk-test.yaml at testRoot so LoadBrandSettings uses it when ZQK_TEST_ROOT is set.
 func writeTestSettingsFile(testRoot string) error {
-	path := filepath.Join(testRoot, paths.TestSettingsFilename)
+	configDir := filepath.Join(testRoot, paths.ConfigDir)
+	if err := fileutil.EnsureDir(configDir); err != nil {
+		return err
+	}
+	path := filepath.Join(configDir, paths.ZqkTestConfigFileName)
 	body := testSettingsShape{
 		Version: paths.DefaultBrandSettingsVersion,
 		Paths:   map[string]any{},

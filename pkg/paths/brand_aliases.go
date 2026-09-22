@@ -41,8 +41,6 @@ func testCandidates(projectRoot string) []string {
 		filepath.Join(projectRoot, ConfigDir, ZqkTestConfigFileName),
 		filepath.Join(projectRoot, ConfigDir, ZqkLocalConfigFileName),
 		filepath.Join(projectRoot, ConfigDir, ZqkConfigFileName),
-		filepath.Join(projectRoot, TestSettingsFilename),
-		filepath.Join(projectRoot, ZqkTestSettingsFilename),
 	}
 }
 

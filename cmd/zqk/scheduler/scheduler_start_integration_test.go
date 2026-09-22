@@ -135,7 +135,6 @@ cli:
 		t.Fatalf("write brand settings: %v", err)
 	}
 	_ = fileutil.WriteSecureFile(filepath.Join(scenarioRoot, paths.ConfigDir, paths.ZqkTestConfigFileName), []byte(brandSettings))
-	_ = fileutil.WriteSecureFile(filepath.Join(scenarioRoot, paths.TestSettingsFilename), []byte(brandSettings))
 	configFile := filepath.Join(schedulerConfigDir, "config.yaml")
 	if err := fileutil.WriteSecureFile(configFile, []byte("enabled: true\nproject_type: test\n")); err != nil {
 		t.Fatalf("write scheduler config: %v", err)

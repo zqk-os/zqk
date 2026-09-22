@@ -7,10 +7,39 @@ hygiene:
   check_perms: true
   check_dups: false
   check_cli_names: true
+  forbidden_path_literals:
+    - ".zqk"
+    - ".zqk/"
+  go_scan_dirs:
+    - "pkg/"
+    - "cmd/"
+    - "internal/"
+    - "scripts/"
   exemptions:
     - "*_test.go"
-    - "pkg/paths/constants.go"
-    - "pkg/paths/brand_aliases.go"
+    - "vendor/*"
+    - ".git/*"
+    - "pkg/paths/*"
+    - "pkg/brand/*"
+    - "pkg/specbuilder/bldr_*"
+    - "pkg/cli/bldr_cli_cmd_v1/*"
+    - "pkg/utils/fileutil/*"
+    - "scripts/check_path_and_perm_literals/*"
+    - "scripts/prepare_cas_updates/*"
+    - "scripts/legacy-decommission/*"
+    - "pkg/vet/*"
+    - "*tools_sandbox*"
+  cli_exempt_functions:
+    - "CLIUsage"
+    - "CLIInvocation"
+    - "RewriteCanonicalCLIInvocations"
+  cli_exempt_files:
+    - "*_test.go"
+    - "*/testdata/*"
+    - "vendor/*"
+    - "pkg/paths/cli_command_name.go"
+    - "scripts/check_cli_name_literals/*"
+    - "pkg/vet/*"
 
 tree_police:
   forbidden_paths:
@@ -42,13 +71,50 @@ tree_police:
     - "domains-registered.png"
     - "institutionalize_phase4"
     - "scripts/open-core/community-bounded-includes.txt"
+  archived_doc_dirs:
+    - "docs"
+  archived_doc_names:
+    - "archive"
+    - "_archive"
+  allowed_scripts:
+    - "package-community.sh"
+    - "install.sh"
+    - "generate-openvex.sh"
+    - "check-hardcoded-paths-and-perms-repo.sh"
+    - "check-cli-name-literals-repo.sh"
+    - "build-bootstrap-archive.sh"
+  allowed_script_prefixes:
+    - "scripts/open-core/"
+    - "scripts/starter_kernel_graph/"
+    - "scripts/onboarding_roadmap/"
+    - "scripts/default_agent_skills/"
+    - "scripts/default_policies/"
+    - "scripts/demos/"
   forbidden_script_references:
     - "install-zqk-stable\\.sh"
     - "recycle-stable-daemons\\.sh"
     - "declare-change-intent\\.sh"
     - "check-change-intent\\.sh"
+  grep_exemptions:
+    - "scripts/open-core/police-community-tree.sh"
+    - "pkg/vet/*"
+    - "config/gates.yaml"
 
 payload:
+  required_module_path: "github.com/zqk-os/zqk"
+  sensitive_patterns:
+    - ".zqk/process/**"
+    - "docs/process/**"
+    - ".zqk/keystore/**"
+    - ".zqk/state/**"
+    - "config/zqk-local.yaml"
+    - "*.pem"
+    - "*.key"
+    - "*.p12"
+    - "*.pfx"
+  global_grep_exemptions:
+    - "pkg/vet/*"
+    - "config/gates.yaml"
   required_artifacts:
     - "README.md"
     - "LICENSE"

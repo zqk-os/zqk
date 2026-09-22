@@ -22,7 +22,11 @@ type testSettingsYAMLShapeOrg struct {
 }
 
 func writeMinimalTestSettingsYAMLOrg(testRoot string) error {
-	p := filepath.Join(testRoot, paths.TestSettingsFilename)
+	configDir := filepath.Join(testRoot, paths.ConfigDir)
+	if err := fileutil.EnsureDir(configDir); err != nil {
+		return err
+	}
+	p := filepath.Join(configDir, paths.ZqkTestConfigFileName)
 	body := testSettingsYAMLShapeOrg{
 		Version: clctx.DefaultBrandSettingsVersion,
 		Paths:   map[string]any{},

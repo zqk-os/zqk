@@ -16,13 +16,14 @@ type testSettingsShape struct {
 	Paths   map[string]any `yaml:"paths"`
 }
 
-// Setup creates project layout under testRoot and writes test-settings.yaml (same contract as pkg/testing.SetupTestEnvironment).
+// Setup creates project layout under testRoot and writes config/zqk-test.yaml (same contract as pkg/testing.SetupTestEnvironment).
 func Setup(testRoot string) (string, error) {
 	absRoot, err := filepath.Abs(testRoot)
 	if err != nil {
 		return "", errfmt.Newf("failed to resolve test root path").Wrap(err)
 	}
 	if err := paths.LayoutUnder(absRoot).
+		Dir(paths.ConfigDir, paths.DirPerm755).
 		Dir(paths.ProjectDataDir, paths.DirPerm755).
 		Dir(paths.ProcessDir, paths.DirPerm755).
 		Dir(filepath.Join(paths.ProcessDir, "goals"), paths.DirPerm755).
@@ -44,7 +45,7 @@ func Setup(testRoot string) (string, error) {
 		Err(); err != nil {
 		return "", errfmt.Newf("failed to create test project layout").Wrap(err)
 	}
-	p := filepath.Join(absRoot, paths.TestSettingsFilename)
+	p := filepath.Join(absRoot, paths.ConfigDir, paths.ZqkTestConfigFileName)
 	body := testSettingsShape{
 		Version: paths.DefaultBrandSettingsVersion,
 		Paths:   map[string]any{},

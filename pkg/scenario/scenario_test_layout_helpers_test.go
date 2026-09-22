@@ -17,6 +17,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/storagetesting"
+	"github.com/zqk-os/zqk/pkg/testenvroot"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 
@@ -46,7 +47,11 @@ type testSettingsYAMLShapeScenario struct {
 }
 
 func writeMinimalTestSettingsYAMLScenario(testRoot string) error {
-	p := filepath.Join(testRoot, paths.TestSettingsFilename)
+	configDir := filepath.Join(testRoot, paths.ConfigDir)
+	if err := fileutil.EnsureDir(configDir); err != nil {
+		return err
+	}
+	p := filepath.Join(configDir, paths.ZqkTestConfigFileName)
 	body := testSettingsYAMLShapeScenario{
 		Version: paths.DefaultBrandSettingsVersion,
 		Paths:   map[string]any{},
@@ -73,7 +78,7 @@ func layoutScenarioTestRootFull(t *testing.T, testRoot string) {
 		t.Fatalf("test project layout: %v", err)
 	}
 	if err := writeMinimalTestSettingsYAMLScenario(absRoot); err != nil {
-		t.Fatalf("test-settings.yaml: %v", err)
+		t.Fatalf("config/zqk-test.yaml: %v", err)
 	}
 }
 
@@ -158,15 +163,13 @@ func setupScenarioCompleteTestEnvironment(t *testing.T) *scenarioCompleteTestEnv
 		}
 	})
 
-	layoutScenarioTestRootFull(t, testRoot)
-
-	if o.CopySpecs {
-		mod := moduleRootFromGoEnvScenarioOrEmpty(t)
-		if mod == "" {
-			t.Logf("Warning: could not resolve module root for spec copy")
-		} else if err := copyObjectSpecYAMLFilesToTestRootScenario(testRoot, mod); err != nil {
-			t.Logf("Warning: copy spec files (tests may still work): %v", err)
+	mod := moduleRootFromGoEnvScenarioOrEmpty(t)
+	if mod != "" {
+		if err := testenvroot.BootstrapRoot(testRoot, mod); err != nil {
+			t.Fatalf("testenvroot.BootstrapRoot: %v", err)
 		}
+	} else {
+		layoutScenarioTestRootFull(t, testRoot)
 	}
 
 	if o.GenerateSpecs {

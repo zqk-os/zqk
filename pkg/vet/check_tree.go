@@ -45,65 +45,86 @@ func CheckTreePolice(root string, cfg *GatesConfig) ([]Finding, error) {
 		}
 	}
 
-	// 3. Check for archived docs in candidate docs directory
-	docsDir := filepath.Join(root, "docs")
-	if fi, err := os.Stat(docsDir); err == nil && fi.IsDir() {
-		_ = filepath.WalkDir(docsDir, func(path string, d fs.DirEntry, err error) error {
-			if err != nil || !d.IsDir() {
-				return nil
-			}
-			name := d.Name()
-			if name == "archive" || name == "_archive" {
-				rel, _ := filepath.Rel(root, path)
-				findings = append(findings, Finding{
-					CheckID:  "tree/archived-docs",
-					Suite:    "tree_police",
-					File:     rel,
-					Message:  "archived docs must not be present in public candidate docs",
-					Severity: SeverityError,
-				})
-			}
-			return nil
-		})
+	// 3. Check for archived docs in configured directories
+	docDirs := tp.ArchivedDocDirs
+	if len(docDirs) == 0 {
+		docDirs = []string{"docs"}
+	}
+	docNames := tp.ArchivedDocNames
+	if len(docNames) == 0 {
+		docNames = []string{"archive", "_archive"}
+	}
+	docNameSet := make(map[string]struct{})
+	for _, n := range docNames {
+		docNameSet[n] = struct{}{}
 	}
 
-	// 4. Check extra scripts in scripts/ (G11 rule from police-community-tree.sh)
-	scriptsDir := filepath.Join(root, "scripts")
-	if fi, err := os.Stat(scriptsDir); err == nil && fi.IsDir() {
-		_ = filepath.WalkDir(scriptsDir, func(path string, d fs.DirEntry, err error) error {
-			if err != nil || d.IsDir() {
+	for _, dir := range docDirs {
+		dirPath := filepath.Join(root, dir)
+		if fi, err := os.Stat(dirPath); err == nil && fi.IsDir() {
+			_ = filepath.WalkDir(dirPath, func(path string, d fs.DirEntry, err error) error {
+				if err != nil || !d.IsDir() {
+					return nil
+				}
+				if _, ok := docNameSet[d.Name()]; ok {
+					rel, _ := filepath.Rel(root, path)
+					findings = append(findings, Finding{
+						CheckID:  "tree/archived-docs",
+						Suite:    "tree_police",
+						File:     rel,
+						Message:  "archived docs must not be present in public candidate docs",
+						Severity: SeverityError,
+					})
+				}
 				return nil
-			}
-			name := d.Name()
-			if !strings.HasSuffix(name, ".sh") && !strings.HasSuffix(name, ".py") {
-				return nil
-			}
-			rel, _ := filepath.Rel(root, path)
-			relSlash := filepath.ToSlash(rel)
-
-			if isAllowedCommunityScript(relSlash, name) {
-				return nil
-			}
-
-			findings = append(findings, Finding{
-				CheckID:  "tree/extra-script",
-				Suite:    "tree_police",
-				File:     rel,
-				Message:  "extra unapproved script present in scripts/ (must be in open-core or standard overlays)",
-				Severity: SeverityError,
 			})
-			return nil
-		})
+		}
+	}
+
+	// 4. Check extra scripts in scripts/ (G11 rule)
+	if len(tp.AllowedScripts) > 0 || len(tp.AllowedScriptPrefixes) > 0 {
+		scriptsDir := filepath.Join(root, "scripts")
+		if fi, err := os.Stat(scriptsDir); err == nil && fi.IsDir() {
+			_ = filepath.WalkDir(scriptsDir, func(path string, d fs.DirEntry, err error) error {
+				if err != nil || d.IsDir() {
+					return nil
+				}
+				name := d.Name()
+				if !strings.HasSuffix(name, ".sh") && !strings.HasSuffix(name, ".py") {
+					return nil
+				}
+				rel, _ := filepath.Rel(root, path)
+				relSlash := filepath.ToSlash(rel)
+
+				if isAllowedScript(relSlash, name, tp.AllowedScripts, tp.AllowedScriptPrefixes) {
+					return nil
+				}
+
+				findings = append(findings, Finding{
+					CheckID:  "tree/extra-script",
+					Suite:    "tree_police",
+					File:     rel,
+					Message:  "extra unapproved script present in scripts/ (must be in open-core or standard overlays)",
+					Severity: SeverityError,
+				})
+				return nil
+			})
+		}
 	}
 
 	// 5. Scan repo for forbidden studio script references
+	grepExempts := tp.GrepExemptions
+	if len(grepExempts) == 0 {
+		grepExempts = []string{"scripts/open-core/police-community-tree.sh", "pkg/vet/*", "config/gates.yaml"}
+	}
+	var pathspecs []string
+	pathspecs = append(pathspecs, ".")
+	for _, ex := range grepExempts {
+		pathspecs = append(pathspecs, ":!"+ex)
+	}
+
 	for _, pattern := range tp.ForbiddenScriptReferences {
-		matches, err := runGitGrep(root, pattern, []string{
-			".",
-			":!scripts/open-core/police-community-tree.sh",
-			":!pkg/vet/*",
-			":!config/gates.yaml",
-		})
+		matches, err := runGitGrep(root, pattern, pathspecs)
 		if err == nil {
 			for _, m := range matches {
 				findings = append(findings, Finding{
@@ -121,23 +142,12 @@ func CheckTreePolice(root string, cfg *GatesConfig) ([]Finding, error) {
 	return findings, nil
 }
 
-func isAllowedCommunityScript(relSlash, name string) bool {
-	switch name {
-	case "package-community.sh", "install.sh", "generate-openvex.sh",
-		"check-hardcoded-paths-and-perms-repo.sh", "check-cli-name-literals-repo.sh",
-		"build-bootstrap-archive.sh":
-		return true
+func isAllowedScript(relSlash, name string, allowedScripts, allowedPrefixes []string) bool {
+	for _, s := range allowedScripts {
+		if name == s || relSlash == s {
+			return true
+		}
 	}
-
-	allowedPrefixes := []string{
-		"scripts/open-core/",
-		"scripts/starter_kernel_graph/",
-		"scripts/onboarding_roadmap/",
-		"scripts/default_agent_skills/",
-		"scripts/default_policies/",
-		"scripts/demos/",
-	}
-
 	for _, prefix := range allowedPrefixes {
 		if strings.HasPrefix(relSlash, prefix) {
 			return true

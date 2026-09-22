@@ -86,8 +86,8 @@ func TestWriteProjectConfigFiles_SSOT(t *testing.T) {
 	if !strings.Contains(string(data), `name: test-proj`) {
 		t.Errorf("config should contain name: test-proj, got: %s", string(data))
 	}
-	if fileutil.Exists(filepath.Join(tmpDir, paths.BrandSettingsFilename)) {
-		t.Errorf("obsolete %s must not be created", paths.BrandSettingsFilename)
+	if fileutil.Exists(filepath.Join(tmpDir, "zqk-settings.yaml")) {
+		t.Errorf("obsolete zqk-settings.yaml must not be created")
 	}
 }
 
@@ -146,7 +146,7 @@ func TestFirstRun_PolyglotWorkspaceErgonomics(t *testing.T) {
 	}
 
 	// Assert root isolation and account exist
-	if fileutil.Exists(filepath.Join(tmpDir, paths.BrandSettingsFilename)) {
+	if fileutil.Exists(filepath.Join(tmpDir, "zqk-settings.yaml")) {
 		t.Errorf("obsolete brand settings must not exist in polyglot root")
 	}
 	if !fileutil.Exists(filepath.Join(tmpDir, paths.ConfigDir, paths.ZqkConfigFileName)) {

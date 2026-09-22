@@ -15,26 +15,35 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-var exemptFuncs = map[string]struct{}{
-	"CLIUsage":                       {},
-	"CLIInvocation":                  {},
-	"RewriteCanonicalCLIInvocations": {},
-}
-
 // CheckCLINames scans Go files in projectRoot for hardcoded canonical CLI invocations.
-func CheckCLINames(projectRoot string, files []string) ([]Finding, error) {
+func CheckCLINames(projectRoot string, files []string, cfg *GatesConfig) ([]Finding, error) {
+	if cfg == nil {
+		cfg = DefaultConfig()
+	}
 	var findings []Finding
 
 	if len(files) == 0 {
 		var err error
-		files, err = collectGoFiles(projectRoot)
+		files, err = collectGoFiles(projectRoot, cfg.Hygiene.GoScanDirs)
 		if err != nil {
 			return nil, err
 		}
 	}
 
+	exemptFuncMap := make(map[string]struct{})
+	for _, fn := range cfg.Hygiene.CLIExemptFunctions {
+		exemptFuncMap[fn] = struct{}{}
+	}
+	if len(exemptFuncMap) == 0 {
+		exemptFuncMap = map[string]struct{}{
+			"CLIUsage":                       {},
+			"CLIInvocation":                  {},
+			"RewriteCanonicalCLIInvocations": {},
+		}
+	}
+
 	for _, rel := range files {
-		if shouldSkipCLINameCheck(rel) {
+		if isPathExempt(rel, cfg.Hygiene.CLIExemptFiles) || isPathExempt(rel, cfg.Hygiene.Exemptions) {
 			continue
 		}
 		abs := rel
@@ -71,7 +80,7 @@ func CheckCLINames(projectRoot string, files []string) ([]Finding, error) {
 			if !ok || lit.Kind != token.STRING {
 				return true
 			}
-			if callExempt(stack) || inConstDecl(stack) {
+			if callExempt(stack, exemptFuncMap) || inConstDecl(stack) {
 				return true
 			}
 			s, err := strconv.Unquote(lit.Value)
@@ -94,25 +103,6 @@ func CheckCLINames(projectRoot string, files []string) ([]Finding, error) {
 	}
 
 	return findings, nil
-}
-
-func shouldSkipCLINameCheck(rel string) bool {
-	rel = filepath.ToSlash(rel)
-	switch {
-	case strings.HasSuffix(rel, "_test.go"):
-		return true
-	case strings.Contains(rel, "/testdata/"):
-		return true
-	case strings.HasPrefix(rel, "vendor/"):
-		return true
-	case rel == "pkg/paths/cli_command_name.go":
-		return true
-	case strings.HasPrefix(rel, "scripts/check_cli_name_literals/"):
-		return true
-	case strings.HasPrefix(rel, "pkg/vet/"):
-		return true
-	}
-	return false
 }
 
 func firstCanonicalCLIHit(s string) (bool, string) {
@@ -140,7 +130,7 @@ func firstCanonicalCLIHit(s string) (bool, string) {
 	}
 }
 
-func callExempt(stack []ast.Node) bool {
+func callExempt(stack []ast.Node, exemptFuncs map[string]struct{}) bool {
 	for i := len(stack) - 1; i >= 0; i-- {
 		call, ok := stack[i].(*ast.CallExpr)
 		if !ok {

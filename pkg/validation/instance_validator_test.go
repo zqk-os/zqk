@@ -753,3 +753,48 @@ func TestInstanceValidator_validateSemanticType(t *testing.T) {
 		})
 	}
 }
+
+func TestInstanceValidator_checkPrecondition(t *testing.T) {
+	t.Parallel()
+	iv := &InstanceValidator{}
+
+	// is set
+	objSet := map[string]any{
+		"priority_plan_ref": "PLAN-1",
+	}
+	if !iv.checkPrecondition("priority_plan_ref is set", objSet) {
+		t.Errorf("expected true for priority_plan_ref is set")
+	}
+	if iv.checkPrecondition("other_ref is set", objSet) {
+		t.Errorf("expected false for other_ref is set")
+	}
+
+	// is not empty
+	objList := map[string]any{
+		"milestone_refs": []string{"MS-1"},
+		"empty_list":     []string{},
+	}
+	if !iv.checkPrecondition("milestone_refs is not empty", objList) {
+		t.Errorf("expected true for milestone_refs is not empty")
+	}
+	if iv.checkPrecondition("empty_list is not empty", objList) {
+		t.Errorf("expected false for empty_list is not empty")
+	}
+
+	// at least one
+	objAtLeast := map[string]any{
+		"milestone_refs": []string{"MS-1"},
+	}
+	if !iv.checkPrecondition("at least one milestone_ref linked", objAtLeast) {
+		t.Errorf("expected true for at least one milestone_ref linked")
+	}
+	if iv.checkPrecondition("at least one goal_ref linked", objAtLeast) {
+		t.Errorf("expected false for at least one goal_ref linked")
+	}
+
+	// unknown precondition defaults to true (permissive)
+	if !iv.checkPrecondition("unknown custom precondition rule", objAtLeast) {
+		t.Errorf("expected true for unknown precondition")
+	}
+}
+

@@ -122,7 +122,7 @@ func BrandSettingsPath(projectRoot string) string {
 }
 
 // LoadBrandSettings loads and parses the brand settings file from projectRoot.
-// When the branded TEST_ROOT env matches projectRoot, loads test-settings.yaml or zqk-test-settings.yaml; otherwise config/zqk.yaml.
+// When the branded TEST_ROOT env matches projectRoot, loads config/zqk-test.yaml or config/zqk.yaml.
 // Returns an error if the file is missing or invalid.
 func LoadBrandSettings(projectRoot string) (*BrandSettings, error) {
 	if projectRoot == emptyValue {
@@ -151,9 +151,9 @@ func testRootMatchesProject(projectRoot string) bool {
 	return err1 == nil && err2 == nil && absTest == absProject
 }
 
-// EnsureTestRootBrandSettingsFiles writes test-settings.yaml and zqk-test-settings.yaml when
-// ZQK_*_TEST_ROOT matches projectRoot and either file is missing. Required for scheduler start
-// and other commands that load brand settings in isolated test projects (e.g. zqk-ts + ZQK_TS_TEST_ROOT).
+// EnsureTestRootBrandSettingsFiles writes config/zqk-test.yaml when
+// ZQK_*_TEST_ROOT matches projectRoot and the file is missing. Required for scheduler start
+// and other commands that load brand settings in isolated test projects.
 func EnsureTestRootBrandSettingsFiles(projectRoot string) error {
 	if !testRootMatchesProject(projectRoot) {
 		return nil
@@ -166,20 +166,14 @@ func EnsureTestRootBrandSettingsFiles(projectRoot string) error {
 	if err != nil {
 		return errfmt.Newf("marshal minimal test brand settings").Wrap(err)
 	}
-	configDir := filepath.Join(projectRoot, "config")
-	if err := fileutil.EnsureDir(configDir); err == nil {
-		testYaml := filepath.Join(configDir, "zqk-test.yaml")
-		if _, err := fileutil.Stat(testYaml); err != nil {
-			_ = fileutil.WriteFile(testYaml, data, paths.FilePerm644)
-		}
+	configDir := filepath.Join(projectRoot, paths.ConfigDir)
+	if err := fileutil.EnsureDir(configDir); err != nil {
+		return errfmt.Newf("ensure config dir").Wrap(err)
 	}
-	for _, name := range []string{paths.TestSettingsFilename, paths.ZqkTestSettingsFilename} {
-		p := filepath.Join(projectRoot, name)
-		if _, err := fileutil.Stat(p); err == nil {
-			continue
-		}
-		if err := fileutil.WriteFile(p, data, paths.FilePerm644); err != nil { //nolint:gosec // project-local settings template
-			return errfmt.Newf("write %s", name).Wrap(err)
+	testYaml := filepath.Join(configDir, paths.ZqkTestConfigFileName)
+	if _, err := fileutil.Stat(testYaml); err != nil {
+		if err := fileutil.WriteFile(testYaml, data, paths.FilePerm644); err != nil {
+			return errfmt.Newf("write %s", testYaml).Wrap(err)
 		}
 	}
 	return nil

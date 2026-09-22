@@ -42,7 +42,11 @@ type testSettingsYAMLShapeCoord struct {
 }
 
 func writeMinimalTestSettingsYAMLCoord(testRoot string) error {
-	p := filepath.Join(testRoot, paths.TestSettingsFilename)
+	configDir := filepath.Join(testRoot, paths.ConfigDir)
+	if err := fileutil.EnsureDir(configDir); err != nil {
+		return err
+	}
+	p := filepath.Join(configDir, paths.ZqkTestConfigFileName)
 	body := testSettingsYAMLShapeCoord{
 		Version: paths.DefaultBrandSettingsVersion,
 		Paths:   map[string]any{},
@@ -54,7 +58,7 @@ func writeMinimalTestSettingsYAMLCoord(testRoot string) error {
 	return fileutil.WriteSecureFile(p, data) //nolint:gosec // test file
 }
 
-// layoutCoordinationTestRootFull mirrors pkg/testing.SetupTestEnvironment: project layout + test-settings.yaml.
+// layoutCoordinationTestRootFull mirrors pkg/testing.SetupTestEnvironment: project layout + config/zqk-test.yaml.
 func layoutCoordinationTestRootFull(t *testing.T, testRoot string) {
 	t.Helper()
 	absRoot, err := filepath.Abs(testRoot)
@@ -70,7 +74,7 @@ func layoutCoordinationTestRootFull(t *testing.T, testRoot string) {
 		t.Fatalf("test project layout: %v", err)
 	}
 	if err := writeMinimalTestSettingsYAMLCoord(absRoot); err != nil {
-		t.Fatalf("test-settings.yaml: %v", err)
+		t.Fatalf("config/zqk-test.yaml: %v", err)
 	}
 }
 
