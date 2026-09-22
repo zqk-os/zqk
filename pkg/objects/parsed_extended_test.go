@@ -122,7 +122,7 @@ func TestParseObjectMinimal(t *testing.T) {
 		FieldKeyID:          "BLI-MIN-1",
 		FieldKeyKind:        "backlog_item",
 		FieldKeyNamespaceID: "NS-DEFAULT",
-		FieldKeyStatus:      "proposed",
+		FieldKeyStatus:      "planned",
 		"other_unneeded":    "data",
 	}
 
@@ -136,7 +136,7 @@ func TestParseObjectMinimal(t *testing.T) {
 	if parsed.NamespaceID != "NS-DEFAULT" {
 		t.Errorf("expected namespace NS-DEFAULT, got %s", parsed.NamespaceID)
 	}
-	if parsed.Status != "proposed" {
+	if parsed.Status != "planned" {
 		t.Errorf("expected status proposed, got %s", parsed.Status)
 	}
 }
