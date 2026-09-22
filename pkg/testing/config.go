@@ -105,7 +105,7 @@ func SetupTestEnvironment(testRoot string) (string, error) {
 		return emptyValue, errfmt.Newf("failed to create test project layout").Wrap(err)
 	}
 
-	// Write test-settings.yaml so code using ZQK_TEST_ROOT loads this instead of project zqk-settings.yaml
+	// Write test-settings.yaml so code using ZQK_TEST_ROOT loads this instead of project config/zqk.yaml
 	if err := writeTestSettingsFile(absRoot); err != nil {
 		return emptyValue, errfmt.Newf("failed to write test settings").Wrap(err)
 	}

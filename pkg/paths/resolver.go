@@ -203,7 +203,7 @@ func IsPathCacheStale(projectRoot string, checkDirs []string) bool {
 }
 
 // DefaultStalenessCheckDirs returns the default list of paths (relative to project root) to check for cache staleness.
-// Configurable later via {brand}-settings (e.g. zqk-settings.yaml); for now .zqk and .zqk/agent-runtime are critical.
+// Configurable via project configuration (config/zqk.yaml); defaults to .zqk and .zqk/agent-runtime.
 func DefaultStalenessCheckDirs() []string {
 	return []string{ProjectDataDir, filepath.Join(ProjectDataDir, AgentRuntimeDir)}
 }
@@ -345,7 +345,7 @@ func GetPathAlias(projectRoot, alias string) string {
 // ResolvePathFromCacheOrConstant returns the absolute path for alias when the path cache has been built
 // (so paths come from brand settings), otherwise filepath.Join(projectRoot, fallbackRel).
 // Use this for path construction (e.g. cache dir, config dir) so moving folders only requires editing
-// zqk-settings.yaml; fallbackRel should be the constant-based relative path (e.g. filepath.Join(ProjectDataDir, CacheDir)).
+// config/zqk.yaml; fallbackRel should be the constant-based relative path (e.g. filepath.Join(ProjectDataDir, CacheDir)).
 func ResolvePathFromCacheOrConstant(projectRoot, alias, fallbackRel string) string {
 	if projectRoot == emptyValue {
 		return ""

@@ -33,7 +33,6 @@ func configCandidates(projectRoot string) []string {
 	return []string{
 		filepath.Join(projectRoot, ConfigDir, ZqkLocalConfigFileName),
 		filepath.Join(projectRoot, ConfigDir, ZqkConfigFileName),
-		filepath.Join(projectRoot, BrandSettingsFilename),
 	}
 }
 

@@ -3,7 +3,7 @@ control.
 
 Writes the tip to --snapshot-file (committed in git). Before overwrite, copies the
 previous tip into an external backup directory and keeps only the newest N priors.
-Backup location/keep: --backup-dir/--backup-keep, else zqk-settings.yaml kernel_state.snapshot_backup_*,
+Backup location/keep: --backup-dir/--backup-keep, else config/zqk.yaml kernel_state.snapshot_backup_*,
 else <parent>/<repo>-csnap-backups keep=3. Refuses a large shrink unless --allow-shrink.
 
   Commit system state
@@ -14,7 +14,7 @@ Usage:
 
 Flags:
       --allow-shrink            Allow writing a tip csnap with far fewer objects than the previous tip
-      --backup-dir string       External prior-tip backup dir (overrides zqk-settings.yaml kernel_state.snapshot_backup_dir)
+      --backup-dir string       External prior-tip backup dir (overrides config/zqk.yaml kernel_state.snapshot_backup_dir)
       --backup-keep int         Prior tip copies to keep (0 = use settings or default 3)
       --columns string          Override column widths for table output (format: field:width)
   -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")

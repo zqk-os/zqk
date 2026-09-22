@@ -107,7 +107,8 @@ func TestSchedulerStart_EndToEnd(t *testing.T) {
 		t.Fatalf("copy scenario object specs: %v", err)
 	}
 
-	brandSettingsPath := filepath.Join(scenarioRoot, "zqk-settings.yaml")
+	_ = fileutil.EnsureDir(filepath.Join(scenarioRoot, paths.ConfigDir))
+	brandSettingsPath := filepath.Join(scenarioRoot, paths.ConfigDir, paths.ZqkConfigFileName)
 	brandSettings := fmt.Sprintf(`# Minimal brand settings for scheduler e2e scenario
 $schema: "https://zqk.dev/schemas/brand_settings.schema.json"
 description: "Scheduler e2e test scenario settings"
@@ -133,9 +134,8 @@ cli:
 	if err := fileutil.WriteSecureFile(brandSettingsPath, []byte(brandSettings)); err != nil {
 		t.Fatalf("write brand settings: %v", err)
 	}
-	_ = fileutil.EnsureDir(filepath.Join(scenarioRoot, "config"))
-	_ = fileutil.WriteSecureFile(filepath.Join(scenarioRoot, "config", "zqk-test.yaml"), []byte(brandSettings))
-	_ = fileutil.WriteSecureFile(filepath.Join(scenarioRoot, "test-settings.yaml"), []byte(brandSettings))
+	_ = fileutil.WriteSecureFile(filepath.Join(scenarioRoot, paths.ConfigDir, paths.ZqkTestConfigFileName), []byte(brandSettings))
+	_ = fileutil.WriteSecureFile(filepath.Join(scenarioRoot, paths.TestSettingsFilename), []byte(brandSettings))
 	configFile := filepath.Join(schedulerConfigDir, "config.yaml")
 	if err := fileutil.WriteSecureFile(configFile, []byte("enabled: true\nproject_type: test\n")); err != nil {
 		t.Fatalf("write scheduler config: %v", err)

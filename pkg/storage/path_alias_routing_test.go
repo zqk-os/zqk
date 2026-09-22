@@ -1,5 +1,5 @@
 // Exercises BuildPathAliasCacheForProject + paths.ResolvePathStrict / GetStreamSegmentDir so
-// brand-settings aliases and stream segment wiring stay consistent when remapped.
+// configuration aliases and stream segment wiring stay consistent when remapped.
 package storage
 
 import (
@@ -24,7 +24,11 @@ paths:
     process: "alpha/process"
     streams: ".zqk/streams_alt"
 `
-	settingsPath := filepath.Join(root, paths.BrandSettingsFilename)
+	cfgDir := filepath.Join(root, paths.ConfigDir)
+	if err := fileutil.EnsureDir(cfgDir); err != nil {
+		t.Fatal(err)
+	}
+	settingsPath := filepath.Join(cfgDir, paths.ZqkConfigFileName)
 	if err := fileutil.WriteSecureFile(settingsPath, []byte(settingsYAML)); err != nil {
 		t.Fatal(err)
 	}
@@ -94,7 +98,11 @@ paths:
     process: "alpha/process"
     streams: ".zqk/streams_alt"
 `
-	if err := fileutil.WriteSecureFile(filepath.Join(root, paths.BrandSettingsFilename), []byte(settingsYAML)); err != nil {
+	cfgDir := filepath.Join(root, paths.ConfigDir)
+	if err := fileutil.EnsureDir(cfgDir); err != nil {
+		t.Fatal(err)
+	}
+	if err := fileutil.WriteSecureFile(filepath.Join(cfgDir, paths.ZqkConfigFileName), []byte(settingsYAML)); err != nil {
 		t.Fatal(err)
 	}
 	BuildPathAliasCacheForProject(root)

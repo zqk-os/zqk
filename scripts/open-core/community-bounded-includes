@@ -49,7 +49,7 @@ scripts/open-core/Makefile.community
 scripts/open-core/install-community-makefile.sh
 .zqk/specs
 .zqk/cli/specs
-.zqk/cli/command_spec_coverage_baseline.community.json
+.zqk/cli/command_spec_coverage_baseline.json
 .github/workflows/ci.yml
 .gitignore
 NOTICE

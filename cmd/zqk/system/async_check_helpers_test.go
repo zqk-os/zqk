@@ -26,6 +26,11 @@ func TestInitializeAsyncCheckContext_EnqueuesCachePrewarmTrigger(t *testing.T) {
 	if err != nil {
 		t.Fatalf("initializeAsyncCheckContext: %v", err)
 	}
+	defer func() {
+		if sched := schedulerpkg.GetGlobalScheduler(); sched != nil && sched.IsRunning() {
+			sched.Stop()
+		}
+	}()
 
 	queue := schedulerpkg.NewJobTriggerQueue(projectRoot)
 	reqs, err := queue.PeekTriggerRequests()

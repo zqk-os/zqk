@@ -147,7 +147,7 @@ func startSchedulerInBackground(ctx *cli.Context, cmd *cobra.Command) error {
 	// which makes the child look for ZQK_SCHEDULER_API_KEY instead of ZQK_API_KEY, causing auth failure.
 	//
 	// NOTE: Do NOT use WireExecForIsolatedProject — it sets ZQK_TEST_ROOT / ZQK_TEST_BYPASS_AUTH
-	// which makes the child resolve test-settings.yaml instead of zqk-settings.yaml.
+	// which makes the child resolve test configuration instead of project configuration.
 	// The daemon is a production process that should inherit the parent's full environment.
 	execCmd.Dir = projectRoot
 	execCmd.Env = scrubDaemonInheritEnv(append(os.Environ(),
