@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
+	"testing"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -20,6 +21,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 var (
@@ -202,6 +204,16 @@ func StartDaemon(projectRoot string, out interface{ Write([]byte) (int, error) }
 		exe = "zqk"
 	}
 
+	// TRACK: BLI-1786385524943190000-f8f9dab5 — Setsid + --timeout 0 from *.test
+	// orphans grandchildren onto PID 1. Refuse here; tests that need a daemon
+	// must exec the product CLI and t.Cleanup(StopDaemon).
+	if refuseDetachedAmbientSpawn(exe) {
+		if out != nil {
+			_, _ = fmt.Fprintf(out, "Skipping ambient daemon spawn from test process (%s)\n", filepath.Base(exe))
+		}
+		return nil
+	}
+
 	logPath := ambientLogFilePath(projectRoot)
 	if err := fileutil.EnsureDir(filepath.Dir(logPath)); err != nil {
 		return fmt.Errorf("failed to create ambient log directory: %w", err)
@@ -287,4 +299,11 @@ func StopDaemon(projectRoot string) error {
 	_ = fileutil.Remove(ambientPIDFilePath(projectRoot))
 	logging.Fluent(logger).Info(fmt.Sprintf("Stopped ambient daemon (PID: %d).", pid)).Log()
 	return nil
+}
+
+func refuseDetachedAmbientSpawn(exe string) bool {
+	if testing.Testing() || zqkenv.IsInTest() {
+		return true
+	}
+	return zqkenv.IsGoTestBinary(exe)
 }

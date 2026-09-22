@@ -13,14 +13,24 @@ import "time"
 const (
 	// LayoutDateTimeSpace is a human-readable local-neutral stamp for titles and summaries (UTC wall clock).
 	LayoutDateTimeSpace = "2006-01-02 15:04:05"
+	// LayoutDateTimeMinute is date and hour:minute in UTC (no seconds).
+	LayoutDateTimeMinute = "2006-01-02 15:04"
 	// LayoutDateTimeMillis includes fractional seconds (UTC wall clock); used for trace-style lines.
 	LayoutDateTimeMillis = "2006-01-02 15:04:05.000"
 	// LayoutObjectDateTimeZ is a fixed-offset Z stamp used in many object YAML fields.
 	LayoutObjectDateTimeZ = "2006-01-02T15:04:05Z"
 	// LayoutDate is the calendar date in UTC (directory bucketing, day keys).
 	LayoutDate = "2006-01-02"
+	// LayoutMonth is year-month in UTC.
+	LayoutMonth = "2006-01"
 	// LayoutLogRotateStamp is a compact UTC stamp for rotated log filenames.
 	LayoutLogRotateStamp = "20060102-150405"
+	// LayoutCompactStampZ is a compact UTC stamp with a Z suffix.
+	LayoutCompactStampZ = "20060102T150405Z"
+	// LayoutCompactHour is a compact UTC date+hour:minute stamp.
+	LayoutCompactHour = "20060102T1504"
+	// LayoutCompactDate is a compact UTC calendar date.
+	LayoutCompactDate = "20060102"
 )
 
 // FormatRFC3339UTC renders t as RFC3339 in UTC (Z or offset +00:00).

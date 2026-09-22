@@ -18,6 +18,9 @@ const (
 
 	// InitialFieldVersion is the version assigned when a field is first created (field_versioning).
 	InitialFieldVersion = "1.0.0"
+
+	// SessionIDPrefix is the primary zqk_session object id prefix (id_prefixes_config).
+	SessionIDPrefix = "ZS-"
 )
 
 var schemaVersionRegex = regexp.MustCompile(SchemaVersionPattern)

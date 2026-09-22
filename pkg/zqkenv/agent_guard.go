@@ -43,8 +43,16 @@ func foregroundGoTestPanicMessage() string {
 		"zqk command in the same shell resolves against that directory and fails."
 }
 
+// IsGoTestBinary reports whether path looks like a `go test` compiled binary
+// (`*.test`, `*_test/`). Detached Setsid children of those binaries survive
+// the test process and soak CPU; callers must refuse spawn or t.Cleanup stop.
+func IsGoTestBinary(path string) bool {
+	return isGoTestBinary(path)
+}
+
 func isGoTestBinary(arg0 string) bool {
 	return strings.HasSuffix(arg0, ".test") ||
+		strings.HasSuffix(arg0, ".test.exe") ||
 		strings.Contains(arg0, "/_test/") ||
 		strings.Contains(arg0, "\\_test\\")
 }
