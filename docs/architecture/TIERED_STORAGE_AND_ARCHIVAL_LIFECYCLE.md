@@ -16,7 +16,7 @@ Historically, setting an entity's status to `archived` was purely a metadata lab
 - **System Check Scan Penalties:** Discovery routines must evaluate thousands of dead objects during every validation pass.
 - **Active Edge Ambiguity:** Completed historical nodes clutter active graph traversal queries.
 
-This architecture introduces **Tiered Storage and Subgraph Archival**, converting loose historical objects into **immutable Semantic Capsules** across a 4-tier lifecycle: **Hot $\rightarrow$ Warm $\rightarrow$ Cold $\rightarrow$ Abyss**.
+This architecture introduces **Tiered Storage and Subgraph Archival**, converting loose historical objects into **immutable Semantic Capsules** across a 4-tier lifecycle: **Hot → Warm → Cold → Abyss**.
 
 ---
 
@@ -56,8 +56,8 @@ flowchart TD
 
 | Tier | Lifecycle Plane | Storage Media | Index Footprint | Read SLA | Mutation Policy |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Hot** | `promoted` | Loose CAS YAML (`.zqk/process/`) | Full In-Memory Cache | $< 1\text{ms}$ direct disk | Fully mutable (via Mode A or Mode B socket) |
-| **Warm** | `apoptotic` | Compressed Capsule (`.capsule.zst`) | Tombstone Pointer in CAS Index | $1-2\text{ms}$ in-memory stream | **Forbidden** (Mathematically Immutable) |
+| **Hot** | `promoted` | Loose CAS YAML (`.zqk/process/`) | Full In-Memory Cache | < 1ms direct disk | Fully mutable (via Mode A or Mode B socket) |
+| **Warm** | `apoptotic` | Compressed Capsule (`.capsule.zst`) | Tombstone Pointer in CAS Index | 1–2ms in-memory stream | **Forbidden** (Mathematically Immutable) |
 | **Cold** | `apoptotic` | Detached Vault (S3/GCS/FS) | Remote URL Locator | Network fetch on-demand | **Forbidden** |
 | **Abyss** | `purged` | Zeroed (WAL Audit stream only) | Historical Merkle Hash | Non-recoverable (Proof only) | **Permanent Eviction** |
 
@@ -67,25 +67,36 @@ flowchart TD
 
 Archival operates at **subgraph granularity**, not object isolation. A `Goal` roots a directed acyclic graph (DAG):
 
-$$\text{Goal} \longrightarrow \text{Milestones} \longrightarrow \text{Requirements} \longrightarrow \text{Criteria / BLIs} \longrightarrow \text{Tasks} \longrightarrow \text{QA Records}$$
+```mermaid
+flowchart LR
+    Goal["Goal"] --> Milestones["Milestones"] --> Requirements["Requirements"] --> Criteria["Criteria / BLIs"] --> Tasks["Tasks"] --> QARecords["QA Records"]
+```
 
 ### Archival Pipeline
 
-```
-                              ARCHIVAL COMPACTOR
-                              
-      Loose CAS Objects (100+ files)                 Immutable Semantic Capsule
-    ┌───────────────────────────────┐               ┌───────────────────────────────┐
-    │ GOAL-001                      │   Flatten     │ GOAL-001.capsule.zst          │
-    │ ├─ MIL-001, MIL-002           │ ────────────> │ ├─ manifest.json              │
-    │ ├─ REQ-010..030               │   Compress    │ ├─ topology.json              │
-    │ ├─ BLI-100..150               │               │ ├─ narrative_summary.md       │
-    │ └─ QA-001..090                │               │ └─ blobs.bin.zst              │
-    └───────────────────────────────┘               └───────────────────────────────┘
-                    │                                               │
-                    ▼                                               ▼
-         Pruned from .zqk/process/                      Lightweight Tombstone Pointer
-       (Zero inodes, zero scan lag)                     In .zqk/process/goals/.goal.index
+```mermaid
+flowchart LR
+    subgraph Loose["Loose CAS Objects (100+ files)"]
+        direction TB
+        L_GOAL["GOAL-001 (Root)"]
+        L_MIL["• MIL-001, MIL-002"]
+        L_REQ["• REQ-010..030"]
+        L_BLI["• BLI-100..150"]
+        L_QA["• QA-001..090"]
+    end
+
+    subgraph Capsule["Immutable Semantic Capsule"]
+        direction TB
+        C_CAP["GOAL-001.capsule.zst"]
+        C_MAN["• manifest.json"]
+        C_TOP["• topology.json"]
+        C_NAR["• narrative_summary.md"]
+        C_BLOB["• blobs.bin.zst"]
+    end
+
+    Loose -->|"Archival Compactor<br/>(Flatten & Compress)"| Capsule
+    Loose -.->|"Pruned from .zqk/process/<br/>(Zero inodes, zero scan lag)"| Pruned["Clean Working Tree"]
+    Capsule -.->|"Lightweight Tombstone Pointer"| Index["Index Entry in<br/>.zqk/process/goals/.goal.index"]
 ```
 
 ### 3.1 Pipeline Execution Stages

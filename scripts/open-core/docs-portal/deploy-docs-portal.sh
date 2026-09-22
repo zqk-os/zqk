@@ -8,7 +8,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 BUILD_DIR="/tmp/zqk-docs-build"
 DOCS_REPO="git@github.com:zqk-os/zqk-docs.git"
 CUSTOM_DOMAIN="docs.zqk.dev"

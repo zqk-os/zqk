@@ -85,5 +85,5 @@ When you no longer need the example object, delete it per project policy (`zqk o
 - **Long-running tests:** Prefer `zqk scheduler scan-tests` for package gates; see project scheduler docs and `PRE_CHANGE_CHECKLIST.md` section 6 for scope.
 
 - [AI Agent Onboarding Guide](./AI_AGENT_ONBOARDING.md) — Agent directives and workflow discipline on ZQK Core.
-- [architecture/README.md](../architecture/README.md) — Core system architecture, Knowledge Kernel, and daemon topology.
-- [COMMUNITY_FIRST_RUN.md](./COMMUNITY_FIRST_RUN.md) — First-run setup, MCP installation, and kernel verification.
+- [Architecture Overview](../architecture/README.md) — Core system architecture, Knowledge Kernel, and daemon topology.
+- [Community First-Run Guide](./COMMUNITY_FIRST_RUN.md) — First-run setup, MCP installation, and kernel verification.

@@ -12,35 +12,23 @@ The ZQK Knowledge Kernel implements a cellular membrane pattern to enforce stric
 
 The system operates in one of two distinct modes:
 
-```
-MODE A: DEVELOPER STANDALONE (Open-Core)
-┌─────────────────────────────────────────────────────────────┐
-│  Client Process / Agent Session (CLI / MCP Tools)           │
-└──────────────────────────────┬──────────────────────────────┘
-                               │ Direct File I/O (Local Disk)
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│  .zqk/process/ (CAS Blobs)  &  .zqk/streams/ (WAL Logs)     │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+  subgraph ModeA["Mode A: Developer Standalone (Open-Core)"]
+    direction TD
+    ClientA["Client Process / Agent Session<br/>(CLI / MCP Tools)"]
+    DiskA[".zqk/process/ (CAS Blobs)<br/>& .zqk/streams/ (WAL Logs)"]
+    ClientA -->|"Direct File I/O (Local Disk)"| DiskA
+  end
 
-MODE B: CELLULAR MEMBRANE LOCKDOWN (Swarm / Multi-Tenant Sandbox)
-┌─────────────────────────────────────────────────────────────┐
-│  Untrusted Agent / Client Process (Read-Only / Sandboxed)    │
-└──────────────────────────────┬──────────────────────────────┘
-                               │ JSON-RPC over UNIX Socket
-                               │ (/tmp/zqk-privileged-writer.sock)
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│  PrivilegedWriterDaemon (zqk object daemon)                 │
-│  - Identity: Dedicated Service User (e.g. zqk-service)      │
-│  - Schema Gate: ValidateAllIntakeObjects + Mandatory Desc   │
-│  - SHA-256 CAS Calculation & Atomic Disk Serialization     │
-└──────────────────────────────┬──────────────────────────────┘
-                               │ Privileged Write I/O Only
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│  .zqk/process/ (0750 / 0640)  &  .zqk/streams/ (0700)       │
-└─────────────────────────────────────────────────────────────┘
+  subgraph ModeB["Mode B: Cellular Membrane Lockdown (Swarm / Multi-Tenant Sandbox)"]
+    direction TD
+    ClientB["Untrusted Agent / Client Process<br/>(Read-Only / Sandboxed)"]
+    DaemonB["PrivilegedWriterDaemon (zqk object daemon)<br/>• Dedicated Service User<br/>• ValidateAllIntakeObjects + Mandatory Description<br/>• SHA-256 CAS Calculation & Atomic Serialization"]
+    DiskB[".zqk/process/ (0750 / 0640)<br/>& .zqk/streams/ (0700)"]
+    ClientB -->|"JSON-RPC over UNIX Socket<br/>(/tmp/zqk-privileged-writer.sock)"| DaemonB
+    DaemonB -->|"Privileged Write I/O Only"| DiskB
+  end
 ```
 
 ### Modality Comparison
@@ -206,30 +194,37 @@ In Mode B, agents do not construct CAS files directly on disk. Instead, agents s
 
 ### The Direct-to-CAS Lifecycle Pipeline
 
+```mermaid
+sequenceDiagram
+  autonumber
+  actor Agent as Agent / Operator
+  participant Intake as Semantic Intake (zqk intake)
+  participant Reasoner as Reasoner (pkg/intake)
+  participant Gate as Membrane Gate (ValidateAllIntakeObjects)
+  participant Socket as UNIX Domain Socket
+  participant Daemon as PrivilegedWriterDaemon
+  participant CAS as CAS Storage (.zqk/process & .zqk/streams)
+
+  Agent->>Intake: Submit raw text or requirement
+  Intake->>Reasoner: Pass text & flags
+  Reasoner->>Reasoner: Coerce schema, synthesize description, assign ID & graph linkages
+  Reasoner->>Gate: Validate candidate objects
+  alt Validation Fails
+    Gate-->>Agent: Demote to Draft Plane (.zqk/object_drafts/)
+  else Validation Passes
+    Gate->>Socket: Transmit payload via IPC (/tmp/zqk-privileged-writer.sock)
+    Socket->>Daemon: Deliver payload
+    Daemon->>Daemon: Calculate SHA-256 CAS digest
+    Daemon->>CAS: Atomic disk write (.zqk/process) & append WAL (.zqk/streams)
+    Daemon-->>Agent: Confirmation (Zero draft residue)
+  end
 ```
-1. Input Reception:
-   zqk intake "..." receives raw text and optional flags.
 
-2. Semantic Reasoning (pkg/intake/reasoner.go):
-   - Coerces text into valid schema attributes.
-   - Synthesizes mandatory description (POL-DOC-001).
-   - Generates deterministic entity IDs (REQ-*, BLI-*, etc.).
-   - Establishes graph linkages (workstreams, goals).
-
-3. Pre-Flight Membrane Verification:
-   - Calls ValidateAllIntakeObjects().
-   - If invalid -> Tucked into Draft Plane (.zqk/object_drafts/) for human review.
-   - If valid -> Routes to IPCWriter.
-
-4. IPC Socket Transmission:
-   - Transmits payload over /tmp/zqk-privileged-writer.sock to daemon.
-
-5. Privileged Materialization:
-   - PrivilegedWriterDaemon hashes payload via SHA-256.
-   - Writes directly to .zqk/process/<kind>/<hash>.yaml.
-   - Updates CAS index and records mutation in .zqk/streams/.
-   - Result: ZERO draft plane residue, ZERO manual promotion steps required.
-```
+1. **Input Reception:** `zqk intake "..."` receives raw text and optional flags.
+2. **Semantic Reasoning (`pkg/intake/reasoner.go`):** Coerces text into valid schema attributes, synthesizes mandatory description (POL-DOC-001), generates deterministic entity IDs (`REQ-*`, `BLI-*`, etc.), and establishes graph linkages.
+3. **Pre-Flight Membrane Verification:** Calls `ValidateAllIntakeObjects()`. If invalid, demoted to Draft Plane (`.zqk/object_drafts/`) for human review; if valid, routed to `IPCWriter`.
+4. **IPC Socket Transmission:** Transmits payload over `/tmp/zqk-privileged-writer.sock` to daemon.
+5. **Privileged Materialization:** `PrivilegedWriterDaemon` hashes payload via SHA-256, writes directly to `.zqk/process/<kind>/<hash>.yaml`, updates CAS index, and records mutation in `.zqk/streams/` (zero draft plane residue, zero manual promotion steps required).
 
 ---
 
