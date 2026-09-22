@@ -155,6 +155,24 @@ def build_portal(repo_root: str, target_dir: str):
         if os.path.isfile(p):
             doc_files.append(p)
 
+    # Collect and mirror all static/non-markdown files in docs/ (YAML, JSON, images, etc.)
+    for root, dirs, files in os.walk(os.path.join(repo_root, "docs")):
+        dirs[:] = [d for d in dirs if d not in exclude_parts and not d.startswith(".")]
+        for f in files:
+            if f.endswith(".md") or f == "CNAME":
+                continue
+            src_path = os.path.join(root, f)
+            rel_path = os.path.relpath(src_path, repo_root)
+            dest_path = os.path.join(target_dir, rel_path)
+            os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+            shutil.copy2(src_path, dest_path)
+
+    # Also copy root project files like LICENSE and NOTICE
+    for rf in ["LICENSE", "NOTICE"]:
+        rp = os.path.join(repo_root, rf)
+        if os.path.isfile(rp):
+            shutil.copy2(rp, os.path.join(target_dir, rf))
+
     link_map = {}
     doc_entries = []
 
