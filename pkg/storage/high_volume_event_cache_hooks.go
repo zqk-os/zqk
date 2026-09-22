@@ -31,8 +31,25 @@ func scheduleHighVolumeEventCachePersist(projectRoot string) {
 		hvePersistTimer.Stop()
 	}
 	hvePersistTimer = time.AfterFunc(highVolumeEventPersistDebounce, func() {
+		hvePersistMu.Lock()
+		if hvePersistTimer == nil {
+			hvePersistMu.Unlock()
+			return
+		}
+		hvePersistTimer = nil
+		hvePersistMu.Unlock()
 		SaveHighVolumeEventCache(root)
 	})
+}
+
+// StopHighVolumeEventCachePersistForTest cancels any pending debounce timer for tests.
+func StopHighVolumeEventCachePersistForTest(projectRoot string) {
+	hvePersistMu.Lock()
+	defer hvePersistMu.Unlock()
+	if hvePersistTimer != nil {
+		hvePersistTimer.Stop()
+		hvePersistTimer = nil
+	}
 }
 
 // updateHighVolumeEventCacheOnCreate updates the high-volume event cache when an audit event is created
