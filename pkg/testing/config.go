@@ -113,7 +113,7 @@ func SetupTestEnvironment(testRoot string) (string, error) {
 	return absRoot, nil
 }
 
-// testSettingsShape is the minimal shape for test-settings.yaml (same schema as brand_settings).
+// testSettingsShape is the minimal shape for test-settings.yaml.
 type testSettingsShape struct {
 	Version string         `yaml:"version"`
 	Paths   map[string]any `yaml:"paths"`
