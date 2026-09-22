@@ -100,7 +100,7 @@ Next Agentic Action: Claim BLI-104 with task-curated context slice.`
             <a href="#cellular-model">Cellular Architecture</a>
             <a href="#memory-management">Autonomous Memory</a>
             <a href="#holon-model">Holons & Microkernel</a>
-            <a href="#comparison">Why Cellular OS</a>
+            <a href="#synergy">Industry Convergence</a>
             <a href="#open-core">Open Core</a>
             <a href="https://docs.zqk.dev" target="_blank" rel="noreferrer">Documentation</a>
             <a href="https://github.com/zqk-os/zqk" target="_blank" rel="noreferrer" className="btn-secondary" style={{ padding: '8px 16px', fontSize: '0.85rem' }}>
@@ -183,8 +183,8 @@ Next Agentic Action: Claim BLI-104 with task-curated context slice.`
             <a href="#quickstart" className="btn-primary">
               Get Started (5-minute value) →
             </a>
-            <a href="#memory-management" className="btn-secondary">
-              Explore Autonomous Memory
+            <a href="#synergy" className="btn-secondary">
+              Explore Industry Synergy
             </a>
           </div>
         </div>
@@ -284,8 +284,68 @@ Next Agentic Action: Claim BLI-104 with task-curated context slice.`
         </div>
       </section>
 
+      {/* Industry Synergy & The Emerging Frontier */}
+      <section className="section" id="synergy">
+        <div className="site-container">
+          <div className="section-header">
+            <div className="section-tag">The Emerging Frontier</div>
+            <h2 className="section-title">Industry Convergence on Boundaries & Microkernels</h2>
+            <p className="section-desc">
+              Across systems engineering and semantic standards, independent pioneers are discovering the exact same breaking point: monolithic agent loops fail, raw graphs leak context, and scaling requires holonic microkernel boundaries.
+            </p>
+          </div>
+
+          <div className="bio-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))' }}>
+            <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--accent-cyan)', fontWeight: 700, letterSpacing: '0.08em', marginBottom: '8px' }}>
+                  Semantic Architecture & W3C
+                </div>
+                <h3 style={{ fontSize: '1.3rem', marginBottom: '12px' }}>"Holons as Boundaries: Walls and Doors"</h3>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem', lineHeight: '1.6', marginBottom: '16px' }}>
+                  As Kurt Cagle (Chair, W3C Holon Community Group) notes: a graph without boundaries is an open floor plan where state leaks. A true holon establishes <strong>walls</strong> (invariants defining what can validly exist) and <strong>doors</strong> (trust-gated portals that govern entry).
+                </p>
+              </div>
+              <div style={{ padding: '14px', background: 'rgba(0, 229, 255, 0.06)', borderRadius: '8px', borderLeft: '3px solid var(--accent-cyan)', fontSize: '0.88rem', color: '#e2e8f0' }}>
+                <strong>ZQK Reality:</strong> ZQK implements this distinction natively—<code>PlaneDraft</code> enforces zero blast radius, while <code>InvariantGate</code> evaluates signed agent attestations before allowing mutations through the cellular membrane.
+              </div>
+            </div>
+
+            <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--accent-magenta)', fontWeight: 700, letterSpacing: '0.08em', marginBottom: '8px' }}>
+                  Systems Engineering
+                </div>
+                <h3 style={{ fontSize: '1.3rem', marginBottom: '12px' }}>"Beyond the Loop: Microkernel AI Agents"</h3>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem', lineHeight: '1.6', marginBottom: '16px' }}>
+                  As systems engineers note, monolithic agent codebases grow multiplicatively in complexity until a single memory or tool bug crashes the agent. The antidote is a <strong>microkernel architecture</strong> with isolated failure domains and formal component lifecycles.
+                </p>
+              </div>
+              <div style={{ padding: '14px', background: 'rgba(255, 0, 255, 0.06)', borderRadius: '8px', borderLeft: '3px solid var(--accent-magenta)', fontSize: '0.88rem', color: '#e2e8f0' }}>
+                <strong>ZQK Reality:</strong> ZQK strips the Go kernel to scheduling, state bus, and memory plane isolation—moving high-level dev workflows and enterprise rules into modular user-space packs where complexity scales additively.
+              </div>
+            </div>
+
+            <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--accent-amber)', fontWeight: 700, letterSpacing: '0.08em', marginBottom: '8px' }}>
+                  Context Curation
+                </div>
+                <h3 style={{ fontSize: '1.3rem', marginBottom: '12px' }}>"What the Cook Gives You: Projections"</h3>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem', lineHeight: '1.6', marginBottom: '16px' }}>
+                  A cook does not hand a guest raw eggs and flour; the cook prepares scones. Similarly, handing agents raw graph dumps or unbounded vector lakes leads to hallucinations. Systems must serve occasion-specific <strong>projections</strong>.
+                </p>
+              </div>
+              <div style={{ padding: '14px', background: 'rgba(245, 158, 11, 0.06)', borderRadius: '8px', borderLeft: '3px solid var(--accent-amber)', fontSize: '0.88rem', color: '#e2e8f0' }}>
+                <strong>ZQK Reality:</strong> The ZQK kernel curates exact subgraph projections based on the claimed <code>WorkUnit</code>, ensuring agents receive only the necessary task context without burning token budget.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Cellular Biology 4 Pillars */}
-      <section className="section" id="cellular-model">
+      <section className="section" id="cellular-model" style={{ background: 'rgba(5, 8, 16, 0.4)' }}>
         <div className="site-container">
           <div className="section-header">
             <div className="section-tag">Biological Systems Architecture</div>
@@ -336,7 +396,7 @@ Next Agentic Action: Claim BLI-104 with task-curated context slice.`
       </section>
 
       {/* Comparison: Vector Swamp vs Cellular OS */}
-      <section className="section" id="comparison" style={{ background: 'rgba(5, 8, 16, 0.4)' }}>
+      <section className="section" id="comparison">
         <div className="site-container">
           <div className="section-header">
             <div className="section-tag">First-Principles Paradigm Shift</div>
@@ -405,7 +465,7 @@ Next Agentic Action: Claim BLI-104 with task-curated context slice.`
       </section>
 
       {/* Open-Core Boundary Matrix */}
-      <section className="section" id="open-core">
+      <section className="section" id="open-core" style={{ background: 'rgba(5, 8, 16, 0.4)' }}>
         <div className="site-container">
           <div className="section-header">
             <div className="section-tag">Distribution Architecture</div>
@@ -462,7 +522,7 @@ Next Agentic Action: Claim BLI-104 with task-curated context slice.`
       </section>
 
       {/* Quickstart / CTA */}
-      <section className="section" id="quickstart" style={{ background: 'rgba(5, 8, 16, 0.4)' }}>
+      <section className="section" id="quickstart">
         <div className="site-container" style={{ textAlign: 'center' }}>
           <div className="glass-panel" style={{ maxWidth: '800px', margin: '0 auto', padding: '48px' }}>
             <h2 style={{ fontSize: '2.2rem', marginBottom: '16px' }}>Ready to Run Living Software?</h2>
@@ -496,8 +556,8 @@ Next Agentic Action: Claim BLI-104 with task-curated context slice.`
               <p><a href="#cellular-model">Cellular Model</a></p>
               <p><a href="#memory-management">Autonomous Memory</a></p>
               <p><a href="#holon-model">Holonic Architecture</a></p>
+              <p><a href="#synergy">Industry Synergy</a></p>
               <p><a href="#open-core">Open Core Boundary</a></p>
-              <p><a href="https://docs.zqk.dev/specs" target="_blank" rel="noreferrer">Kernel Specifications</a></p>
             </div>
             <div>
               <h4 style={{ color: '#fff', marginBottom: '16px' }}>Developers</h4>
