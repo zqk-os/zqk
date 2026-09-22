@@ -4,7 +4,7 @@
 # Binary basename comes from brand.executable_name in
 # config/zqk-local.yaml (wins) then config/zqk.yaml (default zqk).
 
-.PHONY: help all bootstrap-archive clean test test-unit test-unit-all test-integration test-coverage test-coverage-html
+.PHONY: help all bootstrap-archive clean test test-unit test-unit-all test-integration test-coverage test-coverage-html lint vet verify gate-release zqk-vet
 
 .DEFAULT_GOAL := all
 
@@ -35,15 +35,25 @@ LDFLAGS = -X github.com/zqk-os/zqk/cmd/zqk/app.version=$(VERSION) \
 help:
 	@echo "ZQK — binary name is brand.executable_name ($(BRAND_EXE))"
 	@echo ""
+	@echo "Build & Code Generation:"
 	@echo "  make / make all       Build ./$(BIN)"
 	@echo "  make codegen          Run spec & command builder codegen and refresh bootstrap archive"
 	@echo "  make clean            Remove bin/*"
+	@echo ""
+	@echo "Verification & Gates (Single Source of Truth: config/gates.yaml):"
+	@echo "  make lint             Run fast AST hygiene checks (paths, perms, CLI names)"
+	@echo "  make vet              Run full verification engine (hygiene, tree_police, payload)"
+	@echo "  make verify           Full pre-commit validation (vet + unit tests)"
+	@echo "  make gate-release     Full release gate (verify + integration tests)"
+	@echo ""
+	@echo "Testing:"
 	@echo "  make test             Run both unit and integration tests"
 	@echo "  make test-unit        Run partitioned unit tests (pkg/... & cmd/...)"
 	@echo "  make test-unit-all    Run full non-short unit tests"
 	@echo "  make test-integration Run integration tests using built binary (release gates & CLI suites)"
 	@echo "  make test-coverage    Run unit tests with coverage profile and print summary table"
 	@echo "  make test-coverage-html Generate HTML visual test coverage report (coverage.html)"
+	@echo ""
 	@echo ""
 	@echo "Scheduler CLI: ./$(BIN) scheduler start|stop|status"
 	@echo "Run ./$(BIN) from this directory. Do not export a project-root environment variable."
@@ -97,6 +107,22 @@ test-coverage-html: test-coverage
 	@echo "Coverage HTML report generated at coverage.html"
  
 test: test-unit test-integration
+
+bin/zqk-vet: $(shell find pkg/vet cmd/zqk-vet -name '*.go')
+	@mkdir -p bin
+	go build -o bin/zqk-vet ./cmd/zqk-vet
+
+zqk-vet: bin/zqk-vet
+
+lint: bin/zqk-vet
+	./bin/zqk-vet --suite hygiene
+
+vet: bin/zqk-vet
+	./bin/zqk-vet --suite all
+
+verify: vet test-unit
+
+gate-release: vet test-integration
 
 clean:
 	rm -rf bin/* coverage.out coverage.html
