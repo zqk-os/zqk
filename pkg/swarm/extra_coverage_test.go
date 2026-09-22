@@ -3,10 +3,12 @@ package swarm
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/llm"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestTokenTracker_DefaultsAndEdgeCases(t *testing.T) {
@@ -682,4 +684,94 @@ func TestLLMTrace_ChannelAndHint(t *testing.T) {
 	if len(names) != 2 || names[0] != "tool1" || names[1] != "tool2" {
 		t.Errorf("unexpected toolDefinitionNames: %v", names)
 	}
+}
+
+type extraStringer struct{}
+
+func (extraStringer) String() string { return "s" }
+
+func TestExtraGuardsTraceAndArgs(t *testing.T) {
+	ctx := context.Background()
+	call := llm.ToolCall{Name: "write_code"}
+	g := NewToolDenialGuard()
+	g.OnSuccess(ctx, call, "ok")
+	if _, err := g.PostTool(ctx, call, "ALLOWLIST DENY", nil); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := g.PostTool(ctx, call, "Soft-blocked", errors.New("x")); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := g.PostTool(ctx, call, "GUIDANCE: Do not use", nil); err == nil {
+		t.Fatal("expected denial abort")
+	}
+	if _, err := g.PostTool(ctx, call, "ok", nil); err != nil {
+		t.Fatal(err)
+	}
+	h := NewHallucinationCircuitBreaker()
+	h.OnSuccess(ctx, call, "ok")
+	if _, err := h.PostTool(ctx, call, "No such file or directory", nil); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := h.PostTool(ctx, call, "no such file or directory", nil); err != nil {
+		t.Fatal(err)
+	}
+	out, err := h.PostTool(ctx, call, "NO SUCH FILE OR DIRECTORY", nil)
+	if err != nil || !strings.Contains(out, "zqk_observer_search") {
+		t.Fatalf("guidance=%q err=%v", out, err)
+	}
+	if _, err := h.PostTool(ctx, call, "no such file or directory", nil); err == nil {
+		t.Fatal("expected hallucination abort")
+	}
+	if _, err := h.PostTool(ctx, call, "fine", nil); err != nil {
+		t.Fatal(err)
+	}
+	seeder := &ProactiveWorkspaceSeeder{}
+	if err := seeder.PreTool(ctx, call); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := seeder.PostTool(ctx, call, "ok", nil); err != nil {
+		t.Fatal(err)
+	}
+	seeder.OnSuccess(ctx, call, "ok")
+	seeder.OnSuccess(ctx, llm.ToolCall{Name: "execute_bash"}, "ok")
+	if stringifyArg("x") != "x" || stringifyArg(extraStringer{}) != "s" || stringifyArg(1) != "" {
+		t.Fatal("stringifyArg")
+	}
+	if parseToolArgs("") != nil || parseToolArgs("{") != nil {
+		t.Fatal("parseToolArgs")
+	}
+	_ = parseToolArgs(`{"k":"v"}`)
+	_ = mcpCallInnerIsNotATool("")
+	_ = mcpCallInnerIsNotATool(`{"name":"inner tool"}`)
+	_ = mcpCallInnerIsNotATool(`{"name":"ok"}`)
+	dir := t.TempDir()
+	t.Setenv(zqkenv.LLMTrace().Name(), "1")
+	t.Setenv(zqkenv.LLMTraceDir().Name(), dir)
+	if !llmTraceEnabled() {
+		t.Fatal("trace enabled")
+	}
+	if llmTraceDir() != dir {
+		t.Fatalf("dir=%q", llmTraceDir())
+	}
+	writeLLMTrace(llmTraceRecord{
+		EngineID:   "trace id!",
+		Step:       1,
+		Prompt:     []llm.Message{{Role: "user", Name: "n", Content: "hi"}},
+		RawContent: "<tool_call>",
+	})
+	_ = getProjectRoot()
+	t.Setenv(zqkenv.ProjectRoot().Name(), dir)
+	_ = getProjectRoot()
+	t.Setenv(zqkenv.ProjectRoot().Name(), "")
+	t.Setenv(zqkenv.TestRoot().Name(), dir)
+	_ = getProjectRoot()
+	ex := &MCPExecutor{}
+	ex.SetTelemetryContext("persona", nil)
+	if _, err := NewMCPExecutor(ctx, ""); err == nil {
+		t.Fatal("empty mcp path")
+	}
+	_, _ = clipSwarmToolResult("object_list", strings.Repeat("x", swarmListResultCap+1))
+	_ = swarmToolResultCap("read_file")
+	_ = TruncatedToolResultGuidance()
+	_ = fmt.Sprint(sanitizeTraceID(""))
 }
