@@ -28,7 +28,7 @@ To prevent Confused Deputy exploits while preserving frictionless developer expe
 
 ```mermaid
 flowchart TD
-  Start["zqk tray run &lt;name&gt;"] --> Q1{"Is it a built-in default?<br/>(embedded in compiled binary)"}
+  Start["zqk tray run [name]"] --> Q1{"Is it a built-in default?<br/>(embedded in compiled binary)"}
   Q1 -- Yes --> Pass1["TRUSTED: PASS"]
   Q1 -- No (from .zqk/tray.yaml) --> Q2{"Does argv contain HIGH-STAKES<br/>mutations or BREAK-GLASS flags?<br/>(--override, --force, object delete, policy, account, keystore)"}
   Q2 -- No --> Pass2["READ-ONLY / SAFE MUTATION: PASS"]

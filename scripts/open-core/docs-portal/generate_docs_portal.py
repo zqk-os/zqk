@@ -117,9 +117,13 @@ def render_markdown_to_html(content: str, current_html_rel: str, link_map: dict)
             )
             # Transform fenced mermaid code blocks to <pre class="mermaid">
             # markdown fenced_code generates: <pre><code class="language-mermaid">...</code></pre>
+            def _mermaid_replacer(match):
+                code_text = match.group(1)
+                return f'<pre class="mermaid">{html.unescape(code_text)}</pre>'
+
             rendered = re.sub(
                 r'<pre><code class="(?:language-)?mermaid">([\s\S]*?)</code></pre>',
-                r'<pre class="mermaid">\1</pre>',
+                _mermaid_replacer,
                 rendered
             )
             return rendered
@@ -240,6 +244,12 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
     with open(os.path.join(target_dir, "README.md"), "w", encoding="utf-8") as f:
         f.write(portal_readme_content)
 
+    # CNAME and .nojekyll for GitHub Pages deployment
+    with open(os.path.join(target_dir, "CNAME"), "w", encoding="utf-8") as f:
+        f.write("docs.zqk.dev\n")
+    with open(os.path.join(target_dir, ".nojekyll"), "w", encoding="utf-8") as f:
+        f.write("")
+
     pages = []
     category_counts = {}
 
@@ -317,6 +327,7 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
     mermaid.initialize({{
       startOnLoad: true,
+      securityLevel: 'loose',
       theme: 'dark',
       themeVariables: {{
         darkMode: true,
@@ -414,6 +425,7 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
     mermaid.initialize({{
       startOnLoad: true,
+      securityLevel: 'loose',
       theme: 'dark',
       themeVariables: {{
         darkMode: true,

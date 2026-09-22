@@ -16,15 +16,15 @@ Policies serve as the immutable rulebook for both human engineers and autonomous
 
 ```mermaid
 flowchart TD
-    subgraph Governance["Governance &amp; Rule Sources"]
+    subgraph Governance["Governance and Rule Sources"]
         P_Spec["Authoritative Specs (POL-DOC-*, POL-CODE-*)"]
         P_Seed["Default Policy Pack (POL-DEFAULT-*)"]
-        P_Adhoc["Local Instance Policies (POL-<nanos>-*)"]
+        P_Adhoc["Local Instance Policies (POL-[nanos]-*)"]
     end
 
-    subgraph Kernel["Knowledge Kernel &amp; Validation"]
+    subgraph Kernel["Knowledge Kernel and Validation"]
         SIR["Semantic Intake Reasoner<br/>(Fail-Closed Boundary)"]
-        AST["AST Linters &amp; Code Checks<br/>(pkg/validation/qa)"]
+        AST["AST Linters and Code Checks<br/>(pkg/validation/qa)"]
         VDS["Verifiable Decomposition Spine<br/>(pkg/vds)"]
     end
 
