@@ -1,7 +1,7 @@
 # Tiered Storage, Subtree Flattening, and Archival Lifecycle
 
 > **Technical Specification:** `TSP-TIERED-STORAGE-ARCHIVE-001`  
-> **Governing Policy:** `POL-CODE-1789812821281452000-51f4aea4`  
+> **Governing Policy:** `POL-STORAGE-RETENTION-001`  
 > **Status:** Approved / Active Architecture  
 > **Target Audience:** Core Storage Architects, DevOps, Agent Operators, Platform Engineers
 
@@ -114,7 +114,7 @@ $$\text{Goal} \longrightarrow \text{Milestones} \longrightarrow \text{Requiremen
 
 ## 4. Configurable Retention Windows (Zero Hardcoding)
 
-Per policy `POL-CODE-1789812821281452000-51f4aea4`, **no retention duration or tier boundary may be hardcoded**. Environments exhibit vastly different throughput:
+Per policy `POL-STORAGE-RETENTION-001`, **no retention duration or tier boundary may be hardcoded**. Environments exhibit vastly different throughput:
 - **Ephemeral CI / Testbeds:** High churn; hot retention measured in hours.
 - **Developer Workstations:** Medium churn; hot retention measured in days.
 - **Regulated Enterprise Clusters:** Low churn, high audit retention; cold storage retained for years.
@@ -240,6 +240,6 @@ This architecture is implemented and verified by `pkg/resourcehygiene` and CLI c
 
 - **Priority Plan:** `PRI-IO-RESOURCE-HYGIENE-001`
 - **Backlog Items Verified:**
-  - `BLI-1789798192202007000-d96bdcbf` (Mandatory I/O Resource Lifecycle & Lock/Temp Cleanup)
+  - `BLI-IO-MANDATORY-LIFECYCLE-001` (Mandatory I/O Resource Lifecycle & Lock/Temp Cleanup)
   - `BLI-IO-CLEANUP-RESOURCE-RETENTION-001` (Automated Log Rolling, Stream Retention, and Stale Lock/Temp Reaping)
   - `BLI-IO-TELEMETRY-REPORTING-001` (I/O Resource Telemetry and Diagnostics Reporting)

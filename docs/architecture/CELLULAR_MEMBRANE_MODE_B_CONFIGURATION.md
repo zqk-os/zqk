@@ -62,7 +62,7 @@ Mode B mitigates the following critical attack vectors:
 1. **Arbitrary File Traversal / Injection:**
    Even if an agent escapes its workspace boundary or suffers prompt injection, it cannot mutate the kernel graph because `.zqk/process/` is owned by an isolated system user (`zqk-service`) with non-writeable POSIX permissions.
 2. **Schema & Description Bypass:**
-   Direct YAML tampering is impossible. All writes pass through `ValidateAllIntakeObjects`. Any object lacking a required `description` (POL-DOC-001, REQ-1789334232564133000-02789aa2) is rejected or demoted to the Draft Plane (`.zqk/object_drafts/`).
+   Direct YAML tampering is impossible. All writes pass through `ValidateAllIntakeObjects`. Any object lacking a required `description` (POL-DOC-001) is rejected or demoted to the Draft Plane (`.zqk/object_drafts/`).
 3. **Audit Trail Tampering:**
    The lifecycle mutation stream (`.zqk/streams/`) is append-only and writable exclusively by the daemon process ID.
 4. **CAS Ghost Refs:**

@@ -204,9 +204,8 @@ func StartDaemon(projectRoot string, out interface{ Write([]byte) (int, error) }
 		exe = "zqk"
 	}
 
-	// TRACK: BLI-1786385524943190000-f8f9dab5 — Setsid + --timeout 0 from *.test
-	// orphans grandchildren onto PID 1. Refuse here; tests that need a daemon
-	// must exec the product CLI and t.Cleanup(StopDaemon).
+	// Setsid + --timeout 0 from *.test orphans grandchildren onto PID 1.
+	// Refuse here; tests that need a daemon must exec the product CLI and t.Cleanup(StopDaemon).
 	if refuseDetachedAmbientSpawn(exe) {
 		if out != nil {
 			_, _ = fmt.Fprintf(out, "Skipping ambient daemon spawn from test process (%s)\n", filepath.Base(exe))

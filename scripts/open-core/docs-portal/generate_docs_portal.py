@@ -202,11 +202,12 @@ def build_portal(repo_root: str, target_dir: str):
           </ul>
         </div>
         <div class="sidebar-section">
-          <h3>Operations & Operations</h3>
+          <h3>Operations & Guides</h3>
           <ul>
+            <li><a href="{root_rel}docs/howto/README.html">How-To Overview</a></li>
             <li><a href="{root_rel}docs/howto/SCHEDULER_AND_MAINTENANCE.html">Scheduler & Maintenance</a></li>
             <li><a href="{root_rel}docs/onboarding/EDGE_HEADLESS_FIRST_RUN.html">Edge / Headless Mode</a></li>
-            <li><a href="{root_rel}docs/enforcement/PROMPT_DEVELOPMENT_GUIDE.html">Prompt Development Guide</a></li>
+            <li><a href="{root_rel}docs/quality/README.html">Quality & Verification Gates</a></li>
           </ul>
         </div>
         <div class="sidebar-section">
@@ -338,7 +339,7 @@ def build_portal(repo_root: str, target_dir: str):
       <div class="hero-box">
         <h1>Zen Quantum Kernel (ZQK) Core Documentation</h1>
         <p class="hero-desc">
-          The canonical, un-bifurcated system kernel for sovereign human-agent software engineering.
+          The foundational, sovereign Knowledge Kernel for human-agent software engineering.
         </p>
         <div class="portal-stat-badge">
           <strong>{len(pages)}</strong> official open-core documentation guides and specifications
@@ -362,7 +363,7 @@ def build_portal(repo_root: str, target_dir: str):
           <h3>🏛️ Core Architecture</h3>
           <p>Deep foundational specifications governing the Knowledge Kernel.</p>
           <ul>
-            <li><a href="docs/architecture/README.html">Upstream Core & Studio Architecture</a></li>
+            <li><a href="docs/architecture/README.html">Core Architecture Overview</a></li>
             <li><a href="docs/architecture/CELLULAR_MEMBRANE_MODE_B_CONFIGURATION.html">Cellular Membrane Mode B Runbook</a></li>
             <li><a href="docs/architecture/CLI_COMMAND_TAXONOMY_STANDARDS.html">CLI Command Taxonomy & Standards</a></li>
             <li><a href="docs/architecture/TIERED_STORAGE_AND_ARCHIVAL_LIFECYCLE.html">Tiered Storage & Capsule Archival</a></li>
@@ -373,9 +374,9 @@ def build_portal(repo_root: str, target_dir: str):
           <h3>🛠️ How-To & Operations</h3>
           <p>Operational task recipes for running daemons and background organisms.</p>
           <ul>
+            <li><a href="docs/howto/README.html">How-To Guides Overview</a></li>
             <li><a href="docs/howto/SCHEDULER_AND_MAINTENANCE.html">Scheduler & Maintenance Jobs Guide</a></li>
-            <li><a href="docs/enforcement/PROMPT_DEVELOPMENT_GUIDE.html">Prompt Development & Right-Sizing Guide</a></li>
-            <li><a href="docs/planning/PRODUCT_REFINEMENT_PROMPT_TEMPLATES.html">Product Refinement Prompt Templates</a></li>
+            <li><a href="docs/quality/README.html">First-Run Quality & Verification Gates</a></li>
           </ul>
         </div>
         <div class="quad-box">

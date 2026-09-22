@@ -1,8 +1,7 @@
-# Edge / headless first-run (Vector B)
+# Edge & Headless First-Run Guide
 
-**Audience:** Operators on appliances, DGX/Spark-class boxes, SSH-only hosts, local SLM runtimes (Liquid-class, etc.) — **no** public IDE agent (or `--headless` forced).
-**SKU map:** [`COMMUNITY_FIRST_RUN.md`](./COMMUNITY_FIRST_RUN.md).
-**Strategy:** [`AI_AGENT_ONBOARDING.md`](./AI_AGENT_ONBOARDING.md) (pointer only — the studio process pack is not shipped).
+**Audience:** Operators on remote servers, appliances, DGX/GPU clusters, SSH-only hosts, or local SLM runtimes without desktop IDE agents.  
+**Related Guides:** [`COMMUNITY_FIRST_RUN.md`](./COMMUNITY_FIRST_RUN.md), [`AI_AGENT_ONBOARDING.md`](./AI_AGENT_ONBOARDING.md).
 
 ## Goal
 
@@ -47,8 +46,8 @@ Returned under `market_probe_open` in `agent-onboard` JSON. Canonical list also 
 
 Prefer scheduler ticks and feed/`delivery_mode=notify` — not Terminal paste. See mesh wake policies when multi-agent seats exist.
 
-## After green
+## After Setup
 
 1. `zqk workflow whats-next --format json`
-2. [`COMMUNITY_FIRST_RUN.md`](./COMMUNITY_FIRST_RUN.md) — which SKU you are actually running
-3. Studio process guide only if dogfooding ZQK Studio: [`AI_AGENT_ONBOARDING.md`](./AI_AGENT_ONBOARDING.md)
+2. [`COMMUNITY_FIRST_RUN.md`](./COMMUNITY_FIRST_RUN.md) — First-run setup, CLI tools, and kernel verification.
+3. [`AI_AGENT_ONBOARDING.md`](./AI_AGENT_ONBOARDING.md) — Agent operating directives and seating configuration.

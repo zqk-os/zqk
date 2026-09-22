@@ -1,4 +1,4 @@
-# First-run quality gate
+# First-Run Quality & Verification Gates
 
 Run the independently verifiable launch checks from this checkout:
 
@@ -6,14 +6,9 @@ Run the independently verifiable launch checks from this checkout:
 ./bin/zqk workflow vds evaluate --format json --persist
 ```
 
-The chunks in [`vds_chunks.yaml`](./vds_chunks.yaml) verify the launch criteria
-for `BLI-1789630408733990000-0a2023fb`: kernel isolation, shipped documentation
-registration, and exclusion of archived documentation.
+The chunks in [`vds_chunks.yaml`](./vds_chunks.yaml) verify critical launch criteria: kernel isolation, documentation completeness, and exclusion of archived drafts.
 
-They also provide the executable first-run acceptance surface for umbrella
-`BLI-1789681478369698000-263b989c`: the commands advertised to a new user must
-exist on the built SKU, and local pressure-test branding must not leak into the
-committed documentation.
+They also provide the executable first-run acceptance surface: verifying that all advertised CLI commands exist and function, and ensuring clean, uncorrupted configuration.
 
 For executable test-to-criteria lineage, run:
 
@@ -21,18 +16,9 @@ For executable test-to-criteria lineage, run:
 ./bin/zqk test dashboard
 ```
 
-Before preparing any public artifact, run the dest-owned payload gate:
+To run release gates and payload verification before preparing distribution artifacts:
 
 ```bash
 sh scripts/open-core/check-public-release-payload.sh
-```
-
-The broader local/CI gate also proves the community build and help surfaces:
-
-```bash
 sh scripts/open-core/test-public-release-gates.sh
 ```
-
-These release checks implement
-`BLI-1789717939876745000-1a629968`. A passing payload gate is not permission
-to push; publication still requires explicit human acknowledgment.

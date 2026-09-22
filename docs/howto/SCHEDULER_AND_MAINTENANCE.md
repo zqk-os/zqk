@@ -61,15 +61,15 @@ Read **title**, not the opaque id. `scheduler list` shows both. The id is a hand
 | `SCH-passive-test-sweeper` | Passive test sweeper | Idle test-bundle hygiene |
 | `SCH-cap-orchestrator` | CAP orchestrator | Continuous agent loop tick (when CAP is in use) |
 
-Studio-dense extras on the same list (`SCH-cvs-*`, `SCH-dce-tick`, improvement/autofix run jobs) are kernel/organism ticks. If a job's command or script is not in **this** tree, disable it rather than leaving a timer that fails 126:
+If a custom job's command or script is not present on your system, disable it rather than leaving an erroring timer:
 
 ```bash
 ./bin/zqk object update SCH-that-job --field "enabled=false"
 ```
 
-## Source-code pack (opt in)
+## Source-Code Verification Jobs (Optional Pack)
 
-These three are **not** required on Community. Templates still exist so a source checkout can mint them. They are named `SCH-pre-commit-*` for historical reasons (they write `.zqk/pre-commit/` so a git hook can read cached results). They are **not** git hooks themselves.
+These scheduled jobs are optional and provide automated test and lint checks. They cache output under `.zqk/pre-commit/` for fast evaluation during commit hooks:
 
 | Id | What you think it is | What it actually is |
 | :--- | :--- | :--- |
@@ -105,26 +105,19 @@ If you need a one-off check without a timer:
 
 That is the orchestration-friendly substitute for `SCH-pre-commit-integrity`.
 
-## Naming (current vs what we should use)
+## Job Naming Conventions
+ 
+ Scheduled jobs follow clear naming patterns:
+ 
+ - **Format**: `SCH-<scope>-<noun>` using lowercase kebab-case (e.g., `SCH-retention-tolerance`, `SCH-cache-prewarm`, `SCH-audit-event-aggregation`).
+ - **Scope**:
+   - `kernel`: Core system maintenance, retention, and storage hygiene.
+   - `source`: Codebase verification, automated testing, or linting.
+ - **Title**: Human-readable summary displayed in `zqk scheduler list`.
 
-**Not ideal today.** Three generations sit in one namespace:
+- **Examples**: `SCH-retention-tolerance`, `SCH-cache-prewarm`, `SCH-audit-event-aggregation`.
 
-1. Opaque stubs: `SCH-val`, `SCH-evag` — unreadable in logs.
-2. Numeric serials (legacy `SCH-001` / `SCH-101`) — collide and say nothing.
-3. Kebab nouns: `SCH-retention-tolerance`, `SCH-cache-prewarm` — this is the one to keep.
-
-Convention going forward (do not rename live ids in place without updating `required_jobs` **and** `jobs_paused_schedule_exempt_job_ids` together):
-
-- Id = `SCH-<audience>-<noun>` in kebab-case. No abbreviations, no serials.
-- Audience is `kernel` (survival) or `source` (code gates), not `pre-commit`.
-- Title is a sentence a new operator can read in `scheduler list` without opening YAML.
-- `required_jobs` lists **kernel** only. Source timers belong in an optional pack, minted from templates when the scripts exist.
-
-Examples: `SCH-kernel-object-validation` instead of `SCH-val`; `SCH-source-lint` instead of `SCH-pre-commit-lint`.
-
-Until that rename lands, treat **title** as the user-facing name and the id as a stable handle.
-
-## How to tell which layer a job is
+## Job Layers and Categories
 
 1. Does the command path live under `scripts/pre-commit-*.sh` or a language linter? → source pack.
 2. Does it mention retention, WAL, cache, object validation, audit aggregation? → kernel survival.
