@@ -25,12 +25,12 @@ This architecture introduces **Tiered Storage and Subgraph Archival**, convertin
 ```mermaid
 flowchart TD
     subgraph Tier0 ["Tier 0: HOT STORAGE (Active CAS Plane)"]
-        H1[".zqk/process/<kind>/<hash>.yaml"]
+        H1[".zqk/process/[kind]/[hash].yaml"]
         H2["Loose CAS Blobs | Mutable Edges | 0ms Read/Write"]
     end
 
     subgraph Tier1 ["Tier 1: WARM STORAGE (Local Capsule Archive)"]
-        W1[".zqk/archive/bundles/<ROOT-ID>.capsule.zst"]
+        W1[".zqk/archive/bundles/[ROOT-ID].capsule.zst"]
         W2["Apoptotic Plane | Strictly Immutable | Transparent Read-Through"]
         W3["85-92% Storage & File Reduction"]
     end
@@ -38,7 +38,7 @@ flowchart TD
     subgraph Tier2 ["Tier 2: COLD STORAGE (Detached Remote Vault)"]
         C1["Remote Object Store (S3 / GCS / Git LFS / ~/.zqk/cold-vault)"]
         C2["0 Bytes Local Payload | Tombstone Locator in Index"]
-        C3["On-Demand Fetch: zqk archive fetch <ROOT-ID>"]
+        C3["On-Demand Fetch: zqk archive fetch [ROOT-ID]"]
     end
 
     subgraph Tier3 ["Tier 3: THE ABYSS (A-Bits / Cryptographic Purge)"]
