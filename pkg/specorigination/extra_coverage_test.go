@@ -20,8 +20,8 @@ func setupSpecOriginationTestRepo(t *testing.T) (string, string) {
 	// Create directory structure
 	specsDir := filepath.Join(root, paths.ProcessInternalObjectSpecsDir)
 	configsDir := filepath.Join(root, paths.ProcessInternalConfigsDir)
-	_ = os.MkdirAll(specsDir, 0755)
-	_ = os.MkdirAll(configsDir, 0755)
+	_ = os.MkdirAll(specsDir, paths.DirPerm755)
+	_ = os.MkdirAll(configsDir, paths.DirPerm755)
 
 	// Create a minimal valid object spec
 	specContent := `schema_version: "2.0.0"
@@ -38,7 +38,7 @@ fields:
     required: true
 `
 	specPath := filepath.Join(specsDir, "sample_item.yaml")
-	_ = os.WriteFile(specPath, []byte(specContent), 0644)
+	_ = os.WriteFile(specPath, []byte(specContent), paths.FilePerm644)
 
 	// Create kind_mappings_config.yaml
 	kmContent := `$schema: kind_mappings_schema.json
@@ -50,7 +50,7 @@ backends:
     directory_to_kind:
       existing_items: "existing_kind"
 `
-	_ = os.WriteFile(filepath.Join(configsDir, paths.KindMappingsConfigFile), []byte(kmContent), 0644)
+	_ = os.WriteFile(filepath.Join(configsDir, paths.KindMappingsConfigFile), []byte(kmContent), paths.FilePerm644)
 
 	// Create id_prefixes_config.yaml
 	idpContent := `$schema: id_prefixes_schema.json
@@ -59,7 +59,7 @@ kind_to_prefixes:
   existing_kind:
     - "EXI-"
 `
-	_ = os.WriteFile(filepath.Join(configsDir, paths.IdPrefixesConfigFile), []byte(idpContent), 0644)
+	_ = os.WriteFile(filepath.Join(configsDir, paths.IdPrefixesConfigFile), []byte(idpContent), paths.FilePerm644)
 
 	// Create namespaces_config.yaml
 	nsContent := `$schema: namespaces_schema.json
@@ -70,7 +70,7 @@ namespaces:
     kinds:
       - "existing_kind"
 `
-	_ = os.WriteFile(filepath.Join(configsDir, paths.NamespacesConfigFile), []byte(nsContent), 0644)
+	_ = os.WriteFile(filepath.Join(configsDir, paths.NamespacesConfigFile), []byte(nsContent), paths.FilePerm644)
 
 	return root, specPath
 }
@@ -258,7 +258,7 @@ func TestMutationHelpers(t *testing.T) {
 func TestPipeline_StageMaterializeIndexes_FieldKeys(t *testing.T) {
 	root, _ := setupSpecOriginationTestRepo(t)
 	// Create pkg/objects directory so FieldKeys can be written
-	_ = os.MkdirAll(filepath.Join(root, "pkg", "objects"), 0755)
+	_ = os.MkdirAll(filepath.Join(root, "pkg", "objects"), paths.DirPerm755)
 
 	pctx := &pipeline.Context{
 		Ctx:     pkgctx.NewSystemContext(),

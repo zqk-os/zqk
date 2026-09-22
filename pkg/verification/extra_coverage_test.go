@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
@@ -114,9 +115,9 @@ func TestASTSemanticMatchStrategy(t *testing.T) {
 	badFile := filepath.Join(tempDir, "bad.go")
 	txtFile := filepath.Join(tempDir, "test.txt")
 
-	_ = os.WriteFile(goodFile, []byte("package test\nfunc Good() {}\n"), 0644)
-	_ = os.WriteFile(badFile, []byte("package test\nfunc Bad() { panic(\"forbidden\") }\n"), 0644)
-	_ = os.WriteFile(txtFile, []byte("forbidden pattern here"), 0644)
+	_ = os.WriteFile(goodFile, []byte("package test\nfunc Good() {}\n"), paths.FilePerm644)
+	_ = os.WriteFile(badFile, []byte("package test\nfunc Bad() { panic(\"forbidden\") }\n"), paths.FilePerm644)
+	_ = os.WriteFile(txtFile, []byte("forbidden pattern here"), paths.FilePerm644)
 
 	t.Run("forbidden pattern detected in go file", func(t *testing.T) {
 		step := map[string]any{

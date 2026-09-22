@@ -1,6 +1,7 @@
 package config_builders
 
 import (
+	"github.com/zqk-os/zqk/pkg/paths"
 	"os"
 	"path/filepath"
 	"testing"
@@ -230,7 +231,7 @@ func TestCodegenHelpers(t *testing.T) {
 	t.Run("GenerateBuilderFromYAML", func(t *testing.T) {
 		tempDir := t.TempDir()
 		yamlPath := filepath.Join(tempDir, "sample_test_config.yaml")
-		_ = os.WriteFile(yamlPath, []byte("version: 1.0.0\nname: test\n"), 0644)
+		_ = os.WriteFile(yamlPath, []byte("version: 1.0.0\nname: test\n"), paths.FilePerm644)
 
 		outDir := filepath.Join(tempDir, "out")
 		err := GenerateBuilderFromYAML(yamlPath, outDir)
