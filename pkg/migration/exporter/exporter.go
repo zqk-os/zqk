@@ -68,6 +68,11 @@ func (e *GraphExporter) ExportEntity(ctx context.Context, entityID, outputPath s
 func (e *GraphExporter) exportEntities(_ context.Context, opts ExportOptions) error {
 	// Group entities by type for directory structure
 	typeGroups := make(map[string][]map[string]any)
+	for _, objType := range opts.ObjectTypes {
+		if objType != emptyValue {
+			typeGroups[objType] = nil
+		}
+	}
 
 	// This is a placeholder implementation
 	// Full implementation would:
