@@ -18,6 +18,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // 1. ProxyDaemon comprehensive tests
@@ -418,7 +419,7 @@ func TestDeep2_RoleGuidance_Comprehensive(t *testing.T) {
 
 // 6. ToolsSandbox comprehensive tests
 func TestDeep2_ToolsSandbox_Comprehensive(t *testing.T) {
-	if !targetsGuardedKernelDir(".zqk/process/bli.json") {
+	if !targetsGuardedKernelDir(filepath.Join(paths.ProcessDir, "bli.json")) {
 		t.Error("expected true for .zqk/process path")
 	}
 	if targetsGuardedKernelDir("pkg/mcp/proxy.go") {
@@ -510,16 +511,16 @@ func TestDeep2_ResourceMIMEAdapters_Comprehensive(t *testing.T) {
 
 	tmpDir := t.TempDir()
 	mdFile := filepath.Join(tmpDir, "test.md")
-	_ = os.WriteFile(mdFile, []byte("# Markdown Title\nThis is a markdown description.\n"), 0644)
+	_ = os.WriteFile(mdFile, []byte("# Markdown Title\nThis is a markdown description.\n"), paths.FilePerm644)
 
 	txtFile := filepath.Join(tmpDir, "test.txt")
-	_ = os.WriteFile(txtFile, []byte("Simple plain text file\n"), 0644)
+	_ = os.WriteFile(txtFile, []byte("Simple plain text file\n"), paths.FilePerm644)
 
 	jsonFile := filepath.Join(tmpDir, "test.json")
-	_ = os.WriteFile(jsonFile, []byte(`{"title":"JSON Title","description":"JSON Description"}`), 0644)
+	_ = os.WriteFile(jsonFile, []byte(`{"title":"JSON Title","description":"JSON Description"}`), paths.FilePerm644)
 
 	yamlFile := filepath.Join(tmpDir, "test.yaml")
-	_ = os.WriteFile(yamlFile, []byte("title: YAML Title\ndescription: YAML Description\n"), 0644)
+	_ = os.WriteFile(yamlFile, []byte("title: YAML Title\ndescription: YAML Description\n"), paths.FilePerm644)
 
 	_ = reg.ExtractTitle(mdFile, "text/markdown")
 	_ = reg.ExtractDescription(mdFile, "text/markdown")

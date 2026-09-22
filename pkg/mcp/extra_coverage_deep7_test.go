@@ -14,6 +14,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 type mockEventCoordinatorDeep7 struct {
@@ -280,7 +281,7 @@ func TestDeep7_ServerInitHelpers_AuthenticationFlows(t *testing.T) {
 func TestDeep7_Resources_CriticalResourcesFromSpec(t *testing.T) {
 	tmpDir := t.TempDir()
 	docFile := filepath.Join(tmpDir, "test-doc.md")
-	_ = os.WriteFile(docFile, []byte("# Test Doc\nContent"), 0644)
+	_ = os.WriteFile(docFile, []byte("# Test Doc\nContent"), paths.FilePerm644)
 
 	s := NewServer()
 	s.SetProjectRoot(tmpDir)

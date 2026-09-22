@@ -9,6 +9,7 @@ import (
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // 1. ServerInit comprehensive tests
@@ -140,7 +141,7 @@ func TestDeep3_VerificationTools_Comprehensive(t *testing.T) {
 // 8. ServerConfig comprehensive tests
 func TestDeep3_ServerConfig_Comprehensive(t *testing.T) {
 	tmpDir := t.TempDir()
-	_ = os.MkdirAll(filepath.Join(tmpDir, ".zqk", "mcp"), 0755)
+	_ = os.MkdirAll(filepath.Join(tmpDir, paths.ProjectDataDir, "mcp"), paths.DirPerm755)
 	cfg := &ServerConfig{}
 	cfg.MCPServer.IdleTimeout = "10m"
 

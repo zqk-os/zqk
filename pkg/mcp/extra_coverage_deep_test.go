@@ -574,8 +574,8 @@ func TestDeep_ResourceURIScheme_ConfigAndRules(t *testing.T) {
 // 23. ServerConfig Path Expansion & SaveMCPConfig
 func TestDeep_ServerConfig_PathExpansionAndSave(t *testing.T) {
 	tmpDir := t.TempDir()
-	expanded := expandPathSubstitutions("${PROJECT_ROOT}/config/${MCP_CONFIG_DIR}", tmpDir, ".zqk/mcp")
-	if expanded != tmpDir+"/config/.zqk/mcp" {
+	expanded := expandPathSubstitutions("${PROJECT_ROOT}/config/${MCP_CONFIG_DIR}", tmpDir, filepath.Join(paths.ProjectDataDir, "mcp"))
+	if expanded != filepath.Join(tmpDir, "config", paths.ProjectDataDir, "mcp") {
 		t.Errorf("unexpected expanded path: %s", expanded)
 	}
 
