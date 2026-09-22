@@ -56,7 +56,11 @@ func schedulerCLIAppendStagesBeforeStorage(root string) []testkit.NamedTestStep 
 		{
 			Name: "scheduler_cli_brand_settings",
 			Fn: func() error {
-				return fileutil.WriteSecureFile(filepath.Join(root, "zqk-settings.yaml"), []byte(schedulerCLITestBrandSettingsYAML))
+				cfgDir := filepath.Join(root, paths.ConfigDir)
+				if err := fileutil.EnsureDir(cfgDir); err != nil {
+					return err
+				}
+				return fileutil.WriteSecureFile(filepath.Join(cfgDir, paths.ZqkConfigFileName), []byte(schedulerCLITestBrandSettingsYAML))
 			},
 		},
 		{

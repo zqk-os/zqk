@@ -69,21 +69,25 @@ func TestWriteRootIsolationFiles(t *testing.T) {
 	}
 }
 
-func TestWriteBrandSettings_ProjectRootExplicit(t *testing.T) {
+func TestWriteProjectConfigFiles_SSOT(t *testing.T) {
 	tmpDir := t.TempDir()
 
-	err := writeBrandSettings(tmpDir, false)
+	projectDataDir := filepath.Join(tmpDir, paths.ProjectDataDir)
+	err := writeProjectConfigFiles(projectDataDir, "test-proj", "standard", false)
 	if err != nil {
-		t.Fatalf("writeBrandSettings failed: %v", err)
+		t.Fatalf("writeProjectConfigFiles failed: %v", err)
 	}
 
-	rootSettings := filepath.Join(tmpDir, paths.BrandSettingsFilename)
-	data, err := os.ReadFile(rootSettings)
+	configFile := filepath.Join(tmpDir, paths.ConfigDir, paths.ZqkConfigFileName)
+	data, err := os.ReadFile(configFile)
 	if err != nil {
-		t.Fatalf("failed to read %s: %v", rootSettings, err)
+		t.Fatalf("failed to read %s: %v", configFile, err)
 	}
-	if !strings.Contains(string(data), `project_root: "."`) {
-		t.Errorf("brand settings should contain project_root: \".\", got: %s", string(data))
+	if !strings.Contains(string(data), `name: test-proj`) {
+		t.Errorf("config should contain name: test-proj, got: %s", string(data))
+	}
+	if fileutil.Exists(filepath.Join(tmpDir, paths.BrandSettingsFilename)) {
+		t.Errorf("obsolete %s must not be created", paths.BrandSettingsFilename)
 	}
 }
 
@@ -137,16 +141,13 @@ func TestFirstRun_PolyglotWorkspaceErgonomics(t *testing.T) {
 	if err := writeRootIsolationFiles(tmpDir, false, logger); err != nil {
 		t.Fatalf("writeRootIsolationFiles failed in polyglot root: %v", err)
 	}
-	if err := writeBrandSettings(tmpDir, false); err != nil {
-		t.Fatalf("writeBrandSettings failed in polyglot root: %v", err)
-	}
 	if err := writeSystemAccount(tmpDir); err != nil {
 		t.Fatalf("writeSystemAccount failed in polyglot root: %v", err)
 	}
 
 	// Assert root isolation and account exist
-	if !fileutil.Exists(filepath.Join(tmpDir, paths.BrandSettingsFilename)) {
-		t.Errorf("expected brand settings in polyglot root")
+	if fileutil.Exists(filepath.Join(tmpDir, paths.BrandSettingsFilename)) {
+		t.Errorf("obsolete brand settings must not exist in polyglot root")
 	}
 	if !fileutil.Exists(filepath.Join(tmpDir, paths.ConfigDir, paths.ZqkConfigFileName)) {
 		t.Errorf("expected zqk.yaml in polyglot root config/")
@@ -192,8 +193,8 @@ func TestFirstRun_BoundaryAndErrorHandling(t *testing.T) {
 		t.Errorf("expected writeRootIsolationFiles to fail when root is a file")
 	}
 
-	if err := writeBrandSettings(filePath, false); err == nil {
-		t.Errorf("expected writeBrandSettings to fail when root is a file")
+	if err := writeProjectConfigFiles(filepath.Join(filePath, paths.ProjectDataDir), "blocked", "standard", false); err == nil {
+		t.Errorf("expected writeProjectConfigFiles to fail when root is a file")
 	}
 }
 

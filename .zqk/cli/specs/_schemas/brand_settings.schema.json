@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://zqk.dev/schemas/brand_settings.schema.json",
   "title": "Brand Settings Schema",
-  "description": "Schema for {brand}-settings.yaml (e.g. zqk-settings.yaml). Per-project or per-CLI-instance settings: path config, staleness check dirs, optional path alias overrides. Used by path resolution and zqk use.",
+  "description": "Schema for project configuration and brand settings (e.g. config/zqk.yaml). Per-project or per-CLI-instance settings: path config, staleness check dirs, optional path alias overrides. Used by path resolution and zqk use.",
   "type": "object",
   "properties": {
     "$schema": {

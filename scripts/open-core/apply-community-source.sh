@@ -66,7 +66,7 @@ OVERLAY_PATHS=(
   "scripts/default_agent_skills"
   ".zqk/specs"
   ".zqk/cli/specs"
-  ".zqk/cli/command_spec_coverage_baseline.community.json"
+  ".zqk/cli/command_spec_coverage_baseline.json"
   ".gitignore"
   "NOTICE"
   "go.mod"

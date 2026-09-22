@@ -1,5 +1,5 @@
-// Package context: brand settings ({brand}-settings.yaml) as the definitive resource for CLI orientation.
-// See .zqk/cli/specs/schemas/brand_settings.schema.json and PATH_ALIAS_RESOLUTION.md §6.
+// Package context: brand settings and project configuration (config/zqk.yaml) as the definitive resource for CLI orientation.
+// See .zqk/cli/specs/_schemas/brand_settings.schema.json.
 package context
 
 import (
@@ -42,7 +42,7 @@ type BrandSettingsKernelState struct {
 	SnapshotBackupKeep int `yaml:"snapshot_backup_keep"`
 }
 
-// BrandSettings is the in-memory shape of {brand}-settings.yaml (e.g. zqk-settings.yaml).
+// BrandSettings is the in-memory shape of project configuration (e.g. config/zqk.yaml).
 type BrandSettings struct {
 	Schema      string                   `yaml:"$schema"`
 	Description string                   `yaml:"description"`
@@ -122,7 +122,7 @@ func BrandSettingsPath(projectRoot string) string {
 }
 
 // LoadBrandSettings loads and parses the brand settings file from projectRoot.
-// When the branded TEST_ROOT env matches projectRoot, loads test-settings.yaml or zqk-test-settings.yaml; otherwise zqk-settings.yaml.
+// When the branded TEST_ROOT env matches projectRoot, loads test-settings.yaml or zqk-test-settings.yaml; otherwise config/zqk.yaml.
 // Returns an error if the file is missing or invalid.
 func LoadBrandSettings(projectRoot string) (*BrandSettings, error) {
 	if projectRoot == emptyValue {
@@ -135,7 +135,7 @@ func LoadBrandSettings(projectRoot string) (*BrandSettings, error) {
 	return s, nil
 }
 
-// minimalTestBrandSettingsYAML is the default content for test root settings (same schema as zqk-settings.yaml).
+// minimalTestBrandSettingsYAML is the default content for test root settings (same schema as config/zqk.yaml).
 type minimalTestBrandSettingsYAML struct {
 	Version string         `yaml:"version"`
 	Paths   map[string]any `yaml:"paths"`
@@ -234,7 +234,7 @@ func LoadBrandSettingsFromFile(settingsPath string) (*BrandSettings, string, err
 // ResolveProjectRootFromSettings resolves project root by loading the brand settings file at the
 // path given by ResolveProjectRoot(startPath) (e.g. .zqk/current_root or ZQK_PROJECT_ROOT) and
 // returning the effective project root from settings (paths.project_root or the settings file dir).
-// Use this so project root is always defined by zqk-settings.yaml. Returns error if hint root is
+// Use this so project root is always defined by configuration. Returns error if hint root is
 // missing or brand settings file is missing/invalid.
 func ResolveProjectRootFromSettings(startPath string) (projectRoot string, settings *BrandSettings, err error) {
 	hint := ResolveProjectRoot(startPath)

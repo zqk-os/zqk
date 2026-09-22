@@ -133,8 +133,8 @@ fi
 		./cmd/zqk/app ./cmd/zqk/test ./cmd/zqk/docman ./cmd/zqk/automation \
 		./cmd/zqk/new ./cmd/zqk/inbox ./cmd/zqk/learn ./cmd/zqk/matrix ./cmd/zqk/mcp ./cmd/zqk/mcp-simple \
 		./cmd/zqk/mesh ./cmd/zqk/feed ./cmd/zqk/convergence ./cmd/zqk/callback ./cmd/zqk/intake \
-		./cmd/zqk/domain ./cmd/zqk/ambient
-	go test ./cmd/zqk/system -run 'TestInit_Greenfield$|TestInit_Legacy$|TestInit_Greenfield_StarterKernelGraph$|TestInit_Greenfield_NoEnvVars$|TestCheckOutput|TestSystemCheck' -timeout 5m
+		./cmd/zqk/domain ./cmd/zqk/ambient ./cmd/zqk/agent ./cmd/zqk/swarm ./cmd/zqk/spec ./cmd/zqk/keystore
+	go test ./cmd/zqk/system -run 'TestInit_Greenfield$|TestInit_Legacy$|TestInit_Greenfield_StarterKernelGraph$|TestInit_Greenfield_NoEnvVars$|TestCheckOutput|TestSystemCheck|TestCommandSpecPolicingAudit|TestCLITaxonomyGovernance|TestRollupCLITaxonomyOverhaul|TestWriteProjectConfigFiles' -timeout 5m
 
 	# 3. Run core kernel packages test suite
 	go test -short -p 2 -timeout 5m \
