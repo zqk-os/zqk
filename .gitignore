@@ -44,6 +44,7 @@ COMMIT_MSG*
 **/.zqk/scheduler/
 **/.zqk/streams/
 .agents/*
+.agent/*
 .zqk/**/*.lock
 .zqk/autofix/
 .zqk/cache/
