@@ -237,7 +237,6 @@ chunks:
     evidence_refs:
       - CRIT-1789719098362565000-21b9314b
       - scripts/open-core/community-bounded-includes
-      - scripts/open-core/community-bounded-includes.txt
       - sh scripts/open-core/test-community-overlay-release-files.sh
     gate_integrate: yes
     independent_verify: yes

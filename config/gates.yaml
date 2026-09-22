@@ -1,0 +1,130 @@
+# ZQK Quality & Release Gate Verification Rules
+# Single Source of Truth for all codebase hygiene, release payload, and tree policing gates.
+version: "1.0.0"
+
+hygiene:
+  check_paths: true
+  check_perms: true
+  check_dups: false
+  check_cli_names: true
+  exemptions:
+    - "*_test.go"
+    - "pkg/paths/constants.go"
+    - "pkg/paths/brand_aliases.go"
+
+tree_police:
+  forbidden_paths:
+    - "docs/commercial"
+    - "docs/marketing"
+    - "docs/launch"
+    - "marketing-site"
+    - ".workstream-os"
+    - "cmd/build"
+    - "cmd/codegen_runner"
+    - "cmd/pattern-cli"
+    - "cmd/utilities"
+    - "scripts/zqk-internal"
+    - "scripts/legacy-decommission"
+    - "pkg/billing"
+  forbidden_files:
+    - "ack.txt"
+    - "remaining.txt"
+    - "issues.json"
+    - "planned_blis.json"
+    - "dry_caches.py"
+    - "refactor.py"
+    - "fake_editor.sh"
+    - "cap_background.sh"
+    - "cap_orchestrator.sh"
+    - "fix_refs.sh"
+    - "register_docs.sh"
+    - "c-corp-filing.png"
+    - "domains-registered.png"
+    - "institutionalize_phase4"
+    - "scripts/open-core/community-bounded-includes.txt"
+  forbidden_script_references:
+    - "install-zqk-stable\\.sh"
+    - "recycle-stable-daemons\\.sh"
+    - "declare-change-intent\\.sh"
+    - "check-change-intent\\.sh"
+
+payload:
+  required_artifacts:
+    - "README.md"
+    - "LICENSE"
+    - "NOTICE"
+    - "SECURITY.md"
+    - "CODE_OF_CONDUCT.md"
+    - "CONTRIBUTING.md"
+    - "go.mod"
+    - "config/zqk.yaml"
+    - "cmd/zqk/main.go"
+    - "docs/INDEX.md"
+    - "docs/onboarding/COMMUNITY_FIRST_RUN.md"
+    - "scripts/open-core/police-community-tree.sh"
+  forbidden_artifacts:
+    - "docs/_archive"
+    - "cmd/zqk-admin"
+    - "cmd/codegen_runner"
+    - "cmd/pattern-cli"
+    - "pkg/billing"
+    - "pkg/community/container_helm_test.go"
+    - "docs/commercial"
+    - "docs/marketing"
+    - "docs/launch"
+  prohibited_patterns:
+    - id: "private_module"
+      pattern: 'github\.com/lanceman/zqk'
+      message: "private module path remains in Go source or go.mod"
+      scope: ["*.go", "go.mod"]
+    - id: "private_github_identity"
+      pattern: 'lanceman/zqk'
+      message: "private GitHub identity remains in scripts"
+      scope: ["scripts/**"]
+      exemptions:
+        - "scripts/open-core/rewrite-community-module-path.sh"
+        - "scripts/open-core/check-public-release-payload.sh"
+    - id: "private_owner"
+      pattern: '(?i)lanceman'
+      message: "private owner/namespace reference (lanceman) remains in tracked repo files"
+      scope: ["**"]
+      exemptions:
+        - "scripts/open-core/rewrite-community-module-path.sh"
+        - "scripts/open-core/check-public-release-payload.sh"
+        - "config/gates.yaml"
+    - id: "studio_technical_debt"
+      pattern: 'TDE-[0-9]{15,}-[0-9a-fA-F]{8}'
+      message: "studio technical_debt instance id remains in scripts"
+      scope: ["scripts/**"]
+      exemptions:
+        - "scripts/open-core/check-public-release-payload.sh"
+        - "scripts/open-core/test-public-release-gates.sh"
+    - id: "studio_track_comment"
+      pattern: 'TRACK:.*(BLI|REQ|CRIT|PRI|TDE|ATK|CAP|CVS)-'
+      message: "studio TRACK comment with kernel object id remains in cmd or scripts"
+      scope: ["cmd/**", "scripts/**"]
+      exemptions:
+        - "scripts/open-core/check-public-release-payload.sh"
+        - "scripts/open-core/test-public-release-gates.sh"
+    - id: "studio_nanos_hex"
+      pattern: '[A-Z]{2,12}-[0-9]{15,}-[0-9a-fA-F]{8}'
+      message: "studio nanos-hex kernel object id remains in production cmd, CLI specs, or command builders"
+      scope: ["cmd/**", ".zqk/cli/specs/**", "pkg/cli/bldr_cli_cmd_v1/**"]
+      exemptions:
+        - "*_test.go"
+        - "scripts/open-core/check-public-release-payload.sh"
+    - id: "studio_cef_object_id"
+      pattern: '(BLI|REQ|CRIT|TDE)-CEF-'
+      message: "studio CEF kernel object id remains in production cmd or scripts"
+      scope: ["cmd/**", "scripts/**"]
+      exemptions:
+        - "*_test.go"
+        - "scripts/open-core/check-public-release-payload.sh"
+        - "scripts/open-core/test-public-release-gates.sh"
+    - id: "credential_markers"
+      pattern: 'BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{40,}|xox[baprs]-[A-Za-z0-9-]{10,}'
+      message: "tracked files contain an obvious credential or private-key marker"
+      scope: ["**"]
+      exemptions:
+        - "scripts/open-core/check-public-release-payload.sh"
+        - "config/gates.yaml"
