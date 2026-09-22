@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/infrastructure"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 func TestExtraWALSpinePublishReplayClose(t *testing.T) {
@@ -70,7 +71,7 @@ func TestExtraWALSpinePublishReplayClose(t *testing.T) {
 	}
 
 	garbage := filepath.Join(t.TempDir(), "g.log")
-	if err := os.WriteFile(garbage, []byte("not-json\n"), 0o600); err != nil {
+	if err := os.WriteFile(garbage, []byte("not-json\n"), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 	gspine, err := NewWALSpine(ctx, garbage, "")

@@ -55,6 +55,8 @@ type SyncReport struct {
 	PrimedFiles    []string         `json:"primed_files"`
 	SkippedFiles   []string         `json:"skipped_files,omitempty"`
 	PackPaths      []string         `json:"pack_paths,omitempty"`
+	SkillsLinked   []string         `json:"skills_linked,omitempty"`
+	SkillsPruned   []string         `json:"skills_pruned,omitempty"`
 	EdgeSignals    []EdgeSignal     `json:"edge_signals,omitempty"`
 	SeatingCreated int              `json:"seating_created"`
 	SmokeOK        bool             `json:"smoke_ok"`

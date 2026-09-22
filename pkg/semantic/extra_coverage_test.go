@@ -21,10 +21,10 @@ func TestExtraScannersAssessorImportInfer(t *testing.T) {
 
 	mustWrite := func(rel, body string) {
 		p := filepath.Join(root, rel)
-		if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+		if err := os.MkdirAll(filepath.Dir(p), paths.DirPerm755); err != nil {
 			t.Fatal(err)
 		}
-		if err := os.WriteFile(p, []byte(body), 0o644); err != nil {
+		if err := os.WriteFile(p, []byte(body), paths.FilePerm644); err != nil {
 			t.Fatal(err)
 		}
 	}

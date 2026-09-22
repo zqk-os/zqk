@@ -11,6 +11,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/scheduler/transceiver/types"
 )
 
@@ -169,16 +170,16 @@ func TestExtraLoaderValidationVerificationAndBroker(t *testing.T) {
     - protocol: webhook
       endpoint: http://example.local
 `)
-	if err := os.WriteFile(yamlPath, body, 0o644); err != nil {
+	if err := os.WriteFile(yamlPath, body, paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(ymlPath, body, 0o644); err != nil {
+	if err := os.WriteFile(ymlPath, body, paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(skipPath, []byte("nope"), 0o644); err != nil {
+	if err := os.WriteFile(skipPath, []byte("nope"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(dir, "bad.yaml"), []byte(":]"), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "bad.yaml"), []byte(":]"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 

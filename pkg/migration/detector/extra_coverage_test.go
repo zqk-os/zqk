@@ -34,10 +34,10 @@ func TestExtraDetectorVersionManifestAndSignatures(t *testing.T) {
 	dir := t.TempDir()
 	bin := filepath.Join(dir, d.binaryName)
 	script := "#!/bin/sh\necho zqk-migrate version 1.2.3\n"
-	if err := fileutil.WriteFile(bin, []byte(script), 0o755); err != nil {
+	if err := fileutil.WriteFile(bin, []byte(script), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.Chmod(bin, 0o755); err != nil {
+	if err := os.Chmod(bin, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	found := NewBinaryDetector().WithSearchPaths([]string{dir}).WithTrustedSigners([]string{"nope"})
@@ -50,10 +50,10 @@ func TestExtraDetectorVersionManifestAndSignatures(t *testing.T) {
 		t.Fatalf("version=%q err=%v", ver, err)
 	}
 	plain := filepath.Join(dir, "plain")
-	if err := fileutil.WriteFile(plain, []byte("#!/bin/sh\necho 9.9.9\n"), 0o755); err != nil {
+	if err := fileutil.WriteFile(plain, []byte("#!/bin/sh\necho 9.9.9\n"), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
-	_ = os.Chmod(plain, 0o755)
+	_ = os.Chmod(plain, paths.DirPerm755)
 	if v, err := found.GetVersion(plain); err != nil || v == "" {
 		t.Fatalf("plain version=%q err=%v", v, err)
 	}

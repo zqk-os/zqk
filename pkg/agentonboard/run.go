@@ -52,6 +52,7 @@ type Result struct {
 	MarketProbeOpen    []MarketProbeQuestion  `json:"market_probe_open,omitempty"`
 	SpecializationTier string                 `json:"specialization_tier,omitempty"`
 	PackPaths          []string               `json:"pack_paths,omitempty"`
+	SkillsSync         *SkillSyncResult       `json:"skills_sync,omitempty"`
 }
 
 // Run executes detect → (auth warn) → seat → prime → kernel sync → smoke.
@@ -177,12 +178,25 @@ func Run(opts Options) (*Result, error) {
 			return res, nil
 		}
 		res.PackPaths = packPaths
+
+		skillRes, err := SyncSkills(root, detected, opts.AllVendors, opts.Headless, opts.DryRun, opts.Force)
+		if err != nil {
+			res.Stages[StagePrimeWorkspace] = StageResult{Status: StageFailed, Error: err.Error()}
+			res.Status = ResultBlocked
+			res.NextSteps = []string{"Fix skill sync errors, then re-run agent-onboard"}
+			return res, nil
+		}
+		res.SkillsSync = skillRes
+
 		res.Stages[StagePrimeWorkspace] = StageResult{
 			Status: StageOK,
 			Detail: map[string]any{
 				"files":                 primed,
 				objects.FieldKeySkipped: skipped,
 				"pack_paths":            packPaths,
+				"skills_linked":         skillRes.Linked,
+				"skills_pruned":         skillRes.Pruned,
+				"skills_skipped":        skillRes.Skipped,
 				"dry_run":               opts.DryRun,
 				"force":                 opts.Force,
 				"vendors":               vendorIDs(vendors),
@@ -192,6 +206,11 @@ func Run(opts Options) (*Result, error) {
 
 	smokeOK, smokeDetail := smoke(root, opts.DryRun, opts.SkipPrime, primed, skipped)
 	fp := WorkspaceFingerprint(root, res.Vector, detected)
+	var skillsLinked, skillsPruned []string
+	if res.SkillsSync != nil {
+		skillsLinked = res.SkillsSync.Linked
+		skillsPruned = res.SkillsSync.Pruned
+	}
 	report := SyncReport{
 		Schema:         SyncReportSchema,
 		UpdatedAt:      time.Now().UTC().Format(time.RFC3339),
@@ -200,6 +219,8 @@ func Run(opts Options) (*Result, error) {
 		PrimedFiles:    primed,
 		SkippedFiles:   skipped,
 		PackPaths:      packPaths,
+		SkillsLinked:   skillsLinked,
+		SkillsPruned:   skillsPruned,
 		Fingerprint:    fp,
 		EdgeSignals:    edge,
 		SeatingCreated: seatingCreated,
