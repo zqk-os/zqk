@@ -1,0 +1,30 @@
+Validates that backlog items trace to milestones. Outputs unlinked items and can
+optionally fix them.
+
+Audit checks:
+  - Detect backlog items without milestone_refs
+  - Detect backlog items without priority_plan_ref
+  - Use --fix to apply a default milestone
+  - Use --default-milestone to specify the milestone ID for --fix
+
+  Check milestone associations
+  zqk system audit-milestones
+  Fix unlinked items
+  zqk system audit-milestones --fix --default-milestone MIL-123
+
+Usage:
+  zqk system audit-milestones [flags]
+
+Flags:
+      --columns string             Override column widths for table output (format: field:width)
+      --default-milestone string   The milestone ID to use when fixing unlinked items (e.g., MIL-triage)
+      --fix                        Fix unlinked items by associating them with the default milestone
+  -f, --format string              Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+      --ignore-scheduler-down      Ignore scheduler down warning/lockdown
+  -o, --output string              Write output to file
+  -q, --quiet                      Suppress non-essential output
+      --timeout duration           Timeout for command execution (0 = auto-calculate)
+  -v, --verbose                    Verbose output
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

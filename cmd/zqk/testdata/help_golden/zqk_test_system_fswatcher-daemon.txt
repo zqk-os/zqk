@@ -1,8 +1,0 @@
-Starts a robust filesystem watcher daemon to monitor workspace events and
-trigger ambient actions.
-
-Usage:
-  zqk.test system fswatcher-daemon [flags]
-
-Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

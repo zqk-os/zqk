@@ -1,0 +1,32 @@
+Repair Tier-1 CAS filename/content hash mismatches ("CAS file corruption detected").
+
+Input format: TSV with columns:
+  object_kind <tab> object_id <tab> file_path <tab> message
+
+This command:
+  - Writes a correctly named content-hash file alongside the corrupt file
+  - Updates the CAS index mapping (ID -> content hash) under cross-process lock
+  - Moves the corrupt file into a quarantine folder for forensic inspection
+
+If the file is already correctly addressed (64-hex filename stem equals SHA-256 of file content), repair is a no-op
+(no quarantine; avoids deleting the only blob when re-running repair after content was fixed).
+
+Examples:
+  # Dry run from the latest system-health report
+  zqk system repair-cas-corruption --input-file .zqk/system-health/tier1-cas-corruption.tsv --dry-run
+
+  # Apply repairs (recommended to stop scheduler while repairing scheduler_job objects)
+  zqk system repair-cas-corruption --input-file .zqk/system-health/tier1-cas-corruption.tsv
+
+Usage:
+  zqk system repair-cas-corruption [flags]
+
+Flags:
+      --dry-run                 Show what would be repaired without making changes
+      --input-file string       Path to TSV input file (defaults to .zqk/system-health/tier1-cas-corruption.tsv)
+      --quarantine-dir string   Directory to move corrupt files into (defaults to .zqk/system-health/quarantine)
+      --restart-scheduler       Restart scheduler daemon after repair (only if --stop-scheduler is true)
+      --stop-scheduler          Stop scheduler daemon before repairing (recommended for scheduler_job corruption)
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

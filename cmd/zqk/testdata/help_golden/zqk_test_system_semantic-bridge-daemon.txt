@@ -1,7 +1,0 @@
-Generated spec for semantic-bridge-daemon
-
-Usage:
-  zqk.test system semantic-bridge-daemon [flags]
-
-Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

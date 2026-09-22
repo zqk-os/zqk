@@ -1,0 +1,10 @@
+Display version information including executable name, build datetime, and git
+commit.
+
+  Show version (top-level alias)
+  zqk version
+  Show version under utility
+  zqk utility version
+
+Usage:
+  zqk utility version

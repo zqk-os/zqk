@@ -1,0 +1,40 @@
+Validate YAML file syntax without loading as objects.
+
+This command performs a simple "gut check" to verify YAML files are syntactically
+valid. It does not validate against object schemas or check references - use
+'%s system validate' for that.
+
+With --register-hashes, valid YAML object files (files with a 'kind' field) will
+also have their integrity hashes registered in the hash registry. This is useful
+for files created outside the CLI.
+
+IMPORTANT: Hash registration uses '%s system check --auto-fix' under
+the hood to validate objects and register missing hashes. This reuses existing
+validation logic instead of duplicating it.
+
+Security: This command differentiates between:
+  - Missing hash (new object): Safe to register automatically
+  - Hash mismatch (tampering): Detected and reported, requires --force to fix
+
+Objects that fail validation will be skipped with a warning.
+Use '%s object create' to create properly validated objects, or run
+'%s system check' after hash registration to validate references.
+
+  Validate a single file
+  zqk utility validate-yaml .zqk/specs/objects/organization.yaml
+  Validate multiple files
+  zqk utility validate-yaml file1.yaml file2.yaml file3.yaml
+  Validate all YAML files in a directory (recursive)
+  zqk utility validate-yaml --recursive .zqk/specs/objects/
+  Validate and register hashes for valid object files
+  zqk utility validate-yaml --register-hashes --recursive .zqk/process/backlog_items/
+  Quiet mode (only show errors)
+  zqk utility validate-yaml --quiet file.yaml
+
+Usage:
+  zqk utility validate-yaml [file...] [flags]
+
+Flags:
+  -q, --quiet             Only show errors, suppress success messages
+  -r, --recursive         Recursively validate YAML files in directories
+      --register-hashes   Register integrity hashes for valid YAML object files (does not fix YAML syntax)

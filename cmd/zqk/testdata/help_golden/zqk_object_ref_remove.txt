@@ -1,0 +1,33 @@
+Removes one or more references from a source object.
+
+Can remove specific target IDs across reference fields, remove all references of
+a specific kind
+
+using --kind, or clear all references on the object using --all.
+
+  Remove specific requirement from backlog item
+  zqk object ref remove BLI-001 REQ-001
+  Remove all criteria references
+  zqk object ref remove REQ-001 --kind criteria
+  Purge all references on an object
+  zqk object ref remove BLI-001 --all
+
+Usage:
+  zqk object ref remove [flags]
+
+Flags:
+      --all                     Remove all references across all reference fields on the object
+      --columns string          Override column widths for table output (format: field:width)
+      --field string            Restrict removal to a specific reference field
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+      --ignore-scheduler-down   Ignore scheduler down warning/lockdown
+      --kind string             Remove all references pointing to objects of this kind
+  -o, --output string           Write output to file
+      --park                    Park parent execution plan (transition to paused) if remaining items reach zero instead of auto-completing
+  -q, --quiet                   Suppress non-essential output
+      --timeout duration        Timeout for command execution (0 = auto-calculate)
+  -v, --verbose                 Verbose output
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --internal         Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)

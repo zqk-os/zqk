@@ -1,0 +1,19 @@
+View the current state of file lock metrics accumulated in memory.
+
+This shows metrics that have been recorded but not yet collected/flushed.
+Metrics are accumulated atomically as file lock operations occur.
+
+Usage:
+  zqk system metrics file-lock view [flags]
+
+Flags:
+      --columns string          Override column widths for table output (format: field:width)
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+      --ignore-scheduler-down   Ignore scheduler down warning/lockdown
+  -o, --output string           Write output to file
+  -q, --quiet                   Suppress non-essential output
+      --timeout duration        Timeout for command execution (0 = auto-calculate)
+  -v, --verbose                 Verbose output
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

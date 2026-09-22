@@ -1,0 +1,28 @@
+Without --list-kinds, use 'object <kind> fields' to list fields for a specific kind.
+With --list-kinds, output object kinds for the current seat (planner/doer membrane).
+Use --all-kinds for the full registered catalog (admin break-glass).
+
+Examples: zqk object backlog_item fields
+
+  List seat-scoped kinds
+  zqk object fields --list-kinds
+  List kinds as JSON
+  zqk object fields --list-kinds --format json
+  Full catalog
+  zqk object fields --list-kinds --all-kinds
+
+Usage:
+  zqk object fields [flags]
+
+Flags:
+      --all-kinds          Show full registered kind catalog (bypass planner/doer discovery membrane)
+      --filterable         Show only filterable fields
+      --format string      Output format: table, json, yaml (default "table")
+      --groupable          Show only groupable fields
+      --list-kinds         List all object kinds (instead of listing fields for a kind)
+      --sortable           Show only sortable fields
+      --specialized-only   Show only specialized fields (exclude common fields)
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --internal         Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)

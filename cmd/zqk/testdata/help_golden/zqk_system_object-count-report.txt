@@ -1,0 +1,43 @@
+Generates an operational congruence report: YAML files on disk per dir, object
+count by kind,
+
+optional internal count. Computes disparity (disk - object count per directory)
+and can emit
+
+coordinator events (audit, logging) when disparity exceeds threshold for metrics
+and alerts.
+
+With --include-filesystem-snapshot, also walks the full project tree (skipping
+bulky third-party dirs)
+
+and records file/byte counts by top-level bucket and by each .zqk/* child for
+landfill detection over time.
+
+Output is written under .zqk/logs/reports/ unless --report-file is set.
+
+  Default (report to timestamped file)
+  zqk system object-count-report
+  Emit alerts when disparity > 50
+  zqk system object-count-report --emit-events
+  Custom output and threshold
+  zqk system object-count-report --report-file ./report.txt --disparity-threshold 100
+  Include full-tree file counts (for landfill / I/O trends on a schedule)
+  zqk system object-count-report --include-filesystem-snapshot
+  Filesystem snapshot only under .zqk (faster scheduled run)
+  zqk system object-count-report --include-filesystem-snapshot --filesystem-snapshot-scope=zqk
+
+Usage:
+  zqk system object-count-report [flags]
+
+Flags:
+      --disparity-threshold int            Alert when disk - object count exceeds this per directory (0 = use default) (default 50)
+      --emit-events                        Emit coordinator events (audit, logging) when there are alerts so metrics and notifications can be triggered
+      --filesystem-snapshot-scope string   With --include-filesystem-snapshot: full (entire repo), zqk (.zqk only), docs (docs/ only), zqk-and-docs (both; parallel fan-out per subtree) (default "full")
+      --include-filesystem-snapshot        Walk the project tree (see --filesystem-snapshot-scope) and attach file/byte counts; writes time series under .zqk/metrics/filesystem_snapshot/
+      --include-internal                   Include internal count via subprocess (zqk internal count --format json) (default true)
+      --metrics-chunk-retention-days int   Prune metrics time-series .chunk files older than N days under .zqk/metrics/ (object_volume, stream_volume, filesystem_snapshot). 0 uses ZQK_METRICS_CHUNK_RETENTION_DAYS or default 14
+      --no-cache                           Use storage.Count per kind instead of object-id cache (slower but accurate after bulk rm or when cache is stale)
+      --report-file string                 Write report to this path (default: .zqk/logs/reports/object-count-report-<timestamp>.txt)
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

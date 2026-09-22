@@ -1,0 +1,34 @@
+Generate comprehensive audit reports analyzing command execution metrics.
+
+This command analyzes command metrics to identify:
+  - Commands with high failure rates
+  - Frequent timeouts
+  - Slow commands
+  - Improvement opportunities
+  - Churn indicators (user confusion patterns)
+
+The report helps identify areas for improvement and clarifications to reduce
+churn.
+
+  Generate audit report
+  zqk system audit-report
+  Save report to file
+  zqk system audit-report --output report.md
+  Generate report with specific focus
+  zqk system audit-report --focus failures
+
+Usage:
+  zqk system audit-report [flags]
+
+Flags:
+      --columns string          Override column widths for table output (format: field:width)
+      --focus string            Focus on a report section: failures, timeouts, slow, churn, or all (default "all")
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+      --ignore-scheduler-down   Ignore scheduler down warning/lockdown
+  -o, --output string           Write output to file
+  -q, --quiet                   Suppress non-essential output
+      --timeout duration        Timeout for command execution (0 = auto-calculate)
+  -v, --verbose                 Verbose output
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

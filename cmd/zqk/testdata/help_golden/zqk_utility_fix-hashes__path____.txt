@@ -1,0 +1,31 @@
+Fix missing or mismatched integrity hashes for object files.
+
+This command scans YAML files and registers/updates their integrity hashes in
+the hash registry. It's useful for fixing files created outside the CLI or
+resolving hash mismatches.
+
+  Fix hashes for a single file
+  zqk utility fix-hashes .zqk/process/backlog_items/BLI-001.yaml
+  Fix hashes for all YAML files in a directory (recursive)
+  zqk utility fix-hashes --recursive .zqk/process/backlog_items/
+  Fix hashes for all objects of a specific kind
+  zqk utility fix-hashes --kind audit_event
+  Fix hashes for all internal objects
+  zqk utility fix-hashes --internal
+  Force fix hash mismatches (creates audit events)
+  zqk utility fix-hashes --force .zqk/process/backlog_items/BLI-001.yaml
+  Dry run (preview changes without writing)
+  zqk utility fix-hashes --dry-run --kind backlog_item
+  Quiet mode (only show errors)
+  zqk utility fix-hashes --quiet --recursive .zqk/process/
+
+Usage:
+  zqk utility fix-hashes [path...] [flags]
+
+Flags:
+      --dry-run       Show what would be fixed without making changes
+  -F, --force         Force fix hash mismatches (creates audit events)
+      --internal      Fix hashes for all internal objects (audit_event, change_journal_entry)
+      --kind string   Fix hashes for all objects of the specified kind
+  -q, --quiet         Only show errors, suppress success messages
+  -r, --recursive     Recursively fix hashes for YAML files in directories

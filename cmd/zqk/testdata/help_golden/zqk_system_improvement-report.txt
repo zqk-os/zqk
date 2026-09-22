@@ -1,0 +1,23 @@
+Generates a comprehensive report to drive system improvement lifecycle and
+focus.
+
+Runs on a cadence and can optionally trigger remediation and adaptive
+scheduler-cadence tuning.
+
+  Generate improvement report
+  zqk system improvement-report
+  Generate JSON report without remediation triggers
+  zqk system improvement-report --format json --trigger-remediation=false
+
+Usage:
+  zqk system improvement-report [flags]
+
+Flags:
+      --apply-adaptive-cadence   Apply adaptive cadence recommendation to SCH-improvement-report with change cooldown (default true)
+      --emit-events              Emit coordinator events for report completion (for dashboards)
+      --persist-snapshot-audit   Persist compact improvement snapshot to audit_event for queryable history (default true)
+      --report-file string       Write report to this path (default: .zqk/logs/reports/improvement-report-<timestamp>.{txt,json})
+      --trigger-remediation      After writing the report, enqueue scheduler jobs to address work items (default true)
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

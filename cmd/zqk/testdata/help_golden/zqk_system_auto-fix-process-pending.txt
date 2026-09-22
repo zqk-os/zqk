@@ -1,0 +1,25 @@
+Discovers all AUTOFIX-*.json under .zqk/autofix/ and processes each via the
+standardized
+
+pipeline (INGEST → NORMALIZE → COMMIT → FINALIZE) per
+docs/architecture/data-pipeline-lifecycle.md.
+
+Used by SCH-autofix-process-pending so autofix files don't build up; can be
+triggered when
+
+batches are submitted or run on a timer. Internal command (hidden from main
+help).
+
+  Process pending (scheduler or manual)
+  zqk system auto-fix-process-pending
+  With explicit project root
+  zqk system auto-fix-process-pending --project-root /path/to/project
+
+Usage:
+  zqk system auto-fix-process-pending [flags]
+
+Flags:
+      --allow-degraded        Allow running when scheduler daemon is not running (results may be partial/stale)
+      --project-root string   Project root (default: resolve from current directory)
+      --sync-glossary         After processing batches, run system sync-glossary-from-specs (dry-run report; organele maintenance)
+      --sync-glossary-apply   With --sync-glossary, also create missing glossary terms (guarded by AUTOFIX_GLOSSARY_MAX_CREATE; requires explicit enable)
