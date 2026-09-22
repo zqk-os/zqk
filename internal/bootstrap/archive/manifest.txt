@@ -223,11 +223,6 @@
 ./cli_specs/agent/swarm/
 ./cli_specs/agent/swarm/
 ./cli_specs/agent/swarm/
-./cli_specs/agent/swarm/init_command.yaml
-./cli_specs/agent/swarm/init_command.yaml
-./cli_specs/agent/swarm/init_command.yaml
-./cli_specs/agent/swarm/init_command.yaml
-./cli_specs/agent/swarm/init_command.yaml
 ./cli_specs/agent/swarm/status_command.yaml
 ./cli_specs/agent/swarm/status_command.yaml
 ./cli_specs/agent/swarm/status_command.yaml

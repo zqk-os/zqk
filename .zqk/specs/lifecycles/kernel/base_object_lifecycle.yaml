@@ -2,7 +2,7 @@ $schema: "../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json"
 
 object_type: base_object
 # Five-question exam: docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md
-# TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+# TRACK: kernel-backlog
 statuses:
   - value: conceptual
     display: Conceptual
@@ -99,7 +99,7 @@ transitions:
       - role is halted
       - hop from any occupancy to error
       - system halt; repair before leaving halted
-  # TRACK: BLI-1785723654802038000-b14064bc — recover persona/base_object from error (promote skips archive-only).
+  # TRACK: kernel-backlog — recover persona/base_object from error (promote skips archive-only).
   - from: error
     to: approved
     description: Recover from system error after repair

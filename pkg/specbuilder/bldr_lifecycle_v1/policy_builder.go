@@ -68,7 +68,7 @@ func (b *PolicyLifecycleBuilder) addPolicyLifecycleData() {
 	b.AddStatus(objects.Status{
 		Value:       "active",
 		Display:     "Active",
-		Description: "policy status 'active' (Active): membrane live / enforced — not Gantt shovel-ready. Class role enforced (TRACK: BLI-CEF-R26-POLICY-PRI-EXAM-001). See docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md and POLICY_LIFECYCLE.md.",
+		Description: "policy status 'active' (Active): membrane live / enforced — not Gantt shovel-ready. Class role enforced (TRACK: kernel-backlog). See docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md and POLICY_LIFECYCLE.md.",
 	})
 	b.AddStatus(objects.Status{
 		Value:       "deprecated",

@@ -50,7 +50,7 @@ statuses:
   description: "Option A (park-but-CAP-bound): recoverable handoff/parking hold. CAP
     may\nstill bind; measure/tick must not persist session measurements; whats-next\n\
     does not auto-select for measure. Resume→active, or complete/abandon.\nNOT lifecycle-terminal.
-    See DEC-1786686986572580000-54124993 /\nBLI-1786686768606200000-31133cc3.\n"
+    See kernel-backlog /\nkernel-backlog.\n"
   role: halted
 - value: error
   display: Error

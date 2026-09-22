@@ -2,7 +2,7 @@ $schema: "../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json"
 
 object_type: qa_success
 # Five-question exam: origin is already terminal (success/failure/archived).
-# TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+# TRACK: kernel-backlog
 # postconditions: not applicable (empty hop set)
 statuses:
   - value: conceptual
@@ -19,7 +19,7 @@ statuses:
     display: Success
     origin: false
     # Not preliminary: origin+terminal+preliminary has no draft-plane leave path.
-    # TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane / promote membrane.
+    # TRACK: kernel-backlog — draft-plane / promote membrane.
     terminal: true
     role: terminal
     description: "qa success status 'success' (Success): ended; no further normal

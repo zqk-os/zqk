@@ -18,7 +18,7 @@ func NewRemainingOpenBuilder() *RemainingOpenBuilder {
 
 	builder.
 		SetExtends("work_interval").
-		SetDescription("Mixin for remaining-open cardinality (remaining_open_count). open_countable means the container's behavior changes when the count hits zero. Membership stays child→parent (not stored here). Not instantiable (kind_mappings skip_specs). Compose onto Gantt containers that complete when members drain (priority_plan). Parallel: occupancy houses claimed_by / claimed_at. TRACK: POL-ARCH-20260901 / BLI-CEF-CONTAINER-REMAINING-OPEN-001. ").
+		SetDescription("Mixin for remaining-open cardinality (remaining_open_count). open_countable means the container's behavior changes when the count hits zero. Membership stays child→parent (not stored here). Not instantiable (kind_mappings skip_specs). Compose onto Gantt containers that complete when members drain (priority_plan). Parallel: occupancy houses claimed_by / claimed_at. TRACK: POL-ARCH-20260901 / kernel-backlog. ").
 		SetVisibility("internal").
 		SetSchemaVersion(objects.DefaultSchemaVersion).
 		AddTrait("open_countable")

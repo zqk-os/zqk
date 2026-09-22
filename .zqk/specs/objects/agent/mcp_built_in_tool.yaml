@@ -8,7 +8,7 @@ id_prefixes:
 description: |
   Catalog entry for a built-in MCP tool (draft → proposed → under_review → active).
   Lifecycle: mcp_built_in_tool_lifecycle.yaml.
-  TRACK: BLI-CEF-R26-REMAINING-KINDS-001 — was a census lifecycle_orphan (YAML without a spec).
+  TRACK: kernel-backlog — was a census lifecycle_orphan (YAML without a spec).
 fields:
   id:
     checklist:

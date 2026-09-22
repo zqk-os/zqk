@@ -43,6 +43,7 @@ func GenerateBuilderFromYAML(yamlPath, outputDir string) error {
 		Status       string         `yaml:"status"`
 		ObjectConfig map[string]any `yaml:"object_config"`
 		FieldConfig  map[string]any `yaml:"field_config"`
+		Config       map[string]any `yaml:"config"`
 	}
 
 	if err := yaml.Unmarshal(data, &traitFile); err != nil {
@@ -81,6 +82,7 @@ func GenerateBuilderFromYAML(yamlPath, outputDir string) error {
 		traitFile.Includes,
 		traitFile.ObjectConfig,
 		traitFile.FieldConfig,
+		traitFile.Config,
 		traitName,
 		defaultVersion,
 		defaultVersionPackage,
@@ -114,7 +116,7 @@ func generateBuilderCode(
 	_ string, description, category string,
 	objectLevel, fieldLevel bool,
 	requires, conflicts, includes []string,
-	objectConfig, fieldConfig map[string]any,
+	objectConfig, fieldConfig, topLevelConfig map[string]any,
 	traitName, version, packageName string,
 ) (string, error) {
 	var buf strings.Builder
@@ -147,7 +149,21 @@ func generateBuilderCode(
 	buf.WriteString("\t}\n\n")
 
 	// Configure trait
-	hasConfig := len(objectConfig) > 0 || len(fieldConfig) > 0
+	mergedConfig := make(map[string]any)
+	if len(objectConfig) > 0 {
+		mergedConfig["object_config"] = objectConfig
+	}
+	if len(fieldConfig) > 0 {
+		mergedConfig["field_config"] = fieldConfig
+	}
+	for k, v := range topLevelConfig {
+		if k == emptyValue {
+			continue
+		}
+		mergedConfig[k] = v
+	}
+
+	hasConfig := len(mergedConfig) > 0
 	hasSetters := description != emptyValue || category != emptyValue || objectLevel || fieldLevel || len(requires) > 0 || len(conflicts) > 0 || len(includes) > 0 || hasConfig
 
 	if hasSetters {
@@ -207,17 +223,10 @@ func generateBuilderCode(
 			}
 		}
 
-		// Set config (from object_config and field_config)
+		// Set config (from object_config, field_config, and top-level config)
 		if hasConfig {
-			config := make(map[string]any)
-			if len(objectConfig) > 0 {
-				config["object_config"] = objectConfig
-			}
-			if len(fieldConfig) > 0 {
-				config["field_config"] = fieldConfig
-			}
 			buf.WriteString("\n\t\tSetConfig(")
-			buf.WriteString(formatValue(config, 2))
+			buf.WriteString(formatValue(mergedConfig, 2))
 			buf.WriteString(")")
 		}
 
@@ -255,13 +264,54 @@ func formatValue(val any, indentLevel int) string {
 		return "false"
 	case nil:
 		return "nil"
+	case []string:
+		var buf strings.Builder
+		buf.WriteString("[]string{\n")
+		for _, item := range v {
+			buf.WriteString(indent + "\t")
+			fmt.Fprintf(&buf, "%q,\n", item)
+		}
+		buf.WriteString(indent + "}")
+		return buf.String()
 	case []any:
+		allStrings := len(v) > 0
+		for _, item := range v {
+			if _, ok := item.(string); !ok {
+				allStrings = false
+				break
+			}
+		}
+		if allStrings {
+			var buf strings.Builder
+			buf.WriteString("[]string{\n")
+			for _, item := range v {
+				buf.WriteString(indent + "\t")
+				fmt.Fprintf(&buf, "%q,\n", item.(string))
+			}
+			buf.WriteString(indent + "}")
+			return buf.String()
+		}
+
 		var buf strings.Builder
 		buf.WriteString("[]any{\n")
 		for _, item := range v {
 			buf.WriteString(indent + "\t")
 			buf.WriteString(formatValue(item, indentLevel+1))
 			buf.WriteString(",\n")
+		}
+		buf.WriteString(indent + "}")
+		return buf.String()
+	case map[string]string:
+		var buf strings.Builder
+		buf.WriteString("map[string]any{\n")
+		keys := make([]string, 0, len(v))
+		for k := range v {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		for _, k := range keys {
+			buf.WriteString(indent + "\t")
+			fmt.Fprintf(&buf, "%q: %q,\n", k, v[k])
 		}
 		buf.WriteString(indent + "}")
 		return buf.String()

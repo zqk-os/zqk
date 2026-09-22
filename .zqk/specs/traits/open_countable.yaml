@@ -9,7 +9,7 @@ description: |
   Interpreter CAS-decrements remaining_open_count on a member terminal hop.
   Non-zero is a no-op (no status catalyst). Zero hops complete (new catalyst).
   Do not List members on the hop. Not occupiable. Not status_reactive.
-  TRACK: POL-ARCH-20260901 / BLI-CEF-CONTAINER-REMAINING-OPEN-001.
+  TRACK: POL-ARCH-20260901 / kernel-backlog.
 category: behavior
 requires: []
 conflicts: []

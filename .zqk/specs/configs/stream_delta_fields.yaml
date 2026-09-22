@@ -34,7 +34,7 @@ metric:
   - last_seen
 
 # command_metric needs identity + command keys so Create/Update tier-2 validation matches stream SSOT.
-# TRACK: BLI-1785443942668406000-1ec5c811 — stream delta vs draft/CAS visibility contracts.
+# TRACK: kernel-backlog — stream delta vs draft/CAS visibility contracts.
 command_metric:
   - id
   - kind

@@ -3,7 +3,7 @@
 # exam: same machine as base_object; do not mint a fake kind-owned graph.
 # Loader fallback: pkg/objects.LoadLifecycle already uses base_object when
 # KIND_lifecycle.yaml is absent. This list makes that decision census-visible.
-# TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+# TRACK: kernel-backlog
 inherit_base:
   - api_spec
   - auto_fix_rule
