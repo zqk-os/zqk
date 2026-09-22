@@ -4,19 +4,19 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"os"
 	"path/filepath"
 	"testing"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestLoadConfig_ExistingValid(t *testing.T) {
 	root := t.TempDir()
 	configDir := filepath.Dir(ConfigPath(root))
-	if err := os.MkdirAll(configDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(configDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 
@@ -29,7 +29,7 @@ func TestLoadConfig_ExistingValid(t *testing.T) {
 		IncludeRecommendations: true,
 	}
 	data, _ := json.Marshal(cfg)
-	if err := os.WriteFile(ConfigPath(root), data, 0644); err != nil {
+	if err := fileutil.WriteFile(ConfigPath(root), data, paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -51,8 +51,8 @@ func TestLoadConfig_ExistingValid(t *testing.T) {
 func TestLoadConfig_InvalidJSON(t *testing.T) {
 	root := t.TempDir()
 	configDir := filepath.Dir(ConfigPath(root))
-	_ = os.MkdirAll(configDir, 0755)
-	_ = os.WriteFile(ConfigPath(root), []byte("{bad-json"), 0644)
+	_ = fileutil.MkdirAll(configDir, paths.DirPerm755)
+	_ = fileutil.WriteFile(ConfigPath(root), []byte("{bad-json"), paths.FilePerm644)
 
 	_, err := LoadConfig(root)
 	if err == nil {
@@ -68,7 +68,7 @@ func TestWriteExampleConfig(t *testing.T) {
 	}
 
 	p := ConfigPath(root) + ".example"
-	if _, err := os.Stat(p); err != nil {
+	if _, err := fileutil.Stat(p); err != nil {
 		t.Fatalf("expected example config file to exist: %v", err)
 	}
 }
@@ -119,7 +119,7 @@ func TestNotify_Tripped_EmptyAgentID(t *testing.T) {
 func TestNotify_Tripped_FeedWake(t *testing.T) {
 	root := t.TempDir()
 	// Set up .zqk dir structure
-	_ = os.MkdirAll(filepath.Join(root, paths.ProjectDataDir), 0755)
+	_ = fileutil.MkdirAll(filepath.Join(root, paths.ProjectDataDir), paths.DirPerm755)
 
 	logger := logging.NewLogger(io.Discard, logging.InfoLevel, logging.NewTextFormatter(pkgctx.NewSystemContext()))
 	feedWake := true

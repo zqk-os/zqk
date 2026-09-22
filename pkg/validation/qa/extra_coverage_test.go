@@ -3,7 +3,6 @@ package qa
 import (
 	"context"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -11,7 +10,9 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/validation"
 )
 
@@ -81,7 +82,7 @@ func HeavyFunc(store *storage.FileObjectStorage) {
 }
 `
 	srcFile := filepath.Join(tmpDir, "sample.go")
-	if err := os.WriteFile(srcFile, []byte(code), 0644); err != nil {
+	if err := fileutil.WriteFile(srcFile, []byte(code), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -261,7 +262,7 @@ func TestASTAuditor_ComplexAndInterface(t *testing.T) {
 	lines = append(lines, "}")
 
 	srcFile := filepath.Join(tmpDir, "long.go")
-	if err := os.WriteFile(srcFile, []byte(strings.Join(lines, "\n")), 0644); err != nil {
+	if err := fileutil.WriteFile(srcFile, []byte(strings.Join(lines, "\n")), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -373,7 +374,7 @@ func Bad() {
 	fmt.Println("direct print")
 }
 `
-	if err := os.WriteFile(badFile, []byte(badCode), 0644); err != nil {
+	if err := fileutil.WriteFile(badFile, []byte(badCode), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	store.objs["BLI-AST-BAD"] = map[string]any{
@@ -397,7 +398,7 @@ func Bad() {
 
 	// 5. Artifact that fails to parse
 	unparseableFile := filepath.Join(tmpDir, "unparseable.go")
-	if err := os.WriteFile(unparseableFile, []byte("package unparseable\nfunc Broken({{{"), 0644); err != nil {
+	if err := fileutil.WriteFile(unparseableFile, []byte("package unparseable\nfunc Broken({{{"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	store.objs["BLI-PARSE-ERR"] = map[string]any{
@@ -496,7 +497,7 @@ func Spawn() {
 func doSomething() {}
 `
 	unmanagedFile := filepath.Join(tmpDir, "unmanaged.go")
-	if err := os.WriteFile(unmanagedFile, []byte(unmanagedCode), 0644); err != nil {
+	if err := fileutil.WriteFile(unmanagedFile, []byte(unmanagedCode), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -524,7 +525,7 @@ func SpawnManaged(ctx context.Context) {
 func doSomethingManaged(ctx context.Context) {}
 `
 	managedFile := filepath.Join(tmpDir, "managed.go")
-	if err := os.WriteFile(managedFile, []byte(managedCode), 0644); err != nil {
+	if err := fileutil.WriteFile(managedFile, []byte(managedCode), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	violations, err = auditor.AuditFile(managedFile)
@@ -562,7 +563,7 @@ func TestNewAuditorSigner_KeyReload(t *testing.T) {
 
 	// 3. Corrupt key file
 	corruptPath := filepath.Join(tmpDir, "corrupt.priv")
-	if err := os.WriteFile(corruptPath, []byte("NOT A VALID PEM BLOCK"), 0644); err != nil {
+	if err := fileutil.WriteFile(corruptPath, []byte("NOT A VALID PEM BLOCK"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	// Should generate fresh key rather than failing
@@ -616,7 +617,7 @@ func Extract(m map[string]any) string {
 }
 `
 	srcFile := filepath.Join(tmpDir, "extract.go")
-	if err := os.WriteFile(srcFile, []byte(code), 0644); err != nil {
+	if err := fileutil.WriteFile(srcFile, []byte(code), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 

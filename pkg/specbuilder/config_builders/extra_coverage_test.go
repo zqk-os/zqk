@@ -1,10 +1,11 @@
 package config_builders
 
 import (
-	"github.com/zqk-os/zqk/pkg/paths"
-	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 type dummyConfigBuilder struct {
@@ -142,7 +143,7 @@ func TestConfigGenerator(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected GenerateConfig error: %v", err)
 		}
-		content, err := os.ReadFile(filepath.Join(tempDir, "my_gen_config.yaml"))
+		content, err := fileutil.ReadFile(filepath.Join(tempDir, "my_gen_config.yaml"))
 		if err != nil {
 			t.Fatalf("expected file to exist: %v", err)
 		}
@@ -231,7 +232,7 @@ func TestCodegenHelpers(t *testing.T) {
 	t.Run("GenerateBuilderFromYAML", func(t *testing.T) {
 		tempDir := t.TempDir()
 		yamlPath := filepath.Join(tempDir, "sample_test_config.yaml")
-		_ = os.WriteFile(yamlPath, []byte("version: 1.0.0\nname: test\n"), paths.FilePerm644)
+		_ = fileutil.WriteFile(yamlPath, []byte("version: 1.0.0\nname: test\n"), paths.FilePerm644)
 
 		outDir := filepath.Join(tempDir, "out")
 		err := GenerateBuilderFromYAML(yamlPath, outDir)

@@ -2,11 +2,11 @@ package policy
 
 import (
 	"context"
-	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestFieldKeysGate_Coverage(t *testing.T) {
@@ -32,11 +32,11 @@ func TestFieldKeysGate_Coverage(t *testing.T) {
 
 	// 2. field_keys.go with no keys
 	objectsDir := filepath.Join(tempDir, "pkg", "objects")
-	if err := os.MkdirAll(objectsDir, paths.DirPerm755); err != nil {
+	if err := fileutil.MkdirAll(objectsDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	fkFile := filepath.Join(objectsDir, "field_keys.go")
-	if err := os.WriteFile(fkFile, []byte("// no keys here\npackage objects\n"), paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(fkFile, []byte("// no keys here\npackage objects\n"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -55,7 +55,7 @@ const (
 	FieldKeyStatus = "status"
 )
 `
-	if err := os.WriteFile(fkFile, []byte(validFK), paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(fkFile, []byte(validFK), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -77,7 +77,7 @@ func Foo() {
 	_ = objects.FieldKeyTitle
 }
 `
-	if err := os.WriteFile(cleanFile, []byte(cleanContent), paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(cleanFile, []byte(cleanContent), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -100,7 +100,7 @@ func Bad() {
 	m["title"] = "hello"
 }
 `
-	if err := os.WriteFile(badFile, []byte(badContent), paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(badFile, []byte(badContent), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -169,7 +169,7 @@ func TestGoroutinesGate_ExtendedPatterns(t *testing.T) {
 
 	// 2. Create complex Go file with comments, command strings, nolint
 	pkgDir := filepath.Join(tempDir, "pkg", "worker")
-	if err := os.MkdirAll(pkgDir, paths.DirPerm755); err != nil {
+	if err := fileutil.MkdirAll(pkgDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 
@@ -195,7 +195,7 @@ func Run() {
 }
 `
 	srcFile := filepath.Join(pkgDir, "worker.go")
-	if err := os.WriteFile(srcFile, []byte(code), paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(srcFile, []byte(code), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -252,28 +252,28 @@ func TestStorageBoundariesGate_ExtendedRules(t *testing.T) {
 	graphDir := filepath.Join(tempDir, "pkg", "storage", "graph")
 	extraDir := filepath.Join(tempDir, "pkg", "storage", "extra")
 	for _, d := range []string{walDir, fileDir, graphDir, extraDir} {
-		if err := os.MkdirAll(d, paths.DirPerm755); err != nil {
+		if err := fileutil.MkdirAll(d, paths.DirPerm755); err != nil {
 			t.Fatal(err)
 		}
 	}
 
 	// extra imports root pkg/storage
-	_ = os.WriteFile(filepath.Join(extraDir, "extra.go"), []byte(`package extra
+	_ = fileutil.WriteFile(filepath.Join(extraDir, "extra.go"), []byte(`package extra
 import "github.com/zqk-os/zqk/pkg/storage"
 `), paths.FilePerm644)
 
 	// wal imports file
-	_ = os.WriteFile(filepath.Join(walDir, "wal.go"), []byte(`package wal
+	_ = fileutil.WriteFile(filepath.Join(walDir, "wal.go"), []byte(`package wal
 import "github.com/zqk-os/zqk/pkg/storage/file"
 `), paths.FilePerm644)
 
 	// file imports graph
-	_ = os.WriteFile(filepath.Join(fileDir, "file.go"), []byte(`package file
+	_ = fileutil.WriteFile(filepath.Join(fileDir, "file.go"), []byte(`package file
 import "github.com/zqk-os/zqk/pkg/storage/graph"
 `), paths.FilePerm644)
 
 	// graph imports file
-	_ = os.WriteFile(filepath.Join(graphDir, "graph.go"), []byte(`package graph
+	_ = fileutil.WriteFile(filepath.Join(graphDir, "graph.go"), []byte(`package graph
 import "github.com/zqk-os/zqk/pkg/storage/file"
 `), paths.FilePerm644)
 
