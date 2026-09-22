@@ -70,6 +70,10 @@ func (a *ASTAuditor) AuditFile(path string) ([]Violation, error) {
 			// Heuristic: Flag any string literal longer than 5 chars that isn't in a constant.
 			violations = append(violations, a.auditHardcodedValues(x)...)
 
+		case *ast.FuncDecl:
+			violations = append(violations, a.auditInterfaceUsage(x)...)
+			violations = append(violations, a.auditFunctionComplexity(x)...)
+
 		case *ast.IfStmt:
 			// Rule: Map extraction boilerplate.
 			violations = append(violations, a.auditMapExtractionAntiPattern(x)...)
