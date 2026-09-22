@@ -2,7 +2,7 @@ $schema: "../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json"
 
 object_type: audit_aggregation_metric
 # Five-question exam: docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md
-# TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+# TRACK: kernel-backlog
 statuses:
   - value: conceptual
     display: Conceptual
@@ -19,7 +19,7 @@ statuses:
     origin: false
     # Born-complete metrics must not be preliminary: draft plane has no leave path
     # when origin is also terminal (CAS index / List would never see them).
-    # TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane / promote membrane.
+    # TRACK: kernel-backlog — draft-plane / promote membrane.
     terminal: true
     description: Aggregation metric has been successfully created
     role: terminal

@@ -2,7 +2,7 @@ $schema: "../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json"
 
 object_type: mcp_spec
 # Five-question exam: docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md
-# TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+# TRACK: kernel-backlog
 metadata:
   description: >
     Lifecycle for declarative MCP configuration. Specs are reviewed in draft,

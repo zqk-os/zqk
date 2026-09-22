@@ -2,7 +2,7 @@ $schema: "../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json"
 
 object_type: organization
 # Five-question exam: docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md
-# TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+# TRACK: kernel-backlog
 statuses:
   - value: conceptual
     display: Conceptual

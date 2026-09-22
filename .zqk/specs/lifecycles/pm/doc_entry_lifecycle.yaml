@@ -2,7 +2,7 @@ $schema: "../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json"
 
 object_type: doc_entry
 # Five-question exam: docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md
-# TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+# TRACK: kernel-backlog
 statuses:
   - value: conceptual
     display: Conceptual
@@ -26,7 +26,7 @@ statuses:
     role: realign
     description: "doc entry status 'review' (Review): not yet committed for execution;
       reshape before pickup."
-  # TRACK: BLI-1785723654802038000-b14064bc — published/active are ready (not terminal) so promote can leave review.
+  # TRACK: kernel-backlog — published/active are ready (not terminal) so promote can leave review.
   - value: published
     display: Published
     role: shovel_ready
@@ -126,7 +126,7 @@ transitions:
       - role is halted
       - hop from any occupancy to error
       - system halt; repair before leaving halted
-  # TRACK: BLI-1785723654802038000-b14064bc — recover docs stuck in error (promote skips archive-only edges).
+  # TRACK: kernel-backlog — recover docs stuck in error (promote skips archive-only edges).
   - from: error
     to: review
     description: Recover from system error into review after repair

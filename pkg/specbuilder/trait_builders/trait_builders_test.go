@@ -255,6 +255,7 @@ func TestTraitCodegenHelpers(t *testing.T) {
 			[]string{"inc1"},
 			map[string]any{"obj_k": "v"},
 			map[string]any{"fld_k": "v"},
+			nil,
 			"listable",
 			"v1_0_0",
 			"test_pkg",

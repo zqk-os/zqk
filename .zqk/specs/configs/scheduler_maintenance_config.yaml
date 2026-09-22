@@ -87,7 +87,7 @@ required_jobs:
   # Community SKU does not ship scripts/pre-commit-{lint,policy,integrity}.sh.
   # Those SCH-pre-commit-* jobs are studio-dense; leaving them in required_jobs
   # makes the daemon exit 126 every timer. Templates remain under scripts/scheduler_jobs/
-  # for studio checkouts. TRACK: BLI-1789871626046148000-78991fa7
+  # for local checkouts. TRACK: kernel-backlog
   - id: SCH-cleanup
     job_type: cleanup
     template_file: scripts/scheduler_jobs/cleanup_on_demand.yaml

@@ -456,7 +456,7 @@ fields:
       dependencies: team configuration registry
       observability: "yes"
       origin_lifecycle: mutable
-      purpose: References a team configuration (cellular archetype) for the priority plan pod execution. Required (with persona_refs as alternate) before shovel-ready active / execution-locked — CAP dispatch identity (TRACK BLI-1785915238591238000-619a2f9e).
+      purpose: References a team configuration (cellular archetype) for the priority plan pod execution. Required (with persona_refs as alternate) before shovel-ready active / execution-locked — CAP dispatch identity (TRACK kernel-backlog).
       security: non-sensitive
       system_usage:
         - orchestrator provisioning

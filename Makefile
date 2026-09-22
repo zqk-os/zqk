@@ -79,6 +79,7 @@ codegen: compile-bin
 	@$(BRAND_ENV_PREFIX)_DEV_CODEGEN=1 ./$(BIN) system generate-api-builders --overwrite --allow-degraded
 	@$(BRAND_ENV_PREFIX)_DEV_CODEGEN=1 ./$(BIN) system generate-profile-builders --overwrite --allow-degraded
 	@$(BRAND_ENV_PREFIX)_DEV_CODEGEN=1 ./$(BIN) system generate-lifecycle-builders --overwrite --allow-degraded
+	@$(BRAND_ENV_PREFIX)_DEV_CODEGEN=1 ./$(BIN) system generate-trait-builders --overwrite --allow-degraded
 	@$(BRAND_ENV_PREFIX)_DEV_CODEGEN=1 ./$(BIN) system sync-id-prefixes-from-specs --apply --dry-run=false --allow-degraded
 	-@$(BRAND_ENV_PREFIX)_DEV_CODEGEN=1 ./$(BIN) system sync-glossary-from-specs --apply --dry-run=false --allow-degraded
 	@$(MAKE) bootstrap-archive

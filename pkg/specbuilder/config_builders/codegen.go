@@ -120,9 +120,12 @@ func generateBuilderCode(config map[string]any, fileName, version, packageName, 
 	typeName := toCamelCase(fileName) + "Builder"
 	constructorName := "New" + typeName
 
+	formattedConfig := formatValue(config, 2, packageName, fileName)
+	needsObjects := strings.Contains(formattedConfig, "objects.")
+
 	writeGeneratedConfigBuilderHeader(&buf, sourceYAML)
 	writePackageDeclaration(&buf, packageName)
-	writeImportBlock(&buf, true)
+	writeImportBlock(&buf, needsObjects)
 
 	// Type definition
 	fmt.Fprintf(&buf, "// %s builds the %s config at version %s\n", typeName, fileName, version)
@@ -141,7 +144,7 @@ func generateBuilderCode(config map[string]any, fileName, version, packageName, 
 	// Set config
 	buf.WriteString("\t// Configure the config\n")
 	buf.WriteString("\tbuilder.\n\t\tSetConfig(")
-	buf.WriteString(formatValue(config, 2, packageName, fileName))
+	buf.WriteString(formattedConfig)
 	buf.WriteString(")\n\n")
 
 	buf.WriteString("\treturn builder\n")

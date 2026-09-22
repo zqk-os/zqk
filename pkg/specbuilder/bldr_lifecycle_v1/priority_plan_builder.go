@@ -332,7 +332,7 @@ func (b *PriorityPlanLifecycleBuilder) addPriorityPlanLifecycleData() {
 	b.AddTransition(objects.Transition{
 		From:        "in_progress",
 		To:          "complete",
-		Description: "Complete when all linked backlog items are terminal. Dual edge (manual+auto): promote may take this hop when holds pass; shockwave / lifecycle updater may still auto-complete on last-child. Hot path auto: last linked member → terminal CAS-decrements remaining_open_count on the remaining_open mixin (open_countable); zero applies this YAML hop with no member List. Unset remaining_open_count fail-closes (no member List). Override pplan remove of the last open child uses the same path. TRACK: BLI-CEF-CONTAINER-REMAINING-OPEN-001 First-class promote recipe: docs/architecture/LIFECYCLE_STATUS_ROLES.md § First-class promote.",
+		Description: "Complete when all linked backlog items are terminal. Dual edge (manual+auto): promote may take this hop when holds pass; shockwave / lifecycle updater may still auto-complete on last-child. Hot path auto: last linked member → terminal CAS-decrements remaining_open_count on the remaining_open mixin (open_countable); zero applies this YAML hop with no member List. Unset remaining_open_count fail-closes (no member List). Override pplan remove of the last open child uses the same path. TRACK: kernel-backlog First-class promote recipe: docs/architecture/LIFECYCLE_STATUS_ROLES.md § First-class promote.",
 		Manual:      true,
 		Auto:        true,
 		Preconditions: []string{

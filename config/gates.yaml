@@ -160,8 +160,8 @@ payload:
         - "config/gates.yaml"
     - id: "studio_technical_debt"
       pattern: 'TDE-[0-9]{15,}-[0-9a-fA-F]{8}'
-      message: "studio technical_debt instance id remains in scripts"
-      scope: ["scripts/**"]
+      message: "studio technical_debt instance id remains in scripts or specs"
+      scope: ["scripts/**", ".zqk/specs/**", "pkg/specbuilder/**"]
       exemptions:
         - "scripts/open-core/check-public-release-payload.sh"
         - "scripts/open-core/test-public-release-gates.sh"
@@ -174,15 +174,15 @@ payload:
         - "scripts/open-core/test-public-release-gates.sh"
     - id: "studio_nanos_hex"
       pattern: '[A-Z]{2,12}-[0-9]{15,}-[0-9a-fA-F]{8}'
-      message: "studio nanos-hex kernel object id remains in production cmd, CLI specs, or command builders"
-      scope: ["cmd/**", ".zqk/cli/specs/**", "pkg/cli/bldr_cli_cmd_v1/**"]
+      message: "studio nanos-hex kernel object id remains in production cmd, CLI specs, command builders, specs, or specbuilders"
+      scope: ["cmd/**", ".zqk/cli/specs/**", "pkg/cli/bldr_cli_cmd_v1/**", ".zqk/specs/**", "pkg/specbuilder/**"]
       exemptions:
         - "*_test.go"
         - "scripts/open-core/check-public-release-payload.sh"
     - id: "studio_cef_object_id"
       pattern: '(BLI|REQ|CRIT|TDE)-CEF-'
-      message: "studio CEF kernel object id remains in production cmd or scripts"
-      scope: ["cmd/**", "scripts/**"]
+      message: "studio CEF kernel object id remains in production cmd, scripts, specs, or specbuilders"
+      scope: ["cmd/**", "scripts/**", ".zqk/specs/**", "pkg/specbuilder/**"]
       exemptions:
         - "*_test.go"
         - "scripts/open-core/check-public-release-payload.sh"

@@ -8,7 +8,7 @@ id_prefixes:
 description: |
   Durable record of an audit-event aggregation pass (pending → aggregating → aggregated).
   Complements the scheduler job_type of the same name. Lifecycle: audit_event_aggregation_lifecycle.yaml.
-  TRACK: BLI-CEF-R26-REMAINING-KINDS-001 — was a census lifecycle_orphan (YAML without a spec).
+  TRACK: kernel-backlog — was a census lifecycle_orphan (YAML without a spec).
 fields:
   id:
     checklist:

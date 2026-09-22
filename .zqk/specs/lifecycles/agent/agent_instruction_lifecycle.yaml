@@ -2,7 +2,7 @@ $schema: "../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json"
 
 object_type: agent_instruction
 # Five-question exam: docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md
-# TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+# TRACK: kernel-backlog
 extends: base_lifecycle
 status_mapping:
   approved: approved
@@ -51,7 +51,7 @@ statuses:
     role: terminal
     description: "agent instruction status 'completed' (Completed): ended; no further
       normal execution transitions expected. Flags: terminal."
-  # TRACK: BLI-1785723654802038000-b14064bc — archived used by CAP/history; must be defined (maps to completed in status_mapping).
+  # TRACK: kernel-backlog — archived used by CAP/history; must be defined (maps to completed in status_mapping).
   - value: archived
     display: Archived
     terminal: true

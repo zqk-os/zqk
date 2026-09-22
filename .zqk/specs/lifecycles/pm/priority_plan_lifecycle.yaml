@@ -41,7 +41,7 @@ statuses:
       hop (or seal-to-active) finds work already in flight and all siblings ready-or-later
       (draft-plane siblings skip the lock until they leave exploring/validated). Complete
       children on an active plan mean closeout failed (promote to complete), not a
-      valid parked state. TRACK: BLI-1785439369431933000-f0cccd6c"
+      valid parked state. TRACK: kernel-backlog"
     preconditions:
       - at least one ready backlog_item references this plan via priority_plan_ref
       - all linked backlog_items referencing this plan are ready or later
@@ -275,7 +275,7 @@ transitions:
       CAS-decrements remaining_open_count on the remaining_open mixin (open_countable);
       zero applies this YAML hop with no member List. Unset remaining_open_count fail-closes
       (no member List). Override pplan remove of the last open child uses the same
-      path. TRACK: BLI-CEF-CONTAINER-REMAINING-OPEN-001 First-class promote recipe:
+      path. TRACK: kernel-backlog First-class promote recipe:
       docs/architecture/LIFECYCLE_STATUS_ROLES.md § First-class promote."
     manual: true
     auto: true

@@ -8,7 +8,7 @@ description: |
   Kinds without this trait no-op. The listener updates only itself.
   Not occupiable (claimed_by slot). Not open_countable (remaining_open_count).
   Not auto_status_transitionable (--auto-status).
-  TRACK: POL-ARCH-20260901 / BLI-1786411312347141000-5f3d9063.
+  TRACK: POL-ARCH-20260901 / kernel-backlog.
 category: behavior
 requires: []
 conflicts: []

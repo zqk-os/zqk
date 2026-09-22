@@ -92,6 +92,7 @@ func NewSystemCmd() *cobra.Command {
 			NewGenerateAgentConfigsCmd(),
 			NewGenerateLifecycleBuildersCmd(),
 			NewGenerateProfileBuildersCmd(),
+			NewGenerateTraitBuildersCmd(),
 			NewGenerateConfigBuildersCmd(),
 			NewGenerateAPIBuildersCmd(),
 			NewGenerateCommandBuildersCmd(),

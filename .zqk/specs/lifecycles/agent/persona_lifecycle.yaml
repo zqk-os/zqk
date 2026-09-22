@@ -1,11 +1,11 @@
 $schema: "../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json"
 
-# TRACK: BLI-1785904242062561000-ec024787 — persona lifecycle was missing; CAS gate
+# TRACK: kernel-backlog — persona lifecycle was missing; CAS gate
 # rejected approved/implemented personas ("no lifecycle status meta"). Aligns with
 # base_object statuses used by existing persona instances.
 object_type: persona
 # Five-question exam: docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md
-# TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+# TRACK: kernel-backlog
 extends: base_lifecycle
 statuses:
   - value: conceptual
@@ -102,7 +102,7 @@ transitions:
       - role is halted
       - hop from any occupancy to error
       - system halt; repair before leaving halted
-  # TRACK: BLI-1785723654802038000-b14064bc — recover from error
+  # TRACK: kernel-backlog — recover from error
   - from: error
     to: approved
     description: Recover from system error after repair
