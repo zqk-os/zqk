@@ -3,6 +3,7 @@ package mcp
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -100,6 +101,8 @@ func (a *MCPServerAdapter) Initialize(ctx context.Context, params *InitializePar
 	switch v := result.(type) {
 	case *InitializeResult:
 		return v, nil
+	case InitializeResult:
+		return &v, nil
 	case map[string]any:
 		return mapToStruct[InitializeResult](v)
 	}
@@ -114,6 +117,10 @@ func (a *MCPServerAdapter) NotifyInitialized(ctx context.Context, params *Initia
 		return err
 	}
 	_, err = a.handleNotificationInitialized(ctx, "notifications/initialized", paramsJSON)
+	var sentinel *NotificationSentinel
+	if errors.As(err, &sentinel) {
+		return nil
+	}
 	return err
 }
 
@@ -145,6 +152,8 @@ func (a *MCPServerAdapter) ListTools(ctx context.Context) (*ToolsListResult, err
 	switch v := result.(type) {
 	case *ToolsListResult:
 		return v, nil
+	case ToolsListResult:
+		return &v, nil
 	case map[string]any:
 		return mapToStruct[ToolsListResult](v)
 	}
@@ -196,6 +205,8 @@ func (a *MCPServerAdapter) CallTool(ctx context.Context, params *ToolCallParams)
 	switch v := result.(type) {
 	case *ToolCallResult:
 		return v, nil
+	case ToolCallResult:
+		return &v, nil
 	case map[string]any:
 		return mapToStruct[ToolCallResult](v)
 	}
@@ -228,6 +239,8 @@ func (a *MCPServerAdapter) ListResources(ctx context.Context, params *ResourcesL
 	switch v := result.(type) {
 	case *ResourcesListResult:
 		return v, nil
+	case ResourcesListResult:
+		return &v, nil
 	case map[string]any:
 		return mapToStruct[ResourcesListResult](v)
 	}
@@ -256,6 +269,8 @@ func (a *MCPServerAdapter) GetResource(ctx context.Context, params *ResourceGetP
 	switch v := result.(type) {
 	case *ResourceGetResult:
 		return v, nil
+	case ResourceGetResult:
+		return &v, nil
 	case map[string]any:
 		return mapToStruct[ResourceGetResult](v)
 	}
@@ -279,6 +294,8 @@ func (a *MCPServerAdapter) ListPrompts(ctx context.Context) (*PromptsListResult,
 	switch v := result.(type) {
 	case *PromptsListResult:
 		return v, nil
+	case PromptsListResult:
+		return &v, nil
 	case map[string]any:
 		return mapToStruct[PromptsListResult](v)
 	}
@@ -309,6 +326,8 @@ func (a *MCPServerAdapter) GetPrompt(ctx context.Context, params *PromptGetParam
 	switch v := result.(type) {
 	case *PromptGetResult:
 		return v, nil
+	case PromptGetResult:
+		return &v, nil
 	case map[string]any:
 		return mapToStruct[PromptGetResult](v)
 	}
@@ -332,6 +351,8 @@ func (a *MCPServerAdapter) ListRoots(ctx context.Context) (*RootsListResult, err
 	switch v := result.(type) {
 	case *RootsListResult:
 		return v, nil
+	case RootsListResult:
+		return &v, nil
 	case map[string]any:
 		return mapToStruct[RootsListResult](v)
 	}

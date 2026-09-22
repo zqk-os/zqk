@@ -259,12 +259,14 @@ func CategorizeErrorCode(code int) ErrorCodeCategory {
 	if code >= ErrorCodeRangeStandardStart && code <= ErrorCodeRangeStandardEnd {
 		return ErrorCategoryStandard
 	}
-	// Check client error codes
-	if code >= ErrorCodeRangeClientStart && code <= ErrorCodeRangeClientEnd {
+	// Check client error codes (-32049 to -32000)
+	if (code >= ErrorCodeRangeClientStart && code <= ErrorCodeRangeClientEnd) ||
+		(code >= ErrorCodeRangeClientEnd && code <= ErrorCodeRangeClientStart) {
 		return ErrorCategoryClient
 	}
-	// Check server error codes
-	if code >= ErrorCodeRangeServerStart && code <= ErrorCodeRangeServerEnd {
+	// Check server error codes (-32099 to -32050)
+	if (code >= ErrorCodeRangeServerStart && code <= ErrorCodeRangeServerEnd) ||
+		(code >= ErrorCodeRangeServerEnd && code <= ErrorCodeRangeServerStart) {
 		return ErrorCategoryServer
 	}
 	// Codes between -32604 and -31999 are in the gap between standard and client ranges
