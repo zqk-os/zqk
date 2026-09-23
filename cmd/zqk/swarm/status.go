@@ -40,7 +40,7 @@ func runSwarmStatus(cmd *cobra.Command, args []string) error {
 			return errfmt.Errorf("storage unavailable")
 		}
 
-		payload, err := buildSwarmStatus(ctx, sp, sec)
+		payload, err := BuildSwarmStatus(ctx, sp, sec)
 		if err != nil {
 			logging.FluentEvent(proc.Logger()).Error("swarm status failed", err).Log()
 			return err
@@ -49,7 +49,8 @@ func runSwarmStatus(cmd *cobra.Command, args []string) error {
 	})(cmd, args)
 }
 
-func buildSwarmStatus(ctx context.Context, sp storage.ObjectStorageProvider, sec *pkgctx.SecurityContext) (map[string]any, error) {
+// BuildSwarmStatus compiles the swarm throughput, agent tasks, instructions, and orchestration status.
+func BuildSwarmStatus(ctx context.Context, sp storage.ObjectStorageProvider, sec *pkgctx.SecurityContext) (map[string]any, error) {
 	atkByStatus, atkTotal, err := countByStatus(ctx, sp, sec, objects.KindAgentTask)
 	if err != nil {
 		return nil, err

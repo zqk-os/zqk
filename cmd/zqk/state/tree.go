@@ -272,6 +272,11 @@ type rawStreamRecord struct {
 }
 
 func readRecentJournalMutations(projectRoot string, limit int) []JournalMutation {
+	return ReadRecentJournalMutations(projectRoot, limit)
+}
+
+// ReadRecentJournalMutations reads and aggregates recent mutations across all active kernel streams.
+func ReadRecentJournalMutations(projectRoot string, limit int) []JournalMutation {
 	if projectRoot == "" {
 		return nil
 	}

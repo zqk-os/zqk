@@ -43,6 +43,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/system"
 	testcmd "github.com/zqk-os/zqk/cmd/zqk/test"
 	"github.com/zqk-os/zqk/cmd/zqk/tray"
+	"github.com/zqk-os/zqk/cmd/zqk/ui"
 	"github.com/zqk-os/zqk/cmd/zqk/utility"
 	"github.com/zqk-os/zqk/cmd/zqk/validate"
 	"github.com/zqk-os/zqk/cmd/zqk/vendor"
@@ -309,6 +310,11 @@ func registerCommands() {
 	stateCmdInst := state.NewStateCmd()
 	stateCmdInst.GroupID = "everyday"
 	rootCmd.AddCommand(stateCmdInst)
+
+	// Interactive full-screen terminal mission control
+	uiCmdInst := ui.NewUICmd()
+	uiCmdInst.GroupID = "everyday"
+	rootCmd.AddCommand(uiCmdInst)
 
 	// Executable test case runner and criteria verification
 	testCmdInst := testcmd.NewTestCmd()

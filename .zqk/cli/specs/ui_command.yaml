@@ -1,0 +1,31 @@
+$schema: schemas/command_spec.schema.json
+name: ui
+short: Interactive full-screen terminal mission control
+description: |-
+    Launches an interactive terminal user interface (TUI) for real-time kernel telemetry,
+    state seismograph streaming, swarm inspection, and scheduler monitoring.
+
+      Launch interactive mission control
+      zqk ui
+
+      Launch UI focused on swarm status
+      zqk ui --tab swarm
+aliases:
+    - dashboard
+    - console
+args:
+    type: arbitrary_args
+flags:
+    - name: tab
+      shorthand: "t"
+      type: string
+      default: "seismograph"
+      description: Initial tab to display (seismograph, swarm, objects, scheduler)
+help:
+    examples:
+        - comment: Launch mission control
+          command: '%s ui'
+        - comment: Launch focused on swarm tab
+          command: '%s ui --tab swarm'
+run_e: runUI
+common_flags: true

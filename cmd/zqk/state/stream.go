@@ -232,7 +232,7 @@ func BuildDashboardView(projectRoot string, recent []JournalMutation) string {
 			timeStr = time.Unix(m.CreatedAt, 0).Format("15:04:05")
 		}
 
-		badge := formatEventBadge(m.ChangeType)
+		badge := FormatEventBadge(m.ChangeType)
 		ref := m.ObjectRef
 		if len(ref) > 32 {
 			ref = ref[:29] + "..."
@@ -253,7 +253,8 @@ func BuildDashboardView(projectRoot string, recent []JournalMutation) string {
 	return buf.String()
 }
 
-func formatEventBadge(changeType string) string {
+// FormatEventBadge formats a change/event type into a standardized ANSI badge.
+func FormatEventBadge(changeType string) string {
 	ct := strings.ToUpper(strings.TrimSpace(changeType))
 	switch ct {
 	case "SYSTEM_CONFIG_CHANGE":
@@ -317,7 +318,7 @@ func FormatMutationLine(m JournalMutation) string {
 		timeStr = time.Unix(m.CreatedAt, 0).Format("15:04:05")
 	}
 
-	badge := formatEventBadge(m.ChangeType)
+	badge := FormatEventBadge(m.ChangeType)
 	ref := m.ObjectRef
 	if len(ref) > 36 {
 		ref = ref[:33] + "..."
