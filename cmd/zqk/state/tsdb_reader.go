@@ -1,6 +1,7 @@
 package state
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -12,19 +13,60 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/resourcehygiene"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // TSDBTelemetry holds aggregated performance and operational metrics from the kernel TSDB.
 type TSDBTelemetry struct {
-	TotalPoints   int              `json:"total_points"`
-	TotalFiles    int              `json:"total_files"`
-	DiskSizeBytes int64            `json:"disk_size_bytes"`
-	DiskSizeStr   string           `json:"disk_size_str"`
-	Measurements  []string         `json:"measurements"`
-	JobSummaries  []TSDBJobSummary `json:"job_summaries"`
-	RecentPoints  []TSDBPointView  `json:"recent_points,omitempty"`
-	ChunkStats    TSDBChunkStats   `json:"chunk_stats"`
+	TotalPoints   int                 `json:"total_points"`
+	TotalFiles    int                 `json:"total_files"`
+	DiskSizeBytes int64               `json:"disk_size_bytes"`
+	DiskSizeStr   string              `json:"disk_size_str"`
+	Measurements  []string            `json:"measurements"`
+	JobSummaries  []TSDBJobSummary    `json:"job_summaries"`
+	RecentPoints  []TSDBPointView     `json:"recent_points,omitempty"`
+	ChunkStats    TSDBChunkStats      `json:"chunk_stats"`
+	HygieneStats  TSDBHygieneStats    `json:"hygiene_stats"`
+	TopCommands   []TSDBCommandMetric `json:"top_commands,omitempty"`
+	KindVolumes   []TSDBKindVolume    `json:"kind_volumes,omitempty"`
+	StreamRates   []TSDBStreamRate    `json:"stream_rates,omitempty"`
+}
+
+// TSDBHygieneStats represents Layer 4 storage & resource hygiene vitals.
+type TSDBHygieneStats struct {
+	OpenFileDescriptors int     `json:"open_file_descriptors"`
+	MaxFileDescriptors  int     `json:"max_file_descriptors"`
+	FDUsagePercent      float64 `json:"fd_usage_percent"`
+	TotalStorageFiles   int     `json:"total_storage_files"`
+	TotalStorageBytes   int64   `json:"total_storage_bytes"`
+	StorageSizeStr      string  `json:"storage_size_str"`
+	StaleLocksCount     int     `json:"stale_locks_count"`
+	OrphanedTempCount   int     `json:"orphaned_temp_count"`
+	DraftObjectsCount   int     `json:"draft_objects_count"`
+	Status              string  `json:"status"`
+}
+
+// TSDBCommandMetric represents metrics for a single CLI command.
+type TSDBCommandMetric struct {
+	Command      string  `json:"command"`
+	Invocations  int     `json:"invocations"`
+	Successes    int     `json:"successes"`
+	Failures     int     `json:"failures"`
+	AvgLatencyMs float64 `json:"avg_latency_ms"`
+	LastSeen     string  `json:"last_seen"`
+}
+
+// TSDBKindVolume represents object volume stats for a single kind.
+type TSDBKindVolume struct {
+	Kind         string `json:"kind"`
+	CurrentCount int    `json:"current_count"`
+}
+
+// TSDBStreamRate represents mutation rate for an event stream.
+type TSDBStreamRate struct {
+	StreamName string `json:"stream_name"`
+	TotalFiles int    `json:"total_files"`
 }
 
 // TSDBJobSummary represents time-series aggregates for a single scheduler job.
@@ -76,6 +118,10 @@ func ReadTSDBTelemetry(projectRoot string, since time.Duration, recentLimit int)
 	files, err := fileutil.ReadDir(tsdbDir)
 	if err != nil || len(files) == 0 {
 		readChunkMetrics(projectRoot, telem)
+		readHygieneStats(projectRoot, telem)
+		readCommandMetricsStats(projectRoot, telem)
+		readObjectVolumeStats(projectRoot, telem)
+		readStreamVolumeStats(projectRoot, telem)
 		return telem
 	}
 
@@ -283,8 +329,12 @@ func ReadTSDBTelemetry(projectRoot string, since time.Duration, recentLimit int)
 	}
 	telem.RecentPoints = allRecentPoints
 
-	// Inspect chunk metrics
+	// Inspect chunk metrics, hygiene vitals, commands, object volumes, and streams
 	readChunkMetrics(projectRoot, telem)
+	readHygieneStats(projectRoot, telem)
+	readCommandMetricsStats(projectRoot, telem)
+	readObjectVolumeStats(projectRoot, telem)
+	readStreamVolumeStats(projectRoot, telem)
 
 	return telem
 }
@@ -369,3 +419,173 @@ func formatByteSize(b int64) string {
 	}
 	return fmt.Sprintf("%.2f %cB", float64(b)/float64(div), "KMGTPE"[exp])
 }
+
+func readHygieneStats(projectRoot string, telem *TSDBTelemetry) {
+	ioTel, err := resourcehygiene.InspectIOResources(context.Background(), projectRoot)
+	if err != nil || ioTel == nil {
+		return
+	}
+
+	fdPct := 0.0
+	if ioTel.MaxFileDescriptors > 0 && ioTel.OpenFileDescriptors > 0 {
+		fdPct = (float64(ioTel.OpenFileDescriptors) / float64(ioTel.MaxFileDescriptors)) * 100.0
+	}
+
+	status := "HEALTHY"
+	if ioTel.StaleLocksCount > 0 || ioTel.OrphanedTempCount > 0 || fdPct > 70.0 {
+		status = "ATTENTION"
+	}
+	if fdPct > 90.0 {
+		status = "CRITICAL"
+	}
+
+	draftsCount := 0
+	draftsDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.ObjectDraftsDir)
+	if dEntries, dErr := fileutil.ReadDir(draftsDir); dErr == nil {
+		for _, de := range dEntries {
+			if de.IsDir() {
+				if sub, sErr := fileutil.ReadDir(filepath.Join(draftsDir, de.Name())); sErr == nil {
+					draftsCount += len(sub)
+				}
+			}
+		}
+	}
+
+	telem.HygieneStats = TSDBHygieneStats{
+		OpenFileDescriptors: ioTel.OpenFileDescriptors,
+		MaxFileDescriptors:  ioTel.MaxFileDescriptors,
+		FDUsagePercent:      fdPct,
+		TotalStorageFiles:   int(ioTel.TotalZqkFiles),
+		TotalStorageBytes:   ioTel.TotalZqkBytes,
+		StorageSizeStr:      formatByteSize(ioTel.TotalZqkBytes),
+		StaleLocksCount:     ioTel.StaleLocksCount,
+		OrphanedTempCount:   ioTel.OrphanedTempCount,
+		DraftObjectsCount:   draftsCount,
+		Status:              status,
+	}
+}
+
+type commandMetricsPayload struct {
+	Metrics map[string]struct {
+		Command         string `json:"command"`
+		NormalizedCmd   string `json:"normalized_cmd"`
+		InvocationCount int    `json:"invocation_count"`
+		SuccessCount    int    `json:"success_count"`
+		FailureCount    int    `json:"failure_count"`
+		AvgDuration     int64  `json:"avg_duration"` // nanoseconds
+		LastSeen        string `json:"last_seen"`
+	} `json:"metrics"`
+}
+
+func readCommandMetricsStats(projectRoot string, telem *TSDBTelemetry) {
+	cmdMetricsFile := filepath.Join(projectRoot, paths.ProjectDataDir, "metrics", "command_metrics.json")
+	data, err := fileutil.ReadFile(cmdMetricsFile)
+	if err != nil {
+		return
+	}
+
+	var parsed commandMetricsPayload
+	if err := json.Unmarshal(data, &parsed); err != nil {
+		return
+	}
+
+	cmds := make([]TSDBCommandMetric, 0, len(parsed.Metrics))
+	for _, m := range parsed.Metrics {
+		cmds = append(cmds, TSDBCommandMetric{
+			Command:      m.NormalizedCmd,
+			Invocations:  m.InvocationCount,
+			Successes:    m.SuccessCount,
+			Failures:     m.FailureCount,
+			AvgLatencyMs: float64(m.AvgDuration) / 1e6,
+			LastSeen:     m.LastSeen,
+		})
+	}
+
+	sort.Slice(cmds, func(i, j int) bool {
+		return cmds[i].Invocations > cmds[j].Invocations
+	})
+
+	if len(cmds) > 6 {
+		cmds = cmds[:6]
+	}
+	telem.TopCommands = cmds
+}
+
+func readObjectVolumeStats(projectRoot string, telem *TSDBTelemetry) {
+	processDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.ProcessDir)
+	entries, err := fileutil.ReadDir(processDir)
+	if err != nil {
+		return
+	}
+
+	trackedKinds := map[string]bool{
+		"backlog_item":         true,
+		"priority_plan":        true,
+		"workstream":           true,
+		"requirement":          true,
+		"criteria":             true,
+		"test_case":            true,
+		"doc_entry":            true,
+		"risk_blocker":         true,
+		"technical_debt":       true,
+		"change_journal_entry": true,
+		"audit_event":          true,
+	}
+
+	vols := make([]TSDBKindVolume, 0)
+	for _, e := range entries {
+		if e.IsDir() && trackedKinds[e.Name()] {
+			kDir := filepath.Join(processDir, e.Name())
+			files, fErr := fileutil.ReadDir(kDir)
+			count := 0
+			if fErr == nil {
+				for _, f := range files {
+					if !f.IsDir() && strings.HasSuffix(f.Name(), ".json") {
+						count++
+					}
+				}
+			}
+			vols = append(vols, TSDBKindVolume{
+				Kind:         e.Name(),
+				CurrentCount: count,
+			})
+		}
+	}
+
+	sort.Slice(vols, func(i, j int) bool {
+		return vols[i].CurrentCount > vols[j].CurrentCount
+	})
+
+	telem.KindVolumes = vols
+}
+
+func readStreamVolumeStats(projectRoot string, telem *TSDBTelemetry) {
+	streamsDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.StreamsDir)
+	entries, err := fileutil.ReadDir(streamsDir)
+	if err != nil {
+		return
+	}
+
+	rates := make([]TSDBStreamRate, 0)
+	for _, e := range entries {
+		if e.IsDir() {
+			sDir := filepath.Join(streamsDir, e.Name())
+			files, fErr := fileutil.ReadDir(sDir)
+			fileCount := 0
+			if fErr == nil {
+				fileCount = len(files)
+			}
+			rates = append(rates, TSDBStreamRate{
+				StreamName: e.Name(),
+				TotalFiles: fileCount,
+			})
+		}
+	}
+
+	sort.Slice(rates, func(i, j int) bool {
+		return rates[i].TotalFiles > rates[j].TotalFiles
+	})
+
+	telem.StreamRates = rates
+}
+

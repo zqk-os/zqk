@@ -8,6 +8,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/zqk-os/zqk/cmd/zqk/state"
+	"github.com/zqk-os/zqk/cmd/zqk/ui/tds"
 )
 
 var (
@@ -183,20 +184,16 @@ func renderStateTab(b *strings.Builder, m *UIModel) {
 
 			badge := state.FormatEventBadge(mut.ChangeType)
 			ref := mut.ObjectRef
-			if len(ref) > refW {
-				ref = ref[:refW-3] + "..."
-			}
-
 			summary := mut.DiffSummary
 			if summary == "" {
 				summary = mut.ChangeType
 			}
-			if len(summary) > sumW {
-				summary = summary[:sumW-3] + "..."
-			}
 
-			b.WriteString(fmt.Sprintf("[%s] │ %-*s │ %-*s │ %s\n",
-				tStr, eventW, badge, refW, ref, summary))
+			b.WriteString(fmt.Sprintf("[%s] │ %s │ %s │ %s\n",
+				tStr,
+				tds.PadRight(badge, eventW),
+				tds.PadRight(tds.TruncateVisible(ref, refW, "…"), refW),
+				tds.TruncateVisible(summary, sumW, "…")))
 		}
 	}
 
@@ -520,116 +517,198 @@ func renderMetricsTab(b *strings.Builder, m *UIModel) {
 		w = 80
 	}
 
-	b.WriteString(whiteBold("📊 Knowledge Kernel Telemetry & Resource Hygiene\n"))
-	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
-
-	// Resource Hygiene Indicators
-	h := m.Hygiene
-	b.WriteString(fmt.Sprintf("Resource Hygiene: %s process objects │ %s object kinds │ %s stream files │ %s active stream lanes\n",
-		greenBold(fmt.Sprintf("%d", h.ProcessObjectCount)),
-		whiteBold(fmt.Sprintf("%d", h.KindCount)),
-		cyanBold(fmt.Sprintf("%d", h.StreamFileCount)),
-		yellowBold(fmt.Sprintf("%d", h.ActiveStreams))))
-	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
-
-	// TSDB Telemetry Section
-	if m.TSDB != nil {
-		b.WriteString(whiteBold("Time-Series Database (TSDB) Engine & Performance:\n"))
-		b.WriteString(fmt.Sprintf("  Storage: .zqk/scheduler/tsdb (%s points across %d files, %s) │ Chunk Store: %d chunks (%s)\n",
-			cyanBold(fmt.Sprintf("%d", m.TSDB.TotalPoints)), m.TSDB.TotalFiles, m.TSDB.DiskSizeStr, m.TSDB.ChunkStats.TotalChunks, m.TSDB.ChunkStats.DiskSizeStr))
-
-		if len(m.TSDB.JobSummaries) > 0 {
-			b.WriteString("  " + dim("Job Execution Latency & Reliability (from TSDB):") + "\n")
-			tsdbIDW := 24
-			tsdbRunsW := 5
-			tsdbSuccW := 6
-			tsdbFailW := 5
-			tsdbAvgW := 10
-			tsdbMinMaxW := 16
-			tsdbLastW := 9
-			b.WriteString(fmt.Sprintf("  %-*s │ %-*s │ %-*s │ %-*s │ %-*s │ %-*s │ %-*s │ %s\n",
-				tsdbIDW, "JOB IDENTIFIER", tsdbRunsW, "RUNS", tsdbSuccW, "SUCC", tsdbFailW, "FAIL", tsdbAvgW, "AVG LAT", tsdbMinMaxW, "MIN / MAX", tsdbLastW, "LAST RUN", "LATENCY TREND"))
-			b.WriteString("  " + dim(strings.Repeat("─", w-4)) + "\n")
-
-			limit := 7
-			if len(m.TSDB.JobSummaries) < limit {
-				limit = len(m.TSDB.JobSummaries)
-			}
-			for i := 0; i < limit; i++ {
-				j := m.TSDB.JobSummaries[i]
-				lastRunStr := "--:--:--"
-				if !j.LastRunAt.IsZero() {
-					lastRunStr = j.LastRunAt.Format("15:04:05")
-				}
-				failBadge := fmt.Sprintf("%d", j.Failures)
-				if j.Failures > 0 {
-					failBadge = redBold(failBadge)
-				}
-				displayID := j.JobID
-				if len(displayID) > tsdbIDW {
-					displayID = displayID[:tsdbIDW-3] + "..."
-				}
-				avgStr := formatDurationMs(j.AvgDurationMs)
-				minMaxStr := fmt.Sprintf("%s / %s", formatDurationMs(j.MinDurationMs), formatDurationMs(j.MaxDurationMs))
-
-				b.WriteString(fmt.Sprintf("  %-*s │ %-*d │ %-*d │ %-*s │ %-*s │ %-*s │ %-*s │ %s\n",
-					tsdbIDW, displayID, tsdbRunsW, j.Executions, tsdbSuccW, j.Successes, tsdbFailW, failBadge, tsdbAvgW, avgStr, tsdbMinMaxW, minMaxStr, tsdbLastW, lastRunStr, j.Sparkline))
-			}
+	// 1. System Vitals & Resource Hygiene Card (using TDS Panel)
+	var vitalsLines []string
+	if m.TSDB != nil && m.TSDB.HygieneStats.MaxFileDescriptors > 0 {
+		h := m.TSDB.HygieneStats
+		fdItem := tds.StatItem{
+			Label: "File Descriptors",
+			Value: fmt.Sprintf("%d / %d (%.2f%%)", h.OpenFileDescriptors, h.MaxFileDescriptors, h.FDUsagePercent),
+			Extra: tds.Badge(h.Status),
 		}
-		b.WriteString("\n")
-	}
+		storItem := tds.StatItem{
+			Label: "Storage Volume",
+			Value: h.StorageSizeStr,
+			Extra: dim(fmt.Sprintf("(%d files)", h.TotalStorageFiles)),
+		}
+		vitalsLines = append(vitalsLines, tds.StatRow([]tds.StatItem{fdItem, storItem}, w-4))
 
-	// Command Telemetry
-	b.WriteString(whiteBold("Command Execution Telemetry (command_metric):\n"))
-	if len(m.CommandMetrics) == 0 {
-		b.WriteString(dim("  [No command execution telemetry recorded yet]\n\n"))
+		lockItem := tds.StatItem{
+			Label: "Lock Contention",
+			Value: fmt.Sprintf("%d stale locks", h.StaleLocksCount),
+			Extra: tds.Badge(ternary(h.StaleLocksCount == 0, "HEALTHY", "ATTENTION")),
+		}
+		draftItem := tds.StatItem{
+			Label: "Draft Plane",
+			Value: fmt.Sprintf("%d awaiting crossing", h.DraftObjectsCount),
+			Extra: tds.Badge(ternary(h.DraftObjectsCount == 0, "OK", "PENDING")),
+		}
+		vitalsLines = append(vitalsLines, tds.StatRow([]tds.StatItem{lockItem, draftItem}, w-4))
 	} else {
-		cmdW := 22
-		execW := 8
-		durW := 12
-		lastW := 19
-		b.WriteString(fmt.Sprintf("  %-*s │ %-*s │ %-*s │ %-*s │ %s\n",
-			cmdW, "COMMAND", execW, "CALLS", durW, "DURATION", lastW, "LAST RUN", "STATUS"))
-		b.WriteString("  " + dim(strings.Repeat("─", w-4)) + "\n")
-		for _, cm := range m.CommandMetrics {
-			b.WriteString(fmt.Sprintf("  %-*s │ %-*d │ %-*s │ %-*s │ %s\n",
-				cmdW, cm.CommandName, execW, cm.ExecCount, durW, cm.AvgDuration, lastW, cm.LastRunAt, greenBold(cm.Status)))
+		h := m.Hygiene
+		row1 := tds.StatItem{
+			Label: "Resource Hygiene",
+			Value: fmt.Sprintf("%d process objects", h.ProcessObjectCount),
+			Extra: dim(fmt.Sprintf("(%d kinds)", h.KindCount)),
+		}
+		row2 := tds.StatItem{
+			Label: "Active Streams",
+			Value: fmt.Sprintf("%d lanes", h.ActiveStreams),
+			Extra: dim(fmt.Sprintf("(%d files)", h.StreamFileCount)),
+		}
+		vitalsLines = append(vitalsLines, tds.StatRow([]tds.StatItem{row1, row2}, w-4))
+	}
+	b.WriteString(tds.Panel("📊 Knowledge Kernel Telemetry & Resource Hygiene", vitalsLines, w, tds.BorderRounded))
+	b.WriteString("\n")
+
+	// 2. Kernel Object Volumes (CAS Storage)
+	if m.TSDB != nil && len(m.TSDB.KindVolumes) > 0 {
+		b.WriteString(tds.SectionDivider("KERNEL OBJECT INVENTORY (CAS STORAGE)", w))
+		var items []tds.StatItem
+		for _, kv := range m.TSDB.KindVolumes {
+			items = append(items, tds.StatItem{
+				Label: kv.Kind,
+				Value: fmt.Sprintf("%d", kv.CurrentCount),
+			})
+		}
+		for i := 0; i < len(items); i += 4 {
+			end := i + 4
+			if end > len(items) {
+				end = len(items)
+			}
+			b.WriteString("  " + tds.StatRow(items[i:end], w-4) + "\n")
 		}
 		b.WriteString("\n")
 	}
 
-	// Scheduler Health Telemetry
+	// 3. Stream Ingestion Velocity
+	if m.TSDB != nil && len(m.TSDB.StreamRates) > 0 {
+		b.WriteString(tds.SectionDivider("STREAM INGESTION VOLUME", w))
+		var sItems []tds.StatItem
+		for _, sr := range m.TSDB.StreamRates {
+			sItems = append(sItems, tds.StatItem{
+				Label: sr.StreamName,
+				Value: fmt.Sprintf("%d files", sr.TotalFiles),
+			})
+		}
+		for i := 0; i < len(sItems); i += 3 {
+			end := i + 3
+			if end > len(sItems) {
+				end = len(sItems)
+			}
+			b.WriteString("  " + tds.StatRow(sItems[i:end], w-4) + "\n")
+		}
+		b.WriteString("\n")
+	}
+
+	// 4. CLI Command Velocity
+	if m.TSDB != nil && len(m.TSDB.TopCommands) > 0 {
+		b.WriteString(tds.SectionDivider("TOP CLI COMMAND VELOCITY (command_metrics)", w))
+		cmdTable := tds.NewTable(w).
+			AddColumn("COMMAND", tds.AlignLeft, 24, 0.45).
+			AddColumn("RUNS", tds.AlignRight, 6, 0.12).
+			AddColumn("AVG LATENCY", tds.AlignRight, 10, 0.18).
+			AddColumn("FAILURES", tds.AlignRight, 8, 0.10).
+			AddColumn("STATUS", tds.AlignCenter, 10, 0.15)
+
+		for _, cm := range m.TSDB.TopCommands {
+			errStr := fmt.Sprintf("%d", cm.Failures)
+			stBadge := tds.Badge("PASS")
+			if cm.Failures > 0 {
+				errStr = redBold(errStr)
+				stBadge = tds.Badge("WARN")
+			}
+			cmdTable.AddRow(
+				cm.Command,
+				fmt.Sprintf("%d", cm.Invocations),
+				formatDurationMs(cm.AvgLatencyMs),
+				errStr,
+				stBadge,
+			)
+		}
+		b.WriteString(cmdTable.Render())
+		b.WriteString("\n")
+	} else if len(m.CommandMetrics) > 0 {
+		b.WriteString(tds.SectionDivider("COMMAND EXECUTION TELEMETRY (command_metric)", w))
+		cmdTable := tds.NewTable(w).
+			AddColumn("COMMAND", tds.AlignLeft, 22, 0.35).
+			AddColumn("CALLS", tds.AlignRight, 8, 0.15).
+			AddColumn("DURATION", tds.AlignRight, 12, 0.20).
+			AddColumn("LAST RUN", tds.AlignCenter, 19, 0.30)
+		for _, cm := range m.CommandMetrics {
+			cmdTable.AddRow(
+				cm.CommandName,
+				fmt.Sprintf("%d", cm.ExecCount),
+				cm.AvgDuration,
+				cm.LastRunAt,
+			)
+		}
+		b.WriteString(cmdTable.Render())
+		b.WriteString("\n")
+	}
+
+	// 5. Scheduler Health Telemetry
 	if len(m.SchedulerHealth) > 0 {
-		b.WriteString(whiteBold("Scheduler Health Telemetry (scheduler_health_metric):\n"))
+		b.WriteString(tds.SectionDivider("SCHEDULER HEALTH TELEMETRY (scheduler_health_metric)", w))
 		for _, sh := range m.SchedulerHealth {
 			st := greenBold(sh.Status)
 			if sh.Failures > 0 {
 				st = redBold(fmt.Sprintf("%s (%d failures)", sh.Status, sh.Failures))
 			}
-			b.WriteString(fmt.Sprintf("  • %-16s Status: %s │ Heartbeat: %s │ Total Executions: %d\n",
+			b.WriteString(fmt.Sprintf("  • %-16s Status: %s │ Heartbeat: %s │ Executions: %d\n",
 				sh.ID, st, sh.HeartbeatAt, sh.Executions))
 		}
 		b.WriteString("\n")
 	}
 
-	// Lock & Concurrency Contention
-	if len(m.LockMetrics) > 0 {
-		b.WriteString(whiteBold("Lock & Concurrency Metrics (file_lock_metric):\n"))
-		for _, lm := range m.LockMetrics {
-			b.WriteString(fmt.Sprintf("  • Target Kind: %-18s Contention: %-4d Avg Duration: %-10s Status: %s\n",
-				lm.TargetKind, lm.Contention, lm.Duration, greenBold(lm.Status)))
+	// 6. Scheduler Job Execution Performance & Latency Matrix
+	if m.TSDB != nil && len(m.TSDB.JobSummaries) > 0 {
+		b.WriteString(tds.SectionDivider("SCHEDULER JOB LATENCY & RELIABILITY MATRIX (TSDB)", w))
+		schedTable := tds.NewTable(w).
+			AddColumn("JOB IDENTIFIER", tds.AlignLeft, 22, 0.30).
+			AddColumn("RUNS", tds.AlignRight, 5, 0.08).
+			AddColumn("SUCC", tds.AlignRight, 5, 0.08).
+			AddColumn("FAIL", tds.AlignRight, 5, 0.08).
+			AddColumn("AVG LAT", tds.AlignRight, 9, 0.14).
+			AddColumn("MIN / MAX", tds.AlignRight, 14, 0.16).
+			AddColumn("LAST RUN", tds.AlignCenter, 8, 0.08).
+			AddColumn("TREND", tds.AlignCenter, 8, 0.08)
+
+		limit := 8
+		if len(m.TSDB.JobSummaries) < limit {
+			limit = len(m.TSDB.JobSummaries)
 		}
+		for i := 0; i < limit; i++ {
+			j := m.TSDB.JobSummaries[i]
+			lastRunStr := "--:--:--"
+			if !j.LastRunAt.IsZero() {
+				lastRunStr = j.LastRunAt.Format("15:04:05")
+			}
+			failBadge := fmt.Sprintf("%d", j.Failures)
+			if j.Failures > 0 {
+				failBadge = redBold(failBadge)
+			}
+			schedTable.AddRow(
+				j.JobID,
+				fmt.Sprintf("%d", j.Executions),
+				fmt.Sprintf("%d", j.Successes),
+				failBadge,
+				formatDurationMs(j.AvgDurationMs),
+				fmt.Sprintf("%s / %s", formatDurationMs(j.MinDurationMs), formatDurationMs(j.MaxDurationMs)),
+				lastRunStr,
+				j.Sparkline,
+			)
+		}
+		b.WriteString(schedTable.Render())
 		b.WriteString("\n")
 	}
+}
 
-	// Quality & Aggregation
-	if len(m.QualityMetrics) > 0 {
-		b.WriteString(whiteBold("Quality & Stream Aggregation Metrics:\n"))
-		for _, qm := range m.QualityMetrics {
-			b.WriteString(fmt.Sprintf("  • %-18s Metric: %-16s Value: %-14s Status: %s\n",
-				qm.ID, qm.MetricType, cyanBold(qm.Value), greenBold(qm.Status)))
-		}
+func ternary[T any](cond bool, a, b T) T {
+	if cond {
+		return a
 	}
+	return b
 }
 
 func renderSchedulerTab(b *strings.Builder, m *UIModel) {

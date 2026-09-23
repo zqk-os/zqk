@@ -121,6 +121,80 @@ func FormatTSDBTelemetryText(telem *TSDBTelemetry, sinceStr string) string {
 	fmt.Fprintf(&buf, "Time Window:  %s\n", tsdbYellowBold(windowStr))
 	buf.WriteString("──────────────────────────────────────────────────────────────────────────────────────────\n")
 
+	if telem.HygieneStats.MaxFileDescriptors > 0 {
+		buf.WriteString(tsdbWhiteBold("System Vitals & Resource Hygiene:\n"))
+		fdStatus := tsdbGreenBold("[✓ HEALTHY]")
+		if telem.HygieneStats.Status == "ATTENTION" {
+			fdStatus = tsdbYellowBold("[⚠️ ATTENTION]")
+		} else if telem.HygieneStats.Status == "CRITICAL" {
+			fdStatus = tsdbRedBold("[✗ CRITICAL]")
+		}
+		fmt.Fprintf(&buf, "  File Descriptors: %d / %d (%.2f%%) %s\n",
+			telem.HygieneStats.OpenFileDescriptors, telem.HygieneStats.MaxFileDescriptors,
+			telem.HygieneStats.FDUsagePercent, fdStatus)
+		fmt.Fprintf(&buf, "  Storage Volume:   %s (%d files in .zqk) │ Stale Locks: %d │ Orphaned Temp: %d │ Drafts: %d\n",
+			telem.HygieneStats.StorageSizeStr, telem.HygieneStats.TotalStorageFiles,
+			telem.HygieneStats.StaleLocksCount, telem.HygieneStats.OrphanedTempCount,
+			telem.HygieneStats.DraftObjectsCount)
+		buf.WriteString(tsdbDim(strings.Repeat("─", 90)) + "\n")
+	}
+
+	if len(telem.KindVolumes) > 0 {
+		buf.WriteString(tsdbWhiteBold("Kernel Object Volumes (CAS Storage):\n"))
+		var items []string
+		for _, kv := range telem.KindVolumes {
+			items = append(items, fmt.Sprintf("%s: %s", tsdbDim(kv.Kind), tsdbCyanBold(fmt.Sprintf("%d", kv.CurrentCount))))
+		}
+		for i := 0; i < len(items); i += 4 {
+			end := i + 4
+			if end > len(items) {
+				end = len(items)
+			}
+			buf.WriteString("  " + strings.Join(items[i:end], " │ ") + "\n")
+		}
+		buf.WriteString(tsdbDim(strings.Repeat("─", 90)) + "\n")
+	}
+
+	if len(telem.StreamRates) > 0 {
+		buf.WriteString(tsdbWhiteBold("Active Streams Ingestion Volume:\n"))
+		var sItems []string
+		for _, sr := range telem.StreamRates {
+			sItems = append(sItems, fmt.Sprintf("%s: %s files", tsdbDim(sr.StreamName), tsdbYellowBold(fmt.Sprintf("%d", sr.TotalFiles))))
+		}
+		for i := 0; i < len(sItems); i += 3 {
+			end := i + 3
+			if end > len(sItems) {
+				end = len(sItems)
+			}
+			buf.WriteString("  " + strings.Join(sItems[i:end], " │ ") + "\n")
+		}
+		buf.WriteString(tsdbDim(strings.Repeat("─", 90)) + "\n")
+	}
+
+	if len(telem.TopCommands) > 0 {
+		buf.WriteString(tsdbWhiteBold("CLI Command Velocity (Top Invocations):\n"))
+		cmdColW := 36
+		invColW := 8
+		latColW := 12
+		errColW := 8
+		buf.WriteString(fmt.Sprintf("  %-*s │ %-*s │ %-*s │ %-*s\n",
+			cmdColW, "COMMAND", invColW, "RUNS", latColW, "AVG LATENCY", errColW, "ERRORS"))
+		buf.WriteString("  " + tsdbDim(strings.Repeat("─", cmdColW+invColW+latColW+errColW+9)) + "\n")
+		for _, c := range telem.TopCommands {
+			cName := c.Command
+			if len(cName) > cmdColW {
+				cName = cName[:cmdColW-3] + "..."
+			}
+			errStr := fmt.Sprintf("%d", c.Failures)
+			if c.Failures > 0 {
+				errStr = tsdbRedBold(errStr)
+			}
+			buf.WriteString(fmt.Sprintf("  %-*s │ %-*d │ %-*s │ %-*s\n",
+				cmdColW, cName, invColW, c.Invocations, latColW, formatDurationMs(c.AvgLatencyMs), errColW, errStr))
+		}
+		buf.WriteString(tsdbDim(strings.Repeat("─", 90)) + "\n")
+	}
+
 	if len(telem.JobSummaries) == 0 {
 		buf.WriteString(tsdbDim("  [No scheduler job execution data recorded in the specified window]\n\n"))
 	} else {
