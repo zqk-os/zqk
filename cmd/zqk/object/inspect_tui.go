@@ -18,6 +18,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // ANSI terminal escape control constants.
@@ -66,23 +67,35 @@ type InspectTUIModel struct {
 	SearchBuffer      string
 	DetailModalOpen   bool
 	PolicyStudioOpen  bool
+	EditorProfile     string // "newb", "pro", "jedi"
 	StatusMessage     string
 	StatusExpiresAt   time.Time
 }
 
 // NewInspectTUIModel constructs a new interactive Object Inspector model.
 func NewInspectTUIModel(ctx context.Context, initialKind string, fields, filters []string, sortBy string, sortAsc bool, sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, storageCtx *storage.StorageContext) *InspectTUIModel {
+	profile := "newb"
+	if envProfile := zqkenv.EditorProfile().Get(); envProfile != "" {
+		switch strings.ToLower(envProfile) {
+		case "pro":
+			profile = "pro"
+		case "jedi":
+			profile = "jedi"
+		}
+	}
+
 	m := &InspectTUIModel{
-		Ctx:         ctx,
-		Storage:     sp,
-		SecCtx:      secCtx,
-		StorageCtx:  storageCtx,
-		Fields:      fields,
-		SortBy:      sortBy,
-		SortAsc:     sortAsc,
-		FilterPill:  "all",
-		Width:       100,
-		Height:      30,
+		Ctx:           ctx,
+		Storage:       sp,
+		SecCtx:        secCtx,
+		StorageCtx:    storageCtx,
+		Fields:        fields,
+		SortBy:        sortBy,
+		SortAsc:       sortAsc,
+		FilterPill:    "all",
+		EditorProfile: profile,
+		Width:         100,
+		Height:        30,
 	}
 
 	if m.SortBy == "" {
@@ -98,6 +111,35 @@ func NewInspectTUIModel(ctx context.Context, initialKind string, fields, filters
 	m.DiscoverAvailableKinds(initialKind)
 	m.RefreshObjects()
 	return m
+}
+
+// CycleEditorProfile toggles between newb, pro, and jedi editor profiles.
+func (m *InspectTUIModel) CycleEditorProfile() {
+	switch m.EditorProfile {
+	case "newb", "":
+		m.EditorProfile = "pro"
+		m.SetStatus("Profile: PRO (compact header & property card)", 2*time.Second)
+	case "pro":
+		m.EditorProfile = "jedi"
+		m.SetStatus("Profile: JEDI (zen mode — maximum table view)", 2*time.Second)
+	case "jedi":
+		m.EditorProfile = "newb"
+		m.SetStatus("Profile: NEWB (full help & property card)", 2*time.Second)
+	default:
+		m.EditorProfile = "newb"
+	}
+}
+
+// SetEditorProfile safely sets the profile to a valid preset.
+func (m *InspectTUIModel) SetEditorProfile(profile string) {
+	switch strings.ToLower(profile) {
+	case "pro":
+		m.EditorProfile = "pro"
+	case "jedi":
+		m.EditorProfile = "jedi"
+	default:
+		m.EditorProfile = "newb"
+	}
 }
 
 // DiscoverAvailableKinds populates available kinds from FieldRegistry and known schemas.
@@ -294,28 +336,50 @@ func (m *InspectTUIModel) Render() string {
 
 	var out strings.Builder
 
-	// 1. Top Header Banner
-	bannerTitle := fmt.Sprintf("🔍 ZQK OBJECT INSPECTOR — [Kind: %s] (%d active)", m.ActiveKind, len(m.AllObjects))
-	var headerLines []string
 	filterPillStr := fmt.Sprintf("[%s]", strings.ToUpper(m.FilterPill))
 	sortPillStr := fmt.Sprintf("[%s %s]", m.SortBy, map[bool]string{true: "▲", false: "▼"}[m.SortAsc])
 	searchIndicator := ""
 	if m.SearchQuery != "" {
 		searchIndicator = fmt.Sprintf("  │ Search: '%s'", m.SearchQuery)
 	}
-	statusLine := fmt.Sprintf("Filter: %s  │ Sort: %s%s  │ Match: %d/%d",
-		color.New(color.FgCyan, color.Bold).Sprint(filterPillStr),
-		color.New(color.FgYellow).Sprint(sortPillStr),
-		searchIndicator,
-		len(m.VisibleProjections),
-		len(m.AllObjects),
-	)
-	if m.StatusMessage != "" && time.Now().Before(m.StatusExpiresAt) {
-		statusLine += fmt.Sprintf("  │ %s", color.New(color.FgGreen, color.Bold).Sprint(m.StatusMessage))
+
+	// 1. Top Header Banner based on EditorProfile
+	switch m.EditorProfile {
+	case "jedi":
+		// Jedi mode: completely collapse top header banner unless searching
+	case "pro":
+		proHeader := fmt.Sprintf("🔍 ZQK │ Kind: %s (%d) │ %s %s%s │ %s",
+			m.ActiveKind, len(m.AllObjects),
+			color.New(color.FgCyan, color.Bold).Sprint(filterPillStr),
+			color.New(color.FgYellow).Sprint(sortPillStr),
+			searchIndicator,
+			color.New(color.FgYellow, color.Bold).Sprint("[PRO]"),
+		)
+		if m.StatusMessage != "" && time.Now().Before(m.StatusExpiresAt) {
+			proHeader += fmt.Sprintf(" │ %s", color.New(color.FgGreen, color.Bold).Sprint(m.StatusMessage))
+		}
+		if tds.VisibleWidth(proHeader) > w {
+			proHeader = tds.TruncateVisible(proHeader, w, "")
+		}
+		out.WriteString(tds.PadRight(proHeader, w) + "\n")
+		out.WriteString(dim(strings.Repeat("─", w)) + "\n")
+	default: // "newb"
+		bannerTitle := fmt.Sprintf("🔍 ZQK OBJECT INSPECTOR — [Kind: %s] (%d active)", m.ActiveKind, len(m.AllObjects))
+		var headerLines []string
+		statusLine := fmt.Sprintf("Filter: %s  │ Sort: %s%s  │ Match: %d/%d",
+			color.New(color.FgCyan, color.Bold).Sprint(filterPillStr),
+			color.New(color.FgYellow).Sprint(sortPillStr),
+			searchIndicator,
+			len(m.VisibleProjections),
+			len(m.AllObjects),
+		)
+		if m.StatusMessage != "" && time.Now().Before(m.StatusExpiresAt) {
+			statusLine += fmt.Sprintf("  │ %s", color.New(color.FgGreen, color.Bold).Sprint(m.StatusMessage))
+		}
+		headerLines = append(headerLines, statusLine)
+		out.WriteString(tds.Panel(bannerTitle, headerLines, w, tds.BorderHeavy))
+		out.WriteString("\n")
 	}
-	headerLines = append(headerLines, statusLine)
-	out.WriteString(tds.Panel(bannerTitle, headerLines, w, tds.BorderHeavy))
-	out.WriteString("\n")
 
 	// 2. Drill-Down Detail Modal Overlay
 	if m.DetailModalOpen && m.SelectedIndex < len(m.VisibleProjections) {
@@ -329,10 +393,27 @@ func (m *InspectTUIModel) Render() string {
 		return out.String()
 	}
 
-	// 4. Split Pane: Master Table (top half) + Inspected Object Property Card (bottom half)
-	tableRows := (h - 14) / 2
-	if tableRows < 5 {
-		tableRows = 5
+	// 4. Master Table Height Budgeting by Profile
+	var tableRows int
+	switch m.EditorProfile {
+	case "jedi":
+		tableRows = h - 4
+		if m.IsSearching {
+			tableRows -= 2
+		}
+		if tableRows < 5 {
+			tableRows = 5
+		}
+	case "pro":
+		tableRows = (h - 10) * 2 / 3
+		if tableRows < 6 {
+			tableRows = 6
+		}
+	default: // "newb"
+		tableRows = (h - 14) / 2
+		if tableRows < 5 {
+			tableRows = 5
+		}
 	}
 
 	table := tds.NewTable(w - 2)
@@ -376,26 +457,36 @@ func (m *InspectTUIModel) Render() string {
 	out.WriteString(table.Render())
 	out.WriteString("\n")
 
-	// 5. Lower Pane: Inspected Object Property Card
-	if m.SelectedIndex < len(m.VisibleProjections) {
-		sel := m.VisibleProjections[m.SelectedIndex]
-		out.WriteString(m.renderPropertyCard(sel, w))
-	} else {
-		emptyCard := tds.Panel("INSPECTED OBJECT", []string{"No object selected"}, w, tds.BorderRounded)
-		out.WriteString(emptyCard)
+	// 5. Lower Pane: Inspected Object Property Card (hidden in jedi mode)
+	if m.EditorProfile != "jedi" {
+		if m.SelectedIndex < len(m.VisibleProjections) {
+			sel := m.VisibleProjections[m.SelectedIndex]
+			out.WriteString(m.renderPropertyCard(sel, w))
+		} else {
+			emptyCard := tds.Panel("INSPECTED OBJECT", []string{"No object selected"}, w, tds.BorderRounded)
+			out.WriteString(emptyCard)
+		}
+		out.WriteString("\n")
 	}
-	out.WriteString("\n")
 
-	// 6. Inline Search Prompt (if active)
+	// 6. Navigation Key Help Bar / Search Prompt
 	if m.IsSearching {
 		prompt := fmt.Sprintf("🔍 Search regex/substring: %s█  (Press [Enter] to apply, [Esc] to cancel)", m.SearchBuffer)
 		out.WriteString(color.New(color.FgCyan, color.Bold).Sprint(prompt))
 		out.WriteString("\n")
 	} else {
-		// Navigation Key Help Bar
-		helpBar := "Nav: [Tab] Kind │ [j/k] Select │ [g/G] Top/Bottom │ [f] Filter │ [s] Sort │ [/] Search │ [Enter] Drill-down │ [p] Policy │ [q] Quit"
-		out.WriteString(color.New(color.Faint).Sprint(helpBar))
-		out.WriteString("\n")
+		switch m.EditorProfile {
+		case "jedi":
+			// Zen mode: no footer help bar
+		case "pro":
+			helpBar := "Nav: [Tab] Kind │ [j/k/g/G] Select │ [/] Search │ [Enter] Drill-down │ [z/?] jedi │ [q] Quit"
+			out.WriteString(color.New(color.Faint).Sprint(helpBar))
+			out.WriteString("\n")
+		default: // "newb"
+			helpBar := "Nav: [Tab] Kind │ [j/k] Select │ [g/G] Top/Bottom │ [f] Filter │ [s] Sort │ [/] Search │ [Enter] Drill-down │ [p] Policy │ [z/?] Profile (newb) │ [q] Quit"
+			out.WriteString(color.New(color.Faint).Sprint(helpBar))
+			out.WriteString("\n")
+		}
 	}
 
 	return out.String()
@@ -618,6 +709,8 @@ func (m *InspectTUIModel) HandleInput(key []byte) bool {
 			m.CycleSort()
 		case 'p', 'P': // Toggle Policy Studio
 			m.PolicyStudioOpen = !m.PolicyStudioOpen
+		case 'z', 'Z', '?': // Cycle editor profile: newb -> pro -> jedi
+			m.CycleEditorProfile()
 		case 'r', 'R': // Force refresh
 			m.RefreshObjects()
 			m.SetStatus("Refreshed object list", 2*time.Second)
@@ -794,4 +887,8 @@ func writeInspectScreen(s string) {
 	}
 	buf.WriteString(ansiClearToBottom)
 	_, _ = os.Stdout.WriteString(buf.String())
+}
+
+func dim(s string) string {
+	return color.New(color.Faint).Sprint(s)
 }

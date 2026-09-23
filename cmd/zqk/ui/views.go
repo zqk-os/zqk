@@ -30,77 +30,102 @@ func Render(m *UIModel) string {
 		return renderDetailModal(m)
 	}
 
-	var b strings.Builder
+	var headerBuf strings.Builder
+	renderHeader(&headerBuf, m)
 
-	// Top Navigation Header
-	renderHeader(&b, m)
-
-	// Tab-Specific Body
+	var bodyBuf strings.Builder
 	switch m.ActiveTab {
 	case TabState:
-		renderStateTab(&b, m)
+		renderStateTab(&bodyBuf, m)
 	case TabAudit:
-		renderAuditTab(&b, m)
+		renderAuditTab(&bodyBuf, m)
 	case TabSwarm:
-		renderSwarmTab(&b, m)
+		renderSwarmTab(&bodyBuf, m)
 	case TabPM:
-		renderPMTab(&b, m)
+		renderPMTab(&bodyBuf, m)
 	case TabMetrics:
-		renderMetricsTab(&b, m)
+		renderMetricsTab(&bodyBuf, m)
 	case TabScheduler:
-		renderSchedulerTab(&b, m)
+		renderSchedulerTab(&bodyBuf, m)
 	case TabQA:
-		renderQATab(&b, m)
+		renderQATab(&bodyBuf, m)
 	case TabHealth:
-		renderHealthTab(&b, m)
+		renderHealthTab(&bodyBuf, m)
 	default:
-		renderStateTab(&b, m)
+		renderStateTab(&bodyBuf, m)
 	}
 
-	// Bottom Status & Help Bar
-	renderFooter(&b, m)
+	var footerBuf strings.Builder
+	renderFooter(&footerBuf, m)
 
-	rendered := b.String()
+	headerStr := headerBuf.String()
+	bodyStr := bodyBuf.String()
+	footerStr := footerBuf.String()
+
 	if m.Height > 0 {
-		lines := strings.Split(rendered, "\n")
-		if len(lines) > 0 && lines[len(lines)-1] == "" {
-			lines = lines[:len(lines)-1]
+		var headerLines []string
+		if len(headerStr) > 0 {
+			headerLines = strings.Split(headerStr, "\n")
+			if len(headerLines) > 0 && headerLines[len(headerLines)-1] == "" {
+				headerLines = headerLines[:len(headerLines)-1]
+			}
 		}
-		if len(lines) > m.Height {
-			// Keep header (first 7 lines: box + tabs + dynamic message, or 9 lines if search is active) and footer (last 3 lines), clamp middle with scroll offset
-			if m.Height >= 11 {
-				keepTop := 7
-				if m.IsSearching || m.SearchQuery != "" {
-					keepTop = 9
-				}
-				keepBottom := 3
-				middleBudget := m.Height - keepTop - keepBottom
-				middleLines := lines[keepTop : len(lines)-keepBottom]
-				if len(middleLines) > middleBudget {
-					// Use ScrollOffset if applicable
-					start := 0
-					if m.ScrollOffset > 0 {
-						start = m.ScrollOffset
-						if start > len(middleLines)-middleBudget {
-							start = len(middleLines) - middleBudget
-						}
-					}
-					end := start + middleBudget
-					if end > len(middleLines) {
-						end = len(middleLines)
-					}
-					truncatedLines := make([]string, 0, m.Height)
-					truncatedLines = append(truncatedLines, lines[:keepTop]...)
-					truncatedLines = append(truncatedLines, middleLines[start:end]...)
-					truncatedLines = append(truncatedLines, lines[len(lines)-keepBottom:]...)
-					return strings.Join(truncatedLines, "\n")
+
+		var footerLines []string
+		if len(footerStr) > 0 {
+			footerLines = strings.Split(footerStr, "\n")
+			if len(footerLines) > 0 && footerLines[len(footerLines)-1] == "" {
+				footerLines = footerLines[:len(footerLines)-1]
+			}
+		}
+
+		var bodyLines []string
+		if len(bodyStr) > 0 {
+			bodyLines = strings.Split(bodyStr, "\n")
+			if len(bodyLines) > 0 && bodyLines[len(bodyLines)-1] == "" {
+				bodyLines = bodyLines[:len(bodyLines)-1]
+			}
+		}
+
+		keepTop := len(headerLines)
+		keepBottom := len(footerLines)
+		middleBudget := m.Height - keepTop - keepBottom
+		if middleBudget < 1 {
+			middleBudget = 1
+		}
+
+		if len(bodyLines) > middleBudget {
+			start := 0
+			if m.ScrollOffset > 0 {
+				start = m.ScrollOffset
+				if start > len(bodyLines)-middleBudget {
+					start = len(bodyLines) - middleBudget
 				}
 			}
-			return strings.Join(lines[:m.Height], "\n")
+			end := start + middleBudget
+			if end > len(bodyLines) {
+				end = len(bodyLines)
+			}
+			middleLines := bodyLines[start:end]
+
+			var resultLines []string
+			resultLines = append(resultLines, headerLines...)
+			resultLines = append(resultLines, middleLines...)
+			resultLines = append(resultLines, footerLines...)
+			return strings.Join(resultLines, "\n")
 		}
+
+		var resultLines []string
+		resultLines = append(resultLines, headerLines...)
+		resultLines = append(resultLines, bodyLines...)
+		resultLines = append(resultLines, footerLines...)
+		if len(resultLines) > m.Height {
+			resultLines = resultLines[:m.Height]
+		}
+		return strings.Join(resultLines, "\n")
 	}
 
-	return rendered
+	return headerStr + bodyStr + footerStr
 }
 
 func renderHeader(b *strings.Builder, m *UIModel) {
@@ -109,17 +134,14 @@ func renderHeader(b *strings.Builder, m *UIModel) {
 		w = 80
 	}
 
-	b.WriteString("╔" + strings.Repeat("═", w-2) + "╗\n")
-	title := "⚡ ZQK KNOWLEDGE KERNEL — MISSION CONTROL CONSOLE"
-	innerW := w - 2
-	if tds.VisibleWidth(title) > innerW-2 {
-		title = tds.TruncateVisible(title, innerW-4, "…")
+	// 1. Jedi (Zen) Mode: collapse double-box banner, tabs, and dynamic message bar.
+	// Only render interactive search prompts when search is actively engaged or filtered.
+	if m.EditorProfile == ProfileJedi {
+		renderSearchBar(b, m, w)
+		return
 	}
-	titleFormatted := cyanBold(title)
-	b.WriteString("║" + tds.PadCenter(titleFormatted, innerW) + "║\n")
-	b.WriteString("╚" + strings.Repeat("═", w-2) + "╝\n")
 
-	// Tabs Bar (8 tabs) with responsive width adapting
+	// Helper for building tab buttons
 	type tabEntry struct {
 		idx     int
 		full    string
@@ -158,6 +180,42 @@ func renderHeader(b *strings.Builder, m *UIModel) {
 		return strings.Join(tabStrs, sep)
 	}
 
+	// 2. Pro Mode: compact 1-line top title + tab bar + profile tag
+	if m.EditorProfile == ProfilePro {
+		var tabLine string
+		if w >= 115 {
+			tabLine = buildTabLine("full", "│")
+		} else if w >= 90 {
+			tabLine = buildTabLine("tight", "│")
+		} else {
+			tabLine = buildTabLine("compact", "│")
+		}
+
+		proHeader := cyanBold("⚡ ZQK") + " " + yellowBold("[PRO]") + " │ " + tabLine
+		if tds.VisibleWidth(proHeader) > w {
+			proHeader = tds.TruncateVisible(proHeader, w, "")
+		}
+		b.WriteString(tds.PadRight(proHeader, w) + "\n")
+		b.WriteString(dim(strings.Repeat("─", w)) + "\n")
+
+		renderDynamicMessage(b, m, w)
+		b.WriteString(dim(strings.Repeat("─", w)) + "\n")
+
+		renderSearchBar(b, m, w)
+		return
+	}
+
+	// 3. Newb Mode (Default): full decorative double-box banner + full tabs bar
+	b.WriteString("╔" + strings.Repeat("═", w-2) + "╗\n")
+	title := "⚡ ZQK KNOWLEDGE KERNEL — MISSION CONTROL CONSOLE"
+	innerW := w - 2
+	if tds.VisibleWidth(title) > innerW-2 {
+		title = tds.TruncateVisible(title, innerW-4, "…")
+	}
+	titleFormatted := cyanBold(title)
+	b.WriteString("║" + tds.PadCenter(titleFormatted, innerW) + "║\n")
+	b.WriteString("╚" + strings.Repeat("═", w-2) + "╝\n")
+
 	var tabLine string
 	if w >= 120 {
 		tabLine = buildTabLine("full", " │ ")
@@ -174,7 +232,13 @@ func renderHeader(b *strings.Builder, m *UIModel) {
 	b.WriteString(tds.PadRight(tabLine, w) + "\n")
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 
-	// Dynamic Message Bar (Viewable across any tab)
+	renderDynamicMessage(b, m, w)
+	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
+
+	renderSearchBar(b, m, w)
+}
+
+func renderDynamicMessage(b *strings.Builder, m *UIModel, w int) {
 	msg := m.DynamicMessage
 	if msg == "" {
 		msg = "System operating normally — ambient telemetry stream active"
@@ -203,9 +267,9 @@ func renderHeader(b *strings.Builder, m *UIModel) {
 		dynamicLine = tds.TruncateVisible(dynamicLine, w, "")
 	}
 	b.WriteString(tds.PadRight(dynamicLine, w) + "\n")
-	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
+}
 
-	// Interactive Search Bar / Filter Indicator
+func renderSearchBar(b *strings.Builder, m *UIModel, w int) {
 	if m.IsSearching {
 		searchPrompt := cyanBold("🔍 SEARCH: ") + "[/" + whiteBold(m.SearchBuffer) + cyanBold("█") + "]" + dim("  (Press Enter to lock search, Esc to cancel)")
 		if tds.VisibleWidth(searchPrompt) > w {
@@ -277,7 +341,7 @@ func renderStateTab(b *strings.Builder, m *UIModel) {
 		timeW, "TIME", eventW, "EVENT", refW, "OBJECT REF", "SUMMARY / DIFF"))
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 
-	availRows := m.Height - 12
+	availRows := m.Height - 12 + m.ProfileSpacingBonus()
 	if availRows < 6 {
 		availRows = 6
 	}
@@ -402,7 +466,7 @@ func renderAuditTab(b *strings.Builder, m *UIModel) {
 		timeW, "TIME", actorW, "ACTOR", opW, "OPERATION", refW, "OBJECT REF", "DETAILS / PAYLOAD"))
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 
-	availRows := m.Height - 12
+	availRows := m.Height - 12 + m.ProfileSpacingBonus()
 	if availRows < 6 {
 		availRows = 6
 	}
@@ -585,6 +649,8 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 		greenBold("Done"), bs.Done,
 		greenBold(fmt.Sprintf("%d", bs.Claimed))))
 
+	effectiveHeight := m.Height + m.ProfileSpacingBonus()
+
 	// 2. Priority Plans Table
 	if len(m.PriorityPlans) > 0 {
 		b.WriteString(tds.SectionDivider("ACTIVE PRIORITY PLANS", w))
@@ -596,7 +662,7 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 			AddColumn("TITLE", tds.AlignLeft, 24, 0.38)
 
 		limit := 1
-		if m.Height >= 40 {
+		if effectiveHeight >= 40 {
 			limit = 2
 		}
 		if len(m.PriorityPlans) < limit {
@@ -633,7 +699,7 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 			AddColumn("TITLE", tds.AlignLeft, 30, 0.54)
 
 		limit := 1
-		if m.Height >= 40 {
+		if effectiveHeight >= 40 {
 			limit = 2
 		}
 		if len(m.Blockers) < limit {
@@ -671,9 +737,9 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 			AddColumn("TITLE", tds.AlignLeft, 25, 0.40)
 
 		bliLimit := 3
-		if m.Height >= 40 {
+		if effectiveHeight >= 40 {
 			bliLimit = 6
-		} else if m.Height >= 32 {
+		} else if effectiveHeight >= 32 {
 			bliLimit = 4
 		}
 		if len(backlog) < bliLimit {
@@ -734,9 +800,9 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 			AddColumn("TITLE", tds.AlignLeft, 26, 0.50)
 
 		debtLimit := 2
-		if m.Height >= 40 {
+		if effectiveHeight >= 40 {
 			debtLimit = 4
-		} else if m.Height >= 32 {
+		} else if effectiveHeight >= 32 {
 			debtLimit = 3
 		}
 		if len(debt) < debtLimit {
@@ -1016,7 +1082,7 @@ func renderSchedulerTab(b *strings.Builder, m *UIModel) {
 		AddColumn("NEXT RUN", tds.AlignCenter, 19, 0.20).
 		AddColumn("STATUS", tds.AlignCenter, 10, 0.10)
 
-	availRows := m.Height - 12
+	availRows := m.Height - 12 + m.ProfileSpacingBonus()
 	if availRows < 6 {
 		availRows = 6
 	}
@@ -1073,12 +1139,55 @@ func renderSchedulerTab(b *strings.Builder, m *UIModel) {
 }
 
 func renderFooter(b *strings.Builder, m *UIModel) {
+	// 1. Jedi (Zen) Mode: collapse footer completely to maximize terminal data space
+	if m.EditorProfile == ProfileJedi {
+		return
+	}
+
 	w := m.Width
 	if w < 70 {
 		w = 80
 	}
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 
+	triggerActionHint := "[Keys] Action"
+	if m.ActiveTab == TabScheduler {
+		triggerActionHint = "[t/d] Trigger Job"
+	}
+
+	// 2. Pro Mode: compact single-line help bar
+	if m.EditorProfile == ProfilePro {
+		var proNavLine string
+		if w >= 115 {
+			proNavLine = whiteBold("[1-8/Tab]") + " Nav  " +
+				whiteBold("[j/k]") + " Select  " +
+				whiteBold("[g/G]") + " Top/Bot  " +
+				whiteBold("[/]") + " Search  " +
+				whiteBold("[Enter]") + " Inspect  " +
+				whiteBold(triggerActionHint) + "  " +
+				whiteBold("[z/?]") + " Profile (pro)  " +
+				whiteBold("[q]") + " Exit"
+		} else if w >= 85 {
+			proNavLine = whiteBold("[1-8]") + " Nav  " +
+				whiteBold("[j/k]") + " Select  " +
+				whiteBold("[/]") + " Search  " +
+				whiteBold("[Enter]") + " Inspect  " +
+				whiteBold("[z/?]") + " Profile (pro)  " +
+				whiteBold("[q]") + " Exit"
+		} else {
+			proNavLine = whiteBold("[1-8]") + " Nav  " +
+				whiteBold("[j/k]") + " Select  " +
+				whiteBold("[Enter]") + " Inspect  " +
+				whiteBold("[q]") + " Exit"
+		}
+		if tds.VisibleWidth(proNavLine) > w {
+			proNavLine = tds.TruncateVisible(proNavLine, w, "")
+		}
+		b.WriteString(tds.PadRight(proNavLine, w) + "\n")
+		return
+	}
+
+	// 3. Newb Mode: full multi-line legend + detailed navigation shortcuts
 	var legendLine string
 	if w >= 115 {
 		legendLine = dim("Legend: ") + "⚡ State │ 📜 Audit │ 🤖 Swarm │ 📋 PM │ 📊 Metrics │ ⏱️ Sched │ 🧪 QA │ 🛡️ Health/Actions"
@@ -1092,11 +1201,6 @@ func renderFooter(b *strings.Builder, m *UIModel) {
 	}
 	b.WriteString(tds.PadRight(legendLine, w) + "\n")
 
-	triggerActionHint := "[Keys] Action"
-	if m.ActiveTab == TabScheduler {
-		triggerActionHint = "[t/d] Trigger Job"
-	}
-
 	var navLine string
 	if w >= 120 {
 		navLine = whiteBold("[Tab/1-8]") + " Switch View  " +
@@ -1105,6 +1209,7 @@ func renderFooter(b *strings.Builder, m *UIModel) {
 			whiteBold("[/]") + " Search  " +
 			whiteBold("[Enter]") + " Inspect  " +
 			whiteBold(triggerActionHint) + "  " +
+			whiteBold("[z/?]") + " Profile (newb)  " +
 			whiteBold("[Space]") + " Pause  " +
 			whiteBold("[r]") + " Refresh  " +
 			whiteBold("[q/Esc]") + " Exit"
@@ -1114,12 +1219,14 @@ func renderFooter(b *strings.Builder, m *UIModel) {
 			whiteBold("[/]") + " Search  " +
 			whiteBold("[Enter]") + " Inspect  " +
 			whiteBold(triggerActionHint) + "  " +
+			whiteBold("[z/?]") + " Profile (newb)  " +
 			whiteBold("[r]") + " Refresh  " +
 			whiteBold("[q]") + " Exit"
 	} else {
 		navLine = whiteBold("[Tab]") + " Nav  " +
 			whiteBold("[↑/↓]") + " Select  " +
 			whiteBold("[Enter]") + " Inspect  " +
+			whiteBold("[z]") + " Mode  " +
 			whiteBold("[q]") + " Exit"
 	}
 	if tds.VisibleWidth(navLine) > w {
@@ -1271,7 +1378,7 @@ func renderQATab(b *strings.Builder, m *UIModel) {
 		AddColumn("CRITERIA", tds.AlignCenter, 12, 0.14).
 		AddColumn("TITLE", tds.AlignLeft, 26, 0.44)
 
-	availRows := m.Height - 16
+	availRows := m.Height - 16 + m.ProfileSpacingBonus()
 	if availRows < 4 {
 		availRows = 4
 	}
@@ -1527,7 +1634,7 @@ func renderHealthTab(b *strings.Builder, m *UIModel) {
 		AddColumn("OBJECT ID", tds.AlignLeft, 16, 0.20).
 		AddColumn("MESSAGE", tds.AlignLeft, 30, 0.44)
 
-	availRows := m.Height - 20
+	availRows := m.Height - 20 + m.ProfileSpacingBonus()
 	if availRows < 4 {
 		availRows = 4
 	}

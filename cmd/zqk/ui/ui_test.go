@@ -972,5 +972,82 @@ func TestUI_InlineSearch_FilteringAndUnwinding(t *testing.T) {
 	assert.True(t, shouldExit, "Esc with clean state should exit UI")
 }
 
+func TestUI_EditorProfiles_NewbProJedi(t *testing.T) {
+	m := NewUIModel("", "state")
+	assert.Equal(t, ProfileNewb, m.EditorProfile, "default profile should be newb")
+	assert.Equal(t, 0, m.ProfileSpacingBonus())
+
+	// 1. Cycle to Pro
+	m.CycleEditorProfile()
+	assert.Equal(t, ProfilePro, m.EditorProfile)
+	assert.Equal(t, 5, m.ProfileSpacingBonus())
+	assert.Contains(t, m.DynamicMessage, "PRO")
+
+	// 2. Cycle to Jedi
+	m.CycleEditorProfile()
+	assert.Equal(t, ProfileJedi, m.EditorProfile)
+	assert.Equal(t, 10, m.ProfileSpacingBonus())
+	assert.Contains(t, m.DynamicMessage, "JEDI")
+
+	// 3. Cycle to Newb
+	m.CycleEditorProfile()
+	assert.Equal(t, ProfileNewb, m.EditorProfile)
+	assert.Equal(t, 0, m.ProfileSpacingBonus())
+	assert.Contains(t, m.DynamicMessage, "NEWB")
+
+	// 4. Test keypresses 'z', 'Z', '?'
+	handleInput(m, []byte{'z'})
+	assert.Equal(t, ProfilePro, m.EditorProfile, "'z' should cycle to pro")
+
+	handleInput(m, []byte{'Z'})
+	assert.Equal(t, ProfileJedi, m.EditorProfile, "'Z' should cycle to jedi")
+
+	handleInput(m, []byte{'?'})
+	assert.Equal(t, ProfileNewb, m.EditorProfile, "'?' should cycle to newb")
+
+	// 5. Test SetEditorProfile
+	m.SetEditorProfile("pro")
+	assert.Equal(t, ProfilePro, m.EditorProfile)
+	m.SetEditorProfile("jedi")
+	assert.Equal(t, ProfileJedi, m.EditorProfile)
+	m.SetEditorProfile("invalid")
+	assert.Equal(t, ProfileNewb, m.EditorProfile)
+
+	// 6. Test Render in Newb Mode
+	m.SetEditorProfile(ProfileNewb)
+	m.Width = 140
+	m.Height = 30
+	renderedNewb := Render(m)
+	assert.Contains(t, renderedNewb, "╔═════")
+	assert.Contains(t, renderedNewb, "⚡ ZQK KNOWLEDGE KERNEL — MISSION CONTROL CONSOLE")
+	assert.Contains(t, renderedNewb, "Legend:")
+	assert.Contains(t, renderedNewb, "Profile (newb)")
+
+	// 7. Test Render in Pro Mode
+	m.SetEditorProfile(ProfilePro)
+	renderedPro := Render(m)
+	assert.NotContains(t, renderedPro, "╔═════════")
+	assert.Contains(t, renderedPro, "[PRO]")
+	assert.NotContains(t, renderedPro, "Legend:")
+	assert.Contains(t, renderedPro, "Profile (pro)")
+
+	// 8. Test Render in Jedi (Zen) Mode
+	m.SetEditorProfile(ProfileJedi)
+	renderedJedi := Render(m)
+	assert.NotContains(t, renderedJedi, "╔═════════")
+	assert.NotContains(t, renderedJedi, "⚡ ZQK KNOWLEDGE KERNEL")
+	assert.NotContains(t, renderedJedi, "Legend:")
+	assert.NotContains(t, renderedJedi, "Switch View")
+	assert.NotContains(t, renderedJedi, "[q/Esc] Exit")
+
+	// 9. In Jedi Mode, search prompt MUST still render when active
+	m.IsSearching = true
+	m.SearchBuffer = "error"
+	renderedJediSearch := Render(m)
+	assert.Contains(t, renderedJediSearch, "SEARCH:")
+	assert.Contains(t, renderedJediSearch, "error")
+}
+
+
 
 

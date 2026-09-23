@@ -376,6 +376,9 @@ func handleInput(m *UIModel, key []byte) bool {
 			if m.AutoScroll {
 				m.ScrollOffset = 0
 			}
+		case 'z', 'Z', '?': // Cycle editor profile: newb -> pro -> jedi
+			m.CycleEditorProfile()
+			_, _ = os.Stdout.WriteString(AnsiClearScreen)
 		case 'r', 'R': // Force refresh
 			ctx := context.Background()
 			m.RefreshMutations()
