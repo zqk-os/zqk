@@ -1,0 +1,28 @@
+$schema: ../schemas/command_spec.schema.json
+name: export
+short: Export knowledge graph into W3C Holon DataBook or RDF format
+description: Export knowledge kernel objects into standard W3C Holon DataBook (JSON-LD) or RDF Turtle format.
+args:
+    type: no_args
+flags:
+    - name: format
+      shorthand: f
+      type: string
+      default: databook
+      description: "Export format: databook (JSON-LD), turtle (RDF), or json-ld"
+    - name: kind
+      shorthand: k
+      type: string
+      description: Filter exported objects by kind (optional)
+    - name: output
+      shorthand: o
+      type: string
+      description: Write output to file path instead of stdout
+help:
+    examples:
+        - comment: Export all objects as W3C Holon DataBook
+          command: zqk graph export
+        - comment: Export objects as W3C RDF Turtle
+          command: zqk graph export --format turtle
+run_e: runExport
+common_flags: true

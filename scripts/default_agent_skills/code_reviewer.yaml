@@ -1,0 +1,22 @@
+kind: agent_skill
+schema_version: "2.0.0"
+id: ASK-SYSTEM-CODE-REVIEWER
+title: Automated Code Review and Structural Integrity
+status: approved
+provider: zqk
+instructions_summary: Automated diff inspection, structural AST validation, and regression risk analysis.
+instructions: |
+  # System Code Reviewer Skill
+
+  ## Objective
+  Perform comprehensive structural and architectural reviews on proposed changes before merge.
+
+  ## Review Checklist
+  1. **AST & Boundary Conformance**:
+     - Verify no direct mutations of internal process directories.
+     - Validate that public interfaces respect fail-closed invariants.
+  2. **Test Traceability**:
+     - Ensure all modified packages include unit tests covering both positive and negative cases.
+     - Verify that criteria and test case objects are updated to reflect the new capabilities.
+  3. **Resource Hygiene**:
+     - Check that all file descriptors, network connections, and channels are cleanly deferred or pooled.

@@ -1,0 +1,22 @@
+kind: agent_skill
+schema_version: "2.0.0"
+id: ASK-SYSTEM-SECURITY-LINTER
+title: Security and Boundary Invariant Linting
+status: approved
+provider: zqk
+instructions_summary: Hardcoded path/permission checking, credential leaks, and CPCP boundary validation.
+instructions: |
+  # System Security Linter Skill
+
+  ## Objective
+  Detect and prevent security vulnerabilities, credential leaks, and boundary violations across the repository.
+
+  ## Audit Checklist
+  1. **Permissions & Sockets**:
+     - Verify UNIX domain sockets use 0600 permissions.
+     - Detect unsafe temporary file creation outside managed scratch roots.
+  2. **Boundary Contracts**:
+     - Verify Model Context Protocol (MCP) handlers enforce fail-closed authorization.
+     - Validate CPCP boundary contracts for non-deterministic agents interacting with deterministic storage.
+  3. **Path Sanitization**:
+     - Guard against directory traversal in file path inputs.
