@@ -99,7 +99,7 @@ for platform in "${PLATFORMS[@]}"; do
   fi
 
   # Create archive
-  (cd "$DIST_DIR" && find "$ARCHIVE_NAME" | sort | tar -cf - -T - | gzip -n > "${ARCHIVE_NAME}.tar.gz")
+  (cd "$DIST_DIR" && find "$ARCHIVE_NAME" | sort | tar --no-recursion -cf - -T - | gzip -n > "${ARCHIVE_NAME}.tar.gz")
   # Also create standard zqk_ archive alias for installer and release parity
   (cd "$DIST_DIR" && cp "${ARCHIVE_NAME}.tar.gz" "zqk_${VER_NUM}_${GOOS}_${GOARCH}.tar.gz")
   if [[ "$GOOS" == "darwin" && -f "${REPO_ROOT}/scripts/notarize-and-sign-darwin.sh" ]]; then
@@ -149,7 +149,7 @@ if [ -f "${REPO_ROOT}/scripts/generate-openapi-clients.sh" ]; then
   if [ -n "${SOURCE_DATE_EPOCH:-}" ]; then
     find "${DIST_DIR}/sdk" -exec touch -h -t "$TOUCH_TS" {} + 2>/dev/null || true
   fi
-  (cd "$DIST_DIR" && find sdk | sort | tar -cf - -T - | gzip -n > "zqk-client-sdks.tar.gz")
+  (cd "$DIST_DIR" && find sdk | sort | tar --no-recursion -cf - -T - | gzip -n > "zqk-client-sdks.tar.gz")
 fi
 
 
