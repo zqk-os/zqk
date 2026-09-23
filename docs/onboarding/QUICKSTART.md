@@ -20,7 +20,8 @@ See [`COMMUNITY_FIRST_RUN.md`](./COMMUNITY_FIRST_RUN.md) for full agent host det
 
 For greenfield initialization in a fresh directory:
 ```sh
-zqk system init --project-name my-project
+mkdir my-project && cd my-project
+zqk init
 ```
 
 ## 2. Connect Your AI Agent
@@ -58,7 +59,7 @@ Add this to `.cursor/mcp.json` in your project root:
 
 #### Claude Desktop
 
-Add this to your `claude_desktop_config.json` (located at `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+Add this to your Claude Desktop configuration (`claude_desktop_config.json`):
 
 ```json
 {
@@ -71,9 +72,9 @@ Add this to your `claude_desktop_config.json` (located at `~/Library/Application
 }
 ```
 
-#### VS Code (Continue)
+#### VS Code (Continue / Roo Code)
 
-Add this to your `~/.continue/config.json`:
+Add this to your extension's MCP configuration:
 
 ```json
 {
@@ -106,3 +107,18 @@ Then ask your AI agent a question in your IDE that requires project context, for
 - *"Summarize our project context."*
 
 The agent will automatically invoke the `get_project_context` tool to read your policies and goals and respond accurately.
+
+## 4. Run Swarms & Live Telemetry
+
+Execute portable multi-agent swarms with fail-closed membrane isolation:
+
+```sh
+# Run a remote or local swarm package
+zqk run https://github.com/zqk-os/swarm-starter-kit
+
+# Stream real-time mutations with the visual ANSI seismograph
+zqk state stream --dashboard
+
+# Inspect the Knowledge Kernel hierarchy
+zqk state tree
+```

@@ -4,27 +4,33 @@
 **CLI:** Examples use the canonical executable `zqk`.  
 **Kernel Directory:** `.zqk/` stores local kernel state and runtime artifacts; project configuration resides in `config/`.
 
-## Install (this tree)
+## Install
 
-There is **no Homebrew formula and no public GitHub release** yet.
+**Homebrew (Recommended):**
+```bash
+brew tap zqk-os/zqk
+brew install zqk
+```
 
+**Build from Source:**
 ```bash
 make                 # → ./bin/zqk  (or ./bin/<brand.executable_name>)
 ./bin/zqk --version
 # equivalent: ./scripts/install.sh   (builds the branded binary locally; does not clone GitHub)
 ```
 
-Use `./bin/zqk` from the project directory. **Do not** `export ZQK_PROJECT_ROOT` in your shell profile.
+Use `zqk` (or `./bin/zqk` from this tree). **Do not** `export ZQK_PROJECT_ROOT` in your shell profile.
 
 ## Fail-closed sequence
 
 ```bash
-./bin/zqk system init --project-name my-project   # skip if .zqk/ already exists
-./bin/zqk system agent-onboard --format json
-./bin/zqk quickstart
-./bin/zqk mcp install
-./bin/zqk object list
-./bin/zqk workflow whats-next --format json
+zqk init                                          # Greenfield setup (skip if .zqk/ exists)
+zqk system agent-onboard --format json
+zqk quickstart
+zqk mcp install
+zqk object list
+zqk workflow whats-next --format json
+zqk state stream --dashboard                      # Real-time ANSI visual seismograph
 ```
 
 | Stage | What it does | If it fails |
@@ -45,7 +51,7 @@ Use `./bin/zqk` from the project directory. **Do not** `export ZQK_PROJECT_ROOT`
 
 ```bash
 mkdir my-project && cd my-project
-/path/to/this-repo/bin/zqk system init --project-name my-project
+zqk init
 ```
 
 Init **seeds the starter Gantt in-process** (org → mission → vision → goal → workstream → plan) and writes slim retention/audit jobs. Optional flags `--with-onboarding-roadmap` / `--with-maintenance-jobs` are aliases for those outcomes — they do not fail.
@@ -53,8 +59,8 @@ Init **seeds the starter Gantt in-process** (org → mission → vision → goal
 Background loops (job ticks, retention, one-shots):
 
 ```bash
-./bin/zqk scheduler start
-./bin/zqk scheduler status
+zqk scheduler start
+zqk scheduler status
 ```
 
 First-run CRUD, `object list`, and `whats-next` work without the daemon. Start it when you want the organism to keep running after you close the shell.
@@ -64,17 +70,20 @@ Init's maintenance jobs are **kernel survival** (retention, object validation, c
 ## Code search
 
 ```bash
-./bin/zqk grep "MyStruct" pkg/
-./bin/zqk grep --ast "func Test*" .
+zqk grep "MyStruct" pkg/
+zqk grep --ast "func Test*" .
 ```
 
 ## After green
 
-1. `./bin/zqk quickstart` — same text as `./bin/zqk system start-here`. See [`QUICKSTART.md`](./QUICKSTART.md).
-2. `./bin/zqk mcp install` then optionally `./bin/zqk mcp ensure --tcp 127.0.0.1:8443`.
-3. `./bin/zqk object list` — first-run scoreboard.
-4. `./bin/zqk system dashboard` — kernel pulse (plan + counts).
-5. `./bin/zqk test dashboard` — test_case ↔ criteria lineage.
-6. `./bin/zqk workflow whats-next --format json`.
+1. `zqk quickstart` — same text as `zqk system start-here`. See [`QUICKSTART.md`](./QUICKSTART.md).
+2. `zqk mcp install` then optionally `zqk mcp ensure --tcp 127.0.0.1:8443`.
+3. `zqk run <url|file>` — run a portable agent swarm package.
+4. `zqk state stream --dashboard` — stream live change journal mutations and CPCP status with the visual seismograph.
+5. `zqk state tree` — inspect the live knowledge graph hierarchy.
+6. `zqk object list` — first-run scoreboard.
+7. `zqk system dashboard` — kernel pulse (plan + counts).
+8. `zqk test dashboard` — test_case ↔ criteria lineage.
+9. `zqk workflow whats-next --format json`.
 
 ZQK Core provides the complete system kernel: object lifecycle, spec origination, command codegen, scheduler daemons (`zqk scheduler start|stop|status`), and Model Context Protocol (MCP) integration are fully native and offline-capable out of the box.

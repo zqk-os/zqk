@@ -110,11 +110,18 @@ for platform in "${PLATFORMS[@]}"; do
 done
 
 # Packaging Static Documentation Portal
-if [ -f "${REPO_ROOT}/scripts/generate-docs-portal.sh" ]; then
+DOCS_PORTAL_SCRIPT=""
+if [ -f "${REPO_ROOT}/scripts/open-core/docs-portal/generate-docs-portal.sh" ]; then
+  DOCS_PORTAL_SCRIPT="${REPO_ROOT}/scripts/open-core/docs-portal/generate-docs-portal.sh"
+elif [ -f "${REPO_ROOT}/scripts/generate-docs-portal.sh" ]; then
+  DOCS_PORTAL_SCRIPT="${REPO_ROOT}/scripts/generate-docs-portal.sh"
+fi
+
+if [ -n "$DOCS_PORTAL_SCRIPT" ]; then
   echo ""
   echo "  📚 Packaging static documentation portal..."
-  bash "${REPO_ROOT}/scripts/generate-docs-portal.sh" "${DIST_DIR}/docs-portal"
-  bash "${REPO_ROOT}/scripts/generate-docs-portal.sh" --verify "${DIST_DIR}/docs-portal.tar.gz"
+  bash "$DOCS_PORTAL_SCRIPT" "${DIST_DIR}/docs-portal"
+  bash "$DOCS_PORTAL_SCRIPT" --verify "${DIST_DIR}/docs-portal.tar.gz"
 fi
 
 # Packaging Community Helm Chart

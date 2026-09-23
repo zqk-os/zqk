@@ -79,6 +79,10 @@ All commands must implement the standard **Command DNA**:
 
 | Domain Namespace | Primary Responsibilities | Example Commands |
 | :--- | :--- | :--- |
+| **`zqk init`** | Zero-friction greenfield project knowledge kernel initialization | `init`, `init my-project` |
+| **`zqk run`** | Portable multi-agent swarm package execution (local or remote Git) | `run swarm.yaml`, `run https://github.com/org/swarm` |
+| **`zqk state`** | Knowledge kernel state graph inspection, audit journals, and live telemetry | `state stream --dashboard`, `state tree`, `state journal` |
+| **`zqk grep`** | In-process trigram and AST code search | `grep "Pattern" pkg/`, `grep --ast "func Test*"` |
 | **`zqk system`** | Host environment, kernel health, resource hygiene, spec validation, initialization | `system check`, `system resource-hygiene`, `system init`, `system validate-command-specs` |
 | **`zqk workflow`** | Process flow, next-action discovery, pipeline generation, VDS gating | `workflow whats-next`, `workflow gen-trace-pipeline`, `workflow vds evaluate` |
 | **`zqk object`** | Full CRUD, relationship traversal, draft plane promotion across all kernel objects | `object get <id>`, `object list <kind>`, `object create <kind>`, `object promote <id>` |

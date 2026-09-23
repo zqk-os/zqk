@@ -7,7 +7,15 @@
 
 ## Quickstart (5 Minutes)
 
-### 1. Build the Microkernel
+### 1. Install or Build
+
+**Via Homebrew (macOS & Linux):**
+```sh
+brew tap zqk-os/zqk
+brew install zqk
+```
+
+**Or Build from Source:**
 ```sh
 make          # → ./bin/zqk
 ./bin/zqk --version
@@ -16,23 +24,32 @@ make          # → ./bin/zqk
 ### 2. Seed a Sovereign Cell (Polyglot: Go, Python, TS, Rust)
 ```sh
 mkdir my-project && cd my-project
-/path/to/this-repo/bin/zqk system init --project-name my-project
-/path/to/this-repo/bin/zqk quickstart
+zqk init
+zqk quickstart
 ```
 
 Do **not** `export ZQK_PROJECT_ROOT` in your shell profile. ZQK discovers the nearest `.zqk/` membrane from the working tree.
 
 ### 3. Seat Your AI Agent (Cursor, Claude Code, Windsurf, Cline)
 ```sh
-./bin/zqk system agent-onboard --format json
-./bin/zqk system start-here
+zqk system agent-onboard --format json
+zqk system start-here
 ```
 
 ### 4. Connect via Model Context Protocol (MCP)
 ```sh
-./bin/zqk mcp install
-./bin/zqk mcp ensure --tcp 127.0.0.1:8443
-# Cursor stdio: ./bin/zqk mcp cursor-adapter
+zqk mcp install
+zqk mcp ensure --tcp 127.0.0.1:8443
+# Cursor stdio: zqk mcp cursor-adapter
+```
+
+### 5. Run Swarms & Live Telemetry
+```sh
+# Run a portable swarm package (local path or remote git URL)
+zqk run https://github.com/zqk-os/swarm-starter-kit
+
+# Stream real-time mutations with the visual ANSI seismograph
+zqk state stream --dashboard
 ```
 
 ---
