@@ -26,15 +26,29 @@ import (
 
 // ApplyOptions optional overrides for ApplyScenarioBundle (e.g. use existing storage in tests).
 type ApplyOptions struct {
-	Storage    storage.ObjectStorageProvider // if set, use instead of creating storage from projectRoot
-	StepStdout io.Writer                     // when set, step command stdout is written here (e.g. CLI stdout)
-	StepStderr io.Writer                     // when set, step command stderr is written here (e.g. CLI stderr)
+	Storage           storage.ObjectStorageProvider // if set, use instead of creating storage from projectRoot
+	StepStdout        io.Writer                     // when set, step command stdout is written here (e.g. CLI stdout)
+	StepStderr        io.Writer                     // when set, step command stderr is written here (e.g. CLI stderr)
+	TargetObjectID    string                        // root object that anchors this scenario bundle (e.g. REQ-*, GOAL-*)
+	TargetKind        string                        // kind of the root anchor object
+	TargetTitle       string                        // title of the anchor object
+	TargetPreExisted  bool                          // whether target object already existed in kernel
+	LinkedExistingIDs []string                      // existing objects linked into this trace pipeline
+	LinkageNote       string                        // human/agent-readable explanation of linkage
 }
 
 // BundleSummary describes the result of applying a bundle.
 type BundleSummary struct {
 	ProjectRoot string `json:"project_root"`
 	BundleName  string `json:"bundle_name"`
+
+	// Target/Anchor context (when bundle is generated for or linked to existing kernel objects).
+	TargetObjectID    string   `json:"target_object_id,omitempty"`
+	TargetKind        string   `json:"target_kind,omitempty"`
+	TargetTitle       string   `json:"target_title,omitempty"`
+	TargetPreExisted  bool     `json:"target_pre_existed,omitempty"`
+	LinkedExistingIDs []string `json:"linked_existing_ids,omitempty"`
+	LinkageNote       string   `json:"linkage_note,omitempty"`
 
 	// Created object IDs by kind.
 	CreatedSchedulerJobIDs       []string `json:"created_scheduler_job_ids,omitempty"`
@@ -114,6 +128,14 @@ func ApplyScenarioBundle(ctx stdcontext.Context, projectRoot string, r io.Reader
 		ProjectRoot: projectRoot,
 		BundleName:  bundle.Metadata.Name,
 		HintToID:    make(map[string]string),
+	}
+	if len(opts) > 0 && opts[0] != nil {
+		summary.TargetObjectID = opts[0].TargetObjectID
+		summary.TargetKind = opts[0].TargetKind
+		summary.TargetTitle = opts[0].TargetTitle
+		summary.TargetPreExisted = opts[0].TargetPreExisted
+		summary.LinkedExistingIDs = opts[0].LinkedExistingIDs
+		summary.LinkageNote = opts[0].LinkageNote
 	}
 
 	// Fixtures: scheduler_jobs (first so HintToID is populated for any refs from traceability objects)
@@ -223,13 +245,13 @@ func ApplyScenarioBundle(ctx stdcontext.Context, projectRoot string, r io.Reader
 				}
 			}
 			if updateErr != nil {
-				_ = emitScenarioSummary(projectRoot, summary)
+				_ = EmitScenarioSummary(projectRoot, summary)
 				return nil, updateErr
 			}
 		}
 	}
 
-	if err := emitScenarioSummary(projectRoot, summary); err != nil {
+	if err := EmitScenarioSummary(projectRoot, summary); err != nil {
 		logging.Fluent(logger).Warn("Failed to write scenario summary (non-fatal)").
 			WithError(err).
 			String("bundle_name", summary.BundleName).
@@ -280,8 +302,8 @@ func LoadScenarioSummary(projectRoot, bundleName string) (*BundleSummary, error)
 	return &summary, nil
 }
 
-// emitScenarioSummary writes summary to .zqk/scenarios/<bundle-name>/scenario-summary.json for traceability and debugging.
-func emitScenarioSummary(projectRoot string, summary *BundleSummary) error {
+// EmitScenarioSummary writes summary to .zqk/scenarios/<bundle-name>/scenario-summary.json for traceability and debugging.
+func EmitScenarioSummary(projectRoot string, summary *BundleSummary) error {
 	dir := scenarioSummaryDir(projectRoot, summary.BundleName)
 	if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
 		return errfmt.Errorf("create scenario dir %q: %w", dir, err)
@@ -295,6 +317,10 @@ func emitScenarioSummary(projectRoot string, summary *BundleSummary) error {
 		return errfmt.Errorf("write %q: %w", path, err)
 	}
 	return nil
+}
+
+func emitScenarioSummary(projectRoot string, summary *BundleSummary) error {
+	return EmitScenarioSummary(projectRoot, summary)
 }
 
 // executeBundleSteps runs the commands defined in bundle.Steps in order when ApplyMode is ApplyObjectsAndSteps.

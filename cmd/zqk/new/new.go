@@ -4,14 +4,17 @@ import (
 	"fmt"
 	"github.com/zqk-os/zqk/pkg/quick"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/cmd/zqk/object"
 	"github.com/zqk-os/zqk/cmd/zqk/workflow"
 	"github.com/zqk-os/zqk/internal/cli"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -183,16 +186,100 @@ func shouldAutoTracePipelineConfigured(cmd *cobra.Command, kind string, inTest b
 }
 
 type commandSpecFile struct {
-	Schema      string `yaml:"$schema"`
-	Name        string `yaml:"name"`
-	Short       string `yaml:"short"`
-	Description string `yaml:"description"`
+	Schema      string            `yaml:"$schema"`
+	Name        string            `yaml:"name"`
+	Short       string            `yaml:"short"`
+	Description string            `yaml:"description"`
+	Aliases     []string          `yaml:"aliases,omitempty"`
+	Args        *clipkg.ArgsSpec  `yaml:"args,omitempty"`
+	Flags       []clipkg.FlagSpec `yaml:"flags,omitempty"`
+	Help        *clipkg.HelpSpec  `yaml:"help,omitempty"`
+	RunE        string            `yaml:"run_e,omitempty"`
+	Async       bool              `yaml:"async,omitempty"`
+	CommonFlags *bool             `yaml:"common_flags,omitempty"`
 }
 
 func newCommandSpecCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewNewCommandSpecCommandBuilder()
+	ensureCommandSpecFlags(cmd)
 	cmd.RunE = runNewCommandSpec
 	return cmd
+}
+
+func ensureCommandSpecFlags(cmd *cobra.Command) {
+	if cmd.Flags().Lookup("from-cmd") == nil {
+		cmd.Flags().Bool("from-cmd", false, "Introspect registered Cobra command tree to extract flags, args, and usage")
+	}
+	if cmd.Flags().Lookup("aliases") == nil {
+		cmd.Flags().String("aliases", "", "Comma-separated command aliases")
+	}
+	if cmd.Flags().Lookup("args-type") == nil {
+		cmd.Flags().String("args-type", "", "Positional argument validation type: no_args, exact, minimum, maximum, range")
+	}
+	if cmd.Flags().Lookup("args-count") == nil {
+		cmd.Flags().Int("args-count", 0, "Argument count for exact args")
+	}
+	if cmd.Flags().Lookup("args-min") == nil {
+		cmd.Flags().Int("args-min", 0, "Minimum argument count")
+	}
+	if cmd.Flags().Lookup("args-max") == nil {
+		cmd.Flags().Int("args-max", 0, "Maximum argument count")
+	}
+	if cmd.Flags().Lookup("flag") == nil {
+		cmd.Flags().StringArray("flag", nil, "Custom flag definition (name:type:default:description[:shorthand])")
+	}
+	if cmd.Flags().Lookup("example") == nil {
+		cmd.Flags().StringArray("example", nil, "Help example in comment:command format")
+	}
+	if cmd.Flags().Lookup("run-e") == nil {
+		cmd.Flags().String("run-e", "", "RunE execution function name")
+	}
+	if cmd.Flags().Lookup("common-flags") == nil {
+		cmd.Flags().Bool("common-flags", true, "Include standard common flags in the spec")
+	}
+	if cmd.Flags().Lookup("async") == nil {
+		cmd.Flags().Bool("async", false, "Wrap RunE with BindAsyncProgress")
+	}
+}
+
+func findCobraCommand(root *cobra.Command, segments []string) *cobra.Command {
+	if root == nil || len(segments) == 0 {
+		return nil
+	}
+	curr := root
+	for _, seg := range segments {
+		var found *cobra.Command
+		for _, child := range curr.Commands() {
+			if child.Name() == seg || child.HasAlias(seg) {
+				found = child
+				break
+			}
+		}
+		if found == nil {
+			return nil
+		}
+		curr = found
+	}
+	return curr
+}
+
+func parsePathSegments(commandPath string) []string {
+	return strings.FieldsFunc(strings.TrimSpace(commandPath), func(r rune) bool {
+		return r == '/' || r == '\\' || r == ' ' || r == '\t'
+	})
+}
+
+func toPascalCase(s string) string {
+	parts := strings.FieldsFunc(s, func(r rune) bool {
+		return r == '-' || r == '_' || r == ' '
+	})
+	var b strings.Builder
+	for _, p := range parts {
+		if len(p) > 0 {
+			b.WriteString(strings.ToUpper(p[:1]) + strings.ToLower(p[1:]))
+		}
+	}
+	return b.String()
 }
 
 func runNewCommandSpec(cmd *cobra.Command, args []string) error {
@@ -203,20 +290,7 @@ func runNewCommandSpec(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	use, _ := cmd.Flags().GetString("use")
-	if use = strings.TrimSpace(use); use == emptyValue {
-		use = defaultUse
-	}
-	short, _ := cmd.Flags().GetString("short")
-	description, _ := cmd.Flags().GetString("description")
 	force, _ := cmd.Flags().GetBool("force")
-	if strings.TrimSpace(short) == emptyValue {
-		return errfmt.Errorf("short is required (pass --short)")
-	}
-	if strings.TrimSpace(description) == emptyValue {
-		return errfmt.Errorf("description is required (pass --description)")
-	}
-
 	if !force {
 		if _, statErr := fileutil.Stat(outputPath); statErr == nil {
 			return errfmt.Errorf("command spec already exists: %s (pass --force to replace)", outputPath)
@@ -224,20 +298,257 @@ func runNewCommandSpec(cmd *cobra.Command, args []string) error {
 			return errfmt.Newf("inspect command spec path").Wrap(statErr)
 		}
 	}
+
+	segments := parsePathSegments(args[0])
+	fromCmd, _ := cmd.Flags().GetBool("from-cmd")
+	foundCmd := findCobraCommand(cmd.Root(), segments)
+
+	if fromCmd && foundCmd == nil {
+		return errfmt.Errorf("command %q not found in registered CLI command tree", args[0])
+	}
+
+	use, _ := cmd.Flags().GetString("use")
+	short, _ := cmd.Flags().GetString("short")
+	description, _ := cmd.Flags().GetString("description")
+	aliasesStr, _ := cmd.Flags().GetString("aliases")
+	argsType, _ := cmd.Flags().GetString("args-type")
+	argsCount, _ := cmd.Flags().GetInt("args-count")
+	argsMin, _ := cmd.Flags().GetInt("args-min")
+	argsMax, _ := cmd.Flags().GetInt("args-max")
+	flagDefs, _ := cmd.Flags().GetStringArray("flag")
+	exampleDefs, _ := cmd.Flags().GetStringArray("example")
+	runEName, _ := cmd.Flags().GetString("run-e")
+	commonFlagsVal, _ := cmd.Flags().GetBool("common-flags")
+	asyncVal, _ := cmd.Flags().GetBool("async")
+
+	spec := commandSpecFile{}
+
+	introspect := fromCmd || (foundCmd != nil && (short == "" || description == ""))
+	if introspect && foundCmd != nil {
+		if use == "" {
+			use = foundCmd.Use
+		}
+		if short == "" {
+			short = foundCmd.Short
+		}
+		if description == "" {
+			if foundCmd.Long != "" {
+				description = foundCmd.Long
+			} else {
+				description = foundCmd.Short
+			}
+		}
+		if aliasesStr == "" && len(foundCmd.Aliases) > 0 {
+			spec.Aliases = foundCmd.Aliases
+		}
+	}
+
+	if use = strings.TrimSpace(use); use == emptyValue {
+		use = defaultUse
+	}
+	if strings.TrimSpace(short) == emptyValue {
+		return errfmt.Errorf("short is required (pass --short or --from-cmd)")
+	}
+	if strings.TrimSpace(description) == emptyValue {
+		description = short
+	}
+
+	spec.Name = use
+	spec.Short = strings.TrimSpace(short)
+	spec.Description = strings.TrimSpace(description)
+
+	if aliasesStr != "" {
+		for _, a := range strings.Split(aliasesStr, ",") {
+			if a = strings.TrimSpace(a); a != "" {
+				spec.Aliases = append(spec.Aliases, a)
+			}
+		}
+	}
+
+	// Positional arguments
+	if argsType != "" {
+		spec.Args = &clipkg.ArgsSpec{
+			Type: argsType,
+		}
+		if argsCount > 0 {
+			spec.Args.Count = &argsCount
+		}
+		if argsMin > 0 {
+			spec.Args.Min = &argsMin
+		}
+		if argsMax > 0 {
+			spec.Args.Max = &argsMax
+		}
+	} else if introspect && foundCmd != nil {
+		if strings.Contains(use, "<") {
+			count := strings.Count(use, "<")
+			spec.Args = &clipkg.ArgsSpec{
+				Type:  "exact",
+				Count: &count,
+			}
+		} else if strings.Contains(use, "[") && strings.Contains(use, "...") {
+			zero := 0
+			spec.Args = &clipkg.ArgsSpec{
+				Type: "minimum",
+				Min:  &zero,
+			}
+		} else {
+			spec.Args = &clipkg.ArgsSpec{
+				Type: "no_args",
+			}
+		}
+	} else {
+		spec.Args = &clipkg.ArgsSpec{
+			Type: "no_args",
+		}
+	}
+
+	// Flags
+	commonFlagsMap := map[string]bool{
+		"format": true, "output": true, "verbose": true, "quiet": true,
+		"timeout": true, "columns": true, "context": true, "help": true,
+		"ignore-scheduler-down": true, "profile": true,
+	}
+
+	if len(flagDefs) > 0 {
+		for _, fDef := range flagDefs {
+			parts := strings.SplitN(fDef, ":", 5)
+			if len(parts) >= 2 {
+				fs := clipkg.FlagSpec{
+					Name: strings.TrimSpace(parts[0]),
+					Type: strings.TrimSpace(parts[1]),
+				}
+				if len(parts) >= 3 && strings.TrimSpace(parts[2]) != "" {
+					fs.Default = strings.TrimSpace(parts[2])
+				}
+				if len(parts) >= 4 {
+					fs.Description = strings.TrimSpace(parts[3])
+				}
+				if len(parts) >= 5 {
+					fs.Shorthand = strings.TrimSpace(parts[4])
+				}
+				spec.Flags = append(spec.Flags, fs)
+			}
+		}
+	} else if introspect && foundCmd != nil {
+		foundCmd.Flags().VisitAll(func(f *pflag.Flag) {
+			if commonFlagsMap[f.Name] {
+				return
+			}
+			fType := "string"
+			switch f.Value.Type() {
+			case "bool":
+				fType = "bool"
+			case "int", "int32", "int64":
+				fType = "int"
+			case "stringSlice", "stringArray":
+				fType = "string_array"
+			case "duration":
+				fType = "duration"
+			}
+			var defVal any = f.DefValue
+			if fType == "bool" {
+				defVal = (f.DefValue == "true")
+			} else if fType == "int" {
+				if iv, err := strconv.Atoi(f.DefValue); err == nil {
+					defVal = iv
+				}
+			} else if defVal == "" {
+				defVal = nil
+			}
+			spec.Flags = append(spec.Flags, clipkg.FlagSpec{
+				Name:        f.Name,
+				Shorthand:   f.Shorthand,
+				Type:        fType,
+				Default:     defVal,
+				Description: f.Usage,
+			})
+		})
+	}
+
+	// Help and Examples
+	var examples []clipkg.HelpExampleSpec
+	if len(exampleDefs) > 0 {
+		for _, exDef := range exampleDefs {
+			parts := strings.SplitN(exDef, ":", 2)
+			if len(parts) == 2 {
+				examples = append(examples, clipkg.HelpExampleSpec{
+					Comment: strings.TrimSpace(parts[0]),
+					Command: strings.TrimSpace(parts[1]),
+				})
+			} else {
+				examples = append(examples, clipkg.HelpExampleSpec{
+					Comment: "Run " + strings.Join(segments, " "),
+					Command: strings.TrimSpace(parts[0]),
+				})
+			}
+		}
+	} else if introspect && foundCmd != nil && foundCmd.Example != "" {
+		lines := strings.Split(foundCmd.Example, "\n")
+		var currentComment string
+		for _, l := range lines {
+			l = strings.TrimSpace(l)
+			if l == "" {
+				continue
+			}
+			if strings.HasPrefix(l, "#") || strings.HasPrefix(l, "//") {
+				currentComment = strings.TrimSpace(strings.TrimLeft(l, "#/ "))
+			} else {
+				if currentComment == "" {
+					currentComment = "Example invocation"
+				}
+				examples = append(examples, clipkg.HelpExampleSpec{
+					Comment: currentComment,
+					Command: l,
+				})
+				currentComment = ""
+			}
+		}
+	}
+	if len(examples) == 0 {
+		cmdInvocation := "%s " + strings.Join(segments, " ")
+		examples = append(examples, clipkg.HelpExampleSpec{
+			Comment: "Run " + strings.Join(segments, " "),
+			Command: cmdInvocation,
+		})
+	}
+	spec.Help = &clipkg.HelpSpec{
+		Examples: examples,
+	}
+
+	// RunE
+	if runEName != "" {
+		spec.RunE = runEName
+	} else {
+		var parts []string
+		for _, seg := range segments {
+			parts = append(parts, toPascalCase(seg))
+		}
+		spec.RunE = "run" + strings.Join(parts, "")
+	}
+
+	// CommonFlags
+	spec.CommonFlags = &commonFlagsVal
+	spec.Async = asyncVal
+
 	if err := paths.EnsureDir(filepath.Dir(outputPath), paths.DirPerm755); err != nil {
 		return errfmt.Newf("create command spec directory").Wrap(err)
 	}
+
 	schemaPath := filepath.Join(specsDir, "schemas", "command_spec.schema.json")
+	if _, statErr := fileutil.Stat(schemaPath); statErr != nil {
+		altSchemaPath := filepath.Join(specsDir, "_schemas", "command_spec.schema.json")
+		if _, altErr := fileutil.Stat(altSchemaPath); altErr == nil {
+			schemaPath = altSchemaPath
+		}
+	}
 	schemaRef, err := filepath.Rel(filepath.Dir(outputPath), schemaPath)
 	if err != nil {
 		return errfmt.Newf("resolve command spec schema").Wrap(err)
 	}
-	data, err := yaml.Marshal(commandSpecFile{
-		Schema:      filepath.ToSlash(schemaRef),
-		Name:        use,
-		Short:       strings.TrimSpace(short),
-		Description: strings.TrimSpace(description),
-	})
+	spec.Schema = filepath.ToSlash(schemaRef)
+
+	data, err := yaml.Marshal(spec)
 	if err != nil {
 		return errfmt.Newf("marshal command spec").Wrap(err)
 	}
@@ -248,6 +559,8 @@ func runNewCommandSpec(cmd *cobra.Command, args []string) error {
 		objects.FieldKeyPath: outputPath,
 		"command_path":       args[0],
 		objects.FieldKeyUse:  use,
+		"flags_count":        len(spec.Flags),
+		"examples_count":     len(examples),
 	})
 }
 

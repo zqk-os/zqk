@@ -4,17 +4,20 @@ package bldr_cli_cmd_v1
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 )
 
 // NewStateTreeCommandBuilder creates a new state_tree command
 func NewStateTreeCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("tree")
-	builder.WithShort("Visualize the hierarchical kernel state tree and active leases")
-	help := clipkg.DynamicHelpBuilder("Visualize the hierarchical kernel state tree and active leases")
-	help.WithDescriptionLines("Displays a live hierarchical tree of the kernel graph (Organization, Mission, Vision, Goals, Priority Plans, Backlog Items) along with active agent leases and recent WAL mutation journal entries.")
+	builder.WithShort("Visualize the current execution state tree, active leases, and recent mutations")
+	help := clipkg.DynamicHelpBuilder("Visualize the current execution state tree, active leases, and recent mutations")
+	help.WithDescriptionLines("Visualize the current execution state tree, active leases, and recent mutations")
+	help.AddExample("Run state tree", "%s state tree")
 	builder.WithHelpBuilder(help)
-	builder.WithCommonFlags(false, nil)
+	builder.WithArgs(cobra.NoArgs)
+	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
 	cmd := builder.Build()
 	return cmd
 }

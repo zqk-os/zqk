@@ -4,17 +4,31 @@ package bldr_cli_cmd_v1
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 )
 
 // NewStateCommandBuilder creates a new state command
 func NewStateCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("state")
-	builder.WithShort("Inspect kernel state, topologies, and streaming mutations")
-	help := clipkg.DynamicHelpBuilder("Inspect kernel state, topologies, and streaming mutations")
-	help.WithDescriptionLines("Root command for inspecting live knowledge kernel topologies, agent leases, and audit streams.")
+	builder.WithShort("State — inspect live knowledge kernel state graph and audit journals")
+	help := clipkg.DynamicHelpBuilder("State — inspect live knowledge kernel state graph and audit journals")
+	help.WithDescriptionLines("Provides human-readable inspection of the live kernel state graph, active agent")
+	help.WithDescriptionLines("leases, and recent mutation journals.")
+	help.WithDescriptionLines("")
+	help.WithDescriptionLines("Use 'zqk state tree' to visualize the organizational and backlog execution")
+	help.WithDescriptionLines("hierarchy.")
+	help.WithDescriptionLines("")
+	help.WithDescriptionLines("  Render live execution state tree")
+	help.WithDescriptionLines("  zqk state tree")
+	help.WithDescriptionLines("  Render state tree as JSON")
+	help.WithDescriptionLines("  zqk state tree --format json")
+	help.WithDescriptionLines("  List recent journal mutations")
+	help.WithDescriptionLines("  zqk state journal --limit 10")
+	help.AddExample("Run state", "%s state")
 	builder.WithHelpBuilder(help)
-	builder.WithCommonFlags(false, nil)
+	builder.WithArgs(cobra.NoArgs)
+	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
 	cmd := builder.Build()
 	return cmd
 }

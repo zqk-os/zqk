@@ -4,17 +4,21 @@ package bldr_cli_cmd_v1
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 )
 
 // NewStateJournalCommandBuilder creates a new state_journal command
 func NewStateJournalCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("journal")
-	builder.WithShort("Query and inspect streaming change journal mutations")
-	help := clipkg.DynamicHelpBuilder("Query and inspect streaming change journal mutations")
-	help.WithDescriptionLines("Lists and filters recent object mutations recorded in the streaming change journal directory.")
+	builder.WithShort("List recent cryptographic change journal mutations")
+	help := clipkg.DynamicHelpBuilder("List recent cryptographic change journal mutations")
+	help.WithDescriptionLines("List recent cryptographic change journal mutations")
+	help.AddExample("Run state journal", "%s state journal")
 	builder.WithHelpBuilder(help)
-	builder.WithCommonFlags(false, nil)
+	builder.WithArgs(cobra.NoArgs)
+	builder.AddIntFlag("limit", "n", 20, "Maximum number of journal mutations to return")
+	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
 	cmd := builder.Build()
 	return cmd
 }
