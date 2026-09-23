@@ -24,7 +24,7 @@ func Badge(status string) string {
 	case "PASS", "HEALTHY", "ACTIVE", "OK", "DONE", "ENFORCING":
 		return badgePassStyle("[✓ " + status + "]")
 	case "WARN", "ATTENTION", "DEGRADED", "STALE":
-		return badgeWarnStyle("[⚠️ " + status + "]")
+		return badgeWarnStyle("[⚠️  " + status + "]")
 	case "FAIL", "BLOCKED", "ERROR", "CRITICAL":
 		return badgeFailStyle("[✗ " + status + "]")
 	case "IDLE", "DRAFT", "PENDING", "UNKNOWN":
@@ -32,6 +32,16 @@ func Badge(status string) string {
 	default:
 		return badgeInfoStyle("[" + status + "]")
 	}
+}
+
+// RowCursor renders the selection carrot/pointer indicator with consistent alignment.
+// Selected rows display a bright cyan "> " prefix, while unselected rows display "  " padding
+// so all row text aligns cleanly across columns.
+func RowCursor(isSelected bool, id string) string {
+	if isSelected {
+		return color.New(color.FgCyan, color.Bold).Sprint("> ") + id
+	}
+	return "  " + id
 }
 
 // StatItem represents a single key-value metric pair.

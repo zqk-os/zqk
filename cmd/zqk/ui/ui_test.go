@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"strings"
 	"testing"
 	"time"
 
@@ -8,6 +9,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/zqk-os/zqk/cmd/zqk/state"
 	"github.com/zqk-os/zqk/cmd/zqk/test"
+	"github.com/zqk-os/zqk/cmd/zqk/ui/tds"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestNewUICmd(t *testing.T) {
@@ -451,4 +454,329 @@ func TestRender_HealthTab_ActionCenter(t *testing.T) {
 	handleInput(m, []byte{KeyEsc})
 	assert.Nil(t, m.DetailModal)
 }
+
+func TestUIQuirk1_ActionCenterKeyNoCollisionWithVimNav(t *testing.T) {
+	tmpDir := t.TempDir()
+	m := NewUIModel(tmpDir, "health")
+	m.RefreshHealth()
+
+	// Verify WAL maintenance action is mapped to 'm' (not 'k')
+	var walAction *ActionCenterItem
+	for i := range m.ActionItems {
+		if strings.Contains(strings.ToLower(m.ActionItems[i].Name), "wal") {
+			walAction = &m.ActionItems[i]
+			break
+		}
+	}
+	require.NotNil(t, walAction)
+	assert.Equal(t, "m", walAction.Key, "WAL maintenance must be mapped to 'm' to avoid vim nav collision")
+
+	// Verify pressing 'k' does not trigger WAL action
+	m.SelectedIndex = 1
+	handleInput(m, []byte{'k'})
+	assert.False(t, walAction.IsTriggered, "'k' must not trigger WAL maintenance")
+	assert.Equal(t, 0, m.SelectedIndex, "'k' must navigate cursor up")
+
+	// Verify pressing 'm' triggers WAL maintenance
+	handleInput(m, []byte{'m'})
+	assert.True(t, walAction.IsTriggered, "'m' must trigger WAL maintenance")
+	assert.Equal(t, "enqueued", walAction.Status)
+}
+
+func TestUIQuirk2_ActionStatusProgressionBadges(t *testing.T) {
+	m := NewUIModel("", "health")
+	m.Width = 120
+	m.Height = 30
+
+	m.ActionItems = []ActionCenterItem{
+		{Key: "c", Name: "Action One", Description: "Test 1", JobID: "SCH-1", IsTriggered: true, Status: "enqueued"},
+		{Key: "a", Name: "Action Two", Description: "Test 2", JobID: "SCH-2", IsTriggered: true, Status: "processing"},
+		{Key: "w", Name: "Action Three", Description: "Test 3", JobID: "SCH-3", IsTriggered: true, Status: "completed"},
+		{Key: "d", Name: "Action Four", Description: "Test 4", JobID: "SCH-4", IsTriggered: true, Status: "failed"},
+	}
+
+	out := Render(m)
+	assert.Contains(t, out, "ENQUEUED")
+	assert.Contains(t, out, "PROCESSING")
+	assert.Contains(t, out, "PROCESSED")
+	assert.Contains(t, out, "FAILED")
+}
+
+func TestUIQuirk3_IconSpacingAndSmooshing(t *testing.T) {
+	// Wide icons must be detected and padded with 2 spaces
+	assert.True(t, tds.IsWideIcon("⚙️"))
+	assert.True(t, tds.IsWideIcon("⚠️"))
+	assert.True(t, tds.IsWideIcon("🛡️"))
+	assert.True(t, tds.IsWideIcon("⏱️"))
+	assert.True(t, tds.IsWideIcon("📦"))
+
+	assert.Equal(t, "⚙️  ", tds.IconPad("⚙️"))
+	assert.Equal(t, "⚠️  ", tds.IconPad("⚠️"))
+
+	// Compact symbols get 1 space
+	assert.False(t, tds.IsWideIcon("✓"))
+	assert.False(t, tds.IsWideIcon("✗"))
+	assert.Equal(t, "✓ ", tds.IconPad("✓"))
+
+	// tds.Badge with WARN must include 2 spaces after warning triangle
+	warnBadge := tds.Badge("WARN")
+	assert.Contains(t, warnBadge, "⚠️  WARN")
+}
+
+func TestUIQuirk4_RowCursorVisibleAcrossAllTabs(t *testing.T) {
+	m := NewUIModel("", "pm")
+	m.Width = 100
+	m.Height = 35
+
+	// Tab 4: PM
+	m.RecentBacklog = []PMBacklogRow{
+		{ID: "BLI-101", Title: "Task 1", Status: "planned", Priority: "P1"},
+		{ID: "BLI-102", Title: "Task 2", Status: "in_progress", Priority: "P0"},
+	}
+	m.TechnicalDebt = []PMDebtRow{
+		{ID: "DEBT-101", Title: "Debt 1", Priority: "high", Category: "security", Status: "active"},
+	}
+
+	m.SelectedIndex = 0
+	outPM := Render(m)
+	assert.Contains(t, outPM, "> BLI-101")
+
+	// Tab 5: Metrics
+	m.ActiveTab = TabMetrics
+	m.CommandMetrics = []CommandMetricRow{
+		{CommandName: "zqk test run", ExecCount: 12, AvgDuration: "120ms", LastRunAt: "10:00", Status: "pass"},
+	}
+	m.SelectedIndex = 0
+	outMetrics := Render(m)
+	assert.Contains(t, outMetrics, "> zqk test run")
+
+	// Tab 6: Scheduler
+	m.ActiveTab = TabScheduler
+	m.SchedulerJobs = []SchedulerJobRow{
+		{ID: "SCH-job-01", Schedule: "*/5 * * * *", LastRunAt: "10:00", NextRunAt: "10:05", Status: "active"},
+	}
+	m.SelectedIndex = 0
+	outSched := Render(m)
+	assert.Contains(t, outSched, "> SCH-job-01")
+
+	// Tab 7: QA
+	m.ActiveTab = TabQA
+	m.TestCases = []*test.TestCaseModel{
+		{ID: "TC-001", Title: "Unit Test", Status: "complete", TotalCriteria: 1, CompletedCriteria: 1},
+	}
+	m.SelectedIndex = 0
+	outQA := Render(m)
+	assert.Contains(t, outQA, "> TC-001")
+}
+
+func TestUIQuirk5_PMTabSyncAndTechDebtBounds(t *testing.T) {
+	m := NewUIModel("", "pm")
+	m.Width = 100
+	m.Height = 35
+
+	// Populate backlog items with complete and originated statuses
+	blis := []PMBacklogRow{
+		{ID: "BLI-001", Title: "Originated BLI", Status: "originated", Priority: "P1", ClaimedBy: "agent-1"},
+		{ID: "BLI-002", Title: "Completed BLI", Status: "complete", Priority: "P0", ClaimedBy: "agent-2"},
+	}
+	m.RecentBacklog = blis
+	m.TechnicalDebt = []PMDebtRow{
+		{ID: "DEBT-501", Title: "Resolve WAL tail latency", Priority: "high", Category: "storage", Status: "active"},
+	}
+
+	// 1. Row count must include both BLIs and Tech Debt
+	assert.Equal(t, 3, m.GetCurrentRowCount())
+
+	// 2. Select index pointing to Technical Debt item (index 2)
+	m.SelectedIndex = 2
+	m.OpenSelectedItemDetail()
+	require.NotNil(t, m.DetailModal)
+	assert.Equal(t, objects.KindTechnicalDebt, m.DetailModal.Kind)
+	assert.Equal(t, "DEBT-501", m.DetailModal.ID)
+	assert.Equal(t, "Resolve WAL tail latency", m.DetailModal.Title)
+}
+
+func TestUI_MessageBannerSpacingAndEmphasis(t *testing.T) {
+	m := NewUIModel("", "state")
+	m.Width = 100
+	m.Height = 30
+
+	m.DynamicMessage = "✓ Job executed successfully"
+	out := Render(m)
+	assert.Contains(t, out, "🔔 MESSAGE:")
+	assert.Contains(t, out, "✓ Job executed successfully")
+
+	m.DynamicMessage = "⚡ Enqueued [SCH-001] to trigger queue"
+	out2 := Render(m)
+	assert.Contains(t, out2, "⚡ Enqueued [SCH-001]")
+
+	m.DynamicMessage = "✗ Error during execution"
+	out3 := Render(m)
+	assert.Contains(t, out3, "✗ Error during execution")
+}
+
+func TestUI_SchedulerHealthTelemetryTable(t *testing.T) {
+	m := NewUIModel("", "metrics")
+	m.Width = 100
+	m.Height = 35
+
+	m.SchedulerHealth = []SchedulerHealthRow{
+		{ID: "SH-001", HeartbeatAt: "2026-09-23 14:00:00", Status: "active", Executions: 42, Failures: 0},
+		{ID: "SH-002", HeartbeatAt: "2026-09-23 14:05:00", Status: "degraded", Executions: 10, Failures: 2},
+	}
+
+	out := Render(m)
+	// Must contain structured table headers, not bullet points
+	assert.Contains(t, out, "SCHEDULER HEALTH TELEMETRY")
+	assert.Contains(t, out, "HEALTH RECORD")
+	assert.Contains(t, out, "HEARTBEAT")
+	assert.Contains(t, out, "EXECUTIONS")
+	assert.Contains(t, out, "FAILURES")
+	assert.Contains(t, out, "SH-001")
+	assert.Contains(t, out, "42")
+	assert.Contains(t, out, "SH-002")
+	assert.NotContains(t, out, "• SH-001 Status:")
+}
+
+func TestUI_SchedulerJobScheduleAndTrigger(t *testing.T) {
+	tmpDir := t.TempDir()
+	m := NewUIModel(tmpDir, "sched")
+	m.Width = 100
+	m.Height = 30
+
+	m.SchedulerJobs = []SchedulerJobRow{
+		{
+			ID:            "SCH-maintenance-001",
+			Title:         "System Maintenance WAL Cycle",
+			Description:   "Executes periodic WAL cleanup and retention",
+			Category:      "maintenance",
+			JobType:       "run_wrapper",
+			TriggerType:   "timer",
+			ExecutionMode: "exclusive",
+			MaxRuntimeSec: 600,
+			Schedule:      "*/15 * * * *",
+			LastRunAt:     "2026-09-23 13:45:00",
+			NextRunAt:     "2026-09-23 14:00:00",
+			Status:        "active",
+			Command:       "/bin/sh",
+			CommandArgs:   []string{"-c", "zqk system wal prune"},
+		},
+	}
+
+	out := Render(m)
+	assert.Contains(t, out, "SCH-maintenance-001")
+	assert.Contains(t, out, "*/15 * * * *")
+
+	// Test drill-down detail modal
+	m.SelectedIndex = 0
+	m.OpenSelectedItemDetail()
+	require.NotNil(t, m.DetailModal)
+	assert.Equal(t, "SCH-maintenance-001", m.DetailModal.ID)
+	assert.Equal(t, "System Maintenance WAL Cycle", m.DetailModal.Title)
+	assert.Equal(t, "Executes periodic WAL cleanup and retention", m.DetailModal.Summary)
+
+	modalRender := Render(m)
+	assert.Contains(t, modalRender, "DETAILED RECORD INSPECTION")
+	assert.Contains(t, modalRender, "Executes periodic WAL cleanup and retention")
+	assert.Contains(t, modalRender, "Cron Schedule : */15 * * * *")
+	assert.Contains(t, modalRender, "Command Exec  : /bin/sh -c zqk system wal prune")
+	assert.Contains(t, modalRender, "Trigger Now   : Press [t]")
+
+	// Dismiss modal
+	handleInput(m, []byte{KeyEsc})
+	assert.Nil(t, m.DetailModal)
+
+	// Trigger immediately via 't'
+	handleInput(m, []byte{'t'})
+	assert.Contains(t, m.DynamicMessage, "Enqueued [SCH-maintenance-001]")
+
+	// Trigger with delay via 'd'
+	handleInput(m, []byte{'d'})
+	assert.Contains(t, m.DynamicMessage, "Scheduled [SCH-maintenance-001] to trigger in 10 seconds")
+}
+
+func TestUI_QAViewTruthfulDoDAndBLICoverage(t *testing.T) {
+	m := NewUIModel("", "qa")
+	m.Width = 100
+	m.Height = 30
+
+	// 1. Zero test cases: must NOT report 100% Intact
+	m.QASummary = QASummaryRow{
+		TotalTestCases:   0,
+		VerifiedBLICount: 0,
+		TotalBLICount:    39,
+		DoDCompliant:     false,
+	}
+	m.TestCases = nil
+
+	outEmpty := Render(m)
+	assert.Contains(t, outEmpty, "0% (No Test Suites)")
+	assert.Contains(t, outEmpty, "PENDING")
+	assert.Contains(t, outEmpty, "BLI Coverage")
+	assert.Contains(t, outEmpty, "0 / 39")
+	assert.Contains(t, outEmpty, "No active test case objects discovered")
+
+	// 2. Active test cases present
+	m.QASummary = QASummaryRow{
+		TotalTestCases:    14,
+		InFlightCount:     2,
+		RegressionCount:   12,
+		SatisfiedCriteria: 24,
+		TotalCriteria:     27,
+		IntactChains:      14,
+		VerifiedBLICount:  6,
+		TotalBLICount:     39,
+		DoDCompliant:      true,
+	}
+	m.TestCases = []*test.TestCaseModel{
+		{
+			ID:                "TST-001",
+			Title:             "Kernel State Test",
+			Status:            "complete",
+			CompletedCriteria: 3,
+			TotalCriteria:     3,
+			Lineage:           &test.LineageChain{IsIntact: true},
+		},
+	}
+
+	outActive := Render(m)
+	assert.Contains(t, outActive, "100% Intact")
+	assert.Contains(t, outActive, "14 / 14")
+	assert.Contains(t, outActive, "BLI Coverage")
+	assert.Contains(t, outActive, "6 / 39")
+	assert.Contains(t, outActive, "TST-001")
+	assert.Contains(t, outActive, "Kernel State Test")
+}
+
+func TestUI_HealthViolationDetailMessage(t *testing.T) {
+	m := NewUIModel("", "health")
+	m.Width = 100
+	m.Height = 30
+
+	m.HealthViolations = []HealthViolationRow{
+		{
+			Kind:        "backlog_item",
+			ObjectID:    "BLI-TEST-999",
+			Severity:    "ERROR",
+			Tier:        1,
+			Category:    "structural",
+			Message:     "Structural schema failure: missing required field 'priority_tier' in object specification",
+			AutoFixable: false,
+			Path:        ".zqk/process/backlog_items/bli_999.yaml",
+		},
+	}
+
+	m.SelectedIndex = 0
+	m.OpenSelectedItemDetail()
+	require.NotNil(t, m.DetailModal)
+	assert.Equal(t, "BLI-TEST-999", m.DetailModal.ID)
+	assert.Equal(t, "Structural schema failure: missing required field 'priority_tier' in object specification", m.DetailModal.Summary)
+
+	rendered := Render(m)
+	assert.Contains(t, rendered, "DETAILED RECORD INSPECTION — BLI-TEST-999")
+	assert.Contains(t, rendered, "DETAILED DIAGNOSTIC MESSAGE / SUMMARY:")
+	assert.Contains(t, rendered, "Structural schema failure: missing required field 'priority_tier' in object specification")
+	assert.Contains(t, rendered, "Full Message  : Structural schema failure: missing required field 'priority_tier'")
+}
+
 

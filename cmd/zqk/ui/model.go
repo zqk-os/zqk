@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -55,11 +56,13 @@ type HealthViolationRow struct {
 
 // ActionCenterItem represents a triggerable action shortcut backed by the tray and scheduler.
 type ActionCenterItem struct {
-	Key         string `json:"key"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	JobID       string `json:"job_id"`
-	IsTriggered bool   `json:"is_triggered"`
+	Key         string    `json:"key"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	JobID       string    `json:"job_id"`
+	IsTriggered bool      `json:"is_triggered"`
+	Status      string    `json:"status,omitempty"` // "idle", "enqueued", "processing", "completed", "failed"
+	TriggeredAt time.Time `json:"triggered_at,omitempty"`
 }
 
 // HealthSummary captures system integrity and hygiene indicators.
@@ -81,11 +84,21 @@ type HealthSummary struct {
 
 // SchedulerJobRow captures a job's operational state for display.
 type SchedulerJobRow struct {
-	ID        string
-	Schedule  string
-	LastRunAt string
-	NextRunAt string
-	Status    string
+	ID            string
+	Title         string
+	Description   string
+	Category      string
+	JobType       string
+	TriggerType   string
+	ExecutionMode string
+	MaxRuntimeSec int
+	Schedule      string
+	LastRunAt     string
+	NextRunAt     string
+	Status        string
+	Command       string
+	CommandArgs   []string
+	LastError     string
 }
 
 // PMGoalRow represents a strategic program goal.
@@ -232,6 +245,8 @@ type QASummaryRow struct {
 	TotalCriteria     int
 	IntactChains      int
 	UnboundCriteria   int
+	VerifiedBLICount  int
+	TotalBLICount     int
 	DoDCompliant      bool
 }
 
@@ -243,6 +258,8 @@ type UIModel struct {
 	AutoScroll   bool
 	Width        int
 	Height       int
+	Storage      storage.ObjectStorageProvider
+	SecCtx       *pkgctx.SecurityContext
 
 	// Interactive Selection Cursor & Drill-Down Inspection Modal
 	SelectedIndex int
@@ -311,7 +328,7 @@ func NewUIModel(projectRoot string, initialTab string) *UIModel {
 		tab = TabPM
 	case "metrics", "telemetry", "metric", "tsdb", "timeseries":
 		tab = TabMetrics
-	case "scheduler", "jobs", "job":
+	case "scheduler", "sched", "jobs", "job":
 		tab = TabScheduler
 	case "qa", "test", "tests", "tui-test", "lineage", "dod":
 		tab = TabQA
@@ -494,18 +511,21 @@ func (m *UIModel) RefreshPM(ctx context.Context, sp storage.ObjectStorageProvide
 			switch st {
 			case "draft":
 				summary.Draft++
-			case "planned", "ready":
+			case "planned", "ready", "originated":
 				summary.Planned++
-			case "in_progress", "active":
+			case "in_progress", "inprog", "active", "claimed", "executing":
 				summary.InProgress++
 			case "blocked":
 				summary.Blocked++
-			case "completed":
-				summary.Completed++
-			case "done":
+			case "complete", "completed", "done", "approved", "closed":
 				summary.Done++
-			case "approved":
-				summary.Approved++
+				summary.Completed++
+			default:
+				if claimed != "" && claimed != "<nil>" {
+					summary.InProgress++
+				} else {
+					summary.Planned++
+				}
 			}
 
 			prio := fmt.Sprintf("%v", b["priority_tier"])
@@ -526,7 +546,30 @@ func (m *UIModel) RefreshPM(ctx context.Context, sp storage.ObjectStorageProvide
 			})
 		}
 
-		sort.Slice(recent, func(i, j int) bool { return recent[i].ID < recent[j].ID })
+		statusRank := func(s string) int {
+			switch s {
+			case "in_progress", "inprog", "active", "claimed", "executing":
+				return 0
+			case "planned", "ready", "originated":
+				return 1
+			case "blocked":
+				return 2
+			case "draft":
+				return 3
+			case "complete", "completed", "done", "approved", "closed":
+				return 4
+			default:
+				return 5
+			}
+		}
+
+		sort.Slice(recent, func(i, j int) bool {
+			ri, rj := statusRank(recent[i].Status), statusRank(recent[j].Status)
+			if ri != rj {
+				return ri < rj
+			}
+			return recent[i].ID > recent[j].ID
+		})
 		m.BacklogSummary = summary
 		m.RecentBacklog = recent
 	}
@@ -707,7 +750,10 @@ func (m *UIModel) RefreshScheduler(ctx context.Context, sp storage.ObjectStorage
 	jobs := make([]SchedulerJobRow, 0, len(res.Objects))
 	for _, obj := range res.Objects {
 		id := fmt.Sprintf("%v", obj["id"])
-		sch := fmt.Sprintf("%v", obj["schedule"])
+		sch := fmt.Sprintf("%v", obj["schedule_expression"])
+		if sch == "" || sch == "<nil>" {
+			sch = fmt.Sprintf("%v", obj["schedule"])
+		}
 		if sch == "" || sch == "<nil>" {
 			sch = fmt.Sprintf("%v", obj["interval"])
 		}
@@ -726,12 +772,62 @@ func (m *UIModel) RefreshScheduler(ctx context.Context, sp storage.ObjectStorage
 			status = "active"
 		}
 
+		title := fmt.Sprintf("%v", obj[objects.FieldKeyTitle])
+		if title == "" || title == "<nil>" {
+			title = id
+		}
+		desc := fmt.Sprintf("%v", obj[objects.FieldKeyDescription])
+		if desc == "<nil>" {
+			desc = ""
+		}
+		cat := fmt.Sprintf("%v", obj["category"])
+		if cat == "<nil>" {
+			cat = "system"
+		}
+		jType := fmt.Sprintf("%v", obj["job_type"])
+		if jType == "<nil>" {
+			jType = "standard"
+		}
+		trigType := fmt.Sprintf("%v", obj["trigger_type"])
+		if trigType == "<nil>" {
+			trigType = "timer"
+		}
+		execMode := fmt.Sprintf("%v", obj["execution_mode"])
+		if execMode == "<nil>" {
+			execMode = "standard"
+		}
+		maxRun := getIntVal(obj["max_runtime_seconds"])
+		cmd := fmt.Sprintf("%v", obj["command"])
+		if cmd == "<nil>" {
+			cmd = ""
+		}
+		var cmdArgs []string
+		if argsRaw, ok := obj["command_args"].([]any); ok {
+			for _, a := range argsRaw {
+				cmdArgs = append(cmdArgs, fmt.Sprintf("%v", a))
+			}
+		}
+		lastErr := fmt.Sprintf("%v", obj["last_error"])
+		if lastErr == "<nil>" {
+			lastErr = ""
+		}
+
 		jobs = append(jobs, SchedulerJobRow{
-			ID:        id,
-			Schedule:  sch,
-			LastRunAt: lastRun,
-			NextRunAt: nextRun,
-			Status:    status,
+			ID:            id,
+			Title:         title,
+			Description:   desc,
+			Category:      cat,
+			JobType:       jType,
+			TriggerType:   trigType,
+			ExecutionMode: execMode,
+			MaxRuntimeSec: maxRun,
+			Schedule:      sch,
+			LastRunAt:     lastRun,
+			NextRunAt:     nextRun,
+			Status:        status,
+			Command:       cmd,
+			CommandArgs:   cmdArgs,
+			LastError:     lastErr,
 		})
 	}
 
@@ -770,7 +866,7 @@ func formatTimeVal(v any) string {
 
 // RefreshQA loads test dashboard metrics, test cases, and lineage status.
 // It prioritizes zero-cost reads from the materialized test_dashboard_lite.json file,
-// and falls back to storage scanning when sp is provided.
+// and falls back to storage scanning when sp is provided or self-heals from ProjectRoot.
 func (m *UIModel) RefreshQA(ctx context.Context, sp storage.ObjectStorageProvider, sec *pkgctx.SecurityContext) {
 	if m.ProjectRoot == "" {
 		return
@@ -778,9 +874,16 @@ func (m *UIModel) RefreshQA(ctx context.Context, sp storage.ObjectStorageProvide
 
 	dState := test.NewDashboardStateWithProjectRoot(m.ProjectRoot)
 	loaded, err := dState.LoadFromLiteFile(m.ProjectRoot)
-	if !loaded || err != nil {
+	if !loaded || err != nil || len(dState.TestCases) == 0 {
+		if (sp == nil || sec == nil) && m.ProjectRoot != "" {
+			if factory, fErr := storage.NewStorageFactory(ctx, m.ProjectRoot); fErr == nil {
+				sp = factory.GetStorage()
+				sec = pkgctx.NewSystemSecurityContext()
+			}
+		}
 		if sp != nil && sec != nil {
 			_ = dState.ScanFromStorage(ctx, sp)
+			_ = dState.SaveToLiteFile(m.ProjectRoot)
 		}
 	}
 
@@ -805,7 +908,7 @@ func (m *UIModel) RefreshQA(ctx context.Context, sp storage.ObjectStorageProvide
 	}
 
 	// Evaluate DoD compliance: all active test cases must have intact lineage
-	dodOk := true
+	dodOk := len(tcs) > 0
 	for _, tc := range tcs {
 		if tc.Status == objects.ObjectStatusActive {
 			if tc.Lineage == nil || !tc.Lineage.IsIntact {
@@ -818,6 +921,29 @@ func (m *UIModel) RefreshQA(ctx context.Context, sp storage.ObjectStorageProvide
 		dodOk = false
 	}
 
+	// Calculate BLI test coverage
+	verifiedBLIs := make(map[string]bool)
+	for _, tc := range tcs {
+		if tc.Lineage != nil {
+			for _, bli := range tc.Lineage.BacklogItems {
+				if bli.ID != "" {
+					verifiedBLIs[bli.ID] = true
+				}
+			}
+		}
+		for _, ref := range tc.BacklogItemRefs {
+			if ref != "" {
+				verifiedBLIs[ref] = true
+			}
+		}
+	}
+	totalBLIs := m.BacklogSummary.Total
+	if totalBLIs == 0 && sp != nil && sec != nil {
+		if blis, err := sp.List(ctx, sec, nil, storage.ListFilter{Kind: objects.KindBacklogItem}); err == nil {
+			totalBLIs = len(blis.Objects)
+		}
+	}
+
 	m.QASummary = QASummaryRow{
 		TotalTestCases:    payload.TotalTestCases,
 		InFlightCount:     payload.InFlightCount,
@@ -826,6 +952,8 @@ func (m *UIModel) RefreshQA(ctx context.Context, sp storage.ObjectStorageProvide
 		TotalCriteria:     payload.TotalCriteria,
 		IntactChains:      payload.IntactChains,
 		UnboundCriteria:   len(payload.UnboundTestCriteria),
+		VerifiedBLICount:  len(verifiedBLIs),
+		TotalBLICount:     totalBLIs,
 		DoDCompliant:      dodOk,
 	}
 	m.TestCases = tcs
@@ -842,7 +970,7 @@ func (m *UIModel) RefreshHealth() {
 	// 1. Initialize Action Center items from Tray manifest + native scheduler bindings
 	if len(m.ActionItems) == 0 {
 		trayEntries, _ := tray.Load(m.ProjectRoot)
-		keyMap := []string{"c", "a", "w", "d", "p", "k", "s", "b"}
+		keyMap := []string{"c", "a", "w", "d", "p", "m", "s", "b"}
 		keyIdx := 0
 
 		// Priority well-known actions
@@ -891,6 +1019,76 @@ func (m *UIModel) RefreshHealth() {
 			keyIdx++
 		}
 		m.ActionItems = items
+	}
+
+	// 1b. Update live status of triggered Action Center items
+	for i := range m.ActionItems {
+		item := &m.ActionItems[i]
+		if !item.IsTriggered {
+			continue
+		}
+
+		// Check if still in trigger queue
+		inQueue := false
+		tq := schedulerpkg.NewJobTriggerQueue(m.ProjectRoot)
+		if pending, pErr := tq.PeekTriggerRequests(); pErr == nil {
+			for _, pr := range pending {
+				if pr.JobID == item.JobID {
+					inQueue = true
+					break
+				}
+			}
+		}
+
+		if inQueue {
+			item.Status = "enqueued"
+			continue
+		}
+
+		// Dequeued by scheduler — inspect scheduler diagnostics log for outcome
+		statusFound := false
+		diagPath := filepath.Join(m.ProjectRoot, paths.ProjectDataDir, paths.SchedulerDir, "diagnostics.jsonl")
+		if data, dErr := os.ReadFile(diagPath); dErr == nil && len(data) > 0 {
+			scanData := data
+			if len(scanData) > 65536 {
+				scanData = scanData[len(scanData)-65536:]
+			}
+			lines := strings.Split(string(scanData), "\n")
+			for j := len(lines) - 1; j >= 0; j-- {
+				line := strings.TrimSpace(lines[j])
+				if line == "" || !strings.Contains(line, item.JobID) {
+					continue
+				}
+				var ev struct {
+					Status    string `json:"status"`
+					EventType string `json:"event_type"`
+					JobID     string `json:"job_id"`
+				}
+				if json.Unmarshal([]byte(line), &ev) == nil && ev.JobID == item.JobID {
+					if ev.Status == "completed" || ev.EventType == "scheduler_job_completed" {
+						item.Status = "completed"
+						statusFound = true
+						break
+					} else if ev.Status == "failed" || ev.EventType == "scheduler_job_failed" {
+						item.Status = "failed"
+						statusFound = true
+						break
+					} else if ev.Status == "started" || ev.EventType == "scheduler_job_started" || ev.EventType == "trigger_queue_processing" {
+						item.Status = "processing"
+						statusFound = true
+						break
+					}
+				}
+			}
+		}
+
+		if !statusFound {
+			if !item.TriggeredAt.IsZero() && time.Since(item.TriggeredAt) < 3*time.Second {
+				item.Status = "processing"
+			} else {
+				item.Status = "completed"
+			}
+		}
 	}
 
 	// 2. Read validation_cache.json snapshot (< 3ms, zero validation overhead)
@@ -1053,7 +1251,37 @@ func (m *UIModel) TriggerActionCenter(key string) bool {
 	}
 
 	target.IsTriggered = true
+	target.Status = "enqueued"
+	target.TriggeredAt = time.Now()
 	m.DynamicMessage = fmt.Sprintf("⚡ Enqueued [%s] to scheduler trigger queue (%s)", target.Name, target.JobID)
+	return true
+}
+
+// TriggerScheduledJob enqueues a scheduled job into the JobTriggerQueue immediately or with a delay.
+func (m *UIModel) TriggerScheduledJob(jobID string, delaySeconds int) bool {
+	if m.ProjectRoot == "" || jobID == "" {
+		return false
+	}
+	tq := schedulerpkg.NewJobTriggerQueue(m.ProjectRoot)
+	if delaySeconds <= 0 {
+		err := tq.EnqueueTriggerRequest(jobID)
+		if err != nil {
+			m.DynamicMessage = fmt.Sprintf("✗ Trigger queue error for %s: %v", jobID, err)
+			return true
+		}
+		m.DynamicMessage = fmt.Sprintf("⚡ Enqueued [%s] to scheduler trigger queue (immediate)", jobID)
+		return true
+	}
+
+	m.DynamicMessage = fmt.Sprintf("⏳ Scheduled [%s] to trigger in %d seconds...", jobID, delaySeconds)
+	time.AfterFunc(time.Duration(delaySeconds)*time.Second, func() {
+		tqInner := schedulerpkg.NewJobTriggerQueue(m.ProjectRoot)
+		if err := tqInner.EnqueueTriggerRequest(jobID); err != nil {
+			m.DynamicMessage = fmt.Sprintf("✗ Delayed trigger failed for %s: %v", jobID, err)
+		} else {
+			m.DynamicMessage = fmt.Sprintf("✓ Delayed trigger enqueued [%s] to scheduler queue", jobID)
+		}
+	})
 	return true
 }
 
@@ -1065,7 +1293,7 @@ func (m *UIModel) GetCurrentRowCount() int {
 	case TabAudit:
 		return len(m.AuditEvents)
 	case TabPM:
-		return len(m.RecentBacklog)
+		return len(m.RecentBacklog) + len(m.TechnicalDebt)
 	case TabMetrics:
 		return len(m.CommandMetrics)
 	case TabScheduler:
@@ -1177,6 +1405,21 @@ func (m *UIModel) OpenSelectedItemDetail() {
 				Details: details,
 				Lineage: lineage,
 			}
+		} else if debtIdx := idx - len(m.RecentBacklog); debtIdx < len(m.TechnicalDebt) {
+			debt := m.TechnicalDebt[debtIdx]
+			details := []string{
+				fmt.Sprintf("Debt ID       : %s", debt.ID),
+				fmt.Sprintf("Category      : %s", debt.Category),
+				fmt.Sprintf("Priority      : %s", debt.Priority),
+				fmt.Sprintf("Workflow State: %s", debt.Status),
+			}
+			m.DetailModal = &ItemDetailModel{
+				Kind:    objects.KindTechnicalDebt,
+				ID:      debt.ID,
+				Status:  debt.Status,
+				Title:   debt.Title,
+				Details: details,
+			}
 		}
 
 	case TabMetrics:
@@ -1203,18 +1446,40 @@ func (m *UIModel) OpenSelectedItemDetail() {
 		if idx < len(m.SchedulerJobs) {
 			job := m.SchedulerJobs[idx]
 			details := []string{
+				fmt.Sprintf("Job Title     : %s", job.Title),
+				fmt.Sprintf("Category      : %s", job.Category),
+				fmt.Sprintf("Job Type      : %s", job.JobType),
+				fmt.Sprintf("Trigger Type  : %s", job.TriggerType),
+				fmt.Sprintf("Execution Mode: %s", job.ExecutionMode),
+				fmt.Sprintf("Max Runtime   : %d seconds", job.MaxRuntimeSec),
 				fmt.Sprintf("Cron Schedule : %s", job.Schedule),
 				fmt.Sprintf("Last Executed : %s", job.LastRunAt),
 				fmt.Sprintf("Next Scheduled: %s", job.NextRunAt),
 				fmt.Sprintf("Job Status    : %s", job.Status),
 			}
+			if job.Command != "" {
+				cmdStr := job.Command
+				if len(job.CommandArgs) > 0 {
+					cmdStr += " " + strings.Join(job.CommandArgs, " ")
+				}
+				details = append(details, fmt.Sprintf("Command Exec  : %s", cmdStr))
+			}
+			if job.LastError != "" {
+				details = append(details, fmt.Sprintf("Last Error    : %s", job.LastError))
+			}
+			var actions []string
+			actions = append(actions, "Trigger Now   : Press [t] to enqueue immediate execution")
+			actions = append(actions, "Trigger Delay : Press [d] to enqueue execution with 10s delay")
+
 			m.DetailModal = &ItemDetailModel{
 				Kind:      objects.KindSchedulerJob,
 				ID:        job.ID,
 				Status:    job.Status,
-				Title:     job.ID,
+				Title:     job.Title,
 				Timestamp: job.LastRunAt,
+				Summary:   job.Description,
 				Details:   details,
+				Criteria:  actions,
 			}
 		}
 
@@ -1272,6 +1537,7 @@ func (m *UIModel) OpenSelectedItemDetail() {
 				fmt.Sprintf("Violation Tier: Tier %d (%s)", v.Tier, v.Severity),
 				fmt.Sprintf("Category      : %s", v.Category),
 				fmt.Sprintf("Object Target : [%s] %s", v.Kind, v.ObjectID),
+				fmt.Sprintf("Full Message  : %s", v.Message),
 				fmt.Sprintf("Auto-Fixable  : %v", v.AutoFixable),
 				fmt.Sprintf("CAS File Path : %s", v.Path),
 			}
@@ -1286,7 +1552,8 @@ func (m *UIModel) OpenSelectedItemDetail() {
 				Kind:     v.Kind,
 				ID:       v.ObjectID,
 				Status:   v.Severity,
-				Title:    v.Message,
+				Title:    v.ObjectID,
+				Summary:  v.Message,
 				Details:  details,
 				Criteria: actions,
 			}
