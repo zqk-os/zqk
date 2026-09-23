@@ -647,11 +647,11 @@ func extractStorageProfile(sp storage.ObjectStorageProvider, id, kind string, ob
 					casHash = stem
 				}
 			}
-			if strings.Contains(filePath, ".object_drafts") {
-				storagePlane = "draft_plane"
-			} else if strings.Contains(filePath, "stream") {
-				storagePlane = "stream_buffer"
-			}
+		}
+		if strings.Contains(filePath, "object_drafts") {
+			storagePlane = "draft_plane"
+		} else if strings.Contains(filePath, "stream") {
+			storagePlane = "stream_buffer"
 		}
 	}
 
