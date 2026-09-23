@@ -217,3 +217,129 @@ func (m *mockInspectStorage) List(ctx context.Context, secCtx *pkgctx.SecurityCo
 	}
 	return &storage.QueryResult{Objects: list}, nil
 }
+
+func TestInspectTUIModel_NavigationAndDrillDown(t *testing.T) {
+	mockStorage := &mockInspectStorage{
+		objects: map[string]map[string]any{
+			"BLI-001": {
+				objects.FieldKeyID:       "BLI-001",
+				objects.FieldKeyKind:     objects.KindBacklogItem,
+				objects.FieldKeyTitle:    "TUI View Integration",
+				objects.FieldKeyStatus:   "in_progress",
+				objects.FieldKeyPriority: "P0",
+				"claimed_by":             "agent-alpha",
+				"requirement_ref":        "REQ-001",
+				"milestone_ref":          "MIL-001",
+				"updated_at":             "2026-09-23T12:00:00Z",
+			},
+			"BLI-002": {
+				objects.FieldKeyID:       "BLI-002",
+				objects.FieldKeyKind:     objects.KindBacklogItem,
+				objects.FieldKeyTitle:    "CAS Optimization",
+				objects.FieldKeyStatus:   "planned",
+				objects.FieldKeyPriority: "P1",
+				"claimed_by":             "",
+				"updated_at":             "2026-09-23T11:00:00Z",
+			},
+			"BLI-003": {
+				objects.FieldKeyID:       "BLI-003",
+				objects.FieldKeyKind:     objects.KindBacklogItem,
+				objects.FieldKeyTitle:    "Deadlock Fix",
+				objects.FieldKeyStatus:   "complete",
+				objects.FieldKeyPriority: "P2",
+				"claimed_by":             "agent-beta",
+				"updated_at":             "2026-09-23T10:00:00Z",
+			},
+		},
+	}
+
+	ctx := context.Background()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	storageCtx := pkgctx.NewStorageContext()
+
+	model := NewInspectTUIModel(ctx, objects.KindBacklogItem, nil, nil, "updated_at", false, mockStorage, secCtx, storageCtx)
+	require.NotNil(t, model)
+	assert.Equal(t, objects.KindBacklogItem, model.ActiveKind)
+	assert.Equal(t, 3, len(model.VisibleProjections))
+	assert.Equal(t, 0, model.SelectedIndex)
+
+	// 1. Test Key Down ('j') and Key Up ('k')
+	model.HandleInput([]byte{'j'})
+	assert.Equal(t, 1, model.SelectedIndex)
+	model.HandleInput([]byte{'k'})
+	assert.Equal(t, 0, model.SelectedIndex)
+
+	// 2. Test Quick Filter Cycling ('f')
+	model.HandleInput([]byte{'f'}) // "active"
+	assert.Equal(t, "active", model.FilterPill)
+	// BLI-001 (in_progress) and BLI-002 (planned) are active; BLI-003 (complete) is excluded
+	assert.Equal(t, 2, len(model.VisibleProjections))
+
+	model.HandleInput([]byte{'f'}) // "draft"
+	assert.Equal(t, "draft", model.FilterPill)
+
+	model.HandleInput([]byte{'f'}) // "blocked"
+	assert.Equal(t, "blocked", model.FilterPill)
+
+	model.HandleInput([]byte{'f'}) // "complete"
+	assert.Equal(t, "complete", model.FilterPill)
+	assert.Equal(t, 1, len(model.VisibleProjections))
+	assert.Equal(t, "BLI-003", model.VisibleProjections[0].ID)
+
+	// Reset filter back to "all"
+	for model.FilterPill != "all" {
+		model.HandleInput([]byte{'f'})
+	}
+	assert.Equal(t, 3, len(model.VisibleProjections))
+
+	// 3. Test Inline Search ('/')
+	model.HandleInput([]byte{'/'})
+	assert.True(t, model.IsSearching)
+	model.HandleInput([]byte{'C'})
+	model.HandleInput([]byte{'A'})
+	model.HandleInput([]byte{'S'})
+	assert.Equal(t, 1, len(model.VisibleProjections))
+	assert.Equal(t, "BLI-002", model.VisibleProjections[0].ID)
+	// Confirm search with Enter
+	model.HandleInput([]byte{13})
+	assert.False(t, model.IsSearching)
+	assert.Equal(t, "CAS", model.SearchQuery)
+
+	// Clear search
+	model.HandleInput([]byte{'/'})
+	model.HandleInput([]byte{27}) // Cancel search with Esc
+	assert.False(t, model.IsSearching)
+
+	// Reset search query manually for further tests
+	model.SearchQuery = ""
+	model.RefreshObjects()
+	assert.Equal(t, 3, len(model.VisibleProjections))
+
+	// 4. Test Drill-Down Detail Modal (Enter)
+	model.SelectedIndex = 0
+	model.HandleInput([]byte{13})
+	assert.True(t, model.DetailModalOpen)
+
+	// Verify rendered output contains deep inspection panel
+	rendered := model.Render()
+	assert.Contains(t, rendered, "DEEP OBJECT INSPECTION: BLI-001")
+	assert.Contains(t, rendered, "End-to-End Lineage Hierarchy")
+	assert.Contains(t, rendered, "REQ-001")
+
+	// Dismiss detail modal with Esc
+	model.HandleInput([]byte{27})
+	assert.False(t, model.DetailModalOpen)
+
+	// 5. Test Policy Studio Toggle ('p')
+	model.HandleInput([]byte{'p'})
+	assert.True(t, model.PolicyStudioOpen)
+	renderedStudio := model.Render()
+	assert.Contains(t, renderedStudio, "LIVE POLICY RULE STUDIO: BACKLOG_ITEM")
+	model.HandleInput([]byte{27})
+	assert.False(t, model.PolicyStudioOpen)
+
+	// 6. Test Kind Cycling ('Tab')
+	initialKind := model.ActiveKind
+	model.HandleInput([]byte{9}) // Tab
+	assert.NotEqual(t, initialKind, model.ActiveKind)
+}

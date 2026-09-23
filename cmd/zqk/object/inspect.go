@@ -165,6 +165,15 @@ func runInspect(cmd *cobra.Command, args []string) error {
 		format := cli.GetFormat(cmd)
 		isStructured := format == cli.FormatJSON || format == cli.FormatYAML || format == cli.FormatJSONRPC
 
+		// Interactive TUI Mode:
+		// When output is an interactive terminal (or --interactive is passed), not asking for structured JSON/YAML,
+		// and not explicitly requesting non-interactive execution.
+		interactiveFlag, _ := cmd.Flags().GetBool("interactive")
+		isTerminal := term.IsTerminal(int(os.Stdin.Fd())) && term.IsTerminal(int(os.Stdout.Fd()))
+		if (interactiveFlag || (isTerminal && targetID == "")) && !isStructured && !policyStudio {
+			return RunInspectTUI(cmd, targetKind, fieldsFlag, filterFlags, sortBy, sortAsc, sp, ctx, secCtx, storageCtx)
+		}
+
 		// Branch 1: Policy Studio
 		if policyStudio {
 			return runPolicyStudio(cmd, targetKind, sp, ctx, secCtx, storageCtx, isStructured)
