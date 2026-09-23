@@ -35,6 +35,7 @@ func NewGraphCmd() *cobra.Command {
 	// Add subcommands
 	graphCmd.AddCommand(NewQueryCmd())
 	graphCmd.AddCommand(NewDiscoverCmd())
+	graphCmd.AddCommand(NewExportCmd())
 
 	return graphCmd
 }
