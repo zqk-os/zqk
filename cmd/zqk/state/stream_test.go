@@ -128,4 +128,35 @@ func TestStateStreamCommand(t *testing.T) {
 	if time.Since(start) < 150*time.Millisecond {
 		t.Errorf("expected follow to wait for context cancellation, exited too early: %v", time.Since(start))
 	}
+
+	// 5. Test Visual Seismograph Dashboard Formatting
+	dashOut := BuildDashboardView(tempDir, []JournalMutation{m1, m2})
+	if !strings.Contains(dashOut, "ZQK STATE SEISMOGRAPH & TELEMETRY DASHBOARD") {
+		t.Errorf("expected dashboard title banner, got:\n%s", dashOut)
+	}
+	if !strings.Contains(dashOut, "CPCP-MEMBRANE-001") {
+		t.Errorf("expected CPCP-MEMBRANE-001 in dashboard, got:\n%s", dashOut)
+	}
+	if !strings.Contains(dashOut, "BLI-001") {
+		t.Errorf("expected BLI-001 in dashboard table, got:\n%s", dashOut)
+	}
+
+	// 6. Test Stream Execution (Dashboard Mode)
+	dashCmd := &cobra.Command{}
+	err = StreamJournalMutations(dashCmd, tempDir, false, 10, "", true)
+	if err != nil {
+		t.Fatalf("StreamJournalMutations dashboard failed: %v", err)
+	}
+
+	// 7. Test Follow with Dashboard Mode Context Cancellation
+	dashCtx, dashCancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
+	defer dashCancel()
+
+	followDashCmd := &cobra.Command{}
+	followDashCmd.SetContext(dashCtx)
+
+	err = StreamJournalMutations(followDashCmd, tempDir, true, 10, "", true)
+	if err != nil {
+		t.Fatalf("StreamJournalMutations follow dashboard failed: %v", err)
+	}
 }
