@@ -111,6 +111,7 @@ func ArmCheckin(projectRoot, taskID, holder, kind string, cadence time.Duration)
 		_ = fileutil.MkdirAll(filepath.Dir(walPath), paths.DirPerm755)
 		_ = fileutil.WriteFile(walPath, data, paths.FilePerm644)
 	}
+	_ = UpsertSeatClaim(projectRoot, holder, taskID)
 	return writeCheckin(projectRoot, timer)
 }
 
@@ -213,6 +214,11 @@ func ClearCheckin(projectRoot, taskID string) error {
 		return nil
 	}
 	path := CheckinTimerPath(projectRoot, taskID)
+	if timer, err := LoadCheckin(projectRoot, taskID); err == nil && timer != nil {
+		_ = RemoveSeatClaim(projectRoot, timer.ClaimedBy, taskID)
+	} else {
+		_ = RemoveSeatClaim(projectRoot, "", taskID)
+	}
 	if q := globalQueue; q != nil {
 		q.mu.Lock()
 		delete(q.items, path)

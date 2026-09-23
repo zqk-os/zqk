@@ -1,0 +1,47 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "claim-gate"
+short: "Fail-closed check that this seat holds a live occupiable claim"
+description: |
+  Mutating agent actions require occupancy (`zqk agent claim`). Exit 0 when
+  this seat holds a live claim. Otherwise electrocute (non-zero). --auto-assign
+  claims a free occupiable assignment then still refuses the write so the seat
+  is interrupted onto that task. When no ATK is free, occupancy is minted so
+  the write is interrupted onto a fallback instead of deadlocking.
+
+args:
+  type: "no_args"
+
+flags:
+  - name: "by"
+    type: "string"
+    default: ""
+    description: "Claimant agent/account id (default: seating/env identity)"
+  - name: "assignment"
+    type: "string"
+    default: ""
+    description: "Occupiable task id that must be held, or that --auto-assign may claim"
+  - name: "auto-assign"
+    type: "bool"
+    default: false
+    description: "Claim a free ATK if possible, then still refuse the mutating action"
+  - name: "wake"
+    type: "bool"
+    default: false
+    description: "Include an interrupt payload naming the assigned task (hook/feed wake)"
+  - name: "require-assignment"
+    type: "bool"
+    default: false
+    description: "Also fail when a live claim exists but is not --assignment"
+
+help:
+  examples:
+    - comment: "Check this seat holds occupancy before a write"
+      command: "%s agent claim-gate"
+    - comment: "Auto-assign a free task then interrupt"
+      command: "%s agent claim-gate --auto-assign --assignment ATK-123 --wake"
+  exclude_flags:
+    - "columns"
+
+run_e: "runAgentClaimGate"
+common_flags: true
