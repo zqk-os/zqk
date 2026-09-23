@@ -2,7 +2,6 @@ package state
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -84,17 +83,18 @@ func StreamJournalMutations(cmd *cobra.Command, projectRoot string, follow bool,
 		}
 	}
 
-	streamDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.StreamsDir, "change_journal_entry")
-	_ = fileutil.MkdirAll(streamDir, paths.DirPerm755)
-
 	watcher, err := fsnotify.NewWatcher()
 	if err == nil {
 		defer watcher.Close()
-		_ = watcher.Add(streamDir)
-		if entries, rErr := os.ReadDir(streamDir); rErr == nil {
-			for _, entry := range entries {
-				if strings.HasSuffix(entry.Name(), ".json") {
-					_ = watcher.Add(filepath.Join(streamDir, entry.Name()))
+		for _, kind := range trackedStreamKinds {
+			sDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.StreamsDir, kind)
+			_ = fileutil.MkdirAll(sDir, paths.DirPerm755)
+			_ = watcher.Add(sDir)
+			if entries, rErr := fileutil.ReadDir(sDir); rErr == nil {
+				for _, entry := range entries {
+					if strings.HasSuffix(entry.Name(), ".json") {
+						_ = watcher.Add(filepath.Join(sDir, entry.Name()))
+					}
 				}
 			}
 		}
@@ -232,10 +232,7 @@ func BuildDashboardView(projectRoot string, recent []JournalMutation) string {
 			timeStr = time.Unix(m.CreatedAt, 0).Format("15:04:05")
 		}
 
-		badge := "⚡ " + strings.ToUpper(m.ChangeType)
-		if len(badge) > 12 {
-			badge = badge[:12]
-		}
+		badge := formatEventBadge(m.ChangeType)
 		ref := m.ObjectRef
 		if len(ref) > 32 {
 			ref = ref[:29] + "..."
@@ -254,6 +251,33 @@ func BuildDashboardView(projectRoot string, recent []JournalMutation) string {
 	buf.WriteString("──────────────────────────────────────────────────────────────────────────────────────────\n")
 
 	return buf.String()
+}
+
+func formatEventBadge(changeType string) string {
+	ct := strings.ToUpper(strings.TrimSpace(changeType))
+	switch ct {
+	case "SYSTEM_CONFIG_CHANGE":
+		ct = "CONFIG"
+	case "COMMAND_EXECUTION":
+		ct = "EXEC"
+	case "SCHEDULER_JOB_COMPLETED":
+		ct = "JOB_DONE"
+	case "OBJECT_CREATION":
+		ct = "CREATE"
+	case "OBJECT_UPDATE":
+		ct = "UPDATE"
+	case "OBJECT_DELETION":
+		ct = "DELETE"
+	case "PROCESS_LIFECYCLE":
+		ct = "PROC"
+	case "AGENT_INSTRUCTION":
+		ct = "INSTR"
+	default:
+		if len(ct) > 8 {
+			ct = ct[:8]
+		}
+	}
+	return "⚡ " + ct
 }
 
 func generateSparkline(count int) string {
@@ -293,7 +317,7 @@ func FormatMutationLine(m JournalMutation) string {
 		timeStr = time.Unix(m.CreatedAt, 0).Format("15:04:05")
 	}
 
-	badge := "⚡ " + strings.ToUpper(m.ChangeType)
+	badge := formatEventBadge(m.ChangeType)
 	ref := m.ObjectRef
 	if len(ref) > 36 {
 		ref = ref[:33] + "..."
@@ -307,5 +331,5 @@ func FormatMutationLine(m JournalMutation) string {
 		summary = summary[:37] + "..."
 	}
 
-	return fmt.Sprintf("[%s] %-10s | %-12s | %-32s | %-35s | [CPCP: PASS]", timeStr, badge, m.ID, ref, summary)
+	return fmt.Sprintf("[%s] %-12s | %-12s | %-32s | %-35s | [CPCP: PASS]", timeStr, badge, m.ID, ref, summary)
 }

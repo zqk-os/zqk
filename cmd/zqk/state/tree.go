@@ -5,10 +5,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
 	"path/filepath"
 	"sort"
 	"strings"
+	"sync"
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
@@ -16,6 +16,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -239,62 +240,174 @@ func buildStateTreePayload(ctx context.Context, sp storage.ObjectStorageProvider
 	return payload
 }
 
+var (
+	streamFileCacheMu sync.RWMutex
+	streamFileCache   = make(map[string]cachedStreamFile)
+)
+
+type cachedStreamFile struct {
+	stamp     stampmemo.Stamp
+	mutations []JournalMutation
+}
+
+var trackedStreamKinds = []string{
+	"change_journal_entry",
+	"audit_event",
+	"agent_instruction",
+	"process_lifecycle",
+}
+
+type rawStreamRecord struct {
+	ID          string `json:"id"`
+	Kind        string `json:"kind,omitempty"`
+	ChangeType  string `json:"change_type,omitempty"`
+	EventType   string `json:"event_type,omitempty"`
+	ObjectRef   string `json:"object_ref,omitempty"`
+	DiffSummary string `json:"diff_summary,omitempty"`
+	Operation   string `json:"operation,omitempty"`
+	Title       string `json:"title,omitempty"`
+	Instruction string `json:"instruction,omitempty"`
+	CreatedAt   int64  `json:"created_at,omitempty"`
+	CreatedBy   string `json:"created_by,omitempty"`
+}
+
 func readRecentJournalMutations(projectRoot string, limit int) []JournalMutation {
 	if projectRoot == "" {
 		return nil
 	}
-	streamDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.StreamsDir, "change_journal_entry")
-	files, err := os.ReadDir(streamDir)
-	if err != nil || len(files) == 0 {
-		return nil
-	}
 
-	// Sort files by modification time descending
-	type fileEntry struct {
-		name    string
+	type streamFileRef struct {
+		path    string
 		modTime int64
 	}
-	entries := make([]fileEntry, 0, len(files))
-	for _, f := range files {
-		if strings.HasSuffix(f.Name(), ".json") {
-			if info, err := f.Info(); err == nil {
-				entries = append(entries, fileEntry{name: f.Name(), modTime: info.ModTime().UnixNano()})
-			}
-		}
-	}
-	sort.Slice(entries, func(i, j int) bool {
-		return entries[i].modTime > entries[j].modTime
-	})
 
-	mutations := make([]JournalMutation, 0, limit)
-	for _, fe := range entries {
-		path := filepath.Join(streamDir, fe.name)
-		file, err := fileutil.Open(path)
-		if err != nil {
+	var allFiles []streamFileRef
+
+	for _, kind := range trackedStreamKinds {
+		streamDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.StreamsDir, kind)
+		files, err := fileutil.ReadDir(streamDir)
+		if err != nil || len(files) == 0 {
 			continue
 		}
-		scanner := bufio.NewScanner(file)
-		fileLines := make([]string, 0, 64)
-		for scanner.Scan() {
-			line := strings.TrimSpace(scanner.Text())
-			if line != "" {
-				fileLines = append(fileLines, line)
-			}
-		}
-		file.Close()
-
-		// Read in reverse order
-		for i := len(fileLines) - 1; i >= 0; i-- {
-			var m JournalMutation
-			if err := json.Unmarshal([]byte(fileLines[i]), &m); err == nil && m.ID != "" {
-				mutations = append(mutations, m)
-				if len(mutations) >= limit {
-					return mutations
+		for _, f := range files {
+			if strings.HasSuffix(f.Name(), ".json") {
+				p := filepath.Join(streamDir, f.Name())
+				stamp := stampmemo.Of(p)
+				if stamp > 0 {
+					allFiles = append(allFiles, streamFileRef{path: p, modTime: int64(stamp)})
 				}
 			}
 		}
 	}
-	return mutations
+
+	if len(allFiles) == 0 {
+		return nil
+	}
+
+	// Sort files by modTime descending to read newest streams first
+	sort.Slice(allFiles, func(i, j int) bool {
+		return allFiles[i].modTime > allFiles[j].modTime
+	})
+
+	var allMutations []JournalMutation
+
+	for _, fileRef := range allFiles {
+		stamp := stampmemo.Stamp(fileRef.modTime)
+
+		streamFileCacheMu.RLock()
+		cached, ok := streamFileCache[fileRef.path]
+		streamFileCacheMu.RUnlock()
+
+		var fileMutations []JournalMutation
+		if ok && cached.stamp == stamp {
+			fileMutations = cached.mutations
+		} else {
+			file, err := fileutil.Open(fileRef.path)
+			if err != nil {
+				continue
+			}
+			scanner := bufio.NewScanner(file)
+			fileLines := make([]string, 0, 64)
+			for scanner.Scan() {
+				line := strings.TrimSpace(scanner.Text())
+				if line != "" {
+					fileLines = append(fileLines, line)
+				}
+			}
+			_ = file.Close()
+
+			fileMutations = make([]JournalMutation, 0, len(fileLines))
+			for _, line := range fileLines {
+				var raw rawStreamRecord
+				if err := json.Unmarshal([]byte(line), &raw); err == nil && raw.ID != "" {
+					cType := raw.ChangeType
+					if cType == "" {
+						if raw.EventType != "" {
+							cType = raw.EventType
+						} else if raw.Kind != "" {
+							cType = raw.Kind
+						} else {
+							cType = "event"
+						}
+					}
+
+					ref := raw.ObjectRef
+					if ref == "" {
+						if raw.Kind != "" {
+							ref = raw.Kind + ":" + raw.ID
+						} else {
+							ref = raw.ID
+						}
+					}
+
+					summary := raw.DiffSummary
+					if summary == "" {
+						if raw.Operation != "" {
+							summary = raw.Operation
+						} else if raw.Title != "" {
+							summary = raw.Title
+						} else if raw.Instruction != "" {
+							summary = raw.Instruction
+						} else {
+							summary = cType
+						}
+					}
+
+					fileMutations = append(fileMutations, JournalMutation{
+						ID:          raw.ID,
+						ChangeType:  cType,
+						ObjectRef:   ref,
+						DiffSummary: summary,
+						CreatedAt:   raw.CreatedAt,
+						CreatedBy:   raw.CreatedBy,
+					})
+				}
+			}
+
+			streamFileCacheMu.Lock()
+			streamFileCache[fileRef.path] = cachedStreamFile{
+				stamp:     stamp,
+				mutations: fileMutations,
+			}
+			streamFileCacheMu.Unlock()
+		}
+
+		allMutations = append(allMutations, fileMutations...)
+	}
+
+	// Sort all mutations by CreatedAt descending (falling back to ID ordering)
+	sort.Slice(allMutations, func(i, j int) bool {
+		if allMutations[i].CreatedAt != allMutations[j].CreatedAt {
+			return allMutations[i].CreatedAt > allMutations[j].CreatedAt
+		}
+		return allMutations[i].ID > allMutations[j].ID
+	})
+
+	if len(allMutations) > limit {
+		allMutations = allMutations[:limit]
+	}
+
+	return allMutations
 }
 
 func renderStateTreeText(cmd *cobra.Command, payload *StateTreePayload) error {
