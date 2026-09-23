@@ -40,12 +40,11 @@ func DefaultBufferedWriterConfig() BufferedWriterConfig {
 // BufferedWriter wraps an io.Writer with buffering to minimize I/O context switches.
 // Auto-flush is process-wide (one ticker), not one goroutine per writer.
 type BufferedWriter struct {
-	writer        io.Writer
-	buf           *bufio.Writer
-	config        BufferedWriterConfig
-	mu            sync.Mutex
-	autoFlush     bool
-	lastFlushTime time.Time
+	writer    io.Writer
+	buf       *bufio.Writer
+	config    BufferedWriterConfig
+	mu        sync.Mutex
+	autoFlush bool
 }
 
 // NewBufferedWriter creates a new buffered writer
@@ -58,11 +57,10 @@ func NewBufferedWriter(writer io.Writer, config BufferedWriterConfig) *BufferedW
 	}
 
 	bw := &BufferedWriter{
-		writer:        writer,
-		buf:           bufio.NewWriterSize(writer, config.BufferSize),
-		config:        config,
-		autoFlush:     config.FlushInterval > 0,
-		lastFlushTime: time.Now(),
+		writer:    writer,
+		buf:       bufio.NewWriterSize(writer, config.BufferSize),
+		config:    config,
+		autoFlush: config.FlushInterval > 0,
 	}
 	if bw.autoFlush {
 		processBufferedFlusher.register(bw)
@@ -70,55 +68,44 @@ func NewBufferedWriter(writer io.Writer, config BufferedWriterConfig) *BufferedW
 	return bw
 }
 
-// Write writes data to the buffer
-func (bw *BufferedWriter) Write(p []byte) (n int, err error) {
+// Write writes data to the buffer.
+func (bw *BufferedWriter) Write(p []byte) (int, error) {
 	bw.mu.Lock()
 	defer bw.mu.Unlock()
-	n, err = bw.buf.Write(p)
+	return bw.writeLocked(p, false)
+}
+
+// WriteWithLevel writes data and flushes in the same critical section for
+// error/fatal (config flags are immutable after NewBufferedWriter).
+func (bw *BufferedWriter) WriteWithLevel(p []byte, level LogLevel) (int, error) {
+	forceFlush := (level == ErrorLevel && bw.config.FlushOnError) ||
+		(level == FatalLevel && bw.config.FlushOnFatal)
+	bw.mu.Lock()
+	defer bw.mu.Unlock()
+	return bw.writeLocked(p, forceFlush)
+}
+
+func (bw *BufferedWriter) writeLocked(p []byte, forceFlush bool) (int, error) {
+	n, err := bw.buf.Write(p)
 	if err != nil {
 		return n, err
 	}
-	if bw.buf.Available() == 0 {
+	if forceFlush || bw.buf.Available() == 0 {
 		if err := bw.buf.Flush(); err != nil {
 			return n, err
 		}
-		bw.lastFlushTime = time.Now()
 	}
-	return n, nil
-}
-
-// WriteWithLevel writes data with a log level, flushing immediately for error/fatal if configured
-func (bw *BufferedWriter) WriteWithLevel(p []byte, level LogLevel) (n int, err error) {
-	n, err = bw.Write(p)
-	if err != nil {
-		return n, err
-	}
-
-	bw.mu.Lock()
-	shouldFlush := (level == ErrorLevel && bw.config.FlushOnError) ||
-		(level == FatalLevel && bw.config.FlushOnFatal)
-	bw.mu.Unlock()
-
-	if shouldFlush {
-		if err := bw.Flush(); err != nil {
-			return n, err
-		}
-	}
-
 	return n, nil
 }
 
 // Flush flushes the buffer to the underlying writer.
 // Plain mutex: timeout-context wrappers belong on contended locks, not the 1s log flusher
-// (REQ-1790151409621692000-007e7255).
+// (REQ-1790151409621692000-007e7255). bufio.Writer is not concurrent-safe, so
+// Buffered/Available also take this lock rather than racing b.n.
 func (bw *BufferedWriter) Flush() error {
 	bw.mu.Lock()
 	defer bw.mu.Unlock()
-	if err := bw.buf.Flush(); err != nil {
-		return err
-	}
-	bw.lastFlushTime = time.Now()
-	return nil
+	return bw.buf.Flush()
 }
 
 // Sync flushes the buffer and syncs the underlying writer if it supports it
