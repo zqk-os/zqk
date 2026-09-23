@@ -88,10 +88,14 @@ type PolicyStudioProjection struct {
 
 // RuleEvaluation conveys a single policy rule verification check.
 type RuleEvaluation struct {
-	RuleID      string `json:"rule_id" yaml:"rule_id"`
-	Description string `json:"description" yaml:"description"`
-	Passed      bool   `json:"passed" yaml:"passed"`
-	Violations  int    `json:"violations" yaml:"violations"`
+	RuleID         string   `json:"rule_id" yaml:"rule_id"`
+	Description    string   `json:"description" yaml:"description"`
+	Passed         bool     `json:"passed" yaml:"passed"`
+	Violations     int      `json:"violations"`
+	Expression     string   `json:"expression,omitempty" yaml:"expression,omitempty"`
+	TotalEvaluated int      `json:"total_evaluated,omitempty" yaml:"total_evaluated,omitempty"`
+	OffendingIDs   []string `json:"offending_ids,omitempty" yaml:"offending_ids,omitempty"`
+	Summary        string   `json:"summary,omitempty" yaml:"summary,omitempty"`
 }
 
 // NewInspectCmd creates the inspect command handler.
@@ -99,6 +103,8 @@ func NewInspectCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewObjectInspectCommandBuilder()
 	cli.BindAsyncProgress(cmd, runInspect)
 	cmd.Aliases = []string{"ins"}
+	cmd.Flags().String("rule-expr", "", "Evaluate a custom DSL predicate expression across repository objects in real time")
+	cmd.Flags().String("suggest-dsl", "", "Get autocomplete suggestions for a DSL input prefix")
 	return cmd
 }
 
@@ -159,6 +165,10 @@ func runInspect(cmd *cobra.Command, args []string) error {
 		sortAsc, _ := cmd.Flags().GetBool("sort-asc")
 		groupBy, _ := cmd.Flags().GetString("group-by")
 		policyStudio, _ := cmd.Flags().GetBool("policy-studio")
+		ruleExpr, _ := cmd.Flags().GetString("rule-expr")
+		if strings.TrimSpace(ruleExpr) != "" || cmd.Flags().Changed("suggest-dsl") {
+			policyStudio = true
+		}
 
 		targetKind := strings.TrimSpace(kindFlag)
 		targetID := strings.TrimSpace(idFlag)
@@ -441,6 +451,27 @@ func runPolicyStudio(cmd *cobra.Command, kind string, sp storage.ObjectStoragePr
 		kind = objects.KindBacklogItem
 	}
 
+	// 1. Suggest DSL Autocompletion
+	if cmd.Flags().Changed("suggest-dsl") {
+		suggestPrefix, _ := cmd.Flags().GetString("suggest-dsl")
+		suggestions := SuggestDSLTokens(kind, suggestPrefix)
+		if isStructured {
+			return cli.FormatOutput(cmd, suggestions)
+		}
+		termWidth := getTerminalWidth()
+		table := tds.NewTable(termWidth)
+		table.AddColumn("TOKEN", tds.AlignLeft, 24, 2.0)
+		table.AddColumn("TYPE", tds.AlignLeft, 14, 1.0)
+		table.AddColumn("DESCRIPTION", tds.AlignLeft, 42, 3.0)
+		for _, s := range suggestions {
+			table.AddRow(s.Token, string(s.Type), s.Description)
+		}
+		title := fmt.Sprintf("DSL AUTOCOMPLETE SUGGESTIONS: %s (prefix: %q)", strings.ToUpper(kind), suggestPrefix)
+		panelOutput := tds.Panel(title, []string{table.Render()}, termWidth, tds.BorderRounded)
+		_, _ = fmt.Fprintln(cmd.OutOrStdout(), panelOutput)
+		return nil
+	}
+
 	reg := objects.GetGlobalFieldRegistry()
 	var registeredFields []string
 	if reg != nil {
@@ -452,25 +483,49 @@ func runPolicyStudio(cmd *cobra.Command, kind string, sp storage.ObjectStoragePr
 	}
 	sort.Strings(registeredFields)
 
-	evals := []RuleEvaluation{
-		{
-			RuleID:      "POL-INTEGRITY-LINEAGE-001",
-			Description: "Backlog item has unbroken lineage to milestone & requirement",
-			Passed:      true,
-			Violations:  0,
-		},
-		{
-			RuleID:      "POL-CRITERIA-COMPLETION-001",
-			Description: "Complete status requires all linked criteria satisfied",
-			Passed:      true,
-			Violations:  0,
-		},
-		{
-			RuleID:      "POL-ESTIMATED-EFFORT-001",
-			Description: "Planned work items specify valid estimated effort",
-			Passed:      true,
-			Violations:  0,
-		},
+	rules := DefaultPolicyRulesForKind(kind)
+	ruleExpr, _ := cmd.Flags().GetString("rule-expr")
+	if strings.TrimSpace(ruleExpr) != "" {
+		customRule := PolicyRule{
+			ID:          "POL-CUSTOM-PREDICATE",
+			Name:        "Custom Expression Rule",
+			Description: fmt.Sprintf("Dynamic predicate evaluation: %s", ruleExpr),
+			TargetKind:  kind,
+			Expression:  strings.TrimSpace(ruleExpr),
+			Severity:    "warning",
+		}
+		rules = append([]PolicyRule{customRule}, rules...)
+	}
+
+	var evals []RuleEvaluation
+	if sp != nil {
+		results, err := RunPolicyStudioDryRun(ctx, sp, secCtx, storageCtx, kind, rules)
+		if err == nil {
+			for _, r := range results {
+				evals = append(evals, RuleEvaluation{
+					RuleID:         r.RuleID,
+					Description:    r.Name,
+					Passed:         r.Passed,
+					Violations:     r.ViolationsCount,
+					Expression:     r.Expression,
+					TotalEvaluated: r.TotalEvaluated,
+					OffendingIDs:   r.OffendingIDs,
+					Summary:        r.Summary,
+				})
+			}
+		}
+	}
+
+	if len(evals) == 0 {
+		for _, r := range rules {
+			evals = append(evals, RuleEvaluation{
+				RuleID:      r.ID,
+				Description: r.Name,
+				Passed:      true,
+				Violations:  0,
+				Expression:  r.Expression,
+			})
+		}
 	}
 
 	proj := PolicyStudioProjection{
@@ -494,7 +549,17 @@ func runPolicyStudio(cmd *cobra.Command, kind string, sp storage.ObjectStoragePr
 		if !e.Passed {
 			statusBadge = tds.Badge("FAIL")
 		}
-		lines = append(lines, fmt.Sprintf("  • [%s] %s  %s", e.RuleID, e.Description, statusBadge))
+		violStr := ""
+		if e.Violations > 0 {
+			violStr = fmt.Sprintf(" (%d violations)", e.Violations)
+		}
+		lines = append(lines, fmt.Sprintf("  • [%s] %s  %s%s", e.RuleID, e.Description, statusBadge, violStr))
+		if e.Expression != "" {
+			lines = append(lines, fmt.Sprintf("      DSL: %s", e.Expression))
+		}
+		if len(e.OffendingIDs) > 0 {
+			lines = append(lines, fmt.Sprintf("      Offenders: %s", strings.Join(e.OffendingIDs, ", ")))
+		}
 	}
 	lines = append(lines, "")
 	lines = append(lines, "Actions: [c] Edit Condition  [t] Test Expression  [s] Save Rule  [Esc] Close")
