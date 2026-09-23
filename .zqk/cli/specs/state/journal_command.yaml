@@ -1,0 +1,4 @@
+$schema: ../schemas/command_spec.schema.json
+name: journal
+short: Query and inspect streaming change journal mutations
+description: Lists and filters recent object mutations recorded in the streaming change journal directory.

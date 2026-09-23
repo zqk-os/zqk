@@ -1,0 +1,4 @@
+$schema: ../schemas/command_spec.schema.json
+name: tree
+short: Visualize the hierarchical kernel state tree and active leases
+description: Displays a live hierarchical tree of the kernel graph (Organization, Mission, Vision, Goals, Priority Plans, Backlog Items) along with active agent leases and recent WAL mutation journal entries.
