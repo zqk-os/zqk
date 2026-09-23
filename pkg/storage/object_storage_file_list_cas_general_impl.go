@@ -17,6 +17,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/storage/crud"
 	"github.com/zqk-os/zqk/pkg/storage/filecas"
 	"github.com/zqk-os/zqk/pkg/when"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 	"gopkg.in/yaml.v3"
 )
 
@@ -80,7 +81,7 @@ func (f *FileObjectStorage) listCASPathGeneral(ctx context.Context, secCtx *pkgc
 				idSet[id] = true
 			}
 		}
-		if !StreamStorageEnabledForKind(filter.Kind) && len(casIDs) == 0 {
+		if !StreamStorageEnabledForKind(filter.Kind) && (len(casIDs) == 0 || zqkenv.TestAllowCASFallthrough().Get() == "1") {
 			when.When(func() bool { return f.usesBucketedStorage(filter.Kind, kindDir) }).Then(func() {
 				idToPath = f.ScanIDBasedFilesRecursive(kindDir, filter.Kind)
 				for id := range idToPath {
