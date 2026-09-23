@@ -1,0 +1,60 @@
+$schema: "../../schemas/command_spec.schema.json"
+
+name: "inspect"
+short: "Interactive terminal object inspector and semantic projection viewer"
+description: |
+  Launches an interactive terminal user interface (TUI) or outputs semantic machine-readable
+  projections for inspecting and navigating kernel object instances.
+
+  Provides modular display modules for lineage, storage profile, CAS digests, and metadata.
+  Includes an interactive Policy Rule Studio for authoring, dry-running, and testing validation DSLs.
+
+args:
+  type: "maximum"
+  max: 2
+
+flags:
+  - name: "kind"
+    type: "string"
+    default: ""
+    description: "Initial object kind to inspect (e.g. backlog_item, requirement, test_case, policy)"
+  - name: "id"
+    type: "string"
+    default: ""
+    description: "Specific object identifier to inspect immediately in modal detail"
+  - name: "filter"
+    type: "stringArray"
+    description: "Initial filter expressions (field=value, field!=value)"
+  - name: "group-by"
+    type: "string"
+    default: ""
+    description: "Initial group-by field"
+  - name: "sort-by"
+    type: "string"
+    default: "updated_at"
+    description: "Initial sort field"
+  - name: "sort-asc"
+    type: "bool"
+    default: false
+    description: "Sort ascending (default is descending/newest first)"
+  - name: "policy-studio"
+    type: "bool"
+    default: false
+    description: "Launch directly into the interactive Policy Rule Studio"
+
+help:
+  examples:
+    - comment: "Launch interactive object inspector"
+      command: "%s object inspect"
+    - comment: "Inspect backlog items with quick filters"
+      command: "%s object inspect backlog_item"
+    - comment: "Inspect specific requirement details"
+      command: "%s object inspect requirement REQ-012"
+    - comment: "Launch Policy Rule Studio"
+      command: "%s object inspect policy --policy-studio"
+    - comment: "Semantic agent-friendly JSON projection"
+      command: "%s object inspect backlog_item --format json"
+
+run_e: "runInspect"
+common_flags: true
+query_flags: true
