@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"os/signal"
 	"sort"
 	"strings"
@@ -13,6 +14,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
+	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/cmd/zqk/ui/tds"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
@@ -67,6 +69,8 @@ type InspectTUIModel struct {
 	SearchBuffer      string
 	DetailModalOpen   bool
 	PolicyStudioOpen  bool
+	ActionPaletteOpen bool
+	ActionIndex       int
 	EditorProfile     string // "newb", "pro", "jedi"
 	StatusMessage     string
 	StatusExpiresAt   time.Time
@@ -381,13 +385,19 @@ func (m *InspectTUIModel) Render() string {
 		out.WriteString("\n")
 	}
 
-	// 2. Drill-Down Detail Modal Overlay
+	// 2. Action Palette Overlay
+	if m.ActionPaletteOpen && m.SelectedIndex < len(m.VisibleProjections) {
+		out.WriteString(m.renderActionPaletteOverlay(w, h))
+		return out.String()
+	}
+
+	// 3. Drill-Down Detail Modal Overlay
 	if m.DetailModalOpen && m.SelectedIndex < len(m.VisibleProjections) {
 		out.WriteString(m.renderDetailModal(w, h))
 		return out.String()
 	}
 
-	// 3. Policy Studio Overlay
+	// 4. Policy Studio Overlay
 	if m.PolicyStudioOpen {
 		out.WriteString(m.renderPolicyStudioOverlay(w, h))
 		return out.String()
@@ -507,6 +517,36 @@ func (m *InspectTUIModel) renderPropertyCard(p SemanticAgentProjection, width in
 		lines = append(lines, fmt.Sprintf("Title: %s", color.New(color.FgWhite, color.Bold).Sprint(p.Title)))
 	}
 
+	// CAS Storage Profile
+	if p.StorageProfile != nil {
+		hashSnippet := p.StorageProfile.CASHash
+		if len(hashSnippet) > 18 {
+			hashSnippet = hashSnippet[:8] + "…" + hashSnippet[len(hashSnippet)-6:]
+		}
+		lines = append(lines, fmt.Sprintf("Storage: [%s] │ Hash: %s │ Size: %d B │ Mode: %s │ Mod: %s",
+			strings.ToUpper(p.StorageProfile.StoragePlane),
+			hashSnippet,
+			p.StorageProfile.ByteSize,
+			p.StorageProfile.Permissions,
+			p.StorageProfile.LastModified,
+		))
+	}
+
+	// Ontology & Schema Profile
+	if p.Ontology != nil {
+		traitsList := "none"
+		if len(p.Ontology.Traits) > 0 {
+			traitsList = strings.Join(p.Ontology.Traits, ", ")
+		}
+		lines = append(lines, fmt.Sprintf("Ontology: ns:%s │ ctx:%s │ profile:%s │ fields:%d │ traits:[%s]",
+			p.Ontology.Namespace,
+			p.Ontology.VersionContext,
+			p.Ontology.StorageProfile,
+			p.Ontology.RegisteredFieldsCount,
+			traitsList,
+		))
+	}
+
 	// Lineage Radar Summary
 	if p.Lineage != nil {
 		chainParts := []string{}
@@ -541,11 +581,9 @@ func (m *InspectTUIModel) renderPropertyCard(p SemanticAgentProjection, width in
 			p.CriteriaSummary.Satisfied, p.CriteriaSummary.Total, p.CriteriaSummary.Pending, bar))
 	}
 
-	if len(p.ActionsAvailable) > 0 {
-		lines = append(lines, fmt.Sprintf("Actions: [%s]  (Press [Enter] to inspect/act)", strings.Join(p.ActionsAvailable, ", ")))
-	}
+	lines = append(lines, "Actions: [a] Action Palette │ [Enter] Full Drill-Down │ [p] Policy Studio │ [c] Claim │ [t] State")
 
-	cardTitle := fmt.Sprintf("── INSPECTED OBJECT: %s (Press Enter for Full Drill-Down) ──", p.ID)
+	cardTitle := fmt.Sprintf("── INSPECTED OBJECT: %s (Press [a] for Actions / [Enter] for Drill-Down) ──", p.ID)
 	return tds.Panel(cardTitle, lines, width, tds.BorderRounded)
 }
 
@@ -564,6 +602,33 @@ func (m *InspectTUIModel) renderDetailModal(width, height int) string {
 	lines = append(lines, fmt.Sprintf("Claimed Owner     : %s", defaultStr(p.ClaimedBy, "unassigned")))
 	lines = append(lines, fmt.Sprintf("Title / Summary   : %s", p.Title))
 	lines = append(lines, "")
+
+	// CAS Storage & Data-Cell Profile
+	if p.StorageProfile != nil {
+		lines = append(lines, "── CAS Storage & Data-Cell Profile ──")
+		lines = append(lines, fmt.Sprintf("  • Storage Plane      : %s", p.StorageProfile.StoragePlane))
+		lines = append(lines, fmt.Sprintf("  • CAS Content Hash   : %s", p.StorageProfile.CASHash))
+		lines = append(lines, fmt.Sprintf("  • Content Size       : %d bytes", p.StorageProfile.ByteSize))
+		lines = append(lines, fmt.Sprintf("  • Permissions / Mode : %s", p.StorageProfile.Permissions))
+		lines = append(lines, fmt.Sprintf("  • Last Modified Time : %s", p.StorageProfile.LastModified))
+		if p.StorageProfile.FilePath != "" {
+			lines = append(lines, fmt.Sprintf("  • File Path          : %s", p.StorageProfile.FilePath))
+		}
+		lines = append(lines, "")
+	}
+
+	// Ontology Profile
+	if p.Ontology != nil {
+		lines = append(lines, "── Ontology & Schema Profile ──")
+		lines = append(lines, fmt.Sprintf("  • Namespace          : %s", p.Ontology.Namespace))
+		lines = append(lines, fmt.Sprintf("  • Version Context    : %s", p.Ontology.VersionContext))
+		lines = append(lines, fmt.Sprintf("  • Storage Profile    : %s", p.Ontology.StorageProfile))
+		lines = append(lines, fmt.Sprintf("  • Registered Fields  : %d fields", p.Ontology.RegisteredFieldsCount))
+		if len(p.Ontology.Traits) > 0 {
+			lines = append(lines, fmt.Sprintf("  • Declared Traits    : %s", strings.Join(p.Ontology.Traits, ", ")))
+		}
+		lines = append(lines, "")
+	}
 
 	// Traceability Radar
 	lines = append(lines, "── End-to-End Lineage Hierarchy ──")
@@ -601,9 +666,378 @@ func (m *InspectTUIModel) renderDetailModal(width, height int) string {
 		lines = append(lines, "")
 	}
 
-	lines = append(lines, "Navigation: [Esc] / [q] Close Drill-Down │ [e] Edit Object in $EDITOR")
+	lines = append(lines, "Navigation: [Esc]/[q] Close Drill-Down │ [a] Action Palette │ [e] Edit Object │ [p] Policy Studio")
 	modalTitle := fmt.Sprintf("DEEP OBJECT INSPECTION: %s", p.ID)
 	return tds.Panel(modalTitle, lines, width, tds.BorderHeavy)
+}
+
+// ActionPaletteItem represents an executable action within the Role-Gated Action Palette.
+type ActionPaletteItem struct {
+	Key         rune
+	Label       string
+	Description string
+	Gated       bool
+	GateReason  string
+}
+
+func (m *InspectTUIModel) prepareActionItems() []ActionPaletteItem {
+	if m.SelectedIndex >= len(m.VisibleProjections) {
+		return nil
+	}
+	p := m.VisibleProjections[m.SelectedIndex]
+
+	canDel, delReason := canDelete(m.SecCtx, p.Kind)
+	canEd, edReason := canEdit(m.SecCtx, p.Kind)
+
+	claimLabel := "Claim Work"
+	claimDesc := "Assign current operator to object"
+	if p.ClaimedBy != "" {
+		claimLabel = "Unclaim Work"
+		claimDesc = "Release assignment back to pool"
+	}
+
+	nextState := getNextLifecycleState(p.Kind, p.Status)
+
+	return []ActionPaletteItem{
+		{
+			Key:         'c',
+			Label:       claimLabel,
+			Description: claimDesc,
+			Gated:       false,
+		},
+		{
+			Key:         't',
+			Label:       "Transition Status",
+			Description: fmt.Sprintf("Progress lifecycle state to: %s", nextState),
+			Gated:       false,
+		},
+		{
+			Key:         'e',
+			Label:       "Edit in $EDITOR",
+			Description: "Edit YAML properties with schema validation",
+			Gated:       !canEd,
+			GateReason:  edReason,
+		},
+		{
+			Key:         'p',
+			Label:       "Open Policy Studio",
+			Description: "Inspect and test DSL validation rules",
+			Gated:       false,
+		},
+		{
+			Key:         'd',
+			Label:       "Delete Object",
+			Description: "Delete object permanently from CAS store",
+			Gated:       !canDel,
+			GateReason:  delReason,
+		},
+	}
+}
+
+func (m *InspectTUIModel) renderActionPaletteOverlay(width, height int) string {
+	if m.SelectedIndex >= len(m.VisibleProjections) {
+		return ""
+	}
+	p := m.VisibleProjections[m.SelectedIndex]
+	items := m.prepareActionItems()
+
+	actor := "anonymous"
+	roles := "[]"
+	perms := "[]"
+	if m.SecCtx != nil {
+		if m.SecCtx.AccountID != "" {
+			actor = m.SecCtx.AccountID
+		}
+		if len(m.SecCtx.Roles) > 0 {
+			roles = fmt.Sprintf("[%s]", strings.Join(m.SecCtx.Roles, ", "))
+		}
+		if len(m.SecCtx.Permissions) > 0 {
+			perms = fmt.Sprintf("[%s]", strings.Join(m.SecCtx.Permissions, ", "))
+		}
+	}
+
+	var lines []string
+	lines = append(lines, fmt.Sprintf("Target Object   : %s  │ Kind: %s  │ Status: %s %s",
+		color.New(color.FgCyan, color.Bold).Sprint(p.ID),
+		p.Kind,
+		p.Status,
+		tds.Badge(p.Status),
+	))
+	lines = append(lines, fmt.Sprintf("Caller Security : Actor: %s │ Roles: %s │ Permissions: %s",
+		color.New(color.FgYellow).Sprint(actor),
+		roles,
+		perms,
+	))
+	lines = append(lines, "")
+	lines = append(lines, "── Available Actions (Role-Gated) ──")
+
+	for i, item := range items {
+		cursor := "  "
+		if i == m.ActionIndex {
+			cursor = color.New(color.FgCyan, color.Bold).Sprint("➔ ")
+		}
+
+		keyBadge := color.New(color.FgWhite, color.Bold).Sprintf("[%c]", item.Key)
+		labelStr := color.New(color.Bold).Sprint(item.Label)
+		if item.Gated {
+			labelStr = color.New(color.Faint).Sprint(item.Label)
+			gateNotice := color.New(color.FgRed).Sprintf(" [LOCKED: %s]", item.GateReason)
+			lines = append(lines, fmt.Sprintf("%s%s %-20s - %s%s", cursor, keyBadge, labelStr, color.New(color.Faint).Sprint(item.Description), gateNotice))
+		} else {
+			lines = append(lines, fmt.Sprintf("%s%s %-20s - %s", cursor, keyBadge, labelStr, color.New(color.FgHiBlack).Sprint(item.Description)))
+		}
+	}
+
+	lines = append(lines, "")
+	lines = append(lines, "Hotkeys: [↑/↓/j/k] Navigate │ [Enter] Execute Selected │ [c/t/e/p/d] Trigger │ [Esc] Close")
+
+	title := fmt.Sprintf("⚡ ROLE-GATED ACTION PALETTE: %s", p.ID)
+	return tds.Panel(title, lines, width, tds.BorderHeavy)
+}
+
+func (m *InspectTUIModel) executeCurrentAction() {
+	items := m.prepareActionItems()
+	if m.ActionIndex < 0 || m.ActionIndex >= len(items) {
+		return
+	}
+	item := items[m.ActionIndex]
+	if item.Gated {
+		m.SetStatus(fmt.Sprintf("Action '%s' is locked: %s", item.Label, item.GateReason), 3*time.Second)
+		return
+	}
+	switch item.Key {
+	case 'c':
+		m.executeClaimToggle()
+	case 't':
+		m.executeStatusTransition()
+	case 'e':
+		m.executeEditObject()
+	case 'p':
+		m.ActionPaletteOpen = false
+		m.PolicyStudioOpen = true
+	case 'd':
+		m.executeDeleteObject()
+	}
+}
+
+func (m *InspectTUIModel) executeClaimToggle() {
+	if m.SelectedIndex >= len(m.VisibleProjections) {
+		return
+	}
+	p := m.VisibleProjections[m.SelectedIndex]
+	actor := "ACC-OPERATOR"
+	if m.SecCtx != nil && m.SecCtx.AccountID != "" {
+		actor = m.SecCtx.AccountID
+	}
+
+	var updates map[string]any
+	var statusMsg string
+	if p.ClaimedBy != "" {
+		updates = map[string]any{"claimed_by": ""}
+		statusMsg = "Work unclaimed: " + p.ID
+	} else {
+		updates = map[string]any{"claimed_by": actor}
+		statusMsg = fmt.Sprintf("Work claimed by %s for %s", actor, p.ID)
+	}
+
+	if err := m.Storage.Update(m.Ctx, m.SecCtx, p.ID, updates); err != nil {
+		m.SetStatus("Claim update failed: "+err.Error(), 3*time.Second)
+		return
+	}
+
+	m.SetStatus(statusMsg, 3*time.Second)
+	m.ActionPaletteOpen = false
+	m.RefreshObjects()
+}
+
+func (m *InspectTUIModel) executeStatusTransition() {
+	if m.SelectedIndex >= len(m.VisibleProjections) {
+		return
+	}
+	p := m.VisibleProjections[m.SelectedIndex]
+	nextStatus := getNextLifecycleState(p.Kind, p.Status)
+
+	updates := map[string]any{"status": nextStatus}
+	if err := m.Storage.Update(m.Ctx, m.SecCtx, p.ID, updates); err != nil {
+		m.SetStatus("Transition failed: "+err.Error(), 3*time.Second)
+		return
+	}
+
+	m.SetStatus(fmt.Sprintf("Status transitioned: %s ➔ %s for %s", p.Status, nextStatus, p.ID), 3*time.Second)
+	m.ActionPaletteOpen = false
+	m.RefreshObjects()
+}
+
+func (m *InspectTUIModel) executeEditObject() {
+	if m.SelectedIndex >= len(m.VisibleProjections) {
+		return
+	}
+	p := m.VisibleProjections[m.SelectedIndex]
+	allowed, reason := canEdit(m.SecCtx, p.Kind)
+	if !allowed {
+		m.SetStatus("Permission denied for edit: "+reason, 3*time.Second)
+		m.ActionPaletteOpen = false
+		return
+	}
+
+	rawObj, err := m.Storage.Read(m.Ctx, m.SecCtx, p.ID)
+	if err != nil || rawObj == nil {
+		m.SetStatus("Failed to read object for edit: "+p.ID, 3*time.Second)
+		return
+	}
+
+	data, err := yaml.Marshal(rawObj)
+	if err != nil {
+		m.SetStatus("Failed to serialize object: "+err.Error(), 3*time.Second)
+		return
+	}
+
+	tmpFile, err := os.CreateTemp("", fmt.Sprintf("zqk-edit-%s-*.yaml", p.ID))
+	if err != nil {
+		m.SetStatus("Failed to create temp file: "+err.Error(), 3*time.Second)
+		return
+	}
+	tmpPath := tmpFile.Name()
+	defer os.Remove(tmpPath)
+
+	if _, err := tmpFile.Write(data); err != nil {
+		_ = tmpFile.Close()
+		m.SetStatus("Failed to write temp file: "+err.Error(), 3*time.Second)
+		return
+	}
+	_ = tmpFile.Close()
+
+	editor := os.Getenv("EDITOR")
+	if editor == "" {
+		editor = "vi"
+	}
+
+	if term.IsTerminal(int(os.Stdin.Fd())) {
+		cmd := exec.Command(editor, tmpPath)
+		cmd.Stdin = os.Stdin
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		_ = cmd.Run()
+	}
+
+	editedBytes, err := os.ReadFile(tmpPath)
+	if err != nil {
+		m.SetStatus("Failed to read edited file", 3*time.Second)
+		return
+	}
+
+	var updatedObj map[string]any
+	if err := yaml.Unmarshal(editedBytes, &updatedObj); err != nil {
+		m.SetStatus("Invalid YAML: "+err.Error(), 3*time.Second)
+		return
+	}
+
+	if err := m.Storage.Update(m.Ctx, m.SecCtx, p.ID, updatedObj); err != nil {
+		m.SetStatus("Update failed: "+err.Error(), 3*time.Second)
+		return
+	}
+
+	m.SetStatus("Successfully updated: "+p.ID, 3*time.Second)
+	m.ActionPaletteOpen = false
+	m.RefreshObjects()
+}
+
+func (m *InspectTUIModel) executeDeleteObject() {
+	if m.SelectedIndex >= len(m.VisibleProjections) {
+		return
+	}
+	p := m.VisibleProjections[m.SelectedIndex]
+	allowed, reason := canDelete(m.SecCtx, p.Kind)
+	if !allowed {
+		m.SetStatus("Permission denied for delete: "+reason, 3*time.Second)
+		m.ActionPaletteOpen = false
+		return
+	}
+
+	if err := m.Storage.Delete(m.Ctx, m.SecCtx, p.ID, false); err != nil {
+		m.SetStatus("Failed to delete "+p.ID+": "+err.Error(), 3*time.Second)
+		return
+	}
+
+	m.SetStatus("Object deleted from CAS: "+p.ID, 3*time.Second)
+	m.ActionPaletteOpen = false
+	m.DetailModalOpen = false
+	m.RefreshObjects()
+}
+
+func canDelete(secCtx *pkgctx.SecurityContext, kind string) (bool, string) {
+	if secCtx == nil {
+		return false, "unauthenticated"
+	}
+	for _, r := range secCtx.Roles {
+		if r == "admin" || r == "test" || r == "system" {
+			return true, ""
+		}
+	}
+	for _, p := range secCtx.Permissions {
+		if p == "delete:*" || p == "delete:"+kind || p == "access:*" || p == "write:*" {
+			return true, ""
+		}
+	}
+	return false, "requires role:admin or permission:delete:object"
+}
+
+func canEdit(secCtx *pkgctx.SecurityContext, kind string) (bool, string) {
+	if secCtx == nil {
+		return false, "unauthenticated"
+	}
+	for _, r := range secCtx.Roles {
+		if r == "admin" || r == "test" || r == "system" || r == "developer" || r == "operator" {
+			return true, ""
+		}
+	}
+	for _, p := range secCtx.Permissions {
+		if p == "write:*" || p == "write:"+kind || p == "access:*" {
+			return true, ""
+		}
+	}
+	if secCtx.AccountID != "" {
+		return true, ""
+	}
+	return false, "requires authenticated operator"
+}
+
+func getNextLifecycleState(kind, currentStatus string) string {
+	switch kind {
+	case objects.KindBacklogItem:
+		switch currentStatus {
+		case "originated", "planned":
+			return "in_progress"
+		case "in_progress":
+			return "review"
+		case "review":
+			return "complete"
+		case "complete":
+			return "originated"
+		default:
+			return "in_progress"
+		}
+	case objects.KindPriorityPlan:
+		switch currentStatus {
+		case "planned":
+			return "in_progress"
+		case "in_progress":
+			return "complete"
+		default:
+			return "in_progress"
+		}
+	default:
+		switch currentStatus {
+		case "draft", "originated":
+			return "in_progress"
+		case "in_progress":
+			return "complete"
+		case "complete":
+			return "draft"
+		default:
+			return "in_progress"
+		}
+	}
 }
 
 func (m *InspectTUIModel) renderPolicyStudioOverlay(width, height int) string {
@@ -672,10 +1106,91 @@ func (m *InspectTUIModel) HandleInput(key []byte) bool {
 		return false
 	}
 
-	// 2. Modal Overlay Dismissal
+	// 2. Action Palette Modal
+	if m.ActionPaletteOpen {
+		if len(key) == 1 {
+			switch key[0] {
+			case 27, 'q', 'Q': // Esc / q closes action palette
+				m.ActionPaletteOpen = false
+				return false
+			case 'j': // Next action
+				items := m.prepareActionItems()
+				if m.ActionIndex < len(items)-1 {
+					m.ActionIndex++
+				}
+				return false
+			case 'k': // Prev action
+				if m.ActionIndex > 0 {
+					m.ActionIndex--
+				}
+				return false
+			case 13, 10: // Enter: execute selected action
+				m.executeCurrentAction()
+				return false
+			case 'c', 'C': // Direct hotkey Claim/Unclaim
+				m.executeClaimToggle()
+				return false
+			case 't', 'T': // Direct hotkey Transition Status
+				m.executeStatusTransition()
+				return false
+			case 'e', 'E': // Direct hotkey Edit in $EDITOR
+				m.executeEditObject()
+				return false
+			case 'p', 'P': // Direct hotkey Policy Studio
+				m.ActionPaletteOpen = false
+				m.PolicyStudioOpen = true
+				return false
+			case 'd', 'D': // Direct hotkey Delete
+				m.executeDeleteObject()
+				return false
+			}
+		} else if len(key) >= 3 && key[0] == 27 && key[1] == '[' {
+			switch key[2] {
+			case 'A': // Up
+				if m.ActionIndex > 0 {
+					m.ActionIndex--
+				}
+				return false
+			case 'B': // Down
+				items := m.prepareActionItems()
+				if m.ActionIndex < len(items)-1 {
+					m.ActionIndex++
+				}
+				return false
+			}
+		}
+		if key[0] == 3 { // Ctrl+C
+			return true
+		}
+		return false
+	}
+
+	// 3. Detail Modal or Policy Studio Dismissal
 	if m.DetailModalOpen || m.PolicyStudioOpen {
-		if (len(key) == 1 && (key[0] == 27 || key[0] == 'q' || key[0] == 'Q')) ||
-			(len(key) >= 3 && key[0] == 27 && key[1] == '[') {
+		if len(key) == 1 {
+			switch key[0] {
+			case 27, 'q', 'Q':
+				m.DetailModalOpen = false
+				m.PolicyStudioOpen = false
+				return false
+			case 'a', 'A':
+				if m.DetailModalOpen {
+					m.ActionPaletteOpen = true
+					m.ActionIndex = 0
+					return false
+				}
+			case 'e', 'E':
+				if m.DetailModalOpen {
+					m.executeEditObject()
+					return false
+				}
+			case 'p', 'P':
+				m.DetailModalOpen = false
+				m.PolicyStudioOpen = true
+				return false
+			}
+		}
+		if len(key) >= 3 && key[0] == 27 && key[1] == '[' {
 			m.DetailModalOpen = false
 			m.PolicyStudioOpen = false
 			return false
@@ -686,12 +1201,12 @@ func (m *InspectTUIModel) HandleInput(key []byte) bool {
 		return false
 	}
 
-	// 3. Exit commands
+	// 4. Exit commands
 	if key[0] == 'q' || key[0] == 'Q' || key[0] == 3 || (len(key) == 1 && key[0] == 27) {
 		return true
 	}
 
-	// 4. Single-byte keys
+	// 5. Single-byte keys
 	if len(key) == 1 {
 		switch key[0] {
 		case 9: // Tab: next kind
@@ -699,6 +1214,28 @@ func (m *InspectTUIModel) HandleInput(key []byte) bool {
 		case 13, 10: // Enter: open drill-down modal
 			if len(m.VisibleProjections) > 0 {
 				m.DetailModalOpen = true
+			}
+		case 'a', 'A': // Open role-gated Action Palette
+			if len(m.VisibleProjections) > 0 {
+				m.ActionPaletteOpen = true
+				m.ActionIndex = 0
+			}
+		case 'c', 'C': // Direct claim toggle
+			if len(m.VisibleProjections) > 0 {
+				m.executeClaimToggle()
+			}
+		case 't', 'T': // Direct status transition
+			if len(m.VisibleProjections) > 0 {
+				m.executeStatusTransition()
+			}
+		case 'e', 'E': // Direct edit
+			if len(m.VisibleProjections) > 0 {
+				m.executeEditObject()
+			}
+		case 'd', 'D': // Direct delete prompt via Action Palette
+			if len(m.VisibleProjections) > 0 {
+				m.ActionPaletteOpen = true
+				m.ActionIndex = 4 // Index of Delete Object
 			}
 		case '/': // Open search
 			m.IsSearching = true
