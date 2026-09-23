@@ -204,6 +204,7 @@ func (f *FileObjectStorage) listStreamSegmentsWithLimit(ctx context.Context, _ *
 					// Restore compressed field keys
 					registry := GetFieldRegistry(f.projectRoot)
 					full = registry.RestoreFieldKeys(full)
+					decodeStreamRecordTimestamps(full)
 
 					id, _ := full[objects.FieldKeyID].(string)
 					if id == emptyValue || deletedMap[id] || !liveSet[id] {
@@ -431,6 +432,7 @@ func (f *FileObjectStorage) countStreamSegmentsWithFilters(ctx context.Context, 
 					// Restore compressed field keys
 					registry := GetFieldRegistry(f.projectRoot)
 					full = registry.RestoreFieldKeys(full)
+					decodeStreamRecordTimestamps(full)
 
 					id, _ := full[objects.FieldKeyID].(string)
 					if id == emptyValue || deletedMap[id] || !liveSet[id] {

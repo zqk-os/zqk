@@ -253,8 +253,17 @@ func TestChangeJournalAggregationService_CleanupAggregatedEntries_EmptyArchive(t
 	if n != 0 {
 		t.Errorf("CleanupAggregatedEntries(archive=true, empty slice) count = %d, want 0", n)
 	}
-	// Delete path (archive=false) is restricted to CLI in this storage implementation; skip testing that path here
+	// Delete path (archive=false) with empty list
+	cliCtx := WithCLIOperation(ctx)
+	delN, err := svc.CleanupAggregatedEntries(cliCtx, secCtx, []string{}, false)
+	if err != nil {
+		t.Fatalf("CleanupAggregatedEntries(archive=false, empty slice) error = %v", err)
+	}
+	if delN != 0 {
+		t.Errorf("CleanupAggregatedEntries(archive=false, empty slice) count = %d, want 0", delN)
+	}
 }
+
 
 // TestChangeJournalAggregationService_AggregateChangeJournalEntries_Integration runs the full
 // aggregation workflow: create change journal entries, run aggregation, verify metric and entry updates.
@@ -263,16 +272,9 @@ func TestChangeJournalAggregationService_AggregateChangeJournalEntries_Integrati
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
-	tmpDir := t.TempDir()
-	CopyObjectSpecsFromModuleOrSkip(t, tmpDir)
-	storageFactory, err := NewStorageFactory(context.Background(), tmpDir)
-	if err != nil {
-		t.Fatalf("NewStorageFactory: %v", err)
-	}
-	t.Cleanup(func() { _ = storageFactory.Shutdown(context.Background()) })
-	storageProvider := storageFactory.GetStorage()
+	tmpDir, fos, secCtx := SetupTestingFactoryCompleteTestEnvironmentForTest(t)
+	storageProvider := fos
 	ctx := context.Background()
-	secCtx := pkgctx.NewSystemSecurityContext()
 	storageCtx := pkgctx.GetStorageContext()
 
 	// Create two change journal entries so aggregation has something to process

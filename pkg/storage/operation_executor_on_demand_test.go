@@ -313,6 +313,7 @@ func TestOperationExecutor_MultipleWorkers(t *testing.T) {
 
 	// Create operation executor with max 3 workers
 	executor := storage.NewOperationExecutor(pkgctx.NewSystemContext(), fileStorage, queue, 3, nil)
+	defer executor.Stop()
 	executor.SetProjectRoot(testRoot)
 
 	// Enqueue multiple operations to trigger multiple workers

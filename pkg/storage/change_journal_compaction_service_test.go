@@ -179,4 +179,16 @@ fields:
 	if entriesCompacted != 2 {
 		t.Errorf("GetCompactionStats entriesCompacted = %d, want 2", entriesCompacted)
 	}
+
+	// Test CompactWindow with empty window (no entries)
+	emptyStart := time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC)
+	emptyEnd := time.Date(2025, 1, 2, 0, 0, 0, 0, time.UTC)
+	emptyRes, err := service.CompactWindow(ctx, secCtx, storageCtx, emptyStart, emptyEnd, outputDir)
+	if err != nil {
+		t.Fatalf("CompactWindow(empty) failed: %v", err)
+	}
+	if emptyRes.EntryCount != 0 {
+		t.Errorf("expected 0 entries in empty window, got %d", emptyRes.EntryCount)
+	}
 }
+

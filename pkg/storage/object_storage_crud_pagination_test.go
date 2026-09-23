@@ -300,7 +300,7 @@ func testKindCRUD(t *testing.T, storage *FileObjectStorage, ctx context.Context,
 			objects.FieldKeyStatus:        objects.ObjectStatusActive,
 			objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		}
-		_ = storage.Create(cliCtx, secCtx, goalObj)
+		EnsureCASVisibleRef(t, storage, cliCtx, secCtx, goalObj, "active")
 
 		critID := "CRIT-999"
 		critObj := map[string]any{
@@ -308,10 +308,10 @@ func testKindCRUD(t *testing.T, storage *FileObjectStorage, ctx context.Context,
 			objects.FieldKeyKind:          "criteria",
 			objects.FieldKeyTitle:         "Test Criteria",
 			objects.FieldKeyCategory:      "functional",
-			objects.FieldKeyStatus:        objects.ObjectStatusNotStarted,
+			objects.FieldKeyStatus:        "originated",
 			objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		}
-		_ = storage.Create(cliCtx, secCtx, critObj)
+		EnsureCASVisibleRef(t, storage, cliCtx, secCtx, critObj, "originated")
 
 		reqID := "REQ-999"
 		reqObj := map[string]any{
@@ -319,13 +319,12 @@ func testKindCRUD(t *testing.T, storage *FileObjectStorage, ctx context.Context,
 			objects.FieldKeyKind:          "requirement",
 			objects.FieldKeyTitle:         "Test requirement",
 			objects.FieldKeyStatus:        objects.ObjectStatusActive,
+			objects.FieldKeyPriority:      "p2",
 			objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 			objects.FieldKeyGoalRefs:      []string{"GOAL-999"},
 			objects.FieldKeyCriteriaRefs:  []string{"CRIT-999"},
 		}
-		if err := storage.Create(cliCtx, secCtx, reqObj); err != nil && !errors.Is(err, ErrObjectExists) {
-			t.Logf("Warning: Could not create referenced requirement %s: %v (test may fail)", reqID, err)
-		}
+		EnsureCASVisibleRef(t, storage, cliCtx, secCtx, reqObj, "active")
 	default:
 		// No special setup needed for other kinds
 	}
