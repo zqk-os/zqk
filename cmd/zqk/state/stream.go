@@ -8,6 +8,7 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/cmd/zqk/ui/tds"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -171,16 +172,18 @@ func StreamJournalMutations(cmd *cobra.Command, projectRoot string, follow bool,
 
 // BuildDashboardView renders an interactive ANSI visual seismograph dashboard.
 func BuildDashboardView(projectRoot string, recent []JournalMutation) string {
+	w := 96
 	var buf strings.Builder
 
-	buf.WriteString("╔═══════════════════════════════════════════════════════════════════════════════════════════════╗\n")
-	buf.WriteString("║                    ⚡ ZQK STATE SEISMOGRAPH & TELEMETRY DASHBOARD                            ║\n")
-	buf.WriteString("╚═══════════════════════════════════════════════════════════════════════════════════════════════╝\n")
+	displaySlice := recent
+	if len(displaySlice) > 15 {
+		displaySlice = displaySlice[len(displaySlice)-15:]
+	}
 
 	actors := make(map[string]int)
 	kinds := make(map[string]int)
 
-	for _, m := range recent {
+	for _, m := range displaySlice {
 		if m.CreatedBy != "" {
 			actors[m.CreatedBy]++
 		}
@@ -197,34 +200,47 @@ func BuildDashboardView(projectRoot string, recent []JournalMutation) string {
 	actorLine := "none"
 	if len(actorStrs) > 0 {
 		actorLine = strings.Join(actorStrs, ", ")
-		if len(actorLine) > 55 {
-			actorLine = actorLine[:52] + "..."
+		if len(actorLine) > 40 {
+			actorLine = actorLine[:37] + "..."
 		}
 	}
-
-	sparkline := generateSparkline(len(recent))
-
-	buf.WriteString(fmt.Sprintf("Root:       %s\n", projectRoot))
-	buf.WriteString(fmt.Sprintf("Status:     ACTIVE | Events in Window: %d | Sparkline: %s\n", len(recent), sparkline))
-	buf.WriteString("Membrane:   CPCP-MEMBRANE-001 (FAIL-CLOSED) | Status: ENFORCING (0 Blocked)\n")
-	buf.WriteString(fmt.Sprintf("Actors:     %s\n", actorLine))
 
 	kindStrs := make([]string, 0, len(kinds))
 	for k, count := range kinds {
 		kindStrs = append(kindStrs, fmt.Sprintf("%s: %d", k, count))
 	}
+	kindLine := "none"
 	if len(kindStrs) > 0 {
-		buf.WriteString(fmt.Sprintf("Objects:    %s\n", strings.Join(kindStrs, " | ")))
+		kindLine = strings.Join(kindStrs, " │ ")
+		if len(kindLine) > 40 {
+			kindLine = kindLine[:37] + "..."
+		}
 	}
 
-	buf.WriteString("──────────────────────────────────────────────────────────────────────────────────────────\n")
-	buf.WriteString(fmt.Sprintf("%-10s | %-12s | %-32s | %-24s | %s\n", "TIME", "EVENT", "OBJECT REF", "SUMMARY / DIFF", "CPCP"))
-	buf.WriteString("──────────────────────────────────────────────────────────────────────────────────────────\n")
+	sparkline := generateSparkline(len(displaySlice))
 
-	displaySlice := recent
-	if len(displaySlice) > 15 {
-		displaySlice = displaySlice[len(displaySlice)-15:]
-	}
+	buf.WriteString(tds.Panel("⚡ ZQK STATE SEISMOGRAPH & TELEMETRY DASHBOARD", []string{
+		tds.StatRow([]tds.StatItem{
+			{Label: "Root", Value: projectRoot},
+			{Label: "Status", Value: "ACTIVE", Extra: tds.Badge("OK")},
+		}, w-4),
+		tds.StatRow([]tds.StatItem{
+			{Label: "Events in Window", Value: fmt.Sprintf("%d", len(displaySlice)), Extra: sparkline},
+			{Label: "Membrane", Value: "CPCP-MEMBRANE-001 (FAIL-CLOSED)", Extra: tds.Badge("ENFORCING")},
+		}, w-4),
+		tds.StatRow([]tds.StatItem{
+			{Label: "Actors", Value: actorLine},
+			{Label: "Objects", Value: kindLine},
+		}, w-4),
+	}, w, tds.BorderHeavy))
+	buf.WriteString("\n")
+
+	tbl := tds.NewTable(w).
+		AddColumn("TIME", tds.AlignCenter, 10, 0.12).
+		AddColumn("EVENT", tds.AlignLeft, 12, 0.14).
+		AddColumn("OBJECT REF", tds.AlignLeft, 28, 0.32).
+		AddColumn("SUMMARY / DIFF", tds.AlignLeft, 24, 0.28).
+		AddColumn("CPCP", tds.AlignCenter, 14, 0.14)
 
 	for _, m := range displaySlice {
 		timeStr := "--:--:--"
@@ -233,22 +249,22 @@ func BuildDashboardView(projectRoot string, recent []JournalMutation) string {
 		}
 
 		badge := FormatEventBadge(m.ChangeType)
-		ref := m.ObjectRef
-		if len(ref) > 32 {
-			ref = ref[:29] + "..."
-		}
-
 		summary := m.DiffSummary
 		if summary == "" {
 			summary = m.ChangeType
 		}
-		if len(summary) > 24 {
-			summary = summary[:21] + "..."
-		}
 
-		buf.WriteString(fmt.Sprintf("[%s] | %-12s | %-32s | %-24s | [CPCP: PASS]\n", timeStr, badge, ref, summary))
+		tbl.AddRow(
+			fmt.Sprintf("[%s]", timeStr),
+			badge,
+			m.ObjectRef,
+			summary,
+			"[CPCP: PASS]",
+		)
 	}
-	buf.WriteString("──────────────────────────────────────────────────────────────────────────────────────────\n")
+
+	buf.WriteString(tbl.Render())
+	buf.WriteString("\n")
 
 	return buf.String()
 }

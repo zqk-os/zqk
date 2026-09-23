@@ -303,33 +303,23 @@ func renderAuditTab(b *strings.Builder, m *UIModel) {
 			if act == "" {
 				act = "system"
 			}
-			if len(act) > actorW {
-				act = act[:actorW-3] + "..."
-			}
 
 			op := aud.Operation
 			if op == "" {
 				op = aud.ChangeType
-			}
-			if len(op) > opW {
-				op = op[:opW-3] + "..."
-			}
-
-			ref := aud.ObjectRef
-			if len(ref) > refW {
-				ref = ref[:refW-3] + "..."
 			}
 
 			detail := aud.DiffSummary
 			if detail == "" {
 				detail = "--"
 			}
-			if len(detail) > detailW {
-				detail = detail[:detailW-3] + "..."
-			}
 
-			b.WriteString(fmt.Sprintf("[%s] │ %-*s │ %-*s │ %-*s │ %s\n",
-				tStr, actorW, act, opW, op, refW, ref, detail))
+			b.WriteString(fmt.Sprintf("[%s] │ %s │ %s │ %s │ %s\n",
+				tStr,
+				tds.PadRight(tds.TruncateVisible(act, actorW, "…"), actorW),
+				tds.PadRight(tds.TruncateVisible(op, opW, "…"), opW),
+				tds.PadRight(tds.TruncateVisible(aud.ObjectRef, refW, "…"), refW),
+				tds.TruncateVisible(detail, detailW, "…")))
 		}
 	}
 
@@ -466,18 +456,12 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 	// 6. Recent Backlog Items Table
 	if len(m.RecentBacklog) > 0 {
 		b.WriteString(whiteBold("Recent Work Units (Backlog Items):\n"))
-		bliIDW := 14
-		prioW := 6
-		stW := 12
-		claimW := 16
-		titleW := w - bliIDW - prioW - stW - claimW - 14
-		if titleW < 15 {
-			titleW = 15
-		}
-
-		b.WriteString(fmt.Sprintf("  %-*s │ %-*s │ %-*s │ %-*s │ %s\n",
-			bliIDW, "BLI ID", prioW, "PRIO", stW, "STATUS", claimW, "CLAIMED BY", "TITLE"))
-		b.WriteString("  " + dim(strings.Repeat("─", w-4)) + "\n")
+		bliTable := tds.NewTable(w).
+			AddColumn("BLI ID", tds.AlignLeft, 14, 0.16).
+			AddColumn("PRIO", tds.AlignCenter, 6, 0.08).
+			AddColumn("STATUS", tds.AlignCenter, 12, 0.14).
+			AddColumn("CLAIMED BY", tds.AlignLeft, 16, 0.20).
+			AddColumn("TITLE", tds.AlignLeft, 25, 0.42)
 
 		limit := 6
 		if len(m.RecentBacklog) < limit {
@@ -499,14 +483,16 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 				claimed = dim("unassigned")
 			}
 
-			tTitle := item.Title
-			if len(tTitle) > titleW {
-				tTitle = tTitle[:titleW-3] + "..."
-			}
-
-			b.WriteString(fmt.Sprintf("  %-*s │ %-*s │ %-*s │ %-*s │ %s\n",
-				bliIDW, item.ID, prioW, item.Priority, stW, stBadge, claimW, claimed, tTitle))
+			bliTable.AddRow(
+				item.ID,
+				item.Priority,
+				stBadge,
+				claimed,
+				item.Title,
+			)
 		}
+		b.WriteString(bliTable.Render())
+		b.WriteString("\n")
 	}
 }
 
@@ -724,18 +710,12 @@ func renderSchedulerTab(b *strings.Builder, m *UIModel) {
 		return
 	}
 
-	idW := 28
-	schW := 10
-	lastW := 19
-	nextW := 19
-	if w < 90 {
-		idW = 20
-		schW = 8
-	}
-
-	b.WriteString(fmt.Sprintf("%-*s │ %-*s │ %-*s │ %-*s │ %s\n",
-		idW, "JOB IDENTIFIER", schW, "SCHEDULE", lastW, "LAST RUN", nextW, "NEXT RUN", "STATUS"))
-	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
+	schedTable := tds.NewTable(w).
+		AddColumn("JOB IDENTIFIER", tds.AlignLeft, 24, 0.35).
+		AddColumn("SCHEDULE", tds.AlignLeft, 10, 0.15).
+		AddColumn("LAST RUN", tds.AlignCenter, 19, 0.20).
+		AddColumn("NEXT RUN", tds.AlignCenter, 19, 0.20).
+		AddColumn("STATUS", tds.AlignCenter, 10, 0.10)
 
 	for _, job := range m.SchedulerJobs {
 		stBadge := greenBold(job.Status)
@@ -745,19 +725,17 @@ func renderSchedulerTab(b *strings.Builder, m *UIModel) {
 			stBadge = yellowBold(job.Status)
 		}
 
-		jID := job.ID
-		if len(jID) > idW {
-			jID = jID[:idW-3] + "..."
-		}
-
-		sch := job.Schedule
-		if len(sch) > schW {
-			sch = sch[:schW-3] + "..."
-		}
-
-		b.WriteString(fmt.Sprintf("%-*s │ %-*s │ %-*s │ %-*s │ %s\n",
-			idW, jID, schW, sch, lastW, job.LastRunAt, nextW, job.NextRunAt, stBadge))
+		schedTable.AddRow(
+			job.ID,
+			job.Schedule,
+			job.LastRunAt,
+			job.NextRunAt,
+			stBadge,
+		)
 	}
+
+	b.WriteString(schedTable.Render())
+	b.WriteString("\n")
 }
 
 func renderFooter(b *strings.Builder, m *UIModel) {
