@@ -22,6 +22,23 @@ func NewUICmd() *cobra.Command {
 			sec := pkgctx.NewSystemSecurityContext()
 			sp := proc.Storage()
 
+			format := proc.Format()
+			if format == cli.FormatJSON || format == cli.FormatJSONL || format == cli.FormatYAML {
+				m := NewUIModel(projectRoot, tab)
+				m.RefreshMutations()
+				m.RefreshAuditEvents()
+				m.RefreshObjects()
+				m.RefreshQA(proc.OperationContext(), sp, sec)
+				m.RefreshHealth()
+				if sp != nil && sec != nil {
+					m.RefreshSwarm(proc.OperationContext(), sp, sec)
+					m.RefreshPM(proc.OperationContext(), sp, sec)
+					m.RefreshMetrics(proc.OperationContext(), sp, sec)
+					m.RefreshScheduler(proc.OperationContext(), sp, sec)
+				}
+				return cli.FormatOutput(cmd, m)
+			}
+
 			return RunTUI(proc.OperationContext(), projectRoot, tab, sp, sec)
 		})(cmd, args)
 	}

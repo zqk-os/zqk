@@ -23,6 +23,11 @@ var (
 
 // Render formats the entire TUI screen into an ANSI string.
 func Render(m *UIModel) string {
+	// If a modal drill-down inspection is active, render the modal overlay
+	if m.DetailModal != nil {
+		return renderDetailModal(m)
+	}
+
 	var b strings.Builder
 
 	// Top Navigation Header
@@ -42,6 +47,10 @@ func Render(m *UIModel) string {
 		renderMetricsTab(&b, m)
 	case TabScheduler:
 		renderSchedulerTab(&b, m)
+	case TabQA:
+		renderQATab(&b, m)
+	case TabHealth:
+		renderHealthTab(&b, m)
 	default:
 		renderStateTab(&b, m)
 	}
@@ -56,9 +65,9 @@ func Render(m *UIModel) string {
 			lines = lines[:len(lines)-1]
 		}
 		if len(lines) > m.Height {
-			// Keep header (first 5 lines) and footer (last 3 lines), clamp middle with scroll offset
-			if m.Height >= 9 {
-				keepTop := 5
+			// Keep header (first 6 lines: box + tabs + dynamic message) and footer (last 3 lines), clamp middle with scroll offset
+			if m.Height >= 10 {
+				keepTop := 6
 				keepBottom := 3
 				middleBudget := m.Height - keepTop - keepBottom
 				middleLines := lines[keepTop : len(lines)-keepBottom]
@@ -105,7 +114,7 @@ func renderHeader(b *strings.Builder, m *UIModel) {
 	b.WriteString("║" + tds.PadCenter(titleFormatted, innerW) + "║\n")
 	b.WriteString("╚" + strings.Repeat("═", w-2) + "╝\n")
 
-	// Tabs Bar (6 tabs)
+	// Tabs Bar (8 tabs)
 	tabs := []struct {
 		idx  int
 		name string
@@ -113,9 +122,11 @@ func renderHeader(b *strings.Builder, m *UIModel) {
 		{TabState, "1: ⚡ State"},
 		{TabAudit, "2: 📜 Audit"},
 		{TabSwarm, "3: 🤖 Swarm"},
-		{TabPM, "4: 📋 PM & Process"},
+		{TabPM, "4: 📋 PM"},
 		{TabMetrics, "5: 📊 Metrics"},
-		{TabScheduler, "6: ⏱️  Scheduler"},
+		{TabScheduler, "6: ⏱️  Sched"},
+		{TabQA, "7: 🧪 QA"},
+		{TabHealth, "8: 🛡️  Health"},
 	}
 
 	var tabStrs []string
@@ -128,6 +139,21 @@ func renderHeader(b *strings.Builder, m *UIModel) {
 	}
 	tabLine := strings.Join(tabStrs, " │ ")
 	b.WriteString(tds.PadRight(tabLine, w) + "\n")
+
+	// Line 6: Dynamic Message Bar (Viewable across any tab)
+	msg := m.DynamicMessage
+	if msg == "" {
+		msg = "System operating normally — ambient telemetry stream active"
+	}
+	prefix := cyanBold("🔔 MESSAGE: ")
+	prefixW := tds.VisibleWidth("🔔 MESSAGE: ")
+	maxMsgW := w - prefixW - 2
+	if maxMsgW < 10 {
+		maxMsgW = 10
+	}
+	msgClean := tds.TruncateVisible(msg, maxMsgW, "…")
+	dynamicLine := prefix + msgClean
+	b.WriteString(tds.PadRight(dynamicLine, w) + "\n")
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 }
 
@@ -448,30 +474,21 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 		w = 80
 	}
 
-	b.WriteString(whiteBold("📋 Program & Process Management Administration (TPM / PM Cascade)\n"))
-	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
-
-	// 1. Strategic Alignment & Pipeline Overview
 	mis := m.MissionTitle
 	if mis == "" {
 		mis = "Continuous Autonomous Development"
 	}
-	vis := m.VisionTitle
-	if vis == "" {
-		vis = "Zero-Overhead Agentic Knowledge Operating System"
-	}
-	b.WriteString(fmt.Sprintf("Mission: %s │ Vision: %s\n", cyanBold(mis), dim(vis)))
-
 	bs := m.BacklogSummary
-	b.WriteString(fmt.Sprintf("%s │ %s: %d  %s: %d  %s: %d  %s: %d  %s: %d  (%s claimed / %s open)\n",
-		whiteBold(fmt.Sprintf("BLI Pipeline (%d Total)", bs.Total)),
+	b.WriteString(fmt.Sprintf("%s │ %s: %s\n",
+		whiteBold("📋 PM & Process Administration"),
+		cyanBold("Mission"), cyanBold(mis)))
+	b.WriteString(fmt.Sprintf("%s │ %s: %d  %s: %d  %s: %d  %s: %d  (%s claimed)\n",
+		whiteBold(fmt.Sprintf("BLI Pipeline (%d)", bs.Total)),
 		cyanBold("Planned"), bs.Planned,
 		yellowBold("InProg"), bs.InProgress,
 		redBold("Blocked"), bs.Blocked,
 		greenBold("Done"), bs.Done,
-		whiteBold("Approved"), bs.Approved,
-		greenBold(fmt.Sprintf("%d", bs.Claimed)),
-		yellowBold(fmt.Sprintf("%d", bs.Unclaimed))))
+		greenBold(fmt.Sprintf("%d", bs.Claimed))))
 
 	// 2. Priority Plans Table
 	if len(m.PriorityPlans) > 0 {
@@ -895,11 +912,13 @@ func renderFooter(b *strings.Builder, m *UIModel) {
 		w = 80
 	}
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
-	legendLine := dim("Legend: ") + "⚡ State │ 📜 Audit │ 🤖 Swarm │ 📋 PM/Process │ 📊 Metrics │ ⏱️  Scheduler"
+	legendLine := dim("Legend: ") + "⚡ State │ 📜 Audit │ 🤖 Swarm │ 📋 PM │ 📊 Metrics │ ⏱️  Sched │ 🧪 QA │ 🛡️  Health/Actions"
 	b.WriteString(tds.PadRight(legendLine, w) + "\n")
-	navLine := whiteBold("[Tab / 1-6]") + " Switch View  " +
-		whiteBold("[↑/↓/j/k]") + " Scroll  " +
-		whiteBold("[Space]") + " Pause/Resume  " +
+	navLine := whiteBold("[Tab / 1-8]") + " Switch View  " +
+		whiteBold("[↑/↓/j/k]") + " Select / Scroll  " +
+		whiteBold("[Enter]") + " Inspect  " +
+		whiteBold("[Keys]") + " Trigger Action  " +
+		whiteBold("[Space]") + " Pause  " +
 		whiteBold("[r]") + " Refresh  " +
 		whiteBold("[q/Esc]") + " Exit"
 	b.WriteString(tds.PadRight(navLine, w) + "\n")
@@ -961,3 +980,351 @@ func formatDurationMs(ms float64) string {
 	}
 	return fmt.Sprintf("%.2fs", ms/1000.0)
 }
+
+// renderQATab renders the unified QA, test cases, and lineage traceability dashboard.
+func renderQATab(b *strings.Builder, m *UIModel) {
+	w := m.Width
+	if w < 70 {
+		w = 80
+	}
+
+	qs := m.QASummary
+
+	// 1. Traceability & DoD Vitals Card (TDS Panel)
+	dodStatus := tds.Badge("PASS")
+	if !qs.DoDCompliant {
+		dodStatus = tds.Badge("FAIL")
+	}
+
+	chainStatus := tds.Badge("OK")
+	if qs.IntactChains < qs.TotalTestCases {
+		chainStatus = tds.Badge("WARN")
+	}
+
+	unboundStatus := tds.Badge("OK")
+	if qs.UnboundCriteria > 0 {
+		unboundStatus = tds.Badge("WARN")
+	}
+
+	critPct := 0.0
+	if qs.TotalCriteria > 0 {
+		critPct = float64(qs.SatisfiedCriteria) / float64(qs.TotalCriteria)
+	}
+
+	row1 := []tds.StatItem{
+		{Label: "Traceability DoD", Value: ternary(qs.DoDCompliant, "100% Intact", "Action Needed"), Extra: dodStatus},
+		{Label: "Intact Chains", Value: fmt.Sprintf("%d / %d", qs.IntactChains, qs.TotalTestCases), Extra: chainStatus},
+		{Label: "Unbound Criteria", Value: fmt.Sprintf("%d", qs.UnboundCriteria), Extra: unboundStatus},
+	}
+	row2 := []tds.StatItem{
+		{Label: "In-Flight Suites", Value: fmt.Sprintf("%d", qs.InFlightCount)},
+		{Label: "Regression Pool", Value: fmt.Sprintf("%d", qs.RegressionCount)},
+		{Label: "Criteria Progress", Value: fmt.Sprintf("%d / %d", qs.SatisfiedCriteria, qs.TotalCriteria), Extra: tds.ProgressBar(critPct, 10)},
+	}
+
+	panelLines := []string{
+		tds.StatRow(row1, w-4),
+		tds.StatRow(row2, w-4),
+	}
+	b.WriteString(tds.Panel("🧪 QA, Verification & Lineage Traceability (DoD Gate)", panelLines, w, tds.BorderRounded))
+	b.WriteString("\n")
+
+	// 2. Active Test Cases Table
+	if len(m.TestCases) == 0 {
+		b.WriteString(dim("  [No test cases discovered or test_dashboard_lite.json empty]\n\n"))
+		return
+	}
+
+	b.WriteString(tds.SectionDivider("TEST SUITES & DOWNWARD TRACEABILITY (Press Enter to inspect)", w))
+	tcTable := tds.NewTable(w).
+		AddColumn("TEST CASE ID", tds.AlignLeft, 14, 0.18).
+		AddColumn("STATUS", tds.AlignCenter, 10, 0.12).
+		AddColumn("LINEAGE", tds.AlignCenter, 10, 0.12).
+		AddColumn("CRITERIA", tds.AlignCenter, 12, 0.14).
+		AddColumn("TITLE", tds.AlignLeft, 26, 0.44)
+
+	availRows := m.Height - 16
+	if availRows < 4 {
+		availRows = 4
+	}
+
+	limit := len(m.TestCases)
+	if limit > availRows {
+		limit = availRows
+	}
+
+	for i := 0; i < limit; i++ {
+		tc := m.TestCases[i]
+
+		// Status Badge
+		stBadge := yellowBold(tc.Status)
+		if tc.Status == "complete" || tc.Status == "passed" || tc.Status == "active" {
+			stBadge = greenBold(tc.Status)
+		} else if tc.Status == "error" || tc.Status == "failed" {
+			stBadge = redBold(tc.Status)
+		}
+
+		// Lineage Badge
+		lineageBadge := greenBold("✓ INTACT")
+		if tc.Lineage == nil || !tc.Lineage.IsIntact {
+			lineageBadge = redBold("✗ BROKEN")
+		}
+
+		// Criteria progress
+		crStr := fmt.Sprintf("%d/%d ok", tc.CompletedCriteria, tc.TotalCriteria)
+
+		// Indicate row cursor if selected
+		idCell := tc.ID
+		if i == m.SelectedIndex {
+			idCell = reverse(" ▶ " + tc.ID + " ")
+		}
+
+		tcTable.AddRow(
+			idCell,
+			stBadge,
+			lineageBadge,
+			crStr,
+			tc.Title,
+		)
+	}
+
+	b.WriteString(tcTable.Render())
+	b.WriteString("\n")
+
+	// 3. Unbound Test Criteria notice if any exist
+	if len(m.UnboundCriteria) > 0 {
+		b.WriteString(tds.SectionDivider("⚠️ UNBOUND CRITERIA (Missing test_case binding)", w))
+		critLimit := 2
+		if len(m.UnboundCriteria) < critLimit {
+			critLimit = len(m.UnboundCriteria)
+		}
+		for i := 0; i < critLimit; i++ {
+			unc := m.UnboundCriteria[i]
+			b.WriteString(fmt.Sprintf("  • %s  %s  %s\n",
+				cyanBold(unc.ID), yellowBold("["+unc.Status+"]"), unc.Title))
+		}
+		b.WriteString("\n")
+	}
+
+	// 4. Recent Criteria Satisfied Ticker
+	if len(m.RecentQAEvents) > 0 {
+		b.WriteString(tds.SectionDivider("LIVE CRITERIA SATISFACTION TICKER", w))
+		tickerLimit := 2
+		if len(m.RecentQAEvents) < tickerLimit {
+			tickerLimit = len(m.RecentQAEvents)
+		}
+		for i := 0; i < tickerLimit; i++ {
+			ev := m.RecentQAEvents[i]
+			tsStr := ev.Timestamp.Format("15:04:05")
+			b.WriteString(fmt.Sprintf("  ⚡ [%s] %s\n", dim(tsStr), greenBold(ev.Message)))
+		}
+		b.WriteString("\n")
+	}
+}
+
+// renderDetailModal renders an overlay modal dialog showing full record details.
+func renderDetailModal(m *UIModel) string {
+	w := m.Width
+	if w < 70 {
+		w = 80
+	}
+	h := m.Height
+	if h < 20 {
+		h = 24
+	}
+
+	modal := m.DetailModal
+	if modal == nil {
+		return ""
+	}
+
+	var lines []string
+	lines = append(lines, "")
+	lines = append(lines, fmt.Sprintf("  %s %s │ %s %s",
+		dim("OBJECT ID:"), whiteBold(modal.ID),
+		dim("KIND:"), cyanBold(modal.Kind)))
+	lines = append(lines, fmt.Sprintf("  %s %s │ %s %s",
+		dim("STATUS   :"), greenBold(modal.Status),
+		dim("TITLE:"), whiteBold(modal.Title)))
+	if modal.Actor != "" {
+		lines = append(lines, fmt.Sprintf("  %s %s", dim("ACTOR / OWNER :"), modal.Actor))
+	}
+	if modal.Timestamp != "" {
+		lines = append(lines, fmt.Sprintf("  %s %s", dim("TIMESTAMP     :"), modal.Timestamp))
+	}
+	lines = append(lines, dim("  "+strings.Repeat("─", w-8)))
+
+	if len(modal.Details) > 0 {
+		lines = append(lines, whiteBold("  PROPERTIES & METRICS:"))
+		for _, d := range modal.Details {
+			lines = append(lines, "    "+d)
+		}
+		lines = append(lines, "")
+	}
+
+	if len(modal.Lineage) > 0 {
+		lines = append(lines, whiteBold("  TRACEABILITY & LINEAGE CHAIN:"))
+		for _, l := range modal.Lineage {
+			lines = append(lines, "    "+l)
+		}
+		lines = append(lines, "")
+	}
+
+	if len(modal.Criteria) > 0 {
+		lines = append(lines, whiteBold("  BOUND CRITERIA & VERIFICATION:"))
+		for _, c := range modal.Criteria {
+			lines = append(lines, "    "+c)
+		}
+		lines = append(lines, "")
+	}
+
+	if modal.Summary != "" && len(modal.Details) == 0 {
+		lines = append(lines, whiteBold("  DIFF / PAYLOAD SUMMARY:"))
+		lines = append(lines, "    "+modal.Summary)
+		lines = append(lines, "")
+	}
+
+	lines = append(lines, dim("  "+strings.Repeat("─", w-8)))
+	lines = append(lines, dim("  Press [Esc] or [Backspace] or [q] to close modal and return to table view"))
+	lines = append(lines, "")
+
+	// Pad or truncate to fit height
+	maxLines := h - 4
+	if len(lines) > maxLines {
+		lines = lines[:maxLines]
+	}
+
+	panelTitle := fmt.Sprintf("🔍 DETAILED RECORD INSPECTION — %s", modal.ID)
+	return tds.Panel(panelTitle, lines, w, tds.BorderHeavy)
+}
+
+// renderHealthTab renders the System Health & Action Center tab.
+func renderHealthTab(b *strings.Builder, m *UIModel) {
+	w := m.Width
+	if w < 70 {
+		w = 80
+	}
+
+	hs := m.HealthSummary
+
+	// 1. Health & Integrity Vitals Card (TDS Panel)
+	statusBadge := tds.Badge("HEALTHY")
+	switch hs.OverallStatus {
+	case "BLOCKED":
+		statusBadge = tds.Badge("FAIL")
+	case "ATTENTION":
+		statusBadge = tds.Badge("WARN")
+	case "NOTICE":
+		statusBadge = tds.Badge("NOTICE")
+	}
+
+	freshBadge := tds.Badge("OK")
+	if strings.HasPrefix(hs.CheckFreshness, "STALE") {
+		freshBadge = tds.Badge("WARN")
+	}
+
+	row1 := []tds.StatItem{
+		{Label: "Kernel Integrity", Value: hs.OverallStatus, Extra: statusBadge},
+		{Label: "Validation Cache", Value: hs.CheckFreshness, Extra: freshBadge},
+		{Label: "Active Violations", Value: fmt.Sprintf("%d total", hs.TotalViolations), Extra: dim(fmt.Sprintf("(%d fixable)", hs.AutoFixableCount))},
+	}
+	row2 := []tds.StatItem{
+		{Label: "Tier Breakdown", Value: fmt.Sprintf("T1:%d  T2:%d  T3:%d", hs.Tier1Count, hs.Tier2Count, hs.Tier3Count)},
+		{Label: "Storage Membrane", Value: fmt.Sprintf("%s (%d objs)", hs.StorageSizeStr, hs.StorageFiles)},
+		{Label: "File Descriptors", Value: fmt.Sprintf("%d / %d", hs.OpenFileDesc, hs.MaxFileDesc), Extra: tds.Badge(ternary(hs.StaleLocksCount == 0, "CLEAN", "LOCKS"))},
+	}
+
+	panelLines := []string{
+		tds.StatRow(row1, w-4),
+		tds.StatRow(row2, w-4),
+	}
+	b.WriteString(tds.Panel("🛡️  Kernel Integrity Radar & System Health", panelLines, w, tds.BorderRounded))
+	b.WriteString("\n")
+
+	// 2. Action Center Card (Tray-Backed Scheduler Triggers)
+	if len(m.ActionItems) > 0 {
+		b.WriteString(tds.SectionDivider("⚡ ACTION CENTER (Press key to trigger background scheduler job)", w))
+		var actionLines []string
+		for _, item := range m.ActionItems {
+			keyBadge := whiteBold(fmt.Sprintf("[%s]", strings.ToUpper(item.Key)))
+			nameStr := cyanBold(item.Name)
+			stStr := dim(item.JobID)
+			if item.IsTriggered {
+				stStr = greenBold("✓ ENQUEUED")
+			}
+			actionLines = append(actionLines, fmt.Sprintf("  %s %-24s %-40s %s", keyBadge, nameStr, item.Description, stStr))
+		}
+		// Print top 4-6 actions
+		limit := 4
+		if m.Height >= 40 {
+			limit = 6
+		}
+		if len(actionLines) < limit {
+			limit = len(actionLines)
+		}
+		for i := 0; i < limit; i++ {
+			b.WriteString(actionLines[i] + "\n")
+		}
+		b.WriteString("\n")
+	}
+
+	// 3. Active Violations & Integrity Warnings Table
+	if len(m.HealthViolations) == 0 {
+		b.WriteString(tds.SectionDivider("ACTIVE VIOLATIONS & INTEGRITY WARNINGS", w))
+		b.WriteString(dim("  [No integrity violations found in validation cache — kernel is clean]\n\n"))
+		return
+	}
+
+	b.WriteString(tds.SectionDivider("ACTIVE VIOLATIONS & INTEGRITY WARNINGS (Press Enter to inspect)", w))
+	vTable := tds.NewTable(w).
+		AddColumn("TIER", tds.AlignCenter, 6, 0.08).
+		AddColumn("SEVERITY", tds.AlignCenter, 10, 0.12).
+		AddColumn("KIND", tds.AlignLeft, 14, 0.16).
+		AddColumn("OBJECT ID", tds.AlignLeft, 16, 0.20).
+		AddColumn("MESSAGE", tds.AlignLeft, 30, 0.44)
+
+	availRows := m.Height - 20
+	if availRows < 4 {
+		availRows = 4
+	}
+
+	limit := len(m.HealthViolations)
+	if limit > availRows {
+		limit = availRows
+	}
+
+	for i := 0; i < limit; i++ {
+		v := m.HealthViolations[i]
+
+		tierStr := fmt.Sprintf("T%d", v.Tier)
+		sevBadge := dim(v.Severity)
+		switch v.Tier {
+		case 1:
+			sevBadge = redBold(v.Severity)
+			tierStr = redBold(tierStr)
+		case 2:
+			sevBadge = yellowBold(v.Severity)
+			tierStr = yellowBold(tierStr)
+		case 3:
+			sevBadge = cyanBold(v.Severity)
+			tierStr = cyanBold(tierStr)
+		}
+
+		idCell := v.ObjectID
+		if i == m.SelectedIndex {
+			idCell = reverse(" ▶ " + v.ObjectID + " ")
+		}
+
+		vTable.AddRow(
+			tierStr,
+			sevBadge,
+			v.Kind,
+			idCell,
+			v.Message,
+		)
+	}
+
+	b.WriteString(vTable.Render())
+	b.WriteString("\n")
+}
+

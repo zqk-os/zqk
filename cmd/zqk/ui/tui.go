@@ -31,6 +31,7 @@ func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp stora
 		m.RefreshMutations()
 		m.RefreshAuditEvents()
 		m.RefreshObjects()
+		m.RefreshQA(ctx, sp, sec)
 		if sp != nil && sec != nil {
 			m.RefreshSwarm(ctx, sp, sec)
 			m.RefreshPM(ctx, sp, sec)
@@ -69,6 +70,7 @@ func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp stora
 	m.RefreshMutations()
 	m.RefreshAuditEvents()
 	m.RefreshObjects()
+	m.RefreshQA(ctx, sp, sec)
 	if sp != nil && sec != nil {
 		m.RefreshSwarm(ctx, sp, sec)
 		m.RefreshPM(ctx, sp, sec)
@@ -142,6 +144,8 @@ func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp stora
 		case <-refreshTicker.C:
 			m.RefreshMutations()
 			m.RefreshAuditEvents()
+			m.RefreshQA(ctx, sp, sec)
+			m.RefreshHealth()
 			if sp != nil && sec != nil {
 				m.RefreshSwarm(ctx, sp, sec)
 				m.RefreshPM(ctx, sp, sec)
@@ -184,7 +188,20 @@ func handleInput(m *UIModel, key []byte) bool {
 		return false
 	}
 
-	// Exit commands
+	// Modal Overlay Dismissal: if modal is open, Esc, Backspace, or 'q' closes the modal without exiting TUI
+	if m.DetailModal != nil {
+		if (len(key) == 1 && (key[0] == KeyEsc || key[0] == KeyBackspace || key[0] == 'q' || key[0] == 'Q')) ||
+			(len(key) >= 3 && key[0] == CSIPrefixEsc && key[1] == CSIPrefixBracket) {
+			m.DetailModal = nil
+			return false
+		}
+		if key[0] == KeyCtrlC {
+			return true
+		}
+		return false
+	}
+
+	// Exit commands when modal is not open
 	if key[0] == 'q' || key[0] == 'Q' || key[0] == KeyCtrlC || (len(key) == 1 && key[0] == KeyEsc) {
 		return true
 	}
@@ -195,31 +212,50 @@ func handleInput(m *UIModel, key []byte) bool {
 		case KeyTab: // Cycle tabs forward
 			m.ActiveTab = (m.ActiveTab + 1) % TotalTabs
 			m.ScrollOffset = 0
+			m.SelectedIndex = 0
 			m.AutoScroll = true
 		case '1':
 			m.ActiveTab = TabState
 			m.ScrollOffset = 0
+			m.SelectedIndex = 0
 			m.AutoScroll = true
 		case '2':
 			m.ActiveTab = TabAudit
 			m.ScrollOffset = 0
+			m.SelectedIndex = 0
 			m.AutoScroll = true
 		case '3':
 			m.ActiveTab = TabSwarm
 			m.ScrollOffset = 0
+			m.SelectedIndex = 0
 			m.AutoScroll = true
 		case '4':
 			m.ActiveTab = TabPM
 			m.ScrollOffset = 0
+			m.SelectedIndex = 0
 			m.AutoScroll = true
 		case '5':
 			m.ActiveTab = TabMetrics
 			m.ScrollOffset = 0
+			m.SelectedIndex = 0
 			m.AutoScroll = true
 		case '6':
 			m.ActiveTab = TabScheduler
 			m.ScrollOffset = 0
+			m.SelectedIndex = 0
 			m.AutoScroll = true
+		case '7':
+			m.ActiveTab = TabQA
+			m.ScrollOffset = 0
+			m.SelectedIndex = 0
+			m.AutoScroll = true
+		case '8':
+			m.ActiveTab = TabHealth
+			m.ScrollOffset = 0
+			m.SelectedIndex = 0
+			m.AutoScroll = true
+		case KeyEnter, '\n': // Step into record details (drill-down modal)
+			m.OpenSelectedItemDetail()
 		case KeySpace: // Toggle auto-scroll
 			m.AutoScroll = !m.AutoScroll
 			if m.AutoScroll {
@@ -229,15 +265,28 @@ func handleInput(m *UIModel, key []byte) bool {
 			m.RefreshMutations()
 			m.RefreshAuditEvents()
 			m.RefreshObjects()
-		case 'k', 'K': // Scroll up
+			m.RefreshQA(context.Background(), nil, nil)
+			m.RefreshHealth()
+		case 'c', 'C', 'a', 'A', 'w', 'W', 'd', 'D', 'p', 'P': // Action Center triggers (Tab 8)
+			if m.ActiveTab == TabHealth {
+				m.TriggerActionCenter(string(key[0]))
+			}
+		case 'k', 'K': // Cursor up / Scroll up
 			m.AutoScroll = false
 			m.ScrollOffset++
-		case 'j', 'J': // Scroll down
+			if m.SelectedIndex > 0 {
+				m.SelectedIndex--
+			}
+		case 'j', 'J': // Cursor down / Scroll down
 			if m.ScrollOffset > 0 {
 				m.ScrollOffset--
 			}
 			if m.ScrollOffset == 0 {
 				m.AutoScroll = true
+			}
+			maxRows := m.GetCurrentRowCount()
+			if maxRows > 0 && m.SelectedIndex < maxRows-1 {
+				m.SelectedIndex++
 			}
 		}
 		return false
@@ -249,6 +298,9 @@ func handleInput(m *UIModel, key []byte) bool {
 		case SeqCodeArrowUp:
 			m.AutoScroll = false
 			m.ScrollOffset++
+			if m.SelectedIndex > 0 {
+				m.SelectedIndex--
+			}
 		case SeqCodeArrowDown:
 			if m.ScrollOffset > 0 {
 				m.ScrollOffset--
@@ -256,18 +308,32 @@ func handleInput(m *UIModel, key []byte) bool {
 			if m.ScrollOffset == 0 {
 				m.AutoScroll = true
 			}
+			maxRows := m.GetCurrentRowCount()
+			if maxRows > 0 && m.SelectedIndex < maxRows-1 {
+				m.SelectedIndex++
+			}
 		case SeqCodePageUp:
 			m.AutoScroll = false
 			m.ScrollOffset += 10
+			m.SelectedIndex -= 10
+			if m.SelectedIndex < 0 {
+				m.SelectedIndex = 0
+			}
 		case SeqCodePageDown:
 			m.ScrollOffset -= 10
 			if m.ScrollOffset <= 0 {
 				m.ScrollOffset = 0
 				m.AutoScroll = true
 			}
+			maxRows := m.GetCurrentRowCount()
+			m.SelectedIndex += 10
+			if maxRows > 0 && m.SelectedIndex >= maxRows {
+				m.SelectedIndex = maxRows - 1
+			}
 		case SeqCodeShiftTab: // Shift+Tab: cycle tabs backward
 			m.ActiveTab = (m.ActiveTab - 1 + TotalTabs) % TotalTabs
 			m.ScrollOffset = 0
+			m.SelectedIndex = 0
 			m.AutoScroll = true
 		}
 	}
