@@ -82,7 +82,7 @@ All commands must implement the standard **Command DNA**:
 | **`zqk init`** | Zero-friction greenfield project knowledge kernel initialization | `init`, `init my-project` |
 | **`zqk run`** | Portable multi-agent swarm package execution (local or remote Git) | `run swarm.yaml`, `run https://github.com/org/swarm` |
 | **`zqk ui`** | Interactive full-screen terminal mission control console (state, audit, swarm, pm, metrics, scheduler) | `ui`, `ui --tab pm`, `ui --tab metrics` |
-| **`zqk state`** | Knowledge kernel state graph inspection, audit journals, and live telemetry | `state stream --dashboard`, `state tree`, `state journal` |
+| **`zqk state`** | Knowledge kernel state graph inspection, audit journals, time-series telemetry, and live streaming | `state stream --dashboard`, `state tree`, `state journal`, `state tsdb` |
 | **`zqk grep`** | In-process trigram and AST code search | `grep "Pattern" pkg/`, `grep --ast "func Test*"` |
 | **`zqk system`** | Host environment, kernel health, resource hygiene, spec validation, initialization | `system check`, `system resource-hygiene`, `system init`, `system validate-command-specs` |
 | **`zqk workflow`** | Process flow, next-action discovery, pipeline generation, VDS gating | `workflow whats-next`, `workflow gen-trace-pipeline`, `workflow vds evaluate` |

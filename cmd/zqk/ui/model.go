@@ -196,6 +196,7 @@ type UIModel struct {
 	LockMetrics     []FileLockMetricRow
 	QualityMetrics  []QualityMetricRow
 	Hygiene         ResourceHygieneRow
+	TSDB            *state.TSDBTelemetry
 
 	// Tab 6: Background Scheduler
 	SchedulerJobs []SchedulerJobRow
@@ -215,7 +216,7 @@ func NewUIModel(projectRoot string, initialTab string) *UIModel {
 		tab = TabSwarm
 	case "pm", "process", "admin", "backlog", "plans", "plan", "objects":
 		tab = TabPM
-	case "metrics", "telemetry", "metric":
+	case "metrics", "telemetry", "metric", "tsdb", "timeseries":
 		tab = TabMetrics
 	case "scheduler", "jobs", "job":
 		tab = TabScheduler
@@ -506,6 +507,10 @@ func (m *UIModel) RefreshPM(ctx context.Context, sp storage.ObjectStorageProvide
 
 // RefreshMetrics queries telemetry and metrics objects.
 func (m *UIModel) RefreshMetrics(ctx context.Context, sp storage.ObjectStorageProvider, sec *pkgctx.SecurityContext) {
+	if m.ProjectRoot != "" {
+		m.TSDB = state.ReadTSDBTelemetry(m.ProjectRoot, 24*time.Hour, 10)
+	}
+
 	if sp == nil {
 		return
 	}

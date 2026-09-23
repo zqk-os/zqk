@@ -1,0 +1,56 @@
+$schema: ../schemas/command_spec.schema.json
+name: tsdb
+short: Inspect embedded kernel time-series database (TSDB) metrics and execution history
+description: |-
+    Queries, aggregates, and inspects time-series performance data recorded in the kernel TSDB
+    (.zqk/scheduler/tsdb) and chunked metrics directories (.zqk/metrics).
+
+      Inspect aggregate TSDB performance telemetry
+      zqk state tsdb
+
+      View time-series execution metrics for the last 24 hours
+      zqk state tsdb --since 24h
+
+      Inspect metrics for a specific scheduler job
+      zqk state tsdb --job-id SCH-autofix-run
+
+      Tail recent raw TSDB points in JSON format
+      zqk state tsdb --limit 50 --format json
+aliases:
+    - timeseries
+    - metrics-history
+args:
+    type: arbitrary_args
+flags:
+    - name: limit
+      shorthand: "l"
+      type: int
+      default: 20
+      description: Maximum number of recent TSDB points to display
+    - name: since
+      shorthand: "s"
+      type: string
+      default: ""
+      description: Time window filter (e.g. 1h, 6h, 24h, 7d, 30d)
+    - name: job-id
+      shorthand: "j"
+      type: string
+      default: ""
+      description: Filter execution metrics by specific scheduler job ID
+    - name: summary
+      type: bool
+      default: true
+      description: Output aggregated performance and latency summary
+    - name: format
+      shorthand: "f"
+      type: string
+      default: "text"
+      description: Output format (text or json)
+help:
+    examples:
+        - comment: View TSDB performance summary
+          command: '%s state tsdb'
+        - comment: Filter by job ID
+          command: '%s state tsdb --job-id SCH-cap-orchestrator'
+run_e: runStateTsdb
+common_flags: true

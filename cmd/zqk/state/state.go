@@ -12,6 +12,7 @@ func NewStateCmd() *cobra.Command {
 	cmd.AddCommand(newTreeCmd())
 	cmd.AddCommand(newJournalCmd())
 	cmd.AddCommand(newStreamCmd())
+	cmd.AddCommand(newTsdbCmd())
 
 	return cmd
 }

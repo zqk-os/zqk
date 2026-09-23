@@ -532,6 +532,53 @@ func renderMetricsTab(b *strings.Builder, m *UIModel) {
 		yellowBold(fmt.Sprintf("%d", h.ActiveStreams))))
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 
+	// TSDB Telemetry Section
+	if m.TSDB != nil {
+		b.WriteString(whiteBold("Time-Series Database (TSDB) Engine & Performance:\n"))
+		b.WriteString(fmt.Sprintf("  Storage: .zqk/scheduler/tsdb (%s points across %d files, %s) │ Chunk Store: %d chunks (%s)\n",
+			cyanBold(fmt.Sprintf("%d", m.TSDB.TotalPoints)), m.TSDB.TotalFiles, m.TSDB.DiskSizeStr, m.TSDB.ChunkStats.TotalChunks, m.TSDB.ChunkStats.DiskSizeStr))
+
+		if len(m.TSDB.JobSummaries) > 0 {
+			b.WriteString("  " + dim("Job Execution Latency & Reliability (from TSDB):") + "\n")
+			tsdbIDW := 24
+			tsdbRunsW := 5
+			tsdbSuccW := 6
+			tsdbFailW := 5
+			tsdbAvgW := 10
+			tsdbMinMaxW := 16
+			tsdbLastW := 9
+			b.WriteString(fmt.Sprintf("  %-*s │ %-*s │ %-*s │ %-*s │ %-*s │ %-*s │ %-*s │ %s\n",
+				tsdbIDW, "JOB IDENTIFIER", tsdbRunsW, "RUNS", tsdbSuccW, "SUCC", tsdbFailW, "FAIL", tsdbAvgW, "AVG LAT", tsdbMinMaxW, "MIN / MAX", tsdbLastW, "LAST RUN", "LATENCY TREND"))
+			b.WriteString("  " + dim(strings.Repeat("─", w-4)) + "\n")
+
+			limit := 7
+			if len(m.TSDB.JobSummaries) < limit {
+				limit = len(m.TSDB.JobSummaries)
+			}
+			for i := 0; i < limit; i++ {
+				j := m.TSDB.JobSummaries[i]
+				lastRunStr := "--:--:--"
+				if !j.LastRunAt.IsZero() {
+					lastRunStr = j.LastRunAt.Format("15:04:05")
+				}
+				failBadge := fmt.Sprintf("%d", j.Failures)
+				if j.Failures > 0 {
+					failBadge = redBold(failBadge)
+				}
+				displayID := j.JobID
+				if len(displayID) > tsdbIDW {
+					displayID = displayID[:tsdbIDW-3] + "..."
+				}
+				avgStr := formatDurationMs(j.AvgDurationMs)
+				minMaxStr := fmt.Sprintf("%s / %s", formatDurationMs(j.MinDurationMs), formatDurationMs(j.MaxDurationMs))
+
+				b.WriteString(fmt.Sprintf("  %-*s │ %-*d │ %-*d │ %-*s │ %-*s │ %-*s │ %-*s │ %s\n",
+					tsdbIDW, displayID, tsdbRunsW, j.Executions, tsdbSuccW, j.Successes, tsdbFailW, failBadge, tsdbAvgW, avgStr, tsdbMinMaxW, minMaxStr, tsdbLastW, lastRunStr, j.Sparkline))
+			}
+		}
+		b.WriteString("\n")
+	}
+
 	// Command Telemetry
 	b.WriteString(whiteBold("Command Execution Telemetry (command_metric):\n"))
 	if len(m.CommandMetrics) == 0 {
@@ -693,4 +740,14 @@ func generateSparkline(count int) string {
 	}
 	b.WriteRune(']')
 	return b.String()
+}
+
+func formatDurationMs(ms float64) string {
+	if ms < 1.0 {
+		return fmt.Sprintf("%.2fms", ms)
+	}
+	if ms < 1000.0 {
+		return fmt.Sprintf("%.1fms", ms)
+	}
+	return fmt.Sprintf("%.2fs", ms/1000.0)
 }
