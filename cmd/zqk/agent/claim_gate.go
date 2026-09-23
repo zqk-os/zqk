@@ -14,6 +14,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 const (
@@ -91,7 +92,7 @@ func runAgentClaimGate(cmd *cobra.Command, _ []string, proc *cli.Processor) erro
 }
 
 func activeIntentAssignment(projectRoot string) string {
-	pointer := filepath.Join(projectRoot, ".zqk", "state", "change_intent_active")
+	pointer := filepath.Join(paths.StateDirPath(projectRoot), "change_intent_active")
 	raw, err := os.ReadFile(pointer)
 	if err != nil {
 		return ""

@@ -235,7 +235,7 @@ func TestTryClaim_RefusesConceptual(t *testing.T) {
 	store := newClaimMemStore(map[string]any{
 		objects.FieldKeyID:     "ATK-1",
 		objects.FieldKeyKind:   objects.KindAgentTask,
-		objects.FieldKeyStatus: "conceptual",
+		objects.FieldKeyStatus: objects.ObjectStatusConceptual,
 	})
 	res, err := TryClaim(ctx, store, sec, "ATK-1", "agent-a")
 	if err == nil || res.Reason != "not_dispatched" {
