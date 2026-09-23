@@ -311,6 +311,11 @@ type UIModel struct {
 	// Dynamic ambient message banner (Line 6, viewable on any tab)
 	DynamicMessage string
 
+	// Inline interactive search filter
+	IsSearching  bool
+	SearchBuffer string
+	SearchQuery  string
+
 	// Discovered kinds and counts
 	ObjectCounts map[string]int
 	LastUpdated  time.Time
@@ -357,16 +362,58 @@ func (m *UIModel) RefreshMutations() {
 		muts[i], muts[j] = muts[j], muts[i]
 	}
 	m.Mutations = muts
-	// If dynamic message is empty, auto-populate from latest mutation or agent instruction
-	if m.DynamicMessage == "" && len(muts) > 0 {
-		latest := muts[len(muts)-1]
+	// If dynamic message is empty, auto-populate from latest mutation, agent instruction, or chat feed
+	if m.DynamicMessage == "" {
+		m.RefreshDynamicMessage()
+	}
+	m.LastUpdated = time.Now()
+}
+
+// RefreshDynamicMessage refreshes the ambient Line 6 dynamic message notification pipeline from
+// recent agent chat events, kernel state mutations, or active scheduler triggers.
+func (m *UIModel) RefreshDynamicMessage() {
+	if m.ProjectRoot == "" {
+		return
+	}
+	// Check agent chat channel for recent kernel events
+	chatFile := filepath.Join(m.ProjectRoot, ".zqk", "logs", "ide-hooks", "agent_chat_channel.jsonl")
+	if data, err := os.ReadFile(chatFile); err == nil {
+		lines := strings.Split(strings.TrimSpace(string(data)), "\n")
+		for i := len(lines) - 1; i >= 0; i-- {
+			line := strings.TrimSpace(lines[i])
+			if line == "" {
+				continue
+			}
+			var entry struct {
+				Type      string `json:"type"`
+				Operation string `json:"operation"`
+				Kind      string `json:"kind"`
+				ObjectID  string `json:"object_id"`
+				Message   string `json:"message"`
+			}
+			if err := json.Unmarshal([]byte(line), &entry); err == nil && entry.ObjectID != "" {
+				if entry.Message != "" {
+					msg := entry.Message
+					if idx := strings.Index(msg, "Object "); idx != -1 {
+						msg = msg[idx:]
+					}
+					m.DynamicMessage = "⚡ " + msg
+					return
+				}
+				m.DynamicMessage = fmt.Sprintf("⚡ %s %s: %s", entry.Kind, entry.Operation, entry.ObjectID)
+				return
+			}
+		}
+	}
+	// Fallback to latest mutation if available
+	if len(m.Mutations) > 0 {
+		latest := m.Mutations[len(m.Mutations)-1]
 		summary := latest.DiffSummary
 		if summary == "" {
 			summary = latest.ChangeType
 		}
-		m.DynamicMessage = fmt.Sprintf("%s │ %s", latest.ObjectRef, summary)
+		m.DynamicMessage = fmt.Sprintf("⚡ %s │ %s", latest.ObjectRef, summary)
 	}
-	m.LastUpdated = time.Now()
 }
 
 // RefreshAuditEvents re-reads high-volume operational audit events.
@@ -1285,23 +1332,148 @@ func (m *UIModel) TriggerScheduledJob(jobID string, delaySeconds int) bool {
 	return true
 }
 
+func (m *UIModel) matchesQuery(targets ...string) bool {
+	if m.SearchQuery == "" {
+		return true
+	}
+	q := strings.ToLower(m.SearchQuery)
+	for _, t := range targets {
+		if strings.Contains(strings.ToLower(t), q) {
+			return true
+		}
+	}
+	return false
+}
+
+// GetVisibleMutations returns mutations matching active search query.
+func (m *UIModel) GetVisibleMutations() []state.JournalMutation {
+	if m.SearchQuery == "" {
+		return m.Mutations
+	}
+	var res []state.JournalMutation
+	for _, mut := range m.Mutations {
+		if m.matchesQuery(mut.ID, mut.ObjectRef, mut.ChangeType, mut.Actor, mut.DiffSummary) {
+			res = append(res, mut)
+		}
+	}
+	return res
+}
+
+// GetVisibleAuditEvents returns audit events matching active search query.
+func (m *UIModel) GetVisibleAuditEvents() []state.JournalMutation {
+	if m.SearchQuery == "" {
+		return m.AuditEvents
+	}
+	var res []state.JournalMutation
+	for _, a := range m.AuditEvents {
+		if m.matchesQuery(a.ID, a.ObjectRef, a.ChangeType, a.Actor, a.CreatedBy, a.DiffSummary) {
+			res = append(res, a)
+		}
+	}
+	return res
+}
+
+// GetVisibleBacklog returns backlog items matching active search query.
+func (m *UIModel) GetVisibleBacklog() []PMBacklogRow {
+	if m.SearchQuery == "" {
+		return m.RecentBacklog
+	}
+	var res []PMBacklogRow
+	for _, b := range m.RecentBacklog {
+		if m.matchesQuery(b.ID, b.Title, b.Status, b.Priority, b.ClaimedBy, b.PlanRef) {
+			res = append(res, b)
+		}
+	}
+	return res
+}
+
+// GetVisibleTechnicalDebt returns technical debt items matching active search query.
+func (m *UIModel) GetVisibleTechnicalDebt() []PMDebtRow {
+	if m.SearchQuery == "" {
+		return m.TechnicalDebt
+	}
+	var res []PMDebtRow
+	for _, d := range m.TechnicalDebt {
+		if m.matchesQuery(d.ID, d.Title, d.Category, d.Status, d.Priority) {
+			res = append(res, d)
+		}
+	}
+	return res
+}
+
+// GetVisibleCommandMetrics returns command metrics matching active search query.
+func (m *UIModel) GetVisibleCommandMetrics() []CommandMetricRow {
+	if m.SearchQuery == "" {
+		return m.CommandMetrics
+	}
+	var res []CommandMetricRow
+	for _, cm := range m.CommandMetrics {
+		if m.matchesQuery(cm.ID, cm.CommandName, cm.Status) {
+			res = append(res, cm)
+		}
+	}
+	return res
+}
+
+// GetVisibleSchedulerJobs returns scheduler jobs matching active search query.
+func (m *UIModel) GetVisibleSchedulerJobs() []SchedulerJobRow {
+	if m.SearchQuery == "" {
+		return m.SchedulerJobs
+	}
+	var res []SchedulerJobRow
+	for _, j := range m.SchedulerJobs {
+		if m.matchesQuery(j.ID, j.Title, j.Description, j.Category, j.Schedule, j.Status, j.Command) {
+			res = append(res, j)
+		}
+	}
+	return res
+}
+
+// GetVisibleTestCases returns test cases matching active search query.
+func (m *UIModel) GetVisibleTestCases() []*test.TestCaseModel {
+	if m.SearchQuery == "" {
+		return m.TestCases
+	}
+	var res []*test.TestCaseModel
+	for _, tc := range m.TestCases {
+		if tc != nil && m.matchesQuery(tc.ID, tc.Title, tc.Status, tc.PathOrID, tc.Scope, tc.Category) {
+			res = append(res, tc)
+		}
+	}
+	return res
+}
+
+// GetVisibleHealthViolations returns health violations matching active search query.
+func (m *UIModel) GetVisibleHealthViolations() []HealthViolationRow {
+	if m.SearchQuery == "" {
+		return m.HealthViolations
+	}
+	var res []HealthViolationRow
+	for _, v := range m.HealthViolations {
+		if m.matchesQuery(v.ObjectID, v.Kind, v.Severity, v.Category, v.Message, v.Path) {
+			res = append(res, v)
+		}
+	}
+	return res
+}
+
 // GetCurrentRowCount returns the number of selectable rows in the active tab.
 func (m *UIModel) GetCurrentRowCount() int {
 	switch m.ActiveTab {
 	case TabState:
-		return len(m.Mutations)
+		return len(m.GetVisibleMutations())
 	case TabAudit:
-		return len(m.AuditEvents)
+		return len(m.GetVisibleAuditEvents())
 	case TabPM:
-		return len(m.RecentBacklog) + len(m.TechnicalDebt)
+		return len(m.GetVisibleBacklog()) + len(m.GetVisibleTechnicalDebt())
 	case TabMetrics:
-		return len(m.CommandMetrics)
+		return len(m.GetVisibleCommandMetrics())
 	case TabScheduler:
-		return len(m.SchedulerJobs)
+		return len(m.GetVisibleSchedulerJobs())
 	case TabQA:
-		return len(m.TestCases)
+		return len(m.GetVisibleTestCases())
 	case TabHealth:
-		return len(m.HealthViolations)
+		return len(m.GetVisibleHealthViolations())
 	default:
 		return 0
 	}
@@ -1316,8 +1488,9 @@ func (m *UIModel) OpenSelectedItemDetail() {
 
 	switch m.ActiveTab {
 	case TabState:
-		if idx < len(m.Mutations) {
-			mut := m.Mutations[idx]
+		mutations := m.GetVisibleMutations()
+		if idx < len(mutations) {
+			mut := mutations[idx]
 			tStr := "--"
 			if mut.CreatedAt > 0 {
 				tStr = time.Unix(mut.CreatedAt, 0).Format("2006-01-02 15:04:05")
@@ -1343,8 +1516,9 @@ func (m *UIModel) OpenSelectedItemDetail() {
 		}
 
 	case TabAudit:
-		if idx < len(m.AuditEvents) {
-			aud := m.AuditEvents[idx]
+		audits := m.GetVisibleAuditEvents()
+		if idx < len(audits) {
+			aud := audits[idx]
 			tStr := "--"
 			if aud.CreatedAt > 0 {
 				tStr = time.Unix(aud.CreatedAt, 0).Format("2006-01-02 15:04:05")
@@ -1376,8 +1550,10 @@ func (m *UIModel) OpenSelectedItemDetail() {
 		}
 
 	case TabPM:
-		if idx < len(m.RecentBacklog) {
-			bli := m.RecentBacklog[idx]
+		backlog := m.GetVisibleBacklog()
+		debt := m.GetVisibleTechnicalDebt()
+		if idx < len(backlog) {
+			bli := backlog[idx]
 			claimed := bli.ClaimedBy
 			if claimed == "" || claimed == "<nil>" {
 				claimed = "unassigned"
@@ -1405,26 +1581,27 @@ func (m *UIModel) OpenSelectedItemDetail() {
 				Details: details,
 				Lineage: lineage,
 			}
-		} else if debtIdx := idx - len(m.RecentBacklog); debtIdx < len(m.TechnicalDebt) {
-			debt := m.TechnicalDebt[debtIdx]
+		} else if debtIdx := idx - len(backlog); debtIdx < len(debt) {
+			d := debt[debtIdx]
 			details := []string{
-				fmt.Sprintf("Debt ID       : %s", debt.ID),
-				fmt.Sprintf("Category      : %s", debt.Category),
-				fmt.Sprintf("Priority      : %s", debt.Priority),
-				fmt.Sprintf("Workflow State: %s", debt.Status),
+				fmt.Sprintf("Debt ID       : %s", d.ID),
+				fmt.Sprintf("Category      : %s", d.Category),
+				fmt.Sprintf("Priority      : %s", d.Priority),
+				fmt.Sprintf("Workflow State: %s", d.Status),
 			}
 			m.DetailModal = &ItemDetailModel{
 				Kind:    objects.KindTechnicalDebt,
-				ID:      debt.ID,
-				Status:  debt.Status,
-				Title:   debt.Title,
+				ID:      d.ID,
+				Status:  d.Status,
+				Title:   d.Title,
 				Details: details,
 			}
 		}
 
 	case TabMetrics:
-		if idx < len(m.CommandMetrics) {
-			cm := m.CommandMetrics[idx]
+		cmdMetrics := m.GetVisibleCommandMetrics()
+		if idx < len(cmdMetrics) {
+			cm := cmdMetrics[idx]
 			details := []string{
 				fmt.Sprintf("Command Name  : %s", cm.CommandName),
 				fmt.Sprintf("Invocations   : %d", cm.ExecCount),
@@ -1443,8 +1620,9 @@ func (m *UIModel) OpenSelectedItemDetail() {
 		}
 
 	case TabScheduler:
-		if idx < len(m.SchedulerJobs) {
-			job := m.SchedulerJobs[idx]
+		jobs := m.GetVisibleSchedulerJobs()
+		if idx < len(jobs) {
+			job := jobs[idx]
 			details := []string{
 				fmt.Sprintf("Job Title     : %s", job.Title),
 				fmt.Sprintf("Category      : %s", job.Category),
@@ -1484,8 +1662,9 @@ func (m *UIModel) OpenSelectedItemDetail() {
 		}
 
 	case TabQA:
-		if idx < len(m.TestCases) {
-			tc := m.TestCases[idx]
+		testCases := m.GetVisibleTestCases()
+		if idx < len(testCases) {
+			tc := testCases[idx]
 			details := []string{
 				fmt.Sprintf("Scope / Suite : %s (%s)", tc.Scope, tc.Category),
 				fmt.Sprintf("Target File   : %s", tc.PathOrID),
@@ -1531,8 +1710,9 @@ func (m *UIModel) OpenSelectedItemDetail() {
 		}
 
 	case TabHealth:
-		if idx < len(m.HealthViolations) {
-			v := m.HealthViolations[idx]
+		violations := m.GetVisibleHealthViolations()
+		if idx < len(violations) {
+			v := violations[idx]
 			details := []string{
 				fmt.Sprintf("Violation Tier: Tier %d (%s)", v.Tier, v.Severity),
 				fmt.Sprintf("Category      : %s", v.Category),

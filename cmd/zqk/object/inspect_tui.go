@@ -393,7 +393,7 @@ func (m *InspectTUIModel) Render() string {
 		out.WriteString("\n")
 	} else {
 		// Navigation Key Help Bar
-		helpBar := "Nav: [Tab] Kind │ [j/k/↑/↓] Select │ [f] Filter │ [s] Sort │ [/] Search │ [Enter] Drill-down │ [p] Policy │ [q] Quit"
+		helpBar := "Nav: [Tab] Kind │ [j/k] Select │ [g/G] Top/Bottom │ [f] Filter │ [s] Sort │ [/] Search │ [Enter] Drill-down │ [p] Policy │ [q] Quit"
 		out.WriteString(color.New(color.Faint).Sprint(helpBar))
 		out.WriteString("\n")
 	}
@@ -621,6 +621,30 @@ func (m *InspectTUIModel) HandleInput(key []byte) bool {
 		case 'r', 'R': // Force refresh
 			m.RefreshObjects()
 			m.SetStatus("Refreshed object list", 2*time.Second)
+		case 'g': // Little gee: jump to top (or toggle to bottom if already at top: g->G)
+			if len(m.VisibleProjections) > 0 {
+				if m.SelectedIndex == 0 && len(m.VisibleProjections) > 1 {
+					m.SelectedIndex = len(m.VisibleProjections) - 1
+				} else {
+					m.SelectedIndex = 0
+				}
+			}
+		case 'G': // Big gee: jump to bottom (or toggle to top if already at bottom: G->g)
+			if len(m.VisibleProjections) > 0 {
+				if m.SelectedIndex == len(m.VisibleProjections)-1 && len(m.VisibleProjections) > 1 {
+					m.SelectedIndex = 0
+				} else {
+					m.SelectedIndex = len(m.VisibleProjections) - 1
+				}
+			}
+		case 'n': // Next item / match
+			if len(m.VisibleProjections) > 0 {
+				m.SelectedIndex = (m.SelectedIndex + 1) % len(m.VisibleProjections)
+			}
+		case 'N': // Previous item / match
+			if len(m.VisibleProjections) > 0 {
+				m.SelectedIndex = (m.SelectedIndex - 1 + len(m.VisibleProjections)) % len(m.VisibleProjections)
+			}
 		case 'j', 'J': // Cursor down
 			if m.SelectedIndex < len(m.VisibleProjections)-1 {
 				m.SelectedIndex++
@@ -636,6 +660,12 @@ func (m *InspectTUIModel) HandleInput(key []byte) bool {
 	// 5. ANSI multi-byte escape sequences
 	if len(key) >= 3 && key[0] == 27 && key[1] == '[' {
 		switch key[2] {
+		case 'H': // Home
+			m.SelectedIndex = 0
+		case 'F': // End
+			if len(m.VisibleProjections) > 0 {
+				m.SelectedIndex = len(m.VisibleProjections) - 1
+			}
 		case 'A': // Arrow Up
 			if m.SelectedIndex > 0 {
 				m.SelectedIndex--
