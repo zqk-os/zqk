@@ -25,9 +25,14 @@ const (
 	// \033[?25h: restores cursor visibility.
 	AnsiShowCursor = "\033[?25h"
 
-	// \033[K: erases from the current cursor position to the end of the line.
+	// AnsiClearToEOL erases from the current cursor position to the end of the line.
 	// Essential in raw mode to prevent artifacts when overwriting previous frames.
 	AnsiClearToEOL = "\033[K"
+
+	// AnsiClearToBottom erases from the current cursor position to the end of the screen/display.
+	// Essential when switching from a taller view to a shorter view to prevent stale ghost lines.
+	AnsiClearToBottom = "\033[J"
+	AnsiClearToScreenBottom = AnsiClearToBottom
 
 	// CRLF is the explicit Carriage Return + Line Feed required in raw terminal mode.
 	// In raw mode, standard '\n' only performs line-feed without resetting column position,

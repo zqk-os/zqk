@@ -25,7 +25,7 @@ func NewUiCommandBuilder() *cobra.Command {
 	help.AddExample("Launch focused on swarm tab", "%s ui --tab swarm")
 	builder.WithHelpBuilder(help)
 	builder.WithArgs(cobra.NoArgs)
-	builder.AddStringFlag("tab", "t", "seismograph", "Initial tab to display (state, audit, swarm, pm, metrics, scheduler)")
+	builder.AddStringFlag("tab", "t", "seismograph", "Initial tab to display (state, audit, swarm, pm, metrics, scheduler, qa, health)")
 	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
 	cmd := builder.Build()
 	return cmd

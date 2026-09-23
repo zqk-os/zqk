@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zqk-os/zqk/cmd/zqk/state"
+	"github.com/zqk-os/zqk/cmd/zqk/test"
 )
 
 func TestNewUICmd(t *testing.T) {
@@ -43,7 +44,7 @@ func TestUIModel_NavigationAndScrolling(t *testing.T) {
 	assert.True(t, m.AutoScroll)
 	assert.Equal(t, 0, m.ScrollOffset)
 
-	// Tab cycle forward through all 6 tabs
+	// Tab cycle forward through all 8 tabs
 	assert.False(t, handleInput(m, []byte{KeyTab}))
 	assert.Equal(t, TabAudit, m.ActiveTab)
 
@@ -59,11 +60,17 @@ func TestUIModel_NavigationAndScrolling(t *testing.T) {
 	assert.False(t, handleInput(m, []byte{KeyTab}))
 	assert.Equal(t, TabScheduler, m.ActiveTab)
 
+	assert.False(t, handleInput(m, []byte{KeyTab}))
+	assert.Equal(t, TabQA, m.ActiveTab)
+
+	assert.False(t, handleInput(m, []byte{KeyTab}))
+	assert.Equal(t, TabHealth, m.ActiveTab)
+
 	// Cycle back to 0
 	assert.False(t, handleInput(m, []byte{KeyTab}))
 	assert.Equal(t, TabState, m.ActiveTab)
 
-	// Direct numeric key selection (1-6)
+	// Direct numeric key selection (1-8)
 	handleInput(m, []byte{'2'})
 	assert.Equal(t, TabAudit, m.ActiveTab)
 
@@ -79,12 +86,18 @@ func TestUIModel_NavigationAndScrolling(t *testing.T) {
 	handleInput(m, []byte{'6'})
 	assert.Equal(t, TabScheduler, m.ActiveTab)
 
+	handleInput(m, []byte{'7'})
+	assert.Equal(t, TabQA, m.ActiveTab)
+
+	handleInput(m, []byte{'8'})
+	assert.Equal(t, TabHealth, m.ActiveTab)
+
 	handleInput(m, []byte{'1'})
 	assert.Equal(t, TabState, m.ActiveTab)
 
 	// Shift+Tab backward cycle
 	handleInput(m, []byte{CSIPrefixEsc, CSIPrefixBracket, SeqCodeShiftTab})
-	assert.Equal(t, TabScheduler, m.ActiveTab)
+	assert.Equal(t, TabHealth, m.ActiveTab)
 
 	// Scroll controls
 	handleInput(m, []byte{'k'}) // Scroll up
@@ -232,9 +245,12 @@ func TestRender_AllSixTabs(t *testing.T) {
 
 	// Render Tab 1: State
 	m.ActiveTab = TabState
+	m.DynamicMessage = "Test dynamic message line broadcast"
 	out1 := Render(m)
 	assert.Contains(t, out1, "MISSION CONTROL CONSOLE")
 	assert.Contains(t, out1, "1: ⚡ State")
+	assert.Contains(t, out1, "MESSAGE:")
+	assert.Contains(t, out1, "Test dynamic message line broadcast")
 	assert.Contains(t, out1, "BLI-001")
 	assert.Contains(t, out1, "AUTO-SCROLL: ON")
 
@@ -256,10 +272,10 @@ func TestRender_AllSixTabs(t *testing.T) {
 	// Render Tab 4: PM & Process
 	m.ActiveTab = TabPM
 	out4 := Render(m)
-	assert.Contains(t, out4, "Program & Process Management Administration")
+	assert.Contains(t, out4, "PM & Process Administration")
 	assert.Contains(t, out4, "Build Resilient Operating System")
 	assert.Contains(t, out4, "PRI-TPM-CONV")
-	assert.Contains(t, out4, "BLI Pipeline (12 Total)")
+	assert.Contains(t, out4, "BLI Pipeline (12)")
 	assert.Contains(t, out4, "BLK-01")
 	assert.Contains(t, out4, "DEBT-01")
 
@@ -277,4 +293,162 @@ func TestRender_AllSixTabs(t *testing.T) {
 	assert.Contains(t, out6, "Autonomous Scheduler")
 	assert.Contains(t, out6, "SCH-autofix-run")
 	assert.Contains(t, out6, "@every 5m")
+
+	// Tab 7 Data: QA & Lineage
+	m.QASummary = QASummaryRow{
+		TotalTestCases:    5,
+		InFlightCount:     2,
+		RegressionCount:   3,
+		SatisfiedCriteria: 10,
+		TotalCriteria:     12,
+		IntactChains:      5,
+		UnboundCriteria:   0,
+		DoDCompliant:      true,
+	}
+	m.TestCases = []*test.TestCaseModel{
+		{
+			ID:                 "TC-CORE-001",
+			Title:              "CAS Content Deduplication Integrity",
+			Status:             "active",
+			CompletedCriteria:  2,
+			TotalCriteria:      2,
+			RemainingOpenCount: 0,
+			Lineage: &test.LineageChain{
+				RootObject: &test.LineageNode{ID: "GOAL-01", Kind: "goal", Status: "active", Title: "Zero Data Corruption"},
+				IsIntact:   true,
+			},
+		},
+	}
+
+	// Render Tab 7: QA
+	m.ActiveTab = TabQA
+	out7 := Render(m)
+	assert.Contains(t, out7, "QA, Verification & Lineage Traceability")
+	assert.Contains(t, out7, "TC-CORE-001")
+	assert.Contains(t, out7, "CAS Content Deduplication Integrity")
+	assert.Contains(t, out7, "100% Intact")
+	assert.Contains(t, out7, "INTACT")
 }
+
+func TestRender_DrillDownModal(t *testing.T) {
+	m := NewUIModel("", "qa")
+	m.Width = 100
+	m.Height = 30
+	m.ActiveTab = TabQA
+
+	m.TestCases = []*test.TestCaseModel{
+		{
+			ID:                 "TC-UI-007",
+			Title:              "Mission Control TUI Interactive Drill-Down",
+			Status:             "active",
+			PathOrID:           "cmd/zqk/ui/views.go",
+			Scope:              "ui",
+			Category:           "tui",
+			CompletedCriteria:  1,
+			TotalCriteria:      1,
+			RemainingOpenCount: 0,
+			Lineage: &test.LineageChain{
+				RootObject: &test.LineageNode{ID: "GOAL-01", Kind: "goal", Status: "active", Title: "World-Class TUI Experience"},
+				IsIntact:   true,
+			},
+		},
+	}
+
+	// Verify Enter triggers drill-down modal
+	m.SelectedIndex = 0
+	handleInput(m, []byte{KeyEnter})
+	require.NotNil(t, m.DetailModal)
+	assert.Equal(t, "TC-UI-007", m.DetailModal.ID)
+
+	modalOut := Render(m)
+	assert.Contains(t, modalOut, "DETAILED RECORD INSPECTION")
+	assert.Contains(t, modalOut, "TC-UI-007")
+	assert.Contains(t, modalOut, "Mission Control TUI Interactive Drill-Down")
+	assert.Contains(t, modalOut, "TRACEABILITY & LINEAGE CHAIN")
+
+	// Verify Esc closes modal without quitting TUI
+	exit := handleInput(m, []byte{KeyEsc})
+	assert.False(t, exit)
+	assert.Nil(t, m.DetailModal)
+}
+
+func TestRender_HealthTab_ActionCenter(t *testing.T) {
+	tmpDir := t.TempDir()
+	m := NewUIModel(tmpDir, "health")
+	m.Width = 100
+	m.Height = 35
+	assert.Equal(t, TabHealth, m.ActiveTab)
+
+	// Populate health summary and violations
+	m.HealthSummary = HealthSummary{
+		OverallStatus:    "ATTENTION",
+		CheckFreshness:   "FRESH (2m ago)",
+		TotalViolations:  2,
+		Tier1Count:       0,
+		Tier2Count:       1,
+		Tier3Count:       1,
+		AutoFixableCount: 1,
+		StaleLocksCount:  0,
+		StorageFiles:     14800,
+		StorageSizeStr:   "142MiB",
+		OpenFileDesc:     10,
+		MaxFileDesc:      245760,
+	}
+
+	m.ActionItems = []ActionCenterItem{
+		{Key: "c", Name: "Quick Cache Check", Description: "Trigger non-blocking validation scan via scheduler", JobID: "SCH-cache-prewarm"},
+		{Key: "a", Name: "Auto-Fix Batch", Description: "Execute batch remediation of auto-fixable issues", JobID: "SCH-autofix-run"},
+	}
+
+	m.HealthViolations = []HealthViolationRow{
+		{
+			Tier:        2,
+			Severity:    "WARN",
+			Kind:        "backlog_item",
+			ObjectID:    "BLI-042",
+			Category:    "reference",
+			Message:     "Missing priority_plan_ref link",
+			AutoFixable: true,
+			Path:        ".zqk/process/backlog_items/bli_042.yaml",
+		},
+		{
+			Tier:        3,
+			Severity:    "NOTICE",
+			Kind:        "scheduler_job",
+			ObjectID:    "SCH-evag",
+			Category:    "outstanding_validation",
+			Message:     "Validation pending (outstanding)",
+			AutoFixable: false,
+			Path:        ".zqk/process/scheduler_jobs/sch_evag.yaml",
+		},
+	}
+
+	out := Render(m)
+	assert.Contains(t, out, "Kernel Integrity Radar & System Health")
+	assert.Contains(t, out, "ACTION CENTER")
+	assert.Contains(t, out, "[C]")
+	assert.Contains(t, out, "Quick Cache Check")
+	assert.Contains(t, out, "BLI-042")
+	assert.Contains(t, out, "Missing priority_plan_ref link")
+	assert.Contains(t, out, "SCH-evag")
+
+	// Test triggering an Action Center key ('c')
+	handleInput(m, []byte{'c'})
+	assert.Contains(t, m.DynamicMessage, "Enqueued [Quick Cache Check]")
+
+	// Test drill-down modal on selected violation
+	m.SelectedIndex = 0
+	handleInput(m, []byte{KeyEnter})
+	require.NotNil(t, m.DetailModal)
+	assert.Equal(t, "BLI-042", m.DetailModal.ID)
+
+	modalOut := Render(m)
+	assert.Contains(t, modalOut, "DETAILED RECORD INSPECTION — BLI-042")
+	assert.Contains(t, modalOut, "Missing priority_plan_ref link")
+	assert.Contains(t, modalOut, "Remediation")
+
+	// Close modal
+	handleInput(m, []byte{KeyEsc})
+	assert.Nil(t, m.DetailModal)
+}
+
