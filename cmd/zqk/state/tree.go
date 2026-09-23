@@ -12,6 +12,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -74,16 +75,12 @@ type StateTreePayload struct {
 }
 
 func newTreeCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "tree",
-		Short: "Visualize the current execution state tree, active leases, and recent mutations",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-				return runStateTree(cmd, proc)
-			})(cmd, args)
-		},
+	cmd := bldr_cli_cmd_v1.NewStateTreeCommandBuilder()
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
+			return runStateTree(cmd, proc)
+		})(cmd, args)
 	}
-	cli.AddCommonFlags(cmd)
 	return cmd
 }
 

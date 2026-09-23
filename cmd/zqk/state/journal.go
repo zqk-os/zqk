@@ -7,22 +7,21 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 )
 
 func newJournalCmd() *cobra.Command {
-	var limit int
-	cmd := &cobra.Command{
-		Use:     "journal",
-		Aliases: []string{"log", "history"},
-		Short:   "List recent cryptographic change journal mutations",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-				projectRoot := proc.ProjectRoot()
-				if projectRoot == "" {
-					projectRoot = cli.ResolveProjectRoot(".")
-				}
+	cmd := bldr_cli_cmd_v1.NewStateJournalCommandBuilder()
+	cmd.Aliases = []string{"log", "history"}
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		limit, _ := cmd.Flags().GetInt("limit")
+		return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
+			projectRoot := proc.ProjectRoot()
+			if projectRoot == "" {
+				projectRoot = cli.ResolveProjectRoot(".")
+			}
 
-				mutations := readRecentJournalMutations(projectRoot, limit)
+			mutations := readRecentJournalMutations(projectRoot, limit)
 
 				format, _ := cmd.Flags().GetString("format")
 				if format == "json" {
@@ -61,9 +60,6 @@ func newJournalCmd() *cobra.Command {
 
 				return cli.WriteOutput(cmd, []byte(buf.String()))
 			})(cmd, args)
-		},
-	}
-	cmd.Flags().IntVarP(&limit, "limit", "n", 20, "Maximum number of journal mutations to return")
-	cli.AddCommonFlags(cmd)
+		}
 	return cmd
 }

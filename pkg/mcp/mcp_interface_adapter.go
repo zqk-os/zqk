@@ -21,8 +21,9 @@ type EventCoordinator interface {
 // This avoids method name conflicts with existing Server methods
 type MCPServerAdapter struct {
 	*Server
-	metrics     *MCPMetrics
-	coordinator EventCoordinator // Optional coordinator for event emission (avoids import cycle)
+	metrics         *MCPMetrics
+	coordinator     EventCoordinator // Optional coordinator for event emission (avoids import cycle)
+	cpcpInterceptor *CPCPInterceptor // CPCP-MEMBRANE-001 Boundary Contract Interceptor
 }
 
 // NewMCPServerAdapter creates a new adapter that implements the MCP interfaces
@@ -30,8 +31,9 @@ func NewMCPServerAdapter(server *Server) *MCPServerAdapter {
 	// Try to get coordinator via reflection/interface to avoid import cycle
 	// Coordinator will be set via SetCoordinator if available
 	adapter := &MCPServerAdapter{
-		Server:  server,
-		metrics: server.mcpMetrics,
+		Server:          server,
+		metrics:         server.mcpMetrics,
+		cpcpInterceptor: NewCPCPInterceptor(),
 		// Coordinator will be set via SetCoordinator if coordinator package is available
 	}
 	return adapter
@@ -40,9 +42,10 @@ func NewMCPServerAdapter(server *Server) *MCPServerAdapter {
 // NewMCPServerAdapterWithCoordinator creates a new adapter with a specific coordinator
 func NewMCPServerAdapterWithCoordinator(server *Server, coordinator EventCoordinator) *MCPServerAdapter {
 	return &MCPServerAdapter{
-		Server:      server,
-		metrics:     server.mcpMetrics,
-		coordinator: coordinator,
+		Server:          server,
+		metrics:         server.mcpMetrics,
+		coordinator:     coordinator,
+		cpcpInterceptor: NewCPCPInterceptor(),
 	}
 }
 
@@ -166,8 +169,27 @@ func (a *MCPServerAdapter) ListTools(ctx context.Context) (*ToolsListResult, err
 // CallTool implements MCPServer.CallTool
 func (a *MCPServerAdapter) CallTool(ctx context.Context, params *ToolCallParams) (*ToolCallResult, error) {
 	start := time.Now()
-	toolName := params.Name
+	var toolName string
+	if params != nil {
+		toolName = params.Name
+	}
 	operationID := fmt.Sprintf("mcp_tool_call_%s_%d", toolName, time.Now().UnixNano())
+
+	if a.cpcpInterceptor != nil {
+		if err := a.cpcpInterceptor.ValidateToolCall(ctx, params); err != nil {
+			duration := time.Since(start)
+			a.metrics.RecordToolCall(toolName, duration, err)
+			return &ToolCallResult{
+				IsError: true,
+				Content: []Content{
+					{
+						Type: "text",
+						Text: err.Error(),
+					},
+				},
+			}, err
+		}
+	}
 
 	defer func() {
 		duration := time.Since(start)
