@@ -752,7 +752,7 @@ func (h *RunWrapperHandler) runWrapperRetryAttempts(ctx context.Context, job *Sc
 		// For long-running commands, log periodic progress updates
 		// This helps diagnose what the command was doing when it times out
 		progressTicker := time.NewTicker(30 * time.Second) // Log progress every 30 seconds
-		progressDone := make(chan bool)
+		progressDone := make(chan bool, 1)
 		goroutinelabels.NewGoroutine("job_progress_monitor", fmt.Sprintf("monitoring progress for job %s", job.ID)).
 			WithCleanup(func() {
 				progressTicker.Stop()
@@ -785,7 +785,10 @@ func (h *RunWrapperHandler) runWrapperRetryAttempts(ctx context.Context, job *Sc
 		// We need to start the command first to get the PID, then set up cleanup
 		if err := cmd.Start(); err != nil {
 			progressTicker.Stop()
-			progressDone <- true
+			select {
+			case progressDone <- true:
+			default:
+			}
 			lastErr = err
 			if cancel != nil {
 				cancel()

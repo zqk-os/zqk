@@ -580,7 +580,7 @@ func TestTriggerQueue_ReloadsForMissingJobSoNewTestBundlesRun(t *testing.T) {
 	})
 
 	// retry backoff wait
-	time.Sleep(2500 * time.Millisecond)
+	time.Sleep(4000 * time.Millisecond)
 	cancel()
 	<-watchDone
 
