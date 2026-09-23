@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -778,5 +779,198 @@ func TestUI_HealthViolationDetailMessage(t *testing.T) {
 	assert.Contains(t, rendered, "Structural schema failure: missing required field 'priority_tier' in object specification")
 	assert.Contains(t, rendered, "Full Message  : Structural schema failure: missing required field 'priority_tier'")
 }
+
+func TestUI_UniversalMessageLine_AllTabs(t *testing.T) {
+	// BLI-OBJECT-INSPECT-MSG-001: Line 6 universal dynamic message notification pipeline across all tabs
+	tabs := []int{TabState, TabAudit, TabSwarm, TabPM, TabMetrics, TabScheduler, TabQA, TabHealth}
+	for _, tab := range tabs {
+		m := NewUIModel("", "state")
+		m.ActiveTab = tab
+		m.Width = 100
+		m.Height = 30
+		m.DynamicMessage = "⚡ Universal Notification Broadcast Event"
+
+		out := Render(m)
+		assert.Contains(t, out, "🔔 MESSAGE:", "tab %d missing message prefix", tab)
+		assert.Contains(t, out, "Universal Notification Broadcast Event", "tab %d missing dynamic message content", tab)
+		assert.Contains(t, out, "MISSION CONTROL CONSOLE", "tab %d missing top console header", tab)
+	}
+}
+
+func TestUI_HeaderContinuity_NoLineWrap(t *testing.T) {
+	// BLI-OBJECT-INSPECT-MSG-001: Header and tabs must never exceed terminal width (no wrapping)
+	widths := []int{75, 80, 90, 100, 120, 140}
+	for _, w := range widths {
+		m := NewUIModel("", "state")
+		m.Width = w
+		m.Height = 30
+		m.DynamicMessage = "A very long status message that would definitely wrap around narrow terminals if not properly truncated by the dynamic message line pipeline"
+
+		out := Render(m)
+		lines := strings.Split(out, "\n")
+		// Header lines are top 7 lines
+		require.GreaterOrEqual(t, len(lines), 7)
+		for idx := 0; idx < 7; idx++ {
+			vw := tds.VisibleWidth(lines[idx])
+			assert.LessOrEqual(t, vw, w, "header line %d exceeds width %d: actual width %d", idx, w, vw)
+		}
+	}
+}
+
+func TestUI_FooterContinuity_NoLineWrap(t *testing.T) {
+	// BLI-OBJECT-INSPECT-MSG-001: Footer lines must never exceed terminal width (no wrapping)
+	widths := []int{75, 80, 90, 100, 120, 140}
+	for _, w := range widths {
+		m := NewUIModel("", "sched")
+		m.Width = w
+		m.Height = 30
+
+		out := Render(m)
+		lines := strings.Split(out, "\n")
+		require.GreaterOrEqual(t, len(lines), 3)
+		// Last 3 lines are footer
+		for i := len(lines) - 3; i < len(lines); i++ {
+			vw := tds.VisibleWidth(lines[i])
+			assert.LessOrEqual(t, vw, w, "footer line %d exceeds width %d: actual width %d", i, w, vw)
+		}
+	}
+}
+
+func TestUI_RefreshDynamicMessage_FeedIntegration(t *testing.T) {
+	// BLI-OBJECT-INSPECT-MSG-001: Dynamic message hydrates from agent chat feed and mutations
+	tmpDir := t.TempDir()
+	logDir := tmpDir + "/.zqk/logs/ide-hooks"
+	require.NoError(t, os.MkdirAll(logDir, 0755))
+	chatFile := logDir + "/agent_chat_channel.jsonl"
+	chatEntry := `{"type":"kernel_change","operation":"update","kind":"backlog_item","object_id":"BLI-001","message":"Object backlog_item updated: BLI-001 (backlog_item)"}` + "\n"
+	require.NoError(t, os.WriteFile(chatFile, []byte(chatEntry), 0644))
+
+	m := NewUIModel(tmpDir, "state")
+	m.RefreshDynamicMessage()
+	assert.Contains(t, m.DynamicMessage, "BLI-001")
+	assert.Contains(t, m.DynamicMessage, "⚡")
+}
+
+func TestUI_VimTopBottomNavigation_gG_Toggling(t *testing.T) {
+	m := NewUIModel("", "pm")
+	m.RecentBacklog = []PMBacklogRow{
+		{ID: "BLI-001", Title: "Task 1", Status: "planned"},
+		{ID: "BLI-002", Title: "Task 2", Status: "in_progress"},
+		{ID: "BLI-003", Title: "Task 3", Status: "testing"},
+		{ID: "BLI-004", Title: "Task 4", Status: "done"},
+		{ID: "BLI-005", Title: "Task 5", Status: "complete"},
+	}
+	assert.Equal(t, 5, m.GetCurrentRowCount())
+
+	// Start at 0, jump to bottom with 'G' (big gee)
+	m.SelectedIndex = 0
+	handleInput(m, []byte{'G'})
+	assert.Equal(t, 4, m.SelectedIndex, "G should jump to bottom")
+
+	// Jump to top with 'g' (little gee)
+	handleInput(m, []byte{'g'})
+	assert.Equal(t, 0, m.SelectedIndex, "g should jump to top")
+
+	// Toggle g -> G when already at top
+	handleInput(m, []byte{'g'})
+	assert.Equal(t, 4, m.SelectedIndex, "g when at top should toggle to bottom (g->G)")
+
+	// Toggle G -> g when already at bottom
+	handleInput(m, []byte{'G'})
+	assert.Equal(t, 0, m.SelectedIndex, "G when at bottom should toggle to top (G->g)")
+
+	// Home and End ANSI sequences
+	handleInput(m, []byte{CSIPrefixEsc, CSIPrefixBracket, 'F'}) // End
+	assert.Equal(t, 4, m.SelectedIndex, "End key should jump to bottom")
+	handleInput(m, []byte{CSIPrefixEsc, CSIPrefixBracket, 'H'}) // Home
+	assert.Equal(t, 0, m.SelectedIndex, "Home key should jump to top")
+}
+
+func TestUI_InlineSearch_FilteringAndUnwinding(t *testing.T) {
+	m := NewUIModel("", "pm")
+	m.RecentBacklog = []PMBacklogRow{
+		{ID: "BLI-001", Title: "Fix WAL deadlock contention", Status: "planned"},
+		{ID: "BLI-002", Title: "Implement object inspect CLI", Status: "in_progress"},
+		{ID: "BLI-003", Title: "Optimize CAS storage hygiene", Status: "testing"},
+		{ID: "BLI-004", Title: "TDS component color fixes", Status: "done"},
+	}
+	m.TechnicalDebt = []PMDebtRow{
+		{ID: "DEBT-001", Title: "Legacy CAS inspection wrappers", Category: "storage"},
+		{ID: "DEBT-002", Title: "Vim navigation keybinding", Category: "ui"},
+	}
+	assert.Equal(t, 6, m.GetCurrentRowCount())
+
+	// 1. Press '/' to initiate search
+	handleInput(m, []byte{'/'})
+	assert.True(t, m.IsSearching, "IsSearching should be true after '/'")
+
+	// 2. Type 'c', 'a', 's'
+	handleInput(m, []byte{'c'})
+	handleInput(m, []byte{'a'})
+	handleInput(m, []byte{'s'})
+	assert.Equal(t, "cas", m.SearchBuffer)
+	assert.Equal(t, "cas", m.SearchQuery)
+
+	// In live filtering, only BLI-003 and DEBT-001 match 'cas'
+	assert.Equal(t, 2, m.GetCurrentRowCount(), "Should match 1 BLI and 1 Debt item")
+	visibleBLI := m.GetVisibleBacklog()
+	require.Len(t, visibleBLI, 1)
+	assert.Equal(t, "BLI-003", visibleBLI[0].ID)
+	visibleDebt := m.GetVisibleTechnicalDebt()
+	require.Len(t, visibleDebt, 1)
+	assert.Equal(t, "DEBT-001", visibleDebt[0].ID)
+
+	// 3. Test Backspace
+	handleInput(m, []byte{KeyBackspace})
+	assert.Equal(t, "ca", m.SearchQuery)
+
+	// Type 's' back
+	handleInput(m, []byte{'s'})
+	assert.Equal(t, "cas", m.SearchQuery)
+
+	// 4. Confirm search with Enter
+	handleInput(m, []byte{KeyEnter})
+	assert.False(t, m.IsSearching, "IsSearching should be false after Enter")
+	assert.Equal(t, "cas", m.SearchQuery, "SearchQuery should remain locked")
+
+	// 5. Test n / N match cycling
+	assert.Equal(t, 0, m.SelectedIndex)
+	handleInput(m, []byte{'n'})
+	assert.Equal(t, 1, m.SelectedIndex, "n should cycle to second match")
+	handleInput(m, []byte{'n'})
+	assert.Equal(t, 0, m.SelectedIndex, "n should wrap back to first match")
+	handleInput(m, []byte{'N'})
+	assert.Equal(t, 1, m.SelectedIndex, "N should cycle backward")
+
+	// 6. Test Header Rendering with search filter banner
+	m.Width = 100
+	m.Height = 30
+	rendered := Render(m)
+	assert.Contains(t, rendered, "SEARCH:")
+	assert.Contains(t, rendered, "cas")
+	assert.Contains(t, rendered, "2 matches")
+
+	// 7. Test Drill-Down modal inspection on filtered item
+	m.SelectedIndex = 0
+	handleInput(m, []byte{KeyEnter})
+	require.NotNil(t, m.DetailModal, "Enter on filtered row should open detail modal")
+	assert.Equal(t, "BLI-003", m.DetailModal.ID)
+
+	// 8. Test Esc unwinding:
+	// Esc 1: Dismiss modal, remain in search filter
+	handleInput(m, []byte{KeyEsc})
+	assert.Nil(t, m.DetailModal, "Esc should dismiss detail modal")
+	assert.Equal(t, "cas", m.SearchQuery, "SearchQuery should still be active")
+
+	// Esc 2: Clear search filter, restore full backlog
+	handleInput(m, []byte{KeyEsc})
+	assert.Equal(t, "", m.SearchQuery, "Esc should clear search filter")
+	assert.Equal(t, 6, m.GetCurrentRowCount(), "All 6 items should be restored")
+
+	// Esc 3: Exit application
+	shouldExit := handleInput(m, []byte{KeyEsc})
+	assert.True(t, shouldExit, "Esc with clean state should exit UI")
+}
+
 
 

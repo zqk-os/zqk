@@ -67,9 +67,12 @@ func Render(m *UIModel) string {
 			lines = lines[:len(lines)-1]
 		}
 		if len(lines) > m.Height {
-			// Keep header (first 6 lines: box + tabs + dynamic message) and footer (last 3 lines), clamp middle with scroll offset
-			if m.Height >= 10 {
-				keepTop := 6
+			// Keep header (first 7 lines: box + tabs + dynamic message, or 9 lines if search is active) and footer (last 3 lines), clamp middle with scroll offset
+			if m.Height >= 11 {
+				keepTop := 7
+				if m.IsSearching || m.SearchQuery != "" {
+					keepTop = 9
+				}
 				keepBottom := 3
 				middleBudget := m.Height - keepTop - keepBottom
 				middleLines := lines[keepTop : len(lines)-keepBottom]
@@ -116,30 +119,58 @@ func renderHeader(b *strings.Builder, m *UIModel) {
 	b.WriteString("║" + tds.PadCenter(titleFormatted, innerW) + "║\n")
 	b.WriteString("╚" + strings.Repeat("═", w-2) + "╝\n")
 
-	// Tabs Bar (8 tabs)
-	tabs := []struct {
-		idx  int
-		name string
-	}{
-		{TabState, "1: ⚡ State"},
-		{TabAudit, "2: 📜 Audit"},
-		{TabSwarm, "3: 🤖 Swarm"},
-		{TabPM, "4: 📋 PM"},
-		{TabMetrics, "5: 📊 Metrics"},
-		{TabScheduler, "6: ⏱️  Sched"},
-		{TabQA, "7: 🧪 QA"},
-		{TabHealth, "8: 🛡️  Health"},
+	// Tabs Bar (8 tabs) with responsive width adapting
+	type tabEntry struct {
+		idx     int
+		full    string
+		tight   string
+		compact string
+	}
+	tabs := []tabEntry{
+		{TabState, "1: ⚡ State", "1: ⚡ State", "1:State"},
+		{TabAudit, "2: 📜 Audit", "2: 📜 Audit", "2:Audit"},
+		{TabSwarm, "3: 🤖 Swarm", "3: 🤖 Swarm", "3:Swarm"},
+		{TabPM, "4: 📋 PM", "4: 📋 PM", "4:PM"},
+		{TabMetrics, "5: 📊 Metrics", "5: 📊 Metrics", "5:Metrics"},
+		{TabScheduler, "6: ⏱️ Sched", "6: ⏱️ Sched", "6:Sched"},
+		{TabQA, "7: 🧪 QA", "7: 🧪 QA", "7:QA"},
+		{TabHealth, "8: 🛡️ Health", "8: 🛡️ Health", "8:Health"},
 	}
 
-	var tabStrs []string
-	for _, t := range tabs {
-		if t.idx == m.ActiveTab {
-			tabStrs = append(tabStrs, reverse(fmt.Sprintf(" [%s] ", t.name)))
-		} else {
-			tabStrs = append(tabStrs, dim(fmt.Sprintf("  %s  ", t.name)))
+	buildTabLine := func(mode string, sep string) string {
+		var tabStrs []string
+		for _, t := range tabs {
+			var label string
+			switch mode {
+			case "full":
+				label = t.full
+			case "tight":
+				label = t.tight
+			default:
+				label = t.compact
+			}
+			if t.idx == m.ActiveTab {
+				tabStrs = append(tabStrs, reverse(fmt.Sprintf("[%s]", label)))
+			} else {
+				tabStrs = append(tabStrs, dim(fmt.Sprintf(" %s ", label)))
+			}
 		}
+		return strings.Join(tabStrs, sep)
 	}
-	tabLine := strings.Join(tabStrs, " │ ")
+
+	var tabLine string
+	if w >= 120 {
+		tabLine = buildTabLine("full", " │ ")
+	} else if w >= 105 {
+		tabLine = buildTabLine("full", "│")
+	} else if w >= 90 {
+		tabLine = buildTabLine("tight", "│")
+	} else {
+		tabLine = buildTabLine("compact", "│")
+	}
+	if tds.VisibleWidth(tabLine) > w {
+		tabLine = tds.TruncateVisible(tabLine, w, "")
+	}
 	b.WriteString(tds.PadRight(tabLine, w) + "\n")
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 
@@ -168,8 +199,34 @@ func renderHeader(b *strings.Builder, m *UIModel) {
 	}
 
 	dynamicLine := prefix + coloredMsg
+	if tds.VisibleWidth(dynamicLine) > w {
+		dynamicLine = tds.TruncateVisible(dynamicLine, w, "")
+	}
 	b.WriteString(tds.PadRight(dynamicLine, w) + "\n")
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
+
+	// Interactive Search Bar / Filter Indicator
+	if m.IsSearching {
+		searchPrompt := cyanBold("🔍 SEARCH: ") + "[/" + whiteBold(m.SearchBuffer) + cyanBold("█") + "]" + dim("  (Press Enter to lock search, Esc to cancel)")
+		if tds.VisibleWidth(searchPrompt) > w {
+			searchPrompt = tds.TruncateVisible(searchPrompt, w, "")
+		}
+		b.WriteString(tds.PadRight(searchPrompt, w) + "\n")
+		b.WriteString(dim(strings.Repeat("─", w)) + "\n")
+	} else if m.SearchQuery != "" {
+		matchCount := m.GetCurrentRowCount()
+		matchStr := fmt.Sprintf("%d match", matchCount)
+		if matchCount != 1 {
+			matchStr += "es"
+		}
+		filterBanner := cyanBold("🔍 SEARCH: ") + "\"" + yellowBold(m.SearchQuery) + "\" " + greenBold(fmt.Sprintf("(%s)", matchStr)) +
+			dim(" │ [/] Edit │ [n/N] Next/Prev │ [g/G] Top/Bottom │ [Esc] Clear")
+		if tds.VisibleWidth(filterBanner) > w {
+			filterBanner = tds.TruncateVisible(filterBanner, w, "")
+		}
+		b.WriteString(tds.PadRight(filterBanner, w) + "\n")
+		b.WriteString(dim(strings.Repeat("─", w)) + "\n")
+	}
 }
 
 // renderStateTab renders real-time state mutations, instructions, and lifecycles (excluding high-volume audit logs).
@@ -179,15 +236,16 @@ func renderStateTab(b *strings.Builder, m *UIModel) {
 		w = 80
 	}
 
+	mutations := m.GetVisibleMutations()
 	kindCounts := make(map[string]int)
-	for _, mut := range m.Mutations {
+	for _, mut := range mutations {
 		parts := strings.Split(mut.ObjectRef, ":")
 		if len(parts) > 0 && parts[0] != "" {
 			kindCounts[parts[0]]++
 		}
 	}
 
-	sparkline := generateSparkline(len(m.Mutations))
+	sparkline := generateSparkline(len(mutations))
 	symbolCounters := formatSymbolCounters(kindCounts)
 
 	scrollMode := greenBold("[AUTO-SCROLL: ON]")
@@ -196,7 +254,7 @@ func renderStateTab(b *strings.Builder, m *UIModel) {
 	}
 
 	b.WriteString(fmt.Sprintf("Status: %s │ Buffer: %d state mutations │ Rate: %s │ %s\n",
-		greenBold("ENFORCING"), len(m.Mutations), sparkline, scrollMode))
+		greenBold("ENFORCING"), len(mutations), sparkline, scrollMode))
 	b.WriteString(fmt.Sprintf("Types:  %s\n", symbolCounters))
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 
@@ -224,11 +282,15 @@ func renderStateTab(b *strings.Builder, m *UIModel) {
 		availRows = 6
 	}
 
-	total := len(m.Mutations)
+	total := len(mutations)
 	var visible []state.JournalMutation
 
 	if total == 0 {
-		b.WriteString(dim("  [No state mutations recorded in stream buffer yet]\n"))
+		if m.SearchQuery != "" {
+			b.WriteString(dim(fmt.Sprintf("  [No state mutations matching search query \"%s\"]\n", m.SearchQuery)))
+		} else {
+			b.WriteString(dim("  [No state mutations recorded in stream buffer yet]\n"))
+		}
 	} else {
 		start := 0
 		if m.AutoScroll {
@@ -236,7 +298,7 @@ func renderStateTab(b *strings.Builder, m *UIModel) {
 			if start < 0 {
 				start = 0
 			}
-			visible = m.Mutations[start:]
+			visible = mutations[start:]
 		} else {
 			end := total - m.ScrollOffset
 			if end > total {
@@ -246,7 +308,7 @@ func renderStateTab(b *strings.Builder, m *UIModel) {
 			if start < 0 {
 				start = 0
 			}
-			visible = m.Mutations[start:end]
+			visible = mutations[start:end]
 		}
 
 		for i, mut := range visible {
@@ -288,9 +350,9 @@ func renderAuditTab(b *strings.Builder, m *UIModel) {
 		w = 80
 	}
 
-	// Actor breakdown
+	auditEvents := m.GetVisibleAuditEvents()
 	actors := make(map[string]int)
-	for _, a := range m.AuditEvents {
+	for _, a := range auditEvents {
 		act := a.CreatedBy
 		if act == "" {
 			act = a.Actor
@@ -311,14 +373,14 @@ func renderAuditTab(b *strings.Builder, m *UIModel) {
 		actorLine = actorLine[:w-28] + "..."
 	}
 
-	sparkline := generateSparkline(len(m.AuditEvents))
+	sparkline := generateSparkline(len(auditEvents))
 	scrollMode := greenBold("[AUTO-SCROLL: ON]")
 	if !m.AutoScroll {
 		scrollMode = yellowBold(fmt.Sprintf("[PAUSED: +%d]", m.ScrollOffset))
 	}
 
 	b.WriteString(fmt.Sprintf("Stream: %s │ Buffer: %d audit events │ Rate: %s │ %s\n",
-		cyanBold("audit_event"), len(m.AuditEvents), sparkline, scrollMode))
+		cyanBold("audit_event"), len(auditEvents), sparkline, scrollMode))
 	b.WriteString(fmt.Sprintf("Actors: %s\n", actorLine))
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 
@@ -345,11 +407,15 @@ func renderAuditTab(b *strings.Builder, m *UIModel) {
 		availRows = 6
 	}
 
-	total := len(m.AuditEvents)
+	total := len(auditEvents)
 	var visible []state.JournalMutation
 
 	if total == 0 {
-		b.WriteString(dim("  [No audit events recorded in audit stream yet]\n"))
+		if m.SearchQuery != "" {
+			b.WriteString(dim(fmt.Sprintf("  [No audit events matching search query \"%s\"]\n", m.SearchQuery)))
+		} else {
+			b.WriteString(dim("  [No audit events recorded in audit stream yet]\n"))
+		}
 	} else {
 		start := 0
 		if m.AutoScroll {
@@ -357,7 +423,7 @@ func renderAuditTab(b *strings.Builder, m *UIModel) {
 			if start < 0 {
 				start = 0
 			}
-			visible = m.AuditEvents[start:]
+			visible = auditEvents[start:]
 		} else {
 			end := total - m.ScrollOffset
 			if end > total {
@@ -367,7 +433,7 @@ func renderAuditTab(b *strings.Builder, m *UIModel) {
 			if start < 0 {
 				start = 0
 			}
-			visible = m.AuditEvents[start:end]
+			visible = auditEvents[start:end]
 		}
 
 		for i, aud := range visible {
@@ -592,7 +658,10 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 	}
 
 	// 4. Recent Work Units (Backlog Items) Table
-	if len(m.RecentBacklog) > 0 {
+	backlog := m.GetVisibleBacklog()
+	debt := m.GetVisibleTechnicalDebt()
+
+	if len(backlog) > 0 {
 		b.WriteString(tds.SectionDivider("RECENT WORK UNITS (BACKLOG ITEMS)", w))
 		bliTable := tds.NewTable(w).
 			AddColumn("BLI ID", tds.AlignLeft, 16, 0.18).
@@ -607,24 +676,24 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 		} else if m.Height >= 32 {
 			bliLimit = 4
 		}
-		if len(m.RecentBacklog) < bliLimit {
-			bliLimit = len(m.RecentBacklog)
+		if len(backlog) < bliLimit {
+			bliLimit = len(backlog)
 		}
 
 		bliStart := 0
-		if m.SelectedIndex < len(m.RecentBacklog) && m.SelectedIndex >= bliLimit {
+		if m.SelectedIndex < len(backlog) && m.SelectedIndex >= bliLimit {
 			bliStart = m.SelectedIndex - bliLimit + 1
 		}
-		if bliStart+bliLimit > len(m.RecentBacklog) {
-			bliStart = len(m.RecentBacklog) - bliLimit
+		if bliStart+bliLimit > len(backlog) {
+			bliStart = len(backlog) - bliLimit
 		}
 		if bliStart < 0 {
 			bliStart = 0
 		}
 
-		for i := 0; i < bliLimit && (bliStart+i) < len(m.RecentBacklog); i++ {
+		for i := 0; i < bliLimit && (bliStart+i) < len(backlog); i++ {
 			actualIdx := bliStart + i
-			item := m.RecentBacklog[actualIdx]
+			item := backlog[actualIdx]
 			stBadge := item.Status
 			if item.Status == "done" || item.Status == "completed" || item.Status == "complete" {
 				stBadge = greenBold(item.Status)
@@ -656,7 +725,7 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 	}
 
 	// 5. Technical Debt Items Table
-	if len(m.TechnicalDebt) > 0 {
+	if len(debt) > 0 {
 		b.WriteString(tds.SectionDivider("TECHNICAL DEBT & HYGIENE ITEMS", w))
 		debtTable := tds.NewTable(w).
 			AddColumn("DEBT ID", tds.AlignLeft, 16, 0.22).
@@ -670,28 +739,28 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 		} else if m.Height >= 32 {
 			debtLimit = 3
 		}
-		if len(m.TechnicalDebt) < debtLimit {
-			debtLimit = len(m.TechnicalDebt)
+		if len(debt) < debtLimit {
+			debtLimit = len(debt)
 		}
 
 		debtStart := 0
-		if m.SelectedIndex >= len(m.RecentBacklog) {
-			currDebtIdx := m.SelectedIndex - len(m.RecentBacklog)
+		if m.SelectedIndex >= len(backlog) {
+			currDebtIdx := m.SelectedIndex - len(backlog)
 			if currDebtIdx >= debtLimit {
 				debtStart = currDebtIdx - debtLimit + 1
 			}
 		}
-		if debtStart+debtLimit > len(m.TechnicalDebt) {
-			debtStart = len(m.TechnicalDebt) - debtLimit
+		if debtStart+debtLimit > len(debt) {
+			debtStart = len(debt) - debtLimit
 		}
 		if debtStart < 0 {
 			debtStart = 0
 		}
 
-		for i := 0; i < debtLimit && (debtStart+i) < len(m.TechnicalDebt); i++ {
+		for i := 0; i < debtLimit && (debtStart+i) < len(debt); i++ {
 			actualDebtIdx := debtStart + i
-			d := m.TechnicalDebt[actualDebtIdx]
-			isSelected := (len(m.RecentBacklog)+actualDebtIdx == m.SelectedIndex)
+			d := debt[actualDebtIdx]
+			isSelected := (len(backlog)+actualDebtIdx == m.SelectedIndex)
 			idCell := tds.RowCursor(isSelected, d.ID)
 
 			debtTable.AddRow(
@@ -823,14 +892,14 @@ func renderMetricsTab(b *strings.Builder, m *UIModel) {
 		}
 		b.WriteString(cmdTable.Render())
 		b.WriteString("\n")
-	} else if len(m.CommandMetrics) > 0 {
+	} else if cmdMetrics := m.GetVisibleCommandMetrics(); len(cmdMetrics) > 0 {
 		b.WriteString(tds.SectionDivider("COMMAND EXECUTION TELEMETRY (command_metric)", w))
 		cmdTable := tds.NewTable(w).
 			AddColumn("COMMAND", tds.AlignLeft, 24, 0.35).
 			AddColumn("CALLS", tds.AlignRight, 8, 0.15).
 			AddColumn("DURATION", tds.AlignRight, 12, 0.20).
 			AddColumn("LAST RUN", tds.AlignCenter, 19, 0.30)
-		for i, cm := range m.CommandMetrics {
+		for i, cm := range cmdMetrics {
 			isSelected := (i == m.SelectedIndex)
 			cmdTable.AddRow(
 				tds.RowCursor(isSelected, cm.CommandName),
@@ -930,8 +999,13 @@ func renderSchedulerTab(b *strings.Builder, m *UIModel) {
 	b.WriteString(whiteBold("⏱️  Autonomous Scheduler & Background Daemons") + dim("  (Press [Enter] to inspect, [t] to trigger now, [d] for 10s delay)\n"))
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 
-	if len(m.SchedulerJobs) == 0 {
-		b.WriteString(dim("  [No scheduler jobs registered or scheduler not initialized]\n\n"))
+	jobs := m.GetVisibleSchedulerJobs()
+	if len(jobs) == 0 {
+		if m.SearchQuery != "" {
+			b.WriteString(dim(fmt.Sprintf("  [No scheduler jobs matching search query \"%s\"]\n\n", m.SearchQuery)))
+		} else {
+			b.WriteString(dim("  [No scheduler jobs registered or scheduler not initialized]\n\n"))
+		}
 		return
 	}
 
@@ -947,7 +1021,7 @@ func renderSchedulerTab(b *strings.Builder, m *UIModel) {
 		availRows = 6
 	}
 
-	total := len(m.SchedulerJobs)
+	total := len(jobs)
 	var visible []SchedulerJobRow
 
 	if m.AutoScroll {
@@ -955,7 +1029,7 @@ func renderSchedulerTab(b *strings.Builder, m *UIModel) {
 		if end > total {
 			end = total
 		}
-		visible = m.SchedulerJobs[:end]
+		visible = jobs[:end]
 	} else {
 		start := m.ScrollOffset
 		if start >= total {
@@ -968,7 +1042,7 @@ func renderSchedulerTab(b *strings.Builder, m *UIModel) {
 		if end > total {
 			end = total
 		}
-		visible = m.SchedulerJobs[start:end]
+		visible = jobs[start:end]
 	}
 
 	for i, job := range visible {
@@ -1004,19 +1078,53 @@ func renderFooter(b *strings.Builder, m *UIModel) {
 		w = 80
 	}
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
-	legendLine := dim("Legend: ") + "⚡ State │ 📜 Audit │ 🤖 Swarm │ 📋 PM │ 📊 Metrics │ ⏱️  Sched │ 🧪 QA │ 🛡️  Health/Actions"
+
+	var legendLine string
+	if w >= 115 {
+		legendLine = dim("Legend: ") + "⚡ State │ 📜 Audit │ 🤖 Swarm │ 📋 PM │ 📊 Metrics │ ⏱️ Sched │ 🧪 QA │ 🛡️ Health/Actions"
+	} else if w >= 85 {
+		legendLine = dim("Tabs: ") + "1:State │ 2:Audit │ 3:Swarm │ 4:PM │ 5:Metrics │ 6:Sched │ 7:QA │ 8:Health"
+	} else {
+		legendLine = dim("Tabs: ") + "1:State 2:Audit 3:Swarm 4:PM 5:Metrics 6:Sched 7:QA 8:Health"
+	}
+	if tds.VisibleWidth(legendLine) > w {
+		legendLine = tds.TruncateVisible(legendLine, w, "")
+	}
 	b.WriteString(tds.PadRight(legendLine, w) + "\n")
-	triggerActionHint := "[Keys] Trigger Action"
+
+	triggerActionHint := "[Keys] Action"
 	if m.ActiveTab == TabScheduler {
 		triggerActionHint = "[t/d] Trigger Job"
 	}
-	navLine := whiteBold("[Tab / 1-8]") + " Switch View  " +
-		whiteBold("[↑/↓/j/k]") + " Select / Scroll  " +
-		whiteBold("[Enter]") + " Inspect  " +
-		whiteBold(triggerActionHint) + "  " +
-		whiteBold("[Space]") + " Pause  " +
-		whiteBold("[r]") + " Refresh  " +
-		whiteBold("[q/Esc]") + " Exit"
+
+	var navLine string
+	if w >= 120 {
+		navLine = whiteBold("[Tab/1-8]") + " Switch View  " +
+			whiteBold("[↑/↓/j/k]") + " Select  " +
+			whiteBold("[g/G]") + " Top/Bottom  " +
+			whiteBold("[/]") + " Search  " +
+			whiteBold("[Enter]") + " Inspect  " +
+			whiteBold(triggerActionHint) + "  " +
+			whiteBold("[Space]") + " Pause  " +
+			whiteBold("[r]") + " Refresh  " +
+			whiteBold("[q/Esc]") + " Exit"
+	} else if w >= 90 {
+		navLine = whiteBold("[Tab/1-8]") + " Switch  " +
+			whiteBold("[↑/↓]") + " Scroll  " +
+			whiteBold("[/]") + " Search  " +
+			whiteBold("[Enter]") + " Inspect  " +
+			whiteBold(triggerActionHint) + "  " +
+			whiteBold("[r]") + " Refresh  " +
+			whiteBold("[q]") + " Exit"
+	} else {
+		navLine = whiteBold("[Tab]") + " Nav  " +
+			whiteBold("[↑/↓]") + " Select  " +
+			whiteBold("[Enter]") + " Inspect  " +
+			whiteBold("[q]") + " Exit"
+	}
+	if tds.VisibleWidth(navLine) > w {
+		navLine = tds.TruncateVisible(navLine, w, "")
+	}
 	b.WriteString(tds.PadRight(navLine, w) + "\n")
 }
 
@@ -1144,9 +1252,14 @@ func renderQATab(b *strings.Builder, m *UIModel) {
 	b.WriteString("\n")
 
 	// 2. Active Test Cases Table
-	if len(m.TestCases) == 0 {
-		b.WriteString(yellow("  ⚠  No active test case objects discovered in test_dashboard_lite.json or CAS storage.\n"))
-		b.WriteString(dim("     To generate test suites and link criteria, run 'zqk test bind' or 'zqk workflow whats-next'.\n\n"))
+	testCases := m.GetVisibleTestCases()
+	if len(testCases) == 0 {
+		if m.SearchQuery != "" {
+			b.WriteString(yellow(fmt.Sprintf("  ⚠  No test cases matching search query \"%s\".\n\n", m.SearchQuery)))
+		} else {
+			b.WriteString(yellow("  ⚠  No active test case objects discovered in test_dashboard_lite.json or CAS storage.\n"))
+			b.WriteString(dim("     To generate test suites and link criteria, run 'zqk test bind' or 'zqk workflow whats-next'.\n\n"))
+		}
 		return
 	}
 
@@ -1163,13 +1276,13 @@ func renderQATab(b *strings.Builder, m *UIModel) {
 		availRows = 4
 	}
 
-	limit := len(m.TestCases)
+	limit := len(testCases)
 	if limit > availRows {
 		limit = availRows
 	}
 
 	for i := 0; i < limit; i++ {
-		tc := m.TestCases[i]
+		tc := testCases[i]
 
 		// Status Badge
 		stBadge := yellowBold(tc.Status)
@@ -1395,9 +1508,14 @@ func renderHealthTab(b *strings.Builder, m *UIModel) {
 	}
 
 	// 3. Active Violations & Integrity Warnings Table
-	if len(m.HealthViolations) == 0 {
+	violations := m.GetVisibleHealthViolations()
+	if len(violations) == 0 {
 		b.WriteString(tds.SectionDivider("ACTIVE VIOLATIONS & INTEGRITY WARNINGS", w))
-		b.WriteString(dim("  [No integrity violations found in validation cache — kernel is clean]\n\n"))
+		if m.SearchQuery != "" {
+			b.WriteString(dim(fmt.Sprintf("  [No integrity violations matching search query \"%s\"]\n\n", m.SearchQuery)))
+		} else {
+			b.WriteString(dim("  [No integrity violations found in validation cache — kernel is clean]\n\n"))
+		}
 		return
 	}
 
@@ -1414,13 +1532,13 @@ func renderHealthTab(b *strings.Builder, m *UIModel) {
 		availRows = 4
 	}
 
-	limit := len(m.HealthViolations)
+	limit := len(violations)
 	if limit > availRows {
 		limit = availRows
 	}
 
 	for i := 0; i < limit; i++ {
-		v := m.HealthViolations[i]
+		v := violations[i]
 
 		tierStr := fmt.Sprintf("T%d", v.Tier)
 		sevBadge := dim(v.Severity)
