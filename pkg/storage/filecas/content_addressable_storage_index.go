@@ -416,7 +416,7 @@ func (idx *IDIndex) SetMappings(mappings, bucketKeys map[string]string, createdA
 
 	saveErr := idx.SaveMappingsLocked(mappingsCopy, bucketKeysCopy, createdAtsCopy)
 	metrics.RecordSetMapping(time.Since(start), saveErr, reloaded)
-	if saveErr == nil {
+	if saveErr == nil && ConfirmPendingAfterDurableMapping != nil {
 		for id, hash := range mappings {
 			ConfirmPendingAfterDurableMapping(idx.FilePath, id, hash)
 		}
