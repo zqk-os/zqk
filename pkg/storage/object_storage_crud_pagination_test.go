@@ -192,16 +192,13 @@ func testKindCRUD(t *testing.T, storage *FileObjectStorage, ctx context.Context,
 			objects.FieldKeyID:            goalID,
 			objects.FieldKeyKind:          "goal",
 			objects.FieldKeyTitle:         "Test Goal for change journal",
+			objects.FieldKeyDescription:   "Substantive description for test goal",
 			objects.FieldKeyTarget:        "100",
 			objects.FieldKeyMetric:        "count",
 			objects.FieldKeyStatus:        objects.ObjectStatusActive,
 			objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		}
-		if err := storage.Create(cliCtx, secCtx, goalObj); err != nil {
-			if !errors.Is(err, ErrObjectExists) {
-				t.Logf("Warning: Could not create referenced goal %s: %v (test may fail)", goalID, err)
-			}
-		}
+		EnsureCASVisibleRef(t, storage, cliCtx, secCtx, goalObj, "active")
 	case "workstream_transition":
 		// Create referenced workstreams for from_workstream_ref and to_workstream_ref
 		// First create the account that workstreams need (use valid username)
@@ -295,6 +292,7 @@ func testKindCRUD(t *testing.T, storage *FileObjectStorage, ctx context.Context,
 			objects.FieldKeyID:            goalID,
 			objects.FieldKeyKind:          "goal",
 			objects.FieldKeyTitle:         "Test Goal",
+			objects.FieldKeyDescription:   "Substantive description for test goal.",
 			objects.FieldKeyTarget:        "100",
 			objects.FieldKeyMetric:        "count",
 			objects.FieldKeyStatus:        objects.ObjectStatusActive,
