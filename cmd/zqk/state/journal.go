@@ -1,0 +1,69 @@
+package state
+
+import (
+	"fmt"
+	"strings"
+	"time"
+
+	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/internal/cli"
+)
+
+func newJournalCmd() *cobra.Command {
+	var limit int
+	cmd := &cobra.Command{
+		Use:     "journal",
+		Aliases: []string{"log", "history"},
+		Short:   "List recent cryptographic change journal mutations",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
+				projectRoot := proc.ProjectRoot()
+				if projectRoot == "" {
+					projectRoot = cli.ResolveProjectRoot(".")
+				}
+
+				mutations := readRecentJournalMutations(projectRoot, limit)
+
+				format, _ := cmd.Flags().GetString("format")
+				if format == "json" {
+					return cli.FormatOutputAs(cmd, cli.FormatJSON, map[string]any{
+						"count":     len(mutations),
+						"mutations": mutations,
+					})
+				}
+
+				var buf strings.Builder
+				buf.WriteString(fmt.Sprintf("\n📜 Recent Change Journal Mutations (Total: %d)\n", len(mutations)))
+				buf.WriteString("──────────────────────────────────────────────────────────────────────────────────────────\n")
+				buf.WriteString(fmt.Sprintf("%-12s %-8s %-36s %s\n", "ID", "TYPE", "OBJECT REF", "DIFF / SUMMARY"))
+				buf.WriteString("──────────────────────────────────────────────────────────────────────────────────────────\n")
+
+				for _, m := range mutations {
+					diff := m.DiffSummary
+					if diff == "" {
+						diff = m.ChangeType
+					}
+					if len(diff) > 40 {
+						diff = diff[:37] + "..."
+					}
+					timeStr := ""
+					if m.CreatedAt > 0 {
+						t := time.Unix(m.CreatedAt, 0)
+						timeStr = t.Format("15:04:05")
+					}
+					ref := m.ObjectRef
+					if len(ref) > 35 {
+						ref = ref[:32] + "..."
+					}
+					buf.WriteString(fmt.Sprintf("%-12s %-8s %-36s %s (%s)\n", m.ID, m.ChangeType, ref, diff, timeStr))
+				}
+				buf.WriteString("──────────────────────────────────────────────────────────────────────────────────────────\n\n")
+
+				return cli.WriteOutput(cmd, []byte(buf.String()))
+			})(cmd, args)
+		},
+	}
+	cmd.Flags().IntVarP(&limit, "limit", "n", 20, "Maximum number of journal mutations to return")
+	cli.AddCommonFlags(cmd)
+	return cmd
+}

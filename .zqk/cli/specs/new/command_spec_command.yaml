@@ -22,13 +22,53 @@ flags:
   - name: "short"
     type: "string"
     default: ""
-    required: true
     description: "One-line command summary"
   - name: "description"
     type: "string"
     default: ""
-    required: true
     description: "Long command description"
+  - name: "from-cmd"
+    type: "bool"
+    default: false
+    description: "Introspect registered Cobra command tree to extract flags, args, and usage"
+  - name: "aliases"
+    type: "string"
+    default: ""
+    description: "Comma-separated command aliases"
+  - name: "args-type"
+    type: "string"
+    default: ""
+    description: "Positional argument validation type: no_args, exact, minimum, maximum, range"
+  - name: "args-count"
+    type: "int"
+    default: 0
+    description: "Argument count for exact args"
+  - name: "args-min"
+    type: "int"
+    default: 0
+    description: "Minimum argument count"
+  - name: "args-max"
+    type: "int"
+    default: 0
+    description: "Maximum argument count"
+  - name: "flag"
+    type: "string_array"
+    description: "Custom flag definition (name:type:default:description[:shorthand])"
+  - name: "example"
+    type: "string_array"
+    description: "Help example in comment:command format"
+  - name: "run-e"
+    type: "string"
+    default: ""
+    description: "RunE execution function name"
+  - name: "common-flags"
+    type: "bool"
+    default: true
+    description: "Include standard common flags in the spec"
+  - name: "async"
+    type: "bool"
+    default: false
+    description: "Wrap RunE with BindAsyncProgress"
   - name: "force"
     type: "bool"
     default: false
@@ -36,8 +76,10 @@ flags:
 
 help:
   examples:
-    - comment: "Create DNA for a system subcommand"
-      command: "%s new command-spec system/check-foo --short \"Check foo\" --description \"Validate foo state.\""
+    - comment: "Introspect registered command to generate a full canonical spec"
+      command: "%s new command-spec state/tree --from-cmd"
+    - comment: "Create rich DNA for a command with explicit args, flags, and examples"
+      command: "%s new command-spec system/check-foo --short \"Check foo\" --description \"Validate foo state.\" --args-type no_args"
   exclude_flags:
     - "columns"
     - "ignore-scheduler-down"

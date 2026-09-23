@@ -3,11 +3,13 @@ package newcmd
 import (
 	"bytes"
 	"context"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v3"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -322,3 +324,213 @@ func TestAutoTracePipeline_BLI1789335658105469000_Discipline(t *testing.T) {
 		}
 	}
 }
+
+func TestRunNewCommandSpec_RichScaffold(t *testing.T) {
+	tmpDir := t.TempDir()
+	t.Setenv("ZQK_TEST_ROOT", tmpDir)
+
+	root := &cobra.Command{Use: "zqk"}
+	newCmd := NewNewCmd()
+	root.AddCommand(newCmd)
+
+	var buf bytes.Buffer
+	root.SetOut(&buf)
+	root.SetArgs([]string{
+		"new", "command-spec", "testpkg/my-action",
+		"--short", "Perform a test action",
+		"--description", "Detailed description of the test action.",
+		"--force",
+	})
+	if err := root.Execute(); err != nil {
+		t.Fatalf("execute failed: %v", err)
+	}
+
+	specPath := filepath.Join(tmpDir, ".zqk/cli/specs/testpkg/my_action_command.yaml")
+	data, err := os.ReadFile(specPath)
+	if err != nil {
+		t.Fatalf("failed to read generated spec: %v", err)
+	}
+
+	var parsed map[string]any
+	if err := yaml.Unmarshal(data, &parsed); err != nil {
+		t.Fatalf("failed to parse generated spec YAML: %v", err)
+	}
+
+	if parsed["name"] != "my-action" {
+		t.Errorf("expected name 'my-action', got %v", parsed["name"])
+	}
+	if parsed["short"] != "Perform a test action" {
+		t.Errorf("expected short 'Perform a test action', got %v", parsed["short"])
+	}
+	if parsed["common_flags"] != true {
+		t.Errorf("expected common_flags true, got %v", parsed["common_flags"])
+	}
+	if parsed["run_e"] != "runTestpkgMyAction" {
+		t.Errorf("expected run_e 'runTestpkgMyAction', got %v", parsed["run_e"])
+	}
+
+	argsMap, ok := parsed["args"].(map[string]any)
+	if !ok || argsMap["type"] != "no_args" {
+		t.Errorf("expected args.type 'no_args', got %v", parsed["args"])
+	}
+
+	helpMap, ok := parsed["help"].(map[string]any)
+	if !ok {
+		t.Fatalf("expected help block, got %v", parsed["help"])
+	}
+	examples, ok := helpMap["examples"].([]any)
+	if !ok || len(examples) == 0 {
+		t.Errorf("expected generated help examples, got %v", helpMap["examples"])
+	}
+}
+
+func TestRunNewCommandSpec_FromCmdIntrospection(t *testing.T) {
+	tmpDir := t.TempDir()
+	t.Setenv("ZQK_TEST_ROOT", tmpDir)
+
+	root := &cobra.Command{Use: "zqk"}
+	newCmd := NewNewCmd()
+	root.AddCommand(newCmd)
+
+	// Register a mock command with flags, aliases, and examples in root
+	sampleCmd := &cobra.Command{
+		Use:     "sample-worker <target>",
+		Aliases: []string{"worker", "sw"},
+		Short:   "Execute worker on target",
+		Long:    "Long form description of the worker processing steps.",
+		Example: "# Sample invocation\nzqk sample-worker foo --count 10",
+	}
+	sampleCmd.Flags().IntP("count", "c", 5, "Number of items to process")
+	sampleCmd.Flags().Bool("dry-run", false, "Simulate execution without mutations")
+	root.AddCommand(sampleCmd)
+
+	var buf bytes.Buffer
+	root.SetOut(&buf)
+	root.SetArgs([]string{
+		"new", "command-spec", "sample-worker",
+		"--from-cmd",
+		"--force",
+	})
+	if err := root.Execute(); err != nil {
+		t.Fatalf("execute failed: %v", err)
+	}
+
+	specPath := filepath.Join(tmpDir, ".zqk/cli/specs/sample_worker_command.yaml")
+	data, err := os.ReadFile(specPath)
+	if err != nil {
+		t.Fatalf("failed to read generated spec: %v", err)
+	}
+
+	var parsed map[string]any
+	if err := yaml.Unmarshal(data, &parsed); err != nil {
+		t.Fatalf("failed to parse generated spec YAML: %v", err)
+	}
+
+	if parsed["name"] != "sample-worker <target>" {
+		t.Errorf("expected name 'sample-worker <target>', got %v", parsed["name"])
+	}
+	if parsed["short"] != "Execute worker on target" {
+		t.Errorf("expected short 'Execute worker on target', got %v", parsed["short"])
+	}
+	if parsed["description"] != "Long form description of the worker processing steps." {
+		t.Errorf("expected long description, got %v", parsed["description"])
+	}
+
+	aliases, ok := parsed["aliases"].([]any)
+	if !ok || len(aliases) != 2 || aliases[0] != "worker" || aliases[1] != "sw" {
+		t.Errorf("expected aliases ['worker', 'sw'], got %v", parsed["aliases"])
+	}
+
+	argsMap, ok := parsed["args"].(map[string]any)
+	if !ok || argsMap["type"] != "exact" || argsMap["count"] != 1 {
+		t.Errorf("expected args {type: exact, count: 1}, got %v", parsed["args"])
+	}
+
+	flags, ok := parsed["flags"].([]any)
+	if !ok || len(flags) != 2 {
+		t.Fatalf("expected 2 flags introspected, got %v", parsed["flags"])
+	}
+
+	flag0 := flags[0].(map[string]any)
+	if flag0["name"] != "count" || flag0["type"] != "int" || flag0["shorthand"] != "c" || flag0["default"] != 5 {
+		t.Errorf("unexpected flag0: %v", flag0)
+	}
+
+	flag1 := flags[1].(map[string]any)
+	if flag1["name"] != "dry-run" || flag1["type"] != "bool" || flag1["default"] != false {
+		t.Errorf("unexpected flag1: %v", flag1)
+	}
+}
+
+func TestRunNewCommandSpec_CustomFlagsAndExamples(t *testing.T) {
+	tmpDir := t.TempDir()
+	t.Setenv("ZQK_TEST_ROOT", tmpDir)
+
+	root := &cobra.Command{Use: "zqk"}
+	newCmd := NewNewCmd()
+	root.AddCommand(newCmd)
+
+	var buf bytes.Buffer
+	root.SetOut(&buf)
+	root.SetArgs([]string{
+		"new", "command-spec", "compute/hash",
+		"--short", "Hash input data",
+		"--description", "Computes cryptographic hashes of inputs.",
+		"--aliases", "sha,digest",
+		"--args-type", "exact",
+		"--args-count", "1",
+		"--flag", "algo:string:sha256:Algorithm to use:a",
+		"--flag", "iterations:int:1000:Number of iterations",
+		"--example", "Standard hash:%s compute hash my-file",
+		"--force",
+	})
+	if err := root.Execute(); err != nil {
+		t.Fatalf("execute failed: %v", err)
+	}
+
+	specPath := filepath.Join(tmpDir, ".zqk/cli/specs/compute/hash_command.yaml")
+	data, err := os.ReadFile(specPath)
+	if err != nil {
+		t.Fatalf("failed to read generated spec: %v", err)
+	}
+
+	var parsed map[string]any
+	if err := yaml.Unmarshal(data, &parsed); err != nil {
+		t.Fatalf("failed to parse generated spec YAML: %v", err)
+	}
+
+	aliases := parsed["aliases"].([]any)
+	if len(aliases) != 2 || aliases[0] != "sha" || aliases[1] != "digest" {
+		t.Errorf("expected aliases ['sha', 'digest'], got %v", parsed["aliases"])
+	}
+
+	argsMap := parsed["args"].(map[string]any)
+	if argsMap["type"] != "exact" || argsMap["count"] != 1 {
+		t.Errorf("expected args {type: exact, count: 1}, got %v", argsMap)
+	}
+
+	flags := parsed["flags"].([]any)
+	if len(flags) != 2 {
+		t.Fatalf("expected 2 flags, got %v", flags)
+	}
+	f0 := flags[0].(map[string]any)
+	if f0["name"] != "algo" || f0["type"] != "string" || f0["default"] != "sha256" || f0["shorthand"] != "a" {
+		t.Errorf("unexpected flag0: %v", f0)
+	}
+
+	f1 := flags[1].(map[string]any)
+	if f1["name"] != "iterations" || f1["type"] != "int" || f1["default"] != "1000" {
+		t.Errorf("unexpected flag1: %v", f1)
+	}
+
+	helpMap := parsed["help"].(map[string]any)
+	examples := helpMap["examples"].([]any)
+	if len(examples) != 1 {
+		t.Fatalf("expected 1 example, got %v", examples)
+	}
+	ex0 := examples[0].(map[string]any)
+	if ex0["comment"] != "Standard hash" || ex0["command"] != "%s compute hash my-file" {
+		t.Errorf("unexpected example: %v", ex0)
+	}
+}
+

@@ -1,0 +1,24 @@
+$schema: schemas/command_spec.schema.json
+name: state
+short: State — inspect live knowledge kernel state graph and audit journals
+description: |-
+    Provides human-readable inspection of the live kernel state graph, active agent
+    leases, and recent mutation journals.
+
+    Use 'zqk state tree' to visualize the organizational and backlog execution
+    hierarchy.
+
+      Render live execution state tree
+      zqk state tree
+      Render state tree as JSON
+      zqk state tree --format json
+      List recent journal mutations
+      zqk state journal --limit 10
+args:
+    type: no_args
+help:
+    examples:
+        - comment: Run state
+          command: '%s state'
+run_e: runState
+common_flags: true

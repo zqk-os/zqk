@@ -385,6 +385,7 @@ func applyBacklogItems(
 		reqRefs := resolveRefs(t.RequirementRefs, summary.HintToID)
 		critRefs := resolveRefs(t.CriteriaRefs, summary.HintToID)
 		tcRefs := resolveRefs(t.TestCaseRefs, summary.HintToID)
+		milRefs := resolveRefs(t.MilestoneRefs, summary.HintToID)
 		builder.SetID(id)
 		builder.SetField(objects.FieldKeyTitle, t.Title)
 		if t.Status != emptyValue {
@@ -400,6 +401,9 @@ func applyBacklogItems(
 		}
 		if len(tcRefs) > 0 {
 			builder.SetField(objects.FieldKeyTestCaseRefs, tcRefs)
+		}
+		if len(milRefs) > 0 {
+			builder.SetField(objects.FieldKeyMilestoneRefs, milRefs)
 		}
 		if t.KindUnderTest != emptyValue {
 			builder.SetField(objects.FieldKeyKindUnderTest, t.KindUnderTest)

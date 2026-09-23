@@ -135,6 +135,35 @@ func generateTracePipelineBundle(targetID string, obj map[string]any, criteriaNe
 		pipelineStatus = objects.ObjectStatusOriginated
 	}
 
+	targetReqID := targetID
+	if strings.HasPrefix(targetID, "GOAL-") {
+		var existingReqs []string
+		if rrefs, ok := obj[objects.FieldKeyRequirementRefs].([]any); ok {
+			for _, r := range rrefs {
+				s := strings.TrimSpace(fmt.Sprint(r))
+				if s != "" && s != "<nil>" {
+					existingReqs = append(existingReqs, s)
+				}
+			}
+		}
+		if len(existingReqs) > 0 {
+			targetReqID = existingReqs[0]
+		} else {
+			reqBytes := make([]byte, 4)
+			_, _ = rand.Read(reqBytes)
+			reqHint := fmt.Sprintf("REQ-%d-%x", ts+2, reqBytes)
+			targetReqID = reqHint
+			bundle.Objects.Requirements = append(bundle.Objects.Requirements, scenario.RequirementTemplate{
+				ID:       reqHint,
+				IDHint:   reqHint,
+				Title:    fmt.Sprintf("Requirement: %s", title),
+				Status:   pipelineStatus,
+				GoalRefs: []string{targetID},
+				Priority: "p1",
+			})
+		}
+	}
+
 	// Generate supplemental or full base criteria
 	for i := 0; i < numCriteriaToGenerate; i++ {
 		facetIdx := len(existingCriteria) + i
@@ -164,9 +193,9 @@ func generateTracePipelineBundle(targetID string, obj map[string]any, criteriaNe
 			Description: facet.description,
 			Status:      pipelineStatus,
 		}
-		if strings.HasPrefix(targetID, "REQ-") {
-			critTemplate.RequirementRef = targetID
-			critTemplate.RequirementRefs = []string{targetID}
+		if strings.HasPrefix(targetReqID, "REQ-") {
+			critTemplate.RequirementRef = targetReqID
+			critTemplate.RequirementRefs = []string{targetReqID}
 		}
 		bundle.Objects.Criteria = append(bundle.Objects.Criteria, critTemplate)
 	}
@@ -179,13 +208,19 @@ func generateTracePipelineBundle(targetID string, obj map[string]any, criteriaNe
 		_, _ = rand.Read(testBytes)
 		testHint := fmt.Sprintf("TST-%d-%x", ts+1, testBytes)
 		allTestCases = append(allTestCases, testHint)
+
+		var tcReqRefs []string
+		if strings.HasPrefix(targetReqID, "REQ-") {
+			tcReqRefs = []string{targetReqID}
+		}
+
 		bundle.Objects.TestCases = append(bundle.Objects.TestCases, scenario.TestCaseTemplate{
 			ID:              testHint,
 			IDHint:          testHint,
 			Title:           fmt.Sprintf("Test Suite: %s", title),
 			Status:          pipelineStatus,
 			CriteriaRefs:    allCriteria,
-			RequirementRefs: []string{targetID},
+			RequirementRefs: tcReqRefs,
 			PathOrID:        "pkg/dummy/path_test.go",
 		})
 	}
@@ -195,6 +230,16 @@ func generateTracePipelineBundle(targetID string, obj map[string]any, criteriaNe
 		randomBytes := make([]byte, 4)
 		_, _ = rand.Read(randomBytes)
 		bliHint := fmt.Sprintf("BLI-%d-%x", ts, randomBytes)
+
+		var bliReqRefs []string
+		if strings.HasPrefix(targetReqID, "REQ-") {
+			bliReqRefs = []string{targetReqID}
+		}
+		var bliMilRefs []string
+		if strings.HasPrefix(targetID, "MIL-") {
+			bliMilRefs = []string{targetID}
+		}
+
 		bundle.Objects.BacklogItems = append(bundle.Objects.BacklogItems, scenario.BacklogTemplate{
 			ID:              bliHint,
 			IDHint:          bliHint,
@@ -202,7 +247,8 @@ func generateTracePipelineBundle(targetID string, obj map[string]any, criteriaNe
 			Description:     fmt.Sprintf("Implementation and verification pipeline for: %s", title),
 			Status:          pipelineStatus,
 			CriteriaRefs:    allCriteria,
-			RequirementRefs: []string{targetID},
+			RequirementRefs: bliReqRefs,
+			MilestoneRefs:   bliMilRefs,
 			TestCaseRefs:    allTestCases,
 			Priority:        "high",
 			PriorityTier:    "P1",
@@ -319,8 +365,30 @@ func applyGeneratedTracePipeline(cmd *cobra.Command, proc *cli.Processor, target
 		}
 	}
 
+	var targetKind string
+	if strings.HasPrefix(targetID, "REQ-") {
+		targetKind = objects.KindRequirement
+	} else if strings.HasPrefix(targetID, "GOAL-") {
+		targetKind = objects.KindGoal
+	} else if strings.HasPrefix(targetID, "MIL-") {
+		targetKind = objects.KindMilestone
+	} else {
+		targetKind = "unknown"
+	}
+	targetTitle, _ := obj[objects.FieldKeyTitle].(string)
+
+	applyOpts := &scenario.ApplyOptions{
+		Storage:           storageProvider,
+		TargetObjectID:    targetID,
+		TargetKind:        targetKind,
+		TargetTitle:       targetTitle,
+		TargetPreExisted:  true,
+		LinkedExistingIDs: []string{targetID},
+		LinkageNote: fmt.Sprintf("Target %s %s pre-existed in Knowledge Kernel. Generated pipeline components are being linked to it.", targetKind, targetID),
+	}
+
 	stopPulse := pulseMeaningfulActivityWhileWaiting(proc)
-	summary, err := scenario.ApplyScenarioBundle(ctx, proc.ProjectRoot(), bytes.NewReader(data), scenario.ApplyObjectsOnly, &scenario.ApplyOptions{Storage: storageProvider})
+	summary, err := scenario.ApplyScenarioBundle(ctx, proc.ProjectRoot(), bytes.NewReader(data), scenario.ApplyObjectsOnly, applyOpts)
 	stopPulse()
 	process.TouchMeaningfulActivity()
 
@@ -364,9 +432,41 @@ func applyGeneratedTracePipeline(cmd *cobra.Command, proc *cli.Processor, target
 		if err := storageProvider.Update(ctx, secCtx, targetID, obj); err != nil {
 			fmt.Fprintf(cmd.OutOrStdout(), "Warning: could not link requirement to new criteria due to lifecycle disparity: %v\n", err)
 			fmt.Fprintf(cmd.OutOrStdout(), "Pipeline components were successfully generated but left unlinked in the draft plane.\n")
+			summary.LinkageNote = fmt.Sprintf("Target requirement %s pre-existed. Pipeline components were generated but unlinked due to lifecycle disparity: %v", targetID, err)
 		} else {
 			fmt.Fprintf(cmd.OutOrStdout(), "Linked %d new criteria to %s: %s\n", len(summary.CreatedCriteriaIDs), targetID, strings.Join(summary.CreatedCriteriaIDs, ", "))
+			summary.LinkageNote = fmt.Sprintf("Target requirement %s pre-existed in Knowledge Kernel. Successfully linked %d criteria (%s), %d test case (%s), and %d backlog item (%s) to it.",
+				targetID,
+				len(summary.CreatedCriteriaIDs), strings.Join(summary.CreatedCriteriaIDs, ", "),
+				len(summary.CreatedTestCaseIDs), strings.Join(summary.CreatedTestCaseIDs, ", "),
+				len(summary.CreatedBacklogItemIDs), strings.Join(summary.CreatedBacklogItemIDs, ", "),
+			)
 		}
+		_ = scenario.EmitScenarioSummary(proc.ProjectRoot(), summary)
+	}
+
+	if strings.HasPrefix(targetID, "GOAL-") {
+		if len(summary.CreatedRequirementIDs) > 0 {
+			reqRefs, _ := obj[objects.FieldKeyRequirementRefs].([]any)
+			for _, rid := range summary.CreatedRequirementIDs {
+				reqRefs = append(reqRefs, rid)
+			}
+			obj[objects.FieldKeyRequirementRefs] = reqRefs
+			if err := storageProvider.Update(ctx, secCtx, targetID, obj); err == nil {
+				fmt.Fprintf(cmd.OutOrStdout(), "Linked %d new requirement(s) to %s: %s\n", len(summary.CreatedRequirementIDs), targetID, strings.Join(summary.CreatedRequirementIDs, ", "))
+				summary.LinkageNote = fmt.Sprintf("Target goal %s pre-existed in Knowledge Kernel. Minted requirement (%s) and linked criteria, test cases, and backlog items to it.", targetID, strings.Join(summary.CreatedRequirementIDs, ", "))
+			} else {
+				summary.LinkageNote = fmt.Sprintf("Target goal %s pre-existed in Knowledge Kernel. Minted requirement (%s) but failed to update goal requirement_refs: %v", targetID, strings.Join(summary.CreatedRequirementIDs, ", "), err)
+			}
+		} else {
+			summary.LinkageNote = fmt.Sprintf("Target goal %s pre-existed in Knowledge Kernel. Pipeline criteria, test cases, and backlog items linked to existing requirement hierarchy.", targetID)
+		}
+		_ = scenario.EmitScenarioSummary(proc.ProjectRoot(), summary)
+	}
+
+	if strings.HasPrefix(targetID, "MIL-") {
+		summary.LinkageNote = fmt.Sprintf("Target milestone %s pre-existed in Knowledge Kernel. Generated pipeline backlog items linked to milestone.", targetID)
+		_ = scenario.EmitScenarioSummary(proc.ProjectRoot(), summary)
 	}
 
 	fmt.Fprintf(cmd.OutOrStdout(), "Pipeline updated successfully.\n")

@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://zqk.dev/schemas/boundary_contract_spec.schema.json",
+  "title": "CPCP Boundary Contract Specification Schema",
+  "description": "Schema for Contract Protocol for Continuous Pipelines (CPCP) formalizing the boundary between nondeterministic agent/LLM behavior and the deterministic kernel membrane.",
+  "type": "object",
+  "required": ["contract_id", "version", "membrane_mode", "invariants"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Reference to this schema file"
+    },
+    "contract_id": {
+      "type": "string",
+      "description": "Unique identifier for the boundary contract (e.g. CPCP-MEMBRANE-001)"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Contract version (semantic versioning)"
+    },
+    "membrane_mode": {
+      "type": "string",
+      "enum": ["fail_closed", "audit_only"],
+      "description": "Enforcement mode of the cellular membrane barrier"
+    },
+    "nondeterministic_layer": {
+      "type": "string",
+      "description": "Scope and protocol of the nondeterministic agent runtime (e.g. MCP / Tool execution)"
+    },
+    "deterministic_layer": {
+      "type": "string",
+      "description": "Scope of the deterministic knowledge kernel (e.g. CAS storage, WAL, change_journal)"
+    },
+    "invariants": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Non-negotiable invariants required for membrane traversal"
+    },
+    "rejection_action": {
+      "type": "string",
+      "enum": ["reject_mutation", "fail_closed", "quarantine"],
+      "description": "Enforcement response on invariant violation"
+    }
+  },
+  "additionalProperties": false
+}

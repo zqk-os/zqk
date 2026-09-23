@@ -160,3 +160,64 @@ func TestCoerceRequirementPriorityForCASUpdate(t *testing.T) {
 		t.Fatalf("medium -> p2, got %#v", obj[objects.FieldKeyPriority])
 	}
 }
+
+func TestGenerateTracePipelineBundle_GoalTarget_MintsRequirement(t *testing.T) {
+	goalObj := map[string]any{
+		"_kind":               objects.KindGoal,
+		objects.FieldKeyTitle: "Enterprise Scalability Goal",
+	}
+
+	bundle, _, needCriteria := generateTracePipelineBundle("GOAL-001", goalObj, nil)
+	if bundle == nil {
+		t.Fatal("expected bundle for Goal target")
+	}
+	if !needCriteria {
+		t.Fatal("expected needCriteria to be true")
+	}
+	if len(bundle.Objects.Requirements) != 1 {
+		t.Fatalf("expected 1 Requirement to be minted for Goal, got %d", len(bundle.Objects.Requirements))
+	}
+	req := bundle.Objects.Requirements[0]
+	if len(req.GoalRefs) != 1 || req.GoalRefs[0] != "GOAL-001" {
+		t.Errorf("expected Requirement to link GoalRefs ['GOAL-001'], got %v", req.GoalRefs)
+	}
+
+	// Criteria must link to the minted Requirement, NOT the Goal ID
+	for _, crit := range bundle.Objects.Criteria {
+		if crit.RequirementRef != req.IDHint {
+			t.Errorf("expected Criteria RequirementRef %q, got %q", req.IDHint, crit.RequirementRef)
+		}
+	}
+
+	// Test Case must link to the minted Requirement
+	tc := bundle.Objects.TestCases[0]
+	if len(tc.RequirementRefs) != 1 || tc.RequirementRefs[0] != req.IDHint {
+		t.Errorf("expected TestCase RequirementRefs [%q], got %v", req.IDHint, tc.RequirementRefs)
+	}
+
+	// Backlog Item must link to the minted Requirement
+	bli := bundle.Objects.BacklogItems[0]
+	if len(bli.RequirementRefs) != 1 || bli.RequirementRefs[0] != req.IDHint {
+		t.Errorf("expected BacklogItem RequirementRefs [%q], got %v", req.IDHint, bli.RequirementRefs)
+	}
+}
+
+func TestGenerateTracePipelineBundle_MilestoneTarget_SetsMilestoneRefs(t *testing.T) {
+	milObj := map[string]any{
+		"_kind":               objects.KindMilestone,
+		objects.FieldKeyTitle: "Q3 GA Milestone",
+	}
+
+	bundle, _, _ := generateTracePipelineBundle("MIL-001", milObj, nil)
+	if bundle == nil {
+		t.Fatal("expected bundle for Milestone target")
+	}
+	if len(bundle.Objects.BacklogItems) != 1 {
+		t.Fatalf("expected 1 BacklogItem, got %d", len(bundle.Objects.BacklogItems))
+	}
+	bli := bundle.Objects.BacklogItems[0]
+	if len(bli.MilestoneRefs) != 1 || bli.MilestoneRefs[0] != "MIL-001" {
+		t.Errorf("expected BacklogItem MilestoneRefs ['MIL-001'], got %v", bli.MilestoneRefs)
+	}
+}
+
