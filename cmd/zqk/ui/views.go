@@ -48,9 +48,27 @@ func Render(m *UIModel) string {
 }
 
 func renderHeader(b *strings.Builder, m *UIModel) {
-	b.WriteString("╔═══════════════════════════════════════════════════════════════════════════════════════════════╗\n")
-	b.WriteString("║                 ⚡ ZQK KNOWLEDGE KERNEL — MISSION CONTROL CONSOLE                             ║\n")
-	b.WriteString("╚═══════════════════════════════════════════════════════════════════════════════════════════════╝\n")
+	w := m.Width
+	if w < 60 {
+		w = 80
+	}
+
+	b.WriteString("╔" + strings.Repeat("═", w-2) + "╗\n")
+	title := "⚡ ZQK KNOWLEDGE KERNEL — MISSION CONTROL CONSOLE"
+	innerW := w - 2
+	titleRunes := []rune(title)
+	if len(titleRunes) > innerW-2 {
+		title = string(titleRunes[:innerW-5]) + "..."
+		titleRunes = []rune(title)
+	}
+	pad := innerW - len(titleRunes)
+	if pad < 0 {
+		pad = 0
+	}
+	leftPad := pad / 2
+	rightPad := pad - leftPad
+	b.WriteString("║" + strings.Repeat(" ", leftPad) + cyanBold(title) + strings.Repeat(" ", rightPad) + "║\n")
+	b.WriteString("╚" + strings.Repeat("═", w-2) + "╝\n")
 
 	// Tabs Bar
 	tabs := []struct {
@@ -72,10 +90,15 @@ func renderHeader(b *strings.Builder, m *UIModel) {
 		}
 	}
 	b.WriteString(strings.Join(tabStrs, " │ ") + "\n")
-	b.WriteString(dim("───────────────────────────────────────────────────────────────────────────────────────────\n"))
+	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 }
 
 func renderSeismographTab(b *strings.Builder, m *UIModel) {
+	w := m.Width
+	if w < 60 {
+		w = 80
+	}
+
 	// Calculate kind counts from recent mutations
 	kindCounts := make(map[string]int)
 	for _, mut := range m.Mutations {
@@ -97,12 +120,31 @@ func renderSeismographTab(b *strings.Builder, m *UIModel) {
 		scrollMode = yellowBold(fmt.Sprintf("[PAUSED: +%d]", m.ScrollOffset))
 	}
 
-	b.WriteString(fmt.Sprintf("Status: %s | Buffer: %d events | Rate: %s | %s\n",
+	b.WriteString(fmt.Sprintf("Status: %s │ Buffer: %d events │ Rate: %s │ %s\n",
 		greenBold("ENFORCING"), len(m.Mutations), sparkline, scrollMode))
 	b.WriteString(fmt.Sprintf("Types:  %s\n", symbolCounters))
-	b.WriteString("───────────────────────────────────────────────────────────────────────────────────────────\n")
-	b.WriteString(fmt.Sprintf("%-10s │ %-12s │ %-32s │ %-30s\n", "TIME", "EVENT", "OBJECT REF", "SUMMARY / DIFF"))
-	b.WriteString("───────────────────────────────────────────────────────────────────────────────────────────\n")
+	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
+
+	// Column widths fitting terminal width w
+	timeW := 10
+	eventW := 12
+	refW := 24
+	if w >= 100 {
+		refW = 30
+	}
+	// Separators: " │ " x 3 = 9 characters
+	sumW := w - timeW - eventW - refW - 9
+	if sumW < 14 {
+		refW = 18
+		sumW = w - timeW - eventW - refW - 9
+	}
+	if sumW < 10 {
+		sumW = 10
+	}
+
+	b.WriteString(fmt.Sprintf("%-*s │ %-*s │ %-*s │ %s\n",
+		timeW, "TIME", eventW, "EVENT", refW, "OBJECT REF", "SUMMARY / DIFF"))
+	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 
 	// Determine visible lines based on terminal height
 	availRows := m.Height - 12
@@ -142,19 +184,20 @@ func renderSeismographTab(b *strings.Builder, m *UIModel) {
 
 			badge := state.FormatEventBadge(mut.ChangeType)
 			ref := mut.ObjectRef
-			if len(ref) > 32 {
-				ref = ref[:29] + "..."
+			if len(ref) > refW {
+				ref = ref[:refW-3] + "..."
 			}
 
 			summary := mut.DiffSummary
 			if summary == "" {
 				summary = mut.ChangeType
 			}
-			if len(summary) > 30 {
-				summary = summary[:27] + "..."
+			if len(summary) > sumW {
+				summary = summary[:sumW-3] + "..."
 			}
 
-			b.WriteString(fmt.Sprintf("[%s] │ %-12s │ %-32s │ %s\n", tStr, badge, ref, summary))
+			b.WriteString(fmt.Sprintf("[%s] │ %-*s │ %-*s │ %s\n",
+				tStr, eventW, badge, refW, ref, summary))
 		}
 	}
 
@@ -165,8 +208,12 @@ func renderSeismographTab(b *strings.Builder, m *UIModel) {
 }
 
 func renderSwarmTab(b *strings.Builder, m *UIModel) {
+	w := m.Width
+	if w < 60 {
+		w = 80
+	}
 	b.WriteString(whiteBold("🤖 Multi-Agent Swarm Orchestration & Throughput (MMORCH)\n"))
-	b.WriteString("───────────────────────────────────────────────────────────────────────────────────────────\n")
+	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 
 	if m.SwarmData == nil {
 		b.WriteString(dim("  [Swarm status unavailable or storage initializing...]\n\n"))
@@ -207,8 +254,12 @@ func renderSwarmTab(b *strings.Builder, m *UIModel) {
 }
 
 func renderObjectsTab(b *strings.Builder, m *UIModel) {
+	w := m.Width
+	if w < 60 {
+		w = 80
+	}
 	b.WriteString(whiteBold("📋 Knowledge Kernel Object Inventory & Process Data Cells\n"))
-	b.WriteString("───────────────────────────────────────────────────────────────────────────────────────────\n")
+	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 
 	if len(m.ObjectCounts) == 0 {
 		b.WriteString(dim("  [No process objects discovered in .zqk/process/]\n\n"))
@@ -227,28 +278,55 @@ func renderObjectsTab(b *strings.Builder, m *UIModel) {
 	b.WriteString(fmt.Sprintf("Total Discovered Objects: %s across %s kinds\n\n",
 		greenBold(fmt.Sprintf("%d", total)), whiteBold(fmt.Sprintf("%d", len(kinds)))))
 
-	b.WriteString(fmt.Sprintf("%-28s │ %-8s │ %-45s\n", "OBJECT KIND", "COUNT", "DESCRIPTION"))
-	b.WriteString("───────────────────────────────────────────────────────────────────────────────────────────\n")
+	kindW := 24
+	countW := 8
+	descW := w - kindW - countW - 7
+	if descW < 15 {
+		descW = 15
+	}
+
+	b.WriteString(fmt.Sprintf("%-*s │ %-*s │ %s\n", kindW, "OBJECT KIND", countW, "COUNT", "DESCRIPTION"))
+	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 
 	for _, k := range kinds {
 		c := m.ObjectCounts[k]
 		desc := describeKind(k)
-		b.WriteString(fmt.Sprintf("%-28s │ %-8d │ %s\n", k, c, dim(desc)))
+		displayK := k
+		if len(displayK) > kindW {
+			displayK = displayK[:kindW-3] + "..."
+		}
+		if len(desc) > descW {
+			desc = desc[:descW-3] + "..."
+		}
+		b.WriteString(fmt.Sprintf("%-*s │ %-*d │ %s\n", kindW, displayK, countW, c, dim(desc)))
 	}
 }
 
 func renderSchedulerTab(b *strings.Builder, m *UIModel) {
+	w := m.Width
+	if w < 60 {
+		w = 80
+	}
 	b.WriteString(whiteBold("⏱️ Autonomous Scheduler & Background Daemons\n"))
-	b.WriteString("───────────────────────────────────────────────────────────────────────────────────────────\n")
+	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 
 	if len(m.SchedulerJobs) == 0 {
 		b.WriteString(dim("  [No scheduler jobs registered or scheduler not initialized]\n\n"))
 		return
 	}
 
-	b.WriteString(fmt.Sprintf("%-30s │ %-12s │ %-19s │ %-19s │ %s\n",
-		"JOB IDENTIFIER", "SCHEDULE", "LAST RUN", "NEXT RUN", "STATUS"))
-	b.WriteString("───────────────────────────────────────────────────────────────────────────────────────────\n")
+	idW := 28
+	schW := 10
+	lastW := 19
+	nextW := 19
+	if w < 90 {
+		idW = 20
+		schW = 8
+	}
+
+	b.WriteString(fmt.Sprintf("%-*s │ %-*s │ %-*s │ %-*s │ %s\n",
+		idW, "JOB IDENTIFIER", schW, "SCHEDULE", lastW, "LAST RUN", nextW, "NEXT RUN", "STATUS"))
+	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 
 	for _, job := range m.SchedulerJobs {
 		stBadge := greenBold(job.Status)
@@ -258,15 +336,29 @@ func renderSchedulerTab(b *strings.Builder, m *UIModel) {
 			stBadge = yellowBold(job.Status)
 		}
 
-		b.WriteString(fmt.Sprintf("%-30s │ %-12s │ %-19s │ %-19s │ %s\n",
-			job.ID, job.Schedule, job.LastRunAt, job.NextRunAt, stBadge))
+		jID := job.ID
+		if len(jID) > idW {
+			jID = jID[:idW-3] + "..."
+		}
+
+		sch := job.Schedule
+		if len(sch) > schW {
+			sch = sch[:schW-3] + "..."
+		}
+
+		b.WriteString(fmt.Sprintf("%-*s │ %-*s │ %-*s │ %-*s │ %s\n",
+			idW, jID, schW, sch, lastW, job.LastRunAt, nextW, job.NextRunAt, stBadge))
 	}
 }
 
 func renderFooter(b *strings.Builder, m *UIModel) {
-	b.WriteString(dim("───────────────────────────────────────────────────────────────────────────────────────────\n"))
+	w := m.Width
+	if w < 60 {
+		w = 80
+	}
+	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 	// Legend Bar
-	b.WriteString(dim("Legend: ") + "⚡ Audit | 📋 Backlog | ⚙️ Scheduler | 🤖 Agent | 📦 Change | 🎯 Requirement\n")
+	b.WriteString(dim("Legend: ") + "⚡ Audit │ 📋 Backlog │ ⚙️ Scheduler │ 🤖 Agent │ 📦 Change │ 🎯 Requirement\n")
 	// Keybindings Bar
 	b.WriteString(whiteBold("[Tab / 1-4]") + " Switch View  " +
 		whiteBold("[↑/↓/j/k]") + " Scroll  " +

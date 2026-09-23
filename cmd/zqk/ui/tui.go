@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"syscall"
 	"time"
 
@@ -47,10 +48,10 @@ func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp stora
 	}()
 
 	// Switch to alternate screen buffer, clear screen, and hide cursor
-	fmt.Print("\033[?1049h\033[2J\033[H\033[?25l")
+	_, _ = os.Stdout.WriteString("\033[?1049h\033[2J\033[H\033[?25l")
 	defer func() {
 		// Show cursor and restore normal screen buffer
-		fmt.Print("\033[?25h\033[?1049l")
+		_, _ = os.Stdout.WriteString("\033[?25h\033[?1049l\r\n")
 	}()
 
 	m := NewUIModel(projectRoot, initialTab)
@@ -58,7 +59,7 @@ func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp stora
 	if err == nil {
 		m.Width, m.Height = w, h
 	} else {
-		m.Width, m.Height = 100, 30
+		m.Width, m.Height = 80, 24
 	}
 
 	// Initial data fetch
@@ -70,7 +71,7 @@ func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp stora
 	}
 
 	// Render initial frame
-	fmt.Print("\033[H" + Render(m))
+	writeScreen(Render(m))
 
 	// Setup reactive filesystem watcher
 	watcher, _ := fsnotify.NewWatcher()
@@ -117,9 +118,9 @@ func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp stora
 		if sErr == nil && (curW != m.Width || curH != m.Height) {
 			m.Width, m.Height = curW, curH
 			// Clear on size change
-			fmt.Print("\033[2J")
+			_, _ = os.Stdout.WriteString("\033[2J")
 		}
-		fmt.Print("\033[H" + Render(m))
+		writeScreen(Render(m))
 	}
 
 	for {
@@ -147,6 +148,24 @@ func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp stora
 			}
 		}
 	}
+}
+
+// writeScreen handles rendering in terminal raw mode.
+// In raw mode, lone \n causes the cursor to step down without returning to column 0
+// (the "staircase effect" cascading diagonally down and to the right).
+// writeScreen replaces every \n with \r\n and clears the line remainder (\033[K).
+func writeScreen(s string) {
+	lines := strings.Split(s, "\n")
+	var buf strings.Builder
+	buf.WriteString("\033[H")
+	for i, line := range lines {
+		buf.WriteString(line)
+		buf.WriteString("\033[K")
+		if i < len(lines)-1 {
+			buf.WriteString("\r\n")
+		}
+	}
+	_, _ = os.Stdout.WriteString(buf.String())
 }
 
 func handleInput(m *UIModel, key []byte) bool {
