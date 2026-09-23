@@ -29,16 +29,20 @@ func Render(m *UIModel) string {
 
 	// Tab-Specific Body
 	switch m.ActiveTab {
-	case TabSeismograph:
-		renderSeismographTab(&b, m)
+	case TabState:
+		renderStateTab(&b, m)
+	case TabAudit:
+		renderAuditTab(&b, m)
 	case TabSwarm:
 		renderSwarmTab(&b, m)
-	case TabObjects:
-		renderObjectsTab(&b, m)
+	case TabPM:
+		renderPMTab(&b, m)
+	case TabMetrics:
+		renderMetricsTab(&b, m)
 	case TabScheduler:
 		renderSchedulerTab(&b, m)
 	default:
-		renderSeismographTab(&b, m)
+		renderStateTab(&b, m)
 	}
 
 	// Bottom Status & Help Bar
@@ -49,7 +53,7 @@ func Render(m *UIModel) string {
 
 func renderHeader(b *strings.Builder, m *UIModel) {
 	w := m.Width
-	if w < 60 {
+	if w < 70 {
 		w = 80
 	}
 
@@ -70,15 +74,17 @@ func renderHeader(b *strings.Builder, m *UIModel) {
 	b.WriteString("║" + strings.Repeat(" ", leftPad) + cyanBold(title) + strings.Repeat(" ", rightPad) + "║\n")
 	b.WriteString("╚" + strings.Repeat("═", w-2) + "╝\n")
 
-	// Tabs Bar
+	// Tabs Bar (6 tabs)
 	tabs := []struct {
 		idx  int
 		name string
 	}{
-		{TabSeismograph, "1: ⚡ Seismograph"},
-		{TabSwarm, "2: 🤖 Swarm"},
-		{TabObjects, "3: 📋 Objects"},
-		{TabScheduler, "4: ⏱️ Scheduler"},
+		{TabState, "1: ⚡ State"},
+		{TabAudit, "2: 📜 Audit"},
+		{TabSwarm, "3: 🤖 Swarm"},
+		{TabPM, "4: 📋 PM & Process"},
+		{TabMetrics, "5: 📊 Metrics"},
+		{TabScheduler, "6: ⏱️ Scheduler"},
 	}
 
 	var tabStrs []string
@@ -93,13 +99,13 @@ func renderHeader(b *strings.Builder, m *UIModel) {
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 }
 
-func renderSeismographTab(b *strings.Builder, m *UIModel) {
+// renderStateTab renders real-time state mutations, instructions, and lifecycles (excluding high-volume audit logs).
+func renderStateTab(b *strings.Builder, m *UIModel) {
 	w := m.Width
-	if w < 60 {
+	if w < 70 {
 		w = 80
 	}
 
-	// Calculate kind counts from recent mutations
 	kindCounts := make(map[string]int)
 	for _, mut := range m.Mutations {
 		parts := strings.Split(mut.ObjectRef, ":")
@@ -108,31 +114,25 @@ func renderSeismographTab(b *strings.Builder, m *UIModel) {
 		}
 	}
 
-	// Sparkline
 	sparkline := generateSparkline(len(m.Mutations))
-
-	// Symbol counters
 	symbolCounters := formatSymbolCounters(kindCounts)
 
-	// Auto-scroll badge
 	scrollMode := greenBold("[AUTO-SCROLL: ON]")
 	if !m.AutoScroll {
 		scrollMode = yellowBold(fmt.Sprintf("[PAUSED: +%d]", m.ScrollOffset))
 	}
 
-	b.WriteString(fmt.Sprintf("Status: %s │ Buffer: %d events │ Rate: %s │ %s\n",
+	b.WriteString(fmt.Sprintf("Status: %s │ Buffer: %d state mutations │ Rate: %s │ %s\n",
 		greenBold("ENFORCING"), len(m.Mutations), sparkline, scrollMode))
 	b.WriteString(fmt.Sprintf("Types:  %s\n", symbolCounters))
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 
-	// Column widths fitting terminal width w
 	timeW := 10
 	eventW := 12
 	refW := 24
-	if w >= 100 {
-		refW = 30
+	if w >= 110 {
+		refW = 32
 	}
-	// Separators: " │ " x 3 = 9 characters
 	sumW := w - timeW - eventW - refW - 9
 	if sumW < 14 {
 		refW = 18
@@ -146,7 +146,6 @@ func renderSeismographTab(b *strings.Builder, m *UIModel) {
 		timeW, "TIME", eventW, "EVENT", refW, "OBJECT REF", "SUMMARY / DIFF"))
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 
-	// Determine visible lines based on terminal height
 	availRows := m.Height - 12
 	if availRows < 6 {
 		availRows = 6
@@ -156,7 +155,7 @@ func renderSeismographTab(b *strings.Builder, m *UIModel) {
 	var visible []state.JournalMutation
 
 	if total == 0 {
-		b.WriteString(dim("  [No stream events recorded yet. Perform an action to see real-time events]\n"))
+		b.WriteString(dim("  [No state mutations recorded in stream buffer yet]\n"))
 	} else {
 		if m.AutoScroll {
 			start := total - availRows
@@ -201,7 +200,142 @@ func renderSeismographTab(b *strings.Builder, m *UIModel) {
 		}
 	}
 
-	// Pad remaining rows so layout remains stable
+	for i := len(visible); i < availRows; i++ {
+		b.WriteString("\n")
+	}
+}
+
+// renderAuditTab renders the dedicated high-volume operational audit stream.
+func renderAuditTab(b *strings.Builder, m *UIModel) {
+	w := m.Width
+	if w < 70 {
+		w = 80
+	}
+
+	// Actor breakdown
+	actors := make(map[string]int)
+	for _, a := range m.AuditEvents {
+		act := a.CreatedBy
+		if act == "" {
+			act = a.Actor
+		}
+		if act == "" {
+			act = "system"
+		}
+		actors[act]++
+	}
+
+	var actorParts []string
+	for act, cnt := range actors {
+		actorParts = append(actorParts, fmt.Sprintf("%s (%d)", act, cnt))
+	}
+	sort.Strings(actorParts)
+	actorLine := strings.Join(actorParts, ", ")
+	if len(actorLine) > w-25 && len(actorLine) > 20 {
+		actorLine = actorLine[:w-28] + "..."
+	}
+
+	sparkline := generateSparkline(len(m.AuditEvents))
+	scrollMode := greenBold("[AUTO-SCROLL: ON]")
+	if !m.AutoScroll {
+		scrollMode = yellowBold(fmt.Sprintf("[PAUSED: +%d]", m.ScrollOffset))
+	}
+
+	b.WriteString(fmt.Sprintf("Stream: %s │ Buffer: %d audit events │ Rate: %s │ %s\n",
+		cyanBold("audit_event"), len(m.AuditEvents), sparkline, scrollMode))
+	b.WriteString(fmt.Sprintf("Actors: %s\n", actorLine))
+	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
+
+	timeW := 10
+	actorW := 16
+	opW := 18
+	refW := 22
+	if w >= 110 {
+		actorW = 18
+		opW = 20
+		refW = 26
+	}
+	detailW := w - timeW - actorW - opW - refW - 12
+	if detailW < 12 {
+		detailW = 12
+	}
+
+	b.WriteString(fmt.Sprintf("%-*s │ %-*s │ %-*s │ %-*s │ %s\n",
+		timeW, "TIME", actorW, "ACTOR", opW, "OPERATION", refW, "OBJECT REF", "DETAILS / PAYLOAD"))
+	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
+
+	availRows := m.Height - 12
+	if availRows < 6 {
+		availRows = 6
+	}
+
+	total := len(m.AuditEvents)
+	var visible []state.JournalMutation
+
+	if total == 0 {
+		b.WriteString(dim("  [No audit events recorded in audit stream yet]\n"))
+	} else {
+		if m.AutoScroll {
+			start := total - availRows
+			if start < 0 {
+				start = 0
+			}
+			visible = m.AuditEvents[start:]
+		} else {
+			end := total - m.ScrollOffset
+			if end > total {
+				end = total
+			}
+			start := end - availRows
+			if start < 0 {
+				start = 0
+			}
+			visible = m.AuditEvents[start:end]
+		}
+
+		for _, aud := range visible {
+			tStr := "--:--:--"
+			if aud.CreatedAt > 0 {
+				tStr = time.Unix(aud.CreatedAt, 0).Format("15:04:05")
+			}
+
+			act := aud.CreatedBy
+			if act == "" {
+				act = aud.Actor
+			}
+			if act == "" {
+				act = "system"
+			}
+			if len(act) > actorW {
+				act = act[:actorW-3] + "..."
+			}
+
+			op := aud.Operation
+			if op == "" {
+				op = aud.ChangeType
+			}
+			if len(op) > opW {
+				op = op[:opW-3] + "..."
+			}
+
+			ref := aud.ObjectRef
+			if len(ref) > refW {
+				ref = ref[:refW-3] + "..."
+			}
+
+			detail := aud.DiffSummary
+			if detail == "" {
+				detail = "--"
+			}
+			if len(detail) > detailW {
+				detail = detail[:detailW-3] + "..."
+			}
+
+			b.WriteString(fmt.Sprintf("[%s] │ %-*s │ %-*s │ %-*s │ %s\n",
+				tStr, actorW, act, opW, op, refW, ref, detail))
+		}
+	}
+
 	for i := len(visible); i < availRows; i++ {
 		b.WriteString("\n")
 	}
@@ -209,14 +343,14 @@ func renderSeismographTab(b *strings.Builder, m *UIModel) {
 
 func renderSwarmTab(b *strings.Builder, m *UIModel) {
 	w := m.Width
-	if w < 60 {
+	if w < 70 {
 		w = 80
 	}
 	b.WriteString(whiteBold("🤖 Multi-Agent Swarm Orchestration & Throughput (MMORCH)\n"))
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 
 	if m.SwarmData == nil {
-		b.WriteString(dim("  [Swarm status unavailable or storage initializing...]\n\n"))
+		b.WriteString(dim("  [Swarm status initializing or storage unavailable...]\n\n"))
 		return
 	}
 
@@ -253,58 +387,207 @@ func renderSwarmTab(b *strings.Builder, m *UIModel) {
 	}
 }
 
-func renderObjectsTab(b *strings.Builder, m *UIModel) {
+// renderPMTab renders the dedicated PM & Process Admin dashboard (Strategic cascade, delivery pipeline, blockers).
+func renderPMTab(b *strings.Builder, m *UIModel) {
 	w := m.Width
-	if w < 60 {
+	if w < 70 {
 		w = 80
 	}
-	b.WriteString(whiteBold("📋 Knowledge Kernel Object Inventory & Process Data Cells\n"))
+
+	b.WriteString(whiteBold("📋 Program & Process Management Administration (TPM / PM Cascade)\n"))
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 
-	if len(m.ObjectCounts) == 0 {
-		b.WriteString(dim("  [No process objects discovered in .zqk/process/]\n\n"))
-		return
+	// 1. Strategic Alignment (Mission, Vision, Goals)
+	mis := m.MissionTitle
+	if mis == "" {
+		mis = "Continuous Autonomous Development"
+	}
+	vis := m.VisionTitle
+	if vis == "" {
+		vis = "Zero-Overhead Agentic Knowledge Operating System"
 	}
 
-	// Sort kinds alphabetically
-	kinds := make([]string, 0, len(m.ObjectCounts))
-	total := 0
-	for k, c := range m.ObjectCounts {
-		kinds = append(kinds, k)
-		total += c
+	b.WriteString(fmt.Sprintf("Mission: %s │ Vision: %s\n", cyanBold(mis), dim(vis)))
+
+	if len(m.Goals) > 0 {
+		var goalParts []string
+		for _, g := range m.Goals {
+			goalParts = append(goalParts, fmt.Sprintf("%s: %s [%s]", g.ID, g.Title, greenBold(g.Status)))
+		}
+		b.WriteString(fmt.Sprintf("Goals:   %s\n", strings.Join(goalParts, " │ ")))
 	}
-	sort.Strings(kinds)
-
-	b.WriteString(fmt.Sprintf("Total Discovered Objects: %s across %s kinds\n\n",
-		greenBold(fmt.Sprintf("%d", total)), whiteBold(fmt.Sprintf("%d", len(kinds)))))
-
-	kindW := 24
-	countW := 8
-	descW := w - kindW - countW - 7
-	if descW < 15 {
-		descW = 15
-	}
-
-	b.WriteString(fmt.Sprintf("%-*s │ %-*s │ %s\n", kindW, "OBJECT KIND", countW, "COUNT", "DESCRIPTION"))
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 
-	for _, k := range kinds {
-		c := m.ObjectCounts[k]
-		desc := describeKind(k)
-		displayK := k
-		if len(displayK) > kindW {
-			displayK = displayK[:kindW-3] + "..."
+	// 2. Delivery Pipeline Summary Box
+	bs := m.BacklogSummary
+	b.WriteString(fmt.Sprintf("%s │ %s: %d  %s: %d  %s: %d  %s: %d  %s: %d  %s: %d  (%s claimed / %s open)\n",
+		whiteBold(fmt.Sprintf("BLI Pipeline (%d Total)", bs.Total)),
+		dim("Draft"), bs.Draft,
+		cyanBold("Planned"), bs.Planned,
+		yellowBold("InProg"), bs.InProgress,
+		redBold("Blocked"), bs.Blocked,
+		greenBold("Done"), bs.Done,
+		whiteBold("Approved"), bs.Approved,
+		greenBold(fmt.Sprintf("%d", bs.Claimed)),
+		yellowBold(fmt.Sprintf("%d", bs.Unclaimed))))
+	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
+
+	// 3. Priority Plans & Workstreams
+	if len(m.PriorityPlans) > 0 {
+		b.WriteString(whiteBold("Active Priority Plans:\n"))
+		for _, p := range m.PriorityPlans {
+			wsStr := strings.Join(p.Workstreams, ", ")
+			if wsStr == "" {
+				wsStr = "core"
+			}
+			b.WriteString(fmt.Sprintf("  • %-16s %-32s status: %-10s (workstreams: %s, BLIs: %d)\n",
+				cyanBold(p.ID), p.Title, yellowBold(p.Status), dim(wsStr), p.BLICount))
 		}
-		if len(desc) > descW {
-			desc = desc[:descW-3] + "..."
+		b.WriteString("\n")
+	}
+
+	// 4. Active Blockers & Risks
+	if len(m.Blockers) > 0 {
+		b.WriteString(redBold("Active Risks & Blockers:\n"))
+		for _, blk := range m.Blockers {
+			b.WriteString(fmt.Sprintf("  ⚠️  %-12s %-30s [Sev: %s | Impact: %s | Status: %s]\n",
+				blk.ID, blk.Title, redBold(blk.Severity), blk.Impact, blk.Status))
 		}
-		b.WriteString(fmt.Sprintf("%-*s │ %-*d │ %s\n", kindW, displayK, countW, c, dim(desc)))
+		b.WriteString("\n")
+	}
+
+	// 5. Technical Debt
+	if len(m.TechnicalDebt) > 0 {
+		b.WriteString(yellowBold("Technical Debt Items:\n"))
+		for _, d := range m.TechnicalDebt {
+			b.WriteString(fmt.Sprintf("  🔧 %-12s %-30s [Category: %s | Priority: %s | Status: %s]\n",
+				d.ID, d.Title, d.Category, d.Priority, d.Status))
+		}
+		b.WriteString("\n")
+	}
+
+	// 6. Recent Backlog Items Table
+	if len(m.RecentBacklog) > 0 {
+		b.WriteString(whiteBold("Recent Work Units (Backlog Items):\n"))
+		bliIDW := 14
+		prioW := 6
+		stW := 12
+		claimW := 16
+		titleW := w - bliIDW - prioW - stW - claimW - 14
+		if titleW < 15 {
+			titleW = 15
+		}
+
+		b.WriteString(fmt.Sprintf("  %-*s │ %-*s │ %-*s │ %-*s │ %s\n",
+			bliIDW, "BLI ID", prioW, "PRIO", stW, "STATUS", claimW, "CLAIMED BY", "TITLE"))
+		b.WriteString("  " + dim(strings.Repeat("─", w-4)) + "\n")
+
+		limit := 6
+		if len(m.RecentBacklog) < limit {
+			limit = len(m.RecentBacklog)
+		}
+		for i := 0; i < limit; i++ {
+			item := m.RecentBacklog[i]
+			stBadge := item.Status
+			if item.Status == "done" || item.Status == "completed" {
+				stBadge = greenBold(item.Status)
+			} else if item.Status == "in_progress" {
+				stBadge = yellowBold(item.Status)
+			} else if item.Status == "blocked" {
+				stBadge = redBold(item.Status)
+			}
+
+			claimed := item.ClaimedBy
+			if claimed == "" || claimed == "<nil>" {
+				claimed = dim("unassigned")
+			}
+
+			tTitle := item.Title
+			if len(tTitle) > titleW {
+				tTitle = tTitle[:titleW-3] + "..."
+			}
+
+			b.WriteString(fmt.Sprintf("  %-*s │ %-*s │ %-*s │ %-*s │ %s\n",
+				bliIDW, item.ID, prioW, item.Priority, stW, stBadge, claimW, claimed, tTitle))
+		}
+	}
+}
+
+// renderMetricsTab renders kernel telemetry, command metrics, scheduler health, and lock hygiene.
+func renderMetricsTab(b *strings.Builder, m *UIModel) {
+	w := m.Width
+	if w < 70 {
+		w = 80
+	}
+
+	b.WriteString(whiteBold("📊 Knowledge Kernel Telemetry & Resource Hygiene\n"))
+	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
+
+	// Resource Hygiene Indicators
+	h := m.Hygiene
+	b.WriteString(fmt.Sprintf("Resource Hygiene: %s process objects │ %s object kinds │ %s stream files │ %s active stream lanes\n",
+		greenBold(fmt.Sprintf("%d", h.ProcessObjectCount)),
+		whiteBold(fmt.Sprintf("%d", h.KindCount)),
+		cyanBold(fmt.Sprintf("%d", h.StreamFileCount)),
+		yellowBold(fmt.Sprintf("%d", h.ActiveStreams))))
+	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
+
+	// Command Telemetry
+	b.WriteString(whiteBold("Command Execution Telemetry (command_metric):\n"))
+	if len(m.CommandMetrics) == 0 {
+		b.WriteString(dim("  [No command execution telemetry recorded yet]\n\n"))
+	} else {
+		cmdW := 22
+		execW := 8
+		durW := 12
+		lastW := 19
+		b.WriteString(fmt.Sprintf("  %-*s │ %-*s │ %-*s │ %-*s │ %s\n",
+			cmdW, "COMMAND", execW, "CALLS", durW, "DURATION", lastW, "LAST RUN", "STATUS"))
+		b.WriteString("  " + dim(strings.Repeat("─", w-4)) + "\n")
+		for _, cm := range m.CommandMetrics {
+			b.WriteString(fmt.Sprintf("  %-*s │ %-*d │ %-*s │ %-*s │ %s\n",
+				cmdW, cm.CommandName, execW, cm.ExecCount, durW, cm.AvgDuration, lastW, cm.LastRunAt, greenBold(cm.Status)))
+		}
+		b.WriteString("\n")
+	}
+
+	// Scheduler Health Telemetry
+	if len(m.SchedulerHealth) > 0 {
+		b.WriteString(whiteBold("Scheduler Health Telemetry (scheduler_health_metric):\n"))
+		for _, sh := range m.SchedulerHealth {
+			st := greenBold(sh.Status)
+			if sh.Failures > 0 {
+				st = redBold(fmt.Sprintf("%s (%d failures)", sh.Status, sh.Failures))
+			}
+			b.WriteString(fmt.Sprintf("  • %-16s Status: %s │ Heartbeat: %s │ Total Executions: %d\n",
+				sh.ID, st, sh.HeartbeatAt, sh.Executions))
+		}
+		b.WriteString("\n")
+	}
+
+	// Lock & Concurrency Contention
+	if len(m.LockMetrics) > 0 {
+		b.WriteString(whiteBold("Lock & Concurrency Metrics (file_lock_metric):\n"))
+		for _, lm := range m.LockMetrics {
+			b.WriteString(fmt.Sprintf("  • Target Kind: %-18s Contention: %-4d Avg Duration: %-10s Status: %s\n",
+				lm.TargetKind, lm.Contention, lm.Duration, greenBold(lm.Status)))
+		}
+		b.WriteString("\n")
+	}
+
+	// Quality & Aggregation
+	if len(m.QualityMetrics) > 0 {
+		b.WriteString(whiteBold("Quality & Stream Aggregation Metrics:\n"))
+		for _, qm := range m.QualityMetrics {
+			b.WriteString(fmt.Sprintf("  • %-18s Metric: %-16s Value: %-14s Status: %s\n",
+				qm.ID, qm.MetricType, cyanBold(qm.Value), greenBold(qm.Status)))
+		}
 	}
 }
 
 func renderSchedulerTab(b *strings.Builder, m *UIModel) {
 	w := m.Width
-	if w < 60 {
+	if w < 70 {
 		w = 80
 	}
 	b.WriteString(whiteBold("⏱️ Autonomous Scheduler & Background Daemons\n"))
@@ -353,14 +636,12 @@ func renderSchedulerTab(b *strings.Builder, m *UIModel) {
 
 func renderFooter(b *strings.Builder, m *UIModel) {
 	w := m.Width
-	if w < 60 {
+	if w < 70 {
 		w = 80
 	}
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
-	// Legend Bar
-	b.WriteString(dim("Legend: ") + "⚡ Audit │ 📋 Backlog │ ⚙️ Scheduler │ 🤖 Agent │ 📦 Change │ 🎯 Requirement\n")
-	// Keybindings Bar
-	b.WriteString(whiteBold("[Tab / 1-4]") + " Switch View  " +
+	b.WriteString(dim("Legend: ") + "⚡ State │ 📜 Audit │ 🤖 Swarm │ 📋 PM/Process │ 📊 Metrics │ ⏱️ Scheduler\n")
+	b.WriteString(whiteBold("[Tab / 1-6]") + " Switch View  " +
 		whiteBold("[↑/↓/j/k]") + " Scroll  " +
 		whiteBold("[Space]") + " Pause/Resume  " +
 		whiteBold("[r]") + " Refresh  " +
@@ -373,14 +654,14 @@ func formatSymbolCounters(counts map[string]int) string {
 		symbol string
 		tag    string
 	}{
-		{"audit_event", "⚡", "AUD"},
-		{"scheduler_job", "⚙️", "SCH"},
-		{"backlog_item", "📋", "BLI"},
 		{"change_journal_entry", "📦", "CHA"},
-		{"agent_task", "🤖", "ATK"},
 		{"agent_instruction", "📨", "AGI"},
+		{"process_lifecycle", "🔄", "PRC"},
+		{"agent_task", "🤖", "ATK"},
+		{"backlog_item", "📋", "BLI"},
 		{"requirement", "🎯", "REQ"},
 		{"test_case", "🧪", "TCA"},
+		{"scheduler_job", "⚙️", "SCH"},
 	}
 
 	var parts []string
@@ -412,53 +693,4 @@ func generateSparkline(count int) string {
 	}
 	b.WriteRune(']')
 	return b.String()
-}
-
-func describeKind(k string) string {
-	switch k {
-	case "backlog_item", "backlog_items":
-		return "Executable work unit (BLI)"
-	case "priority_plan", "priority_plans":
-		return "Sprint/milestone plan boundary (PRI)"
-	case "requirement", "requirements":
-		return "Functional or technical requirement (REQ)"
-	case "criteria":
-		return "Acceptance test criteria (CRT)"
-	case "test_case", "test_cases":
-		return "Executable test case chain (TCA)"
-	case "workstream", "workstreams":
-		return "Domain workstream lane (WKS)"
-	case "scheduler_job", "scheduler_jobs":
-		return "Automated maintenance daemon job (SCH)"
-	case "agent_task", "agent_tasks":
-		return "Autonomous swarm task lease (ATK)"
-	case "agent_instruction", "agent_instructions":
-		return "Peer correspondence instruction (AGI)"
-	case "audit_event", "audit_events":
-		return "Immutable operational audit record (AUD)"
-	case "change_journal_entry", "change_journal_entries":
-		return "Delta mutation log record (CHA)"
-	case "milestone", "milestones":
-		return "Program milestone target (MIL)"
-	case "policy", "policies":
-		return "Repository governance rule (POL)"
-	case "persona", "personas":
-		return "Agent host seating persona (PER)"
-	case "agent_skill", "agent_skills":
-		return "Agent persona capability pack"
-	case "glossary_term", "glossary_terms":
-		return "Knowledge domain ontology term"
-	case "qa_success":
-		return "Automated test gate success record"
-	case "risk_blocker", "risk_blockers":
-		return "Active risk and operational blocker"
-	case "goal", "goals":
-		return "Strategic program goal"
-	case "mission", "missions":
-		return "Core system mission definition"
-	case "vision", "visions":
-		return "Product vision and strategic intent"
-	default:
-		return "Knowledge kernel data cell"
-	}
 }

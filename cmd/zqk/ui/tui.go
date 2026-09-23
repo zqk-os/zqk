@@ -24,21 +24,24 @@ func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp stora
 	stdinFd := int(os.Stdin.Fd())
 	stdoutFd := int(os.Stdout.Fd())
 
-	// If stdout or stdin is not a terminal, render a single-shot view
+	// Non-interactive fallback: render a single-shot frame
 	if !term.IsTerminal(stdinFd) || !term.IsTerminal(stdoutFd) {
 		m := NewUIModel(projectRoot, initialTab)
 		m.Width, m.Height = 100, 30
 		m.RefreshMutations()
+		m.RefreshAuditEvents()
 		m.RefreshObjects()
 		if sp != nil && sec != nil {
 			m.RefreshSwarm(ctx, sp, sec)
+			m.RefreshPM(ctx, sp, sec)
+			m.RefreshMetrics(ctx, sp, sec)
 			m.RefreshScheduler(ctx, sp, sec)
 		}
 		fmt.Print(Render(m))
 		return nil
 	}
 
-	// Put terminal into raw mode
+	// Put terminal into raw mode to capture individual keypresses
 	oldState, err := term.MakeRaw(stdinFd)
 	if err != nil {
 		return err
@@ -48,10 +51,10 @@ func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp stora
 	}()
 
 	// Switch to alternate screen buffer, clear screen, and hide cursor
-	_, _ = os.Stdout.WriteString("\033[?1049h\033[2J\033[H\033[?25l")
+	_, _ = os.Stdout.WriteString(AnsiAltBufferEnter + AnsiClearScreen + AnsiHomeCursor + AnsiHideCursor)
 	defer func() {
-		// Show cursor and restore normal screen buffer
-		_, _ = os.Stdout.WriteString("\033[?25h\033[?1049l\r\n")
+		// Restore cursor visibility, exit alternate buffer, and return cursor
+		_, _ = os.Stdout.WriteString(AnsiShowCursor + AnsiAltBufferExit + CRLF)
 	}()
 
 	m := NewUIModel(projectRoot, initialTab)
@@ -64,16 +67,19 @@ func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp stora
 
 	// Initial data fetch
 	m.RefreshMutations()
+	m.RefreshAuditEvents()
 	m.RefreshObjects()
 	if sp != nil && sec != nil {
 		m.RefreshSwarm(ctx, sp, sec)
+		m.RefreshPM(ctx, sp, sec)
+		m.RefreshMetrics(ctx, sp, sec)
 		m.RefreshScheduler(ctx, sp, sec)
 	}
 
 	// Render initial frame
 	writeScreen(Render(m))
 
-	// Setup reactive filesystem watcher
+	// Setup reactive filesystem watcher across tracked stream directories
 	watcher, _ := fsnotify.NewWatcher()
 	if watcher != nil {
 		defer watcher.Close()
@@ -84,7 +90,7 @@ func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp stora
 		}
 	}
 
-	// Key event channel
+	// Non-blocking keyboard input loop
 	keyCh := make(chan []byte, 16)
 	go func() {
 		buf := make([]byte, 16)
@@ -101,7 +107,7 @@ func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp stora
 		}
 	}()
 
-	// OS signals
+	// OS signals for clean interruption
 	sigCh := make(chan os.Signal, 2)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
 
@@ -117,8 +123,7 @@ func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp stora
 		curW, curH, sErr := term.GetSize(stdoutFd)
 		if sErr == nil && (curW != m.Width || curH != m.Height) {
 			m.Width, m.Height = curW, curH
-			// Clear on size change
-			_, _ = os.Stdout.WriteString("\033[2J")
+			_, _ = os.Stdout.WriteString(AnsiClearScreen)
 		}
 		writeScreen(Render(m))
 	}
@@ -136,14 +141,18 @@ func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp stora
 			renderScreen()
 		case <-refreshTicker.C:
 			m.RefreshMutations()
+			m.RefreshAuditEvents()
 			if sp != nil && sec != nil {
 				m.RefreshSwarm(ctx, sp, sec)
+				m.RefreshPM(ctx, sp, sec)
+				m.RefreshMetrics(ctx, sp, sec)
 				m.RefreshScheduler(ctx, sp, sec)
 			}
 			renderScreen()
 		case ev, ok := <-fsEvents:
 			if ok && (ev.Has(fsnotify.Write) || ev.Has(fsnotify.Create)) {
 				m.RefreshMutations()
+				m.RefreshAuditEvents()
 				renderScreen()
 			}
 		}
@@ -151,18 +160,18 @@ func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp stora
 }
 
 // writeScreen handles rendering in terminal raw mode.
-// In raw mode, lone \n causes the cursor to step down without returning to column 0
+// In raw mode, standard '\n' only performs line-feed without resetting column position
 // (the "staircase effect" cascading diagonally down and to the right).
-// writeScreen replaces every \n with \r\n and clears the line remainder (\033[K).
+// writeScreen clears each line remainder and appends an explicit CRLF.
 func writeScreen(s string) {
 	lines := strings.Split(s, "\n")
 	var buf strings.Builder
-	buf.WriteString("\033[H")
+	buf.WriteString(AnsiHomeCursor)
 	for i, line := range lines {
 		buf.WriteString(line)
-		buf.WriteString("\033[K")
+		buf.WriteString(AnsiClearToEOL)
 		if i < len(lines)-1 {
-			buf.WriteString("\r\n")
+			buf.WriteString(CRLF)
 		}
 	}
 	_, _ = os.Stdout.WriteString(buf.String())
@@ -173,37 +182,42 @@ func handleInput(m *UIModel, key []byte) bool {
 		return false
 	}
 
-	// Check exit keys
-	if key[0] == 'q' || key[0] == 'Q' || key[0] == 3 { // Ctrl+C = 3
+	// Exit commands
+	if key[0] == 'q' || key[0] == 'Q' || key[0] == KeyCtrlC || (len(key) == 1 && key[0] == KeyEsc) {
 		return true
 	}
 
-	// Single key presses
+	// Single keypress handling
 	if len(key) == 1 {
 		switch key[0] {
-		case 27: // Esc
-			return true
-		case '\t': // Tab: cycle tabs
+		case KeyTab: // Cycle tabs forward
 			m.ActiveTab = (m.ActiveTab + 1) % TotalTabs
 			m.ScrollOffset = 0
 			m.AutoScroll = true
 		case '1':
-			m.ActiveTab = TabSeismograph
+			m.ActiveTab = TabState
 			m.ScrollOffset = 0
 			m.AutoScroll = true
 		case '2':
-			m.ActiveTab = TabSwarm
+			m.ActiveTab = TabAudit
+			m.ScrollOffset = 0
+			m.AutoScroll = true
 		case '3':
-			m.ActiveTab = TabObjects
+			m.ActiveTab = TabSwarm
 		case '4':
+			m.ActiveTab = TabPM
+		case '5':
+			m.ActiveTab = TabMetrics
+		case '6':
 			m.ActiveTab = TabScheduler
-		case ' ': // Space: toggle auto-scroll
+		case KeySpace: // Toggle auto-scroll
 			m.AutoScroll = !m.AutoScroll
 			if m.AutoScroll {
 				m.ScrollOffset = 0
 			}
 		case 'r', 'R': // Force refresh
 			m.RefreshMutations()
+			m.RefreshAuditEvents()
 			m.RefreshObjects()
 		case 'k', 'K': // Scroll up
 			m.AutoScroll = false
@@ -219,29 +233,29 @@ func handleInput(m *UIModel, key []byte) bool {
 		return false
 	}
 
-	// ANSI Escape sequences
-	if len(key) >= 3 && key[0] == 27 && key[1] == '[' {
+	// ANSI multi-byte escape sequences
+	if len(key) >= 3 && key[0] == CSIPrefixEsc && key[1] == CSIPrefixBracket {
 		switch key[2] {
-		case 'A': // Arrow Up
+		case SeqCodeArrowUp:
 			m.AutoScroll = false
 			m.ScrollOffset++
-		case 'B': // Arrow Down
+		case SeqCodeArrowDown:
 			if m.ScrollOffset > 0 {
 				m.ScrollOffset--
 			}
 			if m.ScrollOffset == 0 {
 				m.AutoScroll = true
 			}
-		case '5': // Page Up
+		case SeqCodePageUp:
 			m.AutoScroll = false
 			m.ScrollOffset += 10
-		case '6': // Page Down
+		case SeqCodePageDown:
 			m.ScrollOffset -= 10
 			if m.ScrollOffset <= 0 {
 				m.ScrollOffset = 0
 				m.AutoScroll = true
 			}
-		case 'Z': // Shift-Tab
+		case SeqCodeShiftTab: // Shift+Tab: cycle tabs backward
 			m.ActiveTab = (m.ActiveTab - 1 + TotalTabs) % TotalTabs
 			m.ScrollOffset = 0
 			m.AutoScroll = true

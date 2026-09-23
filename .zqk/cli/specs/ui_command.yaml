@@ -20,7 +20,7 @@ flags:
       shorthand: "t"
       type: string
       default: "seismograph"
-      description: Initial tab to display (seismograph, swarm, objects, scheduler)
+      description: Initial tab to display (state, audit, swarm, pm, metrics, scheduler)
 help:
     examples:
         - comment: Launch mission control

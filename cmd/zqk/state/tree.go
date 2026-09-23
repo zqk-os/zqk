@@ -28,6 +28,9 @@ type JournalMutation struct {
 	DiffSummary string `json:"diff_summary,omitempty"`
 	CreatedAt   int64  `json:"created_at,omitempty"`
 	CreatedBy   string `json:"created_by,omitempty"`
+	StreamKind  string `json:"stream_kind,omitempty"`
+	Actor       string `json:"actor,omitempty"`
+	Operation   string `json:"operation,omitempty"`
 }
 
 type BacklogItemNode struct {
@@ -269,6 +272,7 @@ type rawStreamRecord struct {
 	Instruction string `json:"instruction,omitempty"`
 	CreatedAt   int64  `json:"created_at,omitempty"`
 	CreatedBy   string `json:"created_by,omitempty"`
+	Actor       string `json:"actor,omitempty"`
 }
 
 func readRecentJournalMutations(projectRoot string, limit int) []JournalMutation {
@@ -277,18 +281,27 @@ func readRecentJournalMutations(projectRoot string, limit int) []JournalMutation
 
 // ReadRecentJournalMutations reads and aggregates recent mutations across all active kernel streams.
 func ReadRecentJournalMutations(projectRoot string, limit int) []JournalMutation {
+	return ReadRecentStreamMutations(projectRoot, limit, trackedStreamKinds...)
+}
+
+// ReadRecentStreamMutations reads and aggregates recent mutations across specified kernel streams.
+func ReadRecentStreamMutations(projectRoot string, limit int, streamKinds ...string) []JournalMutation {
 	if projectRoot == "" {
 		return nil
 	}
+	if len(streamKinds) == 0 {
+		streamKinds = trackedStreamKinds
+	}
 
 	type streamFileRef struct {
-		path    string
-		modTime int64
+		path       string
+		streamKind string
+		modTime    int64
 	}
 
 	var allFiles []streamFileRef
 
-	for _, kind := range trackedStreamKinds {
+	for _, kind := range streamKinds {
 		streamDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.StreamsDir, kind)
 		files, err := fileutil.ReadDir(streamDir)
 		if err != nil || len(files) == 0 {
@@ -299,7 +312,7 @@ func ReadRecentJournalMutations(projectRoot string, limit int) []JournalMutation
 				p := filepath.Join(streamDir, f.Name())
 				stamp := stampmemo.Of(p)
 				if stamp > 0 {
-					allFiles = append(allFiles, streamFileRef{path: p, modTime: int64(stamp)})
+					allFiles = append(allFiles, streamFileRef{path: p, streamKind: kind, modTime: int64(stamp)})
 				}
 			}
 		}
@@ -378,13 +391,21 @@ func ReadRecentJournalMutations(projectRoot string, limit int) []JournalMutation
 						}
 					}
 
+					creator := raw.CreatedBy
+					if creator == "" && raw.Actor != "" {
+						creator = raw.Actor
+					}
+
 					fileMutations = append(fileMutations, JournalMutation{
 						ID:          raw.ID,
 						ChangeType:  cType,
 						ObjectRef:   ref,
 						DiffSummary: summary,
 						CreatedAt:   raw.CreatedAt,
-						CreatedBy:   raw.CreatedBy,
+						CreatedBy:   creator,
+						StreamKind:  fileRef.streamKind,
+						Actor:       raw.Actor,
+						Operation:   raw.Operation,
 					})
 				}
 			}

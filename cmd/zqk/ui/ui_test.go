@@ -21,28 +21,72 @@ func TestNewUICmd(t *testing.T) {
 	assert.Equal(t, "seismograph", tabFlag.DefValue)
 }
 
+func TestAnsiConstants(t *testing.T) {
+	assert.Equal(t, "\033[?1049h", AnsiAltBufferEnter)
+	assert.Equal(t, "\033[?1049l", AnsiAltBufferExit)
+	assert.Equal(t, "\033[2J", AnsiClearScreen)
+	assert.Equal(t, "\033[H", AnsiHomeCursor)
+	assert.Equal(t, "\033[?25l", AnsiHideCursor)
+	assert.Equal(t, "\033[?25h", AnsiShowCursor)
+	assert.Equal(t, "\033[K", AnsiClearToEOL)
+	assert.Equal(t, "\r\n", CRLF)
+
+	assert.Equal(t, byte(3), KeyCtrlC)
+	assert.Equal(t, byte('\t'), KeyTab)
+	assert.Equal(t, byte(27), KeyEsc)
+	assert.Equal(t, byte(' '), KeySpace)
+}
+
 func TestUIModel_NavigationAndScrolling(t *testing.T) {
-	m := NewUIModel("", "seismograph")
-	assert.Equal(t, TabSeismograph, m.ActiveTab)
+	m := NewUIModel("", "state")
+	assert.Equal(t, TabState, m.ActiveTab)
 	assert.True(t, m.AutoScroll)
 	assert.Equal(t, 0, m.ScrollOffset)
 
-	// Tab cycle forward
-	exit := handleInput(m, []byte{'\t'})
-	assert.False(t, exit)
+	// Tab cycle forward through all 6 tabs
+	assert.False(t, handleInput(m, []byte{KeyTab}))
+	assert.Equal(t, TabAudit, m.ActiveTab)
+
+	assert.False(t, handleInput(m, []byte{KeyTab}))
 	assert.Equal(t, TabSwarm, m.ActiveTab)
 
-	// Direct tab selection
+	assert.False(t, handleInput(m, []byte{KeyTab}))
+	assert.Equal(t, TabPM, m.ActiveTab)
+
+	assert.False(t, handleInput(m, []byte{KeyTab}))
+	assert.Equal(t, TabMetrics, m.ActiveTab)
+
+	assert.False(t, handleInput(m, []byte{KeyTab}))
+	assert.Equal(t, TabScheduler, m.ActiveTab)
+
+	// Cycle back to 0
+	assert.False(t, handleInput(m, []byte{KeyTab}))
+	assert.Equal(t, TabState, m.ActiveTab)
+
+	// Direct numeric key selection (1-6)
+	handleInput(m, []byte{'2'})
+	assert.Equal(t, TabAudit, m.ActiveTab)
+
 	handleInput(m, []byte{'3'})
-	assert.Equal(t, TabObjects, m.ActiveTab)
+	assert.Equal(t, TabSwarm, m.ActiveTab)
 
 	handleInput(m, []byte{'4'})
+	assert.Equal(t, TabPM, m.ActiveTab)
+
+	handleInput(m, []byte{'5'})
+	assert.Equal(t, TabMetrics, m.ActiveTab)
+
+	handleInput(m, []byte{'6'})
 	assert.Equal(t, TabScheduler, m.ActiveTab)
 
 	handleInput(m, []byte{'1'})
-	assert.Equal(t, TabSeismograph, m.ActiveTab)
+	assert.Equal(t, TabState, m.ActiveTab)
 
-	// Test scroll controls
+	// Shift+Tab backward cycle
+	handleInput(m, []byte{CSIPrefixEsc, CSIPrefixBracket, SeqCodeShiftTab})
+	assert.Equal(t, TabScheduler, m.ActiveTab)
+
+	// Scroll controls
 	handleInput(m, []byte{'k'}) // Scroll up
 	assert.False(t, m.AutoScroll)
 	assert.Equal(t, 1, m.ScrollOffset)
@@ -57,58 +101,125 @@ func TestUIModel_NavigationAndScrolling(t *testing.T) {
 	assert.Equal(t, 0, m.ScrollOffset)
 	assert.True(t, m.AutoScroll) // Returning to 0 re-enables auto-scroll
 
-	// Toggle pause
-	handleInput(m, []byte{' '})
+	// Toggle pause with Space
+	handleInput(m, []byte{KeySpace})
 	assert.False(t, m.AutoScroll)
 
-	handleInput(m, []byte{' '})
+	handleInput(m, []byte{KeySpace})
 	assert.True(t, m.AutoScroll)
+
+	// Arrow keys
+	handleInput(m, []byte{CSIPrefixEsc, CSIPrefixBracket, SeqCodeArrowUp})
+	assert.Equal(t, 1, m.ScrollOffset)
+
+	handleInput(m, []byte{CSIPrefixEsc, CSIPrefixBracket, SeqCodeArrowDown})
+	assert.Equal(t, 0, m.ScrollOffset)
+
+	// Page Up / Down
+	handleInput(m, []byte{CSIPrefixEsc, CSIPrefixBracket, SeqCodePageUp})
+	assert.Equal(t, 10, m.ScrollOffset)
+
+	handleInput(m, []byte{CSIPrefixEsc, CSIPrefixBracket, SeqCodePageDown})
+	assert.Equal(t, 0, m.ScrollOffset)
 
 	// Exit keys
 	assert.True(t, handleInput(m, []byte{'q'}))
 	assert.True(t, handleInput(m, []byte{'Q'}))
-	assert.True(t, handleInput(m, []byte{27})) // Esc
-	assert.True(t, handleInput(m, []byte{3}))  // Ctrl+C
+	assert.True(t, handleInput(m, []byte{KeyEsc}))
+	assert.True(t, handleInput(m, []byte{KeyCtrlC}))
 }
 
-func TestRender_AllTabs(t *testing.T) {
-	m := NewUIModel("", "seismograph")
-	m.Width = 100
-	m.Height = 30
+func TestRender_AllSixTabs(t *testing.T) {
+	m := NewUIModel("", "state")
+	m.Width = 110
+	m.Height = 35
 
+	// Tab 1 Data: State stream
 	m.Mutations = []state.JournalMutation{
 		{
-			ID:          "AUD-100",
-			ChangeType:  "system_config_change",
-			ObjectRef:   "audit_event:AUD-100",
-			DiffSummary: "Queue state changed",
+			ID:          "CJE-101",
+			ChangeType:  "object_update",
+			ObjectRef:   "backlog_item:BLI-001",
+			DiffSummary: "status changed to in_progress",
 			CreatedAt:   time.Now().Unix(),
 		},
+	}
+
+	// Tab 2 Data: Audit events stream
+	m.AuditEvents = []state.JournalMutation{
 		{
-			ID:          "SCH-101",
-			ChangeType:  "update",
-			ObjectRef:   "scheduler_job:SCH-autofix-run",
-			DiffSummary: "next_run_at updated",
+			ID:          "AUD-201",
+			ChangeType:  "COMMAND_EXECUTION",
+			ObjectRef:   "command_spec:zqk-state-stream",
+			DiffSummary: "zqk state stream --dashboard executed",
+			CreatedBy:   "ACC-SYSTEM",
+			Actor:       "ACC-SYSTEM",
+			Operation:   "EXECUTE",
 			CreatedAt:   time.Now().Unix(),
 		},
 	}
 
-	m.ObjectCounts = map[string]int{
-		"backlog_item": 5,
-		"scheduler_job": 12,
-		"audit_event": 42,
-	}
-
+	// Tab 3 Data: Swarm
 	m.SwarmData = map[string]any{
 		"throughput_hint":              "executing",
-		"active_priority_plans":        1,
-		"executing_agent_tasks":        2,
-		"agent_instructions_total":     4,
-		"agent_instructions_by_status": map[string]any{"proposed": 2, "approved": 2},
-		"persona_skill_bound":          map[string]any{"bound": 3, "unbound": 6, "total": 9},
+		"active_priority_plans":        2,
+		"executing_agent_tasks":        3,
+		"agent_instructions_total":     6,
+		"agent_instructions_by_status": map[string]any{"proposed": 2, "approved": 4},
+		"persona_skill_bound":          map[string]any{"bound": 4, "unbound": 2, "total": 6},
 		"cap_orchestrator_job":         map[string]any{"id": "SCH-cap-orchestrator", "present": true},
 	}
 
+	// Tab 4 Data: PM & Process
+	m.MissionTitle = "Build Resilient Operating System"
+	m.VisionTitle = "Universal Agent Knowledge Layer"
+	m.Goals = []PMGoalRow{
+		{ID: "G-1", Title: "Zero Failure Convergence", Status: "active", Metric: "failures", Target: "0"},
+	}
+	m.PriorityPlans = []PMPlanRow{
+		{ID: "PRI-TPM-CONV", Title: "Swarm Convergence Loop", Status: "in_progress", Workstreams: []string{"core", "pm"}, BLICount: 3},
+	}
+	m.Workstreams = []PMWorkstreamRow{
+		{ID: "WKS-PM", Title: "Program Management & Process", Status: "active"},
+	}
+	m.BacklogSummary = PMBacklogSummary{
+		Total:      12,
+		Draft:      2,
+		Planned:    3,
+		InProgress: 4,
+		Blocked:    1,
+		Done:       2,
+		Claimed:    4,
+		Unclaimed:  8,
+	}
+	m.RecentBacklog = []PMBacklogRow{
+		{ID: "BLI-001", Title: "Implement TUI 6-Tab View", Status: "in_progress", Priority: "P0", ClaimedBy: "agent-alpha", PlanRef: "PRI-TPM-CONV"},
+	}
+	m.Blockers = []PMBlockerRow{
+		{ID: "BLK-01", Title: "CAS Gate Index Contention", Severity: "high", Status: "active", Impact: "delays commits"},
+	}
+	m.TechnicalDebt = []PMDebtRow{
+		{ID: "DEBT-01", Title: "Direct os calls in tests", Category: "hygiene", Status: "identified", Priority: "medium"},
+	}
+
+	// Tab 5 Data: Metrics
+	m.Hygiene = ResourceHygieneRow{
+		ProcessObjectCount: 350,
+		KindCount:          24,
+		StreamFileCount:    48,
+		ActiveStreams:      4,
+	}
+	m.CommandMetrics = []CommandMetricRow{
+		{ID: "CM-01", CommandName: "zqk ui", ExecCount: 14, AvgDuration: "42ms", LastRunAt: "2026-09-22 22:00:00", Status: "success"},
+	}
+	m.SchedulerHealth = []SchedulerHealthRow{
+		{ID: "SCH-HEALTH-01", HeartbeatAt: "2026-09-22 22:00:00", Status: "healthy", Executions: 120, Failures: 0},
+	}
+	m.LockMetrics = []FileLockMetricRow{
+		{ID: "FLM-01", TargetKind: "change_journal_entry", Contention: 0, Duration: "1.2ms", Status: "healthy"},
+	}
+
+	// Tab 6 Data: Scheduler
 	m.SchedulerJobs = []SchedulerJobRow{
 		{
 			ID:        "SCH-autofix-run",
@@ -119,32 +230,51 @@ func TestRender_AllTabs(t *testing.T) {
 		},
 	}
 
-	// Tab 1: Seismograph
-	m.ActiveTab = TabSeismograph
+	// Render Tab 1: State
+	m.ActiveTab = TabState
 	out1 := Render(m)
 	assert.Contains(t, out1, "MISSION CONTROL CONSOLE")
-	assert.Contains(t, out1, "AUD-100")
-	assert.Contains(t, out1, "SCH-autofix-run")
+	assert.Contains(t, out1, "1: ⚡ State")
+	assert.Contains(t, out1, "BLI-001")
 	assert.Contains(t, out1, "AUTO-SCROLL: ON")
 
-	// Tab 2: Swarm
-	m.ActiveTab = TabSwarm
+	// Render Tab 2: Audit
+	m.ActiveTab = TabAudit
 	out2 := Render(m)
-	assert.Contains(t, out2, "Multi-Agent Swarm Orchestration")
-	assert.Contains(t, out2, "SCH-cap-orchestrator")
-	assert.Contains(t, out2, "executing")
+	assert.Contains(t, out2, "audit_event")
+	assert.Contains(t, out2, "ACC-SYSTEM")
+	assert.Contains(t, out2, "command_spec:zqk-state-")
+	assert.Contains(t, out2, "zqk state stream")
 
-	// Tab 3: Objects
-	m.ActiveTab = TabObjects
+	// Render Tab 3: Swarm
+	m.ActiveTab = TabSwarm
 	out3 := Render(m)
-	assert.Contains(t, out3, "Knowledge Kernel Object Inventory")
-	assert.Contains(t, out3, "backlog_item")
-	assert.Contains(t, out3, "Executable work unit (BLI)")
+	assert.Contains(t, out3, "Multi-Agent Swarm Orchestration")
+	assert.Contains(t, out3, "SCH-cap-orchestrator")
+	assert.Contains(t, out3, "executing")
 
-	// Tab 4: Scheduler
-	m.ActiveTab = TabScheduler
+	// Render Tab 4: PM & Process
+	m.ActiveTab = TabPM
 	out4 := Render(m)
-	assert.Contains(t, out4, "Autonomous Scheduler")
-	assert.Contains(t, out4, "SCH-autofix-run")
-	assert.Contains(t, out4, "@every 5m")
+	assert.Contains(t, out4, "Program & Process Management Administration")
+	assert.Contains(t, out4, "Build Resilient Operating System")
+	assert.Contains(t, out4, "PRI-TPM-CONV")
+	assert.Contains(t, out4, "BLI Pipeline (12 Total)")
+	assert.Contains(t, out4, "BLK-01")
+	assert.Contains(t, out4, "DEBT-01")
+
+	// Render Tab 5: Metrics
+	m.ActiveTab = TabMetrics
+	out5 := Render(m)
+	assert.Contains(t, out5, "Knowledge Kernel Telemetry & Resource Hygiene")
+	assert.Contains(t, out5, "350 process objects")
+	assert.Contains(t, out5, "zqk ui")
+	assert.Contains(t, out5, "SCH-HEALTH-01")
+
+	// Render Tab 6: Scheduler
+	m.ActiveTab = TabScheduler
+	out6 := Render(m)
+	assert.Contains(t, out6, "Autonomous Scheduler")
+	assert.Contains(t, out6, "SCH-autofix-run")
+	assert.Contains(t, out6, "@every 5m")
 }
