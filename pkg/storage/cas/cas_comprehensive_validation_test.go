@@ -15,6 +15,7 @@ import (
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // TestCAS_MixedCASAndNonCAS tests that the system handles mixed CAS and non-CAS objects correctly
@@ -24,6 +25,7 @@ func TestCAS_MixedCASAndNonCAS(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping CAS mixed integration test in short mode")
 	}
+	t.Setenv(zqkenv.TestAllowCASFallthrough().Name(), "1")
 	// Mixed CAS/non-CAS scenario uses an isolated temp tree (test-scenarios path); no live checkout storage root.
 	// Create test root in a path that contains "test-scenarios" to enable CAS
 	baseTempDir := t.TempDir()
@@ -73,7 +75,7 @@ func TestCAS_MixedCASAndNonCAS(t *testing.T) {
 		objects.FieldKeyID:            "BLI-801",
 		objects.FieldKeyKind:          "backlog_item",
 		objects.FieldKeyTitle:         "ID-Based Object",
-		objects.FieldKeyStatus:        objects.ObjectStatusExploring,
+		objects.FieldKeyStatus:        objects.ObjectStatusPlanned,
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 	}
 
@@ -164,6 +166,7 @@ func TestCAS_ListIncludesBothCASAndIDBased(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping CAS list integration test in short mode")
 	}
+	t.Setenv(zqkenv.TestAllowCASFallthrough().Name(), "1")
 	// Create test root in a path that contains "test-scenarios" to enable CAS
 	baseTempDir := t.TempDir()
 	testRoot := filepath.Join(baseTempDir, "test-scenarios", "cas-list-test")
@@ -212,7 +215,7 @@ func TestCAS_ListIncludesBothCASAndIDBased(t *testing.T) {
 			objects.FieldKeyID:            id,
 			objects.FieldKeyKind:          "backlog_item",
 			objects.FieldKeyTitle:         "ID-Based Object " + id,
-			objects.FieldKeyStatus:        objects.ObjectStatusExploring,
+			objects.FieldKeyStatus:        objects.ObjectStatusPlanned,
 			objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		}
 		data, _ := yaml.Marshal(obj)

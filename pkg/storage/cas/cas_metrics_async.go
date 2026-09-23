@@ -105,8 +105,6 @@ func (c *CASMetricsAsyncCollector) CollectMetricsAsync(
 
 // worker processes metrics batches in the background
 func (c *CASMetricsAsyncCollector) worker() {
-	defer c.wg.Done()
-
 	for {
 		select {
 		case <-c.stopChan:
