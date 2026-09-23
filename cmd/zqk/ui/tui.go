@@ -14,6 +14,7 @@ import (
 	"golang.org/x/term"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -27,6 +28,8 @@ func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp stora
 	// Non-interactive fallback: render a single-shot frame
 	if !term.IsTerminal(stdinFd) || !term.IsTerminal(stdoutFd) {
 		m := NewUIModel(projectRoot, initialTab)
+		m.Storage = sp
+		m.SecCtx = sec
 		m.Width, m.Height = 100, 30
 		m.RefreshMutations()
 		m.RefreshAuditEvents()
@@ -59,6 +62,8 @@ func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp stora
 	}()
 
 	m := NewUIModel(projectRoot, initialTab)
+	m.Storage = sp
+	m.SecCtx = sec
 	w, h, err := term.GetSize(stdoutFd)
 	if err == nil {
 		m.Width, m.Height = w, h
@@ -188,8 +193,18 @@ func handleInput(m *UIModel, key []byte) bool {
 		return false
 	}
 
-	// Modal Overlay Dismissal: if modal is open, Esc, Backspace, or 'q' closes the modal without exiting TUI
+	// Modal Overlay Dismissal & In-Modal Actions
 	if m.DetailModal != nil {
+		if m.DetailModal.Kind == objects.KindSchedulerJob {
+			if len(key) == 1 && (key[0] == 't' || key[0] == 'T') {
+				m.TriggerScheduledJob(m.DetailModal.ID, 0)
+				return false
+			}
+			if len(key) == 1 && (key[0] == 'd' || key[0] == 'D') {
+				m.TriggerScheduledJob(m.DetailModal.ID, 10)
+				return false
+			}
+		}
 		if (len(key) == 1 && (key[0] == KeyEsc || key[0] == KeyBackspace || key[0] == 'q' || key[0] == 'Q')) ||
 			(len(key) >= 3 && key[0] == CSIPrefixEsc && key[1] == CSIPrefixBracket) {
 			m.DetailModal = nil
@@ -262,14 +277,29 @@ func handleInput(m *UIModel, key []byte) bool {
 				m.ScrollOffset = 0
 			}
 		case 'r', 'R': // Force refresh
+			ctx := context.Background()
 			m.RefreshMutations()
 			m.RefreshAuditEvents()
 			m.RefreshObjects()
-			m.RefreshQA(context.Background(), nil, nil)
+			m.RefreshQA(ctx, m.Storage, m.SecCtx)
 			m.RefreshHealth()
-		case 'c', 'C', 'a', 'A', 'w', 'W', 'd', 'D', 'p', 'P', 'm', 'M', 's', 'S', 'b', 'B': // Action Center triggers (Tab 8)
+			if m.Storage != nil && m.SecCtx != nil {
+				m.RefreshSwarm(ctx, m.Storage, m.SecCtx)
+				m.RefreshPM(ctx, m.Storage, m.SecCtx)
+				m.RefreshMetrics(ctx, m.Storage, m.SecCtx)
+				m.RefreshScheduler(ctx, m.Storage, m.SecCtx)
+			}
+		case 't', 'T': // Trigger scheduled job immediately (Tab 6)
+			if m.ActiveTab == TabScheduler && m.SelectedIndex < len(m.SchedulerJobs) {
+				m.TriggerScheduledJob(m.SchedulerJobs[m.SelectedIndex].ID, 0)
+			}
+		case 'c', 'C', 'a', 'A', 'w', 'W', 'd', 'D', 'p', 'P', 'm', 'M', 's', 'S', 'b', 'B': // Action Center (Tab 8) / Delayed Trigger (Tab 6)
 			if m.ActiveTab == TabHealth {
 				m.TriggerActionCenter(string(key[0]))
+			} else if m.ActiveTab == TabScheduler && (key[0] == 'd' || key[0] == 'D') {
+				if m.SelectedIndex < len(m.SchedulerJobs) {
+					m.TriggerScheduledJob(m.SchedulerJobs[m.SelectedIndex].ID, 10)
+				}
 			}
 		case 'k', 'K': // Cursor up / Scroll up
 			m.AutoScroll = false

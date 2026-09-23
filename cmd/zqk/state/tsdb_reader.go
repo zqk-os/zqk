@@ -376,35 +376,34 @@ func readChunkMetrics(projectRoot string, telem *TSDBTelemetry) {
 }
 
 func generateDurationSparkline(vals []float64) string {
-	bars := []rune{' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'}
 	if len(vals) == 0 {
-		return "[   --   ]"
+		return "--"
+	}
+	if len(vals) == 1 {
+		return "• BASE"
 	}
 
-	maxVal := 0.0
-	for _, v := range vals {
-		if v > maxVal {
-			maxVal = v
-		}
+	// Compare latest run to the baseline average of previous runs
+	latest := vals[len(vals)-1]
+	sumPrev := 0.0
+	for i := 0; i < len(vals)-1; i++ {
+		sumPrev += vals[i]
 	}
-	if maxVal <= 0.0 {
-		return "[        ]"
+	avgPrev := sumPrev / float64(len(vals)-1)
+
+	if avgPrev <= 0 {
+		return "• BASE"
 	}
 
-	var b strings.Builder
-	b.WriteRune('[')
-	for _, v := range vals {
-		idx := int((v / maxVal) * float64(len(bars)-1))
-		if idx < 0 {
-			idx = 0
-		}
-		if idx >= len(bars) {
-			idx = len(bars) - 1
-		}
-		b.WriteRune(bars[idx])
+	diffPct := ((latest - avgPrev) / avgPrev) * 100.0
+
+	// Intelligible trend indicator
+	if diffPct > 15.0 {
+		return fmt.Sprintf("▲ +%.0f%%", diffPct) // Latency increased (slower)
+	} else if diffPct < -15.0 {
+		return fmt.Sprintf("▼ %.0f%%", diffPct)  // Latency decreased (faster)
 	}
-	b.WriteRune(']')
-	return b.String()
+	return "→ STABLE"
 }
 
 func formatByteSize(b int64) string {
@@ -502,7 +501,13 @@ func readCommandMetricsStats(projectRoot string, telem *TSDBTelemetry) {
 	}
 
 	sort.Slice(cmds, func(i, j int) bool {
-		return cmds[i].Invocations > cmds[j].Invocations
+		if cmds[i].Invocations != cmds[j].Invocations {
+			return cmds[i].Invocations > cmds[j].Invocations
+		}
+		if cmds[i].LastSeen != cmds[j].LastSeen {
+			return cmds[i].LastSeen > cmds[j].LastSeen
+		}
+		return cmds[i].Command < cmds[j].Command
 	})
 
 	if len(cmds) > 6 {

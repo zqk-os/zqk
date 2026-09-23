@@ -84,11 +84,21 @@ type HealthSummary struct {
 
 // SchedulerJobRow captures a job's operational state for display.
 type SchedulerJobRow struct {
-	ID        string
-	Schedule  string
-	LastRunAt string
-	NextRunAt string
-	Status    string
+	ID            string
+	Title         string
+	Description   string
+	Category      string
+	JobType       string
+	TriggerType   string
+	ExecutionMode string
+	MaxRuntimeSec int
+	Schedule      string
+	LastRunAt     string
+	NextRunAt     string
+	Status        string
+	Command       string
+	CommandArgs   []string
+	LastError     string
 }
 
 // PMGoalRow represents a strategic program goal.
@@ -235,6 +245,8 @@ type QASummaryRow struct {
 	TotalCriteria     int
 	IntactChains      int
 	UnboundCriteria   int
+	VerifiedBLICount  int
+	TotalBLICount     int
 	DoDCompliant      bool
 }
 
@@ -246,6 +258,8 @@ type UIModel struct {
 	AutoScroll   bool
 	Width        int
 	Height       int
+	Storage      storage.ObjectStorageProvider
+	SecCtx       *pkgctx.SecurityContext
 
 	// Interactive Selection Cursor & Drill-Down Inspection Modal
 	SelectedIndex int
@@ -314,7 +328,7 @@ func NewUIModel(projectRoot string, initialTab string) *UIModel {
 		tab = TabPM
 	case "metrics", "telemetry", "metric", "tsdb", "timeseries":
 		tab = TabMetrics
-	case "scheduler", "jobs", "job":
+	case "scheduler", "sched", "jobs", "job":
 		tab = TabScheduler
 	case "qa", "test", "tests", "tui-test", "lineage", "dod":
 		tab = TabQA
@@ -736,7 +750,10 @@ func (m *UIModel) RefreshScheduler(ctx context.Context, sp storage.ObjectStorage
 	jobs := make([]SchedulerJobRow, 0, len(res.Objects))
 	for _, obj := range res.Objects {
 		id := fmt.Sprintf("%v", obj["id"])
-		sch := fmt.Sprintf("%v", obj["schedule"])
+		sch := fmt.Sprintf("%v", obj["schedule_expression"])
+		if sch == "" || sch == "<nil>" {
+			sch = fmt.Sprintf("%v", obj["schedule"])
+		}
 		if sch == "" || sch == "<nil>" {
 			sch = fmt.Sprintf("%v", obj["interval"])
 		}
@@ -755,12 +772,62 @@ func (m *UIModel) RefreshScheduler(ctx context.Context, sp storage.ObjectStorage
 			status = "active"
 		}
 
+		title := fmt.Sprintf("%v", obj[objects.FieldKeyTitle])
+		if title == "" || title == "<nil>" {
+			title = id
+		}
+		desc := fmt.Sprintf("%v", obj[objects.FieldKeyDescription])
+		if desc == "<nil>" {
+			desc = ""
+		}
+		cat := fmt.Sprintf("%v", obj["category"])
+		if cat == "<nil>" {
+			cat = "system"
+		}
+		jType := fmt.Sprintf("%v", obj["job_type"])
+		if jType == "<nil>" {
+			jType = "standard"
+		}
+		trigType := fmt.Sprintf("%v", obj["trigger_type"])
+		if trigType == "<nil>" {
+			trigType = "timer"
+		}
+		execMode := fmt.Sprintf("%v", obj["execution_mode"])
+		if execMode == "<nil>" {
+			execMode = "standard"
+		}
+		maxRun := getIntVal(obj["max_runtime_seconds"])
+		cmd := fmt.Sprintf("%v", obj["command"])
+		if cmd == "<nil>" {
+			cmd = ""
+		}
+		var cmdArgs []string
+		if argsRaw, ok := obj["command_args"].([]any); ok {
+			for _, a := range argsRaw {
+				cmdArgs = append(cmdArgs, fmt.Sprintf("%v", a))
+			}
+		}
+		lastErr := fmt.Sprintf("%v", obj["last_error"])
+		if lastErr == "<nil>" {
+			lastErr = ""
+		}
+
 		jobs = append(jobs, SchedulerJobRow{
-			ID:        id,
-			Schedule:  sch,
-			LastRunAt: lastRun,
-			NextRunAt: nextRun,
-			Status:    status,
+			ID:            id,
+			Title:         title,
+			Description:   desc,
+			Category:      cat,
+			JobType:       jType,
+			TriggerType:   trigType,
+			ExecutionMode: execMode,
+			MaxRuntimeSec: maxRun,
+			Schedule:      sch,
+			LastRunAt:     lastRun,
+			NextRunAt:     nextRun,
+			Status:        status,
+			Command:       cmd,
+			CommandArgs:   cmdArgs,
+			LastError:     lastErr,
 		})
 	}
 
@@ -799,7 +866,7 @@ func formatTimeVal(v any) string {
 
 // RefreshQA loads test dashboard metrics, test cases, and lineage status.
 // It prioritizes zero-cost reads from the materialized test_dashboard_lite.json file,
-// and falls back to storage scanning when sp is provided.
+// and falls back to storage scanning when sp is provided or self-heals from ProjectRoot.
 func (m *UIModel) RefreshQA(ctx context.Context, sp storage.ObjectStorageProvider, sec *pkgctx.SecurityContext) {
 	if m.ProjectRoot == "" {
 		return
@@ -807,9 +874,16 @@ func (m *UIModel) RefreshQA(ctx context.Context, sp storage.ObjectStorageProvide
 
 	dState := test.NewDashboardStateWithProjectRoot(m.ProjectRoot)
 	loaded, err := dState.LoadFromLiteFile(m.ProjectRoot)
-	if !loaded || err != nil {
+	if !loaded || err != nil || len(dState.TestCases) == 0 {
+		if (sp == nil || sec == nil) && m.ProjectRoot != "" {
+			if factory, fErr := storage.NewStorageFactory(ctx, m.ProjectRoot); fErr == nil {
+				sp = factory.GetStorage()
+				sec = pkgctx.NewSystemSecurityContext()
+			}
+		}
 		if sp != nil && sec != nil {
 			_ = dState.ScanFromStorage(ctx, sp)
+			_ = dState.SaveToLiteFile(m.ProjectRoot)
 		}
 	}
 
@@ -834,7 +908,7 @@ func (m *UIModel) RefreshQA(ctx context.Context, sp storage.ObjectStorageProvide
 	}
 
 	// Evaluate DoD compliance: all active test cases must have intact lineage
-	dodOk := true
+	dodOk := len(tcs) > 0
 	for _, tc := range tcs {
 		if tc.Status == objects.ObjectStatusActive {
 			if tc.Lineage == nil || !tc.Lineage.IsIntact {
@@ -847,6 +921,29 @@ func (m *UIModel) RefreshQA(ctx context.Context, sp storage.ObjectStorageProvide
 		dodOk = false
 	}
 
+	// Calculate BLI test coverage
+	verifiedBLIs := make(map[string]bool)
+	for _, tc := range tcs {
+		if tc.Lineage != nil {
+			for _, bli := range tc.Lineage.BacklogItems {
+				if bli.ID != "" {
+					verifiedBLIs[bli.ID] = true
+				}
+			}
+		}
+		for _, ref := range tc.BacklogItemRefs {
+			if ref != "" {
+				verifiedBLIs[ref] = true
+			}
+		}
+	}
+	totalBLIs := m.BacklogSummary.Total
+	if totalBLIs == 0 && sp != nil && sec != nil {
+		if blis, err := sp.List(ctx, sec, nil, storage.ListFilter{Kind: objects.KindBacklogItem}); err == nil {
+			totalBLIs = len(blis.Objects)
+		}
+	}
+
 	m.QASummary = QASummaryRow{
 		TotalTestCases:    payload.TotalTestCases,
 		InFlightCount:     payload.InFlightCount,
@@ -855,6 +952,8 @@ func (m *UIModel) RefreshQA(ctx context.Context, sp storage.ObjectStorageProvide
 		TotalCriteria:     payload.TotalCriteria,
 		IntactChains:      payload.IntactChains,
 		UnboundCriteria:   len(payload.UnboundTestCriteria),
+		VerifiedBLICount:  len(verifiedBLIs),
+		TotalBLICount:     totalBLIs,
 		DoDCompliant:      dodOk,
 	}
 	m.TestCases = tcs
@@ -1158,6 +1257,34 @@ func (m *UIModel) TriggerActionCenter(key string) bool {
 	return true
 }
 
+// TriggerScheduledJob enqueues a scheduled job into the JobTriggerQueue immediately or with a delay.
+func (m *UIModel) TriggerScheduledJob(jobID string, delaySeconds int) bool {
+	if m.ProjectRoot == "" || jobID == "" {
+		return false
+	}
+	tq := schedulerpkg.NewJobTriggerQueue(m.ProjectRoot)
+	if delaySeconds <= 0 {
+		err := tq.EnqueueTriggerRequest(jobID)
+		if err != nil {
+			m.DynamicMessage = fmt.Sprintf("✗ Trigger queue error for %s: %v", jobID, err)
+			return true
+		}
+		m.DynamicMessage = fmt.Sprintf("⚡ Enqueued [%s] to scheduler trigger queue (immediate)", jobID)
+		return true
+	}
+
+	m.DynamicMessage = fmt.Sprintf("⏳ Scheduled [%s] to trigger in %d seconds...", jobID, delaySeconds)
+	time.AfterFunc(time.Duration(delaySeconds)*time.Second, func() {
+		tqInner := schedulerpkg.NewJobTriggerQueue(m.ProjectRoot)
+		if err := tqInner.EnqueueTriggerRequest(jobID); err != nil {
+			m.DynamicMessage = fmt.Sprintf("✗ Delayed trigger failed for %s: %v", jobID, err)
+		} else {
+			m.DynamicMessage = fmt.Sprintf("✓ Delayed trigger enqueued [%s] to scheduler queue", jobID)
+		}
+	})
+	return true
+}
+
 // GetCurrentRowCount returns the number of selectable rows in the active tab.
 func (m *UIModel) GetCurrentRowCount() int {
 	switch m.ActiveTab {
@@ -1319,18 +1446,40 @@ func (m *UIModel) OpenSelectedItemDetail() {
 		if idx < len(m.SchedulerJobs) {
 			job := m.SchedulerJobs[idx]
 			details := []string{
+				fmt.Sprintf("Job Title     : %s", job.Title),
+				fmt.Sprintf("Category      : %s", job.Category),
+				fmt.Sprintf("Job Type      : %s", job.JobType),
+				fmt.Sprintf("Trigger Type  : %s", job.TriggerType),
+				fmt.Sprintf("Execution Mode: %s", job.ExecutionMode),
+				fmt.Sprintf("Max Runtime   : %d seconds", job.MaxRuntimeSec),
 				fmt.Sprintf("Cron Schedule : %s", job.Schedule),
 				fmt.Sprintf("Last Executed : %s", job.LastRunAt),
 				fmt.Sprintf("Next Scheduled: %s", job.NextRunAt),
 				fmt.Sprintf("Job Status    : %s", job.Status),
 			}
+			if job.Command != "" {
+				cmdStr := job.Command
+				if len(job.CommandArgs) > 0 {
+					cmdStr += " " + strings.Join(job.CommandArgs, " ")
+				}
+				details = append(details, fmt.Sprintf("Command Exec  : %s", cmdStr))
+			}
+			if job.LastError != "" {
+				details = append(details, fmt.Sprintf("Last Error    : %s", job.LastError))
+			}
+			var actions []string
+			actions = append(actions, "Trigger Now   : Press [t] to enqueue immediate execution")
+			actions = append(actions, "Trigger Delay : Press [d] to enqueue execution with 10s delay")
+
 			m.DetailModal = &ItemDetailModel{
 				Kind:      objects.KindSchedulerJob,
 				ID:        job.ID,
 				Status:    job.Status,
-				Title:     job.ID,
+				Title:     job.Title,
 				Timestamp: job.LastRunAt,
+				Summary:   job.Description,
 				Details:   details,
+				Criteria:  actions,
 			}
 		}
 
@@ -1388,6 +1537,7 @@ func (m *UIModel) OpenSelectedItemDetail() {
 				fmt.Sprintf("Violation Tier: Tier %d (%s)", v.Tier, v.Severity),
 				fmt.Sprintf("Category      : %s", v.Category),
 				fmt.Sprintf("Object Target : [%s] %s", v.Kind, v.ObjectID),
+				fmt.Sprintf("Full Message  : %s", v.Message),
 				fmt.Sprintf("Auto-Fixable  : %v", v.AutoFixable),
 				fmt.Sprintf("CAS File Path : %s", v.Path),
 			}
@@ -1402,7 +1552,8 @@ func (m *UIModel) OpenSelectedItemDetail() {
 				Kind:     v.Kind,
 				ID:       v.ObjectID,
 				Status:   v.Severity,
-				Title:    v.Message,
+				Title:    v.ObjectID,
+				Summary:  v.Message,
 				Details:  details,
 				Criteria: actions,
 			}

@@ -596,3 +596,187 @@ func TestUIQuirk5_PMTabSyncAndTechDebtBounds(t *testing.T) {
 	assert.Equal(t, "Resolve WAL tail latency", m.DetailModal.Title)
 }
 
+func TestUI_MessageBannerSpacingAndEmphasis(t *testing.T) {
+	m := NewUIModel("", "state")
+	m.Width = 100
+	m.Height = 30
+
+	m.DynamicMessage = "✓ Job executed successfully"
+	out := Render(m)
+	assert.Contains(t, out, "🔔 MESSAGE:")
+	assert.Contains(t, out, "✓ Job executed successfully")
+
+	m.DynamicMessage = "⚡ Enqueued [SCH-001] to trigger queue"
+	out2 := Render(m)
+	assert.Contains(t, out2, "⚡ Enqueued [SCH-001]")
+
+	m.DynamicMessage = "✗ Error during execution"
+	out3 := Render(m)
+	assert.Contains(t, out3, "✗ Error during execution")
+}
+
+func TestUI_SchedulerHealthTelemetryTable(t *testing.T) {
+	m := NewUIModel("", "metrics")
+	m.Width = 100
+	m.Height = 35
+
+	m.SchedulerHealth = []SchedulerHealthRow{
+		{ID: "SH-001", HeartbeatAt: "2026-09-23 14:00:00", Status: "active", Executions: 42, Failures: 0},
+		{ID: "SH-002", HeartbeatAt: "2026-09-23 14:05:00", Status: "degraded", Executions: 10, Failures: 2},
+	}
+
+	out := Render(m)
+	// Must contain structured table headers, not bullet points
+	assert.Contains(t, out, "SCHEDULER HEALTH TELEMETRY")
+	assert.Contains(t, out, "HEALTH RECORD")
+	assert.Contains(t, out, "HEARTBEAT")
+	assert.Contains(t, out, "EXECUTIONS")
+	assert.Contains(t, out, "FAILURES")
+	assert.Contains(t, out, "SH-001")
+	assert.Contains(t, out, "42")
+	assert.Contains(t, out, "SH-002")
+	assert.NotContains(t, out, "• SH-001 Status:")
+}
+
+func TestUI_SchedulerJobScheduleAndTrigger(t *testing.T) {
+	tmpDir := t.TempDir()
+	m := NewUIModel(tmpDir, "sched")
+	m.Width = 100
+	m.Height = 30
+
+	m.SchedulerJobs = []SchedulerJobRow{
+		{
+			ID:            "SCH-maintenance-001",
+			Title:         "System Maintenance WAL Cycle",
+			Description:   "Executes periodic WAL cleanup and retention",
+			Category:      "maintenance",
+			JobType:       "run_wrapper",
+			TriggerType:   "timer",
+			ExecutionMode: "exclusive",
+			MaxRuntimeSec: 600,
+			Schedule:      "*/15 * * * *",
+			LastRunAt:     "2026-09-23 13:45:00",
+			NextRunAt:     "2026-09-23 14:00:00",
+			Status:        "active",
+			Command:       "/bin/sh",
+			CommandArgs:   []string{"-c", "zqk system wal prune"},
+		},
+	}
+
+	out := Render(m)
+	assert.Contains(t, out, "SCH-maintenance-001")
+	assert.Contains(t, out, "*/15 * * * *")
+
+	// Test drill-down detail modal
+	m.SelectedIndex = 0
+	m.OpenSelectedItemDetail()
+	require.NotNil(t, m.DetailModal)
+	assert.Equal(t, "SCH-maintenance-001", m.DetailModal.ID)
+	assert.Equal(t, "System Maintenance WAL Cycle", m.DetailModal.Title)
+	assert.Equal(t, "Executes periodic WAL cleanup and retention", m.DetailModal.Summary)
+
+	modalRender := Render(m)
+	assert.Contains(t, modalRender, "DETAILED RECORD INSPECTION")
+	assert.Contains(t, modalRender, "Executes periodic WAL cleanup and retention")
+	assert.Contains(t, modalRender, "Cron Schedule : */15 * * * *")
+	assert.Contains(t, modalRender, "Command Exec  : /bin/sh -c zqk system wal prune")
+	assert.Contains(t, modalRender, "Trigger Now   : Press [t]")
+
+	// Dismiss modal
+	handleInput(m, []byte{KeyEsc})
+	assert.Nil(t, m.DetailModal)
+
+	// Trigger immediately via 't'
+	handleInput(m, []byte{'t'})
+	assert.Contains(t, m.DynamicMessage, "Enqueued [SCH-maintenance-001]")
+
+	// Trigger with delay via 'd'
+	handleInput(m, []byte{'d'})
+	assert.Contains(t, m.DynamicMessage, "Scheduled [SCH-maintenance-001] to trigger in 10 seconds")
+}
+
+func TestUI_QAViewTruthfulDoDAndBLICoverage(t *testing.T) {
+	m := NewUIModel("", "qa")
+	m.Width = 100
+	m.Height = 30
+
+	// 1. Zero test cases: must NOT report 100% Intact
+	m.QASummary = QASummaryRow{
+		TotalTestCases:   0,
+		VerifiedBLICount: 0,
+		TotalBLICount:    39,
+		DoDCompliant:     false,
+	}
+	m.TestCases = nil
+
+	outEmpty := Render(m)
+	assert.Contains(t, outEmpty, "0% (No Test Suites)")
+	assert.Contains(t, outEmpty, "PENDING")
+	assert.Contains(t, outEmpty, "BLI Coverage")
+	assert.Contains(t, outEmpty, "0 / 39")
+	assert.Contains(t, outEmpty, "No active test case objects discovered")
+
+	// 2. Active test cases present
+	m.QASummary = QASummaryRow{
+		TotalTestCases:    14,
+		InFlightCount:     2,
+		RegressionCount:   12,
+		SatisfiedCriteria: 24,
+		TotalCriteria:     27,
+		IntactChains:      14,
+		VerifiedBLICount:  6,
+		TotalBLICount:     39,
+		DoDCompliant:      true,
+	}
+	m.TestCases = []*test.TestCaseModel{
+		{
+			ID:                "TST-001",
+			Title:             "Kernel State Test",
+			Status:            "complete",
+			CompletedCriteria: 3,
+			TotalCriteria:     3,
+			Lineage:           &test.LineageChain{IsIntact: true},
+		},
+	}
+
+	outActive := Render(m)
+	assert.Contains(t, outActive, "100% Intact")
+	assert.Contains(t, outActive, "14 / 14")
+	assert.Contains(t, outActive, "BLI Coverage")
+	assert.Contains(t, outActive, "6 / 39")
+	assert.Contains(t, outActive, "TST-001")
+	assert.Contains(t, outActive, "Kernel State Test")
+}
+
+func TestUI_HealthViolationDetailMessage(t *testing.T) {
+	m := NewUIModel("", "health")
+	m.Width = 100
+	m.Height = 30
+
+	m.HealthViolations = []HealthViolationRow{
+		{
+			Kind:        "backlog_item",
+			ObjectID:    "BLI-TEST-999",
+			Severity:    "ERROR",
+			Tier:        1,
+			Category:    "structural",
+			Message:     "Structural schema failure: missing required field 'priority_tier' in object specification",
+			AutoFixable: false,
+			Path:        ".zqk/process/backlog_items/bli_999.yaml",
+		},
+	}
+
+	m.SelectedIndex = 0
+	m.OpenSelectedItemDetail()
+	require.NotNil(t, m.DetailModal)
+	assert.Equal(t, "BLI-TEST-999", m.DetailModal.ID)
+	assert.Equal(t, "Structural schema failure: missing required field 'priority_tier' in object specification", m.DetailModal.Summary)
+
+	rendered := Render(m)
+	assert.Contains(t, rendered, "DETAILED RECORD INSPECTION — BLI-TEST-999")
+	assert.Contains(t, rendered, "DETAILED DIAGNOSTIC MESSAGE / SUMMARY:")
+	assert.Contains(t, rendered, "Structural schema failure: missing required field 'priority_tier' in object specification")
+	assert.Contains(t, rendered, "Full Message  : Structural schema failure: missing required field 'priority_tier'")
+}
+
+

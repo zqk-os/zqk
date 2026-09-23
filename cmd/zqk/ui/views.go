@@ -13,8 +13,10 @@ import (
 
 var (
 	cyanBold   = color.New(color.FgCyan, color.Bold).SprintFunc()
+	cyan       = color.New(color.FgCyan).SprintFunc()
 	whiteBold  = color.New(color.FgWhite, color.Bold).SprintFunc()
 	yellowBold = color.New(color.FgYellow, color.Bold).SprintFunc()
+	yellow     = color.New(color.FgYellow).SprintFunc()
 	greenBold  = color.New(color.FgGreen, color.Bold).SprintFunc()
 	redBold    = color.New(color.FgRed, color.Bold).SprintFunc()
 	dim        = color.New(color.Faint).SprintFunc()
@@ -139,8 +141,9 @@ func renderHeader(b *strings.Builder, m *UIModel) {
 	}
 	tabLine := strings.Join(tabStrs, " │ ")
 	b.WriteString(tds.PadRight(tabLine, w) + "\n")
+	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 
-	// Line 6: Dynamic Message Bar (Viewable across any tab)
+	// Dynamic Message Bar (Viewable across any tab)
 	msg := m.DynamicMessage
 	if msg == "" {
 		msg = "System operating normally — ambient telemetry stream active"
@@ -152,7 +155,19 @@ func renderHeader(b *strings.Builder, m *UIModel) {
 		maxMsgW = 10
 	}
 	msgClean := tds.TruncateVisible(msg, maxMsgW, "…")
-	dynamicLine := prefix + msgClean
+
+	var coloredMsg string
+	if strings.Contains(msg, "✓") {
+		coloredMsg = greenBold(msgClean)
+	} else if strings.Contains(msg, "⚡") || strings.Contains(msg, "⏳") {
+		coloredMsg = yellowBold(msgClean)
+	} else if strings.Contains(msg, "✗") || strings.Contains(msg, "FAIL") || strings.Contains(msg, "ERR") {
+		coloredMsg = redBold(msgClean)
+	} else {
+		coloredMsg = cyan(msgClean)
+	}
+
+	dynamicLine := prefix + coloredMsg
 	b.WriteString(tds.PadRight(dynamicLine, w) + "\n")
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 }
@@ -831,14 +846,29 @@ func renderMetricsTab(b *strings.Builder, m *UIModel) {
 	// 5. Scheduler Health Telemetry
 	if len(m.SchedulerHealth) > 0 {
 		b.WriteString(tds.SectionDivider("SCHEDULER HEALTH TELEMETRY (scheduler_health_metric)", w))
+		shTable := tds.NewTable(w).
+			AddColumn("HEALTH RECORD", tds.AlignLeft, 22, 0.30).
+			AddColumn("HEARTBEAT", tds.AlignCenter, 19, 0.25).
+			AddColumn("EXECUTIONS", tds.AlignRight, 10, 0.15).
+			AddColumn("FAILURES", tds.AlignRight, 8, 0.15).
+			AddColumn("STATUS", tds.AlignCenter, 10, 0.15)
+
 		for _, sh := range m.SchedulerHealth {
-			st := greenBold(sh.Status)
+			failStr := fmt.Sprintf("%d", sh.Failures)
+			stBadge := tds.Badge("HEALTHY")
 			if sh.Failures > 0 {
-				st = redBold(fmt.Sprintf("%s (%d failures)", sh.Status, sh.Failures))
+				failStr = redBold(failStr)
+				stBadge = tds.Badge("DEGRADED")
 			}
-			b.WriteString(fmt.Sprintf("  • %-16s Status: %s │ Heartbeat: %s │ Executions: %d\n",
-				sh.ID, st, sh.HeartbeatAt, sh.Executions))
+			shTable.AddRow(
+				sh.ID,
+				sh.HeartbeatAt,
+				fmt.Sprintf("%d", sh.Executions),
+				failStr,
+				stBadge,
+			)
 		}
+		b.WriteString(shTable.Render())
 		b.WriteString("\n")
 	}
 
@@ -897,7 +927,7 @@ func renderSchedulerTab(b *strings.Builder, m *UIModel) {
 	if w < 70 {
 		w = 80
 	}
-	b.WriteString(whiteBold("⏱️  Autonomous Scheduler & Background Daemons\n"))
+	b.WriteString(whiteBold("⏱️  Autonomous Scheduler & Background Daemons") + dim("  (Press [Enter] to inspect, [t] to trigger now, [d] for 10s delay)\n"))
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 
 	if len(m.SchedulerJobs) == 0 {
@@ -906,8 +936,8 @@ func renderSchedulerTab(b *strings.Builder, m *UIModel) {
 	}
 
 	schedTable := tds.NewTable(w).
-		AddColumn("JOB IDENTIFIER", tds.AlignLeft, 24, 0.35).
-		AddColumn("SCHEDULE", tds.AlignLeft, 10, 0.15).
+		AddColumn("JOB IDENTIFIER", tds.AlignLeft, 22, 0.30).
+		AddColumn("SCHEDULE", tds.AlignLeft, 14, 0.20).
 		AddColumn("LAST RUN", tds.AlignCenter, 19, 0.20).
 		AddColumn("NEXT RUN", tds.AlignCenter, 19, 0.20).
 		AddColumn("STATUS", tds.AlignCenter, 10, 0.10)
@@ -976,10 +1006,14 @@ func renderFooter(b *strings.Builder, m *UIModel) {
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 	legendLine := dim("Legend: ") + "⚡ State │ 📜 Audit │ 🤖 Swarm │ 📋 PM │ 📊 Metrics │ ⏱️  Sched │ 🧪 QA │ 🛡️  Health/Actions"
 	b.WriteString(tds.PadRight(legendLine, w) + "\n")
+	triggerActionHint := "[Keys] Trigger Action"
+	if m.ActiveTab == TabScheduler {
+		triggerActionHint = "[t/d] Trigger Job"
+	}
 	navLine := whiteBold("[Tab / 1-8]") + " Switch View  " +
 		whiteBold("[↑/↓/j/k]") + " Select / Scroll  " +
 		whiteBold("[Enter]") + " Inspect  " +
-		whiteBold("[Keys]") + " Trigger Action  " +
+		whiteBold(triggerActionHint) + "  " +
 		whiteBold("[Space]") + " Pause  " +
 		whiteBold("[r]") + " Refresh  " +
 		whiteBold("[q/Esc]") + " Exit"
@@ -1054,12 +1088,16 @@ func renderQATab(b *strings.Builder, m *UIModel) {
 
 	// 1. Traceability & DoD Vitals Card (TDS Panel)
 	dodStatus := tds.Badge("PASS")
-	if !qs.DoDCompliant {
+	if qs.TotalTestCases == 0 {
+		dodStatus = tds.Badge("PENDING")
+	} else if !qs.DoDCompliant {
 		dodStatus = tds.Badge("FAIL")
 	}
 
 	chainStatus := tds.Badge("OK")
-	if qs.IntactChains < qs.TotalTestCases {
+	if qs.TotalTestCases == 0 {
+		chainStatus = tds.Badge("EMPTY")
+	} else if qs.IntactChains < qs.TotalTestCases {
 		chainStatus = tds.Badge("WARN")
 	}
 
@@ -1073,15 +1111,29 @@ func renderQATab(b *strings.Builder, m *UIModel) {
 		critPct = float64(qs.SatisfiedCriteria) / float64(qs.TotalCriteria)
 	}
 
+	bliPct := 0.0
+	if qs.TotalBLICount > 0 {
+		bliPct = float64(qs.VerifiedBLICount) / float64(qs.TotalBLICount)
+	}
+
+	dodText := ternary(qs.DoDCompliant, "100% Intact", "Action Needed")
+	if qs.TotalTestCases == 0 {
+		dodText = "0% (No Test Suites)"
+	}
+
 	row1 := []tds.StatItem{
-		{Label: "Traceability DoD", Value: ternary(qs.DoDCompliant, "100% Intact", "Action Needed"), Extra: dodStatus},
+		{Label: "Traceability DoD", Value: dodText, Extra: dodStatus},
 		{Label: "Intact Chains", Value: fmt.Sprintf("%d / %d", qs.IntactChains, qs.TotalTestCases), Extra: chainStatus},
 		{Label: "Unbound Criteria", Value: fmt.Sprintf("%d", qs.UnboundCriteria), Extra: unboundStatus},
 	}
+	critText := fmt.Sprintf("%d / %d", qs.SatisfiedCriteria, qs.TotalCriteria)
+	if qs.TotalCriteria > 0 {
+		critText = fmt.Sprintf("%d / %d (%.0f%%)", qs.SatisfiedCriteria, qs.TotalCriteria, critPct*100)
+	}
 	row2 := []tds.StatItem{
-		{Label: "In-Flight Suites", Value: fmt.Sprintf("%d", qs.InFlightCount)},
-		{Label: "Regression Pool", Value: fmt.Sprintf("%d", qs.RegressionCount)},
-		{Label: "Criteria Progress", Value: fmt.Sprintf("%d / %d", qs.SatisfiedCriteria, qs.TotalCriteria), Extra: tds.ProgressBar(critPct, 10)},
+		{Label: "In-Flight / Regress", Value: fmt.Sprintf("%d / %d", qs.InFlightCount, qs.RegressionCount)},
+		{Label: "Criteria Met", Value: critText},
+		{Label: "BLI Coverage", Value: fmt.Sprintf("%d / %d", qs.VerifiedBLICount, qs.TotalBLICount), Extra: tds.ProgressBar(bliPct, 8)},
 	}
 
 	panelLines := []string{
@@ -1093,7 +1145,8 @@ func renderQATab(b *strings.Builder, m *UIModel) {
 
 	// 2. Active Test Cases Table
 	if len(m.TestCases) == 0 {
-		b.WriteString(dim("  [No test cases discovered or test_dashboard_lite.json empty]\n\n"))
+		b.WriteString(yellow("  ⚠  No active test case objects discovered in test_dashboard_lite.json or CAS storage.\n"))
+		b.WriteString(dim("     To generate test suites and link criteria, run 'zqk test bind' or 'zqk workflow whats-next'.\n\n"))
 		return
 	}
 
@@ -1237,9 +1290,14 @@ func renderDetailModal(m *UIModel) string {
 		lines = append(lines, "")
 	}
 
-	if modal.Summary != "" && len(modal.Details) == 0 {
-		lines = append(lines, whiteBold("  DIFF / PAYLOAD SUMMARY:"))
-		lines = append(lines, "    "+modal.Summary)
+	if modal.Summary != "" {
+		lines = append(lines, whiteBold("  DETAILED DIAGNOSTIC MESSAGE / SUMMARY:"))
+		for _, sl := range strings.Split(modal.Summary, "\n") {
+			slTrim := strings.TrimSpace(sl)
+			if slTrim != "" {
+				lines = append(lines, "    "+cyan(slTrim))
+			}
+		}
 		lines = append(lines, "")
 	}
 
