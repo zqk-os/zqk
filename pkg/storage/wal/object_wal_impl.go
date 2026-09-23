@@ -16,6 +16,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/validation"
 	"github.com/zqk-os/zqk/pkg/walutil"
@@ -36,6 +37,15 @@ const (
 	legacyObjectWALFileName2 = LegacyObjectWALFileName2
 	maxWALLineSize           = MaxWALLineSize
 )
+
+// walReplayIdle memos a ReplayWALChunk pass so idle polls skip Open while the WAL stamp
+// and appliedSeq have not moved. TRACK: BLI-1790151410719520000-fdb19989
+type walReplayIdle struct {
+	appliedSeq int64
+	hitLimit   bool
+}
+
+var objectWALReplayMemo stampmemo.Table[walReplayIdle]
 
 // WALRecord is one log entry: create, update, or delete.
 type WALRecord struct {
@@ -478,6 +488,12 @@ func ReplayWAL(projectRoot string, appliedSeq int64, fn func(rec *WALRecord) err
 	return err
 }
 
+func rememberWALReplayIdle(path string, stamp stampmemo.Stamp, appliedSeq int64, hitLimit bool) {
+	_, _ = objectWALReplayMemo.Load(path, stamp, func() (walReplayIdle, error) {
+		return walReplayIdle{appliedSeq: appliedSeq, hitLimit: hitLimit}, nil
+	})
+}
+
 // ReplayWALChunk replays up to limit records (seq > appliedSeq) from the WAL, calling fn for each.
 // If limit <= 0, replays all. Returns (replayedCount, lastSeq, err).
 // Use for chunked replay: replay N, process buffer, then call again with updated appliedSeq.
@@ -487,9 +503,14 @@ func ReplayWALChunk(projectRoot string, appliedSeq int64, limit int, fn func(rec
 	}
 	logging.LogSwallowedError(migrateObjectWALToCanonicalNames(projectRoot))
 	path := filepath.Join(projectRoot, paths.ProjectDataDir, paths.WalDir, objectWALFileName)
+	stamp := stampmemo.Of(path)
+	if idle, ok := objectWALReplayMemo.Peek(path, stamp); ok && !idle.hitLimit && appliedSeq >= idle.appliedSeq {
+		return 0, appliedSeq, nil
+	}
 	f, err := fileutil.Open(path)
 	if err != nil {
 		if fileutil.IsNotExist(err) {
+			rememberWALReplayIdle(path, stamp, appliedSeq, false)
 			return 0, appliedSeq, nil
 		}
 		return 0, appliedSeq, err
@@ -501,6 +522,7 @@ func ReplayWALChunk(projectRoot string, appliedSeq int64, limit int, fn func(rec
 	sc.Buffer(buf, maxWALLineSize)
 	for sc.Scan() {
 		if limit > 0 && replayed >= limit {
+			rememberWALReplayIdle(path, stamp, appliedSeq, true)
 			return replayed, lastSeq, nil
 		}
 
@@ -538,6 +560,7 @@ func ReplayWALChunk(projectRoot string, appliedSeq int64, limit int, fn func(rec
 			ProjectRoot(projectRoot).
 			Log()
 	}
+	rememberWALReplayIdle(path, stamp, appliedSeq, false)
 	return replayed, lastSeq, nil
 }
 

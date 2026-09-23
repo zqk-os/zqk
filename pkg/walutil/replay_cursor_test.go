@@ -2,6 +2,7 @@ package walutil
 
 import (
 	"encoding/json"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -111,6 +112,42 @@ func TestReplayFromCursor_IdleAtEOFScansNothing(t *testing.T) {
 	}
 	if stats.Scanned != 0 || stats.Delivered != 0 {
 		t.Fatalf("idle stats=%+v", stats)
+	}
+}
+
+func TestReplayFromCursor_IdleEOFSkipsOpen(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "events.wal")
+	line, _ := json.Marshal(map[string]any{"seq": 1})
+	body := append(line, '\n')
+	if err := fileutil.WriteFile(path, body, paths.FilePerm600); err != nil {
+		t.Fatal(err)
+	}
+	cursor := ReplayCursor{Seq: 1, Offset: int64(len(body))}
+	if err := os.Chmod(path, 0); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.Chmod(path, paths.FilePerm600) })
+	if f, err := os.Open(path); err == nil {
+		_ = f.Close()
+		t.Skip("process can still open chmod-0 file (e.g. root); cannot prove Open was skipped")
+	}
+	stats, err := ReplayFromCursor[map[string]any](path, 0, cursor,
+		func(b []byte) (*map[string]any, error) {
+			t.Fatal("parse should not run when Open is skipped")
+			return nil, nil
+		},
+		func(m *map[string]any) int64 { return 0 },
+		func(m *map[string]any) error {
+			t.Fatal("fn should not run when Open is skipped")
+			return nil
+		},
+	)
+	if err != nil {
+		t.Fatalf("idle skip should Stat-only, not Open: %v", err)
+	}
+	if stats.Scanned != 0 || stats.Delivered != 0 {
+		t.Fatalf("idle skip stats=%+v", stats)
 	}
 }
 

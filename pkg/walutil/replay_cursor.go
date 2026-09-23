@@ -46,6 +46,19 @@ func ReplayFromCursor[T any](
 	fn func(*T) error,
 ) (ReplayStats, error) {
 	stats := ReplayStats{Cursor: cursor}
+	info, err := fileutil.Stat(walPath)
+	if err != nil {
+		if fileutil.IsNotExist(err) {
+			return stats, nil
+		}
+		return stats, err
+	}
+	size := info.Size()
+	// Stamp skip: at EOF there are no new bytes. Stat is cheaper than Open (CRIT-1790151410719520000-18e0643b).
+	if size == cursor.Offset {
+		return stats, nil
+	}
+
 	f, err := fileutil.Open(walPath)
 	if err != nil {
 		if fileutil.IsNotExist(err) {
@@ -54,12 +67,6 @@ func ReplayFromCursor[T any](
 		return stats, err
 	}
 	defer f.Close()
-
-	info, err := f.Stat()
-	if err != nil {
-		return stats, err
-	}
-	size := info.Size()
 
 	start := cursor.Offset
 	if start < 0 || start > size {

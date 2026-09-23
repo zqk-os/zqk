@@ -43,6 +43,46 @@ func TestBufferedWriter_WriteThenCloseFlushes(t *testing.T) {
 	}
 }
 
+func TestBufferedWriter_WriteWithLevelErrorFlushesPending(t *testing.T) {
+	w := &captureWriter{}
+	cfg := DefaultBufferedWriterConfig()
+	cfg.BufferSize = 1024
+	bw := NewBufferedWriter(w, cfg)
+	t.Cleanup(func() { _ = bw.Close() })
+
+	if _, err := bw.Write([]byte("stay")); err != nil {
+		t.Fatal(err)
+	}
+	if got := string(w.buf); got != "" {
+		t.Fatalf("info write should stay buffered, got %q", got)
+	}
+
+	if _, err := bw.WriteWithLevel([]byte("boom"), ErrorLevel); err != nil {
+		t.Fatal(err)
+	}
+	if got := string(w.buf); got != "stayboom" {
+		t.Fatalf("error level should flush pending+new in one lock, got %q", got)
+	}
+}
+
+func TestBufferedWriter_WriteWithLevelInfoStaysBuffered(t *testing.T) {
+	w := &captureWriter{}
+	cfg := DefaultBufferedWriterConfig()
+	cfg.BufferSize = 1024
+	bw := NewBufferedWriter(w, cfg)
+	t.Cleanup(func() { _ = bw.Close() })
+
+	if _, err := bw.WriteWithLevel([]byte("info"), InfoLevel); err != nil {
+		t.Fatal(err)
+	}
+	if got := string(w.buf); got != "" {
+		t.Fatalf("info level should stay buffered, got %q", got)
+	}
+	if bw.Buffered() != 4 {
+		t.Fatalf("Buffered() = %d, want 4", bw.Buffered())
+	}
+}
+
 type captureWriter struct {
 	buf []byte
 }

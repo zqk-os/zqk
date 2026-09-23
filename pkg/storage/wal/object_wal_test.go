@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -229,6 +230,46 @@ func TestReplayWALChunk_LimitsReplay(t *testing.T) {
 	}
 	if replayed3 != 1 || len(replayed) != 5 {
 		t.Errorf("third chunk: replayed=%d len(replayed)=%d, want 1 and 5", replayed3, len(replayed))
+	}
+}
+
+func TestReplayWALChunk_IdleSkipOpen(t *testing.T) {
+	tmpDir := t.TempDir()
+	wal, err := NewObjectWAL(tmpDir)
+	if err != nil {
+		t.Fatalf("NewObjectWAL: %v", err)
+	}
+	if err := wal.Append(&WALRecord{Op: "create", Kind: "backlog_item", ID: "bli-idle"}); err != nil {
+		t.Fatal(err)
+	}
+	if err := wal.Sync(); err != nil {
+		t.Fatal(err)
+	}
+	if err := wal.Close(); err != nil {
+		t.Fatal(err)
+	}
+	n, last, err := ReplayWALChunk(tmpDir, 0, 0, func(rec *WALRecord) error { return nil })
+	if err != nil || n != 1 || last == 0 {
+		t.Fatalf("warm replay n=%d last=%d err=%v", n, last, err)
+	}
+	path := GetWALPath(tmpDir)
+	if err := os.Chmod(path, 0); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.Chmod(path, paths.FilePerm600) })
+	if f, err := os.Open(path); err == nil {
+		_ = f.Close()
+		t.Skip("process can still open chmod-0 file (e.g. root); cannot prove Open was skipped")
+	}
+	n2, _, err := ReplayWALChunk(tmpDir, last, 0, func(rec *WALRecord) error {
+		t.Fatal("fn should not run on idle skip")
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("idle skip should Stat-only, not Open: %v", err)
+	}
+	if n2 != 0 {
+		t.Fatalf("idle skip replayed=%d", n2)
 	}
 }
 
