@@ -52,7 +52,7 @@ func (t *Table) AddColumn(title string, align Alignment, minWidth int, weight fl
 	if minWidth < 3 {
 		minWidth = 3
 	}
-	if weight <= 0 {
+	if weight <= 0.0001 {
 		weight = 1.0
 	}
 	t.Columns = append(t.Columns, Column{

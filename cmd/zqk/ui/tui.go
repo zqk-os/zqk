@@ -162,7 +162,8 @@ func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp stora
 // writeScreen handles rendering in terminal raw mode.
 // In raw mode, standard '\n' only performs line-feed without resetting column position
 // (the "staircase effect" cascading diagonally down and to the right).
-// writeScreen clears each line remainder and appends an explicit CRLF.
+// writeScreen clears each line remainder, appends an explicit CRLF, and finally clears
+// from cursor to the bottom of the screen (AnsiClearToBottom) to erase any old lines.
 func writeScreen(s string) {
 	lines := strings.Split(s, "\n")
 	var buf strings.Builder
@@ -174,6 +175,7 @@ func writeScreen(s string) {
 			buf.WriteString(CRLF)
 		}
 	}
+	buf.WriteString(AnsiClearToBottom)
 	_, _ = os.Stdout.WriteString(buf.String())
 }
 
@@ -204,12 +206,20 @@ func handleInput(m *UIModel, key []byte) bool {
 			m.AutoScroll = true
 		case '3':
 			m.ActiveTab = TabSwarm
+			m.ScrollOffset = 0
+			m.AutoScroll = true
 		case '4':
 			m.ActiveTab = TabPM
+			m.ScrollOffset = 0
+			m.AutoScroll = true
 		case '5':
 			m.ActiveTab = TabMetrics
+			m.ScrollOffset = 0
+			m.AutoScroll = true
 		case '6':
 			m.ActiveTab = TabScheduler
+			m.ScrollOffset = 0
+			m.AutoScroll = true
 		case KeySpace: // Toggle auto-scroll
 			m.AutoScroll = !m.AutoScroll
 			if m.AutoScroll {

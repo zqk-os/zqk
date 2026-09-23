@@ -49,7 +49,44 @@ func Render(m *UIModel) string {
 	// Bottom Status & Help Bar
 	renderFooter(&b, m)
 
-	return b.String()
+	rendered := b.String()
+	if m.Height > 0 {
+		lines := strings.Split(rendered, "\n")
+		if len(lines) > 0 && lines[len(lines)-1] == "" {
+			lines = lines[:len(lines)-1]
+		}
+		if len(lines) > m.Height {
+			// Keep header (first 5 lines) and footer (last 3 lines), clamp middle with scroll offset
+			if m.Height >= 9 {
+				keepTop := 5
+				keepBottom := 3
+				middleBudget := m.Height - keepTop - keepBottom
+				middleLines := lines[keepTop : len(lines)-keepBottom]
+				if len(middleLines) > middleBudget {
+					// Use ScrollOffset if applicable
+					start := 0
+					if m.ScrollOffset > 0 {
+						start = m.ScrollOffset
+						if start > len(middleLines)-middleBudget {
+							start = len(middleLines) - middleBudget
+						}
+					}
+					end := start + middleBudget
+					if end > len(middleLines) {
+						end = len(middleLines)
+					}
+					truncatedLines := make([]string, 0, m.Height)
+					truncatedLines = append(truncatedLines, lines[:keepTop]...)
+					truncatedLines = append(truncatedLines, middleLines[start:end]...)
+					truncatedLines = append(truncatedLines, lines[len(lines)-keepBottom:]...)
+					return strings.Join(truncatedLines, "\n")
+				}
+			}
+			return strings.Join(lines[:m.Height], "\n")
+		}
+	}
+
+	return rendered
 }
 
 func renderHeader(b *strings.Builder, m *UIModel) {
@@ -61,18 +98,11 @@ func renderHeader(b *strings.Builder, m *UIModel) {
 	b.WriteString("╔" + strings.Repeat("═", w-2) + "╗\n")
 	title := "⚡ ZQK KNOWLEDGE KERNEL — MISSION CONTROL CONSOLE"
 	innerW := w - 2
-	titleRunes := []rune(title)
-	if len(titleRunes) > innerW-2 {
-		title = string(titleRunes[:innerW-5]) + "..."
-		titleRunes = []rune(title)
+	if tds.VisibleWidth(title) > innerW-2 {
+		title = tds.TruncateVisible(title, innerW-4, "…")
 	}
-	pad := innerW - len(titleRunes)
-	if pad < 0 {
-		pad = 0
-	}
-	leftPad := pad / 2
-	rightPad := pad - leftPad
-	b.WriteString("║" + strings.Repeat(" ", leftPad) + cyanBold(title) + strings.Repeat(" ", rightPad) + "║\n")
+	titleFormatted := cyanBold(title)
+	b.WriteString("║" + tds.PadCenter(titleFormatted, innerW) + "║\n")
 	b.WriteString("╚" + strings.Repeat("═", w-2) + "╝\n")
 
 	// Tabs Bar (6 tabs)
@@ -96,7 +126,8 @@ func renderHeader(b *strings.Builder, m *UIModel) {
 			tabStrs = append(tabStrs, dim(fmt.Sprintf("  %s  ", t.name)))
 		}
 	}
-	b.WriteString(strings.Join(tabStrs, " │ ") + "\n")
+	tabLine := strings.Join(tabStrs, " │ ")
+	b.WriteString(tds.PadRight(tabLine, w) + "\n")
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 }
 
@@ -333,11 +364,12 @@ func renderSwarmTab(b *strings.Builder, m *UIModel) {
 	if w < 70 {
 		w = 80
 	}
-	b.WriteString(whiteBold("🤖 Multi-Agent Swarm Orchestration & Throughput (MMORCH)\n"))
-	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 
 	if m.SwarmData == nil {
-		b.WriteString(dim("  [Swarm status initializing or storage unavailable...]\n\n"))
+		b.WriteString(tds.Panel("🤖 Multi-Agent Swarm Orchestration & Throughput (MMORCH)", []string{
+			"  [Swarm status initializing or storage unavailable...]",
+		}, w, tds.BorderRounded))
+		b.WriteString("\n")
 		return
 	}
 
@@ -346,31 +378,66 @@ func renderSwarmTab(b *strings.Builder, m *UIModel) {
 	tasks := fmt.Sprintf("%v", m.SwarmData["executing_agent_tasks"])
 	instTotal := fmt.Sprintf("%v", m.SwarmData["agent_instructions_total"])
 
-	b.WriteString(fmt.Sprintf("Throughput Status:       %s\n", cyanBold(hint)))
-	b.WriteString(fmt.Sprintf("Active Priority Plans:   %s\n", yellowBold(plans)))
-	b.WriteString(fmt.Sprintf("Executing Agent Tasks:   %s\n", greenBold(tasks)))
-	b.WriteString(fmt.Sprintf("Total Instructions:      %s\n\n", whiteBold(instTotal)))
-
-	if instByStatus, ok := m.SwarmData["agent_instructions_by_status"].(map[string]any); ok && len(instByStatus) > 0 {
-		b.WriteString(whiteBold("Instruction Breakdown:\n"))
-		for status, count := range instByStatus {
-			b.WriteString(fmt.Sprintf("  • %-16s %v\n", status+":", count))
-		}
-		b.WriteString("\n")
+	// 1. Throughput Vitals Panel
+	vitals := []tds.StatItem{
+		{Label: "Throughput Status", Value: hint, Extra: tds.Badge(ternary(hint == "executing" || hint == "active", "ACTIVE", "PENDING"))},
+		{Label: "Active Priority Plans", Value: plans},
+		{Label: "Executing Agent Tasks", Value: tasks},
+		{Label: "Total Instructions", Value: instTotal},
 	}
+	vitalsLines := []string{
+		tds.StatRow(vitals[:2], w-4),
+		tds.StatRow(vitals[2:], w-4),
+	}
+	b.WriteString(tds.Panel("🤖 Multi-Agent Swarm Orchestration & Throughput (MMORCH)", vitalsLines, w, tds.BorderRounded))
+	b.WriteString("\n")
 
+	// 2. Seating & Personas Card
+	var seatingLines []string
 	if personaInfo, ok := m.SwarmData["persona_skill_bound"].(map[string]any); ok {
 		bound := fmt.Sprintf("%v", personaInfo["bound"])
 		total := fmt.Sprintf("%v", personaInfo["total"])
 		unbound := fmt.Sprintf("%v", personaInfo["unbound"])
-		b.WriteString(fmt.Sprintf("Agent Seating / Skills:  %s bound, %s unbound (Total: %s personas)\n",
-			greenBold(bound), yellowBold(unbound), total))
+		seatingItems := []tds.StatItem{
+			{Label: "Bound Personas", Value: bound, Extra: tds.Badge("OK")},
+			{Label: "Unbound Personas", Value: unbound, Extra: tds.Badge(ternary(unbound == "0", "OK", "WARN"))},
+			{Label: "Total Swarm Personas", Value: total},
+		}
+		seatingLines = append(seatingLines, tds.StatRow(seatingItems, w-4))
 	}
 
 	if capJob, ok := m.SwarmData["cap_orchestrator_job"].(map[string]any); ok {
 		id := fmt.Sprintf("%v", capJob["id"])
 		present := fmt.Sprintf("%v", capJob["present"])
-		b.WriteString(fmt.Sprintf("CAP Orchestrator Daemon: %s (registered: %s)\n", cyanBold(id), present))
+		capItem := []tds.StatItem{
+			{Label: "CAP Orchestrator Daemon", Value: id, Extra: tds.Badge(ternary(present == "true", "ACTIVE", "WARN"))},
+		}
+		seatingLines = append(seatingLines, tds.StatRow(capItem, w-4))
+	}
+	if len(seatingLines) > 0 {
+		b.WriteString(tds.Panel("👥 Agent Swarm Seating & Continuous Autonomous Loop (CAP)", seatingLines, w, tds.BorderRounded))
+		b.WriteString("\n")
+	}
+
+	// 3. Instruction Breakdown
+	if instByStatus, ok := m.SwarmData["agent_instructions_by_status"].(map[string]any); ok && len(instByStatus) > 0 {
+		var instItems []tds.StatItem
+		for status, count := range instByStatus {
+			instItems = append(instItems, tds.StatItem{
+				Label: strings.ToUpper(status),
+				Value: fmt.Sprintf("%v", count),
+			})
+		}
+		var breakdownLines []string
+		for i := 0; i < len(instItems); i += 4 {
+			end := i + 4
+			if end > len(instItems) {
+				end = len(instItems)
+			}
+			breakdownLines = append(breakdownLines, tds.StatRow(instItems[i:end], w-4))
+		}
+		b.WriteString(tds.Panel("📨 Instruction Queue & Backlog Breakdown", breakdownLines, w, tds.BorderRounded))
+		b.WriteString("\n")
 	}
 }
 
@@ -384,7 +451,7 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 	b.WriteString(whiteBold("📋 Program & Process Management Administration (TPM / PM Cascade)\n"))
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 
-	// 1. Strategic Alignment (Mission, Vision, Goals)
+	// 1. Strategic Alignment & Pipeline Overview
 	mis := m.MissionTitle
 	if mis == "" {
 		mis = "Continuous Autonomous Development"
@@ -393,23 +460,11 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 	if vis == "" {
 		vis = "Zero-Overhead Agentic Knowledge Operating System"
 	}
-
 	b.WriteString(fmt.Sprintf("Mission: %s │ Vision: %s\n", cyanBold(mis), dim(vis)))
 
-	if len(m.Goals) > 0 {
-		var goalParts []string
-		for _, g := range m.Goals {
-			goalParts = append(goalParts, fmt.Sprintf("%s: %s [%s]", g.ID, g.Title, greenBold(g.Status)))
-		}
-		b.WriteString(fmt.Sprintf("Goals:   %s\n", strings.Join(goalParts, " │ ")))
-	}
-	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
-
-	// 2. Delivery Pipeline Summary Box
 	bs := m.BacklogSummary
-	b.WriteString(fmt.Sprintf("%s │ %s: %d  %s: %d  %s: %d  %s: %d  %s: %d  %s: %d  (%s claimed / %s open)\n",
+	b.WriteString(fmt.Sprintf("%s │ %s: %d  %s: %d  %s: %d  %s: %d  %s: %d  (%s claimed / %s open)\n",
 		whiteBold(fmt.Sprintf("BLI Pipeline (%d Total)", bs.Total)),
-		dim("Draft"), bs.Draft,
 		cyanBold("Planned"), bs.Planned,
 		yellowBold("InProg"), bs.InProgress,
 		redBold("Blocked"), bs.Blocked,
@@ -417,45 +472,82 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 		whiteBold("Approved"), bs.Approved,
 		greenBold(fmt.Sprintf("%d", bs.Claimed)),
 		yellowBold(fmt.Sprintf("%d", bs.Unclaimed))))
-	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 
-	// 3. Priority Plans & Workstreams
+	// 2. Priority Plans Table
 	if len(m.PriorityPlans) > 0 {
-		b.WriteString(whiteBold("Active Priority Plans:\n"))
-		for _, p := range m.PriorityPlans {
+		b.WriteString(tds.SectionDivider("ACTIVE PRIORITY PLANS", w))
+		planTable := tds.NewTable(w).
+			AddColumn("PLAN ID", tds.AlignLeft, 16, 0.22).
+			AddColumn("STATUS", tds.AlignCenter, 12, 0.14).
+			AddColumn("BLIS", tds.AlignRight, 6, 0.08).
+			AddColumn("WORKSTREAMS", tds.AlignLeft, 14, 0.18).
+			AddColumn("TITLE", tds.AlignLeft, 24, 0.38)
+
+		limit := 1
+		if m.Height >= 40 {
+			limit = 2
+		}
+		if len(m.PriorityPlans) < limit {
+			limit = len(m.PriorityPlans)
+		}
+		for i := 0; i < limit; i++ {
+			p := m.PriorityPlans[i]
 			wsStr := strings.Join(p.Workstreams, ", ")
 			if wsStr == "" {
 				wsStr = "core"
 			}
-			b.WriteString(fmt.Sprintf("  • %-16s %-32s status: %-10s (workstreams: %s, BLIs: %d)\n",
-				cyanBold(p.ID), p.Title, yellowBold(p.Status), dim(wsStr), p.BLICount))
+			stBadge := yellowBold(p.Status)
+			if p.Status == "complete" || p.Status == "done" {
+				stBadge = greenBold(p.Status)
+			}
+			planTable.AddRow(
+				p.ID,
+				stBadge,
+				fmt.Sprintf("%d", p.BLICount),
+				wsStr,
+				p.Title,
+			)
 		}
-		b.WriteString("\n")
+		b.WriteString(planTable.Render())
 	}
 
-	// 4. Active Blockers & Risks
+	// 3. Active Blockers & Risks
 	if len(m.Blockers) > 0 {
-		b.WriteString(redBold("Active Risks & Blockers:\n"))
-		for _, blk := range m.Blockers {
-			b.WriteString(fmt.Sprintf("  ⚠️  %-12s %-30s [Sev: %s | Impact: %s | Status: %s]\n",
-				blk.ID, blk.Title, redBold(blk.Severity), blk.Impact, blk.Status))
+		b.WriteString(tds.SectionDivider("ACTIVE RISKS & BLOCKERS", w))
+		blkTable := tds.NewTable(w).
+			AddColumn("RISK ID", tds.AlignLeft, 16, 0.22).
+			AddColumn("SEVERITY", tds.AlignCenter, 10, 0.12).
+			AddColumn("STATUS", tds.AlignCenter, 10, 0.12).
+			AddColumn("TITLE", tds.AlignLeft, 30, 0.54)
+
+		limit := 1
+		if m.Height >= 40 {
+			limit = 2
 		}
-		b.WriteString("\n")
+		if len(m.Blockers) < limit {
+			limit = len(m.Blockers)
+		}
+		for i := 0; i < limit; i++ {
+			blk := m.Blockers[i]
+			sev := redBold(blk.Severity)
+			if blk.Severity == "low" || blk.Severity == "info" {
+				sev = dim(blk.Severity)
+			} else if blk.Severity == "medium" {
+				sev = yellowBold(blk.Severity)
+			}
+			blkTable.AddRow(
+				blk.ID,
+				sev,
+				blk.Status,
+				blk.Title,
+			)
+		}
+		b.WriteString(blkTable.Render())
 	}
 
-	// 5. Technical Debt
-	if len(m.TechnicalDebt) > 0 {
-		b.WriteString(yellowBold("Technical Debt Items:\n"))
-		for _, d := range m.TechnicalDebt {
-			b.WriteString(fmt.Sprintf("  🔧 %-12s %-30s [Category: %s | Priority: %s | Status: %s]\n",
-				d.ID, d.Title, d.Category, d.Priority, d.Status))
-		}
-		b.WriteString("\n")
-	}
-
-	// 6. Recent Backlog Items Table
+	// 4. Recent Backlog Items Table
 	if len(m.RecentBacklog) > 0 {
-		b.WriteString(whiteBold("Recent Work Units (Backlog Items):\n"))
+		b.WriteString(tds.SectionDivider("RECENT WORK UNITS (BACKLOG ITEMS)", w))
 		bliTable := tds.NewTable(w).
 			AddColumn("BLI ID", tds.AlignLeft, 14, 0.16).
 			AddColumn("PRIO", tds.AlignCenter, 6, 0.08).
@@ -463,7 +555,10 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 			AddColumn("CLAIMED BY", tds.AlignLeft, 16, 0.20).
 			AddColumn("TITLE", tds.AlignLeft, 25, 0.42)
 
-		limit := 6
+		limit := 1
+		if m.Height >= 40 {
+			limit = 2
+		}
 		if len(m.RecentBacklog) < limit {
 			limit = len(m.RecentBacklog)
 		}
@@ -492,7 +587,34 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 			)
 		}
 		b.WriteString(bliTable.Render())
-		b.WriteString("\n")
+	}
+
+	// 5. Technical Debt Items Table
+	if len(m.TechnicalDebt) > 0 {
+		b.WriteString(tds.SectionDivider("TECHNICAL DEBT & HYGIENE ITEMS", w))
+		debtTable := tds.NewTable(w).
+			AddColumn("DEBT ID", tds.AlignLeft, 16, 0.22).
+			AddColumn("PRIORITY", tds.AlignCenter, 10, 0.12).
+			AddColumn("CATEGORY", tds.AlignCenter, 14, 0.16).
+			AddColumn("TITLE", tds.AlignLeft, 26, 0.50)
+
+		limit := 1
+		if m.Height >= 40 {
+			limit = 2
+		}
+		if len(m.TechnicalDebt) < limit {
+			limit = len(m.TechnicalDebt)
+		}
+		for i := 0; i < limit; i++ {
+			d := m.TechnicalDebt[i]
+			debtTable.AddRow(
+				d.ID,
+				yellowBold(d.Priority),
+				d.Category,
+				d.Title,
+			)
+		}
+		b.WriteString(debtTable.Render())
 	}
 }
 
@@ -717,7 +839,36 @@ func renderSchedulerTab(b *strings.Builder, m *UIModel) {
 		AddColumn("NEXT RUN", tds.AlignCenter, 19, 0.20).
 		AddColumn("STATUS", tds.AlignCenter, 10, 0.10)
 
-	for _, job := range m.SchedulerJobs {
+	availRows := m.Height - 12
+	if availRows < 6 {
+		availRows = 6
+	}
+
+	total := len(m.SchedulerJobs)
+	var visible []SchedulerJobRow
+
+	if m.AutoScroll {
+		end := availRows
+		if end > total {
+			end = total
+		}
+		visible = m.SchedulerJobs[:end]
+	} else {
+		start := m.ScrollOffset
+		if start >= total {
+			start = total - 1
+		}
+		if start < 0 {
+			start = 0
+		}
+		end := start + availRows
+		if end > total {
+			end = total
+		}
+		visible = m.SchedulerJobs[start:end]
+	}
+
+	for _, job := range visible {
 		stBadge := greenBold(job.Status)
 		if job.Status == "failed" || job.Status == "error" {
 			stBadge = redBold(job.Status)
@@ -744,12 +895,14 @@ func renderFooter(b *strings.Builder, m *UIModel) {
 		w = 80
 	}
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
-	b.WriteString(dim("Legend: ") + "⚡ State │ 📜 Audit │ 🤖 Swarm │ 📋 PM/Process │ 📊 Metrics │ ⏱️  Scheduler\n")
-	b.WriteString(whiteBold("[Tab / 1-6]") + " Switch View  " +
+	legendLine := dim("Legend: ") + "⚡ State │ 📜 Audit │ 🤖 Swarm │ 📋 PM/Process │ 📊 Metrics │ ⏱️  Scheduler"
+	b.WriteString(tds.PadRight(legendLine, w) + "\n")
+	navLine := whiteBold("[Tab / 1-6]") + " Switch View  " +
 		whiteBold("[↑/↓/j/k]") + " Scroll  " +
 		whiteBold("[Space]") + " Pause/Resume  " +
 		whiteBold("[r]") + " Refresh  " +
-		whiteBold("[q/Esc]") + " Exit\n")
+		whiteBold("[q/Esc]") + " Exit"
+	b.WriteString(tds.PadRight(navLine, w) + "\n")
 }
 
 func formatSymbolCounters(counts map[string]int) string {

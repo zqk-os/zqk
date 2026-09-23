@@ -30,7 +30,7 @@ func NewStateTsdbCommandBuilder() *cobra.Command {
 	help.AddExample("View TSDB performance summary", "%s state tsdb")
 	help.AddExample("Filter by job ID", "%s state tsdb --job-id SCH-cap-orchestrator")
 	builder.WithHelpBuilder(help)
-	builder.WithArgs(cobra.ArbitraryArgs)
+	builder.WithArgs(cobra.NoArgs)
 	builder.AddIntFlag("limit", "l", 20, "Maximum number of recent TSDB points to display")
 	builder.AddStringFlag("since", "s", "", "Time window filter (e.g. 1h, 6h, 24h, 7d, 30d)")
 	builder.AddStringFlag("job-id", "j", "", "Filter execution metrics by specific scheduler job ID")
