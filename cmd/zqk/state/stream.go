@@ -2,12 +2,16 @@ package state
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 	"time"
 
+	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func newStreamCmd() *cobra.Command {
@@ -79,29 +83,69 @@ func StreamJournalMutations(cmd *cobra.Command, projectRoot string, follow bool,
 		}
 	}
 
-	ticker := time.NewTicker(500 * time.Millisecond)
-	defer ticker.Stop()
+	streamDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.StreamsDir, "change_journal_entry")
+	_ = fileutil.MkdirAll(streamDir, paths.DirPerm755)
+
+	watcher, err := fsnotify.NewWatcher()
+	if err == nil {
+		defer watcher.Close()
+		_ = watcher.Add(streamDir)
+	}
+
+	var eventsCh <-chan fsnotify.Event
+	var errorsCh <-chan error
+	if watcher != nil {
+		eventsCh = watcher.Events
+		errorsCh = watcher.Errors
+	}
+
+	var debounceTimer *time.Timer
+	var debounceCh <-chan time.Time
+
+	renderLatest := func() {
+		current := readRecentJournalMutations(projectRoot, limit)
+		// Reverse to chronological
+		for i, j := 0, len(current)-1; i < j; i, j = i+1, j-1 {
+			current[i], current[j] = current[j], current[i]
+		}
+		if isDashboard {
+			_ = cli.WriteOutput(cmd, []byte("\033[H\033[2J"+BuildDashboardView(projectRoot, current)))
+		} else {
+			for _, m := range current {
+				if !seen[m.ID] {
+					seen[m.ID] = true
+					_ = cli.WriteOutput(cmd, []byte(FormatMutationLine(m)+"\n"))
+				}
+			}
+		}
+	}
 
 	for {
 		select {
 		case <-cmd.Context().Done():
+			if debounceTimer != nil {
+				debounceTimer.Stop()
+			}
 			_ = cli.WriteOutput(cmd, []byte("\n[Stream closed]\n"))
 			return nil
-		case <-ticker.C:
-			current := readRecentJournalMutations(projectRoot, limit)
-			// Reverse to chronological
-			for i, j := 0, len(current)-1; i < j; i, j = i+1, j-1 {
-				current[i], current[j] = current[j], current[i]
+		case event, ok := <-eventsCh:
+			if !ok {
+				return nil
 			}
-			if isDashboard {
-				_ = cli.WriteOutput(cmd, []byte("\033[H\033[2J"+BuildDashboardView(projectRoot, current)))
-			} else {
-				for _, m := range current {
-					if !seen[m.ID] {
-						seen[m.ID] = true
-						_ = cli.WriteOutput(cmd, []byte(FormatMutationLine(m)+"\n"))
-					}
+			if event.Has(fsnotify.Write) || event.Has(fsnotify.Create) {
+				if debounceTimer == nil {
+					debounceTimer = time.NewTimer(50 * time.Millisecond)
+					debounceCh = debounceTimer.C
+				} else {
+					debounceTimer.Reset(50 * time.Millisecond)
 				}
+			}
+		case <-debounceCh:
+			renderLatest()
+			debounceCh = nil
+		case _, ok := <-errorsCh:
+			if !ok {
+				return nil
 			}
 		}
 	}
