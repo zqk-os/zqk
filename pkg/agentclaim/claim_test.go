@@ -2,6 +2,7 @@ package agentclaim
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"sync"
 	"testing"
@@ -15,6 +16,7 @@ import (
 type claimMemStore struct {
 	storage.ObjectStorageProvider
 	mu   sync.Mutex
+	seq  int
 	objs map[string]map[string]any
 }
 
@@ -52,6 +54,44 @@ func (m *claimMemStore) Update(ctx context.Context, sec *pkgctx.SecurityContext,
 		o[k] = v
 	}
 	return nil
+}
+
+func (m *claimMemStore) Create(ctx context.Context, sec *pkgctx.SecurityContext, obj map[string]any) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	id, _ := obj[objects.FieldKeyID].(string)
+	id = strings.TrimSpace(id)
+	if id == "" {
+		m.seq++
+		id = fmt.Sprintf("ATK-mem-%d", m.seq)
+		obj[objects.FieldKeyID] = id
+	}
+	if _, ok := obj[objects.FieldKeyKind]; !ok {
+		obj[objects.FieldKeyKind] = objects.KindAgentTask
+	}
+	cp := make(map[string]any, len(obj))
+	for k, v := range obj {
+		cp[k] = v
+	}
+	m.objs[id] = cp
+	return nil
+}
+
+func (m *claimMemStore) List(ctx context.Context, sec *pkgctx.SecurityContext, st *pkgctx.StorageContext, filter storage.ListFilter) (*storage.QueryResult, error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	out := &storage.QueryResult{}
+	for _, o := range m.objs {
+		if filter.Kind != "" && objects.StringField(o, objects.FieldKeyKind) != filter.Kind {
+			continue
+		}
+		cp := make(map[string]any, len(o))
+		for k, v := range o {
+			cp[k] = v
+		}
+		out.Objects = append(out.Objects, cp)
+	}
+	return out, nil
 }
 
 func TestTryClaim_ContentionAndIdempotent(t *testing.T) {

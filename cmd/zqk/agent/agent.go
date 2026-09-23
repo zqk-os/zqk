@@ -27,6 +27,7 @@ Enables task routing, context delegation to specialized sub-agents, and shared s
 	cmd.AddCommand(NewExecuteCmd())
 	cmd.AddCommand(NewPrepareContextCmd())
 	cmd.AddCommand(NewClaimCmd())
+	cmd.AddCommand(NewClaimGateCmd())
 	cmd.AddCommand(NewReleaseCmd())
 	cmd.AddCommand(NewRecoverCmd())
 	cmd.AddCommand(NewNextCmd())
