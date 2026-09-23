@@ -216,3 +216,24 @@ func (s *AuditAggregationService) markEventsAsAggregated(
 
 // AuditAggregationResult is the storage alias for audit.AggregationResult.
 type AuditAggregationResult = audit.AggregationResult
+
+// CreateAggregationMetricForTest exposes createAggregationMetric for tests.
+func (s *AuditAggregationService) CreateAggregationMetricForTest(ctx context.Context, secCtx *pkgctx.SecurityContext, metric map[string]any) (string, error) {
+	return s.createAggregationMetric(ctx, secCtx, metric)
+}
+
+// FindExistingMetricByWindowForTest exposes findExistingMetricByWindow for tests.
+func (s *AuditAggregationService) FindExistingMetricByWindowForTest(ctx context.Context, secCtx *pkgctx.SecurityContext, windowStart, windowEnd string) (map[string]any, error) {
+	return s.findExistingMetricByWindow(ctx, secCtx, windowStart, windowEnd)
+}
+
+// FindExistingMetricByOverlappingWindowForTest exposes findExistingMetricByOverlappingWindow for tests.
+func (s *AuditAggregationService) FindExistingMetricByOverlappingWindowForTest(ctx context.Context, secCtx *pkgctx.SecurityContext, windowStart, windowEnd string) string {
+	return s.findExistingMetricByOverlappingWindow(ctx, secCtx, windowStart, windowEnd)
+}
+
+// MarkEventsAsAggregatedForTest exposes markEventsAsAggregated for tests.
+func (s *AuditAggregationService) MarkEventsAsAggregatedForTest(ctx context.Context, secCtx *pkgctx.SecurityContext, eventIDs []string) (int, error) {
+	return s.markEventsAsAggregated(ctx, secCtx, eventIDs)
+}
+

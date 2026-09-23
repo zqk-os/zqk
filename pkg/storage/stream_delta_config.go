@@ -124,6 +124,7 @@ func builtinMetricDeltaFields() []string {
 		ConstStreamAggregatedEntryCount, objects.FieldKeyEventCount, objects.FieldKeyEventTypeCounts, objects.FieldKeyMetricType,
 		objects.FieldKeyTitle, objects.FieldKeySummary,
 		objects.FieldKeyCollectionCount,
+		objects.FieldKeySource,
 	}
 }
 

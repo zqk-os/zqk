@@ -244,3 +244,29 @@ func darwinKindDirYAMLFingerprint(kindDir string) (string, error) {
 	})
 	return b.String(), err
 }
+
+// PostFlushDarwinCASVisibilityIfNeededForTest exposes postFlushDarwinCASVisibilityIfNeeded for testing.
+func PostFlushDarwinCASVisibilityIfNeededForTest(ctx context.Context, projectRoot string, flushKinds []string) error {
+	return postFlushDarwinCASVisibilityIfNeeded(ctx, projectRoot, flushKinds)
+}
+
+// DarwinWaitCASKindVisibleForTest exposes darwinWaitCASKindVisible for testing.
+func DarwinWaitCASKindVisibleForTest(ctx context.Context, projectRoot, kind string, deadline time.Time) error {
+	return darwinWaitCASKindVisible(ctx, projectRoot, kind, deadline)
+}
+
+// DarwinSleepPollForTest exposes darwinSleepPoll for testing.
+func DarwinSleepPollForTest(ctx context.Context, d time.Duration) error {
+	return darwinSleepPoll(ctx, d)
+}
+
+// DarwinWaitKindDirYAMLFingerprintStableForTest exposes darwinWaitKindDirYAMLFingerprintStable for testing.
+func DarwinWaitKindDirYAMLFingerprintStableForTest(ctx context.Context, kindDir string, deadline time.Time) error {
+	return darwinWaitKindDirYAMLFingerprintStable(ctx, kindDir, deadline)
+}
+
+// DarwinKindDirYAMLFingerprintForTest exposes darwinKindDirYAMLFingerprint for testing.
+func DarwinKindDirYAMLFingerprintForTest(kindDir string) (string, error) {
+	return darwinKindDirYAMLFingerprint(kindDir)
+}
+

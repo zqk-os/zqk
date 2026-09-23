@@ -20,3 +20,12 @@ func SetupStorageInitBudgetTestEnvironmentForTest(t *testing.T) string {
 	t.Helper()
 	return setupStorageInitBudgetTestEnvironmentForTest(t)
 }
+
+// NewStorageFactoryForTesting returns a StorageFactory backed by the provided ObjectStorageProvider
+func NewStorageFactoryForTesting(provider ObjectStorageProvider) *StorageFactory {
+	return &StorageFactory{
+		defaultStorage: provider,
+		providers:      make(map[string]ObjectStorageProvider),
+	}
+}
+
