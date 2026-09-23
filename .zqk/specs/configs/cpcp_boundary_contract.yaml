@@ -1,0 +1,13 @@
+$schema: "../../../.zqk/cli/specs/schemas/boundary_contract_spec.schema.json"
+
+contract_id: CPCP-MEMBRANE-001
+version: 1.0.0
+membrane_mode: fail_closed
+nondeterministic_layer: Model Context Protocol (MCP) and multi-agent LLM reasoning execution
+deterministic_layer: ZQK Content-Addressable Storage (CAS), Write-Ahead Log (WAL), and Change Journal
+invariants:
+  - "Direct file writes to .zqk/process/ bypass the cellular membrane and are strictly prohibited"
+  - "Every mutation must possess schema validation, valid lifecycle status transition, and cryptographic lineage"
+  - "All unhandled errors or missing pre-conditions fail-closed and abort execution"
+  - "Cryptographic audit events are appended to streams before state commit is acknowledged"
+rejection_action: fail_closed

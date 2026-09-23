@@ -46,6 +46,10 @@
 ./cli_specs/_schemas/blocking_check_config.schema.json
 ./cli_specs/_schemas/blocking_check_config.schema.json
 ./cli_specs/_schemas/blocking_check_config.schema.json
+./cli_specs/_schemas/boundary_contract_spec.schema.json
+./cli_specs/_schemas/boundary_contract_spec.schema.json
+./cli_specs/_schemas/boundary_contract_spec.schema.json
+./cli_specs/_schemas/boundary_contract_spec.schema.json
 ./cli_specs/_schemas/brand_settings.schema.json
 ./cli_specs/_schemas/brand_settings.schema.json
 ./cli_specs/_schemas/brand_settings.schema.json
@@ -774,6 +778,10 @@
 ./cli_specs/schemas/blocking_check_config.schema.json
 ./cli_specs/schemas/blocking_check_config.schema.json
 ./cli_specs/schemas/blocking_check_config.schema.json
+./cli_specs/schemas/boundary_contract_spec.schema.json
+./cli_specs/schemas/boundary_contract_spec.schema.json
+./cli_specs/schemas/boundary_contract_spec.schema.json
+./cli_specs/schemas/boundary_contract_spec.schema.json
 ./cli_specs/schemas/brand_settings.schema.json
 ./cli_specs/schemas/brand_settings.schema.json
 ./cli_specs/schemas/brand_settings.schema.json
@@ -1143,6 +1151,9 @@
 ./configs/cleanup_config.yaml
 ./configs/cleanup_config.yaml
 ./configs/cleanup_config.yaml
+./configs/cpcp_boundary_contract.yaml
+./configs/cpcp_boundary_contract.yaml
+./configs/cpcp_boundary_contract.yaml
 ./configs/high_volume_kinds.yaml
 ./configs/high_volume_kinds.yaml
 ./configs/high_volume_kinds.yaml

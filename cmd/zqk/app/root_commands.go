@@ -38,6 +38,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/scheduler"
 	"github.com/zqk-os/zqk/cmd/zqk/semantic"
 	"github.com/zqk-os/zqk/cmd/zqk/spec"
+	"github.com/zqk-os/zqk/cmd/zqk/state"
 	"github.com/zqk-os/zqk/cmd/zqk/swarm"
 	"github.com/zqk-os/zqk/cmd/zqk/system"
 	testcmd "github.com/zqk-os/zqk/cmd/zqk/test"
@@ -136,6 +137,11 @@ func registerCommands() {
 	quickstartCmdInst := system.NewQuickstartCmd()
 	quickstartCmdInst.GroupID = "getting_started"
 	rootCmd.AddCommand(quickstartCmdInst)
+
+	// Top-level init command (zero-friction Day-0 onboarding)
+	initCmdInst := system.NewInitCmd()
+	initCmdInst.GroupID = "getting_started"
+	rootCmd.AddCommand(initCmdInst)
 
 	// Tray: named shortcuts to zqk argv (.zqk/tray.yaml over embedded defaults)
 	trayCmdInst := tray.NewTrayCmd()
@@ -293,6 +299,11 @@ func registerCommands() {
 	pplanCmdInst := object.NewPPlanCmd()
 	pplanCmdInst.GroupID = "everyday"
 	rootCmd.AddCommand(pplanCmdInst)
+
+	// Live kernel state tree and mutation journal
+	stateCmdInst := state.NewStateCmd()
+	stateCmdInst.GroupID = "everyday"
+	rootCmd.AddCommand(stateCmdInst)
 
 	// Executable test case runner and criteria verification
 	testCmdInst := testcmd.NewTestCmd()
