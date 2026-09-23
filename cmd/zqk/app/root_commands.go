@@ -143,6 +143,11 @@ func registerCommands() {
 	initCmdInst.GroupID = "getting_started"
 	rootCmd.AddCommand(initCmdInst)
 
+	// Top-level run command for portable swarm packages
+	runCmdInst := swarm.NewTopLevelRunCmd()
+	runCmdInst.GroupID = "getting_started"
+	rootCmd.AddCommand(runCmdInst)
+
 	// Tray: named shortcuts to zqk argv (.zqk/tray.yaml over embedded defaults)
 	trayCmdInst := tray.NewTrayCmd()
 	trayCmdInst.GroupID = "integrations"

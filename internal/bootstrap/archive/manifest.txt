@@ -102,6 +102,10 @@
 ./cli_specs/_schemas/scenario_spec.schema.json
 ./cli_specs/_schemas/scenario_spec.schema.json
 ./cli_specs/_schemas/scenario_spec.schema.json
+./cli_specs/_schemas/swarm_package_spec.schema.json
+./cli_specs/_schemas/swarm_package_spec.schema.json
+./cli_specs/_schemas/swarm_package_spec.schema.json
+./cli_specs/_schemas/swarm_package_spec.schema.json
 ./cli_specs/_schemas/trait_spec.schema.json
 ./cli_specs/_schemas/trait_spec.schema.json
 ./cli_specs/_schemas/trait_spec.schema.json
@@ -579,6 +583,9 @@
 ./cli_specs/quickstart_command.yaml
 ./cli_specs/quickstart_command.yaml
 ./cli_specs/quickstart_command.yaml
+./cli_specs/run_command.yaml
+./cli_specs/run_command.yaml
+./cli_specs/run_command.yaml
 ./cli_specs/scheduler/
 ./cli_specs/scheduler/
 ./cli_specs/scheduler/
@@ -844,6 +851,10 @@
 ./cli_specs/schemas/scenario_spec.schema.json
 ./cli_specs/schemas/scenario_spec.schema.json
 ./cli_specs/schemas/scenario_spec.schema.json
+./cli_specs/schemas/swarm_package_spec.schema.json
+./cli_specs/schemas/swarm_package_spec.schema.json
+./cli_specs/schemas/swarm_package_spec.schema.json
+./cli_specs/schemas/swarm_package_spec.schema.json
 ./cli_specs/schemas/trait_spec.schema.json
 ./cli_specs/schemas/trait_spec.schema.json
 ./cli_specs/schemas/trait_spec.schema.json
@@ -929,6 +940,10 @@
 ./cli_specs/swarm/init_command.yaml
 ./cli_specs/swarm/init_command.yaml
 ./cli_specs/swarm/init_command.yaml
+./cli_specs/swarm/run_command.yaml
+./cli_specs/swarm/run_command.yaml
+./cli_specs/swarm/run_command.yaml
+./cli_specs/swarm/run_command.yaml
 ./cli_specs/swarm/status_command.yaml
 ./cli_specs/swarm/status_command.yaml
 ./cli_specs/swarm/status_command.yaml

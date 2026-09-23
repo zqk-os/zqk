@@ -8,14 +8,14 @@ import (
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 )
 
-// NewRunCommandBuilder creates a new run command
-func NewRunCommandBuilder() *cobra.Command {
+// NewSwarmRunCommandBuilder creates a new swarm_run command
+func NewSwarmRunCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("run")
 	builder.WithShort("Run a portable agent swarm package")
 	help := clipkg.DynamicHelpBuilder("Run a portable agent swarm package")
 	help.WithDescriptionLines("Load, validate, and execute an autonomous swarm defined by a portable swarm manifest (swarm.yaml).")
-	help.AddExample("Run local swarm manifest", "zqk run ./swarm.yaml")
-	help.AddExample("Validate swarm package in dry-run mode", "zqk run ./my-swarm/ --dry-run")
+	help.AddExample("Run local swarm manifest", "zqk swarm run ./swarm.yaml")
+	help.AddExample("Validate swarm package in dry-run mode", "zqk swarm run ./my-swarm/ --dry-run")
 	builder.WithHelpBuilder(help)
 	builder.WithArgs(cobra.ExactArgs(1))
 	builder.AddBoolFlag("dry-run", "", false, "Validate swarm manifest and print execution topology without launching agents")

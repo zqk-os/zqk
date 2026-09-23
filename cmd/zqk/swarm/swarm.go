@@ -10,5 +10,6 @@ func NewSwarmCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewSwarmCommandBuilder()
 	cmd.AddCommand(NewStatusCmd())
 	cmd.AddCommand(NewInitCmd())
+	cmd.AddCommand(NewRunCmd())
 	return cmd
 }
