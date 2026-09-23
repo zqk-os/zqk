@@ -116,6 +116,9 @@ Execute portable multi-agent swarms with fail-closed membrane isolation:
 # Run a remote or local swarm package
 zqk run https://github.com/zqk-os/swarm-starter-kit
 
+# Launch interactive full-screen terminal mission control
+zqk ui
+
 # Stream real-time mutations with the visual ANSI seismograph
 zqk state stream --dashboard
 

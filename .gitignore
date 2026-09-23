@@ -91,6 +91,8 @@ Thumbs.db
 bin/
 dist/
 dist-community/
+dist-docs/
+dist-docs.tar.gz
 build
 codebase-inventory
 /zqk

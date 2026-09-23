@@ -48,6 +48,9 @@ zqk mcp ensure --tcp 127.0.0.1:8443
 # Run a portable swarm package (local path or remote git URL)
 zqk run https://github.com/zqk-os/swarm-starter-kit
 
+# Launch interactive full-screen terminal mission control
+zqk ui
+
 # Stream real-time mutations with the visual ANSI seismograph
 zqk state stream --dashboard
 ```
