@@ -621,4 +621,227 @@ func TestInspectTUIModel_ActionPalette_RoleGated(t *testing.T) {
 	assert.False(t, adminModel.ActionPaletteOpen)
 }
 
+func TestPolicyStudio_SuggestDSLTokens(t *testing.T) {
+	// 1. Empty input suggests available schema fields
+	suggs := SuggestDSLTokens(objects.KindBacklogItem, "")
+	require.NotEmpty(t, suggs)
+	hasID := false
+	hasStatus := false
+	for _, s := range suggs {
+		if s.Token == objects.FieldKeyID {
+			hasID = true
+		}
+		if s.Token == objects.FieldKeyStatus {
+			hasStatus = true
+		}
+	}
+	assert.True(t, hasID, "expected id token suggested")
+	assert.True(t, hasStatus, "expected status token suggested")
+
+	// 2. Exact field token suggests comparison operators
+	opSuggs := SuggestDSLTokens(objects.KindBacklogItem, "status")
+	require.NotEmpty(t, opSuggs)
+	hasEquals := false
+	hasIsPopulated := false
+	for _, s := range opSuggs {
+		if s.Token == "==" {
+			hasEquals = true
+		}
+		if s.Token == "is_populated" {
+			hasIsPopulated = true
+		}
+	}
+	assert.True(t, hasEquals, "expected == operator suggested")
+	assert.True(t, hasIsPopulated, "expected is_populated operator suggested")
+
+	// 3. Status operator suggests lifecycle statuses
+	statusValSuggs := SuggestDSLTokens(objects.KindBacklogItem, "status ==")
+	require.NotEmpty(t, statusValSuggs)
+	for _, s := range statusValSuggs {
+		assert.Equal(t, TokenTypeValue, s.Type)
+	}
+
+	// 4. Logical AND suggests schema fields again
+	logicalSuggs := SuggestDSLTokens(objects.KindBacklogItem, "status == \"planned\" &&")
+	require.NotEmpty(t, logicalSuggs)
+	assert.Equal(t, TokenTypeField, logicalSuggs[0].Type)
+}
+
+func TestPolicyStudio_EvaluateDSLExpression(t *testing.T) {
+	objPass := map[string]any{
+		objects.FieldKeyID:       "BLI-TEST-001",
+		objects.FieldKeyTitle:    "Policy Studio Implementation",
+		objects.FieldKeyStatus:   "in_progress",
+		objects.FieldKeyPriority: "P0",
+		"requirement_refs":       []any{"REQ-001"},
+		"milestone_refs":         []any{"MIL-001"},
+		"tags":                   []string{"qa", "studio"},
+		"effort_hours":           8,
+	}
+
+	// Unary predicates
+	pass, err := EvaluateDSLExpression("id is_populated", objPass)
+	require.NoError(t, err)
+	assert.True(t, pass)
+
+	pass, err = EvaluateDSLExpression("missing_key is_empty", objPass)
+	require.NoError(t, err)
+	assert.True(t, pass)
+
+	pass, err = EvaluateDSLExpression("requirement_refs is_not_empty", objPass)
+	require.NoError(t, err)
+	assert.True(t, pass)
+
+	// Binary equality & comparison
+	pass, err = EvaluateDSLExpression("status == \"in_progress\"", objPass)
+	require.NoError(t, err)
+	assert.True(t, pass)
+
+	pass, err = EvaluateDSLExpression("priority != \"P2\"", objPass)
+	require.NoError(t, err)
+	assert.True(t, pass)
+
+	pass, err = EvaluateDSLExpression("title contains \"Studio\"", objPass)
+	require.NoError(t, err)
+	assert.True(t, pass)
+
+	pass, err = EvaluateDSLExpression("effort_hours > 5", objPass)
+	require.NoError(t, err)
+	assert.True(t, pass)
+
+	// Compound expressions with &&
+	compoundExpr := "status == \"in_progress\" && priority == \"P0\" && requirement_refs is_not_empty"
+	pass, err = EvaluateDSLExpression(compoundExpr, objPass)
+	require.NoError(t, err)
+	assert.True(t, pass)
+
+	// Failing compound condition
+	failExpr := "status == \"in_progress\" && priority == \"P3\""
+	pass, err = EvaluateDSLExpression(failExpr, objPass)
+	require.NoError(t, err)
+	assert.False(t, pass)
+}
+
+func TestPolicyStudio_RunPolicyStudioDryRun(t *testing.T) {
+	mockStorage := &mockInspectStorage{
+		objects: map[string]map[string]any{
+			"BLI-POL-001": {
+				objects.FieldKeyID:       "BLI-POL-001",
+				objects.FieldKeyKind:     objects.KindBacklogItem,
+				objects.FieldKeyTitle:    "Valid Item",
+				objects.FieldKeyStatus:   "planned",
+				"requirement_refs":       []any{"REQ-1"},
+				"milestone_refs":         []any{"MIL-1"},
+				"estimated_effort":       "2d",
+			},
+			"BLI-POL-002": {
+				objects.FieldKeyID:       "BLI-POL-002",
+				objects.FieldKeyKind:     objects.KindBacklogItem,
+				objects.FieldKeyTitle:    "Invalid Item (Missing lineage & effort)",
+				objects.FieldKeyStatus:   "planned",
+			},
+		},
+	}
+
+	ctx := context.Background()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	storageCtx := pkgctx.NewStorageContext()
+
+	rules := []PolicyRule{
+		{
+			ID:          "POL-LINEAGE-CHECK",
+			Name:        "Lineage Intact",
+			TargetKind:  objects.KindBacklogItem,
+			Expression:  "requirement_refs is_not_empty && milestone_refs is_not_empty",
+			Severity:    "blocker",
+		},
+		{
+			ID:          "POL-EFFORT-CHECK",
+			Name:        "Effort Populated",
+			TargetKind:  objects.KindBacklogItem,
+			Expression:  "estimated_effort is_populated",
+			Severity:    "warning",
+		},
+	}
+
+	results, err := RunPolicyStudioDryRun(ctx, mockStorage, secCtx, storageCtx, objects.KindBacklogItem, rules)
+	require.NoError(t, err)
+	require.Len(t, results, 2)
+
+	// Both rules should have 1 violation (BLI-POL-002)
+	assert.False(t, results[0].Passed)
+	assert.Equal(t, 1, results[0].ViolationsCount)
+	assert.Contains(t, results[0].OffendingIDs, "BLI-POL-002")
+
+	assert.False(t, results[1].Passed)
+	assert.Equal(t, 1, results[1].ViolationsCount)
+	assert.Contains(t, results[1].OffendingIDs, "BLI-POL-002")
+}
+
+func TestInspectTUIModel_PolicyStudio_Interactive(t *testing.T) {
+	mockStorage := &mockInspectStorage{
+		objects: map[string]map[string]any{
+			"BLI-TUI-POL-001": {
+				objects.FieldKeyID:       "BLI-TUI-POL-001",
+				objects.FieldKeyKind:     objects.KindBacklogItem,
+				objects.FieldKeyTitle:    "TUI Studio Item",
+				objects.FieldKeyStatus:   "planned",
+				objects.FieldKeyPriority: "P1",
+				"requirement_refs":       []any{"REQ-1"},
+				"milestone_refs":         []any{"MIL-1"},
+			},
+		},
+	}
+
+	ctx := context.Background()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	storageCtx := pkgctx.NewStorageContext()
+
+	model := NewInspectTUIModel(ctx, objects.KindBacklogItem, nil, nil, "updated_at", false, mockStorage, secCtx, storageCtx)
+	require.NotNil(t, model)
+	model.Width = 140
+
+	// 1. Toggle Policy Studio Open with 'p'
+	model.HandleInput([]byte{'p'})
+	assert.True(t, model.PolicyStudioOpen)
+	assert.False(t, model.DSLEditMode)
+	assert.NotEmpty(t, model.PolicyRules)
+
+	rendered := model.Render()
+	assert.Contains(t, rendered, "LIVE POLICY RULE STUDIO: BACKLOG_ITEM")
+	assert.Contains(t, rendered, "POL-INTEGRITY-LINEAGE-001")
+
+	// 2. Navigate Rules with 'j' and 'k'
+	model.HandleInput([]byte{'j'})
+	assert.Equal(t, 1, model.ActiveRuleIndex)
+	model.HandleInput([]byte{'k'})
+	assert.Equal(t, 0, model.ActiveRuleIndex)
+
+	// 3. Enter DSL Edit Mode with 'c'
+	model.HandleInput([]byte{'c'})
+	assert.True(t, model.DSLEditMode)
+	assert.NotEmpty(t, model.DSLSuggestions)
+
+	// 4. Type a condition into DSL buffer
+	for _, ch := range "status == " {
+		model.HandleInput([]byte{byte(ch)})
+	}
+	assert.Contains(t, model.DSLInputBuffer, "status ==")
+
+	// 5. Test Autocomplete Tab Key
+	model.HandleInput([]byte{9}) // Tab
+	// Commit condition with Enter
+	model.HandleInput([]byte{13})
+	assert.False(t, model.DSLEditMode)
+
+	// 6. Test Dry-Run Re-evaluation with 't'
+	model.HandleInput([]byte{'t'})
+	assert.NotEmpty(t, model.DryRunResults)
+
+	// 7. Close Policy Studio with 'Esc'
+	model.HandleInput([]byte{27})
+	assert.False(t, model.PolicyStudioOpen)
+}
+
+
 

@@ -67,13 +67,20 @@ type InspectTUIModel struct {
 	SearchQuery       string
 	IsSearching       bool
 	SearchBuffer      string
-	DetailModalOpen   bool
-	PolicyStudioOpen  bool
-	ActionPaletteOpen bool
-	ActionIndex       int
-	EditorProfile     string // "newb", "pro", "jedi"
-	StatusMessage     string
-	StatusExpiresAt   time.Time
+	DetailModalOpen    bool
+	PolicyStudioOpen   bool
+	PolicyRules        []PolicyRule
+	ActiveRuleIndex    int
+	DSLEditMode        bool
+	DSLInputBuffer     string
+	DSLSuggestions     []DSLTokenSuggestion
+	DSLSuggestionIndex int
+	DryRunResults      []RuleEvaluationResult
+	ActionPaletteOpen  bool
+	ActionIndex        int
+	EditorProfile      string // "newb", "pro", "jedi"
+	StatusMessage      string
+	StatusExpiresAt    time.Time
 }
 
 // NewInspectTUIModel constructs a new interactive Object Inspector model.
@@ -1040,7 +1047,57 @@ func getNextLifecycleState(kind, currentStatus string) string {
 	}
 }
 
+func (m *InspectTUIModel) RefreshPolicyStudioDryRun() {
+	if len(m.PolicyRules) == 0 {
+		m.PolicyRules = DefaultPolicyRulesForKind(m.ActiveKind)
+	}
+
+	var results []RuleEvaluationResult
+	evalObjects := m.AllObjects
+	if len(evalObjects) == 0 && m.Storage != nil {
+		if qRes, err := m.Storage.List(m.Ctx, m.SecCtx, m.StorageCtx, storage.ListFilter{Kind: m.ActiveKind}); err == nil && qRes != nil {
+			evalObjects = qRes.Objects
+		}
+	}
+
+	for _, rule := range m.PolicyRules {
+		res := RuleEvaluationResult{
+			RuleID:         rule.ID,
+			Name:           rule.Name,
+			Expression:     rule.Expression,
+			TotalEvaluated: len(evalObjects),
+			Passed:         true,
+		}
+
+		for _, obj := range evalObjects {
+			id, _ := obj[objects.FieldKeyID].(string)
+			matches, err := EvaluateDSLExpression(rule.Expression, obj)
+			if err != nil || !matches {
+				res.ViolationsCount++
+				res.Passed = false
+				if len(res.OffendingIDs) < 5 {
+					res.OffendingIDs = append(res.OffendingIDs, id)
+				}
+			}
+		}
+
+		if res.Passed {
+			res.Summary = fmt.Sprintf("All %d %s objects satisfy rule", len(evalObjects), m.ActiveKind)
+		} else {
+			res.Summary = fmt.Sprintf("%d of %d objects violate rule (offenders: %s)", res.ViolationsCount, len(evalObjects), strings.Join(res.OffendingIDs, ", "))
+		}
+
+		results = append(results, res)
+	}
+	m.DryRunResults = results
+}
+
 func (m *InspectTUIModel) renderPolicyStudioOverlay(width, height int) string {
+	if len(m.PolicyRules) == 0 {
+		m.PolicyRules = DefaultPolicyRulesForKind(m.ActiveKind)
+		m.RefreshPolicyStudioDryRun()
+	}
+
 	reg := objects.GetGlobalFieldRegistry()
 	var registeredFields []string
 	if reg != nil {
@@ -1053,16 +1110,86 @@ func (m *InspectTUIModel) renderPolicyStudioOverlay(width, height int) string {
 	sort.Strings(registeredFields)
 
 	var lines []string
-	lines = append(lines, fmt.Sprintf("Target Kind : %s", color.New(color.FgCyan, color.Bold).Sprint(m.ActiveKind)))
-	lines = append(lines, fmt.Sprintf("Registered Schema Fields : %d fields available for validation DSLs", len(registeredFields)))
-	lines = append(lines, fmt.Sprintf("Fields      : %s", strings.Join(registeredFields, ", ")))
+	headerStr := fmt.Sprintf("Target Kind: %s  │  Available Schema Fields: %d",
+		color.New(color.FgCyan, color.Bold).Sprint(m.ActiveKind),
+		len(registeredFields),
+	)
+	lines = append(lines, headerStr)
 	lines = append(lines, "")
-	lines = append(lines, "── Live Policy Evaluation Rules ──")
-	lines = append(lines, "  • [POL-INTEGRITY-LINEAGE-001] Lineage chain unbroken to milestone  "+tds.Badge("PASS"))
-	lines = append(lines, "  • [POL-CRITERIA-COMPLETION-001] Complete items require criteria satisfied  "+tds.Badge("PASS"))
-	lines = append(lines, "  • [POL-ESTIMATED-EFFORT-001] Planned items have estimated effort set  "+tds.Badge("PASS"))
+
+	lines = append(lines, "── Active Evaluation Rules (Select with [j/k], [c] to Edit Condition, [t] to Test) ──")
+	for i, rule := range m.PolicyRules {
+		cursor := "  "
+		if i == m.ActiveRuleIndex {
+			cursor = "❯ "
+		}
+
+		statusBadge := tds.Badge("PASS")
+		violStr := ""
+		if i < len(m.DryRunResults) {
+			r := m.DryRunResults[i]
+			if !r.Passed {
+				statusBadge = tds.Badge("FAIL")
+				violStr = fmt.Sprintf(" (%d violations)", r.ViolationsCount)
+			}
+		}
+
+		line := fmt.Sprintf("%s[%s] %s  %s%s", cursor, rule.ID, rule.Name, statusBadge, violStr)
+		if i == m.ActiveRuleIndex {
+			line = color.New(color.FgHiWhite, color.Bold).Sprint(line)
+		}
+		lines = append(lines, line)
+		lines = append(lines, fmt.Sprintf("    DSL: %s", color.New(color.FgYellow).Sprint(rule.Expression)))
+	}
 	lines = append(lines, "")
-	lines = append(lines, "Actions: [c] New Condition │ [t] Test Expression │ [s] Save Rule │ [Esc] Close Studio")
+
+	// If DSL Edit Mode is active, render interactive input editor and autocomplete suggestions
+	if m.DSLEditMode {
+		lines = append(lines, "── Live DSL Predicate Editor ──")
+		inputDisplay := fmt.Sprintf("Condition > %s", m.DSLInputBuffer)
+		lines = append(lines, color.New(color.FgGreen, color.Bold).Sprint(inputDisplay)+"█")
+
+		if len(m.DSLSuggestions) > 0 {
+			lines = append(lines, "")
+			lines = append(lines, "Autocomplete Suggestions (Press [Tab] to insert, [↑/↓] to cycle):")
+			var pills []string
+			maxShow := 8
+			if len(m.DSLSuggestions) < maxShow {
+				maxShow = len(m.DSLSuggestions)
+			}
+			for si := 0; si < maxShow; si++ {
+				s := m.DSLSuggestions[si]
+				pillText := fmt.Sprintf("[%s]", s.Token)
+				if si == m.DSLSuggestionIndex {
+					pills = append(pills, color.New(color.BgCyan, color.FgBlack, color.Bold).Sprint(pillText))
+				} else {
+					pills = append(pills, color.New(color.FgCyan).Sprint(pillText))
+				}
+			}
+			if len(m.DSLSuggestions) > maxShow {
+				pills = append(pills, fmt.Sprintf("+%d more", len(m.DSLSuggestions)-maxShow))
+			}
+			lines = append(lines, "  "+strings.Join(pills, " "))
+			if m.DSLSuggestionIndex < len(m.DSLSuggestions) {
+				sel := m.DSLSuggestions[m.DSLSuggestionIndex]
+				lines = append(lines, fmt.Sprintf("  ↳ %s: %s", sel.Token, sel.Description))
+			}
+		}
+		lines = append(lines, "")
+		lines = append(lines, "Actions: [Tab] Complete Token  │  [Enter] Apply Rule  │  [Esc] Cancel Edit")
+	} else {
+		// Dry Run Outcome summary
+		if len(m.DryRunResults) > 0 && m.ActiveRuleIndex < len(m.DryRunResults) {
+			res := m.DryRunResults[m.ActiveRuleIndex]
+			lines = append(lines, "── Dry-Run Verification Summary ──")
+			lines = append(lines, fmt.Sprintf("  • Status      : %s", res.Summary))
+			if len(res.OffendingIDs) > 0 {
+				lines = append(lines, fmt.Sprintf("  • Violations  : %s", strings.Join(res.OffendingIDs, ", ")))
+			}
+			lines = append(lines, "")
+		}
+		lines = append(lines, "Actions: [c] Edit Condition │ [t] Re-run Dry Run │ [j/k] Navigate │ [Esc]/[q] Close Studio")
+	}
 
 	title := fmt.Sprintf("LIVE POLICY RULE STUDIO: %s", strings.ToUpper(m.ActiveKind))
 	return tds.Panel(title, lines, width, tds.BorderHeavy)
@@ -1165,34 +1292,178 @@ func (m *InspectTUIModel) HandleInput(key []byte) bool {
 		return false
 	}
 
-	// 3. Detail Modal or Policy Studio Dismissal
-	if m.DetailModalOpen || m.PolicyStudioOpen {
+	// 2.5 Policy Studio Modal
+	if m.PolicyStudioOpen {
+		if m.DSLEditMode {
+			if len(key) == 1 {
+				switch key[0] {
+				case 27: // Esc: cancel edit mode
+					m.DSLEditMode = false
+					m.DSLSuggestions = nil
+					m.SetStatus("Exited DSL edit mode", 2*time.Second)
+					return false
+				case 13, 10: // Enter: commit condition
+					trimmed := strings.TrimSpace(m.DSLInputBuffer)
+					if trimmed != "" {
+						if m.ActiveRuleIndex < len(m.PolicyRules) {
+							m.PolicyRules[m.ActiveRuleIndex].Expression = trimmed
+						} else {
+							m.PolicyRules = append(m.PolicyRules, PolicyRule{
+								ID:          fmt.Sprintf("POL-CUSTOM-%03d", len(m.PolicyRules)+1),
+								Name:        "Custom Policy Rule",
+								Description: "User-defined DSL verification condition",
+								TargetKind:  m.ActiveKind,
+								Expression:  trimmed,
+								Severity:    "warning",
+							})
+						}
+						m.RefreshPolicyStudioDryRun()
+						m.SetStatus("Applied DSL condition to policy rule", 3*time.Second)
+					}
+					m.DSLEditMode = false
+					m.DSLSuggestions = nil
+					return false
+				case 9: // Tab: insert suggestion
+					if len(m.DSLSuggestions) > 0 {
+						if m.DSLSuggestionIndex >= len(m.DSLSuggestions) {
+							m.DSLSuggestionIndex = 0
+						}
+						token := m.DSLSuggestions[m.DSLSuggestionIndex].Token
+						parts := strings.Fields(m.DSLInputBuffer)
+						if len(parts) > 0 && !strings.HasSuffix(m.DSLInputBuffer, " ") {
+							parts[len(parts)-1] = token
+							m.DSLInputBuffer = strings.Join(parts, " ") + " "
+						} else {
+							m.DSLInputBuffer = strings.TrimSpace(m.DSLInputBuffer + " " + token) + " "
+						}
+						m.DSLSuggestions = SuggestDSLTokens(m.ActiveKind, m.DSLInputBuffer)
+						m.DSLSuggestionIndex = 0
+					}
+					return false
+				case 127, 8: // Backspace
+					if len(m.DSLInputBuffer) > 0 {
+						m.DSLInputBuffer = m.DSLInputBuffer[:len(m.DSLInputBuffer)-1]
+						m.DSLSuggestions = SuggestDSLTokens(m.ActiveKind, m.DSLInputBuffer)
+						m.DSLSuggestionIndex = 0
+					}
+					return false
+				default:
+					if key[0] >= 32 && key[0] <= 126 {
+						m.DSLInputBuffer += string(key[0])
+						m.DSLSuggestions = SuggestDSLTokens(m.ActiveKind, m.DSLInputBuffer)
+						m.DSLSuggestionIndex = 0
+						return false
+					}
+				}
+			} else if len(key) >= 3 && key[0] == 27 && key[1] == '[' {
+				switch key[2] {
+				case 'A': // Up suggestion
+					if len(m.DSLSuggestions) > 0 {
+						if m.DSLSuggestionIndex > 0 {
+							m.DSLSuggestionIndex--
+						} else {
+							m.DSLSuggestionIndex = len(m.DSLSuggestions) - 1
+						}
+					}
+					return false
+				case 'B': // Down suggestion
+					if len(m.DSLSuggestions) > 0 {
+						if m.DSLSuggestionIndex < len(m.DSLSuggestions)-1 {
+							m.DSLSuggestionIndex++
+						} else {
+							m.DSLSuggestionIndex = 0
+						}
+					}
+					return false
+				}
+			}
+			if key[0] == 3 {
+				return true
+			}
+			return false
+		}
+
+		// Navigation Mode within Policy Studio
+		if len(key) == 1 {
+			switch key[0] {
+			case 27, 'q', 'Q':
+				m.PolicyStudioOpen = false
+				m.SetStatus("Closed Policy Studio", 2*time.Second)
+				return false
+			case 'j':
+				if m.ActiveRuleIndex < len(m.PolicyRules)-1 {
+					m.ActiveRuleIndex++
+				}
+				return false
+			case 'k':
+				if m.ActiveRuleIndex > 0 {
+					m.ActiveRuleIndex--
+				}
+				return false
+			case 'c', 'C':
+				m.DSLEditMode = true
+				if m.ActiveRuleIndex < len(m.PolicyRules) {
+					m.DSLInputBuffer = m.PolicyRules[m.ActiveRuleIndex].Expression
+				} else {
+					m.DSLInputBuffer = ""
+				}
+				m.DSLSuggestions = SuggestDSLTokens(m.ActiveKind, m.DSLInputBuffer)
+				m.DSLSuggestionIndex = 0
+				m.SetStatus("DSL Edit Mode: type condition, [Tab] autocomplete, [Enter] apply", 3*time.Second)
+				return false
+			case 't', 'T':
+				m.RefreshPolicyStudioDryRun()
+				m.SetStatus(fmt.Sprintf("Re-evaluated %d policy rules against objects", len(m.PolicyRules)), 3*time.Second)
+				return false
+			}
+		} else if len(key) >= 3 && key[0] == 27 && key[1] == '[' {
+			switch key[2] {
+			case 'A': // Up
+				if m.ActiveRuleIndex > 0 {
+					m.ActiveRuleIndex--
+				}
+				return false
+			case 'B': // Down
+				if m.ActiveRuleIndex < len(m.PolicyRules)-1 {
+					m.ActiveRuleIndex++
+				}
+				return false
+			}
+		}
+		if key[0] == 3 {
+			return true
+		}
+		return false
+	}
+
+	// 3. Detail Modal Dismissal
+	if m.DetailModalOpen {
 		if len(key) == 1 {
 			switch key[0] {
 			case 27, 'q', 'Q':
 				m.DetailModalOpen = false
-				m.PolicyStudioOpen = false
 				return false
 			case 'a', 'A':
-				if m.DetailModalOpen {
-					m.ActionPaletteOpen = true
-					m.ActionIndex = 0
-					return false
-				}
+				m.ActionPaletteOpen = true
+				m.ActionIndex = 0
+				return false
 			case 'e', 'E':
-				if m.DetailModalOpen {
-					m.executeEditObject()
-					return false
-				}
+				m.executeEditObject()
+				return false
 			case 'p', 'P':
 				m.DetailModalOpen = false
 				m.PolicyStudioOpen = true
+				m.PolicyRules = DefaultPolicyRulesForKind(m.ActiveKind)
+				m.ActiveRuleIndex = 0
+				m.DSLEditMode = false
+				m.DSLInputBuffer = ""
+				m.DSLSuggestions = nil
+				m.RefreshPolicyStudioDryRun()
 				return false
 			}
 		}
 		if len(key) >= 3 && key[0] == 27 && key[1] == '[' {
 			m.DetailModalOpen = false
-			m.PolicyStudioOpen = false
 			return false
 		}
 		if key[0] == 3 { // Ctrl+C
@@ -1246,6 +1517,20 @@ func (m *InspectTUIModel) HandleInput(key []byte) bool {
 			m.CycleSort()
 		case 'p', 'P': // Toggle Policy Studio
 			m.PolicyStudioOpen = !m.PolicyStudioOpen
+			if m.PolicyStudioOpen {
+				m.DetailModalOpen = false
+				m.ActionPaletteOpen = false
+				m.PolicyRules = DefaultPolicyRulesForKind(m.ActiveKind)
+				m.ActiveRuleIndex = 0
+				m.DSLEditMode = false
+				m.DSLInputBuffer = ""
+				m.DSLSuggestions = nil
+				m.RefreshPolicyStudioDryRun()
+				m.SetStatus(fmt.Sprintf("Opened Policy Studio for %s", m.ActiveKind), 3*time.Second)
+			} else {
+				m.DSLEditMode = false
+				m.SetStatus("Closed Policy Studio", 2*time.Second)
+			}
 		case 'z', 'Z', '?': // Cycle editor profile: newb -> pro -> jedi
 			m.CycleEditorProfile()
 		case 'r', 'R': // Force refresh
