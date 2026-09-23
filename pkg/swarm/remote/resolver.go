@@ -3,12 +3,12 @@ package remote
 import (
 	"context"
 	"fmt"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/git"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -21,12 +21,7 @@ type Cloner interface {
 type defaultGitCloner struct{}
 
 func (c *defaultGitCloner) Clone(ctx context.Context, cloneURL, destDir string) error {
-	cmd := exec.CommandContext(ctx, "git", "clone", "--depth", "1", cloneURL, destDir)
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		return errfmt.Errorf("git clone failed (%s): %s", err, string(out))
-	}
-	return nil
+	return git.CloneShallow(ctx, cloneURL, destDir)
 }
 
 // IsRemoteTarget checks if a target identifier represents a remote Git repository.
