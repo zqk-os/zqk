@@ -75,6 +75,11 @@ func registerCommands() {
 	objCmd.GroupID = "everyday"
 	rootCmd.AddCommand(objCmd)
 
+	// Top-level inspect command (shortcut for object inspect)
+	inspectCmdInst := object.NewInspectCmd()
+	inspectCmdInst.GroupID = "everyday"
+	rootCmd.AddCommand(inspectCmdInst)
+
 	// System operations group (health, validation, and maintenance)
 	systemCmdInst := system.NewSystemCmd()
 	systemCmdInst.GroupID = "everyday"

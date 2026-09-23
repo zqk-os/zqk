@@ -84,6 +84,7 @@ Examples:
 	add(NewMoveCmd(), objectHelpGroupVerbs)
 	add(NewRenameCmd(), objectHelpGroupVerbs)
 	add(NewCountCmd(), objectHelpGroupVerbs)
+	add(NewInspectCmd(), objectHelpGroupVerbs)
 	add(NewTemplateCmd(), objectHelpGroupVerbs)
 	add(NewObjectRootFieldsCmd(), objectHelpGroupVerbs)
 

@@ -363,7 +363,7 @@ func generateFlagCode(flag FlagSpec) string {
 			defStr = fmt.Sprint(def)
 		}
 		return fmt.Sprintf("AddDurationFlag(%q, %q, %q, %q)", flag.Name, flag.Shorthand, defStr, flag.Description)
-	case "string_array", "stringSlice":
+	case "string_array", "stringArray", "stringSlice", "string_slice":
 		return fmt.Sprintf("AddStringArrayFlag(%q, %q, %q)", flag.Name, flag.Shorthand, flag.Description)
 	default:
 		if def == nil {
