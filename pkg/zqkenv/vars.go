@@ -58,6 +58,7 @@ const _sfxEnableSpecCellIntegrationTests = "ENABLE_SPEC_CELL_INTEGRATION_TESTS"
 const _sfxEnableSpecCellREQ019Validate = "ENABLE_SPEC_CELL_REQ019_VALIDATE"
 const _sfxEnableCASMigrationScenarioTest = "ENABLE_CAS_MIGRATION_SCENARIO_TEST"
 const _sfxEnableCLIScenarioTests = "ENABLE_CLI_SCENARIO_TESTS"
+const _sfxEditorProfile = "EDITOR_PROFILE"
 const _sfxEnableHashRegistryCoordinatorTests = "ENABLE_HASH_REGISTRY_COORDINATOR_TESTS"
 const _sfxEnableMigrateLegacyToStreamIntegrationTest = "ENABLE_MIGRATE_LEGACY_TO_STREAM_INTEGRATION_TEST"
 const _sfxEnableIOQueueShutdownTests = "ENABLE_IOQUEUE_SHUTDOWN_TESTS"
@@ -342,6 +343,10 @@ func EnableCASMigrationScenarioTest() EnvVar {
 
 // EnableCLIScenarioTests returns the environment variable name for ENABLE_CLI_SCENARIO_TESTS (brand-prefixed).
 func EnableCLIScenarioTests() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxEnableCLIScenarioTests)} }
+
+// EditorProfile returns the environment variable name for EDITOR_PROFILE (brand-prefixed).
+// Configures the default experience profile for interactive TUIs: "newb", "pro", "jedi".
+func EditorProfile() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxEditorProfile)} }
 
 // EnableHashRegistryCoordinatorTests returns the environment variable name for ENABLE_HASH_REGISTRY_COORDINATOR_TESTS (brand-prefixed).
 func EnableHashRegistryCoordinatorTests() EnvVar {

@@ -20,6 +20,14 @@ import (
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/tray"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
+)
+
+// Editor profile constants for human experience levels.
+const (
+	ProfileNewb = "newb"
+	ProfilePro  = "pro"
+	ProfileJedi = "jedi"
 )
 
 // Tab identifier constants.
@@ -311,6 +319,9 @@ type UIModel struct {
 	// Dynamic ambient message banner (Line 6, viewable on any tab)
 	DynamicMessage string
 
+	// Human Editor Experience Profile: "newb" (full help/legend/banners), "pro" (compact header/footer), "jedi" (zen mode - full table view)
+	EditorProfile string
+
 	// Inline interactive search filter
 	IsSearching  bool
 	SearchBuffer string
@@ -343,12 +354,64 @@ func NewUIModel(projectRoot string, initialTab string) *UIModel {
 		tab = TabState
 	}
 
+	profile := ProfileNewb
+	if envProfile := zqkenv.EditorProfile().Get(); envProfile != "" {
+		switch strings.ToLower(envProfile) {
+		case ProfilePro:
+			profile = ProfilePro
+		case ProfileJedi:
+			profile = ProfileJedi
+		}
+	}
+
 	return &UIModel{
-		ProjectRoot:  projectRoot,
-		ActiveTab:    tab,
-		AutoScroll:   true,
-		ObjectCounts: make(map[string]int),
-		LastUpdated:  time.Now(),
+		ProjectRoot:   projectRoot,
+		ActiveTab:     tab,
+		AutoScroll:    true,
+		EditorProfile: profile,
+		ObjectCounts:  make(map[string]int),
+		LastUpdated:   time.Now(),
+	}
+}
+
+// CycleEditorProfile toggles the human editor experience level between newb, pro, and jedi.
+func (m *UIModel) CycleEditorProfile() {
+	switch m.EditorProfile {
+	case ProfileNewb, "":
+		m.EditorProfile = ProfilePro
+		m.DynamicMessage = "⚡ Profile switched to: PRO (compact header & footer)"
+	case ProfilePro:
+		m.EditorProfile = ProfileJedi
+		m.DynamicMessage = "⚡ Profile switched to: JEDI (zen mode — maximum data view)"
+	case ProfileJedi:
+		m.EditorProfile = ProfileNewb
+		m.DynamicMessage = "⚡ Profile switched to: NEWB (full header, footer & hints)"
+	default:
+		m.EditorProfile = ProfileNewb
+	}
+}
+
+// SetEditorProfile safely assigns the editor profile to a valid preset.
+func (m *UIModel) SetEditorProfile(profile string) {
+	switch strings.ToLower(profile) {
+	case ProfilePro:
+		m.EditorProfile = ProfilePro
+	case ProfileJedi:
+		m.EditorProfile = ProfileJedi
+	default:
+		m.EditorProfile = ProfileNewb
+	}
+}
+
+// ProfileSpacingBonus returns the vertical row budget bonus gained from compact or collapsed views.
+func (m *UIModel) ProfileSpacingBonus() int {
+	switch m.EditorProfile {
+	case ProfileJedi:
+		return 10
+	case ProfilePro:
+		return 5
+	default:
+		return 0
 	}
 }
 

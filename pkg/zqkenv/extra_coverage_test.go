@@ -131,6 +131,9 @@ func TestExtraCoverage_AllEnvVars(t *testing.T) {
 	if v := EnableCLIScenarioTests().Name(); v == "" {
 		t.Errorf("expected non-empty name for EnableCLIScenarioTests")
 	}
+	if v := EditorProfile().Name(); v == "" {
+		t.Errorf("expected non-empty name for EditorProfile")
+	}
 	if v := EnableHashRegistryCoordinatorTests().Name(); v == "" {
 		t.Errorf("expected non-empty name for EnableHashRegistryCoordinatorTests")
 	}
