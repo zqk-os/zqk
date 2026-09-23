@@ -385,3 +385,84 @@ func TestInspectTUIModel_VimNav_gG_TopBottom(t *testing.T) {
 	model.HandleInput([]byte{'N'})
 	assert.Equal(t, 0, model.SelectedIndex, "N should cycle backward")
 }
+
+func TestInspectTUIModel_EditorProfiles_NewbProJedi(t *testing.T) {
+	mockStorage := &mockInspectStorage{
+		objects: map[string]map[string]any{
+			"BLI-001": {objects.FieldKeyID: "BLI-001", objects.FieldKeyKind: objects.KindBacklogItem, objects.FieldKeyTitle: "Alpha"},
+			"BLI-002": {objects.FieldKeyID: "BLI-002", objects.FieldKeyKind: objects.KindBacklogItem, objects.FieldKeyTitle: "Beta"},
+		},
+	}
+
+	ctx := context.Background()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	storageCtx := pkgctx.NewStorageContext()
+
+	model := NewInspectTUIModel(ctx, objects.KindBacklogItem, nil, nil, "id", true, mockStorage, secCtx, storageCtx)
+	require.NotNil(t, model)
+	assert.Equal(t, "newb", model.EditorProfile)
+
+	// 1. Cycle to Pro
+	model.CycleEditorProfile()
+	assert.Equal(t, "pro", model.EditorProfile)
+	assert.Contains(t, model.StatusMessage, "PRO")
+
+	// 2. Cycle to Jedi
+	model.CycleEditorProfile()
+	assert.Equal(t, "jedi", model.EditorProfile)
+	assert.Contains(t, model.StatusMessage, "JEDI")
+
+	// 3. Cycle to Newb
+	model.CycleEditorProfile()
+	assert.Equal(t, "newb", model.EditorProfile)
+	assert.Contains(t, model.StatusMessage, "NEWB")
+
+	// 4. Test keypresses 'z', 'Z', '?'
+	model.HandleInput([]byte{'z'})
+	assert.Equal(t, "pro", model.EditorProfile)
+
+	model.HandleInput([]byte{'Z'})
+	assert.Equal(t, "jedi", model.EditorProfile)
+
+	model.HandleInput([]byte{'?'})
+	assert.Equal(t, "newb", model.EditorProfile)
+
+	// 5. Test SetEditorProfile
+	model.SetEditorProfile("pro")
+	assert.Equal(t, "pro", model.EditorProfile)
+	model.SetEditorProfile("jedi")
+	assert.Equal(t, "jedi", model.EditorProfile)
+	model.SetEditorProfile("invalid")
+	assert.Equal(t, "newb", model.EditorProfile)
+
+	// 6. Test Render in Newb Mode
+	model.SetEditorProfile("newb")
+	model.Width = 100
+	model.Height = 30
+	renderedNewb := model.Render()
+	assert.Contains(t, renderedNewb, "ZQK OBJECT INSPECTOR")
+	assert.Contains(t, renderedNewb, "INSPECTED OBJECT:")
+	assert.Contains(t, renderedNewb, "Profile (newb)")
+
+	// 7. Test Render in Pro Mode
+	model.SetEditorProfile("pro")
+	renderedPro := model.Render()
+	assert.Contains(t, renderedPro, "[PRO]")
+	assert.Contains(t, renderedPro, "jedi")
+	assert.Contains(t, renderedPro, "INSPECTED OBJECT:")
+
+	// 8. Test Render in Jedi Mode (Zen)
+	model.SetEditorProfile("jedi")
+	renderedJedi := model.Render()
+	assert.NotContains(t, renderedJedi, "ZQK OBJECT INSPECTOR")
+	assert.NotContains(t, renderedJedi, "INSPECTED OBJECT:")
+	assert.NotContains(t, renderedJedi, "Nav:")
+
+	// 9. When searching in Jedi mode, search prompt is visible
+	model.IsSearching = true
+	model.SearchBuffer = "alpha"
+	renderedJediSearch := model.Render()
+	assert.Contains(t, renderedJediSearch, "Search regex/substring:")
+	assert.Contains(t, renderedJediSearch, "alpha")
+}
+
