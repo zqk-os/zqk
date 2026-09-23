@@ -8,7 +8,7 @@ func TestNewRunCommandBuilder(t *testing.T) {
 	if cmd == nil || cmd.Use != "run" {
 		t.Fatalf("NewRunCommandBuilder Use=%v", cmd)
 	}
-	if cmd.Flags().Lookup("package") == nil {
-		t.Fatal("expected --package flag")
+	if cmd.Flags().Lookup("dry-run") == nil {
+		t.Fatal("expected --dry-run flag")
 	}
 }
