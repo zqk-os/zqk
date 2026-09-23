@@ -200,7 +200,7 @@ func renderStateTab(b *strings.Builder, m *UIModel) {
 		sumW = 10
 	}
 
-	b.WriteString(fmt.Sprintf("%-*s │ %-*s │ %-*s │ %s\n",
+	b.WriteString(fmt.Sprintf("  %-*s │ %-*s │ %-*s │ %s\n",
 		timeW, "TIME", eventW, "EVENT", refW, "OBJECT REF", "SUMMARY / DIFF"))
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 
@@ -215,8 +215,9 @@ func renderStateTab(b *strings.Builder, m *UIModel) {
 	if total == 0 {
 		b.WriteString(dim("  [No state mutations recorded in stream buffer yet]\n"))
 	} else {
+		start := 0
 		if m.AutoScroll {
-			start := total - availRows
+			start = total - availRows
 			if start < 0 {
 				start = 0
 			}
@@ -226,14 +227,14 @@ func renderStateTab(b *strings.Builder, m *UIModel) {
 			if end > total {
 				end = total
 			}
-			start := end - availRows
+			start = end - availRows
 			if start < 0 {
 				start = 0
 			}
 			visible = m.Mutations[start:end]
 		}
 
-		for _, mut := range visible {
+		for i, mut := range visible {
 			tStr := "--:--:--"
 			if mut.CreatedAt > 0 {
 				tStr = time.Unix(mut.CreatedAt, 0).Format("15:04:05")
@@ -246,7 +247,13 @@ func renderStateTab(b *strings.Builder, m *UIModel) {
 				summary = mut.ChangeType
 			}
 
-			b.WriteString(fmt.Sprintf("[%s] │ %s │ %s │ %s\n",
+			cursor := "  "
+			if start+i == m.SelectedIndex {
+				cursor = cyanBold("> ")
+			}
+
+			b.WriteString(fmt.Sprintf("%s[%s] │ %s │ %s │ %s\n",
+				cursor,
 				tStr,
 				tds.PadRight(badge, eventW),
 				tds.PadRight(tds.TruncateVisible(ref, refW, "…"), refW),
@@ -314,7 +321,7 @@ func renderAuditTab(b *strings.Builder, m *UIModel) {
 		detailW = 12
 	}
 
-	b.WriteString(fmt.Sprintf("%-*s │ %-*s │ %-*s │ %-*s │ %s\n",
+	b.WriteString(fmt.Sprintf("  %-*s │ %-*s │ %-*s │ %-*s │ %s\n",
 		timeW, "TIME", actorW, "ACTOR", opW, "OPERATION", refW, "OBJECT REF", "DETAILS / PAYLOAD"))
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 
@@ -329,8 +336,9 @@ func renderAuditTab(b *strings.Builder, m *UIModel) {
 	if total == 0 {
 		b.WriteString(dim("  [No audit events recorded in audit stream yet]\n"))
 	} else {
+		start := 0
 		if m.AutoScroll {
-			start := total - availRows
+			start = total - availRows
 			if start < 0 {
 				start = 0
 			}
@@ -340,14 +348,14 @@ func renderAuditTab(b *strings.Builder, m *UIModel) {
 			if end > total {
 				end = total
 			}
-			start := end - availRows
+			start = end - availRows
 			if start < 0 {
 				start = 0
 			}
 			visible = m.AuditEvents[start:end]
 		}
 
-		for _, aud := range visible {
+		for i, aud := range visible {
 			tStr := "--:--:--"
 			if aud.CreatedAt > 0 {
 				tStr = time.Unix(aud.CreatedAt, 0).Format("15:04:05")
@@ -371,7 +379,13 @@ func renderAuditTab(b *strings.Builder, m *UIModel) {
 				detail = "--"
 			}
 
-			b.WriteString(fmt.Sprintf("[%s] │ %s │ %s │ %s │ %s\n",
+			cursor := "  "
+			if start+i == m.SelectedIndex {
+				cursor = cyanBold("> ")
+			}
+
+			b.WriteString(fmt.Sprintf("%s[%s] │ %s │ %s │ %s │ %s\n",
+				cursor,
 				tStr,
 				tds.PadRight(tds.TruncateVisible(act, actorW, "…"), actorW),
 				tds.PadRight(tds.TruncateVisible(op, opW, "…"), opW),
@@ -562,32 +576,49 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 		b.WriteString(blkTable.Render())
 	}
 
-	// 4. Recent Backlog Items Table
+	// 4. Recent Work Units (Backlog Items) Table
 	if len(m.RecentBacklog) > 0 {
 		b.WriteString(tds.SectionDivider("RECENT WORK UNITS (BACKLOG ITEMS)", w))
 		bliTable := tds.NewTable(w).
-			AddColumn("BLI ID", tds.AlignLeft, 14, 0.16).
+			AddColumn("BLI ID", tds.AlignLeft, 16, 0.18).
 			AddColumn("PRIO", tds.AlignCenter, 6, 0.08).
 			AddColumn("STATUS", tds.AlignCenter, 12, 0.14).
 			AddColumn("CLAIMED BY", tds.AlignLeft, 16, 0.20).
-			AddColumn("TITLE", tds.AlignLeft, 25, 0.42)
+			AddColumn("TITLE", tds.AlignLeft, 25, 0.40)
 
-		limit := 1
+		bliLimit := 3
 		if m.Height >= 40 {
-			limit = 2
+			bliLimit = 6
+		} else if m.Height >= 32 {
+			bliLimit = 4
 		}
-		if len(m.RecentBacklog) < limit {
-			limit = len(m.RecentBacklog)
+		if len(m.RecentBacklog) < bliLimit {
+			bliLimit = len(m.RecentBacklog)
 		}
-		for i := 0; i < limit; i++ {
-			item := m.RecentBacklog[i]
+
+		bliStart := 0
+		if m.SelectedIndex < len(m.RecentBacklog) && m.SelectedIndex >= bliLimit {
+			bliStart = m.SelectedIndex - bliLimit + 1
+		}
+		if bliStart+bliLimit > len(m.RecentBacklog) {
+			bliStart = len(m.RecentBacklog) - bliLimit
+		}
+		if bliStart < 0 {
+			bliStart = 0
+		}
+
+		for i := 0; i < bliLimit && (bliStart+i) < len(m.RecentBacklog); i++ {
+			actualIdx := bliStart + i
+			item := m.RecentBacklog[actualIdx]
 			stBadge := item.Status
-			if item.Status == "done" || item.Status == "completed" {
+			if item.Status == "done" || item.Status == "completed" || item.Status == "complete" {
 				stBadge = greenBold(item.Status)
-			} else if item.Status == "in_progress" {
+			} else if item.Status == "in_progress" || item.Status == "active" || item.Status == "executing" {
 				stBadge = yellowBold(item.Status)
 			} else if item.Status == "blocked" {
 				stBadge = redBold(item.Status)
+			} else if item.Status == "originated" || item.Status == "planned" || item.Status == "ready" {
+				stBadge = cyanBold(item.Status)
 			}
 
 			claimed := item.ClaimedBy
@@ -595,8 +626,11 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 				claimed = dim("unassigned")
 			}
 
+			isSelected := (actualIdx == m.SelectedIndex)
+			idCell := tds.RowCursor(isSelected, item.ID)
+
 			bliTable.AddRow(
-				item.ID,
+				idCell,
 				item.Priority,
 				stBadge,
 				claimed,
@@ -615,17 +649,38 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 			AddColumn("CATEGORY", tds.AlignCenter, 14, 0.16).
 			AddColumn("TITLE", tds.AlignLeft, 26, 0.50)
 
-		limit := 1
+		debtLimit := 2
 		if m.Height >= 40 {
-			limit = 2
+			debtLimit = 4
+		} else if m.Height >= 32 {
+			debtLimit = 3
 		}
-		if len(m.TechnicalDebt) < limit {
-			limit = len(m.TechnicalDebt)
+		if len(m.TechnicalDebt) < debtLimit {
+			debtLimit = len(m.TechnicalDebt)
 		}
-		for i := 0; i < limit; i++ {
-			d := m.TechnicalDebt[i]
+
+		debtStart := 0
+		if m.SelectedIndex >= len(m.RecentBacklog) {
+			currDebtIdx := m.SelectedIndex - len(m.RecentBacklog)
+			if currDebtIdx >= debtLimit {
+				debtStart = currDebtIdx - debtLimit + 1
+			}
+		}
+		if debtStart+debtLimit > len(m.TechnicalDebt) {
+			debtStart = len(m.TechnicalDebt) - debtLimit
+		}
+		if debtStart < 0 {
+			debtStart = 0
+		}
+
+		for i := 0; i < debtLimit && (debtStart+i) < len(m.TechnicalDebt); i++ {
+			actualDebtIdx := debtStart + i
+			d := m.TechnicalDebt[actualDebtIdx]
+			isSelected := (len(m.RecentBacklog)+actualDebtIdx == m.SelectedIndex)
+			idCell := tds.RowCursor(isSelected, d.ID)
+
 			debtTable.AddRow(
-				d.ID,
+				idCell,
 				yellowBold(d.Priority),
 				d.Category,
 				d.Title,
@@ -756,13 +811,14 @@ func renderMetricsTab(b *strings.Builder, m *UIModel) {
 	} else if len(m.CommandMetrics) > 0 {
 		b.WriteString(tds.SectionDivider("COMMAND EXECUTION TELEMETRY (command_metric)", w))
 		cmdTable := tds.NewTable(w).
-			AddColumn("COMMAND", tds.AlignLeft, 22, 0.35).
+			AddColumn("COMMAND", tds.AlignLeft, 24, 0.35).
 			AddColumn("CALLS", tds.AlignRight, 8, 0.15).
 			AddColumn("DURATION", tds.AlignRight, 12, 0.20).
 			AddColumn("LAST RUN", tds.AlignCenter, 19, 0.30)
-		for _, cm := range m.CommandMetrics {
+		for i, cm := range m.CommandMetrics {
+			isSelected := (i == m.SelectedIndex)
 			cmdTable.AddRow(
-				cm.CommandName,
+				tds.RowCursor(isSelected, cm.CommandName),
 				fmt.Sprintf("%d", cm.ExecCount),
 				cm.AvgDuration,
 				cm.LastRunAt,
@@ -885,7 +941,7 @@ func renderSchedulerTab(b *strings.Builder, m *UIModel) {
 		visible = m.SchedulerJobs[start:end]
 	}
 
-	for _, job := range visible {
+	for i, job := range visible {
 		stBadge := greenBold(job.Status)
 		if job.Status == "failed" || job.Status == "error" {
 			stBadge = redBold(job.Status)
@@ -893,8 +949,14 @@ func renderSchedulerTab(b *strings.Builder, m *UIModel) {
 			stBadge = yellowBold(job.Status)
 		}
 
+		actualIdx := i
+		if !m.AutoScroll {
+			actualIdx = m.ScrollOffset + i
+		}
+		isSelected := (actualIdx == m.SelectedIndex)
+
 		schedTable.AddRow(
-			job.ID,
+			tds.RowCursor(isSelected, job.ID),
 			job.Schedule,
 			job.LastRunAt,
 			job.NextRunAt,
@@ -943,7 +1005,7 @@ func formatSymbolCounters(counts map[string]int) string {
 	var parts []string
 	for _, m := range mapping {
 		if c, ok := counts[m.kind]; ok && c > 0 {
-			parts = append(parts, fmt.Sprintf("%s %s: %d", m.symbol, m.tag, c))
+			parts = append(parts, fmt.Sprintf("%s%s: %d", tds.IconPad(m.symbol), m.tag, c))
 		}
 	}
 
@@ -1074,10 +1136,7 @@ func renderQATab(b *strings.Builder, m *UIModel) {
 		crStr := fmt.Sprintf("%d/%d ok", tc.CompletedCriteria, tc.TotalCriteria)
 
 		// Indicate row cursor if selected
-		idCell := tc.ID
-		if i == m.SelectedIndex {
-			idCell = reverse(" ▶ " + tc.ID + " ")
-		}
+		idCell := tds.RowCursor(i == m.SelectedIndex, tc.ID)
 
 		tcTable.AddRow(
 			idCell,
@@ -1250,7 +1309,16 @@ func renderHealthTab(b *strings.Builder, m *UIModel) {
 			nameStr := cyanBold(item.Name)
 			stStr := dim(item.JobID)
 			if item.IsTriggered {
-				stStr = greenBold("✓ ENQUEUED")
+				switch item.Status {
+				case "completed", "processed":
+					stStr = greenBold("✓ PROCESSED")
+				case "processing":
+					stStr = yellowBold("⚡ PROCESSING")
+				case "failed":
+					stStr = redBold("✗ FAILED")
+				default:
+					stStr = cyanBold("⏳ ENQUEUED")
+				}
 			}
 			actionLines = append(actionLines, fmt.Sprintf("  %s %-24s %-40s %s", keyBadge, nameStr, item.Description, stStr))
 		}
@@ -1310,10 +1378,7 @@ func renderHealthTab(b *strings.Builder, m *UIModel) {
 			tierStr = cyanBold(tierStr)
 		}
 
-		idCell := v.ObjectID
-		if i == m.SelectedIndex {
-			idCell = reverse(" ▶ " + v.ObjectID + " ")
-		}
+		idCell := tds.RowCursor(i == m.SelectedIndex, v.ObjectID)
 
 		vTable.AddRow(
 			tierStr,

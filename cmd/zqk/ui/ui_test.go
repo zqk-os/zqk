@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"strings"
 	"testing"
 	"time"
 
@@ -8,6 +9,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/zqk-os/zqk/cmd/zqk/state"
 	"github.com/zqk-os/zqk/cmd/zqk/test"
+	"github.com/zqk-os/zqk/cmd/zqk/ui/tds"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestNewUICmd(t *testing.T) {
@@ -450,5 +453,146 @@ func TestRender_HealthTab_ActionCenter(t *testing.T) {
 	// Close modal
 	handleInput(m, []byte{KeyEsc})
 	assert.Nil(t, m.DetailModal)
+}
+
+func TestUIQuirk1_ActionCenterKeyNoCollisionWithVimNav(t *testing.T) {
+	tmpDir := t.TempDir()
+	m := NewUIModel(tmpDir, "health")
+	m.RefreshHealth()
+
+	// Verify WAL maintenance action is mapped to 'm' (not 'k')
+	var walAction *ActionCenterItem
+	for i := range m.ActionItems {
+		if strings.Contains(strings.ToLower(m.ActionItems[i].Name), "wal") {
+			walAction = &m.ActionItems[i]
+			break
+		}
+	}
+	require.NotNil(t, walAction)
+	assert.Equal(t, "m", walAction.Key, "WAL maintenance must be mapped to 'm' to avoid vim nav collision")
+
+	// Verify pressing 'k' does not trigger WAL action
+	m.SelectedIndex = 1
+	handleInput(m, []byte{'k'})
+	assert.False(t, walAction.IsTriggered, "'k' must not trigger WAL maintenance")
+	assert.Equal(t, 0, m.SelectedIndex, "'k' must navigate cursor up")
+
+	// Verify pressing 'm' triggers WAL maintenance
+	handleInput(m, []byte{'m'})
+	assert.True(t, walAction.IsTriggered, "'m' must trigger WAL maintenance")
+	assert.Equal(t, "enqueued", walAction.Status)
+}
+
+func TestUIQuirk2_ActionStatusProgressionBadges(t *testing.T) {
+	m := NewUIModel("", "health")
+	m.Width = 120
+	m.Height = 30
+
+	m.ActionItems = []ActionCenterItem{
+		{Key: "c", Name: "Action One", Description: "Test 1", JobID: "SCH-1", IsTriggered: true, Status: "enqueued"},
+		{Key: "a", Name: "Action Two", Description: "Test 2", JobID: "SCH-2", IsTriggered: true, Status: "processing"},
+		{Key: "w", Name: "Action Three", Description: "Test 3", JobID: "SCH-3", IsTriggered: true, Status: "completed"},
+		{Key: "d", Name: "Action Four", Description: "Test 4", JobID: "SCH-4", IsTriggered: true, Status: "failed"},
+	}
+
+	out := Render(m)
+	assert.Contains(t, out, "ENQUEUED")
+	assert.Contains(t, out, "PROCESSING")
+	assert.Contains(t, out, "PROCESSED")
+	assert.Contains(t, out, "FAILED")
+}
+
+func TestUIQuirk3_IconSpacingAndSmooshing(t *testing.T) {
+	// Wide icons must be detected and padded with 2 spaces
+	assert.True(t, tds.IsWideIcon("⚙️"))
+	assert.True(t, tds.IsWideIcon("⚠️"))
+	assert.True(t, tds.IsWideIcon("🛡️"))
+	assert.True(t, tds.IsWideIcon("⏱️"))
+	assert.True(t, tds.IsWideIcon("📦"))
+
+	assert.Equal(t, "⚙️  ", tds.IconPad("⚙️"))
+	assert.Equal(t, "⚠️  ", tds.IconPad("⚠️"))
+
+	// Compact symbols get 1 space
+	assert.False(t, tds.IsWideIcon("✓"))
+	assert.False(t, tds.IsWideIcon("✗"))
+	assert.Equal(t, "✓ ", tds.IconPad("✓"))
+
+	// tds.Badge with WARN must include 2 spaces after warning triangle
+	warnBadge := tds.Badge("WARN")
+	assert.Contains(t, warnBadge, "⚠️  WARN")
+}
+
+func TestUIQuirk4_RowCursorVisibleAcrossAllTabs(t *testing.T) {
+	m := NewUIModel("", "pm")
+	m.Width = 100
+	m.Height = 35
+
+	// Tab 4: PM
+	m.RecentBacklog = []PMBacklogRow{
+		{ID: "BLI-101", Title: "Task 1", Status: "planned", Priority: "P1"},
+		{ID: "BLI-102", Title: "Task 2", Status: "in_progress", Priority: "P0"},
+	}
+	m.TechnicalDebt = []PMDebtRow{
+		{ID: "DEBT-101", Title: "Debt 1", Priority: "high", Category: "security", Status: "active"},
+	}
+
+	m.SelectedIndex = 0
+	outPM := Render(m)
+	assert.Contains(t, outPM, "> BLI-101")
+
+	// Tab 5: Metrics
+	m.ActiveTab = TabMetrics
+	m.CommandMetrics = []CommandMetricRow{
+		{CommandName: "zqk test run", ExecCount: 12, AvgDuration: "120ms", LastRunAt: "10:00", Status: "pass"},
+	}
+	m.SelectedIndex = 0
+	outMetrics := Render(m)
+	assert.Contains(t, outMetrics, "> zqk test run")
+
+	// Tab 6: Scheduler
+	m.ActiveTab = TabScheduler
+	m.SchedulerJobs = []SchedulerJobRow{
+		{ID: "SCH-job-01", Schedule: "*/5 * * * *", LastRunAt: "10:00", NextRunAt: "10:05", Status: "active"},
+	}
+	m.SelectedIndex = 0
+	outSched := Render(m)
+	assert.Contains(t, outSched, "> SCH-job-01")
+
+	// Tab 7: QA
+	m.ActiveTab = TabQA
+	m.TestCases = []*test.TestCaseModel{
+		{ID: "TC-001", Title: "Unit Test", Status: "complete", TotalCriteria: 1, CompletedCriteria: 1},
+	}
+	m.SelectedIndex = 0
+	outQA := Render(m)
+	assert.Contains(t, outQA, "> TC-001")
+}
+
+func TestUIQuirk5_PMTabSyncAndTechDebtBounds(t *testing.T) {
+	m := NewUIModel("", "pm")
+	m.Width = 100
+	m.Height = 35
+
+	// Populate backlog items with complete and originated statuses
+	blis := []PMBacklogRow{
+		{ID: "BLI-001", Title: "Originated BLI", Status: "originated", Priority: "P1", ClaimedBy: "agent-1"},
+		{ID: "BLI-002", Title: "Completed BLI", Status: "complete", Priority: "P0", ClaimedBy: "agent-2"},
+	}
+	m.RecentBacklog = blis
+	m.TechnicalDebt = []PMDebtRow{
+		{ID: "DEBT-501", Title: "Resolve WAL tail latency", Priority: "high", Category: "storage", Status: "active"},
+	}
+
+	// 1. Row count must include both BLIs and Tech Debt
+	assert.Equal(t, 3, m.GetCurrentRowCount())
+
+	// 2. Select index pointing to Technical Debt item (index 2)
+	m.SelectedIndex = 2
+	m.OpenSelectedItemDetail()
+	require.NotNil(t, m.DetailModal)
+	assert.Equal(t, objects.KindTechnicalDebt, m.DetailModal.Kind)
+	assert.Equal(t, "DEBT-501", m.DetailModal.ID)
+	assert.Equal(t, "Resolve WAL tail latency", m.DetailModal.Title)
 }
 

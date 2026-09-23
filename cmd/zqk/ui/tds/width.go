@@ -115,3 +115,45 @@ func TruncateVisible(s string, maxWidth int, tail string) string {
 	b.WriteString(tail)
 	return b.String()
 }
+
+// IsWideIcon returns true if the symbol contains emoji or pictographic runes
+// that terminal emulators commonly render with a wide bounding box or 2 character cells.
+func IsWideIcon(symbol string) bool {
+	for _, r := range symbol {
+		// Variation selector 16 (emoji presentation)
+		if r == 0xfe0f {
+			return true
+		}
+		// Emoji & Symbols ranges:
+		// Miscellaneous Technical (0x2300-0x23FF) e.g. ⏱ (0x23F1)
+		// Miscellaneous Symbols (0x2600-0x26FF) e.g. ⚙ (0x2699), ⚠️ (0x26A0)
+		// Supplemental Symbols and Pictographs / Emoji (0x1F000-0x1FAFF) e.g. 🛡 (0x1F6E1), 📦, 🤖, etc.
+		if (r >= 0x2300 && r <= 0x23ff) ||
+			(r >= 0x2600 && r <= 0x27bf && r != 0x2713 && r != 0x2717 && r != 0x2794) ||
+			(r >= 0x1f000 && r <= 0x1faff) {
+			return true
+		}
+	}
+	return false
+}
+
+// IconPad inspects the symbol and returns it with terminal-safe trailing whitespace.
+// Wide icons receive 2 trailing spaces to prevent text smooshing in modern terminals,
+// while compact symbols receive 1 space.
+func IconPad(symbol string) string {
+	if symbol == "" {
+		return ""
+	}
+	if IsWideIcon(symbol) {
+		return symbol + "  "
+	}
+	return symbol + " "
+}
+
+// Icon renders a symbol and label with consistent terminal-safe spacing.
+func Icon(symbol, label string) string {
+	if symbol == "" {
+		return label
+	}
+	return IconPad(symbol) + label
+}

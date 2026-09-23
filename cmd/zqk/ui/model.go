@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -55,11 +56,13 @@ type HealthViolationRow struct {
 
 // ActionCenterItem represents a triggerable action shortcut backed by the tray and scheduler.
 type ActionCenterItem struct {
-	Key         string `json:"key"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	JobID       string `json:"job_id"`
-	IsTriggered bool   `json:"is_triggered"`
+	Key         string    `json:"key"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	JobID       string    `json:"job_id"`
+	IsTriggered bool      `json:"is_triggered"`
+	Status      string    `json:"status,omitempty"` // "idle", "enqueued", "processing", "completed", "failed"
+	TriggeredAt time.Time `json:"triggered_at,omitempty"`
 }
 
 // HealthSummary captures system integrity and hygiene indicators.
@@ -494,18 +497,21 @@ func (m *UIModel) RefreshPM(ctx context.Context, sp storage.ObjectStorageProvide
 			switch st {
 			case "draft":
 				summary.Draft++
-			case "planned", "ready":
+			case "planned", "ready", "originated":
 				summary.Planned++
-			case "in_progress", "active":
+			case "in_progress", "inprog", "active", "claimed", "executing":
 				summary.InProgress++
 			case "blocked":
 				summary.Blocked++
-			case "completed":
-				summary.Completed++
-			case "done":
+			case "complete", "completed", "done", "approved", "closed":
 				summary.Done++
-			case "approved":
-				summary.Approved++
+				summary.Completed++
+			default:
+				if claimed != "" && claimed != "<nil>" {
+					summary.InProgress++
+				} else {
+					summary.Planned++
+				}
 			}
 
 			prio := fmt.Sprintf("%v", b["priority_tier"])
@@ -526,7 +532,30 @@ func (m *UIModel) RefreshPM(ctx context.Context, sp storage.ObjectStorageProvide
 			})
 		}
 
-		sort.Slice(recent, func(i, j int) bool { return recent[i].ID < recent[j].ID })
+		statusRank := func(s string) int {
+			switch s {
+			case "in_progress", "inprog", "active", "claimed", "executing":
+				return 0
+			case "planned", "ready", "originated":
+				return 1
+			case "blocked":
+				return 2
+			case "draft":
+				return 3
+			case "complete", "completed", "done", "approved", "closed":
+				return 4
+			default:
+				return 5
+			}
+		}
+
+		sort.Slice(recent, func(i, j int) bool {
+			ri, rj := statusRank(recent[i].Status), statusRank(recent[j].Status)
+			if ri != rj {
+				return ri < rj
+			}
+			return recent[i].ID > recent[j].ID
+		})
 		m.BacklogSummary = summary
 		m.RecentBacklog = recent
 	}
@@ -842,7 +871,7 @@ func (m *UIModel) RefreshHealth() {
 	// 1. Initialize Action Center items from Tray manifest + native scheduler bindings
 	if len(m.ActionItems) == 0 {
 		trayEntries, _ := tray.Load(m.ProjectRoot)
-		keyMap := []string{"c", "a", "w", "d", "p", "k", "s", "b"}
+		keyMap := []string{"c", "a", "w", "d", "p", "m", "s", "b"}
 		keyIdx := 0
 
 		// Priority well-known actions
@@ -891,6 +920,76 @@ func (m *UIModel) RefreshHealth() {
 			keyIdx++
 		}
 		m.ActionItems = items
+	}
+
+	// 1b. Update live status of triggered Action Center items
+	for i := range m.ActionItems {
+		item := &m.ActionItems[i]
+		if !item.IsTriggered {
+			continue
+		}
+
+		// Check if still in trigger queue
+		inQueue := false
+		tq := schedulerpkg.NewJobTriggerQueue(m.ProjectRoot)
+		if pending, pErr := tq.PeekTriggerRequests(); pErr == nil {
+			for _, pr := range pending {
+				if pr.JobID == item.JobID {
+					inQueue = true
+					break
+				}
+			}
+		}
+
+		if inQueue {
+			item.Status = "enqueued"
+			continue
+		}
+
+		// Dequeued by scheduler — inspect scheduler diagnostics log for outcome
+		statusFound := false
+		diagPath := filepath.Join(m.ProjectRoot, paths.ProjectDataDir, paths.SchedulerDir, "diagnostics.jsonl")
+		if data, dErr := os.ReadFile(diagPath); dErr == nil && len(data) > 0 {
+			scanData := data
+			if len(scanData) > 65536 {
+				scanData = scanData[len(scanData)-65536:]
+			}
+			lines := strings.Split(string(scanData), "\n")
+			for j := len(lines) - 1; j >= 0; j-- {
+				line := strings.TrimSpace(lines[j])
+				if line == "" || !strings.Contains(line, item.JobID) {
+					continue
+				}
+				var ev struct {
+					Status    string `json:"status"`
+					EventType string `json:"event_type"`
+					JobID     string `json:"job_id"`
+				}
+				if json.Unmarshal([]byte(line), &ev) == nil && ev.JobID == item.JobID {
+					if ev.Status == "completed" || ev.EventType == "scheduler_job_completed" {
+						item.Status = "completed"
+						statusFound = true
+						break
+					} else if ev.Status == "failed" || ev.EventType == "scheduler_job_failed" {
+						item.Status = "failed"
+						statusFound = true
+						break
+					} else if ev.Status == "started" || ev.EventType == "scheduler_job_started" || ev.EventType == "trigger_queue_processing" {
+						item.Status = "processing"
+						statusFound = true
+						break
+					}
+				}
+			}
+		}
+
+		if !statusFound {
+			if !item.TriggeredAt.IsZero() && time.Since(item.TriggeredAt) < 3*time.Second {
+				item.Status = "processing"
+			} else {
+				item.Status = "completed"
+			}
+		}
 	}
 
 	// 2. Read validation_cache.json snapshot (< 3ms, zero validation overhead)
@@ -1053,6 +1152,8 @@ func (m *UIModel) TriggerActionCenter(key string) bool {
 	}
 
 	target.IsTriggered = true
+	target.Status = "enqueued"
+	target.TriggeredAt = time.Now()
 	m.DynamicMessage = fmt.Sprintf("⚡ Enqueued [%s] to scheduler trigger queue (%s)", target.Name, target.JobID)
 	return true
 }
@@ -1065,7 +1166,7 @@ func (m *UIModel) GetCurrentRowCount() int {
 	case TabAudit:
 		return len(m.AuditEvents)
 	case TabPM:
-		return len(m.RecentBacklog)
+		return len(m.RecentBacklog) + len(m.TechnicalDebt)
 	case TabMetrics:
 		return len(m.CommandMetrics)
 	case TabScheduler:
@@ -1176,6 +1277,21 @@ func (m *UIModel) OpenSelectedItemDetail() {
 				Actor:   claimed,
 				Details: details,
 				Lineage: lineage,
+			}
+		} else if debtIdx := idx - len(m.RecentBacklog); debtIdx < len(m.TechnicalDebt) {
+			debt := m.TechnicalDebt[debtIdx]
+			details := []string{
+				fmt.Sprintf("Debt ID       : %s", debt.ID),
+				fmt.Sprintf("Category      : %s", debt.Category),
+				fmt.Sprintf("Priority      : %s", debt.Priority),
+				fmt.Sprintf("Workflow State: %s", debt.Status),
+			}
+			m.DetailModal = &ItemDetailModel{
+				Kind:    objects.KindTechnicalDebt,
+				ID:      debt.ID,
+				Status:  debt.Status,
+				Title:   debt.Title,
+				Details: details,
 			}
 		}
 

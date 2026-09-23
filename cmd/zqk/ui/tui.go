@@ -267,7 +267,7 @@ func handleInput(m *UIModel, key []byte) bool {
 			m.RefreshObjects()
 			m.RefreshQA(context.Background(), nil, nil)
 			m.RefreshHealth()
-		case 'c', 'C', 'a', 'A', 'w', 'W', 'd', 'D', 'p', 'P': // Action Center triggers (Tab 8)
+		case 'c', 'C', 'a', 'A', 'w', 'W', 'd', 'D', 'p', 'P', 'm', 'M', 's', 'S', 'b', 'B': // Action Center triggers (Tab 8)
 			if m.ActiveTab == TabHealth {
 				m.TriggerActionCenter(string(key[0]))
 			}
