@@ -10,6 +10,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/swarm/pack"
+	"github.com/zqk-os/zqk/pkg/swarm/remote"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -39,15 +40,18 @@ func runSwarmPackage(cmd *cobra.Command, targetPath string, dryRun bool, entrypo
 	logger := logging.GetLoggerFromContext(cmd.Context())
 
 	manifestPath := targetPath
-	if st, err := fileutil.Stat(targetPath); err == nil && st.IsDir() {
+	if remote.IsRemoteTarget(targetPath) {
+		logging.FluentEvent(logger).Info(fmt.Sprintf("Resolving remote swarm package from %s", targetPath)).Log()
+		resolved, err := remote.Resolve(cmd.Context(), targetPath, remote.ResolveOptions{})
+		if err != nil {
+			return errfmt.Newf("failed to resolve remote swarm %s", targetPath).Wrap(err)
+		}
+		manifestPath = resolved
+	} else if st, err := fileutil.Stat(targetPath); err == nil && st.IsDir() {
 		manifestPath = filepath.Join(targetPath, "swarm.yaml")
 	}
 
 	if !fileutil.Exists(manifestPath) {
-		// If path doesn't exist locally, check if it's a remote git repo identifier
-		if strings.Contains(targetPath, "/") && !strings.HasPrefix(targetPath, ".") && !strings.HasPrefix(targetPath, "/") {
-			return errfmt.Errorf("decentralized remote package %q: remote git cloning requires git credentials or local checkout at ./%s", targetPath, filepath.Base(targetPath))
-		}
 		return errfmt.Errorf("swarm package manifest not found: %s", manifestPath)
 	}
 

@@ -16,10 +16,12 @@ func NewStateStreamCommandBuilder() *cobra.Command {
 	help.WithDescriptionLines("Stream real-time change journal mutations and audit events from the knowledge kernel.")
 	help.AddExample("View recent change journal stream", "zqk state stream")
 	help.AddExample("Continuously follow live mutations", "zqk state stream -w")
+	help.AddExample("Render terminal visual seismograph dashboard", "zqk state stream --dashboard")
 	builder.WithHelpBuilder(help)
 	builder.WithArgs(cobra.NoArgs)
 	builder.AddBoolFlag("follow", "w", false, "Stream new events continuously as they occur")
 	builder.AddIntFlag("limit", "n", 20, "Maximum number of recent mutations to display")
+	builder.AddBoolFlag("dashboard", "d", false, "Display an interactive ANSI visual seismograph dashboard")
 	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
 	cmd := builder.Build()
 	return cmd
