@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://zqk.dev/schemas/swarm_package_spec.schema.json",
+  "title": "ZQK Portable Swarm Package Specification Schema",
+  "description": "Schema for portable, decentralized agent swarm package manifests (swarm.yaml).",
+  "type": "object",
+  "required": ["name", "version", "description", "agents"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Reference to this schema file"
+    },
+    "name": {
+      "type": "string",
+      "description": "Unique swarm package name (e.g. expert-refactor-swarm)"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Package version (semantic versioning)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of the swarm's role and capabilities"
+    },
+    "author": {
+      "type": "string",
+      "description": "Author or publisher identifier"
+    },
+    "license": {
+      "type": "string",
+      "description": "Software license identifier (e.g. Apache-2.0, MIT)"
+    },
+    "entrypoint": {
+      "type": "string",
+      "description": "Initial task, workflow, or priority plan to execute upon launch"
+    },
+    "membranes": {
+      "type": "array",
+      "description": "Custom membrane boundaries and path constraints for the swarm",
+      "items": {
+        "type": "object",
+        "required": ["path", "mode"],
+        "properties": {
+          "path": { "type": "string" },
+          "mode": { "type": "string", "enum": ["read_only", "disallow", "audit_log"] }
+        }
+      }
+    },
+    "agents": {
+      "type": "array",
+      "description": "Agent definitions configured within this swarm",
+      "items": {
+        "type": "object",
+        "required": ["name", "role"],
+        "properties": {
+          "name": { "type": "string" },
+          "role": { "type": "string" },
+          "skills": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "system_prompt": { "type": "string" }
+        }
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "description": "Declarative task templates for the swarm execution pipeline",
+      "items": {
+        "type": "object",
+        "required": ["id", "title"],
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "role": { "type": "string" },
+          "depends_on": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}
