@@ -2,13 +2,18 @@ package object
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
+	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/cmd/zqk/ui/tds"
 	"github.com/zqk-os/zqk/internal/cli"
@@ -23,16 +28,37 @@ import (
 // SemanticAgentProjection is the high-signal, token-efficient projection
 // designed for autonomous agent decision loops (SPEC-OBJECT-INSPECTOR-CONSOLE-001 §6.2).
 type SemanticAgentProjection struct {
-	Kind             string                  `json:"kind" yaml:"kind"`
-	ID               string                  `json:"id" yaml:"id"`
-	Status           string                  `json:"status,omitempty" yaml:"status,omitempty"`
-	Priority         string                  `json:"priority,omitempty" yaml:"priority,omitempty"`
-	Title            string                  `json:"title,omitempty" yaml:"title,omitempty"`
-	ClaimedBy        string                  `json:"claimed_by,omitempty" yaml:"claimed_by,omitempty"`
-	Lineage          *LineageRadarProjection `json:"lineage,omitempty" yaml:"lineage,omitempty"`
-	CriteriaSummary  *CriteriaSummary        `json:"criteria_summary,omitempty" yaml:"criteria_summary,omitempty"`
-	ActionsAvailable []string                `json:"actions_available,omitempty" yaml:"actions_available,omitempty"`
-	RawFields        map[string]any          `json:"raw_fields,omitempty" yaml:"raw_fields,omitempty"`
+	Kind             string                    `json:"kind" yaml:"kind"`
+	ID               string                    `json:"id" yaml:"id"`
+	Status           string                    `json:"status,omitempty" yaml:"status,omitempty"`
+	Priority         string                    `json:"priority,omitempty" yaml:"priority,omitempty"`
+	Title            string                    `json:"title,omitempty" yaml:"title,omitempty"`
+	ClaimedBy        string                    `json:"claimed_by,omitempty" yaml:"claimed_by,omitempty"`
+	StorageProfile   *StorageProfileProjection `json:"storage_profile,omitempty" yaml:"storage_profile,omitempty"`
+	Ontology         *OntologyProjection       `json:"ontology,omitempty" yaml:"ontology,omitempty"`
+	Lineage          *LineageRadarProjection   `json:"lineage,omitempty" yaml:"lineage,omitempty"`
+	CriteriaSummary  *CriteriaSummary          `json:"criteria_summary,omitempty" yaml:"criteria_summary,omitempty"`
+	ActionsAvailable []string                  `json:"actions_available,omitempty" yaml:"actions_available,omitempty"`
+	RawFields        map[string]any            `json:"raw_fields,omitempty" yaml:"raw_fields,omitempty"`
+}
+
+// StorageProfileProjection conveys physical and logical CAS storage parameters.
+type StorageProfileProjection struct {
+	CASHash      string `json:"cas_hash,omitempty" yaml:"cas_hash,omitempty"`
+	StoragePlane string `json:"storage_plane,omitempty" yaml:"storage_plane,omitempty"` // "cas", "draft_plane", "stream_buffer"
+	ByteSize     int64  `json:"byte_size" yaml:"byte_size"`
+	Permissions  string `json:"permissions,omitempty" yaml:"permissions,omitempty"`
+	LastModified string `json:"last_modified,omitempty" yaml:"last_modified,omitempty"`
+	FilePath     string `json:"file_path,omitempty" yaml:"file_path,omitempty"`
+}
+
+// OntologyProjection conveys schema traits, namespace isolation, and field registry data.
+type OntologyProjection struct {
+	Namespace             string   `json:"namespace,omitempty" yaml:"namespace,omitempty"`
+	VersionContext        string   `json:"version_context,omitempty" yaml:"version_context,omitempty"`
+	StorageProfile        string   `json:"storage_profile,omitempty" yaml:"storage_profile,omitempty"`
+	Traits                []string `json:"traits,omitempty" yaml:"traits,omitempty"`
+	RegisteredFieldsCount int      `json:"registered_fields_count" yaml:"registered_fields_count"`
 }
 
 // LineageRadarProjection conveys the vertical traceability hierarchy of an object.
@@ -229,6 +255,33 @@ func inspectSingleObject(cmd *cobra.Command, kind, id string, fields []string, s
 
 	if proj.Title != "" {
 		lines = append(lines, fmt.Sprintf("Title: %s", proj.Title))
+		lines = append(lines, "")
+	}
+
+	if proj.StorageProfile != nil {
+		lines = append(lines, "── CAS Storage & Data-Cell Profile ──")
+		hashDisplay := proj.StorageProfile.CASHash
+		if len(hashDisplay) > 28 {
+			hashDisplay = hashDisplay[:12] + "…" + hashDisplay[len(hashDisplay)-10:]
+		}
+		lines = append(lines, fmt.Sprintf("  Storage Plane: %s  │ CAS Hash: %s",
+			tds.Badge(proj.StorageProfile.StoragePlane), hashDisplay))
+		lines = append(lines, fmt.Sprintf("  Content Size:  %d bytes  │ Mode: %s  │ Modified: %s",
+			proj.StorageProfile.ByteSize, proj.StorageProfile.Permissions, proj.StorageProfile.LastModified))
+		if proj.StorageProfile.FilePath != "" {
+			lines = append(lines, fmt.Sprintf("  File Path:     %s", proj.StorageProfile.FilePath))
+		}
+		lines = append(lines, "")
+	}
+
+	if proj.Ontology != nil {
+		lines = append(lines, "── Ontology & Schema Profile ──")
+		lines = append(lines, fmt.Sprintf("  Namespace:     %s  │ Version: %s  │ Storage: %s",
+			proj.Ontology.Namespace, proj.Ontology.VersionContext, proj.Ontology.StorageProfile))
+		lines = append(lines, fmt.Sprintf("  Field Count:   %d registered schema fields", proj.Ontology.RegisteredFieldsCount))
+		if len(proj.Ontology.Traits) > 0 {
+			lines = append(lines, fmt.Sprintf("  Traits:        [%s]", strings.Join(proj.Ontology.Traits, ", ")))
+		}
 		lines = append(lines, "")
 	}
 
@@ -471,6 +524,8 @@ func buildSemanticProjection(ctx context.Context, sp storage.ObjectStorageProvid
 	lineage := extractLineageRadar(obj)
 	critSummary := extractCriteriaSummary(ctx, sp, secCtx, obj)
 	actions := determineAvailableActions(kind, status, claimedBy)
+	storageProf := extractStorageProfile(sp, id, kind, obj)
+	ontologyProf := extractOntologyProjection(obj, kind)
 
 	var rawSelected map[string]any
 	if len(requestedFields) > 0 {
@@ -490,10 +545,130 @@ func buildSemanticProjection(ctx context.Context, sp storage.ObjectStorageProvid
 		Priority:         priority,
 		Title:            title,
 		ClaimedBy:        claimedBy,
+		StorageProfile:   storageProf,
+		Ontology:         ontologyProf,
 		Lineage:          lineage,
 		CriteriaSummary:  critSummary,
 		ActionsAvailable: actions,
 		RawFields:        rawSelected,
+	}
+}
+
+func extractStorageProfile(sp storage.ObjectStorageProvider, id, kind string, obj map[string]any) *StorageProfileProjection {
+	var filePath string
+	if fos, ok := sp.(interface {
+		GetFilePathForObject(id, kind string) (string, error)
+	}); ok {
+		if p, err := fos.GetFilePathForObject(id, kind); err == nil {
+			filePath = p
+		}
+	}
+
+	storagePlane := "cas"
+	var byteSize int64
+	var permissions string
+	var lastModified string
+	var casHash string
+
+	if filePath != "" {
+		if fi, err := os.Stat(filePath); err == nil {
+			byteSize = fi.Size()
+			permissions = fi.Mode().String()
+			lastModified = fi.ModTime().UTC().Format(time.RFC3339)
+			base := filepath.Base(filePath)
+			if strings.HasSuffix(base, ".yaml") {
+				stem := strings.TrimSuffix(base, ".yaml")
+				if len(stem) == 64 {
+					casHash = stem
+				}
+			}
+			if strings.Contains(filePath, ".object_drafts") {
+				storagePlane = "draft_plane"
+			} else if strings.Contains(filePath, "stream") {
+				storagePlane = "stream_buffer"
+			}
+		}
+	}
+
+	if lastModified == "" {
+		if upd, ok := obj["updated_at"].(string); ok && upd != "" {
+			lastModified = upd
+		} else if cr, ok := obj["created_at"].(string); ok && cr != "" {
+			lastModified = cr
+		}
+	}
+
+	if byteSize == 0 && obj != nil {
+		if d, err := yaml.Marshal(obj); err == nil {
+			byteSize = int64(len(d))
+			if casHash == "" {
+				h := sha256.Sum256(d)
+				casHash = hex.EncodeToString(h[:])
+			}
+		}
+	}
+
+	if permissions == "" {
+		permissions = "-rw-r--r--"
+	}
+
+	return &StorageProfileProjection{
+		CASHash:      casHash,
+		StoragePlane: storagePlane,
+		ByteSize:     byteSize,
+		Permissions:  permissions,
+		LastModified: lastModified,
+		FilePath:     filePath,
+	}
+}
+
+func extractOntologyProjection(obj map[string]any, kind string) *OntologyProjection {
+	var namespace string
+	if ns, ok := obj["namespace_id"].(string); ok && ns != "" {
+		namespace = ns
+	}
+	versionCtx := "default"
+	if vc, ok := obj["version_context"].(string); ok && vc != "" {
+		versionCtx = vc
+	}
+
+	var traits []string
+	storageProfile := "cas_entity"
+	sl := objects.NewSpecLoader("")
+	if spec, err := sl.LoadSpec(kind); err == nil && spec != nil {
+		if namespace == "" && spec.Namespace != "" {
+			namespace = spec.Namespace
+		}
+		if spec.StorageProfile != "" {
+			storageProfile = spec.StorageProfile
+		}
+		if len(spec.ResolvedTraits) > 0 {
+			traits = spec.ResolvedTraits
+		} else if len(spec.Traits) > 0 {
+			traits = spec.Traits
+		}
+	}
+	if len(traits) == 0 {
+		traits = []string{"HasMetadata", "HasLifecycle", "HasAudit"}
+	}
+	if namespace == "" {
+		namespace = "zqk:kernel"
+	}
+
+	fieldCount := 0
+	reg := objects.GetGlobalFieldRegistry()
+	if reg != nil {
+		if kf, err := reg.GetFieldsForKind(kind); err == nil && kf != nil {
+			fieldCount = len(kf.AllFields)
+		}
+	}
+
+	return &OntologyProjection{
+		Namespace:             namespace,
+		VersionContext:        versionCtx,
+		StorageProfile:        storageProfile,
+		Traits:                traits,
+		RegisteredFieldsCount: fieldCount,
 	}
 }
 

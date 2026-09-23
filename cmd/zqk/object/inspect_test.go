@@ -208,6 +208,20 @@ func (m *mockInspectStorage) Read(ctx context.Context, secCtx *pkgctx.SecurityCo
 	return nil, nil
 }
 
+func (m *mockInspectStorage) Update(ctx context.Context, secCtx *pkgctx.SecurityContext, id string, updates map[string]any) error {
+	if obj, ok := m.objects[id]; ok {
+		for k, v := range updates {
+			obj[k] = v
+		}
+	}
+	return nil
+}
+
+func (m *mockInspectStorage) Delete(ctx context.Context, secCtx *pkgctx.SecurityContext, id string, force bool) error {
+	delete(m.objects, id)
+	return nil
+}
+
 func (m *mockInspectStorage) List(ctx context.Context, secCtx *pkgctx.SecurityContext, storageCtx *storage.StorageContext, filter storage.ListFilter) (*storage.QueryResult, error) {
 	var list []map[string]any
 	for _, o := range m.objects {
@@ -465,4 +479,146 @@ func TestInspectTUIModel_EditorProfiles_NewbProJedi(t *testing.T) {
 	assert.Contains(t, renderedJediSearch, "Search regex/substring:")
 	assert.Contains(t, renderedJediSearch, "alpha")
 }
+
+func TestInspect_ModularCards_StorageAndOntology(t *testing.T) {
+	mockStorage := &mockInspectStorage{
+		objects: map[string]map[string]any{
+			"BLI-CARDS-001": {
+				objects.FieldKeyID:       "BLI-CARDS-001",
+				objects.FieldKeyKind:     objects.KindBacklogItem,
+				objects.FieldKeyTitle:    "Display Cards Test",
+				objects.FieldKeyStatus:   "originated",
+				objects.FieldKeyPriority: "P1",
+				"claimed_by":             "agent-test",
+				"namespace_id":           "zqk:kernel",
+				"version_context":        "v2.0.0",
+				"requirement_ref":        "REQ-001",
+				"milestone_ref":          "MIL-001",
+				"criteria_refs":          []string{"CRIT-001"},
+				"updated_at":             "2026-09-23T14:00:00Z",
+			},
+			"CRIT-001": {
+				objects.FieldKeyID:     "CRIT-001",
+				objects.FieldKeyKind:   objects.KindCriteria,
+				objects.FieldKeyStatus: "satisfied",
+			},
+		},
+	}
+
+	ctx := context.Background()
+	secCtx := pkgctx.NewSystemSecurityContext()
+
+	// 1. Test buildSemanticProjection
+	rawObj, err := mockStorage.Read(ctx, secCtx, "BLI-CARDS-001")
+	require.NoError(t, err)
+	proj := buildSemanticProjection(ctx, mockStorage, secCtx, rawObj, objects.KindBacklogItem, nil)
+
+	// Verify StorageProfile
+	require.NotNil(t, proj.StorageProfile)
+	assert.NotEmpty(t, proj.StorageProfile.CASHash)
+	assert.NotEmpty(t, proj.StorageProfile.StoragePlane)
+	assert.True(t, proj.StorageProfile.ByteSize > 0)
+	assert.NotEmpty(t, proj.StorageProfile.Permissions)
+	assert.Equal(t, "2026-09-23T14:00:00Z", proj.StorageProfile.LastModified)
+
+	// Verify Ontology
+	require.NotNil(t, proj.Ontology)
+	assert.Equal(t, "zqk:kernel", proj.Ontology.Namespace)
+	assert.Equal(t, "v2.0.0", proj.Ontology.VersionContext)
+	assert.NotEmpty(t, proj.Ontology.StorageProfile)
+	assert.NotEmpty(t, proj.Ontology.Traits)
+
+	// Verify Lineage Radar & Criteria
+	require.NotNil(t, proj.Lineage)
+	assert.Equal(t, "REQ-001", proj.Lineage.Requirement)
+	assert.Equal(t, "MIL-001", proj.Lineage.Milestone)
+	assert.True(t, proj.Lineage.IsIntact)
+	require.NotNil(t, proj.CriteriaSummary)
+	assert.Equal(t, 1, proj.CriteriaSummary.Total)
+	assert.Equal(t, 1, proj.CriteriaSummary.Satisfied)
+
+	// 2. Test Human/TDS output rendering in inspectSingleObject
+	var buf bytes.Buffer
+	testCmd := &cobra.Command{Use: "inspect"}
+	testCmd.SetOut(&buf)
+	err = inspectSingleObject(testCmd, objects.KindBacklogItem, "BLI-CARDS-001", nil, mockStorage, ctx, secCtx, false)
+	require.NoError(t, err)
+	outStr := buf.String()
+	assert.Contains(t, outStr, "CAS Storage & Data-Cell Profile")
+	assert.Contains(t, outStr, "Ontology & Schema Profile")
+	assert.Contains(t, outStr, "Lineage & Traceability Radar")
+	assert.Contains(t, outStr, "Acceptance Criteria (1 total, 1 satisfied, 0 pending)")
+}
+
+func TestInspectTUIModel_ActionPalette_RoleGated(t *testing.T) {
+	mockStorage := &mockInspectStorage{
+		objects: map[string]map[string]any{
+			"BLI-ACT-001": {
+				objects.FieldKeyID:       "BLI-ACT-001",
+				objects.FieldKeyKind:     objects.KindBacklogItem,
+				objects.FieldKeyTitle:    "Action Palette Integration",
+				objects.FieldKeyStatus:   "originated",
+				objects.FieldKeyPriority: "P1",
+				"claimed_by":             "",
+				"updated_at":             "2026-09-23T12:00:00Z",
+			},
+		},
+	}
+
+	ctx := context.Background()
+	// Unprivileged operator (cannot delete, but can claim and transition)
+	unprivilegedSecCtx := pkgctx.NewSecurityContext("operator-user", []string{"developer"}, []string{"read:*", "write:backlog_item"})
+	storageCtx := pkgctx.NewStorageContext()
+
+	model := NewInspectTUIModel(ctx, objects.KindBacklogItem, nil, nil, "updated_at", false, mockStorage, unprivilegedSecCtx, storageCtx)
+	require.NotNil(t, model)
+	model.Width = 140
+	assert.Equal(t, 1, len(model.VisibleProjections))
+
+	// 1. Open Action Palette with 'a'
+	model.HandleInput([]byte{'a'})
+	assert.True(t, model.ActionPaletteOpen)
+	assert.Equal(t, 0, model.ActionIndex)
+
+	renderedPalette := model.Render()
+	assert.Contains(t, renderedPalette, "ROLE-GATED ACTION PALETTE: BLI-ACT-001")
+	assert.Contains(t, renderedPalette, "Claim Work")
+	assert.Contains(t, renderedPalette, "Transition Status")
+	assert.Contains(t, renderedPalette, "Edit in $EDITOR")
+	assert.Contains(t, renderedPalette, "Open Policy Studio")
+	assert.Contains(t, renderedPalette, "Delete Object")
+	// For unprivileged user, delete should be locked
+	assert.Contains(t, renderedPalette, "LOCKED: requires role:admin or permission:delete:object")
+
+	// 2. Test Navigation in Action Palette ('j' and 'k')
+	model.HandleInput([]byte{'j'})
+	assert.Equal(t, 1, model.ActionIndex) // Selected: Transition Status
+	model.HandleInput([]byte{'k'})
+	assert.Equal(t, 0, model.ActionIndex) // Selected: Claim Work
+
+	// 3. Test Claim execution via hotkey 'c' in Action Palette
+	model.HandleInput([]byte{'c'})
+	assert.False(t, model.ActionPaletteOpen) // Palette closes on action execution
+	// Object should now be claimed by operator-user
+	obj, _ := mockStorage.Read(ctx, unprivilegedSecCtx, "BLI-ACT-001")
+	assert.Equal(t, "operator-user", obj["claimed_by"])
+
+	// 4. Test Transition Status via hotkey 't' in main table
+	model.HandleInput([]byte{'t'})
+	obj, _ = mockStorage.Read(ctx, unprivilegedSecCtx, "BLI-ACT-001")
+	assert.Equal(t, "in_progress", obj["status"])
+
+	// 5. Test Admin Role Unlocks Delete
+	adminSecCtx := pkgctx.NewSystemSecurityContext()
+	adminModel := NewInspectTUIModel(ctx, objects.KindBacklogItem, nil, nil, "updated_at", false, mockStorage, adminSecCtx, storageCtx)
+	adminModel.Width = 140
+	adminModel.HandleInput([]byte{'a'})
+	adminRendered := adminModel.Render()
+	assert.NotContains(t, adminRendered, "LOCKED:")
+
+	// 6. Test Close Action Palette with 'Esc'
+	adminModel.HandleInput([]byte{27})
+	assert.False(t, adminModel.ActionPaletteOpen)
+}
+
 
