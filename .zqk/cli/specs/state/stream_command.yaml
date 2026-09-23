@@ -1,0 +1,28 @@
+$schema: ../schemas/command_spec.schema.json
+name: stream
+short: Stream live change journal mutations and swarm state events
+description: Stream real-time change journal mutations and audit events from the knowledge kernel.
+aliases:
+    - monitor
+    - watch
+args:
+    type: no_args
+flags:
+    - name: follow
+      shorthand: "w"
+      type: bool
+      default: "false"
+      description: Stream new events continuously as they occur
+    - name: limit
+      shorthand: "n"
+      type: int
+      default: 20
+      description: Maximum number of recent mutations to display
+help:
+    examples:
+        - comment: View recent change journal stream
+          command: zqk state stream
+        - comment: Continuously follow live mutations
+          command: zqk state stream -w
+run_e: runStateStream
+common_flags: true

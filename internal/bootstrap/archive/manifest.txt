@@ -926,6 +926,10 @@
 ./cli_specs/state/journal_command.yaml
 ./cli_specs/state/journal_command.yaml
 ./cli_specs/state/journal_command.yaml
+./cli_specs/state/stream_command.yaml
+./cli_specs/state/stream_command.yaml
+./cli_specs/state/stream_command.yaml
+./cli_specs/state/stream_command.yaml
 ./cli_specs/state/tree_command.yaml
 ./cli_specs/state/tree_command.yaml
 ./cli_specs/state/tree_command.yaml
