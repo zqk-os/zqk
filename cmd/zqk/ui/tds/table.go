@@ -78,31 +78,68 @@ func (t *Table) Render() string {
 	}
 
 	// 1. Calculate column widths
-	// Overhead: "│ " at left, " │ " between cols, " │" at right -> 1 + (numCols)*3
+	// Overhead: "│ " at left (2), " │ " between cols (3 each), " │\n" at right (2) -> 1 + numCols*3
 	overhead := 1 + numCols*3
 	availWidth := t.TotalWidth - overhead
-	if availWidth < numCols*3 {
-		availWidth = numCols * 3
+	if availWidth < numCols {
+		availWidth = numCols
 	}
 
 	totalWeight := 0.0
+	totalMin := 0
 	for _, col := range t.Columns {
 		totalWeight += col.Weight
+		totalMin += col.MinWidth
+	}
+	if totalWeight <= 0 {
+		totalWeight = float64(numCols)
 	}
 
-	remaining := availWidth
-	for i := range t.Columns {
-		calc := int(float64(availWidth) * (t.Columns[i].Weight / totalWeight))
-		if calc < t.Columns[i].MinWidth {
-			calc = t.Columns[i].MinWidth
+	if availWidth >= totalMin {
+		// Normal case: Room to satisfy all MinWidths.
+		// Allocate MinWidth first, then distribute extra space proportionally to Weight.
+		extra := availWidth - totalMin
+		remainingExtra := extra
+		for i := range t.Columns {
+			add := int(float64(extra) * (t.Columns[i].Weight / totalWeight))
+			t.Columns[i].allocated = t.Columns[i].MinWidth + add
+			remainingExtra -= add
 		}
-		t.Columns[i].allocated = calc
-		remaining -= calc
-	}
-
-	// Distribute any rounding remainder to the first flexible column
-	if remaining > 0 && len(t.Columns) > 0 {
-		t.Columns[0].allocated += remaining
+		// Distribute any rounding remainder
+		for i := 0; remainingExtra > 0 && i < len(t.Columns); i++ {
+			t.Columns[i].allocated++
+			remainingExtra--
+		}
+	} else {
+		// Constrained case: Available width is less than totalMin.
+		// Scale each column proportionally down according to Weight, with a minimum floor of 1.
+		floor := 1
+		remaining := availWidth
+		for i := range t.Columns {
+			calc := int(float64(availWidth) * (t.Columns[i].Weight / totalWeight))
+			if calc < floor {
+				calc = floor
+			}
+			t.Columns[i].allocated = calc
+			remaining -= calc
+		}
+		if remaining > 0 {
+			for i := 0; remaining > 0 && i < len(t.Columns); i++ {
+				t.Columns[i].allocated++
+				remaining--
+			}
+		} else if remaining < 0 {
+			for i := len(t.Columns) - 1; remaining < 0 && i >= 0; i-- {
+				if t.Columns[i].allocated > floor {
+					reduce := t.Columns[i].allocated - floor
+					if -remaining < reduce {
+						reduce = -remaining
+					}
+					t.Columns[i].allocated -= reduce
+					remaining += reduce
+				}
+			}
+		}
 	}
 
 	var b strings.Builder

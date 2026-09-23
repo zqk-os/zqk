@@ -172,7 +172,7 @@ func StreamJournalMutations(cmd *cobra.Command, projectRoot string, follow bool,
 
 // BuildDashboardView renders an interactive ANSI visual seismograph dashboard.
 func BuildDashboardView(projectRoot string, recent []JournalMutation) string {
-	w := 96
+	w := tds.GetTerminalWidth(96)
 	var buf strings.Builder
 
 	displaySlice := recent
@@ -220,27 +220,27 @@ func BuildDashboardView(projectRoot string, recent []JournalMutation) string {
 	sparkline := generateSparkline(len(displaySlice))
 
 	buf.WriteString(tds.Panel("⚡ ZQK STATE SEISMOGRAPH & TELEMETRY DASHBOARD", []string{
-		tds.StatRow([]tds.StatItem{
+		" " + tds.StatRow([]tds.StatItem{
 			{Label: "Root", Value: projectRoot},
 			{Label: "Status", Value: "ACTIVE", Extra: tds.Badge("OK")},
-		}, w-4),
-		tds.StatRow([]tds.StatItem{
+		}, w-6),
+		" " + tds.StatRow([]tds.StatItem{
 			{Label: "Events in Window", Value: fmt.Sprintf("%d", len(displaySlice)), Extra: sparkline},
 			{Label: "Membrane", Value: "CPCP-MEMBRANE-001 (FAIL-CLOSED)", Extra: tds.Badge("ENFORCING")},
-		}, w-4),
-		tds.StatRow([]tds.StatItem{
+		}, w-6),
+		" " + tds.StatRow([]tds.StatItem{
 			{Label: "Actors", Value: actorLine},
 			{Label: "Objects", Value: kindLine},
-		}, w-4),
+		}, w-6),
 	}, w, tds.BorderHeavy))
 	buf.WriteString("\n")
 
 	tbl := tds.NewTable(w).
 		AddColumn("TIME", tds.AlignCenter, 10, 0.12).
 		AddColumn("EVENT", tds.AlignLeft, 12, 0.14).
-		AddColumn("OBJECT REF", tds.AlignLeft, 28, 0.32).
-		AddColumn("SUMMARY / DIFF", tds.AlignLeft, 24, 0.28).
-		AddColumn("CPCP", tds.AlignCenter, 14, 0.14)
+		AddColumn("OBJECT REF", tds.AlignLeft, 22, 0.32).
+		AddColumn("SUMMARY / DIFF", tds.AlignLeft, 20, 0.28).
+		AddColumn("CPCP", tds.AlignCenter, 12, 0.14)
 
 	for _, m := range displaySlice {
 		timeStr := "--:--:--"

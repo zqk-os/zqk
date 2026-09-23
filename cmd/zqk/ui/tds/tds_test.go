@@ -77,13 +77,41 @@ func TestTable_LineUniformityAndGridAlignment(t *testing.T) {
 	rendered := tbl.Render()
 	splitLines := strings.Split(strings.TrimRight(rendered, "\n"), "\n")
 
-	// Verify every line has the exact same visual width
-	expectedWidth := VisibleWidth(splitLines[0])
-	assert.GreaterOrEqual(t, expectedWidth, targetWidth-2)
-
+	// Verify every line has the exact target width
 	for i, l := range splitLines {
 		vw := VisibleWidth(l)
-		assert.Equal(t, expectedWidth, vw, "Table line %d visible width mismatch. Line: %q", i, l)
+		assert.Equal(t, targetWidth, vw, "Table line %d visible width mismatch. Line: %q", i, l)
+	}
+
+	// Verify Dashboard 5-column scenario where MinWidths could previously cause overflow
+	dashWidth := 96
+	dashTbl := NewTable(dashWidth).
+		AddColumn("TIME", AlignCenter, 10, 0.12).
+		AddColumn("EVENT", AlignLeft, 12, 0.14).
+		AddColumn("OBJECT REF", AlignLeft, 22, 0.32).
+		AddColumn("SUMMARY / DIFF", AlignLeft, 20, 0.28).
+		AddColumn("CPCP", AlignCenter, 12, 0.14)
+
+	dashTbl.AddRow("[23:15:16]", "⚡ JOB_DONE", "audit_event:AUD-2389", "Scheduler job SCH-cache…", "[CPCP: PASS]")
+	dashTbl.AddRow("[23:15:16]", "⚡ UPDATE", "scheduler_job:SCH-cache-pre…", "last_run_at: 2026-09-23…", "[CPCP: PASS]")
+
+	renderedTbl := dashTbl.Render()
+	renderedPanel := Panel("⚡ ZQK STATE SEISMOGRAPH & TELEMETRY DASHBOARD", []string{
+		" Root: /test/path   Status: ACTIVE",
+		" Events: 15         Membrane: ENFORCING",
+	}, dashWidth, BorderHeavy)
+
+	panelLines := strings.Split(strings.TrimRight(renderedPanel, "\n"), "\n")
+	tableLines := strings.Split(strings.TrimRight(renderedTbl, "\n"), "\n")
+
+	// Verify Panel width
+	for i, l := range panelLines {
+		assert.Equal(t, dashWidth, VisibleWidth(l), "Panel line %d width mismatch", i)
+	}
+
+	// Verify Table width matches Panel width down to the single character
+	for i, l := range tableLines {
+		assert.Equal(t, dashWidth, VisibleWidth(l), "Table line %d width mismatch", i)
 	}
 }
 

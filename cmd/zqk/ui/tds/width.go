@@ -5,7 +5,19 @@ import (
 	"strings"
 
 	"github.com/mattn/go-runewidth"
+	"golang.org/x/term"
 )
+
+// GetTerminalWidth retrieves the current terminal column width, falling back to fallback if unavailable or smaller than 40.
+func GetTerminalWidth(fallback int) int {
+	if fallback < 40 {
+		fallback = 80
+	}
+	if w, _, err := term.GetSize(0); err == nil && w >= 60 {
+		return w
+	}
+	return fallback
+}
 
 var ansiRegex = regexp.MustCompile(`\x1b\[[0-9;]*[a-zA-Z]`)
 

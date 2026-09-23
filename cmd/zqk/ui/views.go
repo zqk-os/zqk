@@ -85,7 +85,7 @@ func renderHeader(b *strings.Builder, m *UIModel) {
 		{TabSwarm, "3: 🤖 Swarm"},
 		{TabPM, "4: 📋 PM & Process"},
 		{TabMetrics, "5: 📊 Metrics"},
-		{TabScheduler, "6: ⏱️ Scheduler"},
+		{TabScheduler, "6: ⏱️  Scheduler"},
 	}
 
 	var tabStrs []string
@@ -702,7 +702,7 @@ func renderSchedulerTab(b *strings.Builder, m *UIModel) {
 	if w < 70 {
 		w = 80
 	}
-	b.WriteString(whiteBold("⏱️ Autonomous Scheduler & Background Daemons\n"))
+	b.WriteString(whiteBold("⏱️  Autonomous Scheduler & Background Daemons\n"))
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
 
 	if len(m.SchedulerJobs) == 0 {
@@ -744,7 +744,7 @@ func renderFooter(b *strings.Builder, m *UIModel) {
 		w = 80
 	}
 	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
-	b.WriteString(dim("Legend: ") + "⚡ State │ 📜 Audit │ 🤖 Swarm │ 📋 PM/Process │ 📊 Metrics │ ⏱️ Scheduler\n")
+	b.WriteString(dim("Legend: ") + "⚡ State │ 📜 Audit │ 🤖 Swarm │ 📋 PM/Process │ 📊 Metrics │ ⏱️  Scheduler\n")
 	b.WriteString(whiteBold("[Tab / 1-6]") + " Switch View  " +
 		whiteBold("[↑/↓/j/k]") + " Scroll  " +
 		whiteBold("[Space]") + " Pause/Resume  " +
