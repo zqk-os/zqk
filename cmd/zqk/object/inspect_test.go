@@ -343,3 +343,45 @@ func TestInspectTUIModel_NavigationAndDrillDown(t *testing.T) {
 	model.HandleInput([]byte{9}) // Tab
 	assert.NotEqual(t, initialKind, model.ActiveKind)
 }
+
+func TestInspectTUIModel_VimNav_gG_TopBottom(t *testing.T) {
+	mockStorage := &mockInspectStorage{
+		objects: map[string]map[string]any{
+			"BLI-001": {objects.FieldKeyID: "BLI-001", objects.FieldKeyKind: objects.KindBacklogItem, objects.FieldKeyTitle: "Alpha"},
+			"BLI-002": {objects.FieldKeyID: "BLI-002", objects.FieldKeyKind: objects.KindBacklogItem, objects.FieldKeyTitle: "Beta"},
+			"BLI-003": {objects.FieldKeyID: "BLI-003", objects.FieldKeyKind: objects.KindBacklogItem, objects.FieldKeyTitle: "Gamma"},
+			"BLI-004": {objects.FieldKeyID: "BLI-004", objects.FieldKeyKind: objects.KindBacklogItem, objects.FieldKeyTitle: "Delta"},
+		},
+	}
+
+	ctx := context.Background()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	storageCtx := pkgctx.NewStorageContext()
+
+	model := NewInspectTUIModel(ctx, objects.KindBacklogItem, nil, nil, "id", true, mockStorage, secCtx, storageCtx)
+	require.NotNil(t, model)
+	assert.Equal(t, 4, len(model.VisibleProjections))
+
+	// Start at 0, jump to bottom with 'G' (big gee)
+	model.SelectedIndex = 0
+	model.HandleInput([]byte{'G'})
+	assert.Equal(t, 3, model.SelectedIndex, "G should jump to bottom")
+
+	// Jump to top with 'g' (little gee)
+	model.HandleInput([]byte{'g'})
+	assert.Equal(t, 0, model.SelectedIndex, "g should jump to top")
+
+	// Toggle g -> G when already at top
+	model.HandleInput([]byte{'g'})
+	assert.Equal(t, 3, model.SelectedIndex, "g when at top should toggle to bottom (g->G)")
+
+	// Toggle G -> g when already at bottom
+	model.HandleInput([]byte{'G'})
+	assert.Equal(t, 0, model.SelectedIndex, "G when at bottom should toggle to top (G->g)")
+
+	// Test n/N cycling
+	model.HandleInput([]byte{'n'})
+	assert.Equal(t, 1, model.SelectedIndex, "n should cycle forward")
+	model.HandleInput([]byte{'N'})
+	assert.Equal(t, 0, model.SelectedIndex, "N should cycle backward")
+}

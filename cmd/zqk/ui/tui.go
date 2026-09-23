@@ -216,7 +216,59 @@ func handleInput(m *UIModel, key []byte) bool {
 		return false
 	}
 
-	// Exit commands when modal is not open
+	// 2. Active Inline Search Input Mode
+	if m.IsSearching {
+		if len(key) == 1 {
+			switch key[0] {
+			case KeyEnter, '\n': // Confirm / lock search query
+				m.SearchQuery = strings.TrimSpace(m.SearchBuffer)
+				m.IsSearching = false
+				m.SelectedIndex = 0
+				m.ScrollOffset = 0
+				return false
+			case KeyEsc: // Cancel search
+				m.IsSearching = false
+				m.SearchBuffer = ""
+				m.SearchQuery = ""
+				m.SelectedIndex = 0
+				m.ScrollOffset = 0
+				return false
+			case KeyBackspace, 8: // Backspace
+				if len(m.SearchBuffer) > 0 {
+					m.SearchBuffer = m.SearchBuffer[:len(m.SearchBuffer)-1]
+					m.SearchQuery = m.SearchBuffer
+					m.SelectedIndex = 0
+					m.ScrollOffset = 0
+				}
+				return false
+			case KeyCtrlC, 21: // Ctrl+C or Ctrl+U: clear search input
+				m.SearchBuffer = ""
+				m.SearchQuery = ""
+				m.SelectedIndex = 0
+				return false
+			default:
+				if key[0] >= 32 && key[0] <= 126 {
+					m.SearchBuffer += string(key[0])
+					m.SearchQuery = m.SearchBuffer
+					m.SelectedIndex = 0
+					m.ScrollOffset = 0
+				}
+				return false
+			}
+		}
+		return false
+	}
+
+	// 3. Clear active search filter with Esc
+	if len(key) == 1 && key[0] == KeyEsc && m.SearchQuery != "" {
+		m.SearchQuery = ""
+		m.SearchBuffer = ""
+		m.SelectedIndex = 0
+		m.ScrollOffset = 0
+		return false
+	}
+
+	// 4. Exit commands when modal and search are not open
 	if key[0] == 'q' || key[0] == 'Q' || key[0] == KeyCtrlC || (len(key) == 1 && key[0] == KeyEsc) {
 		return true
 	}
@@ -224,51 +276,99 @@ func handleInput(m *UIModel, key []byte) bool {
 	// Single keypress handling
 	if len(key) == 1 {
 		switch key[0] {
+		case '/': // Open search
+			m.IsSearching = true
+			m.SearchBuffer = m.SearchQuery
+		case 'n': // Next search match / cycle down
+			maxRows := m.GetCurrentRowCount()
+			if maxRows > 0 {
+				m.SelectedIndex = (m.SelectedIndex + 1) % maxRows
+			}
+		case 'N': // Previous search match / cycle up
+			maxRows := m.GetCurrentRowCount()
+			if maxRows > 0 {
+				m.SelectedIndex = (m.SelectedIndex - 1 + maxRows) % maxRows
+			}
+		case 'g': // Little gee: jump to top (or toggle to bottom if already at top: g->G)
+			maxRows := m.GetCurrentRowCount()
+			if maxRows > 0 {
+				if m.SelectedIndex == 0 && maxRows > 1 {
+					m.SelectedIndex = maxRows - 1
+					m.ScrollOffset = 0
+					m.AutoScroll = true
+				} else {
+					m.SelectedIndex = 0
+					m.ScrollOffset = 0
+					m.AutoScroll = false
+				}
+			}
+		case 'G': // Big gee: jump to bottom (or toggle to top if already at bottom: G->g)
+			maxRows := m.GetCurrentRowCount()
+			if maxRows > 0 {
+				if m.SelectedIndex == maxRows-1 && maxRows > 1 {
+					m.SelectedIndex = 0
+					m.ScrollOffset = 0
+					m.AutoScroll = false
+				} else {
+					m.SelectedIndex = maxRows - 1
+					m.ScrollOffset = 0
+					m.AutoScroll = true
+				}
+			}
 		case KeyTab: // Cycle tabs forward
 			m.ActiveTab = (m.ActiveTab + 1) % TotalTabs
 			m.ScrollOffset = 0
 			m.SelectedIndex = 0
 			m.AutoScroll = true
+			_, _ = os.Stdout.WriteString(AnsiClearScreen)
 		case '1':
 			m.ActiveTab = TabState
 			m.ScrollOffset = 0
 			m.SelectedIndex = 0
 			m.AutoScroll = true
+			_, _ = os.Stdout.WriteString(AnsiClearScreen)
 		case '2':
 			m.ActiveTab = TabAudit
 			m.ScrollOffset = 0
 			m.SelectedIndex = 0
 			m.AutoScroll = true
+			_, _ = os.Stdout.WriteString(AnsiClearScreen)
 		case '3':
 			m.ActiveTab = TabSwarm
 			m.ScrollOffset = 0
 			m.SelectedIndex = 0
 			m.AutoScroll = true
+			_, _ = os.Stdout.WriteString(AnsiClearScreen)
 		case '4':
 			m.ActiveTab = TabPM
 			m.ScrollOffset = 0
 			m.SelectedIndex = 0
 			m.AutoScroll = true
+			_, _ = os.Stdout.WriteString(AnsiClearScreen)
 		case '5':
 			m.ActiveTab = TabMetrics
 			m.ScrollOffset = 0
 			m.SelectedIndex = 0
 			m.AutoScroll = true
+			_, _ = os.Stdout.WriteString(AnsiClearScreen)
 		case '6':
 			m.ActiveTab = TabScheduler
 			m.ScrollOffset = 0
 			m.SelectedIndex = 0
 			m.AutoScroll = true
+			_, _ = os.Stdout.WriteString(AnsiClearScreen)
 		case '7':
 			m.ActiveTab = TabQA
 			m.ScrollOffset = 0
 			m.SelectedIndex = 0
 			m.AutoScroll = true
+			_, _ = os.Stdout.WriteString(AnsiClearScreen)
 		case '8':
 			m.ActiveTab = TabHealth
 			m.ScrollOffset = 0
 			m.SelectedIndex = 0
 			m.AutoScroll = true
+			_, _ = os.Stdout.WriteString(AnsiClearScreen)
 		case KeyEnter, '\n': // Step into record details (drill-down modal)
 			m.OpenSelectedItemDetail()
 		case KeySpace: // Toggle auto-scroll
@@ -290,15 +390,17 @@ func handleInput(m *UIModel, key []byte) bool {
 				m.RefreshScheduler(ctx, m.Storage, m.SecCtx)
 			}
 		case 't', 'T': // Trigger scheduled job immediately (Tab 6)
-			if m.ActiveTab == TabScheduler && m.SelectedIndex < len(m.SchedulerJobs) {
-				m.TriggerScheduledJob(m.SchedulerJobs[m.SelectedIndex].ID, 0)
+			jobs := m.GetVisibleSchedulerJobs()
+			if m.ActiveTab == TabScheduler && m.SelectedIndex < len(jobs) {
+				m.TriggerScheduledJob(jobs[m.SelectedIndex].ID, 0)
 			}
 		case 'c', 'C', 'a', 'A', 'w', 'W', 'd', 'D', 'p', 'P', 'm', 'M', 's', 'S', 'b', 'B': // Action Center (Tab 8) / Delayed Trigger (Tab 6)
 			if m.ActiveTab == TabHealth {
 				m.TriggerActionCenter(string(key[0]))
 			} else if m.ActiveTab == TabScheduler && (key[0] == 'd' || key[0] == 'D') {
-				if m.SelectedIndex < len(m.SchedulerJobs) {
-					m.TriggerScheduledJob(m.SchedulerJobs[m.SelectedIndex].ID, 10)
+				jobs := m.GetVisibleSchedulerJobs()
+				if m.SelectedIndex < len(jobs) {
+					m.TriggerScheduledJob(jobs[m.SelectedIndex].ID, 10)
 				}
 			}
 		case 'k', 'K': // Cursor up / Scroll up
@@ -325,6 +427,20 @@ func handleInput(m *UIModel, key []byte) bool {
 	// ANSI multi-byte escape sequences
 	if len(key) >= 3 && key[0] == CSIPrefixEsc && key[1] == CSIPrefixBracket {
 		switch key[2] {
+		case 'H': // Home key
+			maxRows := m.GetCurrentRowCount()
+			if maxRows > 0 {
+				m.SelectedIndex = 0
+				m.ScrollOffset = 0
+				m.AutoScroll = false
+			}
+		case 'F': // End key
+			maxRows := m.GetCurrentRowCount()
+			if maxRows > 0 {
+				m.SelectedIndex = maxRows - 1
+				m.ScrollOffset = 0
+				m.AutoScroll = true
+			}
 		case SeqCodeArrowUp:
 			m.AutoScroll = false
 			m.ScrollOffset++
