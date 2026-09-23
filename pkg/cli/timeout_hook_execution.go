@@ -153,6 +153,7 @@ var otherDaemonCommands = []string{
 	zqkenv.PrivilegedWriterDaemonCommandFragment(),
 	"feed watch",        // long-lived MCP subscriber; auto-timeout must not kill the seat watcher
 	"agent orchestrate", // multi-task priority plan orchestrator; runs until plan completes
+	"state stream",      // long-lived telemetry stream; runs until user interrupts (Ctrl+C)
 }
 
 // isMCPLongLivedCommand reports whether the command is an MCP process that must not be killed by

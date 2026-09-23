@@ -2,6 +2,7 @@ package state
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -90,6 +91,13 @@ func StreamJournalMutations(cmd *cobra.Command, projectRoot string, follow bool,
 	if err == nil {
 		defer watcher.Close()
 		_ = watcher.Add(streamDir)
+		if entries, rErr := os.ReadDir(streamDir); rErr == nil {
+			for _, entry := range entries {
+				if strings.HasSuffix(entry.Name(), ".json") {
+					_ = watcher.Add(filepath.Join(streamDir, entry.Name()))
+				}
+			}
+		}
 	}
 
 	var eventsCh <-chan fsnotify.Event
@@ -120,6 +128,9 @@ func StreamJournalMutations(cmd *cobra.Command, projectRoot string, follow bool,
 		}
 	}
 
+	heartbeat := time.NewTicker(1 * time.Second)
+	defer heartbeat.Stop()
+
 	for {
 		select {
 		case <-cmd.Context().Done():
@@ -132,6 +143,11 @@ func StreamJournalMutations(cmd *cobra.Command, projectRoot string, follow bool,
 			if !ok {
 				return nil
 			}
+			if event.Has(fsnotify.Create) && strings.HasSuffix(event.Name, ".json") {
+				if watcher != nil {
+					_ = watcher.Add(event.Name)
+				}
+			}
 			if event.Has(fsnotify.Write) || event.Has(fsnotify.Create) {
 				if debounceTimer == nil {
 					debounceTimer = time.NewTimer(50 * time.Millisecond)
@@ -143,6 +159,8 @@ func StreamJournalMutations(cmd *cobra.Command, projectRoot string, follow bool,
 		case <-debounceCh:
 			renderLatest()
 			debounceCh = nil
+		case <-heartbeat.C:
+			renderLatest()
 		case _, ok := <-errorsCh:
 			if !ok {
 				return nil
