@@ -102,7 +102,7 @@ TOUCH_TS="$(date -u -r "$SOURCE_DATE_EPOCH" '+%Y%m%d%H%M.%S' 2>/dev/null || date
 find "$STAGING" -exec touch -h -t "$TOUCH_TS" {} + 2>/dev/null || true
 
 unset GZIP 2>/dev/null || true
-(cd "$STAGING" && find . | sort | tar -cf - -T - | gzip -n > "$ARCHIVE_TMP")
+(cd "$STAGING" && find . | sort | tar --no-recursion -cf - -T - | gzip -n > "$ARCHIVE_TMP")
 # Traceability: list all paths in the archive (REQ-9011)
 tar tzf "$ARCHIVE_TMP" | sort > "$MANIFEST_TMP"
 mv "$ARCHIVE_TMP" "$ARCHIVE"
