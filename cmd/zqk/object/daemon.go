@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 
 	"github.com/spf13/cobra"
@@ -74,10 +75,14 @@ func NewDaemonCmd() *cobra.Command {
 					return err
 				}
 
+				projectRoot := proc.ProjectRoot()
 				adapter := &daemonAdapter{fileStorage: fileStorage}
-				daemon := storage.NewPrivilegedWriterDaemon(adapter)
+				daemon := storage.NewPrivilegedWriterDaemon(adapter, projectRoot)
 
-				socketPath := storage.DefaultPrivilegedWriterSocketPath()
+				socketPath := storage.ProjectScopedPrivilegedWriterSocketPath(projectRoot)
+				if err := fileutil.MkdirAll(filepath.Dir(socketPath), paths.DirPerm755); err != nil {
+					return errfmt.Errorf("failed to create socket directory: %w", err)
+				}
 				// Clean up old socket if it exists
 				_ = fileutil.Remove(socketPath)
 

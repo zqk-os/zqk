@@ -23,6 +23,7 @@ go.work
 # IDE
 .idea/
 .ide/
+.cursor/
 # Track `.vscode/settings.json` for shared editor/extension defaults; keep other `.vscode/*` local.
 .vscode/*
 !.vscode/settings.json

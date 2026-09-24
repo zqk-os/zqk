@@ -11,6 +11,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -20,14 +21,27 @@ const socketFileExtension = ".sock"
 // privilegedWriterSocketBasename is the socket file name (without brand prefix or extension).
 const privilegedWriterSocketBasename = "privileged-writer"
 
-// DefaultPrivilegedWriterSocketPath returns the default UNIX socket path for the
-// PrivilegedWriter helper (LaunchAgent / KeepAlive).
-//
-// Rendezvous is always under /tmp (not [os.TempDir]): macOS TMPDIR is per-user and
-// changes across sessions, which desyncs a KeepAlive LaunchAgent from CLI clients.
-// The basename uses [brand.NamespacePrefix] rather than a hardcoded "zqk" token.
-// Override with PRIVILEGED_WRITER_SOCKET. TRACK: BLI-CAS-HAND-DUP-CHECK-001
-func DefaultPrivilegedWriterSocketPath() string {
+// ProjectScopedPrivilegedWriterSocketPath returns the UNIX socket path scoped to a specific projectRoot.
+// Privileged writer sockets are located under .zqk/run/ inside the project root.
+func ProjectScopedPrivilegedWriterSocketPath(projectRoot string) string {
+	name := brand.NamespacePrefix() + "-" + privilegedWriterSocketBasename + socketFileExtension
+	if projectRoot == "" {
+		projectRoot = paths.ResolveProjectRoot(".")
+	}
+	return filepath.Join(projectRoot, ".zqk", "run", name)
+}
+
+// DefaultPrivilegedWriterSocketPath returns the default UNIX socket path.
+// If a project root can be resolved, it returns the project-scoped socket path.
+// Otherwise, it falls back to a temporary path under runtime temp dir.
+func DefaultPrivilegedWriterSocketPath(projectRoots ...string) string {
+	if len(projectRoots) > 0 && projectRoots[0] != "" {
+		return ProjectScopedPrivilegedWriterSocketPath(projectRoots[0])
+	}
+	root := paths.ResolveProjectRoot(".")
+	if root != "" {
+		return ProjectScopedPrivilegedWriterSocketPath(root)
+	}
 	name := brand.NamespacePrefix() + "-" + privilegedWriterSocketBasename + socketFileExtension
 	if runtime.GOOS == "windows" {
 		return filepath.Join(fileutil.TempDir(), name)
@@ -35,10 +49,20 @@ func DefaultPrivilegedWriterSocketPath() string {
 	return filepath.Join("/tmp", name)
 }
 
-func privilegedWriterSocketExists() bool {
-	path := DefaultPrivilegedWriterSocketPath()
+func resolvePrivilegedWriterSocketPath(projectRoots ...string) string {
 	if v := strings.TrimSpace(zqkenv.PrivilegedWriterSocket().Get()); v != "" {
-		path = v
+		return v
+	}
+	return DefaultPrivilegedWriterSocketPath(projectRoots...)
+}
+
+func privilegedWriterSocketExists(projectRoots ...string) bool {
+	path := resolvePrivilegedWriterSocketPath(projectRoots...)
+	// Standalone open-core must NEVER connect to a global /tmp socket unless explicitly configured via PRIVILEGED_WRITER_SOCKET.
+	if strings.TrimSpace(zqkenv.PrivilegedWriterSocket().Get()) == "" {
+		if strings.HasPrefix(filepath.Clean(path), filepath.Clean("/tmp")) {
+			return false
+		}
 	}
 	_, err := fileutil.Stat(path)
 	return err == nil
@@ -72,18 +96,21 @@ func privilegedWriterLocalWriteAllowed(projectRoots ...string) bool {
 		return true
 	}
 	// Socket-absent default: if PrivilegedWriter socket does not exist, write locally (open-core / standalone).
-	if !privilegedWriterSocketExists() {
+	if !privilegedWriterSocketExists(projectRoots...) {
 		return true
 	}
 	return false
 }
 
-func dialPrivilegedWriter() (*IPCWriter, error) {
-	path := DefaultPrivilegedWriterSocketPath()
-	if v := strings.TrimSpace(zqkenv.PrivilegedWriterSocket().Get()); v != "" {
-		path = v
+func dialPrivilegedWriter(projectRoots ...string) (*IPCWriter, error) {
+	path := resolvePrivilegedWriterSocketPath(projectRoots...)
+	// Standalone open-core must NEVER connect to a global /tmp socket unless explicitly configured via PRIVILEGED_WRITER_SOCKET.
+	if strings.TrimSpace(zqkenv.PrivilegedWriterSocket().Get()) == "" {
+		if strings.HasPrefix(filepath.Clean(path), filepath.Clean("/tmp")) {
+			return nil, errfmt.Errorf("refusing to connect to global tmp socket: %s", path)
+		}
 	}
-	return NewIPCWriter(path)
+	return NewIPCWriter(path, projectRoots...)
 }
 
 func errPrivilegedWriterUnavailable(err error) error {
@@ -119,7 +146,7 @@ func (f *FileObjectStorage) writeCASThroughMembrane(ctx context.Context, id, kin
 	if privilegedWriterLocalWriteAllowed(root) {
 		return localFn()
 	}
-	w, err := dialPrivilegedWriter()
+	w, err := dialPrivilegedWriter(root)
 	if err != nil {
 		return errPrivilegedWriterUnavailable(err)
 	}
@@ -154,7 +181,7 @@ func (f *FileObjectStorage) renameCASThroughMembrane(ctx context.Context, id, ne
 	if privilegedWriterLocalWriteAllowed(root) {
 		return localFn()
 	}
-	w, err := dialPrivilegedWriter()
+	w, err := dialPrivilegedWriter(root)
 	if err != nil {
 		return errPrivilegedWriterUnavailable(err)
 	}
@@ -183,7 +210,7 @@ func (f *FileObjectStorage) deleteCASThroughMembrane(ctx context.Context, id, ki
 	if privilegedWriterLocalWriteAllowed(root) {
 		return localFn()
 	}
-	w, err := dialPrivilegedWriter()
+	w, err := dialPrivilegedWriter(root)
 	if err != nil {
 		return errPrivilegedWriterUnavailable(err)
 	}
