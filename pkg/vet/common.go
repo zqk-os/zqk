@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/git"
 )
 
 // isGeneratedCode checks if the file has typical code generator headers.
@@ -20,8 +20,8 @@ func isGeneratedCode(src []byte) bool {
 
 // collectGitFiles returns all git-tracked files in root.
 func collectGitFiles(root string) ([]string, error) {
-	cmd := execwrap.Command("git", "-C", root, "ls-files", "-z")
-	out, err := cmd.Output()
+	g := git.NewFacade(root)
+	out, err := g.LSFiles("-z")
 	if err == nil {
 		var files []string
 		for _, p := range strings.Split(string(out), "\x00") {
@@ -84,8 +84,8 @@ func isPathExempt(path string, exemptions []string) bool {
 
 // collectGoFiles gathers relevant Go files in the repository.
 func collectGoFiles(root string, scanDirs []string) ([]string, error) {
-	cmd := execwrap.Command("git", "-C", root, "ls-files", "-z", "--cached", "--others", "--exclude-standard", "--", "*.go")
-	out, err := cmd.Output()
+	g := git.NewFacade(root)
+	out, err := g.LSFiles("-z", "--cached", "--others", "--exclude-standard", "--", "*.go")
 	if err == nil {
 		var files []string
 		for _, p := range strings.Split(string(out), "\x00") {

@@ -81,6 +81,24 @@ func (f *Facade) DiffCachedStat() ([]byte, error) {
 	return f.output("diff", "--cached", "--stat")
 }
 
+// Diff executes git diff with the given arguments.
+func (f *Facade) Diff(args ...string) ([]byte, error) {
+	cmdArgs := append([]string{"diff"}, args...)
+	return f.output(cmdArgs...)
+}
+
+// Show executes git show with the given arguments.
+func (f *Facade) Show(args ...string) ([]byte, error) {
+	cmdArgs := append([]string{"show"}, args...)
+	return f.output(cmdArgs...)
+}
+
+// Grep executes git grep with the given arguments.
+func (f *Facade) Grep(args ...string) ([]byte, error) {
+	cmdArgs := append([]string{"grep"}, args...)
+	return f.output(cmdArgs...)
+}
+
 func (f *Facade) Commit(message string) ([]byte, error) {
 	return f.combinedOutput("commit", "-m", message)
 }
