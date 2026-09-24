@@ -439,7 +439,7 @@ func (m *UIModel) RefreshDynamicMessage() {
 		return
 	}
 	// Check agent chat channel for recent kernel events
-	chatFile := filepath.Join(m.ProjectRoot, ".zqk", "logs", "ide-hooks", "agent_chat_channel.jsonl")
+	chatFile := filepath.Join(m.ProjectRoot, paths.ProjectDataDir, paths.LogsDir, "ide-hooks", "agent_chat_channel.jsonl")
 	if data, err := os.ReadFile(chatFile); err == nil {
 		lines := strings.Split(strings.TrimSpace(string(data)), "\n")
 		for i := len(lines) - 1; i >= 0; i-- {
@@ -1933,7 +1933,7 @@ func (m *UIModel) OpenSelectedItemDetail() {
 			if v.AutoFixable {
 				actions = append(actions, "Remediation  : Press [a] in Health Tab to run batch auto-fix")
 			} else {
-				actions = append(actions, fmt.Sprintf("Remediation  : Run 'zqk system check %s' for targeted diagnosis", v.ObjectID))
+				actions = append(actions, fmt.Sprintf("Remediation  : Run '%s' for targeted diagnosis", paths.CLIInvocation("system check "+v.ObjectID)))
 			}
 
 			m.DetailModal = &ItemDetailModel{

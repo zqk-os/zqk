@@ -300,7 +300,7 @@ func GateWrite(projectRoot, claimant string, opts GateOptions) (GateDecision, er
 		}
 	}
 
-	dec.Message = electrocuteMessage(claimant, "mutating tools are forbidden until `zqk agent claim <ATK>` holds occupancy (POL-AGENT-WORK-CLAIM-001)")
+	dec.Message = electrocuteMessage(claimant, paths.RewriteCanonicalCLIInvocations("mutating tools are forbidden until `zqk agent claim <ATK>` holds occupancy (POL-AGENT-WORK-CLAIM-001)"))
 	return dec, nil
 }
 
@@ -314,7 +314,7 @@ func interruptAssigned(dec *GateDecision, projectRoot, claimant, taskID, reason 
 	dec.AutoAssignedID = taskID
 	dec.TaskIDs = []string{taskID}
 	if minted {
-		dec.Message = electrocuteMessage(claimant, "runway had no occupiable ATK; minted and claimed "+taskID+". Objectify onto unlocked grooming, claim that ATK, then `zqk agent release "+taskID+"`. POL-AGENT-WORK-CLAIM-001")
+		dec.Message = electrocuteMessage(claimant, paths.RewriteCanonicalCLIInvocations("runway had no occupiable ATK; minted and claimed "+taskID+". Objectify onto unlocked grooming, claim that ATK, then `zqk agent release "+taskID+"`. POL-AGENT-WORK-CLAIM-001"))
 		return true
 	}
 	dec.Message = electrocuteMessage(claimant, "auto-assigned "+taskID+"; mutating tools remain blocked until you work that task")
