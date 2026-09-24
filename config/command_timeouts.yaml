@@ -113,6 +113,11 @@ rules:
     timeout: 60m
     child_max_timeout_exempt: true
 
+  # System compact-wal: standalone WAL compaction; allow sufficient window for high-volume WAL files.
+  - pattern: "system compact-wal"
+    timeout: 5m
+    idle_shutdown_duration: 5m
+
   # Auto-fix pending/batch: processes many files; needs generous time and child-max-timeout exemption
   - pattern: "system auto-fix-process-pending"
     timeout: 60m
