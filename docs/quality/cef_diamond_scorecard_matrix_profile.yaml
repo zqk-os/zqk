@@ -1,0 +1,91 @@
+# Machine-readable profile for CEF diamond scorecard traceability.
+# Rows are per-seat (or ENVELOPE rollup) per freeze SHA. Linked to CVS-CEF-UNTIL-45-001.
+schema_version: 1
+profile_id: cef_diamond_scorecard_v1
+evaluation_surface_label: CEF diamond dual-seat scorecard (RDB…ROB) across remesure freezes
+
+default_paths:
+  active: docs/quality/CEF_DIAMOND_SCORECARD_MATRIX.csv
+
+fieldnames:
+  - run_id
+  - seat_role
+  - agent_run_id
+  - seat_agent_id
+  - freeze_sha
+  - assessed_at
+  - RDB
+  - MNT
+  - TST
+  - REL
+  - OBS
+  - RCV
+  - SEC
+  - ROB
+  - envelope_min
+  - package_complete
+  - output_home
+  - scorecard_path
+  - cvs_id
+  - bli_ref
+  - notes
+
+completion:
+  gate_columns:
+    - package_complete
+  done_values:
+    - "yes"
+    - "na"
+
+column_semantics:
+  run_id:
+    role: artifact_identity
+  seat_role:
+    role: free_text
+  agent_run_id:
+    role: free_text
+  seat_agent_id:
+    role: free_text
+  freeze_sha:
+    role: evidence_sha
+  assessed_at:
+    role: free_text
+  RDB:
+    role: free_text
+    rubric_anchor: docs/quality/codebase_evaluation/DIAMOND_SCALE.md
+  MNT:
+    role: free_text
+    rubric_anchor: docs/quality/codebase_evaluation/DIAMOND_SCALE.md
+  TST:
+    role: free_text
+    rubric_anchor: docs/quality/codebase_evaluation/DIAMOND_SCALE.md
+  REL:
+    role: free_text
+    rubric_anchor: docs/quality/codebase_evaluation/DIAMOND_SCALE.md
+  OBS:
+    role: free_text
+    rubric_anchor: docs/quality/codebase_evaluation/DIAMOND_SCALE.md
+  RCV:
+    role: free_text
+    rubric_anchor: docs/quality/codebase_evaluation/DIAMOND_SCALE.md
+  SEC:
+    role: free_text
+    rubric_anchor: docs/quality/codebase_evaluation/DIAMOND_SCALE.md
+  ROB:
+    role: free_text
+    rubric_anchor: docs/quality/codebase_evaluation/DIAMOND_SCALE.md
+  envelope_min:
+    role: free_text
+  package_complete:
+    role: status_gate
+  output_home:
+    role: free_text
+  scorecard_path:
+    role: free_text
+  cvs_id:
+    role: session_ref
+    target_kind: convergence_session
+  bli_ref:
+    role: free_text
+  notes:
+    role: free_text

@@ -1,3 +1,6 @@
-schema_version: 2.0.0
-default_name: ""
-matrices: {}
+default: cef_diamond_scorecard
+matrices:
+  cef_diamond_scorecard:
+    csv: docs/quality/CEF_DIAMOND_SCORECARD_MATRIX.csv
+    profile: docs/quality/cef_diamond_scorecard_matrix_profile.yaml
+    session_ref_column: cvs_id
