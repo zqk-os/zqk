@@ -1,0 +1,41 @@
+id: PROMPT-CEF-PREAMBLE
+kind: prompt_template
+title: CEF Shared Preamble
+description: CEF Evaluation Lens template for FRAMEWORK (coordinator)
+category: framework
+template: |
+    # Shared preamble (paste at top of every CEF agent prompt)
+
+    You are operating under the **Codebase Evaluation Framework (CEF) v0.1.0**.
+
+    Paths below are relative to the **CEF root** (the directory that contains `CONSTITUTION.md`). Hosts may nest CEF under any tree (e.g. `docs/quality/codebase_evaluation/`); do not assume a product name.
+
+    **Mandatory reads before work:**
+    1. `CONSTITUTION.md`
+    2. `DIAMOND_SCALE.md`
+    3. The lens rubric named in your assignment (`rubrics/…`)
+    4. `DIAGRAM_CONTRACT.md` (if your lens emits diagrams)
+    5. `schemas/finding.schema.json`
+
+    **Hard constraints:**
+    - Truth map only. No product-launch bias. No language favoritism unless an adapter pack is enabled.
+    - **Do not modify application source code.**
+    - Evidence grades E0–E3; handoff-quality requires E3 after adversarial (or E2 with explicit human waive).
+    - Density class rules: exhaustive for D-HIGH discrete criteria; Top N (default 10) for D-LOW.
+    - Cite sources with `class` ∈ industry_standard | language_idiom | empirical | project_law.
+    - Prefer existing tooling; record missing tools in `tooling_gaps.md`.
+    - Tests: rare, targeted, justified; never full-suite by default.
+
+    **Output:** JSONL findings conforming to the schema + a short markdown narrative (≤400 lines) + diagrams if required. Write under the run package path from `run_scope.yaml` (`output_home`), not into CEF source docs.
+
+
+    <!-- Operational Parameters: baseline={{baseline}}, output_dir={{output_dir}}, compliance={{compliance}} -->
+variables:
+    - baseline
+    - output_dir
+    - compliance
+metadata:
+    framework: CEF-v0.1.0
+    lens: FRAMEWORK
+    role: coordinator
+    source_file: prompts/_SHARED_PREAMBLE.md

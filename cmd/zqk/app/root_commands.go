@@ -32,6 +32,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/ontology"
 	"github.com/zqk-os/zqk/cmd/zqk/ops"
 	"github.com/zqk-os/zqk/cmd/zqk/organizational"
+	packcmd "github.com/zqk-os/zqk/cmd/zqk/pack"
 	"github.com/zqk-os/zqk/cmd/zqk/precommit"
 	"github.com/zqk-os/zqk/cmd/zqk/reports"
 	rollbackcmd "github.com/zqk-os/zqk/cmd/zqk/rollback"
@@ -271,6 +272,11 @@ func registerCommands() {
 	swarmCmdInst := swarm.NewSwarmCmd()
 	swarmCmdInst.GroupID = "advanced"
 	rootCmd.AddCommand(swarmCmdInst)
+
+	// Holonic Swarm Package management (init, seal, validate)
+	packCmdInst := packcmd.NewPackCmd()
+	packCmdInst.GroupID = "advanced"
+	rootCmd.AddCommand(packCmdInst)
 
 	// Semantic Intake Pipeline
 	intakeCmdInst := intake.NewIntakeCmd()

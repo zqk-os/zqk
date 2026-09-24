@@ -1,0 +1,110 @@
+$schema: https://zqk.dev/schemas/swarm_package_spec.schema.json
+name: code-eval
+version: 1.0.0
+description: Codebase Evaluation Framework (CEF) 8-Lens diamond quality and adversarial verification swarm
+author: zqk-community
+license: Apache-2.0
+entrypoint: wave-1-preflight
+parameters:
+    baseline:
+        type: float
+        default: 4.5
+        description: Minimum acceptable diamond envelope quality score
+    compliance:
+        type: string
+        default: SOC2,OWASP-TOP10
+        description: Comma-separated list of regulatory and compliance overlay constraints
+    output_dir:
+        type: string
+        default: .zqk/runs/code-eval-latest
+        description: Directory path for catabolic exhaust (findings, scorecards, traces)
+integrity:
+    algorithm: ed25519
+    signer_id: cef-curator@zqk.dev
+    content_digest: sha256:785e3e4c04f42407c7d83969f62d20fa46fc13d54928195ec0b728a6dffeb2ed
+    signature: 266e11fa429b9e2e0ea001c310774424e9c2ce427321f9cf33edbcb035a5db045404cf2073d2ac0c47dbf00d4a53f01b94d848418d9be4fb8d8dc0b17c8f0900
+membranes:
+    - path: .zqk/process/
+      mode: read_only
+    - path: .zqk/audit/
+      mode: audit_log
+    - path: docs/quality/codebase_evaluation/
+      mode: read_only
+agents:
+    - name: Specialist Evaluator
+      role: specialist_evaluator
+      skills:
+        - ASK-COMMUNITY-CODE-CRAFTSMAN
+        - ASK-COMMUNITY-ARCH-DESIGN
+      system_prompt: Execute objective, evidence-driven codebase evaluation across designated lenses.
+    - name: Adversarial Auditor
+      role: adversarial_auditor
+      skills:
+        - ASK-COMMUNITY-QA-VERIFICATION
+      system_prompt: Subject findings and code invariants to falsifiable critique, boundary tests, and fail-closed bounds.
+    - name: Lead Integrator
+      role: lead_integrator
+      skills:
+        - ASK-COMMUNITY-TPM-ORCHESTRATION
+      system_prompt: Synthesize multi-agent findings, calculate Diamond Scale envelope, and certify convergence.
+tasks:
+    - id: wave-1-preflight
+      title: Inspect codebase inventory, tool availability, and define run scope
+      role: lead_integrator
+    - id: wave-2-code-quality
+      title: Evaluate Code Quality & Maintainability (MNT)
+      role: specialist_evaluator
+      depends_on:
+        - wave-1-preflight
+    - id: wave-2-code-quality-critique
+      title: Adversarial critique of Code Quality findings
+      role: adversarial_auditor
+      depends_on:
+        - wave-2-code-quality
+    - id: wave-2-architecture
+      title: Evaluate Architecture, Package Boundaries & Graph Hygeine (RDB)
+      role: specialist_evaluator
+      depends_on:
+        - wave-1-preflight
+    - id: wave-2-architecture-critique
+      title: Adversarial critique of Architecture findings
+      role: adversarial_auditor
+      depends_on:
+        - wave-2-architecture
+    - id: wave-2-security
+      title: Evaluate Security & Threat Vectors (SEC)
+      role: specialist_evaluator
+      depends_on:
+        - wave-1-preflight
+    - id: wave-2-security-critique
+      title: Adversarial verification of Security findings
+      role: adversarial_auditor
+      depends_on:
+        - wave-2-security
+    - id: wave-2-testing
+      title: Evaluate Test Strategy & Invariant Proofs (TST)
+      role: specialist_evaluator
+      depends_on:
+        - wave-1-preflight
+    - id: wave-2-testing-critique
+      title: Adversarial stress-test of Testing assertions
+      role: adversarial_auditor
+      depends_on:
+        - wave-2-testing
+    - id: wave-3-reliability
+      title: Evaluate Reliability & Error Recovery (REL/ROB)
+      role: specialist_evaluator
+      depends_on:
+        - wave-2-code-quality-critique
+        - wave-2-architecture-critique
+    - id: wave-3-observability
+      title: Evaluate Observability & Diagnostics (OBS)
+      role: specialist_evaluator
+      depends_on:
+        - wave-2-code-quality-critique
+    - id: wave-4-synthesis
+      title: Synthesize multi-agent findings, calculate Diamond Scale envelope, and check convergence
+      role: lead_integrator
+      depends_on:
+        - wave-3-reliability
+        - wave-3-observability
