@@ -269,3 +269,16 @@ rules:
     idle_shutdown_duration: 15m
     child_max_timeout_exempt: true
 
+  # Object inspect: interactive terminal user interface and policy rule studio.
+  # Can be kept open indefinitely by the user for exploration and DSL authoring.
+  - pattern: "object inspect"
+    timeout: 4h
+    idle_shutdown_duration: 1h
+    child_max_timeout_exempt: true
+    child_max_timeout_exempt_if_explicit: true
+  - pattern: "inspect"
+    timeout: 4h
+    idle_shutdown_duration: 1h
+    child_max_timeout_exempt: true
+    child_max_timeout_exempt_if_explicit: true
+

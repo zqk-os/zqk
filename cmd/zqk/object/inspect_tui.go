@@ -17,6 +17,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/cmd/zqk/ui/tds"
+	"github.com/zqk-os/zqk/internal/cli"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
@@ -1615,6 +1616,11 @@ func (m *InspectTUIModel) HandleInput(key []byte) bool {
 
 // RunInspectTUI launches the full-screen interactive Object Inspector TUI session.
 func RunInspectTUI(cmd *cobra.Command, initialKind string, fields, filters []string, sortBy string, sortAsc bool, sp storage.ObjectStorageProvider, ctx context.Context, secCtx *pkgctx.SecurityContext, storageCtx *storage.StorageContext) error {
+	reconnect := cli.DisconnectTimeoutMonitor(func() {
+		cli.TouchMeaningfulActivity()
+	})
+	defer reconnect()
+
 	stdinFd := int(os.Stdin.Fd())
 	stdoutFd := int(os.Stdout.Fd())
 
@@ -1684,15 +1690,20 @@ func RunInspectTUI(cmd *cobra.Command, initialKind string, fields, filters []str
 	for {
 		select {
 		case <-ctx.Done():
+			if cli.IsTimeoutMonitorDisconnected() {
+				continue
+			}
 			return nil
 		case <-sigCh:
 			return nil
 		case rawKeys := <-keyCh:
+			cli.TouchMeaningfulActivity()
 			if shouldExit := m.HandleInput(rawKeys); shouldExit {
 				return nil
 			}
 			renderScreen()
 		case <-refreshTicker.C:
+			cli.TouchMeaningfulActivity()
 			m.RefreshObjects()
 			renderScreen()
 		}
