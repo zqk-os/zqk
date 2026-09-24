@@ -417,7 +417,10 @@ func (f *FileObjectStorage) applyCreateFromBuffer(ctx context.Context, id, kind 
 	}
 	if useDraftPlane {
 		if err := f.errIfDraftCreateWouldDualPlane(id, kind); err != nil {
-			return err
+			// In write-behind apply: if CAS already maps this id, the object was already materialized
+			// to CAS (or promoted). The write-behind draft create is superseded by CAS reality;
+			// mark as complete rather than stalling write-behind replay.
+			return nil
 		}
 	}
 	if err := f.writeObjectToStorage(ctx, id, kind, filePath, data, secCtx, useDraftPlane); err != nil {
