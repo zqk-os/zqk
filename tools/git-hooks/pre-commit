@@ -2,8 +2,10 @@
 #
 # Pre-commit hook for ZQK
 # Fail-closed enforcement for projects initialized with ZQK:
-# 1. Knowledge Kernel CAS & Referential Integrity Gate (zqk system check)
-# 2. Test-Driven Development & Lineage Gate (zqk test dashboard --check-dod)
+# 0. Branch Protection Gate: Direct commits to main/master prohibited (POL-WORKFLOW-002)
+# 1. CAS Membrane Integrity Gate (Prevent hand-editing of files past the CAS membrane)
+# 2. Knowledge Kernel CAS & Referential Integrity Gate (zqk system check)
+# 3. Test-Driven Development & Lineage Gate (zqk test dashboard --check-dod)
 
 set -e
 
@@ -32,7 +34,32 @@ if [ -z "$ZQK_BIN" ]; then
 	exit 0
 fi
 
-# 0. CAS Membrane Integrity Gate (Prevent hand-editing of files past the CAS membrane)
+# 0. Branch Protection Gate (POL-WORKFLOW-002)
+# Committing directly to protected branches (main, master) is strictly prohibited.
+CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")"
+if [ "$CURRENT_BRANCH" = "main" ] || [ "$CURRENT_BRANCH" = "master" ]; then
+	if [ "${ZQK_ALLOW_MAIN_COMMIT}" != "1" ]; then
+		echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+		echo "❌ [ZQK PRE-COMMIT] FAIL-CLOSED BRANCH PROTECTION VIOLATION" >&2
+		echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+		echo "Direct commit to protected branch '$CURRENT_BRANCH' is strictly forbidden." >&2
+		echo "" >&2
+		echo "All code changes MUST be committed on a topic/feature/integration branch" >&2
+		echo "and merged through a validated Pull Request (POL-WORKFLOW-002)." >&2
+		echo "" >&2
+		echo "Remediation:" >&2
+		echo "  1. Switch to a feature/integration branch:" >&2
+		echo "     git checkout -b <branch-name>" >&2
+		echo "  2. Commit your staged changes there:" >&2
+		echo "     git commit -m \"...\"" >&2
+		echo "  3. Open a Pull Request once tests and criteria pass:" >&2
+		echo "     gh pr create --fill" >&2
+		echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+		exit 1
+	fi
+fi
+
+# 1. CAS Membrane Integrity Gate (Prevent hand-editing of files past the CAS membrane)
 # Any staged file under .zqk/process/**/*.yaml must:
 # a) Have its filename match sha256 of its staged content (CAS content-addressable hash invariant)
 # b) Not be in a preliminary status (conceptual) - those must remain on the draft plane (.zqk/object_drafts/)
@@ -72,7 +99,7 @@ if [ -n "$STAGED_CAS_FILES" ]; then
 	done
 fi
 
-# 1. Knowledge Kernel CAS & Referential Integrity Gate
+# 2. Knowledge Kernel CAS & Referential Integrity Gate
 if [ -d "$REPO_ROOT/.zqk/process" ]; then
 	echo "🔍 [ZQK PRE-COMMIT] Verifying Knowledge Kernel integrity..."
 	if ! "$ZQK_BIN" system check --tier 1; then
@@ -82,7 +109,7 @@ if [ -d "$REPO_ROOT/.zqk/process" ]; then
 	fi
 fi
 
-# 2. Test-Driven Development (TDD) Definition of Done Verification
+# 3. Test-Driven Development (TDD) Definition of Done Verification
 if [ -d "$REPO_ROOT/.zqk/process/test_cases" ] || [ -f "$REPO_ROOT/.zqk/state/test_dashboard_lite.json" ]; then
 	echo "⚡ [ZQK PRE-COMMIT] Verifying Test Matrix Definition of Done..."
 	if ! "$ZQK_BIN" test dashboard --check-dod; then

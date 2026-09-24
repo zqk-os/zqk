@@ -1,6 +1,7 @@
 package system
 
 import (
+	"bytes"
 	"path/filepath"
 	"testing"
 
@@ -92,5 +93,41 @@ func assertExecutableHook(t *testing.T, path string) {
 	}
 	if info.Mode().Perm()&ownerExecuteBit == 0 {
 		t.Fatalf("hook mode %o is not executable", info.Mode().Perm())
+	}
+}
+
+func TestEnsureGitHooks_InstallsPreCommitAndPrePush(t *testing.T) {
+	t.Parallel()
+
+	root := t.TempDir()
+	gitDir := filepath.Join(root, ".git")
+	if err := fileutil.EnsureDir(gitDir); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := EnsureGitHooks(root, nil); err != nil {
+		t.Fatalf("EnsureGitHooks failed: %v", err)
+	}
+
+	preCommit := filepath.Join(gitDir, "hooks", "pre-commit")
+	prePush := filepath.Join(gitDir, "hooks", "pre-push")
+
+	assertExecutableHook(t, preCommit)
+	assertExecutableHook(t, prePush)
+
+	preCommitContent, err := fileutil.ReadFile(preCommit)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !bytes.Contains(preCommitContent, []byte("FAIL-CLOSED BRANCH PROTECTION VIOLATION")) {
+		t.Errorf("pre-commit missing branch protection check")
+	}
+
+	prePushContent, err := fileutil.ReadFile(prePush)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !bytes.Contains(prePushContent, []byte("FAIL-CLOSED BRANCH PROTECTION VIOLATION")) {
+		t.Errorf("pre-push missing branch protection check")
 	}
 }
