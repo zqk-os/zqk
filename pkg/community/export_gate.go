@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"fmt"
 	"io/fs"
-	"os/exec"
 	"path/filepath"
 	"strings"
 
+	"github.com/zqk-os/zqk/pkg/git"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -47,8 +47,8 @@ var DefaultProhibitedExtensions = []string{
 
 func getGitIgnoredPaths(targetDir string) map[string]bool {
 	ignored := make(map[string]bool)
-	cmd := exec.Command("git", "-C", targetDir, "status", "--ignored", "--porcelain")
-	out, err := cmd.Output()
+	g := git.NewFacade(targetDir)
+	out, err := g.StatusIgnoredPorcelain()
 	if err != nil {
 		return ignored
 	}

@@ -56,6 +56,17 @@ func (f *Facade) StatusShort() ([]byte, error) {
 	return f.output("status", "--short")
 }
 
+// StatusPorcelain returns the machine-readable git status output.
+func (f *Facade) StatusPorcelain(args ...string) ([]byte, error) {
+	cmdArgs := append([]string{"status", "--porcelain"}, args...)
+	return f.output(cmdArgs...)
+}
+
+// StatusIgnoredPorcelain returns the machine-readable git status output including ignored files.
+func (f *Facade) StatusIgnoredPorcelain() ([]byte, error) {
+	return f.output("status", "--ignored", "--porcelain")
+}
+
 func (f *Facade) AddAll() ([]byte, error) {
 	return f.combinedOutput("add", "-A")
 }
