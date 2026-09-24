@@ -296,8 +296,10 @@ const defaultPreCommitHookScript = `#!/bin/sh
 #
 # Pre-commit hook for ZQK
 # Fail-closed enforcement for projects initialized with ZQK:
-# 1. Knowledge Kernel CAS & Referential Integrity Gate (zqk system check)
-# 2. Test-Driven Development & Lineage Gate (zqk test dashboard --check-dod)
+# 0. Branch Protection Gate: Direct commits to main/master prohibited (POL-WORKFLOW-002)
+# 1. CAS Membrane Integrity Gate (Prevent hand-editing of files past the CAS membrane)
+# 2. Knowledge Kernel CAS & Referential Integrity Gate (zqk system check)
+# 3. Test-Driven Development & Lineage Gate (zqk test dashboard --check-dod)
 
 set -e
 
@@ -326,7 +328,32 @@ if [ -z "$ZQK_BIN" ]; then
 	exit 0
 fi
 
-# 0. CAS Membrane Integrity Gate (Prevent hand-editing of files past the CAS membrane)
+# 0. Branch Protection Gate (POL-WORKFLOW-002)
+# Committing directly to protected branches (main, master) is strictly prohibited.
+CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")"
+if [ "$CURRENT_BRANCH" = "main" ] || [ "$CURRENT_BRANCH" = "master" ]; then
+	if [ "${ZQK_ALLOW_MAIN_COMMIT}" != "1" ]; then
+		echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+		echo "❌ [ZQK PRE-COMMIT] FAIL-CLOSED BRANCH PROTECTION VIOLATION" >&2
+		echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+		echo "Direct commit to protected branch '$CURRENT_BRANCH' is strictly forbidden." >&2
+		echo "" >&2
+		echo "All code changes MUST be committed on a topic/feature/integration branch" >&2
+		echo "and merged through a validated Pull Request (POL-WORKFLOW-002)." >&2
+		echo "" >&2
+		echo "Remediation:" >&2
+		echo "  1. Switch to a feature/integration branch:" >&2
+		echo "     git checkout -b <branch-name>" >&2
+		echo "  2. Commit your staged changes there:" >&2
+		echo "     git commit -m \"...\"" >&2
+		echo "  3. Open a Pull Request once tests and criteria pass:" >&2
+		echo "     gh pr create --fill" >&2
+		echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+		exit 1
+	fi
+fi
+
+# 1. CAS Membrane Integrity Gate (Prevent hand-editing of files past the CAS membrane)
 # Any staged file under .zqk/process/**/*.yaml must:
 # a) Have its filename match sha256 of its staged content (CAS content-addressable hash invariant)
 # b) Not be in a preliminary status (conceptual) - those must remain on the draft plane (.zqk/object_drafts/)
@@ -366,17 +393,17 @@ if [ -n "$STAGED_CAS_FILES" ]; then
 	done
 fi
 
-# 1. Knowledge Kernel CAS & Referential Integrity Gate
+# 2. Knowledge Kernel CAS & Referential Integrity Gate
 if [ -d "$REPO_ROOT/.zqk/process" ]; then
 	echo "🔍 [ZQK PRE-COMMIT] Verifying Knowledge Kernel integrity..."
-	if ! "$ZQK_BIN" system check; then
+	if ! "$ZQK_BIN" system check --tier 1; then
 		echo "❌ [ZQK PRE-COMMIT] System check failed! Blocking violations found in kernel graph."
 		echo "   Run '$ZQK_BIN system check --details' to inspect and resolve."
 		exit 1
 	fi
 fi
 
-# 2. Test-Driven Development (TDD) Definition of Done Verification
+# 3. Test-Driven Development (TDD) Definition of Done Verification
 if [ -d "$REPO_ROOT/.zqk/process/test_cases" ] || [ -f "$REPO_ROOT/.zqk/state/test_dashboard_lite.json" ]; then
 	echo "⚡ [ZQK PRE-COMMIT] Verifying Test Matrix Definition of Done..."
 	if ! "$ZQK_BIN" test dashboard --check-dod; then
@@ -387,8 +414,66 @@ if [ -d "$REPO_ROOT/.zqk/process/test_cases" ] || [ -f "$REPO_ROOT/.zqk/state/te
 fi
 `
 
+const defaultPrePushHookScript = `#!/bin/sh
+#
+# Pre-push hook for ZQK
+# Fail-closed enforcement for Git branch protection & PR workflow (POL-WORKFLOW-002)
+#
+# Rules:
+# 1. Pushing directly to 'main' or 'master' is strictly prohibited.
+# 2. All changes must be pushed to topic/integration/feature branches and merged via Pull Request.
+# 3. Can be bypassed ONLY in exceptional manual emergencies via ZQK_ALLOW_MAIN_PUSH=1.
+
+set -e
+
+remote="$1"
+url="$2"
+
+zero="0000000000000000000000000000000000000000"
+
+while read -r local_ref local_oid remote_ref remote_oid; do
+	# Check if deleting remote ref
+	if [ "$local_oid" = "$zero" ]; then
+		# Remote branch deletion
+		if [ "$remote_ref" = "refs/heads/main" ] || [ "$remote_ref" = "refs/heads/master" ]; then
+			echo "❌ [ZQK PRE-PUSH] Prohibited: Deleting protected branch '$remote_ref' is forbidden." >&2
+			exit 1
+		fi
+		continue
+	fi
+
+	# Target branch is main or master
+	if [ "$remote_ref" = "refs/heads/main" ] || [ "$remote_ref" = "refs/heads/master" ]; then
+		if [ "${ZQK_ALLOW_MAIN_PUSH}" = "1" ]; then
+			echo "⚠️  [ZQK PRE-PUSH] Warning: Direct push to protected branch '$remote_ref' permitted via ZQK_ALLOW_MAIN_PUSH=1." >&2
+			continue
+		fi
+
+		echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+		echo "❌ [ZQK PRE-PUSH] FAIL-CLOSED BRANCH PROTECTION VIOLATION" >&2
+		echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+		echo "Direct push to protected branch '$remote_ref' is strictly forbidden." >&2
+		echo "" >&2
+		echo "All code changes MUST be submitted via topic/feature/integration branches" >&2
+		echo "and merged through a validated Pull Request (POL-WORKFLOW-002)." >&2
+		echo "" >&2
+		echo "Remediation:" >&2
+		echo "  1. Create or switch to an integration/feature branch:" >&2
+		echo "     git checkout -b <branch-name>" >&2
+		echo "  2. Push your topic branch:" >&2
+		echo "     git push -u origin <branch-name>" >&2
+		echo "  3. Open a Pull Request on GitHub:" >&2
+		echo "     gh pr create --fill" >&2
+		echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+		exit 1
+	fi
+done
+
+exit 0
+`
+
 // EnsureGitHooks checks if a git repository is present and installs/updates
-// the ZQK pre-commit hook into .git/hooks/pre-commit and tools/git-hooks/pre-commit.
+// the ZQK pre-commit and pre-push hooks into .git/hooks and tools/git-hooks.
 func EnsureGitHooks(projectRoot string, logger logging.Logger) error {
 	gitDir := filepath.Join(projectRoot, ".git")
 	if _, err := fileutil.Stat(gitDir); err != nil {
@@ -400,43 +485,53 @@ func EnsureGitHooks(projectRoot string, logger logging.Logger) error {
 		return fmt.Errorf("failed to create tools/git-hooks: %w", err)
 	}
 
-	templatePath := filepath.Join(toolsDir, "pre-commit")
-	if _, err := fileutil.Stat(templatePath); fileutil.IsNotExist(err) {
-		if err := fileutil.WriteFile(templatePath, []byte(defaultPreCommitHookScript), paths.DirPerm755); err != nil {
-			return fmt.Errorf("failed to write hook template %s: %w", templatePath, err)
-		}
-	}
-
 	hooksDir := filepath.Join(gitDir, "hooks")
 	if err := fileutil.MkdirAll(hooksDir, paths.DirPerm755); err != nil {
 		return fmt.Errorf("failed to create .git/hooks: %w", err)
 	}
 
-	installedPath := filepath.Join(hooksDir, "pre-commit")
-	if _, err := fileutil.Stat(installedPath + disabledHookSuffix); err == nil {
-		if logger != nil {
-			logging.Fluent(logger).Info("Pre-commit hook is manually disabled (.git/hooks/pre-commit.disabled); skipping").Log()
-		}
-		return nil
+	standardHooks := []struct {
+		name     string
+		template string
+	}{
+		{name: "pre-commit", template: defaultPreCommitHookScript},
+		{name: "pre-push", template: defaultPrePushHookScript},
 	}
 
-	// Install or update if missing or different
-	needsInstall := false
-	if _, err := fileutil.Stat(installedPath); fileutil.IsNotExist(err) {
-		needsInstall = true
-	} else {
-		eq, _ := compareFiles(templatePath, installedPath)
-		if !eq {
+	for _, h := range standardHooks {
+		templatePath := filepath.Join(toolsDir, h.name)
+		if _, err := fileutil.Stat(templatePath); fileutil.IsNotExist(err) {
+			if err := fileutil.WriteFile(templatePath, []byte(h.template), paths.DirPerm755); err != nil {
+				return fmt.Errorf("failed to write hook template %s: %w", templatePath, err)
+			}
+		}
+
+		installedPath := filepath.Join(hooksDir, h.name)
+		if _, err := fileutil.Stat(installedPath + disabledHookSuffix); err == nil {
+			if logger != nil {
+				logging.Fluent(logger).Info(fmt.Sprintf("%s hook is manually disabled (%s.disabled); skipping", h.name, installedPath)).Log()
+			}
+			continue
+		}
+
+		// Install or update if missing or different
+		needsInstall := false
+		if _, err := fileutil.Stat(installedPath); fileutil.IsNotExist(err) {
 			needsInstall = true
+		} else {
+			eq, _ := compareFiles(templatePath, installedPath)
+			if !eq {
+				needsInstall = true
+			}
 		}
-	}
 
-	if needsInstall {
-		if err := installHook(templatePath, installedPath); err != nil {
-			return fmt.Errorf("failed to install pre-commit hook: %w", err)
-		}
-		if logger != nil {
-			logging.Fluent(logger).Info("Installed pre-commit hook into .git/hooks/pre-commit").Log()
+		if needsInstall {
+			if err := installHook(templatePath, installedPath); err != nil {
+				return fmt.Errorf("failed to install %s hook: %w", h.name, err)
+			}
+			if logger != nil {
+				logging.Fluent(logger).Info(fmt.Sprintf("Installed %s hook into .git/hooks/%s", h.name, h.name)).Log()
+			}
 		}
 	}
 

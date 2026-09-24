@@ -1,0 +1,56 @@
+#!/bin/sh
+#
+# Pre-push hook for ZQK
+# Fail-closed enforcement for Git branch protection & PR workflow (POL-WORKFLOW-002)
+#
+# Rules:
+# 1. Pushing directly to 'main' or 'master' is strictly prohibited.
+# 2. All changes must be pushed to topic/integration/feature branches and merged via Pull Request.
+# 3. Can be bypassed ONLY in exceptional manual emergencies via ZQK_ALLOW_MAIN_PUSH=1.
+
+set -e
+
+remote="$1"
+url="$2"
+
+zero="0000000000000000000000000000000000000000"
+
+while read -r local_ref local_oid remote_ref remote_oid; do
+	# Check if deleting remote ref
+	if [ "$local_oid" = "$zero" ]; then
+		# Remote branch deletion
+		if [ "$remote_ref" = "refs/heads/main" ] || [ "$remote_ref" = "refs/heads/master" ]; then
+			echo "❌ [ZQK PRE-PUSH] Prohibited: Deleting protected branch '$remote_ref' is forbidden." >&2
+			exit 1
+		fi
+		continue
+	fi
+
+	# Target branch is main or master
+	if [ "$remote_ref" = "refs/heads/main" ] || [ "$remote_ref" = "refs/heads/master" ]; then
+		if [ "${ZQK_ALLOW_MAIN_PUSH}" = "1" ]; then
+			echo "⚠️  [ZQK PRE-PUSH] Warning: Direct push to protected branch '$remote_ref' permitted via ZQK_ALLOW_MAIN_PUSH=1." >&2
+			continue
+		fi
+
+		echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+		echo "❌ [ZQK PRE-PUSH] FAIL-CLOSED BRANCH PROTECTION VIOLATION" >&2
+		echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+		echo "Direct push to protected branch '$remote_ref' is strictly forbidden." >&2
+		echo "" >&2
+		echo "All code changes MUST be submitted via topic/feature/integration branches" >&2
+		echo "and merged through a validated Pull Request (POL-WORKFLOW-002)." >&2
+		echo "" >&2
+		echo "Remediation:" >&2
+		echo "  1. Create or switch to an integration/feature branch:" >&2
+		echo "     git checkout -b <branch-name>" >&2
+		echo "  2. Push your topic branch:" >&2
+		echo "     git push -u origin <branch-name>" >&2
+		echo "  3. Open a Pull Request on GitHub:" >&2
+		echo "     gh pr create --fill" >&2
+		echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+		exit 1
+	fi
+done
+
+exit 0
