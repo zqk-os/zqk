@@ -28,7 +28,7 @@ func ProjectScopedPrivilegedWriterSocketPath(projectRoot string) string {
 	if projectRoot == "" {
 		projectRoot = paths.ResolveProjectRoot(".")
 	}
-	return filepath.Join(projectRoot, ".zqk", "run", name)
+	return filepath.Join(projectRoot, paths.ProjectDataDir, "run", name)
 }
 
 // DefaultPrivilegedWriterSocketPath returns the default UNIX socket path.

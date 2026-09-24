@@ -10,6 +10,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/state"
 	"github.com/zqk-os/zqk/cmd/zqk/ui/tds"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 var (
@@ -1426,7 +1427,7 @@ func renderQATab(b *strings.Builder, m *UIModel) {
 			b.WriteString(yellow(fmt.Sprintf("  ⚠  No test cases matching search query \"%s\".\n\n", m.SearchQuery)))
 		} else {
 			b.WriteString(yellow("  ⚠  No active test case objects discovered in test_dashboard_lite.json or CAS storage.\n"))
-			b.WriteString(dim("     To generate test suites and link criteria, run 'zqk test bind' or 'zqk workflow whats-next'.\n\n"))
+			b.WriteString(dim(fmt.Sprintf("     To generate test suites and link criteria, run '%s' or '%s'.\n\n", paths.CLIInvocation("test bind"), paths.CLIInvocation("workflow whats-next"))))
 		}
 		return
 	}
