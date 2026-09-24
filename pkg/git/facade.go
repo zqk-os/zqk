@@ -56,6 +56,12 @@ func (f *Facade) StatusShort() ([]byte, error) {
 	return f.output("status", "--short")
 }
 
+// LSFiles returns the output of git ls-files with optional arguments.
+func (f *Facade) LSFiles(args ...string) ([]byte, error) {
+	cmdArgs := append([]string{"ls-files"}, args...)
+	return f.output(cmdArgs...)
+}
+
 // StatusPorcelain returns the machine-readable git status output.
 func (f *Facade) StatusPorcelain(args ...string) ([]byte, error) {
 	cmdArgs := append([]string{"status", "--porcelain"}, args...)
