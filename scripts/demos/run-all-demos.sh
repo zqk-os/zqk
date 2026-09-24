@@ -42,6 +42,9 @@ run_demo() {
     4)
       bash "${SCRIPT_DIR}/crypto_audit_demo.sh"
       ;;
+    5)
+      bash "${SCRIPT_DIR}/object_inspector_policy_studio_demo.sh"
+      ;;
     *)
       echo -e "${RED}Invalid demo selection: ${num}${NC}"
       exit 1
@@ -56,9 +59,9 @@ run_all() {
   fi
 
   print_header
-  echo -e "${BOLD}Executing full 4-part showcase sequence...${NC}\n"
+  echo -e "${BOLD}Executing full 5-part showcase sequence...${NC}\n"
   
-  echo -e "${BOLD}▶ [1/4] DAY-0 GREENFIELD DEVELOPER EXPERIENCE${NC}"
+  echo -e "${BOLD}▶ [1/5] DAY-0 GREENFIELD DEVELOPER EXPERIENCE${NC}"
   run_demo 1
   
   if [[ "$interactive" -eq 1 ]]; then
@@ -66,7 +69,7 @@ run_all() {
     read -r _ || true
   fi
   
-  echo -e "\n${BOLD}▶ [2/4] CRASH-CONSISTENCY & KILL -9 RESURRECTION${NC}"
+  echo -e "\n${BOLD}▶ [2/5] CRASH-CONSISTENCY & KILL -9 RESURRECTION${NC}"
   run_demo 2
   
   if [[ "$interactive" -eq 1 ]]; then
@@ -74,7 +77,7 @@ run_all() {
     read -r _ || true
   fi
   
-  echo -e "\n${BOLD}▶ [3/4] DYNAMIC MEMBRANE & PROMPT INJECTION INTERCEPT${NC}"
+  echo -e "\n${BOLD}▶ [3/5] DYNAMIC MEMBRANE & PROMPT INJECTION INTERCEPT${NC}"
   run_demo 3
   
   if [[ "$interactive" -eq 1 ]]; then
@@ -82,11 +85,19 @@ run_all() {
     read -r _ || true
   fi
   
-  echo -e "\n${BOLD}▶ [4/4] CRYPTOGRAPHIC AUDIT & OPENVEX ATTESTATION${NC}"
+  echo -e "\n${BOLD}▶ [4/5] CRYPTOGRAPHIC AUDIT & OPENVEX ATTESTATION${NC}"
   run_demo 4
 
+  if [[ "$interactive" -eq 1 ]]; then
+    echo -e "\n${BOLD}Press Enter to proceed to Demo 5 (or Ctrl+C to stop)...${NC}"
+    read -r _ || true
+  fi
+
+  echo -e "\n${BOLD}▶ [5/5] OBJECT INSPECTOR, POLICY STUDIO & UNIFIED QA CONSOLE${NC}"
+  run_demo 5
+
   echo -e "\n${BOLD}═══════════════════════════════════════════════════════════════════════════${NC}"
-  echo -e "${BOLD}${GREEN}✔ ALL 4 SHOWCASE DEMOS COMPLETED SUCCESSFULLY${NC}"
+  echo -e "${BOLD}${GREEN}✔ ALL 5 SHOWCASE DEMOS COMPLETED SUCCESSFULLY${NC}"
   echo -e "${BOLD}═══════════════════════════════════════════════════════════════════════════${NC}"
 }
 
@@ -100,7 +111,7 @@ if [[ "${1:-}" == "--demo" && -n "${2:-}" ]]; then
   exit 0
 fi
 
-if [[ -n "${1:-}" && "${1:-}" =~ ^[1-4]$ ]]; then
+if [[ -n "${1:-}" && "${1:-}" =~ ^[1-5]$ ]]; then
   run_demo "$1"
   exit 0
 fi
@@ -112,14 +123,15 @@ echo -e "  ${BOLD}[1]${NC} Day-0 Greenfield DX     (Instant setup, starter graph
 echo -e "  ${BOLD}[2]${NC} Crash-Consistency       (Unannounced kill -9, WAL replay, zero data loss)"
 echo -e "  ${BOLD}[3]${NC} Dynamic Membrane        (MCP directory jail, prompt injection trapping)"
 echo -e "  ${BOLD}[4]${NC} Cryptographic Audit     (Multi-agent custody, CISA OpenVEX attestation)"
+echo -e "  ${BOLD}[5]${NC} Object Inspector & QA   (Dual human/agent views, Policy Studio, DoD QA)"
 echo -e "  ${BOLD}[A]${NC} Run All Demonstrations"
 echo -e "  ${BOLD}[Q]${NC} Quit\n"
 
-read -p "Enter choice [1-4, A, Q]: " -n 1 -r CHOICE
+read -p "Enter choice [1-5, A, Q]: " -n 1 -r CHOICE
 echo ""
 
 case "${CHOICE}" in
-  1|2|3|4)
+  1|2|3|4|5)
     run_demo "${CHOICE}"
     ;;
   [aA])

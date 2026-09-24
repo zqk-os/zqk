@@ -82,8 +82,9 @@ zqk grep --ast "func Test*" .
 4. `zqk state stream --dashboard` — stream live change journal mutations and CPCP status with the visual seismograph.
 5. `zqk state tree` — inspect the live knowledge graph hierarchy.
 6. `zqk object list` — first-run scoreboard.
-7. `zqk system dashboard` — kernel pulse (plan + counts).
-8. `zqk test dashboard` — test_case ↔ criteria lineage.
-9. `zqk workflow whats-next --format json`.
+7. `zqk object inspect` — interactive object inspector, lineage radar, and live Policy Studio.
+8. `zqk system dashboard` (or `zqk ui`) — Mission Control Console with dedicated QA Tab (`--tab qa`).
+9. `zqk test dashboard --check-dod` — test_case ↔ criteria lineage and 100% Definition of Done verification.
+10. `zqk workflow whats-next --format json`.
 
 ZQK Core provides the complete system kernel: object lifecycle, spec origination, command codegen, scheduler daemons (`zqk scheduler start|stop|status`), and Model Context Protocol (MCP) integration are fully native and offline-capable out of the box.

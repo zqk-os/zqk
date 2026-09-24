@@ -14,9 +14,12 @@ Start in **onboarding**.
 | **[Contributing](../CONTRIBUTING.md)** | How to work in this tree |
 | **[Governance](../GOVERNANCE.md)** | Open-core boundary, decision-making, publication hold |
 | **[Tutorials](./tutorials/README.md)** | Learn-by-doing (Divio) |
+| **[Object Inspector Tutorial](./tutorials/INTERACTIVE_OBJECT_INSPECTION_TUTORIAL.md)** | Interactive TUI inspection, drill-downs, and live Policy Studio walkthrough |
 | **[How-to](./howto/README.md)** | Task recipes (Divio) |
+| **[Inspect & Validate Objects](./howto/INSPECT_AND_VALIDATE_OBJECTS.md)** | Dual human/machine projections, live DSL policy dry-runs, and DoD verification |
 | **[Scheduler and maintenance](./howto/SCHEDULER_AND_MAINTENANCE.md)** | Daemon, kernel survival jobs vs optional source-code lint/policy/integrity |
 | **[Maintenance & Development](./development/README.md)** | Engineering guides, policy durability, and maintenance conventions |
 | **[Policy Governance & Durability](./development/POLICY_GOVERNANCE_AND_DURABILITY.md)** | Durability tiers, cryptographic seeds, AST linters, and conventions |
 | **[Manual](./manual/README.md)** | Reference (Divio) |
+| **[Object Inspector Manual](./manual/OBJECT_INSPECTOR_AND_POLICY_STUDIO.md)** | Complete CLI flags, TUI keybindings, Role-Gated Action Palette, and Policy Studio specs |
 | **[Explanation](./explanation/README.md)** | Why the kernel is shaped this way (Divio) |
