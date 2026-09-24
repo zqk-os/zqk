@@ -10,7 +10,7 @@ import (
 
 var runtimeManifests stampmemo.Table[RuntimeManifest] // keyed by projectRoot
 
-// RuntimeManifest is optional JSON at .zqk/agent-runtime/datacell_runtime.json (or alias override).
+// RuntimeManifest is optional JSON at .zqk/config/datacell_runtime.json (or alias override).
 // When missing, consumers treat protocol version as [ProtocolVersion] constant.
 type RuntimeManifest struct {
 	ProtocolVersion string `json:"protocol_version"`
@@ -18,7 +18,7 @@ type RuntimeManifest struct {
 
 // RuntimeManifestPath returns the absolute path to the optional runtime manifest file.
 func RuntimeManifestPath(projectRoot string) string {
-	return paths.ResolveAgentRuntimePath(projectRoot, paths.PathAliasDatacellRuntimeManifest, paths.DataCellRuntimeManifestFile)
+	return resolveConfigLitePath(projectRoot, paths.PathAliasDatacellRuntimeManifest, paths.DataCellRuntimeManifestFile)
 }
 
 // ReadRuntimeManifest loads the manifest when present. A missing file returns (RuntimeManifest{}, nil).

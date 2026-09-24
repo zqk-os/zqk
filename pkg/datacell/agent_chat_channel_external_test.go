@@ -14,7 +14,7 @@ import (
 func TestReadAgentChatChannelConfig_validFile(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
-	cfgDir := filepath.Join(root, paths.ProjectDataDir, paths.AgentRuntimeDir)
+	cfgDir := filepath.Join(root, paths.ProjectDataDir, paths.ConfigDir)
 	if err := fileutil.EnsureDir(cfgDir); err != nil {
 		t.Fatal(err)
 	}
@@ -42,7 +42,7 @@ func TestReadAgentChatChannelConfig_validFile(t *testing.T) {
 func TestReadAgentChatChannelConfig_deliveryMode(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
-	cfgDir := filepath.Join(root, paths.ProjectDataDir, paths.AgentRuntimeDir)
+	cfgDir := filepath.Join(root, paths.ProjectDataDir, paths.ConfigDir)
 	if err := fileutil.EnsureDir(cfgDir); err != nil {
 		t.Fatal(err)
 	}
