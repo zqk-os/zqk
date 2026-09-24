@@ -156,11 +156,16 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 	// 5. Synthesize Ontological Graph Lineage
 	cleanName := strings.ToUpper(strings.ReplaceAll(manifest.Name, "-", "_"))
 	goalID := fmt.Sprintf("GOAL-%s", cleanName)
-	milestoneID := fmt.Sprintf("MLS-%s", cleanName)
+	milestoneID := fmt.Sprintf("MIL-%s", cleanName)
 	planID := fmt.Sprintf("PRI-%s", cleanName)
 	cvsID := fmt.Sprintf("CVS-%s", cleanName)
 
 	var kernelObjects []map[string]any
+
+	baselineScore := 4.5
+	if b, ok := opts.Parameters["baseline"].(float64); ok && b > 0 {
+		baselineScore = b
+	}
 
 	// Layer 1: Goal
 	goalObj := map[string]any{
@@ -168,25 +173,17 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 		objects.FieldKeyKind:        "goal",
 		objects.FieldKeyTitle:       fmt.Sprintf("Swarm Goal: %s", manifest.Name),
 		objects.FieldKeyDescription: manifest.Description,
-		objects.FieldKeyStatus:      objects.ObjectStatusActive,
+		"metric":                     "quality_score",
+		"target":                     fmt.Sprintf("%.1f", baselineScore),
+		objects.FieldKeyStatus:      objects.ObjectStatusOriginated,
 	}
 	kernelObjects = append(kernelObjects, goalObj)
 
-	// Milestone
-	mlsObj := map[string]any{
-		objects.FieldKeyID:          milestoneID,
-		objects.FieldKeyKind:        "milestone",
-		objects.FieldKeyTitle:       fmt.Sprintf("Milestone: %s Execution", manifest.Name),
-		objects.FieldKeyDescription: fmt.Sprintf("Execute all tasks and evaluations declared by %s v%s", manifest.Name, manifest.Version),
-		objects.FieldKeyGoalRefs:    []string{goalID},
-		objects.FieldKeyStatus:      objects.ObjectStatusPlanned,
-	}
-	kernelObjects = append(kernelObjects, mlsObj)
+	var allCritIDs []string
+	var allReqIDs []string
 
-	var bliRefs []string
-
-	// Layer 2-4: For each task, synthesize Req -> Criteria (3-Fold) -> Test Case -> Backlog Item
-	for i, task := range manifest.Tasks {
+	// Layer 2-4: For each task, synthesize Criteria (3-Fold) -> Req -> Test Case -> Backlog Item
+	for _, task := range manifest.Tasks {
 		taskClean := strings.ToUpper(strings.ReplaceAll(task.ID, "-", "_"))
 		reqID := fmt.Sprintf("REQ-%s-%s", cleanName, taskClean)
 		critInvID := fmt.Sprintf("CRIT-%s-%s-INV", cleanName, taskClean)
@@ -195,63 +192,71 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 		tstID := fmt.Sprintf("TST-%s-%s", cleanName, taskClean)
 		bliID := fmt.Sprintf("BLI-%s-%s", cleanName, taskClean)
 
-		bliRefs = append(bliRefs, bliID)
-
-		// Requirement
-		reqObj := map[string]any{
-			objects.FieldKeyID:          reqID,
-			objects.FieldKeyKind:        "requirement",
-			objects.FieldKeyTitle:       task.Title,
-			objects.FieldKeyDescription: fmt.Sprintf("Satisfy specification for task %s (%s)", task.ID, task.Title),
-			objects.FieldKeyGoalRefs:    []string{goalID},
-			objects.FieldKeyCriteriaRefs: []string{critInvID, critDynID, critAdvID},
-			objects.FieldKeyStatus:      objects.ObjectStatusActive,
-		}
-		kernelObjects = append(kernelObjects, reqObj)
+		allCritIDs = append(allCritIDs, critInvID, critDynID, critAdvID)
+		allReqIDs = append(allReqIDs, reqID)
 
 		// Criteria 1: Invariant
 		critInv := map[string]any{
-			objects.FieldKeyID:          critInvID,
-			objects.FieldKeyKind:        "criteria",
-			objects.FieldKeyTitle:       fmt.Sprintf("State Invariant for %s", task.ID),
-			"formula_type":              "invariant",
-			"statement":                 fmt.Sprintf("Specification schema and output structure are strictly valid for %s", task.ID),
+			objects.FieldKeyID:              critInvID,
+			objects.FieldKeyKind:            "criteria",
+			objects.FieldKeyTitle:           fmt.Sprintf("State Invariant for %s", task.ID),
+			"formula_type":                  "invariant",
+			"statement":                     fmt.Sprintf("Specification schema and output structure are strictly valid for %s", task.ID),
+			objects.FieldKeyCategory:        "quality",
 			objects.FieldKeyRequirementRefs: []string{reqID},
-			objects.FieldKeyStatus:      objects.ObjectStatusActive,
+			objects.FieldKeyStatus:          objects.ObjectStatusAwaitingVerification,
 		}
 		// Criteria 2: Dynamic
 		critDyn := map[string]any{
-			objects.FieldKeyID:          critDynID,
-			objects.FieldKeyKind:        "criteria",
-			objects.FieldKeyTitle:       fmt.Sprintf("Dynamic Execution for %s", task.ID),
-			"formula_type":              "dynamic",
-			"statement":                 fmt.Sprintf("Agent task executes successfully and generates verifiable observations for %s", task.ID),
+			objects.FieldKeyID:              critDynID,
+			objects.FieldKeyKind:            "criteria",
+			objects.FieldKeyTitle:           fmt.Sprintf("Dynamic Execution for %s", task.ID),
+			"formula_type":                  "dynamic",
+			"statement":                     fmt.Sprintf("Agent task executes successfully and generates verifiable observations for %s", task.ID),
+			objects.FieldKeyCategory:        "quality",
 			objects.FieldKeyRequirementRefs: []string{reqID},
-			objects.FieldKeyStatus:      objects.ObjectStatusActive,
+			objects.FieldKeyStatus:          objects.ObjectStatusAwaitingVerification,
 		}
 		// Criteria 3: Adversarial
 		critAdv := map[string]any{
-			objects.FieldKeyID:          critAdvID,
-			objects.FieldKeyKind:        "criteria",
-			objects.FieldKeyTitle:       fmt.Sprintf("Adversarial Boundary for %s", task.ID),
-			"formula_type":              "adversarial",
-			"statement":                 fmt.Sprintf("Non-conforming outputs or membrane transgressions fail closed for %s", task.ID),
+			objects.FieldKeyID:              critAdvID,
+			objects.FieldKeyKind:            "criteria",
+			objects.FieldKeyTitle:           fmt.Sprintf("Adversarial Boundary for %s", task.ID),
+			"formula_type":                  "adversarial",
+			"statement":                     fmt.Sprintf("Non-conforming outputs or membrane transgressions fail closed for %s", task.ID),
+			objects.FieldKeyCategory:        "quality",
 			objects.FieldKeyRequirementRefs: []string{reqID},
-			objects.FieldKeyStatus:      objects.ObjectStatusActive,
+			objects.FieldKeyStatus:          objects.ObjectStatusAwaitingVerification,
 		}
 		kernelObjects = append(kernelObjects, critInv, critDyn, critAdv)
 
+		// Requirement (persisted after criteria so criteria_refs exist)
+		reqObj := map[string]any{
+			objects.FieldKeyID:            reqID,
+			objects.FieldKeyKind:          "requirement",
+			objects.FieldKeyTitle:         task.Title,
+			objects.FieldKeyDescription:   fmt.Sprintf("Satisfy specification for task %s (%s)", task.ID, task.Title),
+			objects.FieldKeyGoalRefs:      []string{goalID},
+			objects.FieldKeyCriteriaRefs:  []string{critInvID, critDynID, critAdvID},
+			objects.FieldKeyStatus:        objects.ObjectStatusProposed,
+		}
+		kernelObjects = append(kernelObjects, reqObj)
+
 		// Test Case
 		tstObj := map[string]any{
-			objects.FieldKeyID:          tstID,
-			objects.FieldKeyKind:        "test_case",
-			objects.FieldKeyTitle:       fmt.Sprintf("Automated Confirmation for %s", task.ID),
-			objects.FieldKeyCriteriaRefs: []string{critInvID, critDynID, critAdvID},
-			objects.FieldKeyStatus:      objects.ObjectStatusActive,
+			objects.FieldKeyID:              tstID,
+			objects.FieldKeyKind:            "test_case",
+			objects.FieldKeyTitle:           fmt.Sprintf("Automated Confirmation for %s", task.ID),
+			objects.FieldKeyPathOrID:        fmt.Sprintf("packs/%s/tasks/%s", manifest.Name, task.ID),
+			objects.FieldKeyCriteriaRefs:    []string{critInvID, critDynID, critAdvID},
+			objects.FieldKeyRequirementRefs: []string{reqID},
+			objects.FieldKeyBacklogItemRefs:  []string{bliID},
+			objects.FieldKeyGoalRefs:         []string{goalID},
+			objects.FieldKeyStatus:          objects.ObjectStatusDraft,
 		}
 		kernelObjects = append(kernelObjects, tstObj)
 
-		// Backlog Item
+		// Backlog Item (child owns priority_plan_ref)
 		bliObj := map[string]any{
 			objects.FieldKeyID:             bliID,
 			objects.FieldKeyKind:           "backlog_item",
@@ -263,22 +268,31 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 			objects.FieldKeyTestCaseRefs:   []string{tstID},
 			objects.FieldKeyPriority:       "p1",
 			objects.FieldKeyEstimatedEffort: "medium",
-			"sequence_index":               i + 1,
+			objects.FieldKeyPriorityPlanRef: planID,
 			objects.FieldKeyStatus:         objects.ObjectStatusPlanned,
 		}
 		kernelObjects = append(kernelObjects, bliObj)
 	}
 
-	// Layer 5: Priority Plan
+	// Milestone
+	mlsObj := map[string]any{
+		objects.FieldKeyID:          milestoneID,
+		objects.FieldKeyKind:        "milestone",
+		objects.FieldKeyTitle:       fmt.Sprintf("Milestone: %s Execution", manifest.Name),
+		objects.FieldKeyDescription: fmt.Sprintf("Execute all tasks and evaluations declared by %s v%s", manifest.Name, manifest.Version),
+		objects.FieldKeyGoalRefs:    []string{goalID},
+		objects.FieldKeyCriteriaRefs: allCritIDs,
+		objects.FieldKeyStatus:      objects.ObjectStatusNotStarted,
+	}
+	kernelObjects = append(kernelObjects, mlsObj)
+
+	// Layer 5: Priority Plan (membership is child-owned via backlog_item.priority_plan_ref)
 	priObj := map[string]any{
-		objects.FieldKeyID:             planID,
-		objects.FieldKeyKind:           "priority_plan",
-		objects.FieldKeyTitle:          fmt.Sprintf("Execution Plan: %s", manifest.Name),
-		objects.FieldKeyDescription:    manifest.Description,
-		objects.FieldKeyBacklogItemRefs: bliRefs,
-		objects.FieldKeyMilestoneRefs:  []string{milestoneID},
-		objects.FieldKeyGoalRefs:       []string{goalID},
-		objects.FieldKeyStatus:         objects.ObjectStatusPlanned,
+		objects.FieldKeyID:          planID,
+		objects.FieldKeyKind:        "priority_plan",
+		objects.FieldKeyTitle:       fmt.Sprintf("Execution Plan: %s", manifest.Name),
+		objects.FieldKeyDescription: manifest.Description,
+		objects.FieldKeyStatus:      objects.ObjectStatusOriginated,
 	}
 
 	// Team configuration and persona dispatch wiring (supports ad-hoc personas or reusable team configurations)
@@ -326,14 +340,13 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 
 	// Closed-Loop Convergence Session
 	cvsObj := map[string]any{
-		objects.FieldKeyID:             cvsID,
-		objects.FieldKeyKind:           "convergence_session",
-		objects.FieldKeyTitle:          fmt.Sprintf("Closed-Loop Convergence for %s", manifest.Name),
-		"pack_urn":                     urn.String(),
-		"evaluation_surface":           "cef_diamond_scorecard",
-		objects.FieldKeyGoalRefs:       []string{goalID},
-		objects.FieldKeyMilestoneRefs:  []string{milestoneID},
-		objects.FieldKeyStatus:         "c1_intake",
+		objects.FieldKeyID:              cvsID,
+		objects.FieldKeyKind:            "convergence_session",
+		objects.FieldKeyTitle:           fmt.Sprintf("Closed-Loop Convergence for %s", manifest.Name),
+		"current_phase":                 "c1_scope",
+		"outcome_character":             "pending",
+		objects.FieldKeyRequirementRefs: allReqIDs,
+		objects.FieldKeyStatus:          objects.ObjectStatusActive,
 	}
 	kernelObjects = append(kernelObjects, cvsObj)
 
