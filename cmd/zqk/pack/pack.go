@@ -60,17 +60,17 @@ func newInitCmd() *cobra.Command {
 				return fmt.Errorf("invalid package version: %w", err)
 			}
 
-			if err := os.MkdirAll(targetDir, 0755); err != nil {
+			if err := os.MkdirAll(targetDir, paths.DirPerm755); err != nil {
 				return fmt.Errorf("failed to create target directory: %w", err)
 			}
 
 			templatesDir := filepath.Join(targetDir, "templates")
-			if err := os.MkdirAll(templatesDir, 0755); err != nil {
+			if err := os.MkdirAll(templatesDir, paths.DirPerm755); err != nil {
 				return fmt.Errorf("failed to create templates directory: %w", err)
 			}
 
 			membranesDir := filepath.Join(targetDir, "membranes")
-			if err := os.MkdirAll(membranesDir, 0755); err != nil {
+			if err := os.MkdirAll(membranesDir, paths.DirPerm755); err != nil {
 				return fmt.Errorf("failed to create membranes directory: %w", err)
 			}
 
@@ -203,7 +203,7 @@ func newSealCmd() *cobra.Command {
 
 			if pubOut != "" {
 				pubHex := hex.EncodeToString(pubKey)
-				if err := os.WriteFile(pubOut, []byte(pubHex), 0644); err != nil {
+				if err := os.WriteFile(pubOut, []byte(pubHex), paths.FilePerm644); err != nil {
 					return fmt.Errorf("failed to write public key to %s: %w", pubOut, err)
 				}
 			}

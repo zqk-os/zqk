@@ -61,11 +61,11 @@ type DualStreamRouter struct {
 // NewDualStreamRouter creates a router ensuring outputDir is safely created and isolated.
 func NewDualStreamRouter(outputDir string, streamA StreamARecipient) (*DualStreamRouter, error) {
 	if outputDir == "" {
-		outputDir = filepath.Join(".zqk", "exhaust", fmt.Sprintf("run-%d", time.Now().UnixNano()))
+		outputDir = filepath.Join(paths.ProjectDataDir, "exhaust", fmt.Sprintf("run-%d", time.Now().UnixNano()))
 	}
 
 	cleanDir := filepath.Clean(outputDir)
-	if err := os.MkdirAll(cleanDir, 0755); err != nil {
+	if err := os.MkdirAll(cleanDir, paths.DirPerm755); err != nil {
 		return nil, fmt.Errorf("%w: failed to create output directory %s: %v", ErrInvalidOutputDir, cleanDir, err)
 	}
 
@@ -163,7 +163,7 @@ func (r *DualStreamRouter) RouteTrace(filename string, data []byte) error {
 	defer r.mu.Unlock()
 
 	traceDir := filepath.Join(r.outputDir, "traces")
-	if err := os.MkdirAll(traceDir, 0755); err != nil {
+	if err := os.MkdirAll(traceDir, paths.DirPerm755); err != nil {
 		return fmt.Errorf("failed to create traces directory: %w", err)
 	}
 
