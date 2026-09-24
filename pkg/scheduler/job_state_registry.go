@@ -95,7 +95,7 @@ type JobStateRegistry struct {
 	// Full-tree retention cleanup is rate-limited + single-flight. Historically CompleteExecution
 	// called cleanupCompletedBestEffort on every finish, which ReadFile'd every state YAML under
 	// .zqk/scheduler/state (thousands of files) while concurrent job completions ran in parallel.
-	// That drove OS thread growth (blocked opens) and multi-GB RSS — showstopper under scan-tests.
+	// That drove OS thread growth (blocked opens) and multi-GB RSS — showstopper under bulk test-job create.
 	// TRACK: BLI-CAS-HAND-DUP-CHECK-001 / scheduler state retention hot path
 	cleanupMu           sync.Mutex
 	lastFullCleanupAt   time.Time

@@ -12,7 +12,7 @@ import (
 // TRACK: TDE-CEF-ZQKENV-AGENT-GUARD-SPLIT-001
 func EnforceForegroundGoTestGuard() {
 	// Agent-facing poison pill: IDE/agent terminals must not run unbounded
-	// foreground `go test` as a substitute for scheduler scan-tests.
+	// foreground `go test` as a substitute for kernel test_case runs.
 	//
 	// This must NEVER break Make, CI, or scripted verify steps that legitimately
 	// invoke `go test` (e.g. make zqk-community → verify-bootstrap-portable.sh).
@@ -39,7 +39,7 @@ func foregroundGoTestPanicMessage() string {
 	exe := brand.ExecutableName()
 	return "⚡️ BZZZT! AGENT ELECTROCUTED: FOREGROUND TEST EXECUTION DETECTED\n" +
 		"Target Persona: [PRE-SESSION/OS-LEVEL]\n" +
-		"User Mandate Violation: All tests MUST be submitted as a scheduler_job (e.g., " + exe + " scheduler scan-tests).\n" +
+		"User Mandate Violation: All tests MUST run via " + exe + " test run (kernel test_case objects).\n" +
 		"Direct 'go test' execution is strictly forbidden.\n" +
 		"Bypass (Make/CI): run under make (MAKEFLAGS), or set " + AllowForegroundGoTest().Name() + "=1.\n" +
 		"Do NOT set " + TestRoot().Name() + " for this: it relocates the project root, so every later\n" +

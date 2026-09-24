@@ -2,17 +2,15 @@ package ci
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/localci"
 	"github.com/zqk-os/zqk/pkg/paths"
 
 	"github.com/spf13/cobra"
 
-	schcmd "github.com/zqk-os/zqk/cmd/zqk/scheduler"
+	testcmd "github.com/zqk-os/zqk/cmd/zqk/test"
 	"github.com/zqk-os/zqk/internal/cli"
 	bldr "github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -36,23 +34,22 @@ func newDemoteCmd() *cobra.Command {
 }
 
 func newCheckoutCmd() *cobra.Command {
-	cmd := bldr.NewCheckoutCommandBuilder()
+	cmd := bldr.NewCiCheckoutCommandBuilder()
 	cli.BindAsyncProgress(cmd, runCheckout)
 	return cmd
 }
 
 func newRunCmd() *cobra.Command {
-	cmd := bldr.NewRunCommandBuilder()
+	cmd := bldr.NewCiRunCommandBuilder()
 	cli.BindAsyncProgress(cmd, runCIRun)
 	return cmd
 }
 
 func newStatusCmd() *cobra.Command {
 	// Do not use NewStatusCommandBuilder — that DNA is scheduler status (name collision).
-	// prefer ci_status_* builder once codegen nests like mcp_svc_*.
 	cmd := &cobra.Command{
 		Use:   "status",
-		Short: "Show Local CI SOURCE_SHA and test-bundle health summary",
+		Short: "Show Local CI SOURCE_SHA and workdir",
 	}
 	cli.BindAsyncProgress(cmd, runStatus)
 	return cmd
@@ -70,7 +67,7 @@ func runCIRun(cmd *cobra.Command, args []string) error {
 	if checkoutOnly {
 		return nil
 	}
-	return runScanTestsAfterCheckout(cmd)
+	return runTestCasesAfterCheckout(cmd)
 }
 
 func runLocalCICheckout(cmd *cobra.Command) error {
@@ -100,7 +97,7 @@ func runLocalCICheckout(cmd *cobra.Command) error {
 	return nil
 }
 
-func runScanTestsAfterCheckout(cmd *cobra.Command) error {
+func runTestCasesAfterCheckout(cmd *cobra.Command) error {
 	studio := cli.ResolveProjectRoot(".")
 	if studio == "" {
 		return errfmt.Errorf("project root not found")
@@ -109,27 +106,12 @@ func runScanTestsAfterCheckout(cmd *cobra.Command) error {
 	if _, err := fileutil.Stat(filepath.Join(workdir, "go.mod")); err != nil {
 		return errfmt.Errorf("local-ci workdir missing go.mod at %s (run checkout first)", workdir)
 	}
-	pkg, _ := cmd.Flags().GetString("package")
-	all, _ := cmd.Flags().GetBool("all")
-	if strings.TrimSpace(pkg) == "" && !all {
-		all = true
-	}
-	scan := schcmd.NewScanTestsCmd()
-	// Inherit parent context for FormatOutput / project root
-	scan.SetContext(cmd.Context())
-	scan.SetOut(cmd.OutOrStdout())
-	scan.SetErr(cmd.ErrOrStderr())
-	// Explicit source-root: CI-honest go test cwd (studio keeps SCH-run + health logs).
-	var argv []string
-	argv = append(argv, "--source-root", workdir)
-	if strings.TrimSpace(pkg) != "" {
-		argv = append(argv, "--package", pkg)
-	}
-	if all {
-		argv = append(argv, "--all")
-	}
-	scan.SetArgs(argv)
-	return scan.Execute()
+	run := testcmd.NewRunCmd()
+	run.SetContext(cmd.Context())
+	run.SetOut(cmd.OutOrStdout())
+	run.SetErr(cmd.ErrOrStderr())
+	run.SetArgs([]string{"--all"})
+	return run.Execute()
 }
 
 func runStatus(cmd *cobra.Command, args []string) error {
@@ -152,16 +134,7 @@ func runStatus(cmd *cobra.Command, args []string) error {
 	} else {
 		fmt.Fprintf(&b, "  workdir=(missing)\n")
 	}
-	if err := cli.WriteOutput(cmd, []byte(b.String())); err != nil {
-		return err
-	}
-	// Best-effort health summary (studio logs)
-	health := execwrap.Command(os.Args[0], "scheduler", "test-failures", "health")
-	health.Dir = studio
-	health.Stdout = cmd.OutOrStdout()
-	health.Stderr = cmd.ErrOrStderr()
-	_ = health.Run()
-	return nil
+	return cli.WriteOutput(cmd, []byte(b.String()))
 }
 
 func runDemote(cmd *cobra.Command, args []string) error {

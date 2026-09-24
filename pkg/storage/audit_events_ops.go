@@ -234,7 +234,7 @@ func CreateLintBypassAuditEvent(projectRoot, gitUser, gitEmail, commitMessage st
 }
 
 // createCreateAuditEvent creates an audit event for object creation.
-// ctx is passed through so bulk-create callers can defer CAS flush (e.g. scan-tests job generation).
+// ctx is passed through so bulk-create callers can defer CAS flush (e.g. bulk scheduler_job create).
 // fileStorage is optional - if provided and CAS is enabled, routes through CAS
 //
 //nolint:unparam // Always returns nil error - audit events are best-effort

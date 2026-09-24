@@ -45,22 +45,22 @@ func TestExtractVerificationHintLines(t *testing.T) {
 	if len(got) != 0 {
 		t.Fatalf("got %v", got)
 	}
-	got = extractVerificationHintLines("run zqk scheduler scan-tests --package ./pkg/foo")
-	if len(got) != 1 || got[0] != "zqk scheduler scan-tests --package ./pkg/foo" {
+	got = extractVerificationHintLines("run zqk test run TST-EXAMPLE-001")
+	if len(got) != 1 || got[0] != "zqk test run TST-EXAMPLE-001" {
 		t.Fatalf("got %v", got)
 	}
 	got = extractVerificationHintLines("line1\n  go test ./pkg/bar -timeout 60s\n")
 	if len(got) != 1 || got[0] != "go test ./pkg/bar -timeout 60s" {
 		t.Fatalf("got %v", got)
 	}
-	prose := "Documented matrix: unit (pkg/datacell), profile matrix tests, integration/registry, spec cell suite triggers, scan-tests packages for storage/scheduler/cmd/zqk/system when those trees change."
+	prose := "Documented matrix: unit (pkg/datacell), profile matrix tests, integration/registry, spec cell suite triggers, zqk test run for storage/scheduler/cmd/zqk/system when those trees change."
 	if got := extractVerificationHintLines(prose); len(got) != 0 {
 		t.Fatalf("prose should not yield fake commands: %v", got)
 	}
 	if verificationHintAcceptable(prose) {
 		t.Fatal("prose must not be acceptable as verification hint")
 	}
-	if !verificationHintAcceptable("go test ./pkg/foo") || !verificationHintAcceptable("zqk scheduler scan-tests --package ./p") {
+	if !verificationHintAcceptable("go test ./pkg/foo") || !verificationHintAcceptable("zqk test run TST-EXAMPLE-001") {
 		t.Fatal("expected acceptable hints")
 	}
 }

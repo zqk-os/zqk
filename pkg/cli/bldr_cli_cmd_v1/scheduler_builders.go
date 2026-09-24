@@ -372,67 +372,6 @@ func NewSchedulerRerunCommandBuilder() *cobra.Command {
 	})
 }
 
-// NewSchedulerScanTestsCommandBuilder creates a new scheduler_scan_tests [flags] command
-func NewSchedulerScanTestsCommandBuilder() *cobra.Command {
-	return buildSchedulerCommand(SchedulerCommandConfig{
-		Use:   "scan-tests [flags]",
-		Short: "Scan and schedule tests using the test scanner",
-		Description: []string{"Scan Go test files and schedule them as scheduler jobs.",
-			"",
-			"The scanner:",
-			"  - Identifies test functions in *_test.go files",
-			"  - Detects parallel safety (t.Parallel())",
-			"  - Bundles tests that can run safely in parallel",
-			"  - Schedules tests based on runtime metrics",
-			"  - Creates optimized scheduler jobs",
-			"",
-			"Modes:",
-			"  --test <name>     - Scan and schedule a single test by name",
-			"  --tests <names>   - Scan and schedule multiple tests (comma-separated)",
-			"  --package <path>  - Scan and schedule all tests in one or more packages (comma-separated, e.g. ./pkg/a,./pkg/b)",
-			"  --all             - Scan and schedule all tests in the project",
-			"  --load-bundle <name> - Load a previously saved bundle",
-			"  --load-bundles <names> - Load multiple bundles (comma-separated) for regression",
-			"",
-			"Bundle Management:",
-			"  --save-bundle <name> - Save created bundles with this name",
-			"  --load-bundle <name>  - Load a previously saved bundle",
-			"  --load-bundles <names> - Load multiple saved bundles (comma-separated)",
-			"  --list-bundles       - List all saved bundles",
-			"  --show-bundle        - Show bundle details without scheduling",
-			"  --only <indexes>     - Run only specified test indexes (e.g., 0,2,5)",
-			"  --skip <indexes>     - Skip specified test indexes (e.g., 1,3)"},
-		Examples: []string{"Schedule a single test", "%s scheduler scan-tests --test TestMyFeature",
-			"Schedule all tests in a package", "%s scheduler scan-tests --package ./pkg/storage",
-			"Schedule all tests in multiple packages (comma-separated)", "%s scheduler scan-tests --package ./pkg/paths,./pkg/agentdelivery",
-			"Schedule all tests in project", "%s scheduler scan-tests --all",
-			"Run regression: schedule multiple saved bundles", "%s scheduler scan-tests --load-bundles pkg-storage-1,pkg-scheduler-2,cmd-zqk-system-2"},
-		Flags: func(builder *clipkg.CommandBuilder) {
-			builder.AddStringFlag("test", "", "", "Single test name to schedule")
-			builder.AddStringFlag("tests", "", "", "Comma-separated list of test names to schedule")
-			builder.AddStringFlag("package", "", "", "One package path or comma-separated paths (e.g., ./pkg/storage or ./pkg/a,./pkg/b)")
-			builder.AddBoolFlag("all", "", false, "Schedule all tests in the project")
-			builder.AddIntFlag("max-bundle-size", "", 10, "Maximum number of tests per bundle")
-			builder.AddIntFlag("max-parallel", "", 4, "Maximum number of parallel bundles")
-			builder.AddStringFlag("save-bundle", "", "", "Save the created bundles with this name")
-			builder.AddStringFlag("load-bundle", "", "", "Load a previously saved bundle")
-			builder.AddStringFlag("load-bundles", "", "", "Load multiple saved bundles (comma-separated names); schedules all for regression runs")
-			builder.AddStringFlag("only", "", "", "Comma-separated list of test indexes to run (e.g., 0,2,5)")
-			builder.AddStringFlag("skip", "", "", "Comma-separated list of test indexes to skip (e.g., 1,3)")
-			builder.AddBoolFlag("list-bundles", "", false, "List all saved bundles")
-			builder.AddBoolFlag("show-bundle", "", false, "Show bundle details without scheduling")
-			builder.AddBoolFlag("overwrite", "", false, "Overwrite existing bundle when saving")
-			builder.AddBoolFlag("merge", "", false, "Merge new tests with existing bundle (adds new, keeps existing)")
-			builder.AddBoolFlag("remove-missing", "", false, "Remove tests from bundle that no longer exist (use with --merge)")
-			builder.AddBoolFlag("setup-bundles", "", false, "Set up initial bundles for the project (scans all tests and creates bundles)")
-			builder.AddBoolFlag("delete-all-bundles", "", false, "Delete all saved test bundles from .zqk/test-bundles (does not remove scheduler_job objects like SCH-run-bundle-*; use before --setup-bundles to recreate)")
-			builder.AddBoolFlag("suggest-timeout", "", false, "Print suggested timeout in seconds for --package (dynamic from timing data and package defaults); if multiple comma-separated packages, prints the maximum; exit without scheduling")
-			builder.AddStringFlag("source-root", "", "", "Go module root for go test cwd (Local CI workdir). Defaults to .zqk/local-ci/workdir when present unless --live-source. Logs and SCH-run objects stay on studio project root.")
-			builder.AddBoolFlag("live-source", "", false, "Force go test against the live studio tree (not Local CI). Escape hatch; not CI-honest.")
-		},
-	})
-}
-
 // NewSchedulerServiceCommandBuilder creates a new scheduler_service command
 func NewSchedulerServiceCommandBuilder() *cobra.Command {
 	return buildSchedulerCommand(SchedulerCommandConfig{

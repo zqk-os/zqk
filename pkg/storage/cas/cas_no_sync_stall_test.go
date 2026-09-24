@@ -5,7 +5,7 @@ package cas_test
 // Root cause (2026-03-19): WriteFileWithSync() called tmp.Sync() and then a
 // directory Sync() after hardlinking the temp file. On macOS, both calls invoke
 // F_FULLFSYNC — a full hardware-cache flush — which can stall 1-2 seconds per
-// file. For 327 bulk CAS creates (scan-tests --all), this meant 5-10 minutes of
+// file. For 327 bulk CAS creates (bulk scheduler_job create), this meant 5-10 minutes of
 // blocking in the main goroutine, causing the command to hang and get killed.
 //
 // Fix: darwin skips tmp.Sync() / directory Sync() (F_FULLFSYNC stalls).
@@ -25,7 +25,7 @@ import (
 )
 
 // TestCAS_WriteFileWithSync_CompletesQuicklyForBulkCreate verifies that creating
-// 327 CAS objects (the scan-tests --all bundle count) completes well under 60 seconds.
+// 327 CAS objects (a large bulk-create count) completes well under 60 seconds.
 // Previously, each tmp.Sync() stalled ~1-2 s on macOS, totalling 5-10 minutes.
 func TestCAS_WriteFileWithSync_CompletesQuicklyForBulkCreate(t *testing.T) {
 

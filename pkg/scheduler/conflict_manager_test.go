@@ -100,7 +100,7 @@ func TestConflictManager_CanRun_RunWrapperDifferentIDsAllowed(t *testing.T) {
 	cm.UnregisterRunning(j1)
 }
 
-// TestConflictManager_TestBundleRunWrappersConcurrent documents scan-tests behavior: testing-category
+// TestConflictManager_TestBundleRunWrappersConcurrent documents leftover SCH-run-* behavior: testing-category
 // run_wrapper jobs get ConcurrentAllowed from isConcurrentAllowed so the worker pool does not
 // drop SCH-run-* triggers while another bundle is still running (see lifecycle_coordination isConcurrentAllowed).
 func TestConflictManager_TestBundleRunWrappersConcurrent(t *testing.T) {

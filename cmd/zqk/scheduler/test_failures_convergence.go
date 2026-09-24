@@ -31,7 +31,7 @@ const agentPromptAutonomyBlock = `Autonomy (routine convergence work):
 - Infer scope from the repo, CVS fields, and suggested reruns; do not ask to confirm facts already in this prompt or prior thread context.
 - **Anti-Idle Mandate**: Do not sit idle awaiting human input that is redundant because the kernel already absorbed the knowledge in an earlier interaction. Stop only for hard blockers (missing secrets, destructive ops, or a genuine product/architecture fork). Otherwise implement, measure, and iterate.
 - **The Knowledge Flywheel**: This is a cycle that feeds itself perpetually. Your role is to provide the simple 'pong' of agent exchanges that provide the pumping action to tip the scale towards or away from some initial value or state. Where momentum wanes, store enough potential energy to set the flywheel back in motion so things remain in near perfect equilibrium.
-- Verification: follow project rules — targeted **zqk scheduler scan-tests** / bundles and log files for package gates; avoid long foreground **go test** on heavy trees.
+- Verification: follow project rules — **zqk test run** (and **zqk test discover** when cases are missing); avoid long foreground **go test** on heavy trees.
 `
 
 func runTestFailuresConvergence(cliCtx *cli.Context, cmd *cobra.Command) error {

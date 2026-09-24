@@ -778,7 +778,7 @@ func (s *Scheduler) TriggerJob(ctx context.Context, jobID string) error {
 	}
 
 	// Validate trigger type allows manual/queue triggering
-	// immediate: used by trigger queue (e.g. scan-tests SCH-run-*); timer/manual/workflow/event/lifecycle for CLI or events
+	// immediate: used by trigger queue (e.g. SCH-run-* leftover jobs); timer/manual/workflow/event/lifecycle for CLI or events
 	if job.TriggerType != TriggerTypeManual && job.TriggerType != TriggerTypeWorkflow && job.TriggerType != TriggerTypeEvent && job.TriggerType != TriggerTypeLifecycle && job.TriggerType != TriggerTypeTimer && job.TriggerType != TriggerTypeImmediate {
 		return errfmt.Errorf("job trigger_type (%s) does not support manual triggering", job.TriggerType)
 	}
@@ -1137,7 +1137,7 @@ func (s *Scheduler) matchesLifecycleFilter(filter, kind, fromState, toState stri
 
 // isConcurrentAllowed determines if a job type allows concurrent execution (distinct job IDs).
 // JobTypeCachePrewarm: parallel per-kind warm-up.
-// JobTypeRunWrapper + CategoryTesting: scan-tests enqueues many SCH-run-* bundles at once; the
+// JobTypeRunWrapper + CategoryTesting: many SCH-run-* leftover jobs may enqueue at once; the
 // triggered worker pool (many goroutines) would otherwise dequeue jobs while one bundle is still
 // running, hit ConflictManager's "same job type" rule, and exit without retry—dropping most bundles.
 // Same job ID is still serialized in ConflictManager. Hot packages (e.g. pkg/storage) stay serial

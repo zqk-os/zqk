@@ -43,7 +43,7 @@ func TestGeneratePromptSection_refsNotBodies(t *testing.T) {
 }
 
 func TestSkillMatchesQuery_titleTokens(t *testing.T) {
-	if !skillMatchesQuery("run scheduler scan-tests bundle", "Scheduler Expert Protocol", "", "") {
+	if !skillMatchesQuery("run zqk test run", "Scheduler Expert Protocol", "", "") {
 		t.Fatal("expected scheduler token match")
 	}
 	if skillMatchesQuery("unrelated gardening", "Scheduler Expert Protocol", "", "") {

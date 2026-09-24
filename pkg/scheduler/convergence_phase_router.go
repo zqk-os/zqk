@@ -61,7 +61,7 @@ var phaseRoutingProfiles = map[string]phaseRoutingProfile{
 		ID: "code_quality_go_matrix",
 		ExtraNotes: func(*TestBundleConvergenceSnapshot) []string {
 			return []string{
-				"Profile code_quality_go_matrix: matrix rows, FieldKey/ZQK-env repo gates, scan-tests bundles; use matrix report for surfaces beyond CLI rollup.",
+				"Profile code_quality_go_matrix: matrix rows, FieldKey/ZQK-env repo gates, zqk test run; use matrix report for surfaces beyond CLI rollup.",
 			}
 		},
 	},
@@ -69,7 +69,7 @@ var phaseRoutingProfiles = map[string]phaseRoutingProfile{
 		ID: "code_quality_drift_and_standardization",
 		ExtraNotes: func(*TestBundleConvergenceSnapshot) []string {
 			return []string{
-				"Profile code_quality_drift_and_standardization: triage drift/hardcoded-literal baselines (map keys are not necessarily FieldKey debt); targeted scan-tests; agent-prompt + rollup; prefer AST fixers and path-scoped refactors.",
+				"Profile code_quality_drift_and_standardization: triage drift/hardcoded-literal baselines (map keys are not necessarily FieldKey debt); targeted zqk test run; agent-prompt + rollup; prefer AST fixers and path-scoped refactors.",
 			}
 		},
 	},
@@ -86,7 +86,7 @@ var phaseRoutingProfiles = map[string]phaseRoutingProfile{
 	"expertise_docs_and_alpha_prep": {
 		ID: "expertise_docs_and_alpha_prep",
 		ExtraNotes: func(*TestBundleConvergenceSnapshot) []string {
-			return []string{paths.RewriteCanonicalCLIInvocations("Profile expertise_docs_and_alpha_prep: land docs under docs/architecture/ with a single index; link PRI/backlog; archive redundant reports to docs/archive/; use targeted zqk scheduler scan-tests so health.jsonl advances — full matrix only when blast radius warrants it.")}
+			return []string{paths.RewriteCanonicalCLIInvocations("Profile expertise_docs_and_alpha_prep: land docs under docs/architecture/ with a single index; link PRI/backlog; archive redundant reports to docs/archive/; use targeted zqk test run so test_case evidence advances — full matrix only when blast radius warrants it.")}
 		},
 	},
 	// Backlog-scoped delivery (tutorial/docs/hands-on); session thresholds may disable bundle-health as completion gate.
@@ -103,7 +103,7 @@ var phaseRoutingProfiles = map[string]phaseRoutingProfile{
 		ID: "product_delivery_datacell",
 		ExtraNotes: func(*TestBundleConvergenceSnapshot) []string {
 			return []string{
-				"Profile product_delivery_datacell: phased BLIs for cell identity, profile contracts, operational envelope, membrane adapters, admin/discovery, migration; pkg/datacell + spec cell integration + targeted scan-tests; do not treat green bundles alone as proof of desired_end_state.",
+				"Profile product_delivery_datacell: phased BLIs for cell identity, profile contracts, operational envelope, membrane adapters, admin/discovery, migration; pkg/datacell + spec cell integration + targeted zqk test run; do not treat green bundles alone as proof of desired_end_state.",
 			}
 		},
 	},

@@ -258,7 +258,7 @@ func (q *JobTriggerQueue) EnqueueTriggerRequestWithOrigin(jobID, triggerOrigin s
 }
 
 // EnqueueTriggerRequests appends multiple job trigger requests in a single lock/write.
-// Use this from CLI (e.g. scan-tests) to avoid lock contention when enqueueing many jobs.
+// Use this from CLI (e.g. zqk test run) to avoid lock contention when enqueueing many jobs.
 // triggerOrigin is passed to each request (e.g. "" or TriggerOriginPreCommit).
 func (q *JobTriggerQueue) EnqueueTriggerRequests(jobIDs []string, triggerOrigin string) error {
 	if len(jobIDs) == 0 {
@@ -683,7 +683,7 @@ func jobIDLooksLikeCASInstanceSchedulerJobID(jobID string) bool {
 }
 
 // batchNeedsCASReconcileBeforeTriggerReload is true when the batch may include scheduler_job rows
-// created by another process before the CAS list index caught up (scan-tests SCH-run-*, test-runner
+// created by another process before the CAS list index caught up (SCH-run-* leftover jobs, test-runner
 // SCH-<timestamp>, SCH-<ns>-<hash> from object create, or SCH-run-test-*). See CAS_LIST_GET_CONSISTENCY.md and ReconcileSchedulerJobCASIndex.
 // prioritizeCachePrewarmTriggers moves DefaultCachePrewarmJobID (SCH-cache-prewarm) to the front of a dequeue
 // batch so cache_prewarm runs before bulk SCH-run-* triggers in the same poll cycle.
@@ -761,7 +761,7 @@ func (q *JobTriggerQueue) drainAndProcessTriggerBatch(ctx context.Context, sched
 			}
 		}
 
-		// Cross-process creates (scan-tests SCH-run-*, test-runner SCH-<unix> / SCH-run-test-*) can
+		// Cross-process creates (SCH-run-* leftover jobs, test-runner SCH-<unix> / SCH-run-test-*) can
 		// lag the CAS list index; list without reconcile may omit new IDs. Sync scan before reload.
 		// Gate full CAS reconciliation behind a debounce interval unless a job is missing from cache.
 		needsCAS := batchNeedsCASReconcileBeforeTriggerReload(requests)
@@ -841,7 +841,7 @@ func (q *JobTriggerQueue) drainAndProcessTriggerBatch(ctx context.Context, sched
 			// Reload jobs once per batch so newly created jobs (SCH-AUTOFIX-*, SCH-run-*, etc.) are visible.
 			// ReloadJobs repopulates cron from storage so timer jobs are preserved.
 			// SCH-run-* must use the same path: previously we set didReloadForBatch without reload, which
-			// left the cache stale and dropped bulk test-bundle triggers (CAS index lag after scan-tests).
+			// left the cache stale and dropped bulk test-bundle triggers (CAS index lag after bulk job create).
 			scheduler.EmitTriggerQueueEvent(map[string]any{
 				objects.FieldKeyEventType: "trigger_queue_reload_retry",
 				"message":                 "Job not in scheduler cache, reloading jobs from storage then retrying trigger",
@@ -1044,7 +1044,7 @@ func (q *JobTriggerQueue) drainAndProcessTriggerBatch(ctx context.Context, sched
 			triggerQueueKeyMessage:    "Missing expected test-bundle jobs from trigger queue batch",
 			triggerQueueKeyCount:      len(missingIDs),
 			triggerQueueKeyJobIDs:     missingIDs,
-			"hint":                    paths.RewriteCanonicalCLIInvocations("Run `zqk scheduler scan-tests --setup-bundles --overwrite` to recreate bundles/jobs, then re-run scan-tests."),
+			"hint":                    paths.RewriteCanonicalCLIInvocations("Run `zqk test discover` then `zqk test run` to refresh kernel test_case objects."),
 		})
 		if len(missingIDs) >= ExcessiveMissingTestBundleThreshold {
 			scheduler.EmitTriggerQueueEvent(map[string]any{

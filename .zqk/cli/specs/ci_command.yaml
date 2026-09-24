@@ -1,19 +1,19 @@
 $schema: "./schemas/command_spec.schema.json"
 
 name: "ci"
-short: "Local CI (commit → checkout elsewhere → scan-tests)"
+short: "Local CI (commit → checkout elsewhere → test run)"
 description: |
   Studio-local CI that mirrors remote CI. Commit on the studio root, then
-  checkout that SHA into .zqk/local-ci/workdir and run scan-tests against it
-  while health/logs stay on studio.
+  checkout that SHA into .zqk/local-ci/workdir and run kernel test_case
+  objects via zqk test run. Logs stay on studio.
 
 help:
   examples:
-    - comment: "Checkout HEAD into local-ci workdir and scan all packages"
+    - comment: "Checkout HEAD into local-ci workdir and run test cases"
       command: "%s ci run"
-    - comment: "Checkout only (no schedule)"
+    - comment: "Checkout only (no tests)"
       command: "%s ci checkout"
-    - comment: "Show pinned SOURCE_SHA and health summary"
+    - comment: "Show pinned SOURCE_SHA"
       command: "%s ci status"
   exclude_flags:
     - "format"

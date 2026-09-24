@@ -325,7 +325,7 @@ func (s *SkillEnforcement) GeneratePromptSectionOpts(maxInstrRunes int) string {
 
 	var sb strings.Builder
 	sb.WriteString("## Relevant Agent Skills\n")
-	sb.WriteString("The following specialized project skills are binding for this task. Follow their mandates; narrative claims are not a substitute for evidence gates (VDS / scan-tests).\n\n")
+	sb.WriteString("The following specialized project skills are binding for this task. Follow their mandates; narrative claims are not a substitute for evidence gates (VDS / zqk test run).\n\n")
 
 	for _, skill := range s.RelevantSkills {
 		title, _ := skill[objects.FieldKeyTitle].(string)

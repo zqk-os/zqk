@@ -41,7 +41,7 @@ import (
 // After split: This file now serves as documentation and module index
 
 // User-facing message when test-bundles/health.jsonl is absent (health + convergence subcommands).
-const msgTestBundleHealthFileMissing = "No test-bundle health file yet (.zqk/logs/scheduler/cvs/test-bundles/health.jsonl). Run scheduler test bundles first.\n"
+const msgTestBundleHealthFileMissing = "No test health file yet. Run zqk test run (kernel test_case objects).\n"
 
 // errTestBundleHealthFileHandled is returned when the missing-file message was already written to cmd.
 var errTestBundleHealthFileHandled = errfmt.Errorf("test-bundle health.jsonl missing (user message already written)")

@@ -29,7 +29,7 @@ Current System State:
 
 Respond ONLY with a valid JSON array of 3 strings. Example:
 [
-  "ZQK Observer Tip: The test bundle for PRI-003 is blocked. Ensure 'zqk scheduler scan-tests' is running parallel jobs.",
+  "ZQK Observer Tip: A test_case for PRI-003 is blocked. Run zqk test run for the implicated TST-* objects.",
   "ZQK Observer Tip: You have 3 backlog items in 'planned' but no active agents. Run 'zqk agent orchestrate' to parallelize the work."
 ]`, systemStateSummary))
 

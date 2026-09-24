@@ -229,7 +229,7 @@ func rerunTestFailures(cliCtx *cli.Context, cmd *cobra.Command) error {
 		jobIDs = append(jobIDs, jobID)
 	}
 
-	// Enqueue trigger requests so the daemon actually runs the jobs (same as scan-tests flow).
+	// Enqueue trigger requests so the daemon actually runs the jobs (same as zqk test run enqueue).
 	if len(jobIDs) > 0 && projectRoot != emptyValue {
 		triggerQueue := schedpkg.NewJobTriggerQueue(projectRoot)
 		if enqErr := triggerQueue.EnqueueTriggerRequests(jobIDs, ""); enqErr != nil {

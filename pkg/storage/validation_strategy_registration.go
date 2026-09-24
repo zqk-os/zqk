@@ -20,7 +20,7 @@ var HighVolumeKinds = []string{
 	objects.KindAuditEvent,   // Created on every CLI command - highest frequency
 	objects.KindMcpSession,   // Created per MCP server session - high during active use
 	objects.KindZqkSession,   // Created per CLI or interactive session - high during active use
-	objects.KindSchedulerJob, // Created by scan-tests, triggers; high at scale
+	objects.KindSchedulerJob, // Created by triggers and test_case runs; high at scale
 	objects.KindDocEntry,     // Batch-created during docman-sync - spiky but large batches
 }
 

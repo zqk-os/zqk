@@ -77,7 +77,7 @@ func findFormatFlagInChain(cmd *cobra.Command) *pflag.Flag {
 // and that command outputs work correctly in JSON and YAML formats
 func TestHelpOutputFormats(t *testing.T) {
 	if testing.Short() {
-		t.Skip("skip CLI integration in -short mode (spawns zqk per command); covered by scan-tests bundles")
+		t.Skip("skip CLI integration in -short mode (spawns zqk per command); covered by zqk test run")
 	}
 	// Not t.Parallel(): OutputValidity uses setupCLITestEnvironmentForParity → PrepareIsolatedTempProject (t.Setenv).
 	rootCmd := buildRootCommand()
@@ -383,7 +383,7 @@ func findCommandByPath(root *cobra.Command, pathParts ...string) *cobra.Command 
 // TestCommandOutputJSONYAML tests that all commands that produce output support JSON and YAML formats
 func TestCommandOutputJSONYAML(t *testing.T) {
 	if testing.Short() {
-		t.Skip("skip CLI integration in -short mode (spawns zqk per command); covered by scan-tests bundles")
+		t.Skip("skip CLI integration in -short mode (spawns zqk per command); covered by zqk test run")
 	}
 	// Not t.Parallel(): setupCLITestEnvironmentForParity uses PrepareIsolatedTempProject (t.Setenv).
 	tmpDir, cliBinary := setupCLITestEnvironmentForParity(t)

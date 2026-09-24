@@ -10,12 +10,12 @@ import (
 // NewCiCommandBuilder creates a new ci command
 func NewCiCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("ci")
-	builder.WithShort("Local CI (commit → checkout elsewhere → scan-tests)")
-	help := clipkg.DynamicHelpBuilder("Local CI (commit → checkout elsewhere → scan-tests)")
+	builder.WithShort("Local CI (commit → checkout elsewhere → test run)")
+	help := clipkg.DynamicHelpBuilder("Local CI (commit → checkout elsewhere → test run)")
 	help.WithDescriptionLines("Studio-local CI that mirrors remote CI. Commit on the studio root, then")
-	help.WithDescriptionLines("checkout that SHA into .zqk/local-ci/workdir and run scan-tests against it")
+	help.WithDescriptionLines("checkout that SHA into .zqk/local-ci/workdir and run zqk test run against it")
 	help.WithDescriptionLines("while health/logs stay on studio.")
-	help.AddExample("Checkout HEAD into local-ci workdir and scan all packages", "%s ci run")
+	help.AddExample("Checkout HEAD into local-ci workdir and run test cases", "%s ci run")
 	help.AddExample("Checkout only (no schedule)", "%s ci checkout")
 	help.AddExample("Show pinned SOURCE_SHA and health summary", "%s ci status")
 	help.ExcludeFlag("format")

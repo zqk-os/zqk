@@ -72,7 +72,6 @@ func TestExtended_CAPOrchestratorMethodsDeep(t *testing.T) {
 
 	_, _ = coh.resolveCLIExecutable()
 	_, _, _ = coh.verifyCriticalPackagesHealth(ctx, pkgctx.NewSystemSecurityContext())
-	coh.requestCriticalPackageScanTests([]string{"pkg/scheduler"})
 	_ = coh.autoRecoverPlanTasks(ctx, "PRI-1")
 	coh.wakeAgentAndScheduleHourglass("task-1", "tpm")
 	_ = coh.resolveWakePlanID(ctx, "PRI-1")

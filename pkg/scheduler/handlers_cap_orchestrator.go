@@ -13,7 +13,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -930,9 +929,8 @@ func (h *CapOrchestratorHandler) verifyCriticalPackagesHealth(ctx context.Contex
 	if len(missingRoots) > 0 {
 		h.logger.Warn("cap_review_no_critical_test_jobs_found",
 			logging.String("missing_roots", strings.Join(missingRoots, ",")))
-		h.requestCriticalPackageScanTests(missingRoots)
 		for _, root := range missingRoots {
-			softErrs = append(softErrs, fmt.Sprintf("no critical test bundle jobs for %s (scan-tests requested)", root))
+			softErrs = append(softErrs, fmt.Sprintf("no recent test_case evidence for %s (run %s)", root, paths.RewriteCanonicalCLIInvocations("zqk test run")))
 		}
 	}
 
@@ -991,35 +989,6 @@ func (h *CapOrchestratorHandler) verifyCriticalPackagesHealth(ctx context.Contex
 	}
 
 	return allPassed && len(hardErrs) == 0 && len(softErrs) == 0, hardErrs, softErrs
-}
-
-// requestCriticalPackageScanTests best-effort enqueues scan-tests for missing CAP critical roots.
-func (h *CapOrchestratorHandler) requestCriticalPackageScanTests(roots []string) {
-	if len(roots) == 0 || h.projectRoot == "" {
-		return
-	}
-	exe, err := h.resolveCLIExecutable()
-	if err != nil {
-		h.logger.Warn("cap_review_scan_tests_resolve_cli_failed", logging.String("error", err.Error()))
-		return
-	}
-	for _, root := range roots {
-		pkgArg := "./" + root
-		rootCopy := root
-		goroutinelabels.NewGoroutine("cap_orchestrator", "request critical package scan-tests").StartSimple(func() {
-			cmd := execwrap.Command(exe, "scheduler", "scan-tests", "--package", pkgArg)
-			cmd = h.prepareCmd(cmd)
-			out, runErr := cmd.CombinedOutput()
-			if runErr != nil {
-				h.logger.Warn("cap_review_scan_tests_request_failed",
-					logging.String("package", rootCopy),
-					logging.String("error", runErr.Error()),
-					logging.OutputField(truncateOutput(string(out), 300)))
-				return
-			}
-			h.logger.Info("cap_review_scan_tests_requested", logging.String("package", rootCopy))
-		})
-	}
 }
 
 // parseSystemCheckPublicBlockers extracts public blocker count from system check JSON (CRIT-CAPH-008).

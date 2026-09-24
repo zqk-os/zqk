@@ -427,7 +427,7 @@ func (gv *GoValidator) validatePatternConstraint(fieldName string, fieldValue an
 		return nil, nil
 	}
 
-	// Optional fields: empty string is valid (e.g. last_run_at cleared for scan-tests re-run)
+	// Optional fields: empty string is valid (e.g. last_run_at cleared for a test_case re-run)
 	if required, _ := validation["required"].(bool); !required && strValue == emptyValue {
 		return nil, nil
 	}

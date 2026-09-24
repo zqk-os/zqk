@@ -36,7 +36,7 @@ func BuildRecommendedNextAction(status RollupStatus, blockers []Blocker, tb Test
 			"(related_object_refs), or document explicit acceptance. See docs/architecture/CONVERGENCE_ORCHESTRATION_AND_NESTED_CVS.md."
 	}
 	if !readyBundles {
-		return "Wait for bundle health to satisfy ready_for_session_completion (scan-tests, scheduler activity); " + paths.RewriteCanonicalCLIInvocations("then re-measure with zqk scheduler convergence measure --format json --session-id <CVS>.")
+		return "Wait for test_case evidence to satisfy ready_for_session_completion (zqk test run, scheduler activity); " + paths.RewriteCanonicalCLIInvocations("then re-measure with zqk scheduler convergence measure --format json --session-id <CVS>.")
 	}
 	return "Address rollup blockers above; re-run convergence measure and literal gates. " +
 		"See docs/architecture/CONVERGENCE_ORCHESTRATION_AND_NESTED_CVS.md."
@@ -49,12 +49,12 @@ func actionLineForBlocker(code, detail string, tb TestBundleInput) string {
 		if n == 0 {
 			n = 1
 		}
-		return fmt.Sprintf(paths.RewriteCanonicalCLIInvocations("Fix failing test bundles (%d fingerprint(s) in latest measurement): run targeted zqk scheduler scan-tests --package … ")+
+		return fmt.Sprintf(paths.RewriteCanonicalCLIInvocations("Fix failing test_case objects (%d fingerprint(s) in latest measurement): run zqk test run ")+
 			"and inspect .zqk/logs/scheduler/cvs/test-bundles/; re-run measure when green.", n,
 		)
 	case "delta_trending_away":
 		return "Bundle health is trending away from the session goal; stabilize tests and scheduler load before advancing phase. " +
-			"Re-run scan-tests for the packages implicated by failing fingerprints."
+			"Re-run zqk test run for the test_case objects implicated by failing fingerprints."
 	case "field_key_literals_gate":
 		return "Field-key literal gate failed (" + detail + "). Inspect field key literals and use pkg/objects accessors."
 	case "zqk_env_literals_gate":

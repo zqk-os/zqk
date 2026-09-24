@@ -51,7 +51,7 @@ func runCriteriaEvidence(cliCtx *cli.Context, cmd *cobra.Command) error {
 	if err != nil {
 		if fileutil.IsNotExist(err) {
 			msg := fmt.Sprintf("No test-bundle events file yet (%s).\n"+
-				"Run SCH-run-* bundles (scan-tests); criteria_verification_evidence lines append on completion when bundle JSON declares criteria_refs.\n",
+				"Run zqk test run; criteria_verification_evidence lines append on completion when test_case objects declare criteria_refs.\n",
 				filepath.Base(path))
 			return cli.WriteOutput(cmd, []byte(msg))
 		}

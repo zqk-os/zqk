@@ -9,7 +9,7 @@ import (
 func TestAgentPromptPreferredNextAction_prefersPersistedOperatorText(t *testing.T) {
 	t.Parallel()
 	cvs := map[string]any{
-		objects.FieldKeyNextAction: "Next: triage .zqk/logs/drift/ then scan-tests --package ./pkg/foo.",
+		objects.FieldKeyNextAction: "Next: triage .zqk/logs/drift/ then zqk test run.",
 	}
 	sug := map[string]any{
 		objects.FieldKeyNextAction: "No failing outcomes in this window.",
@@ -22,7 +22,7 @@ func TestAgentPromptPreferredNextAction_prefersPersistedOperatorText(t *testing.
 func TestMergeObjectUpdateBodyPreservingOperatorNextAction_keepsHandoff(t *testing.T) {
 	t.Parallel()
 	existing := map[string]any{
-		objects.FieldKeyNextAction: "Rollup satisfied — not drift done. Next: triage .zqk/logs/drift/ and scan-tests --package ./pkg/foo.",
+		objects.FieldKeyNextAction: "Rollup satisfied — not drift done. Next: triage .zqk/logs/drift/ and zqk test run.",
 	}
 	body := map[string]any{
 		objects.FieldKeyNextAction: "No failing outcomes in this window.",

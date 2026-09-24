@@ -95,13 +95,13 @@ func TestLoadStreamStorageKindsFromYAML_FallbackOnMissing(t *testing.T) {
 }
 
 // TestStreamStorageEnabledForKind_SchedulerJobAlwaysFalse guards against
-// scheduler_job ever being re-added to stream storage (it broke scan-tests --all).
+// scheduler_job ever being re-added to stream storage (it broke bulk scheduler_job create).
 func TestStreamStorageEnabledForKind_SchedulerJobAlwaysFalse(t *testing.T) {
 
 	// The live map (populated from YAML or default) must not contain scheduler_job.
 	m := getStreamStorageEnabledKinds()
 	if m["scheduler_job"] {
-		t.Fatal("scheduler_job is stream-backed; this breaks scan-tests --all and CRUD operations. " +
+		t.Fatal("scheduler_job is stream-backed; this breaks bulk scheduler_job create and CRUD operations. " +
 			"Remove it from high_volume_kinds.yaml or streamStorageKindsDefault.")
 	}
 }

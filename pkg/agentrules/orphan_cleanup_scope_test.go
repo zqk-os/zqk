@@ -42,7 +42,7 @@ func daemonPgrepPattern(t *testing.T) *regexp.Regexp {
 // pass that scripts/agent-validate-changes.sh makes from the pre-commit gates.
 //
 // The pattern used to be ".*scheduler", which matches every one-off `zqk scheduler …` invocation.
-// A `scheduler scan-tests` run dispatched as a scheduler job was therefore listed as an abandoned
+// A long `zqk test run` dispatched as a scheduler job was therefore listed as an abandoned
 // daemon and SIGKILLed 438s into an 1800s budget, immediately after planning 143 bundles — no
 // timeout, no memory pressure (95% free, swap unused), just a pattern that was too wide. The
 // failure mode is quiet: the job dies with signal: killed and the packages it was scanning never
@@ -58,7 +58,7 @@ func TestOrphanCleanupDoesNotClassifySchedulerSubcommandsAsDaemons(t *testing.T)
 	}
 	// One-off CLI work: bounded, usually supervised, and never a leaked daemon.
 	transientArgv := []string{
-		"./bin/zqk-stable scheduler scan-tests --package ./pkg/objects",
+		"./bin/zqk-stable test run --all",
 		"./bin/zqk-stable scheduler submit ./script.sh --title t",
 		"./bin/zqk-stable scheduler history --job-id SCH-1787601142198539000",
 		"./bin/zqk-stable scheduler activity",

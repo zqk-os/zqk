@@ -105,7 +105,7 @@ func (h *ConvergenceSessionTickHandler) executeTerminalConvergenceSessionTick(
 		}
 		if len(snap.SuggestedRerunByFingerprint) > 0 {
 			fields = append(fields, logging.Int("suggested_rerun_fingerprint_count", len(snap.SuggestedRerunByFingerprint)))
-			fields = append(fields, logging.String("suggested_rerun_review", "see health.jsonl lines for suggested_rerun_commands per failing fingerprint; re-run bundles or fix then scan-tests"))
+			fields = append(fields, logging.String("suggested_rerun_review", "see health.jsonl lines for suggested_rerun_commands per failing fingerprint; re-run zqk test run or fix then re-measure"))
 		}
 		ConvergenceSessionTickLog(h.logger).Warn(LogEventConvergenceSessionTickTerminalMeasurementFollowupWarn).
 			WithFields(fields...).

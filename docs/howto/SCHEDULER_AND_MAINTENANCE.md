@@ -17,7 +17,7 @@ One-shot work (tests, a long command, anything you should not block a chat on):
 
 ```bash
 ./bin/zqk scheduler submit "./bin/zqk system check" --title "kernel check" --max-runtime 600
-./bin/zqk scheduler scan-tests --package ./pkg/scheduler
+./bin/zqk test run --all
 ```
 
 CRUD, `object list`, and `whats-next` work **without** the daemon. Start it when you want timers, retention, and one-shots to keep running.
@@ -36,7 +36,7 @@ Ensure the kernel survival jobs exist (idempotent):
 | :--- | :--- | :--- |
 | **Kernel survival** | Keep CAS, caches, retention, and object validation healthy | Every project that runs the daemon |
 | **Source-code pack** | Lint, logging/policy, kernel-integrity timers that feed git hooks | Checkouts that contain product source you gate before commit |
-| **One-shots** | `submit` / `scan-tests` you ask for | Anyone with a long command or a test package |
+| **One-shots** | `submit` you ask for | Anyone with a long command |
 
 A knowledge-only or orchestration project (backlog, Gantt, feed, no product tree) should run **kernel survival** and skip the source-code pack. Shipping those timers as required is how you get exit **126** on missing `scripts/pre-commit-*.sh`.
 
@@ -121,7 +121,7 @@ That is the orchestration-friendly substitute for `SCH-pre-commit-integrity`.
 
 1. Does the command path live under `scripts/pre-commit-*.sh` or a language linter? → source pack.
 2. Does it mention retention, WAL, cache, object validation, audit aggregation? → kernel survival.
-3. Did you type `scheduler submit` / `scan-tests` this session? → one-shot; it will get its own `SCH-*` and should be reaped by job-retention.
+3. Did you type `scheduler submit` this session? → one-shot; it will get its own `SCH-*` and should be reaped by job-retention.
 
 `zqk scheduler issues` is the inbox for failed timers. Clear it after you have fixed or disabled the job, not to hide a missing script.
 

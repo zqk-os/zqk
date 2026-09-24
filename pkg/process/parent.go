@@ -75,7 +75,7 @@ func RegisterPagerExitCallback(cb func()) {
 	pagerExitCallbacks = append(pagerExitCallbacks, cb)
 }
 
-// TouchMeaningfulActivity records that the current command did real work (e.g. scan-tests loaded bundles).
+// TouchMeaningfulActivity records that the current command did real work (e.g. zqk test run executed test_case objects).
 // Used by the idle watchdog when parent is not zqk to cancel context after prolonged inactivity.
 func TouchMeaningfulActivity() {
 	lastMeaningfulActivityMu.Lock()

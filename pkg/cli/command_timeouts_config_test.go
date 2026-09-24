@@ -49,11 +49,8 @@ func parseRuleDuration(t *testing.T, field, pattern, value string) time.Duration
 // the same command that happens not to spell the specific flag. If that fallback is *stricter*,
 // then work of identical cost is killed sooner purely because of how the request was written.
 //
-// This is not hypothetical. "scheduler scan-tests --all" carried 20m plus a child-cap exemption
-// and a 5m idle window, while the bare "scheduler scan-tests" fallback carried 10m and neither.
-// Scan cost is driven by how many bundles get generated — one scheduler_job object written per
-// bundle — and a --package list of 45 packages generates as many as --all does. Such a scan was
-// killed at 10m mid-generation and reported a timeout indistinguishable from a hang.
+// This is not hypothetical. A specific flag rule that is looser than its general fallback
+// kills identical-cost work sooner when the flag is omitted.
 //
 // A pattern cannot count packages, so it cannot tell a large scan from a small one. The only
 // sound rule is that the fallback may not be tighter than the specific case it shadows.
@@ -95,31 +92,31 @@ func TestCommandTimeouts_generalFallbackIsNotStricterThanTheSpecificRuleItCatche
 
 // TestCommandTimeouts_scanTestsRulesAgreeOnScale anchors the specific case above so the
 // regression that motivated the invariant stays named even if the rules are reorganized.
-func TestCommandTimeouts_scanTestsRulesAgreeOnScale(t *testing.T) {
+func TestCommandTimeouts_testRunRulesAgreeOnScale(t *testing.T) {
 	cfg := loadShippedCommandTimeouts(t)
 
 	var found []commandTimeoutRule
 	for _, r := range cfg.Rules {
-		if strings.Contains(r.Pattern, "scheduler scan-tests") {
+		if strings.Contains(r.Pattern, "test run") {
 			found = append(found, r)
 		}
 	}
 	if len(found) == 0 {
-		t.Fatal("no scheduler scan-tests timeout rule found; scans would fall back to default_max")
+		t.Fatal("no test run timeout rule found; test run would fall back to default_max")
 	}
 
 	want := found[0]
 	for _, got := range found[1:] {
 		if got.Timeout != want.Timeout {
-			t.Errorf("scan-tests rules disagree on timeout: %q=%s vs %q=%s (bundle count, not flag spelling, drives cost)",
+			t.Errorf("test run rules disagree on timeout: %q=%s vs %q=%s (same family must agree on scale)",
 				want.Pattern, want.Timeout, got.Pattern, got.Timeout)
 		}
 		if got.ChildMaxTimeoutExempt != want.ChildMaxTimeoutExempt {
-			t.Errorf("scan-tests rules disagree on child_max_timeout_exempt: %q=%v vs %q=%v",
+			t.Errorf("test run rules disagree on child_max_timeout_exempt: %q=%v vs %q=%v",
 				want.Pattern, want.ChildMaxTimeoutExempt, got.Pattern, got.ChildMaxTimeoutExempt)
 		}
 		if got.IdleShutdownDuration != want.IdleShutdownDuration {
-			t.Errorf("scan-tests rules disagree on idle_shutdown_duration: %q=%s vs %q=%s",
+			t.Errorf("test run rules disagree on idle_shutdown_duration: %q=%s vs %q=%s",
 				want.Pattern, want.IdleShutdownDuration, got.Pattern, got.IdleShutdownDuration)
 		}
 	}
