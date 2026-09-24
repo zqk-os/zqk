@@ -126,6 +126,7 @@
 ./cli_specs/mcp_command.yaml
 ./cli_specs/new/
 ./cli_specs/new/command_spec_command.yaml
+./cli_specs/new/object_command.yaml
 ./cli_specs/object/
 ./cli_specs/object/count_command.yaml
 ./cli_specs/object/draft/

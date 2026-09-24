@@ -861,6 +861,52 @@ func (b *BacklogItemBuilder) addBacklogItemFields() {
 		WithPermissions("rwx").
 		WithSemanticType("statement").
 		WithProfileCode("BLI-036"))
+
+	b.AddFieldBuilder(builders.NewFieldBuilder("code_reference_refs", "list").
+		WithChecklist(builders.NewChecklistBuilder().
+			Authority("owner/developer.").
+			AutomationHooks("trace code implementations.").
+			Cardinality("many").
+			Criticality("association").
+			Default([]any{}).
+			Dependencies("none.").
+			Lifecycle("mutable").
+			Observability("yes").
+			Purpose("Code references (CDR-...) that implement this backlog item.").
+			Security("non-sensitive").
+			SystemUsage([]any{"implementation", "traceability"}).
+			Validation("Must reference existing code_reference IDs.").
+			Build()).
+		WithAccess(builders.NewAccessBuilder().
+			Requires("access:confidential").
+			Build()).
+		WithTraits("field_mutable_group", "field_reference_group", "writable", "modifiable").
+		WithPermissions("rwx").
+		WithSemanticType("reference").
+		WithProfileCode("BLI-040"))
+
+	b.AddFieldBuilder(builders.NewFieldBuilder("epic_refs", "list").
+		WithChecklist(builders.NewChecklistBuilder().
+			Authority("owner/planner.").
+			AutomationHooks("bounds child work unit permissions and blast radius under the epic enclave.").
+			Cardinality("many").
+			Criticality("association").
+			Default([]any{}).
+			Dependencies("epic registry.").
+			Lifecycle("mutable").
+			Observability("yes").
+			Purpose("Enclave epics governing and bounding the scope of this backlog item.").
+			Security("non-sensitive").
+			SystemUsage([]any{"planning", "scope_boundary", "isolation"}).
+			Validation("must reference existing epic IDs.").
+			Build()).
+		WithAccess(builders.NewAccessBuilder().
+			Requires("access:confidential").
+			Build()).
+		WithTraits("field_mutable_group", "field_reference_group").
+		WithPermissions("r-x").
+		WithSemanticType("reference").
+		WithProfileCode("BLI-041"))
 }
 
 // Build builds the spec (inherited from BaseSpecBuilder)

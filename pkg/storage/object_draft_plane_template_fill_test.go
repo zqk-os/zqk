@@ -201,3 +201,79 @@ func TestDraftPlane_PromoteStickFailsClosedUntilValid(t *testing.T) {
 		t.Fatalf("expected draft to remain on draft plane after failed promote")
 	}
 }
+
+func TestWriteObjectToDraftPlane_FullTemplateOfPossiblesAndMembraneTimestamps(t *testing.T) {
+	_, fileStorage, _ := SetupTestingFactoryCompleteTestEnvironmentForTest(t)
+	secCtx := pkgctx.NewSystemSecurityContext()
+	ctx := pkgctx.NewSystemContext()
+
+	id := "BLI-1777000000000000000-tplfill04"
+	sparseObj := map[string]any{
+		objects.FieldKeyID:            id,
+		objects.FieldKeyKind:          objects.KindBacklogItem,
+		objects.FieldKeyTitle:         "Full possibles draft test",
+		objects.FieldKeyStatus:        objects.ObjectStatusConceptual,
+		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+	}
+
+	sparseData, err := yaml.Marshal(sparseObj)
+	if err != nil {
+		t.Fatalf("marshal sparse object: %v", err)
+	}
+
+	if err := fileStorage.WriteObjectToDraftPlane(id, objects.KindBacklogItem, sparseData); err != nil {
+		t.Fatalf("WriteObjectToDraftPlane failed: %v", err)
+	}
+
+	draftPath := fileStorage.objectDraftPlanePath(objects.KindBacklogItem, id)
+	data, err := fileutil.ReadFile(draftPath)
+	if err != nil {
+		t.Fatalf("read draft file: %v", err)
+	}
+
+	var parsed map[string]any
+	if err := yaml.Unmarshal(data, &parsed); err != nil {
+		t.Fatalf("unmarshal draft YAML: %v", err)
+	}
+
+	// 1. Verify membrane provenance fields are NOT on the draft plane
+	for _, membraneKey := range []string{objects.FieldKeyCreatedAt, objects.FieldKeyCreatedBy, objects.FieldKeyUpdatedAt, objects.FieldKeyUpdatedBy, "hash"} {
+		if val, exists := parsed[membraneKey]; exists && val != "" {
+			t.Errorf("expected membrane key %q to be absent from draft plane, but found %v", membraneKey, val)
+		}
+	}
+
+	// 2. Verify non-required spec fields appear as placeholders (full template of possibles)
+	for _, expectedSlot := range []string{"persona_refs", "epic_refs", "workstream_refs", "code_location", "commit_hashes"} {
+		if _, exists := parsed[expectedSlot]; !exists {
+			t.Errorf("expected full template of possibles to include %q on draft plane, but missing", expectedSlot)
+		}
+	}
+
+	// 3. Complete fields and promote to originated (crossing CAS membrane)
+	validUpdates := map[string]any{
+		objects.FieldKeyStatus:      objects.ObjectStatusOriginated,
+		objects.FieldKeyDescription: "Valid description for originated object",
+	}
+
+	if err := fileStorage.Update(ctx, secCtx, id, validUpdates); err != nil {
+		t.Fatalf("update/promote to originated failed: %v", err)
+	}
+
+	// 4. Verify draft file was removed after CAS materialization
+	if fileStorage.objectDraftPlaneExists(objects.KindBacklogItem, id) {
+		t.Fatalf("draft still exists on draft plane after materializing to CAS")
+	}
+
+	// 5. Verify CAS object now has created_at and created_by stamped
+	casObj, err := fileStorage.Read(ctx, secCtx, id)
+	if err != nil {
+		t.Fatalf("storage.Read materialized CAS object failed: %v", err)
+	}
+	if casObj[objects.FieldKeyCreatedAt] == nil || casObj[objects.FieldKeyCreatedAt] == "" {
+		t.Errorf("expected created_at to be stamped upon CAS origination, but was empty")
+	}
+	if casObj[objects.FieldKeyCreatedBy] == nil || casObj[objects.FieldKeyCreatedBy] == "" {
+		t.Errorf("expected created_by to be stamped upon CAS origination, but was empty")
+	}
+}

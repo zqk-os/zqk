@@ -23,6 +23,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/validation"
 	"github.com/zqk-os/zqk/pkg/validation/qa"
 	"github.com/zqk-os/zqk/pkg/workflow/whatsnext"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 // NewPromoteCmd creates a new promote command
@@ -155,6 +156,23 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 					candidateObj[k] = v
 				}
 				candidateObj[objects.FieldKeyStatus] = candidate
+				if _, ok := candidateObj[objects.FieldKeyCreatedAt]; !ok || candidateObj[objects.FieldKeyCreatedAt] == nil || candidateObj[objects.FieldKeyCreatedAt] == "" {
+					now := zqktime.NowRFC3339UTC()
+					actor := objects.DefaultSystemAccountID
+					if secCtx != nil && secCtx.AccountID != "" {
+						actor = pkgctx.ActorIDForAttribution(secCtx.AccountID)
+					}
+					candidateObj[objects.FieldKeyCreatedAt] = now
+					if _, ok := candidateObj[objects.FieldKeyCreatedBy]; !ok || candidateObj[objects.FieldKeyCreatedBy] == nil || candidateObj[objects.FieldKeyCreatedBy] == "" {
+						candidateObj[objects.FieldKeyCreatedBy] = actor
+					}
+					if _, ok := candidateObj[objects.FieldKeyUpdatedAt]; !ok || candidateObj[objects.FieldKeyUpdatedAt] == nil || candidateObj[objects.FieldKeyUpdatedAt] == "" {
+						candidateObj[objects.FieldKeyUpdatedAt] = now
+					}
+					if _, ok := candidateObj[objects.FieldKeyUpdatedBy]; !ok || candidateObj[objects.FieldKeyUpdatedBy] == nil || candidateObj[objects.FieldKeyUpdatedBy] == "" {
+						candidateObj[objects.FieldKeyUpdatedBy] = actor
+					}
+				}
 				// Validate as if already at candidate (no edge from the illegal status).
 				valOptions := &validation.ValidationOptions{
 					CurrentState:          candidate,
@@ -290,6 +308,26 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 			// only, so promote active→complete failed while active_order was set.
 			for _, field := range objects.TransitionClearFields(lifecycle, currentStatus, candidate) {
 				delete(candidateObj, field)
+			}
+			// If candidate is crossing out of draft plane (or current lacked membrane timestamps),
+			// supply provisional timestamps and actor identity so validation does not reject
+			// an object for fields that will be stamped upon crossing the CAS membrane.
+			if _, ok := candidateObj[objects.FieldKeyCreatedAt]; !ok || candidateObj[objects.FieldKeyCreatedAt] == nil || candidateObj[objects.FieldKeyCreatedAt] == "" {
+				now := zqktime.NowRFC3339UTC()
+				actor := objects.DefaultSystemAccountID
+				if secCtx != nil && secCtx.AccountID != "" {
+					actor = pkgctx.ActorIDForAttribution(secCtx.AccountID)
+				}
+				candidateObj[objects.FieldKeyCreatedAt] = now
+				if _, ok := candidateObj[objects.FieldKeyCreatedBy]; !ok || candidateObj[objects.FieldKeyCreatedBy] == nil || candidateObj[objects.FieldKeyCreatedBy] == "" {
+					candidateObj[objects.FieldKeyCreatedBy] = actor
+				}
+				if _, ok := candidateObj[objects.FieldKeyUpdatedAt]; !ok || candidateObj[objects.FieldKeyUpdatedAt] == nil || candidateObj[objects.FieldKeyUpdatedAt] == "" {
+					candidateObj[objects.FieldKeyUpdatedAt] = now
+				}
+				if _, ok := candidateObj[objects.FieldKeyUpdatedBy]; !ok || candidateObj[objects.FieldKeyUpdatedBy] == nil || candidateObj[objects.FieldKeyUpdatedBy] == "" {
+					candidateObj[objects.FieldKeyUpdatedBy] = actor
+				}
 			}
 
 			// CRI-PERSONA-SKILL-BOUND: refuse shovel-ready+ promote without resolving ASK links.

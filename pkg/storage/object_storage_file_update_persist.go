@@ -60,6 +60,13 @@ func (f *FileObjectStorage) persistFileObjectUpdate(p *fileObjectUpdatePrep) err
 			}
 		} else {
 			// Leaving preliminary: materialize into CAS then drop draft file (fail closed).
+			// Stamp origination metadata (created_at, created_by) as object crosses membrane into CAS.
+			f.ensureObjectMetadata(ctx, existing, secCtx, true)
+			var marshalErr error
+			data, marshalErr = f.yamlMarshalForPersistence(existing)
+			if marshalErr != nil {
+				return errfmt.Newf(ErrMsgMarshalUpdatedObj).Wrap(marshalErr)
+			}
 			if err := f.writeCASThroughMembrane(ctx, id, kind, data, false, func() error {
 				return f.writeObjectToCAS(ctx, id, kind, "", data, secCtx)
 			}); err != nil {
