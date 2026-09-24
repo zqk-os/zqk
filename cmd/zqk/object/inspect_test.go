@@ -198,7 +198,17 @@ func TestRunPolicyStudio_JSON(t *testing.T) {
 // mockInspectStorage implements minimal storage methods for test isolation
 type mockInspectStorage struct {
 	storage.ObjectStorageProvider
-	objects map[string]map[string]any
+	objects   map[string]map[string]any
+	filePaths map[string]string
+}
+
+func (m *mockInspectStorage) GetFilePathForObject(id, kind string) (string, error) {
+	if m.filePaths != nil {
+		if p, ok := m.filePaths[id]; ok {
+			return p, nil
+		}
+	}
+	return "", nil
 }
 
 func (m *mockInspectStorage) Read(ctx context.Context, secCtx *pkgctx.SecurityContext, id string) (map[string]any, error) {
@@ -520,6 +530,15 @@ func TestInspect_ModularCards_StorageAndOntology(t *testing.T) {
 	assert.True(t, proj.StorageProfile.ByteSize > 0)
 	assert.NotEmpty(t, proj.StorageProfile.Permissions)
 	assert.Equal(t, "2026-09-23T14:00:00Z", proj.StorageProfile.LastModified)
+
+	// Verify draft-plane path detection (.zqk/object_drafts/...)
+	mockStorage.filePaths = map[string]string{
+		"BLI-CARDS-001": "/Users/test/workspace/.zqk/object_drafts/backlog_item/ab/BLI-CARDS-001.yaml",
+	}
+	projDraft := buildSemanticProjection(ctx, mockStorage, secCtx, rawObj, objects.KindBacklogItem, nil)
+	require.NotNil(t, projDraft.StorageProfile)
+	assert.Equal(t, "draft_plane", projDraft.StorageProfile.StoragePlane)
+	assert.Equal(t, "/Users/test/workspace/.zqk/object_drafts/backlog_item/ab/BLI-CARDS-001.yaml", projDraft.StorageProfile.FilePath)
 
 	// Verify Ontology
 	require.NotNil(t, proj.Ontology)
