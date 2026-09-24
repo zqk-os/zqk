@@ -571,6 +571,34 @@ func (b *PriorityPlanBuilder) addPriorityPlanFields() {
 		WithPermissions("rwx").
 		WithSemanticType("statement").
 		WithProfileCode("PRIO-019"))
+	b.AddFieldBuilder(builders.NewFieldBuilder("epic_refs", "list").
+		WithChecklist(builders.NewChecklistBuilder().
+			Authority("owner/planner.").
+			AutomationHooks("links priority execution plans implementing this epic.").
+			Cardinality("many").
+			Criticality("association").
+			Default([]any{}).
+			Dependencies("epic registry.").
+			Lifecycle("mutable").
+			Observability("yes").
+			Purpose("Epics driving execution of this priority plan.").
+			Security("non-sensitive").
+			SystemUsage([]any{
+				"execution",
+				"scheduling",
+			}).
+			Validation("Must reference existing epic IDs.").
+			Build()).
+		WithAccess(builders.NewAccessBuilder().
+			Requires("access:confidential").
+			Build()).
+		WithValidation(builders.NewValidationBuilder().
+			Required(false).
+			Build()).
+		WithTraits("field_mutable_group", "field_reference_group").
+		WithPermissions("r-x").
+		WithSemanticType("reference").
+		WithProfileCode("PRIO-020"))
 }
 
 // Build builds the spec (inherited from BaseSpecBuilder)

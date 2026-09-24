@@ -37,4 +37,6 @@ const (
 	WorkstreamFieldWorkflowRef = "workflow_ref"
 	// WorkstreamFieldWorkstreamRefs is the field name for workstream_refs
 	WorkstreamFieldWorkstreamRefs = "workstream_refs"
+	// WorkstreamFieldEpicRefs is the field name for epic_refs
+	WorkstreamFieldEpicRefs = "epic_refs"
 )

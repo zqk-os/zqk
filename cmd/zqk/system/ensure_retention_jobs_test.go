@@ -7,6 +7,7 @@ import (
 	"github.com/zqk-os/zqk/internal/bootstrap"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -86,6 +87,7 @@ environment_variables:
 func TestEnsureRetentionJobs_FallbackToEmbeddedTemplates(t *testing.T) {
 	t.Parallel()
 	tmp := t.TempDir()
+	testkit.RegisterTempProjectTeardown(t, tmp, nil)
 	logger := logging.GetLoggerFromProfile("test")
 
 	// Extract bootstrap specs into tmp, but do not extract scripts/

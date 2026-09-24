@@ -6,11 +6,7 @@
 
 ## Install
 
-**Homebrew (Recommended):**
-```bash
-brew tap zqk-os/zqk
-brew install zqk
-```
+There is **no Homebrew formula and no public GitHub release** yet.
 
 **Build from Source:**
 ```bash

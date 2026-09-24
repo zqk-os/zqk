@@ -435,6 +435,34 @@ func (b *WorkstreamBuilder) addWorkstreamFields() {
 		WithPermissions("r-x").
 		WithSemanticType("reference").
 		WithProfileCode("WKS-014"))
+	b.AddFieldBuilder(builders.NewFieldBuilder("epic_refs", "list").
+		WithChecklist(builders.NewChecklistBuilder().
+			Authority("owner/planner.").
+			AutomationHooks("associates epic with workstream execution tracks.").
+			Cardinality("many").
+			Criticality("association").
+			Default([]any{}).
+			Dependencies("epic registry.").
+			Lifecycle("mutable").
+			Observability("yes").
+			Purpose("Epics executing components of this workstream.").
+			Security("non-sensitive").
+			SystemUsage([]any{
+				"planning",
+				"reporting",
+			}).
+			Validation("must reference existing epic IDs.").
+			Build()).
+		WithAccess(builders.NewAccessBuilder().
+			Requires("access:confidential").
+			Build()).
+		WithValidation(builders.NewValidationBuilder().
+			Required(false).
+			Build()).
+		WithTraits("field_mutable_group", "field_reference_group").
+		WithPermissions("r-x").
+		WithSemanticType("reference").
+		WithProfileCode("WKS-019"))
 }
 
 // Build builds the spec (inherited from BaseSpecBuilder)

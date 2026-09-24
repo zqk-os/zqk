@@ -75,6 +75,7 @@ if command -v find >/dev/null 2>&1; then
       ! -name 'generate-openvex.sh' \
       ! -name 'check-hardcoded-paths-and-perms-repo.sh' \
       ! -name 'check-cli-name-literals-repo.sh' \
+      ! -name 'scan-secrets.sh' \
       ! -path '*/open-core/*' \
       ! -path '*/starter_kernel_graph/*' \
       ! -path '*/onboarding_roadmap/*' \

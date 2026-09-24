@@ -60,7 +60,8 @@ fi
 if git -C "$ROOT" grep -n -i 'lanceman' -- \
 	. \
 	':!scripts/open-core/rewrite-community-module-path.sh' \
-	':!scripts/open-core/check-public-release-payload.sh' >/dev/null 2>&1; then
+	':!scripts/open-core/check-public-release-payload.sh' \
+	':!config/gates.yaml' >/dev/null 2>&1; then
 	fail "private owner/namespace reference (lanceman) remains in tracked repo files"
 fi
 

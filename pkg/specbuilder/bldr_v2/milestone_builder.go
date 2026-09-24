@@ -325,6 +325,34 @@ func (b *MilestoneBuilder) addMilestoneFields() {
 		WithPermissions("r-x").
 		WithSemanticType("reference").
 		WithProfileCode("MLS-004"))
+	b.AddFieldBuilder(builders.NewFieldBuilder("epic_refs", "list").
+		WithChecklist(builders.NewChecklistBuilder().
+			Authority("owner/planner.").
+			AutomationHooks("associates milestone checkpoints with governing epics.").
+			Cardinality("many").
+			Criticality("association").
+			Default([]any{}).
+			Dependencies("epic registry.").
+			Lifecycle("mutable").
+			Observability("yes").
+			Purpose("Epics this milestone tracks or contributes to.").
+			Security("non-sensitive").
+			SystemUsage([]any{
+				"planning",
+				"reporting",
+			}).
+			Validation("must reference existing epic IDs.").
+			Build()).
+		WithAccess(builders.NewAccessBuilder().
+			Requires("access:confidential").
+			Build()).
+		WithValidation(builders.NewValidationBuilder().
+			Required(false).
+			Build()).
+		WithTraits("field_mutable_group", "field_reference_group").
+		WithPermissions("r-x").
+		WithSemanticType("reference").
+		WithProfileCode("MLS-012"))
 }
 
 // Build builds the spec (inherited from BaseSpecBuilder)
