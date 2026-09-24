@@ -1098,28 +1098,21 @@ func renderSchedulerTab(b *strings.Builder, m *UIModel) {
 	}
 
 	total := len(jobs)
-	var visible []SchedulerJobRow
-
-	if m.AutoScroll {
-		end := availRows
-		if end > total {
-			end = total
-		}
-		visible = jobs[:end]
-	} else {
-		start := m.ScrollOffset
-		if start >= total {
-			start = total - 1
-		}
-		if start < 0 {
-			start = 0
-		}
-		end := start + availRows
-		if end > total {
-			end = total
-		}
-		visible = jobs[start:end]
+	start := 0
+	if m.SelectedIndex >= availRows {
+		start = m.SelectedIndex - availRows + 1
 	}
+	if start+availRows > total {
+		start = total - availRows
+	}
+	if start < 0 {
+		start = 0
+	}
+	end := start + availRows
+	if end > total {
+		end = total
+	}
+	visible := jobs[start:end]
 
 	for i, job := range visible {
 		stBadge := greenBold(job.Status)
@@ -1129,10 +1122,7 @@ func renderSchedulerTab(b *strings.Builder, m *UIModel) {
 			stBadge = yellowBold(job.Status)
 		}
 
-		actualIdx := i
-		if !m.AutoScroll {
-			actualIdx = m.ScrollOffset + i
-		}
+		actualIdx := start + i
 		isSelected := (actualIdx == m.SelectedIndex)
 
 		schedTable.AddRow(
@@ -1512,7 +1502,14 @@ func renderDetailModal(m *UIModel) string {
 	if len(modal.Details) > 0 {
 		lines = append(lines, whiteBold("  PROPERTIES & METRICS:"))
 		for _, d := range modal.Details {
-			lines = append(lines, "    "+d)
+			parts := strings.Split(d, "\n")
+			for j, p := range parts {
+				if j == 0 {
+					lines = append(lines, "    "+p)
+				} else {
+					lines = append(lines, "      "+p)
+				}
+			}
 		}
 		lines = append(lines, "")
 	}

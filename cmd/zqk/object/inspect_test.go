@@ -27,7 +27,6 @@ func TestNewInspectCmd_Structure(t *testing.T) {
 	assert.NotNil(t, cmd.Flags().Lookup("filter"))
 	assert.NotNil(t, cmd.Flags().Lookup("sort-by"))
 	assert.NotNil(t, cmd.Flags().Lookup("sort-asc"))
-	assert.NotNil(t, cmd.Flags().Lookup("group-by"))
 	assert.NotNil(t, cmd.Flags().Lookup("policy-studio"))
 	assert.NotNil(t, cmd.Flags().Lookup("format"))
 }

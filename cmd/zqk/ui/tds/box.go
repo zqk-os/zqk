@@ -93,8 +93,18 @@ func Panel(title string, lines []string, width int, style BorderStyle) string {
 	}
 	b.WriteString(style.TopRight + "\n")
 
-	// 2. Content rows
+	// 2. Content rows (flatten any embedded newlines to preserve left and right box borders)
+	var flatLines []string
 	for _, line := range lines {
+		if strings.Contains(line, "\n") {
+			parts := strings.Split(line, "\n")
+			flatLines = append(flatLines, parts...)
+		} else {
+			flatLines = append(flatLines, line)
+		}
+	}
+
+	for _, line := range flatLines {
 		b.WriteString(style.Vertical)
 		padded := PadRight(line, innerWidth)
 		// If line exceeds inner width, safely truncate

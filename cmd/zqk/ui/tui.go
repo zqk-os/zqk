@@ -417,17 +417,21 @@ func handleInput(m *UIModel, key []byte) bool {
 				}
 			}
 		case 'k', 'K': // Cursor up / Scroll up
-			m.AutoScroll = false
-			m.ScrollOffset++
+			if m.ActiveTab == TabState || m.ActiveTab == TabAudit {
+				m.AutoScroll = false
+				m.ScrollOffset++
+			}
 			if m.SelectedIndex > 0 {
 				m.SelectedIndex--
 			}
 		case 'j', 'J': // Cursor down / Scroll down
-			if m.ScrollOffset > 0 {
-				m.ScrollOffset--
-			}
-			if m.ScrollOffset == 0 {
-				m.AutoScroll = true
+			if m.ActiveTab == TabState || m.ActiveTab == TabAudit {
+				if m.ScrollOffset > 0 {
+					m.ScrollOffset--
+				}
+				if m.ScrollOffset == 0 {
+					m.AutoScroll = true
+				}
 			}
 			maxRows := m.GetCurrentRowCount()
 			if maxRows > 0 && m.SelectedIndex < maxRows-1 {
@@ -455,17 +459,21 @@ func handleInput(m *UIModel, key []byte) bool {
 				m.AutoScroll = true
 			}
 		case SeqCodeArrowUp:
-			m.AutoScroll = false
-			m.ScrollOffset++
+			if m.ActiveTab == TabState || m.ActiveTab == TabAudit {
+				m.AutoScroll = false
+				m.ScrollOffset++
+			}
 			if m.SelectedIndex > 0 {
 				m.SelectedIndex--
 			}
 		case SeqCodeArrowDown:
-			if m.ScrollOffset > 0 {
-				m.ScrollOffset--
-			}
-			if m.ScrollOffset == 0 {
-				m.AutoScroll = true
+			if m.ActiveTab == TabState || m.ActiveTab == TabAudit {
+				if m.ScrollOffset > 0 {
+					m.ScrollOffset--
+				}
+				if m.ScrollOffset == 0 {
+					m.AutoScroll = true
+				}
 			}
 			maxRows := m.GetCurrentRowCount()
 			if maxRows > 0 && m.SelectedIndex < maxRows-1 {
