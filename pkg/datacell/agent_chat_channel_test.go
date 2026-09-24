@@ -26,7 +26,7 @@ func TestReadAgentChatChannelConfig_missingFile_defaults(t *testing.T) {
 func TestReadAgentChatChannelConfig_reloadsWhenStampMoves(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
-	if err := fileutil.MkdirAll(filepath.Join(root, paths.ProjectDataDir, paths.AgentRuntimeDir), paths.DirPerm755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Join(root, paths.ProjectDataDir, paths.ConfigDir), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	first, err := ReadAgentChatChannelConfig(root)
