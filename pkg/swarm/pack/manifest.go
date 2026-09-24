@@ -11,16 +11,34 @@ import (
 
 // SwarmPackage represents a portable, decentralized swarm manifest.
 type SwarmPackage struct {
-	Schema      string         `yaml:"$schema,omitempty" json:"$schema,omitempty"`
-	Name        string         `yaml:"name" json:"name"`
-	Version     string         `yaml:"version" json:"version"`
-	Description string         `yaml:"description" json:"description"`
-	Author      string         `yaml:"author,omitempty" json:"author,omitempty"`
-	License     string         `yaml:"license,omitempty" json:"license,omitempty"`
-	Entrypoint  string         `yaml:"entrypoint,omitempty" json:"entrypoint,omitempty"`
-	Membranes   []MembraneRule `yaml:"membranes,omitempty" json:"membranes,omitempty"`
-	Agents      []AgentConfig  `yaml:"agents" json:"agents"`
-	Tasks       []TaskConfig   `yaml:"tasks,omitempty" json:"tasks,omitempty"`
+	Schema      string                  `yaml:"$schema,omitempty" json:"$schema,omitempty"`
+	Name        string                  `yaml:"name" json:"name"`
+	Version     string                  `yaml:"version" json:"version"`
+	Description string                  `yaml:"description" json:"description"`
+	Author      string                  `yaml:"author,omitempty" json:"author,omitempty"`
+	License     string                  `yaml:"license,omitempty" json:"license,omitempty"`
+	Entrypoint  string                  `yaml:"entrypoint,omitempty" json:"entrypoint,omitempty"`
+	Parameters  map[string]ParameterDef `yaml:"parameters,omitempty" json:"parameters,omitempty"`
+	Integrity   *Integrity              `yaml:"integrity,omitempty" json:"integrity,omitempty"`
+	Membranes   []MembraneRule          `yaml:"membranes,omitempty" json:"membranes,omitempty"`
+	Agents      []AgentConfig           `yaml:"agents" json:"agents"`
+	Tasks       []TaskConfig            `yaml:"tasks,omitempty" json:"tasks,omitempty"`
+}
+
+// ParameterDef defines a configurable parameter for a swarm package.
+type ParameterDef struct {
+	Type        string      `yaml:"type" json:"type"`
+	Default     interface{} `yaml:"default,omitempty" json:"default,omitempty"`
+	Description string      `yaml:"description,omitempty" json:"description,omitempty"`
+	Required    bool        `yaml:"required,omitempty" json:"required,omitempty"`
+}
+
+// Integrity records cryptographic attestation and content hashes.
+type Integrity struct {
+	Algorithm     string `yaml:"algorithm" json:"algorithm"`
+	SignerID      string `yaml:"signer_id" json:"signer_id"`
+	ContentDigest string `yaml:"content_digest" json:"content_digest"`
+	Signature     string `yaml:"signature" json:"signature"`
 }
 
 // MembraneRule specifies path-level boundary restrictions for the swarm.
@@ -76,6 +94,9 @@ func ValidateManifest(pkg *SwarmPackage) error {
 	}
 	if strings.TrimSpace(pkg.Version) == "" {
 		return fmt.Errorf("swarm package version is required")
+	}
+	if _, err := ParseSemVer(pkg.Version); err != nil {
+		return fmt.Errorf("swarm package version invalid: %w", err)
 	}
 	if strings.TrimSpace(pkg.Description) == "" {
 		return fmt.Errorf("swarm package description is required")
