@@ -1602,6 +1602,34 @@ func (m *UIModel) GetVisibleHealthViolations() []HealthViolationRow {
 	return res
 }
 
+// GetVisiblePriorityPlans returns priority plans matching active search query.
+func (m *UIModel) GetVisiblePriorityPlans() []PMPlanRow {
+	if m.SearchQuery == "" {
+		return m.PriorityPlans
+	}
+	var res []PMPlanRow
+	for _, p := range m.PriorityPlans {
+		if m.matchesQuery(p.ID, p.Title, p.Status, strings.Join(p.Workstreams, " ")) {
+			res = append(res, p)
+		}
+	}
+	return res
+}
+
+// GetVisibleBlockers returns active risks/blockers matching active search query.
+func (m *UIModel) GetVisibleBlockers() []PMBlockerRow {
+	if m.SearchQuery == "" {
+		return m.Blockers
+	}
+	var res []PMBlockerRow
+	for _, b := range m.Blockers {
+		if m.matchesQuery(b.ID, b.Title, b.Impact, b.Status, b.Severity) {
+			res = append(res, b)
+		}
+	}
+	return res
+}
+
 // GetCurrentRowCount returns the number of selectable rows in the active tab.
 func (m *UIModel) GetCurrentRowCount() int {
 	switch m.ActiveTab {
@@ -1610,7 +1638,7 @@ func (m *UIModel) GetCurrentRowCount() int {
 	case TabAudit:
 		return len(m.GetVisibleAuditEvents())
 	case TabPM:
-		return len(m.GetVisibleBacklog()) + len(m.GetVisibleTechnicalDebt())
+		return len(m.GetVisiblePriorityPlans()) + len(m.GetVisibleBlockers()) + len(m.GetVisibleBacklog()) + len(m.GetVisibleTechnicalDebt())
 	case TabMetrics:
 		return len(m.GetVisibleCommandMetrics())
 	case TabScheduler:
@@ -1695,10 +1723,45 @@ func (m *UIModel) OpenSelectedItemDetail() {
 		}
 
 	case TabPM:
+		plans := m.GetVisiblePriorityPlans()
+		blks := m.GetVisibleBlockers()
 		backlog := m.GetVisibleBacklog()
 		debt := m.GetVisibleTechnicalDebt()
-		if idx < len(backlog) {
-			bli := backlog[idx]
+
+		if idx < len(plans) {
+			p := plans[idx]
+			details := []string{
+				fmt.Sprintf("Plan ID       : %s", p.ID),
+				fmt.Sprintf("Status        : %s", p.Status),
+				fmt.Sprintf("Workstreams   : %s", strings.Join(p.Workstreams, ", ")),
+				fmt.Sprintf("Backlog Units : %d", p.BLICount),
+			}
+			m.DetailModal = &ItemDetailModel{
+				Kind:    objects.KindPriorityPlan,
+				ID:      p.ID,
+				Status:  p.Status,
+				Title:   p.Title,
+				Details: details,
+			}
+		} else if blkIdx := idx - len(plans); blkIdx < len(blks) {
+			blk := blks[blkIdx]
+			details := []string{
+				fmt.Sprintf("Risk ID       : %s", blk.ID),
+				fmt.Sprintf("Severity      : %s", blk.Severity),
+				fmt.Sprintf("Status        : %s", blk.Status),
+			}
+			if blk.Impact != "" {
+				details = append(details, fmt.Sprintf("Impact        : %s", blk.Impact))
+			}
+			m.DetailModal = &ItemDetailModel{
+				Kind:    objects.KindRiskBlocker,
+				ID:      blk.ID,
+				Status:  blk.Status,
+				Title:   blk.Title,
+				Details: details,
+			}
+		} else if bliIdx := idx - len(plans) - len(blks); bliIdx < len(backlog) {
+			bli := backlog[bliIdx]
 			claimed := bli.ClaimedBy
 			if claimed == "" || claimed == "<nil>" {
 				claimed = "unassigned"
@@ -1726,7 +1789,7 @@ func (m *UIModel) OpenSelectedItemDetail() {
 				Details: details,
 				Lineage: lineage,
 			}
-		} else if debtIdx := idx - len(backlog); debtIdx < len(debt) {
+		} else if debtIdx := idx - len(plans) - len(blks) - len(backlog); debtIdx < len(debt) {
 			d := debt[debtIdx]
 			details := []string{
 				fmt.Sprintf("Debt ID       : %s", d.ID),
