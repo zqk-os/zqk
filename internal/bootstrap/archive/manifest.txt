@@ -33,6 +33,7 @@
 ./cli_specs/agent/
 ./cli_specs/agent/chat-responder_command.yaml
 ./cli_specs/agent/claim_command.yaml
+./cli_specs/agent/claim_gate_command.yaml
 ./cli_specs/agent/evaluate-run_command.yaml
 ./cli_specs/agent/feed/
 ./cli_specs/agent/feed/ack_command.yaml
@@ -243,6 +244,7 @@
 ./cli_specs/system/agent_onboard_command.yaml
 ./cli_specs/system/check_policy_command.yaml
 ./cli_specs/system/cli_hooks_command.yaml
+./cli_specs/system/compact_wal_command.yaml
 ./cli_specs/system/disk_usage_command.yaml
 ./cli_specs/system/export_gate_command.yaml
 ./cli_specs/system/generate_agent_configs_command.yaml
