@@ -2,6 +2,7 @@ package scheduler
 
 import (
 	"context"
+	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -791,5 +792,307 @@ func TestOneTimeJobDisabledAfterFailJobAdmission(t *testing.T) {
 	// Recycle check: should reload/recycle re-fire?
 	if oneTimeImmediateShouldStartOnReload(job, false) {
 		t.Fatal("recycle must not re-fire disabled one_time job")
+	}
+}
+
+func createAdmissionTestFixtureJobData(jobID string, created time.Time) map[string]any {
+	return map[string]any{
+		objects.FieldKeyID:                jobID,
+		objects.FieldKeyKind:              objects.KindSchedulerJob,
+		objects.FieldKeyTitle:             "Admission lease fixture",
+		objects.FieldKeyStatus:            objects.ObjectStatusActive,
+		objects.FieldKeyJobType:           JobTypeRunWrapper,
+		objects.FieldKeyTriggerType:       TriggerTypeImmediate,
+		objects.FieldKeyCategory:          CategoryManual,
+		objects.FieldKeyPriority:          JobPriorityHigh,
+		objects.FieldKeyExecutionMode:     ExecutionModeOneTime,
+		objects.FieldKeyMaxRuntimeSeconds: 60,
+		objects.FieldKeyEnabled:           true,
+		objects.FieldKeyCommand:           "true",
+		objects.FieldKeyCallbackOnError:   "true",
+		objects.FieldKeyCreatedAt:         created.Format(time.RFC3339),
+		objects.FieldKeyCreatedBy:         "ACC-TEST",
+		objects.FieldKeyUpdatedAt:         created.Format(time.RFC3339),
+		objects.FieldKeyUpdatedBy:         "ACC-TEST",
+		objects.FieldKeyOriginProject:     validation.DefaultOriginProject,
+		objects.FieldKeyOriginSystem:      validation.DefaultOriginSystem,
+		objects.FieldKeySchemaVersion:     objects.DefaultSchemaVersion,
+	}
+}
+
+func TestScanAdmissionTimeouts_JobExecutionLeasePreventsDisabledOnLiveRun(t *testing.T) {
+	sched, _, cleanup := setupTestScheduler(t)
+	t.Cleanup(cleanup)
+	t.Cleanup(func() { setAdmissionTimeoutForTest(0) })
+
+	ctx := pkgctx.NewSystemContext()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	jobID := "SCH-1788059947969029991"
+
+	created := time.Now().UTC().Add(-2 * time.Minute)
+	jobData := createAdmissionTestFixtureJobData(jobID, created)
+	if err := sched.storage.Create(ctx, secCtx, jobData); err != nil {
+		t.Fatalf("storage.Create: %v", err)
+	}
+
+	job := &ScheduledJob{
+		ID:              jobID,
+		JobType:         JobTypeRunWrapper,
+		Category:        CategoryManual,
+		Priority:        JobPriorityHigh,
+		TriggerType:     TriggerTypeImmediate,
+		ExecutionMode:   ExecutionModeOneTime,
+		Enabled:         true,
+		Status:          StatusActive,
+		CallbackOnError: "true",
+		CreatedAt:       created,
+	}
+	sched.jobsMu.Lock()
+	sched.jobs[jobID] = job
+	sched.jobsMu.Unlock()
+
+	// Persist pickup occupancy via JobStateRegistry in_progress + JobExecutionLease
+	executionID := "exec-live-test-001"
+	lease, err := sched.stateRegistry.RegisterExecutionWithLease(jobID, executionID, os.Getpid(), 300)
+	if err != nil {
+		t.Fatalf("RegisterExecutionWithLease: %v", err)
+	}
+	if lease == nil || !lease.IsValid(time.Now().UTC()) {
+		t.Fatal("expected lease to be active and valid")
+	}
+
+	setAdmissionTimeoutForTest(50 * time.Millisecond)
+	sched.scanAdmissionTimeouts(ctx)
+
+	// Must NOT be marked failed or disabled while holding an active lease
+	if sched.admissionAlreadyFailed(jobID) {
+		t.Fatal("live run with active JobExecutionLease must not fail admission")
+	}
+	if !job.Enabled {
+		t.Fatal("live run job in memory must stay enabled")
+	}
+
+	raw, err := sched.storage.Read(ctx, secCtx, jobID)
+	if err != nil {
+		t.Fatalf("read after scan: %v", err)
+	}
+	if enabled, _ := raw[objects.FieldKeyEnabled].(bool); !enabled {
+		t.Fatal("live run job in storage must stay enabled")
+	}
+
+	// Complete execution releases occupancy
+	if err := sched.stateRegistry.CompleteExecution(jobID, executionID, "completed"); err != nil {
+		t.Fatalf("CompleteExecution: %v", err)
+	}
+	activeLease, err := sched.stateRegistry.GetActiveLease(jobID)
+	if err != nil {
+		t.Fatalf("GetActiveLease: %v", err)
+	}
+	if activeLease != nil {
+		t.Fatal("active lease should be nil after CompleteExecution")
+	}
+}
+
+func TestScanAdmissionTimeouts_ExpiredLeasePastMaxRuntimeTimesOut(t *testing.T) {
+	sched, _, cleanup := setupTestScheduler(t)
+	t.Cleanup(cleanup)
+	t.Cleanup(func() { setAdmissionTimeoutForTest(0) })
+
+	ctx := pkgctx.NewSystemContext()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	jobID := "SCH-1788059947969029992"
+
+	created := time.Now().UTC().Add(-2 * time.Minute)
+	jobData := createAdmissionTestFixtureJobData(jobID, created)
+	if err := sched.storage.Create(ctx, secCtx, jobData); err != nil {
+		t.Fatalf("storage.Create: %v", err)
+	}
+
+	job := &ScheduledJob{
+		ID:              jobID,
+		JobType:         JobTypeRunWrapper,
+		Category:        CategoryManual,
+		Priority:        JobPriorityHigh,
+		TriggerType:     TriggerTypeImmediate,
+		ExecutionMode:   ExecutionModeOneTime,
+		Enabled:         true,
+		Status:          StatusActive,
+		CallbackOnError: "true",
+		CreatedAt:       created,
+	}
+	sched.jobsMu.Lock()
+	sched.jobs[jobID] = job
+	sched.jobsMu.Unlock()
+
+	// Register an expired lease (started and expired in the past)
+	executionID := "exec-expired-test-001"
+	_, err := sched.stateRegistry.RegisterExecutionWithLease(jobID, executionID, os.Getpid(), 1)
+	if err != nil {
+		t.Fatalf("RegisterExecutionWithLease: %v", err)
+	}
+	// Backdate lease in state file to simulate max_runtime expiration
+	st, err := sched.stateRegistry.GetExecutionState(jobID)
+	if err != nil || st == nil {
+		t.Fatalf("GetExecutionState: %v", err)
+	}
+	st.StartedAt = time.Now().UTC().Add(-10 * time.Minute)
+	if st.Lease != nil {
+		st.Lease.AcquiredAt = st.StartedAt
+		st.Lease.ExpiresAt = st.StartedAt.Add(1 * time.Minute)
+	}
+	if err := sched.stateRegistry.UpdateState(jobID, st); err != nil {
+		t.Fatalf("UpdateState: %v", err)
+	}
+
+	// Verify lease is now expired
+	activeLease, _ := sched.stateRegistry.GetActiveLease(jobID)
+	if activeLease != nil {
+		t.Fatal("expected expired lease to return nil active lease")
+	}
+
+	setAdmissionTimeoutForTest(50 * time.Millisecond)
+	sched.scanAdmissionTimeouts(ctx)
+
+	// Since lease expired and job is not running, it must time out
+	if !sched.admissionAlreadyFailed(jobID) {
+		t.Fatal("never-started / expired lease past max_runtime must fail admission")
+	}
+	if job.Enabled {
+		t.Fatal("expected job to be disabled after admission timeout")
+	}
+}
+
+func TestExecuteJob_PickupRegistersLeaseAndStaysOccupiedUntilComplete(t *testing.T) {
+	sched, _, cleanup := setupTestScheduler(t)
+	t.Cleanup(cleanup)
+	t.Cleanup(func() { setAdmissionTimeoutForTest(0) })
+
+	ctx := pkgctx.NewSystemContext()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	jobID := "SCH-1788059947969029993"
+
+	created := time.Now().UTC().Add(-2 * time.Minute)
+	jobData := createAdmissionTestFixtureJobData(jobID, created)
+	if err := sched.storage.Create(ctx, secCtx, jobData); err != nil {
+		t.Fatalf("storage.Create: %v", err)
+	}
+
+	job := &ScheduledJob{
+		ID:                jobID,
+		JobType:           JobTypeRunWrapper,
+		Category:          CategoryManual,
+		Priority:          JobPriorityHigh,
+		TriggerType:       TriggerTypeImmediate,
+		ExecutionMode:     ExecutionModeOneTime,
+		Enabled:           true,
+		Status:            StatusActive,
+		MaxRuntimeSeconds: 60,
+		CallbackOnError:   "true",
+		CreatedAt:         created,
+	}
+	sched.jobsMu.Lock()
+	sched.jobs[jobID] = job
+	sched.jobsMu.Unlock()
+
+	setAdmissionTimeoutForTest(50 * time.Millisecond)
+
+	handlerExecuted := false
+	handler := &mockJobHandler{
+		executeFunc: func(execCtx context.Context, j *ScheduledJob) error {
+			handlerExecuted = true
+			// Inside handler (live run):
+			// 1. Job must be marked running
+			if !j.IsRunning() {
+				t.Error("job.IsRunning() must be true inside handler")
+			}
+			// 2. State registry must have active JobExecutionLease
+			lease, err := sched.stateRegistry.GetActiveLease(j.ID)
+			if err != nil || lease == nil {
+				t.Errorf("expected active lease inside handler, got lease=%v, err=%v", lease, err)
+			}
+			// 3. scanAdmissionTimeouts must NOT disable the job on a live run!
+			sched.scanAdmissionTimeouts(execCtx)
+			if sched.admissionAlreadyFailed(j.ID) {
+				t.Error("scanAdmissionTimeouts must not fail admission on a live run")
+			}
+			if !j.Enabled {
+				t.Error("job must remain enabled inside handler")
+			}
+			return nil
+		},
+	}
+
+	sched.executeJob(ctx, job, handler)
+
+	if !handlerExecuted {
+		t.Fatal("handler was not executed")
+	}
+
+	// After completion:
+	// 1. Running is false
+	if job.IsRunning() {
+		t.Error("job.IsRunning() must be false after executeJob")
+	}
+	// 2. Active lease is released
+	activeLease, err := sched.stateRegistry.GetActiveLease(job.ID)
+	if err != nil {
+		t.Errorf("GetActiveLease: %v", err)
+	}
+	if activeLease != nil {
+		t.Errorf("expected active lease to be nil after CompleteExecution, got %+v", activeLease)
+	}
+}
+
+func TestReloadJobs_PreservesLiveRunningStateAndLastRunAt(t *testing.T) {
+	sched, _, cleanup := setupTestScheduler(t)
+	t.Cleanup(cleanup)
+
+	ctx := pkgctx.NewSystemContext()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	jobID := "SCH-1788059947969029994"
+
+	// Create job in storage with LastRunAt = nil
+	jobData := createAdmissionTestFixtureJobData(jobID, time.Now().UTC())
+	if err := sched.storage.Create(ctx, secCtx, jobData); err != nil {
+		t.Fatalf("storage.Create: %v", err)
+	}
+
+	job := &ScheduledJob{
+		ID:            jobID,
+		JobType:       JobTypeRunWrapper,
+		Category:      CategoryManual,
+		Priority:      JobPriorityHigh,
+		TriggerType:   TriggerTypeImmediate,
+		ExecutionMode: ExecutionModeOneTime,
+		Enabled:       true,
+		Status:        StatusActive,
+	}
+	now := time.Now().UTC()
+	job.RunningMu.Lock()
+	job.Running = true
+	job.LastRunAt = &now
+	job.RunningMu.Unlock()
+
+	sched.jobsMu.Lock()
+	sched.jobs[jobID] = job
+	sched.jobsMu.Unlock()
+
+	// Reload from storage
+	if err := sched.ReloadJobs(ctx); err != nil {
+		t.Fatalf("ReloadJobs: %v", err)
+	}
+
+	sched.jobsMu.RLock()
+	reloadedJob := sched.jobs[jobID]
+	sched.jobsMu.RUnlock()
+
+	if reloadedJob == nil {
+		t.Fatal("expected job to be in s.jobs after reload")
+	}
+	if !reloadedJob.IsRunning() {
+		t.Fatal("expected live running state to be preserved across ReloadJobs")
+	}
+	if reloadedJob.LastRunAt == nil {
+		t.Fatal("expected LastRunAt to be preserved across ReloadJobs")
 	}
 }

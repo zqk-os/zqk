@@ -275,6 +275,8 @@ type JobStateRegistryInterface interface {
 	UpdateState(jobID string, state *JobExecutionState) error
 	ListInProgress() ([]*JobExecutionState, error)
 	RegisterExecution(jobID, executionID string, processID int) error
+	RegisterExecutionWithLease(jobID, executionID string, processID int, maxRuntimeSeconds int) (*JobExecutionLease, error)
+	GetActiveLease(jobID string) (*JobExecutionLease, error)
 	CompleteExecution(jobID, executionID, result string) error
 	DeferExecution(jobID, reason string, deferUntil *time.Time) error
 	SetObservabilityRecorder(rec observability.Recorder)
