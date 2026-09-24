@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -1108,6 +1109,148 @@ func TestUI_TabQA_HotkeysAndModalInteraction(t *testing.T) {
 	handleInput(m, []byte{KeyEsc})
 	assert.Nil(t, m.DetailModal)
 }
+
+func TestUI_TabPM_AllFourSectionsNavigationAndDetailInspection(t *testing.T) {
+	m := NewUIModel("", "pm")
+	m.ActiveTab = TabPM
+	m.PriorityPlans = []PMPlanRow{
+		{ID: "PRI-001", Title: "Core Architecture Plan", Status: "active", Workstreams: []string{"core", "mesh"}, BLICount: 5},
+		{ID: "PRI-002", Title: "UI Modernization Plan", Status: "complete", Workstreams: []string{"ui"}, BLICount: 3},
+	}
+	m.Blockers = []PMBlockerRow{
+		{ID: "BLK-001", Title: "Stale File Lock Contention", Severity: "high", Status: "open", Impact: "Blocks auto-compaction"},
+		{ID: "BLK-002", Title: "Deprecated Schema Migration", Severity: "low", Status: "open"},
+	}
+	m.RecentBacklog = []PMBacklogRow{
+		{ID: "BLI-101", Title: "Fix TUI cursor drift", Status: "in_progress", Priority: "P0", ClaimedBy: "agent-1", PlanRef: "PRI-002"},
+		{ID: "BLI-102", Title: "Add unassigned claimant styling", Status: "planned", Priority: "P1", ClaimedBy: ""},
+	}
+	m.TechnicalDebt = []PMDebtRow{
+		{ID: "DEBT-201", Title: "Refactor TSDB sparkline helper", Category: "metrics", Priority: "P2", Status: "identified"},
+	}
+
+	// 1. Total row count must equal sum of all 4 sections (2 + 2 + 2 + 1 = 7)
+	assert.Equal(t, 7, m.GetCurrentRowCount())
+
+	// 2. Select index 0 (Plan 1)
+	m.SelectedIndex = 0
+	m.OpenSelectedItemDetail()
+	require.NotNil(t, m.DetailModal)
+	assert.Equal(t, objects.KindPriorityPlan, m.DetailModal.Kind)
+	assert.Equal(t, "PRI-001", m.DetailModal.ID)
+	assert.Equal(t, "Core Architecture Plan", m.DetailModal.Title)
+	m.DetailModal = nil
+
+	// 3. Select index 2 (Blocker 1)
+	m.SelectedIndex = 2
+	m.OpenSelectedItemDetail()
+	require.NotNil(t, m.DetailModal)
+	assert.Equal(t, objects.KindRiskBlocker, m.DetailModal.Kind)
+	assert.Equal(t, "BLK-001", m.DetailModal.ID)
+	assert.Equal(t, "Stale File Lock Contention", m.DetailModal.Title)
+	m.DetailModal = nil
+
+	// 4. Select index 4 (BLI 1)
+	m.SelectedIndex = 4
+	m.OpenSelectedItemDetail()
+	require.NotNil(t, m.DetailModal)
+	assert.Equal(t, objects.KindBacklogItem, m.DetailModal.Kind)
+	assert.Equal(t, "BLI-101", m.DetailModal.ID)
+	assert.Equal(t, "agent-1", m.DetailModal.Actor)
+	m.DetailModal = nil
+
+	// 5. Select index 6 (Debt 1)
+	m.SelectedIndex = 6
+	m.OpenSelectedItemDetail()
+	require.NotNil(t, m.DetailModal)
+	assert.Equal(t, objects.KindTechnicalDebt, m.DetailModal.Kind)
+	assert.Equal(t, "DEBT-201", m.DetailModal.ID)
+	m.DetailModal = nil
+
+	// 6. Test Render contains claimant column and cursor
+	m.Width = 120
+	m.Height = 35
+	m.SelectedIndex = 2 // Pointing to BLK-001
+	rendered := Render(m)
+	assert.Contains(t, rendered, "ACTIVE PRIORITY PLANS")
+	assert.Contains(t, rendered, "ACTIVE RISKS & BLOCKERS")
+	assert.Contains(t, rendered, "RECENT WORK UNITS (BACKLOG ITEMS)")
+	assert.Contains(t, rendered, "TECHNICAL DEBT & HYGIENE ITEMS")
+	assert.Contains(t, rendered, "CLAIMANT")
+	// Verify that empty claimant renders as "-" rather than long "unassigned"
+	assert.Contains(t, rendered, "-")
+}
+
+func TestUI_Windowing_QA_Scheduler_Health(t *testing.T) {
+	m := NewUIModel("", "pm")
+	m.Width = 100
+	m.Height = 35
+
+	// Test QA windowing
+	m.ActiveTab = TabQA
+	var tcs []*test.TestCaseModel
+	for i := 0; i < 20; i++ {
+		tcs = append(tcs, &test.TestCaseModel{
+			ID:     fmt.Sprintf("TC-%03d", i),
+			Title:  fmt.Sprintf("Test Suite %d", i),
+			Status: "passed",
+		})
+	}
+	m.TestCases = tcs
+
+	// When selected index is at 15 (beyond initial window), cursor must still be rendered
+	m.SelectedIndex = 15
+	qaRendered := Render(m)
+	assert.Contains(t, qaRendered, "TC-015")
+	assert.Contains(t, qaRendered, "> ")
+
+	// Test Health windowing
+	m.ActiveTab = TabHealth
+	var violations []HealthViolationRow
+	for i := 0; i < 25; i++ {
+		violations = append(violations, HealthViolationRow{
+			Tier:      1,
+			Severity:  "critical",
+			Kind:      "contract",
+			ObjectID:  fmt.Sprintf("VIO-%03d", i),
+			Message:   fmt.Sprintf("Violation %d", i),
+		})
+	}
+	m.HealthViolations = violations
+
+	m.SelectedIndex = 20
+	healthRendered := Render(m)
+	assert.Contains(t, healthRendered, "VIO-020")
+	assert.Contains(t, healthRendered, "> ")
+}
+
+func TestUI_Render_NoScrollbackBleed(t *testing.T) {
+	m := NewUIModel("", "pm")
+	m.Width = 90
+	m.Height = 25
+	m.ActiveTab = TabState
+
+	// Inject mutation with embedded newlines in DiffSummary and ObjectRef
+	m.Mutations = []state.JournalMutation{
+		{
+			ID:          "MUT-001",
+			ChangeType:  "insert",
+			ObjectRef:   "backlog_items/BLI-001\nwith_newline",
+			DiffSummary: "line1: value\nline2: other\nline3: third\nline4: fourth",
+			CreatedAt:   time.Now().Unix(),
+		},
+	}
+
+	rendered := Render(m)
+	lines := strings.Split(rendered, "\n")
+	assert.LessOrEqual(t, len(lines), m.Height, "Rendered output line count must not exceed terminal height")
+
+	for i, line := range lines {
+		visW := tds.VisibleWidth(line)
+		assert.LessOrEqual(t, visW, m.Width, "Line %d visible width (%d) must not exceed terminal width (%d)", i, visW, m.Width)
+	}
+}
+
 
 
 

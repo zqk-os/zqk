@@ -206,7 +206,7 @@ func (s *DashboardState) BuildPayload() *DashboardLitePayload {
 func (s *DashboardState) ScanFromStorage(ctx context.Context, sp storage.ObjectStorageProvider) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	return s.scanFromStorageLocked(ctx, sp, nil, s.projectRoot, false, "", "")
+	return s.scanFromStorageLocked(ctx, sp, nil, s.projectRoot, true, "", "")
 }
 
 // WarmLiteFile builds and persists the materialized test dashboard lite file from storage.

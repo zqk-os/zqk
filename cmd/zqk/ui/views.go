@@ -95,9 +95,15 @@ func Render(m *UIModel) string {
 			middleBudget = 1
 		}
 
+		w := m.Width
+		if w < 70 {
+			w = 80
+		}
+
+		var resultLines []string
 		if len(bodyLines) > middleBudget {
 			start := 0
-			if m.ScrollOffset > 0 {
+			if m.ScrollOffset > 0 && (m.ActiveTab == TabState || m.ActiveTab == TabAudit) {
 				start = m.ScrollOffset
 				if start > len(bodyLines)-middleBudget {
 					start = len(bodyLines) - middleBudget
@@ -108,20 +114,22 @@ func Render(m *UIModel) string {
 				end = len(bodyLines)
 			}
 			middleLines := bodyLines[start:end]
-
-			var resultLines []string
 			resultLines = append(resultLines, headerLines...)
 			resultLines = append(resultLines, middleLines...)
 			resultLines = append(resultLines, footerLines...)
-			return strings.Join(resultLines, "\n")
+		} else {
+			resultLines = append(resultLines, headerLines...)
+			resultLines = append(resultLines, bodyLines...)
+			resultLines = append(resultLines, footerLines...)
 		}
 
-		var resultLines []string
-		resultLines = append(resultLines, headerLines...)
-		resultLines = append(resultLines, bodyLines...)
-		resultLines = append(resultLines, footerLines...)
 		if len(resultLines) > m.Height {
 			resultLines = resultLines[:m.Height]
+		}
+		for i := range resultLines {
+			if tds.VisibleWidth(resultLines[i]) > w {
+				resultLines[i] = tds.TruncateVisible(resultLines[i], w, "")
+			}
 		}
 		return strings.Join(resultLines, "\n")
 	}
@@ -383,14 +391,14 @@ func renderStateTab(b *strings.Builder, m *UIModel) {
 			}
 
 			badge := state.FormatEventBadge(mut.ChangeType)
-			ref := mut.ObjectRef
-			summary := mut.DiffSummary
+			ref := strings.ReplaceAll(strings.ReplaceAll(mut.ObjectRef, "\r", ""), "\n", " ")
+			summary := strings.ReplaceAll(strings.ReplaceAll(mut.DiffSummary, "\r", ""), "\n", " ")
 			if summary == "" {
 				summary = mut.ChangeType
 			}
 
 			cursor := "  "
-			if start+i == m.SelectedIndex {
+			if start+i == m.SelectedIndex || (m.AutoScroll && (m.SelectedIndex < start || m.SelectedIndex >= total) && start+i == total-1) {
 				cursor = cyanBold("> ")
 			}
 
@@ -520,13 +528,14 @@ func renderAuditTab(b *strings.Builder, m *UIModel) {
 				op = aud.ChangeType
 			}
 
-			detail := aud.DiffSummary
+			detail := strings.ReplaceAll(strings.ReplaceAll(aud.DiffSummary, "\r", ""), "\n", " ")
 			if detail == "" {
 				detail = "--"
 			}
+			ref := strings.ReplaceAll(strings.ReplaceAll(aud.ObjectRef, "\r", ""), "\n", " ")
 
 			cursor := "  "
-			if start+i == m.SelectedIndex {
+			if start+i == m.SelectedIndex || (m.AutoScroll && (m.SelectedIndex < start || m.SelectedIndex >= total) && start+i == total-1) {
 				cursor = cyanBold("> ")
 			}
 
@@ -535,7 +544,7 @@ func renderAuditTab(b *strings.Builder, m *UIModel) {
 				tStr,
 				tds.PadRight(tds.TruncateVisible(act, actorW, "…"), actorW),
 				tds.PadRight(tds.TruncateVisible(op, opW, "…"), opW),
-				tds.PadRight(tds.TruncateVisible(aud.ObjectRef, refW, "…"), refW),
+				tds.PadRight(tds.TruncateVisible(ref, refW, "…"), refW),
 				tds.TruncateVisible(detail, detailW, "…")))
 		}
 	}
@@ -653,8 +662,13 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 	effectiveHeight := m.Height + m.ProfileSpacingBonus()
 
 	// 2. Priority Plans Table
-	if len(m.PriorityPlans) > 0 {
-		b.WriteString(tds.SectionDivider("ACTIVE PRIORITY PLANS", w))
+	plans := m.GetVisiblePriorityPlans()
+	blks := m.GetVisibleBlockers()
+	backlog := m.GetVisibleBacklog()
+	debt := m.GetVisibleTechnicalDebt()
+
+	if len(plans) > 0 {
+		b.WriteString(tds.SectionDivider("ACTIVE PRIORITY PLANS (Press Enter to inspect)", w))
 		planTable := tds.NewTable(w).
 			AddColumn("PLAN ID", tds.AlignLeft, 16, 0.22).
 			AddColumn("STATUS", tds.AlignCenter, 12, 0.14).
@@ -662,15 +676,26 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 			AddColumn("WORKSTREAMS", tds.AlignLeft, 14, 0.18).
 			AddColumn("TITLE", tds.AlignLeft, 24, 0.38)
 
-		limit := 1
+		limit := 2
 		if effectiveHeight >= 40 {
-			limit = 2
+			limit = 3
 		}
-		if len(m.PriorityPlans) < limit {
-			limit = len(m.PriorityPlans)
+		if len(plans) < limit {
+			limit = len(plans)
 		}
-		for i := 0; i < limit; i++ {
-			p := m.PriorityPlans[i]
+		start := 0
+		if m.SelectedIndex < len(plans) && m.SelectedIndex >= limit {
+			start = m.SelectedIndex - limit + 1
+		}
+		if start+limit > len(plans) {
+			start = len(plans) - limit
+		}
+		if start < 0 {
+			start = 0
+		}
+		for i := 0; i < limit && (start+i) < len(plans); i++ {
+			actualIdx := start + i
+			p := plans[actualIdx]
 			wsStr := strings.Join(p.Workstreams, ", ")
 			if wsStr == "" {
 				wsStr = "core"
@@ -679,8 +704,9 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 			if p.Status == "complete" || p.Status == "done" {
 				stBadge = greenBold(p.Status)
 			}
+			idCell := tds.RowCursor(actualIdx == m.SelectedIndex, p.ID)
 			planTable.AddRow(
-				p.ID,
+				idCell,
 				stBadge,
 				fmt.Sprintf("%d", p.BLICount),
 				wsStr,
@@ -691,31 +717,48 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 	}
 
 	// 3. Active Blockers & Risks
-	if len(m.Blockers) > 0 {
-		b.WriteString(tds.SectionDivider("ACTIVE RISKS & BLOCKERS", w))
+	if len(blks) > 0 {
+		b.WriteString(tds.SectionDivider("ACTIVE RISKS & BLOCKERS (Press Enter to inspect)", w))
 		blkTable := tds.NewTable(w).
 			AddColumn("RISK ID", tds.AlignLeft, 16, 0.22).
 			AddColumn("SEVERITY", tds.AlignCenter, 10, 0.12).
 			AddColumn("STATUS", tds.AlignCenter, 10, 0.12).
 			AddColumn("TITLE", tds.AlignLeft, 30, 0.54)
 
-		limit := 1
+		limit := 2
 		if effectiveHeight >= 40 {
-			limit = 2
+			limit = 3
 		}
-		if len(m.Blockers) < limit {
-			limit = len(m.Blockers)
+		if len(blks) < limit {
+			limit = len(blks)
 		}
-		for i := 0; i < limit; i++ {
-			blk := m.Blockers[i]
+		blkOffset := len(plans)
+		start := 0
+		if m.SelectedIndex >= blkOffset && m.SelectedIndex < blkOffset+len(blks) {
+			curr := m.SelectedIndex - blkOffset
+			if curr >= limit {
+				start = curr - limit + 1
+			}
+		}
+		if start+limit > len(blks) {
+			start = len(blks) - limit
+		}
+		if start < 0 {
+			start = 0
+		}
+		for i := 0; i < limit && (start+i) < len(blks); i++ {
+			actualBlkIdx := start + i
+			blk := blks[actualBlkIdx]
 			sev := redBold(blk.Severity)
 			if blk.Severity == "low" || blk.Severity == "info" {
 				sev = dim(blk.Severity)
 			} else if blk.Severity == "medium" {
 				sev = yellowBold(blk.Severity)
 			}
+			actualIdx := blkOffset + actualBlkIdx
+			idCell := tds.RowCursor(actualIdx == m.SelectedIndex, blk.ID)
 			blkTable.AddRow(
-				blk.ID,
+				idCell,
 				sev,
 				blk.Status,
 				blk.Title,
@@ -725,17 +768,14 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 	}
 
 	// 4. Recent Work Units (Backlog Items) Table
-	backlog := m.GetVisibleBacklog()
-	debt := m.GetVisibleTechnicalDebt()
-
 	if len(backlog) > 0 {
 		b.WriteString(tds.SectionDivider("RECENT WORK UNITS (BACKLOG ITEMS)", w))
 		bliTable := tds.NewTable(w).
 			AddColumn("BLI ID", tds.AlignLeft, 16, 0.18).
 			AddColumn("PRIO", tds.AlignCenter, 6, 0.08).
 			AddColumn("STATUS", tds.AlignCenter, 12, 0.14).
-			AddColumn("CLAIMED BY", tds.AlignLeft, 16, 0.20).
-			AddColumn("TITLE", tds.AlignLeft, 25, 0.40)
+			AddColumn("CLAIMANT", tds.AlignLeft, 10, 0.10).
+			AddColumn("TITLE", tds.AlignLeft, 30, 0.50)
 
 		bliLimit := 3
 		if effectiveHeight >= 40 {
@@ -747,9 +787,13 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 			bliLimit = len(backlog)
 		}
 
+		bliOffset := len(plans) + len(blks)
 		bliStart := 0
-		if m.SelectedIndex < len(backlog) && m.SelectedIndex >= bliLimit {
-			bliStart = m.SelectedIndex - bliLimit + 1
+		if m.SelectedIndex >= bliOffset && m.SelectedIndex < bliOffset+len(backlog) {
+			curr := m.SelectedIndex - bliOffset
+			if curr >= bliLimit {
+				bliStart = curr - bliLimit + 1
+			}
 		}
 		if bliStart+bliLimit > len(backlog) {
 			bliStart = len(backlog) - bliLimit
@@ -759,8 +803,8 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 		}
 
 		for i := 0; i < bliLimit && (bliStart+i) < len(backlog); i++ {
-			actualIdx := bliStart + i
-			item := backlog[actualIdx]
+			actualBliIdx := bliStart + i
+			item := backlog[actualBliIdx]
 			stBadge := item.Status
 			if item.Status == "done" || item.Status == "completed" || item.Status == "complete" {
 				stBadge = greenBold(item.Status)
@@ -773,10 +817,11 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 			}
 
 			claimed := item.ClaimedBy
-			if claimed == "" || claimed == "<nil>" {
-				claimed = dim("unassigned")
+			if claimed == "" || claimed == "<nil>" || claimed == "unassigned" {
+				claimed = dim("-")
 			}
 
+			actualIdx := bliOffset + actualBliIdx
 			isSelected := (actualIdx == m.SelectedIndex)
 			idCell := tds.RowCursor(isSelected, item.ID)
 
@@ -810,9 +855,10 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 			debtLimit = len(debt)
 		}
 
+		debtOffset := len(plans) + len(blks) + len(backlog)
 		debtStart := 0
-		if m.SelectedIndex >= len(backlog) {
-			currDebtIdx := m.SelectedIndex - len(backlog)
+		if m.SelectedIndex >= debtOffset {
+			currDebtIdx := m.SelectedIndex - debtOffset
 			if currDebtIdx >= debtLimit {
 				debtStart = currDebtIdx - debtLimit + 1
 			}
@@ -827,7 +873,7 @@ func renderPMTab(b *strings.Builder, m *UIModel) {
 		for i := 0; i < debtLimit && (debtStart+i) < len(debt); i++ {
 			actualDebtIdx := debtStart + i
 			d := debt[actualDebtIdx]
-			isSelected := (len(backlog)+actualDebtIdx == m.SelectedIndex)
+			isSelected := (debtOffset+actualDebtIdx == m.SelectedIndex)
 			idCell := tds.RowCursor(isSelected, d.ID)
 
 			debtTable.AddRow(
@@ -942,15 +988,16 @@ func renderMetricsTab(b *strings.Builder, m *UIModel) {
 			AddColumn("FAILURES", tds.AlignRight, 8, 0.10).
 			AddColumn("STATUS", tds.AlignCenter, 10, 0.15)
 
-		for _, cm := range m.TSDB.TopCommands {
+		for i, cm := range m.TSDB.TopCommands {
 			errStr := fmt.Sprintf("%d", cm.Failures)
 			stBadge := tds.Badge("PASS")
 			if cm.Failures > 0 {
 				errStr = redBold(errStr)
 				stBadge = tds.Badge("WARN")
 			}
+			isSelected := (i == m.SelectedIndex)
 			cmdTable.AddRow(
-				cm.Command,
+				tds.RowCursor(isSelected, cm.Command),
 				fmt.Sprintf("%d", cm.Invocations),
 				formatDurationMs(cm.AvgLatencyMs),
 				errStr,
@@ -989,7 +1036,20 @@ func renderMetricsTab(b *strings.Builder, m *UIModel) {
 			AddColumn("FAILURES", tds.AlignRight, 8, 0.15).
 			AddColumn("STATUS", tds.AlignCenter, 10, 0.15)
 
-		for _, sh := range m.SchedulerHealth {
+		healthRows := m.SchedulerHealth
+		// If all heartbeats are empty/zero, limit to at most 3 rows to save vertical space
+		allInactive := true
+		for _, sh := range healthRows {
+			if sh.HeartbeatAt != "--" && sh.HeartbeatAt != "" && sh.Executions > 0 {
+				allInactive = false
+				break
+			}
+		}
+		if allInactive && len(healthRows) > 3 {
+			healthRows = healthRows[:3]
+		}
+
+		for _, sh := range healthRows {
 			failStr := fmt.Sprintf("%d", sh.Failures)
 			stBadge := tds.Badge("HEALTHY")
 			if sh.Failures > 0 {
@@ -1010,16 +1070,16 @@ func renderMetricsTab(b *strings.Builder, m *UIModel) {
 
 	// 6. Scheduler Job Execution Performance & Latency Matrix
 	if m.TSDB != nil && len(m.TSDB.JobSummaries) > 0 {
-		b.WriteString(tds.SectionDivider("SCHEDULER JOB LATENCY & RELIABILITY MATRIX (TSDB)", w))
+		b.WriteString(tds.SectionDivider("SCHEDULER JOB LATENCY & RELIABILITY (TSDB — % vs historical avg)", w))
 		schedTable := tds.NewTable(w).
-			AddColumn("JOB IDENTIFIER", tds.AlignLeft, 22, 0.30).
+			AddColumn("JOB IDENTIFIER", tds.AlignLeft, 22, 0.28).
 			AddColumn("RUNS", tds.AlignRight, 5, 0.08).
 			AddColumn("SUCC", tds.AlignRight, 5, 0.08).
 			AddColumn("FAIL", tds.AlignRight, 5, 0.08).
 			AddColumn("AVG LAT", tds.AlignRight, 9, 0.14).
 			AddColumn("MIN / MAX", tds.AlignRight, 14, 0.16).
 			AddColumn("LAST RUN", tds.AlignCenter, 8, 0.08).
-			AddColumn("TREND", tds.AlignCenter, 8, 0.08)
+			AddColumn("LAT TREND", tds.AlignCenter, 10, 0.10)
 
 		limit := 8
 		if len(m.TSDB.JobSummaries) < limit {
@@ -1035,6 +1095,14 @@ func renderMetricsTab(b *strings.Builder, m *UIModel) {
 			if j.Failures > 0 {
 				failBadge = redBold(failBadge)
 			}
+			trendStr := j.Sparkline
+			if strings.HasPrefix(trendStr, "▲") {
+				trendStr = yellowBold(trendStr)
+			} else if strings.HasPrefix(trendStr, "▼") {
+				trendStr = greenBold(trendStr)
+			} else if strings.Contains(trendStr, "STABLE") {
+				trendStr = cyan(trendStr)
+			}
 			schedTable.AddRow(
 				j.JobID,
 				fmt.Sprintf("%d", j.Executions),
@@ -1043,7 +1111,7 @@ func renderMetricsTab(b *strings.Builder, m *UIModel) {
 				formatDurationMs(j.AvgDurationMs),
 				fmt.Sprintf("%s / %s", formatDurationMs(j.MinDurationMs), formatDurationMs(j.MaxDurationMs)),
 				lastRunStr,
-				j.Sparkline,
+				trendStr,
 			)
 		}
 		b.WriteString(schedTable.Render())
@@ -1089,28 +1157,21 @@ func renderSchedulerTab(b *strings.Builder, m *UIModel) {
 	}
 
 	total := len(jobs)
-	var visible []SchedulerJobRow
-
-	if m.AutoScroll {
-		end := availRows
-		if end > total {
-			end = total
-		}
-		visible = jobs[:end]
-	} else {
-		start := m.ScrollOffset
-		if start >= total {
-			start = total - 1
-		}
-		if start < 0 {
-			start = 0
-		}
-		end := start + availRows
-		if end > total {
-			end = total
-		}
-		visible = jobs[start:end]
+	start := 0
+	if m.SelectedIndex >= availRows {
+		start = m.SelectedIndex - availRows + 1
 	}
+	if start+availRows > total {
+		start = total - availRows
+	}
+	if start < 0 {
+		start = 0
+	}
+	end := start + availRows
+	if end > total {
+		end = total
+	}
+	visible := jobs[start:end]
 
 	for i, job := range visible {
 		stBadge := greenBold(job.Status)
@@ -1120,10 +1181,7 @@ func renderSchedulerTab(b *strings.Builder, m *UIModel) {
 			stBadge = yellowBold(job.Status)
 		}
 
-		actualIdx := i
-		if !m.AutoScroll {
-			actualIdx = m.ScrollOffset + i
-		}
+		actualIdx := start + i
 		isSelected := (actualIdx == m.SelectedIndex)
 
 		schedTable.AddRow(
@@ -1381,19 +1439,29 @@ func renderQATab(b *strings.Builder, m *UIModel) {
 		AddColumn("CRITERIA", tds.AlignCenter, 12, 0.14).
 		AddColumn("TITLE", tds.AlignLeft, 26, 0.44)
 
-	availRows := m.Height - 16 + m.ProfileSpacingBonus()
-	if availRows < 4 {
-		availRows = 4
+	availRows := m.Height - 21 + m.ProfileSpacingBonus()
+	if availRows < 3 {
+		availRows = 3
 	}
 
-	limit := len(testCases)
-	if limit > availRows {
-		limit = availRows
+	total := len(testCases)
+	start := 0
+	if m.SelectedIndex >= availRows {
+		start = m.SelectedIndex - availRows + 1
 	}
+	if start+availRows > total {
+		start = total - availRows
+	}
+	if start < 0 {
+		start = 0
+	}
+	end := start + availRows
+	if end > total {
+		end = total
+	}
+	visible := testCases[start:end]
 
-	for i := 0; i < limit; i++ {
-		tc := testCases[i]
-
+	for i, tc := range visible {
 		// Status Badge
 		stBadge := yellowBold(tc.Status)
 		if tc.Status == "complete" || tc.Status == "passed" || tc.Status == "active" {
@@ -1412,7 +1480,8 @@ func renderQATab(b *strings.Builder, m *UIModel) {
 		crStr := fmt.Sprintf("%d/%d ok", tc.CompletedCriteria, tc.TotalCriteria)
 
 		// Indicate row cursor if selected
-		idCell := tds.RowCursor(i == m.SelectedIndex, tc.ID)
+		actualIdx := start + i
+		idCell := tds.RowCursor(actualIdx == m.SelectedIndex, tc.ID)
 
 		tcTable.AddRow(
 			idCell,
@@ -1489,10 +1558,28 @@ func renderDetailModal(m *UIModel) string {
 	}
 	lines = append(lines, dim("  "+strings.Repeat("─", w-8)))
 
+	if modal.Summary != "" {
+		lines = append(lines, whiteBold("  DETAILED DIAGNOSTIC MESSAGE / SUMMARY:"))
+		for _, sl := range strings.Split(modal.Summary, "\n") {
+			slTrim := strings.TrimSpace(sl)
+			if slTrim != "" {
+				lines = append(lines, "    "+cyan(slTrim))
+			}
+		}
+		lines = append(lines, "")
+	}
+
 	if len(modal.Details) > 0 {
 		lines = append(lines, whiteBold("  PROPERTIES & METRICS:"))
 		for _, d := range modal.Details {
-			lines = append(lines, "    "+d)
+			parts := strings.Split(d, "\n")
+			for j, p := range parts {
+				if j == 0 {
+					lines = append(lines, "    "+p)
+				} else {
+					lines = append(lines, "      "+p)
+				}
+			}
 		}
 		lines = append(lines, "")
 	}
@@ -1509,17 +1596,6 @@ func renderDetailModal(m *UIModel) string {
 		lines = append(lines, whiteBold("  BOUND CRITERIA & VERIFICATION:"))
 		for _, c := range modal.Criteria {
 			lines = append(lines, "    "+c)
-		}
-		lines = append(lines, "")
-	}
-
-	if modal.Summary != "" {
-		lines = append(lines, whiteBold("  DETAILED DIAGNOSTIC MESSAGE / SUMMARY:"))
-		for _, sl := range strings.Split(modal.Summary, "\n") {
-			slTrim := strings.TrimSpace(sl)
-			if slTrim != "" {
-				lines = append(lines, "    "+cyan(slTrim))
-			}
 		}
 		lines = append(lines, "")
 	}
@@ -1643,19 +1719,33 @@ func renderHealthTab(b *strings.Builder, m *UIModel) {
 		AddColumn("OBJECT ID", tds.AlignLeft, 16, 0.20).
 		AddColumn("MESSAGE", tds.AlignLeft, 30, 0.44)
 
-	availRows := m.Height - 20 + m.ProfileSpacingBonus()
-	if availRows < 4 {
-		availRows = 4
+	overhead := 21
+	if len(m.ActionItems) > 0 {
+		overhead += 5
+	}
+	availRows := m.Height - overhead + m.ProfileSpacingBonus()
+	if availRows < 3 {
+		availRows = 3
 	}
 
-	limit := len(violations)
-	if limit > availRows {
-		limit = availRows
+	total := len(violations)
+	start := 0
+	if m.SelectedIndex >= availRows {
+		start = m.SelectedIndex - availRows + 1
 	}
+	if start+availRows > total {
+		start = total - availRows
+	}
+	if start < 0 {
+		start = 0
+	}
+	end := start + availRows
+	if end > total {
+		end = total
+	}
+	visible := violations[start:end]
 
-	for i := 0; i < limit; i++ {
-		v := violations[i]
-
+	for i, v := range visible {
 		tierStr := fmt.Sprintf("T%d", v.Tier)
 		sevBadge := dim(v.Severity)
 		switch v.Tier {
@@ -1670,7 +1760,8 @@ func renderHealthTab(b *strings.Builder, m *UIModel) {
 			tierStr = cyanBold(tierStr)
 		}
 
-		idCell := tds.RowCursor(i == m.SelectedIndex, v.ObjectID)
+		actualIdx := start + i
+		idCell := tds.RowCursor(actualIdx == m.SelectedIndex, v.ObjectID)
 
 		vTable.AddRow(
 			tierStr,

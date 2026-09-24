@@ -25,14 +25,13 @@ flags:
   - name: "filter"
     type: "stringArray"
     description: "Initial filter expressions (field=value, field!=value)"
-  - name: "group-by"
-    type: "string"
-    default: ""
-    description: "Initial group-by field"
+  - name: "fields"
+    type: "stringArray"
+    description: "Keys to include per object (repeat or comma-separated); omit for full rows"
   - name: "sort-by"
     type: "string"
     default: "updated_at"
-    description: "Initial sort field"
+    description: "Initial sort field (default \"updated_at\")"
   - name: "sort-asc"
     type: "bool"
     default: false
@@ -43,6 +42,7 @@ flags:
     description: "Launch directly into the interactive Policy Rule Studio"
 
 help:
+  exclude_flags: ["columns", "quiet"]
   examples:
     - comment: "Launch interactive object inspector"
       command: "%s object inspect"
@@ -57,4 +57,4 @@ help:
 
 run_e: "runInspect"
 common_flags: true
-query_flags: true
+query_flags: false
