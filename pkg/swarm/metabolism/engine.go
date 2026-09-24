@@ -280,6 +280,48 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 		objects.FieldKeyGoalRefs:       []string{goalID},
 		objects.FieldKeyStatus:         objects.ObjectStatusPlanned,
 	}
+
+	// Team configuration and persona dispatch wiring (supports ad-hoc personas or reusable team configurations)
+	var personaRefs []string
+	for _, a := range manifest.Agents {
+		if a.Name != "" {
+			personaRefs = append(personaRefs, a.Name)
+		}
+	}
+
+	if manifest.TeamConfiguration != nil {
+		tcfgID := manifest.TeamConfiguration.ID
+		if tcfgID == "" {
+			tcfgID = fmt.Sprintf("TCFG-%s", cleanName)
+		}
+		var allocations []map[string]any
+		for _, alloc := range manifest.TeamConfiguration.PersonaAllocations {
+			allocations = append(allocations, map[string]any{
+				"persona_ref": alloc.PersonaRef,
+				"role":        alloc.Role,
+				"count":       alloc.Count,
+			})
+			personaRefs = append(personaRefs, alloc.PersonaRef)
+		}
+		tcfgObj := map[string]any{
+			objects.FieldKeyID:                 tcfgID,
+			objects.FieldKeyKind:               "team_configuration",
+			objects.FieldKeyTitle:              fmt.Sprintf("Team Archetype for %s", manifest.Name),
+			"cell_type":                         manifest.TeamConfiguration.CellType,
+			"focus_area":                        manifest.TeamConfiguration.FocusArea,
+			objects.FieldKeyPersonaAllocations: allocations,
+			objects.FieldKeyStatus:             objects.ObjectStatusActive,
+		}
+		kernelObjects = append(kernelObjects, tcfgObj)
+		priObj[objects.FieldKeyTeamConfigurationRef] = tcfgID
+	} else if manifest.TeamConfigurationRef != "" {
+		priObj[objects.FieldKeyTeamConfigurationRef] = manifest.TeamConfigurationRef
+	}
+
+	if len(personaRefs) > 0 {
+		priObj[objects.FieldKeyPersonaRefs] = personaRefs
+	}
+
 	kernelObjects = append(kernelObjects, priObj)
 
 	// Closed-Loop Convergence Session

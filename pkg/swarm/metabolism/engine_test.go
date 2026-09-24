@@ -150,3 +150,119 @@ func TestMetabolismEngine_IngestAndSynthesize(t *testing.T) {
 		t.Errorf("expected epoch 2 on re-ingest, got %d", digest2.Lease.Epoch)
 	}
 }
+
+func TestMetabolismEngine_TeamConfiguration(t *testing.T) {
+	pub, priv, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		t.Fatalf("failed to generate key: %v", err)
+	}
+
+	t.Run("RefMode", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		manifestContent := `
+name: archetype-swarm
+version: 1.0.0
+description: Swarm using referenced team archetype
+team_configuration_ref: TCFG-CEF-DIAMOND-EVALUATION
+tasks:
+  - id: eval-task
+    title: Evaluate Codebase
+`
+		if err := os.WriteFile(filepath.Join(tmpDir, "swarm.yaml"), []byte(manifestContent), 0644); err != nil {
+			t.Fatalf("write failed: %v", err)
+		}
+		if _, err := pack.SealPack(tmpDir, priv, "signer@zqk.dev"); err != nil {
+			t.Fatalf("seal failed: %v", err)
+		}
+
+		engine := NewMetabolismEngine(NewReceptorRegistry())
+		digest, err := engine.Ingest(IngestionOptions{
+			PackDir:    tmpDir,
+			PublicKey:  pub,
+			VerifySeal: true,
+		})
+		if err != nil {
+			t.Fatalf("ingest failed: %v", err)
+		}
+
+		var pri map[string]any
+		for _, obj := range digest.KernelObjects {
+			if k, _ := obj[objects.FieldKeyKind].(string); k == "priority_plan" {
+				pri = obj
+				break
+			}
+		}
+		if pri == nil {
+			t.Fatal("priority_plan not synthesized")
+		}
+		if ref, _ := pri[objects.FieldKeyTeamConfigurationRef].(string); ref != "TCFG-CEF-DIAMOND-EVALUATION" {
+			t.Errorf("expected team_configuration_ref TCFG-CEF-DIAMOND-EVALUATION, got %q", ref)
+		}
+	})
+
+	t.Run("InlineMode", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		manifestContent := `
+name: inline-pod-swarm
+version: 1.0.0
+description: Swarm using inline team configuration
+team_configuration:
+  id: TCFG-INLINE-POD
+  cell_type: neuron
+  focus_area: architecture_evaluation
+  persona_allocations:
+    - persona_ref: PRS-SYSTEMS-ARCHITECT
+      role: architect
+      count: 2
+tasks:
+  - id: pod-task
+    title: Architect Assessment
+`
+		if err := os.WriteFile(filepath.Join(tmpDir, "swarm.yaml"), []byte(manifestContent), 0644); err != nil {
+			t.Fatalf("write failed: %v", err)
+		}
+		if _, err := pack.SealPack(tmpDir, priv, "signer@zqk.dev"); err != nil {
+			t.Fatalf("seal failed: %v", err)
+		}
+
+		engine := NewMetabolismEngine(NewReceptorRegistry())
+		digest, err := engine.Ingest(IngestionOptions{
+			PackDir:    tmpDir,
+			PublicKey:  pub,
+			VerifySeal: true,
+		})
+		if err != nil {
+			t.Fatalf("ingest failed: %v", err)
+		}
+
+		var pri, tcfg map[string]any
+		for _, obj := range digest.KernelObjects {
+			switch k, _ := obj[objects.FieldKeyKind].(string); k {
+			case "priority_plan":
+				pri = obj
+			case "team_configuration":
+				tcfg = obj
+			}
+		}
+		if pri == nil {
+			t.Fatal("priority_plan not synthesized")
+		}
+		if tcfg == nil {
+			t.Fatal("team_configuration not synthesized into kernel objects")
+		}
+		if id, _ := tcfg[objects.FieldKeyID].(string); id != "TCFG-INLINE-POD" {
+			t.Errorf("expected TCFG-INLINE-POD, got %s", id)
+		}
+		if ct, _ := tcfg["cell_type"].(string); ct != "neuron" {
+			t.Errorf("expected cell_type neuron, got %s", ct)
+		}
+		if ref, _ := pri[objects.FieldKeyTeamConfigurationRef].(string); ref != "TCFG-INLINE-POD" {
+			t.Errorf("expected priority_plan to reference TCFG-INLINE-POD, got %s", ref)
+		}
+		personas, _ := pri[objects.FieldKeyPersonaRefs].([]string)
+		if len(personas) != 1 || personas[0] != "PRS-SYSTEMS-ARCHITECT" {
+			t.Errorf("expected persona PRS-SYSTEMS-ARCHITECT in priority_plan, got %v", personas)
+		}
+	})
+}
+

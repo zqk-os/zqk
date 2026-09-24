@@ -169,6 +169,7 @@ func BuildCanonicalCEFPack(cefSourceDir string, destPackDir string, privKey ed25
 			{Path: ".zqk/audit/", Mode: "audit_log"},
 			{Path: "docs/quality/codebase_evaluation/", Mode: "read_only"},
 		},
+		TeamConfigurationRef: "TCFG-CEF-DIAMOND-EVALUATION",
 		Agents: []pack.AgentConfig{
 			{
 				Name:         "Specialist Evaluator",

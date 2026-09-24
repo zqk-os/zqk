@@ -51,14 +51,14 @@ agents:
 		t.Error("expected error for missing name")
 	}
 
-	// Missing agents
+	// Missing both agents and team_configuration
 	bad2 := `
 name: test-swarm
 version: 1.0.0
 description: Test
 `
 	if _, err := ParseManifest([]byte(bad2)); err == nil {
-		t.Error("expected error for missing agents")
+		t.Error("expected error for missing both agents and team_configuration")
 	}
 
 	// Invalid membrane mode
@@ -75,6 +75,73 @@ membranes:
 `
 	if _, err := ParseManifest([]byte(bad3)); err == nil {
 		t.Error("expected error for invalid membrane mode")
+	}
+}
+
+func TestParseManifest_TeamConfiguration(t *testing.T) {
+	// 1. Valid with team_configuration_ref (no agents declared inline)
+	yamlWithRef := `
+name: team-ref-swarm
+version: 1.0.0
+description: Swarm using team_configuration_ref
+team_configuration_ref: TCFG-CEF-EVALUATION-POD
+tasks:
+  - id: t1
+    title: Task 1
+`
+	pkg1, err := ParseManifest([]byte(yamlWithRef))
+	if err != nil {
+		t.Fatalf("unexpected error with team_configuration_ref: %v", err)
+	}
+	if pkg1.TeamConfigurationRef != "TCFG-CEF-EVALUATION-POD" {
+		t.Errorf("expected team_configuration_ref TCFG-CEF-EVALUATION-POD, got %s", pkg1.TeamConfigurationRef)
+	}
+	if len(pkg1.Agents) != 0 {
+		t.Errorf("expected 0 inline agents, got %d", len(pkg1.Agents))
+	}
+
+	// 2. Valid with inline team_configuration
+	yamlWithInline := `
+name: inline-team-swarm
+version: 1.0.0
+description: Swarm with inline team_configuration
+team_configuration:
+  cell_type: neuron
+  focus_area: architecture
+  persona_allocations:
+    - persona_ref: PER-1790238938478986000
+      count: 2
+tasks:
+  - id: t1
+    title: Task 1
+`
+	pkg2, err := ParseManifest([]byte(yamlWithInline))
+	if err != nil {
+		t.Fatalf("unexpected error with inline team_configuration: %v", err)
+	}
+	if pkg2.TeamConfiguration == nil || pkg2.TeamConfiguration.CellType != "neuron" {
+		t.Errorf("unexpected inline team configuration: %+v", pkg2.TeamConfiguration)
+	}
+
+	// 3. Valid with both team_configuration_ref and ad-hoc persona augmentation
+	yamlHybrid := `
+name: hybrid-swarm
+version: 1.0.0
+description: Swarm with both team_configuration_ref and ad-hoc agent
+team_configuration_ref: TCFG-DEFAULT-ENGINEERING
+agents:
+  - name: Ad-hoc Specialist
+    role: specialist_evaluator
+tasks:
+  - id: t1
+    title: Task 1
+`
+	pkg3, err := ParseManifest([]byte(yamlHybrid))
+	if err != nil {
+		t.Fatalf("unexpected error with hybrid pack: %v", err)
+	}
+	if pkg3.TeamConfigurationRef != "TCFG-DEFAULT-ENGINEERING" || len(pkg3.Agents) != 1 {
+		t.Errorf("unexpected hybrid pack state: %+v", pkg3)
 	}
 }
 
