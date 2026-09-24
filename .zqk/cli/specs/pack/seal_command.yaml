@@ -1,0 +1,36 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "seal [pack_dir]"
+short: "Cryptographically seal a swarm package with Ed25519 signature"
+description: |
+  Computes content digests, generates/applies an Ed25519 signature, and stamps integrity metadata on the swarm.yaml manifest.
+
+args:
+  type: "maximum"
+  max: 1
+
+flags:
+  - name: "signer-id"
+    type: "string"
+    default: "architect@zqk.dev"
+    description: "Signer identity or email"
+  - name: "key"
+    type: "string"
+    default: ""
+    description: "Path to Ed25519 private key (optional)"
+  - name: "pubkey-out"
+    type: "string"
+    default: ""
+    description: "Path to write public key hex (optional)"
+
+help:
+  examples:
+    - comment: "Seal package in current directory"
+      command: "%s pack seal"
+    - comment: "Seal package with explicit key and signer"
+      command: "%s pack seal ./my-pack --key ./signing.key --signer-id ops@example.com"
+
+common_flags: false
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false

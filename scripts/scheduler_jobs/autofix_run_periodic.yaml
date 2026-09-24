@@ -33,4 +33,4 @@ command_args:
   - |
     set -e
     ZQK="${ZQK_BIN:-zqk}"
-    "$ZQK" system check all --auto-fix --auto-fix-scheduler --timeout 540s
+    "$ZQK" system check all --auto-fix --auto-fix-scheduler --skip-if-locked --timeout 540s

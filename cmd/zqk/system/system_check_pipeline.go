@@ -153,82 +153,111 @@ func runSystemCheckPipelineWithOutcome(
 			checkCtx := plLoad.checkCtx
 			if autoFix, _ := plLoad.cmd.Flags().GetBool("auto-fix"); autoFix && checkCtx.ProjectRoot != emptyValue {
 				cli.TouchMeaningfulActivity()
-				const proactiveCleanupTimeout = 2 * time.Minute
-				if checkCtx.OperationID != emptyValue && checkCtx.ProjectRoot != emptyValue {
-					emitObjectIDCacheProgressViaCoordinator(checkCtx.Cmd.Context(), checkCtx.OperationID, progressStageLoading, "Proactive Stale CAS cleanup starting...")
-				}
-				processDir, err := resolveProcessDirForAsyncCheck(checkCtx)
-				if err != nil {
-					return nil, err
-				}
-				objectIDCache := GetGlobalObjectIDCache()
-				var allKinds []string
-				if objectIDCache.IsPopulatedForProject(checkCtx.ProjectRoot) {
-					allKinds = objectIDCache.GetKinds()
-					logging.Fluent(checkCtx.Logger).Debug("Proactive Stale CAS cleanup: using object ID cache for kinds").KindsCount(len(allKinds)).Log()
-				}
-				if len(allKinds) == 0 {
-					logging.Fluent(checkCtx.Logger).Debug("Proactive Stale CAS cleanup: discovering object kinds...").Log()
-					allKinds = discoverObjectKindsWithTimeout(plLoad.cancelCtx, processDir, 30*time.Second, checkCtx.Logger)
-				}
-				if allKinds == nil {
-					allKinds = []string{}
-				}
-				if len(allKinds) > 0 {
-					cli.TouchMeaningfulActivity()
-					if checkCtx.OperationID != emptyValue {
-						emitObjectIDCacheProgressViaCoordinator(checkCtx.Cmd.Context(), checkCtx.OperationID, progressStageLoading,
-							fmt.Sprintf("Proactive Stale CAS cleanup: cleaning %d kinds (timeout %s)...", len(allKinds), proactiveCleanupTimeout))
-					}
-					done := make(chan struct{})
-					var total int
-					var errs []error
-					var onKindProgress KindProgressFunc
-					if checkCtx.OperationID != emptyValue {
-						onKindProgress = func(kind string, completedIndex, totalKinds int) {
-							cli.TouchMeaningfulActivity()
-							emitObjectIDCacheProgressViaCoordinator(checkCtx.Cmd.Context(), checkCtx.OperationID, progressStageLoading,
-								fmt.Sprintf("Proactive Stale CAS cleanup: %s (%d/%d)...", kind, completedIndex, totalKinds))
+				force, _ := plLoad.cmd.Flags().GetBool("force")
+				clearCache, _ := plLoad.cmd.Flags().GetBool("clear-cache")
+
+				// Fast-path / Dirty-state gating:
+				// Avoid re-scanning 96 kinds on disk if the workspace and WAL are clean since the last cleanup.
+				stampPath := filepath.Join(checkCtx.ProjectRoot, paths.ProjectDataDir, paths.StateDir, "proactive_cas_cleanup.stamp")
+				needsCleanup := force || clearCache
+				if !needsCleanup {
+					if stampInfo, err := fileutil.Stat(stampPath); err == nil {
+						if time.Since(stampInfo.ModTime()) > 30*time.Minute {
+							needsCleanup = true
+						} else {
+							walPath := filepath.Join(checkCtx.ProjectRoot, paths.ProjectDataDir, paths.WalDir, "lifecycle_events.wal")
+							if walInfo, err := fileutil.Stat(walPath); err == nil && walInfo.ModTime().After(stampInfo.ModTime().Add(1*time.Second)) {
+								needsCleanup = true
+							}
 						}
 					} else {
-						onKindProgress = func(kind string, completedIndex, totalKinds int) {
-							cli.TouchMeaningfulActivity()
-						}
+						needsCleanup = true
 					}
-					cleanupBuilder := goroutinelabels.NewGoroutine("async_check_proactive_cleanup", "RunHashDuplicatesCleanupForKinds with timeout").
-						AsCleanup()
-					cleanupBuilder.StartSimple(func() {
-						defer close(done)
-						deleteForKinds := storage.GetGlobalBlockingCheckConfig().GetBypassKinds()
-						total, errs = RunHashDuplicatesCleanupForKinds(checkCtx.ProjectRoot, allKinds, false, false, checkCtx.Logger, onKindProgress, deleteForKinds)
-					})
-					timeoutCtx, stopTimeout := stdcontext.WithTimeout(stdcontext.Background(), proactiveCleanupTimeout) // Background: request-or-shutdown derived
-					defer stopTimeout()
-					idleTicker := time.NewTicker(5 * time.Second)
-					defer idleTicker.Stop()
-					cleanupDone := false
-					for !cleanupDone {
-						select {
-						case <-done:
-							cleanupDone = true
-							if total > 0 {
-								logging.Fluent(checkCtx.Logger).Info("Proactive Stale CAS cleanup completed").
-									KindsCount(len(allKinds)).Int("files_quarantined", total).Log()
-							}
-							for _, e := range errs {
-								if e != nil {
-									logging.Fluent(checkCtx.Logger).Warn("Stale CAS cleanup reported error").WithError(e).Log()
-								}
-							}
-						case <-timeoutCtx.Done():
-							cleanupDone = true
-							logging.Fluent(checkCtx.Logger).Warn("Proactive Stale CAS cleanup timed out - continuing with check").Log()
-						case <-plLoad.cancelCtx.Done():
-							cleanupDone = true
-							logging.Fluent(checkCtx.Logger).Warn("Proactive Stale CAS cleanup cancelled - continuing with check").Log()
-						case <-idleTicker.C:
-							cli.TouchMeaningfulActivity()
+				}
+
+				if !needsCleanup {
+					logging.Fluent(checkCtx.Logger).Debug("Proactive Stale CAS cleanup skipped: workspace clean since last scan").Log()
+				} else {
+					const proactiveCleanupTimeout = 2 * time.Minute
+					if checkCtx.OperationID != emptyValue && checkCtx.ProjectRoot != emptyValue {
+						emitObjectIDCacheProgressViaCoordinator(checkCtx.Cmd.Context(), checkCtx.OperationID, progressStageLoading, "Proactive Stale CAS cleanup starting...")
+					}
+					processDir, err := resolveProcessDirForAsyncCheck(checkCtx)
+					if err != nil {
+						return nil, err
+					}
+					objectIDCache := GetGlobalObjectIDCache()
+					var allKinds []string
+					if objectIDCache.IsPopulatedForProject(checkCtx.ProjectRoot) {
+						allKinds = objectIDCache.GetKinds()
+						logging.Fluent(checkCtx.Logger).Debug("Proactive Stale CAS cleanup: using object ID cache for kinds").KindsCount(len(allKinds)).Log()
+					}
+					if len(allKinds) == 0 {
+						logging.Fluent(checkCtx.Logger).Debug("Proactive Stale CAS cleanup: discovering object kinds...").Log()
+						allKinds = discoverObjectKindsWithTimeout(plLoad.cancelCtx, processDir, 30*time.Second, checkCtx.Logger)
+					}
+					if allKinds == nil {
+						allKinds = []string{}
+					}
+					if len(allKinds) > 0 {
+						cli.TouchMeaningfulActivity()
+						if checkCtx.OperationID != emptyValue {
+							emitObjectIDCacheProgressViaCoordinator(checkCtx.Cmd.Context(), checkCtx.OperationID, progressStageLoading,
+								fmt.Sprintf("Proactive Stale CAS cleanup: cleaning %d kinds (timeout %s)...", len(allKinds), proactiveCleanupTimeout))
 						}
+						done := make(chan struct{})
+						var total int
+						var errs []error
+						var onKindProgress KindProgressFunc
+						if checkCtx.OperationID != emptyValue {
+							onKindProgress = func(kind string, completedIndex, totalKinds int) {
+								cli.TouchMeaningfulActivity()
+								emitObjectIDCacheProgressViaCoordinator(checkCtx.Cmd.Context(), checkCtx.OperationID, progressStageLoading,
+									fmt.Sprintf("Proactive Stale CAS cleanup: %s (%d/%d)...", kind, completedIndex, totalKinds))
+							}
+						} else {
+							onKindProgress = func(kind string, completedIndex, totalKinds int) {
+								cli.TouchMeaningfulActivity()
+							}
+						}
+						cleanupBuilder := goroutinelabels.NewGoroutine("async_check_proactive_cleanup", "RunHashDuplicatesCleanupForKinds with timeout").
+							AsCleanup()
+						cleanupBuilder.StartSimple(func() {
+							defer close(done)
+							deleteForKinds := storage.GetGlobalBlockingCheckConfig().GetBypassKinds()
+							total, errs = RunHashDuplicatesCleanupForKinds(checkCtx.ProjectRoot, allKinds, false, false, checkCtx.Logger, onKindProgress, deleteForKinds)
+						})
+						timeoutCtx, stopTimeout := stdcontext.WithTimeout(stdcontext.Background(), proactiveCleanupTimeout) // Background: request-or-shutdown derived
+						defer stopTimeout()
+						idleTicker := time.NewTicker(5 * time.Second)
+						defer idleTicker.Stop()
+						cleanupDone := false
+						for !cleanupDone {
+							select {
+							case <-done:
+								cleanupDone = true
+								if total > 0 {
+									logging.Fluent(checkCtx.Logger).Info("Proactive Stale CAS cleanup completed").
+										KindsCount(len(allKinds)).Int("files_quarantined", total).Log()
+								}
+								for _, e := range errs {
+									if e != nil {
+										logging.Fluent(checkCtx.Logger).Warn("Stale CAS cleanup reported error").WithError(e).Log()
+									}
+								}
+							case <-timeoutCtx.Done():
+								cleanupDone = true
+								logging.Fluent(checkCtx.Logger).Warn("Proactive Stale CAS cleanup timed out - continuing with check").Log()
+							case <-plLoad.cancelCtx.Done():
+								cleanupDone = true
+								logging.Fluent(checkCtx.Logger).Warn("Proactive Stale CAS cleanup cancelled - continuing with check").Log()
+							case <-idleTicker.C:
+								cli.TouchMeaningfulActivity()
+							}
+						}
+						// Record successful cleanup stamp for fast-path gating
+						_ = fileutil.EnsureDir(filepath.Dir(stampPath))
+						_ = fileutil.WriteFile(stampPath, []byte(time.Now().UTC().Format(time.RFC3339Nano)), paths.FilePerm644)
 					}
 				}
 			}

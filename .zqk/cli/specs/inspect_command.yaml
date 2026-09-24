@@ -1,0 +1,56 @@
+$schema: schemas/command_spec.schema.json
+
+name: "inspect"
+short: "Interactive terminal object inspector and semantic projection viewer"
+description: |
+  Top-level shortcut for 'object inspect'. Launches an interactive terminal user interface (TUI)
+  or outputs semantic machine-readable projections for inspecting and navigating kernel object instances.
+
+args:
+  type: "maximum"
+  max: 2
+
+flags:
+  - name: "kind"
+    type: "string"
+    default: ""
+    description: "Initial object kind to inspect (e.g. backlog_item, requirement, test_case, policy)"
+  - name: "id"
+    type: "string"
+    default: ""
+    description: "Specific object identifier to inspect immediately in modal detail"
+  - name: "filter"
+    type: "stringArray"
+    description: "Initial filter expressions (field=value, field!=value)"
+  - name: "fields"
+    type: "stringArray"
+    description: "Keys to include per object (repeat or comma-separated); omit for full rows"
+  - name: "sort-by"
+    type: "string"
+    default: "updated_at"
+    description: "Initial sort field (default \"updated_at\")"
+  - name: "sort-asc"
+    type: "bool"
+    default: false
+    description: "Sort ascending (default is descending/newest first)"
+  - name: "policy-studio"
+    type: "bool"
+    default: false
+    description: "Launch directly into the interactive Policy Rule Studio"
+
+help:
+  exclude_flags: ["columns", "quiet"]
+  examples:
+    - comment: "Launch interactive object inspector"
+      command: "%s inspect"
+    - comment: "Inspect backlog items"
+      command: "%s inspect backlog_item"
+    - comment: "Inspect specific object by kind and id"
+      command: "%s inspect requirement REQ-012"
+
+run_e: "runInspect"
+common_flags: true
+query_flags: false
+requires_storage: true
+requires_session: false
+requires_scheduler_check: false

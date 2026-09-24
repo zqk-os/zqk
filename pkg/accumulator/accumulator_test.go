@@ -3,7 +3,6 @@ package accumulator
 import (
 	"context"
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"sync"
 	"sync/atomic"
@@ -432,7 +431,7 @@ func TestEngine_DualFormatDeserialization(t *testing.T) {
 		t.Fatalf("new engine: %v", err)
 	}
 
-	if err := os.MkdirAll(filepath.Dir(spec.StoragePath), paths.DirPerm755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(spec.StoragePath), paths.DirPerm755); err != nil {
 		t.Fatalf("mkdir state: %v", err)
 	}
 
@@ -451,7 +450,7 @@ func TestEngine_DualFormatDeserialization(t *testing.T) {
 		t.Fatalf("marshal legacy flat: %v", err)
 	}
 
-	if err := os.WriteFile(spec.StoragePath, legacyFlatJSON, paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(spec.StoragePath, legacyFlatJSON, paths.FilePerm644); err != nil {
 		t.Fatalf("write legacy flat file: %v", err)
 	}
 
@@ -489,7 +488,7 @@ func TestEngine_DualFormatDeserialization(t *testing.T) {
 		t.Fatalf("marshal envelope: %v", err)
 	}
 
-	if err := os.WriteFile(spec.StoragePath, envelopeJSON, paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(spec.StoragePath, envelopeJSON, paths.FilePerm644); err != nil {
 		t.Fatalf("write envelope file: %v", err)
 	}
 

@@ -1,0 +1,33 @@
+$schema: schemas/command_spec.schema.json
+
+name: "pack"
+short: "Holonic swarm package management (scaffold, seal, validate)"
+description: |
+  Initialize, cryptographically seal, and validate portable holonic swarm packages.
+
+help:
+  examples:
+    - comment: "Scaffold a new swarm package in the current directory"
+      command: "%s pack init"
+    - comment: "Cryptographically seal a package with Ed25519 signature"
+      command: "%s pack seal ./my-pack"
+    - comment: "Validate swarm package manifest and signature"
+      command: "%s pack validate ./my-pack"
+  exclude_flags:
+    - "output"
+    - "quiet"
+    - "columns"
+    - "timeout"
+
+common_flags: false
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false
+
+subcommands:
+  - name: init
+    spec_ref: pack/init_command.yaml
+  - name: seal
+    spec_ref: pack/seal_command.yaml
+  - name: validate
+    spec_ref: pack/validate_command.yaml

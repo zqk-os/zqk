@@ -1,0 +1,37 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "init [target_dir]"
+short: "Scaffold a new holonic swarm package structure"
+description: |
+  Scaffolds a new holonic swarm package structure including swarm.yaml manifest,
+  templates/, and membranes/ directories.
+
+args:
+  type: "maximum"
+  max: 1
+
+flags:
+  - name: "name"
+    type: "string"
+    default: ""
+    description: "Package name"
+  - name: "version"
+    type: "string"
+    default: "1.0.0"
+    description: "Semantic version (SemVer 2.0.0)"
+  - name: "description"
+    type: "string"
+    default: "A portable holonic swarm package"
+    description: "Package description"
+
+help:
+  examples:
+    - comment: "Scaffold package in current directory"
+      command: "%s pack init"
+    - comment: "Scaffold package in a specific directory"
+      command: "%s pack init ./custom-pack --name my-swarm --version 1.0.0"
+
+common_flags: false
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false
