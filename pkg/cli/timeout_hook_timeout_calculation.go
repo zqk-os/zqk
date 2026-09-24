@@ -29,7 +29,7 @@ type commandTimeoutRule struct {
 
 	// ChildMaxTimeoutExempt skips the childMaxTimeout cap (2m) for this command when
 	// the parent process is not zqk. Use for commands that are long-running by design
-	// (e.g. scan-tests --all).
+	// (e.g. test run --all).
 	ChildMaxTimeoutExempt bool `yaml:"child_max_timeout_exempt,omitempty"`
 
 	// ChildMaxTimeoutExemptIfExplicit skips the childMaxTimeout cap only when the user
@@ -287,7 +287,7 @@ func (h *TimeoutHook) getTimeoutFromCommandTimeoutsConfig(normalizedCmd string, 
 
 // isChildMaxTimeoutExempt reports whether the command should bypass the childMaxTimeout cap
 // (applied when the parent process is not zqk). The result depends on:
-//   - ChildMaxTimeoutExempt: always exempt (e.g. scan-tests --all)
+//   - ChildMaxTimeoutExempt: always exempt (e.g. test run --all)
 //   - ChildMaxTimeoutExemptIfExplicit: exempt only when the caller passed --timeout explicitly
 func (h *TimeoutHook) isChildMaxTimeoutExempt(normalizedCmd string, timeoutExplicitlySet bool) bool {
 	cfg := h.loadCommandTimeoutsConfig()

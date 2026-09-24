@@ -216,6 +216,4 @@ func TestExtended_CapOrchestrator_FailureTrackerAndIndex(t *testing.T) {
 	_ = h.resolveWakePlanID(ctx, "TASK-cap-1")
 	_ = h.topOpenPlanBLIs(ctx, "PRI-test", 5)
 
-	// 5. requestCriticalPackageScanTests
-	h.requestCriticalPackageScanTests([]string{"pkg/storage"})
 }

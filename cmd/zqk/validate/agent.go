@@ -148,25 +148,22 @@ func RunValidateAgent(cmd *cobra.Command, args []string, proc *cli.Processor) er
 		cmd.Printf("  - %s\n", p)
 	}
 
-	// Compilation and targeted tests have been removed to obey the mandate.
-	// All validation must go through the scheduler via test-bundles.
-	cmd.Println("✅ Validation analysis complete. Preparing test bundles...")
-
-	// Asynchronously queue background test-bundles
-	cmd.Println("⏳ Queueing test-bundles for background exhaustive verification...")
+	// Compilation and unbounded foreground go test are not the validation path.
+	// Kernel test_case objects are the process: discover, then run.
+	cmd.Println("✅ Validation analysis complete.")
+	cmd.Println("⏳ Queueing zqk test discover for kernel test_case refresh...")
 	exe, err := fileutil.Executable()
 	if err == nil {
-		commaPkgs := strings.Join(pkgs, ",")
-		scanCmd := execwrap.Command(exe, "scheduler", "scan-tests", "--package", commaPkgs)
-		scanCmd.Dir = projectRoot
-		if err := scanCmd.Start(); err == nil {
-			goroutinelabels.NewGoroutine("scan_tests_wait", "waiting for background scan-tests process").
+		disc := execwrap.Command(exe, "test", "discover")
+		disc.Dir = projectRoot
+		if err := disc.Start(); err == nil {
+			goroutinelabels.NewGoroutine("test_discover_wait", "waiting for background test discover").
 				StartSimple(func() {
-					_ = scanCmd.Wait()
+					_ = disc.Wait()
 				})
-			cmd.Println("✅ Background verification queued successfully.")
+			cmd.Println("✅ Background test discover queued. Run zqk test run for execution.")
 		} else {
-			cmd.Printf("⚠️ Background verification queue failed: %v\n", err)
+			cmd.Printf("⚠️ Background test discover failed: %v\n", err)
 		}
 	}
 

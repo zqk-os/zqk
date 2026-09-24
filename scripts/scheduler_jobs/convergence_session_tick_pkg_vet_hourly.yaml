@@ -26,7 +26,7 @@ title: Convergence — test-bundle health tick (pipeline CVS)
 description: |
   Reads .zqk/logs/scheduler/cvs/test-bundles/health.jsonl and updates the configured convergence_session
   when the health watermark advances. Respects thresholds.max_ticks_per_hour on the session.
-  Use alongside targeted zqk scheduler scan-tests; does not replace bundle runs.
+  Use alongside targeted zqk test run; does not replace kernel test_case runs.
   With CONVERGENCE_TICK_ROLLUP, after a successful tick runs orchestrate rollup-only (skip persist) and
   records rollup outcome on the job events JSONL (see pkg/scheduler handlers_convergence_session_tick).
 job_type: convergence_session_tick

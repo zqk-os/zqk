@@ -70,8 +70,7 @@ func TestUniversalTestCaseLifecycleTransitions(t *testing.T) {
 	}
 }
 
-// TestBundleDeprecationFacade validates that legacy scan-tests logic
-// can be instantiated or queried safely without panicking.
+// TestBundleDeprecationFacade is a leftover no-op from the bundle-deprecation window.
 func TestBundleDeprecationFacade(t *testing.T) {
 	t.Parallel()
 

@@ -119,7 +119,6 @@ func TestCoreSchedulerCommandBuilders(t *testing.T) {
 		{"SchedulerStart", func() any { return NewSchedulerStartCommandBuilder() }, "start"},
 		{"SchedulerStop", func() any { return NewSchedulerStopCommandBuilder() }, "stop"},
 		{"SchedulerStatus", func() any { return NewSchedulerStatusCommandBuilder() }, "status"},
-		{"SchedulerScanTests", func() any { return NewSchedulerScanTestsCommandBuilder() }, "scan-tests"},
 		{"SchedulerService", func() any { return NewSchedulerServiceCommandBuilder() }, "service"},
 		{"SchedulerHealth", func() any { return NewSchedulerHealthCommandBuilder() }, "health"},
 		{"SchedulerIssues", func() any { return NewSchedulerIssuesCommandBuilder() }, "issues"},

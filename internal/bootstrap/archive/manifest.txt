@@ -172,7 +172,6 @@
 ./cli_specs/scheduler/issues_bundle_health_command.yaml
 ./cli_specs/scheduler/list_command.yaml
 ./cli_specs/scheduler/record_cvs_orchestrate_run_command.yaml
-./cli_specs/scheduler/scan_tests_command.yaml
 ./cli_specs/scheduler/service/
 ./cli_specs/scheduler/service/gc_command.yaml
 ./cli_specs/scheduler/service/install_command.yaml

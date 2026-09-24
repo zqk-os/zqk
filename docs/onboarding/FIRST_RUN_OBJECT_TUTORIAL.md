@@ -82,7 +82,7 @@ When you no longer need the example object, delete it per project policy (`zqk o
 - **Validation errors:** Read the message; fix the cited field. For kind-specific rules, see `.zqk/specs/objects/<kind>.yaml` or `zqk system check <kind> <id>` after create.
 - **Status/lifecycle rejection on update:** Show allowed status values with `zqk object <kind> fields` and choose a valid transition from the lifecycle.
 - **Scheduler daemon not running:** Start it with `zqk scheduler start`. Do not treat `--allow-degraded` as the default fix — that flag means partial or degraded results are intentionally accepted (see `docs/architecture/SCHEDULER_DEGRADED_MODE_GUARDRAILS.md`).
-- **Long-running tests:** Prefer `zqk scheduler scan-tests` for package gates; see project scheduler docs and `PRE_CHANGE_CHECKLIST.md` section 6 for scope.
+- **Tests:** Use `zqk test discover`, `zqk test bind`, and `zqk test run TST-*` (kernel test_case objects). Do not use `scheduler scan-tests` — that command is gone.
 
 - [AI Agent Onboarding Guide](./AI_AGENT_ONBOARDING.md) — Agent directives and workflow discipline on ZQK Core.
 - [Architecture Overview](../architecture/README.md) — Core system architecture, Knowledge Kernel, and daemon topology.

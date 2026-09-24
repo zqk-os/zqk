@@ -1,10 +1,8 @@
 package test
 
 import (
-	"strings"
 	"testing"
 
-	"github.com/zqk-os/zqk/cmd/zqk/scheduler"
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
@@ -35,23 +33,19 @@ func TestUniversalTestOrchestration_FunctionalAcceptance(t *testing.T) {
 	}
 }
 
-// TestUniversalTestOrchestration_BoundaryAndErrorHandling verifies deprecation notice enforcement
-// and legacy bundle warning forwarding (CRIT-1789523308803875000-bebed512).
-func TestUniversalTestOrchestration_BoundaryAndErrorHandling(t *testing.T) {
+func TestUniversalTestOrchestration_ScanTestsGone(t *testing.T) {
 	t.Parallel()
 
-	scanCmd := scheduler.NewScanTestsCmd()
-	if scanCmd == nil {
-		t.Fatalf("expected NewScanTestsCmd to return a valid command")
+	top := NewTestCmd()
+	if top == nil {
+		t.Fatalf("expected NewTestCmd")
 	}
-
-	if scanCmd.Name() != "scan-tests" {
-		t.Errorf("expected scanCmd name to be scan-tests, got %s", scanCmd.Name())
+	names := map[string]bool{}
+	for _, c := range top.Commands() {
+		names[c.Name()] = true
 	}
-
-	deprecationNotice := "⚠️  DEPRECATION NOTICE: 'zqk scheduler scan-tests' and disk test-bundles are deprecated. Use 'zqk test discover' and 'zqk test run' for universal test_case orchestration."
-	if !strings.Contains(deprecationNotice, "zqk test discover") || !strings.Contains(deprecationNotice, "zqk test run") {
-		t.Errorf("expected deprecation notice to point to both discover and run")
+	if !names["run"] || !names["discover"] {
+		t.Fatalf("expected run and discover under test")
 	}
 }
 

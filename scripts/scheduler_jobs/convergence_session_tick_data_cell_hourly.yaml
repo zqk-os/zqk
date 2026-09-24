@@ -15,7 +15,7 @@ title: Convergence — test-bundle health tick (data-cell CVS)
 description: |
   Reads .zqk/logs/scheduler/cvs/test-bundles/health.jsonl and updates CVS-1776080007703030000-a726d525
   when the health watermark advances (same payload as zqk scheduler convergence measure --session-id).
-  Pair with SCH-cvs-pipeline-tick (tutorial CVS); scan-tests populate health.jsonl.
+  Pair with SCH-cvs-pipeline-tick (tutorial CVS); zqk test run records test_case evidence.
 job_type: convergence_session_tick
 trigger_type: timer
 schedule_expression: "20 * * * *"

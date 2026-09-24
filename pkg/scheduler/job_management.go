@@ -328,7 +328,7 @@ type casIndexReconciler interface {
 // ReconcileSchedulerJobCASIndex runs a synchronous full scan of scheduler_job CAS files
 // (when file storage supports it) so List/LoadJobs sees the same object IDs as on disk.
 // Call before ReloadJobs when processing trigger batches that include jobs created by another
-// process (e.g. zqk scheduler scan-tests --all SCH-run-*, scripts/test-runner.sh SCH-run-test-*
+// process (e.g. leftover SCH-run-* jobs, scripts/test-runner.sh SCH-run-test-*
 // or legacy SCH-<unix>); otherwise cross-process CAS index lag can leave new jobs out of the
 // cache and the trigger queue will drop their intents.
 // See docs/architecture/CAS_LIST_GET_CONSISTENCY.md.
@@ -531,7 +531,7 @@ func (s *Scheduler) tryScheduleJob(result map[string]any, h hydratedJob, reload 
 		return nil, nil
 	}
 	job := h.job
-	// Skip archived and disabled jobs at schedule time (testjobgen delete+recreates SCH-run-* on rescan;
+	// Skip archived and disabled jobs at schedule time (legacy SCH-run-* jobs may be deleted+recreated;
 	// other paths must not re-trigger terminal archived jobs or disabled one-time jobs). TRACK
 	if job == nil || !job.Enabled || job.Status == objects.ObjectStatusArchived || job.Status == StatusDisabled {
 		return nil, nil
@@ -559,7 +559,7 @@ func (s *Scheduler) tryScheduleJob(result map[string]any, h hydratedJob, reload 
 			if job.ExecutionMode == ExecutionModeOneTime {
 				if IsTestBundleJob(job.ID) || job.Category == CategoryTesting {
 					// Test bundles must always stay register-only until explicitly triggered
-					// (e.g. by scan-tests or `zqk scheduler trigger`). Submitting them on boot
+					// (e.g. by zqk test run or `zqk scheduler trigger`). Submitting them on boot
 					// or reload floods the worker pool with hundreds of test bundles.
 					scheduleErr = s.registerTriggeredJob(job)
 				} else if reload {

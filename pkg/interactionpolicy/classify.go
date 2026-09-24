@@ -10,7 +10,7 @@ import (
 
 var (
 	reGitWorktreeAdd = regexp.MustCompile(`(?i)git\s+worktree\s+add`)
-	reGoTest         = regexp.MustCompile(`(?i)\b(go\s+test|scan-tests|test-runner\.sh)\b`)
+	reGoTest         = regexp.MustCompile(`(?i)\b(go\s+test|test run|test discover|test bind|test-runner\.sh)\b`)
 	reGitCommit      = regexp.MustCompile(`(?i)\bgit\s+commit\b`)
 	reAgentExecute   = regexp.MustCompile(`(?i)agent\s+execute\b`)
 )

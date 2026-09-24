@@ -78,7 +78,7 @@ func formatConvergenceDesiredEndStateRecommendation(cvs, sug map[string]any, sna
 	}
 
 	if snap != nil && len(snap.FailingFingerprintsNow) > 0 {
-		focus = append(focus, paths.RewriteCanonicalCLIInvocations("**Bundles:** Fix failing fingerprints (targeted `zqk scheduler scan-tests` / package scope) until Latest measurement is green."))
+		focus = append(focus, paths.RewriteCanonicalCLIInvocations("**Tests:** Fix failing test_case objects (`zqk test run`) until Latest measurement is green."))
 	}
 	if snap != nil && len(snap.FailingFingerprintsNow) == 0 && !snap.ReadyForSessionCompletion {
 		if rfsRequired {

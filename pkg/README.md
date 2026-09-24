@@ -162,10 +162,8 @@ This directory contains Go packages for the ZQK project. Each package is a reusa
 | [telemetry](./telemetry/) | `github.com/zqk-os/zqk/pkg/telemetry` | 7+6 | 6 | - | ✅ [README](./telemetry/README.md) | - **Tracker**: Provides standard interfaces for... |
 | [testenvroot](./testenvroot/) | `github.com/zqk-os/zqk/pkg/testenvroot` | 4+3 | 3 | - | ❌ - | - |
 | [testing](./testing/) | `github.com/zqk-os/zqk/pkg/testing` | 12+2 | 2 | - | ✅ [README](./testing/README.md) | When running tests, you can configure the syste... |
-| [testjobgen](./testjobgen/) | `github.com/zqk-os/zqk/pkg/testjobgen` | 1+3 | 3 | - | ❌ - | - |
 | [testkit](./testkit/) | `github.com/zqk-os/zqk/pkg/testkit` | 14+10 | 10 | dummy_policy | ❌ - | - |
 | [testrunner](./testrunner/) | `github.com/zqk-os/zqk/pkg/testrunner` | 2+2 | 2 | - | ❌ - | - |
-| [testscan](./testscan/) | `github.com/zqk-os/zqk/pkg/testscan` | 5+3 | 3 | - | ❌ - | - |
 | [testservices](./testservices/) | `github.com/zqk-os/zqk/pkg/testservices` | 1+1 | 1 | - | ❌ - | - |
 | [translation](./translation/) | `github.com/zqk-os/zqk/pkg/translation` | 10+4 | 4 | - | ✅ [README](./translation/README.md) | - **Translator**: `SourceFormat()` returns form... |
 | [transport](./transport/) | `github.com/zqk-os/zqk/pkg/transport` | 3+3 | 3 | - | ❌ - | - |
@@ -432,11 +430,9 @@ pkg/
 ├── telemetry/          # - **Tracker**: Provides standard interfaces for recording executions, rate limits, caching, and I...
 ├── testenvroot/          # 
 ├── testing/          # When running tests, you can configure the system to use a separate test data directory instead of...
-├── testjobgen/          # 
 ├── testkit/          # 
     └── dummy_policy/
 ├── testrunner/          # 
-├── testscan/          # 
 ├── testservices/          # 
 ├── translation/          # - **Translator**: `SourceFormat()` returns format key; `Translate(raw, opts)` returns `TranslateR...
 ├── transport/          # 

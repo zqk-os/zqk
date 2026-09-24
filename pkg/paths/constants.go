@@ -49,7 +49,7 @@ const (
 
 	// StudioNestedWorktreesDir is a repo-root folder some seats use for linked
 	// worktrees. That violates POL-AGENT-WORKTREE-ISOLATION-001 (default is
-	// $TMPDIR/zqk-worktrees/…). Test discovery must skip it so scan-tests
+	// $TMPDIR/zqk-worktrees/…). Test discovery must skip it so test discover
 	// --package does not double-count the same tests from the nested tree.
 	StudioNestedWorktreesDir = ".worktrees"
 

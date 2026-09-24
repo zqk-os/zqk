@@ -21,15 +21,15 @@ const (
 	agentPromptBacklogSectionTitle        = "## Linked backlog (acceptance criteria)\n\n"
 )
 
-// Command-shaped snippets only (avoid treating prose bullets that merely mention "scan-tests" as runnable commands).
+// Command-shaped snippets only (avoid treating prose bullets that merely mention tests as runnable commands).
 var (
-	reAgentPromptGoTest       = regexp.MustCompile(`(?i)\bgo\s+test(?:\s+[^;\n]+)?`)
-	reAgentPromptZqkScanTests = regexp.MustCompile(`(?i)\bzqk\s+scheduler\s+scan-tests(?:\s+[^;\n]+)?`)
+	reAgentPromptGoTest     = regexp.MustCompile(`(?i)\bgo\s+test(?:\s+[^;\n]+)?`)
+	reAgentPromptZqkTestRun = regexp.MustCompile(`(?i)\bzqk\s+test\s+(?:run|discover|bind)(?:\s+[^;\n]+)?`)
 )
 
 // formatLinkedBacklogAcceptanceSection resolves CVS backlog_item_refs to backlog_item objects and
-// expands CRIT-* entries into criteria summaries. Surfaces scan-tests / go test mentions and ties
-// automated_test criteria to health.jsonl / scan-tests for measurable advancement.
+// expands CRIT-* entries into criteria summaries. Surfaces zqk test run / go test mentions and ties
+// automated_test criteria to kernel test_case execution for measurable advancement.
 func formatLinkedBacklogAcceptanceSection(p *cli.Processor, cvs map[string]any) string {
 	if p == nil || cvs == nil {
 		return ""
@@ -176,7 +176,7 @@ func formatCriteriaAcceptanceBulletResolved(crit map[string]any, globalHints map
 	}
 
 	if method == criteriaValidationMethodAutomatedTest {
-		b.WriteString(paths.RewriteCanonicalCLIInvocations("    - **Programmatic verification:** Run targeted **`zqk scheduler scan-tests --package …`** (or saved bundles) so a passing line lands in **health.jsonl**; green bundle measurement plus satisfied **rollup_status_core** support advancing **current_phase** / completion when **desired_end_state** is also met.\n"))
+		b.WriteString(paths.RewriteCanonicalCLIInvocations("    - **Programmatic verification:** Run targeted **`zqk test run`** (discover/bind first if cases are missing) so kernel test_case evidence advances **current_phase** / completion when **desired_end_state** is also met.\n"))
 	}
 	return b.String()
 }
@@ -258,7 +258,7 @@ func extractVerificationHintLines(s string) []string {
 		seen[m] = struct{}{}
 		out = append(out, m)
 	}
-	reList := []*regexp.Regexp{reAgentPromptGoTest, reAgentPromptZqkScanTests}
+	reList := []*regexp.Regexp{reAgentPromptGoTest, reAgentPromptZqkTestRun}
 	for _, line := range strings.Split(s, "\n") {
 		line = strings.TrimSpace(line)
 		if line == emptyValue {
@@ -289,5 +289,5 @@ func verificationHintAcceptable(m string) bool {
 		return false
 	}
 	lm := strings.ToLower(m)
-	return strings.HasPrefix(lm, "go test") || strings.HasPrefix(lm, paths.RewriteCanonicalCLIInvocations("zqk scheduler scan-tests"))
+	return strings.HasPrefix(lm, "go test") || strings.HasPrefix(lm, paths.RewriteCanonicalCLIInvocations("zqk test run")) || strings.HasPrefix(lm, paths.RewriteCanonicalCLIInvocations("zqk test discover")) || strings.HasPrefix(lm, paths.RewriteCanonicalCLIInvocations("zqk test bind"))
 }

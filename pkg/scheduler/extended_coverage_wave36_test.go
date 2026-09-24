@@ -223,7 +223,6 @@ func TestExtended_CapOrchestrator_DeepCoverage(t *testing.T) {
 	passed, hardErrs, softErrs := handler.verifyCriticalPackagesHealth(ctx, nil)
 	t.Logf("verifyCriticalPackagesHealth: passed=%v hard=%v soft=%v", passed, hardErrs, softErrs)
 
-	handler.requestCriticalPackageScanTests([]string{"pkg/scheduler", "pkg/storage"})
 	_ = handler.autoRecoverPlanTasks(ctx, "PRI-none")
 
 	instIdx := handler.buildOpenAgentInstructionIndex(ctx)

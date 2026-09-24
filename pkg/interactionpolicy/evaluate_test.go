@@ -14,7 +14,7 @@ func TestClassifyShell(t *testing.T) {
 		want string
 	}{
 		{"go test ./pkg/foo -timeout 30s", EventGoTest},
-		{"zqk scheduler scan-tests --package ./pkg/foo", EventGoTest},
+		{"zqk test run TST-EXAMPLE-001", EventGoTest},
 		{"git commit -m msg", EventGitCommit},
 		{"git worktree add .zqk/worktrees/ATK-1 HEAD", EventGitWorktreeAdd},
 		{"git worktree add /tmp/zqk-worktrees/repo/ATK-1 HEAD", ""},

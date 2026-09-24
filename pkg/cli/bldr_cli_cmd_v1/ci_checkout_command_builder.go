@@ -12,7 +12,7 @@ func NewCiCheckoutCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("checkout [flags]")
 	builder.WithShort("Checkout committed SHA into .zqk/local-ci/workdir")
 	help := clipkg.DynamicHelpBuilder("Checkout committed SHA into .zqk/local-ci/workdir")
-	help.WithDescriptionLines("Refresh the Local CI git worktree only (no scan-tests).")
+	help.WithDescriptionLines("Refresh the Local CI git worktree only (no test run).")
 	help.AddExample("Checkout HEAD", "%s ci checkout")
 	help.ExcludeFlag("format")
 	help.ExcludeFlag("output")

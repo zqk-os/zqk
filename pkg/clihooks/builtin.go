@@ -6,9 +6,8 @@ const (
 	ProtocolVersion = "zqk.cli_hooks.v1"
 
 	// Built-in hook IDs (stable contract for git hooks, CI, and tray automation).
-	// HookPostCommitScanTests runs background test bundles for packages changed in the last commit.
-	// Default implementation: tools/git-hooks/post-commit → scripts/run-tests-for-changed-packages.sh
-	// See docs/architecture/PRE_COMMIT_BACKGROUND_RESULTS.md
+	// HookPostCommitScanTests is a stable hook ID (do not rename).
+	// After commit, discover/bind/run kernel test_case objects for changed packages.
 	HookPostCommitScanTests = "post_commit_scan_tests"
 )
 
@@ -16,7 +15,7 @@ func builtinHooks() []*Hook {
 	return []*Hook{
 		{
 			ID:          HookPostCommitScanTests,
-			Description: "After each commit, run scheduler scan-tests for packages with changed .go files (background)",
+			Description: "After each commit, run zqk test discover / zqk test run for packages with changed .go files",
 			Enabled:     true,
 			TrayEntry:   "", // optional: non-empty means prefer `zqk tray run <name>` for this hook
 		},

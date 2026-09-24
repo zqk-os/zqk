@@ -306,7 +306,7 @@ func (s *Scheduler) executeJobAfterHandlerReturns(
 		InvokeJobCallback(ctx, s.logger, s.asyncRouter, job, jobCallbackEventError, map[string]any{"outcome": "error", "error": err.Error()})
 	}).Run()
 
-	// SCH-run-* test bundles are one_time + immediate but must stay enabled so scan-tests re-triggers and
+	// SCH-run-* test bundles are one_time + immediate but must stay enabled so zqk test run re-triggers and
 	// `zqk scheduler trigger SCH-run-*` can re-run regression bundles; disabling after each green run
 	// left jobs stuck disabled with no health.jsonl updates on subsequent triggers.
 	if job.ExecutionMode == jobExecutionModeOneTime && !IsTestBundleJob(job.ID) {
@@ -576,7 +576,7 @@ func (s *Scheduler) executeJob(ctx context.Context, job *ScheduledJob, handler J
 	s.clearLockFailureCount(job.ID)
 
 	// Limit concurrent run_wrapper jobs per package path (e.g. at most 1 pkg/storage at a time)
-	// to avoid timeouts and contention when scan-tests submits many bundles at once.
+	// to avoid timeouts and contention when many test jobs are submitted at once.
 	if job.JobType == jobTypeRunWrapper && s.packageConcurrencyLimiter != nil {
 		packagePath := circuitbreaker.ExtractPackagePathFromRunWrapperCommand(job.Command, job.CommandArgs)
 		if s.packageConcurrencyLimiter.ShouldLimit(packagePath) {

@@ -12,7 +12,6 @@ func registerStudioSchedulerCommands(cmd *cobra.Command) {
 		return
 	}
 	cmd.AddCommand(NewSubmitCmd())
-	cmd.AddCommand(NewScanTestsCmd())
 	cmd.AddCommand(NewPrintIDEPasteApplescriptCmd())
 	cmd.AddCommand(NewSchedulerConvergenceCmd())
 	cmd.AddCommand(NewTestFailuresCmd())

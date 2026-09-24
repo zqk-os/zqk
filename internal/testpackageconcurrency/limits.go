@@ -1,5 +1,5 @@
 // Package testpackageconcurrency holds on-disk package concurrency policy for test bundles
-// (scheduler scan-tests ↔ run_wrapper) without importing pkg/testing.
+// (legacy SCH-run-* run_wrapper jobs) without importing pkg/testing.
 package testpackageconcurrency
 
 import (
@@ -13,7 +13,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
-// LimitsFileName is stored under .zqk/test-bundles/; scan-tests updates it so the
+// LimitsFileName is stored under .zqk/test-bundles/; leftover from retired bundle scans so the
 // scheduler can enforce the same cross-process limits for any package without hardcoded paths.
 const LimitsFileName = "package_concurrency_limits.json"
 

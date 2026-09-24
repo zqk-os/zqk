@@ -393,7 +393,7 @@ const (
 	// KeyBundleID is the test bundle id for structured logs (matches scheduler_job.metadata bundle_id).
 	KeyBundleID = "bundle_id"
 	// KeyPriorBundleCommandFingerprint / KeyNewBundleCommandFingerprint are structured log field names
-	// when scan-tests updates a stable SCH-run-* job to a different go test -run set.
+	// when a leftover SCH-run-* job is updated to a different go test -run set.
 	KeyPriorBundleCommandFingerprint = "prior_bundle_command_fingerprint"
 	KeyNewBundleCommandFingerprint   = "new_bundle_command_fingerprint"
 	// KeyTestOutcome is a coarse result: pass, test_fail, fail, timeout, ok (non-go-test bundle).
@@ -408,7 +408,7 @@ const (
 	KeySeverity                         = objects.FieldKeySeverity
 )
 
-// Test-bundle scheduler_job.metadata map keys (scan-tests JobGenerator, package concurrency sync).
+// Test-bundle scheduler_job.metadata map keys (legacy test-bundle metadata, package concurrency sync).
 const (
 	KeyTestBundleMetaBundleID                 = "bundle_id"
 	KeyTestBundleMetaPackagePath              = "package_path"
@@ -417,10 +417,10 @@ const (
 	KeyTestBundleMetaEstimatedDurationSec     = "estimated_duration_seconds"
 	KeyTestBundleMetaLogFile                  = "log_file"
 	KeyTestBundleMetaMaxConcurrentSamePackage = "max_concurrent_same_package"
-	// KeyTestBundleMetaCriteriaRefs lists CRIT-* ids copied from saved bundle JSON (testscan.TestBundle.CriteriaRefs).
+	// KeyTestBundleMetaCriteriaRefs lists CRIT-* ids copied from saved bundle JSON (legacy test-bundle CriteriaRefs).
 	// Same wire string as objects.FieldKeyCriteriaRefs.
 	KeyTestBundleMetaCriteriaRefs = "criteria_refs"
-	// KeyTestBundleMetaTestCaseRefs lists TEST-* ids copied from saved bundle JSON (testscan.TestBundle.TestCaseRefs).
+	// KeyTestBundleMetaTestCaseRefs lists TEST-* ids copied from saved bundle JSON (legacy test-bundle TestCaseRefs).
 	KeyTestBundleMetaTestCaseRefs = "test_case_refs"
 )
 

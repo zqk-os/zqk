@@ -162,22 +162,6 @@ rules:
     child_max_timeout_exempt: true
     idle_shutdown_duration: 5m
 
-  # Scheduler scan-tests: creates one scheduler_job object per bundle, so cost scales with the
-  # number of packages scanned. Both rules carry the same exemption and idle window because the
-  # cost driver is bundle count, not which flag spelled the request: a --package list of 45
-  # packages is the same bulk-CAS-write work as --all, and only --all used to say so. A 45-package
-  # scan therefore matched the generic rule and was killed at 10m mid-generation, reporting a
-  # timeout that looked like a hang. The idle watchdog, not the total timeout, is what catches a
-  # genuinely stuck scan; the total only bounds how long a large legitimate one may take.
-  - pattern: "scheduler scan-tests --all"
-    timeout: 45m
-    child_max_timeout_exempt: true
-    idle_shutdown_duration: 5m
-  - pattern: "scheduler scan-tests"
-    timeout: 45m
-    child_max_timeout_exempt: true
-    idle_shutdown_duration: 5m
-
   # Marketing swarm generate: Calls external video generation APIs that can take > 5 minutes
   - pattern: "marketing swarm generate"
     timeout: 15m
@@ -214,7 +198,7 @@ rules:
   # Object daemon (PrivilegedWriter): long-lived RPC helper supervised by launchd, so the parent is
   # never zqk and the 10s idle watchdog shuts it down between writes. It exits leaving the unix socket
   # behind, so every later write fails "connection refused" and the CAS membrane goes fail-closed
-  # (object create/update and scheduler scan-tests all break). Runs until stopped.
+  # (object create/update and zqk test run all break). Runs until stopped.
   - pattern: "object daemon"
     timeout: 24h
     idle_shutdown_duration: 24h
@@ -255,9 +239,13 @@ rules:
     idle_shutdown_duration: 30m
     child_max_timeout_exempt: true
 
-  # Test run: running test cases and full verification suites across Go packages.
-  # child_max_timeout_exempt: allow full test run duration when invoked from IDE or parent script.
+  # Test run / discover: kernel test_case orchestration.
+  # child_max_timeout_exempt: allow full duration when invoked from IDE or parent script.
   - pattern: "test run"
+    timeout: 30m
+    idle_shutdown_duration: 5m
+    child_max_timeout_exempt: true
+  - pattern: "test discover"
     timeout: 30m
     idle_shutdown_duration: 5m
     child_max_timeout_exempt: true

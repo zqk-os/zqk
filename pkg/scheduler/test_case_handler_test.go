@@ -15,7 +15,7 @@ import (
 )
 
 // TestSchedulerTestCaseRouting verifies CRIT-TEST-SCHED-FUNC-ROUTING-001:
-// test_case jobs route to generic test runner handler instead of legacy scan-tests bundle.
+// test_case jobs route to generic test runner handler instead of leftover SCH-run-* bundles.
 func TestSchedulerTestCaseRouting(t *testing.T) {
 	t.Parallel()
 

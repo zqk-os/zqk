@@ -324,7 +324,7 @@ func TestFormatAgentMarkdown(t *testing.T) {
 		ReadyForSessionCompletion: false,
 	}, "", nil, map[string]any{
 		"rollup_status":               "blocked",
-		"recommended_next_action":     "Run scan-tests for failing bundles.",
+		"recommended_next_action":     "Run zqk test run for failing test_case objects.",
 		objects.FieldKeyBlockers:      []any{map[string]any{objects.FieldKeyCode: "test_bundles_failing", "detail": "1 fingerprint(s) latest bad"}},
 		"ready_for_parent_completion": false,
 	}, "scheduler_fast", map[string]any{"flow_variant_source": "object", "effective_flow_variant": "scheduler_fast"}, "")
@@ -419,7 +419,7 @@ func TestFormatAgentMarkdown_prefersCVSNextActionWhenSuggestedIsBundleOnly(t *te
 		objects.FieldKeyHypothesis:      "H1",
 		objects.FieldKeyDesiredEndState: "D",
 		objects.FieldKeyStatus:          objects.ObjectStatusActive,
-		objects.FieldKeyNextAction:      "Operator handoff: triage .zqk/logs/drift/ then scan-tests --package ./pkg/foo.",
+		objects.FieldKeyNextAction:      "Operator handoff: triage .zqk/logs/drift/ then zqk test run.",
 		objects.FieldKeyCurrentPhase:    "c6_exit",
 		objects.FieldKeyFlowVariant:     "code_quality_drift_and_standardization",
 	}, map[string]any{
