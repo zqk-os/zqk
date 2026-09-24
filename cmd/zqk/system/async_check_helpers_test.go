@@ -2,11 +2,13 @@ package system
 
 import (
 	"testing"
+	"time"
 
 	"github.com/zqk-os/zqk/internal/cli"
 
 	"github.com/spf13/cobra"
 	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 // TestInitializeAsyncCheckContext_EnqueuesCachePrewarmTrigger verifies that when system check
@@ -15,6 +17,7 @@ import (
 func TestInitializeAsyncCheckContext_EnqueuesCachePrewarmTrigger(t *testing.T) {
 	t.Parallel()
 	projectRoot := t.TempDir()
+	testkit.RegisterTempProjectTeardown(t, projectRoot, nil)
 	cmd := &cobra.Command{}
 	cmd.Flags().Bool("auto-fix", false, "")
 	cmd.Flags().Bool("auto-fix-scheduler", true, "")
@@ -27,8 +30,12 @@ func TestInitializeAsyncCheckContext_EnqueuesCachePrewarmTrigger(t *testing.T) {
 		t.Fatalf("initializeAsyncCheckContext: %v", err)
 	}
 	defer func() {
-		if sched := schedulerpkg.GetGlobalScheduler(); sched != nil && sched.IsRunning() {
-			sched.Stop()
+		for i := 0; i < 50; i++ {
+			if sched := schedulerpkg.GetGlobalScheduler(); sched != nil {
+				sched.Stop()
+				break
+			}
+			time.Sleep(20 * time.Millisecond)
 		}
 	}()
 

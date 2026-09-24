@@ -9,13 +9,9 @@
 
 ### 1. Install or Build
 
-**Via Homebrew (macOS & Linux):**
-```sh
-brew tap zqk-os/zqk
-brew install zqk
-```
+There is **no brew formula and no public GitHub release** yet.
 
-**Or Build from Source:**
+**Build from Source:**
 ```sh
 make          # → ./bin/zqk
 ./bin/zqk --version

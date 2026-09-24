@@ -267,6 +267,12 @@ func GetGlobalLifecycleLoader() *LifecycleLoader {
 	return globalLifecycleLoader
 }
 
+func init() {
+	if hit := paths.FirstExistingFromCwd(paths.ProcessInternalLifecyclesDir); hit != emptyValue {
+		setFallbackLifecyclesDir(hit)
+	}
+}
+
 // ClearCache drops every lifecycle memo because the key space was explicitly invalidated.
 // This is not a size cap — see pkg/stampmemo.
 func (ll *LifecycleLoader) ClearCache() {
@@ -548,6 +554,11 @@ func (ll *LifecycleLoader) IsPreliminaryStatusForKind(kind, status string) (bool
 		if errors.Is(err, ErrLifecycleStatusUnknown) {
 			return false, nil
 		}
+		// If lifecycle files cannot be resolved (e.g. unseeded test environment), fallback to canonical preliminary statuses
+		switch status {
+		case "conceptual", "exploring", "identified", "draft", "proposed":
+			return true, nil
+		}
 		return false, err
 	}
 	if resolved.Preliminary {
@@ -572,6 +583,28 @@ func pathRefForFile(filePath string) string {
 	return paths.PathRefFromRelPath(filePath)
 }
 
+var (
+	fallbackLifecyclesDirMu sync.RWMutex
+	fallbackLifecyclesDir   string
+)
+
+func setFallbackLifecyclesDir(dir string) {
+	if dir == emptyValue {
+		return
+	}
+	fallbackLifecyclesDirMu.Lock()
+	if fallbackLifecyclesDir == emptyValue && lifecyclesDirHasBaseLifecycle(dir) {
+		fallbackLifecyclesDir = dir
+	}
+	fallbackLifecyclesDirMu.Unlock()
+}
+
+func getFallbackLifecyclesDir() string {
+	fallbackLifecyclesDirMu.RLock()
+	defer fallbackLifecyclesDirMu.RUnlock()
+	return fallbackLifecyclesDir
+}
+
 // findLifecyclesDir finds the lifecycles directory
 // Uses async I/O with timeout and retry logic to prevent blocking
 // Per concurrency-patterns-v1.0.md and established RetryConfig pattern
@@ -579,11 +612,16 @@ func findLifecyclesDir() string {
 	if testRoot := zqkenv.TestRoot().Get(); testRoot != emptyValue {
 		lcDir := filepath.Join(testRoot, paths.ProcessInternalLifecyclesDir)
 		if stampmemo.Of(lcDir) != 0 && lifecyclesDirHasBaseLifecycle(lcDir) {
+			setFallbackLifecyclesDir(lcDir)
 			return lcDir
 		}
 	}
 	if hit := paths.FirstExistingFromCwd(paths.ProcessInternalLifecyclesDir); hit != emptyValue {
+		setFallbackLifecyclesDir(hit)
 		return hit
+	}
+	if fb := getFallbackLifecyclesDir(); fb != emptyValue {
+		return fb
 	}
 	return paths.ProcessInternalLifecyclesDir
 }

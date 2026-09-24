@@ -27,4 +27,6 @@ const (
 	GoalFieldTarget = "target"
 	// GoalFieldWorkstreamRefs is the field name for workstream_refs
 	GoalFieldWorkstreamRefs = "workstream_refs"
+	// GoalFieldEpicRefs is the field name for epic_refs
+	GoalFieldEpicRefs = "epic_refs"
 )

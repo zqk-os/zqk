@@ -83,6 +83,7 @@ tree_police:
     - "check-hardcoded-paths-and-perms-repo.sh"
     - "check-cli-name-literals-repo.sh"
     - "build-bootstrap-archive.sh"
+    - "scan-secrets.sh"
   allowed_script_prefixes:
     - "scripts/open-core/"
     - "scripts/starter_kernel_graph/"

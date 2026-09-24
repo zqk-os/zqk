@@ -238,6 +238,34 @@ func (b *RequirementBuilder) addRequirementFields() {
 		WithPermissions("r-x").
 		WithSemanticType("reference").
 		WithProfileCode("REQ-006"))
+	b.AddFieldBuilder(builders.NewFieldBuilder("epic_refs", "list").
+		WithChecklist(builders.NewChecklistBuilder().
+			Authority("architect/owner.").
+			AutomationHooks("links requirements under the governing epic enclave umbrella.").
+			Cardinality("many").
+			Criticality("association").
+			Default([]any{}).
+			Dependencies("epic registry.").
+			Lifecycle("mutable").
+			Observability("yes").
+			Purpose("Epics governing this requirement deliverable.").
+			Security("non-sensitive").
+			SystemUsage([]any{
+				"traceability",
+				"coverage",
+			}).
+			Validation("Must reference existing epic IDs.").
+			Build()).
+		WithAccess(builders.NewAccessBuilder().
+			Requires("access:confidential").
+			Build()).
+		WithValidation(builders.NewValidationBuilder().
+			Required(false).
+			Build()).
+		WithTraits("field_mutable_group", "field_reference_group").
+		WithPermissions("r-x").
+		WithSemanticType("reference").
+		WithProfileCode("REQ-008"))
 }
 
 // Build builds the spec (inherited from BaseSpecBuilder)

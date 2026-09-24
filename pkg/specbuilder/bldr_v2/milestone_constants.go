@@ -27,4 +27,6 @@ const (
 	FieldStageType = "stage_type"
 	// MilestoneFieldWorkstreamRefs is the field name for workstream_refs
 	MilestoneFieldWorkstreamRefs = "workstream_refs"
+	// MilestoneFieldEpicRefs is the field name for epic_refs
+	MilestoneFieldEpicRefs = "epic_refs"
 )

@@ -41,4 +41,6 @@ const (
 	PriorityPlanFieldBranchName = "branch_name"
 	// PriorityPlanFieldBranchRef is the field name for branch_ref
 	PriorityPlanFieldBranchRef = "branch_ref" // Deprecated: use PriorityPlanFieldBranchName
+	// PriorityPlanFieldEpicRefs is the field name for epic_refs
+	PriorityPlanFieldEpicRefs = "epic_refs"
 )

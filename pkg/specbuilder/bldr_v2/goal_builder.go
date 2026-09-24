@@ -292,6 +292,35 @@ func (b *GoalBuilder) addGoalFields() {
 		WithPermissions("r-x").
 		WithSemanticType("reference").
 		WithProfileCode("GOL-005"))
+	b.AddFieldBuilder(builders.NewFieldBuilder("epic_refs", "list").
+		WithChecklist(builders.NewChecklistBuilder().
+			Authority("owner/planner.").
+			AutomationHooks("maps strategic goal into concrete enclave epics.").
+			Cardinality("many").
+			Criticality("composition").
+			Default([]any{}).
+			Dependencies("epic registry.").
+			Lifecycle("mutable").
+			Observability("yes").
+			Purpose("Epics directly executing towards achieving this strategic goal.").
+			Security("non-sensitive").
+			SystemUsage([]any{
+				"planning",
+				"traceability",
+				"alignment",
+			}).
+			Validation("must reference existing epic IDs.").
+			Build()).
+		WithAccess(builders.NewAccessBuilder().
+			Requires("access:confidential").
+			Build()).
+		WithValidation(builders.NewValidationBuilder().
+			Required(false).
+			Build()).
+		WithTraits("field_mutable_group", "field_reference_group").
+		WithPermissions("r-x").
+		WithSemanticType("reference").
+		WithProfileCode("GOL-011"))
 }
 
 // Build builds the spec (inherited from BaseSpecBuilder)
