@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cef.local/schemas/diagram.schema.json",
+  "title": "CEF Diagram Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "cef_version",
+    "diagram_id",
+    "kind",
+    "title",
+    "path",
+    "anchors"
+  ],
+  "properties": {
+    "cef_version": { "type": "string", "const": "0.1.0" },
+    "diagram_id": {
+      "type": "string",
+      "pattern": "^D-[A-Z0-9][A-Z0-9_-]*$"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "c4_context",
+        "c4_container",
+        "c4_component",
+        "sequence",
+        "flowchart",
+        "state",
+        "dependency_graph",
+        "deployment",
+        "data_flow",
+        "other"
+      ]
+    },
+    "title": { "type": "string", "minLength": 8 },
+    "path": {
+      "type": "string",
+      "description": "Path relative to the run package diagrams/ directory"
+    },
+    "anchors": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["label", "ref"],
+        "properties": {
+          "label": { "type": "string" },
+          "ref": {
+            "type": "string",
+            "description": "Repo path, symbol, package, or external system name"
+          },
+          "line_start": { "type": "integer", "minimum": 1 },
+          "line_end": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
+    "finding_ids": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "notes": { "type": "string" }
+  }
+}

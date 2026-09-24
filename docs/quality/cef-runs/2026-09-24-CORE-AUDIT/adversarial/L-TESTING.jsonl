@@ -1,0 +1,2 @@
+{"finding_id":"F-TST-001","resolution":"stand","notes":"TPM DoD passes 100% with 0 unbound criteria across all test chains.","counter_citations":[]}
+{"finding_id":"F-TST-002","resolution":"stand","notes":"Polyglot test discovery operates natively without compiler dependencies.","counter_citations":[]}

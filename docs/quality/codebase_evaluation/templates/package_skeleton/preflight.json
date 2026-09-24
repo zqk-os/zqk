@@ -1,0 +1,11 @@
+{
+  "cef_version": "0.1.0",
+  "status": "REPLACE_ME",
+  "freeze_sha": "REPLACE_ME",
+  "languages_detected": [],
+  "adapters_enabled": ["go"],
+  "include_globs_count": 0,
+  "exclude_globs_count": 0,
+  "available_tools": {},
+  "notes": "TODO_OVERWRITE — Wave 0 L-PREFLIGHT only"
+}

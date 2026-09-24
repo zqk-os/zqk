@@ -1,0 +1,2 @@
+{"finding_id":"F-SEC-001","resolution":"stand","notes":"IPC server strictly validates projectRoot path matching.","counter_citations":[]}
+{"finding_id":"F-SEC-002","resolution":"stand","notes":"Zero prohibited patterns or sensitive paths detected across all 8381 files.","counter_citations":[]}

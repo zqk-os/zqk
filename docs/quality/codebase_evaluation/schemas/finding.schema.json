@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cef.local/schemas/finding.schema.json",
+  "title": "CEF Finding",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "cef_version",
+    "finding_id",
+    "lens_id",
+    "title",
+    "severity",
+    "summary",
+    "recommendation",
+    "evidence_grade",
+    "evidence",
+    "citations",
+    "diamond_axes",
+    "density_class"
+  ],
+  "properties": {
+    "cef_version": { "type": "string", "const": "0.1.0" },
+    "finding_id": { "type": "string", "pattern": "^F-[A-Z0-9][A-Z0-9_-]*$" },
+    "lens_id": { "type": "string" },
+    "title": { "type": "string", "minLength": 8, "maxLength": 160 },
+    "severity": {
+      "type": "string",
+      "enum": ["critical", "high", "moderate", "low", "info"]
+    },
+    "summary": { "type": "string", "minLength": 40 },
+    "recommendation": { "type": "string", "minLength": 40 },
+    "non_goals": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "evidence_grade": { "type": "string", "enum": ["E0", "E1", "E2", "E3"] },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["kind", "detail"],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "path_line",
+              "command_output",
+              "metric",
+              "ast_match",
+              "test_result",
+              "external_citation"
+            ]
+          },
+          "detail": { "type": "string" },
+          "path": { "type": "string" },
+          "line_start": { "type": "integer", "minimum": 1 },
+          "line_end": { "type": "integer", "minimum": 1 },
+          "symbol": { "type": "string" },
+          "command": { "type": "string" }
+        }
+      }
+    },
+    "citations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["class", "work", "point"],
+        "properties": {
+          "class": {
+            "type": "string",
+            "enum": [
+              "industry_standard",
+              "language_idiom",
+              "empirical",
+              "project_law"
+            ]
+          },
+          "work": { "type": "string" },
+          "point": { "type": "string" },
+          "locator": { "type": "string" }
+        }
+      }
+    },
+    "diamond_axes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "enum": ["RDB", "MNT", "TST", "REL", "OBS", "RCV", "SEC", "ROB", "CMP", "OPS", "MOD"]
+      }
+    },
+    "density_class": { "type": "string", "enum": ["D-HIGH", "D-MED", "D-LOW"] },
+    "diagram_refs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "local_refs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Host-specific IDs (optional)",
+      "default": []
+    },
+    "suggested_work_types": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "requirement",
+          "criterion",
+          "test_case",
+          "milestone",
+          "work_item",
+          "tech_debt",
+          "mission",
+          "goal",
+          "workstream",
+          "priority_plan",
+          "agent_task",
+          "agent_instruction",
+          "tooling_gap"
+        ]
+      },
+      "default": []
+    },
+    "adversarial": {
+      "type": "object",
+      "properties": {
+        "resolution": {
+          "type": "string",
+          "enum": ["stand", "downgrade", "retract", "reframe"]
+        },
+        "notes": { "type": "string" },
+        "revised_severity": {
+          "type": "string",
+          "enum": ["critical", "high", "moderate", "low", "info"]
+        }
+      }
+    }
+  }
+}

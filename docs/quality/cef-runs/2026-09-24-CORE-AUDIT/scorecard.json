@@ -1,0 +1,58 @@
+{
+  "cef_version": "0.1.0",
+  "assessed_at": "2026-09-24T06:19:00Z",
+  "repo_fingerprint": "6ddde14c7760773d722d56a25ba65bfdc7cfbb54",
+  "integrator": "CEF_WAVE4_INTEGRATOR",
+  "notes": "Authentic full-framework audit of ZQK Core under Codebase Evaluation Framework v0.1.0. All 4 waves executed with adversarial paired review; 0 E0 findings.",
+  "axes": {
+    "RDB": {
+      "grade": 4,
+      "confidence": 0.95,
+      "drivers": ["F-ARCH-002"],
+      "notes": "Go codebase adheres to idiomatic styling and standard directory structure; command builders strictly standardize CLI signatures."
+    },
+    "MNT": {
+      "grade": 4,
+      "confidence": 0.92,
+      "drivers": ["F-ARCH-001"],
+      "notes": "Complete severance of Core from Studio filestorage; direct local FileObjectStorage default enforced; 0 findings in zqk-vet hygiene."
+    },
+    "TST": {
+      "grade": 4,
+      "confidence": 0.95,
+      "drivers": ["F-TST-001", "F-TST-002"],
+      "notes": "100% TPM DoD satisfied across 16 test case chains with 0 unbound criteria; polyglot test discovery verified."
+    },
+    "REL": {
+      "grade": 4,
+      "confidence": 0.96,
+      "drivers": ["F-REL-001"],
+      "notes": "Storage crash consistency verified; dual-plane write-behind verified clean; 0 stale locks and 0 temp leaks in system check."
+    },
+    "OBS": {
+      "grade": 4,
+      "confidence": 0.94,
+      "drivers": ["F-ARCH-002"],
+      "notes": "Comprehensive observability via real-time ANSI seismograph (zqk state stream --dashboard), TUI Mission Control, and structured system check."
+    },
+    "RCV": {
+      "grade": 4,
+      "confidence": 0.90,
+      "drivers": ["F-REL-001"],
+      "notes": "Automated CAS membrane repair, state cache fingerprinting, and canonical compact-wal command verified."
+    },
+    "SEC": {
+      "grade": 4,
+      "confidence": 0.98,
+      "drivers": ["F-SEC-001", "F-SEC-002"],
+      "notes": "Export gate clean across 8381 files; privileged writer IPC scoped to projectRoot; 0 hardcoded keys."
+    },
+    "ROB": {
+      "grade": 4,
+      "confidence": 0.94,
+      "drivers": ["F-SEC-001"],
+      "notes": "POL-AGENT-WORK-CLAIM-001 fail-closed enforcement active; pre-commit test matrix gate intact."
+    }
+  },
+  "envelope_min": 4
+}
