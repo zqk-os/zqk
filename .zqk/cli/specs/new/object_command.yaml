@@ -1,0 +1,57 @@
+$schema: ../schemas/command_spec.schema.json
+name: object
+short: Mint an object onto the draft plane (kind + title)
+description: |-
+    Persists kind+title onto .zqk/object_drafts/ as {id}.yaml (no CAS until a
+    successful promote). Populates the full template of possible fields for the
+    kind with editable placeholders, omitting membrane timestamps.
+
+    Default: stay on the draft plane (title-only is rarely promote-ready). Pass
+    --promote to enqueue background promote.
+
+    Requirement, goal, and milestone mints auto-run workflow gen-trace-pipeline
+    unless --skip-trace-pipeline.
+
+    For printable YAML scaffolds (edit offline), use: zqk object template <kind>
+
+      Mint a backlog item onto the draft plane
+      zqk new object backlog_item --title "Explore draft plane"
+      Mint a requirement and scaffold CRIT/TST/BLI
+      zqk new object requirement --title "Description required at CAS"
+      Mint and enqueue background promote
+      zqk new object agent_task --title "Ready spike" --promote
+args:
+    type: exact
+    count: 1
+flags:
+    - name: title
+      shorthand: t
+      type: string
+      description: 'Required: object title (persists onto draft plane)'
+    - name: description
+      shorthand: d
+      type: string
+      description: 'Optional: object description'
+    - name: file
+      type: string
+      description: 'Optional: file to read title/description from'
+    - name: content
+      shorthand: c
+      type: string
+      description: 'Optional: inline content/body for description'
+    - name: promote
+      type: bool
+      default: false
+      description: Enqueue background object promote after mint (opt-in; often sticks on title-only)
+    - name: skip-trace-pipeline
+      type: bool
+      default: false
+      description: Do not auto-run workflow gen-trace-pipeline after minting requirement, goal, or milestone
+help:
+    examples:
+        - comment: Mint a backlog item onto the draft plane
+          command: '%s new object backlog_item --title "Explore draft plane"'
+        - comment: Mint a requirement with inline description
+          command: '%s new object requirement --title "Ingestion pipeline" -d "Detailed spec"'
+run_e: runNewObject
+common_flags: true

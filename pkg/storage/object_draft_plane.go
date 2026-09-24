@@ -334,9 +334,27 @@ var draftPlaneNextStatusFields = map[string]map[string]any{
 	},
 }
 
+// isDraftPlaneMembraneField identifies fields that belong strictly to CAS origination/provenance
+// and must NOT be written to preliminary drafts on the draft plane.
+func isDraftPlaneMembraneField(fieldName string) bool {
+	switch fieldName {
+	case objects.FieldKeyCreatedAt,
+		objects.FieldKeyCreatedBy,
+		objects.FieldKeyUpdatedAt,
+		objects.FieldKeyUpdatedBy,
+		"hash",
+		"cas_address":
+		return true
+	default:
+		return false
+	}
+}
+
 func draftFieldPlaceholder(field objects.FieldInfo) any {
 	switch field.Type {
-	case "string", "text":
+	case "datetime", "date":
+		return nil // Dates/datetimes cannot be empty strings in schema validation; omit until provided
+	case "string", "text", "reference":
 		return ""
 	case "integer", "number":
 		return 0
@@ -367,7 +385,7 @@ func (f *FileObjectStorage) mergeDraftPlaneTemplate(kind, id string, data []byte
 
 	merged := make(map[string]any)
 
-	// 1. Seed with spec required fields if available from field registry
+	// 1. Seed full template of possibles from specialized fields for this kind
 	var kf *objects.KindFields
 	if fr := objects.GetGlobalFieldRegistry(); fr != nil {
 		if loaded, ok := fr.GetFieldsForKindIfLoaded(kind); ok && loaded != nil {
@@ -377,9 +395,17 @@ func (f *FileObjectStorage) mergeDraftPlaneTemplate(kind, id string, data []byte
 		}
 	}
 	if kf != nil {
-		for _, field := range kf.AllFields {
-			if field.Required {
-				merged[field.Name] = draftFieldPlaceholder(field)
+		merged[objects.FieldKeyTitle] = ""
+		merged[objects.FieldKeyDescription] = ""
+		merged[ConstVersionContext] = "default"
+
+		for _, field := range kf.SpecializedFields {
+			if isDraftPlaneMembraneField(field.Name) || field.Name == objects.FieldKeyKind || field.Name == objects.FieldKeyID || field.Name == objects.FieldKeySchemaVersion {
+				continue
+			}
+			placeholder := draftFieldPlaceholder(field)
+			if placeholder != nil {
+				merged[field.Name] = placeholder
 			}
 		}
 	}
@@ -391,8 +417,18 @@ func (f *FileObjectStorage) mergeDraftPlaneTemplate(kind, id string, data []byte
 		}
 	}
 
-	// 3. Layer incoming user-supplied fields on top (user values strictly win)
+	// 3. Seed canonical lifecycle origin status if not already populated
+	if originStatus, err := f.GetLifecycleLoader().GetOriginStatus(kind); err == nil && originStatus != "" {
+		merged[objects.FieldKeyStatus] = originStatus
+	} else if _, hasStatus := merged[objects.FieldKeyStatus]; !hasStatus {
+		merged[objects.FieldKeyStatus] = objects.ObjectStatusConceptual
+	}
+
+	// 4. Layer incoming user-supplied fields on top (user values strictly win)
 	for k, v := range incoming {
+		if isDraftPlaneMembraneField(k) {
+			continue // Do not allow premature CAS timestamps on the draft plane
+		}
 		merged[k] = v
 	}
 
@@ -406,6 +442,14 @@ func (f *FileObjectStorage) mergeDraftPlaneTemplate(kind, id string, data []byte
 	if _, ok := merged[objects.FieldKeySchemaVersion]; !ok {
 		merged[objects.FieldKeySchemaVersion] = objects.DefaultSchemaVersion
 	}
+
+	// Strip any membrane provenance fields that might have leaked into merged
+	delete(merged, objects.FieldKeyCreatedAt)
+	delete(merged, objects.FieldKeyCreatedBy)
+	delete(merged, objects.FieldKeyUpdatedAt)
+	delete(merged, objects.FieldKeyUpdatedBy)
+	delete(merged, "hash")
+	delete(merged, "cas_address")
 
 	marshaled, err := f.yamlMarshalForPersistence(merged)
 	if err != nil {

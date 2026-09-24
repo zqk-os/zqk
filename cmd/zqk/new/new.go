@@ -99,6 +99,7 @@ func runNewObject(cmd *cobra.Command, args []string) (err error) {
 	title = strings.TrimSpace(title)
 	file, _ := cmd.Flags().GetString("file")
 	content, _ := cmd.Flags().GetString("content")
+	desc, _ := cmd.Flags().GetString("description")
 
 	var body string
 	if file != emptyValue || content != emptyValue {
@@ -107,6 +108,9 @@ func runNewObject(cmd *cobra.Command, args []string) (err error) {
 		if err != nil {
 			return err
 		}
+	}
+	if body == emptyValue && desc != emptyValue {
+		body = strings.TrimSpace(desc)
 	}
 
 	if kind == objects.KindCommandSpec {

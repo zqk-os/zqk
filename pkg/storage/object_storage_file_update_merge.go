@@ -113,8 +113,14 @@ func (f *FileObjectStorage) mergeFileObjectUpdate(p *fileObjectUpdatePrep) error
 	// Ensure kind field is set correctly (preserve the kind, not ontology)
 	existing[objects.FieldKeyKind] = kind
 
-	// Ensure metadata
-	f.ensureObjectMetadata(ctx, existing, secCtx, false)
+	// Ensure metadata: if object is materializing from draft plane into CAS or lacks created_at, stamp origination metadata
+	newStateCandidate, _ := existing[objects.FieldKeyStatus].(string)
+	isLeavingDraftPlane := f.objectDraftPlaneExists(kind, id) && !shouldUseObjectDraftPlane(kind, newStateCandidate)
+	if isLeavingDraftPlane || existing[objects.FieldKeyCreatedAt] == nil || existing[objects.FieldKeyCreatedAt] == "" {
+		f.ensureObjectMetadata(ctx, existing, secCtx, true)
+	} else {
+		f.ensureObjectMetadata(ctx, existing, secCtx, false)
+	}
 
 	// Priority & priority_tier pair synchronization on update:
 	// If only one was explicitly updated, update the other to match.
