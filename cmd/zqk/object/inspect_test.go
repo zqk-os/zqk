@@ -862,5 +862,101 @@ func TestInspectTUIModel_PolicyStudio_Interactive(t *testing.T) {
 	assert.False(t, model.PolicyStudioOpen)
 }
 
+func TestInspectTUIModel_StatusTransitionInDrillDownModal(t *testing.T) {
+	mockStorage := &mockInspectStorage{
+		objects: map[string]map[string]any{
+			"BLI-MODAL-001": {
+				objects.FieldKeyID:       "BLI-MODAL-001",
+				objects.FieldKeyKind:     objects.KindBacklogItem,
+				objects.FieldKeyTitle:    "Modal Transition Item",
+				objects.FieldKeyStatus:   "originated",
+				objects.FieldKeyPriority: "P1",
+			},
+		},
+	}
+
+	ctx := context.Background()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	storageCtx := pkgctx.NewStorageContext()
+
+	model := NewInspectTUIModel(ctx, objects.KindBacklogItem, nil, nil, "updated_at", false, mockStorage, secCtx, storageCtx)
+	require.NotNil(t, model)
+	model.Width = 120
+	model.Height = 30
+
+	// 1. Enter drill-down modal
+	model.HandleInput([]byte{13})
+	assert.True(t, model.DetailModalOpen)
+
+	modalRender := model.Render()
+	assert.Contains(t, modalRender, "DEEP OBJECT INSPECTION: BLI-MODAL-001")
+	assert.Contains(t, modalRender, "[t] Status Transition")
+
+	// 2. Press 't' in drill-down modal
+	model.HandleInput([]byte{'t'})
+	assert.True(t, model.DetailModalOpen, "modal must remain open after transition")
+	assert.Contains(t, model.StatusMessage, "Status transitioned")
+	assert.Equal(t, "in_progress", mockStorage.objects["BLI-MODAL-001"][objects.FieldKeyStatus])
+
+	// 3. Dismiss modal with Esc
+	model.HandleInput([]byte{27})
+	assert.False(t, model.DetailModalOpen)
+}
+
+func TestInspectTUIModel_TestCaseInspection(t *testing.T) {
+	mockStorage := &mockInspectStorage{
+		objects: map[string]map[string]any{
+			"TST-INSPECT-001": {
+				objects.FieldKeyID:       "TST-INSPECT-001",
+				objects.FieldKeyKind:     objects.KindTestCase,
+				objects.FieldKeyTitle:    "End-to-End Test Suite",
+				objects.FieldKeyStatus:   "complete",
+				objects.FieldKeyPriority: "P0",
+				"category":               "test",
+				"scope":                  "integration",
+				"path_or_id":             "cmd/zqk/object/inspect_test.go",
+				"criteria_refs":          []string{"CRIT-1", "CRIT-2"},
+				"backlog_item_refs":      []string{"BLI-1"},
+			},
+			"CRIT-1": {
+				objects.FieldKeyID:     "CRIT-1",
+				objects.FieldKeyStatus: "satisfied",
+			},
+			"CRIT-2": {
+				objects.FieldKeyID:     "CRIT-2",
+				objects.FieldKeyStatus: "satisfied",
+			},
+		},
+	}
+
+	ctx := context.Background()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	storageCtx := pkgctx.NewStorageContext()
+
+	model := NewInspectTUIModel(ctx, objects.KindTestCase, nil, nil, "updated_at", false, mockStorage, secCtx, storageCtx)
+	require.NotNil(t, model)
+	model.Width = 140
+	model.Height = 30
+
+	// 1. Verify table view renders test case
+	rendered := model.Render()
+	assert.Contains(t, rendered, "TST-INSPECT-001")
+	assert.Contains(t, rendered, "End-to-End Test Suite")
+
+	// 2. Open drill-down modal
+	model.HandleInput([]byte{13})
+	assert.True(t, model.DetailModalOpen)
+
+	modalRender := model.Render()
+	assert.Contains(t, modalRender, "DEEP OBJECT INSPECTION: TST-INSPECT-001")
+	assert.Contains(t, modalRender, "test_case")
+	assert.Contains(t, modalRender, "criteria_refs")
+
+	// 3. Dismiss modal
+	model.HandleInput([]byte{'q'})
+	assert.False(t, model.DetailModalOpen)
+}
+
+
 
 
