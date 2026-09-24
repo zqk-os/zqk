@@ -673,7 +673,7 @@ func (m *InspectTUIModel) renderDetailModal(width, height int) string {
 		lines = append(lines, "")
 	}
 
-	lines = append(lines, "Navigation: [Esc]/[q] Close Drill-Down │ [a] Action Palette │ [e] Edit Object │ [p] Policy Studio")
+	lines = append(lines, "Navigation: [Esc]/[q] Close Drill-Down │ [a] Action Palette │ [t] Status Transition │ [e] Edit Object │ [p] Policy Studio")
 	modalTitle := fmt.Sprintf("DEEP OBJECT INSPECTION: %s", p.ID)
 	return tds.Panel(modalTitle, lines, width, tds.BorderHeavy)
 }
@@ -1446,6 +1446,9 @@ func (m *InspectTUIModel) HandleInput(key []byte) bool {
 			case 'a', 'A':
 				m.ActionPaletteOpen = true
 				m.ActionIndex = 0
+				return false
+			case 't', 'T':
+				m.executeStatusTransition()
 				return false
 			case 'e', 'E':
 				m.executeEditObject()

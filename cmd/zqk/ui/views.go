@@ -9,6 +9,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/zqk-os/zqk/cmd/zqk/state"
 	"github.com/zqk-os/zqk/cmd/zqk/ui/tds"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 var (
@@ -1153,6 +1154,8 @@ func renderFooter(b *strings.Builder, m *UIModel) {
 	triggerActionHint := "[Keys] Action"
 	if m.ActiveTab == TabScheduler {
 		triggerActionHint = "[t/d] Trigger Job"
+	} else if m.ActiveTab == TabQA {
+		triggerActionHint = "[t] Re-scan Matrix"
 	}
 
 	// 2. Pro Mode: compact single-line help bar
@@ -1370,7 +1373,7 @@ func renderQATab(b *strings.Builder, m *UIModel) {
 		return
 	}
 
-	b.WriteString(tds.SectionDivider("TEST SUITES & DOWNWARD TRACEABILITY (Press Enter to inspect)", w))
+	b.WriteString(tds.SectionDivider("TEST SUITES & DOWNWARD TRACEABILITY (Press Enter to inspect, [t] to re-scan)", w))
 	tcTable := tds.NewTable(w).
 		AddColumn("TEST CASE ID", tds.AlignLeft, 14, 0.18).
 		AddColumn("STATUS", tds.AlignCenter, 10, 0.12).
@@ -1522,7 +1525,13 @@ func renderDetailModal(m *UIModel) string {
 	}
 
 	lines = append(lines, dim("  "+strings.Repeat("─", w-8)))
-	lines = append(lines, dim("  Press [Esc] or [Backspace] or [q] to close modal and return to table view"))
+	if modal.Kind == objects.KindTestCase {
+		lines = append(lines, dim("  [t] Re-scan QA Matrix │ [Esc]/[q] Close Modal"))
+	} else if modal.Kind == objects.KindSchedulerJob {
+		lines = append(lines, dim("  [t] Run Immediately │ [d] Run in 10s │ [Esc]/[q] Close Modal"))
+	} else {
+		lines = append(lines, dim("  Press [Esc] or [Backspace] or [q] to close modal and return to table view"))
+	}
 	lines = append(lines, "")
 
 	// Pad or truncate to fit height

@@ -205,6 +205,12 @@ func handleInput(m *UIModel, key []byte) bool {
 				return false
 			}
 		}
+		if m.DetailModal.Kind == objects.KindTestCase {
+			if len(key) == 1 && (key[0] == 't' || key[0] == 'T') {
+				m.TriggerQARescan()
+				return false
+			}
+		}
 		if (len(key) == 1 && (key[0] == KeyEsc || key[0] == KeyBackspace || key[0] == 'q' || key[0] == 'Q')) ||
 			(len(key) >= 3 && key[0] == CSIPrefixEsc && key[1] == CSIPrefixBracket) {
 			m.DetailModal = nil
@@ -392,10 +398,14 @@ func handleInput(m *UIModel, key []byte) bool {
 				m.RefreshMetrics(ctx, m.Storage, m.SecCtx)
 				m.RefreshScheduler(ctx, m.Storage, m.SecCtx)
 			}
-		case 't', 'T': // Trigger scheduled job immediately (Tab 6)
-			jobs := m.GetVisibleSchedulerJobs()
-			if m.ActiveTab == TabScheduler && m.SelectedIndex < len(jobs) {
-				m.TriggerScheduledJob(jobs[m.SelectedIndex].ID, 0)
+		case 't', 'T': // Trigger scheduled job immediately (Tab 6) or QA rescan (Tab 7)
+			if m.ActiveTab == TabScheduler {
+				jobs := m.GetVisibleSchedulerJobs()
+				if m.SelectedIndex < len(jobs) {
+					m.TriggerScheduledJob(jobs[m.SelectedIndex].ID, 0)
+				}
+			} else if m.ActiveTab == TabQA {
+				m.TriggerQARescan()
 			}
 		case 'c', 'C', 'a', 'A', 'w', 'W', 'd', 'D', 'p', 'P', 'm', 'M', 's', 'S', 'b', 'B': // Action Center (Tab 8) / Delayed Trigger (Tab 6)
 			if m.ActiveTab == TabHealth {

@@ -1048,6 +1048,68 @@ func TestUI_EditorProfiles_NewbProJedi(t *testing.T) {
 	assert.Contains(t, renderedJediSearch, "error")
 }
 
+func TestUI_TabQA_HotkeysAndModalInteraction(t *testing.T) {
+	tempDir, err := os.MkdirTemp("", "zqk-ui-qa-test-*")
+	require.NoError(t, err)
+	defer os.RemoveAll(tempDir)
+
+	m := NewUIModel(tempDir, "qa")
+	assert.Equal(t, TabQA, m.ActiveTab)
+
+	// Seed test dashboard state with a test case
+	dState := test.NewDashboardStateWithProjectRoot(tempDir)
+	tc := &test.TestCaseModel{
+		ID:                "TST-SAMPLE-001",
+		Title:             "Sample Test Suite",
+		Status:            "passed",
+		Scope:             "integration",
+		Category:          "test",
+		CompletedCriteria: 2,
+		TotalCriteria:     2,
+		Lineage:           &test.LineageChain{IsIntact: true},
+	}
+	dState.TestCases["TST-SAMPLE-001"] = tc
+	dState.TestCaseOrder = []string{"TST-SAMPLE-001"}
+	err = dState.SaveToLiteFile(tempDir)
+	require.NoError(t, err)
+
+	m.RefreshQA(nil, nil, nil)
+	assert.Equal(t, 1, len(m.TestCases))
+	assert.Equal(t, "TST-SAMPLE-001", m.TestCases[0].ID)
+
+	// Test 1: Verify footer action hint for TabQA
+	m.Width = 120
+	m.Height = 30
+	rendered := Render(m)
+	assert.Contains(t, rendered, "[t] Re-scan Matrix")
+	assert.Contains(t, rendered, "TEST SUITES & DOWNWARD TRACEABILITY (Press Enter to inspect, [t] to re-scan)")
+
+	// Test 2: Trigger QA re-scan with 't' key on TabQA
+	handleInput(m, []byte{'t'})
+	assert.Contains(t, m.DynamicMessage, "QA test matrix rescanned")
+
+	// Test 3: Open drill-down modal with Enter
+	handleInput(m, []byte{KeyEnter})
+	require.NotNil(t, m.DetailModal)
+	assert.Equal(t, objects.KindTestCase, m.DetailModal.Kind)
+	assert.Equal(t, "TST-SAMPLE-001", m.DetailModal.ID)
+
+	modalRendered := Render(m)
+	assert.Contains(t, modalRendered, "DETAILED RECORD INSPECTION")
+	assert.Contains(t, modalRendered, "[t] Re-scan QA Matrix")
+
+	// Test 4: In-modal 't' hotkey re-scans matrix without closing modal
+	m.DynamicMessage = ""
+	handleInput(m, []byte{'t'})
+	assert.Contains(t, m.DynamicMessage, "QA test matrix rescanned")
+	assert.NotNil(t, m.DetailModal)
+
+	// Test 5: Dismiss modal with Esc
+	handleInput(m, []byte{KeyEsc})
+	assert.Nil(t, m.DetailModal)
+}
+
+
 
 
 
