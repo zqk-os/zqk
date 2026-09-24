@@ -4,7 +4,12 @@
   "title": "ZQK Portable Swarm Package Specification Schema",
   "description": "Schema for portable, decentralized agent swarm package manifests (swarm.yaml).",
   "type": "object",
-  "required": ["name", "version", "description", "agents"],
+  "required": ["name", "version", "description"],
+  "anyOf": [
+    { "required": ["agents"] },
+    { "required": ["team_configuration_ref"] },
+    { "required": ["team_configuration"] }
+  ],
   "properties": {
     "$schema": {
       "type": "string",
@@ -34,6 +39,55 @@
     "entrypoint": {
       "type": "string",
       "description": "Initial task, workflow, or priority plan to execute upon launch"
+    },
+    "parameters": {
+      "type": "object",
+      "description": "Configurable parameters for the swarm package execution",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": { "type": "string" },
+          "default": {},
+          "description": { "type": "string" },
+          "required": { "type": "boolean" }
+        }
+      }
+    },
+    "integrity": {
+      "type": "object",
+      "description": "Cryptographic attestation and content hashes",
+      "properties": {
+        "algorithm": { "type": "string" },
+        "signer_id": { "type": "string" },
+        "content_digest": { "type": "string" },
+        "signature": { "type": "string" }
+      }
+    },
+    "team_configuration_ref": {
+      "type": "string",
+      "description": "Reference to an existing kernel team_configuration archetype (e.g. TCFG-CEF-DIAMOND-EVALUATION)"
+    },
+    "team_configuration": {
+      "type": "object",
+      "description": "Inline cellular team archetype definition",
+      "properties": {
+        "id": { "type": "string" },
+        "cell_type": { "type": "string", "enum": ["neuron", "muscle", "heart", "lungs"] },
+        "focus_area": { "type": "string" },
+        "persona_allocations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["persona_ref"],
+            "properties": {
+              "persona_ref": { "type": "string" },
+              "role": { "type": "string" },
+              "count": { "type": "integer", "minimum": 1 }
+            }
+          }
+        }
+      }
     },
     "membranes": {
       "type": "array",

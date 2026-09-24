@@ -11,18 +11,35 @@ import (
 
 // SwarmPackage represents a portable, decentralized swarm manifest.
 type SwarmPackage struct {
-	Schema      string                  `yaml:"$schema,omitempty" json:"$schema,omitempty"`
-	Name        string                  `yaml:"name" json:"name"`
-	Version     string                  `yaml:"version" json:"version"`
-	Description string                  `yaml:"description" json:"description"`
-	Author      string                  `yaml:"author,omitempty" json:"author,omitempty"`
-	License     string                  `yaml:"license,omitempty" json:"license,omitempty"`
-	Entrypoint  string                  `yaml:"entrypoint,omitempty" json:"entrypoint,omitempty"`
-	Parameters  map[string]ParameterDef `yaml:"parameters,omitempty" json:"parameters,omitempty"`
-	Integrity   *Integrity              `yaml:"integrity,omitempty" json:"integrity,omitempty"`
-	Membranes   []MembraneRule          `yaml:"membranes,omitempty" json:"membranes,omitempty"`
-	Agents      []AgentConfig           `yaml:"agents" json:"agents"`
-	Tasks       []TaskConfig            `yaml:"tasks,omitempty" json:"tasks,omitempty"`
+	Schema               string                  `yaml:"$schema,omitempty" json:"$schema,omitempty"`
+	Name                 string                  `yaml:"name" json:"name"`
+	Version              string                  `yaml:"version" json:"version"`
+	Description          string                  `yaml:"description" json:"description"`
+	Author               string                  `yaml:"author,omitempty" json:"author,omitempty"`
+	License              string                  `yaml:"license,omitempty" json:"license,omitempty"`
+	Entrypoint           string                  `yaml:"entrypoint,omitempty" json:"entrypoint,omitempty"`
+	Parameters           map[string]ParameterDef `yaml:"parameters,omitempty" json:"parameters,omitempty"`
+	Integrity            *Integrity              `yaml:"integrity,omitempty" json:"integrity,omitempty"`
+	TeamConfigurationRef string                  `yaml:"team_configuration_ref,omitempty" json:"team_configuration_ref,omitempty"`
+	TeamConfiguration    *TeamConfiguration      `yaml:"team_configuration,omitempty" json:"team_configuration,omitempty"`
+	Membranes            []MembraneRule          `yaml:"membranes,omitempty" json:"membranes,omitempty"`
+	Agents               []AgentConfig           `yaml:"agents,omitempty" json:"agents,omitempty"`
+	Tasks                []TaskConfig            `yaml:"tasks,omitempty" json:"tasks,omitempty"`
+}
+
+// TeamConfiguration defines a cellular team archetype to prevent repetitive agent boilerplate.
+type TeamConfiguration struct {
+	ID                 string              `yaml:"id,omitempty" json:"id,omitempty"`
+	CellType           string              `yaml:"cell_type,omitempty" json:"cell_type,omitempty"` // neuron, muscle, heart, lungs
+	FocusArea          string              `yaml:"focus_area,omitempty" json:"focus_area,omitempty"`
+	PersonaAllocations []PersonaAllocation `yaml:"persona_allocations,omitempty" json:"persona_allocations,omitempty"`
+}
+
+// PersonaAllocation specifies a persona and count within a team configuration.
+type PersonaAllocation struct {
+	PersonaRef string `yaml:"persona_ref" json:"persona_ref"`
+	Role       string `yaml:"role,omitempty" json:"role,omitempty"`
+	Count      int    `yaml:"count,omitempty" json:"count,omitempty"`
 }
 
 // ParameterDef defines a configurable parameter for a swarm package.
@@ -101,8 +118,13 @@ func ValidateManifest(pkg *SwarmPackage) error {
 	if strings.TrimSpace(pkg.Description) == "" {
 		return fmt.Errorf("swarm package description is required")
 	}
-	if len(pkg.Agents) == 0 {
-		return fmt.Errorf("swarm package must define at least one agent")
+
+	hasAgents := len(pkg.Agents) > 0
+	hasTeamRef := strings.TrimSpace(pkg.TeamConfigurationRef) != ""
+	hasTeamConfig := pkg.TeamConfiguration != nil
+
+	if !hasAgents && !hasTeamRef && !hasTeamConfig {
+		return fmt.Errorf("swarm package must define either agents (ad-hoc personas), team_configuration_ref, or team_configuration")
 	}
 
 	for i, a := range pkg.Agents {
@@ -111,6 +133,13 @@ func ValidateManifest(pkg *SwarmPackage) error {
 		}
 		if strings.TrimSpace(a.Role) == "" {
 			return fmt.Errorf("agent[%d] role is required", i)
+		}
+	}
+
+	if hasTeamConfig && pkg.TeamConfiguration.CellType != "" {
+		ct := strings.ToLower(strings.TrimSpace(pkg.TeamConfiguration.CellType))
+		if ct != "neuron" && ct != "muscle" && ct != "heart" && ct != "lungs" {
+			return fmt.Errorf("invalid team_configuration cell_type %q; must be neuron, muscle, heart, or lungs", pkg.TeamConfiguration.CellType)
 		}
 	}
 
