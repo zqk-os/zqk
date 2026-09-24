@@ -151,7 +151,7 @@ func RunValidateAgent(cmd *cobra.Command, args []string, proc *cli.Processor) er
 	// Compilation and unbounded foreground go test are not the validation path.
 	// Kernel test_case objects are the process: discover, then run.
 	cmd.Println("✅ Validation analysis complete.")
-	cmd.Println("⏳ Queueing zqk test discover for kernel test_case refresh...")
+	cmd.Println(paths.RewriteCanonicalCLIInvocations("⏳ Queueing zqk test discover for kernel test_case refresh..."))
 	exe, err := fileutil.Executable()
 	if err == nil {
 		disc := execwrap.Command(exe, "test", "discover")
@@ -161,7 +161,7 @@ func RunValidateAgent(cmd *cobra.Command, args []string, proc *cli.Processor) er
 				StartSimple(func() {
 					_ = disc.Wait()
 				})
-			cmd.Println("✅ Background test discover queued. Run zqk test run for execution.")
+			cmd.Println(paths.RewriteCanonicalCLIInvocations("✅ Background test discover queued. Run zqk test run for execution."))
 		} else {
 			cmd.Printf("⚠️ Background test discover failed: %v\n", err)
 		}

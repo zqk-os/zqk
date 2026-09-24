@@ -512,7 +512,7 @@ func formatAgentMarkdown(sessionID string, cvs map[string]any, sug map[string]an
 		fmt.Fprintf(&b, "`%s`", sessionID)
 		b.WriteString(paths.RewriteCanonicalCLIInvocations(" and apply `suggested_convergence_session_fields.object_update_body` with `zqk object update`, **or** use **`--persist-session`** on this command to write the CVS in one step.\n"))
 	}
-	b.WriteString("- Use targeted `zqk test run` per project policy; attach log paths when reporting.\n")
+	b.WriteString(paths.RewriteCanonicalCLIInvocations("- Use targeted `zqk test run` per project policy; attach log paths when reporting.\n"))
 
 	return b.String()
 }

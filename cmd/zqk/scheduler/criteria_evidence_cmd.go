@@ -13,6 +13,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	schedpkg "github.com/zqk-os/zqk/pkg/scheduler"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -50,8 +51,7 @@ func runCriteriaEvidence(cliCtx *cli.Context, cmd *cobra.Command) error {
 	rows, err := schedpkg.ReadTestBundleEventsTailLines(ctx, projectRoot, limit)
 	if err != nil {
 		if fileutil.IsNotExist(err) {
-			msg := fmt.Sprintf("No test-bundle events file yet (%s).\n"+
-				"Run zqk test run; criteria_verification_evidence lines append on completion when test_case objects declare criteria_refs.\n",
+			msg := fmt.Sprintf("No test-bundle events file yet (%s).\n"+paths.RewriteCanonicalCLIInvocations("Run zqk test run; criteria_verification_evidence lines append on completion when test_case objects declare criteria_refs.\n"),
 				filepath.Base(path))
 			return cli.WriteOutput(cmd, []byte(msg))
 		}

@@ -60,17 +60,13 @@ var phaseRoutingProfiles = map[string]phaseRoutingProfile{
 	"code_quality_go_matrix": {
 		ID: "code_quality_go_matrix",
 		ExtraNotes: func(*TestBundleConvergenceSnapshot) []string {
-			return []string{
-				"Profile code_quality_go_matrix: matrix rows, FieldKey/ZQK-env repo gates, zqk test run; use matrix report for surfaces beyond CLI rollup.",
-			}
+			return []string{paths.RewriteCanonicalCLIInvocations("Profile code_quality_go_matrix: matrix rows, FieldKey/ZQK-env repo gates, zqk test run; use matrix report for surfaces beyond CLI rollup.")}
 		},
 	},
 	"code_quality_drift_and_standardization": {
 		ID: "code_quality_drift_and_standardization",
 		ExtraNotes: func(*TestBundleConvergenceSnapshot) []string {
-			return []string{
-				"Profile code_quality_drift_and_standardization: triage drift/hardcoded-literal baselines (map keys are not necessarily FieldKey debt); targeted zqk test run; agent-prompt + rollup; prefer AST fixers and path-scoped refactors.",
-			}
+			return []string{paths.RewriteCanonicalCLIInvocations("Profile code_quality_drift_and_standardization: triage drift/hardcoded-literal baselines (map keys are not necessarily FieldKey debt); targeted zqk test run; agent-prompt + rollup; prefer AST fixers and path-scoped refactors.")}
 		},
 	},
 	// Nested / matrix-only C6: matrix fully vetted per rubric; bundles are secondary.
@@ -102,9 +98,7 @@ var phaseRoutingProfiles = map[string]phaseRoutingProfile{
 	"product_delivery_datacell": {
 		ID: "product_delivery_datacell",
 		ExtraNotes: func(*TestBundleConvergenceSnapshot) []string {
-			return []string{
-				"Profile product_delivery_datacell: phased BLIs for cell identity, profile contracts, operational envelope, membrane adapters, admin/discovery, migration; pkg/datacell + spec cell integration + targeted zqk test run; do not treat green bundles alone as proof of desired_end_state.",
-			}
+			return []string{paths.RewriteCanonicalCLIInvocations("Profile product_delivery_datacell: phased BLIs for cell identity, profile contracts, operational envelope, membrane adapters, admin/discovery, migration; pkg/datacell + spec cell integration + targeted zqk test run; do not treat green bundles alone as proof of desired_end_state.")}
 		},
 	},
 }

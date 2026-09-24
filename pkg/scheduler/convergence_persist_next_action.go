@@ -89,8 +89,7 @@ func isOperatorHandoffNextAction(s string) bool {
 		return false
 	}
 	markers := []string{
-		"drift", "triage", "cvs_outcome", paths.ProjectDataDir + "/" + paths.LogsDir + "/" + paths.LogsDriftSubdir, "zqk test run",
-		"matrix", "baseline", "hardcoded-go-literals", "rollup", "fieldkeys",
+		"drift", "triage", "cvs_outcome", paths.ProjectDataDir + "/" + paths.LogsDir + "/" + paths.LogsDriftSubdir, paths.RewriteCanonicalCLIInvocations("zqk test run"), "matrix", "baseline", "hardcoded-go-literals", "rollup", "fieldkeys",
 		"packages rollup", "scripts/drift",
 	}
 	for _, m := range markers {
