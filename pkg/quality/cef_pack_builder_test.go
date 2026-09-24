@@ -10,11 +10,12 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/swarm/metabolism"
 	"github.com/zqk-os/zqk/pkg/swarm/pack"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestConvertCEFPrompts_All25Enzymes(t *testing.T) {
 	cefSrcDir := filepath.Join("..", "..", "docs", "quality", "codebase_evaluation")
-	if _, err := os.Stat(cefSrcDir); err != nil {
+	if _, err := fileutil.Stat(cefSrcDir); err != nil {
 		t.Skipf("CEF source directory not found at %s: %v", cefSrcDir, err)
 	}
 
@@ -46,7 +47,7 @@ func TestConvertCEFPrompts_All25Enzymes(t *testing.T) {
 
 func TestBuildCanonicalCEFPack_4WaveDAGAndSeal(t *testing.T) {
 	cefSrcDir := filepath.Join("..", "..", "docs", "quality", "codebase_evaluation")
-	if _, err := os.Stat(cefSrcDir); err != nil {
+	if _, err := fileutil.Stat(cefSrcDir); err != nil {
 		t.Skipf("CEF source directory not found at %s: %v", cefSrcDir, err)
 	}
 
@@ -122,7 +123,7 @@ func TestBuildCanonicalCEFPack_4WaveDAGAndSeal(t *testing.T) {
 
 func TestEnsureCanonicalCEFPackCommitted(t *testing.T) {
 	cefSrcDir := filepath.Join("..", "..", "docs", "quality", "codebase_evaluation")
-	if _, err := os.Stat(cefSrcDir); err != nil {
+	if _, err := fileutil.Stat(cefSrcDir); err != nil {
 		t.Skipf("CEF source directory not found: %v", err)
 	}
 

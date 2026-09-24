@@ -5,7 +5,6 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -60,17 +59,17 @@ func newInitCmd() *cobra.Command {
 				return fmt.Errorf("invalid package version: %w", err)
 			}
 
-			if err := os.MkdirAll(targetDir, paths.DirPerm755); err != nil {
+			if err := fileutil.MkdirAll(targetDir, paths.DirPerm755); err != nil {
 				return fmt.Errorf("failed to create target directory: %w", err)
 			}
 
 			templatesDir := filepath.Join(targetDir, "templates")
-			if err := os.MkdirAll(templatesDir, paths.DirPerm755); err != nil {
+			if err := fileutil.MkdirAll(templatesDir, paths.DirPerm755); err != nil {
 				return fmt.Errorf("failed to create templates directory: %w", err)
 			}
 
 			membranesDir := filepath.Join(targetDir, "membranes")
-			if err := os.MkdirAll(membranesDir, paths.DirPerm755); err != nil {
+			if err := fileutil.MkdirAll(membranesDir, paths.DirPerm755); err != nil {
 				return fmt.Errorf("failed to create membranes directory: %w", err)
 			}
 
@@ -175,7 +174,7 @@ func newSealCmd() *cobra.Command {
 			var pubKey ed25519.PublicKey
 
 			if keyPath != "" {
-				keyData, err := os.ReadFile(keyPath)
+				keyData, err := fileutil.ReadFile(keyPath)
 				if err != nil {
 					return fmt.Errorf("failed to read private key from %s: %w", keyPath, err)
 				}
@@ -203,7 +202,7 @@ func newSealCmd() *cobra.Command {
 
 			if pubOut != "" {
 				pubHex := hex.EncodeToString(pubKey)
-				if err := os.WriteFile(pubOut, []byte(pubHex), paths.FilePerm644); err != nil {
+				if err := fileutil.WriteFile(pubOut, []byte(pubHex), paths.FilePerm644); err != nil {
 					return fmt.Errorf("failed to write public key to %s: %w", pubOut, err)
 				}
 			}
@@ -249,7 +248,7 @@ func newValidateCmd() *cobra.Command {
 
 			var pubKey ed25519.PublicKey
 			if keyPath != "" {
-				keyData, err := os.ReadFile(keyPath)
+				keyData, err := fileutil.ReadFile(keyPath)
 				if err != nil {
 					return fmt.Errorf("failed to read public key from %s: %w", keyPath, err)
 				}

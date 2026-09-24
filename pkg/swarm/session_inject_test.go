@@ -1,7 +1,6 @@
 package swarm
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -87,7 +86,7 @@ func TestSessionAutoInject_IntegrationAndConformance(t *testing.T) {
 		t.Fatalf("failed to create state dir: %v", err)
 	}
 	expectedSession := "ZQK-SES-FROM-STATE-FILE-999"
-	if err := os.WriteFile(filepath.Join(stateDir, "session"), []byte(expectedSession), paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(stateDir, "session"), []byte(expectedSession), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write session file: %v", err)
 	}
 

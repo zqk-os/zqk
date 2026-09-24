@@ -2,10 +2,12 @@ package packcmd
 
 import (
 	"bytes"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestPackCLI_InitSealValidate(t *testing.T) {
@@ -27,7 +29,7 @@ func TestPackCLI_InitSealValidate(t *testing.T) {
 	}
 
 	manifestPath := filepath.Join(packDir, "swarm.yaml")
-	if _, err := os.Stat(manifestPath); err != nil {
+	if _, err := fileutil.Stat(manifestPath); err != nil {
 		t.Fatalf("swarm.yaml not created: %v", err)
 	}
 
@@ -62,7 +64,7 @@ func TestPackCLI_InitSealValidate(t *testing.T) {
 
 	// 4. Adversarial: Tamper a template and test validate fails closed
 	tplPath := filepath.Join(packDir, "templates", "eval_prompt.yaml")
-	if err := os.WriteFile(tplPath, []byte("prompt: tampered content\n"), 0644); err != nil {
+	if err := fileutil.WriteFile(tplPath, []byte("prompt: tampered content\n"), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to tamper template: %v", err)
 	}
 

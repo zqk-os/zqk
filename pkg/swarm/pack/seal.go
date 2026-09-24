@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -65,7 +64,7 @@ func ComputePackDigest(packDir string) (string, error) {
 	})
 
 	// Walk packDir for additional files (e.g. templates, membranes, schemas)
-	err = filepath.Walk(packDir, func(path string, info os.FileInfo, walkErr error) error {
+	err = filepath.Walk(packDir, func(path string, info fileutil.FileInfo, walkErr error) error {
 		if walkErr != nil {
 			return walkErr
 		}
@@ -84,7 +83,7 @@ func ComputePackDigest(packDir string) (string, error) {
 			return nil
 		}
 
-		fBytes, err := os.ReadFile(path)
+		fBytes, err := fileutil.ReadFile(path)
 		if err != nil {
 			return err
 		}

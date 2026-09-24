@@ -4,10 +4,11 @@ import (
 	"bufio"
 	"encoding/json"
 	"errors"
-	"os"
 	"path/filepath"
 	"sync"
 	"testing"
+
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 type mockStreamA struct {
@@ -62,7 +63,7 @@ func TestDualStreamRouter_IsolationAndRouting(t *testing.T) {
 
 	// Verify findings.jsonl exists and contains 2 lines
 	findingsPath := filepath.Join(outDir, "findings.jsonl")
-	file, err := os.Open(findingsPath)
+	file, err := fileutil.OpenFile(findingsPath, fileutil.O_RDONLY, 0)
 	if err != nil {
 		t.Fatalf("failed to open findings.jsonl: %v", err)
 	}
@@ -102,7 +103,7 @@ func TestDualStreamRouter_IsolationAndRouting(t *testing.T) {
 	}
 
 	scorecardPath := filepath.Join(outDir, "scorecard.json")
-	scData, err := os.ReadFile(scorecardPath)
+	scData, err := fileutil.ReadFile(scorecardPath)
 	if err != nil {
 		t.Fatalf("failed to read scorecard.json: %v", err)
 	}
@@ -119,7 +120,7 @@ func TestDualStreamRouter_IsolationAndRouting(t *testing.T) {
 		t.Fatalf("RouteTrace failed: %v", err)
 	}
 	tracePath := filepath.Join(outDir, "traces", "seismograph.json")
-	if _, err := os.Stat(tracePath); err != nil {
+	if _, err := fileutil.Stat(tracePath); err != nil {
 		t.Fatalf("trace file not found: %v", err)
 	}
 
@@ -127,7 +128,7 @@ func TestDualStreamRouter_IsolationAndRouting(t *testing.T) {
 		t.Fatalf("EmitSummary failed: %v", err)
 	}
 	summaryPath := filepath.Join(outDir, "summary.md")
-	if _, err := os.Stat(summaryPath); err != nil {
+	if _, err := fileutil.Stat(summaryPath); err != nil {
 		t.Fatalf("summary file not found: %v", err)
 	}
 
