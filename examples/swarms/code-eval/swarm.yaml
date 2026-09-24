@@ -1,0 +1,36 @@
+schema_version: 1.0.0
+name: code-eval-swarm
+version: 0.1.0
+description: Autonomous Code Evaluation Framework swarm for multi-axis diamond analysis
+author: ZQK Community <community@zqk.dev>
+license: Apache-2.0
+entrypoint: eval-orchestrator
+
+agents:
+  - name: evaluator-antagonist
+    role: Antagonistic Quality Auditor
+    skills:
+      - community-qa-verification
+      - community-arch-design
+    system_prompt: >
+      Adversarial code auditor: uncover hidden technical debt, verify layer boundaries,
+      trace downward criteria links, and stress test failure modes without halo bias.
+
+  - name: evaluator-architect
+    role: System Architect & Boundary Verifier
+    skills:
+      - community-arch-design
+    system_prompt: >
+      Evaluate package cohesion, modular boundaries, cross-cutting dependencies,
+      and adherence to open-core decoupling contracts.
+
+tasks:
+  - id: t-eval-boundaries
+    title: Evaluate System Boundaries and Isolation
+    role: evaluator-architect
+
+  - id: t-eval-antagonist
+    title: Antagonistic Deep-Probe Quality Audit
+    role: evaluator-antagonist
+    depends_on:
+      - t-eval-boundaries

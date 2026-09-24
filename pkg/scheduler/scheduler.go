@@ -318,6 +318,16 @@ type ScheduledJob struct {
 	executionCancel context.CancelFunc // Cancel function for current execution
 }
 
+// IsRunning returns whether the job is currently marked as running under lock.
+func (j *ScheduledJob) IsRunning() bool {
+	if j == nil {
+		return false
+	}
+	j.RunningMu.RLock()
+	defer j.RunningMu.RUnlock()
+	return j.Running
+}
+
 // NewScheduler creates a new scheduler instance
 func NewScheduler(storage storagepkg.ObjectStorageProvider, specLoader *objects.SpecLoader, lifecycleLoader *objects.LifecycleLoader) SchedulerInterface {
 	return NewSchedulerWithProjectRoot(storage, specLoader, lifecycleLoader, "", nil)

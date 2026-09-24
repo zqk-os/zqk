@@ -21,6 +21,27 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
+// JobExecutionLease represents a persisted occupancy lease for an active job execution.
+type JobExecutionLease struct {
+	JobID             string    `json:"job_id" yaml:"job_id"`
+	ExecutionID       string    `json:"execution_id" yaml:"execution_id"`
+	ProcessID         int       `json:"process_id" yaml:"process_id"`
+	AcquiredAt        time.Time `json:"acquired_at" yaml:"acquired_at"`
+	ExpiresAt         time.Time `json:"expires_at" yaml:"expires_at"`
+	MaxRuntimeSeconds int       `json:"max_runtime_seconds,omitempty" yaml:"max_runtime_seconds,omitempty"`
+}
+
+// IsValid checks if the lease is active (not expired at given time).
+func (l *JobExecutionLease) IsValid(now time.Time) bool {
+	if l == nil {
+		return false
+	}
+	if l.ExpiresAt.IsZero() {
+		return true
+	}
+	return now.Before(l.ExpiresAt)
+}
+
 // JobExecutionState is the persisted execution state for a scheduler job.
 // The registry is file-based so multiple scheduler processes share a single view.
 type JobExecutionState struct {
@@ -37,6 +58,8 @@ type JobExecutionState struct {
 
 	RetryCount int `yaml:"retry_count,omitempty"`
 	MaxRetries int `yaml:"max_retries,omitempty"`
+
+	Lease *JobExecutionLease `yaml:"lease,omitempty"`
 }
 
 const (
@@ -158,14 +181,35 @@ func (r *JobStateRegistry) ListStates() ([]*JobExecutionState, error) {
 
 // RegisterExecution registers the start of a job execution and marks it in_progress.
 func (r *JobStateRegistry) RegisterExecution(jobID, executionID string, processID int) error {
+	_, err := r.RegisterExecutionWithLease(jobID, executionID, processID, 0)
+	return err
+}
+
+// RegisterExecutionWithLease registers the start of a job execution, marks it in_progress, and establishes a JobExecutionLease.
+func (r *JobStateRegistry) RegisterExecutionWithLease(jobID, executionID string, processID int, maxRuntimeSeconds int) (*JobExecutionLease, error) {
 	if strings.TrimSpace(jobID) == emptyValue {
-		return errfmt.Errorf("jobID required")
+		return nil, errfmt.Errorf("jobID required")
 	}
 	if strings.TrimSpace(executionID) == emptyValue {
-		return errfmt.Errorf("executionID required")
+		return nil, errfmt.Errorf("executionID required")
 	}
 
 	now := time.Now().UTC()
+	runtimeDur := time.Duration(maxRuntimeSeconds) * time.Second
+	if runtimeDur <= 0 {
+		runtimeDur = 1 * time.Hour
+	}
+	expiresAt := now.Add(runtimeDur)
+
+	lease := &JobExecutionLease{
+		JobID:             jobID,
+		ExecutionID:       executionID,
+		ProcessID:         processID,
+		AcquiredAt:        now,
+		ExpiresAt:         expiresAt,
+		MaxRuntimeSeconds: maxRuntimeSeconds,
+	}
+
 	state := &JobExecutionState{
 		JobID:          jobID,
 		ExecutionID:    executionID,
@@ -173,6 +217,7 @@ func (r *JobStateRegistry) RegisterExecution(jobID, executionID string, processI
 		ProcessID:      processID,
 		StartedAt:      now,
 		PolicyDecision: "execute",
+		Lease:          lease,
 	}
 
 	lockPath := r.lockPathForJobID(jobID)
@@ -183,10 +228,10 @@ func (r *JobStateRegistry) RegisterExecution(jobID, executionID string, processI
 		_ = r.writeStateHintsFile() // best-effort
 		return r.writeStateAtomically(state)
 	}); err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return lease, nil
 }
 
 // Summarize returns per-state counts and stale in_progress/deferred count.
@@ -497,6 +542,36 @@ func (r *JobStateRegistry) GetExecutionState(jobID string) (*JobExecutionState, 
 	return nil, nil
 }
 
+// GetActiveLease returns the active JobExecutionLease for a job if an in_progress state exists
+// and has not expired. Returns nil if no active lease exists.
+func (r *JobStateRegistry) GetActiveLease(jobID string) (*JobExecutionLease, error) {
+	st, err := r.GetExecutionState(jobID)
+	if err != nil {
+		return nil, err
+	}
+	if st == nil || st.State != jobExecutionStateInProgress {
+		return nil, nil
+	}
+	now := time.Now().UTC()
+	if st.Lease != nil {
+		if st.Lease.IsValid(now) {
+			return st.Lease, nil
+		}
+		return nil, nil
+	}
+	// Fallback when state was written without explicit lease: check StartedAt against 1 hour default
+	if now.Sub(st.StartedAt) < 1*time.Hour {
+		return &JobExecutionLease{
+			JobID:       st.JobID,
+			ExecutionID: st.ExecutionID,
+			ProcessID:   st.ProcessID,
+			AcquiredAt:  st.StartedAt,
+			ExpiresAt:   st.StartedAt.Add(1 * time.Hour),
+		}, nil
+	}
+	return nil, nil
+}
+
 // ListInProgress returns all states currently in in_progress or deferred.
 func (r *JobStateRegistry) ListInProgress() ([]*JobExecutionState, error) {
 	r.mu.RLock()
@@ -559,6 +634,9 @@ func (r *JobStateRegistry) CompleteExecution(jobID, executionID, result string) 
 
 		now := time.Now().UTC()
 		target.CompletedAt = &now
+		if target.Lease != nil {
+			target.Lease.ExpiresAt = now
+		}
 
 		resultLower := strings.ToLower(strings.TrimSpace(result))
 		switch {

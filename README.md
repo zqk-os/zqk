@@ -46,7 +46,8 @@ zqk mcp ensure --tcp 127.0.0.1:8443
 ### 5. Run Swarms & Live Telemetry
 ```sh
 # Run a portable swarm package (local path or remote git URL)
-zqk run https://github.com/zqk-os/swarm-starter-kit
+zqk run ./examples/swarms/code-eval/
+# Or run from remote git: zqk run https://github.com/zqk-os/swarm-starter-kit
 
 # Launch interactive full-screen terminal mission control
 zqk ui

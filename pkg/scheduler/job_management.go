@@ -123,6 +123,7 @@ func (s *Scheduler) loadAndScheduleJobs(ctx context.Context, reload bool) error 
 			// Schedule timer and non-immediate jobs first, then start cron + bootstrap cache_prewarm / SCH-maintenance-wal,
 			// then submit immediate jobs. Otherwise scheduleImmediateJob can block on a full triggered pool queue
 			// for hundreds of bundle jobs before startup bootstrap runs (multi-minute daemon "hang").
+			var priorJobs map[string]*ScheduledJob
 			schedulePass := func(immediateOnly bool) error {
 				for i, result := range in.rawJobs {
 					h := in.hydrated[i]
@@ -146,6 +147,18 @@ func (s *Scheduler) loadAndScheduleJobs(ctx context.Context, reload bool) error 
 					if job == nil {
 						continue
 					}
+					if in.reload && priorJobs != nil {
+						if existing, ok := priorJobs[job.ID]; ok && existing != nil {
+							if existing.IsRunning() {
+								job.Running = true
+								job.executionCtx = existing.executionCtx
+								job.executionCancel = existing.executionCancel
+							}
+							if existing.LastRunAt != nil && job.LastRunAt == nil {
+								job.LastRunAt = existing.LastRunAt
+							}
+						}
+					}
 					s.jobs[job.ID] = job
 					SchedulerJobManagementLog(s.logger).Info(LogEventSchedulerJobMgmtScheduledJob).
 						WithFields(jobLogFieldsWithSchedule(job)...).
@@ -159,7 +172,7 @@ func (s *Scheduler) loadAndScheduleJobs(ctx context.Context, reload bool) error 
 				LockNameSchedulerLoadAndScheduleJobs,
 				lockLog,
 				func() error {
-					s.unscheduleAllJobs()
+					priorJobs = s.unscheduleAllJobs()
 					return schedulePass(false)
 				},
 			)
@@ -223,6 +236,18 @@ func (s *Scheduler) loadAndScheduleJobs(ctx context.Context, reload bool) error 
 								}
 								if job == nil {
 									continue
+								}
+								if in.reload && priorJobs != nil {
+									if existing, ok := priorJobs[job.ID]; ok && existing != nil {
+										if existing.IsRunning() {
+											job.Running = true
+											job.executionCtx = existing.executionCtx
+											job.executionCancel = existing.executionCancel
+										}
+										if existing.LastRunAt != nil && job.LastRunAt == nil {
+											job.LastRunAt = existing.LastRunAt
+										}
+									}
 								}
 								s.jobs[job.ID] = job
 								SchedulerJobManagementLog(s.logger).Info(LogEventSchedulerJobMgmtScheduledJob).
@@ -475,10 +500,11 @@ func (s *Scheduler) hydrateJobs(ctx context.Context, rawJobs []map[string]any) [
 }
 
 // unscheduleAllJobs removes all cron entries and clears the job map.
+// Returns the prior jobs map so reloads can preserve active execution state.
 // Must be called with s.jobsMu held. Prevents duplicate cron entries on reload
 // (TriggerJob / TriggerJobByLifecycle / TriggerJobByEvent use s.jobs, so re-adding
 // jobs in the same lock re-registers them).
-func (s *Scheduler) unscheduleAllJobs() {
+func (s *Scheduler) unscheduleAllJobs() map[string]*ScheduledJob {
 	if s.cron != nil {
 		for _, job := range s.jobs {
 			if job.CronEntryID != 0 {
@@ -486,7 +512,9 @@ func (s *Scheduler) unscheduleAllJobs() {
 			}
 		}
 	}
+	prior := s.jobs
 	s.jobs = make(map[string]*ScheduledJob)
+	return prior
 }
 
 // tryScheduleJob schedules one job by trigger type and records metrics.
