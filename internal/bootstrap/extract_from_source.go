@@ -125,6 +125,18 @@ func extractFilesFromSource(projectRoot string, logger logging.Logger, force boo
 		}
 	}
 
+	// Default seed prompt templates (CEF evaluation templates)
+	sourceTemplates := filepath.Join(sourceRoot, "packs", "code-eval", "templates")
+	targetTemplates := filepath.Join(projectRoot, ".zqk", "process", "prompt_templates")
+	if info, err := fileutil.Stat(sourceTemplates); err == nil && info.IsDir() {
+		if err := fileutil.EnsureDir(targetTemplates); err != nil {
+			return errfmt.Newf("failed to create target .zqk/process/prompt_templates").Wrap(err)
+		}
+		if err := copyDirRecursive(sourceTemplates, targetTemplates, force, logger); err != nil {
+			return errfmt.Newf("failed to copy seed prompt templates").Wrap(err)
+		}
+	}
+
 	logging.Fluent(logger).Info("Bootstrap files extracted successfully").
 		ProjectRoot(projectRoot).
 		Log()
