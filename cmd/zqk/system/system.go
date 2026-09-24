@@ -48,6 +48,7 @@ func NewSystemCmd() *cobra.Command {
 	// Deprecated migration commands removed - use 'system migrate' with migration specs instead
 	systemCmd.AddCommand(NewMigrateCasCmd())
 	systemCmd.AddCommand(NewCompactJournalCmd())
+	systemCmd.AddCommand(NewCompactWALCmd())
 	// - migrate-audit-buckets: Use 'system migrate' with migration spec
 	// - migrate-lifecycles: Use 'system migrate lifecycle-files-to-objects.yaml'
 	systemCmd.AddCommand(NewCleanupDuplicatesCmd())

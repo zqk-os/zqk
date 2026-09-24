@@ -20,7 +20,7 @@ func TestReclaimOrMintFallback_skipsWhenRealATKFree(t *testing.T) {
 		objects.FieldKeyStatus: objects.ObjectStatusApproved,
 		objects.FieldKeyTitle:  "real work",
 	})
-	id, minted, err := ReclaimOrMintFallback(ctx, store, sec, "seat-a", t.TempDir())
+	id, minted, err := ReclaimOrMintFallback(ctx, store, sec, "seat-a", tempDir(t))
 	if err != nil {
 		t.Fatalf("ReclaimOrMintFallback: %v", err)
 	}
@@ -35,7 +35,7 @@ func TestReclaimOrMintFallback_mintsWhenPoolEmpty(t *testing.T) {
 	_ = objects.GetGlobalLifecycleLoader().EnsureReady(ctx)
 	sec := pkgctx.NewSystemSecurityContext()
 	store := newClaimMemStore()
-	root := t.TempDir()
+	root := tempDir(t)
 	id, minted, err := ReclaimOrMintFallback(ctx, store, sec, "seat-b", root)
 	if err != nil {
 		t.Fatalf("ReclaimOrMintFallback: %v", err)
