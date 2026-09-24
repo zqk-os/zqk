@@ -2,19 +2,19 @@ package quality
 
 import (
 	"crypto/ed25519"
-	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/swarm/metabolism"
 	"github.com/zqk-os/zqk/pkg/swarm/pack"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/workflow"
 )
 
 func TestCEFConvergence_EndToEnd(t *testing.T) {
 	packDir := filepath.Join("..", "..", "packs", "code-eval")
-	if _, err := os.Stat(packDir); err != nil {
+	if _, err := fileutil.Stat(packDir); err != nil {
 		t.Skipf("packs/code-eval not found: %v", err)
 	}
 

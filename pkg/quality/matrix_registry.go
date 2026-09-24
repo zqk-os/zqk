@@ -3,7 +3,6 @@ package quality
 import (
 	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -104,7 +103,7 @@ func LoadMatrixRegistry(projectRoot, registryRel string) (*MatrixRegistry, error
 	}
 	data, err := fileutil.ReadFile(p)
 	if err != nil {
-		if (os.IsNotExist(err) || fileutil.IsNotExist(err)) && isDefault {
+		if fileutil.IsNotExist(err) && isDefault {
 			defaultReg := MatrixRegistry{
 				SchemaVersion: "2.0.0",
 				DefaultName:   "",

@@ -5,6 +5,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 type cefScorecard struct {
@@ -65,7 +67,7 @@ func TestCEFStandaloneLaunchMatrixAndScorecard(t *testing.T) {
 
 	// 2. Validate the standalone launch scorecard JSON
 	scorecardPath := filepath.Join(root, "docs/quality/cef-runs/2026-09-24-CORE-STANDALONE/scorecard.json")
-	data, err := os.ReadFile(scorecardPath)
+	data, err := fileutil.ReadFile(scorecardPath)
 	if err != nil {
 		t.Fatalf("read standalone scorecard: %v", err)
 	}

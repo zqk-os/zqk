@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
 	"sync"
 	"time"
@@ -65,7 +64,7 @@ func NewDualStreamRouter(outputDir string, streamA StreamARecipient) (*DualStrea
 	}
 
 	cleanDir := filepath.Clean(outputDir)
-	if err := os.MkdirAll(cleanDir, paths.DirPerm755); err != nil {
+	if err := fileutil.MkdirAll(cleanDir, paths.DirPerm755); err != nil {
 		return nil, fmt.Errorf("%w: failed to create output directory %s: %v", ErrInvalidOutputDir, cleanDir, err)
 	}
 
@@ -99,7 +98,7 @@ func (r *DualStreamRouter) RouteFinding(f Finding) error {
 		return fmt.Errorf("failed to serialize finding: %w", err)
 	}
 
-	fHandle, err := os.OpenFile(r.findingsFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, paths.FilePerm644)
+	fHandle, err := fileutil.OpenFile(r.findingsFile, fileutil.O_CREATE|fileutil.O_WRONLY|fileutil.O_APPEND, paths.FilePerm644)
 	if err != nil {
 		return fmt.Errorf("failed to open findings.jsonl: %w", err)
 	}
@@ -163,7 +162,7 @@ func (r *DualStreamRouter) RouteTrace(filename string, data []byte) error {
 	defer r.mu.Unlock()
 
 	traceDir := filepath.Join(r.outputDir, "traces")
-	if err := os.MkdirAll(traceDir, paths.DirPerm755); err != nil {
+	if err := fileutil.MkdirAll(traceDir, paths.DirPerm755); err != nil {
 		return fmt.Errorf("failed to create traces directory: %w", err)
 	}
 

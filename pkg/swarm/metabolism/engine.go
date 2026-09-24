@@ -3,7 +3,6 @@ package metabolism
 import (
 	"crypto/ed25519"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -115,7 +114,7 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 	var templates []PromptTemplateObject
 	templatesDir := filepath.Join(opts.PackDir, "templates")
 	if fileutil.Exists(templatesDir) {
-		err := filepath.Walk(templatesDir, func(path string, info os.FileInfo, walkErr error) error {
+		err := filepath.Walk(templatesDir, func(path string, info fileutil.FileInfo, walkErr error) error {
 			if walkErr != nil || info.IsDir() {
 				return walkErr
 			}
@@ -124,7 +123,7 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 				return nil
 			}
 
-			content, readErr := os.ReadFile(path)
+			content, readErr := fileutil.ReadFile(path)
 			if readErr != nil {
 				return readErr
 			}

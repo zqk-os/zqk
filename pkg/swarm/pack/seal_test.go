@@ -4,10 +4,12 @@ import (
 	"crypto/ed25519"
 	"crypto/rand"
 	"errors"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestSealAndVerifyPack_Success(t *testing.T) {
@@ -24,11 +26,11 @@ func TestSealAndVerifyPack_Success(t *testing.T) {
 
 	// Create a sample template file in the pack
 	templatesDir := filepath.Join(tmpDir, "templates")
-	if err := os.MkdirAll(templatesDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(templatesDir, paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create templates dir: %v", err)
 	}
 	templateFile := filepath.Join(templatesDir, "eval.yaml")
-	if err := os.WriteFile(templateFile, []byte("prompt: test evaluation prompt\n"), 0644); err != nil {
+	if err := fileutil.WriteFile(templateFile, []byte("prompt: test evaluation prompt\n"), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write template file: %v", err)
 	}
 
@@ -69,11 +71,11 @@ func TestVerifyPack_TamperTemplateFailsClosed(t *testing.T) {
 	}
 
 	templatesDir := filepath.Join(tmpDir, "templates")
-	if err := os.MkdirAll(templatesDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(templatesDir, paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create templates dir: %v", err)
 	}
 	templateFile := filepath.Join(templatesDir, "eval.yaml")
-	if err := os.WriteFile(templateFile, []byte("prompt: original content\n"), 0644); err != nil {
+	if err := fileutil.WriteFile(templateFile, []byte("prompt: original content\n"), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write template file: %v", err)
 	}
 
@@ -83,7 +85,7 @@ func TestVerifyPack_TamperTemplateFailsClosed(t *testing.T) {
 	}
 
 	// Tamper template file by modifying one byte
-	if err := os.WriteFile(templateFile, []byte("prompt: modified content\n"), 0644); err != nil {
+	if err := fileutil.WriteFile(templateFile, []byte("prompt: modified content\n"), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to tamper template file: %v", err)
 	}
 
@@ -115,12 +117,12 @@ func TestVerifyPack_TamperManifestFailsClosed(t *testing.T) {
 	}
 
 	// Tamper manifest name without resealing
-	tamperedBytes, err := os.ReadFile(manifestPath)
+	tamperedBytes, err := fileutil.ReadFile(manifestPath)
 	if err != nil {
 		t.Fatalf("failed to read manifest: %v", err)
 	}
 	tamperedStr := strings.Replace(string(tamperedBytes), "sample-refactor-swarm", "tampered-swarm", 1)
-	if err := os.WriteFile(manifestPath, []byte(tamperedStr), 0644); err != nil {
+	if err := fileutil.WriteFile(manifestPath, []byte(tamperedStr), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write tampered manifest: %v", err)
 	}
 

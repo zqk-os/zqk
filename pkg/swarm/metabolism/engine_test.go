@@ -3,12 +3,13 @@ package metabolism
 import (
 	"crypto/ed25519"
 	"crypto/rand"
-	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/swarm/pack"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/workflow"
 )
 
@@ -26,11 +27,11 @@ func TestMetabolismEngine_IngestAndSynthesize(t *testing.T) {
 
 	// Add templates to pack
 	templatesDir := filepath.Join(tmpDir, "templates")
-	if err := os.MkdirAll(templatesDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(templatesDir, paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create templates dir: %v", err)
 	}
 	tplFile := filepath.Join(templatesDir, "rdb_eval.yaml")
-	if err := os.WriteFile(tplFile, []byte("prompt: Evaluate readability invariants\n"), 0644); err != nil {
+	if err := fileutil.WriteFile(tplFile, []byte("prompt: Evaluate readability invariants\n"), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write template: %v", err)
 	}
 
@@ -168,7 +169,7 @@ tasks:
   - id: eval-task
     title: Evaluate Codebase
 `
-		if err := os.WriteFile(filepath.Join(tmpDir, "swarm.yaml"), []byte(manifestContent), 0644); err != nil {
+		if err := fileutil.WriteFile(filepath.Join(tmpDir, "swarm.yaml"), []byte(manifestContent), paths.FilePerm644); err != nil {
 			t.Fatalf("write failed: %v", err)
 		}
 		if _, err := pack.SealPack(tmpDir, priv, "signer@zqk.dev"); err != nil {
@@ -179,6 +180,7 @@ tasks:
 		digest, err := engine.Ingest(IngestionOptions{
 			PackDir:    tmpDir,
 			PublicKey:  pub,
+			OutputDir:  filepath.Join(t.TempDir(), "output"),
 			VerifySeal: true,
 		})
 		if err != nil {
@@ -218,7 +220,7 @@ tasks:
   - id: pod-task
     title: Architect Assessment
 `
-		if err := os.WriteFile(filepath.Join(tmpDir, "swarm.yaml"), []byte(manifestContent), 0644); err != nil {
+		if err := fileutil.WriteFile(filepath.Join(tmpDir, "swarm.yaml"), []byte(manifestContent), paths.FilePerm644); err != nil {
 			t.Fatalf("write failed: %v", err)
 		}
 		if _, err := pack.SealPack(tmpDir, priv, "signer@zqk.dev"); err != nil {
@@ -229,6 +231,7 @@ tasks:
 		digest, err := engine.Ingest(IngestionOptions{
 			PackDir:    tmpDir,
 			PublicKey:  pub,
+			OutputDir:  filepath.Join(t.TempDir(), "output"),
 			VerifySeal: true,
 		})
 		if err != nil {

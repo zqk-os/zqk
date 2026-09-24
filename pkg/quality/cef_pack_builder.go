@@ -4,7 +4,6 @@ import (
 	"crypto/ed25519"
 	"crypto/rand"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -57,7 +56,7 @@ var CEFPromptRegistry = []CEFPromptDefinition{
 // ConvertCEFPrompts reads markdown prompt files from cefSourceDir, validates against stubs,
 // and creates structured CAS prompt_template objects in targetTemplatesDir.
 func ConvertCEFPrompts(cefSourceDir string, targetTemplatesDir string) ([]metabolism.PromptTemplateObject, error) {
-	if err := os.MkdirAll(targetTemplatesDir, paths.DirPerm755); err != nil {
+	if err := fileutil.MkdirAll(targetTemplatesDir, paths.DirPerm755); err != nil {
 		return nil, fmt.Errorf("failed to create target templates dir: %w", err)
 	}
 
@@ -66,7 +65,7 @@ func ConvertCEFPrompts(cefSourceDir string, targetTemplatesDir string) ([]metabo
 
 	for _, def := range CEFPromptRegistry {
 		srcFile := filepath.Join(cefSourceDir, def.RelPath)
-		data, err := os.ReadFile(srcFile)
+		data, err := fileutil.ReadFile(srcFile)
 		if err != nil {
 			return nil, fmt.Errorf("failed to read CEF source prompt %s: %w", srcFile, err)
 		}
@@ -121,7 +120,7 @@ func ConvertCEFPrompts(cefSourceDir string, targetTemplatesDir string) ([]metabo
 
 // BuildCanonicalCEFPack assembles the complete canonical code-eval pack in destPackDir and cryptographically seals it.
 func BuildCanonicalCEFPack(cefSourceDir string, destPackDir string, privKey ed25519.PrivateKey) (*pack.SwarmPackage, error) {
-	if err := os.MkdirAll(destPackDir, paths.DirPerm755); err != nil {
+	if err := fileutil.MkdirAll(destPackDir, paths.DirPerm755); err != nil {
 		return nil, fmt.Errorf("failed to create pack dir: %w", err)
 	}
 
@@ -131,7 +130,7 @@ func BuildCanonicalCEFPack(cefSourceDir string, destPackDir string, privKey ed25
 	}
 
 	membranesDir := filepath.Join(destPackDir, "membranes")
-	if err := os.MkdirAll(membranesDir, paths.DirPerm755); err != nil {
+	if err := fileutil.MkdirAll(membranesDir, paths.DirPerm755); err != nil {
 		return nil, fmt.Errorf("failed to create membranes dir: %w", err)
 	}
 
