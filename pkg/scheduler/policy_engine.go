@@ -189,6 +189,10 @@ func (pe *PolicyEngine) inProgressStateIsStale(st *JobExecutionState, job *Sched
 		return false
 	}
 	now := time.Now().UTC()
+	// Active lease means the run is legitimately occupied until CompleteExecution or max_runtime.
+	if st.Lease != nil && st.Lease.IsValid(now) {
+		return false
+	}
 	age := now.Sub(st.StartedAt)
 	if st.ProcessID > 0 && st.ProcessID != os.Getpid() && age >= staleInProgressOtherPIDAfter {
 		return true

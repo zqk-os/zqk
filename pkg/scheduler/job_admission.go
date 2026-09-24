@@ -52,6 +52,9 @@ func jobWarrantsAdmissionHourglass(job *ScheduledJob) bool {
 	if job == nil || !job.Enabled || job.LastRunAt != nil || job.Status == StatusDisabled || job.Status == objects.ObjectStatusArchived {
 		return false
 	}
+	if job.IsRunning() {
+		return false
+	}
 	if job.ExecutionMode != ExecutionModeOneTime || job.TriggerType != TriggerTypeImmediate {
 		return false
 	}
@@ -228,6 +231,28 @@ func (s *Scheduler) failJobAdmission(ctx context.Context, job *ScheduledJob, rea
 	})
 }
 
+// isJobOccupied returns true if the job is actively running in memory, pending immediate dispatch,
+// or holds an active, unexpired JobExecutionLease in JobStateRegistry.
+// When occupied, CreatedAt age does not represent "never started" and scanAdmissionTimeouts must not disable it.
+func (s *Scheduler) isJobOccupied(job *ScheduledJob) bool {
+	if s == nil || job == nil {
+		return false
+	}
+	if job.IsRunning() {
+		return true
+	}
+	if s.isImmediateDispatchPending(job.ID) {
+		return true
+	}
+	if s.stateRegistry != nil {
+		lease, err := s.stateRegistry.GetActiveLease(job.ID)
+		if err == nil && lease != nil && lease.IsValid(time.Now().UTC()) {
+			return true
+		}
+	}
+	return false
+}
+
 func (s *Scheduler) scanAdmissionTimeouts(ctx context.Context) {
 	if s == nil {
 		return
@@ -245,8 +270,8 @@ func (s *Scheduler) scanAdmissionTimeouts(ctx context.Context) {
 				if s.admissionAlreadyFailed(job.ID) {
 					continue
 				}
-				if s.isImmediateDispatchPending(job.ID) {
-					// Already accepted onto a pool worker; CreatedAt age is not "never started".
+				if s.isJobOccupied(job) {
+					// Already accepted onto a pool worker, actively running, or holding active lease; CreatedAt age is not "never started".
 					continue
 				}
 				if job.CreatedAt.IsZero() {
@@ -260,6 +285,9 @@ func (s *Scheduler) scanAdmissionTimeouts(ctx context.Context) {
 		},
 	)
 	for _, job := range due {
+		if s.isJobOccupied(job) {
+			continue
+		}
 		s.failJobAdmission(ctx, job, admissionReasonTimeout)
 	}
 }

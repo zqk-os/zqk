@@ -254,7 +254,7 @@ func (s *Scheduler) executeJobAfterHandlerReturns(
 
 	unregisterCallback()
 
-	if executionID != emptyValue && s.coordinationChannel != nil && s.stateRegistry != nil {
+	if executionID != emptyValue && s.stateRegistry != nil {
 		completionState := jobExecStateFailed
 		completionEventType := jobExecEventFailed
 		resultStr := jobExecStateFailed
@@ -272,21 +272,23 @@ func (s *Scheduler) executeJobAfterHandlerReturns(
 		if errStatus := s.stateRegistry.CompleteExecution(job.ID, executionID, resultStr); errStatus != nil {
 			SchedulerJobExecutionLog(s.logger).Warn("Failed to complete job execution in state registry").WithError(errStatus).Log()
 		}
-		metadata := map[string]any{}
-		if completionEventType == jobExecEventFailed {
-			metadata["error"] = err.Error()
-		}
+		if s.coordinationChannel != nil {
+			metadata := map[string]any{}
+			if completionEventType == jobExecEventFailed {
+				metadata["error"] = err.Error()
+			}
 
-		if errPub := s.coordinationChannel.PublishEvent(Event{
-			Type:           completionEventType,
-			Timestamp:      time.Now().UTC(),
-			JobID:          job.ID,
-			ExecutionID:    executionID,
-			ProcessID:      os.Getpid(),
-			PolicyDecision: completionState,
-			Metadata:       metadata,
-		}); errPub != nil {
-			SchedulerJobExecutionLog(s.logger).Warn("Failed to publish job completion event").WithError(errPub).Log()
+			if errPub := s.coordinationChannel.PublishEvent(Event{
+				Type:           completionEventType,
+				Timestamp:      time.Now().UTC(),
+				JobID:          job.ID,
+				ExecutionID:    executionID,
+				ProcessID:      os.Getpid(),
+				PolicyDecision: completionState,
+				Metadata:       metadata,
+			}); errPub != nil {
+				SchedulerJobExecutionLog(s.logger).Warn("Failed to publish job completion event").WithError(errPub).Log()
+			}
 		}
 	}
 
@@ -659,29 +661,30 @@ func (s *Scheduler) executeJob(ctx context.Context, job *ScheduledJob, handler J
 		},
 	)
 
-	// Coordination kernel (CRIT-9040): register execution + publish "started".
+	// Coordination kernel (CRIT-9040): register execution with lease + publish "started".
 	var executionID string
-	if s.coordinationChannel != nil && s.stateRegistry != nil {
+	if s.stateRegistry != nil {
 		executionID = fmt.Sprintf("exec-%d-%d", executionStart.Unix(), os.Getpid())
-		if err := s.stateRegistry.RegisterExecution(job.ID, executionID, os.Getpid()); err != nil {
+		if _, err := s.stateRegistry.RegisterExecutionWithLease(job.ID, executionID, os.Getpid(), job.MaxRuntimeSeconds); err != nil {
 			SchedulerJobExecutionLog(s.logger).Warn(LogEventSchedulerJobExecCoordinationRegisterFailed).
 				WithError(err).
 				Log()
 			executionID = ""
-		} else {
-			_ = s.coordinationChannel.PublishEvent(Event{
-				Type:           "job_execution_started",
-				Timestamp:      time.Now().UTC(),
-				JobID:          job.ID,
-				ExecutionID:    executionID,
-				ProcessID:      os.Getpid(),
-				PolicyDecision: "execute",
-				Metadata: map[string]any{
-					objects.FieldKeyJobType:  job.JobType,
-					objects.FieldKeyCategory: job.Category,
-				},
-			})
 		}
+	}
+	if executionID != emptyValue && s.coordinationChannel != nil {
+		_ = s.coordinationChannel.PublishEvent(Event{
+			Type:           "job_execution_started",
+			Timestamp:      time.Now().UTC(),
+			JobID:          job.ID,
+			ExecutionID:    executionID,
+			ProcessID:      os.Getpid(),
+			PolicyDecision: "execute",
+			Metadata: map[string]any{
+				objects.FieldKeyJobType:  job.JobType,
+				objects.FieldKeyCategory: job.Category,
+			},
+		})
 	}
 
 	// Pool workers (goroutinelabels) recover panics without re-panicking, so a panic in the
@@ -693,17 +696,19 @@ func (s *Scheduler) executeJob(ctx context.Context, job *ScheduledJob, handler J
 	defer func() {
 		if r := recover(); r != nil {
 			panicErr := errfmt.Errorf("panic in executeJob: %v", r)
-			if executionID != emptyValue && s.coordinationChannel != nil && s.stateRegistry != nil {
+			if executionID != emptyValue && s.stateRegistry != nil {
 				_ = s.stateRegistry.CompleteExecution(job.ID, executionID, "failed")
-				_ = s.coordinationChannel.PublishEvent(Event{
-					Type:           "job_execution_failed",
-					Timestamp:      time.Now().UTC(),
-					JobID:          job.ID,
-					ExecutionID:    executionID,
-					ProcessID:      os.Getpid(),
-					PolicyDecision: "failed",
-					Metadata:       map[string]any{"error": panicErr.Error()},
-				})
+				if s.coordinationChannel != nil {
+					_ = s.coordinationChannel.PublishEvent(Event{
+						Type:           "job_execution_failed",
+						Timestamp:      time.Now().UTC(),
+						JobID:          job.ID,
+						ExecutionID:    executionID,
+						ProcessID:      os.Getpid(),
+						PolicyDecision: "failed",
+						Metadata:       map[string]any{"error": panicErr.Error()},
+					})
+				}
 			}
 			s.executeJobAfterHandlerReturns(ctx, job, panicErr, executionStart, executionID, opCallback, operationID, unregisterCallback)
 		}
@@ -754,17 +759,19 @@ func (s *Scheduler) executeJob(ctx context.Context, job *ScheduledJob, handler J
 	// Create audit event for job start (BLI-TDE-AUDIT-FAILCLOSED-001: fail-closed if audit persist fails)
 	if err := s.createJobAuditEvent(ctx, auditEventSchedulerStarted, job.ID, job.JobType, job.Category, true, 0, nil); err != nil {
 		auditErr := fmt.Errorf("fail-closed: job start audit persist failed: %w", err)
-		if executionID != emptyValue && s.coordinationChannel != nil && s.stateRegistry != nil {
+		if executionID != emptyValue && s.stateRegistry != nil {
 			_ = s.stateRegistry.CompleteExecution(job.ID, executionID, "failed")
-			_ = s.coordinationChannel.PublishEvent(Event{
-				Type:           "job_execution_failed",
-				Timestamp:      time.Now().UTC(),
-				JobID:          job.ID,
-				ExecutionID:    executionID,
-				ProcessID:      os.Getpid(),
-				PolicyDecision: "failed",
-				Metadata:       map[string]any{"error": auditErr.Error()},
-			})
+			if s.coordinationChannel != nil {
+				_ = s.coordinationChannel.PublishEvent(Event{
+					Type:           "job_execution_failed",
+					Timestamp:      time.Now().UTC(),
+					JobID:          job.ID,
+					ExecutionID:    executionID,
+					ProcessID:      os.Getpid(),
+					PolicyDecision: "failed",
+					Metadata:       map[string]any{"error": auditErr.Error()},
+				})
+			}
 		}
 		s.executeJobAfterHandlerReturns(ctx, job, auditErr, executionStart, executionID, opCallback, operationID, unregisterCallback)
 		return
