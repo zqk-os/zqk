@@ -390,7 +390,7 @@ func renderStateTab(b *strings.Builder, m *UIModel) {
 			}
 
 			cursor := "  "
-			if start+i == m.SelectedIndex {
+			if start+i == m.SelectedIndex || (m.AutoScroll && (m.SelectedIndex < start || m.SelectedIndex >= total) && start+i == total-1) {
 				cursor = cyanBold("> ")
 			}
 
@@ -526,7 +526,7 @@ func renderAuditTab(b *strings.Builder, m *UIModel) {
 			}
 
 			cursor := "  "
-			if start+i == m.SelectedIndex {
+			if start+i == m.SelectedIndex || (m.AutoScroll && (m.SelectedIndex < start || m.SelectedIndex >= total) && start+i == total-1) {
 				cursor = cyanBold("> ")
 			}
 
@@ -942,15 +942,16 @@ func renderMetricsTab(b *strings.Builder, m *UIModel) {
 			AddColumn("FAILURES", tds.AlignRight, 8, 0.10).
 			AddColumn("STATUS", tds.AlignCenter, 10, 0.15)
 
-		for _, cm := range m.TSDB.TopCommands {
+		for i, cm := range m.TSDB.TopCommands {
 			errStr := fmt.Sprintf("%d", cm.Failures)
 			stBadge := tds.Badge("PASS")
 			if cm.Failures > 0 {
 				errStr = redBold(errStr)
 				stBadge = tds.Badge("WARN")
 			}
+			isSelected := (i == m.SelectedIndex)
 			cmdTable.AddRow(
-				cm.Command,
+				tds.RowCursor(isSelected, cm.Command),
 				fmt.Sprintf("%d", cm.Invocations),
 				formatDurationMs(cm.AvgLatencyMs),
 				errStr,
@@ -1035,6 +1036,14 @@ func renderMetricsTab(b *strings.Builder, m *UIModel) {
 			if j.Failures > 0 {
 				failBadge = redBold(failBadge)
 			}
+			trendStr := j.Sparkline
+			if strings.HasPrefix(trendStr, "▲") {
+				trendStr = yellowBold(trendStr)
+			} else if strings.HasPrefix(trendStr, "▼") {
+				trendStr = greenBold(trendStr)
+			} else if strings.Contains(trendStr, "STABLE") {
+				trendStr = cyan(trendStr)
+			}
 			schedTable.AddRow(
 				j.JobID,
 				fmt.Sprintf("%d", j.Executions),
@@ -1043,7 +1052,7 @@ func renderMetricsTab(b *strings.Builder, m *UIModel) {
 				formatDurationMs(j.AvgDurationMs),
 				fmt.Sprintf("%s / %s", formatDurationMs(j.MinDurationMs), formatDurationMs(j.MaxDurationMs)),
 				lastRunStr,
-				j.Sparkline,
+				trendStr,
 			)
 		}
 		b.WriteString(schedTable.Render())
@@ -1489,6 +1498,17 @@ func renderDetailModal(m *UIModel) string {
 	}
 	lines = append(lines, dim("  "+strings.Repeat("─", w-8)))
 
+	if modal.Summary != "" {
+		lines = append(lines, whiteBold("  DETAILED DIAGNOSTIC MESSAGE / SUMMARY:"))
+		for _, sl := range strings.Split(modal.Summary, "\n") {
+			slTrim := strings.TrimSpace(sl)
+			if slTrim != "" {
+				lines = append(lines, "    "+cyan(slTrim))
+			}
+		}
+		lines = append(lines, "")
+	}
+
 	if len(modal.Details) > 0 {
 		lines = append(lines, whiteBold("  PROPERTIES & METRICS:"))
 		for _, d := range modal.Details {
@@ -1509,17 +1529,6 @@ func renderDetailModal(m *UIModel) string {
 		lines = append(lines, whiteBold("  BOUND CRITERIA & VERIFICATION:"))
 		for _, c := range modal.Criteria {
 			lines = append(lines, "    "+c)
-		}
-		lines = append(lines, "")
-	}
-
-	if modal.Summary != "" {
-		lines = append(lines, whiteBold("  DETAILED DIAGNOSTIC MESSAGE / SUMMARY:"))
-		for _, sl := range strings.Split(modal.Summary, "\n") {
-			slTrim := strings.TrimSpace(sl)
-			if slTrim != "" {
-				lines = append(lines, "    "+cyan(slTrim))
-			}
 		}
 		lines = append(lines, "")
 	}

@@ -504,10 +504,10 @@ func readCommandMetricsStats(projectRoot string, telem *TSDBTelemetry) {
 		if cmds[i].Invocations != cmds[j].Invocations {
 			return cmds[i].Invocations > cmds[j].Invocations
 		}
-		if cmds[i].LastSeen != cmds[j].LastSeen {
-			return cmds[i].LastSeen > cmds[j].LastSeen
+		if cmds[i].Command != cmds[j].Command {
+			return cmds[i].Command < cmds[j].Command
 		}
-		return cmds[i].Command < cmds[j].Command
+		return cmds[i].LastSeen > cmds[j].LastSeen
 	})
 
 	if len(cmds) > 6 {

@@ -681,7 +681,23 @@ func (m *UIModel) RefreshPM(ctx context.Context, sp storage.ObjectStorageProvide
 			return recent[i].ID > recent[j].ID
 		})
 		m.BacklogSummary = summary
-		m.RecentBacklog = recent
+
+		// Filter recent backlog: keep all active/in_progress/planned/blocked/draft units,
+		// plus up to 5 completed items so operators can smoothly navigate into Technical Debt.
+		var filtered []PMBacklogRow
+		completedCount := 0
+		for _, b := range recent {
+			st := b.Status
+			if st == "complete" || st == "completed" || st == "done" || st == "approved" || st == "closed" {
+				if completedCount < 5 {
+					filtered = append(filtered, b)
+					completedCount++
+				}
+			} else {
+				filtered = append(filtered, b)
+			}
+		}
+		m.RecentBacklog = filtered
 	}
 
 	// 5. Priority Plans
@@ -798,12 +814,37 @@ func (m *UIModel) RefreshMetrics(ctx context.Context, sp storage.ObjectStoragePr
 	if res, err := sp.List(ctx, sec, nil, storage.ListFilter{Kind: objects.KindSchedulerHealthMetric}); err == nil {
 		shRows := make([]SchedulerHealthRow, 0, len(res.Objects))
 		for _, obj := range res.Objects {
+			hb := formatTimeVal(obj["heartbeat_at"])
+			if hb == "--" {
+				hb = formatTimeVal(obj["last_seen"])
+			}
+			if hb == "--" {
+				hb = formatTimeVal(obj["timestamp"])
+			}
+			execs := getIntVal(obj["total_executions"])
+			if execs == 0 {
+				execs = getIntVal(obj["collection_count"])
+			}
+			if execs == 0 {
+				execs = getIntVal(obj["executions"])
+			}
+			fails := getIntVal(obj["failure_count"])
+			if fails == 0 {
+				fails = getIntVal(obj["failures"])
+			}
+			st := fmt.Sprintf("%v", obj[objects.FieldKeyStatus])
+			if st == "<nil>" || st == "" {
+				st = fmt.Sprintf("%v", obj["status"])
+			}
+			if st == "<nil>" || st == "" {
+				st = "healthy"
+			}
 			shRows = append(shRows, SchedulerHealthRow{
 				ID:          fmt.Sprintf("%v", obj[objects.FieldKeyID]),
-				HeartbeatAt: formatTimeVal(obj["heartbeat_at"]),
-				Status:      fmt.Sprintf("%v", obj[objects.FieldKeyStatus]),
-				Executions:  getIntVal(obj["total_executions"]),
-				Failures:    getIntVal(obj["failure_count"]),
+				HeartbeatAt: hb,
+				Status:      st,
+				Executions:  execs,
+				Failures:    fails,
 			})
 		}
 		// Sort newest heartbeat / highest ID first
@@ -860,6 +901,11 @@ func (m *UIModel) RefreshScheduler(ctx context.Context, sp storage.ObjectStorage
 	jobs := make([]SchedulerJobRow, 0, len(res.Objects))
 	for _, obj := range res.Objects {
 		id := fmt.Sprintf("%v", obj["id"])
+		trigType := fmt.Sprintf("%v", obj["trigger_type"])
+		if trigType == "<nil>" || trigType == "" {
+			trigType = "timer"
+		}
+
 		sch := fmt.Sprintf("%v", obj["schedule_expression"])
 		if sch == "" || sch == "<nil>" {
 			sch = fmt.Sprintf("%v", obj["schedule"])
@@ -867,8 +913,19 @@ func (m *UIModel) RefreshScheduler(ctx context.Context, sp storage.ObjectStorage
 		if sch == "" || sch == "<nil>" {
 			sch = fmt.Sprintf("%v", obj["interval"])
 		}
-		if sch == "" || sch == "<nil>" {
-			sch = "--"
+		if sch == "" || sch == "<nil>" || sch == "--" {
+			if trigType == "event" {
+				filter := fmt.Sprintf("%v", obj["event_filter"])
+				if filter != "" && filter != "<nil>" {
+					sch = "⚡ event: " + filter
+				} else {
+					sch = "⚡ on-event"
+				}
+			} else if trigType == "manual" {
+				sch = "⚡ manual"
+			} else {
+				sch = "--"
+			}
 		}
 
 		lastRun := formatTimeVal(obj["last_run_at"])
@@ -897,10 +954,6 @@ func (m *UIModel) RefreshScheduler(ctx context.Context, sp storage.ObjectStorage
 		jType := fmt.Sprintf("%v", obj["job_type"])
 		if jType == "<nil>" {
 			jType = "standard"
-		}
-		trigType := fmt.Sprintf("%v", obj["trigger_type"])
-		if trigType == "<nil>" {
-			trigType = "timer"
 		}
 		execMode := fmt.Sprintf("%v", obj["execution_mode"])
 		if execMode == "<nil>" {
@@ -1117,7 +1170,7 @@ func (m *UIModel) RefreshHealth() {
 			{"Quick Cache Check", "Trigger non-blocking validation scan via scheduler", schedulerpkg.DefaultCachePrewarmJobID},
 			{"Auto-Fix Batch", "Execute batch remediation of auto-fixable issues", "SCH-autofix-run"},
 			{"Workflow What's Next", "Run autonomous priority plan discovery", "SCH-cap-orchestrator"},
-			{"Regression Test Suite", "Run full regression test matrix via scheduler", "SCH-run-pkg-scheduler-0"},
+			{"Regression Test Suite", "Run full regression test matrix via scheduler", "SCH-passive-test-sweeper"},
 			{"Events Aggregation", "Aggregate events and flush journal buffers", schedulerpkg.SchedulerEventsAggregationJobID},
 			{"Maintenance WAL Cycle", "Trigger storage maintenance & WAL retention cycle", schedulerpkg.MaintenanceWALTriggerJobID},
 		}
@@ -1185,8 +1238,8 @@ func (m *UIModel) RefreshHealth() {
 		diagPath := filepath.Join(m.ProjectRoot, paths.ProjectDataDir, paths.SchedulerDir, "diagnostics.jsonl")
 		if data, dErr := os.ReadFile(diagPath); dErr == nil && len(data) > 0 {
 			scanData := data
-			if len(scanData) > 65536 {
-				scanData = scanData[len(scanData)-65536:]
+			if len(scanData) > 262144 {
+				scanData = scanData[len(scanData)-262144:]
 			}
 			lines := strings.Split(string(scanData), "\n")
 			for j := len(lines) - 1; j >= 0; j-- {
@@ -1195,23 +1248,27 @@ func (m *UIModel) RefreshHealth() {
 					continue
 				}
 				var ev struct {
-					Status    string `json:"status"`
-					EventType string `json:"event_type"`
-					JobID     string `json:"job_id"`
+					Status      string `json:"status"`
+					EventType   string `json:"event_type"`
+					JobID       string `json:"job_id"`
+					OperationID string `json:"operation_id"`
 				}
-				if json.Unmarshal([]byte(line), &ev) == nil && ev.JobID == item.JobID {
-					if ev.Status == "completed" || ev.EventType == "scheduler_job_completed" {
-						item.Status = "completed"
-						statusFound = true
-						break
-					} else if ev.Status == "failed" || ev.EventType == "scheduler_job_failed" {
-						item.Status = "failed"
-						statusFound = true
-						break
-					} else if ev.Status == "started" || ev.EventType == "scheduler_job_started" || ev.EventType == "trigger_queue_processing" {
-						item.Status = "processing"
-						statusFound = true
-						break
+				if json.Unmarshal([]byte(line), &ev) == nil {
+					match := ev.JobID == item.JobID || strings.Contains(ev.OperationID, item.JobID) || strings.Contains(line, item.JobID)
+					if match {
+						if ev.Status == "completed" || ev.EventType == "scheduler_job_completed" {
+							item.Status = "completed"
+							statusFound = true
+							break
+						} else if ev.Status == "failed" || ev.EventType == "scheduler_job_failed" {
+							item.Status = "failed"
+							statusFound = true
+							break
+						} else if ev.Status == "started" || ev.EventType == "scheduler_job_started" || ev.EventType == "trigger_queue_processing" {
+							item.Status = "processing"
+							statusFound = true
+							break
+						}
 					}
 				}
 			}
