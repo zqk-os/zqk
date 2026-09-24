@@ -25,3 +25,6 @@ common_flags: false
 subcommands:
   - name: status
     spec_ref: swarm/status_command.yaml
+  - name: run
+    spec_ref: swarm/run_command.yaml
+

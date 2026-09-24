@@ -45,6 +45,21 @@ func TestSuggest_validation(t *testing.T) {
 	}
 }
 
+func TestSuggest_validationPromote(t *testing.T) {
+	err := errors.New("validation failed: goal_refs required")
+	opts := Options{Verbose: false, ExperienceLevel: ExperienceStandard, CommandPath: "zqk object promote"}
+	s := Suggest(err, opts)
+	if s.Hint == emptyValue {
+		t.Fatal("expected hint for promote validation")
+	}
+	if strings.Contains(s.Hint, "--dry-run") || strings.Contains(s.Hint, "--relaxed") {
+		t.Errorf("promote hint must not mention non-existent flags: %q", s.Hint)
+	}
+	if !strings.Contains(s.Hint, "update") {
+		t.Errorf("promote hint should mention update: %q", s.Hint)
+	}
+}
+
 func TestSuggest_permission(t *testing.T) {
 	err := errors.New("permission denied")
 	opts := Options{Verbose: false, ExperienceLevel: ExperienceStandard}

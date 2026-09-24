@@ -797,6 +797,21 @@ func GetOrRecoverPayload(ctx context.Context, sp storage.ObjectStorageProvider, 
 
 	age := time.Since(payload.MaterializedAt)
 	if age > stalenessTolerance {
+		// Inactivity-resilient watermark touch:
+		// If the lifecycle WAL has not received new mutations since payload.MaterializedAt,
+		// the graph is fully synchronized and quiescent. Refresh watermark without triggering
+		// a redundant storage scan across CAS objects.
+		walPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.WalDir, "lifecycle_events.wal")
+		if fi, err := fileutil.Stat(walPath); err == nil && !fi.ModTime().After(payload.MaterializedAt.Add(1*time.Second)) {
+			payload.MaterializedAt = time.Now().UTC()
+			payload.Stale = false
+			payload.Recovering = false
+			payload.DegradedReason = ""
+			view.lastUpdated = payload.MaterializedAt
+			_ = view.SaveToLiteFile()
+			return payload, nil
+		}
+
 		payload.Stale = true
 		payload.Recovering = true
 		payload.DegradedReason = fmt.Sprintf("materialized view watermark exceeds tolerance (%s > %s)", age.Round(time.Second), stalenessTolerance)

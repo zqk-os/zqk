@@ -88,6 +88,34 @@ func TestAcquireExclusiveAutoFixCheckLock_RejectsSecondCheck(t *testing.T) {
 	}
 }
 
+func TestRunCheck_SkipIfLocked_Succeeds(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir()
+	cmd1 := NewCheckCmd()
+	cli.SetContext(cmd1, cli.ContextForProjectRoot(root))
+	if err := cmd1.Flags().Set("auto-fix", "true"); err != nil {
+		t.Fatal(err)
+	}
+	unlock, err := acquireExclusiveAutoFixCheckLock(cmd1)
+	if err != nil {
+		t.Fatalf("first check lock: %v", err)
+	}
+	defer unlock()
+
+	// Second check with --skip-if-locked should cleanly return nil instead of error
+	cmd2 := NewCheckCmd()
+	cli.SetContext(cmd2, cli.ContextForProjectRoot(root))
+	if err := cmd2.Flags().Set("auto-fix", "true"); err != nil {
+		t.Fatal(err)
+	}
+	if err := cmd2.Flags().Set("skip-if-locked", "true"); err != nil {
+		t.Fatal(err)
+	}
+	if err := runCheck(cmd2, nil); err != nil {
+		t.Fatalf("expected runCheck to cleanly exit 0 on lock skip, got: %v", err)
+	}
+}
+
 func TestAutofixChunkCommitLogMessage(t *testing.T) {
 	t.Parallel()
 	tests := []struct {

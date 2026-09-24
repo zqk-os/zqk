@@ -100,6 +100,12 @@ func suggestNotFound(opts Options) string {
 }
 
 func suggestValidation(opts Options) string {
+	if strings.Contains(opts.CommandPath, "promote") {
+		if opts.ExperienceLevel == ExperienceBeginner || opts.Verbose {
+			return paths.RewriteCanonicalCLIInvocations("Check field values against lifecycle preconditions. Update required fields with 'zqk object update' before re-running promote.")
+		}
+		return paths.RewriteCanonicalCLIInvocations("Update required fields with 'zqk object update' then re-run promote.")
+	}
 	if opts.ExperienceLevel == ExperienceBeginner || opts.Verbose {
 		return "Check field names and allowed values. Use --dry-run to validate without applying. For batch or agentic workflows, consider using --relaxed to defer strict reference checks."
 	}

@@ -7,6 +7,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 
 	stdcontext "context"
+	"errors"
 	"fmt"
 	"path/filepath"
 	"sync"
@@ -315,6 +316,16 @@ func runCheck(cmd *cobra.Command, args []string) error {
 	}
 	unlockAutoFix, err := acquireExclusiveAutoFixCheckLock(cmd)
 	if err != nil {
+		skipIfLocked, _ := cmd.Flags().GetBool("skip-if-locked")
+		isSchedulerJob := zqkenv.JobID().Get() != emptyValue
+		if errors.Is(err, ErrAutoFixLockBusy) && (skipIfLocked || isSchedulerJob) {
+			logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+			logging.Fluent(logger).Info("Another auto-fix process is actively running; skipping this execution cycle").
+				String("job_id", zqkenv.JobID().Get()).
+				Log()
+			cmd.Println("Auto-fix lock held by another process; skipping execution cycle.")
+			return nil
+		}
 		return err
 	}
 	if unlockAutoFix != nil {

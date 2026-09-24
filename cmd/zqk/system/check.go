@@ -73,6 +73,7 @@ func NewCheckCmd() *cobra.Command {
 	cmd.Flags().Bool("auto-fix", false, "Automatically fix recoverable issues (missing hashes and hash mismatches)")
 	cmd.Flags().Bool("force", false, "Force fix hash mismatches (requires explicit confirmation, creates audit event)")
 	cmd.Flags().Bool("auto-fix-scheduler", true, "Use scheduler for auto-fix batching (provides status updates and timeout handling, default: true for batches >= 10 issues)")
+	cmd.Flags().Bool("skip-if-locked", false, "Cleanly exit with code 0 if auto-fix lock is held by another process")
 	cmd.Flags().Bool("check-refs", true, "Check reference integrity (enabled by default; --fast disables). Combined with --auto-fix/--force, refs are re-enabled")
 	cmd.Flags().Bool("fast", false, "Partial check: skip reference integrity only. Not an authoritative health verdict. Combined with --auto-fix/--force, --fast is dropped")
 	cmd.Flags().Int("tier", 0, "Filter results to only show objects with issues of the specified tier (1=blocking, 2=warning, 3=informational, 4=recommendation, 0=all)")

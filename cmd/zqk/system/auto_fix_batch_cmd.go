@@ -484,6 +484,9 @@ func tryAcquireAutoFixProcessingLock(projectRoot string) (*storage.FileLock, boo
 	return lock, true, nil
 }
 
+// ErrAutoFixLockBusy indicates another system check --auto-fix or autofix batch process holds the exclusive lock.
+var ErrAutoFixLockBusy = errors.New("another system check --auto-fix (or autofix batch) is already running; wait for it to finish")
+
 // acquireExclusiveAutoFixCheckLock fail-closes overlapping `system check --auto-fix` processes.
 // Three concurrent checks (parent launchd) were observed at 227% CPU / 1000+ OS threads.
 func acquireExclusiveAutoFixCheckLock(cmd *cobra.Command) (unlock func(), err error) {
@@ -505,7 +508,7 @@ func acquireExclusiveAutoFixCheckLock(cmd *cobra.Command) (unlock func(), err er
 		return nil, err
 	}
 	if !acquired {
-		return nil, errfmt.Errorf("another system check --auto-fix (or autofix batch) is already running; wait for it to finish")
+		return nil, ErrAutoFixLockBusy
 	}
 	return func() {
 		_ = lock.Close()

@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
 	"path/filepath"
 	"sync"
 	"sync/atomic"
@@ -121,7 +120,7 @@ func (e *Engine[T]) SaveToLiteFile() error {
 	envelope := e.BuildEnvelope()
 
 	targetPath := e.spec.StoragePath
-	if err := os.MkdirAll(filepath.Dir(targetPath), paths.DirPerm755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(targetPath), paths.DirPerm755); err != nil {
 		return fmt.Errorf("create state dir: %w", err)
 	}
 
@@ -135,8 +134,8 @@ func (e *Engine[T]) SaveToLiteFile() error {
 		return fmt.Errorf("write temp lite file: %w", err)
 	}
 
-	if err := os.Rename(tmpFile, targetPath); err != nil {
-		_ = os.Remove(tmpFile)
+	if err := fileutil.Rename(tmpFile, targetPath); err != nil {
+		_ = fileutil.Remove(tmpFile)
 		return fmt.Errorf("rename lite file: %w", err)
 	}
 
@@ -192,7 +191,7 @@ func (e *Engine[T]) LoadFromLiteFile() (*Envelope[T], error) {
 		_ = json.Unmarshal(rawMat, &matAt)
 	}
 	if matAt.IsZero() {
-		if fi, err := os.Stat(targetPath); err == nil {
+		if fi, err := fileutil.Stat(targetPath); err == nil {
 			matAt = fi.ModTime().UTC()
 		} else {
 			matAt = time.Now().UTC()
@@ -204,6 +203,20 @@ func (e *Engine[T]) LoadFromLiteFile() (*Envelope[T], error) {
 		MaterializedAt: matAt,
 		Payload:        payload,
 	}, nil
+}
+
+// isQuiescentSince returns true if the lifecycle WAL exists and has not had any
+// event appends since matAt (within a 1s clock skew margin).
+func (e *Engine[T]) isQuiescentSince(matAt time.Time) bool {
+	if e.spec.ProjectRoot == "" || matAt.IsZero() {
+		return false
+	}
+	walPath := filepath.Join(e.spec.ProjectRoot, paths.ProjectDataDir, paths.WalDir, "lifecycle_events.wal")
+	fi, err := fileutil.Stat(walPath)
+	if err != nil {
+		return false
+	}
+	return !fi.ModTime().After(matAt.Add(1 * time.Second))
 }
 
 // GetOrRecoverPayload implements the Zero Hot-Path Scan Invariant.
@@ -230,6 +243,20 @@ func (e *Engine[T]) GetOrRecoverPayload(ctx context.Context, sp storage.ObjectSt
 	// Case 2: Watermark staleness exceeded -> Serve last-known-good + non-blocking recovery
 	age := time.Since(envelope.MaterializedAt)
 	if age > e.spec.StalenessTolerance {
+		// Inactivity-resilient watermark touch:
+		// If the lifecycle WAL has not received new mutations since envelope.MaterializedAt,
+		// the graph is fully synchronized and quiescent. Refresh watermark without triggering
+		// a redundant storage scan across CAS objects.
+		if e.isQuiescentSince(envelope.MaterializedAt) {
+			envelope.MaterializedAt = time.Now().UTC()
+			envelope.Stale = false
+			envelope.Recovering = false
+			envelope.DegradedReason = ""
+			e.SetLastUpdated(envelope.MaterializedAt)
+			_ = e.SaveToLiteFile()
+			return envelope, nil
+		}
+
 		envelope.Stale = true
 		envelope.Recovering = true
 		envelope.DegradedReason = fmt.Sprintf("materialized projection watermark exceeds tolerance (%s > %s)", age.Round(time.Second), e.spec.StalenessTolerance)
@@ -318,6 +345,12 @@ func (e *Engine[T]) SubscribeWAL(ctx context.Context, updateCh chan<- struct{}) 
 	}
 
 	var cursor walutil.ReplayCursor
+	heartbeatInterval := e.spec.StalenessTolerance / 2
+	if heartbeatInterval <= 0 {
+		heartbeatInterval = time.Minute
+	}
+	lastHeartbeat := time.Now()
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -345,14 +378,24 @@ func (e *Engine[T]) SubscribeWAL(ctx context.Context, updateCh chan<- struct{}) 
 			cursor = newCursor
 		}
 
+		now := time.Now()
 		if mutated {
+			e.SetLastUpdated(now)
 			_ = e.SaveToLiteFile()
+			lastHeartbeat = now
 			if updateCh != nil {
 				select {
 				case updateCh <- struct{}{}:
 				default:
 				}
 			}
+		} else if now.Sub(lastHeartbeat) >= heartbeatInterval {
+			// Inactivity-resilient watermark touch:
+			// If WAL has been fully replayed and no new mutating events arrived,
+			// touch the lite file watermark to prevent false staleness and redundant CAS scans.
+			e.SetLastUpdated(now)
+			_ = e.SaveToLiteFile()
+			lastHeartbeat = now
 		}
 
 		select {

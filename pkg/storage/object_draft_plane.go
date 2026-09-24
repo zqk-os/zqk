@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"sync"
 
 	"gopkg.in/yaml.v3"
 
@@ -334,6 +335,62 @@ var draftPlaneNextStatusFields = map[string]map[string]any{
 	},
 }
 
+var draftPlaneTemplateCache sync.Map // map[string]map[string]any
+
+// getDraftPlaneTemplateForKind returns a cached in-memory template skeleton for the kind.
+// Pre-computing and caching the specialized fields eliminates repetitive reflection and schema traversals.
+func getDraftPlaneTemplateForKind(kind string) map[string]any {
+	if val, ok := draftPlaneTemplateCache.Load(kind); ok {
+		cached := val.(map[string]any)
+		cp := make(map[string]any, len(cached))
+		for k, v := range cached {
+			cp[k] = v
+		}
+		return cp
+	}
+
+	merged := make(map[string]any)
+	var kf *objects.KindFields
+	if fr := objects.GetGlobalFieldRegistry(); fr != nil {
+		if loaded, ok := fr.GetFieldsForKindIfLoaded(kind); ok && loaded != nil {
+			kf = loaded
+		} else if loaded, err := fr.GetFieldsForKind(kind); err == nil {
+			kf = loaded
+		}
+	}
+	if kf != nil {
+		merged[objects.FieldKeyTitle] = ""
+		merged[objects.FieldKeyDescription] = ""
+		merged[ConstVersionContext] = "default"
+
+		for _, field := range kf.SpecializedFields {
+			if isDraftPlaneMembraneField(field.Name) || field.Name == objects.FieldKeyKind || field.Name == objects.FieldKeyID || field.Name == objects.FieldKeySchemaVersion {
+				continue
+			}
+			placeholder := draftFieldPlaceholder(field)
+			if placeholder != nil {
+				merged[field.Name] = placeholder
+			}
+		}
+	}
+
+	if nextFields, ok := draftPlaneNextStatusFields[kind]; ok {
+		for k, v := range nextFields {
+			merged[k] = v
+		}
+	}
+
+	if kf != nil {
+		toStore := make(map[string]any, len(merged))
+		for k, v := range merged {
+			toStore[k] = v
+		}
+		draftPlaneTemplateCache.Store(kind, toStore)
+	}
+
+	return merged
+}
+
 // isDraftPlaneMembraneField identifies fields that belong strictly to CAS origination/provenance
 // and must NOT be written to preliminary drafts on the draft plane.
 func isDraftPlaneMembraneField(fieldName string) bool {
@@ -383,39 +440,7 @@ func (f *FileObjectStorage) mergeDraftPlaneTemplate(kind, id string, data []byte
 		return data
 	}
 
-	merged := make(map[string]any)
-
-	// 1. Seed full template of possibles from specialized fields for this kind
-	var kf *objects.KindFields
-	if fr := objects.GetGlobalFieldRegistry(); fr != nil {
-		if loaded, ok := fr.GetFieldsForKindIfLoaded(kind); ok && loaded != nil {
-			kf = loaded
-		} else if loaded, err := fr.GetFieldsForKind(kind); err == nil {
-			kf = loaded
-		}
-	}
-	if kf != nil {
-		merged[objects.FieldKeyTitle] = ""
-		merged[objects.FieldKeyDescription] = ""
-		merged[ConstVersionContext] = "default"
-
-		for _, field := range kf.SpecializedFields {
-			if isDraftPlaneMembraneField(field.Name) || field.Name == objects.FieldKeyKind || field.Name == objects.FieldKeyID || field.Name == objects.FieldKeySchemaVersion {
-				continue
-			}
-			placeholder := draftFieldPlaceholder(field)
-			if placeholder != nil {
-				merged[field.Name] = placeholder
-			}
-		}
-	}
-
-	// 2. Seed with known next-status required slots for this kind
-	if nextFields, ok := draftPlaneNextStatusFields[kind]; ok {
-		for k, v := range nextFields {
-			merged[k] = v
-		}
-	}
+	merged := getDraftPlaneTemplateForKind(kind)
 
 	// 3. Seed canonical lifecycle origin status if not already populated
 	if originStatus, err := f.GetLifecycleLoader().GetOriginStatus(kind); err == nil && originStatus != "" {

@@ -1,0 +1,23 @@
+$schema: ../../schemas/command_spec.schema.json
+name: run
+short: Run a portable agent swarm package
+description: Load, validate, and execute an autonomous swarm defined by a portable swarm manifest (swarm.yaml).
+args:
+    type: exact
+    count: 1
+flags:
+    - name: dry-run
+      type: bool
+      default: "false"
+      description: Validate swarm manifest and print execution topology without launching agents
+    - name: entrypoint
+      type: string
+      description: Override default entrypoint task specified in swarm package
+help:
+    examples:
+        - comment: Run local swarm manifest
+          command: zqk agent swarm run ./swarm.yaml
+        - comment: Validate swarm package in dry-run mode
+          command: zqk agent swarm run ./my-swarm/ --dry-run
+run_e: runSwarmPackage
+common_flags: true

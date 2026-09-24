@@ -1,0 +1,28 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "validate [pack_dir]"
+short: "Validate swarm package schema, SemVer, Merkle digest, and cryptographic signature"
+description: |
+  Validates swarm package manifest schema conformity, version semantics, and verifies Ed25519 signature integrity.
+
+args:
+  type: "maximum"
+  max: 1
+
+flags:
+  - name: "key"
+    type: "string"
+    default: ""
+    description: "Path to Ed25519 public key for signature verification (optional)"
+
+help:
+  examples:
+    - comment: "Validate package in current directory"
+      command: "%s pack validate"
+    - comment: "Validate package with public key"
+      command: "%s pack validate ./my-pack --key ./pubkey.hex"
+
+common_flags: false
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false

@@ -58,6 +58,7 @@
 ./cli_specs/agent/seat_worker_command.yaml
 ./cli_specs/agent/status_command.yaml
 ./cli_specs/agent/swarm/
+./cli_specs/agent/swarm/run_command.yaml
 ./cli_specs/agent/swarm/status_command.yaml
 ./cli_specs/agent/swarm_command.yaml
 ./cli_specs/agent/swarm_init_command.yaml
@@ -103,6 +104,7 @@
 ./cli_specs/graph/export_command.yaml
 ./cli_specs/grep_command.yaml
 ./cli_specs/init_command.yaml
+./cli_specs/inspect_command.yaml
 ./cli_specs/job/
 ./cli_specs/job/activity_command.yaml
 ./cli_specs/job/clear_issues_command.yaml
@@ -149,6 +151,11 @@
 ./cli_specs/ops/
 ./cli_specs/ops/level_up_command.yaml
 ./cli_specs/ops_command.yaml
+./cli_specs/pack/
+./cli_specs/pack/init_command.yaml
+./cli_specs/pack/seal_command.yaml
+./cli_specs/pack/validate_command.yaml
+./cli_specs/pack_command.yaml
 ./cli_specs/quickstart_command.yaml
 ./cli_specs/run_command.yaml
 ./cli_specs/scheduler/
