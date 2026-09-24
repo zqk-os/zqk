@@ -1071,6 +1071,31 @@ func (m *UIModel) RefreshQA(ctx context.Context, sp storage.ObjectStorageProvide
 	m.RecentQAEvents = payload.RecentEvents
 }
 
+// TriggerQARescan forces a full re-scan of the QA test matrix and criteria from storage into the Lite file and UIModel.
+func (m *UIModel) TriggerQARescan() {
+	if m.ProjectRoot == "" {
+		m.DynamicMessage = "🧪 QA re-scan skipped (no project root configured)"
+		return
+	}
+	ctx := context.Background()
+	sp := m.Storage
+	sec := m.SecCtx
+	if (sp == nil || sec == nil) && m.ProjectRoot != "" {
+		if factory, fErr := storage.NewStorageFactory(ctx, m.ProjectRoot); fErr == nil {
+			sp = factory.GetStorage()
+			sec = pkgctx.NewSystemSecurityContext()
+		}
+	}
+	dState := test.NewDashboardStateWithProjectRoot(m.ProjectRoot)
+	if sp != nil {
+		if err := dState.ScanFromStorage(ctx, sp); err == nil && len(dState.TestCases) > 0 {
+			_ = dState.SaveToLiteFile(m.ProjectRoot)
+		}
+	}
+	m.RefreshQA(ctx, sp, sec)
+	m.DynamicMessage = fmt.Sprintf("🧪 QA test matrix rescanned (%d test suites, %d criteria)", m.QASummary.TotalTestCases, m.QASummary.TotalCriteria)
+}
+
 // RefreshHealth loads the zero-cost validation cache snapshot, tray shortcuts, and resource hygiene.
 func (m *UIModel) RefreshHealth() {
 	if m.ProjectRoot == "" {
