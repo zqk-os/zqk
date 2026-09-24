@@ -19,6 +19,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/git"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -340,9 +341,8 @@ func inspectGitStatusForPaths(projectRoot string, filePaths []string) map[string
 		pathToClean[rel] = clean
 	}
 
-	cmdLs := execwrap.Command("git", append([]string{"ls-files", "--"}, relPaths...)...)
-	cmdLs.Dir = projectRoot
-	outLs, err := cmdLs.Output()
+	g := git.NewFacade(projectRoot)
+	outLs, err := g.LSFiles(append([]string{"--"}, relPaths...)...)
 	if err != nil {
 		return states
 	}
@@ -354,9 +354,7 @@ func inspectGitStatusForPaths(projectRoot string, filePaths []string) map[string
 		}
 	}
 
-	cmdSt := execwrap.Command("git", append([]string{"status", "--porcelain", "-uall", "--"}, relPaths...)...)
-	cmdSt.Dir = projectRoot
-	outSt, _ := cmdSt.Output()
+	outSt, _ := g.StatusPorcelain(append([]string{"-uall", "--"}, relPaths...)...)
 	statusMap := make(map[string]string)
 	for _, line := range strings.Split(string(outSt), "\n") {
 		if len(line) >= 4 {

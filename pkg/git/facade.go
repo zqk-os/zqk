@@ -56,12 +56,47 @@ func (f *Facade) StatusShort() ([]byte, error) {
 	return f.output("status", "--short")
 }
 
+// LSFiles returns the output of git ls-files with optional arguments.
+func (f *Facade) LSFiles(args ...string) ([]byte, error) {
+	cmdArgs := append([]string{"ls-files"}, args...)
+	return f.output(cmdArgs...)
+}
+
+// StatusPorcelain returns the machine-readable git status output.
+func (f *Facade) StatusPorcelain(args ...string) ([]byte, error) {
+	cmdArgs := append([]string{"status", "--porcelain"}, args...)
+	return f.output(cmdArgs...)
+}
+
+// StatusIgnoredPorcelain returns the machine-readable git status output including ignored files.
+func (f *Facade) StatusIgnoredPorcelain() ([]byte, error) {
+	return f.output("status", "--ignored", "--porcelain")
+}
+
 func (f *Facade) AddAll() ([]byte, error) {
 	return f.combinedOutput("add", "-A")
 }
 
 func (f *Facade) DiffCachedStat() ([]byte, error) {
 	return f.output("diff", "--cached", "--stat")
+}
+
+// Diff executes git diff with the given arguments.
+func (f *Facade) Diff(args ...string) ([]byte, error) {
+	cmdArgs := append([]string{"diff"}, args...)
+	return f.output(cmdArgs...)
+}
+
+// Show executes git show with the given arguments.
+func (f *Facade) Show(args ...string) ([]byte, error) {
+	cmdArgs := append([]string{"show"}, args...)
+	return f.output(cmdArgs...)
+}
+
+// Grep executes git grep with the given arguments.
+func (f *Facade) Grep(args ...string) ([]byte, error) {
+	cmdArgs := append([]string{"grep"}, args...)
+	return f.output(cmdArgs...)
 }
 
 func (f *Facade) Commit(message string) ([]byte, error) {

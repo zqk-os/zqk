@@ -188,8 +188,8 @@ func predGitDiffOrWaiver(pred string, chunk Chunk, opt EvalOptions) PredicateRes
 	if opt.ProjectRoot == "" {
 		return PredicateResult{Predicate: pred, OK: false, Detail: "project root unknown"}
 	}
-	cmd := execwrap.Command("git", "-C", opt.ProjectRoot, "status", "--porcelain")
-	out, err := cmd.Output()
+	g := git.NewFacade(opt.ProjectRoot)
+	out, err := g.StatusPorcelain()
 	if err != nil {
 		return PredicateResult{Predicate: pred, OK: false, Detail: "git status failed: " + err.Error()}
 	}

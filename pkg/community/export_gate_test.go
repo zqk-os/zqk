@@ -1,6 +1,7 @@
 package community
 
 import (
+	"os/exec"
 	"path/filepath"
 	"testing"
 
@@ -73,6 +74,44 @@ func TestRunExportGate_DetectsProhibitedExtension(t *testing.T) {
 	}
 	if len(res.Violations) != 1 || res.Violations[0].Rule != "POL-OPENCORE-PROHIBITED-EXTENSION" {
 		t.Fatalf("unexpected violations: %+v", res.Violations)
+	}
+}
+
+func TestRunExportGate_IgnoresGitIgnoredDirectories(t *testing.T) {
+	// CRIT-1790218415870919000-6785ceb2: Untracked gitignored paths do not trip prohibited patterns
+	tmp := t.TempDir()
+
+	// Initialize git repo in tmp
+	cmd := exec.Command("git", "init", tmp)
+	if err := cmd.Run(); err != nil {
+		t.Fatalf("git init failed: %v", err)
+	}
+
+	// Create .gitignore ignoring .cursor/
+	if err := fileutil.WriteFile(filepath.Join(tmp, ".gitignore"), []byte(".cursor/\n"), paths.FilePerm644); err != nil {
+		t.Fatalf("failed to write .gitignore: %v", err)
+	}
+
+	// Create ignored .cursor directory with a file
+	cursorDir := filepath.Join(tmp, ".cursor")
+	if err := fileutil.MkdirAll(cursorDir, paths.DirPerm755); err != nil {
+		t.Fatalf("failed to mkdir .cursor: %v", err)
+	}
+	if err := fileutil.WriteFile(filepath.Join(cursorDir, "rules.json"), []byte("{}"), paths.FilePerm644); err != nil {
+		t.Fatalf("failed to write .cursor/rules.json: %v", err)
+	}
+
+	// Also write a tracked normal file
+	if err := fileutil.WriteFile(filepath.Join(tmp, "main.go"), []byte("package main"), paths.FilePerm644); err != nil {
+		t.Fatalf("failed to write main.go: %v", err)
+	}
+
+	res, err := RunExportGate(tmp, nil)
+	if err != nil {
+		t.Fatalf("unexpected export gate error: %v", err)
+	}
+	if !res.Passed {
+		t.Fatalf("expected export gate to pass for gitignored .cursor, got violations: %+v", res.Violations)
 	}
 }
 

@@ -1,11 +1,13 @@
 package community
 
 import (
+	"bytes"
 	"fmt"
 	"io/fs"
 	"path/filepath"
 	"strings"
 
+	"github.com/zqk-os/zqk/pkg/git"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -43,6 +45,27 @@ var DefaultProhibitedExtensions = []string{
 	".csnap.bak",
 }
 
+func getGitIgnoredPaths(targetDir string) map[string]bool {
+	ignored := make(map[string]bool)
+	g := git.NewFacade(targetDir)
+	out, err := g.StatusIgnoredPorcelain()
+	if err != nil {
+		return ignored
+	}
+	lines := bytes.Split(out, []byte("\n"))
+	for _, line := range lines {
+		if bytes.HasPrefix(line, []byte("!! ")) {
+			p := strings.TrimSpace(string(line[3:]))
+			p = strings.TrimSuffix(p, "/")
+			p = filepath.ToSlash(p)
+			if p != "" {
+				ignored[p] = true
+			}
+		}
+	}
+	return ignored
+}
+
 // RunExportGate audits targetDir recursively against open-core distribution policies.
 func RunExportGate(targetDir string, extraProhibited []string) (*ExportGateResult, error) {
 	if targetDir == "" {
@@ -65,6 +88,8 @@ func RunExportGate(targetDir string, extraProhibited []string) (*ExportGateResul
 	prohibited := append([]string{}, DefaultProhibitedPatterns...)
 	prohibited = append(prohibited, extraProhibited...)
 
+	ignoredPaths := getGitIgnoredPaths(absDir)
+
 	result := &ExportGateResult{
 		TargetDirectory: absDir,
 		Violations:      make([]Violation, 0),
@@ -85,13 +110,31 @@ func RunExportGate(targetDir string, extraProhibited []string) (*ExportGateResul
 			return nil
 		}
 
+		normRel := filepath.ToSlash(rel)
+
+		// Skip gitignored paths (e.g. untracked local .cursor or scratch dirs)
+		if ignoredPaths[normRel] {
+			if d.IsDir() {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		// Also check if any parent directory is in ignoredPaths
+		for ign := range ignoredPaths {
+			if strings.HasPrefix(normRel, ign+"/") {
+				if d.IsDir() {
+					return filepath.SkipDir
+				}
+				return nil
+			}
+		}
+
 		// Skip standard git metadata
 		if d.IsDir() && (d.Name() == ".git" || d.Name() == "node_modules" || d.Name() == "vendor") {
 			return filepath.SkipDir
 		}
 
 		// Check prohibited path patterns
-		normRel := filepath.ToSlash(rel)
 		for _, pat := range prohibited {
 			if strings.Contains(normRel, pat) {
 				result.Violations = append(result.Violations, Violation{
