@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 // Copyright 2026 ZQK Authors. All rights reserved.
 // Use of this source code is governed by an Apache-2.0 license.
 
@@ -7,6 +8,8 @@ import (
 	"bufio"
 	"bytes"
 	"io"
+	"os"
+	"strings"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/bufferpool"
@@ -59,3 +62,24 @@ func TestStreamRead(t *testing.T) {
 		t.Errorf("expected 2 lines, got %d", len(lines))
 	}
 }
+
+func TestLicenseHeaders(t *testing.T) {
+	files := []string{"pool.go", "pool_test.go"}
+	const expectedSPDX = "// SPDX-License-Identifier: Apache-2.0"
+	const expectedCopyright = "// Copyright 2026 ZQK Authors. All rights reserved."
+
+	for _, fname := range files {
+		data, err := os.ReadFile(fname)
+		if err != nil {
+			t.Fatalf("failed to read %s: %v", fname, err)
+		}
+		content := string(data)
+		if !strings.Contains(content, expectedSPDX) {
+			t.Errorf("%s missing SPDX-License-Identifier header", fname)
+		}
+		if !strings.Contains(content, expectedCopyright) {
+			t.Errorf("%s missing Copyright header", fname)
+		}
+	}
+}
+

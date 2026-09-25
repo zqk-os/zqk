@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 // Copyright 2026 ZQK Authors. All rights reserved.
 // Use of this source code is governed by an Apache-2.0 license.
 

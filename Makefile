@@ -4,7 +4,7 @@
 # Binary basename comes from brand.executable_name in
 # config/zqk-local.yaml (wins) then config/zqk.yaml (default zqk).
 
-.PHONY: help all bootstrap-archive compile-bin zqk clean test test-unit test-unit-all test-race test-integration test-coverage test-coverage-html lint vet verify gate-release zqk-vet
+.PHONY: help all bootstrap-archive compile-bin zqk clean test test-unit test-unit-all test-race test-integration test-integration-go test-coverage test-coverage-html lint vet verify gate-release zqk-vet
 
 .DEFAULT_GOAL := all
 
@@ -55,7 +55,8 @@ help:
 	@echo "  make test             Run both unit and integration tests"
 	@echo "  make test-unit        Run partitioned unit tests (pkg/... & cmd/...)"
 	@echo "  make test-unit-all    Run full non-short unit tests"
-	@echo "  make test-integration Run integration tests using built binary (release gates & CLI suites)"
+	@echo "  make test-integration Run full integration suite (Go integration tests + release gates)"
+	@echo "  make test-integration-go Run build-tagged Go integration tests (-tags integration)"
 	@echo "  make test-coverage    Run unit tests with coverage profile and print summary table"
 	@echo "  make test-coverage-html Generate HTML visual test coverage report (coverage.html)"
 	@echo ""
@@ -105,7 +106,11 @@ test-unit-all:
 test-race:
 	go test -race -short -timeout 5m ./pkg/goroutinelabels/... ./pkg/concurrency/... ./pkg/bufferpool/...
 
-test-integration: all
+test-integration-go:
+	go test -tags integration -timeout 10m ./pkg/storage -run TestAdversarialConcurrency
+	go test -tags integration -timeout 10m ./pkg/testdiscovery
+
+test-integration: all test-integration-go
 	$(BRAND_ENV_PREFIX)_SHARED_TEST_BIN="$$(pwd)/$(BIN)" sh scripts/open-core/test-public-release-gates.sh
 
 test-coverage:
