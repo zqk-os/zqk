@@ -56,33 +56,30 @@ func FindingToRemediationBLI(finding metabolism.Finding, milestoneID string) (*R
 
 	// 2. Synthesize Three-Fold Criteria
 	critInv := map[string]any{
-		objects.FieldKeyID:          critInvID,
-		objects.FieldKeyKind:        "criteria",
-		objects.FieldKeyTitle:       fmt.Sprintf("State Invariant for %s", finding.ID),
-		"formula_type":              "invariant",
-		"statement":                 fmt.Sprintf("Static schema invariants and configuration adhere to %s requirements without regression.", finding.Lens),
-		objects.FieldKeyRequirementRefs: []string{reqID},
-		objects.FieldKeyStatus:      objects.ObjectStatusActive,
+		objects.FieldKeyID:     critInvID,
+		objects.FieldKeyKind:   "criteria",
+		objects.FieldKeyTitle:  fmt.Sprintf("State Invariant for %s", finding.ID),
+		"formula_type":         "invariant",
+		"statement":            fmt.Sprintf("Static schema invariants and configuration adhere to %s requirements without regression.", finding.Lens),
+		objects.FieldKeyStatus: objects.ObjectStatusActive,
 	}
 
 	critDyn := map[string]any{
-		objects.FieldKeyID:          critDynID,
-		objects.FieldKeyKind:        "criteria",
-		objects.FieldKeyTitle:       fmt.Sprintf("Dynamic Fix Verification for %s", finding.ID),
-		"formula_type":              "dynamic",
-		"statement":                 fmt.Sprintf("Remediated code compiles and executes dynamic tests proving resolution of %s.", finding.Title),
-		objects.FieldKeyRequirementRefs: []string{reqID},
-		objects.FieldKeyStatus:      objects.ObjectStatusActive,
+		objects.FieldKeyID:     critDynID,
+		objects.FieldKeyKind:   "criteria",
+		objects.FieldKeyTitle:  fmt.Sprintf("Dynamic Fix Verification for %s", finding.ID),
+		"formula_type":         "dynamic",
+		"statement":            fmt.Sprintf("Remediated code compiles and executes dynamic tests proving resolution of %s.", finding.Title),
+		objects.FieldKeyStatus: objects.ObjectStatusActive,
 	}
 
 	critAdv := map[string]any{
-		objects.FieldKeyID:          critAdvID,
-		objects.FieldKeyKind:        "criteria",
-		objects.FieldKeyTitle:       fmt.Sprintf("Adversarial Regression Guard for %s", finding.ID),
-		"formula_type":              "adversarial",
-		"statement":                 fmt.Sprintf("Adversarial inputs reproducing defect %s fail closed and prevent regression.", finding.ID),
-		objects.FieldKeyRequirementRefs: []string{reqID},
-		objects.FieldKeyStatus:      objects.ObjectStatusActive,
+		objects.FieldKeyID:     critAdvID,
+		objects.FieldKeyKind:   "criteria",
+		objects.FieldKeyTitle:  fmt.Sprintf("Adversarial Regression Guard for %s", finding.ID),
+		"formula_type":         "adversarial",
+		"statement":            fmt.Sprintf("Adversarial inputs reproducing defect %s fail closed and prevent regression.", finding.ID),
+		objects.FieldKeyStatus: objects.ObjectStatusActive,
 	}
 
 	criteriaList := []map[string]any{critInv, critDyn, critAdv}

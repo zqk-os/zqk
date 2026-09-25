@@ -97,13 +97,16 @@ func TestCEFConvergence_EndToEnd(t *testing.T) {
 	// Verify all synthesized requirements pass the Anti-Superficiality Quality Gate
 	for _, req := range reqList {
 		reqID, _ := req[objects.FieldKeyID].(string)
+		critRefs, _ := req[objects.FieldKeyCriteriaRefs].([]string)
+		critSet := make(map[string]bool)
+		for _, ref := range critRefs {
+			critSet[ref] = true
+		}
 		var linked []map[string]any
 		for _, c := range critList {
-			rRefs, _ := c[objects.FieldKeyRequirementRefs].([]string)
-			for _, r := range rRefs {
-				if r == reqID {
-					linked = append(linked, c)
-				}
+			cID, _ := c[objects.FieldKeyID].(string)
+			if critSet[cID] {
+				linked = append(linked, c)
 			}
 		}
 		if err := workflow.CheckShovelReadyQuality(req, linked); err != nil {

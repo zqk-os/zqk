@@ -217,39 +217,36 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 
 		// Criteria 1: Invariant
 		critInv := map[string]any{
-			objects.FieldKeyID:              critInvID,
-			objects.FieldKeyKind:            "criteria",
-			objects.FieldKeyTitle:           fmt.Sprintf("State Invariant for %s", task.ID),
-			objects.FieldKeyDescription:     fmt.Sprintf("Specification schema and output structure are strictly valid for %s", task.ID),
-			"formula_type":                  "invariant",
-			"statement":                     fmt.Sprintf("Specification schema and output structure are strictly valid for %s", task.ID),
-			objects.FieldKeyCategory:        "acceptance",
-			objects.FieldKeyRequirementRefs: []string{reqID},
-			objects.FieldKeyStatus:          objects.ObjectStatusAwaitingVerification,
+			objects.FieldKeyID:          critInvID,
+			objects.FieldKeyKind:        "criteria",
+			objects.FieldKeyTitle:       fmt.Sprintf("State Invariant for %s", task.ID),
+			objects.FieldKeyDescription: fmt.Sprintf("Specification schema and output structure are strictly valid for %s", task.ID),
+			"formula_type":              "invariant",
+			"statement":                 fmt.Sprintf("Specification schema and output structure are strictly valid for %s", task.ID),
+			objects.FieldKeyCategory:    "acceptance",
+			objects.FieldKeyStatus:      objects.ObjectStatusAwaitingVerification,
 		}
 		// Criteria 2: Dynamic
 		critDyn := map[string]any{
-			objects.FieldKeyID:              critDynID,
-			objects.FieldKeyKind:            "criteria",
-			objects.FieldKeyTitle:           fmt.Sprintf("Dynamic Execution for %s", task.ID),
-			objects.FieldKeyDescription:     fmt.Sprintf("Agent task executes successfully and generates verifiable observations for %s", task.ID),
-			"formula_type":                  "dynamic",
-			"statement":                     fmt.Sprintf("Agent task executes successfully and generates verifiable observations for %s", task.ID),
-			objects.FieldKeyCategory:        "acceptance",
-			objects.FieldKeyRequirementRefs: []string{reqID},
-			objects.FieldKeyStatus:          objects.ObjectStatusAwaitingVerification,
+			objects.FieldKeyID:          critDynID,
+			objects.FieldKeyKind:        "criteria",
+			objects.FieldKeyTitle:       fmt.Sprintf("Dynamic Execution for %s", task.ID),
+			objects.FieldKeyDescription: fmt.Sprintf("Agent task executes successfully and generates verifiable observations for %s", task.ID),
+			"formula_type":              "dynamic",
+			"statement":                 fmt.Sprintf("Agent task executes successfully and generates verifiable observations for %s", task.ID),
+			objects.FieldKeyCategory:    "acceptance",
+			objects.FieldKeyStatus:      objects.ObjectStatusAwaitingVerification,
 		}
 		// Criteria 3: Adversarial
 		critAdv := map[string]any{
-			objects.FieldKeyID:              critAdvID,
-			objects.FieldKeyKind:            "criteria",
-			objects.FieldKeyTitle:           fmt.Sprintf("Adversarial Boundary for %s", task.ID),
-			objects.FieldKeyDescription:     fmt.Sprintf("Non-conforming outputs or membrane transgressions fail closed for %s", task.ID),
-			"formula_type":                  "adversarial",
-			"statement":                     fmt.Sprintf("Non-conforming outputs or membrane transgressions fail closed for %s", task.ID),
-			objects.FieldKeyCategory:        "acceptance",
-			objects.FieldKeyRequirementRefs: []string{reqID},
-			objects.FieldKeyStatus:          objects.ObjectStatusAwaitingVerification,
+			objects.FieldKeyID:          critAdvID,
+			objects.FieldKeyKind:        "criteria",
+			objects.FieldKeyTitle:       fmt.Sprintf("Adversarial Boundary for %s", task.ID),
+			objects.FieldKeyDescription: fmt.Sprintf("Non-conforming outputs or membrane transgressions fail closed for %s", task.ID),
+			"formula_type":              "adversarial",
+			"statement":                 fmt.Sprintf("Non-conforming outputs or membrane transgressions fail closed for %s", task.ID),
+			objects.FieldKeyCategory:    "acceptance",
+			objects.FieldKeyStatus:      objects.ObjectStatusAwaitingVerification,
 		}
 		kernelObjects = append(kernelObjects, critInv, critDyn, critAdv)
 
@@ -377,11 +374,6 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 
 	// Team configuration and persona dispatch wiring (supports ad-hoc personas or reusable team configurations)
 	var personaRefs []string
-	for _, a := range manifest.Agents {
-		if a.Name != "" {
-			personaRefs = append(personaRefs, a.Name)
-		}
-	}
 
 	tcfgID := ""
 	if manifest.TeamConfiguration != nil {
@@ -396,7 +388,9 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 				"role":        alloc.Role,
 				"count":       alloc.Count,
 			})
-			personaRefs = append(personaRefs, alloc.PersonaRef)
+			if alloc.PersonaRef != "" {
+				personaRefs = append(personaRefs, alloc.PersonaRef)
+			}
 		}
 		tcfgObj := map[string]any{
 			objects.FieldKeyID:                 tcfgID,
@@ -425,6 +419,7 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 				"role":        a.Role,
 				"count":       1,
 			})
+			personaRefs = append(personaRefs, pRef)
 			personaObj := map[string]any{
 				objects.FieldKeyID:                pRef,
 				objects.FieldKeyKind:              objects.KindPersona,
@@ -450,8 +445,15 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 		priObj[objects.FieldKeyTeamConfigurationRef] = tcfgID
 	}
 
-	// Ensure persona_refs contains configured persona refs, falling back to defaults if empty
-	validPersonaRefs := personaRefs
+	// Ensure persona_refs contains unique configured persona refs, falling back to defaults if empty
+	var validPersonaRefs []string
+	seenPersonas := make(map[string]bool)
+	for _, p := range personaRefs {
+		if p != "" && !seenPersonas[p] {
+			seenPersonas[p] = true
+			validPersonaRefs = append(validPersonaRefs, p)
+		}
+	}
 	if len(validPersonaRefs) == 0 {
 		validPersonaRefs = []string{objects.ConstPersonaDefaultAgent, objects.ConstPersonaDefaultOperator}
 	}

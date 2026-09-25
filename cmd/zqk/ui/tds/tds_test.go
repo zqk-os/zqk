@@ -125,3 +125,20 @@ func TestComponents(t *testing.T) {
 	spark := Sparkline([]float64{10, 20, 30, 40}, 4)
 	assert.Equal(t, 6, VisibleWidth(spark)) // "[ ▄▆█]" is 6 cells
 }
+
+func TestTable_SanitizesEmbeddedNewlines(t *testing.T) {
+	tbl := NewTable(80).
+		AddColumn("ID", AlignLeft, 10, 0.20).
+		AddColumn("TITLE", AlignLeft, 60, 0.80)
+
+	tbl.AddRow("TC-01", "Line 1\nLine 2\r\nLine 3")
+	rendered := tbl.Render()
+	lines := strings.Split(strings.TrimRight(rendered, "\n"), "\n")
+
+	// 1 header divider + 1 header row + 1 header-data divider + 1 data row + 1 bottom divider = 5 lines total
+	assert.Equal(t, 5, len(lines), "Embedded newlines in cell must not create additional table rows")
+	for i, l := range lines {
+		assert.Equal(t, 80, VisibleWidth(l), "Line %d width mismatch after newline sanitization", i)
+	}
+}
+

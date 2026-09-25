@@ -1434,13 +1434,20 @@ func renderQATab(b *strings.Builder, m *UIModel) {
 
 	b.WriteString(tds.SectionDivider("TEST SUITES & DOWNWARD TRACEABILITY (Press Enter to inspect, [t] to re-scan)", w))
 	tcTable := tds.NewTable(w).
-		AddColumn("TEST CASE ID", tds.AlignLeft, 14, 0.18).
-		AddColumn("STATUS", tds.AlignCenter, 10, 0.12).
-		AddColumn("LINEAGE", tds.AlignCenter, 10, 0.12).
-		AddColumn("CRITERIA", tds.AlignCenter, 12, 0.14).
-		AddColumn("TITLE", tds.AlignLeft, 26, 0.44)
+		AddColumn("TEST CASE ID", tds.AlignLeft, 32, 0.32).
+		AddColumn("STATUS", tds.AlignCenter, 10, 0.10).
+		AddColumn("LINEAGE", tds.AlignCenter, 10, 0.10).
+		AddColumn("CRITERIA", tds.AlignCenter, 10, 0.10).
+		AddColumn("TITLE", tds.AlignLeft, 24, 0.38)
 
-	availRows := m.Height - 21 + m.ProfileSpacingBonus()
+	overhead := 18
+	if len(m.UnboundCriteria) > 0 {
+		overhead += 4
+	}
+	if len(m.RecentQAEvents) > 0 {
+		overhead += 4
+	}
+	availRows := m.Height - overhead + m.ProfileSpacingBonus()
 	if availRows < 3 {
 		availRows = 3
 	}
@@ -1494,7 +1501,6 @@ func renderQATab(b *strings.Builder, m *UIModel) {
 	}
 
 	b.WriteString(tcTable.Render())
-	b.WriteString("\n")
 
 	// 3. Unbound Test Criteria notice if any exist
 	if len(m.UnboundCriteria) > 0 {

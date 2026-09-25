@@ -124,6 +124,9 @@ func NewDashboardStateWithProjectRoot(projectRoot string) *DashboardState {
 	state := NewDashboardState()
 	state.projectRoot = projectRoot
 	state.EnsureEngine(projectRoot)
+	if projectRoot != "" {
+		_, _ = state.LoadFromLiteFile(projectRoot)
+	}
 	return state
 }
 
@@ -134,6 +137,17 @@ func (s *DashboardState) StartBackgroundWALSubscriber(ctx context.Context, updat
 	s.mu.Unlock()
 	if projectRoot != "" {
 		s.EnsureEngine(projectRoot)
+		s.mu.RLock()
+		empty := len(s.TestCases) == 0
+		s.mu.RUnlock()
+		if empty {
+			loaded, _ := s.LoadFromLiteFile(projectRoot)
+			if !loaded {
+				if factory, err := storage.NewStorageFactory(ctx, projectRoot); err == nil && factory != nil {
+					_ = s.ScanFromStorage(ctx, factory.GetStorage())
+				}
+			}
+		}
 	}
 	s.mu.Lock()
 	eng := s.engine
@@ -247,6 +261,17 @@ func (s *DashboardState) applyPayloadLocked(payload *DashboardLitePayload) {
 	if s.TestCaseOrder == nil {
 		s.TestCaseOrder = make([]string, 0)
 	}
+	// Guarantee every test case in s.TestCases is in s.TestCaseOrder
+	orderSet := make(map[string]bool, len(s.TestCaseOrder))
+	for _, id := range s.TestCaseOrder {
+		orderSet[id] = true
+	}
+	for id := range s.TestCases {
+		if !orderSet[id] {
+			s.TestCaseOrder = append(s.TestCaseOrder, id)
+			orderSet[id] = true
+		}
+	}
 	s.UnboundTestCriteria = payload.UnboundTestCriteria
 	if s.UnboundTestCriteria == nil {
 		s.UnboundTestCriteria = make([]*UnboundCriterionModel, 0)
@@ -305,6 +330,18 @@ func (s *DashboardState) LoadFromLiteFile(projectRoot string) (bool, error) {
 }
 
 func (s *DashboardState) buildPayloadLocked() *DashboardLitePayload {
+	// Guarantee all test cases in s.TestCases are in s.TestCaseOrder
+	orderSet := make(map[string]bool, len(s.TestCaseOrder))
+	for _, id := range s.TestCaseOrder {
+		orderSet[id] = true
+	}
+	for id := range s.TestCases {
+		if !orderSet[id] {
+			s.TestCaseOrder = append(s.TestCaseOrder, id)
+			orderSet[id] = true
+		}
+	}
+
 	payload := &DashboardLitePayload{
 		SchemaVersion:       "1.0.0",
 		MaterializedAt:      s.LastUpdated,
@@ -993,6 +1030,13 @@ func (s *DashboardState) handleLifecycleEventLocked(ev *lifecycle.LifecycleEvent
 		} else if strings.EqualFold(ev.Kind, objects.KindTestCase) {
 			if tc, ok := s.TestCases[ev.ID]; ok {
 				tc.Status = ev.ToStatus
+			} else {
+				tc = s.hydrateTestCaseFromStorageLocked(ev.ID)
+				if tc != nil {
+					tc.Status = ev.ToStatus
+					s.TestCases[ev.ID] = tc
+					s.ensureTestCaseInOrderLocked(ev.ID)
+				}
 			}
 			s.appendRecentEvent(LifecycleEventSummary{
 				Timestamp: ts,
@@ -1015,13 +1059,19 @@ func (s *DashboardState) handleReferenceLinkedLocked(ev *lifecycle.LifecycleEven
 		critID := ev.TargetID
 		tc, ok := s.TestCases[tcID]
 		if !ok {
-			tc = &TestCaseModel{
-				ID:       tcID,
-				Status:   objects.ObjectStatusActive,
-				Criteria: make([]*CriterionState, 0),
+			tc = s.hydrateTestCaseFromStorageLocked(tcID)
+			if tc == nil {
+				tc = &TestCaseModel{
+					ID:       tcID,
+					Status:   objects.ObjectStatusActive,
+					Criteria: make([]*CriterionState, 0),
+				}
 			}
 			s.TestCases[tcID] = tc
+		} else if tc.Title == "" || tc.Lineage == nil {
+			s.enrichTestCaseFromStorageLocked(tc)
 		}
+		s.ensureTestCaseInOrderLocked(tcID)
 
 		// Ensure criterion is in tc.Criteria
 		found := false
@@ -1054,34 +1104,219 @@ func (s *DashboardState) handleReferenceLinkedLocked(ev *lifecycle.LifecycleEven
 	} else if ev.Kind == objects.KindTestCase && ev.TargetKind == objects.KindBacklogItem {
 		tcID := ev.ID
 		bliID := ev.TargetID
-		if tc, ok := s.TestCases[tcID]; ok {
-			already := false
-			for _, r := range tc.BacklogItemRefs {
-				if r == bliID {
-					already = true
-					break
+		tc, ok := s.TestCases[tcID]
+		if !ok {
+			tc = s.hydrateTestCaseFromStorageLocked(tcID)
+			if tc == nil {
+				tc = &TestCaseModel{
+					ID:       tcID,
+					Status:   objects.ObjectStatusActive,
+					Criteria: make([]*CriterionState, 0),
 				}
 			}
-			if !already {
-				tc.BacklogItemRefs = append(tc.BacklogItemRefs, bliID)
+			s.TestCases[tcID] = tc
+		} else if tc.Title == "" || tc.Lineage == nil {
+			s.enrichTestCaseFromStorageLocked(tc)
+		}
+		s.ensureTestCaseInOrderLocked(tcID)
+		already := false
+		for _, r := range tc.BacklogItemRefs {
+			if r == bliID {
+				already = true
+				break
 			}
 		}
+		if !already {
+			tc.BacklogItemRefs = append(tc.BacklogItemRefs, bliID)
+		}
+		s.refreshLineageLocked(tc)
 	} else if ev.Kind == objects.KindTestCase && ev.TargetKind == objects.KindRequirement {
 		tcID := ev.ID
 		reqID := ev.TargetID
-		if tc, ok := s.TestCases[tcID]; ok {
-			already := false
-			for _, r := range tc.RequirementRefs {
-				if r == reqID {
-					already = true
-					break
+		tc, ok := s.TestCases[tcID]
+		if !ok {
+			tc = s.hydrateTestCaseFromStorageLocked(tcID)
+			if tc == nil {
+				tc = &TestCaseModel{
+					ID:       tcID,
+					Status:   objects.ObjectStatusActive,
+					Criteria: make([]*CriterionState, 0),
 				}
 			}
-			if !already {
-				tc.RequirementRefs = append(tc.RequirementRefs, reqID)
+			s.TestCases[tcID] = tc
+		} else if tc.Title == "" || tc.Lineage == nil {
+			s.enrichTestCaseFromStorageLocked(tc)
+		}
+		s.ensureTestCaseInOrderLocked(tcID)
+		already := false
+		for _, r := range tc.RequirementRefs {
+			if r == reqID {
+				already = true
+				break
 			}
 		}
+		if !already {
+			tc.RequirementRefs = append(tc.RequirementRefs, reqID)
+		}
+		s.refreshLineageLocked(tc)
 	}
+}
+
+func (s *DashboardState) ensureTestCaseInOrderLocked(tcID string) {
+	for _, id := range s.TestCaseOrder {
+		if id == tcID {
+			return
+		}
+	}
+	s.TestCaseOrder = append(s.TestCaseOrder, tcID)
+}
+
+func (s *DashboardState) hydrateTestCaseFromStorageLocked(tcID string) *TestCaseModel {
+	if s.projectRoot == "" || tcID == "" {
+		return nil
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	factory, err := storage.NewStorageFactory(ctx, s.projectRoot)
+	if err != nil || factory == nil {
+		return nil
+	}
+	sp := factory.GetStorage()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	tcObj, err := sp.Read(ctx, secCtx, tcID)
+	if err != nil || tcObj == nil {
+		return nil
+	}
+
+	title, _ := tcObj[objects.FieldKeyTitle].(string)
+	status, _ := tcObj[objects.FieldKeyStatus].(string)
+	if status == "" {
+		status = objects.ObjectStatusActive
+	}
+	pathOrID, _ := tcObj[objects.FieldKeyPathOrID].(string)
+	scope, _ := tcObj["scope"].(string)
+	category, _ := tcObj["category"].(string)
+
+	critRefs := lifecycle.StringRefsFromAny(tcObj[objects.FieldKeyCriteriaRefs])
+	reqRefs := lifecycle.StringRefsFromAny(tcObj[objects.FieldKeyRequirementRefs])
+	bliRefs := lifecycle.StringRefsFromAny(tcObj[objects.FieldKeyBacklogItemRefs])
+	goalRefs := lifecycle.StringRefsFromAny(tcObj[objects.FieldKeyGoalRefs])
+
+	readWithCache := func(id string) map[string]any {
+		if id == "" {
+			return nil
+		}
+		obj, _ := sp.Read(ctx, secCtx, id)
+		return obj
+	}
+	lineage := resolveLineageChain(readWithCache, reqRefs, bliRefs, goalRefs)
+
+	criteriaList := make([]*CriterionState, 0, len(critRefs))
+	completedCount := 0
+	for _, crID := range critRefs {
+		cState := &CriterionState{
+			ID:     crID,
+			Status: objects.ObjectStatusOriginated,
+		}
+		if crObj := readWithCache(crID); crObj != nil {
+			if st, ok := crObj[objects.FieldKeyStatus].(string); ok && st != "" {
+				cState.Status = st
+			}
+			if desc, ok := crObj[objects.FieldKeyDescription].(string); ok {
+				cState.Description = desc
+			}
+		}
+		if isCriterionComplete(cState.Status) {
+			completedCount++
+		}
+		criteriaList = append(criteriaList, cState)
+	}
+
+	remOpen := len(criteriaList) - completedCount
+	if remOpen < 0 {
+		remOpen = 0
+	}
+
+	return &TestCaseModel{
+		ID:                 tcID,
+		Title:              title,
+		Status:             status,
+		PathOrID:           pathOrID,
+		Scope:              scope,
+		Category:           category,
+		Lineage:            lineage,
+		RequirementRefs:    reqRefs,
+		BacklogItemRefs:    bliRefs,
+		GoalRefs:           goalRefs,
+		Criteria:           criteriaList,
+		RemainingOpenCount: remOpen,
+		TotalCriteria:      len(criteriaList),
+		CompletedCriteria:  completedCount,
+	}
+}
+
+func (s *DashboardState) enrichTestCaseFromStorageLocked(tc *TestCaseModel) {
+	if tc == nil || s.projectRoot == "" {
+		return
+	}
+	hydrated := s.hydrateTestCaseFromStorageLocked(tc.ID)
+	if hydrated == nil {
+		return
+	}
+	if tc.Title == "" {
+		tc.Title = hydrated.Title
+	}
+	if tc.PathOrID == "" {
+		tc.PathOrID = hydrated.PathOrID
+	}
+	if tc.Scope == "" {
+		tc.Scope = hydrated.Scope
+	}
+	if tc.Category == "" {
+		tc.Category = hydrated.Category
+	}
+	if len(tc.RequirementRefs) == 0 {
+		tc.RequirementRefs = hydrated.RequirementRefs
+	}
+	if len(tc.BacklogItemRefs) == 0 {
+		tc.BacklogItemRefs = hydrated.BacklogItemRefs
+	}
+	if len(tc.GoalRefs) == 0 {
+		tc.GoalRefs = hydrated.GoalRefs
+	}
+	if tc.Lineage == nil {
+		tc.Lineage = hydrated.Lineage
+	}
+	if len(tc.Criteria) == 0 && len(hydrated.Criteria) > 0 {
+		tc.Criteria = hydrated.Criteria
+		tc.TotalCriteria = hydrated.TotalCriteria
+		tc.CompletedCriteria = hydrated.CompletedCriteria
+		tc.RemainingOpenCount = hydrated.RemainingOpenCount
+	}
+}
+
+func (s *DashboardState) refreshLineageLocked(tc *TestCaseModel) {
+	if tc == nil || s.projectRoot == "" {
+		return
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	factory, err := storage.NewStorageFactory(ctx, s.projectRoot)
+	if err != nil || factory == nil {
+		return
+	}
+	sp := factory.GetStorage()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	readWithCache := func(id string) map[string]any {
+		if id == "" {
+			return nil
+		}
+		obj, _ := sp.Read(ctx, secCtx, id)
+		return obj
+	}
+	tc.Lineage = resolveLineageChain(readWithCache, tc.RequirementRefs, tc.BacklogItemRefs, tc.GoalRefs)
 }
 
 func (s *DashboardState) appendRecentEvent(ev LifecycleEventSummary) {

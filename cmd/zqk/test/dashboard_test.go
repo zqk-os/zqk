@@ -772,4 +772,79 @@ func TestDashboardState_HandleReferenceLinkedEvent(t *testing.T) {
 	if len(state.RecentEvents) != 1 || !strings.Contains(state.RecentEvents[0].Message, "LINKAGE SHOCKWAVE") {
 		t.Errorf("expected LINKAGE SHOCKWAVE in recent events, got %v", state.RecentEvents)
 	}
+
+	// Verify that TST-101 was added to TestCaseOrder
+	found := false
+	for _, id := range state.TestCaseOrder {
+		if id == "TST-101" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Errorf("expected TST-101 in state.TestCaseOrder")
+	}
 }
+
+func TestDashboardState_HandleReferenceLinked_BacklogItemAndRequirement(t *testing.T) {
+	state := NewDashboardState()
+	tc := &TestCaseModel{
+		ID:       "TST-201",
+		Status:   objects.ObjectStatusActive,
+		Criteria: make([]*CriterionState, 0),
+	}
+	state.TestCases[tc.ID] = tc
+
+	// 1. Link Requirement
+	evReq := &lifecycle.LifecycleEvent{
+		Seq:        1,
+		Ts:         time.Now(),
+		EventType:  lifecycle.EventTypeReferenceLinked,
+		Kind:       objects.KindTestCase,
+		ID:         "TST-201",
+		TargetKind: objects.KindRequirement,
+		TargetID:   "REQ-201",
+		FieldName:  "requirement_refs",
+	}
+	state.HandleLifecycleEvent(evReq)
+
+	if len(tc.RequirementRefs) != 1 || tc.RequirementRefs[0] != "REQ-201" {
+		t.Fatalf("expected requirement REQ-201 linked to TST-201, got %v", tc.RequirementRefs)
+	}
+
+	// 2. Link BacklogItem
+	evBli := &lifecycle.LifecycleEvent{
+		Seq:        2,
+		Ts:         time.Now(),
+		EventType:  lifecycle.EventTypeReferenceLinked,
+		Kind:       objects.KindTestCase,
+		ID:         "TST-201",
+		TargetKind: objects.KindBacklogItem,
+		TargetID:   "BLI-201",
+		FieldName:  "backlog_item_refs",
+	}
+	state.HandleLifecycleEvent(evBli)
+
+	if len(tc.BacklogItemRefs) != 1 || tc.BacklogItemRefs[0] != "BLI-201" {
+		t.Fatalf("expected backlog item BLI-201 linked to TST-201, got %v", tc.BacklogItemRefs)
+	}
+}
+
+func TestDashboardState_BuildPayload_EnsuresAllTestCasesInOrder(t *testing.T) {
+	state := NewDashboardState()
+	state.TestCases["TST-ORPHAN-01"] = &TestCaseModel{
+		ID:     "TST-ORPHAN-01",
+		Title:  "Orphan",
+		Status: objects.ObjectStatusActive,
+	}
+	// Note: state.TestCaseOrder intentionally left empty
+
+	payload := state.BuildPayload()
+	if payload.TotalTestCases != 1 {
+		t.Fatalf("expected TotalTestCases = 1, got %d", payload.TotalTestCases)
+	}
+	if len(payload.TestCaseOrder) != 1 || payload.TestCaseOrder[0] != "TST-ORPHAN-01" {
+		t.Fatalf("expected TestCaseOrder to include TST-ORPHAN-01, got %v", payload.TestCaseOrder)
+	}
+}
+
