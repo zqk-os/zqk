@@ -121,3 +121,32 @@ func TestGhostDriftMTTRObservability(t *testing.T) {
 		t.Errorf("Expected sum 900.0, got %f", sum)
 	}
 }
+
+func TestHistogramAccessors(t *testing.T) {
+	tracker := NewTracker(nil)
+
+	ctx := context.Background()
+	tracker.RecordIPCLatency(ctx, "storage_read", 25*time.Millisecond)
+	tracker.RecordGhostDriftMTTR(ctx, "goroutine_leak", 120*time.Second)
+
+	ipcHist := tracker.GetIPCHistograms()
+	if h, ok := ipcHist["storage_read"]; !ok {
+		t.Fatal("expected storage_read histogram in GetIPCHistograms")
+	} else {
+		_, count := h.GetStats()
+		if count != 1 {
+			t.Errorf("expected count 1, got %d", count)
+		}
+	}
+
+	driftHist := tracker.GetGhostDriftHistograms()
+	if h, ok := driftHist["goroutine_leak"]; !ok {
+		t.Fatal("expected goroutine_leak histogram in GetGhostDriftHistograms")
+	} else {
+		_, count := h.GetStats()
+		if count != 1 {
+			t.Errorf("expected count 1, got %d", count)
+		}
+	}
+}
+

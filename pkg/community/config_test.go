@@ -1,7 +1,6 @@
 package community_test
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -121,8 +120,7 @@ func TestConfigOverlay_IntegrationAndConformance(t *testing.T) {
 	}))
 
 	// Set environment override
-	os.Setenv("APP_TEST_SERVER_URL", "https://env-override.zqk.io")
-	defer os.Unsetenv("APP_TEST_SERVER_URL")
+	t.Setenv("APP_TEST_SERVER_URL", "https://env-override.zqk.io")
 
 	effective, err := engine.ResolveEffectiveConfig("prod", "APP_TEST")
 	require.NoError(t, err)

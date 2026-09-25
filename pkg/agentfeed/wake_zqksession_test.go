@@ -64,15 +64,6 @@ func TestSelfWakeExcluded(t *testing.T) {
 func TestSelfWakeSkippedWithSessionBinding(t *testing.T) {
 	fake := &testFakeWakeAdapter{}
 
-	orig := os.Getenv(SessionEnvKey)
-	defer func() {
-		if orig == "" {
-			_ = os.Unsetenv(SessionEnvKey)
-		} else {
-			_ = os.Setenv(SessionEnvKey, orig)
-		}
-	}()
-
 	// Scenario: ZQK_SESSION is set.  FromAgentID should be populated from it.
 	t.Setenv(SessionEnvKey, "session-abc")
 

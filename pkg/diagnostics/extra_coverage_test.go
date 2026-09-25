@@ -93,51 +93,59 @@ func TestPprofHelpers(t *testing.T) {
 	}
 
 	// Test pprofEnabledFromEnv with env set
-	envVar := zqkenv.Pprof().Name()
-	os.Setenv(envVar, "1")
-	if !pprofEnabledFromEnv() {
-		t.Fatal("expected pprofEnabledFromEnv to be true when env var is 1")
-	}
-	os.Unsetenv(envVar)
+	t.Run("pprofEnabledFromEnv_default", func(t *testing.T) {
+		envVar := zqkenv.Pprof().Name()
+		t.Setenv(envVar, "1")
+		if !pprofEnabledFromEnv() {
+			t.Fatal("expected pprofEnabledFromEnv to be true when env var is 1")
+		}
+	})
 
 	// Fallback env vars for pprofEnabledFromEnv
-	os.Setenv(fallbackSchedulerDaemonPprof, "true")
-	if !pprofEnabledFromEnv() {
-		t.Fatal("expected pprofEnabledFromEnv to be true with fallbackSchedulerDaemonPprof")
-	}
-	os.Unsetenv(fallbackSchedulerDaemonPprof)
+	t.Run("pprofEnabledFromEnv_fallbackScheduler", func(t *testing.T) {
+		t.Setenv(fallbackSchedulerDaemonPprof, "true")
+		if !pprofEnabledFromEnv() {
+			t.Fatal("expected pprofEnabledFromEnv to be true with fallbackSchedulerDaemonPprof")
+		}
+	})
 
-	os.Setenv(fallbackStableBinaryPprof, "TRUE")
-	if !pprofEnabledFromEnv() {
-		t.Fatal("expected pprofEnabledFromEnv to be true with fallbackStableBinaryPprof")
-	}
-	os.Unsetenv(fallbackStableBinaryPprof)
+	t.Run("pprofEnabledFromEnv_fallbackStableBinary", func(t *testing.T) {
+		t.Setenv(fallbackStableBinaryPprof, "TRUE")
+		if !pprofEnabledFromEnv() {
+			t.Fatal("expected pprofEnabledFromEnv to be true with fallbackStableBinaryPprof")
+		}
+	})
 
 	// Test pprofPortFromEnv
-	portVar := zqkenv.PprofPort().Name()
-	os.Setenv(portVar, "9876")
-	if pprofPortFromEnv() != 9876 {
-		t.Fatalf("expected port 9876, got %d", pprofPortFromEnv())
-	}
-	os.Unsetenv(portVar)
+	t.Run("pprofPortFromEnv_portVar", func(t *testing.T) {
+		portVar := zqkenv.PprofPort().Name()
+		t.Setenv(portVar, "9876")
+		if pprofPortFromEnv() != 9876 {
+			t.Fatalf("expected port 9876, got %d", pprofPortFromEnv())
+		}
+	})
 
-	os.Setenv(fallbackSchedulerDaemonPort, "9877")
-	if pprofPortFromEnv() != 9877 {
-		t.Fatalf("expected port 9877, got %d", pprofPortFromEnv())
-	}
-	os.Unsetenv(fallbackSchedulerDaemonPort)
+	t.Run("pprofPortFromEnv_fallbackScheduler", func(t *testing.T) {
+		t.Setenv(fallbackSchedulerDaemonPort, "9877")
+		if pprofPortFromEnv() != 9877 {
+			t.Fatalf("expected port 9877, got %d", pprofPortFromEnv())
+		}
+	})
 
-	os.Setenv(fallbackStableBinaryPprofPort, "9878")
-	if pprofPortFromEnv() != 9878 {
-		t.Fatalf("expected port 9878, got %d", pprofPortFromEnv())
-	}
-	os.Unsetenv(fallbackStableBinaryPprofPort)
+	t.Run("pprofPortFromEnv_fallbackStableBinary", func(t *testing.T) {
+		t.Setenv(fallbackStableBinaryPprofPort, "9878")
+		if pprofPortFromEnv() != 9878 {
+			t.Fatalf("expected port 9878, got %d", pprofPortFromEnv())
+		}
+	})
 
-	os.Setenv(portVar, "invalid_port")
-	if pprofPortFromEnv() != defaultPort {
-		t.Fatalf("expected default port on invalid port, got %d", pprofPortFromEnv())
-	}
-	os.Unsetenv(portVar)
+	t.Run("pprofPortFromEnv_invalidPort", func(t *testing.T) {
+		portVar := zqkenv.PprofPort().Name()
+		t.Setenv(portVar, "invalid_port")
+		if pprofPortFromEnv() != defaultPort {
+			t.Fatalf("expected default port on invalid port, got %d", pprofPortFromEnv())
+		}
+	})
 }
 
 func TestStartPprofServerIfEnabled(t *testing.T) {
@@ -147,10 +155,8 @@ func TestStartPprofServerIfEnabled(t *testing.T) {
 	// With env set and a dynamic port to avoid collision
 	portVar := zqkenv.PprofPort().Name()
 	flagVar := zqkenv.Pprof().Name()
-	os.Setenv(flagVar, "1")
-	os.Setenv(portVar, "39281")
-	defer os.Unsetenv(flagVar)
-	defer os.Unsetenv(portVar)
+	t.Setenv(flagVar, "1")
+	t.Setenv(portVar, "39281")
 
 	StartPprofServerIfEnabled()
 

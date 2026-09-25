@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"fmt"
+	"io"
 	"maps"
 	"path/filepath"
 	"slices"
@@ -147,17 +148,9 @@ func (f *FileObjectStorage) readObjectFileNoCache(filePath string) (map[string]a
 		}
 	}
 
-	var data []byte
-	stat, err := file.Stat()
-	if err == nil {
-		data = make([]byte, stat.Size())
-		n, err := file.Read(data)
-		if err != nil && err.Error() != "EOF" {
-			return nil, errfmt.Newf(ErrMsgReadFile).Wrap(err)
-		}
-		data = data[:n]
-	} else {
-		// Fallback to os.ReadFile if stat fails
+	data, err := io.ReadAll(file)
+	if err != nil {
+		// Fallback to fileutil.ReadFile if direct stream read fails
 		data, err = fileutil.ReadFile(filePath)
 		if err != nil {
 			return nil, errfmt.Newf(ErrMsgReadFile).Wrap(err)

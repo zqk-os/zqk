@@ -21,6 +21,8 @@ type Tracker interface {
 	RecordAgentTokenUsage(ctx context.Context, agentName string, inputTokens, outputTokens int64)
 	RecordGhostDriftMTTR(ctx context.Context, driftType string, mttr time.Duration)
 	RecordPersonaSkillInvocation(ctx context.Context, personaID string, skillID string, latency time.Duration, success bool)
+	GetIPCHistograms() map[string]*metrics.PrometheusHistogram
+	GetGhostDriftHistograms() map[string]*metrics.PrometheusHistogram
 }
 
 // DefaultTracker implements Tracker using ZQK's structured logging.
@@ -198,3 +200,28 @@ func (t *DefaultTracker) RecordPersonaSkillInvocation(ctx context.Context, perso
 
 	entry.Log()
 }
+
+// GetIPCHistograms returns a thread-safe snapshot copy of the IPC latency histograms.
+func (t *DefaultTracker) GetIPCHistograms() map[string]*metrics.PrometheusHistogram {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
+	result := make(map[string]*metrics.PrometheusHistogram, len(t.ipcHistograms))
+	for k, v := range t.ipcHistograms {
+		result[k] = v
+	}
+	return result
+}
+
+// GetGhostDriftHistograms returns a thread-safe snapshot copy of the ghost drift MTTR histograms.
+func (t *DefaultTracker) GetGhostDriftHistograms() map[string]*metrics.PrometheusHistogram {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
+	result := make(map[string]*metrics.PrometheusHistogram, len(t.ghostDriftHistograms))
+	for k, v := range t.ghostDriftHistograms {
+		result[k] = v
+	}
+	return result
+}
+
