@@ -238,7 +238,7 @@ jobs:
           ./"bin/$BRAND_EXE" system --help
 
       - name: Upload Binary Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: zqk-binary
           path: bin/
