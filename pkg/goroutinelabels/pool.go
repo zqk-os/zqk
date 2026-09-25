@@ -141,25 +141,25 @@ func (p *Pool) Start(ctx context.Context) {
 		}
 		NewGoroutine(name, purpose).
 			WithWaitGroup(&p.wg).
-			StartWithContext(p.runCtx, func(workerCtx context.Context) error {
+			StartSimple(func() {
 				for {
 					select {
 					case w, ok := <-p.work:
 						if !ok {
-							return nil
+							return
 						}
 						runWorkItemSafely(w)
-					case <-workerCtx.Done():
+					case <-p.runCtx.Done():
 						// Drain remaining buffered work if any before exiting
 						for {
 							select {
 							case w, ok := <-p.work:
 								if !ok {
-									return nil
+									return
 								}
 								runWorkItemSafely(w)
 							default:
-								return workerCtx.Err()
+								return
 							}
 						}
 					}
@@ -252,15 +252,15 @@ func (p *Pool) Stop() {
 		return
 	}
 
-	// 1. Cancel runCtx first so any pending Submit unblocks.
-	if cancel != nil {
-		cancel()
-	}
-
-	// 2. Lock submitMu to ensure no concurrent Submit call is sending on p.work.
+	// 1. Lock submitMu to ensure no concurrent Submit call is sending on p.work.
 	p.submitMu.Lock()
 	close(p.work)
 	p.submitMu.Unlock()
+
+	// 2. Cancel runCtx so any pending Submit or idle worker unblocks.
+	if cancel != nil {
+		cancel()
+	}
 
 	// 3. Wait for workers to drain remaining work and exit.
 	p.wg.Wait()

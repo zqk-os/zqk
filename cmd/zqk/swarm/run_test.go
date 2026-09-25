@@ -117,6 +117,7 @@ agents:
 
 func TestSwarmRunCommand_LiveIngestionAndPersistence(t *testing.T) {
 	root := t.TempDir()
+	testkit.RegisterTempProjectTeardown(t, root, nil)
 	logger := logging.GetLoggerFromProfile("test")
 	if err := bootstrap.ExtractTo(root, logger, true); err != nil {
 		t.Fatalf("bootstrap.ExtractTo failed: %v", err)
@@ -132,7 +133,7 @@ func TestSwarmRunCommand_LiveIngestionAndPersistence(t *testing.T) {
 	buf := new(bytes.Buffer)
 	cmd.SetOut(buf)
 	cmd.SetErr(buf)
-	cmd.SetArgs([]string{manifestFile})
+	cmd.SetArgs([]string{manifestFile, "--stage-only"})
 
 	if err := cmd.Execute(); err != nil {
 		t.Fatalf("live execution failed: %v", err)

@@ -36,6 +36,23 @@ func TestRegistrySpecPersistenceAndDefaults(t *testing.T) {
 	require.True(t, ok)
 	assert.Equal(t, overseer.DesiredStateDisabled, spec.DesiredState)
 
+	spec, ok = reg.Get("privileged-writer")
+	require.True(t, ok)
+	assert.Equal(t, overseer.DesiredStateEnabled, spec.DesiredState)
+	assert.Equal(t, overseer.RestartPolicyAlways, spec.RestartPolicy)
+
+	spec, ok = reg.Get("steward")
+	require.True(t, ok)
+	assert.Equal(t, overseer.DesiredStateEnabled, spec.DesiredState)
+
+	spec, ok = reg.Get("mcp")
+	require.True(t, ok)
+	assert.Equal(t, overseer.DesiredStateDisabled, spec.DesiredState)
+
+	spec, ok = reg.Get("seat-worker")
+	require.True(t, ok)
+	assert.Equal(t, overseer.DesiredStateDisabled, spec.DesiredState)
+
 	// Mutate desired state and verify reload
 	err = reg.SetDesiredState("fswatcher", overseer.DesiredStateEnabled)
 	require.NoError(t, err)

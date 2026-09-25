@@ -1,0 +1,12 @@
+$schema: ../schemas/command_spec.schema.json
+name: steward
+short: Kernel Health & Intake Clustering Steward
+description: Kernel Health & Intake Clustering Steward
+args:
+    type: no_args
+help:
+    examples:
+        - comment: Run kernel steward
+          command: '%s kernel steward'
+run_e: runKernelSteward
+common_flags: true

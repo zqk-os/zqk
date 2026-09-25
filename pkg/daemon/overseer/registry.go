@@ -90,6 +90,16 @@ func DefaultDaemonSpecs() []*DaemonSpec {
 			BackoffMax:    30 * time.Second,
 		},
 		{
+			Name:          "privileged-writer",
+			Description:   "ZQK Privileged CAS Storage Writer Daemon",
+			Command:       []string{"object", "daemon"},
+			DesiredState:  DesiredStateEnabled,
+			RestartPolicy: RestartPolicyAlways,
+			MaxRestarts:   10,
+			BackoffMin:    500 * time.Millisecond,
+			BackoffMax:    30 * time.Second,
+		},
+		{
 			Name:          "fswatcher",
 			Description:   "ZQK Filesystem Object Watcher Daemon",
 			Command:       []string{"system", "fswatcher-daemon"},
@@ -113,6 +123,16 @@ func DefaultDaemonSpecs() []*DaemonSpec {
 			Name:          "mcp",
 			Description:   "Model Context Protocol & Semantic Bridge Daemon",
 			Command:       []string{"mcp", "serve"},
+			DesiredState:  DesiredStateDisabled,
+			RestartPolicy: RestartPolicyOnFailure,
+			MaxRestarts:   5,
+			BackoffMin:    1 * time.Second,
+			BackoffMax:    30 * time.Second,
+		},
+		{
+			Name:          "seat-worker",
+			Description:   "ZQK Autonomous Mesh Agent Seat Worker",
+			Command:       []string{"agent", "seat-worker", "--agent-id", "peer-agent-1"},
 			DesiredState:  DesiredStateDisabled,
 			RestartPolicy: RestartPolicyOnFailure,
 			MaxRestarts:   5,
@@ -170,6 +190,18 @@ func (r *Registry) Load() error {
 	r.Daemons = stored.Daemons
 	if r.Daemons == nil {
 		r.Daemons = make(map[string]*DaemonSpec)
+	}
+
+	// Seed any newly added default daemon specs not present in the stored registry
+	changed := false
+	for _, spec := range DefaultDaemonSpecs() {
+		if _, exists := r.Daemons[spec.Name]; !exists {
+			r.Daemons[spec.Name] = spec
+			changed = true
+		}
+	}
+	if changed {
+		return r.saveLocked()
 	}
 	return nil
 }

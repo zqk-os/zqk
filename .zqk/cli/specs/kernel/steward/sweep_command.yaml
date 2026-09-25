@@ -1,0 +1,12 @@
+$schema: ../../schemas/command_spec.schema.json
+name: sweep
+short: Run a single one-shot Kernel Steward hygiene and runway sweep
+description: Run a single one-shot Kernel Steward hygiene and runway sweep
+args:
+    type: no_args
+help:
+    examples:
+        - comment: Run kernel steward sweep
+          command: '%s kernel steward sweep'
+run_e: runKernelStewardSweep
+common_flags: true

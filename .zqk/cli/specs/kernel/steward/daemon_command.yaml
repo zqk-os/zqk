@@ -1,0 +1,17 @@
+$schema: ../../schemas/command_spec.schema.json
+name: daemon
+short: Run the continuous Kernel Steward loop for hygiene sweeps and runway replenishment
+description: Run the continuous Kernel Steward loop for hygiene sweeps and runway replenishment
+args:
+    type: no_args
+flags:
+    - name: interval
+      type: int
+      default: 30
+      description: Interval in seconds between stewardship sweeps
+help:
+    examples:
+        - comment: Run kernel steward daemon
+          command: '%s kernel steward daemon'
+run_e: runKernelStewardDaemon
+common_flags: true
