@@ -8,8 +8,54 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/service"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
+
+// OverseerServiceSpec constructs the canonical ServiceSpec for the unified overseer process.
+func OverseerServiceSpec(absRoot, binaryPath string) service.ServiceSpec {
+	bin := binaryPath
+	if bin == "" {
+		candidate := filepath.Join(absRoot, "bin", "zqk")
+		if fileutil.Exists(candidate) {
+			bin = candidate
+		} else {
+			bin = "zqk"
+		}
+	}
+
+	envPath := zqkenv.OSPath().Get()
+	if envPath == "" {
+		envPath = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+	}
+	home, _ := fileutil.UserHomeDir()
+
+	logsDir := filepath.Join(absRoot, paths.ProjectDataDir, paths.LogsDir)
+	stdoutLog := filepath.Join(logsDir, "overseer.launchd.out")
+	stderrLog := filepath.Join(logsDir, "overseer.launchd.err")
+
+	return service.ServiceSpec{
+		ID:          OverseerLaunchAgentLabel,
+		DisplayName: "ZQK Process Group Overseer",
+		Description: "Solitary host-level supervisor managing all ZQK background daemons under a unified process group.",
+		Executable:  bin,
+		Arguments:   []string{"daemon", "run", "--timeout", "0"},
+		WorkingDir:  absRoot,
+		Environment: map[string]string{
+			"HOME":             home,
+			"PATH":             envPath,
+			"ZQK_PROJECT_ROOT": absRoot,
+			"ZQK_IS_DAEMON":    "1",
+			"ZQK_API_KEY":      "ACC-SYSTEM",
+		},
+		StandardOutPath: stdoutLog,
+		StandardErrorPath: stderrLog,
+		RunAtLoad:       true,
+		KeepAlive:       true,
+		RestartPolicy:   service.RestartOnFailure,
+	}
+}
 
 const (
 	// OverseerLaunchAgentLabel is the canonical macOS launchd label for the solitary overseer daemon.
