@@ -1076,7 +1076,16 @@ func (m *UIModel) RefreshQA(ctx context.Context, sp storage.ObjectStorageProvide
 
 	dState := test.NewDashboardStateWithProjectRoot(m.ProjectRoot)
 	loaded, err := dState.LoadFromLiteFile(m.ProjectRoot)
-	if !loaded || err != nil || len(dState.TestCases) == 0 {
+	hasBrokenData := false
+	if loaded && err == nil && len(dState.TestCases) > 0 {
+		for _, tc := range dState.TestCases {
+			if tc.Title == "" && tc.Lineage == nil {
+				hasBrokenData = true
+				break
+			}
+		}
+	}
+	if !loaded || err != nil || len(dState.TestCases) == 0 || hasBrokenData {
 		if (sp == nil || sec == nil) && m.ProjectRoot != "" {
 			if factory, fErr := storage.NewStorageFactory(ctx, m.ProjectRoot); fErr == nil {
 				sp = factory.GetStorage()

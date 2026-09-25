@@ -115,13 +115,16 @@ func TestMetabolismEngine_IngestAndSynthesize(t *testing.T) {
 	// 3. Verify that each synthesized requirement satisfies the Anti-Superficiality Shovel-Ready Gate!
 	for _, req := range reqs {
 		reqID, _ := req[objects.FieldKeyID].(string)
+		critRefs, _ := req[objects.FieldKeyCriteriaRefs].([]string)
+		critSet := make(map[string]bool)
+		for _, ref := range critRefs {
+			critSet[ref] = true
+		}
 		var linkedCrit []map[string]any
 		for _, c := range criteria {
-			cReqs, _ := c[objects.FieldKeyRequirementRefs].([]string)
-			for _, rRef := range cReqs {
-				if rRef == reqID {
-					linkedCrit = append(linkedCrit, c)
-				}
+			cID, _ := c[objects.FieldKeyID].(string)
+			if critSet[cID] {
+				linkedCrit = append(linkedCrit, c)
 			}
 		}
 

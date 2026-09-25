@@ -185,6 +185,8 @@ func (t *Table) Render() string {
 }
 
 func (t *Table) formatCell(content string, width int, align Alignment) string {
+	content = strings.ReplaceAll(content, "\r\n", " ")
+	content = strings.ReplaceAll(content, "\n", " ")
 	vw := VisibleWidth(content)
 	if vw > width {
 		content = TruncateVisible(content, width, "…")
