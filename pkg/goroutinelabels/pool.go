@@ -44,6 +44,7 @@ type Pool struct {
 	wg        sync.WaitGroup
 
 	mu         sync.RWMutex
+	submitMu   sync.RWMutex
 	started    bool
 	stopped    bool
 	isFallback atomic.Bool // true when this pool was created because budget reserve failed or no budget
@@ -142,18 +143,25 @@ func (p *Pool) Start(ctx context.Context) {
 			WithWaitGroup(&p.wg).
 			StartWithContext(p.runCtx, func(workerCtx context.Context) error {
 				for {
-					// Check for shutdown first before selecting from work queue
-					if workerCtx.Err() != nil {
-						return workerCtx.Err()
-					}
 					select {
-					case <-workerCtx.Done():
-						return workerCtx.Err()
 					case w, ok := <-p.work:
 						if !ok {
 							return nil
 						}
 						_ = w.fn(w.ctx) //nolint:errcheck // best-effort per task
+					case <-workerCtx.Done():
+						// Drain remaining buffered work if any before exiting
+						for {
+							select {
+							case w, ok := <-p.work:
+								if !ok {
+									return nil
+								}
+								_ = w.fn(w.ctx) //nolint:errcheck // best-effort per task
+							default:
+								return workerCtx.Err()
+							}
+						}
 					}
 				}
 			})
@@ -167,6 +175,9 @@ func (p *Pool) Submit(ctx context.Context, fn func(context.Context) error) error
 	if err := ctx.Err(); err != nil {
 		return err
 	}
+	p.submitMu.RLock()
+	defer p.submitMu.RUnlock()
+
 	p.mu.RLock()
 	runCtx := p.runCtx
 	stopped := p.stopped
@@ -188,6 +199,9 @@ func (p *Pool) Submit(ctx context.Context, fn func(context.Context) error) error
 // SubmitNonBlocking enqueues a task if the queue has capacity and returns immediately.
 // Returns ErrPoolFull if the work channel is full or the pool is stopped.
 func (p *Pool) SubmitNonBlocking(ctx context.Context, fn func(context.Context) error) error {
+	p.submitMu.RLock()
+	defer p.submitMu.RUnlock()
+
 	p.mu.RLock()
 	runCtx := p.runCtx
 	stopped := p.stopped
@@ -220,6 +234,7 @@ func (p *Pool) Stop() {
 	}
 	p.stopped = true
 	started := p.started
+	cancel := p.runCancel
 	p.mu.Unlock()
 
 	if !started {
@@ -230,14 +245,18 @@ func (p *Pool) Stop() {
 		return
 	}
 
-	// Close work channel first to allow workers to drain it.
-	// We don't cancel runCtx immediately here to avoid workers exiting while work is still in channel.
-	close(p.work)
-	p.wg.Wait()
-
-	if p.runCancel != nil {
-		p.runCancel()
+	// 1. Cancel runCtx first so any pending Submit unblocks.
+	if cancel != nil {
+		cancel()
 	}
+
+	// 2. Lock submitMu to ensure no concurrent Submit call is sending on p.work.
+	p.submitMu.Lock()
+	close(p.work)
+	p.submitMu.Unlock()
+
+	// 3. Wait for workers to drain remaining work and exit.
+	p.wg.Wait()
 
 	if p.release != nil {
 		p.release()

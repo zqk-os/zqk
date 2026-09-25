@@ -81,10 +81,8 @@ func (s *Server) generatePermissionFormatExamples() string {
 	if len(objectKinds) > 0 {
 		resourcesList = fmt.Sprintf("* (all), %s, etc.", strings.Join(objectKinds[:min(3, len(objectKinds))], ", "))
 	} else {
-		// Fail hard if we can't determine object kinds - this indicates a configuration issue
-		// Object kinds should be discoverable from the system
-		// TRACK: [MCP initialization error]
-		panic("MCP server configuration error: unable to determine object kinds for permission format examples. This indicates the field registry or kind mapper is not properly initialized. Ensure object specs are available and the system is properly configured.")
+		// Provide safe default resource examples if object kinds are not yet discoverable
+		resourcesList = "* (all), backlog_item, requirement, test_case, etc."
 	}
 
 	return fmt.Sprintf("## Understanding Permission Format\n\n"+

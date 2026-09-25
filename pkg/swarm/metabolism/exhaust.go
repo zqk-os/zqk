@@ -117,7 +117,9 @@ func (r *DualStreamRouter) RouteFinding(f Finding) error {
 			"title":       f.Title,
 			"description": f.Description,
 		}
-		_ = r.streamA.RecordKernelMutation("finding", f.ID, objData)
+		if err := r.streamA.RecordKernelMutation("finding", f.ID, objData); err != nil {
+			return fmt.Errorf("failed to record finding mutation to stream A: %w", err)
+		}
 	}
 
 	return nil
@@ -150,7 +152,9 @@ func (r *DualStreamRouter) RouteScorecard(sc Scorecard) error {
 			"envelope_min": sc.EnvelopeMin,
 			"status":       sc.Status,
 		}
-		_ = r.streamA.RecordKernelMutation("scorecard", sc.SessionID, objData)
+		if err := r.streamA.RecordKernelMutation("scorecard", sc.SessionID, objData); err != nil {
+			return fmt.Errorf("failed to record scorecard mutation to stream A: %w", err)
+		}
 	}
 
 	return nil

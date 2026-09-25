@@ -111,9 +111,6 @@ func TestCriticalCommandBuilders_NonEmptyUse(t *testing.T) {
 		t.Fatalf("getwd: %v", err)
 	}
 	buildersDir := filepath.Join(wd, "bldr_cli_cmd_v1")
-	if _, err := fileutil.Stat(buildersDir); fileutil.IsNotExist(err) {
-		buildersDir = filepath.Join(wd, "command_builders", "bldr_cli_cmd_v1")
-	}
 
 	for _, name := range criticalCommandBuildersMustHaveUse {
 		path := filepath.Join(buildersDir, name)

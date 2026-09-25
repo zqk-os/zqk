@@ -154,3 +154,53 @@ func TestDualStreamRouter_InvalidFindingFailsClosed(t *testing.T) {
 		t.Errorf("expected ErrFindingInvalid, got %v", err)
 	}
 }
+
+type errorStreamA struct {
+	err error
+}
+
+func (e *errorStreamA) RecordKernelMutation(kind string, id string, data map[string]any) error {
+	return e.err
+}
+
+func TestDualStreamRouter_StreamAErrorsPropagated(t *testing.T) {
+	outDir := filepath.Join(t.TempDir(), "eval_output")
+	simulatedErr := errors.New("simulated kernel write error")
+	streamA := &errorStreamA{err: simulatedErr}
+
+	router, err := NewDualStreamRouter(outDir, streamA)
+	if err != nil {
+		t.Fatalf("NewDualStreamRouter failed: %v", err)
+	}
+
+	f := Finding{
+		ID:          "FINDING-ERR-1",
+		Lens:        "TST",
+		Severity:    "E1",
+		Title:       "Test Finding",
+		Description: "Testing error propagation",
+	}
+
+	err = router.RouteFinding(f)
+	if err == nil {
+		t.Fatal("expected RouteFinding error when StreamA fails, got nil")
+	}
+	if !errors.Is(err, simulatedErr) {
+		t.Errorf("expected wrapped simulatedErr, got %v", err)
+	}
+
+	sc := Scorecard{
+		PackURN:     "urn:zqk:pack:test:1.0.0",
+		SessionID:   "session-err-1",
+		EnvelopeMin: 4.0,
+		Status:      "passed",
+	}
+
+	err = router.RouteScorecard(sc)
+	if err == nil {
+		t.Fatal("expected RouteScorecard error when StreamA fails, got nil")
+	}
+	if !errors.Is(err, simulatedErr) {
+		t.Errorf("expected wrapped simulatedErr, got %v", err)
+	}
+}

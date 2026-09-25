@@ -41,7 +41,10 @@ func Decide(ctx context.Context, reg *Registry, pipelineKind string, in Mutation
 		reg = Default()
 	}
 	if err := WarmDefaultRegistry(""); err != nil {
-		panic("WarmDefaultRegistry failed: " + err.Error())
+		return DecideOutcome{
+			Plan:         PlanRefuse,
+			RefuseReason: fmt.Sprintf("WarmDefaultRegistry failed (fail closed): %v", err),
+		}
 	}
 	def, ok := reg.GetByParts(in.Kind, pipelineKind, in.Intent)
 	if !ok || def == nil {
@@ -152,7 +155,7 @@ func ValidateObjectIntent(ctx context.Context, reg *Registry, kind, pipelineKind
 		reg = Default()
 	}
 	if err := WarmDefaultRegistry(""); err != nil {
-		panic("WarmDefaultRegistry failed: " + err.Error())
+		return []ValidationError{{Field: "registry", Message: "WarmDefaultRegistry failed: " + err.Error()}}
 	}
 	def, ok := reg.GetByParts(kind, pipelineKind, intent)
 	if !ok || def == nil {

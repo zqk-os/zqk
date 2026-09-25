@@ -4,7 +4,7 @@
 # Binary basename comes from brand.executable_name in
 # config/zqk-local.yaml (wins) then config/zqk.yaml (default zqk).
 
-.PHONY: help all bootstrap-archive compile-bin zqk clean test test-unit test-unit-all test-integration test-coverage test-coverage-html lint vet verify gate-release zqk-vet
+.PHONY: help all bootstrap-archive compile-bin zqk clean test test-unit test-unit-all test-race test-integration test-coverage test-coverage-html lint vet verify gate-release zqk-vet
 
 .DEFAULT_GOAL := all
 
@@ -96,6 +96,9 @@ test-unit:
 
 test-unit-all:
 	go test -p 2 -timeout 20m ./pkg/... ./cmd/... ./internal/... ./ext/...
+
+test-race:
+	go test -race -short -timeout 5m ./pkg/goroutinelabels/... ./pkg/concurrency/... ./pkg/bufferpool/...
 
 test-integration: all
 	$(BRAND_ENV_PREFIX)_SHARED_TEST_BIN="$$(pwd)/$(BIN)" sh scripts/open-core/test-public-release-gates.sh

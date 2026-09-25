@@ -16,9 +16,8 @@ YAML Specs → Codegen → Generated Builders → Runtime Usage
 pkg/cli/
 ├── command_spec.go              # Command spec definitions (like objects.Spec)
 ├── command_spec_builder.go      # Builder for creating commands from specs
-├── command_builders/
-│   ├── codegen.go               # Codegen for command builders (like pkg/specbuilder/builders/codegen.go)
-│   └── codegen_test.go
+├── codegen.go                   # Codegen for command builders (like pkg/specbuilder/builders/codegen.go)
+├── codegen_test.go
 ├── bldr_cli_cmd_v1/             # Generated command builders (like pkg/specbuilder/bldr_trait_v1/)
 │   ├── get_command_builder.go
 │   ├── create_command_builder.go
@@ -35,7 +34,7 @@ The command builder system mirrors the specbuilder pattern:
 | Aspect | pkg/specbuilder | pkg/cli |
 |--------|----------------|---------|
 | **Specs** | `objects.Spec` (YAML) | `CommandSpec` (YAML) |
-| **Codegen** | `pkg/specbuilder/builders/codegen.go` | `pkg/cli/command_builders/codegen.go` |
+| **Codegen** | `pkg/specbuilder/builders/codegen.go` | `pkg/cli/codegen.go` |
 | **Generated Builders** | `pkg/specbuilder/bldr_v2/` | `pkg/cli/bldr_cli_cmd_v1/` |
 | **Versioning** | `bldr_v2`, `bldr_trait_v1`, etc. | `bldr_cli_cmd_v1` |
 | **System Command** | `zqk system generate-builders` | `zqk system generate-command-builders` |

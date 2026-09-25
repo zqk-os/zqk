@@ -77,11 +77,19 @@ func TestDeep3_ResourceURISchemeConfig_Comprehensive(t *testing.T) {
 // 4. SessionDisconnect comprehensive tests
 func TestDeep3_SessionDisconnect_Comprehensive(t *testing.T) {
 	s := NewServer()
+	s.SetInProcessCLIRunner(func(_ context.Context, commandPath string, cmdArgs []string) (any, error) {
+		return map[string]any{"ok": true}, nil
+	})
 	MarkSessionDisconnected(s) // empty sessionID returns immediately
 
 	s.SetCurrentSessionID("session-999")
 	MarkSessionDisconnected(s)
-	time.Sleep(20 * time.Millisecond)
+	for i := 0; i < 50; i++ {
+		if s.GetCurrentSessionID() == "" {
+			break
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
 	if s.GetCurrentSessionID() != "" {
 		t.Errorf("expected session cleared, got: %s", s.GetCurrentSessionID())
 	}
