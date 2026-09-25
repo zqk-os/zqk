@@ -5,6 +5,7 @@ package filecas
 import (
 	"errors"
 	"sync"
+	"time"
 
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
@@ -14,6 +15,7 @@ import (
 var (
 	darwinSyncQueueOnce sync.Once
 	darwinSyncQueue     chan *fileutil.File
+	darwinSyncWG        sync.WaitGroup
 )
 
 func initDarwinSyncQueue() {
@@ -26,6 +28,7 @@ func initDarwinSyncQueue() {
 						logging.LogSwallowedError(err)
 					}
 				}
+				darwinSyncWG.Done()
 			}
 		})
 }
@@ -37,13 +40,42 @@ func syncAndClose(f *fileutil.File) error {
 }
 
 func queueOrSync(queue chan<- *fileutil.File, f *fileutil.File) error {
+	isGlobalQueue := (queue == darwinSyncQueue)
+	if isGlobalQueue {
+		darwinSyncWG.Add(1)
+	}
 	select {
 	case queue <- f:
 		return nil
 	default:
 		// Queue pressure must not silently discard durability. Fall back to a
 		// synchronous fsync so a successful publish still has crash semantics.
-		return syncAndClose(f)
+		err := syncAndClose(f)
+		if isGlobalQueue {
+			darwinSyncWG.Done()
+		}
+		return err
+	}
+}
+
+// DrainDarwinSyncQueue waits up to timeout for all pending background CAS syncs to complete.
+func DrainDarwinSyncQueue(timeout time.Duration) error {
+	done := make(chan struct{})
+	goroutinelabels.NewGoroutine("storage.darwin_cas_sync_drain", "await darwin CAS sync queue drain").
+		StartSimple(func() {
+			darwinSyncWG.Wait()
+			close(done)
+		})
+
+	if timeout <= 0 {
+		timeout = 5 * time.Second
+	}
+
+	select {
+	case <-done:
+		return nil
+	case <-time.After(timeout):
+		return errors.New("timed out waiting for darwin CAS sync queue to drain")
 	}
 }
 

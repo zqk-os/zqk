@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -67,7 +68,23 @@ func CleanStaleLocksByAge(dir string, threshold time.Duration) (int, error) {
 		if now.Sub(info.ModTime()) <= threshold {
 			continue
 		}
-		if removeErr := fileutil.Remove(p); removeErr == nil {
+
+		// Verify whether the lock is actively held by another process using non-blocking flock.
+		// Never unlink a file if another process holds the flock.
+		fl, err := storagepkg.NewFileLock(p)
+		if err != nil {
+			continue
+		}
+		acquired, lockErr := fl.TryLock()
+		if !acquired || lockErr != nil {
+			_ = fl.Close()
+			continue
+		}
+		removeErr := fileutil.Remove(p)
+		_ = fl.Unlock()
+		_ = fl.Close()
+
+		if removeErr == nil {
 			removed++
 		} else if !fileutil.IsNotExist(removeErr) {
 			// Best-effort: skip and continue. The scan should not abort on

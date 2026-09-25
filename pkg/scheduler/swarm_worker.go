@@ -41,14 +41,7 @@ func getSwarmWorkerPool() *goroutinelabels.Pool {
 
 var TestSwarmWorkerHook func(context.Context)
 var SwarmNewLLMClient = func(ctx context.Context, c *llm.Config) llm.Client {
-	provider := config.LLMProvider().OrDefault("")
-	if provider == "openai" {
-		return llm.NewClient(ctx, c)
-	}
-	if provider == "gemini" {
-		return llm.NewGeminiClient(ctx, c)
-	}
-	return llm.NewQwenClient(ctx, c)
+	return llm.NewClient(ctx, c)
 }
 var SwarmNewMCPExecutor = func(ctx context.Context, path string) (swarm.Executor, error) { return swarm.NewMCPExecutor(ctx, path) }
 

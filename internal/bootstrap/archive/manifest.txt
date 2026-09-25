@@ -48,6 +48,9 @@
 ./cli_specs/agent/feed/watch_command.yaml
 ./cli_specs/agent/feed_command.yaml
 ./cli_specs/agent/guiding_step_command.yaml
+./cli_specs/agent/hook/
+./cli_specs/agent/hook/pre_subagent_command.yaml
+./cli_specs/agent/hook_command.yaml
 ./cli_specs/agent/new_command.yaml
 ./cli_specs/agent/next_command.yaml
 ./cli_specs/agent/orchestrate_command.yaml
@@ -129,6 +132,7 @@
 ./cli_specs/new/
 ./cli_specs/new/command_spec_command.yaml
 ./cli_specs/new/object_command.yaml
+./cli_specs/new/swarm_command.yaml
 ./cli_specs/object/
 ./cli_specs/object/count_command.yaml
 ./cli_specs/object/draft/
@@ -153,6 +157,7 @@
 ./cli_specs/ops_command.yaml
 ./cli_specs/pack/
 ./cli_specs/pack/init_command.yaml
+./cli_specs/pack/manifest_command.yaml
 ./cli_specs/pack/seal_command.yaml
 ./cli_specs/pack/validate_command.yaml
 ./cli_specs/pack_command.yaml
@@ -589,8 +594,6 @@
 ./scripts/scheduler_jobs/cleanup_on_demand.yaml
 ./scripts/scheduler_jobs/convergence_orchestrate.yaml
 ./scripts/scheduler_jobs/convergence_overseer_record_daily.yaml
-./scripts/scheduler_jobs/convergence_session_tick_data_cell_hourly.yaml
-./scripts/scheduler_jobs/convergence_session_tick_pkg_vet_hourly.yaml
 ./scripts/scheduler_jobs/data_cell_envelope_tick_six_hourly.yaml
 ./scripts/scheduler_jobs/emergency_manager.yaml
 ./scripts/scheduler_jobs/idle_worktree_cleanup.yaml

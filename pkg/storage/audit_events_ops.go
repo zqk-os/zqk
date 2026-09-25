@@ -84,11 +84,6 @@ func createDeleteAuditEvent(ctx context.Context, projectRoot, id, kind, filePath
 		return nil
 	}
 
-	// Test-only: skip creating delete audit event when env is set (see setup_test.go; PRI-212)
-	if zqkenv.SkipDeleteAudit().Get() == "1" {
-		return nil
-	}
-
 	runCtx := ctx
 	if runCtx == nil {
 		runCtx = pkgctx.NewSystemContext()

@@ -26,6 +26,7 @@ func TestExtended_AuditAggregationSession_DeepCoverage(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create storage: %v", err)
 	}
+	registerFileStorageTestTeardown(t, tmpDir, sp)
 	defer func() {
 		_ = sp.Shutdown(context.Background())
 	}()
@@ -139,6 +140,7 @@ func TestExtended_CapOrchestrator_DeepCoverage(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create storage: %v", err)
 	}
+	registerFileStorageTestTeardown(t, tmpDir, sp)
 	defer func() {
 		_ = sp.Shutdown(context.Background())
 	}()

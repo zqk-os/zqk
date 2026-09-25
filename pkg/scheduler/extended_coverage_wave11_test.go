@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 	"path/filepath"
-	"strings"
+	"regexp"
 	"testing"
 	"time"
 
@@ -202,49 +202,73 @@ func TestExtended_Hourglass_EscalationsAndSweeps(t *testing.T) {
 	// 2. sweepStaleAgentTasks
 	// Seed a terminal priority plan
 	planID := "PRI-1785886324283087000-plan00001"
-	_ = sp.Create(ctx, secCtx, map[string]any{
+	planObj := map[string]any{
 		objects.FieldKeyID:            planID,
 		objects.FieldKeyKind:          objects.KindPriorityPlan,
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
-		objects.FieldKeyStatus:        objects.ObjectStatusCompleted,
+		objects.FieldKeyStatus:        objects.ObjectStatusComplete,
+		objects.FieldKeySourceFormat:  "manual",
+		objects.FieldKeyDescription:   "Terminal plan for test",
+	}
+	storagepkg.CreateCASVisible(t, sp, ctx, secCtx, planObj, objects.ObjectStatusComplete)
+	_ = sp.Update(pkgctx.WithLifecycleBreakGlass(ctx, "test"), secCtx, planID, map[string]any{
+		objects.FieldKeyStatus: objects.ObjectStatusComplete,
 	})
 
 	// Seed orphaned task whose plan is terminal
 	orphanedID := "ATK-1785886324283087000-orph00002"
-	_ = sp.Create(ctx, secCtx, map[string]any{
-		objects.FieldKeyID:              orphanedID,
-		objects.FieldKeyKind:            objects.KindAgentTask,
-		objects.FieldKeySchemaVersion:   objects.DefaultSchemaVersion,
-		objects.FieldKeyStatus:          objects.ObjectStatusInProgress,
-		objects.FieldKeyPriorityPlanRef: planID,
-	})
+	orphanedTask := map[string]any{
+		objects.FieldKeyID:                 orphanedID,
+		objects.FieldKeyKind:               objects.KindAgentTask,
+		objects.FieldKeySchemaVersion:      objects.DefaultSchemaVersion,
+		objects.FieldKeyStatus:             objects.ObjectStatusInProgress,
+		objects.FieldKeyPriorityPlanRef:    planID,
+		objects.FieldKeyTitle:              "Orphaned task",
+		objects.FieldKeyAssigneePersonaRef: "software_engineer",
+		objects.FieldKeyDescription:        "Orphaned task for testing",
+	}
+	if err := sp.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, orphanedTask); err != nil {
+		t.Fatalf("failed to create orphanedTask: %v", err)
+	}
 
 	// Seed timed-out stale task
 	staleID := "ATK-1785886324283087000-stal00003"
-	_ = sp.Create(ctx, secCtx, map[string]any{
-		objects.FieldKeyID:            staleID,
-		objects.FieldKeyKind:          objects.KindAgentTask,
-		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
-		objects.FieldKeyStatus:        objects.ObjectStatusInProgress,
-	})
+	staleTask := map[string]any{
+		objects.FieldKeyID:                 staleID,
+		objects.FieldKeyKind:               objects.KindAgentTask,
+		objects.FieldKeySchemaVersion:      objects.DefaultSchemaVersion,
+		objects.FieldKeyStatus:             objects.ObjectStatusInProgress,
+		objects.FieldKeyTitle:              "Stale task",
+		objects.FieldKeyAssigneePersonaRef: "software_engineer",
+		objects.FieldKeyDescription:        "Stale task for testing",
+		objects.FieldKeyUpdatedAt:          time.Now().Add(-5 * time.Hour).UTC().Format(time.RFC3339),
+	}
+	if err := sp.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, staleTask); err != nil {
+		t.Fatalf("failed to create staleTask: %v", err)
+	}
 
 	// Update the on-disk file to have an old updated_at timestamp
 	if filePath, pathErr := sp.GetObjectFilePath(staleID, objects.KindAgentTask); pathErr == nil && filePath != "" {
 		if content, readErr := fileutil.ReadFile(filePath); readErr == nil {
 			oldTs := time.Now().Add(-5 * time.Hour).UTC().Format(time.RFC3339)
-			modContent := strings.Replace(string(content), "in_progress", "in_progress\nupdated_at: \""+oldTs+"\"", 1)
+			re := regexp.MustCompile(`updated_at:\s*"?[^"\n\r]*"?`)
+			modContent := re.ReplaceAllString(string(content), "updated_at: \""+oldTs+"\"")
 			_ = fileutil.WriteFile(filePath, []byte(modContent), 0644)
 		}
 	}
+
+	storagepkg.GetGlobalParseCache().Clear()
+	storagepkg.FlushAllOrFail(t, tmpDir)
 
 	s.sweepStaleAgentTasks(ctx)
 
 	// Verify orphaned task was archived
 	orphanedObj, err := sp.Read(ctx, secCtx, orphanedID)
-	if err == nil {
-		if orphanedObj[objects.FieldKeyStatus] != objects.ObjectStatusArchived {
-			t.Errorf("expected orphaned task status archived, got %v", orphanedObj[objects.FieldKeyStatus])
-		}
+	if err != nil {
+		t.Fatalf("expected orphaned task to be readable, got: %v", err)
+	}
+	if orphanedObj[objects.FieldKeyStatus] != objects.ObjectStatusArchived {
+		t.Errorf("expected orphaned task status archived, got %v", orphanedObj[objects.FieldKeyStatus])
 	}
 
 	// Verify timed-out task was transitioned to error

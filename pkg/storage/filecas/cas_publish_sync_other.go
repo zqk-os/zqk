@@ -38,3 +38,8 @@ func CasPublishSyncDirOS(dirPath string) error {
 	}
 	return nil
 }
+
+// DrainDarwinSyncQueue is a no-op on non-darwin platforms.
+func DrainDarwinSyncQueue(_ ...any) error {
+	return nil
+}

@@ -2,6 +2,7 @@ package storage
 
 import (
 	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
+	"github.com/zqk-os/zqk/pkg/storage/filecas"
 
 	"github.com/zqk-os/zqk/pkg/objects"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -155,6 +156,7 @@ func RunProjectTestTeardown(opts ProjectTestTeardownOptions) error {
 	ShutdownAsyncValidationStrategies()
 	ShutdownHashRegistriesForProjectTesting(opts.ProjectRoot)
 	ShutdownAllAuditBuffersForTesting()
+	_ = filecas.DrainDarwinSyncQueue(2 * time.Second)
 	StopReverseReferenceIndexPersistForTest(opts.ProjectRoot)
 	StopHighVolumeEventCachePersistForTest(opts.ProjectRoot)
 	// Reset global singletons to prevent cross-test contamination when ZQK_TEST_ROOT changes

@@ -190,3 +190,78 @@ func TestModifyingSignedEntry_FailsClosed(t *testing.T) {
 		t.Errorf("expected error to contain 'signature verification failed', got: %v", err)
 	}
 }
+
+func TestAppendedPrivilegedArguments_Rejected(t *testing.T) {
+	entries := []traypkg.Entry{
+		{
+			Name:        "safe-cmd",
+			Description: "Safe command without privileged flags",
+			Argv:        []string{"workflow", "whats-next"},
+		},
+	}
+	projectRoot := setupTestProjectWithTrayYAML(t, entries)
+
+	// Appending a restricted flag at runtime must fail closed
+	_, err := executeTrayCmd(projectRoot, "run", "safe-cmd", "--", "--force")
+	if err == nil {
+		t.Fatal("expected access denied error when appending --force to safe command, got success")
+	}
+	if !strings.Contains(err.Error(), "access denied") {
+		t.Errorf("expected access denied error, got: %v", err)
+	}
+}
+
+func TestDefaultEntry_PrivilegedAppendedArgument_Rejected(t *testing.T) {
+	tmpDir := t.TempDir()
+	// Run default embedded entry "whats-next" with smuggled restricted argument
+	_, err := executeTrayCmd(tmpDir, "run", "whats-next", "--", "--override")
+	if err == nil {
+		t.Fatal("expected access denied error when appending --override to default entry, got success")
+	}
+	if !strings.Contains(err.Error(), "access denied") {
+		t.Errorf("expected access denied error, got: %v", err)
+	}
+}
+
+func TestAuditorPublicKey_VerificationWithoutPrivateKey(t *testing.T) {
+	entries := []traypkg.Entry{
+		{
+			Name:        "purge-cmd",
+			Description: "Purge cache with force",
+			Argv:        []string{"cache", "clear", "--force"},
+		},
+	}
+	projectRoot := setupTestProjectWithTrayYAML(t, entries)
+
+	// Sign the entry (generates auditor.priv and auditor.pub)
+	signOut, err := executeTrayCmd(projectRoot, "sign", "purge-cmd")
+	if err != nil {
+		t.Fatalf("tray sign failed: %v\nOutput: %s", err, signOut)
+	}
+
+	privPath := filepath.Join(projectRoot, paths.ProjectDataDir, "keystore", "auditor.priv")
+	pubPath := filepath.Join(projectRoot, paths.ProjectDataDir, "keystore", "auditor.pub")
+
+	if !fileutil.Exists(pubPath) {
+		t.Fatalf("expected auditor.pub to be generated alongside private key, but missing")
+	}
+
+	// Delete private key completely
+	if err := fileutil.Remove(privPath); err != nil {
+		t.Fatalf("failed to remove auditor.priv: %v", err)
+	}
+
+	// Verification must succeed using ONLY auditor.pub!
+	runOut, err := executeTrayCmd(projectRoot, "run", "purge-cmd", "--dry-run")
+	if err != nil {
+		t.Fatalf("tray run failed when only auditor.pub is present: %v\nOutput: %s", err, runOut)
+	}
+	if !strings.Contains(runOut, "dry_run: true") {
+		t.Errorf("expected dry_run output, got: %s", runOut)
+	}
+
+	// Ensure private key was NOT recreated
+	if fileutil.Exists(privPath) {
+		t.Errorf("auditor.priv was recreated during verification! Verification must never create private keys.")
+	}
+}
