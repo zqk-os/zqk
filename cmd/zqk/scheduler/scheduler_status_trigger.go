@@ -17,7 +17,6 @@ import (
 	clicontext "github.com/zqk-os/zqk/internal/cli/context"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/zqk-os/zqk/pkg/functional"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -53,16 +52,16 @@ func showSchedulerStatus(cmd *cobra.Command) error {
 			statusData[schedulerFieldProjectRoot] = status.ProjectRoot
 		}
 
-		functional.When(func() bool { return !status.Running }).Then(func() {
+		if !status.Running {
 			statusData[objects.FieldKeyStatus] = schedulerStatusNotRunning
-		}).OrElseWhen(func() bool { return status.InProcess }).Then(func() {
+		} else if status.InProcess {
 			statusData[objects.FieldKeyStatus] = schedulerStatusRunning
 			statusData[schedulerFieldInProcess] = true
-		}).OrElse(func() {
+		} else {
 			statusData[objects.FieldKeyStatus] = schedulerStatusRunning
 			statusData[schedulerFieldInProcess] = false
 			statusData[schedulerFieldPID] = status.ProcessID
-		}).Run()
+		}
 
 		return outputSchedulerStatus(cmd, statusData)
 	})
@@ -89,23 +88,23 @@ func outputSchedulerStatusTable(cmd *cobra.Command, statusData map[string]any) e
 		schedulerpkg.SLog(logger).Warn("Failed to parse running status from status data").Log()
 	}
 
-	functional.When(func() bool { return !running }).Then(func() {
+	if !running {
 		buf.WriteString("Scheduler daemon: Not running\n")
 		if proot, ok := statusData[schedulerFieldProjectRoot].(string); ok && proot != emptyValue {
 			fmt.Fprintf(&buf, "  Checked: %s (run from project dir or set %s)\n", paths.SchedulerPIDFilePath(proot), zqkenv.ProjectRoot().Name())
 		} else {
 			fmt.Fprintf(&buf, "  No project root (run from project directory or set %s)\n", zqkenv.ProjectRoot().Name())
 		}
-	}).OrElse(func() {
+	} else {
 		buf.WriteString("Scheduler daemon: Running")
-		functional.When(func() bool { inProcess, ok := statusData[schedulerFieldInProcess].(bool); return ok && inProcess }).Then(func() {
+		if inProcess, ok := statusData[schedulerFieldInProcess].(bool); ok && inProcess {
 			buf.WriteString(" (in this process)\n")
-		}).OrElseWhen(func() bool { _, ok := statusData[schedulerFieldPID].(int); return ok }).Then(func() {
-			fmt.Fprintf(&buf, " (PID: %d)\n", statusData[schedulerFieldPID].(int))
-		}).OrElse(func() {
+		} else if pid, ok := statusData[schedulerFieldPID].(int); ok {
+			fmt.Fprintf(&buf, " (PID: %d)\n", pid)
+		} else {
 			buf.WriteString("\n")
-		}).Run()
-	}).Run()
+		}
+	}
 
 	return cli.WriteOutput(cmd, []byte(buf.String()))
 }
