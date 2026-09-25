@@ -32,7 +32,7 @@ setup:
     tool: "test_generate_builders"
     args:
       specs_dir: ".zqk/cli/specs"
-      output_dir: "pkg/cli/command_builders"
+      output_dir: "pkg/cli"
     expected:
       success: true
       has_field:

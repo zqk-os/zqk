@@ -38,7 +38,7 @@ func NewGenerateCommandBuildersCmd() *cobra.Command {
 	).
 		AddExample("Generate builders for all command specs", "%s system generate-command-builders").
 		AddExample("Generate builders from a specific directory", "%s system generate-command-builders --specs-dir .zqk/cli/specs").
-		AddExample("Generate builders to a specific output directory", "%s system generate-command-builders --output-dir pkg/cli/command_builders").
+		AddExample("Generate builders to a specific output directory", "%s system generate-command-builders --output-dir pkg/cli").
 		AddExample("Overwrite existing builder files", "%s system generate-command-builders --overwrite").
 		ExcludeCommonFlags()
 
@@ -60,7 +60,7 @@ func NewGenerateCommandBuildersCmd() *cobra.Command {
 
 		// Default output directory
 		if outputDir == EmptyValue {
-			outputDir = "pkg/cli/command_builders"
+			outputDir = "pkg/cli"
 		}
 
 		// Ensure output directory exists
@@ -112,8 +112,7 @@ func NewGenerateCommandBuildersCmd() *cobra.Command {
 			baseName = strings.ReplaceAll(baseName, string(filepath.Separator), "_")
 			baseName = strings.ReplaceAll(baseName, "/", "_")
 
-			parentDir := filepath.Dir(outputDir)
-			outputFile := filepath.Join(parentDir, "bldr_cli_cmd_v1", fmt.Sprintf("%s_command_builder.go", baseName))
+			outputFile := filepath.Join(outputDir, "bldr_cli_cmd_v1", fmt.Sprintf("%s_command_builder.go", baseName))
 
 			if !overwrite {
 				if _, err := fileutil.Stat(outputFile); err == nil {
@@ -145,7 +144,7 @@ func NewGenerateCommandBuildersCmd() *cobra.Command {
 	helpBuilder.ApplyToCommand(cmd)
 
 	cmd.Flags().StringVar(&specsDir, "specs-dir", "", "Directory containing YAML command spec files (default: .zqk/cli/specs)")
-	cmd.Flags().StringVar(&outputDir, "output-dir", "", "Output directory for generated builder files (default: pkg/cli/command_builders)")
+	cmd.Flags().StringVar(&outputDir, "output-dir", "", "Output directory for generated builder files (default: pkg/cli)")
 	cmd.Flags().BoolVar(&overwrite, "overwrite", false, "Overwrite existing command builder files")
 
 	cli.AddCommonFlags(cmd)

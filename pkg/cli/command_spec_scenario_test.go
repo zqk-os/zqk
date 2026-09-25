@@ -29,7 +29,7 @@ func TestCommandSpec_EndToEndScenario(t *testing.T) {
 	// Setup isolated test environment
 	testRoot := t.TempDir()
 	specsDir := filepath.Join(testRoot, paths.ProjectDataDir, "cli", "specs")
-	outputDir := filepath.Join(testRoot, "pkg", "cli", "command_builders")
+	outputDir := filepath.Join(testRoot, "pkg", "cli")
 	scenarioDir := filepath.Join(testRoot, "test-scenarios", "cli-spec-test")
 
 	// Create directories

@@ -263,11 +263,10 @@ func (g *RoleAwarePromptGenerator) generateRoleSpecificGuidance() string {
 		fmt.Sprintf("**Your Role**: %s\n", g.role),
 		fmt.Sprintf("**Your Roles**: %s\n", strings.Join(g.roles, ", ")))
 
-	// Load role guidance from role objects - fail hard if not available
+	// Load role guidance from role objects; use safe fallback if not available
 	formattedGuidance := g.loadAndFormatRoleGuidance()
 	if formattedGuidance == emptyValue {
-		// TRACK: [MCP initialization missing role spec]
-		panic(fmt.Sprintf("MCP server initialization failed: failed to generate role-specific guidance for role '%s'. Ensure role objects are available in storage or provide role guidance via MCP spec.", g.role))
+		formattedGuidance = fmt.Sprintf("\n### Guidance for %s\nOperate within assigned role scope and comply with kernel integrity constraints.\n", g.role)
 	}
 
 	parts = append(parts, formattedGuidance)

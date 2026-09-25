@@ -183,8 +183,25 @@ func getSystemHealthDataMCPFast(projectRoot string) map[string]any {
 		schedulerRunning = false
 	}
 	healthData["scheduler"] = map[string]any{"running": schedulerRunning}
-	healthData[objects.FieldKeyStatus] = "unknown"
 	healthData["mcp_fast"] = true
+
+	checkSummary := loadCheckSummaryFromSystemHealth(projectRoot)
+	if checkSummary != nil {
+		healthData["blocking_issues"] = checkSummary.Blocking
+		healthData["warnings"] = checkSummary.Warnings
+		healthData["total_objects"] = checkSummary.TotalObjects
+		healthData["source"] = checkSummary.Source
+		switch {
+		case checkSummary.Blocking > 0:
+			healthData[objects.FieldKeyStatus] = "degraded"
+		case checkSummary.Warnings > 0:
+			healthData[objects.FieldKeyStatus] = "warning"
+		default:
+			healthData[objects.FieldKeyStatus] = "healthy"
+		}
+	} else {
+		healthData[objects.FieldKeyStatus] = "unknown"
+	}
 	return healthData
 }
 
