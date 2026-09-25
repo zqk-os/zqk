@@ -115,6 +115,9 @@ func (b *CriteriaLifecycleBuilder) addCriteriaLifecycleData() {
 		Description: "Initial domain workflow transition to awaiting_verification.",
 		Manual:      true,
 		Auto:        true,
+		Preconditions: []string{
+			"at least one active test_case_ref linked",
+		},
 		Shockwave: objects.ShockwavePolicy{
 			Mode: "propagate",
 		},

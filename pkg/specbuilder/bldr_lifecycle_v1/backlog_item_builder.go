@@ -397,6 +397,7 @@ func (b *BacklogItemLifecycleBuilder) addBacklogItemLifecycleData() {
 		Auto:        false,
 		Preconditions: []string{
 			"Standard checks pass",
+			"all linked criteria_refs bound to active test_case_refs (tdd red phase)",
 		},
 		Shockwave: objects.ShockwavePolicy{
 			Mode: "propagate",
@@ -410,7 +411,7 @@ func (b *BacklogItemLifecycleBuilder) addBacklogItemLifecycleData() {
 		Manual:      true,
 		Auto:        false,
 		Preconditions: []string{
-			"Must link to a criteria object which is linked to an active but failing test_case (Red TDD phase)",
+			"all linked criteria_refs bound to active test_case_refs (tdd red phase)",
 		},
 		Shockwave: objects.ShockwavePolicy{
 			Mode: "propagate",

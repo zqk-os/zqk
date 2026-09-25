@@ -20,9 +20,9 @@ parameters:
         description: Directory path for catabolic exhaust (findings, scorecards, traces)
 integrity:
     algorithm: ed25519
-    signer_id: cef-curator@zqk.dev
-    content_digest: sha256:a50a65362b200b56e78cd9d8304d67ab4584875437ddb0008fcec064cdaf1ca3
-    signature: 718bc457abdb72651cbb1bb8832aaac88a2f49bde795cb0480507dd36a47d042fc67d3600a86ad8a2c0f40965dfba3308e978399237843a1eeb3c9f9a7c78b0f
+    signer_id: architect@zqk.dev
+    content_digest: sha256:1038a977714a60a5508586bb2eeca92c221c36b0e8ebf99a5bb5d82855b02b2d
+    signature: f288952c74a1c0ecfc31ab6599cfcb48c576c999f3911c66a27f96c9d307de7e71a32976f9ef1a96c45747314c9e59a373d0157866a1e5e52c245efd1c682a0a
 team_configuration_ref: TCFG-CEF-DIAMOND-EVALUATION
 membranes:
     - path: .zqk/process/
@@ -36,17 +36,23 @@ agents:
       role: specialist_evaluator
       skills:
         - ASK-COMMUNITY-CODE-CRAFTSMAN
+        - ASK-COMMUNITY-FUNCTIONAL-CRAFTSMAN
         - ASK-COMMUNITY-ARCH-DESIGN
+        - ASK-COMMUNITY-DISTRIBUTED-SYSTEMS
       system_prompt: Execute objective, evidence-driven codebase evaluation across designated lenses.
     - name: Adversarial Auditor
       role: adversarial_auditor
       skills:
         - ASK-COMMUNITY-QA-VERIFICATION
+        - ASK-COMMUNITY-FUNCTIONAL-CRAFTSMAN
+        - ASK-COMMUNITY-DISTRIBUTED-SYSTEMS
       system_prompt: Subject findings and code invariants to falsifiable critique, boundary tests, and fail-closed bounds.
     - name: Lead Integrator
       role: lead_integrator
       skills:
         - ASK-COMMUNITY-TPM-ORCHESTRATION
+        - ASK-COMMUNITY-FUNCTIONAL-CRAFTSMAN
+        - ASK-COMMUNITY-DISTRIBUTED-SYSTEMS
       system_prompt: Synthesize multi-agent findings, calculate Diamond Scale envelope, and certify convergence.
 tasks:
     - id: wave-1-preflight
