@@ -1,0 +1,89 @@
+{
+  "cef_version": "0.1.0",
+  "status": "complete",
+  "analyzed_at": "2026-09-25T09:18:00Z",
+  "target_repository": "github.com/zqk-os/zqk",
+  "commit_sha": "392fb153b506c0ecee2047a3ddb05a327a161f4e",
+  "freeze_sha": "392fb153b506c0ecee2047a3ddb05a327a161f4e",
+  "languages_detected": [
+    "go",
+    "yaml",
+    "markdown",
+    "shell",
+    "json",
+    "python"
+  ],
+  "adapters_enabled": [
+    "go"
+  ],
+  "include_globs_count": 1,
+  "exclude_globs_count": 9,
+  "inventory": {
+    "go_files": 7341,
+    "go_loc": 1100614,
+    "yaml_files": 622,
+    "yaml_loc": 52891,
+    "markdown_files": 107,
+    "markdown_loc": 9732,
+    "shell_files": 33,
+    "shell_loc": 3657,
+    "json_files": 26,
+    "json_loc": 62914,
+    "python_files": 3,
+    "python_loc": 1616,
+    "total_tracked_files": 8452,
+    "languages": [
+      "go",
+      "yaml",
+      "markdown",
+      "shell",
+      "json",
+      "python"
+    ]
+  },
+  "available_tools": {
+    "go": "go1.26.6 darwin/arm64",
+    "golangci-lint": "2.11.4",
+    "gofmt": "go1.26.6 darwin/arm64",
+    "zqk-vet": "./bin/zqk-vet (hygiene, tree, payload)",
+    "zqk": "dev (bin/zqk)",
+    "git": "2.54.0",
+    "python3": "3.9.6",
+    "police-community-tree.sh": "./scripts/open-core/police-community-tree.sh",
+    "docker": "/usr/local/bin/docker",
+    "jq": "/opt/homebrew/bin/jq"
+  },
+  "tools_executed": [
+    {
+      "tool": "go vet ./cmd/... ./internal/...",
+      "exit_code": 0,
+      "findings": 0
+    },
+    {
+      "tool": "zqk-vet hygiene",
+      "exit_code": 1,
+      "findings": 4
+    },
+    {
+      "tool": "zqk-vet tree_police",
+      "exit_code": 0,
+      "findings": 0
+    },
+    {
+      "tool": "zqk-vet payload",
+      "exit_code": 0,
+      "findings": 0
+    },
+    {
+      "tool": "police-community-tree.sh",
+      "exit_code": 0,
+      "findings": 0
+    },
+    {
+      "tool": "zqk system export-gate",
+      "exit_code": 0,
+      "findings": 0
+    }
+  ],
+  "notes": "Wave 0 L-PREFLIGHT complete. Codebase inventory and tool availability cataloged. Scope frozen."
+}

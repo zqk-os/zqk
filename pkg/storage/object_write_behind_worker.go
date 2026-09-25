@@ -58,6 +58,8 @@ type ObjectWriteBehindWorker struct {
 	backlogCheckInterval time.Duration
 	// lastCompactTime is when we last ran WAL compaction (for compactInterval)
 	lastCompactTime time.Time
+	// applyFn overrides standard storage apply when non-nil (for testing error scenarios)
+	applyFn func(ctx context.Context, op *PendingOp, secCtx *pkgctx.SecurityContext) error
 }
 
 // NewObjectWriteBehindWorker creates a worker that will apply ops from buf using storage.
@@ -345,9 +347,11 @@ func (w *ObjectWriteBehindWorker) processOneOrMore(ctx context.Context, secCtx *
 			return
 		}
 		if err := w.apply(ctx, op, secCtx); err != nil {
-			// Only drop-and-advance for explicitly retryable cases (WAL retains the op for replay).
-			// For other failures, keep the op at the head and do not advance applied_seq so we never
-			// claim durability that did not happen (silent data loss). Backlog ticker will retry apply.
+			// Do NOT drop-and-advance for retryable cases (e.g. SaveQueue full).
+			// Advancing applied_seq while dropping the op guarantees permanent data loss because
+			// CompactWAL purges records <= applied_seq and startup replay skips them.
+			// Instead, keep the op at the head of the buffer and do not advance applied_seq so
+			// the next tick or notification retries once the save queue has drained.
 			if isRetryableWriteBehindApplyDrop(err) {
 				StorageLog(logger).Warn(LogEventStorageWriteBehindApplyRetryableDropped).
 					WithError(err).
@@ -355,10 +359,8 @@ func (w *ObjectWriteBehindWorker) processOneOrMore(ctx context.Context, secCtx *
 					Kind(op.Kind).
 					ObjectID(op.ID).
 					Log()
-				w.buf.RemoveFront(op)
-				pendingSeq = op.Seq
 				flushCheckpoint(pendingSeq)
-				continue
+				return
 			}
 			StorageLog(logger).Error(LogEventStorageWriteBehindApplyNonRetryableHeld, err).
 				String("op", op.Op).

@@ -35,8 +35,15 @@ type FileObjectTransaction struct {
 	ctx        context.Context
 	mu         sync.Mutex
 	ops        []fileTransactionOp
+	applied    []appliedTxOp
 	committed  bool
 	rolledBack bool
+}
+
+type appliedTxOp struct {
+	opType  string
+	id      string
+	prevObj map[string]any
 }
 
 type fileTransactionOp struct {

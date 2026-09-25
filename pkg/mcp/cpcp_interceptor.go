@@ -73,6 +73,9 @@ func (ci *CPCPInterceptor) checkProtectedPath(p string) error {
 		paths.ProjectDataDir + "/streams",
 		paths.ProjectDataDir + "/cas",
 		paths.ProjectDataDir + "/wal",
+		paths.ProjectDataDir + "/run",
+		paths.ProjectDataDir + "/bin",
+		paths.ProjectDataDir + "/state",
 	}
 
 	for _, seg := range protectedSegments {

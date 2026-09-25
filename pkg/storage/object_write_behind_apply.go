@@ -11,6 +11,9 @@ import (
 )
 
 func (w *ObjectWriteBehindWorker) apply(ctx context.Context, op *PendingOp, secCtx *pkgctx.SecurityContext) error {
+	if w.applyFn != nil {
+		return w.applyFn(ctx, op, secCtx)
+	}
 	switch op.Op {
 	case "create":
 		return w.storage.applyCreateFromBuffer(ctx, op.ID, op.Kind, op.Data, secCtx)
@@ -32,8 +35,7 @@ func (w *ObjectWriteBehindWorker) drain(ctx context.Context, secCtx *pkgctx.Secu
 		}
 		if err := w.apply(ctx, op, secCtx); err != nil {
 			if isRetryableWriteBehindApplyDrop(err) {
-				w.buf.RemoveFront(op)
-				logging.LogSwallowedError(WriteAppliedSeq(w.projectRoot, op.Seq))
+				time.Sleep(10 * time.Millisecond)
 				continue
 			}
 			StorageLog(logger).Error(LogEventStorageWriteBehindShutdownDrainApplyFailed, err).

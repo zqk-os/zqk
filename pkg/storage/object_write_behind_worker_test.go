@@ -9,6 +9,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/concurrency"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -380,3 +381,42 @@ func TestObjectWriteBehindWorker_PostStartupCompaction(t *testing.T) {
 		t.Errorf("WAL should be empty after post-startup compaction; got %d bytes (regression: workers would replay stale entries every 250ms)", walSize)
 	}
 }
+
+func TestObjectWriteBehindWorker_RetryableQueueFullDoesNotDropOrAdvance(t *testing.T) {
+	tmpDir := t.TempDir()
+	buf := NewObjectWriteBuffer()
+	buf.Enqueue("create", "backlog_item", "BLI-DATA-LOSS-TEST", 42, []byte(`{"id":"BLI-DATA-LOSS-TEST"}`))
+
+	worker := &ObjectWriteBehindWorker{
+		projectRoot: tmpDir,
+		buf:         buf,
+		applyFn: func(ctx context.Context, op *PendingOp, secCtx *pkgctx.SecurityContext) error {
+			return errors.New(ConstStreamSaveQueueIsFull)
+		},
+	}
+
+	ctx := context.Background()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+
+	// Initial checkpoint is 0
+	seq, _ := ReadAppliedSeq(tmpDir)
+	if seq != 0 {
+		t.Fatalf("expected initial seq 0, got %d", seq)
+	}
+
+	// Run processOneOrMore
+	worker.processOneOrMore(ctx, secCtx, logger)
+
+	// Op must NOT have been removed from buffer
+	if worker.buf.Len() != 1 {
+		t.Fatalf("data loss vulnerability! Op was dropped from write-behind buffer on retryable queue full error")
+	}
+
+	// Checkpoint must NOT have advanced to 42
+	seqAfter, _ := ReadAppliedSeq(tmpDir)
+	if seqAfter >= 42 {
+		t.Fatalf("data loss vulnerability! Checkpoint advanced to %d despite mutation not being durably applied", seqAfter)
+	}
+}
+

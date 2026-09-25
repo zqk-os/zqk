@@ -304,3 +304,31 @@ func TestCheckSandboxAllowlist_redirection(t *testing.T) {
 		})
 	}
 }
+
+func TestCheckSandboxAllowlist_EscapeDenials(t *testing.T) {
+	cases := []struct {
+		cmd     string
+		wantErr bool
+		errSub  string
+	}{
+		{"find . -name '*.go'", false, ""},
+		{"find . -type f", false, ""},
+		{"find . -exec rm -rf / {} +", true, "execution flag is not permitted"},
+		{"find . -ok echo {} \\;", true, "execution flag is not permitted"},
+		{"go test ./...", false, ""},
+		{"go build ./cmd/zqk", false, ""},
+		{"go run exploit.go", true, "'go run' is not permitted"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.cmd, func(t *testing.T) {
+			err := checkSandboxAllowlist(tc.cmd)
+			if (err != nil) != tc.wantErr {
+				t.Fatalf("checkSandboxAllowlist(%q) error = %v, wantErr = %v", tc.cmd, err, tc.wantErr)
+			}
+			if tc.wantErr && !strings.Contains(err.Error(), tc.errSub) {
+				t.Fatalf("checkSandboxAllowlist(%q) error = %v, expected substring %q", tc.cmd, err, tc.errSub)
+			}
+		})
+	}
+}
+

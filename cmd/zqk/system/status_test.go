@@ -95,5 +95,80 @@ func TestFormatStatusTablePlan_WithoutBacklogItems(t *testing.T) {
 	}
 }
 
-// Note: Full integration test for status would require a properly initialized
-// ZQK project with objects. This is tested manually or in integration tests.
+func TestFormatStatusTableStatus_SubsystemHealth(t *testing.T) {
+	t.Parallel()
+
+	// 1. Healthy
+	healthyData := map[string]any{
+		objects.FieldKeyStatus: projectStatusInitialized,
+		"system_health": map[string]any{
+			objects.FieldKeyStatus: "partial_ok",
+			"scheduler":            map[string]any{"running": true},
+			"blocking_issues":      0,
+			"warnings":             0,
+		},
+	}
+	out := formatStatusTableStatus(healthyData)
+	if !strings.Contains(out, "✅ Initialized (Healthy)") {
+		t.Errorf("expected healthy initialized status, got %q", out)
+	}
+
+	// 2. Critical blocking issues - must NOT report green
+	criticalData := map[string]any{
+		objects.FieldKeyStatus: projectStatusInitialized,
+		"system_health": map[string]any{
+			objects.FieldKeyStatus: "critical",
+			"scheduler":            map[string]any{"running": true},
+			"blocking_issues":      3,
+			"warnings":             1,
+		},
+	}
+	outCrit := formatStatusTableStatus(criticalData)
+	if strings.Contains(outCrit, "✅") {
+		t.Errorf("false-green detected! Critical health must not contain ✅, got %q", outCrit)
+	}
+	if !strings.Contains(outCrit, "❌ Degraded / Critical (3 blocking issue(s) detected)") {
+		t.Errorf("expected critical status text, got %q", outCrit)
+	}
+
+	// 3. Scheduler stopped - must report warning
+	schedStoppedData := map[string]any{
+		objects.FieldKeyStatus: projectStatusInitialized,
+		"system_health": map[string]any{
+			objects.FieldKeyStatus: "partial_ok",
+			"scheduler":            map[string]any{"running": false},
+			"blocking_issues":      0,
+		},
+	}
+	outSched := formatStatusTableStatus(schedStoppedData)
+	if strings.Contains(outSched, "✅") {
+		t.Errorf("false-green detected! Stopped scheduler must not contain ✅, got %q", outSched)
+	}
+	if !strings.Contains(outSched, "⚠️  Initialized (Scheduler daemon stopped)") {
+		t.Errorf("expected scheduler stopped warning, got %q", outSched)
+	}
+}
+
+func TestFormatStatusTableHealth_DisplaysDetails(t *testing.T) {
+	t.Parallel()
+
+	healthData := map[string]any{
+		"system_health": map[string]any{
+			"scheduler":            map[string]any{"running": true},
+			objects.FieldKeyStatus: "warning",
+			"blocking_issues":      0,
+			"warnings":             4,
+		},
+	}
+	out := formatStatusTableHealth(healthData)
+	if !strings.Contains(out, "System Health:") {
+		t.Errorf("expected 'System Health:' header, got %q", out)
+	}
+	if !strings.Contains(out, "Scheduler: running") {
+		t.Errorf("expected scheduler running, got %q", out)
+	}
+	if !strings.Contains(out, "Warnings: 4") {
+		t.Errorf("expected warnings count, got %q", out)
+	}
+}
+
