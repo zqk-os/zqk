@@ -12,8 +12,9 @@ require (
 	github.com/google/go-cmp v0.7.0
 	github.com/jedib0t/go-pretty/v6 v6.8.0
 	github.com/joho/godotenv v1.5.1
+	github.com/mattn/go-runewidth v0.0.16
 	github.com/mitchellh/go-ps v1.0.0
-	github.com/neo4j/neo4j-go-driver/v5 v5.28.4
+	github.com/neo4j/neo4j-go-driver/v5 v5.28.5
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1
 	github.com/shirou/gopsutil/v3 v3.24.5
@@ -37,7 +38,6 @@ require (
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
