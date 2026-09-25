@@ -351,8 +351,7 @@ transitions:
     auto: false
     preconditions:
       - Standard checks pass
-      - Must link to a criteria object which is linked to an active but failing 
-        test_case (Red TDD phase)
+      - all linked criteria_refs bound to active test_case_refs (tdd red phase)
     postconditions:
       - role is execution_locked
     catalyst: Standard progression
@@ -364,8 +363,7 @@ transitions:
     manual: true
     auto: false
     preconditions:
-      - Must link to a criteria object which is linked to an active but failing 
-        test_case (Red TDD phase)
+      - all linked criteria_refs bound to active test_case_refs (tdd red phase)
     postconditions:
       - role is execution_locked
     catalyst: Standard progression

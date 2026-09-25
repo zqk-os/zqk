@@ -155,8 +155,8 @@ const (
 	// Must be the exact lifecycle precondition string so checkPrecondition cannot no-op.
 	// TRACK: CAP dor-gap vs empty-column split.
 	PrecondCRIShovelReady = shovelready.Precondition
-	// PrecondTDDTestRedPhase requires that the object links to a criteria linked to a red test case
-	PrecondTDDTestRedPhase = "Must link to a criteria object which is linked to an active but failing test_case (Red TDD phase)"
+	// PrecondTDDTestRedPhase requires that all criteria linked to the backlog item are bound to active test cases
+	PrecondTDDTestRedPhase = "all linked criteria_refs bound to active test_case_refs (tdd red phase)"
 	// PrecondCriteriaLinkedToActiveTestCase requires that a criterion links to an active/ready test case
 	PrecondCriteriaLinkedToActiveTestCase = "Must link to an active test_case"
 	// PrecondAllLinkedBacklogReadyOrLater gates execution lock (→in_progress), including shockwave:
