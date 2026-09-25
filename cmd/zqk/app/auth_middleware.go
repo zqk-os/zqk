@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"testing"
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
@@ -43,15 +44,8 @@ func AuthMiddleware(cmd *cobra.Command, projectRoot string) error {
 	if bypassVal == "1" {
 		isTest = true
 	} else if bypassVal != "0" {
-		if strings.HasSuffix(os.Args[0], ".test") {
+		if testing.Testing() || strings.HasSuffix(os.Args[0], ".test") {
 			isTest = true
-		} else {
-			for _, arg := range os.Args {
-				if strings.HasPrefix(arg, "-test.") {
-					isTest = true
-					break
-				}
-			}
 		}
 	}
 

@@ -10,6 +10,7 @@ import (
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects/koi"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/pipeline"
 	"github.com/zqk-os/zqk/pkg/shovelready"
@@ -221,14 +222,14 @@ func evalOverlayRule(ctx context.Context, kind string, obj map[string]any, looku
 }
 
 func evalRefuseFieldPresent(obj map[string]any, cfg map[string]any) []ValidationError {
-	field, _ := cfg[objects.FieldKeyField].(string)
+	field := koi.GetString(cfg, objects.FieldKeyField)
 	if field == "" {
 		return nil
 	}
 	if _, ok := obj[field]; !ok {
 		return nil
 	}
-	msg, _ := cfg["message"].(string)
+	msg := koi.GetString(cfg, "message")
 	if msg == "" {
 		msg = fmt.Sprintf("field %s must not be present", field)
 	}
@@ -240,8 +241,8 @@ func evalRefuseFieldPresent(obj map[string]any, cfg map[string]any) []Validation
 }
 
 func evalRefuseRefPrefix(obj map[string]any, cfg map[string]any) []ValidationError {
-	field, _ := cfg[objects.FieldKeyField].(string)
-	prefix, _ := cfg["prefix"].(string)
+	field := koi.GetString(cfg, objects.FieldKeyField)
+	prefix := koi.GetString(cfg, "prefix")
 	if field == "" || prefix == "" {
 		return nil
 	}
@@ -249,7 +250,7 @@ func evalRefuseRefPrefix(obj map[string]any, cfg map[string]any) []ValidationErr
 		if !strings.HasPrefix(ref, prefix) {
 			continue
 		}
-		msg, _ := cfg["message"].(string)
+		msg := koi.GetString(cfg, "message")
 		if msg == "" {
 			msg = fmt.Sprintf("%s must not contain %s references", field, prefix)
 		}
@@ -343,8 +344,8 @@ func evalRefuseUnknownFields(kind string, obj map[string]any, cfg map[string]any
 }
 
 func evalRefuseSelfRef(obj map[string]any, cfg map[string]any) []ValidationError {
-	field, _ := cfg[objects.FieldKeyField].(string)
-	id, _ := obj[objects.FieldKeyID].(string)
+	field := koi.GetString(cfg, objects.FieldKeyField)
+	id := koi.ID(obj)
 	if field == "" || id == "" {
 		return nil
 	}
@@ -352,7 +353,7 @@ func evalRefuseSelfRef(obj map[string]any, cfg map[string]any) []ValidationError
 		if ref != id {
 			continue
 		}
-		msg, _ := cfg["message"].(string)
+		msg := koi.GetString(cfg, "message")
 		if msg == "" {
 			msg = fmt.Sprintf("%s must not contain this object's id", field)
 		}
@@ -362,8 +363,8 @@ func evalRefuseSelfRef(obj map[string]any, cfg map[string]any) []ValidationError
 }
 
 func evalRefuseTwoCycle(obj map[string]any, lookup ObjectLookup, cfg map[string]any) []ValidationError {
-	field, _ := cfg[objects.FieldKeyField].(string)
-	id, _ := obj[objects.FieldKeyID].(string)
+	field := koi.GetString(cfg, objects.FieldKeyField)
+	id := koi.ID(obj)
 	if field == "" || id == "" || lookup == nil {
 		return nil
 	}
@@ -379,7 +380,7 @@ func evalRefuseTwoCycle(obj map[string]any, lookup ObjectLookup, cfg map[string]
 			if back != id {
 				continue
 			}
-			msg, _ := cfg["message"].(string)
+			msg := koi.GetString(cfg, "message")
 			if msg == "" {
 				msg = fmt.Sprintf("%s must not form a 2-cycle", field)
 			}
@@ -390,11 +391,11 @@ func evalRefuseTwoCycle(obj map[string]any, lookup ObjectLookup, cfg map[string]
 }
 
 func evalRefuseChildStatus(obj map[string]any, lookup ObjectLookup, cfg map[string]any) []ValidationError {
-	parentStatus, _ := obj[objects.FieldKeyStatus].(string)
-	whenParentStatus, _ := cfg["when_parent_status"].([]any)
+	parentStatus := koi.Status(obj)
+	whenParentStatus := koi.GetStringSlice(cfg, "when_parent_status")
 	match := false
 	for _, s := range whenParentStatus {
-		if ss, ok := s.(string); ok && ss == parentStatus {
+		if s == parentStatus {
 			match = true
 			break
 		}
@@ -402,27 +403,18 @@ func evalRefuseChildStatus(obj map[string]any, lookup ObjectLookup, cfg map[stri
 	if !match {
 		return nil
 	}
-	childField, _ := cfg["child_field"].(string)
-	refuseChildStatus, _ := cfg["refuse_child_status"].([]any)
-	var childRefs []any
-	switch v := obj[childField].(type) {
-	case []any:
-		childRefs = v
-	case []string:
-		for _, s := range v {
-			childRefs = append(childRefs, s)
-		}
-	}
+	childField := koi.GetString(cfg, "child_field")
+	refuseChildStatus := koi.GetStringSlice(cfg, "refuse_child_status")
+	childRefs := stringRefs(obj[childField])
 	var errs []ValidationError
-	for _, childRef := range childRefs {
-		childID, _ := childRef.(string)
+	for _, childID := range childRefs {
 		if childID == "" {
 			continue
 		}
 		childStatus := lookupPlanStatus(childID, lookup)
 		for _, s := range refuseChildStatus {
-			if ss, ok := s.(string); ok && ss == childStatus {
-				msgFmt, _ := cfg["message_fmt"].(string)
+			if s == childStatus {
+				msgFmt := koi.GetString(cfg, "message_fmt")
 				if msgFmt == "" {
 					msgFmt = "child %s is in forbidden status '%s'"
 				}
@@ -441,15 +433,15 @@ func evalRefuseExecutionFacingMembership(ctx context.Context, kind string, obj m
 	if pkgctx.IsLifecycleBreakGlass(ctx) {
 		return nil
 	}
-	planField, _ := cfg["plan_field"].(string)
+	planField := koi.GetString(cfg, "plan_field")
 	if planField == "" {
 		planField = objects.FieldKeyPriorityPlanRef
 	}
-	planID, _ := obj[planField].(string)
+	planID := koi.GetString(obj, planField)
 	if strings.TrimSpace(planID) == "" {
 		return nil
 	}
-	status, _ := obj[objects.FieldKeyStatus].(string)
+	status := koi.Status(obj)
 	objKind := kind
 	if objKind == "" {
 		objKind = objects.KindBacklogItem
@@ -470,9 +462,9 @@ func evalRefuseExecutionFacingMembership(ctx context.Context, kind string, obj m
 		return nil
 	}
 	if status == "originated" || status == "validated" || status == "exploring" {
-		if id, _ := obj[objects.FieldKeyID].(string); id != "" && lookup != nil {
+		if id := koi.ID(obj); id != "" && lookup != nil {
 			if old, err := lookup(id); err == nil && old != nil {
-				oldRef, _ := old[planField].(string)
+				oldRef := koi.GetString(old, planField)
 				if oldRef == planID {
 					return nil
 				}
@@ -496,7 +488,7 @@ func evalRefuseExecutionFacingMembership(ctx context.Context, kind string, obj m
 	if !requiresReady {
 		return nil
 	}
-	msgFmt, _ := cfg["message_fmt"].(string)
+	msgFmt := koi.GetString(cfg, "message_fmt")
 	if msgFmt == "" {
 		msgFmt = "backlog item status %q cannot link to %s priority plan %s"
 	}
@@ -512,9 +504,9 @@ func evalRefuseExecutionFacingMembership(ctx context.Context, kind string, obj m
 
 func evalRequireRefAny(ctx context.Context, kind string, obj map[string]any, cfg map[string]any) []ValidationError {
 	fields, _ := cfg["fields"].([]any)
-	status, _ := obj[objects.FieldKeyStatus].(string)
+	status := koi.Status(obj)
 	sc := objects.GetGlobalStatusChecker()
-	objKind, _ := cfg[objects.FieldKeyObjectKind].(string)
+	objKind := koi.GetString(cfg, objects.FieldKeyObjectKind)
 	if objKind == "" {
 		objKind = kind
 	}
@@ -559,10 +551,10 @@ func evalRequireRefAny(ctx context.Context, kind string, obj map[string]any, cfg
 }
 
 func statusMatchesConfig(obj map[string]any, cfg map[string]any) bool {
-	status, _ := obj[objects.FieldKeyStatus].(string)
-	statuses, _ := cfg[objects.FieldKeyStatuses].([]any)
+	status := koi.Status(obj)
+	statuses := koi.GetStringSlice(cfg, objects.FieldKeyStatuses)
 	for _, s := range statuses {
-		if ss, ok := s.(string); ok && ss == status {
+		if s == status {
 			return true
 		}
 	}
@@ -570,14 +562,14 @@ func statusMatchesConfig(obj map[string]any, cfg map[string]any) bool {
 }
 
 func evalRequireField(ctx context.Context, kind string, obj map[string]any, cfg map[string]any) []ValidationError {
-	field, _ := cfg[objects.FieldKeyField].(string)
+	field := koi.GetString(cfg, objects.FieldKeyField)
 	if field == "" || hasNonEmpty(obj, field) {
 		return nil
 	}
 	if skip, _ := cfg["skip_preliminary"].(bool); skip {
-		status, _ := obj[objects.FieldKeyStatus].(string)
+		status := koi.Status(obj)
 		sc := objects.GetGlobalStatusChecker()
-		objKind, _ := cfg[objects.FieldKeyObjectKind].(string)
+		objKind := koi.GetString(cfg, objects.FieldKeyObjectKind)
 		if objKind == "" {
 			objKind = kind
 		}
@@ -586,9 +578,9 @@ func evalRequireField(ctx context.Context, kind string, obj map[string]any, cfg 
 		}
 	}
 	if skip, _ := cfg["skip_terminal"].(bool); skip {
-		status, _ := obj[objects.FieldKeyStatus].(string)
+		status := koi.Status(obj)
 		sc := objects.GetGlobalStatusChecker()
-		objKind, _ := cfg[objects.FieldKeyObjectKind].(string)
+		objKind := koi.GetString(cfg, objects.FieldKeyObjectKind)
 		if objKind == "" {
 			objKind = kind
 		}
@@ -596,7 +588,7 @@ func evalRequireField(ctx context.Context, kind string, obj map[string]any, cfg 
 			return nil
 		}
 	}
-	msg, _ := cfg["message"].(string)
+	msg := koi.GetString(cfg, "message")
 	if msg == "" {
 		msg = fmt.Sprintf("%s must be set", field)
 	}
@@ -613,18 +605,18 @@ func evalRequireFieldWhenStatus(obj map[string]any, cfg map[string]any) []Valida
 				return nil
 			}
 		}
-		msg, _ := cfg["message"].(string)
-		field, _ := cfg[objects.FieldKeyField].(string)
+		msg := koi.GetString(cfg, "message")
+		field := koi.GetString(cfg, objects.FieldKeyField)
 		if field == "" && len(stringRefs(fieldsRaw)) > 0 {
 			field = stringRefs(fieldsRaw)[0]
 		}
 		return []ValidationError{{Field: field, Message: msg, Rule: "composed_integrity"}}
 	}
-	field, _ := cfg[objects.FieldKeyField].(string)
+	field := koi.GetString(cfg, objects.FieldKeyField)
 	if hasNonEmpty(obj, field) {
 		return nil
 	}
-	msg, _ := cfg["message"].(string)
+	msg := koi.GetString(cfg, "message")
 	return []ValidationError{{Field: field, Message: msg, Rule: "composed_integrity"}}
 }
 
@@ -636,7 +628,7 @@ func evalShovelReadyWhenStatus(obj map[string]any, cfg map[string]any) []Validat
 	if res.Ready {
 		return nil
 	}
-	msg, _ := cfg["message"].(string)
+	msg := koi.GetString(cfg, "message")
 	if msg == "" {
 		msg = shovelready.Precondition + " fields are missing"
 	}
@@ -651,24 +643,24 @@ func evalShovelReadyWhenStatus(obj map[string]any, cfg map[string]any) []Validat
 }
 
 func evalRefuseFieldWhenStatus(obj map[string]any, cfg map[string]any) []ValidationError {
-	field, _ := cfg[objects.FieldKeyField].(string)
+	field := koi.GetString(cfg, objects.FieldKeyField)
 	if field == "" || !statusMatchesConfig(obj, cfg) {
 		return nil
 	}
 	if !hasNonEmpty(obj, field) {
 		return nil
 	}
-	msg, _ := cfg["message"].(string)
+	msg := koi.GetString(cfg, "message")
 	if msg == "" {
-		msg = fmt.Sprintf("field %s must not be set when status is %v", field, obj[objects.FieldKeyStatus])
+		msg = fmt.Sprintf("field %s must not be set when status is %v", field, koi.Status(obj))
 	}
 	return []ValidationError{{Field: field, Message: msg, Rule: "composed_integrity"}}
 }
 
 func evalRequireFieldWhenActive(kind string, obj map[string]any, cfg map[string]any) []ValidationError {
-	field, _ := cfg[objects.FieldKeyField].(string)
-	status, _ := obj[objects.FieldKeyStatus].(string)
-	objKind, _ := cfg[objects.FieldKeyKind].(string)
+	field := koi.GetString(cfg, objects.FieldKeyField)
+	status := koi.Status(obj)
+	objKind := koi.GetString(cfg, objects.FieldKeyKind)
 	if objKind == "" {
 		objKind = kind
 	}
@@ -684,7 +676,7 @@ func evalRequireFieldWhenActive(kind string, obj map[string]any, cfg map[string]
 	if hasNonEmpty(obj, field) {
 		return nil
 	}
-	msg, _ := cfg["message"].(string)
+	msg := koi.GetString(cfg, "message")
 	if strings.Contains(msg, "%s") {
 		msg = fmt.Sprintf(msg, status)
 	}
@@ -692,7 +684,7 @@ func evalRequireFieldWhenActive(kind string, obj map[string]any, cfg map[string]
 }
 
 func evalMinStringLen(obj map[string]any, cfg map[string]any) []ValidationError {
-	field, _ := cfg[objects.FieldKeyField].(string)
+	field := koi.GetString(cfg, objects.FieldKeyField)
 	minLen := 0
 	switch v := cfg["min_len"].(type) {
 	case int:
@@ -700,17 +692,17 @@ func evalMinStringLen(obj map[string]any, cfg map[string]any) []ValidationError 
 	case float64:
 		minLen = int(v)
 	}
-	raw, _ := obj[field].(string)
+	raw := koi.GetString(obj, field)
 	if len(raw) >= minLen {
 		return nil
 	}
-	msg, _ := cfg["message"].(string)
+	msg := koi.GetString(cfg, "message")
 	return []ValidationError{{Field: field, Message: msg, Rule: "composed_integrity"}}
 }
 
 func evalRefusePlanStatus(ctx context.Context, obj map[string]any, lookup ObjectLookup, cfg map[string]any) []ValidationError {
-	planField, _ := cfg["plan_field"].(string)
-	planRef, _ := obj[planField].(string)
+	planField := koi.GetString(cfg, "plan_field")
+	planRef := koi.GetString(obj, planField)
 	if planRef == "" {
 		return nil
 	}
@@ -718,10 +710,10 @@ func evalRefusePlanStatus(ctx context.Context, obj map[string]any, lookup Object
 		if pkgctx.IsLifecycleBreakGlass(ctx) {
 			return nil
 		}
-		id, _ := obj[objects.FieldKeyID].(string)
+		id := koi.ID(obj)
 		if id != "" && lookup != nil {
 			if old, err := lookup(id); err == nil && old != nil {
-				oldRef, _ := old[planField].(string)
+				oldRef := koi.GetString(old, planField)
 				if oldRef == planRef {
 					return nil
 				}
@@ -729,11 +721,11 @@ func evalRefusePlanStatus(ctx context.Context, obj map[string]any, lookup Object
 		}
 	}
 	// when_object_status gate
-	if when, ok := cfg["when_object_status"].([]any); ok && len(when) > 0 {
-		status, _ := obj[objects.FieldKeyStatus].(string)
+	if when := koi.GetStringSlice(cfg, "when_object_status"); len(when) > 0 {
+		status := koi.Status(obj)
 		match := false
 		for _, s := range when {
-			if ss, _ := s.(string); ss == status {
+			if s == status {
 				match = true
 				break
 			}
@@ -746,10 +738,10 @@ func evalRefusePlanStatus(ctx context.Context, obj map[string]any, lookup Object
 	if planStatus == "" {
 		return nil
 	}
-	if req, ok := cfg["require_plan_status"].([]any); ok && len(req) > 0 {
+	if req := koi.GetStringSlice(cfg, "require_plan_status"); len(req) > 0 {
 		okStatus := false
 		for _, s := range req {
-			if ss, _ := s.(string); strings.EqualFold(ss, planStatus) {
+			if strings.EqualFold(s, planStatus) {
 				okStatus = true
 				break
 			}
@@ -757,17 +749,17 @@ func evalRefusePlanStatus(ctx context.Context, obj map[string]any, lookup Object
 		if okStatus {
 			return nil
 		}
-		msgFmt, _ := cfg["message_fmt"].(string)
+		msgFmt := koi.GetString(cfg, "message_fmt")
 		return []ValidationError{{
 			Field:   objects.FieldKeyStatus,
 			Message: fmt.Sprintf(msgFmt, planRef, planStatus),
 			Rule:    "composed_integrity",
 		}}
 	}
-	refuseWhen, _ := cfg["refuse_when"].([]any)
+	refuseWhen := koi.GetStringSlice(cfg, "refuse_when")
 	for _, s := range refuseWhen {
-		if ss, _ := s.(string); strings.EqualFold(ss, planStatus) {
-			msgFmt, _ := cfg["message_fmt"].(string)
+		if strings.EqualFold(s, planStatus) {
+			msgFmt := koi.GetString(cfg, "message_fmt")
 			return []ValidationError{{
 				Field:   planField,
 				Message: fmt.Sprintf(msgFmt, planRef, planStatus),
@@ -781,8 +773,7 @@ func evalRefusePlanStatus(ctx context.Context, obj map[string]any, lookup Object
 func lookupPlanStatus(planRef string, lookup ObjectLookup) string {
 	if lookup != nil {
 		if obj, err := lookup(planRef); err == nil && obj != nil {
-			st, _ := obj[objects.FieldKeyStatus].(string)
-			return st
+			return koi.Status(obj)
 		}
 	}
 	// Disk fallback (same spirit as former getPriorityPlanStatus).
@@ -811,9 +802,8 @@ func lookupPlanStatus(planRef string, lookup ObjectLookup) string {
 		if yaml.Unmarshal(b, &m) != nil {
 			continue
 		}
-		if id, _ := m[objects.FieldKeyID].(string); id == planRef {
-			st, _ := m[objects.FieldKeyStatus].(string)
-			return st
+		if koi.ID(m) == planRef {
+			return koi.Status(m)
 		}
 	}
 	return ""
@@ -838,34 +828,30 @@ func hasNonEmpty(obj map[string]any, field string) bool {
 
 func evalValidatePriorityValues(obj map[string]any, cfg map[string]any) []ValidationError {
 	var errs []ValidationError
-	if rawPri, ok := obj[objects.FieldKeyPriority]; ok && rawPri != nil {
-		if s, ok := rawPri.(string); ok && strings.TrimSpace(s) != "" {
-			if !objects.IsLegitimatePriority(s) {
-				msg, _ := cfg["priority_message"].(string)
-				if msg == "" {
-					msg = fmt.Sprintf("invalid priority %q: must be one of critical, high, medium, low", s)
-				}
-				errs = append(errs, ValidationError{
-					Field:   objects.FieldKeyPriority,
-					Message: msg,
-					Rule:    "composed_integrity",
-				})
+	if s := koi.GetString(obj, objects.FieldKeyPriority); s != "" {
+		if !objects.IsLegitimatePriority(s) {
+			msg := koi.GetString(cfg, "priority_message")
+			if msg == "" {
+				msg = fmt.Sprintf("invalid priority %q: must be one of critical, high, medium, low", s)
 			}
+			errs = append(errs, ValidationError{
+				Field:   objects.FieldKeyPriority,
+				Message: msg,
+				Rule:    "composed_integrity",
+			})
 		}
 	}
-	if rawTier, ok := obj[objects.FieldKeyPriorityTier]; ok && rawTier != nil {
-		if s, ok := rawTier.(string); ok && strings.TrimSpace(s) != "" {
-			if !objects.IsLegitimatePriorityTier(s) {
-				msg, _ := cfg["tier_message"].(string)
-				if msg == "" {
-					msg = fmt.Sprintf("invalid priority_tier %q: must be one of P0, P1, P2, P3", s)
-				}
-				errs = append(errs, ValidationError{
-					Field:   objects.FieldKeyPriorityTier,
-					Message: msg,
-					Rule:    "composed_integrity",
-				})
+	if s := koi.GetString(obj, objects.FieldKeyPriorityTier); s != "" {
+		if !objects.IsLegitimatePriorityTier(s) {
+			msg := koi.GetString(cfg, "tier_message")
+			if msg == "" {
+				msg = fmt.Sprintf("invalid priority_tier %q: must be one of P0, P1, P2, P3", s)
 			}
+			errs = append(errs, ValidationError{
+				Field:   objects.FieldKeyPriorityTier,
+				Message: msg,
+				Rule:    "composed_integrity",
+			})
 		}
 	}
 	return errs

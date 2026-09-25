@@ -1,6 +1,7 @@
 package compose
 
 import (
+	"os"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -62,26 +63,26 @@ func repoRootFromCompose() string { return filepath.Join("..", "..", "..") }
 func lifecycleKinds(t *testing.T) []string {
 	t.Helper()
 	dir := filepath.Join(repoRootFromCompose(), paths.ProcessInternalLifecyclesDir)
-	entries, err := fileutil.ReadDir(dir)
-	if err != nil {
-		t.Fatalf("read lifecycles dir: %v", err)
-	}
 	var kinds []string
-	for _, e := range entries {
-		if e.IsDir() || !strings.HasSuffix(e.Name(), ".yaml") {
-			continue
+	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil || info == nil || info.IsDir() || !strings.HasSuffix(info.Name(), ".yaml") {
+			return nil
 		}
-		raw, err := fileutil.ReadFile(filepath.Join(dir, e.Name()))
+		raw, err := fileutil.ReadFile(path)
 		if err != nil {
-			t.Fatalf("read %s: %v", e.Name(), err)
+			t.Fatalf("read %s: %v", info.Name(), err)
 		}
 		var lc objects.Lifecycle
 		if err := yaml.Unmarshal(raw, &lc); err != nil {
-			continue
+			return nil
 		}
 		if lc.ObjectType != "" {
 			kinds = append(kinds, lc.ObjectType)
 		}
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("read lifecycles dir: %v", err)
 	}
 	sort.Strings(kinds)
 	return kinds
@@ -273,8 +274,8 @@ func TestStatusKeyOwners_coversEveryKeyTheEvaluatorReads(t *testing.T) {
 	if err != nil {
 		t.Fatalf("read evaluate.go: %v", err)
 	}
-	// cfg["…status…"] plus the one status key that is not spelled with "status".
-	re := regexp.MustCompile(`cfg\["([a-z_]*status[a-z_]*|refuse_when)"\]`)
+	// cfg["…status…"] / koi.GetString(Slice)(cfg, "…") plus the one status key that is not spelled with "status".
+	re := regexp.MustCompile(`(?:cfg\["|koi\.GetString(?:Slice)?\(cfg,\s*")([a-z_]*status[a-z_]*|refuse_when)"`)
 	found := map[string]bool{}
 	for _, m := range re.FindAllStringSubmatch(string(src), -1) {
 		found[m[1]] = true

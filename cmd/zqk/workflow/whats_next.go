@@ -26,6 +26,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/interactionpolicy"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects/koi"
 	observerpkg "github.com/zqk-os/zqk/pkg/observer"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/tpm"
@@ -370,11 +371,11 @@ func runWhatsNextSyncSweep(cmd *cobra.Command, args []string, proc *cli.Processo
 		if err == nil {
 			var bestProposed map[string]any
 			for _, obj := range listRes.Objects {
-				status, _ := obj[objects.FieldKeyStatus].(string)
+				status := koi.Status(obj)
 				if status != objects.ObjectStatusInProgress && status != objects.ObjectStatusProposed {
 					continue
 				}
-				assignee, _ := obj[objects.FieldKeyAssigneePersonaRef].(string)
+				assignee := koi.GetString(obj, objects.FieldKeyAssigneePersonaRef)
 				matches := false
 				if assignee == secCtx.AccountID && secCtx.AccountID != "" {
 					matches = true
@@ -405,21 +406,21 @@ func runWhatsNextSyncSweep(cmd *cobra.Command, args []string, proc *cli.Processo
 	}
 
 	if activeTask != nil {
-		planRef, _ := activeTask[objects.FieldKeyPipelineRef].(string)
+		planRef := koi.GetString(activeTask, objects.FieldKeyPipelineRef)
 		var planTitle string
 		if planRef != "" {
 			if planObj, err := sp.Read(ctx, secCtx, planRef); err == nil && planObj != nil {
-				planTitle, _ = planObj[objects.FieldKeyTitle].(string)
+				planTitle = koi.Title(planObj)
 			}
 		}
 		var stepsStr strings.Builder
-		if steps, ok := activeTask[objects.FieldKeyTaskSteps].([]any); ok { // "task_steps" has no predefined constant
+		if steps := koi.GetSlice(activeTask, objects.FieldKeyTaskSteps); steps != nil {
 			for _, stepAny := range steps {
 				if step, ok := stepAny.(map[string]any); ok {
-					title, _ := step[objects.FieldKeyTitle].(string)
-					desc, _ := step[objects.FieldKeyDescription].(string)
-					status, _ := step[objects.FieldKeyStatus].(string)
-					cmd, _ := step[objects.FieldKeyCommand].(string)
+					title := koi.Title(step)
+					desc := koi.GetString(step, objects.FieldKeyDescription)
+					status := koi.Status(step)
+					cmd := koi.GetString(step, objects.FieldKeyCommand)
 					stepsStr.WriteString(fmt.Sprintf("- **%s** [%s]: %s\n", title, status, desc))
 					if cmd != "" {
 						stepsStr.WriteString(fmt.Sprintf("  Command: `%s`\n", cmd))
@@ -428,9 +429,9 @@ func runWhatsNextSyncSweep(cmd *cobra.Command, args []string, proc *cli.Processo
 			}
 		}
 
-		taskTitle, _ := activeTask[objects.FieldKeyTitle].(string)
-		taskDesc, _ := activeTask[objects.FieldKeyDescription].(string)
-		targetAgent, _ := activeTask[objects.FieldKeyAssigneePersonaRef].(string)
+		taskTitle := koi.Title(activeTask)
+		taskDesc := koi.GetString(activeTask, objects.FieldKeyDescription)
+		targetAgent := koi.GetString(activeTask, objects.FieldKeyAssigneePersonaRef)
 
 		var sessionIDStr string
 		if len(rows) > 0 {
@@ -623,7 +624,7 @@ func resolvePriorityPlanForWhatsNext(ctx context.Context, sp workflowStorage, ex
 				Build())
 			if err == nil {
 				for _, obj := range res.Objects {
-					st, _ := obj[objects.FieldKeyStatus].(string)
+					st := koi.Status(obj)
 					if objects.PlanStatusEligibleForWhatsNext(objects.KindPriorityPlan, st) && hasPersonaMatch(obj, personaIDs) {
 						candidates = append(candidates, obj)
 					}
@@ -643,8 +644,8 @@ func resolvePriorityPlanForWhatsNext(ctx context.Context, sp workflowStorage, ex
 	bestScore := -1
 
 	for _, obj := range candidates {
-		id, _ := obj[objects.FieldKeyID].(string)
-		if id == emptyValue {
+		id := koi.ID(obj)
+		if id == emptyValue || id == "" {
 			continue
 		}
 
@@ -653,11 +654,11 @@ func resolvePriorityPlanForWhatsNext(ctx context.Context, sp workflowStorage, ex
 			activePlans = append(activePlans, *pSumm)
 		}
 
-		st, _ := obj[objects.FieldKeyStatus].(string)
+		st := koi.Status(obj)
 		score := countOpenLinkedBLIs(ctx, sp, id, personaIDs)
 		score += cliPlanExecutionStatusBonus(st)
 		score += objects.PlanSeatedPersonaBonus(personaIDs, obj)
-		if kind, _ := obj[objects.FieldKeyKind].(string); kind == objects.KindPriorityPlan {
+		if koi.IsKind(obj, objects.KindPriorityPlan) {
 			score += 1_000_000
 		}
 		score -= cliActiveOrderPenalty(obj)
@@ -711,8 +712,8 @@ func preferSeatedPlansWithOpenWork(ctx context.Context, sp workflowStorage, cand
 	}
 	var fueled []map[string]any
 	for _, obj := range candidates {
-		id, _ := obj[objects.FieldKeyID].(string)
-		if id != emptyValue && countOpenLinkedBLIs(ctx, sp, id, personaIDs) > 0 {
+		id := koi.ID(obj)
+		if id != emptyValue && id != "" && countOpenLinkedBLIs(ctx, sp, id, personaIDs) > 0 {
 			fueled = append(fueled, obj)
 		}
 	}
@@ -733,11 +734,11 @@ func countOpenLinkedBLIs(ctx context.Context, sp workflowStorage, planID string,
 	countOpen := func(objs []map[string]any) int {
 		n := 0
 		for _, o := range objs {
-			ref, _ := o[objects.FieldKeyPriorityPlanRef].(string)
+			ref := koi.GetString(o, objects.FieldKeyPriorityPlanRef)
 			if ref != planID {
 				continue
 			}
-			st, _ := o[objects.FieldKeyStatus].(string)
+			st := koi.Status(o)
 			if !objects.BacklogCountsAsOpenWork(st) {
 				continue
 			}
@@ -777,12 +778,12 @@ func cliActiveOrderPenalty(obj map[string]any) int {
 }
 
 func summarizePriorityPlan(obj map[string]any) (string, *whatsNextPriorityPlan) {
-	id, _ := obj[objects.FieldKeyID].(string)
-	if id == emptyValue {
+	id := koi.ID(obj)
+	if id == emptyValue || id == "" {
 		return "", nil
 	}
-	title, _ := obj[objects.FieldKeyTitle].(string)
-	st, _ := obj[objects.FieldKeyStatus].(string)
+	title := koi.Title(obj)
+	st := koi.Status(obj)
 	return id, &whatsNextPriorityPlan{ID: id, Title: title, Status: st, Shaped: priorityPlanLooksShaped(obj)}
 }
 
@@ -793,14 +794,7 @@ func priorityPlanLooksShaped(obj map[string]any) bool {
 	if !objects.PlanHasWrittenIdentity(obj) || !objects.PlanHasWorkstreamLane(obj) {
 		return false
 	}
-	switch refs := obj[objects.FieldKeyPersonaRefs].(type) {
-	case []any:
-		return len(refs) > 0
-	case []string:
-		return len(refs) > 0
-	default:
-		return false
-	}
+	return len(koi.GetStringSlice(obj, objects.FieldKeyPersonaRefs)) > 0
 }
 
 func countBacklogByStatus(ctx context.Context, sp workflowStorage, planID string, personaIDs []string) map[string]int {
@@ -824,8 +818,8 @@ func countBacklogByStatus(ctx context.Context, sp workflowStorage, planID string
 		if !hasPersonaMatch(o, personaIDs) {
 			continue
 		}
-		st, _ := o[objects.FieldKeyStatus].(string)
-		if st == emptyValue {
+		st := koi.Status(o)
+		if st == emptyValue || st == "" {
 			st = "unknown"
 		}
 		out[st]++
@@ -880,13 +874,13 @@ func getAgentPersonaIDs(ctx context.Context, sp workflowStorage, explicitPersona
 
 	var personaIDs []string
 	for _, obj := range res.Objects {
-		role, _ := obj[objects.FieldKeyRole].(string)
+		role := koi.GetString(obj, objects.FieldKeyRole)
 		if role == "" {
 			continue
 		}
 		for _, secRole := range secCtx.Roles {
 			if strings.EqualFold(role, secRole) {
-				id, _ := obj[objects.FieldKeyID].(string)
+				id := koi.ID(obj)
 				personaIDs = append(personaIDs, id)
 				break
 			}
@@ -910,7 +904,7 @@ func leadColumnPersonaIDs(ctx context.Context, sp workflowStorage, personaIDs []
 		if err != nil || obj == nil {
 			continue
 		}
-		role, _ := obj[objects.FieldKeyRole].(string)
+		role := koi.GetString(obj, objects.FieldKeyRole)
 		if objects.PersonaSeesLeadGantt(role) {
 			return nil
 		}
@@ -922,33 +916,18 @@ func hasPersonaMatch(obj map[string]any, personaIDs []string) bool {
 	if len(personaIDs) == 0 {
 		return true // no filtering
 	}
-	refsAny := obj[objects.FieldKeyPersonaRefs]
-	if refsAny == nil {
+	refs := koi.GetStringSlice(obj, objects.FieldKeyPersonaRefs)
+	if refs == nil {
 		// Unassigned stays eligible (same contract as pkg/workflow/whatsnext).
 		return true
 	}
-	if refs, ok := refsAny.([]any); ok {
-		if len(refs) == 0 {
-			return true
-		}
-		for _, rAny := range refs {
-			if r, okStr := rAny.(string); okStr {
-				for _, pid := range personaIDs {
-					if strings.EqualFold(r, pid) {
-						return true
-					}
-				}
-			}
-		}
-	} else if refStrs, ok := refsAny.([]string); ok {
-		if len(refStrs) == 0 {
-			return true
-		}
-		for _, r := range refStrs {
-			for _, pid := range personaIDs {
-				if strings.EqualFold(r, pid) {
-					return true
-				}
+	if len(refs) == 0 {
+		return true
+	}
+	for _, r := range refs {
+		for _, pid := range personaIDs {
+			if strings.EqualFold(r, pid) {
+				return true
 			}
 		}
 	}
@@ -971,13 +950,13 @@ func listActiveOrPausedConvergenceSessions(ctx context.Context, sp workflowStora
 	}
 	var rows []whatsNextCVSRow
 	for _, obj := range res.Objects {
-		id, _ := obj[objects.FieldKeyID].(string)
-		if id == emptyValue {
+		id := koi.ID(obj)
+		if id == emptyValue || id == "" {
 			continue
 		}
-		st, _ := obj[objects.FieldKeyStatus].(string)
-		title, _ := obj[objects.FieldKeyTitle].(string)
-		phase, _ := obj[objects.FieldKeyCurrentPhase].(string)
+		st := koi.Status(obj)
+		title := koi.Title(obj)
+		phase := koi.GetString(obj, objects.FieldKeyCurrentPhase)
 		rows = append(rows, whatsNextCVSRow{
 			ID: id, Title: title, CurrentPhase: phase, Status: st,
 		})
@@ -1068,7 +1047,7 @@ func compressWhatsNextMeasure(m map[string]any) map[string]any {
 		"rollup_status":           rsc["rollup_status"],
 		"recommended_next_action": rsc["recommended_next_action"],
 	}
-	if na, ok := sug[objects.FieldKeyNextAction].(string); ok {
+	if na := koi.GetString(sug, objects.FieldKeyNextAction); na != "" {
 		out["next_action_suggested"] = na
 	} else {
 		out["next_action_suggested"] = nil
@@ -1304,9 +1283,9 @@ func buildWhatsNextCorrespondence(projectRoot, agentID, personaFlag string, pers
 	corr.AgentID = agentID
 	corr.PersonaID = personaRef
 	if activeTask != nil {
-		id, _ := activeTask[objects.FieldKeyID].(string)
-		st, _ := activeTask[objects.FieldKeyStatus].(string)
-		title, _ := activeTask[objects.FieldKeyTitle].(string)
+		id := koi.ID(activeTask)
+		st := koi.Status(activeTask)
+		title := koi.Title(activeTask)
 		corr.ActiveAgentTask = &whatsNextActiveTask{ID: id, Status: st, Title: title}
 	}
 	snap, err := agentfeed.LoadCorrespondence(projectRoot, agentfeed.Seat{

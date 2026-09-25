@@ -104,6 +104,11 @@ func Kind(m map[string]any) string {
 	return GetString(m, objects.FieldKeyKind)
 }
 
+// IsKind reports whether m has the specified kind (case-insensitive comparison).
+func IsKind(m map[string]any, expected string) bool {
+	return strings.EqualFold(Kind(m), expected)
+}
+
 // Title returns the object title from m, or empty string if absent or nil.
 func Title(m map[string]any) string {
 	return GetString(m, objects.FieldKeyTitle)
@@ -172,6 +177,21 @@ func GetStringSlice(m map[string]any, key string) []string {
 	default:
 		return nil
 	}
+}
+
+// GetSlice returns a []any slice from m at key, or nil if absent or non-slice.
+func GetSlice(m map[string]any, key string) []any {
+	if m == nil {
+		return nil
+	}
+	v, ok := m[key]
+	if !ok || v == nil {
+		return nil
+	}
+	if s, ok := v.([]any); ok {
+		return s
+	}
+	return nil
 }
 
 // GetMap returns a map[string]any for key, or nil if missing or non-map.
@@ -347,6 +367,11 @@ func (i Inspector) Kind() string {
 	return Kind(i.raw)
 }
 
+// IsKind reports whether kind matches expected (case-insensitive).
+func (i Inspector) IsKind(expected string) bool {
+	return IsKind(i.raw, expected)
+}
+
 // Title returns the object title.
 func (i Inspector) Title() string {
 	return Title(i.raw)
@@ -415,6 +440,11 @@ func (i Inspector) GetStringOr(key string, fallback string) string {
 // GetStringSlice extracts string slice.
 func (i Inspector) GetStringSlice(key string) []string {
 	return GetStringSlice(i.raw, key)
+}
+
+// GetSlice returns a []any slice from m at key, or nil if absent or non-slice.
+func (i Inspector) GetSlice(key string) []any {
+	return GetSlice(i.raw, key)
 }
 
 // GetMap extracts nested map.

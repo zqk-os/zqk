@@ -16,11 +16,13 @@ builds:
     goarch:
       - amd64
       - arm64
+    flags:
+      - -trimpath
     ldflags:
-     - -s -w
-     - -X main.version={{.Version}}
-     - -X main.commit={{.Commit}}
-     - -X main.date={{.Date}}
+      - -s -w
+      - -X github.com/zqk-os/zqk/cmd/zqk/app.version={{.Version}}
+      - -X github.com/zqk-os/zqk/cmd/zqk/app.gitCommit={{.Commit}}
+      - -X github.com/zqk-os/zqk/cmd/zqk/app.buildDate={{.Date}}
 
 archives:
   - format: tar.gz

@@ -15,6 +15,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/test"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects/koi"
 	"github.com/zqk-os/zqk/pkg/paths"
 	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
 	"github.com/zqk-os/zqk/pkg/storage"
@@ -571,14 +572,14 @@ func (m *UIModel) RefreshPM(ctx context.Context, sp storage.ObjectStorageProvide
 		Limit:  1,
 		Fields: []string{objects.FieldKeyTitle},
 	}); err == nil && len(mis.Objects) > 0 {
-		m.MissionTitle = fmt.Sprintf("%v", mis.Objects[0][objects.FieldKeyTitle])
+		m.MissionTitle = koi.Title(mis.Objects[0])
 	}
 	if vis, err := sp.List(ctx, sec, nil, storage.ListFilter{
 		Kind:   objects.KindVision,
 		Limit:  1,
 		Fields: []string{objects.FieldKeyTitle},
 	}); err == nil && len(vis.Objects) > 0 {
-		m.VisionTitle = fmt.Sprintf("%v", vis.Objects[0][objects.FieldKeyTitle])
+		m.VisionTitle = koi.Title(vis.Objects[0])
 	}
 
 	// 2. Goals
@@ -589,12 +590,13 @@ func (m *UIModel) RefreshPM(ctx context.Context, sp storage.ObjectStorageProvide
 	}); err == nil {
 		goals := make([]PMGoalRow, 0, len(gList.Objects))
 		for _, g := range gList.Objects {
+			k := koi.Wrap(g)
 			goals = append(goals, PMGoalRow{
-				ID:     fmt.Sprintf("%v", g[objects.FieldKeyID]),
-				Title:  fmt.Sprintf("%v", g[objects.FieldKeyTitle]),
-				Status: fmt.Sprintf("%v", g[objects.FieldKeyStatus]),
-				Metric: fmt.Sprintf("%v", g[objects.FieldKeyMetric]),
-				Target: fmt.Sprintf("%v", g[objects.FieldKeyTarget]),
+				ID:     k.ID(),
+				Title:  k.Title(),
+				Status: k.Status(),
+				Metric: k.GetString(objects.FieldKeyMetric),
+				Target: k.GetString(objects.FieldKeyTarget),
 			})
 		}
 		sort.Slice(goals, func(i, j int) bool { return goals[i].ID < goals[j].ID })
@@ -609,10 +611,11 @@ func (m *UIModel) RefreshPM(ctx context.Context, sp storage.ObjectStorageProvide
 	}); err == nil {
 		workstreams := make([]PMWorkstreamRow, 0, len(wsList.Objects))
 		for _, ws := range wsList.Objects {
+			k := koi.Wrap(ws)
 			workstreams = append(workstreams, PMWorkstreamRow{
-				ID:     fmt.Sprintf("%v", ws[objects.FieldKeyID]),
-				Title:  fmt.Sprintf("%v", ws[objects.FieldKeyTitle]),
-				Status: fmt.Sprintf("%v", ws[objects.FieldKeyStatus]),
+				ID:     k.ID(),
+				Title:  k.Title(),
+				Status: k.Status(),
 			})
 		}
 		sort.Slice(workstreams, func(i, j int) bool { return workstreams[i].ID < workstreams[j].ID })
@@ -633,9 +636,10 @@ func (m *UIModel) RefreshPM(ctx context.Context, sp storage.ObjectStorageProvide
 		recent := make([]PMBacklogRow, 0, len(blis.Objects))
 
 		for _, b := range blis.Objects {
-			st := strings.ToLower(fmt.Sprintf("%v", b[objects.FieldKeyStatus]))
-			claimed := fmt.Sprintf("%v", b["claimed_by"])
-			if claimed != "" && claimed != "<nil>" {
+			k := koi.Wrap(b)
+			st := strings.ToLower(k.Status())
+			claimed := k.GetString("claimed_by")
+			if claimed != "" {
 				summary.Claimed++
 			} else {
 				summary.Unclaimed++
@@ -654,28 +658,28 @@ func (m *UIModel) RefreshPM(ctx context.Context, sp storage.ObjectStorageProvide
 				summary.Done++
 				summary.Completed++
 			default:
-				if claimed != "" && claimed != "<nil>" {
+				if claimed != "" {
 					summary.InProgress++
 				} else {
 					summary.Planned++
 				}
 			}
 
-			prio := fmt.Sprintf("%v", b["priority_tier"])
-			if prio == "<nil>" || prio == "" {
-				prio = fmt.Sprintf("%v", b["priority"])
+			prio := k.GetString("priority_tier")
+			if prio == "" {
+				prio = k.GetString("priority")
 			}
-			if prio == "<nil>" {
+			if prio == "" {
 				prio = "P2"
 			}
 
 			recent = append(recent, PMBacklogRow{
-				ID:        fmt.Sprintf("%v", b[objects.FieldKeyID]),
-				Title:     fmt.Sprintf("%v", b[objects.FieldKeyTitle]),
+				ID:        k.ID(),
+				Title:     k.Title(),
 				Status:    st,
 				Priority:  prio,
 				ClaimedBy: claimed,
-				PlanRef:   fmt.Sprintf("%v", b[objects.FieldKeyPriorityPlanRef]),
+				PlanRef:   k.GetString(objects.FieldKeyPriorityPlanRef),
 			})
 		}
 
@@ -731,14 +735,10 @@ func (m *UIModel) RefreshPM(ctx context.Context, sp storage.ObjectStorageProvide
 	}); err == nil {
 		planRows := make([]PMPlanRow, 0, len(plans.Objects))
 		for _, p := range plans.Objects {
-			pID := fmt.Sprintf("%v", p[objects.FieldKeyID])
-			st := fmt.Sprintf("%v", p[objects.FieldKeyStatus])
-			var ws []string
-			if wsList, ok := p[objects.FieldKeyWorkstreamRefs].([]any); ok {
-				for _, w := range wsList {
-					ws = append(ws, fmt.Sprintf("%v", w))
-				}
-			}
+			k := koi.Wrap(p)
+			pID := k.ID()
+			st := k.Status()
+			ws := k.GetStringSlice(objects.FieldKeyWorkstreamRefs)
 
 			// Count BLIs referencing this plan
 			bCount := 0
@@ -750,7 +750,7 @@ func (m *UIModel) RefreshPM(ctx context.Context, sp storage.ObjectStorageProvide
 
 			planRows = append(planRows, PMPlanRow{
 				ID:          pID,
-				Title:       fmt.Sprintf("%v", p[objects.FieldKeyTitle]),
+				Title:       k.Title(),
 				Status:      st,
 				Workstreams: ws,
 				BLICount:    bCount,
@@ -768,10 +768,11 @@ func (m *UIModel) RefreshPM(ctx context.Context, sp storage.ObjectStorageProvide
 	}); err == nil {
 		reqRows := make([]PMRequirementRow, 0, len(reqs.Objects))
 		for _, r := range reqs.Objects {
+			k := koi.Wrap(r)
 			reqRows = append(reqRows, PMRequirementRow{
-				ID:     fmt.Sprintf("%v", r[objects.FieldKeyID]),
-				Title:  fmt.Sprintf("%v", r[objects.FieldKeyTitle]),
-				Status: fmt.Sprintf("%v", r[objects.FieldKeyStatus]),
+				ID:     k.ID(),
+				Title:  k.Title(),
+				Status: k.Status(),
 			})
 		}
 		sort.Slice(reqRows, func(i, j int) bool { return reqRows[i].ID < reqRows[j].ID })
@@ -786,12 +787,13 @@ func (m *UIModel) RefreshPM(ctx context.Context, sp storage.ObjectStorageProvide
 	}); err == nil {
 		blkRows := make([]PMBlockerRow, 0, len(blockers.Objects))
 		for _, blk := range blockers.Objects {
+			k := koi.Wrap(blk)
 			blkRows = append(blkRows, PMBlockerRow{
-				ID:       fmt.Sprintf("%v", blk[objects.FieldKeyID]),
-				Title:    fmt.Sprintf("%v", blk[objects.FieldKeyTitle]),
-				Severity: fmt.Sprintf("%v", blk["severity"]),
-				Status:   fmt.Sprintf("%v", blk[objects.FieldKeyStatus]),
-				Impact:   fmt.Sprintf("%v", blk["impact"]),
+				ID:       k.ID(),
+				Title:    k.Title(),
+				Severity: k.GetString("severity"),
+				Status:   k.Status(),
+				Impact:   k.GetString("impact"),
 			})
 		}
 		sort.Slice(blkRows, func(i, j int) bool { return blkRows[i].ID < blkRows[j].ID })
@@ -806,12 +808,13 @@ func (m *UIModel) RefreshPM(ctx context.Context, sp storage.ObjectStorageProvide
 	}); err == nil {
 		debtRows := make([]PMDebtRow, 0, len(debts.Objects))
 		for _, d := range debts.Objects {
+			k := koi.Wrap(d)
 			debtRows = append(debtRows, PMDebtRow{
-				ID:       fmt.Sprintf("%v", d[objects.FieldKeyID]),
-				Title:    fmt.Sprintf("%v", d[objects.FieldKeyTitle]),
-				Category: fmt.Sprintf("%v", d["debt_category"]),
-				Status:   fmt.Sprintf("%v", d[objects.FieldKeyStatus]),
-				Priority: fmt.Sprintf("%v", d["priority"]),
+				ID:       k.ID(),
+				Title:    k.Title(),
+				Category: k.GetString("debt_category"),
+				Status:   k.Status(),
+				Priority: k.GetString("priority"),
 			})
 		}
 		sort.Slice(debtRows, func(i, j int) bool { return debtRows[i].ID < debtRows[j].ID })
@@ -833,13 +836,14 @@ func (m *UIModel) RefreshMetrics(ctx context.Context, sp storage.ObjectStoragePr
 	if res, err := sp.List(ctx, sec, nil, storage.ListFilter{Kind: objects.KindCommandMetric}); err == nil {
 		cmdMetrics := make([]CommandMetricRow, 0, len(res.Objects))
 		for _, obj := range res.Objects {
+			k := koi.Wrap(obj)
 			cmdMetrics = append(cmdMetrics, CommandMetricRow{
-				ID:          fmt.Sprintf("%v", obj[objects.FieldKeyID]),
-				CommandName: fmt.Sprintf("%v", obj["command_name"]),
-				ExecCount:   getIntVal(obj["execution_count"]),
-				AvgDuration: fmt.Sprintf("%v", obj["duration"]),
+				ID:          k.ID(),
+				CommandName: k.GetString("command_name"),
+				ExecCount:   k.GetIntOr("execution_count", 0),
+				AvgDuration: k.GetString("duration"),
 				LastRunAt:   formatTimeVal(obj["last_executed_at"]),
-				Status:      fmt.Sprintf("%v", obj[objects.FieldKeyStatus]),
+				Status:      k.Status(),
 			})
 		}
 		sort.Slice(cmdMetrics, func(i, j int) bool { return cmdMetrics[i].ID < cmdMetrics[j].ID })
@@ -853,6 +857,7 @@ func (m *UIModel) RefreshMetrics(ctx context.Context, sp storage.ObjectStoragePr
 	if res, err := sp.List(ctx, sec, nil, storage.ListFilter{Kind: objects.KindSchedulerHealthMetric}); err == nil {
 		shRows := make([]SchedulerHealthRow, 0, len(res.Objects))
 		for _, obj := range res.Objects {
+			k := koi.Wrap(obj)
 			hb := formatTimeVal(obj["heartbeat_at"])
 			if hb == "--" {
 				hb = formatTimeVal(obj["last_seen"])
@@ -860,26 +865,26 @@ func (m *UIModel) RefreshMetrics(ctx context.Context, sp storage.ObjectStoragePr
 			if hb == "--" {
 				hb = formatTimeVal(obj["timestamp"])
 			}
-			execs := getIntVal(obj["total_executions"])
+			execs := k.GetIntOr("total_executions", 0)
 			if execs == 0 {
-				execs = getIntVal(obj["collection_count"])
+				execs = k.GetIntOr("collection_count", 0)
 			}
 			if execs == 0 {
-				execs = getIntVal(obj["executions"])
+				execs = k.GetIntOr("executions", 0)
 			}
-			fails := getIntVal(obj["failure_count"])
+			fails := k.GetIntOr("failure_count", 0)
 			if fails == 0 {
-				fails = getIntVal(obj["failures"])
+				fails = k.GetIntOr("failures", 0)
 			}
-			st := fmt.Sprintf("%v", obj[objects.FieldKeyStatus])
-			if st == "<nil>" || st == "" {
-				st = fmt.Sprintf("%v", obj["status"])
+			st := k.Status()
+			if st == "" {
+				st = k.GetString("status")
 			}
-			if st == "<nil>" || st == "" {
+			if st == "" {
 				st = "healthy"
 			}
 			shRows = append(shRows, SchedulerHealthRow{
-				ID:          fmt.Sprintf("%v", obj[objects.FieldKeyID]),
+				ID:          k.ID(),
 				HeartbeatAt: hb,
 				Status:      st,
 				Executions:  execs,
@@ -898,12 +903,13 @@ func (m *UIModel) RefreshMetrics(ctx context.Context, sp storage.ObjectStoragePr
 	if res, err := sp.List(ctx, sec, nil, storage.ListFilter{Kind: objects.KindFileLockMetric}); err == nil {
 		flRows := make([]FileLockMetricRow, 0, len(res.Objects))
 		for _, obj := range res.Objects {
+			k := koi.Wrap(obj)
 			flRows = append(flRows, FileLockMetricRow{
-				ID:         fmt.Sprintf("%v", obj[objects.FieldKeyID]),
-				TargetKind: fmt.Sprintf("%v", obj["target_kind"]),
-				Contention: getIntVal(obj["contention_count"]),
-				Duration:   fmt.Sprintf("%v", obj["lock_duration"]),
-				Status:     fmt.Sprintf("%v", obj[objects.FieldKeyStatus]),
+				ID:         k.ID(),
+				TargetKind: k.GetString("target_kind"),
+				Contention: k.GetIntOr("contention_count", 0),
+				Duration:   k.GetString("lock_duration"),
+				Status:     k.Status(),
 			})
 		}
 		m.LockMetrics = flRows
@@ -913,12 +919,13 @@ func (m *UIModel) RefreshMetrics(ctx context.Context, sp storage.ObjectStoragePr
 	if res, err := sp.List(ctx, sec, nil, storage.ListFilter{Kind: objects.KindAuditAggregationMetric}); err == nil {
 		qmRows := make([]QualityMetricRow, 0, len(res.Objects))
 		for _, obj := range res.Objects {
+			k := koi.Wrap(obj)
 			qmRows = append(qmRows, QualityMetricRow{
-				ID:         fmt.Sprintf("%v", obj[objects.FieldKeyID]),
+				ID:         k.ID(),
 				MetricType: "Audit Aggregation",
 				Value:      fmt.Sprintf("%v events", obj["events_processed"]),
-				Status:     fmt.Sprintf("%v", obj[objects.FieldKeyStatus]),
-				Window:     fmt.Sprintf("%v", obj["aggregation_window"]),
+				Status:     k.Status(),
+				Window:     k.GetString("aggregation_window"),
 			})
 		}
 		m.QualityMetrics = qmRows
@@ -939,23 +946,24 @@ func (m *UIModel) RefreshScheduler(ctx context.Context, sp storage.ObjectStorage
 
 	jobs := make([]SchedulerJobRow, 0, len(res.Objects))
 	for _, obj := range res.Objects {
-		id := fmt.Sprintf("%v", obj["id"])
-		trigType := fmt.Sprintf("%v", obj["trigger_type"])
-		if trigType == "<nil>" || trigType == "" {
+		k := koi.Wrap(obj)
+		id := k.ID()
+		trigType := k.GetString("trigger_type")
+		if trigType == "" {
 			trigType = "timer"
 		}
 
-		sch := fmt.Sprintf("%v", obj["schedule_expression"])
-		if sch == "" || sch == "<nil>" {
-			sch = fmt.Sprintf("%v", obj["schedule"])
+		sch := k.GetString("schedule_expression")
+		if sch == "" {
+			sch = k.GetString("schedule")
 		}
-		if sch == "" || sch == "<nil>" {
-			sch = fmt.Sprintf("%v", obj["interval"])
+		if sch == "" {
+			sch = k.GetString("interval")
 		}
-		if sch == "" || sch == "<nil>" || sch == "--" {
+		if sch == "" || sch == "--" {
 			if trigType == "event" {
-				filter := fmt.Sprintf("%v", obj["event_filter"])
-				if filter != "" && filter != "<nil>" {
+				filter := k.GetString("event_filter")
+				if filter != "" {
 					sch = "⚡ event: " + filter
 				} else {
 					sch = "⚡ on-event"
@@ -970,49 +978,35 @@ func (m *UIModel) RefreshScheduler(ctx context.Context, sp storage.ObjectStorage
 		lastRun := formatTimeVal(obj["last_run_at"])
 		nextRun := formatTimeVal(obj["next_run_at"])
 
-		status := fmt.Sprintf("%v", obj["last_status"])
-		if status == "<nil>" || status == "" {
-			status = fmt.Sprintf("%v", obj[objects.FieldKeyStatus])
+		status := k.GetString("last_status")
+		if status == "" {
+			status = k.Status()
 		}
-		if status == "" || status == "<nil>" {
+		if status == "" {
 			status = "active"
 		}
 
-		title := fmt.Sprintf("%v", obj[objects.FieldKeyTitle])
-		if title == "" || title == "<nil>" {
+		title := k.Title()
+		if title == "" {
 			title = id
 		}
-		desc := fmt.Sprintf("%v", obj[objects.FieldKeyDescription])
-		if desc == "<nil>" {
-			desc = ""
-		}
-		cat := fmt.Sprintf("%v", obj["category"])
-		if cat == "<nil>" {
+		desc := k.GetString(objects.FieldKeyDescription)
+		cat := k.GetString("category")
+		if cat == "" {
 			cat = "system"
 		}
-		jType := fmt.Sprintf("%v", obj["job_type"])
-		if jType == "<nil>" {
+		jType := k.GetString("job_type")
+		if jType == "" {
 			jType = "standard"
 		}
-		execMode := fmt.Sprintf("%v", obj["execution_mode"])
-		if execMode == "<nil>" {
+		execMode := k.GetString("execution_mode")
+		if execMode == "" {
 			execMode = "standard"
 		}
-		maxRun := getIntVal(obj["max_runtime_seconds"])
-		cmd := fmt.Sprintf("%v", obj["command"])
-		if cmd == "<nil>" {
-			cmd = ""
-		}
-		var cmdArgs []string
-		if argsRaw, ok := obj["command_args"].([]any); ok {
-			for _, a := range argsRaw {
-				cmdArgs = append(cmdArgs, fmt.Sprintf("%v", a))
-			}
-		}
-		lastErr := fmt.Sprintf("%v", obj["last_error"])
-		if lastErr == "<nil>" {
-			lastErr = ""
-		}
+		maxRun := k.GetIntOr("max_runtime_seconds", 0)
+		cmd := k.GetString("command")
+		cmdArgs := k.GetStringSlice("command_args")
+		lastErr := k.GetString("last_error")
 
 		jobs = append(jobs, SchedulerJobRow{
 			ID:            id,
