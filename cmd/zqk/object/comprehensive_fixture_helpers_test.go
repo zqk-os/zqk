@@ -569,7 +569,7 @@ func copySpecFilesForComprehensive(sourceDir, targetDir string) error {
 		}
 		data, err := fileutil.ReadFile(path)
 		if err != nil {
-			return nil
+			return nil //nolint:nilerr // skip unreadable test fixture files
 		}
 		if err := fileutil.MkdirAll(filepath.Dir(out), paths.DirPerm755); err != nil {
 			return err

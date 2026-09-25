@@ -76,7 +76,7 @@ func NewGenerateLifecycleBuildersCmd() *cobra.Command {
 
 		err := filepath.WalkDir(lifecyclesDir, func(path string, d os.DirEntry, walkErr error) error {
 			if walkErr != nil || d == nil {
-				return nil
+				return nil //nolint:nilerr // skip unreadable entries
 			}
 			if d.IsDir() {
 				if d.Name() == ".git" || d.Name() == "node_modules" {

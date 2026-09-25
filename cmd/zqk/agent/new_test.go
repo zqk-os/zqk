@@ -32,7 +32,7 @@ func TestAgentNew(t *testing.T) {
 	t.Logf("DEBUG FILES:")
 	_ = filepath.Walk(filepath.Join(root, paths.ProcessDir), func(path string, info fileutil.FileInfo, err error) error {
 		if err != nil {
-			return nil
+			return nil //nolint:nilerr // debug directory walk in test
 		}
 		if !info.IsDir() {
 			rel, _ := filepath.Rel(root, path)

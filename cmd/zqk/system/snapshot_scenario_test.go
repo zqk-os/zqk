@@ -31,7 +31,7 @@ func setupTestSnapshotEnvironment(t *testing.T) (tmpDir string, storageProvider 
 	t.Cleanup(func() {
 		_ = filepath.Walk(tmpDir, func(path string, info fileutil.FileInfo, err error) error {
 			if err != nil {
-				return nil
+				return nil //nolint:nilerr // cleanup walk in test
 			}
 			if info.IsDir() && info.Name() == paths.ProjectDataDir {
 				_ = fileutil.RemoveAll(path)

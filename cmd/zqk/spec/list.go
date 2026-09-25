@@ -82,7 +82,7 @@ func listSpecsFromFiles(projectRoot string) (*storage.QueryResult, error) {
 	var specObjects []map[string]any
 	err := filepath.Walk(specsDir, func(path string, info fileutil.FileInfo, walkErr error) error {
 		if walkErr != nil || info.IsDir() {
-			return nil
+			return nil //nolint:nilerr // skip unreadable files
 		}
 		if appledouble.SkipPathInTreeWalk(path) {
 			return nil
@@ -96,11 +96,11 @@ func listSpecsFromFiles(projectRoot string) (*storage.QueryResult, error) {
 
 		data, readErr := fileutil.ReadFile(path)
 		if readErr != nil {
-			return nil
+			return nil //nolint:nilerr // skip files that cannot be read
 		}
 		var specDef map[string]any
 		if parseErr := yaml.Unmarshal(data, &specDef); parseErr != nil {
-			return nil
+			return nil //nolint:nilerr // skip unparseable YAML
 		}
 		ontology, _ := specDef[objects.FieldKeyOntology].(string)
 		if ontology == emptyValue {

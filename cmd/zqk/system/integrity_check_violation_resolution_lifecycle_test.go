@@ -31,7 +31,7 @@ func findObjectFilePathByID(kindDir, objectID string) (string, error) {
 	var found string
 	err := filepath.Walk(kindDir, func(path string, info fileutil.FileInfo, err error) error {
 		if err != nil {
-			return nil
+			return nil //nolint:nilerr // skip unreadable test files
 		}
 		if info.IsDir() {
 			return nil
@@ -41,11 +41,11 @@ func findObjectFilePathByID(kindDir, objectID string) (string, error) {
 		}
 		data, readErr := fileutil.ReadFile(path)
 		if readErr != nil {
-			return nil
+			return nil //nolint:nilerr // skip unreadable test files
 		}
 		var obj map[string]any
 		if yaml.Unmarshal(data, &obj) != nil {
-			return nil
+			return nil //nolint:nilerr // skip invalid test files
 		}
 		if id, ok := obj[objects.FieldKeyID].(string); ok && id == objectID {
 			found = path

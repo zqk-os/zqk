@@ -653,7 +653,7 @@ func createAllKindDirectories(processDir string) error {
 	if err := mapper.EnsureReady(pkgctx.NewSystemContext()); err != nil {
 		// If initialization fails, just create common directories
 		// This can happen if processDir doesn't exist yet
-		return nil
+		return nil //nolint:nilerr // kind mapper not ready during initial directory bootstrap
 	}
 	kinds := mapper.GetAllKinds()
 
@@ -1073,7 +1073,7 @@ func runLegacyDiscoverWizard(projectRoot string, logger logging.Logger) error {
 		var n int
 		_ = filepath.Walk(kindDir, func(path string, info fileutil.FileInfo, err error) error {
 			if err != nil {
-				return nil // skip errors, continue walking
+				return nil //nolint:nilerr // skip errors, continue walking
 			}
 			if info.IsDir() {
 				return nil

@@ -181,7 +181,7 @@ func checkRegistrationIssue(projectRoot, objectID string, validator *validation.
 
 	err := filepath.Walk(processDir, func(path string, info fileutil.FileInfo, err error) error {
 		if err != nil {
-			return nil
+			return nil //nolint:nilerr // continue walking on path error
 		}
 		if info.IsDir() {
 			return nil
@@ -270,7 +270,7 @@ func findKindRegistrationIssues(projectRoot, kind string, validator *validation.
 	// Walk the kind directory
 	err := filepath.Walk(kindDir, func(path string, info fileutil.FileInfo, err error) error {
 		if err != nil {
-			return nil
+			return nil //nolint:nilerr // continue walking on path error
 		}
 		if info.IsDir() {
 			return nil
@@ -318,7 +318,7 @@ func findAllRegistrationIssues(projectRoot string, validator *validation.IDValid
 	// Walk all object directories
 	err := filepath.Walk(processDir, func(path string, info fileutil.FileInfo, err error) error {
 		if err != nil {
-			return nil
+			return nil //nolint:nilerr // continue walking on path error
 		}
 		if info.IsDir() {
 			return nil

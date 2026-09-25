@@ -99,7 +99,7 @@ func TestCommandFlagPermutations(t *testing.T) {
 		var spec CommandSpecWithPermutations
 		if err := yaml.Unmarshal(data, &spec); err != nil {
 			// Some specs might fail to parse loosely if malformed, but we only care if it has test_permutations
-			return nil
+			return nil //nolint:nilerr // skip non-conforming spec files
 		}
 
 		if len(spec.TestPermutations) == 0 {

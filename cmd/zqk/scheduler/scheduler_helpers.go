@@ -86,7 +86,7 @@ func getSchedulerStatus(ctx *cli.Context) (*SchedulerStatus, error) {
 	}
 	if rr.err != nil {
 		// Error reading PID file - assume not running
-		return status, nil
+		return status, nil //nolint:nilerr // PID read error indicates daemon is not running
 	}
 
 	if rr.running {

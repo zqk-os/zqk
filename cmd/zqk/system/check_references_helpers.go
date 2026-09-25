@@ -490,7 +490,7 @@ func findObjectFile(projectRoot, objectID, kind string) string {
 		var foundPath string
 		_ = filepath.Walk(dir, func(path string, info fileutil.FileInfo, err error) error {
 			if err != nil {
-				return nil
+				return nil //nolint:nilerr // continue walking on error
 			}
 			if info.IsDir() {
 				return nil

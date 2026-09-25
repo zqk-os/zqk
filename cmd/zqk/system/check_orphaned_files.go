@@ -125,7 +125,7 @@ func detectOrphanedFiles(cmd *cobra.Command, projectRoot string, results []Check
 
 		_ = filepath.Walk(kindDir, func(path string, info fileutil.FileInfo, err error) error {
 			if err != nil {
-				return nil
+				return nil //nolint:nilerr // continue walking on error
 			}
 			if info.IsDir() {
 				name := info.Name()
@@ -301,7 +301,7 @@ func countCASHashYAMLFiles(kindDir string) int {
 	count := 0
 	_ = filepath.Walk(kindDir, func(path string, info fileutil.FileInfo, err error) error {
 		if err != nil || info == nil || info.IsDir() {
-			return nil
+			return nil //nolint:nilerr // best-effort file count
 		}
 		if hashFilePattern.MatchString(info.Name()) {
 			count++

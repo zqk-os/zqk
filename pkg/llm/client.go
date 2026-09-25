@@ -204,8 +204,6 @@ func NewClient(ctx context.Context, config *Config) Client {
 	switch strings.ToLower(config.Provider) {
 	case "gemini":
 		primary = NewGeminiClient(ctx, config)
-	case "qwen":
-		primary = NewQwenClient(ctx, config)
 	default:
 		primary = NewOpenAIClient(ctx, config)
 	}
@@ -227,8 +225,6 @@ func NewClient(ctx context.Context, config *Config) Client {
 		switch strings.ToLower(secConfig.Provider) {
 		case "gemini":
 			secondary = NewGeminiClient(ctx, secConfig)
-		case "qwen":
-			secondary = NewQwenClient(ctx, secConfig)
 		default:
 			secondary = NewOpenAIClient(ctx, secConfig)
 		}

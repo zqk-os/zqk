@@ -181,7 +181,7 @@ func countProcessDirYAMLFiles(projectRoot, kind string) int {
 	count := 0
 	_ = filepath.WalkDir(base, func(path string, d fs.DirEntry, err error) error {
 		if err != nil || d.IsDir() {
-			return nil
+			return nil //nolint:nilerr // best-effort directory walk
 		}
 		name := d.Name()
 		if strings.HasSuffix(name, ".yaml") || strings.HasSuffix(name, ".yml") {

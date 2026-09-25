@@ -46,6 +46,9 @@ func runCreate(cmd *cobra.Command, args []string) error {
 
 		kind, ok := kindCanonicalFromPRERun(cmd)
 		if !ok {
+			if len(args) == 0 {
+				return cli.Guard(cmd).Err(fmt.Errorf("object kind argument required (e.g. zqk object create <kind>)")).Return()
+			}
 			var err error
 			kind, err = objects.ResolveAndValidateKindForProject(proc.ProjectRoot(), args[0])
 			if err != nil {

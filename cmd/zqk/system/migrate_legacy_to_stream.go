@@ -123,7 +123,7 @@ func runMigrateLegacyToStream(cmd *cobra.Command, _ []string) error {
 			if walkErr != nil {
 				errorMessages = append(errorMessages, path+": "+walkErr.Error())
 				errCount++
-				return nil
+				return nil //nolint:nilerr // error recorded in errorMessages and errCount
 			}
 			if d.IsDir() {
 				return nil
@@ -138,13 +138,13 @@ func runMigrateLegacyToStream(cmd *cobra.Command, _ []string) error {
 			if err != nil {
 				errorMessages = append(errorMessages, path+": "+err.Error())
 				errCount++
-				return nil
+				return nil //nolint:nilerr // error recorded in errorMessages and errCount
 			}
 			var obj map[string]any
 			if err := yaml.Unmarshal(data, &obj); err != nil {
 				errorMessages = append(errorMessages, path+": unmarshal: "+err.Error())
 				errCount++
-				return nil
+				return nil //nolint:nilerr // error recorded in errorMessages and errCount
 			}
 			idVal := obj[objects.FieldKeyID]
 			id, _ := idVal.(string)

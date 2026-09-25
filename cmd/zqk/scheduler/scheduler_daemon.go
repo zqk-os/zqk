@@ -80,15 +80,15 @@ func attachSchedulerDaemonStdioToDevNull(execCmd *exec.Cmd) (func(), error) {
 
 func rejectHostServiceOwnedBackgroundStart(projectRoot string) error {
 	serviceEntry, err := hostservice.ResolveEntry(projectRoot)
-	if err != nil {
-		return nil
+	if err == nil {
+		return errfmt.Errorf(
+			schedulerErrHostServiceOwnsRootFmt,
+			serviceEntry.UnitLabel,
+			projectRoot,
+			projectRoot,
+		)
 	}
-	return errfmt.Errorf(
-		schedulerErrHostServiceOwnsRootFmt,
-		serviceEntry.UnitLabel,
-		projectRoot,
-		projectRoot,
-	)
+	return nil
 }
 
 // startSchedulerInBackground starts the scheduler daemon in a detached child process and returns immediately.
