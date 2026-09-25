@@ -1,11 +1,17 @@
 package wal
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
+	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -13,12 +19,9 @@ import (
 func TestExtraCoverage_ObjectWALRegistry(t *testing.T) {
 	// Empty project root returns error
 	walEmpty, err := AcquireObjectWAL("")
-	if err == nil {
-		t.Error("expected error for empty root")
-		if walEmpty != nil {
-			_ = ReleaseObjectWAL("", walEmpty)
-		}
-	}
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "requires non-empty projectRoot")
+	require.Nil(t, walEmpty)
 	_ = ReleaseObjectWAL("", nil)
 
 	tmpDir := t.TempDir()
@@ -161,9 +164,9 @@ func TestExtraCoverage_CompactInPlaceAndReopen(t *testing.T) {
 
 func TestExtraCoverage_CompactWAL_EdgeCases(t *testing.T) {
 	// Empty project root
-	if err := CompactWAL(""); err == nil {
-		t.Error("expected error for empty project root")
-	}
+	err := CompactWAL("")
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "project root required for WAL compaction")
 
 	// Project root with no WAL file
 	emptyDir := t.TempDir()
@@ -192,9 +195,9 @@ func TestExtraCoverage_CompactWAL_EdgeCases(t *testing.T) {
 
 func TestExtraCoverage_ReadLastSeqFromTail_EdgeCases(t *testing.T) {
 	// Non-existent
-	if _, err := ReadLastSeqFromTail(filepath.Join(t.TempDir(), "nonexistent")); err == nil {
-		t.Error("expected error for nonexistent")
-	}
+	_, err := ReadLastSeqFromTail(filepath.Join(t.TempDir(), "nonexistent"))
+	require.Error(t, err)
+	assert.True(t, errors.Is(err, os.ErrNotExist) || os.IsNotExist(err) || fileutil.IsNotExist(err), "expected ErrNotExist")
 
 	// Empty file
 	tmpDir := t.TempDir()
@@ -296,9 +299,9 @@ func TestExtraCoverage_MigrateObjectWALToCanonicalNames(t *testing.T) {
 	// Corrupt checkpoint file
 	ckPath := filepath.Join(walDir, objectWALFileName+objectWALCheckpointExt)
 	_ = fileutil.WriteFile(ckPath, []byte("invalid json"), paths.FilePerm644)
-	if _, err := ReadAppliedSeq(tmpDir); err == nil {
-		t.Error("expected error for corrupt checkpoint file")
-	}
+	_, err = ReadAppliedSeq(tmpDir)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "invalid character")
 
 	// ReplayWALChunk edge cases
 	if replayed, _, err := ReplayWALChunk("", 0, 10, nil); err != nil || replayed != 0 {
@@ -321,12 +324,12 @@ func TestExtraCoverage_MigrateObjectWALToCanonicalNames(t *testing.T) {
 		t.Errorf("expected 1 replayed with limit=1, got %d, err %v", replayed, err)
 	}
 
+	replayCallbackSentinel := errors.New("callback error sentinel")
 	_, _, err = ReplayWALChunk(chunkDir, 0, 0, func(r *WALRecord) error {
-		return fmt.Errorf("callback error")
+		return replayCallbackSentinel
 	})
-	if err == nil {
-		t.Error("expected error when replay callback fails")
-	}
+	require.Error(t, err)
+	require.ErrorIs(t, err, replayCallbackSentinel)
 }
 
 func TestExtraCoverage_WALCompactFunctions(t *testing.T) {
@@ -347,9 +350,10 @@ func TestExtraCoverage_WALCompactFunctions(t *testing.T) {
 	if recs[0].Seq != 99 {
 		t.Errorf("expected seq 99, got %d", recs[0].Seq)
 	}
-	if _, err := ParseWALLine([]byte("not valid")); err == nil {
-		t.Error("expected error for invalid line")
-	}
+	_, err = ParseWALLine([]byte("not valid"))
+	require.Error(t, err)
+	var syntaxErr *json.SyntaxError
+	assert.True(t, errors.As(err, &syntaxErr) || strings.Contains(err.Error(), "invalid character"))
 
 	// Test marshal and parse of different ops and audit_event kind
 	for _, op := range []string{"create", "update", "delete", "custom_op"} {
@@ -471,4 +475,70 @@ func TestExtraCoverage_ReadLastSeqFromTail(t *testing.T) {
 		t.Errorf("expected last seq 25, got %d", seq)
 	}
 }
+
+func TestExtraCoverage_WALSpecificErrors(t *testing.T) {
+	// 1. AcquireObjectWAL with empty projectRoot must return specific non-empty root error
+	walEmpty, err := AcquireObjectWAL("")
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "requires non-empty projectRoot")
+	require.Nil(t, walEmpty)
+
+	// 2. CompactWAL with empty projectRoot must return specific non-empty root error
+	err = CompactWAL("")
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "project root required for WAL compaction")
+
+	// 3. ReadLastSeqFromTail on nonexistent path must return ErrNotExist
+	_, err = ReadLastSeqFromTail(filepath.Join(t.TempDir(), "nonexistent"))
+	require.Error(t, err)
+	assert.True(t, errors.Is(err, os.ErrNotExist) || os.IsNotExist(err) || fileutil.IsNotExist(err),
+		"expected ErrNotExist, got: %v", err)
+
+	// 4. ParseWALLine with invalid JSON must return json.SyntaxError
+	_, err = ParseWALLine([]byte("invalid json line"))
+	require.Error(t, err)
+	var syntaxErr *json.SyntaxError
+	assert.True(t, errors.As(err, &syntaxErr) || strings.Contains(err.Error(), "invalid character"),
+		"expected syntax error or invalid character, got: %v", err)
+
+	// 5. ReadAppliedSeq on corrupt checkpoint file must return JSON unmarshal error
+	tmpDir := t.TempDir()
+	walDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.WalDir)
+	require.NoError(t, fileutil.MkdirAll(walDir, paths.DirPerm755))
+	ckPath := filepath.Join(walDir, objectWALFileName+objectWALCheckpointExt)
+	require.NoError(t, fileutil.WriteFile(ckPath, []byte("invalid json checkpoint"), paths.FilePerm644))
+	_, err = ReadAppliedSeq(tmpDir)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "invalid character")
+
+	// 6. ReplayWALChunk must return exact callback error via errors.Is
+	chunkDir := t.TempDir()
+	chunkWal, err := NewObjectWAL(chunkDir)
+	require.NoError(t, err)
+	require.NoError(t, chunkWal.Append(&WALRecord{Op: "create", Kind: "doc", ID: "d-1"}))
+	require.NoError(t, chunkWal.Sync())
+	require.NoError(t, chunkWal.Close())
+
+	expectedSentinel := errors.New("sentinel-replay-callback-failure")
+	_, _, err = ReplayWALChunk(chunkDir, 0, 0, func(r *WALRecord) error {
+		return expectedSentinel
+	})
+	require.Error(t, err)
+	require.ErrorIs(t, err, expectedSentinel)
+
+	// 7. Operations on closed WAL must return closed error
+	closedDir := t.TempDir()
+	closedWal, err := NewObjectWAL(closedDir)
+	require.NoError(t, err)
+	require.NoError(t, closedWal.Close())
+
+	err = closedWal.Append(&WALRecord{Op: "create", Kind: "doc", ID: "d-closed"})
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "closed")
+
+	err = closedWal.Sync()
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "closed")
+}
+
 

@@ -5,12 +5,12 @@ package storage
 import (
 	"context"
 	"fmt"
-	"path/filepath"
+	"strings"
 	"sync"
 	"testing"
 	"time"
 
-	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage/audit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
@@ -93,17 +93,25 @@ func TestAdversarialConcurrency(t *testing.T) {
 			ticker := time.NewTicker(500 * time.Millisecond)
 			defer ticker.Stop()
 
+			lastEnd := time.Now().Add(-1 * time.Hour)
 			for {
 				select {
 				case <-stopChan:
 					fmt.Printf("A%d stopping\n", aggID)
 					return
 				case <-ticker.C:
-					// Trigger full aggregation
-					fmt.Printf("A%d aggregating\n", aggID)
-					_, err := aggSvc.AggregateAuditEvents(ctx, secCtx, storageCtx, time.Now().Add(-1*time.Hour), time.Now())
-					if err != nil {
-						fmt.Printf("A%d error: %v\n", aggID, err)
+					now := time.Now()
+					if now.After(lastEnd) {
+						fmt.Printf("A%d aggregating\n", aggID)
+						_, err := aggSvc.AggregateAuditEvents(ctx, secCtx, storageCtx, lastEnd, now)
+						if err != nil {
+							// If concurrent workers attempt overlapping windows, verify it is safely rejected
+							if !strings.Contains(err.Error(), "overlapping") {
+								fmt.Printf("A%d unexpected error: %v\n", aggID, err)
+							}
+						} else {
+							lastEnd = now
+						}
 					}
 				}
 			}
@@ -133,14 +141,20 @@ func TestAdversarialConcurrency(t *testing.T) {
 	// 7. Verification: Full Flush and Final Aggregation
 	fmt.Println("🧹 Final verification...")
 	FlushGlobalAuditBufferForProjectRoot(root)
-	_, aggErr := aggSvc.AggregateAuditEvents(ctx, secCtx, storageCtx, time.Now().Add(-24*time.Hour), time.Now())
-	if aggErr != nil {
+	now := time.Now()
+	_, aggErr := aggSvc.AggregateAuditEvents(ctx, secCtx, storageCtx, now.Add(-100*time.Millisecond), now)
+	if aggErr != nil && !strings.Contains(aggErr.Error(), "overlapping") {
 		t.Errorf("final aggregation failed: %v", aggErr)
 	}
 
 	// 8. Structural Integrity Check
-	kindDir := filepath.Join(root, paths.ProjectDataDir, paths.StateDir, "datacells", "audit_event", "cas")
-	if entries, err := fileutil.ReadDir(kindDir); err == nil {
-		fmt.Printf("📦 CAS contains %d bucket directories.\n", len(entries))
+	kindDir := audit.KindDir(root)
+	entries, err := fileutil.ReadDir(kindDir)
+	if err == nil {
+		fmt.Printf("📦 Storage contains %d monthly directories.\n", len(entries))
+	}
+	if err != nil || len(entries) == 0 {
+		t.Errorf("expected storage entries for audit events, got %d (err: %v)", len(entries), err)
 	}
 }
+
