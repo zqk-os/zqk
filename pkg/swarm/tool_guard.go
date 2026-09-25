@@ -18,7 +18,9 @@ var hourglassOnlyTools = map[string]struct{}{
 	"agent_next":                {},
 	"chat_send":                 {},
 	"get_current_backlog_item":  {},
+	"get_next_backlog_item":     {},
 	"get_current_priority_plan": {},
+	"workflow_next":             {},
 	objects.FieldKeyNextAction:  {},
 }
 
@@ -201,8 +203,8 @@ func InventedMutationToolGuidance() string {
 func HourglassOnlyToolGuidance() string {
 	p := DefaultToolPrefix()
 	return fmt.Sprintf(
-		"GUIDANCE: That verb is not a swarm MCP tool. The seat-worker advances the ATK after write evidence. "+
-			"Call %swrite_code or %swrite_file on a real repo path now. Do not call agent_next, chat_send, or get_current_* again.",
+		"GUIDANCE: That verb is not a swarm MCP tool. Your scope is exclusively your assigned task; the orchestrator manages backlog items and plans. "+
+			"Call %swrite_code or %swrite_file on a real repo path now. Do not call agent_next, workflow_next, or get_*_backlog_item again.",
 		p, p,
 	)
 }

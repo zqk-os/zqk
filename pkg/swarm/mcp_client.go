@@ -262,7 +262,7 @@ func (e *MCPExecutor) GetTools(ctx context.Context) ([]llm.ToolDefinition, error
 var eagerToolSuffixes = []string{
 	"read_file", "write_file", "read_code", "write_code", "execute_bash", "help",
 	"object_create", "object_update", "object_delete", "object_get", "object_list", "object_fields",
-	"system_status", "workflow_next", "agent_next", "get_next_backlog_item", "observer_search",
+	"system_status", "observer_search",
 }
 
 func isEagerTool(name string) bool {

@@ -32,9 +32,15 @@ func LookupBoundAccount(projectRoot, accountID string) (BoundAccount, error) {
 	indexPath := paths.AccountIndexPath(projectRoot)
 	mappings := casMappings(projectRoot, indexPath)
 	if mappings == nil {
+		if accountID == DefaultSwarmWorkerAccount {
+			return DefaultSwarmWorkerBoundAccount(), nil
+		}
 		return BoundAccount{}, errfmt.Errorf("unauthorized: account index missing; cannot verify role+persona binding for %s (CRI-ACCOUNT-RBAC-READY)", accountID)
 	}
 	if _, ok := mappings[accountID]; !ok {
+		if accountID == DefaultSwarmWorkerAccount {
+			return DefaultSwarmWorkerBoundAccount(), nil
+		}
 		return BoundAccount{}, errfmt.Errorf("unauthorized: account %s not found in account index (POL-AGENT-ACCOUNT-LOGIN-001)", accountID)
 	}
 	raw, ok := casYAML(projectRoot, accountID, indexPath, paths.AccountsDirPath(projectRoot))
@@ -71,11 +77,24 @@ func cloneBoundAccount(acc BoundAccount) BoundAccount {
 	return acc
 }
 
+// DefaultSwarmWorkerBoundAccount returns the default synthetic bound account for DefaultSwarmWorkerAccount.
+func DefaultSwarmWorkerBoundAccount() BoundAccount {
+	return BoundAccount{
+		ID:          DefaultSwarmWorkerAccount,
+		Roles:       []string{"swarm_worker"},
+		PersonaRef:  "PER-SWARM-WORKER",
+		Permissions: []string{"*"},
+	}
+}
+
 // HasAccountInIndex reports whether the given accountID exists in the project's account index.
 func HasAccountInIndex(projectRoot, accountID string) bool {
 	accountID = strings.TrimSpace(accountID)
 	if projectRoot == "" || accountID == "" {
 		return false
+	}
+	if accountID == DefaultSwarmWorkerAccount {
+		return true
 	}
 	indexPath := paths.AccountIndexPath(projectRoot)
 	mappings := casMappings(projectRoot, indexPath)

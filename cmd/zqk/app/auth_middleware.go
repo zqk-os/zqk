@@ -229,6 +229,11 @@ func resolveSecurityContext(projectRoot string, rawAccountID string) (*pkgctx.Se
 		secCtx.PersonaID = explicitPersona
 		return secCtx, nil
 	}
+	if accountID == authcred.DefaultSwarmWorkerAccount {
+		secCtx := pkgctx.NewSecurityContext(authcred.DefaultSwarmWorkerAccount, []string{"swarm_worker"}, []string{"*"})
+		secCtx.PersonaID = firstNonEmpty(explicitPersona, "PER-SWARM-WORKER")
+		return secCtx, nil
+	}
 
 	if !strings.HasPrefix(accountID, "ACC-") {
 		return nil, errfmt.Errorf("unauthorized: account id must use ACC-* form (got %q); see POL-AGENT-ACCOUNT-LOGIN-001", accountID)

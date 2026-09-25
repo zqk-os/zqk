@@ -19,6 +19,9 @@ func TestGuardSwarmToolCall_hourglassAndStatus(t *testing.T) {
 	}{
 		{"agent_next", "agent_next", `{}`, true, "not a swarm MCP tool"},
 		{"prefixed agent_next", "zqk_agent_next", `{}`, true, "not a swarm MCP tool"},
+		{"workflow_next", "zqk_workflow_next", `{}`, true, "not a swarm MCP tool"},
+		{"get_next_backlog_item", "zqk_get_next_backlog_item", `{}`, true, "not a swarm MCP tool"},
+		{"get_current_backlog_item", "zqk_get_current_backlog_item", `{}`, true, "not a swarm MCP tool"},
 		{"chat_send", "zqk_chat_send", `{}`, true, "not a swarm MCP tool"},
 		{"status field", "zqk_object_update", `{"id":"ATK-1","status":"complete"}`, true, "promote"},
 		{"status assign", "zqk_object_update", `{"id":"ATK-1","fields":["status=complete"]}`, true, "promote"},
