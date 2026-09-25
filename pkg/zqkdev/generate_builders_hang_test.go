@@ -261,7 +261,7 @@ func TestGenerateBuilders_FullCLIExecution(t *testing.T) {
 
 	// Create the actual command (this includes BindAsyncProgress wrapper)
 	cmd := NewGenerateCommandBuildersCmd()
-	cmd.SetArgs([]string{"--overwrite"})
+	cmd.SetArgs([]string{"--overwrite", "--output-dir", t.TempDir()})
 
 	// Set project root context
 	ctx := context.Background()
