@@ -385,7 +385,7 @@ func runSwarmPackage(cmd *cobra.Command, targetPath string, dryRun bool, entrypo
 	fmt.Fprintf(out, "  • Output Directory:  %s\n", outputDir)
 
 	if stageOnly {
-		fmt.Fprintf(out, "\nSwarm staged (stage-only mode). Launch anytime with:\n  zqk agent orchestrate %s\n", planID)
+		fmt.Fprintf(out, "\nSwarm staged (stage-only mode). Launch anytime with:\n  %s\n", paths.CLIInvocation("agent orchestrate "+planID))
 		return nil
 	}
 
@@ -408,14 +408,14 @@ func runSwarmPackage(cmd *cobra.Command, targetPath string, dryRun bool, entrypo
 	}
 
 	if !launch {
-		fmt.Fprintf(out, "\nSwarm staged. Launch anytime with:\n  zqk agent orchestrate %s\n", planID)
+		fmt.Fprintf(out, "\nSwarm staged. Launch anytime with:\n  %s\n", paths.CLIInvocation("agent orchestrate "+planID))
 		return nil
 	}
 
 	// Launch swarm orchestration in the background
 	exe, err := os.Executable()
 	if err != nil {
-		exe = "zqk"
+		exe = paths.BrandExecutableName()
 	}
 	logRelPath := filepath.Join(paths.ProjectDataDir, paths.LogsDir, fmt.Sprintf("swarm-orchestrate-%s.log", strings.ToLower(cleanName)))
 	logPath := filepath.Join(projectRoot, logRelPath)
@@ -440,6 +440,6 @@ func runSwarmPackage(cmd *cobra.Command, targetPath string, dryRun bool, entrypo
 	fmt.Fprintf(out, "\n🚀 Swarm launched in background (PID: %d)\n", orchCmd.Process.Pid)
 	fmt.Fprintf(out, "  • Plan:     %s\n", planID)
 	fmt.Fprintf(out, "  • Logs:     %s\n", logRelPath)
-	fmt.Fprintf(out, "  • Monitor:  zqk agent status  OR  zqk ui\n")
+	fmt.Fprintf(out, "  • Monitor:  %s  OR  %s\n", paths.CLIInvocation("agent status"), paths.CLIInvocation("ui"))
 	return nil
 }

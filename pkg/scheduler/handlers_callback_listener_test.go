@@ -1,9 +1,14 @@
 package scheduler
 
 import (
+	"bytes"
+	"context"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
+
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 func TestCallbackListener_Constants(t *testing.T) {
@@ -41,4 +46,61 @@ func TestCallbackListenerHandler_BuildHTTPServer(t *testing.T) {
 	if srv.IdleTimeout != callbackServerIdleTimeout {
 		t.Errorf("expected IdleTimeout %v, got %v", callbackServerIdleTimeout, srv.IdleTimeout)
 	}
+}
+
+type testAuthHook struct {
+	authenticated bool
+	subject       string
+	permissions   []string
+	err           error
+}
+
+func (m *testAuthHook) Authenticate(ctx context.Context, r *http.Request) (bool, string, []string, error) {
+	return m.authenticated, m.subject, m.permissions, m.err
+}
+
+func TestCallbackListenerAuth(t *testing.T) {
+	job := &ScheduledJob{ID: "test-job"}
+
+	t.Run("nil auth hook allows requests (testing mode)", func(t *testing.T) {
+		handler := &CallbackListenerHandler{
+			authHook: nil,
+			logger:   logging.GetLoggerFromProfile("system"),
+		}
+		req := httptest.NewRequest("POST", "/callbacks/trigger", bytes.NewBufferString(`{"key":"value"}`))
+		rr := httptest.NewRecorder()
+
+		handler.handleCallback(rr, req, "trigger", job)
+		if rr.Code == http.StatusUnauthorized {
+			t.Errorf("expected request to proceed with nil auth hook, got 401")
+		}
+	})
+
+	t.Run("unauthenticated request returns 401 Unauthorized", func(t *testing.T) {
+		handler := &CallbackListenerHandler{
+			authHook: &testAuthHook{authenticated: false},
+			logger:   logging.GetLoggerFromProfile("system"),
+		}
+		req := httptest.NewRequest("POST", "/callbacks/trigger", bytes.NewBufferString(`{"key":"value"}`))
+		rr := httptest.NewRecorder()
+
+		handler.handleCallback(rr, req, "trigger", job)
+		if rr.Code != http.StatusUnauthorized {
+			t.Errorf("expected 401 Unauthorized, got %d", rr.Code)
+		}
+	})
+
+	t.Run("authenticated request succeeds", func(t *testing.T) {
+		handler := &CallbackListenerHandler{
+			authHook: &testAuthHook{authenticated: true, subject: "test-agent"},
+			logger:   logging.GetLoggerFromProfile("system"),
+		}
+		req := httptest.NewRequest("POST", "/callbacks/trigger", bytes.NewBufferString(`{"key":"value"}`))
+		rr := httptest.NewRecorder()
+
+		handler.handleCallback(rr, req, "trigger", job)
+		if rr.Code == http.StatusUnauthorized {
+			t.Errorf("expected authenticated request not to return 401, got %d", rr.Code)
+		}
+	})
 }

@@ -335,11 +335,11 @@ func DraftSwarmManifestYAML(opts SwarmDraftOptions) ([]byte, error) {
 	}
 
 	var buf bytes.Buffer
-	buf.WriteString("# Canonical ZQK Portable Swarm Manifest (zqk new swarm)\n")
-	buf.WriteString("# Next steps:\n")
-	buf.WriteString("#   1. Edit agent personas, tasks, dependencies, and membranes as needed.\n")
-	buf.WriteString("#   2. Cryptographically seal: zqk pack seal <dir>\n")
-	buf.WriteString("#   3. Execute swarm: zqk run <dir>\n\n")
+	buf.WriteString(paths.RewriteCanonicalCLIInvocations("# Canonical ZQK Portable Swarm Manifest (zqk new swarm)\n" +
+		"# Next steps:\n" +
+		"#   1. Edit agent personas, tasks, dependencies, and membranes as needed.\n" +
+		"#   2. Cryptographically seal: zqk pack seal <dir>\n" +
+		"#   3. Execute swarm: zqk run <dir>\n\n"))
 
 	enc := yaml.NewEncoder(&buf)
 	enc.SetIndent(2)

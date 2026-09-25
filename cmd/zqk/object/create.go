@@ -22,6 +22,7 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // NewCreateCmd creates a new create command
@@ -47,7 +48,7 @@ func runCreate(cmd *cobra.Command, args []string) error {
 		kind, ok := kindCanonicalFromPRERun(cmd)
 		if !ok {
 			if len(args) == 0 {
-				return cli.Guard(cmd).Err(fmt.Errorf("object kind argument required (e.g. zqk object create <kind>)")).Return()
+				return cli.Guard(cmd).Err(fmt.Errorf("object kind argument required (e.g. %s)", paths.CLIInvocation("object create <kind>"))).Return()
 			}
 			var err error
 			kind, err = objects.ResolveAndValidateKindForProject(proc.ProjectRoot(), args[0])

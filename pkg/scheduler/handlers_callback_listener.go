@@ -223,8 +223,6 @@ func (h *CallbackListenerHandler) registerRoutes(mux *http.ServeMux, basePath st
 }
 
 // authenticateRequest authenticates the incoming request using the auth hook
-//
-//nolint:unused // Reserved for future authentication features
 func (h *CallbackListenerHandler) authenticateRequest(w http.ResponseWriter, r *http.Request) bool {
 	if h.authHook == nil {
 		// No auth hook configured - allow request (for testing)
@@ -270,6 +268,11 @@ func (h *CallbackListenerHandler) authenticateRequest(w http.ResponseWriter, r *
 
 // handleCallback processes incoming callback requests
 func (h *CallbackListenerHandler) handleCallback(w http.ResponseWriter, r *http.Request, handlerType string, job *ScheduledJob) {
+	// Authenticate request before processing
+	if !h.authenticateRequest(w, r) {
+		return
+	}
+
 	// Update last activity
 	if err := concurrency.RunInLockWithLogger(
 		&h.lastActivityMu, LockNameCallbackListenerUpdateActivity, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
@@ -284,6 +287,7 @@ func (h *CallbackListenerHandler) handleCallback(w http.ResponseWriter, r *http.
 	// Parse request body
 	var payload map[string]any
 	if r.Body != nil {
+		r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
 		decoder := json.NewDecoder(r.Body)
 		if err := decoder.Decode(&payload); err != nil {
 			CallbackListenerLog(h.logger).Warn(LogEventCallbackListenerParsePayloadFailed).

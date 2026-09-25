@@ -38,8 +38,14 @@ func NewPrivilegedWriterDaemon(target PrivilegedWriter, projectRoots ...string) 
 }
 
 func (d *PrivilegedWriterDaemon) checkAffinity(args *IPCWriterArgs) error {
-	if d.projectRoot == "" || args == nil || args.ProjectRoot == "" {
+	if args == nil {
+		return fmt.Errorf("invalid nil IPC writer args")
+	}
+	if d.projectRoot == "" {
 		return nil
+	}
+	if args.ProjectRoot == "" {
+		return fmt.Errorf("missing project root in IPC writer args; affinity validation required")
 	}
 	dClean := filepath.Clean(d.projectRoot)
 	aClean := filepath.Clean(args.ProjectRoot)

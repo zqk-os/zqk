@@ -118,3 +118,13 @@ if [ -d "$REPO_ROOT/.zqk/process/test_cases" ] || [ -f "$REPO_ROOT/.zqk/state/te
 		exit 1
 	fi
 fi
+
+# 4. Secret & Credential Leak Scanning Gate
+if [ -f "$REPO_ROOT/scripts/scan-secrets.sh" ]; then
+	echo "🔒 [ZQK PRE-COMMIT] Scanning repository for credentials and secrets..."
+	if ! /bin/sh "$REPO_ROOT/scripts/scan-secrets.sh" "$REPO_ROOT"; then
+		echo "❌ [ZQK PRE-COMMIT] Potential secrets detected! Commit aborted."
+		exit 1
+	fi
+fi
+
