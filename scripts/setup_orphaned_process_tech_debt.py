@@ -36,7 +36,7 @@ def main():
         "kind": "technical_debt",
         "title": "Test Harness and Child Subprocess Leak Causes Runaway CPU and System Exhaustion",
         "description": "Test suites invoking subprocesses, background daemons, and archive builds leak orphan child processes when tests time out or terminate. Root causes include lack of process-group pgid scoping, missing t.Cleanup process tree termination, and unbounded recursive compilation in test suites, causing severe CPU spikes and antivirus thrashing.",
-        "debt_type": "testability",
+        "debt_type": "tooling",
         "impact_assessment": "high",
         "priority": "high",
         "target_resolution_date": "2026-10-15",
