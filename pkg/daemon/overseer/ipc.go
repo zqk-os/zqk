@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
+	"errors"
 	"net"
 	"os"
 	"path/filepath"
@@ -11,6 +12,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -40,6 +42,7 @@ type IPCServer struct {
 	supervisor *Supervisor
 	mu         sync.Mutex
 	stopCh     chan struct{}
+	wg         sync.WaitGroup
 }
 
 // NewIPCServer creates an IPCServer instance.
@@ -70,17 +73,17 @@ func (s *IPCServer) Start() error {
 	}
 	s.listener = l
 
-	go s.serve()
+	goroutinelabels.NewGoroutine("overseer_ipc_serve", "listen and accept overseer IPC connections").
+		StartSimple(s.serve)
 	return nil
 }
 
-// Stop closes the domain socket listener.
+// Stop closes the domain socket listener and drains active connections.
 func (s *IPCServer) Stop() error {
 	s.mu.Lock()
-	defer s.mu.Unlock()
-
 	select {
 	case <-s.stopCh:
+		s.mu.Unlock()
 		return nil
 	default:
 		close(s.stopCh)
@@ -90,6 +93,20 @@ func (s *IPCServer) Stop() error {
 		_ = s.listener.Close()
 	}
 	_ = os.Remove(s.socketPath)
+	s.mu.Unlock()
+
+	// Wait for active client connections to finish with a capped deadline
+	done := make(chan struct{})
+	goroutinelabels.NewGoroutine("overseer_ipc_drain", "drain active IPC connections on shutdown").
+		StartSimple(func() {
+			s.wg.Wait()
+			close(done)
+		})
+
+	select {
+	case <-done:
+	case <-time.After(1 * time.Second):
+	}
 	return nil
 }
 
@@ -101,15 +118,27 @@ func (s *IPCServer) serve() {
 			case <-s.stopCh:
 				return
 			default:
-				continue
 			}
+			if errors.Is(err, net.ErrClosed) {
+				return
+			}
+			// Transient accept error: back off briefly to avoid tight spin loop
+			time.Sleep(50 * time.Millisecond)
+			continue
 		}
-		go s.handleConnection(conn)
+
+		s.wg.Add(1)
+		goroutinelabels.NewGoroutine("overseer_ipc_conn", "handle client request on overseer domain socket").
+			WithCleanup(s.wg.Done).
+			StartSimple(func() {
+				s.handleConnection(conn)
+			})
 	}
 }
 
 func (s *IPCServer) handleConnection(conn net.Conn) {
 	defer conn.Close()
+	_ = conn.SetDeadline(time.Now().Add(5 * time.Second))
 
 	scanner := bufio.NewScanner(conn)
 	if !scanner.Scan() {

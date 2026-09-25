@@ -141,28 +141,30 @@ func (m *ProcessGroupManager) TerminateGroup(ctx context.Context, targetPgid int
 	// 1. Send SIGTERM
 	_ = m.SignalGroup(pgid, syscall.SIGTERM)
 
-	// 2. Poll for termination up to gracePeriod
-	deadline := time.Now().Add(gracePeriod)
-	for time.Now().Before(deadline) {
-		select {
-		case <-ctx.Done():
-			_ = m.SignalGroup(pgid, syscall.SIGKILL)
-			return ctx.Err()
-		default:
-		}
+	// 2. Poll for termination up to gracePeriod with context awareness
+	ticker := time.NewTicker(25 * time.Millisecond)
+	defer ticker.Stop()
+	timeout := time.After(gracePeriod)
 
+	for {
 		err := unix.Kill(-pgid, 0)
 		if err == unix.ESRCH || err == unix.EPERM {
 			return nil
 		}
-		time.Sleep(25 * time.Millisecond)
-	}
 
-	// 3. Force kill with SIGKILL
-	if err := m.SignalGroup(pgid, syscall.SIGKILL); err != nil && err != unix.ESRCH && err != unix.EPERM {
-		return err
+		select {
+		case <-ctx.Done():
+			_ = m.SignalGroup(pgid, syscall.SIGKILL)
+			return ctx.Err()
+		case <-timeout:
+			// Grace period expired, force kill with SIGKILL
+			if err := m.SignalGroup(pgid, syscall.SIGKILL); err != nil && err != unix.ESRCH && err != unix.EPERM {
+				return err
+			}
+			return nil
+		case <-ticker.C:
+		}
 	}
-	return nil
 }
 
 // EnableSubreaper configures the current process as a child subreaper on supported platforms.

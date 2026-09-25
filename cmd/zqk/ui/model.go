@@ -1473,13 +1473,13 @@ func (m *UIModel) RefreshHealth() {
 
 	sockPath := overseer.SocketPath(m.ProjectRoot)
 	ipcClient := overseer.NewIPCClient(sockPath)
-	if ipcClient.IsRunning() {
+	ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
+	resp, err := ipcClient.Send(ctx, overseer.IPCRequest{Action: "status"})
+	cancel()
+
+	if err == nil && resp != nil && resp.Success {
 		overseerRunning = true
-		ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
-		resp, err := ipcClient.Send(ctx, overseer.IPCRequest{Action: "status"})
-		cancel()
-		if err == nil && resp != nil && resp.Success {
-			daemonsTotal = len(resp.Daemons)
+		daemonsTotal = len(resp.Daemons)
 			for _, d := range resp.Daemons {
 				statusStr := "STOPPED"
 				uptimeStr := "--"
@@ -1506,7 +1506,6 @@ func (m *UIModel) RefreshHealth() {
 					Status:       statusStr,
 				})
 			}
-		}
 	} else {
 		// Fallback to registry on disk if overseer is offline / standby
 		regPath := overseer.DefaultRegistryPath(m.ProjectRoot)

@@ -2,6 +2,7 @@ package overseer
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -9,6 +10,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 // CommandExecutor represents the interface for launching subprocesses.
@@ -74,23 +76,24 @@ func (s *Supervisor) Start(ctx context.Context, pollInterval time.Duration) erro
 		return err
 	}
 
-	go func() {
-		defer close(s.doneCh)
-		ticker := time.NewTicker(pollInterval)
-		defer ticker.Stop()
+	goroutinelabels.NewGoroutine("overseer_supervisor_loop", "overseer periodic reconciliation and process reaping").
+		StartSimple(func() {
+			defer close(s.doneCh)
+			ticker := time.NewTicker(pollInterval)
+			defer ticker.Stop()
 
-		for {
-			select {
-			case <-s.stopCh:
-				return
-			case <-ctx.Done():
-				return
-			case <-ticker.C:
-				_ = s.Reconcile(ctx)
-				s.pgMgr.ReapZombies()
+			for {
+				select {
+				case <-s.stopCh:
+					return
+				case <-ctx.Done():
+					return
+				case <-ticker.C:
+					_ = s.Reconcile(ctx)
+					s.pgMgr.ReapZombies()
+				}
 			}
-		}
-	}()
+		})
 
 	return nil
 }
@@ -107,16 +110,18 @@ func (s *Supervisor) Stop(ctx context.Context) error {
 	}
 	s.mu.Unlock()
 
-	<-s.doneCh
+	select {
+	case <-s.doneCh:
+	case <-ctx.Done():
+		return ctx.Err()
+	}
 
-	// Terminate all running processes
+	// Snapshot running processes to terminate without holding lock during wait
 	s.mu.Lock()
-	defer s.mu.Unlock()
-
+	pidsToKill := make([]int, 0, len(s.processes))
 	for name, cmd := range s.processes {
 		if cmd != nil && cmd.Process != nil {
-			pgid := cmd.Process.Pid
-			_ = s.pgMgr.TerminateGroup(ctx, pgid, 300*time.Millisecond)
+			pidsToKill = append(pidsToKill, cmd.Process.Pid)
 		}
 		if status, ok := s.statuses[name]; ok {
 			status.ActualState = ActualStateStopped
@@ -125,14 +130,20 @@ func (s *Supervisor) Stop(ctx context.Context) error {
 		}
 	}
 	s.processes = make(map[string]*exec.Cmd)
+	s.mu.Unlock()
+
+	// Terminate process groups outside the supervisor lock
+	for _, pid := range pidsToKill {
+		_ = s.pgMgr.TerminateGroup(ctx, pid, 300*time.Millisecond)
+	}
+
 	return nil
 }
 
 // Reconcile evaluates all daemon specs, starting enabled ones and stopping disabled ones.
 func (s *Supervisor) Reconcile(ctx context.Context) error {
 	s.mu.Lock()
-	defer s.mu.Unlock()
-
+	var pidsToStop []int
 	specs := s.registry.List()
 	now := time.Now()
 
@@ -168,7 +179,7 @@ func (s *Supervisor) Reconcile(ctx context.Context) error {
 			if status.ActualState == ActualStateRunning {
 				cmd, ok := s.processes[spec.Name]
 				if ok && cmd != nil && cmd.Process != nil {
-					_ = s.pgMgr.TerminateGroup(ctx, cmd.Process.Pid, 200*time.Millisecond)
+					pidsToStop = append(pidsToStop, cmd.Process.Pid)
 				}
 				delete(s.processes, spec.Name)
 				status.ActualState = ActualStateStopped
@@ -179,6 +190,11 @@ func (s *Supervisor) Reconcile(ctx context.Context) error {
 				status.BackoffUntil = time.Time{}
 			}
 		}
+	}
+	s.mu.Unlock()
+
+	for _, pid := range pidsToStop {
+		_ = s.pgMgr.TerminateGroup(ctx, pid, 200*time.Millisecond)
 	}
 
 	return nil
@@ -235,7 +251,10 @@ func (s *Supervisor) launchDaemonLocked(ctx context.Context, spec *DaemonSpec, s
 	status.LastError = ""
 
 	// Launch async monitor for unexpected exit
-	go s.monitorProcessExit(spec.Name, cmd, spec)
+	goroutinelabels.NewGoroutine(fmt.Sprintf("overseer_exit_mon_%s", spec.Name), fmt.Sprintf("monitor process exit for daemon %s", spec.Name)).
+		StartSimple(func() {
+			s.monitorProcessExit(spec.Name, cmd, spec)
+		})
 
 	return nil
 }
@@ -245,6 +264,18 @@ func (s *Supervisor) monitorProcessExit(name string, cmd *exec.Cmd, spec *Daemon
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
+
+	// If the supervisor is shutting down, transition to stopped without backoff/restart
+	select {
+	case <-s.stopCh:
+		if status, exists := s.statuses[name]; exists {
+			status.ActualState = ActualStateStopped
+			status.PID = 0
+			status.PGID = 0
+		}
+		return
+	default:
+	}
 
 	// Clean up process tracking
 	delete(s.processes, name)
@@ -308,9 +339,10 @@ func (s *Supervisor) Disable(ctx context.Context, name string) error {
 // Restart stops and restarts a daemon.
 func (s *Supervisor) Restart(ctx context.Context, name string) error {
 	s.mu.Lock()
+	var pidToStop int
 	cmd, ok := s.processes[name]
 	if ok && cmd != nil && cmd.Process != nil {
-		_ = s.pgMgr.TerminateGroup(ctx, cmd.Process.Pid, 200*time.Millisecond)
+		pidToStop = cmd.Process.Pid
 	}
 	delete(s.processes, name)
 	if status, exists := s.statuses[name]; exists {
@@ -320,6 +352,10 @@ func (s *Supervisor) Restart(ctx context.Context, name string) error {
 		status.BackoffUntil = time.Time{}
 	}
 	s.mu.Unlock()
+
+	if pidToStop > 0 {
+		_ = s.pgMgr.TerminateGroup(ctx, pidToStop, 200*time.Millisecond)
+	}
 
 	return s.Reconcile(ctx)
 }
