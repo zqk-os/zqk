@@ -13,3 +13,9 @@ five business days and coordinate disclosure after a fix is available.
 
 Until the first tagged public release, security fixes apply to the current
 default branch only.
+
+## Automated Verification & Dependency Security
+
+- **Secret Scanning**: Automated secret scanning is enforced on all pull requests and branch updates via `.github/workflows/secret-scan.yml` and pre-commit checks to prevent credential leaks.
+- **Dependency Management**: Automated dependency updates and security scanning are managed through **Dependabot** configured for Go modules (`gomod`) and GitHub Actions.
+- **Software Bill of Materials (SBOM)**: Formal **SBOM** manifests are continuously generated and published for releases via `.github/workflows/sbom.yml`.

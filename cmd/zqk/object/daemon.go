@@ -62,9 +62,7 @@ func NewDaemonCmd() *cobra.Command {
 			}
 			// Privileged writer daemon must run under the system service account
 			// so it does not inherit ambient unprivileged sessions from the workspace.
-			if os.Getenv(zqkenv.APIKey().Name()) == "" {
-				_ = zqkenv.APIKey().Set(pkgctx.SystemAccountID)
-			}
+			_ = zqkenv.APIKey().Set(pkgctx.SystemAccountID)
 			return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 				logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 				fileStorage := storage.UnwrapToFileObjectStorage(proc.Storage())

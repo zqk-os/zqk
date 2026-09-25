@@ -120,9 +120,11 @@ bin/zqk-vet: $(shell find pkg/vet cmd/zqk-vet -name '*.go')
 zqk-vet: bin/zqk-vet
 
 lint: bin/zqk-vet
+	sh scripts/scan-secrets.sh .
 	./bin/zqk-vet --suite hygiene
 
 vet: bin/zqk-vet
+	sh scripts/scan-secrets.sh .
 	./bin/zqk-vet --suite all
 
 verify: vet test-unit

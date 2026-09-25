@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -216,6 +217,14 @@ const (
 )
 
 func upgradeToWebSocket(w http.ResponseWriter, r *http.Request) (net.Conn, error) {
+	if origin := r.Header.Get("Origin"); origin != "" {
+		u, err := url.Parse(origin)
+		if err != nil || (u.Host != r.Host && u.Hostname() != "localhost" && u.Hostname() != "127.0.0.1") {
+			http.Error(w, "Forbidden cross-origin WebSocket request", http.StatusForbidden)
+			return nil, fmt.Errorf("cross-origin WebSocket upgrade rejected: origin=%s", origin)
+		}
+	}
+
 	hj, ok := w.(http.Hijacker)
 	if !ok {
 		return nil, fmt.Errorf("webserver doesn't support hijacking")

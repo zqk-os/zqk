@@ -4,6 +4,7 @@ package httpapi
 
 import (
 	"context"
+	"crypto/subtle"
 	"encoding/json"
 	"io"
 	"net"
@@ -129,7 +130,7 @@ func (s *Server) withAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if tok := strings.TrimSpace(s.cfg.Token); tok != "" {
 			got := strings.TrimSpace(strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer"))
-			if got == "" || got != tok {
+			if got == "" || subtle.ConstantTimeCompare([]byte(got), []byte(tok)) != 1 {
 				writeErr(w, http.StatusUnauthorized, "unauthorized")
 				return
 			}

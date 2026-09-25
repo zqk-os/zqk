@@ -48,9 +48,10 @@ func runAmbientIngest(cmd *cobra.Command, _ []string) error {
 			return
 		}
 
+		r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
-			http.Error(w, "Failed to read request body", http.StatusBadRequest)
+			http.Error(w, "Failed to read request body or body too large", http.StatusBadRequest)
 			return
 		}
 		defer r.Body.Close()
