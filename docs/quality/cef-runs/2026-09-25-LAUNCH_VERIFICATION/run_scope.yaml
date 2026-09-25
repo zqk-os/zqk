@@ -1,0 +1,31 @@
+# CEF v0.1.0 Post-Remediation Launch Verification Scope
+cef_version: 0.1.0
+mode: launch_verification
+repo_root: .
+target_commit: 78f18dad099f1ddd601e8744a7c44730de10ed8d
+assessed_at: '2026-09-25T18:50:00Z'
+include_globs:
+- '**/*'
+exclude_globs:
+- .git/**
+- vendor/**
+- node_modules/**
+- dist/**
+- build/**
+- '**/*.min.js'
+- '**/*.pb.go'
+- docs/quality/cef-runs/**
+- docs/quality/codebase_evaluation/**
+languages_detected:
+- go
+- yaml
+- markdown
+- shell
+- json
+- python
+adapters_enabled:
+- go
+top_n_default: 10
+output_home: docs/quality/cef-runs/2026-09-25-LAUNCH_VERIFICATION
+notes: Post-remediation launch verification run; target commit 78f18dad; all 61 CEF
+  debts verified remediated.
