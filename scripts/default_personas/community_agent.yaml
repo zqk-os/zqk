@@ -11,3 +11,6 @@ description: |
 needs:
   - Emit mesh status with persona_ref PER-DEFAULT-AGENT
   - Acknowledge steering events on the agent chat feed
+agent_skill_refs:
+  - ASK-COMMUNITY-OBJECT-STEWARD
+

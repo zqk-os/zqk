@@ -512,3 +512,106 @@ func TestSemanticDateOperators_NonDateFields(t *testing.T) {
 		_ = result.Objects // Just verify query completes without error
 	})
 }
+
+// TestLogicalOrAndOperators tests $or and $and filter operators using QueryBuilder
+func TestLogicalOrAndOperators(t *testing.T) {
+	testRoot, cleanup := setupTestEnvironment(t)
+	defer cleanup()
+
+	store, err := NewFileObjectStorageForTest(testRoot)
+	if err != nil {
+		t.Fatalf("Failed to create storage: %v", err)
+	}
+
+	defer func() { _ = store.Shutdown(context.Background()) }()
+	t.Cleanup(func() {
+		opts := TempProjectTeardown(testRoot, store)
+		if err := RunProjectTestTeardown(opts); err != nil {
+			t.Logf("teardown: %v", err)
+		}
+	})
+	BuildPathAliasCacheForProject(testRoot)
+
+	secCtx := pkgctx.NewSystemSecurityContext()
+	ctx := context.Background()
+
+	now := time.Now().UTC()
+	testItems := []map[string]any{
+		{
+			objects.FieldKeyID:                     "AAM-LOGICAL-001",
+			objects.FieldKeyKind:                   objects.KindAuditAggregationMetric,
+			objects.FieldKeyTitle:                  "Metric Alpha",
+			objects.FieldKeyCreatedAt:              now.Format(time.RFC3339),
+			objects.FieldKeyStatus:                 objects.ObjectStatusCompleted,
+			objects.FieldKeyMetricType:             "system",
+			objects.FieldKeySchemaVersion:          objects.DefaultSchemaVersion,
+			objects.FieldKeyAggregationWindowStart: now.Format(time.RFC3339),
+			objects.FieldKeyAggregationWindowEnd:   now.Format(time.RFC3339),
+			objects.FieldKeyEventCount:             10,
+		},
+		{
+			objects.FieldKeyID:                     "AAM-LOGICAL-002",
+			objects.FieldKeyKind:                   objects.KindAuditAggregationMetric,
+			objects.FieldKeyTitle:                  "Metric Beta",
+			objects.FieldKeyCreatedAt:              now.Format(time.RFC3339),
+			objects.FieldKeyStatus:                 objects.ObjectStatusCompleted,
+			objects.FieldKeyMetricType:             "custom",
+			objects.FieldKeySchemaVersion:          objects.DefaultSchemaVersion,
+			objects.FieldKeyAggregationWindowStart: now.Format(time.RFC3339),
+			objects.FieldKeyAggregationWindowEnd:   now.Format(time.RFC3339),
+			objects.FieldKeyEventCount:             20,
+		},
+		{
+			objects.FieldKeyID:                     "AAM-LOGICAL-003",
+			objects.FieldKeyKind:                   objects.KindAuditAggregationMetric,
+			objects.FieldKeyTitle:                  "Metric Gamma",
+			objects.FieldKeyCreatedAt:              now.Format(time.RFC3339),
+			objects.FieldKeyStatus:                 objects.ObjectStatusCompleted,
+			objects.FieldKeyMetricType:             "system",
+			objects.FieldKeySchemaVersion:          objects.DefaultSchemaVersion,
+			objects.FieldKeyAggregationWindowStart: now.Format(time.RFC3339),
+			objects.FieldKeyAggregationWindowEnd:   now.Format(time.RFC3339),
+			objects.FieldKeyEventCount:             30,
+		},
+	}
+
+	for _, item := range testItems {
+		if err := store.Create(ctx, secCtx, item); err != nil {
+			t.Fatalf("Failed to create item %s: %v", item[objects.FieldKeyID], err)
+		}
+	}
+
+	t.Run("QueryBuilder OrFilter", func(t *testing.T) {
+		qb := NewQueryBuilder(objects.KindAuditAggregationMetric).
+			OrFilter(
+				map[string]any{objects.FieldKeyTitle: "Metric Alpha"},
+				map[string]any{objects.FieldKeyMetricType: "custom"},
+			)
+		res, err := store.List(ctx, secCtx, &pkgctx.StorageContext{}, qb.Build())
+		if err != nil {
+			t.Fatalf("List with OrFilter failed: %v", err)
+		}
+		// Should match AAM-LOGICAL-001 (title: Metric Alpha) and AAM-LOGICAL-002 (metric_type: custom)
+		if len(res.Objects) != 2 {
+			t.Errorf("Expected 2 objects matching $or, got %d", len(res.Objects))
+		}
+	})
+
+	t.Run("QueryBuilder AndFilter with OrFilter", func(t *testing.T) {
+		qb := NewQueryBuilder(objects.KindAuditAggregationMetric).
+			AndFilter(objects.FieldKeyMetricType, "system").
+			OrFilter(
+				map[string]any{objects.FieldKeyTitle: "Metric Alpha"},
+				map[string]any{objects.FieldKeyTitle: "Metric Gamma"},
+			)
+		res, err := store.List(ctx, secCtx, &pkgctx.StorageContext{}, qb.Build())
+		if err != nil {
+			t.Fatalf("List with And+Or failed: %v", err)
+		}
+		// Matches AAM-LOGICAL-001 (system + Alpha) and AAM-LOGICAL-003 (system + Gamma)
+		if len(res.Objects) != 2 {
+			t.Errorf("Expected 2 objects, got %d", len(res.Objects))
+		}
+	})
+}
+

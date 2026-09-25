@@ -112,7 +112,7 @@ func buildStateTreePayload(ctx context.Context, sp storage.ObjectStorageProvider
 	secCtx := pkgctx.GetSecurityContext(ctx)
 
 	// 1. Organization
-	if orgs, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{Kind: objects.KindOrganization}); err == nil && len(orgs.Objects) > 0 {
+	if orgs, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.IdTitle(objects.KindOrganization).Limit(1).Build()); err == nil && len(orgs.Objects) > 0 {
 		payload.Organization = &struct {
 			ID    string `json:"id"`
 			Title string `json:"title"`
@@ -123,7 +123,7 @@ func buildStateTreePayload(ctx context.Context, sp storage.ObjectStorageProvider
 	}
 
 	// 2. Mission
-	if missions, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{Kind: objects.KindMission}); err == nil && len(missions.Objects) > 0 {
+	if missions, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.IdTitle(objects.KindMission).Limit(1).Build()); err == nil && len(missions.Objects) > 0 {
 		payload.Mission = &struct {
 			ID    string `json:"id"`
 			Title string `json:"title"`
@@ -134,7 +134,7 @@ func buildStateTreePayload(ctx context.Context, sp storage.ObjectStorageProvider
 	}
 
 	// 3. Vision
-	if visions, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{Kind: objects.KindVision}); err == nil && len(visions.Objects) > 0 {
+	if visions, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.IdTitle(objects.KindVision).Limit(1).Build()); err == nil && len(visions.Objects) > 0 {
 		payload.Vision = &struct {
 			ID    string `json:"id"`
 			Title string `json:"title"`
@@ -145,7 +145,7 @@ func buildStateTreePayload(ctx context.Context, sp storage.ObjectStorageProvider
 	}
 
 	// 4. Goal
-	if goals, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{Kind: objects.KindGoal}); err == nil && len(goals.Objects) > 0 {
+	if goals, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.IdTitle(objects.KindGoal).Limit(1).Build()); err == nil && len(goals.Objects) > 0 {
 		payload.Goal = &struct {
 			ID    string `json:"id"`
 			Title string `json:"title"`
@@ -155,15 +155,30 @@ func buildStateTreePayload(ctx context.Context, sp storage.ObjectStorageProvider
 		}
 	}
 
+	// Pre-load requirements once for all priority plans
+	baseReqMap := make(map[string]RequirementNode)
+	if reqs, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+		NotArchived(objects.KindRequirement).
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus).
+		Build()); err == nil {
+		for _, r := range reqs.Objects {
+			rID := getString(r, objects.FieldKeyID)
+			baseReqMap[rID] = RequirementNode{
+				ID:     rID,
+				Title:  getString(r, objects.FieldKeyTitle),
+				Status: getString(r, objects.FieldKeyStatus),
+			}
+		}
+	}
+
 	// 5. Active Priority Plans
 	planNodes := make([]PriorityPlanNode, 0)
-	if plans, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{Kind: objects.KindPriorityPlan}); err == nil {
-		// Filter for open priority plans (skip complete, archived, cancelled)
+	if plans, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+		ActiveNotComplete(objects.KindPriorityPlan).
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyWorkstreamRefs).
+		Build()); err == nil {
 		for _, p := range plans.Objects {
 			status := getString(p, objects.FieldKeyStatus)
-			if status == objects.ObjectStatusComplete || status == "archived" || status == "cancelled" {
-				continue
-			}
 			planID := getString(p, objects.FieldKeyID)
 			node := PriorityPlanNode{
 				ID:     planID,
@@ -178,25 +193,19 @@ func buildStateTreePayload(ctx context.Context, sp storage.ObjectStorageProvider
 					}
 				}
 			}
-			// Requirements
-			reqMap := make(map[string]*RequirementNode)
-			if reqs, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{Kind: objects.KindRequirement}); err == nil {
-				for _, r := range reqs.Objects {
-					rID := getString(r, objects.FieldKeyID)
-					reqMap[rID] = &RequirementNode{
-						ID:     rID,
-						Title:  getString(r, objects.FieldKeyTitle),
-						Status: getString(r, objects.FieldKeyStatus),
-					}
-				}
+			// Clone requirement template nodes for this plan
+			reqMap := make(map[string]*RequirementNode, len(baseReqMap))
+			for rID, rn := range baseReqMap {
+				rnCopy := rn
+				reqMap[rID] = &rnCopy
 			}
 			// Backlog items linked to this plan
-			if blis, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{Kind: objects.KindBacklogItem}); err == nil {
+			if blis, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+				ForPlan(objects.KindBacklogItem, planID).
+				StatusNot(objects.ObjectStatusArchived).
+				IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, "priority_tier", "claimed_by", objects.FieldKeyRequirementRefs).
+				Build()); err == nil {
 				for _, b := range blis.Objects {
-					planRef := getString(b, objects.FieldKeyPriorityPlanRef)
-					if planRef != planID {
-						continue
-					}
 					bNode := BacklogItemNode{
 						ID:        getString(b, objects.FieldKeyID),
 						Title:     getString(b, objects.FieldKeyTitle),

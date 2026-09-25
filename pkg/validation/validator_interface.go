@@ -74,6 +74,9 @@ type ValidationOptions struct {
 	// IsDraftPlaneOnly reports whether an object ID exists only on the draft plane.
 	// Used to ensure CAS-resident objects do not reference draft-plane-only objects (cross-plane invariant).
 	IsDraftPlaneOnly func(id string) bool
+
+	// OnValidationEvent is an optional event callback for validation lifecycle events.
+	OnValidationEvent func(event ValidationEvent)
 }
 
 // DefaultValidationOptions returns default validation options

@@ -11,3 +11,6 @@ description: |
 needs:
   - Steer agents via zqk feed steer
   - Stamp mesh status with persona-backed emit-status
+agent_skill_refs:
+  - ASK-DEFAULT-FEED-CORRESPONDENCE
+

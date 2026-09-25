@@ -14,6 +14,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage/locknames"
 	"github.com/zqk-os/zqk/pkg/when"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 func (f *FileObjectStorage) persistFileObjectUpdate(p *fileObjectUpdatePrep) error {
@@ -61,7 +62,13 @@ func (f *FileObjectStorage) persistFileObjectUpdate(p *fileObjectUpdatePrep) err
 		} else {
 			// Leaving preliminary: materialize into CAS then drop draft file (fail closed).
 			// Stamp origination metadata (created_at, created_by) as object crosses membrane into CAS.
-			f.ensureObjectMetadata(ctx, existing, secCtx, true)
+			if _, ok := existing[objects.FieldKeyCreatedAt]; !ok || existing[objects.FieldKeyCreatedAt] == "" {
+				existing[objects.FieldKeyCreatedAt] = zqktime.NowRFC3339UTC()
+			}
+			if _, ok := existing[objects.FieldKeyCreatedBy]; !ok || existing[objects.FieldKeyCreatedBy] == "" {
+				existing[objects.FieldKeyCreatedBy] = pkgctx.ActorIDForAttribution(secCtx.AccountID)
+			}
+			f.ensureObjectMetadata(ctx, existing, secCtx, false)
 			var marshalErr error
 			data, marshalErr = f.yamlMarshalForPersistence(existing)
 			if marshalErr != nil {

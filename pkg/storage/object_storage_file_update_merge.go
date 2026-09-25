@@ -8,6 +8,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage/crud"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 func (f *FileObjectStorage) mergeFileObjectUpdate(p *fileObjectUpdatePrep) error {
@@ -117,10 +118,14 @@ func (f *FileObjectStorage) mergeFileObjectUpdate(p *fileObjectUpdatePrep) error
 	newStateCandidate, _ := existing[objects.FieldKeyStatus].(string)
 	isLeavingDraftPlane := f.objectDraftPlaneExists(kind, id) && !shouldUseObjectDraftPlane(kind, newStateCandidate)
 	if isLeavingDraftPlane || existing[objects.FieldKeyCreatedAt] == nil || existing[objects.FieldKeyCreatedAt] == "" {
-		f.ensureObjectMetadata(ctx, existing, secCtx, true)
-	} else {
-		f.ensureObjectMetadata(ctx, existing, secCtx, false)
+		if _, ok := existing[objects.FieldKeyCreatedAt]; !ok || existing[objects.FieldKeyCreatedAt] == "" {
+			existing[objects.FieldKeyCreatedAt] = zqktime.NowRFC3339UTC()
+		}
+		if _, ok := existing[objects.FieldKeyCreatedBy]; !ok || existing[objects.FieldKeyCreatedBy] == "" {
+			existing[objects.FieldKeyCreatedBy] = pkgctx.ActorIDForAttribution(secCtx.AccountID)
+		}
 	}
+	f.ensureObjectMetadata(ctx, existing, secCtx, false)
 
 	// Priority & priority_tier pair synchronization on update:
 	// If only one was explicitly updated, update the other to match.

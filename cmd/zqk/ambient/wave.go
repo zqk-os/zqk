@@ -36,7 +36,10 @@ func runWave(cmd *cobra.Command, args []string) error {
 		root := proc.ProjectRoot()
 
 		// 1. Gather command_metrics
-		cmdRes, _ := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{Kind: "command_metric"})
+		cmdRes, _ := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
+			Kind:   "command_metric",
+			Fields: []string{objects.FieldKeyID, objects.FieldKeyFailureCount},
+		})
 		cmdErrs := 0
 		for _, obj := range cmdRes.Objects {
 			if f, ok := obj[objects.FieldKeyFailureCount].(float64); ok {
@@ -47,7 +50,10 @@ func runWave(cmd *cobra.Command, args []string) error {
 		}
 
 		// 2. Gather scheduler_health_metric
-		schRes, _ := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{Kind: "scheduler_health_metric"})
+		schRes, _ := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
+			Kind:   "scheduler_health_metric",
+			Fields: []string{objects.FieldKeyID, objects.FieldKeyStatus},
+		})
 		schStuck := 0
 		for _, obj := range schRes.Objects {
 			st, _ := obj[objects.FieldKeyStatus].(string)
@@ -57,7 +63,10 @@ func runWave(cmd *cobra.Command, args []string) error {
 		}
 
 		// 3. Gather audit_aggregation_metric
-		audRes, _ := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{Kind: "audit_aggregation_metric"})
+		audRes, _ := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
+			Kind:   "audit_aggregation_metric",
+			Fields: []string{objects.FieldKeyID},
+		})
 		audCount := len(audRes.Objects)
 
 		// 4. Gather system-check from KernelAmbience

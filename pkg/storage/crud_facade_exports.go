@@ -121,7 +121,13 @@ func LiveCASBlobUnreadable(err error) bool {
 
 type ListFilter = crud.ListFilter
 type QueryResult = crud.QueryResult
+type QueryBuilder = crud.QueryBuilder
+type QueryFactory = crud.QueryFactory
 type AggregationFunction = crud.AggregationFunction
+
+var NewQueryBuilder = crud.NewQueryBuilder
+var NewQueryFactory = crud.NewQueryFactory
+var DefaultQueryFactory = crud.DefaultQueryFactory
 
 const (
 	AggregationCount = crud.AggregationCount

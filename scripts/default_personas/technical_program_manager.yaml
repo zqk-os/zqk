@@ -11,3 +11,6 @@ needs:
   - Backlog hygiene and priority tiering
   - Multi-agent coordination via agent chat feed
   - Clear milestone and priority plan tracking
+agent_skill_refs:
+  - ASK-COMMUNITY-TPM-ORCHESTRATION
+

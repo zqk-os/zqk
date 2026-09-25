@@ -47,6 +47,12 @@ func NewCoachCmd() *cobra.Command {
 			var activePlans []string
 			listRes, err := sp.List(ctx, secCtx, pkgctx.NewStorageContext(), storage.ListFilter{
 				Kind: objects.KindPriorityPlan,
+				Filters: map[string]any{
+					objects.FieldKeyStatus: map[string]any{
+						"$in": []string{"active", "in_progress", "grooming"},
+					},
+				},
+				Fields: []string{objects.FieldKeyID, objects.FieldKeyStatus},
 			})
 			if err == nil {
 				for _, obj := range listRes.Objects {
@@ -63,6 +69,12 @@ func NewCoachCmd() *cobra.Command {
 			var activeSessions []string
 			listSess, err := sp.List(ctx, secCtx, pkgctx.NewStorageContext(), storage.ListFilter{
 				Kind: objects.KindConvergenceSession,
+				Filters: map[string]any{
+					objects.FieldKeyStatus: map[string]any{
+						"$in": []string{"active", "paused"},
+					},
+				},
+				Fields: []string{objects.FieldKeyID, objects.FieldKeyStatus},
 			})
 			if err == nil {
 				for _, obj := range listSess.Objects {

@@ -126,7 +126,15 @@ func displayDashboard(cmd *cobra.Command, proc *cli.Processor, ctx context.Conte
 	// 2. VARIANCE RADAR (Progress vs. Forecast)
 	buf.WriteString(fmt.Sprintf("%s\n", bold("PILLAR 2: VARIANCE RADAR (Realization Delta)")))
 
-	ppFilter := storage.ListFilter{Kind: objects.KindPriorityPlan, Limit: 50}
+	ppFilter := storage.ListFilter{
+		Kind: objects.KindPriorityPlan,
+		Filters: map[string]any{
+			objects.FieldKeyStatus: map[string]any{
+				"$nin": []string{"archived", "complete"},
+			},
+		},
+		Limit: 50,
+	}
 	ppResult, err := sp.List(ctx, secCtx, proc.StorageContext(), ppFilter)
 
 	var bestPlan map[string]any
@@ -194,7 +202,11 @@ func displayDashboard(cmd *cobra.Command, proc *cli.Processor, ctx context.Conte
 	// 3. STRUCTURAL INTEGRITY (Complexity & Evolution)
 	buf.WriteString(fmt.Sprintf("%s\n", bold("PILLAR 3: STRUCTURAL INTEGRITY (System Health)")))
 
-	evolFilter := storage.ListFilter{Kind: "evolution_management", Limit: 1}
+	evolFilter := storage.ListFilter{
+		Kind:   "evolution_management",
+		Limit:  1,
+		Fields: []string{objects.FieldKeyID, objects.FieldKeyTitle},
+	}
 	evolResult, err := sp.List(ctx, secCtx, proc.StorageContext(), evolFilter)
 
 	if err == nil && evolResult != nil && len(evolResult.Objects) > 0 {
@@ -211,7 +223,11 @@ func displayDashboard(cmd *cobra.Command, proc *cli.Processor, ctx context.Conte
 	// 4. SYNERGY INDEX (Resource Reusability & Economy)
 	buf.WriteString(fmt.Sprintf("%s\n", bold("PILLAR 4: SYNERGY INDEX (Federated Economy)")))
 
-	marketFilter := storage.ListFilter{Kind: objects.KindCapacityAdvertisement, Limit: 0}
+	marketFilter := storage.ListFilter{
+		Kind:   objects.KindCapacityAdvertisement,
+		Limit:  0,
+		Fields: []string{objects.FieldKeyID},
+	}
 	marketResult, err := sp.List(ctx, secCtx, proc.StorageContext(), marketFilter)
 
 	leaseFilter := storage.ListFilter{
@@ -220,6 +236,7 @@ func displayDashboard(cmd *cobra.Command, proc *cli.Processor, ctx context.Conte
 		Filters: map[string]any{
 			objects.FieldKeySessionMode: "federated_lease",
 		},
+		Fields: []string{objects.FieldKeyID},
 	}
 	leaseResult, err2 := sp.List(ctx, secCtx, proc.StorageContext(), leaseFilter)
 
@@ -244,7 +261,11 @@ func displayDashboard(cmd *cobra.Command, proc *cli.Processor, ctx context.Conte
 	// 5. MESH PULSE (Strategic Alignment)
 	buf.WriteString(fmt.Sprintf("%s\n", bold("PILLAR 5: MESH PULSE (Strategic Shape)")))
 
-	wsFilter := storage.ListFilter{Kind: objects.KindWorkstream, Limit: 0}
+	wsFilter := storage.ListFilter{
+		Kind:   objects.KindWorkstream,
+		Limit:  0,
+		Fields: []string{objects.FieldKeyID, objects.FieldKeyStatus},
+	}
 	wsResult, err := sp.List(ctx, secCtx, proc.StorageContext(), wsFilter)
 
 	alignmentScore := 0.0
@@ -281,7 +302,11 @@ func getPCSStatus(pcs float64) string {
 }
 
 func getPeers(sp storage.ObjectStorageProvider, ctx context.Context, secCtx *pkgctx.SecurityContext, storageCtx *pkgctx.StorageContext) []map[string]any {
-	filter := storage.ListFilter{Kind: objects.KindRemoteKernel, Limit: 0}
+	filter := storage.ListFilter{
+		Kind:   objects.KindRemoteKernel,
+		Limit:  0,
+		Fields: []string{objects.FieldKeyID},
+	}
 	res, err := sp.List(ctx, secCtx, storageCtx, filter)
 	if err != nil {
 		return nil

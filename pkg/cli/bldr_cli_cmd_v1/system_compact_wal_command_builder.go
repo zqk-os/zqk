@@ -22,7 +22,7 @@ func NewSystemCompactWalCommandBuilder() *cobra.Command {
 	help.AddExample("Force compaction even if scheduler appears running (unsafe)", "%s system compact-wal --force")
 	builder.WithHelpBuilder(help)
 	builder.AddBoolFlag("force", "", false, "Allow compaction while the scheduler daemon appears to be running (unsafe; prefer stopping the daemon or letting the write-behind worker compact via TryCompactWAL)")
-	builder.WithCommonFlags(true, cli.AddCommonFlags)
+	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
 	cmd := builder.Build()
 	return cmd
 }

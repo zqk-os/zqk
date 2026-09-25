@@ -11,3 +11,6 @@ needs:
   - Strict Test-Driven Development (TDD)
   - Clean idiomatic code conforming to BaseObject primitives
   - Zero linter warnings on all commits
+agent_skill_refs:
+  - ASK-COMMUNITY-CODE-CRAFTSMAN
+

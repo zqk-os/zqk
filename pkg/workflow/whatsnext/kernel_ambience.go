@@ -498,7 +498,11 @@ func LoadEmployedWorkflowHints(ctx context.Context, sp storage.ObjectStorageProv
 		}
 	}
 
-	res, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{Kind: objects.KindWorkflow})
+	res, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
+		Kind:    objects.KindWorkflow,
+		Filters: map[string]any{objects.FieldKeyStatus: "active"},
+		Fields:  []string{objects.FieldKeyID, objects.FieldKeyStatus, objects.FieldKeyTitle, objects.FieldKeyName, objects.FieldKeyDescription},
+	})
 	if err != nil || len(res.Objects) == 0 {
 		return nil
 	}

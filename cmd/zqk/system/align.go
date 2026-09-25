@@ -87,7 +87,13 @@ func runAlign(cmd *cobra.Command, gapsOnly bool, goalID string, scoreOnly bool, 
 
 	// List backlog items (work items with goal_refs)
 	listResult, err := storageProvider.List(cmd.Context(), secCtx, storageCtx, storage.ListFilter{
-		Kind:    objects.KindBacklogItem,
+		Kind: objects.KindBacklogItem,
+		Filters: map[string]any{
+			objects.FieldKeyStatus: map[string]any{
+				"$ne": objects.ObjectStatusArchived,
+			},
+		},
+		Fields:  []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, "goal_ref", objects.FieldKeyGoalRefs},
 		Limit:   10000,
 		SortBy:  "id",
 		SortAsc: true,
@@ -102,7 +108,13 @@ func runAlign(cmd *cobra.Command, gapsOnly bool, goalID string, scoreOnly bool, 
 		goalIDs = map[string]bool{goalID: true}
 	} else {
 		goalList, _ := storageProvider.List(cmd.Context(), secCtx, storageCtx, storage.ListFilter{
-			Kind:    objects.KindGoal,
+			Kind: objects.KindGoal,
+			Filters: map[string]any{
+				objects.FieldKeyStatus: map[string]any{
+					"$ne": objects.ObjectStatusArchived,
+				},
+			},
+			Fields:  []string{objects.FieldKeyID, objects.FieldKeyStatus},
 			Limit:   5000,
 			SortBy:  "id",
 			SortAsc: true,

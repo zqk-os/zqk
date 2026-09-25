@@ -22,6 +22,7 @@ func (g *GoroutinesGate) Description() string {
 }
 
 var rawGoRegex = regexp.MustCompile(`^\s*go\s+(func\(|[A-Za-z_*(&])`)
+var errgroupGoRegex = regexp.MustCompile(`\b[a-zA-Z0-9_]+\.Go\(\s*func\(`)
 
 func (g *GoroutinesGate) Run(ctx context.Context, opts RunOptions) (*Result, error) {
 	root := opts.ProjectRoot
@@ -127,6 +128,16 @@ func (g *GoroutinesGate) Run(ctx context.Context, opts RunOptions) (*Result, err
 			if rawGoRegex.MatchString(line) {
 				if !strings.Contains(line, "goroutinelabels") && !strings.Contains(line, "nolint:goroutine") {
 					msg := fmt.Sprintf("%s:%d: bare goroutine spawn detected (use goroutinelabels or concurrency pool): %s", rel, lineNum, trimmed)
+					// If running repo-wide without explicit files or staged scope, treat existing debt as warnings
+					if len(opts.Files) == 0 && opts.Scope != "staged" {
+						warnings = append(warnings, msg)
+					} else {
+						violations = append(violations, msg)
+					}
+				}
+			} else if errgroupGoRegex.MatchString(line) {
+				if !strings.Contains(line, "goroutinelabels") && !strings.Contains(line, "nolint:goroutine") {
+					msg := fmt.Sprintf("%s:%d: unmonitored errgroup .Go spawn detected (use goroutinelabels or concurrency pool): %s", rel, lineNum, trimmed)
 					// If running repo-wide without explicit files or staged scope, treat existing debt as warnings
 					if len(opts.Files) == 0 && opts.Scope != "staged" {
 						warnings = append(warnings, msg)

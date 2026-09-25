@@ -103,10 +103,10 @@ func TestRelease_EdgeCases(t *testing.T) {
 func TestCheckin_LoadAndExpired(t *testing.T) {
 	t.Parallel()
 
-	tempDir := t.TempDir()
+	dir := tempDir(t)
 
 	// 1. Missing checkin file returns nil, nil
-	missing, err := LoadCheckin(tempDir, "TSK-MISSING")
+	missing, err := LoadCheckin(dir, "TSK-MISSING")
 	if err != nil || missing != nil {
 		t.Errorf("expected nil, nil for missing checkin file")
 	}
@@ -117,11 +117,11 @@ func TestCheckin_LoadAndExpired(t *testing.T) {
 	}
 
 	// 3. Arm and load valid checkin
-	if err := ArmCheckin(tempDir, "TSK-CHECKIN", "agent-1", objects.KindAgentTask, time.Minute); err != nil {
+	if err := ArmCheckin(dir, "TSK-CHECKIN", "agent-1", objects.KindAgentTask, time.Minute); err != nil {
 		t.Fatalf("ArmCheckin failed: %v", err)
 	}
 
-	loaded, err := LoadCheckin(tempDir, "TSK-CHECKIN")
+	loaded, err := LoadCheckin(dir, "TSK-CHECKIN")
 	if err != nil {
 		t.Fatalf("LoadCheckin failed: %v", err)
 	}

@@ -105,14 +105,11 @@ func getCurrentPriorityPlan(cmd *cobra.Command, projectRoot string) map[string]a
 
 			secCtx := pkgctx.NewSystemSecurityContext()
 			storageCtx := pkgctx.NewStorageContext()
-			plans, err := storageProvider.List(cmd.Context(), secCtx, storageCtx, storage.ListFilter{
-				Kind: objects.KindPriorityPlan,
-				Filters: map[string]any{
-					objects.FieldKeyStatus: objects.ObjectStatusActive,
-				},
-				SortBy:  "active_order",
-				SortAsc: true,
-			})
+			plans, err := storageProvider.List(cmd.Context(), secCtx, storageCtx, storage.DefaultQueryFactory.
+				IdTitleStatusActive(objects.KindPriorityPlan).
+				Sort("active_order", true).
+				Limit(1).
+				Build())
 			if err != nil || len(plans.Objects) == 0 {
 				return
 			}
@@ -126,14 +123,12 @@ func getCurrentPriorityPlan(cmd *cobra.Command, projectRoot string) map[string]a
 
 			out := map[string]any{objects.FieldKeyID: planID, objects.FieldKeyTitle: title}
 			// Backlog item count on this plan (non-terminal statuses only)
-			blResult, err := storageProvider.List(cmd.Context(), secCtx, storageCtx, storage.ListFilter{
-				Kind: objects.KindBacklogItem,
-				Filters: map[string]any{
-					objects.FieldKeyPriorityPlanRef: planID,
-					objects.FieldKeyStatus:          map[string]any{"$nin": []string{"complete", "archived", "rejected"}},
-				},
-				Limit: 1,
-			})
+			blResult, err := storageProvider.List(cmd.Context(), secCtx, storageCtx, storage.DefaultQueryFactory.
+				ForPlan(objects.KindBacklogItem, planID).
+				StatusNotIn("complete", "archived", "rejected").
+				IncludeFields(objects.FieldKeyID).
+				Limit(1).
+				Build())
 			if err == nil && blResult.Meta != nil {
 				if n, ok := blResult.Meta["total_count"].(int); ok {
 					out["backlog_items"] = n

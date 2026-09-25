@@ -76,6 +76,9 @@ func fieldMatches(actual any, cond any) bool {
 			st, _ := actual.(string)
 			return stringInSlice(st, incl)
 		}
+		if neVal, ok := c["$ne"]; ok {
+			return !valuesEqualWorkflowFilter(actual, neVal)
+		}
 		return false
 	default:
 		return valuesEqualWorkflowFilter(actual, c)

@@ -169,9 +169,22 @@ func displayBindingAssistant(
 	bold := color.New(color.Bold).SprintFunc()
 	dim := color.New(color.Faint).SprintFunc()
 
-	// Load available requirements and goals for matching
-	reqList, _ := sp.List(ctx, secCtx, nil, storage.ListFilter{Kind: objects.KindRequirement})
-	goalList, _ := sp.List(ctx, secCtx, nil, storage.ListFilter{Kind: objects.KindGoal})
+	// Load available requirements and goals for matching (filter out completed/archived, project needed fields)
+	activeStatusFilter := map[string]any{
+		objects.FieldKeyStatus: map[string]any{"$nin": []any{objects.ObjectStatusComplete, objects.ObjectStatusArchived}},
+	}
+	reqFields := []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyGoalRefs}
+	goalFields := []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus}
+	reqList, _ := sp.List(ctx, secCtx, nil, storage.ListFilter{
+		Kind:    objects.KindRequirement,
+		Filters: activeStatusFilter,
+		Fields:  reqFields,
+	})
+	goalList, _ := sp.List(ctx, secCtx, nil, storage.ListFilter{
+		Kind:    objects.KindGoal,
+		Filters: activeStatusFilter,
+		Fields:  goalFields,
+	})
 
 	var brokenTCs []*TestCaseModel
 	for _, tcID := range state.TestCaseOrder {
@@ -269,8 +282,21 @@ func executeAutoBinding(
 	secCtx := proc.SecurityContext()
 	projectRoot := proc.ProjectRoot()
 
-	reqList, _ := sp.List(ctx, secCtx, nil, storage.ListFilter{Kind: objects.KindRequirement})
-	goalList, _ := sp.List(ctx, secCtx, nil, storage.ListFilter{Kind: objects.KindGoal})
+	activeStatusFilter := map[string]any{
+		objects.FieldKeyStatus: map[string]any{"$nin": []any{objects.ObjectStatusComplete, objects.ObjectStatusArchived}},
+	}
+	reqFields := []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyGoalRefs}
+	goalFields := []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus}
+	reqList, _ := sp.List(ctx, secCtx, nil, storage.ListFilter{
+		Kind:    objects.KindRequirement,
+		Filters: activeStatusFilter,
+		Fields:  reqFields,
+	})
+	goalList, _ := sp.List(ctx, secCtx, nil, storage.ListFilter{
+		Kind:    objects.KindGoal,
+		Filters: activeStatusFilter,
+		Fields:  goalFields,
+	})
 
 	boundCount := 0
 

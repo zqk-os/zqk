@@ -330,19 +330,6 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 				}
 			}
 
-			// CRI-PERSONA-SKILL-BOUND: refuse shovel-ready+ promote without resolving ASK links.
-			if kind == objects.KindPersona && personaPromoteRequiresSkillBound(candidate) {
-				resolve := func(askID string) (map[string]any, error) {
-					return proc.Storage().Read(ctx, secCtx, askID)
-				}
-				if res := validation.EvaluatePersonaSkillBound(candidateObj, resolve); !res.Bound {
-					rejectionByStatus[candidate] = fmt.Sprintf("%s: missing/unresolved agent_skill link (%v)",
-						validation.CriteriaIDPersonaSkillBound, res.Missing)
-					rejectedOrder = append(rejectedOrder, candidate)
-					continue
-				}
-			}
-
 			// Set up validation options
 			valOptions := &validation.ValidationOptions{
 				CurrentState:          currentStatus,
@@ -675,21 +662,15 @@ func promoteTransitionTargets(lifecycle *objects.Lifecycle, current string) map[
 	return objects.PromoteTransitionTargets(lifecycle, current)
 }
 
-// personaPromoteRequiresSkillBound is true for shovel-ready and later persona statuses.
-func personaPromoteRequiresSkillBound(status string) bool {
-	switch strings.ToLower(strings.TrimSpace(status)) {
-	case objects.ObjectStatusApproved, objects.ObjectStatusInProgress, objects.ObjectStatusImplemented:
-		return true
-	default:
-		return false
-	}
-}
-
 // priorityPlanPromotePackagingCue surfaces PRI≈PR packaging when promoting a wrap-ready plan.
 func priorityPlanPromotePackagingCue(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, planID string, current map[string]any, newStatus string) string {
 	title, _ := current[objects.FieldKeyTitle].(string)
 	counts := map[string]int{}
-	listRes, err := sp.List(ctx, secCtx, pkgctx.NewStorageContext(), storage.ListFilter{Kind: objects.KindBacklogItem})
+	listRes, err := sp.List(ctx, secCtx, pkgctx.NewStorageContext(), storage.ListFilter{
+		Kind:    objects.KindBacklogItem,
+		Filters: map[string]any{objects.FieldKeyPriorityPlanRef: planID},
+		Fields:  []string{objects.FieldKeyID, objects.FieldKeyPriorityPlanRef, objects.FieldKeyStatus},
+	})
 	if err == nil {
 		for _, o := range listRes.Objects {
 			ref, _ := o[objects.FieldKeyPriorityPlanRef].(string)

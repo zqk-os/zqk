@@ -11,3 +11,6 @@ needs:
   - Strict 3-tier layering model enforcement
   - Hermetic boundary between runtime engine and codegen
   - Clean URN namespace design
+agent_skill_refs:
+  - ASK-COMMUNITY-ARCH-DESIGN
+

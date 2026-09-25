@@ -566,15 +566,27 @@ func (m *UIModel) RefreshPM(ctx context.Context, sp storage.ObjectStorageProvide
 	}
 
 	// 1. Mission & Vision
-	if mis, err := sp.List(ctx, sec, nil, storage.ListFilter{Kind: objects.KindMission}); err == nil && len(mis.Objects) > 0 {
+	if mis, err := sp.List(ctx, sec, nil, storage.ListFilter{
+		Kind:   objects.KindMission,
+		Limit:  1,
+		Fields: []string{objects.FieldKeyTitle},
+	}); err == nil && len(mis.Objects) > 0 {
 		m.MissionTitle = fmt.Sprintf("%v", mis.Objects[0][objects.FieldKeyTitle])
 	}
-	if vis, err := sp.List(ctx, sec, nil, storage.ListFilter{Kind: objects.KindVision}); err == nil && len(vis.Objects) > 0 {
+	if vis, err := sp.List(ctx, sec, nil, storage.ListFilter{
+		Kind:   objects.KindVision,
+		Limit:  1,
+		Fields: []string{objects.FieldKeyTitle},
+	}); err == nil && len(vis.Objects) > 0 {
 		m.VisionTitle = fmt.Sprintf("%v", vis.Objects[0][objects.FieldKeyTitle])
 	}
 
 	// 2. Goals
-	if gList, err := sp.List(ctx, sec, nil, storage.ListFilter{Kind: objects.KindGoal}); err == nil {
+	if gList, err := sp.List(ctx, sec, nil, storage.ListFilter{
+		Kind:    objects.KindGoal,
+		Filters: map[string]any{objects.FieldKeyStatus: map[string]any{"$ne": objects.ObjectStatusArchived}},
+		Fields:  []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyMetric, objects.FieldKeyTarget},
+	}); err == nil {
 		goals := make([]PMGoalRow, 0, len(gList.Objects))
 		for _, g := range gList.Objects {
 			goals = append(goals, PMGoalRow{
@@ -590,7 +602,11 @@ func (m *UIModel) RefreshPM(ctx context.Context, sp storage.ObjectStorageProvide
 	}
 
 	// 3. Workstreams
-	if wsList, err := sp.List(ctx, sec, nil, storage.ListFilter{Kind: objects.KindWorkstream}); err == nil {
+	if wsList, err := sp.List(ctx, sec, nil, storage.ListFilter{
+		Kind:    objects.KindWorkstream,
+		Filters: map[string]any{objects.FieldKeyStatus: map[string]any{"$ne": objects.ObjectStatusArchived}},
+		Fields:  []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus},
+	}); err == nil {
 		workstreams := make([]PMWorkstreamRow, 0, len(wsList.Objects))
 		for _, ws := range wsList.Objects {
 			workstreams = append(workstreams, PMWorkstreamRow{
@@ -604,7 +620,14 @@ func (m *UIModel) RefreshPM(ctx context.Context, sp storage.ObjectStorageProvide
 	}
 
 	// 4. Backlog Items
-	if blis, err := sp.List(ctx, sec, nil, storage.ListFilter{Kind: objects.KindBacklogItem}); err == nil {
+	if blis, err := sp.List(ctx, sec, nil, storage.ListFilter{
+		Kind:    objects.KindBacklogItem,
+		Filters: map[string]any{objects.FieldKeyStatus: map[string]any{"$ne": objects.ObjectStatusArchived}},
+		Fields: []string{
+			objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus,
+			"claimed_by", "priority_tier", "priority", objects.FieldKeyPriorityPlanRef,
+		},
+	}); err == nil {
 		var summary PMBacklogSummary
 		summary.Total = len(blis.Objects)
 		recent := make([]PMBacklogRow, 0, len(blis.Objects))
@@ -701,7 +724,11 @@ func (m *UIModel) RefreshPM(ctx context.Context, sp storage.ObjectStorageProvide
 	}
 
 	// 5. Priority Plans
-	if plans, err := sp.List(ctx, sec, nil, storage.ListFilter{Kind: objects.KindPriorityPlan}); err == nil {
+	if plans, err := sp.List(ctx, sec, nil, storage.ListFilter{
+		Kind:    objects.KindPriorityPlan,
+		Filters: map[string]any{objects.FieldKeyStatus: map[string]any{"$ne": objects.ObjectStatusArchived}},
+		Fields:  []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyWorkstreamRefs},
+	}); err == nil {
 		planRows := make([]PMPlanRow, 0, len(plans.Objects))
 		for _, p := range plans.Objects {
 			pID := fmt.Sprintf("%v", p[objects.FieldKeyID])
@@ -734,7 +761,11 @@ func (m *UIModel) RefreshPM(ctx context.Context, sp storage.ObjectStorageProvide
 	}
 
 	// 6. Requirements
-	if reqs, err := sp.List(ctx, sec, nil, storage.ListFilter{Kind: objects.KindRequirement}); err == nil {
+	if reqs, err := sp.List(ctx, sec, nil, storage.ListFilter{
+		Kind:    objects.KindRequirement,
+		Filters: map[string]any{objects.FieldKeyStatus: map[string]any{"$ne": objects.ObjectStatusArchived}},
+		Fields:  []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus},
+	}); err == nil {
 		reqRows := make([]PMRequirementRow, 0, len(reqs.Objects))
 		for _, r := range reqs.Objects {
 			reqRows = append(reqRows, PMRequirementRow{
@@ -748,7 +779,11 @@ func (m *UIModel) RefreshPM(ctx context.Context, sp storage.ObjectStorageProvide
 	}
 
 	// 7. Active Blockers & Risks
-	if blockers, err := sp.List(ctx, sec, nil, storage.ListFilter{Kind: objects.KindRiskBlocker}); err == nil {
+	if blockers, err := sp.List(ctx, sec, nil, storage.ListFilter{
+		Kind:    objects.KindRiskBlocker,
+		Filters: map[string]any{objects.FieldKeyStatus: map[string]any{"$ne": objects.ObjectStatusArchived}},
+		Fields:  []string{objects.FieldKeyID, objects.FieldKeyTitle, "severity", objects.FieldKeyStatus, "impact"},
+	}); err == nil {
 		blkRows := make([]PMBlockerRow, 0, len(blockers.Objects))
 		for _, blk := range blockers.Objects {
 			blkRows = append(blkRows, PMBlockerRow{
@@ -764,7 +799,11 @@ func (m *UIModel) RefreshPM(ctx context.Context, sp storage.ObjectStorageProvide
 	}
 
 	// 8. Technical Debt
-	if debts, err := sp.List(ctx, sec, nil, storage.ListFilter{Kind: objects.KindTechnicalDebt}); err == nil {
+	if debts, err := sp.List(ctx, sec, nil, storage.ListFilter{
+		Kind:    objects.KindTechnicalDebt,
+		Filters: map[string]any{objects.FieldKeyStatus: map[string]any{"$ne": objects.ObjectStatusArchived}},
+		Fields:  []string{objects.FieldKeyID, objects.FieldKeyTitle, "debt_category", objects.FieldKeyStatus, "priority"},
+	}); err == nil {
 		debtRows := make([]PMDebtRow, 0, len(debts.Objects))
 		for _, d := range debts.Objects {
 			debtRows = append(debtRows, PMDebtRow{
@@ -1102,8 +1141,11 @@ func (m *UIModel) RefreshQA(ctx context.Context, sp storage.ObjectStorageProvide
 	}
 	totalBLIs := m.BacklogSummary.Total
 	if totalBLIs == 0 && sp != nil && sec != nil {
-		if blis, err := sp.List(ctx, sec, nil, storage.ListFilter{Kind: objects.KindBacklogItem}); err == nil {
-			totalBLIs = len(blis.Objects)
+		if c, err := sp.Count(ctx, sec, storage.ListFilter{
+			Kind:    objects.KindBacklogItem,
+			Filters: map[string]any{objects.FieldKeyStatus: map[string]any{"$ne": objects.ObjectStatusArchived}},
+		}); err == nil {
+			totalBLIs = c
 		}
 	}
 
