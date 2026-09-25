@@ -384,3 +384,33 @@ func (s *Supervisor) GetAllStatuses() []DaemonStatus {
 	}
 	return statuses
 }
+
+// AddDaemon registers or updates a daemon specification and triggers reconciliation.
+func (s *Supervisor) AddDaemon(ctx context.Context, spec *DaemonSpec) error {
+	if spec == nil || spec.Name == "" {
+		return errfmt.Errorf("daemon spec name cannot be empty")
+	}
+	if err := s.registry.Set(spec); err != nil {
+		return err
+	}
+	return s.Reconcile(ctx)
+}
+
+// RemoveDaemon stops a daemon and removes it from the registry.
+func (s *Supervisor) RemoveDaemon(ctx context.Context, name string) error {
+	s.mu.Lock()
+	var pidToStop int
+	if cmd, ok := s.processes[name]; ok && cmd != nil && cmd.Process != nil {
+		pidToStop = cmd.Process.Pid
+	}
+	delete(s.processes, name)
+	delete(s.statuses, name)
+	s.mu.Unlock()
+
+	if pidToStop > 0 {
+		_ = s.pgMgr.TerminateGroup(ctx, pidToStop, 200*time.Millisecond)
+	}
+
+	return s.registry.Delete(name)
+}
+

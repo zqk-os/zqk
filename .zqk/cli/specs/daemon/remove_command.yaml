@@ -1,0 +1,13 @@
+$schema: ../schemas/command_spec.schema.json
+name: remove <name>
+short: Remove a daemon from overseer supervision
+description: Stop a daemon if running and remove its specification from the overseer registry.
+args:
+  type: exact
+  count: 1
+help:
+  examples:
+    - comment: Remove a worker daemon
+      command: '%s daemon remove seat-worker-2'
+run_e: runDaemonRemove
+common_flags: true

@@ -9,6 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/kernel/steward"
@@ -20,10 +21,7 @@ import (
 )
 
 func newStewardCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "steward",
-		Short: "Kernel Health & Intake Clustering Steward",
-	}
+	cmd := bldr_cli_cmd_v1.NewKernelStewardCommandBuilder()
 	cmd.AddCommand(newStewardDaemonCmd())
 	cmd.AddCommand(newStewardSweepCmd())
 	return cmd
@@ -74,12 +72,9 @@ func (p *kernelPlanProvider) ListCandidatePlans(ctx context.Context) ([]steward.
 }
 
 func newStewardDaemonCmd() *cobra.Command {
-	var intervalSec int
-	cmd := &cobra.Command{
-		Use:   "daemon",
-		Short: "Run the continuous Kernel Steward loop for hygiene sweeps and runway replenishment",
-	}
+	cmd := bldr_cli_cmd_v1.NewKernelStewardDaemonCommandBuilder()
 	cmd.RunE = cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
+		intervalSec, _ := cmd.Flags().GetInt("interval")
 		projectRoot := proc.ProjectRoot()
 		if projectRoot == "" {
 			projectRoot = paths.ResolveProjectRoot(".")
@@ -131,15 +126,11 @@ func newStewardDaemonCmd() *cobra.Command {
 			}
 		}
 	})
-	cmd.Flags().IntVar(&intervalSec, "interval", 30, "Interval in seconds between stewardship sweeps")
 	return cmd
 }
 
 func newStewardSweepCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "sweep",
-		Short: "Run a single one-shot Kernel Steward hygiene and runway sweep",
-	}
+	cmd := bldr_cli_cmd_v1.NewKernelStewardSweepCommandBuilder()
 	cmd.RunE = cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 		projectRoot := proc.ProjectRoot()
 		if projectRoot == "" {

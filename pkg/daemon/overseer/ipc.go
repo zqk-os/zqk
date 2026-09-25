@@ -19,8 +19,9 @@ import (
 
 // IPCRequest represents a command sent over the domain socket.
 type IPCRequest struct {
-	Action string `json:"action"` // "status", "start", "stop", "restart", "enable", "disable", "shutdown"
-	Target string `json:"target,omitempty"`
+	Action string      `json:"action"` // "status", "start", "stop", "restart", "enable", "disable", "add", "remove", "shutdown"
+	Target string      `json:"target,omitempty"`
+	Spec   *DaemonSpec `json:"spec,omitempty"`
 }
 
 // IPCResponse represents the overseer response envelope.
@@ -223,6 +224,29 @@ func (s *IPCServer) executeRequest(req IPCRequest) IPCResponse {
 			list = []DaemonStatus{*st}
 		}
 		return IPCResponse{Success: true, Daemons: list}
+
+	case "add":
+		if req.Spec == nil || req.Spec.Name == "" {
+			return IPCResponse{Success: false, Error: "missing daemon specification or name"}
+		}
+		if err := s.supervisor.AddDaemon(ctx, req.Spec); err != nil {
+			return IPCResponse{Success: false, Error: err.Error()}
+		}
+		st, _ := s.supervisor.GetStatus(req.Spec.Name)
+		var list []DaemonStatus
+		if st != nil {
+			list = []DaemonStatus{*st}
+		}
+		return IPCResponse{Success: true, Daemons: list}
+
+	case "remove":
+		if req.Target == "" {
+			return IPCResponse{Success: false, Error: "missing target daemon name"}
+		}
+		if err := s.supervisor.RemoveDaemon(ctx, req.Target); err != nil {
+			return IPCResponse{Success: false, Error: err.Error()}
+		}
+		return IPCResponse{Success: true}
 
 	default:
 		return IPCResponse{Success: false, Error: "unknown action: " + req.Action}
