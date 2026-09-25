@@ -1,5 +1,17 @@
 // Package locknames defines operation names for RunInLockWithLogger / RunInRLockWithLogger.
 // Shared by storage and id_generation to avoid import cycles (CONSTANTS_AND_DRY_INVENTORY_PLAN Phase A).
+//
+// Lock Taxonomy and Scope Hierarchy:
+//  1. High-frequency memory cache / map read-writes: Prefer direct sync.RWMutex (mu.Lock() / mu.Unlock())
+//     without RunInLockWithLogger to eliminate closure heap allocations and timestamp overhead.
+//  2. Storage index & WAL I/O transactions: Use domain-scoped lock operations (e.g. LockNameListingIndexSave,
+//     LockNameWalCompact) where hold-time threshold monitoring (>100ms) provides actionable telemetry.
+//  3. Async buffers and batch queues: Use collector-scoped lock operations (e.g. LockNameAsyncMetricsCollector*,
+//     LockNameAuditBuffer*).
+//
+// Note: Constant names in this registry provide standardized Prometheus/telemetry labels for long-held lock
+// diagnostics. For inner-loop hot paths where deadlock cycle prevention is statically verified, direct mutex
+// primitives should be used rather than instrumented wrappers.
 package locknames
 
 const (

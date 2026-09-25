@@ -107,6 +107,21 @@ _verify_archive_sha256() {
   fi
 }
 
+# Verify checksums.txt signature (checksums.txt.sig) using cosign if available.
+_verify_checksums_signature() {
+  local checksums_path="$1"
+  local sig_path="${checksums_path}.sig" # verifies checksums.txt.sig
+  if [ ! -f "$sig_path" ]; then
+    return 0
+  fi
+  if command -v cosign >/dev/null 2>&1; then
+    echo "🔒 Verifying checksums signature with cosign..."
+    if ! cosign verify-blob --signature "$sig_path" "$checksums_path" >/dev/null 2>&1; then
+      echo "Warning: cosign signature verification failed for checksums.txt (checksums.txt.sig)" >&2
+    fi
+  fi
+}
+
 # ---------------------------------------------------------------------------
 # Helper: install binary from GitHub Releases (public or private)
 # ---------------------------------------------------------------------------
@@ -149,6 +164,7 @@ install_binary() {
 
   echo "🔒 Verifying checksum..."
   _verify_archive_sha256 "${checksums_path}" "${archive_path}"
+  _verify_checksums_signature "${checksums_path}"
 
   echo "📦 Extracting..."
   tar -xzf "${archive_path}" -C "$TMPDIR"

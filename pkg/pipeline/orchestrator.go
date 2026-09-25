@@ -14,8 +14,8 @@ type ObjectStore interface {
 	Update(ctx context.Context, secCtx *pkgctx.SecurityContext, id string, data map[string]any) error
 }
 
-// PipelinePlugin defines the contract for any executable stage in a pipeline.
-type PipelinePlugin interface {
+// Plugin defines the contract for any executable stage in a pipeline.
+type Plugin interface {
 	// Name returns the unique string identifier for the plugin
 	Name() string
 
@@ -25,6 +25,9 @@ type PipelinePlugin interface {
 	// Validate ensures the output of this plugin satisfies the next stage's requirements
 	Validate(ctx context.Context, output map[string]any) error
 }
+
+// PipelinePlugin is an alias for Plugin preserved for backwards compatibility to eliminate package stutter.
+type PipelinePlugin = Plugin
 
 // Orchestrator manages the execution of multi-agent pipelines based on pipeline_execution records.
 type Orchestrator struct {

@@ -28,6 +28,23 @@ archives:
   - format: tar.gz
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
 
+signs:
+  - id: cosign
+    artifacts: checksum
+    cmd: cosign
+    args:
+      - "sign-blob"
+      - "--output-certificate=${certificate}"
+      - "--output-signature=${signature}"
+      - "${artifact}"
+      - "--yes"
+
+sboms:
+  - id: default
+    artifacts: archive
+    documents:
+      - "${artifact}.spdx.json"
+
 changelog:
   sort: asc
   filters:
