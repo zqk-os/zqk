@@ -96,6 +96,16 @@ func TestLookupBoundAccount(t *testing.T) {
 	if _, err := LookupBoundAccount(root, "ACC-MISSING"); err == nil {
 		t.Fatal("expected missing account")
 	}
+	workerBound, err := LookupBoundAccount(root, DefaultSwarmWorkerAccount)
+	if err != nil {
+		t.Fatalf("LookupBoundAccount for DefaultSwarmWorkerAccount failed: %v", err)
+	}
+	if workerBound.ID != DefaultSwarmWorkerAccount || len(workerBound.Roles) == 0 {
+		t.Fatalf("unexpected worker bound account: %+v", workerBound)
+	}
+	if !HasAccountInIndex(root, DefaultSwarmWorkerAccount) {
+		t.Fatal("expected HasAccountInIndex true for DefaultSwarmWorkerAccount")
+	}
 }
 
 func TestLoadRoleRecords_usesIndexWithoutDirScan(t *testing.T) {

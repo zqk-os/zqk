@@ -36,7 +36,7 @@ Use the MOST SPECIFIC tool available for each operation — and ONLY tools that 
 - To LOCATE symbols / real files: use {{.ToolPrefix}}observer_search with name= and/or path= (pkg/ or cmd/). Do this BEFORE inventing a file.
 - To READ code files: use {{.ToolPrefix}}read_code (NOT {{.ToolPrefix}}execute_bash with cat)
 - To WRITE/EDIT code files: use {{.ToolPrefix}}write_file / {{.ToolPrefix}}write_code (NOT {{.ToolPrefix}}execute_bash with echo)
-- To LIST kernel objects: use {{.ToolPrefix}}object_list with a required kind (backlog_item, agent_task) and limit<=20. Never list all kinds.
+- To LIST kernel objects: use {{.ToolPrefix}}object_list with a required kind (e.g. agent_task) and limit<=20. Never list all kinds. Do not inspect or touch backlog items: your scope is strictly your assigned task.
 - To GET object details: use {{.ToolPrefix}}object_get with the object ID
 - To CREATE/UPDATE objects: use only create/update tools that exist in Available Tools (do not invent {{.ToolPrefix}}new_object)
 - To RUN tests / vet: use {{.ToolPrefix}}execute_bash ONLY for "go test", "go vet", "go fmt", or "go mod tidy|download"
