@@ -163,6 +163,18 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 
 	var kernelObjects []map[string]any
 
+	effectiveParams := make(map[string]string)
+	for k, def := range manifest.Parameters {
+		if def.Default != nil {
+			effectiveParams[k] = fmt.Sprintf("%v", def.Default)
+		}
+	}
+	for k, v := range opts.Parameters {
+		if v != nil {
+			effectiveParams[k] = fmt.Sprintf("%v", v)
+		}
+	}
+
 	baselineScore := 4.5
 	if b, ok := opts.Parameters["baseline"].(float64); ok && b > 0 {
 		baselineScore = b
@@ -316,7 +328,11 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 
 		bliDesc := fmt.Sprintf("Execute agent task %s in alignment with role %s", task.ID, task.Role)
 		if matchedTemplate != "" {
-			bliDesc = matchedTemplate
+			rendered := matchedTemplate
+			for k, v := range effectiveParams {
+				rendered = strings.ReplaceAll(rendered, "{{"+k+"}}", v)
+			}
+			bliDesc = rendered
 		}
 
 		// Backlog Item (child owns priority_plan_ref)
