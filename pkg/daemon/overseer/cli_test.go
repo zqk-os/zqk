@@ -27,7 +27,7 @@ func TestDaemonCLISchemaAndSubcommands(t *testing.T) {
 	require.NotNil(t, cmd)
 	assert.Equal(t, "daemon", cmd.Use)
 
-	expectedSubcommands := []string{"status", "start", "stop", "restart", "enable", "disable", "add", "remove", "run"}
+	expectedSubcommands := []string{"status", "start", "stop", "restart", "enable", "disable", "add", "remove", "run", "service"}
 	foundSubcommands := make(map[string]bool)
 
 	for _, sub := range cmd.Commands() {

@@ -11,6 +11,22 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
+const (
+	// OverseerLaunchAgentLabel is the canonical macOS launchd label for the solitary overseer daemon.
+	OverseerLaunchAgentLabel = "com.zqk.overseer"
+)
+
+// LaunchAgentStatus captures the host launchd state for the overseer.
+type LaunchAgentStatus struct {
+	Label        string   `json:"label"`
+	PlistPath    string   `json:"plist_path"`
+	Installed    bool     `json:"installed"`
+	Loaded       bool     `json:"loaded"`
+	Running      bool     `json:"running"`
+	PID          int      `json:"pid,omitempty"`
+	CleanedUnits []string `json:"cleaned_legacy_units,omitempty"`
+}
+
 // RootID returns a stable identifier for a project root directory.
 func RootID(absRoot string) string {
 	canon := filepath.Clean(absRoot)

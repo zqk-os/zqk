@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.zqk.overseer</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>__ZQK_PROJECT_ROOT__/bin/zqk</string>
+		<string>daemon</string>
+		<string>run</string>
+	</array>
+	<key>WorkingDirectory</key>
+	<string>__ZQK_PROJECT_ROOT__</string>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>KeepAlive</key>
+	<dict>
+		<key>SuccessfulExit</key>
+		<false/>
+	</dict>
+	<key>StandardOutPath</key>
+	<string>__ZQK_PROJECT_ROOT__/.zqk/logs/overseer.launchd.out</string>
+	<key>StandardErrorPath</key>
+	<string>__ZQK_PROJECT_ROOT__/.zqk/logs/overseer.launchd.err</string>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>ZQK_PROJECT_ROOT</key>
+		<string>__ZQK_PROJECT_ROOT__</string>
+		<key>ZQK_IS_DAEMON</key>
+		<string>1</string>
+		<key>ZQK_API_KEY</key>
+		<string>ACC-SYSTEM</string>
+		<key>HOME</key>
+		<string>__HOME__</string>
+		<key>PATH</key>
+		<string>__ZQK_PROJECT_ROOT__/.zqk/bin:__ZQK_PROJECT_ROOT__/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+	</dict>
+</dict>
+</plist>

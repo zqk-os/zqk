@@ -28,6 +28,7 @@ func NewDaemonCmd() *cobra.Command {
 	cmd.AddCommand(newAddCmd())
 	cmd.AddCommand(newRemoveCmd())
 	cmd.AddCommand(newRunCmd())
+	cmd.AddCommand(newServiceCmd())
 	return cmd
 }
 
@@ -488,3 +489,88 @@ func newRunCmd() *cobra.Command {
 	}
 	return cmd
 }
+
+func newServiceCmd() *cobra.Command {
+	parent := bldr_cli_cmd_v1.NewDaemonServiceCommandBuilder()
+	parent.AddCommand(newServiceInstallCmd())
+	parent.AddCommand(newServiceUninstallCmd())
+	parent.AddCommand(newServiceStatusCmd())
+	parent.AddCommand(newServiceCleanupLegacyCmd())
+	return parent
+}
+
+func newServiceInstallCmd() *cobra.Command {
+	cmd := bldr_cli_cmd_v1.NewDaemonServiceInstallCommandBuilder()
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		root, _ := cmd.Flags().GetString("root")
+		if root == "" {
+			root = resolveProjectRoot(cmd)
+		}
+		bin, _ := cmd.Flags().GetString("binary")
+
+		st, err := overseer.InstallOverseerLaunchAgent(root, bin)
+		if err != nil {
+			return err
+		}
+		return cli.FormatOutput(cmd, map[string]any{
+			"status":               "installed",
+			"label":                st.Label,
+			"plist_path":           st.PlistPath,
+			"cleaned_legacy_units": st.CleanedUnits,
+			"running":              st.Running,
+			"pid":                  st.PID,
+			"note":                 "Solitary overseer LaunchAgent active. All daemons run under its process group.",
+		})
+	}
+	return cmd
+}
+
+func newServiceUninstallCmd() *cobra.Command {
+	cmd := bldr_cli_cmd_v1.NewDaemonServiceUninstallCommandBuilder()
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		if err := overseer.UninstallOverseerLaunchAgent(); err != nil {
+			return err
+		}
+		return cli.FormatOutput(cmd, map[string]any{
+			"status": "uninstalled",
+			"label":  overseer.OverseerLaunchAgentLabel,
+		})
+	}
+	return cmd
+}
+
+func newServiceStatusCmd() *cobra.Command {
+	cmd := bldr_cli_cmd_v1.NewDaemonServiceStatusCommandBuilder()
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		st, err := overseer.StatusOverseerLaunchAgent()
+		if err != nil {
+			return err
+		}
+		return cli.FormatOutput(cmd, map[string]any{
+			"label":      st.Label,
+			"installed":  st.Installed,
+			"loaded":     st.Loaded,
+			"running":    st.Running,
+			"pid":        st.PID,
+			"plist_path": st.PlistPath,
+		})
+	}
+	return cmd
+}
+
+func newServiceCleanupLegacyCmd() *cobra.Command {
+	cmd := bldr_cli_cmd_v1.NewDaemonServiceCleanupLegacyCommandBuilder()
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		cleaned, err := overseer.CleanLegacyLaunchAgents()
+		if err != nil {
+			return err
+		}
+		return cli.FormatOutput(cmd, map[string]any{
+			"status":               "cleaned",
+			"cleaned_legacy_units": cleaned,
+			"count":                len(cleaned),
+		})
+	}
+	return cmd
+}
+

@@ -211,11 +211,21 @@ func (s *Supervisor) launchDaemonLocked(ctx context.Context, spec *DaemonSpec, s
 		args = spec.Command[1:]
 	}
 
-	// Resolve executable relative to projectRoot if needed
-	if !filepath.IsAbs(exe) {
+	selfExe, err := os.Executable()
+	if err != nil || selfExe == "" {
+		selfExe = filepath.Join(s.projectRoot, "bin", "zqk")
+	}
+
+	if exe == "zqk" || exe == "zqk-stable" {
+		exe = selfExe
+	} else if !filepath.IsAbs(exe) {
 		binCandidate := filepath.Join(s.projectRoot, "bin", exe)
 		if _, err := os.Stat(binCandidate); err == nil {
 			exe = binCandidate
+		} else if _, err := exec.LookPath(exe); err != nil {
+			// Subcommand of zqk (e.g. "scheduler", "ambient", "object", "kernel")
+			args = spec.Command
+			exe = selfExe
 		}
 	}
 
@@ -226,8 +236,12 @@ func (s *Supervisor) launchDaemonLocked(ctx context.Context, spec *DaemonSpec, s
 		cmd.Dir = s.projectRoot
 	}
 
+	cmd.Env = os.Environ()
+	cmd.Env = append(cmd.Env,
+		"ZQK_PROJECT_ROOT="+s.projectRoot,
+		"ZQK_IS_DAEMON=1",
+	)
 	if len(spec.Env) > 0 {
-		cmd.Env = os.Environ()
 		for k, v := range spec.Env {
 			cmd.Env = append(cmd.Env, k+"="+v)
 		}

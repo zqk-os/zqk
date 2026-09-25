@@ -15,7 +15,7 @@ func TestDaemonCommandStructure(t *testing.T) {
 	require.NotNil(t, cmd)
 	assert.Equal(t, "daemon", cmd.Use)
 
-	expected := []string{"status", "start", "stop", "restart", "enable", "disable", "add", "remove", "run"}
+	expected := []string{"status", "start", "stop", "restart", "enable", "disable", "add", "remove", "run", "service"}
 	for _, exp := range expected {
 		sub, _, err := cmd.Find([]string{exp})
 		require.NoError(t, err)
@@ -54,3 +54,18 @@ func TestDaemonAddStatusRemoveExecution(t *testing.T) {
 	err = verifyCmd.ExecuteContext(context.Background())
 	assert.Error(t, err)
 }
+
+func TestDaemonServiceCommandStructure(t *testing.T) {
+	cmd := daemon.NewDaemonCmd()
+	sub, _, err := cmd.Find([]string{"service"})
+	require.NoError(t, err)
+	require.NotNil(t, sub)
+
+	expected := []string{"install", "uninstall", "status", "cleanup-legacy"}
+	for _, exp := range expected {
+		child, _, err := sub.Find([]string{exp})
+		require.NoError(t, err)
+		require.NotNil(t, child, "expected daemon service subcommand %s", exp)
+	}
+}
+

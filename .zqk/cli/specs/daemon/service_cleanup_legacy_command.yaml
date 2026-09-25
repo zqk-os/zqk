@@ -1,0 +1,12 @@
+$schema: ../schemas/command_spec.schema.json
+name: cleanup-legacy
+short: Clean up all legacy per-daemon LaunchAgents
+description: Scans ~/Library/LaunchAgents, unloads from launchctl, and deletes all legacy per-daemon units (com.zqk.scheduler.*, com.zqk.privileged-writer, com.zqk.mesh.*).
+args:
+  type: no_args
+help:
+  examples:
+    - comment: Clean up legacy LaunchAgents
+      command: '%s daemon service cleanup-legacy'
+run_e: runDaemonServiceCleanupLegacy
+common_flags: true

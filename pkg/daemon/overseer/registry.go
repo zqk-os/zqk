@@ -75,7 +75,7 @@ func DefaultDaemonSpecs() []*DaemonSpec {
 		{
 			Name:          "scheduler",
 			Description:   "ZQK Kernel Task & Event Scheduler Daemon",
-			Command:       []string{"scheduler", "run"},
+			Command:       []string{"scheduler", "start", "--foreground"},
 			DesiredState:  DesiredStateEnabled,
 			RestartPolicy: RestartPolicyAlways,
 			MaxRestarts:   10,
@@ -101,11 +101,15 @@ func DefaultDaemonSpecs() []*DaemonSpec {
 			MaxRestarts:   10,
 			BackoffMin:    500 * time.Millisecond,
 			BackoffMax:    30 * time.Second,
+			Env: map[string]string{
+				"ZQK_IS_DAEMON": "1",
+				"ZQK_API_KEY":   "ACC-SYSTEM",
+			},
 		},
 		{
 			Name:          "fswatcher",
 			Description:   "ZQK Filesystem Object Watcher Daemon",
-			Command:       []string{"system", "fswatcher-daemon"},
+			Command:       []string{"ambient", "daemon"},
 			DesiredState:  DesiredStateDisabled,
 			RestartPolicy: RestartPolicyOnFailure,
 			MaxRestarts:   5,
@@ -125,7 +129,7 @@ func DefaultDaemonSpecs() []*DaemonSpec {
 		{
 			Name:          "mcp",
 			Description:   "Model Context Protocol & Semantic Bridge Daemon",
-			Command:       []string{"mcp", "serve"},
+			Command:       []string{"mcp", "daemon"},
 			DesiredState:  DesiredStateDisabled,
 			RestartPolicy: RestartPolicyOnFailure,
 			MaxRestarts:   5,
