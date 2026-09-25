@@ -201,15 +201,7 @@ func TestSetupTestServices_GraphEnabledWithExistingMemgraph(t *testing.T) {
 	configContent := "storage:\n  graph_enabled: true\n"
 	require.NoError(t, fileutil.WriteFile(configDir+"/zqk.yaml", []byte(configContent), 0644))
 
-	origRoot := os.Getenv("ZQK_PROJECT_ROOT")
-	os.Setenv("ZQK_PROJECT_ROOT", tmpDir)
-	defer func() {
-		if origRoot != "" {
-			os.Setenv("ZQK_PROJECT_ROOT", origRoot)
-		} else {
-			os.Unsetenv("ZQK_PROJECT_ROOT")
-		}
-	}()
+	t.Setenv("ZQK_PROJECT_ROOT", tmpDir)
 
 	// SetupTestServices with graph enabled will call StartService for MemGraph,
 	// which detects zqk-memgraph already running on host ports and succeeds immediately!

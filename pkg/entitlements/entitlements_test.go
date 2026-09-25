@@ -2,7 +2,6 @@ package entitlements
 
 import (
 	"context"
-	"os"
 	"strings"
 	"testing"
 
@@ -75,20 +74,19 @@ func TestCheckEvolveEntitlement_AutoUpgrade(t *testing.T) {
 	// Reset global state
 	defer func() {
 		globalChecker = &CommunityChecker{}
-		_ = os.Unsetenv(brand.DefaultEnvPrefix + "_LICENSE_KEY")
 	}()
 
 	ctx := context.Background()
 
 	// Without key, should fail limit > 3
-	_ = os.Unsetenv(brand.DefaultEnvPrefix + "_LICENSE_KEY")
+	t.Setenv(brand.DefaultEnvPrefix+"_LICENSE_KEY", "")
 	globalChecker = &CommunityChecker{}
 	if err := CheckEvolveEntitlement(ctx, 4); err == nil {
 		t.Error("expected error without license key for limit 4")
 	}
 
 	// With key, should auto-upgrade and pass
-	_ = os.Setenv(brand.DefaultEnvPrefix+"_LICENSE_KEY", "mock-enterprise-key")
+	t.Setenv(brand.DefaultEnvPrefix+"_LICENSE_KEY", "mock-enterprise-key")
 	LoadLicense()
 	if err := CheckEvolveEntitlement(ctx, 4); err != nil {
 		t.Errorf("expected no error with license key, got: %v", err)

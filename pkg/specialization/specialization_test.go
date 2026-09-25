@@ -1,7 +1,6 @@
 package specialization
 
 import (
-	"os"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/zqkenv"
@@ -25,7 +24,7 @@ func TestGetCurrentTier(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_ = os.Setenv(envVar.Name(), tt.envVal)
+			t.Setenv(envVar.Name(), tt.envVal)
 			DefaultTier = tt.defVal
 			if got := GetCurrentTier(); got != tt.expected {
 				t.Errorf("GetCurrentTier() = %v, want %v", got, tt.expected)

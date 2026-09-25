@@ -8,9 +8,11 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"path/filepath"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -609,6 +611,7 @@ func CompactWAL(projectRoot string) error {
 
 	// Read all records and filter to unapplied ones
 	var unappliedRecords []WALRecord
+	var corruptLines [][]byte
 	scanner := bufio.NewScanner(walFile)
 	buf := make([]byte, 0, 64*1024)
 	scanner.Buffer(buf, maxWALLineSize)
@@ -617,8 +620,10 @@ func CompactWAL(projectRoot string) error {
 
 	for scanner.Scan() {
 		totalLines++
-		records, err := parseWALLine(scanner.Bytes())
+		lineBytes := scanner.Bytes()
+		records, err := parseWALLine(lineBytes)
 		if err != nil {
+			corruptLines = append(corruptLines, append([]byte(nil), lineBytes...))
 			StorageLog(logger).Warn(LogEventStorageObjectWALCompactionSkipLineWarn).
 				Int("line_number", int(totalLines)).
 				WithError(err).
@@ -714,6 +719,22 @@ func CompactWAL(projectRoot string) error {
 		return errfmt.Newf(ConstStreamFailedToReplaceWalFile).Wrap(err)
 	}
 	_ = fileutil.SyncDir(filepath.Dir(walPath))
+
+	if len(corruptLines) > 0 {
+		quarantineDir := filepath.Join(filepath.Dir(walPath), "quarantine")
+		_ = fileutil.EnsureDir(quarantineDir)
+		quarantineFile := filepath.Join(quarantineDir, fmt.Sprintf("corrupt_wal_%d.log", time.Now().UnixNano()))
+		var qBuf bytes.Buffer
+		for _, cl := range corruptLines {
+			qBuf.Write(cl)
+			qBuf.WriteByte('\n')
+		}
+		_ = fileutil.WriteFile(quarantineFile, qBuf.Bytes(), paths.FilePerm644)
+		StorageLog(logger).Warn("Quarantined corrupted WAL records during compaction").
+			Int("corrupted_records", len(corruptLines)).
+			String("quarantine_file", quarantineFile).
+			Log()
+	}
 
 	StorageLog(logger).Info(LogEventStorageObjectWALCompactionCompletedInfo).
 		Int("total_records", int(totalRecords)).

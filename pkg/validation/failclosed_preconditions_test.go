@@ -1,7 +1,6 @@
 package validation
 
 import (
-	"os"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -156,10 +155,7 @@ func TestFailClosedPreconditions_BoundaryAndErrorHandling(t *testing.T) {
 
 	t.Run("BreakGlass_FailOpenEnvVar", func(t *testing.T) {
 		envKey := zqkenv.PreconditionsFailOpen().Key
-		orig := os.Getenv(envKey)
-		defer os.Setenv(envKey, orig)
-
-		os.Setenv(envKey, "1")
+		t.Setenv(envKey, "1")
 		met, recognized := gv.evaluatePrecondition("some unknown legacy precondition", map[string]any{}, nil)
 		if recognized {
 			t.Fatal("unknown string must not be recognized even with fail-open enabled")

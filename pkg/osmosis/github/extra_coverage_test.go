@@ -5,6 +5,8 @@ import (
 	"context"
 	"testing"
 	"time"
+
+	"github.com/zqk-os/zqk/pkg/metrics"
 )
 
 type stubLimiter struct{ allow bool }
@@ -28,6 +30,8 @@ func (s *stubTracker) RecordAgentTokenUsage(context.Context, string, int64, int6
 func (s *stubTracker) RecordGhostDriftMTTR(context.Context, string, time.Duration) {}
 func (s *stubTracker) RecordPersonaSkillInvocation(context.Context, string, string, time.Duration, bool) {
 }
+func (s *stubTracker) GetIPCHistograms() map[string]*metrics.PrometheusHistogram        { return nil }
+func (s *stubTracker) GetGhostDriftHistograms() map[string]*metrics.PrometheusHistogram { return nil }
 
 func TestExtraInterceptor(t *testing.T) {
 	ctx := context.Background()
