@@ -9,6 +9,8 @@
 		<string>__ZQK_PROJECT_ROOT__/bin/zqk</string>
 		<string>daemon</string>
 		<string>run</string>
+		<string>--timeout</string>
+		<string>0</string>
 	</array>
 	<key>WorkingDirectory</key>
 	<string>__ZQK_PROJECT_ROOT__</string>

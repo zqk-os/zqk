@@ -73,7 +73,11 @@ func (h *TimeoutHook) parseTimeoutFlag(cmdCtx *CommandContext, args []string) (t
 				if !explicitlySet {
 					explicitlySet = true
 				}
-				if parsed, err := time.ParseDuration(args[i+1]); err == nil {
+				val := args[i+1]
+				if val == "0" {
+					val = "0s"
+				}
+				if parsed, err := time.ParseDuration(val); err == nil {
 					timeout = parsed
 					break
 				}
@@ -148,7 +152,11 @@ var mcpLongLivedCommands = []string{
 
 // otherDaemonCommands are the non-MCP commands that run until stopped.
 var otherDaemonCommands = []string{
+	"daemon run",
 	"scheduler start",
+	"kernel steward daemon",
+	"ambient daemon",
+	"agent seat-worker",
 	"system truth-sentinel",
 	zqkenv.PrivilegedWriterDaemonCommandFragment(),
 	"feed watch",        // long-lived MCP subscriber; auto-timeout must not kill the seat watcher

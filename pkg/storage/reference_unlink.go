@@ -28,7 +28,11 @@ func ShouldCascadeDeleteDependent(dependent map[string]any, deletedID string) bo
 	fr := objects.GetGlobalFieldRegistry()
 	fieldDefs, loaded := fr.GetFieldsForKindIfLoaded(kind)
 	if !loaded || fieldDefs == nil {
-		return true // Default to cascade
+		var err error
+		fieldDefs, err = fr.GetFieldsForKind(kind)
+		if err != nil || fieldDefs == nil {
+			return true // Default to cascade
+		}
 	}
 
 	yamlParser := parser.NewYAMLParser()

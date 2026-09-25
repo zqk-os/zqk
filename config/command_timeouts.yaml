@@ -204,6 +204,13 @@ rules:
     idle_shutdown_duration: 24h
     child_max_timeout_exempt: true
 
+  # Overseer daemon: solitary process group leader supervising all host daemons under launchd/systemd.
+  # Parent is launchd/systemd (non-zqk). Runs until stopped.
+  - pattern: "daemon run"
+    timeout: 24h
+    idle_shutdown_duration: 24h
+    child_max_timeout_exempt: true
+
   # Workflow whats-next: calculates composite metrics and requires idle exemption when called from non-ZQK parents.
   - pattern: "workflow whats-next"
     timeout: 30m

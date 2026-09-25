@@ -145,6 +145,8 @@ func InstallOverseerLaunchAgent(projectRoot, binaryPath string) (*LaunchAgentSta
     <string>%s</string>
     <string>daemon</string>
     <string>run</string>
+    <string>--timeout</string>
+    <string>0</string>
   </array>
   <key>WorkingDirectory</key>
   <string>%s</string>
