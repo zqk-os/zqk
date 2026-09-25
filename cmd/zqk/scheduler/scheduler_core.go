@@ -22,7 +22,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/diagnostics"
 	"github.com/zqk-os/zqk/pkg/dispatch"
 	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/zqk-os/zqk/pkg/functional"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/graph/provider"
 	"github.com/zqk-os/zqk/pkg/graph/rpcpool"
@@ -347,7 +346,7 @@ func startScheduler(ctx *cli.Context, cmd *cobra.Command) error {
 	// Check scheduler configuration
 	config, configErr := loadSchedulerConfig(projectRoot)
 	defaultConfig := &schedulerConfig{Enabled: true, ProjectType: "production", JobsPaused: false}
-	functional.When(func() bool { return configErr != nil }).Then(func() {
+	if configErr != nil {
 		emitSchedulerWarningEventViaCoordinator(
 			pkgctx.NewSystemContext(),
 			projectRoot,
@@ -357,9 +356,9 @@ func startScheduler(ctx *cli.Context, cmd *cobra.Command) error {
 			profile,
 		)
 		config = defaultConfig
-	}).OrElseWhen(func() bool { return config == nil }).Then(func() {
+	} else if config == nil {
 		config = defaultConfig
-	}).Run()
+	}
 
 	// When jobs_paused is true, timer and immediate jobs do not run (maintenance, object-count-report, etc.).
 	// Log prominently so it is obvious; user updates config when the time is right.
@@ -785,11 +784,11 @@ func startSchedulerBackgroundWatchers(_ *cobra.Command, startCtx context.Context
 								}
 							}()
 							captureErr := captureDiagnostics(diagnosticsDir, "scheduler_daemon")
-							functional.When(func() bool { return captureErr != nil }).Then(func() {
+							if captureErr != nil {
 								emitSchedulerDumpEventViaCoordinator(pkgctx.NewSystemContext(), projectRoot, storageProvider, "error", captureErr, profile, map[string]any{schedulerFieldDir: diagnosticsDir})
-							}).OrElse(func() {
+							} else {
 								emitSchedulerDumpEventViaCoordinator(pkgctx.NewSystemContext(), projectRoot, storageProvider, "complete", nil, profile, map[string]any{schedulerFieldDir: diagnosticsDir})
-							}).Run()
+							}
 						})
 					}
 				}
