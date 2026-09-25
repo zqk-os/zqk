@@ -193,36 +193,11 @@ func (jl *JobLock) AcquiredAt() *time.Time {
 	return jl.acquiredAt
 }
 
-// checkAndCleanStaleLock checks if the lock file exists and is stale, and removes it if so
+// checkAndCleanStaleLock is a no-op safety guard. Advisory file locks (flock) are
+// bound to the open file description in the kernel and are automatically released
+// by the OS when the owning process terminates or closes the descriptor. Removing
+// the lock file from disk while processes are attempting to acquire it unlinks the
+// active inode and breaks mutual exclusion across concurrent callers (F-REL-SCHEDULER-STALE-LOCK-MUTEX-BREACH).
 func (jl *JobLock) checkAndCleanStaleLock() error {
-	// Check if lock file exists
-	info, err := fileutil.Stat(jl.lockPath)
-	if fileutil.IsNotExist(err) {
-		// Lock file doesn't exist, nothing to clean
-		return nil
-	}
-	if err != nil {
-		return errfmt.Newf("failed to stat lock file").Wrap(err)
-	}
-
-	// Check if lock file is stale
-	threshold := jl.config.StaleLockThreshold
-	if threshold == 0 {
-		threshold = 1 * time.Hour // Default threshold
-	}
-
-	age := time.Since(info.ModTime())
-	if age > threshold {
-		// Lock file is stale, remove it
-		// Note: We can't safely remove a lock file that might be held by another process
-		// However, if the file is truly stale (older than threshold), it's likely
-		// from a crashed process. We'll attempt to remove it, but the actual lock
-		// will be released when the file is closed or the process exits.
-		// The file lock mechanism will handle the actual lock release.
-		if err := fileutil.Remove(jl.lockPath); err != nil && !fileutil.IsNotExist(err) {
-			return errfmt.Newf("failed to remove stale lock file").Wrap(err)
-		}
-	}
-
 	return nil
 }

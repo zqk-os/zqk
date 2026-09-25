@@ -4,6 +4,9 @@ package tray
 import (
 	"bytes"
 	"context"
+	"crypto/ecdsa"
+	"crypto/x509"
+	"encoding/pem"
 	"errors"
 	"fmt"
 	"os"
@@ -213,20 +216,25 @@ func runRun(cmd *cobra.Command, args []string) error {
 
 	fullArgv := append(append([]string{}, e.Argv...), args[1:]...)
 
-	if !e.IsDefault {
-		isPriv, token := traypkg.IsPrivilegedArgv(fullArgv)
-		if isPriv {
-			if e.Signature == "" {
-				return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("access denied: tray entry %q contains restricted flag/command (%s) and is not cryptographically signed. Use 'zqk tray sign %s' to authorize, or execute directly.", e.Name, token, e.Name)))
+	isPriv, token := traypkg.IsPrivilegedArgv(fullArgv)
+	if isPriv {
+		// Reject privileged arguments smuggled through appended runtime arguments
+		if len(args) > 1 {
+			if isAppendedPriv, appToken := traypkg.IsPrivilegedArgv(args[1:]); isAppendedPriv {
+				return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("access denied: appended arguments to tray entry %q contain restricted flag/command (%s)", e.Name, appToken)))
 			}
-			keyPath := filepath.Join(projectRoot, paths.ProjectDataDir, "keystore", "auditor.priv")
-			signer, err := qa.NewAuditorSigner(keyPath)
-			if err != nil {
-				return errfmt.Errorf("access denied: tray entry %q requires signature verification, but failed to load auditor key: %w", e.Name, err)
-			}
-			if err := traypkg.VerifyEntry(e, signer.PublicKey()); err != nil {
-				return errfmt.Errorf("access denied: tray entry %q signature verification failed: %w", e.Name, err)
-			}
+		}
+
+		if e.Signature == "" {
+			return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("access denied: tray entry %q contains restricted flag/command (%s) and is not cryptographically signed. Use 'zqk tray sign %s' to authorize, or execute directly.", e.Name, token, e.Name)))
+		}
+
+		pubHex, err := resolveAuditorPublicKey(projectRoot)
+		if err != nil {
+			return errfmt.Errorf("access denied: tray entry %q requires signature verification, but failed to load auditor key: %w", e.Name, err)
+		}
+		if err := traypkg.VerifyEntry(e, pubHex); err != nil {
+			return errfmt.Errorf("access denied: tray entry %q signature verification failed: %w", e.Name, err)
 		}
 	}
 
@@ -315,6 +323,12 @@ func runSign(cmd *cobra.Command, args []string) error {
 		return errfmt.Errorf("load auditor signer: %w", err)
 	}
 
+	// Persist matching public key file alongside private key if not already present
+	pubPath := strings.TrimSuffix(keyPath, ".priv") + ".pub"
+	if !fileutil.Exists(pubPath) {
+		_ = fileutil.WriteFile(pubPath, []byte(signer.PublicKey()+"\n"), paths.FilePerm644)
+	}
+
 	accountID := qa.AuditorAccountID
 	if secCtx := pkgctx.GetSecurityContext(cmd.Context()); secCtx != nil && secCtx.AccountID != "" {
 		accountID = secCtx.AccountID
@@ -341,4 +355,46 @@ func runSign(cmd *cobra.Command, args []string) error {
 		"signature": targetEntry.Signature,
 		"key_path":  keyPath,
 	})
+}
+
+// resolveAuditorPublicKey resolves the auditor public key for signature verification without
+// requiring the private key or creating unauthenticated keys on disk.
+func resolveAuditorPublicKey(projectRoot string) (string, error) {
+	// 1. Prefer explicit public key file auditor.pub
+	pubPath := filepath.Join(projectRoot, paths.ProjectDataDir, "keystore", "auditor.pub")
+	if data, err := fileutil.ReadFile(pubPath); err == nil {
+		block, _ := pem.Decode(data)
+		if block != nil {
+			pubInterface, err := x509.ParsePKIXPublicKey(block.Bytes)
+			if err == nil {
+				if ecPub, ok := pubInterface.(*ecdsa.PublicKey); ok {
+					return fmt.Sprintf("%064x%064x", ecPub.X, ecPub.Y), nil
+				}
+			}
+		}
+		str := strings.TrimSpace(string(data))
+		if len(str) >= 64 {
+			return str, nil
+		}
+	}
+
+	// 2. Fall back to existing auditor.priv WITHOUT creating a new key on disk
+	privPath := filepath.Join(projectRoot, paths.ProjectDataDir, "keystore", "auditor.priv")
+	if data, err := fileutil.ReadFile(privPath); err == nil {
+		block, _ := pem.Decode(data)
+		if block != nil && (block.Type == "EC PRIVATE KEY" || strings.Contains(block.Type, "PRIVATE KEY")) {
+			if priv, err := x509.ParseECPrivateKey(block.Bytes); err == nil {
+				pub := priv.PublicKey
+				return fmt.Sprintf("%064x%064x", pub.X, pub.Y), nil
+			}
+			if privInterface, err := x509.ParsePKCS8PrivateKey(block.Bytes); err == nil {
+				if ecPriv, ok := privInterface.(*ecdsa.PrivateKey); ok {
+					pub := ecPriv.PublicKey
+					return fmt.Sprintf("%064x%064x", pub.X, pub.Y), nil
+				}
+			}
+		}
+	}
+
+	return "", errfmt.Errorf("auditor public key not found (neither auditor.pub nor auditor.priv exists in keystore)")
 }

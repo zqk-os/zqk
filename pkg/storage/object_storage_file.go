@@ -369,6 +369,9 @@ func (f *FileObjectStorage) Shutdown(ctx context.Context) error {
 	if err := DrainChangeJournalForRoot(ctx, f.projectRoot); err != nil && shutdownErr == nil {
 		shutdownErr = err
 	}
+	if err := filecas.DrainDarwinSyncQueue(5 * time.Second); err != nil && shutdownErr == nil {
+		shutdownErr = err
+	}
 	return shutdownErr
 }
 

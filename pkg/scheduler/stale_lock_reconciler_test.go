@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/paths"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -233,3 +234,41 @@ func TestCompleteExecutionRecoveredFromCrashWithoutDoubleWork(t *testing.T) {
 		t.Fatalf(msgZeroInProg, list2)
 	}
 }
+
+func TestCleanStaleLocksByAge_PreservesActivelyHeldLocks(t *testing.T) {
+	root := t.TempDir()
+	dir := filepath.Join(root, "locks")
+	if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
+		t.Fatalf(msgMkdir, err)
+	}
+
+	// Create a lock file that is old (> threshold)
+	p := writeLockFile(t, dir, "SCH-actively-held", 5*testStaleLockAge)
+
+	// Open and acquire exclusive flock on this file
+	fl, err := storagepkg.NewFileLock(p)
+	if err != nil {
+		t.Fatalf("NewFileLock: %v", err)
+	}
+	defer fl.Close()
+	defer fl.Unlock()
+
+	if err := fl.Lock(); err != nil {
+		t.Fatalf("Lock: %v", err)
+	}
+
+	// Now run CleanStaleLocksByAge - it must NOT remove the actively held lock!
+	n, err := CleanStaleLocksByAge(dir, testStaleThreshold)
+	if err != nil {
+		t.Fatalf("CleanStaleLocksByAge: %v", err)
+	}
+	if n != 0 {
+		t.Fatalf("expected 0 locks removed, got %d", n)
+	}
+
+	// Verify the file still exists on disk
+	if _, err := fileutil.Stat(p); err != nil {
+		t.Fatalf("actively held lock file was unlinked: %v", err)
+	}
+}
+

@@ -71,6 +71,9 @@ const (
 	// TestHarnessAccountID is used only in tests for SecurityContext attribution.
 	TestHarnessAccountID = "ACC-TEST-HARNESS"
 
+	// GuestAccountID is used for unauthenticated or unbound operations (fail-closed).
+	GuestAccountID = "ACC-GUEST"
+
 	emptyContextValue = ""
 )
 
@@ -152,6 +155,19 @@ func NewTestSecurityContext() *SecurityContext {
 		depth:       DepthRoot,
 	}
 }
+
+// NewGuestSecurityContext creates an unauthenticated/guest SecurityContext with zero permissions (fail-closed).
+func NewGuestSecurityContext() *SecurityContext {
+	return &SecurityContext{
+		AccountID:   GuestAccountID,
+		Roles:       []string{"guest"},
+		Permissions: nil,
+		NamespaceID: "",
+		precedence:  PrecedenceDefault,
+		depth:       DepthRoot,
+	}
+}
+
 
 // GetRoles returns the roles for this security context
 func (s *SecurityContext) GetRoles() []string {

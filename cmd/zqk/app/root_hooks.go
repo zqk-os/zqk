@@ -205,10 +205,10 @@ func checkSchedulerDaemonStatus(projectRoot string, cmd *cobra.Command, _ *cli.C
 	}
 
 	// Check if user has permission to read scheduler status
-	// Use authenticated context for permission check
+	// Use authenticated context for permission check (fail-closed to guest context)
 	secCtx := pkgctx.GetSecurityContext(cmd.Context())
 	if secCtx == nil {
-		secCtx = pkgctx.NewSystemSecurityContext()
+		secCtx = pkgctx.NewGuestSecurityContext()
 	}
 
 	// Check for read:scheduler_job or manage:scheduler permission

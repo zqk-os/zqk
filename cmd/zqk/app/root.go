@@ -48,6 +48,7 @@ import (
 	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2"
 	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/storage/filecas"
 	"github.com/zqk-os/zqk/pkg/when"
 	internal "github.com/zqk-os/zqk/pkg/zqkcli"
 )
@@ -565,6 +566,7 @@ func Execute() {
 	if !isHelpOrVersion {
 		drainCtx, drainCancel := context.WithTimeout(context.Background(), 5*time.Second) // Background: shutdown drain // Background: request-or-shutdown derived
 		_ = storage.GetGlobalShutdownCoordinator().DrainAll(drainCtx)
+		filecas.DrainDarwinSyncQueue(5 * time.Second)
 		drainCancel()
 		hook.Wait() // Wait for async metrics recording
 	}
@@ -591,6 +593,10 @@ func Execute() {
 		if isExpectedObjectNotFound(err) {
 			// Get miss, feed-id infer-kind, or recycle MCP auth gap — fail-closed, not a crash.
 			logging.Fluent(stderrLogger).Warn("Expected client miss").WithError(err).Log()
+		} else if isInformationalCommandError(err) {
+			// Informational client/routing/syntax errors: newspaper headline, not an unrecoverable system crash.
+			logging.Fluent(stderrLogger).Info("Command execution unfulfilled").WithError(err).Log()
+			logging.Fluent(logger).Info("Command execution unfulfilled").WithError(err).Log()
 		} else {
 			logging.Fluent(stderrLogger).Error("ZQK_EXECUTION_ERR", err).Log()
 			logging.Fluent(logger).Error("Command execution failed", err).Log()
@@ -610,6 +616,18 @@ func isExpectedObjectNotFound(err error) bool {
 	// Recycle/MCP bootstrap: Cursor reconnects as ACC-system or with no token.
 	return strings.Contains(msg, "account acc-system not found") ||
 		strings.Contains(msg, "missing token in")
+}
+
+func isInformationalCommandError(err error) bool {
+	if err == nil {
+		return false
+	}
+	msg := strings.ToLower(err.Error())
+	return strings.Contains(msg, "semantic routing failed") ||
+		strings.Contains(msg, "could not semantically resolve") ||
+		strings.Contains(msg, "unknown command") ||
+		strings.Contains(msg, "unknown flag") ||
+		strings.Contains(msg, "flag provided but not defined")
 }
 
 func init() {
@@ -1028,7 +1046,7 @@ func rootPersistentPreRunE(cmd *cobra.Command, args []string) error {
 	// Set actor information from the authenticated context (injected by AuthMiddleware)
 	secCtx := pkgctx.GetSecurityContext(cmd.Context())
 	if secCtx == nil {
-		secCtx = pkgctx.NewSystemSecurityContext()
+		secCtx = pkgctx.NewGuestSecurityContext()
 	}
 	tracker.SetActor(secCtx.AccountID, secCtx.Roles)
 

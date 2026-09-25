@@ -5,6 +5,7 @@ package filecas
 import (
 	"path/filepath"
 	"testing"
+	"time"
 
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -71,3 +72,31 @@ func TestQueueOrSync_PropagatesFallbackSyncError(t *testing.T) {
 		t.Fatal("queueOrSync hid fallback sync failure")
 	}
 }
+
+func TestDrainDarwinSyncQueue(t *testing.T) {
+	// Draining an empty or cleanly initialized queue must succeed within timeout.
+	if err := DrainDarwinSyncQueue(time.Second); err != nil {
+		t.Fatalf("DrainDarwinSyncQueue failed: %v", err)
+	}
+
+	path := filepath.Join(t.TempDir(), "drain-test.yaml")
+	if err := fileutil.WriteFile(path, []byte("id: OBJ-DRAIN\n"), fileutil.StandardFilePerm); err != nil {
+		t.Fatalf("write fixture: %v", err)
+	}
+	f, err := fileutil.Open(path)
+	if err != nil {
+		t.Fatalf("open fixture: %v", err)
+	}
+
+	// Trigger darwin sync queue init and queue the file.
+	darwinSyncQueueOnce.Do(initDarwinSyncQueue)
+	if err := queueOrSync(darwinSyncQueue, f); err != nil {
+		t.Fatalf("queueOrSync failed: %v", err)
+	}
+
+	// Drain queue should wait for background sync & close to complete.
+	if err := DrainDarwinSyncQueue(2 * time.Second); err != nil {
+		t.Fatalf("DrainDarwinSyncQueue after queueing failed: %v", err)
+	}
+}
+

@@ -1,0 +1,12 @@
+$schema: ../../schemas/command_spec.schema.json
+name: pre-subagent
+short: Pre-subagent launch hook
+description: Pre-subagent launch hook execution and gate evaluation.
+args:
+    type: no_args
+help:
+    examples:
+        - comment: Run agent hook pre-subagent
+          command: '%s agent hook pre-subagent'
+run_e: runAgentHookPreSubagent
+common_flags: true

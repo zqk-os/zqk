@@ -12,7 +12,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
-// hourglassOnlyTools are IDE/seat-worker verbs that qwen invents as MCP calls.
+// hourglassOnlyTools are IDE/seat-worker verbs that models commonly hallucinate as MCP calls.
 // The seat-worker runs agent next after write evidence; swarm MCP does not.
 var hourglassOnlyTools = map[string]struct{}{
 	"agent_next":                {},
@@ -24,7 +24,7 @@ var hourglassOnlyTools = map[string]struct{}{
 	objects.FieldKeyNextAction:  {},
 }
 
-// inventedMutationTools are write-adjacent names qwen invents instead of
+// inventedMutationTools are write-adjacent names models hallucinate instead of
 // write_code / write_file. Steering here keeps them off the "tool not found"
 // loop that then parks for missing mutation evidence.
 var inventedMutationTools = map[string]struct{}{
@@ -42,7 +42,6 @@ var inventedObjectListKinds = map[string]struct{}{
 
 // guardSwarmToolCall steers invented or lifecycle-illegal calls into guidance
 // so they do not become coordinator ERROR or "tool not found" loops.
-// hourglass verbs and status= updates after qwen prompt + MCP surface converge.
 func guardSwarmToolCall(call llm.ToolCall) (result string, handled bool) {
 	name := strings.TrimSpace(call.Name)
 	if isHourglassOnlyTool(name) {
@@ -116,7 +115,7 @@ func kernelObjectIDPath(base string) bool {
 	return false
 }
 
-// kernelIDPathPrefixes are object ids qwen opens as files (WFL-SUBAGENT-DISPATCH).
+// kernelIDPathPrefixes are object ids models attempt to open as files (WFL-SUBAGENT-DISPATCH).
 var kernelIDPathPrefixes = []string{
 	"WFL-", "ATK-", "BLI-", "PRI-", "CRIT-", "POL-", "GLS-", "AFE-",
 	"SCH-", "CAP-", "REQ-", "TDE-", "CVS-", "ACC-", "PER-",

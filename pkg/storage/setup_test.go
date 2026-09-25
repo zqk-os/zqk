@@ -29,7 +29,6 @@ func TestMain(m *testing.M) {
 	// t.Setenv call sites via zqkenv so no test hardcodes the socket path.
 	zqkenv.ApplyIsolatedStorageEnv(zqkenv.OSEnvSetter)
 	caspkg.SetListingIndexWriteQueueFactoryToPerProjectRoot()
-	_ = zqkenv.SkipDeleteAudit().Set("1")
 	code := m.Run()
 	caspkg.SetListingIndexWriteQueueFactory(nil) // reset so other packages or benchmarks are unaffected
 	os.Exit(code)

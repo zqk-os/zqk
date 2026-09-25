@@ -97,6 +97,41 @@ func (s *AuditorSigner) PrivateKey() *ecdsa.PrivateKey {
 	return s.privateKey
 }
 
+// GetAuditorPublicKeyHex retrieves the public key hex for verification without generating a new private key.
+func GetAuditorPublicKeyHex(keyPath string) (string, error) {
+	if keyPath == "" {
+		return "", fmt.Errorf("auditor key path is required")
+	}
+	data, err := fileutil.ReadFile(keyPath)
+	if err != nil {
+		return "", fmt.Errorf("read auditor key file: %w", err)
+	}
+	block, _ := pem.Decode(data)
+	if block == nil {
+		return "", fmt.Errorf("failed to decode PEM block from auditor key")
+	}
+	if block.Type == "PUBLIC KEY" {
+		pubInterface, err := x509.ParsePKIXPublicKey(block.Bytes)
+		if err != nil {
+			return "", fmt.Errorf("parse PKIX public key: %w", err)
+		}
+		if ecPub, ok := pubInterface.(*ecdsa.PublicKey); ok {
+			return fmt.Sprintf("%064x%064x", ecPub.X, ecPub.Y), nil
+		}
+		return "", fmt.Errorf("auditor public key is not ECDSA")
+	}
+	if block.Type == validation.ConstMagicExtracted_68 {
+		priv, err := x509.ParseECPrivateKey(block.Bytes)
+		if err != nil {
+			return "", fmt.Errorf("parse EC private key: %w", err)
+		}
+		pub := priv.PublicKey
+		return fmt.Sprintf("%064x%064x", pub.X, pub.Y), nil
+	}
+	return "", fmt.Errorf("unsupported PEM block type: %s", block.Type)
+}
+
+
 // QASuccess object kind.
 const KindQASuccess = "qa_success"
 
