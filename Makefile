@@ -4,7 +4,7 @@
 # Binary basename comes from brand.executable_name in
 # config/zqk-local.yaml (wins) then config/zqk.yaml (default zqk).
 
-.PHONY: help all bootstrap-archive clean test test-unit test-unit-all test-integration test-coverage test-coverage-html lint vet verify gate-release zqk-vet
+.PHONY: help all bootstrap-archive compile-bin zqk clean test test-unit test-unit-all test-integration test-coverage test-coverage-html lint vet verify gate-release zqk-vet
 
 .DEFAULT_GOAL := all
 
@@ -89,6 +89,7 @@ all: codegen
 
 build: all
 build-all: all
+zqk: compile-bin
 
 test-unit:
 	go test -short -p 2 -timeout 15m ./pkg/... ./cmd/... ./internal/... ./ext/...

@@ -16,6 +16,7 @@ import (
 	zqklifecycle "github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects/koi"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/process"
 	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
@@ -100,8 +101,8 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 			continue
 		}
 
-		kind, _ := current[objects.FieldKeyKind].(string)
-		currentStatus, _ := current[objects.FieldKeyStatus].(string)
+		kind := koi.Kind(current)
+		currentStatus := koi.Status(current)
 
 		// Load lifecycle
 		lifecycle, err := lifecycleLoader.LoadLifecycle(kind)
@@ -155,7 +156,7 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 				for k, v := range current {
 					candidateObj[k] = v
 				}
-				candidateObj[objects.FieldKeyStatus] = candidate
+				koi.SetStatus(candidateObj, candidate)
 				if _, ok := candidateObj[objects.FieldKeyCreatedAt]; !ok || candidateObj[objects.FieldKeyCreatedAt] == nil || candidateObj[objects.FieldKeyCreatedAt] == "" {
 					now := zqktime.NowRFC3339UTC()
 					actor := objects.DefaultSystemAccountID
@@ -187,8 +188,7 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 					if err != nil {
 						return "", err
 					}
-					status, _ := obj[objects.FieldKeyStatus].(string)
-					return status, nil
+					return koi.Status(obj), nil
 				}
 				valOptions.DependentsLookup = func(targetID string) []string {
 					return storage.DependentsForID(ctx, proc.Storage(), targetID)
@@ -302,7 +302,7 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 			for k, v := range current {
 				candidateObj[k] = v
 			}
-			candidateObj[objects.FieldKeyStatus] = candidate
+			koi.SetStatus(candidateObj, candidate)
 			// Apply YAML side_effects.clear before composed_integrity (e.g. drop
 			// active_order on priority_plan → complete). Probe used to copy status
 			// only, so promote active→complete failed while active_order was set.
@@ -344,8 +344,7 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 				if err != nil {
 					return "", err
 				}
-				status, _ := obj[objects.FieldKeyStatus].(string)
-				return status, nil
+				return koi.Status(obj), nil
 			}
 			valOptions.DependentsLookup = func(targetID string) []string {
 				return storage.DependentsForID(ctx, proc.Storage(), targetID)
@@ -433,7 +432,7 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 
 		// Read back final object status in case lifecycle hooks (e.g. execution lock) advanced it.
 		if updatedObj, err := proc.Storage().Read(promoteCtx, secCtx, id); err == nil && updatedObj != nil {
-			if st, ok := updatedObj[objects.FieldKeyStatus].(string); ok && st != "" {
+			if st := koi.Status(updatedObj); st != "" {
 				finalStatus = st
 			}
 		}
@@ -664,7 +663,7 @@ func promoteTransitionTargets(lifecycle *objects.Lifecycle, current string) map[
 
 // priorityPlanPromotePackagingCue surfaces PRI≈PR packaging when promoting a wrap-ready plan.
 func priorityPlanPromotePackagingCue(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, planID string, current map[string]any, newStatus string) string {
-	title, _ := current[objects.FieldKeyTitle].(string)
+	title := koi.Title(current)
 	counts := map[string]int{}
 	listRes, err := sp.List(ctx, secCtx, pkgctx.NewStorageContext(), storage.ListFilter{
 		Kind:    objects.KindBacklogItem,
@@ -673,11 +672,10 @@ func priorityPlanPromotePackagingCue(ctx context.Context, sp storage.ObjectStora
 	})
 	if err == nil {
 		for _, o := range listRes.Objects {
-			ref, _ := o[objects.FieldKeyPriorityPlanRef].(string)
-			if ref != planID {
+			if koi.GetString(o, objects.FieldKeyPriorityPlanRef) != planID {
 				continue
 			}
-			st, _ := o[objects.FieldKeyStatus].(string)
+			st := koi.Status(o)
 			if st == "" {
 				st = "unknown"
 			}

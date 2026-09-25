@@ -28,9 +28,9 @@ import (
 	"github.com/zqk-os/zqk/pkg/federation/meshbroker"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/infrastructure/crypto"
-	"github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects/koi"
 	"github.com/zqk-os/zqk/pkg/pipeline"
 	"github.com/zqk-os/zqk/pkg/policy"
 	"github.com/zqk-os/zqk/pkg/primaryorch"
@@ -228,9 +228,10 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 			var active []map[string]any
 			seenIDs := make(map[string]bool)
 			for _, obj := range items.Objects {
-				st, _ := obj[objects.FieldKeyStatus].(string)
-				planRef, _ := obj[objects.FieldKeyPriorityPlanRef].(string)
-				id, _ := obj[objects.FieldKeyID].(string)
+				k := koi.Wrap(obj)
+				st := k.Status()
+				planRef := k.GetString(objects.FieldKeyPriorityPlanRef)
+				id := k.ID()
 				if planRef == state.planID && backlogItemEligibleForOrchestration(st) {
 					if !seenIDs[id] {
 						seenIDs[id] = true
@@ -249,7 +250,7 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 		if state.opts.PersonaID != "" {
 			pObj, err := state.sp.Read(pctx.Ctx, state.secCtx, state.opts.PersonaID)
 			if err == nil {
-				if r, ok := pObj[objects.FieldKeyRole].(string); ok && r != "" {
+				if r := koi.GetString(pObj, objects.FieldKeyRole); r != "" {
 					state.personaRole = r
 				}
 			}
@@ -297,7 +298,7 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 				continue
 			}
 			skipped++
-			id, _ := item[objects.FieldKeyID].(string)
+			id := koi.ID(item)
 			logging.FluentEvent(state.proc.Logger()).Info("orchestrate skipped non-shovel-ready BLI").
 				ObjectID(id).
 				String("missing", strings.Join(res.Missing, ",")).
@@ -346,9 +347,10 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 
 		for i, item := range state.items {
 			i, item := i, item
-			title, _ := item[objects.FieldKeyTitle].(string)
+			kItem := koi.Wrap(item)
+			title := kItem.Title()
 			state.processedItems = append(state.processedItems, title)
-			capability, _ := item[objects.FieldKeyCapabilityType].(string)
+			capability := kItem.GetString(objects.FieldKeyCapabilityType)
 
 			_ = pool.Submit(pctx.Ctx, func(workerCtx context.Context) error {
 				clipkg.ResetTimeout()
@@ -358,13 +360,13 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 					computeBroker := meshbroker.NewComputeBroker(state.sp)
 					pod, err := computeBroker.FindCapabilityPod(workerCtx, capability)
 					if err == nil {
-						endpoint, _ := pod[objects.FieldKeyEndpoint].(string)
+						endpoint := koi.GetString(pod, objects.FieldKeyEndpoint)
 						agentDeliverer = &agentdelivery.TDEEnforcer{Next: agentdelivery.NewMCPDeliverer(sharedMCPTransport, endpoint, "zqk_compute_dispatch")}
 					}
 				}
 
 				subAgent := state.personaRole
-				if subAgentVal, ok := item["sub_agent"].(string); ok && subAgentVal != "" {
+				if subAgentVal := kItem.GetString("sub_agent"); subAgentVal != "" {
 					subAgent = subAgentVal
 				}
 
@@ -387,30 +389,19 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 					}
 				}
 
-				itemID, _ := item[objects.FieldKeyID].(string)
+				itemID := kItem.ID()
 				if itemID == "" {
 					itemID = fmt.Sprintf("generated-%d", time.Now().UnixNano())
 				}
 
 				personaID := state.opts.PersonaID
 				if personaID == "" {
-					if assignee, ok := item[objects.FieldKeyAssigneePersonaRef].(string); ok && assignee != "" {
+					if assignee := kItem.GetString(objects.FieldKeyAssigneePersonaRef); assignee != "" {
 						personaID = assignee
 					} else {
-						refsAny := item[objects.FieldKeyPersonaRefs]
-						if refsAny != nil {
-							switch refs := refsAny.(type) {
-							case []any:
-								if len(refs) > 0 {
-									if s, ok := refs[0].(string); ok {
-										personaID = s
-									}
-								}
-							case []string:
-								if len(refs) > 0 {
-									personaID = refs[0]
-								}
-							}
+						refs := kItem.GetStringSlice(objects.FieldKeyPersonaRefs)
+						if len(refs) > 0 {
+							personaID = refs[0]
 						}
 					}
 				}
@@ -468,7 +459,7 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 					}
 
 					modelTier := "tier_2_simple"
-					if tVal, ok := item[objects.FieldKeyModelTier].(string); ok && tVal != "" {
+					if tVal := kItem.GetString(objects.FieldKeyModelTier); tVal != "" {
 						modelTier = tVal
 					}
 
@@ -567,8 +558,8 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 							}
 							_ = state.sp.Create(workerCtx, state.secCtx, errorEvent)
 						} else {
-							createdID, ok := agentTask[objects.FieldKeyID].(string)
-							if !ok || createdID == "" {
+							createdID := koi.ID(agentTask)
+							if createdID == "" {
 								err = errfmt.Errorf("created agent task has no id")
 								errs[i] = err
 								return err
@@ -585,9 +576,9 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 						// Mark the backlog item in_progress only if TDD posture is satisfied:
 						// All criteria must be linked to a test case in a ready/active state.
 						if itemID != "" && !strings.HasPrefix(itemID, "generated-") {
-							if st, _ := item[objects.FieldKeyStatus].(string); st != "in_progress" {
+							if kItem.Status() != "in_progress" {
 								if verifyBLITDDReady(workerCtx, state.sp, state.secCtx, item) {
-									item[objects.FieldKeyStatus] = "in_progress"
+									kItem.SetStatus("in_progress")
 									_ = state.sp.Update(workerCtx, state.secCtx, itemID, item)
 								} else {
 									logging.FluentEvent(logging.GetLoggerFromContext(workerCtx)).Warn("TDD Gate: Backlog item criteria not linked to ready test cases; in_progress transition held").
@@ -995,12 +986,11 @@ func localSkillIDByTitle(ctx context.Context, sp storage.ObjectStorageProvider, 
 	}
 	want := strings.ToLower(strings.TrimSpace(title))
 	for _, obj := range listed.Objects {
-		got, _ := obj[objects.FieldKeyTitle].(string)
+		got := koi.Title(obj)
 		if strings.ToLower(strings.TrimSpace(got)) != want {
 			continue
 		}
-		id, _ := obj[objects.FieldKeyID].(string)
-		return strings.TrimSpace(id)
+		return strings.TrimSpace(koi.ID(obj))
 	}
 	return ""
 }
@@ -1009,18 +999,18 @@ func verifyBLITDDReady(ctx context.Context, sp storage.ObjectStorageProvider, se
 	if item == nil {
 		return false
 	}
-	critRefs := lifecycle.StringRefsFromAny(item[objects.FieldKeyCriteriaRefs])
-	tcRefs := lifecycle.StringRefsFromAny(item[objects.FieldKeyTestCaseRefs])
+	critRefs := koi.GetStringSlice(item, objects.FieldKeyCriteriaRefs)
+	tcRefs := koi.GetStringSlice(item, objects.FieldKeyTestCaseRefs)
 
 	// If the item has direct test case refs, verify at least one is in a ready state
 	hasDirectReadyTest := false
 	var coveredCriteria []string
 	for _, tcID := range tcRefs {
 		if tcObj, err := sp.Read(ctx, secCtx, tcID); err == nil && tcObj != nil {
-			st, _ := tcObj[objects.FieldKeyStatus].(string)
+			st := koi.Status(tcObj)
 			if isTestCaseReadyStatus(st) {
 				hasDirectReadyTest = true
-				cRefs := lifecycle.StringRefsFromAny(tcObj[objects.FieldKeyCriteriaRefs])
+				cRefs := koi.GetStringSlice(tcObj, objects.FieldKeyCriteriaRefs)
 				coveredCriteria = append(coveredCriteria, cRefs...)
 			}
 		}
@@ -1037,10 +1027,10 @@ func verifyBLITDDReady(ctx context.Context, sp storage.ObjectStorageProvider, se
 		if !hasTestForCrit {
 			critObj, err := sp.Read(ctx, secCtx, critID)
 			if err == nil && critObj != nil {
-				cTestRefs := lifecycle.StringRefsFromAny(critObj[objects.FieldKeyTestCaseRefs])
+				cTestRefs := koi.GetStringSlice(critObj, objects.FieldKeyTestCaseRefs)
 				for _, tcID := range cTestRefs {
 					if tcObj, tErr := sp.Read(ctx, secCtx, tcID); tErr == nil && tcObj != nil {
-						st, _ := tcObj[objects.FieldKeyStatus].(string)
+						st := koi.Status(tcObj)
 						if isTestCaseReadyStatus(st) {
 							hasTestForCrit = true
 							break

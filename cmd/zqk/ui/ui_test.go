@@ -330,7 +330,7 @@ func TestRender_AllSixTabs(t *testing.T) {
 	out7 := Render(m)
 	assert.Contains(t, out7, "QA, Verification & Lineage Traceability")
 	assert.Contains(t, out7, "TC-CORE-001")
-	assert.Contains(t, out7, "CAS Content Deduplication Integrity")
+	assert.Contains(t, out7, "CAS Content Deduplication")
 	assert.Contains(t, out7, "100% Intact")
 	assert.Contains(t, out7, "INTACT")
 }

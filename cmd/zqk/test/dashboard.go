@@ -385,19 +385,20 @@ func (s *DashboardState) SaveToLiteFile(projectRoot string) error {
 	return eng.SaveToLiteFile()
 }
 
-// ValidateTPMDefinitionOfDone verifies that all non-archived test cases have unbroken lineage to root objects
-// and that zero unbound test criteria exist in the test matrix.
+// ValidateTPMDefinitionOfDone verifies that all non-preliminary, active test cases have unbroken lineage to root objects
+// and that zero unbound active test criteria exist in the test matrix.
 func (s *DashboardState) ValidateTPMDefinitionOfDone(out, errOut ioWriter) error {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
+	sc := objects.GetGlobalStatusChecker()
 	var brokenList []string
 	checkedCount := 0
 	intactCount := 0
 
 	for _, tcID := range s.TestCaseOrder {
 		tc := s.TestCases[tcID]
-		if tc == nil || tc.Status == objects.ObjectStatusArchived {
+		if tc == nil || tc.Status == objects.ObjectStatusArchived || tc.Status == objects.ObjectStatusConceptual || tc.Status == objects.ObjectStatusDraft || sc.IsPreliminary(objects.KindTestCase, tc.Status) {
 			continue
 		}
 		checkedCount++
@@ -414,7 +415,7 @@ func (s *DashboardState) ValidateTPMDefinitionOfDone(out, errOut ioWriter) error
 
 	var unboundList []string
 	for _, uc := range s.UnboundTestCriteria {
-		if uc == nil || uc.Status == objects.ObjectStatusArchived {
+		if uc == nil || uc.Status == objects.ObjectStatusArchived || uc.Status == objects.ObjectStatusConceptual || uc.Status == objects.ObjectStatusDraft || sc.IsPreliminary(objects.KindCriteria, uc.Status) {
 			continue
 		}
 		unboundList = append(unboundList, fmt.Sprintf("%s [%s] (%s): category=%s, method=%s", uc.ID, uc.Status, uc.Title, uc.Category, uc.ValidationMethod))

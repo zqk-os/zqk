@@ -12,6 +12,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects/koi"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/when"
 )
@@ -42,10 +43,9 @@ func NewJobLoader(
 
 // rawJobPriority returns the priority field from a raw job map for sorting (default: normal).
 func rawJobPriority(raw map[string]any) string {
-	if p, ok := raw[objects.FieldKeyPriority].(string); ok && p != emptyValue {
-		if p == JobPriorityCritical || p == JobPriorityHigh || p == JobPriorityNormal {
-			return p
-		}
+	p := koi.GetString(raw, objects.FieldKeyPriority)
+	if p == JobPriorityCritical || p == JobPriorityHigh || p == JobPriorityNormal {
+		return p
 	}
 	return JobPriorityNormal
 }
@@ -90,42 +90,31 @@ func (jl *JobLoader) RefreshEnvironmentVariablesFromRaw(job *ScheduledJob, rawJo
 
 // HydrateJob converts a raw job object from storage into a ScheduledJob
 func (jl *JobLoader) HydrateJob(result map[string]any) (*ScheduledJob, error) {
-	jobID, ok := result[objects.FieldKeyID].(string)
-	if !ok {
+	jobID := koi.ID(result)
+	if jobID == "" {
 		return nil, errfmt.Errorf("job missing id field")
 	}
 
 	// Parse basic fields (map keys: objects.FieldKey* — spec-union field_keys.go)
-	jobType, _ := result[objects.FieldKeyJobType].(string)
-	title, _ := result[objects.FieldKeyTitle].(string)
-	description, _ := result[objects.FieldKeyDescription].(string)
-	triggerType, _ := result[objects.FieldKeyTriggerType].(string)
+	jobType := koi.GetString(result, objects.FieldKeyJobType)
+	title := koi.Title(result)
+	description := koi.GetString(result, objects.FieldKeyDescription)
+	triggerType := koi.GetString(result, objects.FieldKeyTriggerType)
 	triggerType = ParseTriggerType(triggerType, jl.logger, jobID)
 
-	scheduleExpr, _ := result[objects.FieldKeyScheduleExpression].(string)
-	workflowRef, _ := result[objects.FieldKeyWorkflowRef].(string)
-	eventFilter, _ := result[objects.FieldKeyEventFilter].(string)
-	lifecycleFilter, _ := result[objects.FieldKeyLifecycleFilter].(string)
+	scheduleExpr := koi.GetString(result, objects.FieldKeyScheduleExpression)
+	workflowRef := koi.GetString(result, objects.FieldKeyWorkflowRef)
+	eventFilter := koi.GetString(result, objects.FieldKeyEventFilter)
+	lifecycleFilter := koi.GetString(result, objects.FieldKeyLifecycleFilter)
 
-	enabled, _ := result[objects.FieldKeyEnabled].(bool)
-	category, _ := result[objects.FieldKeyCategory].(string)
-	if category == emptyValue {
-		category = "maintenance" // Default category
-	}
+	enabled := koi.GetBoolOr(result, objects.FieldKeyEnabled, false)
+	category := koi.GetStringOr(result, objects.FieldKeyCategory, "maintenance")
+	executionMode := koi.GetStringOr(result, objects.FieldKeyExecutionMode, "reusable")
+	transactional := koi.GetBoolOr(result, objects.FieldKeyTransactional, false)
 
-	executionMode, _ := result[objects.FieldKeyExecutionMode].(string)
-	if executionMode == emptyValue {
-		executionMode = "reusable" // Default execution mode
-	}
-
-	transactional, _ := result[objects.FieldKeyTransactional].(bool)
-	// Default to false if not specified (backward compatible)
-
-	maxRuntimeSeconds := 3600 // Default: 1 hour
-	if maxRuntime, ok := result[objects.FieldKeyMaxRuntimeSeconds].(int); ok && maxRuntime > 0 {
-		maxRuntimeSeconds = maxRuntime
-	} else if maxRuntimeFloat, ok := result[objects.FieldKeyMaxRuntimeSeconds].(float64); ok && maxRuntimeFloat > 0 {
-		maxRuntimeSeconds = int(maxRuntimeFloat)
+	maxRuntimeSeconds := koi.GetIntOr(result, objects.FieldKeyMaxRuntimeSeconds, 3600)
+	if maxRuntimeSeconds <= 0 {
+		maxRuntimeSeconds = 3600
 	}
 
 	// Validate trigger requirements
@@ -139,7 +128,7 @@ func (jl *JobLoader) HydrateJob(result map[string]any) (*ScheduledJob, error) {
 
 	// Skip one-time jobs that have already run
 	if executionMode == "one_time" {
-		if lastRunStr, ok := result[objects.FieldKeyLastRunAt].(string); ok && lastRunStr != emptyValue {
+		if lastRun, ok := koi.GetTime(result, objects.FieldKeyLastRunAt); ok && !lastRun.IsZero() {
 			SchedulerJobLoaderLog(jl.logger).Debug(LogEventSchedulerJobLoaderSkippingOneTimeAlreadyRun).
 				JobID(jobID).
 				Log()
@@ -149,23 +138,15 @@ func (jl *JobLoader) HydrateJob(result map[string]any) (*ScheduledJob, error) {
 
 	// Parse timestamps
 	var lastRunAt, nextRunAt *time.Time
-	if lastRunStr, ok := result[objects.FieldKeyLastRunAt].(string); ok && lastRunStr != emptyValue {
-		if t, err := time.Parse(time.RFC3339, lastRunStr); err == nil {
-			lastRunAt = &t
-		}
+	if t, ok := koi.GetTime(result, objects.FieldKeyLastRunAt); ok {
+		lastRunAt = &t
 	}
-	if nextRunStr, ok := result[objects.FieldKeyNextRunAt].(string); ok && nextRunStr != emptyValue {
-		if t, err := time.Parse(time.RFC3339, nextRunStr); err == nil {
-			nextRunAt = &t
-		}
+	if t, ok := koi.GetTime(result, objects.FieldKeyNextRunAt); ok {
+		nextRunAt = &t
 	}
 
 	// Parse log_level
-	logLevel, _ := result[objects.FieldKeyLogLevel].(string)
-	if logLevel == emptyValue {
-		logLevel = "default" // Default log level
-	}
-	// Validate log_level
+	logLevel := koi.GetStringOr(result, objects.FieldKeyLogLevel, "default")
 	if logLevel != "default" && logLevel != "verbose" && logLevel != "debug" {
 		SchedulerJobLoaderLog(jl.logger).Warn(LogEventSchedulerJobLoaderInvalidLogLevel).
 			JobID(jobID).
@@ -174,10 +155,7 @@ func (jl *JobLoader) HydrateJob(result map[string]any) (*ScheduledJob, error) {
 		logLevel = "default"
 	}
 
-	priority, _ := result[objects.FieldKeyPriority].(string)
-	if priority == emptyValue {
-		priority = JobPriorityNormal
-	}
+	priority := koi.GetStringOr(result, objects.FieldKeyPriority, JobPriorityNormal)
 	if priority != JobPriorityNormal && priority != JobPriorityHigh && priority != JobPriorityCritical {
 		SchedulerJobLoaderLog(jl.logger).Warn(LogEventSchedulerJobLoaderInvalidPriority).
 			JobID(jobID).
@@ -186,17 +164,10 @@ func (jl *JobLoader) HydrateJob(result map[string]any) (*ScheduledJob, error) {
 		priority = JobPriorityNormal
 	}
 
-	allowParallel, _ := result[objects.FieldKeyAllowParallelExecution].(bool)
-	status, _ := result[objects.FieldKeyStatus].(string)
+	allowParallel := koi.GetBoolOr(result, objects.FieldKeyAllowParallelExecution, false)
+	status := koi.Status(result)
 
-	var createdAt time.Time
-	if createdStr, ok := result[objects.FieldKeyCreatedAt].(string); ok && createdStr != emptyValue {
-		if t, err := time.Parse(time.RFC3339, createdStr); err == nil {
-			createdAt = t
-		} else if t, err := time.Parse(time.RFC3339Nano, createdStr); err == nil {
-			createdAt = t
-		}
-	}
+	createdAt, _ := koi.GetTime(result, objects.FieldKeyCreatedAt)
 
 	// Parse job-type-specific fields
 	job := &ScheduledJob{
@@ -292,44 +263,21 @@ func (jl *JobLoader) parseEnvironmentVariables(job *ScheduledJob, result map[str
 
 // parseRunWrapperFields parses fields for run_wrapper job type
 func (jl *JobLoader) parseRunWrapperFields(job *ScheduledJob, result map[string]any) {
-	job.Command, _ = result[objects.FieldKeyCommand].(string)
-
-	if argsInterface, ok := result[objects.FieldKeyCommandArgs].([]any); ok {
-		job.CommandArgs = make([]string, 0, len(argsInterface))
-		for _, arg := range argsInterface {
-			if argStr, ok := arg.(string); ok {
-				job.CommandArgs = append(job.CommandArgs, argStr)
-			}
-		}
-	}
-
-	job.WorkingDirectory, _ = result[objects.FieldKeyWorkingDirectory].(string)
+	job.Command = koi.GetString(result, objects.FieldKeyCommand)
+	job.CommandArgs = koi.GetStringSlice(result, objects.FieldKeyCommandArgs)
+	job.WorkingDirectory = koi.GetString(result, objects.FieldKeyWorkingDirectory)
 
 	// environment_variables are parsed for all job types in parseEnvironmentVariables (HydrateJob)
-
-	switch v := result[objects.FieldKeyRetryCount].(type) {
-	case int:
-		job.RetryCount = v
-	case float64:
-		job.RetryCount = int(v)
-	}
-
-	switch v := result[objects.FieldKeyRetryDelaySeconds].(type) {
-	case int:
-		job.RetryDelaySeconds = v
-	case float64:
-		job.RetryDelaySeconds = int(v)
-	default:
-		job.RetryDelaySeconds = 5 // Default
-	}
+	job.RetryCount = koi.GetIntOr(result, objects.FieldKeyRetryCount, 0)
+	job.RetryDelaySeconds = koi.GetIntOr(result, objects.FieldKeyRetryDelaySeconds, 5)
 
 	// Parse callback fields
-	job.CallbackOnCompletion, _ = result[objects.FieldKeyCallbackOnCompletion].(string)
-	job.CallbackOnError, _ = result[objects.FieldKeyCallbackOnError].(string)
-	job.CallbackOnStatus, _ = result[objects.FieldKeyCallbackOnStatus].(string)
-	job.CallbackType, _ = result[objects.FieldKeyCallbackType].(string)
+	job.CallbackOnCompletion = koi.GetString(result, objects.FieldKeyCallbackOnCompletion)
+	job.CallbackOnError = koi.GetString(result, objects.FieldKeyCallbackOnError)
+	job.CallbackOnStatus = koi.GetString(result, objects.FieldKeyCallbackOnStatus)
+	job.CallbackType = koi.GetString(result, objects.FieldKeyCallbackType)
 
-	if meta, ok := result[objects.FieldKeyMetadata].(map[string]any); ok && len(meta) > 0 {
+	if meta := koi.GetMap(result, objects.FieldKeyMetadata); len(meta) > 0 {
 		job.Metadata = make(map[string]any, len(meta))
 		maps.Copy(job.Metadata, meta)
 	}
@@ -354,31 +302,16 @@ func (jl *JobLoader) parseRunWrapperFields(job *ScheduledJob, result map[string]
 
 // parseCallbackListenerFields parses fields for callback_listener job type
 func (jl *JobLoader) parseCallbackListenerFields(job *ScheduledJob, result map[string]any) {
-	port, portOk := result[objects.FieldKeyListenerPort].(int)
-	portFloat, portFloatOk := result[objects.FieldKeyListenerPort].(float64)
-	when.When(func() bool { return portOk && port > 0 }).Then(func() {
-		job.ListenerPort = port
-	}).OrElseWhen(func() bool { return portFloatOk && portFloat > 0 }).Then(func() {
-		job.ListenerPort = int(portFloat)
-	}).OrElse(func() {
-		job.ListenerPort = 8080 // Default
-	}).Run()
-
-	job.ListenerPath, _ = result[objects.FieldKeyListenerPath].(string)
-	if job.ListenerPath == emptyValue {
-		job.ListenerPath = "/callbacks" // Default
+	port := koi.GetIntOr(result, objects.FieldKeyListenerPort, 8080)
+	if port <= 0 {
+		port = 8080
 	}
+	job.ListenerPort = port
+	job.ListenerPath = koi.GetStringOr(result, objects.FieldKeyListenerPath, "/callbacks")
 
-	switch v := result[objects.FieldKeyIdleShutdownSeconds].(type) {
-	case int:
-		job.IdleShutdownSeconds = v
-	case float64:
-		job.IdleShutdownSeconds = int(v)
-	default:
-		job.IdleShutdownSeconds = 300 // Default: 5 minutes
-	}
+	job.IdleShutdownSeconds = koi.GetIntOr(result, objects.FieldKeyIdleShutdownSeconds, 300)
 
-	if routes, ok := result[objects.FieldKeyRouteHandlers].(map[string]any); ok {
+	if routes := koi.GetMap(result, objects.FieldKeyRouteHandlers); len(routes) > 0 {
 		job.RouteHandlers = make(map[string]string)
 		for route, handler := range routes {
 			if handlerStr, ok := handler.(string); ok {
@@ -387,8 +320,8 @@ func (jl *JobLoader) parseCallbackListenerFields(job *ScheduledJob, result map[s
 		}
 	}
 
-	job.AuthType, _ = result[objects.FieldKeyAuthType].(string)
-	if authConfig, ok := result[objects.FieldKeyAuthConfig].(map[string]any); ok {
+	job.AuthType = koi.GetString(result, objects.FieldKeyAuthType)
+	if authConfig := koi.GetMap(result, objects.FieldKeyAuthConfig); len(authConfig) > 0 {
 		job.AuthConfig = make(map[string]any)
 		maps.Copy(job.AuthConfig, authConfig)
 	}

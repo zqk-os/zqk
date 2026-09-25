@@ -27,6 +27,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/maintenance"
 	"github.com/zqk-os/zqk/pkg/mutation"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects/koi"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/scheduler"
 	"github.com/zqk-os/zqk/pkg/storage"
@@ -68,13 +69,13 @@ func QuerySubgraph(ctx context.Context, secCtx *storage.SecurityContext, sp stor
 	}
 
 	hasSemanticPayload := func(obj map[string]any) bool {
-		if desc, ok := obj[objects.FieldKeyDescription].(string); ok && strings.TrimSpace(desc) != "" {
+		if strings.TrimSpace(koi.GetString(obj, objects.FieldKeyDescription)) != "" {
 			return true
 		}
-		if ac, ok := obj[objects.FieldKeyAcceptanceCriteria].([]any); ok && len(ac) > 0 {
+		if len(koi.GetSlice(obj, objects.FieldKeyAcceptanceCriteria)) > 0 {
 			return true
 		}
-		if ps, ok := obj["problem_statement"].(string); ok && strings.TrimSpace(ps) != "" {
+		if strings.TrimSpace(koi.GetString(obj, "problem_statement")) != "" {
 			return true
 		}
 		return false
@@ -109,17 +110,7 @@ func QuerySubgraph(ctx context.Context, secCtx *storage.SecurityContext, sp stor
 
 		var refsToExplore []string
 		extractRefs := func(key string) {
-			if raw, ok := obj[key]; ok {
-				if list, ok2 := raw.([]any); ok2 {
-					for _, ref := range list {
-						if str, ok3 := ref.(string); ok3 && str != "" {
-							refsToExplore = append(refsToExplore, str)
-						}
-					}
-				} else if listStr, ok2 := raw.([]string); ok2 {
-					refsToExplore = append(refsToExplore, listStr...)
-				}
-			}
+			refsToExplore = append(refsToExplore, koi.GetStringSlice(obj, key)...)
 		}
 
 		// Follow pointers upward
@@ -201,8 +192,8 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 	if err != nil {
 		return errfmt.Newf("failed to read task %s", taskID).Wrap(err)
 	}
-	if kind, _ := initTask[objects.FieldKeyKind].(string); kind != objects.KindAgentTask {
-		return errfmt.Errorf("agent sync-loop can only execute agent_task objects, received: %s", kind)
+	if !koi.IsKind(initTask, objects.KindAgentTask) {
+		return errfmt.Errorf("agent sync-loop can only execute agent_task objects, received: %s", koi.Kind(initTask))
 	}
 
 	// Initialize hourglass via Graph
@@ -230,15 +221,12 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 		} else {
 			// Read the task to see if it is implemented
 			currentTask, readErr := sp.Read(ctx, secCtx, taskID)
-			if readErr == nil {
-				st, _ := currentTask[objects.FieldKeyStatus].(string)
-				if st == objects.ObjectStatusImplemented {
-					_ = cc.PublishEvent(scheduler.Event{
-						Type:      "process_completed",
-						JobID:     taskID,
-						Timestamp: time.Now().UTC(),
-					})
-				}
+			if readErr == nil && koi.IsStatus(currentTask, objects.ObjectStatusImplemented) {
+				_ = cc.PublishEvent(scheduler.Event{
+					Type:      "process_completed",
+					JobID:     taskID,
+					Timestamp: time.Now().UTC(),
+				})
 			}
 		}
 	}()
@@ -282,9 +270,9 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 	llmCfg := llm.DefaultConfig(ctx)
 
 	if activeProfile != nil {
-		endpointType, _ := activeProfile[objects.FieldKeyEndpointType].(string)
-		baseURL, _ := activeProfile[objects.FieldKeyBaseURL].(string)
-		modelID, _ := activeProfile[objects.FieldKeyModelID].(string)
+		endpointType := koi.GetString(activeProfile, objects.FieldKeyEndpointType)
+		baseURL := koi.GetString(activeProfile, objects.FieldKeyBaseURL)
+		modelID := koi.GetString(activeProfile, objects.FieldKeyModelID)
 
 		if baseURL != "" {
 			llmCfg.BaseURL = baseURL
@@ -317,8 +305,7 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 				// Transition to error state before aborting
 				currentTask, rErr := sp.Read(ctx, secCtx, taskID)
 				if rErr == nil {
-					currentKind, _ := currentTask[objects.FieldKeyKind].(string)
-					_ = applyStateMutation(ctx, secCtx, sp, taskID, currentKind, validator, auditStream, objects.ObjectStatusFailed)
+					_ = applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed)
 				}
 				return fmt.Errorf("max sync loop limit reached (%d), aborting to prevent infinite cycle", guardCfg.MaxSyncLoops)
 			}
@@ -340,13 +327,12 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 			}
 
 			if stagnation.Observe(fp) {
-				currentKind, _ := currentTask[objects.FieldKeyKind].(string)
-				_ = applyStateMutation(ctx, secCtx, sp, taskID, currentKind, validator, auditStream, objects.ObjectStatusFailed)
+				_ = applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed)
 				return fmt.Errorf("sync-loop stagnation: no progress for %d ticks (fingerprint unchanged), aborting", guardCfg.MaxStagnantProgressTicks)
 			}
 
 			// EXIT CONDITION
-			status, _ := currentTask[objects.FieldKeyStatus].(string)
+			status := koi.Status(currentTask)
 			if status == objects.ObjectStatusImplemented || status == objects.ObjectStatusFailed {
 				if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("Task complete, status: %s\n", status))); wErr != nil {
 					logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
@@ -366,48 +352,36 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 			var aggregatedValidationSteps []map[string]any
 
 			// 1. Native completeness_validation steps
-			if cvRaw, ok := currentTask[objects.FieldKeyCompletenessValidation]; ok {
-				if cvList, ok2 := cvRaw.([]any); ok2 {
-					for _, stepRaw := range cvList {
-						if stepMap, ok3 := stepRaw.(map[string]any); ok3 {
-							aggregatedValidationSteps = append(aggregatedValidationSteps, stepMap)
-						}
-					}
-				}
-			} else if stepsRaw, ok := currentTask[objects.FieldKeyTaskSteps]; ok {
+			cvList := koi.GetSlice(currentTask, objects.FieldKeyCompletenessValidation)
+			if cvList == nil {
 				// Fallback to task_steps if completeness_validation is absent, preserving existing behavior
-				if stepsList, ok2 := stepsRaw.([]any); ok2 {
-					for _, stepRaw := range stepsList {
-						if stepMap, ok3 := stepRaw.(map[string]any); ok3 {
-							aggregatedValidationSteps = append(aggregatedValidationSteps, stepMap)
-						}
-					}
+				cvList = koi.GetSlice(currentTask, objects.FieldKeyTaskSteps)
+			}
+			for _, stepRaw := range cvList {
+				if stepMap, ok3 := stepRaw.(map[string]any); ok3 {
+					aggregatedValidationSteps = append(aggregatedValidationSteps, stepMap)
 				}
 			}
 
 			// 2. Query for applicable policies and extract validation_overlays
 			policyFilter := storage.ListFilter{Kind: objects.KindPolicy}
 			if policies, pErr := sp.List(ctx, secCtx, &storage.StorageContext{}, policyFilter); pErr == nil && policies != nil {
-				currentKind, _ := currentTask[objects.FieldKeyKind].(string)
+				currentKind := koi.Kind(currentTask)
 				for _, pol := range policies.Objects {
-					if applicability, ok := pol[objects.FieldKeyApplicability].(map[string]any); ok {
-						if objectTypesRaw, ok := applicability["object_types"].([]any); ok {
-							applies := false
-							for _, otRaw := range objectTypesRaw {
-								if ot, ok := otRaw.(string); ok && ot == currentKind {
-									applies = true
-									break
-								}
+					applicability := koi.GetMap(pol, objects.FieldKeyApplicability)
+					if applicability != nil {
+						objectTypes := koi.GetStringSlice(applicability, "object_types")
+						applies := false
+						for _, ot := range objectTypes {
+							if ot == currentKind {
+								applies = true
+								break
 							}
-							if applies {
-								if overlaysRaw, ok := pol[objects.FieldKeyValidationOverlays]; ok {
-									if overlaysList, ok2 := overlaysRaw.([]any); ok2 {
-										for _, overlayRaw := range overlaysList {
-											if overlayMap, ok3 := overlayRaw.(map[string]any); ok3 {
-												aggregatedValidationSteps = append(aggregatedValidationSteps, overlayMap)
-											}
-										}
-									}
+						}
+						if applies {
+							for _, overlayRaw := range koi.GetSlice(pol, objects.FieldKeyValidationOverlays) {
+								if overlayMap, ok3 := overlayRaw.(map[string]any); ok3 {
+									aggregatedValidationSteps = append(aggregatedValidationSteps, overlayMap)
 								}
 							}
 						}
@@ -421,13 +395,13 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 				// 2. Transition the first 'pending' validation step to 'pending_verification'.
 				updated := false
 				for i, stepMap := range aggregatedValidationSteps {
-					st, _ := stepMap[objects.FieldKeyStatus].(string)
+					st := koi.Status(stepMap)
 					if st == objects.ObjectStatusPendingImplementation {
-						stepMap[objects.FieldKeyStatus] = objects.ObjectStatusVerified
+						koi.SetStatus(stepMap, objects.ObjectStatusVerified)
 						aggregatedValidationSteps[i] = stepMap
 						updated = true
 					} else if st == objects.ObjectStatusPending || st == objects.ObjectStatusRejected || st == "" {
-						stepMap[objects.FieldKeyStatus] = objects.ObjectStatusPendingVerification
+						koi.SetStatus(stepMap, objects.ObjectStatusPendingVerification)
 						aggregatedValidationSteps[i] = stepMap
 						updated = true
 						break
@@ -442,8 +416,7 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 					}
 					_ = sp.Update(ctx, secCtx, taskID, updates)
 				}
-				currentKind, _ := currentTask[objects.FieldKeyKind].(string)
-				if err := applyStateMutation(ctx, secCtx, sp, taskID, currentKind, validator, auditStream, objects.ObjectStatusInProgress); err != nil {
+				if err := applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusInProgress); err != nil {
 					if !strings.Contains(err.Error(), "already exists") {
 						logging.FluentEvent(logging.GetLogger()).Error("Failed to transition task to in_progress from pending_verification", err).Log()
 					}
@@ -452,9 +425,8 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 			}
 
 			if status != objects.ObjectStatusInProgress {
-				currentTask[objects.FieldKeyStatus] = objects.ObjectStatusInProgress
-				currentKind, _ := currentTask[objects.FieldKeyKind].(string)
-				if err := applyStateMutation(ctx, secCtx, sp, taskID, currentKind, validator, auditStream, objects.ObjectStatusInProgress); err != nil {
+				koi.SetStatus(currentTask, objects.ObjectStatusInProgress)
+				if err := applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusInProgress); err != nil {
 					if strings.Contains(err.Error(), "already exists") {
 						logging.FluentEvent(logging.GetLogger()).Warn("Audit event for state mutation already exists, skipping")
 					} else {
@@ -472,7 +444,7 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 			hasFailedSteps := false
 			allStepsCompleted := true
 			for i, stepMap := range aggregatedValidationSteps {
-				stepStatus, _ := stepMap[objects.FieldKeyStatus].(string)
+				stepStatus := koi.Status(stepMap)
 
 				if stepStatus == objects.ObjectStatusPending || stepStatus == objects.ObjectStatusPendingImplementation || stepStatus == objects.ObjectStatusPendingVerification || stepStatus == "" {
 					// We only process if it's pending OR pending_verification.
@@ -488,22 +460,14 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 					verificationTriggered = true
 
 					// Track and check verification attempts
-					attempts := 0
-					if attRaw, ok := stepMap[objects.FieldKeyVerificationAttempts]; ok {
-						if attFloat, ok2 := attRaw.(float64); ok2 {
-							attempts = int(attFloat)
-						} else if attInt, ok2 := attRaw.(int); ok2 {
-							attempts = attInt
-						}
-					}
-					attempts++
-					stepMap[objects.FieldKeyVerificationAttempts] = attempts
+					attempts := koi.GetIntOr(stepMap, objects.FieldKeyVerificationAttempts, 0) + 1
+					koi.Set(stepMap, objects.FieldKeyVerificationAttempts, attempts)
 
 					maxAttempts := guardCfg.MaxVerificationAttempts
 
 					if attempts > maxAttempts {
-						stepMap[objects.FieldKeyStatus] = objects.ObjectStatusFailed
-						stepMap[objects.FieldKeyVerificationFeedback] = fmt.Sprintf("Max verification loop limit reached (%d/%d attempts). Aborting task.", attempts, maxAttempts)
+						koi.SetStatus(stepMap, objects.ObjectStatusFailed)
+						koi.Set(stepMap, objects.FieldKeyVerificationFeedback, fmt.Sprintf("Max verification loop limit reached (%d/%d attempts). Aborting task.", attempts, maxAttempts))
 
 						// Update the steps slice
 						aggregatedValidationSteps[i] = stepMap
@@ -517,8 +481,7 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 						}
 						// Persist steps + status in one mutation so a status-only write cannot
 						// race and leave steps stuck at pending_verification.
-						currentKind, _ := currentTask[objects.FieldKeyKind].(string)
-						if errMut := applyStateMutationWithFields(ctx, secCtx, sp, taskID, currentKind, validator, auditStream, objects.ObjectStatusFailed, stepFieldUpdates); errMut != nil {
+						if errMut := applyStateMutationWithFields(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed, stepFieldUpdates); errMut != nil {
 							if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Failed to apply state mutation: %v\n", errMut))); wErr != nil {
 								logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
 							}
@@ -533,7 +496,7 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 
 					// Inject task context into stepMap for verification engine
 					stepMap["task_id"] = taskID
-					if arts, ok := currentTask[objects.FieldKeyArtifacts]; ok {
+					if arts := koi.GetSlice(currentTask, objects.FieldKeyArtifacts); arts != nil {
 						stepMap[objects.FieldKeyArtifacts] = arts
 					}
 
@@ -541,18 +504,18 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 					result, err := verification.RunVerification(ctx, secCtx, sp, stepMap)
 
 					if err != nil {
-						stepMap[objects.FieldKeyStatus] = objects.ObjectStatusFailed
-						stepMap[objects.FieldKeyVerificationFeedback] = fmt.Sprintf("Internal Verification Engine Error: %v", err)
+						koi.SetStatus(stepMap, objects.ObjectStatusFailed)
+						koi.Set(stepMap, objects.FieldKeyVerificationFeedback, fmt.Sprintf("Internal Verification Engine Error: %v", err))
 					} else if !result.Passed {
-						stepMap[objects.FieldKeyStatus] = objects.ObjectStatusRejected
-						stepMap[objects.FieldKeyVerificationFeedback] = fmt.Sprintf("Attempt %d/%d: %s", attempts, maxAttempts, result.Feedback)
+						koi.SetStatus(stepMap, objects.ObjectStatusRejected)
+						koi.Set(stepMap, objects.FieldKeyVerificationFeedback, fmt.Sprintf("Attempt %d/%d: %s", attempts, maxAttempts, result.Feedback))
 					} else {
-						stepMap[objects.FieldKeyStatus] = objects.ObjectStatusVerified
-						stepMap[objects.FieldKeyVerificationFeedback] = result.Feedback
+						koi.SetStatus(stepMap, objects.ObjectStatusVerified)
+						koi.Set(stepMap, objects.FieldKeyVerificationFeedback, result.Feedback)
 					}
 
-					stepName, _ := stepMap[objects.FieldKeyName].(string)
-					newStepStatus, _ := stepMap[objects.FieldKeyStatus].(string)
+					stepName := koi.GetString(stepMap, objects.FieldKeyName)
+					newStepStatus := koi.Status(stepMap)
 					auditStream.Publish(ctx, audit.AuditRecord{
 						ID:        fmt.Sprintf("overlay-update-%s-%s", taskID, stepName),
 						Action:    "validation_overlay",
@@ -566,7 +529,7 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 						logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
 					}
 
-					currentStepStatus, _ := stepMap[objects.FieldKeyStatus].(string)
+					currentStepStatus := koi.Status(stepMap)
 					if currentStepStatus == objects.ObjectStatusFailed || currentStepStatus == objects.ObjectStatusRejected {
 						hasFailedSteps = true
 					}
@@ -576,7 +539,7 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 					continue
 				}
 
-				currentStepStatus, _ := stepMap[objects.FieldKeyStatus].(string)
+				currentStepStatus := koi.Status(stepMap)
 				if currentStepStatus == objects.ObjectStatusFailed || currentStepStatus == objects.ObjectStatusRejected {
 					hasFailedSteps = true
 				}
@@ -647,7 +610,7 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 						_ = maintenanceService.CleanupWorktreeAndBranchForID(ctx, taskID)
 					}
 				}
-				currentKind, _ := currentTask[objects.FieldKeyKind].(string)
+				currentKind := koi.Kind(currentTask)
 				if err := applyStateMutation(ctx, secCtx, sp, taskID, currentKind, validator, auditStream, finalStatus); err != nil {
 					if strings.Contains(err.Error(), "already exists") {
 						logging.FluentEvent(logging.GetLogger()).Warn("Audit event for state mutation already exists, skipping")
@@ -664,8 +627,8 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 			// Phase 2: Construct prompt and call LLM
 			bundleBytes, _ := json.MarshalIndent(bundle, "", "  ")
 
-			taskTitleObj, _ := currentTask[objects.FieldKeyTitle].(string)
-			taskDescObj, _ := currentTask[objects.FieldKeyDescription].(string)
+			taskTitleObj := koi.Title(currentTask)
+			taskDescObj := koi.GetString(currentTask, objects.FieldKeyDescription)
 			displayTitle := taskTitleObj
 			if displayTitle == "" {
 				displayTitle = taskID
@@ -674,7 +637,7 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 				displayTitle += "\n\nDescription:\n" + taskDescObj
 			}
 
-			if stepsRaw, ok := currentTask[objects.FieldKeyTaskSteps]; ok {
+			if stepsRaw := koi.GetSlice(currentTask, objects.FieldKeyTaskSteps); stepsRaw != nil {
 				if stepsJson, err := json.MarshalIndent(stepsRaw, "", "  "); err == nil {
 					displayTitle += "\n\nSteps:\n" + string(stepsJson)
 				}
@@ -682,23 +645,21 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 
 			// Process interjections
 			var hasNewInterjections bool
-			if rawInterjections, ok := currentTask[objects.FieldKeyInterjections]; ok {
-				if interjections, isArr := rawInterjections.([]any); isArr {
-					for i, rawInj := range interjections {
-						if inj, isMap := rawInj.(map[string]any); isMap {
-							if status, _ := inj[objects.FieldKeyStatus].(string); status == objects.ObjectStatusUnread {
-								hasNewInterjections = true
-								msg, _ := inj["message"].(string)
-								displayTitle += fmt.Sprintf("\n\nCRITICAL OVERRIDE (Interjection from %s at %s):\n%s\n", inj["from"], inj["timestamp"], msg)
-								inj[objects.FieldKeyStatus] = objects.ObjectStatusRead
-								interjections[i] = inj
-							}
+			if interjections := koi.GetSlice(currentTask, objects.FieldKeyInterjections); interjections != nil {
+				for i, rawInj := range interjections {
+					if inj, isMap := rawInj.(map[string]any); isMap {
+						if koi.IsStatus(inj, objects.ObjectStatusUnread) {
+							hasNewInterjections = true
+							msg := koi.GetString(inj, "message")
+							displayTitle += fmt.Sprintf("\n\nCRITICAL OVERRIDE (Interjection from %s at %s):\n%s\n", inj["from"], inj["timestamp"], msg)
+							koi.SetStatus(inj, objects.ObjectStatusRead)
+							interjections[i] = inj
 						}
 					}
-					if hasNewInterjections {
-						currentTask[objects.FieldKeyInterjections] = interjections
-						_ = sp.Update(ctx, secCtx, taskID, currentTask)
-					}
+				}
+				if hasNewInterjections {
+					currentTask[objects.FieldKeyInterjections] = interjections
+					_ = sp.Update(ctx, secCtx, taskID, currentTask)
 				}
 			}
 
@@ -724,8 +685,7 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 				if wErr := cli.WriteOutput(cmd, []byte(budgetErr.Error()+"\n")); wErr != nil {
 					logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
 				}
-				currentKind, _ := currentTask[objects.FieldKeyKind].(string)
-				_ = applyStateMutation(ctx, secCtx, sp, taskID, currentKind, validator, auditStream, objects.ObjectStatusFailed)
+				_ = applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed)
 				return budgetErr
 			}
 			prompt = fittedPrompt
@@ -735,8 +695,7 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 				if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("LLM error: %v\n", err))); wErr != nil {
 					logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
 				}
-				currentKind, _ := currentTask[objects.FieldKeyKind].(string)
-				_ = applyStateMutation(ctx, secCtx, sp, taskID, currentKind, validator, auditStream, objects.ObjectStatusFailed)
+				_ = applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed)
 				return err
 			}
 
@@ -751,8 +710,7 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 				if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("Failed to parse mutation: %v\nRAW:\n%s\n", uErr, cleanResp))); wErr != nil {
 					logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
 				}
-				currentKind, _ := currentTask[objects.FieldKeyKind].(string)
-				_ = applyStateMutation(ctx, secCtx, sp, taskID, currentKind, validator, auditStream, objects.ObjectStatusFailed)
+				_ = applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed)
 				continue
 			}
 
@@ -812,7 +770,7 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 				Status:    objects.ObjectStatusSuccess,
 			})
 
-			if mut.StatusTransition != "" && mut.StatusTransition != currentTask[objects.FieldKeyStatus] {
+			if mut.StatusTransition != "" && !koi.IsStatus(currentTask, mut.StatusTransition) {
 				_ = sp.Update(ctx, secCtx, taskID, map[string]any{objects.FieldKeyStatus: mut.StatusTransition})
 			}
 
@@ -852,7 +810,7 @@ func applyStateMutationWithFields(ctx context.Context, secCtx *storage.SecurityC
 	// Auto-inject missing required assignee_persona_ref to avoid validation errors blocking transition
 	taskObj, err := sp.Read(ctx, secCtx, taskID)
 	if err == nil {
-		if val, ok := taskObj[objects.FieldKeyAssigneePersonaRef].(string); !ok || val == "" {
+		if koi.GetString(taskObj, objects.FieldKeyAssigneePersonaRef) == "" {
 			mut.Fields[objects.FieldKeyAssigneePersonaRef] = objects.ConstPersonaOrchestratorAlpha
 		}
 	}
@@ -917,8 +875,7 @@ func createIdempotencyAuditStamp(ctx context.Context, secCtx *storage.SecurityCo
 }
 
 func transitionToError(ctx context.Context, secCtx *storage.SecurityContext, sp storage.ObjectStorageProvider, taskID string, currentTask map[string]any, validator *mutation.Validator, auditStream *audit.AuditStream) {
-	currentKind, _ := currentTask[objects.FieldKeyKind].(string)
-	if err := applyStateMutation(ctx, secCtx, sp, taskID, currentKind, validator, auditStream, objects.ObjectStatusFailed); err != nil {
+	if err := applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed); err != nil {
 		logging.FluentEvent(logging.GetLogger()).Error("Failed to transition to error", err).Log()
 	}
 }

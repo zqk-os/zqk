@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -433,6 +434,25 @@ func TestAuthMiddleware_ForeignHomeCredentialsFallsBackToLocalSystemAccount(t *t
 	token := authcred.ReadCredentialToken(localCred)
 	if token != pkgctx.SystemAccountID {
 		t.Fatalf("expected local credentials to have %s, got %s", pkgctx.SystemAccountID, token)
+	}
+}
+
+func TestAuthMiddleware_NoTestArgBypassInNonTestMode(t *testing.T) {
+	cmd := &cobra.Command{Use: "test"}
+	home := t.TempDir()
+	t.Setenv(zqkenv.OSHome().Name(), home)
+	t.Setenv(zqkenv.APIKey().Name(), "")
+	t.Setenv(zqkenv.TestRoot().Name(), "")
+	t.Setenv(zqkenv.TestBypassAuth().Name(), "0")
+
+	origArgs := os.Args
+	t.Cleanup(func() { os.Args = origArgs })
+	os.Args = append([]string{"bin/zqk"}, "-test.dummy")
+
+	projectRoot := t.TempDir()
+	err := AuthMiddleware(cmd, projectRoot)
+	if err == nil {
+		t.Fatalf("expected unauthorized error when passing -test.dummy without credentials, got nil (auth bypass detected!)")
 	}
 }
 
