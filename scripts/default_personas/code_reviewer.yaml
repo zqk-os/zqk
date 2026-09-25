@@ -11,3 +11,6 @@ needs:
   - BaseObject trait adherence
   - Rigorous test coverage verification
   - Zero tolerance for deadlocks or resource leaks
+agent_skill_refs:
+  - ASK-SYSTEM-CODE-REVIEWER
+

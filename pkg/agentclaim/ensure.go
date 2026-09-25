@@ -55,8 +55,14 @@ func firstMatchingATK(ctx context.Context, sp storage.ObjectStorageProvider, sec
 		sec = pkgctx.NewSystemSecurityContext()
 	}
 	res, err := sp.List(ctx, sec, pkgctx.NewStorageContext(), storage.ListFilter{
-		Kind:  objects.KindAgentTask,
-		Limit: 200,
+		Kind: objects.KindAgentTask,
+		Filters: map[string]any{
+			objects.FieldKeyStatus: map[string]any{
+				"$nin": []any{objects.ObjectStatusDraft, objects.ObjectStatusComplete, objects.ObjectStatusArchived, "cancelled"},
+			},
+		},
+		Fields: []string{objects.FieldKeyID, objects.FieldKeyStatus, objects.FieldKeyTitle, objects.FieldKeyClaimedBy},
+		Limit:  200,
 	})
 	if err != nil {
 		return "", err

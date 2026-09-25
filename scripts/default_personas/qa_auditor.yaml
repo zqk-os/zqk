@@ -11,3 +11,6 @@ needs:
   - Invariant gate verification before plane promotion
   - Full requirements-to-criteria traceability
   - Regression testing and automated test execution
+agent_skill_refs:
+  - ASK-COMMUNITY-QA-VERIFICATION
+

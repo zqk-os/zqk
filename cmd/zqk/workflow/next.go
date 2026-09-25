@@ -191,6 +191,7 @@ func selectActiveConvergence(ctx context.Context, sp workflowStorage) *convergen
 		Filters: map[string]any{
 			objects.FieldKeyStatus: statusInProcess,
 		},
+		Fields: []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyUpdatedAt},
 	})
 	if err != nil || len(result.Objects) == 0 {
 		return nil
@@ -242,6 +243,7 @@ func selectBacklogNext(ctx context.Context, sp workflowStorage) (string, *backlo
 				"$nin": []string{statusComplete, statusArchived, statusRejected, statusCancelled},
 			},
 		},
+		Fields: []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyPriorityTier, objects.FieldKeyUpdatedAt},
 	})
 	if err != nil || len(result.Objects) == 0 {
 		return planID, nil
@@ -287,6 +289,7 @@ func resolveCurrentPlanID(ctx context.Context, sp workflowStorage) string {
 				"$in": []string{statusInProcess, "active"},
 			},
 		},
+		Fields: []string{objects.FieldKeyID, objects.FieldKeyActiveOrder, objects.FieldKeyUpdatedAt},
 	})
 	if err != nil || len(result.Objects) == 0 {
 		return ""

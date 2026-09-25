@@ -96,23 +96,56 @@ func (r *DependencyTreeResolver) Resolve(ctx context.Context, planID string) (*T
 		return nil, fmt.Errorf("failed to read priority plan %s: %w", planID, err)
 	}
 
-	// Fetch all backlog_items, goals, requirements, criteria
-	backlogRes, err := r.sp.List(ctx, secCtx, storageCtx, storage.ListFilter{Kind: objects.KindBacklogItem})
+	// Fetch backlog_items (scoped to plan and non-archived), goals, requirements, criteria (non-archived)
+	backlogRes, err := r.sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
+		Kind: objects.KindBacklogItem,
+		Filters: map[string]any{
+			objects.FieldKeyPriorityPlanRef: planID,
+			objects.FieldKeyStatus: map[string]any{
+				"$ne": objects.ObjectStatusArchived,
+			},
+		},
+		Fields: []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyPriorityPlanRef, "requirement_ref", objects.FieldKeyRequirementRefs, "goal_ref", objects.FieldKeyGoalRefs},
+	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to list backlog items: %w", err)
 	}
 
-	goalRes, err := r.sp.List(ctx, secCtx, storageCtx, storage.ListFilter{Kind: objects.KindGoal})
+	goalRes, err := r.sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
+		Kind: objects.KindGoal,
+		Filters: map[string]any{
+			objects.FieldKeyStatus: map[string]any{
+				"$ne": objects.ObjectStatusArchived,
+			},
+		},
+		Fields: []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyPriorityPlanRef, objects.FieldKeyPriorityPlanRefs},
+	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to list goals: %w", err)
 	}
 
-	reqRes, err := r.sp.List(ctx, secCtx, storageCtx, storage.ListFilter{Kind: objects.KindRequirement})
+	reqRes, err := r.sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
+		Kind: objects.KindRequirement,
+		Filters: map[string]any{
+			objects.FieldKeyStatus: map[string]any{
+				"$ne": objects.ObjectStatusArchived,
+			},
+		},
+		Fields: []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, "goal_ref", objects.FieldKeyGoalRefs},
+	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to list requirements: %w", err)
 	}
 
-	critRes, err := r.sp.List(ctx, secCtx, storageCtx, storage.ListFilter{Kind: objects.KindCriteria})
+	critRes, err := r.sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
+		Kind: objects.KindCriteria,
+		Filters: map[string]any{
+			objects.FieldKeyStatus: map[string]any{
+				"$ne": objects.ObjectStatusArchived,
+			},
+		},
+		Fields: []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyBacklogItemRef, "requirement_ref", objects.FieldKeyRequirementRefs, "goal_ref", objects.FieldKeyGoalRefs},
+	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to list criteria: %w", err)
 	}
@@ -226,6 +259,8 @@ func resolvePriorityPlan(ctx context.Context, sp workflowStorage, explicit strin
 		res, lerr := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
 			Kind:    objects.KindPriorityPlan,
 			Filters: map[string]any{objects.FieldKeyID: explicit},
+			Limit:   1,
+			Fields:  []string{objects.FieldKeyID, objects.FieldKeyStatus},
 		})
 		if lerr == nil && len(res.Objects) > 0 {
 			return objects.GetString(res.Objects[0], objects.FieldKeyID), nil
@@ -237,6 +272,8 @@ func resolvePriorityPlan(ctx context.Context, sp workflowStorage, explicit strin
 	res, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
 		Kind:    objects.KindPriorityPlan,
 		Filters: map[string]any{objects.FieldKeyStatus: objects.ObjectStatusInProgress},
+		Limit:   1,
+		Fields:  []string{objects.FieldKeyID, objects.FieldKeyStatus},
 	})
 	if err == nil && len(res.Objects) > 0 {
 		return objects.GetString(res.Objects[0], objects.FieldKeyID), nil
@@ -246,6 +283,8 @@ func resolvePriorityPlan(ctx context.Context, sp workflowStorage, explicit strin
 	res, err = sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
 		Kind:    objects.KindPriorityPlan,
 		Filters: map[string]any{objects.FieldKeyStatus: objects.ObjectStatusActive},
+		Limit:   1,
+		Fields:  []string{objects.FieldKeyID, objects.FieldKeyStatus},
 	})
 	if err == nil && len(res.Objects) > 0 {
 		return objects.GetString(res.Objects[0], objects.FieldKeyID), nil
@@ -255,6 +294,8 @@ func resolvePriorityPlan(ctx context.Context, sp workflowStorage, explicit strin
 	res, err = sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
 		Kind:    objects.KindPriorityPlan,
 		Filters: map[string]any{objects.FieldKeyStatus: objects.ObjectStatusPaused},
+		Limit:   1,
+		Fields:  []string{objects.FieldKeyID, objects.FieldKeyStatus},
 	})
 	if err == nil && len(res.Objects) > 0 {
 		return objects.GetString(res.Objects[0], objects.FieldKeyID), nil

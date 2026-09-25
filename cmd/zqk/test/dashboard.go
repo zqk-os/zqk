@@ -594,8 +594,28 @@ func (s *DashboardState) scanFromStorageLocked(
 		return obj
 	}
 
+	tcFilterMap := make(map[string]any)
+	if tcFilter != "" {
+		tcFilterMap[objects.FieldKeyID] = tcFilter
+	}
+	if statusFilter != "" {
+		tcFilterMap[objects.FieldKeyStatus] = statusFilter
+	} else if !showAll {
+		tcFilterMap[objects.FieldKeyStatus] = map[string]any{"$ne": objects.ObjectStatusArchived}
+	}
+
+	tcFields := []string{
+		objects.FieldKeyID, objects.FieldKeyStatus, objects.FieldKeyTitle,
+		objects.FieldKeyPathOrID, "scope", "category",
+		objects.FieldKeyCriteriaRefs, objects.FieldKeyRequirementRefs,
+		objects.FieldKeyBacklogItemRefs, objects.FieldKeyGoalRefs,
+		objects.FieldKeyRemainingOpenCount,
+	}
+
 	listRes, err := sp.List(ctx, secCtx, nil, storage.ListFilter{
-		Kind: objects.KindTestCase,
+		Kind:    objects.KindTestCase,
+		Filters: tcFilterMap,
+		Fields:  tcFields,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to list test cases: %w", err)
@@ -690,9 +710,19 @@ func (s *DashboardState) scanFromStorageLocked(
 		}
 	}
 
-	// Discover standalone / unbound test criteria for complete visibility
+	critFilterMap := make(map[string]any)
+	if !showAll {
+		critFilterMap[objects.FieldKeyStatus] = map[string]any{"$ne": objects.ObjectStatusArchived}
+	}
+	critFields := []string{
+		objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus,
+		"category", "validation_method", objects.FieldKeyGoalRefs,
+	}
+
 	critListRes, err := sp.List(ctx, secCtx, nil, storage.ListFilter{
-		Kind: objects.KindCriteria,
+		Kind:    objects.KindCriteria,
+		Filters: critFilterMap,
+		Fields:  critFields,
 	})
 	if err == nil {
 		for _, crObj := range critListRes.Objects {

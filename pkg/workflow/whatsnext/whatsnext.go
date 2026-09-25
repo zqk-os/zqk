@@ -16,7 +16,6 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/agentfeed"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
-	"github.com/zqk-os/zqk/pkg/convergence"
 	"github.com/zqk-os/zqk/pkg/objects"
 	observerpkg "github.com/zqk-os/zqk/pkg/observer"
 	"github.com/zqk-os/zqk/pkg/storage"
@@ -90,15 +89,15 @@ func resolvePriorityPlanForWhatsNext(ctx context.Context, sp storage.ObjectStora
 			pID, pSumm := summarizePriorityPlan(obj)
 			return pID, pSumm, nil
 		}
-		res, lerr := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
-			Kind:    objects.KindPriorityPlan,
-			Filters: map[string]any{objects.FieldKeyID: explicit},
-		})
+		res, lerr := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+			ById(objects.KindPriorityPlan, explicit).
+			IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyActiveOrder, objects.FieldKeyPersonaRefs).
+			Build())
 		if lerr != nil || len(res.Objects) == 0 {
-			res, lerr = sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
-				Kind:    objects.KindStrategicPlan,
-				Filters: map[string]any{objects.FieldKeyID: explicit},
-			})
+			res, lerr = sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+				ById(objects.KindStrategicPlan, explicit).
+				IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyActiveOrder, objects.FieldKeyPersonaRefs).
+				Build())
 		}
 		if lerr == nil && len(res.Objects) > 0 {
 			if hasPersonaMatch(res.Objects[0], personaIDs) {
@@ -126,10 +125,10 @@ func resolvePriorityPlanForWhatsNext(ctx context.Context, sp storage.ObjectStora
 	var candidates []map[string]any
 	for _, st := range planStatuses {
 		for _, kind := range []string{objects.KindPriorityPlan, objects.KindStrategicPlan} {
-			res, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
-				Kind:    kind,
-				Filters: map[string]any{objects.FieldKeyStatus: st},
-			})
+			res, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+				ByStatus(kind, st).
+				IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyActiveOrder, objects.FieldKeyPersonaRefs).
+				Build())
 			if err == nil {
 				for _, obj := range res.Objects {
 					if hasPersonaMatch(obj, personaIDs) {
@@ -143,7 +142,10 @@ func resolvePriorityPlanForWhatsNext(ctx context.Context, sp storage.ObjectStora
 	// Also try a broad list in case status filtering missed some
 	if len(candidates) == 0 {
 		for _, kind := range []string{objects.KindPriorityPlan, objects.KindStrategicPlan} {
-			res, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{Kind: kind})
+			res, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+				ActiveNotComplete(kind).
+				IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyActiveOrder, objects.FieldKeyPersonaRefs).
+				Build())
 			if err == nil {
 				for _, obj := range res.Objects {
 					st, _ := obj[objects.FieldKeyStatus].(string)
@@ -297,25 +299,15 @@ func countOpenLinkedBLIs(ctx context.Context, sp storage.ObjectStorageProvider, 
 		return count
 	}
 
-	// Try filtered query first
-	res, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
-		Kind: objects.KindBacklogItem,
-		Filters: map[string]any{
-			objects.FieldKeyPriorityPlanRef: planID,
-		},
-	})
-	if err == nil && len(res.Objects) > 0 {
+	res, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+		ForPlan(objects.KindBacklogItem, planID).
+		StatusNotIn(objects.ObjectStatusComplete, objects.ObjectStatusArchived).
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyStatus, objects.FieldKeyPriorityPlanRef, objects.FieldKeyPersonaRefs).
+		Build())
+	if err == nil {
 		return countOpen(res.Objects)
 	}
-
-	// Fallback: load all BLIs and filter client-side
-	allRes, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
-		Kind: objects.KindBacklogItem,
-	})
-	if err != nil {
-		return 0
-	}
-	return countOpen(allRes.Objects)
+	return 0
 }
 
 // countLinkedBLIs returns the number of BLIs linked to a plan (including terminal).
@@ -324,34 +316,14 @@ func countLinkedBLIs(ctx context.Context, sp storage.ObjectStorageProvider, plan
 	secCtx := pkgctx.NewSystemSecurityContext()
 	storageCtx := pkgctx.NewStorageContext()
 
-	countAll := func(objs []map[string]any) int {
-		count := 0
-		for _, o := range objs {
-			ref, _ := o[objects.FieldKeyPriorityPlanRef].(string)
-			if ref == planID {
-				count++
-			}
-		}
-		return count
+	res, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+		ForPlan(objects.KindBacklogItem, planID).
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyPriorityPlanRef, objects.FieldKeyStatus).
+		Build())
+	if err == nil {
+		return len(res.Objects)
 	}
-
-	res, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
-		Kind: objects.KindBacklogItem,
-		Filters: map[string]any{
-			objects.FieldKeyPriorityPlanRef: planID,
-		},
-	})
-	if err == nil && len(res.Objects) > 0 {
-		return countAll(res.Objects)
-	}
-
-	allRes, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
-		Kind: objects.KindBacklogItem,
-	})
-	if err != nil {
-		return 0
-	}
-	return countAll(allRes.Objects)
+	return 0
 }
 
 func summarizePriorityPlan(obj map[string]any) (string, *WhatsNextPriorityPlan) {
@@ -379,10 +351,22 @@ func countBacklogByStatus(ctx context.Context, sp storage.ObjectStorageProvider,
 	}
 
 	out := map[string]int{}
+	qb := storage.DefaultQueryFactory.
+		NotArchived(objects.KindBacklogItem).
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyPriorityPlanRef, objects.FieldKeyStatus)
+	if len(planIDSet) == 1 {
+		for pid := range planIDSet {
+			qb.AndFilter(objects.FieldKeyPriorityPlanRef, pid)
+		}
+	} else if len(planIDSet) > 1 {
+		pids := make([]string, 0, len(planIDSet))
+		for pid := range planIDSet {
+			pids = append(pids, pid)
+		}
+		qb.FilterOp(objects.FieldKeyPriorityPlanRef, "$in", pids)
+	}
 
-	allRes, allErr := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
-		Kind: objects.KindBacklogItem,
-	})
+	allRes, allErr := sp.List(ctx, secCtx, storageCtx, qb.Build())
 	if allErr != nil {
 		return out
 	}
@@ -454,7 +438,10 @@ func getAgentPersonaIDs(ctx context.Context, sp storage.ObjectStorageProvider, e
 
 	sysSecCtx := pkgctx.NewSystemSecurityContext()
 	storageCtx := pkgctx.NewStorageContext()
-	res, err := sp.List(ctx, sysSecCtx, storageCtx, storage.ListFilter{Kind: objects.KindPersona})
+	res, err := sp.List(ctx, sysSecCtx, storageCtx, storage.DefaultQueryFactory.
+		NotArchived(objects.KindPersona).
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyRole, objects.FieldKeyStatus).
+		Build())
 	if err != nil || len(res.Objects) == 0 {
 		return nil
 	}
@@ -517,20 +504,21 @@ func hasPersonaMatch(obj map[string]any, personaIDs []string) bool {
 func listActiveOrPausedConvergenceSessions(ctx context.Context, sp storage.ObjectStorageProvider) []WhatsNextCVSRow {
 	secCtx := pkgctx.NewSystemSecurityContext()
 	storageCtx := pkgctx.NewStorageContext()
-	res, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{Kind: objects.KindConvergenceSession})
+	res, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+		Builder(objects.KindConvergenceSession).
+		StatusIn("active", "paused").
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyCurrentPhase, objects.FieldKeyStatus).
+		Build())
 	if err != nil {
 		return nil
 	}
 	var rows []WhatsNextCVSRow
 	for _, obj := range res.Objects {
-		st, _ := obj[objects.FieldKeyStatus].(string)
-		if !convergence.SessionStatusListedForWhatsNextMeasure(st) {
-			continue
-		}
 		id, _ := obj[objects.FieldKeyID].(string)
 		if id == emptyValue {
 			continue
 		}
+		st, _ := obj[objects.FieldKeyStatus].(string)
 		title, _ := obj[objects.FieldKeyTitle].(string)
 		phase, _ := obj[objects.FieldKeyCurrentPhase].(string)
 		rows = append(rows, WhatsNextCVSRow{

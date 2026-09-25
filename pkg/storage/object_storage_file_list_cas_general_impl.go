@@ -74,6 +74,16 @@ func (f *FileObjectStorage) listCASPathGeneral(ctx context.Context, secCtx *pkgc
 					candidateRefIDs[depID] = true
 				}
 			}
+			matchFound := false
+			for _, id := range casIDs {
+				if candidateRefIDs[id] {
+					matchFound = true
+					break
+				}
+			}
+			if !matchFound {
+				candidateRefIDs = nil
+			}
 		}
 
 		for _, id := range casIDs {

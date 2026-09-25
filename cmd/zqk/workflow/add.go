@@ -103,7 +103,13 @@ func runAdd(cmd *cobra.Command, args []string) error {
 		} else {
 			// Search for active priority plan matching active order
 			listFilter := storage.ListFilter{
-				Kind: "priority_plan",
+				Kind: objects.KindPriorityPlan,
+				Filters: map[string]any{
+					objects.FieldKeyStatus: map[string]any{
+						"$in": []string{objects.ObjectStatusGrooming, objects.ObjectStatusPlanned},
+					},
+				},
+				Fields: []string{objects.FieldKeyID, objects.FieldKeyStatus, objects.FieldKeyActiveOrder},
 			}
 			planList, err := proc.Storage().List(proc.OperationContext(), proc.SecurityContext(), proc.StorageContext(), listFilter)
 			if err == nil {
@@ -149,7 +155,13 @@ func runAdd(cmd *cobra.Command, args []string) error {
 			} else {
 				// Find milestones referencing this plan
 				listFilter := storage.ListFilter{
-					Kind: "milestone",
+					Kind: objects.KindMilestone,
+					Filters: map[string]any{
+						objects.FieldKeyStatus: map[string]any{
+							"$ne": objects.ObjectStatusArchived,
+						},
+					},
+					Fields: []string{objects.FieldKeyID, objects.FieldKeyStatus, objects.FieldKeyPriorityPlanRef, objects.FieldKeyPriorityPlanRefs},
 				}
 				milestoneList, err := proc.Storage().List(proc.OperationContext(), proc.SecurityContext(), proc.StorageContext(), listFilter)
 				if err == nil {
@@ -164,7 +176,15 @@ func runAdd(cmd *cobra.Command, args []string) error {
 
 				// Fallback: use first in_progress milestone in the system
 				if resolvedMilestoneID == "" {
-					milestoneList, err = proc.Storage().List(proc.OperationContext(), proc.SecurityContext(), proc.StorageContext(), listFilter)
+					inProgFilter := storage.ListFilter{
+						Kind: objects.KindMilestone,
+						Filters: map[string]any{
+							objects.FieldKeyStatus: "in_progress",
+						},
+						Limit:  1,
+						Fields: []string{objects.FieldKeyID, objects.FieldKeyStatus},
+					}
+					milestoneList, err = proc.Storage().List(proc.OperationContext(), proc.SecurityContext(), proc.StorageContext(), inProgFilter)
 					if err == nil {
 						for _, mObj := range milestoneList.Objects {
 							mID, _ := mObj[objects.FieldKeyID].(string)

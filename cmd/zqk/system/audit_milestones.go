@@ -79,12 +79,12 @@ func runAuditMilestones(cmd *cobra.Command, fix bool, defaultMilestoneID string)
 	storageCtx := pkgctx.NewStorageContext()
 
 	// List backlog items
-	listResult, err := storageProvider.List(cmd.Context(), secCtx, storageCtx, storage.ListFilter{
-		Kind:    objects.KindBacklogItem,
-		Limit:   10000,
-		SortBy:  "id",
-		SortAsc: true,
-	})
+	listResult, err := storageProvider.List(cmd.Context(), secCtx, storageCtx, storage.DefaultQueryFactory.
+		NotArchived(objects.KindBacklogItem).
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyMilestoneRefs).
+		Limit(10000).
+		Sort("id", true).
+		Build())
 	if err != nil {
 		return errfmt.Newf("list backlog_item").Wrap(err)
 	}

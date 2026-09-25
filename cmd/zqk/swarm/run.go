@@ -1,14 +1,26 @@
 package swarm
 
 import (
+	stdcontext "context"
 	"fmt"
 	"path/filepath"
+	"sort"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/cmd/zqk/system"
+	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/agentfeed"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/scenario"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/swarm/metabolism"
 	"github.com/zqk-os/zqk/pkg/swarm/pack"
 	"github.com/zqk-os/zqk/pkg/swarm/remote"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -109,6 +121,236 @@ func runSwarmPackage(cmd *cobra.Command, targetPath string, dryRun bool, entrypo
 	}
 
 	logging.FluentEvent(logger).Info(fmt.Sprintf("Launching swarm package %s (entrypoint: %s)", pkg.Name, selectedEntrypoint)).Log()
+
+	// Resolve project root and storage provider
+	opCtx := cmd.Context()
+	if opCtx == nil {
+		opCtx = stdcontext.Background()
+	}
+
+	var sp storage.ObjectStorageProvider
+	var secCtx *pkgctx.SecurityContext
+	projectRoot := ""
+
+	if proc, err := cli.NewProcessor(cmd); err == nil && proc.Storage() != nil {
+		sp = proc.Storage()
+		projectRoot = proc.ProjectRoot()
+		secCtx = proc.SecurityContext()
+		if proc.OperationContext() != nil {
+			opCtx = proc.OperationContext()
+		}
+	} else {
+		projectRoot = paths.ResolveProjectRoot(".")
+		if projectRoot == "" {
+			projectRoot = "."
+		}
+		var err error
+		sp, err = storage.GetGlobalStorageProviderCache().GetOrCreate(opCtx, projectRoot)
+		if err != nil {
+			return errfmt.Newf("failed to initialize storage provider for project %s", projectRoot).Wrap(err)
+		}
+		secCtx = pkgctx.NewSystemSecurityContext()
+	}
+	opCtx = pkgctx.WithPromoteOnCreate(opCtx)
+
+	packDir := filepath.Dir(manifestPath)
+	params := make(map[string]interface{})
+	for k, def := range pkg.Parameters {
+		if def.Default != nil {
+			params[k] = def.Default
+		}
+	}
+
+	outputDir := filepath.Join(projectRoot, paths.ProjectDataDir, "runs", fmt.Sprintf("%s-latest", pkg.Name))
+	if outVal, ok := params["output_dir"].(string); ok && outVal != "" {
+		if filepath.IsAbs(outVal) {
+			outputDir = outVal
+		} else {
+			outputDir = filepath.Join(projectRoot, outVal)
+		}
+	}
+	_ = fileutil.MkdirAll(outputDir, paths.DirPerm755)
+
+	reg := metabolism.NewReceptorRegistry()
+	engine := metabolism.NewMetabolismEngine(reg)
+	verifySeal := (pkg.Integrity != nil)
+	// Ensure default agent seating (personas and skills) is seeded
+	sysLogger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+	_, _ = system.SeedDefaultAgentSeatingPack(projectRoot, sysLogger)
+
+	// Ensure valid active account for workstream owner_ref
+	accountID := secCtx.AccountID
+	validAccount := false
+	if accountID != "" {
+		if obj, err := sp.Read(opCtx, secCtx, accountID); err == nil && obj != nil {
+			if st, _ := obj[objects.FieldKeyStatus].(string); st == "" || st == objects.ObjectStatusActive {
+				validAccount = true
+			}
+		}
+	}
+	if !validAccount {
+		accList, err := sp.List(opCtx, secCtx, pkgctx.NewStorageContext(), storage.ListFilter{
+			Kind: objects.KindAccount,
+			Filters: map[string]any{
+				objects.FieldKeyStatus: objects.ObjectStatusActive,
+			},
+			Limit:  1,
+			Fields: []string{objects.FieldKeyID, objects.FieldKeyStatus},
+		})
+		if err == nil && len(accList.Objects) > 0 {
+			if firstID, ok := accList.Objects[0][objects.FieldKeyID].(string); ok && firstID != "" {
+				accountID = firstID
+				validAccount = true
+			}
+		}
+	}
+	if !validAccount {
+		if accountID == "" {
+			accountID = pkgctx.SystemAccountID
+		}
+		now := time.Now().UTC().Format(time.RFC3339)
+		_ = sp.Create(opCtx, secCtx, map[string]any{
+			objects.FieldKeyID:        accountID,
+			objects.FieldKeyKind:      objects.KindAccount,
+			objects.FieldKeyTitle:     "System Account",
+			"username":                "system",
+			"roles":                   []string{"admin"},
+			objects.FieldKeyStatus:    objects.ObjectStatusActive,
+			objects.FieldKeyCreatedAt: now,
+			objects.FieldKeyCreatedBy: accountID,
+		})
+	}
+
+	digest, err := engine.Ingest(metabolism.IngestionOptions{
+		PackDir:    packDir,
+		OutputDir:  outputDir,
+		VerifySeal: verifySeal,
+		Parameters: params,
+		AccountID:  accountID,
+	})
+	if err != nil {
+		return errfmt.Newf("metabolism ingestion failed for swarm package %s", pkg.Name).Wrap(err)
+	}
+
+	// Persist prompt templates into Storage
+	templatesStored := 0
+	for _, tpl := range digest.PromptTemplates {
+		if tpl.ID == "" {
+			continue
+		}
+		tplObj := map[string]any{
+			objects.FieldKeyID:          tpl.ID,
+			objects.FieldKeyKind:        "prompt_template",
+			objects.FieldKeyTitle:       tpl.Title,
+			objects.FieldKeyDescription: tpl.Description,
+			"category":                  tpl.Category,
+			"prompt_archetype":          "structured",
+			"prompt_body":               tpl.Template,
+			"variables":                 tpl.Variables,
+			"metadata":                  tpl.Metadata,
+			objects.FieldKeyStatus:      objects.ObjectStatusActive,
+		}
+		if _, err := sp.Read(opCtx, secCtx, tpl.ID); err == nil {
+			continue
+		}
+		if err := sp.Create(opCtx, secCtx, tplObj); err != nil {
+			logging.FluentEvent(logger).Warn(fmt.Sprintf("failed to persist prompt template %s", tpl.ID)).WithError(err).Log()
+		} else {
+			templatesStored++
+		}
+	}
+
+	// Persist Synthesized Kernel Objects in Topological Order derived from spec index
+	distinctKinds := make([]string, 0)
+	kindSeen := make(map[string]bool)
+	for _, obj := range digest.KernelObjects {
+		if k, _ := obj[objects.FieldKeyKind].(string); k != "" && !kindSeen[k] {
+			kindSeen[k] = true
+			distinctKinds = append(distinctKinds, k)
+		}
+	}
+
+	orderedKinds, _, _ := scenario.CreateOrderFromSpecIndex(projectRoot, distinctKinds)
+	kindRank := make(map[string]int, len(orderedKinds))
+	for rank, k := range orderedKinds {
+		kindRank[k] = rank
+	}
+
+	sortedObjects := make([]map[string]any, len(digest.KernelObjects))
+	copy(sortedObjects, digest.KernelObjects)
+	sort.SliceStable(sortedObjects, func(i, j int) bool {
+		ki, _ := sortedObjects[i][objects.FieldKeyKind].(string)
+		kj, _ := sortedObjects[j][objects.FieldKeyKind].(string)
+		ri, oki := kindRank[ki]
+		rj, okj := kindRank[kj]
+		if oki && okj {
+			return ri < rj
+		}
+		if oki {
+			return true
+		}
+		if okj {
+			return false
+		}
+		return ki < kj
+	})
+
+	objectsPersisted := 0
+	for _, obj := range sortedObjects {
+		id, _ := obj[objects.FieldKeyID].(string)
+		kind, _ := obj[objects.FieldKeyKind].(string)
+		if id == "" {
+			continue
+		}
+		if _, err := sp.Read(opCtx, secCtx, id); err == nil {
+			continue
+		}
+		if err := sp.Create(opCtx, secCtx, obj); err != nil {
+			return errfmt.Newf("failed to persist synthesized %s object %s", kind, id).Wrap(err)
+		}
+		objectsPersisted++
+	}
+
+	// Promote Priority Plan to Active
+	cleanName := strings.ToUpper(strings.ReplaceAll(pkg.Name, "-", "_"))
+	planID := fmt.Sprintf("PRI-%s", cleanName)
+
+	// Ensure reverse reference index has all child backlog items linked to planID
+	revIndex := storage.GetGlobalReverseReferenceIndex()
+	for _, obj := range sortedObjects {
+		if k, _ := obj[objects.FieldKeyKind].(string); k == objects.KindBacklogItem {
+			if bid, _ := obj[objects.FieldKeyID].(string); bid != "" {
+				revIndex.AddReference(bid, planID)
+			}
+		}
+	}
+	if projectRoot != "" {
+		_ = revIndex.SaveCache(projectRoot)
+	}
+
+	if err := sp.Update(opCtx, secCtx, planID, map[string]any{
+		objects.FieldKeyStatus:      objects.ObjectStatusActive,
+		objects.FieldKeyActiveOrder: 1,
+	}); err != nil {
+		return errfmt.Newf("failed to activate priority plan %s", planID).Wrap(err)
+	}
+
+	// Emit Swarm Launch Steering to Agent Feed
+	feedMsg := fmt.Sprintf("SWARM DISPATCH: Initialized swarm package %s v%s. Active Plan: %s with %d tasks. Entrypoint: %s.",
+		pkg.Name, pkg.Version, planID, len(pkg.Tasks), selectedEntrypoint)
+	_, _ = agentfeed.AppendEvent(agentfeed.AppendEventInput{
+		ProjectRoot: projectRoot,
+		Message:     feedMsg,
+		AgentID:     "system",
+		PersonaRef:  "PER-DEFAULT-OPERATOR",
+		Sender:      agentfeed.FeedSenderMeshStatus,
+		EventType:   agentfeed.FeedEventTypeMeshStatus,
+		SelfACK:     true,
+	})
+
 	fmt.Fprintf(out, "\n✓ Swarm initialized and dispatch ready for %d agents.\n", len(pkg.Agents))
+	fmt.Fprintf(out, "  • Graph Ingested:    %d kernel objects persisted, %d prompt templates stored\n", objectsPersisted, templatesStored)
+	fmt.Fprintf(out, "  • Active Plan:       %s\n", planID)
+	fmt.Fprintf(out, "  • Output Directory:  %s\n", outputDir)
 	return nil
 }

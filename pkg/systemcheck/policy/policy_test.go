@@ -141,6 +141,16 @@ func Run() {
 	if resBad.Passed {
 		t.Fatal("expected goroutines gate to fail on bare go func, but passed")
 	}
+
+	// Bare errgroup .Go spawn
+	badErrgroupFile := filepath.Join(pkgDir, "bad_errgroup.go")
+	badErrgroupCode := "package myfeature\nfunc BadEG(g interface{ Go(func() error) }) {\n\tg.Go(func() error {\n\t\treturn nil\n\t})\n}\n"
+	_ = os.WriteFile(badErrgroupFile, []byte(badErrgroupCode), paths.FilePerm644)
+
+	resBadEG, _ := gate.Run(context.Background(), RunOptions{ProjectRoot: tempDir, Files: []string{badErrgroupFile}})
+	if resBadEG.Passed {
+		t.Fatal("expected goroutines gate to fail on unmonitored g.Go, but passed")
+	}
 }
 
 func TestRunGates(t *testing.T) {

@@ -363,9 +363,10 @@ func runWhatsNextSyncSweep(cmd *cobra.Command, args []string, proc *cli.Processo
 	var taskPrompt string
 	var activeTask map[string]any
 	if secCtx != nil && (len(personaIDs) > 0 || secCtx.AccountID != "") {
-		listRes, err := sp.List(ctx, secCtx, pkgctx.NewStorageContext(), storage.ListFilter{
-			Kind: objects.KindAgentTask,
-		})
+		listRes, err := sp.List(ctx, secCtx, pkgctx.NewStorageContext(), storage.DefaultQueryFactory.
+			Builder(objects.KindAgentTask).
+			StatusIn(objects.ObjectStatusInProgress, objects.ObjectStatusProposed).
+			Build())
 		if err == nil {
 			var bestProposed map[string]any
 			for _, obj := range listRes.Objects {
@@ -573,15 +574,17 @@ func resolvePriorityPlanForWhatsNext(ctx context.Context, sp workflowStorage, ex
 			pID, pSumm := summarizePriorityPlan(obj)
 			return pID, pSumm, nil
 		}
-		res, lerr := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
-			Kind:    objects.KindPriorityPlan,
-			Filters: map[string]any{objects.FieldKeyID: explicit},
-		})
+		res, lerr := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+			ById(objects.KindPriorityPlan, explicit).
+			Limit(1).
+			IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyActiveOrder, objects.FieldKeyPersonaRefs).
+			Build())
 		if lerr != nil || len(res.Objects) == 0 {
-			res, lerr = sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
-				Kind:    objects.KindStrategicPlan,
-				Filters: map[string]any{objects.FieldKeyID: explicit},
-			})
+			res, lerr = sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+				ById(objects.KindStrategicPlan, explicit).
+				Limit(1).
+				IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyActiveOrder, objects.FieldKeyPersonaRefs).
+				Build())
 		}
 		if lerr == nil && len(res.Objects) > 0 {
 			if hasPersonaMatch(res.Objects[0], personaIDs) {
@@ -596,10 +599,10 @@ func resolvePriorityPlanForWhatsNext(ctx context.Context, sp workflowStorage, ex
 	var candidates []map[string]any
 	for _, st := range objects.PlanWhatsNextCandidateStatuses() {
 		for _, kind := range []string{objects.KindPriorityPlan, objects.KindStrategicPlan} {
-			res, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
-				Kind:    kind,
-				Filters: map[string]any{objects.FieldKeyStatus: st},
-			})
+			res, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+				ByStatus(kind, st).
+				IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyActiveOrder, objects.FieldKeyPersonaRefs).
+				Build())
 			if err == nil {
 				for _, obj := range res.Objects {
 					if hasPersonaMatch(obj, personaIDs) {
@@ -610,10 +613,14 @@ func resolvePriorityPlanForWhatsNext(ctx context.Context, sp workflowStorage, ex
 		}
 	}
 
-	// Also try a broad list in case status filtering missed some
+	// Also try a broad list in case status filtering missed some (excluding terminal/archived)
 	if len(candidates) == 0 {
 		for _, kind := range []string{objects.KindPriorityPlan, objects.KindStrategicPlan} {
-			res, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{Kind: kind})
+			res, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+				Builder(kind).
+				StatusNotIn(objects.ObjectStatusComplete, objects.ObjectStatusArchived, "cancelled").
+				IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyActiveOrder, objects.FieldKeyPersonaRefs).
+				Build())
 			if err == nil {
 				for _, obj := range res.Objects {
 					st, _ := obj[objects.FieldKeyStatus].(string)
@@ -684,32 +691,15 @@ func countLinkedBLIs(ctx context.Context, sp workflowStorage, planID string) int
 	}
 	storageCtx := pkgctx.NewStorageContext()
 
-	// Try filtered query first
-	res, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
-		Kind: objects.KindBacklogItem,
-		Filters: map[string]any{
-			objects.FieldKeyPriorityPlanRef: planID,
-		},
-	})
-	if err == nil && len(res.Objects) > 0 {
+	res, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+		ForPlan(objects.KindBacklogItem, planID).
+		StatusNot(objects.ObjectStatusArchived).
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyPriorityPlanRef, objects.FieldKeyStatus).
+		Build())
+	if err == nil {
 		return len(res.Objects)
 	}
-
-	// Fallback: load all BLIs and filter client-side
-	allRes, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
-		Kind: objects.KindBacklogItem,
-	})
-	if err != nil {
-		return 0
-	}
-	count := 0
-	for _, o := range allRes.Objects {
-		ref, _ := o[objects.FieldKeyPriorityPlanRef].(string)
-		if ref == planID {
-			count++
-		}
-	}
-	return count
+	return 0
 }
 
 // preferSeatedPlansWithOpenWork drops hollow matches when the seated persona has
@@ -765,20 +755,15 @@ func countOpenLinkedBLIs(ctx context.Context, sp workflowStorage, planID string,
 		}
 		return n
 	}
-	res, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
-		Kind: objects.KindBacklogItem,
-		Filters: map[string]any{
-			objects.FieldKeyPriorityPlanRef: planID,
-		},
-	})
-	if err == nil && len(res.Objects) > 0 {
+	res, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+		ForPlan(objects.KindBacklogItem, planID).
+		StatusNotIn(objects.ObjectStatusComplete, objects.ObjectStatusArchived).
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyStatus, objects.FieldKeyPriorityPlanRef, objects.FieldKeyPersonaRefs).
+		Build())
+	if err == nil {
 		return countOpen(res.Objects)
 	}
-	allRes, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{Kind: objects.KindBacklogItem})
-	if err != nil {
-		return 0
-	}
-	return countOpen(allRes.Objects)
+	return 0
 }
 
 func cliPlanExecutionStatusBonus(st string) int {
@@ -825,33 +810,14 @@ func countBacklogByStatus(ctx context.Context, sp workflowStorage, planID string
 	}
 	storageCtx := pkgctx.NewStorageContext()
 
-	// Try filtered query first
-	res, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
-		Kind: objects.KindBacklogItem,
-		Filters: map[string]any{
-			objects.FieldKeyPriorityPlanRef: planID,
-		},
-	})
-
 	out := map[string]int{}
-
-	// If filter returned nothing, fall back to full list + client-side match
+	res, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+		ForPlan(objects.KindBacklogItem, planID).
+		StatusNot(objects.ObjectStatusArchived).
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyStatus, objects.FieldKeyPriorityPlanRef, objects.FieldKeyPersonaRefs).
+		Build())
 	if err != nil || len(res.Objects) == 0 {
-		allRes, allErr := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
-			Kind: objects.KindBacklogItem,
-		})
-		if allErr != nil {
-			return out
-		}
-		// Filter client-side
-		var filtered []map[string]any
-		for _, o := range allRes.Objects {
-			ref, _ := o[objects.FieldKeyPriorityPlanRef].(string)
-			if ref == planID {
-				filtered = append(filtered, o)
-			}
-		}
-		res = &storage.QueryResult{Objects: filtered}
+		return out
 	}
 
 	for _, o := range res.Objects {
@@ -904,7 +870,10 @@ func getAgentPersonaIDs(ctx context.Context, sp workflowStorage, explicitPersona
 
 	sysSecCtx := pkgctx.NewSystemSecurityContext()
 	storageCtx := pkgctx.NewStorageContext()
-	res, err := sp.List(ctx, sysSecCtx, storageCtx, storage.ListFilter{Kind: objects.KindPersona})
+	res, err := sp.List(ctx, sysSecCtx, storageCtx, storage.DefaultQueryFactory.
+		NotArchived(objects.KindPersona).
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyRole, objects.FieldKeyStatus).
+		Build())
 	if err != nil || len(res.Objects) == 0 {
 		return nil
 	}
@@ -992,21 +961,21 @@ func listActiveOrPausedConvergenceSessions(ctx context.Context, sp workflowStora
 		secCtx = pkgctx.NewSystemSecurityContext()
 	}
 	storageCtx := pkgctx.NewStorageContext()
-	res, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{Kind: objects.KindConvergenceSession})
+	res, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+		Builder(objects.KindConvergenceSession).
+		StatusIn("active", "paused").
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyCurrentPhase, objects.FieldKeyStatus).
+		Build())
 	if err != nil {
 		return nil
 	}
 	var rows []whatsNextCVSRow
 	for _, obj := range res.Objects {
-		st, _ := obj[objects.FieldKeyStatus].(string)
-		ls := strings.ToLower(strings.TrimSpace(st))
-		if ls != "active" && ls != "paused" {
-			continue
-		}
 		id, _ := obj[objects.FieldKeyID].(string)
 		if id == emptyValue {
 			continue
 		}
+		st, _ := obj[objects.FieldKeyStatus].(string)
 		title, _ := obj[objects.FieldKeyTitle].(string)
 		phase, _ := obj[objects.FieldKeyCurrentPhase].(string)
 		rows = append(rows, whatsNextCVSRow{

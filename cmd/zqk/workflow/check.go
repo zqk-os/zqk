@@ -75,10 +75,12 @@ func runCheck(cmd *cobra.Command, args []string) error {
 		sp := proc.Storage()
 		if sp != nil && activeItemID != "main" && activeItemID != "master" {
 			filter := storage.ListFilter{
-				Kind: "priority_plan",
+				Kind: objects.KindPriorityPlan,
 				Filters: map[string]any{
 					objects.FieldKeyStatus: objects.ObjectStatusActive,
 				},
+				Limit:  1,
+				Fields: []string{objects.FieldKeyID, objects.FieldKeyStatus, objects.FieldKeyBacklogItemRefs},
 			}
 			res, err := sp.List(proc.OperationContext(), proc.SecurityContext(), pkgctx.NewStorageContext(), filter)
 			if err == nil && res != nil && len(res.Objects) > 0 {

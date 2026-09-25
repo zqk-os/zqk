@@ -771,20 +771,40 @@ func (ll *LifecycleLoader) mergeLifecycles(parent, child *Lifecycle) Lifecycle {
 		merged.Statuses = append(merged.Statuses, status)
 	}
 
+	// Child-owned from-statuses already declare their own hops. A rewritten
+	// parent edge must not invent a second hop (priority_plan maps approved
+	// onto grooming, so approved→in_progress became grooming→in_progress and
+	// skipped shovel-ready). TRACK: BLI-1785439369431933000-f0cccd6c
+	childOwnsFrom := make(map[string]bool, len(child.Transitions))
+	for _, transition := range child.Transitions {
+		if transition.From != emptyValue {
+			childOwnsFrom[transition.From] = true
+		}
+	}
+
 	// Start with parent transitions, then add/override with child transitions
 	transitionMap := make(map[string]Transition) // key: "from->to"
 	for _, transition := range parent.Transitions {
 		from := transition.From
-		if from != "*" {
-			from = mapInheritedStatus(from)
-		}
 		to := transition.To
-		if to != "*" {
-			to = mapInheritedStatus(to)
+		mappedFrom := from
+		mappedTo := to
+		if from != "*" {
+			mappedFrom = mapInheritedStatus(from)
 		}
-		transition.From = from
-		transition.To = to
-		key := fmt.Sprintf("%s->%s", from, to)
+		if to != "*" {
+			mappedTo = mapInheritedStatus(to)
+		}
+		rewritten := (from != "*" && mappedFrom != from) || (to != "*" && mappedTo != to)
+		if mappedFrom == mappedTo && mappedFrom != "*" {
+			continue
+		}
+		if rewritten && childOwnsFrom[mappedFrom] {
+			continue
+		}
+		transition.From = mappedFrom
+		transition.To = mappedTo
+		key := fmt.Sprintf("%s->%s", mappedFrom, mappedTo)
 		transitionMap[key] = transition
 	}
 

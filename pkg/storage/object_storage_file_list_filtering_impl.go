@@ -16,6 +16,52 @@ func (f *FileObjectStorage) matchesFiltersParsed(parsed *objects.ParsedObject, f
 	}
 
 	for field, filterValue := range filters {
+		if field == "$or" {
+			matched := false
+			switch orList := filterValue.(type) {
+			case []map[string]any:
+				for _, subMap := range orList {
+					if f.matchesFiltersParsed(parsed, subMap) {
+						matched = true
+						break
+					}
+				}
+			case []any:
+				for _, subItem := range orList {
+					if subMap, ok := subItem.(map[string]any); ok {
+						if f.matchesFiltersParsed(parsed, subMap) {
+							matched = true
+							break
+						}
+					}
+				}
+			}
+			if !matched {
+				return false
+			}
+			continue
+		}
+
+		if field == "$and" {
+			switch andList := filterValue.(type) {
+			case []map[string]any:
+				for _, subMap := range andList {
+					if !f.matchesFiltersParsed(parsed, subMap) {
+						return false
+					}
+				}
+			case []any:
+				for _, subItem := range andList {
+					if subMap, ok := subItem.(map[string]any); ok {
+						if !f.matchesFiltersParsed(parsed, subMap) {
+							return false
+						}
+					}
+				}
+			}
+			continue
+		}
+
 		if objects.IsKernelObjectRefField(field) {
 			if !kernelRefFilterMatches(parsed, field, filterValue, f) {
 				return false
@@ -73,6 +119,52 @@ func (f *FileObjectStorage) matchesFilters(obj, filters map[string]any) bool {
 	}
 
 	for field, filterValue := range filters {
+		if field == "$or" {
+			matched := false
+			switch orList := filterValue.(type) {
+			case []map[string]any:
+				for _, subMap := range orList {
+					if f.matchesFilters(obj, subMap) {
+						matched = true
+						break
+					}
+				}
+			case []any:
+				for _, subItem := range orList {
+					if subMap, ok := subItem.(map[string]any); ok {
+						if f.matchesFilters(obj, subMap) {
+							matched = true
+							break
+						}
+					}
+				}
+			}
+			if !matched {
+				return false
+			}
+			continue
+		}
+
+		if field == "$and" {
+			switch andList := filterValue.(type) {
+			case []map[string]any:
+				for _, subMap := range andList {
+					if !f.matchesFilters(obj, subMap) {
+						return false
+					}
+				}
+			case []any:
+				for _, subItem := range andList {
+					if subMap, ok := subItem.(map[string]any); ok {
+						if !f.matchesFilters(obj, subMap) {
+							return false
+						}
+					}
+				}
+			}
+			continue
+		}
+
 		if objects.IsKernelObjectRefField(field) {
 			parsed := &objects.ParsedObject{Raw: obj}
 			if !kernelRefFilterMatches(parsed, field, filterValue, f) {

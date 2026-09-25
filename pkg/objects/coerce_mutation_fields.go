@@ -129,16 +129,23 @@ func AppendRefList(current, added any) []string {
 }
 
 // RequireCriteriaCategory fails closed when kind is criteria and category is empty
-// after CoerceMutationFields. Call from the CAS membrane (hash persist / promote),
-// not from create-validate — incomplete creates park on the draft plane.
+// or not one of the defined criteria categories after CoerceMutationFields.
+// Call from the CAS membrane (hash persist / promote), not from create-validate —
+// incomplete creates park on the draft plane.
 func RequireCriteriaCategory(kind string, obj map[string]any) error {
 	if kind != KindCriteria {
 		return nil
 	}
-	if strings.TrimSpace(GetString(obj, FieldKeyCategory)) != "" {
-		return nil
+	cat := strings.TrimSpace(GetString(obj, FieldKeyCategory))
+	if cat == "" {
+		return fmt.Errorf("criteria requires category (functional|non-functional|acceptance|test|performance|security|compliance)")
 	}
-	return fmt.Errorf("criteria requires category (functional|non-functional|acceptance|test|performance|security|compliance)")
+	switch cat {
+	case "functional", "non-functional", "acceptance", "test", "performance", "security", "compliance":
+		return nil
+	default:
+		return fmt.Errorf("criteria category %q is invalid; must be one of: functional, non-functional, acceptance, test, performance, security, compliance", cat)
+	}
 }
 
 func refListFieldNames(obj map[string]any) map[string]struct{} {

@@ -184,13 +184,28 @@ func topologicalOrderWithCycles(kinds []string, deps map[string]map[string]struc
 			continue
 		}
 		// Cycle: pick next from cycleBreakOrder so we create criteria before requirement.
+		found := false
 		for _, k := range cycleBreakOrder {
 			if !remaining[k] {
 				continue
 			}
 			order = append(order, k)
 			delete(remaining, k)
+			found = true
 			break
+		}
+		if !found {
+			// Fallback: pick any remaining kind deterministically to ensure loop termination
+			var fallbackKind string
+			for k := range remaining {
+				if fallbackKind == "" || k < fallbackKind {
+					fallbackKind = k
+				}
+			}
+			if fallbackKind != "" {
+				order = append(order, fallbackKind)
+				delete(remaining, fallbackKind)
+			}
 		}
 	}
 

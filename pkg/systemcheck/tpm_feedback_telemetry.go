@@ -43,22 +43,30 @@ func CollectTPMFeedbackTelemetry(ctx context.Context, sp storagepkg.ObjectStorag
 		RankedActionClusters: make([]TPMActionCluster, 0),
 	}
 
-	// 1. Scan criteria
+	// 1. Scan criteria: filter out completed and archived criteria at the storage boundary
 	critRes, err := sp.List(ctx, secCtx, storageCtx, storagepkg.ListFilter{
 		Kind: objects.KindCriteria,
+		Filters: map[string]any{
+			objects.FieldKeyStatus: map[string]any{"$nin": []any{objects.ObjectStatusComplete, objects.ObjectStatusArchived}},
+		},
+		Fields: []string{objects.FieldKeyStatus},
 	})
 	if err == nil && critRes != nil {
 		for _, obj := range critRes.Objects {
 			status, _ := obj[objects.FieldKeyStatus].(string)
-			if status != objects.ObjectStatusComplete && status != "archived" {
+			if status != objects.ObjectStatusComplete && status != objects.ObjectStatusArchived {
 				telemetry.UnverifiedCriteria++
 			}
 		}
 	}
 
-	// 2. Scan backlog items
+	// 2. Scan backlog items: filter out archived backlog items at the storage boundary
 	bliRes, err := sp.List(ctx, secCtx, storageCtx, storagepkg.ListFilter{
 		Kind: objects.KindBacklogItem,
+		Filters: map[string]any{
+			objects.FieldKeyStatus: map[string]any{"$ne": objects.ObjectStatusArchived},
+		},
+		Fields: []string{objects.FieldKeyStatus, objects.FieldKeyDescription},
 	})
 	if err == nil && bliRes != nil {
 		for _, obj := range bliRes.Objects {

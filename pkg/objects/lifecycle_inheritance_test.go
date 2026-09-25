@@ -112,6 +112,11 @@ func TestLifecycleLoader_StatusMapping(t *testing.T) {
 	if mapped, ok := lifecycle.StatusMapping["in_progress"]; ok && mapped != "in_progress" {
 		t.Error("priority_plan status_mapping must not include in_progress (would launder execution lock)")
 	}
+	for _, tr := range lifecycle.Transitions {
+		if tr.From == "grooming" && tr.To == "in_progress" {
+			t.Fatal("status_mapping must not invent grooming→in_progress from approved→in_progress")
+		}
+	}
 
 	// Verify that priority_plan-specific statuses are present
 	statusMap := make(map[string]bool)

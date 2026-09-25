@@ -13,7 +13,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
-	"golang.org/x/sync/errgroup"
 )
 
 // TreeNode represents a node in the dependency tree.
@@ -91,57 +90,40 @@ func (r *DependencyTreeResolver) Resolve(ctx context.Context, planID string) (*T
 		return nil, errfmt.Errorf("failed to read priority plan %s: %w", planID, err)
 	}
 
-	var (
-		backlogRes *storage.QueryResult
-		goalRes    *storage.QueryResult
-		reqRes     *storage.QueryResult
-		critRes    *storage.QueryResult
-	)
+	// Fetch backlog items (scoped to plan and non-archived)
+	backlogRes, err := r.sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+		ForPlanNotArchived(objects.KindBacklogItem, planID).
+		Fields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyPriorityPlanRef, "requirement_ref", objects.FieldKeyRequirementRefs, "goal_ref", objects.FieldKeyGoalRefs).
+		Build())
+	if err != nil {
+		return nil, errfmt.Errorf("failed to list backlog items: %w", err)
+	}
 
-	g, gCtx := errgroup.WithContext(ctx)
+	// Fetch goals (non-archived)
+	goalRes, err := r.sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+		NotArchived(objects.KindGoal).
+		Fields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyPriorityPlanRef, objects.FieldKeyPriorityPlanRefs).
+		Build())
+	if err != nil {
+		return nil, errfmt.Errorf("failed to list goals: %w", err)
+	}
 
-	// Fetch backlog items
-	g.Go(func() error {
-		var err error
-		backlogRes, err = r.sp.List(gCtx, secCtx, storageCtx, storage.ListFilter{Kind: objects.KindBacklogItem})
-		if err != nil {
-			return errfmt.Errorf("failed to list backlog items: %w", err)
-		}
-		return nil
-	})
+	// Fetch requirements (non-archived)
+	reqRes, err := r.sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+		NotArchived(objects.KindRequirement).
+		Fields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, "goal_ref", objects.FieldKeyGoalRefs).
+		Build())
+	if err != nil {
+		return nil, errfmt.Errorf("failed to list requirements: %w", err)
+	}
 
-	// Fetch goals
-	g.Go(func() error {
-		var err error
-		goalRes, err = r.sp.List(gCtx, secCtx, storageCtx, storage.ListFilter{Kind: objects.KindGoal})
-		if err != nil {
-			return errfmt.Errorf("failed to list goals: %w", err)
-		}
-		return nil
-	})
-
-	// Fetch requirements
-	g.Go(func() error {
-		var err error
-		reqRes, err = r.sp.List(gCtx, secCtx, storageCtx, storage.ListFilter{Kind: objects.KindRequirement})
-		if err != nil {
-			return errfmt.Errorf("failed to list requirements: %w", err)
-		}
-		return nil
-	})
-
-	// Fetch criteria
-	g.Go(func() error {
-		var err error
-		critRes, err = r.sp.List(gCtx, secCtx, storageCtx, storage.ListFilter{Kind: objects.KindCriteria})
-		if err != nil {
-			return errfmt.Errorf("failed to list criteria: %w", err)
-		}
-		return nil
-	})
-
-	if err := g.Wait(); err != nil {
-		return nil, err
+	// Fetch criteria (non-archived)
+	critRes, err := r.sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+		NotArchived(objects.KindCriteria).
+		Fields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyBacklogItemRef, "requirement_ref", objects.FieldKeyRequirementRefs, "goal_ref", objects.FieldKeyGoalRefs).
+		Build())
+	if err != nil {
+		return nil, errfmt.Errorf("failed to list criteria: %w", err)
 	}
 
 	// Build index maps
@@ -250,10 +232,11 @@ func resolvePriorityPlan(ctx context.Context, sp workflowStorage, explicit strin
 		if err == nil && obj != nil {
 			return explicit, nil
 		}
-		res, lerr := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
-			Kind:    objects.KindPriorityPlan,
-			Filters: map[string]any{objects.FieldKeyID: explicit},
-		})
+		res, lerr := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+			ById(objects.KindPriorityPlan, explicit).
+			IncludeFields(objects.FieldKeyID, objects.FieldKeyStatus).
+			Limit(1).
+			Build())
 		if lerr == nil && len(res.Objects) > 0 {
 			return objects.GetString(res.Objects[0], objects.FieldKeyID), nil
 		}
@@ -261,28 +244,31 @@ func resolvePriorityPlan(ctx context.Context, sp workflowStorage, explicit strin
 	}
 
 	// Try in_progress
-	res, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
-		Kind:    objects.KindPriorityPlan,
-		Filters: map[string]any{objects.FieldKeyStatus: objects.ObjectStatusInProgress},
-	})
+	res, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+		ByStatus(objects.KindPriorityPlan, objects.ObjectStatusInProgress).
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyStatus).
+		Limit(1).
+		Build())
 	if err == nil && len(res.Objects) > 0 {
 		return objects.GetString(res.Objects[0], objects.FieldKeyID), nil
 	}
 
 	// Try active
-	res, err = sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
-		Kind:    objects.KindPriorityPlan,
-		Filters: map[string]any{objects.FieldKeyStatus: objects.ObjectStatusActive},
-	})
+	res, err = sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+		ByStatus(objects.KindPriorityPlan, objects.ObjectStatusActive).
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyStatus).
+		Limit(1).
+		Build())
 	if err == nil && len(res.Objects) > 0 {
 		return objects.GetString(res.Objects[0], objects.FieldKeyID), nil
 	}
 
 	// Try paused
-	res, err = sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
-		Kind:    objects.KindPriorityPlan,
-		Filters: map[string]any{objects.FieldKeyStatus: objects.ObjectStatusPaused},
-	})
+	res, err = sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+		ByStatus(objects.KindPriorityPlan, objects.ObjectStatusPaused).
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyStatus).
+		Limit(1).
+		Build())
 	if err == nil && len(res.Objects) > 0 {
 		return objects.GetString(res.Objects[0], objects.FieldKeyID), nil
 	}

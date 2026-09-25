@@ -215,6 +215,9 @@ func CreateCASVisible(t testing.TB, fs ObjectStorageProvider, ctx context.Contex
 	if objects.GetString(obj, objects.FieldKeyDescription) == "" {
 		obj[objects.FieldKeyDescription] = "Substantive test description for CAS visibility test harness."
 	}
+	if kind == objects.KindPriorityPlan && objects.GetString(obj, objects.FieldKeySourceFormat) == "" {
+		obj[objects.FieldKeySourceFormat] = "manual"
+	}
 	if err := fs.Create(ctx, secCtx, obj); err != nil {
 		t.Fatalf("CreateCASVisible Create %s: %v", id, err)
 	}

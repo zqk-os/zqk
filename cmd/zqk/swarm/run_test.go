@@ -2,12 +2,20 @@ package swarm
 
 import (
 	"bytes"
+	"context"
 	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/zqk-os/zqk/internal/bootstrap"
+	"github.com/zqk-os/zqk/internal/cli"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/swarm/pack"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -105,4 +113,89 @@ agents:
 	if !strings.Contains(out, "cached-swarm v0.1.0") {
 		t.Errorf("expected cached swarm output, got:\n%s", out)
 	}
+}
+
+func TestSwarmRunCommand_LiveIngestionAndPersistence(t *testing.T) {
+	root := t.TempDir()
+	logger := logging.GetLoggerFromProfile("test")
+	if err := bootstrap.ExtractTo(root, logger, true); err != nil {
+		t.Fatalf("bootstrap.ExtractTo failed: %v", err)
+	}
+
+	manifestFile := filepath.Join(root, "swarm.yaml")
+	if err := pack.EnsureSampleSwarm(manifestFile); err != nil {
+		t.Fatalf("EnsureSampleSwarm failed: %v", err)
+	}
+
+	cmd := NewRunCmd()
+	cli.SetContext(cmd, cli.ContextForProjectRoot(root))
+	buf := new(bytes.Buffer)
+	cmd.SetOut(buf)
+	cmd.SetErr(buf)
+	cmd.SetArgs([]string{manifestFile})
+
+	if err := cmd.Execute(); err != nil {
+		t.Fatalf("live execution failed: %v", err)
+	}
+
+	out := buf.String()
+	if !strings.Contains(out, "Swarm Package: sample-refactor-swarm") {
+		t.Errorf("expected swarm package header, got:\n%s", out)
+	}
+	if !strings.Contains(out, "Swarm initialized and dispatch ready") {
+		t.Errorf("expected dispatch ready output, got:\n%s", out)
+	}
+	if !strings.Contains(out, "Active Plan:       PRI-SAMPLE_REFACTOR_SWARM") {
+		t.Errorf("expected Active Plan in output, got:\n%s", out)
+	}
+
+	// Verify persistence in ObjectStorageProvider
+	ctx := context.Background()
+	sec := pkgctx.NewSystemSecurityContext()
+	store, err := storage.GetGlobalStorageProviderCache().GetOrCreate(ctx, root)
+	if err != nil {
+		t.Fatalf("failed to get storage for root %s: %v", root, err)
+	}
+	testkit.RegisterStorageTestCleanup(t, root, store)
+
+	// Verify Priority Plan
+	planObj, err := store.Read(ctx, sec, "PRI-SAMPLE_REFACTOR_SWARM")
+	if err != nil {
+		t.Fatalf("failed to read persisted priority_plan: %v", err)
+	}
+	if planObj[objects.FieldKeyStatus] != objects.ObjectStatusActive {
+		t.Errorf("expected plan status active, got: %v", planObj[objects.FieldKeyStatus])
+	}
+
+	// Verify Backlog Items
+	bliObj, err := store.Read(ctx, sec, "BLI-SAMPLE_REFACTOR_SWARM-TASK_REFACTOR")
+	if err != nil {
+		t.Fatalf("failed to read persisted backlog_item: %v", err)
+	}
+	if bliObj[objects.FieldKeyPriorityPlanRef] != "PRI-SAMPLE_REFACTOR_SWARM" {
+		t.Errorf("expected priority_plan_ref link, got: %v", bliObj[objects.FieldKeyPriorityPlanRef])
+	}
+	if bliObj[objects.FieldKeyStatus] != objects.ObjectStatusPlanned {
+		t.Errorf("expected backlog item status planned, got: %v", bliObj[objects.FieldKeyStatus])
+	}
+
+	// Verify Goal and Milestone
+	if _, err := store.Read(ctx, sec, "GOAL-SAMPLE_REFACTOR_SWARM"); err != nil {
+		t.Errorf("failed to read goal: %v", err)
+	}
+	if _, err := store.Read(ctx, sec, "MIL-SAMPLE_REFACTOR_SWARM"); err != nil {
+		t.Errorf("failed to read milestone: %v", err)
+	}
+	if _, err := store.Read(ctx, sec, "WS-SAMPLE_REFACTOR_SWARM"); err != nil {
+		t.Errorf("failed to read workstream: %v", err)
+	}
+
+	// Verify Requirements and Criteria
+	if _, err := store.Read(ctx, sec, "REQ-SAMPLE_REFACTOR_SWARM-TASK_REFACTOR"); err != nil {
+		t.Errorf("failed to read requirement: %v", err)
+	}
+	if _, err := store.Read(ctx, sec, "CRIT-SAMPLE_REFACTOR_SWARM-TASK_REFACTOR-INV"); err != nil {
+		t.Errorf("failed to read criteria: %v", err)
+	}
+	_ = store.Shutdown(ctx)
 }

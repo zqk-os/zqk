@@ -171,5 +171,50 @@ type mockStorageForTest struct {
 }
 
 func (m *mockStorageForTest) List(ctx context.Context, secCtx *storagepkg.SecurityContext, storageCtx *storagepkg.StorageContext, filter storagepkg.ListFilter) (*storagepkg.QueryResult, error) {
-	return &storagepkg.QueryResult{Objects: m.items}, nil
+	if len(filter.Filters) == 0 {
+		return &storagepkg.QueryResult{Objects: m.items}, nil
+	}
+	var results []map[string]any
+	for _, obj := range m.items {
+		match := true
+		for k, v := range filter.Filters {
+			objVal := obj[k]
+			if opMap, ok := v.(map[string]any); ok {
+				if ninList, hasNin := opMap["$nin"].([]any); hasNin {
+					for _, item := range ninList {
+						if objVal == item {
+							match = false
+							break
+						}
+					}
+				}
+				if neVal, hasNe := opMap["$ne"]; hasNe {
+					if objVal == neVal {
+						match = false
+						break
+					}
+				}
+				if inList, hasIn := opMap["$in"].([]any); hasIn {
+					found := false
+					for _, item := range inList {
+						if objVal == item {
+							found = true
+							break
+						}
+					}
+					if !found {
+						match = false
+						break
+					}
+				}
+			} else if objVal != v {
+				match = false
+				break
+			}
+		}
+		if match {
+			results = append(results, obj)
+		}
+	}
+	return &storagepkg.QueryResult{Objects: results}, nil
 }

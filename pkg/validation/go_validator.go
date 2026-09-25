@@ -194,6 +194,12 @@ func (gv *GoValidator) Validate(ctx context.Context, obj map[string]any, kind st
 		result.Errors = append(result.Errors, customErrors...)
 	}
 
+	// Apply registered extended validation handlers
+	extendedErrors := GetGlobalExtendedValidationRegistry().Validate(ctx, obj, kind, options)
+	if len(extendedErrors) > 0 {
+		result.Errors = append(result.Errors, extendedErrors...)
+	}
+
 	// Cross-plane validation: CAS objects must not reference draft-plane-only objects (crossing the streams).
 	crossPlaneErrors := gv.validateCrossPlaneReferences(obj, kind, options)
 	if len(crossPlaneErrors) > 0 {

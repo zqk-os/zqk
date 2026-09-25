@@ -11,3 +11,6 @@ needs:
   - Fail-closed security boundaries
   - CPCP non-deterministic/deterministic contract verification
   - Zero hardcoded secrets or permissive UNIX socket permissions
+agent_skill_refs:
+  - ASK-SYSTEM-SECURITY-LINTER
+

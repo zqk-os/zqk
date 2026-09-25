@@ -11,3 +11,6 @@ needs:
   - High information density
   - Lossless retention of cryptographic hashes and object IDs
   - Elimination of conversational fluff and redundant tool steps
+agent_skill_refs:
+  - ASK-SYSTEM-CONTEXT-COMPRESSOR
+

@@ -1,5 +1,9 @@
 package crud
 
+import (
+	"github.com/zqk-os/zqk/pkg/objects"
+)
+
 // ListFilter defines filtering, sorting, pagination, and grouping options
 // Filters can be specified as:
 //   - Simple equality: Filters["status"] = "planned"
@@ -16,6 +20,94 @@ type ListFilter struct {
 	// Fields lists top-level YAML keys to return per object after materialization (hybrid projection).
 	// Empty means return full maps. SortBy is merged into the projection mask automatically when Fields is non-empty.
 	Fields []string
+}
+
+// Build returns self (identity), enabling ListFilter to be used wherever a builder's Build() is called.
+func (lf ListFilter) Build() ListFilter {
+	return lf
+}
+
+// ToFilter returns self.
+func (lf ListFilter) ToFilter() ListFilter {
+	return lf
+}
+
+// IncludeFields returns a copy of ListFilter with Fields set.
+func (lf ListFilter) IncludeFields(fields ...string) ListFilter {
+	return lf.WithFields(fields...)
+}
+
+// AndFilter returns a copy of ListFilter with an additional filter condition.
+func (lf ListFilter) AndFilter(field string, value any) ListFilter {
+	return lf.WithFilter(field, value)
+}
+
+// Status returns a copy of ListFilter with status set.
+func (lf ListFilter) Status(status string) ListFilter {
+	return lf.WithFilter(objects.FieldKeyStatus, status)
+}
+
+// StatusIn returns a copy of ListFilter with status in statuses.
+func (lf ListFilter) StatusIn(statuses ...string) ListFilter {
+	vals := make([]any, len(statuses))
+	for i, s := range statuses {
+		vals[i] = s
+	}
+	return lf.WithFilter(objects.FieldKeyStatus, map[string]any{"$in": vals})
+}
+
+// StatusNotIn returns a copy of ListFilter with status not in statuses.
+func (lf ListFilter) StatusNotIn(statuses ...string) ListFilter {
+	vals := make([]any, len(statuses))
+	for i, s := range statuses {
+		vals[i] = s
+	}
+	return lf.WithFilter(objects.FieldKeyStatus, map[string]any{"$nin": vals})
+}
+
+// StatusNot returns a copy of ListFilter with status != status.
+func (lf ListFilter) StatusNot(status string) ListFilter {
+	return lf.WithFilter(objects.FieldKeyStatus, map[string]any{"$ne": status})
+}
+
+// FilterOp returns a copy of ListFilter with an operator condition.
+func (lf ListFilter) FilterOp(field, op string, val any) ListFilter {
+	return lf.WithFilter(field, map[string]any{op: val})
+}
+
+// Id returns a copy of ListFilter with ID filter set.
+func (lf ListFilter) Id(id string) ListFilter {
+	return lf.WithFilter(objects.FieldKeyID, id)
+}
+
+// WithLimit returns a copy of ListFilter with Limit set.
+func (lf ListFilter) WithLimit(limit int) ListFilter {
+	lf.Limit = limit
+	return lf
+}
+
+// WithFields returns a copy of ListFilter with Fields set.
+func (lf ListFilter) WithFields(fields ...string) ListFilter {
+	lf.Fields = append([]string(nil), fields...)
+	return lf
+}
+
+// WithFilter returns a copy of ListFilter with an additional filter condition.
+func (lf ListFilter) WithFilter(field string, value any) ListFilter {
+	m := make(map[string]any, len(lf.Filters)+1)
+	for k, v := range lf.Filters {
+		m[k] = v
+	}
+	m[field] = value
+	lf.Filters = m
+	return lf
+}
+
+// WithSort returns a copy of ListFilter with sorting options set.
+func (lf ListFilter) WithSort(sortBy string, asc bool) ListFilter {
+	lf.SortBy = sortBy
+	lf.SortAsc = asc
+	return lf
 }
 
 // QueryResult contains query execution results

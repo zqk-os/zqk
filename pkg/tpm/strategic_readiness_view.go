@@ -419,8 +419,11 @@ func (v *StrategicReadinessView) ScanFromStorageWithSecurity(ctx context.Context
 	v.mu.Lock()
 	defer v.mu.Unlock()
 
-	// 1. Load priority plans
-	planRes, err := sp.List(ctx, secCtx, nil, storage.ListFilter{Kind: objects.KindPriorityPlan})
+	// 1. Load priority plans (non-archived)
+	planRes, err := sp.List(ctx, secCtx, nil, storage.DefaultQueryFactory.
+		NotArchived(objects.KindPriorityPlan).
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyStatus).
+		Build())
 	if err != nil {
 		return fmt.Errorf("list priority plans: %w", err)
 	}
@@ -433,8 +436,11 @@ func (v *StrategicReadinessView) ScanFromStorageWithSecurity(ctx context.Context
 		}
 	}
 
-	// 2. Load backlog items
-	bliRes, err := sp.List(ctx, secCtx, nil, storage.ListFilter{Kind: objects.KindBacklogItem})
+	// 2. Load backlog items (non-archived)
+	bliRes, err := sp.List(ctx, secCtx, nil, storage.DefaultQueryFactory.
+		NotArchived(objects.KindBacklogItem).
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyPriorityPlanRef, objects.FieldKeyRequirementRefs).
+		Build())
 	if err != nil {
 		return fmt.Errorf("list backlog items: %w", err)
 	}
@@ -452,8 +458,11 @@ func (v *StrategicReadinessView) ScanFromStorageWithSecurity(ctx context.Context
 		}
 	}
 
-	// 3. Load test cases
-	tcRes, err := sp.List(ctx, secCtx, nil, storage.ListFilter{Kind: objects.KindTestCase})
+	// 3. Load test cases (non-archived)
+	tcRes, err := sp.List(ctx, secCtx, nil, storage.DefaultQueryFactory.
+		NotArchived(objects.KindTestCase).
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyCriteriaRefs).
+		Build())
 	if err != nil {
 		return fmt.Errorf("list test cases: %w", err)
 	}
@@ -466,8 +475,11 @@ func (v *StrategicReadinessView) ScanFromStorageWithSecurity(ctx context.Context
 		}
 	}
 
-	// 4. Load requirements
-	reqRes, err := sp.List(ctx, secCtx, nil, storage.ListFilter{Kind: objects.KindRequirement})
+	// 4. Load requirements (non-archived)
+	reqRes, err := sp.List(ctx, secCtx, nil, storage.DefaultQueryFactory.
+		NotArchived(objects.KindRequirement).
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyCriteriaRefs).
+		Build())
 	if err != nil {
 		return fmt.Errorf("list requirements: %w", err)
 	}

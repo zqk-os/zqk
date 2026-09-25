@@ -395,7 +395,10 @@ func (v *WhatsNextMaterializedView) ScanFromStorageWithSecurity(ctx context.Cont
 	storageCtx := pkgctx.NewStorageContext()
 
 	// 1. Scan Priority Plans
-	planRes, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{Kind: objects.KindPriorityPlan})
+	planRes, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+		NotArchived(objects.KindPriorityPlan).
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyActiveOrder, objects.FieldKeyPersonaRefs).
+		Build())
 	if err != nil {
 		return fmt.Errorf("list priority plans: %w", err)
 	}
@@ -424,7 +427,10 @@ func (v *WhatsNextMaterializedView) ScanFromStorageWithSecurity(ctx context.Cont
 	}
 
 	// 2. Scan Backlog Items
-	bliRes, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{Kind: objects.KindBacklogItem})
+	bliRes, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+		NotArchived(objects.KindBacklogItem).
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyPriorityPlanRef, objects.FieldKeyPersonaRefs).
+		Build())
 	if err != nil {
 		return fmt.Errorf("list backlog items: %w", err)
 	}
@@ -448,7 +454,10 @@ func (v *WhatsNextMaterializedView) ScanFromStorageWithSecurity(ctx context.Cont
 	}
 
 	// 3. Scan Convergence Sessions
-	cvsRes, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{Kind: objects.KindConvergenceSession})
+	cvsRes, err := sp.List(ctx, secCtx, storageCtx, storage.NewQueryBuilder(objects.KindConvergenceSession).
+		StatusIn("active", "paused").
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyCurrentPhase, objects.FieldKeyStatus).
+		Build())
 	if err == nil {
 		v.cvsSessions = make(map[string]*CVSNode, len(cvsRes.Objects))
 		for _, obj := range cvsRes.Objects {
@@ -457,10 +466,6 @@ func (v *WhatsNextMaterializedView) ScanFromStorageWithSecurity(ctx context.Cont
 				continue
 			}
 			st, _ := obj[objects.FieldKeyStatus].(string)
-			ls := strings.ToLower(strings.TrimSpace(st))
-			if ls != "active" && ls != "paused" {
-				continue
-			}
 			title, _ := obj[objects.FieldKeyTitle].(string)
 			phase, _ := obj[objects.FieldKeyCurrentPhase].(string)
 			v.cvsSessions[id] = &CVSNode{
@@ -473,7 +478,10 @@ func (v *WhatsNextMaterializedView) ScanFromStorageWithSecurity(ctx context.Cont
 	}
 
 	// 4. Scan Agent Tasks
-	taskRes, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{Kind: objects.KindAgentTask})
+	taskRes, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+		NotArchived(objects.KindAgentTask).
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyAssigneePersonaRef, objects.FieldKeyPipelineRef).
+		Build())
 	if err == nil {
 		v.tasks = make(map[string]*TaskNode, len(taskRes.Objects))
 		for _, obj := range taskRes.Objects {

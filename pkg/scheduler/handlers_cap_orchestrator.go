@@ -136,7 +136,14 @@ func (h *CapOrchestratorHandler) resolveWakePlanID(ctx context.Context, taskID s
 	}
 	secCtx := pkgctx.NewSystemSecurityContext()
 	storageCtx := pkgctx.NewStorageContext()
-	res, err := h.storage.List(ctx, secCtx, storageCtx, storagepkg.ListFilter{Kind: objects.KindPriorityPlan})
+	res, err := h.storage.List(ctx, secCtx, storageCtx, storagepkg.ListFilter{
+		Kind: objects.KindPriorityPlan,
+		Filters: map[string]any{
+			objects.FieldKeyStatus: objects.ObjectStatusActive,
+		},
+		Limit:  1,
+		Fields: []string{objects.FieldKeyID, objects.FieldKeyStatus},
+	})
 	if err != nil || res == nil {
 		return ""
 	}
@@ -158,7 +165,16 @@ func (h *CapOrchestratorHandler) topOpenPlanBLIs(ctx context.Context, planID str
 	}
 	secCtx := pkgctx.NewSystemSecurityContext()
 	storageCtx := pkgctx.NewStorageContext()
-	res, err := h.storage.List(ctx, secCtx, storageCtx, storagepkg.ListFilter{Kind: objects.KindBacklogItem})
+	res, err := h.storage.List(ctx, secCtx, storageCtx, storagepkg.ListFilter{
+		Kind: objects.KindBacklogItem,
+		Filters: map[string]any{
+			objects.FieldKeyPriorityPlanRef: planID,
+			objects.FieldKeyStatus: map[string]any{
+				"$nin": []string{objects.ObjectStatusComplete, "completed", objects.ObjectStatusArchived, "cancelled", "canceled"},
+			},
+		},
+		Fields: []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyDescription, objects.FieldKeyPriorityTier, objects.FieldKeyPriorityPlanRef, objects.FieldKeyStatus},
+	})
 	if err != nil || res == nil {
 		return nil
 	}
@@ -605,7 +621,15 @@ func (h *CapOrchestratorHandler) buildOpenAgentInstructionIndex(ctx context.Cont
 	}
 	secCtx := pkgctx.NewSystemSecurityContext()
 	storageCtx := pkgctx.NewStorageContext()
-	res, err := h.storage.List(ctx, secCtx, storageCtx, storagepkg.ListFilter{Kind: objects.KindAgentInstruction})
+	res, err := h.storage.List(ctx, secCtx, storageCtx, storagepkg.ListFilter{
+		Kind: objects.KindAgentInstruction,
+		Filters: map[string]any{
+			objects.FieldKeyStatus: map[string]any{
+				"$in": []string{objects.ObjectStatusProposed, objects.ObjectStatusInProgress},
+			},
+		},
+		Fields: []string{objects.FieldKeyID, objects.FieldKeyStatus, "persona_id", "plan_id", objects.FieldKeyInstruction},
+	})
 	if err != nil || res == nil {
 		return idx
 	}
@@ -707,7 +731,15 @@ func (h *CapOrchestratorHandler) buildOpenAgentTaskIndex(ctx context.Context) *o
 	}
 	secCtx := pkgctx.NewSystemSecurityContext()
 	storageCtx := pkgctx.NewStorageContext()
-	if res, err := h.storage.List(ctx, secCtx, storageCtx, storagepkg.ListFilter{Kind: objects.KindAgentTask}); err == nil && res != nil {
+	if res, err := h.storage.List(ctx, secCtx, storageCtx, storagepkg.ListFilter{
+		Kind: objects.KindAgentTask,
+		Filters: map[string]any{
+			objects.FieldKeyStatus: map[string]any{
+				"$in": []string{objects.ObjectStatusProposed, objects.ObjectStatusInProgress, objects.ObjectStatusApproved},
+			},
+		},
+		Fields: []string{objects.FieldKeyID, objects.FieldKeyStatus, capFieldTaskID, capFieldPlanID},
+	}); err == nil && res != nil {
 		for _, obj := range res.Objects {
 			idx.rememberIfOpen(obj)
 		}
@@ -879,6 +911,10 @@ func (h *CapOrchestratorHandler) verifyCriticalPackagesHealth(ctx context.Contex
 
 	allJobs, err := h.storage.List(ctx, secCtx, storageCtx, storagepkg.ListFilter{
 		Kind: objects.KindSchedulerJob,
+		Filters: map[string]any{
+			objects.FieldKeyJobType: JobTypeRunWrapper,
+		},
+		Fields: []string{objects.FieldKeyID, objects.FieldKeyJobType, objects.FieldKeyMetadata, objects.FieldKeyLastRunAt},
 	})
 	if err != nil {
 		return false, []string{fmt.Sprintf("failed to list scheduler jobs: %v", err)}, nil
