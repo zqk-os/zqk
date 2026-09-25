@@ -1,3 +1,11 @@
+// Package koi provides the KernelObjectInspector veneer for nil-safe, fluent traversal
+// and spec-driven status assertions on raw map[string]any kernel objects.
+//
+// Implemented under PRI-STARTER-COMMUNITY-031 for:
+//   - BLI-TECH-DEBT-KOI-INSPECTOR
+//   - BLI-TECH-DEBT-LOGGING-SIGNAL
+//   - BLI-TECH-DEBT-QUERY-FACTORY
+//   - BLI-TECH-DEBT-SWARM-METABOLISM
 package koi
 
 import (
