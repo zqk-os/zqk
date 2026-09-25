@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/swarm/metabolism"
 	"github.com/zqk-os/zqk/pkg/swarm/pack"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -118,6 +119,17 @@ func TestBuildCanonicalCEFPack_4WaveDAGAndSeal(t *testing.T) {
 	}
 	if len(digest.KernelObjects) == 0 {
 		t.Fatal("expected kernel objects to be synthesized from code-eval tasks")
+	}
+
+	// 4. Verify centralized paths.ProjectDataDir usage in parameters and membranes
+	outParam, ok := pkg.Parameters["output_dir"]
+	if !ok || outParam.Default != paths.ProjectDataDir+"/runs/code-eval-latest" {
+		t.Errorf("expected output_dir default to reference paths.ProjectDataDir, got %v", outParam.Default)
+	}
+	for _, m := range pkg.Membranes {
+		if strings.HasPrefix(m.Path, ".zqk/") && !strings.HasPrefix(m.Path, paths.ProjectDataDir) {
+			t.Errorf("membrane path %s must use paths.ProjectDataDir", m.Path)
+		}
 	}
 }
 

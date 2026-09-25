@@ -62,8 +62,14 @@ func NewConfigFileWatcher(projectRoot string, coordinator coordination.EventCoor
 		logger:       logger,
 		watchedFiles: make(map[string]fileState),
 		stopChan:     make(chan struct{}),
-		pollInterval: 5 * time.Second, // Poll every 5 seconds (can be made configurable)
 	}
+}
+
+// SetPollInterval configures the polling interval for the watcher.
+func (w *ConfigFileWatcher) SetPollInterval(interval time.Duration) {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	w.pollInterval = interval
 }
 
 // RegisterFile registers a config file to watch
