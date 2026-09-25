@@ -148,7 +148,7 @@ def main():
             "criteria_refs": [item["crit_id"]],
             "test_case_refs": [item["tst_id"]],
             "milestone_refs": ["MIL-LAUNCH-REMEDIATION-P4"],
-            "priority_plan_ref": "PRI-LAUNCH-REMEDIATION-PHASE4",
+            "priority_plan_ref": "PRI-LAUNCH-REMEDIATION-PHASE5",
             "persona_refs": ["PER-COMMUNITY-SOFTWARE-ENGINEER"],
             "estimated_effort": "2h",
             "priority": "high",
