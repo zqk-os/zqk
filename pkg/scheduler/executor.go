@@ -5,6 +5,8 @@ import (
 	"context"
 	"io"
 	"os/exec"
+	"strings"
+	"sync"
 	"syscall"
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
@@ -177,3 +179,96 @@ func (m *MockExecutor) Execute(ctx context.Context, dir string, env []string, na
 	err := cmd.Run()
 	return buf.Bytes(), err
 }
+
+// InProcessHandler defines an in-process command execution handler.
+type InProcessHandler func(ctx context.Context, dir string, env []string, stdin io.Reader, stdout, stderr io.Writer, args ...string) error
+
+// InProcessCmd wraps an in-process handler invocation to satisfy the Cmd interface without OS-level process fork.
+type InProcessCmd struct {
+	ctx     context.Context
+	handler InProcessHandler
+	args    []string
+	dir     string
+	env     []string
+	stdin   io.Reader
+	stdout  io.Writer
+	stderr  io.Writer
+}
+
+func (c *InProcessCmd) Start() error { return nil }
+func (c *InProcessCmd) Wait() error  { return nil }
+func (c *InProcessCmd) Run() error {
+	if c.handler == nil {
+		return nil
+	}
+	return c.handler(c.ctx, c.dir, c.env, c.stdin, c.stdout, c.stderr, c.args...)
+}
+func (c *InProcessCmd) Output() ([]byte, error) {
+	var buf bytes.Buffer
+	c.stdout = &buf
+	err := c.Run()
+	return buf.Bytes(), err
+}
+func (c *InProcessCmd) SetDir(dir string)                        { c.dir = dir }
+func (c *InProcessCmd) SetEnv(env []string)                      { c.env = env }
+func (c *InProcessCmd) SetStdin(r io.Reader)                     { c.stdin = r }
+func (c *InProcessCmd) SetStdout(w io.Writer)                    { c.stdout = w }
+func (c *InProcessCmd) SetStderr(w io.Writer)                    { c.stderr = w }
+func (c *InProcessCmd) SetSysProcAttr(attr *syscall.SysProcAttr) {}
+func (c *InProcessCmd) GetPid() int                              { return 0 }
+
+// InProcessExecutor intercepts registered commands to execute them directly in-process,
+// eliminating process fork latency, memory overhead, and subprocess cancellation failure modes.
+type InProcessExecutor struct {
+	fallback CommandExecutor
+	handlers map[string]InProcessHandler
+	mu       sync.RWMutex
+}
+
+// NewInProcessExecutor creates an InProcessExecutor with a fallback executor.
+func NewInProcessExecutor(fallback CommandExecutor) *InProcessExecutor {
+	if fallback == nil {
+		fallback = &NativeExecutor{}
+	}
+	return &InProcessExecutor{
+		fallback: fallback,
+		handlers: make(map[string]InProcessHandler),
+	}
+}
+
+// RegisterHandler registers an in-process execution handler for a specific command key or subcommand path.
+func (e *InProcessExecutor) RegisterHandler(key string, handler InProcessHandler) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	e.handlers[key] = handler
+}
+
+// CommandContext checks for registered in-process handlers matching the command or argument signature.
+func (e *InProcessExecutor) CommandContext(ctx context.Context, name string, args ...string) Cmd {
+	e.mu.RLock()
+	defer e.mu.RUnlock()
+
+	// Check full signature first
+	full := name
+	for _, a := range args {
+		full += " " + a
+	}
+	if h, ok := e.handlers[full]; ok {
+		return &InProcessCmd{ctx: ctx, handler: h, args: args}
+	}
+
+	// Check command key containment (e.g. "scheduler convergence measure" within "bin/zqk scheduler convergence measure ...")
+	for key, h := range e.handlers {
+		if strings.Contains(full, key) {
+			return &InProcessCmd{ctx: ctx, handler: h, args: args}
+		}
+	}
+
+	// Check name
+	if h, ok := e.handlers[name]; ok {
+		return &InProcessCmd{ctx: ctx, handler: h, args: args}
+	}
+
+	return e.fallback.CommandContext(ctx, name, args...)
+}
+

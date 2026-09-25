@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"io"
 	"strings"
 	"testing"
 )
@@ -81,3 +82,46 @@ func TestMockExecutor(t *testing.T) {
 		}
 	})
 }
+
+func TestInProcessExecutor(t *testing.T) {
+	mockFallback := &MockExecutor{
+		CommandContextFn: func(ctx context.Context, name string, args ...string) Cmd {
+			return &MockCmd{OutputBytes: []byte("fallback: " + name)}
+		},
+	}
+	inproc := NewInProcessExecutor(mockFallback)
+
+	// Register an in-process handler for "scheduler convergence measure"
+	inproc.RegisterHandler("scheduler convergence measure", func(ctx context.Context, dir string, env []string, stdin io.Reader, stdout, stderr io.Writer, args ...string) error {
+		_, _ = stdout.Write([]byte(`{"rollup_status":"success","in_process":true}`))
+		return nil
+	})
+
+	ctx := context.Background()
+
+	t.Run("Executes registered command in-process without process fork", func(t *testing.T) {
+		cmd := inproc.CommandContext(ctx, "bin/zqk", "scheduler", "convergence", "measure", "--session-id", "CVS-123")
+		out, err := cmd.Output()
+		if err != nil {
+			t.Fatalf("expected no error, got %v", err)
+		}
+		if !strings.Contains(string(out), `"rollup_status":"success"`) {
+			t.Errorf("expected in-process json result, got %s", string(out))
+		}
+		if cmd.GetPid() != 0 {
+			t.Errorf("expected in-process pid 0, got %d", cmd.GetPid())
+		}
+	})
+
+	t.Run("Unregistered commands fall back to fallback executor", func(t *testing.T) {
+		cmd := inproc.CommandContext(ctx, "git", "status")
+		out, err := cmd.Output()
+		if err != nil {
+			t.Fatalf("expected no error, got %v", err)
+		}
+		if string(out) != "fallback: git" {
+			t.Errorf("expected fallback output, got %s", string(out))
+		}
+	})
+}
+
