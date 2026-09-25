@@ -241,6 +241,95 @@ func TestGoValidator_TDDTestRedPhase(t *testing.T) {
 	if !gv.checkTDDTestRedPhase(obj, opts) {
 		t.Errorf("expected true when valid criteria and test case")
 	}
+
+	// multiple criteria: one has test case, one does not -> MUST FAIL (strict TDD)
+	optsPartial := &ValidationOptions{
+		ObjectStatusLookup: func(id string) (string, error) {
+			return "active", nil
+		},
+		DependentsLookup: func(id string) []string {
+			if id == "CRIT-1" {
+				return []string{"TST-1"}
+			}
+			return nil
+		},
+	}
+	objMulti := map[string]any{
+		"criteria_refs": []string{"CRIT-1", "CRIT-2"},
+	}
+	if gv.checkTDDTestRedPhase(objMulti, optsPartial) {
+		t.Errorf("expected false when one of the criteria has no linked test case")
+	}
+}
+
+func TestGoValidator_CriteriaLinkedToActiveTestCase(t *testing.T) {
+	gv := NewGoValidator()
+
+	// nil options -> false
+	if gv.checkCriteriaLinkedToActiveTestCase(map[string]any{"id": "CRIT-1"}, nil) {
+		t.Errorf("expected false for nil options")
+	}
+
+	// no test cases linked -> false
+	optsNoTests := &ValidationOptions{
+		DependentsLookup: func(id string) []string {
+			return nil
+		},
+	}
+	if gv.checkCriteriaLinkedToActiveTestCase(map[string]any{"id": "CRIT-1"}, optsNoTests) {
+		t.Errorf("expected false when no test case linked")
+	}
+
+	// forward test_case_refs -> true
+	optsForward := &ValidationOptions{
+		ObjectStatusLookup: func(id string) (string, error) {
+			if id == "TST-ACTIVE" {
+				return "active", nil
+			}
+			return "archived", nil
+		},
+	}
+	if !gv.checkCriteriaLinkedToActiveTestCase(map[string]any{"id": "CRIT-1", "test_case_refs": []string{"TST-ACTIVE"}}, optsForward) {
+		t.Errorf("expected true when active test case in forward test_case_refs")
+	}
+
+	// reverse dependent TST-1 in active status -> true
+	optsReverse := &ValidationOptions{
+		DependentsLookup: func(id string) []string {
+			if id == "CRIT-1" {
+				return []string{"TST-1"}
+			}
+			return nil
+		},
+		ObjectStatusLookup: func(id string) (string, error) {
+			if id == "TST-1" {
+				return "active", nil
+			}
+			return "archived", nil
+		},
+	}
+	if !gv.checkCriteriaLinkedToActiveTestCase(map[string]any{"id": "CRIT-1"}, optsReverse) {
+		t.Errorf("expected true when active test case in dependents")
+	}
+
+	// reverse dependent TST-1 in archived status -> false
+	optsArchived := &ValidationOptions{
+		DependentsLookup: func(id string) []string {
+			return []string{"TST-1"}
+		},
+		ObjectStatusLookup: func(id string) (string, error) {
+			return "archived", nil
+		},
+	}
+	if gv.checkCriteriaLinkedToActiveTestCase(map[string]any{"id": "CRIT-1"}, optsArchived) {
+		t.Errorf("expected false when dependent test case is archived")
+	}
+
+	// full dispatch through precondition string
+	handled, met := gv.evaluatePrecondition("Must link to an active test_case", map[string]any{"id": "CRIT-1"}, optsReverse)
+	if !handled || !met {
+		t.Errorf("expected precondition dispatch to be handled and met, got handled=%v, met=%v", handled, met)
+	}
 }
 
 func TestGoValidator_DynamicRulesAndCustomRules(t *testing.T) {

@@ -388,6 +388,24 @@ func (f *FileObjectStorage) validateReferences(obj map[string]any, kind string) 
 			if fileInfo != nil && fileInfo.IsDir() {
 				return errfmt.Errorf(ConstStreamReferencedObjectStrKindStrInFieldStrPathStr, refID, refKind, fieldName, refFilePath)
 			}
+
+			// Pre-save target state validation: verify referenced object is in expected state
+			if fieldName == objects.FieldKeyCriteriaRefs || fieldName == "criteria_ref" ||
+				fieldName == objects.FieldKeyTestCaseRefs || (kind == objects.KindTestCase && refKind == objects.KindCriteria) {
+				if refData, rErr := f.Read(context.Background(), pkgctx.NewSystemSecurityContext(), actualRefID); rErr == nil && refData != nil {
+					refStatus, _ := refData[objects.FieldKeyStatus].(string)
+					refStatus = strings.ToLower(strings.TrimSpace(refStatus))
+					if refKind == objects.KindCriteria {
+						if refStatus == objects.ObjectStatusArchived || refStatus == "rejected" {
+							return errfmt.Errorf("cannot link %s to criteria %s: criterion is in %s status", kind, actualRefID, refStatus)
+						}
+					} else if refKind == objects.KindTestCase {
+						if refStatus == objects.ObjectStatusArchived || refStatus == "error" {
+							return errfmt.Errorf("cannot link %s to test_case %s: test_case is in %s status", kind, actualRefID, refStatus)
+						}
+					}
+				}
+			}
 		}
 	}
 

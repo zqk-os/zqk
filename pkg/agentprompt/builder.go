@@ -116,6 +116,8 @@ type TaskPromptOptions struct {
 	TokenBudget   int    // Maximum tokens for the prompt, defaults to 32768
 	// Layer Persist writes the compact envelope only. Execute (default) still uses refs, not bodies.
 	Layer PromptLayer
+	// InlineBodies inlines policy descriptions and skill instruction bodies into the execution prompt.
+	InlineBodies bool
 	// IncludeObserver adds a live, task-scoped AST hint. Default is the tool-access
 	// pointer only. Never persist the hint on agent_task.
 	IncludeObserver bool
@@ -135,11 +137,15 @@ func BuildTaskPrompt(ctx context.Context, sp storage.ObjectStorageProvider, secC
 
 	personaID := resolvePersonaID(opts)
 
-	// 1. Bound policies (standing + persona) — refs, not the full catalog bodies.
+	// 1. Bound policies (standing + persona) — bodies when InlineBodies, refs otherwise
 	policiesEnv, err := LoadBoundPolicies(ctx, sp, secCtx, personaID)
 	var policySection string
 	if err == nil && policiesEnv != nil {
-		policySection = policiesEnv.GeneratePromptSection()
+		if opts.InlineBodies {
+			policySection = policiesEnv.GeneratePromptSectionBodies()
+		} else {
+			policySection = policiesEnv.GeneratePromptSectionRefs()
+		}
 	}
 
 	// 2. Fetch Autonomous Feedback
@@ -156,7 +162,11 @@ func BuildTaskPrompt(ctx context.Context, sp storage.ObjectStorageProvider, secC
 	}
 	var skillSection string
 	if skillEnforcement != nil {
-		skillSection = skillEnforcement.GeneratePromptSection()
+		if opts.InlineBodies {
+			skillSection = skillEnforcement.GeneratePromptSectionOpts(0)
+		} else {
+			skillSection = skillEnforcement.GeneratePromptSectionRefs()
+		}
 	}
 
 	// 4. Observer: tool access always. Task-scoped hits are opt-in and never persisted.
@@ -191,6 +201,25 @@ func BuildTaskPrompt(ctx context.Context, sp storage.ObjectStorageProvider, secC
 	}
 	if opts.TargetAgent != "" {
 		coreSb.WriteString(fmt.Sprintf("Target Agent/Pod: %s (Capability: %s)\n", opts.TargetAgent, opts.Capability))
+	}
+	if personaID != "" && sp != nil {
+		if personaObj, err := sp.Read(ctx, secCtx, personaID); err == nil && personaObj != nil {
+			role, _ := personaObj[objects.FieldKeyRole].(string)
+			desc, _ := personaObj[objects.FieldKeyDescription].(string)
+			sysPrompt, _ := personaObj["system_prompt"].(string)
+			if role != "" || desc != "" || sysPrompt != "" {
+				coreSb.WriteString("## Assigned Persona & Directives\n")
+				if role != "" {
+					coreSb.WriteString(fmt.Sprintf("- Role: %s (%s)\n", role, personaID))
+				}
+				if desc != "" {
+					coreSb.WriteString(fmt.Sprintf("- Profile: %s\n", strings.TrimSpace(desc)))
+				}
+				if sysPrompt != "" {
+					coreSb.WriteString(fmt.Sprintf("- Directives: %s\n", strings.TrimSpace(sysPrompt)))
+				}
+			}
+		}
 	}
 	coreSb.WriteString("\n")
 
@@ -238,10 +267,23 @@ func BuildTaskPrompt(ctx context.Context, sp storage.ObjectStorageProvider, secC
 	var footerSb strings.Builder
 	footerSb.WriteString("## Standing mandates\n")
 	footerSb.WriteString(paths.RewriteCanonicalCLIInvocations("Resolve bodies with `zqk object get`. Do not copy them into the task object.\n"))
+	tddID, tddTitle := ResolvePolicyByIntent(ctx, sp, secCtx, "testing", "Test-Driven Development", "TDD")
 	if opts.IncludeTDD {
-		footerSb.WriteString(fmt.Sprintf("- TDD: `%s`\n", StandingPolicyTDD))
+		if tddID != "" {
+			footerSb.WriteString(fmt.Sprintf("- TDD: `%s` (%s)\n", tddID, tddTitle))
+		} else {
+			footerSb.WriteString(fmt.Sprintf("- TDD: `%s`\n", StandingPolicyTDD))
+		}
 	}
-	footerSb.WriteString(fmt.Sprintf("- Flywheel (Anti-Idleness Protocol): `%s` — summary/merge is a milestone transition, never a stopping condition; advance autonomously without yielding to idle.\n\n", StandingPolicyFlywheel))
+	flyID, flyTitle := ResolvePolicyByIntent(ctx, sp, secCtx, "workflow", "Pull Request-Only", "Plan-Scoped", "Flywheel")
+	if flyID == "" {
+		flyID, flyTitle = ResolvePolicyByIntent(ctx, sp, secCtx, "agent_guidance", "Autonomous", "Swarm Concurrency", "Flywheel")
+	}
+	if flyID != "" {
+		footerSb.WriteString(fmt.Sprintf("- Flywheel (Anti-Idleness Protocol): `%s` (%s) — summary/merge is a milestone transition, never a stopping condition; advance autonomously without yielding to idle.\n\n", flyID, flyTitle))
+	} else {
+		footerSb.WriteString(fmt.Sprintf("- Flywheel (Anti-Idleness Protocol): `%s` — summary/merge is a milestone transition, never a stopping condition; advance autonomously without yielding to idle.\n\n", StandingPolicyFlywheel))
+	}
 	if opts.ValidationDSL != "" {
 		footerSb.WriteString("## Validation DSL (Verification Steps)\n")
 		footerSb.WriteString(opts.ValidationDSL)

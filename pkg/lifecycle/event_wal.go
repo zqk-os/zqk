@@ -55,6 +55,8 @@ const (
 	EventTypeStatusTransition EventType = "status_transition"
 	// EventTypeCriterionSatisfied records that a criterion was satisfied (criterion_id, scope).
 	EventTypeCriterionSatisfied EventType = "criterion_satisfied"
+	// EventTypeReferenceLinked records that a reference link was created or updated between objects.
+	EventTypeReferenceLinked EventType = "reference_linked"
 )
 
 // LifecycleEvent is one durable record in the lifecycle event WAL.
@@ -67,6 +69,9 @@ type LifecycleEvent struct {
 	FromStatus  string            `json:"from_status,omitempty"`
 	ToStatus    string            `json:"to_status,omitempty"`
 	CriterionID string            `json:"criterion_id,omitempty"`
+	TargetKind  string            `json:"target_kind,omitempty"`
+	TargetID    string            `json:"target_id,omitempty"`
+	FieldName   string            `json:"field_name,omitempty"`
 	Scope       map[string]string `json:"scope,omitempty"`
 }
 

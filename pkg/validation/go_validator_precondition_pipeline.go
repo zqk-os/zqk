@@ -138,6 +138,15 @@ var precondDecideRules = []precondDecideRule{
 	matchContains("tdd_test_red_phase", strings.ToLower(PrecondTDDTestRedPhase), func(gv *GoValidator, _ string, obj map[string]any, options *ValidationOptions) bool {
 		return gv.checkTDDTestRedPhase(obj, options)
 	}),
+	matchContains("criteria_active_test_case", strings.ToLower(PrecondCriteriaLinkedToActiveTestCase), func(gv *GoValidator, _ string, obj map[string]any, options *ValidationOptions) bool {
+		return gv.checkCriteriaLinkedToActiveTestCase(obj, options)
+	}),
+	matchContains("criteria_active_test_case_formal", strings.ToLower(PrecondActiveTestCaseRefLinked), func(gv *GoValidator, _ string, obj map[string]any, options *ValidationOptions) bool {
+		if strings.ToLower(objects.GetString(obj, objects.FieldKeyKind)) == objects.KindCriteria {
+			return gv.checkCriteriaLinkedToActiveTestCase(obj, options)
+		}
+		return false
+	}),
 	matchContains("shovel_ready", strings.ToLower(PrecondCRIShovelReady), func(_ *GoValidator, _ string, obj map[string]any, _ *ValidationOptions) bool {
 		return EvaluateShovelReady(obj).Ready
 	}),
@@ -494,8 +503,8 @@ func collectActiveRefFields(precondition string) []string {
 	return refFields
 }
 
-// checkTDDTestRedPhase verifies that a backlog_item links to at least one criteria
-// which is itself linked to at least one test_case in draft, active, or error status.
+// checkTDDTestRedPhase verifies that a backlog_item links to criteria
+// and that all of those criteria are linked to at least one test_case in ready/active status.
 func (gv *GoValidator) checkTDDTestRedPhase(obj map[string]any, options *ValidationOptions) bool {
 	if options == nil || options.ObjectStatusLookup == nil || options.DependentsLookup == nil {
 		return false
@@ -508,17 +517,67 @@ func (gv *GoValidator) checkTDDTestRedPhase(obj map[string]any, options *Validat
 
 	for _, critID := range critIDs {
 		deps := options.DependentsLookup(critID)
+		hasTest := false
 		for _, depID := range deps {
 			if strings.HasPrefix(depID, "TST-") {
 				status, err := options.ObjectStatusLookup(depID)
 				if err == nil {
 					status = strings.ToLower(strings.TrimSpace(status))
-					if status == "draft" || status == "active" || status == "error" || status == "complete" || status == "metrics_captured" {
-						return true
+					if isTestCaseReadyStatus(status) {
+						hasTest = true
+						break
 					}
 				}
 			}
 		}
+		if !hasTest {
+			return false
+		}
 	}
+	return true
+}
+
+// checkCriteriaLinkedToActiveTestCase verifies that a criterion is linked to at least one test_case in an active/ready state.
+func (gv *GoValidator) checkCriteriaLinkedToActiveTestCase(obj map[string]any, options *ValidationOptions) bool {
+	if options == nil {
+		return false
+	}
+
+	// 1. Direct forward reference: test_case_refs on the criterion
+	tcIDs := gv.extractIDsFromField(obj, "test_case_refs")
+	for _, tcID := range tcIDs {
+		if options.ObjectStatusLookup != nil {
+			status, err := options.ObjectStatusLookup(tcID)
+			if err == nil && isTestCaseReadyStatus(status) {
+				return true
+			}
+		} else {
+			return true
+		}
+	}
+
+	// 2. Reverse reference via DependentsLookup
+	critID, _ := obj[objects.FieldKeyID].(string)
+	if critID != "" && options.DependentsLookup != nil {
+		deps := options.DependentsLookup(critID)
+		for _, depID := range deps {
+			if strings.HasPrefix(depID, "TST-") {
+				if options.ObjectStatusLookup != nil {
+					status, err := options.ObjectStatusLookup(depID)
+					if err == nil && isTestCaseReadyStatus(status) {
+						return true
+					}
+				} else {
+					return true
+				}
+			}
+		}
+	}
+
 	return false
+}
+
+func isTestCaseReadyStatus(status string) bool {
+	s := strings.ToLower(strings.TrimSpace(status))
+	return s == "active" || s == "draft" || s == "metrics_captured" || s == "complete" || s == "error"
 }

@@ -43,7 +43,7 @@ func TestGeneratePromptSection_refsNotBodies(t *testing.T) {
 }
 
 func TestSkillMatchesQuery_titleTokens(t *testing.T) {
-	if !skillMatchesQuery("run zqk test run", "Scheduler Expert Protocol", "", "") {
+	if !skillMatchesQuery("run scheduler test run", "Scheduler Expert Protocol", "", "") {
 		t.Fatal("expected scheduler token match")
 	}
 	if skillMatchesQuery("unrelated gardening", "Scheduler Expert Protocol", "", "") {
@@ -98,6 +98,11 @@ func (m *testMockSP) Read(ctx context.Context, secCtx *pkgctx.SecurityContext, i
 		return obj, nil
 	}
 	return nil, storage.ErrObjectNotFound
+}
+
+func (m *testMockSP) Exists(ctx context.Context, secCtx *pkgctx.SecurityContext, id string) (bool, error) {
+	_, ok := m.objects[id]
+	return ok, nil
 }
 
 func (m *testMockSP) Update(ctx context.Context, secCtx *pkgctx.SecurityContext, id string, obj map[string]any) error {

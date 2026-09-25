@@ -1,20 +1,26 @@
 package swarm
 
 import (
+	"bufio"
 	stdcontext "context"
 	"fmt"
+	"os"
 	"path/filepath"
 	"sort"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/spf13/cobra"
+	"golang.org/x/term"
+
 	"github.com/zqk-os/zqk/cmd/zqk/system"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/agentfeed"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -24,15 +30,20 @@ import (
 	"github.com/zqk-os/zqk/pkg/swarm/pack"
 	"github.com/zqk-os/zqk/pkg/swarm/remote"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/workflow/whatsnext"
 )
 
 // NewRunCmd creates a new swarm run command.
 func NewRunCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewSwarmRunCommandBuilder()
+	cmd.Flags().Bool("stage-only", false, "Stage and ingest the swarm package into the kernel without launching execution")
+	cmd.Flags().BoolP("yes", "y", false, "Launch the swarm automatically without interactive confirmation")
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		entrypoint, _ := cmd.Flags().GetString("entrypoint")
-		return runSwarmPackage(cmd, args[0], dryRun, entrypoint)
+		stageOnly, _ := cmd.Flags().GetBool("stage-only")
+		autoLaunch, _ := cmd.Flags().GetBool("yes")
+		return runSwarmPackage(cmd, args[0], dryRun, entrypoint, stageOnly, autoLaunch)
 	}
 	return cmd
 }
@@ -40,15 +51,19 @@ func NewRunCmd() *cobra.Command {
 // NewTopLevelRunCmd creates the root 'zqk run' command.
 func NewTopLevelRunCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewRunCommandBuilder()
+	cmd.Flags().Bool("stage-only", false, "Stage and ingest the swarm package into the kernel without launching execution")
+	cmd.Flags().BoolP("yes", "y", false, "Launch the swarm automatically without interactive confirmation")
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		entrypoint, _ := cmd.Flags().GetString("entrypoint")
-		return runSwarmPackage(cmd, args[0], dryRun, entrypoint)
+		stageOnly, _ := cmd.Flags().GetBool("stage-only")
+		autoLaunch, _ := cmd.Flags().GetBool("yes")
+		return runSwarmPackage(cmd, args[0], dryRun, entrypoint, stageOnly, autoLaunch)
 	}
 	return cmd
 }
 
-func runSwarmPackage(cmd *cobra.Command, targetPath string, dryRun bool, entrypointOverride string) error {
+func runSwarmPackage(cmd *cobra.Command, targetPath string, dryRun bool, entrypointOverride string, stageOnly bool, autoLaunch bool) error {
 	logger := logging.GetLoggerFromContext(cmd.Context())
 
 	manifestPath := targetPath
@@ -328,11 +343,27 @@ func runSwarmPackage(cmd *cobra.Command, targetPath string, dryRun bool, entrypo
 		_ = revIndex.SaveCache(projectRoot)
 	}
 
-	if err := sp.Update(opCtx, secCtx, planID, map[string]any{
-		objects.FieldKeyStatus:      objects.ObjectStatusActive,
-		objects.FieldKeyActiveOrder: 1,
-	}); err != nil {
-		return errfmt.Newf("failed to activate priority plan %s", planID).Wrap(err)
+	// Promote Priority Plan to Active if not already active or in_progress
+	planObj, planErr := sp.Read(opCtx, secCtx, planID)
+	curStatus := ""
+	if planErr == nil && planObj != nil {
+		curStatus, _ = planObj[objects.FieldKeyStatus].(string)
+	}
+	if curStatus != objects.ObjectStatusActive && curStatus != objects.ObjectStatusInProgress {
+		if err := sp.Update(opCtx, secCtx, planID, map[string]any{
+			objects.FieldKeyStatus:      objects.ObjectStatusActive,
+			objects.FieldKeyActiveOrder: 1,
+		}); err != nil {
+			return errfmt.Newf("failed to activate priority plan %s", planID).Wrap(err)
+		}
+	}
+
+	// Invalidate and refresh materialized view cache so whats-next and scheduler see the plan and tasks immediately
+	if projectRoot != "" && sp != nil {
+		mv := whatsnext.NewWhatsNextMaterializedView(projectRoot)
+		if scanErr := mv.ScanFromStorageWithSecurity(opCtx, sp, secCtx); scanErr == nil {
+			_ = mv.SaveToLiteFile()
+		}
 	}
 
 	// Emit Swarm Launch Steering to Agent Feed
@@ -352,5 +383,63 @@ func runSwarmPackage(cmd *cobra.Command, targetPath string, dryRun bool, entrypo
 	fmt.Fprintf(out, "  • Graph Ingested:    %d kernel objects persisted, %d prompt templates stored\n", objectsPersisted, templatesStored)
 	fmt.Fprintf(out, "  • Active Plan:       %s\n", planID)
 	fmt.Fprintf(out, "  • Output Directory:  %s\n", outputDir)
+
+	if stageOnly {
+		fmt.Fprintf(out, "\nSwarm staged (stage-only mode). Launch anytime with:\n  zqk agent orchestrate %s\n", planID)
+		return nil
+	}
+
+	launch := autoLaunch
+	if !launch {
+		if term.IsTerminal(int(os.Stdin.Fd())) {
+			fmt.Fprintf(out, "\nLaunch the swarm now? [Y/n]: ")
+			reader := bufio.NewReader(os.Stdin)
+			ans, err := reader.ReadString('\n')
+			if err == nil {
+				ans = strings.TrimSpace(strings.ToLower(ans))
+				if ans == "" || ans == "y" || ans == "yes" {
+					launch = true
+				}
+			}
+		} else {
+			// In non-interactive environments without --stage-only, execute by default
+			launch = true
+		}
+	}
+
+	if !launch {
+		fmt.Fprintf(out, "\nSwarm staged. Launch anytime with:\n  zqk agent orchestrate %s\n", planID)
+		return nil
+	}
+
+	// Launch swarm orchestration in the background
+	exe, err := os.Executable()
+	if err != nil {
+		exe = "zqk"
+	}
+	logRelPath := filepath.Join(paths.ProjectDataDir, paths.LogsDir, fmt.Sprintf("swarm-orchestrate-%s.log", strings.ToLower(cleanName)))
+	logPath := filepath.Join(projectRoot, logRelPath)
+	_ = fileutil.EnsureDir(filepath.Dir(logPath))
+	logFile, err := fileutil.OpenAppend(logPath)
+	if err != nil {
+		return errfmt.Newf("failed to open swarm orchestrate log %s", logPath).Wrap(err)
+	}
+
+	orchCmd := execwrap.Command(exe, "agent", "orchestrate", planID)
+	orchCmd.Dir = projectRoot
+	orchCmd.Stdout = logFile
+	orchCmd.Stderr = logFile
+	orchCmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true}
+
+	if err := orchCmd.Start(); err != nil {
+		_ = logFile.Close()
+		return errfmt.Newf("failed to launch swarm orchestrator").Wrap(err)
+	}
+	_ = logFile.Close()
+
+	fmt.Fprintf(out, "\n🚀 Swarm launched in background (PID: %d)\n", orchCmd.Process.Pid)
+	fmt.Fprintf(out, "  • Plan:     %s\n", planID)
+	fmt.Fprintf(out, "  • Logs:     %s\n", logRelPath)
+	fmt.Fprintf(out, "  • Monitor:  zqk agent status  OR  zqk ui\n")
 	return nil
 }

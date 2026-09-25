@@ -157,6 +157,8 @@ const (
 	PrecondCRIShovelReady = shovelready.Precondition
 	// PrecondTDDTestRedPhase requires that the object links to a criteria linked to a red test case
 	PrecondTDDTestRedPhase = "Must link to a criteria object which is linked to an active but failing test_case (Red TDD phase)"
+	// PrecondCriteriaLinkedToActiveTestCase requires that a criterion links to an active/ready test case
+	PrecondCriteriaLinkedToActiveTestCase = "Must link to an active test_case"
 	// PrecondAllLinkedBacklogReadyOrLater gates execution lock (→in_progress), including shockwave:
 	// every linked backlog_item must be planned+ (ready-or-later). Vacuous true when no BLI dependents.
 	PrecondAllLinkedBacklogReadyOrLater = "all linked backlog_items referencing this plan are ready or later"

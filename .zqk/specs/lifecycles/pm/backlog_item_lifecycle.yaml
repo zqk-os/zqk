@@ -351,6 +351,8 @@ transitions:
     auto: false
     preconditions:
       - Standard checks pass
+      - Must link to a criteria object which is linked to an active but failing 
+        test_case (Red TDD phase)
     postconditions:
       - role is execution_locked
     catalyst: Standard progression

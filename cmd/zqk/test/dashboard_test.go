@@ -740,3 +740,36 @@ func TestDashboardState_StartBackgroundWALSubscriber(t *testing.T) {
 		t.Fatal("timed out waiting for WAL subscriber to process event")
 	}
 }
+
+func TestDashboardState_HandleReferenceLinkedEvent(t *testing.T) {
+	state := NewDashboardState()
+	tc := &TestCaseModel{
+		ID:       "TST-101",
+		Status:   objects.ObjectStatusActive,
+		Criteria: make([]*CriterionState, 0),
+	}
+	state.TestCases[tc.ID] = tc
+
+	// Dispatch reference_linked event: TST-101 linked to CRIT-101
+	ev := &lifecycle.LifecycleEvent{
+		Seq:        1,
+		Ts:         time.Now(),
+		EventType:  lifecycle.EventTypeReferenceLinked,
+		Kind:       objects.KindTestCase,
+		ID:         "TST-101",
+		TargetKind: objects.KindCriteria,
+		TargetID:   "CRIT-101",
+		FieldName:  "criteria_refs",
+	}
+	state.HandleLifecycleEvent(ev)
+
+	if len(tc.Criteria) != 1 || tc.Criteria[0].ID != "CRIT-101" {
+		t.Fatalf("expected criterion CRIT-101 linked to TST-101 in-memory, got %v", tc.Criteria)
+	}
+	if len(state.CriteriaIndex["CRIT-101"]) != 1 {
+		t.Errorf("expected CriteriaIndex for CRIT-101 to contain TST-101")
+	}
+	if len(state.RecentEvents) != 1 || !strings.Contains(state.RecentEvents[0].Message, "LINKAGE SHOCKWAVE") {
+		t.Errorf("expected LINKAGE SHOCKWAVE in recent events, got %v", state.RecentEvents)
+	}
+}
