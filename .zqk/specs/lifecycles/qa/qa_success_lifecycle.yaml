@@ -55,3 +55,11 @@ transitions:
     manual: true
     auto: true
     catalyst: System initialization
+percent_complete:
+  method: status_defaults
+  default_by_status:
+    conceptual: 0
+    originated: 50
+    success: 100
+    failure: 100
+    archived: 100
