@@ -227,6 +227,95 @@ func TestNewBundle_defaultOutput_createsDraftAndLastDraftPointer(t *testing.T) {
 	}
 }
 
+func TestNewScenario_alias_stdout_contains_scenario_bundle(t *testing.T) {
+	var buf bytes.Buffer
+	ctx := pkgctx.WithCommandOutputWriter(context.Background(), &buf)
+	cmd := NewNewCmd()
+	cmd.SetContext(ctx)
+	cmd.SetArgs([]string{"scenario", "-o", "-", "--name", "scenario-alias-test"})
+	if err := cmd.Execute(); err != nil {
+		t.Fatal(err)
+	}
+	out := buf.String()
+	if !strings.Contains(out, "kind: scenario_bundle") || !strings.Contains(out, "name: scenario-alias-test") {
+		t.Fatalf("expected scenario_bundle in stdout, got: %q", out)
+	}
+}
+
+func TestNewSwarm_stdout_contains_swarm_package(t *testing.T) {
+	var buf bytes.Buffer
+	ctx := pkgctx.WithCommandOutputWriter(context.Background(), &buf)
+	cmd := NewNewCmd()
+	cmd.SetContext(ctx)
+	cmd.SetArgs([]string{"swarm", "-o", "-", "--name", "my-swarm-test", "--description", "Autonomous migration pipeline"})
+	if err := cmd.Execute(); err != nil {
+		t.Fatal(err)
+	}
+	out := buf.String()
+	for _, needle := range []string{
+		"name: my-swarm-test",
+		"version: 1.0.0",
+		"description: Autonomous migration pipeline",
+		"entrypoint: task-execute",
+		"agents:",
+		"tasks:",
+		"task-execute",
+		"task-verify",
+	} {
+		if !strings.Contains(out, needle) {
+			t.Fatalf("stdout missing %q:\n%s", needle, out)
+		}
+	}
+}
+
+func TestNewSwarm_cellular_archetype_stdout(t *testing.T) {
+	var buf bytes.Buffer
+	ctx := pkgctx.WithCommandOutputWriter(context.Background(), &buf)
+	cmd := NewNewCmd()
+	cmd.SetContext(ctx)
+	cmd.SetArgs([]string{"swarm-manifest", "-o", "-", "--name", "neuron-cell", "--cell-type", "neuron"})
+	if err := cmd.Execute(); err != nil {
+		t.Fatal(err)
+	}
+	out := buf.String()
+	if !strings.Contains(out, "team_configuration:") || !strings.Contains(out, "cell_type: neuron") {
+		t.Fatalf("expected cellular team_configuration in stdout, got:\n%s", out)
+	}
+}
+
+func TestNewSwarm_defaultOutput_createsDraftAndLastDraftPointer(t *testing.T) {
+	tmp := t.TempDir()
+	if err := fileutil.EnsureDir(filepath.Join(tmp, paths.ProjectDataDir)); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv(zqkenv.ProjectRoot().Name(), tmp)
+
+	var buf bytes.Buffer
+	ctx := pkgctx.WithCommandOutputWriter(context.Background(), &buf)
+	cmd := NewNewCmd()
+	cmd.SetContext(ctx)
+	cmd.SetArgs([]string{"swarm", "--name", "my-draft-swarm"})
+	if err := cmd.Execute(); err != nil {
+		t.Fatal(err)
+	}
+	matches, err := filepath.Glob(filepath.Join(tmp, paths.ProjectDataDir, paths.DraftsSubdir, "my-draft-swarm-*.yaml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(matches) != 1 {
+		t.Fatalf("expected one swarm draft, got %v (stdout=%q)", matches, buf.String())
+	}
+	ptrPath := filepath.Join(tmp, paths.ProjectDataDir, paths.DraftsSubdir, "last-draft.yaml")
+	ptrBytes, err := fileutil.ReadFile(ptrPath)
+	if err != nil {
+		t.Fatalf("last-draft pointer: %v", err)
+	}
+	s := string(ptrBytes)
+	if !strings.Contains(s, "scope: swarm") || !strings.Contains(s, "kind: swarm_package") {
+		t.Fatalf("unexpected pointer: %s", s)
+	}
+}
+
 func TestNewObjectSpecKind_stdout_contains_inheritance_and_storage_profile(t *testing.T) {
 	var buf bytes.Buffer
 	ctx := pkgctx.WithCommandOutputWriter(context.Background(), &buf)

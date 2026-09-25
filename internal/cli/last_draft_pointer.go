@@ -17,6 +17,7 @@ const (
 	LastDraftScopeObject   = "object"
 	LastDraftScopeInternal = "internal"
 	LastDraftScopeBundle   = "bundle"
+	LastDraftScopeSwarm    = "swarm"
 )
 
 // LastDraftPointer is persisted to .zqk/drafts/last-draft.yaml by `zqk new` after writing a draft file.
@@ -135,6 +136,10 @@ func lastDraftRerunHint(scope, canonicalKind string) string {
 		return paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("zqk new object %s", canonicalKind))
 	case LastDraftScopeInternal:
 		return paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("zqk new internal %s", canonicalKind))
+	case LastDraftScopeBundle:
+		return paths.RewriteCanonicalCLIInvocations("zqk new scenario")
+	case LastDraftScopeSwarm:
+		return paths.RewriteCanonicalCLIInvocations("zqk new swarm")
 	default:
 		return paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("zqk new (scope %s)", scope))
 	}

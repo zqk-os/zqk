@@ -175,9 +175,30 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 		}
 	}
 
-	baselineScore := 4.5
-	if b, ok := opts.Parameters["baseline"].(float64); ok && b > 0 {
-		baselineScore = b
+	goalMetric := "completion_rate"
+	goalTarget := "100"
+	goalDesc := manifest.Description
+	if manifest.Goal != nil {
+		if manifest.Goal.Metric != "" {
+			goalMetric = manifest.Goal.Metric
+		}
+		if manifest.Goal.Target != "" {
+			goalTarget = manifest.Goal.Target
+		}
+		if manifest.Goal.Description != "" {
+			goalDesc = manifest.Goal.Description
+		}
+	} else if b, ok := opts.Parameters["baseline"].(float64); ok && b > 0 {
+		goalMetric = "quality_score"
+		goalTarget = fmt.Sprintf("%.1f", b)
+	} else if metric, ok := opts.Parameters["goal_metric"].(string); ok && metric != "" {
+		goalMetric = metric
+		if target, ok := opts.Parameters["goal_target"].(string); ok && target != "" {
+			goalTarget = target
+		}
+	} else if b, ok := opts.Parameters["baseline"]; ok && b != nil {
+		goalMetric = "quality_score"
+		goalTarget = fmt.Sprintf("%v", b)
 	}
 
 	// Layer 0: Workstream (Gantt execution lane for the swarm)
@@ -204,9 +225,9 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 		objects.FieldKeyID:          goalID,
 		objects.FieldKeyKind:        "goal",
 		objects.FieldKeyTitle:       fmt.Sprintf("Swarm Goal: %s", manifest.Name),
-		objects.FieldKeyDescription: manifest.Description,
-		"metric":                     "quality_score",
-		"target":                     fmt.Sprintf("%.1f", baselineScore),
+		objects.FieldKeyDescription: goalDesc,
+		"metric":                     goalMetric,
+		"target":                     goalTarget,
 		objects.FieldKeyStatus:      objects.ObjectStatusActive,
 	}
 	kernelObjects = append(kernelObjects, goalObj)
@@ -288,43 +309,8 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 		}
 		kernelObjects = append(kernelObjects, tstObj)
 
-		// Match template for task
-		var matchedTemplate string
-		taskKey := strings.ToLower(strings.TrimPrefix(task.ID, "wave-"))
-		for _, pfx := range []string{"1-", "2-", "3-", "4-", "5-"} {
-			taskKey = strings.TrimPrefix(taskKey, pfx)
-		}
-		if task.ID == "wave-1-preflight" || strings.Contains(taskKey, "preflight") {
-			for _, t := range templates {
-				if strings.Contains(strings.ToLower(t.Metadata["file"]), "kickoff") {
-					matchedTemplate = t.Template
-					break
-				}
-			}
-		} else if strings.HasSuffix(taskKey, "-critique") {
-			stem := strings.TrimSuffix(taskKey, "-critique")
-			for _, t := range templates {
-				if strings.Contains(strings.ToLower(t.Metadata["file"]), stem+"-adv") {
-					matchedTemplate = t.Template
-					break
-				}
-			}
-		} else {
-			for _, t := range templates {
-				if strings.Contains(strings.ToLower(t.Metadata["file"]), taskKey+"-spec") {
-					matchedTemplate = t.Template
-					break
-				}
-			}
-		}
-		if matchedTemplate == "" && task.Role == "lead_integrator" {
-			for _, t := range templates {
-				if strings.Contains(strings.ToLower(t.Metadata["file"]), "integrator-spec") {
-					matchedTemplate = t.Template
-					break
-				}
-			}
-		}
+		// Match template for task using explicit refs, manifest mappings, or convention fallbacks
+		matchedTemplate := resolveTaskTemplate(task, manifest, templates)
 
 		bliDesc := fmt.Sprintf("Execute agent task %s in alignment with role %s", task.ID, task.Role)
 		if matchedTemplate != "" {
@@ -519,3 +505,86 @@ func (e *MetabolismEngine) AbortIngestion(digest *MetabolicDigest) error {
 func ExportPromptTemplate(tpl PromptTemplateObject) ([]byte, error) {
 	return yaml.Marshal(tpl)
 }
+
+// resolveTaskTemplate resolves the prompt template for a task through:
+// 1. Explicit task template references (template_ref, template, prompt_template)
+// 2. Manifest template_mapping declarations
+// 3. Exact template ID / filename matches
+// 4. Conventional fallback matching (for backwards compatibility)
+func resolveTaskTemplate(task pack.TaskConfig, manifest *pack.SwarmPackage, templates []PromptTemplateObject) string {
+	// 1. Explicit declaration on task
+	explicitRef := task.TemplateRef
+	if explicitRef == "" {
+		explicitRef = task.Template
+	}
+	if explicitRef == "" {
+		explicitRef = task.PromptTemplate
+	}
+	if explicitRef != "" {
+		cleanRef := strings.TrimSuffix(strings.TrimPrefix(filepath.Base(explicitRef), "templates/"), ".yaml")
+		cleanRef = strings.TrimSuffix(cleanRef, ".yml")
+		for _, t := range templates {
+			fileBase := strings.TrimSuffix(strings.TrimSuffix(filepath.Base(t.Metadata["file"]), ".yaml"), ".yml")
+			if strings.EqualFold(t.ID, explicitRef) || strings.EqualFold(fileBase, cleanRef) || strings.EqualFold(t.Metadata["file"], explicitRef) {
+				return t.Template
+			}
+		}
+	}
+
+	// 2. Manifest TemplateMapping
+	if manifest != nil && manifest.TemplateMapping != nil {
+		if mappingRef, ok := manifest.TemplateMapping[task.ID]; ok && mappingRef != "" {
+			for _, t := range templates {
+				fileBase := strings.TrimSuffix(strings.TrimSuffix(filepath.Base(t.Metadata["file"]), ".yaml"), ".yml")
+				if strings.EqualFold(t.ID, mappingRef) || strings.EqualFold(fileBase, mappingRef) || strings.Contains(strings.ToLower(t.Metadata["file"]), strings.ToLower(mappingRef)) {
+					return t.Template
+				}
+			}
+		}
+	}
+
+	// 3. Direct task ID match
+	cleanTaskID := strings.ToLower(task.ID)
+	for _, t := range templates {
+		fileBase := strings.ToLower(strings.TrimSuffix(strings.TrimSuffix(filepath.Base(t.Metadata["file"]), ".yaml"), ".yml"))
+		if strings.EqualFold(t.ID, task.ID) || fileBase == cleanTaskID {
+			return t.Template
+		}
+	}
+
+	// 4. Convention fallback (supports CEF wave-* and stem matching for backwards compatibility)
+	taskKey := strings.ToLower(strings.TrimPrefix(task.ID, "wave-"))
+	for _, pfx := range []string{"1-", "2-", "3-", "4-", "5-"} {
+		taskKey = strings.TrimPrefix(taskKey, pfx)
+	}
+	if task.ID == "wave-1-preflight" || strings.Contains(taskKey, "preflight") {
+		for _, t := range templates {
+			if strings.Contains(strings.ToLower(t.Metadata["file"]), "kickoff") {
+				return t.Template
+			}
+		}
+	} else if strings.HasSuffix(taskKey, "-critique") {
+		stem := strings.TrimSuffix(taskKey, "-critique")
+		for _, t := range templates {
+			if strings.Contains(strings.ToLower(t.Metadata["file"]), stem+"-adv") {
+				return t.Template
+			}
+		}
+	} else {
+		for _, t := range templates {
+			if strings.Contains(strings.ToLower(t.Metadata["file"]), taskKey+"-spec") {
+				return t.Template
+			}
+		}
+	}
+	if task.Role == "lead_integrator" {
+		for _, t := range templates {
+			if strings.Contains(strings.ToLower(t.Metadata["file"]), "integrator-spec") {
+				return t.Template
+			}
+		}
+	}
+
+	return ""
+}
+

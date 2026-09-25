@@ -2,20 +2,30 @@ package swarm
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"strings"
 	"text/template"
 
+	"github.com/zqk-os/zqk/pkg/authcred"
 	"github.com/zqk-os/zqk/pkg/brand"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
-// QwenSystemPromptTemplate defines the core persona and behavior for the Qwen worker.
-// This prompt is deliberately detailed to steer small local LLMs (7B-36B) toward correct
-// tool-calling patterns and away from the two dominant failure modes observed in production:
-// 1. Bash-loop addiction (calling execute_bash repeatedly instead of specific MCP tools)
-// 2. Tool-name hallucination (inventing tool names not in the registered set)
-const QwenSystemPromptTemplate = `You are a Qwen LLM acting as a worker node in the ZQK Swarm Orchestrator.
+// Prompt template kernel object IDs.
+const (
+	PromptTemplateSwarmWorkerSystemCoding   = "PROMPT-SWARM-WORKER-SYSTEM-CODING"
+	PromptTemplateSwarmWorkerSystemDocsEval = "PROMPT-SWARM-WORKER-SYSTEM-DOCS-EVAL"
+	PromptTemplateSwarmWorkerTask           = "PROMPT-SWARM-WORKER-TASK"
+)
+
+// DefaultSwarmWorkerCodingSystemPromptTemplate defines the fallback persona and behavior for coding tasks.
+// Small local LLMs and remote LLMs are steered toward correct tool-calling patterns and away from
+// bash-loop addiction and tool-name hallucination.
+const DefaultSwarmWorkerCodingSystemPromptTemplate = `You are an LLM acting as a worker node in the ZQK Swarm Orchestrator.
 
 ## How you call tools
 The host already registered tools on this request. To invoke a tool you MUST use the native function-calling API (tool_calls field). Leave assistant text empty when calling a tool.
@@ -57,10 +67,9 @@ Capabilities: {{range .Capabilities}}{{.}}, {{end}}
 Work class: coding
 `
 
-// QwenDocsEvalSystemPromptTemplate is for docs / evaluation ATKs.
+// DefaultSwarmWorkerDocsEvalSystemPromptTemplate is for docs / evaluation ATKs.
 // It must not push TDD, go test loops, or source edits.
-// TRACK: BLI-AGENT-INIT-PROMPT-CLASS-001
-const QwenDocsEvalSystemPromptTemplate = `You are an LLM acting as a docs/evaluation worker in the Swarm Orchestrator.
+const DefaultSwarmWorkerDocsEvalSystemPromptTemplate = `You are an LLM acting as a docs/evaluation worker in the Swarm Orchestrator.
 
 ## How you call tools
 The host already registered tools on this request. To invoke a tool you MUST use the native function-calling API (tool_calls field). Leave assistant text empty when calling a tool.
@@ -94,10 +103,10 @@ Capabilities: {{range .Capabilities}}{{.}}, {{end}}
 Work class: docs_eval
 `
 
-// QwenTaskPromptTemplate is used to assign a specific task to the Qwen worker.
+// DefaultSwarmWorkerTaskPromptTemplate is used to assign a specific task to the worker.
 // It includes a concrete example workflow to anchor the model toward productive
 // tool-calling sequences rather than open-ended exploration.
-const QwenTaskPromptTemplate = `Assigned Task: {{.TaskName}}
+const DefaultSwarmWorkerTaskPromptTemplate = `Assigned Task: {{.TaskName}}
 Description: {{.TaskDescription}}
 Context: {{.Context}}
 
@@ -366,16 +375,16 @@ func RepeatingCycleGuidance(period int) string {
 	)
 }
 
-// QwenSystemData holds template data for the system prompt.
-type QwenSystemData struct {
+// SwarmWorkerSystemData holds template data for the system prompt.
+type SwarmWorkerSystemData struct {
 	WorkerID     string
 	Capabilities []string
 	ToolPrefix   string // Brand-aware tool prefix (e.g. "zqk_"). Set via DefaultToolPrefix().
 	WorkClass    string // coding | docs_eval — selects system template.
 }
 
-// QwenTaskData holds template data for the task prompt.
-type QwenTaskData struct {
+// SwarmWorkerTaskData holds template data for the task prompt.
+type SwarmWorkerTaskData struct {
 	TaskName        string
 	TaskDescription string
 	Context         string
@@ -423,17 +432,49 @@ func MarkdownToolCallConventionGuidance() string {
 		"Do not wrap the next call in a json fence or a name-plus-arguments object."
 }
 
-// RenderSystemPrompt renders the Qwen system prompt for the work class.
-// If ToolPrefix is empty, it defaults to the brand-aware prefix.
-func RenderSystemPrompt(data QwenSystemData) (string, error) {
+// ResolvePromptTemplate retrieves a prompt template body by ID from kernel storage,
+// returning fallback if the storage provider is nil, the object is missing,
+// or the template body is empty.
+func ResolvePromptTemplate(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, templateID string, fallback string) string {
+	if sp == nil || templateID == "" {
+		return fallback
+	}
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	if secCtx == nil {
+		secCtx = pkgctx.NewSecurityContext(authcred.DefaultSwarmWorkerAccount, []string{"swarm_worker"}, []string{"*"})
+	}
+	obj, err := sp.Read(ctx, secCtx, templateID)
+	if err != nil || obj == nil {
+		return fallback
+	}
+	if body, ok := obj[objects.FieldKeyPromptBody].(string); ok && strings.TrimSpace(body) != "" {
+		return strings.TrimSpace(body)
+	}
+	return fallback
+}
+
+// RenderSystemPromptWithStorage renders the swarm worker system prompt, resolving the template
+// dynamically from the kernel prompt_template object in storage if available, falling back to default.
+func RenderSystemPromptWithStorage(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, data SwarmWorkerSystemData) (string, error) {
 	if data.ToolPrefix == "" {
 		data.ToolPrefix = DefaultToolPrefix()
 	}
-	tmplSrc := QwenSystemPromptTemplate
+	var templateID, fallback string
 	if strings.EqualFold(strings.TrimSpace(data.WorkClass), "docs_eval") {
-		tmplSrc = QwenDocsEvalSystemPromptTemplate
+		templateID = PromptTemplateSwarmWorkerSystemDocsEval
+		fallback = DefaultSwarmWorkerDocsEvalSystemPromptTemplate
+	} else {
+		templateID = PromptTemplateSwarmWorkerSystemCoding
+		fallback = DefaultSwarmWorkerCodingSystemPromptTemplate
 	}
-	tmpl, err := template.New("qwen_system").Parse(tmplSrc)
+	tmplSrc := ResolvePromptTemplate(ctx, sp, secCtx, templateID, fallback)
+	tmpl, err := template.New("swarm_worker_system").Parse(tmplSrc)
+	if err != nil && tmplSrc != fallback {
+		// Fallback to built-in template if custom template has syntax error
+		tmpl, err = template.New("swarm_worker_system").Parse(fallback)
+	}
 	if err != nil {
 		return "", err
 	}
@@ -444,13 +485,18 @@ func RenderSystemPrompt(data QwenSystemData) (string, error) {
 	return buf.String(), nil
 }
 
-// RenderTaskPrompt renders the Qwen task prompt.
-// If ToolPrefix is empty, it defaults to the brand-aware prefix.
-func RenderTaskPrompt(data QwenTaskData) (string, error) {
+// RenderTaskPromptWithStorage renders the swarm worker task prompt, resolving the template
+// dynamically from the kernel prompt_template object in storage if available, falling back to default.
+func RenderTaskPromptWithStorage(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, data SwarmWorkerTaskData) (string, error) {
 	if data.ToolPrefix == "" {
 		data.ToolPrefix = DefaultToolPrefix()
 	}
-	tmpl, err := template.New("qwen_task").Parse(QwenTaskPromptTemplate)
+	tmplSrc := ResolvePromptTemplate(ctx, sp, secCtx, PromptTemplateSwarmWorkerTask, DefaultSwarmWorkerTaskPromptTemplate)
+	tmpl, err := template.New("swarm_worker_task").Parse(tmplSrc)
+	if err != nil && tmplSrc != DefaultSwarmWorkerTaskPromptTemplate {
+		// Fallback to built-in template if custom template has syntax error
+		tmpl, err = template.New("swarm_worker_task").Parse(DefaultSwarmWorkerTaskPromptTemplate)
+	}
 	if err != nil {
 		return "", err
 	}
@@ -459,4 +505,16 @@ func RenderTaskPrompt(data QwenTaskData) (string, error) {
 		return "", err
 	}
 	return buf.String(), nil
+}
+
+// RenderSystemPrompt renders the swarm worker system prompt using default fallback templates.
+// If ToolPrefix is empty, it defaults to the brand-aware prefix.
+func RenderSystemPrompt(data SwarmWorkerSystemData) (string, error) {
+	return RenderSystemPromptWithStorage(context.Background(), nil, nil, data)
+}
+
+// RenderTaskPrompt renders the swarm worker task prompt using default fallback templates.
+// If ToolPrefix is empty, it defaults to the brand-aware prefix.
+func RenderTaskPrompt(data SwarmWorkerTaskData) (string, error) {
+	return RenderTaskPromptWithStorage(context.Background(), nil, nil, data)
 }

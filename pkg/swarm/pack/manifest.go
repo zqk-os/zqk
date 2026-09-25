@@ -1,6 +1,7 @@
 package pack
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
 
@@ -23,8 +24,17 @@ type SwarmPackage struct {
 	TeamConfigurationRef string                  `yaml:"team_configuration_ref,omitempty" json:"team_configuration_ref,omitempty"`
 	TeamConfiguration    *TeamConfiguration      `yaml:"team_configuration,omitempty" json:"team_configuration,omitempty"`
 	Membranes            []MembraneRule          `yaml:"membranes,omitempty" json:"membranes,omitempty"`
+	Goal                 *GoalConfig             `yaml:"goal,omitempty" json:"goal,omitempty"`
+	TemplateMapping      map[string]string       `yaml:"template_mapping,omitempty" json:"template_mapping,omitempty"`
 	Agents               []AgentConfig           `yaml:"agents,omitempty" json:"agents,omitempty"`
 	Tasks                []TaskConfig            `yaml:"tasks,omitempty" json:"tasks,omitempty"`
+}
+
+// GoalConfig defines explicit goal attributes for the swarm package.
+type GoalConfig struct {
+	Metric      string `yaml:"metric,omitempty" json:"metric,omitempty"`
+	Target      string `yaml:"target,omitempty" json:"target,omitempty"`
+	Description string `yaml:"description,omitempty" json:"description,omitempty"`
 }
 
 // TeamConfiguration defines a cellular team archetype to prevent repetitive agent boilerplate.
@@ -74,10 +84,13 @@ type AgentConfig struct {
 
 // TaskConfig defines a unit of work in the swarm pipeline.
 type TaskConfig struct {
-	ID        string   `yaml:"id" json:"id"`
-	Title     string   `yaml:"title" json:"title"`
-	Role      string   `yaml:"role,omitempty" json:"role,omitempty"`
-	DependsOn []string `yaml:"depends_on,omitempty" json:"depends_on,omitempty"`
+	ID             string   `yaml:"id" json:"id"`
+	Title          string   `yaml:"title" json:"title"`
+	Role           string   `yaml:"role,omitempty" json:"role,omitempty"`
+	DependsOn      []string `yaml:"depends_on,omitempty" json:"depends_on,omitempty"`
+	Template       string   `yaml:"template,omitempty" json:"template,omitempty"`
+	TemplateRef    string   `yaml:"template_ref,omitempty" json:"template_ref,omitempty"`
+	PromptTemplate string   `yaml:"prompt_template,omitempty" json:"prompt_template,omitempty"`
 }
 
 // ParseManifest parses raw YAML or JSON data into a SwarmPackage.
@@ -199,4 +212,148 @@ tasks:
       - task-refactor
 `
 	return fileutil.WriteFile(destPath, []byte(content), paths.FilePerm644)
+}
+
+// SwarmDraftOptions configures generation of a draft swarm package manifest.
+type SwarmDraftOptions struct {
+	Name            string
+	Version         string
+	Description     string
+	Author          string
+	License         string
+	CellType        string
+	TeamRef         string
+	GoalMetric      string
+	GoalTarget      string
+	GoalDescription string
+}
+
+// DraftSwarmManifestYAML returns a valid swarm.yaml document for editing before sealing or running.
+func DraftSwarmManifestYAML(opts SwarmDraftOptions) ([]byte, error) {
+	name := strings.TrimSpace(opts.Name)
+	if name == "" {
+		name = "custom-swarm"
+	}
+	ver := strings.TrimSpace(opts.Version)
+	if ver == "" {
+		ver = "1.0.0"
+	}
+	if _, err := ParseSemVer(ver); err != nil {
+		return nil, fmt.Errorf("invalid swarm version: %w", err)
+	}
+	desc := strings.TrimSpace(opts.Description)
+	if desc == "" {
+		desc = "Autonomous multi-agent swarm pipeline."
+	}
+	author := strings.TrimSpace(opts.Author)
+	if author == "" {
+		author = "zqk-community"
+	}
+	license := strings.TrimSpace(opts.License)
+	if license == "" {
+		license = "Apache-2.0"
+	}
+
+	pkg := &SwarmPackage{
+		Schema:      "https://zqk.dev/schemas/swarm_package_spec.schema.json",
+		Name:        name,
+		Version:     ver,
+		Description: desc,
+		Author:      author,
+		License:     license,
+		Entrypoint:  "task-execute",
+		Membranes: []MembraneRule{
+			{Path: ".zqk/process/", Mode: "read_only"},
+		},
+		Parameters: map[string]ParameterDef{
+			"baseline": {
+				Type:        "float",
+				Default:     4.5,
+				Description: "Target quality baseline",
+				Required:    false,
+			},
+		},
+		Tasks: []TaskConfig{
+			{
+				ID:    "task-execute",
+				Title: "Execute pipeline implementation and code changes",
+				Role:  "lead_integrator",
+			},
+			{
+				ID:        "task-verify",
+				Title:     "Run verification test suite and validate acceptance criteria",
+				Role:      "qa_auditor",
+				DependsOn: []string{"task-execute"},
+			},
+		},
+	}
+
+	if strings.TrimSpace(opts.CellType) != "" {
+		ct := strings.ToLower(strings.TrimSpace(opts.CellType))
+		pkg.TeamConfiguration = &TeamConfiguration{
+			ID:        name + "-team",
+			CellType:  ct,
+			FocusArea: desc,
+			PersonaAllocations: []PersonaAllocation{
+				{
+					PersonaRef: "PER-DEFAULT-OPERATOR",
+					Role:       "cell_lead",
+					Count:      1,
+				},
+			},
+		}
+		pkg.Tasks[0].Role = "cell_lead"
+	} else if strings.TrimSpace(opts.TeamRef) != "" {
+		pkg.TeamConfigurationRef = strings.TrimSpace(opts.TeamRef)
+	} else {
+		pkg.Agents = []AgentConfig{
+			{
+				Name:         "Lead Integrator",
+				Role:         "lead_integrator",
+				Skills:       []string{"ASK-COMMUNITY-CODE-CRAFTSMAN"},
+				SystemPrompt: "Coordinate task decomposition, code crafting, and structural refactoring.\n",
+			},
+			{
+				Name:         "QA Verifier",
+				Role:         "qa_auditor",
+				Skills:       []string{"ASK-COMMUNITY-QA-VERIFICATION"},
+				SystemPrompt: "Execute verification test suite and validate acceptance criteria satisfaction.\n",
+			},
+		}
+	}
+
+	if strings.TrimSpace(opts.GoalMetric) != "" || strings.TrimSpace(opts.GoalTarget) != "" || strings.TrimSpace(opts.GoalDescription) != "" {
+		pkg.Goal = &GoalConfig{
+			Metric:      strings.TrimSpace(opts.GoalMetric),
+			Target:      strings.TrimSpace(opts.GoalTarget),
+			Description: strings.TrimSpace(opts.GoalDescription),
+		}
+	}
+
+	if err := ValidateManifest(pkg); err != nil {
+		return nil, fmt.Errorf("generated swarm manifest is invalid: %w", err)
+	}
+
+	var buf bytes.Buffer
+	buf.WriteString("# Canonical ZQK Portable Swarm Manifest (zqk new swarm)\n")
+	buf.WriteString("# Next steps:\n")
+	buf.WriteString("#   1. Edit agent personas, tasks, dependencies, and membranes as needed.\n")
+	buf.WriteString("#   2. Cryptographically seal: zqk pack seal <dir>\n")
+	buf.WriteString("#   3. Execute swarm: zqk run <dir>\n\n")
+
+	enc := yaml.NewEncoder(&buf)
+	enc.SetIndent(2)
+	if err := enc.Encode(pkg); err != nil {
+		return nil, fmt.Errorf("encode swarm manifest: %w", err)
+	}
+	if err := enc.Close(); err != nil {
+		return nil, err
+	}
+
+	// Verify round-trip parse
+	if _, err := ParseManifest(buf.Bytes()); err != nil {
+		return nil, fmt.Errorf("generated manifest failed roundtrip validation: %w", err)
+	}
+
+	return buf.Bytes(), nil
 }

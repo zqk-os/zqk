@@ -213,7 +213,7 @@ func (s *Scheduler) pollAndSpawnSwarmTasks(ctx context.Context) {
 			}
 
 			workClass := agentprompt.ClassifyWorkClass(taskTitle, taskDesc, taskInstr)
-			systemPrompt, err := swarm.RenderSystemPrompt(swarm.QwenSystemData{
+			systemPrompt, err := swarm.RenderSystemPromptWithStorage(workerCtx, s.storage, secCtx, swarm.SwarmWorkerSystemData{
 				WorkerID:     taskID,
 				Capabilities: workClass.PromptCapabilities(),
 				WorkClass:    string(workClass),
@@ -223,7 +223,7 @@ func (s *Scheduler) pollAndSpawnSwarmTasks(ctx context.Context) {
 				return nil
 			}
 
-			userPrompt, err := swarm.RenderTaskPrompt(swarm.QwenTaskData{
+			userPrompt, err := swarm.RenderTaskPromptWithStorage(workerCtx, s.storage, secCtx, swarm.SwarmWorkerTaskData{
 				TaskName:        taskTitle,
 				TaskDescription: taskDesc,
 				Context:         taskInstr,

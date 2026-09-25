@@ -63,6 +63,7 @@ func DefaultHooks() []AgentHook {
 	return []AgentHook{
 		NewToolDenialGuard(),
 		NewHallucinationCircuitBreaker(),
+		NewCatastrophicErrorGuard(),
 	}
 }
 

@@ -82,12 +82,22 @@ func NewSeatWorkerCmd() *cobra.Command {
 }
 
 func runAgentSeatWorker(cmd *cobra.Command, _ []string) error {
+	if envRoot := zqkenv.ProjectRoot().Get(); envRoot != "" && paths.IsAgentWorktreePath(envRoot) {
+		return errfmt.Errorf("seat-worker cannot run with ZQK_PROJECT_ROOT set to agent worktree %s without seated kernel configuration", envRoot)
+	}
+	resolvedRoot := paths.ResolveProjectRoot(".")
+	if resolvedRoot == "" {
+		if envRoot := zqkenv.ProjectRoot().Get(); envRoot != "" && paths.IsAgentWorktreePath(envRoot) {
+			return errfmt.Errorf("seat-worker cannot run with ZQK_PROJECT_ROOT set to agent worktree %s without seated kernel configuration", envRoot)
+		}
+		return errfmt.Errorf("project root not found")
+	}
+	if paths.IsAgentWorktreePath(resolvedRoot) {
+		return errfmt.Errorf("seat-worker cannot run with project root inside agent worktree %s", resolvedRoot)
+	}
 	return cli.WithProcessor(func(cmd *cobra.Command, _ []string, proc *cli.Processor) error {
 		root := proc.ProjectRoot()
 		if root == "" {
-			if envRoot := zqkenv.ProjectRoot().Get(); envRoot != "" && paths.IsAgentWorktreePath(envRoot) {
-				return errfmt.Errorf("seat-worker cannot run with ZQK_PROJECT_ROOT set to agent worktree %s without seated kernel configuration", envRoot)
-			}
 			return errfmt.Errorf("project root not found")
 		}
 		if paths.IsAgentWorktreePath(root) {
@@ -583,7 +593,7 @@ func buildSeatWorkerAgentXPrompts(
 	workClass := agentprompt.ClassifyWorkClass(steer, prepared.Title, prepared.Prompt)
 	out.WorkClass = workClass
 	out.ExecRoot = root
-	systemPrompt, err := swarm.RenderSystemPrompt(swarm.QwenSystemData{
+	systemPrompt, err := swarm.RenderSystemPromptWithStorage(ctx, sp, secCtx, swarm.SwarmWorkerSystemData{
 		WorkerID:     agentID,
 		Capabilities: workClass.PromptCapabilities(),
 		WorkClass:    string(workClass),

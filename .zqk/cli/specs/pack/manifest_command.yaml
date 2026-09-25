@@ -1,0 +1,43 @@
+$schema: ../schemas/command_spec.schema.json
+name: manifest
+short: Generate a draft swarm package manifest (swarm.yaml)
+description: Generate a draft swarm package manifest (swarm.yaml)
+aliases:
+    - draft
+args:
+    type: no_args
+flags:
+    - name: author
+      type: string
+      default: zqk-community
+      description: Author
+    - name: cell-type
+      type: string
+      description: Cellular archetype (neuron, muscle, heart, lungs)
+    - name: description
+      type: string
+      description: Package description
+    - name: goal-metric
+      type: string
+      description: Goal metric
+    - name: goal-target
+      type: string
+      description: Goal target
+    - name: license
+      type: string
+      default: Apache-2.0
+      description: License
+    - name: name
+      type: string
+      default: custom-swarm
+      description: Package name
+    - name: version
+      type: string
+      default: 1.0.0
+      description: Semantic version (SemVer 2.0.0)
+help:
+    examples:
+        - comment: Run pack manifest
+          command: '%s pack manifest'
+run_e: runPackManifest
+common_flags: true

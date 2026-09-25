@@ -14,6 +14,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/git"
 	"github.com/zqk-os/zqk/pkg/interactionpolicy"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects/koi"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/resourcehygiene"
 	"github.com/zqk-os/zqk/pkg/storage"
@@ -384,12 +385,10 @@ func EnrichKernelAmbienceWithStaleTasks(ctx context.Context, sp storage.ObjectSt
 	secCtx := pkgctx.NewSystemSecurityContext()
 	storageCtx := pkgctx.NewStorageContext()
 
-	res, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
-		Kind: objects.KindAgentTask,
-		Filters: map[string]any{
-			objects.FieldKeyStatus: objects.ObjectStatusInProgress,
-		},
-	})
+	res, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+		ByStatus(objects.KindAgentTask, objects.ObjectStatusInProgress).
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyPriorityPlanRef, objects.FieldKeyClaimedBy, objects.FieldKeyUpdatedAt, objects.FieldKeyCreatedAt).
+		Build())
 	if err != nil || len(res.Objects) == 0 {
 		return
 	}
@@ -401,9 +400,9 @@ func EnrichKernelAmbienceWithStaleTasks(ctx context.Context, sp storage.ObjectSt
 		planRef := ""
 		claimedBy := ""
 		for _, obj := range res.Objects {
-			if id, _ := obj[objects.FieldKeyID].(string); id == topStale.TaskID {
-				planRef, _ = obj[objects.FieldKeyPriorityPlanRef].(string)
-				claimedBy, _ = obj[objects.FieldKeyClaimedBy].(string)
+			if koi.ID(obj) == topStale.TaskID {
+				planRef = koi.GetString(obj, objects.FieldKeyPriorityPlanRef)
+				claimedBy = koi.GetString(obj, objects.FieldKeyClaimedBy)
 				break
 			}
 		}
@@ -498,11 +497,10 @@ func LoadEmployedWorkflowHints(ctx context.Context, sp storage.ObjectStorageProv
 		}
 	}
 
-	res, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
-		Kind:    objects.KindWorkflow,
-		Filters: map[string]any{objects.FieldKeyStatus: "active"},
-		Fields:  []string{objects.FieldKeyID, objects.FieldKeyStatus, objects.FieldKeyTitle, objects.FieldKeyName, objects.FieldKeyDescription},
-	})
+	res, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+		ByStatus(objects.KindWorkflow, objects.ObjectStatusActive).
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyStatus, objects.FieldKeyTitle, objects.FieldKeyName, objects.FieldKeyDescription).
+		Build())
 	if err != nil || len(res.Objects) == 0 {
 		return nil
 	}
@@ -514,20 +512,18 @@ func LoadEmployedWorkflowHints(ctx context.Context, sp storage.ObjectStorageProv
 	}
 	var cands []cand
 	for _, obj := range res.Objects {
-		id, _ := obj[objects.FieldKeyID].(string)
-		id = strings.TrimSpace(id)
+		id := strings.TrimSpace(koi.ID(obj))
 		if id == "" || isFixtureWorkflow(obj, id) {
 			continue
 		}
-		st, _ := obj[objects.FieldKeyStatus].(string)
-		if !strings.EqualFold(strings.TrimSpace(st), "active") {
+		if !koi.IsStatus(obj, objects.ObjectStatusActive) {
 			continue
 		}
-		title, _ := obj[objects.FieldKeyTitle].(string)
+		title := koi.Title(obj)
 		if title == "" {
-			title, _ = obj[objects.FieldKeyName].(string)
+			title = koi.GetString(obj, objects.FieldKeyName)
 		}
-		summary := truncateRunes(firstNonEmptyLine(fmt.Sprint(obj[objects.FieldKeyDescription])), MaxEmployedWorkflowSummaryLen)
+		summary := truncateRunes(firstNonEmptyLine(koi.GetString(obj, objects.FieldKeyDescription)), MaxEmployedWorkflowSummaryLen)
 		src := "active"
 		rank := 100
 		if s, ok := preferred[id]; ok {

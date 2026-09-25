@@ -165,3 +165,70 @@ func TestEnsureSampleSwarm(t *testing.T) {
 		t.Errorf("expected 2 agents in sample, got %d", len(pkg.Agents))
 	}
 }
+
+func TestDraftSwarmManifestYAML(t *testing.T) {
+	// 1. Default options
+	data, err := DraftSwarmManifestYAML(SwarmDraftOptions{})
+	if err != nil {
+		t.Fatalf("unexpected error drafting swarm: %v", err)
+	}
+	pkg, err := ParseManifest(data)
+	if err != nil {
+		t.Fatalf("failed to parse generated manifest: %v", err)
+	}
+	if pkg.Name != "custom-swarm" {
+		t.Errorf("expected custom-swarm, got %q", pkg.Name)
+	}
+	if pkg.Version != "1.0.0" {
+		t.Errorf("expected version 1.0.0, got %q", pkg.Version)
+	}
+	if len(pkg.Agents) != 2 {
+		t.Errorf("expected 2 agents, got %d", len(pkg.Agents))
+	}
+	if len(pkg.Tasks) != 2 {
+		t.Errorf("expected 2 tasks, got %d", len(pkg.Tasks))
+	}
+
+	// 2. Cellular archetype
+	cellData, err := DraftSwarmManifestYAML(SwarmDraftOptions{
+		Name:     "cell-swarm",
+		CellType: "neuron",
+	})
+	if err != nil {
+		t.Fatalf("unexpected error drafting cellular swarm: %v", err)
+	}
+	cellPkg, err := ParseManifest(cellData)
+	if err != nil {
+		t.Fatalf("failed to parse cellular manifest: %v", err)
+	}
+	if cellPkg.TeamConfiguration == nil || cellPkg.TeamConfiguration.CellType != "neuron" {
+		t.Errorf("expected neuron cell_type, got %+v", cellPkg.TeamConfiguration)
+	}
+
+	// 3. Goal configuration
+	goalData, err := DraftSwarmManifestYAML(SwarmDraftOptions{
+		Name:            "goal-swarm",
+		GoalMetric:      "test_coverage",
+		GoalTarget:      "95%",
+		GoalDescription: "Ensure high coverage",
+	})
+	if err != nil {
+		t.Fatalf("unexpected error drafting goal swarm: %v", err)
+	}
+	goalPkg, err := ParseManifest(goalData)
+	if err != nil {
+		t.Fatalf("failed to parse goal manifest: %v", err)
+	}
+	if goalPkg.Goal == nil || goalPkg.Goal.Metric != "test_coverage" || goalPkg.Goal.Target != "95%" {
+		t.Errorf("expected test_coverage goal, got %+v", goalPkg.Goal)
+	}
+
+	// 4. Invalid SemVer
+	_, err = DraftSwarmManifestYAML(SwarmDraftOptions{
+		Version: "invalid-semver",
+	})
+	if err == nil {
+		t.Fatal("expected error with invalid SemVer version")
+	}
+}
+

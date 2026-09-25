@@ -25,6 +25,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/validation"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/swarm/pack"
 	"github.com/zqk-os/zqk/pkg/telemetry"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
@@ -35,7 +36,7 @@ const (
 )
 
 func newRootIntro() string {
-	return "Mint instances (`new object --title`) onto the draft plane; command DNA: `new command-spec`; YAML scaffolds: `" + paths.CLIUsage("object", "template") + " <kind>`. Bundles/object-specs still use .zqk/drafts/."
+	return "Mint instances (`new object --title`) onto the draft plane; command DNA: `new command-spec`; YAML scaffolds: `" + paths.CLIUsage("object", "template") + " <kind>`. Bundles/object-specs/swarms still use .zqk/drafts/."
 }
 
 // NewNewCmd is the `zqk new` command tree. Root long/short help and subcommands are spec-driven;
@@ -62,6 +63,7 @@ func NewNewCmd() *cobra.Command {
 	root.AddCommand(newObjectSpecKindCmd())
 	root.AddCommand(newCommandSpecCmd())
 	root.AddCommand(newBundleCmd())
+	root.AddCommand(newSwarmCmd())
 	return root
 }
 
@@ -633,6 +635,7 @@ func runNewObjectSpecKind(cmd *cobra.Command, args []string) (err error) {
 
 func newBundleCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewNewBundleCommandBuilder()
+	cmd.Aliases = []string{"scenario"}
 	cli.BindAsyncProgress(cmd, runNewBundle)
 	return cmd
 }
@@ -653,6 +656,48 @@ func runNewBundle(cmd *cobra.Command, args []string) (err error) {
 		base = name
 	}
 	return writeDraft(cmd, out, base, data, cli.LastDraftScopeBundle, "scenario_bundle")
+}
+
+func newSwarmCmd() *cobra.Command {
+	cmd := bldr_cli_cmd_v1.NewNewSwarmCommandBuilder()
+	cli.BindAsyncProgress(cmd, runNewSwarm)
+	return cmd
+}
+
+func runNewSwarm(cmd *cobra.Command, args []string) (err error) {
+	_, endSpan := telemetry.GlobalManager().StartSpan(cmd.Context(), "zqk_new_swarm", map[string]string{"args": strings.Join(args, " ")})
+	defer func() { endSpan(err) }()
+
+	name, _ := cmd.Flags().GetString("name")
+	version, _ := cmd.Flags().GetString("version")
+	desc, _ := cmd.Flags().GetString("description")
+	author, _ := cmd.Flags().GetString("author")
+	license, _ := cmd.Flags().GetString("license")
+	cellType, _ := cmd.Flags().GetString("cell-type")
+	goalMetric, _ := cmd.Flags().GetString("goal-metric")
+	goalTarget, _ := cmd.Flags().GetString("goal-target")
+	goalDesc, _ := cmd.Flags().GetString("goal-description")
+	out, _ := cmd.Flags().GetString("output")
+
+	data, err := pack.DraftSwarmManifestYAML(pack.SwarmDraftOptions{
+		Name:            name,
+		Version:         version,
+		Description:     desc,
+		Author:          author,
+		License:         license,
+		CellType:        cellType,
+		GoalMetric:      goalMetric,
+		GoalTarget:      goalTarget,
+		GoalDescription: goalDesc,
+	})
+	if err != nil {
+		return err
+	}
+	base := "swarm"
+	if strings.TrimSpace(name) != emptyValue {
+		base = name
+	}
+	return writeDraft(cmd, out, base, data, cli.LastDraftScopeSwarm, "swarm_package")
 }
 
 func readTitleAndBody(filePath, content, titleOverride string) (body, title string, err error) {

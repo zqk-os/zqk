@@ -17,6 +17,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/agentfeed"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects/koi"
 	observerpkg "github.com/zqk-os/zqk/pkg/observer"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/tpm"
@@ -109,7 +110,7 @@ func resolvePriorityPlanForWhatsNext(ctx context.Context, sp storage.ObjectStora
 
 	// 2. Check the hardcoded default alpha plan.
 	if obj, err := sp.Read(ctx, secCtx, defaultAlphaPriorityPlanID); err == nil && obj != nil && hasPersonaMatch(obj, personaIDs) {
-		if st, _ := obj[objects.FieldKeyStatus].(string); !strings.EqualFold(st, "complete") && !strings.EqualFold(st, "archived") {
+		if !koi.IsStatus(obj, objects.ObjectStatusComplete) && !koi.IsStatus(obj, objects.ObjectStatusArchived) {
 			// Only use if it has work linked to it
 			if planHasWork(ctx, sp, defaultAlphaPriorityPlanID) {
 				pID, pSumm := summarizePriorityPlan(obj)
@@ -168,11 +169,11 @@ func resolvePriorityPlanForWhatsNext(ctx context.Context, sp storage.ObjectStora
 	// grooming/prioritizing umbrella plans win solely on historical link count.
 	executionReady := false
 	for _, obj := range candidates {
-		id, _ := obj[objects.FieldKeyID].(string)
+		id := koi.ID(obj)
 		if id == emptyValue {
 			continue
 		}
-		st, _ := obj[objects.FieldKeyStatus].(string)
+		st := koi.Status(obj)
 		if planStatusExecutionReady(st) && countOpenLinkedBLIs(ctx, sp, id, personaIDs) > 0 {
 			executionReady = true
 			break
@@ -183,7 +184,7 @@ func resolvePriorityPlanForWhatsNext(ctx context.Context, sp storage.ObjectStora
 	bestScore := -1
 
 	for _, obj := range candidates {
-		id, _ := obj[objects.FieldKeyID].(string)
+		id := koi.ID(obj)
 		if id == emptyValue {
 			continue
 		}
@@ -193,7 +194,7 @@ func resolvePriorityPlanForWhatsNext(ctx context.Context, sp storage.ObjectStora
 			activePlans = append(activePlans, *pSumm)
 		}
 
-		st, _ := obj[objects.FieldKeyStatus].(string)
+		st := koi.Status(obj)
 		if executionReady && !planStatusExecutionReady(st) {
 			continue
 		}
@@ -279,11 +280,11 @@ func countOpenLinkedBLIs(ctx context.Context, sp storage.ObjectStorageProvider, 
 	countOpen := func(objs []map[string]any) int {
 		count := 0
 		for _, o := range objs {
-			ref, _ := o[objects.FieldKeyPriorityPlanRef].(string)
+			ref := koi.GetString(o, objects.FieldKeyPriorityPlanRef)
 			if ref != planID {
 				continue
 			}
-			st, _ := o[objects.FieldKeyStatus].(string)
+			st := koi.Status(o)
 			if !hasPersonaMatch(o, personaIDs) {
 				continue
 			}
@@ -327,13 +328,11 @@ func countLinkedBLIs(ctx context.Context, sp storage.ObjectStorageProvider, plan
 }
 
 func summarizePriorityPlan(obj map[string]any) (string, *WhatsNextPriorityPlan) {
-	id, _ := obj[objects.FieldKeyID].(string)
+	id := koi.ID(obj)
 	if id == emptyValue {
 		return "", nil
 	}
-	title, _ := obj[objects.FieldKeyTitle].(string)
-	st, _ := obj[objects.FieldKeyStatus].(string)
-	return id, &WhatsNextPriorityPlan{ID: id, Title: title, Status: st}
+	return id, &WhatsNextPriorityPlan{ID: id, Title: koi.Title(obj), Status: koi.Status(obj)}
 }
 
 func countBacklogByStatus(ctx context.Context, sp storage.ObjectStorageProvider, primaryPlanID string, activePlanIDs []string, personaIDs []string) map[string]int {
@@ -373,11 +372,11 @@ func countBacklogByStatus(ctx context.Context, sp storage.ObjectStorageProvider,
 
 	_ = personaIDs // backlog inventory is plan-scoped; persona filtering applies to plans, not BLIs
 	for _, o := range allRes.Objects {
-		ref, _ := o[objects.FieldKeyPriorityPlanRef].(string)
+		ref := koi.GetString(o, objects.FieldKeyPriorityPlanRef)
 		if len(planIDSet) > 0 && !planIDSet[ref] {
 			continue
 		}
-		st, _ := o[objects.FieldKeyStatus].(string)
+		st := koi.Status(o)
 		if st == emptyValue {
 			st = "unknown"
 		}
@@ -514,15 +513,15 @@ func listActiveOrPausedConvergenceSessions(ctx context.Context, sp storage.Objec
 	}
 	var rows []WhatsNextCVSRow
 	for _, obj := range res.Objects {
-		id, _ := obj[objects.FieldKeyID].(string)
+		id := koi.ID(obj)
 		if id == emptyValue {
 			continue
 		}
-		st, _ := obj[objects.FieldKeyStatus].(string)
-		title, _ := obj[objects.FieldKeyTitle].(string)
-		phase, _ := obj[objects.FieldKeyCurrentPhase].(string)
 		rows = append(rows, WhatsNextCVSRow{
-			ID: id, Title: title, CurrentPhase: phase, Status: st,
+			ID:           id,
+			Title:        koi.Title(obj),
+			CurrentPhase: koi.GetString(obj, objects.FieldKeyCurrentPhase),
+			Status:       koi.Status(obj),
 		})
 	}
 	return rows

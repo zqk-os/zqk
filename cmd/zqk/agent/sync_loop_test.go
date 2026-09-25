@@ -155,17 +155,31 @@ func TestSyncLoop_MaxVerificationAttempts(t *testing.T) {
 		}
 	}
 
+	// Create an agent_skill to satisfy CRIT-PERSONA-SKILL-BOUND
+	skillCtx := storage.WithSyncCreateForKind(context.Background(), objects.KindAgentSkill)
+	skillCtx = storage.WithSkipWriteBehind(skillCtx)
+	skillID := "ASK-ORCH-ALPHA"
+	skill := map[string]any{
+		objects.FieldKeyID:            skillID,
+		objects.FieldKeyKind:          objects.KindAgentSkill,
+		objects.FieldKeyTitle:         "Orchestrator Skill",
+		objects.FieldKeySchemaVersion: "2.0.0",
+		objects.FieldKeyStatus:        objects.ObjectStatusImplemented,
+	}
+	storage.CreateCASVisible(t, store, skillCtx, pkgctx.NewSystemSecurityContext(), skill, objects.ObjectStatusImplemented)
+
 	// Create the persona PER-ORCH-ALPHA to satisfy reference checks
 	personaCtx := storage.WithSyncCreateForKind(context.Background(), "persona")
 	personaCtx = storage.WithSkipWriteBehind(personaCtx)
 	persona := map[string]any{
-		objects.FieldKeyID:            objects.ConstPersonaOrchestratorAlpha,
-		objects.FieldKeyKind:          objects.KindPersona,
-		objects.FieldKeyTitle:         "Orchestrator Persona",
-		objects.FieldKeyName:          "Orchestrator Persona",
-		objects.FieldKeyRole:          "agent",
-		objects.FieldKeySchemaVersion: "2.0.0",
-		objects.FieldKeyStatus:        objects.ObjectStatusImplemented,
+		objects.FieldKeyID:             objects.ConstPersonaOrchestratorAlpha,
+		objects.FieldKeyKind:           objects.KindPersona,
+		objects.FieldKeyTitle:          "Orchestrator Persona",
+		objects.FieldKeyName:           "Orchestrator Persona",
+		objects.FieldKeyRole:           "agent",
+		objects.FieldKeySchemaVersion:  "2.0.0",
+		objects.FieldKeyStatus:         objects.ObjectStatusImplemented,
+		objects.FieldKeyAgentSkillRefs: []any{skillID},
 	}
 	storage.CreateCASVisible(t, store, personaCtx, pkgctx.NewSystemSecurityContext(), persona, objects.ObjectStatusImplemented)
 
