@@ -988,7 +988,7 @@ func writeIOResourceHygieneSummary(buf *strings.Builder, projectRoot string) {
 	headers := []string{"METRIC", "VALUE", "STATUS"}
 	rows := [][]string{
 		{"Open File Descriptors", fdVal, fdStatus},
-		{".zqk Storage Volume", storageVal, cyan("tracked")},
+		{".zqk Storage Volume", storageVal, cyan("✓ tracked")},
 		{"Stale Lock Files", fmt.Sprintf("%d", ioTel.StaleLocksCount), lockStatus},
 		{"Orphaned Temp Files", fmt.Sprintf("%d", ioTel.OrphanedTempCount), tempStatus},
 	}

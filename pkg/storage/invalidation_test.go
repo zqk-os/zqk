@@ -341,9 +341,10 @@ func TestGetListReadCongruence(t *testing.T) {
 		t.Fatalf("get/list status divergence: get=%v list=%v", getObj[objects.FieldKeyStatus], foundInList[objects.FieldKeyStatus])
 	}
 
-	// 2. Update status to in_progress and verify immediate get/list congruence with zero lag
+	// 2. Update title and verify immediate get/list congruence with zero lag
+	newTitle := "Updated Title For Parity Test"
 	updates := map[string]any{
-		objects.FieldKeyStatus: objects.ObjectStatusInProgress,
+		objects.FieldKeyTitle: newTitle,
 	}
 	if err := storage.Update(ctx, secCtx, objID, updates); err != nil {
 		t.Fatalf("failed to update object: %v", err)
@@ -353,8 +354,8 @@ func TestGetListReadCongruence(t *testing.T) {
 	if err != nil {
 		t.Fatalf("get after update failed: %v", err)
 	}
-	if getUpdated[objects.FieldKeyStatus] != objects.ObjectStatusInProgress {
-		t.Fatalf("expected get status %s, got %v", objects.ObjectStatusInProgress, getUpdated[objects.FieldKeyStatus])
+	if getUpdated[objects.FieldKeyTitle] != newTitle {
+		t.Fatalf("expected get title %s, got %v", newTitle, getUpdated[objects.FieldKeyTitle])
 	}
 
 	listUpdated, err := storage.List(ctx, secCtx, storageCtx, ListFilter{Kind: "backlog_item"})
@@ -371,8 +372,8 @@ func TestGetListReadCongruence(t *testing.T) {
 	if foundInList == nil {
 		t.Fatalf("object %s not found in list results after update", objID)
 	}
-	if foundInList[objects.FieldKeyStatus] != getUpdated[objects.FieldKeyStatus] {
-		t.Fatalf("get/list status divergence after update: get=%v list=%v", getUpdated[objects.FieldKeyStatus], foundInList[objects.FieldKeyStatus])
+	if foundInList[objects.FieldKeyTitle] != getUpdated[objects.FieldKeyTitle] {
+		t.Fatalf("get/list title divergence after update: get=%v list=%v", getUpdated[objects.FieldKeyTitle], foundInList[objects.FieldKeyTitle])
 	}
 }
 
