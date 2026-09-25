@@ -199,7 +199,7 @@ func (r *Registry) saveLocked() error {
 	}
 
 	tmpFile := r.filePath + ".tmp"
-	if err := fileutil.WriteFile(tmpFile, data, 0644); err != nil {
+	if err := fileutil.WriteFile(tmpFile, data, paths.FilePerm644); err != nil {
 		return errfmt.Newf("write temp registry %s", tmpFile).Wrap(err)
 	}
 	if err := fileutil.Rename(tmpFile, r.filePath); err != nil {

@@ -1,0 +1,15 @@
+$schema: ../schemas/command_spec.schema.json
+name: start <daemon>
+short: Start a managed daemon and mark it as enabled
+description: Start a managed daemon and mark it as enabled
+args:
+  type: exact
+  count: 1
+help:
+  examples:
+    - comment: Start the scheduler daemon
+      command: '%s daemon start scheduler'
+    - comment: Start the ambient daemon
+      command: '%s daemon start ambient'
+run_e: runDaemonStart
+common_flags: true

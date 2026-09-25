@@ -1,0 +1,15 @@
+$schema: ../schemas/command_spec.schema.json
+name: status [daemon]
+short: Show status matrix of all managed daemons or a specific daemon
+description: Show status matrix of all managed daemons or a specific daemon
+args:
+  type: maximum
+  max: 1
+help:
+  examples:
+    - comment: Show status of all managed daemons
+      command: '%s daemon status'
+    - comment: Show status of a specific daemon
+      command: '%s daemon status scheduler'
+run_e: runDaemonStatus
+common_flags: true

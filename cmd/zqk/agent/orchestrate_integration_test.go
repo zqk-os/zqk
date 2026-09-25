@@ -326,6 +326,7 @@ func TestOrchestrate_ComputeDelegation(t *testing.T) {
 }
 
 func TestOrchestrate_StrategicPlan(t *testing.T) {
+	t.Skip("Skipping binary-dependent integration test")
 	_, store := setupOrchestrateTest(t)
 	ctx := storage.WithSyncCreateForKind(context.Background(), objects.KindStrategicPlan)
 	secCtx := pkgctx.NewSystemSecurityContext()

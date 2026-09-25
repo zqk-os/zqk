@@ -12,6 +12,7 @@ import (
 func NewUiCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("ui")
 	builder.WithShort("Interactive full-screen terminal mission control")
+	builder.WithAliases("dashboard", "console")
 	help := clipkg.DynamicHelpBuilder("Interactive full-screen terminal mission control")
 	help.WithDescriptionLines("Launches an interactive terminal user interface (TUI) for real-time kernel telemetry,")
 	help.WithDescriptionLines("state seismograph streaming, swarm inspection, and scheduler monitoring.")

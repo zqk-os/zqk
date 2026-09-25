@@ -91,6 +91,14 @@ func generateCommandBuilderCode(spec *CommandSpec, commandName, packageName stri
 		fmt.Fprintf(&buf, "\tbuilder.WithShort(%q)\n", spec.Short)
 	}
 
+	if len(spec.Aliases) > 0 {
+		aliasArgs := make([]string, len(spec.Aliases))
+		for i, a := range spec.Aliases {
+			aliasArgs[i] = fmt.Sprintf("%q", a)
+		}
+		fmt.Fprintf(&buf, "\tbuilder.WithAliases(%s)\n", strings.Join(aliasArgs, ", "))
+	}
+
 	var excludeFlags []string
 	if spec.Help != nil && len(spec.Help.ExcludeFlags) > 0 {
 		excludeFlags = spec.Help.ExcludeFlags

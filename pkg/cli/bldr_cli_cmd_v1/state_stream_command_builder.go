@@ -12,6 +12,7 @@ import (
 func NewStateStreamCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("stream")
 	builder.WithShort("Stream live change journal mutations and swarm state events")
+	builder.WithAliases("monitor", "watch")
 	help := clipkg.DynamicHelpBuilder("Stream live change journal mutations and swarm state events")
 	help.WithDescriptionLines("Stream real-time change journal mutations and audit events from the knowledge kernel.")
 	help.AddExample("View recent change journal stream", "zqk state stream")

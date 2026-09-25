@@ -457,6 +457,102 @@ func TestRender_HealthTab_ActionCenter(t *testing.T) {
 	assert.Nil(t, m.DetailModal)
 }
 
+func TestRender_HealthTab_ProcessGroupOverseerAndDaemons(t *testing.T) {
+	tmpDir := t.TempDir()
+	m := NewUIModel(tmpDir, "health")
+	m.Width = 110
+	m.Height = 35
+
+	// 1. Standby mode (Overseer offline, registry loaded)
+	m.HealthSummary = HealthSummary{
+		OverallStatus:   "HEALTHY",
+		CheckFreshness:  "FRESH (1m ago)",
+		OverseerRunning: false,
+		DaemonsRunning:  0,
+		DaemonsTotal:    5,
+	}
+	m.DaemonHealth = []DaemonHealthRow{
+		{
+			Name:         "scheduler",
+			DesiredState: "enabled",
+			ActualState:  "stopped",
+			PID:          0,
+			PGID:         0,
+			RestartCount: 0,
+			Uptime:       "--",
+			Status:       "STOPPED",
+		},
+		{
+			Name:         "ambient",
+			DesiredState: "enabled",
+			ActualState:  "stopped",
+			PID:          0,
+			PGID:         0,
+			RestartCount: 0,
+			Uptime:       "--",
+			Status:       "STOPPED",
+		},
+	}
+
+	outStandby := Render(m)
+	assert.Contains(t, outStandby, "Kernel Integrity Radar & System Health")
+	assert.Contains(t, outStandby, "Process Overseer: 0/5 running")
+	assert.Contains(t, outStandby, "PROCESS GROUP OVERSEER & DAEMONS [OVERSEER STANDBY]")
+	assert.Contains(t, outStandby, "scheduler")
+	assert.Contains(t, outStandby, "ambient")
+	assert.Contains(t, outStandby, "STOPPED")
+
+	// 2. Active mode (Overseer running with live supervised processes)
+	m.HealthSummary.OverseerRunning = true
+	m.HealthSummary.DaemonsRunning = 2
+	m.DaemonHealth = []DaemonHealthRow{
+		{
+			Name:         "scheduler",
+			DesiredState: "enabled",
+			ActualState:  "running",
+			PID:          4567,
+			PGID:         4567,
+			RestartCount: 0,
+			Uptime:       "2m45s",
+			Status:       "HEALTHY",
+		},
+		{
+			Name:         "ambient",
+			DesiredState: "enabled",
+			ActualState:  "running",
+			PID:          4568,
+			PGID:         4567,
+			RestartCount: 1,
+			Uptime:       "1m10s",
+			Status:       "HEALTHY",
+		},
+	}
+
+	outActive := Render(m)
+	assert.Contains(t, outActive, "Process Overseer: 2/5 running")
+	assert.Contains(t, outActive, "PROCESS GROUP OVERSEER & DAEMONS [OVERSEER ACTIVE]")
+	assert.Contains(t, outActive, "4567")
+	assert.Contains(t, outActive, "4568")
+	assert.Contains(t, outActive, "2m45s")
+	assert.Contains(t, outActive, "HEALTHY")
+
+	// 3. Test RefreshHealth populates DaemonHealth from disk registry
+	m2 := NewUIModel(tmpDir, "health")
+	m2.RefreshHealth()
+	assert.False(t, m2.HealthSummary.OverseerRunning)
+	assert.GreaterOrEqual(t, m2.HealthSummary.DaemonsTotal, 5)
+	assert.NotEmpty(t, m2.DaemonHealth)
+	foundScheduler := false
+	for _, d := range m2.DaemonHealth {
+		if d.Name == "scheduler" {
+			foundScheduler = true
+			assert.Equal(t, "enabled", d.DesiredState)
+			assert.Equal(t, "stopped", d.ActualState)
+		}
+	}
+	assert.True(t, foundScheduler, "expected default scheduler spec in DaemonHealth")
+}
+
 func TestUIQuirk1_ActionCenterKeyNoCollisionWithVimNav(t *testing.T) {
 	tmpDir := t.TempDir()
 	m := NewUIModel(tmpDir, "health")

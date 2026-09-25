@@ -86,6 +86,7 @@ type CommandBuilder struct {
 	version       string
 	groupID       string
 	annotations   map[string]string
+	aliases       []string
 
 	// Flag configuration
 	commonFlags            bool
@@ -145,6 +146,12 @@ func NewCommandBuilder(use string) *CommandBuilder {
 // WithUse sets the use string
 func (b *CommandBuilder) WithUse(use string) *CommandBuilder {
 	b.use = use
+	return b
+}
+
+// WithAliases sets alternative command names/synonyms
+func (b *CommandBuilder) WithAliases(aliases ...string) *CommandBuilder {
+	b.aliases = append(b.aliases, aliases...)
 	return b
 }
 
@@ -375,6 +382,7 @@ func (b *CommandBuilder) Build() *cobra.Command {
 		Hidden:       b.hidden,
 		Version:      b.version,
 		GroupID:      b.groupID,
+		Aliases:      b.aliases,
 	}
 
 	// Set short description

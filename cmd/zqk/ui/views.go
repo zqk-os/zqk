@@ -1652,13 +1652,18 @@ func renderHealthTab(b *strings.Builder, m *UIModel) {
 		freshBadge = tds.Badge("WARN")
 	}
 
+	overseerBadge := tds.Badge("ACTIVE")
+	if !hs.OverseerRunning {
+		overseerBadge = tds.Badge("STANDBY")
+	}
+
 	row1 := []tds.StatItem{
 		{Label: "Kernel Integrity", Value: hs.OverallStatus, Extra: statusBadge},
 		{Label: "Validation Cache", Value: hs.CheckFreshness, Extra: freshBadge},
 		{Label: "Active Violations", Value: fmt.Sprintf("%d total", hs.TotalViolations), Extra: dim(fmt.Sprintf("(%d fixable)", hs.AutoFixableCount))},
 	}
 	row2 := []tds.StatItem{
-		{Label: "Tier Breakdown", Value: fmt.Sprintf("T1:%d  T2:%d  T3:%d", hs.Tier1Count, hs.Tier2Count, hs.Tier3Count)},
+		{Label: "Process Overseer", Value: fmt.Sprintf("%d/%d running", hs.DaemonsRunning, hs.DaemonsTotal), Extra: overseerBadge},
 		{Label: "Storage Membrane", Value: fmt.Sprintf("%s (%d objs)", hs.StorageSizeStr, hs.StorageFiles)},
 		{Label: "File Descriptors", Value: fmt.Sprintf("%d / %d", hs.OpenFileDesc, hs.MaxFileDesc), Extra: tds.Badge(ternary(hs.StaleLocksCount == 0, "CLEAN", "LOCKS"))},
 	}
@@ -1670,7 +1675,62 @@ func renderHealthTab(b *strings.Builder, m *UIModel) {
 	b.WriteString(tds.Panel("🛡️  Kernel Integrity Radar & System Health", panelLines, w, tds.BorderRounded))
 	b.WriteString("\n")
 
-	// 2. Action Center Card (Tray-Backed Scheduler Triggers)
+	// 2. Process Group Overseer & Managed Daemons Section
+	if len(m.DaemonHealth) > 0 {
+		overseerHeader := "⚡ PROCESS GROUP OVERSEER & DAEMONS"
+		if hs.OverseerRunning {
+			overseerHeader += " [OVERSEER ACTIVE]"
+		} else {
+			overseerHeader += " [OVERSEER STANDBY]"
+		}
+		b.WriteString(tds.SectionDivider(overseerHeader, w))
+
+		dTable := tds.NewTable(w).
+			AddColumn("DAEMON", tds.AlignLeft, 14, 0.16).
+			AddColumn("DESIRED", tds.AlignCenter, 10, 0.12).
+			AddColumn("ACTUAL", tds.AlignCenter, 10, 0.12).
+			AddColumn("PID", tds.AlignCenter, 8, 0.10).
+			AddColumn("PGID", tds.AlignCenter, 8, 0.10).
+			AddColumn("RESTARTS", tds.AlignCenter, 10, 0.12).
+			AddColumn("UPTIME", tds.AlignCenter, 12, 0.14).
+			AddColumn("STATUS", tds.AlignCenter, 10, 0.14)
+
+		for _, d := range m.DaemonHealth {
+			stBadge := dim(d.Status)
+			switch d.Status {
+			case "HEALTHY", "RUNNING":
+				stBadge = greenBold(d.Status)
+			case "BACKOFF":
+				stBadge = yellowBold(d.Status)
+			case "CRASHED", "FAIL":
+				stBadge = redBold(d.Status)
+			}
+
+			pidStr := "--"
+			if d.PID > 0 {
+				pidStr = fmt.Sprintf("%d", d.PID)
+			}
+			pgidStr := "--"
+			if d.PGID > 0 {
+				pgidStr = fmt.Sprintf("%d", d.PGID)
+			}
+
+			dTable.AddRow(
+				cyanBold(d.Name),
+				d.DesiredState,
+				d.ActualState,
+				pidStr,
+				pgidStr,
+				fmt.Sprintf("%d", d.RestartCount),
+				d.Uptime,
+				stBadge,
+			)
+		}
+		b.WriteString(dTable.Render())
+		b.WriteString("\n")
+	}
+
+	// 3. Action Center Card (Tray-Backed Scheduler Triggers)
 	if len(m.ActionItems) > 0 {
 		b.WriteString(tds.SectionDivider("⚡ ACTION CENTER (Press key to trigger background scheduler job)", w))
 		var actionLines []string
@@ -1727,6 +1787,9 @@ func renderHealthTab(b *strings.Builder, m *UIModel) {
 		AddColumn("MESSAGE", tds.AlignLeft, 30, 0.44)
 
 	overhead := 21
+	if len(m.DaemonHealth) > 0 {
+		overhead += len(m.DaemonHealth) + 4
+	}
 	if len(m.ActionItems) > 0 {
 		overhead += 5
 	}

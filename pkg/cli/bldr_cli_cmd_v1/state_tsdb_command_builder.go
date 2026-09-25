@@ -12,6 +12,7 @@ import (
 func NewStateTsdbCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("tsdb")
 	builder.WithShort("Inspect embedded kernel time-series database (TSDB) metrics and execution history")
+	builder.WithAliases("timeseries", "metrics-history")
 	help := clipkg.DynamicHelpBuilder("Inspect embedded kernel time-series database (TSDB) metrics and execution history")
 	help.WithDescriptionLines("Queries, aggregates, and inspects time-series performance data recorded in the kernel TSDB")
 	help.WithDescriptionLines("(.zqk/scheduler/tsdb) and chunked metrics directories (.zqk/metrics).")

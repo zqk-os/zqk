@@ -1,0 +1,12 @@
+$schema: ../schemas/command_spec.schema.json
+name: run
+short: Run the overseer supervisor in the foreground as process group leader
+description: Run the overseer supervisor in the foreground as process group leader
+args:
+  type: no_args
+help:
+  examples:
+    - comment: Run the overseer supervisor
+      command: '%s daemon run'
+run_e: runDaemonRun
+common_flags: true

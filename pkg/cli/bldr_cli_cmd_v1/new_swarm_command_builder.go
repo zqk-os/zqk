@@ -12,6 +12,7 @@ import (
 func NewNewSwarmCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("swarm")
 	builder.WithShort("Write a portable swarm manifest draft (swarm.yaml)")
+	builder.WithAliases("swarm-manifest", "swarm-spec", "pack-manifest")
 	help := clipkg.DynamicHelpBuilder("Write a portable swarm manifest draft (swarm.yaml)")
 	help.WithDescriptionLines("Valid holonic swarm package manifest conforming to swarm_package_spec.")
 	help.WithDescriptionLines("")
