@@ -301,6 +301,11 @@ func init() {
 		// (object-id-cache, list cache, validation cache) in sync with storage,
 		// including background deletes/compactions that do not pass CacheContext.
 		system.CascadeOnObjectChange(ctx, projectRoot, operation, kind, id, zqkenv.SessionID().Get())
+
+		// Shockwave linkage emission on update/create so accumulators update in-memory graphs immediately:
+		if (operation == storage.OpUpdate || operation == storage.OpCreate) && projectRoot != EmptyValue && objectData != nil {
+			emitReferenceShockwaves(projectRoot, kind, id, objectData)
+		}
 		return nil
 	})
 
@@ -1083,4 +1088,29 @@ func rootPersistentPreRunE(cmd *cobra.Command, args []string) error {
 
 	mcpInitTrace(initStart, "pre_run_done")
 	return nil
+}
+
+func emitReferenceShockwaves(projectRoot, kind, id string, objectData map[string]any) {
+	if kind == objects.KindTestCase {
+		for _, critID := range lifecycle.StringRefsFromAny(objectData[objects.FieldKeyCriteriaRefs]) {
+			lifecycle.AppendReferenceLinked(projectRoot, objects.KindTestCase, id, objects.KindCriteria, critID, objects.FieldKeyCriteriaRefs)
+		}
+		for _, reqID := range lifecycle.StringRefsFromAny(objectData[objects.FieldKeyRequirementRefs]) {
+			lifecycle.AppendReferenceLinked(projectRoot, objects.KindTestCase, id, objects.KindRequirement, reqID, objects.FieldKeyRequirementRefs)
+		}
+		for _, bliID := range lifecycle.StringRefsFromAny(objectData[objects.FieldKeyBacklogItemRefs]) {
+			lifecycle.AppendReferenceLinked(projectRoot, objects.KindTestCase, id, objects.KindBacklogItem, bliID, objects.FieldKeyBacklogItemRefs)
+		}
+	} else if kind == objects.KindCriteria {
+		for _, tcID := range lifecycle.StringRefsFromAny(objectData[objects.FieldKeyTestCaseRefs]) {
+			lifecycle.AppendReferenceLinked(projectRoot, objects.KindCriteria, id, objects.KindTestCase, tcID, objects.FieldKeyTestCaseRefs)
+		}
+	} else if kind == objects.KindBacklogItem {
+		for _, critID := range lifecycle.StringRefsFromAny(objectData[objects.FieldKeyCriteriaRefs]) {
+			lifecycle.AppendReferenceLinked(projectRoot, objects.KindBacklogItem, id, objects.KindCriteria, critID, objects.FieldKeyCriteriaRefs)
+		}
+		for _, tcID := range lifecycle.StringRefsFromAny(objectData[objects.FieldKeyTestCaseRefs]) {
+			lifecycle.AppendReferenceLinked(projectRoot, objects.KindBacklogItem, id, objects.KindTestCase, tcID, objects.FieldKeyTestCaseRefs)
+		}
+	}
 }

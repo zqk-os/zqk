@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"time"
 
@@ -27,6 +28,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/federation/meshbroker"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/infrastructure/crypto"
+	"github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/pipeline"
@@ -580,11 +582,17 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 							return err
 						}
 
-						// Mark the backlog item in_progress so CAP / whats-next see active work.
+						// Mark the backlog item in_progress only if TDD posture is satisfied:
+						// All criteria must be linked to a test case in a ready/active state.
 						if itemID != "" && !strings.HasPrefix(itemID, "generated-") {
 							if st, _ := item[objects.FieldKeyStatus].(string); st != "in_progress" {
-								item[objects.FieldKeyStatus] = "in_progress"
-								_ = state.sp.Update(workerCtx, state.secCtx, itemID, item)
+								if verifyBLITDDReady(workerCtx, state.sp, state.secCtx, item) {
+									item[objects.FieldKeyStatus] = "in_progress"
+									_ = state.sp.Update(workerCtx, state.secCtx, itemID, item)
+								} else {
+									logging.FluentEvent(logging.GetLoggerFromContext(workerCtx)).Warn("TDD Gate: Backlog item criteria not linked to ready test cases; in_progress transition held").
+										ItemID(itemID).Log()
+								}
 							}
 						}
 
@@ -996,3 +1004,60 @@ func localSkillIDByTitle(ctx context.Context, sp storage.ObjectStorageProvider, 
 	}
 	return ""
 }
+
+func verifyBLITDDReady(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, item map[string]any) bool {
+	if item == nil {
+		return false
+	}
+	critRefs := lifecycle.StringRefsFromAny(item[objects.FieldKeyCriteriaRefs])
+	tcRefs := lifecycle.StringRefsFromAny(item[objects.FieldKeyTestCaseRefs])
+
+	// If the item has direct test case refs, verify at least one is in a ready state
+	hasDirectReadyTest := false
+	var coveredCriteria []string
+	for _, tcID := range tcRefs {
+		if tcObj, err := sp.Read(ctx, secCtx, tcID); err == nil && tcObj != nil {
+			st, _ := tcObj[objects.FieldKeyStatus].(string)
+			if isTestCaseReadyStatus(st) {
+				hasDirectReadyTest = true
+				cRefs := lifecycle.StringRefsFromAny(tcObj[objects.FieldKeyCriteriaRefs])
+				coveredCriteria = append(coveredCriteria, cRefs...)
+			}
+		}
+	}
+
+	// If no criteria refs, need at least direct ready test
+	if len(critRefs) == 0 {
+		return hasDirectReadyTest
+	}
+
+	// Every criterion must be covered by a ready test case
+	for _, critID := range critRefs {
+		hasTestForCrit := slices.Contains(coveredCriteria, critID)
+		if !hasTestForCrit {
+			critObj, err := sp.Read(ctx, secCtx, critID)
+			if err == nil && critObj != nil {
+				cTestRefs := lifecycle.StringRefsFromAny(critObj[objects.FieldKeyTestCaseRefs])
+				for _, tcID := range cTestRefs {
+					if tcObj, tErr := sp.Read(ctx, secCtx, tcID); tErr == nil && tcObj != nil {
+						st, _ := tcObj[objects.FieldKeyStatus].(string)
+						if isTestCaseReadyStatus(st) {
+							hasTestForCrit = true
+							break
+						}
+					}
+				}
+			}
+		}
+		if !hasTestForCrit {
+			return false
+		}
+	}
+	return true
+}
+
+func isTestCaseReadyStatus(status string) bool {
+	s := strings.ToLower(strings.TrimSpace(status))
+	return s == "active" || s == "draft" || s == "metrics_captured" || s == "complete"
+}
+

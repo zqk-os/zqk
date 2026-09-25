@@ -60,3 +60,24 @@ func AppendStatusTransition(projectRoot, kind, id, fromStatus, toStatus string) 
 	_ = wal.Append(ev)
 	_ = wal.Sync()
 }
+
+// AppendReferenceLinked appends a reference_linked event to the lifecycle WAL for projectRoot.
+func AppendReferenceLinked(projectRoot, sourceKind, sourceID, targetKind, targetID, fieldName string) {
+	if projectRoot == emptyValue {
+		return
+	}
+	wal, err := GetOrCreateLifecycleWAL(projectRoot)
+	if err != nil {
+		return
+	}
+	ev := &LifecycleEvent{
+		EventType:  EventTypeReferenceLinked,
+		Kind:       sourceKind,
+		ID:         sourceID,
+		TargetKind: targetKind,
+		TargetID:   targetID,
+		FieldName:  fieldName,
+	}
+	_ = wal.Append(ev)
+	_ = wal.Sync()
+}

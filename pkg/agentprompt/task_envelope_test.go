@@ -125,6 +125,31 @@ func TestBuildTaskPrompt_refsNotBodies(t *testing.T) {
 	}
 }
 
+func TestBuildTaskPrompt_inlineBodies(t *testing.T) {
+	sp := &testMockSP{
+		objects: map[string]map[string]any{
+			"ASK-BOOT": {
+				objects.FieldKeyKind:                objects.KindAgentSkill,
+				objects.FieldKeyID:                  "ASK-BOOT",
+				objects.FieldKeyTitle:               "Boot skill",
+				objects.FieldKeyInstructionsSummary: "[orchestration-boot] required",
+				objects.FieldKeyInstructions:        "Strictly execute tests with proper evidence gates.",
+			},
+		},
+	}
+	out, err := BuildTaskPrompt(context.Background(), sp, pkgctx.NewSystemSecurityContext(), "", TaskPromptOptions{
+		PlanTitle:    "Test Plan",
+		TaskTitle:    "Work",
+		InlineBodies: true,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(out, "Strictly execute tests with proper evidence gates.") {
+		t.Fatalf("expected inlined skill body in execute prompt with InlineBodies: true:\n%s", out)
+	}
+}
+
 func TestBuildTaskPrompt_persistLayerIsEnvelope(t *testing.T) {
 	sp := &testMockSP{objects: map[string]map[string]any{}}
 	opts := TaskPromptOptions{

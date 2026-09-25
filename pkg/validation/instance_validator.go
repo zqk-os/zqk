@@ -5,10 +5,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/zqk-os/zqk/pkg/concurrency"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
@@ -274,24 +272,10 @@ func (iv *InstanceValidator) validateFieldPattern(fieldName string, fieldValue a
 				Rule:    "pattern",
 			}, nil
 		}
-		// Check if IDValidator actually validated (has patterns for this kind) or was permissive
-		// If IDValidator was permissive (returned true for unknown kind), also validate against spec pattern
-		var hasPatterns bool
-		if err := concurrency.RunInRLockWithLogger(
-			&idValidator.mu,
-			LockNameInstanceValidatorCheckPatterns,
-			lockLoggerSystem(),
-			func() error {
-				hasPatterns = idValidator.patterns[kind] != nil
-				return nil
-			},
-		); err != nil {
-			logging.Fluent(logging.GetLoggerFromProfile(
-
-				// IDValidator has patterns for this kind and validated - skip spec pattern validation
-				string(pkgctx.ProfileSystem))).Error(ErrMsgSwallowedError, err).Log()
-		}
-		if hasPatterns {
+		// Check if IDValidator actually validated (has patterns for this kind) or was permissive.
+		// If IDValidator was permissive (returned true for unknown kind), also validate against spec pattern.
+		// IDValidator has patterns for this kind and validated - skip spec pattern validation.
+		if idValidator.HasLoadedPattern(kind) {
 
 			return nil, nil
 		}

@@ -43,12 +43,19 @@ func LoadBoundPolicies(ctx context.Context, sp storage.ObjectStorageProvider, se
 	if sp == nil {
 		return &PolicyEnforcement{}, nil
 	}
-	ids := append([]string{}, StandingPolicyRefs()...)
+	var ids []string
 	if pid := strings.TrimSpace(personaID); pid != "" && strings.HasPrefix(strings.ToUpper(pid), "PER-") {
 		if persona, err := sp.Read(ctx, secCtx, pid); err == nil && persona != nil {
 			ids = uniqueIDs(ids, objects.CollectPersonaInteractionPolicyRefs(persona))
 		}
 	}
+	// Check candidate IDs from legacy standing refs if they exist in storage
+	for _, standingID := range StandingPolicyRefs() {
+		if obj, err := sp.Read(ctx, secCtx, standingID); err == nil && obj != nil {
+			ids = append(ids, standingID)
+		}
+	}
+
 	var policies []map[string]any
 	for _, id := range ids {
 		obj, err := sp.Read(ctx, secCtx, id)
@@ -57,8 +64,17 @@ func LoadBoundPolicies(ctx context.Context, sp storage.ObjectStorageProvider, se
 		}
 		policies = append(policies, obj)
 	}
+
+	// If no bound policies were found by ID, dynamically discover active policies from the kernel.
+	if len(policies) == 0 {
+		if activeEnf, err := LoadActivePolicies(ctx, sp, secCtx); err == nil && activeEnf != nil {
+			policies = activeEnf.ActivePolicies
+		}
+	}
+
 	return &PolicyEnforcement{ActivePolicies: policies}, nil
 }
+
 
 // GeneratePromptSection lists bound policies as ID+title refs. Bodies stay in the kernel.
 func (p *PolicyEnforcement) GeneratePromptSection() string {

@@ -1083,9 +1083,11 @@ func (m *UIModel) RefreshQA(ctx context.Context, sp storage.ObjectStorageProvide
 				sec = pkgctx.NewSystemSecurityContext()
 			}
 		}
-		if sp != nil && sec != nil {
+		if sp != nil {
 			_ = dState.ScanFromStorage(ctx, sp)
-			_ = dState.SaveToLiteFile(m.ProjectRoot)
+			if len(dState.TestCases) > 0 {
+				_ = dState.SaveToLiteFile(m.ProjectRoot)
+			}
 		}
 	}
 

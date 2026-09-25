@@ -71,6 +71,8 @@ transitions:
     manual: true
     auto: true
     catalyst: System initialization
+    preconditions:
+      - at least one active test_case_ref linked
     postconditions:
       - role is shovel_ready
     class_vs_specialty: class-agnostic

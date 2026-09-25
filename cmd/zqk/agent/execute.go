@@ -118,6 +118,7 @@ func NewExecuteCmd() *cobra.Command {
 						PersonaID:       targetAgent,
 						IncludeTDD:      true,
 						IncludeObserver: true,
+						InlineBodies:    true,
 						TaskContext:     string(bundleBytes),
 					}
 					prompt, err = agentprompt.BuildTaskPrompt(ctx, proc.Storage(), proc.SecurityContext(), proc.ProjectRoot(), promptOpts)
@@ -127,6 +128,13 @@ func NewExecuteCmd() *cobra.Command {
 				} else {
 					// Historic ATKs stored a pasted prompt catalog in description.
 					prompt = taskPrompt
+				}
+				for _, dep := range deps {
+					if dep[objects.FieldKeyKind] == objects.KindBacklogItem {
+						if desc, ok := dep[objects.FieldKeyDescription].(string); ok && desc != "" && !agentprompt.IsTaskEnvelope(desc) {
+							prompt += "\n\n## Backlog Item Instructions & Deliverables\n" + desc
+						}
+					}
 				}
 				prompt += "\n\n## Bounded Kernel Context\n" + string(bundleBytes)
 				if stepsSection := formatTaskStepsSection(task[objects.FieldKeyTaskSteps]); stepsSection != "" {
@@ -148,6 +156,7 @@ func NewExecuteCmd() *cobra.Command {
 					TargetAgent:     targetAgent,
 					IncludeTDD:      true,
 					IncludeObserver: true,
+					InlineBodies:    true,
 					TaskContext:     string(bundleBytes),
 				}
 				prompt, err = agentprompt.BuildTaskPrompt(ctx, proc.Storage(), proc.SecurityContext(), proc.ProjectRoot(), promptOpts)

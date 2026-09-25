@@ -41,11 +41,29 @@ func IsTaskEnvelope(s string) bool {
 // BuildTaskEnvelope loads persona-bound refs and formats a compact persist description.
 func BuildTaskEnvelope(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, projectRoot string, opts TaskPromptOptions) (*TaskEnvelope, error) {
 	personaID := resolvePersonaID(opts)
-	policyIDs := append([]string{}, StandingPolicyRefs()...)
-	if personaID != "" && strings.HasPrefix(strings.ToUpper(personaID), "PER-") && sp != nil {
-		if persona, err := sp.Read(ctx, secCtx, personaID); err == nil && persona != nil {
-			policyIDs = uniqueIDs(policyIDs, objects.CollectPersonaInteractionPolicyRefs(persona))
+	var policyIDs []string
+	if sp != nil {
+		// 1. Add valid persona-bound interaction policies that exist in storage
+		if personaID != "" && strings.HasPrefix(strings.ToUpper(personaID), "PER-") {
+			if persona, err := sp.Read(ctx, secCtx, personaID); err == nil && persona != nil {
+				for _, id := range objects.CollectPersonaInteractionPolicyRefs(persona) {
+					if policyExistsInStorage(ctx, sp, secCtx, id) {
+						policyIDs = append(policyIDs, id)
+					}
+				}
+			}
 		}
+		// 2. Discover active standing policies from the kernel
+		if activeEnf, err := LoadActivePolicies(ctx, sp, secCtx); err == nil && activeEnf != nil {
+			for _, pol := range activeEnf.ActivePolicies {
+				if pid, ok := pol[objects.FieldKeyID].(string); ok && pid != "" {
+					policyIDs = append(policyIDs, pid)
+				}
+			}
+		}
+		policyIDs = uniqueIDs(nil, policyIDs)
+	} else {
+		policyIDs = append([]string{}, StandingPolicyRefs()...)
 	}
 
 	var skillIDs []string
@@ -62,6 +80,19 @@ func BuildTaskEnvelope(ctx context.Context, sp storage.ObjectStorageProvider, se
 		PolicyRefs:  policyIDs,
 		SkillRefs:   skillIDs,
 	}, nil
+}
+
+func policyExistsInStorage(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, id string) bool {
+	if sp == nil {
+		return false
+	}
+	if exists, err := sp.Exists(ctx, secCtx, id); err == nil && exists {
+		return true
+	}
+	if obj, err := sp.Read(ctx, secCtx, id); err == nil && obj != nil {
+		return true
+	}
+	return false
 }
 
 // FormatTaskEnvelope renders the persist-layer markdown. No policy/skill bodies.
@@ -95,15 +126,10 @@ func FormatTaskEnvelope(opts TaskPromptOptions, policyRefs, skillRefs []string) 
 		sb.WriteString("\n")
 	}
 
-	sb.WriteString("\n## Standing refs (do not duplicate bodies)\n")
-	for _, id := range StandingPolicyRefs() {
-		sb.WriteString(paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("- `%s` — `zqk object get %s`\n", id, id)))
-	}
-
 	if len(policyRefs) > 0 {
-		sb.WriteString("\n## Bound policies\n")
+		sb.WriteString("\n## Standing & bound policies (do not duplicate bodies)\n")
 		for _, id := range policyRefs {
-			sb.WriteString(fmt.Sprintf("- `%s`\n", id))
+			sb.WriteString(paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("- `%s` — `zqk object get %s`\n", id, id)))
 		}
 	}
 	if len(skillRefs) > 0 {

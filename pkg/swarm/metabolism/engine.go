@@ -217,36 +217,39 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 
 		// Criteria 1: Invariant
 		critInv := map[string]any{
-			objects.FieldKeyID:          critInvID,
-			objects.FieldKeyKind:        "criteria",
-			objects.FieldKeyTitle:       fmt.Sprintf("State Invariant for %s", task.ID),
-			objects.FieldKeyDescription: fmt.Sprintf("Specification schema and output structure are strictly valid for %s", task.ID),
-			"formula_type":              "invariant",
-			"statement":                 fmt.Sprintf("Specification schema and output structure are strictly valid for %s", task.ID),
-			objects.FieldKeyCategory:    "acceptance",
-			objects.FieldKeyStatus:      objects.ObjectStatusAwaitingVerification,
+			objects.FieldKeyID:              critInvID,
+			objects.FieldKeyKind:            "criteria",
+			objects.FieldKeyTitle:           fmt.Sprintf("State Invariant for %s", task.ID),
+			objects.FieldKeyDescription:     fmt.Sprintf("Specification schema and output structure are strictly valid for %s", task.ID),
+			"formula_type":                  "invariant",
+			"statement":                     fmt.Sprintf("Specification schema and output structure are strictly valid for %s", task.ID),
+			objects.FieldKeyCategory:        "acceptance",
+			objects.FieldKeyRequirementRefs: []string{reqID},
+			objects.FieldKeyStatus:          objects.ObjectStatusAwaitingVerification,
 		}
 		// Criteria 2: Dynamic
 		critDyn := map[string]any{
-			objects.FieldKeyID:          critDynID,
-			objects.FieldKeyKind:        "criteria",
-			objects.FieldKeyTitle:       fmt.Sprintf("Dynamic Execution for %s", task.ID),
-			objects.FieldKeyDescription: fmt.Sprintf("Agent task executes successfully and generates verifiable observations for %s", task.ID),
-			"formula_type":              "dynamic",
-			"statement":                 fmt.Sprintf("Agent task executes successfully and generates verifiable observations for %s", task.ID),
-			objects.FieldKeyCategory:    "acceptance",
-			objects.FieldKeyStatus:      objects.ObjectStatusAwaitingVerification,
+			objects.FieldKeyID:              critDynID,
+			objects.FieldKeyKind:            "criteria",
+			objects.FieldKeyTitle:           fmt.Sprintf("Dynamic Execution for %s", task.ID),
+			objects.FieldKeyDescription:     fmt.Sprintf("Agent task executes successfully and generates verifiable observations for %s", task.ID),
+			"formula_type":                  "dynamic",
+			"statement":                     fmt.Sprintf("Agent task executes successfully and generates verifiable observations for %s", task.ID),
+			objects.FieldKeyCategory:        "acceptance",
+			objects.FieldKeyRequirementRefs: []string{reqID},
+			objects.FieldKeyStatus:          objects.ObjectStatusAwaitingVerification,
 		}
 		// Criteria 3: Adversarial
 		critAdv := map[string]any{
-			objects.FieldKeyID:          critAdvID,
-			objects.FieldKeyKind:        "criteria",
-			objects.FieldKeyTitle:       fmt.Sprintf("Adversarial Boundary for %s", task.ID),
-			objects.FieldKeyDescription: fmt.Sprintf("Non-conforming outputs or membrane transgressions fail closed for %s", task.ID),
-			"formula_type":              "adversarial",
-			"statement":                 fmt.Sprintf("Non-conforming outputs or membrane transgressions fail closed for %s", task.ID),
-			objects.FieldKeyCategory:    "acceptance",
-			objects.FieldKeyStatus:      objects.ObjectStatusAwaitingVerification,
+			objects.FieldKeyID:              critAdvID,
+			objects.FieldKeyKind:            "criteria",
+			objects.FieldKeyTitle:           fmt.Sprintf("Adversarial Boundary for %s", task.ID),
+			objects.FieldKeyDescription:     fmt.Sprintf("Non-conforming outputs or membrane transgressions fail closed for %s", task.ID),
+			"formula_type":                  "adversarial",
+			"statement":                     fmt.Sprintf("Non-conforming outputs or membrane transgressions fail closed for %s", task.ID),
+			objects.FieldKeyCategory:        "acceptance",
+			objects.FieldKeyRequirementRefs: []string{reqID},
+			objects.FieldKeyStatus:          objects.ObjectStatusAwaitingVerification,
 		}
 		kernelObjects = append(kernelObjects, critInv, critDyn, critAdv)
 
@@ -276,12 +279,55 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 		}
 		kernelObjects = append(kernelObjects, tstObj)
 
+		// Match template for task
+		var matchedTemplate string
+		taskKey := strings.ToLower(strings.TrimPrefix(task.ID, "wave-"))
+		for _, pfx := range []string{"1-", "2-", "3-", "4-", "5-"} {
+			taskKey = strings.TrimPrefix(taskKey, pfx)
+		}
+		if task.ID == "wave-1-preflight" || strings.Contains(taskKey, "preflight") {
+			for _, t := range templates {
+				if strings.Contains(strings.ToLower(t.Metadata["file"]), "kickoff") {
+					matchedTemplate = t.Template
+					break
+				}
+			}
+		} else if strings.HasSuffix(taskKey, "-critique") {
+			stem := strings.TrimSuffix(taskKey, "-critique")
+			for _, t := range templates {
+				if strings.Contains(strings.ToLower(t.Metadata["file"]), stem+"-adv") {
+					matchedTemplate = t.Template
+					break
+				}
+			}
+		} else {
+			for _, t := range templates {
+				if strings.Contains(strings.ToLower(t.Metadata["file"]), taskKey+"-spec") {
+					matchedTemplate = t.Template
+					break
+				}
+			}
+		}
+		if matchedTemplate == "" && task.Role == "lead_integrator" {
+			for _, t := range templates {
+				if strings.Contains(strings.ToLower(t.Metadata["file"]), "integrator-spec") {
+					matchedTemplate = t.Template
+					break
+				}
+			}
+		}
+
+		bliDesc := fmt.Sprintf("Execute agent task %s in alignment with role %s", task.ID, task.Role)
+		if matchedTemplate != "" {
+			bliDesc = matchedTemplate
+		}
+
 		// Backlog Item (child owns priority_plan_ref)
 		bliObj := map[string]any{
 			objects.FieldKeyID:             bliID,
 			objects.FieldKeyKind:           "backlog_item",
 			objects.FieldKeyTitle:          task.Title,
-			objects.FieldKeyDescription:    fmt.Sprintf("Execute agent task %s in alignment with role %s", task.ID, task.Role),
+			objects.FieldKeyDescription:    bliDesc,
 			objects.FieldKeyMilestoneRefs:  []string{milestoneID},
 			objects.FieldKeyRequirementRefs: []string{reqID},
 			objects.FieldKeyCriteriaRefs:   []string{critInvID, critDynID, critAdvID},
@@ -296,7 +342,7 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 			if a.Role == task.Role && a.Name != "" {
 				pRef := a.Name
 				if !strings.HasPrefix(pRef, "PER-") {
-					pRef = objects.ConstPersonaDefaultAgent
+					pRef = fmt.Sprintf("PER-%s-%s", cleanName, strings.ToUpper(strings.ReplaceAll(a.Role, "-", "_")))
 				}
 				taskPersonas = append(taskPersonas, pRef)
 			}
@@ -372,20 +418,24 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 		for _, a := range manifest.Agents {
 			pRef := a.Name
 			if !strings.HasPrefix(pRef, "PER-") {
-				pRef = objects.ConstPersonaDefaultAgent
+				pRef = fmt.Sprintf("PER-%s-%s", cleanName, strings.ToUpper(strings.ReplaceAll(a.Role, "-", "_")))
 			}
 			allocations = append(allocations, map[string]any{
 				"persona_ref": pRef,
 				"role":        a.Role,
 				"count":       1,
 			})
-		}
-		if len(allocations) == 0 {
-			allocations = append(allocations, map[string]any{
-				"persona_ref": objects.ConstPersonaDefaultAgent,
-				"role":        "agent",
-				"count":       1,
-			})
+			personaObj := map[string]any{
+				objects.FieldKeyID:                pRef,
+				objects.FieldKeyKind:              objects.KindPersona,
+				objects.FieldKeyTitle:             a.Name,
+				objects.FieldKeyRole:              a.Role,
+				objects.FieldKeyDescription:       a.SystemPrompt,
+				"system_prompt":                   a.SystemPrompt,
+				objects.FieldKeyRelatedObjectRefs: a.Skills,
+				objects.FieldKeyStatus:            objects.ObjectStatusApproved,
+			}
+			kernelObjects = append(kernelObjects, personaObj)
 		}
 		tcfgObj := map[string]any{
 			objects.FieldKeyID:                 tcfgID,
@@ -400,8 +450,11 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 		priObj[objects.FieldKeyTeamConfigurationRef] = tcfgID
 	}
 
-	// Ensure persona_refs only contains valid existing or default persona refs
-	validPersonaRefs := []string{objects.ConstPersonaDefaultAgent, objects.ConstPersonaDefaultOperator}
+	// Ensure persona_refs contains configured persona refs, falling back to defaults if empty
+	validPersonaRefs := personaRefs
+	if len(validPersonaRefs) == 0 {
+		validPersonaRefs = []string{objects.ConstPersonaDefaultAgent, objects.ConstPersonaDefaultOperator}
+	}
 	priObj[objects.FieldKeyPersonaRefs] = validPersonaRefs
 
 	kernelObjects = append(kernelObjects, priObj)

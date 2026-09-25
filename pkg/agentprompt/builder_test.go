@@ -47,3 +47,8 @@ func (m *mockStorageProvider) List(ctx context.Context, secCtx *pkgctx.SecurityC
 func (m *mockStorageProvider) Read(ctx context.Context, secCtx *pkgctx.SecurityContext, id string) (map[string]any, error) {
 	return nil, storage.ErrObjectNotFound
 }
+
+func (m *mockStorageProvider) Exists(ctx context.Context, secCtx *pkgctx.SecurityContext, id string) (bool, error) {
+	return false, nil
+}
+

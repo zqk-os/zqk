@@ -210,6 +210,27 @@ func (v *IDValidator) validateByPattern(id, pattern string) (bool, error) {
 	return re.MatchString(id), nil
 }
 
+// HasLoadedPattern reports whether kind has a configured ID pattern.
+// Callers must use this instead of reading patterns or mu.
+func (v *IDValidator) HasLoadedPattern(kind string) bool {
+	if v == nil {
+		return false
+	}
+	var has bool
+	if err := concurrency.RunInRLockWithLogger(
+		&v.mu,
+		LockNameInstanceValidatorCheckPatterns,
+		lockLoggerSystem(),
+		func() error {
+			has = v.patterns[kind] != nil
+			return nil
+		},
+	); err != nil {
+		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgSwallowedError, err).Log()
+	}
+	return has
+}
+
 // GetValidPrefixes returns valid prefixes for a given kind
 func (v *IDValidator) GetValidPrefixes(kind string) []string {
 	var config *IDPatternConfig

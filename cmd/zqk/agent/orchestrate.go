@@ -193,7 +193,6 @@ func buildOrchestrationTaskEnvelope(
 	if err != nil || env == nil {
 		env = &agentprompt.TaskEnvelope{
 			Description: fmt.Sprintf("Task: %s\n%s\n", taskTitle, agentprompt.TaskEnvelopeMarker),
-			PolicyRefs:  agentprompt.StandingPolicyRefs(),
 		}
 	}
 	if meshSkillSection != "" {

@@ -20,6 +20,7 @@ import (
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/accumulator"
 	bldr "github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -204,9 +205,18 @@ func (s *DashboardState) BuildPayload() *DashboardLitePayload {
 
 // ScanFromStorage satisfies accumulator.Accumulator interface.
 func (s *DashboardState) ScanFromStorage(ctx context.Context, sp storage.ObjectStorageProvider) error {
+	secCtx := pkgctx.NewSystemSecurityContext()
+	return s.ScanFromStorageWithSecurity(ctx, sp, secCtx)
+}
+
+// ScanFromStorageWithSecurity performs a full load from storage using the provided security context.
+func (s *DashboardState) ScanFromStorageWithSecurity(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *storage.SecurityContext) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	return s.scanFromStorageLocked(ctx, sp, nil, s.projectRoot, true, "", "")
+	if secCtx == nil {
+		secCtx = pkgctx.NewSystemSecurityContext()
+	}
+	return s.scanFromStorageLocked(ctx, sp, secCtx, s.projectRoot, true, "", "")
 }
 
 // WarmLiteFile builds and persists the materialized test dashboard lite file from storage.
@@ -577,6 +587,9 @@ func (s *DashboardState) scanFromStorageLocked(
 	statusFilter string,
 	tcFilter string,
 ) error {
+	if secCtx == nil {
+		secCtx = pkgctx.NewSystemSecurityContext()
+	}
 	// In-memory cache for fast lineage resolution across the scan
 	objCache := make(map[string]map[string]any)
 	readWithCache := func(id string) map[string]any {
@@ -989,9 +1002,86 @@ func (s *DashboardState) handleLifecycleEventLocked(ev *lifecycle.LifecycleEvent
 				Message:   fmt.Sprintf("TEST CASE %s: %s -> %s", ev.ID, ev.FromStatus, ev.ToStatus),
 			})
 		}
+	case lifecycle.EventTypeReferenceLinked:
+		s.handleReferenceLinkedLocked(ev, ts)
 	}
 
 	s.LastUpdated = time.Now()
+}
+
+func (s *DashboardState) handleReferenceLinkedLocked(ev *lifecycle.LifecycleEvent, ts time.Time) {
+	if ev.Kind == objects.KindTestCase && ev.TargetKind == objects.KindCriteria {
+		tcID := ev.ID
+		critID := ev.TargetID
+		tc, ok := s.TestCases[tcID]
+		if !ok {
+			tc = &TestCaseModel{
+				ID:       tcID,
+				Status:   objects.ObjectStatusActive,
+				Criteria: make([]*CriterionState, 0),
+			}
+			s.TestCases[tcID] = tc
+		}
+
+		// Ensure criterion is in tc.Criteria
+		found := false
+		for _, cr := range tc.Criteria {
+			if cr.ID == critID {
+				found = true
+				break
+			}
+		}
+		if !found {
+			tc.Criteria = append(tc.Criteria, &CriterionState{
+				ID:     critID,
+				Status: objects.ObjectStatusOriginated,
+			})
+			tc.TotalCriteria = len(tc.Criteria)
+			tc.RemainingOpenCount = tc.TotalCriteria - tc.CompletedCriteria
+		}
+
+		// Update CriteriaIndex
+		s.CriteriaIndex[critID] = append(s.CriteriaIndex[critID], tc)
+
+		s.appendRecentEvent(LifecycleEventSummary{
+			Timestamp:   ts,
+			EventType:   string(ev.EventType),
+			Kind:        ev.Kind,
+			ObjectID:    tcID,
+			CriterionID: critID,
+			Message:     fmt.Sprintf("LINKAGE SHOCKWAVE: Test Case %s ➔ Criterion %s", tcID, critID),
+		})
+	} else if ev.Kind == objects.KindTestCase && ev.TargetKind == objects.KindBacklogItem {
+		tcID := ev.ID
+		bliID := ev.TargetID
+		if tc, ok := s.TestCases[tcID]; ok {
+			already := false
+			for _, r := range tc.BacklogItemRefs {
+				if r == bliID {
+					already = true
+					break
+				}
+			}
+			if !already {
+				tc.BacklogItemRefs = append(tc.BacklogItemRefs, bliID)
+			}
+		}
+	} else if ev.Kind == objects.KindTestCase && ev.TargetKind == objects.KindRequirement {
+		tcID := ev.ID
+		reqID := ev.TargetID
+		if tc, ok := s.TestCases[tcID]; ok {
+			already := false
+			for _, r := range tc.RequirementRefs {
+				if r == reqID {
+					already = true
+					break
+				}
+			}
+			if !already {
+				tc.RequirementRefs = append(tc.RequirementRefs, reqID)
+			}
+		}
+	}
 }
 
 func (s *DashboardState) appendRecentEvent(ev LifecycleEventSummary) {
