@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """
-setup_orphaned_process_tech_debt.py
+restructure_subprocess_hygiene_plan.py
 
-Objectify, kernelize, and prioritize technical debt item TDE-F-TST-ORPHANED-PROCESS-LEAK
-along with its full DoD-traceable lineage (Milestone, Requirement, Criterion, Priority Plan,
-Test Case, and Backlog Item).
+Restructure PRI-TST-SUBPROCESS-HYGIENE incorporating user architectural overrides:
+- REQ:TST ratio is 1:1 (or 2:1), NOT 1:1 per criterion
+- CRIT:TST is many:1 (3 criteria -> 1 unified Test Case / Execution Organizer)
+- The Test Case acts as the cohesive execution container defining the verification topology (sequential & concurrent stages)
+- 4 decoupled Backlog Items mapped to the plan and unified test case
 """
 
 import json
@@ -15,7 +17,7 @@ import yaml
 import hashlib
 
 def import_objects(kind, objects):
-    import_path = f"/tmp/import_{kind}.json"
+    import_path = f"/tmp/import_restructure_{kind}.json"
     with open(import_path, "w", encoding="utf-8") as f:
         json.dump(objects, f, indent=2)
     print(f"Importing {len(objects)} {kind} objects into kernel...")
@@ -28,26 +30,9 @@ def import_objects(kind, objects):
         os.remove(import_path)
 
 def main():
-    print("Kernelizing TDE-F-TST-ORPHANED-PROCESS-LEAK and lineage...")
+    print("Restructuring PRI-TST-SUBPROCESS-HYGIENE with REQ:TST=1:1 and CRIT:TST=3:1...")
 
-    # 1. Technical Debt Object
-    tde_obj = [{
-        "id": "TDE-F-TST-ORPHANED-PROCESS-LEAK",
-        "kind": "technical_debt",
-        "title": "Test Harness and Child Subprocess Leak Causes Runaway CPU and System Exhaustion",
-        "description": "Test suites invoking subprocesses, background daemons, and archive builds leak orphan child processes when tests time out or terminate. Root causes include lack of process-group pgid scoping, missing t.Cleanup process tree termination, and unbounded recursive compilation in test suites, causing severe CPU spikes and antivirus thrashing.",
-        "debt_type": "tooling",
-        "impact_assessment": "high",
-        "priority": "high",
-        "target_resolution_date": "2026-10-15",
-        "status": "identified",
-        "tags": ["cef", "tst", "testability", "high", "finding:F-TST-ORPHANED-PROCESS-LEAK"],
-        "namespace_id": "zqk:kernel",
-        "schema_version": "2.0.0"
-    }]
-    import_objects("technical_debt", tde_obj)
-
-    # 2. Milestone
+    # 1. Milestone
     milestone = [{
         "id": "MIL-TEST-HARNESS-ROBUSTNESS",
         "kind": "milestone",
@@ -62,51 +47,100 @@ def main():
     }]
     import_objects("milestone", milestone)
 
-    # 3. Criteria (kind: criteria)
-    crit_objs = [{
-        "id": "CRIT-TST-SUBPROCESS-LIFECYCLE-HYGIENE",
-        "kind": "criteria",
-        "title": "Validation criteria for REQ-TST-SUBPROCESS-LIFECYCLE-HYGIENE",
-        "description": "All test suites spawning subprocesses or background daemons must bind execution to context cancellation, setpgid process groups, and t.Cleanup termination hooks to prevent orphan process leaks.",
-        "status": "originated",
-        "category": "functional",
-        "namespace_id": "zqk:kernel",
-        "schema_version": "2.0.0"
-    }]
+    # 2. Three-Fold Proof Criteria (3 criteria for the requirement)
+    crit_objs = [
+        {
+            "id": "CRIT-TST-SUBPROCESS-STATIC-GUARD",
+            "kind": "criteria",
+            "title": "Static Floor: Static AST guardrail prohibits unmanaged exec.Command in test suites",
+            "description": "Static analysis (via zqk-vet or custom AST visitor) verifies that test files do not instantiate naked exec.Command without context or testkit managed execution primitives.",
+            "status": "originated",
+            "category": "functional",
+            "namespace_id": "zqk:kernel",
+            "schema_version": "2.0.0"
+        },
+        {
+            "id": "CRIT-TST-SUBPROCESS-MANAGED-RUNNER",
+            "kind": "criteria",
+            "title": "Operational Proof: ManagedCommand binds process group pgid and t.Cleanup termination",
+            "description": "testkit.ManagedCommand launches child commands in distinct POSIX process groups (Setpgid: true) and registers t.Cleanup hooks that kill the entire process tree on test completion.",
+            "status": "originated",
+            "category": "functional",
+            "namespace_id": "zqk:kernel",
+            "schema_version": "2.0.0"
+        },
+        {
+            "id": "CRIT-TST-SUBPROCESS-REAPER-ADVERSARIAL",
+            "kind": "criteria",
+            "title": "Adversarial Boundary: Subprocess leak detector detects and reaps orphan processes on test timeouts",
+            "description": "testkit.VerifyNoSubprocessLeaks and adversarial timeout tests confirm that child processes (including compilers and daemons) are terminated upon context cancellation, leaving zero descendant processes alive.",
+            "status": "originated",
+            "category": "functional",
+            "namespace_id": "zqk:kernel",
+            "schema_version": "2.0.0"
+        }
+    ]
     import_objects("criteria", crit_objs)
 
-    # 4. Requirement
+    # 3. Requirement
     req_objs = [{
         "id": "REQ-TST-SUBPROCESS-LIFECYCLE-HYGIENE",
         "kind": "requirement",
         "title": "Deterministic Subprocess Scoping and Process Reaping Across Test Suites",
         "description": "Audit and enforce strict subprocess lifecycle management across testkit, scheduler, and CLI integration tests so that any spawned process trees are guaranteed to terminate upon test completion, failure, or timeout.",
-        "priority": "high",
+        "priority": "p1",
         "priority_tier": "P1",
         "status": "originated",
         "goal_refs": ["GOAL-STARTER-COMMUNITY-001"],
         "milestone_refs": ["MIL-TEST-HARNESS-ROBUSTNESS"],
-        "criteria_refs": ["CRIT-TST-SUBPROCESS-LIFECYCLE-HYGIENE"],
+        "criteria_refs": [
+            "CRIT-TST-SUBPROCESS-STATIC-GUARD",
+            "CRIT-TST-SUBPROCESS-MANAGED-RUNNER",
+            "CRIT-TST-SUBPROCESS-REAPER-ADVERSARIAL"
+        ],
         "namespace_id": "zqk:kernel",
         "schema_version": "2.0.0"
     }]
     import_objects("requirement", req_objs)
+
+    # 4. Single Unified Test Case (Execution Organizer / Pipeline Container)
+    # Ratio REQ:TST = 1:1, CRIT:TST = 3:1
+    tst_objs = [
+        {
+            "id": "TST-TST-SUBPROCESS-LIFECYCLE-HYGIENE",
+            "kind": "test_case",
+            "title": "Execution Organizer: Subprocess lifecycle multi-stage verification suite",
+            "description": "Unified test harness organizing multi-stage verifications: (1) static vet guardrail against unmanaged exec, (2) operational process group lifecycle under testkit.ManagedCommand, and (3) adversarial abort and leak detection assertions.",
+            "criteria_refs": [
+                "CRIT-TST-SUBPROCESS-STATIC-GUARD",
+                "CRIT-TST-SUBPROCESS-MANAGED-RUNNER",
+                "CRIT-TST-SUBPROCESS-REAPER-ADVERSARIAL"
+            ],
+            "requirement_refs": ["REQ-TST-SUBPROCESS-LIFECYCLE-HYGIENE"],
+            "milestone_refs": ["MIL-TEST-HARNESS-ROBUSTNESS"],
+            "path_or_id": "pkg/testkit/subprocess_lifecycle_test.go",
+            "scope": "integration",
+            "status": "originated",
+            "namespace_id": "zqk:kernel",
+            "schema_version": "2.0.0"
+        }
+    ]
+    import_objects("test_case", tst_objs)
 
     # 5. Priority Plan
     pri_plan = {
         "id": "PRI-TST-SUBPROCESS-HYGIENE",
         "kind": "priority_plan",
         "title": "Troubleshoot and Eradicate Orphaned Test Subprocess Leaks",
-        "description": "Priority plan targeting TDE-F-TST-ORPHANED-PROCESS-LEAK: investigate subprocess invocation patterns in test files, implement process group reaping utilities, and verify zero orphan leaks under test aborts.",
-        "status": "originated",
+        "description": "Ontological multi-item execution plan targeting TDE-F-TST-ORPHANED-PROCESS-LEAK across static linter guards, managed process group runners, adversarial leak detectors, and high-risk test call site refactoring.",
+        "status": "planned",
         "priority_tier": "P1",
         "branch_name": "integration/PRI-TST-SUBPROCESS-HYGIENE",
         "workstream_refs": ["WS-STARTER-COMMUNITY-001"],
         "persona_refs": ["PER-COMMUNITY-SOFTWARE-ENGINEER"],
-        "created_at": "2026-09-25T16:58:00Z",
-        "updated_at": "2026-09-25T16:58:00Z",
+        "created_at": "2026-09-25T17:15:00Z",
+        "updated_at": "2026-09-25T17:15:00Z",
         "created_by": "ACC-1785920548450214012-68b850c0",
-        "updated_by": "ACC-1785920548450214012-68b850c0",
         "version_context": "default",
         "namespace_id": "zqk:kernel",
         "schema_version": "2.0.0"
@@ -129,45 +163,84 @@ def main():
     with open(index_path, "w", encoding="utf-8") as f:
         json.dump(index_data, f)
 
-    # 6. Test Case
-    tst_objs = [{
-        "id": "TST-TST-SUBPROCESS-LIFECYCLE-HYGIENE",
-        "kind": "test_case",
-        "title": "Automated verification of test subprocess lifecycle and process group teardown",
-        "description": "Verification execution: go test -v ./pkg/testkit -run TestSubprocessCleanup",
-        "criteria_refs": ["CRIT-TST-SUBPROCESS-LIFECYCLE-HYGIENE"],
-        "requirement_refs": ["REQ-TST-SUBPROCESS-LIFECYCLE-HYGIENE"],
-        "milestone_refs": ["MIL-TEST-HARNESS-ROBUSTNESS"],
-        "path_or_id": "pkg/testkit/subprocess_cleanup_test.go",
-        "scope": "unit",
-        "status": "originated",
-        "namespace_id": "zqk:kernel",
-        "schema_version": "2.0.0"
-    }]
-    import_objects("test_case", tst_objs)
-
-    # 7. Backlog Item
-    bli_objs = [{
-        "id": "BLI-TST-SUBPROCESS-LIFECYCLE-HYGIENE",
-        "kind": "backlog_item",
-        "title": "Audit and harden test subprocess execution with process group reaping and strict teardown",
-        "description": "Root cause and resolve TDE-F-TST-ORPHANED-PROCESS-LEAK by providing testkit process management helpers that guarantee child process tree termination via setpgid / SIGKILL on t.Cleanup.",
-        "status": "planned",
-        "priority": "high",
-        "priority_tier": "P1",
-        "estimated_effort": "3h",
-        "priority_plan_ref": "PRI-TST-SUBPROCESS-HYGIENE",
-        "milestone_refs": ["MIL-TEST-HARNESS-ROBUSTNESS"],
-        "requirement_refs": ["REQ-TST-SUBPROCESS-LIFECYCLE-HYGIENE"],
-        "criteria_refs": ["CRIT-TST-SUBPROCESS-LIFECYCLE-HYGIENE"],
-        "test_case_refs": ["TST-TST-SUBPROCESS-LIFECYCLE-HYGIENE"],
-        "persona_refs": ["PER-COMMUNITY-SOFTWARE-ENGINEER"],
-        "namespace_id": "zqk:kernel",
-        "schema_version": "2.0.0"
-    }]
+    # 6. Four Decoupled Backlog Items - all referencing the unified test case container
+    bli_objs = [
+        {
+            "id": "BLI-TST-PROCESS-GROUP-PRIMITIVES",
+            "kind": "backlog_item",
+            "title": "Implement testkit.ManagedCommand with Setpgid and t.Cleanup process group reaping",
+            "description": "Provide a first-class testkit.ManagedCommand runner that configures process group isolation and ensures child and grandchild processes are reaped on test termination.",
+            "status": "planned",
+            "priority": "high",
+            "priority_tier": "P1",
+            "estimated_effort": "2h",
+            "priority_plan_ref": "PRI-TST-SUBPROCESS-HYGIENE",
+            "milestone_refs": ["MIL-TEST-HARNESS-ROBUSTNESS"],
+            "requirement_refs": ["REQ-TST-SUBPROCESS-LIFECYCLE-HYGIENE"],
+            "criteria_refs": ["CRIT-TST-SUBPROCESS-MANAGED-RUNNER"],
+            "test_case_refs": ["TST-TST-SUBPROCESS-LIFECYCLE-HYGIENE"],
+            "persona_refs": ["PER-COMMUNITY-SOFTWARE-ENGINEER"],
+            "namespace_id": "zqk:kernel",
+            "schema_version": "2.0.0"
+        },
+        {
+            "id": "BLI-TST-SUBPROCESS-LEAK-DETECTOR",
+            "kind": "backlog_item",
+            "title": "Build testkit.VerifyNoSubprocessLeaks for adversarial leak assertions",
+            "description": "Implement a test utility to inspect descending process trees before and after test execution to assert zero leaked descendant processes.",
+            "status": "planned",
+            "priority": "high",
+            "priority_tier": "P1",
+            "estimated_effort": "2h",
+            "priority_plan_ref": "PRI-TST-SUBPROCESS-HYGIENE",
+            "milestone_refs": ["MIL-TEST-HARNESS-ROBUSTNESS"],
+            "requirement_refs": ["REQ-TST-SUBPROCESS-LIFECYCLE-HYGIENE"],
+            "criteria_refs": ["CRIT-TST-SUBPROCESS-REAPER-ADVERSARIAL"],
+            "test_case_refs": ["TST-TST-SUBPROCESS-LIFECYCLE-HYGIENE"],
+            "persona_refs": ["PER-COMMUNITY-SOFTWARE-ENGINEER"],
+            "namespace_id": "zqk:kernel",
+            "schema_version": "2.0.0"
+        },
+        {
+            "id": "BLI-TST-REFACTOR-HIGH-RISK-CALLS",
+            "kind": "backlog_item",
+            "title": "Refactor high-risk unconstrained exec.Command call sites across test suites",
+            "description": "Audit and migrate high-risk test call sites (such as pkg/osslaunch/launch_prep_test.go dry-compile and pkg/scheduler daemon tests) to use managed commands with explicit timeouts.",
+            "status": "planned",
+            "priority": "high",
+            "priority_tier": "P1",
+            "estimated_effort": "2h",
+            "priority_plan_ref": "PRI-TST-SUBPROCESS-HYGIENE",
+            "milestone_refs": ["MIL-TEST-HARNESS-ROBUSTNESS"],
+            "requirement_refs": ["REQ-TST-SUBPROCESS-LIFECYCLE-HYGIENE"],
+            "criteria_refs": ["CRIT-TST-SUBPROCESS-MANAGED-RUNNER"],
+            "test_case_refs": ["TST-TST-SUBPROCESS-LIFECYCLE-HYGIENE"],
+            "persona_refs": ["PER-COMMUNITY-SOFTWARE-ENGINEER"],
+            "namespace_id": "zqk:kernel",
+            "schema_version": "2.0.0"
+        },
+        {
+            "id": "BLI-TST-VET-LINTER-GUARDRAIL",
+            "kind": "backlog_item",
+            "title": "Add static analysis check in zqk-vet prohibiting unmanaged exec.Command in test files",
+            "description": "Introduce an automated linter rule in zqk-vet that flags naked exec.Command invocations in *_test.go files to statically enforce process group hygiene.",
+            "status": "planned",
+            "priority": "medium",
+            "priority_tier": "P1",
+            "estimated_effort": "1.5h",
+            "priority_plan_ref": "PRI-TST-SUBPROCESS-HYGIENE",
+            "milestone_refs": ["MIL-TEST-HARNESS-ROBUSTNESS"],
+            "requirement_refs": ["REQ-TST-SUBPROCESS-LIFECYCLE-HYGIENE"],
+            "criteria_refs": ["CRIT-TST-SUBPROCESS-STATIC-GUARD"],
+            "test_case_refs": ["TST-TST-SUBPROCESS-LIFECYCLE-HYGIENE"],
+            "persona_refs": ["PER-COMMUNITY-SOFTWARE-ENGINEER"],
+            "namespace_id": "zqk:kernel",
+            "schema_version": "2.0.0"
+        }
+    ]
     import_objects("backlog_item", bli_objs)
 
-    print("✓ Successfully objectified TDE-F-TST-ORPHANED-PROCESS-LEAK and established complete DoD lineage!")
+    print("✓ Successfully restructured PRI-TST-SUBPROCESS-HYGIENE with REQ:TST=1:1 and CRIT:TST=3:1!")
 
 if __name__ == "__main__":
     main()
