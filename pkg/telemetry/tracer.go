@@ -70,6 +70,18 @@ func ParseTraceparent(header string) (TraceContext, error) {
 	}, nil
 }
 
+// ChildSpan generates a new child TraceContext linked to this context as parent.
+func (tc TraceContext) ChildSpan() TraceContext {
+	childBytes := make([]byte, 8)
+	_, _ = rand.Read(childBytes)
+	return TraceContext{
+		TraceID:      tc.TraceID,
+		SpanID:       hex.EncodeToString(childBytes),
+		ParentSpanID: tc.SpanID,
+		Sampled:      tc.Sampled,
+	}
+}
+
 // Span represents a single unit of work in distributed tracing.
 type Span struct {
 	Name      string
@@ -83,15 +95,7 @@ type Span struct {
 // StartSpan starts a child span linked to parent trace context.
 func StartSpan(ctx context.Context, name string) (context.Context, *Span) {
 	parent := GetTraceContext(ctx)
-	childBytes := make([]byte, 8)
-	_, _ = rand.Read(childBytes)
-
-	child := TraceContext{
-		TraceID:      parent.TraceID,
-		SpanID:       hex.EncodeToString(childBytes),
-		ParentSpanID: parent.SpanID,
-		Sampled:      parent.Sampled,
-	}
+	child := parent.ChildSpan()
 
 	span := &Span{
 		Name:      name,

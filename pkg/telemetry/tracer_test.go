@@ -40,3 +40,24 @@ func TestSpanCreation(t *testing.T) {
 		t.Errorf("context trace context mismatch: expected %s, got %s", span.TraceCtx.SpanID, tc.SpanID)
 	}
 }
+
+func TestChildSpan(t *testing.T) {
+	parent := NewTraceContext()
+	child := parent.ChildSpan()
+
+	if child.TraceID != parent.TraceID {
+		t.Errorf("child trace ID %s must match parent trace ID %s", child.TraceID, parent.TraceID)
+	}
+	if child.ParentSpanID != parent.SpanID {
+		t.Errorf("child ParentSpanID %s must match parent SpanID %s", child.ParentSpanID, parent.SpanID)
+	}
+	if child.SpanID == parent.SpanID {
+		t.Error("child SpanID must be unique and distinct from parent SpanID")
+	}
+	if len(child.SpanID) != 16 {
+		t.Errorf("child SpanID length expected 16, got %d", len(child.SpanID))
+	}
+	if child.Sampled != parent.Sampled {
+		t.Errorf("child Sampled %v must match parent Sampled %v", child.Sampled, parent.Sampled)
+	}
+}

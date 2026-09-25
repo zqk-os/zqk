@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/testkit"
@@ -293,19 +294,16 @@ func TestAsyncValidation_MaxRetriesExceeded(t *testing.T) {
 
 	asyncValidator.Enqueue("TEST-MAX-RETRY", "backlog_item", "test-max-retry.yaml", 1)
 
-	// Wait for max retries
-	time.Sleep(3 * time.Second)
-
-	// Check that error progress was sent
-	if !errorReceived.Load() {
-		t.Log("Note: Error progress may not be sent if channel is full, but task should be removed from queue")
-	}
+	// Assert error progress is received upon retry exhaustion
+	require.Eventually(t, func() bool {
+		return errorReceived.Load()
+	}, 5*time.Second, 50*time.Millisecond, "expected error progress to be received on retry exhaustion")
 
 	// Task should be removed from queue after max retries
-	_, _, _, queueSize := asyncValidator.GetValidationStats()
-	if queueSize > 0 {
-		t.Logf("Queue still has %d tasks (may be processing)", queueSize)
-	}
+	require.Eventually(t, func() bool {
+		_, _, _, queueSize := asyncValidator.GetValidationStats()
+		return queueSize == 0
+	}, 5*time.Second, 50*time.Millisecond, "expected task to be removed from queue after max retries")
 }
 
 // TestAsyncValidation_ProgressReporting tests progress channel behavior

@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -329,6 +330,7 @@ func TestConfigFileWatcher_RegisterAndDetectChanges(t *testing.T) {
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 
 	watcher := NewConfigFileWatcher(tmpDir, coordinator, logger)
+	watcher.SetPollInterval(50 * time.Millisecond)
 
 	// Register a test file
 	var reloadCalled atomic.Bool
@@ -351,8 +353,8 @@ func TestConfigFileWatcher_RegisterAndDetectChanges(t *testing.T) {
 	}
 	defer watcher.Stop()
 
-	// Wait a bit for initial state to be recorded
-	time.Sleep(1 * time.Second)
+	// Wait briefly for initial state to be recorded
+	time.Sleep(100 * time.Millisecond)
 
 	// Modify the file
 	updatedContent := "version: 2.0.0\n"
@@ -360,11 +362,8 @@ func TestConfigFileWatcher_RegisterAndDetectChanges(t *testing.T) {
 		t.Fatalf("Failed to update test file: %v", err)
 	}
 
-	// Wait for watcher to detect change (poll interval is 5 seconds)
-	time.Sleep(6 * time.Second)
-
-	// Verify reload was called
-	if !reloadCalled.Load() {
-		t.Error("Reload function was not called when file changed")
-	}
+	// Wait deterministically for watcher to detect change
+	require.Eventually(t, func() bool {
+		return reloadCalled.Load()
+	}, 2*time.Second, 20*time.Millisecond, "Reload function was not called when file changed")
 }

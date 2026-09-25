@@ -152,7 +152,7 @@ func BuildCanonicalCEFPack(cefSourceDir string, destPackDir string, privKey ed25
 			},
 			"output_dir": {
 				Type:        "string",
-				Default:     ".zqk/runs/code-eval-latest",
+				Default:     paths.ProjectDataDir + "/runs/code-eval-latest",
 				Description: "Directory path for catabolic exhaust (findings, scorecards, traces)",
 				Required:    false,
 			},
@@ -164,8 +164,8 @@ func BuildCanonicalCEFPack(cefSourceDir string, destPackDir string, privKey ed25
 			},
 		},
 		Membranes: []pack.MembraneRule{
-			{Path: ".zqk/process/", Mode: "read_only"},
-			{Path: ".zqk/audit/", Mode: "audit_log"},
+			{Path: paths.ProjectDataDir + "/process/", Mode: "read_only"},
+			{Path: paths.ProjectDataDir + "/audit/", Mode: "audit_log"},
 			{Path: "docs/quality/codebase_evaluation/", Mode: "read_only"},
 		},
 		TeamConfigurationRef: "TCFG-CEF-DIAMOND-EVALUATION",
