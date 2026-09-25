@@ -161,11 +161,11 @@ func checkPolicyInterruptGateInRoot(projectRoot string) error {
 
 	acks, err := policyinterrupt.LoadAcksIncremental(projectRoot)
 	if err != nil {
-		return nil // best-effort gate; do not block on WAL read errors
+		return nil //nolint:nilerr // best-effort gate; do not block on WAL read errors
 	}
 	latest, err := policyinterrupt.LoadLatestCriticalUnacked(projectRoot, acks)
 	if err != nil || latest == nil {
-		return nil
+		return nil //nolint:nilerr // best-effort check for unacked policy interrupts
 	}
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	msg := latest.Message

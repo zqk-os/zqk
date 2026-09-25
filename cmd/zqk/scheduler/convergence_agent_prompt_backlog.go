@@ -289,5 +289,25 @@ func verificationHintAcceptable(m string) bool {
 		return false
 	}
 	lm := strings.ToLower(m)
-	return strings.HasPrefix(lm, "go test") || strings.HasPrefix(lm, paths.RewriteCanonicalCLIInvocations("zqk test run")) || strings.HasPrefix(lm, paths.RewriteCanonicalCLIInvocations("zqk test discover")) || strings.HasPrefix(lm, paths.RewriteCanonicalCLIInvocations("zqk test bind"))
+	var rest string
+	switch {
+	case strings.HasPrefix(lm, "go test"):
+		rest = strings.TrimPrefix(lm, "go test")
+	case strings.HasPrefix(lm, paths.RewriteCanonicalCLIInvocations("zqk test run")):
+		rest = strings.TrimPrefix(lm, paths.RewriteCanonicalCLIInvocations("zqk test run"))
+	case strings.HasPrefix(lm, paths.RewriteCanonicalCLIInvocations("zqk test discover")):
+		rest = strings.TrimPrefix(lm, paths.RewriteCanonicalCLIInvocations("zqk test discover"))
+	case strings.HasPrefix(lm, paths.RewriteCanonicalCLIInvocations("zqk test bind")):
+		rest = strings.TrimPrefix(lm, paths.RewriteCanonicalCLIInvocations("zqk test bind"))
+	default:
+		return false
+	}
+	fields := strings.Fields(rest)
+	if len(fields) > 0 {
+		first := fields[0]
+		if !strings.HasPrefix(first, "-") && !strings.HasPrefix(first, "tst-") && !strings.HasPrefix(first, "./") && !strings.HasPrefix(first, "pkg/") && !strings.HasPrefix(first, "cmd/") && !strings.HasPrefix(first, "integration/") {
+			return false
+		}
+	}
+	return true
 }

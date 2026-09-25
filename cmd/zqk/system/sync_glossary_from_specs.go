@@ -189,7 +189,7 @@ func newCASGlossaryTermID() (string, error) {
 	baseTime := time.Now().UnixNano()
 	randomBytes := make([]byte, 4)
 	if _, err := rand.Read(randomBytes); err != nil {
-		return fmt.Sprintf("%s%d", prefix, baseTime), nil
+		return fmt.Sprintf("%s%d", prefix, baseTime), nil //nolint:nilerr // fallback ID on entropy exhaustion
 	}
 	return fmt.Sprintf("%s%d-%s", prefix, baseTime, hex.EncodeToString(randomBytes)), nil
 }
@@ -493,7 +493,7 @@ func scanSpecCandidates(root, dir string) ([]glossaryCandidate, error) {
 	var files []string
 	_ = filepath.Walk(dir, func(path string, info fileutil.FileInfo, err error) error {
 		if err != nil || info.IsDir() || !strings.HasSuffix(path, ".yaml") {
-			return nil
+			return nil //nolint:nilerr // continue walking on path error or non-matching file
 		}
 		files = append(files, path)
 		return nil
@@ -550,7 +550,7 @@ func scanLifecycleCandidates(root, dir string) ([]glossaryCandidate, error) {
 	var files []string
 	_ = filepath.Walk(dir, func(path string, info fileutil.FileInfo, err error) error {
 		if err != nil || info.IsDir() || !strings.HasSuffix(path, ".yaml") {
-			return nil
+			return nil //nolint:nilerr // continue walking on path error or non-matching file
 		}
 		files = append(files, path)
 		return nil

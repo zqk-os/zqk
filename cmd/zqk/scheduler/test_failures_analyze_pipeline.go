@@ -125,14 +125,14 @@ func stageCollectLogs(stageCtx *pipeline.Context, p any) (any, error) {
 	if _, err := fileutil.Stat(callbackLogsDir); err == nil {
 		err = filepath.Walk(callbackLogsDir, func(path string, info fileutil.FileInfo, err error) error {
 			if err != nil || info.ModTime().Before(payload.cutoffTime) {
-				return nil
+				return nil //nolint:nilerr // skip unreadable or outdated callback logs
 			}
 			if !strings.HasSuffix(path, ".log") && !strings.HasSuffix(path, ".jsonl") {
 				return nil
 			}
 			data, err := fileutil.ReadFile(path)
 			if err != nil {
-				return nil
+				return nil //nolint:nilerr // best-effort log parsing
 			}
 			for line := range strings.SplitSeq(string(data), "\n") {
 				line = strings.TrimSpace(line)
@@ -151,14 +151,14 @@ func stageCollectLogs(stageCtx *pipeline.Context, p any) (any, error) {
 	if _, err := fileutil.Stat(schedulerLogsDir); err == nil {
 		err = filepath.Walk(schedulerLogsDir, func(path string, info fileutil.FileInfo, err error) error {
 			if err != nil || info.ModTime().Before(payload.cutoffTime) {
-				return nil
+				return nil //nolint:nilerr // skip unreadable or outdated scheduler logs
 			}
 			if !strings.HasSuffix(path, ".log") {
 				return nil
 			}
 			data, err := fileutil.ReadFile(path)
 			if err != nil {
-				return nil
+				return nil //nolint:nilerr // best-effort log parsing
 			}
 			for line := range strings.SplitSeq(string(data), "\n") {
 				line = strings.TrimSpace(line)

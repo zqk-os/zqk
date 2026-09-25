@@ -193,7 +193,7 @@ func toolChannelHint(content string, nativeCount int) string {
 	}
 	switch {
 	case strings.Contains(content, "<tool_call>"):
-		return "native tool_calls empty; content is Hermes <tool_call> XML. vLLM needs --enable-auto-tool-choice --tool-call-parser hermes; llama.cpp needs --jinja with the Qwen/Hermes chat template."
+		return "native tool_calls empty; content is Hermes <tool_call> XML. vLLM needs --enable-auto-tool-choice --tool-call-parser hermes; llama.cpp needs --jinja with a compatible tool-call chat template."
 	case strings.Contains(content, "```"):
 		return "native tool_calls empty; model wrote markdown JSON. The host recovered it. Local servers that advertise OpenAI tools still need a tool-call parser to populate the tool_calls field."
 	default:

@@ -381,12 +381,6 @@ func init() {
 				}
 			}
 		}
-		// Repoint SCH-cvs-pipeline-tick when the package-vetting convergence_session completes or a matching session activates.
-		if kind == objects.KindConvergenceSession && projectRoot != EmptyValue {
-			if st, ok := cli.GetObjectStorageForProjectRoot(projectRoot); ok && st != nil {
-				_ = schedulerpkg.SyncCVSPipelineTickJobOnLifecycle(ctx, st, fromState, toState, objectData) //nolint:errcheck // best-effort
-			}
-		}
 		// Immediate branch/worktree cleanup when a task or backlog item completes or reaches a terminal/error state.
 		if (kind == objects.KindAgentTask || kind == objects.KindBacklogItem) && projectRoot != EmptyValue {
 			isTerminal := objects.GetGlobalStatusChecker().IsTerminal(kind, toState)
@@ -595,7 +589,8 @@ func Execute() {
 			logging.Fluent(stderrLogger).Warn("Expected client miss").WithError(err).Log()
 		} else if isInformationalCommandError(err) {
 			// Informational client/routing/syntax errors: newspaper headline, not an unrecoverable system crash.
-			logging.Fluent(stderrLogger).Info("Command execution unfulfilled").WithError(err).Log()
+			infoStderr := logging.NewLogger(os.Stderr, logging.InfoLevel, logging.NewTextFormatter(context.Background()))
+			logging.Fluent(infoStderr).Info("Command execution unfulfilled").WithError(err).Log()
 			logging.Fluent(logger).Info("Command execution unfulfilled").WithError(err).Log()
 		} else {
 			logging.Fluent(stderrLogger).Error("ZQK_EXECUTION_ERR", err).Log()

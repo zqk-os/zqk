@@ -326,8 +326,8 @@ func BuildTaskPrompt(ctx context.Context, sp storage.ObjectStorageProvider, secC
 // SentinelPromptTemplateID is the canonical ID for the CAP Sentinel prompt template.
 const SentinelPromptTemplateID = "PROMPT-SENTINEL"
 
-// defaultSentinelTokenBudget is a conservative budget for small local LLMs (Qwen, Ollama 7B, etc.).
-// Larger models (Llama 70B, hosted APIs) should pass a higher TokenBudget via SentinelPromptOptions.
+// defaultSentinelTokenBudget is a conservative budget for small local LLMs (e.g. 7B parameter models).
+// Larger models (hosted APIs or large parameter models) should pass a higher TokenBudget via SentinelPromptOptions.
 const defaultSentinelTokenBudget = 2048
 
 // KernelHealthSignals captures observable health metrics from the ZQK kernel.
@@ -351,7 +351,7 @@ type SentinelPromptOptions struct {
 // BuildSentinelPrompt builds a context-window-aware prompt for the CAP Kernel Steward
 // using pipeline.Allocator — the same mechanism as BuildOnboardingPrompt. Kernel objects
 // (mission, milestones, goals, health signals, policies) are ranked by weight so that
-// small local LLMs (Qwen 7B, Ollama) always get the most actionable context first, and
+// small local LLMs always get the most actionable context first, and
 // verbose lower-priority sections are dropped when budget is tight.
 func BuildSentinelPrompt(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, _ string, opts SentinelPromptOptions) (string, error) {
 	budget := opts.TokenBudget

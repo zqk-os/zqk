@@ -3,14 +3,12 @@ package storage
 import (
 	"context"
 	"maps"
-	"path/filepath"
 	"strings"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/migration/parser"
 	"github.com/zqk-os/zqk/pkg/objects"
-	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // GetRelated finds objects related to the given object via stored graph edges.
@@ -245,87 +243,22 @@ func (f *FileObjectStorage) GetNeighbors(ctx context.Context, secCtx *pkgctx.Sec
 
 	// Handle incoming (objects that reference this)
 	if direction == "incoming" || direction == "both" {
-		// Find all objects that reference this object
-		// We need to search all object kinds for reference fields containing this ID
-		// This is expensive but necessary for file-based backend
-		// Get all object kinds by scanning the process directory
-		processEntries, err := fileutil.ReadDir(f.processDir)
-		if err != nil {
-			// If we can't read the directory, skip incoming search
-			return neighbors, nil
-		}
-
-		for _, entry := range processEntries {
-			if !entry.IsDir() {
-				continue
-			}
-
-			kind := objects.GetKindFromDirectory(entry.Name())
-			if kind == emptyValue {
-				continue
-			}
-
-			kindDir := filepath.Join(f.processDir, entry.Name())
-			if _, err := fileutil.Stat(kindDir); fileutil.IsNotExist(err) {
-				continue
-			}
-
-			// Collect file paths
-			filePaths, err := f.collectFilePaths(ctx, kindDir, nil, nil)
-			if err != nil {
-				continue
-			}
-
-			// Check each object
-			for _, filePath := range filePaths {
-				fileObj, readErr := f.readObjectFile(ctx, filePath)
-				if readErr != nil {
-					continue
-				}
-
-				// Extract reference fields
-				yamlParser := parser.NewYAMLParser()
-				refFields := yamlParser.ExtractReferenceFields(fileObj)
-
-				// Check if any reference field contains our ID
-				found := false
-				for _, refValue := range refFields {
-					var refIDs []string
-					switch v := refValue.(type) {
-					case string:
-						if v != emptyValue {
-							refIDs = []string{v}
-						}
-					case []any:
-						for _, item := range v {
-							if str, ok := item.(string); ok && str != emptyValue {
-								refIDs = append(refIDs, str)
-							}
-						}
-					case []string:
-						refIDs = v
+		// TRACK: BLI-PHASE3-GETNEIGHBORS-INDEX (F-ARCH-004) — use DependentsForID
+		// which queries in-memory ReverseReferenceIndex (O(1)) and candidate referencing
+		// kinds, eliminating unbounded O(N) full directory traversal and YAML deserialization storms.
+		deps := DependentsForID(ctx, f, normalizedID)
+		for _, depID := range deps {
+			normalizedDepID := normalizeID(depID)
+			if !visited[normalizedDepID] {
+				depObj, readErr := f.Read(ctx, secCtx, normalizedDepID)
+				if readErr == nil && depObj != nil {
+					depKind := objects.GetString(depObj, objects.FieldKeyKind)
+					if depKind == objects.KindChangeJournalEntry || depKind == objects.KindAuditEvent || objects.IsBypassKind(depKind) {
+						continue
 					}
-
-					for _, refID := range refIDs {
-						normalizedRefID := normalizeID(refID)
-						if normalizedRefID == normalizedID {
-							found = true
-							break
-						}
-					}
-					if found {
-						break
-					}
-				}
-
-				if found {
-					objID, _ := fileObj[objects.FieldKeyID].(string)
-					if objID != emptyValue && !visited[objID] {
-						// Check permissions
-						if err := f.checkPermission(secCtx, "read", kind); err == nil {
-							neighbors = append(neighbors, fileObj)
-							visited[objID] = true
-						}
+					if err := f.checkPermission(secCtx, "read", depKind); err == nil {
+						neighbors = append(neighbors, depObj)
+						visited[normalizedDepID] = true
 					}
 				}
 			}

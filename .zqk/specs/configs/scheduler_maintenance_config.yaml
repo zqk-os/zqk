@@ -91,12 +91,6 @@ required_jobs:
   - id: SCH-cleanup
     job_type: cleanup
     template_file: scripts/scheduler_jobs/cleanup_on_demand.yaml
-  - id: SCH-cvs-pipeline-tick
-    job_type: convergence_session_tick
-    template_file: scripts/scheduler_jobs/convergence_session_tick_pkg_vet_hourly.yaml
-  - id: SCH-cvs-datacell-tick
-    job_type: convergence_session_tick
-    template_file: scripts/scheduler_jobs/convergence_session_tick_data_cell_hourly.yaml
   - id: SCH-convergence-overseer-record
     job_type: run_wrapper
     template_file: scripts/scheduler_jobs/convergence_overseer_record_daily.yaml

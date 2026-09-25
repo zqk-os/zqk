@@ -477,7 +477,7 @@ exit 0
 func EnsureGitHooks(projectRoot string, logger logging.Logger) error {
 	gitDir := filepath.Join(projectRoot, ".git")
 	if _, err := fileutil.Stat(gitDir); err != nil {
-		return nil // Not a git repo, skip cleanly
+		return nil //nolint:nilerr // not a git repo, skip cleanly
 	}
 
 	toolsDir := filepath.Join(projectRoot, "tools", "git-hooks")

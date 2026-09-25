@@ -99,9 +99,25 @@ func extractObjectIDFromReference(refStr string) string {
 	return refStr
 }
 
+func shouldIndexInReverseReferenceIndex(objectID string, obj map[string]any) bool {
+	if objectID == emptyValue {
+		return false
+	}
+	if strings.HasPrefix(objectID, "CHA-") || strings.HasPrefix(objectID, "AUD-") || strings.HasPrefix(objectID, "ATE-") {
+		return false
+	}
+	if obj != nil {
+		kind := objects.GetString(obj, objects.FieldKeyKind)
+		if kind == objects.KindChangeJournalEntry || kind == objects.KindAuditEvent || kind == "agent_task_event" || objects.IsBypassKind(kind) {
+			return false
+		}
+	}
+	return true
+}
+
 // updateReverseReferenceIndexOnCreate updates the reverse reference index when an object is created
 func updateReverseReferenceIndexOnCreate(objectID string, obj map[string]any) {
-	if objectID == emptyValue || obj == nil {
+	if !shouldIndexInReverseReferenceIndex(objectID, obj) || obj == nil {
 		return
 	}
 	index := GetGlobalReverseReferenceIndex()
@@ -116,7 +132,7 @@ func updateReverseReferenceIndexOnCreate(objectID string, obj map[string]any) {
 
 // updateReverseReferenceIndexOnUpdate updates the reverse reference index when an object is updated
 func updateReverseReferenceIndexOnUpdate(objectID string, oldObj, newObj map[string]any) {
-	if objectID == emptyValue {
+	if !shouldIndexInReverseReferenceIndex(objectID, newObj) {
 		return
 	}
 	index := GetGlobalReverseReferenceIndex()
@@ -147,6 +163,9 @@ func updateReverseReferenceIndexOnIDChange(oldID, newID string, obj map[string]a
 	if oldID == emptyValue || newID == emptyValue || oldID == newID {
 		return
 	}
+	if !shouldIndexInReverseReferenceIndex(newID, obj) {
+		return
+	}
 	index := GetGlobalReverseReferenceIndex()
 	// Remove old ID from all dependent lists
 	index.RemoveObject(oldID)
@@ -159,3 +178,4 @@ func updateReverseReferenceIndexOnIDChange(oldID, newID string, obj map[string]a
 	}
 	afterReverseReferenceIndexMutation()
 }
+

@@ -58,7 +58,7 @@ func RunCleanupQuarantine(ctx *CleanupQuarantineContext) (removed int, errs []er
 	cutoff := time.Now().Add(-ctx.OlderThan)
 	err = filepath.Walk(ctx.QuarantineRoot, func(path string, info fileutil.FileInfo, err error) error {
 		if err != nil {
-			return nil
+			return nil //nolint:nilerr // continue walking on error
 		}
 		if info.IsDir() {
 			return nil

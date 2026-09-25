@@ -104,16 +104,6 @@ func NewSchedulerMaintenanceConfigBuilder() *SchedulerMaintenanceConfigBuilder {
 					"template_file":         "scripts/scheduler_jobs/cleanup_on_demand.yaml",
 				},
 				map[string]any{
-					objects.FieldKeyID:      "SCH-cvs-pipeline-tick",
-					objects.FieldKeyJobType: "convergence_session_tick",
-					"template_file":         "scripts/scheduler_jobs/convergence_session_tick_pkg_vet_hourly.yaml",
-				},
-				map[string]any{
-					objects.FieldKeyID:      "SCH-cvs-datacell-tick",
-					objects.FieldKeyJobType: "convergence_session_tick",
-					"template_file":         "scripts/scheduler_jobs/convergence_session_tick_data_cell_hourly.yaml",
-				},
-				map[string]any{
 					objects.FieldKeyID:      "SCH-convergence-overseer-record",
 					objects.FieldKeyJobType: "run_wrapper",
 					"template_file":         "scripts/scheduler_jobs/convergence_overseer_record_daily.yaml",

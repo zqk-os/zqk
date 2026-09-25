@@ -164,12 +164,12 @@ func enqueueValidationForObjectCore(projectRoot, objectID, kind, filePath string
 			Path(absPath).
 			WithError(err).
 			Log()
-		return nil
+		return nil //nolint:nilerr // best-effort background validation enqueue
 	}
 
 	state, err := fn(bgCtx, objectID, kind, absPath, content)
 	if err != nil || state == nil {
-		return nil
+		return nil //nolint:nilerr // validation failures handled by validation state
 	}
 
 	// Write result into shared per-project cache so incremental validation

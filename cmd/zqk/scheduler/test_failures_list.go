@@ -74,7 +74,7 @@ func listTestFailures(cliCtx *cli.Context, cmd *cobra.Command) error {
 	if hasCallbackLogs {
 		err = filepath.Walk(callbackLogsDir, func(path string, info fileutil.FileInfo, err error) error {
 			if err != nil {
-				return nil // Skip files we can't read
+				return nil //nolint:nilerr // skip files we can't read
 			}
 
 			// Only process log files modified since cutoff
@@ -89,7 +89,7 @@ func listTestFailures(cliCtx *cli.Context, cmd *cobra.Command) error {
 			// Read and parse log file
 			data, err := fileutil.ReadFile(path)
 			if err != nil {
-				return nil // Skip files we can't read
+				return nil //nolint:nilerr // skip files we can't read
 			}
 
 			// Parse JSONL format (one JSON object per line)
@@ -160,7 +160,7 @@ func listTestFailures(cliCtx *cli.Context, cmd *cobra.Command) error {
 	if hasSchedulerLogs {
 		err = filepath.Walk(schedulerLogsDir, func(path string, info fileutil.FileInfo, err error) error {
 			if err != nil {
-				return nil
+				return nil //nolint:nilerr // skip files we can't read
 			}
 
 			// Only process log files modified since cutoff
@@ -175,7 +175,7 @@ func listTestFailures(cliCtx *cli.Context, cmd *cobra.Command) error {
 			// Read and parse log file
 			data, err := fileutil.ReadFile(path)
 			if err != nil {
-				return nil
+				return nil //nolint:nilerr // skip files we can't read
 			}
 
 			// Parse JSONL format

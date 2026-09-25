@@ -275,8 +275,8 @@ func StopDaemon(projectRoot string) error {
 	process, err := os.FindProcess(pid)
 	if err != nil {
 		_ = fileutil.Remove(ambientPIDFilePath(projectRoot))
-		logging.Fluent(logger).Info("Ambient daemon is not running.").Log()
-		return nil
+		logging.Fluent(logger).Warn("Ambient daemon process lookup failed").WithError(err).Log()
+		return fmt.Errorf("ambient daemon process %d lookup failed: %w", pid, err)
 	}
 
 	_ = process.Signal(syscall.SIGTERM)

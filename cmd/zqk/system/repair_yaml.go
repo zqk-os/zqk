@@ -208,7 +208,7 @@ func findObjectFileByID(projectRoot, objectID string) (string, error) {
 		var foundPath string
 		err := filepath.Walk(dir, func(path string, info fileutil.FileInfo, err error) error {
 			if err != nil {
-				return nil // Continue on error
+				return nil //nolint:nilerr // continue walking on error
 			}
 			if info.IsDir() {
 				return nil
@@ -225,7 +225,7 @@ func findObjectFileByID(projectRoot, objectID string) (string, error) {
 				// Read file and check ID field
 				data, readErr := fileutil.ReadFile(path)
 				if readErr != nil {
-					return nil
+					return nil //nolint:nilerr // skip files that cannot be read
 				}
 
 				// Try to parse (even if corrupted, we might be able to read the ID)

@@ -420,3 +420,36 @@ func TestObjectWriteBehindWorker_RetryableQueueFullDoesNotDropOrAdvance(t *testi
 	}
 }
 
+func TestObjectWriteBehindWorker_DrainRetryableQueueFullDoesNotDropOrAdvance(t *testing.T) {
+	tmpDir := t.TempDir()
+	buf := NewObjectWriteBuffer()
+	buf.Enqueue("create", "backlog_item", "BLI-DATA-LOSS-DRAIN", 99, []byte(`{"id":"BLI-DATA-LOSS-DRAIN"}`))
+
+	worker := &ObjectWriteBehindWorker{
+		projectRoot: tmpDir,
+		buf:         buf,
+		applyFn: func(ctx context.Context, op *PendingOp, secCtx *pkgctx.SecurityContext) error {
+			return errors.New(ConstStreamSaveQueueIsFull)
+		},
+	}
+
+	ctx := context.Background()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+
+	// Run drain
+	worker.drain(ctx, secCtx, logger)
+
+	// Op must NOT have been removed from buffer
+	if worker.buf.Len() != 1 {
+		t.Fatalf("data loss vulnerability! Op was dropped from write-behind buffer on drain retryable queue full error")
+	}
+
+	// Checkpoint must NOT have advanced to 99
+	seqAfter, _ := ReadAppliedSeq(tmpDir)
+	if seqAfter >= 99 {
+		t.Fatalf("data loss vulnerability! Checkpoint advanced to %d despite mutation not being durably applied during drain", seqAfter)
+	}
+}
+
+

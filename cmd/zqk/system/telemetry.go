@@ -61,15 +61,23 @@ func NewTelemetryCmd() *cobra.Command {
 			}
 
 			format := cli.GetFormat(cmd)
+			summary := daemon.GetSummary()
+			spansCount := summary["total_spans"]
+			metricsCount := summary["total_metrics"]
+
 			switch format {
 			case cli.FormatJSON, cli.FormatJSONL, cli.FormatYAML:
-				if err := cli.FormatOutput(cmd, listRes.Objects); err != nil {
+				payload := map[string]any{
+					"agent_tasks": listRes.Objects,
+					"summary":     summary,
+				}
+				if err := cli.FormatOutput(cmd, payload); err != nil {
 					return cli.Guard(cmd).Err(err).Return()
 				}
 				return nil
 			default:
 				// Output simple table or text
-				_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("Swarm Telemetry: %d active agent tasks tracked.\n", len(listRes.Objects))))
+				_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("Swarm Telemetry: %d active agent tasks tracked. (Recorded spans: %v, metrics: %v)\n", len(listRes.Objects), spansCount, metricsCount)))
 				return nil
 			}
 		},

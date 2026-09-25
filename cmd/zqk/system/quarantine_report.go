@@ -170,7 +170,7 @@ func countYAMLFiles(dir string) (int, error) {
 	var n int
 	err := filepath.Walk(dir, func(path string, info fileutil.FileInfo, err error) error {
 		if err != nil {
-			return nil
+			return nil //nolint:nilerr // continue walking on path error
 		}
 		if info.IsDir() {
 			return nil

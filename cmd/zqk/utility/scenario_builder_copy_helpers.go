@@ -191,7 +191,7 @@ func copySingleObject(ctx context.Context, sb *ScenarioBuilder, copyCtx *CopyCon
 	// Read object from source
 	obj, err := readObjectFromSource(ctx, copyCtx.SourceStorage, objectID, sb.logger)
 	if err != nil {
-		return nil // Already logged warning, continue with next object
+		return nil //nolint:nilerr // already logged warning, continue with next object
 	}
 
 	// Verify hash and handle changes

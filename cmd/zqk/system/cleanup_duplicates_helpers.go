@@ -140,11 +140,11 @@ func primaryFromCASIndex(ctx context.Context, dirPath, kind, projectRoot string)
 	}
 	ids, err := cas.ListIDs()
 	if err != nil || len(ids) == 0 {
-		return nil, nil
+		return nil, nil //nolint:nilerr // if directory cannot be listed or is empty, no primary hashes exist
 	}
 	mappings, err := cas.GetAllMappings()
 	if err != nil || len(mappings) == 0 {
-		return nil, nil
+		return nil, nil //nolint:nilerr // if mappings cannot be read, no primary hashes exist
 	}
 	primary = make(map[string]string, len(ids))
 	idx := cas.GetIndex()
@@ -246,7 +246,7 @@ func scanHashFiles(dirPath string, verbose bool, logger logging.Logger) (primary
 
 	err := filepath.Walk(dirPath, func(path string, info fileutil.FileInfo, err error) error {
 		if err != nil || info.IsDir() || !hashFilePattern.MatchString(info.Name()) {
-			return nil
+			return nil //nolint:nilerr // continue walking on error or non-matching files
 		}
 
 		objectID, readErr := objectIDFromHashFile(path, verbose, logger)
@@ -667,7 +667,7 @@ func processTraditionalFile(
 func scanTraditionalFiles(dirPath string, hashFileIDs map[string]string, ctx *CleanupDuplicatesContext) (deleted, skipped int, errors []error) {
 	err := filepath.Walk(dirPath, func(path string, info fileutil.FileInfo, err error) error {
 		if err != nil {
-			return nil
+			return nil //nolint:nilerr // continue walking on error
 		}
 		if !isTraditionalYAMLFile(info.Name(), info.IsDir()) {
 			return nil

@@ -59,7 +59,7 @@ func rerunTestFailures(cliCtx *cli.Context, cmd *cobra.Command) error {
 	if errCallbacks == nil {
 		walkErr = filepath.Walk(callbackLogsDir, func(path string, info fileutil.FileInfo, walkPathErr error) error {
 			if walkPathErr != nil || info.ModTime().Before(cutoffTime) {
-				return nil
+				return nil //nolint:nilerr // skip unreadable or outdated files
 			}
 
 			if !strings.HasSuffix(path, ".log") && !strings.HasSuffix(path, ".jsonl") {
@@ -68,7 +68,7 @@ func rerunTestFailures(cliCtx *cli.Context, cmd *cobra.Command) error {
 
 			data, readErr := fileutil.ReadFile(path)
 			if readErr != nil {
-				return nil
+				return nil //nolint:nilerr // skip files that cannot be read
 			}
 
 			for line := range strings.SplitSeq(string(data), "\n") {

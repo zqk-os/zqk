@@ -435,7 +435,10 @@ func enforcePriorityOrder(ctx context.Context, secCtx *pkgctx.SecurityContext, s
 		},
 	}
 	res, err := sp.List(ctx, secCtx, pkgctx.NewStorageContext(), filter)
-	if err != nil || res == nil || len(res.Objects) == 0 {
+	if err != nil {
+		return fmt.Errorf("failed to query active priority plans: %w", err)
+	}
+	if res == nil || len(res.Objects) == 0 {
 		return nil
 	}
 

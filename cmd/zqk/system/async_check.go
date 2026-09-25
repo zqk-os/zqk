@@ -1235,7 +1235,7 @@ func scanObjectFilesWithContext(ctx stdcontext.Context, dir, kind string, logger
 			}
 
 			if err != nil {
-				return nil // Continue on error
+				return nil //nolint:nilerr // continue walking on error
 			}
 
 			if info.IsDir() {

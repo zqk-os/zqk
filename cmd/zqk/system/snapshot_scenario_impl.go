@@ -201,7 +201,7 @@ func applyFieldHandlers(
 	// Load spec to get field definitions
 	spec, err := specLoader.LoadSpecWithInheritance(kind)
 	if err != nil {
-		return obj, nil // Can't load spec, return object as-is
+		return obj, nil //nolint:nilerr // can't load spec, return object as-is
 	}
 
 	// Check if object has snapable trait

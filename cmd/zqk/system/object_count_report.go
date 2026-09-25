@@ -383,7 +383,7 @@ func gatherProcessIntegrity(projectRoot string, streamBackedDirs []string) Proce
 	var unmanaged []string
 	err := filepath.Walk(processDir, func(path string, info fileutil.FileInfo, err error) error {
 		if err != nil {
-			return nil // skip errors
+			return nil //nolint:nilerr // skip errors during best-effort unmanaged scan
 		}
 		if info.IsDir() {
 			// Do not treat _internal (config/spec/migrations) as process data
