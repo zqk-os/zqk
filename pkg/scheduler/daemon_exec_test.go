@@ -2,6 +2,7 @@ package scheduler_test
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -14,6 +15,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -76,7 +78,9 @@ func main() {
 	}
 
 	childExePath := filepath.Join(testDir, "child_daemon_exe")
-	compileCmd := exec.Command("go", "build", "-o", childExePath, childSrcPath) //nolint:gosec
+	buildCtx, buildCancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer buildCancel()
+	compileCmd := testkit.ManagedCommand(t, buildCtx, "go", "build", "-o", childExePath, childSrcPath) //nolint:gosec
 	output, err := compileCmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf(`Failed to compile child daemon: %v

@@ -111,6 +111,14 @@ func (r *Runner) runHygiene(files []string) ([]Finding, error) {
 		findings = append(findings, cliFindings...)
 	}
 
+	if r.Config.Hygiene.CheckSubprocessHygiene {
+		subprocFindings, err := CheckTestSubprocessHygiene(r.Root, r.Config)
+		if err != nil {
+			return nil, err
+		}
+		findings = append(findings, subprocFindings...)
+	}
+
 	return findings, nil
 }
 

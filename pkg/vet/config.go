@@ -20,6 +20,7 @@ type HygieneConfig struct {
 	CheckPerms            bool     `yaml:"check_perms"`
 	CheckDups             bool     `yaml:"check_dups"`
 	CheckCLINames         bool     `yaml:"check_cli_names"`
+	CheckSubprocessHygiene bool     `yaml:"check_subprocess_hygiene"`
 	ForbiddenPathLiterals []string `yaml:"forbidden_path_literals"`
 	GoScanDirs            []string `yaml:"go_scan_dirs"`
 	Exemptions            []string `yaml:"exemptions"`
@@ -83,6 +84,7 @@ func DefaultConfig() *GatesConfig {
 			CheckPaths:            true,
 			CheckPerms:            true,
 			CheckCLINames:         true,
+			CheckSubprocessHygiene: true,
 			ForbiddenPathLiterals: []string{".zqk", ".zqk/"},
 			GoScanDirs:            []string{"pkg/", "cmd/", "internal/", "scripts/"},
 			Exemptions:            []string{"*_test.go", "vendor/*", ".git/*", "pkg/paths/*", "pkg/brand/*", "pkg/vet/*"},

@@ -7,9 +7,11 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/systemcheck/policy"
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 // TestPublicRepoSanitation verifies REQ-OSS-REPO-CLEAN-001:
@@ -178,8 +180,11 @@ func TestStandaloneCleanBuild(t *testing.T) {
 			devDir = ""
 		}
 
+		ctx, cancel := context.WithTimeout(context.Background(), 45*time.Second)
+		defer cancel()
+
 		tmpOut := filepath.Join(t.TempDir(), "zqk-dry-compile")
-		cmd := exec.Command("go", "build", "-o", tmpOut, "./cmd/zqk")
+		cmd := testkit.ManagedCommand(t, ctx, "go", "build", "-o", tmpOut, "./cmd/zqk")
 		cmd.Dir = projectRoot
 		env := os.Environ()
 		if devDir != "" {
@@ -199,7 +204,10 @@ func TestStandaloneCleanBuild(t *testing.T) {
 			t.Skipf("bin/zqk-stable not built yet: %v", err)
 		}
 
-		cmd := exec.Command(binaryPath, "--help")
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		cmd := testkit.ManagedCommand(t, ctx, binaryPath, "--help")
 		cmd.Dir = projectRoot
 		out, err := cmd.CombinedOutput()
 		if err != nil {
