@@ -48,6 +48,9 @@ func TestCPCPInterceptor_BlockedProcessWrite(t *testing.T) {
 		".zqk/streams/change_journal_entry/001.json",
 		"/repo/.zqk/cas/objects/ab/123",
 		".zqk/wal/log.wal",
+		".zqk/run/scheduler.sock",
+		"/repo/.zqk/bin/zqk-stable",
+		".zqk/state/cap_review_result.json",
 	}
 
 	for _, p := range blockedPaths {

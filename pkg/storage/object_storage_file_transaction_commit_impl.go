@@ -4,11 +4,13 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
+	"maps"
 	"path/filepath"
 
 	"github.com/zqk-os/zqk/pkg/concurrency"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/kernelcas"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage/locknames"
@@ -208,25 +210,31 @@ func (tx *FileObjectTransaction) commitStageApplyPerOpMixed(ctx context.Context,
 		switch op.opType {
 		case OpCreate:
 			if err := tx.storage.Create(ctx, secCtx, op.obj); err != nil {
-				var _err_83887600 = tx.Rollback(ctx)
-				if _err_83887600 != nil {
-					logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgSwallowedError, _err_83887600).Log()
-				}
+				_ = tx.Rollback(ctx)
 				return nil, errfmt.Errorf(ConstStreamFailedToCreateObjectStrErr, op.id, err)
 			}
+			tx.applied = append(tx.applied, appliedTxOp{opType: OpCreate, id: op.id})
 		case OpUpdate:
+			var prevObj map[string]any
+			if existing, getErr := tx.storage.Read(ctx, secCtx, op.id); getErr == nil && existing != nil {
+				prevObj = maps.Clone(existing)
+			}
 			if err := tx.storage.Update(ctx, secCtx, op.id, op.updates); err != nil {
-				var _err_83887851 = tx.Rollback(ctx)
-				if _err_83887851 != nil {
-					logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgSwallowedError, _err_83887851).Log()
-				}
+				_ = tx.Rollback(ctx)
 				return nil, errfmt.Errorf(ConstStreamFailedToUpdateObjectStrErr, op.id, err)
 			}
+			tx.applied = append(tx.applied, appliedTxOp{opType: OpUpdate, id: op.id, prevObj: prevObj})
 		case OpDelete:
+			var prevObj map[string]any
+			if existing, getErr := tx.storage.Read(ctx, secCtx, op.id); getErr == nil && existing != nil {
+				prevObj = maps.Clone(existing)
+			}
 			if err := tx.storage.Delete(ctx, secCtx, op.id, false); err != nil {
 				if !errors.Is(err, ErrObjectNotFound) {
 					deleteErrors = append(deleteErrors, errfmt.Errorf(ConstStreamFailedToDeleteObjectStrErr, op.id, err))
 				}
+			} else {
+				tx.applied = append(tx.applied, appliedTxOp{opType: OpDelete, id: op.id, prevObj: prevObj})
 			}
 		}
 	}
@@ -299,12 +307,38 @@ func (f *FileObjectStorage) prepareBatchWALRecords(ctx context.Context, secCtx *
 	return recs, nil
 }
 
-// Rollback rolls back the transaction (no-op for file backend since we haven't applied changes yet)
+func (tx *FileObjectTransaction) rollbackApplied(ctx context.Context, secCtx *pkgctx.SecurityContext) {
+	cliCtx := pkgctx.WithAllowCoreObjectDelete(kernelcas.WithCommit(WithCLIOperation(ctx)))
+	for i := len(tx.applied) - 1; i >= 0; i-- {
+		act := tx.applied[i]
+		switch act.opType {
+		case OpCreate:
+			_ = tx.storage.Delete(cliCtx, secCtx, act.id, false)
+		case OpUpdate:
+			if act.prevObj != nil {
+				_ = tx.storage.Update(cliCtx, secCtx, act.id, act.prevObj)
+			}
+		case OpDelete:
+			if act.prevObj != nil {
+				_ = tx.storage.Create(cliCtx, secCtx, act.prevObj)
+			}
+		}
+	}
+	tx.applied = nil
+}
+
+// Rollback rolls back the transaction, reverting any mutations applied prior to an abort
 func (tx *FileObjectTransaction) Rollback(ctx context.Context) error {
+	tx.mu.Lock()
+	defer tx.mu.Unlock()
+
 	if tx.committed {
 		return errfmt.Errorf(ConstStreamTransactionAlreadyCommitted)
 	}
+	secCtx := pkgctx.NewSystemSecurityContext()
+	tx.rollbackApplied(ctx, secCtx)
 	tx.rolledBack = true
-	tx.ops = nil // Clear operations
+	tx.ops = nil
 	return nil
 }
+

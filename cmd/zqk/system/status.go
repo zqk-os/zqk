@@ -131,6 +131,7 @@ func outputStatusTable(cmd *cobra.Command, statusData map[string]any) error {
 	buf.WriteString(formatStatusTableProject(statusData))
 	buf.WriteString(formatStatusTableStatus(statusData))
 	buf.WriteString(formatStatusTablePlan(statusData))
+	buf.WriteString(formatStatusTableHealth(statusData))
 	buf.WriteString(formatStatusTableCapReview(statusData))
 	buf.WriteString(formatStatusTableStorage(statusData))
 	buf.WriteString(formatStatusTableActivity(statusData))

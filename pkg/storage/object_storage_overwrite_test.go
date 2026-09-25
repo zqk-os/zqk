@@ -145,16 +145,14 @@ func TestUpdateRequiresExplicitConfirmation(t *testing.T) {
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 	}
 
-	if err := fos.Create(ctx, secCtx, obj); err != nil {
-		t.Fatalf("failed to create initial object: %v", err)
-	}
+	storage.CreateCASVisible(t, fos, ctx, secCtx, obj, "")
 
 	// Read object to get updated_at timestamp
 	obj1, err := fos.Read(ctx, secCtx, objID)
 	if err != nil {
 		t.Fatalf("failed to read object: %v", err)
 	}
-	originalUpdatedAt := obj1[objects.FieldKeyUpdatedAt].(string)
+	originalUpdatedAt, _ := obj1[objects.FieldKeyUpdatedAt].(string)
 
 	// Small delay to ensure timestamp changes (for timestamp precision, not deletion)
 	time.Sleep(10 * time.Millisecond)
@@ -278,9 +276,7 @@ func TestConcurrentUpdatesPreventOverwrite(t *testing.T) {
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 	}
 
-	if err := fos.Create(ctx, secCtx, obj); err != nil {
-		t.Fatalf("failed to create initial object: %v", err)
-	}
+	storage.CreateCASVisible(t, fos, ctx, secCtx, obj, "")
 
 	// Simulate concurrent updates
 	// All goroutines should read the same initial state, then all try to update

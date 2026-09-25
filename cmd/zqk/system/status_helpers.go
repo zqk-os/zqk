@@ -491,16 +491,87 @@ func formatStatusTableStatus(statusData map[string]any) string {
 	if !ok {
 		return ""
 	}
-	statusMsg := "✅ Initialized"
 	if status == projectStatusIncomplete {
 		if m, ok := statusData["message"].(string); ok && m != "" {
-			statusMsg = "⚠️  " + m
-		} else {
-			statusMsg = fmt.Sprintf("⚠️  Incomplete (%s directory not found)", paths.ProcessDir)
+			return fmt.Sprintf("Status: ⚠️  %s\n", m)
 		}
+		return fmt.Sprintf("Status: ⚠️  Incomplete (%s directory not found)\n", paths.ProcessDir)
 	}
+
+	var statusMsg string
+	if health, ok := statusData["system_health"].(map[string]any); ok {
+		healthStatus, _ := health[objects.FieldKeyStatus].(string)
+		schedRunning := true
+		if sched, ok := health["scheduler"].(map[string]any); ok {
+			if r, ok := sched["running"].(bool); ok {
+				schedRunning = r
+			}
+		}
+
+		if healthStatus == "critical" || healthStatus == "error" {
+			errMsg := "blocking issues detected"
+			if b, ok := health["blocking_issues"].(int); ok && b > 0 {
+				errMsg = fmt.Sprintf("%d blocking issue(s) detected", b)
+			} else if e, ok := health["error"].(string); ok && e != "" {
+				errMsg = e
+			}
+			statusMsg = fmt.Sprintf("❌ Degraded / Critical (%s)", errMsg)
+		} else if healthStatus == "degraded" {
+			statusMsg = "⚠️  Degraded (health check timed out)"
+		} else if !schedRunning {
+			statusMsg = "⚠️  Initialized (Scheduler daemon stopped)"
+		} else if healthStatus == "warning" {
+			wCount := 0
+			if w, ok := health["warnings"].(int); ok {
+				wCount = w
+			}
+			if wCount > 0 {
+				statusMsg = fmt.Sprintf("⚠️  Initialized (%d warnings)", wCount)
+			} else {
+				statusMsg = "⚠️  Initialized (warnings detected)"
+			}
+		} else {
+			statusMsg = "✅ Initialized (Healthy)"
+		}
+	} else {
+		statusMsg = "✅ Initialized"
+	}
+
 	return fmt.Sprintf("Status: %s\n", statusMsg)
 }
+
+// formatStatusTableHealth formats system health information for table output
+func formatStatusTableHealth(statusData map[string]any) string {
+	health, ok := statusData["system_health"].(map[string]any)
+	if !ok || len(health) == 0 {
+		return ""
+	}
+	var buf strings.Builder
+	buf.WriteString("\nSystem Health:\n")
+	if sched, ok := health["scheduler"].(map[string]any); ok {
+		if r, ok := sched["running"].(bool); ok {
+			schedStatus := "running"
+			if !r {
+				schedStatus = "stopped"
+			}
+			buf.WriteString(fmt.Sprintf("  Scheduler: %s\n", schedStatus))
+		}
+	}
+	if hs, ok := health[objects.FieldKeyStatus].(string); ok && hs != "" {
+		buf.WriteString(fmt.Sprintf("  Health Status: %s\n", hs))
+	}
+	if b, ok := health["blocking_issues"].(int); ok && b > 0 {
+		buf.WriteString(fmt.Sprintf("  Blocking Issues: %d\n", b))
+	}
+	if w, ok := health["warnings"].(int); ok && w > 0 {
+		buf.WriteString(fmt.Sprintf("  Warnings: %d\n", w))
+	}
+	if errStr, ok := health["error"].(string); ok && errStr != "" {
+		buf.WriteString(fmt.Sprintf("  Error: %s\n", errStr))
+	}
+	return buf.String()
+}
+
 
 // formatStatusTablePlan formats priority plan information for table output
 func formatStatusTablePlan(statusData map[string]any) string {

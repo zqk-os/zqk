@@ -52,13 +52,29 @@ func checkSandboxAllowlist(command string) error {
 	}
 
 	for _, segment := range splitShellSegments(command) {
-		executable := extractBaseExecutable(segment)
-		if executable == "" {
+		tokens := parseCommandTokens(segment)
+		if len(tokens) == 0 {
 			continue
 		}
-		if !slices.Contains(sandboxAllowedExecutableList, filepath.Base(executable)) {
+		executable := tokens[0]
+		baseExe := filepath.Base(executable)
+		if !slices.Contains(sandboxAllowedExecutableList, baseExe) {
 			return fmt.Errorf("%s: %q is not in the agent sandbox allowlist; use a dedicated %s MCP tool instead",
 				sandboxDenyPrefix, executable, brand.ExecutableName())
+		}
+
+		// Prevent sandbox escapes via allowlisted tools that can spawn arbitrary processes
+		switch baseExe {
+		case "find":
+			for _, tok := range tokens[1:] {
+				if tok == "-exec" || tok == "-execdir" || tok == "-ok" || tok == "-okdir" {
+					return fmt.Errorf("%s: find with %q execution flag is not permitted in the agent sandbox", sandboxDenyPrefix, tok)
+				}
+			}
+		case "go":
+			if len(tokens) > 1 && tokens[1] == "run" {
+				return fmt.Errorf("%s: 'go run' is not permitted in the agent sandbox; use 'go test' or 'go build' instead", sandboxDenyPrefix)
+			}
 		}
 	}
 

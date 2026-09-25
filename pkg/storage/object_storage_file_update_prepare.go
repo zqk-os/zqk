@@ -189,14 +189,15 @@ func (f *FileObjectStorage) prepareFileObjectUpdate(ctx context.Context, secCtx 
 	// Note: We check this early, but for true concurrency safety, we should re-check
 	// right before writing. For now, this provides basic optimistic locking.
 	var expectedUpdatedAt string
-	if expectedUpdatedAtValue := objects.GetString(updates, FieldKeyExpectedUpdatedAt); expectedUpdatedAtValue != "" {
-		expectedUpdatedAt = expectedUpdatedAtValue
-		actualUpdatedAt, _ := existing[objects.FieldKeyUpdatedAt].(string)
-		if actualUpdatedAt != expectedUpdatedAt {
-			return nil, ErrVersionConflict
-		}
-		// Remove from updates (it's a control field, not part of the object)
+	if _, hasExpected := updates[FieldKeyExpectedUpdatedAt]; hasExpected {
+		expectedUpdatedAt = objects.GetString(updates, FieldKeyExpectedUpdatedAt)
 		delete(updates, FieldKeyExpectedUpdatedAt)
+		if expectedUpdatedAt != "" {
+			actualUpdatedAt, _ := existing[objects.FieldKeyUpdatedAt].(string)
+			if actualUpdatedAt != expectedUpdatedAt {
+				return nil, ErrVersionConflict
+			}
+		}
 	}
 
 	// Check if this is a built-in object and user has admin role
