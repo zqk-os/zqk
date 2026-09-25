@@ -1,0 +1,15 @@
+$schema: ../schemas/command_spec.schema.json
+name: stop <daemon>
+short: Stop a managed daemon and mark it as disabled
+description: Stop a managed daemon and mark it as disabled
+args:
+  type: exact
+  count: 1
+help:
+  examples:
+    - comment: Stop the ambient daemon
+      command: '%s daemon stop ambient'
+    - comment: Stop the fswatcher daemon
+      command: '%s daemon stop fswatcher'
+run_e: runDaemonStop
+common_flags: true

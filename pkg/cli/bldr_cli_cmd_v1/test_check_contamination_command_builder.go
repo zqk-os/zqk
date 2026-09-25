@@ -12,6 +12,7 @@ import (
 func NewTestCheckContaminationCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("check-contamination")
 	builder.WithShort("Execute tests and fail if the kernel schema plane was mutated")
+	builder.WithAliases("contamination-check")
 	help := clipkg.DynamicHelpBuilder("Execute tests and fail if the kernel schema plane was mutated")
 	help.WithDescriptionLines("Runs a command and verifies the kernel schema plane (.zqk/specs) was not mutated during execution. Generates a pre/post SHA-256 snapshot to detect additions, deletions, or edits caused by tests with improper isolation.")
 	help.AddExample("Run a test package under contamination guard", "%s test check-contamination -- go test ./pkg/storage")

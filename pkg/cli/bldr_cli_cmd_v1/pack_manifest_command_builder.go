@@ -12,6 +12,7 @@ import (
 func NewPackManifestCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("manifest")
 	builder.WithShort("Generate a draft swarm package manifest (swarm.yaml)")
+	builder.WithAliases("draft")
 	help := clipkg.DynamicHelpBuilder("Generate a draft swarm package manifest (swarm.yaml)")
 	help.WithDescriptionLines("Generate a draft swarm package manifest (swarm.yaml)")
 	help.AddExample("Run pack manifest", "%s pack manifest")

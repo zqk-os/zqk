@@ -12,6 +12,7 @@ import (
 func NewSystemCheckPolicyCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("check-policy")
 	builder.WithShort("Check repository policy compliance")
+	builder.WithAliases("policy-check", "check-repo-policy")
 	help := clipkg.DynamicHelpBuilder("Check repository policy compliance")
 	help.WithDescriptionLines("Check repository policy compliance against governance gates (secrets, doc links, storage boundaries, goroutines, field keys).")
 	help.AddExample("Run all repository policy checks", "%s system check-policy --all")

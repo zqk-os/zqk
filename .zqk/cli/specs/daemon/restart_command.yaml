@@ -1,0 +1,15 @@
+$schema: ../schemas/command_spec.schema.json
+name: restart <daemon>
+short: Restart a managed daemon
+description: Restart a managed daemon
+args:
+  type: exact
+  count: 1
+help:
+  examples:
+    - comment: Restart the scheduler daemon
+      command: '%s daemon restart scheduler'
+    - comment: Restart the steward daemon
+      command: '%s daemon restart steward'
+run_e: runDaemonRestart
+common_flags: true

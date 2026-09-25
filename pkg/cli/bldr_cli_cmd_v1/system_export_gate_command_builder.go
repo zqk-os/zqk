@@ -12,6 +12,7 @@ import (
 func NewSystemExportGateCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("export-gate")
 	builder.WithShort("Audit candidate directory or open-core distribution against export gates")
+	builder.WithAliases("police-export", "verify-export")
 	help := clipkg.DynamicHelpBuilder("Audit candidate directory or open-core distribution against export gates")
 	help.WithDescriptionLines("Audit an open-core community target directory to ensure proprietary internal scripts, vendor-specific state, credentials, and forbidden patterns are not leaked.")
 	help.AddExample("Audit current repo as community export candidate", "%s system export-gate")

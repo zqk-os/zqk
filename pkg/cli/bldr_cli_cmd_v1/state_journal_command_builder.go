@@ -12,6 +12,7 @@ import (
 func NewStateJournalCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("journal")
 	builder.WithShort("List recent cryptographic change journal mutations")
+	builder.WithAliases("log", "history")
 	help := clipkg.DynamicHelpBuilder("List recent cryptographic change journal mutations")
 	help.WithDescriptionLines("List recent cryptographic change journal mutations")
 	help.AddExample("Run state journal", "%s state journal")

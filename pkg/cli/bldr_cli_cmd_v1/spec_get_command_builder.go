@@ -12,6 +12,7 @@ import (
 func NewSpecGetCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("get <kind>")
 	builder.WithShort("Get object specification details")
+	builder.WithAliases("show")
 	help := clipkg.DynamicHelpBuilder("Get object specification details")
 	help.WithDescriptionLines("Display specification details for an object kind including ontology, traits, and field requirements.")
 	builder.WithHelpBuilder(help)

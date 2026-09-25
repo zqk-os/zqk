@@ -14,6 +14,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/swarm"
 	"github.com/zqk-os/zqk/cmd/zqk/test"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/daemon/overseer"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/objects/koi"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -74,21 +75,36 @@ type ActionCenterItem struct {
 	TriggeredAt time.Time `json:"triggered_at,omitempty"`
 }
 
+// DaemonHealthRow captures the operational status of a supervised background daemon.
+type DaemonHealthRow struct {
+	Name         string `json:"name"`
+	DesiredState string `json:"desired_state"`
+	ActualState  string `json:"actual_state"`
+	PID          int    `json:"pid"`
+	PGID         int    `json:"pgid"`
+	RestartCount int    `json:"restart_count"`
+	Uptime       string `json:"uptime"`
+	Status       string `json:"status"` // "HEALTHY", "STOPPED", "BACKOFF", "CRASHED"
+}
+
 // HealthSummary captures system integrity and hygiene indicators.
 type HealthSummary struct {
-	LastChecked      time.Time
-	CheckFreshness   string
-	OverallStatus    string
-	TotalViolations  int
-	Tier1Count       int
-	Tier2Count       int
-	Tier3Count       int
-	AutoFixableCount int
-	StaleLocksCount  int
-	StorageFiles     int
-	StorageSizeStr   string
-	OpenFileDesc     int
-	MaxFileDesc      int
+	LastChecked      time.Time `json:"last_checked"`
+	CheckFreshness   string    `json:"check_freshness"`
+	OverallStatus    string    `json:"overall_status"`
+	TotalViolations  int       `json:"total_violations"`
+	Tier1Count       int       `json:"tier1_count"`
+	Tier2Count       int       `json:"tier2_count"`
+	Tier3Count       int       `json:"tier3_count"`
+	AutoFixableCount int       `json:"auto_fixable_count"`
+	StaleLocksCount  int       `json:"stale_locks_count"`
+	StorageFiles     int       `json:"storage_files"`
+	StorageSizeStr   string    `json:"storage_size_str"`
+	OpenFileDesc     int       `json:"open_file_desc"`
+	MaxFileDesc      int       `json:"max_file_desc"`
+	OverseerRunning  bool      `json:"overseer_running"`
+	DaemonsRunning   int       `json:"daemons_running"`
+	DaemonsTotal     int       `json:"daemons_total"`
 }
 
 // SchedulerJobRow captures a job's operational state for display.
@@ -316,6 +332,7 @@ type UIModel struct {
 	HealthSummary    HealthSummary
 	HealthViolations []HealthViolationRow
 	ActionItems      []ActionCenterItem
+	DaemonHealth     []DaemonHealthRow
 
 	// Dynamic ambient message banner (Line 6, viewable on any tab)
 	DynamicMessage string
@@ -1448,6 +1465,74 @@ func (m *UIModel) RefreshHealth() {
 		storSizeStr = h.StorageSizeStr
 	}
 
+	// 3. Query Daemon Process Group Overseer & Managed Daemons (< 5ms)
+	var daemonRows []DaemonHealthRow
+	overseerRunning := false
+	daemonsRunning := 0
+	daemonsTotal := 0
+
+	sockPath := overseer.SocketPath(m.ProjectRoot)
+	ipcClient := overseer.NewIPCClient(sockPath)
+	ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
+	resp, err := ipcClient.Send(ctx, overseer.IPCRequest{Action: "status"})
+	cancel()
+
+	if err == nil && resp != nil && resp.Success {
+		overseerRunning = true
+		daemonsTotal = len(resp.Daemons)
+			for _, d := range resp.Daemons {
+				statusStr := "STOPPED"
+				uptimeStr := "--"
+				if d.ActualState == overseer.ActualStateRunning {
+					statusStr = "HEALTHY"
+					daemonsRunning++
+					if !d.StartedAt.IsZero() {
+						uptimeStr = time.Since(d.StartedAt).Round(time.Second).String()
+					}
+				} else if d.ActualState == overseer.ActualStateBackoff {
+					statusStr = "BACKOFF"
+				} else if d.ActualState == overseer.ActualStateCrashed {
+					statusStr = "CRASHED"
+				}
+
+				daemonRows = append(daemonRows, DaemonHealthRow{
+					Name:         d.Name,
+					DesiredState: string(d.DesiredState),
+					ActualState:  string(d.ActualState),
+					PID:          d.PID,
+					PGID:         d.PGID,
+					RestartCount: d.RestartCount,
+					Uptime:       uptimeStr,
+					Status:       statusStr,
+				})
+			}
+	} else {
+		// Fallback to registry on disk if overseer is offline / standby
+		regPath := overseer.DefaultRegistryPath(m.ProjectRoot)
+		reg := overseer.NewRegistry(regPath)
+		if reg.Load() == nil {
+			daemons := reg.List()
+			daemonsTotal = len(daemons)
+			for _, spec := range daemons {
+				daemonRows = append(daemonRows, DaemonHealthRow{
+					Name:         spec.Name,
+					DesiredState: string(spec.DesiredState),
+					ActualState:  string(overseer.ActualStateStopped),
+					PID:          0,
+					PGID:         0,
+					RestartCount: 0,
+					Uptime:       "--",
+					Status:       "STOPPED",
+				})
+			}
+		}
+	}
+
+	sort.Slice(daemonRows, func(i, j int) bool {
+		return daemonRows[i].Name < daemonRows[j].Name
+	})
+	m.DaemonHealth = daemonRows
+
 	m.HealthSummary = HealthSummary{
 		LastChecked:      updatedTime,
 		CheckFreshness:   freshness,
@@ -1462,6 +1547,9 @@ func (m *UIModel) RefreshHealth() {
 		StorageSizeStr:   storSizeStr,
 		OpenFileDesc:     openFDs,
 		MaxFileDesc:      maxFDs,
+		OverseerRunning:  overseerRunning,
+		DaemonsRunning:   daemonsRunning,
+		DaemonsTotal:     daemonsTotal,
 	}
 }
 

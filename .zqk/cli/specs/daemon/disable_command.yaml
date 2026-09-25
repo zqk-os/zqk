@@ -1,0 +1,15 @@
+$schema: ../schemas/command_spec.schema.json
+name: disable <daemon>
+short: Disable a daemon under supervision
+description: Disable a daemon under supervision
+args:
+  type: exact
+  count: 1
+help:
+  examples:
+    - comment: Disable the mcp daemon
+      command: '%s daemon disable mcp'
+    - comment: Disable the fswatcher daemon
+      command: '%s daemon disable fswatcher'
+run_e: runDaemonDisable
+common_flags: true

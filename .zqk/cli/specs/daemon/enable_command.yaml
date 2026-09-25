@@ -1,0 +1,15 @@
+$schema: ../schemas/command_spec.schema.json
+name: enable <daemon>
+short: Enable a daemon to start automatically under supervision
+description: Enable a daemon to start automatically under supervision
+args:
+  type: exact
+  count: 1
+help:
+  examples:
+    - comment: Enable the fswatcher daemon
+      command: '%s daemon enable fswatcher'
+    - comment: Enable the mcp daemon
+      command: '%s daemon enable mcp'
+run_e: runDaemonEnable
+common_flags: true

@@ -12,6 +12,7 @@ import (
 func NewObjectSpecListCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("list")
 	builder.WithShort("List available object specifications")
+	builder.WithAliases("ls")
 	help := clipkg.DynamicHelpBuilder("List available object specifications")
 	help.WithDescriptionLines("List object_spec objects from storage (or bundled specs when using file backend).")
 	builder.WithHelpBuilder(help)

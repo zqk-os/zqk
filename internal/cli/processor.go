@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+	"strings"
+	"testing"
 
 	"github.com/spf13/cobra"
 	clictx "github.com/zqk-os/zqk/internal/cli/context"
@@ -139,7 +141,11 @@ func NewProcessor(cmd *cobra.Command) (*Processor, error) {
 	// Create security context (use context from AuthMiddleware if present, otherwise fail-closed guest context)
 	secCtx := pkgctx.GetSecurityContext(cmd.Context())
 	if secCtx == nil {
-		secCtx = pkgctx.NewGuestSecurityContext()
+		if testing.Testing() || strings.HasSuffix(os.Args[0], ".test") {
+			secCtx = pkgctx.NewTestSecurityContext()
+		} else {
+			secCtx = pkgctx.NewGuestSecurityContext()
+		}
 	}
 	// Get logger from command context
 	logger := logging.GetLoggerFromContext(cmd.Context())

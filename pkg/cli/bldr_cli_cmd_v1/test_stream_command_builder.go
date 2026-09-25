@@ -12,6 +12,7 @@ import (
 func NewTestStreamCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("stream")
 	builder.WithShort("Run Go tests with real-time progress streaming and duration tracking")
+	builder.WithAliases("run-progress")
 	help := clipkg.DynamicHelpBuilder("Run Go tests with real-time progress streaming and duration tracking")
 	help.WithDescriptionLines("Executes Go tests with unbuffered progress streaming, per-package timing, parallel process controls, and structured status logging to .zqk/logs.")
 	help.AddExample("Run all tests with progress streaming", "%s test stream")

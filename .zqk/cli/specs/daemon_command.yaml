@@ -1,0 +1,32 @@
+$schema: schemas/command_spec.schema.json
+name: daemon
+short: Manage background daemons under unified process group supervision
+description: |-
+    Unified Process Group Overseer for all ZQK background daemons (scheduler,
+    ambient, fswatcher, steward, mcp).
+
+    Ensures all daemons run under a dedicated POSIX process group with subreaper supervision,
+    exponential backoff crash recovery, and unified desired vs actual state reconciliation.
+
+      Check daemon status matrix
+      zqk daemon status
+      Start a daemon
+      zqk daemon start scheduler
+      Stop a daemon
+      zqk daemon stop ambient
+      Restart a daemon
+      zqk daemon restart scheduler
+      Enable auto-start for a daemon
+      zqk daemon enable fswatcher
+      Disable a daemon
+      zqk daemon disable mcp
+      Run the overseer foreground supervisor
+      zqk daemon run
+args:
+    type: no_args
+help:
+    examples:
+        - comment: Run daemon
+          command: '%s daemon'
+run_e: runDaemon
+common_flags: true

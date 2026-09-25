@@ -12,6 +12,7 @@ import (
 func NewTestIdentifyParallelCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("identify-parallel")
 	builder.WithShort("Analyze Go tests for safe t.Parallel() adoption")
+	builder.WithAliases("parallel-audit")
 	help := clipkg.DynamicHelpBuilder("Analyze Go tests for safe t.Parallel() adoption")
 	help.WithDescriptionLines("Scans Go test files across the repository using AST analysis to identify tests that can safely adopt t.Parallel(). Detects isolation markers (t.TempDir) and race hazards (t.Setenv, unisolated global state).")
 	help.AddExample("Scan the entire repository for parallel test safety", "%s test identify-parallel")

@@ -12,6 +12,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/callback"
 	cicmd "github.com/zqk-os/zqk/cmd/zqk/ci"
 	"github.com/zqk-os/zqk/cmd/zqk/convergence"
+	"github.com/zqk-os/zqk/cmd/zqk/daemon"
 	"github.com/zqk-os/zqk/cmd/zqk/docman"
 	"github.com/zqk-os/zqk/cmd/zqk/domain"
 	"github.com/zqk-os/zqk/cmd/zqk/feed"
@@ -194,6 +195,11 @@ func registerCommands() {
 	schedulerCmdInst := scheduler.NewSchedulerCmd()
 	schedulerCmdInst.GroupID = "integrations"
 	rootCmd.AddCommand(schedulerCmdInst)
+
+	// Daemon process group overseer and lifecycle management
+	daemonCmdInst := daemon.NewDaemonCmd()
+	daemonCmdInst.GroupID = "integrations"
+	rootCmd.AddCommand(daemonCmdInst)
 
 	// Local CI — commit locally, checkout SHA elsewhere, run tests
 	ciCmdInst := cicmd.NewCICmd()
