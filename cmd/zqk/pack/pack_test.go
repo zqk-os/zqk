@@ -74,3 +74,28 @@ func TestPackCLI_InitSealValidate(t *testing.T) {
 		t.Fatal("expected pack validate to fail closed on tampered pack, got nil")
 	}
 }
+
+func TestPackCLI_Manifest(t *testing.T) {
+	manifestCmd := newManifestCmd()
+	buf := new(bytes.Buffer)
+	manifestCmd.SetOut(buf)
+	manifestCmd.SetArgs([]string{"--name", "cli-draft-test", "--description", "CLI test swarm", "-o", "-"})
+
+	if err := manifestCmd.Execute(); err != nil {
+		t.Fatalf("pack manifest failed: %v", err)
+	}
+
+	out := buf.String()
+	for _, needle := range []string{
+		"name: cli-draft-test",
+		"version: 1.0.0",
+		"description: CLI test swarm",
+		"agents:",
+		"tasks:",
+	} {
+		if !strings.Contains(out, needle) {
+			t.Fatalf("pack manifest stdout missing %q:\n%s", needle, out)
+		}
+	}
+}
+

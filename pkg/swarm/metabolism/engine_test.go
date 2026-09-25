@@ -272,3 +272,112 @@ tasks:
 	})
 }
 
+func TestMetabolismEngine_GenericGoalAndTemplateRef(t *testing.T) {
+	pub, priv, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		t.Fatalf("failed to generate key: %v", err)
+	}
+
+	tmpDir := t.TempDir()
+	manifestContent := `
+name: doc-migration-swarm
+version: 1.0.0
+description: Migrate documentation to new standard
+goal:
+  metric: docs_coverage
+  target: "99%"
+  description: Migrate all doc files
+agents:
+  - name: doc-auditor
+    role: auditor
+  - name: doc-writer
+    role: writer
+tasks:
+  - id: scan-docs
+    title: Scan Documents
+    role: auditor
+    template_ref: scan_template
+  - id: rewrite-docs
+    title: Rewrite Documents
+    role: writer
+    template: templates/rewrite.yaml
+`
+	if err := fileutil.WriteFile(filepath.Join(tmpDir, "swarm.yaml"), []byte(manifestContent), paths.FilePerm644); err != nil {
+		t.Fatalf("failed to write swarm.yaml: %v", err)
+	}
+
+	templatesDir := filepath.Join(tmpDir, "templates")
+	if err := fileutil.MkdirAll(templatesDir, paths.DirPerm755); err != nil {
+		t.Fatalf("failed to create templates dir: %v", err)
+	}
+	if err := fileutil.WriteFile(filepath.Join(templatesDir, "scan_template.yaml"), []byte("prompt: Scan {{dir}}\n"), paths.FilePerm644); err != nil {
+		t.Fatalf("failed to write scan template: %v", err)
+	}
+	if err := fileutil.WriteFile(filepath.Join(templatesDir, "rewrite.yaml"), []byte("prompt: Rewrite {{dir}}\n"), paths.FilePerm644); err != nil {
+		t.Fatalf("failed to write rewrite template: %v", err)
+	}
+
+	if _, err := pack.SealPack(tmpDir, priv, "author@zqk.dev"); err != nil {
+		t.Fatalf("SealPack failed: %v", err)
+	}
+
+	registry := NewReceptorRegistry()
+	engine := NewMetabolismEngine(registry)
+
+	outDir := filepath.Join(t.TempDir(), "output")
+	opts := IngestionOptions{
+		PackDir:    tmpDir,
+		PublicKey:  pub,
+		OutputDir:  outDir,
+		VerifySeal: true,
+		Parameters: map[string]interface{}{
+			"dir": "docs/architecture",
+		},
+	}
+
+	digest, err := engine.Ingest(opts)
+	if err != nil {
+		t.Fatalf("Ingest failed: %v", err)
+	}
+
+	var goal, scanBli, rewriteBli map[string]any
+	for _, obj := range digest.KernelObjects {
+		switch k, _ := obj[objects.FieldKeyKind].(string); k {
+		case "goal":
+			goal = obj
+		case "backlog_item":
+			id, _ := obj[objects.FieldKeyID].(string)
+			if id == "BLI-DOC_MIGRATION_SWARM-SCAN_DOCS" {
+				scanBli = obj
+			} else if id == "BLI-DOC_MIGRATION_SWARM-REWRITE_DOCS" {
+				rewriteBli = obj
+			}
+		}
+	}
+
+	if goal == nil {
+		t.Fatal("expected goal to be synthesized")
+	}
+	if m, _ := goal["metric"].(string); m != "docs_coverage" {
+		t.Errorf("expected goal metric docs_coverage, got %s", m)
+	}
+	if tgt, _ := goal["target"].(string); tgt != "99%" {
+		t.Errorf("expected goal target 99%%, got %s", tgt)
+	}
+
+	if scanBli == nil {
+		t.Fatal("expected scan backlog_item to be synthesized")
+	}
+	if desc, _ := scanBli[objects.FieldKeyDescription].(string); desc != "prompt: Scan docs/architecture\n" {
+		t.Errorf("expected rendered scan template, got %q", desc)
+	}
+
+	if rewriteBli == nil {
+		t.Fatal("expected rewrite backlog_item to be synthesized")
+	}
+	if desc, _ := rewriteBli[objects.FieldKeyDescription].(string); desc != "prompt: Rewrite docs/architecture\n" {
+		t.Errorf("expected rendered rewrite template, got %q", desc)
+	}
+}
+
+

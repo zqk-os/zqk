@@ -438,7 +438,8 @@ func resolveLogLevel(eventCtx *EventContext, message string, fields []logging.Fi
 	if eventCtx.Status == OperationStatusProgress || eventCtx.Status == "spec" || eventCtx.Status == "lifecycle" {
 		return logging.DebugLevel
 	}
-	if eventCtx.OperationType == "queue_shutdown" {
+	if eventCtx.OperationType == "queue_shutdown" || eventCtx.OperationID == "queue_shutdown" ||
+		eventCtx.OperationType == "initiate" || eventCtx.OperationType == "drain_start" || eventCtx.OperationType == "drain_complete" {
 		return logging.DebugLevel
 	}
 

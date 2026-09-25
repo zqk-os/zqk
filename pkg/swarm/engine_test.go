@@ -661,6 +661,65 @@ func TestEngine_VerifyThreeStrikesToolDenialGuard(t *testing.T) {
 	})
 }
 
+func TestEngine_VerifyCatastrophicErrorGuard(t *testing.T) {
+	p := DefaultToolPrefix()
+	tools := []llm.ToolDefinition{
+		{Name: p + "read_code", Description: "read code"},
+		{Name: p + "write_code", Description: "write code"},
+	}
+
+	t.Run("immediate_auth_failure_abort", func(t *testing.T) {
+		client := &mockClient{
+			responses: []llm.StructuredCompletionResponse{
+				{ToolCalls: []llm.ToolCall{{ID: "c1", Name: p + "read_code", Arguments: `{"path":"main.go"}`}}},
+				{Content: "should not be reached"},
+			},
+		}
+		executor := &mockCallExecutor{
+			tools: tools,
+			fn: func(ctx context.Context, call llm.ToolCall) (string, error) {
+				return "", fmt.Errorf("unauthorized: account ACC-SWARM-WORKER not found in account index (POL-AGENT-ACCOUNT-LOGIN-001)")
+			},
+		}
+
+		engine := NewEngine(client, executor, 0, "test-catastrophic")
+		_, err := engine.Run(context.Background(), "sys", "user")
+		if err == nil {
+			t.Fatal("expected immediate abort on auth failure, got nil")
+		}
+		if !strings.Contains(err.Error(), "catastrophic_error_guard: unrecoverable auth/identity failure") {
+			t.Fatalf("expected catastrophic error message, got: %v", err)
+		}
+	})
+
+	t.Run("consecutive_identical_execution_errors_abort", func(t *testing.T) {
+		client := &mockClient{
+			responses: []llm.StructuredCompletionResponse{
+				{ToolCalls: []llm.ToolCall{{ID: "c1", Name: p + "write_code", Arguments: `{"path":"x1.go"}`}}},
+				{ToolCalls: []llm.ToolCall{{ID: "c2", Name: p + "write_code", Arguments: `{"path":"x2.go"}`}}},
+				{ToolCalls: []llm.ToolCall{{ID: "c3", Name: p + "write_code", Arguments: `{"path":"x3.go"}`}}},
+				{Content: "should not be reached"},
+			},
+		}
+		executor := &mockCallExecutor{
+			tools: tools,
+			fn: func(ctx context.Context, call llm.ToolCall) (string, error) {
+				return "", fmt.Errorf("tool execution failed: broken kernel storage connection")
+			},
+		}
+
+		engine := NewEngine(client, executor, 0, "test-catastrophic-loop")
+		_, err := engine.Run(context.Background(), "sys", "user")
+		if err == nil {
+			t.Fatal("expected abort after 3 identical execution failures, got nil")
+		}
+		if !strings.Contains(err.Error(), "catastrophic_error_guard: 3 consecutive identical execution failures") {
+			t.Fatalf("expected catastrophic loop abort message, got: %v", err)
+		}
+	})
+}
+
+
 // TST-1789075168791184000-fd8b6784 / CRIT-1789074573786400000-3483af38: Verify Hallucination Steering Post-Hook
 func TestEngine_VerifyHallucinationSteeringPostHook(t *testing.T) {
 	p := DefaultToolPrefix()

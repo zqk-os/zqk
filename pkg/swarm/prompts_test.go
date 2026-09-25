@@ -1,14 +1,18 @@
 package swarm
 
 import (
+	"context"
+	"fmt"
 	"strings"
 	"testing"
 
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 func TestRenderSystemPrompt(t *testing.T) {
-	data := QwenSystemData{
+	data := SwarmWorkerSystemData{
 		WorkerID:     "worker-123",
 		Capabilities: []string{"coding", "review", "docs"},
 	}
@@ -27,7 +31,7 @@ func TestRenderSystemPrompt(t *testing.T) {
 }
 
 func TestRenderSystemPrompt_ContainsTacticalGuidance(t *testing.T) {
-	data := QwenSystemData{
+	data := SwarmWorkerSystemData{
 		WorkerID:     "worker-tactical",
 		Capabilities: []string{"coding"},
 	}
@@ -68,7 +72,7 @@ func TestRenderSystemPrompt_ContainsTacticalGuidance(t *testing.T) {
 }
 
 func TestRenderSystemPrompt_UsesCustomToolPrefix(t *testing.T) {
-	data := QwenSystemData{
+	data := SwarmWorkerSystemData{
 		WorkerID:     "worker-custom",
 		Capabilities: []string{"coding"},
 		ToolPrefix:   "acme_",
@@ -88,7 +92,7 @@ func TestRenderSystemPrompt_UsesCustomToolPrefix(t *testing.T) {
 }
 
 func TestRenderTaskPrompt(t *testing.T) {
-	data := QwenTaskData{
+	data := SwarmWorkerTaskData{
 		TaskName:        "Test Task",
 		TaskDescription: "Do something testable",
 		Context:         "Some context here",
@@ -111,7 +115,7 @@ func TestRenderTaskPrompt(t *testing.T) {
 }
 
 func TestRenderTaskPrompt_ContainsExampleWorkflow(t *testing.T) {
-	data := QwenTaskData{
+	data := SwarmWorkerTaskData{
 		TaskName:        "Fix Bug",
 		TaskDescription: "Fix a bug in the system",
 		Context:         "Bug context",
@@ -131,7 +135,7 @@ func TestRenderTaskPrompt_ContainsExampleWorkflow(t *testing.T) {
 }
 
 func TestRenderTaskPrompt_UsesCustomToolPrefix(t *testing.T) {
-	data := QwenTaskData{
+	data := SwarmWorkerTaskData{
 		TaskName:        "Fix Bug",
 		TaskDescription: "Fix it",
 		Context:         "ctx",
@@ -520,3 +524,124 @@ func TestIsContextGatheringTool(t *testing.T) {
 		})
 	}
 }
+
+type mockPromptTemplateStorage struct {
+	storage.NoopObjectStorage
+	templates map[string]map[string]any
+}
+
+func (m *mockPromptTemplateStorage) Read(ctx context.Context, secCtx *pkgctx.SecurityContext, id string) (map[string]any, error) {
+	if obj, ok := m.templates[id]; ok {
+		return obj, nil
+	}
+	return nil, fmt.Errorf("object not found: %s", id)
+}
+
+func TestRenderSystemPromptWithStorage_DynamicResolution(t *testing.T) {
+	mockStore := &mockPromptTemplateStorage{
+		templates: map[string]map[string]any{
+			PromptTemplateSwarmWorkerSystemCoding: {
+				objects.FieldKeyID:         PromptTemplateSwarmWorkerSystemCoding,
+				objects.FieldKeyPromptBody: "Custom Dynamic Coding Prompt for {{.WorkerID}} with prefix {{.ToolPrefix}}",
+			},
+			PromptTemplateSwarmWorkerSystemDocsEval: {
+				objects.FieldKeyID:         PromptTemplateSwarmWorkerSystemDocsEval,
+				objects.FieldKeyPromptBody: "Custom Dynamic DocsEval Prompt for {{.WorkerID}} with prefix {{.ToolPrefix}}",
+			},
+		},
+	}
+
+	// 1. Coding task with dynamic template
+	res, err := RenderSystemPromptWithStorage(context.Background(), mockStore, nil, SwarmWorkerSystemData{
+		WorkerID:   "worker-dyn-1",
+		ToolPrefix: "zqk_",
+		WorkClass:  "coding",
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	expectedCoding := "Custom Dynamic Coding Prompt for worker-dyn-1 with prefix zqk_"
+	if res != expectedCoding {
+		t.Errorf("expected %q, got %q", expectedCoding, res)
+	}
+
+	// 2. Docs eval task with dynamic template
+	resDocs, err := RenderSystemPromptWithStorage(context.Background(), mockStore, nil, SwarmWorkerSystemData{
+		WorkerID:   "worker-dyn-docs",
+		ToolPrefix: "zqk_",
+		WorkClass:  "docs_eval",
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	expectedDocs := "Custom Dynamic DocsEval Prompt for worker-dyn-docs with prefix zqk_"
+	if resDocs != expectedDocs {
+		t.Errorf("expected %q, got %q", expectedDocs, resDocs)
+	}
+}
+
+func TestRenderTaskPromptWithStorage_DynamicResolution(t *testing.T) {
+	mockStore := &mockPromptTemplateStorage{
+		templates: map[string]map[string]any{
+			PromptTemplateSwarmWorkerTask: {
+				objects.FieldKeyID:         PromptTemplateSwarmWorkerTask,
+				objects.FieldKeyPromptBody: "Execute Task: {{.TaskName}} | Desc: {{.TaskDescription}} | ToolPrefix: {{.ToolPrefix}}",
+			},
+		},
+	}
+
+	res, err := RenderTaskPromptWithStorage(context.Background(), mockStore, nil, SwarmWorkerTaskData{
+		TaskName:        "ATK-1234",
+		TaskDescription: "Refactor prompts to kernel objects",
+		ToolPrefix:      "zqk_",
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	expected := "Execute Task: ATK-1234 | Desc: Refactor prompts to kernel objects | ToolPrefix: zqk_"
+	if res != expected {
+		t.Errorf("expected %q, got %q", expected, res)
+	}
+}
+
+func TestRenderSystemPromptWithStorage_FallbackWhenMissing(t *testing.T) {
+	emptyStore := &mockPromptTemplateStorage{templates: map[string]map[string]any{}}
+
+	res, err := RenderSystemPromptWithStorage(context.Background(), emptyStore, nil, SwarmWorkerSystemData{
+		WorkerID:  "worker-fb",
+		WorkClass: "coding",
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !strings.Contains(res, "Worker ID: worker-fb") {
+		t.Errorf("expected fallback template to render Worker ID, got: %s", res)
+	}
+	if !strings.Contains(res, "You are an LLM acting as a worker node") {
+		t.Errorf("expected vendor-neutral worker phrasing in fallback, got: %s", res)
+	}
+}
+
+func TestRenderSystemPromptWithStorage_FallbackOnInvalidTemplateSyntax(t *testing.T) {
+	brokenStore := &mockPromptTemplateStorage{
+		templates: map[string]map[string]any{
+			PromptTemplateSwarmWorkerSystemCoding: {
+				objects.FieldKeyID:         PromptTemplateSwarmWorkerSystemCoding,
+				objects.FieldKeyPromptBody: "Broken template with invalid syntax: {{.WorkerID",
+			},
+		},
+	}
+
+	// Should gracefully fallback to default template instead of failing completely
+	res, err := RenderSystemPromptWithStorage(context.Background(), brokenStore, nil, SwarmWorkerSystemData{
+		WorkerID:  "worker-broken-syntax",
+		WorkClass: "coding",
+	})
+	if err != nil {
+		t.Fatalf("expected fallback on syntax error, got err: %v", err)
+	}
+	if !strings.Contains(res, "Worker ID: worker-broken-syntax") {
+		t.Errorf("expected fallback to render Worker ID, got: %s", res)
+	}
+}
+

@@ -39,6 +39,7 @@ Enables task routing, context delegation to specialized sub-agents, and shared s
 	cmd.AddCommand(swarm.NewAgentSwarmInitCmd())
 	cmd.AddCommand(swarm.NewSwarmCmd())
 	cmd.AddCommand(feed.NewFeedCmd())
+	cmd.AddCommand(NewAgentHookCmd())
 
 	return cmd
 }

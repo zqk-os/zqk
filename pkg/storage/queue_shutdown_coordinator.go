@@ -138,7 +138,7 @@ func GetGlobalShutdownCoordinator() *QueueShutdownCoordinator {
 
 // RegisterQueue registers a queue for shutdown coordination
 func (c *QueueShutdownCoordinator) RegisterQueue(queue QueueShutdownHandler) {
-	StorageLog(c.logger.Logger()).Info(LogEventStorageQueueShutdownRegisteringInfo).QueueName(queue.GetName()).Log()
+	StorageLog(c.logger.Logger()).Debug(LogEventStorageQueueShutdownRegisteringInfo).QueueName(queue.GetName()).Log()
 	_ = concurrency.RunInLockOrLog(
 		&c.mu, locknames.LockNameQueueShutdownRegister, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 		func() error {
@@ -172,7 +172,7 @@ func (c *QueueShutdownCoordinator) InitiateShutdown() error {
 		return nil // Already shutting down
 	}
 
-	StorageLog(c.logger.Logger()).Info(LogEventStorageQueueShutdownInitiatingInfo).Log()
+	StorageLog(c.logger.Logger()).Debug(LogEventStorageQueueShutdownInitiatingInfo).Log()
 
 	// Notify all queues to stop accepting new operations
 	var queues []QueueShutdownHandler
@@ -233,7 +233,7 @@ func (c *QueueShutdownCoordinator) drainAllInner(ctx context.Context) error {
 	)
 
 	if len(queues) == 0 {
-		StorageLog(c.logger.Logger()).Info(LogEventStorageQueueShutdownNoQueuesInfo).Log()
+		StorageLog(c.logger.Logger()).Debug(LogEventStorageQueueShutdownNoQueuesInfo).Log()
 		c.shutdownOnce.Do(func() {
 			close(c.shutdownComplete)
 		})
@@ -244,7 +244,7 @@ func (c *QueueShutdownCoordinator) drainAllInner(ctx context.Context) error {
 	for _, q := range queues {
 		queueNames = append(queueNames, q.GetName())
 	}
-	StorageLog(c.logger.Logger()).Info(fmt.Sprintf("Draining queues [%s]", strings.Join(queueNames, ", "))).
+	StorageLog(c.logger.Logger()).Debug(fmt.Sprintf("Draining queues [%s]", strings.Join(queueNames, ", "))).
 		Int("queue_count", len(queues)).
 		Log()
 
@@ -313,7 +313,7 @@ func (c *QueueShutdownCoordinator) drainAllInner(ctx context.Context) error {
 	select {
 	case <-waitDone:
 		// All queues drained
-		StorageLog(c.logger.Logger()).Info(LogEventStorageQueueShutdownAllDrainedSuccessInfo).Log()
+		StorageLog(c.logger.Logger()).Debug(LogEventStorageQueueShutdownAllDrainedSuccessInfo).Log()
 	case <-drainCtx.Done():
 		// Timeout exceeded
 		if c.config.ForceShutdown {

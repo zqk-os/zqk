@@ -89,3 +89,76 @@ func (p *ProactiveWorkspaceSeeder) OnSuccess(ctx context.Context, call llm.ToolC
 		})
 	}
 }
+
+// CatastrophicErrorGuard aborts execution immediately when unrecoverable or catastrophic
+// failures occur (e.g. fatal authentication/authorization denials, missing accounts, or
+// persistent fatal infrastructure errors), preventing wasteful CPU and token burn.
+type CatastrophicErrorGuard struct {
+	consecutiveFailures     int
+	lastErrorSummary        string
+	maxConsecutiveIdentical int
+}
+
+// NewCatastrophicErrorGuard creates a new CatastrophicErrorGuard.
+func NewCatastrophicErrorGuard() *CatastrophicErrorGuard {
+	return &CatastrophicErrorGuard{
+		maxConsecutiveIdentical: 3,
+	}
+}
+
+func (g *CatastrophicErrorGuard) PreTool(ctx context.Context, call llm.ToolCall) error {
+	return nil
+}
+
+func (g *CatastrophicErrorGuard) PostTool(ctx context.Context, call llm.ToolCall, result string, err error) (string, error) {
+	combined := result
+	if err != nil {
+		if combined != "" {
+			combined += ": " + err.Error()
+		} else {
+			combined = err.Error()
+		}
+	}
+
+	lower := strings.ToLower(combined)
+
+	// Immediate fatal catastrophic errors: Authentication / Authorization policy rejection
+	// Once an account index or auth policy fails (e.g. POL-AGENT-ACCOUNT-LOGIN-001 or missing worker account),
+	// further execution turns will NEVER succeed.
+	if strings.Contains(combined, "POL-AGENT-ACCOUNT-LOGIN") ||
+		strings.Contains(lower, "not found in account index") ||
+		strings.Contains(lower, "unauthorized: account") ||
+		strings.Contains(lower, "unauthorized: persona") ||
+		strings.Contains(lower, "unrecoverable security failure") {
+		return "", fmt.Errorf("catastrophic_error_guard: unrecoverable auth/identity failure (%s). Aborting swarm to prevent thrashing", strings.TrimSpace(combined))
+	}
+
+	// Repeated identical execution failures:
+	if err != nil || strings.Contains(lower, "error:") || strings.Contains(lower, "tool execution failed") {
+		currErr := strings.TrimSpace(combined)
+		if len(currErr) > 200 {
+			currErr = currErr[:200]
+		}
+		if currErr != "" && currErr == g.lastErrorSummary {
+			g.consecutiveFailures++
+			if g.consecutiveFailures >= g.maxConsecutiveIdentical {
+				return "", fmt.Errorf("catastrophic_error_guard: %d consecutive identical execution failures (%s). Aborting swarm", g.consecutiveFailures, g.lastErrorSummary)
+			}
+		} else {
+			g.lastErrorSummary = currErr
+			g.consecutiveFailures = 1
+		}
+	} else {
+		// Clean success resets consecutive failure counter
+		g.consecutiveFailures = 0
+		g.lastErrorSummary = ""
+	}
+
+	return "", nil
+}
+
+func (g *CatastrophicErrorGuard) OnSuccess(ctx context.Context, call llm.ToolCall, result string) {
+	g.consecutiveFailures = 0
+	g.lastErrorSummary = ""
+}
+

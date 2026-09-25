@@ -35,7 +35,11 @@ func emitQueueShutdownEventViaCoordinator(
 	}
 
 	// Create event context
-	eventCtx := coordination.NewEventContext(operationIDQueueShutdown, eventType, status).
+	eventCtx := coordination.NewEventContext(operationIDQueueShutdown, eventType, status)
+	if err == nil {
+		eventCtx.WithLevel("debug")
+	}
+	eventCtx.
 		WithEventData(&coordination.EventData{
 			LoggingFields: []coordination.LoggingField{
 				{Key: eventKeyQueueName, Value: queueName},

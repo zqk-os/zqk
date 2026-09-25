@@ -8,6 +8,7 @@ import (
 	"time"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/metrics"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -241,3 +242,54 @@ func (ts *testSubscriber) EventTypes() []string {
 func (ts *testSubscriber) IsActive() bool {
 	return ts.active
 }
+
+func TestResolveLogLevel_QueueShutdownNoiseSuppression(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name          string
+		eventCtx      *EventContext
+		expectedLevel logging.LogLevel
+	}{
+		{
+			name:          "queue_shutdown operation type",
+			eventCtx:      NewEventContext("op-1", "queue_shutdown", OperationStatusComplete),
+			expectedLevel: logging.DebugLevel,
+		},
+		{
+			name:          "queue_shutdown operation ID with initiate type",
+			eventCtx:      NewEventContext("queue_shutdown", "initiate", OperationStatusComplete),
+			expectedLevel: logging.DebugLevel,
+		},
+		{
+			name:          "drain_start event type",
+			eventCtx:      NewEventContext("queue_shutdown", "drain_start", OperationStatusProgress),
+			expectedLevel: logging.DebugLevel,
+		},
+		{
+			name:          "drain_complete event type",
+			eventCtx:      NewEventContext("queue_shutdown", "drain_complete", OperationStatusComplete),
+			expectedLevel: logging.DebugLevel,
+		},
+		{
+			name:          "explicit debug level override",
+			eventCtx:      NewEventContext("op-2", "arbitrary_operation", OperationStatusComplete).WithLevel("debug"),
+			expectedLevel: logging.DebugLevel,
+		},
+		{
+			name:          "standard operation defaults to info",
+			eventCtx:      NewEventContext("op-3", "user_action", OperationStatusComplete),
+			expectedLevel: logging.InfoLevel,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			level := resolveLogLevel(tt.eventCtx, "test-msg", nil)
+			if level != tt.expectedLevel {
+				t.Errorf("resolveLogLevel() = %v, want %v", level, tt.expectedLevel)
+			}
+		})
+	}
+}
+

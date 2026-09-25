@@ -212,7 +212,7 @@ func TestPrompts_RenderPromptEdgeCases(t *testing.T) {
 	t.Parallel()
 
 	// RenderSystemPrompt docs_eval and default prefix
-	sysPrompt, err := RenderSystemPrompt(QwenSystemData{
+	sysPrompt, err := RenderSystemPrompt(SwarmWorkerSystemData{
 		WorkClass: "docs_eval",
 	})
 	if err != nil {
@@ -223,7 +223,7 @@ func TestPrompts_RenderPromptEdgeCases(t *testing.T) {
 	}
 
 	// RenderTaskPrompt default prefix
-	taskPrompt, err := RenderTaskPrompt(QwenTaskData{
+	taskPrompt, err := RenderTaskPrompt(SwarmWorkerTaskData{
 		TaskName: "TASK-1",
 	})
 	if err != nil {

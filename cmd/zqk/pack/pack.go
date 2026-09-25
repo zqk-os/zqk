@@ -26,6 +26,7 @@ func NewPackCmd() *cobra.Command {
 	cmd.AddCommand(newInitCmd())
 	cmd.AddCommand(newSealCmd())
 	cmd.AddCommand(newValidateCmd())
+	cmd.AddCommand(newManifestCmd())
 
 	return cmd
 }
@@ -279,6 +280,65 @@ func newValidateCmd() *cobra.Command {
 	}
 
 	cmd.Flags().StringVar(&keyPath, "key", "", "Path to Ed25519 public key for signature verification (optional)")
+
+	return cmd
+}
+
+func newManifestCmd() *cobra.Command {
+	var (
+		name     string
+		version  string
+		desc     string
+		author   string
+		license  string
+		cellType string
+		metric   string
+		target   string
+		outPath  string
+	)
+
+	cmd := &cobra.Command{
+		Use:     "manifest",
+		Aliases: []string{"draft"},
+		Short:   "Generate a draft swarm package manifest (swarm.yaml)",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			manifestBytes, err := pack.DraftSwarmManifestYAML(pack.SwarmDraftOptions{
+				Name:            name,
+				Version:         version,
+				Description:     desc,
+				Author:          author,
+				License:         license,
+				CellType:        cellType,
+				GoalMetric:      metric,
+				GoalTarget:      target,
+				GoalDescription: desc,
+			})
+			if err != nil {
+				return err
+			}
+
+			if outPath == "" || outPath == "-" {
+				cmd.Print(string(manifestBytes))
+				return nil
+			}
+
+			if err := fileutil.WriteFile(outPath, manifestBytes, paths.FilePerm644); err != nil {
+				return fmt.Errorf("failed to write manifest to %s: %w", outPath, err)
+			}
+			cmd.Printf("✓ Successfully wrote swarm manifest to %s\n", outPath)
+			return nil
+		},
+	}
+
+	cmd.Flags().StringVarP(&outPath, "output", "o", "-", "Output file path, or '-' for stdout")
+	cmd.Flags().StringVar(&name, "name", "custom-swarm", "Package name")
+	cmd.Flags().StringVar(&version, "version", "1.0.0", "Semantic version (SemVer 2.0.0)")
+	cmd.Flags().StringVar(&desc, "description", "", "Package description")
+	cmd.Flags().StringVar(&author, "author", "zqk-community", "Author")
+	cmd.Flags().StringVar(&license, "license", "Apache-2.0", "License")
+	cmd.Flags().StringVar(&cellType, "cell-type", "", "Cellular archetype (neuron, muscle, heart, lungs)")
+	cmd.Flags().StringVar(&metric, "goal-metric", "", "Goal metric")
+	cmd.Flags().StringVar(&target, "goal-target", "", "Goal target")
 
 	return cmd
 }

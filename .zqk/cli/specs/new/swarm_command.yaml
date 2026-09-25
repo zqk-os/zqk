@@ -1,0 +1,58 @@
+$schema: ../schemas/command_spec.schema.json
+name: swarm
+short: Write a portable swarm manifest draft (swarm.yaml)
+description: |-
+    Valid holonic swarm package manifest conforming to swarm_package_spec.
+
+    Next: zqk pack seal <dir> or zqk run <dir>
+
+      Minimal swarm manifest draft
+      zqk new swarm
+      Named swarm manifest
+      zqk new swarm --name code-migration --description "Migrate packages to Go 1.24"
+      Cellular archetype swarm
+      zqk new swarm --name analysis-cell --cell-type neuron
+aliases:
+    - swarm-manifest
+    - swarm-spec
+    - pack-manifest
+args:
+    type: no_args
+flags:
+    - name: author
+      type: string
+      default: zqk-community
+      description: Author or owner of the swarm package
+    - name: cell-type
+      type: string
+      description: Cellular team archetype (neuron, muscle, heart, lungs)
+    - name: description
+      type: string
+      description: Package description (empty uses default description)
+    - name: goal-description
+      type: string
+      description: Human-readable goal description
+    - name: goal-metric
+      type: string
+      description: Target metric name for the swarm goal
+    - name: goal-target
+      type: string
+      description: Target goal value/percentage (e.g. 95%)
+    - name: license
+      type: string
+      default: Apache-2.0
+      description: License identifier for the swarm package
+    - name: name
+      type: string
+      default: custom-swarm
+      description: Package name for the swarm
+    - name: version
+      type: string
+      default: 1.0.0
+      description: SemVer version for the swarm package
+help:
+    examples:
+        - comment: Run new swarm
+          command: '%s new swarm'
+run_e: runNewSwarm
+common_flags: true
