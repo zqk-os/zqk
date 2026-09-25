@@ -1,0 +1,31 @@
+{
+  "cef_version": "0.1.0",
+  "status": "pass",
+  "freeze_sha": "5f54f19d",
+  "git_branch": "integration/PRI-CODE_EVAL-CYCLE-2-EXPLORATORY",
+  "timestamp": "2026-09-25T19:59:00Z",
+  "languages_detected": [
+    "go",
+    "python",
+    "shell",
+    "yaml",
+    "markdown"
+  ],
+  "adapters_enabled": [
+    "go"
+  ],
+  "available_tools": {
+    "go": "go1.26.6 darwin/arm64",
+    "zqk": "v0.1.0-beta.3-107-g5f54f19d",
+    "zqk-vet": "available (suites: hygiene, tree_police, payload all pass)",
+    "git": "available",
+    "gitleaks": "available via scripts/scan-secrets.sh"
+  },
+  "repo_inventory": {
+    "total_packages": 54,
+    "total_dod_chains": 106,
+    "cas_blockers": 0,
+    "tier1_blockers": 0
+  },
+  "notes": "Wave 0 Preflight complete. Clean baseline with 106 DoD chains unbroken and 0 tree violations."
+}
