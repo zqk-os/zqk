@@ -148,7 +148,7 @@ func (p *Pool) Start(ctx context.Context) {
 						if !ok {
 							return nil
 						}
-						_ = w.fn(w.ctx) //nolint:errcheck // best-effort per task
+						runWorkItemSafely(w)
 					case <-workerCtx.Done():
 						// Drain remaining buffered work if any before exiting
 						for {
@@ -157,7 +157,7 @@ func (p *Pool) Start(ctx context.Context) {
 								if !ok {
 									return nil
 								}
-								_ = w.fn(w.ctx) //nolint:errcheck // best-effort per task
+								runWorkItemSafely(w)
 							default:
 								return workerCtx.Err()
 							}
@@ -166,6 +166,13 @@ func (p *Pool) Start(ctx context.Context) {
 				}
 			})
 	}
+}
+
+func runWorkItemSafely(w poolWork) {
+	defer func() {
+		_ = recover()
+	}()
+	_ = w.fn(w.ctx) //nolint:errcheck // best-effort per task
 }
 
 // Submit enqueues a task to be run by a pool worker. It is non-blocking if the queue has capacity;

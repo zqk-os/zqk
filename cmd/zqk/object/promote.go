@@ -61,7 +61,7 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 	specLoader.SetBuilderRegistry(adapter)
 
 	if err := specLoader.EnsureReady(ctx); err != nil {
-		return fmt.Errorf("failed to initialize spec loader: %v", err)
+		return fmt.Errorf("failed to initialize spec loader: %w", err)
 	}
 
 	lifecyclesDir := filepath.Join(proc.ProjectRoot(), paths.ProcessInternalLifecyclesDir)

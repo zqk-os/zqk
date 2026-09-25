@@ -20,6 +20,7 @@ const (
 	MaxRateLimitTokens = 5
 	RateLimitRefillSec = 5 // Refill 5 tokens per second
 	BufferTTL          = 60 * time.Second
+	MaxBufferQueueSize = 100 // Maximum buffered payloads retained per client
 )
 
 type BufferedPayload struct {
@@ -45,20 +46,29 @@ type RelayServer struct {
 
 	blockMu   sync.RWMutex
 	blocklist map[string]struct{}
+
+	ctx    context.Context
+	cancel context.CancelFunc
+	done   chan struct{}
 }
 
 // NewServer creates a new Sovereign Relay Server.
 func NewServer(addr string) *RelayServer {
+	ctx, cancel := context.WithCancel(context.Background())
 	s := &RelayServer{
 		addr:      addr,
 		mux:       http.NewServeMux(),
 		buffers:   make(map[string][]BufferedPayload),
 		limiters:  make(map[string]*rateLimit),
 		blocklist: make(map[string]struct{}),
+		ctx:       ctx,
+		cancel:    cancel,
+		done:      make(chan struct{}),
 	}
 
 	s.routes()
 	goroutinelabels.NewGoroutine("relay.cleanup_loop", "running relay payload cleanup loop").StartSimple(func() {
+		defer close(s.done)
 		s.cleanupLoop()
 	})
 
@@ -106,12 +116,13 @@ func (s *RelayServer) Start() error {
 				ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 				defer cancel()
 				_ = srv.Shutdown(ctx)
+				_ = s.Close()
 			}()
 		})
 
 	slog.Info("[Sovereign Relay] Listening", "addr", s.addr)
 	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		return fmt.Errorf("relay server error: %v", err)
+		return fmt.Errorf("relay server error: %w", err)
 	}
 
 	return nil
@@ -175,11 +186,16 @@ func (s *RelayServer) Allow(clientID string) bool {
 }
 
 // BufferPayload temporarily buffers a payload for a disconnected client.
+// Caps per-client queue at MaxBufferQueueSize to prevent unbounded memory growth.
 func (s *RelayServer) BufferPayload(clientID string, payload []byte) {
 	s.bufferMu.Lock()
 	defer s.bufferMu.Unlock()
 
-	s.buffers[clientID] = append(s.buffers[clientID], BufferedPayload{
+	queue := s.buffers[clientID]
+	if len(queue) >= MaxBufferQueueSize {
+		queue = queue[1:]
+	}
+	s.buffers[clientID] = append(queue, BufferedPayload{
 		Data:      payload,
 		ExpiresAt: time.Now().Add(BufferTTL),
 	})
@@ -210,10 +226,25 @@ func (s *RelayServer) GetBufferedPayloads(clientID string) [][]byte {
 
 func (s *RelayServer) cleanupLoop() {
 	ticker := time.NewTicker(30 * time.Second)
-	for range ticker.C {
-		s.cleanupBuffers()
-		s.cleanupLimiters()
+	defer ticker.Stop()
+	for {
+		select {
+		case <-s.ctx.Done():
+			return
+		case <-ticker.C:
+			s.cleanupBuffers()
+			s.cleanupLimiters()
+		}
 	}
+}
+
+// Close gracefully terminates the background cleanup loop and releases server resources.
+func (s *RelayServer) Close() error {
+	if s.cancel != nil {
+		s.cancel()
+		<-s.done
+	}
+	return nil
 }
 
 func (s *RelayServer) cleanupBuffers() {

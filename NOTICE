@@ -67,3 +67,19 @@ under its own permissive open source terms:
 14. golang.org/x/{crypto,sync,sys,term,tools}
     License: BSD 3-Clause License
     Copyright (c) 2009 The Go Authors
+
+15. github.com/google/go-cmp
+    License: BSD 3-Clause License
+    Copyright (c) 2017 The Go Authors
+
+16. github.com/joho/godotenv
+    License: MIT License
+    Copyright (c) 2013 John Barton
+
+17. github.com/mitchellh/go-ps
+    License: MIT License
+    Copyright (c) 2014 Mitchell Hashimoto
+
+18. go.uber.org/goleak
+    License: MIT License
+    Copyright (c) 2017-2023 Uber Technologies, Inc.
