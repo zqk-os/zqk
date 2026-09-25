@@ -151,22 +151,21 @@ func (p *ProxyDaemon) Start(ctx context.Context) error {
 }
 
 func (p *ProxyDaemon) connectionLoop(ctx context.Context) {
+	ticker := time.NewTicker(1 * time.Second)
+	defer ticker.Stop()
+
 	for {
 		select {
 		case <-ctx.Done():
 			return
-		default:
-		}
+		case <-ticker.C:
+			p.mu.Lock()
+			conn := p.conn
+			p.mu.Unlock()
 
-		p.mu.Lock()
-		conn := p.conn
-		p.mu.Unlock()
-
-		if conn == nil {
-			_ = p.tryConnectOnce(true) // replay cached initialize after daemon restart
-			time.Sleep(1 * time.Second)
-		} else {
-			time.Sleep(1 * time.Second)
+			if conn == nil {
+				_ = p.tryConnectOnce(true) // replay cached initialize after daemon restart
+			}
 		}
 	}
 }

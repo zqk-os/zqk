@@ -183,4 +183,42 @@ func TestRelayServer_Timeouts(t *testing.T) {
 	if srv.IdleTimeout <= 0 {
 		t.Errorf("expected IdleTimeout > 0, got %v", srv.IdleTimeout)
 	}
+	_ = s.Close()
 }
+
+func TestRelayServer_Close(t *testing.T) {
+	s := NewServer(":8443")
+	done := make(chan error, 1)
+	go func() {
+		done <- s.Close()
+	}()
+
+	select {
+	case err := <-done:
+		if err != nil {
+			t.Errorf("expected nil error on Close, got %v", err)
+		}
+	case <-time.After(2 * time.Second):
+		t.Fatal("RelayServer.Close() timed out; cleanup goroutine leaked")
+	}
+}
+
+func TestRelayServer_BufferQueueBound(t *testing.T) {
+	s := NewServer(":8443")
+	defer s.Close()
+
+	clientID := "overflow_client"
+	for i := 0; i < MaxBufferQueueSize+50; i++ {
+		s.BufferPayload(clientID, []byte{byte(i)})
+	}
+
+	payloads := s.GetBufferedPayloads(clientID)
+	if len(payloads) != MaxBufferQueueSize {
+		t.Fatalf("expected queue bounded to %d, got %d", MaxBufferQueueSize, len(payloads))
+	}
+	// Oldest 50 payloads dropped, so first element should be 50
+	if payloads[0][0] != 50 {
+		t.Errorf("expected oldest payloads dropped; first element is %d, want 50", payloads[0][0])
+	}
+}
+

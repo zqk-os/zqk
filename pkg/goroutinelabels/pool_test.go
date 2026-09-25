@@ -352,3 +352,40 @@ func TestPool_ConcurrentSubmitAndStop(t *testing.T) {
 	pool.Stop()
 	wg.Wait()
 }
+
+func TestPool_WorkerRecoversFromPanic(t *testing.T) {
+	t.Parallel()
+	b := NewBudget(BudgetConfig{MaxTotal: 10})
+	pool := b.NewPool("test_panic", "worker panic recovery test", 1, 10)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	pool.Start(ctx)
+
+	// Task 1: panics intentionally
+	_ = pool.Submit(ctx, func(context.Context) error {
+		panic("intentional task panic for test")
+	})
+
+	// Wait briefly for panic to be recovered
+	time.Sleep(20 * time.Millisecond)
+
+	// Task 2: runs on the same worker (size=1) and should complete successfully
+	var ran atomic.Bool
+	err := pool.Submit(ctx, func(context.Context) error {
+		ran.Store(true)
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("Submit after panic: %v", err)
+	}
+
+	time.Sleep(30 * time.Millisecond)
+	if !ran.Load() {
+		t.Errorf("worker died after task panic; subsequent task was not processed")
+	}
+
+	pool.Stop()
+}
+

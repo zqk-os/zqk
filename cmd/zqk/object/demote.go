@@ -47,7 +47,7 @@ func runDemote(cmd *cobra.Command, args []string) error {
 		specLoader.SetBuilderRegistry(adapter)
 
 		if err := specLoader.EnsureReady(ctx); err != nil {
-			return fmt.Errorf("failed to initialize spec loader: %v", err)
+			return fmt.Errorf("failed to initialize spec loader: %w", err)
 		}
 
 		lifecyclesDir := filepath.Join(proc.ProjectRoot(), paths.ProcessInternalLifecyclesDir)

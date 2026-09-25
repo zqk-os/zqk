@@ -224,13 +224,13 @@ func processFileForHashFix(cmd *cobra.Command, stdCtx context.Context, file, pro
 func readAndParseYAMLFile(file string) (data []byte, obj map[string]any, err error) {
 	data, err = fileutil.ReadFile(file)
 	if err != nil {
-		err = errfmt.Errorf("failed to read file: %v", err)
+		err = errfmt.Errorf("failed to read file: %w", err)
 		return
 	}
 
 	obj = make(map[string]any)
 	if err = yaml.Unmarshal(data, &obj); err != nil {
-		err = errfmt.Errorf("failed to parse YAML: %v", err)
+		err = errfmt.Errorf("failed to parse YAML: %w", err)
 		return
 	}
 

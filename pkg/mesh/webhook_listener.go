@@ -40,7 +40,11 @@ func WebhookHandler(store storage.ObjectStorageProvider) http.HandlerFunc {
 				if payload.URL != "" {
 					updates["artifact_url"] = payload.URL
 				}
-				if err := store.Update(context.Background(), nil, payload.JobID, updates); err != nil {
+				reqCtx := req.Context
+				if reqCtx == nil {
+					reqCtx = context.Background()
+				}
+				if err := store.Update(reqCtx, nil, payload.JobID, updates); err != nil {
 					return transport.Response[map[string]any]{
 						StatusCode: http.StatusInternalServerError,
 					}, err

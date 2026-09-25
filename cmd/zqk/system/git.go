@@ -166,7 +166,7 @@ func runGitQuery(cmd *cobra.Command, args []string) error {
 
 		result, err := proc.Storage().List(proc.OperationContext(), proc.SecurityContext(), storageCtx, filter)
 		if err != nil {
-			return errfmt.Errorf("failed to query code references: %v", err)
+			return errfmt.Errorf("failed to query code references: %w", err)
 		}
 
 		switch proc.Format() {

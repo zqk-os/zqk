@@ -25,6 +25,11 @@ func CLIName() string {
 	return CLICommandNameDefault
 }
 
+// BrandExecutableName returns the branded executable name configured in brand settings.
+func BrandExecutableName() string {
+	return brand.ExecutableName()
+}
+
 // CLIUsage joins the live executable name with subcommand tokens.
 func CLIUsage(args ...string) string {
 	parts := make([]string, 0, 1+len(args))

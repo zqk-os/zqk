@@ -25,9 +25,14 @@ BRAND_ENV_PREFIX := ZQK
 endif
 VERSION    ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
 GIT_COMMIT ?= $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+ifdef SOURCE_DATE_EPOCH
+BUILD_DATE ?= $(shell date -u -r $(SOURCE_DATE_EPOCH) '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date -u -d @$(SOURCE_DATE_EPOCH) '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date -u '+%Y-%m-%dT%H:%M:%SZ')
+else
 BUILD_DATE ?= $(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
+endif
 # Public module path after the bounded community rewrite.
-LDFLAGS = -X github.com/zqk-os/zqk/cmd/zqk/app.version=$(VERSION) \
+LDFLAGS = -s -w \
+          -X github.com/zqk-os/zqk/cmd/zqk/app.version=$(VERSION) \
           -X github.com/zqk-os/zqk/cmd/zqk/app.buildDate=$(BUILD_DATE) \
           -X github.com/zqk-os/zqk/cmd/zqk/app.gitCommit=$(GIT_COMMIT)
 
@@ -68,7 +73,7 @@ bootstrap-archive:
 	fi
 
 compile-bin: bootstrap-archive
-	go build -ldflags '$(LDFLAGS)' -o $(BIN) ./cmd/zqk
+	go build -trimpath -ldflags '$(LDFLAGS)' -o $(BIN) ./cmd/zqk
 	ln -sf $(BRAND_EXE) bin/$(BRAND_EXE)-mcp-ide-adapter
 
 codegen: compile-bin
@@ -115,7 +120,7 @@ test: test-unit test-integration
 
 bin/zqk-vet: $(shell find pkg/vet cmd/zqk-vet -name '*.go')
 	@mkdir -p bin
-	go build -o bin/zqk-vet ./cmd/zqk-vet
+	go build -trimpath -o bin/zqk-vet ./cmd/zqk-vet
 
 zqk-vet: bin/zqk-vet
 

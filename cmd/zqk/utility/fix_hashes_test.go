@@ -1,17 +1,16 @@
 package utility
 
 import (
-	"github.com/zqk-os/zqk/pkg/datacell"
-	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
-
+	"errors"
+	"os"
 	"path/filepath"
 	"testing"
 
-	"github.com/zqk-os/zqk/pkg/paths"
-
+	"github.com/zqk-os/zqk/pkg/datacell"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
-
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestCollectFilesByKind(t *testing.T) {
@@ -134,3 +133,27 @@ func TestGetPrefixFromID(t *testing.T) {
 		})
 	}
 }
+
+func TestReadAndParseYAMLFile_ErrorWrapping(t *testing.T) {
+	t.Parallel()
+	// Test file read error unwrapping
+	nonExistentFile := filepath.Join(t.TempDir(), "non-existent-file.yaml")
+	_, _, err := readAndParseYAMLFile(nonExistentFile)
+	if err == nil {
+		t.Fatal("expected error for non-existent file, got nil")
+	}
+	if !errors.Is(err, os.ErrNotExist) {
+		t.Errorf("expected errors.Is(err, os.ErrNotExist) to be true for wrapped error, got false; err: %v", err)
+	}
+
+	// Test invalid yaml parse error
+	invalidFile := filepath.Join(t.TempDir(), "invalid.yaml")
+	if err := fileutil.WriteFile(invalidFile, []byte("invalid:\n  - incomplete: ["), paths.FilePerm644); err != nil {
+		t.Fatalf("failed to write invalid yaml file: %v", err)
+	}
+	_, _, err = readAndParseYAMLFile(invalidFile)
+	if err == nil {
+		t.Fatal("expected parse error for invalid yaml, got nil")
+	}
+}
+

@@ -170,7 +170,7 @@ func resolveSessionAccountID(ctx context.Context, cmd *cobra.Command, projectRoo
 func readSessionAccountID(ctx context.Context, cmd *cobra.Command, projectRoot, sessionID string) (string, error) {
 	sp, err := cli.GetObjectStorageForCommand(cmd, projectRoot)
 	if err != nil || sp == nil {
-		return "", errfmt.Errorf("unauthorized: storage not available to validate session: %v", err)
+		return "", errfmt.Errorf("unauthorized: storage not available to validate session: %w", err)
 	}
 	systemSecCtx := pkgctx.NewSystemSecurityContext()
 	sessionObj, readErr := sp.Read(ctx, systemSecCtx, sessionID)
