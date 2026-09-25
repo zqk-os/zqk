@@ -9,12 +9,20 @@ import (
 
 const personaRefTagPrefix = "persona_ref:"
 
-// PipelineRouter handles routing logic for priority plans.
-type PipelineRouter struct{}
+// PlanRouter handles routing logic for priority plans.
+type PlanRouter struct{}
 
-// NewPipelineRouter creates a new PipelineRouter.
+// NewPlanRouter creates a new PlanRouter.
+func NewPlanRouter() *PlanRouter {
+	return &PlanRouter{}
+}
+
+// PipelineRouter is a type alias preserved for backwards compatibility to eliminate package stutter.
+type PipelineRouter = PlanRouter
+
+// NewPipelineRouter is an alias for NewPlanRouter preserved for backwards compatibility.
 func NewPipelineRouter() *PipelineRouter {
-	return &PipelineRouter{}
+	return NewPlanRouter()
 }
 
 // RouteResult holds the output of the routing logic.

@@ -10,6 +10,8 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
+// ObjectStorageProvider defines the subset of storage operations supported directly by the CAS file layer.
+// Callers requiring full transaction, query, search, and graph capabilities should use pkg/storage.ObjectStorageProvider.
 type ObjectStorageProvider interface {
 	Create(ctx context.Context, secCtx *pkgctx.SecurityContext, obj map[string]any) error
 	Read(ctx context.Context, secCtx *pkgctx.SecurityContext, id string) (map[string]any, error)

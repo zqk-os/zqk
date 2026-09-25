@@ -8,10 +8,13 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
-// PipelineStorageProvider defines the minimal storage contract needed to load pipelines.
-type PipelineStorageProvider interface {
+// StorageProvider defines the minimal storage contract needed to load pipelines.
+type StorageProvider interface {
 	Read(ctx context.Context, secCtx any, id string) (map[string]any, error)
 }
+
+// PipelineStorageProvider is an alias for StorageProvider preserved for backwards compatibility to eliminate package stutter.
+type PipelineStorageProvider = StorageProvider
 
 // LoadPipeline loads a PIP-* object from storage and returns an instrumented Builder.
 // It maps the sequential/parallel execution_mode from pipeline_stage objects into the builder.

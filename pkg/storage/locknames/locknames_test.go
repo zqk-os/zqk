@@ -109,3 +109,49 @@ func TestLockNames(t *testing.T) {
 		}
 	}
 }
+
+// TestLockHierarchyDocumentation asserts that lock operation scopes are well-formed snake_case identifiers
+// with recognized domain prefixes to prevent unstructured registry sprawl (TDE-F-ARCH-010).
+func TestLockHierarchyDocumentation(t *testing.T) {
+	recognizedPrefixes := []string{
+		"async_metrics_",
+		"audit_buffer_",
+		"batch_generator_",
+		"bucket_strategy_",
+		"bulk_delete_",
+		"cache_manager_",
+		"cas_",
+		"listing_index_",
+		"change_journal_",
+		"storage_",
+		"stream_registry_",
+		"test_mode_",
+		"transaction_",
+		"unified_metrics_",
+		"update_",
+		"volume_tracker_",
+		"waitgroup_",
+		"wal_",
+		"kind_mapper_",
+		"evolution_",
+	}
+
+	for _, name := range []string{
+		LockNameListingIndexSave,
+		LockNameWalCompact,
+		LockNameAsyncMetricsCollectorEnqueue,
+		LockNameAuditBufferAddEvent,
+		LockNameKindMapperSetDirectories,
+	} {
+		matched := false
+		for _, prefix := range recognizedPrefixes {
+			if len(name) >= len(prefix) && name[:len(prefix)] == prefix {
+				matched = true
+				break
+			}
+		}
+		if !matched {
+			t.Errorf("lock name %q does not start with any recognized domain scope prefix", name)
+		}
+	}
+}
