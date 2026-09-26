@@ -390,10 +390,30 @@ func EnrichKernelAmbienceWithStaleTasks(ctx context.Context, sp storage.ObjectSt
 		IncludeFields(objects.FieldKeyID, objects.FieldKeyPriorityPlanRef, objects.FieldKeyClaimedBy, objects.FieldKeyUpdatedAt, objects.FieldKeyCreatedAt).
 		Build())
 	if err != nil || len(res.Objects) == 0 {
+		// Check if an in_progress priority_plan has stalled with zero active tasks
+		planRes, pErr := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+			ByStatus(objects.KindPriorityPlan, objects.ObjectStatusInProgress).
+			IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyUpdatedAt).
+			Build())
+		if pErr == nil && len(planRes.Objects) > 0 {
+			topPlan := planRes.Objects[0]
+			planID := koi.ID(topPlan)
+			planTitle := koi.GetString(topPlan, objects.FieldKeyTitle)
+			amb.StaleAgentTask = &StaleAgentTask{
+				PlanID:      planID,
+				CommandHint: paths.CLIUsage("agent", "orchestrate", planID),
+			}
+			stalledMsg := fmt.Sprintf("stalled swarm detected: plan %s (%s) is in_progress with 0 active tasks", planID, planTitle)
+			if amb.Note != "" {
+				amb.Note = fmt.Sprintf("%s; %s", amb.Note, stalledMsg)
+			} else {
+				amb.Note = stalledMsg
+			}
+		}
 		return
 	}
 
-	staleThreshold := 2 * time.Hour
+	staleThreshold := 15 * time.Minute
 	staleItems := interactionpolicy.DetectStaleAgentTasks(res.Objects, now, staleThreshold)
 	if len(staleItems) > 0 {
 		topStale := staleItems[0]
