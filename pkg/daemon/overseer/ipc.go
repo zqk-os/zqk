@@ -61,7 +61,7 @@ func (s *IPCServer) Start() error {
 	defer s.mu.Unlock()
 
 	dir := filepath.Dir(s.socketPath)
-	if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
+	if err := fileutil.MkdirAll(dir, paths.DirPerm700); err != nil {
 		return errfmt.Newf("mkdir socket dir %s", dir).Wrap(err)
 	}
 
@@ -72,6 +72,7 @@ func (s *IPCServer) Start() error {
 	if err != nil {
 		return errfmt.Newf("listen on unix socket %s", s.socketPath).Wrap(err)
 	}
+	_ = os.Chmod(s.socketPath, paths.FilePerm600)
 	s.listener = l
 
 	goroutinelabels.NewGoroutine("overseer_ipc_serve", "listen and accept overseer IPC connections").
