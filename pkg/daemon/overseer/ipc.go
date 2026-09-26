@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"net"
-	"os"
 	"path/filepath"
 	"sync"
 	"time"
@@ -66,13 +65,13 @@ func (s *IPCServer) Start() error {
 	}
 
 	// Remove stale socket if exists
-	_ = os.Remove(s.socketPath)
+	_ = fileutil.Remove(s.socketPath)
 
 	l, err := net.Listen("unix", s.socketPath)
 	if err != nil {
 		return errfmt.Newf("listen on unix socket %s", s.socketPath).Wrap(err)
 	}
-	_ = os.Chmod(s.socketPath, paths.FilePerm600)
+	_ = fileutil.Chmod(s.socketPath, paths.FilePerm600)
 	s.listener = l
 
 	goroutinelabels.NewGoroutine("overseer_ipc_serve", "listen and accept overseer IPC connections").
@@ -94,7 +93,7 @@ func (s *IPCServer) Stop() error {
 	if s.listener != nil {
 		_ = s.listener.Close()
 	}
-	_ = os.Remove(s.socketPath)
+	_ = fileutil.Remove(s.socketPath)
 	s.mu.Unlock()
 
 	// Wait for active client connections to finish with a capped deadline
