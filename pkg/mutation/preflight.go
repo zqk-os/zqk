@@ -6,6 +6,9 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
+
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // SchemaViolation details a specific schema or constraint violation.
@@ -41,13 +44,20 @@ type PreflightValidator interface {
 	ValidateBatch(ctx context.Context, muts []Mutation) (*PreflightBatchReceipt, error)
 }
 
+// StatusResolverFunc resolves the current status of an object by its ID.
+type StatusResolverFunc func(ctx context.Context, id string) (string, bool)
+
 // DefaultPreflightValidator evaluates candidate mutations in-memory without initiating disk writes.
 type DefaultPreflightValidator struct {
 	validActions       map[Action]bool
 	validSafetyClasses map[SafetyClass]bool
 	validPriorityTiers map[string]bool
 	validStatuses      map[string]bool
+	systemFields       map[string]bool
 	idPattern          *regexp.Regexp
+	specLoader         *objects.SpecLoader
+	lifecycleLoader    *objects.LifecycleLoader
+	statusResolver     StatusResolverFunc
 }
 
 // NewDefaultPreflightValidator creates a configured preflight validator with kernel schema invariants.
@@ -79,8 +89,44 @@ func NewDefaultPreflightValidator() *DefaultPreflightValidator {
 			"active":      true,
 			"archived":    true,
 		},
-		idPattern: regexp.MustCompile(`^[a-zA-Z0-9]+(-[a-zA-Z0-9_-]+)+$`),
+		systemFields: map[string]bool{
+			"created_at":      true,
+			"created_by":      true,
+			"updated_at":      true,
+			"updated_by":      true,
+			"archived_at":     true,
+			"archived_by":     true,
+			"status_history":  true,
+			"provenance":      true,
+			"change_log":      true,
+			"version":         true,
+			"schema_version":  true,
+			"schema_ref":      true,
+			"namespace_id":    true,
+			"version_context": true,
+		},
+		idPattern:       regexp.MustCompile(`^[a-zA-Z0-9]+(-[a-zA-Z0-9_-]+)+$`),
+		specLoader:      objects.GetGlobalSpecLoader(),
+		lifecycleLoader: objects.GetGlobalLifecycleLoader(),
 	}
+}
+
+// WithStatusResolver sets a status resolver function for inspecting existing object state.
+func (v *DefaultPreflightValidator) WithStatusResolver(fn StatusResolverFunc) *DefaultPreflightValidator {
+	v.statusResolver = fn
+	return v
+}
+
+// WithSpecLoader sets the spec loader used for schema constraint evaluation.
+func (v *DefaultPreflightValidator) WithSpecLoader(sl *objects.SpecLoader) *DefaultPreflightValidator {
+	v.specLoader = sl
+	return v
+}
+
+// WithLifecycleLoader sets the lifecycle loader used for transition evaluation.
+func (v *DefaultPreflightValidator) WithLifecycleLoader(ll *objects.LifecycleLoader) *DefaultPreflightValidator {
+	v.lifecycleLoader = ll
+	return v
 }
 
 // Validate evaluates an individual mutation entirely in-memory.
@@ -163,6 +209,32 @@ func (v *DefaultPreflightValidator) Validate(ctx context.Context, mut *Mutation)
 
 	// 5. Validate Fields Map for Type Invariants and Constraints
 	if mut.Fields != nil {
+		// 5a. System-Managed Fields Check (forbidden unless BreakGlass authorized)
+		if !pkgctx.IsLifecycleBreakGlass(ctx) {
+			for fName, fVal := range mut.Fields {
+				if fName == "id" || fName == "kind" {
+					continue
+				}
+				isSys := v.systemFields[fName]
+				if !isSys {
+					if reg := objects.GetGlobalSystemFieldsRegistry(); reg != nil {
+						if isRegSys, err := reg.IsSystemGeneratedField(fName); err == nil && isRegSys {
+							isSys = true
+						}
+					}
+				}
+				if isSys {
+					receipt.Violations = append(receipt.Violations, SchemaViolation{
+						FieldPath:         "fields." + fName,
+						FailingConstraint: "system_managed_field",
+						Expected:          "field value must be computed by system runtime; manual modification forbidden without break-glass",
+						Actual:            fmt.Sprintf("%v", fVal),
+						Remediation:       fmt.Sprintf("Remove system-managed field %q from mutation payload or use --break-glass with justification", fName),
+					})
+				}
+			}
+		}
+
 		// Priority Tier Enum Check
 		if ptVal, hasPT := mut.Fields["priority_tier"]; hasPT {
 			if ptStr, ok := ptVal.(string); ok {
@@ -186,17 +258,60 @@ func (v *DefaultPreflightValidator) Validate(ctx context.Context, mut *Mutation)
 			}
 		}
 
-		// Status Enum Check
+		// Status Enum and Lifecycle Transition Check
 		if statusVal, hasStatus := mut.Fields["status"]; hasStatus {
 			if statusStr, ok := statusVal.(string); ok {
-				if !v.validStatuses[statusStr] {
+				var statusValid bool
+				if v.lifecycleLoader != nil && mut.TargetKind != "" {
+					if sv, err := v.lifecycleLoader.IsValidStatus(mut.TargetKind, statusStr); err == nil {
+						statusValid = sv
+					} else {
+						statusValid = v.validStatuses[statusStr]
+					}
+				} else {
+					statusValid = v.validStatuses[statusStr]
+				}
+
+				if !statusValid {
 					receipt.Violations = append(receipt.Violations, SchemaViolation{
 						FieldPath:         "fields.status",
 						FailingConstraint: "enum_membership",
-						Expected:          "valid kernel status constant (e.g. planned, testing, active, complete)",
+						Expected:          fmt.Sprintf("valid lifecycle status for %s", mut.TargetKind),
 						Actual:            statusStr,
-						Remediation:       "Use an authorized lifecycle status string",
+						Remediation:       fmt.Sprintf("Use an authorized lifecycle status string for %s", mut.TargetKind),
 					})
+				} else if !pkgctx.IsLifecycleBreakGlass(ctx) {
+					// Validate status transitions on update
+					if mut.Action == ActionUpdateNode && mut.TargetID != "" {
+						var oldStatus string
+						if v.statusResolver != nil {
+							if s, found := v.statusResolver(ctx, mut.TargetID); found {
+								oldStatus = s
+							}
+						}
+						if oldStatus != "" && oldStatus != statusStr && v.lifecycleLoader != nil {
+							validTrans, transErr := v.lifecycleLoader.IsValidTransition(mut.TargetKind, oldStatus, statusStr)
+							if transErr != nil || !validTrans {
+								receipt.Violations = append(receipt.Violations, SchemaViolation{
+									FieldPath:         "fields.status",
+									FailingConstraint: "invalid_lifecycle_transition",
+									Expected:          fmt.Sprintf("valid lifecycle transition from %q", oldStatus),
+									Actual:            statusStr,
+									Remediation:       fmt.Sprintf("Status cannot transition directly from %q to %q for %s without break-glass authorization", oldStatus, statusStr, mut.TargetKind),
+								})
+							}
+						}
+					} else if mut.Action == ActionCreateNode && v.lifecycleLoader != nil {
+						if isTerm, err := v.lifecycleLoader.IsTerminalStatusForKind(mut.TargetKind, statusStr); err == nil && isTerm {
+							receipt.Violations = append(receipt.Violations, SchemaViolation{
+								FieldPath:         "fields.status",
+								FailingConstraint: "invalid_lifecycle_transition",
+								Expected:          "non-terminal status upon object creation",
+								Actual:            statusStr,
+								Remediation:       "Newly created objects cannot start in a terminal status without break-glass authorization",
+							})
+						}
+					}
 				}
 			} else {
 				receipt.Violations = append(receipt.Violations, SchemaViolation{
@@ -206,6 +321,49 @@ func (v *DefaultPreflightValidator) Validate(ctx context.Context, mut *Mutation)
 					Actual:            fmt.Sprintf("%T", statusVal),
 					Remediation:       "Status must be a string",
 				})
+			}
+		}
+
+		// Spec-driven validation for value-restricted enum and pattern fields
+		if v.specLoader != nil && mut.TargetKind != "" {
+			if spec, err := v.specLoader.LoadSpecWithInheritance(mut.TargetKind + ".yaml"); err == nil && spec != nil && spec.ResolvedFields != nil {
+				for fName, fVal := range mut.Fields {
+					if fName == "status" || fName == "priority_tier" || fName == "title" {
+						continue
+					}
+					fieldDefRaw, exists := spec.ResolvedFields[fName]
+					if !exists {
+						continue
+					}
+					fieldDef, ok := fieldDefRaw.(map[string]any)
+					if !ok {
+						continue
+					}
+					if valMap, ok := fieldDef["validation"].(map[string]any); ok {
+						if enumRaw, hasEnum := valMap["enum"]; hasEnum && enumRaw != nil {
+							allowedValues := parseEnumStrings(enumRaw)
+							if len(allowedValues) > 0 {
+								valStr := fmt.Sprintf("%v", fVal)
+								matched := false
+								for _, allowed := range allowedValues {
+									if valStr == allowed {
+										matched = true
+										break
+									}
+								}
+								if !matched {
+									receipt.Violations = append(receipt.Violations, SchemaViolation{
+										FieldPath:         "fields." + fName,
+										FailingConstraint: "enum_membership",
+										Expected:          fmt.Sprintf("one of: [%s]", strings.Join(allowedValues, ", ")),
+										Actual:            valStr,
+										Remediation:       fmt.Sprintf("Set %s to one of the authorized spec enum values: %s", fName, strings.Join(allowedValues, ", ")),
+									})
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 
@@ -279,4 +437,23 @@ func (v *DefaultPreflightValidator) ValidateBatch(ctx context.Context, muts []Mu
 	}
 
 	return batch, nil
+}
+
+func parseEnumStrings(raw any) []string {
+	switch v := raw.(type) {
+	case []string:
+		return v
+	case []any:
+		res := make([]string, 0, len(v))
+		for _, item := range v {
+			if s, ok := item.(string); ok {
+				res = append(res, s)
+			} else if item != nil {
+				res = append(res, fmt.Sprintf("%v", item))
+			}
+		}
+		return res
+	default:
+		return nil
+	}
 }

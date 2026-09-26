@@ -1,0 +1,215 @@
+BEGIN TRANSACTION;
+
+UPSERT milestone ID "MIL-SWARM-COLLAB-ASSIST-001" {
+  "title": "Heterogeneous Swarm Collaboration, Ambient Guidance & Upstream Provenance",
+  "description": "Enhances the autonomous swarm runtime with upstream deliverable provenance propagation, reactive tool-denial coaching, the 'I Need Assistance' guidance loop, and heterogeneous model tier delegation between local swarm workers and hosted subagents.",
+  "status": "originated",
+  "stage_type": "tier",
+  "priority_tier": "P1",
+  "namespace_id": "zqk:kernel",
+  "schema_version": "2.0.0",
+  "created_at": "2026-09-26T20:25:00Z",
+  "created_by": "ACC-SYSTEM",
+  "updated_at": "2026-09-26T20:25:00Z",
+  "updated_by": "ACC-SYSTEM"
+};
+
+UPSERT criteria ID "CRIT-SWARM-PROVENANCE-001" {
+  "title": "Shockwave Upstream Artifact Provenance Delivery",
+  "description": "Downstream dependent tasks receive verified upstream deliverable artifact paths in their task prompt context.",
+  "category": "functional",
+  "status": "originated",
+  "priority_tier": "P1",
+  "namespace_id": "zqk:kernel",
+  "schema_version": "2.0.0",
+  "created_at": "2026-09-26T20:25:00Z",
+  "created_by": "ACC-SYSTEM",
+  "updated_at": "2026-09-26T20:25:00Z",
+  "updated_by": "ACC-SYSTEM"
+};
+
+UPSERT criteria ID "CRIT-SWARM-TOOL-GUARD-001" {
+  "title": "Tool Guard Reactive Coaching on Permission & Kind Errors",
+  "description": "Tool guard returns actionable guidance on unknown kinds and permission denials, preventing 3-strike tool denial aborts.",
+  "category": "functional",
+  "status": "originated",
+  "priority_tier": "P1",
+  "namespace_id": "zqk:kernel",
+  "schema_version": "2.0.0",
+  "created_at": "2026-09-26T20:25:00Z",
+  "created_by": "ACC-SYSTEM",
+  "updated_at": "2026-09-26T20:25:00Z",
+  "updated_by": "ACC-SYSTEM"
+};
+
+UPSERT criteria ID "CRIT-SWARM-ASSIST-TOOL-001" {
+  "title": "Observer Coach Guidance Signal MCP Integration",
+  "description": "MCP zqk_request_guidance tool successfully queries Observer Coach and injects steering guidance into agent context.",
+  "category": "functional",
+  "status": "originated",
+  "priority_tier": "P1",
+  "namespace_id": "zqk:kernel",
+  "schema_version": "2.0.0",
+  "created_at": "2026-09-26T20:25:00Z",
+  "created_by": "ACC-SYSTEM",
+  "updated_at": "2026-09-26T20:25:00Z",
+  "updated_by": "ACC-SYSTEM"
+};
+
+UPSERT criteria ID "CRIT-SWARM-MODEL-ROUTING-001" {
+  "title": "Model Tier Heterogeneous Routing Across Local and Hosted Seats",
+  "description": "Orchestrator dispatches tier_1_complex to primary/hosted seats and tier_2_simple to local swarm workers with synced agent_feed.",
+  "category": "functional",
+  "status": "originated",
+  "priority_tier": "P1",
+  "namespace_id": "zqk:kernel",
+  "schema_version": "2.0.0",
+  "created_at": "2026-09-26T20:25:00Z",
+  "created_by": "ACC-SYSTEM",
+  "updated_at": "2026-09-26T20:25:00Z",
+  "updated_by": "ACC-SYSTEM"
+};
+
+UPSERT requirement ID "REQ-SWARM-PROVENANCE-PROPAGATE-001" {
+  "title": "Upstream Shockwave Deliverable Provenance Propagation",
+  "description": "The orchestrator shockwave dependency gate MUST propagate verified deliverable artifact paths (e.g. docs/eval/*.md) from upstream tasks into downstream task envelopes to prevent speculative kind guessing and permission errors.",
+  "status": "active",
+  "priority_tier": "P1",
+  "milestone_refs": ["MIL-SWARM-COLLAB-ASSIST-001"],
+  "criteria_refs": ["CRIT-SWARM-PROVENANCE-001"],
+  "namespace_id": "zqk:kernel",
+  "schema_version": "2.0.0",
+  "created_at": "2026-09-26T20:25:00Z",
+  "created_by": "ACC-SYSTEM",
+  "updated_at": "2026-09-26T20:25:00Z",
+  "updated_by": "ACC-SYSTEM"
+};
+
+UPSERT requirement ID "REQ-SWARM-TOOL-GUARD-COACH-001" {
+  "title": "Reactive Tool-Denial & Permission Ambient Coaching",
+  "description": "The swarm engine and tool guard MUST intercept permission denials and unknown object kinds, returning actionable ambient coaching and guidance instead of silent coordinator errors or tripping tool_denial_guard aborts.",
+  "status": "active",
+  "priority_tier": "P1",
+  "milestone_refs": ["MIL-SWARM-COLLAB-ASSIST-001"],
+  "criteria_refs": ["CRIT-SWARM-TOOL-GUARD-001"],
+  "namespace_id": "zqk:kernel",
+  "schema_version": "2.0.0",
+  "created_at": "2026-09-26T20:25:00Z",
+  "created_by": "ACC-SYSTEM",
+  "updated_at": "2026-09-26T20:25:00Z",
+  "updated_by": "ACC-SYSTEM"
+};
+
+UPSERT requirement ID "REQ-SWARM-ASSIST-ESCAPE-HATCH-001" {
+  "title": "Ambient Assistance Signal and Guidance Escape Hatch",
+  "description": "Agents MUST have an explicit MCP guidance tool ('zqk_request_guidance') allowing them to signal obstacles or ambiguity to the Observer Coach and receive real-time steering before exhausting lookup budgets.",
+  "status": "active",
+  "priority_tier": "P1",
+  "milestone_refs": ["MIL-SWARM-COLLAB-ASSIST-001"],
+  "criteria_refs": ["CRIT-SWARM-ASSIST-TOOL-001"],
+  "namespace_id": "zqk:kernel",
+  "schema_version": "2.0.0",
+  "created_at": "2026-09-26T20:25:00Z",
+  "created_by": "ACC-SYSTEM",
+  "updated_at": "2026-09-26T20:25:00Z",
+  "updated_by": "ACC-SYSTEM"
+};
+
+UPSERT requirement ID "REQ-SWARM-HETEROGENEOUS-DELEGATION-001" {
+  "title": "Heterogeneous Multi-Model Delegation & Collaboration",
+  "description": "The swarm orchestrator MUST support capability- and tier-based dispatch that splits assignments between local swarm workers (e.g., routine/eval tasks via Ollama) and hosted subagents (e.g., complex synthesis via Gemini) with shared agent_feed collaboration.",
+  "status": "active",
+  "priority_tier": "P1",
+  "milestone_refs": ["MIL-SWARM-COLLAB-ASSIST-001"],
+  "criteria_refs": ["CRIT-SWARM-MODEL-ROUTING-001"],
+  "namespace_id": "zqk:kernel",
+  "schema_version": "2.0.0",
+  "created_at": "2026-09-26T20:25:00Z",
+  "created_by": "ACC-SYSTEM",
+  "updated_at": "2026-09-26T20:25:00Z",
+  "updated_by": "ACC-SYSTEM"
+};
+
+UPSERT priority_plan ID "PRI-SWARM-COLLAB-ASSIST-001" {
+  "title": "Execution Plan: Swarm Guidance, Heterogeneous Delegation & Provenance",
+  "description": "Plan to implement upstream provenance propagation, tool guard ambient coaching, the 'I Need Assistance' signal, and multi-model collaboration channels across local and hosted agents.",
+  "status": "originated",
+  "priority_tier": "P1",
+  "related_object_refs": ["MIL-SWARM-COLLAB-ASSIST-001"],
+  "namespace_id": "zqk:kernel",
+  "schema_version": "2.0.0",
+  "created_at": "2026-09-26T20:25:00Z",
+  "created_by": "ACC-SYSTEM",
+  "updated_at": "2026-09-26T20:25:00Z",
+  "updated_by": "ACC-SYSTEM"
+};
+
+UPSERT backlog_item ID "BLI-SWM-PROVENANCE-001" {
+  "title": "Propagate Upstream Deliverables via Shockwave Dependency Gate",
+  "description": "Enhance orchestrator shockwave gate in orchestrate_run.go to inject upstream deliverable artifact paths into downstream prompts.",
+  "status": "originated",
+  "priority_tier": "P1",
+  "priority_plan_ref": "PRI-SWARM-COLLAB-ASSIST-001",
+  "milestone_refs": ["MIL-SWARM-COLLAB-ASSIST-001"],
+  "requirement_refs": ["REQ-SWARM-PROVENANCE-PROPAGATE-001"],
+  "criteria_refs": ["CRIT-SWARM-PROVENANCE-001"],
+  "namespace_id": "zqk:kernel",
+  "schema_version": "2.0.0",
+  "created_at": "2026-09-26T20:25:00Z",
+  "created_by": "ACC-SYSTEM",
+  "updated_at": "2026-09-26T20:25:00Z",
+  "updated_by": "ACC-SYSTEM"
+};
+
+UPSERT backlog_item ID "BLI-SWM-TOOL-GUARD-001" {
+  "title": "Implement Reactive Ambient Coaching in Swarm Tool Guard",
+  "description": "Extend pkg/swarm/tool_guard.go to catch permission denials and unknown object kinds with contextual coaching guidance.",
+  "status": "originated",
+  "priority_tier": "P1",
+  "priority_plan_ref": "PRI-SWARM-COLLAB-ASSIST-001",
+  "milestone_refs": ["MIL-SWARM-COLLAB-ASSIST-001"],
+  "requirement_refs": ["REQ-SWARM-TOOL-GUARD-COACH-001"],
+  "criteria_refs": ["CRIT-SWARM-TOOL-GUARD-001"],
+  "namespace_id": "zqk:kernel",
+  "schema_version": "2.0.0",
+  "created_at": "2026-09-26T20:25:00Z",
+  "created_by": "ACC-SYSTEM",
+  "updated_at": "2026-09-26T20:25:00Z",
+  "updated_by": "ACC-SYSTEM"
+};
+
+UPSERT backlog_item ID "BLI-SWM-ASSIST-TOOL-001" {
+  "title": "Implement 'I Need Assistance' Guidance Loop and MCP Tool",
+  "description": "Add zqk_request_guidance MCP tool and connect it to Observer Coach and agent_feed to provide dynamic clarification.",
+  "status": "originated",
+  "priority_tier": "P1",
+  "priority_plan_ref": "PRI-SWARM-COLLAB-ASSIST-001",
+  "milestone_refs": ["MIL-SWARM-COLLAB-ASSIST-001"],
+  "requirement_refs": ["REQ-SWARM-ASSIST-ESCAPE-HATCH-001"],
+  "criteria_refs": ["CRIT-SWARM-ASSIST-TOOL-001"],
+  "namespace_id": "zqk:kernel",
+  "schema_version": "2.0.0",
+  "created_at": "2026-09-26T20:25:00Z",
+  "created_by": "ACC-SYSTEM",
+  "updated_at": "2026-09-26T20:25:00Z",
+  "updated_by": "ACC-SYSTEM"
+};
+
+UPSERT backlog_item ID "BLI-SWM-MODEL-ROUTING-001" {
+  "title": "Shore Up Heterogeneous Model Delegation and Agent Collaboration",
+  "description": "Enable hybrid swarm orchestration routing tier_1_complex tasks to hosted Gemini subagents and routine tasks to local swarm workers with shared agent_feed channels.",
+  "status": "originated",
+  "priority_tier": "P1",
+  "priority_plan_ref": "PRI-SWARM-COLLAB-ASSIST-001",
+  "milestone_refs": ["MIL-SWARM-COLLAB-ASSIST-001"],
+  "requirement_refs": ["REQ-SWARM-HETEROGENEOUS-DELEGATION-001"],
+  "criteria_refs": ["CRIT-SWARM-MODEL-ROUTING-001"],
+  "namespace_id": "zqk:kernel",
+  "schema_version": "2.0.0",
+  "created_at": "2026-09-26T20:25:00Z",
+  "created_by": "ACC-SYSTEM",
+  "updated_at": "2026-09-26T20:25:00Z",
+  "updated_by": "ACC-SYSTEM"
+};
+
+COMMIT;

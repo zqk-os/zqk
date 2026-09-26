@@ -447,7 +447,8 @@ func buildOrchestrationExecutorArgs(taskID, promptMarkdown string, timeout time.
 // bind yields an account-login / RBAC-ready failure on DefaultSwarmWorkerAccount.
 func orchestrationExecutorChildEnv(parent []string, seatedKernelRoot, seatKey, zqkBin string) []string {
 	childEnv := withLocalLLMEnv(authcred.WithSeatAPIKeyEnv(parent, seatKey, seatedKernelRoot))
-	return withEnvValue(childEnv, zqkenv.Bin().Name(), zqkBin)
+	childEnv = withEnvValue(childEnv, zqkenv.Bin().Name(), zqkBin)
+	return withEnvValue(childEnv, zqkenv.IsParentZqk().Name(), "1")
 }
 
 func appendStringReference(raw any, value string) []any {

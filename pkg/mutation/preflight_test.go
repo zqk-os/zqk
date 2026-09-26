@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/mutation"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -235,3 +236,244 @@ func TestPreflight_SchemaCorruptionFailClosedNegative(t *testing.T) {
 	require.Equal(t, len(testCases), batchReceipt.InvalidCount)
 	require.Equal(t, 0, batchReceipt.ValidCount)
 }
+
+func TestPreflight_SystemManagedFieldsRestriction(t *testing.T) {
+	ctx := context.Background()
+	validator := mutation.NewDefaultPreflightValidator()
+
+	systemFieldsToTest := []string{
+		"created_at",
+		"created_by",
+		"updated_at",
+		"updated_by",
+		"archived_at",
+		"archived_by",
+		"version",
+		"status_history",
+		"change_log",
+	}
+
+	for _, sf := range systemFieldsToTest {
+		t.Run("rejects_"+sf, func(t *testing.T) {
+			mut := mutation.Mutation{
+				Action:     mutation.ActionCreateNode,
+				TargetKind: "backlog_item",
+				TargetID:   "BLI-SYS-001",
+				Fields: map[string]any{
+					"title": "Legitimate Title",
+					sf:      "malicious_or_manual_value",
+				},
+			}
+
+			receipt, err := validator.Validate(ctx, &mut)
+			require.NoError(t, err)
+			require.False(t, receipt.Valid, "expected rejection when %s is explicitly specified", sf)
+			require.Equal(t, "rejected_failclosed", receipt.Disposition)
+
+			found := false
+			for _, v := range receipt.Violations {
+				if v.FieldPath == "fields."+sf && v.FailingConstraint == "system_managed_field" {
+					found = true
+					break
+				}
+			}
+			require.True(t, found, "expected system_managed_field violation for %s", sf)
+		})
+	}
+
+	t.Run("allows_system_fields_with_break_glass", func(t *testing.T) {
+		bgCtx := pkgctx.WithLifecycleBreakGlass(ctx, "authorized emergency data migration")
+		mut := mutation.Mutation{
+			Action:     mutation.ActionCreateNode,
+			TargetKind: "backlog_item",
+			TargetID:   "BLI-SYS-002",
+			Fields: map[string]any{
+				"title":      "Emergency Migrated Task",
+				"created_at": "2026-01-01T00:00:00Z",
+				"created_by": "ACC-LEGACY-MIGRATOR",
+			},
+		}
+
+		receipt, err := validator.Validate(bgCtx, &mut)
+		require.NoError(t, err)
+		require.True(t, receipt.Valid, "break-glass must permit system-managed fields")
+		require.Equal(t, "accepted", receipt.Disposition)
+		require.Empty(t, receipt.Violations)
+	})
+}
+
+func TestPreflight_SpecValueRestrictedEnumValidation(t *testing.T) {
+	ctx := context.Background()
+	validator := mutation.NewDefaultPreflightValidator()
+
+	t.Run("criteria_category_validation", func(t *testing.T) {
+		// Disallowed category
+		invalidMut := mutation.Mutation{
+			Action:     mutation.ActionCreateNode,
+			TargetKind: "criteria",
+			TargetID:   "CRIT-CAT-001",
+			Fields: map[string]any{
+				"title":    "Valid Criteria Title",
+				"category": "not_a_valid_category_enum",
+			},
+		}
+		receipt, err := validator.Validate(ctx, &invalidMut)
+		require.NoError(t, err)
+		require.False(t, receipt.Valid)
+
+		found := false
+		for _, v := range receipt.Violations {
+			if v.FieldPath == "fields.category" && v.FailingConstraint == "enum_membership" {
+				found = true
+				require.Contains(t, v.Expected, "functional")
+				require.Contains(t, v.Expected, "security")
+				break
+			}
+		}
+		require.True(t, found, "must diagnose category enum violation against spec")
+
+		// Allowed category
+		validMut := mutation.Mutation{
+			Action:     mutation.ActionCreateNode,
+			TargetKind: "criteria",
+			TargetID:   "CRIT-CAT-002",
+			Fields: map[string]any{
+				"title":    "Valid Security Criteria",
+				"category": "security",
+			},
+		}
+		validReceipt, err := validator.Validate(ctx, &validMut)
+		require.NoError(t, err)
+		require.True(t, validReceipt.Valid)
+	})
+
+	t.Run("milestone_stage_type_validation", func(t *testing.T) {
+		invalidMut := mutation.Mutation{
+			Action:     mutation.ActionCreateNode,
+			TargetKind: "milestone",
+			TargetID:   "MIL-STG-001",
+			Fields: map[string]any{
+				"title":      "Valid Milestone Title",
+				"stage_type": "disallowed_type",
+			},
+		}
+		receipt, err := validator.Validate(ctx, &invalidMut)
+		require.NoError(t, err)
+		require.False(t, receipt.Valid)
+
+		found := false
+		for _, v := range receipt.Violations {
+			if v.FieldPath == "fields.stage_type" && v.FailingConstraint == "enum_membership" {
+				found = true
+				require.Contains(t, v.Expected, "tier")
+				require.Contains(t, v.Expected, "stage")
+				break
+			}
+		}
+		require.True(t, found, "must diagnose stage_type enum violation against spec")
+
+		validMut := mutation.Mutation{
+			Action:     mutation.ActionCreateNode,
+			TargetKind: "milestone",
+			TargetID:   "MIL-STG-002",
+			Fields: map[string]any{
+				"title":      "Valid Milestone Title",
+				"stage_type": "stage",
+			},
+		}
+		validReceipt, err := validator.Validate(ctx, &validMut)
+		require.NoError(t, err)
+		require.True(t, validReceipt.Valid)
+	})
+}
+
+func TestPreflight_LifecycleStateTransitionEnforcement(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("enforces_valid_transition_on_update", func(t *testing.T) {
+		// Mock status resolver returning "in_progress" for PRI-PLAN-001
+		validator := mutation.NewDefaultPreflightValidator().WithStatusResolver(func(ctx context.Context, id string) (string, bool) {
+			if id == "PRI-PLAN-001" {
+				return "in_progress", true
+			}
+			return "", false
+		})
+
+		// Transition from in_progress to active is illegal in priority_plan_lifecycle.yaml (check valve)
+		illegalMut := mutation.Mutation{
+			Action:     mutation.ActionUpdateNode,
+			TargetKind: "priority_plan",
+			TargetID:   "PRI-PLAN-001",
+			Fields: map[string]any{
+				"status": "active",
+			},
+		}
+
+		receipt, err := validator.Validate(ctx, &illegalMut)
+		require.NoError(t, err)
+		require.False(t, receipt.Valid, "illegal transition in_progress -> active must fail preflight")
+
+		found := false
+		for _, v := range receipt.Violations {
+			if v.FieldPath == "fields.status" && v.FailingConstraint == "invalid_lifecycle_transition" {
+				found = true
+				break
+			}
+		}
+		require.True(t, found, "expected invalid_lifecycle_transition violation")
+
+		// Legal transition: in_progress -> paused
+		legalMut := mutation.Mutation{
+			Action:     mutation.ActionUpdateNode,
+			TargetKind: "priority_plan",
+			TargetID:   "PRI-PLAN-001",
+			Fields: map[string]any{
+				"status": "paused",
+			},
+		}
+		legalReceipt, err := validator.Validate(ctx, &legalMut)
+		require.NoError(t, err)
+		require.True(t, legalReceipt.Valid, "legal transition in_progress -> paused must pass")
+
+		// Break-glass allows emergency transition override
+		bgCtx := pkgctx.WithLifecycleBreakGlass(ctx, "operator emergency realignment of stalled plan")
+		bgReceipt, err := validator.Validate(bgCtx, &illegalMut)
+		require.NoError(t, err)
+		require.True(t, bgReceipt.Valid, "break-glass must allow emergency transition override")
+	})
+
+	t.Run("rejects_terminal_status_on_create_without_break_glass", func(t *testing.T) {
+		validator := mutation.NewDefaultPreflightValidator()
+
+		// Creating directly into complete
+		terminalMut := mutation.Mutation{
+			Action:     mutation.ActionCreateNode,
+			TargetKind: "backlog_item",
+			TargetID:   "BLI-TERM-001",
+			Fields: map[string]any{
+				"title":  "Instant Done Item",
+				"status": "complete",
+			},
+		}
+
+		receipt, err := validator.Validate(ctx, &terminalMut)
+		require.NoError(t, err)
+		require.False(t, receipt.Valid, "cannot create object directly into terminal status")
+
+		found := false
+		for _, v := range receipt.Violations {
+			if v.FieldPath == "fields.status" && v.FailingConstraint == "invalid_lifecycle_transition" {
+				found = true
+				break
+			}
+		}
+		require.True(t, found, "expected invalid_lifecycle_transition violation on terminal create")
+
+		// With break-glass
+		bgCtx := pkgctx.WithLifecycleBreakGlass(ctx, "seeding historically completed backlog records")
+		bgReceipt, err := validator.Validate(bgCtx, &terminalMut)
+		require.NoError(t, err)
+		require.True(t, bgReceipt.Valid, "break-glass allows seeding completed objects")
+	})
+}
+
