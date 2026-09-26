@@ -8,6 +8,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"math/big"
+	"os"
 	"path/filepath"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
@@ -47,12 +48,30 @@ func (g *AuditorGate) VerifyComplete(ctx context.Context, itemID string) error {
 
 	secCtx := pkgctx.NewSystemSecurityContext()
 
+	// 1. LATCH 1 (Data Existence): If item exists in storage, verify required artifacts exist on disk.
+	if obj, readErr := g.storage.Read(ctx, secCtx, itemID); readErr == nil && obj != nil {
+		paths := extractArtifactPaths(obj[objects.FieldKeyArtifacts])
+		if len(paths) == 0 && (obj[objects.FieldKeyKind] == objects.KindBacklogItem || obj[objects.FieldKeyKind] == objects.KindAgentTask) {
+			return fmt.Errorf("latch 1 failed (data existence): missing required deliverable artifacts for %s", itemID)
+		}
+		for _, p := range paths {
+			targetPath := p
+			if !filepath.IsAbs(targetPath) && g.projectRoot != "" {
+				targetPath = filepath.Join(g.projectRoot, targetPath)
+			}
+			info, statErr := os.Stat(targetPath)
+			if statErr != nil || info.IsDir() {
+				return fmt.Errorf("latch 1 failed (data existence): artifact file does not exist or cannot be read: %s", p)
+			}
+		}
+	}
+
 	trustedPubHex, err := g.trustedPubHex(ctx, secCtx)
 	if err != nil {
 		return err
 	}
 
-	// 2. Query for QASuccess object referencing this itemID
+	// 2. LATCH 2 (AST / Invariant Clean): Query for QASuccess object referencing this itemID
 	filter := storage.ListFilter{
 		Kind: KindQASuccess,
 		Filters: map[string]any{
