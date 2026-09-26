@@ -76,8 +76,9 @@ func NewQueryCmd() *cobra.Command {
 
 			// Build graph index from kernel storage
 			idx := traversal.NewGraphIndex()
+			targetKinds := extractTargetKinds(ast)
 			if proc, procErr := cli.NewProcessor(cmd); procErr == nil && proc.Storage() != nil {
-				_ = PopulateIndexFromStorage(cmd.Context(), proc, idx)
+				_ = PopulateIndexFromStorage(cmd.Context(), proc, idx, targetKinds...)
 			}
 
 			executor := traversal.NewQueryExecutor(idx)
@@ -127,15 +128,41 @@ func NewQueryCmd() *cobra.Command {
 	return cmd
 }
 
+func extractTargetKinds(ast *traversal.QueryAST) []string {
+	if ast == nil || len(ast.Patterns) == 0 {
+		return nil
+	}
+	kindsSet := make(map[string]struct{})
+	for _, p := range ast.Patterns {
+		for _, node := range p.Nodes {
+			if node.Kind == "" {
+				return nil // Wildcard match requires scanning all kinds
+			}
+			kindsSet[node.Kind] = struct{}{}
+		}
+	}
+	var res []string
+	for k := range kindsSet {
+		res = append(res, k)
+	}
+	return res
+}
+
 // PopulateIndexFromStorage scans known object kinds and indexes nodes and relationships.
-func PopulateIndexFromStorage(ctx context.Context, proc *cli.Processor, idx *traversal.GraphIndex) error {
-	registry := objects.GetGlobalFieldRegistry()
-	_ = registry.LoadFields()
-	kinds, err := registry.GetAllKinds()
-	if err != nil || len(kinds) == 0 {
-		kinds = []string{
-			"goal", "milestone", "priority_plan", "workstream", "backlog_item",
-			"criteria", "test_case", "policy", "persona", "prompt", "audit_event",
+func PopulateIndexFromStorage(ctx context.Context, proc *cli.Processor, idx *traversal.GraphIndex, targetKinds ...string) error {
+	var kinds []string
+	if len(targetKinds) > 0 {
+		kinds = targetKinds
+	} else {
+		registry := objects.GetGlobalFieldRegistry()
+		_ = registry.LoadFields()
+		var err error
+		kinds, err = registry.GetAllKinds()
+		if err != nil || len(kinds) == 0 {
+			kinds = []string{
+				"goal", "milestone", "priority_plan", "workstream", "backlog_item",
+				"criteria", "test_case", "policy", "persona", "prompt", "audit_event",
+			}
 		}
 	}
 
