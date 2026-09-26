@@ -19,10 +19,14 @@ type ZQLExecutionReceipt struct {
 	Error          string              `json:"error,omitempty"`
 }
 
+// ExistingObjectResolver resolves existing object data from underlying storage or cache.
+type ExistingObjectResolver func(ctx context.Context, id string) (map[string]any, bool, error)
+
 // ZQLExecutor compiles and executes a parsed ZQLProgram against a TransactionEngine or store.
 type ZQLExecutor struct {
-	engine    *TransactionEngine
-	validator PreflightValidator
+	engine         *TransactionEngine
+	validator      PreflightValidator
+	objectResolver ExistingObjectResolver
 }
 
 // NewZQLExecutor creates a new ZQL executor.
@@ -30,10 +34,42 @@ func NewZQLExecutor(engine *TransactionEngine) *ZQLExecutor {
 	if engine == nil {
 		engine = NewTransactionEngine()
 	}
+	v := NewDefaultPreflightValidator()
+	v.WithStatusResolver(func(ctx context.Context, id string) (string, bool) {
+		if existing, ok := engine.Get(ctx, id); ok {
+			if s, has := existing["status"].(string); has {
+				return s, true
+			}
+		}
+		return "", false
+	})
 	return &ZQLExecutor{
 		engine:    engine,
-		validator: NewDefaultPreflightValidator(),
+		validator: v,
 	}
+}
+
+// WithObjectResolver attaches an external storage reader for preflight status and existence checks.
+func (e *ZQLExecutor) WithObjectResolver(resolver ExistingObjectResolver) *ZQLExecutor {
+	e.objectResolver = resolver
+	if defVal, ok := e.validator.(*DefaultPreflightValidator); ok {
+		defVal.WithStatusResolver(func(ctx context.Context, id string) (string, bool) {
+			if existing, ok := e.engine.Get(ctx, id); ok {
+				if s, has := existing["status"].(string); has {
+					return s, true
+				}
+			}
+			if resolver != nil {
+				if obj, ok, _ := resolver(ctx, id); ok && obj != nil {
+					if s, has := obj["status"].(string); has {
+						return s, true
+					}
+				}
+			}
+			return "", false
+		})
+	}
+	return e
 }
 
 // Execute evaluates a ZQLProgram atomically.
@@ -164,8 +200,8 @@ func (e *ZQLExecutor) Execute(ctx context.Context, program *ZQLProgram) (*ZQLExe
 		}
 	}
 
-	// Execute transaction through TransactionEngine
-	if err := e.engine.ExecuteTransaction(ctx, tx); err != nil {
+	// Execute transaction through TransactionEngine with preflight validator
+	if err := e.engine.ExecuteTransactionWithValidator(ctx, tx, e.validator); err != nil {
 		receipt.Error = err.Error()
 		receipt.Receipts = tx.Receipts()
 		receipt.Committed = false
@@ -196,23 +232,30 @@ func (e *ZQLExecutor) buildMutation(u *UpsertExpr, bindings map[string]any) (Mut
 		targetID = fmt.Sprintf("%s-%d-%s", strings.ToUpper(u.Kind[:min(len(u.Kind), 3)]), time.Now().UnixNano(), randomHex(3))
 	}
 
-	fields := make(map[string]any, len(u.Payload.Fields)+2)
+	fields := make(map[string]any, len(u.Payload.Fields))
 	for k, fExpr := range u.Payload.Fields {
+		if k == "id" || k == "kind" {
+			continue
+		}
 		val, err := e.resolveExpression(fExpr, bindings)
 		if err != nil {
 			return Mutation{}, err
 		}
 		fields[k] = val
 	}
-	fields["id"] = targetID
-	if _, ok := fields["kind"]; !ok {
-		fields["kind"] = u.Kind
-	}
 
 	action := ActionCreateNode
-	// If node exists in engine, treat as update
-	if _, exists := e.engine.Get(context.Background(), targetID); exists {
-		action = ActionUpdateNode
+	// If node exists in objectResolver or engine, treat as update
+	if e.objectResolver != nil {
+		if existing, exists, _ := e.objectResolver(context.Background(), targetID); exists && existing != nil {
+			action = ActionUpdateNode
+			e.engine.Seed(targetID, existing)
+		}
+	}
+	if action != ActionUpdateNode {
+		if _, exists := e.engine.Get(context.Background(), targetID); exists {
+			action = ActionUpdateNode
+		}
 	}
 
 	return Mutation{

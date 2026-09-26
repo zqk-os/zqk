@@ -4,7 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
+	"time"
+
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 // TxnState represents the discrete lifecycle states of an ACID transaction.
@@ -352,8 +356,27 @@ func (e *TransactionEngine) Count(ctx context.Context) int {
 	return len(e.store)
 }
 
+// Seed populates an initial node in the engine store (e.g. from an external resolver for updates).
+func (e *TransactionEngine) Seed(id string, data map[string]any) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	if e.store == nil {
+		e.store = make(map[string]map[string]any)
+	}
+	clone := make(map[string]any, len(data))
+	for k, v := range data {
+		clone[k] = v
+	}
+	e.store[id] = clone
+}
+
 // ExecuteTransaction executes a transaction against the engine with full ACID and isolation guarantees.
 func (e *TransactionEngine) ExecuteTransaction(ctx context.Context, tx *Transaction) error {
+	return e.ExecuteTransactionWithValidator(ctx, tx, nil)
+}
+
+// ExecuteTransactionWithValidator executes a transaction using an optional preflight validator.
+func (e *TransactionEngine) ExecuteTransactionWithValidator(ctx context.Context, tx *Transaction, validator PreflightValidator) error {
 	if tx.State() == StateInitial {
 		if err := tx.Begin(); err != nil {
 			return err
@@ -365,6 +388,19 @@ func (e *TransactionEngine) ExecuteTransaction(ctx context.Context, tx *Transact
 		if err := tx.PreCheck(ctx, func(ctx context.Context, idx int, mut *Mutation) error {
 			if mut.TargetKind == "" {
 				return errors.New("target_kind cannot be empty")
+			}
+			if validator != nil {
+				receipt, valErr := validator.Validate(ctx, mut)
+				if valErr != nil {
+					return valErr
+				}
+				if !receipt.Valid {
+					var msgs []string
+					for _, v := range receipt.Violations {
+						msgs = append(msgs, fmt.Sprintf("%s (%s: %s)", v.FieldPath, v.FailingConstraint, v.Actual))
+					}
+					return fmt.Errorf("%w: %s", ErrValidationFailed, strings.Join(msgs, "; "))
+				}
 			}
 			return nil
 		}); err != nil {
@@ -383,6 +419,9 @@ func (e *TransactionEngine) ExecuteTransaction(ctx context.Context, tx *Transact
 			return nil, errors.New("target_id is required for execution")
 		}
 
+		nowStr := time.Now().UTC().Format(time.RFC3339)
+		actor := pkgctx.ActorIDForAttribution("")
+
 		switch mut.Action {
 		case ActionCreateNode:
 			if fail, ok := mut.Fields["fail_trigger"].(bool); ok && fail {
@@ -397,6 +436,18 @@ func (e *TransactionEngine) ExecuteTransaction(ctx context.Context, tx *Transact
 			}
 			nodeData["id"] = id
 			nodeData["kind"] = mut.TargetKind
+			if nodeData["created_at"] == nil {
+				nodeData["created_at"] = nowStr
+			}
+			if nodeData["created_by"] == nil {
+				nodeData["created_by"] = actor
+			}
+			if nodeData["updated_at"] == nil {
+				nodeData["updated_at"] = nowStr
+			}
+			if nodeData["updated_by"] == nil {
+				nodeData["updated_by"] = actor
+			}
 			e.store[id] = nodeData
 
 			undo := func(ctx context.Context) error {
@@ -417,6 +468,12 @@ func (e *TransactionEngine) ExecuteTransaction(ctx context.Context, tx *Transact
 			}
 			for k, v := range mut.Fields {
 				prevData[k] = v
+			}
+			if !pkgctx.IsLifecycleBreakGlass(ctx) || prevData["updated_at"] == nil {
+				prevData["updated_at"] = nowStr
+			}
+			if !pkgctx.IsLifecycleBreakGlass(ctx) || prevData["updated_by"] == nil {
+				prevData["updated_by"] = actor
 			}
 			e.store[id] = prevData
 
