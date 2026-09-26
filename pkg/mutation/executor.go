@@ -186,17 +186,27 @@ func (e *ZQLExecutor) buildMutation(u *UpsertExpr, bindings map[string]any) (Mut
 			return Mutation{}, err
 		}
 		targetID = fmt.Sprintf("%v", idVal)
+	} else if idExpr, ok := u.Payload.Fields["id"]; ok {
+		idVal, err := e.resolveExpression(idExpr, bindings)
+		if err != nil {
+			return Mutation{}, err
+		}
+		targetID = fmt.Sprintf("%v", idVal)
 	} else {
 		targetID = fmt.Sprintf("%s-%d-%s", strings.ToUpper(u.Kind[:min(len(u.Kind), 3)]), time.Now().UnixNano(), randomHex(3))
 	}
 
-	fields := make(map[string]any, len(u.Payload.Fields))
+	fields := make(map[string]any, len(u.Payload.Fields)+2)
 	for k, fExpr := range u.Payload.Fields {
 		val, err := e.resolveExpression(fExpr, bindings)
 		if err != nil {
 			return Mutation{}, err
 		}
 		fields[k] = val
+	}
+	fields["id"] = targetID
+	if _, ok := fields["kind"]; !ok {
+		fields["kind"] = u.Kind
 	}
 
 	action := ActionCreateNode
@@ -268,14 +278,35 @@ func (e *ZQLExecutor) resolveExpression(expr ZQLExpression, bindings map[string]
 		return res, nil
 
 	case UpsertExpr:
+		targetID := ""
+		if x.ID != nil {
+			idVal, err := e.resolveExpression(x.ID, bindings)
+			if err != nil {
+				return nil, err
+			}
+			targetID = fmt.Sprintf("%v", idVal)
+		} else if idExpr, ok := x.Payload.Fields["id"]; ok {
+			idVal, err := e.resolveExpression(idExpr, bindings)
+			if err != nil {
+				return nil, err
+			}
+			targetID = fmt.Sprintf("%v", idVal)
+		}
+
 		// Build payload object map
-		res := make(map[string]any, len(x.Payload.Fields))
+		res := make(map[string]any, len(x.Payload.Fields)+2)
 		for k, fExpr := range x.Payload.Fields {
 			val, err := e.resolveExpression(fExpr, bindings)
 			if err != nil {
 				return nil, err
 			}
 			res[k] = val
+		}
+		if targetID != "" {
+			res["id"] = targetID
+		}
+		if _, ok := res["kind"]; !ok {
+			res["kind"] = x.Kind
 		}
 		return res, nil
 	}

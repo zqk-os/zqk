@@ -139,21 +139,32 @@ func persistCommittedMutations(ctx context.Context, proc *cli.Processor, engine 
 				kind = k
 			}
 		}
+		if kind != "" {
+			data[objects.FieldKeyKind] = kind
+		}
+		if r.TargetID != "" {
+			data[objects.FieldKeyID] = r.TargetID
+		}
 
 		switch r.Action {
 		case mutation.ActionCreateNode, mutation.ActionUpdateNode:
 			existing, readErr := proc.Storage().Read(ctx, secCtx, r.TargetID)
 			if readErr == nil && existing != nil {
-				for k, v := range data {
-					existing[k] = v
+				// Preserve existing system metadata fields if not explicitly specified
+				for _, sysKey := range []string{"created_at", "created_by", "namespace_id", "schema_version", "version_context"} {
+					if v, ok := existing[sysKey]; ok {
+						if _, has := data[sysKey]; !has {
+							data[sysKey] = v
+						}
+					}
 				}
-				if err := proc.Storage().Update(ctx, secCtx, r.TargetID, existing); err != nil {
+				if err := proc.Storage().Update(ctx, secCtx, r.TargetID, data); err != nil {
 					return fmt.Errorf("failed to update node %s: %w", r.TargetID, err)
 				}
 			} else {
 				if err := proc.Storage().Create(ctx, secCtx, data); err != nil {
 					if updateErr := proc.Storage().Update(ctx, secCtx, r.TargetID, data); updateErr != nil {
-						return fmt.Errorf("failed to persist node %s: %w", r.TargetID, updateErr)
+						return fmt.Errorf("failed to persist node %s: %w (create error: %v)", r.TargetID, updateErr, err)
 					}
 				}
 			}

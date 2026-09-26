@@ -13,6 +13,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/supervision"
 )
 
 // Every cognition entry (CLI prepare-context, seat-worker AgentX) must call
@@ -68,6 +69,7 @@ type PreparedContextInput struct {
 	Depth       int
 	IncludeTDD  bool
 	WorkClass   agentprompt.WorkClass
+	Supervision *supervision.SupervisionEnvelope
 }
 
 // PreparedContext is the kernel bundle + prompt that must exist before AgentX runs.
@@ -220,6 +222,9 @@ func AssemblePreparedContext(
 	})
 	if err != nil {
 		return PreparedContext{}, errfmt.Newf("build prompt").Wrap(err)
+	}
+	if in.Supervision != nil {
+		prompt = supervision.FormatContrastiveRetryPrompt(prompt, *in.Supervision)
 	}
 	out.Prompt = prompt
 	out.Persona = persona

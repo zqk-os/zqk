@@ -374,3 +374,67 @@ func TestRecoverFiltersAreStorageListFilters(t *testing.T) {
 	t.Parallel()
 	var _ []storage.ListFilter = recoverAgentTaskListFilters("PRI-X")
 }
+
+func TestOrchestrationTask_IdempotentDeduplication(t *testing.T) {
+	t.Parallel()
+
+	itemID := "BLI-100"
+	planID := "PRI-TEST-001"
+	title := "Implement Agnostic Supervision"
+
+	// 1. In-flight task is reused (no duplicate minting)
+	tasks := []map[string]any{
+		{
+			objects.FieldKeyID:             "ATK-LIVE-1",
+			objects.FieldKeyTitle:          title,
+			objects.FieldKeyStatus:         objects.ObjectStatusInProgress,
+			objects.FieldKeyPriorityPlanRef: planID,
+			objects.FieldKeyBacklogItemRef: itemID,
+			objects.FieldKeyUpdatedAt:      "2026-09-26T12:00:00Z",
+		},
+	}
+	id, status, disp := pickExistingOrchestrationTask(tasks, title, planID, itemID)
+	if disp != orchDispositionReuse || id != "ATK-LIVE-1" || status != objects.ObjectStatusInProgress {
+		t.Fatalf("expected reuse of in-flight task ATK-LIVE-1, got id=%s, status=%s, disp=%d", id, status, disp)
+	}
+
+	// 2. Completed task is skipped (prevents rerun/remint)
+	doneTasks := []map[string]any{
+		{
+			objects.FieldKeyID:             "ATK-DONE-1",
+			objects.FieldKeyTitle:          title,
+			objects.FieldKeyStatus:         objects.ObjectStatusComplete,
+			objects.FieldKeyPriorityPlanRef: planID,
+			objects.FieldKeyBacklogItemRef: itemID,
+			objects.FieldKeyUpdatedAt:      "2026-09-26T12:00:00Z",
+		},
+	}
+	id, status, disp = pickExistingOrchestrationTask(doneTasks, title, planID, itemID)
+	if disp != orchDispositionSkipDone || id != "ATK-DONE-1" {
+		t.Fatalf("expected skip of completed task ATK-DONE-1, got id=%s, status=%s, disp=%d", id, status, disp)
+	}
+}
+
+func TestOrchestrationExecutor_ParentZqkEnvShielding(t *testing.T) {
+	parent := []string{"PATH=/usr/bin"}
+	env := orchestrationExecutorChildEnv(parent, "/tmp/kernel", "test-key", "/opt/zqk/bin/zqk")
+
+	foundParentZqk := false
+	foundBin := false
+	for _, kv := range env {
+		if kv == zqkenv.IsParentZqk().Name()+"=1" {
+			foundParentZqk = true
+		}
+		if kv == zqkenv.Bin().Name()+"=/opt/zqk/bin/zqk" {
+			foundBin = true
+		}
+	}
+
+	if !foundParentZqk {
+		t.Fatalf("expected %s=1 to be injected into child execution env to shield from idle watchdog", zqkenv.IsParentZqk().Name())
+	}
+	if !foundBin {
+		t.Fatalf("expected %s to be injected into child execution env", zqkenv.Bin().Name())
+	}
+}
+
