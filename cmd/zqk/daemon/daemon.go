@@ -14,6 +14,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/daemon/overseer"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // NewDaemonCmd creates the root daemon command for process group supervision.
@@ -145,9 +146,9 @@ func newStartCmd() *cobra.Command {
 			return errfmt.Errorf("%s", resp.Error)
 		}
 		return cli.FormatOutput(cmd, map[string]any{
-			"status":  "success",
-			"daemon":  name,
-			"daemons": resp.Daemons,
+			objects.FieldKeyStatus: objects.ObjectStatusSuccess,
+			"daemon":               name,
+			"daemons":              resp.Daemons,
 		})
 	}
 	return cmd
@@ -190,9 +191,9 @@ func newStopCmd() *cobra.Command {
 			return errfmt.Errorf("%s", resp.Error)
 		}
 		return cli.FormatOutput(cmd, map[string]any{
-			"status":  "success",
-			"daemon":  name,
-			"daemons": resp.Daemons,
+			objects.FieldKeyStatus: objects.ObjectStatusSuccess,
+			"daemon":               name,
+			"daemons":              resp.Daemons,
 		})
 	}
 	return cmd
@@ -224,9 +225,9 @@ func newRestartCmd() *cobra.Command {
 			return errfmt.Errorf("%s", resp.Error)
 		}
 		return cli.FormatOutput(cmd, map[string]any{
-			"status":  "success",
-			"daemon":  name,
-			"daemons": resp.Daemons,
+			objects.FieldKeyStatus: objects.ObjectStatusSuccess,
+			"daemon":               name,
+			"daemons":              resp.Daemons,
 		})
 	}
 	return cmd
@@ -251,9 +252,9 @@ func newEnableCmd() *cobra.Command {
 				return errfmt.Errorf("%s", resp.Error)
 			}
 			return cli.FormatOutput(cmd, map[string]any{
-				"status":  "success",
-				"daemon":  name,
-				"desired": "enabled",
+				objects.FieldKeyStatus: objects.ObjectStatusSuccess,
+				"daemon":               name,
+				"desired":              "enabled",
 			})
 		}
 
@@ -292,9 +293,9 @@ func newDisableCmd() *cobra.Command {
 				return errfmt.Errorf("%s", resp.Error)
 			}
 			return cli.FormatOutput(cmd, map[string]any{
-				"status":  "success",
-				"daemon":  name,
-				"desired": "disabled",
+				objects.FieldKeyStatus: objects.ObjectStatusSuccess,
+				"daemon":               name,
+				"desired":              "disabled",
 			})
 		}
 
@@ -364,10 +365,10 @@ func newAddCmd() *cobra.Command {
 				return err
 			}
 			return cli.FormatOutput(cmd, map[string]any{
-				"daemon":  name,
-				"status":  "added",
-				"desired": string(desiredState),
-				"note":    "Overseer is not running; daemon configuration saved to registry.",
+				"daemon":               name,
+				objects.FieldKeyStatus: objects.ObjectStatusAdded,
+				"desired":              string(desiredState),
+				"note":                 "Overseer is not running; daemon configuration saved to registry.",
 			})
 		}
 
@@ -385,9 +386,9 @@ func newAddCmd() *cobra.Command {
 			return errfmt.Errorf("%s", resp.Error)
 		}
 		return cli.FormatOutput(cmd, map[string]any{
-			"status":  "success",
-			"daemon":  name,
-			"daemons": resp.Daemons,
+			objects.FieldKeyStatus: objects.ObjectStatusSuccess,
+			"daemon":               name,
+			"daemons":              resp.Daemons,
 		})
 	}
 	return cmd
@@ -411,8 +412,8 @@ func newRemoveCmd() *cobra.Command {
 				return err
 			}
 			return cli.FormatOutput(cmd, map[string]any{
-				"daemon": name,
-				"status": "removed",
+				"daemon":               name,
+				objects.FieldKeyStatus: objects.ObjectStatusRemoved,
 			})
 		}
 
@@ -430,8 +431,8 @@ func newRemoveCmd() *cobra.Command {
 			return errfmt.Errorf("%s", resp.Error)
 		}
 		return cli.FormatOutput(cmd, map[string]any{
-			"status": "success",
-			"daemon": name,
+			objects.FieldKeyStatus: objects.ObjectStatusSuccess,
+			"daemon":               name,
 		})
 	}
 	return cmd
@@ -513,7 +514,7 @@ func newServiceInstallCmd() *cobra.Command {
 			return err
 		}
 		return cli.FormatOutput(cmd, map[string]any{
-			"status":               "installed",
+			objects.FieldKeyStatus: objects.ObjectStatusInstalled,
 			"label":                st.Label,
 			"plist_path":           st.PlistPath,
 			"cleaned_legacy_units": st.CleanedUnits,
@@ -532,8 +533,8 @@ func newServiceUninstallCmd() *cobra.Command {
 			return err
 		}
 		return cli.FormatOutput(cmd, map[string]any{
-			"status": "uninstalled",
-			"label":  overseer.OverseerLaunchAgentLabel,
+			objects.FieldKeyStatus: objects.ObjectStatusUninstalled,
+			"label":                overseer.OverseerLaunchAgentLabel,
 		})
 	}
 	return cmd
@@ -566,7 +567,7 @@ func newServiceCleanupLegacyCmd() *cobra.Command {
 			return err
 		}
 		return cli.FormatOutput(cmd, map[string]any{
-			"status":               "cleaned",
+			objects.FieldKeyStatus: objects.ObjectStatusCleaned,
 			"cleaned_legacy_units": cleaned,
 			"count":                len(cleaned),
 		})
