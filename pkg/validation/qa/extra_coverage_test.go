@@ -3,6 +3,7 @@ package qa
 import (
 	"context"
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -792,4 +793,104 @@ func TestIsAuditTriggeringEvent_Cases(t *testing.T) {
 		t.Error("expected true for in_progress status")
 	}
 }
+
+func TestAuditorGate_ThreeLatchCountdown(t *testing.T) {
+	ctx := context.Background()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	tmpDir := t.TempDir()
+
+	signer, err := NewAuditorSigner("")
+	if err != nil {
+		t.Fatalf("signer creation failed: %v", err)
+	}
+
+	t.Run("latch 1 fails when backlog_item has zero artifacts", func(t *testing.T) {
+		store := newMockQASuccessStore()
+		store.objs[AuditorKeyID] = map[string]any{
+			objects.FieldKeyID:          AuditorKeyID,
+			objects.FieldKeyDescription: signer.PublicKey(),
+		}
+		bliID := "BLI-LATCH-EMPTY"
+		store.objs[bliID] = map[string]any{
+			objects.FieldKeyID:        bliID,
+			objects.FieldKeyKind:      objects.KindBacklogItem,
+			objects.FieldKeyArtifacts: []any{},
+		}
+		gate := NewAuditorGate(store)
+		err := gate.VerifyComplete(ctx, bliID)
+		if err == nil || !strings.Contains(err.Error(), "latch 1 failed") {
+			t.Fatalf("expected latch 1 failure for empty artifacts, got: %v", err)
+		}
+	})
+
+	t.Run("latch 1 fails when artifact file does not exist on disk", func(t *testing.T) {
+		store := newMockQASuccessStore()
+		store.objs[AuditorKeyID] = map[string]any{
+			objects.FieldKeyID:          AuditorKeyID,
+			objects.FieldKeyDescription: signer.PublicKey(),
+		}
+		bliID := "BLI-LATCH-NONEXISTENT"
+		store.objs[bliID] = map[string]any{
+			objects.FieldKeyID:        bliID,
+			objects.FieldKeyKind:      objects.KindBacklogItem,
+			objects.FieldKeyArtifacts: []any{filepath.Join(tmpDir, "missing.go")},
+		}
+		gate := NewAuditorGate(store)
+		err := gate.VerifyComplete(ctx, bliID)
+		if err == nil || !strings.Contains(err.Error(), "latch 1 failed") {
+			t.Fatalf("expected latch 1 failure for non-existent file, got: %v", err)
+		}
+	})
+
+	t.Run("latch 2 fails when QASuccess object is missing", func(t *testing.T) {
+		store := newMockQASuccessStore()
+		store.objs[AuditorKeyID] = map[string]any{
+			objects.FieldKeyID:          AuditorKeyID,
+			objects.FieldKeyDescription: signer.PublicKey(),
+		}
+		cleanFile := filepath.Join(tmpDir, "clean.go")
+		_ = os.WriteFile(cleanFile, []byte("package clean\n"), 0644)
+		bliID := "BLI-LATCH-NO-QAS"
+		store.objs[bliID] = map[string]any{
+			objects.FieldKeyID:        bliID,
+			objects.FieldKeyKind:      objects.KindBacklogItem,
+			objects.FieldKeyArtifacts: []any{cleanFile},
+		}
+		gate := NewAuditorGate(store)
+		err := gate.VerifyComplete(ctx, bliID)
+		if err == nil {
+			t.Fatal("expected error when QASuccess is missing")
+		}
+	})
+
+	t.Run("all 3 latches pass when artifacts exist, QASuccess verified, and signature valid", func(t *testing.T) {
+		store := newMockQASuccessStore()
+		store.objs[AuditorKeyID] = map[string]any{
+			objects.FieldKeyID:          AuditorKeyID,
+			objects.FieldKeyDescription: signer.PublicKey(),
+		}
+		cleanFile := filepath.Join(tmpDir, "valid_clean.go")
+		_ = os.WriteFile(cleanFile, []byte("package valid\n"), 0644)
+		bliID := "BLI-LATCH-ALL-PASS"
+		store.objs[bliID] = map[string]any{
+			objects.FieldKeyID:        bliID,
+			objects.FieldKeyKind:      objects.KindBacklogItem,
+			objects.FieldKeyArtifacts: []any{cleanFile},
+		}
+
+		status := objects.ObjectStatusSuccess
+		data := []byte(bliID + status)
+		sig, _ := signer.Sign(data)
+		qaObj, _ := buildQASuccessObject(bliID, sig, signer.PublicKey())
+		qaObj[objects.FieldKeyStatus] = status
+		_ = store.Create(ctx, secCtx, qaObj)
+
+		gate := NewAuditorGate(store)
+		err := gate.VerifyComplete(ctx, bliID)
+		if err != nil {
+			t.Fatalf("expected VerifyComplete to pass all 3 latches, got: %v", err)
+		}
+	})
+}
+
 
