@@ -1,0 +1,38 @@
+$schema: schemas/command_spec.schema.json
+name: mutate
+short: Execute declarative ZQL mutations and transactions
+description: |
+  Execute declarative ACID mutations across the knowledge kernel using the ZQL
+  mutation engine with Kahn topological variable resolution, in-memory preflight
+  validation, and atomic transaction rollback.
+aliases:
+  - zql
+args:
+  type: maximum
+  max: 1
+flags:
+  - name: file
+    shorthand: "f"
+    type: string
+    default: ""
+    description: Path to file containing ZQL mutation script
+  - name: dry-run
+    type: bool
+    default: false
+    description: Validate preflight schemas and topological order without persisting
+  - name: format
+    type: string
+    default: "table"
+    description: Output format (table, json)
+help:
+  examples:
+    - comment: "Create plan and backlog item atomically"
+      command: "%s mutate \"BEGIN; LET $p = UPSERT priority_plan { title: 'New Plan', priority_tier: 'P1', status: 'in_progress' }; UPSERT backlog_item { title: 'First Task', priority_plan_ref: $p.id, priority_tier: 'P1', status: 'planned' }; COMMIT;\""
+    - comment: "Validate mutations with dry-run preflight"
+      command: "%s mutate -f script.zql --dry-run"
+    - comment: "Output diagnostic receipt as JSON"
+      command: "%s mutate -f script.zql --format json"
+common_flags: false
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false

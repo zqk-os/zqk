@@ -7,6 +7,9 @@ hygiene:
   check_perms: true
   check_dups: false
   check_cli_names: true
+  check_subprocess_hygiene: true
+  check_command_specs: true
+  check_cli_builders: true
   forbidden_path_literals:
     - ".zqk"
     - ".zqk/"

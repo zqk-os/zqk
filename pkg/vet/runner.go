@@ -16,8 +16,9 @@ type RunOptions struct {
 
 // Runner coordinates execution of verification checks.
 type Runner struct {
-	Root   string
-	Config *GatesConfig
+	Root        string
+	Config      *GatesConfig
+	RootCommand any // optional *cobra.Command to enable full command-spec parity analysis
 }
 
 // NewRunner creates a new Runner for the given repo root and config.
@@ -117,6 +118,22 @@ func (r *Runner) runHygiene(files []string) ([]Finding, error) {
 			return nil, err
 		}
 		findings = append(findings, subprocFindings...)
+	}
+
+	if r.Config.Hygiene.CheckCommandSpecs {
+		specFindings, err := CheckCommandSpecs(r.Root, r.Config, r.RootCommand)
+		if err != nil {
+			return nil, err
+		}
+		findings = append(findings, specFindings...)
+	}
+
+	if r.Config.Hygiene.CheckCLIBuilders {
+		builderFindings, err := CheckCLIBuilders(r.Root, r.Config, r.RootCommand)
+		if err != nil {
+			return nil, err
+		}
+		findings = append(findings, builderFindings...)
 	}
 
 	return findings, nil

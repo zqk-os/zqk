@@ -10,6 +10,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/swarm/pack"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -17,11 +19,7 @@ import (
 
 // NewPackCmd creates the top-level 'zqk pack' command.
 func NewPackCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "pack",
-		Short: "Holonic swarm package management (scaffold, seal, validate)",
-		Long:  "Initialize, cryptographically seal, and validate portable holonic swarm packages.",
-	}
+	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewPackCommandBuilder(), &cobra.Command{})
 
 	cmd.AddCommand(newInitCmd())
 	cmd.AddCommand(newSealCmd())
