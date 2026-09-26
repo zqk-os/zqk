@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"github.com/zqk-os/zqk/cmd/zqk/query"
+	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -22,6 +23,7 @@ func TestQueryCmd_Help(t *testing.T) {
 
 func TestQueryCmd_ExecuteFile(t *testing.T) {
 	tmpDir := t.TempDir()
+	t.Cleanup(func() { _ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(tmpDir, nil)) })
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 	queryFile := filepath.Join(tmpDir, "test.zparql")
 	err := fileutil.WriteFile(queryFile, []byte("MATCH (b:backlog_item) RETURN b.id;"), 0644)
@@ -38,6 +40,7 @@ func TestQueryCmd_ExecuteFile(t *testing.T) {
 
 func TestQueryCmd_ExecuteDirectString(t *testing.T) {
 	tmpDir := t.TempDir()
+	t.Cleanup(func() { _ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(tmpDir, nil)) })
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 
 	cmd := query.NewQueryCmd()
@@ -51,6 +54,7 @@ func TestQueryCmd_ExecuteDirectString(t *testing.T) {
 
 func TestQueryCmd_ExecuteWildcard(t *testing.T) {
 	tmpDir := t.TempDir()
+	t.Cleanup(func() { _ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(tmpDir, nil)) })
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 
 	cmd := query.NewQueryCmd()

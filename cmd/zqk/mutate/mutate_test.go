@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"github.com/zqk-os/zqk/cmd/zqk/mutate"
+	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -22,6 +23,7 @@ func TestMutateCmd_Help(t *testing.T) {
 
 func TestMutateCmd_DryRunFile(t *testing.T) {
 	tmpDir := t.TempDir()
+	t.Cleanup(func() { _ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(tmpDir, nil)) })
 	scriptFile := filepath.Join(tmpDir, "test.zql")
 	script := `
 		BEGIN;
@@ -43,4 +45,19 @@ func TestMutateCmd_DryRunFile(t *testing.T) {
 	require.NoError(t, err)
 	require.Contains(t, buf.String(), `"transaction_id"`)
 	require.Contains(t, buf.String(), `"dry_run"`)
+}
+
+func TestMutateCmd_DirectString(t *testing.T) {
+	tmpDir := t.TempDir()
+	t.Cleanup(func() { _ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(tmpDir, nil)) })
+	t.Setenv("ZQK_TEST_ROOT", tmpDir)
+
+	cmd := mutate.NewMutateCmd()
+	var buf bytes.Buffer
+	cmd.SetOut(&buf)
+	cmd.SetArgs([]string{"BEGIN; LET $p = UPSERT priority_plan { title: 'Direct Plan', priority_tier: 'P1', status: 'in_progress' }; COMMIT;", "--dry-run", "--format", "table"})
+	err := cmd.Execute()
+	require.NoError(t, err)
+	require.Contains(t, buf.String(), "Transaction")
+	require.Contains(t, buf.String(), "DRY-RUN VALIDATED")
 }
