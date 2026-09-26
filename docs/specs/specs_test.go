@@ -135,3 +135,30 @@ func TestZQLTransactionExecutionSpec(t *testing.T) {
 	require.Contains(t, content, "Zero Dirty-Read Invariant")
 }
 
+func TestZQLPreflightValidationSpec(t *testing.T) {
+	specsDir := findSpecsDir()
+	specPath := filepath.Join(specsDir, "SPEC-ZQL-PREFLIGHT-VALIDATION.md")
+	data, err := os.ReadFile(specPath)
+	require.NoError(t, err, "ZQL preflight validation specification file must exist: %s", specPath)
+	content := string(data)
+	require.NotEmpty(t, content, "ZQL preflight validation specification content must not be empty")
+
+	// Semantic Validator Contract (CRIT-ZQL-INMEMORY-VALIDATION-CONTRACT)
+	require.Contains(t, content, "PreflightValidator")
+	require.Contains(t, content, "Zero Disk I/O Invariant")
+	require.Contains(t, content, "CRIT-ZQL-INMEMORY-VALIDATION-CONTRACT")
+
+	// Diagnostic Receipt Protocol (CRIT-ZQL-PREFLIGHT-DIAGNOSTIC-RECEIPT)
+	require.Contains(t, content, "Preflight Diagnostic Receipt")
+	require.Contains(t, content, "SchemaViolation")
+	require.Contains(t, content, "field_path")
+	require.Contains(t, content, "failing_constraint")
+	require.Contains(t, content, "remediation")
+
+	// Fail-closed negative invariant (CRIT-ZQL-SCHEMA-CORRUPTION-FAILCLOSED-NEGATIVE)
+	require.Contains(t, content, "rejected_failclosed")
+	require.Contains(t, content, "CRIT-ZQL-SCHEMA-CORRUPTION-FAILCLOSED-NEGATIVE")
+	require.Contains(t, content, "Fail-Closed Boundary")
+}
+
+
