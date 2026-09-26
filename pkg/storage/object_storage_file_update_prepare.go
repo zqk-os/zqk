@@ -163,7 +163,11 @@ func (f *FileObjectStorage) prepareFileObjectUpdate(ctx context.Context, secCtx 
 				case "criteria":
 					updates[objects.FieldKeyStatus] = "awaiting_verification"
 				case "convergence_session":
-					updates[objects.FieldKeyStatus] = "c1_scope"
+					if cur := objects.GetString(existing, objects.FieldKeyStatus); cur != "" {
+						updates[objects.FieldKeyStatus] = cur
+					} else {
+						updates[objects.FieldKeyStatus] = objects.ObjectStatusDraft
+					}
 				case "test_case":
 					// test_case has no verification-hold status (pending_verification is agent_task).
 					// Refuse the terminal hop by keeping the current legal status.
