@@ -159,10 +159,18 @@ func persistCommittedMutations(ctx context.Context, proc *cli.Processor, engine 
 		}
 
 		switch r.Action {
-		case mutation.ActionCreateNode:
-			_ = proc.Storage().Create(ctx, secCtx, data)
-		case mutation.ActionUpdateNode:
-			_ = proc.Storage().Update(ctx, secCtx, r.TargetID, data)
+		case mutation.ActionCreateNode, mutation.ActionUpdateNode:
+			existing, readErr := proc.Storage().Read(ctx, secCtx, r.TargetID)
+			if readErr == nil && existing != nil {
+				for k, v := range data {
+					existing[k] = v
+				}
+				_ = proc.Storage().Update(ctx, secCtx, r.TargetID, existing)
+			} else {
+				if err := proc.Storage().Create(ctx, secCtx, data); err != nil {
+					_ = proc.Storage().Update(ctx, secCtx, r.TargetID, data)
+				}
+			}
 		case mutation.ActionRemoveEdge:
 			_ = proc.Storage().Delete(ctx, secCtx, r.TargetID, false)
 		}

@@ -1,0 +1,50 @@
+BEGIN TRANSACTION;
+
+UPSERT technical_debt ID "TDE-F-TREE-POLICE-LINT-GAP-001" {
+  "title": "Pre-commit lint target omitted tree_police verification suite",
+  "description": "The Makefile lint target only invoked zqk-vet --suite hygiene, allowing unapproved migration and setup scripts placed directly in scripts/ to evade pre-commit gates despite violating config/gates.yaml.",
+  "debt_type": "tooling",
+  "impact_assessment": "medium",
+  "priority": "medium",
+  "target_resolution_date": "2026-11-15",
+  "tags": ["cef", "l-supply-release", "moderate", "finding:F-TREE-POLICE-LINT-GAP-001"],
+  "namespace_id": "zqk:kernel",
+  "schema_version": "2.0.0",
+  "status": "resolved",
+  "resolution_notes": "Relocated 14 unapproved scripts from scripts/ into scripts/open-core/setup_scripts/ and enforced tree_police suite gating (PR #225).",
+  "completed_at": "2026-09-25T13:00:00Z"
+};
+
+UPSERT technical_debt ID "TDE-F-LIFECYCLE-QA-COMPLETION-MAP-001" {
+  "title": "Lifecycle specification for qa_success omitted status default completion mapping",
+  "description": "The qa_success_lifecycle.yaml spec omitted the percent_complete.default_by_status map, preventing the CLI promotion state machine from recognizing forward progress from conceptual to originated.",
+  "debt_type": "infrastructure",
+  "impact_assessment": "medium",
+  "priority": "medium",
+  "target_resolution_date": "2026-11-15",
+  "tags": ["cef", "l-reliability", "moderate", "finding:F-LIFECYCLE-QA-COMPLETION-MAP-001"],
+  "namespace_id": "zqk:kernel",
+  "schema_version": "2.0.0",
+  "status": "resolved",
+  "resolution_notes": "Added explicit default_by_status mapping for conceptual, originated, success, failure, archived to qa_success_lifecycle.yaml (PR #225).",
+  "completed_at": "2026-09-25T13:00:00Z",
+  "file_path": ".zqk/specs/lifecycles/qa/qa_success_lifecycle.yaml"
+};
+
+UPSERT technical_debt ID "TDE-F-SECURITY-AUDITOR-KEY-FALLBACK-001" {
+  "title": "AuditorGate falls back to unencrypted disk keystore when CAS entry is absent",
+  "description": "In AuditorGate.trustedPubHex, when the key object KEY-AUDITOR-001 is missing from CAS, the system falls back to loading .zqk/keystore/auditor.priv from the local disk filesystem without hardware security module or keychain binding.",
+  "debt_type": "security",
+  "impact_assessment": "low",
+  "priority": "low",
+  "target_resolution_date": "2026-12-01",
+  "tags": ["cef", "l-security", "low", "finding:F-SECURITY-AUDITOR-KEY-FALLBACK-001"],
+  "namespace_id": "zqk:kernel",
+  "schema_version": "2.0.0",
+  "status": "resolved",
+  "resolution_notes": "Added strict keystore fallback policy to AuditorGate preventing unencrypted disk private key fallback when KEY-AUDITOR-001 is missing from CAS (commit b2e89d5f).",
+  "completed_at": "2026-09-25T22:14:43Z",
+  "file_path": "pkg/validation/qa/gate.go"
+};
+
+COMMIT;
