@@ -23,6 +23,20 @@ func (m *mockShockwaveGateStore) Read(ctx context.Context, secCtx *pkgctx.Securi
 	return nil, errfmt.Errorf("not found: %s", id)
 }
 
+const (
+	testUpstreamID        = "BLI-SPECIALIST-EVAL-001"
+	testUpstreamTitle     = "Evaluate Security Findings"
+	testDownstreamID      = "BLI-ADVERSARIAL-CRITIQUE-001"
+	testDownstreamTitle   = "Adversarial Critique of Security Findings"
+	testIndependentID     = "BLI-INDEPENDENT-TASK-001"
+	testIndependentTitle  = "Independent Scaffolding Task"
+	testArtifactPath      = ".zqk/runs/code-eval/findings/findings_SEC.jsonl"
+	testErrStage1Withheld = "downstream critique task must be withheld while upstream is in_progress"
+	testErrStage1Indep    = "independent task must not be blocked"
+	testErrStage2NoArt    = "downstream critique task must be withheld if upstream complete without artifacts"
+	testErrStage3Pass     = "downstream critique task must be unblocked once shockwave delivers verified upstream artifacts"
+)
+
 // Satisfies CRIT-QA-SHOCKWAVE-EVENT-DISPATCH:
 // Swarm orchestrator must withhold downstream dependent task dispatch until a shockwave event
 // delivers verified upstream artifacts, preventing blind critiques of unproduced findings.
@@ -35,49 +49,49 @@ func TestOrchestrate_ShockwaveDependencyGate(t *testing.T) {
 	}
 
 	// 1. Upstream Specialist Finding Task (in_progress, no artifacts yet)
-	upstreamID := "BLI-SPECIALIST-EVAL-001"
-	store.objs[upstreamID] = map[string]any{
-		objects.FieldKeyID:        upstreamID,
+	store.objs[testUpstreamID] = map[string]any{
+		objects.FieldKeyID:        testUpstreamID,
 		objects.FieldKeyKind:      objects.KindBacklogItem,
-		objects.FieldKeyTitle:     "Evaluate Security Findings",
+		objects.FieldKeyTitle:     testUpstreamTitle,
 		objects.FieldKeyStatus:    objects.ObjectStatusInProgress,
 		objects.FieldKeyArtifacts: []any{},
 	}
 
 	// Downstream Adversarial Critique Task (depends_on upstream specialist task)
 	downstreamItem := map[string]any{
-		objects.FieldKeyID:     "BLI-ADVERSARIAL-CRITIQUE-001",
+		objects.FieldKeyID:     testDownstreamID,
 		objects.FieldKeyKind:   objects.KindBacklogItem,
-		objects.FieldKeyTitle:  "Adversarial Critique of Security Findings",
+		objects.FieldKeyTitle:  testDownstreamTitle,
 		objects.FieldKeyStatus: objects.ObjectStatusPlanned,
-		"depends_on":           []any{upstreamID},
+		"depends_on":           []any{testUpstreamID},
 	}
 
 	// Independent Task without upstream dependencies
 	independentItem := map[string]any{
-		objects.FieldKeyID:     "BLI-INDEPENDENT-TASK-001",
+		objects.FieldKeyID:     testIndependentID,
 		objects.FieldKeyKind:   objects.KindBacklogItem,
-		objects.FieldKeyTitle:  "Independent Scaffolding Task",
+		objects.FieldKeyTitle:  testIndependentTitle,
 		objects.FieldKeyStatus: objects.ObjectStatusPlanned,
 	}
 
 	// Stage 1 Verification: Downstream task MUST be withheld when upstream is in_progress
 	blocked := isBlockedByUnverifiedUpstream(ctx, store, secCtx, downstreamItem)
-	require.True(t, blocked, "downstream critique task must be withheld while upstream is in_progress")
+	require.True(t, blocked, testErrStage1Withheld)
 
 	// Independent task must NOT be blocked
 	indepBlocked := isBlockedByUnverifiedUpstream(ctx, store, secCtx, independentItem)
-	require.False(t, indepBlocked, "independent task must not be blocked")
+	require.False(t, indepBlocked, testErrStage1Indep)
 
 	// Stage 2: Upstream task reaches complete but artifacts are still missing
-	store.objs[upstreamID][objects.FieldKeyStatus] = objects.ObjectStatusComplete
+	store.objs[testUpstreamID][objects.FieldKeyStatus] = objects.ObjectStatusComplete
 	blockedNoArtifacts := isBlockedByUnverifiedUpstream(ctx, store, secCtx, downstreamItem)
-	require.True(t, blockedNoArtifacts, "downstream critique task must be withheld if upstream complete without artifacts")
+	require.True(t, blockedNoArtifacts, testErrStage2NoArt)
 
 	// Stage 3: Upstream task receives shockwave verified status transition delivering artifacts
-	store.objs[upstreamID][objects.FieldKeyArtifacts] = []any{
-		".zqk/runs/code-eval/findings/findings_SEC.jsonl",
+	store.objs[testUpstreamID][objects.FieldKeyArtifacts] = []any{
+		testArtifactPath,
 	}
 	unblocked := isBlockedByUnverifiedUpstream(ctx, store, secCtx, downstreamItem)
-	require.False(t, unblocked, "downstream critique task must be unblocked once shockwave delivers verified upstream artifacts")
+	require.False(t, unblocked, testErrStage3Pass)
 }
+

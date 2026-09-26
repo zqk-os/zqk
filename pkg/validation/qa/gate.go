@@ -39,6 +39,11 @@ func NewAuditorGateForProject(s storage.ObjectStorageProvider, projectRoot strin
 	return &AuditorGate{storage: s, projectRoot: projectRoot}
 }
 
+const (
+	errFmtLatch1MissingArtifacts = "latch 1 failed (data existence): missing required deliverable artifacts for %s"
+	errFmtLatch1ArtifactNotFound = "latch 1 failed (data existence): artifact file does not exist or cannot be read: %s"
+)
+
 // VerifyComplete verifies that a signed QASuccess object exists for the itemID
 // AND that the signature is valid according to the trusted Auditor public key.
 func (g *AuditorGate) VerifyComplete(ctx context.Context, itemID string) error {
@@ -52,7 +57,7 @@ func (g *AuditorGate) VerifyComplete(ctx context.Context, itemID string) error {
 	if obj, readErr := g.storage.Read(ctx, secCtx, itemID); readErr == nil && obj != nil {
 		paths := extractArtifactPaths(obj[objects.FieldKeyArtifacts])
 		if len(paths) == 0 && (obj[objects.FieldKeyKind] == objects.KindBacklogItem || obj[objects.FieldKeyKind] == objects.KindAgentTask) {
-			return fmt.Errorf("latch 1 failed (data existence): missing required deliverable artifacts for %s", itemID)
+			return fmt.Errorf(errFmtLatch1MissingArtifacts, itemID)
 		}
 		for _, p := range paths {
 			targetPath := p
@@ -61,7 +66,7 @@ func (g *AuditorGate) VerifyComplete(ctx context.Context, itemID string) error {
 			}
 			info, statErr := os.Stat(targetPath)
 			if statErr != nil || info.IsDir() {
-				return fmt.Errorf("latch 1 failed (data existence): artifact file does not exist or cannot be read: %s", p)
+				return fmt.Errorf(errFmtLatch1ArtifactNotFound, p)
 			}
 		}
 	}
