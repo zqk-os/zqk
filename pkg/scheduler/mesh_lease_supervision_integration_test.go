@@ -2,7 +2,6 @@ package scheduler
 
 import (
 	"fmt"
-	__exec "os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -256,7 +255,7 @@ func TestMeshLeaseSupervision_Integration(t *testing.T) {
 	}
 	// Find the yaml file
 	//nolint:gosec
-	cmdExec := __exec.Command("find", providerRoot, "-name", "*ZQK-1000*")
+	cmdExec := testkit.ManagedCommand(t, t.Context(), "find", providerRoot, "-name", "*ZQK-1000*")
 	outExec, _ := cmdExec.CombinedOutput()
 	t.Logf("Found files: %s", string(outExec))
 

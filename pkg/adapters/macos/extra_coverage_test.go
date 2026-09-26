@@ -7,8 +7,8 @@ import (
 	"testing"
 )
 
-func failCmd(_ context.Context, _ string, _ ...string) *exec.Cmd {
-	return exec.Command("false")
+func failCmd(ctx context.Context, _ string, _ ...string) *exec.Cmd {
+	return exec.CommandContext(ctx, "false")
 }
 
 func TestClipboardPasteAdapter_PbcopyFailure(t *testing.T) {
@@ -26,9 +26,9 @@ func TestClipboardPasteAdapter_OsascriptFailure(t *testing.T) {
 		NewCommand: func(ctx context.Context, name string, arg ...string) *exec.Cmd {
 			n++
 			if name == pbcopyBin {
-				return exec.Command("true")
+				return exec.CommandContext(ctx, "true")
 			}
-			return exec.Command("false")
+			return exec.CommandContext(ctx, "false")
 		},
 	}
 	if err := a.Deliver(context.Background(), "hi", "id", nil); err == nil {
@@ -60,7 +60,7 @@ func TestClipboardPasteAdapter_commandUsesFactory(t *testing.T) {
 	a := &ClipboardPasteAdapter{
 		NewCommand: func(ctx context.Context, name string, arg ...string) *exec.Cmd {
 			called = true
-			return exec.Command("true")
+			return exec.CommandContext(ctx, "true")
 		},
 	}
 	cmd := a.command(context.Background(), "true")

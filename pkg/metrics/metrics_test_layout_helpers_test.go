@@ -1,11 +1,11 @@
 package metrics
 
 import (
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/testkit"
 	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -56,7 +56,7 @@ func layoutMetricsTestProjectRoot(t *testing.T, testRoot string) {
 
 func moduleRootFromGoEnvMetricsOrEmpty(t *testing.T) string {
 	t.Helper()
-	out, err := exec.Command("go", "env", "GOMOD").Output()
+	out, err := testkit.ManagedCommand(t, t.Context(), "go", "env", "GOMOD").Output()
 	if err != nil {
 		t.Logf("go env GOMOD: %v", err)
 		return ""

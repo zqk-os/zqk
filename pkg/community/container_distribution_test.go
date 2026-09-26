@@ -5,12 +5,12 @@ import (
 	"compress/gzip"
 	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -77,7 +77,7 @@ func TestContainerDistribution_FunctionalAcceptance(t *testing.T) {
 	}
 
 	tmpDir := t.TempDir()
-	cmd := exec.Command("bash", packageScript, "v1.5.0", tmpDir)
+	cmd := testkit.ManagedCommand(t, t.Context(), "bash", packageScript, "v1.5.0", tmpDir)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("package-helm-chart.sh failed: %v, output: %s", err, string(out))
@@ -97,13 +97,13 @@ func TestContainerDistribution_BoundaryAndErrorHandling(t *testing.T) {
 	packageScript := filepath.Join(root, "scripts", "package-helm-chart.sh")
 
 	// 1. Missing verify target argument
-	cmdNoArg := exec.Command("bash", packageScript, "--verify")
+	cmdNoArg := testkit.ManagedCommand(t, t.Context(), "bash", packageScript, "--verify")
 	if err := cmdNoArg.Run(); err == nil {
 		t.Errorf("expected --verify without argument to exit with error")
 	}
 
 	// 2. Nonexistent archive
-	cmdNonexistent := exec.Command("bash", packageScript, "--verify", "/nonexistent/chart.tgz")
+	cmdNonexistent := testkit.ManagedCommand(t, t.Context(), "bash", packageScript, "--verify", "/nonexistent/chart.tgz")
 	if err := cmdNonexistent.Run(); err == nil {
 		t.Errorf("expected --verify on nonexistent file to exit with error")
 	}
@@ -114,7 +114,7 @@ func TestContainerDistribution_BoundaryAndErrorHandling(t *testing.T) {
 	if err := os.WriteFile(corruptTgz, []byte("invalid gzip stream content"), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write corrupt archive: %v", err)
 	}
-	cmdCorrupt := exec.Command("bash", packageScript, "--verify", corruptTgz)
+	cmdCorrupt := testkit.ManagedCommand(t, t.Context(), "bash", packageScript, "--verify", corruptTgz)
 	if err := cmdCorrupt.Run(); err == nil {
 		t.Errorf("expected --verify on corrupt archive to exit with error")
 	}
@@ -131,7 +131,7 @@ func TestContainerDistribution_BoundaryAndErrorHandling(t *testing.T) {
 	gw.Close()
 	f.Close()
 
-	cmdMissingChart := exec.Command("bash", packageScript, "--verify", emptyTgz)
+	cmdMissingChart := testkit.ManagedCommand(t, t.Context(), "bash", packageScript, "--verify", emptyTgz)
 	if err := cmdMissingChart.Run(); err == nil {
 		t.Errorf("expected --verify on archive missing Chart.yaml to fail")
 	}
@@ -182,7 +182,7 @@ func TestContainerDistribution_IntegrationAndConformance(t *testing.T) {
 	// 3. Verify Helm chart tarball internal entries
 	tmpDir := t.TempDir()
 	genScript := filepath.Join(root, "scripts", "package-helm-chart.sh")
-	if out, err := exec.Command("bash", genScript, "v2.0.0", tmpDir).CombinedOutput(); err != nil {
+	if out, err := testkit.ManagedCommand(t, t.Context(), "bash", genScript, "v2.0.0", tmpDir).CombinedOutput(); err != nil {
 		t.Fatalf("failed to package helm chart: %v, out: %s", err, string(out))
 	}
 

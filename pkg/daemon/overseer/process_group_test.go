@@ -24,7 +24,7 @@ func init() {
 			os.Exit(0)
 		case "parent_with_child":
 			// Spawn a grandchild and sleep
-			child := exec.Command(os.Args[0])
+			child := exec.CommandContext(context.Background(), os.Args[0])
 			child.Env = append(os.Environ(), "TEST_OVERSEER_HELPER=1", "TEST_OVERSEER_HELPER_MODE=worker")
 			if err := child.Start(); err != nil {
 				os.Exit(1)
@@ -45,7 +45,7 @@ func TestProcessGroupIsolation(t *testing.T) {
 	require.Greater(t, mgr.PGID(), 0)
 
 	// Child with own PGID
-	cmd := exec.Command(os.Args[0])
+	cmd := exec.CommandContext(t.Context(), os.Args[0])
 	cmd.Env = append(os.Environ(), "TEST_OVERSEER_HELPER=1", "TEST_OVERSEER_HELPER_MODE=worker")
 	mgr.PrepareCommand(cmd, true)
 
@@ -74,7 +74,7 @@ func TestAtomicGroupSignaling(t *testing.T) {
 	mgr, err := overseer.NewProcessGroupManager(false)
 	require.NoError(t, err)
 
-	cmd := exec.Command(os.Args[0])
+	cmd := exec.CommandContext(t.Context(), os.Args[0])
 	cmd.Env = append(os.Environ(), "TEST_OVERSEER_HELPER=1", "TEST_OVERSEER_HELPER_MODE=worker")
 	mgr.PrepareCommand(cmd, true)
 
@@ -115,7 +115,7 @@ func TestSubreaperReaping(t *testing.T) {
 	}
 
 	// Spawn a fast-exiting child to verify ReapZombies
-	cmd := exec.Command(os.Args[0])
+	cmd := exec.CommandContext(t.Context(), os.Args[0])
 	cmd.Env = append(os.Environ(), "TEST_OVERSEER_HELPER=1", "TEST_OVERSEER_HELPER_MODE=fast_exit")
 	mgr.PrepareCommand(cmd, true)
 	require.NoError(t, cmd.Start())

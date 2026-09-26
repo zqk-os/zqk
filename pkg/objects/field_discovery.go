@@ -491,14 +491,10 @@ func (fr *FieldRegistry) extractFieldInfo(fieldName string, fieldDef map[string]
 	if validationVal, ok := fieldDef["validation"]; ok && validationVal != nil {
 		if validation, ok := validationVal.(map[string]any); ok {
 			fieldInfo.Required = getBoolFromMap(validation, "required")
-			if fieldInfo.Type == "enum" {
-				extractEnumValues(validation["enum"], &fieldInfo.EnumValues)
-			}
+			extractEnumValues(validation["enum"], &fieldInfo.EnumValues)
 		} else if validation, ok := validationVal.(map[interface{}]interface{}); ok {
 			fieldInfo.Required = getBoolFromMapAny(validation, "required")
-			if fieldInfo.Type == "enum" {
-				extractEnumValues(validation["enum"], &fieldInfo.EnumValues)
-			}
+			extractEnumValues(validation["enum"], &fieldInfo.EnumValues)
 		}
 	}
 

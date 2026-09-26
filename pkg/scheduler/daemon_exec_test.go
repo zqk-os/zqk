@@ -89,7 +89,7 @@ Output:
 	}
 
 	// --- Parent process launches the child using os/exec daemonization ---
-	cmd := exec.Command(childExePath, pidFile, logFile, "--test-id=daemon-exec-test") //nolint:gosec
+	cmd := exec.CommandContext(t.Context(), childExePath, pidFile, logFile, "--test-id=daemon-exec-test") //nolint:gosec
 	defer func() {
 		if cmd != nil && cmd.Process != nil {
 			_ = cmd.Process.Kill()

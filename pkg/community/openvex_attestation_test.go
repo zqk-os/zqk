@@ -3,12 +3,12 @@ package community
 import (
 	"encoding/json"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -54,7 +54,7 @@ func TestOpenVEX_FunctionalAcceptance(t *testing.T) {
 	tmpDir := t.TempDir()
 	outVex := filepath.Join(tmpDir, "openvex.json")
 
-	cmd := exec.Command("bash", scriptPath, "v2.8.0", outVex)
+	cmd := testkit.ManagedCommand(t, t.Context(), "bash", scriptPath, "v2.8.0", outVex)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("generate-openvex.sh failed: %v, output: %s", err, string(out))
@@ -111,13 +111,13 @@ func TestOpenVEX_BoundaryAndErrorHandling(t *testing.T) {
 	scriptPath := filepath.Join(root, "scripts", "generate-openvex.sh")
 
 	// 1. Missing verify argument
-	cmdNoArg := exec.Command("bash", scriptPath, "--verify")
+	cmdNoArg := testkit.ManagedCommand(t, t.Context(), "bash", scriptPath, "--verify")
 	if err := cmdNoArg.Run(); err == nil {
 		t.Errorf("expected --verify without file argument to fail")
 	}
 
 	// 2. Nonexistent file
-	cmdNonexistent := exec.Command("bash", scriptPath, "--verify", "/nonexistent/openvex.json")
+	cmdNonexistent := testkit.ManagedCommand(t, t.Context(), "bash", scriptPath, "--verify", "/nonexistent/openvex.json")
 	if err := cmdNonexistent.Run(); err == nil {
 		t.Errorf("expected --verify on nonexistent file to fail")
 	}
@@ -128,7 +128,7 @@ func TestOpenVEX_BoundaryAndErrorHandling(t *testing.T) {
 	if err := os.WriteFile(badJSON, []byte("{invalid json content"), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write bad json: %v", err)
 	}
-	cmdBad := exec.Command("bash", scriptPath, "--verify", badJSON)
+	cmdBad := testkit.ManagedCommand(t, t.Context(), "bash", scriptPath, "--verify", badJSON)
 	if err := cmdBad.Run(); err == nil {
 		t.Errorf("expected --verify on corrupt JSON to fail")
 	}
@@ -139,7 +139,7 @@ func TestOpenVEX_BoundaryAndErrorHandling(t *testing.T) {
 	if err := os.WriteFile(invalidVex, []byte(invalidContent), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write invalid vex: %v", err)
 	}
-	cmdInvalid := exec.Command("bash", scriptPath, "--verify", invalidVex)
+	cmdInvalid := testkit.ManagedCommand(t, t.Context(), "bash", scriptPath, "--verify", invalidVex)
 	if err := cmdInvalid.Run(); err == nil {
 		t.Errorf("expected --verify on document with empty statements to fail")
 	}
@@ -173,11 +173,11 @@ func TestOpenVEX_IntegrationAndConformance(t *testing.T) {
 	genScript := filepath.Join(root, "scripts", "generate-openvex.sh")
 	vexPath := filepath.Join(tmpDir, "openvex.json")
 
-	if out, err := exec.Command("bash", genScript, "v3.0.0", vexPath).CombinedOutput(); err != nil {
+	if out, err := testkit.ManagedCommand(t, t.Context(), "bash", genScript, "v3.0.0", vexPath).CombinedOutput(); err != nil {
 		t.Fatalf("failed to generate OpenVEX doc: %v, out: %s", err, string(out))
 	}
 
-	verifyCmd := exec.Command("bash", genScript, "--verify", vexPath)
+	verifyCmd := testkit.ManagedCommand(t, t.Context(), "bash", genScript, "--verify", vexPath)
 	out, err := verifyCmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("expected --verify on generated OpenVEX doc to pass: %v, out: %s", err, string(out))

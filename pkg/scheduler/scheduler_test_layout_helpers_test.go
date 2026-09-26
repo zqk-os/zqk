@@ -3,7 +3,6 @@ package scheduler
 import (
 	"context"
 	"fmt"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -142,7 +141,7 @@ var (
 func moduleRootFromGoEnvSchedulerOrEmpty(t *testing.T) string {
 	t.Helper()
 	moduleRootOnce.Do(func() {
-		out, err := exec.Command("go", "env", "GOMOD").Output()
+		out, err := testkit.ManagedCommand(t, t.Context(), "go", "env", "GOMOD").Output()
 		if err != nil {
 			t.Logf("go env GOMOD: %v", err)
 			return

@@ -2,7 +2,6 @@ package system
 
 import (
 	"encoding/json"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -10,6 +9,7 @@ import (
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -92,7 +92,7 @@ func TestRunValidateCommandSpecs_BinaryIntegration(t *testing.T) {
 		t.Skip("bin/zqk not found, skipping full binary execution test")
 	}
 
-	out, err := exec.Command(binPath, "system", "validate-command-specs").CombinedOutput()
+	out, err := testkit.ManagedCommand(t, t.Context(), binPath, "system", "validate-command-specs").CombinedOutput()
 	if err != nil {
 		t.Fatalf("zqk system validate-command-specs failed: %v\nOutput: %s", err, string(out))
 	}
@@ -141,7 +141,7 @@ func TestCommandSpecPolicingAudit_ZeroNewDrift(t *testing.T) {
 		t.Skip("bin/zqk not found, skipping binary audit test")
 	}
 
-	out, err := exec.Command(binPath, "system", "validate-command-specs", "--format", "json").CombinedOutput()
+	out, err := testkit.ManagedCommand(t, t.Context(), binPath, "system", "validate-command-specs", "--format", "json").CombinedOutput()
 	if err != nil {
 		t.Fatalf("zqk system validate-command-specs failed: %v\nOutput: %s", err, string(out))
 	}
@@ -180,7 +180,7 @@ func TestRollupCLITaxonomyOverhaul_Integration(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		out, err := exec.Command(binPath, tc...).CombinedOutput()
+		out, err := testkit.ManagedCommand(t, t.Context(), binPath, tc...).CombinedOutput()
 		if err != nil {
 			t.Fatalf("command failed: zqk %v: %v\nOutput: %s", tc, err, string(out))
 		}

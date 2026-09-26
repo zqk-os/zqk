@@ -3,7 +3,6 @@ package agent_test
 import (
 	"context"
 	"os"
-	"os/exec"
 	"strings"
 	"testing"
 
@@ -13,6 +12,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -60,14 +60,14 @@ func TestAgentNext_FailClosedOnNotMerged(t *testing.T) {
 	root, store := setupOrchestrateTest(t)
 
 	// Init a git repo in root
-	initCmd := exec.Command("git", "init")
+	initCmd := testkit.ManagedCommand(t, t.Context(), "git", "init")
 	initCmd.Dir = root
 	if err := initCmd.Run(); err != nil {
 		t.Fatalf("git init failed: %v", err)
 	}
 
 	// Create an initial commit
-	commitCmd := exec.Command("git", "commit", "--allow-empty", "-m", "init")
+	commitCmd := testkit.ManagedCommand(t, t.Context(), "git", "commit", "--allow-empty", "-m", "init")
 	commitCmd.Dir = root
 	commitCmd.Env = append(os.Environ(), "GIT_AUTHOR_NAME=Test", "GIT_AUTHOR_EMAIL=test@example.com", "GIT_COMMITTER_NAME=Test", "GIT_COMMITTER_EMAIL=test@example.com")
 	if err := commitCmd.Run(); err != nil {
@@ -75,7 +75,7 @@ func TestAgentNext_FailClosedOnNotMerged(t *testing.T) {
 	}
 
 	// Create a dummy branch
-	branchCmd := exec.Command("git", "branch", "integration/pri-123")
+	branchCmd := testkit.ManagedCommand(t, t.Context(), "git", "branch", "integration/pri-123")
 	branchCmd.Dir = root
 	if err := branchCmd.Run(); err != nil {
 		t.Fatalf("git branch failed: %v", err)
@@ -83,14 +83,14 @@ func TestAgentNext_FailClosedOnNotMerged(t *testing.T) {
 
 	// Get a commit hash that is NOT in integration/pri-123
 	// We make a new commit on main
-	commitCmd2 := exec.Command("git", "commit", "--allow-empty", "-m", "unmerged")
+	commitCmd2 := testkit.ManagedCommand(t, t.Context(), "git", "commit", "--allow-empty", "-m", "unmerged")
 	commitCmd2.Dir = root
 	commitCmd2.Env = append(os.Environ(), "GIT_AUTHOR_NAME=Test", "GIT_AUTHOR_EMAIL=test@example.com", "GIT_COMMITTER_NAME=Test", "GIT_COMMITTER_EMAIL=test@example.com")
 	if err := commitCmd2.Run(); err != nil {
 		t.Fatalf("git commit 2 failed: %v", err)
 	}
 
-	revCmd := exec.Command("git", "rev-parse", "HEAD")
+	revCmd := testkit.ManagedCommand(t, t.Context(), "git", "rev-parse", "HEAD")
 	revCmd.Dir = root
 	out, err := revCmd.Output()
 	if err != nil {
@@ -166,13 +166,13 @@ func TestAgentNext_FailClosedOnNotMerged_Lowercase(t *testing.T) {
 	root, store := setupOrchestrateTest(t)
 
 	// Init a git repo in root
-	initCmd := exec.Command("git", "init")
+	initCmd := testkit.ManagedCommand(t, t.Context(), "git", "init")
 	initCmd.Dir = root
 	if err := initCmd.Run(); err != nil {
 		t.Fatalf("git init failed: %v", err)
 	}
 
-	commitCmd := exec.Command("git", "commit", "--allow-empty", "-m", "init")
+	commitCmd := testkit.ManagedCommand(t, t.Context(), "git", "commit", "--allow-empty", "-m", "init")
 	commitCmd.Dir = root
 	commitCmd.Env = append(os.Environ(), "GIT_AUTHOR_NAME=Test", "GIT_AUTHOR_EMAIL=test@example.com", "GIT_COMMITTER_NAME=Test", "GIT_COMMITTER_EMAIL=test@example.com")
 	if err := commitCmd.Run(); err != nil {
@@ -180,14 +180,14 @@ func TestAgentNext_FailClosedOnNotMerged_Lowercase(t *testing.T) {
 	}
 
 	// create unmerged commit
-	commitCmd2 := exec.Command("git", "commit", "--allow-empty", "-m", "unmerged")
+	commitCmd2 := testkit.ManagedCommand(t, t.Context(), "git", "commit", "--allow-empty", "-m", "unmerged")
 	commitCmd2.Dir = root
 	commitCmd2.Env = append(os.Environ(), "GIT_AUTHOR_NAME=Test", "GIT_AUTHOR_EMAIL=test@example.com", "GIT_COMMITTER_NAME=Test", "GIT_COMMITTER_EMAIL=test@example.com")
 	if err := commitCmd2.Run(); err != nil {
 		t.Fatalf("git commit 2 failed: %v", err)
 	}
 
-	revCmd := exec.Command("git", "rev-parse", "HEAD")
+	revCmd := testkit.ManagedCommand(t, t.Context(), "git", "rev-parse", "HEAD")
 	revCmd.Dir = root
 	out, err := revCmd.Output()
 	if err != nil {

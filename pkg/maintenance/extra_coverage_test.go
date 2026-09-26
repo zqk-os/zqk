@@ -3,10 +3,11 @@ package maintenance
 import (
 	"context"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 func setupTestRepo(t *testing.T) (string, *GitMaintenanceService) {
@@ -14,7 +15,7 @@ func setupTestRepo(t *testing.T) (string, *GitMaintenanceService) {
 	tmpDir := t.TempDir()
 
 	run := func(args ...string) {
-		cmd := exec.Command("git", args...)
+		cmd := testkit.ManagedCommand(t, t.Context(), "git", args...)
 		cmd.Dir = tmpDir
 		if out, err := cmd.CombinedOutput(); err != nil {
 			t.Fatalf("git %v failed: %v\nOutput:\n%s", args, err, string(out))
@@ -55,7 +56,7 @@ func TestGitMaintenanceService_BranchOperations(t *testing.T) {
 	ctx := context.Background()
 
 	run := func(args ...string) {
-		cmd := exec.Command("git", args...)
+		cmd := testkit.ManagedCommand(t, t.Context(), "git", args...)
 		cmd.Dir = dir
 		if out, err := cmd.CombinedOutput(); err != nil {
 			t.Fatalf("git %v failed: %v\nOutput:\n%s", args, err, string(out))
@@ -116,7 +117,7 @@ func TestGitMaintenanceService_CleanupWorktreeAndBranchForID(t *testing.T) {
 	ctx := context.Background()
 
 	run := func(args ...string) {
-		cmd := exec.Command("git", args...)
+		cmd := testkit.ManagedCommand(t, t.Context(), "git", args...)
 		cmd.Dir = dir
 		if out, err := cmd.CombinedOutput(); err != nil {
 			t.Fatalf("git %v failed: %v\nOutput:\n%s", args, err, string(out))
@@ -162,7 +163,7 @@ func TestGitMaintenanceService_PruneStaleBranches(t *testing.T) {
 	ctx := context.Background()
 
 	run := func(args ...string) {
-		cmd := exec.Command("git", args...)
+		cmd := testkit.ManagedCommand(t, t.Context(), "git", args...)
 		cmd.Dir = dir
 		if out, err := cmd.CombinedOutput(); err != nil {
 			t.Fatalf("git %v failed: %v\nOutput:\n%s", args, err, string(out))
@@ -182,7 +183,7 @@ func TestGitMaintenanceService_PruneStaleBranches(t *testing.T) {
 	}
 
 	// Check refs/archive/stale-merged-feat exists
-	cmd := exec.Command("git", "show-ref", "--verify", "--quiet", "refs/archive/stale-merged-feat")
+	cmd := testkit.ManagedCommand(t, t.Context(), "git", "show-ref", "--verify", "--quiet", "refs/archive/stale-merged-feat")
 	cmd.Dir = dir
 	if err := cmd.Run(); err != nil {
 		t.Errorf("expected archived ref refs/archive/stale-merged-feat to exist")

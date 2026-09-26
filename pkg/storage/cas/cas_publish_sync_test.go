@@ -8,8 +8,9 @@ import (
 	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
 	"errors"
-	"os/exec"
 	"path/filepath"
+
+	"github.com/zqk-os/zqk/pkg/testkit"
 
 	"github.com/zqk-os/zqk/pkg/storage/filecas"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -120,7 +121,7 @@ func TestCAS_WriteFileWithSync_VisibleAfterChildKill(t *testing.T) {
 	}
 
 	dir := t.TempDir()
-	cmd := exec.Command(os.Args[0], "-test.run=^TestCAS_WriteFileWithSync_VisibleAfterChildKill$", "-test.count=1") //nolint:gosec
+	cmd := testkit.ManagedCommand(t, t.Context(), os.Args[0], "-test.run=^TestCAS_WriteFileWithSync_VisibleAfterChildKill$", "-test.count=1") //nolint:gosec
 	cmd.Dir = dir
 	cmd.Env = append(os.Environ(), envCASCrashKillChild+"=1", envCASCrashKillDir+"="+dir)
 	cmd.Stdout = os.Stdout

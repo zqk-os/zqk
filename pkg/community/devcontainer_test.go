@@ -2,12 +2,13 @@ package community_test
 
 import (
 	"encoding/json"
-	"github.com/zqk-os/zqk/pkg/paths"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 type devcontainerConfig struct {
@@ -117,7 +118,7 @@ func TestDevcontainer_BoundaryAndErrorHandling(t *testing.T) {
 
 	// Sub-test 1: Missing devcontainer directory
 	t.Run("MissingDirectory", func(t *testing.T) {
-		cmd := exec.Command("bash", verifier, filepath.Join(tmpDir, "non_existent"))
+		cmd := testkit.ManagedCommand(t, t.Context(), "bash", verifier, filepath.Join(tmpDir, "non_existent"))
 		out, err := cmd.CombinedOutput()
 		if err == nil {
 			t.Fatalf("expected error for missing directory, but command succeeded:\n%s", string(out))
@@ -140,7 +141,7 @@ func TestDevcontainer_BoundaryAndErrorHandling(t *testing.T) {
 			t.Fatalf("failed to write post-create.sh: %v", err)
 		}
 
-		cmd := exec.Command("bash", verifier, badDir)
+		cmd := testkit.ManagedCommand(t, t.Context(), "bash", verifier, badDir)
 		out, err := cmd.CombinedOutput()
 		if err == nil {
 			t.Fatalf("expected error for malformed JSON, but command succeeded:\n%s", string(out))
@@ -175,7 +176,7 @@ func TestDevcontainer_BoundaryAndErrorHandling(t *testing.T) {
 			t.Fatalf("failed to write post-create.sh: %v", err)
 		}
 
-		cmd := exec.Command("bash", verifier, noPortDir)
+		cmd := testkit.ManagedCommand(t, t.Context(), "bash", verifier, noPortDir)
 		out, err := cmd.CombinedOutput()
 		if err == nil {
 			t.Fatalf("expected error for missing port 8443, but command succeeded:\n%s", string(out))
@@ -190,7 +191,7 @@ func TestDevcontainer_IntegrationAndConformance(t *testing.T) {
 	verifier := filepath.Join(repoRoot, "scripts", "verify-devcontainer.sh")
 	devcontainerDir := filepath.Join(repoRoot, ".devcontainer")
 
-	cmd := exec.Command("bash", verifier, devcontainerDir)
+	cmd := testkit.ManagedCommand(t, t.Context(), "bash", verifier, devcontainerDir)
 	cmd.Dir = repoRoot
 	out, err := cmd.CombinedOutput()
 	if err != nil {
@@ -199,7 +200,7 @@ func TestDevcontainer_IntegrationAndConformance(t *testing.T) {
 
 	// Verify post-create.sh syntax with bash -n
 	scriptPath := filepath.Join(devcontainerDir, "post-create.sh")
-	checkCmd := exec.Command("bash", "-n", scriptPath)
+	checkCmd := testkit.ManagedCommand(t, t.Context(), "bash", "-n", scriptPath)
 	if checkOut, err := checkCmd.CombinedOutput(); err != nil {
 		t.Fatalf("post-create.sh failed syntax check: %v\nOutput:\n%s", err, string(checkOut))
 	}

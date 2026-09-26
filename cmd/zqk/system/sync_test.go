@@ -6,10 +6,10 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
-
-	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 func TestNewSyncCmd(t *testing.T) {
@@ -94,7 +94,7 @@ func TestSyncWithGitRepository(t *testing.T) {
 	}()
 
 	// Initialize git repository
-	initCmd := exec.Command("git", "init")
+	initCmd := testkit.ManagedCommand(t, t.Context(), "git", "init")
 	zqkenv.WireExecForIsolatedProject(initCmd, tmpDir)
 	if err := initCmd.Run(); err != nil {
 		t.Fatalf("Failed to initialize git repository: %v", err)
@@ -106,13 +106,13 @@ func TestSyncWithGitRepository(t *testing.T) {
 		t.Fatalf("Failed to create test file: %v", err)
 	}
 
-	addCmd := exec.Command("git", "add", "test.txt")
+	addCmd := testkit.ManagedCommand(t, t.Context(), "git", "add", "test.txt")
 	zqkenv.WireExecForIsolatedProject(addCmd, tmpDir)
 	if err := addCmd.Run(); err != nil {
 		t.Fatalf("Failed to add test file: %v", err)
 	}
 
-	commitCmd := exec.Command("git", "commit", "-m", "Initial commit")
+	commitCmd := testkit.ManagedCommand(t, t.Context(), "git", "commit", "-m", "Initial commit")
 	zqkenv.WireExecForIsolatedProject(commitCmd, tmpDir)
 	commitCmd.Env = append(os.Environ(), "GIT_AUTHOR_NAME=test", "GIT_AUTHOR_EMAIL=test@test.com", "GIT_COMMITTER_NAME=test", "GIT_COMMITTER_EMAIL=test@test.com")
 	if err := commitCmd.Run(); err != nil {

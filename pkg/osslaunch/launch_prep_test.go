@@ -3,7 +3,6 @@ package osslaunch
 import (
 	"context"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -25,7 +24,7 @@ func TestPublicRepoSanitation(t *testing.T) {
 	}
 
 	t.Run("FunctionalAcceptance_NoTrackedScratchOrStudioArtifacts", func(t *testing.T) {
-		cmd := exec.Command("git", "ls-files")
+		cmd := testkit.ManagedCommand(t, t.Context(), "git", "ls-files")
 		cmd.Dir = projectRoot
 		out, err := cmd.Output()
 		if err != nil {
@@ -139,7 +138,7 @@ func TestPublicPushLeakPrevention(t *testing.T) {
 			t.Errorf("scripts/scan-secrets.sh is not executable")
 		}
 
-		cmd := exec.Command("/bin/bash", scriptPath, scriptPath)
+		cmd := testkit.ManagedCommand(t, t.Context(), "/bin/bash", scriptPath, scriptPath)
 		cmd.Dir = projectRoot
 		out, err := cmd.CombinedOutput()
 		if err != nil {

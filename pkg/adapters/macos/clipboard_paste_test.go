@@ -8,8 +8,8 @@ import (
 	"testing"
 )
 
-func stubCmd(_ context.Context, _ string, _ ...string) *exec.Cmd {
-	return exec.Command(os.Args[0], "-test.run=^$")
+func stubCmd(ctx context.Context, _ string, _ ...string) *exec.Cmd {
+	return exec.CommandContext(ctx, os.Args[0], "-test.run=^$")
 }
 
 func TestClipboardPasteAdapter_Vendor(t *testing.T) {

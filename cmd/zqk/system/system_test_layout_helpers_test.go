@@ -7,11 +7,12 @@ import (
 
 	"context"
 	"fmt"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/zqk-os/zqk/pkg/testkit"
 
 	"gopkg.in/yaml.v3"
 
@@ -153,7 +154,7 @@ func bootstrapSystemTestRoot(t testing.TB, testRoot, projectRoot string) error {
 // moduleRootFromGoEnvSystem mirrors pkg/testing.ModuleRootFromGoEnv.
 func moduleRootFromGoEnvSystem(t *testing.T) string {
 	t.Helper()
-	out, err := exec.Command("go", "env", "GOMOD").Output()
+	out, err := testkit.ManagedCommand(t, t.Context(), "go", "env", "GOMOD").Output()
 	if err != nil {
 		t.Fatalf("go env GOMOD: %v", err)
 	}
