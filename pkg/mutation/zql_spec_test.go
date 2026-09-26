@@ -2,13 +2,13 @@ package mutation_test
 
 import (
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func extractJSONBlock(content string) string {
@@ -24,7 +24,7 @@ func extractJSONBlock(content string) string {
 // Formal ISO/IEC 14977 EBNF grammar and Draft 2020-12 AST specification exists and defines canonical keywords.
 func TestZQL_GrammarStaticSpec(t *testing.T) {
 	specPath := filepath.Join("..", "..", "docs", "specs", "SPEC-ZQL-DECLARATIVE-MUTATION-GRAMMAR.md")
-	content, err := os.ReadFile(specPath)
+	content, err := fileutil.ReadFile(specPath)
 	if err != nil {
 		t.Fatalf("failed to read ZQL grammar specification at %s: %v", specPath, err)
 	}
@@ -185,7 +185,7 @@ func TestZQL_UnboundVariableAndCycleDetection_Negative(t *testing.T) {
 // Satisfies CRIT-ZQL-TXN-ISOLATION-SPEC, CRIT-ZQL-ALL-OR-NOTHING-ROLLBACK-PROOF, CRIT-ZQL-DIRTY-READ-CONCURRENCY-NEGATIVE
 func TestZQLTransactionExecutionSpec(t *testing.T) {
 	specPath := filepath.Join("..", "..", "docs", "specs", "SPEC-ZQL-TRANSACTION-EXECUTION.md")
-	data, err := os.ReadFile(specPath)
+	data, err := fileutil.ReadFile(specPath)
 	require.NoError(t, err, "ZQL transaction execution specification file must exist: %s", specPath)
 	content := string(data)
 	require.NotEmpty(t, content, "ZQL transaction execution specification content must not be empty")
@@ -214,7 +214,7 @@ func TestZQLTransactionExecutionSpec(t *testing.T) {
 // Satisfies CRIT-ZQL-INMEMORY-VALIDATION-CONTRACT, CRIT-ZQL-PREFLIGHT-DIAGNOSTIC-RECEIPT, CRIT-ZQL-SCHEMA-CORRUPTION-FAILCLOSED-NEGATIVE
 func TestZQLPreflightValidationSpec(t *testing.T) {
 	specPath := filepath.Join("..", "..", "docs", "specs", "SPEC-ZQL-PREFLIGHT-VALIDATION.md")
-	data, err := os.ReadFile(specPath)
+	data, err := fileutil.ReadFile(specPath)
 	require.NoError(t, err, "ZQL preflight validation specification file must exist: %s", specPath)
 	content := string(data)
 	require.NotEmpty(t, content, "ZQL preflight validation specification content must not be empty")
