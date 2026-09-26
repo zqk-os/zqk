@@ -21,4 +21,7 @@ Execute implementation tasks with high structural rigor, complete test coverage,
 4. **Code Quality Gates**:
    - Run `golangci-lint run ./...` and resolve any flagged issues.
    - Stage changes on plan-scoped integration branches.
+5. **Declarative Kernel Operations**:
+   - Leverage `zqk query` (ZPARQL) for cycle-safe topological queries across kernel dependencies rather than implementing custom graph search in Go scripts.
+   - Leverage `zqk mutate` (ZQL) for batch object creation, ensuring all-or-nothing transactional atomicity and clean rollback.
 

@@ -45,3 +45,37 @@ Govern the scrupulous breakdown of high-level intents and composite packs into o
   - **Maximal Parallelism**: Partition work into decoupled packages to prevent file lock contention and git merge conflicts.
   - **Shovel-Ready Verification**: Backlog items must have problem statements, acceptance considerations, linked milestone, requirements, criteria, and tests before entering `planned` status.
   - **Convergence Binding**: Bind work intervals to `convergence_session` objects for iterative re-measurement.
+
+### 6. Declarative Traversal & Atomic Mutation Discipline (ZPARQL & ZQL)
+- **Declarative Graph Traversal (`zqk query` / MCP `query_zparql`)**:
+  Do NOT perform manual multi-step CLI loops or procedural BFS sweeps in code to discover dependencies or check DoD traceability. Use declarative ZPARQL:
+  ```zparql
+  MATCH (p:priority_plan {status: "in_progress"})-[:items]->(b:backlog_item),
+        (b)-[:criteria_refs]->(c:criteria),
+        (c)-[:test_case_refs]->(t:test_case)
+  WHERE b.status != "complete"
+  RETURN p.title AS plan, b.id AS bli_id, c.title AS criterion, t.id AS test_case
+  ORDER BY b.id ASC;
+  ```
+- **Atomic Multi-Object Mutation (`zqk mutate` / MCP `mutate_zql`)**:
+  Do NOT make multiple fragmented CLI calls (`zqk object create ...`) that risk partial failure and orphan CAS records. Define the entire object constellation in an atomic ZQL transaction:
+  ```zql
+  BEGIN TRANSACTION ISOLATION LEVEL STAGED_SNAPSHOT;
+  LET $plan = UPSERT priority_plan {
+      title: "Observability Overhaul",
+      priority_tier: "P1",
+      status: "in_progress"
+  } RETURNING id;
+  LET $bli = UPSERT backlog_item {
+      title: "Stream Consumer Daemon",
+      priority_plan_ref: $plan.id,
+      priority_tier: "P1",
+      status: "planned"
+  } RETURNING id;
+  UPSERT criteria {
+      title: "Zero Memory Leak Invariant",
+      backlog_item_ref: $bli.id
+  };
+  COMMIT TRANSACTION;
+  ```
+  Forward and backward variable references (`$plan.id`, `$bli.id`) are resolved via Kahn's algorithm with preflight validation and atomic rollback.

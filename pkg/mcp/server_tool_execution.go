@@ -41,6 +41,10 @@ func (s *Server) handleToolCallWithContext(ctx context.Context, rawName string, 
 		toolSuffix = strings.TrimPrefix(name, toolPrefix)
 	}
 	switch {
+	case name == GetToolName("query_zparql") || toolSuffix == "query_zparql" || name == "query_zparql":
+		return HandleQueryZPARQL(ctx, s, args)
+	case name == GetToolName("mutate_zql") || toolSuffix == "mutate_zql" || name == "mutate_zql":
+		return HandleMutateZQL(ctx, s, args)
 	case name == GetToolName("graph_traversal") || toolSuffix == "graph_traversal" || name == "graph_traversal":
 		return HandleGraphTraversal(ctx, args)
 	case name == GetToolName("resolve_references") || toolSuffix == "resolve_references" || name == "resolve_references":

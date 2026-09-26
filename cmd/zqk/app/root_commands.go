@@ -27,6 +27,7 @@ import (
 	matrixcmd "github.com/zqk-os/zqk/cmd/zqk/matrix"
 	"github.com/zqk-os/zqk/cmd/zqk/mcp"
 	"github.com/zqk-os/zqk/cmd/zqk/mesh"
+	mutatecmd "github.com/zqk-os/zqk/cmd/zqk/mutate"
 	newcmd "github.com/zqk-os/zqk/cmd/zqk/new"
 	"github.com/zqk-os/zqk/cmd/zqk/object"
 	"github.com/zqk-os/zqk/cmd/zqk/observer"
@@ -35,6 +36,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/organizational"
 	packcmd "github.com/zqk-os/zqk/cmd/zqk/pack"
 	"github.com/zqk-os/zqk/cmd/zqk/precommit"
+	querycmd "github.com/zqk-os/zqk/cmd/zqk/query"
 	"github.com/zqk-os/zqk/cmd/zqk/reports"
 	rollbackcmd "github.com/zqk-os/zqk/cmd/zqk/rollback"
 	"github.com/zqk-os/zqk/cmd/zqk/scheduler"
@@ -91,6 +93,16 @@ func registerCommands() {
 	grepCmdInst := grep.NewGrepCmd()
 	grepCmdInst.GroupID = "everyday"
 	rootCmd.AddCommand(grepCmdInst)
+
+	// Declarative ZPARQL graph query engine
+	queryCmdInst := querycmd.NewQueryCmd()
+	queryCmdInst.GroupID = "everyday"
+	rootCmd.AddCommand(queryCmdInst)
+
+	// Declarative ZQL mutation and transaction engine
+	mutateCmdInst := mutatecmd.NewMutateCmd()
+	mutateCmdInst.GroupID = "everyday"
+	rootCmd.AddCommand(mutateCmdInst)
 
 	// Health check registry (list, enable/disable, run monitors)
 	healthchkCmdInst := healthchk.NewHealthchkCmd()

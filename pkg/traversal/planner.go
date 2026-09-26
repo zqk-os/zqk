@@ -97,6 +97,31 @@ func (g *GraphIndex) GetOutEdges(sourceID, relation string) []string {
 	return nil
 }
 
+// GetInEdges returns source node IDs for target and relation in O(1) time.
+func (g *GraphIndex) GetInEdges(targetID, relation string) []string {
+	g.mu.RLock()
+	defer g.mu.RUnlock()
+	if rels, ok := g.backwardEdges[targetID]; ok {
+		if sources, ok := rels[relation]; ok {
+			res := make([]string, len(sources))
+			copy(res, sources)
+			return res
+		}
+	}
+	return nil
+}
+
+// GetAllNodeIDs returns all node IDs in the index.
+func (g *GraphIndex) GetAllNodeIDs() []string {
+	g.mu.RLock()
+	defer g.mu.RUnlock()
+	res := make([]string, 0, len(g.nodes))
+	for id := range g.nodes {
+		res = append(res, id)
+	}
+	return res
+}
+
 // TotalNodes returns total node count N.
 func (g *GraphIndex) TotalNodes() int {
 	g.mu.RLock()

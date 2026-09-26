@@ -140,6 +140,7 @@ func RegisterAllTools(server *Server) {
 	RegisterInteractiveTools(server)    // Interactive object creation tools
 	RegisterProjectContextTool(server)  // P0-3: Project context onboarding tool
 	RegisterMetricsTools(server)        // Metrics tools for observability
+	RegisterDeclarativeTools(server)    // Declarative ZPARQL query and ZQL mutate engines
 
 	// Register all onboarding prompts
 	RegisterOnboardingPrompts(server)
@@ -159,6 +160,7 @@ func RegisterAllTools(server *Server) {
 // This allows role-based filtering of workflow tools
 func RegisterAllToolsWithSecurityContext(server *Server, secCtx *pkgctx.SecurityContext) {
 	RegisterGraphTools(server)
+	RegisterDeclarativeTools(server)      // Declarative ZPARQL query and ZQL mutate engines
 	RegisterEchoTool(server)              // Test tool for MCP communication validation
 	RegisterChatInjectTool(server)        // Chat integration tool
 	RegisterIdeBridgeTool(server)         // IDE bridge control bus (zqk-ide-bridge extension)
@@ -182,4 +184,50 @@ func RegisterAllToolsWithSecurityContext(server *Server, secCtx *pkgctx.Security
 	// Discover additional resources dynamically from docs directory
 	// This allows new documentation to be automatically available
 	DiscoverAdditionalResources(server)
+}
+
+// RegisterDeclarativeTools registers declarative ZPARQL query and ZQL mutation tools.
+func RegisterDeclarativeTools(server *Server) {
+	server.RegisterTool(
+		GetToolName("query_zparql"),
+		"Execute a declarative graph pattern query across the knowledge kernel using ZPARQL. Supports multi-hop traversal (*1..4), WHERE filtering, projections, and aggregations.",
+		map[string]any{
+			objects.FieldKeyType: "object",
+			"required":           []string{"query"},
+			"properties": map[string]any{
+				"query": map[string]any{
+					objects.FieldKeyType:        "string",
+					objects.FieldKeyDescription: "Declarative ZPARQL query string conforming to SPEC-ZPARQL-GRAPH-TRAVERSAL-GRAMMAR",
+				},
+				objects.FieldKeyFormat: map[string]any{
+					objects.FieldKeyType:        "string",
+					"enum":                      []string{"json", "table"},
+					"default":                   "json",
+					objects.FieldKeyDescription: "Output format",
+				},
+			},
+		},
+		nil,
+	)
+
+	server.RegisterTool(
+		GetToolName("mutate_zql"),
+		"Execute a declarative multi-object mutation script with atomic transaction semantics, Kahn topological variable resolution, and in-memory preflight validation using ZQL.",
+		map[string]any{
+			objects.FieldKeyType: "object",
+			"required":           []string{"script"},
+			"properties": map[string]any{
+				"script": map[string]any{
+					objects.FieldKeyType:        "string",
+					objects.FieldKeyDescription: "Declarative ZQL mutation script conforming to SPEC-ZQL-DECLARATIVE-MUTATION-GRAMMAR",
+				},
+				"dry_run": map[string]any{
+					objects.FieldKeyType:        "boolean",
+					"default":                   false,
+					objects.FieldKeyDescription: "Perform preflight schema validation without persisting writes",
+				},
+			},
+		},
+		nil,
+	)
 }
