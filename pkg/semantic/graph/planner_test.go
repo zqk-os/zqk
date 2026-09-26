@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/semantic/graph"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -61,7 +62,7 @@ func TestPlanner_ContractSpecification(t *testing.T) {
 			},
 		},
 		Where: []graph.Predicate{
-			{Field: "b.status", Operator: "=", Value: "planned"},
+			{Field: "b.status", Operator: "=", Value: objects.ObjectStatusPlanned},
 			{Field: "c.category", Operator: "=", Value: "functional"},
 		},
 		ReturnVars: []string{"b", "c"},
@@ -115,10 +116,10 @@ func TestPlanner_IndexScanComplexityProof(t *testing.T) {
 
 	// 2. Create targeted matched subgraph (K = 4 nodes in a 3-hop path)
 	// (BLI-100) -[criteria_refs]-> (CRIT-201) -[test_case_refs]-> (TST-301) -[req_refs]-> (REQ-401)
-	storage.AddNode("BLI-100", "backlog_item", map[string]any{"status": "planned"})
-	storage.AddNode("CRIT-201", "criteria", map[string]any{"status": "originated"})
-	storage.AddNode("TST-301", "test_case", map[string]any{"status": "active"})
-	storage.AddNode("REQ-401", "requirement", map[string]any{"status": "complete"})
+	storage.AddNode("BLI-100", "backlog_item", map[string]any{objects.FieldKeyStatus: objects.ObjectStatusPlanned})
+	storage.AddNode("CRIT-201", "criteria", map[string]any{objects.FieldKeyStatus: objects.ObjectStatusOriginated})
+	storage.AddNode("TST-301", "test_case", map[string]any{objects.FieldKeyStatus: objects.ObjectStatusActive})
+	storage.AddNode("REQ-401", "requirement", map[string]any{objects.FieldKeyStatus: objects.ObjectStatusComplete})
 
 	storage.AddEdge("BLI-100", "criteria_refs", "CRIT-201")
 	storage.AddEdge("CRIT-201", "test_case_refs", "TST-301")
