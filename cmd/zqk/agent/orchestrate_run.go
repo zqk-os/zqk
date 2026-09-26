@@ -315,6 +315,35 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 		return state, nil
 	})
 
+	// Withhold downstream dependent tasks until upstream deliverables are verified (CRIT-QA-SHOCKWAVE-EVENT-DISPATCH).
+	b.AddStage("gate_shockwave_dependencies", func(pctx *pipeline.Context, payload any) (any, error) {
+		state := payload.(*orchestratorState)
+		if state.isStrategicPlan {
+			return state, nil
+		}
+		var kept []map[string]any
+		var withheldCount int
+		for _, item := range state.items {
+			if isBlockedByUnverifiedUpstream(pctx.Ctx, state.sp, state.proc.SecurityContext(), item) {
+				withheldCount++
+				logging.FluentEvent(state.proc.Logger()).Info("orchestrate withheld downstream dependent task awaiting upstream shockwave delivery").
+					ObjectID(koi.ID(item)).
+					String("criteria_ref", "CRIT-QA-SHOCKWAVE-EVENT-DISPATCH").
+					Log()
+				continue
+			}
+			kept = append(kept, item)
+		}
+		if withheldCount > 0 {
+			_ = cli.WriteOutput(state.cmd, []byte(fmt.Sprintf(
+				"ℹ️  Shockwave dependency gate (CRIT-QA-SHOCKWAVE-EVENT-DISPATCH): withheld %d dependent task(s) awaiting verified upstream artifacts.\n",
+				withheldCount,
+			)))
+		}
+		state.items = kept
+		return state, nil
+	})
+
 	b.AddStage("load_contexts", func(pctx *pipeline.Context, payload any) (any, error) {
 		state := payload.(*orchestratorState)
 		if state.opts.AmbientContext != "" {
@@ -1049,5 +1078,39 @@ func verifyBLITDDReady(ctx context.Context, sp storage.ObjectStorageProvider, se
 func isTestCaseReadyStatus(status string) bool {
 	s := strings.ToLower(strings.TrimSpace(status))
 	return s == "active" || s == "draft" || s == "metrics_captured" || s == "complete"
+}
+
+func isBlockedByUnverifiedUpstream(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, item map[string]any) bool {
+	if sp == nil || item == nil {
+		return false
+	}
+	kItem := koi.Wrap(item)
+
+	var upstreamIDs []string
+	if deps := kItem.GetStringSlice("depends_on"); len(deps) > 0 {
+		upstreamIDs = append(upstreamIDs, deps...)
+	}
+	if upstreamTasks := kItem.GetStringSlice("upstream_task_refs"); len(upstreamTasks) > 0 {
+		upstreamIDs = append(upstreamIDs, upstreamTasks...)
+	}
+
+	for _, upID := range upstreamIDs {
+		upObj, err := sp.Read(ctx, secCtx, upID)
+		if err != nil {
+			// If upstream object is not readable or missing, withhold downstream task
+			return true
+		}
+		kUp := koi.Wrap(upObj)
+		if kUp.Status() != objects.ObjectStatusComplete && kUp.Status() != "validated" {
+			return true
+		}
+		// If upstream item declares artifacts, verify that they are non-empty
+		artifacts := kUp.GetStringSlice(objects.FieldKeyArtifacts)
+		if len(artifacts) == 0 {
+			return true
+		}
+	}
+
+	return false
 }
 
