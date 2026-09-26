@@ -105,3 +105,33 @@ func TestZPARQLGraphTraversalSpec(t *testing.T) {
 	require.Contains(t, content, "ERR_ZPARQL_SYNTAX_ERROR")
 	require.Contains(t, content, "ERR_ZPARQL_INVALID_EDGE_TYPE")
 }
+
+func TestZQLTransactionExecutionSpec(t *testing.T) {
+	specsDir := findSpecsDir()
+	specPath := filepath.Join(specsDir, "SPEC-ZQL-TRANSACTION-EXECUTION.md")
+	data, err := os.ReadFile(specPath)
+	require.NoError(t, err, "ZQL transaction execution specification file must exist: %s", specPath)
+	content := string(data)
+	require.NotEmpty(t, content, "ZQL transaction execution specification content must not be empty")
+
+	// State machine lifecycle verification (CRIT-ZQL-TXN-ISOLATION-SPEC)
+	require.Contains(t, content, "BEGIN")
+	require.Contains(t, content, "STAGE")
+	require.Contains(t, content, "PRE_CHECK")
+	require.Contains(t, content, "COMMIT")
+	require.Contains(t, content, "ROLLBACK")
+
+	// Isolation modes verification (CRIT-ZQL-TXN-ISOLATION-SPEC)
+	require.Contains(t, content, "all_or_nothing")
+	require.Contains(t, content, "partial_commit")
+	require.Contains(t, content, "dry_run")
+
+	// Atomic rollback verification (CRIT-ZQL-ALL-OR-NOTHING-ROLLBACK-PROOF)
+	require.Contains(t, content, "CRIT-ZQL-ALL-OR-NOTHING-ROLLBACK-PROOF")
+	require.Contains(t, content, "Zero Orphan Guarantee")
+
+	// Write isolation and dirty-read concurrency verification (CRIT-ZQL-DIRTY-READ-CONCURRENCY-NEGATIVE)
+	require.Contains(t, content, "CRIT-ZQL-DIRTY-READ-CONCURRENCY-NEGATIVE")
+	require.Contains(t, content, "Zero Dirty-Read Invariant")
+}
+
