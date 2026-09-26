@@ -367,6 +367,9 @@ func getDraftPlaneTemplateForKind(kind string) map[string]any {
 			if isDraftPlaneMembraneField(field.Name) || field.Name == objects.FieldKeyKind || field.Name == objects.FieldKeyID || field.Name == objects.FieldKeySchemaVersion {
 				continue
 			}
+			if !field.Required {
+				continue
+			}
 			placeholder := draftFieldPlaceholder(field)
 			if placeholder != nil {
 				merged[field.Name] = placeholder
@@ -408,6 +411,9 @@ func isDraftPlaneMembraneField(fieldName string) bool {
 }
 
 func draftFieldPlaceholder(field objects.FieldInfo) any {
+	if len(field.EnumValues) > 0 {
+		return field.EnumValues[0]
+	}
 	switch field.Type {
 	case "datetime", "date":
 		return nil // Dates/datetimes cannot be empty strings in schema validation; omit until provided
@@ -415,7 +421,7 @@ func draftFieldPlaceholder(field objects.FieldInfo) any {
 		return ""
 	case "integer", "number":
 		return 0
-	case "boolean":
+	case "boolean", "bool":
 		return false
 	case "list", "array":
 		return []any{}
