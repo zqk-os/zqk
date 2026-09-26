@@ -1,4 +1,4 @@
-package docs_test
+package docman_test
 
 import (
 	"os"
@@ -9,10 +9,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// Satisfies CRIT-PHASE11-OPERABILITY-RUNBOOKS:
+// Automated test verifying operational incident runbook coverage, structure, and integrity.
 func TestRunbooksIntegrity(t *testing.T) {
-	runbooksDir := filepath.Join("..", "docs", "runbooks")
+	runbooksDir := filepath.Join("..", "..", "docs", "runbooks")
 	if _, err := os.Stat(runbooksDir); os.IsNotExist(err) {
-		runbooksDir = "runbooks"
+		runbooksDir = filepath.Join("docs", "runbooks")
 	}
 
 	requiredRunbooks := []string{

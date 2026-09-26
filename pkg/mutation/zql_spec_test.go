@@ -1,11 +1,24 @@
 package mutation_test
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
+
+func extractJSONBlock(content string) string {
+	re := regexp.MustCompile("(?s)```json\n(.*?)\n```")
+	matches := re.FindStringSubmatch(content)
+	if len(matches) > 1 {
+		return matches[1]
+	}
+	return ""
+}
 
 // Satisfies CRIT-ZQL-GRAMMAR-STATIC-SPEC:
 // Formal ISO/IEC 14977 EBNF grammar and Draft 2020-12 AST specification exists and defines canonical keywords.
@@ -38,6 +51,14 @@ func TestZQL_GrammarStaticSpec(t *testing.T) {
 			t.Errorf("ZQL specification missing required grammar token or section: %q", token)
 		}
 	}
+
+	// JSON Schema AST verification
+	jsonBlock := extractJSONBlock(specText)
+	require.NotEmpty(t, jsonBlock, "ZQL specification must contain an AST JSON Schema code block")
+	var schemaMap map[string]any
+	err = json.Unmarshal([]byte(jsonBlock), &schemaMap)
+	require.NoError(t, err, "ZQL AST schema block must be valid JSON")
+	require.Equal(t, "https://json-schema.org/draft/2020-12/schema", schemaMap["$schema"])
 }
 
 // Satisfies CRIT-ZQL-AST-VARIABLE-RESOLUTION:
@@ -159,4 +180,59 @@ func TestZQL_UnboundVariableAndCycleDetection_Negative(t *testing.T) {
 			t.Fatalf("expected unbound variable error for $unbound_parent, got: %v", unboundErrors)
 		}
 	})
+}
+
+// Satisfies CRIT-ZQL-TXN-ISOLATION-SPEC, CRIT-ZQL-ALL-OR-NOTHING-ROLLBACK-PROOF, CRIT-ZQL-DIRTY-READ-CONCURRENCY-NEGATIVE
+func TestZQLTransactionExecutionSpec(t *testing.T) {
+	specPath := filepath.Join("..", "..", "docs", "specs", "SPEC-ZQL-TRANSACTION-EXECUTION.md")
+	data, err := os.ReadFile(specPath)
+	require.NoError(t, err, "ZQL transaction execution specification file must exist: %s", specPath)
+	content := string(data)
+	require.NotEmpty(t, content, "ZQL transaction execution specification content must not be empty")
+
+	// State machine lifecycle verification (CRIT-ZQL-TXN-ISOLATION-SPEC)
+	require.Contains(t, content, "BEGIN")
+	require.Contains(t, content, "STAGE")
+	require.Contains(t, content, "PRE_CHECK")
+	require.Contains(t, content, "COMMIT")
+	require.Contains(t, content, "ROLLBACK")
+
+	// Isolation modes verification (CRIT-ZQL-TXN-ISOLATION-SPEC)
+	require.Contains(t, content, "all_or_nothing")
+	require.Contains(t, content, "partial_commit")
+	require.Contains(t, content, "dry_run")
+
+	// Atomic rollback verification (CRIT-ZQL-ALL-OR-NOTHING-ROLLBACK-PROOF)
+	require.Contains(t, content, "CRIT-ZQL-ALL-OR-NOTHING-ROLLBACK-PROOF")
+	require.Contains(t, content, "Zero Orphan Guarantee")
+
+	// Write isolation and dirty-read concurrency verification (CRIT-ZQL-DIRTY-READ-CONCURRENCY-NEGATIVE)
+	require.Contains(t, content, "CRIT-ZQL-DIRTY-READ-CONCURRENCY-NEGATIVE")
+	require.Contains(t, content, "Zero Dirty-Read Invariant")
+}
+
+// Satisfies CRIT-ZQL-INMEMORY-VALIDATION-CONTRACT, CRIT-ZQL-PREFLIGHT-DIAGNOSTIC-RECEIPT, CRIT-ZQL-SCHEMA-CORRUPTION-FAILCLOSED-NEGATIVE
+func TestZQLPreflightValidationSpec(t *testing.T) {
+	specPath := filepath.Join("..", "..", "docs", "specs", "SPEC-ZQL-PREFLIGHT-VALIDATION.md")
+	data, err := os.ReadFile(specPath)
+	require.NoError(t, err, "ZQL preflight validation specification file must exist: %s", specPath)
+	content := string(data)
+	require.NotEmpty(t, content, "ZQL preflight validation specification content must not be empty")
+
+	// Semantic Validator Contract (CRIT-ZQL-INMEMORY-VALIDATION-CONTRACT)
+	require.Contains(t, content, "PreflightValidator")
+	require.Contains(t, content, "Zero Disk I/O Invariant")
+	require.Contains(t, content, "CRIT-ZQL-INMEMORY-VALIDATION-CONTRACT")
+
+	// Diagnostic Receipt Protocol (CRIT-ZQL-PREFLIGHT-DIAGNOSTIC-RECEIPT)
+	require.Contains(t, content, "Preflight Diagnostic Receipt")
+	require.Contains(t, content, "SchemaViolation")
+	require.Contains(t, content, "field_path")
+	require.Contains(t, content, "failing_constraint")
+	require.Contains(t, content, "remediation")
+
+	// Fail-closed negative invariant (CRIT-ZQL-SCHEMA-CORRUPTION-FAILCLOSED-NEGATIVE)
+	require.Contains(t, content, "rejected_failclosed")
+	require.Contains(t, content, "CRIT-ZQL-SCHEMA-CORRUPTION-FAILCLOSED-NEGATIVE")
+	require.Contains(t, content, "Fail-Closed Boundary")
 }
