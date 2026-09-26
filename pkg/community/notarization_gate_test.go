@@ -3,12 +3,12 @@ package community
 import (
 	"encoding/json"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -29,7 +29,7 @@ func TestNotarizationGate_FunctionalAcceptance(t *testing.T) {
 		t.Fatalf("failed to write dummy binary: %v", err)
 	}
 
-	cmd := exec.Command("bash", scriptPath, dummyBin)
+	cmd := testkit.ManagedCommand(t, t.Context(), "bash", scriptPath, dummyBin)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("notarize script failed on dummy binary: %v, output: %s", err, string(out))
@@ -68,7 +68,7 @@ func TestNotarizationGate_BoundaryAndErrorHandling(t *testing.T) {
 	scriptPath := filepath.Join(root, "scripts", "notarize-and-sign-darwin.sh")
 
 	// Verify failure on missing target
-	cmd := exec.Command("bash", scriptPath, "/nonexistent/path/binary")
+	cmd := testkit.ManagedCommand(t, t.Context(), "bash", scriptPath, "/nonexistent/path/binary")
 	if err := cmd.Run(); err == nil {
 		t.Errorf("expected script to fail on missing target file")
 	}
@@ -81,13 +81,13 @@ func TestNotarizationGate_BoundaryAndErrorHandling(t *testing.T) {
 	}
 
 	// First run notarization metadata creation
-	signCmd := exec.Command("bash", scriptPath, dummyArchive)
+	signCmd := testkit.ManagedCommand(t, t.Context(), "bash", scriptPath, dummyArchive)
 	if out, err := signCmd.CombinedOutput(); err != nil {
 		t.Fatalf("failed to create notarization manifest: %v, out: %s", err, string(out))
 	}
 
 	// Then verify with --verify flag
-	verifyCmd := exec.Command("bash", scriptPath, "--verify", dummyArchive)
+	verifyCmd := testkit.ManagedCommand(t, t.Context(), "bash", scriptPath, "--verify", dummyArchive)
 	out, err := verifyCmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("expected --verify to succeed for signed archive: %v, out: %s", err, string(out))

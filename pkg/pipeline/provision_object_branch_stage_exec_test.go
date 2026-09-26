@@ -2,12 +2,12 @@ package pipeline
 
 import (
 	"context"
-	"os/exec"
 	"strings"
 	"sync"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 func TestProvisionObjectBranchStage(t *testing.T) {
@@ -32,26 +32,26 @@ func TestProvisionObjectBranchStage_Locking(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Init a dummy git repo
-	initCmd := exec.Command("git", "init")
+	initCmd := testkit.ManagedCommand(t, t.Context(), "git", "init")
 	initCmd.Dir = tmpDir
 	if err := initCmd.Run(); err != nil {
 		t.Fatalf("failed to init dummy git repo: %v", err)
 	}
 
 	// Create a dummy commit so show-ref and worktree have something to anchor to
-	configCmd1 := exec.Command("git", "config", "user.name", "test")
+	configCmd1 := testkit.ManagedCommand(t, t.Context(), "git", "config", "user.name", "test")
 	configCmd1.Dir = tmpDir
 	_ = configCmd1.Run()
-	configCmd2 := exec.Command("git", "config", "user.email", "test@example.com")
+	configCmd2 := testkit.ManagedCommand(t, t.Context(), "git", "config", "user.email", "test@example.com")
 	configCmd2.Dir = tmpDir
 	_ = configCmd2.Run()
 
 	// Ensure base branch is main
-	checkoutCmd := exec.Command("git", "checkout", "-b", "main")
+	checkoutCmd := testkit.ManagedCommand(t, t.Context(), "git", "checkout", "-b", "main")
 	checkoutCmd.Dir = tmpDir
 	_ = checkoutCmd.Run()
 
-	commitCmd := exec.Command("git", "commit", "--allow-empty", "-m", "initial commit")
+	commitCmd := testkit.ManagedCommand(t, t.Context(), "git", "commit", "--allow-empty", "-m", "initial commit")
 	commitCmd.Dir = tmpDir
 	if err := commitCmd.Run(); err != nil {
 		t.Fatalf("failed to create dummy commit: %v", err)

@@ -4,13 +4,13 @@ package scheduler
 
 import (
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strconv"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/scheduler"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -148,7 +148,7 @@ func TestSchedulerStart_PreventDuplicateCrossProcess(t *testing.T) {
 
 	// PID file must point to a *different* live process than this test. Using os.Getpid()
 	// makes startScheduler treat "running PID == us" and it proceeds into full daemon init (broken pipe).
-	foreign := exec.Command("sleep", "120")
+	foreign := testkit.ManagedCommand(t, t.Context(), "sleep", "120")
 	if err := foreign.Start(); err != nil {
 		t.Fatalf("failed to start stand-in process: %v", err)
 	}

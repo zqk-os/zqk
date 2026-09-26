@@ -2,12 +2,12 @@ package community
 
 import (
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -29,7 +29,7 @@ func TestDocsPortal_FunctionalAcceptance(t *testing.T) {
 	tmpDir := t.TempDir()
 	outDir := filepath.Join(tmpDir, "dist-docs-test")
 
-	cmd := exec.Command("bash", scriptPath, outDir)
+	cmd := testkit.ManagedCommand(t, t.Context(), "bash", scriptPath, outDir)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("generate-docs-portal.sh failed: %v, output: %s", err, string(out))
@@ -77,7 +77,7 @@ func TestDocsPortal_BoundaryAndErrorHandling(t *testing.T) {
 	scriptPath := filepath.Join(root, "scripts", "open-core", "docs-portal", "generate-docs-portal.sh")
 
 	// Verification mode failure on nonexistent tarball
-	cmd := exec.Command("bash", scriptPath, "--verify", "/nonexistent/path/docs.tar.gz")
+	cmd := testkit.ManagedCommand(t, t.Context(), "bash", scriptPath, "--verify", "/nonexistent/path/docs.tar.gz")
 	if err := cmd.Run(); err == nil {
 		t.Errorf("expected failure when verifying nonexistent tarball")
 	}
@@ -87,7 +87,7 @@ func TestDocsPortal_BoundaryAndErrorHandling(t *testing.T) {
 	outDir := filepath.Join(tmpDir, "dist-docs-verify")
 	tarballPath := outDir + ".tar.gz"
 
-	buildCmd := exec.Command("bash", scriptPath, outDir)
+	buildCmd := testkit.ManagedCommand(t, t.Context(), "bash", scriptPath, outDir)
 	if out, err := buildCmd.CombinedOutput(); err != nil {
 		t.Fatalf("build failed: %v, out: %s", err, string(out))
 	}
@@ -97,7 +97,7 @@ func TestDocsPortal_BoundaryAndErrorHandling(t *testing.T) {
 	}
 
 	// Verify tarball passes verification check
-	verifyCmd := exec.Command("bash", scriptPath, "--verify", tarballPath)
+	verifyCmd := testkit.ManagedCommand(t, t.Context(), "bash", scriptPath, "--verify", tarballPath)
 	out, err := verifyCmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("tarball verification failed: %v, out: %s", err, string(out))

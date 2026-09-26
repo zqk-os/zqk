@@ -3,10 +3,11 @@ package storage_test
 import (
 	"context"
 	"io"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/zqk-os/zqk/pkg/testkit"
 
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -20,7 +21,7 @@ import (
 
 func moduleRootFromGoEnv(t *testing.T) string {
 	t.Helper()
-	out, err := exec.Command("go", "env", "GOMOD").Output()
+	out, err := testkit.ManagedCommand(t, t.Context(), "go", "env", "GOMOD").Output()
 	if err != nil {
 		t.Fatalf("go env GOMOD: %v", err)
 	}

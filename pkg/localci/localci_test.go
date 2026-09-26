@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -43,7 +44,7 @@ func TestCheckoutDemote_gitWorktree(t *testing.T) {
 	repo := t.TempDir()
 	run := func(args ...string) {
 		t.Helper()
-		cmd := exec.Command("git", args...)
+		cmd := testkit.ManagedCommand(t, t.Context(), "git", args...)
 		cmd.Dir = repo
 		if out, err := cmd.CombinedOutput(); err != nil {
 			t.Fatalf("git %s: %s (%v)", strings.Join(args, " "), out, err)

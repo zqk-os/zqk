@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -41,7 +40,7 @@ func (f *fakeTB) Fatalf(format string, args ...any) {
 
 func TestCLISubprocess_Wire(t *testing.T) {
 	tmp := t.TempDir()
-	cmd := exec.Command("echo", "hello")
+	cmd := ManagedCommand(t, t.Context(), "echo", "hello")
 	WireCLISubprocessForIsolatedProject(cmd, tmp)
 	if cmd.Dir != tmp {
 		t.Fatalf("expected cmd.Dir %s, got %s", tmp, cmd.Dir)
@@ -61,7 +60,7 @@ func TestGitEvidence_ProductCommitMentioningBacklog(t *testing.T) {
 	}
 
 	// Verify commit message
-	cmd := exec.Command("git", "log", "-1", "--pretty=%B")
+	cmd := ManagedCommand(t, t.Context(), "git", "log", "-1", "--pretty=%B")
 	cmd.Dir = tmp
 	out, err := cmd.CombinedOutput()
 	if err != nil {

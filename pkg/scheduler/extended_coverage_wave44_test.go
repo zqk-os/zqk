@@ -148,7 +148,7 @@ func TestExtended_MeshLeaseSupervision_Wave44(t *testing.T) {
 
 	// 2. reapStaleSubprocesses with dummy cmd
 	activeLeases := map[string]bool{"LEASE-active": true}
-	cmd := exec.Command("true")
+	cmd := exec.CommandContext(t.Context(), "true")
 	_ = cmd.Start()
 	leaseSupervisionMutex.Lock()
 	activeLeaseSubprocesses["LEASE-stale"] = cmd

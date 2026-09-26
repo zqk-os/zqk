@@ -1,13 +1,13 @@
 package gitevidence_test
 
 import (
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/gitevidence"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -157,7 +157,7 @@ func head(t *testing.T, root string) string {
 
 func run(t *testing.T, dir string, name string, args ...string) string {
 	t.Helper()
-	cmd := exec.Command(name, args...) //nolint:gosec
+	cmd := testkit.ManagedCommand(t, t.Context(), name, args...) //nolint:gosec
 	cmd.Dir = dir
 	out, err := cmd.CombinedOutput()
 	if err != nil {

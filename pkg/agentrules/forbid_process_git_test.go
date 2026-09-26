@@ -2,12 +2,12 @@ package agentrules
 
 import (
 	"os"
-	"os/exec"
 	"path/filepath"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -40,7 +40,7 @@ func TestScanStashForProcessCAS_emptyStashExitsZero(t *testing.T) {
 	dir := t.TempDir()
 	run := func(args ...string) {
 		t.Helper()
-		cmd := exec.Command("git", args...) //nolint:gosec
+		cmd := testkit.ManagedCommand(t, t.Context(), "git", args...) //nolint:gosec
 		cmd.Dir = dir
 		if out, err := cmd.CombinedOutput(); err != nil {
 			t.Fatalf("git %v: %v\n%s", args, err, out)

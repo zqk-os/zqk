@@ -1,11 +1,11 @@
 package processhygiene_test
 
 import (
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -59,7 +59,7 @@ func TestRootScratchGitignoreAndHygiene(t *testing.T) {
 	}
 
 	// 3. Verify that forbidden scratch files are not tracked in git at root
-	cmd := exec.Command("git", "-C", repoRoot, "ls-files") //nolint:gosec
+	cmd := testkit.ManagedCommand(t, t.Context(), "git", "-C", repoRoot, "ls-files") //nolint:gosec
 	out, err := cmd.Output()
 	if err != nil {
 		t.Fatalf("git ls-files failed: %v", err)

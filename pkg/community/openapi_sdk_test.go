@@ -1,14 +1,15 @@
 package community_test
 
 import (
-	"github.com/zqk-os/zqk/pkg/paths"
 	"go/parser"
 	"go/token"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 func findRepoRootForSDK(t *testing.T) string {
@@ -41,7 +42,7 @@ func TestOpenAPIClientSDK_FunctionalAcceptance(t *testing.T) {
 	tmpDir := t.TempDir()
 	outDir := filepath.Join(tmpDir, "sdk")
 
-	cmd := exec.Command("bash", filepath.Join(repoRoot, "scripts", "generate-openapi-clients.sh"), outDir)
+	cmd := testkit.ManagedCommand(t, t.Context(), "bash", filepath.Join(repoRoot, "scripts", "generate-openapi-clients.sh"), outDir)
 	cmd.Dir = repoRoot
 	out, err := cmd.CombinedOutput()
 	if err != nil {
@@ -120,7 +121,7 @@ func TestOpenAPIClientSDK_BoundaryAndErrorHandling(t *testing.T) {
 
 	// Sub-test 1: Missing OpenAPI spec file
 	t.Run("MissingSpecFile", func(t *testing.T) {
-		cmd := exec.Command("python3", genScript, "--spec", filepath.Join(tmpDir, "non_existent.yaml"), "--out-dir", filepath.Join(tmpDir, "out1"))
+		cmd := testkit.ManagedCommand(t, t.Context(), "python3", genScript, "--spec", filepath.Join(tmpDir, "non_existent.yaml"), "--out-dir", filepath.Join(tmpDir, "out1"))
 		out, err := cmd.CombinedOutput()
 		if err == nil {
 			t.Fatalf("expected error for missing spec file, but command succeeded:\n%s", string(out))
@@ -133,7 +134,7 @@ func TestOpenAPIClientSDK_BoundaryAndErrorHandling(t *testing.T) {
 		if err := os.WriteFile(badYaml, []byte("just a string, not a valid openapi dict\n"), paths.FilePerm644); err != nil {
 			t.Fatalf("failed to write bad.yaml: %v", err)
 		}
-		cmd := exec.Command("python3", genScript, "--spec", badYaml, "--out-dir", filepath.Join(tmpDir, "out2"))
+		cmd := testkit.ManagedCommand(t, t.Context(), "python3", genScript, "--spec", badYaml, "--out-dir", filepath.Join(tmpDir, "out2"))
 		out, err := cmd.CombinedOutput()
 		if err == nil {
 			t.Fatalf("expected error for malformed spec YAML, but command succeeded:\n%s", string(out))
@@ -147,7 +148,7 @@ func TestOpenAPIClientSDK_BoundaryAndErrorHandling(t *testing.T) {
 		if err := os.WriteFile(noPathsYaml, []byte(content), paths.FilePerm644); err != nil {
 			t.Fatalf("failed to write nopaths.yaml: %v", err)
 		}
-		cmd := exec.Command("python3", genScript, "--spec", noPathsYaml, "--out-dir", filepath.Join(tmpDir, "out3"))
+		cmd := testkit.ManagedCommand(t, t.Context(), "python3", genScript, "--spec", noPathsYaml, "--out-dir", filepath.Join(tmpDir, "out3"))
 		out, err := cmd.CombinedOutput()
 		if err == nil {
 			t.Fatalf("expected error for empty paths, but command succeeded:\n%s", string(out))
@@ -172,7 +173,7 @@ paths:
 		if err := os.WriteFile(noOpIdYaml, []byte(content), paths.FilePerm644); err != nil {
 			t.Fatalf("failed to write noopid.yaml: %v", err)
 		}
-		cmd := exec.Command("python3", genScript, "--spec", noOpIdYaml, "--out-dir", filepath.Join(tmpDir, "out4"))
+		cmd := testkit.ManagedCommand(t, t.Context(), "python3", genScript, "--spec", noOpIdYaml, "--out-dir", filepath.Join(tmpDir, "out4"))
 		out, err := cmd.CombinedOutput()
 		if err == nil {
 			t.Fatalf("expected error for missing operationId, but command succeeded:\n%s", string(out))
@@ -182,7 +183,7 @@ paths:
 	// Sub-test 5: Unsupported target language
 	t.Run("UnsupportedLanguage", func(t *testing.T) {
 		specPath := filepath.Join(repoRoot, "docs", "api", "openapi.yaml")
-		cmd := exec.Command("python3", genScript, "--spec", specPath, "--out-dir", filepath.Join(tmpDir, "out5"), "--languages", "ruby")
+		cmd := testkit.ManagedCommand(t, t.Context(), "python3", genScript, "--spec", specPath, "--out-dir", filepath.Join(tmpDir, "out5"), "--languages", "ruby")
 		out, err := cmd.CombinedOutput()
 		if err == nil {
 			t.Fatalf("expected error for unsupported language 'ruby', but command succeeded:\n%s", string(out))
@@ -201,14 +202,14 @@ func TestOpenAPIClientSDK_IntegrationAndConformance(t *testing.T) {
 	outDir := filepath.Join(tmpDir, "sdk")
 
 	// Generate SDK
-	cmd := exec.Command("bash", filepath.Join(repoRoot, "scripts", "generate-openapi-clients.sh"), outDir)
+	cmd := testkit.ManagedCommand(t, t.Context(), "bash", filepath.Join(repoRoot, "scripts", "generate-openapi-clients.sh"), outDir)
 	cmd.Dir = repoRoot
 	if out, err := cmd.CombinedOutput(); err != nil {
 		t.Fatalf("generate-openapi-clients.sh failed: %v\nOutput:\n%s", err, string(out))
 	}
 
 	// Verify mode on valid output
-	vCmd := exec.Command("bash", filepath.Join(repoRoot, "scripts", "generate-openapi-clients.sh"), "--verify", outDir)
+	vCmd := testkit.ManagedCommand(t, t.Context(), "bash", filepath.Join(repoRoot, "scripts", "generate-openapi-clients.sh"), "--verify", outDir)
 	vCmd.Dir = repoRoot
 	if out, err := vCmd.CombinedOutput(); err != nil {
 		t.Fatalf("generate-openapi-clients.sh --verify failed on valid directory: %v\nOutput:\n%s", err, string(out))
@@ -219,7 +220,7 @@ func TestOpenAPIClientSDK_IntegrationAndConformance(t *testing.T) {
 	if err := os.MkdirAll(corruptedDir, paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create corrupted dir: %v", err)
 	}
-	vFailCmd := exec.Command("bash", filepath.Join(repoRoot, "scripts", "generate-openapi-clients.sh"), "--verify", corruptedDir)
+	vFailCmd := testkit.ManagedCommand(t, t.Context(), "bash", filepath.Join(repoRoot, "scripts", "generate-openapi-clients.sh"), "--verify", corruptedDir)
 	vFailCmd.Dir = repoRoot
 	if out, err := vFailCmd.CombinedOutput(); err == nil {
 		t.Fatalf("expected --verify to fail on empty directory, but it succeeded:\n%s", string(out))

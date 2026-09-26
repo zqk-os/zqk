@@ -151,7 +151,7 @@ func TestExtended_CapOrchestrator_DeepCoverage(t *testing.T) {
 	ctx := context.Background()
 
 	// 1. prepareCmd
-	cmd := exec.Command("echo", "hello")
+	cmd := exec.CommandContext(ctx, "echo", "hello")
 	cmd = handler.prepareCmd(cmd)
 	foundSysAccount := false
 	for _, env := range cmd.Env {

@@ -9,6 +9,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 func TestFieldsCommand(t *testing.T) {
@@ -42,7 +44,7 @@ func TestFieldsCommand(t *testing.T) {
 
 	t.Run("List fields for kind", func(t *testing.T) {
 		// Test new syntax: object <kind> fields
-		cmd := exec.Command(cliBinary, "object", pplanKindBacklogItem, "fields")
+		cmd := testkit.ManagedCommand(t, t.Context(), cliBinary, "object", pplanKindBacklogItem, "fields")
 		wireExecForTest(cmd, env.TestRoot)
 		output, err := cmd.CombinedOutput()
 		if err != nil {
@@ -61,7 +63,7 @@ func TestFieldsCommand(t *testing.T) {
 
 	t.Run("List filterable fields", func(t *testing.T) {
 		// Test new syntax: object <kind> fields --filterable (flag may be unknown when kind is not a subcommand, e.g. bundler)
-		cmd := exec.Command(cliBinary, "object", pplanKindBacklogItem, "fields", "--filterable")
+		cmd := testkit.ManagedCommand(t, t.Context(), cliBinary, "object", pplanKindBacklogItem, "fields", "--filterable")
 		wireExecForTest(cmd, env.TestRoot)
 		output, err := cmd.CombinedOutput()
 		outStr := string(output)
@@ -79,7 +81,7 @@ func TestFieldsCommand(t *testing.T) {
 
 	t.Run("JSON output", func(t *testing.T) {
 		// Test new syntax: object <kind> fields --format json
-		cmd := exec.Command(cliBinary, "object", pplanKindBacklogItem, "fields", "--format", objectFormatJSON)
+		cmd := testkit.ManagedCommand(t, t.Context(), cliBinary, "object", pplanKindBacklogItem, "fields", "--format", objectFormatJSON)
 		wireExecForTest(cmd, env.TestRoot)
 		output, err := cmd.CombinedOutput()
 		if err != nil {

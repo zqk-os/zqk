@@ -2,7 +2,6 @@ package system
 
 import (
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -261,7 +260,7 @@ func TestCommunitySourceOverlay_IntegrityAndProcessPreservation(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	cmd := exec.Command(overlayScript, tmpDest)
+	cmd := testkit.ManagedCommand(t, t.Context(), overlayScript, tmpDest)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("apply-community-source.sh failed: %v, output: %s", err, string(out))
@@ -305,7 +304,7 @@ func TestCommunitySourceOverlay_IntegrityAndProcessPreservation(t *testing.T) {
 	if err := os.WriteFile(destReadmePath, customReadme, paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
-	cmd2 := exec.Command(overlayScript, tmpDest)
+	cmd2 := testkit.ManagedCommand(t, t.Context(), overlayScript, tmpDest)
 	if out2, err := cmd2.CombinedOutput(); err != nil {
 		t.Fatalf("second apply-community-source.sh run failed: %v, output: %s", err, string(out2))
 	}

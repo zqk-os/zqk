@@ -3,17 +3,17 @@ package testrunner_test
 import (
 	"bytes"
 	"context"
-	"os/exec"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/testkit"
 	"github.com/zqk-os/zqk/pkg/testrunner"
 )
 
 // TestStreamTests_EmptyOrSinglePkg verifies BLI-SCRIPT-PROD-TESTING-002 test progress streaming.
 func TestStreamTests_EmptyOrSinglePkg(t *testing.T) {
-	outBytes, err := exec.Command("git", "rev-parse", "--show-toplevel").Output()
+	outBytes, err := testkit.ManagedCommand(t, t.Context(), "git", "rev-parse", "--show-toplevel").Output()
 	if err != nil {
 		t.Fatalf("git rev-parse: %v", err)
 	}
