@@ -8,13 +8,13 @@ import (
 	"encoding/hex"
 	"fmt"
 	"math/big"
-	"os"
 	"path/filepath"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/validation"
 )
 
@@ -64,7 +64,7 @@ func (g *AuditorGate) VerifyComplete(ctx context.Context, itemID string) error {
 			if !filepath.IsAbs(targetPath) && g.projectRoot != "" {
 				targetPath = filepath.Join(g.projectRoot, targetPath)
 			}
-			info, statErr := os.Stat(targetPath)
+			info, statErr := fileutil.Stat(targetPath)
 			if statErr != nil || info.IsDir() {
 				return fmt.Errorf(errFmtLatch1ArtifactNotFound, p)
 			}

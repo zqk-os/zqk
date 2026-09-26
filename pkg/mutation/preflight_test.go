@@ -2,12 +2,12 @@ package mutation_test
 
 import (
 	"context"
-	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 	"github.com/zqk-os/zqk/pkg/mutation"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // Satisfies CRIT-ZQL-INMEMORY-VALIDATION-CONTRACT:
@@ -22,7 +22,7 @@ func TestPreflight_InMemoryValidationContract(t *testing.T) {
 	var specContent string
 	var found bool
 	for _, p := range specCandidates {
-		if data, err := os.ReadFile(p); err == nil {
+		if data, err := fileutil.ReadFile(p); err == nil {
 			specContent = string(data)
 			found = true
 			break

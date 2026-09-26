@@ -1,19 +1,19 @@
 package docman_test
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // Satisfies CRIT-PHASE11-OPERABILITY-RUNBOOKS:
 // Automated test verifying operational incident runbook coverage, structure, and integrity.
 func TestRunbooksIntegrity(t *testing.T) {
 	runbooksDir := filepath.Join("..", "..", "docs", "runbooks")
-	if _, err := os.Stat(runbooksDir); os.IsNotExist(err) {
+	if _, err := fileutil.Stat(runbooksDir); fileutil.IsNotExist(err) {
 		runbooksDir = filepath.Join("docs", "runbooks")
 	}
 
@@ -27,7 +27,7 @@ func TestRunbooksIntegrity(t *testing.T) {
 
 	for _, filename := range requiredRunbooks {
 		path := filepath.Join(runbooksDir, filename)
-		data, err := os.ReadFile(path)
+		data, err := fileutil.ReadFile(path)
 		require.NoError(t, err, "runbook file should exist: %s", path)
 		content := string(data)
 		require.NotEmpty(t, content, "runbook content should not be empty")

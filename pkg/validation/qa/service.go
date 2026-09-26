@@ -3,7 +3,6 @@ package qa
 import (
 	"context"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -212,7 +211,7 @@ func (s *AuditorService) performAudit(ctx context.Context, id string, kind strin
 
 	// For all declared artifacts, verify that the files actually exist on disk before running AST analysis.
 	for _, path := range artifactPaths {
-		info, err := os.Stat(path)
+		info, err := fileutil.Stat(path)
 		if err != nil || info.IsDir() {
 			reason := fmt.Sprintf("Artifact file does not exist or cannot be read: %s", path)
 			logging.FluentEvent(logger).Warn(fmt.Sprintf(LogFmtAuditorContentDisparity, id, reason)).Log()
@@ -223,7 +222,7 @@ func (s *AuditorService) performAudit(ctx context.Context, id string, kind strin
 			}
 			return
 		}
-		f, err := os.Open(path)
+		f, err := fileutil.Open(path)
 		if err != nil {
 			reason := fmt.Sprintf("Artifact file cannot be read: %s", path)
 			logging.FluentEvent(logger).Warn(fmt.Sprintf(LogFmtAuditorContentDisparity, id, reason)).Log()

@@ -2,13 +2,13 @@ package qa
 
 import (
 	"context"
-	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 const (
@@ -24,15 +24,18 @@ func TestAuditorGate_LatchCountdownSequenceDedicated(t *testing.T) {
 	secCtx := pkgctx.NewSystemSecurityContext()
 	tmpDir := t.TempDir()
 
-	store := &mockGateStore{
-		objs: make(map[string]map[string]any),
-	}
+	store := newMockQASuccessStore()
 
 	signer, err := NewAuditorSigner("")
 	require.NoError(t, err, testErrSignerFailed)
 
+	store.objs[AuditorKeyID] = map[string]any{
+		objects.FieldKeyID:          AuditorKeyID,
+		objects.FieldKeyDescription: signer.PublicKey(),
+	}
+
 	cleanFile := filepath.Join(tmpDir, testCleanFileName)
-	err = os.WriteFile(cleanFile, []byte(testValidGoContent), 0644)
+	err = fileutil.WriteFile(cleanFile, []byte(testValidGoContent), 0644)
 	require.NoError(t, err)
 
 	store.objs[testLatchBacklogItemID] = map[string]any{
@@ -57,7 +60,7 @@ func TestAuditorGate_LatchCountdownSequenceDedicated(t *testing.T) {
 	require.NoError(t, err, testErrGatePassedExpected)
 }
 
-func gateVerify(ctx context.Context, store *mockGateStore, itemID string) error {
+func gateVerify(ctx context.Context, store *mockQASuccessStore, itemID string) error {
 	gate := NewAuditorGate(store)
 	return gate.VerifyComplete(ctx, itemID)
 }

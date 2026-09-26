@@ -6,6 +6,8 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 const (
@@ -91,7 +93,7 @@ func (p *StreamProducer) Stream(
 
 	out := make(chan StreamFrame, bufferCapacity)
 
-	go func() {
+	goroutinelabels.NewGoroutine("zparql_stream_emitter", "streaming query results in reactive chunks").StartSimple(func() {
 		defer close(out)
 
 		// 1. Emit Header Frame
@@ -137,7 +139,7 @@ func (p *StreamProducer) Stream(
 			return
 		case out <- StreamFrame{Type: FrameTypeTrailer, Trailer: &trailer}:
 		}
-	}()
+	})
 
 	return out
 }

@@ -2,12 +2,12 @@ package traversal_test
 
 import (
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"regexp"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func findSpecsDir() string {
@@ -18,8 +18,8 @@ func findSpecsDir() string {
 		".",
 	}
 	for _, c := range candidates {
-		if fi, err := os.Stat(c); err == nil && fi.IsDir() {
-			if _, err := os.Stat(filepath.Join(c, "SPEC-ZPARQL-GRAPH-TRAVERSAL-GRAMMAR.md")); err == nil {
+		if fi, err := fileutil.Stat(c); err == nil && fi.IsDir() {
+			if _, err := fileutil.Stat(filepath.Join(c, "SPEC-ZPARQL-GRAPH-TRAVERSAL-GRAMMAR.md")); err == nil {
 				return c
 			}
 		}
@@ -40,7 +40,7 @@ func extractJSONBlock(content string) string {
 func TestZPARQLGraphTraversalSpec(t *testing.T) {
 	specsDir := findSpecsDir()
 	specPath := filepath.Join(specsDir, "SPEC-ZPARQL-GRAPH-TRAVERSAL-GRAMMAR.md")
-	data, err := os.ReadFile(specPath)
+	data, err := fileutil.ReadFile(specPath)
 	require.NoError(t, err, "ZPARQL specification file must exist: %s", specPath)
 	content := string(data)
 	require.NotEmpty(t, content, "ZPARQL specification content must not be empty")
@@ -75,7 +75,7 @@ func TestZPARQLGraphTraversalSpec(t *testing.T) {
 func TestZPARQLIndexedQueryPlannerSpec(t *testing.T) {
 	specsDir := findSpecsDir()
 	specPath := filepath.Join(specsDir, "SPEC-ZPARQL-INDEXED-QUERY-PLANNER.md")
-	data, err := os.ReadFile(specPath)
+	data, err := fileutil.ReadFile(specPath)
 	require.NoError(t, err, "ZPARQL query planner specification file must exist: %s", specPath)
 	content := string(data)
 	require.NotEmpty(t, content, "ZPARQL query planner specification content must not be empty")
@@ -100,7 +100,7 @@ func TestZPARQLIndexedQueryPlannerSpec(t *testing.T) {
 func TestZPARQLResultStreamingSpec(t *testing.T) {
 	specsDir := findSpecsDir()
 	specPath := filepath.Join(specsDir, "SPEC-ZPARQL-RESULT-STREAMING.md")
-	data, err := os.ReadFile(specPath)
+	data, err := fileutil.ReadFile(specPath)
 	require.NoError(t, err, "ZPARQL result streaming specification file must exist: %s", specPath)
 	content := string(data)
 	require.NotEmpty(t, content, "ZPARQL result streaming specification content must not be empty")
