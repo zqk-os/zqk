@@ -5,14 +5,16 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/zqk-os/zqk/pkg/agentfeed"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/observer"
 )
 
 const (
-	observerSearchToolSuffix   = "observer_search"
-	observerRegisterToolSuffix = "observer_register_agent"
-	observerSearchMaxHits      = 20
+	observerSearchToolSuffix          = "observer_search"
+	observerRegisterToolSuffix        = "observer_register_agent"
+	observerRequestGuidanceToolSuffix = "request_guidance"
+	observerSearchMaxHits             = 20
 )
 
 // RegisterObserverTools exposes live Go AST search and agent registration.
@@ -67,6 +69,30 @@ func RegisterObserverTools(server *Server) {
 			"required": []string{"account_id"},
 		},
 		server.handleObserverRegisterTool,
+	)
+
+	server.RegisterTool(
+		GetToolName(observerRequestGuidanceToolSuffix),
+		"Request ambient assistance and dynamic steering from the Observer Coach and team feed when encountering ambiguity, permission denials, or missing deliverables. Provide your question/obstacle, context, and optional task ID. Returns actionable guidance and logs the signal to the agent feed.",
+		map[string]any{
+			objects.FieldKeyType: "object",
+			"properties": map[string]any{
+				"query": map[string]any{
+					objects.FieldKeyType:        "string",
+					objects.FieldKeyDescription: "The question, obstacle, or ambiguity you need guidance on",
+				},
+				"task_id": map[string]any{
+					objects.FieldKeyType:        "string",
+					objects.FieldKeyDescription: "Optional current task ID (e.g. ATK-*, BLI-*)",
+				},
+				"context": map[string]any{
+					objects.FieldKeyType:        "string",
+					objects.FieldKeyDescription: "Optional context, attempted steps, or observed error messages",
+				},
+			},
+			"required": []string{"query"},
+		},
+		server.handleObserverRequestGuidanceTool,
 	)
 }
 
@@ -157,4 +183,89 @@ func (s *Server) handleObserverRegisterTool(ctx context.Context, args map[string
 	}
 
 	return fmt.Sprintf("Successfully registered agent %s with roles %v and profile %s", accountID, roles, profile), nil
+}
+
+func (s *Server) handleObserverRequestGuidanceTool(ctx context.Context, args map[string]any) (any, error) {
+	root := s.fileSandboxRoot()
+	if s.initCtx != nil && s.initCtx.ProjectRoot != "" {
+		root = s.initCtx.ProjectRoot
+	}
+	return HandleObserverRequestGuidance(ctx, root, args)
+}
+
+// HandleObserverRequestGuidance queries the Observer Coach and logs the signal to the agent feed.
+func HandleObserverRequestGuidance(ctx context.Context, projectRoot string, args map[string]any) (any, error) {
+	query, _ := args["query"].(string)
+	if strings.TrimSpace(query) == "" {
+		if q, ok := args["issue"].(string); ok {
+			query = q
+		} else if q, ok := args["message"].(string); ok {
+			query = q
+		} else if q, ok := args["question"].(string); ok {
+			query = q
+		}
+	}
+	if strings.TrimSpace(query) == "" {
+		return nil, fmt.Errorf("query is required: describe what guidance, clarification, or obstacle you need help with")
+	}
+
+	taskID, _ := args[objects.FieldKeyID].(string)
+	if taskID == "" {
+		taskID, _ = args["task_id"].(string)
+	}
+	contextDetails, _ := args["context"].(string)
+
+	// 1. Emit assistance signal onto agent_feed for collaboration traceability
+	if projectRoot != "" {
+		_, _ = agentfeed.AppendEvent(agentfeed.AppendEventInput{
+			ProjectRoot:      projectRoot,
+			Message:          fmt.Sprintf("ASSISTANCE_REQUEST (task %s): %s | Context: %s", taskID, query, contextDetails),
+			AgentID:          "swarm_agent",
+			ToAgentID:        "observer_coach",
+			Sender:           "agent_assistance_signal",
+			EventType:        agentfeed.FeedEventTypeSteering,
+			SkipEnabledCheck: true,
+		})
+	}
+
+	// 2. Synthesize actionable guidance from Observer Coach
+	var sb strings.Builder
+	sb.WriteString(fmt.Sprintf("### Observer Coach Guidance (Task: %s)\n", taskID))
+	sb.WriteString(fmt.Sprintf("**Query:** %s\n\n", query))
+
+	lowerQ := strings.ToLower(query + " " + contextDetails)
+	if strings.Contains(lowerQ, "where") || strings.Contains(lowerQ, "find") || strings.Contains(lowerQ, "deliverable") || strings.Contains(lowerQ, "artifact") || strings.Contains(lowerQ, "eval") {
+		sb.WriteString("#### Deliverable & File Guidance:\n")
+		sb.WriteString("- Artifact deliverables MUST be written to repository files using `write_file` or `write_code`.\n")
+		sb.WriteString("- Code evaluations and reviews belong in `docs/eval/*.md` or the directory specified by upstream deliverables.\n")
+		sb.WriteString("- Do not invent speculative kernel object kinds (e.g. `eval_finding`). Use standard files or registered kinds.\n\n")
+	}
+
+	if strings.Contains(lowerQ, "permission") || strings.Contains(lowerQ, "denied") || strings.Contains(lowerQ, "read-only") || strings.Contains(lowerQ, "system") {
+		sb.WriteString("#### Permission & Scope Guidance:\n")
+		sb.WriteString("- Swarm workers run with plan-scoped permissions. They cannot mutate system-managed fields (`created_at`, `updated_at`, `status`).\n")
+		sb.WriteString("- Status transitions are managed by the orchestrator upon write verification. Focus solely on producing code/doc artifacts.\n\n")
+	}
+
+	if strings.Contains(lowerQ, "symbol") || strings.Contains(lowerQ, "function") || strings.Contains(lowerQ, "type") || strings.Contains(lowerQ, "code") {
+		sb.WriteString("#### AST Discovery Guidance:\n")
+		sb.WriteString("- Use `zqk_observer_search` with symbol substrings or package paths to locate symbols in the live AST.\n")
+		sb.WriteString("- Read discovered code with `read_code` or `read_file`.\n\n")
+	}
+
+	if projectRoot != "" {
+		tips := observer.ReadCachedTips(projectRoot)
+		if len(tips) > 0 {
+			sb.WriteString("#### Ambient System Insights:\n")
+			for _, tip := range tips {
+				sb.WriteString(fmt.Sprintf("- %s\n", tip))
+			}
+			sb.WriteString("\n")
+		}
+	}
+
+	sb.WriteString("#### Recommended Immediate Action:\n")
+	sb.WriteString("Proceed with editing or creating the target deliverable files using `write_file`/`write_code`. If you need to search codebase symbols, run `zqk_observer_search`.\n")
+
+	return sb.String(), nil
 }

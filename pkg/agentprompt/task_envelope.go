@@ -125,6 +125,11 @@ func FormatTaskEnvelope(opts TaskPromptOptions, policyRefs, skillRefs []string) 
 		sb.WriteString(opts.TaskContext)
 		sb.WriteString("\n")
 	}
+	if opts.UpstreamDeliverables != "" {
+		sb.WriteString("\n")
+		sb.WriteString(strings.TrimSpace(opts.UpstreamDeliverables))
+		sb.WriteString("\n")
+	}
 
 	if len(policyRefs) > 0 {
 		sb.WriteString("\n## Standing & bound policies (do not duplicate bodies)\n")

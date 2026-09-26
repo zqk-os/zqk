@@ -121,7 +121,8 @@ type TaskPromptOptions struct {
 	// IncludeObserver adds a live, task-scoped AST hint. Default is the tool-access
 	// pointer only. Never persist the hint on agent_task.
 	IncludeObserver bool
-	TaskSteps       string // Pre-formatted task steps section (or synthesized mutation steps)
+	TaskSteps            string // Pre-formatted task steps section (or synthesized mutation steps)
+	UpstreamDeliverables string // Markdown section of verified upstream deliverables from dependency shockwaves
 }
 
 // BuildTaskPrompt creates a unified markdown prompt for an agent task, incorporating
@@ -261,6 +262,14 @@ func BuildTaskPrompt(ctx context.Context, sp storage.ObjectStorageProvider, secC
 			Tokens:  len(ambientSection) / 4,
 			Weight:  0.7,
 			Payload: ambientSection + "\n",
+		})
+	}
+	if opts.UpstreamDeliverables != "" {
+		candidates = append(candidates, pipeline.ContextNode{
+			ID:      "upstream_deliverables",
+			Tokens:  len(opts.UpstreamDeliverables) / 4,
+			Weight:  0.95,
+			Payload: opts.UpstreamDeliverables + "\n",
 		})
 	}
 

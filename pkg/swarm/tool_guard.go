@@ -32,12 +32,28 @@ var inventedMutationTools = map[string]struct{}{
 	"commit":       {},
 }
 
-var inventedObjectListKinds = map[string]struct{}{
+var inventedObjectKinds = map[string]struct{}{
 	objects.FieldKeySourceFile: {},
 	"code_file":                {},
 	"file":                     {},
 	objects.FieldKeySource:     {},
 	objects.FieldKeyCode:       {},
+	"eval_finding":             {},
+	"evaluation_finding":       {},
+	"evaluation_report":        {},
+	"eval_report":              {},
+	"evaluation":               {},
+	"finding":                  {},
+	"security_finding":         {},
+	"quality_finding":          {},
+	"architecture_finding":     {},
+	"docs_eval":                {},
+	"test_report":              {},
+	"report":                   {},
+	"deliverable":              {},
+	"document":                 {},
+	"documentation":            {},
+	"metric":                   {},
 }
 
 // guardSwarmToolCall steers invented or lifecycle-illegal calls into guidance
@@ -57,8 +73,8 @@ func guardSwarmToolCall(call llm.ToolCall) (result string, handled bool) {
 		return PlaceholderObjectIDGuidance(), true
 	case isObjectListTool(name) && unscopedObjectList(call.Arguments):
 		return UnscopedObjectListGuidance(), true
-	case isObjectListTool(name) && inventedObjectListKind(call.Arguments):
-		return InventedObjectListKindGuidance(), true
+	case (isObjectListTool(name) || isObjectCreateTool(name) || isObjectUpdateTool(name)) && isInventedObjectKind(call.Arguments):
+		return InventedObjectKindGuidance(extractedObjectKind(call.Arguments)), true
 	case isObjectListTool(name) && oversizedObjectList(call.Arguments):
 		return OversizedObjectListGuidance(), true
 	case toolSuffixIs(name, "mcp_call_tool") && mcpCallInnerIsNotATool(call.Arguments):
@@ -159,6 +175,10 @@ func namedToolInSet(name string, set map[string]struct{}) bool {
 	return false
 }
 
+func isObjectCreateTool(name string) bool {
+	return toolSuffixIs(name, "object_create")
+}
+
 func isObjectUpdateTool(name string) bool {
 	return toolSuffixIs(name, "object_update")
 }
@@ -245,11 +265,33 @@ func UnscopedObjectListGuidance() string {
 }
 
 func InventedObjectListKindGuidance() string {
+	return InventedObjectKindGuidance("source_file")
+}
+
+func InventedObjectKindGuidance(kind string) string {
+	p := DefaultToolPrefix()
+	if kind == "source_file" || kind == "code_file" || kind == "file" || kind == "source" || kind == "code" {
+		return fmt.Sprintf(
+			"GUIDANCE: source files are not kernel object kinds. Use %sread_code / %sread_file on a real repo path. "+
+				"%sobject_list is only for registered kinds (backlog_item, agent_task, …).",
+			p, p, p,
+		)
+	}
+	return fmt.Sprintf(
+		"GUIDANCE: %q is not a valid kernel object kind. Kernel kinds are ontological graph nodes (backlog_item, criteria, requirement, test_case, milestone, priority_plan, etc.). "+
+			"Evaluation findings, reports, and code deliverables MUST be written to repository deliverable files (e.g. docs/eval/*.md or pkg/...) using %swrite_file or %swrite_code. "+
+			"To ask for clarification on paths, call %srequest_guidance.",
+		kind, p, p, p,
+	)
+}
+
+func PermissionDenialGuidance(errStr string) string {
 	p := DefaultToolPrefix()
 	return fmt.Sprintf(
-		"GUIDANCE: source files are not kernel object kinds. Use %sread_code / %sread_file on a real repo path. "+
-			"%sobject_list is only for registered kinds (backlog_item, agent_task, …).",
-		p, p, p,
+		"GUIDANCE: Permission denial encountered (%s). Worker accounts have plan-scoped permissions and cannot modify system-managed fields (created_at, updated_at, status) or restricted root objects. "+
+			"Produce your task deliverables by creating or updating files with %swrite_code / %swrite_file instead of mutating restricted kernel objects. "+
+			"If you are unsure of your scope or deliverables, call %srequest_guidance for steering.",
+		errStr, p, p, p,
 	)
 }
 
@@ -362,13 +404,24 @@ func objectListLimit(args map[string]any) (int, bool) {
 	}
 }
 
-func inventedObjectListKind(arguments string) bool {
+func extractedObjectKind(arguments string) string {
 	args := parseToolArgs(arguments)
 	if args == nil {
-		return false
+		return ""
 	}
 	kind := strings.ToLower(strings.TrimSpace(stringifyArg(args[objects.FieldKeyKind])))
-	_, ok := inventedObjectListKinds[kind]
+	if kind == "" {
+		kind = strings.ToLower(strings.TrimSpace(stringifyArg(args["object_kind"])))
+	}
+	return kind
+}
+
+func isInventedObjectKind(arguments string) bool {
+	kind := extractedObjectKind(arguments)
+	if kind == "" {
+		return false
+	}
+	_, ok := inventedObjectKinds[kind]
 	return ok
 }
 

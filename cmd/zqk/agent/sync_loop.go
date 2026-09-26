@@ -140,7 +140,6 @@ func stripGraphBloat(obj map[string]any) {
 	delete(obj, objects.FieldKeyResolvedRelatedObjectRefs)
 	delete(obj, objects.FieldKeyStatusHistory)
 	delete(obj, objects.FieldKeyChangeLog)
-	delete(obj, objects.FieldKeyArtifacts)
 
 	for k, v := range obj {
 		if strings.HasPrefix(k, "resolved_") {

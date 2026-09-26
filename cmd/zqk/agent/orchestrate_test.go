@@ -646,3 +646,29 @@ func containsEnvLine(ss []string, want string) bool {
 	}
 	return false
 }
+
+// Satisfies CRIT-SWARM-MODEL-ROUTING-001:
+// Verifies heterogeneous model tier delegation boundaries between local swarm workers and hosted seats.
+func TestNativeSwarmEligible_ModelTierRouting(t *testing.T) {
+	t.Parallel()
+	cases := []struct {
+		tier string
+		want bool
+	}{
+		{"tier_1_complex", false},
+		{"TIER_1_COMPLEX", false},
+		{"tier_1_routine", true},
+		{"tier_2_simple", true},
+		{"tier_3_light", true},
+		{"tier_3_simple", true},
+		{"unknown_tier", false},
+		{"", false},
+	}
+	for _, tc := range cases {
+		got := nativeSwarmEligible(tc.tier)
+		if got != tc.want {
+			t.Errorf("nativeSwarmEligible(%q) = %v; want %v", tc.tier, got, tc.want)
+		}
+	}
+}
+

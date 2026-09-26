@@ -36,6 +36,11 @@ func (f SubagentInvokerFunc) Invoke(ctx context.Context, invocation SubagentInvo
 	return f(ctx, invocation)
 }
 
+var (
+	// DefaultSubagentDeliverer is the registered runtime deliverer for subagent execution targets.
+	DefaultSubagentDeliverer Deliverer
+)
+
 // SubagentDeliverer routes tasks to subagents while strictly enforcing context parity with local LLM execution.
 type SubagentDeliverer struct {
 	Invoker          SubagentInvoker

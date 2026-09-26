@@ -12,6 +12,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects/koi"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/supervision"
 )
@@ -211,14 +212,48 @@ func AssemblePreparedContext(
 	}
 	taskSteps := agentprompt.FormatTaskStepsPromptSection(taskStepsRaw, workClass)
 
+	var upstreamDeliverables string
+	if len(out.Deps) > 0 {
+		var dSb strings.Builder
+		var count int
+		for _, dep := range out.Deps {
+			kDep := koi.Wrap(dep)
+			artifacts := kDep.GetStringSlice(objects.FieldKeyArtifacts)
+			if len(artifacts) == 0 {
+				if a := kDep.GetString(objects.FieldKeyArtifacts); a != "" {
+					artifacts = []string{a}
+				}
+			}
+			if len(artifacts) > 0 {
+				if count == 0 {
+					dSb.WriteString("## Upstream Verified Deliverables\n")
+					dSb.WriteString("The following upstream deliverable artifacts were produced and verified by prior tasks. Use these artifact paths directly:\n")
+				}
+				count++
+				title := kDep.Title()
+				if title == "" {
+					title = kDep.ID()
+				}
+				dSb.WriteString(fmt.Sprintf("- **%s** (`%s`, status: `%s`):\n", title, kDep.ID(), kDep.Status()))
+				for _, art := range artifacts {
+					dSb.WriteString(fmt.Sprintf("  - Deliverable Artifact: `%s`\n", art))
+				}
+			}
+		}
+		if count > 0 {
+			upstreamDeliverables = dSb.String()
+		}
+	}
+
 	prompt, err := agentprompt.BuildTaskPrompt(ctx, sp, sec, in.ProjectRoot, agentprompt.TaskPromptOptions{
-		TaskTitle:       out.Title,
-		PlanID:          taskID,
-		TargetAgent:     target,
-		IncludeTDD:      includeTDD,
-		IncludeObserver: includeObserver,
-		TaskContext:     taskContext,
-		TaskSteps:       taskSteps,
+		TaskTitle:            out.Title,
+		PlanID:               taskID,
+		TargetAgent:          target,
+		IncludeTDD:           includeTDD,
+		IncludeObserver:      includeObserver,
+		TaskContext:          taskContext,
+		TaskSteps:            taskSteps,
+		UpstreamDeliverables: upstreamDeliverables,
 	})
 	if err != nil {
 		return PreparedContext{}, errfmt.Newf("build prompt").Wrap(err)

@@ -90,10 +90,17 @@
 ./cli_specs/convergence/record_overseer_run_command.yaml
 ./cli_specs/convergence_command.yaml
 ./cli_specs/daemon/
+./cli_specs/daemon/add_command.yaml
 ./cli_specs/daemon/disable_command.yaml
 ./cli_specs/daemon/enable_command.yaml
+./cli_specs/daemon/remove_command.yaml
 ./cli_specs/daemon/restart_command.yaml
 ./cli_specs/daemon/run_command.yaml
+./cli_specs/daemon/service_cleanup_legacy_command.yaml
+./cli_specs/daemon/service_command.yaml
+./cli_specs/daemon/service_install_command.yaml
+./cli_specs/daemon/service_status_command.yaml
+./cli_specs/daemon/service_uninstall_command.yaml
 ./cli_specs/daemon/start_command.yaml
 ./cli_specs/daemon/status_command.yaml
 ./cli_specs/daemon/stop_command.yaml
@@ -128,6 +135,12 @@
 ./cli_specs/job/state_command.yaml
 ./cli_specs/job/trigger_command.yaml
 ./cli_specs/job_command.yaml
+./cli_specs/kernel/
+./cli_specs/kernel/steward/
+./cli_specs/kernel/steward/daemon_command.yaml
+./cli_specs/kernel/steward/sweep_command.yaml
+./cli_specs/kernel/steward_command.yaml
+./cli_specs/kernel_command.yaml
 ./cli_specs/mcp/
 ./cli_specs/mcp/ensure_command.yaml
 ./cli_specs/mcp/supervise_command.yaml
@@ -138,6 +151,7 @@
 ./cli_specs/mcp/svc/proxy_command.yaml
 ./cli_specs/mcp/svc/serve_command.yaml
 ./cli_specs/mcp_command.yaml
+./cli_specs/mutate_command.yaml
 ./cli_specs/new/
 ./cli_specs/new/command_spec_command.yaml
 ./cli_specs/new/object_command.yaml
@@ -170,6 +184,7 @@
 ./cli_specs/pack/seal_command.yaml
 ./cli_specs/pack/validate_command.yaml
 ./cli_specs/pack_command.yaml
+./cli_specs/query_command.yaml
 ./cli_specs/quickstart_command.yaml
 ./cli_specs/run_command.yaml
 ./cli_specs/scheduler/

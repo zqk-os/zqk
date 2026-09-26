@@ -88,3 +88,39 @@ func TestRegisterObserverTools_exposesRegister(t *testing.T) {
 		t.Fatalf("missing %s", name)
 	}
 }
+
+func TestRegisterObserverTools_exposesRequestGuidance(t *testing.T) {
+	t.Parallel()
+	s := NewServer()
+	RegisterObserverTools(s)
+	name := GetToolName(observerRequestGuidanceToolSuffix)
+	if _, ok := s.tools[name]; !ok {
+		t.Fatalf("missing %s", name)
+	}
+}
+
+func TestHandleObserverRequestGuidance(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir()
+
+	res, err := HandleObserverRequestGuidance(context.Background(), root, map[string]any{
+		"query":   "Where should I write the CEF evaluation findings?",
+		"task_id": "BLI-TEST-001",
+		"context": "Attempted to create eval_finding kind and got an error",
+	})
+	if err != nil {
+		t.Fatalf("HandleObserverRequestGuidance error: %v", err)
+	}
+
+	text, ok := res.(string)
+	if !ok {
+		t.Fatalf("expected string response, got %T", res)
+	}
+
+	if !strings.Contains(text, "Observer Coach Guidance") {
+		t.Errorf("missing header in %s", text)
+	}
+	if !strings.Contains(text, "docs/eval/*.md") {
+		t.Errorf("missing deliverable guidance in %s", text)
+	}
+}
