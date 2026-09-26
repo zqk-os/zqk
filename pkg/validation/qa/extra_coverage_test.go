@@ -3,7 +3,6 @@ package qa
 import (
 	"context"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -849,7 +848,7 @@ func TestAuditorGate_ThreeLatchCountdown(t *testing.T) {
 			objects.FieldKeyDescription: signer.PublicKey(),
 		}
 		cleanFile := filepath.Join(tmpDir, "clean.go")
-		_ = os.WriteFile(cleanFile, []byte("package clean\n"), 0644)
+		_ = fileutil.WriteFile(cleanFile, []byte("package clean\n"), 0644)
 		bliID := "BLI-LATCH-NO-QAS"
 		store.objs[bliID] = map[string]any{
 			objects.FieldKeyID:        bliID,
@@ -870,7 +869,7 @@ func TestAuditorGate_ThreeLatchCountdown(t *testing.T) {
 			objects.FieldKeyDescription: signer.PublicKey(),
 		}
 		cleanFile := filepath.Join(tmpDir, "valid_clean.go")
-		_ = os.WriteFile(cleanFile, []byte("package valid\n"), 0644)
+		_ = fileutil.WriteFile(cleanFile, []byte("package valid\n"), 0644)
 		bliID := "BLI-LATCH-ALL-PASS"
 		store.objs[bliID] = map[string]any{
 			objects.FieldKeyID:        bliID,
