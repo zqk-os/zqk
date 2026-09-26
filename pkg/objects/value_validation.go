@@ -199,8 +199,8 @@ func ValidateObjectFieldRestrictions(spec *Spec, kind string, updates map[string
 	}
 
 	for k, v := range updates {
-		// Skip control and metadata keys
-		if k == FieldKeyID || k == FieldKeyKind || k == "expected_updated_at" || k == "_dry_run" {
+		// Skip control, metadata, and lifecycle status keys (status is governed by lifecycle engine)
+		if k == FieldKeyID || k == FieldKeyKind || k == FieldKeyStatus || k == "expected_updated_at" || k == "_dry_run" {
 			continue
 		}
 		// Skip unset markers
