@@ -12,6 +12,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
@@ -82,6 +83,23 @@ func runStatus(cmd *cobra.Command, args []string) error {
 			activeAgents = []string{"No active swarm workers"}
 		}
 
+		var stalledPlans []string
+		if storageProvider != nil && (len(activeAgents) == 0 || activeAgents[0] == "No active swarm workers") {
+			planRes, pErr := storageProvider.List(cmd.Context(), pkgctx.NewSystemSecurityContext(), pkgctx.NewStorageContext(), storage.ListFilter{
+				Kind: objects.KindPriorityPlan,
+				Filters: map[string]any{
+					objects.FieldKeyStatus: objects.ObjectStatusInProgress,
+				},
+			})
+			if pErr == nil && planRes != nil {
+				for _, obj := range planRes.Objects {
+					pTitle, _ := obj[objects.FieldKeyTitle].(string)
+					pID, _ := obj[objects.FieldKeyID].(string)
+					stalledPlans = append(stalledPlans, fmt.Sprintf("%s (%s) - 0 active workers (resume: %s)", pID, pTitle, paths.CLIUsage("agent", "orchestrate", pID)))
+				}
+			}
+		}
+
 		var budgetInfo map[string]any
 		if budget != nil {
 			activeCount := 0
@@ -97,10 +115,14 @@ func runStatus(cmd *cobra.Command, args []string) error {
 		}
 
 		policyCompliance := HeartbeatComplianceFromModTime(latestModTime)
+		if len(stalledPlans) > 0 {
+			policyCompliance = "stalled_swarm_alert"
+		}
 
 		hiveState := map[string]any{
 			"orchestrator_status": "online",
 			"active_sub_agents":   activeAgents,
+			"stalled_plans":       stalledPlans,
 			"worker_budget":       budgetInfo,
 			"policy_compliance":   policyCompliance,
 		}
@@ -129,6 +151,13 @@ func runStatus(cmd *cobra.Command, args []string) error {
 		out += "\nActive Sub-Agents/Tasks:\n"
 		for _, agent := range activeAgents {
 			out += fmt.Sprintf("  - %s\n", agent)
+		}
+
+		if len(stalledPlans) > 0 {
+			out += "\n⚠️  Stalled In-Progress Plans (0 active workers):\n"
+			for _, sp := range stalledPlans {
+				out += fmt.Sprintf("  - %s\n", sp)
+			}
 		}
 
 		return cli.WriteOutput(cmd, []byte(out))

@@ -200,3 +200,45 @@ func TestAgentStatusCmd(t *testing.T) {
 		assert.Equal(t, "heartbeat_stale", agent.HeartbeatComplianceFromModTime(stale))
 	})
 }
+
+// TestAgentStatusCmd_StalledPlanAlert tests stalled in-progress plan detection when 0 active workers are running.
+func TestAgentStatusCmd_StalledPlanAlert(t *testing.T) {
+	root, store := setupOrchestrateTest(t)
+
+	oldBudget := goroutinelabels.DefaultBudget()
+	t.Cleanup(func() {
+		goroutinelabels.SetDefaultBudget(oldBudget)
+	})
+	goroutinelabels.SetDefaultBudget(nil)
+
+	ctx := context.Background()
+	secCtx := pkgctx.NewSystemSecurityContext()
+
+	plan := map[string]any{
+		objects.FieldKeyID:            "PRI-STALLED-TEST",
+		objects.FieldKeyKind:          objects.KindPriorityPlan,
+		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+		objects.FieldKeyTitle:         "Stalled Plan Test",
+		objects.FieldKeyStatus:        objects.ObjectStatusInProgress,
+	}
+	storage.CreateCASVisible(t, store, ctx, secCtx, plan, objects.ObjectStatusInProgress)
+
+	flushCtx, flushCancel := storage.DurabilityFlushContext()
+	err := storage.EnsureCLIObjectMutationVisibleForProvider(flushCtx, store, root, []string{objects.KindPriorityPlan})
+	flushCancel()
+	assert.NoError(t, err)
+
+	cmd := agent.NewStatusCmd()
+	cli.SetContext(cmd, cli.ContextForProjectRoot(root))
+	var buf bytes.Buffer
+	cmd.SetContext(pkgctx.WithCommandOutputWriter(context.Background(), &buf))
+	cmd.SetOut(&buf)
+	cmd.SetErr(&buf)
+
+	err = cmd.Execute()
+	assert.NoError(t, err)
+	output := buf.String()
+	assert.Contains(t, output, "Policy Compliance: stalled_swarm_alert")
+	assert.Contains(t, output, "Stalled In-Progress Plans")
+	assert.Contains(t, output, "PRI-STALLED-TEST")
+}
