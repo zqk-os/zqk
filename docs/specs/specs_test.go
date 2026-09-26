@@ -161,4 +161,29 @@ func TestZQLPreflightValidationSpec(t *testing.T) {
 	require.Contains(t, content, "Fail-Closed Boundary")
 }
 
+func TestZPARQLIndexedQueryPlannerSpec(t *testing.T) {
+	specsDir := findSpecsDir()
+	specPath := filepath.Join(specsDir, "SPEC-ZPARQL-INDEXED-QUERY-PLANNER.md")
+	data, err := os.ReadFile(specPath)
+	require.NoError(t, err, "ZPARQL query planner specification file must exist: %s", specPath)
+	content := string(data)
+	require.NotEmpty(t, content, "ZPARQL query planner specification content must not be empty")
+
+	// Planner execution contract (CRIT-ZPARQL-PLANNER-CONTRACT-SPEC)
+	require.Contains(t, content, "CRIT-ZPARQL-PLANNER-CONTRACT-SPEC")
+	require.Contains(t, content, "IndexSeek")
+	require.Contains(t, content, "KindScan")
+	require.Contains(t, content, "Predicate Pushdown")
+
+	// Complexity bound verification (CRIT-ZPARQL-INDEX-SCAN-COMPLEXITY-PROOF)
+	require.Contains(t, content, "CRIT-ZPARQL-INDEX-SCAN-COMPLEXITY-PROOF")
+	require.Contains(t, content, "O(K)")
+
+	// Cycle safety and depth bound (CRIT-ZPARQL-CYCLIC-TRAVERSAL-RECURSION-NEGATIVE)
+	require.Contains(t, content, "CRIT-ZPARQL-CYCLIC-TRAVERSAL-RECURSION-NEGATIVE")
+	require.Contains(t, content, "VisitedSet")
+	require.Contains(t, content, "ERR_ZPARQL_CYCLIC_RECURSION_LIMIT")
+}
+
+
 
