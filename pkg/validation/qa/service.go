@@ -3,6 +3,7 @@ package qa
 import (
 	"context"
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -166,15 +167,16 @@ func (s *AuditorService) performAudit(ctx context.Context, id string, kind strin
 
 	// 1.5 Traceability Check
 	status, _ := obj[objects.FieldKeyStatus].(string)
-	if kind == objects.KindBacklogItem && status == objects.ObjectStatusComplete {
+	isComplete := status == objects.ObjectStatusComplete || status == objects.ObjectStatusCompleted || status == "complete" || status == "completed"
+	artifactPaths := extractArtifactPaths(obj[objects.FieldKeyArtifacts])
+
+	if kind == objects.KindBacklogItem && isComplete {
 		hasTraceability := hasStringEvidence(obj[objects.FieldKeyCommitHashes])
 		hasTestAsset := false
-		if artifacts, ok := obj[objects.FieldKeyArtifacts].([]any); ok {
-			for _, art := range artifacts {
-				if path, ok := art.(string); ok && strings.HasSuffix(path, "_test.go") {
-					hasTestAsset = true
-					break
-				}
+		for _, path := range artifactPaths {
+			if strings.HasSuffix(path, "_test.go") {
+				hasTestAsset = true
+				break
 			}
 		}
 		if !hasTestAsset {
@@ -184,23 +186,64 @@ func (s *AuditorService) performAudit(ctx context.Context, id string, kind strin
 		if !hasTraceability && !hasTestAsset {
 			reason := "Missing verified test assets or traceability linkage"
 			logging.FluentEvent(logger).Warn(fmt.Sprintf(LogFmtAuditorContentDisparity, id, reason)).Log()
-			if err := s.emitter.EmitDisparityInterrupt(ctx, id, reason); err != nil {
-				logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorEmitHITLFailed, err), err).Log()
+			if s.emitter != nil {
+				if err := s.emitter.EmitDisparityInterrupt(ctx, id, reason); err != nil {
+					logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorEmitHITLFailed, err), err).Log()
+				}
 			}
 			return
 		}
 	}
 
+	// 1.6 Deliverable Artifacts Validation
+	// Fail-closed: completed backlog items must have at least one deliverable artifact.
+	if kind == objects.KindBacklogItem && isComplete {
+		if len(artifactPaths) == 0 {
+			reason := ReasonMissingArtifacts
+			logging.FluentEvent(logger).Warn(fmt.Sprintf(LogFmtAuditorContentDisparity, id, reason)).Log()
+			if s.emitter != nil {
+				if err := s.emitter.EmitDisparityInterrupt(ctx, id, reason); err != nil {
+					logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorEmitHITLFailed, err), err).Log()
+				}
+			}
+			return
+		}
+	}
+
+	// For all declared artifacts, verify that the files actually exist on disk before running AST analysis.
+	for _, path := range artifactPaths {
+		info, err := os.Stat(path)
+		if err != nil || info.IsDir() {
+			reason := fmt.Sprintf("Artifact file does not exist or cannot be read: %s", path)
+			logging.FluentEvent(logger).Warn(fmt.Sprintf(LogFmtAuditorContentDisparity, id, reason)).Log()
+			if s.emitter != nil {
+				if emitErr := s.emitter.EmitDisparityInterrupt(ctx, id, reason); emitErr != nil {
+					logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorEmitHITLFailed, emitErr), emitErr).Log()
+				}
+			}
+			return
+		}
+		f, err := os.Open(path)
+		if err != nil {
+			reason := fmt.Sprintf("Artifact file cannot be read: %s", path)
+			logging.FluentEvent(logger).Warn(fmt.Sprintf(LogFmtAuditorContentDisparity, id, reason)).Log()
+			if s.emitter != nil {
+				if emitErr := s.emitter.EmitDisparityInterrupt(ctx, id, reason); emitErr != nil {
+					logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorEmitHITLFailed, emitErr), emitErr).Log()
+				}
+			}
+			return
+		}
+		_ = f.Close()
+	}
+
 	// 2. STRUCTURAL AST AUDIT
-	// Scan artifacts listed in the object
-	artifacts, ok := obj[objects.FieldKeyArtifacts].([]any)
-	if !ok {
+	if len(artifactPaths) == 0 {
 		logging.FluentEvent(logger).Info(fmt.Sprintf("Skipping AST audit: no artifacts defined for %s", id)).Log()
 	}
 	var astViolations []Violation
-	for _, art := range artifacts {
-		path, ok := art.(string)
-		if !ok || !strings.HasSuffix(path, ".go") {
+	for _, path := range artifactPaths {
+		if !strings.HasSuffix(path, ".go") {
 			continue
 		}
 
@@ -208,7 +251,14 @@ func (s *AuditorService) performAudit(ctx context.Context, id string, kind strin
 		violations, err := s.astAuditor.AuditFile(path)
 		if err != nil {
 			logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorScanFailed, path, err), err).Log()
-			continue
+			reason := fmt.Sprintf("AST scan failed for %s: %v", path, err)
+			logging.FluentEvent(logger).Warn(fmt.Sprintf(LogFmtAuditorASTDisparity, id, reason)).Log()
+			if s.emitter != nil {
+				if emitErr := s.emitter.EmitDisparityInterrupt(ctx, id, reason); emitErr != nil {
+					logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorEmitHITLFailed, emitErr), emitErr).Log()
+				}
+			}
+			return
 		}
 		astViolations = append(astViolations, violations...)
 	}
@@ -225,8 +275,10 @@ func (s *AuditorService) performAudit(ctx context.Context, id string, kind strin
 			logging.FluentEvent(logger).Info(fmt.Sprintf("   - %s\n", step)).Log()
 		}
 
-		if err := s.emitter.EmitDisparityInterrupt(ctx, id, reason); err != nil {
-			logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorEmitHITLFailed, err), err).Log()
+		if s.emitter != nil {
+			if err := s.emitter.EmitDisparityInterrupt(ctx, id, reason); err != nil {
+				logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorEmitHITLFailed, err), err).Log()
+			}
 		}
 		return
 	}
@@ -247,9 +299,17 @@ func (s *AuditorService) performAudit(ctx context.Context, id string, kind strin
 	if hasSmoke || hasTODO {
 		reason := LogFmtAuditorSmokeAndMirrors
 		logging.FluentEvent(logger).Warn(fmt.Sprintf(LogFmtAuditorContentDisparity, id, reason)).Log()
-		if err := s.emitter.EmitDisparityInterrupt(ctx, id, reason); err != nil {
-			logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorEmitHITLFailed, err), err).Log()
+		if s.emitter != nil {
+			if err := s.emitter.EmitDisparityInterrupt(ctx, id, reason); err != nil {
+				logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorEmitHITLFailed, err), err).Log()
+			}
 		}
+		return
+	}
+
+	// Invariant: QASuccess is never minted during in_progress lifecycle status transitions.
+	if status == objects.ObjectStatusInProgress || status == "in_progress" {
+		logging.FluentEvent(logger).Info(fmt.Sprintf("Skipping QASuccess issuance: status is in_progress for %s", id)).Log()
 		return
 	}
 
@@ -279,6 +339,30 @@ func (s *AuditorService) performAudit(ctx context.Context, id string, kind strin
 
 	logging.FluentEvent(logger).Info(fmt.Sprintf(LogFmtAuditorSuccess, id)).Log()
 }
+
+func extractArtifactPaths(value any) []string {
+	var paths []string
+	switch items := value.(type) {
+	case []any:
+		for _, item := range items {
+			if s, ok := item.(string); ok && strings.TrimSpace(s) != "" {
+				paths = append(paths, strings.TrimSpace(s))
+			}
+		}
+	case []string:
+		for _, s := range items {
+			if strings.TrimSpace(s) != "" {
+				paths = append(paths, strings.TrimSpace(s))
+			}
+		}
+	case string:
+		if strings.TrimSpace(items) != "" {
+			paths = append(paths, strings.TrimSpace(items))
+		}
+	}
+	return paths
+}
+
 
 func hasStringEvidence(value any) bool {
 	switch refs := value.(type) {

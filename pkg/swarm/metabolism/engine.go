@@ -254,8 +254,6 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 			objects.FieldKeyKind:        "criteria",
 			objects.FieldKeyTitle:       fmt.Sprintf("State Invariant for %s", task.ID),
 			objects.FieldKeyDescription: fmt.Sprintf("Specification schema and output structure are strictly valid for %s", task.ID),
-			"formula_type":              "invariant",
-			"statement":                 fmt.Sprintf("Specification schema and output structure are strictly valid for %s", task.ID),
 			objects.FieldKeyCategory:    "acceptance",
 			objects.FieldKeyStatus:      objects.ObjectStatusAwaitingVerification,
 		}
@@ -265,8 +263,6 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 			objects.FieldKeyKind:        "criteria",
 			objects.FieldKeyTitle:       fmt.Sprintf("Dynamic Execution for %s", task.ID),
 			objects.FieldKeyDescription: fmt.Sprintf("Agent task executes successfully and generates verifiable observations for %s", task.ID),
-			"formula_type":              "dynamic",
-			"statement":                 fmt.Sprintf("Agent task executes successfully and generates verifiable observations for %s", task.ID),
 			objects.FieldKeyCategory:    "acceptance",
 			objects.FieldKeyStatus:      objects.ObjectStatusAwaitingVerification,
 		}
@@ -276,8 +272,6 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 			objects.FieldKeyKind:        "criteria",
 			objects.FieldKeyTitle:       fmt.Sprintf("Adversarial Boundary for %s", task.ID),
 			objects.FieldKeyDescription: fmt.Sprintf("Non-conforming outputs or membrane transgressions fail closed for %s", task.ID),
-			"formula_type":              "adversarial",
-			"statement":                 fmt.Sprintf("Non-conforming outputs or membrane transgressions fail closed for %s", task.ID),
 			objects.FieldKeyCategory:    "acceptance",
 			objects.FieldKeyStatus:      objects.ObjectStatusAwaitingVerification,
 		}

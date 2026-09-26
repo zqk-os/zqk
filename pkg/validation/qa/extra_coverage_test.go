@@ -178,26 +178,137 @@ func TestAuditorService_PerformAudit_MemoryStore(t *testing.T) {
 	})
 
 	t.Run("smoke and mirrors emits interrupt", func(t *testing.T) {
+		smokeFile := filepath.Join(tmpDir, "smoke.go")
+		_ = fileutil.WriteSecureFile(smokeFile, []byte("package smoke\n\nfunc Smoke() {}\n"))
 		store.objs["BLI-SMOKE"] = map[string]any{
 			objects.FieldKeyID:           "BLI-SMOKE",
 			objects.FieldKeyKind:         objects.KindBacklogItem,
 			objects.FieldKeyStatus:       objects.ObjectStatusComplete,
 			objects.FieldKeyCommitHashes: []any{"abc1234"},
+			objects.FieldKeyArtifacts:    []any{smokeFile},
 			objects.FieldKeyTitle:        "Smoke and mirrors test",
 		}
 		svc.performAudit(context.Background(), "BLI-SMOKE", "backlog_item")
 	})
 
 	t.Run("clean object passes audit and creates success token", func(t *testing.T) {
+		cleanFile := filepath.Join(tmpDir, "clean.go")
+		_ = fileutil.WriteSecureFile(cleanFile, []byte("package clean\n\nfunc Clean() {}\n"))
 		store.objs["BLI-CLEAN"] = map[string]any{
 			objects.FieldKeyID:           "BLI-CLEAN",
 			objects.FieldKeyKind:         objects.KindBacklogItem,
 			objects.FieldKeyStatus:       objects.ObjectStatusComplete,
 			objects.FieldKeyCommitHashes: []any{"abc1234"},
+			objects.FieldKeyArtifacts:    []any{cleanFile},
 			objects.FieldKeyTitle:        "Clean Verified Work",
 			objects.FieldKeyDescription:  "Properly implemented feature",
 		}
 		svc.performAudit(context.Background(), "BLI-CLEAN", "backlog_item")
+	})
+
+	t.Run("in_progress status does not mint QASuccess", func(t *testing.T) {
+		inprogFile := filepath.Join(tmpDir, "inprog.go")
+		_ = fileutil.WriteSecureFile(inprogFile, []byte("package inprog\n\nfunc InProg() {}\n"))
+		store.objs["BLI-INPROG"] = map[string]any{
+			objects.FieldKeyID:           "BLI-INPROG",
+			objects.FieldKeyKind:         objects.KindBacklogItem,
+			objects.FieldKeyStatus:       objects.ObjectStatusInProgress,
+			objects.FieldKeyCommitHashes: []any{"abc1234"},
+			objects.FieldKeyArtifacts:    []any{inprogFile},
+			objects.FieldKeyTitle:        "Work in progress",
+			objects.FieldKeyDescription:  "Work currently in progress",
+		}
+		svc.performAudit(context.Background(), "BLI-INPROG", "backlog_item")
+
+		for id, obj := range store.objs {
+			if obj[objects.FieldKeyKind] == KindQASuccess && obj[objects.FieldKeyItemID] == "BLI-INPROG" {
+				t.Fatalf("QASuccess must never be issued for in_progress status, found %s: %+v", id, obj)
+			}
+		}
+	})
+
+	t.Run("completed backlog item with zero artifacts is rejected", func(t *testing.T) {
+		store.objs["BLI-ZERO-ART"] = map[string]any{
+			objects.FieldKeyID:           "BLI-ZERO-ART",
+			objects.FieldKeyKind:         objects.KindBacklogItem,
+			objects.FieldKeyStatus:       objects.ObjectStatusComplete,
+			objects.FieldKeyCommitHashes: []any{"abc1234"},
+			objects.FieldKeyArtifacts:    []any{},
+			objects.FieldKeyTitle:        "Completed with zero artifacts",
+			objects.FieldKeyDescription:  "Feature done without artifacts",
+		}
+		svc.performAudit(context.Background(), "BLI-ZERO-ART", "backlog_item")
+
+		for id, obj := range store.objs {
+			if obj[objects.FieldKeyKind] == KindQASuccess && obj[objects.FieldKeyItemID] == "BLI-ZERO-ART" {
+				t.Fatalf("QASuccess must not be issued for item with zero artifacts, found %s: %+v", id, obj)
+			}
+		}
+
+		latest := latestCriticalInterrupt(t, tmpDir)
+		if latest == nil || latest.DedupeKey != "qa-disparity-BLI-ZERO-ART" {
+			t.Fatalf("expected disparity interrupt for zero artifacts, got: %+v", latest)
+		}
+		if !strings.Contains(latest.Message, ReasonMissingArtifacts) {
+			t.Fatalf("expected message to mention missing deliverable artifacts, got: %s", latest.Message)
+		}
+	})
+
+	t.Run("completed backlog item with non-existent artifact is rejected", func(t *testing.T) {
+		nonExistentPath := filepath.Join(tmpDir, "does_not_exist.go")
+		store.objs["BLI-NONEXIST-ART"] = map[string]any{
+			objects.FieldKeyID:           "BLI-NONEXIST-ART",
+			objects.FieldKeyKind:         objects.KindBacklogItem,
+			objects.FieldKeyStatus:       objects.ObjectStatusComplete,
+			objects.FieldKeyCommitHashes: []any{"abc1234"},
+			objects.FieldKeyArtifacts:    []any{nonExistentPath},
+			objects.FieldKeyTitle:        "Completed with non-existent artifact",
+			objects.FieldKeyDescription:  "Feature referencing missing file",
+		}
+		svc.performAudit(context.Background(), "BLI-NONEXIST-ART", "backlog_item")
+
+		for id, obj := range store.objs {
+			if obj[objects.FieldKeyKind] == KindQASuccess && obj[objects.FieldKeyItemID] == "BLI-NONEXIST-ART" {
+				t.Fatalf("QASuccess must not be issued for item with non-existent artifact, found %s: %+v", id, obj)
+			}
+		}
+
+		latest := latestCriticalInterrupt(t, tmpDir)
+		if latest == nil || latest.DedupeKey != "qa-disparity-BLI-NONEXIST-ART" {
+			t.Fatalf("expected disparity interrupt for non-existent artifact, got: %+v", latest)
+		}
+		if !strings.Contains(latest.Message, "does not exist or cannot be read") {
+			t.Fatalf("expected message to mention file does not exist, got: %s", latest.Message)
+		}
+	})
+
+	t.Run("completed backlog item with valid clean artifacts receives signed QASuccess", func(t *testing.T) {
+		cleanPassFile := filepath.Join(tmpDir, "clean_pass.go")
+		_ = fileutil.WriteSecureFile(cleanPassFile, []byte("package cleanpass\n\nfunc Pass() string { return \"ok\" }\n"))
+		store.objs["BLI-CLEAN-PASS"] = map[string]any{
+			objects.FieldKeyID:           "BLI-CLEAN-PASS",
+			objects.FieldKeyKind:         objects.KindBacklogItem,
+			objects.FieldKeyStatus:       objects.ObjectStatusComplete,
+			objects.FieldKeyCommitHashes: []any{"abc1234"},
+			objects.FieldKeyArtifacts:    []any{cleanPassFile},
+			objects.FieldKeyTitle:        "Valid Clean Deliverables",
+			objects.FieldKeyDescription:  "Properly implemented feature with valid deliverables",
+		}
+		svc.performAudit(context.Background(), "BLI-CLEAN-PASS", "backlog_item")
+
+		var foundSuccess map[string]any
+		for _, obj := range store.objs {
+			if obj[objects.FieldKeyKind] == KindQASuccess && obj[objects.FieldKeyItemID] == "BLI-CLEAN-PASS" {
+				foundSuccess = obj
+				break
+			}
+		}
+		if foundSuccess == nil {
+			t.Fatal("expected signed QASuccess object to be created")
+		}
+		if foundSuccess[objects.FieldKeyStatus] != objects.ObjectStatusSuccess {
+			t.Fatalf("expected QASuccess status %q, got %q", objects.ObjectStatusSuccess, foundSuccess[objects.FieldKeyStatus])
+		}
 	})
 
 	t.Run("isAuditTriggeringEvent", func(t *testing.T) {
@@ -342,11 +453,15 @@ func TestAuditorService_performAudit_AdditionalBranches(t *testing.T) {
 	}
 
 	// 1. Backlog item with _test.go artifact (satisfies test asset traceability)
+	testAssetFile := filepath.Join(tmpDir, "foo_test.go")
+	if err := fileutil.WriteFile(testAssetFile, []byte("package service\n\nfunc TestFoo() {}\n"), paths.FilePerm644); err != nil {
+		t.Fatal(err)
+	}
 	store.objs["BLI-TEST-ASSET"] = map[string]any{
 		objects.FieldKeyID:        "BLI-TEST-ASSET",
 		objects.FieldKeyTitle:     "Clean Backlog Item",
 		objects.FieldKeyStatus:    objects.ObjectStatusComplete,
-		objects.FieldKeyArtifacts: []any{"pkg/service/foo_test.go"},
+		objects.FieldKeyArtifacts: []any{testAssetFile},
 	}
 	svc.performAudit(ctx, "BLI-TEST-ASSET", objects.KindBacklogItem)
 	if len(store.objs) <= 1 {
@@ -358,11 +473,16 @@ func TestAuditorService_performAudit_AdditionalBranches(t *testing.T) {
 		objects.FieldKeyID:     "CRIT-DONE",
 		objects.FieldKeyStatus: objects.ObjectStatusCompleted,
 	}
+	critCleanFile := filepath.Join(tmpDir, "crit.go")
+	if err := fileutil.WriteFile(critCleanFile, []byte("package crit\n\nfunc Crit() {}\n"), paths.FilePerm644); err != nil {
+		t.Fatal(err)
+	}
 	store.objs["BLI-CRIT-ASSET"] = map[string]any{
 		objects.FieldKeyID:           "BLI-CRIT-ASSET",
 		objects.FieldKeyTitle:        "Clean Backlog Item 2",
 		objects.FieldKeyStatus:       objects.ObjectStatusComplete,
 		objects.FieldKeyCriteriaRefs: []any{"CRIT-DONE"},
+		objects.FieldKeyArtifacts:    []any{critCleanFile},
 	}
 	svc.performAudit(ctx, "BLI-CRIT-ASSET", objects.KindBacklogItem)
 
@@ -377,22 +497,31 @@ func Bad() {
 	if err := fileutil.WriteFile(badFile, []byte(badCode), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
+	nonGoFile := filepath.Join(tmpDir, "non-go.txt")
+	if err := fileutil.WriteFile(nonGoFile, []byte("plain text\n"), paths.FilePerm644); err != nil {
+		t.Fatal(err)
+	}
 	store.objs["BLI-AST-BAD"] = map[string]any{
-		objects.FieldKeyID:        "BLI-AST-BAD",
-		objects.FieldKeyTitle:     "AST Bad Item",
-		objects.FieldKeyStatus:    objects.ObjectStatusComplete,
-		objects.FieldKeyArtifacts: []any{badFile, 12345, "non-go.txt"},
+		objects.FieldKeyID:           "BLI-AST-BAD",
+		objects.FieldKeyTitle:        "AST Bad Item",
+		objects.FieldKeyStatus:       objects.ObjectStatusComplete,
+		objects.FieldKeyArtifacts:    []any{badFile, 12345, nonGoFile},
 		objects.FieldKeyCommitHashes: []any{"hash-1"},
 	}
 	svc.performAudit(ctx, "BLI-AST-BAD", objects.KindBacklogItem)
 
 	// 4. Smoke and mirrors with TODO in description
+	todoCleanFile := filepath.Join(tmpDir, "todo.go")
+	if err := fileutil.WriteFile(todoCleanFile, []byte("package todo\n\nfunc Todo() {}\n"), paths.FilePerm644); err != nil {
+		t.Fatal(err)
+	}
 	store.objs["BLI-TODO"] = map[string]any{
 		objects.FieldKeyID:           "BLI-TODO",
 		objects.FieldKeyTitle:        "Valid Title",
 		objects.FieldKeyDescription:  "This is a TODO item",
 		objects.FieldKeyStatus:       objects.ObjectStatusComplete,
 		objects.FieldKeyCommitHashes: []any{"hash-1"},
+		objects.FieldKeyArtifacts:    []any{todoCleanFile},
 	}
 	svc.performAudit(ctx, "BLI-TODO", objects.KindBacklogItem)
 
