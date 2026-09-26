@@ -89,6 +89,15 @@
 ./cli_specs/convergence/record_cvs_orchestrate_run_command.yaml
 ./cli_specs/convergence/record_overseer_run_command.yaml
 ./cli_specs/convergence_command.yaml
+./cli_specs/daemon/
+./cli_specs/daemon/disable_command.yaml
+./cli_specs/daemon/enable_command.yaml
+./cli_specs/daemon/restart_command.yaml
+./cli_specs/daemon/run_command.yaml
+./cli_specs/daemon/start_command.yaml
+./cli_specs/daemon/status_command.yaml
+./cli_specs/daemon/stop_command.yaml
+./cli_specs/daemon_command.yaml
 ./cli_specs/docman/
 ./cli_specs/docman/verify_command.yaml
 ./cli_specs/feed/

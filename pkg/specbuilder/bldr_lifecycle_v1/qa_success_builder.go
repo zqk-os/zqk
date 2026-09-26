@@ -19,6 +19,19 @@ func NewQaSuccessLifecycleBuilder() *QaSuccessLifecycleBuilder {
 		BaseLifecycleBuilder: lifecycle_builders.NewBaseLifecycleBuilder("qa_success", "v1_0_0"),
 	}
 
+	// Configure the lifecycle
+	builder.
+		SetPercentComplete(objects.PercentCompleteConfig{
+			Method: "status_defaults",
+			DefaultByStatus: map[string]any{
+				"archived":   100,
+				"conceptual": 0,
+				"failure":    100,
+				"originated": 50,
+				"success":    100,
+			},
+		})
+
 	// Add statuses and transitions
 	builder.addQaSuccessLifecycleData()
 
