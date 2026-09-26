@@ -117,12 +117,15 @@ func TestAuditorService_PerformAudit_CompleteUsesSupportedEvidence(t *testing.T)
 	t.Run("commit reference", func(t *testing.T) {
 		service, objectStorage, ctx, secCtx, tmpDir := newTraceabilityAuditorTest(t)
 		bliID := qaFixtureID("BLI-COMMIT-EVIDENCE")
+		cleanFile := filepath.Join(tmpDir, "commit_art.go")
+		_ = fileutil.WriteSecureFile(cleanFile, []byte("package commit\n\nfunc Commit() {}\n"))
 		qaForceStatus(t, objectStorage, ctx, secCtx, map[string]any{
 			objects.FieldKeyID:           bliID,
 			objects.FieldKeyKind:         "backlog_item",
 			objects.FieldKeyTitle:        "Complete with traceability",
 			objects.FieldKeyStatus:       objects.ObjectStatusComplete,
 			objects.FieldKeyCommitHashes: []any{"abc123"},
+			objects.FieldKeyArtifacts:    []any{cleanFile},
 		})
 
 		service.performAudit(context.Background(), bliID, "backlog_item")
@@ -136,6 +139,8 @@ func TestAuditorService_PerformAudit_CompleteUsesSupportedEvidence(t *testing.T)
 		service, objectStorage, ctx, secCtx, tmpDir := newTraceabilityAuditorTest(t)
 		critID := qaFixtureID("CRIT-COMPLETE-EVIDENCE")
 		bliID := qaFixtureID("BLI-CRITERION-EVIDENCE")
+		critCleanFile := filepath.Join(tmpDir, "crit_art.go")
+		_ = fileutil.WriteSecureFile(critCleanFile, []byte("package crit\n\nfunc Crit() {}\n"))
 		qaForceStatus(t, objectStorage, ctx, secCtx, map[string]any{
 			objects.FieldKeyID:     critID,
 			objects.FieldKeyKind:   "criteria",
@@ -148,6 +153,7 @@ func TestAuditorService_PerformAudit_CompleteUsesSupportedEvidence(t *testing.T)
 			objects.FieldKeyTitle:        "Complete with verified criterion",
 			objects.FieldKeyStatus:       objects.ObjectStatusComplete,
 			objects.FieldKeyCriteriaRefs: []any{critID},
+			objects.FieldKeyArtifacts:    []any{critCleanFile},
 		})
 
 		service.performAudit(context.Background(), bliID, "backlog_item")
@@ -202,8 +208,16 @@ func TestAuditorService_PerformAudit_Success(t *testing.T) {
 	ctx := pkgctx.NewSystemContext()
 	secCtx := pkgctx.NewSystemSecurityContext()
 
+	cleanFile := filepath.Join(tmpDir, "success.go")
+	_ = fileutil.WriteSecureFile(cleanFile, []byte("package success\n\nfunc Success() {}\n"))
+
 	_ = realStorage.Create(ctx, secCtx, map[string]any{
-		objects.FieldKeyID: "BLI-SUCCESS", objects.FieldKeyKind: "backlog_item", objects.FieldKeyTitle: "Good Item",
+		objects.FieldKeyID:           "BLI-SUCCESS",
+		objects.FieldKeyKind:         "backlog_item",
+		objects.FieldKeyTitle:        "Good Item",
+		objects.FieldKeyStatus:       objects.ObjectStatusComplete,
+		objects.FieldKeyCommitHashes: []any{"abc1234"},
+		objects.FieldKeyArtifacts:    []any{cleanFile},
 	})
 
 	signer, _ := NewAuditorSigner("")
