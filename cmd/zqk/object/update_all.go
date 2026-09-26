@@ -152,6 +152,9 @@ func runUpdateAll(cmd *cobra.Command, args []string) error {
 			if err := guardManualRefFieldUpdates(cmd, proc, objID, objKind, objUpdates); err != nil {
 				return err
 			}
+			if err := guardManualSystemProvenanceFields(cmd, proc, objID, objKind, objUpdates); err != nil {
+				return err
+			}
 			var glassErr error
 			opCtx, glassErr = withUpdateBreakGlass(cmd, opCtx, objKind)
 			if glassErr != nil {

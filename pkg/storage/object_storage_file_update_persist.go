@@ -69,6 +69,14 @@ func (f *FileObjectStorage) persistFileObjectUpdate(p *fileObjectUpdatePrep) err
 				existing[objects.FieldKeyCreatedBy] = pkgctx.ActorIDForAttribution(secCtx.AccountID)
 			}
 			f.ensureObjectMetadata(ctx, existing, secCtx, false)
+			if pkgctx.HasLifecycleBreakGlass(ctx) {
+				if explicitUpdatedAt, has := updates[objects.FieldKeyUpdatedAt]; has {
+					existing[objects.FieldKeyUpdatedAt] = explicitUpdatedAt
+				}
+				if explicitUpdatedBy, has := updates[objects.FieldKeyUpdatedBy]; has {
+					existing[objects.FieldKeyUpdatedBy] = explicitUpdatedBy
+				}
+			}
 			var marshalErr error
 			data, marshalErr = f.yamlMarshalForPersistence(existing)
 			if marshalErr != nil {

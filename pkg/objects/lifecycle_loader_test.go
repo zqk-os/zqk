@@ -313,6 +313,32 @@ func TestLifecycleLoader_IsValidTransition(t *testing.T) {
 	}
 }
 
+func TestLifecycleLoader_GetAllowedTransitions(t *testing.T) {
+	t.Parallel()
+	lifecyclesDir := filepath.Join("..", "..", paths.ProcessInternalLifecyclesDir)
+	loader := NewLifecycleLoader(lifecyclesDir)
+
+	targets, err := loader.GetAllowedTransitions("criteria", "conceptual")
+	if err != nil {
+		if fileutil.IsNotExist(err) {
+			t.Skip("Lifecycle file not found for criteria")
+		}
+		t.Fatalf("GetAllowedTransitions(criteria, conceptual) error = %v", err)
+	}
+
+	// Should contain originated, rejected, archived
+	targetMap := make(map[string]bool)
+	for _, trg := range targets {
+		targetMap[trg] = true
+	}
+	if !targetMap["originated"] {
+		t.Errorf("expected 'originated' in allowed targets, got %v", targets)
+	}
+	if targetMap["complete"] {
+		t.Errorf("did not expect 'complete' in allowed targets from conceptual, got %v", targets)
+	}
+}
+
 func TestLifecycleLoader_GetOriginStatus(t *testing.T) {
 	t.Parallel()
 	lifecyclesDir := filepath.Join("..", "..", paths.ProcessInternalLifecyclesDir)

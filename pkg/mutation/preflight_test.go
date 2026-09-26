@@ -475,5 +475,78 @@ func TestPreflight_LifecycleStateTransitionEnforcement(t *testing.T) {
 		require.NoError(t, err)
 		require.True(t, bgReceipt.Valid, "break-glass allows seeding completed objects")
 	})
+
+	t.Run("rejects_illegal_directed_transition_and_reports_allowed_targets", func(t *testing.T) {
+		validator := mutation.NewDefaultPreflightValidator().WithStatusResolver(func(ctx context.Context, id string) (string, bool) {
+			switch id {
+			case "BLI-PRE-001":
+				return "conceptual", true
+			case "TST-PRE-001":
+				return "draft", true
+			case "CRIT-PRE-001":
+				return "conceptual", true
+			}
+			return "", false
+		})
+
+		// 1. Illegal transition: backlog_item conceptual -> complete
+		illegalMut := mutation.Mutation{
+			Action:     mutation.ActionUpdateNode,
+			TargetKind: "backlog_item",
+			TargetID:   "BLI-PRE-001",
+			Fields: map[string]any{
+				"status": "complete",
+			},
+		}
+
+		receipt, err := validator.Validate(ctx, &illegalMut)
+		require.NoError(t, err)
+		require.False(t, receipt.Valid, "illegal transition conceptual -> complete must fail")
+
+		var matchedViolation *mutation.SchemaViolation
+		for i := range receipt.Violations {
+			if receipt.Violations[i].FieldPath == "fields.status" && receipt.Violations[i].FailingConstraint == "invalid_lifecycle_transition" {
+				matchedViolation = &receipt.Violations[i]
+				break
+			}
+		}
+		require.NotNil(t, matchedViolation, "expected invalid_lifecycle_transition violation")
+		require.Contains(t, matchedViolation.Expected, "allowed targets")
+		require.Contains(t, matchedViolation.Expected, "originated")
+		require.Contains(t, matchedViolation.Remediation, "allowed targets")
+		require.Contains(t, matchedViolation.Remediation, "originated")
+
+		// 2. Legal transition: test_case draft -> active
+		legalMut := mutation.Mutation{
+			Action:     mutation.ActionUpdateNode,
+			TargetKind: "test_case",
+			TargetID:   "TST-PRE-001",
+			Fields: map[string]any{
+				"status": "active",
+			},
+		}
+		legalReceipt, err := validator.Validate(ctx, &legalMut)
+		require.NoError(t, err)
+		require.True(t, legalReceipt.Valid, "legal transition draft -> active must pass")
+
+		// 3. Legal transition: criteria conceptual -> originated
+		legalCritMut := mutation.Mutation{
+			Action:     mutation.ActionUpdateNode,
+			TargetKind: "criteria",
+			TargetID:   "CRIT-PRE-001",
+			Fields: map[string]any{
+				"status": "originated",
+			},
+		}
+		legalCritReceipt, err := validator.Validate(ctx, &legalCritMut)
+		require.NoError(t, err)
+		require.True(t, legalCritReceipt.Valid, "legal transition conceptual -> originated must pass")
+
+		// 4. Break-glass allows emergency override of illegal transition
+		bgCtx := pkgctx.WithLifecycleBreakGlass(ctx, "emergency hotfix test validation")
+		bgReceipt, err := validator.Validate(bgCtx, &illegalMut)
+		require.NoError(t, err)
+		require.True(t, bgReceipt.Valid, "break-glass allows emergency override")
+	})
 }
 

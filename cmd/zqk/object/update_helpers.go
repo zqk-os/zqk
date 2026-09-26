@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 
@@ -736,6 +737,42 @@ func guardManualRefFieldUpdates(cmd *cobra.Command, proc *cli.Processor, id, obj
 	return clipkg.EnforceOverrideFriction(cmd, proc.OperationContext(), proc.SecurityContext(), proc.Storage(), id, objKind, reasonCode)
 }
 
+// guardManualSystemProvenanceFields refuses direct manual modification of system-managed provenance
+// fields (created_at, created_by, updated_at, updated_by, cas_address, hash) unless override or break-glass is armed.
+func guardManualSystemProvenanceFields(cmd *cobra.Command, proc *cli.Processor, id, objKind string, updates map[string]any) error {
+	provenanceFields := []string{"created_at", "created_by", "updated_at", "updated_by", "cas_address", "hash"}
+	var violating []string
+	for _, f := range provenanceFields {
+		if _, has := updates[f]; has {
+			violating = append(violating, f)
+		}
+	}
+	if len(violating) == 0 {
+		return nil
+	}
+	override := false
+	if cmd != nil && cmd.Flags() != nil && cmd.Flags().Lookup("override") != nil {
+		override, _ = cmd.Flags().GetBool("override")
+	}
+	if override {
+		reasonCode := emptyValue
+		if cmd.Flags().Lookup("reason-code") != nil {
+			reasonCode, _ = cmd.Flags().GetString("reason-code")
+		}
+		if reasonCode == emptyValue {
+			return cli.Guard(cmd).Require(false, "--reason-code is required when using --override to mutate system provenance fields").Return()
+		}
+		if proc != nil {
+			return clipkg.EnforceOverrideFriction(cmd, proc.OperationContext(), proc.SecurityContext(), proc.Storage(), id, objKind, reasonCode)
+		}
+		return nil
+	}
+	if proc != nil && pkgctx.IsLifecycleBreakGlass(proc.OperationContext()) {
+		return nil
+	}
+	return cli.Guard(cmd).Require(false, fmt.Sprintf("manual mutation of system provenance field(s) [%s] is restricted; provenance fields are computed exclusively by storage infrastructure. Use --override with --reason-code for emergency human administration", strings.Join(violating, ", "))).Return()
+}
+
 // withUpdateBreakGlass arms DECIDE break_glass for --force/--override. Critical kinds
 // require --reason-code.
 func withUpdateBreakGlass(cmd *cobra.Command, ctx stdcontext.Context, objKind string) (stdcontext.Context, error) {
@@ -755,7 +792,7 @@ func withUpdateBreakGlass(cmd *cobra.Command, ctx stdcontext.Context, objKind st
 		}
 		reasonCode = rc
 	}
-	opCtx := pkgctx.WithLifecycleBreakGlass(ctx, reasonCode)
+	opCtx := pkgctx.WithLifecycleBreakGlassWindow(ctx, reasonCode, 15*time.Minute)
 	if storage.IsCoreKernelKind(objKind) {
 		coreCtx, coreErr := withCoreDeleteReasonFromFlags(cmd, opCtx)
 		if coreErr != nil {

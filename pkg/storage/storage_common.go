@@ -116,13 +116,20 @@ func EnsureObjectMetadata(ctx context.Context, obj map[string]any, secCtx *pkgct
 	actor := pkgctx.ActorIDForAttribution(secCtx.AccountID)
 
 	if isCreate {
-		if _, ok := obj[objects.FieldKeyCreatedAt]; !ok {
+		if !pkgctx.IsLifecycleBreakGlass(ctx) && (secCtx == nil || !pkgctx.IsSystemAccount(secCtx.AccountID)) {
 			obj[objects.FieldKeyCreatedAt] = now
-		}
-		if existing, ok := obj[objects.FieldKeyCreatedBy].(string); !ok || existing == emptyValue {
 			obj[objects.FieldKeyCreatedBy] = actor
+			delete(obj, "cas_address")
+			delete(obj, "hash")
 		} else {
-			obj[objects.FieldKeyCreatedBy] = pkgctx.ActorIDForAttribution(existing)
+			if _, ok := obj[objects.FieldKeyCreatedAt]; !ok {
+				obj[objects.FieldKeyCreatedAt] = now
+			}
+			if existing, ok := obj[objects.FieldKeyCreatedBy].(string); !ok || existing == emptyValue {
+				obj[objects.FieldKeyCreatedBy] = actor
+			} else {
+				obj[objects.FieldKeyCreatedBy] = pkgctx.ActorIDForAttribution(existing)
+			}
 		}
 		// Ensure create status is a valid lifecycle origin (or another valid status).
 		// Missing or invalid status → lifecycle origin. Avoids stranded objects
@@ -131,9 +138,20 @@ func EnsureObjectMetadata(ctx context.Context, obj map[string]any, secCtx *pkgct
 		ensureCreateLifecycleStatus(ctx, obj, pkgctx.GetPromoteOnCreate(ctx))
 	}
 
-	// Always set updated_at and updated_by (never persist the retired "system" alias).
-	obj[objects.FieldKeyUpdatedAt] = now
-	obj[objects.FieldKeyUpdatedBy] = actor
+	// Always set updated_at and updated_by (never persist the retired "system" alias) unless break-glass.
+	if !pkgctx.IsLifecycleBreakGlass(ctx) && (secCtx == nil || !pkgctx.IsSystemAccount(secCtx.AccountID)) {
+		obj[objects.FieldKeyUpdatedAt] = now
+		obj[objects.FieldKeyUpdatedBy] = actor
+		delete(obj, "cas_address")
+		delete(obj, "hash")
+	} else {
+		if _, ok := obj[objects.FieldKeyUpdatedAt]; !ok {
+			obj[objects.FieldKeyUpdatedAt] = now
+		}
+		if _, ok := obj[objects.FieldKeyUpdatedBy]; !ok {
+			obj[objects.FieldKeyUpdatedBy] = actor
+		}
+	}
 
 	// Inject version_context defaulting to 'default' if missing (Ontology Layer Scoping)
 	if _, hasVersion := obj[ConstVersionContext]; !hasVersion {

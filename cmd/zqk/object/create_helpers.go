@@ -388,3 +388,4 @@ func guardManualStatusOnCreate(cmd *cobra.Command, proc *cli.Processor, kind str
 	}
 	return clipkg.EnforceOverrideFriction(cmd, proc.OperationContext(), proc.SecurityContext(), proc.Storage(), objID, kind, reasonCode)
 }
+
