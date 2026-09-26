@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/search"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -49,7 +50,7 @@ func NewGrepCmd() *cobra.Command {
 		AddExample("Token-budgeted JSON output for AI agents", "%s grep 'error' --max-tokens 2000 -f json").
 		AddExample("Rebuild persistent index cache", "%s grep --reindex")
 
-	cmd := &cobra.Command{
+	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewGrepCommandBuilder(), &cobra.Command{
 		Use:     "grep [query] [path]",
 		Aliases: []string{"zgrep"},
 		Short:   "In-process trigram and AST code search",
@@ -170,7 +171,7 @@ func NewGrepCmd() *cobra.Command {
 				return nil
 			}
 		},
-	}
+	})
 
 	cmd.Flags().BoolVarP(&ignoreCase, "ignore-case", "i", false, "Case-insensitive search")
 	cmd.Flags().BoolVarP(&useRegex, "regex", "e", false, "Treat query as regular expression")

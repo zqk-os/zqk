@@ -11,6 +11,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/storage"
@@ -24,24 +26,21 @@ var (
 
 // NewAgentHookCmd returns the parent command for vendor and kernel lifecycle hook integrations.
 func NewAgentHookCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "hook",
-		Short: "Execute kernel-driven lifecycle hooks for agent hosts (Antigravity, IDE, CLI)",
-	}
+	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewAgentHookCommandBuilder(), &cobra.Command{})
 	cmd.AddCommand(newPreSubagentHookCmd())
 	return cmd
 }
 
 func newPreSubagentHookCmd() *cobra.Command {
 	var vendor string
-	cmd := &cobra.Command{
-		Use:   "pre-subagent",
-		Short: "Pre-tool interception hook for subagent invocations, enforcing complete context parity",
+	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewAgentHookPreSubagentCommandBuilder(), &cobra.Command{
 		RunE: cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 			return runPreSubagentHook(cmd, proc, vendor)
 		}),
+	})
+	if cmd.Flags().Lookup("vendor") == nil {
+		cmd.Flags().StringVar(&vendor, "vendor", "antigravity", "Target agent host vendor format (antigravity, generic)")
 	}
-	cmd.Flags().StringVar(&vendor, "vendor", "antigravity", "Target agent host vendor format (antigravity, generic)")
 	return cmd
 }
 

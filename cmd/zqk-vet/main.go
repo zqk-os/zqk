@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/zqk-os/zqk/cmd/zqk/app"
 	"github.com/zqk-os/zqk/pkg/vet"
 )
 
@@ -48,6 +49,7 @@ func main() {
 	}
 
 	runner := vet.NewRunner(absRoot, cfg)
+	runner.RootCommand = app.NewRootCommand()
 	report, err := runner.Run(vet.RunOptions{
 		Suites:   suites,
 		Files:    flag.Args(),

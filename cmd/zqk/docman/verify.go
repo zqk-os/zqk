@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/docman"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -16,38 +17,9 @@ import (
 
 // NewVerifyCmd creates a new verify command for docman
 func NewVerifyCmd() *cobra.Command {
-	helpBuilder := clipkg.DynamicHelpBuilder(
-		"Cryptographically verify doc_entry objects against on-disk files and detect drift",
-		"Verify cryptographic integrity (SHA-256 and byte size) of registered doc_entry objects against on-disk documentation files.",
-		"",
-		"This command:",
-		"  - Scans doc_entry objects across specified subtrees or IDs",
-		"  - Computes cryptographic SHA-256 hashes of the target markdown files",
-		"  - Validates content_hash and content_size matching against recorded leases",
-		"  - Fails closed if drift or unsealed published docs are detected",
-		"  - Supports --auto-seal to automatically record/update cryptographic hashes",
-	).
-		AddExample("Verify all shipped documentation entries", "%s docman verify --shipped-only").
-		AddExample("Verify specific doc_entry IDs", "%s docman verify --ids DOC-001,DOC-002").
-		AddExample("Verify and auto-seal drifted or unsealed documents", "%s docman verify --shipped-only --auto-seal").
-		ExcludeCommonFlags()
-
-	verifyCmd := &cobra.Command{
-		Use:   "verify",
-		Short: "Cryptographically verify doc_entry objects against on-disk files and detect drift",
-		RunE:  runVerify,
-	}
-
-	helpBuilder.ApplyToCommand(verifyCmd)
-
-	verifyCmd.Flags().StringSlice("ids", nil, "Specific doc_entry IDs to verify")
-	verifyCmd.Flags().StringSlice("subtrees", nil, "Specific subtrees to verify (defaults to all doc_entries)")
-	verifyCmd.Flags().Bool("shipped-only", false, "Only verify shipped documentation subtrees (architecture, best-practices, onboarding)")
-	verifyCmd.Flags().Bool("auto-seal", false, "Compute and update cryptographic content_hash and content_size in storage")
-	verifyCmd.Flags().Bool("strict", true, "Fail closed (exit with non-zero code) if any verification violations occur")
-
-	cli.AddCommonFlags(verifyCmd)
-
+	verifyCmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewDocmanVerifyCommandBuilder(), &cobra.Command{
+		RunE: runVerify,
+	})
 	return verifyCmd
 }
 

@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/kindnames"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
@@ -19,114 +20,93 @@ import (
 
 // NewQueryCmd creates the top-level 'zqk query' command for declarative ZPARQL graph queries.
 func NewQueryCmd() *cobra.Command {
-	var (
-		filePath string
-		format   string
-	)
+	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewQueryCommandBuilder(), &cobra.Command{
+		RunE: runQuery,
+	})
+	cli.BindAsyncProgress(cmd, runQuery)
+	return cmd
+}
 
-	helpBuilder := clipkg.DynamicHelpBuilder(
-		"Execute declarative graph queries across the knowledge kernel",
-		"Declarative ZPARQL graph pattern matching and relational traversal engine with cycle safety and predicate pushdown.",
-		"",
-		"Enables agents and operators to perform multi-hop topological queries directly over local CAS storage without requiring an external graph database.",
-	).
-		AddExample("Find all planned backlog items", `%s query "MATCH (b:backlog_item) WHERE b.status == 'planned' RETURN b.id, b.title;"`).
-		AddExample("Multi-hop plan and criteria traversal", `%s query "MATCH (p:priority_plan)-[:items]->(b:backlog_item)-[:criteria_refs]->(c:criteria) RETURN p.title AS plan, b.id AS bli, c.title AS criterion;"`).
-		AddExample("Query from file formatted as JSON", `%s query -f query.zparql --format json`)
+func runQuery(cmd *cobra.Command, args []string) error {
+	filePath, _ := cmd.Flags().GetString("file")
+	format, _ := cmd.Flags().GetString("format")
 
-	cmd := &cobra.Command{
-		Use:     "query [query-string]",
-		Short:   "Execute declarative ZPARQL graph queries",
-		Aliases: []string{"zparql"},
-		Args:    cobra.MaximumNArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			var queryStr string
+	var queryStr string
 
-			if filePath != "" {
-				if filePath == "-" {
-					b, err := io.ReadAll(cmd.InOrStdin())
-					if err != nil {
-						return fmt.Errorf("failed to read query from stdin: %w", err)
-					}
-					queryStr = string(b)
-				} else {
-					data, err := fileutil.ReadFile(filePath)
-					if err != nil {
-						return fmt.Errorf("failed to read query file: %w", err)
-					}
-					queryStr = string(data)
-				}
-			} else if len(args) > 0 {
-				if args[0] == "-" {
-					b, err := io.ReadAll(cmd.InOrStdin())
-					if err != nil {
-						return fmt.Errorf("failed to read query from stdin: %w", err)
-					}
-					queryStr = string(b)
-				} else {
-					queryStr = args[0]
-				}
-			} else {
-				return fmt.Errorf("query string required as argument or via -f/--file")
-			}
-
-			ast, err := traversal.ParseZPARQL(queryStr)
+	if filePath != "" {
+		if filePath == "-" {
+			b, err := io.ReadAll(cmd.InOrStdin())
 			if err != nil {
-				return fmt.Errorf("ZPARQL query syntax error: %w", err)
+				return fmt.Errorf("failed to read query from stdin: %w", err)
 			}
-
-			// Build graph index from kernel storage
-			idx := traversal.NewGraphIndex()
-			targetKinds := extractTargetKinds(ast)
-			if proc, procErr := cli.NewProcessor(cmd); procErr == nil && proc.Storage() != nil {
-				_ = PopulateIndexFromStorage(cmd.Context(), proc, idx, targetKinds...)
-			}
-
-			executor := traversal.NewQueryExecutor(idx)
-			result, err := executor.Execute(cmd.Context(), ast)
+			queryStr = string(b)
+		} else {
+			data, err := fileutil.ReadFile(filePath)
 			if err != nil {
-				return fmt.Errorf("query execution failed: %w", err)
+				return fmt.Errorf("failed to read query file: %w", err)
 			}
-
-			out := cmd.OutOrStdout()
-			if strings.EqualFold(format, "json") {
-				enc := json.NewEncoder(out)
-				enc.SetIndent("", "  ")
-				return enc.Encode(result)
+			queryStr = string(data)
+		}
+	} else if len(args) > 0 {
+		if args[0] == "-" {
+			b, err := io.ReadAll(cmd.InOrStdin())
+			if err != nil {
+				return fmt.Errorf("failed to read query from stdin: %w", err)
 			}
-
-			// Table / human-readable output
-			if len(result.Rows) == 0 {
-				fmt.Fprintln(out, "No matches found.")
-				return nil
-			}
-
-			// Print header
-			headerLine := strings.Join(result.Headers, "\t| ")
-			fmt.Fprintln(out, headerLine)
-			fmt.Fprintln(out, strings.Repeat("-", len(headerLine)+10))
-
-			for _, row := range result.Rows {
-				rowVals := make([]string, len(result.Headers))
-				for i, h := range result.Headers {
-					rowVals[i] = fmt.Sprintf("%v", row[h])
-				}
-				fmt.Fprintln(out, strings.Join(rowVals, "\t| "))
-			}
-
-			fmt.Fprintf(out, "\n(%d rows)\n", len(result.Rows))
-			return nil
-		},
+			queryStr = string(b)
+		} else {
+			queryStr = args[0]
+		}
+	} else {
+		return fmt.Errorf("query string required as argument or via -f/--file")
 	}
 
-	cmd.Flags().StringVarP(&filePath, "file", "f", "", "Path to file containing ZPARQL query")
-	cmd.Flags().StringVar(&format, "format", "table", "Output format (table, json)")
+	ast, err := traversal.ParseZPARQL(queryStr)
+	if err != nil {
+		return fmt.Errorf("ZPARQL query syntax error: %w", err)
+	}
 
-	helpBuilder.ApplyToCommand(cmd)
-	cli.RequireSession(cmd, false)
-	cli.RequireStorage(cmd, false)
+	// Build graph index from kernel storage
+	idx := traversal.NewGraphIndex()
+	targetKinds := extractTargetKinds(ast)
+	if proc, procErr := cli.NewProcessor(cmd); procErr == nil && proc.Storage() != nil {
+		_ = PopulateIndexFromStorage(cmd.Context(), proc, idx, targetKinds...)
+	}
 
-	return cmd
+	executor := traversal.NewQueryExecutor(idx)
+	result, err := executor.Execute(cmd.Context(), ast)
+	if err != nil {
+		return fmt.Errorf("query execution failed: %w", err)
+	}
+
+	out := cmd.OutOrStdout()
+	if strings.EqualFold(format, "json") {
+		enc := json.NewEncoder(out)
+		enc.SetIndent("", "  ")
+		return enc.Encode(result)
+	}
+
+	// Table / human-readable output
+	if len(result.Rows) == 0 {
+		fmt.Fprintln(out, "No matches found.")
+		return nil
+	}
+
+	// Print header
+	headerLine := strings.Join(result.Headers, "\t| ")
+	fmt.Fprintln(out, headerLine)
+	fmt.Fprintln(out, strings.Repeat("-", len(headerLine)+10))
+
+	for _, row := range result.Rows {
+		rowVals := make([]string, len(result.Headers))
+		for i, h := range result.Headers {
+			rowVals[i] = fmt.Sprintf("%v", row[h])
+		}
+		fmt.Fprintln(out, strings.Join(rowVals, "\t| "))
+	}
+
+	fmt.Fprintf(out, "\n(%d rows)\n", len(result.Rows))
+	return nil
 }
 
 func extractTargetKinds(ast *traversal.QueryAST) []string {

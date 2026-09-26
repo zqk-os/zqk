@@ -4,15 +4,13 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/cmd/zqk/mcp"
 	"github.com/zqk-os/zqk/cmd/zqk/scheduler"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 )
 
 // NewCursorCmd creates the cursor vendor command group
 func NewCursorCmd() *cobra.Command {
-	cursorCmd := &cobra.Command{
-		Use:   "cursor",
-		Short: "Cursor IDE integrations and adapters",
-		Long:  "Cursor-specific MCP adapters, AppleScript automation bridges, and environment configurations.",
-	}
+	cursorCmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewVendorCursorCursorCommandBuilder(), &cobra.Command{})
 
 	cursorCmd.AddCommand(NewCursorAdapterCmd())
 	cursorCmd.AddCommand(NewCursorPasteApplescriptCmd())
