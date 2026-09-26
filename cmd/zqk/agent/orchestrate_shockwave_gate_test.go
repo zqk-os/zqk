@@ -93,5 +93,12 @@ func TestOrchestrate_ShockwaveDependencyGate(t *testing.T) {
 	}
 	unblocked := isBlockedByUnverifiedUpstream(ctx, store, secCtx, downstreamItem)
 	require.False(t, unblocked, testErrStage3Pass)
+
+	// Stage 4 Verification (CRIT-SWARM-PROVENANCE-001):
+	// Downstream tasks receive verified upstream deliverable artifact paths in their task prompt context.
+	deliverables := resolveVerifiedUpstreamDeliverables(ctx, store, secCtx, downstreamItem)
+	require.Contains(t, deliverables, "## Upstream Verified Deliverables")
+	require.Contains(t, deliverables, testArtifactPath)
+	require.Contains(t, deliverables, testUpstreamID)
 }
 

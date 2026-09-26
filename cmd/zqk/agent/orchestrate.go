@@ -155,8 +155,10 @@ func buildOrchestrationTaskPrompt(
 	ctx context.Context,
 	state *orchestratorState,
 	targetAgent, personaID, capability, taskTitle, meshSkillSection string,
+	upstreamDeliverables string,
 ) string {
 	opts := orchestrationTaskOpts(state, targetAgent, personaID, capability, taskTitle)
+	opts.UpstreamDeliverables = upstreamDeliverables
 	promptMarkdown, err := agentprompt.BuildTaskPrompt(
 		ctx,
 		state.sp,
@@ -167,6 +169,9 @@ func buildOrchestrationTaskPrompt(
 	if err != nil {
 		promptMarkdown = fmt.Sprintf("Task: %s", taskTitle)
 	}
+	if upstreamDeliverables != "" && !strings.Contains(promptMarkdown, upstreamDeliverables) {
+		promptMarkdown += "\n" + upstreamDeliverables
+	}
 	return promptMarkdown + meshSkillSection
 }
 
@@ -174,9 +179,11 @@ func buildOrchestrationTaskEnvelope(
 	ctx context.Context,
 	state *orchestratorState,
 	targetAgent, personaID, capability, taskTitle, meshSkillSection string,
+	upstreamDeliverables string,
 ) *agentprompt.TaskEnvelope {
 	opts := orchestrationTaskOpts(state, targetAgent, personaID, capability, taskTitle)
 	opts.Layer = agentprompt.PromptLayerPersist
+	opts.UpstreamDeliverables = upstreamDeliverables
 	// Ambient file/text is execute-time context; do not copy it onto every ATK.
 	if state.opts.AmbientContext != "" {
 		opts.TaskContext = "Ambient context supplied at orchestrate; resolve at execute / prepare-context."
@@ -194,6 +201,9 @@ func buildOrchestrationTaskEnvelope(
 		env = &agentprompt.TaskEnvelope{
 			Description: fmt.Sprintf("Task: %s\n%s\n", taskTitle, agentprompt.TaskEnvelopeMarker),
 		}
+	}
+	if upstreamDeliverables != "" && !strings.Contains(env.Description, upstreamDeliverables) {
+		env.Description += "\n" + upstreamDeliverables
 	}
 	if meshSkillSection != "" {
 		env.Description += meshSkillSection

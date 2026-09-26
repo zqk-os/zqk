@@ -28,6 +28,17 @@ func (g *ToolDenialGuard) PostTool(ctx context.Context, call llm.ToolCall, resul
 	if err != nil {
 		combined += " " + err.Error()
 	}
+
+	lower := strings.ToLower(combined)
+	if strings.Contains(lower, "permission denied") ||
+		strings.Contains(lower, "system_managed_field") ||
+		strings.Contains(lower, "read-only") ||
+		strings.Contains(lower, "unauthorized") {
+		// Provide ambient coaching prompt instead of tripping consecutive denial kill
+		g.consecutiveDenials = 0
+		return PermissionDenialGuidance(combined), nil
+	}
+
 	if strings.Contains(combined, "ALLOWLIST DENY") || strings.Contains(combined, "Soft-blocked") || strings.Contains(combined, "Soft-block") || strings.Contains(combined, "GUIDANCE: Do not use") {
 		g.consecutiveDenials++
 		if g.consecutiveDenials >= 3 {

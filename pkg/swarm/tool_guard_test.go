@@ -47,6 +47,8 @@ func TestGuardSwarmToolCall_hourglassAndStatus(t *testing.T) {
 		{"replace_code", "zqk_replace_code", `{}`, true, "no replace_code"},
 		{"stable replace", "zqk-stable_replace_code", `{}`, true, "no replace_code"},
 		{"commit", "zqk_commit", `{}`, true, "no replace_code"},
+		{"invented kind object_create", "zqk_object_create", `{"kind":"eval_finding","title":"finding"}`, true, "not a valid kernel object kind"},
+		{"invented kind report", "zqk_object_create", `{"kind":"evaluation_report","title":"report"}`, true, "not a valid kernel object kind"},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -77,5 +79,19 @@ func TestShouldSoftBlockBashTool_allowsVetAndMod(t *testing.T) {
 	}
 	if !ShouldSoftBlockBashTool(`{"command":"go get github.com/fatih/color"}`) {
 		t.Fatal("go get must stay blocked")
+	}
+}
+
+func TestToolDenialGuard_PermissionDenialCoaching(t *testing.T) {
+	guard := NewToolDenialGuard()
+	steer, err := guard.PostTool(t.Context(), llm.ToolCall{Name: "zqk_object_update"}, "permission denied: cannot modify system-managed field", nil)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !strings.Contains(steer, "Permission denial encountered") {
+		t.Fatalf("expected permission coaching guidance, got: %s", steer)
+	}
+	if guard.consecutiveDenials != 0 {
+		t.Fatalf("consecutive denials should be 0 after coaching, got %d", guard.consecutiveDenials)
 	}
 }

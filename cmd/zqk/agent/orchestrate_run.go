@@ -332,6 +332,9 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 					Log()
 				continue
 			}
+			if upstreamSec := resolveVerifiedUpstreamDeliverables(pctx.Ctx, state.sp, state.proc.SecurityContext(), item); upstreamSec != "" {
+				item["upstream_deliverables_section"] = upstreamSec
+			}
 			kept = append(kept, item)
 		}
 		if withheldCount > 0 {
@@ -418,6 +421,20 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 					}
 				}
 
+				executionTarget := strings.ToLower(strings.TrimSpace(kItem.GetString("execution_target")))
+				if executionTarget == "" {
+					executionTarget = strings.ToLower(strings.TrimSpace(kItem.GetString("runtime")))
+				}
+				if executionTarget == "" && (strings.HasPrefix(strings.ToLower(subAgent), "gemini") || subAgent == "subagent") {
+					executionTarget = "subagent"
+				}
+
+				if agentDeliverer == nil && executionTarget == "subagent" {
+					if agentdelivery.DefaultSubagentDeliverer != nil {
+						agentDeliverer = agentdelivery.DefaultSubagentDeliverer
+					}
+				}
+
 				itemID := kItem.ID()
 				if itemID == "" {
 					itemID = fmt.Sprintf("generated-%d", time.Now().UnixNano())
@@ -453,6 +470,11 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 					personaID = authcred.DefaultSwarmWorkerAccount
 				}
 
+				upstreamDeliverables, _ := kItem.Raw()["upstream_deliverables_section"].(string)
+				if upstreamDeliverables == "" {
+					upstreamDeliverables = resolveVerifiedUpstreamDeliverables(workerCtx, state.sp, state.secCtx, kItem.Raw())
+				}
+
 				if agentDeliverer == nil {
 					titleStr := fmt.Sprintf("Execute Task: %s", title)
 					envelope := buildOrchestrationTaskEnvelope(
@@ -463,6 +485,7 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 						capability,
 						title,
 						meshSkillSection,
+						upstreamDeliverables,
 					)
 					promptMarkdown := buildOrchestrationTaskPrompt(
 						workerCtx,
@@ -472,6 +495,7 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 						capability,
 						title,
 						meshSkillSection,
+						upstreamDeliverables,
 					)
 
 					existingID, existingStatus, existingDisp, findErr := findExistingOrchestrationTask(workerCtx, state, title, itemID)
@@ -645,7 +669,24 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 								}); werr != nil {
 									_ = cli.WriteOutput(state.cmd, []byte(fmt.Sprintf("⚠️ primaryorch wake failed for %s: %v\n", taskID, werr)))
 								}
+								_, _ = agentfeed.AppendEvent(agentfeed.AppendEventInput{
+									ProjectRoot:      state.proc.ProjectRoot(),
+									Message:          fmt.Sprintf("Complex task %s dispatched to primary/hosted seat (%s, tier: %s)", taskID, titleStr, modelTier),
+									AgentID:          "orchestration_engine",
+									ToAgentID:        personaID,
+									Sender:           agentfeed.FeedSenderHumanSteer,
+									EventType:        agentfeed.FeedEventTypeSteering,
+									SkipEnabledCheck: true,
+								})
 							} else {
+								_, _ = agentfeed.AppendEvent(agentfeed.AppendEventInput{
+									ProjectRoot:      state.proc.ProjectRoot(),
+									Message:          fmt.Sprintf("Routine task %s dispatched to native/local swarm worker (%s, tier: %s)", taskID, titleStr, modelTier),
+									AgentID:          "orchestration_engine",
+									Sender:           agentfeed.FeedSenderHumanSteer,
+									EventType:        agentfeed.FeedEventTypeMeshStatus,
+									SkipEnabledCheck: true,
+								})
 								inTest := zqkenv.IsInTest()
 								workClass := agentprompt.ClassifyWorkClass(title, promptMarkdown)
 								worktreePath := state.proc.ProjectRoot()
@@ -885,6 +926,7 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 						capability,
 						title,
 						meshSkillSection,
+						upstreamDeliverables,
 					)
 
 					signer, _ := crypto.GenerateKeypair()
@@ -1112,5 +1154,66 @@ func isBlockedByUnverifiedUpstream(ctx context.Context, sp storage.ObjectStorage
 	}
 
 	return false
+}
+
+func resolveVerifiedUpstreamDeliverables(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, item map[string]any) string {
+	if sp == nil || item == nil {
+		return ""
+	}
+	kItem := koi.Wrap(item)
+
+	var upstreamIDs []string
+	if deps := kItem.GetStringSlice("depends_on"); len(deps) > 0 {
+		upstreamIDs = append(upstreamIDs, deps...)
+	}
+	if upstreamTasks := kItem.GetStringSlice("upstream_task_refs"); len(upstreamTasks) > 0 {
+		upstreamIDs = append(upstreamIDs, upstreamTasks...)
+	}
+	if len(upstreamIDs) == 0 {
+		return ""
+	}
+
+	var sb strings.Builder
+	var count int
+	for _, upID := range upstreamIDs {
+		upObj, err := sp.Read(ctx, secCtx, upID)
+		if err != nil || upObj == nil {
+			continue
+		}
+		kUp := koi.Wrap(upObj)
+		artifacts := kUp.GetStringSlice(objects.FieldKeyArtifacts)
+		if len(artifacts) == 0 {
+			if a := kUp.GetString(objects.FieldKeyArtifacts); a != "" {
+				artifacts = []string{a}
+			}
+		}
+		summary := kUp.GetString("result_summary")
+		if summary == "" {
+			summary = kUp.GetString("summary")
+		}
+
+		if count == 0 {
+			sb.WriteString("## Upstream Verified Deliverables\n")
+			sb.WriteString("The following upstream deliverable artifacts were produced and verified by prior tasks. Use these artifact paths directly:\n")
+		}
+		count++
+		title := kUp.Title()
+		if title == "" {
+			title = upID
+		}
+		sb.WriteString(fmt.Sprintf("- **%s** (`%s`, status: `%s`):\n", title, upID, kUp.Status()))
+		if len(artifacts) > 0 {
+			for _, art := range artifacts {
+				sb.WriteString(fmt.Sprintf("  - Deliverable Artifact: `%s`\n", art))
+			}
+		}
+		if summary != "" {
+			sb.WriteString(fmt.Sprintf("  - Summary: %s\n", summary))
+		}
+	}
+	if count == 0 {
+		return ""
+	}
+	return sb.String()
 }
 
