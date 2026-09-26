@@ -966,7 +966,7 @@ func writeIOResourceHygieneSummary(buf *strings.Builder, projectRoot string) {
 
 	fdStatus := green("✓ healthy")
 	if ioTel.MaxFileDescriptors > 0 && ioTel.OpenFileDescriptors > ioTel.MaxFileDescriptors*8/10 {
-		fdStatus = yellow("⚠️ warning (>80% FD limit)")
+		fdStatus = yellow("⚠️  warning (>80% FD limit)")
 	}
 	fdVal := fmt.Sprintf("%d / %d", ioTel.OpenFileDescriptors, ioTel.MaxFileDescriptors)
 	if ioTel.OpenFileDescriptors < 0 {
@@ -977,18 +977,18 @@ func writeIOResourceHygieneSummary(buf *strings.Builder, projectRoot string) {
 
 	lockStatus := green("✓ clean (0 stale)")
 	if ioTel.StaleLocksCount > 0 {
-		lockStatus = yellow(fmt.Sprintf("⚠️ attention (%d stale .lock files)", ioTel.StaleLocksCount))
+		lockStatus = yellow(fmt.Sprintf("⚠️  attention (%d stale .lock files)", ioTel.StaleLocksCount))
 	}
 
 	tempStatus := green("✓ clean (0 orphaned)")
 	if ioTel.OrphanedTempCount > 0 {
-		tempStatus = yellow(fmt.Sprintf("⚠️ attention (%d orphaned .tmp files)", ioTel.OrphanedTempCount))
+		tempStatus = yellow(fmt.Sprintf("⚠️  attention (%d orphaned .tmp files)", ioTel.OrphanedTempCount))
 	}
 
 	headers := []string{"METRIC", "VALUE", "STATUS"}
 	rows := [][]string{
 		{"Open File Descriptors", fdVal, fdStatus},
-		{".zqk Storage Volume", storageVal, cyan("tracked")},
+		{".zqk Storage Volume", storageVal, cyan("✓ tracked")},
 		{"Stale Lock Files", fmt.Sprintf("%d", ioTel.StaleLocksCount), lockStatus},
 		{"Orphaned Temp Files", fmt.Sprintf("%d", ioTel.OrphanedTempCount), tempStatus},
 	}

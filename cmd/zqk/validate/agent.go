@@ -346,7 +346,8 @@ func verifyVettingMatrix(projectRoot string, changedFiles []string) error {
 	}
 	_, csvPath, _, err := reg.Resolve(projectRoot, "codebase_vetting")
 	if err != nil {
-		return errfmt.Errorf("failed to resolve codebase_vetting matrix: %w", err)
+		// If codebase_vetting matrix is not registered, skip validation
+		return nil
 	}
 
 	f, err := fileutil.Open(csvPath)

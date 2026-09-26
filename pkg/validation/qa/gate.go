@@ -16,6 +16,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // Gate defines the interface for the mandatory quality gate.
@@ -25,8 +26,9 @@ type Gate interface {
 
 // AuditorGate implements the mandatory quality gate.
 type AuditorGate struct {
-	storage     storage.ObjectStorageProvider
-	projectRoot string
+	storage        storage.ObjectStorageProvider
+	projectRoot    string
+	strictFallback bool
 }
 
 func NewAuditorGate(s storage.ObjectStorageProvider) *AuditorGate {
@@ -36,7 +38,18 @@ func NewAuditorGate(s storage.ObjectStorageProvider) *AuditorGate {
 // NewAuditorGateForProject is VerifyComplete with a file fallback to
 // .zqk/keystore/auditor.priv when KEY-AUDITOR-001 is not in CAS.
 func NewAuditorGateForProject(s storage.ObjectStorageProvider, projectRoot string) *AuditorGate {
-	return &AuditorGate{storage: s, projectRoot: projectRoot}
+	return &AuditorGate{
+		storage:        s,
+		projectRoot:    projectRoot,
+		strictFallback: zqkenv.ProductionKeystoreStrict().Get() == "1" || zqkenv.ProductionKeystoreStrict().Get() == "true",
+	}
+}
+
+// WithStrictFallback configures whether unencrypted disk-based private key fallback
+// is disallowed when KEY-AUDITOR-001 is absent from CAS.
+func (g *AuditorGate) WithStrictFallback(strict bool) *AuditorGate {
+	g.strictFallback = strict
+	return g
 }
 
 const (
@@ -117,6 +130,12 @@ func (g *AuditorGate) trustedPubHex(ctx context.Context, secCtx *pkgctx.Security
 		if ok && trustedPubHex != "" && trustedPubHex != validation.ConstMagic57bc28f9 {
 			return trustedPubHex, nil
 		}
+	}
+	if g.strictFallback {
+		if err != nil {
+			return "", fmt.Errorf("%s: %w", ErrMsgDiskFallbackDisallowed, err)
+		}
+		return "", fmt.Errorf("%s: key %s not found in CAS", ErrMsgDiskFallbackDisallowed, AuditorKeyID)
 	}
 	if g.projectRoot == "" {
 		if err != nil {

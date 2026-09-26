@@ -22,6 +22,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/inbox"
 	"github.com/zqk-os/zqk/cmd/zqk/intake"
 	"github.com/zqk-os/zqk/cmd/zqk/job"
+	"github.com/zqk-os/zqk/cmd/zqk/kernel"
 	"github.com/zqk-os/zqk/cmd/zqk/keystore"
 	"github.com/zqk-os/zqk/cmd/zqk/learn"
 	matrixcmd "github.com/zqk-os/zqk/cmd/zqk/matrix"
@@ -212,6 +213,11 @@ func registerCommands() {
 	daemonCmdInst := daemon.NewDaemonCmd()
 	daemonCmdInst.GroupID = "integrations"
 	rootCmd.AddCommand(daemonCmdInst)
+
+	// Kernel steward and runtime lifecycle
+	kernelCmdInst := kernel.NewKernelCmd()
+	kernelCmdInst.GroupID = "integrations"
+	rootCmd.AddCommand(kernelCmdInst)
 
 	// Local CI — commit locally, checkout SHA elsewhere, run tests
 	ciCmdInst := cicmd.NewCICmd()

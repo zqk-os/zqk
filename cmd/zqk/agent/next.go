@@ -181,7 +181,7 @@ func requireCommitsMergedToIntegration(ctx context.Context, projectRoot, taskID,
 		cmd := execwrap.CommandContext(ctx, "git", "branch", "--contains", crStr)
 		cmd.Dir = projectRoot
 		out, err := cmd.CombinedOutput()
-		if err != nil || !strings.Contains(string(out), integrationBranch) {
+		if err != nil || !strings.Contains(strings.ToLower(string(out)), strings.ToLower(integrationBranch)) {
 			return errfmt.Errorf("FAIL-CLOSED: commit %s is not merged into %s. You must merge your work before calling 'agent next'.", crStr, integrationBranch)
 		}
 	}

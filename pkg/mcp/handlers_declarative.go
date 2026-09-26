@@ -16,10 +16,10 @@ func HandleQueryZPARQL(ctx context.Context, s *Server, args map[string]any) (any
 			[]ElicitationParam{
 				ElicitParamWithExample(
 					"query",
-					"The ZPARQL query string to execute (e.g., MATCH (b:backlog_item) WHERE b.status = 'planned' RETURN b.id, b.title;)",
+					"The ZPARQL query string to execute (e.g., MATCH (b:backlog_item) WHERE b.status == 'planned' RETURN b.id, b.title;)",
 					"string",
 					true,
-					"MATCH (b:backlog_item) WHERE b.status = 'planned' RETURN b.id, b.title;",
+					"MATCH (b:backlog_item) WHERE b.status == 'planned' RETURN b.id, b.title;",
 				),
 			},
 		)

@@ -2,6 +2,7 @@ package qa
 
 const (
 	ErrMsgServiceReplayFailed        = "AuditorService: replay failed"
+	ErrMsgDiskFallbackDisallowed     = "AuditorGate: disk keystore fallback disallowed in strict mode"
 	LogFmtAuditorStart               = "🛡️ [QA-AUDITOR] Auditing %s:%s...\n"
 	LogFmtAuditorReadFailed          = "❌ [QA-AUDITOR] Failed to read %s: %v\n"
 	LogFmtAuditorMissingArtifacts    = "Warning: artifacts field missing or not a slice in object %s\n"

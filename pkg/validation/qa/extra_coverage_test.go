@@ -603,6 +603,47 @@ func TestAuditorGate_VerifySignature_And_TrustedPubHex(t *testing.T) {
 	}
 }
 
+func TestAuditorGate_StrictFallbackPolicy(t *testing.T) {
+	ctx := context.Background()
+	sec := pkgctx.NewSystemSecurityContext()
+	tmpDir := t.TempDir()
+
+	store := newMockQASuccessStore()
+	// Without AuditorKeyID in CAS, WithStrictFallback(true) must reject disk fallback
+	gateStrict := NewAuditorGateForProject(store, tmpDir).WithStrictFallback(true)
+
+	_, err := gateStrict.trustedPubHex(ctx, sec)
+	if err == nil {
+		t.Fatal("expected error in strict mode when CAS key is absent, got nil")
+	}
+	if !strings.Contains(err.Error(), ErrMsgDiskFallbackDisallowed) {
+		t.Fatalf("expected error containing %q, got %q", ErrMsgDiskFallbackDisallowed, err.Error())
+	}
+
+	// In non-strict mode, fallback succeeds
+	gateLenient := NewAuditorGateForProject(store, tmpDir).WithStrictFallback(false)
+	pubHex, err := gateLenient.trustedPubHex(ctx, sec)
+	if err != nil {
+		t.Fatalf("expected non-strict gate to fall back to disk key successfully, got: %v", err)
+	}
+	if pubHex == "" {
+		t.Fatal("expected non-empty pubHex from disk fallback")
+	}
+
+	// When CAS has the key, strict mode succeeds using the CAS key
+	store.objs[AuditorKeyID] = map[string]any{
+		objects.FieldKeyID:          AuditorKeyID,
+		objects.FieldKeyDescription: pubHex,
+	}
+	casPubHex, err := gateStrict.trustedPubHex(ctx, sec)
+	if err != nil {
+		t.Fatalf("expected strict gate to succeed when CAS key is present, got: %v", err)
+	}
+	if casPubHex != pubHex {
+		t.Fatalf("expected CAS pubHex %q, got %q", pubHex, casPubHex)
+	}
+}
+
 func TestInterruptEmitter_AckDisparityOnPass_EdgeCases(t *testing.T) {
 	var nilEmitter *InterruptEmitter
 	nilEmitter.AckDisparityOnPass("BLI-1") // Should not panic

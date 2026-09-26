@@ -36,6 +36,23 @@ func TestRegistrySpecPersistenceAndDefaults(t *testing.T) {
 	require.True(t, ok)
 	assert.Equal(t, overseer.DesiredStateDisabled, spec.DesiredState)
 
+	spec, ok = reg.Get("privileged-writer")
+	require.True(t, ok)
+	assert.Equal(t, overseer.DesiredStateEnabled, spec.DesiredState)
+	assert.Equal(t, overseer.RestartPolicyAlways, spec.RestartPolicy)
+
+	spec, ok = reg.Get("steward")
+	require.True(t, ok)
+	assert.Equal(t, overseer.DesiredStateEnabled, spec.DesiredState)
+
+	spec, ok = reg.Get("mcp")
+	require.True(t, ok)
+	assert.Equal(t, overseer.DesiredStateDisabled, spec.DesiredState)
+
+	spec, ok = reg.Get("seat-worker")
+	require.True(t, ok)
+	assert.Equal(t, overseer.DesiredStateDisabled, spec.DesiredState)
+
 	// Mutate desired state and verify reload
 	err = reg.SetDesiredState("fswatcher", overseer.DesiredStateEnabled)
 	require.NoError(t, err)
@@ -166,3 +183,121 @@ func TestRapidCrashExponentialBackoffBound(t *testing.T) {
 		assert.LessOrEqual(t, delay, crashSpec.BackoffMax+50*time.Millisecond)
 	}
 }
+
+func TestRegistryAddDelete(t *testing.T) {
+	tempDir := t.TempDir()
+	regPath := filepath.Join(tempDir, "registry.json")
+
+	reg := overseer.NewRegistry(regPath)
+	require.NoError(t, reg.Load())
+
+	// Add custom daemon spec
+	spec := &overseer.DaemonSpec{
+		Name:          "seat-worker-3",
+		Description:   "Third autonomous seat worker",
+		Command:       []string{"agent", "seat-worker", "--agent-id", "peer-agent-3"},
+		DesiredState:  overseer.DesiredStateDisabled,
+		RestartPolicy: overseer.RestartPolicyOnFailure,
+		MaxRestarts:   5,
+	}
+	require.NoError(t, reg.Set(spec))
+
+	retrieved, ok := reg.Get("seat-worker-3")
+	require.True(t, ok)
+	assert.Equal(t, "Third autonomous seat worker", retrieved.Description)
+	assert.Equal(t, []string{"agent", "seat-worker", "--agent-id", "peer-agent-3"}, retrieved.Command)
+
+	// Delete custom daemon spec
+	require.NoError(t, reg.Delete("seat-worker-3"))
+	_, ok = reg.Get("seat-worker-3")
+	assert.False(t, ok)
+
+	// Deleting non-existent returns error
+	assert.Error(t, reg.Delete("non-existent"))
+}
+
+func TestRegistryPeerSeatsAutoSeeding(t *testing.T) {
+	rootDir := t.TempDir()
+	meshDir := filepath.Join(rootDir, ".zqk", "state", "mesh")
+	require.NoError(t, os.MkdirAll(meshDir, 0755))
+
+	peerSeatsContent := []byte(`{
+  "schema_version": "1",
+  "seats": {
+    "peer-agent-1": {
+      "note": "lead peer"
+    },
+    "peer-agent-2": {
+      "note": "worker peer 2"
+    }
+  }
+}`)
+	require.NoError(t, os.WriteFile(filepath.Join(meshDir, "peer_seats.json"), peerSeatsContent, 0644))
+
+	regPath := overseer.DefaultRegistryPath(rootDir)
+	reg := overseer.NewRegistry(regPath)
+	require.NoError(t, reg.Load())
+
+	// Verify both seat workers were automatically seeded
+	spec1, ok := reg.Get("seat-worker-peer-agent-1")
+	require.True(t, ok, "seat-worker-peer-agent-1 should be auto-seeded")
+	assert.Equal(t, []string{"agent", "seat-worker", "--agent-id", "peer-agent-1"}, spec1.Command)
+
+	spec2, ok := reg.Get("seat-worker-peer-agent-2")
+	require.True(t, ok, "seat-worker-peer-agent-2 should be auto-seeded")
+	assert.Equal(t, []string{"agent", "seat-worker", "--agent-id", "peer-agent-2"}, spec2.Command)
+}
+
+func TestSupervisorAddRemoveDaemonViaIPC(t *testing.T) {
+	tempDir := t.TempDir()
+	sockPath := shortTempSocket(t)
+	regPath := filepath.Join(tempDir, "registry.json")
+
+	pgMgr, err := overseer.NewProcessGroupManager(false)
+	require.NoError(t, err)
+
+	reg := overseer.NewRegistry(regPath)
+	require.NoError(t, reg.Load())
+
+	sup := overseer.NewSupervisor(tempDir, reg, pgMgr)
+	require.NoError(t, sup.Start(context.Background(), 20*time.Millisecond))
+	defer func() { _ = sup.Stop(context.Background()) }()
+
+	ipcServer := overseer.NewIPCServer(sockPath, sup)
+	require.NoError(t, ipcServer.Start())
+	defer func() { _ = ipcServer.Stop() }()
+
+	client := overseer.NewIPCClient(sockPath)
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	// Add dynamic seat worker
+	addResp, err := client.Send(ctx, overseer.IPCRequest{
+		Action: "add",
+		Spec: &overseer.DaemonSpec{
+			Name:          "seat-worker-dynamic",
+			Description:   "Dynamic seat worker",
+			Command:       []string{"agent", "seat-worker", "--agent-id", "peer-agent-dyn"},
+			DesiredState:  overseer.DesiredStateDisabled,
+			RestartPolicy: overseer.RestartPolicyNever,
+		},
+	})
+	require.NoError(t, err)
+	assert.True(t, addResp.Success)
+
+	st, err := sup.GetStatus("seat-worker-dynamic")
+	require.NoError(t, err)
+	assert.Equal(t, "seat-worker-dynamic", st.Name)
+
+	// Remove dynamic seat worker
+	remResp, err := client.Send(ctx, overseer.IPCRequest{
+		Action: "remove",
+		Target: "seat-worker-dynamic",
+	})
+	require.NoError(t, err)
+	assert.True(t, remResp.Success)
+
+	_, err = sup.GetStatus("seat-worker-dynamic")
+	assert.Error(t, err)
+}
+

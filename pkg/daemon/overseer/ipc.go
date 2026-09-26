@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"net"
-	"os"
 	"path/filepath"
 	"sync"
 	"time"
@@ -19,8 +18,9 @@ import (
 
 // IPCRequest represents a command sent over the domain socket.
 type IPCRequest struct {
-	Action string `json:"action"` // "status", "start", "stop", "restart", "enable", "disable", "shutdown"
-	Target string `json:"target,omitempty"`
+	Action string      `json:"action"` // "status", "start", "stop", "restart", "enable", "disable", "add", "remove", "shutdown"
+	Target string      `json:"target,omitempty"`
+	Spec   *DaemonSpec `json:"spec,omitempty"`
 }
 
 // IPCResponse represents the overseer response envelope.
@@ -60,17 +60,18 @@ func (s *IPCServer) Start() error {
 	defer s.mu.Unlock()
 
 	dir := filepath.Dir(s.socketPath)
-	if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
+	if err := fileutil.MkdirAll(dir, paths.DirPerm700); err != nil {
 		return errfmt.Newf("mkdir socket dir %s", dir).Wrap(err)
 	}
 
 	// Remove stale socket if exists
-	_ = os.Remove(s.socketPath)
+	_ = fileutil.Remove(s.socketPath)
 
 	l, err := net.Listen("unix", s.socketPath)
 	if err != nil {
 		return errfmt.Newf("listen on unix socket %s", s.socketPath).Wrap(err)
 	}
+	_ = fileutil.Chmod(s.socketPath, paths.FilePerm600)
 	s.listener = l
 
 	goroutinelabels.NewGoroutine("overseer_ipc_serve", "listen and accept overseer IPC connections").
@@ -92,7 +93,7 @@ func (s *IPCServer) Stop() error {
 	if s.listener != nil {
 		_ = s.listener.Close()
 	}
-	_ = os.Remove(s.socketPath)
+	_ = fileutil.Remove(s.socketPath)
 	s.mu.Unlock()
 
 	// Wait for active client connections to finish with a capped deadline
@@ -223,6 +224,29 @@ func (s *IPCServer) executeRequest(req IPCRequest) IPCResponse {
 			list = []DaemonStatus{*st}
 		}
 		return IPCResponse{Success: true, Daemons: list}
+
+	case "add":
+		if req.Spec == nil || req.Spec.Name == "" {
+			return IPCResponse{Success: false, Error: "missing daemon specification or name"}
+		}
+		if err := s.supervisor.AddDaemon(ctx, req.Spec); err != nil {
+			return IPCResponse{Success: false, Error: err.Error()}
+		}
+		st, _ := s.supervisor.GetStatus(req.Spec.Name)
+		var list []DaemonStatus
+		if st != nil {
+			list = []DaemonStatus{*st}
+		}
+		return IPCResponse{Success: true, Daemons: list}
+
+	case "remove":
+		if req.Target == "" {
+			return IPCResponse{Success: false, Error: "missing target daemon name"}
+		}
+		if err := s.supervisor.RemoveDaemon(ctx, req.Target); err != nil {
+			return IPCResponse{Success: false, Error: err.Error()}
+		}
+		return IPCResponse{Success: true}
 
 	default:
 		return IPCResponse{Success: false, Error: "unknown action: " + req.Action}

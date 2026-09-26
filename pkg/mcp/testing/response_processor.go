@@ -63,7 +63,7 @@ func (p *IgnoreErrorsProcessor) ProcessResponse(result any, err error) (any, err
 			"error_message":   err.Error(),
 			"original_result": result,
 		}
-		return errorResult, nil, true
+		return errorResult, nil, true //nolint:nilerr // IgnoreErrorsProcessor explicitly ignores errors by design
 	}
 	return result, nil, true
 }

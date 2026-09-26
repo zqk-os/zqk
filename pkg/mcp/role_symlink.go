@@ -105,7 +105,7 @@ func EnsureMCPRoleSymlink(projectRoot, role, targetBin string) (string, error) {
 	}
 	absLink, err := filepath.Abs(linkPath)
 	if err != nil {
-		return linkPath, nil
+		return linkPath, nil //nolint:nilerr // fallback to linkPath if absolute path resolution fails
 	}
 	return absLink, nil
 }

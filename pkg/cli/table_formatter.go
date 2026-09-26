@@ -148,7 +148,7 @@ func RenderTableWithTitle(title string, columns []string, widths []int, rows [][
 	t.SetColumnConfigs(colConfigs)
 
 	t.SetStyle(table.StyleLight)
-	return t.Render()
+	return adjustEmojiPadding(t.Render())
 }
 
 // RenderTableWithTitleAndWrap formats a table using go-pretty/table with specified column widths, centered title, and text wrapping (instead of truncation).
@@ -189,5 +189,33 @@ func RenderTableWithTitleAndWrap(title string, columns []string, widths []int, r
 	t.SetStyle(table.StyleLight)
 	t.Style().Title.Colors = text.Colors{text.Bold}
 	t.Style().Color.Header = text.Colors{text.Bold}
-	return t.Render()
+	return adjustEmojiPadding(t.Render())
 }
+
+// adjustEmojiPadding aligns table borders by trimming trailing spaces in cells where emojis
+// (such as ⚠️ / \u26a0) have terminal display width 2 but runewidth library computes width 1.
+func adjustEmojiPadding(rendered string) string {
+	if !strings.ContainsRune(rendered, '\u26a0') {
+		return rendered
+	}
+	lines := strings.Split(rendered, "\n")
+	for idx, line := range lines {
+		if !strings.ContainsRune(line, '\u26a0') {
+			continue
+		}
+		if strings.HasPrefix(line, "│") && strings.HasSuffix(line, "│") {
+			cells := strings.Split(line, "│")
+			for i := 1; i < len(cells)-1; i++ {
+				count := strings.Count(cells[i], "\u26a0")
+				for c := 0; c < count; c++ {
+					if strings.HasSuffix(cells[i], " ") {
+						cells[i] = strings.TrimSuffix(cells[i], " ")
+					}
+				}
+			}
+			lines[idx] = strings.Join(cells, "│")
+		}
+	}
+	return strings.Join(lines, "\n")
+}
+

@@ -28,4 +28,39 @@ func TestVars(t *testing.T) {
 	if HostloadDisable().Name() != brand.EnvVar("HOSTLOAD_DISABLE") {
 		t.Errorf("expected %s, got %q", brand.EnvVar("HOSTLOAD_DISABLE"), HostloadDisable().Name())
 	}
+	if ProductionKeystoreStrict().Name() != brand.EnvVar("PRODUCTION_KEYSTORE_STRICT") {
+		t.Errorf("expected %s, got %q", brand.EnvVar("PRODUCTION_KEYSTORE_STRICT"), ProductionKeystoreStrict().Name())
+	}
 }
+
+func TestIsTestBinaryPath_Precision(t *testing.T) {
+	testCases := []struct {
+		path     string
+		expected bool
+	}{
+		{"", false},
+		{"/var/folders/xyz/T/go-build12345/b001/exe/mytool", false},
+		{"/tmp/go-build999/exe/main", false},
+		{"/Users/dev/zqk-public-candidate/bin/zqk", false},
+		{"/Users/dev/zqk-public-candidate/bin/zqk-vet", false},
+		{"/var/folders/xyz/T/go-build12345/b001/pkg.test", true},
+		{"/tmp/my_package.test", true},
+		{"C:\\Users\\dev\\AppData\\Local\\Temp\\go-build123\\b001\\pkg.test.exe", true},
+		{"/usr/local/bin/mytest", false},
+	}
+
+	for _, tc := range testCases {
+		got := IsTestBinaryPath(tc.path)
+		if got != tc.expected {
+			t.Errorf("IsTestBinaryPath(%q) = %v; want %v", tc.path, got, tc.expected)
+		}
+	}
+}
+
+func TestIsInTest(t *testing.T) {
+	// Inside 'go test', testing.Testing() or flag.Lookup("test.v") will be true
+	if !IsInTest() {
+		t.Errorf("expected IsInTest() to be true when executing inside 'go test'")
+	}
+}
+

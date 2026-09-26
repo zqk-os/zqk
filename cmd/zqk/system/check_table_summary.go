@@ -469,8 +469,8 @@ func renderTableWithTitle(title string, headers []string, rows [][]string) strin
 		} else if headers[0] == "METRIC" || headers[0] == "Metric" {
 			// Layer 4: METRIC, VALUE, STATUS
 			widths[0] = 30
-			widths[1] = 25
-			widths[2] = 35
+			widths[1] = 20
+			widths[2] = 40
 		} else {
 			widths[0] = 30
 			widths[1] = 15

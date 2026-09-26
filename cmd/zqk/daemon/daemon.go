@@ -14,6 +14,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/daemon/overseer"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // NewDaemonCmd creates the root daemon command for process group supervision.
@@ -25,14 +26,26 @@ func NewDaemonCmd() *cobra.Command {
 	cmd.AddCommand(newRestartCmd())
 	cmd.AddCommand(newEnableCmd())
 	cmd.AddCommand(newDisableCmd())
+	cmd.AddCommand(newAddCmd())
+	cmd.AddCommand(newRemoveCmd())
 	cmd.AddCommand(newRunCmd())
+	cmd.AddCommand(newServiceCmd())
 	return cmd
+}
+
+func resolveProjectRoot(cmd *cobra.Command) string {
+	if cmd != nil {
+		if c := cli.GetContext(cmd); c != nil && c.ProjectRoot != "" {
+			return c.ProjectRoot
+		}
+	}
+	return cli.ResolveProjectRoot(".")
 }
 
 func newStatusCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewDaemonStatusCommandBuilder()
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-			projectRoot := cli.ResolveProjectRoot(".")
+			projectRoot := resolveProjectRoot(cmd)
 			sockPath := overseer.SocketPath(projectRoot)
 			client := overseer.NewIPCClient(sockPath)
 
@@ -98,7 +111,7 @@ func newStartCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewDaemonStartCommandBuilder()
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		name := args[0]
-		projectRoot := cli.ResolveProjectRoot(".")
+		projectRoot := resolveProjectRoot(cmd)
 		sockPath := overseer.SocketPath(projectRoot)
 		client := overseer.NewIPCClient(sockPath)
 
@@ -133,9 +146,9 @@ func newStartCmd() *cobra.Command {
 			return errfmt.Errorf("%s", resp.Error)
 		}
 		return cli.FormatOutput(cmd, map[string]any{
-			"status":  "success",
-			"daemon":  name,
-			"daemons": resp.Daemons,
+			objects.FieldKeyStatus: objects.ObjectStatusSuccess,
+			"daemon":               name,
+			"daemons":              resp.Daemons,
 		})
 	}
 	return cmd
@@ -145,7 +158,7 @@ func newStopCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewDaemonStopCommandBuilder()
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		name := args[0]
-		projectRoot := cli.ResolveProjectRoot(".")
+		projectRoot := resolveProjectRoot(cmd)
 		sockPath := overseer.SocketPath(projectRoot)
 		client := overseer.NewIPCClient(sockPath)
 
@@ -178,9 +191,9 @@ func newStopCmd() *cobra.Command {
 			return errfmt.Errorf("%s", resp.Error)
 		}
 		return cli.FormatOutput(cmd, map[string]any{
-			"status":  "success",
-			"daemon":  name,
-			"daemons": resp.Daemons,
+			objects.FieldKeyStatus: objects.ObjectStatusSuccess,
+			"daemon":               name,
+			"daemons":              resp.Daemons,
 		})
 	}
 	return cmd
@@ -190,7 +203,7 @@ func newRestartCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewDaemonRestartCommandBuilder()
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		name := args[0]
-		projectRoot := cli.ResolveProjectRoot(".")
+		projectRoot := resolveProjectRoot(cmd)
 		sockPath := overseer.SocketPath(projectRoot)
 		client := overseer.NewIPCClient(sockPath)
 
@@ -212,9 +225,9 @@ func newRestartCmd() *cobra.Command {
 			return errfmt.Errorf("%s", resp.Error)
 		}
 		return cli.FormatOutput(cmd, map[string]any{
-			"status":  "success",
-			"daemon":  name,
-			"daemons": resp.Daemons,
+			objects.FieldKeyStatus: objects.ObjectStatusSuccess,
+			"daemon":               name,
+			"daemons":              resp.Daemons,
 		})
 	}
 	return cmd
@@ -224,7 +237,7 @@ func newEnableCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewDaemonEnableCommandBuilder()
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		name := args[0]
-		projectRoot := cli.ResolveProjectRoot(".")
+		projectRoot := resolveProjectRoot(cmd)
 		sockPath := overseer.SocketPath(projectRoot)
 		client := overseer.NewIPCClient(sockPath)
 
@@ -239,9 +252,9 @@ func newEnableCmd() *cobra.Command {
 				return errfmt.Errorf("%s", resp.Error)
 			}
 			return cli.FormatOutput(cmd, map[string]any{
-				"status":  "success",
-				"daemon":  name,
-				"desired": "enabled",
+				objects.FieldKeyStatus: objects.ObjectStatusSuccess,
+				"daemon":               name,
+				"desired":              "enabled",
 			})
 		}
 
@@ -265,7 +278,7 @@ func newDisableCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewDaemonDisableCommandBuilder()
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		name := args[0]
-		projectRoot := cli.ResolveProjectRoot(".")
+		projectRoot := resolveProjectRoot(cmd)
 		sockPath := overseer.SocketPath(projectRoot)
 		client := overseer.NewIPCClient(sockPath)
 
@@ -280,9 +293,9 @@ func newDisableCmd() *cobra.Command {
 				return errfmt.Errorf("%s", resp.Error)
 			}
 			return cli.FormatOutput(cmd, map[string]any{
-				"status":  "success",
-				"daemon":  name,
-				"desired": "disabled",
+				objects.FieldKeyStatus: objects.ObjectStatusSuccess,
+				"daemon":               name,
+				"desired":              "disabled",
 			})
 		}
 
@@ -302,10 +315,133 @@ func newDisableCmd() *cobra.Command {
 	return cmd
 }
 
+func newAddCmd() *cobra.Command {
+	cmd := bldr_cli_cmd_v1.NewDaemonAddCommandBuilder()
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		name := args[0]
+		commandArgs := args[1:]
+
+		description, _ := cmd.Flags().GetString("description")
+		restartPolicyStr, _ := cmd.Flags().GetString("restart-policy")
+		maxRestarts, _ := cmd.Flags().GetInt("max-restarts")
+		workingDir, _ := cmd.Flags().GetString("working-dir")
+		enabled, _ := cmd.Flags().GetBool("enabled")
+
+		desiredState := overseer.DesiredStateDisabled
+		if enabled {
+			desiredState = overseer.DesiredStateEnabled
+		}
+
+		restartPolicy := overseer.RestartPolicy(restartPolicyStr)
+		if restartPolicy != overseer.RestartPolicyAlways &&
+			restartPolicy != overseer.RestartPolicyOnFailure &&
+			restartPolicy != overseer.RestartPolicyNever {
+			return errfmt.Errorf("invalid restart-policy %q: must be always, on-failure, or never", restartPolicyStr)
+		}
+
+		spec := &overseer.DaemonSpec{
+			Name:          name,
+			Description:   description,
+			Command:       commandArgs,
+			DesiredState:  desiredState,
+			RestartPolicy: restartPolicy,
+			MaxRestarts:   maxRestarts,
+			BackoffMin:    1 * time.Second,
+			BackoffMax:    30 * time.Second,
+			WorkingDir:    workingDir,
+		}
+
+		projectRoot := resolveProjectRoot(cmd)
+		sockPath := overseer.SocketPath(projectRoot)
+		client := overseer.NewIPCClient(sockPath)
+
+		if !client.IsRunning() {
+			regPath := overseer.DefaultRegistryPath(projectRoot)
+			reg := overseer.NewRegistry(regPath)
+			if err := reg.Load(); err != nil {
+				return errfmt.Newf("load registry").Wrap(err)
+			}
+			if err := reg.Set(spec); err != nil {
+				return err
+			}
+			return cli.FormatOutput(cmd, map[string]any{
+				"daemon":               name,
+				objects.FieldKeyStatus: objects.ObjectStatusAdded,
+				"desired":              string(desiredState),
+				"note":                 "Overseer is not running; daemon configuration saved to registry.",
+			})
+		}
+
+		ctx, cancel := context.WithTimeout(cmd.Context(), 5*time.Second)
+		defer cancel()
+
+		resp, err := client.Send(ctx, overseer.IPCRequest{
+			Action: "add",
+			Spec:   spec,
+		})
+		if err != nil {
+			return errfmt.Newf("send add command").Wrap(err)
+		}
+		if !resp.Success {
+			return errfmt.Errorf("%s", resp.Error)
+		}
+		return cli.FormatOutput(cmd, map[string]any{
+			objects.FieldKeyStatus: objects.ObjectStatusSuccess,
+			"daemon":               name,
+			"daemons":              resp.Daemons,
+		})
+	}
+	return cmd
+}
+
+func newRemoveCmd() *cobra.Command {
+	cmd := bldr_cli_cmd_v1.NewDaemonRemoveCommandBuilder()
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		name := args[0]
+		projectRoot := resolveProjectRoot(cmd)
+		sockPath := overseer.SocketPath(projectRoot)
+		client := overseer.NewIPCClient(sockPath)
+
+		if !client.IsRunning() {
+			regPath := overseer.DefaultRegistryPath(projectRoot)
+			reg := overseer.NewRegistry(regPath)
+			if err := reg.Load(); err != nil {
+				return errfmt.Newf("load registry").Wrap(err)
+			}
+			if err := reg.Delete(name); err != nil {
+				return err
+			}
+			return cli.FormatOutput(cmd, map[string]any{
+				"daemon":               name,
+				objects.FieldKeyStatus: objects.ObjectStatusRemoved,
+			})
+		}
+
+		ctx, cancel := context.WithTimeout(cmd.Context(), 5*time.Second)
+		defer cancel()
+
+		resp, err := client.Send(ctx, overseer.IPCRequest{
+			Action: "remove",
+			Target: name,
+		})
+		if err != nil {
+			return errfmt.Newf("send remove command").Wrap(err)
+		}
+		if !resp.Success {
+			return errfmt.Errorf("%s", resp.Error)
+		}
+		return cli.FormatOutput(cmd, map[string]any{
+			objects.FieldKeyStatus: objects.ObjectStatusSuccess,
+			"daemon":               name,
+		})
+	}
+	return cmd
+}
+
 func newRunCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewDaemonRunCommandBuilder()
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		projectRoot := cli.ResolveProjectRoot(".")
+		projectRoot := resolveProjectRoot(cmd)
 		logger := logging.GetLoggerFromProfile("human")
 
 		pgMgr, err := overseer.NewProcessGroupManager(true)
@@ -354,3 +490,88 @@ func newRunCmd() *cobra.Command {
 	}
 	return cmd
 }
+
+func newServiceCmd() *cobra.Command {
+	parent := bldr_cli_cmd_v1.NewDaemonServiceCommandBuilder()
+	parent.AddCommand(newServiceInstallCmd())
+	parent.AddCommand(newServiceUninstallCmd())
+	parent.AddCommand(newServiceStatusCmd())
+	parent.AddCommand(newServiceCleanupLegacyCmd())
+	return parent
+}
+
+func newServiceInstallCmd() *cobra.Command {
+	cmd := bldr_cli_cmd_v1.NewDaemonServiceInstallCommandBuilder()
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		root, _ := cmd.Flags().GetString("root")
+		if root == "" {
+			root = resolveProjectRoot(cmd)
+		}
+		bin, _ := cmd.Flags().GetString("binary")
+
+		st, err := overseer.InstallOverseerLaunchAgent(root, bin)
+		if err != nil {
+			return err
+		}
+		return cli.FormatOutput(cmd, map[string]any{
+			objects.FieldKeyStatus: objects.ObjectStatusInstalled,
+			"label":                st.Label,
+			"plist_path":           st.PlistPath,
+			"cleaned_legacy_units": st.CleanedUnits,
+			"running":              st.Running,
+			"pid":                  st.PID,
+			"note":                 "Solitary overseer LaunchAgent active. All daemons run under its process group.",
+		})
+	}
+	return cmd
+}
+
+func newServiceUninstallCmd() *cobra.Command {
+	cmd := bldr_cli_cmd_v1.NewDaemonServiceUninstallCommandBuilder()
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		if err := overseer.UninstallOverseerLaunchAgent(); err != nil {
+			return err
+		}
+		return cli.FormatOutput(cmd, map[string]any{
+			objects.FieldKeyStatus: objects.ObjectStatusUninstalled,
+			"label":                overseer.OverseerLaunchAgentLabel,
+		})
+	}
+	return cmd
+}
+
+func newServiceStatusCmd() *cobra.Command {
+	cmd := bldr_cli_cmd_v1.NewDaemonServiceStatusCommandBuilder()
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		st, err := overseer.StatusOverseerLaunchAgent()
+		if err != nil {
+			return err
+		}
+		return cli.FormatOutput(cmd, map[string]any{
+			"label":      st.Label,
+			"installed":  st.Installed,
+			"loaded":     st.Loaded,
+			"running":    st.Running,
+			"pid":        st.PID,
+			"plist_path": st.PlistPath,
+		})
+	}
+	return cmd
+}
+
+func newServiceCleanupLegacyCmd() *cobra.Command {
+	cmd := bldr_cli_cmd_v1.NewDaemonServiceCleanupLegacyCommandBuilder()
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		cleaned, err := overseer.CleanLegacyLaunchAgents()
+		if err != nil {
+			return err
+		}
+		return cli.FormatOutput(cmd, map[string]any{
+			objects.FieldKeyStatus: objects.ObjectStatusCleaned,
+			"cleaned_legacy_units": cleaned,
+			"count":                len(cleaned),
+		})
+	}
+	return cmd
+}
+

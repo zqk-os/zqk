@@ -1,0 +1,14 @@
+$schema: ../schemas/command_spec.schema.json
+name: service
+short: Manage host OS supervisor service (launchd / systemd) for the Overseer
+description: Manage host OS supervisor service for the Overseer. Ensures only one single overseer service is registered under the host init system.
+args:
+  type: no_args
+help:
+  examples:
+    - comment: Show overseer host service status
+      command: '%s daemon service status'
+    - comment: Install the solitary overseer launchd service and clean legacy units
+      command: '%s daemon service install'
+run_e: runDaemonService
+common_flags: true

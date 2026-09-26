@@ -20,8 +20,13 @@ func (f *FileObjectStorage) findDependents(ctx context.Context, id, _ string) ([
 		existingDependents := make([]string, 0, len(dependents))
 		secCtx := pkgctx.NewSystemSecurityContext()
 		for _, depID := range dependents {
-			if _, err := f.Read(ctx, secCtx, depID); err == nil {
-				existingDependents = append(existingDependents, depID)
+			if depObj, err := f.Read(ctx, secCtx, depID); err == nil {
+				for _, refID := range GetReferencedObjectIDs(depObj) {
+					if refID == id {
+						existingDependents = append(existingDependents, depID)
+						break
+					}
+				}
 			}
 		}
 		return existingDependents, nil

@@ -470,14 +470,12 @@ func TestPartialUpdatePreservesSystemFields(t *testing.T) {
 		objects.FieldKeyID:            objID,
 		objects.FieldKeyKind:          "backlog_item",
 		objects.FieldKeyTitle:         "Original Title",
-		objects.FieldKeyStatus:        objects.ObjectStatusExploring,
+		objects.FieldKeyStatus:        objects.ObjectStatusPlanned,
 		objects.FieldKeyCreatedBy:     originalCreatedBy,
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 	}
 
-	if err := fos.Create(ctx, secCtx, obj); err != nil {
-		t.Fatalf("failed to create object: %v", err)
-	}
+	storage.CreateCASVisible(t, fos, ctx, secCtx, obj, objects.ObjectStatusPlanned)
 
 	// Read to get created_at
 	original, err := fos.Read(ctx, secCtx, objID)

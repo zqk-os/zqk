@@ -194,7 +194,6 @@ func (s *ClientMetricsStore) Load() error {
 	}
 
 	if err := json.Unmarshal(data, &fileData); err != nil {
-		// If parsing fails, start fresh
 		_ = concurrency.RunInLockWithLogger(
 			&s.mu, LockNameClientMetricsLoadInit4, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 			func() error {
@@ -202,7 +201,7 @@ func (s *ClientMetricsStore) Load() error {
 				return nil
 			},
 		)
-		return nil
+		return fmt.Errorf("failed to unmarshal client metrics: %w", err)
 	}
 
 	// Update metrics (re-acquire lock)

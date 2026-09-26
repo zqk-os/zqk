@@ -232,8 +232,25 @@ func applySpecFix(fixCtx *AutoFixContext, originalObj map[string]any, updatedObj
 	}
 
 	options := validation.DefaultValidationOptions()
+	options.ProjectRoot = getProjectRootFromContext(fixCtx.Ctx)
 	if status, ok := updatedObj[objects.FieldKeyStatus].(string); ok {
 		options.CurrentState = status
+	}
+	if storageProvider != nil {
+		options.ObjectLookup = func(id string) (map[string]any, error) {
+			return storageProvider.Read(stdctx, secCtx, id)
+		}
+		options.ObjectStatusLookup = func(id string) (string, error) {
+			obj, err := options.ObjectLookup(id)
+			if err != nil {
+				return "", err
+			}
+			status, _ := obj[objects.FieldKeyStatus].(string)
+			return status, nil
+		}
+		options.DependentsLookup = func(id string) []string {
+			return storage.DependentsForID(stdctx, storageProvider, id)
+		}
 	}
 
 	result, valErr := validator.Validate(stdctx, updatedObj, fixCtx.Kind, options)
@@ -249,7 +266,11 @@ func applySpecFix(fixCtx *AutoFixContext, originalObj map[string]any, updatedObj
 	if updatedErrCount > 0 {
 		originalErrCount := -1
 		if originalObj != nil {
-			origResult, origErr := validator.Validate(stdctx, originalObj, fixCtx.Kind, options)
+			origOptions := *options
+			if origStatus, ok := originalObj[objects.FieldKeyStatus].(string); ok {
+				origOptions.CurrentState = origStatus
+			}
+			origResult, origErr := validator.Validate(stdctx, originalObj, fixCtx.Kind, &origOptions)
 			if origErr == nil && origResult != nil {
 				originalErrCount = len(origResult.Errors)
 			}

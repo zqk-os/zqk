@@ -1,0 +1,36 @@
+$schema: ../schemas/command_spec.schema.json
+name: add <name> -- <command...>
+short: Register a new daemon under overseer supervision
+description: Register a new daemon specification in the overseer registry with optional auto-start.
+args:
+  type: minimum
+  min: 2
+flags:
+  - name: description
+    type: string
+    default: ""
+    description: Human-readable description of the daemon
+  - name: restart-policy
+    type: string
+    default: on-failure
+    description: Auto-restart policy (always, on-failure, never)
+  - name: max-restarts
+    type: int
+    default: 5
+    description: Maximum consecutive restart attempts before backoff
+  - name: working-dir
+    type: string
+    default: ""
+    description: Working directory for the daemon process
+  - name: enabled
+    type: bool
+    default: false
+    description: Mark daemon as enabled and start immediately if overseer is running
+help:
+  examples:
+    - comment: Register a second seat-worker
+      command: '%s daemon add seat-worker-2 -- agent seat-worker --agent-id peer-agent-2'
+    - comment: Register and immediately start a custom worker
+      command: '%s daemon add worker-qa --enabled -- agent seat-worker --agent-id peer-agent-qa'
+run_e: runDaemonAdd
+common_flags: true

@@ -97,7 +97,7 @@ func TestPriorityPlanSecurityGate_InProgressRefusesNonShovelReadyChildren(t *tes
 		objects.FieldKeyKind:        objects.KindPriorityPlan,
 		objects.FieldKeyTitle:       "Test Plan Shovel Ready Gate",
 		objects.FieldKeyDescription: "Test Priority Plan Shovel Ready Gate Description",
-		objects.FieldKeyStatus:      objects.ObjectStatusGrooming,
+		objects.FieldKeyStatus:      objects.ObjectStatusActive,
 	}
 	if err := fos.Create(ctx, secCtx, plan); err != nil {
 		t.Fatalf("Create plan: %v", err)

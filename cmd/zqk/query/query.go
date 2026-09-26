@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/kindnames"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/traversal"
@@ -29,7 +30,7 @@ func NewQueryCmd() *cobra.Command {
 		"",
 		"Enables agents and operators to perform multi-hop topological queries directly over local CAS storage without requiring an external graph database.",
 	).
-		AddExample("Find all planned backlog items", `%s query "MATCH (b:backlog_item) WHERE b.status = 'planned' RETURN b.id, b.title;"`).
+		AddExample("Find all planned backlog items", `%s query "MATCH (b:backlog_item) WHERE b.status == 'planned' RETURN b.id, b.title;"`).
 		AddExample("Multi-hop plan and criteria traversal", `%s query "MATCH (p:priority_plan)-[:items]->(b:backlog_item)-[:criteria_refs]->(c:criteria) RETURN p.title AS plan, b.id AS bli, c.title AS criterion;"`).
 		AddExample("Query from file formatted as JSON", `%s query -f query.zparql --format json`)
 
@@ -160,8 +161,18 @@ func PopulateIndexFromStorage(ctx context.Context, proc *cli.Processor, idx *tra
 		kinds, err = registry.GetAllKinds()
 		if err != nil || len(kinds) == 0 {
 			kinds = []string{
-				"goal", "milestone", "priority_plan", "workstream", "backlog_item",
-				"criteria", "test_case", "policy", "persona", "prompt", "audit_event",
+				kindnames.Goal,
+				kindnames.Milestone,
+				kindnames.PriorityPlan,
+				kindnames.Workstream,
+				kindnames.BacklogItem,
+				kindnames.Criteria,
+				kindnames.TestCase,
+				kindnames.Policy,
+				kindnames.Persona,
+				kindnames.PromptTemplate,
+				kindnames.AuditEvent,
+				kindnames.TechnicalDebt,
 			}
 		}
 	}
@@ -174,7 +185,7 @@ func PopulateIndexFromStorage(ctx context.Context, proc *cli.Processor, idx *tra
 			continue
 		}
 		for _, obj := range res.Objects {
-			id, _ := obj["id"].(string)
+			id, _ := obj[objects.FieldKeyID].(string)
 			if id == "" {
 				continue
 			}

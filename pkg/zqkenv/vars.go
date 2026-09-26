@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"testing"
 
 	"github.com/zqk-os/zqk/pkg/brand"
 )
@@ -122,6 +123,7 @@ const _sfxPreconditionsFailOpen = "PRECONDITIONS_FAIL_OPEN"
 const _sfxPprof = "PPROF"
 const _sfxPprofPort = "PPROF_PORT"
 const _sfxProjectRoot = "PROJECT_ROOT"
+const _sfxProductionKeystoreStrict = "PRODUCTION_KEYSTORE_STRICT"
 const _sfxRetentionToleranceConfig = "RETENTION_TOLERANCE_CONFIG"
 const _sfxRollbackCaptureDisabled = "ROLLBACK_CAPTURE_DISABLED"
 const _sfxRollbackRetainCount = "ROLLBACK_RETAIN_COUNT"
@@ -436,6 +438,15 @@ func HighVolumeCacheKindParallelism() EnvVar {
 // When set to "true", indicates the process is running inside a test harness.
 func InTest() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxInTest)} }
 
+// IsTestBinaryPath checks whether an executable path looks like a test runner binary.
+func IsTestBinaryPath(execPath string) bool {
+	if execPath == "" {
+		return false
+	}
+	base := strings.ToLower(filepath.Base(execPath))
+	return strings.HasSuffix(base, ".test") || strings.HasSuffix(base, ".test.exe")
+}
+
 // IsInTest returns true if the IN_TEST environment variable is set to "true",
 // or if the process is detected to be running under a test runner.
 func IsInTest() bool {
@@ -443,18 +454,12 @@ func IsInTest() bool {
 		return true
 	}
 	// Check if running under go test
-	if flag.Lookup("test.v") != nil {
+	if testing.Testing() || flag.Lookup("test.v") != nil {
 		return true
 	}
-	// Fallback to checking executable suffix
+	// Fallback to checking executable name for test binary suffixes
 	if len(os.Args) > 0 {
-		base := strings.ToLower(filepath.Base(os.Args[0]))
-		if strings.HasSuffix(base, ".test") ||
-			strings.Contains(os.Args[0], "go-build") ||
-			strings.Contains(os.Args[0], "___go_build") ||
-			strings.Contains(base, "test") {
-			return true
-		}
+		return IsTestBinaryPath(os.Args[0])
 	}
 	return false
 }
@@ -589,6 +594,13 @@ func PprofPort() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxPprofPort)} }
 
 // ProjectRoot returns the environment variable name for PROJECT_ROOT (brand-prefixed).
 func ProjectRoot() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxProjectRoot)} }
+
+// ProductionKeystoreStrict returns the environment variable name for PRODUCTION_KEYSTORE_STRICT (brand-prefixed).
+// When set to "1", "true", or "yes", AuditorGate disallows falling back to local disk-based private keys
+// if the trusted auditor key is absent from CAS.
+func ProductionKeystoreStrict() EnvVar {
+	return EnvVar{Key: brand.EnvVar(_sfxProductionKeystoreStrict)}
+}
 
 // RetentionToleranceConfig returns the environment variable name for RETENTION_TOLERANCE_CONFIG (brand-prefixed).
 func RetentionToleranceConfig() EnvVar {

@@ -199,7 +199,7 @@ func DiscoverAdditionalResources(server *Server) {
 	err := filepath.Walk(archDir, func(filePath string, info fileutil.FileInfo, walkErr error) error {
 		// Handle walk errors gracefully - skip problematic entries
 		if walkErr != nil {
-			return nil
+			return nil //nolint:nilerr // skip unreadable files during resource discovery walk
 		}
 
 		// Process only regular files (skip directories)

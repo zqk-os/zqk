@@ -211,11 +211,21 @@ func (s *Supervisor) launchDaemonLocked(ctx context.Context, spec *DaemonSpec, s
 		args = spec.Command[1:]
 	}
 
-	// Resolve executable relative to projectRoot if needed
-	if !filepath.IsAbs(exe) {
+	selfExe, err := os.Executable()
+	if err != nil || selfExe == "" {
+		selfExe = filepath.Join(s.projectRoot, "bin", "zqk")
+	}
+
+	if exe == "zqk" || exe == "zqk-stable" {
+		exe = selfExe
+	} else if !filepath.IsAbs(exe) {
 		binCandidate := filepath.Join(s.projectRoot, "bin", exe)
 		if _, err := os.Stat(binCandidate); err == nil {
 			exe = binCandidate
+		} else if _, err := exec.LookPath(exe); err != nil {
+			// Subcommand of zqk (e.g. "scheduler", "ambient", "object", "kernel")
+			args = spec.Command
+			exe = selfExe
 		}
 	}
 
@@ -226,8 +236,12 @@ func (s *Supervisor) launchDaemonLocked(ctx context.Context, spec *DaemonSpec, s
 		cmd.Dir = s.projectRoot
 	}
 
+	cmd.Env = os.Environ()
+	cmd.Env = append(cmd.Env,
+		"ZQK_PROJECT_ROOT="+s.projectRoot,
+		"ZQK_IS_DAEMON=1",
+	)
 	if len(spec.Env) > 0 {
-		cmd.Env = os.Environ()
 		for k, v := range spec.Env {
 			cmd.Env = append(cmd.Env, k+"="+v)
 		}
@@ -384,3 +398,33 @@ func (s *Supervisor) GetAllStatuses() []DaemonStatus {
 	}
 	return statuses
 }
+
+// AddDaemon registers or updates a daemon specification and triggers reconciliation.
+func (s *Supervisor) AddDaemon(ctx context.Context, spec *DaemonSpec) error {
+	if spec == nil || spec.Name == "" {
+		return errfmt.Errorf("daemon spec name cannot be empty")
+	}
+	if err := s.registry.Set(spec); err != nil {
+		return err
+	}
+	return s.Reconcile(ctx)
+}
+
+// RemoveDaemon stops a daemon and removes it from the registry.
+func (s *Supervisor) RemoveDaemon(ctx context.Context, name string) error {
+	s.mu.Lock()
+	var pidToStop int
+	if cmd, ok := s.processes[name]; ok && cmd != nil && cmd.Process != nil {
+		pidToStop = cmd.Process.Pid
+	}
+	delete(s.processes, name)
+	delete(s.statuses, name)
+	s.mu.Unlock()
+
+	if pidToStop > 0 {
+		_ = s.pgMgr.TerminateGroup(ctx, pidToStop, 200*time.Millisecond)
+	}
+
+	return s.registry.Delete(name)
+}
+

@@ -106,7 +106,7 @@ func (rtw *RollingTraceWriter) Write(p []byte) (n int, err error) {
 			// Write to current file
 			writeN, writeErr = rtw.currentFile.Write(p)
 			if writeErr != nil {
-				return nil
+				return writeErr
 			}
 
 			// Update size
@@ -116,7 +116,7 @@ func (rtw *RollingTraceWriter) Write(p []byte) (n int, err error) {
 			if rtw.currentSize > rtw.maxSize {
 				if err := rtw.rotateLocked(); err != nil {
 					writeErr = errfmt.Newf("failed to rotate trace file after write").Wrap(err)
-					return nil
+					return writeErr
 				}
 			}
 
