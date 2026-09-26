@@ -77,7 +77,7 @@ func InitializePermissionCache(server *Server, initCtx *pkgctx.CliInitialization
 			if err := permissionCache.BuildPermissionCache(secCtx); err != nil {
 				// Log error but don't fail initialization
 				// Permission cache will be built lazily when needed
-				return permissionCache, specAccessControl, nil
+				return permissionCache, specAccessControl, nil //nolint:nilerr // permission cache will build lazily on failure
 			}
 		}
 	}

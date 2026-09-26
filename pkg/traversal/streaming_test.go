@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/traversal"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -86,7 +87,7 @@ func TestZPARQL_StreamingBackpressureProof(t *testing.T) {
 	var consumedCount atomic.Int64
 	done := make(chan error, 1)
 
-	go func() {
+	goroutinelabels.NewGoroutine("zparql_test_consumer", "streaming test consumer").StartSimple(func() {
 		result, err := consumer.Consume(ctx, stream)
 		if err != nil {
 			done <- err
@@ -94,7 +95,7 @@ func TestZPARQL_StreamingBackpressureProof(t *testing.T) {
 		}
 		consumedCount.Store(int64(len(result.Records)))
 		done <- nil
-	}()
+	})
 
 	select {
 	case err := <-done:

@@ -11,6 +11,7 @@ import (
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/mutation"
+	"github.com/zqk-os/zqk/pkg/objects"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -93,7 +94,9 @@ func NewMutateCmd() *cobra.Command {
 			// If connected to storage and not dry-run, persist committed mutations
 			if !dryRun && receipt.Committed {
 				if proc, procErr := cli.NewProcessor(cmd); procErr == nil && proc.Storage() != nil {
-					_ = persistCommittedMutations(cmd.Context(), proc, engine, receipt)
+					if err := persistCommittedMutations(cmd.Context(), proc, engine, receipt); err != nil {
+						return fmt.Errorf("mutation persistence failed: %w", err)
+					}
 				}
 			}
 
@@ -153,7 +156,7 @@ func persistCommittedMutations(ctx context.Context, proc *cli.Processor, engine 
 		}
 		kind := r.TargetKind
 		if kind == "" {
-			if k, ok := data["kind"].(string); ok {
+			if k, ok := data[objects.FieldKeyKind].(string); ok {
 				kind = k
 			}
 		}
@@ -165,14 +168,20 @@ func persistCommittedMutations(ctx context.Context, proc *cli.Processor, engine 
 				for k, v := range data {
 					existing[k] = v
 				}
-				_ = proc.Storage().Update(ctx, secCtx, r.TargetID, existing)
+				if err := proc.Storage().Update(ctx, secCtx, r.TargetID, existing); err != nil {
+					return fmt.Errorf("failed to update node %s: %w", r.TargetID, err)
+				}
 			} else {
 				if err := proc.Storage().Create(ctx, secCtx, data); err != nil {
-					_ = proc.Storage().Update(ctx, secCtx, r.TargetID, data)
+					if updateErr := proc.Storage().Update(ctx, secCtx, r.TargetID, data); updateErr != nil {
+						return fmt.Errorf("failed to persist node %s: %w", r.TargetID, updateErr)
+					}
 				}
 			}
 		case mutation.ActionRemoveEdge:
-			_ = proc.Storage().Delete(ctx, secCtx, r.TargetID, false)
+			if err := proc.Storage().Delete(ctx, secCtx, r.TargetID, false); err != nil {
+				return fmt.Errorf("failed to delete node %s: %w", r.TargetID, err)
+			}
 		}
 	}
 	return nil
