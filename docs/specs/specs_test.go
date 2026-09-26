@@ -185,5 +185,30 @@ func TestZPARQLIndexedQueryPlannerSpec(t *testing.T) {
 	require.Contains(t, content, "ERR_ZPARQL_CYCLIC_RECURSION_LIMIT")
 }
 
+func TestZPARQLResultStreamingSpec(t *testing.T) {
+	specsDir := findSpecsDir()
+	specPath := filepath.Join(specsDir, "SPEC-ZPARQL-RESULT-STREAMING.md")
+	data, err := os.ReadFile(specPath)
+	require.NoError(t, err, "ZPARQL result streaming specification file must exist: %s", specPath)
+	content := string(data)
+	require.NotEmpty(t, content, "ZPARQL result streaming specification content must not be empty")
+
+	// Result Schema Spec (CRIT-ZPARQL-RESULT-SCHEMA-SPEC)
+	require.Contains(t, content, "CRIT-ZPARQL-RESULT-SCHEMA-SPEC")
+	require.Contains(t, content, "Header Frame")
+	require.Contains(t, content, "Chunk Frames")
+	require.Contains(t, content, "Trailer Frame")
+
+	// Streaming backpressure proof (CRIT-ZPARQL-STREAMING-BACKPRESSURE-PROOF)
+	require.Contains(t, content, "CRIT-ZPARQL-STREAMING-BACKPRESSURE-PROOF")
+	require.Contains(t, content, "Constant Memory Overhead")
+
+	// Truncated stream negative invariant (CRIT-ZPARQL-TRUNCATED-STREAM-NEGATIVE)
+	require.Contains(t, content, "CRIT-ZPARQL-TRUNCATED-STREAM-NEGATIVE")
+	require.Contains(t, content, "EOS_FINALIZED")
+	require.Contains(t, content, "ERR_ZPARQL_STREAM_TRUNCATED")
+}
+
+
 
 
