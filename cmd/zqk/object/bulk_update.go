@@ -186,6 +186,9 @@ func runBulkUpdate(cmd *cobra.Command, args []string) error {
 	if err := guardManualRefFieldUpdates(cmd, nil, "", kind, setMap); err != nil {
 		return err
 	}
+	if err := guardManualSystemProvenanceFields(cmd, nil, "", kind, setMap); err != nil {
+		return err
+	}
 
 	storageProvider, err := cli.GetObjectStorageForCommand(cmd, projectRoot)
 	if err != nil {
@@ -447,6 +450,9 @@ func runBulkUpdateFromFile(cmd *cobra.Command, cliContext *cli.Context, logger *
 			return err
 		}
 		if err := guardManualRefFieldUpdates(cmd, nil, id, kind, entry.Updates); err != nil {
+			return err
+		}
+		if err := guardManualSystemProvenanceFields(cmd, nil, id, kind, entry.Updates); err != nil {
 			return err
 		}
 

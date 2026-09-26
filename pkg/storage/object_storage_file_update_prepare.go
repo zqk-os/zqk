@@ -126,6 +126,46 @@ func (f *FileObjectStorage) prepareFileObjectUpdate(ctx context.Context, secCtx 
 		updates[objects.FieldKeyStatus] = canonical
 	}
 
+	// Enforce directed lifecycle status transitions unless elevated break-glass mode is active
+	if newStatus := objects.GetString(updates, objects.FieldKeyStatus); newStatus != "" {
+		existingStatus := objects.GetString(existing, objects.FieldKeyStatus)
+		if existingStatus != "" {
+			if canonExisting, err := canonicalizePersistedLifecycleStatus(f.GetLifecycleLoader(), kind, existingStatus); err == nil {
+				existingStatus = canonExisting
+			}
+		} else {
+			loader := f.GetLifecycleLoader()
+			if loader == nil {
+				loader = objects.GetGlobalLifecycleLoader()
+			}
+			if loader != nil {
+				if origin, err := loader.GetOriginStatus(kind); err == nil {
+					existingStatus = origin
+				}
+			}
+		}
+
+		if existingStatus != "" && newStatus != existingStatus && !pkgctx.HasLifecycleBreakGlass(ctx) {
+			loader := f.GetLifecycleLoader()
+			if loader == nil {
+				loader = objects.GetGlobalLifecycleLoader()
+			}
+			if loader != nil {
+				valid, transErr := loader.IsValidTransition(kind, existingStatus, newStatus)
+				if transErr != nil || !valid {
+					allowedTargets, _ := loader.GetAllowedTransitions(kind, existingStatus)
+					var allowedDesc string
+					if len(allowedTargets) > 0 {
+						allowedDesc = fmt.Sprintf("allowed transition target(s): [%s]", strings.Join(allowedTargets, ", "))
+					} else {
+						allowedDesc = "no allowed transition targets (terminal status)"
+					}
+					return nil, errfmt.Errorf("illegal lifecycle status transition for %s %q: cannot transition from %q to %q (current status is %q; %s)", kind, id, existingStatus, newStatus, existingStatus, allowedDesc)
+				}
+			}
+		}
+	}
+
 	if s := objects.GetString(updates, objects.FieldKeyStatus); s != "" {
 		if err := checkVerificationOutcomeAuthority(kind, secCtx, s); err != nil {
 			return nil, err
@@ -204,6 +244,27 @@ func (f *FileObjectStorage) prepareFileObjectUpdate(ctx context.Context, secCtx 
 		}
 	}
 
+	// Restrict manual mutation of system provenance fields unless elevated break-glass mode is active
+	if !pkgctx.HasLifecycleBreakGlass(ctx) {
+		provenanceFields := []string{
+			objects.FieldKeyCreatedAt,
+			objects.FieldKeyCreatedBy,
+			objects.FieldKeyUpdatedAt,
+			objects.FieldKeyUpdatedBy,
+			"cas_address",
+			"hash",
+		}
+		var violating []string
+		for _, f := range provenanceFields {
+			if _, has := updates[f]; has {
+				violating = append(violating, f)
+			}
+		}
+		if len(violating) > 0 {
+			return nil, errfmt.Errorf("manual mutation of system provenance field(s) [%s] is restricted; provenance fields are system-computed and immutable", strings.Join(violating, ", "))
+		}
+	}
+
 	// Check if this is a built-in object and user has admin role
 	isBuiltIn := IsBuiltIn(existing)
 	hasAdminRole := slices.Contains(secCtx.Roles, "admin")
@@ -220,10 +281,13 @@ func (f *FileObjectStorage) prepareFileObjectUpdate(ctx context.Context, secCtx 
 		spec, specErr = loader.LoadSpecWithInheritance(specFile)
 		if specErr != nil && !IsExpectedMissingErr(specErr) {
 			logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
-
-				// Check if ID is being updated
 				Error(ErrMsgSwallowedError, specErr).Log()
 		}
+	}
+
+	// Validate value-restricted spec fields (enums, format regex, numeric range bounds)
+	if err := objects.ValidateObjectFieldRestrictions(spec, kind, updates); err != nil {
+		return nil, errfmt.Errorf("validation failed: %w", err)
 	}
 
 	var newID string

@@ -64,7 +64,7 @@ func (f *FileObjectStorage) mergeFileObjectUpdate(p *fileObjectUpdatePrep) error
 
 		// Spec-Driven Read-Only/Immutable Fields
 		isFieldImmutable := strings.HasPrefix(lifecycleMode, "immutable") || strings.HasPrefix(lifecycleMode, "read-only") ||
-			(lifecycleMode == "" && (k == objects.FieldKeyCreatedAt || k == objects.FieldKeyCreatedBy)) // Fallback
+			(lifecycleMode == "" && (k == objects.FieldKeyCreatedAt || k == objects.FieldKeyCreatedBy || k == "cas_address" || k == "hash" || k == objects.FieldKeyUpdatedAt || k == objects.FieldKeyUpdatedBy)) // Fallback
 
 		// Don't allow updating immutable fields, unless:
 		// - Object is built-in AND user has admin role (for internal command)
@@ -126,6 +126,14 @@ func (f *FileObjectStorage) mergeFileObjectUpdate(p *fileObjectUpdatePrep) error
 		}
 	}
 	f.ensureObjectMetadata(ctx, existing, secCtx, false)
+	if pkgctx.HasLifecycleBreakGlass(ctx) {
+		if explicitUpdatedAt, has := updates[objects.FieldKeyUpdatedAt]; has {
+			existing[objects.FieldKeyUpdatedAt] = explicitUpdatedAt
+		}
+		if explicitUpdatedBy, has := updates[objects.FieldKeyUpdatedBy]; has {
+			existing[objects.FieldKeyUpdatedBy] = explicitUpdatedBy
+		}
+	}
 
 	// Priority & priority_tier pair synchronization on update:
 	// If only one was explicitly updated, update the other to match.

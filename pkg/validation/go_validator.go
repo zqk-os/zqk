@@ -1285,7 +1285,9 @@ func isStandardMetadataField(key string) bool {
 		objects.FieldKeyUpdatedAt,
 		objects.FieldKeyUpdatedBy,
 		objects.FieldKeyNamespaceID,
-		"version_context":
+		"version_context",
+		"cas_address",
+		"hash":
 		return true
 	default:
 		return false

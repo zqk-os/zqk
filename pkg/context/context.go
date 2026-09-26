@@ -624,11 +624,51 @@ func WithLifecycleBreakGlass(ctx stdcontext.Context, reason string) stdcontext.C
 	return ctx
 }
 
-// IsLifecycleBreakGlass reports DECIDE break_glass is armed: force override plus non-empty reason.
+type lifecycleBreakGlassExpiryKey struct{}
+
+// WithLifecycleBreakGlassWindow sets break glass with an audited reason and a time-bounded duration window.
+func WithLifecycleBreakGlassWindow(ctx stdcontext.Context, reason string, window time.Duration) stdcontext.Context {
+	return WithLifecycleBreakGlassExpiresAt(ctx, reason, time.Now().Add(window))
+}
+
+// WithLifecycleBreakGlassExpiresAt sets break glass with an audited reason and an explicit expiration timestamp.
+func WithLifecycleBreakGlassExpiresAt(ctx stdcontext.Context, reason string, expiresAt time.Time) stdcontext.Context {
+	ctx = WithLifecycleBreakGlass(ctx, reason)
+	if ctx == nil {
+		ctx = stdcontext.Background()
+	}
+	return stdcontext.WithValue(ctx, lifecycleBreakGlassExpiryKey{}, expiresAt)
+}
+
+// GetLifecycleBreakGlassExpiry returns the expiration timestamp if set.
+func GetLifecycleBreakGlassExpiry(ctx stdcontext.Context) (time.Time, bool) {
+	if ctx == nil {
+		return time.Time{}, false
+	}
+	if v, ok := ctx.Value(lifecycleBreakGlassExpiryKey{}).(time.Time); ok {
+		return v, true
+	}
+	return time.Time{}, false
+}
+
+// IsLifecycleBreakGlass reports DECIDE break_glass is armed: force override plus non-empty reason
+// and, if an expiration timestamp is configured, that the window has not elapsed.
 // Composed integrity overlays and critical-kind skips must use this — not bare Force.
-// TRACK: follow-up in kernel backlog
 func IsLifecycleBreakGlass(ctx stdcontext.Context) bool {
+	if ctx == nil {
+		return false
+	}
+	if exp, ok := GetLifecycleBreakGlassExpiry(ctx); ok && !exp.IsZero() {
+		if time.Now().After(exp) {
+			return false
+		}
+	}
 	return strings.TrimSpace(GetLifecycleBreakGlassReason(ctx)) != ""
+}
+
+// HasLifecycleBreakGlass reports whether DECIDE break_glass is armed. Alias for IsLifecycleBreakGlass.
+func HasLifecycleBreakGlass(ctx stdcontext.Context) bool {
+	return IsLifecycleBreakGlass(ctx)
 }
 
 // promoteOnCreateKey is the context key for create-time leave-preliminary (CLI --promote).
