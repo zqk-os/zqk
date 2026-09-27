@@ -165,7 +165,7 @@ func (r *FieldValueRestriction) ValidateFieldValue(value any) error {
 	// Pattern check
 	if r.PatternRegexp != nil {
 		valStr := fmt.Sprintf("%v", value)
-		if !r.PatternRegexp.MatchString(valStr) {
+		if valStr != "" && !r.PatternRegexp.MatchString(valStr) {
 			return fmt.Errorf("field %q value %q does not match required pattern %q", r.FieldName, valStr, r.Pattern)
 		}
 	}

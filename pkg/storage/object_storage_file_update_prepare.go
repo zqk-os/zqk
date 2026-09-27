@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"maps"
 	"path/filepath"
+	"reflect"
 	"slices"
 	"strings"
 	"time"
@@ -256,7 +257,11 @@ func (f *FileObjectStorage) prepareFileObjectUpdate(ctx context.Context, secCtx 
 		}
 		var violating []string
 		for _, f := range provenanceFields {
-			if _, has := updates[f]; has {
+			if newVal, has := updates[f]; has {
+				if existingVal, exists := existing[f]; exists && reflect.DeepEqual(newVal, existingVal) {
+					delete(updates, f)
+					continue
+				}
 				violating = append(violating, f)
 			}
 		}

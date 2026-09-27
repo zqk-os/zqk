@@ -198,3 +198,27 @@ func TestSystemProvenanceFields_BreakGlassPermitted(t *testing.T) {
 		})
 	}
 }
+
+func TestSystemProvenanceFields_UnchangedProvenanceFieldsPermitted(t *testing.T) {
+	fos, _, secCtx := setupTestStorage(t)
+	ctx := context.Background()
+
+	objID := "BLI-301"
+	created := createTestBacklogItem(t, fos, secCtx, objID)
+
+	// Simulate full object read-modify-write where unchanged provenance fields are present
+	created[objects.FieldKeyTitle] = "Updated Backlog Item Title"
+	err := fos.Update(ctx, secCtx, objID, created)
+	if err != nil {
+		t.Fatalf("expected read-modify-write update with unchanged provenance to succeed, got: %v", err)
+	}
+
+	readBack, err := fos.Read(ctx, secCtx, objID)
+	if err != nil {
+		t.Fatalf("failed to read back object: %v", err)
+	}
+	if readBack[objects.FieldKeyTitle] != "Updated Backlog Item Title" {
+		t.Errorf("expected updated title, got %v", readBack[objects.FieldKeyTitle])
+	}
+}
+
