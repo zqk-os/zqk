@@ -164,9 +164,26 @@ func (r *FieldValueRestriction) ValidateFieldValue(value any) error {
 
 	// Pattern check
 	if r.PatternRegexp != nil {
-		valStr := fmt.Sprintf("%v", value)
-		if !r.PatternRegexp.MatchString(valStr) {
-			return fmt.Errorf("field %q value %q does not match required pattern %q", r.FieldName, valStr, r.Pattern)
+		switch v := value.(type) {
+		case []string:
+			for _, item := range v {
+				itemStr := strings.TrimSpace(item)
+				if itemStr != "" && !r.PatternRegexp.MatchString(itemStr) {
+					return fmt.Errorf("field %q value %q does not match required pattern %q", r.FieldName, itemStr, r.Pattern)
+				}
+			}
+		case []any:
+			for _, item := range v {
+				itemStr := strings.TrimSpace(fmt.Sprintf("%v", item))
+				if itemStr != "" && !r.PatternRegexp.MatchString(itemStr) {
+					return fmt.Errorf("field %q value %q does not match required pattern %q", r.FieldName, itemStr, r.Pattern)
+				}
+			}
+		default:
+			valStr := strings.TrimSpace(fmt.Sprintf("%v", value))
+			if valStr != "" && !r.PatternRegexp.MatchString(valStr) {
+				return fmt.Errorf("field %q value %q does not match required pattern %q", r.FieldName, valStr, r.Pattern)
+			}
 		}
 	}
 
