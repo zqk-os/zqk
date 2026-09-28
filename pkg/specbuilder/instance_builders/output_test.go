@@ -199,6 +199,30 @@ func TestGeneratedGoalPackCompiles(t *testing.T) {
 	}
 }
 
+func TestGeneratedWorkPackKindsCompile(t *testing.T) {
+	root := moduleRoot(t)
+	packRoot := filepath.Join(root, "packs", "work")
+	t.Cleanup(func() { _ = os.RemoveAll(packRoot) })
+	toolDir := filepath.Join(packRoot, "instance_builders")
+	specs := []string{
+		filepath.Join(root, ".zqk", "specs", "objects", "pm", "goal.yaml"),
+		filepath.Join(root, ".zqk", "specs", "objects", "pm", "requirement.yaml"),
+		filepath.Join(root, ".zqk", "specs", "objects", "qa", "criteria.yaml"),
+		filepath.Join(root, ".zqk", "specs", "objects", "qa", "test_case.yaml"),
+	}
+	for _, specPath := range specs {
+		if err := GenerateInstanceBuilderFromSpec(specPath, toolDir, "2.0.0"); err != nil {
+			t.Fatalf("%s: %v", specPath, err)
+		}
+	}
+	cmd := exec.Command("go", "build", "./packs/work/"+generatedInstancePackage)
+	cmd.Dir = root
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("generated work pack kinds did not compile: %v\n%s", err, out)
+	}
+}
+
 func moduleRoot(t *testing.T) string {
 	t.Helper()
 	dir, err := os.Getwd()
