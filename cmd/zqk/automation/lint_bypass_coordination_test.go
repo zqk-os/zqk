@@ -10,8 +10,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/coordination"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
-	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1" // Register instance builders
-	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2"          // Register spec builders
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2" // Register spec builders
 	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/testkit"

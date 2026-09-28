@@ -11,8 +11,7 @@ import (
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/paths"
-	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1" // Register instance builders
-	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2"          // Register spec builders
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2" // Register spec builders
 	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"

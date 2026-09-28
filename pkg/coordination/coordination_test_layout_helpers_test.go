@@ -16,8 +16,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 
-	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1" // Register instance builders for GenerateAllSpecs
-	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2"          // Register spec builders for GenerateAllSpecs
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2" // Register spec builders for GenerateAllSpecs
 )
 
 type coordinationTestEnvOptions struct {

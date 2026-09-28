@@ -11,7 +11,6 @@ import (
 
 	// Side-effect imports to register builders in global registries
 	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_config_v1"
-	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
 	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_lifecycle_v1"
 	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_profile_v1"
 	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_routing_v1"
@@ -31,8 +30,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/specbuilder/trait_builders"
 
 	mcptesting "github.com/zqk-os/zqk/pkg/mcp/testing"
-	enumv "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/accounts"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
 )
 
 // TestConcurrencySpecGenerator runs builders.SpecGenerator concurrently
@@ -336,8 +333,9 @@ func TestConcurrencyBaseGenerator(t *testing.T) {
 func TestInstanceBuilderStatefulness(t *testing.T) {
 	t.Parallel()
 
-	builder := bldr_instance_v1.NewAccountInstanceBuilder(objects.DefaultSchemaVersion)
-	builder.ID("ACC-STRESS-001").Status(enumv.StatusActive)
+	builder := instance_builders.NewForKind(objects.KindAccount, objects.DefaultSchemaVersion)
+	builder.SetID("ACC-STRESS-001")
+	builder.SetStatus("active")
 
 	// First Build should succeed
 	inst1, err := builder.Build()

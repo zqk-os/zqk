@@ -25,7 +25,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/testkit"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 
-	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
 	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2"
 )
 
