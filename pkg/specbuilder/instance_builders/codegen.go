@@ -165,7 +165,7 @@ func GenerateInstanceBuilderFromSpec(specPath, outputDir string, schemaVersion s
 	fieldOrder := buildFieldOrder(specForGeneration)
 
 	versionDir, packageName := InstanceBuilderOutput(outputDir)
-	code, err := generateInstanceBuilderCode(specForGeneration, ontology, schemaVersion, fieldOrder, packageName, EnumImportBase(outputDir))
+	code, err := generateInstanceBuilderCode(specForGeneration, ontology, fieldOrder, packageName, EnumImportBase(outputDir))
 	if err != nil {
 		return errfmt.Newf("failed to generate code").Wrap(err)
 	}
@@ -399,7 +399,7 @@ func (f *goFileBuilder) String() string {
 // generateInstanceBuilderCode generates the Go code for an instance builder
 //
 //nolint:unparam // Codegen helpers currently return an always-nil error for forward compatibility.
-func generateInstanceBuilderCode(spec *objects.Spec, ontology, schemaVersion string, fieldOrder []string, packageName, enumImportBase string) (string, error) {
+func generateInstanceBuilderCode(spec *objects.Spec, ontology string, fieldOrder []string, packageName, enumImportBase string) (string, error) {
 	// Type name (e.g., "PolicyInstanceBuilder" from "policy")
 	typeName := toCamelCase(ontology) + "InstanceBuilder"
 	constructorName := "New" + typeName
@@ -486,9 +486,7 @@ func generateInstanceBuilderCode(spec *objects.Spec, ontology, schemaVersion str
 		}
 	}
 
-	// Auto-register this builder
-	defs.WithRaw(renderInitRegistration(constructorName, schemaVersion))
-
+	// Callers construct with NewForKind. Generated files do not register on the kernel singleton.
 	return file.String(), nil
 }
 
@@ -545,23 +543,6 @@ func renderCompatAlias(typeName, aliasName, canonicalName, valueType string) str
 				fn.Line(fmt.Sprintf("return b.%s(value)", canonicalName))
 			},
 		)
-	return file.String()
-}
-
-func renderInitRegistration(constructorName, schemaVersion string) string {
-	file := NewGoFile("")
-	defs := file.WithDefinitions()
-	defs.WithFunction("func init()", func(fn *goFuncBodyBuilder) {
-		fn.Choose(
-			schemaVersion == objects.DefaultSchemaVersion,
-			func(b *goFuncBodyBuilder) {
-				b.Line(fmt.Sprintf("instance_builders.RegisterBuilder(%s(objects.DefaultSchemaVersion))", constructorName))
-			},
-			func(b *goFuncBodyBuilder) {
-				b.Line(fmt.Sprintf("instance_builders.RegisterBuilder(%s(%q))", constructorName, schemaVersion))
-			},
-		)
-	})
 	return file.String()
 }
 

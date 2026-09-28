@@ -50,12 +50,15 @@ func TestGenerateInstanceBuilderCode_packEnumImport(t *testing.T) {
 		},
 	}
 	packDir := filepath.Join("packs", "work", "instance_builders")
-	code, err := generateInstanceBuilderCode(spec, "widget", "1.0.0", nil, generatedInstancePackage, EnumImportBase(packDir))
+	code, err := generateInstanceBuilderCode(spec, "widget", nil, generatedInstancePackage, EnumImportBase(packDir))
 	if err != nil {
 		t.Fatal(err)
 	}
 	want := "enumv \"github.com/zqk-os/zqk/packs/work/bldr_enum_v1/widget\""
 	if !strings.Contains(code, want) {
 		t.Fatalf("missing pack enum import")
+	}
+	if strings.Contains(code, "RegisterBuilder") {
+		t.Fatal("generated builder registers on the kernel singleton")
 	}
 }
