@@ -203,7 +203,8 @@ func RegisterDynamicKindCommands(objectCmd *cobra.Command) {
 	// Use RegisterKindCommandsForKinds so we add by exact name; Find([]string{kind}) would
 	// return the generic <kind> command and we would skip adding (no per-kind subcommands).
 
-	RegisterKindCommandsForKinds(objectCmd, kinds)
+	RegisterKindCommandsForKinds(objectCmd, objects.WithoutKinds(kinds, objects.PackOwnedKinds()))
+	RegisterKindCommandsForKinds(objectCmd, objects.PackOwnedKinds())
 }
 
 // runKindDefault is handled inline in NewKindCmd
