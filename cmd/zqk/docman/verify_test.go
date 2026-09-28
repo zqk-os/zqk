@@ -12,7 +12,7 @@ import (
 )
 
 func TestDocmanVerify_CLI(t *testing.T) {
-	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SkipSetupTestEnvironment: true, SkipFileStorage: false})
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SkipSetupTestEnvironment: false, SkipFileStorage: false})
 	tmpDir := proj.Root
 
 	docPath := "docs/architecture/verify_sample.md"

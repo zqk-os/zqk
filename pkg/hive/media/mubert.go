@@ -16,7 +16,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/specbuilder"
 	"github.com/zqk-os/zqk/pkg/specbuilder/api_builders"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2"
+	"github.com/zqk-os/zqk/packs/interface/bldr_v2"
 )
 
 // MubertGenerator implements the MediaGenerator interface for the Mubert API.
