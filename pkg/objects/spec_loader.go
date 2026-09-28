@@ -169,7 +169,7 @@ func NewSpecLoader(specsDir string) *SpecLoader {
 
 // readSpecFile loads raw bytes and modification time for an absolute spec path.
 func (sl *SpecLoader) readSpecFile(ctx context.Context, absPath string) ([]byte, time.Time, error) {
-	if sl != nil && sl.specStorage != nil {
+	if sl != nil && sl.specStorage != nil && !pathInExtraSpecRoot(absPath) {
 		data, meta, err := sl.specStorage.ReadSpecBytes(ctx, absPath)
 		return data, meta.ModTime, err
 	}
@@ -382,8 +382,9 @@ func (sl *SpecLoader) specNameIndex() map[string]string {
 	if sl == nil || sl.specsDir == emptyValue {
 		return nil
 	}
-	idx, _ := sl.specIndex.Load(sl.specsDir, paths.DomainTreeStamp(sl.specsDir), func() (map[string]string, error) {
-		return paths.IndexYAMLNames(sl.specsDir), nil
+	roots := ExtraSpecRoots()
+	idx, _ := sl.specIndex.Load(specIndexKey(sl.specsDir, roots), specIndexStamp(sl.specsDir, roots), func() (map[string]string, error) {
+		return mergeSpecIndexes(sl.specsDir, roots), nil
 	})
 	return idx
 }

@@ -172,7 +172,7 @@ func TestGeneratedGoalPackCompiles(t *testing.T) {
 	root := moduleRoot(t)
 	packRoot := filepath.Join(root, "packs", "workgen")
 	t.Cleanup(func() { _ = os.RemoveAll(packRoot) })
-	specPath := filepath.Join(root, ".zqk", "specs", "objects", "pm", "goal.yaml")
+	specPath := filepath.Join(root, "packs", "work", "specs", "goal.yaml")
 	toolDir := filepath.Join(packRoot, "instance_builders")
 	if err := GenerateInstanceBuilderFromSpec(specPath, toolDir, "2.0.0"); err != nil {
 		t.Fatal(err)
@@ -205,10 +205,10 @@ func TestGeneratedWorkPackKindsCompile(t *testing.T) {
 	t.Cleanup(func() { _ = os.RemoveAll(packRoot) })
 	toolDir := filepath.Join(packRoot, "instance_builders")
 	specs := []string{
-		filepath.Join(root, ".zqk", "specs", "objects", "pm", "goal.yaml"),
-		filepath.Join(root, ".zqk", "specs", "objects", "pm", "requirement.yaml"),
-		filepath.Join(root, ".zqk", "specs", "objects", "qa", "criteria.yaml"),
-		filepath.Join(root, ".zqk", "specs", "objects", "qa", "test_case.yaml"),
+		filepath.Join(root, "packs", "work", "specs", "goal.yaml"),
+		filepath.Join(root, "packs", "work", "specs", "requirement.yaml"),
+		filepath.Join(root, "packs", "work", "specs", "criteria.yaml"),
+		filepath.Join(root, "packs", "work", "specs", "test_case.yaml"),
 	}
 	for _, specPath := range specs {
 		if err := GenerateInstanceBuilderFromSpec(specPath, toolDir, "2.0.0"); err != nil {

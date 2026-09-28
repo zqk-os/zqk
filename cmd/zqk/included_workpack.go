@@ -10,6 +10,7 @@ import (
 
 func init() {
 	objects.SetPackOwnedKinds(workpack.Kinds())
+	objects.AddModuleSpecRoot(workpack.SpecDir)
 	workpack.Enable()
 }
 

@@ -16,6 +16,9 @@ const (
 	// ToolDir is the instance builder tool directory for this pack.
 	// Generated builders and enums are written beside it.
 	ToolDir = "packs/work/instance_builders"
+	// SpecDir is the object spec directory this pack owns.
+	// pkg/objects registers the same relative path when the omit tag is off.
+	SpecDir = "packs/work/specs"
 	// OmitBuildTag drops this pack from the zqk composition root.
 	OmitBuildTag = "zqk_omit_workpack"
 )
