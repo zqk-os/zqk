@@ -168,6 +168,37 @@ func TestGeneratedSiblingCompiles(t *testing.T) {
 	}
 }
 
+func TestGeneratedGoalPackCompiles(t *testing.T) {
+	root := moduleRoot(t)
+	packRoot := filepath.Join(root, "packs", "work")
+	t.Cleanup(func() { _ = os.RemoveAll(packRoot) })
+	specPath := filepath.Join(root, ".zqk", "specs", "objects", "pm", "goal.yaml")
+	toolDir := filepath.Join(packRoot, "instance_builders")
+	if err := GenerateInstanceBuilderFromSpec(specPath, toolDir, "2.0.0"); err != nil {
+		t.Fatal(err)
+	}
+	enumSrc, err := os.ReadFile(filepath.Join(packRoot, generatedEnumPackage, "goal", "enums_generated.go"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	src := string(enumSrc)
+	if !strings.Contains(src, "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object") {
+		t.Fatal("goal enums dropped the kernel base_object alias")
+	}
+	if !strings.Contains(src, "github.com/zqk-os/zqk/packs/work/bldr_enum_v1/shared_goals") {
+		t.Fatal("goal enums did not import the shared status package written beside the pack")
+	}
+	if strings.Contains(src, "github.com/zqk-os/zqk/packs/work/bldr_enum_v1/base_object") {
+		t.Fatal("goal enums imported a pack copy of base_object that was not generated")
+	}
+	cmd := exec.Command("go", "build", "./packs/work/"+generatedInstancePackage)
+	cmd.Dir = root
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("generated goal pack did not compile: %v\n%s", err, out)
+	}
+}
+
 func moduleRoot(t *testing.T) string {
 	t.Helper()
 	dir, err := os.Getwd()
