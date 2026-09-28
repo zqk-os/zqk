@@ -85,7 +85,7 @@ func generateEnumsForSpec(specPath, outputDir string) error {
 		return errfmt.Newf("failed to generate domain shared status package").Wrap(err)
 	}
 
-	defs := collectEnumDefinitions(specForGeneration, ontology, enumOwners, sharedStatus)
+	defs := collectEnumDefinitions(specForGeneration, ontology, enumOwners, sharedStatus, EnumImportBase(outputDir))
 	if len(defs) == 0 {
 		return nil
 	}
@@ -110,7 +110,7 @@ func generateEnumsForSpec(specPath, outputDir string) error {
 	return nil
 }
 
-func collectEnumDefinitions(spec *objects.Spec, ontology string, enumOwners map[string]string, sharedStatus *sharedStatusPackage) []enumSpec {
+func collectEnumDefinitions(spec *objects.Spec, ontology string, enumOwners map[string]string, sharedStatus *sharedStatusPackage, importBase string) []enumSpec {
 	defMap := map[string]enumSpec{}
 
 	lifecycle, err := objects.GetGlobalLifecycleLoader().LoadLifecycle(ontology)
@@ -137,7 +137,7 @@ func collectEnumDefinitions(spec *objects.Spec, ontology string, enumOwners map[
 				statusDef.AliasPackage = owner
 				statusDef.AliasTypeName = enumCodegenTypeNameStatus
 				statusDef.AliasImportAs = sanitizePackageName(owner) + "enum"
-				statusDef.AliasImportPkg = fmt.Sprintf("%s/%s", enumModuleBasePath, sanitizePackageName(owner))
+				statusDef.AliasImportPkg = fmt.Sprintf("%s/%s", importBase, sanitizePackageName(owner))
 				statusDef.AliasValues = ownerValues
 			}
 			defMap[enumCodegenTypeNameStatus] = statusDef
@@ -179,7 +179,7 @@ func collectEnumDefinitions(spec *objects.Spec, ontology string, enumOwners map[
 			def.AliasPackage = owner
 			def.AliasTypeName = typeName
 			def.AliasImportAs = alias
-			def.AliasImportPkg = fmt.Sprintf("%s/%s", enumModuleBasePath, sanitizePackageName(owner))
+			def.AliasImportPkg = fmt.Sprintf("%s/%s", importBase, sanitizePackageName(owner))
 			def.AliasValues = enumValuesForField(owner, fieldName)
 		}
 		defMap[typeName] = def
@@ -297,7 +297,7 @@ func ensureDomainSharedStatusPackage(specPath, outputDir, ontology string) (*sha
 
 	return &sharedStatusPackage{
 		Alias:     pkgSegment + "enum",
-		ImportPkg: fmt.Sprintf("%s/%s", enumModuleBasePath, pkgSegment),
+		ImportPkg: fmt.Sprintf("%s/%s", EnumImportBase(outputDir), pkgSegment),
 		Values:    statuses,
 	}, nil
 }

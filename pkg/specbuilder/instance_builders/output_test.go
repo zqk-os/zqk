@@ -64,6 +64,43 @@ func TestGenerateInstanceBuilderCode_packEnumImport(t *testing.T) {
 	}
 }
 
+func TestCollectEnumDefinitions_aliasUsesEnumImportBase(t *testing.T) {
+	spec := &objects.Spec{
+		Ontology: "widget",
+		Fields: map[string]any{
+			"tone": map[string]any{
+				objects.FieldKeyType: enumCodegenFieldTypeEnum,
+				enumCodegenFieldKeyValidation: map[string]any{
+					enumCodegenFieldKeyEnum: []any{"low", "high"},
+				},
+			},
+		},
+	}
+	owners := map[string]string{"tone": "parent"}
+	packDir := filepath.Join("packs", "work", "instance_builders")
+	defs := collectEnumDefinitions(spec, "widget", owners, nil, EnumImportBase(packDir))
+	got := aliasImportForField(defs, "tone")
+	want := "github.com/zqk-os/zqk/packs/work/bldr_enum_v1/parent"
+	if got != want {
+		t.Fatalf("pack alias import %q", got)
+	}
+	defs = collectEnumDefinitions(spec, "widget", owners, nil, EnumImportBase(DefaultInstanceBuilderToolDir))
+	got = aliasImportForField(defs, "tone")
+	want = "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/parent"
+	if got != want {
+		t.Fatalf("kernel alias import %q", got)
+	}
+}
+
+func aliasImportForField(defs []enumSpec, field string) string {
+	for _, def := range defs {
+		if def.FieldName == field {
+			return def.AliasImportPkg
+		}
+	}
+	return ""
+}
+
 func TestGenerateInstanceBuilderFromSpec_writesSiblingWithoutRegistry(t *testing.T) {
 	tmp := t.TempDir()
 	specPath := filepath.Join(tmp, "widget.yaml")
