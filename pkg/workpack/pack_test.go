@@ -1,0 +1,35 @@
+package workpack
+
+import (
+	"testing"
+
+	"github.com/zqk-os/zqk/pkg/objects"
+)
+
+func TestKindsArePlanningAndVerification(t *testing.T) {
+	got := Kinds()
+	want := []string{
+		objects.KindGoal,
+		objects.KindRequirement,
+		objects.KindCriteria,
+		objects.KindTestCase,
+	}
+	if len(got) != len(want) {
+		t.Fatalf("kinds %v", got)
+	}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Fatalf("kinds[%d]=%q want %q", i, got[i], want[i])
+		}
+	}
+}
+
+func TestEnableRecordsTheLink(t *testing.T) {
+	if Enabled() {
+		t.Fatal("pack starts unlinked")
+	}
+	Enable()
+	if !Enabled() {
+		t.Fatal("Enable did not record the link")
+	}
+}
