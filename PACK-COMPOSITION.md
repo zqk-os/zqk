@@ -1,16 +1,13 @@
-# Pack composition workspace
+# Pack Composition Architecture
 
-This checkout is the kernel side of the pack-composition effort.
+This directory and repository tree adhere to the ZQK modular pack composition architecture.
 
-Folder: `zqk-pack-composition`. Sibling studio: `../zqke-pack-composition`.
+For the canonical architecture guide, pack manifest format (`pack.yaml`), builder codegen (`bldr_cli_cmd_v1`), and composition root patterns, please see:
 
-Public `github.com/zqk-os/zqk` stays the beta. `main` here tracks `origin/main`. Stay current with `git pull origin main`, then merge `main` into the working branch.
+👉 [Modular Pack Composition and Extensibility Architecture Guide](docs/architecture/PACK_COMPOSITION_AND_EXTENSIBILITY.md)
 
-This tree is for:
-
-- The kernel creates and validates objects from specs. It does not import generated instance builders.
-- Code generation stays a tool. Its output lives with the pack that owns the spec.
-- A pack is a Go package registered from the composition root (`cmd/zqk`, or a third-party main). One binary, one Go version.
-- When a pack is uploaded and verified, the kernel records a formal spec so the loaded pack behaves as typed objects inside the kernel.
-
-Do not push this work onto `zqk-os/zqk` main.
+## Summary of Tenets
+- **Kernel vs. Pack Boundary**: The kernel validates and persists objects from specs. It does not import pack-specific generated instance builders.
+- **Code Generation**: Code generation toolchains produce Go builders under `pkg/cli/bldr_cli_cmd_v1` and pack packages.
+- **Composition Root**: Packs are linked at the single static binary entry point (`cmd/zqk`).
+- **Dynamic Spec Loading**: Verified packs register formal specs in the Knowledge Kernel graph, ensuring runtime typed behavior and integrity enforcement across all workflows.

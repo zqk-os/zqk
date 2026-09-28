@@ -1,15 +1,22 @@
-# ZQK OS (`zqk@zqkos.com`)
+# ZQK OS
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Go Report Card](https://goreportcard.com/badge/github.com/zqk-os/zqk)](https://goreportcard.com/report/github.com/zqk-os/zqk)
+[![Documentation](https://img.shields.io/badge/docs-docs.zqk.dev-blue)](https://docs.zqk.dev)
 
-**The Cellular Knowledge Operating System for autonomous agent swarms.** This repository is **ZQK Core**, the open-core community microkernel. Full first-run: [Community First-Run Guide](./docs/onboarding/COMMUNITY_FIRST_RUN.md).
+**The Cellular Knowledge Operating System for autonomous agent swarms.** This repository is **ZQK Core**, the open-core community microkernel. Canonical portal: [Community First-Run Guide](https://docs.zqk.dev/onboarding/COMMUNITY_FIRST_RUN).
 
 ## Quickstart (5 Minutes)
 
 ### 1. Install or Build
 
-There is **no brew formula and no public GitHub release** yet.
+**Via Homebrew:**
+```sh
+brew install zqk-os/tap/zqk
+```
+
+**Download Pre-Compiled Binaries:**
+Grab the latest release archive for macOS or Linux from the [GitHub Releases](https://github.com/zqk-os/zqk/releases) page.
 
 **Build from Source:**
 ```sh
@@ -110,17 +117,18 @@ ZQK follows the classical operating system boundary: **POSIX/Kernel primitives a
 
 ## Documentation & Guides
 
-- **[Community First-Run Guide](./docs/onboarding/COMMUNITY_FIRST_RUN.md)** — Recommended starting point for humans and agents.
-- **[First-Run Object Tutorial](./docs/onboarding/FIRST_RUN_OBJECT_TUTORIAL.md)** — Creating and managing kernel objects.
-- **[Quickstart & MCP Setup](./docs/onboarding/QUICKSTART.md)** — Connecting Cursor, Claude Code, and other LLMs.
-- **[Architecture Guide](./docs/architecture/README.md)** — Deep dive into the cellular microkernel architecture.
+- **[Community First-Run Guide](https://docs.zqk.dev/onboarding/COMMUNITY_FIRST_RUN)** — Recommended starting point for humans and agents.
+- **[First-Run Object Tutorial](https://docs.zqk.dev/onboarding/FIRST_RUN_OBJECT_TUTORIAL)** — Creating and managing kernel objects.
+- **[Quickstart & MCP Setup](https://docs.zqk.dev/onboarding/QUICKSTART)** — Connecting Cursor, Claude Code, and other LLMs.
+- **[Architecture Guide](https://docs.zqk.dev/architecture/README)** — Deep dive into the cellular microkernel architecture.
 - **[Contributing](./CONTRIBUTING.md)** — Development guidelines and PR policies.
 - **[Security Policy](./SECURITY.md)** — Vulnerability reporting and fail-closed security guarantees.
 
 ## Connect & Community
 
-- **Website:** [zqkos.com](https://zqkos.com)
-- **Public Contact:** [zqk@zqkos.com](mailto:zqk@zqkos.com)
+- **Website:** [zqk.dev](https://zqk.dev)
+- **Documentation Portal:** [docs.zqk.dev](https://docs.zqk.dev)
+- **Public Contact:** [hello@zqk.dev](mailto:hello@zqk.dev)
 - **Schedule a Call:** [Book a ZQK Inquiry](https://calendar.app.google/VhhrKgXqrukr48Kg7)
 - **GitHub:** [zqk-os/zqk](https://github.com/zqk-os/zqk)
 

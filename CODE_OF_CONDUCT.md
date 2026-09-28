@@ -51,4 +51,4 @@ repositories, issue trackers, documentation sites, and communication channels.
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the project leadership. All complaints will be reviewed and investigated promptly and fairly.
+reported to the project leadership at [conduct@zqk.dev](mailto:conduct@zqk.dev). All complaints will be reviewed and investigated promptly and fairly.
