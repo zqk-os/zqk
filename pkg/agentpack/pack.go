@@ -26,6 +26,7 @@ func Kinds() []string {
 		"agent_onboarding_preparation",
 		"agent_skill",
 		"agent_task",
+		"context_refresh_schedule",
 		"mcp_built_in_tool",
 		"mcp_session",
 		"mcp_spec",

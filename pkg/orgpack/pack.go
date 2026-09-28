@@ -20,11 +20,13 @@ const (
 // Kinds are the object kinds this pack owns.
 func Kinds() []string {
 	return []string{
+		"corporate_initiative",
 		"department",
 		"division",
 		"organization",
 		"organizational_change",
 		"partnership",
+		"stakeholder_profile",
 		"team",
 		"team_configuration",
 	}

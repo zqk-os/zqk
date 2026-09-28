@@ -26,6 +26,7 @@ func Kinds() []string {
 		"file_lock_metric",
 		"kind_mapping_metric",
 		"list_metric_sampler",
+		"metadata_package",
 		"ordered_list_metric_sampler",
 		"sampler_profile",
 		"scalar_metric_sampler",
