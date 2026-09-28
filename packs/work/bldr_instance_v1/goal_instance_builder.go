@@ -443,3 +443,37 @@ func (b *GoalInstanceBuilder) WorkstreamRefs(value []string) *GoalInstanceBuilde
 func (b *GoalInstanceBuilder) SetWorkstreamRefs(value []string) *GoalInstanceBuilder {
 	return b.WorkstreamRefs(value)
 }
+
+// RequirementRefs sets the requirement_refs field
+func (b *GoalInstanceBuilder) RequirementRefs(value []string) *GoalInstanceBuilder {
+	b.SetField(objects.FieldKeyRequirementRefs, value)
+	return b
+}
+
+// SetRequirementRefs is a compatibility alias for RequirementRefs.
+func (b *GoalInstanceBuilder) SetRequirementRefs(value []string) *GoalInstanceBuilder {
+	return b.RequirementRefs(value)
+}
+
+// SuccessCriteria sets the success_criteria field
+func (b *GoalInstanceBuilder) SuccessCriteria(value []string) *GoalInstanceBuilder {
+	b.SetField(objects.FieldKeySuccessCriteria, value)
+	return b
+}
+
+// SetSuccessCriteria is a compatibility alias for SuccessCriteria.
+func (b *GoalInstanceBuilder) SetSuccessCriteria(value []string) *GoalInstanceBuilder {
+	return b.SuccessCriteria(value)
+}
+
+// VisionRef sets the vision_ref field
+func (b *GoalInstanceBuilder) VisionRef(value string) *GoalInstanceBuilder {
+	b.SetField(objects.FieldKeyVisionRef, value)
+	return b
+}
+
+// SetVisionRef is a compatibility alias for VisionRef.
+func (b *GoalInstanceBuilder) SetVisionRef(value string) *GoalInstanceBuilder {
+	return b.VisionRef(value)
+}
+

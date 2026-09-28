@@ -53,7 +53,7 @@ func CoerceMutationFields(kind string, obj map[string]any) {
 		if k == "" {
 			k = GetString(obj, FieldKeyKind)
 		}
-		if k == KindBacklogItem || k == KindMilestone || k == KindGoal {
+		if k == KindBacklogItem {
 			if _, hasHashes := obj[FieldKeyCommitHashes]; !hasHashes {
 				obj[FieldKeyCommitHashes] = v
 			}

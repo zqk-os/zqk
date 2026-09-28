@@ -385,7 +385,7 @@ func (sl *SpecLoader) applicableExtraSpecRoots() []string {
 	}
 	mod, err := paths.ModuleRootFromPath(sl.specsDir)
 	if err != nil || mod == "" {
-		return all
+		return nil
 	}
 	var out []string
 	for _, root := range all {

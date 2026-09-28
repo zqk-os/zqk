@@ -33,7 +33,7 @@ const (
 	FieldTeamConfigurationRef = "team_configuration_ref"
 	// FieldWorkflowRef is the field name for workflow_ref
 	FieldWorkflowRef = "workflow_ref"
-	// FieldWorkstreamRef is the field name for workstream_ref
+	// FieldWorkstreamRef is the field name for workstream_ref (deprecated: use PriorityPlanFieldWorkstreamRefs)
 	FieldWorkstreamRef = "workstream_ref"
 	// PriorityPlanFieldWorkstreamRefs is the field name for workstream_refs
 	PriorityPlanFieldWorkstreamRefs = "workstream_refs"

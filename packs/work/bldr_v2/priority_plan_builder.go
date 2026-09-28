@@ -86,34 +86,6 @@ func (b *PriorityPlanBuilder) addPriorityPlanFields() {
 		WithPermissions("rwx").
 		WithSemanticType("ordering").
 		WithProfileCode("PRIO-013"))
-	b.AddFieldBuilder(builders.NewFieldBuilder("description", "text").
-		WithChecklist(builders.NewChecklistBuilder().
-			Authority("owner.").
-			AutomationHooks("used in reports and documentation.").
-			Cardinality("one").
-			Criticality("association").
-			Default(nil).
-			Dependencies("none.").
-			Lifecycle("mutable").
-			Observability("yes").
-			Purpose("Description of this priority plan.").
-			Security("non-sensitive").
-			SystemUsage([]any{
-				"documentation",
-				"context",
-			}).
-			Validation("Free text or markdown.").
-			Build()).
-		WithAccess(builders.NewAccessBuilder().
-			Requires("access:confidential").
-			Build()).
-		WithValidation(builders.NewValidationBuilder().
-			Required(false).
-			Build()).
-		WithTraits("readable", "writable", "modifiable").
-		WithPermissions("rwx").
-		WithSemanticType("statement").
-		WithProfileCode("PRIO-000"))
 	b.AddFieldBuilder(builders.NewFieldBuilder("id", "string").
 		WithChecklist(builders.NewChecklistBuilder().
 			Authority("automation (Generator)").
@@ -487,34 +459,6 @@ func (b *PriorityPlanBuilder) addPriorityPlanFields() {
 		WithPermissions("rwx").
 		WithSemanticType("reference").
 		WithProfileCode("PRIO-014"))
-	b.AddFieldBuilder(builders.NewFieldBuilder("workstream_ref", "string").
-		WithChecklist(builders.NewChecklistBuilder().
-			Authority("owner/executive.").
-			AutomationHooks("used for workstream-based grouping.").
-			Cardinality("one").
-			Criticality("association").
-			Default(nil).
-			Dependencies("workstream registry.").
-			Lifecycle("mutable").
-			Observability("yes").
-			Purpose("Link to associated workstream (singular reference, legacy field).").
-			Security("non-sensitive").
-			SystemUsage([]any{
-				"grouping",
-				"reporting",
-			}).
-			Validation("Must reference existing workstream ID.").
-			Build()).
-		WithAccess(builders.NewAccessBuilder().
-			Requires("access:confidential").
-			Build()).
-		WithValidation(builders.NewValidationBuilder().
-			Required(false).
-			Build()).
-		WithTraits("field_mutable_group", "field_reference_group").
-		WithPermissions("r-x").
-		WithSemanticType("reference").
-		WithProfileCode("PRIO-011"))
 	b.AddFieldBuilder(builders.NewFieldBuilder("workstream_refs", "list").
 		WithChecklist(builders.NewChecklistBuilder().
 			Authority("owner/executive.").
