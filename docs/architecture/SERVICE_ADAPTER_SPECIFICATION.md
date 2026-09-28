@@ -44,3 +44,20 @@ flowchart TD
 
 3. **Autonomous Host Detection**:
    - `service.NewManager(nil)` detects the host operating system (`runtime.GOOS`) and instantiates the appropriate adapter automatically.
+
+## Host Platform Adapter Implementation Details
+
+### 1. macOS Launchd Adapter
+- Encapsulates `.plist` generation under `~/Library/LaunchAgents` or `/Library/LaunchDaemons`.
+- Configures key attributes: `Label`, `ProgramArguments`, `RunAtLoad`, and `KeepAlive`.
+- Interacts with `launchctl` using deterministic process management.
+
+### 2. Linux Systemd Adapter
+- Generates systemd unit files under `~/.config/systemd/user/` or `/etc/systemd/system/`.
+- Configures `[Unit]`, `[Service]`, and `[Install]` sections with `Restart=always|on-failure|no`.
+- Interacts with `systemctl` for daemon-reload and unit lifecycle commands.
+
+### 3. Local Process Supervisor Fallback
+- Operates when native system init is unavailable or in containerized sandboxes.
+- Tracks process states (running, stopped, failed) with PID files and signal handling.
+
