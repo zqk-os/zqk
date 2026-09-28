@@ -10,25 +10,25 @@ import (
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
-// StorageKernelStore adapts storage.ObjectStorageProvider to the KernelStore interface.
-type StorageKernelStore struct {
+// KernelSyncStore adapts storage.ObjectStorageProvider to the KernelStore interface.
+type KernelSyncStore struct {
 	sp     storage.ObjectStorageProvider
 	secCtx *pkgctx.SecurityContext
 }
 
-// NewStorageKernelStore creates a new StorageKernelStore.
-func NewStorageKernelStore(sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext) *StorageKernelStore {
+// NewKernelSyncStore creates a new KernelSyncStore.
+func NewKernelSyncStore(sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext) *KernelSyncStore {
 	if secCtx == nil {
 		secCtx = pkgctx.NewSystemSecurityContext()
 	}
-	return &StorageKernelStore{
+	return &KernelSyncStore{
 		sp:     sp,
 		secCtx: secCtx,
 	}
 }
 
 // GetBacklogItemByExternalID retrieves a backlog item matching source and external ID.
-func (s *StorageKernelStore) GetBacklogItemByExternalID(ctx context.Context, source ExternalSource, extID string) (*BacklogItemSyncData, error) {
+func (s *KernelSyncStore) GetBacklogItemByExternalID(ctx context.Context, source ExternalSource, extID string) (*BacklogItemSyncData, error) {
 	if s.sp == nil {
 		return nil, nil
 	}
@@ -59,7 +59,7 @@ func (s *StorageKernelStore) GetBacklogItemByExternalID(ctx context.Context, sou
 }
 
 // UpsertBacklogItem creates or updates a BacklogItemSyncData in kernel storage.
-func (s *StorageKernelStore) UpsertBacklogItem(ctx context.Context, item *BacklogItemSyncData) error {
+func (s *KernelSyncStore) UpsertBacklogItem(ctx context.Context, item *BacklogItemSyncData) error {
 	if s.sp == nil || item == nil {
 		return nil
 	}
@@ -101,7 +101,7 @@ func (s *StorageKernelStore) UpsertBacklogItem(ctx context.Context, item *Backlo
 }
 
 // ListBacklogItems lists all backlog items from kernel storage as BacklogItemSyncData.
-func (s *StorageKernelStore) ListBacklogItems(ctx context.Context) ([]*BacklogItemSyncData, error) {
+func (s *KernelSyncStore) ListBacklogItems(ctx context.Context) ([]*BacklogItemSyncData, error) {
 	if s.sp == nil {
 		return nil, nil
 	}

@@ -101,32 +101,33 @@ func ReadFileObject(f FileStorageReadFacade, ctx context.Context, secCtx *pkgctx
 
 		data, readErr := fileutil.ReadFile(filePath)
 		if readErr != nil {
-			if fileutil.IsNotExist(readErr) {
-				return nil, ErrObjectNotFound
+			if !fileutil.IsNotExist(readErr) {
+				return nil, errfmt.Errorf("STREAM_READ_AFTER_CAS_DISCOVERY_FAILED: %s %s: %w", id, kind, readErr)
 			}
-			return nil, errfmt.Errorf("STREAM_READ_AFTER_CAS_DISCOVERY_FAILED: %s %s: %w", id, kind, readErr)
-		}
-		if isCASFile {
-			if err := f.VerifyOrReconcileCASHash(ctx, kind, id, filePath, data); err != nil {
-				return nil, err
+			// Cached live path was race-deleted or superseded by a concurrent update; fall through to authoritative lookup.
+		} else {
+			if isCASFile {
+				if err := f.VerifyOrReconcileCASHash(ctx, kind, id, filePath, data); err != nil {
+					return nil, err
+				}
 			}
+			obj := make(map[string]any)
+			if err := yaml.Unmarshal(data, &obj); err != nil {
+				return nil, errfmt.Newf("STREAM_FAILED_TO_UNMARSHAL_OBJECT_AFTER_CAS_DISCOVERY").Wrap(err)
+			}
+			if isCASFile {
+				f.PutParseCacheEntry(hash, obj)
+			}
+			obj = f.MaterializeCasYAMLMapAfterLoad(f.GetProjectRoot(), kind, id, obj)
+			keystoreDir := objects.GetDirectoryFromKind(objects.KindKeystoreEntry)
+			if keystoreDir != emptyValue && objects.GetDirectoryFromKind(kind) == keystoreDir {
+				obj = f.ApplyKeystoreAccessControl(obj, secCtx)
+			}
+			if objects.GetString(obj, objects.FieldKeyStatus) == emptyValue && kind != objects.KindKeystoreEntry {
+				return nil, errfmt.Errorf("get invariant violated: CAS read returned meta-only stub (missing status) for %s", id)
+			}
+			return obj, nil
 		}
-		obj := make(map[string]any)
-		if err := yaml.Unmarshal(data, &obj); err != nil {
-			return nil, errfmt.Newf("STREAM_FAILED_TO_UNMARSHAL_OBJECT_AFTER_CAS_DISCOVERY").Wrap(err)
-		}
-		if isCASFile {
-			f.PutParseCacheEntry(hash, obj)
-		}
-		obj = f.MaterializeCasYAMLMapAfterLoad(f.GetProjectRoot(), kind, id, obj)
-		keystoreDir := objects.GetDirectoryFromKind(objects.KindKeystoreEntry)
-		if keystoreDir != emptyValue && objects.GetDirectoryFromKind(kind) == keystoreDir {
-			obj = f.ApplyKeystoreAccessControl(obj, secCtx)
-		}
-		if objects.GetString(obj, objects.FieldKeyStatus) == emptyValue && kind != objects.KindKeystoreEntry {
-			return nil, errfmt.Errorf("get invariant violated: CAS read returned meta-only stub (missing status) for %s", id)
-		}
-		return obj, nil
 	}
 
 	// Check if this kind uses content-addressable storage

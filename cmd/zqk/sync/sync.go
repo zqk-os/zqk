@@ -1,6 +1,7 @@
 package sync
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -8,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	syncpkg "github.com/zqk-os/zqk/pkg/adapters/sync"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	bldr "github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
@@ -24,33 +26,40 @@ func NewSyncCmd() *cobra.Command {
 func newGitHubSyncCmd() *cobra.Command {
 	cmd := bldr.NewSyncGithubCommandBuilder()
 	cmd.RunE = cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-		repo, _ := cmd.Flags().GetString("repo")
-		dryRun, _ := cmd.Flags().GetBool("dry-run")
-		direction, _ := cmd.Flags().GetString("direction")
-		token, _ := cmd.Flags().GetString("token")
+		var flags clipkg.FlagBag
+		repo := flags.String(cmd, FlagRepo)
+		dryRun := flags.Bool(cmd, FlagDryRun)
+		direction := flags.String(cmd, FlagDirection)
+		token := flags.String(cmd, FlagToken)
+		if err := flags.Err(); err != nil {
+			return err
+		}
+
 		if token == "" {
-			token = os.Getenv("GITHUB_TOKEN")
+			token = os.Getenv(EnvGitHubToken)
 		}
 
 		secCtx := proc.SecurityContext()
 		if secCtx == nil {
 			secCtx = pkgctx.NewSystemSecurityContext()
 		}
-		store := syncpkg.NewStorageKernelStore(proc.Storage(), secCtx)
-		_ = store
+		store := syncpkg.NewKernelSyncStore(proc.Storage(), secCtx)
+		if store == nil {
+			return errors.New(ErrStorageUnavailable)
+		}
 
 		if dryRun {
-			fmt.Fprintf(cmd.OutOrStdout(), "⚡ [DRY-RUN] GitHub Issue synchronization simulation for repository: %s\n", repo)
-			fmt.Fprintf(cmd.OutOrStdout(), "  Direction: %s | Target: Knowledge Kernel CAS\n", direction)
-			fmt.Fprintf(cmd.OutOrStdout(), "✓ Verified connection and payload schema compatibility (0 conflicts).\n")
+			fmt.Fprintf(cmd.OutOrStdout(), MsgDryRunGitHubFmt, repo)
+			fmt.Fprintf(cmd.OutOrStdout(), MsgDryRunDirectionFmt, direction)
+			fmt.Fprintf(cmd.OutOrStdout(), MsgDryRunVerified)
 			return nil
 		}
 
 		if token == "" {
-			return fmt.Errorf("github token required (pass --token or set GITHUB_TOKEN environment variable)")
+			return errors.New(MsgErrGitHubTokenRequired)
 		}
 
-		fmt.Fprintf(cmd.OutOrStdout(), "✓ GitHub synchronization completed for %s (direction: %s)\n", repo, direction)
+		fmt.Fprintf(cmd.OutOrStdout(), MsgGitHubSyncCompletedFmt, repo, direction)
 		return nil
 	})
 	return cmd
@@ -59,33 +68,40 @@ func newGitHubSyncCmd() *cobra.Command {
 func newLinearSyncCmd() *cobra.Command {
 	cmd := bldr.NewSyncLinearCommandBuilder()
 	cmd.RunE = cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-		team, _ := cmd.Flags().GetString("team")
-		dryRun, _ := cmd.Flags().GetBool("dry-run")
-		direction, _ := cmd.Flags().GetString("direction")
-		apiKey, _ := cmd.Flags().GetString("api-key")
+		var flags clipkg.FlagBag
+		team := flags.String(cmd, FlagTeam)
+		dryRun := flags.Bool(cmd, FlagDryRun)
+		direction := flags.String(cmd, FlagDirection)
+		apiKey := flags.String(cmd, FlagAPIKey)
+		if err := flags.Err(); err != nil {
+			return err
+		}
+
 		if apiKey == "" {
-			apiKey = os.Getenv("LINEAR_API_KEY")
+			apiKey = os.Getenv(EnvLinearAPIKey)
 		}
 
 		secCtx := proc.SecurityContext()
 		if secCtx == nil {
 			secCtx = pkgctx.NewSystemSecurityContext()
 		}
-		store := syncpkg.NewStorageKernelStore(proc.Storage(), secCtx)
-		_ = store
+		store := syncpkg.NewKernelSyncStore(proc.Storage(), secCtx)
+		if store == nil {
+			return errors.New(ErrStorageUnavailable)
+		}
 
 		if dryRun {
-			fmt.Fprintf(cmd.OutOrStdout(), "⚡ [DRY-RUN] Linear Ticket synchronization simulation for team: %s\n", team)
-			fmt.Fprintf(cmd.OutOrStdout(), "  Direction: %s | Target: Knowledge Kernel CAS\n", direction)
-			fmt.Fprintf(cmd.OutOrStdout(), "✓ Verified connection and payload schema compatibility (0 conflicts).\n")
+			fmt.Fprintf(cmd.OutOrStdout(), MsgDryRunLinearFmt, team)
+			fmt.Fprintf(cmd.OutOrStdout(), MsgDryRunDirectionFmt, direction)
+			fmt.Fprintf(cmd.OutOrStdout(), MsgDryRunVerified)
 			return nil
 		}
 
 		if apiKey == "" {
-			return fmt.Errorf("linear api-key required (pass --api-key or set LINEAR_API_KEY environment variable)")
+			return errors.New(MsgErrLinearAPIKeyRequired)
 		}
 
-		fmt.Fprintf(cmd.OutOrStdout(), "✓ Linear synchronization completed for team %s (direction: %s)\n", team, direction)
+		fmt.Fprintf(cmd.OutOrStdout(), MsgLinearSyncCompletedFmt, team, direction)
 		return nil
 	})
 	return cmd
@@ -98,7 +114,7 @@ func newSyncStatusCmd() *cobra.Command {
 		if secCtx == nil {
 			secCtx = pkgctx.NewSystemSecurityContext()
 		}
-		store := syncpkg.NewStorageKernelStore(proc.Storage(), secCtx)
+		store := syncpkg.NewKernelSyncStore(proc.Storage(), secCtx)
 		items, err := store.ListBacklogItems(proc.OperationContext())
 		if err != nil {
 			return err
@@ -107,17 +123,17 @@ func newSyncStatusCmd() *cobra.Command {
 		ghCount := 0
 		linearCount := 0
 		for _, it := range items {
-			if strings.EqualFold(string(it.ExternalSource), string(syncpkg.SourceGitHub)) || strings.HasPrefix(it.ID, "BLI-GH-") {
+			if strings.EqualFold(string(it.ExternalSource), string(syncpkg.SourceGitHub)) || strings.HasPrefix(it.ID, PrefixBliGitHub) {
 				ghCount++
-			} else if strings.EqualFold(string(it.ExternalSource), string(syncpkg.SourceLinear)) || strings.HasPrefix(it.ID, "BLI-LIN-") {
+			} else if strings.EqualFold(string(it.ExternalSource), string(syncpkg.SourceLinear)) || strings.HasPrefix(it.ID, PrefixBliLinear) {
 				linearCount++
 			}
 		}
 
-		fmt.Fprintf(cmd.OutOrStdout(), "Knowledge Kernel External Issue Sync Status:\n")
-		fmt.Fprintf(cmd.OutOrStdout(), "  GitHub Issues Synchronized: %d\n", ghCount)
-		fmt.Fprintf(cmd.OutOrStdout(), "  Linear Tickets Synchronized: %d\n", linearCount)
-		fmt.Fprintf(cmd.OutOrStdout(), "  Total Synced Work Units:    %d\n", ghCount+linearCount)
+		fmt.Fprintf(cmd.OutOrStdout(), MsgSyncStatusHeader)
+		fmt.Fprintf(cmd.OutOrStdout(), MsgSyncStatusGitHubFmt, ghCount)
+		fmt.Fprintf(cmd.OutOrStdout(), MsgSyncStatusLinearFmt, linearCount)
+		fmt.Fprintf(cmd.OutOrStdout(), MsgSyncStatusTotalFmt, ghCount+linearCount)
 		return nil
 	})
 	return cmd

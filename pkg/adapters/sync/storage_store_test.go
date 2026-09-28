@@ -58,7 +58,7 @@ func (m *mockStorageProvider) List(ctx context.Context, secCtx *pkgctx.SecurityC
 
 func TestStorageKernelStore_CRUD(t *testing.T) {
 	sp := newMockStorageProvider()
-	store := NewStorageKernelStore(sp, nil)
+	store := NewKernelSyncStore(sp, nil)
 	ctx := context.Background()
 
 	item := &BacklogItemSyncData{
