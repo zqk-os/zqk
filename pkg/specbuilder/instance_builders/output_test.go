@@ -226,8 +226,16 @@ func TestGeneratedWorkPackKindsCompile(t *testing.T) {
 func TestPackSpecFindsKernelParent(t *testing.T) {
 	root := moduleRoot(t)
 	got := findSpecPath(filepath.Join(root, "packs", "work", "specs"), "work_interval")
-	if !strings.HasSuffix(got, filepath.Join("objects", "pm", "work_interval.yaml")) {
+	if !strings.HasSuffix(got, filepath.Join("packs", "work", "specs", "work_interval.yaml")) && !strings.HasSuffix(got, filepath.Join("objects", "pm", "work_interval.yaml")) {
 		t.Fatalf("pack spec parent resolved to %s", got)
+	}
+}
+
+func TestKernelSpecFindsPackParent(t *testing.T) {
+	root := moduleRoot(t)
+	got := findSpecPath(filepath.Join(root, ".zqk", "specs", "objects", "kernel"), "work_interval")
+	if !strings.HasSuffix(got, filepath.Join("packs", "work", "specs", "work_interval.yaml")) {
+		t.Fatalf("kernel spec parent resolved to %s", got)
 	}
 }
 func moduleRoot(t *testing.T) string {
