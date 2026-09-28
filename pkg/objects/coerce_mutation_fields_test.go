@@ -157,7 +157,7 @@ func TestCoercePersonaTitleAndName(t *testing.T) {
 }
 
 // TestCoerceMutationFields_commitRefsScoping verifies BLI-MESH-MCP-SPEC-001 and BLI-MESH-SWARM-ENVELOPE-001:
-// commit_refs is only coerced to commit_hashes for kinds supporting commit_hashes (e.g. backlog_item, milestone, goal),
+// commit_refs is only coerced to commit_hashes for kinds supporting commit_hashes (backlog_item),
 // and is cleanly pruned from criteria without polluting the criteria schema with unknown fields.
 func TestCoerceMutationFields_commitRefsScoping(t *testing.T) {
 	t.Parallel()

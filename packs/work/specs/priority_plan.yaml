@@ -95,35 +95,6 @@ fields:
     type: list
     validation:
       required: false
-  description:
-    access:
-      requires:
-        - access:confidential
-    checklist:
-      authority: owner.
-      automation_hooks: used in reports and documentation.
-      cardinality: one
-      criticality: association
-      default: null
-      dependencies: none.
-      observability: "yes"
-      origin_lifecycle: mutable
-      purpose: Description of this priority plan.
-      security: non-sensitive
-      system_usage:
-        - documentation
-        - context
-      validation: Free text or markdown.
-    field_profile_code: PRIO-000
-    permissions: rwx
-    semantic_type: statement
-    traits:
-      - readable
-      - writable
-      - modifiable
-    type: text
-    validation:
-      required: false
   id:
     access:
       requires:
@@ -493,34 +464,6 @@ fields:
       validation: Must reference existing workflow object ID (WFL-###).
     field_profile_code: PRIO-014
     permissions: rwx
-    semantic_type: reference
-    traits:
-      - field_mutable_group
-      - field_reference_group
-    type: string
-    validation:
-      required: false
-  workstream_ref:
-    access:
-      requires:
-        - access:confidential
-    checklist:
-      authority: owner/executive.
-      automation_hooks: used for workstream-based grouping.
-      cardinality: one
-      criticality: association
-      default: null
-      dependencies: workstream registry.
-      observability: "yes"
-      origin_lifecycle: mutable
-      purpose: Link to associated workstream (singular reference, legacy field).
-      security: non-sensitive
-      system_usage:
-        - grouping
-        - reporting
-      validation: Must reference existing workstream ID.
-    field_profile_code: PRIO-011
-    permissions: r-x
     semantic_type: reference
     traits:
       - field_mutable_group

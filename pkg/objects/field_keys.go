@@ -704,6 +704,7 @@ const (
 	FieldKeyStrategyType                    = "strategy_type"
 	FieldKeySubstitutionPatterns            = "substitution_patterns"
 	FieldKeySuccessCount                    = "success_count"
+	FieldKeySuccessCriteria                 = "success_criteria"
 	FieldKeySuccessRate                     = "success_rate"
 	FieldKeySuggestedActions                = "suggested_actions"
 	FieldKeySummary                         = "summary"

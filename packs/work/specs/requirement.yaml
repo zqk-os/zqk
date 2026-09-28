@@ -67,36 +67,6 @@ fields:
     validation:
       min_length: 0
       required: false
-  description:
-    access:
-      requires:
-        - access:confidential
-    checklist:
-      authority: owner.
-      automation_hooks: used in reports, requirement documentation.
-      cardinality: one
-      criticality: association
-      default: none (optional)
-      dependencies: none.
-      observability: "yes"
-      origin_lifecycle: mutable
-      purpose: Detailed description of the requirement, its context, and expected outcomes.
-      security: non-sensitive
-      system_usage:
-        - documentation
-        - communication
-        - planning
-      validation: free text or markdown.
-    field_profile_code: REQ-011
-    permissions: rwx
-    semantic_type: statement
-    traits:
-      - readable
-      - writable
-      - modifiable
-    type: text
-    validation:
-      required: false
   goal_refs:
     access:
       requires:

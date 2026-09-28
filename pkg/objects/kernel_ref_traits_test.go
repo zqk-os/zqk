@@ -103,7 +103,7 @@ func TestGenerateFilterableFields_KernelRefsExpandFromGroup(t *testing.T) {
 	for _, f := range filterable {
 		got[f] = true
 	}
-	for _, want := range []string{FieldKeyWorkstreamRef, FieldKeyWorkstreamRefs} {
+	for _, want := range []string{FieldKeyWorkstreamRefs, FieldKeyReleaseRef} {
 		if !got[want] {
 			t.Errorf("priority_plan filterable missing %s (field_reference_group should expand)", want)
 		}
