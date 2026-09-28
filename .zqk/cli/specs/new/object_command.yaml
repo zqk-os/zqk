@@ -43,6 +43,10 @@ flags:
       type: bool
       default: false
       description: Enqueue background object promote after mint (opt-in; often sticks on title-only)
+    - name: cas
+      type: bool
+      default: false
+      description: Directly materialize the object into CAS storage instead of leaving on draft plane
     - name: skip-trace-pipeline
       type: bool
       default: false
