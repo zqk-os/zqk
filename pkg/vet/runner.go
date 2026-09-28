@@ -136,6 +136,14 @@ func (r *Runner) runHygiene(files []string) ([]Finding, error) {
 		findings = append(findings, builderFindings...)
 	}
 
+	if r.Config.Hygiene.CheckRawGoroutines {
+		goroutineFindings, err := CheckRawGoroutines(r.Root, files, r.Config)
+		if err != nil {
+			return nil, err
+		}
+		findings = append(findings, goroutineFindings...)
+	}
+
 	return findings, nil
 }
 

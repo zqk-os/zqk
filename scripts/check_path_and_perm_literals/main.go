@@ -35,6 +35,8 @@ import (
 	"time"
 
 	"golang.org/x/tools/go/ast/astutil"
+
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 const (
@@ -125,7 +127,11 @@ func main() {
 	var scanPath atomic.Value
 	scanIndex.Store(-1)
 	if !quiet {
-		go heartbeat(ctx, len(files), heartbeatEvery, &scanIndex, &scanPath)
+		goroutinelabels.NewGoroutine("heartbeat", "heartbeat progress reporter").
+			WithContext(ctx).
+			StartSimple(func() {
+				heartbeat(ctx, len(files), heartbeatEvery, &scanIndex, &scanPath)
+			})
 	}
 
 	var allViolations []Violation

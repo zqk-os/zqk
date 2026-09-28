@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"sync"
 	"time"
+
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 // Engine dispatches verification topologies with deterministic barrier controls and panic safety.
@@ -91,18 +93,20 @@ func (e *Engine) executeConcurrent(ctx context.Context, stages []VerificationSta
 	var mu sync.Mutex
 
 	for _, s := range stages {
-		wg.Add(1)
-		go func(stage VerificationStage) {
-			defer wg.Done()
-			res := e.runSingleStage(ctx, stage)
+		stage := s
+		goroutinelabels.NewGoroutine("verification_stage_concurrent", "executing concurrent verification stage").
+			WithContext(ctx).
+			WithWaitGroup(&wg).
+			StartSimple(func() {
+				res := e.runSingleStage(ctx, stage)
 
-			mu.Lock()
-			report.StageResults[stage.ID] = res
-			if res.Panicked {
-				report.PanicsCaught++
-			}
-			mu.Unlock()
-		}(s)
+				mu.Lock()
+				report.StageResults[stage.ID] = res
+				if res.Panicked {
+					report.PanicsCaught++
+				}
+				mu.Unlock()
+			})
 	}
 
 	wg.Wait()
@@ -137,30 +141,32 @@ func (e *Engine) executeHybridDAG(ctx context.Context, stages []VerificationStag
 
 		var wg sync.WaitGroup
 		for _, stageID := range currentBatch {
-			wg.Add(1)
-			go func(id string) {
-				defer wg.Done()
-				stage := stageMap[id]
-				res := e.runSingleStage(ctx, stage)
+			id := stageID
+			goroutinelabels.NewGoroutine("verification_stage_dag", "executing DAG verification stage").
+				WithContext(ctx).
+				WithWaitGroup(&wg).
+				StartSimple(func() {
+					stage := stageMap[id]
+					res := e.runSingleStage(ctx, stage)
 
-				mu.Lock()
-				defer mu.Unlock()
-				report.StageResults[id] = res
-				if res.Panicked {
-					report.PanicsCaught++
-				}
-				processedCount++
+					mu.Lock()
+					defer mu.Unlock()
+					report.StageResults[id] = res
+					if res.Panicked {
+						report.PanicsCaught++
+					}
+					processedCount++
 
-				// If stage passed, decrement in-degree for dependents
-				if res.Passed {
-					for _, depID := range dependents[id] {
-						inDegree[depID]--
-						if inDegree[depID] == 0 {
-							ready = append(ready, depID)
+					// If stage passed, decrement in-degree for dependents
+					if res.Passed {
+						for _, depID := range dependents[id] {
+							inDegree[depID]--
+							if inDegree[depID] == 0 {
+								ready = append(ready, depID)
+							}
 						}
 					}
-				}
-			}(stageID)
+				})
 		}
 		wg.Wait()
 	}

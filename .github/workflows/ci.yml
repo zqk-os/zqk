@@ -35,6 +35,9 @@ jobs:
       - name: Vet Code
         run: go vet ./...
 
+      - name: Run ZQK Verification Engine (zqk-vet)
+        run: make vet
+
       - name: Verify Public Release Payload
         run: sh scripts/open-core/check-public-release-payload.sh
 
@@ -59,6 +62,7 @@ jobs:
           | :--- | :---: |
           | Go Formatting (`gofmt`) | ✅ Clean |
           | Static Analysis (`go vet`) | ✅ Passed |
+          | ZQK Verification Engine (`zqk-vet`) | ✅ Passed |
           | Public Release Payload Gate | ✅ Passed |
           | Path & Permission Literals | ✅ Passed |
           | CLI Name Literals | ✅ Passed |

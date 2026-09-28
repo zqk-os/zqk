@@ -14,6 +14,7 @@ import (
 	"golang.org/x/term"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
@@ -99,20 +100,22 @@ func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp stora
 
 	// Non-blocking keyboard input loop
 	keyCh := make(chan []byte, 16)
-	go func() {
-		buf := make([]byte, 16)
-		for {
-			n, rErr := os.Stdin.Read(buf)
-			if rErr != nil {
-				return
+	goroutinelabels.NewGoroutine("tui_stdin_reader", "reading keyboard input for live dashboard TUI").
+		AsControlPlane().
+		StartSimple(func() {
+			buf := make([]byte, 16)
+			for {
+				n, rErr := os.Stdin.Read(buf)
+				if rErr != nil {
+					return
+				}
+				if n > 0 {
+					cp := make([]byte, n)
+					copy(cp, buf[:n])
+					keyCh <- cp
+				}
 			}
-			if n > 0 {
-				cp := make([]byte, n)
-				copy(cp, buf[:n])
-				keyCh <- cp
-			}
-		}
-	}()
+		})
 
 	// OS signals for clean interruption
 	sigCh := make(chan os.Signal, 2)

@@ -19,6 +19,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/ui/tds"
 	"github.com/zqk-os/zqk/internal/cli"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
@@ -1657,20 +1658,22 @@ func RunInspectTUI(cmd *cobra.Command, initialKind string, fields, filters []str
 	writeInspectScreen(m.Render())
 
 	keyCh := make(chan []byte, 16)
-	go func() {
-		buf := make([]byte, 16)
-		for {
-			n, rErr := os.Stdin.Read(buf)
-			if rErr != nil {
-				return
+	goroutinelabels.NewGoroutine("tui_stdin_reader", "reading keyboard input for inspect TUI").
+		AsControlPlane().
+		StartSimple(func() {
+			buf := make([]byte, 16)
+			for {
+				n, rErr := os.Stdin.Read(buf)
+				if rErr != nil {
+					return
+				}
+				if n > 0 {
+					cp := make([]byte, n)
+					copy(cp, buf[:n])
+					keyCh <- cp
+				}
 			}
-			if n > 0 {
-				cp := make([]byte, n)
-				copy(cp, buf[:n])
-				keyCh <- cp
-			}
-		}
-	}()
+		})
 
 	sigCh := make(chan os.Signal, 2)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)

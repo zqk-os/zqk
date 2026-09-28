@@ -10,6 +10,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
@@ -92,9 +93,11 @@ func (s *Server) Start(addr string) error {
 
 	s.started = true
 
-	go func() {
-		_ = s.httpServer.Serve(ln)
-	}()
+	goroutinelabels.NewGoroutine("studio_ui_http_serve", "serving studio UI HTTP traffic").
+		AsControlPlane().
+		StartSimple(func() {
+			_ = s.httpServer.Serve(ln)
+		})
 
 	return nil
 }

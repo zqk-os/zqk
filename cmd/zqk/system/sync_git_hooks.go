@@ -300,6 +300,8 @@ const defaultPreCommitHookScript = `#!/bin/sh
 # 1. CAS Membrane Integrity Gate (Prevent hand-editing of files past the CAS membrane)
 # 2. Knowledge Kernel CAS & Referential Integrity Gate (zqk system check)
 # 3. Test-Driven Development & Lineage Gate (zqk test dashboard --check-dod)
+# 4. Secret & Credential Leak Scanning Gate (scripts/scan-secrets.sh)
+# 5. Codebase Verification Gate (zqk-vet hygiene & tree police)
 
 set -e
 
@@ -409,6 +411,39 @@ if [ -d "$REPO_ROOT/.zqk/process/test_cases" ] || [ -f "$REPO_ROOT/.zqk/state/te
 	if ! "$ZQK_BIN" test dashboard --check-dod; then
 		echo "❌ [ZQK PRE-COMMIT] Definition of Done validation failed! Broken lineage detected."
 		echo "   Run '$ZQK_BIN test dashboard' to inspect broken bindings."
+		exit 1
+	fi
+fi
+
+# 4. Secret & Credential Leak Scanning Gate
+if [ -f "$REPO_ROOT/scripts/scan-secrets.sh" ]; then
+	echo "🔒 [ZQK PRE-COMMIT] Scanning repository for credentials and secrets..."
+	if ! /bin/sh "$REPO_ROOT/scripts/scan-secrets.sh" "$REPO_ROOT"; then
+		echo "❌ [ZQK PRE-COMMIT] Potential secrets detected! Commit aborted."
+		exit 1
+	fi
+fi
+
+# 5. Codebase Verification Gate (zqk-vet)
+# Enforces AST hygiene (paths, permissions, CLI names, raw goroutines), tree policing, and invariants.
+ZQK_VET_BIN=""
+if [ -x "$REPO_ROOT/bin/zqk-vet" ]; then
+	ZQK_VET_BIN="$REPO_ROOT/bin/zqk-vet"
+elif command -v zqk-vet >/dev/null 2>&1; then
+	ZQK_VET_BIN="$(command -v zqk-vet)"
+elif command -v go >/dev/null 2>&1 && [ -f "$REPO_ROOT/cmd/zqk-vet/main.go" ]; then
+	echo "⚙️  [ZQK PRE-COMMIT] Compiling bin/zqk-vet..."
+	go build -trimpath -o "$REPO_ROOT/bin/zqk-vet" "$REPO_ROOT/cmd/zqk-vet" 2>/dev/null || true
+	if [ -x "$REPO_ROOT/bin/zqk-vet" ]; then
+		ZQK_VET_BIN="$REPO_ROOT/bin/zqk-vet"
+	fi
+fi
+
+if [ -n "$ZQK_VET_BIN" ]; then
+	echo "🛡️  [ZQK PRE-COMMIT] Running zqk-vet hygiene and tree police checks..."
+	VET_SUITES="${ZQK_VET_SUITE:-hygiene,tree_police}"
+	if ! "$ZQK_VET_BIN" --suite "$VET_SUITES"; then
+		echo "❌ [ZQK PRE-COMMIT] zqk-vet verification failed! Please resolve findings before committing."
 		exit 1
 	fi
 fi
