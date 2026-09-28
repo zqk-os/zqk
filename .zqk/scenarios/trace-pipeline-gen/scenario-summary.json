@@ -1,30 +1,30 @@
 {
   "project_root": "/Users/lanceettl/zqk-public-candidate",
   "bundle_name": "trace-pipeline-gen",
-  "target_object_id": "REQ-CEF-KEYSTORE-STRICT-FALLBACK-GUARD",
+  "target_object_id": "REQ-ADAPTIVE-TASK-SUPERVISION-001",
   "target_kind": "requirement",
-  "target_title": "Enforce Strict Cryptographic Keystore Fallback Guard and Key Custody Verification",
+  "target_title": "Agnostic Adaptive Task Supervision, Failure Delta Illumination, and Idempotent Envelope Deduplication",
   "target_pre_existed": true,
   "linked_existing_ids": [
-    "REQ-CEF-KEYSTORE-STRICT-FALLBACK-GUARD"
+    "REQ-ADAPTIVE-TASK-SUPERVISION-001"
   ],
-  "linkage_note": "Target requirement REQ-CEF-KEYSTORE-STRICT-FALLBACK-GUARD pre-existed in Knowledge Kernel. Successfully linked 3 criteria (CRIT-1790601833527796000-1ad095db, CRIT-1790601833527797000-63bbf09c, CRIT-1790601833527798000-21a925e2), 1 test case (TST-1790601833527796001-819ee566), and 1 backlog item (BLI-1790601833527796000-c7b713bc) to it.",
+  "linkage_note": "Target requirement REQ-ADAPTIVE-TASK-SUPERVISION-001 pre-existed in Knowledge Kernel. Successfully linked 3 criteria (CRIT-1790602421435754000-caff01c3, CRIT-1790602421435755000-19c9265e, CRIT-1790602421435756000-e4dad377), 1 test case (TST-1790602421435754001-4cd06745), and 1 backlog item (BLI-1790602421435754000-c3ba0a8b) to it.",
   "created_criteria_ids": [
-    "CRIT-1790601833527796000-1ad095db",
-    "CRIT-1790601833527797000-63bbf09c",
-    "CRIT-1790601833527798000-21a925e2"
+    "CRIT-1790602421435754000-caff01c3",
+    "CRIT-1790602421435755000-19c9265e",
+    "CRIT-1790602421435756000-e4dad377"
   ],
   "created_backlog_item_ids": [
-    "BLI-1790601833527796000-c7b713bc"
+    "BLI-1790602421435754000-c3ba0a8b"
   ],
   "created_test_case_ids": [
-    "TST-1790601833527796001-819ee566"
+    "TST-1790602421435754001-4cd06745"
   ],
   "hint_to_id": {
-    "BLI-1790601833527796000-c7b713bc": "BLI-1790601833527796000-c7b713bc",
-    "CRIT-1790601833527796000-1ad095db": "CRIT-1790601833527796000-1ad095db",
-    "CRIT-1790601833527797000-63bbf09c": "CRIT-1790601833527797000-63bbf09c",
-    "CRIT-1790601833527798000-21a925e2": "CRIT-1790601833527798000-21a925e2",
-    "TST-1790601833527796001-819ee566": "TST-1790601833527796001-819ee566"
+    "BLI-1790602421435754000-c3ba0a8b": "BLI-1790602421435754000-c3ba0a8b",
+    "CRIT-1790602421435754000-caff01c3": "CRIT-1790602421435754000-caff01c3",
+    "CRIT-1790602421435755000-19c9265e": "CRIT-1790602421435755000-19c9265e",
+    "CRIT-1790602421435756000-e4dad377": "CRIT-1790602421435756000-e4dad377",
+    "TST-1790602421435754001-4cd06745": "TST-1790602421435754001-4cd06745"
   }
 }
