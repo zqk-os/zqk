@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
@@ -233,27 +234,28 @@ func (r *ExtendedValidationRegistry) Validate(ctx context.Context, obj map[strin
 			default:
 			}
 
-			wg.Add(1)
-			go func(handler ExtendedValidationHandler) {
-				defer wg.Done()
-
-				// Acquire pool slot
-				if pool != nil && pool.sem != nil {
-					select {
-					case pool.sem <- struct{}{}:
-						defer func() { <-pool.sem }()
-					case <-ctx.Done():
-						return
+			handler := h
+			goroutinelabels.NewGoroutine("extended_validation_handler", "running extended validation handler").
+				WithContext(ctx).
+				WithWaitGroup(&wg).
+				StartSimple(func() {
+					// Acquire pool slot
+					if pool != nil && pool.sem != nil {
+						select {
+						case pool.sem <- struct{}{}:
+							defer func() { <-pool.sem }()
+						case <-ctx.Done():
+							return
+						}
 					}
-				}
 
-				subErrs := handler.Validate(ctx, obj, options)
-				if len(subErrs) > 0 {
-					errsMu.Lock()
-					errs = append(errs, subErrs...)
-					errsMu.Unlock()
-				}
-			}(h)
+					subErrs := handler.Validate(ctx, obj, options)
+					if len(subErrs) > 0 {
+						errsMu.Lock()
+						errs = append(errs, subErrs...)
+						errsMu.Unlock()
+					}
+				})
 		}
 		wg.Wait()
 	}

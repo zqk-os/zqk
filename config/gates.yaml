@@ -10,6 +10,12 @@ hygiene:
   check_subprocess_hygiene: true
   check_command_specs: true
   check_cli_builders: true
+  check_raw_goroutines: true
+  goroutine_exemptions:
+    - "*_test.go"
+    - "vendor/*"
+    - "pkg/goroutinelabels/*"
+    - "*/testdata/*"
   forbidden_path_literals:
     - ".zqk"
     - ".zqk/"
