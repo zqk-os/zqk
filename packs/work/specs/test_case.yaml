@@ -40,41 +40,6 @@ fields:
     type: list
     validation:
       required: false
-  category:
-    access:
-      requires:
-        - access:confidential
-    checklist:
-      authority: QA/owner.
-      automation_hooks: used for test filtering and grouping.
-      cardinality: one
-      criticality: association
-      default: null
-      dependencies: none.
-      observability: "yes"
-      origin_lifecycle: mutable
-      purpose: Test category classification (e.g., \\\"Unit\\\", \\\"Integration\\\", \\\"E2E\\\", \\\"Performance\\\").
-      security: non-sensitive
-      system_usage:
-        - filtering
-        - grouping
-        - reporting
-      validation: Free-form string.
-    field_profile_code: TST-001
-    permissions: rwx
-    semantic_type: statement
-    traits:
-      - listable
-      - readable
-      - writable
-      - modifiable
-      - groupable
-      - filterable
-      - sortable
-      - searchable
-    type: string
-    validation:
-      required: false
   criteria_refs:
     access:
       requires:
@@ -101,37 +66,6 @@ fields:
       - field_mutable_group
       - field_reference_group
     type: list
-    validation:
-      required: false
-  description:
-    access:
-      requires:
-        - access:confidential
-    checklist:
-      authority: QA/owner.
-      automation_hooks: used in test reports and documentation.
-      cardinality: one
-      criticality: association
-      default: null
-      dependencies: none.
-      observability: "yes"
-      origin_lifecycle: mutable
-      purpose: Detailed description of what the test case validates.
-      security: non-sensitive
-      system_usage:
-        - documentation
-        - reporting
-        - search
-      validation: Free-form text (markdown allowed).
-    field_profile_code: TST-003
-    permissions: rwx
-    semantic_type: statement
-    traits:
-      - readable
-      - writable
-      - modifiable
-      - searchable
-    type: text
     validation:
       required: false
   milestone_refs:

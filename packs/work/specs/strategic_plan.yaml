@@ -36,39 +36,6 @@ fields:
     type: list
     validation:
       required: false
-  id:
-    access:
-      requires:
-        - access:confidential
-    checklist:
-      authority: automation (Generator)
-      automation_hooks: used for cross-file references.
-      cardinality: one
-      criticality: composition
-      default: auto-assigned per kind sequence
-      dependencies: linkage constraints, URN creation.
-      observability: logged + manifests.
-      origin_lifecycle: immutable
-      purpose: Stable identifier used across the graph (\\\"STRAT-PLAN-####\\\").
-      security: non-sensitive
-      system_usage:
-        - linking
-        - reporting
-        - URIs
-      validation: regex ^STRAT-PLAN-\\\\d{3,}$; uniqueness enforced.
-    permissions: r-x
-    semantic_type: statement
-    traits:
-      - listable
-      - readable
-      - writable
-      - filterable
-      - sortable
-      - searchable
-    type: string
-    validation:
-      pattern: ^STRAT-PLAN-\d{3,}$
-      required: true
   phases:
     access:
       requires:

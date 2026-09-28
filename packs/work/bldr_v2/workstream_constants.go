@@ -11,8 +11,6 @@ const (
 	FieldBlockers = "blockers"
 	// WorkstreamFieldCategory is the field name for category
 	WorkstreamFieldCategory = "category"
-	// WorkstreamFieldDescription is the field name for description
-	WorkstreamFieldDescription = "description"
 	// FieldEntryPoint is the field name for entry_point
 	FieldEntryPoint = "entry_point"
 	// WorkstreamFieldMetadata is the field name for metadata
