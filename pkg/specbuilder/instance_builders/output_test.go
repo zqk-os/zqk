@@ -87,4 +87,10 @@ func TestGenerateInstanceBuilderFromSpec_writesSiblingWithoutRegistry(t *testing
 	if strings.Contains(src, "RegisterBuilder") {
 		t.Fatal("written builder registers on the kernel singleton")
 	}
+	if !strings.Contains(src, "instance_builders.FieldOrderFromSpec(") {
+		t.Fatal("written builder does not take field order from the spec")
+	}
+	if strings.Contains(src, "buildFieldOrderFromSpec") {
+		t.Fatal("written builder depends on a helper that lives only in the kernel package")
+	}
 }

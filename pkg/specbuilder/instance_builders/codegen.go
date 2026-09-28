@@ -431,7 +431,7 @@ func generateInstanceBuilderCode(spec *objects.Spec, ontology string, fieldOrder
 			func(fn *goFuncBodyBuilder) {
 				fn.Line("// Derive canonical field order from spec (follows architecture pattern)").
 					Line("// System fields first, then spec-defined fields in sorted order").
-					Line(fmt.Sprintf("fieldOrder := buildFieldOrderFromSpec(%q)", ontology)).
+					Line(fmt.Sprintf("fieldOrder := instance_builders.FieldOrderFromSpec(%q)", ontology)).
 					Blank().
 					Line("// Create base builder").
 					Line(fmt.Sprintf("builder := &%s{", typeName)).
