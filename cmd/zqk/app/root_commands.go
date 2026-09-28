@@ -14,6 +14,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/convergence"
 	"github.com/zqk-os/zqk/cmd/zqk/daemon"
 	"github.com/zqk-os/zqk/cmd/zqk/docman"
+	"github.com/zqk-os/zqk/cmd/zqk/do"
 	"github.com/zqk-os/zqk/cmd/zqk/domain"
 	"github.com/zqk-os/zqk/cmd/zqk/feed"
 	"github.com/zqk-os/zqk/cmd/zqk/graph"
@@ -80,6 +81,11 @@ func registerCommands() {
 	object.RegisterDynamicKindCommands(objCmd)
 	objCmd.GroupID = "everyday"
 	rootCmd.AddCommand(objCmd)
+
+	// Top-level autonomous execution loop (zqk do / zqk auto-exec)
+	doCmdInst := do.NewDoCmd()
+	doCmdInst.GroupID = "everyday"
+	rootCmd.AddCommand(doCmdInst)
 
 	// Top-level inspect command (shortcut for object inspect)
 	inspectCmdInst := object.NewInspectCmd()

@@ -31,6 +31,9 @@ func ResolveProjectRoot(startPath string) string {
 			if settingsRoot := LoadBrandSettingsProjectRoot(abs); settingsRoot != "" && !IsAgentWorktreePath(settingsRoot) {
 				return settingsRoot
 			}
+			if main, err := AgentWorktreeMainRepo(abs); err == nil && IsValidProjectRoot(main) {
+				return main
+			}
 			return ""
 		}
 		return abs
@@ -44,6 +47,9 @@ func ResolveProjectRoot(startPath string) string {
 			if settingsRoot := LoadBrandSettingsProjectRoot(abs); settingsRoot != "" && !IsAgentWorktreePath(settingsRoot) {
 				return settingsRoot
 			}
+			if main, err := AgentWorktreeMainRepo(abs); err == nil && IsValidProjectRoot(main) {
+				return main
+			}
 			return ""
 		}
 		return abs
@@ -52,26 +58,47 @@ func ResolveProjectRoot(startPath string) string {
 		if r := ReadPersistedCurrentRoot(workspaceRoot); r != emptyValue {
 			return r
 		}
+		return workspaceRoot
 	}
 	root := FindNearestProjectRoot(startPath)
 	if root != "" && IsAgentWorktreePath(root) {
 		if settingsRoot := LoadBrandSettingsProjectRoot(root); settingsRoot != "" && !IsAgentWorktreePath(settingsRoot) {
 			return settingsRoot
 		}
+		if main, err := AgentWorktreeMainRepo(root); err == nil && IsValidProjectRoot(main) {
+			return main
+		}
 		return ""
+	}
+	if root == "" {
+		if wtRoot := FindWorktreeProjectRoot(startPath); wtRoot != "" {
+			return wtRoot
+		}
 	}
 	return root
 }
 
 // FindWorkspaceRoot returns the nearest directory (walking up from startPath) that contains .zqk.
+// If none is found and startPath is in a linked git worktree, it returns the main repository root.
 func FindWorkspaceRoot(startPath string) string {
 	dir, err := filepath.Abs(startPath)
 	if err != nil {
 		dir = startPath
 	}
 	for {
+		gitEntry := filepath.Join(dir, GitWorktreeMetadataEntry)
+		if st, err := fileutil.Stat(gitEntry); err == nil {
+			if !st.IsDir() {
+				if wtRoot := resolveGitWorktreeFile(dir, gitEntry); wtRoot != "" {
+					return wtRoot
+				}
+			}
+		}
 		if _, err := fileutil.Stat(filepath.Join(dir, ProjectDataDir)); err == nil {
 			return dir
+		}
+		if _, err := fileutil.Stat(gitEntry); err == nil {
+			break
 		}
 		parent := filepath.Dir(dir)
 		if parent == dir {
@@ -142,8 +169,19 @@ func FindNearestProjectRoot(startPath string) string {
 	}
 	var candidates []string
 	for {
+		gitEntry := filepath.Join(dir, GitWorktreeMetadataEntry)
+		if st, err := fileutil.Stat(gitEntry); err == nil {
+			if !st.IsDir() {
+				if wtRoot := resolveGitWorktreeFile(dir, gitEntry); wtRoot != "" {
+					return wtRoot
+				}
+			}
+		}
 		if _, err := fileutil.Stat(filepath.Join(dir, ProjectDataDir)); err == nil {
 			candidates = append(candidates, dir)
+		}
+		if _, err := fileutil.Stat(gitEntry); err == nil {
+			break
 		}
 		parent := filepath.Dir(dir)
 		if parent == dir {
@@ -156,5 +194,83 @@ func FindNearestProjectRoot(startPath string) string {
 			return c
 		}
 	}
+	if wtRoot := FindWorktreeProjectRoot(startPath); wtRoot != "" {
+		return wtRoot
+	}
 	return ""
 }
+
+// FindWorktreeProjectRoot attempts to locate the parent repository's project root containing .zqk
+// when startPath is within a linked git worktree (where .git is a file referencing the main repo).
+func FindWorktreeProjectRoot(startPath string) string {
+	dir, err := filepath.Abs(startPath)
+	if err != nil {
+		dir = startPath
+	}
+	for {
+		gitEntry := filepath.Join(dir, GitWorktreeMetadataEntry)
+		st, err := fileutil.Stat(gitEntry)
+		if err == nil {
+			if !st.IsDir() {
+				// .git is a file -> linked git worktree
+				if mainRoot := resolveGitWorktreeFile(dir, gitEntry); mainRoot != "" {
+					return mainRoot
+				}
+			}
+			break
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			break
+		}
+		dir = parent
+	}
+	return ""
+}
+
+func resolveGitWorktreeFile(worktreeDir, gitFilePath string) string {
+	b, err := fileutil.ReadFile(gitFilePath)
+	if err != nil {
+		return ""
+	}
+	content := strings.TrimSpace(string(b))
+	const prefix = "gitdir:"
+	if !strings.HasPrefix(strings.ToLower(content), prefix) {
+		return ""
+	}
+	gitDirPath := strings.TrimSpace(content[len(prefix):])
+	if !filepath.IsAbs(gitDirPath) {
+		gitDirPath = filepath.Clean(filepath.Join(worktreeDir, gitDirPath))
+	} else {
+		gitDirPath = filepath.Clean(gitDirPath)
+	}
+
+	// 1. Check commondir inside gitDirPath
+	commondirPath := filepath.Join(gitDirPath, "commondir")
+	if cdata, err := fileutil.ReadFile(commondirPath); err == nil {
+		commonRel := strings.TrimSpace(string(cdata))
+		mainGitDir := filepath.Clean(filepath.Join(gitDirPath, commonRel))
+		mainRepo := filepath.Dir(mainGitDir)
+		if IsValidProjectRoot(mainRepo) {
+			return mainRepo
+		}
+	}
+
+	// 2. Structural path convention: .git/worktrees/<name>
+	// Walking up two levels gets to .git, three levels gets to repo root
+	parentGit := filepath.Dir(filepath.Dir(gitDirPath))
+	if filepath.Base(parentGit) == GitWorktreeMetadataEntry {
+		mainRepo := filepath.Dir(parentGit)
+		if IsValidProjectRoot(mainRepo) {
+			return mainRepo
+		}
+	}
+
+	// 3. Fallback: try git rev-parse --git-common-dir
+	if main, err := gitCommonWorkingTree(worktreeDir); err == nil && IsValidProjectRoot(main) {
+		return main
+	}
+
+	return ""
+}
+
