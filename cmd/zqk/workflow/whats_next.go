@@ -29,6 +29,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects/koi"
 	observerpkg "github.com/zqk-os/zqk/pkg/observer"
 	"github.com/zqk-os/zqk/pkg/storage"
+	pkgsystem "github.com/zqk-os/zqk/pkg/system"
 	"github.com/zqk-os/zqk/pkg/tpm"
 	"github.com/zqk-os/zqk/pkg/workflow/whatsnext"
 )
@@ -60,6 +61,8 @@ type whatsNextOut struct {
 	MaterializedViewStale          bool                      `json:"materialized_view_stale,omitempty"`
 	MaterializedViewRecovering     bool                      `json:"materialized_view_recovering,omitempty"`
 	MaterializedViewDegradedReason string                    `json:"materialized_view_degraded_reason,omitempty"`
+	RemedyRecipes                  []string                  `json:"remedy_recipes,omitempty"`
+	RemedyReport                   *pkgsystem.RemedyReport   `json:"remedy_report,omitempty"`
 }
 
 // whatsNextGuidingStep is compiled hunger from the interaction policy.
@@ -110,6 +113,7 @@ func NewWhatsNextCmd() *cobra.Command {
 	cmd.Flags().String("persona-id", "", "Optional persona ID to evaluate what's next for a specific persona")
 	cmd.Flags().String("agent-id", "", "Swarm seat id: correspondence plus seated persona_ref for plan selection (peer_seats). Operator/TPM seats still compile the Gantt lead.")
 	cmd.Flags().Bool("sync-sweep", false, "Emergency diagnostics only: perform synchronous full storage sweep instead of reading materialized lite view")
+	cmd.Flags().Bool("auto-remedy", false, "Automatically diagnose and safely apply precondition and hygiene fixes (stale locks, orphaned tmp files)")
 	cli.BindAsyncProgress(cmd, runWhatsNext)
 	cli.RequireStorage(cmd, true)
 	return cmd
@@ -312,6 +316,8 @@ func runWhatsNextLite(cmd *cobra.Command, args []string, proc *cli.Processor, pr
 		out.MeasureCompressed = nil
 		out.MeasureSkipReason = "zero-cost hot path (use --session-id or --sync-sweep to measure)"
 	}
+
+	enrichWhatsNextRemedies(cmd, projectRoot, &out)
 
 	switch cli.GetFormat(cmd) {
 	case cli.FormatJSON, cli.FormatJSONL:
@@ -540,12 +546,20 @@ func runWhatsNextSyncSweep(cmd *cobra.Command, args []string, proc *cli.Processo
 		}
 	}
 
-	// Materialized View: Probe zero-cost projection and trigger async background recovery if disrupted
-	if lite, _ := whatsnext.GetOrRecoverPayload(ctx, sp, projectRoot, whatsnext.DefaultStalenessTolerance); lite != nil {
+	// Materialized View: Synchronously rebuild and persist zero-cost projection
+	rebuildView := whatsnext.NewWhatsNextMaterializedView(projectRoot)
+	if err := rebuildView.ScanFromStorageWithSecurity(ctx, sp, secCtx); err == nil {
+		_ = rebuildView.SaveToLiteFile()
+		out.MaterializedViewStale = false
+		out.MaterializedViewRecovering = false
+		out.MaterializedViewDegradedReason = ""
+	} else if lite, _ := whatsnext.GetOrRecoverPayload(ctx, sp, projectRoot, whatsnext.DefaultStalenessTolerance); lite != nil {
 		out.MaterializedViewStale = lite.Stale
 		out.MaterializedViewRecovering = lite.Recovering
 		out.MaterializedViewDegradedReason = lite.DegradedReason
 	}
+
+	enrichWhatsNextRemedies(cmd, projectRoot, &out)
 
 	switch cli.GetFormat(cmd) {
 	case cli.FormatJSON, cli.FormatJSONL:
@@ -1055,6 +1069,30 @@ func compressWhatsNextMeasure(m map[string]any) map[string]any {
 	return out
 }
 
+func enrichWhatsNextRemedies(cmd *cobra.Command, projectRoot string, out *whatsNextOut) {
+	if projectRoot == emptyValue || out == nil {
+		return
+	}
+	engine := pkgsystem.NewDiagnosticsRemedyEngine(projectRoot)
+	plans, err := engine.Diagnose(context.Background(), nil)
+	if err != nil || len(plans) == 0 {
+		return
+	}
+	for _, p := range plans {
+		if p.Command != "" {
+			out.RemedyRecipes = append(out.RemedyRecipes, fmt.Sprintf("%s: %s (run: %s)", p.Title, p.Description, p.Command))
+		} else {
+			out.RemedyRecipes = append(out.RemedyRecipes, fmt.Sprintf("%s: %s", p.Title, p.Description))
+		}
+	}
+	if autoRemedy, _ := cmd.Flags().GetBool("auto-remedy"); autoRemedy {
+		rep, err := engine.Apply(context.Background(), plans)
+		if err == nil {
+			out.RemedyReport = rep
+		}
+	}
+}
+
 func writeWhatsNextTable(cmd *cobra.Command, out whatsNextOut) error {
 	var b strings.Builder
 	b.WriteString("Workflow whats-next (composite)\n")
@@ -1104,6 +1142,19 @@ func writeWhatsNextTable(cmd *cobra.Command, out whatsNextOut) error {
 		b.WriteString("\nKernel steward (ambience):\n  ")
 		b.WriteString(out.KernelAmbience.StewardFocus)
 		b.WriteString("\n")
+	}
+	if out.RemedyReport != nil && out.RemedyReport.TotalApplied > 0 {
+		b.WriteString("\nPrecondition & Hygiene Auto-Remedy:\n")
+		for _, o := range out.RemedyReport.Outcomes {
+			if o.Applied {
+				b.WriteString(fmt.Sprintf("  ✓ %s: %s\n", o.Plan.Title, o.Detail))
+			}
+		}
+	} else if len(out.RemedyRecipes) > 0 {
+		b.WriteString("\nDeterministic Remedy Recipes:\n")
+		for _, r := range out.RemedyRecipes {
+			b.WriteString(fmt.Sprintf("  • %s\n", r))
+		}
 	}
 	if out.FillItem != nil && out.FillItem.CommandHint != "" {
 		b.WriteString("\nKernel fill (no live ATK):\n  ")

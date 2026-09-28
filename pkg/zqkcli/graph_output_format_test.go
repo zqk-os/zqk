@@ -3,11 +3,11 @@ package internal
 import (
 	"encoding/json"
 	"fmt"
-	"os/exec"
 	"path/filepath"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/config"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -64,7 +64,7 @@ func TestGraphBackendOutputFormats(t *testing.T) {
 		}
 
 		// Create the object (will use graph backend)
-		createCmd := exec.Command(cliBinary, "object", "create", "backlog_item", "--file", testFile) //nolint:gosec
+		createCmd := testkit.ManagedCommand(t, t.Context(), cliBinary, "object", "create", "backlog_item", "--file", testFile) //nolint:gosec
 		zqkenv.WireExecForIsolatedProjectWithExtras(createCmd, tmpDir, zqkenv.GraphEnabled().Name()+"=true")
 		if err := createCmd.Run(); err != nil {
 			t.Skipf("Skipping graph list JSON test (failed to create test object): %v", err)
@@ -72,7 +72,7 @@ func TestGraphBackendOutputFormats(t *testing.T) {
 		}
 
 		// List with JSON format
-		listCmd := exec.Command(cliBinary, "object", "list", "backlog_item", "--format", "json") //nolint:gosec
+		listCmd := testkit.ManagedCommand(t, t.Context(), cliBinary, "object", "list", "backlog_item", "--format", "json") //nolint:gosec
 		zqkenv.WireExecForIsolatedProjectWithExtras(listCmd, tmpDir, zqkenv.GraphEnabled().Name()+"=true")
 		output, err := listCmd.CombinedOutput()
 		if err != nil {
@@ -98,7 +98,7 @@ func TestGraphBackendOutputFormats(t *testing.T) {
 	// Test that list command produces valid YAML in graph mode
 	t.Run("ListYAML", func(t *testing.T) {
 		// List with YAML format
-		listCmd := exec.Command(cliBinary, "object", "list", "backlog_item", "--format", "yaml") //nolint:gosec
+		listCmd := testkit.ManagedCommand(t, t.Context(), cliBinary, "object", "list", "backlog_item", "--format", "yaml") //nolint:gosec
 		zqkenv.WireExecForIsolatedProjectWithExtras(listCmd, tmpDir, zqkenv.GraphEnabled().Name()+"=true")
 		output, err := listCmd.CombinedOutput()
 		if err != nil {
@@ -144,7 +144,7 @@ func TestGraphBackendOutputFormats(t *testing.T) {
 		}
 
 		// Create the object
-		createCmd := exec.Command(cliBinary, "object", "create", "backlog_item", "--file", testFile) //nolint:gosec
+		createCmd := testkit.ManagedCommand(t, t.Context(), cliBinary, "object", "create", "backlog_item", "--file", testFile) //nolint:gosec
 		zqkenv.WireExecForIsolatedProjectWithExtras(createCmd, tmpDir, zqkenv.GraphEnabled().Name()+"=true")
 		if err := createCmd.Run(); err != nil {
 			t.Skipf("Skipping graph get JSON test (failed to create test object): %v", err)
@@ -152,7 +152,7 @@ func TestGraphBackendOutputFormats(t *testing.T) {
 		}
 
 		// Get with JSON format
-		getCmd := exec.Command(cliBinary, "object", "get", "BLI-997", "--format", "json") //nolint:gosec
+		getCmd := testkit.ManagedCommand(t, t.Context(), cliBinary, "object", "get", "BLI-997", "--format", "json") //nolint:gosec
 		zqkenv.WireExecForIsolatedProjectWithExtras(getCmd, tmpDir, zqkenv.GraphEnabled().Name()+"=true")
 		output, err := getCmd.CombinedOutput()
 		if err != nil {
@@ -212,7 +212,7 @@ func TestGraphBackendOutputFormats(t *testing.T) {
 		}
 
 		// Create the object
-		createCmd := exec.Command(cliBinary, "object", "create", "backlog_item", "--file", testFile) //nolint:gosec
+		createCmd := testkit.ManagedCommand(t, t.Context(), cliBinary, "object", "create", "backlog_item", "--file", testFile) //nolint:gosec
 		zqkenv.WireExecForIsolatedProjectWithExtras(createCmd, tmpDir, zqkenv.GraphEnabled().Name()+"=true")
 		if err := createCmd.Run(); err != nil {
 			t.Skipf("Skipping graph get YAML test (failed to create test object): %v", err)
@@ -220,7 +220,7 @@ func TestGraphBackendOutputFormats(t *testing.T) {
 		}
 
 		// Get with YAML format
-		getCmd := exec.Command(cliBinary, "object", "get", "BLI-996", "--format", "yaml") //nolint:gosec
+		getCmd := testkit.ManagedCommand(t, t.Context(), cliBinary, "object", "get", "BLI-996", "--format", "yaml") //nolint:gosec
 		zqkenv.WireExecForIsolatedProjectWithExtras(getCmd, tmpDir, zqkenv.GraphEnabled().Name()+"=true")
 		output, err := getCmd.CombinedOutput()
 		if err != nil {
@@ -262,7 +262,7 @@ func TestGraphBackendOutputFormats(t *testing.T) {
 
 	// Test that fields command produces valid JSON in graph mode
 	t.Run("FieldsJSON", func(t *testing.T) {
-		fieldsCmd := exec.Command(cliBinary, "object", "fields", "--list-kinds", "--format", "json") //nolint:gosec
+		fieldsCmd := testkit.ManagedCommand(t, t.Context(), cliBinary, "object", "fields", "--list-kinds", "--format", "json") //nolint:gosec
 		zqkenv.WireExecForIsolatedProjectWithExtras(fieldsCmd, tmpDir, zqkenv.GraphEnabled().Name()+"=true")
 		output, err := fieldsCmd.CombinedOutput()
 		if err != nil {
@@ -284,7 +284,7 @@ func TestGraphBackendOutputFormats(t *testing.T) {
 
 	// Test that fields command produces valid YAML in graph mode
 	t.Run("FieldsYAML", func(t *testing.T) {
-		fieldsCmd := exec.Command(cliBinary, "object", "fields", "--list-kinds", "--format", "yaml") //nolint:gosec
+		fieldsCmd := testkit.ManagedCommand(t, t.Context(), cliBinary, "object", "fields", "--list-kinds", "--format", "yaml") //nolint:gosec
 		zqkenv.WireExecForIsolatedProjectWithExtras(fieldsCmd, tmpDir, zqkenv.GraphEnabled().Name()+"=true")
 		output, err := fieldsCmd.CombinedOutput()
 		if err != nil {
@@ -340,14 +340,14 @@ func TestGraphBackendOutputConsistency(t *testing.T) {
 	}
 
 	// Create object in file backend first
-	createFileCmd := exec.Command(cliBinary, "object", "create", "backlog_item", "--file", testFile) //nolint:gosec
+	createFileCmd := testkit.ManagedCommand(t, t.Context(), cliBinary, "object", "create", "backlog_item", "--file", testFile) //nolint:gosec
 	wireIsolatedCLI(createFileCmd, tmpDir)
 	if err := createFileCmd.Run(); err != nil {
 		t.Fatalf("Failed to create object in file backend: %v", err)
 	}
 
 	// Get object from file backend as JSON
-	getFileCmd := exec.Command(cliBinary, "object", "get", "BLI-999", "--format", "json") //nolint:gosec
+	getFileCmd := testkit.ManagedCommand(t, t.Context(), cliBinary, "object", "get", "BLI-999", "--format", "json") //nolint:gosec
 	wireIsolatedCLI(getFileCmd, tmpDir)
 	fileOutput, err := getFileCmd.CombinedOutput()
 	if err != nil {
@@ -381,14 +381,14 @@ func TestGraphBackendOutputConsistency(t *testing.T) {
 	}
 
 	// Now create same object in graph backend
-	createGraphCmd := exec.Command(cliBinary, "object", "create", "backlog_item", "--file", testFile) //nolint:gosec
+	createGraphCmd := testkit.ManagedCommand(t, t.Context(), cliBinary, "object", "create", "backlog_item", "--file", testFile) //nolint:gosec
 	zqkenv.WireExecForIsolatedProjectWithExtras(createGraphCmd, tmpDir, zqkenv.GraphEnabled().Name()+"=true")
 	// Note: This might fail if object already exists, but that's okay for this test
 	//nolint:errcheck // Test command run - error acceptable
 	_ = createGraphCmd.Run()
 
 	// Get object from graph backend as JSON
-	getGraphCmd := exec.Command(cliBinary, "object", "get", "BLI-999", "--format", "json") //nolint:gosec
+	getGraphCmd := testkit.ManagedCommand(t, t.Context(), cliBinary, "object", "get", "BLI-999", "--format", "json") //nolint:gosec
 	zqkenv.WireExecForIsolatedProjectWithExtras(getGraphCmd, tmpDir, zqkenv.GraphEnabled().Name()+"=true")
 	graphOutput, err := getGraphCmd.CombinedOutput()
 	if err != nil {

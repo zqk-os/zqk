@@ -21,7 +21,7 @@ type ValidationRuleInstanceBuilder struct {
 func NewValidationRuleInstanceBuilder(schemaVersion string) *ValidationRuleInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("validation_rule")
+	fieldOrder := instance_builders.FieldOrderFromSpec("validation_rule")
 
 	// Create base builder
 	builder := &ValidationRuleInstanceBuilder{
@@ -387,8 +387,4 @@ func (b *ValidationRuleInstanceBuilder) Version(value int) *ValidationRuleInstan
 // SetVersion is a compatibility alias for Version.
 func (b *ValidationRuleInstanceBuilder) SetVersion(value int) *ValidationRuleInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewValidationRuleInstanceBuilder(objects.DefaultSchemaVersion))
 }

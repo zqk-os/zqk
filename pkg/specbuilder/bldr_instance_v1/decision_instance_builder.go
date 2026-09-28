@@ -21,7 +21,7 @@ type DecisionInstanceBuilder struct {
 func NewDecisionInstanceBuilder(schemaVersion string) *DecisionInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("decision")
+	fieldOrder := instance_builders.FieldOrderFromSpec("decision")
 
 	// Create base builder
 	builder := &DecisionInstanceBuilder{
@@ -409,8 +409,4 @@ func (b *DecisionInstanceBuilder) WorkstreamRefs(value []string) *DecisionInstan
 // SetWorkstreamRefs is a compatibility alias for WorkstreamRefs.
 func (b *DecisionInstanceBuilder) SetWorkstreamRefs(value []string) *DecisionInstanceBuilder {
 	return b.WorkstreamRefs(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewDecisionInstanceBuilder(objects.DefaultSchemaVersion))
 }

@@ -21,7 +21,7 @@ type RollbackReportInstanceBuilder struct {
 func NewRollbackReportInstanceBuilder(schemaVersion string) *RollbackReportInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("rollback_report")
+	fieldOrder := instance_builders.FieldOrderFromSpec("rollback_report")
 
 	// Create base builder
 	builder := &RollbackReportInstanceBuilder{
@@ -354,8 +354,4 @@ func (b *RollbackReportInstanceBuilder) Version(value int) *RollbackReportInstan
 // SetVersion is a compatibility alias for Version.
 func (b *RollbackReportInstanceBuilder) SetVersion(value int) *RollbackReportInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewRollbackReportInstanceBuilder(objects.DefaultSchemaVersion))
 }

@@ -21,7 +21,7 @@ type PolicyInstanceBuilder struct {
 func NewPolicyInstanceBuilder(schemaVersion string) *PolicyInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("policy")
+	fieldOrder := instance_builders.FieldOrderFromSpec("policy")
 
 	// Create base builder
 	builder := &PolicyInstanceBuilder{
@@ -464,8 +464,4 @@ func (b *PolicyInstanceBuilder) WorkstreamRefs(value []string) *PolicyInstanceBu
 // SetWorkstreamRefs is a compatibility alias for WorkstreamRefs.
 func (b *PolicyInstanceBuilder) SetWorkstreamRefs(value []string) *PolicyInstanceBuilder {
 	return b.WorkstreamRefs(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewPolicyInstanceBuilder(objects.DefaultSchemaVersion))
 }

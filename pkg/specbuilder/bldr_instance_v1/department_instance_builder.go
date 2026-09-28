@@ -21,7 +21,7 @@ type DepartmentInstanceBuilder struct {
 func NewDepartmentInstanceBuilder(schemaVersion string) *DepartmentInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("department")
+	fieldOrder := instance_builders.FieldOrderFromSpec("department")
 
 	// Create base builder
 	builder := &DepartmentInstanceBuilder{
@@ -398,8 +398,4 @@ func (b *DepartmentInstanceBuilder) Version(value int) *DepartmentInstanceBuilde
 // SetVersion is a compatibility alias for Version.
 func (b *DepartmentInstanceBuilder) SetVersion(value int) *DepartmentInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewDepartmentInstanceBuilder(objects.DefaultSchemaVersion))
 }

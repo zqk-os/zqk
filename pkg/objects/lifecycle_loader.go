@@ -391,6 +391,8 @@ func (ll *LifecycleLoader) IsValidTransition(kind, from, to string) (bool, error
 	}
 	fromCanonical := ApplyAliasesForStatus(from, validSet)
 	toCanonical := ApplyAliasesForStatus(to, validSet)
+	fromCanonical = applyLifecycleStatusMapping(lifecycle.StatusMapping, from, fromCanonical, validSet)
+	toCanonical = applyLifecycleStatusMapping(lifecycle.StatusMapping, to, toCanonical, validSet)
 
 	// Check if both states are valid
 	fromValid, err := ll.IsValidStatus(kind, fromCanonical)
@@ -423,6 +425,33 @@ func (ll *LifecycleLoader) IsValidTransition(kind, from, to string) (bool, error
 	}
 
 	return false, nil
+}
+
+// GetAllowedTransitions returns a sorted list of allowed target statuses transitioning from the given status for kind.
+func (ll *LifecycleLoader) GetAllowedTransitions(kind, from string) ([]string, error) {
+	lifecycle, err := ll.LoadLifecycle(kind)
+	if err != nil {
+		return nil, err
+	}
+	validSet := make(map[string]bool, len(lifecycle.Statuses))
+	for _, s := range lifecycle.Statuses {
+		validSet[s.Value] = true
+	}
+	fromCanonical := ApplyAliasesForStatus(from, validSet)
+	fromCanonical = applyLifecycleStatusMapping(lifecycle.StatusMapping, from, fromCanonical, validSet)
+
+	targetSet := make(map[string]bool)
+	for _, transition := range lifecycle.Transitions {
+		if transition.From == fromCanonical || transition.From == "*" {
+			targetSet[transition.To] = true
+		}
+	}
+	out := make([]string, 0, len(targetSet))
+	for t := range targetSet {
+		out = append(out, t)
+	}
+	sort.Strings(out)
+	return out, nil
 }
 
 // NormalizeStatusForKind returns the preferred status for this kind when the given

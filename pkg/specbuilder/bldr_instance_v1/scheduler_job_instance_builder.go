@@ -21,7 +21,7 @@ type SchedulerJobInstanceBuilder struct {
 func NewSchedulerJobInstanceBuilder(schemaVersion string) *SchedulerJobInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("scheduler_job")
+	fieldOrder := instance_builders.FieldOrderFromSpec("scheduler_job")
 
 	// Create base builder
 	builder := &SchedulerJobInstanceBuilder{
@@ -662,8 +662,4 @@ func (b *SchedulerJobInstanceBuilder) WorkingDirectory(value string) *SchedulerJ
 // SetWorkingDirectory is a compatibility alias for WorkingDirectory.
 func (b *SchedulerJobInstanceBuilder) SetWorkingDirectory(value string) *SchedulerJobInstanceBuilder {
 	return b.WorkingDirectory(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewSchedulerJobInstanceBuilder(objects.DefaultSchemaVersion))
 }

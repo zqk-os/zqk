@@ -1,0 +1,37 @@
+$schema: schemas/command_spec.schema.json
+name: do
+aliases:
+    - auto-exec
+    - auto-do
+short: Execute autonomous single-command workflow loop for a backlog item or task
+description: Autonomously discovers, claims, context-prepares, verifies, and latches a backlog item or task in a single invocation.
+args:
+    type: maximum
+    count: 1
+flags:
+    - name: dry-run
+      type: bool
+      default: "false"
+      description: Simulate pipeline discovery and claiming without writing mutations
+    - name: verify
+      type: bool
+      default: "true"
+      description: Execute test verification and criteria latching
+    - name: by
+      type: string
+      default: ""
+      description: "Claimant agent or account id (default: seating or env identity)"
+    - name: persona-ref
+      type: string
+      default: PER-COMMUNITY-SOFTWARE-ENGINEER
+      description: Target persona reference
+help:
+    examples:
+        - comment: Auto-discover the next planned backlog item and execute end-to-end
+          command: zqk do
+        - comment: Execute a designated backlog item
+          command: zqk do BLI-ERGONOMICS-AUTO-EXEC-001
+        - comment: Dry run without mutating storage
+          command: zqk do --dry-run
+run_e: runDo
+common_flags: true

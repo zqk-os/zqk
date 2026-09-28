@@ -21,7 +21,7 @@ type DisplayInstanceBuilder struct {
 func NewDisplayInstanceBuilder(schemaVersion string) *DisplayInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("display")
+	fieldOrder := instance_builders.FieldOrderFromSpec("display")
 
 	// Create base builder
 	builder := &DisplayInstanceBuilder{
@@ -398,8 +398,4 @@ func (b *DisplayInstanceBuilder) Version(value int) *DisplayInstanceBuilder {
 // SetVersion is a compatibility alias for Version.
 func (b *DisplayInstanceBuilder) SetVersion(value int) *DisplayInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewDisplayInstanceBuilder(objects.DefaultSchemaVersion))
 }

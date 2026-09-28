@@ -3,6 +3,8 @@
 package filecas
 
 import (
+	"context"
+	"errors"
 	"path/filepath"
 	"testing"
 	"time"
@@ -99,4 +101,75 @@ func TestDrainDarwinSyncQueue(t *testing.T) {
 		t.Fatalf("DrainDarwinSyncQueue after queueing failed: %v", err)
 	}
 }
+
+func TestDrainDarwinSyncQueueContext_SuccessAndPendingCount(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	path := filepath.Join(t.TempDir(), "drain-ctx-test.yaml")
+	if err := fileutil.WriteFile(path, []byte("id: OBJ-DRAIN-CTX\n"), fileutil.StandardFilePerm); err != nil {
+		t.Fatalf("write fixture: %v", err)
+	}
+	f, err := fileutil.Open(path)
+	if err != nil {
+		t.Fatalf("open fixture: %v", err)
+	}
+
+	darwinSyncQueueOnce.Do(initDarwinSyncQueue)
+	if err := queueOrSync(darwinSyncQueue, f); err != nil {
+		t.Fatalf("queueOrSync failed: %v", err)
+	}
+
+	if err := DrainDarwinSyncQueueContext(ctx); err != nil {
+		t.Fatalf("DrainDarwinSyncQueueContext failed: %v", err)
+	}
+
+	if !IsDarwinSyncQueueDrained() {
+		t.Errorf("expected queue to be drained, got pending: %d", DarwinSyncQueuePendingCount())
+	}
+}
+
+func TestDrainDarwinSyncQueueContext_CancelledContext(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel() // Cancel immediately
+
+	err := DrainDarwinSyncQueueContext(ctx)
+	if err == nil {
+		t.Fatal("expected error with pre-cancelled context, got nil")
+	}
+	if !errors.Is(err, context.Canceled) {
+		t.Fatalf("expected context.Canceled, got %v", err)
+	}
+}
+
+func TestInitiateDarwinSyncShutdown_SynchronousFallback(t *testing.T) {
+	darwinSyncQueueOnce.Do(initDarwinSyncQueue)
+
+	if err := InitiateDarwinSyncShutdown(); err != nil {
+		t.Fatalf("InitiateDarwinSyncShutdown failed: %v", err)
+	}
+
+	path := filepath.Join(t.TempDir(), "shutdown-test.yaml")
+	if err := fileutil.WriteFile(path, []byte("id: OBJ-SHUTDOWN\n"), fileutil.StandardFilePerm); err != nil {
+		t.Fatalf("write fixture: %v", err)
+	}
+	f, err := fileutil.Open(path)
+	if err != nil {
+		t.Fatalf("open fixture: %v", err)
+	}
+
+	// Under shutdown, queueOrSync must immediately execute syncAndClose synchronously
+	if err := queueOrSync(darwinSyncQueue, f); err != nil {
+		t.Fatalf("queueOrSync under shutdown failed: %v", err)
+	}
+
+	// File descriptor should already be closed by synchronous fallback
+	if _, err := f.Stat(); err == nil {
+		t.Fatal("expected file descriptor to be closed after synchronous fallback")
+	}
+
+	// Reset shutdown flag for other tests
+	darwinSyncShutdown.Store(false)
+}
+
 

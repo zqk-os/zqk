@@ -21,7 +21,7 @@ type WorkstreamTransitionInstanceBuilder struct {
 func NewWorkstreamTransitionInstanceBuilder(schemaVersion string) *WorkstreamTransitionInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("workstream_transition")
+	fieldOrder := instance_builders.FieldOrderFromSpec("workstream_transition")
 
 	// Create base builder
 	builder := &WorkstreamTransitionInstanceBuilder{
@@ -398,8 +398,4 @@ func (b *WorkstreamTransitionInstanceBuilder) Version(value int) *WorkstreamTran
 // SetVersion is a compatibility alias for Version.
 func (b *WorkstreamTransitionInstanceBuilder) SetVersion(value int) *WorkstreamTransitionInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewWorkstreamTransitionInstanceBuilder(objects.DefaultSchemaVersion))
 }

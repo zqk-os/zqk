@@ -132,6 +132,7 @@ func GetGlobalShutdownCoordinator() *QueueShutdownCoordinator {
 			config:           DefaultShutdownConfig(),
 			logger:           logging.NewEventLogger(pkgctx.NewSystemContext()),
 		}
+		globalShutdownCoordinator.RegisterQueue(&DarwinSyncQueueShutdownHandler{})
 	})
 	return globalShutdownCoordinator
 }

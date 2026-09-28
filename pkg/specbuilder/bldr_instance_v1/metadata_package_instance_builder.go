@@ -21,7 +21,7 @@ type MetadataPackageInstanceBuilder struct {
 func NewMetadataPackageInstanceBuilder(schemaVersion string) *MetadataPackageInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("metadata_package")
+	fieldOrder := instance_builders.FieldOrderFromSpec("metadata_package")
 
 	// Create base builder
 	builder := &MetadataPackageInstanceBuilder{
@@ -365,8 +365,4 @@ func (b *MetadataPackageInstanceBuilder) Version(value int) *MetadataPackageInst
 // SetVersion is a compatibility alias for Version.
 func (b *MetadataPackageInstanceBuilder) SetVersion(value int) *MetadataPackageInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewMetadataPackageInstanceBuilder(objects.DefaultSchemaVersion))
 }

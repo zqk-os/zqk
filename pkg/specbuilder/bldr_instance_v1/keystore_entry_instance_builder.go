@@ -21,7 +21,7 @@ type KeystoreEntryInstanceBuilder struct {
 func NewKeystoreEntryInstanceBuilder(schemaVersion string) *KeystoreEntryInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("keystore_entry")
+	fieldOrder := instance_builders.FieldOrderFromSpec("keystore_entry")
 
 	// Create base builder
 	builder := &KeystoreEntryInstanceBuilder{
@@ -409,8 +409,4 @@ func (b *KeystoreEntryInstanceBuilder) Version(value int) *KeystoreEntryInstance
 // SetVersion is a compatibility alias for Version.
 func (b *KeystoreEntryInstanceBuilder) SetVersion(value int) *KeystoreEntryInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewKeystoreEntryInstanceBuilder(objects.DefaultSchemaVersion))
 }

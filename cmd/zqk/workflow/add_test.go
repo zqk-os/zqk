@@ -2,7 +2,6 @@ package workflow
 
 import (
 	"context"
-	"os/exec"
 	"strings"
 	"testing"
 	"time"
@@ -89,7 +88,7 @@ func TestWorkflowAddCommand(t *testing.T) {
 
 	t.Run("Workflow add automatically scaffolds priority plan and milestone", func(t *testing.T) {
 		// AllowCIOverrides removed (PRI-ENV-SIGNED-LOGIN-001): no --override in automated tests.
-		cmd := exec.Command(cliBinary, "workflow", "add", bliID, "3")
+		cmd := testkit.ManagedCommand(t, t.Context(), cliBinary, "workflow", "add", bliID, "3")
 		zqkenv.WireExecForIsolatedProjectWithExtras(cmd, tmpDir)
 		output, err := cmd.CombinedOutput()
 		if err != nil {
@@ -214,7 +213,7 @@ func TestWorkflowAddCommand(t *testing.T) {
 
 		// Pass --milestone explicitly: list-based discovery of priority_plan_refs can miss
 		// freshly created milestones depending on listing-index timing under the CLI subprocess.
-		cmd := exec.Command(cliBinary, "workflow", "add", bliID2, planID,
+		cmd := testkit.ManagedCommand(t, t.Context(), cliBinary, "workflow", "add", bliID2, planID,
 			"--milestone", milestoneID)
 		zqkenv.WireExecForIsolatedProjectWithExtras(cmd, tmpDir)
 		output, err := cmd.CombinedOutput()

@@ -111,6 +111,9 @@ func runUpdate(cmd *cobra.Command, args []string) error {
 				if err := guardManualRefFieldUpdates(cmd, proc, id, kind, updates); err != nil {
 					return err
 				}
+				if err := guardManualSystemProvenanceFields(cmd, proc, id, kind, updates); err != nil {
+					return err
+				}
 				bulkItems = append(bulkItems, storage.BulkUpdateItem{ID: id, Updates: updates})
 
 				if kind != "" && !kindSet[kind] {
@@ -340,6 +343,9 @@ func runUpdate(cmd *cobra.Command, args []string) error {
 					return err
 				}
 				if err := guardManualRefFieldUpdates(cmd, proc, id, objKind, updates); err != nil {
+					return err
+				}
+				if err := guardManualSystemProvenanceFields(cmd, proc, id, objKind, updates); err != nil {
 					return err
 				}
 			}

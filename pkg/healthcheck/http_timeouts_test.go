@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/gitconstants"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -33,7 +34,7 @@ func TestHTTPListeners_TimeoutsEnforced(t *testing.T) {
 		root = parent
 	}
 
-	cmd := exec.Command(gitconstants.BinaryGit, "-C", root, "grep", "-l", "-I", "--", "ListenAndServe", "cmd", "pkg", "internal")
+	cmd := testkit.ManagedCommand(t, t.Context(), gitconstants.BinaryGit, "-C", root, "grep", "-l", "-I", "--", "ListenAndServe", "cmd", "pkg", "internal")
 	out, err := cmd.Output()
 	if err != nil {
 		if ee, ok := err.(*exec.ExitError); ok && ee.ExitCode() == 1 {

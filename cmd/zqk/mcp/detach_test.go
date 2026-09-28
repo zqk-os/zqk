@@ -8,7 +8,7 @@ import (
 
 // TestSetDetach ensures setDetach correctly attaches OS-specific process attributes.
 func TestSetDetach(t *testing.T) {
-	cmd := exec.Command("echo", "test")
+	cmd := exec.CommandContext(t.Context(), "echo", "test")
 
 	// Pre-condition: SysProcAttr should be nil initially
 	if cmd.SysProcAttr != nil {

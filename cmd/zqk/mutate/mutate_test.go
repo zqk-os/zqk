@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/zqk-os/zqk/cmd/zqk/mutate"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testenvroot"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -132,5 +133,58 @@ func TestMutateCmd_SystemFieldRejectionAndOverride(t *testing.T) {
 		require.NoError(t, err)
 		require.Contains(t, buf.String(), "DRY-RUN VALIDATED")
 	})
+}
+
+func findModuleRoot() (string, error) {
+	dir, err := fileutil.Getwd()
+	if err != nil {
+		return "", err
+	}
+	for {
+		if _, err := fileutil.Stat(filepath.Join(dir, "go.mod")); err == nil {
+			return dir, nil
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			return "", fileutil.ErrNotExist
+		}
+		dir = parent
+	}
+}
+
+func TestMutateCmd_NonDryRun_CreateAndUpdatePersistence(t *testing.T) {
+	tmpDir := t.TempDir()
+	t.Cleanup(func() { _ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(tmpDir, nil)) })
+	t.Setenv("ZQK_TEST_ROOT", tmpDir)
+
+	repoRoot, err := findModuleRoot()
+	require.NoError(t, err)
+	require.NoError(t, testenvroot.BootstrapRoot(tmpDir, repoRoot))
+	require.NoError(t, testenvroot.CopyLifecyclesFromProject(tmpDir, repoRoot))
+	require.NoError(t, testenvroot.CopyObjectSpecsFromProject(tmpDir, repoRoot))
+
+	// Step 1: Create a new priority_plan object via ZQL without dry-run
+	cmdCreate := mutate.NewMutateCmd()
+	var createBuf bytes.Buffer
+	cmdCreate.SetOut(&createBuf)
+	cmdCreate.SetArgs([]string{
+		"BEGIN; LET $p = UPSERT priority_plan { id: 'PRI-TEST-PERSIST-001', title: 'Persisted Plan', priority_tier: 'P1', status: 'originated' }; COMMIT;",
+		"--format", "table",
+	})
+	err = cmdCreate.Execute()
+	require.NoError(t, err)
+	require.Contains(t, createBuf.String(), "COMMITTED")
+
+	// Step 2: Update the existing priority_plan object via ZQL without dry-run
+	cmdUpdate := mutate.NewMutateCmd()
+	var updateBuf bytes.Buffer
+	cmdUpdate.SetOut(&updateBuf)
+	cmdUpdate.SetArgs([]string{
+		"BEGIN; UPSERT priority_plan { id: 'PRI-TEST-PERSIST-001', title: 'Updated Plan Title' }; COMMIT;",
+		"--format", "table",
+	})
+	err = cmdUpdate.Execute()
+	require.NoError(t, err)
+	require.Contains(t, updateBuf.String(), "COMMITTED")
 }
 

@@ -439,3 +439,50 @@ func TestGuardManualRefFieldUpdates_addRefFlagAllowed(t *testing.T) {
 		t.Fatalf("expected --add-ref field to be exempt from direct mutation guard, got %v", err)
 	}
 }
+
+func TestGuardManualSystemProvenanceFields_refusesProvenanceFieldsWithoutOverride(t *testing.T) {
+	t.Parallel()
+	provenanceFields := []string{"created_at", "created_by", "updated_at", "updated_by", "cas_address", "hash"}
+	for _, field := range provenanceFields {
+		cmd := &cobra.Command{}
+		err := guardManualSystemProvenanceFields(cmd, nil, "BLI-1", objects.KindBacklogItem, map[string]any{
+			field: "manual-override-value",
+		})
+		if err == nil {
+			t.Fatalf("expected guardManualSystemProvenanceFields to refuse mutation of %s", field)
+		}
+		if !strings.Contains(err.Error(), "manual mutation of system provenance field(s)") {
+			t.Fatalf("unexpected error message for field %s: %v", field, err)
+		}
+	}
+}
+
+func TestGuardManualSystemProvenanceFields_overrideRequiresReasonCode(t *testing.T) {
+	t.Parallel()
+	cmd := &cobra.Command{}
+	cmd.Flags().Bool("override", true, "")
+	cmd.Flags().String("reason-code", "", "")
+	err := guardManualSystemProvenanceFields(cmd, nil, "BLI-1", objects.KindBacklogItem, map[string]any{
+		"created_at": "2026-01-01T00:00:00Z",
+	})
+	if err == nil {
+		t.Fatal("expected refuse for override without reason-code")
+	}
+	if !strings.Contains(err.Error(), "--reason-code is required") {
+		t.Fatalf("expected reason-code required message, got %v", err)
+	}
+}
+
+func TestGuardManualSystemProvenanceFields_overrideWithReasonCodePasses(t *testing.T) {
+	t.Parallel()
+	cmd := &cobra.Command{}
+	cmd.Flags().Bool("override", true, "")
+	cmd.Flags().String("reason-code", "emergency audit data recovery", "")
+	err := guardManualSystemProvenanceFields(cmd, nil, "BLI-1", objects.KindBacklogItem, map[string]any{
+		"created_at": "2026-01-01T00:00:00Z",
+	})
+	if err != nil {
+		t.Fatalf("expected override with reason-code to pass, got %v", err)
+	}
+}
+

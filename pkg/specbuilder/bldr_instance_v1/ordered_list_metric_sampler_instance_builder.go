@@ -21,7 +21,7 @@ type OrderedListMetricSamplerInstanceBuilder struct {
 func NewOrderedListMetricSamplerInstanceBuilder(schemaVersion string) *OrderedListMetricSamplerInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("ordered_list_metric_sampler")
+	fieldOrder := instance_builders.FieldOrderFromSpec("ordered_list_metric_sampler")
 
 	// Create base builder
 	builder := &OrderedListMetricSamplerInstanceBuilder{
@@ -409,8 +409,4 @@ func (b *OrderedListMetricSamplerInstanceBuilder) Version(value int) *OrderedLis
 // SetVersion is a compatibility alias for Version.
 func (b *OrderedListMetricSamplerInstanceBuilder) SetVersion(value int) *OrderedListMetricSamplerInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewOrderedListMetricSamplerInstanceBuilder(objects.DefaultSchemaVersion))
 }

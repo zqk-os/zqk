@@ -14,6 +14,7 @@ import (
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	kernelintake "github.com/zqk-os/zqk/pkg/kernel/intake"
 	"github.com/zqk-os/zqk/pkg/llm"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -190,6 +191,36 @@ Valid kinds usually include: requirement, workstream, goal, technical_spec, stra
 				return gateErr
 			}
 
+			clusterFlag, _ := cmd.Flags().GetBool("cluster")
+			concurrencyFlag, _ := cmd.Flags().GetBool("concurrency")
+			strictAntiChain, _ := cmd.Flags().GetBool("strict-anti-chain")
+
+			if clusterFlag || concurrencyFlag || len(parsedObjects) >= 2 {
+				synthesis, synthErr := SynthesizeIntakeMembrane(parsedObjects, strictAntiChain)
+				if synthErr != nil {
+					return errfmt.Errorf("intake membrane processing failed: %w", synthErr)
+				}
+
+				if clusterFlag || concurrencyFlag {
+					fmt.Fprintf(out, "=== Intake Membrane Synthesis ===\n")
+					fmt.Fprintf(out, "Total Inputs: %d | Clusters: %d | Deduplicated/Merged: %d\n\n",
+						synthesis.TotalInputCount, len(synthesis.Clusters), synthesis.DeduplicatedCount)
+
+					for i, c := range synthesis.Clusters {
+						topo := synthesis.Topologies[i]
+						fmt.Fprintf(out, "Cluster %d [%s]: %s (Domain: %s, Mode: %s)\n",
+							i+1, c.ClusterID, c.Title, c.DomainCategory, topo.Mode)
+						if concurrencyFlag {
+							fmt.Fprintf(out, "  Batches: %v\n", topo.Batches)
+							if len(topo.Dependencies) > 0 {
+								fmt.Fprintf(out, "  Dependencies: %v\n", topo.Dependencies)
+							}
+						}
+					}
+					fmt.Fprintln(out)
+				}
+			}
+
 			fmt.Fprintf(out, "\nSynthesized %d objects. %s\n\n", len(parsedObjects), statusApplyingShockwave)
 
 			// Instantiate objects (Bulk commit)
@@ -224,7 +255,46 @@ Valid kinds usually include: requirement, workstream, goal, technical_spec, stra
 		}),
 	})
 
+	cmd.Flags().Bool("cluster", false, "Group synthesized intake requests into cohesive workstreams via IntakeMembrane")
+	cmd.Flags().Bool("concurrency", false, "Preview and output synthesized concurrency vs sequential execution pipelines")
+	cmd.Flags().Bool("strict-anti-chain", true, "Reject redundant 1:1 micro-chain proposals fail-closed")
+
 	return cmd
+}
+
+// SynthesizeIntakeMembrane executes the two-stage intake clustering and concurrency synthesis
+// pipeline on a batch of synthesized intake objects.
+func SynthesizeIntakeMembrane(objects []IntakeObject, strictAntiChain bool) (*kernelintake.IntakeSynthesisResult, error) {
+	if len(objects) == 0 {
+		return nil, kernelintake.ErrEmptyIntakeRequests
+	}
+
+	reqs := make([]kernelintake.IntakeRequest, len(objects))
+	for i, obj := range objects {
+		targetPaths := extractTargetPaths(obj.Description)
+		reqs[i] = kernelintake.IntakeRequest{
+			ID:             fmt.Sprintf("REQ-INTAKE-%03d", i+1),
+			Title:          obj.Title,
+			Description:    obj.Description,
+			DomainCategory: obj.Kind,
+			TargetPaths:    targetPaths,
+		}
+	}
+
+	membrane := kernelintake.NewIntakeMembrane(kernelintake.WithStrictAntiChain(strictAntiChain))
+	return membrane.ProcessIntake(reqs)
+}
+
+func extractTargetPaths(text string) []string {
+	words := strings.Fields(text)
+	var paths []string
+	for _, w := range words {
+		cleaned := strings.Trim(w, "(),;:\"'`")
+		if strings.HasPrefix(cleaned, "pkg/") || strings.HasPrefix(cleaned, "cmd/") || strings.HasPrefix(cleaned, "internal/") {
+			paths = append(paths, cleaned)
+		}
+	}
+	return paths
 }
 
 // ValidateAllIntakeObjects enforces the base_object description gate across

@@ -71,28 +71,33 @@ func loadAllLifecycleDocs(t *testing.T) []lifecycleYAMLDoc {
 	if err != nil {
 		t.Fatal(err)
 	}
-	dir := filepath.Join(root, paths.ProcessInternalLifecyclesDir)
+	dirs := []string{filepath.Join(root, paths.ProcessInternalLifecyclesDir)}
+	for _, extra := range ExtraLifecycleRoots() {
+		dirs = append(dirs, extra)
+	}
 	var out []lifecycleYAMLDoc
-	err = filepath.WalkDir(dir, func(path string, d os.DirEntry, err error) error {
-		if err != nil || d == nil {
+	for _, dir := range dirs {
+		err = filepath.WalkDir(dir, func(path string, d os.DirEntry, err error) error {
+			if err != nil || d == nil {
+				return nil
+			}
+			if d.IsDir() || filepath.Ext(d.Name()) != ".yaml" {
+				return nil
+			}
+			data, err := fileutil.ReadFile(path)
+			if err != nil {
+				t.Fatalf("read %s: %v", d.Name(), err)
+			}
+			var doc lifecycleYAMLDoc
+			if err := yaml.Unmarshal(data, &doc); err != nil {
+				t.Fatalf("parse %s: %v", d.Name(), err)
+			}
+			out = append(out, doc)
 			return nil
-		}
-		if d.IsDir() || filepath.Ext(d.Name()) != ".yaml" {
-			return nil
-		}
-		data, err := fileutil.ReadFile(path)
+		})
 		if err != nil {
-			t.Fatalf("read %s: %v", d.Name(), err)
+			t.Fatal(err)
 		}
-		var doc lifecycleYAMLDoc
-		if err := yaml.Unmarshal(data, &doc); err != nil {
-			t.Fatalf("parse %s: %v", d.Name(), err)
-		}
-		out = append(out, doc)
-		return nil
-	})
-	if err != nil {
-		t.Fatal(err)
 	}
 	return out
 }

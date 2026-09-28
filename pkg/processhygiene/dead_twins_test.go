@@ -1,13 +1,14 @@
 package processhygiene
 
 import (
-	"os/exec"
 	"strings"
 	"testing"
+
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 func TestDeadTwinsRemoved(t *testing.T) {
-	cmd := exec.Command("go", "list", "./...")
+	cmd := testkit.ManagedCommand(t, t.Context(), "go", "list", "./...")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("go list failed: %v", err)

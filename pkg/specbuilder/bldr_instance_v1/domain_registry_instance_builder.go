@@ -21,7 +21,7 @@ type DomainRegistryInstanceBuilder struct {
 func NewDomainRegistryInstanceBuilder(schemaVersion string) *DomainRegistryInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("domain_registry")
+	fieldOrder := instance_builders.FieldOrderFromSpec("domain_registry")
 
 	// Create base builder
 	builder := &DomainRegistryInstanceBuilder{
@@ -332,8 +332,4 @@ func (b *DomainRegistryInstanceBuilder) Version(value int) *DomainRegistryInstan
 // SetVersion is a compatibility alias for Version.
 func (b *DomainRegistryInstanceBuilder) SetVersion(value int) *DomainRegistryInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewDomainRegistryInstanceBuilder(objects.DefaultSchemaVersion))
 }

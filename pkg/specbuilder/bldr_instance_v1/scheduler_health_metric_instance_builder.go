@@ -21,7 +21,7 @@ type SchedulerHealthMetricInstanceBuilder struct {
 func NewSchedulerHealthMetricInstanceBuilder(schemaVersion string) *SchedulerHealthMetricInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("scheduler_health_metric")
+	fieldOrder := instance_builders.FieldOrderFromSpec("scheduler_health_metric")
 
 	// Create base builder
 	builder := &SchedulerHealthMetricInstanceBuilder{
@@ -596,8 +596,4 @@ func (b *SchedulerHealthMetricInstanceBuilder) WindowStart(value string) *Schedu
 // SetWindowStart is a compatibility alias for WindowStart.
 func (b *SchedulerHealthMetricInstanceBuilder) SetWindowStart(value string) *SchedulerHealthMetricInstanceBuilder {
 	return b.WindowStart(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewSchedulerHealthMetricInstanceBuilder(objects.DefaultSchemaVersion))
 }

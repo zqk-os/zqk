@@ -1,11 +1,11 @@
 package community
 
 import (
-	"os/exec"
 	"path/filepath"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -82,7 +82,7 @@ func TestRunExportGate_IgnoresGitIgnoredDirectories(t *testing.T) {
 	tmp := t.TempDir()
 
 	// Initialize git repo in tmp
-	cmd := exec.Command("git", "init", tmp)
+	cmd := testkit.ManagedCommand(t, t.Context(), "git", "init", tmp)
 	if err := cmd.Run(); err != nil {
 		t.Fatalf("git init failed: %v", err)
 	}

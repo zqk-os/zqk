@@ -123,7 +123,7 @@ test-coverage-html: test-coverage
  
 test: test-unit test-integration
 
-bin/zqk-vet: $(shell find pkg/vet cmd/zqk-vet -name '*.go')
+bin/zqk-vet: $(shell find pkg cmd -name '*.go') config/gates.yaml
 	@mkdir -p bin
 	go build -trimpath -o bin/zqk-vet ./cmd/zqk-vet
 

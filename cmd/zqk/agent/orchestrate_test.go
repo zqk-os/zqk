@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -347,7 +346,7 @@ func TestCollectOrchestrationCommitManifestRejectsMissingEvidence(t *testing.T) 
 func TestConfigureOrchestrationExecutorProcessFailsClosed(t *testing.T) {
 	t.Parallel()
 
-	cmd := exec.Command("sh", "-c", "exit 0")
+	cmd := testkit.ManagedCommand(t, t.Context(), "sh", "-c", "exit 0")
 	configureOrchestrationExecutorProcess(cmd)
 
 	if cmd.SysProcAttr == nil || !cmd.SysProcAttr.Setpgid {
@@ -366,7 +365,7 @@ func TestConfigureOrchestrationExecutorProcessFailsClosed(t *testing.T) {
 
 func runTestGit(t *testing.T, dir string, args ...string) string {
 	t.Helper()
-	cmd := exec.Command("git", args...) //nolint:gosec
+	cmd := testkit.ManagedCommand(t, t.Context(), "git", args...) //nolint:gosec
 	cmd.Dir = dir
 	output, err := cmd.CombinedOutput()
 	if err != nil {

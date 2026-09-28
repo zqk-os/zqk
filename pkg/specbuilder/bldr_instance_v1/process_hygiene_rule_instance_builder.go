@@ -21,7 +21,7 @@ type ProcessHygieneRuleInstanceBuilder struct {
 func NewProcessHygieneRuleInstanceBuilder(schemaVersion string) *ProcessHygieneRuleInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("process_hygiene_rule")
+	fieldOrder := instance_builders.FieldOrderFromSpec("process_hygiene_rule")
 
 	// Create base builder
 	builder := &ProcessHygieneRuleInstanceBuilder{
@@ -409,8 +409,4 @@ func (b *ProcessHygieneRuleInstanceBuilder) Version(value int) *ProcessHygieneRu
 // SetVersion is a compatibility alias for Version.
 func (b *ProcessHygieneRuleInstanceBuilder) SetVersion(value int) *ProcessHygieneRuleInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewProcessHygieneRuleInstanceBuilder(objects.DefaultSchemaVersion))
 }

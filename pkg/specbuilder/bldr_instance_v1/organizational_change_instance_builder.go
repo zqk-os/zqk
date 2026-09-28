@@ -21,7 +21,7 @@ type OrganizationalChangeInstanceBuilder struct {
 func NewOrganizationalChangeInstanceBuilder(schemaVersion string) *OrganizationalChangeInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("organizational_change")
+	fieldOrder := instance_builders.FieldOrderFromSpec("organizational_change")
 
 	// Create base builder
 	builder := &OrganizationalChangeInstanceBuilder{
@@ -365,8 +365,4 @@ func (b *OrganizationalChangeInstanceBuilder) Version(value int) *Organizational
 // SetVersion is a compatibility alias for Version.
 func (b *OrganizationalChangeInstanceBuilder) SetVersion(value int) *OrganizationalChangeInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewOrganizationalChangeInstanceBuilder(objects.DefaultSchemaVersion))
 }

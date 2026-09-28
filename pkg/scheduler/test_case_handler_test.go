@@ -11,6 +11,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	"github.com/zqk-os/zqk/pkg/testrunner"
 )
 
@@ -196,7 +197,7 @@ func TestSchedulerTestCaseProcessGroupIsolation(t *testing.T) {
 func TestSchedulerTestCaseCrashResilience(t *testing.T) {
 	t.Parallel()
 
-	cmd := exec.Command("bash", "-c", "exit 42")
+	cmd := testkit.ManagedCommand(t, t.Context(), "bash", "-c", "exit 42")
 	err := cmd.Run()
 	if err == nil {
 		t.Fatalf("expected non-zero exit error")
@@ -217,7 +218,7 @@ func TestSchedulerTestCaseStreamingLogs(t *testing.T) {
 	t.Parallel()
 
 	var buf bytes.Buffer
-	cmd := exec.Command("echo", "test output line")
+	cmd := testkit.ManagedCommand(t, t.Context(), "echo", "test output line")
 	cmd.Stdout = &buf
 
 	if err := cmd.Run(); err != nil {

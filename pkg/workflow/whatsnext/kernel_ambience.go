@@ -18,6 +18,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/resourcehygiene"
 	"github.com/zqk-os/zqk/pkg/storage"
+	pkgsystem "github.com/zqk-os/zqk/pkg/system"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -68,6 +69,7 @@ type KernelAmbience struct {
 	MetricsRollup     *MetricsRollupSnapshot `json:"metrics_rollup,omitempty"`
 	StaleTestCatalyst *StaleTestCatalyst     `json:"stale_test_catalyst,omitempty"`
 	StaleAgentTask    *StaleAgentTask        `json:"stale_agent_task,omitempty"`
+	RemedyHint        string                 `json:"remedy_hint,omitempty"`
 }
 
 // StaleAgentTask holds information and command hints for stalled in-progress agent tasks.
@@ -241,11 +243,32 @@ func LoadKernelAmbience(projectRoot string) KernelAmbience {
 
 	EnrichStrategicAlignment(&amb, projectRoot)
 	EnrichMetricsRollup(&amb, projectRoot)
+	EnrichAutoRemedy(&amb, projectRoot)
 	if n := git.NewFacade(projectRoot).CountAheadUpstream(); n > 0 {
 		amb.BranchAhead = n
 	}
 	amb.StewardFocus = ProjectStewardFocus(amb, "")
 	return amb
+}
+
+// EnrichAutoRemedy checks for active remedy recipes (stale locks, orphaned tmp files)
+func EnrichAutoRemedy(amb *KernelAmbience, projectRoot string) {
+	if amb == nil || projectRoot == "" {
+		return
+	}
+	engine := pkgsystem.NewDiagnosticsRemedyEngine(projectRoot)
+	plans, err := engine.Diagnose(context.Background(), nil)
+	if err == nil && len(plans) > 0 {
+		var fixableCount int
+		for _, p := range plans {
+			if p.AutoApply {
+				fixableCount++
+			}
+		}
+		if fixableCount > 0 {
+			amb.RemedyHint = paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("remedy required: %d auto-fixable issue(s) detected — run zqk system check --auto-remedy", fixableCount))
+		}
+	}
 }
 
 // EnrichMetricsRollup loads the metrics rollup from state/ambient/metrics-rollup.json
@@ -756,6 +779,9 @@ func ProjectStewardFocus(amb KernelAmbience, correspondenceHint string) string {
 				len(amb.MetricsRollup.TopWarnClusters),
 			))
 		}
+	}
+	if amb.RemedyHint != "" {
+		parts = append(parts, amb.RemedyHint)
 	}
 	if len(parts) == 0 {
 		if amb.Available && amb.ObjectComplianceOK && amb.DraftPlaneTotal == 0 {

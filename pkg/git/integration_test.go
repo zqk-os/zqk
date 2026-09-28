@@ -6,7 +6,6 @@ import (
 
 	"context"
 	"fmt"
-	"os/exec"
 	"strings"
 	"testing"
 	"time"
@@ -58,7 +57,7 @@ func TestCommitIntegrationService_LinkCommitToWorkItems(t *testing.T) {
 	// Create a commit with work item references
 	createTestCommit(t, repoPath, "feat: implement BLI-001 and GOAL-002")
 
-	cmd := exec.Command("git", "log", "-1", "--format=%H")
+	cmd := testkit.ManagedCommand(t, t.Context(), "git", "log", "-1", "--format=%H")
 	cmd.Dir = repoPath
 	output, err := cmd.Output()
 	if err != nil {
@@ -153,7 +152,7 @@ func TestCommitIntegrationService_LinkCommitToWorkItems_NonExistentWorkItem(t *t
 	// Create a commit with reference to non-existent work item
 	createTestCommit(t, repoPath, "feat: implement BLI-999")
 
-	cmd := exec.Command("git", "log", "-1", "--format=%H")
+	cmd := testkit.ManagedCommand(t, t.Context(), "git", "log", "-1", "--format=%H")
 	cmd.Dir = repoPath
 	output, err := cmd.Output()
 	if err != nil {
@@ -208,7 +207,7 @@ func TestCommitIntegrationService_LinkCommitToWorkItems_Timeout(t *testing.T) {
 
 	createTestCommit(t, repoPath, "test commit")
 
-	cmd := exec.Command("git", "log", "-1", "--format=%H")
+	cmd := testkit.ManagedCommand(t, t.Context(), "git", "log", "-1", "--format=%H")
 	cmd.Dir = repoPath
 	output, err := cmd.Output()
 	if err != nil {
@@ -263,7 +262,7 @@ func TestCommitIntegrationService_MergeReferences(t *testing.T) {
 
 	// Create first commit
 	createTestCommit(t, repoPath, "feat: implement BLI-001")
-	cmd := exec.Command("git", "log", "-1", "--format=%H")
+	cmd := testkit.ManagedCommand(t, t.Context(), "git", "log", "-1", "--format=%H")
 	cmd.Dir = repoPath
 	output, err := cmd.Output()
 	if err != nil {
@@ -273,7 +272,7 @@ func TestCommitIntegrationService_MergeReferences(t *testing.T) {
 
 	// Create second commit referencing same work item
 	createTestCommit(t, repoPath, "fix: update BLI-001")
-	cmd = exec.Command("git", "log", "-1", "--format=%H")
+	cmd = testkit.ManagedCommand(t, t.Context(), "git", "log", "-1", "--format=%H")
 	cmd.Dir = repoPath
 	output, err = cmd.Output()
 	if err != nil {

@@ -21,7 +21,7 @@ type CorporateInitiativeInstanceBuilder struct {
 func NewCorporateInitiativeInstanceBuilder(schemaVersion string) *CorporateInitiativeInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("corporate_initiative")
+	fieldOrder := instance_builders.FieldOrderFromSpec("corporate_initiative")
 
 	// Create base builder
 	builder := &CorporateInitiativeInstanceBuilder{
@@ -420,8 +420,4 @@ func (b *CorporateInitiativeInstanceBuilder) Version(value int) *CorporateInitia
 // SetVersion is a compatibility alias for Version.
 func (b *CorporateInitiativeInstanceBuilder) SetVersion(value int) *CorporateInitiativeInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewCorporateInitiativeInstanceBuilder(objects.DefaultSchemaVersion))
 }

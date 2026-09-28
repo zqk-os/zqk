@@ -23,6 +23,8 @@ func NewQueryCmd() *cobra.Command {
 	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewQueryCommandBuilder(), &cobra.Command{
 		RunE: runQuery,
 	})
+	cmd.Flags().BoolP("interactive", "i", false, "Start interactive ZPARQL REPL console")
+	cmd.Flags().Bool("visualize", false, "Format query results as graph edge path visualization")
 	cli.BindAsyncProgress(cmd, runQuery)
 	return cmd
 }
@@ -30,6 +32,16 @@ func NewQueryCmd() *cobra.Command {
 func runQuery(cmd *cobra.Command, args []string) error {
 	filePath, _ := cmd.Flags().GetString("file")
 	format, _ := cmd.Flags().GetString("format")
+	interactive, _ := cmd.Flags().GetBool("interactive")
+	visualize, _ := cmd.Flags().GetBool("visualize")
+
+	if interactive || (len(args) > 0 && args[0] == "repl") {
+		proc, err := cli.NewProcessor(cmd)
+		if err != nil {
+			return fmt.Errorf("failed to initialize processor for interactive query: %w", err)
+		}
+		return RunInteractiveREPL(cmd, proc, visualize)
+	}
 
 	var queryStr string
 
@@ -58,7 +70,7 @@ func runQuery(cmd *cobra.Command, args []string) error {
 			queryStr = args[0]
 		}
 	} else {
-		return fmt.Errorf("query string required as argument or via -f/--file")
+		return fmt.Errorf("query string required as argument or via -f/--file (or pass -i / --interactive for console)")
 	}
 
 	ast, err := traversal.ParseZPARQL(queryStr)
@@ -84,6 +96,11 @@ func runQuery(cmd *cobra.Command, args []string) error {
 		enc := json.NewEncoder(out)
 		enc.SetIndent("", "  ")
 		return enc.Encode(result)
+	}
+
+	if visualize || strings.EqualFold(format, "visual") {
+		fmt.Fprint(out, FormatVisualizer(result, ast))
+		return nil
 	}
 
 	// Table / human-readable output

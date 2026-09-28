@@ -21,7 +21,7 @@ type McpSpecInstanceBuilder struct {
 func NewMcpSpecInstanceBuilder(schemaVersion string) *McpSpecInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("mcp_spec")
+	fieldOrder := instance_builders.FieldOrderFromSpec("mcp_spec")
 
 	// Create base builder
 	builder := &McpSpecInstanceBuilder{
@@ -354,8 +354,4 @@ func (b *McpSpecInstanceBuilder) Version(value string) *McpSpecInstanceBuilder {
 // SetVersion is a compatibility alias for Version.
 func (b *McpSpecInstanceBuilder) SetVersion(value string) *McpSpecInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewMcpSpecInstanceBuilder(objects.DefaultSchemaVersion))
 }

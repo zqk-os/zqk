@@ -1,0 +1,21 @@
+package bldr_cli_cmd_v1
+
+import (
+	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/internal/cli"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+)
+
+// NewKindPackInstallCommandBuilder creates a new kind-pack install command
+func NewKindPackInstallCommandBuilder() *cobra.Command {
+	builder := clipkg.NewCommandBuilder("install [pack_dir]")
+	builder.WithShort("Verify a spec pack and record its formal specs")
+	help := clipkg.DynamicHelpBuilder("Verify a spec pack and record its formal specs")
+	help.WithDescriptionLines("Verify an uploaded spec pack and record its formal specs into the kernel.")
+	help.AddExample("Install a verified spec pack", "zqk kind-pack install packs/work")
+	builder.WithHelpBuilder(help)
+	builder.WithArgs(cobra.ExactArgs(1))
+	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
+	cmd := builder.Build()
+	return cmd
+}

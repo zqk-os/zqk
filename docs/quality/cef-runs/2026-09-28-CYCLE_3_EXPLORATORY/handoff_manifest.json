@@ -1,0 +1,15 @@
+{
+  "cef_version": "0.1.0",
+  "run_id": "2026-09-28-CYCLE_3_EXPLORATORY",
+  "generated_at": "2026-09-28T06:30:00Z",
+  "target_sha": "e536ee8e",
+  "certified_by": "lead_integrator",
+  "artifacts": [
+    "scorecard.json",
+    "run_scope.yaml",
+    "preflight.json",
+    "EXECUTIVE_NARRATIVE.md",
+    "findings.jsonl",
+    "adversarial_resolutions.jsonl"
+  ]
+}

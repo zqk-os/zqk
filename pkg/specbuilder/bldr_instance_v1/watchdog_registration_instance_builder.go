@@ -21,7 +21,7 @@ type WatchdogRegistrationInstanceBuilder struct {
 func NewWatchdogRegistrationInstanceBuilder(schemaVersion string) *WatchdogRegistrationInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("watchdog_registration")
+	fieldOrder := instance_builders.FieldOrderFromSpec("watchdog_registration")
 
 	// Create base builder
 	builder := &WatchdogRegistrationInstanceBuilder{
@@ -387,8 +387,4 @@ func (b *WatchdogRegistrationInstanceBuilder) Version(value int) *WatchdogRegist
 // SetVersion is a compatibility alias for Version.
 func (b *WatchdogRegistrationInstanceBuilder) SetVersion(value int) *WatchdogRegistrationInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewWatchdogRegistrationInstanceBuilder(objects.DefaultSchemaVersion))
 }

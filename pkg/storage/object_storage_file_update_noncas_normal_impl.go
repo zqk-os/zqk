@@ -54,8 +54,15 @@ func (f *FileObjectStorage) updateNonCASPathNormal(ctx context.Context, secCtx *
 
 				// Update metadata inside mutex to ensure each goroutine gets a unique timestamp
 				// This ensures that after the first write, subsequent goroutines will see a different updated_at
-				// Note: ensureObjectMetadata will update updated_at to a new value, which is what we want
 				f.ensureObjectMetadata(ctx, existing, secCtx, false)
+				if pkgctx.HasLifecycleBreakGlass(ctx) {
+					if explicitUpdatedAt, has := updates[objects.FieldKeyUpdatedAt]; has {
+						existing[objects.FieldKeyUpdatedAt] = explicitUpdatedAt
+					}
+					if explicitUpdatedBy, has := updates[objects.FieldKeyUpdatedBy]; has {
+						existing[objects.FieldKeyUpdatedBy] = explicitUpdatedBy
+					}
+				}
 
 				// Write file (within mutex protection in test mode)
 				if err := f.writeObjectFile(ctx, oldFilePath, existing); err != nil {

@@ -21,7 +21,7 @@ type PromptTemplateInstanceBuilder struct {
 func NewPromptTemplateInstanceBuilder(schemaVersion string) *PromptTemplateInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("prompt_template")
+	fieldOrder := instance_builders.FieldOrderFromSpec("prompt_template")
 
 	// Create base builder
 	builder := &PromptTemplateInstanceBuilder{
@@ -431,8 +431,4 @@ func (b *PromptTemplateInstanceBuilder) Version(value int) *PromptTemplateInstan
 // SetVersion is a compatibility alias for Version.
 func (b *PromptTemplateInstanceBuilder) SetVersion(value int) *PromptTemplateInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewPromptTemplateInstanceBuilder(objects.DefaultSchemaVersion))
 }

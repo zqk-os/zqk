@@ -2,33 +2,34 @@ package maintenance
 
 import (
 	"context"
-	"os/exec"
 	"testing"
 	"time"
+
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 func TestPruneQuarantinedRefs(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Init dummy git repo
-	initCmd := exec.Command("git", "init")
+	initCmd := testkit.ManagedCommand(t, t.Context(), "git", "init")
 	initCmd.Dir = tmpDir
 	if err := initCmd.Run(); err != nil {
 		t.Fatalf("failed to init git: %v", err)
 	}
 
-	configCmd1 := exec.Command("git", "config", "user.name", "test")
+	configCmd1 := testkit.ManagedCommand(t, t.Context(), "git", "config", "user.name", "test")
 	configCmd1.Dir = tmpDir
 	_ = configCmd1.Run()
-	configCmd2 := exec.Command("git", "config", "user.email", "test@example.com")
+	configCmd2 := testkit.ManagedCommand(t, t.Context(), "git", "config", "user.email", "test@example.com")
 	configCmd2.Dir = tmpDir
 	_ = configCmd2.Run()
 
-	checkoutCmd := exec.Command("git", "checkout", "-b", "main")
+	checkoutCmd := testkit.ManagedCommand(t, t.Context(), "git", "checkout", "-b", "main")
 	checkoutCmd.Dir = tmpDir
 	_ = checkoutCmd.Run()
 
-	commitCmd := exec.Command("git", "commit", "--allow-empty", "-m", "initial commit")
+	commitCmd := testkit.ManagedCommand(t, t.Context(), "git", "commit", "--allow-empty", "-m", "initial commit")
 	commitCmd.Dir = tmpDir
 	if err := commitCmd.Run(); err != nil {
 		t.Fatalf("failed to commit: %v", err)
@@ -36,7 +37,7 @@ func TestPruneQuarantinedRefs(t *testing.T) {
 
 	// Create a branch to quarantine
 	branchName := "test-quarantine"
-	branchCmd := exec.Command("git", "branch", branchName)
+	branchCmd := testkit.ManagedCommand(t, t.Context(), "git", "branch", branchName)
 	branchCmd.Dir = tmpDir
 	if err := branchCmd.Run(); err != nil {
 		t.Fatalf("failed to create branch: %v", err)
@@ -44,14 +45,14 @@ func TestPruneQuarantinedRefs(t *testing.T) {
 
 	// Soft-delete to refs/archive/test-quarantine
 	archiveRef := "refs/archive/" + branchName
-	updateCmd := exec.Command("git", "update-ref", archiveRef, branchName)
+	updateCmd := testkit.ManagedCommand(t, t.Context(), "git", "update-ref", archiveRef, branchName)
 	updateCmd.Dir = tmpDir
 	if err := updateCmd.Run(); err != nil {
 		t.Fatalf("failed to update-ref: %v", err)
 	}
 
 	// Delete local branch
-	delCmd := exec.Command("git", "branch", "-D", branchName)
+	delCmd := testkit.ManagedCommand(t, t.Context(), "git", "branch", "-D", branchName)
 	delCmd.Dir = tmpDir
 	_ = delCmd.Run()
 
@@ -68,7 +69,7 @@ func TestPruneQuarantinedRefs(t *testing.T) {
 	}
 
 	// Verify the ref still exists
-	showCmd := exec.Command("git", "show-ref", "--verify", "--quiet", archiveRef)
+	showCmd := testkit.ManagedCommand(t, t.Context(), "git", "show-ref", "--verify", "--quiet", archiveRef)
 	showCmd.Dir = tmpDir
 	if err := showCmd.Run(); err != nil {
 		t.Errorf("expected archived ref to still exist")
@@ -84,7 +85,7 @@ func TestPruneQuarantinedRefs(t *testing.T) {
 	}
 
 	// Verify the ref was deleted
-	showCmd = exec.Command("git", "show-ref", "--verify", "--quiet", archiveRef)
+	showCmd = testkit.ManagedCommand(t, t.Context(), "git", "show-ref", "--verify", "--quiet", archiveRef)
 	showCmd.Dir = tmpDir
 	if err := showCmd.Run(); err == nil {
 		t.Errorf("expected archived ref to be deleted")

@@ -3,10 +3,11 @@ package cas_test
 import (
 	"context"
 	"encoding/json"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/zqk-os/zqk/pkg/testkit"
 
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
@@ -40,7 +41,7 @@ func TestCAS_CLI_Operations(t *testing.T) {
 
 	t.Run("CreateObject", func(t *testing.T) {
 		// First, try to delete the object if it exists (cleanup from previous runs)
-		deleteCmd := exec.Command(cliBinary, "object", "delete", testID)
+		deleteCmd := testkit.ManagedCommand(t, t.Context(), cliBinary, "object", "delete", testID)
 		deleteCmd.Dir = testScenarioDir
 		deleteCmd.Env = zqkenv.SubprocessEnvironWithTestRoot(testScenarioDir)
 		_ = deleteCmd.Run() //nolint:errcheck // Test cleanup - run errors are handled by test logic //nolint:errcheck // Ignore errors - object might not exist
@@ -55,7 +56,7 @@ func TestCAS_CLI_Operations(t *testing.T) {
 		}
 		jsonData, _ := json.Marshal(objData)
 
-		cmd := exec.Command(cliBinary, "object", "create", "backlog_item", "--data", string(jsonData)) //nolint:gosec
+		cmd := testkit.ManagedCommand(t, t.Context(), cliBinary, "object", "create", "backlog_item", "--data", string(jsonData)) //nolint:gosec
 		cmd.Dir = testScenarioDir
 		cmd.Env = zqkenv.SubprocessEnvironWithTestRoot(testScenarioDir)
 
@@ -72,7 +73,7 @@ func TestCAS_CLI_Operations(t *testing.T) {
 	t.Run("CreateDuplicateID", func(t *testing.T) {
 		// First, verify the object exists from the previous test
 		// Add a small delay to ensure index is flushed to disk
-		checkCmd := exec.Command(cliBinary, "object", "get", testID)
+		checkCmd := testkit.ManagedCommand(t, t.Context(), cliBinary, "object", "get", testID)
 		checkCmd.Dir = testScenarioDir
 		checkCmd.Env = zqkenv.SubprocessEnvironWithTestRoot(testScenarioDir)
 		checkOutput, checkErr := checkCmd.CombinedOutput()
@@ -102,7 +103,7 @@ func TestCAS_CLI_Operations(t *testing.T) {
 		}
 		jsonData, _ := json.Marshal(objData)
 
-		cmd := exec.Command(cliBinary, "object", "create", "backlog_item", "--data", string(jsonData)) //nolint:gosec
+		cmd := testkit.ManagedCommand(t, t.Context(), cliBinary, "object", "create", "backlog_item", "--data", string(jsonData)) //nolint:gosec
 		cmd.Dir = testScenarioDir
 		cmd.Env = zqkenv.SubprocessEnvironWithTestRoot(testScenarioDir)
 
@@ -122,7 +123,7 @@ func TestCAS_CLI_Operations(t *testing.T) {
 
 	t.Run("ReadObject", func(t *testing.T) {
 		// Read the object back
-		cmd := exec.Command(cliBinary, "object", "get", testID, "--format", "json")
+		cmd := testkit.ManagedCommand(t, t.Context(), cliBinary, "object", "get", testID, "--format", "json")
 		cmd.Dir = testScenarioDir
 		cmd.Env = zqkenv.SubprocessEnvironWithTestRoot(testScenarioDir)
 
@@ -155,7 +156,7 @@ func TestCAS_CLI_Operations(t *testing.T) {
 
 	t.Run("UpdateObject", func(t *testing.T) {
 		// Update the object
-		cmd := exec.Command(cliBinary, "object", "update", testID, "--field", "title=Updated CLI Test Object")
+		cmd := testkit.ManagedCommand(t, t.Context(), cliBinary, "object", "update", testID, "--field", "title=Updated CLI Test Object")
 		cmd.Dir = testScenarioDir
 		cmd.Env = zqkenv.SubprocessEnvironWithTestRoot(testScenarioDir)
 
@@ -165,7 +166,7 @@ func TestCAS_CLI_Operations(t *testing.T) {
 		}
 
 		// Verify update
-		readCmd := exec.Command(cliBinary, "object", "get", testID, "--format", "json")
+		readCmd := testkit.ManagedCommand(t, t.Context(), cliBinary, "object", "get", testID, "--format", "json")
 		readCmd.Dir = testScenarioDir
 		readCmd.Env = zqkenv.SubprocessEnvironWithTestRoot(testScenarioDir)
 
@@ -194,7 +195,7 @@ func TestCAS_CLI_Operations(t *testing.T) {
 
 	t.Run("ListObjects", func(t *testing.T) {
 		// List objects (should include our test object)
-		cmd := exec.Command(cliBinary, "object", "list", "backlog_item", "--format", "json")
+		cmd := testkit.ManagedCommand(t, t.Context(), cliBinary, "object", "list", "backlog_item", "--format", "json")
 		cmd.Dir = testScenarioDir
 		cmd.Env = zqkenv.SubprocessEnvironWithTestRoot(testScenarioDir)
 
@@ -237,7 +238,7 @@ func TestCAS_CLI_Operations(t *testing.T) {
 
 	t.Run("CountObjects", func(t *testing.T) {
 		// Count objects
-		cmd := exec.Command(cliBinary, "object", "count", "backlog_item", "--format", "json")
+		cmd := testkit.ManagedCommand(t, t.Context(), cliBinary, "object", "count", "backlog_item", "--format", "json")
 		cmd.Dir = testScenarioDir
 		cmd.Env = zqkenv.SubprocessEnvironWithTestRoot(testScenarioDir)
 
@@ -274,7 +275,7 @@ func TestCAS_CLI_Operations(t *testing.T) {
 
 	t.Run("DeleteObject", func(t *testing.T) {
 		// Delete the object
-		cmd := exec.Command(cliBinary, "object", "delete", testID)
+		cmd := testkit.ManagedCommand(t, t.Context(), cliBinary, "object", "delete", testID)
 		cmd.Dir = testScenarioDir
 		cmd.Env = zqkenv.SubprocessEnvironWithTestRoot(testScenarioDir)
 
@@ -284,7 +285,7 @@ func TestCAS_CLI_Operations(t *testing.T) {
 		}
 
 		// Verify deletion
-		readCmd := exec.Command(cliBinary, "object", "get", testID, "--format", "json")
+		readCmd := testkit.ManagedCommand(t, t.Context(), cliBinary, "object", "get", testID, "--format", "json")
 		readCmd.Dir = testScenarioDir
 		readCmd.Env = zqkenv.SubprocessEnvironWithTestRoot(testScenarioDir)
 

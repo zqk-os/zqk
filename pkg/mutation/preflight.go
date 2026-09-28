@@ -104,6 +104,8 @@ func NewDefaultPreflightValidator() *DefaultPreflightValidator {
 			"schema_ref":      true,
 			"namespace_id":    true,
 			"version_context": true,
+			"cas_address":     true,
+			"hash":            true,
 		},
 		idPattern:       regexp.MustCompile(`^[a-zA-Z0-9]+(-[a-zA-Z0-9_-]+)+$`),
 		specLoader:      objects.GetGlobalSpecLoader(),
@@ -292,12 +294,20 @@ func (v *DefaultPreflightValidator) Validate(ctx context.Context, mut *Mutation)
 						if oldStatus != "" && oldStatus != statusStr && v.lifecycleLoader != nil {
 							validTrans, transErr := v.lifecycleLoader.IsValidTransition(mut.TargetKind, oldStatus, statusStr)
 							if transErr != nil || !validTrans {
+								var allowedTargets []string
+								if v.lifecycleLoader != nil {
+									allowedTargets, _ = v.lifecycleLoader.GetAllowedTransitions(mut.TargetKind, oldStatus)
+								}
+								allowedDesc := "none"
+								if len(allowedTargets) > 0 {
+									allowedDesc = strings.Join(allowedTargets, ", ")
+								}
 								receipt.Violations = append(receipt.Violations, SchemaViolation{
 									FieldPath:         "fields.status",
 									FailingConstraint: "invalid_lifecycle_transition",
-									Expected:          fmt.Sprintf("valid lifecycle transition from %q", oldStatus),
+									Expected:          fmt.Sprintf("valid lifecycle transition from %q (allowed targets: [%s])", oldStatus, allowedDesc),
 									Actual:            statusStr,
-									Remediation:       fmt.Sprintf("Status cannot transition directly from %q to %q for %s without break-glass authorization", oldStatus, statusStr, mut.TargetKind),
+									Remediation:       fmt.Sprintf("Status cannot transition directly from %q to %q for %s without break-glass authorization; allowed targets from %q are: [%s]", oldStatus, statusStr, mut.TargetKind, oldStatus, allowedDesc),
 								})
 							}
 						}
@@ -324,43 +334,79 @@ func (v *DefaultPreflightValidator) Validate(ctx context.Context, mut *Mutation)
 			}
 		}
 
-		// Spec-driven validation for value-restricted enum and pattern fields
-		if v.specLoader != nil && mut.TargetKind != "" {
-			if spec, err := v.specLoader.LoadSpecWithInheritance(mut.TargetKind + ".yaml"); err == nil && spec != nil && spec.ResolvedFields != nil {
-				for fName, fVal := range mut.Fields {
-					if fName == "status" || fName == "priority_tier" || fName == "title" {
-						continue
+		// Spec-driven validation for value-restricted enum, pattern, and range fields
+		if mut.TargetKind != "" {
+			var spec *objects.Spec
+			if v.specLoader != nil {
+				spec, _ = v.specLoader.LoadSpecWithInheritance(mut.TargetKind + ".yaml")
+			}
+			if spec == nil {
+				if globalLoader := objects.GetGlobalSpecLoader(); globalLoader != nil {
+					spec, _ = globalLoader.LoadSpecWithInheritance(mut.TargetKind + ".yaml")
+				}
+			}
+
+			for fName, fVal := range mut.Fields {
+				if fName == "status" || fName == "priority_tier" || fName == "title" {
+					continue
+				}
+				restr := objects.ExtractFieldRestrictions(spec, mut.TargetKind, fName)
+				if restr == nil {
+					continue
+				}
+				// 1. Enum membership check
+				if len(restr.EnumValues) > 0 {
+					valStr := fmt.Sprintf("%v", fVal)
+					matched := false
+					for _, allowed := range restr.EnumValues {
+						if valStr == allowed {
+							matched = true
+							break
+						}
 					}
-					fieldDefRaw, exists := spec.ResolvedFields[fName]
-					if !exists {
-						continue
+					if !matched {
+						receipt.Violations = append(receipt.Violations, SchemaViolation{
+							FieldPath:         "fields." + fName,
+							FailingConstraint: "enum_membership",
+							Expected:          fmt.Sprintf("one of: [%s]", strings.Join(restr.EnumValues, ", ")),
+							Actual:            valStr,
+							Remediation:       fmt.Sprintf("Set %s to one of the authorized spec enum values: %s", fName, strings.Join(restr.EnumValues, ", ")),
+						})
 					}
-					fieldDef, ok := fieldDefRaw.(map[string]any)
-					if !ok {
-						continue
+				}
+				// 2. Pattern regex check
+				if restr.PatternRegexp != nil {
+					valStr := fmt.Sprintf("%v", fVal)
+					if !restr.PatternRegexp.MatchString(valStr) {
+						receipt.Violations = append(receipt.Violations, SchemaViolation{
+							FieldPath:         "fields." + fName,
+							FailingConstraint: "pattern_mismatch",
+							Expected:          fmt.Sprintf("value matching pattern %s", restr.Pattern),
+							Actual:            valStr,
+							Remediation:       fmt.Sprintf("Format %s to match pattern %s", fName, restr.Pattern),
+						})
 					}
-					if valMap, ok := fieldDef["validation"].(map[string]any); ok {
-						if enumRaw, hasEnum := valMap["enum"]; hasEnum && enumRaw != nil {
-							allowedValues := parseEnumStrings(enumRaw)
-							if len(allowedValues) > 0 {
-								valStr := fmt.Sprintf("%v", fVal)
-								matched := false
-								for _, allowed := range allowedValues {
-									if valStr == allowed {
-										matched = true
-										break
-									}
-								}
-								if !matched {
-									receipt.Violations = append(receipt.Violations, SchemaViolation{
-										FieldPath:         "fields." + fName,
-										FailingConstraint: "enum_membership",
-										Expected:          fmt.Sprintf("one of: [%s]", strings.Join(allowedValues, ", ")),
-										Actual:            valStr,
-										Remediation:       fmt.Sprintf("Set %s to one of the authorized spec enum values: %s", fName, strings.Join(allowedValues, ", ")),
-									})
-								}
-							}
+				}
+				// 3. Numeric range bounds check
+				if restr.HasMin || restr.HasMax {
+					if num, ok := objects.ParseNumericValue(fVal); ok {
+						if restr.HasMin && num < restr.Min {
+							receipt.Violations = append(receipt.Violations, SchemaViolation{
+								FieldPath:         "fields." + fName,
+								FailingConstraint: "range_violation",
+								Expected:          fmt.Sprintf("value >= %v", restr.Min),
+								Actual:            fmt.Sprintf("%v", num),
+								Remediation:       fmt.Sprintf("Ensure %s is at least %v", fName, restr.Min),
+							})
+						}
+						if restr.HasMax && num > restr.Max {
+							receipt.Violations = append(receipt.Violations, SchemaViolation{
+								FieldPath:         "fields." + fName,
+								FailingConstraint: "range_violation",
+								Expected:          fmt.Sprintf("value <= %v", restr.Max),
+								Actual:            fmt.Sprintf("%v", num),
+								Remediation:       fmt.Sprintf("Ensure %s is at most %v", fName, restr.Max),
+							})
 						}
 					}
 				}
@@ -455,5 +501,22 @@ func parseEnumStrings(raw any) []string {
 		return res
 	default:
 		return nil
+	}
+}
+
+func parseNumericValue(val any) (float64, bool) {
+	switch v := val.(type) {
+	case int:
+		return float64(v), true
+	case int32:
+		return float64(v), true
+	case int64:
+		return float64(v), true
+	case float64:
+		return v, true
+	case float32:
+		return float64(v), true
+	default:
+		return 0, false
 	}
 }

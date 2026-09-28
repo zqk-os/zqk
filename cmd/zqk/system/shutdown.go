@@ -10,6 +10,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/service"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
@@ -18,6 +19,14 @@ func NewShutdownCmd() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			logger := logging.GetLogger()
 			logging.FluentEvent(logger).Info("Initiating system daemon shutdown...").Log()
+
+			// Pluggable host service manager check
+			hostMgr := service.NewManager()
+			if hostMgr != nil && hostMgr.Adapter() != nil {
+				logging.FluentEvent(logger).Info("Host service adapter active for shutdown").
+					String("adapter", hostMgr.Adapter().Name()).
+					Log()
+			}
 
 			exe, _ := os.Executable()
 			if exe == "" {

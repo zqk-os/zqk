@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
+	"os/exec"
 
 	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
@@ -69,7 +69,7 @@ func TestContentAddressableStorage_ComprehensiveOperations(t *testing.T) {
 
 	// Build test binary for init command (from project root)
 	testBinary := filepath.Join(scenarioDir, "zqk-admin-test-init")
-	buildCmd := exec.Command("go", "build", "-o", testBinary, "./cmd/zqk") //nolint:gosec
+	buildCmd := exec.CommandContext(t.Context(), "go", "build", "-o", testBinary, "./cmd/zqk") //nolint:gosec
 	buildCmd.Dir = projectRoot
 	buildCmd.Stdout = os.Stderr
 	buildCmd.Stderr = os.Stderr

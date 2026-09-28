@@ -21,7 +21,7 @@ type FileLockMetricInstanceBuilder struct {
 func NewFileLockMetricInstanceBuilder(schemaVersion string) *FileLockMetricInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("file_lock_metric")
+	fieldOrder := instance_builders.FieldOrderFromSpec("file_lock_metric")
 
 	// Create base builder
 	builder := &FileLockMetricInstanceBuilder{
@@ -618,8 +618,4 @@ func (b *FileLockMetricInstanceBuilder) WindowStart(value string) *FileLockMetri
 // SetWindowStart is a compatibility alias for WindowStart.
 func (b *FileLockMetricInstanceBuilder) SetWindowStart(value string) *FileLockMetricInstanceBuilder {
 	return b.WindowStart(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewFileLockMetricInstanceBuilder(objects.DefaultSchemaVersion))
 }

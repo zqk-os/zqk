@@ -19,6 +19,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/service"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
@@ -152,16 +153,45 @@ func NewServiceListCmd() *cobra.Command {
 	return cmd
 }
 
-// ServiceManager handles service operations
-type ServiceManager struct {
-	logger logging.Logger
+var activeServiceManagerFactory = func() *ServiceManager {
+	return NewServiceManager()
 }
 
-// NewServiceManager creates a new service manager
-func NewServiceManager() *ServiceManager {
-	return &ServiceManager{
-		logger: logging.GetLoggerFromProfile(systemProfileHuman),
+// SetDefaultServiceManagerFactory allows tests to inject custom ServiceManager configurations.
+func SetDefaultServiceManagerFactory(f func() *ServiceManager) {
+	if f == nil {
+		activeServiceManagerFactory = func() *ServiceManager {
+			return NewServiceManager()
+		}
+		return
 	}
+	activeServiceManagerFactory = f
+}
+
+func getActiveServiceManager() *ServiceManager {
+	return activeServiceManagerFactory()
+}
+
+// ServiceManager handles service operations
+type ServiceManager struct {
+	logger      logging.Logger
+	hostManager *service.Manager
+}
+
+// NewServiceManager creates a new service manager with auto-detected or provided host service adapters
+func NewServiceManager(opts ...service.ManagerOption) *ServiceManager {
+	return &ServiceManager{
+		logger:      logging.GetLoggerFromProfile(systemProfileHuman),
+		hostManager: service.NewManager(opts...),
+	}
+}
+
+// HostManager returns the underlying decoupled host service manager.
+func (sm *ServiceManager) HostManager() *service.Manager {
+	if sm.hostManager == nil {
+		sm.hostManager = service.NewManager()
+	}
+	return sm.hostManager
 }
 
 // ServiceConfig holds configuration for a service
@@ -205,14 +235,35 @@ func (sm *ServiceManager) getServiceConfig(serviceName string) (*ServiceConfig, 
 }
 
 // Start starts a service
-func (sm *ServiceManager) Start(serviceName string, auth *ServiceAuth) error {
+func (sm *ServiceManager) Start(ctx context.Context, serviceName string, auth *ServiceAuth) error {
+	// First: if hostManager has a registered adapter that is a mock or handles the service
+	if sm.hostManager != nil {
+		adapter := sm.hostManager.Adapter()
+		if adapter != nil {
+			if _, isMock := adapter.(*service.MockAdapter); isMock {
+				return sm.hostManager.Start(ctx, serviceName)
+			}
+		}
+	}
+
 	config, err := sm.getServiceConfig(serviceName)
 	if err != nil {
+		if sm.hostManager != nil {
+			return sm.hostManager.Start(ctx, serviceName)
+		}
 		return err
 	}
 
 	// Check if Docker is available
 	if !sm.isDockerAvailable() {
+		if sm.hostManager != nil {
+			if st, err := sm.hostManager.Status(ctx, serviceName); err == nil && st.State == service.StateRunning {
+				return nil
+			}
+			if err := sm.hostManager.Start(ctx, serviceName); err == nil {
+				return nil
+			}
+		}
 		return errfmt.Errorf("docker is not available, please install and start Docker first")
 	}
 
@@ -269,14 +320,31 @@ func (sm *ServiceManager) Start(serviceName string, auth *ServiceAuth) error {
 }
 
 // Stop stops a service
-func (sm *ServiceManager) Stop(serviceName string) error {
+func (sm *ServiceManager) Stop(ctx context.Context, serviceName string) error {
+	if sm.hostManager != nil {
+		adapter := sm.hostManager.Adapter()
+		if adapter != nil {
+			if _, isMock := adapter.(*service.MockAdapter); isMock {
+				return sm.hostManager.Stop(ctx, serviceName)
+			}
+		}
+	}
+
 	config, err := sm.getServiceConfig(serviceName)
 	if err != nil {
+		if sm.hostManager != nil {
+			return sm.hostManager.Stop(ctx, serviceName)
+		}
 		return err
 	}
 
 	// Check if service is running
 	if !sm.isServiceRunning(config.ContainerName) {
+		if sm.hostManager != nil {
+			if err := sm.hostManager.Stop(ctx, serviceName); err == nil {
+				return nil
+			}
+		}
 		logging.Fluent(sm.logger).Info("Service not running").
 			String("service", serviceName).
 			Log()
@@ -298,13 +366,43 @@ func (sm *ServiceManager) Stop(serviceName string) error {
 }
 
 // Status checks service status
-func (sm *ServiceManager) Status(serviceName string) (bool, error) {
+func (sm *ServiceManager) Status(ctx context.Context, serviceName string) (bool, error) {
+	if sm.hostManager != nil {
+		adapter := sm.hostManager.Adapter()
+		if adapter != nil {
+			if _, isMock := adapter.(*service.MockAdapter); isMock {
+				st, err := sm.hostManager.Status(ctx, serviceName)
+				if err != nil {
+					return false, err
+				}
+				return st.State == service.StateRunning, nil
+			}
+		}
+	}
+
 	config, err := sm.getServiceConfig(serviceName)
 	if err != nil {
+		if sm.hostManager != nil {
+			st, statusErr := sm.hostManager.Status(ctx, serviceName)
+			if statusErr == nil {
+				return st.State == service.StateRunning, nil
+			}
+		}
 		return false, err
 	}
 
-	return sm.isServiceRunning(config.ContainerName), nil
+	if sm.isServiceRunning(config.ContainerName) {
+		return true, nil
+	}
+
+	if sm.hostManager != nil {
+		st, statusErr := sm.hostManager.Status(ctx, serviceName)
+		if statusErr == nil && st.State == service.StateRunning {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }
 
 // isDockerAvailable checks if Docker is available
@@ -372,7 +470,7 @@ func runServiceStart(cmd *cobra.Command, args []string) error {
 	serviceName := args[0]
 	logger := logging.GetLoggerFromContext(cmd.Context())
 
-	manager := NewServiceManager()
+	manager := getActiveServiceManager()
 	config, err := manager.getServiceConfig(serviceName)
 	if err != nil {
 		return err
@@ -386,7 +484,7 @@ func runServiceStart(cmd *cobra.Command, args []string) error {
 	auth := manager.getServiceAuth(serviceName, config)
 
 	startTime := time.Now()
-	err = manager.Start(serviceName, auth)
+	err = manager.Start(cmd.Context(), serviceName, auth)
 	duration := time.Since(startTime)
 
 	// Get project root and storage for coordination events
@@ -470,10 +568,10 @@ func runServiceStop(cmd *cobra.Command, args []string) error {
 	serviceName := args[0]
 	logger := logging.GetLoggerFromContext(cmd.Context())
 
-	manager := NewServiceManager()
+	manager := getActiveServiceManager()
 
 	startTime := time.Now()
-	err := manager.Stop(serviceName)
+	err := manager.Stop(cmd.Context(), serviceName)
 	duration := time.Since(startTime)
 
 	// Get project root and storage for coordination events
@@ -557,8 +655,8 @@ func runServiceStatus(cmd *cobra.Command, args []string) error {
 	serviceName := args[0]
 	logger := logging.GetLoggerFromContext(cmd.Context())
 
-	manager := NewServiceManager()
-	running, err := manager.Status(serviceName)
+	manager := getActiveServiceManager()
+	running, err := manager.Status(cmd.Context(), serviceName)
 	if err != nil {
 		logging.FluentEvent(logger).Error("Failed to check service status", err).
 			String("service", serviceName).
@@ -588,7 +686,7 @@ func runServiceStatus(cmd *cobra.Command, args []string) error {
 
 // runServiceList handles the list command
 func runServiceList(cmd *cobra.Command, args []string) error {
-	manager := NewServiceManager()
+	manager := getActiveServiceManager()
 	services := manager.ListServices()
 
 	switch cli.GetFormat(cmd) {

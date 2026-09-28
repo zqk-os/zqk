@@ -66,6 +66,8 @@ func AddModuleSpecRoot(rel string) {
 	addModuleDir(rel, AddSpecRoot)
 }
 
+// extraLifecycleRoots are lifecycle directories a linked pack registered.
+// The kernel tree wins when the same kind exists in both trees.
 var extraLifecycleRoots []string
 
 // AddLifecycleRoot records a directory whose lifecycle YAML merges after the kernel tree.
@@ -83,6 +85,21 @@ func AddLifecycleRoot(dir string) {
 		}
 	}
 	extraLifecycleRoots = append(extraLifecycleRoots, clean)
+}
+
+// RemoveLifecycleRoot drops a directory added by AddLifecycleRoot. Tests use it to isolate a temp root.
+func RemoveLifecycleRoot(dir string) {
+	clean := filepath.Clean(dir)
+	specRootMu.Lock()
+	defer specRootMu.Unlock()
+	kept := extraLifecycleRoots[:0]
+	for _, existing := range extraLifecycleRoots {
+		if existing == clean {
+			continue
+		}
+		kept = append(kept, existing)
+	}
+	extraLifecycleRoots = append([]string(nil), kept...)
 }
 
 // ExtraLifecycleRoots returns the registered pack lifecycle directories.
@@ -110,7 +127,7 @@ func addModuleDir(rel string, add func(string)) {
 	if !ok {
 		return
 	}
-	dir := filepath.Join(root, rel)
+	dir := filepath.Join(root, filepath.FromSlash(rel))
 	info, err := fileutil.Stat(dir)
 	if err != nil || !info.IsDir() {
 		return

@@ -243,6 +243,11 @@ func EvaluatePhiLead(plans []*PlanNode, targetPersonaIDs []string) (*PlanNode, [
 			return ri < rj
 		}
 		if pi.ActiveOrder != pj.ActiveOrder {
+			// For in_progress plans, active_order is unset (0) by invariant rule,
+			// which represents top-of-stack execution priority (0 wins).
+			if pi.Status == objects.ObjectStatusInProgress && pj.Status == objects.ObjectStatusInProgress {
+				return pi.ActiveOrder < pj.ActiveOrder
+			}
 			if pi.ActiveOrder == 0 {
 				return false
 			}

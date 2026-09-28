@@ -72,14 +72,14 @@ func TestVerifyCompletionIntegration(t *testing.T) {
 
 	reqID := "REQ-1"
 	storage.CreateCASVisible(t, fs, ctx, secCtx, map[string]any{
-		objects.FieldKeyKind:            objects.KindRequirement,
-		objects.FieldKeyID:              reqID,
-		objects.FieldKeyTitle:           "Integration requirement",
-		objects.FieldKeyDescription:     "Verify completion hashes propagate to linked objects.",
-		objects.FieldKeyStatus:          objects.ObjectStatusProposed,
-		objects.FieldKeyBacklogItemRefs: []string{bliID},
-		objects.FieldKeyGoalRefs:        []string{goalID},
-		objects.FieldKeyCriteriaRefs:    []string{acID},
+		objects.FieldKeyKind:         objects.KindRequirement,
+		objects.FieldKeyID:           reqID,
+		objects.FieldKeyTitle:        "Integration requirement",
+		objects.FieldKeyDescription:  "Verify completion hashes propagate to linked objects.",
+		objects.FieldKeyStatus:       objects.ObjectStatusProposed,
+		objects.FieldKeyPriority:     "p1",
+		objects.FieldKeyGoalRefs:     []string{goalID},
+		objects.FieldKeyCriteriaRefs: []string{acID},
 	}, objects.ObjectStatusActive)
 
 	tcID := "TEST-1"

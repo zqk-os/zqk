@@ -3,7 +3,9 @@ package storage
 import (
 	"context"
 	"errors"
+	"reflect"
 	"slices"
+	"strings"
 	"time"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
@@ -194,6 +196,40 @@ func (g *GraphObjectStorage) Update(ctx context.Context, secCtx *pkgctx.Security
 		delete(updates, ConstStreamExpectedUpdatedAt)
 	}
 
+	// Restrict manual mutation of system provenance fields unless elevated break-glass mode is active
+	if !pkgctx.HasLifecycleBreakGlass(ctx) {
+		provenanceFields := []string{
+			objects.FieldKeyCreatedAt,
+			objects.FieldKeyCreatedBy,
+			objects.FieldKeyUpdatedAt,
+			objects.FieldKeyUpdatedBy,
+			"cas_address",
+			"hash",
+		}
+		var violating []string
+		for _, f := range provenanceFields {
+			if newVal, has := updates[f]; has {
+				if existingVal, exists := existing[f]; exists && reflect.DeepEqual(newVal, existingVal) {
+					delete(updates, f)
+					continue
+				}
+				violating = append(violating, f)
+			}
+		}
+		if len(violating) > 0 {
+			return errfmt.Errorf("manual mutation of system provenance field(s) [%s] is restricted; provenance fields are system-computed and immutable", strings.Join(violating, ", "))
+		}
+	}
+
+	// Validate value-restricted spec fields (enums, format regex, numeric range bounds)
+	var spec *objects.Spec
+	if loader := objects.GetGlobalSpecLoader(); loader != nil {
+		spec, _ = loader.LoadSpecWithInheritance(kind + ".yaml")
+	}
+	if err := objects.ValidateObjectFieldRestrictions(spec, kind, updates); err != nil {
+		return errfmt.Errorf("validation failed: %w", err)
+	}
+
 	// Check if this is a built-in object and user has admin role
 	isBuiltIn := IsBuiltIn(existing)
 	hasAdminRole := slices.Contains(secCtx.Roles, "admin")
@@ -217,8 +253,8 @@ func (g *GraphObjectStorage) Update(ctx context.Context, secCtx *pkgctx.Security
 			continue
 		}
 		if k == objects.FieldKeyCreatedAt || k == objects.FieldKeyCreatedBy {
-			// Allow updating created_at/created_by for built-in objects with admin role
-			if isBuiltIn && hasAdminRole {
+			// Allow updating created_at/created_by for built-in objects with admin role, or when break_glass is active
+			if (isBuiltIn && hasAdminRole) || pkgctx.HasLifecycleBreakGlass(ctx) {
 				existing[k] = v
 			}
 			// Otherwise, skip (immutable)
@@ -232,6 +268,14 @@ func (g *GraphObjectStorage) Update(ctx context.Context, secCtx *pkgctx.Security
 
 	// Ensure metadata
 	g.ensureObjectMetadata(ctx, existing, secCtx, false)
+	if pkgctx.HasLifecycleBreakGlass(ctx) {
+		if explicitUpdatedAt, has := updates[objects.FieldKeyUpdatedAt]; has {
+			existing[objects.FieldKeyUpdatedAt] = explicitUpdatedAt
+		}
+		if explicitUpdatedBy, has := updates[objects.FieldKeyUpdatedBy]; has {
+			existing[objects.FieldKeyUpdatedBy] = explicitUpdatedBy
+		}
+	}
 
 	// Validate object (spec, lifecycle, references)
 	if err := g.validateObject(ctx, existing, kind, oldState); err != nil {

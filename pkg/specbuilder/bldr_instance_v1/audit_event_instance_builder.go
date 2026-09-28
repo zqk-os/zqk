@@ -21,7 +21,7 @@ type AuditEventInstanceBuilder struct {
 func NewAuditEventInstanceBuilder(schemaVersion string) *AuditEventInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("audit_event")
+	fieldOrder := instance_builders.FieldOrderFromSpec("audit_event")
 
 	// Create base builder
 	builder := &AuditEventInstanceBuilder{
@@ -508,8 +508,4 @@ func (b *AuditEventInstanceBuilder) Version(value int) *AuditEventInstanceBuilde
 // SetVersion is a compatibility alias for Version.
 func (b *AuditEventInstanceBuilder) SetVersion(value int) *AuditEventInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewAuditEventInstanceBuilder(objects.DefaultSchemaVersion))
 }

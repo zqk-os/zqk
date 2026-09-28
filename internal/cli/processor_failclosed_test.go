@@ -5,14 +5,14 @@ import (
 	"testing"
 
 	"github.com/spf13/cobra"
+	pkgcli "github.com/zqk-os/zqk/pkg/cli"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
 func TestNewProcessor_UnboundSecurityContext_FailsClosedToGuest(t *testing.T) {
-	cmd := &cobra.Command{
-		Use: "test",
-		Run: func(cmd *cobra.Command, args []string) {},
-	}
+	cmd := pkgcli.NewCommandBuilder("test").
+		WithRunE(func(cmd *cobra.Command, args []string) error { return nil }).
+		Build()
 	// Explicitly empty context without AuthMiddleware binding
 	cmd.SetContext(context.Background())
 
@@ -34,3 +34,43 @@ func TestNewProcessor_UnboundSecurityContext_FailsClosedToGuest(t *testing.T) {
 		t.Fatalf("expected zero permissions for guest, got %v", guest.Permissions)
 	}
 }
+
+func TestGuestSecurityContext_BoundaryAndImmutability(t *testing.T) {
+	guest := pkgctx.NewGuestSecurityContext()
+	if guest.AccountID != pkgctx.GuestAccountID {
+		t.Errorf("expected GuestAccountID (%s), got %s", pkgctx.GuestAccountID, guest.AccountID)
+	}
+	if len(guest.GetRoles()) != 1 || guest.GetRoles()[0] != "guest" {
+		t.Errorf("expected role ['guest'], got %v", guest.GetRoles())
+	}
+	if guest.GetPrecedence() != pkgctx.PrecedenceDefault {
+		t.Errorf("expected PrecedenceDefault, got %d", guest.GetPrecedence())
+	}
+
+	// Validate method should report clean configuration
+	errs := guest.Validate()
+	if len(errs) != 0 {
+		t.Errorf("expected 0 validation errors for default guest context, got %v", errs)
+	}
+}
+
+func TestSecurityContext_FailClosedIntegration(t *testing.T) {
+	ctx := context.Background()
+	// Unbound context must return nil
+	extracted := pkgctx.GetSecurityContext(ctx)
+	if extracted != nil {
+		t.Fatalf("expected nil from unbound context, got %v", extracted)
+	}
+
+	// Explicit guest context attached
+	guest := pkgctx.NewGuestSecurityContext()
+	boundCtx := pkgctx.WithSecurityContext(ctx, guest)
+	res := pkgctx.GetSecurityContext(boundCtx)
+	if res == nil {
+		t.Fatal("expected non-nil security context from bound context")
+	}
+	if res.AccountID != pkgctx.GuestAccountID {
+		t.Errorf("expected account %s, got %s", pkgctx.GuestAccountID, res.AccountID)
+	}
+}
+

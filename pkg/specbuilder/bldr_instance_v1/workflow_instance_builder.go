@@ -21,7 +21,7 @@ type WorkflowInstanceBuilder struct {
 func NewWorkflowInstanceBuilder(schemaVersion string) *WorkflowInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("workflow")
+	fieldOrder := instance_builders.FieldOrderFromSpec("workflow")
 
 	// Create base builder
 	builder := &WorkflowInstanceBuilder{
@@ -453,8 +453,4 @@ func (b *WorkflowInstanceBuilder) Version(value int) *WorkflowInstanceBuilder {
 // SetVersion is a compatibility alias for Version.
 func (b *WorkflowInstanceBuilder) SetVersion(value int) *WorkflowInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewWorkflowInstanceBuilder(objects.DefaultSchemaVersion))
 }
