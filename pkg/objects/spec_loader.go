@@ -385,10 +385,7 @@ func (sl *SpecLoader) applicableExtraSpecRoots() []string {
 	}
 	mod, err := paths.ModuleRootFromPath(sl.specsDir)
 	if err != nil || mod == "" {
-		if info, statErr := fileutil.Stat(filepath.Join(sl.specsDir, "work_unit.yaml")); statErr == nil && !info.IsDir() {
-			return all
-		}
-		return nil
+		return all
 	}
 	var out []string
 	for _, root := range all {
