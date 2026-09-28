@@ -25,7 +25,7 @@ func TestBootstrapRootCopiesLifecycles(t *testing.T) {
 		}
 		mod = parent
 	}
-	src := filepath.Join(mod, paths.ProcessInternalLifecyclesDir, "pm", "decision_lifecycle.yaml")
+	src := filepath.Join(mod, paths.ProcessInternalLifecyclesDir, "kernel", "account_lifecycle.yaml")
 	if _, err := fileutil.Stat(src); err != nil {
 		t.Skipf("module lifecycles not present: %v", err)
 	}
@@ -33,11 +33,15 @@ func TestBootstrapRootCopiesLifecycles(t *testing.T) {
 	if err := BootstrapRoot(root, mod); err != nil {
 		t.Fatalf("BootstrapRoot: %v", err)
 	}
-	dst := filepath.Join(root, paths.ProcessInternalLifecyclesDir, "pm", "decision_lifecycle.yaml")
+	dst := filepath.Join(root, paths.ProcessInternalLifecyclesDir, "kernel", "account_lifecycle.yaml")
 	if _, err := fileutil.Stat(dst); err != nil {
 		t.Fatalf("expected lifecycle copy at %s: %v", dst, err)
 	}
-	spec := filepath.Join(root, paths.ProcessInternalObjectSpecsDir, "pm", "decision.yaml")
+	packDst := filepath.Join(root, paths.ProcessInternalLifecyclesDir, "decision_lifecycle.yaml")
+	if _, err := fileutil.Stat(packDst); err != nil {
+		t.Fatalf("expected pack lifecycle copy at %s: %v", packDst, err)
+	}
+	spec := filepath.Join(root, paths.ProcessInternalObjectSpecsDir, "kernel", "account.yaml")
 	if _, err := fileutil.Stat(spec); err != nil {
 		t.Fatalf("expected spec copy at %s: %v", spec, err)
 	}
