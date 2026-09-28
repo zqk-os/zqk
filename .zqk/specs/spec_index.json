@@ -16142,16 +16142,12 @@
           "type": "string",
           "semantic_type": "statement",
           "traits": [
-            "filterable",
-            "listable",
-            "readable",
-            "searchable",
-            "sortable",
-            "writable"
+            "field_queryable_group"
           ],
           "filterable": true,
           "sortable": true,
-          "pattern": "^(DEC|ADR)-\\d{3,}$"
+          "max_length": 2048,
+          "pattern": "^[A-Z]+-\\d{3,}$"
         },
         {
           "name": "impact",
@@ -43943,9 +43939,12 @@
           "type": "text",
           "semantic_type": "statement",
           "traits": [
-            "field_mutable_group"
+            "field_mutable_group",
+            "readable",
+            "writable",
+            "modifiable"
           ],
-          "pattern": "^.+$"
+          "min_length": 10
         },
         {
           "name": "id",
@@ -52634,14 +52633,15 @@
         },
         {
           "name": "description",
-          "type": "string",
-          "semantic_type": "expression",
+          "type": "text",
+          "semantic_type": "statement",
           "traits": [
+            "field_mutable_group",
             "readable",
             "writable",
-            "searchable"
+            "modifiable"
           ],
-          "max_length": 2000
+          "min_length": 10
         },
         {
           "name": "estimated_effort",
@@ -53208,10 +53208,12 @@
           "type": "text",
           "semantic_type": "statement",
           "traits": [
+            "field_mutable_group",
             "readable",
             "writable",
             "modifiable"
-          ]
+          ],
+          "min_length": 10
         },
         {
           "name": "id",

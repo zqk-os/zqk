@@ -112,37 +112,6 @@ fields:
         - security
         - observability
       required: true
-  description:
-    access:
-      requires:
-        - access:confidential
-    checklist:
-      authority: creator
-      automation_hooks: used for documentation, reporting
-      cardinality: one
-      criticality: composition
-      default: null
-      dependencies: none
-      observability: "yes"
-      origin_lifecycle: mutable
-      purpose: Detailed description of the technical debt issue
-      security: non-sensitive
-      system_usage:
-        - documentation
-        - reporting
-        - communication
-      validation: Free-form text, max 2000 chars
-    field_profile_code: TDE-005
-    permissions: rwx
-    semantic_type: expression
-    traits:
-      - readable
-      - writable
-      - searchable
-    type: string
-    validation:
-      max_length: 2000
-      required: true
   file_path:
     access:
       requires:
