@@ -7,6 +7,7 @@ import (
 	"github.com/joho/godotenv"
 
 	"github.com/zqk-os/zqk/cmd/zqk/app"
+	"github.com/zqk-os/zqk/pkg/packrecord"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
@@ -37,5 +38,6 @@ func init() {
 // main is the entry point for the primary zqk CLI binary.
 func main() {
 	registerIncludedWorkPack()
+	_ = packrecord.Load(paths.ResolveProjectRoot("."))
 	app.Execute()
 }

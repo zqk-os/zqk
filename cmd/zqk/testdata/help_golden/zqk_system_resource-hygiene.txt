@@ -13,6 +13,8 @@ logs.
   zqk system resource-hygiene --dry-run
   Reap only orphaned temporary files older than 1 hour
   zqk system resource-hygiene --reap-locks=false --enforce-retention=false --temp-threshold 1h
+  Prune logs older than 3 days
+  zqk system resource-hygiene --log-max-age 3d
   JSON output for automation and telemetry integration
   zqk system resource-hygiene --format json
 
@@ -26,6 +28,8 @@ Flags:
   -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
       --ignore-scheduler-down   Ignore scheduler down warning/lockdown
       --lock-threshold string   Threshold duration for stale locks (e.g. 15m, 1h) (default "15m")
+      --log-max-age string      Threshold duration for log retention (e.g. 24h, 3d, 7d) (default "7d")
+      --log-max-size string     Maximum log file size before truncation (e.g. 5MB, 10MB) (default "10MB")
   -o, --output string           Write output to file
       --project-root string     Project root directory
   -q, --quiet                   Suppress non-essential output

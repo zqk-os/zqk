@@ -3,7 +3,7 @@ package bldr_v2_test
 import (
 	"testing"
 
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2"
+	"github.com/zqk-os/zqk/packs/work/bldr_v2"
 )
 
 func TestBacklogItemBuilder_CodeLocation(t *testing.T) {

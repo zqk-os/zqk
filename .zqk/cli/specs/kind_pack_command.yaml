@@ -1,0 +1,9 @@
+$schema: schemas/command_spec.schema.json
+name: kind-pack
+short: Record a verified spec pack as typed object kinds
+description: Record a verified spec pack as typed object kinds so its kinds load as objects.
+help:
+    examples:
+        - comment: Install a verified spec pack
+          command: zqk kind-pack install packs/work
+common_flags: true

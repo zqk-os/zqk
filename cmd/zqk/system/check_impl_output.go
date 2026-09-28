@@ -860,12 +860,16 @@ func evaluateSystemCheckPristine(results []CheckResult, runIssues *ValidationRun
 	layer0Count := 0
 	tier1Count := 0
 	warningsCount := 0
+	var errorStatusIDs []string
 
 	for _, r := range results {
 		status := strings.ToLower(r.Status)
 		status = strings.ReplaceAll(status, " ", "_")
 		if status == "error" || status == "failed" {
 			tier1Count++
+			if id := strings.TrimSpace(r.ObjectID); id != "" {
+				errorStatusIDs = append(errorStatusIDs, id)
+			}
 		}
 
 		if _, isPreliminary := preliminaryCASIssue(r); isPreliminary {
@@ -920,9 +924,13 @@ func evaluateSystemCheckPristine(results []CheckResult, runIssues *ValidationRun
 	}
 
 	if tier1Count > 0 {
+		msg := fmt.Sprintf("system check failed with exit code 1: %d Tier 1 blocking violation(s) found", tier1Count)
+		if len(errorStatusIDs) > 0 {
+			msg += fmt.Sprintf("; error-status: %s", strings.Join(errorStatusIDs, ", "))
+		}
 		return &SystemCheckError{
 			ExitCodeVal:   1,
-			Message:       fmt.Sprintf("system check failed with exit code 1: %d Tier 1 blocking violation(s) found", tier1Count),
+			Message:       msg,
 			Layer0Count:   0,
 			Tier1Count:    tier1Count,
 			WarningsCount: warningsCount,

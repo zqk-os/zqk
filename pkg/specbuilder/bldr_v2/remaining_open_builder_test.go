@@ -3,6 +3,7 @@ package bldr_v2
 import (
 	"testing"
 
+	packspec "github.com/zqk-os/zqk/packs/work/bldr_v2"
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
@@ -29,7 +30,7 @@ func TestRemainingOpenBuilderExtendsWorkInterval(t *testing.T) {
 
 func TestPriorityPlanBuilderComposesRemainingOpen(t *testing.T) {
 	t.Parallel()
-	spec := NewPriorityPlanBuilder().Build()
+	spec := packspec.NewPriorityPlanBuilder().Build()
 	composed := false
 	for _, name := range spec.Composes {
 		if name == objects.KindRemainingOpen {

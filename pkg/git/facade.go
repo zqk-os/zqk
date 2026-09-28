@@ -2,10 +2,13 @@ package git
 
 import (
 	"context"
+	"io"
+	"os"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/execwrap"
 )
 
@@ -28,6 +31,11 @@ type Facade struct {
 
 func NewFacade(repoPath string) *Facade {
 	return &Facade{repoPath: repoPath}
+}
+
+// RepoPath returns the root path of the repository managed by this facade.
+func (f *Facade) RepoPath() string {
+	return f.repoPath
 }
 
 func (f *Facade) CurrentBranch() (string, error) {
@@ -163,4 +171,119 @@ func (f *Facade) combinedOutputWithVerify(verify bool, args ...string) ([]byte, 
 		cmd.Env = append(cmd.Env, "GIT_VERIFY_SIGNATURES=true")
 	}
 	return cmd.CombinedOutput()
+}
+
+// AddToIndex adds paths to an isolated index file without modifying the main working tree index.
+func (f *Facade) AddToIndex(ctx context.Context, indexFile string, relPath string) error {
+	cmd := execwrap.CommandContext(ctx, gitCommandName, "add", "--all", "--", relPath)
+	cmd.Dir = f.repoPath
+	if indexFile != "" {
+		cmd.Env = append(os.Environ(), "GIT_INDEX_FILE="+indexFile)
+	}
+	if out, err := cmd.CombinedOutput(); err != nil {
+		return errfmt.Errorf("git add to index (%s): %w", strings.TrimSpace(string(out)), err)
+	}
+	return nil
+}
+
+// WriteTree writes the current index (or custom GIT_INDEX_FILE) to a git tree object.
+func (f *Facade) WriteTree(ctx context.Context, indexFile string) (string, error) {
+	cmd := execwrap.CommandContext(ctx, gitCommandName, "write-tree")
+	cmd.Dir = f.repoPath
+	if indexFile != "" {
+		cmd.Env = append(os.Environ(), "GIT_INDEX_FILE="+indexFile)
+	}
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return "", errfmt.Errorf("git write-tree (%s): %w", strings.TrimSpace(string(out)), err)
+	}
+	return strings.TrimSpace(string(out)), nil
+}
+
+// CommitTree creates a commit object pointing to a tree with optional parents and message.
+func (f *Facade) CommitTree(ctx context.Context, treeHash string, parentHash string, message string, indexFile string) (string, error) {
+	commitArgs := []string{"commit-tree", treeHash}
+	if parentHash != "" {
+		commitArgs = append(commitArgs, "-p", parentHash)
+	}
+	commitArgs = append(commitArgs, "-m", message)
+	cmd := execwrap.CommandContext(ctx, gitCommandName, commitArgs...)
+	cmd.Dir = f.repoPath
+	if indexFile != "" {
+		cmd.Env = append(os.Environ(), "GIT_INDEX_FILE="+indexFile)
+	}
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return "", errfmt.Errorf("git commit-tree (%s): %w", strings.TrimSpace(string(out)), err)
+	}
+	return strings.TrimSpace(string(out)), nil
+}
+
+// UpdateRef updates a git ref to point to a target commit hash.
+func (f *Facade) UpdateRef(ctx context.Context, ref string, commitHash string) error {
+	cmd := execwrap.CommandContext(ctx, gitCommandName, "update-ref", ref, commitHash)
+	cmd.Dir = f.repoPath
+	if out, err := cmd.CombinedOutput(); err != nil {
+		return errfmt.Errorf("git update-ref (%s): %w", strings.TrimSpace(string(out)), err)
+	}
+	return nil
+}
+
+// RevParseVerify verifies and resolves a ref to its commit hash. Returns empty string if ref not found.
+func (f *Facade) RevParseVerify(ctx context.Context, ref string) (string, error) {
+	cmd := execwrap.CommandContext(ctx, gitCommandName, "rev-parse", "--verify", ref)
+	cmd.Dir = f.repoPath
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return "", errfmt.Errorf("git rev-parse verify (%s): %w", strings.TrimSpace(string(out)), err)
+	}
+	return strings.TrimSpace(string(out)), nil
+}
+
+// Archive pipes a git archive for a given ref and subpath into an io.Writer.
+func (f *Facade) Archive(ctx context.Context, ref string, subpath string, out io.Writer) error {
+	cmd := execwrap.CommandContext(ctx, gitCommandName, "archive", ref, subpath)
+	cmd.Dir = f.repoPath
+	cmd.Stdout = out
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
+// PushRefSpec pushes a specific refspec to a remote.
+func (f *Facade) PushRefSpec(ctx context.Context, remote string, refSpec string) error {
+	cmd := execwrap.CommandContext(ctx, gitCommandName, "push", remote, refSpec)
+	cmd.Dir = f.repoPath
+	if out, err := cmd.CombinedOutput(); err != nil {
+		return errfmt.Errorf("git push %s %s (%s): %w", remote, refSpec, strings.TrimSpace(string(out)), err)
+	}
+	return nil
+}
+
+// FetchRefSpec fetches a specific refspec from a remote.
+func (f *Facade) FetchRefSpec(ctx context.Context, remote string, refSpec string) error {
+	cmd := execwrap.CommandContext(ctx, gitCommandName, "fetch", remote, refSpec)
+	cmd.Dir = f.repoPath
+	if out, err := cmd.CombinedOutput(); err != nil {
+		return errfmt.Errorf("git fetch %s %s (%s): %w", remote, refSpec, strings.TrimSpace(string(out)), err)
+	}
+	return nil
+}
+
+// ForEachRef runs git for-each-ref with a format and pattern.
+func (f *Facade) ForEachRef(ctx context.Context, format string, pattern string) ([]string, error) {
+	cmd := execwrap.CommandContext(ctx, gitCommandName, "for-each-ref", "--format="+format, pattern)
+	cmd.Dir = f.repoPath
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return nil, errfmt.Errorf("git for-each-ref (%s): %w", strings.TrimSpace(string(out)), err)
+	}
+	lines := strings.Split(strings.TrimSpace(string(out)), "\n")
+	var result []string
+	for _, l := range lines {
+		l = strings.TrimSpace(l)
+		if l != "" {
+			result = append(result, l)
+		}
+	}
+	return result, nil
 }

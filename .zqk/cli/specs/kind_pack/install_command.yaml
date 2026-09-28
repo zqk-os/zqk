@@ -1,0 +1,12 @@
+$schema: ../schemas/command_spec.schema.json
+name: install
+short: Verify a spec pack and record its formal specs
+description: Verify an uploaded spec pack and record its formal specs into the kernel.
+args:
+    type: exact
+    count: 1
+help:
+    examples:
+        - comment: Install a verified spec pack
+          command: zqk kind-pack install packs/work
+common_flags: true

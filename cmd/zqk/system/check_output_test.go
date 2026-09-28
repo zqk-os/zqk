@@ -387,6 +387,19 @@ func TestEvaluateSystemCheckPristine(t *testing.T) {
 		t.Fatalf("expected exit code 1, got: %+v", errTier1)
 	}
 
+	errorStatusResults := []CheckResult{
+		{
+			ObjectID:   "ATK-ERR",
+			ObjectKind: "agent_task",
+			Status:     "error",
+		},
+	}
+	errStatus := evaluateSystemCheckPristine(errorStatusResults, nil, "")
+	scStatus, ok := errStatus.(*SystemCheckError)
+	if !ok || scStatus.ExitCode() != 1 || !strings.Contains(scStatus.Error(), "error-status: ATK-ERR") {
+		t.Fatalf("error status must name the object, got: %+v", errStatus)
+	}
+
 	// Case 4: Warnings only (Tier 2/3) -> Exit 3
 	warningResults := []CheckResult{
 		{
