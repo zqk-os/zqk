@@ -3,13 +3,19 @@
 package main
 
 import (
+	"github.com/spf13/cobra"
+
 	"github.com/zqk-os/zqk/cmd/zqk/app"
+	"github.com/zqk-os/zqk/cmd/zqk/object"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/workpack"
 )
 
 func init() {
 	objects.SetPackOwnedKinds(workpack.Kinds())
+	object.SetPackKindRegistrar(func(objectCmd *cobra.Command) {
+		object.RegisterKindCommandsForKinds(objectCmd, workpack.Kinds())
+	})
 	workpack.Enable()
 }
 
