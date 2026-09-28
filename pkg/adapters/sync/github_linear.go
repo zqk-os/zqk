@@ -15,6 +15,49 @@ type ExternalSource string
 const (
 	SourceGitHub ExternalSource = "github"
 	SourceLinear ExternalSource = "linear"
+
+	// Status constants
+	StatusPlanned    = "planned"
+	StatusInProgress = "in_progress"
+	StatusTesting    = "testing"
+	StatusComplete   = "complete"
+	StatusArchived   = "archived"
+
+	// Priority constants
+	PriorityCritical = "critical"
+	PriorityHigh     = "high"
+	PriorityMedium   = "medium"
+	PriorityLow      = "low"
+
+	// Priority Tier constants
+	TierP0 = "P0"
+	TierP1 = "P1"
+	TierP2 = "P2"
+	TierP3 = "P3"
+	TierP4 = "P4"
+
+	// Error messages
+	errMsgGHClientNotConfigured     = "github client not configured"
+	errMsgLinearClientNotConfigured = "linear client not configured"
+	fmtErrListGitHubIssues          = "listing github issues: %w"
+	fmtErrQueryKernelStore          = "querying store: %w"
+	fmtErrInsertMappedItem          = "inserting mapped item: %w"
+	fmtErrUpdateExistingItem        = "updating existing item: %w"
+	fmtErrListLinearIssues          = "listing linear issues: %w"
+	fmtErrInsertLinearItem          = "inserting linear item: %w"
+	fmtErrUpdateLinearItem          = "updating existing linear item: %w"
+	fmtErrListBacklogItems          = "listing backlog items: %w"
+	fmtErrUpdateGitHubIssue         = "updating github issue %d: %w"
+	fmtErrUpdateLinearIssue         = "updating linear issue %s: %w"
+
+	// External metadata keys
+	metaKeyNumber    = "number"
+	metaKeyLabels    = "labels"
+	metaKeyAssignees = "assignees"
+	metaKeyLinearID  = "linear_id"
+	metaKeyState     = "state"
+	metaKeyAssignee  = "assignee"
+	metaKeyProject   = "project"
 )
 
 // GitHubIssue models an issue retrieved from or sent to GitHub Issues API.
@@ -93,63 +136,61 @@ type SyncStats struct {
 
 // SyncEngine coordinates bidirectional synchronization between external trackers and the kernel.
 type SyncEngine struct {
-	ghClient    GitHubClient
+	ghClient     GitHubClient
 	linearClient LinearClient
-	store       KernelStore
-	mu          sync.Mutex
+	store        KernelStore
+	mu           sync.Mutex
 }
 
 // NewSyncEngine constructs an initialized SyncEngine.
 func NewSyncEngine(gh GitHubClient, lin LinearClient, store KernelStore) *SyncEngine {
 	return &SyncEngine{
-		ghClient:    gh,
+		ghClient:     gh,
 		linearClient: lin,
-		store:       store,
+		store:        store,
 	}
 }
 
 // MapGitHubIssueToKernel maps a GitHubIssue into a canonical kernel BacklogItemSyncData.
 func MapGitHubIssueToKernel(gh GitHubIssue) *BacklogItemSyncData {
-	status := "planned"
+	status := StatusPlanned
 	if gh.State == "closed" {
-		status = "complete"
+		status = StatusComplete
 	} else {
 		for _, l := range gh.Labels {
 			lower := strings.ToLower(l)
 			if lower == "in-progress" || lower == "in progress" || lower == "active" {
-				status = "in_progress"
+				status = StatusInProgress
 				break
 			}
 		}
 	}
 
-	priority := "medium"
-	priorityTier := "P2"
+	priority := PriorityMedium
+	priorityTier := TierP2
 	for _, l := range gh.Labels {
 		lower := strings.ToLower(l)
-		if strings.Contains(lower, "p0") || strings.Contains(lower, "critical") {
-			priority = "critical"
-			priorityTier = "P0"
-			break
-		} else if strings.Contains(lower, "p1") || strings.Contains(lower, "high") {
-			priority = "high"
-			priorityTier = "P1"
-			break
-		} else if strings.Contains(lower, "p3") || strings.Contains(lower, "low") {
-			priority = "low"
-			priorityTier = "P3"
-			break
+		switch {
+		case strings.Contains(lower, "p0") || strings.Contains(lower, "critical"):
+			priority = PriorityCritical
+			priorityTier = TierP0
+		case strings.Contains(lower, "p1") || strings.Contains(lower, "high"):
+			priority = PriorityHigh
+			priorityTier = TierP1
+		case strings.Contains(lower, "p3") || strings.Contains(lower, "low"):
+			priority = PriorityLow
+			priorityTier = TierP3
 		}
 	}
 
 	metadata := map[string]string{
-		"number": fmt.Sprintf("%d", gh.Number),
+		metaKeyNumber: fmt.Sprintf("%d", gh.Number),
 	}
 	if len(gh.Labels) > 0 {
-		metadata["labels"] = strings.Join(gh.Labels, ",")
+		metadata[metaKeyLabels] = strings.Join(gh.Labels, ",")
 	}
 	if len(gh.Assignees) > 0 {
-		metadata["assignees"] = strings.Join(gh.Assignees, ",")
+		metadata[metaKeyAssignees] = strings.Join(gh.Assignees, ",")
 	}
 
 	extID := fmt.Sprintf("gh-%d", gh.Number)
@@ -171,44 +212,44 @@ func MapGitHubIssueToKernel(gh GitHubIssue) *BacklogItemSyncData {
 
 // MapLinearIssueToKernel maps a LinearIssue into a canonical kernel BacklogItemSyncData.
 func MapLinearIssueToKernel(lin LinearIssue) *BacklogItemSyncData {
-	status := "planned"
+	status := StatusPlanned
 	switch strings.ToLower(lin.State) {
 	case "done", "completed":
-		status = "complete"
+		status = StatusComplete
 	case "in progress", "started":
-		status = "in_progress"
+		status = StatusInProgress
 	case "canceled", "cancelled":
-		status = "archived"
+		status = StatusArchived
 	default:
-		status = "planned"
+		status = StatusPlanned
 	}
 
-	priority := "medium"
-	priorityTier := "P2"
+	priority := PriorityMedium
+	priorityTier := TierP2
 	switch lin.Priority {
 	case 1:
-		priority = "critical"
-		priorityTier = "P0"
+		priority = PriorityCritical
+		priorityTier = TierP0
 	case 2:
-		priority = "high"
-		priorityTier = "P1"
+		priority = PriorityHigh
+		priorityTier = TierP1
 	case 3:
-		priority = "medium"
-		priorityTier = "P2"
+		priority = PriorityMedium
+		priorityTier = TierP2
 	case 4:
-		priority = "low"
-		priorityTier = "P3"
+		priority = PriorityLow
+		priorityTier = TierP3
 	}
 
 	metadata := map[string]string{
-		"linear_id": lin.ID,
-		"state":     lin.State,
+		metaKeyLinearID: lin.ID,
+		metaKeyState:     lin.State,
 	}
 	if lin.Assignee != "" {
-		metadata["assignee"] = lin.Assignee
+		metadata[metaKeyAssignee] = lin.Assignee
 	}
 	if lin.ProjectName != "" {
-		metadata["project"] = lin.ProjectName
+		metadata[metaKeyProject] = lin.ProjectName
 	}
 
 	var planRef string
@@ -238,12 +279,12 @@ func MapLinearIssueToKernel(lin LinearIssue) *BacklogItemSyncData {
 // MapKernelToGitHub maps a kernel BacklogItemSyncData to an outgoing GitHubIssue.
 func MapKernelToGitHub(item *BacklogItemSyncData) GitHubIssue {
 	state := "open"
-	if item.Status == "complete" {
+	if item.Status == StatusComplete {
 		state = "closed"
 	}
 
 	var labels []string
-	if rawLabels, ok := item.ExternalMetadata["labels"]; ok && rawLabels != "" {
+	if rawLabels, ok := item.ExternalMetadata[metaKeyLabels]; ok && rawLabels != "" {
 		labels = strings.Split(rawLabels, ",")
 	}
 	if item.PriorityTier != "" {
@@ -273,25 +314,25 @@ func MapKernelToGitHub(item *BacklogItemSyncData) GitHubIssue {
 func MapKernelToLinear(item *BacklogItemSyncData) LinearIssue {
 	state := "Todo"
 	switch item.Status {
-	case "complete":
+	case StatusComplete:
 		state = "Done"
-	case "in_progress", "testing":
+	case StatusInProgress, StatusTesting:
 		state = "In Progress"
-	case "archived":
+	case StatusArchived:
 		state = "Canceled"
-	case "planned":
+	case StatusPlanned:
 		state = "Todo"
 	}
 
 	priority := 3
 	switch item.PriorityTier {
-	case "P0":
+	case TierP0:
 		priority = 1
-	case "P1":
+	case TierP1:
 		priority = 2
-	case "P2":
+	case TierP2:
 		priority = 3
-	case "P3", "P4":
+	case TierP3, TierP4:
 		priority = 4
 	}
 
@@ -319,12 +360,12 @@ func (e *SyncEngine) IngestGitHub(ctx context.Context) (SyncStats, error) {
 
 	var stats SyncStats
 	if e.ghClient == nil {
-		return stats, errors.New("github client not configured")
+		return stats, errors.New(errMsgGHClientNotConfigured)
 	}
 
 	issues, err := e.ghClient.ListIssues(ctx)
 	if err != nil {
-		return stats, fmt.Errorf("listing github issues: %w", err)
+		return stats, fmt.Errorf(fmtErrListGitHubIssues, err)
 	}
 
 	for _, gh := range issues {
@@ -333,12 +374,12 @@ func (e *SyncEngine) IngestGitHub(ctx context.Context) (SyncStats, error) {
 
 		existing, err := e.store.GetBacklogItemByExternalID(ctx, SourceGitHub, mapped.ExternalID)
 		if err != nil {
-			return stats, fmt.Errorf("querying store: %w", err)
+			return stats, fmt.Errorf(fmtErrQueryKernelStore, err)
 		}
 
 		if existing == nil {
 			if err := e.store.UpsertBacklogItem(ctx, mapped); err != nil {
-				return stats, fmt.Errorf("inserting mapped item: %w", err)
+				return stats, fmt.Errorf(fmtErrInsertMappedItem, err)
 			}
 			stats.CreatedCount++
 			continue
@@ -362,7 +403,7 @@ func (e *SyncEngine) IngestGitHub(ctx context.Context) (SyncStats, error) {
 			mapped.ID = existing.ID
 		}
 		if err := e.store.UpsertBacklogItem(ctx, mapped); err != nil {
-			return stats, fmt.Errorf("updating existing item: %w", err)
+			return stats, fmt.Errorf(fmtErrUpdateExistingItem, err)
 		}
 		stats.UpdatedCount++
 	}
@@ -377,12 +418,12 @@ func (e *SyncEngine) IngestLinear(ctx context.Context) (SyncStats, error) {
 
 	var stats SyncStats
 	if e.linearClient == nil {
-		return stats, errors.New("linear client not configured")
+		return stats, errors.New(errMsgLinearClientNotConfigured)
 	}
 
 	issues, err := e.linearClient.ListIssues(ctx)
 	if err != nil {
-		return stats, fmt.Errorf("listing linear issues: %w", err)
+		return stats, fmt.Errorf(fmtErrListLinearIssues, err)
 	}
 
 	for _, lin := range issues {
@@ -391,12 +432,12 @@ func (e *SyncEngine) IngestLinear(ctx context.Context) (SyncStats, error) {
 
 		existing, err := e.store.GetBacklogItemByExternalID(ctx, SourceLinear, mapped.ExternalID)
 		if err != nil {
-			return stats, fmt.Errorf("querying store: %w", err)
+			return stats, fmt.Errorf(fmtErrQueryKernelStore, err)
 		}
 
 		if existing == nil {
 			if err := e.store.UpsertBacklogItem(ctx, mapped); err != nil {
-				return stats, fmt.Errorf("inserting linear item: %w", err)
+				return stats, fmt.Errorf(fmtErrInsertLinearItem, err)
 			}
 			stats.CreatedCount++
 			continue
@@ -417,7 +458,7 @@ func (e *SyncEngine) IngestLinear(ctx context.Context) (SyncStats, error) {
 			mapped.ID = existing.ID
 		}
 		if err := e.store.UpsertBacklogItem(ctx, mapped); err != nil {
-			return stats, fmt.Errorf("updating existing linear item: %w", err)
+			return stats, fmt.Errorf(fmtErrUpdateLinearItem, err)
 		}
 		stats.UpdatedCount++
 	}
@@ -432,12 +473,12 @@ func (e *SyncEngine) PushKernelToGitHub(ctx context.Context) (SyncStats, error) 
 
 	var stats SyncStats
 	if e.ghClient == nil {
-		return stats, errors.New("github client not configured")
+		return stats, errors.New(errMsgGHClientNotConfigured)
 	}
 
 	items, err := e.store.ListBacklogItems(ctx)
 	if err != nil {
-		return stats, fmt.Errorf("listing backlog items: %w", err)
+		return stats, fmt.Errorf(fmtErrListBacklogItems, err)
 	}
 
 	for _, item := range items {
@@ -446,13 +487,14 @@ func (e *SyncEngine) PushKernelToGitHub(ctx context.Context) (SyncStats, error) 
 		}
 
 		var num int
-		if _, scanErr := fmt.Sscanf(item.ExternalID, "gh-%d", &num); scanErr != nil || num <= 0 {
+		n, scanErr := fmt.Sscanf(item.ExternalID, "gh-%d", &num)
+		if scanErr != nil || n != 1 || num <= 0 {
 			continue
 		}
 
 		ghPayload := MapKernelToGitHub(item)
 		if err := e.ghClient.UpdateIssue(ctx, num, ghPayload); err != nil {
-			return stats, fmt.Errorf("updating github issue %d: %w", num, err)
+			return stats, fmt.Errorf(fmtErrUpdateGitHubIssue, num, err)
 		}
 		stats.PushedCount++
 	}
@@ -467,12 +509,12 @@ func (e *SyncEngine) PushKernelToLinear(ctx context.Context) (SyncStats, error) 
 
 	var stats SyncStats
 	if e.linearClient == nil {
-		return stats, errors.New("linear client not configured")
+		return stats, errors.New(errMsgLinearClientNotConfigured)
 	}
 
 	items, err := e.store.ListBacklogItems(ctx)
 	if err != nil {
-		return stats, fmt.Errorf("listing backlog items: %w", err)
+		return stats, fmt.Errorf(fmtErrListBacklogItems, err)
 	}
 
 	for _, item := range items {
@@ -487,7 +529,7 @@ func (e *SyncEngine) PushKernelToLinear(ctx context.Context) (SyncStats, error) 
 
 		linPayload := MapKernelToLinear(item)
 		if err := e.linearClient.UpdateIssue(ctx, linID, linPayload); err != nil {
-			return stats, fmt.Errorf("updating linear issue %s: %w", linID, err)
+			return stats, fmt.Errorf(fmtErrUpdateLinearIssue, linID, err)
 		}
 		stats.PushedCount++
 	}

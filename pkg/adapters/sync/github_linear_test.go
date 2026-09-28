@@ -9,6 +9,39 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/zqk-os/zqk/pkg/validation/qa"
+)
+
+const (
+	testGHOriginalTitle         = `Refactor cache eviction pipeline`
+	testGHOriginalBody          = `Cache eviction blocks background flushes under load.`
+	testGHResolvedTitle         = `Refactor cache eviction pipeline (Resolved)`
+	testGHResolvedBody          = `Fixed via lock-free queue.`
+	testGHNewerKernelTitle      = `Newer Kernel Data`
+	testGHStaleExternalTitle     = `Stale External Data`
+
+	testLinOriginalTitle        = `Original linear title`
+	testLinOriginalDesc         = `Original description`
+	testLinPushedTitle          = `Pushed title from zqk kernel`
+	testLinPushedDesc           = `Pushed description from zqk kernel`
+
+	testLinStudioTitle          = `Support Web Studio Embedded UI`
+	testLinStudioDesc           = `Run lightweight web UI server from zqk ui --web.`
+	testLinStudioProject        = `Visual Studio Plane`
+	testLinStudioPlanRef        = `PRI-VISUAL-STUDIO-PLANE`
+
+	testUpdatedKernelTitle      = `Updated Title from Kernel`
+	testUpdatedKernelBody       = `Updated Problem Statement from Kernel`
+
+	testErrIssueNotFoundFmt     = "issue %d not found"
+	testErrLinearNotFoundFmt    = "linear issue %s not found"
+	testLinearEng204ID          = "linear-ENG-204"
+	testLinearEng300ID          = "linear-ENG-300"
+	testBliLinearEng300ID       = "BLI-LIN-ENG-300"
+	testFileGHLinearSrc         = "./github_linear.go"
+	testFileGHLinearTestSrc     = "./github_linear_test.go"
+	testMsgGHZeroViolations     = "github_linear.go must have zero violations"
+	testMsgTestZeroViolations   = "github_linear_test.go must have zero violations"
 )
 
 // mockGitHubClient is an in-memory test double for GitHubClient.
@@ -46,7 +79,7 @@ func (m *mockGitHubClient) UpdateIssue(ctx context.Context, number int, issue Gi
 	defer m.mu.Unlock()
 	existing, ok := m.issues[number]
 	if !ok {
-		return fmt.Errorf("issue %d not found", number)
+		return fmt.Errorf(testErrIssueNotFoundFmt, number)
 	}
 	existing.Title = issue.Title
 	existing.Body = issue.Body
@@ -89,7 +122,7 @@ func (m *mockLinearClient) UpdateIssue(ctx context.Context, id string, issue Lin
 	defer m.mu.Unlock()
 	existing, ok := m.issues[id]
 	if !ok {
-		return fmt.Errorf("linear issue %s not found", id)
+		return fmt.Errorf(testErrLinearNotFoundFmt, id)
 	}
 	existing.Title = issue.Title
 	existing.Description = issue.Description
@@ -149,8 +182,8 @@ func TestGitHubIngestAndIdempotency(t *testing.T) {
 	t0 := time.Now().Add(-10 * time.Minute)
 	gh.issues[42] = GitHubIssue{
 		Number:    42,
-		Title:     "Refactor cache eviction pipeline",
-		Body:      "Cache eviction blocks background flushes under load.",
+		Title:     testGHOriginalTitle,
+		Body:      testGHOriginalBody,
 		State:     "open",
 		Labels:    []string{"P1", "performance", "active"},
 		Assignees: []string{"alice"},
@@ -168,10 +201,10 @@ func TestGitHubIngestAndIdempotency(t *testing.T) {
 	item, err := store.GetBacklogItemByExternalID(ctx, SourceGitHub, "gh-42")
 	require.NoError(t, err)
 	require.NotNil(t, item)
-	assert.Equal(t, "Refactor cache eviction pipeline", item.Title)
-	assert.Equal(t, "in_progress", item.Status) // from "active" label
-	assert.Equal(t, "P1", item.PriorityTier)
-	assert.Equal(t, "high", item.Priority)
+	assert.Equal(t, testGHOriginalTitle, item.Title)
+	assert.Equal(t, StatusInProgress, item.Status) // from "active" label
+	assert.Equal(t, TierP1, item.PriorityTier)
+	assert.Equal(t, PriorityHigh, item.Priority)
 	assert.Equal(t, "gh-42", item.ExternalID)
 
 	// Second ingest without changes: skipped idempotently
@@ -185,8 +218,8 @@ func TestGitHubIngestAndIdempotency(t *testing.T) {
 	t1 := time.Now()
 	gh.issues[42] = GitHubIssue{
 		Number:    42,
-		Title:     "Refactor cache eviction pipeline (Resolved)",
-		Body:      "Fixed via lock-free queue.",
+		Title:     testGHResolvedTitle,
+		Body:      testGHResolvedBody,
 		State:     "closed",
 		Labels:    []string{"P1"},
 		HTMLURL:   "https://github.com/zqk-os/zqk/issues/42",
@@ -199,8 +232,8 @@ func TestGitHubIngestAndIdempotency(t *testing.T) {
 
 	updatedItem, err := store.GetBacklogItemByExternalID(ctx, SourceGitHub, "gh-42")
 	require.NoError(t, err)
-	assert.Equal(t, "complete", updatedItem.Status) // mapped from closed
-	assert.Equal(t, "Refactor cache eviction pipeline (Resolved)", updatedItem.Title)
+	assert.Equal(t, StatusComplete, updatedItem.Status) // mapped from closed
+	assert.Equal(t, testGHResolvedTitle, updatedItem.Title)
 }
 
 func TestLinearIngestAndPlanMapping(t *testing.T) {
@@ -212,11 +245,11 @@ func TestLinearIngestAndPlanMapping(t *testing.T) {
 	t0 := time.Now().Add(-5 * time.Minute)
 	lin.issues["ENG-204"] = LinearIssue{
 		ID:          "ENG-204",
-		Title:       "Support Web Studio Embedded UI",
-		Description: "Run lightweight web UI server from zqk ui --web.",
+		Title:       testLinStudioTitle,
+		Description: testLinStudioDesc,
 		State:       "In Progress",
 		Assignee:    "bob",
-		ProjectName: "Visual Studio Plane",
+		ProjectName: testLinStudioProject,
 		Priority:    1, // Urgent / P0
 		URL:         "https://linear.app/zqk/issue/ENG-204",
 		UpdatedAt:   t0,
@@ -226,15 +259,15 @@ func TestLinearIngestAndPlanMapping(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, 1, stats.CreatedCount)
 
-	item, err := store.GetBacklogItemByExternalID(ctx, SourceLinear, "linear-ENG-204")
+	item, err := store.GetBacklogItemByExternalID(ctx, SourceLinear, testLinearEng204ID)
 	require.NoError(t, err)
 	require.NotNil(t, item)
-	assert.Equal(t, "Support Web Studio Embedded UI", item.Title)
-	assert.Equal(t, "in_progress", item.Status)
-	assert.Equal(t, "P0", item.PriorityTier)
-	assert.Equal(t, "critical", item.Priority)
-	assert.Equal(t, "PRI-VISUAL-STUDIO-PLANE", item.PriorityPlanRef)
-	assert.Equal(t, "bob", item.ExternalMetadata["assignee"])
+	assert.Equal(t, testLinStudioTitle, item.Title)
+	assert.Equal(t, StatusInProgress, item.Status)
+	assert.Equal(t, TierP0, item.PriorityTier)
+	assert.Equal(t, PriorityCritical, item.Priority)
+	assert.Equal(t, testLinStudioPlanRef, item.PriorityPlanRef)
+	assert.Equal(t, "bob", item.ExternalMetadata[metaKeyAssignee])
 
 	// Ingest again: verified idempotent
 	stats2, err := engine.IngestLinear(ctx)
@@ -254,20 +287,20 @@ func TestBidirectionalPushToGitHub(t *testing.T) {
 		Title:     "Old Title",
 		Body:      "Old Body",
 		State:     "open",
-		Labels:    []string{"P2"},
+		Labels:    []string{TierP2},
 		UpdatedAt: time.Now().Add(-1 * time.Hour),
 	}
 
 	// Store has updated item with status complete
 	store.items["gh-99"] = &BacklogItemSyncData{
 		ID:               "BLI-GH-99",
-		Title:            "Updated Title from Kernel",
-		ProblemStatement: "Updated Problem Statement from Kernel",
-		Status:           "complete",
-		PriorityTier:     "P0",
+		Title:            testUpdatedKernelTitle,
+		ProblemStatement: testUpdatedKernelBody,
+		Status:           StatusComplete,
+		PriorityTier:     TierP0,
 		ExternalSource:   SourceGitHub,
 		ExternalID:       "gh-99",
-		ExternalMetadata: map[string]string{"labels": "bug"},
+		ExternalMetadata: map[string]string{metaKeyLabels: "bug"},
 		UpdatedAt:        time.Now(),
 	}
 
@@ -276,10 +309,10 @@ func TestBidirectionalPushToGitHub(t *testing.T) {
 	assert.Equal(t, 1, pushStats.PushedCount)
 
 	ghIssue := gh.issues[99]
-	assert.Equal(t, "Updated Title from Kernel", ghIssue.Title)
-	assert.Equal(t, "Updated Problem Statement from Kernel", ghIssue.Body)
+	assert.Equal(t, testUpdatedKernelTitle, ghIssue.Title)
+	assert.Equal(t, testUpdatedKernelBody, ghIssue.Body)
 	assert.Equal(t, "closed", ghIssue.State) // mapped from complete
-	assert.Contains(t, ghIssue.Labels, "P0")
+	assert.Contains(t, ghIssue.Labels, TierP0)
 }
 
 func TestBidirectionalPushToLinear(t *testing.T) {
@@ -290,21 +323,21 @@ func TestBidirectionalPushToLinear(t *testing.T) {
 
 	lin.issues["ENG-300"] = LinearIssue{
 		ID:          "ENG-300",
-		Title:       "Original linear title",
-		Description: "Original description",
+		Title:       testLinOriginalTitle,
+		Description: testLinOriginalDesc,
 		State:       "Todo",
 		Priority:    3,
 		UpdatedAt:   time.Now().Add(-2 * time.Hour),
 	}
 
-	store.items["linear-ENG-300"] = &BacklogItemSyncData{
-		ID:             "BLI-LIN-ENG-300",
-		Title:          "Pushed title from zqk kernel",
-		Description:    "Pushed description from zqk kernel",
-		Status:         "complete",
-		PriorityTier:   "P1",
+	store.items[testLinearEng300ID] = &BacklogItemSyncData{
+		ID:             testBliLinearEng300ID,
+		Title:          testLinPushedTitle,
+		Description:    testLinPushedDesc,
+		Status:         StatusComplete,
+		PriorityTier:   TierP1,
 		ExternalSource: SourceLinear,
-		ExternalID:     "linear-ENG-300",
+		ExternalID:     testLinearEng300ID,
 		UpdatedAt:      time.Now(),
 	}
 
@@ -313,7 +346,7 @@ func TestBidirectionalPushToLinear(t *testing.T) {
 	assert.Equal(t, 1, pushStats.PushedCount)
 
 	linIssue := lin.issues["ENG-300"]
-	assert.Equal(t, "Pushed title from zqk kernel", linIssue.Title)
+	assert.Equal(t, testLinPushedTitle, linIssue.Title)
 	assert.Equal(t, "Done", linIssue.State) // mapped from complete
 	assert.Equal(t, 2, linIssue.Priority)   // mapped from P1
 }
@@ -328,19 +361,19 @@ func TestConflictResolutionMonotonicPrecedence(t *testing.T) {
 
 	// Kernel store has newer modification
 	store.items["gh-15"] = &BacklogItemSyncData{
-		ID:               "BLI-GH-15",
-		Title:            "Newer Kernel Data",
-		Status:           "in_progress",
-		PriorityTier:     "P1",
-		ExternalSource:   SourceGitHub,
-		ExternalID:       "gh-15",
-		UpdatedAt:        baseTime.Add(10 * time.Minute),
+		ID:             "BLI-GH-15",
+		Title:          testGHNewerKernelTitle,
+		Status:         StatusInProgress,
+		PriorityTier:   TierP1,
+		ExternalSource: SourceGitHub,
+		ExternalID:     "gh-15",
+		UpdatedAt:      baseTime.Add(10 * time.Minute),
 	}
 
 	// GitHub sends stale modification
 	gh.issues[15] = GitHubIssue{
 		Number:    15,
-		Title:     "Stale External Data",
+		Title:     testGHStaleExternalTitle,
 		State:     "open",
 		UpdatedAt: baseTime,
 	}
@@ -352,6 +385,18 @@ func TestConflictResolutionMonotonicPrecedence(t *testing.T) {
 	assert.Equal(t, 0, stats.UpdatedCount)
 
 	// Kernel data was preserved
-	cur, _ := store.GetBacklogItemByExternalID(ctx, SourceGitHub, "gh-15")
-	assert.Equal(t, "Newer Kernel Data", cur.Title)
+	cur, getErr := store.GetBacklogItemByExternalID(ctx, SourceGitHub, "gh-15")
+	require.NoError(t, getErr)
+	assert.Equal(t, testGHNewerKernelTitle, cur.Title)
+}
+
+func TestASTCompliance(t *testing.T) {
+	auditor := qa.NewASTAuditor()
+	v1, err := auditor.AuditFile(testFileGHLinearSrc)
+	require.NoError(t, err)
+	assert.Empty(t, v1, testMsgGHZeroViolations)
+
+	v2, err := auditor.AuditFile(testFileGHLinearTestSrc)
+	require.NoError(t, err)
+	assert.Empty(t, v2, testMsgTestZeroViolations)
 }
