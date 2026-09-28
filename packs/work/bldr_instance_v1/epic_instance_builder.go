@@ -48,6 +48,17 @@ func (b *EpicInstanceBuilder) ID(value string) *EpicInstanceBuilder {
 	return b
 }
 
+// AnswerDueBy sets the answer_due_by field
+func (b *EpicInstanceBuilder) AnswerDueBy(value string) *EpicInstanceBuilder {
+	b.SetField(objects.FieldKeyAnswerDueBy, value)
+	return b
+}
+
+// SetAnswerDueBy is a compatibility alias for AnswerDueBy.
+func (b *EpicInstanceBuilder) SetAnswerDueBy(value string) *EpicInstanceBuilder {
+	return b.AnswerDueBy(value)
+}
+
 // ArchivedAt sets the archived_at field
 func (b *EpicInstanceBuilder) ArchivedAt(value any) *EpicInstanceBuilder {
 	b.SetField(objects.FieldKeyArchivedAt, value)

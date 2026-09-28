@@ -4,8 +4,8 @@
 package test_case
 
 import (
-	shared_test_casesenum "github.com/zqk-os/zqk/packs/work/bldr_enum_v1/shared_test_cases"
 	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	work_intervalenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/work_interval"
 )
 
 type Plane = base_objectenum.Plane
@@ -53,15 +53,15 @@ const (
 	SourceTypeInternal SourceType = base_objectenum.SourceTypeInternal
 )
 
-type Status = shared_test_casesenum.Status
+type Status = work_intervalenum.Status
 
 const (
-	StatusActive          Status = shared_test_casesenum.StatusActive
-	StatusArchived        Status = shared_test_casesenum.StatusArchived
-	StatusComplete        Status = shared_test_casesenum.StatusComplete
-	StatusConceptual      Status = shared_test_casesenum.StatusConceptual
-	StatusDraft           Status = shared_test_casesenum.StatusDraft
-	StatusError           Status = shared_test_casesenum.StatusError
-	StatusMetricsCaptured Status = shared_test_casesenum.StatusMetricsCaptured
-	StatusOriginated      Status = shared_test_casesenum.StatusOriginated
+	StatusActive          Status = "active"
+	StatusArchived        Status = work_intervalenum.StatusArchived
+	StatusComplete        Status = "complete"
+	StatusConceptual      Status = work_intervalenum.StatusConceptual
+	StatusDraft           Status = "draft"
+	StatusError           Status = work_intervalenum.StatusError
+	StatusMetricsCaptured Status = "metrics_captured"
+	StatusOriginated      Status = work_intervalenum.StatusOriginated
 )

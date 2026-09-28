@@ -59,6 +59,17 @@ func (b *MilestoneInstanceBuilder) SetActualEffort(value string) *MilestoneInsta
 	return b.ActualEffort(value)
 }
 
+// AnswerDueBy sets the answer_due_by field
+func (b *MilestoneInstanceBuilder) AnswerDueBy(value string) *MilestoneInstanceBuilder {
+	b.SetField(objects.FieldKeyAnswerDueBy, value)
+	return b
+}
+
+// SetAnswerDueBy is a compatibility alias for AnswerDueBy.
+func (b *MilestoneInstanceBuilder) SetAnswerDueBy(value string) *MilestoneInstanceBuilder {
+	return b.AnswerDueBy(value)
+}
+
 // ArchivedAt sets the archived_at field
 func (b *MilestoneInstanceBuilder) ArchivedAt(value any) *MilestoneInstanceBuilder {
 	b.SetField(objects.FieldKeyArchivedAt, value)
@@ -114,17 +125,6 @@ func (b *MilestoneInstanceBuilder) SetChangeLog(value []string) *MilestoneInstan
 	return b.ChangeLog(value)
 }
 
-// CommitHashes sets the commit_hashes field
-func (b *MilestoneInstanceBuilder) CommitHashes(value []string) *MilestoneInstanceBuilder {
-	b.SetField(objects.FieldKeyCommitHashes, value)
-	return b
-}
-
-// SetCommitHashes is a compatibility alias for CommitHashes.
-func (b *MilestoneInstanceBuilder) SetCommitHashes(value []string) *MilestoneInstanceBuilder {
-	return b.CommitHashes(value)
-}
-
 // CompletedAt sets the completed_at field
 func (b *MilestoneInstanceBuilder) CompletedAt(value string) *MilestoneInstanceBuilder {
 	b.SetField(objects.FieldKeyCompletedAt, value)
@@ -145,17 +145,6 @@ func (b *MilestoneInstanceBuilder) CompletenessValidation(value []string) *Miles
 // SetCompletenessValidation is a compatibility alias for CompletenessValidation.
 func (b *MilestoneInstanceBuilder) SetCompletenessValidation(value []string) *MilestoneInstanceBuilder {
 	return b.CompletenessValidation(value)
-}
-
-// CompletionCriteria sets the completion_criteria field
-func (b *MilestoneInstanceBuilder) CompletionCriteria(value []string) *MilestoneInstanceBuilder {
-	b.SetField(objects.FieldKeyCompletionCriteria, value)
-	return b
-}
-
-// SetCompletionCriteria is a compatibility alias for CompletionCriteria.
-func (b *MilestoneInstanceBuilder) SetCompletionCriteria(value []string) *MilestoneInstanceBuilder {
-	return b.CompletionCriteria(value)
 }
 
 // Context sets the context field

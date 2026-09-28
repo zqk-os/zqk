@@ -4,8 +4,8 @@
 package priority_plan
 
 import (
-	shared_priority_plansenum "github.com/zqk-os/zqk/packs/work/bldr_enum_v1/shared_priority_plans"
 	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	work_intervalenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/work_interval"
 )
 
 type Plane = base_objectenum.Plane
@@ -34,17 +34,17 @@ const (
 	SourceTypeInternal SourceType = base_objectenum.SourceTypeInternal
 )
 
-type Status = shared_priority_plansenum.Status
+type Status = work_intervalenum.Status
 
 const (
-	StatusActive     Status = shared_priority_plansenum.StatusActive
-	StatusArchived   Status = shared_priority_plansenum.StatusArchived
-	StatusBlocked    Status = shared_priority_plansenum.StatusBlocked
-	StatusCancelled  Status = shared_priority_plansenum.StatusCancelled
-	StatusComplete   Status = shared_priority_plansenum.StatusComplete
-	StatusConceptual Status = shared_priority_plansenum.StatusConceptual
-	StatusGrooming   Status = shared_priority_plansenum.StatusGrooming
-	StatusInProgress Status = shared_priority_plansenum.StatusInProgress
-	StatusOriginated Status = shared_priority_plansenum.StatusOriginated
-	StatusPaused     Status = shared_priority_plansenum.StatusPaused
+	StatusActive     Status = "active"
+	StatusArchived   Status = work_intervalenum.StatusArchived
+	StatusBlocked    Status = "blocked"
+	StatusCancelled  Status = "cancelled"
+	StatusComplete   Status = "complete"
+	StatusConceptual Status = work_intervalenum.StatusConceptual
+	StatusGrooming   Status = "grooming"
+	StatusInProgress Status = work_intervalenum.StatusInProgress
+	StatusOriginated Status = work_intervalenum.StatusOriginated
+	StatusPaused     Status = "paused"
 )

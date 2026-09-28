@@ -4,8 +4,8 @@
 package requirement
 
 import (
-	shared_requirementsenum "github.com/zqk-os/zqk/packs/work/bldr_enum_v1/shared_requirements"
 	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	work_intervalenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/work_interval"
 )
 
 type Plane = base_objectenum.Plane
@@ -43,15 +43,15 @@ const (
 	SourceTypeInternal SourceType = base_objectenum.SourceTypeInternal
 )
 
-type Status = shared_requirementsenum.Status
+type Status = work_intervalenum.Status
 
 const (
-	StatusActive     Status = shared_requirementsenum.StatusActive
-	StatusArchived   Status = shared_requirementsenum.StatusArchived
-	StatusComplete   Status = shared_requirementsenum.StatusComplete
-	StatusConceptual Status = shared_requirementsenum.StatusConceptual
-	StatusDeferred   Status = shared_requirementsenum.StatusDeferred
-	StatusOriginated Status = shared_requirementsenum.StatusOriginated
-	StatusProposed   Status = shared_requirementsenum.StatusProposed
-	StatusRejected   Status = shared_requirementsenum.StatusRejected
+	StatusActive     Status = "active"
+	StatusArchived   Status = work_intervalenum.StatusArchived
+	StatusComplete   Status = "complete"
+	StatusConceptual Status = work_intervalenum.StatusConceptual
+	StatusDeferred   Status = "deferred"
+	StatusOriginated Status = work_intervalenum.StatusOriginated
+	StatusProposed   Status = work_intervalenum.StatusProposed
+	StatusRejected   Status = "rejected"
 )

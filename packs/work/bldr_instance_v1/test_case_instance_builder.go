@@ -48,6 +48,17 @@ func (b *TestCaseInstanceBuilder) ID(value string) *TestCaseInstanceBuilder {
 	return b
 }
 
+// AnswerDueBy sets the answer_due_by field
+func (b *TestCaseInstanceBuilder) AnswerDueBy(value string) *TestCaseInstanceBuilder {
+	b.SetField(objects.FieldKeyAnswerDueBy, value)
+	return b
+}
+
+// SetAnswerDueBy is a compatibility alias for AnswerDueBy.
+func (b *TestCaseInstanceBuilder) SetAnswerDueBy(value string) *TestCaseInstanceBuilder {
+	return b.AnswerDueBy(value)
+}
+
 // ArchivedAt sets the archived_at field
 func (b *TestCaseInstanceBuilder) ArchivedAt(value any) *TestCaseInstanceBuilder {
 	b.SetField(objects.FieldKeyArchivedAt, value)
@@ -90,17 +101,6 @@ func (b *TestCaseInstanceBuilder) BacklogItemRefs(value []string) *TestCaseInsta
 // SetBacklogItemRefs is a compatibility alias for BacklogItemRefs.
 func (b *TestCaseInstanceBuilder) SetBacklogItemRefs(value []string) *TestCaseInstanceBuilder {
 	return b.BacklogItemRefs(value)
-}
-
-// Category sets the category field
-func (b *TestCaseInstanceBuilder) Category(value string) *TestCaseInstanceBuilder {
-	b.SetField(objects.FieldKeyCategory, value)
-	return b
-}
-
-// SetCategory is a compatibility alias for Category.
-func (b *TestCaseInstanceBuilder) SetCategory(value string) *TestCaseInstanceBuilder {
-	return b.Category(value)
 }
 
 // ChangeLog sets the change_log field
