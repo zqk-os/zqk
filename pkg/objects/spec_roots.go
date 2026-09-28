@@ -61,21 +61,78 @@ func ExtraSpecRoots() []string {
 	return out
 }
 
+// extraLifecycleRoots are lifecycle directories a linked pack registered.
+// The kernel tree wins when the same kind exists in both trees.
+var extraLifecycleRoots []string
+
+// AddLifecycleRoot records a directory whose lifecycle YAML merges after the kernel tree.
+// The kernel file wins when the same kind exists in both trees.
+func AddLifecycleRoot(dir string) {
+	if dir == "" {
+		return
+	}
+	clean := filepath.Clean(dir)
+	specRootMu.Lock()
+	defer specRootMu.Unlock()
+	for _, existing := range extraLifecycleRoots {
+		if existing == clean {
+			return
+		}
+	}
+	extraLifecycleRoots = append(extraLifecycleRoots, clean)
+}
+
+// RemoveLifecycleRoot drops a directory added by AddLifecycleRoot. Tests use it to isolate a temp root.
+func RemoveLifecycleRoot(dir string) {
+	clean := filepath.Clean(dir)
+	specRootMu.Lock()
+	defer specRootMu.Unlock()
+	kept := extraLifecycleRoots[:0]
+	for _, existing := range extraLifecycleRoots {
+		if existing == clean {
+			continue
+		}
+		kept = append(kept, existing)
+	}
+	extraLifecycleRoots = append([]string(nil), kept...)
+}
+
+// ExtraLifecycleRoots returns the registered pack lifecycle directories.
+func ExtraLifecycleRoots() []string {
+	specRootMu.Lock()
+	defer specRootMu.Unlock()
+	if len(extraLifecycleRoots) == 0 {
+		return nil
+	}
+	out := make([]string, len(extraLifecycleRoots))
+	copy(out, extraLifecycleRoots)
+	return out
+}
+
+// AddModuleLifecycleRoot registers rel under the kernel module root when that directory exists.
+func AddModuleLifecycleRoot(rel string) {
+	addModuleDir(rel, AddLifecycleRoot)
+}
+
 // AddModuleSpecRoot registers rel under the kernel module root when that directory exists.
 func AddModuleSpecRoot(rel string) {
-	if rel == "" {
+	addModuleDir(rel, AddSpecRoot)
+}
+
+func addModuleDir(rel string, add func(string)) {
+	if rel == "" || add == nil {
 		return
 	}
 	root, ok := moduleRootForSpecs()
 	if !ok {
 		return
 	}
-	dir := filepath.Join(root, rel)
+	dir := filepath.Join(root, filepath.FromSlash(rel))
 	info, err := fileutil.Stat(dir)
 	if err != nil || !info.IsDir() {
 		return
 	}
-	AddSpecRoot(dir)
+	add(dir)
 }
 
 func moduleRootForSpecs() (string, bool) {
