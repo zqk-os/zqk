@@ -1,0 +1,12 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "status [flags]"
+short: "Display status and statistics of synchronized external issues"
+description: |
+  Display summary statistics and health metrics of external issue synchronization
+  across GitHub Issues and Linear Tickets stored in the Knowledge Kernel CAS.
+
+help:
+  examples:
+    - comment: "Display sync status summary"
+      command: "%s sync status"

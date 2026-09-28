@@ -1,0 +1,30 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "linear [flags]"
+short: "Synchronize with Linear Tickets"
+description: |
+  Synchronize Linear Tickets with Knowledge Kernel backlog items.
+  Supports ingest, push, or bi-directional synchronization with monotonic state progression.
+
+flags:
+  - name: "team"
+    type: "string"
+    description: "Linear team key or identifier"
+  - name: "direction"
+    type: "string"
+    default: "ingest"
+    description: "Sync direction: ingest, push, or both"
+  - name: "dry-run"
+    type: "bool"
+    default: false
+    description: "Simulate synchronization without applying CAS mutations"
+  - name: "api-key"
+    type: "string"
+    description: "Linear API Key (defaults to LINEAR_API_KEY env)"
+
+help:
+  examples:
+    - comment: "Ingest tickets from Linear team"
+      command: "%s sync linear --team ENG"
+    - comment: "Dry-run ticket sync from Linear"
+      command: "%s sync linear --team ENG --dry-run"

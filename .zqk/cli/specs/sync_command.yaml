@@ -1,0 +1,27 @@
+$schema: "./schemas/command_spec.schema.json"
+
+name: "sync"
+short: "Synchronize Knowledge Kernel backlog items with external trackers"
+description: |
+  Bi-directional synchronization between the ZQK Knowledge Kernel and external issue trackers.
+
+  Supports automated mapping of GitHub Issues and Linear Tickets into first-class
+  backlog_item kernel objects, monotonic state progression, and conflict resolution.
+
+help:
+  examples:
+    - comment: "Ingest GitHub issues into the kernel"
+      command: "%s sync github --repo owner/repo"
+    - comment: "Dry-run sync from Linear"
+      command: "%s sync linear --team ENG --dry-run"
+    - comment: "Check sync health and external issue status"
+      command: "%s sync status"
+
+common_flags: false
+subcommands:
+  - name: github
+    spec_ref: sync/github_command.yaml
+  - name: linear
+    spec_ref: sync/linear_command.yaml
+  - name: status
+    spec_ref: sync/status_command.yaml

@@ -20,7 +20,7 @@ func isolateSyncTest(t *testing.T) {
 
 func TestNewSyncCmd_Structure(t *testing.T) {
 	cmd := NewSyncCmd()
-	if cmd.Use != "sync [command]" {
+	if cmd.Use != "sync" {
 		t.Errorf("unexpected Use: %s", cmd.Use)
 	}
 

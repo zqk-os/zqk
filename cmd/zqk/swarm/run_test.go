@@ -116,8 +116,10 @@ agents:
 }
 
 func TestSwarmRunCommand_LiveIngestionAndPersistence(t *testing.T) {
-	root := t.TempDir()
-	testkit.RegisterTempProjectTeardown(t, root, nil)
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{
+		SeedSchemaPlane: true,
+	})
+	root := proj.Root
 	logger := logging.GetLoggerFromProfile("test")
 	if err := bootstrap.ExtractTo(root, logger, true); err != nil {
 		t.Fatalf("bootstrap.ExtractTo failed: %v", err)

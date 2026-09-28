@@ -617,19 +617,25 @@ func TestUpdateImmutableFieldsPreventsOverwrite(t *testing.T) {
 	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
 	storage.CreateCASVisible(t, fos, ctx, secCtx, obj, objects.ObjectStatusValidated)
 
-	// Update should succeed but most immutable fields should be ignored
+	// Update should succeed but immutable kind should be ignored
 	// Note: ID updates are now allowed (file will be moved), but kind remains immutable
 	newID := "BLI-999"
 	updates := map[string]any{
-		objects.FieldKeyTitle:     "Updated Title",
-		objects.FieldKeyID:        newID,                  // ID updates are now allowed (file will be moved)
-		objects.FieldKeyKind:      "goal",                 // Should be ignored (kind is immutable)
-		objects.FieldKeyCreatedAt: "2020-01-01T00:00:00Z", // Should be ignored (immutable for non-built-in)
-		objects.FieldKeyCreatedBy: "account:hacker",       // Should be ignored (immutable for non-built-in)
+		objects.FieldKeyTitle: "Updated Title",
+		objects.FieldKeyID:    newID,  // ID updates are now allowed (file will be moved)
+		objects.FieldKeyKind:  "goal", // Should be ignored (kind is immutable)
 	}
 
 	if err := fos.Update(ctx, secCtx, objID, updates); err != nil {
-		t.Fatalf("update should succeed even with immutable fields: %v", err)
+		t.Fatalf("update should succeed: %v", err)
+	}
+
+	// Verify manual mutation of provenance fields is strictly rejected by the membrane
+	err = fos.Update(ctx, secCtx, newID, map[string]any{
+		objects.FieldKeyCreatedBy: "account:hacker",
+	})
+	if err == nil {
+		t.Fatal("expected update to fail on provenance field created_by mutation")
 	}
 
 	// Verify object is now at new ID location (ID update moved the file)

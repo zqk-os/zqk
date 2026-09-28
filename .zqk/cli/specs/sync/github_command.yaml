@@ -1,0 +1,30 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "github [flags]"
+short: "Synchronize with GitHub Issues"
+description: |
+  Synchronize GitHub Issues with Knowledge Kernel backlog items.
+  Supports ingest, push, or bi-directional synchronization with monotonic state progression.
+
+flags:
+  - name: "repo"
+    type: "string"
+    description: "Target GitHub repository in owner/repo format"
+  - name: "direction"
+    type: "string"
+    default: "ingest"
+    description: "Sync direction: ingest, push, or both"
+  - name: "dry-run"
+    type: "bool"
+    default: false
+    description: "Simulate synchronization without applying CAS mutations"
+  - name: "token"
+    type: "string"
+    description: "GitHub Personal Access Token (defaults to GITHUB_TOKEN env)"
+
+help:
+  examples:
+    - comment: "Ingest issues from GitHub"
+      command: "%s sync github --repo zqk-os/zqk"
+    - comment: "Simulate push to GitHub"
+      command: "%s sync github --repo zqk-os/zqk --direction push --dry-run"
