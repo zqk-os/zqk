@@ -7,8 +7,6 @@ import (
 	"io"
 	"strings"
 
-	"time"
-
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
@@ -181,49 +179,25 @@ func persistCommittedMutations(ctx context.Context, proc *cli.Processor, engine 
 		switch r.Action {
 		case mutation.ActionCreateNode, mutation.ActionUpdateNode:
 			existing, readErr := proc.Storage().Read(ctx, secCtx, r.TargetID)
-			nowStr := time.Now().UTC().Format(time.RFC3339)
-			actor := pkgctx.ActorIDForAttribution("")
-			if secCtx != nil && secCtx.AccountID != "" {
-				actor = pkgctx.ActorIDForAttribution(secCtx.AccountID)
-			}
 
 			if readErr == nil && existing != nil {
-				// Preserve existing system metadata fields
-				for _, sysKey := range []string{"created_at", "created_by", "namespace_id", "schema_version", "version_context"} {
-					if v, ok := existing[sysKey]; ok {
-						if !pkgctx.IsLifecycleBreakGlass(ctx) {
-							data[sysKey] = v
-						} else if _, has := data[sysKey]; !has {
-							data[sysKey] = v
-						}
-					}
-				}
-				// Implicitly update updated_at and updated_by
-				if !pkgctx.IsLifecycleBreakGlass(ctx) || data["updated_at"] == nil {
-					data["updated_at"] = nowStr
-				}
-				if !pkgctx.IsLifecycleBreakGlass(ctx) || data["updated_by"] == nil {
-					data["updated_by"] = actor
+				// For updates to existing objects, updates map should only contain the updated domain fields.
+				// System provenance fields (created_at, created_by, updated_at, updated_by, cas_address, hash)
+				// are system-computed by Storage().Update() and must NOT be injected manually unless
+				// break-glass is explicitly armed with custom fields.
+				if !pkgctx.IsLifecycleBreakGlass(ctx) {
+					delete(data, "created_at")
+					delete(data, "created_by")
+					delete(data, "updated_at")
+					delete(data, "updated_by")
+					delete(data, "cas_address")
+					delete(data, "hash")
 				}
 
 				if err := proc.Storage().Update(ctx, secCtx, r.TargetID, data); err != nil {
 					return fmt.Errorf("failed to update node %s: %w", r.TargetID, err)
 				}
 			} else {
-				// Implicitly stamp created_at/created_by and updated_at/updated_by for newly created nodes
-				if !pkgctx.IsLifecycleBreakGlass(ctx) || data["created_at"] == nil {
-					data["created_at"] = nowStr
-				}
-				if !pkgctx.IsLifecycleBreakGlass(ctx) || data["created_by"] == nil {
-					data["created_by"] = actor
-				}
-				if !pkgctx.IsLifecycleBreakGlass(ctx) || data["updated_at"] == nil {
-					data["updated_at"] = nowStr
-				}
-				if !pkgctx.IsLifecycleBreakGlass(ctx) || data["updated_by"] == nil {
-					data["updated_by"] = actor
-				}
-
 				if err := proc.Storage().Create(ctx, secCtx, data); err != nil {
 					if updateErr := proc.Storage().Update(ctx, secCtx, r.TargetID, data); updateErr != nil {
 						return fmt.Errorf("failed to persist node %s: %w (create error: %v)", r.TargetID, updateErr, err)
