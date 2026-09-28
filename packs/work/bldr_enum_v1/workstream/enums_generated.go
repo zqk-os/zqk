@@ -4,8 +4,8 @@
 package workstream
 
 import (
-	shared_workstreamsenum "github.com/zqk-os/zqk/packs/work/bldr_enum_v1/shared_workstreams"
 	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	work_intervalenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/work_interval"
 )
 
 type Category string
@@ -45,15 +45,15 @@ const (
 	SourceTypeInternal SourceType = base_objectenum.SourceTypeInternal
 )
 
-type Status = shared_workstreamsenum.Status
+type Status = work_intervalenum.Status
 
 const (
-	StatusActive     Status = shared_workstreamsenum.StatusActive
-	StatusArchived   Status = shared_workstreamsenum.StatusArchived
-	StatusComplete   Status = shared_workstreamsenum.StatusComplete
-	StatusConceptual Status = shared_workstreamsenum.StatusConceptual
-	StatusError      Status = shared_workstreamsenum.StatusError
-	StatusOriginated Status = shared_workstreamsenum.StatusOriginated
-	StatusPaused     Status = shared_workstreamsenum.StatusPaused
-	StatusPlanned    Status = shared_workstreamsenum.StatusPlanned
+	StatusActive     Status = "active"
+	StatusArchived   Status = work_intervalenum.StatusArchived
+	StatusComplete   Status = "complete"
+	StatusConceptual Status = work_intervalenum.StatusConceptual
+	StatusError      Status = work_intervalenum.StatusError
+	StatusOriginated Status = work_intervalenum.StatusOriginated
+	StatusPaused     Status = "paused"
+	StatusPlanned    Status = "planned"
 )

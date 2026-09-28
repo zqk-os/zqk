@@ -4,7 +4,6 @@
 package mission
 
 import (
-	shared_missionsenum "github.com/zqk-os/zqk/packs/work/bldr_enum_v1/shared_missions"
 	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
 )
 
@@ -34,13 +33,13 @@ const (
 	SourceTypeInternal SourceType = base_objectenum.SourceTypeInternal
 )
 
-type Status = shared_missionsenum.Status
+type Status = base_objectenum.Status
 
 const (
-	StatusActive     Status = shared_missionsenum.StatusActive
-	StatusArchived   Status = shared_missionsenum.StatusArchived
-	StatusConceptual Status = shared_missionsenum.StatusConceptual
-	StatusDraft      Status = shared_missionsenum.StatusDraft
-	StatusError      Status = shared_missionsenum.StatusError
-	StatusOriginated Status = shared_missionsenum.StatusOriginated
+	StatusActive     Status = "active"
+	StatusArchived   Status = base_objectenum.StatusArchived
+	StatusConceptual Status = base_objectenum.StatusConceptual
+	StatusDraft      Status = "draft"
+	StatusError      Status = base_objectenum.StatusError
+	StatusOriginated Status = base_objectenum.StatusOriginated
 )

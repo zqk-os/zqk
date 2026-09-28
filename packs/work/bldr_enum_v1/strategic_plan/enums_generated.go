@@ -4,8 +4,8 @@
 package strategic_plan
 
 import (
-	shared_strategic_plansenum "github.com/zqk-os/zqk/packs/work/bldr_enum_v1/shared_strategic_plans"
 	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	work_intervalenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/work_interval"
 )
 
 type Plane = base_objectenum.Plane
@@ -34,14 +34,14 @@ const (
 	SourceTypeInternal SourceType = base_objectenum.SourceTypeInternal
 )
 
-type Status = shared_strategic_plansenum.Status
+type Status = work_intervalenum.Status
 
 const (
-	StatusActive     Status = shared_strategic_plansenum.StatusActive
-	StatusArchived   Status = shared_strategic_plansenum.StatusArchived
-	StatusComplete   Status = shared_strategic_plansenum.StatusComplete
-	StatusConceptual Status = shared_strategic_plansenum.StatusConceptual
-	StatusError      Status = shared_strategic_plansenum.StatusError
-	StatusOriginated Status = shared_strategic_plansenum.StatusOriginated
-	StatusPlanning   Status = shared_strategic_plansenum.StatusPlanning
+	StatusActive     Status = "active"
+	StatusArchived   Status = work_intervalenum.StatusArchived
+	StatusComplete   Status = "complete"
+	StatusConceptual Status = work_intervalenum.StatusConceptual
+	StatusError      Status = work_intervalenum.StatusError
+	StatusOriginated Status = work_intervalenum.StatusOriginated
+	StatusPlanning   Status = "planning"
 )
