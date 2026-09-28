@@ -21,6 +21,28 @@ func SetPackOwnedKinds(kinds []string) {
 	packOwnedKinds = out
 }
 
+// AddPackOwnedKinds appends kinds from another linked pack.
+// Kinds already recorded are left in their original order.
+func AddPackOwnedKinds(kinds []string) {
+	if len(kinds) == 0 {
+		return
+	}
+	have := make(map[string]struct{}, len(packOwnedKinds)+len(kinds))
+	for _, kind := range packOwnedKinds {
+		have[kind] = struct{}{}
+	}
+	for _, kind := range kinds {
+		if kind == "" {
+			continue
+		}
+		if _, ok := have[kind]; ok {
+			continue
+		}
+		have[kind] = struct{}{}
+		packOwnedKinds = append(packOwnedKinds, kind)
+	}
+}
+
 // PackOwnedKinds returns the kinds recorded by SetPackOwnedKinds, in that order.
 func PackOwnedKinds() []string {
 	if len(packOwnedKinds) == 0 {

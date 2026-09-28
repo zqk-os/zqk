@@ -6,12 +6,12 @@ package shared_releases
 type Status string
 
 const (
-	StatusApproved    Status = "approved"
-	StatusArchived    Status = "archived"
-	StatusConceptual  Status = "conceptual"
-	StatusError       Status = "error"
-	StatusImplemented Status = "implemented"
-	StatusInProgress  Status = "in_progress"
-	StatusOriginated  Status = "originated"
-	StatusProposed    Status = "proposed"
+	StatusArchived   Status = "archived"
+	StatusCancelled  Status = "cancelled"
+	StatusConceptual Status = "conceptual"
+	StatusError      Status = "error"
+	StatusInProgress Status = "in_progress"
+	StatusOriginated Status = "originated"
+	StatusPlanned    Status = "planned"
+	StatusReleased   Status = "released"
 )

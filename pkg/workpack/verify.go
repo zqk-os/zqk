@@ -5,12 +5,22 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 var (
 	verifiedSpecs map[string]string
 	verifyErr     error
 )
+
+// kindsWithoutLifecycle are work-graph mixins. They are not instantiable and have no lifecycle file.
+var kindsWithoutLifecycle = map[string]struct{}{
+	objects.KindWorkInterval:  {},
+	objects.KindWorkUnit:      {},
+	objects.KindOccupancy:     {},
+	objects.KindRemainingOpen: {},
+}
 
 // VerifiedSpec returns the spec path recorded when this pack was verified.
 func VerifiedSpec(kind string) (string, bool) {
@@ -39,9 +49,11 @@ func verifyKindFiles(root string, kinds []string, specRel, lifecycleRel string) 
 		if _, err := os.Stat(specPath); err != nil {
 			return nil, fmt.Errorf("work pack kind %s spec: %w", kind, err)
 		}
-		lifecyclePath := filepath.Join(root, lifecycleRel, kind+"_lifecycle.yaml")
-		if _, err := os.Stat(lifecyclePath); err != nil {
-			return nil, fmt.Errorf("work pack kind %s lifecycle: %w", kind, err)
+		if _, skip := kindsWithoutLifecycle[kind]; !skip {
+			lifecyclePath := filepath.Join(root, lifecycleRel, kind+"_lifecycle.yaml")
+			if _, err := os.Stat(lifecyclePath); err != nil {
+				return nil, fmt.Errorf("work pack kind %s lifecycle: %w", kind, err)
+			}
 		}
 		recorded[kind] = specPath
 	}

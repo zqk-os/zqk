@@ -27,3 +27,19 @@ func TestSetPackOwnedKindsRoundTrip(t *testing.T) {
 		}
 	}
 }
+
+func TestAddPackOwnedKindsKeepsEarlierPacks(t *testing.T) {
+	defer SetPackOwnedKinds(nil)
+	AddPackOwnedKinds([]string{"goal"})
+	AddPackOwnedKinds([]string{"glossary_term", "goal"})
+	got := PackOwnedKinds()
+	want := []string{"goal", "glossary_term"}
+	if len(got) != len(want) {
+		t.Fatalf("pack kinds %v", got)
+	}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Fatalf("pack kinds[%d]=%q", i, got[i])
+		}
+	}
+}
