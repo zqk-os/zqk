@@ -8,6 +8,7 @@ import (
 
 	packbldr "github.com/zqk-os/zqk/packs/work/bldr_instance_v1"
 	_ "github.com/zqk-os/zqk/packs/work/bldr_lifecycle_v1"
+	_ "github.com/zqk-os/zqk/packs/work/bldr_v2"
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
