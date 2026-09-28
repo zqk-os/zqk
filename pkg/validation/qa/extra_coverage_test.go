@@ -254,6 +254,34 @@ func TestAuditorService_PerformAudit_MemoryStore(t *testing.T) {
 		}
 	})
 
+	t.Run("completed agent task with zero artifacts is rejected", func(t *testing.T) {
+		taskID := "ATK-ZERO-ART"
+		store.objs[taskID] = map[string]any{
+			objects.FieldKeyID:           taskID,
+			objects.FieldKeyKind:         objects.KindAgentTask,
+			objects.FieldKeyStatus:       objects.ObjectStatusComplete,
+			objects.FieldKeyCommitHashes: []any{"abc1234"},
+			objects.FieldKeyArtifacts:    []any{},
+			objects.FieldKeyTitle:        "Completed agent task with zero artifacts",
+			objects.FieldKeyDescription:  "Agent task done without artifacts",
+		}
+		svc.performAudit(context.Background(), taskID, objects.KindAgentTask)
+
+		for id, obj := range store.objs {
+			if obj[objects.FieldKeyKind] == KindQASuccess && obj[objects.FieldKeyItemID] == taskID {
+				t.Fatalf("QASuccess must not be issued for agent task with zero artifacts, found %s: %+v", id, obj)
+			}
+		}
+
+		latest := latestCriticalInterrupt(t, tmpDir)
+		if latest == nil || latest.DedupeKey != "qa-disparity-"+taskID {
+			t.Fatalf("expected disparity interrupt for zero artifacts, got: %+v", latest)
+		}
+		if !strings.Contains(latest.Message, ReasonMissingArtifacts) {
+			t.Fatalf("expected message to mention missing deliverable artifacts, got: %s", latest.Message)
+		}
+	})
+
 	t.Run("completed backlog item with non-existent artifact is rejected", func(t *testing.T) {
 		nonExistentPath := filepath.Join(tmpDir, "does_not_exist.go")
 		store.objs["BLI-NONEXIST-ART"] = map[string]any{

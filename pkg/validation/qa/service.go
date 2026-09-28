@@ -195,8 +195,8 @@ func (s *AuditorService) performAudit(ctx context.Context, id string, kind strin
 	}
 
 	// 1.6 Deliverable Artifacts Validation
-	// Fail-closed: completed backlog items must have at least one deliverable artifact.
-	if kind == objects.KindBacklogItem && isComplete {
+	// Fail-closed: completed backlog items and agent tasks must have at least one deliverable artifact.
+	if (kind == objects.KindBacklogItem || kind == objects.KindAgentTask) && isComplete {
 		if len(artifactPaths) == 0 {
 			reason := ReasonMissingArtifacts
 			logging.FluentEvent(logger).Warn(fmt.Sprintf(LogFmtAuditorContentDisparity, id, reason)).Log()
