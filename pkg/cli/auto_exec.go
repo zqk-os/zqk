@@ -3,13 +3,14 @@ package cli
 import (
 	"context"
 	"fmt"
-	"os/exec"
 	"sort"
 	"strings"
 	"time"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/git"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
@@ -49,8 +50,9 @@ type TestVerifierFunc func(ctx context.Context, testID, pathOrID string) (bool, 
 
 // AutoExecPipeline coordinates discovery, work claiming, testing, and latching.
 type AutoExecPipeline struct {
-	Storage  storage.ObjectStorageProvider
-	Verifier TestVerifierFunc
+	Storage   storage.ObjectStorageProvider
+	Verifier  TestVerifierFunc
+	GitFacade *git.Facade
 }
 
 // NewAutoExecPipeline creates an autonomous execution pipeline backed by storage.
@@ -188,23 +190,16 @@ func (p *AutoExecPipeline) Execute(ctx context.Context, sec *pkgctx.SecurityCont
 			existingHashes := toStringSlice(bli[objects.FieldKeyCommitHashes])
 			if len(existingHashes) == 0 {
 				planRef, _ := bli[objects.FieldKeyPriorityPlanRef].(string)
-				var grepArgs []string
-				grepArgs = append(grepArgs, "log", "-n", "10", "--format=%H", "--grep="+bliID)
-				if planRef != "" {
-					grepArgs = append(grepArgs, "--grep="+planRef)
+				facade := p.GitFacade
+				if facade == nil {
+					facade = git.NewFacade("")
 				}
-				if out, err := exec.CommandContext(ctx, "git", grepArgs...).Output(); err == nil {
-					lines := strings.Split(strings.TrimSpace(string(out)), "\n")
-					var discovered []string
-					for _, l := range lines {
-						h := strings.TrimSpace(l)
-						if h != "" {
-							discovered = append(discovered, h)
-						}
-					}
-					if len(discovered) > 0 {
-						bli[objects.FieldKeyCommitHashes] = discovered
-					}
+				patterns := []string{bliID}
+				if planRef != "" {
+					patterns = append(patterns, planRef)
+				}
+				if discovered, err := facade.FindCommitHashesByGrep(ctx, 10, patterns...); err == nil && len(discovered) > 0 {
+					bli[objects.FieldKeyCommitHashes] = discovered
 				}
 			}
 
@@ -350,7 +345,7 @@ func (p *AutoExecPipeline) verifyAndLatch(ctx context.Context, sec *pkgctx.Secur
 				passed = false
 			}
 		} else if pathOrID != "" {
-			cmd := exec.CommandContext(ctx, "go", "test", "-v", pathOrID)
+			cmd := execwrap.CommandContext(ctx, "go", "test", "-v", pathOrID)
 			if err := cmd.Run(); err != nil {
 				passed = false
 			}
