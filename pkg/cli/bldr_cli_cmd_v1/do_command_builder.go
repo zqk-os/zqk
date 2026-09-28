@@ -4,6 +4,7 @@ package bldr_cli_cmd_v1
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 )
 
@@ -18,7 +19,12 @@ func NewDoCommandBuilder() *cobra.Command {
 	help.AddExample("Execute a designated backlog item", "zqk do BLI-ERGONOMICS-AUTO-EXEC-001")
 	help.AddExample("Dry run without mutating storage", "zqk do --dry-run")
 	builder.WithHelpBuilder(help)
-	builder.WithCommonFlags(false, nil)
+	builder.WithArgs(cobra.MaximumNArgs(1))
+	builder.AddBoolFlag("dry-run", "", false, "Simulate pipeline discovery and claiming without writing mutations")
+	builder.AddBoolFlag("verify", "", true, "Execute test verification and criteria latching")
+	builder.AddStringFlag("by", "", "", "Claimant agent or account id (default: seating or env identity)")
+	builder.AddStringFlag("persona-ref", "", "PER-COMMUNITY-SOFTWARE-ENGINEER", "Target persona reference")
+	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
 	cmd := builder.Build()
 	return cmd
 }
