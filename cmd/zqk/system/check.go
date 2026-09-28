@@ -71,6 +71,7 @@ func NewCheckCmd() *cobra.Command {
 
 	// Add check-specific flags
 	cmd.Flags().Bool("auto-fix", false, "Automatically fix recoverable issues (missing hashes and hash mismatches)")
+	cmd.Flags().Bool("auto-remedy", false, "Automatically diagnose and safely apply precondition and hygiene fixes (stale locks, orphaned tmp files, unseeded essentials)")
 	cmd.Flags().Bool("force", false, "Force fix hash mismatches (requires explicit confirmation, creates audit event)")
 	cmd.Flags().Bool("auto-fix-scheduler", true, "Use scheduler for auto-fix batching (provides status updates and timeout handling, default: true for batches >= 10 issues)")
 	cmd.Flags().Bool("skip-if-locked", false, "Cleanly exit with code 0 if auto-fix lock is held by another process")
