@@ -6,35 +6,30 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/packrecord"
 	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // NewKindPackCmd installs an uploaded spec pack so its kinds load as objects.
 func NewKindPackCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "kind-pack",
-		Short: "Record a verified spec pack as typed object kinds",
-	}
+	cmd := bldr_cli_cmd_v1.NewKindPackCommandBuilder()
 	cmd.AddCommand(newInstallCmd())
 	return cmd
 }
 
 func newInstallCmd() *cobra.Command {
-	return &cobra.Command{
-		Use:   "install [pack_dir]",
-		Short: "Verify a spec pack and record its formal specs",
-		Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			root := paths.ResolveProjectRoot(".")
-			recorded, err := packrecord.Install(args[0], root)
-			if err != nil {
-				return err
-			}
-			_, err = fmt.Fprintf(cmd.OutOrStdout(), "recorded %s (%s)\n", recorded.Name, joinKinds(recorded.Kinds))
+	cmd := bldr_cli_cmd_v1.NewKindPackInstallCommandBuilder()
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		root := paths.ResolveProjectRoot(".")
+		recorded, err := packrecord.Install(args[0], root)
+		if err != nil {
 			return err
-		},
+		}
+		_, err = fmt.Fprintf(cmd.OutOrStdout(), "recorded %s (%s)\n", recorded.Name, joinKinds(recorded.Kinds))
+		return err
 	}
+	return cmd
 }
 
 func joinKinds(kinds []string) string {
