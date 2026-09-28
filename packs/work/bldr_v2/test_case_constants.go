@@ -7,12 +7,8 @@ package bldr_v2
 const (
 	// TestCaseFieldBacklogItemRefs is the field name for backlog_item_refs
 	TestCaseFieldBacklogItemRefs = "backlog_item_refs"
-	// TestCaseFieldCategory is the field name for category
-	TestCaseFieldCategory = "category"
 	// TestCaseFieldCriteriaRefs is the field name for criteria_refs
 	TestCaseFieldCriteriaRefs = "criteria_refs"
-	// TestCaseFieldDescription is the field name for description
-	TestCaseFieldDescription = "description"
 	// TestCaseFieldMilestoneRefs is the field name for milestone_refs
 	TestCaseFieldMilestoneRefs = "milestone_refs"
 	// FieldPathOrId is the field name for path_or_id

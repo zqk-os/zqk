@@ -128,35 +128,6 @@ func (b *WorkstreamBuilder) addWorkstreamFields() {
 		WithPermissions("rwx").
 		WithSemanticType("statement").
 		WithProfileCode("WKS-002"))
-	b.AddFieldBuilder(builders.NewFieldBuilder("description", "text").
-		WithChecklist(builders.NewChecklistBuilder().
-			Authority("owner.").
-			AutomationHooks("used in reports, documentation.").
-			Cardinality("one").
-			Criticality("association").
-			Default("none (optional, prefer context for brief description)").
-			Dependencies("none.").
-			Lifecycle("mutable").
-			Observability("yes").
-			Purpose("Detailed description of the workstream's purpose and scope.").
-			Security("non-sensitive").
-			SystemUsage([]any{
-				"documentation",
-				"communication",
-				"understanding",
-			}).
-			Validation("free text or markdown.").
-			Build()).
-		WithAccess(builders.NewAccessBuilder().
-			Requires("access:confidential").
-			Build()).
-		WithValidation(builders.NewValidationBuilder().
-			Required(false).
-			Build()).
-		WithTraits("readable", "writable", "modifiable").
-		WithPermissions("rwx").
-		WithSemanticType("statement").
-		WithProfileCode("WKS-016"))
 	b.AddFieldBuilder(builders.NewFieldBuilder("entry_point", "string").
 		WithChecklist(builders.NewChecklistBuilder().
 			Authority("owner.").

@@ -15598,7 +15598,8 @@
             "readable",
             "writable",
             "modifiable"
-          ]
+          ],
+          "min_length": 10
         },
         {
           "name": "evidence",
@@ -22346,15 +22347,6 @@
       "kind": "goal",
       "fields": [
         {
-          "name": "achieved_at",
-          "type": "string",
-          "semantic_type": "statement",
-          "traits": [
-            "field_mutable_group"
-          ],
-          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
-        },
-        {
           "name": "archived_at",
           "type": "datetime",
           "semantic_type": "statement",
@@ -22398,19 +22390,6 @@
           "traits": [
             "field_read_only_group"
           ]
-        },
-        {
-          "name": "commit_hashes",
-          "type": "list",
-          "semantic_type": "statement",
-          "traits": [
-            "readable",
-            "writable",
-            "modifiable",
-            "filterable"
-          ],
-          "filterable": true,
-          "pattern": "^[A-Za-z0-9_-]{1,40}$"
         },
         {
           "name": "completed_at",
@@ -22470,21 +22449,11 @@
           "min_length": 1
         },
         {
-          "name": "current_value",
-          "type": "string",
-          "semantic_type": "expression",
-          "traits": [
-            "field_mutable_group"
-          ]
-        },
-        {
           "name": "deadline",
           "type": "string",
           "semantic_type": "statement",
           "traits": [
-            "readable",
-            "writable",
-            "modifiable"
+            "field_mutable_group"
           ],
           "pattern": "^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}Z)?$"
         },
@@ -22671,6 +22640,19 @@
           "sortable": true
         },
         {
+          "name": "requirement_refs",
+          "type": "list",
+          "semantic_type": "reference",
+          "traits": [
+            "field_mutable_group",
+            "field_reference_group"
+          ],
+          "is_ref": true,
+          "groupable": true,
+          "filterable": true,
+          "sortable": true
+        },
+        {
           "name": "schema_ref",
           "type": "string",
           "semantic_type": "reference",
@@ -22768,6 +22750,14 @@
           ]
         },
         {
+          "name": "success_criteria",
+          "type": "list",
+          "semantic_type": "statement",
+          "traits": [
+            "field_mutable_group"
+          ]
+        },
+        {
           "name": "target",
           "type": "string",
           "semantic_type": "statement",
@@ -22861,6 +22851,19 @@
           "sortable": true,
           "display_length": 10,
           "min_value": 1
+        },
+        {
+          "name": "vision_ref",
+          "type": "string",
+          "semantic_type": "reference",
+          "traits": [
+            "field_mutable_group",
+            "field_reference_group"
+          ],
+          "is_ref": true,
+          "groupable": true,
+          "filterable": true,
+          "sortable": true
         },
         {
           "name": "workstream_refs",
@@ -30206,19 +30209,6 @@
           ]
         },
         {
-          "name": "commit_hashes",
-          "type": "list",
-          "semantic_type": "statement",
-          "traits": [
-            "filterable",
-            "modifiable",
-            "readable",
-            "writable"
-          ],
-          "filterable": true,
-          "pattern": "^[A-Za-z0-9_-]{1,40}$"
-        },
-        {
           "name": "completed_at",
           "type": "string",
           "semantic_type": "statement",
@@ -30231,14 +30221,6 @@
           "name": "completeness_validation",
           "type": "list",
           "semantic_type": "expression",
-          "traits": [
-            "field_mutable_group"
-          ]
-        },
-        {
-          "name": "completion_criteria",
-          "type": "list",
-          "semantic_type": "statement",
           "traits": [
             "field_mutable_group"
           ]
@@ -30625,21 +30607,12 @@
           "type": "enum",
           "semantic_type": "statement",
           "traits": [
-            "filterable",
-            "groupable",
             "listable",
-            "modifiable",
             "readable",
-            "searchable",
+            "groupable",
+            "filterable",
             "sortable",
-            "writable"
-          ],
-          "enum_values": [
-            "not_started",
-            "in_progress",
-            "blocked",
-            "complete",
-            "deferred"
+            "searchable"
           ],
           "groupable": true,
           "filterable": true,
@@ -30650,7 +30623,7 @@
           "type": "list",
           "semantic_type": "expression",
           "traits": [
-            "readable"
+            "field_read_only_group"
           ]
         },
         {
@@ -37732,10 +37705,12 @@
           "type": "text",
           "semantic_type": "statement",
           "traits": [
+            "field_mutable_group",
             "readable",
             "writable",
             "modifiable"
-          ]
+          ],
+          "min_length": 10
         },
         {
           "name": "epic_refs",
@@ -38208,19 +38183,6 @@
         },
         {
           "name": "workflow_ref",
-          "type": "string",
-          "semantic_type": "reference",
-          "traits": [
-            "field_mutable_group",
-            "field_reference_group"
-          ],
-          "is_ref": true,
-          "groupable": true,
-          "filterable": true,
-          "sortable": true
-        },
-        {
-          "name": "workstream_ref",
           "type": "string",
           "semantic_type": "reference",
           "traits": [
@@ -41897,10 +41859,12 @@
           "type": "text",
           "semantic_type": "statement",
           "traits": [
+            "field_mutable_group",
             "readable",
             "writable",
             "modifiable"
-          ]
+          ],
+          "min_length": 10
         },
         {
           "name": "epic_refs",
@@ -51149,16 +51113,12 @@
           "type": "string",
           "semantic_type": "statement",
           "traits": [
-            "listable",
-            "readable",
-            "writable",
-            "filterable",
-            "sortable",
-            "searchable"
+            "field_queryable_group"
           ],
           "filterable": true,
           "sortable": true,
-          "pattern": "^STRAT-PLAN-\\d{3,}$"
+          "max_length": 2048,
+          "pattern": "^[A-Z]+-\\d{3,}$"
         },
         {
           "name": "kind",
@@ -54847,24 +54807,6 @@
           "sortable": true
         },
         {
-          "name": "category",
-          "type": "string",
-          "semantic_type": "statement",
-          "traits": [
-            "listable",
-            "readable",
-            "writable",
-            "modifiable",
-            "groupable",
-            "filterable",
-            "sortable",
-            "searchable"
-          ],
-          "groupable": true,
-          "filterable": true,
-          "sortable": true
-        },
-        {
           "name": "change_log",
           "type": "list",
           "semantic_type": "statement",
@@ -54964,11 +54906,12 @@
           "type": "text",
           "semantic_type": "statement",
           "traits": [
+            "field_mutable_group",
             "readable",
             "writable",
-            "modifiable",
-            "searchable"
-          ]
+            "modifiable"
+          ],
+          "min_length": 10
         },
         {
           "name": "id",
@@ -59110,10 +59053,12 @@
           "type": "text",
           "semantic_type": "statement",
           "traits": [
+            "field_mutable_group",
             "readable",
             "writable",
             "modifiable"
-          ]
+          ],
+          "min_length": 10
         },
         {
           "name": "entry_point",

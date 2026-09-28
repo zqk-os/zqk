@@ -62,35 +62,6 @@ func (b *StrategicPlanBuilder) addStrategicPlanFields() {
 		WithPermissions("r-x").
 		WithSemanticType("reference").
 		WithProfileCode("STRAT-004"))
-	b.AddFieldBuilder(builders.NewFieldBuilder("id", "string").
-		WithChecklist(builders.NewChecklistBuilder().
-			Authority("automation (Generator)").
-			AutomationHooks("used for cross-file references.").
-			Cardinality("one").
-			Criticality("composition").
-			Default("auto-assigned per kind sequence").
-			Dependencies("linkage constraints, URN creation.").
-			Lifecycle("immutable").
-			Observability("logged + manifests.").
-			Purpose("Stable identifier used across the graph (\\\\\\\"STRAT-PLAN-####\\\\\\\").").
-			Security("non-sensitive").
-			SystemUsage([]any{
-				"linking",
-				"reporting",
-				"URIs",
-			}).
-			Validation("regex ^STRAT-PLAN-\\\\\\\\d{3,}$; uniqueness enforced.").
-			Build()).
-		WithAccess(builders.NewAccessBuilder().
-			Requires("access:confidential").
-			Build()).
-		WithValidation(builders.NewValidationBuilder().
-			Pattern(`^STRAT-PLAN-\d{3,}$`).
-			Required(true).
-			Build()).
-		WithTraits("listable", "readable", "writable", "filterable", "sortable", "searchable").
-		WithPermissions("r-x").
-		WithSemanticType("statement"))
 	b.AddFieldBuilder(builders.NewFieldBuilder("phases", "list").
 		WithChecklist(builders.NewChecklistBuilder().
 			Authority("executive/admin").
