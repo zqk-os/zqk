@@ -12,6 +12,9 @@ import (
 const (
 	// Name is the pack id the composition root links.
 	Name = "work"
+	// ToolDir is the instance builder tool directory for this pack.
+	// Generated builders and enums are written beside it.
+	ToolDir = "packs/work/instance_builders"
 	// OmitBuildTag drops this pack from the zqk composition root.
 	OmitBuildTag = "zqk_omit_workpack"
 )
