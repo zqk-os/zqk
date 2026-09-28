@@ -1,13 +1,13 @@
 package workpack
 
 import (
-	"bytes"
 	"fmt"
 	"os"
 	"regexp"
 	"sort"
-	"strconv"
 	"strings"
+
+	"gopkg.in/yaml.v3"
 )
 
 // Message and format constants for the redundancy audit tooling.
@@ -175,92 +175,16 @@ func AuditSpecFile(path string) (*RedundancyReport, error) {
 	return report, nil
 }
 
-type specScope struct {
-	indent int
-	keys   []string
-}
-
-// decodeSpecDocument parses the YAML subset used by kernel object specs:
-// scalar values, nested mappings, and list markers. Anchors and multi-line
-// scalars are not part of the spec grammar and are skipped.
+// decodeSpecDocument parses the YAML spec document into a map[string]any.
 func decodeSpecDocument(data []byte) map[string]any {
-	root := map[string]any{}
-	var scope specScope
-	for _, raw := range bytes.Split(data, []byte("\n")) {
-		trimmed := bytes.TrimSpace(raw)
-		if len(trimmed) == 0 || trimmed[0] == '#' {
-			continue
-		}
-		if trimmed[0] == '-' {
-			continue // list item: not a field key
-		}
-		indent := 0
-		for raw[indent] == ' ' {
-			indent++
-		}
-		content := raw[indent:]
-		m := specEntryRe.FindSubmatch(content)
-		if m == nil {
-			continue
-		}
-		key := string(m[2])
-		value := bytes.TrimSpace(m[3])
-
-		// Pop scopes at the same or deeper indentation.
-		for len(scope.keys) > 0 && scope.indent >= indent {
-			scope.keys = scope.keys[:len(scope.keys)-1]
-		}
-		if len(scope.keys) > 0 && scope.indent >= indent {
-			scope.keys = scope.keys[:0]
-		}
-
-		parent := lookupScope(root, scope.keys)
-		if len(value) == 0 {
-			child, ok := parent[key].(map[string]any)
-			if !ok {
-				child = map[string]any{}
-				parent[key] = child
-			}
-			scope.keys = append(scope.keys, key)
-			scope.indent = indent
-			continue
-		}
-		parent[key] = parseScalar(string(value))
-		scope = specScope{}
+	var root map[string]any
+	if err := yaml.Unmarshal(data, &root); err != nil {
+		return map[string]any{}
+	}
+	if root == nil {
+		return map[string]any{}
 	}
 	return root
-}
-
-// lookupScope descends into the recorded scope keys and returns the innermost
-// mapping a new key belongs to.
-func lookupScope(root map[string]any, keys []string) map[string]any {
-	cur := root
-	for _, k := range keys {
-		next, ok := cur[k].(map[string]any)
-		if !ok {
-			break
-		}
-		cur = next
-	}
-	return cur
-}
-
-// parseScalar converts a YAML scalar token into a typed Go value.
-func parseScalar(value string) any {
-	value = strings.Trim(value, `"'`)
-	if value == "true" {
-		return true
-	}
-	if value == "false" {
-		return false
-	}
-	if n, err := strconv.Atoi(value); err == nil {
-		return n
-	}
-	if f, err := strconv.ParseFloat(value, 64); err == nil {
-		return f
-	}
-	return value
 }
 
 // AuditAll audits every verified spec file in this pack and returns a combined

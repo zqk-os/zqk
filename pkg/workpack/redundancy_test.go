@@ -40,7 +40,7 @@ func TestNormalizeFieldCamelToSnake(t *testing.T) {
 		"change_log":      "change_log",
 		"Source-Type":     "source_type",
 		"goalSummary":     "goal_summary",
-		"ID":              "i_d",
+		"ID":              "id",
 		msgCompletenessField: msgCompletenessField,
 	}
 	for in, want := range cases {
