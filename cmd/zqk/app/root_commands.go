@@ -46,6 +46,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/semantic"
 	"github.com/zqk-os/zqk/cmd/zqk/spec"
 	"github.com/zqk-os/zqk/cmd/zqk/state"
+	synccmd "github.com/zqk-os/zqk/cmd/zqk/sync"
 	"github.com/zqk-os/zqk/cmd/zqk/swarm"
 	"github.com/zqk-os/zqk/cmd/zqk/system"
 	testcmd "github.com/zqk-os/zqk/cmd/zqk/test"
@@ -200,6 +201,11 @@ func registerCommands() {
 	mcpCmdInst := mcp.NewMCPCmd()
 	mcpCmdInst.GroupID = "integrations"
 	rootCmd.AddCommand(mcpCmdInst)
+
+	// External issue tracker sync (GitHub, Linear)
+	syncCmdInst := synccmd.NewSyncCmd()
+	syncCmdInst.GroupID = "integrations"
+	rootCmd.AddCommand(syncCmdInst)
 
 	// Observer agent (AST extraction, knowledge kernel)
 	observerCmdInst := observer.NewObserverCmd()
