@@ -164,3 +164,72 @@ func TestGetGlobalFieldRegistry(t *testing.T) {
 		t.Error("expected GetGlobalFieldRegistry to return the same instance")
 	}
 }
+
+func TestFieldRegistry_MixinInheritanceNotSpecialized(t *testing.T) {
+	t.Parallel()
+	specLoader := NewSpecLoader("")
+	registry := NewFieldRegistry(specLoader)
+
+	err := registry.LoadFields()
+	if err != nil {
+		t.Fatalf("LoadFields failed: %v", err)
+	}
+
+	goalFields, err := registry.GetFieldsForKind("goal")
+	if err != nil {
+		t.Fatalf("GetFieldsForKind(goal): %v", err)
+	}
+	if goalFields == nil {
+		t.Fatal("expected goalFields to not be nil")
+	}
+
+	// Verify started_at and completed_at from work_interval are in CommonFields
+	hasStartedAtCommon := false
+	hasCompletedAtCommon := false
+	for _, f := range goalFields.CommonFields {
+		if f.Name == "started_at" {
+			hasStartedAtCommon = true
+			if !f.Inherited {
+				t.Errorf("expected started_at to have Inherited=true, got %v", f.Inherited)
+			}
+		}
+		if f.Name == "completed_at" {
+			hasCompletedAtCommon = true
+			if !f.Inherited {
+				t.Errorf("expected completed_at to have Inherited=true, got %v", f.Inherited)
+			}
+		}
+	}
+	if !hasStartedAtCommon {
+		t.Errorf("expected started_at in CommonFields for goal")
+	}
+	if !hasCompletedAtCommon {
+		t.Errorf("expected completed_at in CommonFields for goal")
+	}
+
+	// Verify started_at and completed_at are NOT in SpecializedFields
+	for _, f := range goalFields.SpecializedFields {
+		if f.Name == "started_at" || f.Name == "completed_at" {
+			t.Errorf("expected %s NOT to be in SpecializedFields for goal", f.Name)
+		}
+	}
+
+	// Verify local fields like metric and authority ARE in SpecializedFields
+	hasMetric := false
+	hasAuthority := false
+	for _, f := range goalFields.SpecializedFields {
+		if f.Name == "metric" {
+			hasMetric = true
+		}
+		if f.Name == "authority" {
+			hasAuthority = true
+		}
+	}
+	if !hasMetric {
+		t.Errorf("expected metric in SpecializedFields for goal")
+	}
+	if !hasAuthority {
+		t.Errorf("expected authority in SpecializedFields for goal")
+	}
+}
+

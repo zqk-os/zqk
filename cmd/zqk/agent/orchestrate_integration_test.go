@@ -147,6 +147,10 @@ func setupOrchestrateTest(t *testing.T) (string, storage.ObjectStorageProvider) 
 						return err
 					}
 					copyDir(t, srcSpecs, dstSpecs)
+					workSpecs := filepath.Join(repoRoot, "packs", "work", "specs")
+					if entries, err := fileutil.ReadDir(workSpecs); err == nil && len(entries) > 0 {
+						copyDir(t, workSpecs, dstSpecs)
+					}
 
 					// FileObjectStorage binds a LifecycleLoader to this temp root, so every
 					// Create fails with "failed to read lifecycle file" unless the lifecycles
@@ -154,6 +158,11 @@ func setupOrchestrateTest(t *testing.T) (string, storage.ObjectStorageProvider) 
 					// destination first, source second.
 					if err := testenvroot.CopyLifecyclesFromProject(root, repoRoot); err != nil {
 						return err
+					}
+					dstLifecycles := filepath.Join(root, paths.ProcessInternalLifecyclesDir)
+					workLifecycles := filepath.Join(repoRoot, "packs", "work", "lifecycles")
+					if entries, err := fileutil.ReadDir(workLifecycles); err == nil && len(entries) > 0 {
+						copyDir(t, workLifecycles, dstLifecycles)
 					}
 
 					agentSkillSpecPath := filepath.Join(dstSpecs, "agent_skill_spec.yaml")
