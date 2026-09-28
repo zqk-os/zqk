@@ -95,7 +95,9 @@ func FindWorkspaceRoot(startPath string) string {
 			}
 		}
 		if _, err := fileutil.Stat(filepath.Join(dir, ProjectDataDir)); err == nil {
-			return dir
+			if !isIgnoredNestedProjectRoot(dir) {
+				return dir
+			}
 		}
 		if _, err := fileutil.Stat(gitEntry); err == nil {
 			break

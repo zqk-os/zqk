@@ -1,30 +1,22 @@
 {
   "project_root": "/Users/lanceettl/zqk-public-candidate",
   "bundle_name": "trace-pipeline-gen",
-  "target_object_id": "REQ-QA-NO-DATA-DISTINCTION",
-  "target_kind": "requirement",
-  "target_title": "Differentiate [no data] from [no failures] in QA Auditor and Invariant Gates",
+  "target_object_id": "MIL-ZQL-DECLARATIVE-MUTATIONS",
+  "target_kind": "milestone",
+  "target_title": "ZQL Declarative Mutation \u0026 Transaction Engine Specification",
   "target_pre_existed": true,
   "linked_existing_ids": [
-    "REQ-QA-NO-DATA-DISTINCTION"
+    "MIL-ZQL-DECLARATIVE-MUTATIONS"
   ],
-  "linkage_note": "Target requirement REQ-QA-NO-DATA-DISTINCTION pre-existed in Knowledge Kernel. Successfully linked 3 criteria (CRIT-1790566507927638000-374a31de, CRIT-1790566507927639000-f6d793a9, CRIT-1790566507927640000-d759f7d0), 1 test case (TST-1790566507927638001-ae96c84d), and 1 backlog item (BLI-1790566507927638000-3f86d335) to it.",
-  "created_criteria_ids": [
-    "CRIT-1790566507927638000-374a31de",
-    "CRIT-1790566507927639000-f6d793a9",
-    "CRIT-1790566507927640000-d759f7d0"
-  ],
+  "linkage_note": "Target milestone MIL-ZQL-DECLARATIVE-MUTATIONS pre-existed in Knowledge Kernel. Generated pipeline backlog items linked to milestone.",
   "created_backlog_item_ids": [
-    "BLI-1790566507927638000-3f86d335"
+    "BLI-1790595977099614000-11b8cc2b"
   ],
   "created_test_case_ids": [
-    "TST-1790566507927638001-ae96c84d"
+    "TST-1790595977099614001-9c28d923"
   ],
   "hint_to_id": {
-    "BLI-1790566507927638000-3f86d335": "BLI-1790566507927638000-3f86d335",
-    "CRIT-1790566507927638000-374a31de": "CRIT-1790566507927638000-374a31de",
-    "CRIT-1790566507927639000-f6d793a9": "CRIT-1790566507927639000-f6d793a9",
-    "CRIT-1790566507927640000-d759f7d0": "CRIT-1790566507927640000-d759f7d0",
-    "TST-1790566507927638001-ae96c84d": "TST-1790566507927638001-ae96c84d"
+    "BLI-1790595977099614000-11b8cc2b": "BLI-1790595977099614000-11b8cc2b",
+    "TST-1790595977099614001-9c28d923": "TST-1790595977099614001-9c28d923"
   }
 }
