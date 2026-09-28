@@ -285,26 +285,19 @@ func printSchemaInfo(w io.Writer, kind string) {
 		return
 	}
 
-	fields, err := registry.GetFieldsForKind(kind)
-	if err != nil || len(fields) == 0 {
+	kindFields, err := registry.GetFieldsForKind(kind)
+	if err != nil || kindFields == nil || len(kindFields.AllFields) == 0 {
 		fmt.Fprintf(w, "No schema fields found for kind %q.\n\n", kind)
 		return
 	}
 
-	fmt.Fprintf(w, "\nSchema Fields for %q (%d fields):\n", kind, len(fields))
-	fieldNames := make([]string, 0, len(fields))
-	for name := range fields {
-		fieldNames = append(fieldNames, name)
-	}
-	sort.Strings(fieldNames)
-
-	for _, name := range fieldNames {
-		info := fields[name]
+	fmt.Fprintf(w, "\nSchema Fields for %q (%d fields):\n", kind, len(kindFields.AllFields))
+	for _, info := range kindFields.AllFields {
 		reqStr := ""
 		if info.Required {
 			reqStr = " [REQUIRED]"
 		}
-		fmt.Fprintf(w, "  %-25s %-15s%s\n", name, info.Type, reqStr)
+		fmt.Fprintf(w, "  %-25s %-15s%s\n", info.Name, info.Type, reqStr)
 	}
 	fmt.Fprintln(w)
 }

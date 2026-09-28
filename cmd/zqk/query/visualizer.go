@@ -90,7 +90,7 @@ func formatPathPatternResults(sb *strings.Builder, result *traversal.QueryResult
 }
 
 func formatNodeListResults(sb *strings.Builder, result *traversal.QueryResult) {
-	for rowIdx, row := range result.Rows {
+	for _, row := range result.Rows {
 		primaryID := ""
 		for _, h := range result.Headers {
 			if strings.HasSuffix(h, ".id") || strings.EqualFold(h, "id") {
