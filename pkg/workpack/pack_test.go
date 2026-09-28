@@ -45,3 +45,9 @@ func TestRegisterRequiresARoot(t *testing.T) {
 		t.Fatal("Register did not record the root")
 	}
 }
+
+func TestBuilderCountMatchesKinds(t *testing.T) {
+	if BuilderCount() != len(Kinds()) {
+		t.Fatalf("builders %d kinds %d", BuilderCount(), len(Kinds()))
+	}
+}

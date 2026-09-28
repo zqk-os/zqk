@@ -6,6 +6,7 @@ package workpack
 import (
 	"github.com/spf13/cobra"
 
+	packbldr "github.com/zqk-os/zqk/packs/work/bldr_instance_v1"
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
@@ -32,7 +33,16 @@ func Kinds() []string {
 var (
 	enabled    bool
 	linkedRoot bool
+	builders   = []any{
+		packbldr.NewGoalInstanceBuilder,
+		packbldr.NewRequirementInstanceBuilder,
+		packbldr.NewCriteriaInstanceBuilder,
+		packbldr.NewTestCaseInstanceBuilder,
+	}
 )
+
+// BuilderCount is the number of generated constructors this pack links.
+func BuilderCount() int { return len(builders) }
 
 // Enable records that the composition root linked this pack.
 func Enable() { enabled = true }
