@@ -291,6 +291,7 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 		before := len(state.items)
 		var kept []map[string]any
 		var skipped int
+		var skippedDetails []string
 		for _, item := range state.items {
 			res := validation.EvaluateShovelReady(item)
 			if res.Ready {
@@ -299,6 +300,8 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 			}
 			skipped++
 			id := koi.ID(item)
+			missingList := strings.Join(res.Missing, ", ")
+			skippedDetails = append(skippedDetails, fmt.Sprintf("%s lacking [%s]", id, missingList))
 			logging.FluentEvent(state.proc.Logger()).Info("orchestrate skipped non-shovel-ready BLI").
 				ObjectID(id).
 				String("missing", strings.Join(res.Missing, ",")).
@@ -307,9 +310,13 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 		}
 		state.items = kept
 		if skipped > 0 {
+			detailStr := ""
+			if len(skippedDetails) > 0 {
+				detailStr = fmt.Sprintf(": %s", strings.Join(skippedDetails, "; "))
+			}
 			_ = cli.WriteOutput(state.cmd, []byte(fmt.Sprintf(
-				"ℹ️  Shovel-ready gate (%s) kept %d/%d (skipped %d lacking CRI-SHOVEL-READY fields).\n",
-				validation.CriteriaIDShovelReady, len(kept), before, skipped,
+				"ℹ️  Shovel-ready gate (%s) kept %d/%d (skipped %d lacking CRI-SHOVEL-READY fields%s).\n",
+				validation.CriteriaIDShovelReady, len(kept), before, skipped, detailStr,
 			)))
 		}
 		return state, nil

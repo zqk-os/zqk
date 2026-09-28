@@ -222,9 +222,9 @@ func init() {
 			"Everyday (orientation): workflow whats-next, object, system, pplan, auth.\n"+paths.RewriteCanonicalCLIInvocations("Draft objects: zqk object template <kind> (canonical). quick/new are shortcuts — see their --help.\n")+paths.RewriteCanonicalCLIInvocations("Health: zqk system check (warm cache; repeat runs should be fast). Scheduler + integrations below.\n")+
 				"Privileged / developer: internal (admin), keystore; use only when documented for your role.\n"+
 				"The zqk-admin binary (cmd/zqk-admin) shares this same command tree and bootstrap as zqk.\n"+
-				"See "+filepath.Join(paths.ProcessDir, "enforcement", "AGENT_GUIDELINES.md")+" (CLI command surfaces).",
+				"See docs/onboarding/AI_AGENT_ONBOARDING.md and .agents/AGENTS.md (CLI command surfaces).",
 		).
-		AddSection("Documentation (Divio Index)", "Tutorials: "+filepath.Join(paths.ProcessDir, "architecture", "QUICK_CREATE_OBJECTS.md")+", "+filepath.Join(paths.ProcessDir, "onboarding", "README.md")+"\nHow-To: "+filepath.Join(paths.ProcessDir, "architecture", "graph-backend", "ENABLING_GRAPH_BACKEND.md")+"\nReference: "+filepath.Join(paths.ProcessDir, "ontology", "system-ontology-v1.0.md")+"\nExplanation (Dated Architecture): "+filepath.Join(paths.ProcessDir, "architecture", "README.md")).WithAutoDiscoverSubcommands(true)
+		AddSection("Documentation (Divio Index)", "Tutorials: docs/onboarding/COMMUNITY_FIRST_RUN.md, docs/tutorials/INTERACTIVE_OBJECT_INSPECTION_TUTORIAL.md\nHow-To: docs/howto/INSPECT_AND_VALIDATE_OBJECTS.md, docs/howto/SCHEDULER_AND_MAINTENANCE.md\nReference: docs/INDEX.md, docs/architecture/INDEX.md\nExplanation: docs/explanation/README.md, docs/architecture/README.md").WithAutoDiscoverSubcommands(true)
 	helpBuilder.ApplyToCommand(rootCmd)
 
 	// Wire synonym resolver and cache handler when storage is first created (on demand by object commands).
