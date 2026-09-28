@@ -300,6 +300,7 @@ prompt_*.md
 prompt_*.json
 *PROMPT*.md
 *prompt*.md
+!docs/quality/codebase_evaluation/KICKOFF_PROMPT.md
 SUBAGENT_PROMPT.md
 actual_prompt.*
 steer_msg*.txt
