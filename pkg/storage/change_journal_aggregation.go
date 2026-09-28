@@ -11,7 +11,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
 	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	"github.com/zqk-os/zqk/pkg/validation"
 )
@@ -183,15 +182,13 @@ func (s *ChangeJournalAggregationService) aggregateEntries(
 	}
 
 	// Get instance builder from registry (spec-driven); fallback to valid schema version so instance validation passes
-	registry := instance_builders.GetGlobalRegistry()
-	schemaVersion, err := registry.GetLatestVersion(MetricKindAuditAggregation)
+	schemaVersion, err := instance_builders.SchemaVersionForKind(MetricKindAuditAggregation)
 	if err != nil {
 		schemaVersion = objects.DefaultSchemaVersion
 	} else {
 		schemaVersion = objects.ValidSchemaVersion(schemaVersion)
 	}
-	// Create a fresh builder instance for this use (not from registry singleton)
-	builder := bldr_instance_v1.NewAuditAggregationMetricInstanceBuilder(schemaVersion)
+	builder := instance_builders.NewForKind(MetricKindAuditAggregation, schemaVersion)
 
 	// Generate ID for the metric (required by builder.Build())
 	var metricID string
@@ -216,8 +213,8 @@ func (s *ChangeJournalAggregationService) aggregateEntries(
 	// Build audit aggregation metric using instance builder
 	// Builder automatically handles: namespace_id, origin_project, origin_system, audit fields
 	// Status must match audit_aggregation_metric lifecycle: completed, archived, error
-	builder.ID(metricID).
-		Status("completed").
+	builder.SetID(metricID).
+		SetStatus("completed").
 		SetField(MetricFieldTitle, title).
 		SetField(MetricFieldMetricType, StorageMetricTypeSystem).
 		SetField(MetricFieldSource, ChangeJournalAggregationMetricSource).
@@ -229,15 +226,15 @@ func (s *ChangeJournalAggregationService) aggregateEntries(
 	// (namespace_id, origin_project, origin_system) are automatically set by builder.Build()
 
 	// Set audit aggregation specific fields
-	builder.AggregationWindowStart(windowStartStr).
-		AggregationWindowEnd(windowEndStr).
-		EventCount(len(entries))
+	builder.SetField(objects.FieldKeyAggregationWindowStart, windowStartStr).
+		SetField(objects.FieldKeyAggregationWindowEnd, windowEndStr).
+		SetField(objects.FieldKeyEventCount, len(entries))
 	// Convert map[string]int to map[string]any for builder
 	eventTypeCountsAny := make(map[string]any, len(eventTypeCounts))
 	for k, v := range eventTypeCounts {
 		eventTypeCountsAny[k] = v
 	}
-	builder.EventTypeCounts(eventTypeCountsAny)
+	builder.SetField(objects.FieldKeyEventTypeCounts, eventTypeCountsAny)
 
 	// Build the instance
 	aggregationMetric, err := builder.Build()

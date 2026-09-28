@@ -13,9 +13,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/metricsrecording"
 	"github.com/zqk-os/zqk/pkg/objects"
-	commandMetricEnum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/command_metric"
-	fileLockMetricEnum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/file_lock_metric"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
 	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/zqktime"
@@ -48,15 +45,12 @@ const (
 // This ensures consistency across all metric creation points
 type MetricFactory struct {
 	storageProvider storage.ObjectStorageProvider
-	registry        *instance_builders.VersionedInstanceBuilderRegistry
 }
 
 // NewMetricFactory creates a new metric factory
 func NewMetricFactory(storageProvider storage.ObjectStorageProvider) *MetricFactory {
-	registry := instance_builders.GetGlobalRegistry()
 	return &MetricFactory{
 		storageProvider: storageProvider,
-		registry:        registry,
 	}
 }
 
@@ -80,10 +74,8 @@ func (f *MetricFactory) CreateMetric(ctx context.Context, req *MetricCreationReq
 	if !metricsrecording.EnabledForKind(req.Kind) {
 		return "", nil
 	}
-	// Get schema version from registry
-	schemaVersion, err := f.registry.GetLatestVersion(req.Kind)
+	schemaVersion, err := instance_builders.SchemaVersionForKind(req.Kind)
 	if err != nil {
-		// Fallback to default schema version
 		schemaVersion = objects.DefaultSchemaVersion
 	}
 
@@ -235,64 +227,41 @@ func (f *MetricFactory) CreateMetricFromInstanceAsync(
 		})
 }
 
-// createBuilder creates the appropriate builder for a metric kind
-func (f *MetricFactory) createBuilder(kind, schemaVersion string) any {
-	switch kind {
-	case kindFileLockMetric:
-		return bldr_instance_v1.NewFileLockMetricInstanceBuilder(schemaVersion)
-	case kindCommandMetric:
-		return bldr_instance_v1.NewCommandMetricInstanceBuilder(schemaVersion)
-	default:
+// createBuilder returns a spec-backed builder for kind.
+func (f *MetricFactory) createBuilder(kind, schemaVersion string) instance_builders.InstanceBuilder {
+	if kind == "" {
 		return nil
 	}
+	return instance_builders.NewForKind(kind, schemaVersion)
 }
 
 // setCommonFields sets common fields on the builder
-func (f *MetricFactory) setCommonFields(builder any, req *MetricCreationRequest) {
-	// Generate ID (simplified - in production would use proper ID generation)
+func (f *MetricFactory) setCommonFields(builder instance_builders.InstanceBuilder, req *MetricCreationRequest) {
+	if builder == nil || req == nil {
+		return
+	}
 	metricID := fmt.Sprintf(metricIDFmt, time.Now().UnixNano())
-
-	// Use type assertion to set fields based on builder type
-	switch b := builder.(type) {
-	case *bldr_instance_v1.FileLockMetricInstanceBuilder:
-		b.ID(metricID).
-			Title(req.Title).
-			MetricType(fileLockMetricEnum.MetricType(req.MetricType)).
-			Source(req.Source).
-			Tags(req.Tags).
-			CollectionCount(req.EventCount).
-			FirstSeen(zqktime.FormatRFC3339UTC(req.WindowStart)).
-			LastSeen(zqktime.FormatRFC3339UTC(req.WindowEnd))
-		// Set metric-specific fields
-		for k, v := range req.Fields {
-			b.SetField(k, v)
-		}
-	case *bldr_instance_v1.CommandMetricInstanceBuilder:
-		b.ID(metricID).
-			Title(req.Title).
-			MetricType(commandMetricEnum.MetricType(req.MetricType)).
-			Source(req.Source).
-			Tags(req.Tags).
-			CollectionCount(req.EventCount).
-			FirstSeen(zqktime.FormatRFC3339UTC(req.WindowStart)).
-			LastSeen(zqktime.FormatRFC3339UTC(req.WindowEnd))
-		// Set metric-specific fields
-		for k, v := range req.Fields {
-			b.SetField(k, v)
-		}
+	windowStart := zqktime.FormatRFC3339UTC(req.WindowStart)
+	windowEnd := zqktime.FormatRFC3339UTC(req.WindowEnd)
+	builder.SetID(metricID).
+		SetField(objects.FieldKeyTitle, req.Title).
+		SetField(objects.FieldKeyMetricType, req.MetricType).
+		SetField(objects.FieldKeySource, req.Source).
+		SetField(objects.FieldKeyTags, req.Tags).
+		SetField(objects.FieldKeyCollectionCount, req.EventCount).
+		SetField(objects.FieldKeyFirstSeen, windowStart).
+		SetField(objects.FieldKeyLastSeen, windowEnd)
+	for k, v := range req.Fields {
+		builder.SetField(k, v)
 	}
 }
 
 // buildInstance builds the instance from the builder
-func (f *MetricFactory) buildInstance(builder any) (map[string]any, error) {
-	type buildable interface {
-		Build() (map[string]any, error)
-	}
-	b, ok := builder.(buildable)
-	if !ok {
+func (f *MetricFactory) buildInstance(builder instance_builders.InstanceBuilder) (map[string]any, error) {
+	if builder == nil {
 		return nil, errors.New(errUnsupportedBuilderType)
 	}
-	return b.Build()
+	return builder.Build()
 }
 
 // CreateMetricFromConfig creates a metric using CreateBaseMetricObject pattern

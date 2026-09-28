@@ -205,22 +205,7 @@ func (sb *ScenarioBuilder) generateObject(kind string, index, diversity int, spe
 		schemaVersion = spec.SchemaVersion
 	}
 
-	// Get instance builder from registry
-	registry := instancebuilders.GetGlobalRegistry()
-	builder, err := registry.GetBuilder(kind, schemaVersion)
-	if err != nil {
-		logging.FluentEvent(sb.logger).Warn("Failed to get instance builder, using minimal object").
-			String("kind", kind).
-			String("schema_version", schemaVersion).
-			WithError(err).
-			Log()
-		// Return minimal object if builder not available
-		return map[string]any{
-			objects.FieldKeyKind:          kind,
-			objects.FieldKeyTitle:         fixtureScenarioObjectTitle(kind, index+1),
-			objects.FieldKeySchemaVersion: schemaVersion,
-		}
-	}
+	builder := instancebuilders.NewForKind(kind, schemaVersion)
 
 	// Use instance builder
 	// Basic fields

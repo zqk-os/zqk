@@ -11,7 +11,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/metricsrecording"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/zqktime"
 )
@@ -51,27 +51,27 @@ func BuildCacheValidationBaseMetricInstance(metricID string, jsonPayload []byte,
 		oc = meta.AsyncStrategyKinds + meta.KindValidationMetrics
 	}
 
-	builder := bldr_instance_v1.NewBaseMetricInstanceBuilder(objects.DefaultSchemaVersion)
-	builder.ID(metricID).
-		Title(cacheValidationMetricTitle(meta.AsyncStrategyKinds, meta.KindValidationMetrics, meta.TotalValidationsSum)).
-		MetricType(MetricTypeSystem).
-		Source(MetricSourceCASValidationCache).
-		MetricTypeSpecific("cas_validation_cache_snapshot").
-		Tags(tags).
-		CollectionCount(1).
-		ObjectCount(oc).
-		ObjectKind("cas_validation_cache").
-		FirstSeen(start).
-		LastSeen(end).
-		WindowStart(start).
-		WindowEnd(end)
+	builder := instance_builders.NewForKind(objects.KindBaseMetric, objects.DefaultSchemaVersion)
+	builder.SetID(metricID).
+		SetField(objects.FieldKeyTitle, cacheValidationMetricTitle(meta.AsyncStrategyKinds, meta.KindValidationMetrics, meta.TotalValidationsSum)).
+		SetField(objects.FieldKeyMetricType, MetricTypeSystem).
+		SetField(objects.FieldKeySource, MetricSourceCASValidationCache).
+		SetField(objects.FieldKeyMetricTypeSpecific, "cas_validation_cache_snapshot").
+		SetField(objects.FieldKeyTags, tags).
+		SetField(objects.FieldKeyCollectionCount, 1).
+		SetField(objects.FieldKeyObjectCount, oc).
+		SetField(objects.FieldKeyObjectKind, "cas_validation_cache").
+		SetField(objects.FieldKeyFirstSeen, start).
+		SetField(objects.FieldKeyLastSeen, end).
+		SetField(objects.FieldKeyWindowStart, start).
+		SetField(objects.FieldKeyWindowEnd, end)
 
 	payload := string(jsonPayload)
 	if len(payload) > maxCacheValidationMetricsJSONLen {
 		suffix := "\n...(truncated)"
 		payload = payload[:maxCacheValidationMetricsJSONLen-len(suffix)] + suffix
 	}
-	builder.SetContext(map[string]any{objects.FieldKeyCasValidationCacheMetricsJSON: payload})
+	builder.SetField(objects.FieldKeyContext, map[string]any{objects.FieldKeyCasValidationCacheMetricsJSON: payload})
 
 	return builder.Build()
 }

@@ -5,7 +5,6 @@ import (
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
 )
 
 func TestResolveActor(t *testing.T) {
@@ -32,7 +31,10 @@ func TestBufferCheckMap(t *testing.T) {
 
 func TestPopulateEvent(t *testing.T) {
 	t.Parallel()
-	builder := bldr_instance_v1.NewAuditEventInstanceBuilder("2.0.0")
+	builder, err := NewEventBuilder()
+	if err != nil {
+		t.Fatalf("NewEventBuilder: %v", err)
+	}
 	PopulateEvent(builder, "AUD-1", "/proj", "ACC-1", "2026-01-01T00:00:00Z", &EventOptions{
 		EventType: EventTypeObjectCreation,
 		Operation: "create",

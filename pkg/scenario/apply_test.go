@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/objects"
-	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1" // register goal builder for test
 	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -107,11 +106,7 @@ func TestApplyScenarioBundle_CreatesTraceabilityObjects(t *testing.T) {
 	secCtx := env.SecurityContext
 
 	// Requirement spec requires goal_refs (minCount: 1). Create one goal so the bundle can reference it.
-	reg := instance_builders.GetGlobalRegistry()
-	goalBuilder, err := reg.GetBuilder("goal", objects.DefaultSchemaVersion)
-	if err != nil {
-		t.Fatalf("get goal builder: %v", err)
-	}
+	goalBuilder := instance_builders.NewForKind(objects.KindGoal, objects.DefaultSchemaVersion)
 	goalBuilder.SetID("GOAL-TRACE-001")
 	goalBuilder.SetField(objects.FieldKeyTitle, "Traceability test goal")
 	goalBuilder.SetStatus("active")
@@ -345,8 +340,7 @@ func TestApplyScenarioBundle_EmitsScenarioSummary(t *testing.T) {
 	}
 
 	// Use minimal bundle (goal + requirement + criteria without requirement_ref to avoid Update path).
-	reg := instance_builders.GetGlobalRegistry()
-	goalBuilder, _ := reg.GetBuilder("goal", objects.DefaultSchemaVersion)
+	goalBuilder := instance_builders.NewForKind(objects.KindGoal, objects.DefaultSchemaVersion)
 	goalBuilder.SetID("GOAL-SUM-001")
 	goalBuilder.SetField(objects.FieldKeyTitle, "Summary test goal")
 	goalBuilder.SetStatus("active")

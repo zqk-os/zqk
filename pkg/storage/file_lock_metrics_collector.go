@@ -11,7 +11,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/metricsrecording"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
 	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	"github.com/zqk-os/zqk/pkg/zqktime"
 )
@@ -71,14 +70,12 @@ func (c *FileLockMetricsCollector) CollectMetrics(
 	// NOTE: We create a fresh builder instance for each use to avoid concurrent map writes.
 	// Builders from the registry are singleton instances with stateful fields maps that are not thread-safe.
 	// While file lock metrics collection jobs are not concurrent, this prevents issues if concurrency is enabled in the future.
-	registry := instance_builders.GetGlobalRegistry()
-	schemaVersion, err := registry.GetLatestVersion(MetricKindFileLockMetric)
+	schemaVersion, err := instance_builders.SchemaVersionForKind(MetricKindFileLockMetric)
 	if err != nil {
 		return "", errfmt.Newf(ConstMiscFailedToGetLatestSchemaVersionForFileLoc).Wrap(err)
 	}
 
-	// Create a fresh builder instance for this use (not from registry singleton)
-	builder := bldr_instance_v1.NewFileLockMetricInstanceBuilder(schemaVersion)
+	builder := instance_builders.NewForKind(MetricKindFileLockMetric, schemaVersion)
 
 	// Generate ID for the metric (required by builder.Build())
 	// Uses thread-safe batch generator (via generateID) for non-CAS kinds, consistent with other ID generation
@@ -109,32 +106,32 @@ func (c *FileLockMetricsCollector) CollectMetrics(
 	// Build file lock metric using instance builder
 	// Builder automatically handles: created_at, updated_at, created_by, updated_by, namespace_id, origin_project, origin_system
 	// Set status explicitly so lifecycle validation passes (use "completed" to align with metric lifecycles that allow it)
-	builder.ID(metricID). // Set ID before building (required by builder)
-				Status("completed").
-				SetField(MetricFieldTitle, title).
-				SetField(MetricFieldMetricType, StorageMetricTypePerformance).
-				SetField(MetricFieldSource, FileLockMetricSource).
-				SetField(MetricFieldTags, []string{StorageMetricTagFileLock, StorageMetricTagConcurrency, StorageMetricTypePerformance}).
-				SetField(MetricFieldCollectionCount, 1).
-				SetField(MetricFieldFirstSeen, windowStartStr).
-				SetField(MetricFieldLastSeen, windowEndStr)
+	builder.SetID(metricID).
+		SetStatus("completed").
+		SetField(MetricFieldTitle, title).
+		SetField(MetricFieldMetricType, StorageMetricTypePerformance).
+		SetField(MetricFieldSource, FileLockMetricSource).
+		SetField(MetricFieldTags, []string{StorageMetricTagFileLock, StorageMetricTagConcurrency, StorageMetricTypePerformance}).
+		SetField(MetricFieldCollectionCount, 1).
+		SetField(MetricFieldFirstSeen, windowStartStr).
+		SetField(MetricFieldLastSeen, windowEndStr)
 	// Note: Audit fields (created_at, updated_at, created_by, updated_by) and metric defaults
 	// (namespace_id, origin_project, origin_system, status) are automatically set by builder.Build()
 
 	// Set file lock specific fields
-	builder.TotalAcquisitions(int(snapshot.TotalAcquisitions)).
-		TotalFailures(int(snapshot.TotalFailures)).
-		TotalTimeouts(int(snapshot.TotalTimeouts)).
-		TotalContention(int(snapshot.TotalContention)).
-		AvgAcquisitionTimeMs(float64(avgAcquisitionTime.Nanoseconds()) / 1e6).
-		AvgWaitTimeMs(float64(avgWaitTime.Nanoseconds()) / 1e6).
-		MaxAcquisitionTimeMs(float64(snapshot.MaxAcquisitionTime.Nanoseconds()) / 1e6).
-		MaxWaitTimeMs(float64(snapshot.MaxWaitTime.Nanoseconds()) / 1e6).
-		ContentionRate(contentionRate * 100).
-		SuccessRate(successRate * 100).
-		PeakContention(int(snapshot.PeakContention)).
-		MeasurementWindowStart(windowStartStr).
-		MeasurementWindowEnd(windowEndStr)
+	builder.SetField(objects.FieldKeyTotalAcquisitions, int(snapshot.TotalAcquisitions)).
+		SetField(objects.FieldKeyTotalFailures, int(snapshot.TotalFailures)).
+		SetField(objects.FieldKeyTotalTimeouts, int(snapshot.TotalTimeouts)).
+		SetField(objects.FieldKeyTotalContention, int(snapshot.TotalContention)).
+		SetField(objects.FieldKeyAvgAcquisitionTimeMs, float64(avgAcquisitionTime.Nanoseconds())/1e6).
+		SetField(objects.FieldKeyAvgWaitTimeMs, float64(avgWaitTime.Nanoseconds())/1e6).
+		SetField(objects.FieldKeyMaxAcquisitionTimeMs, float64(snapshot.MaxAcquisitionTime.Nanoseconds())/1e6).
+		SetField(objects.FieldKeyMaxWaitTimeMs, float64(snapshot.MaxWaitTime.Nanoseconds())/1e6).
+		SetField(objects.FieldKeyContentionRate, contentionRate*100).
+		SetField(objects.FieldKeySuccessRate, successRate*100).
+		SetField(objects.FieldKeyPeakContention, int(snapshot.PeakContention)).
+		SetField(objects.FieldKeyMeasurementWindowStart, windowStartStr).
+		SetField(objects.FieldKeyMeasurementWindowEnd, windowEndStr)
 
 	// Build the instance
 	instance, err := builder.Build()

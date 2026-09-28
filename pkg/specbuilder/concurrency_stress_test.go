@@ -35,40 +35,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
 )
 
-// specBuilderAdapter wraps builders.SpecBuilder to satisfy instance_builders.SpecBuilderInterface
-type specBuilderAdapter struct {
-	builder builders.SpecBuilder
-}
-
-func (s specBuilderAdapter) Build() any {
-	return s.builder.Build()
-}
-
-func (s specBuilderAdapter) GetVersion() string {
-	return s.builder.GetVersion()
-}
-
-func (s specBuilderAdapter) GetOntology() string {
-	return s.builder.GetOntology()
-}
-
-// specRegistryAdapter wraps builders.VersionedBuilderRegistry to satisfy instance_builders.SpecBuilderRegistryInterface
-type specRegistryAdapter struct {
-	reg *builders.VersionedBuilderRegistry
-}
-
-func (a specRegistryAdapter) GetBuilder(ontology, version string) (instance_builders.SpecBuilderInterface, error) {
-	b, err := a.reg.GetBuilder(ontology, version)
-	if err != nil {
-		return nil, err
-	}
-	return specBuilderAdapter{builder: b}, nil
-}
-
-func (a specRegistryAdapter) GetLatestVersion(ontology string) (string, error) {
-	return a.reg.GetLatestVersion(ontology)
-}
-
 // TestConcurrencySpecGenerator runs builders.SpecGenerator concurrently
 func TestConcurrencySpecGenerator(t *testing.T) {
 	t.Parallel()
@@ -395,12 +361,7 @@ func TestInstanceGeneratorIsSequential(t *testing.T) {
 	t.Parallel()
 
 	tmpDir := t.TempDir()
-	registry := instance_builders.NewVersionedInstanceBuilderRegistry(specRegistryAdapter{reg: builders.GetGlobalRegistry()})
-
-	// Register account builder
-	registry.Register(bldr_instance_v1.NewAccountInstanceBuilder(objects.DefaultSchemaVersion))
-
-	generator := instance_builders.NewInstanceGenerator(tmpDir, registry)
+	generator := instance_builders.NewInstanceGenerator(tmpDir)
 
 	// Generate sequentially
 	err := generator.GenerateInstance("account", "ACC-STRESS-101", objects.DefaultSchemaVersion)

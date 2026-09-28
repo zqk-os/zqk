@@ -11,7 +11,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/metricsrecording"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/validation"
 	"github.com/zqk-os/zqk/pkg/zqktime"
@@ -77,20 +77,20 @@ func BuildAsyncValidationBaseMetricInstance(
 		tags = append(tags, truncateTag(operationID, 50))
 	}
 
-	builder := bldr_instance_v1.NewBaseMetricInstanceBuilder(objects.DefaultSchemaVersion)
-	builder.ID(metricID).
-		Title(asyncValidationMetricTitle(vm.ValidatedObjects, vm.FailedObjects, vm.TotalObjects)).
-		MetricType(MetricTypeSystem).
-		Source(MetricSourceAsyncValidation).
-		MetricTypeSpecific("validation_async_check").
-		Tags(tags).
-		CollectionCount(1).
-		ObjectCount(vm.TotalObjects).
-		ObjectKind("async_validation").
-		FirstSeen(start).
-		LastSeen(endStr).
-		WindowStart(start).
-		WindowEnd(endStr)
+	builder := instance_builders.NewForKind(objects.KindBaseMetric, objects.DefaultSchemaVersion)
+	builder.SetID(metricID).
+		SetField(objects.FieldKeyTitle, asyncValidationMetricTitle(vm.ValidatedObjects, vm.FailedObjects, vm.TotalObjects)).
+		SetField(objects.FieldKeyMetricType, MetricTypeSystem).
+		SetField(objects.FieldKeySource, MetricSourceAsyncValidation).
+		SetField(objects.FieldKeyMetricTypeSpecific, "validation_async_check").
+		SetField(objects.FieldKeyTags, tags).
+		SetField(objects.FieldKeyCollectionCount, 1).
+		SetField(objects.FieldKeyObjectCount, vm.TotalObjects).
+		SetField(objects.FieldKeyObjectKind, "async_validation").
+		SetField(objects.FieldKeyFirstSeen, start).
+		SetField(objects.FieldKeyLastSeen, endStr).
+		SetField(objects.FieldKeyWindowStart, start).
+		SetField(objects.FieldKeyWindowEnd, endStr)
 
 	payload := string(jsonPayload)
 	if len(payload) > maxValidationMetricsJSONLen {
@@ -101,7 +101,7 @@ func BuildAsyncValidationBaseMetricInstance(
 	if operationID != emptyValue {
 		contextMap[objects.FieldKeyOperationID] = operationID
 	}
-	builder.SetContext(contextMap)
+	builder.SetField(objects.FieldKeyContext, contextMap)
 
 	return builder.Build()
 }

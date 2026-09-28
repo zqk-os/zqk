@@ -124,12 +124,7 @@ func createImpactAnalysisObject(changeRef, changeType string, affectedZqkObjects
 	impactID := generateImpactAnalysisID()
 
 	// Use instance builder for type safety and consistency
-	registry := instancebuilders.GetGlobalRegistry()
-	builder, err := registry.GetBuilder(objects.KindImpactAnalysis, objects.DefaultSchemaVersion)
-	if err != nil {
-		// Fallback to manual construction if builder not available
-		return createImpactAnalysisObjectManual(impactID, changeRef, changeType, affectedZqkObjects), nil
-	}
+	builder := instancebuilders.NewForKind(objects.KindImpactAnalysis, objects.DefaultSchemaVersion)
 
 	status := getImpactAnalysisStatus()
 	// Use generic SetField interface (all instance builders implement this)

@@ -13,8 +13,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
-	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1" // Register instance builders for tests
-	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2"          // Register builders for tests
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2" // Register spec builders for tests
 	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
 	instancebuilders "github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -56,17 +55,11 @@ func TestCAS_BaselineValidation(t *testing.T) {
 	}
 
 	// Create multiple objects of different kinds to test baseline collection
-	// Use instance builders to create valid objects that pass validation
-	registry := instancebuilders.GetGlobalRegistry()
 	schemaVersion := objects.DefaultSchemaVersion
 
 	var testObjects []map[string]any
 
-	// Create goal GOAL-123
-	goalBuilder, err := registry.GetBuilder("goal", schemaVersion)
-	if err != nil {
-		t.Fatalf("Failed to get goal builder: %v", err)
-	}
+	goalBuilder := instancebuilders.NewForKind(objects.KindGoal, schemaVersion)
 	goalBuilder.SetID("GOAL-123")
 	goalBuilder.SetField(objects.FieldKeyTitle, "Test Goal")
 	goalBuilder.SetField(objects.FieldKeyDescription, "This is a sufficiently long description for the goal object")
@@ -77,11 +70,7 @@ func TestCAS_BaselineValidation(t *testing.T) {
 	}
 	testObjects = append(testObjects, goalObj)
 
-	// Create backlog_item BLI-001
-	builder1, err := registry.GetBuilder("backlog_item", schemaVersion)
-	if err != nil {
-		t.Fatalf("Failed to get backlog_item builder: %v", err)
-	}
+	builder1 := instancebuilders.NewForKind(objects.KindBacklogItem, schemaVersion)
 	builder1.SetID("BLI-001")
 	builder1.SetField(objects.FieldKeyTitle, "Baseline Test 1")
 	builder1.SetField(objects.FieldKeyGoalRefs, []any{"GOAL-123"})
@@ -92,11 +81,7 @@ func TestCAS_BaselineValidation(t *testing.T) {
 	}
 	testObjects = append(testObjects, obj1)
 
-	// Create backlog_item BLI-002
-	builder2, err := registry.GetBuilder("backlog_item", schemaVersion)
-	if err != nil {
-		t.Fatalf("Failed to get backlog_item builder: %v", err)
-	}
+	builder2 := instancebuilders.NewForKind(objects.KindBacklogItem, schemaVersion)
 	builder2.SetID("BLI-002")
 	builder2.SetField(objects.FieldKeyTitle, "Baseline Test 2")
 	builder2.SetField(objects.FieldKeyGoalRefs, []any{"GOAL-123"})
@@ -107,11 +92,7 @@ func TestCAS_BaselineValidation(t *testing.T) {
 	}
 	testObjects = append(testObjects, obj2)
 
-	// Create milestone MIL-001
-	builder3, err := registry.GetBuilder("milestone", schemaVersion)
-	if err != nil {
-		t.Fatalf("Failed to get milestone builder: %v", err)
-	}
+	builder3 := instancebuilders.NewForKind(objects.KindMilestone, schemaVersion)
 	builder3.SetID("MIL-001")
 	builder3.SetField(objects.FieldKeyTitle, "Baseline Milestone")
 	builder3.SetStatus("not_started")
@@ -121,11 +102,7 @@ func TestCAS_BaselineValidation(t *testing.T) {
 	}
 	testObjects = append(testObjects, obj3)
 
-	// Create doc_entry DOC-001
-	builder4, err := registry.GetBuilder("doc_entry", schemaVersion)
-	if err != nil {
-		t.Fatalf("Failed to get doc_entry builder: %v", err)
-	}
+	builder4 := instancebuilders.NewForKind(objects.KindDocEntry, schemaVersion)
 	builder4.SetID("DOC-001")
 	builder4.SetField(objects.FieldKeyTitle, "Baseline Document")
 	builder4.SetField(objects.FieldKeyPath, "docs/baseline.md")

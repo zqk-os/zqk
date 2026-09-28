@@ -6,7 +6,6 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
-	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1" // register doc_entry, convergence_session builders
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 

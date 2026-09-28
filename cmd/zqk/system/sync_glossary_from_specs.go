@@ -21,7 +21,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	glossary_term "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/glossary_terms"
-	bldr_instance_v1 "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/validation"
@@ -246,18 +246,18 @@ func createGlossaryCandidate(cmd *cobra.Command, sp storage.ObjectStorageProvide
 		return false, errfmt.Errorf("generate glossary_term id: %w", err)
 	}
 
-	b := bldr_instance_v1.NewGlossaryTermInstanceBuilder(objects.DefaultSchemaVersion).
-		ID(newID).
-		Title(c.Title).
-		ContextScope(c.Context).
-		Category(c.Category).
-		Definition(c.Definition).
-		AgentPrompts(c.AgentPrompt).
-		MachineHints(c.MachineHint).
-		SourceType("internal").
-		OriginProject("zqk").
-		OriginSystem("zqk").
-		Status(glossary_term.StatusActive)
+	b := instance_builders.NewForKind(objects.KindGlossaryTerm, objects.DefaultSchemaVersion)
+	b.SetID(newID).
+		SetField(objects.FieldKeyTitle, c.Title).
+		SetField(objects.FieldKeyContextScope, c.Context).
+		SetField(objects.FieldKeyCategory, c.Category).
+		SetField(objects.FieldKeyDefinition, c.Definition).
+		SetField(objects.FieldKeyAgentPrompts, c.AgentPrompt).
+		SetField(objects.FieldKeyMachineHints, c.MachineHint).
+		SetField(objects.FieldKeySourceType, "internal").
+		SetField(objects.FieldKeyOriginProject, "zqk").
+		SetField(objects.FieldKeyOriginSystem, "zqk").
+		SetStatus(string(glossary_term.StatusActive))
 
 	instance, err := b.Build()
 	if err != nil {

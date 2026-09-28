@@ -18,6 +18,7 @@ import (
 )
 
 const enumModuleBasePath = "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1"
+const kernelModulePath = "github.com/zqk-os/zqk"
 
 const (
 	enumCodegenFieldTypeEnum      = "enum"
@@ -96,8 +97,7 @@ func generateEnumsForSpec(specPath, outputDir string) error {
 		formatted = []byte(code)
 	}
 
-	parentDir := filepath.Dir(outputDir)
-	enumRoot := filepath.Join(parentDir, "bldr_enum_v1")
+	enumRoot := EnumOutput(outputDir)
 	enumDir := filepath.Join(enumRoot, sanitizePackageName(ontology))
 	if err := fileutil.MkdirAll(enumDir, defaultDirectoryPerm); err != nil {
 		return errfmt.Newf("failed to create enum package dir").Wrap(err)
@@ -285,8 +285,7 @@ func ensureDomainSharedStatusPackage(specPath, outputDir, ontology string) (*sha
 	if err != nil {
 		formatted = []byte(file.String())
 	}
-	parentDir := filepath.Dir(outputDir)
-	enumRoot := filepath.Join(parentDir, "bldr_enum_v1")
+	enumRoot := EnumOutput(outputDir)
 	outDir := filepath.Join(enumRoot, pkgSegment)
 	if err := fileutil.MkdirAll(outDir, defaultDirectoryPerm); err != nil {
 		return nil, errfmt.Newf("create shared status dir").Wrap(err)

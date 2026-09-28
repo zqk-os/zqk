@@ -66,6 +66,50 @@ func isSystemField(fieldName string) bool {
 	return getSystemFields.lookup[fieldName]
 }
 
+const (
+	generatedInstancePackage = "bldr_instance_v1"
+	generatedEnumPackage     = "bldr_enum_v1"
+	// DefaultInstanceBuilderToolDir is the kernel generator directory.
+	// A pack passes its own instance_builders directory instead.
+	DefaultInstanceBuilderToolDir = "pkg/specbuilder/instance_builders"
+)
+
+// InstanceBuilderOutput is where generated instance builders are written.
+// outputDir is the generator tool directory (…/instance_builders). The files
+// land in the sibling package, so a pack passes its own tool directory and
+// the kernel default stays pkg/specbuilder/instance_builders.
+func InstanceBuilderOutput(outputDir string) (dir, packageName string) {
+	packageName = generatedInstancePackage
+	dir = filepath.Join(filepath.Dir(outputDir), packageName)
+	return dir, packageName
+}
+
+// EnumOutput is the sibling enum root for the same tool directory.
+func EnumOutput(outputDir string) string {
+	return filepath.Join(filepath.Dir(outputDir), generatedEnumPackage)
+}
+
+// EnumImportBase is the Go import prefix for enums written beside outputDir.
+// The kernel tool directory keeps github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1.
+// A relative tool directory inside this module imports its sibling enum tree.
+// An absolute or out-of-module directory keeps the kernel enum import so scratch
+// generation still compiles against the enums that ship with the kernel.
+func EnumImportBase(outputDir string) string {
+	enumDir := filepath.Clean(EnumOutput(outputDir))
+	kernelEnum := filepath.Clean(filepath.Join(filepath.Dir(DefaultInstanceBuilderToolDir), generatedEnumPackage))
+	if enumDir == kernelEnum || !moduleRelativeDir(enumDir) {
+		return enumModuleBasePath
+	}
+	return kernelModulePath + "/" + filepath.ToSlash(enumDir)
+}
+
+func moduleRelativeDir(dir string) bool {
+	if dir == "" || dir == "." || filepath.IsAbs(dir) || strings.HasPrefix(dir, "..") {
+		return false
+	}
+	return true
+}
+
 // GenerateInstanceBuilderFromSpec reads a spec file and generates an instance builder
 // This creates ONE builder per object type (not per instance)
 func GenerateInstanceBuilderFromSpec(specPath, outputDir string, schemaVersion string) error {
@@ -120,8 +164,8 @@ func GenerateInstanceBuilderFromSpec(specPath, outputDir string, schemaVersion s
 	// Generate field order: system fields first, then spec fields
 	fieldOrder := buildFieldOrder(specForGeneration)
 
-	// Generate builder code
-	code, err := generateInstanceBuilderCode(specForGeneration, ontology, schemaVersion, fieldOrder)
+	versionDir, packageName := InstanceBuilderOutput(outputDir)
+	code, err := generateInstanceBuilderCode(specForGeneration, ontology, schemaVersion, fieldOrder, packageName, EnumImportBase(outputDir))
 	if err != nil {
 		return errfmt.Newf("failed to generate code").Wrap(err)
 	}
@@ -133,11 +177,6 @@ func GenerateInstanceBuilderFromSpec(specPath, outputDir string, schemaVersion s
 		formatted = []byte(code)
 	}
 
-	// Determine output directory (write to sibling directory like spec builders)
-	// outputDir is typically pkg/specbuilder/instance_builders, so go up one level then into bldr_instance_v1
-	packageName := "bldr_instance_v1"
-	parentDir := filepath.Dir(outputDir)
-	versionDir := filepath.Join(parentDir, packageName)
 	if err := fileutil.MkdirAll(versionDir, defaultDirectoryPerm); err != nil {
 		return errfmt.Newf("failed to create version directory").Wrap(err)
 	}
@@ -360,18 +399,18 @@ func (f *goFileBuilder) String() string {
 // generateInstanceBuilderCode generates the Go code for an instance builder
 //
 //nolint:unparam // Codegen helpers currently return an always-nil error for forward compatibility.
-func generateInstanceBuilderCode(spec *objects.Spec, ontology, schemaVersion string, fieldOrder []string) (string, error) {
+func generateInstanceBuilderCode(spec *objects.Spec, ontology, schemaVersion string, fieldOrder []string, packageName, enumImportBase string) (string, error) {
 	// Type name (e.g., "PolicyInstanceBuilder" from "policy")
 	typeName := toCamelCase(ontology) + "InstanceBuilder"
 	constructorName := "New" + typeName
 
 	enumImportAlias := "enumv"
-	enumImportPath := fmt.Sprintf("%s/%s", enumModuleBasePath, sanitizePackageName(ontology))
+	enumImportPath := fmt.Sprintf("%s/%s", enumImportBase, sanitizePackageName(ontology))
 	enumFields := collectEnumFieldNames(spec)
 
 	file := NewGoFile(fmt.Sprintf("%s_instance_builder.go", ontology)).
 		WithHeader(generatedHeaderLines("object spec YAML")...).
-		WithPackage("bldr_instance_v1").
+		WithPackage(packageName).
 		WithImports(func(i *goImportBuilder) {
 			i.Include("github.com/zqk-os/zqk/pkg/objects").
 				Include("github.com/zqk-os/zqk/pkg/specbuilder/instance_builders")

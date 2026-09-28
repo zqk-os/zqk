@@ -11,7 +11,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/metricsrecording"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/zqktime"
 )
@@ -60,20 +60,20 @@ func BuildGraphProviderMetricsBaseMetricInstance(metricID string, jsonPayload []
 		oc = meta.OperationKinds + meta.QueryKinds
 	}
 
-	builder := bldr_instance_v1.NewBaseMetricInstanceBuilder(objects.DefaultSchemaVersion)
-	builder.ID(metricID).
-		Title(graphProviderMetricTitle(meta.OperationKinds, meta.QueryKinds, meta.TotalOperations)).
-		MetricType(MetricTypeSystem).
-		Source(MetricSourceGraphProvider).
-		MetricTypeSpecific("graph_provider_snapshot").
-		Tags(tags).
-		CollectionCount(1).
-		ObjectCount(oc).
-		ObjectKind("graph_provider").
-		FirstSeen(start).
-		LastSeen(end).
-		WindowStart(start).
-		WindowEnd(end)
+	builder := instance_builders.NewForKind(objects.KindBaseMetric, objects.DefaultSchemaVersion)
+	builder.SetID(metricID).
+		SetField(objects.FieldKeyTitle, graphProviderMetricTitle(meta.OperationKinds, meta.QueryKinds, meta.TotalOperations)).
+		SetField(objects.FieldKeyMetricType, MetricTypeSystem).
+		SetField(objects.FieldKeySource, MetricSourceGraphProvider).
+		SetField(objects.FieldKeyMetricTypeSpecific, "graph_provider_snapshot").
+		SetField(objects.FieldKeyTags, tags).
+		SetField(objects.FieldKeyCollectionCount, 1).
+		SetField(objects.FieldKeyObjectCount, oc).
+		SetField(objects.FieldKeyObjectKind, "graph_provider").
+		SetField(objects.FieldKeyFirstSeen, start).
+		SetField(objects.FieldKeyLastSeen, end).
+		SetField(objects.FieldKeyWindowStart, start).
+		SetField(objects.FieldKeyWindowEnd, end)
 
 	payload := string(jsonPayload)
 	if len(payload) > maxGraphProviderMetricsJSONLen {

@@ -19,7 +19,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/pipeline"
 	"github.com/zqk-os/zqk/pkg/quality"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/when"
@@ -634,9 +634,9 @@ func (s *Scheduler) recordHealthMetric(ctx context.Context, timestamp time.Time,
 		title = fmt.Sprintf("Scheduler Health: %s", strings.Join(titleParts, ", "))
 	}
 
-	builder := bldr_instance_v1.NewSchedulerHealthMetricInstanceBuilder(objects.DefaultSchemaVersion)
-	builder.ID(metricID)
-	builder.Status("active")
+	builder := instance_builders.NewForKind(objects.KindSchedulerHealthMetric, objects.DefaultSchemaVersion)
+	builder.SetID(metricID)
+	builder.SetStatus("active")
 	builder.SetField(objects.FieldKeyTitle, title)
 	builder.SetField(objects.FieldKeyMetricType, "system")
 	builder.SetField(objects.FieldKeySource, "scheduler")
@@ -644,17 +644,17 @@ func (s *Scheduler) recordHealthMetric(ctx context.Context, timestamp time.Time,
 	builder.SetField(objects.FieldKeyFirstSeen, timestampStr)
 	builder.SetField(objects.FieldKeyLastSeen, timestampStr)
 	builder.SetField(objects.FieldKeyTags, []string{"scheduler", "health", "monitoring"})
-	builder.HealthChecks(healthChecks)
-	builder.MissedTriggers(missedTriggers)
-	builder.RecoveredJobs(recoveredJobs)
-	builder.CronRestarts(cronRestarts)
-	builder.HealthCheckDurationMs(float64(healthCheckDuration.Milliseconds()) + 0.0)
-	builder.GoroutineCount(goroutineCount)
-	builder.RuntimeThreadCount(runtimeThreadCount)
-	builder.HeapAllocBytes(heapAllocBytes)
-	builder.SysMemoryBytes(sysMemoryBytes)
-	builder.MeasurementWindowStart(timestampStr)
-	builder.MeasurementWindowEnd(timestampStr)
+	builder.SetField(objects.FieldKeyHealthChecks, healthChecks)
+	builder.SetField(objects.FieldKeyMissedTriggers, missedTriggers)
+	builder.SetField(objects.FieldKeyRecoveredJobs, recoveredJobs)
+	builder.SetField(objects.FieldKeyCronRestarts, cronRestarts)
+	builder.SetField(objects.FieldKeyHealthCheckDurationMs, float64(healthCheckDuration.Milliseconds()))
+	builder.SetField(objects.FieldKeyGoroutineCount, goroutineCount)
+	builder.SetField(objects.FieldKeyRuntimeThreadCount, runtimeThreadCount)
+	builder.SetField(objects.FieldKeyHeapAllocBytes, heapAllocBytes)
+	builder.SetField(objects.FieldKeySysMemoryBytes, sysMemoryBytes)
+	builder.SetField(objects.FieldKeyMeasurementWindowStart, timestampStr)
+	builder.SetField(objects.FieldKeyMeasurementWindowEnd, timestampStr)
 
 	metricData, buildErr := builder.Build()
 	if buildErr != nil {

@@ -12,7 +12,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
 	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	"github.com/zqk-os/zqk/pkg/storage/locknames"
 	"github.com/zqk-os/zqk/pkg/zqktime"
@@ -108,8 +107,7 @@ func (c *BaseMetricsCollector) CollectMetrics(
 	windowEndStr := zqktime.FormatRFC3339UTC(windowEnd)
 
 	// Get instance builder from registry
-	registry := instance_builders.GetGlobalRegistry()
-	schemaVersion, err := registry.GetLatestVersion(c.config.Kind)
+	schemaVersion, err := instance_builders.SchemaVersionForKind(c.config.Kind)
 	if err != nil {
 		return "", errfmt.Errorf(ConstMiscFailedToGetLatestSchemaVersionForSW, c.config.Kind, err)
 	}
@@ -128,7 +126,9 @@ func (c *BaseMetricsCollector) CollectMetrics(
 	setCommonMetricFields(builder, metricID, title, c.config.MetricType, c.config.Source, c.config.Tags,
 		totalOps, windowStartStr, windowEndStr, createdAt)
 
-	// Build metric-specific fields
+	if c.config.BuildMetricObject == nil {
+		return "", errfmt.Errorf(ConstMiscFailedToBuildMetricObject)
+	}
 	if err := c.config.BuildMetricObject(builder, snapshot, windowStart, windowEnd); err != nil {
 		return "", errfmt.Newf(ConstMiscFailedToBuildMetricObject).Wrap(err)
 	}
@@ -212,35 +212,22 @@ func (c *BaseMetricsCollector) generateMetricID(ctx context.Context, now time.Ti
 	return fmt.Sprintf("%s-%d", c.config.IDPrefix, now.UnixNano())
 }
 
-// createMetricBuilder creates a builder instance for the given kind
-// This is a factory function that handles different metric types
-func createMetricBuilder(kind string, schemaVersion string) any {
-	switch kind {
-	case MetricKindFileLockMetric:
-		return bldr_instance_v1.NewFileLockMetricInstanceBuilder(schemaVersion)
-	case MetricKindCommandMetric:
-		return bldr_instance_v1.NewCommandMetricInstanceBuilder(schemaVersion)
-	// Add more cases as needed
-	default:
+// createMetricBuilder creates a spec-backed builder for kind.
+func createMetricBuilder(kind string, schemaVersion string) instance_builders.InstanceBuilder {
+	if kind == "" {
 		return nil
 	}
+	return instance_builders.NewForKind(kind, schemaVersion)
 }
 
 // setCommonMetricFields sets common fields on the builder
-func setCommonMetricFields(builder any, metricID, title, metricType, source string, tags []string,
+func setCommonMetricFields(builder instance_builders.InstanceBuilder, metricID, title, metricType, source string, tags []string,
 	totalOps int64, windowStart, windowEnd, _ string) {
-	switch b := builder.(type) {
-	case *bldr_instance_v1.FileLockMetricInstanceBuilder:
-		b.ID(metricID).Title(title)
-	case *bldr_instance_v1.CommandMetricInstanceBuilder:
-		b.ID(metricID).Title(title)
-	}
-
-	b, ok := builder.(instance_builders.InstanceBuilder)
-	if !ok {
+	if builder == nil {
 		return
 	}
-	b.SetField(MetricFieldTitle, title).
+	builder.SetID(metricID)
+	builder.SetField(MetricFieldTitle, title).
 		SetField(MetricFieldMetricType, metricType).
 		SetField(MetricFieldSource, source).
 		SetField(MetricFieldTags, tags).
@@ -250,15 +237,11 @@ func setCommonMetricFields(builder any, metricID, title, metricType, source stri
 }
 
 // buildMetricInstance builds the instance from the builder
-func buildMetricInstance(builder any) (map[string]any, error) {
-	type buildable interface {
-		Build() (map[string]any, error)
-	}
-	b, ok := builder.(buildable)
-	if !ok {
+func buildMetricInstance(builder instance_builders.InstanceBuilder) (map[string]any, error) {
+	if builder == nil {
 		return nil, errfmt.Errorf(ConstMiscUnsupportedBuilderType)
 	}
-	return b.Build()
+	return builder.Build()
 }
 
 // AsyncMetricsCollector provides async metrics collection for any MetricsCollector
