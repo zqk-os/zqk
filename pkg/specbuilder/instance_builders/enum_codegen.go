@@ -307,47 +307,71 @@ func collectDomainStatuses(specPath, domain string) (map[string]struct{}, error)
 	if _, err := fileutil.Stat(specsDir); err != nil {
 		specsDir = filepath.Dir(specPath)
 	}
+	candidateDirs := []string{specsDir}
+	candidateDirs = append(candidateDirs, objects.ExtraSpecRoots()...)
+	if root, ok := kernelModuleRoot(); ok {
+		if matches, err := filepath.Glob(filepath.Join(root, "packs", "*", "specs")); err == nil {
+			candidateDirs = append(candidateDirs, matches...)
+		}
+		if lcMatches, err := filepath.Glob(filepath.Join(root, "packs", "*", "lifecycles")); err == nil {
+			for _, m := range lcMatches {
+				objects.AddLifecycleRoot(m)
+			}
+		}
+	}
+
+	seenDirs := make(map[string]bool)
 	out := map[string]struct{}{}
-	err := filepath.WalkDir(specsDir, func(path string, d os.DirEntry, walkErr error) error {
-		if walkErr != nil || d == nil {
-			return nil
+	for _, dir := range candidateDirs {
+		clean := filepath.Clean(dir)
+		if seenDirs[clean] {
+			continue
 		}
-		if d.IsDir() {
-			if d.Name() == ".git" || d.Name() == "node_modules" {
-				return filepath.SkipDir
+		seenDirs[clean] = true
+		if _, err := fileutil.Stat(clean); err != nil {
+			continue
+		}
+		err := filepath.WalkDir(clean, func(path string, d os.DirEntry, walkErr error) error {
+			if walkErr != nil || d == nil {
+				return nil
+			}
+			if d.IsDir() {
+				if d.Name() == ".git" || d.Name() == "node_modules" {
+					return filepath.SkipDir
+				}
+				return nil
+			}
+			if !strings.HasSuffix(d.Name(), enumCodegenFileExtYAML) || appledouble.SkipNameInReadDir(d.Name()) {
+				return nil
+			}
+			data, err := fileutil.ReadFile(path)
+			if err != nil {
+				return nil
+			}
+			var spec objects.Spec
+			if err := yaml.Unmarshal(data, &spec); err != nil {
+				return nil
+			}
+			if spec.Ontology == emptyValue {
+				spec.Ontology = strings.TrimSuffix(d.Name(), enumCodegenFileExtYAML)
+			}
+			if objects.GetDirectoryFromKind(spec.Ontology) != domain {
+				return nil
+			}
+			lifecycle, err := objects.GetGlobalLifecycleLoader().LoadLifecycle(spec.Ontology)
+			if err != nil || lifecycle == nil {
+				return nil
+			}
+			for _, st := range lifecycle.Statuses {
+				if st.Value != emptyValue {
+					out[st.Value] = struct{}{}
+				}
 			}
 			return nil
-		}
-		if !strings.HasSuffix(d.Name(), enumCodegenFileExtYAML) || appledouble.SkipNameInReadDir(d.Name()) {
-			return nil
-		}
-		data, err := fileutil.ReadFile(path)
+		})
 		if err != nil {
-			return nil
+			return nil, errfmt.Newf("walk specs dir %s", clean).Wrap(err)
 		}
-		var spec objects.Spec
-		if err := yaml.Unmarshal(data, &spec); err != nil {
-			return nil
-		}
-		if spec.Ontology == emptyValue {
-			spec.Ontology = strings.TrimSuffix(d.Name(), enumCodegenFileExtYAML)
-		}
-		if objects.GetDirectoryFromKind(spec.Ontology) != domain {
-			return nil
-		}
-		lifecycle, err := objects.GetGlobalLifecycleLoader().LoadLifecycle(spec.Ontology)
-		if err != nil || lifecycle == nil {
-			return nil
-		}
-		for _, st := range lifecycle.Statuses {
-			if st.Value != emptyValue {
-				out[st.Value] = struct{}{}
-			}
-		}
-		return nil
-	})
-	if err != nil {
-		return nil, errfmt.Newf("walk specs dir").Wrap(err)
 	}
 	return out, nil
 }
@@ -467,6 +491,21 @@ func findSpecPath(currentDir, ontology string) string {
 		if hit := specInDir(specsDir, filename); hit != "" {
 			return hit
 		}
+	}
+	// Also search in modular packs: packs/*/specs/<filename>
+	dir := currentDir
+	for i := 0; i < 6; i++ {
+		candidate := filepath.Join(dir, "packs")
+		if info, err := fileutil.Stat(candidate); err == nil && info.IsDir() {
+			if matches, err := filepath.Glob(filepath.Join(candidate, "*", "specs", filename)); err == nil && len(matches) > 0 {
+				return matches[0]
+			}
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			break
+		}
+		dir = parent
 	}
 	return filepath.Join(currentDir, filename)
 }
