@@ -11,7 +11,6 @@ import (
 
 	// Side-effect imports to register builders in global registries
 	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_config_v1"
-	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
 	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_lifecycle_v1"
 	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_profile_v1"
 	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_routing_v1"
@@ -31,43 +30,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/specbuilder/trait_builders"
 
 	mcptesting "github.com/zqk-os/zqk/pkg/mcp/testing"
-	enumv "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/accounts"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
 )
-
-// specBuilderAdapter wraps builders.SpecBuilder to satisfy instance_builders.SpecBuilderInterface
-type specBuilderAdapter struct {
-	builder builders.SpecBuilder
-}
-
-func (s specBuilderAdapter) Build() any {
-	return s.builder.Build()
-}
-
-func (s specBuilderAdapter) GetVersion() string {
-	return s.builder.GetVersion()
-}
-
-func (s specBuilderAdapter) GetOntology() string {
-	return s.builder.GetOntology()
-}
-
-// specRegistryAdapter wraps builders.VersionedBuilderRegistry to satisfy instance_builders.SpecBuilderRegistryInterface
-type specRegistryAdapter struct {
-	reg *builders.VersionedBuilderRegistry
-}
-
-func (a specRegistryAdapter) GetBuilder(ontology, version string) (instance_builders.SpecBuilderInterface, error) {
-	b, err := a.reg.GetBuilder(ontology, version)
-	if err != nil {
-		return nil, err
-	}
-	return specBuilderAdapter{builder: b}, nil
-}
-
-func (a specRegistryAdapter) GetLatestVersion(ontology string) (string, error) {
-	return a.reg.GetLatestVersion(ontology)
-}
 
 // TestConcurrencySpecGenerator runs builders.SpecGenerator concurrently
 func TestConcurrencySpecGenerator(t *testing.T) {
@@ -370,8 +333,9 @@ func TestConcurrencyBaseGenerator(t *testing.T) {
 func TestInstanceBuilderStatefulness(t *testing.T) {
 	t.Parallel()
 
-	builder := bldr_instance_v1.NewAccountInstanceBuilder(objects.DefaultSchemaVersion)
-	builder.ID("ACC-STRESS-001").Status(enumv.StatusActive)
+	builder := instance_builders.NewForKind(objects.KindAccount, objects.DefaultSchemaVersion)
+	builder.SetID("ACC-STRESS-001")
+	builder.SetStatus("active")
 
 	// First Build should succeed
 	inst1, err := builder.Build()
@@ -395,12 +359,7 @@ func TestInstanceGeneratorIsSequential(t *testing.T) {
 	t.Parallel()
 
 	tmpDir := t.TempDir()
-	registry := instance_builders.NewVersionedInstanceBuilderRegistry(specRegistryAdapter{reg: builders.GetGlobalRegistry()})
-
-	// Register account builder
-	registry.Register(bldr_instance_v1.NewAccountInstanceBuilder(objects.DefaultSchemaVersion))
-
-	generator := instance_builders.NewInstanceGenerator(tmpDir, registry)
+	generator := instance_builders.NewInstanceGenerator(tmpDir)
 
 	// Generate sequentially
 	err := generator.GenerateInstance("account", "ACC-STRESS-101", objects.DefaultSchemaVersion)

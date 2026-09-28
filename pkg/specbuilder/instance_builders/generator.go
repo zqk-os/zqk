@@ -10,30 +10,23 @@ import (
 
 const instanceFileExtYAML = ".yaml"
 
-// InstanceGenerator generates instance files from instance builders
+// InstanceGenerator writes instance YAML from spec-backed builders.
 type InstanceGenerator struct {
-	registry  *VersionedInstanceBuilderRegistry
 	outputDir string
 	writer    *sbyaml.YAMLWriter[map[string]any]
 }
 
-// NewInstanceGenerator creates a new instance generator
-func NewInstanceGenerator(outputDir string, registry *VersionedInstanceBuilderRegistry) *InstanceGenerator {
+// NewInstanceGenerator creates a generator that writes into outputDir.
+func NewInstanceGenerator(outputDir string) *InstanceGenerator {
 	return &InstanceGenerator{
-		registry:  registry,
 		outputDir: outputDir,
 		writer:    sbyaml.NewYAMLWriter[map[string]any](),
 	}
 }
 
-// GenerateInstance generates an instance file for a specific kind, ID, and version
+// GenerateInstance writes an instance file for kind, id, and schemaVersion.
 func (ig *InstanceGenerator) GenerateInstance(kind, id, schemaVersion string) error {
-	builder, err := ig.registry.GetBuilder(kind, schemaVersion)
-	if err != nil {
-		return errfmt.Errorf("failed to get builder for %s@%s: %w", kind, schemaVersion, err)
-	}
-
-	// Set ID before build to avoid "id is required" validation error
+	builder := NewForKind(kind, schemaVersion)
 	builder.SetID(id)
 	instance, err := builder.Build()
 	if err != nil {
@@ -58,7 +51,7 @@ func (ig *InstanceGenerator) GenerateInstance(kind, id, schemaVersion string) er
 
 // GenerateLatestInstance generates the latest version of an instance
 func (ig *InstanceGenerator) GenerateLatestInstance(kind, id string) error {
-	version, err := ig.registry.GetLatestVersion(kind)
+	version, err := SchemaVersionForKind(kind)
 	if err != nil {
 		return errfmt.Errorf("failed to get latest version for %s: %w", kind, err)
 	}

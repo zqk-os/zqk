@@ -14,11 +14,10 @@ var (
 
 func init() {
 	globalInstanceBuilderRegistry = NewVersionedInstanceBuilderRegistry(nil)
-	// Builders from bldr_instance_v1 package register themselves via their init() functions
-	// Note: bldr_instance_v1 package must be imported (e.g., in tests or main) to trigger init()
 }
 
-// RegisterBuilder registers a builder (called from version package init() functions)
+// RegisterBuilder registers a builder. Files already generated under bldr_instance_v1
+// still call this from init. New generator output does not. Callers use NewForKind.
 func RegisterBuilder(builder InstanceBuilder) {
 	_ = concurrency.RunInLock(&globalInstanceBuilderRegistryMu, func() error {
 		if globalInstanceBuilderRegistry == nil {

@@ -36,5 +36,6 @@ func init() {
 
 // main is the entry point for the primary zqk CLI binary.
 func main() {
+	registerIncludedWorkPack()
 	app.Execute()
 }
