@@ -1,6 +1,7 @@
 package instance_builders
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -60,5 +61,30 @@ func TestGenerateInstanceBuilderCode_packEnumImport(t *testing.T) {
 	}
 	if strings.Contains(code, "RegisterBuilder") {
 		t.Fatal("generated builder registers on the kernel singleton")
+	}
+}
+
+func TestGenerateInstanceBuilderFromSpec_writesSiblingWithoutRegistry(t *testing.T) {
+	tmp := t.TempDir()
+	specPath := filepath.Join(tmp, "widget.yaml")
+	specYAML := "schema_version: \"1.0.0\"\nontology: widget\nfields:\n  title:\n    type: string\n"
+	if err := os.WriteFile(specPath, []byte(specYAML), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	toolDir := filepath.Join(tmp, "instance_builders")
+	if err := GenerateInstanceBuilderFromSpec(specPath, toolDir, "1.0.0"); err != nil {
+		t.Fatal(err)
+	}
+	out := filepath.Join(tmp, generatedInstancePackage, "widget_instance_builder.go")
+	data, err := os.ReadFile(out)
+	if err != nil {
+		t.Fatal(err)
+	}
+	src := string(data)
+	if !strings.Contains(src, "package "+generatedInstancePackage) {
+		t.Fatal("written file is not the generated instance package")
+	}
+	if strings.Contains(src, "RegisterBuilder") {
+		t.Fatal("written builder registers on the kernel singleton")
 	}
 }
