@@ -17,6 +17,8 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/storage/filecas"
+	"time"
 )
 
 const (
@@ -836,6 +838,14 @@ func (p *Processor) TriggerCacheFreshnessCheck(triggerOperation string, affected
 	_ = p.CheckCacheFreshnessAsync(freshnessCtx)
 }
 
+// Close drains any pending asynchronous CLI operations (including the Darwin CAS fsync queue)
+// and releases processor resources before exit.
+func (p *Processor) Close() error {
+	ctx, cancel := stdcontext.WithTimeout(stdcontext.Background(), 5*time.Second)
+	defer cancel()
+	return filecas.DrainDarwinSyncQueueContext(ctx)
+}
+
 // WithProcessor wraps a cobra RunE function to automatically initialize and inject a Processor.
 func WithProcessor(handler func(cmd *cobra.Command, args []string, proc *Processor) error) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
@@ -843,6 +853,9 @@ func WithProcessor(handler func(cmd *cobra.Command, args []string, proc *Process
 		if err != nil {
 			return errfmt.Errorf("failed to create processor: %w", err)
 		}
+		defer func() {
+			_ = proc.Close()
+		}()
 		err = handler(cmd, args, proc)
 		if err != nil {
 			return Guard(cmd).Err(err).Return()

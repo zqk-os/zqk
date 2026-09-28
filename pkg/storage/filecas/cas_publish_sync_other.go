@@ -3,13 +3,16 @@
 package filecas
 
 import (
+	"context"
+	"time"
+
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 )
 
-// casPublishSyncFileOS fsyncs the temp file before CAS hardlink/rename so a
+// CasPublishSyncFileOS fsyncs the temp file before CAS hardlink/rename so a
 // crash cannot leave a published name pointing at buffered-only bytes.
 func CasPublishSyncFileOS(f *fileutil.File) error {
 	if f == nil {
@@ -21,7 +24,7 @@ func CasPublishSyncFileOS(f *fileutil.File) error {
 	return nil
 }
 
-// casPublishSyncDirOS fsyncs the parent directory so the published directory
+// CasPublishSyncDirOS fsyncs the parent directory so the published directory
 // entry is durable (POSIX crash consistency for Linux/Windows release targets).
 func CasPublishSyncDirOS(dirPath string) error {
 	dirFD, err := fileutil.Open(dirPath)
@@ -42,4 +45,24 @@ func CasPublishSyncDirOS(dirPath string) error {
 // DrainDarwinSyncQueue is a no-op on non-darwin platforms.
 func DrainDarwinSyncQueue(_ ...any) error {
 	return nil
+}
+
+// DrainDarwinSyncQueueContext is a no-op on non-darwin platforms.
+func DrainDarwinSyncQueueContext(_ context.Context) error {
+	return nil
+}
+
+// InitiateDarwinSyncShutdown is a no-op on non-darwin platforms.
+func InitiateDarwinSyncShutdown() error {
+	return nil
+}
+
+// IsDarwinSyncQueueDrained returns true on non-darwin platforms.
+func IsDarwinSyncQueueDrained() bool {
+	return true
+}
+
+// DarwinSyncQueuePendingCount returns 0 on non-darwin platforms.
+func DarwinSyncQueuePendingCount() int64 {
+	return 0
 }
