@@ -91,16 +91,56 @@ func EnumOutput(outputDir string) string {
 
 // EnumImportBase is the Go import prefix for enums written beside outputDir.
 // The kernel tool directory keeps github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1.
-// A relative tool directory inside this module imports its sibling enum tree.
-// An absolute or out-of-module directory keeps the kernel enum import so scratch
+// A tool directory inside this module, relative or absolute, imports its sibling enum tree.
+// An absolute directory outside this module keeps the kernel enum import so scratch
 // generation still compiles against the enums that ship with the kernel.
 func EnumImportBase(outputDir string) string {
 	enumDir := filepath.Clean(EnumOutput(outputDir))
 	kernelEnum := filepath.Clean(filepath.Join(filepath.Dir(DefaultInstanceBuilderToolDir), generatedEnumPackage))
-	if enumDir == kernelEnum || !moduleRelativeDir(enumDir) {
+	if enumDir == kernelEnum {
+		return enumModuleBasePath
+	}
+	if rel, ok := moduleRelPath(enumDir); ok {
+		if rel == kernelEnum {
+			return enumModuleBasePath
+		}
+		return kernelModulePath + "/" + filepath.ToSlash(rel)
+	}
+	if !moduleRelativeDir(enumDir) {
 		return enumModuleBasePath
 	}
 	return kernelModulePath + "/" + filepath.ToSlash(enumDir)
+}
+
+func moduleRelPath(dir string) (string, bool) {
+	if !filepath.IsAbs(dir) {
+		return "", false
+	}
+	current := dir
+	for {
+		data, err := fileutil.ReadFile(filepath.Join(current, "go.mod"))
+		if err == nil && isKernelModule(data) {
+			rel, err := filepath.Rel(current, dir)
+			if err != nil || rel == "." || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+				return "", false
+			}
+			return rel, true
+		}
+		parent := filepath.Dir(current)
+		if parent == current {
+			return "", false
+		}
+		current = parent
+	}
+}
+
+func isKernelModule(data []byte) bool {
+	for _, line := range strings.Split(string(data), "\n") {
+		if strings.TrimSpace(line) == "module "+kernelModulePath {
+			return true
+		}
+	}
+	return false
 }
 
 func moduleRelativeDir(dir string) bool {

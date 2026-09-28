@@ -2,6 +2,7 @@ package instance_builders
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -35,6 +36,10 @@ func TestInstanceBuilderOutput_siblingOfToolDir(t *testing.T) {
 	scratch := filepath.Join(string(filepath.Separator), "tmp", "spec-cell", "instance_builders")
 	if got := EnumImportBase(scratch); got != "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1" {
 		t.Fatalf("scratch enum import: %q", got)
+	}
+	absPack := filepath.Join(moduleRoot(t), "packs", "work", "instance_builders")
+	if got := EnumImportBase(absPack); got != "github.com/zqk-os/zqk/packs/work/bldr_enum_v1" {
+		t.Fatalf("absolute pack enum import: %q", got)
 	}
 }
 
@@ -129,5 +134,47 @@ func TestGenerateInstanceBuilderFromSpec_writesSiblingWithoutRegistry(t *testing
 	}
 	if strings.Contains(src, "buildFieldOrderFromSpec") {
 		t.Fatal("written builder depends on a helper that lives only in the kernel package")
+	}
+}
+
+func TestGeneratedSiblingCompiles(t *testing.T) {
+	root := moduleRoot(t)
+	packRoot := filepath.Join(root, "packs", "work")
+	t.Cleanup(func() { _ = os.RemoveAll(packRoot) })
+	specPath := filepath.Join(packRoot, "widget.yaml")
+	if err := os.MkdirAll(packRoot, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	specYAML := "schema_version: \"1.0.0\"\nontology: widget\nfields:\n  title:\n    type: string\n"
+	if err := os.WriteFile(specPath, []byte(specYAML), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	toolDir := filepath.Join(packRoot, "instance_builders")
+	if err := GenerateInstanceBuilderFromSpec(specPath, toolDir, "1.0.0"); err != nil {
+		t.Fatal(err)
+	}
+	cmd := exec.Command("go", "build", "./packs/work/"+generatedInstancePackage)
+	cmd.Dir = root
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("generated pack builder did not compile: %v\n%s", err, out)
+	}
+}
+
+func moduleRoot(t *testing.T) string {
+	t.Helper()
+	dir, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for {
+		if _, err := os.Stat(filepath.Join(dir, "go.mod")); err == nil {
+			return dir
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			t.Fatal("go.mod not found")
+		}
+		dir = parent
 	}
 }
