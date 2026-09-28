@@ -63,7 +63,47 @@ func ExtraSpecRoots() []string {
 
 // AddModuleSpecRoot registers rel under the kernel module root when that directory exists.
 func AddModuleSpecRoot(rel string) {
-	if rel == "" {
+	addModuleDir(rel, AddSpecRoot)
+}
+
+var extraLifecycleRoots []string
+
+// AddLifecycleRoot records a directory whose lifecycle YAML merges after the kernel tree.
+// The kernel file wins when the same kind exists in both trees.
+func AddLifecycleRoot(dir string) {
+	if dir == "" {
+		return
+	}
+	clean := filepath.Clean(dir)
+	specRootMu.Lock()
+	defer specRootMu.Unlock()
+	for _, existing := range extraLifecycleRoots {
+		if existing == clean {
+			return
+		}
+	}
+	extraLifecycleRoots = append(extraLifecycleRoots, clean)
+}
+
+// ExtraLifecycleRoots returns the registered pack lifecycle directories.
+func ExtraLifecycleRoots() []string {
+	specRootMu.Lock()
+	defer specRootMu.Unlock()
+	if len(extraLifecycleRoots) == 0 {
+		return nil
+	}
+	out := make([]string, len(extraLifecycleRoots))
+	copy(out, extraLifecycleRoots)
+	return out
+}
+
+// AddModuleLifecycleRoot registers rel under the kernel module root when that directory exists.
+func AddModuleLifecycleRoot(rel string) {
+	addModuleDir(rel, AddLifecycleRoot)
+}
+
+func addModuleDir(rel string, add func(string)) {
+	if rel == "" || add == nil {
 		return
 	}
 	root, ok := moduleRootForSpecs()
@@ -75,7 +115,7 @@ func AddModuleSpecRoot(rel string) {
 	if err != nil || !info.IsDir() {
 		return
 	}
-	AddSpecRoot(dir)
+	add(dir)
 }
 
 func moduleRootForSpecs() (string, bool) {

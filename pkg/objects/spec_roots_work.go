@@ -6,4 +6,5 @@ func init() {
 	// Same relative directory as workpack.SpecDir. This package cannot import
 	// workpack: that package already imports objects.
 	AddModuleSpecRoot("packs/work/specs")
+	AddModuleLifecycleRoot("packs/work/lifecycles")
 }

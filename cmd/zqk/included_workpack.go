@@ -14,6 +14,7 @@ import (
 func init() {
 	objects.SetPackOwnedKinds(workpack.Kinds())
 	objects.AddModuleSpecRoot(workpack.SpecDir)
+	objects.AddModuleLifecycleRoot(workpack.LifecycleDir)
 	object.SetPackKindRegistrar(func(objectCmd *cobra.Command) {
 		object.RegisterKindCommandsForKinds(objectCmd, workpack.Kinds())
 	})

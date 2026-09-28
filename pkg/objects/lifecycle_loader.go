@@ -181,6 +181,13 @@ func (ll *LifecycleLoader) doEnsureReady(ctx context.Context) error { //nolint:u
 	if err != nil {
 		return err
 	}
+	for _, root := range ExtraLifecycleRoots() {
+		packIssues, packErr := ParseLifecycleYAMLDir(root)
+		if packErr != nil {
+			return packErr
+		}
+		lcIssues = append(lcIssues, packIssues...)
+	}
 	warnLifecycleYAMLIssues("lifecycle", lcIssues)
 
 	cfgDir := filepath.Join(filepath.Dir(dir), filepath.Base(paths.ProcessInternalConfigsDir))
@@ -207,6 +214,11 @@ func (ll *LifecycleLoader) findLifecyclePath(currentDir, kind string) string {
 	}
 	if hit := ll.indexedYAML(currentDir)[lifecycleFile]; hit != "" {
 		return hit
+	}
+	for _, root := range ExtraLifecycleRoots() {
+		if hit := paths.FindLifecycleFile(root, kind); hit != "" {
+			return hit
+		}
 	}
 	return filepath.Join(currentDir, lifecycleFile)
 }

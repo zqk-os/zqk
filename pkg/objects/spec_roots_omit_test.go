@@ -15,3 +15,11 @@ func TestGoalSpecStaysOutOfKernelWalk(t *testing.T) {
 		t.Fatalf("omit build resolved the work pack spec: %s", got)
 	}
 }
+
+func TestGoalLifecycleStaysOutOfKernelWalk(t *testing.T) {
+	loader := NewLifecycleLoader("")
+	got := loader.findLifecyclePath(loader.getLifecyclesDir(), "goal")
+	if strings.Contains(got, filepath.Join("packs", "work", "lifecycles")) {
+		t.Fatalf("omit build resolved the work pack lifecycle: %s", got)
+	}
+}

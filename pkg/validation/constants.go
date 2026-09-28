@@ -38,7 +38,7 @@ const (
 )
 
 var (
-	PathCriteriaLifecycleYAML           = paths.ProcessInternalLifecyclesDir + "/qa/criteria_lifecycle.yaml"
+	PathCriteriaLifecycleYAML           = "packs/work/lifecycles/criteria_lifecycle.yaml"
 	PathConvergenceSessionLifecycleYAML = paths.ProcessInternalLifecyclesDir + "/kernel/convergence_session_lifecycle.yaml"
 	PathBacklogItemLifecycleYAML        = paths.ProcessInternalLifecyclesDir + "/pm/backlog_item_lifecycle.yaml"
 	PathPriorityPlanLifecycleYAML       = paths.ProcessInternalLifecyclesDir + "/pm/priority_plan_lifecycle.yaml"
@@ -75,6 +75,7 @@ var ValidationCodeChecksumGlobs = []string{
 	"pkg/migration/parser/*.go",
 	paths.ProcessInternalLifecyclesDir + "/*/*.yaml",
 	paths.ProcessInternalLifecyclesDir + "/*.yaml",
+	"packs/work/lifecycles/*.yaml",
 }
 
 const (
