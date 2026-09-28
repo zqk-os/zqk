@@ -6,12 +6,13 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // NewDoCmd creates the 'zqk do' / 'zqk auto-exec' command.
 func NewDoCmd() *cobra.Command {
-	cmd := &cobra.Command{
+	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewDoCommandBuilder(), &cobra.Command{
 		Use:     "do [task_or_bli_id]",
 		Aliases: []string{"auto-exec", "auto-do"},
 		Short:   "Execute autonomous single-command workflow loop for a backlog item or task",
@@ -29,7 +30,7 @@ Examples:
 `,
 		Args: cobra.MaximumNArgs(1),
 		RunE: cli.WithProcessor(runDo),
-	}
+	})
 	cmd.Flags().Bool("dry-run", false, "Simulate pipeline discovery and claiming without writing mutations")
 	cmd.Flags().Bool("verify", true, "Execute test verification and criteria latching")
 	cmd.Flags().String("by", "", "Claimant agent or account id (default: seating or env identity)")

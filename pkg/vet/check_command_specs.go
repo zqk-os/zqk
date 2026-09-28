@@ -119,6 +119,8 @@ func CheckCommandSpecs(projectRoot string, cfg *GatesConfig, rootCmd any) ([]Fin
 
 	baselinePath := filepath.Join(projectRoot, paths.ProjectDataDir, "cli", "command_spec_coverage_baseline.json")
 
+	seenMissingCmds := make(map[string]bool)
+
 	// 2. If dynamic RootCommand is available, use canonical AnalyzeCommandSpecCoverage
 	if cmd, ok := rootCmd.(*cobra.Command); ok && cmd != nil {
 		coverage, err := clipkg.AnalyzeCommandSpecCoverage(cmd, specsDir)
@@ -127,6 +129,8 @@ func CheckCommandSpecs(projectRoot string, cfg *GatesConfig, rootCmd any) ([]Fin
 				coverage = clipkg.ApplyCommandSpecCoverageBaseline(coverage, baseline, baselinePath)
 			}
 			for _, missingCmd := range coverage.NewCommandsWithoutSpecs {
+				seenMissingCmds[missingCmd] = true
+				seenMissingCmds[canonicalCommandIDString(missingCmd)] = true
 				findings = append(findings, Finding{
 					CheckID:  "command_spec/missing",
 					Suite:    "hygiene",
@@ -188,6 +192,13 @@ func CheckCommandSpecs(projectRoot string, cfg *GatesConfig, rootCmd any) ([]Fin
 						if call, ok := rhs.(*ast.CallExpr); ok {
 							fnName := callFunName(call)
 							cmdName := inferCommandNameFromConstructor(fnName)
+							if cmdName == "" {
+								if sel, ok := call.Fun.(*ast.SelectorExpr); ok {
+									if xIdent, ok := sel.X.(*ast.Ident); ok {
+										cmdName = xIdent.Name
+									}
+								}
+							}
 							if cmdName != "" {
 								varToCmd[ident.Name] = cmdName
 								varToPos[ident.Name] = fset.Position(assign.Pos())
@@ -219,6 +230,13 @@ func CheckCommandSpecs(projectRoot string, cfg *GatesConfig, rootCmd any) ([]Fin
 							pos = varToPos[ident.Name]
 						} else if callArg, ok := arg.(*ast.CallExpr); ok {
 							cmdName = inferCommandNameFromConstructor(callFunName(callArg))
+							if cmdName == "" {
+								if sel, ok := callArg.Fun.(*ast.SelectorExpr); ok {
+									if xIdent, ok := sel.X.(*ast.Ident); ok {
+										cmdName = xIdent.Name
+									}
+								}
+							}
 							pos = fset.Position(callArg.Pos())
 						}
 
@@ -230,7 +248,9 @@ func CheckCommandSpecs(projectRoot string, cfg *GatesConfig, rootCmd any) ([]Fin
 						hasSpec := knownSpecs[canonID] != "" || knownSpecsByName[cmdName] != "" || knownSpecsByName[canonID] != ""
 						if !hasSpec {
 							isBaselined := baselineMap[cmdName] || baselineMap[canonID]
-							if !isBaselined {
+							if !isBaselined && !seenMissingCmds[cmdName] && !seenMissingCmds[canonID] {
+								seenMissingCmds[cmdName] = true
+								seenMissingCmds[canonID] = true
 								relFile, _ := filepath.Rel(projectRoot, rootCmdsFile)
 								findings = append(findings, Finding{
 									CheckID:  "command_spec/missing",
