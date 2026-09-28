@@ -454,22 +454,35 @@ func loadSpecInheritanceChain(startPath string) ([]*objects.Spec, error) {
 
 func findSpecPath(currentDir, ontology string) string {
 	filename := specFilenameFromOntology(ontology)
-	direct := filepath.Join(currentDir, filename)
+	if hit := specInDir(currentDir, filename); hit != "" {
+		return hit
+	}
+	parentDir := filepath.Dir(currentDir)
+	if parentDir != currentDir {
+		if hit := specInDir(parentDir, filename); hit != "" {
+			return hit
+		}
+	}
+	if specsDir := objects.FindSpecsDir(); specsDir != "" && specsDir != currentDir && specsDir != parentDir {
+		if hit := specInDir(specsDir, filename); hit != "" {
+			return hit
+		}
+	}
+	return filepath.Join(currentDir, filename)
+}
+
+func specInDir(dir, filename string) string {
+	direct := filepath.Join(dir, filename)
 	if _, err := fileutil.Stat(direct); err == nil {
 		return direct
 	}
-	parentDir := filepath.Dir(currentDir)
 	for _, domain := range []string{"dna", "kernel", "pm", "qa", "agent", "platform"} {
-		cand := filepath.Join(parentDir, domain, filename)
-		if _, err := fileutil.Stat(cand); err == nil {
-			return cand
-		}
-		cand = filepath.Join(currentDir, domain, filename)
+		cand := filepath.Join(dir, domain, filename)
 		if _, err := fileutil.Stat(cand); err == nil {
 			return cand
 		}
 	}
-	return direct
+	return ""
 }
 
 func findStatusAliasOwner(spec *objects.Spec, ontology string) (string, map[string]struct{}) {
