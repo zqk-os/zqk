@@ -26,7 +26,7 @@ P_SLACK="xo""x[baprs]-[0-9]{12}-[0-9]{12}-[a-zA-Z0-9]{24}"
 PATTERN="($P_GHP|$P_GHO|$P_PAT|$P_AWS|$P_KEY|$P_SLACK)"
 
 if [ -d "$TARGET" ]; then
-	if [ -d "$TARGET/.git" ] && command -v git >/dev/null 2>&1; then
+	if [ -e "$TARGET/.git" ] && command -v git >/dev/null 2>&1; then
 		MATCHES=$(git -C "$TARGET" grep -E -n "$PATTERN" -- . \
 			':!scripts/scan-secrets.sh' \
 			':!pkg/systemcheck/policy/secrets.go' \
@@ -40,6 +40,9 @@ if [ -d "$TARGET" ]; then
 		MATCHES=$(grep -r -E -n "$PATTERN" "$TARGET" \
 			--exclude-dir=".git" \
 			--exclude-dir=".zqk" \
+			--exclude-dir="bin" \
+			--exclude-dir="build" \
+			--exclude-dir="dist" \
 			--exclude-dir="testdata" \
 			--exclude="scan-secrets.sh" \
 			--exclude="secrets.go" \
