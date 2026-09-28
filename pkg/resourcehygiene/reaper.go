@@ -151,7 +151,7 @@ func EnforceLogRetention(projectRoot string, maxAge time.Duration, maxSizeBytes 
 		return 0, 0, nil, nil
 	}
 	if maxAge <= 0 {
-		maxAge = 7 * 24 * time.Hour
+		maxAge = 48 * time.Hour
 	}
 	if maxSizeBytes <= 0 {
 		maxSizeBytes = 10 * 1024 * 1024 // 10MB

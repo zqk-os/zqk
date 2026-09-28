@@ -47,7 +47,7 @@ func DefaultHygieneOptions() HygieneOptions {
 		DryRun:           false,
 		LockThreshold:    15 * time.Minute,
 		TempThreshold:    30 * time.Minute,
-		LogMaxAge:        7 * 24 * time.Hour,
+		LogMaxAge:        48 * time.Hour,
 		LogMaxSize:       10 * 1024 * 1024, // 10MB
 	}
 }
