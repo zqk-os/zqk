@@ -1,0 +1,31 @@
+{
+  "cef_version": "0.1.0",
+  "status": "pass",
+  "freeze_sha": "e536ee8e",
+  "git_branch": "integration/pri-cef-cycle3-regression-suite",
+  "timestamp": "2026-09-28T06:30:00Z",
+  "languages_detected": [
+    "go",
+    "python",
+    "shell",
+    "yaml",
+    "markdown"
+  ],
+  "adapters_enabled": [
+    "go"
+  ],
+  "available_tools": {
+    "go": "go1.26.6 darwin/arm64",
+    "zqk": "v0.1.0-beta.3-112-ge536ee8e",
+    "zqk-vet": "available (suites: hygiene, tree_police, payload all pass with 0 errors/warnings)",
+    "git": "available",
+    "gitleaks": "available via scripts/scan-secrets.sh"
+  },
+  "repo_inventory": {
+    "total_packages": 56,
+    "total_dod_chains": 153,
+    "cas_blockers": 0,
+    "tier1_blockers": 0
+  },
+  "notes": "Wave 0 Preflight complete. Clean baseline with 153 DoD chains unbroken and 0 tree violations."
+}
