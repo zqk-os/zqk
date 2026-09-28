@@ -385,7 +385,11 @@ func (sl *SpecLoader) applicableExtraSpecRoots() []string {
 	}
 	mod, err := paths.ModuleRootFromPath(sl.specsDir)
 	if err != nil || mod == "" {
-		return nil
+		if fallback, ok := moduleRootForSpecs(); ok && fallback != "" {
+			mod = fallback
+		} else {
+			return nil
+		}
 	}
 	var out []string
 	for _, root := range all {

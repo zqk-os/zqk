@@ -133,17 +133,22 @@ func BootstrapRoot(testRoot, projectRoot string) error {
 	if err := copyYAMLFilesFromProject(testRoot, projectRoot, "packs"); err != nil {
 		return err
 	}
-	// Also ensure pack-owned specs and lifecycles (e.g. packs/work/specs -> .zqk/specs/objects
-	// and packs/work/lifecycles -> .zqk/specs/lifecycles) are seeded directly into the internal
-	// schema plane so that hermetic test roots have full access to planning kinds (goal,
-	// backlog_item, requirement, criteria, test_case).
-	workSpecs := filepath.Join(projectRoot, "packs", "work", "specs")
+	// Also ensure pack-owned specs and lifecycles (packs/*/specs -> .zqk/specs/objects
+	// and packs/*/lifecycles -> .zqk/specs/lifecycles) are seeded directly into the internal
+	// schema plane so that hermetic test roots have full access to all pack kinds.
 	dstSpecs := filepath.Join(testRoot, paths.ProcessInternalObjectSpecsDir)
-	_ = copyYAMLFiles(workSpecs, dstSpecs)
-
-	workLifecycles := filepath.Join(projectRoot, "packs", "work", "lifecycles")
 	dstLifecycles := filepath.Join(testRoot, paths.ProcessInternalLifecyclesDir)
-	_ = copyYAMLFiles(workLifecycles, dstLifecycles)
+	packsDir := filepath.Join(projectRoot, "packs")
+	if entries, err := fileutil.ReadDir(packsDir); err == nil {
+		for _, e := range entries {
+			if e.IsDir() {
+				packSpecs := filepath.Join(packsDir, e.Name(), "specs")
+				_ = copyYAMLFiles(packSpecs, dstSpecs)
+				packLifecycles := filepath.Join(packsDir, e.Name(), "lifecycles")
+				_ = copyYAMLFiles(packLifecycles, dstLifecycles)
+			}
+		}
+	}
 
 	return CopySpecIndexFromProject(testRoot, projectRoot)
 }
