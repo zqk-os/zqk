@@ -2,7 +2,7 @@ schema_version: 2.0.0
 ontology: release
 extends: base_object
 visibility: public
-description: 'Represents a software release with version, release criteria, and release notes. Enables structured release planning, tracking, and documentation. '
+description: 'Represents a software release with version, release criteria, and release notes. Enables structured release planning, tracking, and documentation.\nLifecycle: release_lifecycle.yaml.\n'
 traits:
   - base_object_traits
 fields:
@@ -120,6 +120,36 @@ fields:
     type: string
     validation:
       pattern: ^\d{4}-\d{2}-\d{2}$
+      required: false
+  release_notes:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/release_manager.
+      automation_hooks: published with the release; the body readers see.
+      cardinality: one
+      criticality: composition
+      default: null
+      dependencies: release publication.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Notes published with this release (changes, upgrade steps, known issues).
+      security: non-sensitive
+      system_usage:
+        - release notes
+        - publication
+      validation: free text. Empty until the release is ready to publish.
+    field_profile_code: REL-008
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - readable
+      - writable
+      - modifiable
+      - searchable
+    type: string
+    validation:
       required: false
   release_type:
     access:

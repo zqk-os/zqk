@@ -13,6 +13,8 @@ const (
 	ReleaseFieldMilestoneRefs = "milestone_refs"
 	// FieldReleaseDate is the field name for release_date
 	FieldReleaseDate = "release_date"
+	// FieldReleaseNotes is the field name for release_notes
+	FieldReleaseNotes = "release_notes"
 	// FieldReleaseType is the field name for release_type
 	FieldReleaseType = "release_type"
 	// ReleaseFieldRequirementRefs is the field name for requirement_refs

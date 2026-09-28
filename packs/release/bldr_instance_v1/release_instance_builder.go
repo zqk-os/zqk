@@ -4,8 +4,8 @@
 package bldr_instance_v1
 
 import (
-	"github.com/zqk-os/zqk/pkg/objects"
 	enumv "github.com/zqk-os/zqk/packs/release/bldr_enum_v1/release"
+	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 )
 
@@ -376,6 +376,17 @@ func (b *ReleaseInstanceBuilder) Urn(value string) *ReleaseInstanceBuilder {
 // SetUrn is a compatibility alias for Urn.
 func (b *ReleaseInstanceBuilder) SetUrn(value string) *ReleaseInstanceBuilder {
 	return b.Urn(value)
+}
+
+// ReleaseNotes sets the release_notes field
+func (b *ReleaseInstanceBuilder) ReleaseNotes(value string) *ReleaseInstanceBuilder {
+	b.SetField(objects.FieldKeyReleaseNotes, value)
+	return b
+}
+
+// SetReleaseNotes is a compatibility alias for ReleaseNotes.
+func (b *ReleaseInstanceBuilder) SetReleaseNotes(value string) *ReleaseInstanceBuilder {
+	return b.ReleaseNotes(value)
 }
 
 // Version sets the version field

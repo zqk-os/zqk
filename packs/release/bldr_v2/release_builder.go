@@ -20,7 +20,7 @@ func NewReleaseBuilder() *ReleaseBuilder {
 	// Configure the spec
 	builder.
 		SetExtends("base_object").
-		SetDescription("Represents a software release with version, release criteria, and release notes. Enables structured release planning, tracking, and documentation. ").
+		SetDescription("Represents a software release with version, release criteria, and release notes. Enables structured release planning, tracking, and documentation.\nLifecycle: release_lifecycle.yaml.\n").
 		SetVisibility("public").
 		SetSchemaVersion(objects.DefaultSchemaVersion).
 		AddTrait("base_object_traits")
@@ -147,6 +147,34 @@ func (b *ReleaseBuilder) addReleaseFields() {
 		WithPermissions("rwx").
 		WithSemanticType("statement").
 		WithProfileCode("REL-002"))
+	b.AddFieldBuilder(builders.NewFieldBuilder("release_notes", "string").
+		WithChecklist(builders.NewChecklistBuilder().
+			Authority("owner/release_manager.").
+			AutomationHooks("published with the release; the body readers see.").
+			Cardinality("one").
+			Criticality("composition").
+			Default(nil).
+			Dependencies("release publication.").
+			Lifecycle("mutable").
+			Observability("yes").
+			Purpose("Notes published with this release (changes, upgrade steps, known issues).").
+			Security("non-sensitive").
+			SystemUsage([]any{
+				"release notes",
+				"publication",
+			}).
+			Validation("free text. Empty until the release is ready to publish.").
+			Build()).
+		WithAccess(builders.NewAccessBuilder().
+			Requires("access:confidential").
+			Build()).
+		WithValidation(builders.NewValidationBuilder().
+			Required(false).
+			Build()).
+		WithTraits("readable", "writable", "modifiable", "searchable").
+		WithPermissions("rwx").
+		WithSemanticType("statement").
+		WithProfileCode("REL-008"))
 	b.AddFieldBuilder(builders.NewFieldBuilder("release_type", "enum").
 		WithChecklist(builders.NewChecklistBuilder().
 			Authority("owner/release_manager.").

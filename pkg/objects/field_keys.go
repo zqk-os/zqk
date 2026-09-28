@@ -596,6 +596,7 @@ const (
 	FieldKeyRelatedQuestionRefs             = "related_question_refs"
 	FieldKeyRelatedRisks                    = "related_risks"
 	FieldKeyReleaseDate                     = "release_date"
+	FieldKeyReleaseNotes                    = "release_notes"
 	FieldKeyReleaseRef                      = "release_ref"
 	FieldKeyReleaseType                     = "release_type"
 	FieldKeyRequirementRefs                 = "requirement_refs"

@@ -1,0 +1,130 @@
+$schema: "../../../.zqk/cli/specs/schemas/lifecycle_spec.schema.json"
+
+object_type: release
+# Five-question exam: docs/architecture/LIFECYCLE_STATE_MACHINE_RUBRIC.md
+# A release is a version cut: plan it, cut it, ship it, keep the record.
+extends: base_lifecycle
+status_mapping:
+  approved: planned
+  implemented: released
+  proposed: planned
+statuses:
+  - value: conceptual
+    display: Conceptual
+    origin: true
+    preliminary: true
+    description: Draft plane status. Prior to CAS membrane crossing.
+    role: realign
+  - value: originated
+    display: Originated
+    description: CAS membrane crossed. Object officially originated.
+    role: realign
+  - value: planned
+    display: Planned
+    role: shovel_ready
+    description: "Release is named and scheduled. Cutting has not started."
+  - value: in_progress
+    display: In Progress
+    role: execution_locked
+    description: "Release is being cut. Contents and notes are still moving."
+  - value: released
+    display: Released
+    terminal: true
+    work_done: true
+    role: terminal
+    description: "Release shipped. Version and notes are the published record."
+  - value: cancelled
+    display: Cancelled
+    terminal: true
+    role: terminal
+    description: "Release will not ship. The record stays until it is archived."
+  - value: archived
+    display: Archived
+    terminal: true
+    archive: true
+    role: terminal
+    description: "Release record kept for history. No further ship transitions."
+  - value: error
+    display: Error
+    system: true
+    role: halted
+    description: "Release is system-held for repair. Resolve before advancing."
+transitions:
+  - from: conceptual
+    to: originated
+    description: Promote from draft plane to CAS membrane (CAS Qualification).
+    manual: true
+    auto: false
+    catalyst: System promotion
+  - from: originated
+    to: planned
+    description: Initial domain transition once the release is on record.
+    manual: true
+    auto: true
+    catalyst: System initialization
+    postconditions:
+      - role is shovel_ready
+  - from: planned
+    to: in_progress
+    description: Start cutting the release.
+    manual: true
+    auto: false
+    postconditions:
+      - role is execution_locked
+  - from: planned
+    to: cancelled
+    description: Cancel a release that will not ship.
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+  - from: in_progress
+    to: released
+    description: Ship the release.
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+  - from: in_progress
+    to: cancelled
+    description: Cancel a release while it is being cut.
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+  - from: released
+    to: archived
+    description: Archive a shipped release.
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+      - ended; no further normal execution hops expected
+  - from: cancelled
+    to: archived
+    description: Archive a cancelled release.
+    manual: true
+    auto: false
+    postconditions:
+      - role is terminal
+      - ended; no further normal execution hops expected
+  - from: '*'
+    to: error
+    description: System error occurred
+    manual: false
+    auto: true
+    postconditions:
+      - role is halted
+      - hop from any occupancy to error
+      - system halt; repair before leaving halted
+percent_complete:
+  method: status_defaults
+  default_by_status:
+    archived: 100
+    cancelled: 100
+    conceptual: 0
+    error: 0
+    in_progress: 50
+    originated: 5
+    planned: 10
+    released: 100

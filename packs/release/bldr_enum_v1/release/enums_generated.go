@@ -48,12 +48,12 @@ const (
 type Status = shared_releasesenum.Status
 
 const (
-	StatusApproved    Status = shared_releasesenum.StatusApproved
-	StatusArchived    Status = shared_releasesenum.StatusArchived
-	StatusConceptual  Status = shared_releasesenum.StatusConceptual
-	StatusError       Status = shared_releasesenum.StatusError
-	StatusImplemented Status = shared_releasesenum.StatusImplemented
-	StatusInProgress  Status = shared_releasesenum.StatusInProgress
-	StatusOriginated  Status = shared_releasesenum.StatusOriginated
-	StatusProposed    Status = shared_releasesenum.StatusProposed
+	StatusArchived   Status = shared_releasesenum.StatusArchived
+	StatusCancelled  Status = shared_releasesenum.StatusCancelled
+	StatusConceptual Status = shared_releasesenum.StatusConceptual
+	StatusError      Status = shared_releasesenum.StatusError
+	StatusInProgress Status = shared_releasesenum.StatusInProgress
+	StatusOriginated Status = shared_releasesenum.StatusOriginated
+	StatusPlanned    Status = shared_releasesenum.StatusPlanned
+	StatusReleased   Status = shared_releasesenum.StatusReleased
 )

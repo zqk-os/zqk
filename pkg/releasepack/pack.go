@@ -2,6 +2,7 @@ package releasepack
 
 import (
 	_ "github.com/zqk-os/zqk/packs/release/bldr_instance_v1"
+	_ "github.com/zqk-os/zqk/packs/release/bldr_lifecycle_v1"
 	_ "github.com/zqk-os/zqk/packs/release/bldr_v2"
 )
 
