@@ -1,6 +1,8 @@
 package workpack
 
 import (
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/spf13/cobra"
@@ -54,6 +56,29 @@ func TestRegisterRequiresARoot(t *testing.T) {
 	Register(&cobra.Command{Use: "zqk"})
 	if !LinkedRoot() {
 		t.Fatal("Register did not record the root")
+	}
+}
+
+func TestVerifyRecordsEachPlanningSpec(t *testing.T) {
+	enabled = false
+	verifiedSpecs = nil
+	Enable()
+	if !Enabled() {
+		t.Fatal(VerifyError())
+	}
+	for _, kind := range Kinds() {
+		got, ok := VerifiedSpec(kind)
+		wantSuffix := filepath.Join("packs", "work", "specs", kind+".yaml")
+		if !ok || !strings.HasSuffix(got, wantSuffix) {
+			t.Fatalf("%s spec %q", kind, got)
+		}
+	}
+}
+
+func TestVerifyRejectsAKindWithoutASpec(t *testing.T) {
+	_, err := verifyKindFiles(t.TempDir(), []string{"goal"}, "specs", "lifecycles")
+	if err == nil {
+		t.Fatal("missing spec was accepted")
 	}
 }
 

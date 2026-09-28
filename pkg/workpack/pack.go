@@ -74,8 +74,20 @@ var (
 // BuilderCount is the number of generated constructors this pack links.
 func BuilderCount() int { return len(builders) }
 
-// Enable records that the composition root linked this pack.
-func Enable() { enabled = true }
+// Enable verifies this pack's spec and lifecycle files, records those spec
+// paths, and marks the pack linked. A failed verification leaves the pack disabled.
+func Enable() {
+	recorded, err := verifyOwnedKinds()
+	if err != nil {
+		enabled = false
+		verifiedSpecs = nil
+		verifyErr = err
+		return
+	}
+	verifiedSpecs = recorded
+	verifyErr = nil
+	enabled = true
+}
 
 // Enabled reports whether the composition root linked this pack.
 func Enabled() bool { return enabled }

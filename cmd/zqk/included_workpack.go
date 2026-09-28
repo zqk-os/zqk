@@ -12,13 +12,16 @@ import (
 )
 
 func init() {
+	workpack.Enable()
+	if !workpack.Enabled() {
+		return
+	}
 	objects.SetPackOwnedKinds(workpack.Kinds())
 	objects.AddModuleSpecRoot(workpack.SpecDir)
 	objects.AddModuleLifecycleRoot(workpack.LifecycleDir)
 	object.SetPackKindRegistrar(func(objectCmd *cobra.Command) {
 		object.RegisterKindCommandsForKinds(objectCmd, workpack.Kinds())
 	})
-	workpack.Enable()
 }
 
 func registerIncludedWorkPack() {
