@@ -9,12 +9,12 @@ import (
 
 // FormatVisualizer formats query results as graph edge path trees or visual relationships.
 func FormatVisualizer(result *traversal.QueryResult, ast *traversal.QueryAST) string {
-	if result == nil || len(result.Rows) == 0 {
-		return "No graph matches found to visualize.\n"
-	}
-
 	var sb strings.Builder
 	sb.WriteString("=== ZPARQL Graph Path Visualization ===\n")
+	if result == nil || len(result.Rows) == 0 {
+		sb.WriteString("No graph matches found to visualize.\n")
+		return sb.String()
+	}
 
 	hasEdges := false
 	if ast != nil {
