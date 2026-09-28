@@ -54,7 +54,7 @@ func Enable() { enabled = true }
 func Enabled() bool { return enabled }
 
 // Register records that the composition root handed this pack the command tree.
-// Commands that speak this pack's kinds still register from cmd/zqk.
+// The composition root attaches this pack's kind commands through the object registrar.
 func Register(root *cobra.Command) {
 	Enable()
 	if root == nil {
