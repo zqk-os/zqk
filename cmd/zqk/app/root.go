@@ -559,8 +559,18 @@ func Execute() {
 	// stale index entries (files written but index not persisted). See [REDACTED-ID].
 	if !isHelpOrVersion {
 		drainCtx, drainCancel := context.WithTimeout(context.Background(), 5*time.Second) // Background: shutdown drain // Background: request-or-shutdown derived
-		_ = storage.GetGlobalShutdownCoordinator().DrainAll(drainCtx)
-		filecas.DrainDarwinSyncQueue(5 * time.Second)
+		if drainErr := storage.GetGlobalShutdownCoordinator().DrainAll(drainCtx); drainErr != nil {
+			logging.Fluent(logging.NewLogger(os.Stderr, logging.WarnLevel, logging.NewTextFormatter(drainCtx))).
+				Warn("storage shutdown drain completed with warnings").
+				WithError(drainErr).
+				Log()
+		}
+		if darwinErr := filecas.DrainDarwinSyncQueueContext(drainCtx); darwinErr != nil {
+			logging.Fluent(logging.NewLogger(os.Stderr, logging.WarnLevel, logging.NewTextFormatter(drainCtx))).
+				Warn("darwin CAS sync queue drain completed with warnings").
+				WithError(darwinErr).
+				Log()
+		}
 		drainCancel()
 		hook.Wait() // Wait for async metrics recording
 	}

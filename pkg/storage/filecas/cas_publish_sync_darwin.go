@@ -3,8 +3,10 @@
 package filecas
 
 import (
+	"context"
 	"errors"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
@@ -16,6 +18,8 @@ var (
 	darwinSyncQueueOnce sync.Once
 	darwinSyncQueue     chan *fileutil.File
 	darwinSyncWG        sync.WaitGroup
+	darwinSyncPending   atomic.Int64
+	darwinSyncShutdown  atomic.Bool
 )
 
 func initDarwinSyncQueue() {
@@ -28,6 +32,7 @@ func initDarwinSyncQueue() {
 						logging.LogSwallowedError(err)
 					}
 				}
+				darwinSyncPending.Add(-1)
 				darwinSyncWG.Done()
 			}
 		})
@@ -42,6 +47,12 @@ func syncAndClose(f *fileutil.File) error {
 func queueOrSync(queue chan<- *fileutil.File, f *fileutil.File) error {
 	isGlobalQueue := (queue == darwinSyncQueue)
 	if isGlobalQueue {
+		// If shutdown has been initiated, do not queue asynchronously;
+		// immediately sync synchronously to guarantee durability before process exit.
+		if darwinSyncShutdown.Load() {
+			return syncAndClose(f)
+		}
+		darwinSyncPending.Add(1)
 		darwinSyncWG.Add(1)
 	}
 	select {
@@ -52,14 +63,35 @@ func queueOrSync(queue chan<- *fileutil.File, f *fileutil.File) error {
 		// synchronous fsync so a successful publish still has crash semantics.
 		err := syncAndClose(f)
 		if isGlobalQueue {
+			darwinSyncPending.Add(-1)
 			darwinSyncWG.Done()
 		}
 		return err
 	}
 }
 
-// DrainDarwinSyncQueue waits up to timeout for all pending background CAS syncs to complete.
-func DrainDarwinSyncQueue(timeout time.Duration) error {
+// InitiateDarwinSyncShutdown signals that the darwin CAS sync queue is preparing for shutdown,
+// forcing all subsequent publish syncs to execute synchronously.
+func InitiateDarwinSyncShutdown() error {
+	darwinSyncShutdown.Store(true)
+	return nil
+}
+
+// IsDarwinSyncQueueDrained reports whether there are zero pending sync operations.
+func IsDarwinSyncQueueDrained() bool {
+	return darwinSyncPending.Load() == 0
+}
+
+// DarwinSyncQueuePendingCount returns the current count of pending background sync operations.
+func DarwinSyncQueuePendingCount() int64 {
+	return darwinSyncPending.Load()
+}
+
+// DrainDarwinSyncQueueContext waits until all pending background CAS syncs complete or ctx is cancelled.
+func DrainDarwinSyncQueueContext(ctx context.Context) error {
+	if ctx == nil {
+		ctx = context.Background()
+	}
 	done := make(chan struct{})
 	goroutinelabels.NewGoroutine("storage.darwin_cas_sync_drain", "await darwin CAS sync queue drain").
 		StartSimple(func() {
@@ -67,19 +99,31 @@ func DrainDarwinSyncQueue(timeout time.Duration) error {
 			close(done)
 		})
 
-	if timeout <= 0 {
-		timeout = 5 * time.Second
-	}
-
 	select {
 	case <-done:
 		return nil
-	case <-time.After(timeout):
-		return errors.New("timed out waiting for darwin CAS sync queue to drain")
+	case <-ctx.Done():
+		return ctx.Err()
 	}
 }
 
-// casPublishSyncFileOS queues asynchronous background fsync on macOS to prevent
+// DrainDarwinSyncQueue waits up to timeout for all pending background CAS syncs to complete.
+func DrainDarwinSyncQueue(timeout time.Duration) error {
+	if timeout <= 0 {
+		timeout = 5 * time.Second
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	if err := DrainDarwinSyncQueueContext(ctx); err != nil {
+		if errors.Is(err, context.DeadlineExceeded) {
+			return errors.New("timed out waiting for darwin CAS sync queue to drain")
+		}
+		return err
+	}
+	return nil
+}
+
+// CasPublishSyncFileOS queues asynchronous background fsync on macOS to prevent
 // stalling synchronous CAS publishes on F_FULLFSYNC while ensuring background durability (K:F-L-RELIABILITY-001).
 func CasPublishSyncFileOS(f *fileutil.File) error {
 	if f == nil {
