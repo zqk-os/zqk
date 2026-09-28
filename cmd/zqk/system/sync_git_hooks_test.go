@@ -122,6 +122,9 @@ func TestEnsureGitHooks_InstallsPreCommitAndPrePush(t *testing.T) {
 	if !bytes.Contains(preCommitContent, []byte("FAIL-CLOSED BRANCH PROTECTION VIOLATION")) {
 		t.Errorf("pre-commit missing branch protection check")
 	}
+	if !bytes.Contains(preCommitContent, []byte("Failed to find or compile zqk-vet verification engine! Aborting commit.")) {
+		t.Errorf("pre-commit missing fail-closed zqk-vet check")
+	}
 
 	prePushContent, err := fileutil.ReadFile(prePush)
 	if err != nil {
@@ -129,5 +132,8 @@ func TestEnsureGitHooks_InstallsPreCommitAndPrePush(t *testing.T) {
 	}
 	if !bytes.Contains(prePushContent, []byte("FAIL-CLOSED BRANCH PROTECTION VIOLATION")) {
 		t.Errorf("pre-push missing branch protection check")
+	}
+	if !bytes.Contains(prePushContent, []byte("CODEBASE VERIFICATION GATE FAILED")) {
+		t.Errorf("pre-push missing zqk-vet verification gate")
 	}
 }

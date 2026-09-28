@@ -424,28 +424,45 @@ if [ -f "$REPO_ROOT/scripts/scan-secrets.sh" ]; then
 	fi
 fi
 
+export PATH="/usr/local/go/bin:/opt/homebrew/bin:$HOME/go/bin:$GOPATH/bin:$PATH"
+
 # 5. Codebase Verification Gate (zqk-vet)
 # Enforces AST hygiene (paths, permissions, CLI names, raw goroutines), tree policing, and invariants.
 ZQK_VET_BIN=""
+
+# Rebuild zqk-vet if missing or if sources/config are newer than the binary
+NEED_VET_BUILD=0
+if [ ! -x "$REPO_ROOT/bin/zqk-vet" ]; then
+	NEED_VET_BUILD=1
+elif [ -n "$(find "$REPO_ROOT/cmd/zqk-vet" "$REPO_ROOT/pkg/vet" "$REPO_ROOT/config/gates.yaml" -newer "$REPO_ROOT/bin/zqk-vet" 2>/dev/null)" ]; then
+	NEED_VET_BUILD=1
+fi
+
+if [ "$NEED_VET_BUILD" -eq 1 ]; then
+	if command -v go >/dev/null 2>&1 && [ -f "$REPO_ROOT/cmd/zqk-vet/main.go" ]; then
+		echo "⚙️  [ZQK PRE-COMMIT] Compiling bin/zqk-vet..."
+		mkdir -p "$REPO_ROOT/bin"
+		go build -trimpath -o "$REPO_ROOT/bin/zqk-vet" "$REPO_ROOT/cmd/zqk-vet" 2>/dev/null || true
+	fi
+fi
+
 if [ -x "$REPO_ROOT/bin/zqk-vet" ]; then
 	ZQK_VET_BIN="$REPO_ROOT/bin/zqk-vet"
 elif command -v zqk-vet >/dev/null 2>&1; then
 	ZQK_VET_BIN="$(command -v zqk-vet)"
-elif command -v go >/dev/null 2>&1 && [ -f "$REPO_ROOT/cmd/zqk-vet/main.go" ]; then
-	echo "⚙️  [ZQK PRE-COMMIT] Compiling bin/zqk-vet..."
-	go build -trimpath -o "$REPO_ROOT/bin/zqk-vet" "$REPO_ROOT/cmd/zqk-vet" 2>/dev/null || true
-	if [ -x "$REPO_ROOT/bin/zqk-vet" ]; then
-		ZQK_VET_BIN="$REPO_ROOT/bin/zqk-vet"
-	fi
 fi
 
-if [ -n "$ZQK_VET_BIN" ]; then
-	echo "🛡️  [ZQK PRE-COMMIT] Running zqk-vet hygiene and tree police checks..."
-	VET_SUITES="${ZQK_VET_SUITE:-hygiene,tree_police}"
-	if ! "$ZQK_VET_BIN" --suite "$VET_SUITES"; then
-		echo "❌ [ZQK PRE-COMMIT] zqk-vet verification failed! Please resolve findings before committing."
-		exit 1
-	fi
+if [ -z "$ZQK_VET_BIN" ]; then
+	echo "❌ [ZQK PRE-COMMIT] Failed to find or compile zqk-vet verification engine! Aborting commit." >&2
+	echo "   Ensure 'go' is installed and available in PATH to compile bin/zqk-vet." >&2
+	exit 1
+fi
+
+echo "🛡️  [ZQK PRE-COMMIT] Running zqk-vet hygiene and tree police checks..."
+VET_SUITES="${ZQK_VET_SUITE:-hygiene,tree_police}"
+if ! "$ZQK_VET_BIN" --suite "$VET_SUITES"; then
+	echo "❌ [ZQK PRE-COMMIT] zqk-vet verification failed! Please resolve findings before committing." >&2
+	exit 1
 fi
 `
 
@@ -503,6 +520,51 @@ while read -r local_ref local_oid remote_ref remote_oid; do
 		exit 1
 	fi
 done
+
+# Augment PATH so git GUI clients and subshells find go and tools
+export PATH="/usr/local/go/bin:/opt/homebrew/bin:$HOME/go/bin:$GOPATH/bin:$PATH"
+
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+
+# Codebase Verification Gate (zqk-vet)
+# Secondary defense: catches any bypass of pre-commit (e.g. git commit --no-verify)
+if [ -d "$REPO_ROOT/.zqk" ]; then
+	ZQK_VET_BIN=""
+	NEED_VET_BUILD=0
+	if [ ! -x "$REPO_ROOT/bin/zqk-vet" ]; then
+		NEED_VET_BUILD=1
+	elif [ -n "$(find "$REPO_ROOT/cmd/zqk-vet" "$REPO_ROOT/pkg/vet" "$REPO_ROOT/config/gates.yaml" -newer "$REPO_ROOT/bin/zqk-vet" 2>/dev/null)" ]; then
+		NEED_VET_BUILD=1
+	fi
+
+	if [ "$NEED_VET_BUILD" -eq 1 ]; then
+		if command -v go >/dev/null 2>&1 && [ -f "$REPO_ROOT/cmd/zqk-vet/main.go" ]; then
+			echo "⚙️  [ZQK PRE-PUSH] Compiling bin/zqk-vet..."
+			mkdir -p "$REPO_ROOT/bin"
+			go build -trimpath -o "$REPO_ROOT/bin/zqk-vet" "$REPO_ROOT/cmd/zqk-vet" 2>/dev/null || true
+		fi
+	fi
+
+	if [ -x "$REPO_ROOT/bin/zqk-vet" ]; then
+		ZQK_VET_BIN="$REPO_ROOT/bin/zqk-vet"
+	elif command -v zqk-vet >/dev/null 2>&1; then
+		ZQK_VET_BIN="$(command -v zqk-vet)"
+	fi
+
+	if [ -n "$ZQK_VET_BIN" ]; then
+		echo "🛡️  [ZQK PRE-PUSH] Running zqk-vet verification before push..."
+		VET_SUITES="${ZQK_VET_SUITE:-hygiene,tree_police}"
+		if ! "$ZQK_VET_BIN" --suite "$VET_SUITES"; then
+			echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+			echo "❌ [ZQK PRE-PUSH] CODEBASE VERIFICATION GATE FAILED" >&2
+			echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+			echo "Push aborted because zqk-vet detected hygiene or tree police violations." >&2
+			echo "Resolve all findings reported above before pushing to remote." >&2
+			echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+			exit 1
+		fi
+	fi
+fi
 
 exit 0
 `

@@ -24,6 +24,8 @@ hygiene:
     - "cmd/"
     - "internal/"
     - "scripts/"
+    - "packs/"
+    - "ext/"
   exemptions:
     - "*_test.go"
     - "vendor/*"
