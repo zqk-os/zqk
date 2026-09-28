@@ -6,7 +6,6 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
-	bldr_instance_v1 "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
 	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/validation"
@@ -41,28 +40,15 @@ func finalID(explicitID, idHint string) string {
 	return idHint
 }
 
-// freshInstanceBuilder returns a new builder instance (registry builders are mutable singletons).
+// freshInstanceBuilder returns a new builder for kind. Registry builders are mutable
+// singletons, so each apply gets its own instance from the spec.
 // TRACK: parallel bundle apply must not share builder state.
 func freshInstanceBuilder(kind string) (instance_builders.InstanceBuilder, error) {
-	schemaVersion := objects.DefaultSchemaVersion
-	switch kind {
-	case objects.KindGoal:
-		return bldr_instance_v1.NewGoalInstanceBuilder(schemaVersion), nil
-	case objects.KindRequirement:
-		return bldr_instance_v1.NewRequirementInstanceBuilder(schemaVersion), nil
-	case objects.KindCriteria:
-		return bldr_instance_v1.NewCriteriaInstanceBuilder(schemaVersion), nil
-	case objects.KindTestCase:
-		return bldr_instance_v1.NewTestCaseInstanceBuilder(schemaVersion), nil
-	case objects.KindBacklogItem:
-		return bldr_instance_v1.NewBacklogItemInstanceBuilder(schemaVersion), nil
-	case objects.KindDocEntry:
-		return bldr_instance_v1.NewDocEntryInstanceBuilder(schemaVersion), nil
-	case objects.KindConvergenceSession:
-		return bldr_instance_v1.NewConvergenceSessionInstanceBuilder(schemaVersion), nil
-	default:
-		return instance_builders.GetGlobalRegistry().GetBuilder(kind, schemaVersion)
+	schemaVersion, err := instance_builders.SchemaVersionForKind(kind)
+	if err != nil {
+		return nil, err
 	}
+	return instance_builders.NewForKind(kind, schemaVersion), nil
 }
 
 func applyGoals(

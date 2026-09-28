@@ -21,20 +21,7 @@ func (sb *ScenarioBuilder) prepareObjectFromDataFile(obj map[string]any, kind st
 		obj[objects.FieldKeySchemaVersion] = schemaVersion
 	}
 
-	// Get instance builder from registry
-	registry := instancebuilders.GetGlobalRegistry()
-	builder, err := registry.GetBuilder(kind, schemaVersion)
-	if err != nil {
-		// If builder not available, just set fields directly
-		// Use background context since we don't have ctx in this function
-		sb.emitCoordinatorEvent(pkgctx.NewSystemContext(), ScenarioBuilderProfileName, scenarioBuilderStatusWarning,
-			"Failed to get instance builder, setting fields directly",
-			map[string]any{
-				objects.FieldKeyKind: kind,
-				"error":              err,
-			})
-		return sb.setFieldsDirectly(obj, kind)
-	}
+	builder := instancebuilders.NewForKind(kind, schemaVersion)
 
 	// Load lifecycle to get valid statuses
 	// Use storage instance's lifecycle loader to ensure correct project context

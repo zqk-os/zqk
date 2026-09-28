@@ -16,8 +16,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
 	"github.com/zqk-os/zqk/pkg/storagetesting"
 
-	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1" // Register instance builders for tests
-	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2"          // Register spec builders for tests
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2" // Register spec builders for tests
 )
 
 // objectCompleteTestEnv mirrors pkg/testing.TestEnvironment fields used by move tests.

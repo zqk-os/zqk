@@ -1491,36 +1491,12 @@ func createTestObject(kind, id string, kindFields *objects.KindFields, index int
 		}
 	}
 
-	// Get instance builder from registry
-	registry := instancebuilders.GetGlobalRegistry()
-	builder, err := registry.GetBuilder(kind, schemaVersion)
-	if err != nil {
-		// Builder not available - return minimal object
-		obj := make(map[string]any)
-		obj[objects.FieldKeyKind] = kind
-		obj[objects.FieldKeyID] = id
-		obj[objects.FieldKeyTitle] = fixtureObjectTitle(kind, index+1)
-		obj[objects.FieldKeySchemaVersion] = schemaVersion
-		if specHasStatus || hasField(kindFields, "status") {
-			obj[objects.FieldKeyStatus] = getInitialStatusForKind(kind)
-		}
-		setKindSpecificFieldsForCLI(obj, kind, index)
-		if err := normalizeObjectValues(obj, kindFields); err != nil {
-			// Log error but don't fail - normalization is best effort
-		}
-		return obj
-	}
-
-	// Use instance builder
+	builder := instancebuilders.NewForKind(kind, schemaVersion)
 	builder.SetID(id)
 	builder.SetField(objects.FieldKeyTitle, fixtureObjectTitle(kind, index+1))
-
-	// Set status if field exists
 	if specHasStatus || hasField(kindFields, "status") {
 		builder.SetStatus(getInitialStatusForKind(kind))
 	}
-
-	// Build instance
 	instance, err := builder.Build()
 	if err != nil {
 		// Build failed - return minimal object

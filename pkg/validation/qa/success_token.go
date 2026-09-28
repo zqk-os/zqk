@@ -7,7 +7,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/objects"
 	qasuccessenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/qa_success"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 )
 
 // qaSuccessTitlePrefix is the human-readable name for a minted token. base_object
@@ -28,12 +28,12 @@ func newQASuccessID() string {
 }
 
 func buildQASuccessObject(itemID, signature, publicKey string) (map[string]any, error) {
-	b := bldr_instance_v1.NewQaSuccessInstanceBuilder(objects.DefaultSchemaVersion)
-	b.ID(newQASuccessID()).
-		Title(QASuccessTitle(itemID)).
-		ItemId(itemID).
-		Status(qasuccessenum.StatusSuccess).
-		Signature(signature).
-		PublicKey(publicKey)
+	b := instance_builders.NewForKind(KindQASuccess, objects.DefaultSchemaVersion)
+	b.SetID(newQASuccessID()).
+		SetField(objects.FieldKeyTitle, QASuccessTitle(itemID)).
+		SetField(objects.FieldKeyItemID, itemID).
+		SetStatus(string(qasuccessenum.StatusSuccess)).
+		SetField(objects.FieldKeySignature, signature).
+		SetField(objects.FieldKeyPublicKey, publicKey)
 	return b.Build()
 }

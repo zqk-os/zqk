@@ -16,7 +16,6 @@ import (
 	"github.com/zqk-os/zqk/internal/cli"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
-	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1" // Register audit event builder
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 

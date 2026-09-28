@@ -18,7 +18,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	objectSpecEnum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/object_spec"
-	bldr_instance_v1 "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -328,14 +328,14 @@ func buildObjectSpecObjectFromBundledFile(projectRoot, absPath string, data []by
 		desc = desc + " specification"
 	}
 
-	b := bldr_instance_v1.NewObjectSpecInstanceBuilder(sv)
-	b.ID(id)
-	b.Status(objectSpecEnum.StatusImplemented)
+	b := instance_builders.NewForKind(objects.KindObjectSpec, sv)
+	b.SetID(id)
+	b.SetStatus(string(objectSpecEnum.StatusImplemented))
 	b.SetField(objects.FieldKeyTitle, title)
 	b.SetField(objects.FieldKeyDescription, desc)
-	b.Ontology(ontology)
-	b.FilePath(relPath)
-	b.SourceType(objectSpecEnum.SourceTypeInternal)
+	b.SetField(objects.FieldKeyOntology, ontology)
+	b.SetField(objects.FieldKeyFilePath, relPath)
+	b.SetField(objects.FieldKeySourceType, string(objectSpecEnum.SourceTypeInternal))
 	b.SetField(objects.FieldKeyNamespaceID, "zqk:kernel")
 	b.SetField(objects.FieldKeyOriginProject, "zqk")
 	b.SetField(objects.FieldKeyOriginSystem, "zqk")

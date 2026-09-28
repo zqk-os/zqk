@@ -7,7 +7,6 @@ import (
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/paths"
-	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 

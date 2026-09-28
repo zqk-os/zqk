@@ -244,12 +244,13 @@ func TestUpdateAllFields(t *testing.T) {
 				}
 			}
 
-			// Get instance builder from registry
-			registry := instancebuilders.GetGlobalRegistry()
-			builder, err := registry.GetBuilder(kind, schemaVersion)
+			builder := instancebuilders.NewForKind(kind, schemaVersion)
+			builder.SetID(testID)
+			builder.SetField(objects.FieldKeyTitle, "Test Object")
+			builder.SetStatus(getInitialStatus(kind))
+			instance, buildErr := builder.Build()
 			var obj map[string]any
-			if err != nil {
-				// Builder not available - create minimal object
+			if buildErr != nil {
 				obj = map[string]any{
 					objects.FieldKeyID:            testID,
 					objects.FieldKeyKind:          kind,
@@ -258,22 +259,7 @@ func TestUpdateAllFields(t *testing.T) {
 					objects.FieldKeySchemaVersion: schemaVersion,
 				}
 			} else {
-				builder.SetID(testID)
-				builder.SetField(objects.FieldKeyTitle, "Test Object")
-				builder.SetStatus(getInitialStatus(kind))
-				instance, buildErr := builder.Build()
-				if buildErr != nil {
-					// Build failed - create minimal object
-					obj = map[string]any{
-						objects.FieldKeyID:            testID,
-						objects.FieldKeyKind:          kind,
-						objects.FieldKeyTitle:         "Test Object",
-						objects.FieldKeyStatus:        getInitialStatus(kind),
-						objects.FieldKeySchemaVersion: schemaVersion,
-					}
-				} else {
-					obj = instance
-				}
+				obj = instance
 			}
 
 			// Add required fields for specific kinds
@@ -567,16 +553,12 @@ func TestUpdateID(t *testing.T) {
 		}
 	}
 
-	registry := instancebuilders.GetGlobalRegistry()
-	builder, err := registry.GetBuilder("backlog_item", schemaVersion)
-	if err == nil && builder != nil {
-		builder.SetID(oldID)
-		builder.SetField(objects.FieldKeyTitle, "Test Object")
-		builder.SetStatus("planned")
-		instance, buildErr := builder.Build()
-		if buildErr == nil {
-			obj = instance
-		}
+	builder := instancebuilders.NewForKind(objects.KindBacklogItem, schemaVersion)
+	builder.SetID(oldID)
+	builder.SetField(objects.FieldKeyTitle, "Test Object")
+	builder.SetStatus("planned")
+	if instance, buildErr := builder.Build(); buildErr == nil {
+		obj = instance
 	}
 
 	// Fallback to manual construction if builder failed
@@ -719,12 +701,13 @@ func TestCacheInvalidationOnUpdate(t *testing.T) {
 		}
 	}
 
-	// Get instance builder from registry
-	registry := instancebuilders.GetGlobalRegistry()
-	builder, err := registry.GetBuilder("backlog_item", schemaVersion)
+	builder := instancebuilders.NewForKind(objects.KindBacklogItem, schemaVersion)
+	builder.SetID(objID)
+	builder.SetField(objects.FieldKeyTitle, "Cache Test")
+	builder.SetStatus("exploring") // Use exploring status to avoid lifecycle precondition requirements
+	instance, buildErr := builder.Build()
 	var obj map[string]any
-	if err != nil {
-		// Builder not available - create minimal object
+	if buildErr != nil {
 		obj = map[string]any{
 			objects.FieldKeyID:            objID,
 			objects.FieldKeyKind:          "backlog_item",
@@ -733,22 +716,7 @@ func TestCacheInvalidationOnUpdate(t *testing.T) {
 			objects.FieldKeySchemaVersion: schemaVersion,
 		}
 	} else {
-		builder.SetID(objID)
-		builder.SetField(objects.FieldKeyTitle, "Cache Test")
-		builder.SetStatus("exploring") // Use exploring status to avoid lifecycle precondition requirements
-		instance, buildErr := builder.Build()
-		if buildErr != nil {
-			// Build failed - create minimal object
-			obj = map[string]any{
-				objects.FieldKeyID:            objID,
-				objects.FieldKeyKind:          "backlog_item",
-				objects.FieldKeyTitle:         "Cache Test",
-				objects.FieldKeyStatus:        objects.ObjectStatusExploring, // Use exploring status to avoid lifecycle precondition requirements
-				objects.FieldKeySchemaVersion: schemaVersion,
-			}
-		} else {
-			obj = instance
-		}
+		obj = instance
 	}
 
 	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.

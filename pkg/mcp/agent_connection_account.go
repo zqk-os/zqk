@@ -14,7 +14,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/observer"
 	accountEnum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/accounts"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 )
 
 const (
@@ -56,16 +56,16 @@ func handleAgentConnectionCreateAccount(ctx context.Context, s *Server, info obs
 	}
 	accountID := "account:" + username
 
-	builder := bldr_instance_v1.NewAccountInstanceBuilder(objects.DefaultSchemaVersion)
+	builder := instance_builders.NewForKind(objects.KindAccount, objects.DefaultSchemaVersion)
 	displayName := info.ClientName
 	if displayName == emptyValue {
 		displayName = info.ClientID
 	}
-	builder.ID(accountID).
-		Status(accountEnum.StatusActive).
-		Username(username).
-		DisplayName(displayName).
-		Roles([]string{defaultAgentRole})
+	builder.SetID(accountID).
+		SetStatus(string(accountEnum.StatusActive)).
+		SetField(objects.FieldKeyUsername, username).
+		SetField(objects.FieldKeyDisplayName, displayName).
+		SetField(objects.FieldKeyRoles, []string{defaultAgentRole})
 	instanceMap, err := builder.Build()
 	if err != nil {
 		logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileMCP))

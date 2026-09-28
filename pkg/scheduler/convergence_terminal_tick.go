@@ -15,7 +15,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	enumv "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/convergence_session"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -159,22 +159,22 @@ func writeTerminalFollowupMarker(path string, m *terminalFollowupMarker) error {
 
 // buildFollowupDraftConvergenceSessionObject builds a create payload (no id) for a draft CVS linked to priorSessionID.
 func buildFollowupDraftConvergenceSessionObject(priorSessionID string, prior map[string]any, snap *TestBundleConvergenceSnapshot) map[string]any {
-	b := bldr_instance_v1.NewConvergenceSessionInstanceBuilder(objects.DefaultSchemaVersion)
-	b.Status(enumv.StatusDraft)
+	b := instance_builders.NewForKind(objects.KindConvergenceSession, objects.DefaultSchemaVersion)
+	b.SetStatus(string(enumv.StatusDraft))
 	title := "Follow-up convergence session"
 	if t, _ := prior[objects.FieldKeyTitle].(string); strings.TrimSpace(t) != "" {
 		title = "Follow-up: " + strings.TrimSpace(t)
 	}
-	b.Title(title)
-	b.CurrentPhase(enumv.CurrentPhaseC1Scope)
-	b.DeltaAssessment(enumv.DeltaAssessmentUnknown)
-	b.OutcomeCharacter(enumv.OutcomeCharacterPending)
+	b.SetField(objects.FieldKeyTitle, title)
+	b.SetField(objects.FieldKeyCurrentPhase, string(enumv.CurrentPhaseC1Scope))
+	b.SetField(objects.FieldKeyDeltaAssessment, string(enumv.DeltaAssessmentUnknown))
+	b.SetField(objects.FieldKeyOutcomeCharacter, string(enumv.OutcomeCharacterPending))
 	na := "Review test-bundle health and activate this session when ready."
 	if snap != nil && strings.TrimSpace(snap.NextActionHint) != "" {
 		na = strings.TrimSpace(snap.NextActionHint)
 	}
-	b.SetNextAction(na)
-	b.RelatedObjectRefs([]string{priorSessionID})
+	b.SetField(objects.FieldKeyNextAction, na)
+	b.SetField(objects.FieldKeyRelatedObjectRefs, []string{priorSessionID})
 
 	copyKeys := []string{
 		objects.FieldKeyHypothesis,
@@ -201,7 +201,14 @@ func buildFollowupDraftConvergenceSessionObject(priorSessionID string, prior map
 	b.SetID("CVS-TEST-TERMINAL-TICK")
 	obj, err := b.Build()
 	if err != nil {
-		out := b.ToEventMap()
+		base, ok := b.(*instance_builders.BaseInstanceBuilder)
+		if !ok {
+			return map[string]any{
+				objects.FieldKeyKind:          objects.KindConvergenceSession,
+				objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+			}
+		}
+		out := base.ToEventMap()
 		merged := make(map[string]any, len(out)+4)
 		maps.Copy(merged, out)
 		merged[objects.FieldKeyKind] = objects.KindConvergenceSession

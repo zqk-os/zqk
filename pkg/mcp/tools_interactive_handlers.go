@@ -77,11 +77,7 @@ func HandleCreateObjectInteractive(ctx context.Context, server *Server, args map
 
 	// Try to load instance builder from registry (if not already loaded)
 	if builder == nil {
-		registry := instancebuilders.GetGlobalRegistry()
-		if b, err := registry.GetBuilder(kind, schemaVersion); err == nil {
-			builder = b
-		}
-		// If builder not found, we'll fallback to template-based approach
+		builder = instancebuilders.NewForKind(kind, schemaVersion)
 	}
 
 	// Process the loop (for validation and completeness checking)

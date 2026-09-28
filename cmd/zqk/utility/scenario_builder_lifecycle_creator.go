@@ -12,7 +12,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
-	bldr_instance_v1 "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -149,7 +149,7 @@ func (sb *ScenarioBuilder) createLifecycleObjectFromFile(ctx context.Context, li
 
 // lifecycleToObjectMap converts a Lifecycle struct to a lifecycle object map
 func lifecycleToObjectMap(lifecycle *objects.Lifecycle, objectType, version string) (map[string]any, error) {
-	builder := bldr_instance_v1.NewLifecycleInstanceBuilder(scenarioBuilderSchemaV2)
+	builder := instance_builders.NewForKind(objects.KindLifecycle, scenarioBuilderSchemaV2)
 
 	// Set ID (use abbreviation format)
 	abbrev := getObjectTypeAbbreviationForLifecycle(objectType)
@@ -157,8 +157,8 @@ func lifecycleToObjectMap(lifecycle *objects.Lifecycle, objectType, version stri
 	builder.SetID(lifecycleID)
 
 	// Set object_type and source_type
-	builder.SetObjectType(objectType)
-	builder.SetSourceType(scenarioBuilderSourceBuiltIn)
+	builder.SetField(objects.FieldKeyObjectType, objectType)
+	builder.SetField(objects.FieldKeySourceType, scenarioBuilderSourceBuiltIn)
 
 	// Set title (required by base_object) - derive from object_type
 	// Convert object_type like "base_object" to "Base Object Lifecycle"
@@ -178,7 +178,7 @@ func lifecycleToObjectMap(lifecycle *objects.Lifecycle, objectType, version stri
 
 	// Set extends if present
 	if lifecycle.Extends != emptyValue {
-		builder.SetExtends(lifecycle.Extends)
+		builder.SetField(objects.FieldKeyExtends, lifecycle.Extends)
 	}
 
 	// Convert status_mapping
@@ -187,7 +187,7 @@ func lifecycleToObjectMap(lifecycle *objects.Lifecycle, objectType, version stri
 		for k, v := range lifecycle.StatusMapping {
 			statusMapping[k] = v
 		}
-		builder.SetStatusMapping(statusMapping)
+		builder.SetField(objects.FieldKeyStatusMapping, statusMapping)
 	}
 
 	// Convert statuses
@@ -253,7 +253,7 @@ func lifecycleToObjectMap(lifecycle *objects.Lifecycle, objectType, version stri
 		if len(lifecycle.PercentComplete.MilestoneBased) > 0 {
 			percentComplete["milestone_based"] = lifecycle.PercentComplete.MilestoneBased
 		}
-		builder.SetPercentComplete(percentComplete)
+		builder.SetField(objects.FieldKeyPercentComplete, percentComplete)
 	}
 
 	// Build the object

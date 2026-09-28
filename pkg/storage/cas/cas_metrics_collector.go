@@ -12,7 +12,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/metricsrecording"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
 	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	"github.com/zqk-os/zqk/pkg/zqktime"
 )
@@ -70,15 +69,13 @@ func (c *CASMetricsCollector) CollectMetrics(
 	// TODO: Create cas_metric builder when schema is defined.
 	// For now, use command_metric as a temporary solution (similar to audit_metrics).
 	// Get instance builder from registry (factory pattern)
-	registry := instance_builders.GetGlobalRegistry()
-	schemaVersion, err := registry.GetLatestVersion("command_metric")
+	schemaVersion, err := instance_builders.SchemaVersionForKind(objects.KindCommandMetric)
 	if err != nil {
 		return "", errfmt.Newf(ConstStreamFailedToGetLatestSchemaVersionForCommandMetric).Wrap(err)
 	}
 
-	// Create a fresh builder instance for this use (not from registry singleton)
-	// NOTE: Using command_metric builder temporarily until cas_metric schema is defined
-	builder := bldr_instance_v1.NewCommandMetricInstanceBuilder(schemaVersion)
+	// command_metric stands in until a cas_metric spec exists.
+	builder := instance_builders.NewForKind(objects.KindCommandMetric, schemaVersion)
 
 	// Generate ID for the metric (required by builder.Build())
 	// Uses thread-safe batch generator (via generateID) for consistency with other ID generation
@@ -106,7 +103,7 @@ func (c *CASMetricsCollector) CollectMetrics(
 
 	// Build CAS metric using command_metric builder (temporary until cas_metric schema exists)
 	// Builder automatically handles: created_at, updated_at, created_by, updated_by, namespace_id, origin_project, origin_system, status
-	builder.ID(metricID).
+	builder.SetID(metricID).
 		SetField(MetricFieldTitle, title).
 		SetField(MetricFieldMetricType, StorageMetricTypePerformance).
 		SetField(MetricFieldSource, CASSystemMetricSource).
@@ -120,13 +117,13 @@ func (c *CASMetricsCollector) CollectMetrics(
 	// Set command_metric fields (using CAS metrics as approximations)
 	// NOTE: command_metric fields don't perfectly match CAS metrics, but we're using it
 	// as a temporary solution. Ideally, this should use a dedicated cas_metric type.
-	builder.Command(ConstStreamCasOperations). // Placeholder command name
-							NormalizedCmd(ConstStreamCasOperations)
+	builder.SetField(objects.FieldKeyCommand, ConstStreamCasOperations).
+		SetField(objects.FieldKeyNormalizedCmd, ConstStreamCasOperations)
 	totalOps := snapshot.Creates + snapshot.Reads + snapshot.Updates + snapshot.Deletes
 	totalFailures := snapshot.CreateFailures + snapshot.ReadFailures + snapshot.UpdateFailures + snapshot.DeleteFailures
-	builder.InvocationCount(int(totalOps)).
-		SuccessCount(int(totalOps - totalFailures)).
-		FailureCount(int(totalFailures))
+	builder.SetField(objects.FieldKeyInvocationCount, int(totalOps)).
+		SetField(objects.FieldKeySuccessCount, int(totalOps-totalFailures)).
+		SetField(objects.FieldKeyFailureCount, int(totalFailures))
 
 	// Calculate durations
 	var avgTime time.Duration
@@ -167,19 +164,19 @@ func (c *CASMetricsCollector) CollectMetrics(
 		minTime = snapshot.MaxDeleteTime
 	}
 
-	builder.AvgDurationSeconds(avgTime.Seconds()).
-		SlowestDurationSeconds(maxTime.Seconds()).
-		FastestDurationSeconds(minTime.Seconds()).
-		BaselineDurationSeconds(avgTime.Seconds()) // Use avg as baseline
+	builder.SetField(objects.FieldKeyAvgDurationSeconds, avgTime.Seconds()).
+		SetField(objects.FieldKeySlowestDurationSeconds, maxTime.Seconds()).
+		SetField(objects.FieldKeyFastestDurationSeconds, minTime.Seconds()).
+		SetField(objects.FieldKeyBaselineDurationSeconds, avgTime.Seconds())
 
 	// Calculate rates
 	var errorRate float64
 	if totalOps > 0 {
 		errorRate = float64(totalFailures) / float64(totalOps) * 100
 	}
-	builder.ErrorRate(errorRate).
-		TimeoutRate(0.0). // CAS operations don't have timeouts
-		TimeoutCount(0)   // CAS operations don't have timeouts
+	builder.SetField(objects.FieldKeyErrorRate, errorRate).
+		SetField(objects.FieldKeyTimeoutRate, 0.0).
+		SetField(objects.FieldKeyTimeoutCount, 0)
 
 	// Content-addressed + listing-index fields as metadata (command_metric preserves extras).
 	casMetadata := map[string]any{

@@ -13,7 +13,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/kernelcas/compose"
 	"github.com/zqk-os/zqk/pkg/objects"
 	enumv "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/pipeline_definitions"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
@@ -140,10 +140,10 @@ func materializePipelineDefinitions(ctx context.Context, store storage.ObjectSto
 			res.Titles = append(res.Titles, title)
 			continue
 		}
-		b := bldr_instance_v1.NewPipelineDefinitionInstanceBuilder(objects.DefaultSchemaVersion)
-		b.ID(stableID)
-		b.Title(title)
-		b.Status(enumv.StatusApproved)
+		b := instance_builders.NewForKind(objects.KindPipelineDefinition, objects.DefaultSchemaVersion)
+		b.SetID(stableID)
+		b.SetField(objects.FieldKeyTitle, title)
+		b.SetStatus(string(enumv.StatusApproved))
 		b.SetField(objects.FieldKeyDescription, desc)
 		b.SetField(objects.FieldKeyStages, stages)
 		b.SetField(objects.FieldKeyTriggers, triggers)

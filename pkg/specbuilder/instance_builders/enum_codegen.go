@@ -18,6 +18,7 @@ import (
 )
 
 const enumModuleBasePath = "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1"
+const kernelModulePath = "github.com/zqk-os/zqk"
 
 const (
 	enumCodegenFieldTypeEnum      = "enum"
@@ -84,7 +85,7 @@ func generateEnumsForSpec(specPath, outputDir string) error {
 		return errfmt.Newf("failed to generate domain shared status package").Wrap(err)
 	}
 
-	defs := collectEnumDefinitions(specForGeneration, ontology, enumOwners, sharedStatus)
+	defs := collectEnumDefinitions(specForGeneration, ontology, enumOwners, sharedStatus, outputDir)
 	if len(defs) == 0 {
 		return nil
 	}
@@ -96,8 +97,7 @@ func generateEnumsForSpec(specPath, outputDir string) error {
 		formatted = []byte(code)
 	}
 
-	parentDir := filepath.Dir(outputDir)
-	enumRoot := filepath.Join(parentDir, "bldr_enum_v1")
+	enumRoot := EnumOutput(outputDir)
 	enumDir := filepath.Join(enumRoot, sanitizePackageName(ontology))
 	if err := fileutil.MkdirAll(enumDir, defaultDirectoryPerm); err != nil {
 		return errfmt.Newf("failed to create enum package dir").Wrap(err)
@@ -110,7 +110,7 @@ func generateEnumsForSpec(specPath, outputDir string) error {
 	return nil
 }
 
-func collectEnumDefinitions(spec *objects.Spec, ontology string, enumOwners map[string]string, sharedStatus *sharedStatusPackage) []enumSpec {
+func collectEnumDefinitions(spec *objects.Spec, ontology string, enumOwners map[string]string, sharedStatus *sharedStatusPackage, outputDir string) []enumSpec {
 	defMap := map[string]enumSpec{}
 
 	lifecycle, err := objects.GetGlobalLifecycleLoader().LoadLifecycle(ontology)
@@ -137,7 +137,7 @@ func collectEnumDefinitions(spec *objects.Spec, ontology string, enumOwners map[
 				statusDef.AliasPackage = owner
 				statusDef.AliasTypeName = enumCodegenTypeNameStatus
 				statusDef.AliasImportAs = sanitizePackageName(owner) + "enum"
-				statusDef.AliasImportPkg = fmt.Sprintf("%s/%s", enumModuleBasePath, sanitizePackageName(owner))
+				statusDef.AliasImportPkg = enumAliasImport(outputDir, owner)
 				statusDef.AliasValues = ownerValues
 			}
 			defMap[enumCodegenTypeNameStatus] = statusDef
@@ -179,7 +179,7 @@ func collectEnumDefinitions(spec *objects.Spec, ontology string, enumOwners map[
 			def.AliasPackage = owner
 			def.AliasTypeName = typeName
 			def.AliasImportAs = alias
-			def.AliasImportPkg = fmt.Sprintf("%s/%s", enumModuleBasePath, sanitizePackageName(owner))
+			def.AliasImportPkg = enumAliasImport(outputDir, owner)
 			def.AliasValues = enumValuesForField(owner, fieldName)
 		}
 		defMap[typeName] = def
@@ -285,8 +285,7 @@ func ensureDomainSharedStatusPackage(specPath, outputDir, ontology string) (*sha
 	if err != nil {
 		formatted = []byte(file.String())
 	}
-	parentDir := filepath.Dir(outputDir)
-	enumRoot := filepath.Join(parentDir, "bldr_enum_v1")
+	enumRoot := EnumOutput(outputDir)
 	outDir := filepath.Join(enumRoot, pkgSegment)
 	if err := fileutil.MkdirAll(outDir, defaultDirectoryPerm); err != nil {
 		return nil, errfmt.Newf("create shared status dir").Wrap(err)
@@ -298,7 +297,7 @@ func ensureDomainSharedStatusPackage(specPath, outputDir, ontology string) (*sha
 
 	return &sharedStatusPackage{
 		Alias:     pkgSegment + "enum",
-		ImportPkg: fmt.Sprintf("%s/%s", enumModuleBasePath, pkgSegment),
+		ImportPkg: fmt.Sprintf("%s/%s", EnumImportBase(outputDir), pkgSegment),
 		Values:    statuses,
 	}, nil
 }
@@ -351,6 +350,49 @@ func collectDomainStatuses(specPath, domain string) (map[string]struct{}, error)
 		return nil, errfmt.Newf("walk specs dir").Wrap(err)
 	}
 	return out, nil
+}
+
+// enumAliasImport is the import path for an owner enum package.
+// A package written beside outputDir stays with that tree. An owner that exists
+// only in the kernel enum tree keeps that import, so a pack spec can alias a
+// kernel enum without a copy of the owner package.
+func enumAliasImport(outputDir, owner string) string {
+	segment := sanitizePackageName(owner)
+	localDir := filepath.Join(EnumOutput(outputDir), segment)
+	if directoryExists(localDir) {
+		return EnumImportBase(outputDir) + "/" + segment
+	}
+	if root, ok := kernelModuleRoot(); ok {
+		kernelDir := filepath.Join(root, filepath.Dir(DefaultInstanceBuilderToolDir), generatedEnumPackage, segment)
+		if directoryExists(kernelDir) {
+			return enumModuleBasePath + "/" + segment
+		}
+	}
+	return EnumImportBase(outputDir) + "/" + segment
+}
+
+func directoryExists(dir string) bool {
+	info, err := fileutil.Stat(dir)
+	return err == nil && info != nil && info.IsDir()
+}
+
+func kernelModuleRoot() (string, bool) {
+	start, err := os.Getwd()
+	if err != nil {
+		return "", false
+	}
+	current := start
+	for {
+		data, err := fileutil.ReadFile(filepath.Join(current, "go.mod"))
+		if err == nil && isKernelModule(data) {
+			return current, true
+		}
+		parent := filepath.Dir(current)
+		if parent == current {
+			return "", false
+		}
+		current = parent
+	}
 }
 
 func buildEnumOwnerMap(specPath, ontology string) (map[string]string, error) {
@@ -412,22 +454,35 @@ func loadSpecInheritanceChain(startPath string) ([]*objects.Spec, error) {
 
 func findSpecPath(currentDir, ontology string) string {
 	filename := specFilenameFromOntology(ontology)
-	direct := filepath.Join(currentDir, filename)
+	if hit := specInDir(currentDir, filename); hit != "" {
+		return hit
+	}
+	parentDir := filepath.Dir(currentDir)
+	if parentDir != currentDir {
+		if hit := specInDir(parentDir, filename); hit != "" {
+			return hit
+		}
+	}
+	if specsDir := objects.FindSpecsDir(); specsDir != "" && specsDir != currentDir && specsDir != parentDir {
+		if hit := specInDir(specsDir, filename); hit != "" {
+			return hit
+		}
+	}
+	return filepath.Join(currentDir, filename)
+}
+
+func specInDir(dir, filename string) string {
+	direct := filepath.Join(dir, filename)
 	if _, err := fileutil.Stat(direct); err == nil {
 		return direct
 	}
-	parentDir := filepath.Dir(currentDir)
 	for _, domain := range []string{"dna", "kernel", "pm", "qa", "agent", "platform"} {
-		cand := filepath.Join(parentDir, domain, filename)
-		if _, err := fileutil.Stat(cand); err == nil {
-			return cand
-		}
-		cand = filepath.Join(currentDir, domain, filename)
+		cand := filepath.Join(dir, domain, filename)
 		if _, err := fileutil.Stat(cand); err == nil {
 			return cand
 		}
 	}
-	return direct
+	return ""
 }
 
 func findStatusAliasOwner(spec *objects.Spec, ontology string) (string, map[string]struct{}) {

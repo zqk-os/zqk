@@ -9,7 +9,6 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
 	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	"github.com/zqk-os/zqk/pkg/storage/audit"
 	"github.com/zqk-os/zqk/pkg/when"
@@ -93,8 +92,7 @@ func (s *AuditAggregationService) aggregateEvents(
 	windowEndStr := windowEnd.Format(time.RFC3339)
 
 	// Get instance builder from registry (spec-driven); fallback to valid schema version so instance validation passes
-	registry := instance_builders.GetGlobalRegistry()
-	schemaVersion, err := registry.GetLatestVersion(MetricKindAuditAggregation)
+	schemaVersion, err := instance_builders.SchemaVersionForKind(MetricKindAuditAggregation)
 	if err != nil {
 		logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 		StorageLog(logger).Warn(LogEventStorageAuditAggregationSchemaDefaultWarn).
@@ -104,10 +102,7 @@ func (s *AuditAggregationService) aggregateEvents(
 	} else {
 		schemaVersion = objects.ValidSchemaVersion(schemaVersion)
 	}
-	// Create a fresh builder instance for this use (not from registry singleton)
-	// This prevents concurrent map writes when multiple aggregation jobs run concurrently
-	// (audit_event_aggregation jobs can run concurrently per scheduler configuration)
-	builder := bldr_instance_v1.NewAuditAggregationMetricInstanceBuilder(schemaVersion)
+	builder := instance_builders.NewForKind(MetricKindAuditAggregation, schemaVersion)
 
 	// Generate ID for the metric (required by builder.Build())
 	var metricID string
@@ -129,8 +124,8 @@ func (s *AuditAggregationService) aggregateEvents(
 	// Build audit aggregation metric using instance builder
 	// Builder automatically handles: namespace_id, origin_project, origin_system, audit fields
 	// Note: status is set to "completed" explicitly (not the default "implemented")
-	builder.ID(metricID).
-		Status(ValueStatusCompleted).
+	builder.SetID(metricID).
+		SetStatus(ValueStatusCompleted).
 		SetField(MetricFieldTitle, title).
 		SetField(MetricFieldMetricType, StorageMetricTypeSystem).
 		SetField(MetricFieldSource, AuditAggregationMetricSource).
@@ -142,16 +137,16 @@ func (s *AuditAggregationService) aggregateEvents(
 	// (namespace_id, origin_project, origin_system, status) are automatically set by builder.Build()
 
 	// Set audit aggregation specific fields
-	builder.AggregationWindowStart(windowStartStr).
-		AggregationWindowEnd(windowEndStr).
-		EventCount(len(events))
-	builder.EventTypeCounts(tally.EventTypeCountsAny()).
-		ObjectKindCounts(tally.ObjectKindCountsAny()).
-		OperationCounts(tally.OperationCountsAny()).
-		StatusCounts(tally.StatusCountsAny()).
-		ErrorEventCount(tally.ErrorEventCount).
-		ErrorRate(tally.ErrorRate()).
-		AggregatedEventIds(idRanges)
+	builder.SetField(objects.FieldKeyAggregationWindowStart, windowStartStr).
+		SetField(objects.FieldKeyAggregationWindowEnd, windowEndStr).
+		SetField(objects.FieldKeyEventCount, len(events))
+	builder.SetField(objects.FieldKeyEventTypeCounts, tally.EventTypeCountsAny()).
+		SetField(objects.FieldKeyObjectKindCounts, tally.ObjectKindCountsAny()).
+		SetField(objects.FieldKeyOperationCounts, tally.OperationCountsAny()).
+		SetField(objects.FieldKeyStatusCounts, tally.StatusCountsAny()).
+		SetField(objects.FieldKeyErrorEventCount, tally.ErrorEventCount).
+		SetField(objects.FieldKeyErrorRate, tally.ErrorRate()).
+		SetField(objects.FieldKeyAggregatedEventIDs, idRanges)
 
 	// Build the instance
 	aggregationMetric, err := builder.Build()

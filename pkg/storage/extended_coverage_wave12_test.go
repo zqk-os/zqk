@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 )
 
 type mockSnapshotWave12 struct {
@@ -105,11 +105,11 @@ func TestStorageExtended_Wave12_MetricsFramework(t *testing.T) {
 				resetCalled = true
 			},
 			BuildMetricObject: func(builder any, snapshot MetricsSnapshot, windowStart, windowEnd time.Time) error {
-				b, ok := builder.(*bldr_instance_v1.FileLockMetricInstanceBuilder)
+				b, ok := builder.(instance_builders.InstanceBuilder)
 				if !ok {
 					return errors.New("unexpected builder type")
 				}
-				b.TotalAcquisitions(int(snapshot.GetTotalOperations()))
+				b.SetField(objects.FieldKeyTotalAcquisitions, int(snapshot.GetTotalOperations()))
 				return nil
 			},
 		}
@@ -153,17 +153,20 @@ func TestStorageExtended_Wave12_MetricsFramework(t *testing.T) {
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "failed to get latest schema version")
 
-		// Kind exists in registry (e.g. "backlog_item") but createMetricBuilder returns nil
+		// Spec-backed builders cover kinds outside the old typed switch.
 		cfgNoBuilder := MetricBuilderConfig{
 			Kind: objects.KindBacklogItem,
 			GetSnapshot: func() MetricsSnapshot {
 				return &mockSnapshotWave12{totalOps: 1}
 			},
 		}
+		cfgNoBuilder.BuildMetricObject = func(builder any, snapshot MetricsSnapshot, windowStart, windowEnd time.Time) error {
+			return nil
+		}
 		c2 := NewBaseMetricsCollector(mockStorage, cfgNoBuilder)
-		_, err = c2.CollectMetrics(ctx, secCtx, now, now)
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "unsupported metric kind")
+		id, err := c2.CollectMetrics(ctx, secCtx, now, now)
+		require.NoError(t, err)
+		assert.NotEmpty(t, id)
 
 		// BuildMetricObject fails
 		cfgBuildErr := MetricBuilderConfig{
@@ -222,21 +225,22 @@ func TestStorageExtended_Wave12_MetricsFramework(t *testing.T) {
 		b2 := createMetricBuilder(MetricKindCommandMetric, "1.0.0")
 		assert.NotNil(t, b2)
 
-		// Unknown kind
+		// Unknown kind still gets a spec-backed builder (system fields if the spec is absent).
 		b3 := createMetricBuilder("unknown_metric_foo", "1.0.0")
-		assert.Nil(t, b3)
+		assert.NotNil(t, b3)
+		assert.Nil(t, createMetricBuilder("", "1.0.0"))
 
 		// setCommonMetricFields on various builders
 		setCommonMetricFields(b1, "FLM-1", "Lock Metric", "system", "file_lock", []string{"t1"}, 10, "start", "end", "created")
 		setCommonMetricFields(b2, "CM-1", "Command Metric", "system", "cmd", []string{"t2"}, 20, "start", "end", "created")
-		setCommonMetricFields("not_a_builder", "ID", "Title", "type", "src", nil, 0, "", "", "")
+		setCommonMetricFields(nil, "ID", "Title", "type", "src", nil, 0, "", "", "")
 
 		// buildMetricInstance
 		inst, err := buildMetricInstance(b1)
 		require.NoError(t, err)
 		assert.NotNil(t, inst)
 
-		_, err = buildMetricInstance("not_buildable")
+		_, err = buildMetricInstance(nil)
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "unsupported builder type")
 	})

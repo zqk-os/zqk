@@ -7,7 +7,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/objects"
 	enumzqksession "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/zqk_session"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
@@ -48,16 +48,16 @@ func StartWorkerSession(
 		in.AccountID,
 		enumzqksession.SessionTypeAgentWorker,
 		sp,
-		func(builder *bldr_instance_v1.ZqkSessionInstanceBuilder) {
-			builder.SetAgentId(in.AgentID)
+		func(builder instance_builders.InstanceBuilder) {
+			builder.SetField(objects.FieldKeyAgentID, in.AgentID)
 			if parent != EmptyValue {
-				builder.SetParentSessionRef(parent)
+				builder.SetField(objects.FieldKeyParentSessionRef, parent)
 			}
-			builder.SetPersonaRef(in.PersonaRef)
-			builder.SetExecutorType(in.ExecutorType)
-			builder.SetProvider(in.Provider)
-			builder.SetProviderProfileRef(in.ProviderProfileRef)
-			builder.SetModelId(in.ModelID)
+			builder.SetField(objects.FieldKeyPersonaRef, in.PersonaRef)
+			builder.SetField(objects.FieldKeyExecutorType, in.ExecutorType)
+			builder.SetField(objects.FieldKeyProvider, in.Provider)
+			builder.SetField(objects.FieldKeyProviderProfileRef, in.ProviderProfileRef)
+			builder.SetField(objects.FieldKeyModelID, in.ModelID)
 		},
 	)
 }

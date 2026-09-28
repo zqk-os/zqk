@@ -18,7 +18,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/primaryorch"
 	riskblockerenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/risk_blocker"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -376,16 +376,16 @@ func buildMissedDeadlineRiskBlocker(id, taskID, kind, title string) (map[string]
 		id = newMissedDeadlineRiskBlockerID()
 	}
 	desc := "The " + kind + " " + taskID + " missed its deadline. Automated wake signal triggered."
-	b := bldr_instance_v1.NewRiskBlockerInstanceBuilder(objects.DefaultSchemaVersion)
-	b.ID(id).
-		Title(missedDeadlineEscalationTitlePrefix + title).
-		Status(riskblockerenum.StatusOpen).
-		PriorityTier(riskblockerenum.PriorityTierP0).
-		RiskType(riskblockerenum.RiskTypeBlocker).
-		Severity(riskblockerenum.SeverityHigh).
-		DetectedBy("hourglass").
-		RelatedObjectRefs([]string{taskID}).
-		AffectedItems([]string{taskID})
+	b := instance_builders.NewForKind(objects.KindRiskBlocker, objects.DefaultSchemaVersion)
+	b.SetID(id).
+		SetField(objects.FieldKeyTitle, missedDeadlineEscalationTitlePrefix+title).
+		SetStatus(string(riskblockerenum.StatusOpen)).
+		SetField(objects.FieldKeyPriorityTier, string(riskblockerenum.PriorityTierP0)).
+		SetField(objects.FieldKeyRiskType, string(riskblockerenum.RiskTypeBlocker)).
+		SetField(objects.FieldKeySeverity, string(riskblockerenum.SeverityHigh)).
+		SetField(objects.FieldKeyDetectedBy, "hourglass").
+		SetField(objects.FieldKeyRelatedObjectRefs, []string{taskID}).
+		SetField(objects.FieldKeyAffectedItems, []string{taskID})
 	b.SetField(objects.FieldKeyDescription, desc)
 	return b.Build()
 }
