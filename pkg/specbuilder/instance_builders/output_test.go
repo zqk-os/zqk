@@ -2,12 +2,12 @@ package instance_builders
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 func TestInstanceBuilderOutput_siblingOfToolDir(t *testing.T) {
@@ -160,11 +160,66 @@ func TestGeneratedSiblingCompiles(t *testing.T) {
 	if err := GenerateInstanceBuilderFromSpec(specPath, toolDir, "1.0.0"); err != nil {
 		t.Fatal(err)
 	}
-	cmd := testkit.ManagedCommand(t, t.Context(), "go", "build", "./packs/work/"+generatedInstancePackage)
+	cmd := exec.CommandContext(t.Context(), "go", "build", "./packs/work/"+generatedInstancePackage)
 	cmd.Dir = root
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("generated pack builder did not compile: %v\n%s", err, out)
+	}
+}
+
+func TestGeneratedGoalPackCompiles(t *testing.T) {
+	root := moduleRoot(t)
+	packRoot := filepath.Join(root, "packs", "work")
+	t.Cleanup(func() { _ = os.RemoveAll(packRoot) })
+	specPath := filepath.Join(root, ".zqk", "specs", "objects", "pm", "goal.yaml")
+	toolDir := filepath.Join(packRoot, "instance_builders")
+	if err := GenerateInstanceBuilderFromSpec(specPath, toolDir, "2.0.0"); err != nil {
+		t.Fatal(err)
+	}
+	enumSrc, err := os.ReadFile(filepath.Join(packRoot, generatedEnumPackage, "goal", "enums_generated.go"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	src := string(enumSrc)
+	if !strings.Contains(src, "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object") {
+		t.Fatal("goal enums dropped the kernel base_object alias")
+	}
+	if !strings.Contains(src, "github.com/zqk-os/zqk/packs/work/bldr_enum_v1/shared_goals") {
+		t.Fatal("goal enums did not import the shared status package written beside the pack")
+	}
+	if strings.Contains(src, "github.com/zqk-os/zqk/packs/work/bldr_enum_v1/base_object") {
+		t.Fatal("goal enums imported a pack copy of base_object that was not generated")
+	}
+	cmd := exec.CommandContext(t.Context(), "go", "build", "./packs/work/"+generatedInstancePackage)
+	cmd.Dir = root
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("generated goal pack did not compile: %v\n%s", err, out)
+	}
+}
+
+func TestGeneratedWorkPackKindsCompile(t *testing.T) {
+	root := moduleRoot(t)
+	packRoot := filepath.Join(root, "packs", "work")
+	t.Cleanup(func() { _ = os.RemoveAll(packRoot) })
+	toolDir := filepath.Join(packRoot, "instance_builders")
+	specs := []string{
+		filepath.Join(root, ".zqk", "specs", "objects", "pm", "goal.yaml"),
+		filepath.Join(root, ".zqk", "specs", "objects", "pm", "requirement.yaml"),
+		filepath.Join(root, ".zqk", "specs", "objects", "qa", "criteria.yaml"),
+		filepath.Join(root, ".zqk", "specs", "objects", "qa", "test_case.yaml"),
+	}
+	for _, specPath := range specs {
+		if err := GenerateInstanceBuilderFromSpec(specPath, toolDir, "2.0.0"); err != nil {
+			t.Fatalf("%s: %v", specPath, err)
+		}
+	}
+	cmd := exec.CommandContext(t.Context(), "go", "build", "./packs/work/"+generatedInstancePackage)
+	cmd.Dir = root
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("generated work pack kinds did not compile: %v\n%s", err, out)
 	}
 }
 
