@@ -43,7 +43,7 @@ name: "work"
 version: "1.0.0"
 description: "Core work tracking, backlog management, and priority program orchestration"
 namespace: "work"
-author: "ZQK Core Maintainers <maintainers@zqk.dev>"
+author: "ZQK Core Maintainers <maintainers@zqk-os.com>"
 dependencies:
   - name: "kernel"
     min_version: "1.0.0"

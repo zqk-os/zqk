@@ -5,7 +5,7 @@
 Do not open a public issue for a suspected vulnerability.
 
 Use GitHub's private vulnerability reporting for the `zqk-os/zqk` repository,
-or email [security@zqk.dev](mailto:security@zqk.dev). Include the affected version
+or email [security@zqk-os.com](mailto:security@zqk-os.com). Include the affected version
 or commit, reproduction steps, impact, and any suggested mitigation. Maintainers
 will acknowledge a complete report within five business days and coordinate
 disclosure after a fix is available.

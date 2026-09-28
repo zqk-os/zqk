@@ -12,7 +12,7 @@ args:
 flags:
   - name: "signer-id"
     type: "string"
-    default: "architect@zqk.dev"
+    default: "architect@zqk-os.com"
     description: "Signer identity or email"
   - name: "key"
     type: "string"

@@ -144,14 +144,15 @@ func (v *Verifier) Verify(ctx context.Context, profile string, opts VerifyOption
 			}
 			newHash, newSize, err := storage.ComputeFileIntegrity(resolvedPath)
 			if err == nil {
-				existing, readErr := v.storageProvider.Read(ctx, secCtx, id)
-				if readErr == nil {
+				_, readErr := v.storageProvider.Read(ctx, secCtx, id)
+				if readErr != nil {
+					logging.Fluent(logger).Warn("Auto-seal read failed").ObjectID(id).WithError(readErr).Log()
+				} else {
 					updates := map[string]any{
 						"content_hash": newHash,
 						"content_size": newSize,
 					}
-					merged := mergeMaps(existing, updates)
-					if updateErr := v.storageProvider.Update(ctx, secCtx, id, merged); updateErr == nil {
+					if updateErr := v.storageProvider.Update(ctx, secCtx, id, updates); updateErr == nil {
 						result.AutoSealed++
 						logging.Fluent(logger).Info("Auto-sealed doc_entry cryptographic integrity").
 							ObjectID(id).
@@ -161,6 +162,8 @@ func (v *Verifier) Verify(ctx context.Context, profile string, opts VerifyOption
 						// Clear violations since it was auto-sealed
 						violations = nil
 						result.Passed++
+					} else {
+						logging.Fluent(logger).Warn("Auto-seal update failed").ObjectID(id).WithError(updateErr).Log()
 					}
 				}
 			}

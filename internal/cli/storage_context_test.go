@@ -10,7 +10,8 @@ import (
 
 func TestStorageAvailableForOptionalUse(t *testing.T) {
 	cmd := pkgcli.NewCommandBuilder("x").Build()
-	cmd.SetContext(nil)
+	var noContext context.Context
+	cmd.SetContext(noContext)
 	if StorageAvailableForOptionalUse(cmd) {
 		t.Error("StorageAvailableForOptionalUse with nil context should be false")
 	}
@@ -22,7 +23,8 @@ func TestStorageAvailableForOptionalUse(t *testing.T) {
 
 func TestGetObjectStorageForCommand_ErrStorageNotInContextWhenProjectRootEmpty(t *testing.T) {
 	cmd := pkgcli.NewCommandBuilder("x").Build()
-	cmd.SetContext(nil)
+	var noContext context.Context
+	cmd.SetContext(noContext)
 	_, err := GetObjectStorageForCommand(cmd, "")
 	if err == nil {
 		t.Fatal("expected ErrStorageNotInContext when projectRoot is empty")

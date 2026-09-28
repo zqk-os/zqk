@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 
 	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // ProtocolVersion is the contract version for the runtime organism layout (paths + future optional manifest).
@@ -17,12 +18,19 @@ func configLiteRel(name string) string {
 }
 
 func resolveConfigLitePath(projectRoot, alias, name string) string {
-	return paths.ResolvePathFromCacheOrConstant(projectRoot, alias, configLiteRel(name))
+	target := paths.ResolvePathFromCacheOrConstant(projectRoot, alias, configLiteRel(name))
+	if projectRoot != "" && !fileutil.Exists(target) {
+		legacy := filepath.Join(projectRoot, paths.ProjectDataDir, paths.ConfigDir, name)
+		if fileutil.Exists(legacy) {
+			return legacy
+		}
+	}
+	return target
 }
 
 // FeatureFlagsPath returns the absolute path to the feature flags JSON file.
 // Uses the path alias [paths.PathAliasDatacellFeatureFlags] when the cache is built; otherwise
-// .zqk/agent-runtime/feature_flags.json. Override via brand/path settings (see PATH_ALIAS_RESOLUTION.md).
+// .zqk/config/feature_flags.json. Override via brand/path settings (see PATH_ALIAS_RESOLUTION.md).
 func FeatureFlagsPath(projectRoot string) string {
 	return resolveConfigLitePath(projectRoot, paths.PathAliasDatacellFeatureFlags, paths.FeatureFlagsFile)
 }

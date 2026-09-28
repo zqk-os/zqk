@@ -81,6 +81,7 @@ func runAgentNew(cmd *cobra.Command, personaName, description string) error {
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyID:            skillID,
 		objects.FieldKeyTitle:         fmt.Sprintf("Core Skillset for %s", personaName),
+		objects.FieldKeyDescription:   fmt.Sprintf("Core operational skill set for %s.", personaName),
 		objects.FieldKeyStatus:        objects.ObjectStatusProposed,
 		objects.FieldKeyProvider:      "zqk",
 		objects.FieldKeyInstructions:  "TODO: Add instructions here.",

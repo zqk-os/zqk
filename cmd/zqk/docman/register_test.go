@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/zqk-os/zqk/internal/cli"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/docman"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -18,7 +17,7 @@ import (
 )
 
 func TestDocmanRegister_ShippedOnly(t *testing.T) {
-	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SkipSetupTestEnvironment: true, SkipFileStorage: false})
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SkipSetupTestEnvironment: false, SkipFileStorage: false})
 	tmpDir := proj.Root
 
 	// Create files in shipped subtrees and non-shipped
@@ -52,7 +51,6 @@ func TestDocmanRegister_ShippedOnly(t *testing.T) {
 	}
 
 	// Run docman register --shipped-only
-	t.Logf("resolved projectRoot=%s, tmpDir=%s", cli.ResolveProjectRoot("."), tmpDir)
 	cmd := NewRegisterCmd()
 	var outBuf bytes.Buffer
 	cmd.SetOut(&outBuf)

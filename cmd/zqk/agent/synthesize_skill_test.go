@@ -1,6 +1,7 @@
 package agent
 
 import (
+	"context"
 	"testing"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
@@ -23,7 +24,8 @@ func TestSynthesizeSkillCommitContext_SetsPromoteOnCreate(t *testing.T) {
 func TestSynthesizeSkillCommitContext_NilFallsBackToSystem(t *testing.T) {
 	t.Parallel()
 
-	got := synthesizeSkillCommitContext(nil)
+	var noContext context.Context
+	got := synthesizeSkillCommitContext(noContext)
 	if !pkgctx.GetPromoteOnCreate(got) {
 		t.Fatal("nil op ctx must still set WithPromoteOnCreate")
 	}

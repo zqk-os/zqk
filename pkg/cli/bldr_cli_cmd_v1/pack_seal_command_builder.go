@@ -18,7 +18,7 @@ func NewPackSealCommandBuilder() *cobra.Command {
 	help.AddExample("Seal package with explicit key and signer", "%s pack seal ./my-pack --key ./signing.key --signer-id ops@example.com")
 	builder.WithHelpBuilder(help)
 	builder.WithArgs(cobra.MaximumNArgs(1))
-	builder.AddStringFlag("signer-id", "", "architect@zqk.dev", "Signer identity or email")
+	builder.AddStringFlag("signer-id", "", "architect@zqk-os.com", "Signer identity or email")
 	builder.AddStringFlag("key", "", "", "Path to Ed25519 private key (optional)")
 	builder.AddStringFlag("pubkey-out", "", "", "Path to write public key hex (optional)")
 	builder.WithCommonFlags(false, nil)

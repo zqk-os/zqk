@@ -185,6 +185,7 @@ func getDefaultIDPrefixesConfig() *IDPrefixesConfig {
 			kindnames.WorkstreamTransition:   {"WST-"},
 			kindnames.Policy:                 {"POL-"},
 			kindnames.TechnicalDebt:          {"TDE-"},
+			objects.KindDocEntry:             {"DOC-"},
 		},
 		KindToSynonyms: map[string][]string{
 			// Two-word kinds

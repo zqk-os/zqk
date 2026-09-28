@@ -39,7 +39,7 @@ echo "📦 [3/4] Preparing Git deployment to ${DOCS_REPO} (main)..."
 cd "${BUILD_DIR}"
 git init -b main
 git config user.name "zqk-bot"
-git config user.email "bot@zqk.dev"
+git config user.email "bot@zqk-os.com"
 git add .
 
 COMMIT_SHA=$(git -C "${REPO_ROOT}" rev-parse --short HEAD 2>/dev/null || echo "core")

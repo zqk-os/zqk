@@ -33,35 +33,42 @@ type LifecycleSpecFile struct {
 // TestLifecycleMatrix_AllKinds verifies that every lifecycle definition in paths.ProcessInternalLifecyclesDir
 // has valid object_type or extends, declared statuses, and origin status (CRIT-CEF-S18-MATRIX-ALL-KINDS-001).
 func TestLifecycleMatrix_AllKinds(t *testing.T) {
-	lifecyclesDir := filepath.Join("../..", paths.ProcessInternalLifecyclesDir)
+	searchDirs := []string{
+		filepath.Join("../..", paths.ProcessInternalLifecyclesDir),
+	}
+	if packMatches, err := filepath.Glob("../../packs/*/lifecycles"); err == nil {
+		searchDirs = append(searchDirs, packMatches...)
+	}
 	count := 0
-	err := filepath.WalkDir(lifecyclesDir, func(path string, d fileutil.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		if d.IsDir() || !strings.HasSuffix(d.Name(), ".yaml") {
-			return nil
-		}
-		count++
-		data, err := fileutil.ReadFile(path)
-		if err != nil {
-			t.Errorf("failed to read %s: %v", path, err)
-			return nil
-		}
+	for _, dir := range searchDirs {
+		err := filepath.WalkDir(dir, func(path string, d fileutil.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+			if d.IsDir() || !strings.HasSuffix(d.Name(), ".yaml") {
+				return nil
+			}
+			count++
+			data, err := fileutil.ReadFile(path)
+			if err != nil {
+				t.Errorf("failed to read %s: %v", path, err)
+				return nil
+			}
 
-		var spec LifecycleSpecFile
-		if err := yaml.Unmarshal(data, &spec); err != nil {
-			t.Errorf("failed to parse YAML in %s: %v", path, err)
-			return nil
-		}
+			var spec LifecycleSpecFile
+			if err := yaml.Unmarshal(data, &spec); err != nil {
+				t.Errorf("failed to parse YAML in %s: %v", path, err)
+				return nil
+			}
 
-		if spec.ObjectType == "" && spec.Extends == "" {
-			t.Errorf("missing object_type or extends in %s", path)
+			if spec.ObjectType == "" && spec.Extends == "" {
+				t.Errorf("missing object_type or extends in %s", path)
+			}
+			return nil
+		})
+		if err != nil {
+			t.Fatalf("failed to walk lifecycles directory %s: %v", dir, err)
 		}
-		return nil
-	})
-	if err != nil {
-		t.Fatalf("failed to walk lifecycles directory: %v", err)
 	}
 
 	if count < 40 {
