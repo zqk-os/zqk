@@ -144,6 +144,7 @@ func NewSystemCmd() *cobra.Command {
 	systemCmd.AddCommand(NewOrchestrateBatchCmd())
 	systemCmd.AddCommand(NewSealSkillCmd())
 	systemCmd.AddCommand(NewGitCmd())
+	systemCmd.AddCommand(NewVerifyCompletionCmd())
 
 	// Internal commands (hidden from help)
 	systemCmd.AddCommand(NewAutoFixBatchCmd())
