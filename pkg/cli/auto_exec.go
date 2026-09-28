@@ -26,10 +26,10 @@ type AutoExecOptions struct {
 
 // AutoExecStepResult records individual pipeline phase execution status.
 type AutoExecStepResult struct {
-	Step     string `json:"step"`
-	Status   string `json:"status"` // ok, skipped, failed, dry_run
-	Detail   string `json:"detail,omitempty"`
-	ObjectID string `json:"object_id,omitempty"`
+	Step       string `json:"step"`
+	StepStatus string `json:"status"` // ok, skipped, failed, dry_run
+	Detail     string `json:"detail,omitempty"`
+	ObjectID   string `json:"object_id,omitempty"`
 }
 
 // AutoExecResult captures the outcome of the autonomous execution pipeline.
@@ -81,12 +81,12 @@ func (p *AutoExecPipeline) Execute(ctx context.Context, sec *pkgctx.SecurityCont
 	// Phase 1: Target Discovery / Resolution
 	bli, taskID, err := p.resolveTarget(ctx, sec, opts.TargetID)
 	if err != nil {
-		res.Status = "failed"
+		res.Status = objects.ObjectStatusFailed
 		res.Error = err.Error()
 		res.Steps = append(res.Steps, AutoExecStepResult{
-			Step:   "discovery",
-			Status: "failed",
-			Detail: err.Error(),
+			Step:       "discovery",
+			StepStatus: objects.ObjectStatusFailed,
+			Detail:     err.Error(),
 		})
 		return res, err
 	}
@@ -94,20 +94,20 @@ func (p *AutoExecPipeline) Execute(ctx context.Context, sec *pkgctx.SecurityCont
 	res.TargetBLIID = bliID
 	res.TargetTaskID = taskID
 	res.Steps = append(res.Steps, AutoExecStepResult{
-		Step:     "discovery",
-		Status:   "ok",
-		Detail:   fmt.Sprintf("Resolved target backlog item %s", bliID),
-		ObjectID: bliID,
+		Step:       "discovery",
+		StepStatus: "ok",
+		Detail:     fmt.Sprintf("Resolved target backlog item %s", bliID),
+		ObjectID:   bliID,
 	})
 
 	// Phase 2: Claiming
 	if opts.DryRun {
 		res.Status = "dry_run"
 		res.Steps = append(res.Steps, AutoExecStepResult{
-			Step:     "claim",
-			Status:   "dry_run",
-			Detail:   "Simulated claim without mutating storage",
-			ObjectID: bliID,
+			Step:       "claim",
+			StepStatus: "dry_run",
+			Detail:     "Simulated claim without mutating storage",
+			ObjectID:   bliID,
 		})
 		return res, nil
 	}
@@ -116,29 +116,29 @@ func (p *AutoExecPipeline) Execute(ctx context.Context, sec *pkgctx.SecurityCont
 	bli[objects.FieldKeyClaimedBy] = claimant
 	bli[objects.FieldKeyClaimedAt] = nowStr
 	currentStatus, _ := bli[objects.FieldKeyStatus].(string)
-	if currentStatus != "in_progress" && currentStatus != "complete" {
-		bli[objects.FieldKeyStatus] = "in_progress"
+	if currentStatus != objects.ObjectStatusInProgress && currentStatus != objects.ObjectStatusComplete {
+		bli[objects.FieldKeyStatus] = objects.ObjectStatusInProgress
 	}
 	if bli["estimated_effort"] == nil || bli["estimated_effort"] == "" {
 		bli["estimated_effort"] = "1d"
 	}
 	if err := p.Storage.Update(ctx, sec, bliID, bli); err != nil {
-		res.Status = "failed"
+		res.Status = objects.ObjectStatusFailed
 		res.Error = fmt.Sprintf("failed to claim BLI: %v", err)
 		res.Steps = append(res.Steps, AutoExecStepResult{
-			Step:     "claim",
-			Status:   "failed",
-			Detail:   err.Error(),
-			ObjectID: bliID,
+			Step:       "claim",
+			StepStatus: objects.ObjectStatusFailed,
+			Detail:     err.Error(),
+			ObjectID:   bliID,
 		})
 		return res, err
 	}
-	res.Status = "in_progress"
+	res.Status = objects.ObjectStatusInProgress
 	res.Steps = append(res.Steps, AutoExecStepResult{
-		Step:     "claim",
-		Status:   "ok",
-		Detail:   fmt.Sprintf("Claimed %s for %s", bliID, claimant),
-		ObjectID: bliID,
+		Step:       "claim",
+		StepStatus: "ok",
+		Detail:     fmt.Sprintf("Claimed %s for %s", bliID, claimant),
+		ObjectID:   bliID,
 	})
 
 	// Phase 3: Context & Verification Latching
@@ -152,51 +152,76 @@ func (p *AutoExecPipeline) Execute(ctx context.Context, sec *pkgctx.SecurityCont
 		if verifyErr != nil {
 			res.Error = verifyErr.Error()
 			res.Steps = append(res.Steps, AutoExecStepResult{
-				Step:   "verification",
-				Status: "failed",
-				Detail: verifyErr.Error(),
+				Step:       "verification",
+				StepStatus: objects.ObjectStatusFailed,
+				Detail:     verifyErr.Error(),
 			})
 			return res, verifyErr
 		}
 		res.VerifiedTestIDs = verifiedTests
 		res.LatchedCritIDs = latchedCrits
 		res.Steps = append(res.Steps, AutoExecStepResult{
-			Step:   "verification",
-			Status: "ok",
-			Detail: fmt.Sprintf("Verified %d tests and latched %d criteria", len(verifiedTests), len(latchedCrits)),
+			Step:       "verification",
+			StepStatus: "ok",
+			Detail:     fmt.Sprintf("Verified %d tests and latched %d criteria", len(verifiedTests), len(latchedCrits)),
 		})
 
 		// Check if all criteria for this BLI are now complete
 		allComplete := true
 		for _, cID := range critIDs {
 			cObj, err := p.Storage.Read(ctx, sec, cID)
-			if err != nil || cObj[objects.FieldKeyStatus] != "complete" {
+			if err != nil || cObj[objects.FieldKeyStatus] != objects.ObjectStatusComplete {
 				allComplete = false
 				break
 			}
 		}
 		if allComplete {
-			bli[objects.FieldKeyStatus] = "complete"
+			bli[objects.FieldKeyStatus] = objects.ObjectStatusComplete
 			if bli["estimated_effort"] == nil || bli["estimated_effort"] == "" {
 				bli["estimated_effort"] = "1d"
 			}
 			if bli["actual_effort"] == nil || bli["actual_effort"] == "" {
 				bli["actual_effort"] = "1d"
 			}
+
+			// Automatically discover commit hashes citing the BLI if not already set
+			existingHashes := toStringSlice(bli[objects.FieldKeyCommitHashes])
+			if len(existingHashes) == 0 {
+				planRef, _ := bli[objects.FieldKeyPriorityPlanRef].(string)
+				var grepArgs []string
+				grepArgs = append(grepArgs, "log", "-n", "10", "--format=%H", "--grep="+bliID)
+				if planRef != "" {
+					grepArgs = append(grepArgs, "--grep="+planRef)
+				}
+				if out, err := exec.CommandContext(ctx, "git", grepArgs...).Output(); err == nil {
+					lines := strings.Split(strings.TrimSpace(string(out)), "\n")
+					var discovered []string
+					for _, l := range lines {
+						h := strings.TrimSpace(l)
+						if h != "" {
+							discovered = append(discovered, h)
+						}
+					}
+					if len(discovered) > 0 {
+						bli[objects.FieldKeyCommitHashes] = discovered
+					}
+				}
+			}
+
 			if err := p.Storage.Update(ctx, sec, bliID, bli); err != nil {
 				res.Steps = append(res.Steps, AutoExecStepResult{
-					Step:     "latch",
-					Status:   "blocked",
-					Detail:   fmt.Sprintf("Promotion to complete blocked by lifecycle precondition: %v", err),
-					ObjectID: bliID,
+					Step:       "latch",
+					StepStatus: objects.ObjectStatusBlocked,
+					Detail:     fmt.Sprintf("Promotion to complete blocked by lifecycle precondition: %v", err),
+					ObjectID:   bliID,
 				})
 			} else {
-				res.Status = "complete"
+				res.Status = objects.ObjectStatusComplete
 				res.Steps = append(res.Steps, AutoExecStepResult{
-					Step:     "latch",
-					Status:   "ok",
-					Detail:   fmt.Sprintf("Promoted %s to complete", bliID),
-					ObjectID: bliID,
+					Step:       "latch",
+					StepStatus: "ok",
+					Detail:     fmt.Sprintf("Promoted %s to complete", bliID),
+					ObjectID:   bliID,
 				})
 			}
 		}
@@ -332,7 +357,7 @@ func (p *AutoExecPipeline) verifyAndLatch(ctx context.Context, sec *pkgctx.Secur
 		}
 
 		if passed {
-			tc[objects.FieldKeyStatus] = "complete"
+			tc[objects.FieldKeyStatus] = objects.ObjectStatusComplete
 			_ = p.Storage.Update(ctx, sec, tcID, tc)
 			verifiedTests = append(verifiedTests, tcID)
 
@@ -340,7 +365,7 @@ func (p *AutoExecPipeline) verifyAndLatch(ctx context.Context, sec *pkgctx.Secur
 				if critMap[c] {
 					cObj, err := p.Storage.Read(ctx, sec, c)
 					if err == nil && cObj != nil {
-						cObj[objects.FieldKeyStatus] = "complete"
+						cObj[objects.FieldKeyStatus] = objects.ObjectStatusComplete
 						_ = p.Storage.Update(ctx, sec, c, cObj)
 						latchedCrits = append(latchedCrits, c)
 					}
