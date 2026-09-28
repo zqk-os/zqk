@@ -361,8 +361,13 @@ func syncExistingJobFromTemplate(logger logging.Logger, provider storage.ObjectS
 		return false
 	}
 	updates := map[string]any{}
-	if schedule != emptyValue && objects.StringField(existing, objects.FieldKeyScheduleExpression) != schedule {
-		updates[objects.FieldKeyScheduleExpression] = schedule
+	if schedule != emptyValue {
+		if objects.StringField(existing, objects.FieldKeyScheduleExpression) != schedule {
+			updates[objects.FieldKeyScheduleExpression] = schedule
+		}
+		if objects.StringField(existing, "trigger_type") != "timer" {
+			updates["trigger_type"] = "timer"
+		}
 	}
 	if tmplHasEnv {
 		existingEnv := environmentVariablesMapFromObject(existing)

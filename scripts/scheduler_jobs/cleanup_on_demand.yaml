@@ -8,12 +8,13 @@ kind: scheduler_job
 schema_version: "2.0.0"
 status: active
 job_type: cleanup
-trigger_type: manual
+trigger_type: timer
+schedule_expression: "0 */4 * * *"
 category: maintenance
 execution_mode: reusable
 enabled: true
 title: Cleanup (config-driven)
 description: |
-  Runs cleanup steps from .zqk/cleanup/config.yaml: delete_files, truncate_files,
-  cli, build_target (make). On-demand only; trigger via zqk scheduler trigger SCH-cleanup.
+  Runs cleanup steps from .zqk/cleanup/config.yaml: reap_temp_files, reap_stale_locks,
+  enforce_log_retention. Executes automatically every 4 hours or on demand.
 namespace_id: zqk:kernel

@@ -183,3 +183,70 @@ func TestInspectIOResources(t *testing.T) {
 		t.Errorf("expected 1 orphaned temp detected, got %d", telemetry.OrphanedTempCount)
 	}
 }
+
+func TestEnforceLogRetention_ProcessOutputsAndScheduler(t *testing.T) {
+	tmpDir := t.TempDir()
+	schedDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.SchedulerDir)
+	logsDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.LogsDir, "scheduler", "SCH-autofix")
+	schedStateDir := filepath.Join(schedDir, "state")
+	_ = fileutil.MkdirAll(schedDir, paths.DirPerm755)
+	_ = fileutil.MkdirAll(logsDir, paths.DirPerm755)
+	_ = fileutil.MkdirAll(schedStateDir, paths.DirPerm755)
+
+	// Process outputs (.stdout and .stderr)
+	stdoutLog := filepath.Join(logsDir, "job.stdout")
+	stderrLog := filepath.Join(logsDir, "job.stderr")
+	_ = fileutil.WriteFile(stdoutLog, []byte("stdout line 1\nstdout line 2\n"), paths.FilePerm600)
+	_ = fileutil.WriteFile(stderrLog, []byte("stderr line 1\nstderr line 2\n"), paths.FilePerm600)
+	oldTime := time.Now().Add(-10 * 24 * time.Hour)
+	_ = os.Chtimes(stdoutLog, oldTime, oldTime)
+	_ = os.Chtimes(stderrLog, oldTime, oldTime)
+
+	// Scheduler diagnostic log in .zqk/scheduler
+	schedDiag := filepath.Join(schedDir, "diagnostics-20260920.jsonl")
+	_ = fileutil.WriteFile(schedDiag, []byte("{\"diag\":1}\n"), paths.FilePerm600)
+	_ = os.Chtimes(schedDiag, oldTime, oldTime)
+
+	// Protected scheduler state files
+	issuesFile := filepath.Join(schedDir, "issues.json")
+	summaryFile := filepath.Join(schedDir, "scheduler-metrics-summary.json")
+	stateFile := filepath.Join(schedStateDir, "state.json")
+	_ = fileutil.WriteFile(issuesFile, []byte("{\"issues\":[]}"), paths.FilePerm600)
+	_ = fileutil.WriteFile(summaryFile, []byte("{\"metrics\":{}}"), paths.FilePerm600)
+	_ = fileutil.WriteFile(stateFile, []byte("{\"state\":\"ok\"}"), paths.FilePerm600)
+	_ = os.Chtimes(issuesFile, oldTime, oldTime)
+	_ = os.Chtimes(summaryFile, oldTime, oldTime)
+	_ = os.Chtimes(stateFile, oldTime, oldTime)
+
+	// Run retention: maxAge 7d
+	cnt, reclaimed, _, err := EnforceLogRetention(tmpDir, 7*24*time.Hour, 10*1024*1024, false)
+	if err != nil {
+		t.Fatalf("EnforceLogRetention failed: %v", err)
+	}
+	if cnt != 3 {
+		t.Errorf("expected 3 pruned logs (.stdout, .stderr, .jsonl), got %d (reclaimed %d bytes)", cnt, reclaimed)
+	}
+
+	// Verify pruned
+	if _, err := fileutil.Stat(stdoutLog); !fileutil.IsNotExist(err) {
+		t.Errorf("expected stdoutLog to be deleted")
+	}
+	if _, err := fileutil.Stat(stderrLog); !fileutil.IsNotExist(err) {
+		t.Errorf("expected stderrLog to be deleted")
+	}
+	if _, err := fileutil.Stat(schedDiag); !fileutil.IsNotExist(err) {
+		t.Errorf("expected schedDiag to be deleted")
+	}
+
+	// Verify protected
+	if _, err := fileutil.Stat(issuesFile); err != nil {
+		t.Errorf("issuesFile should NOT be deleted: %v", err)
+	}
+	if _, err := fileutil.Stat(summaryFile); err != nil {
+		t.Errorf("summaryFile should NOT be deleted: %v", err)
+	}
+	if _, err := fileutil.Stat(stateFile); err != nil {
+		t.Errorf("stateFile in state dir should NOT be deleted: %v", err)
+	}
+}
+

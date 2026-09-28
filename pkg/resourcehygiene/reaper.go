@@ -127,7 +127,25 @@ func ReapStaleLocks(projectRoot string, threshold time.Duration, dryRun bool) (i
 	return count, reaped, err
 }
 
-// EnforceLogRetention prunes or truncates oversized/aged logs under .zqk/logs, .zqk/mcp/logs, and .zqk/scheduler/logs.
+// isLogFile reports whether path/name is a candidate log file for retention enforcement.
+func isLogFile(path, name string) bool {
+	if name == "issues.json" || strings.HasSuffix(name, "-summary.json") || strings.HasSuffix(name, ".pid") || strings.HasSuffix(name, ".keepalive") {
+		return false
+	}
+	ext := strings.ToLower(filepath.Ext(name))
+	switch ext {
+	case ".log", ".jsonl", ".stdout", ".stderr", ".stdio", ".out", ".err":
+		return true
+	case ".json", ".txt":
+		return strings.Contains(path, "logs") || strings.Contains(path, "diagnostics") || strings.Contains(path, "events") || strings.Contains(path, "reports")
+	default:
+		return strings.HasSuffix(name, ".stdout") ||
+			strings.HasSuffix(name, ".stderr") ||
+			strings.HasSuffix(name, ".stdio")
+	}
+}
+
+// EnforceLogRetention prunes or truncates oversized/aged logs under .zqk/logs, .zqk/mcp/logs, and .zqk/scheduler.
 func EnforceLogRetention(projectRoot string, maxAge time.Duration, maxSizeBytes int64, dryRun bool) (int, int64, []string, error) {
 	if projectRoot == "" {
 		return 0, 0, nil, nil
@@ -142,7 +160,7 @@ func EnforceLogRetention(projectRoot string, maxAge time.Duration, maxSizeBytes 
 	logDirs := []string{
 		filepath.Join(projectRoot, paths.ProjectDataDir, paths.LogsDir),
 		filepath.Join(projectRoot, paths.ProjectDataDir, paths.MCPDir, paths.MCPLogsDir),
-		filepath.Join(projectRoot, paths.ProjectDataDir, paths.SchedulerDir, "logs"),
+		filepath.Join(projectRoot, paths.ProjectDataDir, paths.SchedulerDir),
 	}
 
 	cutoff := time.Now().UTC().Add(-maxAge)
@@ -155,12 +173,18 @@ func EnforceLogRetention(projectRoot string, maxAge time.Duration, maxSizeBytes 
 			continue
 		}
 		_ = filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
-			if err != nil || d.IsDir() {
+			if err != nil {
+				return nil
+			}
+			if d.IsDir() {
+				name := d.Name()
+				if name == "state" || name == "locks" || name == "triggers" || name == "hourglass" {
+					return filepath.SkipDir
+				}
 				return nil
 			}
 			name := d.Name()
-			ext := filepath.Ext(name)
-			if ext != ".log" && ext != ".jsonl" && ext != ".json" && ext != ".txt" {
+			if !isLogFile(path, name) {
 				return nil
 			}
 
@@ -181,13 +205,20 @@ func EnforceLogRetention(projectRoot string, maxAge time.Duration, maxSizeBytes 
 				return nil
 			}
 
-			// Condition 2: Larger than maxSizeBytes -> Truncate to last 10,000 lines
+			// Condition 2: Larger than maxSizeBytes -> Truncate to recent lines
 			if info.Size() > maxSizeBytes {
 				data, errRead := fileutil.ReadFile(path)
-				if errRead == nil {
+				if errRead == nil && int64(len(data)) > maxSizeBytes {
 					lines := strings.Split(string(data), "\n")
+					var kept []string
 					if len(lines) > 10000 {
-						kept := lines[len(lines)-10000:]
+						kept = lines[len(lines)-10000:]
+					} else if len(lines) > 100 {
+						kept = lines[len(lines)/2:]
+					} else if len(lines) > 1 {
+						kept = lines[len(lines)-1:]
+					}
+					if len(kept) > 0 {
 						newContent := []byte(strings.Join(kept, "\n"))
 						freed := info.Size() - int64(len(newContent))
 						if freed > 0 {
