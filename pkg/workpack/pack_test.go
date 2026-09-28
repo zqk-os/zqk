@@ -15,6 +15,17 @@ func TestKindsArePlanningAndVerification(t *testing.T) {
 		objects.KindRequirement,
 		objects.KindCriteria,
 		objects.KindTestCase,
+		objects.KindMission,
+		objects.KindVision,
+		objects.KindStrategicContext,
+		objects.KindStrategicPlan,
+		objects.KindRoadmap,
+		objects.KindMilestone,
+		objects.KindEpic,
+		objects.KindBacklogItem,
+		objects.KindWorkstream,
+		objects.KindPriorityPlan,
+		objects.KindRiskBlocker,
 	}
 	if len(got) != len(want) {
 		t.Fatalf("kinds %v", got)

@@ -40,8 +40,8 @@ const (
 var (
 	PathCriteriaLifecycleYAML           = "packs/work/lifecycles/criteria_lifecycle.yaml"
 	PathConvergenceSessionLifecycleYAML = paths.ProcessInternalLifecyclesDir + "/kernel/convergence_session_lifecycle.yaml"
-	PathBacklogItemLifecycleYAML        = paths.ProcessInternalLifecyclesDir + "/pm/backlog_item_lifecycle.yaml"
-	PathPriorityPlanLifecycleYAML       = paths.ProcessInternalLifecyclesDir + "/pm/priority_plan_lifecycle.yaml"
+	PathBacklogItemLifecycleYAML        = "packs/work/lifecycles/backlog_item_lifecycle.yaml"
+	PathPriorityPlanLifecycleYAML       = "packs/work/lifecycles/priority_plan_lifecycle.yaml"
 )
 
 // ValidationCodeChecksumFiles are named paths always unioned into the checker

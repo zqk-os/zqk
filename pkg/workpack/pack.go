@@ -34,6 +34,17 @@ func Kinds() []string {
 		objects.KindRequirement,
 		objects.KindCriteria,
 		objects.KindTestCase,
+		objects.KindMission,
+		objects.KindVision,
+		objects.KindStrategicContext,
+		objects.KindStrategicPlan,
+		objects.KindRoadmap,
+		objects.KindMilestone,
+		objects.KindEpic,
+		objects.KindBacklogItem,
+		objects.KindWorkstream,
+		objects.KindPriorityPlan,
+		objects.KindRiskBlocker,
 	}
 }
 
@@ -45,6 +56,17 @@ var (
 		packbldr.NewRequirementInstanceBuilder,
 		packbldr.NewCriteriaInstanceBuilder,
 		packbldr.NewTestCaseInstanceBuilder,
+		packbldr.NewMissionInstanceBuilder,
+		packbldr.NewVisionInstanceBuilder,
+		packbldr.NewStrategicContextInstanceBuilder,
+		packbldr.NewStrategicPlanInstanceBuilder,
+		packbldr.NewRoadmapInstanceBuilder,
+		packbldr.NewMilestoneInstanceBuilder,
+		packbldr.NewEpicInstanceBuilder,
+		packbldr.NewBacklogItemInstanceBuilder,
+		packbldr.NewWorkstreamInstanceBuilder,
+		packbldr.NewPriorityPlanInstanceBuilder,
+		packbldr.NewRiskBlockerInstanceBuilder,
 	}
 )
 

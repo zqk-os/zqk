@@ -25,7 +25,7 @@ func TestBootstrapRootCopiesLifecycles(t *testing.T) {
 		}
 		mod = parent
 	}
-	src := filepath.Join(mod, paths.ProcessInternalLifecyclesDir, "pm", "backlog_item_lifecycle.yaml")
+	src := filepath.Join(mod, paths.ProcessInternalLifecyclesDir, "pm", "decision_lifecycle.yaml")
 	if _, err := fileutil.Stat(src); err != nil {
 		t.Skipf("module lifecycles not present: %v", err)
 	}
@@ -33,11 +33,11 @@ func TestBootstrapRootCopiesLifecycles(t *testing.T) {
 	if err := BootstrapRoot(root, mod); err != nil {
 		t.Fatalf("BootstrapRoot: %v", err)
 	}
-	dst := filepath.Join(root, paths.ProcessInternalLifecyclesDir, "pm", "backlog_item_lifecycle.yaml")
+	dst := filepath.Join(root, paths.ProcessInternalLifecyclesDir, "pm", "decision_lifecycle.yaml")
 	if _, err := fileutil.Stat(dst); err != nil {
 		t.Fatalf("expected lifecycle copy at %s: %v", dst, err)
 	}
-	spec := filepath.Join(root, paths.ProcessInternalObjectSpecsDir, "pm", "backlog_item.yaml")
+	spec := filepath.Join(root, paths.ProcessInternalObjectSpecsDir, "pm", "decision.yaml")
 	if _, err := fileutil.Stat(spec); err != nil {
 		t.Fatalf("expected spec copy at %s: %v", spec, err)
 	}
