@@ -36,35 +36,6 @@ func NewGoalBuilder() *GoalBuilder {
 
 // addGoalFields adds the goal fields
 func (b *GoalBuilder) addGoalFields() {
-	b.AddFieldBuilder(builders.NewFieldBuilder("achieved_at", "string").
-		WithChecklist(builders.NewChecklistBuilder().
-			Authority("automation/metrics engine.").
-			AutomationHooks("automatically set when metric reaches target.").
-			Cardinality("zero_or_one").
-			Criticality("association").
-			Default(nil).
-			Dependencies("metrics engine.").
-			Lifecycle("mutable (set when goal is achieved).").
-			Observability("yes").
-			Purpose("ISO-8601 datetime when the goal was achieved.").
-			Security("non-sensitive").
-			SystemUsage([]any{
-				"reporting",
-				"metrics",
-			}).
-			Validation("ISO-8601 datetime format.").
-			Build()).
-		WithAccess(builders.NewAccessBuilder().
-			Requires("access:confidential").
-			Build()).
-		WithValidation(builders.NewValidationBuilder().
-			Pattern(`^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$`).
-			Required(false).
-			Build()).
-		WithTraits("field_mutable_group").
-		WithPermissions("rwx").
-		WithSemanticType("statement").
-		WithProfileCode("GOL-010"))
 	b.AddFieldBuilder(builders.NewFieldBuilder("authority", "string").
 		WithChecklist(builders.NewChecklistBuilder().
 			Authority("executive.").
@@ -93,92 +64,6 @@ func (b *GoalBuilder) addGoalFields() {
 		WithPermissions("rwx").
 		WithSemanticType("statement").
 		WithProfileCode("GOL-008"))
-	b.AddFieldBuilder(builders.NewFieldBuilder("commit_hashes", "list").
-		WithChecklist(builders.NewChecklistBuilder().
-			Authority("automation.").
-			AutomationHooks("used for linking commits to goals.").
-			Cardinality("many").
-			Criticality("association").
-			Default([]any{}).
-			Dependencies("Version control repository (Git, SVN, Mercurial, Perforce, etc.).").
-			Lifecycle("mutable").
-			Observability("yes").
-			Purpose("Version control system commit identifiers that implement or relate to this goal.").
-			Security("non-sensitive").
-			SystemUsage([]any{
-				"traceability",
-				"code-to-project graph",
-			}).
-			Validation("Must be valid VCS commit identifiers. Format depends on VCS system:\n- Git: SHA-1 hash (40 chars) or short hash (7+ chars)\n- SVN: Revision number (numeric)\n- Mercurial: Hex hash (40 chars)\n- Perforce: Changelist number (numeric)\n- Other: Alphanumeric string, 1-40 characters\n").
-			Build()).
-		WithAccess(builders.NewAccessBuilder().
-			Requires("access:confidential").
-			Build()).
-		WithValidation(builders.NewValidationBuilder().
-			Pattern(`^[A-Za-z0-9_-]{1,40}$`).
-			Required(false).
-			Build()).
-		WithTraits("readable", "writable", "modifiable", "filterable").
-		WithPermissions("rwx").
-		WithSemanticType("statement").
-		WithProfileCode("GOAL-006"))
-	b.AddFieldBuilder(builders.NewFieldBuilder("current_value", "string").
-		WithChecklist(builders.NewChecklistBuilder().
-			Authority("automation/metrics engine.").
-			AutomationHooks("updated by metrics evaluation pipeline.").
-			Cardinality("one").
-			Criticality("association").
-			Default("none (populated by metrics engine)").
-			Dependencies("metrics engine.").
-			Lifecycle("mutable (updated by metrics engine).").
-			Observability("yes").
-			Purpose("Current measured value for the metric.").
-			Security("non-sensitive").
-			SystemUsage([]any{
-				"evaluation",
-				"reports",
-			}).
-			Validation("format matches metric type.").
-			Build()).
-		WithAccess(builders.NewAccessBuilder().
-			Requires("access:confidential").
-			Build()).
-		WithValidation(builders.NewValidationBuilder().
-			Required(false).
-			Build()).
-		WithTraits("field_mutable_group").
-		WithPermissions("rwx").
-		WithSemanticType("expression").
-		WithProfileCode("GOL-004"))
-	b.AddFieldBuilder(builders.NewFieldBuilder("deadline", "string").
-		WithChecklist(builders.NewChecklistBuilder().
-			Authority("executive.").
-			AutomationHooks("triggers deadline reminders.").
-			Cardinality("one").
-			Criticality("association").
-			Default(nil).
-			Dependencies("scheduler, notification system.").
-			Lifecycle("mutable").
-			Observability("yes").
-			Purpose("ISO-8601 date or datetime when the goal must be achieved.").
-			Security("non-sensitive").
-			SystemUsage([]any{
-				"planning",
-				"notifications",
-			}).
-			Validation("ISO-8601 date or datetime format.").
-			Build()).
-		WithAccess(builders.NewAccessBuilder().
-			Requires("access:confidential").
-			Build()).
-		WithValidation(builders.NewValidationBuilder().
-			Pattern(`^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}Z)?$`).
-			Required(false).
-			Build()).
-		WithTraits("readable", "writable", "modifiable").
-		WithPermissions("rwx").
-		WithSemanticType("statement").
-		WithProfileCode("GOL-009"))
 	b.AddFieldBuilder(builders.NewFieldBuilder("metric", "string").
 		WithChecklist(builders.NewChecklistBuilder().
 			Authority("owner/executive.").
@@ -321,6 +206,92 @@ func (b *GoalBuilder) addGoalFields() {
 		WithPermissions("r-x").
 		WithSemanticType("reference").
 		WithProfileCode("GOL-011"))
+	b.AddFieldBuilder(builders.NewFieldBuilder("requirement_refs", "list").
+		WithChecklist(builders.NewChecklistBuilder().
+			Authority("owner/planner.").
+			AutomationHooks("connects strategic goals to requirement deliverables.").
+			Cardinality("many").
+			Criticality("composition").
+			Default([]any{}).
+			Dependencies("requirement registry.").
+			Lifecycle("mutable").
+			Observability("yes").
+			Purpose("Requirements fulfilling this strategic goal.").
+			Security("non-sensitive").
+			SystemUsage([]any{
+				"planning",
+				"traceability",
+				"alignment",
+			}).
+			Validation("must reference existing requirement IDs.").
+			Build()).
+		WithAccess(builders.NewAccessBuilder().
+			Requires("access:confidential").
+			Build()).
+		WithValidation(builders.NewValidationBuilder().
+			Required(false).
+			Build()).
+		WithTraits("field_mutable_group", "field_reference_group").
+		WithPermissions("r-x").
+		WithSemanticType("reference").
+		WithProfileCode("GOL-012"))
+	b.AddFieldBuilder(builders.NewFieldBuilder("success_criteria", "list").
+		WithChecklist(builders.NewChecklistBuilder().
+			Authority("owner/executive.").
+			AutomationHooks("evaluation of goal achievement conditions.").
+			Cardinality("many").
+			Criticality("composition").
+			Default([]any{}).
+			Dependencies("none.").
+			Lifecycle("mutable").
+			Observability("yes").
+			Purpose("Explicit conditions, invariants, or criteria that must be satisfied for goal achievement.").
+			Security("non-sensitive").
+			SystemUsage([]any{
+				"planning",
+				"evaluation",
+				"reporting",
+			}).
+			Validation("list of criteria statement strings.").
+			Build()).
+		WithAccess(builders.NewAccessBuilder().
+			Requires("access:confidential").
+			Build()).
+		WithValidation(builders.NewValidationBuilder().
+			Required(false).
+			Build()).
+		WithTraits("field_mutable_group").
+		WithPermissions("rwx").
+		WithSemanticType("statement").
+		WithProfileCode("GOL-013"))
+	b.AddFieldBuilder(builders.NewFieldBuilder("vision_ref", "string").
+		WithChecklist(builders.NewChecklistBuilder().
+			Authority("executive.").
+			AutomationHooks("aligns strategic goals with parent vision.").
+			Cardinality("zero_or_one").
+			Criticality("association").
+			Default(nil).
+			Dependencies("vision registry.").
+			Lifecycle("mutable").
+			Observability("yes").
+			Purpose("Vision object governing this strategic goal.").
+			Security("non-sensitive").
+			SystemUsage([]any{
+				"alignment",
+				"traceability",
+			}).
+			Validation("must reference an existing vision ID.").
+			Build()).
+		WithAccess(builders.NewAccessBuilder().
+			Requires("access:confidential").
+			Build()).
+		WithValidation(builders.NewValidationBuilder().
+			Required(false).
+			Build()).
+		WithTraits("field_mutable_group", "field_reference_group").
+		WithPermissions("r-x").
+		WithSemanticType("reference").
+		WithProfileCode("GOL-014"))
 }
 
 // Build builds the spec (inherited from BaseSpecBuilder)

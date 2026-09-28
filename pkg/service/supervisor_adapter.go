@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/paths"
 )
 
@@ -56,9 +57,11 @@ func (s *SupervisorAdapter) Install(ctx context.Context, spec ServiceSpec) error
 	s.specs[spec.ID] = spec
 
 	if spec.RunAtLoad {
-		go func() {
-			_ = s.startLocked(spec.ID)
-		}()
+		goroutinelabels.NewGoroutine("supervisor_run_at_load", "starting service on load").
+			AsControlPlane().
+			StartSimple(func() {
+				_ = s.startLocked(spec.ID)
+			})
 	}
 
 	return nil
@@ -134,14 +137,16 @@ func (s *SupervisorAdapter) startLocked(id string) error {
 	}
 	s.processes[id] = proc
 
-	go func() {
-		_ = cmd.Wait()
-		s.mu.Lock()
-		defer s.mu.Unlock()
-		if current, ok := s.processes[id]; ok && current == proc {
-			delete(s.processes, id)
-		}
-	}()
+	goroutinelabels.NewGoroutine("supervisor_proc_wait", "monitoring supervised process exit").
+		AsControlPlane().
+		StartSimple(func() {
+			_ = cmd.Wait()
+			s.mu.Lock()
+			defer s.mu.Unlock()
+			if current, ok := s.processes[id]; ok && current == proc {
+				delete(s.processes, id)
+			}
+		})
 
 	return nil
 }

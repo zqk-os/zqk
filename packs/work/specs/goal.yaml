@@ -11,34 +11,6 @@ traits:
   - completable
   - status_reactive
 fields:
-  achieved_at:
-    access:
-      requires:
-        - access:confidential
-    checklist:
-      authority: automation/metrics engine.
-      automation_hooks: automatically set when metric reaches target.
-      cardinality: zero_or_one
-      criticality: association
-      default: null
-      dependencies: metrics engine.
-      observability: "yes"
-      origin_lifecycle: mutable (set when goal is achieved).
-      purpose: ISO-8601 datetime when the goal was achieved.
-      security: non-sensitive
-      system_usage:
-        - reporting
-        - metrics
-      validation: ISO-8601 datetime format.
-    field_profile_code: GOL-010
-    permissions: rwx
-    semantic_type: statement
-    traits:
-      - field_mutable_group
-    type: string
-    validation:
-      pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$
-      required: false
   authority:
     access:
       requires:
@@ -67,100 +39,6 @@ fields:
       - modifiable
     type: string
     validation:
-      required: false
-  commit_hashes:
-    access:
-      requires:
-        - access:confidential
-    checklist:
-      authority: automation.
-      automation_hooks: used for linking commits to goals.
-      cardinality: many
-      criticality: association
-      default: []
-      dependencies: Version control repository (Git, SVN, Mercurial, Perforce, etc.).
-      observability: "yes"
-      origin_lifecycle: mutable
-      purpose: Version control system commit identifiers that implement or relate to this goal.
-      security: non-sensitive
-      system_usage:
-        - traceability
-        - code-to-project graph
-      validation: |
-        Must be valid VCS commit identifiers. Format depends on VCS system:
-        - Git: SHA-1 hash (40 chars) or short hash (7+ chars)
-        - SVN: Revision number (numeric)
-        - Mercurial: Hex hash (40 chars)
-        - Perforce: Changelist number (numeric)
-        - Other: Alphanumeric string, 1-40 characters
-    field_profile_code: GOAL-006
-    permissions: rwx
-    semantic_type: statement
-    traits:
-      - readable
-      - writable
-      - modifiable
-      - filterable
-    type: list
-    validation:
-      pattern: ^[A-Za-z0-9_-]{1,40}$
-      required: false
-  current_value:
-    access:
-      requires:
-        - access:confidential
-    checklist:
-      authority: automation/metrics engine.
-      automation_hooks: updated by metrics evaluation pipeline.
-      cardinality: one
-      criticality: association
-      default: none (populated by metrics engine)
-      dependencies: metrics engine.
-      observability: "yes"
-      origin_lifecycle: mutable (updated by metrics engine).
-      purpose: Current measured value for the metric.
-      security: non-sensitive
-      system_usage:
-        - evaluation
-        - reports
-      validation: format matches metric type.
-    field_profile_code: GOL-004
-    permissions: rwx
-    semantic_type: expression
-    traits:
-      - field_mutable_group
-    type: string
-    validation:
-      required: false
-  deadline:
-    access:
-      requires:
-        - access:confidential
-    checklist:
-      authority: executive.
-      automation_hooks: triggers deadline reminders.
-      cardinality: one
-      criticality: association
-      default: null
-      dependencies: scheduler, notification system.
-      observability: "yes"
-      origin_lifecycle: mutable
-      purpose: ISO-8601 date or datetime when the goal must be achieved.
-      security: non-sensitive
-      system_usage:
-        - planning
-        - notifications
-      validation: ISO-8601 date or datetime format.
-    field_profile_code: GOL-009
-    permissions: rwx
-    semantic_type: statement
-    traits:
-      - readable
-      - writable
-      - modifiable
-    type: string
-    validation:
-      pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}Z)?$
       required: false
   metric:
     access:
@@ -300,6 +178,91 @@ fields:
       - field_mutable_group
       - field_reference_group
     type: list
+    validation:
+      required: false
+  requirement_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/planner.
+      automation_hooks: connects strategic goals to requirement deliverables.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: requirement registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Requirements fulfilling this strategic goal.
+      security: non-sensitive
+      system_usage:
+        - planning
+        - traceability
+        - alignment
+      validation: must reference existing requirement IDs.
+    field_profile_code: GOL-012
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+  success_criteria:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/executive.
+      automation_hooks: evaluation of goal achievement conditions.
+      cardinality: many
+      criticality: composition
+      default: []
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Explicit conditions, invariants, or criteria that must be satisfied for goal achievement.
+      security: non-sensitive
+      system_usage:
+        - planning
+        - evaluation
+        - reporting
+      validation: list of criteria statement strings.
+    field_profile_code: GOL-013
+    permissions: rwx
+    semantic_type: statement
+    traits:
+      - field_mutable_group
+    type: list
+    validation:
+      required: false
+  vision_ref:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: executive.
+      automation_hooks: aligns strategic goals with parent vision.
+      cardinality: zero_or_one
+      criticality: association
+      default: null
+      dependencies: vision registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Vision object governing this strategic goal.
+      security: non-sensitive
+      system_usage:
+        - alignment
+        - traceability
+      validation: must reference an existing vision ID.
+    field_profile_code: GOL-014
+    permissions: r-x
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: string
     validation:
       required: false
 
