@@ -96,6 +96,23 @@ func TestPureGoIndexer_CRUDAndGraphTraversal(t *testing.T) {
 	assert.Equal(t, "VIS-001", results[0].ID)
 	assert.Equal(t, "vision", results[0].Kind)
 
+	// Verify singular edge traversal (e.g. goal.vision_ref)
+	goalWithSingular := &storage.IndexedNode{
+		ID:     "GOAL-002",
+		Kind:   "goal",
+		Status: "originated",
+		Title:  "Singular Vision Ref Goal",
+		References: map[string][]string{
+			"vision_ref": {"VIS-001"},
+		},
+	}
+	require.NoError(t, indexer.IndexNode(goalWithSingular))
+	resultsSingular, err := indexer.Traverse(ctx, "GOAL-002", []string{"vision_ref"}, 10)
+	require.NoError(t, err)
+	require.Len(t, resultsSingular, 1)
+	assert.Equal(t, "VIS-001", resultsSingular[0].ID)
+	require.NoError(t, indexer.RemoveNode("GOAL-002"))
+
 	// 6. Node Update & Removal
 	updatedBLI := &storage.IndexedNode{
 		ID:     "BLI-001",
@@ -211,6 +228,67 @@ func TestPureGoIndexer_IndexProjectDir(t *testing.T) {
 	require.True(t, ok)
 	assert.Equal(t, "planned", node.Status)
 	assert.Equal(t, []string{"MIL-TEST-001"}, node.References["milestone_refs"])
+}
+
+func TestPureGoIndexer_UnindexBidirectionalAndSelfLoopEdges(t *testing.T) {
+	t.Parallel()
+	indexer := storage.NewPureGoIndexer()
+
+	// 1. Bidirectional edges between A and B
+	nodeA := &storage.IndexedNode{
+		ID:     "NODE-A",
+		Kind:   "requirement",
+		Status: "complete",
+		References: map[string][]string{
+			"relates_to": {"NODE-B"},
+		},
+	}
+	nodeB := &storage.IndexedNode{
+		ID:     "NODE-B",
+		Kind:   "requirement",
+		Status: "complete",
+		References: map[string][]string{
+			"relates_to": {"NODE-A"},
+		},
+	}
+	// 2. Self-referential loop on C
+	nodeC := &storage.IndexedNode{
+		ID:     "NODE-C",
+		Kind:   "test_case",
+		Status: "active",
+		References: map[string][]string{
+			"depends_on": {"NODE-C"},
+		},
+	}
+
+	require.NoError(t, indexer.IndexNode(nodeA))
+	require.NoError(t, indexer.IndexNode(nodeB))
+	require.NoError(t, indexer.IndexNode(nodeC))
+
+	// Verify initial edges
+	assert.Equal(t, []string{"NODE-B"}, indexer.GetOutEdges("NODE-A", "relates_to"))
+	assert.Equal(t, []string{"NODE-A"}, indexer.GetInEdges("NODE-B", "relates_to"))
+	assert.Equal(t, []string{"NODE-A"}, indexer.GetOutEdges("NODE-B", "relates_to"))
+	assert.Equal(t, []string{"NODE-B"}, indexer.GetInEdges("NODE-A", "relates_to"))
+	assert.Equal(t, []string{"NODE-C"}, indexer.GetOutEdges("NODE-C", "depends_on"))
+	assert.Equal(t, []string{"NODE-C"}, indexer.GetInEdges("NODE-C", "depends_on"))
+
+	// Unindex Node A (bidirectional edge unindex)
+	require.NoError(t, indexer.RemoveNode("NODE-A"))
+	_, ok := indexer.GetNode("NODE-A")
+	assert.False(t, ok)
+	assert.Empty(t, indexer.GetOutEdges("NODE-A", "relates_to"))
+	assert.Empty(t, indexer.GetInEdges("NODE-B", "relates_to"))
+	// B's out edge still points to A (until re-indexed or B is updated), but B exists
+	_, ok = indexer.GetNode("NODE-B")
+	assert.True(t, ok)
+
+	// Unindex Node C (self-loop edge unindex)
+	require.NoError(t, indexer.RemoveNode("NODE-C"))
+	_, ok = indexer.GetNode("NODE-C")
+	assert.False(t, ok)
+	assert.Empty(t, indexer.GetOutEdges("NODE-C", "depends_on"))
+	assert.Empty(t, indexer.GetInEdges("NODE-C", "depends_on"))
 }
 
 // Satisfies CRIT-STORAGE-PUREGO-EMBEDDED-001:

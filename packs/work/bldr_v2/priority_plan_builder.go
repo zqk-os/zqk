@@ -86,36 +86,6 @@ func (b *PriorityPlanBuilder) addPriorityPlanFields() {
 		WithPermissions("rwx").
 		WithSemanticType("ordering").
 		WithProfileCode("PRIO-013"))
-	b.AddFieldBuilder(builders.NewFieldBuilder("id", "string").
-		WithChecklist(builders.NewChecklistBuilder().
-			Authority("automation (Generator)").
-			AutomationHooks("used for cross-file references.").
-			Cardinality("one").
-			Criticality("composition").
-			Default("auto-assigned per kind sequence").
-			Dependencies("linkage constraints, URN creation.").
-			Lifecycle("immutable").
-			Observability("logged + manifests.").
-			Purpose("Stable identifier for the priority plan. Supports formats like \\\\\\\"PRIO-20251212-week1\\\\\\\", \\\\\\\"PRIO-4\\\\\\\", \\\\\\\"PRI-001\\\\\\\", etc.").
-			Security("non-sensitive").
-			SystemUsage([]any{
-				"linking",
-				"reporting",
-				"URIs",
-			}).
-			Validation("Must start with PRI- or PRIO- followed by alphanumeric characters, dots, dashes, or underscores.").
-			Build()).
-		WithAccess(builders.NewAccessBuilder().
-			Requires("access:confidential").
-			Build()).
-		WithValidation(builders.NewValidationBuilder().
-			Pattern(`^(PRI-|PRIO-)[A-Za-z0-9][A-Za-z0-9._-]*$`).
-			Required(true).
-			Build()).
-		WithTraits("filterable", "listable", "readable", "searchable", "sortable", "writable").
-		WithPermissions("r-x").
-		WithSemanticType("statement").
-		WithProfileCode("PRIO-000"))
 	b.AddFieldBuilder(builders.NewFieldBuilder("next_plan_id", "string").
 		WithChecklist(builders.NewChecklistBuilder().
 			Authority("system.").

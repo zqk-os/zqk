@@ -4,7 +4,6 @@
 package strategic_context
 
 import (
-	shared_strategic_contextsenum "github.com/zqk-os/zqk/packs/work/bldr_enum_v1/shared_strategic_contexts"
 	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
 )
 
@@ -34,13 +33,13 @@ const (
 	SourceTypeInternal SourceType = base_objectenum.SourceTypeInternal
 )
 
-type Status = shared_strategic_contextsenum.Status
+type Status = base_objectenum.Status
 
 const (
-	StatusActive     Status = shared_strategic_contextsenum.StatusActive
-	StatusArchived   Status = shared_strategic_contextsenum.StatusArchived
-	StatusConceptual Status = shared_strategic_contextsenum.StatusConceptual
-	StatusDraft      Status = shared_strategic_contextsenum.StatusDraft
-	StatusError      Status = shared_strategic_contextsenum.StatusError
-	StatusOriginated Status = shared_strategic_contextsenum.StatusOriginated
+	StatusActive     Status = "active"
+	StatusArchived   Status = base_objectenum.StatusArchived
+	StatusConceptual Status = base_objectenum.StatusConceptual
+	StatusDraft      Status = "draft"
+	StatusError      Status = base_objectenum.StatusError
+	StatusOriginated Status = base_objectenum.StatusOriginated
 )

@@ -102,7 +102,7 @@ func (r *DependencyTreeResolver) Resolve(ctx context.Context, planID string) (*T
 	// Fetch goals (non-archived)
 	goalRes, err := r.sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
 		NotArchived(objects.KindGoal).
-		Fields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyPriorityPlanRef, objects.FieldKeyPriorityPlanRefs).
+		Fields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyRelatedObjectRefs, objects.FieldKeyPriorityPlanRef, objects.FieldKeyPriorityPlanRefs).
 		Build())
 	if err != nil {
 		return nil, errfmt.Errorf("failed to list goals: %w", err)
@@ -319,6 +319,18 @@ func resolvePlanGoals(goals []map[string]any, planBacklogs []map[string]any, pla
 					if rStr, ok := r.(string); ok && rStr == planID {
 						inRefs = true
 						break
+					}
+				}
+			}
+		}
+		if !inRefs {
+			if relsRaw, ok := goal[objects.FieldKeyRelatedObjectRefs]; ok && relsRaw != nil {
+				if rels, ok := relsRaw.([]any); ok {
+					for _, r := range rels {
+						if rStr, ok := r.(string); ok && rStr == planID {
+							inRefs = true
+							break
+						}
 					}
 				}
 			}

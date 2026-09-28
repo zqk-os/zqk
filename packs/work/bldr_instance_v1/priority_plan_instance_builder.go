@@ -59,6 +59,17 @@ func (b *PriorityPlanInstanceBuilder) SetActiveOrder(value int) *PriorityPlanIns
 	return b.ActiveOrder(value)
 }
 
+// AnswerDueBy sets the answer_due_by field
+func (b *PriorityPlanInstanceBuilder) AnswerDueBy(value string) *PriorityPlanInstanceBuilder {
+	b.SetField(objects.FieldKeyAnswerDueBy, value)
+	return b
+}
+
+// SetAnswerDueBy is a compatibility alias for AnswerDueBy.
+func (b *PriorityPlanInstanceBuilder) SetAnswerDueBy(value string) *PriorityPlanInstanceBuilder {
+	return b.AnswerDueBy(value)
+}
+
 // ArchivedAt sets the archived_at field
 func (b *PriorityPlanInstanceBuilder) ArchivedAt(value any) *PriorityPlanInstanceBuilder {
 	b.SetField(objects.FieldKeyArchivedAt, value)
@@ -530,17 +541,6 @@ func (b *PriorityPlanInstanceBuilder) WorkflowRef(value string) *PriorityPlanIns
 // SetWorkflowRef is a compatibility alias for WorkflowRef.
 func (b *PriorityPlanInstanceBuilder) SetWorkflowRef(value string) *PriorityPlanInstanceBuilder {
 	return b.WorkflowRef(value)
-}
-
-// WorkstreamRef sets the workstream_ref field
-func (b *PriorityPlanInstanceBuilder) WorkstreamRef(value string) *PriorityPlanInstanceBuilder {
-	b.SetField(objects.FieldKeyWorkstreamRef, value)
-	return b
-}
-
-// SetWorkstreamRef is a compatibility alias for WorkstreamRef.
-func (b *PriorityPlanInstanceBuilder) SetWorkstreamRef(value string) *PriorityPlanInstanceBuilder {
-	return b.WorkstreamRef(value)
 }
 
 // WorkstreamRefs sets the workstream_refs field

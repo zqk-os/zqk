@@ -235,37 +235,6 @@ fields:
     type: string
     validation:
       required: false
-  description:
-    access:
-      requires:
-        - access:confidential
-    checklist:
-      authority: creator/owner.
-      automation_hooks: used in verification reports, requirement linkage, and test assertions.
-      cardinality: one
-      criticality: composition
-      default: null
-      dependencies: verification pipeline, requirement traceability.
-      observability: "yes"
-      origin_lifecycle: mutable
-      purpose: Detailed explanation of the criteria and verifiable acceptance conditions.
-      security: non-sensitive
-      system_usage:
-        - verification
-        - documentation
-        - planning
-      validation: free text or markdown.
-    field_profile_code: CRT-005
-    permissions: rwx
-    semantic_type: statement
-    traits:
-      - field_mutable_group
-      - readable
-      - writable
-      - modifiable
-    type: text
-    validation:
-      required: false
   evidence:
     access:
       requires:
@@ -297,7 +266,3 @@ fields:
     type: string
     validation:
       required: false
-created_at: 2026-07-01 18:00:00+00:00
-updated_at: 2026-07-01 18:00:00+00:00
-created_by: ACC-SYSTEM
-updated_by: ACC-SYSTEM

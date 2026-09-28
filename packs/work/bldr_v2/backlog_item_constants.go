@@ -29,8 +29,6 @@ const (
 	BacklogItemFieldCriteriaRefs = "criteria_refs"
 	// FieldDateCaptured is the field name for date_captured
 	FieldDateCaptured = "date_captured"
-	// BacklogItemFieldDescription is the field name for description
-	BacklogItemFieldDescription = "description"
 	// BacklogItemFieldDocEntryRefs is the field name for doc_entry_refs
 	BacklogItemFieldDocEntryRefs = "doc_entry_refs"
 	// FieldDocumentRefs is leftover; kernel pointers are FieldDocEntryRefs.

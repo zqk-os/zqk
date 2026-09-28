@@ -62,35 +62,6 @@ func (b *TestCaseBuilder) addTestCaseFields() {
 		WithPermissions("r-x").
 		WithSemanticType("reference").
 		WithProfileCode("TST-005"))
-	b.AddFieldBuilder(builders.NewFieldBuilder("category", "string").
-		WithChecklist(builders.NewChecklistBuilder().
-			Authority("QA/owner.").
-			AutomationHooks("used for test filtering and grouping.").
-			Cardinality("one").
-			Criticality("association").
-			Default(nil).
-			Dependencies("none.").
-			Lifecycle("mutable").
-			Observability("yes").
-			Purpose("Test category classification (e.g., \\\\\\\"Unit\\\\\\\", \\\\\\\"Integration\\\\\\\", \\\\\\\"E2E\\\\\\\", \\\\\\\"Performance\\\\\\\").").
-			Security("non-sensitive").
-			SystemUsage([]any{
-				"filtering",
-				"grouping",
-				"reporting",
-			}).
-			Validation("Free-form string.").
-			Build()).
-		WithAccess(builders.NewAccessBuilder().
-			Requires("access:confidential").
-			Build()).
-		WithValidation(builders.NewValidationBuilder().
-			Required(false).
-			Build()).
-		WithTraits("listable", "readable", "writable", "modifiable", "groupable", "filterable", "sortable", "searchable").
-		WithPermissions("rwx").
-		WithSemanticType("statement").
-		WithProfileCode("TST-001"))
 	b.AddFieldBuilder(builders.NewFieldBuilder("criteria_refs", "list").
 		WithChecklist(builders.NewChecklistBuilder().
 			Authority("QA/owner.").
@@ -119,35 +90,6 @@ func (b *TestCaseBuilder) addTestCaseFields() {
 		WithPermissions("r-x").
 		WithSemanticType("reference").
 		WithProfileCode("TST-008"))
-	b.AddFieldBuilder(builders.NewFieldBuilder("description", "text").
-		WithChecklist(builders.NewChecklistBuilder().
-			Authority("QA/owner.").
-			AutomationHooks("used in test reports and documentation.").
-			Cardinality("one").
-			Criticality("association").
-			Default(nil).
-			Dependencies("none.").
-			Lifecycle("mutable").
-			Observability("yes").
-			Purpose("Detailed description of what the test case validates.").
-			Security("non-sensitive").
-			SystemUsage([]any{
-				"documentation",
-				"reporting",
-				"search",
-			}).
-			Validation("Free-form text (markdown allowed).").
-			Build()).
-		WithAccess(builders.NewAccessBuilder().
-			Requires("access:confidential").
-			Build()).
-		WithValidation(builders.NewValidationBuilder().
-			Required(false).
-			Build()).
-		WithTraits("readable", "writable", "modifiable", "searchable").
-		WithPermissions("rwx").
-		WithSemanticType("statement").
-		WithProfileCode("TST-003"))
 	b.AddFieldBuilder(builders.NewFieldBuilder("milestone_refs", "list").
 		WithChecklist(builders.NewChecklistBuilder().
 			Authority("QA/owner.").

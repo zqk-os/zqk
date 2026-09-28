@@ -5,6 +5,7 @@ package milestone
 
 import (
 	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	work_unitenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/work_unit"
 )
 
 type Plane = base_objectenum.Plane
@@ -43,12 +44,15 @@ const (
 	StageTypeValidation   StageType = "validation"
 )
 
-type Status string
+type Status = work_unitenum.Status
 
 const (
+	StatusArchived   Status = work_unitenum.StatusArchived
 	StatusBlocked    Status = "blocked"
 	StatusComplete   Status = "complete"
+	StatusConceptual Status = work_unitenum.StatusConceptual
 	StatusDeferred   Status = "deferred"
-	StatusInProgress Status = "in_progress"
+	StatusInProgress Status = work_unitenum.StatusInProgress
 	StatusNotStarted Status = "not_started"
+	StatusOriginated Status = work_unitenum.StatusOriginated
 )

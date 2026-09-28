@@ -4,7 +4,6 @@
 package epic
 
 import (
-	shared_epicsenum "github.com/zqk-os/zqk/packs/work/bldr_enum_v1/shared_epics"
 	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
 )
 
@@ -34,16 +33,16 @@ const (
 	SourceTypeInternal SourceType = base_objectenum.SourceTypeInternal
 )
 
-type Status = shared_epicsenum.Status
+type Status = base_objectenum.Status
 
 const (
-	StatusArchived   Status = shared_epicsenum.StatusArchived
-	StatusCompleted  Status = shared_epicsenum.StatusCompleted
-	StatusConceptual Status = shared_epicsenum.StatusConceptual
-	StatusDraft      Status = shared_epicsenum.StatusDraft
-	StatusError      Status = shared_epicsenum.StatusError
-	StatusInProgress Status = shared_epicsenum.StatusInProgress
-	StatusOriginated Status = shared_epicsenum.StatusOriginated
-	StatusPaused     Status = shared_epicsenum.StatusPaused
-	StatusPlanned    Status = shared_epicsenum.StatusPlanned
+	StatusArchived   Status = base_objectenum.StatusArchived
+	StatusCompleted  Status = "completed"
+	StatusConceptual Status = base_objectenum.StatusConceptual
+	StatusDraft      Status = "draft"
+	StatusError      Status = base_objectenum.StatusError
+	StatusInProgress Status = base_objectenum.StatusInProgress
+	StatusOriginated Status = base_objectenum.StatusOriginated
+	StatusPaused     Status = "paused"
+	StatusPlanned    Status = "planned"
 )

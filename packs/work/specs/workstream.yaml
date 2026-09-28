@@ -108,36 +108,6 @@ fields:
         - ops
         - tooling
       required: false
-  description:
-    access:
-      requires:
-        - access:confidential
-    checklist:
-      authority: owner.
-      automation_hooks: used in reports, documentation.
-      cardinality: one
-      criticality: association
-      default: none (optional, prefer context for brief description)
-      dependencies: none.
-      observability: "yes"
-      origin_lifecycle: mutable
-      purpose: Detailed description of the workstream's purpose and scope.
-      security: non-sensitive
-      system_usage:
-        - documentation
-        - communication
-        - understanding
-      validation: free text or markdown.
-    field_profile_code: WKS-016
-    permissions: rwx
-    semantic_type: statement
-    traits:
-      - readable
-      - writable
-      - modifiable
-    type: text
-    validation:
-      required: false
   entry_point:
     access:
       requires:

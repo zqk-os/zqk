@@ -4,8 +4,8 @@
 package roadmap
 
 import (
-	shared_roadmapsenum "github.com/zqk-os/zqk/packs/work/bldr_enum_v1/shared_roadmaps"
 	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	work_intervalenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/work_interval"
 )
 
 type Plane = base_objectenum.Plane
@@ -34,14 +34,14 @@ const (
 	SourceTypeInternal SourceType = base_objectenum.SourceTypeInternal
 )
 
-type Status = shared_roadmapsenum.Status
+type Status = work_intervalenum.Status
 
 const (
-	StatusActive     Status = shared_roadmapsenum.StatusActive
-	StatusArchived   Status = shared_roadmapsenum.StatusArchived
-	StatusComplete   Status = shared_roadmapsenum.StatusComplete
-	StatusConceptual Status = shared_roadmapsenum.StatusConceptual
-	StatusDraft      Status = shared_roadmapsenum.StatusDraft
-	StatusOriginated Status = shared_roadmapsenum.StatusOriginated
-	StatusPublished  Status = shared_roadmapsenum.StatusPublished
+	StatusActive     Status = "active"
+	StatusArchived   Status = work_intervalenum.StatusArchived
+	StatusComplete   Status = "complete"
+	StatusConceptual Status = work_intervalenum.StatusConceptual
+	StatusDraft      Status = "draft"
+	StatusOriginated Status = work_intervalenum.StatusOriginated
+	StatusPublished  Status = "published"
 )

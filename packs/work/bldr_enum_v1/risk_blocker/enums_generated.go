@@ -68,15 +68,15 @@ const (
 	SourceTypeInternal SourceType = base_objectenum.SourceTypeInternal
 )
 
-type Status = shared_risk_blockersenum.Status
+type Status = base_objectenum.Status
 
 const (
-	StatusArchived    Status = shared_risk_blockersenum.StatusArchived
-	StatusConceptual  Status = shared_risk_blockersenum.StatusConceptual
-	StatusError       Status = shared_risk_blockersenum.StatusError
-	StatusImplemented Status = shared_risk_blockersenum.StatusImplemented
-	StatusInProgress  Status = shared_risk_blockersenum.StatusInProgress
-	StatusOpen        Status = shared_risk_blockersenum.StatusOpen
-	StatusOriginated  Status = shared_risk_blockersenum.StatusOriginated
-	StatusProposed    Status = shared_risk_blockersenum.StatusProposed
+	StatusArchived    Status = base_objectenum.StatusArchived
+	StatusConceptual  Status = base_objectenum.StatusConceptual
+	StatusError       Status = base_objectenum.StatusError
+	StatusImplemented Status = base_objectenum.StatusImplemented
+	StatusInProgress  Status = base_objectenum.StatusInProgress
+	StatusOpen        Status = "open"
+	StatusOriginated  Status = base_objectenum.StatusOriginated
+	StatusProposed    Status = base_objectenum.StatusProposed
 )

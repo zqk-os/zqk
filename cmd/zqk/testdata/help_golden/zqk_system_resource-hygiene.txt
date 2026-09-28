@@ -28,7 +28,7 @@ Flags:
   -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
       --ignore-scheduler-down   Ignore scheduler down warning/lockdown
       --lock-threshold string   Threshold duration for stale locks (e.g. 15m, 1h) (default "15m")
-      --log-max-age string      Threshold duration for log retention (e.g. 24h, 3d, 7d) (default "7d")
+      --log-max-age string      Threshold duration for log retention (e.g. 24h, 48h, 7d) (default "48h")
       --log-max-size string     Maximum log file size before truncation (e.g. 5MB, 10MB) (default "10MB")
   -o, --output string           Write output to file
       --project-root string     Project root directory

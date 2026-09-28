@@ -4,8 +4,8 @@
 package goal
 
 import (
-	shared_goalsenum "github.com/zqk-os/zqk/packs/work/bldr_enum_v1/shared_goals"
 	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	work_intervalenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/work_interval"
 )
 
 type Plane = base_objectenum.Plane
@@ -34,15 +34,15 @@ const (
 	SourceTypeInternal SourceType = base_objectenum.SourceTypeInternal
 )
 
-type Status = shared_goalsenum.Status
+type Status = work_intervalenum.Status
 
 const (
-	StatusActive     Status = shared_goalsenum.StatusActive
-	StatusArchived   Status = shared_goalsenum.StatusArchived
-	StatusBlocked    Status = shared_goalsenum.StatusBlocked
-	StatusComplete   Status = shared_goalsenum.StatusComplete
-	StatusConceptual Status = shared_goalsenum.StatusConceptual
-	StatusError      Status = shared_goalsenum.StatusError
-	StatusOriginated Status = shared_goalsenum.StatusOriginated
-	StatusProposed   Status = shared_goalsenum.StatusProposed
+	StatusActive     Status = "active"
+	StatusArchived   Status = work_intervalenum.StatusArchived
+	StatusBlocked    Status = "blocked"
+	StatusComplete   Status = "complete"
+	StatusConceptual Status = work_intervalenum.StatusConceptual
+	StatusError      Status = work_intervalenum.StatusError
+	StatusOriginated Status = work_intervalenum.StatusOriginated
+	StatusProposed   Status = work_intervalenum.StatusProposed
 )

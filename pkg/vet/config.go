@@ -94,7 +94,7 @@ func DefaultConfig() *GatesConfig {
 			CheckRawGoroutines:     true,
 			GoroutineExemptions:    []string{"*_test.go", "vendor/*", "pkg/goroutinelabels/*", "*/testdata/*"},
 			ForbiddenPathLiterals: []string{".zqk", ".zqk/"},
-			GoScanDirs:            []string{"pkg/", "cmd/", "internal/", "scripts/"},
+			GoScanDirs:            []string{"pkg/", "cmd/", "internal/", "scripts/", "packs/", "ext/"},
 			Exemptions:            []string{"*_test.go", "vendor/*", ".git/*", "pkg/paths/*", "pkg/brand/*", "pkg/vet/*"},
 			CLIExemptFunctions:    []string{"CLIUsage", "CLIInvocation", "RewriteCanonicalCLIInvocations"},
 			CLIExemptFiles:        []string{"*_test.go", "pkg/paths/cli_command_name.go", "pkg/vet/*"},

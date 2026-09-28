@@ -8,6 +8,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestNewResourceHygieneCmd(t *testing.T) {
@@ -34,6 +35,7 @@ func TestNewResourceHygieneCmd(t *testing.T) {
 
 func TestRunResourceHygiene_Execution(t *testing.T) {
 	dir := t.TempDir()
+	t.Setenv(zqkenv.TestRoot().Name(), dir)
 	cacheDir := filepath.Join(dir, paths.ProjectDataDir, paths.CacheDir)
 	if err := fileutil.MkdirAll(cacheDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
