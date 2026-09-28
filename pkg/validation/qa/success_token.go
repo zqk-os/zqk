@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	qasuccessenum "github.com/zqk-os/zqk/packs/qa/bldr_enum_v1/qa_success"
 	"github.com/zqk-os/zqk/pkg/objects"
-	qasuccessenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/qa_success"
 	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 )
 

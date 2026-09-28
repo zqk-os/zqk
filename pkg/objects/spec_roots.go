@@ -5,6 +5,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -178,6 +179,27 @@ func mergeSpecIndexes(specsDir string, roots []string) map[string]string {
 		}
 	}
 	return idx
+}
+
+// FindRegisteredSpecFile resolves a kind spec in the kernel tree, then in
+// spec directories a linked pack registered. The kernel file wins.
+func FindRegisteredSpecFile(specsDir, kind string) (string, error) {
+	if hit, err := paths.FindObjectSpecFile(specsDir, kind); err == nil {
+		return hit, nil
+	}
+	name := paths.ObjectSpecFileName(kind)
+	if name == "" {
+		return "", errfmt.Errorf("object spec %s not found", kind)
+	}
+	for _, root := range ExtraSpecRoots() {
+		cand := filepath.Join(root, name)
+		info, err := fileutil.Stat(cand)
+		if err != nil || info.IsDir() {
+			continue
+		}
+		return cand, nil
+	}
+	return "", errfmt.Errorf("object spec %s not found", kind)
 }
 
 func pathInExtraSpecRoot(absPath string) bool {
