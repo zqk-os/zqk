@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/spf13/cobra"
@@ -142,6 +143,19 @@ func TestGetColumnWidth(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("fields_flag_embedded_widths", func(t *testing.T) {
+		cmdFields := &cobra.Command{}
+		cmdFields.Flags().String("columns", "", "")
+		cmdFields.Flags().StringArray("fields", []string{"id:55,title:100"}, "")
+		if width := GetColumnWidth("title", cmdFields, nil, 20); width != 100 {
+			t.Errorf("expected 100 from embedded fields flag, got %d", width)
+		}
+		if width := GetColumnWidth("id", cmdFields, nil, 20); width != 55 {
+			t.Errorf("expected 55 from embedded fields flag, got %d", width)
+		}
+	})
+
 }
 
 func TestTruncateString(t *testing.T) {
@@ -202,3 +216,46 @@ func TestTruncateString(t *testing.T) {
 		})
 	}
 }
+
+func TestAdjustEmojiPadding(t *testing.T) {
+	t.Parallel()
+
+	t.Run("no_emoji_returns_exact_input", func(t *testing.T) {
+		input := "│ Normal table line │\n│ Another line      │"
+		got := adjustEmojiPadding(input)
+		if got != input {
+			t.Errorf("expected unchanged input, got %q", got)
+		}
+	})
+
+	t.Run("adjusts_line_with_warning_emoji", func(t *testing.T) {
+		input := "│ ⚠️ Warning text   │\n│ Standard line     │"
+		got := adjustEmojiPadding(input)
+		if !strings.Contains(got, "⚠️") {
+			t.Errorf("expected emoji in output, got %q", got)
+		}
+	})
+}
+
+func TestRenderTable(t *testing.T) {
+	t.Parallel()
+
+	cols := []string{"ID", "STATUS"}
+	widths := []int{10, 10}
+	rows := [][]string{
+		{"ID-1", "active"},
+		{"ID-2", "complete"},
+	}
+
+	rendered := RenderTable(cols, widths, rows)
+	if !strings.Contains(rendered, "ID-1") || !strings.Contains(rendered, "active") {
+		t.Errorf("expected row content in table: %s", rendered)
+	}
+
+	withTitle := RenderTableWithTitle("My Table", cols, widths, rows)
+	if !strings.Contains(withTitle, "My Table") {
+		t.Errorf("expected title in table: %s", withTitle)
+	}
+}
+
+

@@ -86,3 +86,42 @@ func TestKindFieldsSegregatedData(t *testing.T) {
 		t.Errorf("specialized_fields = %v", spec)
 	}
 }
+
+func TestFormatKindFieldsSegregatedYAML(t *testing.T) {
+	t.Parallel()
+	kf := &objects.KindFields{
+		Kind: "goal",
+		CommonFields: []objects.FieldInfo{
+			{
+				Name:        "id",
+				Type:        "string",
+				Required:    true,
+				Description: "Stable identifier",
+				Traits:      []string{"readable", "writable"},
+				EnumValues:  []string{"A", "B"},
+			},
+		},
+		SpecializedFields: []objects.FieldInfo{
+			{
+				Name:        "target",
+				Type:        "string",
+				Description: "Success threshold",
+			},
+		},
+	}
+	out, err := FormatKindFieldsSegregatedYAML(kf)
+	if err != nil {
+		t.Fatalf("FormatKindFieldsSegregatedYAML failed: %v", err)
+	}
+	s := string(out)
+	if !strings.Contains(s, "kind: goal") {
+		t.Errorf("expected kind in YAML: %s", s)
+	}
+	if !strings.Contains(s, "common_fields:") || !strings.Contains(s, "specialized_fields:") {
+		t.Errorf("expected common and specialized fields sections in YAML: %s", s)
+	}
+	if !strings.Contains(s, "Stable identifier") || !strings.Contains(s, "Success threshold") {
+		t.Errorf("expected descriptions in YAML: %s", s)
+	}
+}
+

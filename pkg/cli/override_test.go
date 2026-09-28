@@ -73,4 +73,13 @@ func TestEnforceOverrideFriction(t *testing.T) {
 			t.Fatalf("unexpected error message: %v", err)
 		}
 	})
+
+	t.Run("pulse_meaningful_activity", func(t *testing.T) {
+		stop := pulseMeaningfulActivityWhileWaiting()
+		if stop == nil {
+			t.Fatal("expected non-nil stop func")
+		}
+		stop()
+	})
 }
+
