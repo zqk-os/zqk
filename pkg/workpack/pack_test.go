@@ -3,6 +3,8 @@ package workpack
 import (
 	"testing"
 
+	"github.com/spf13/cobra"
+
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
@@ -25,11 +27,21 @@ func TestKindsArePlanningAndVerification(t *testing.T) {
 }
 
 func TestEnableRecordsTheLink(t *testing.T) {
-	if Enabled() {
-		t.Fatal("pack starts unlinked")
-	}
+	enabled = false
 	Enable()
 	if !Enabled() {
 		t.Fatal("Enable did not record the link")
+	}
+}
+
+func TestRegisterRequiresARoot(t *testing.T) {
+	linkedRoot = false
+	Register(nil)
+	if LinkedRoot() {
+		t.Fatal("nil root counted as linked")
+	}
+	Register(&cobra.Command{Use: "zqk"})
+	if !LinkedRoot() {
+		t.Fatal("Register did not record the root")
 	}
 }

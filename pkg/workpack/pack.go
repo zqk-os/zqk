@@ -3,7 +3,11 @@
 // zqk_omit_workpack leaves this package out of the binary.
 package workpack
 
-import "github.com/zqk-os/zqk/pkg/objects"
+import (
+	"github.com/spf13/cobra"
+
+	"github.com/zqk-os/zqk/pkg/objects"
+)
 
 const (
 	// Name is the pack id the composition root links.
@@ -22,10 +26,26 @@ func Kinds() []string {
 	}
 }
 
-var enabled bool
+var (
+	enabled    bool
+	linkedRoot bool
+)
 
 // Enable records that the composition root linked this pack.
 func Enable() { enabled = true }
 
 // Enabled reports whether the composition root linked this pack.
 func Enabled() bool { return enabled }
+
+// Register records that the composition root handed this pack the command tree.
+// Commands that speak this pack's kinds still register from cmd/zqk.
+func Register(root *cobra.Command) {
+	Enable()
+	if root == nil {
+		return
+	}
+	linkedRoot = true
+}
+
+// LinkedRoot reports whether Register received the composition root command.
+func LinkedRoot() bool { return linkedRoot }
