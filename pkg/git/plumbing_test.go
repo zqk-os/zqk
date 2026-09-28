@@ -1,4 +1,4 @@
-package storage_test
+package git_test
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
-	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/git"
 )
 
 func initTestGitRepo(t *testing.T, dir string) {
@@ -39,7 +39,7 @@ func runCmd(t *testing.T, dir string, name string, args ...string) string {
 	return strings.TrimSpace(string(out))
 }
 
-func TestGitPlumbingEngine_SnapshotAndRestore(t *testing.T) {
+func TestPlumbingEngine_SnapshotAndRestore(t *testing.T) {
 	repoDir := t.TempDir()
 	initTestGitRepo(t, repoDir)
 
@@ -56,12 +56,12 @@ func TestGitPlumbingEngine_SnapshotAndRestore(t *testing.T) {
 
 	headBefore := runCmd(t, repoDir, "git", "rev-parse", "HEAD")
 
-	engine, err := storage.NewGitPlumbingEngine(storage.GitPlumbingOptions{
+	engine, err := git.NewPlumbingEngine(git.PlumbingOptions{
 		RepoRoot:   repoDir,
 		StorageDir: ".zqk",
 	})
 	if err != nil {
-		t.Fatalf("NewGitPlumbingEngine: %v", err)
+		t.Fatalf("NewPlumbingEngine: %v", err)
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -110,7 +110,7 @@ func TestGitPlumbingEngine_SnapshotAndRestore(t *testing.T) {
 	}
 }
 
-func TestGitPlumbingEngine_PushAndFetchDistributed(t *testing.T) {
+func TestPlumbingEngine_PushAndFetchDistributed(t *testing.T) {
 	// Remote bare repo
 	remoteDir := t.TempDir()
 	runCmd(t, remoteDir, "git", "init", "--bare")
@@ -131,7 +131,7 @@ func TestGitPlumbingEngine_PushAndFetchDistributed(t *testing.T) {
 		t.Fatalf("write node1Obj: %v", err)
 	}
 
-	engine1, err := storage.NewGitPlumbingEngine(storage.GitPlumbingOptions{
+	engine1, err := git.NewPlumbingEngine(git.PlumbingOptions{
 		RepoRoot:   node1,
 		StorageDir: ".zqk",
 	})
@@ -157,7 +157,7 @@ func TestGitPlumbingEngine_PushAndFetchDistributed(t *testing.T) {
 	initTestGitRepo(t, node2)
 	runCmd(t, node2, "git", "remote", "add", "origin", remoteDir)
 
-	engine2, err := storage.NewGitPlumbingEngine(storage.GitPlumbingOptions{
+	engine2, err := git.NewPlumbingEngine(git.PlumbingOptions{
 		RepoRoot:   node2,
 		StorageDir: ".zqk",
 	})

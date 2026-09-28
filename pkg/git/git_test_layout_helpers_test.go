@@ -10,6 +10,8 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/pkg/paths"
+	_ "github.com/zqk-os/zqk/packs/work/bldr_v2"
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -108,6 +110,34 @@ func copyObjectSpecYAMLFilesToTestRootGit(testRoot, projectRoot string) error {
 		if err := fileutil.WriteSecureFile(targetPath, data); err != nil { //nolint:gosec // spec files
 			return fmt.Errorf("failed to write target file %s: %w", targetPath, err)
 		}
+	}
+
+	// Also copy pack specs and lifecycles so pack-decoupled kinds (e.g. backlog_item, goal) resolve
+	packsDir := filepath.Join(projectRoot, "packs")
+	if _, err := fileutil.Stat(packsDir); err == nil {
+		_ = filepath.Walk(packsDir, func(path string, info fileutil.FileInfo, wErr error) error {
+			if wErr != nil || info == nil || info.IsDir() {
+				return nil
+			}
+			if !yamlSpecExtensionOKGit(info.Name()) {
+				return nil
+			}
+			rel, _ := filepath.Rel(projectRoot, path)
+			targetPath := filepath.Join(testRoot, rel)
+			_ = fileutil.EnsureDir(filepath.Dir(targetPath))
+			if data, rErr := fileutil.ReadFile(path); rErr == nil {
+				_ = fileutil.WriteSecureFile(targetPath, data)
+				if strings.Contains(rel, "/specs/") {
+					_ = fileutil.WriteSecureFile(filepath.Join(targetSpecsDir, info.Name()), data)
+				}
+				if strings.Contains(rel, "/lifecycles/") {
+					targetLifecyclesDir := filepath.Join(testRoot, paths.ProcessInternalLifecyclesDir)
+					_ = fileutil.EnsureDir(targetLifecyclesDir)
+					_ = fileutil.WriteSecureFile(filepath.Join(targetLifecyclesDir, info.Name()), data)
+				}
+			}
+			return nil
+		})
 	}
 	return nil
 }
