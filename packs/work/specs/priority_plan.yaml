@@ -95,40 +95,6 @@ fields:
     type: list
     validation:
       required: false
-  id:
-    access:
-      requires:
-        - access:confidential
-    checklist:
-      authority: automation (Generator)
-      automation_hooks: used for cross-file references.
-      cardinality: one
-      criticality: composition
-      default: auto-assigned per kind sequence
-      dependencies: linkage constraints, URN creation.
-      observability: logged + manifests.
-      origin_lifecycle: immutable
-      purpose: Stable identifier for the priority plan. Supports formats like \\\"PRIO-20251212-week1\\\", \\\"PRIO-4\\\", \\\"PRI-001\\\", etc.
-      security: non-sensitive
-      system_usage:
-        - linking
-        - reporting
-        - URIs
-      validation: Must start with PRI- or PRIO- followed by alphanumeric characters, dots, dashes, or underscores.
-    field_profile_code: PRIO-000
-    permissions: r-x
-    semantic_type: statement
-    traits:
-      - filterable
-      - listable
-      - readable
-      - searchable
-      - sortable
-      - writable
-    type: string
-    validation:
-      pattern: ^(PRI-|PRIO-)[A-Za-z0-9][A-Za-z0-9._-]*$
-      required: true
   next_plan_id:
     access:
       requires:

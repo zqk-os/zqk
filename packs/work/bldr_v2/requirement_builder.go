@@ -92,35 +92,6 @@ func (b *RequirementBuilder) addRequirementFields() {
 		WithPermissions("r-x").
 		WithSemanticType("reference").
 		WithProfileCode("REQ-010"))
-	b.AddFieldBuilder(builders.NewFieldBuilder("description", "text").
-		WithChecklist(builders.NewChecklistBuilder().
-			Authority("owner.").
-			AutomationHooks("used in reports, requirement documentation.").
-			Cardinality("one").
-			Criticality("association").
-			Default("none (optional)").
-			Dependencies("none.").
-			Lifecycle("mutable").
-			Observability("yes").
-			Purpose("Detailed description of the requirement, its context, and expected outcomes.").
-			Security("non-sensitive").
-			SystemUsage([]any{
-				"documentation",
-				"communication",
-				"planning",
-			}).
-			Validation("free text or markdown.").
-			Build()).
-		WithAccess(builders.NewAccessBuilder().
-			Requires("access:confidential").
-			Build()).
-		WithValidation(builders.NewValidationBuilder().
-			Required(false).
-			Build()).
-		WithTraits("readable", "writable", "modifiable").
-		WithPermissions("rwx").
-		WithSemanticType("statement").
-		WithProfileCode("REQ-011"))
 	b.AddFieldBuilder(builders.NewFieldBuilder("goal_refs", "list").
 		WithChecklist(builders.NewChecklistBuilder().
 			Authority("owner/executive.").

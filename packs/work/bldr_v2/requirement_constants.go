@@ -13,8 +13,6 @@ const (
 	RequirementFieldCompletedAt = "completed_at"
 	// RequirementFieldCriteriaRefs is the field name for criteria_refs
 	RequirementFieldCriteriaRefs = "criteria_refs"
-	// RequirementFieldDescription is the field name for description
-	RequirementFieldDescription = "description"
 	// RequirementFieldGoalRefs is the field name for goal_refs
 	RequirementFieldGoalRefs = "goal_refs"
 	// RequirementFieldMilestoneRefs is the field name for milestone_refs

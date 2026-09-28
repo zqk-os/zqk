@@ -7,8 +7,6 @@ package bldr_v2
 const (
 	// FieldActiveOrder is the field name for active_order
 	FieldActiveOrder = "active_order"
-	// PriorityPlanFieldDescription is the field name for description
-	PriorityPlanFieldDescription = "description"
 	// FieldNextPlanId is the field name for next_plan_id
 	FieldNextPlanId = "next_plan_id"
 	// PriorityPlanFieldNote is the field name for note

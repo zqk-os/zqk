@@ -252,35 +252,6 @@ func (b *BacklogItemBuilder) addBacklogItemFields() {
 		WithPermissions("rwx").
 		WithSemanticType("expression").
 		WithProfileCode("BLI-009"))
-	b.AddFieldBuilder(builders.NewFieldBuilder("context", "text").
-		WithChecklist(builders.NewChecklistBuilder().
-			Authority("owner.").
-			AutomationHooks("used in reports, justification documents.").
-			Cardinality("one").
-			Criticality("association").
-			Default("none (optional)").
-			Dependencies("none.").
-			Lifecycle("mutable").
-			Observability("yes").
-			Purpose("When/why the idea surfaced (meeting, user feedback, technical debt, etc.).").
-			Security("non-sensitive").
-			SystemUsage([]any{
-				"context",
-				"justification",
-				"traceability",
-			}).
-			Validation("free text.").
-			Build()).
-		WithAccess(builders.NewAccessBuilder().
-			Requires("access:confidential").
-			Build()).
-		WithValidation(builders.NewValidationBuilder().
-			Required(false).
-			Build()).
-		WithTraits("readable", "writable", "modifiable").
-		WithPermissions("rwx").
-		WithSemanticType("statement").
-		WithProfileCode("BLI-005"))
 	b.AddFieldBuilder(builders.NewFieldBuilder("convergence_session_profile", "string").
 		WithChecklist(builders.NewChecklistBuilder().
 			Authority("owner.").
@@ -368,36 +339,6 @@ func (b *BacklogItemBuilder) addBacklogItemFields() {
 		WithPermissions("r-x").
 		WithSemanticType("statement").
 		WithProfileCode("BLI-004"))
-	b.AddFieldBuilder(builders.NewFieldBuilder("description", "text").
-		WithChecklist(builders.NewChecklistBuilder().
-			Authority("owner.").
-			AutomationHooks("used in markdown generation, reports.").
-			Cardinality("one").
-			Criticality("composition").
-			Default("none (optional but recommended)").
-			Dependencies("none.").
-			Lifecycle("mutable").
-			Observability("yes").
-			Purpose("Detailed description of the feature or enhancement.").
-			Security("non-sensitive").
-			SystemUsage([]any{
-				"documentation",
-				"planning",
-				"communication",
-			}).
-			Validation("free text, recommended >= 50 chars.").
-			Build()).
-		WithAccess(builders.NewAccessBuilder().
-			Requires("access:confidential").
-			Build()).
-		WithValidation(builders.NewValidationBuilder().
-			MinLength(0).
-			Required(false).
-			Build()).
-		WithTraits("readable", "writable", "modifiable").
-		WithPermissions("rwx").
-		WithSemanticType("statement").
-		WithProfileCode("BLI-006"))
 	b.AddFieldBuilder(builders.NewFieldBuilder("doc_entry_refs", "list").
 		WithChecklist(builders.NewChecklistBuilder().
 			Authority("owner.").
