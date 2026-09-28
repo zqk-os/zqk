@@ -61,3 +61,13 @@ flowchart TD
 - Operates when native system init is unavailable or in containerized sandboxes.
 - Tracks process states (running, stopped, failed) with PID files and signal handling.
 
+## ServiceManager Façade API
+
+The `service.Manager` struct provides high-level unified lifecycle orchestration:
+- `Install(ctx, spec)`: Validates spec invariants and delegates to the active platform adapter.
+- `Uninstall(ctx, id)`: Unregisters and removes service descriptor files.
+- `Start(ctx, id)` / `Stop(ctx, id)` / `Restart(ctx, id)`: Controls process lifecycle states.
+- `Status(ctx, id)`: Returns normalized `ServiceStatus` (PID, State, Uptime).
+- `CleanupLegacy(ctx, legacyIDs)`: Bulk sweeps orphaned and superseded service identifiers.
+
+
