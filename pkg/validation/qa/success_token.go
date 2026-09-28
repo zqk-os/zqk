@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/objects"
-	qasuccessenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/qa_success"
+	qasuccessstatus "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_qa_success"
 	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 )
 
@@ -32,7 +32,7 @@ func buildQASuccessObject(itemID, signature, publicKey string) (map[string]any, 
 	b.SetID(newQASuccessID()).
 		SetField(objects.FieldKeyTitle, QASuccessTitle(itemID)).
 		SetField(objects.FieldKeyItemID, itemID).
-		SetStatus(string(qasuccessenum.StatusSuccess)).
+		SetStatus(string(qasuccessstatus.StatusSuccess)).
 		SetField(objects.FieldKeySignature, signature).
 		SetField(objects.FieldKeyPublicKey, publicKey)
 	return b.Build()

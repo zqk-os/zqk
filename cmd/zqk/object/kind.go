@@ -206,20 +206,32 @@ func RegisterDynamicKindCommands(objectCmd *cobra.Command) {
 	attachDiscoveredKindCommands(objectCmd, kinds)
 }
 
-// packKindRegistrar attaches kinds the linked pack owns. The composition root sets it.
+// packKindRegistrars attach kinds each linked pack owns. The composition root adds them.
 // The kernel strips those kinds from its own list and does not know their names.
-var packKindRegistrar func(objectCmd *cobra.Command)
+var packKindRegistrars []func(objectCmd *cobra.Command)
 
-// SetPackKindRegistrar records how a linked pack adds its kind commands.
-// A nil registrar clears the hook.
+// SetPackKindRegistrar replaces the pack command hooks.
+// A nil registrar clears them.
 func SetPackKindRegistrar(fn func(objectCmd *cobra.Command)) {
-	packKindRegistrar = fn
+	if fn == nil {
+		packKindRegistrars = nil
+		return
+	}
+	packKindRegistrars = []func(objectCmd *cobra.Command){fn}
+}
+
+// AddPackKindRegistrar records another linked pack's kind commands.
+func AddPackKindRegistrar(fn func(objectCmd *cobra.Command)) {
+	if fn == nil {
+		return
+	}
+	packKindRegistrars = append(packKindRegistrars, fn)
 }
 
 func attachDiscoveredKindCommands(objectCmd *cobra.Command, kinds []string) {
 	RegisterKindCommandsForKinds(objectCmd, objects.WithoutKinds(kinds, objects.PackOwnedKinds()))
-	if packKindRegistrar != nil {
-		packKindRegistrar(objectCmd)
+	for _, fn := range packKindRegistrars {
+		fn(objectCmd)
 	}
 }
 

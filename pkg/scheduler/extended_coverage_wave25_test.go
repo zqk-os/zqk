@@ -13,7 +13,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
-	riskblockerenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/risk_blocker"
+	riskstatus "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_risk_blockers"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -170,7 +170,7 @@ func TestExtended_Hourglass_DeepCoverage(t *testing.T) {
 	if err != nil {
 		t.Fatalf("buildMissedDeadlineRiskBlocker failed: %v", err)
 	}
-	if blocker[objects.FieldKeyStatus] != string(riskblockerenum.StatusOpen) {
+	if blocker[objects.FieldKeyStatus] != string(riskstatus.StatusOpen) {
 		t.Errorf("expected open status, got %v", blocker[objects.FieldKeyStatus])
 	}
 
@@ -253,13 +253,13 @@ func TestExtended_Hourglass_DeepCoverage(t *testing.T) {
 	// Also write an expired process timer file
 	taskID2 := "ATK-hourglass-2"
 	if err := sp.Create(bgCtx, secCtx, map[string]any{
-		objects.FieldKeyID:                  taskID2,
-		objects.FieldKeyKind:                objects.KindAgentTask,
-		objects.FieldKeySchemaVersion:       objects.DefaultSchemaVersion,
-		objects.FieldKeyStatus:              objects.ObjectStatusInProgress,
-		objects.FieldKeyAssigneePersonaRef:  "software_engineer",
-		objects.FieldKeyTitle:               "Hourglass Task 2",
-		objects.FieldKeyDescription:         "Hourglass task description 2",
+		objects.FieldKeyID:                 taskID2,
+		objects.FieldKeyKind:               objects.KindAgentTask,
+		objects.FieldKeySchemaVersion:      objects.DefaultSchemaVersion,
+		objects.FieldKeyStatus:             objects.ObjectStatusInProgress,
+		objects.FieldKeyAssigneePersonaRef: "software_engineer",
+		objects.FieldKeyTitle:              "Hourglass Task 2",
+		objects.FieldKeyDescription:        "Hourglass task description 2",
 		objects.FieldKeyTaskSteps: []any{
 			map[string]any{
 				objects.FieldKeyStatus: "pending_implementation",
@@ -307,14 +307,14 @@ func TestExtended_Hourglass_DeepCoverage(t *testing.T) {
 
 	orphanTaskID := "ATK-orphan-1"
 	if err := sp.Create(bgCtx, secCtx, map[string]any{
-		objects.FieldKeyID:                  orphanTaskID,
-		objects.FieldKeyKind:                objects.KindAgentTask,
-		objects.FieldKeySchemaVersion:       objects.DefaultSchemaVersion,
-		objects.FieldKeyStatus:              objects.ObjectStatusInProgress,
-		objects.FieldKeyAssigneePersonaRef:  "software_engineer",
-		objects.FieldKeyPriorityPlanRef:     planID,
-		objects.FieldKeyTitle:               "Orphan Task",
-		objects.FieldKeyDescription:         "Task with completed parent plan",
+		objects.FieldKeyID:                 orphanTaskID,
+		objects.FieldKeyKind:               objects.KindAgentTask,
+		objects.FieldKeySchemaVersion:      objects.DefaultSchemaVersion,
+		objects.FieldKeyStatus:             objects.ObjectStatusInProgress,
+		objects.FieldKeyAssigneePersonaRef: "software_engineer",
+		objects.FieldKeyPriorityPlanRef:    planID,
+		objects.FieldKeyTitle:              "Orphan Task",
+		objects.FieldKeyDescription:        "Task with completed parent plan",
 	}); err != nil {
 		t.Fatalf("create orphan task failed: %v", err)
 	}

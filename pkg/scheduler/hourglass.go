@@ -17,7 +17,8 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/primaryorch"
-	riskblockerenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/risk_blocker"
+	baseobjectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	riskstatus "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_risk_blockers"
 	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -26,6 +27,14 @@ import (
 // missedDeadlineEscalationTitlePrefix is the stable title prefix for hourglass
 // deadline escalations (used for dedupe and ops grepping).
 const missedDeadlineEscalationTitlePrefix = "Missed Deadline Escalation: "
+
+// Escalation objects are risk_blocker instances. The work pack owns that kind's
+// generated enum. Status and priority tier come from kernel shared enums; these
+// two wire values are the fields the hourglass itself writes.
+const (
+	escalationRiskTypeBlocker = "blocker"
+	escalationSeverityHigh    = "high"
+)
 
 // expiredTimerAction is what an expired hourglass file warrants.
 //
@@ -379,10 +388,10 @@ func buildMissedDeadlineRiskBlocker(id, taskID, kind, title string) (map[string]
 	b := instance_builders.NewForKind(objects.KindRiskBlocker, objects.DefaultSchemaVersion)
 	b.SetID(id).
 		SetField(objects.FieldKeyTitle, missedDeadlineEscalationTitlePrefix+title).
-		SetStatus(string(riskblockerenum.StatusOpen)).
-		SetField(objects.FieldKeyPriorityTier, string(riskblockerenum.PriorityTierP0)).
-		SetField(objects.FieldKeyRiskType, string(riskblockerenum.RiskTypeBlocker)).
-		SetField(objects.FieldKeySeverity, string(riskblockerenum.SeverityHigh)).
+		SetStatus(string(riskstatus.StatusOpen)).
+		SetField(objects.FieldKeyPriorityTier, string(baseobjectenum.PriorityTierP0)).
+		SetField(objects.FieldKeyRiskType, escalationRiskTypeBlocker).
+		SetField(objects.FieldKeySeverity, escalationSeverityHigh).
 		SetField(objects.FieldKeyDetectedBy, "hourglass").
 		SetField(objects.FieldKeyRelatedObjectRefs, []string{taskID}).
 		SetField(objects.FieldKeyAffectedItems, []string{taskID})
@@ -434,7 +443,7 @@ func hasOpenMissedDeadlineEscalation(ctx context.Context, store storage.ObjectSt
 	}
 	for _, obj := range res.Objects {
 		st, _ := obj[objects.FieldKeyStatus].(string)
-		if st == string(riskblockerenum.StatusArchived) || st == string(riskblockerenum.StatusImplemented) {
+		if st == string(riskstatus.StatusArchived) || st == string(riskstatus.StatusImplemented) {
 			continue
 		}
 		if refsContainID(obj[objects.FieldKeyRelatedObjectRefs], taskID) ||

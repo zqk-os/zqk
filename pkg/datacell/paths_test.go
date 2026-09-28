@@ -11,16 +11,16 @@ import (
 func TestRuntimePaths(t *testing.T) {
 	t.Parallel()
 	root := "/tmp/proj"
-	if g, w := FeatureFlagsPath(root), filepath.Join(root, paths.ProjectDataDir, paths.ConfigDir, paths.FeatureFlagsFile); g != w {
+	if g, w := FeatureFlagsPath(root), filepath.Join(root, paths.AgentRuntimeRel(paths.FeatureFlagsFile)); g != w {
 		t.Fatalf("FeatureFlagsPath: got %q want %q", g, w)
 	}
-	if g, w := CLIHookProfilePath(root), filepath.Join(root, paths.ProjectDataDir, paths.ConfigDir, paths.CLIHookProfileFile); g != w {
+	if g, w := CLIHookProfilePath(root), filepath.Join(root, paths.AgentRuntimeRel(paths.CLIHookProfileFile)); g != w {
 		t.Fatalf("CLIHookProfilePath: got %q want %q", g, w)
 	}
 	if g, w := TrayYAMLPath(root), filepath.Join(root, paths.ProjectDataDir, paths.TrayYAMLFile); g != w {
 		t.Fatalf("TrayYAMLPath: got %q want %q", g, w)
 	}
-	wantACC := filepath.Join(root, paths.ProjectDataDir, paths.ConfigDir, paths.AgentChatChannelConfigFile)
+	wantACC := filepath.Join(root, paths.AgentRuntimeRel(paths.AgentChatChannelConfigFile))
 	if g := AgentChatChannelConfigPath(root); g != wantACC {
 		t.Fatalf("AgentChatChannelConfigPath: got %q want %q", g, wantACC)
 	}

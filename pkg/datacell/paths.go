@@ -10,11 +10,10 @@ import (
 // Bump when introducing a breaking on-disk layout or a new manifest file that consumers must understand.
 const ProtocolVersion = "1"
 
-// configLiteRel is the uncached fallback for Studio-compatible lite-files under .zqk/config/.
-// Cached aliases in this repo still default to AgentRuntimeDir via DefaultPathAliases.
-// TRACK: PRI-CORE-KERNEL-004 — Studio aliases this file; keep ConfigDir fallbacks so .zqk/config resolves.
+// configLiteRel is the uncached fallback for seat lite-files under .zqk/agent-runtime/.
+// The same directory is the default in DefaultPathAliases and AgentRuntimeFile.
 func configLiteRel(name string) string {
-	return filepath.Join(paths.ProjectDataDir, paths.ConfigDir, name)
+	return paths.AgentRuntimeRel(name)
 }
 
 func resolveConfigLitePath(projectRoot, alias, name string) string {
@@ -23,7 +22,7 @@ func resolveConfigLitePath(projectRoot, alias, name string) string {
 
 // FeatureFlagsPath returns the absolute path to the feature flags JSON file.
 // Uses the path alias [paths.PathAliasDatacellFeatureFlags] when the cache is built; otherwise
-// .zqk/config/feature_flags.json. Override via brand/path settings (see PATH_ALIAS_RESOLUTION.md).
+// .zqk/agent-runtime/feature_flags.json. Override via brand/path settings (see PATH_ALIAS_RESOLUTION.md).
 func FeatureFlagsPath(projectRoot string) string {
 	return resolveConfigLitePath(projectRoot, paths.PathAliasDatacellFeatureFlags, paths.FeatureFlagsFile)
 }

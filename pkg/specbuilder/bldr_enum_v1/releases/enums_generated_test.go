@@ -24,12 +24,14 @@ func TestEnums_Completeness(t *testing.T) {
 		{"SourceTypeExternal", string(SourceTypeExternal)},
 		{"SourceTypeImported", string(SourceTypeImported)},
 		{"SourceTypeInternal", string(SourceTypeInternal)},
-		{"StatusApproved", string(StatusApproved)},
 		{"StatusArchived", string(StatusArchived)},
+		{"StatusCancelled", string(StatusCancelled)},
+		{"StatusConceptual", string(StatusConceptual)},
 		{"StatusError", string(StatusError)},
-		{"StatusImplemented", string(StatusImplemented)},
 		{"StatusInProgress", string(StatusInProgress)},
-		{"StatusProposed", string(StatusProposed)},
+		{"StatusOriginated", string(StatusOriginated)},
+		{"StatusPlanned", string(StatusPlanned)},
+		{"StatusReleased", string(StatusReleased)},
 	}
 	for _, tt := range tests {
 		if tt.val == "" {

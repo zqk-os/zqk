@@ -46,6 +46,13 @@ func Kinds() []string {
 		objects.KindWorkstream,
 		objects.KindPriorityPlan,
 		objects.KindRiskBlocker,
+		objects.KindWorkInterval,
+		objects.KindWorkUnit,
+		objects.KindOccupancy,
+		objects.KindRemainingOpen,
+		objects.KindWorkstreamTransition,
+		objects.KindImportantDate,
+		objects.KindTechnicalDebt,
 	}
 }
 
