@@ -25,6 +25,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
+	pkgsystem "github.com/zqk-os/zqk/pkg/system"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/when"
 )
@@ -631,6 +632,7 @@ func outputTable(cmd *cobra.Command, ctx *cli.Context, results []CheckResult, bu
 	writeLayeredSummary(&buf, results, cmd)
 	writeCASDuplicateIDSummary(&buf, casDupInv)
 	writeIOResourceHygieneSummary(&buf, projectRoot)
+	writeRemedySummary(&buf, cmd, projectRoot, results)
 
 	// Pending count may already have been cleared by maybeClearStaleAutofixBatchesAfterLiveGreen.
 	pendingAutofixBatches := countUnprocessedAutofixBatches(projectRoot)
@@ -995,3 +997,57 @@ func writeIOResourceHygieneSummary(buf *strings.Builder, projectRoot string) {
 	buf.WriteString(renderTableWithTitle("Layer 4: I/O Resource Hygiene & Storage Telemetry", headers, rows))
 	buf.WriteString("\n")
 }
+
+func writeRemedySummary(buf *strings.Builder, cmd *cobra.Command, projectRoot string, results []CheckResult) {
+	if projectRoot == emptyValue || cmd == nil {
+		return
+	}
+	engine := pkgsystem.NewDiagnosticsRemedyEngine(projectRoot)
+	engine.PolicySeeder = func(root string) (int, error) {
+		return SeedDefaultPolicyPack(root, nil)
+	}
+	engine.PersonaSeeder = func(root string) (int, error) {
+		return SeedDefaultAgentSeatingPack(root, nil)
+	}
+
+	plans, err := engine.Diagnose(context.Background(), results)
+	if err != nil || len(plans) == 0 {
+		return
+	}
+
+	autoRemedy, _ := cmd.Flags().GetBool("auto-remedy")
+	if autoRemedy {
+		report, err := engine.Apply(context.Background(), plans)
+		if err == nil && report != nil && report.TotalApplied > 0 {
+			green := color.New(color.FgGreen).SprintFunc()
+			bold := color.New(color.Bold).SprintFunc()
+			buf.WriteString(fmt.Sprintf("%s %s\n", green("✓"), bold(fmt.Sprintf("Auto-Remedy applied %d of %d fixes:", report.TotalApplied, report.TotalDiagnosed))))
+			for _, o := range report.Outcomes {
+				if o.Applied {
+					buf.WriteString(fmt.Sprintf("  • %s: %s\n", o.Plan.Title, o.Detail))
+				}
+			}
+			buf.WriteString("\n")
+		}
+	} else {
+		var actionablePlans []pkgsystem.RemedyPlan
+		for _, p := range plans {
+			if p.ActionType == pkgsystem.ActionRemoveFile || p.ActionType == pkgsystem.ActionSeed || p.Command != "" {
+				actionablePlans = append(actionablePlans, p)
+			}
+		}
+		if len(actionablePlans) > 0 {
+			yellow := color.New(color.FgYellow).SprintFunc()
+			buf.WriteString(fmt.Sprintf("%s Deterministic Remedy Recipes (Run with %s to apply safe fixes):\n", yellow("⚡"), yellow("--auto-remedy")))
+			for _, p := range actionablePlans {
+				if p.Command != "" {
+					buf.WriteString(fmt.Sprintf("  • %s: %s\n    Command: %s\n", p.Title, p.Description, p.Command))
+				} else {
+					buf.WriteString(fmt.Sprintf("  • %s: %s\n", p.Title, p.Description))
+				}
+			}
+			buf.WriteString("\n")
+		}
+	}
+}
+
