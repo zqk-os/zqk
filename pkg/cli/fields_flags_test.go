@@ -65,3 +65,18 @@ func TestParseFieldsFlags_DefaultFormat(t *testing.T) {
 		t.Errorf("expected default format table, got %q", opts.Format)
 	}
 }
+
+func TestFieldsHarnessFlagNames(t *testing.T) {
+	t.Parallel()
+
+	withList := FieldsHarnessFlagNames(true)
+	if len(withList) != 6 || withList[0] != "list-kinds" {
+		t.Errorf("expected 6 flags starting with list-kinds, got %v", withList)
+	}
+
+	withoutList := FieldsHarnessFlagNames(false)
+	if len(withoutList) != 5 || withoutList[0] != "filterable" {
+		t.Errorf("expected 5 flags starting with filterable, got %v", withoutList)
+	}
+}
+

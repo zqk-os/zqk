@@ -217,3 +217,14 @@ func stringContains(s, substr string) bool {
 	}
 	return false
 }
+
+func TestFindCLIProfilesDir(t *testing.T) {
+	// findCLIProfilesDir searches cwd and ancestor dirs for paths.CLIProfilesDir (.zqk/cli/profiles)
+	got := findCLIProfilesDir()
+	if got == "" {
+		t.Log("findCLIProfilesDir returned empty string in current environment, which is acceptable")
+	} else if !filepath.IsAbs(got) {
+		t.Errorf("expected absolute path from findCLIProfilesDir, got %s", got)
+	}
+}
+
