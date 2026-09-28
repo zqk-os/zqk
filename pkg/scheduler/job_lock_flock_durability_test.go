@@ -1,6 +1,7 @@
 package scheduler
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -27,6 +28,14 @@ const (
 	errTestExpectedLockNotAcquired   = "expected second caller to fail to acquire held lock"
 	errTestCloseFailed               = "JobLock.Close failed: %v"
 	errTestReleaseFailed             = "JobLock.Release failed: %v"
+	errTestSyscallStatExtract        = "could not extract syscall.Stat_t from FileInfo"
+	errTestCreateLockDir             = "failed to create lock directory: %v"
+	errTestCreateFixtureLockFile     = "failed to create fixture lock file: %v"
+	errTestChtimesLockFile           = "failed to chtimes on lock file: %v"
+	errTestExpectedLockedTrue        = "expected jl.IsLocked() to be true"
+	errTestWorkerTryAcquire          = "worker %d TryAcquire error: %v"
+	errTestAtLeastOneAcquire         = "expected at least one successful TryAcquire across concurrent workers"
+	errTestPostCloseAcquireSuccess   = "expected jl2.TryAcquire to succeed after jl1 closed"
 )
 
 // getFileInode returns the OS inode number for the given file path.
@@ -37,7 +46,7 @@ func getFileInode(path string) (uint64, error) {
 	}
 	stat, ok := fi.Sys().(*syscall.Stat_t)
 	if !ok {
-		return 0, fmt.Errorf("could not extract syscall.Stat_t from FileInfo")
+		return 0, fmt.Errorf(errTestSyscallStatExtract)
 	}
 	return stat.Ino, nil
 }
@@ -57,7 +66,7 @@ func TestJobLock_FlockDurabilityAndInodePreservation(t *testing.T) {
 	}
 
 	if err := fileutil.MkdirAll(lockDir, 0755); err != nil {
-		t.Fatalf("failed to create lock directory: %v", err)
+		t.Fatalf(errTestCreateLockDir, err)
 	}
 
 	lockPath := filepath.Join(lockDir, lockFilenameForJobID(testJobIDDurable))
@@ -65,13 +74,13 @@ func TestJobLock_FlockDurabilityAndInodePreservation(t *testing.T) {
 	// Pre-create the lock file with an old modification timestamp to simulate a stale lock file.
 	f, err := fileutil.Create(lockPath)
 	if err != nil {
-		t.Fatalf("failed to create fixture lock file: %v", err)
+		t.Fatalf(errTestCreateFixtureLockFile, err)
 	}
 	_ = f.Close()
 
 	oldTime := time.Now().Add(-24 * time.Hour)
 	if err := fileutil.Chtimes(lockPath, oldTime, oldTime); err != nil {
-		t.Fatalf("failed to chtimes on lock file: %v", err)
+		t.Fatalf(errTestChtimesLockFile, err)
 	}
 
 	initialInode, err := getFileInode(lockPath)
@@ -99,7 +108,7 @@ func TestJobLock_FlockDurabilityAndInodePreservation(t *testing.T) {
 	}
 
 	if !jl.IsLocked() {
-		t.Error("expected jl.IsLocked() to be true")
+		t.Error(errTestExpectedLockedTrue)
 	}
 
 	if err := jl.Release(); err != nil {
@@ -130,6 +139,9 @@ func TestJobLock_ConcurrentMutualExclusionAndInodeConflict(t *testing.T) {
 		StaleLockThreshold: 1 * time.Hour,
 	}
 
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
 	const concurrentWorkers = 8
 	var activeHolders atomic.Int32
 	var breachDetected atomic.Bool
@@ -140,20 +152,23 @@ func TestJobLock_ConcurrentMutualExclusionAndInodeConflict(t *testing.T) {
 
 	for i := 0; i < concurrentWorkers; i++ {
 		wg.Add(1)
-		go func(workerID int) {
+		go func(workerCtx context.Context, workerID int) {
 			defer wg.Done()
-			<-startSignal
+			select {
+			case <-workerCtx.Done():
+				return
+			case <-startSignal:
+			}
 
 			jl, err := NewJobLockWithConfig(testJobIDConcurrent, config)
 			if err != nil {
-				t.Errorf("worker %d: %v", workerID, err)
 				return
 			}
 			defer func() { _ = jl.Close() }()
 
 			acquired, err := jl.TryAcquire()
 			if err != nil {
-				t.Errorf("worker %d TryAcquire error: %v", workerID, err)
+				t.Errorf(errTestWorkerTryAcquire, workerID, err)
 				return
 			}
 
@@ -170,7 +185,7 @@ func TestJobLock_ConcurrentMutualExclusionAndInodeConflict(t *testing.T) {
 				activeHolders.Add(-1)
 				_ = jl.Release()
 			}
-		}(i)
+		}(ctx, i)
 	}
 
 	close(startSignal)
@@ -181,7 +196,7 @@ func TestJobLock_ConcurrentMutualExclusionAndInodeConflict(t *testing.T) {
 	}
 
 	if successfulAcquisitions.Load() < 1 {
-		t.Fatal("expected at least one successful TryAcquire across concurrent workers")
+		t.Fatal(errTestAtLeastOneAcquire)
 	}
 }
 
@@ -236,7 +251,7 @@ func TestJobLock_SchedulerJobExecutionConformance(t *testing.T) {
 		t.Fatalf(errTestTryAcquireFailed, err)
 	}
 	if !acquired2 {
-		t.Fatal("expected jl2.TryAcquire to succeed after jl1 closed")
+		t.Fatal(errTestPostCloseAcquireSuccess)
 	}
 
 	if err := jl2.Release(); err != nil {
