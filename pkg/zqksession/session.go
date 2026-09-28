@@ -15,7 +15,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	enumzqksession "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/zqk_session"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	"github.com/zqk-os/zqk/pkg/stampmemo"
 	"github.com/zqk-os/zqk/pkg/storage"
 	idgen "github.com/zqk-os/zqk/pkg/storage/id_generation"
@@ -87,7 +87,7 @@ func createSession(
 	projectRoot, title, accountID string,
 	sessionType enumzqksession.SessionType,
 	sp storage.ObjectStorageProvider,
-	configure func(*bldr_instance_v1.ZqkSessionInstanceBuilder),
+	configure func(instance_builders.InstanceBuilder),
 ) (string, error) {
 	if projectRoot == EmptyValue {
 		return EmptyValue, fmt.Errorf("project root is required")
@@ -121,13 +121,13 @@ func createSession(
 			return EmptyValue, fmt.Errorf("generate session ID: %w", err)
 		}
 
-		builder := bldr_instance_v1.NewZqkSessionInstanceBuilder(objects.DefaultSchemaVersion)
+		builder := instance_builders.NewForKind(objects.KindZqkSession, objects.DefaultSchemaVersion)
 		builder.SetID(sessionID).SetStatus(StatusActive).SetField(objects.FieldKeyNamespaceID, namespaceID)
-		builder.SetAccountId(accountID)
+		builder.SetField(objects.FieldKeyAccountID, accountID)
 		builder.SetField(objects.FieldKeyCreatedBy, accountID).SetField(objects.FieldKeyUpdatedBy, accountID)
-		builder.SetSessionType(sessionType)
+		builder.SetField(objects.FieldKeySessionType, string(sessionType))
 		if title != EmptyValue {
-			builder.SetTitle(title)
+			builder.SetField(objects.FieldKeyTitle, title)
 		}
 		if configure != nil {
 			configure(builder)

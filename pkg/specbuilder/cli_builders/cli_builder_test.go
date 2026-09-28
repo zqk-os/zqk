@@ -33,10 +33,10 @@ func TestCLIBuilder_WrapsZQK(t *testing.T) {
 			"ZQK_SESSION_ID=",
 			"ZQK_CONVERGENCE_SESSION_ID=",
 		)).
-		WithArgs("run", "../../../cmd/zqk/main.go", "object", "list", "policy", "--limit", "1")
+		WithArgs("run", "../../../cmd/zqk", "object", "list", "policy", "--limit", "1")
 
-	if _, err := fileutil.Stat("../../../cmd/zqk/main.go"); fileutil.IsNotExist(err) {
-		t.Skip("Skipping test because cmd/zqk/main.go does not exist (likely in open-core candidate tree)")
+	if _, err := fileutil.Stat("../../../cmd/zqk"); fileutil.IsNotExist(err) {
+		t.Skip("Skipping test because cmd/zqk does not exist (likely in open-core candidate tree)")
 	}
 
 	output, err := builder.Execute(context.Background())

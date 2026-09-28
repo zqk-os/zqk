@@ -14,7 +14,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	lifecycleEnum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/lifecycle"
-	bldr_instance_v1 "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/validation"
@@ -236,13 +236,13 @@ func min(a, b int) int {
 }
 
 func (h *lifecycleMigrationHelper) lifecycleToObject(lifecycle *objects.Lifecycle, objectType string, _ string) (map[string]any, error) {
-	builder := bldr_instance_v1.NewLifecycleInstanceBuilder(objects.DefaultSchemaVersion)
+	builder := instance_builders.NewForKind(objects.KindLifecycle, objects.DefaultSchemaVersion)
 
 	// Set ID using standardized format: LIFECYCLE-{ABBR}-001
 	// This matches the pattern ^[A-Z]+-\d{3,}$ for validation
 	abbreviation := getObjectTypeAbbreviation(objectType)
 	lifecycleID := fmt.Sprintf("LIFECYCLE-%s-001", abbreviation)
-	builder.ID(lifecycleID)
+	builder.SetID(lifecycleID)
 
 	// Set title (required by base_object) - derive from object_type
 	// Convert object_type like "base_object" to "Base Object Lifecycle"
@@ -266,15 +266,15 @@ func (h *lifecycleMigrationHelper) lifecycleToObject(lifecycle *objects.Lifecycl
 			}
 		}
 	}
-	builder.Status(lifecycleEnum.Status(status))
+	builder.SetStatus(status)
 
 	// Set object_type and source_type
-	builder.ObjectType(objectType).
-		SourceType(lifecycleEnum.SourceTypeBuiltIn)
+	builder.SetField(objects.FieldKeyObjectType, objectType).
+		SetField(objects.FieldKeySourceType, string(lifecycleEnum.SourceTypeBuiltIn))
 
 	// Set extends if present
 	if lifecycle.Extends != emptyValue {
-		builder.Extends(lifecycle.Extends)
+		builder.SetField(objects.FieldKeyExtends, lifecycle.Extends)
 	}
 
 	// Convert status_mapping
@@ -283,7 +283,7 @@ func (h *lifecycleMigrationHelper) lifecycleToObject(lifecycle *objects.Lifecycl
 		for k, v := range lifecycle.StatusMapping {
 			statusMapping[k] = v
 		}
-		builder.StatusMapping(statusMapping)
+		builder.SetField(objects.FieldKeyStatusMapping, statusMapping)
 	}
 
 	// Convert statuses ([]objects.Status -> []any)
@@ -352,7 +352,7 @@ func (h *lifecycleMigrationHelper) lifecycleToObject(lifecycle *objects.Lifecycl
 		if len(lifecycle.PercentComplete.MilestoneBased) > 0 {
 			percentComplete[lifecycleMigKeyMilestoneBased] = lifecycle.PercentComplete.MilestoneBased
 		}
-		builder.PercentComplete(percentComplete)
+		builder.SetField(objects.FieldKeyPercentComplete, percentComplete)
 	}
 
 	// Build the object

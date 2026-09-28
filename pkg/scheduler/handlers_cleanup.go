@@ -17,7 +17,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	baseMetricEnum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/metrics"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/when"
 )
@@ -81,17 +81,16 @@ func buildBatchMetricErrorRecord(metricID, batchID, nowStr string, createErr err
 	if len(title) > maxErrorTitleLength {
 		title = title[:maxErrorTitleLength-3] + "..."
 	}
-	builder := bldr_instance_v1.NewBaseMetricInstanceBuilder(objects.DefaultSchemaVersion)
-	builder.ID(metricID)
-	builder.Status(baseMetricEnum.StatusError)
+	builder := instance_builders.NewForKind(objects.KindBaseMetric, objects.DefaultSchemaVersion)
+	builder.SetID(metricID)
+	builder.SetStatus(string(baseMetricEnum.StatusError))
 	builder.SetField(objects.FieldKeyTitle, title)
-	builder.
-		SetMetricType("system").
-		SetSource("auto_fix_batch").
-		SetTags([]string{"system", "auto_fix", "batch_processing", "error"}).
-		SetCollectionCount(0).
-		SetFirstSeen(nowStr).
-		SetLastSeen(nowStr)
+	builder.SetField(objects.FieldKeyMetricType, "system").
+		SetField(objects.FieldKeySource, "auto_fix_batch").
+		SetField(objects.FieldKeyTags, []string{"system", "auto_fix", "batch_processing", "error"}).
+		SetField(objects.FieldKeyCollectionCount, 0).
+		SetField(objects.FieldKeyFirstSeen, nowStr).
+		SetField(objects.FieldKeyLastSeen, nowStr)
 	builder.SetField(objects.FieldKeyBatchID, batchID)
 	obj, err := builder.Build()
 	if err != nil {
@@ -269,19 +268,16 @@ func (h *AutofixBatchCleanupHandler) executeAutofixBatchCleanupCore(ctx context.
 			}
 			metricID := fmt.Sprintf("BAS-%d", now.UnixNano())
 
-			builder := bldr_instance_v1.NewBaseMetricInstanceBuilder(objects.DefaultSchemaVersion)
-			// Use a lifecycle-valid generic status for base_metric; detailed outcome
-			// is captured in fields like processed/fixed/failed.
-			builder.ID(metricID)
-			builder.Status(baseMetricEnum.StatusImplemented)
+			builder := instance_builders.NewForKind(objects.KindBaseMetric, objects.DefaultSchemaVersion)
+			builder.SetID(metricID)
+			builder.SetStatus(string(baseMetricEnum.StatusImplemented))
 			builder.SetField(objects.FieldKeyTitle, fmt.Sprintf("Auto-fix batch %s: %.0f processed, %.0f fixed", batchID, processed, fixed))
-			builder.
-				SetMetricType("system").
-				SetSource("auto_fix_batch").
-				SetTags(tags).
-				SetCollectionCount(1).
-				SetFirstSeen(nowStr).
-				SetLastSeen(nowStr)
+			builder.SetField(objects.FieldKeyMetricType, "system").
+				SetField(objects.FieldKeySource, "auto_fix_batch").
+				SetField(objects.FieldKeyTags, tags).
+				SetField(objects.FieldKeyCollectionCount, 1).
+				SetField(objects.FieldKeyFirstSeen, nowStr).
+				SetField(objects.FieldKeyLastSeen, nowStr)
 			builder.SetField(objects.FieldKeyBatchID, batchID)
 			builder.SetField(objects.FieldKeyProcessed, int(processed))
 			builder.SetField(objects.FieldKeyFixed, int(fixed))

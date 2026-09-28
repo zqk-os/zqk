@@ -18,6 +18,7 @@ import (
 func TestStrategicKindStatusVocabulary(t *testing.T) {
 	repoRoot := findRepoRoot(t)
 	lifecyclesDir := filepath.Join(repoRoot, paths.ProcessInternalLifecyclesDir)
+	packLifecyclesDir := filepath.Join(repoRoot, "packs", "work", "lifecycles")
 
 	strategicKinds := []string{
 		"goal_lifecycle.yaml",
@@ -29,21 +30,26 @@ func TestStrategicKindStatusVocabulary(t *testing.T) {
 	}
 
 	findLifecyclePath := func(fileName string) string {
-		var found string
-		_ = filepath.WalkDir(lifecyclesDir, func(p string, d fileutil.DirEntry, err error) error {
-			if err == nil && !d.IsDir() && d.Name() == fileName {
-				found = p
-				return filepath.SkipAll
+		for _, dir := range []string{lifecyclesDir, packLifecyclesDir} {
+			var found string
+			_ = filepath.WalkDir(dir, func(p string, d fileutil.DirEntry, err error) error {
+				if err == nil && !d.IsDir() && d.Name() == fileName {
+					found = p
+					return filepath.SkipAll
+				}
+				return nil
+			})
+			if found != "" {
+				return found
 			}
-			return nil
-		})
-		return found
+		}
+		return ""
 	}
 
 	for _, fileName := range strategicKinds {
 		lifecyclePath := findLifecyclePath(fileName)
 		if lifecyclePath == "" {
-			t.Errorf("lifecycle %s not found under %s", fileName, lifecyclesDir)
+			t.Errorf("lifecycle %s not found under %s or %s", fileName, lifecyclesDir, packLifecyclesDir)
 			continue
 		}
 		data, err := fileutil.ReadFile(lifecyclePath)

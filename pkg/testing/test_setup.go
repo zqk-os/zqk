@@ -18,8 +18,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
-	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1" // Register instance builders for tests
-	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2"          // Register spec builders for tests
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2" // Register spec builders for tests
 	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
 	"github.com/zqk-os/zqk/pkg/storagetesting"
 	"github.com/zqk-os/zqk/pkg/testenvroot"

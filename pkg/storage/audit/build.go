@@ -6,7 +6,6 @@ import (
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/audit_event"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
 	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	"github.com/zqk-os/zqk/pkg/validation"
 )
@@ -23,17 +22,17 @@ func ResolveActor(secCtx *pkgctx.SecurityContext, createdBy string) string {
 }
 
 // PopulateEvent fills a fresh audit_event builder. id must already be allocated.
-// Caller owns retry (builder.ID + Build again).
+// Caller owns retry (builder.SetID + Build again).
 func PopulateEvent(
-	builder *bldr_instance_v1.AuditEventInstanceBuilder,
+	builder instance_builders.InstanceBuilder,
 	id, projectRoot, actor, createdAt string,
 	options *EventOptions,
 ) {
 	if builder == nil || options == nil {
 		return
 	}
-	builder.ID(id)
-	builder.Status(audit_event.StatusCompleted)
+	builder.SetID(id)
+	builder.SetStatus(string(audit_event.StatusCompleted))
 	builder.SetField(FieldOriginSystem, validation.DefaultOriginSystem)
 	builder.SetField(FieldOriginProject, validation.DefaultOriginProject)
 	builder.SetField(FieldNamespaceID, validation.DefaultNamespaceKernel)
@@ -90,14 +89,13 @@ func PopulateEvent(
 	}
 }
 
-// NewEventBuilder returns a fresh audit_event instance builder for the latest spec.
-func NewEventBuilder() (*bldr_instance_v1.AuditEventInstanceBuilder, error) {
-	registry := instance_builders.GetGlobalRegistry()
-	schemaVersion, err := registry.GetLatestVersion(Kind)
+// NewEventBuilder returns a fresh audit_event builder for the spec's schema version.
+func NewEventBuilder() (instance_builders.InstanceBuilder, error) {
+	schemaVersion, err := instance_builders.SchemaVersionForKind(Kind)
 	if err != nil {
 		return nil, err
 	}
-	return bldr_instance_v1.NewAuditEventInstanceBuilder(schemaVersion), nil
+	return instance_builders.NewForKind(Kind, schemaVersion), nil
 }
 
 // BuildEventMap constructs an audit_event instance map. id must already be allocated.

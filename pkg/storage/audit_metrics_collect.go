@@ -12,7 +12,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/metricsrecording"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
 	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	"github.com/zqk-os/zqk/pkg/storage/audit"
 	"github.com/zqk-os/zqk/pkg/zqktime"
@@ -42,14 +41,12 @@ func (c *AuditMetricsCollector) CollectMetrics(
 	// Get instance builder schema version from registry
 	// NOTE: We create a fresh builder instance for each use to avoid concurrent map writes.
 	// Builders from the registry are singleton instances with stateful fields maps that are not thread-safe.
-	registry := instance_builders.GetGlobalRegistry()
-	schemaVersion, err := registry.GetLatestVersion(objects.KindCommandMetric)
+	schemaVersion, err := instance_builders.SchemaVersionForKind(objects.KindCommandMetric)
 	if err != nil {
 		return "", errfmt.Newf(ErrMsgGetLatestSchemaFmt).Wrap(err)
 	}
 
-	// Create a fresh builder instance for this use (not from registry singleton)
-	builder := bldr_instance_v1.NewCommandMetricInstanceBuilder(schemaVersion)
+	builder := instance_builders.NewForKind(objects.KindCommandMetric, schemaVersion)
 
 	// Generate ID for the metric (required by builder.Build())
 	// Uses thread-safe batch generator (via generateID) for consistency with other ID generation
@@ -68,7 +65,7 @@ func (c *AuditMetricsCollector) CollectMetrics(
 	// Build command metric using instance builder
 	// NOTE: This is conceptually wrong - command_metric is for command execution metrics,
 	// not audit event metrics. The audit-specific fields are stored as metadata.
-	builder.ID(metricID).
+	builder.SetID(metricID).
 		SetField(MetricFieldTitle, title).
 		SetField(MetricFieldMetricType, StorageMetricTypeSystem).
 		SetField(MetricFieldSource, AuditSystemMetricSource).
@@ -83,20 +80,20 @@ func (c *AuditMetricsCollector) CollectMetrics(
 	// Set command metric fields (using audit metrics as approximations)
 	// These fields don't perfectly match audit metrics, but we're using command_metric
 	// as a temporary solution. Ideally, this should use a dedicated audit_metric type.
-	builder.Command(ValueAuditEventCollection).
-		NormalizedCmd(ValueAuditEventCollection).
-		InvocationCount(int(snapshot.EventsCreated)).
-		SuccessCount(int(snapshot.SuccessCount())).
-		FailureCount(int(snapshot.EventsFailed)).
-		AvgDurationSeconds(dur.Avg)
+	builder.SetField(objects.FieldKeyCommand, ValueAuditEventCollection).
+		SetField(objects.FieldKeyNormalizedCmd, ValueAuditEventCollection).
+		SetField(objects.FieldKeyInvocationCount, int(snapshot.EventsCreated)).
+		SetField(objects.FieldKeySuccessCount, int(snapshot.SuccessCount())).
+		SetField(objects.FieldKeyFailureCount, int(snapshot.EventsFailed)).
+		SetField(objects.FieldKeyAvgDurationSeconds, dur.Avg)
 
-	builder.SlowestDurationSeconds(dur.Slowest)
-	builder.FastestDurationSeconds(dur.Fastest)
-	builder.BaselineDurationSeconds(dur.Baseline)
+	builder.SetField(objects.FieldKeySlowestDurationSeconds, dur.Slowest)
+	builder.SetField(objects.FieldKeyFastestDurationSeconds, dur.Fastest)
+	builder.SetField(objects.FieldKeyBaselineDurationSeconds, dur.Baseline)
 
-	builder.ErrorRate(snapshot.FailureRate()).
-		TimeoutRate(0.0).
-		TimeoutCount(0)
+	builder.SetField(objects.FieldKeyErrorRate, snapshot.FailureRate()).
+		SetField(objects.FieldKeyTimeoutRate, 0.0).
+		SetField(objects.FieldKeyTimeoutCount, 0)
 
 	// Build the instance
 	metricObj, err := builder.Build()

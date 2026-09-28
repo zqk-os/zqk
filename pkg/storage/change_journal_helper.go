@@ -17,8 +17,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
-	changeJournalEnum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/change_journal_entry"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
 	bldraudit "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2"
 	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	"github.com/zqk-os/zqk/pkg/validation"
@@ -194,10 +192,7 @@ func CreateChangeJournalEntryWithBuilder(
 	// NOTE: We create a fresh builder instance for each use to avoid concurrent map writes.
 	// Builders from the registry are singleton instances with stateful fields maps that are not thread-safe.
 	// CreateChangeJournalEntryWithBuilder can be called concurrently from multiple object update operations.
-	registry := instance_builders.GetGlobalRegistry()
-
-	// Get latest schema version for change_journal_entry
-	schemaVersion, err := registry.GetLatestVersion(changeJournalKind)
+	schemaVersion, err := instance_builders.SchemaVersionForKind(changeJournalKind)
 	if err != nil {
 		changeJournalEntriesFailedTotal.Add(1)
 		logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
@@ -209,20 +204,18 @@ func CreateChangeJournalEntryWithBuilder(
 	}
 	schemaVersion = objects.ValidSchemaVersion(schemaVersion)
 
-	// Create a fresh builder instance for this use (not from registry singleton)
-	builder := bldr_instance_v1.NewChangeJournalEntryInstanceBuilder(schemaVersion)
+	builder := instance_builders.NewForKind(changeJournalKind, schemaVersion)
 
-	// Build change journal entry using instance builder
-	builder.ID(journalID).
-		Status(changeJournalStatusCompleted).
+	builder.SetID(journalID).
+		SetStatus(changeJournalStatusCompleted).
 		SetField(bldraudit.FieldOriginSystem, validation.DefaultOriginSystem).
 		SetField(bldraudit.FieldOriginProject, validation.DefaultOriginProject)
-	builder.ChangeType(changeJournalEnum.ChangeType(options.ChangeType)).
-		ObjectRef(options.ObjectRef).
-		DiffSummary(options.DiffSummary).
+	builder.SetField(objects.FieldKeyChangeType, options.ChangeType).
+		SetField(objects.FieldKeyObjectRef, options.ObjectRef).
+		SetField(objects.FieldKeyDiffSummary, options.DiffSummary).
 		SetField(changeJournalFieldTitle, title)
 	if len(options.ChangedPaths) > 0 {
-		builder.ChangedPaths(options.ChangedPaths)
+		builder.SetField(objects.FieldKeyChangedPaths, options.ChangedPaths)
 	}
 
 	// Set timestamps
@@ -236,7 +229,7 @@ func CreateChangeJournalEntryWithBuilder(
 		// Create a copy to avoid modifying the original
 		previousStateCopy := make(map[string]any, len(options.PreviousState))
 		maps.Copy(previousStateCopy, options.PreviousState)
-		builder.PreviousState(previousStateCopy)
+		builder.SetField(objects.FieldKeyPreviousState, previousStateCopy)
 	}
 
 	// Build the instance

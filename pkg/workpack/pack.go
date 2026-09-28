@@ -6,6 +6,8 @@ package workpack
 import (
 	"github.com/spf13/cobra"
 
+	packbldr "github.com/zqk-os/zqk/packs/work/bldr_instance_v1"
+	_ "github.com/zqk-os/zqk/packs/work/bldr_lifecycle_v1"
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
@@ -32,13 +34,44 @@ func Kinds() []string {
 		objects.KindRequirement,
 		objects.KindCriteria,
 		objects.KindTestCase,
+		objects.KindMission,
+		objects.KindVision,
+		objects.KindStrategicContext,
+		objects.KindStrategicPlan,
+		objects.KindRoadmap,
+		objects.KindMilestone,
+		objects.KindEpic,
+		objects.KindBacklogItem,
+		objects.KindWorkstream,
+		objects.KindPriorityPlan,
+		objects.KindRiskBlocker,
 	}
 }
 
 var (
 	enabled    bool
 	linkedRoot bool
+	builders   = []any{
+		packbldr.NewGoalInstanceBuilder,
+		packbldr.NewRequirementInstanceBuilder,
+		packbldr.NewCriteriaInstanceBuilder,
+		packbldr.NewTestCaseInstanceBuilder,
+		packbldr.NewMissionInstanceBuilder,
+		packbldr.NewVisionInstanceBuilder,
+		packbldr.NewStrategicContextInstanceBuilder,
+		packbldr.NewStrategicPlanInstanceBuilder,
+		packbldr.NewRoadmapInstanceBuilder,
+		packbldr.NewMilestoneInstanceBuilder,
+		packbldr.NewEpicInstanceBuilder,
+		packbldr.NewBacklogItemInstanceBuilder,
+		packbldr.NewWorkstreamInstanceBuilder,
+		packbldr.NewPriorityPlanInstanceBuilder,
+		packbldr.NewRiskBlockerInstanceBuilder,
+	}
 )
+
+// BuilderCount is the number of generated constructors this pack links.
+func BuilderCount() int { return len(builders) }
 
 // Enable records that the composition root linked this pack.
 func Enable() { enabled = true }
@@ -47,7 +80,7 @@ func Enable() { enabled = true }
 func Enabled() bool { return enabled }
 
 // Register records that the composition root handed this pack the command tree.
-// Commands that speak this pack's kinds still register from cmd/zqk.
+// The composition root attaches this pack's kind commands through the object registrar.
 func Register(root *cobra.Command) {
 	Enable()
 	if root == nil {

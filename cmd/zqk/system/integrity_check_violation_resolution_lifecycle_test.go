@@ -77,7 +77,7 @@ func TestViolationResolution_Lifecycle_InvalidStatus(t *testing.T) {
 	// Copy backlog_item lifecycle so the loader can validate status (loader looks for testRoot/backlog_item_lifecycle.yaml)
 	cwd, _ := fileutil.Getwd()
 	for _, base := range []string{cwd, filepath.Join(cwd, "..", "..", "..")} {
-		srcLifecycle := filepath.Join(base, paths.ProcessInternalLifecyclesDir, "backlog_item_lifecycle.yaml")
+		srcLifecycle := filepath.Join(base, "packs/work/lifecycles/backlog_item_lifecycle.yaml")
 		if data, err := fileutil.ReadFile(srcLifecycle); err == nil {
 			_ = fileutil.WriteFile(filepath.Join(testRoot, "backlog_item_lifecycle.yaml"), data, paths.FilePerm644) //nolint:gosec // test file
 			break

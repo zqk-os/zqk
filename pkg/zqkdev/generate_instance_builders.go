@@ -40,6 +40,7 @@ func NewGenerateInstanceBuildersCmd() *cobra.Command {
 		AddExample("Generate instance builders for all specs in the default directory", "%s system generate-instance-builders").
 		AddExample("Generate instance builders from a specific directory", "%s system generate-instance-builders --specs-dir "+paths.ProcessInternalObjectSpecsDir).
 		AddExample("Generate instance builders to a specific output directory", "%s system generate-instance-builders --output-dir pkg/specbuilder/instance_builders").
+		AddExample("A pack passes its own instance_builders directory; files are written beside it", "%s system generate-instance-builders --output-dir packs/work/instance_builders").
 		AddExample("Overwrite existing instance builder files", "%s system generate-instance-builders --overwrite").
 		ExcludeCommonFlags()
 
@@ -61,7 +62,7 @@ func NewGenerateInstanceBuildersCmd() *cobra.Command {
 
 		// Default output directory
 		if outputDir == EmptyValue {
-			outputDir = "pkg/specbuilder/instance_builders"
+			outputDir = instancebuilders.DefaultInstanceBuilderToolDir
 		}
 
 		// Ensure output directory exists
@@ -102,8 +103,8 @@ func NewGenerateInstanceBuildersCmd() *cobra.Command {
 
 			baseName := strings.TrimSuffix(entry.Name(), ".yaml")
 			baseName = strings.TrimSuffix(baseName, ".yml")
-			parentDir := filepath.Dir(outputDir)
-			outputFile := filepath.Join(parentDir, "bldr_instance_v1", fmt.Sprintf("%s_instance_builder.go", baseName))
+			destDir, _ := instancebuilders.InstanceBuilderOutput(outputDir)
+			outputFile := filepath.Join(destDir, fmt.Sprintf("%s_instance_builder.go", baseName))
 
 			if !overwrite {
 				if _, err := fileutil.Stat(outputFile); err == nil {

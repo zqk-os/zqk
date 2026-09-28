@@ -857,33 +857,12 @@ func createTestObjectForCRUD(kind, id string, kindFields *objects.KindFields, in
 		}
 	}
 
-	// Get instance builder from registry
-	registry := instancebuilders.GetGlobalRegistry()
-	builder, err := registry.GetBuilder(kind, schemaVersion)
-	if err != nil {
-		// Builder not available - return minimal object with required fields
-		obj := make(map[string]any)
-		obj[objects.FieldKeyKind] = kind
-		obj[objects.FieldKeyID] = id
-		obj[objects.FieldKeyTitle] = fixtureObjectTitle(kind, index+1)
-		obj[objects.FieldKeySchemaVersion] = schemaVersion
-		if hasField(kindFields, "status") {
-			obj[objects.FieldKeyStatus] = getInitialStatusForKind(kind)
-		}
-		populateRequiredFieldsFromConfig(obj, kind, kindFields, index)
-		return obj
-	}
-
-	// Use instance builder
+	builder := instancebuilders.NewForKind(kind, schemaVersion)
 	builder.SetID(id)
 	builder.SetField(objects.FieldKeyTitle, fixtureObjectTitle(kind, index+1))
-
-	// Set status if field exists
 	if hasField(kindFields, "status") {
 		builder.SetStatus(getInitialStatusForKind(kind))
 	}
-
-	// Build instance
 	instance, err := builder.Build()
 	if err != nil {
 		// Build failed - return minimal object with required fields

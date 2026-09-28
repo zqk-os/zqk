@@ -6,31 +6,22 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestGeneratedGoalLifecycleCompiles(t *testing.T) {
 	root := lifecycleModuleRoot(t)
-	packRoot := filepath.Join(root, "packs", "workgen")
+	packRoot := filepath.Join(root, "packs", "workgen_lifecycle")
 	t.Cleanup(func() { _ = fileutil.RemoveAll(packRoot) })
-
-	yamlPath := filepath.Join(root, paths.ProcessInternalLifecyclesDir, "pm", "goal_lifecycle.yaml")
-	if !fileutil.Exists(yamlPath) {
-		yamlPath = filepath.Join(root, "packs", "work", "lifecycles", "goal_lifecycle.yaml")
-	}
-	if !fileutil.Exists(yamlPath) {
-		t.Skipf("goal lifecycle YAML not found at expected paths")
-	}
-
+	yamlPath := filepath.Join(root, "packs", "work", "lifecycles", "goal_lifecycle.yaml")
 	toolDir := filepath.Join(packRoot, "lifecycle_builders")
-	if err := fileutil.MkdirAll(toolDir, paths.DirPerm755); err != nil {
+	if err := fileutil.MkdirAll(toolDir, 0o755); err != nil {
 		t.Fatal(err)
 	}
 	if err := GenerateBuilderFromYAML(yamlPath, toolDir); err != nil {
 		t.Fatal(err)
 	}
-	cmd := exec.CommandContext(t.Context(), "go", "build", "./packs/workgen/bldr_lifecycle_v1")
+	cmd := exec.CommandContext(t.Context(), "go", "build", "./packs/workgen_lifecycle/bldr_lifecycle_v1")
 	cmd.Dir = root
 	out, err := cmd.CombinedOutput()
 	if err != nil {

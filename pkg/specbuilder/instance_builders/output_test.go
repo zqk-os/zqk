@@ -146,7 +146,7 @@ func TestGenerateInstanceBuilderFromSpec_writesSiblingWithoutRegistry(t *testing
 
 func TestGeneratedSiblingCompiles(t *testing.T) {
 	root := moduleRoot(t)
-	packRoot := filepath.Join(root, "packs", "work")
+	packRoot := filepath.Join(root, "packs", "workgen_sibling")
 	t.Cleanup(func() { _ = os.RemoveAll(packRoot) })
 	specPath := filepath.Join(packRoot, "widget.yaml")
 	if err := os.MkdirAll(packRoot, 0o755); err != nil {
@@ -160,7 +160,7 @@ func TestGeneratedSiblingCompiles(t *testing.T) {
 	if err := GenerateInstanceBuilderFromSpec(specPath, toolDir, "1.0.0"); err != nil {
 		t.Fatal(err)
 	}
-	cmd := exec.CommandContext(t.Context(), "go", "build", "./packs/work/"+generatedInstancePackage)
+	cmd := exec.CommandContext(t.Context(), "go", "build", "./packs/workgen_sibling/"+generatedInstancePackage)
 	cmd.Dir = root
 	out, err := cmd.CombinedOutput()
 	if err != nil {
@@ -170,9 +170,9 @@ func TestGeneratedSiblingCompiles(t *testing.T) {
 
 func TestGeneratedGoalPackCompiles(t *testing.T) {
 	root := moduleRoot(t)
-	packRoot := filepath.Join(root, "packs", "work")
+	packRoot := filepath.Join(root, "packs", "workgen_goal")
 	t.Cleanup(func() { _ = os.RemoveAll(packRoot) })
-	specPath := filepath.Join(root, ".zqk", "specs", "objects", "pm", "goal.yaml")
+	specPath := filepath.Join(root, "packs", "work", "specs", "goal.yaml")
 	toolDir := filepath.Join(packRoot, "instance_builders")
 	if err := GenerateInstanceBuilderFromSpec(specPath, toolDir, "2.0.0"); err != nil {
 		t.Fatal(err)
@@ -185,13 +185,13 @@ func TestGeneratedGoalPackCompiles(t *testing.T) {
 	if !strings.Contains(src, "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object") {
 		t.Fatal("goal enums dropped the kernel base_object alias")
 	}
-	if !strings.Contains(src, "github.com/zqk-os/zqk/packs/work/bldr_enum_v1/shared_goals") {
+	if !strings.Contains(src, "github.com/zqk-os/zqk/packs/workgen_goal/bldr_enum_v1/shared_goals") {
 		t.Fatal("goal enums did not import the shared status package written beside the pack")
 	}
-	if strings.Contains(src, "github.com/zqk-os/zqk/packs/work/bldr_enum_v1/base_object") {
+	if strings.Contains(src, "github.com/zqk-os/zqk/packs/workgen_goal/bldr_enum_v1/base_object") {
 		t.Fatal("goal enums imported a pack copy of base_object that was not generated")
 	}
-	cmd := exec.CommandContext(t.Context(), "go", "build", "./packs/work/"+generatedInstancePackage)
+	cmd := exec.CommandContext(t.Context(), "go", "build", "./packs/workgen_goal/"+generatedInstancePackage)
 	cmd.Dir = root
 	out, err := cmd.CombinedOutput()
 	if err != nil {
@@ -201,21 +201,21 @@ func TestGeneratedGoalPackCompiles(t *testing.T) {
 
 func TestGeneratedWorkPackKindsCompile(t *testing.T) {
 	root := moduleRoot(t)
-	packRoot := filepath.Join(root, "packs", "work")
+	packRoot := filepath.Join(root, "packs", "workgen_kinds")
 	t.Cleanup(func() { _ = os.RemoveAll(packRoot) })
 	toolDir := filepath.Join(packRoot, "instance_builders")
 	specs := []string{
-		filepath.Join(root, ".zqk", "specs", "objects", "pm", "goal.yaml"),
-		filepath.Join(root, ".zqk", "specs", "objects", "pm", "requirement.yaml"),
-		filepath.Join(root, ".zqk", "specs", "objects", "qa", "criteria.yaml"),
-		filepath.Join(root, ".zqk", "specs", "objects", "qa", "test_case.yaml"),
+		filepath.Join(root, "packs", "work", "specs", "goal.yaml"),
+		filepath.Join(root, "packs", "work", "specs", "requirement.yaml"),
+		filepath.Join(root, "packs", "work", "specs", "criteria.yaml"),
+		filepath.Join(root, "packs", "work", "specs", "test_case.yaml"),
 	}
 	for _, specPath := range specs {
 		if err := GenerateInstanceBuilderFromSpec(specPath, toolDir, "2.0.0"); err != nil {
 			t.Fatalf("%s: %v", specPath, err)
 		}
 	}
-	cmd := exec.CommandContext(t.Context(), "go", "build", "./packs/work/"+generatedInstancePackage)
+	cmd := exec.CommandContext(t.Context(), "go", "build", "./packs/workgen_kinds/"+generatedInstancePackage)
 	cmd.Dir = root
 	out, err := cmd.CombinedOutput()
 	if err != nil {
@@ -223,6 +223,13 @@ func TestGeneratedWorkPackKindsCompile(t *testing.T) {
 	}
 }
 
+func TestPackSpecFindsKernelParent(t *testing.T) {
+	root := moduleRoot(t)
+	got := findSpecPath(filepath.Join(root, "packs", "work", "specs"), "work_interval")
+	if !strings.HasSuffix(got, filepath.Join("objects", "pm", "work_interval.yaml")) {
+		t.Fatalf("pack spec parent resolved to %s", got)
+	}
+}
 func moduleRoot(t *testing.T) string {
 	t.Helper()
 	dir, err := os.Getwd()

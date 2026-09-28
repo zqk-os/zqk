@@ -19,7 +19,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/metrics"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -179,12 +179,12 @@ func RenderCommercial(ctx context.Context, planPath, outDir string) error {
 
 		// Mathematical tracking of seed images
 		if imageURL != "" {
-			seedAssetBuilder := bldr_instance_v1.NewDigitalAssetInstanceBuilder(objects.DefaultSchemaVersion)
+			seedAssetBuilder := newDigitalAssetBuilder()
 			seedAsset, err := seedAssetBuilder.
-				ID(fmt.Sprintf("digital_asset-seed-%s-%s", planID, sceneID)).
-				Title(fmt.Sprintf("Seed Image for %s", sceneID)).
-				SourceType("external").
-				Lineage(fmt.Sprintf("seed_image_for: %s, scene: %s", planID, sceneID)).
+				SetID(fmt.Sprintf("digital_asset-seed-%s-%s", planID, sceneID)).
+				SetField(objects.FieldKeyTitle, fmt.Sprintf("Seed Image for %s", sceneID)).
+				SetField(objects.FieldKeySourceType, "external").
+				SetField(objects.FieldKeyLineage, fmt.Sprintf("seed_image_for: %s, scene: %s", planID, sceneID)).
 				Build()
 
 			if err == nil {
@@ -271,12 +271,12 @@ func RenderCommercial(ctx context.Context, planPath, outDir string) error {
 		videoFiles = append(videoFiles, finalSceneDest)
 		logging.FluentEvent(logger).Info("composer_video_downloaded").Scene(i + 1).Dest(finalSceneDest).Log()
 
-		assetBuilder := bldr_instance_v1.NewDigitalAssetInstanceBuilder(objects.DefaultSchemaVersion)
+		assetBuilder := newDigitalAssetBuilder()
 		asset, err := assetBuilder.
-			ID(fmt.Sprintf("digital_asset-video-%s-%s", planID, sceneID)).
-			Title(fmt.Sprintf("Generated Video for %s", sceneID)).
-			SourceType("ai_generated").
-			Lineage(fmt.Sprintf("generated_from: %s, scene: %s", planID, sceneID)).
+			SetID(fmt.Sprintf("digital_asset-video-%s-%s", planID, sceneID)).
+			SetField(objects.FieldKeyTitle, fmt.Sprintf("Generated Video for %s", sceneID)).
+			SetField(objects.FieldKeySourceType, "ai_generated").
+			SetField(objects.FieldKeyLineage, fmt.Sprintf("generated_from: %s, scene: %s", planID, sceneID)).
 			Build()
 
 		if err == nil {
@@ -324,12 +324,12 @@ func RenderCommercial(ctx context.Context, planPath, outDir string) error {
 		}
 	}
 
-	finalAssetBuilder := bldr_instance_v1.NewDigitalAssetInstanceBuilder(objects.DefaultSchemaVersion)
+	finalAssetBuilder := newDigitalAssetBuilder()
 	finalAsset, err := finalAssetBuilder.
-		ID(fmt.Sprintf("digital_asset-commercial-%s", planID)).
-		Title("Final Rendered Commercial").
-		SourceType("ai_generated").
-		Lineage(fmt.Sprintf("stitched_from: %s", planID)).
+		SetID(fmt.Sprintf("digital_asset-commercial-%s", planID)).
+		SetField(objects.FieldKeyTitle, "Final Rendered Commercial").
+		SetField(objects.FieldKeySourceType, "ai_generated").
+		SetField(objects.FieldKeyLineage, fmt.Sprintf("stitched_from: %s", planID)).
 		Build()
 
 	if err == nil {
@@ -349,4 +349,10 @@ func RenderCommercial(ctx context.Context, planPath, outDir string) error {
 	})
 
 	return nil
+}
+
+const digitalAssetKind = "digital_asset"
+
+func newDigitalAssetBuilder() instance_builders.InstanceBuilder {
+	return instance_builders.NewForKind(digitalAssetKind, objects.DefaultSchemaVersion)
 }

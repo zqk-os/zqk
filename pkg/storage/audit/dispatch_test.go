@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 )
 
 type fakeBuffer struct {
@@ -36,9 +36,12 @@ func (f *fakeIDs) GenerateNextID() (string, error) {
 	return id, nil
 }
 
-func testBuilder(t *testing.T, id string) *bldr_instance_v1.AuditEventInstanceBuilder {
+func testBuilder(t *testing.T, id string) instance_builders.InstanceBuilder {
 	t.Helper()
-	b := bldr_instance_v1.NewAuditEventInstanceBuilder("2.0.0")
+	b, err := NewEventBuilder()
+	if err != nil {
+		t.Fatalf("NewEventBuilder: %v", err)
+	}
 	PopulateEvent(b, id, "/tmp/proj", "system", "2026-01-01T00:00:00Z", &EventOptions{
 		EventType: EventTypeCacheInvalidation,
 		Operation: "test",

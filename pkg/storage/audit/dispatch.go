@@ -7,7 +7,7 @@ import (
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
+	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 )
 
 // DispatchDeps is the storage-owned wiring Dispatch needs. Buffer, IDs, and
@@ -36,7 +36,7 @@ type DispatchResult struct {
 func Dispatch(
 	ctx context.Context,
 	secCtx *pkgctx.SecurityContext,
-	builder *bldr_instance_v1.AuditEventInstanceBuilder,
+	builder instance_builders.InstanceBuilder,
 	auditID string,
 	options *EventOptions,
 	deps DispatchDeps,

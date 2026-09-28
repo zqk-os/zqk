@@ -15,6 +15,17 @@ func TestKindsArePlanningAndVerification(t *testing.T) {
 		objects.KindRequirement,
 		objects.KindCriteria,
 		objects.KindTestCase,
+		objects.KindMission,
+		objects.KindVision,
+		objects.KindStrategicContext,
+		objects.KindStrategicPlan,
+		objects.KindRoadmap,
+		objects.KindMilestone,
+		objects.KindEpic,
+		objects.KindBacklogItem,
+		objects.KindWorkstream,
+		objects.KindPriorityPlan,
+		objects.KindRiskBlocker,
 	}
 	if len(got) != len(want) {
 		t.Fatalf("kinds %v", got)
@@ -43,5 +54,11 @@ func TestRegisterRequiresARoot(t *testing.T) {
 	Register(&cobra.Command{Use: "zqk"})
 	if !LinkedRoot() {
 		t.Fatal("Register did not record the root")
+	}
+}
+
+func TestBuilderCountMatchesKinds(t *testing.T) {
+	if BuilderCount() != len(Kinds()) {
+		t.Fatalf("builders %d kinds %d", BuilderCount(), len(Kinds()))
 	}
 }

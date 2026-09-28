@@ -61,6 +61,11 @@ func ExtraSpecRoots() []string {
 	return out
 }
 
+// AddModuleSpecRoot registers rel under the kernel module root when that directory exists.
+func AddModuleSpecRoot(rel string) {
+	addModuleDir(rel, AddSpecRoot)
+}
+
 // extraLifecycleRoots are lifecycle directories a linked pack registered.
 // The kernel tree wins when the same kind exists in both trees.
 var extraLifecycleRoots []string
@@ -112,11 +117,6 @@ func ExtraLifecycleRoots() []string {
 // AddModuleLifecycleRoot registers rel under the kernel module root when that directory exists.
 func AddModuleLifecycleRoot(rel string) {
 	addModuleDir(rel, AddLifecycleRoot)
-}
-
-// AddModuleSpecRoot registers rel under the kernel module root when that directory exists.
-func AddModuleSpecRoot(rel string) {
-	addModuleDir(rel, AddSpecRoot)
 }
 
 func addModuleDir(rel string, add func(string)) {
