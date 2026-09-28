@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 
 	packbldr "github.com/zqk-os/zqk/packs/work/bldr_instance_v1"
+	_ "github.com/zqk-os/zqk/packs/work/bldr_lifecycle_v1"
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
