@@ -96,6 +96,23 @@ func TestPureGoIndexer_CRUDAndGraphTraversal(t *testing.T) {
 	assert.Equal(t, "VIS-001", results[0].ID)
 	assert.Equal(t, "vision", results[0].Kind)
 
+	// Verify singular edge traversal (e.g. goal.vision_ref)
+	goalWithSingular := &storage.IndexedNode{
+		ID:     "GOAL-002",
+		Kind:   "goal",
+		Status: "originated",
+		Title:  "Singular Vision Ref Goal",
+		References: map[string][]string{
+			"vision_ref": {"VIS-001"},
+		},
+	}
+	require.NoError(t, indexer.IndexNode(goalWithSingular))
+	resultsSingular, err := indexer.Traverse(ctx, "GOAL-002", []string{"vision_ref"}, 10)
+	require.NoError(t, err)
+	require.Len(t, resultsSingular, 1)
+	assert.Equal(t, "VIS-001", resultsSingular[0].ID)
+	require.NoError(t, indexer.RemoveNode("GOAL-002"))
+
 	// 6. Node Update & Removal
 	updatedBLI := &storage.IndexedNode{
 		ID:     "BLI-001",
