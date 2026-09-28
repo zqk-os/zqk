@@ -21,7 +21,7 @@ type AgentOnboardingPreparationInstanceBuilder struct {
 func NewAgentOnboardingPreparationInstanceBuilder(schemaVersion string) *AgentOnboardingPreparationInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("agent_onboarding_preparation")
+	fieldOrder := instance_builders.FieldOrderFromSpec("agent_onboarding_preparation")
 
 	// Create base builder
 	builder := &AgentOnboardingPreparationInstanceBuilder{
@@ -376,8 +376,4 @@ func (b *AgentOnboardingPreparationInstanceBuilder) Version(value int) *AgentOnb
 // SetVersion is a compatibility alias for Version.
 func (b *AgentOnboardingPreparationInstanceBuilder) SetVersion(value int) *AgentOnboardingPreparationInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewAgentOnboardingPreparationInstanceBuilder(objects.DefaultSchemaVersion))
 }

@@ -21,7 +21,7 @@ type AutoFixRuleInstanceBuilder struct {
 func NewAutoFixRuleInstanceBuilder(schemaVersion string) *AutoFixRuleInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("auto_fix_rule")
+	fieldOrder := instance_builders.FieldOrderFromSpec("auto_fix_rule")
 
 	// Create base builder
 	builder := &AutoFixRuleInstanceBuilder{
@@ -409,8 +409,4 @@ func (b *AutoFixRuleInstanceBuilder) Version(value int) *AutoFixRuleInstanceBuil
 // SetVersion is a compatibility alias for Version.
 func (b *AutoFixRuleInstanceBuilder) SetVersion(value int) *AutoFixRuleInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewAutoFixRuleInstanceBuilder(objects.DefaultSchemaVersion))
 }

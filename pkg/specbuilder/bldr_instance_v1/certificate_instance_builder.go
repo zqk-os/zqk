@@ -21,7 +21,7 @@ type CertificateInstanceBuilder struct {
 func NewCertificateInstanceBuilder(schemaVersion string) *CertificateInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("certificate")
+	fieldOrder := instance_builders.FieldOrderFromSpec("certificate")
 
 	// Create base builder
 	builder := &CertificateInstanceBuilder{
@@ -398,8 +398,4 @@ func (b *CertificateInstanceBuilder) Version(value int) *CertificateInstanceBuil
 // SetVersion is a compatibility alias for Version.
 func (b *CertificateInstanceBuilder) SetVersion(value int) *CertificateInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewCertificateInstanceBuilder(objects.DefaultSchemaVersion))
 }

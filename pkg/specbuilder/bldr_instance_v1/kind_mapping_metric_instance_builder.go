@@ -21,7 +21,7 @@ type KindMappingMetricInstanceBuilder struct {
 func NewKindMappingMetricInstanceBuilder(schemaVersion string) *KindMappingMetricInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("kind_mapping_metric")
+	fieldOrder := instance_builders.FieldOrderFromSpec("kind_mapping_metric")
 
 	// Create base builder
 	builder := &KindMappingMetricInstanceBuilder{
@@ -695,8 +695,4 @@ func (b *KindMappingMetricInstanceBuilder) WindowStart(value string) *KindMappin
 // SetWindowStart is a compatibility alias for WindowStart.
 func (b *KindMappingMetricInstanceBuilder) SetWindowStart(value string) *KindMappingMetricInstanceBuilder {
 	return b.WindowStart(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewKindMappingMetricInstanceBuilder(objects.DefaultSchemaVersion))
 }

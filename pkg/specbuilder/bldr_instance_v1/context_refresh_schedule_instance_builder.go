@@ -21,7 +21,7 @@ type ContextRefreshScheduleInstanceBuilder struct {
 func NewContextRefreshScheduleInstanceBuilder(schemaVersion string) *ContextRefreshScheduleInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("context_refresh_schedule")
+	fieldOrder := instance_builders.FieldOrderFromSpec("context_refresh_schedule")
 
 	// Create base builder
 	builder := &ContextRefreshScheduleInstanceBuilder{
@@ -365,8 +365,4 @@ func (b *ContextRefreshScheduleInstanceBuilder) Version(value int) *ContextRefre
 // SetVersion is a compatibility alias for Version.
 func (b *ContextRefreshScheduleInstanceBuilder) SetVersion(value int) *ContextRefreshScheduleInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewContextRefreshScheduleInstanceBuilder(objects.DefaultSchemaVersion))
 }

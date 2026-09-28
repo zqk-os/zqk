@@ -21,7 +21,7 @@ type StakeholderProfileInstanceBuilder struct {
 func NewStakeholderProfileInstanceBuilder(schemaVersion string) *StakeholderProfileInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("stakeholder_profile")
+	fieldOrder := instance_builders.FieldOrderFromSpec("stakeholder_profile")
 
 	// Create base builder
 	builder := &StakeholderProfileInstanceBuilder{
@@ -376,8 +376,4 @@ func (b *StakeholderProfileInstanceBuilder) Version(value int) *StakeholderProfi
 // SetVersion is a compatibility alias for Version.
 func (b *StakeholderProfileInstanceBuilder) SetVersion(value int) *StakeholderProfileInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewStakeholderProfileInstanceBuilder(objects.DefaultSchemaVersion))
 }

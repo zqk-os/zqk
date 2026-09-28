@@ -21,7 +21,7 @@ type GlossaryTermRelationInstanceBuilder struct {
 func NewGlossaryTermRelationInstanceBuilder(schemaVersion string) *GlossaryTermRelationInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("glossary_term_relation")
+	fieldOrder := instance_builders.FieldOrderFromSpec("glossary_term_relation")
 
 	// Create base builder
 	builder := &GlossaryTermRelationInstanceBuilder{
@@ -387,8 +387,4 @@ func (b *GlossaryTermRelationInstanceBuilder) Version(value int) *GlossaryTermRe
 // SetVersion is a compatibility alias for Version.
 func (b *GlossaryTermRelationInstanceBuilder) SetVersion(value int) *GlossaryTermRelationInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewGlossaryTermRelationInstanceBuilder(objects.DefaultSchemaVersion))
 }

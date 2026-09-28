@@ -21,7 +21,7 @@ type MaturationReportInstanceBuilder struct {
 func NewMaturationReportInstanceBuilder(schemaVersion string) *MaturationReportInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("maturation_report")
+	fieldOrder := instance_builders.FieldOrderFromSpec("maturation_report")
 
 	// Create base builder
 	builder := &MaturationReportInstanceBuilder{
@@ -365,8 +365,4 @@ func (b *MaturationReportInstanceBuilder) Version(value int) *MaturationReportIn
 // SetVersion is a compatibility alias for Version.
 func (b *MaturationReportInstanceBuilder) SetVersion(value int) *MaturationReportInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewMaturationReportInstanceBuilder(objects.DefaultSchemaVersion))
 }

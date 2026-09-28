@@ -21,7 +21,7 @@ type QaSuccessInstanceBuilder struct {
 func NewQaSuccessInstanceBuilder(schemaVersion string) *QaSuccessInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("qa_success")
+	fieldOrder := instance_builders.FieldOrderFromSpec("qa_success")
 
 	// Create base builder
 	builder := &QaSuccessInstanceBuilder{
@@ -354,8 +354,4 @@ func (b *QaSuccessInstanceBuilder) Version(value int) *QaSuccessInstanceBuilder 
 // SetVersion is a compatibility alias for Version.
 func (b *QaSuccessInstanceBuilder) SetVersion(value int) *QaSuccessInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewQaSuccessInstanceBuilder(objects.DefaultSchemaVersion))
 }

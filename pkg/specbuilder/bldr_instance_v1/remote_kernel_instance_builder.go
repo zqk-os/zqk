@@ -21,7 +21,7 @@ type RemoteKernelInstanceBuilder struct {
 func NewRemoteKernelInstanceBuilder(schemaVersion string) *RemoteKernelInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("remote_kernel")
+	fieldOrder := instance_builders.FieldOrderFromSpec("remote_kernel")
 
 	// Create base builder
 	builder := &RemoteKernelInstanceBuilder{
@@ -398,8 +398,4 @@ func (b *RemoteKernelInstanceBuilder) Version(value int) *RemoteKernelInstanceBu
 // SetVersion is a compatibility alias for Version.
 func (b *RemoteKernelInstanceBuilder) SetVersion(value int) *RemoteKernelInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewRemoteKernelInstanceBuilder(objects.DefaultSchemaVersion))
 }

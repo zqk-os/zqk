@@ -21,7 +21,7 @@ type QuestionInstanceBuilder struct {
 func NewQuestionInstanceBuilder(schemaVersion string) *QuestionInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("question")
+	fieldOrder := instance_builders.FieldOrderFromSpec("question")
 
 	// Create base builder
 	builder := &QuestionInstanceBuilder{
@@ -398,8 +398,4 @@ func (b *QuestionInstanceBuilder) Version(value int) *QuestionInstanceBuilder {
 // SetVersion is a compatibility alias for Version.
 func (b *QuestionInstanceBuilder) SetVersion(value int) *QuestionInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewQuestionInstanceBuilder(objects.DefaultSchemaVersion))
 }

@@ -21,7 +21,7 @@ type TechnicalSpecInstanceBuilder struct {
 func NewTechnicalSpecInstanceBuilder(schemaVersion string) *TechnicalSpecInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("technical_spec")
+	fieldOrder := instance_builders.FieldOrderFromSpec("technical_spec")
 
 	// Create base builder
 	builder := &TechnicalSpecInstanceBuilder{
@@ -343,8 +343,4 @@ func (b *TechnicalSpecInstanceBuilder) Version(value int) *TechnicalSpecInstance
 // SetVersion is a compatibility alias for Version.
 func (b *TechnicalSpecInstanceBuilder) SetVersion(value int) *TechnicalSpecInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewTechnicalSpecInstanceBuilder(objects.DefaultSchemaVersion))
 }

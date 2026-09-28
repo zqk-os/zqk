@@ -21,7 +21,7 @@ type TestCommandRuleInstanceBuilder struct {
 func NewTestCommandRuleInstanceBuilder(schemaVersion string) *TestCommandRuleInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("test_command_rule")
+	fieldOrder := instance_builders.FieldOrderFromSpec("test_command_rule")
 
 	// Create base builder
 	builder := &TestCommandRuleInstanceBuilder{
@@ -354,8 +354,4 @@ func (b *TestCommandRuleInstanceBuilder) Version(value int) *TestCommandRuleInst
 // SetVersion is a compatibility alias for Version.
 func (b *TestCommandRuleInstanceBuilder) SetVersion(value int) *TestCommandRuleInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewTestCommandRuleInstanceBuilder(objects.DefaultSchemaVersion))
 }

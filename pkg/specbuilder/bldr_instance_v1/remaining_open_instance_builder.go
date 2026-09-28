@@ -21,7 +21,7 @@ type RemainingOpenInstanceBuilder struct {
 func NewRemainingOpenInstanceBuilder(schemaVersion string) *RemainingOpenInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("remaining_open")
+	fieldOrder := instance_builders.FieldOrderFromSpec("remaining_open")
 
 	// Create base builder
 	builder := &RemainingOpenInstanceBuilder{
@@ -354,8 +354,4 @@ func (b *RemainingOpenInstanceBuilder) Version(value int) *RemainingOpenInstance
 // SetVersion is a compatibility alias for Version.
 func (b *RemainingOpenInstanceBuilder) SetVersion(value int) *RemainingOpenInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewRemainingOpenInstanceBuilder(objects.DefaultSchemaVersion))
 }

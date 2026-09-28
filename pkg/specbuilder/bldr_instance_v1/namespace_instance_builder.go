@@ -21,7 +21,7 @@ type NamespaceInstanceBuilder struct {
 func NewNamespaceInstanceBuilder(schemaVersion string) *NamespaceInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("namespace")
+	fieldOrder := instance_builders.FieldOrderFromSpec("namespace")
 
 	// Create base builder
 	builder := &NamespaceInstanceBuilder{
@@ -398,8 +398,4 @@ func (b *NamespaceInstanceBuilder) Version(value int) *NamespaceInstanceBuilder 
 // SetVersion is a compatibility alias for Version.
 func (b *NamespaceInstanceBuilder) SetVersion(value int) *NamespaceInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewNamespaceInstanceBuilder(objects.DefaultSchemaVersion))
 }

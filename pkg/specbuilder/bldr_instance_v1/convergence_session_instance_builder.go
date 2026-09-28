@@ -21,7 +21,7 @@ type ConvergenceSessionInstanceBuilder struct {
 func NewConvergenceSessionInstanceBuilder(schemaVersion string) *ConvergenceSessionInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("convergence_session")
+	fieldOrder := instance_builders.FieldOrderFromSpec("convergence_session")
 
 	// Create base builder
 	builder := &ConvergenceSessionInstanceBuilder{
@@ -552,8 +552,4 @@ func (b *ConvergenceSessionInstanceBuilder) Version(value int) *ConvergenceSessi
 // SetVersion is a compatibility alias for Version.
 func (b *ConvergenceSessionInstanceBuilder) SetVersion(value int) *ConvergenceSessionInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewConvergenceSessionInstanceBuilder(objects.DefaultSchemaVersion))
 }

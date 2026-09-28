@@ -21,7 +21,7 @@ type VocabularySchemeInstanceBuilder struct {
 func NewVocabularySchemeInstanceBuilder(schemaVersion string) *VocabularySchemeInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("vocabulary_scheme")
+	fieldOrder := instance_builders.FieldOrderFromSpec("vocabulary_scheme")
 
 	// Create base builder
 	builder := &VocabularySchemeInstanceBuilder{
@@ -376,8 +376,4 @@ func (b *VocabularySchemeInstanceBuilder) Version(value int) *VocabularySchemeIn
 // SetVersion is a compatibility alias for Version.
 func (b *VocabularySchemeInstanceBuilder) SetVersion(value int) *VocabularySchemeInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewVocabularySchemeInstanceBuilder(objects.DefaultSchemaVersion))
 }

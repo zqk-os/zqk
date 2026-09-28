@@ -21,7 +21,7 @@ type AuditAggregationMetricInstanceBuilder struct {
 func NewAuditAggregationMetricInstanceBuilder(schemaVersion string) *AuditAggregationMetricInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("audit_aggregation_metric")
+	fieldOrder := instance_builders.FieldOrderFromSpec("audit_aggregation_metric")
 
 	// Create base builder
 	builder := &AuditAggregationMetricInstanceBuilder{
@@ -596,8 +596,4 @@ func (b *AuditAggregationMetricInstanceBuilder) WindowStart(value string) *Audit
 // SetWindowStart is a compatibility alias for WindowStart.
 func (b *AuditAggregationMetricInstanceBuilder) SetWindowStart(value string) *AuditAggregationMetricInstanceBuilder {
 	return b.WindowStart(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewAuditAggregationMetricInstanceBuilder(objects.DefaultSchemaVersion))
 }

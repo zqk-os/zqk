@@ -21,7 +21,7 @@ type ChangeJournalEntryInstanceBuilder struct {
 func NewChangeJournalEntryInstanceBuilder(schemaVersion string) *ChangeJournalEntryInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("change_journal_entry")
+	fieldOrder := instance_builders.FieldOrderFromSpec("change_journal_entry")
 
 	// Create base builder
 	builder := &ChangeJournalEntryInstanceBuilder{
@@ -376,8 +376,4 @@ func (b *ChangeJournalEntryInstanceBuilder) Version(value int) *ChangeJournalEnt
 // SetVersion is a compatibility alias for Version.
 func (b *ChangeJournalEntryInstanceBuilder) SetVersion(value int) *ChangeJournalEntryInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewChangeJournalEntryInstanceBuilder(objects.DefaultSchemaVersion))
 }

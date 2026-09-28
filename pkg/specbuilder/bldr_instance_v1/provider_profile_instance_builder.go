@@ -21,7 +21,7 @@ type ProviderProfileInstanceBuilder struct {
 func NewProviderProfileInstanceBuilder(schemaVersion string) *ProviderProfileInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("provider_profile")
+	fieldOrder := instance_builders.FieldOrderFromSpec("provider_profile")
 
 	// Create base builder
 	builder := &ProviderProfileInstanceBuilder{
@@ -431,8 +431,4 @@ func (b *ProviderProfileInstanceBuilder) Version(value int) *ProviderProfileInst
 // SetVersion is a compatibility alias for Version.
 func (b *ProviderProfileInstanceBuilder) SetVersion(value int) *ProviderProfileInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewProviderProfileInstanceBuilder(objects.DefaultSchemaVersion))
 }

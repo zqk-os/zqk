@@ -21,7 +21,7 @@ type ImpactAnalysisInstanceBuilder struct {
 func NewImpactAnalysisInstanceBuilder(schemaVersion string) *ImpactAnalysisInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("impact_analysis")
+	fieldOrder := instance_builders.FieldOrderFromSpec("impact_analysis")
 
 	// Create base builder
 	builder := &ImpactAnalysisInstanceBuilder{
@@ -376,8 +376,4 @@ func (b *ImpactAnalysisInstanceBuilder) Version(value int) *ImpactAnalysisInstan
 // SetVersion is a compatibility alias for Version.
 func (b *ImpactAnalysisInstanceBuilder) SetVersion(value int) *ImpactAnalysisInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewImpactAnalysisInstanceBuilder(objects.DefaultSchemaVersion))
 }

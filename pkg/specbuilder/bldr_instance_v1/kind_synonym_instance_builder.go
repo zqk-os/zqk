@@ -21,7 +21,7 @@ type KindSynonymInstanceBuilder struct {
 func NewKindSynonymInstanceBuilder(schemaVersion string) *KindSynonymInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("kind_synonym")
+	fieldOrder := instance_builders.FieldOrderFromSpec("kind_synonym")
 
 	// Create base builder
 	builder := &KindSynonymInstanceBuilder{
@@ -101,8 +101,4 @@ func (b *KindSynonymInstanceBuilder) TargetKind(value string) *KindSynonymInstan
 // SetTargetKind is a compatibility alias for TargetKind.
 func (b *KindSynonymInstanceBuilder) SetTargetKind(value string) *KindSynonymInstanceBuilder {
 	return b.TargetKind(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewKindSynonymInstanceBuilder(objects.DefaultSchemaVersion))
 }

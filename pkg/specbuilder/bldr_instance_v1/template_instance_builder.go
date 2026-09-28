@@ -21,7 +21,7 @@ type TemplateInstanceBuilder struct {
 func NewTemplateInstanceBuilder(schemaVersion string) *TemplateInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("template")
+	fieldOrder := instance_builders.FieldOrderFromSpec("template")
 
 	// Create base builder
 	builder := &TemplateInstanceBuilder{
@@ -354,8 +354,4 @@ func (b *TemplateInstanceBuilder) Version(value int) *TemplateInstanceBuilder {
 // SetVersion is a compatibility alias for Version.
 func (b *TemplateInstanceBuilder) SetVersion(value int) *TemplateInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewTemplateInstanceBuilder(objects.DefaultSchemaVersion))
 }
