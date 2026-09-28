@@ -3,8 +3,8 @@ package bldr_instance_v1_test
 import (
 	"testing"
 
+	"github.com/zqk-os/zqk/packs/work/bldr_instance_v1"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/specbuilder/bldr_instance_v1"
 )
 
 func TestTestCaseInstanceBuilder(t *testing.T) {
