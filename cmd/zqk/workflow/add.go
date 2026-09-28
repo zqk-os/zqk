@@ -371,6 +371,8 @@ func scaffoldPlanMilestoneGoal(ctx context.Context, proc *cli.Processor, activeO
 		objects.FieldKeyTitle:       fmt.Sprintf("Auto-generated Goal %d", timestamp),
 		objects.FieldKeyDescription: "Auto-generated Goal to satisfy hierarchical integrity",
 		objects.FieldKeyStatus:      objects.ObjectStatusActive,
+		objects.FieldKeyMetric:      "Auto-scaffolded plan completion",
+		objects.FieldKeyTarget:      "100%",
 		objects.FieldKeyNamespaceID: "zqk:kernel",
 		objects.FieldKeyCreatedAt:   time.Now().Format(time.RFC3339),
 		objects.FieldKeyCreatedBy:   objects.DefaultSystemAccountID,
