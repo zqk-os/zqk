@@ -21,7 +21,7 @@ type AgentTaskInstanceBuilder struct {
 func NewAgentTaskInstanceBuilder(schemaVersion string) *AgentTaskInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("agent_task")
+	fieldOrder := instance_builders.FieldOrderFromSpec("agent_task")
 
 	// Create base builder
 	builder := &AgentTaskInstanceBuilder{
@@ -508,8 +508,4 @@ func (b *AgentTaskInstanceBuilder) Version(value int) *AgentTaskInstanceBuilder 
 // SetVersion is a compatibility alias for Version.
 func (b *AgentTaskInstanceBuilder) SetVersion(value int) *AgentTaskInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewAgentTaskInstanceBuilder(objects.DefaultSchemaVersion))
 }

@@ -21,7 +21,7 @@ type CodeQualityMetricInstanceBuilder struct {
 func NewCodeQualityMetricInstanceBuilder(schemaVersion string) *CodeQualityMetricInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("code_quality_metric")
+	fieldOrder := instance_builders.FieldOrderFromSpec("code_quality_metric")
 
 	// Create base builder
 	builder := &CodeQualityMetricInstanceBuilder{
@@ -574,8 +574,4 @@ func (b *CodeQualityMetricInstanceBuilder) WindowStart(value string) *CodeQualit
 // SetWindowStart is a compatibility alias for WindowStart.
 func (b *CodeQualityMetricInstanceBuilder) SetWindowStart(value string) *CodeQualityMetricInstanceBuilder {
 	return b.WindowStart(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewCodeQualityMetricInstanceBuilder(objects.DefaultSchemaVersion))
 }

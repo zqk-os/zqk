@@ -21,7 +21,7 @@ type BaseSamplerInstanceBuilder struct {
 func NewBaseSamplerInstanceBuilder(schemaVersion string) *BaseSamplerInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("base_sampler")
+	fieldOrder := instance_builders.FieldOrderFromSpec("base_sampler")
 
 	// Create base builder
 	builder := &BaseSamplerInstanceBuilder{
@@ -409,8 +409,4 @@ func (b *BaseSamplerInstanceBuilder) Version(value int) *BaseSamplerInstanceBuil
 // SetVersion is a compatibility alias for Version.
 func (b *BaseSamplerInstanceBuilder) SetVersion(value int) *BaseSamplerInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewBaseSamplerInstanceBuilder(objects.DefaultSchemaVersion))
 }

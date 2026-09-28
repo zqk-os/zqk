@@ -21,7 +21,7 @@ type AccountInstanceBuilder struct {
 func NewAccountInstanceBuilder(schemaVersion string) *AccountInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("account")
+	fieldOrder := instance_builders.FieldOrderFromSpec("account")
 
 	// Create base builder
 	builder := &AccountInstanceBuilder{
@@ -387,8 +387,4 @@ func (b *AccountInstanceBuilder) Version(value int) *AccountInstanceBuilder {
 // SetVersion is a compatibility alias for Version.
 func (b *AccountInstanceBuilder) SetVersion(value int) *AccountInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewAccountInstanceBuilder(objects.DefaultSchemaVersion))
 }

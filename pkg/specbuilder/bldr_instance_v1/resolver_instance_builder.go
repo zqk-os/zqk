@@ -21,7 +21,7 @@ type ResolverInstanceBuilder struct {
 func NewResolverInstanceBuilder(schemaVersion string) *ResolverInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("resolver")
+	fieldOrder := instance_builders.FieldOrderFromSpec("resolver")
 
 	// Create base builder
 	builder := &ResolverInstanceBuilder{
@@ -354,8 +354,4 @@ func (b *ResolverInstanceBuilder) Version(value int) *ResolverInstanceBuilder {
 // SetVersion is a compatibility alias for Version.
 func (b *ResolverInstanceBuilder) SetVersion(value int) *ResolverInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewResolverInstanceBuilder(objects.DefaultSchemaVersion))
 }

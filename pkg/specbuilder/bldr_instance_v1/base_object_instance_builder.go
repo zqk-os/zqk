@@ -21,7 +21,7 @@ type BaseObjectInstanceBuilder struct {
 func NewBaseObjectInstanceBuilder(schemaVersion string) *BaseObjectInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("base_object")
+	fieldOrder := instance_builders.FieldOrderFromSpec("base_object")
 
 	// Create base builder
 	builder := &BaseObjectInstanceBuilder{
@@ -321,8 +321,4 @@ func (b *BaseObjectInstanceBuilder) Version(value int) *BaseObjectInstanceBuilde
 // SetVersion is a compatibility alias for Version.
 func (b *BaseObjectInstanceBuilder) SetVersion(value int) *BaseObjectInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewBaseObjectInstanceBuilder(objects.DefaultSchemaVersion))
 }

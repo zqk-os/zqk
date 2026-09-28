@@ -43,11 +43,11 @@ func runVerify(cmd *cobra.Command, args []string) error {
 		return errfmt.Errorf("project root not found")
 	}
 
-	ids, err := cmd.Flags().GetStringSlice("ids")
+	ids, err := cmd.Flags().GetStringArray("ids")
 	if err != nil {
 		return errfmt.Newf("failed to get ids flag").Wrap(err)
 	}
-	subtrees, err := cmd.Flags().GetStringSlice("subtrees")
+	subtrees, err := cmd.Flags().GetStringArray("subtrees")
 	if err != nil {
 		return errfmt.Newf("failed to get subtrees flag").Wrap(err)
 	}

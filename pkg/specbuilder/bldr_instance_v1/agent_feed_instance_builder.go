@@ -21,7 +21,7 @@ type AgentFeedInstanceBuilder struct {
 func NewAgentFeedInstanceBuilder(schemaVersion string) *AgentFeedInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("agent_feed")
+	fieldOrder := instance_builders.FieldOrderFromSpec("agent_feed")
 
 	// Create base builder
 	builder := &AgentFeedInstanceBuilder{
@@ -409,8 +409,4 @@ func (b *AgentFeedInstanceBuilder) Version(value int) *AgentFeedInstanceBuilder 
 // SetVersion is a compatibility alias for Version.
 func (b *AgentFeedInstanceBuilder) SetVersion(value int) *AgentFeedInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewAgentFeedInstanceBuilder(objects.DefaultSchemaVersion))
 }

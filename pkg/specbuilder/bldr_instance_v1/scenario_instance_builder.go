@@ -21,7 +21,7 @@ type ScenarioInstanceBuilder struct {
 func NewScenarioInstanceBuilder(schemaVersion string) *ScenarioInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("scenario")
+	fieldOrder := instance_builders.FieldOrderFromSpec("scenario")
 
 	// Create base builder
 	builder := &ScenarioInstanceBuilder{
@@ -574,8 +574,4 @@ func (b *ScenarioInstanceBuilder) WorkstreamRefs(value []string) *ScenarioInstan
 // SetWorkstreamRefs is a compatibility alias for WorkstreamRefs.
 func (b *ScenarioInstanceBuilder) SetWorkstreamRefs(value []string) *ScenarioInstanceBuilder {
 	return b.WorkstreamRefs(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewScenarioInstanceBuilder(objects.DefaultSchemaVersion))
 }

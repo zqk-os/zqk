@@ -21,7 +21,7 @@ type WorkUnitInstanceBuilder struct {
 func NewWorkUnitInstanceBuilder(schemaVersion string) *WorkUnitInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("work_unit")
+	fieldOrder := instance_builders.FieldOrderFromSpec("work_unit")
 
 	// Create base builder
 	builder := &WorkUnitInstanceBuilder{
@@ -365,8 +365,4 @@ func (b *WorkUnitInstanceBuilder) Version(value int) *WorkUnitInstanceBuilder {
 // SetVersion is a compatibility alias for Version.
 func (b *WorkUnitInstanceBuilder) SetVersion(value int) *WorkUnitInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewWorkUnitInstanceBuilder(objects.DefaultSchemaVersion))
 }

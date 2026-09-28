@@ -21,7 +21,7 @@ type McpBuiltInToolInstanceBuilder struct {
 func NewMcpBuiltInToolInstanceBuilder(schemaVersion string) *McpBuiltInToolInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("mcp_built_in_tool")
+	fieldOrder := instance_builders.FieldOrderFromSpec("mcp_built_in_tool")
 
 	// Create base builder
 	builder := &McpBuiltInToolInstanceBuilder{
@@ -332,8 +332,4 @@ func (b *McpBuiltInToolInstanceBuilder) Version(value int) *McpBuiltInToolInstan
 // SetVersion is a compatibility alias for Version.
 func (b *McpBuiltInToolInstanceBuilder) SetVersion(value int) *McpBuiltInToolInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewMcpBuiltInToolInstanceBuilder(objects.DefaultSchemaVersion))
 }

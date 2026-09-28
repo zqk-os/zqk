@@ -21,7 +21,7 @@ type PartnershipInstanceBuilder struct {
 func NewPartnershipInstanceBuilder(schemaVersion string) *PartnershipInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("partnership")
+	fieldOrder := instance_builders.FieldOrderFromSpec("partnership")
 
 	// Create base builder
 	builder := &PartnershipInstanceBuilder{
@@ -420,8 +420,4 @@ func (b *PartnershipInstanceBuilder) Version(value int) *PartnershipInstanceBuil
 // SetVersion is a compatibility alias for Version.
 func (b *PartnershipInstanceBuilder) SetVersion(value int) *PartnershipInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewPartnershipInstanceBuilder(objects.DefaultSchemaVersion))
 }

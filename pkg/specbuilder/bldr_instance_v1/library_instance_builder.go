@@ -21,7 +21,7 @@ type LibraryInstanceBuilder struct {
 func NewLibraryInstanceBuilder(schemaVersion string) *LibraryInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("library")
+	fieldOrder := instance_builders.FieldOrderFromSpec("library")
 
 	// Create base builder
 	builder := &LibraryInstanceBuilder{
@@ -453,8 +453,4 @@ func (b *LibraryInstanceBuilder) Version(value int) *LibraryInstanceBuilder {
 // SetVersion is a compatibility alias for Version.
 func (b *LibraryInstanceBuilder) SetVersion(value int) *LibraryInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewLibraryInstanceBuilder(objects.DefaultSchemaVersion))
 }

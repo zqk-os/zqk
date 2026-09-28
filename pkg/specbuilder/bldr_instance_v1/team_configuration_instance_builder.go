@@ -21,7 +21,7 @@ type TeamConfigurationInstanceBuilder struct {
 func NewTeamConfigurationInstanceBuilder(schemaVersion string) *TeamConfigurationInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("team_configuration")
+	fieldOrder := instance_builders.FieldOrderFromSpec("team_configuration")
 
 	// Create base builder
 	builder := &TeamConfigurationInstanceBuilder{
@@ -354,8 +354,4 @@ func (b *TeamConfigurationInstanceBuilder) Version(value int) *TeamConfiguration
 // SetVersion is a compatibility alias for Version.
 func (b *TeamConfigurationInstanceBuilder) SetVersion(value int) *TeamConfigurationInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewTeamConfigurationInstanceBuilder(objects.DefaultSchemaVersion))
 }

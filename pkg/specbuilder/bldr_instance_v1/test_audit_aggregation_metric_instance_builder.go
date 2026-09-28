@@ -21,7 +21,7 @@ type TestAuditAggregationMetricInstanceBuilder struct {
 func NewTestAuditAggregationMetricInstanceBuilder(schemaVersion string) *TestAuditAggregationMetricInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("test_audit_aggregation_metric")
+	fieldOrder := instance_builders.FieldOrderFromSpec("test_audit_aggregation_metric")
 
 	// Create base builder
 	builder := &TestAuditAggregationMetricInstanceBuilder{
@@ -596,8 +596,4 @@ func (b *TestAuditAggregationMetricInstanceBuilder) WindowStart(value string) *T
 // SetWindowStart is a compatibility alias for WindowStart.
 func (b *TestAuditAggregationMetricInstanceBuilder) SetWindowStart(value string) *TestAuditAggregationMetricInstanceBuilder {
 	return b.WindowStart(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewTestAuditAggregationMetricInstanceBuilder(objects.DefaultSchemaVersion))
 }

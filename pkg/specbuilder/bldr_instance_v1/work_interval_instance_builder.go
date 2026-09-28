@@ -21,7 +21,7 @@ type WorkIntervalInstanceBuilder struct {
 func NewWorkIntervalInstanceBuilder(schemaVersion string) *WorkIntervalInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("work_interval")
+	fieldOrder := instance_builders.FieldOrderFromSpec("work_interval")
 
 	// Create base builder
 	builder := &WorkIntervalInstanceBuilder{
@@ -343,8 +343,4 @@ func (b *WorkIntervalInstanceBuilder) Version(value int) *WorkIntervalInstanceBu
 // SetVersion is a compatibility alias for Version.
 func (b *WorkIntervalInstanceBuilder) SetVersion(value int) *WorkIntervalInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewWorkIntervalInstanceBuilder(objects.DefaultSchemaVersion))
 }

@@ -1,4 +1,4 @@
-package pipeline
+package pipeline_test
 
 import (
 	"context"
@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/pipeline"
 	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
@@ -15,12 +16,12 @@ func TestProvisionObjectBranchStage(t *testing.T) {
 	// Since it runs git worktree add, we cannot fully test it without a git repo unless we mock exec.
 	// This test just ensures we get an error on invalid payload.
 
-	opts := ProvisionObjectBranchOptions{
+	opts := pipeline.ProvisionObjectBranchOptions{
 		ProjectRoot: "/tmp",
 	}
 
-	stage := ProvisionObjectBranchStage(opts)
-	ctx := &Context{Ctx: context.Background()}
+	stage := pipeline.ProvisionObjectBranchStage(opts)
+	ctx := &pipeline.Context{Ctx: context.Background()}
 
 	_, err := stage(ctx, nil)
 	if err == nil {
@@ -76,7 +77,7 @@ func TestProvisionObjectBranchStage_Locking(t *testing.T) {
 		return release, true, nil
 	}
 
-	opts := ProvisionObjectBranchOptions{
+	opts := pipeline.ProvisionObjectBranchOptions{
 		ProjectRoot: tmpDir,
 		ObjectReader: func(ctx context.Context, id string) (map[string]any, error) {
 			return map[string]any{
@@ -87,10 +88,10 @@ func TestProvisionObjectBranchStage_Locking(t *testing.T) {
 		TryLock: tryLockMock,
 	}
 
-	stage := ProvisionObjectBranchStage(opts)
-	releaseStage := ReleaseObjectBranchStage()
+	stage := pipeline.ProvisionObjectBranchStage(opts)
+	releaseStage := pipeline.ReleaseObjectBranchStage()
 
-	ctx1 := &Context{Ctx: context.Background()}
+	ctx1 := &pipeline.Context{Ctx: context.Background()}
 	payload := "TSK-locktest"
 
 	// 1. First execution should succeed (lock acquired)
@@ -100,7 +101,7 @@ func TestProvisionObjectBranchStage_Locking(t *testing.T) {
 	}
 
 	// 2. Second execution on same payload with different context should fail (lock held)
-	ctx2 := &Context{Ctx: context.Background()}
+	ctx2 := &pipeline.Context{Ctx: context.Background()}
 	_, err = stage(ctx2, payload)
 	if err == nil {
 		t.Fatal("expected second stage run to fail due to lock contention, but it succeeded")
@@ -116,7 +117,7 @@ func TestProvisionObjectBranchStage_Locking(t *testing.T) {
 	}
 
 	// 4. Third execution should now succeed (lock released)
-	ctx3 := &Context{Ctx: context.Background()}
+	ctx3 := &pipeline.Context{Ctx: context.Background()}
 	_, err = stage(ctx3, payload)
 	if err != nil {
 		t.Fatalf("expected third stage run to succeed after release, got: %v", err)

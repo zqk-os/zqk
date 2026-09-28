@@ -21,7 +21,7 @@ type ImportantDateInstanceBuilder struct {
 func NewImportantDateInstanceBuilder(schemaVersion string) *ImportantDateInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("important_date")
+	fieldOrder := instance_builders.FieldOrderFromSpec("important_date")
 
 	// Create base builder
 	builder := &ImportantDateInstanceBuilder{
@@ -398,8 +398,4 @@ func (b *ImportantDateInstanceBuilder) Version(value int) *ImportantDateInstance
 // SetVersion is a compatibility alias for Version.
 func (b *ImportantDateInstanceBuilder) SetVersion(value int) *ImportantDateInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewImportantDateInstanceBuilder(objects.DefaultSchemaVersion))
 }

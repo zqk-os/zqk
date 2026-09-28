@@ -31,10 +31,6 @@ Examples:
 		Args: cobra.MaximumNArgs(1),
 		RunE: cli.WithProcessor(runDo),
 	})
-	cmd.Flags().Bool("dry-run", false, "Simulate pipeline discovery and claiming without writing mutations")
-	cmd.Flags().Bool("verify", true, "Execute test verification and criteria latching")
-	cmd.Flags().String("by", "", "Claimant agent or account id (default: seating or env identity)")
-	cmd.Flags().String("persona-ref", "PER-COMMUNITY-SOFTWARE-ENGINEER", "Target persona reference")
 	return cmd
 }
 

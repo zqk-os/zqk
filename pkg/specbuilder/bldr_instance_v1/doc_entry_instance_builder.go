@@ -21,7 +21,7 @@ type DocEntryInstanceBuilder struct {
 func NewDocEntryInstanceBuilder(schemaVersion string) *DocEntryInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("doc_entry")
+	fieldOrder := instance_builders.FieldOrderFromSpec("doc_entry")
 
 	// Create base builder
 	builder := &DocEntryInstanceBuilder{
@@ -442,8 +442,4 @@ func (b *DocEntryInstanceBuilder) WorkstreamRefs(value []string) *DocEntryInstan
 // SetWorkstreamRefs is a compatibility alias for WorkstreamRefs.
 func (b *DocEntryInstanceBuilder) SetWorkstreamRefs(value []string) *DocEntryInstanceBuilder {
 	return b.WorkstreamRefs(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewDocEntryInstanceBuilder(objects.DefaultSchemaVersion))
 }

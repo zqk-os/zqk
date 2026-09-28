@@ -21,7 +21,7 @@ type PipelineStageInstanceBuilder struct {
 func NewPipelineStageInstanceBuilder(schemaVersion string) *PipelineStageInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("pipeline_stage")
+	fieldOrder := instance_builders.FieldOrderFromSpec("pipeline_stage")
 
 	// Create base builder
 	builder := &PipelineStageInstanceBuilder{
@@ -354,8 +354,4 @@ func (b *PipelineStageInstanceBuilder) Version(value int) *PipelineStageInstance
 // SetVersion is a compatibility alias for Version.
 func (b *PipelineStageInstanceBuilder) SetVersion(value int) *PipelineStageInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewPipelineStageInstanceBuilder(objects.DefaultSchemaVersion))
 }

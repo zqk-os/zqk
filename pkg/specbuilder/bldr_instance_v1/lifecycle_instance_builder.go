@@ -21,7 +21,7 @@ type LifecycleInstanceBuilder struct {
 func NewLifecycleInstanceBuilder(schemaVersion string) *LifecycleInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("lifecycle")
+	fieldOrder := instance_builders.FieldOrderFromSpec("lifecycle")
 
 	// Create base builder
 	builder := &LifecycleInstanceBuilder{
@@ -387,8 +387,4 @@ func (b *LifecycleInstanceBuilder) Version(value int) *LifecycleInstanceBuilder 
 // SetVersion is a compatibility alias for Version.
 func (b *LifecycleInstanceBuilder) SetVersion(value int) *LifecycleInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewLifecycleInstanceBuilder(objects.DefaultSchemaVersion))
 }

@@ -21,7 +21,7 @@ type BrandInstanceBuilder struct {
 func NewBrandInstanceBuilder(schemaVersion string) *BrandInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("brand")
+	fieldOrder := instance_builders.FieldOrderFromSpec("brand")
 
 	// Create base builder
 	builder := &BrandInstanceBuilder{
@@ -431,8 +431,4 @@ func (b *BrandInstanceBuilder) Version(value int) *BrandInstanceBuilder {
 // SetVersion is a compatibility alias for Version.
 func (b *BrandInstanceBuilder) SetVersion(value int) *BrandInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewBrandInstanceBuilder(objects.DefaultSchemaVersion))
 }

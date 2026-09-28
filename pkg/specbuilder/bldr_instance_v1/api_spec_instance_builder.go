@@ -21,7 +21,7 @@ type ApiSpecInstanceBuilder struct {
 func NewApiSpecInstanceBuilder(schemaVersion string) *ApiSpecInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("api_spec")
+	fieldOrder := instance_builders.FieldOrderFromSpec("api_spec")
 
 	// Create base builder
 	builder := &ApiSpecInstanceBuilder{
@@ -387,8 +387,4 @@ func (b *ApiSpecInstanceBuilder) Version(value int) *ApiSpecInstanceBuilder {
 // SetVersion is a compatibility alias for Version.
 func (b *ApiSpecInstanceBuilder) SetVersion(value int) *ApiSpecInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewApiSpecInstanceBuilder(objects.DefaultSchemaVersion))
 }

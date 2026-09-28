@@ -21,7 +21,7 @@ type SchedulerHandlerBindingInstanceBuilder struct {
 func NewSchedulerHandlerBindingInstanceBuilder(schemaVersion string) *SchedulerHandlerBindingInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("scheduler_handler_binding")
+	fieldOrder := instance_builders.FieldOrderFromSpec("scheduler_handler_binding")
 
 	// Create base builder
 	builder := &SchedulerHandlerBindingInstanceBuilder{
@@ -376,8 +376,4 @@ func (b *SchedulerHandlerBindingInstanceBuilder) Version(value int) *SchedulerHa
 // SetVersion is a compatibility alias for Version.
 func (b *SchedulerHandlerBindingInstanceBuilder) SetVersion(value int) *SchedulerHandlerBindingInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewSchedulerHandlerBindingInstanceBuilder(objects.DefaultSchemaVersion))
 }

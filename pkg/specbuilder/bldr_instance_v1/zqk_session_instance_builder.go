@@ -21,7 +21,7 @@ type ZqkSessionInstanceBuilder struct {
 func NewZqkSessionInstanceBuilder(schemaVersion string) *ZqkSessionInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("zqk_session")
+	fieldOrder := instance_builders.FieldOrderFromSpec("zqk_session")
 
 	// Create base builder
 	builder := &ZqkSessionInstanceBuilder{
@@ -420,8 +420,4 @@ func (b *ZqkSessionInstanceBuilder) Version(value int) *ZqkSessionInstanceBuilde
 // SetVersion is a compatibility alias for Version.
 func (b *ZqkSessionInstanceBuilder) SetVersion(value int) *ZqkSessionInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewZqkSessionInstanceBuilder(objects.DefaultSchemaVersion))
 }

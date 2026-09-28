@@ -21,7 +21,7 @@ type OccupancyInstanceBuilder struct {
 func NewOccupancyInstanceBuilder(schemaVersion string) *OccupancyInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("occupancy")
+	fieldOrder := instance_builders.FieldOrderFromSpec("occupancy")
 
 	// Create base builder
 	builder := &OccupancyInstanceBuilder{
@@ -365,8 +365,4 @@ func (b *OccupancyInstanceBuilder) Version(value int) *OccupancyInstanceBuilder 
 // SetVersion is a compatibility alias for Version.
 func (b *OccupancyInstanceBuilder) SetVersion(value int) *OccupancyInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewOccupancyInstanceBuilder(objects.DefaultSchemaVersion))
 }

@@ -21,7 +21,7 @@ type RuleInstanceBuilder struct {
 func NewRuleInstanceBuilder(schemaVersion string) *RuleInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("rule")
+	fieldOrder := instance_builders.FieldOrderFromSpec("rule")
 
 	// Create base builder
 	builder := &RuleInstanceBuilder{
@@ -376,8 +376,4 @@ func (b *RuleInstanceBuilder) WorkstreamRefs(value []string) *RuleInstanceBuilde
 // SetWorkstreamRefs is a compatibility alias for WorkstreamRefs.
 func (b *RuleInstanceBuilder) SetWorkstreamRefs(value []string) *RuleInstanceBuilder {
 	return b.WorkstreamRefs(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewRuleInstanceBuilder(objects.DefaultSchemaVersion))
 }
