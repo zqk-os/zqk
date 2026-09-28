@@ -361,8 +361,10 @@ func TestCAS_ComponentLevel_Update(t *testing.T) {
 	}
 
 	// Update object
-	obj1[objects.FieldKeyTitle] = "Updated Title"
-	err = fileStorage.Update(ctx, secCtx, objectID, obj1)
+	updates := map[string]any{
+		objects.FieldKeyTitle: "Updated Title",
+	}
+	err = fileStorage.Update(ctx, secCtx, objectID, updates)
 	if err != nil {
 		t.Fatalf("Failed to update object: %v", err)
 	}

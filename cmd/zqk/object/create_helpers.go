@@ -59,10 +59,11 @@ func RunCreateWithData(cmd *cobra.Command, kind string, objData map[string]any) 
 	objKind, _ := objData[objects.FieldKeyKind].(string)
 	force, _ := cmd.Flags().GetBool("force")
 	promote, _ := cmd.Flags().GetBool("promote")
+	casDirect, _ := cmd.Flags().GetBool("cas")
 	// Sync create for interactive CLI latency (see create.go).
 	opCtx := pkgctx.WithCacheUpdate(proc.OperationContext(), objID, objKind, "")
 	opCtx = storage.WithCLIOperation(storage.WithSkipWriteBehind(opCtx))
-	if promote {
+	if promote || casDirect {
 		opCtx = pkgctx.WithPromoteOnCreate(opCtx)
 	}
 	if err := proc.Storage().Create(opCtx, proc.SecurityContext(), objData); err != nil {

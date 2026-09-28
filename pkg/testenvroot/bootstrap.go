@@ -89,6 +89,33 @@ func CopySpecIndexFromProject(testRoot, projectRoot string) error {
 	return linkOrCopyYAML(sourcePath, targetPath)
 }
 
+func copyYAMLFiles(sourceDir, targetDir string) error {
+	if _, err := fileutil.Stat(sourceDir); fileutil.IsNotExist(err) {
+		return nil
+	}
+	return filepath.Walk(sourceDir, func(path string, info fileutil.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
+		ext := filepath.Ext(path)
+		if ext != ".yaml" && ext != ".yml" {
+			return nil
+		}
+		rel, err := filepath.Rel(sourceDir, path)
+		if err != nil {
+			return err
+		}
+		targetPath := filepath.Join(targetDir, rel)
+		if err := fileutil.EnsureDir(filepath.Dir(targetPath)); err != nil {
+			return err
+		}
+		return linkOrCopyYAML(path, targetPath)
+	})
+}
+
 // BootstrapRoot creates the minimal directory layout under testRoot and, when projectRoot
 // is non-empty, copies object spec, lifecycle, trait, and config YAML from projectRoot
 // (same contract as pkg/testing.BootstrapTestRoot, plus lifecycles/traits/configs required
@@ -106,5 +133,17 @@ func BootstrapRoot(testRoot, projectRoot string) error {
 	if err := copyYAMLFilesFromProject(testRoot, projectRoot, "packs"); err != nil {
 		return err
 	}
+	// Also ensure pack-owned specs and lifecycles (e.g. packs/work/specs -> .zqk/specs/objects
+	// and packs/work/lifecycles -> .zqk/specs/lifecycles) are seeded directly into the internal
+	// schema plane so that hermetic test roots have full access to planning kinds (goal,
+	// backlog_item, requirement, criteria, test_case).
+	workSpecs := filepath.Join(projectRoot, "packs", "work", "specs")
+	dstSpecs := filepath.Join(testRoot, paths.ProcessInternalObjectSpecsDir)
+	_ = copyYAMLFiles(workSpecs, dstSpecs)
+
+	workLifecycles := filepath.Join(projectRoot, "packs", "work", "lifecycles")
+	dstLifecycles := filepath.Join(testRoot, paths.ProcessInternalLifecyclesDir)
+	_ = copyYAMLFiles(workLifecycles, dstLifecycles)
+
 	return CopySpecIndexFromProject(testRoot, projectRoot)
 }

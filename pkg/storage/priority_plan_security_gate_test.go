@@ -5,23 +5,12 @@ import (
 	"strings"
 	"testing"
 
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestPriorityPlanSecurityGate_CompleteRefusesNonTerminalChildren(t *testing.T) {
-	testRoot := t.TempDir()
-	fos, err := NewFileObjectStorageForTest(testRoot)
-	if err != nil {
-		t.Fatalf("NewFileObjectStorageForTest: %v", err)
-	}
-	t.Cleanup(func() {
-		opts := TempProjectTeardown(testRoot, fos)
-		_ = RunProjectTestTeardown(opts)
-	})
-
+	_, fos, secCtx := SetupTestingFactoryCompleteTestEnvironmentForTest(t)
 	ctx := context.Background()
-	secCtx := pkgctx.NewSystemSecurityContext()
 
 	// 1. Create priority plan in grooming
 	planID := "PRI-TEST-GATE-001"
@@ -51,7 +40,7 @@ func TestPriorityPlanSecurityGate_CompleteRefusesNonTerminalChildren(t *testing.
 	}
 
 	// 3. Attempt to update plan to complete -> MUST FAIL
-	err = fos.Update(ctx, secCtx, planID, map[string]any{
+	err := fos.Update(ctx, secCtx, planID, map[string]any{
 		objects.FieldKeyStatus: objects.ObjectStatusComplete,
 	})
 	if err == nil {
@@ -77,18 +66,8 @@ func TestPriorityPlanSecurityGate_CompleteRefusesNonTerminalChildren(t *testing.
 }
 
 func TestPriorityPlanSecurityGate_InProgressRefusesNonShovelReadyChildren(t *testing.T) {
-	testRoot := t.TempDir()
-	fos, err := NewFileObjectStorageForTest(testRoot)
-	if err != nil {
-		t.Fatalf("NewFileObjectStorageForTest: %v", err)
-	}
-	t.Cleanup(func() {
-		opts := TempProjectTeardown(testRoot, fos)
-		_ = RunProjectTestTeardown(opts)
-	})
-
+	_, fos, secCtx := SetupTestingFactoryCompleteTestEnvironmentForTest(t)
 	ctx := context.Background()
-	secCtx := pkgctx.NewSystemSecurityContext()
 
 	// 1. Create priority plan in grooming
 	planID := "PRI-TEST-GATE-002"
@@ -118,7 +97,7 @@ func TestPriorityPlanSecurityGate_InProgressRefusesNonShovelReadyChildren(t *tes
 	}
 
 	// 3. Attempt to update plan to in_progress -> MUST FAIL
-	err = fos.Update(ctx, secCtx, planID, map[string]any{
+	err := fos.Update(ctx, secCtx, planID, map[string]any{
 		objects.FieldKeyStatus: objects.ObjectStatusInProgress,
 	})
 	if err == nil {

@@ -11,6 +11,10 @@ Start in **onboarding**.
 | **[First-run object tutorial](./onboarding/FIRST_RUN_OBJECT_TUTORIAL.md)** | Create / get / update a `question` |
 | **[AI Agent Onboarding](./onboarding/AI_AGENT_ONBOARDING.md)** | Directives and workflow discipline for autonomous agents |
 | **[Architecture](./architecture/README.md)** | Core system architecture, Knowledge Kernel, and daemon topology |
+| **[Modular Pack Composition](./architecture/PACK_COMPOSITION_AND_EXTENSIBILITY.md)** | Pack manifests (`pack.yaml`), builder codegen (`bldr_cli_cmd_v1`), and composition root |
+| **[Lifecycle State Machines](./architecture/LIFECYCLE_STATE_MACHINE.md)** | Visual state machines, check-valves, roles, and cryptographic quality gates |
+| **[ZPARQL Query Language](./manual/ZPARQL_QUERY_LANGUAGE.md)** | Pattern and relational query language for Knowledge Kernel graph traversal |
+| **[ZQL Declarative Mutations](./manual/ZQL_MUTATIONS.md)** | Declarative ACID mutations, CAS ingestion, and Write-Ahead Log |
 | **[Contributing](../CONTRIBUTING.md)** | How to work in this tree |
 | **[Governance](../GOVERNANCE.md)** | Open-core boundary, decision-making, publication hold |
 | **[Tutorials](./tutorials/README.md)** | Learn-by-doing (Divio) |

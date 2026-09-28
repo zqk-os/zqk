@@ -314,9 +314,12 @@ func isFieldUnsetMarker(v any) bool {
 	if v == nil {
 		return false
 	}
-	// Support both string marker and any type with FieldUnset tag
-	val := reflect.ValueOf(v)
-	if val.Kind() == reflect.String && (v == "__UNSET__" || v == "UNSET") {
+	// Support both string marker and any sentinel type with Unset in its type name (e.g. storage.fieldUnsetMarker)
+	if val, ok := v.(string); ok && (val == "__UNSET__" || val == "UNSET") {
+		return true
+	}
+	t := reflect.TypeOf(v)
+	if t.Kind() == reflect.Struct && strings.Contains(strings.ToLower(t.Name()), "unset") {
 		return true
 	}
 	return false

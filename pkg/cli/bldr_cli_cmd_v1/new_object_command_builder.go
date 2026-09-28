@@ -40,6 +40,7 @@ func NewNewObjectCommandBuilder() *cobra.Command {
 	builder.AddStringFlag("file", "", "", "Optional: file to read title/description from")
 	builder.AddStringFlag("content", "c", "", "Optional: inline content/body for description")
 	builder.AddBoolFlag("promote", "", false, "Enqueue background object promote after mint (opt-in; often sticks on title-only)")
+	builder.AddBoolFlag("cas", "", false, "Directly materialize the object into CAS storage instead of leaving on draft plane")
 	builder.AddBoolFlag("skip-trace-pipeline", "", false, "Do not auto-run workflow gen-trace-pipeline after minting requirement, goal, or milestone")
 	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
 	cmd := builder.Build()

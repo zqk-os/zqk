@@ -457,11 +457,11 @@ func TestCAS_BucketedStorage_Update(t *testing.T) {
 	}
 
 	// Update the event
-	event[objects.FieldKeyCollectionCount] = 2
-	event[objects.FieldKeyUpdatedAt] = now.Add(1 * time.Hour).Format(time.RFC3339)
-	event[objects.FieldKeyUpdatedBy] = "ACC-SYSTEM"
+	updates := map[string]any{
+		objects.FieldKeyCollectionCount: 2,
+	}
 
-	err = fileStorage.Update(ctx, secCtx, "BAS-001", event)
+	err = fileStorage.Update(ctx, secCtx, "BAS-001", updates)
 	if err != nil {
 		t.Fatalf("Failed to update metrics event: %v", err)
 	}

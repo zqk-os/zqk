@@ -13,6 +13,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/validation/qa"
 )
 
@@ -74,6 +75,11 @@ func runTruthSentinel(cmd *cobra.Command, args []string) error {
 					}
 				}
 				svc.AuditNow(ctx, id, kind)
+			}
+			flushCtx, cancelFlush := storage.DurabilityFlushContext()
+			defer cancelFlush()
+			if flushErr := storage.EnsureCLIObjectMutationVisibleForProvider(flushCtx, proc.Storage(), projectRoot, []string{qa.KindQASuccess}); flushErr != nil {
+				// Log visibility error but don't fail once audit
 			}
 			return cli.WriteOutput(cmd, []byte(fmt.Sprintf(truthSentinelOnceDoneFmt, len(ids))))
 		}

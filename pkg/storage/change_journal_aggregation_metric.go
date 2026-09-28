@@ -10,7 +10,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 func (s *ChangeJournalAggregationService) createAggregationMetricSync(
@@ -50,17 +49,15 @@ func (s *ChangeJournalAggregationService) createAggregationMetricSync(
 
 			if metricID != emptyValue {
 				// Update existing metric instead of creating new one
-				// Remove fields that shouldn't be updated
 				updates := make(map[string]any)
 				for k, v := range metric {
-					// Skip ID and timestamps that should be preserved
-					if k != objects.FieldKeyID && k != objects.FieldKeyCreatedAt && k != objects.FieldKeyCreatedBy {
+					// Skip ID and system provenance fields that are managed by storage
+					if k != objects.FieldKeyID &&
+						k != objects.FieldKeyCreatedAt && k != objects.FieldKeyCreatedBy &&
+						k != objects.FieldKeyUpdatedAt && k != objects.FieldKeyUpdatedBy {
 						updates[k] = v
 					}
 				}
-				// Always update updated_at and updated_by
-				updates[objects.FieldKeyUpdatedAt] = zqktime.NowRFC3339UTC()
-				updates[objects.FieldKeyUpdatedBy] = pkgctx.SystemAccountID
 
 				updateErr := s.storage.Update(ctx, secCtx, metricID, updates)
 				if updateErr != nil {

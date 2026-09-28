@@ -367,7 +367,7 @@ func getDraftPlaneTemplateForKind(kind string) map[string]any {
 			if isDraftPlaneMembraneField(field.Name) || field.Name == objects.FieldKeyKind || field.Name == objects.FieldKeyID || field.Name == objects.FieldKeySchemaVersion {
 				continue
 			}
-			if !field.Required {
+			if !field.Required && (field.Type == "enum" || len(field.EnumValues) > 0) {
 				continue
 			}
 			placeholder := draftFieldPlaceholder(field)
@@ -547,3 +547,4 @@ func (f *FileObjectStorage) deleteObjectDraftPlane(kind, id string) error {
 	_ = fileutil.Remove(filepath.Dir(shardDir))
 	return nil
 }
+
