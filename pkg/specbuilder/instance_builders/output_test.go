@@ -83,17 +83,24 @@ func TestCollectEnumDefinitions_aliasUsesEnumImportBase(t *testing.T) {
 	}
 	owners := map[string]string{"tone": "parent"}
 	packDir := filepath.Join("packs", "work", "instance_builders")
-	defs := collectEnumDefinitions(spec, "widget", owners, nil, EnumImportBase(packDir))
+	defs := collectEnumDefinitions(spec, "widget", owners, nil, packDir)
 	got := aliasImportForField(defs, "tone")
 	want := "github.com/zqk-os/zqk/packs/work/bldr_enum_v1/parent"
 	if got != want {
 		t.Fatalf("pack alias import %q", got)
 	}
-	defs = collectEnumDefinitions(spec, "widget", owners, nil, EnumImportBase(DefaultInstanceBuilderToolDir))
+	defs = collectEnumDefinitions(spec, "widget", owners, nil, DefaultInstanceBuilderToolDir)
 	got = aliasImportForField(defs, "tone")
 	want = "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/parent"
 	if got != want {
 		t.Fatalf("kernel alias import %q", got)
+	}
+	owners = map[string]string{"tone": "account"}
+	defs = collectEnumDefinitions(spec, "widget", owners, nil, packDir)
+	got = aliasImportForField(defs, "tone")
+	want = "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/account"
+	if got != want {
+		t.Fatalf("kernel owner alias import %q", got)
 	}
 }
 
