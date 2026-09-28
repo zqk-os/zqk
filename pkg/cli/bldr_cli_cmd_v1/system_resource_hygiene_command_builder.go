@@ -30,7 +30,7 @@ func NewSystemResourceHygieneCommandBuilder() *cobra.Command {
 	builder.AddBoolFlag("enforce-retention", "", true, "Prune or truncate logs older than max-age or larger than max-size")
 	builder.AddStringFlag("lock-threshold", "", "15m", "Threshold duration for stale locks (e.g. 15m, 1h)")
 	builder.AddStringFlag("temp-threshold", "", "30m", "Threshold duration for orphaned temp files (e.g. 30m, 2h)")
-	builder.AddStringFlag("log-max-age", "", "7d", "Threshold duration for log retention (e.g. 24h, 3d, 7d)")
+	builder.AddStringFlag("log-max-age", "", "48h", "Threshold duration for log retention (e.g. 24h, 48h, 7d)")
 	builder.AddStringFlag("log-max-size", "", "10MB", "Maximum log file size before truncation (e.g. 5MB, 10MB)")
 	builder.AddStringFlag("project-root", "", "", "Project root directory")
 	builder.WithCommonFlagsDefault(cli.AddCommonFlags)

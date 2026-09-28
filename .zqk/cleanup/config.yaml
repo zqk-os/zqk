@@ -10,5 +10,5 @@ steps:
   - type: reap_stale_locks
     older_than: 15m
   - type: enforce_log_retention
-    max_age: 7d
+    max_age: 48h
     max_size_bytes: 10485760

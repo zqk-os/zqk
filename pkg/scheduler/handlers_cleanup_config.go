@@ -319,7 +319,7 @@ func (h *CleanupConfigHandler) runReapTempFiles(workDir string, params map[strin
 
 func (h *CleanupConfigHandler) runEnforceLogRetention(workDir string, params map[string]any) error {
 	maxAgeStr := strParam(params, "max_age")
-	maxAge := 14 * 24 * time.Hour
+	maxAge := 48 * time.Hour
 	if maxAgeStr != emptyValue {
 		if d, err := parseDuration(maxAgeStr); err == nil {
 			maxAge = d

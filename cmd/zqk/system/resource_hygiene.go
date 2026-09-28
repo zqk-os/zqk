@@ -54,7 +54,7 @@ func runResourceHygiene(cmd *cobra.Command, args []string) error {
 		logMaxAgeStr, _ := cmd.Flags().GetString("log-max-age")
 		logMaxSizeStr, _ := cmd.Flags().GetString("log-max-size")
 
-		logMaxAge := 7 * 24 * time.Hour
+		logMaxAge := 48 * time.Hour
 		if logMaxAgeStr != "" {
 			if d, err := config.ParseDuration(logMaxAgeStr); err == nil {
 				logMaxAge = d
