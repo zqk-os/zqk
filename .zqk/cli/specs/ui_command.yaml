@@ -21,6 +21,16 @@ flags:
       type: string
       default: "seismograph"
       description: Initial tab to display (state, audit, swarm, pm, metrics, scheduler)
+    - name: web
+      shorthand: "w"
+      type: bool
+      default: "false"
+      description: Start local web studio HTTP server with interactive DAG visualizer
+    - name: port
+      shorthand: "p"
+      type: int
+      default: "8080"
+      description: Port to listen on for local web studio (default 8080)
 help:
     examples:
         - comment: Launch mission control
