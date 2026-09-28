@@ -178,9 +178,9 @@ func TestWorkflowAddCommand(t *testing.T) {
 			objects.FieldKeyKind:             "milestone",
 			objects.FieldKeyTitle:            "Existing Milestone Test",
 			objects.FieldKeyDescription:      "Verify milestone links",
-			objects.FieldKeyStatus:           objects.ObjectStatusInProgress,
-			objects.FieldKeyPriorityPlanRefs: []any{planID},
-			objects.FieldKeyNamespaceID:      "zqk:kernel",
+			objects.FieldKeyStatus:            objects.ObjectStatusInProgress,
+			objects.FieldKeyRelatedObjectRefs: []any{planID},
+			objects.FieldKeyNamespaceID:       "zqk:kernel",
 		}
 		if err := storageProvider.Create(pkgctx.NewSystemContext(), secCtx, milestone); err != nil {
 			t.Fatalf("failed to create milestone: %v", err)

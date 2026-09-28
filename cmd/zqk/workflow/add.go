@@ -161,7 +161,7 @@ func runAdd(cmd *cobra.Command, args []string) error {
 							"$ne": objects.ObjectStatusArchived,
 						},
 					},
-					Fields: []string{objects.FieldKeyID, objects.FieldKeyStatus, objects.FieldKeyPriorityPlanRef, objects.FieldKeyPriorityPlanRefs},
+					Fields: []string{objects.FieldKeyID, objects.FieldKeyStatus, objects.FieldKeyRelatedObjectRefs, objects.FieldKeyPriorityPlanRef, objects.FieldKeyPriorityPlanRefs},
 				}
 				milestoneList, err := proc.Storage().List(proc.OperationContext(), proc.SecurityContext(), proc.StorageContext(), listFilter)
 				if err == nil {
@@ -327,10 +327,26 @@ func runAdd(cmd *cobra.Command, args []string) error {
 }
 
 // milestoneReferencesPlan reports whether a milestone object links to planID via
-// priority_plan_refs (list) or priority_plan_ref (singular).
+// related_object_refs (list) or legacy priority_plan_refs (list) / priority_plan_ref (singular).
 func milestoneReferencesPlan(mObj map[string]any, planID string) bool {
 	if planID == "" || mObj == nil {
 		return false
+	}
+	if relRaw, ok := mObj[objects.FieldKeyRelatedObjectRefs]; ok && relRaw != nil {
+		switch rels := relRaw.(type) {
+		case []any:
+			for _, r := range rels {
+				if s, ok := r.(string); ok && s == planID {
+					return true
+				}
+			}
+		case []string:
+			for _, s := range rels {
+				if s == planID {
+					return true
+				}
+			}
+		}
 	}
 	if ref, ok := mObj[objects.FieldKeyPriorityPlanRef].(string); ok && ref == planID {
 		return true
@@ -407,9 +423,9 @@ func scaffoldPlanMilestoneGoal(ctx context.Context, proc *cli.Processor, activeO
 		objects.FieldKeyKind:             "milestone",
 		objects.FieldKeyTitle:            fmt.Sprintf("Auto-generated Milestone %d", timestamp),
 		objects.FieldKeyDescription:      "Auto-generated Milestone linking auto plan and goal",
-		objects.FieldKeyStatus:           objects.ObjectStatusNotStarted,
-		objects.FieldKeyPriorityPlanRefs: []any{planID},
-		objects.FieldKeyGoalRefs:         []any{goalID},
+		objects.FieldKeyStatus:            objects.ObjectStatusNotStarted,
+		objects.FieldKeyRelatedObjectRefs: []any{planID},
+		objects.FieldKeyGoalRefs:          []any{goalID},
 		objects.FieldKeyNamespaceID:      "zqk:kernel",
 		objects.FieldKeyCreatedAt:        time.Now().Format(time.RFC3339),
 		objects.FieldKeyCreatedBy:        objects.DefaultSystemAccountID,

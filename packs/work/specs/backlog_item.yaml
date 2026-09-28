@@ -279,36 +279,6 @@ fields:
     type: list
     validation:
       required: false
-  context:
-    access:
-      requires:
-        - access:confidential
-    checklist:
-      authority: owner.
-      automation_hooks: used in reports, justification documents.
-      cardinality: one
-      criticality: association
-      default: none (optional)
-      dependencies: none.
-      observability: "yes"
-      origin_lifecycle: mutable
-      purpose: When/why the idea surfaced (meeting, user feedback, technical debt, etc.).
-      security: non-sensitive
-      system_usage:
-        - context
-        - justification
-        - traceability
-      validation: free text.
-    field_profile_code: BLI-005
-    permissions: rwx
-    semantic_type: statement
-    traits:
-      - readable
-      - writable
-      - modifiable
-    type: text
-    validation:
-      required: false
   convergence_session_profile:
     access:
       requires:
@@ -428,37 +398,6 @@ fields:
     type: date
     validation:
       pattern: ^\d{4}-\d{2}-\d{2}$
-      required: false
-  description:
-    access:
-      requires:
-        - access:confidential
-    checklist:
-      authority: owner.
-      automation_hooks: used in markdown generation, reports.
-      cardinality: one
-      criticality: composition
-      default: none (optional but recommended)
-      dependencies: none.
-      observability: "yes"
-      origin_lifecycle: mutable
-      purpose: Detailed description of the feature or enhancement.
-      security: non-sensitive
-      system_usage:
-        - documentation
-        - planning
-        - communication
-      validation: free text, recommended >= 50 chars.
-    field_profile_code: BLI-006
-    permissions: rwx
-    semantic_type: statement
-    traits:
-      - readable
-      - writable
-      - modifiable
-    type: text
-    validation:
-      min_length: 0
       required: false
   doc_entry_refs:
     access:

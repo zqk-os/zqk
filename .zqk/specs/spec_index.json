@@ -7029,9 +7029,7 @@
           "type": "text",
           "semantic_type": "statement",
           "traits": [
-            "readable",
-            "writable",
-            "modifiable"
+            "field_mutable_group"
           ]
         },
         {
@@ -7138,10 +7136,12 @@
           "type": "text",
           "semantic_type": "statement",
           "traits": [
+            "field_mutable_group",
             "readable",
             "writable",
             "modifiable"
-          ]
+          ],
+          "min_length": 10
         },
         {
           "name": "doc_entry_refs",
@@ -37730,16 +37730,12 @@
           "type": "string",
           "semantic_type": "statement",
           "traits": [
-            "filterable",
-            "listable",
-            "readable",
-            "searchable",
-            "sortable",
-            "writable"
+            "field_queryable_group"
           ],
           "filterable": true,
           "sortable": true,
-          "pattern": "^(PRI-|PRIO-)[A-Za-z0-9][A-Za-z0-9._-]*$"
+          "max_length": 2048,
+          "pattern": "^[A-Z]+-\\d{3,}$"
         },
         {
           "name": "kind",
