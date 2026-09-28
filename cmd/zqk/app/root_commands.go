@@ -23,6 +23,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/intake"
 	"github.com/zqk-os/zqk/cmd/zqk/job"
 	"github.com/zqk-os/zqk/cmd/zqk/kernel"
+	"github.com/zqk-os/zqk/cmd/zqk/kindpack"
 	"github.com/zqk-os/zqk/cmd/zqk/keystore"
 	"github.com/zqk-os/zqk/cmd/zqk/learn"
 	matrixcmd "github.com/zqk-os/zqk/cmd/zqk/matrix"
@@ -301,6 +302,10 @@ func registerCommands() {
 	packCmdInst := packcmd.NewPackCmd()
 	packCmdInst.GroupID = "advanced"
 	rootCmd.AddCommand(packCmdInst)
+
+	kindPackCmd := kindpack.NewKindPackCmd()
+	kindPackCmd.GroupID = "advanced"
+	rootCmd.AddCommand(kindPackCmd)
 
 	// Semantic Intake Pipeline
 	intakeCmdInst := intake.NewIntakeCmd()
