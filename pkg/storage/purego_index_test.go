@@ -230,6 +230,67 @@ func TestPureGoIndexer_IndexProjectDir(t *testing.T) {
 	assert.Equal(t, []string{"MIL-TEST-001"}, node.References["milestone_refs"])
 }
 
+func TestPureGoIndexer_UnindexBidirectionalAndSelfLoopEdges(t *testing.T) {
+	t.Parallel()
+	indexer := storage.NewPureGoIndexer()
+
+	// 1. Bidirectional edges between A and B
+	nodeA := &storage.IndexedNode{
+		ID:     "NODE-A",
+		Kind:   "requirement",
+		Status: "complete",
+		References: map[string][]string{
+			"relates_to": {"NODE-B"},
+		},
+	}
+	nodeB := &storage.IndexedNode{
+		ID:     "NODE-B",
+		Kind:   "requirement",
+		Status: "complete",
+		References: map[string][]string{
+			"relates_to": {"NODE-A"},
+		},
+	}
+	// 2. Self-referential loop on C
+	nodeC := &storage.IndexedNode{
+		ID:     "NODE-C",
+		Kind:   "test_case",
+		Status: "active",
+		References: map[string][]string{
+			"depends_on": {"NODE-C"},
+		},
+	}
+
+	require.NoError(t, indexer.IndexNode(nodeA))
+	require.NoError(t, indexer.IndexNode(nodeB))
+	require.NoError(t, indexer.IndexNode(nodeC))
+
+	// Verify initial edges
+	assert.Equal(t, []string{"NODE-B"}, indexer.GetOutEdges("NODE-A", "relates_to"))
+	assert.Equal(t, []string{"NODE-A"}, indexer.GetInEdges("NODE-B", "relates_to"))
+	assert.Equal(t, []string{"NODE-A"}, indexer.GetOutEdges("NODE-B", "relates_to"))
+	assert.Equal(t, []string{"NODE-B"}, indexer.GetInEdges("NODE-A", "relates_to"))
+	assert.Equal(t, []string{"NODE-C"}, indexer.GetOutEdges("NODE-C", "depends_on"))
+	assert.Equal(t, []string{"NODE-C"}, indexer.GetInEdges("NODE-C", "depends_on"))
+
+	// Unindex Node A (bidirectional edge unindex)
+	require.NoError(t, indexer.RemoveNode("NODE-A"))
+	_, ok := indexer.GetNode("NODE-A")
+	assert.False(t, ok)
+	assert.Empty(t, indexer.GetOutEdges("NODE-A", "relates_to"))
+	assert.Empty(t, indexer.GetInEdges("NODE-B", "relates_to"))
+	// B's out edge still points to A (until re-indexed or B is updated), but B exists
+	_, ok = indexer.GetNode("NODE-B")
+	assert.True(t, ok)
+
+	// Unindex Node C (self-loop edge unindex)
+	require.NoError(t, indexer.RemoveNode("NODE-C"))
+	_, ok = indexer.GetNode("NODE-C")
+	assert.False(t, ok)
+	assert.Empty(t, indexer.GetOutEdges("NODE-C", "depends_on"))
+	assert.Empty(t, indexer.GetInEdges("NODE-C", "depends_on"))
+}
+
 // Satisfies CRIT-STORAGE-PUREGO-EMBEDDED-001:
 // Benchmark verifying pure-Go index lookups outperform sequential YAML scanning by >= 10x
 func BenchmarkPureGoIndex_vs_YAMLScan(b *testing.B) {

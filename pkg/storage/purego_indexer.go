@@ -172,6 +172,12 @@ func (p *PureGoIndexer) unindexNodeLocked(node *IndexedNode) {
 		}
 	}
 
+	// Invariant: Forward and backward edge cleanups must remain strictly sequential.
+	// Forward edge cleanup mutates p.backwardEdges[targetID], while backward edge
+	// cleanup mutates p.forwardEdges[sourceID]. For bidirectional relationships (A <-> B)
+	// or self-referential edges (A -> A), parallelizing edge cleanup causes concurrent map
+	// writes and data corruption. Furthermore, unindexNodeLocked executes under p.mu.Lock(),
+	// where synchronous in-memory map operations are orders of magnitude faster than goroutine dispatch.
 	// Remove forward edges from this node
 	if rels, ok := p.forwardEdges[node.ID]; ok {
 		for rel, targets := range rels {
