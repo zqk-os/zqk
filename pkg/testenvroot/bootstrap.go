@@ -29,6 +29,9 @@ func copyYAMLFilesFromProject(testRoot, projectRoot, relDir string) error {
 	}
 	return filepath.Walk(sourceDir, func(path string, info fileutil.FileInfo, err error) error {
 		if err != nil {
+			if fileutil.IsNotExist(err) {
+				return nil
+			}
 			return err
 		}
 		if info.IsDir() {
@@ -95,6 +98,9 @@ func copyYAMLFiles(sourceDir, targetDir string) error {
 	}
 	return filepath.Walk(sourceDir, func(path string, info fileutil.FileInfo, err error) error {
 		if err != nil {
+			if fileutil.IsNotExist(err) {
+				return nil
+			}
 			return err
 		}
 		if info.IsDir() {

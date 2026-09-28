@@ -22,6 +22,7 @@ func draftPlaneDocEntry(id, title, status string) map[string]any {
 		objects.FieldKeyID:                id,
 		objects.FieldKeyKind:              objects.KindDocEntry,
 		objects.FieldKeyTitle:             title,
+		objects.FieldKeyDescription:       "Draft plane test document description.",
 		objects.FieldKeyStatus:            status,
 		objects.FieldKeyPath:              "docs/" + id + ".md",
 		objects.FieldKeySummary:           "draft plane test",

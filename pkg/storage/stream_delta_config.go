@@ -122,7 +122,7 @@ func builtinMetricDeltaFields() []string {
 		objects.FieldKeyWindowStart, objects.FieldKeyWindowEnd, objects.FieldKeyFirstSeen, objects.FieldKeyLastSeen,
 		objects.FieldKeyAggregationWindowStart, objects.FieldKeyAggregationWindowEnd,
 		ConstStreamAggregatedEntryCount, objects.FieldKeyEventCount, objects.FieldKeyEventTypeCounts, objects.FieldKeyMetricType,
-		objects.FieldKeyTitle, objects.FieldKeySummary,
+		objects.FieldKeyTitle, objects.FieldKeyDescription, objects.FieldKeySummary,
 		objects.FieldKeyCollectionCount,
 		objects.FieldKeySource,
 	}
@@ -132,7 +132,7 @@ func builtinCommandMetricDeltaFields() []string {
 	return []string{
 		objects.FieldKeyID, objects.FieldKeyKind, objects.FieldKeySchemaVersion, objects.FieldKeyStatus,
 		objects.FieldKeyCreatedAt, objects.FieldKeyCreatedBy, objects.FieldKeyUpdatedAt, objects.FieldKeyUpdatedBy,
-		objects.FieldKeyTitle, objects.FieldKeyMetricType, objects.FieldKeyCollectionCount,
+		objects.FieldKeyTitle, objects.FieldKeyDescription, objects.FieldKeyMetricType, objects.FieldKeyCollectionCount,
 		objects.FieldKeyFirstSeen, objects.FieldKeyLastSeen,
 		objects.FieldKeyCommand, objects.FieldKeyNormalizedCmd, objects.FieldKeyInvocationCount,
 		objects.FieldKeySuccessCount, objects.FieldKeyFailureCount, objects.FieldKeyTimeoutCount,
