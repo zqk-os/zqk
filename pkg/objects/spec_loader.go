@@ -378,11 +378,29 @@ func (sl *SpecLoader) ValidateTraitContracts(specs []*Spec) []ValidationError {
 	return allErrors
 }
 
+func (sl *SpecLoader) applicableExtraSpecRoots() []string {
+	all := ExtraSpecRoots()
+	if len(all) == 0 {
+		return nil
+	}
+	mod, err := paths.ModuleRootFromPath(sl.specsDir)
+	if err != nil || mod == "" {
+		return nil
+	}
+	var out []string
+	for _, root := range all {
+		if strings.HasPrefix(root, mod) {
+			out = append(out, root)
+		}
+	}
+	return out
+}
+
 func (sl *SpecLoader) specNameIndex() map[string]string {
 	if sl == nil || sl.specsDir == emptyValue {
 		return nil
 	}
-	roots := ExtraSpecRoots()
+	roots := sl.applicableExtraSpecRoots()
 	idx, _ := sl.specIndex.Load(specIndexKey(sl.specsDir, roots), specIndexStamp(sl.specsDir, roots), func() (map[string]string, error) {
 		return mergeSpecIndexes(sl.specsDir, roots), nil
 	})
