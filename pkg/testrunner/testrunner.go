@@ -425,12 +425,22 @@ func RunTestCase(
 	afterTC, readErr := sp.Read(ctx, secCtx, testCaseID)
 	if readErr == nil && afterTC != nil {
 		afterStatus, _ := afterTC[objects.FieldKeyStatus].(string)
-		result.TestCaseCompleted = (afterStatus == objects.ObjectStatusComplete)
 		if remVal, ok := afterTC[objects.FieldKeyRemainingOpenCount]; ok {
 			if remInt, okInt := remVal.(int); okInt {
 				result.RemainingOpenCount = remInt
 			}
 		}
+		if afterStatus != objects.ObjectStatusComplete && afterStatus != objects.ObjectStatusArchived && result.PassedCriteria == result.TotalCriteria && result.TotalCriteria > 0 && result.RemainingOpenCount == 0 {
+			trustedCtx := pkgctx.WithLifecycleBreakGlass(pkgctx.WithAllowCoreObjectDelete(ctx), "test_runner all criteria passed and remaining count drained")
+			updates := map[string]any{
+				objects.FieldKeyStatus: objects.ObjectStatusComplete,
+			}
+			if uErr := sp.Update(trustedCtx, secCtx, testCaseID, updates); uErr == nil {
+				afterStatus = objects.ObjectStatusComplete
+				afterTC[objects.FieldKeyStatus] = objects.ObjectStatusComplete
+			}
+		}
+		result.TestCaseCompleted = (afterStatus == objects.ObjectStatusComplete)
 	}
 
 	// Check linked requirement and trigger shockwave if completed
