@@ -123,6 +123,7 @@ func TestStreamBacked_Update_WritesStreamCurrent(t *testing.T) {
 	jobID := "CMD-UPDATE-STREAM"
 	job := storage.CreateCleanupTestCommandMetricForTest(jobID, streamBackedTestTime)
 	job[objects.FieldKeyTitle] = "Before update"
+	job[objects.FieldKeyDescription] = "Command metric for testing stream updates."
 	if err := str.Create(ctx, secCtx, job); err != nil {
 		t.Fatalf("Create: %v", err)
 	}

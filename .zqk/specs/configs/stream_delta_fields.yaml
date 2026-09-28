@@ -29,6 +29,7 @@ metric:
   - aggregated_entry_count
   - event_count
   - title
+  - description
   - summary
   - collection_count
   - last_seen
@@ -45,6 +46,7 @@ command_metric:
   - updated_at
   - updated_by
   - title
+  - description
   - metric_type
   - collection_count
   - first_seen

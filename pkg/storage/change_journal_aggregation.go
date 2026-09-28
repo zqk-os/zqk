@@ -216,6 +216,7 @@ func (s *ChangeJournalAggregationService) aggregateEntries(
 	builder.SetID(metricID).
 		SetStatus("completed").
 		SetField(MetricFieldTitle, title).
+		SetField(objects.FieldKeyDescription, fmt.Sprintf("Aggregation metric for %d change journal entries.", len(entries))).
 		SetField(MetricFieldMetricType, StorageMetricTypeSystem).
 		SetField(MetricFieldSource, ChangeJournalAggregationMetricSource).
 		SetField(MetricFieldTags, []string{StorageMetricTagChangeJournal, StorageMetricTagAggregated}).

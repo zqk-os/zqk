@@ -24,7 +24,10 @@ import (
 func TestDocEntryIntegrity_Suite(t *testing.T) {
 	// Subtest 1: CRIT-DOC-INTEGRITY-001
 	t.Run("CRIT-DOC-INTEGRITY-001_SpecDefinition", func(t *testing.T) {
-		specPath := filepath.Join("..", "..", paths.ProcessInternalObjectSpecsDir, "pm", "doc_entry.yaml")
+		specPath := filepath.Join("..", "..", "packs", "library", "specs", "doc_entry.yaml")
+		if _, err := os.Stat(specPath); err != nil {
+			specPath = filepath.Join("..", "..", paths.ProcessInternalObjectSpecsDir, "pm", "doc_entry.yaml")
+		}
 		//nolint:gosec
 		data, err := os.ReadFile(specPath)
 		if err != nil {
@@ -66,7 +69,10 @@ func TestDocEntryIntegrity_Suite(t *testing.T) {
 
 	// Subtest 2: CRIT-DOC-INTEGRITY-002
 	t.Run("CRIT-DOC-INTEGRITY-002_LifecyclePreconditions", func(t *testing.T) {
-		lifecyclePath := filepath.Join("..", "..", paths.ProcessInternalLifecyclesDir, "pm", "doc_entry_lifecycle.yaml")
+		lifecyclePath := filepath.Join("..", "..", "packs", "library", "lifecycles", "doc_entry_lifecycle.yaml")
+		if _, err := os.Stat(lifecyclePath); err != nil {
+			lifecyclePath = filepath.Join("..", "..", paths.ProcessInternalLifecyclesDir, "pm", "doc_entry_lifecycle.yaml")
+		}
 		//nolint:gosec
 		data, err := os.ReadFile(lifecyclePath)
 		if err != nil {

@@ -8,6 +8,7 @@
 - [ ] `./bin/zqk system check` clean for the change surface
 - [ ] `sh scripts/open-core/test-public-release-gates.sh` (same suite as Community CI)
 - [ ] Process data under `.zqk/process/` went through `./bin/zqk` (no hand-edited hash YAML)
+- [ ] Commit message signed off (`git commit -s`) per Developer Certificate of Origin (DCO)
 
 ## Publication
 

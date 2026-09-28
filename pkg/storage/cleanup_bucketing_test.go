@@ -50,6 +50,7 @@ func createCleanupTestCommandMetric(id string, createdAt time.Time) map[string]a
 		objects.FieldKeyID:                      id,
 		objects.FieldKeyKind:                    objects.KindCommandMetric,
 		objects.FieldKeyTitle:                   "Test Command Metric " + id,
+		objects.FieldKeyDescription:             "Test command metric description for testing.",
 		objects.FieldKeyCreatedAt:               createdAt.Format(time.RFC3339),
 		objects.FieldKeyStatus:                  objects.ObjectStatusImplemented,
 		objects.FieldKeyMetricType:              "command",
