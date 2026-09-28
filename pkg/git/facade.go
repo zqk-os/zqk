@@ -287,3 +287,37 @@ func (f *Facade) ForEachRef(ctx context.Context, format string, pattern string) 
 	}
 	return result, nil
 }
+
+// FindCommitHashesByGrep searches commit history for commits matching the given grep patterns.
+func (f *Facade) FindCommitHashesByGrep(ctx context.Context, maxCount int, patterns ...string) ([]string, error) {
+	if len(patterns) == 0 {
+		return nil, nil
+	}
+	if maxCount <= 0 {
+		maxCount = 10
+	}
+	args := []string{"log", "-n", strconv.Itoa(maxCount), "--format=%H"}
+	for _, p := range patterns {
+		trimmed := strings.TrimSpace(p)
+		if trimmed != "" {
+			args = append(args, "--grep="+trimmed)
+		}
+	}
+	cmd := execwrap.CommandContext(ctx, gitCommandName, args...)
+	if f != nil && f.repoPath != "" {
+		cmd.Dir = f.repoPath
+	}
+	out, err := cmd.Output()
+	if err != nil {
+		return nil, errfmt.Errorf(`git log grep (%s): %w`, strings.TrimSpace(string(out)), err)
+	}
+	lines := strings.Split(strings.TrimSpace(string(out)), "\n")
+	var result []string
+	for _, l := range lines {
+		h := strings.TrimSpace(l)
+		if h != "" {
+			result = append(result, h)
+		}
+	}
+	return result, nil
+}
