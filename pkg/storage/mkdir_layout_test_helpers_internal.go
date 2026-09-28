@@ -6,6 +6,8 @@ package storage
 import (
 	"testing"
 
+	_ "github.com/zqk-os/zqk/packs/work/bldr_v2"
+	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2"
 	"github.com/zqk-os/zqk/pkg/testenvroot"
 )
 

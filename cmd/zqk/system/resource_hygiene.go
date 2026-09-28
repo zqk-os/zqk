@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/config"
 	"github.com/zqk-os/zqk/pkg/diskusage"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -50,6 +51,23 @@ func runResourceHygiene(cmd *cobra.Command, args []string) error {
 			return errfmt.Errorf("project root required")
 		}
 
+		logMaxAgeStr, _ := cmd.Flags().GetString("log-max-age")
+		logMaxSizeStr, _ := cmd.Flags().GetString("log-max-size")
+
+		logMaxAge := 7 * 24 * time.Hour
+		if logMaxAgeStr != "" {
+			if d, err := config.ParseDuration(logMaxAgeStr); err == nil {
+				logMaxAge = d
+			}
+		}
+
+		logMaxSize := int64(10 * 1024 * 1024)
+		if logMaxSizeStr != "" {
+			if sz, err := diskusage.ParseSize(logMaxSizeStr); err == nil {
+				logMaxSize = sz
+			}
+		}
+
 		opts := resourcehygiene.HygieneOptions{
 			ReapLocks:        reapLocks,
 			ReapTemp:         reapTemp,
@@ -57,8 +75,8 @@ func runResourceHygiene(cmd *cobra.Command, args []string) error {
 			DryRun:           dryRun,
 			LockThreshold:    lockThreshold,
 			TempThreshold:    tempThreshold,
-			LogMaxAge:        14 * 24 * time.Hour,
-			LogMaxSize:       10 * 1024 * 1024,
+			LogMaxAge:        logMaxAge,
+			LogMaxSize:       logMaxSize,
 		}
 
 		report, err := resourcehygiene.ExecuteHygiene(root, opts)

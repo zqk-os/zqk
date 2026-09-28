@@ -1,30 +1,30 @@
 {
   "project_root": "/Users/lanceettl/zqk-public-candidate",
   "bundle_name": "trace-pipeline-gen",
-  "target_object_id": "REQ-QA-NO-DATA-DISTINCTION",
+  "target_object_id": "REQ-ADAPTIVE-TASK-SUPERVISION-001",
   "target_kind": "requirement",
-  "target_title": "Differentiate [no data] from [no failures] in QA Auditor and Invariant Gates",
+  "target_title": "Agnostic Adaptive Task Supervision, Failure Delta Illumination, and Idempotent Envelope Deduplication",
   "target_pre_existed": true,
   "linked_existing_ids": [
-    "REQ-QA-NO-DATA-DISTINCTION"
+    "REQ-ADAPTIVE-TASK-SUPERVISION-001"
   ],
-  "linkage_note": "Target requirement REQ-QA-NO-DATA-DISTINCTION pre-existed in Knowledge Kernel. Successfully linked 3 criteria (CRIT-1790566507927638000-374a31de, CRIT-1790566507927639000-f6d793a9, CRIT-1790566507927640000-d759f7d0), 1 test case (TST-1790566507927638001-ae96c84d), and 1 backlog item (BLI-1790566507927638000-3f86d335) to it.",
+  "linkage_note": "Target requirement REQ-ADAPTIVE-TASK-SUPERVISION-001 pre-existed in Knowledge Kernel. Successfully linked 3 criteria (CRIT-1790602421435754000-caff01c3, CRIT-1790602421435755000-19c9265e, CRIT-1790602421435756000-e4dad377), 1 test case (TST-1790602421435754001-4cd06745), and 1 backlog item (BLI-1790602421435754000-c3ba0a8b) to it.",
   "created_criteria_ids": [
-    "CRIT-1790566507927638000-374a31de",
-    "CRIT-1790566507927639000-f6d793a9",
-    "CRIT-1790566507927640000-d759f7d0"
+    "CRIT-1790602421435754000-caff01c3",
+    "CRIT-1790602421435755000-19c9265e",
+    "CRIT-1790602421435756000-e4dad377"
   ],
   "created_backlog_item_ids": [
-    "BLI-1790566507927638000-3f86d335"
+    "BLI-1790602421435754000-c3ba0a8b"
   ],
   "created_test_case_ids": [
-    "TST-1790566507927638001-ae96c84d"
+    "TST-1790602421435754001-4cd06745"
   ],
   "hint_to_id": {
-    "BLI-1790566507927638000-3f86d335": "BLI-1790566507927638000-3f86d335",
-    "CRIT-1790566507927638000-374a31de": "CRIT-1790566507927638000-374a31de",
-    "CRIT-1790566507927639000-f6d793a9": "CRIT-1790566507927639000-f6d793a9",
-    "CRIT-1790566507927640000-d759f7d0": "CRIT-1790566507927640000-d759f7d0",
-    "TST-1790566507927638001-ae96c84d": "TST-1790566507927638001-ae96c84d"
+    "BLI-1790602421435754000-c3ba0a8b": "BLI-1790602421435754000-c3ba0a8b",
+    "CRIT-1790602421435754000-caff01c3": "CRIT-1790602421435754000-caff01c3",
+    "CRIT-1790602421435755000-19c9265e": "CRIT-1790602421435755000-19c9265e",
+    "CRIT-1790602421435756000-e4dad377": "CRIT-1790602421435756000-e4dad377",
+    "TST-1790602421435754001-4cd06745": "TST-1790602421435754001-4cd06745"
   }
 }

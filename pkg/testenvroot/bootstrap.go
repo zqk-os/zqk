@@ -103,5 +103,8 @@ func BootstrapRoot(testRoot, projectRoot string) error {
 	if err := copyYAMLFilesFromProject(testRoot, projectRoot, paths.ProcessInternalDir); err != nil {
 		return err
 	}
+	if err := copyYAMLFilesFromProject(testRoot, projectRoot, "packs"); err != nil {
+		return err
+	}
 	return CopySpecIndexFromProject(testRoot, projectRoot)
 }
