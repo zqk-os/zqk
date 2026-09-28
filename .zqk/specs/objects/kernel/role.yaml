@@ -6,34 +6,6 @@ description: 'Defines roles/authorities in the system (executive, owner, automat
 traits:
   - base_object_traits
 fields:
-  description:
-    access:
-      requires:
-        - access:confidential
-        - role:admin
-    checklist:
-      authority: owner/admin.
-      automation_hooks: none.
-      cardinality: one
-      criticality: composition
-      default: required
-      dependencies: onboarding.
-      observability: "yes"
-      origin_lifecycle: mutable
-      purpose: Explains responsibilities/influence.
-      security: non-sensitive
-      system_usage:
-        - documentation
-      validation: markdown.
-    field_profile_code: RLE-002
-    permissions: rwx
-    semantic_type: statement
-    traits:
-      - field_mutable_group
-    type: text
-    validation:
-      pattern: ^.+$
-      required: true
   influence_level:
     access:
       requires:

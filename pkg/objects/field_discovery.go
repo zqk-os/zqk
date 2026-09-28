@@ -224,11 +224,24 @@ func (fr *FieldRegistry) readFields() (fieldRegistrySnapshot, error) {
 					if !ok {
 						continue
 					}
-					fieldInfo := fr.extractFieldInfo(fieldName, fieldDefMap, kind, false)
-					specializedFieldsMap[fieldName] = fieldInfo
+					declaredLocally := false
+					if spec.Fields != nil {
+						_, declaredLocally = spec.Fields[fieldName]
+					}
+					if declaredLocally {
+						fieldInfo := fr.extractFieldInfo(fieldName, fieldDefMap, kind, false)
+						specializedFieldsMap[fieldName] = fieldInfo
+					} else {
+						fieldInfo := fr.extractFieldInfo(fieldName, fieldDefMap, kind, true)
+						kindFields.CommonFields = append(kindFields.CommonFields, fieldInfo)
+					}
 				}
 			}
 		}
+
+		sort.Slice(kindFields.CommonFields, func(i, j int) bool {
+			return kindFields.CommonFields[i].Name < kindFields.CommonFields[j].Name
+		})
 
 		// Convert specialized fields to sorted slice
 		kindFields.SpecializedFields = make([]FieldInfo, 0, len(specializedFieldsMap))

@@ -32,35 +32,6 @@ fields:
     type: string
     validation:
       required: false
-  description:
-    access:
-      requires:
-        - access:confidential
-    checklist:
-      authority: architect/owner.
-      automation_hooks: used in prompt builders for domain context.
-      cardinality: one
-      criticality: association
-      default: none
-      dependencies: none.
-      observability: "yes"
-      origin_lifecycle: mutable
-      purpose: Architectural explanation and context of the implementation approach.
-      security: non-sensitive
-      system_usage:
-        - documentation
-        - context layering
-      validation: markdown.
-    field_profile_code: TSP-002
-    permissions: rwx
-    semantic_type: statement
-    traits:
-      - readable
-      - writable
-      - modifiable
-    type: text
-    validation:
-      required: true
   requirement_refs:
     access:
       requires:
