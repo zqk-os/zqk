@@ -5,7 +5,7 @@ package milestone
 
 import (
 	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
-	work_unitenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/work_unit"
+	work_unitenum "github.com/zqk-os/zqk/packs/work/bldr_enum_v1/work_unit"
 )
 
 type Plane = base_objectenum.Plane
