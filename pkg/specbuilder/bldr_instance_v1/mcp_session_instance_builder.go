@@ -21,7 +21,7 @@ type McpSessionInstanceBuilder struct {
 func NewMcpSessionInstanceBuilder(schemaVersion string) *McpSessionInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("mcp_session")
+	fieldOrder := instance_builders.FieldOrderFromSpec("mcp_session")
 
 	// Create base builder
 	builder := &McpSessionInstanceBuilder{
@@ -398,8 +398,4 @@ func (b *McpSessionInstanceBuilder) Version(value int) *McpSessionInstanceBuilde
 // SetVersion is a compatibility alias for Version.
 func (b *McpSessionInstanceBuilder) SetVersion(value int) *McpSessionInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewMcpSessionInstanceBuilder(objects.DefaultSchemaVersion))
 }

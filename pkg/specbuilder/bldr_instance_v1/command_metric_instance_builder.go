@@ -21,7 +21,7 @@ type CommandMetricInstanceBuilder struct {
 func NewCommandMetricInstanceBuilder(schemaVersion string) *CommandMetricInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("command_metric")
+	fieldOrder := instance_builders.FieldOrderFromSpec("command_metric")
 
 	// Create base builder
 	builder := &CommandMetricInstanceBuilder{
@@ -607,8 +607,4 @@ func (b *CommandMetricInstanceBuilder) WindowStart(value string) *CommandMetricI
 // SetWindowStart is a compatibility alias for WindowStart.
 func (b *CommandMetricInstanceBuilder) SetWindowStart(value string) *CommandMetricInstanceBuilder {
 	return b.WindowStart(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewCommandMetricInstanceBuilder(objects.DefaultSchemaVersion))
 }

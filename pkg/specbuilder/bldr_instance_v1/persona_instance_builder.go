@@ -21,7 +21,7 @@ type PersonaInstanceBuilder struct {
 func NewPersonaInstanceBuilder(schemaVersion string) *PersonaInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("persona")
+	fieldOrder := instance_builders.FieldOrderFromSpec("persona")
 
 	// Create base builder
 	builder := &PersonaInstanceBuilder{
@@ -398,8 +398,4 @@ func (b *PersonaInstanceBuilder) VocabularySchemeRefs(value []string) *PersonaIn
 // SetVocabularySchemeRefs is a compatibility alias for VocabularySchemeRefs.
 func (b *PersonaInstanceBuilder) SetVocabularySchemeRefs(value []string) *PersonaInstanceBuilder {
 	return b.VocabularySchemeRefs(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewPersonaInstanceBuilder(objects.DefaultSchemaVersion))
 }

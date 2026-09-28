@@ -21,7 +21,7 @@ type StatusHistoryMetricSamplerInstanceBuilder struct {
 func NewStatusHistoryMetricSamplerInstanceBuilder(schemaVersion string) *StatusHistoryMetricSamplerInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("status_history_metric_sampler")
+	fieldOrder := instance_builders.FieldOrderFromSpec("status_history_metric_sampler")
 
 	// Create base builder
 	builder := &StatusHistoryMetricSamplerInstanceBuilder{
@@ -409,8 +409,4 @@ func (b *StatusHistoryMetricSamplerInstanceBuilder) Version(value int) *StatusHi
 // SetVersion is a compatibility alias for Version.
 func (b *StatusHistoryMetricSamplerInstanceBuilder) SetVersion(value int) *StatusHistoryMetricSamplerInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewStatusHistoryMetricSamplerInstanceBuilder(objects.DefaultSchemaVersion))
 }

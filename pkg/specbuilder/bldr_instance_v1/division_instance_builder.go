@@ -21,7 +21,7 @@ type DivisionInstanceBuilder struct {
 func NewDivisionInstanceBuilder(schemaVersion string) *DivisionInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("division")
+	fieldOrder := instance_builders.FieldOrderFromSpec("division")
 
 	// Create base builder
 	builder := &DivisionInstanceBuilder{
@@ -398,8 +398,4 @@ func (b *DivisionInstanceBuilder) Version(value int) *DivisionInstanceBuilder {
 // SetVersion is a compatibility alias for Version.
 func (b *DivisionInstanceBuilder) SetVersion(value int) *DivisionInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewDivisionInstanceBuilder(objects.DefaultSchemaVersion))
 }

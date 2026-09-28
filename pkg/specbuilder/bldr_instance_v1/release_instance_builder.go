@@ -21,7 +21,7 @@ type ReleaseInstanceBuilder struct {
 func NewReleaseInstanceBuilder(schemaVersion string) *ReleaseInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("release")
+	fieldOrder := instance_builders.FieldOrderFromSpec("release")
 
 	// Create base builder
 	builder := &ReleaseInstanceBuilder{
@@ -387,8 +387,4 @@ func (b *ReleaseInstanceBuilder) Version(value string) *ReleaseInstanceBuilder {
 // SetVersion is a compatibility alias for Version.
 func (b *ReleaseInstanceBuilder) SetVersion(value string) *ReleaseInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewReleaseInstanceBuilder(objects.DefaultSchemaVersion))
 }

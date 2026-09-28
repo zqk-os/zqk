@@ -21,7 +21,7 @@ type IntegrityManifestInstanceBuilder struct {
 func NewIntegrityManifestInstanceBuilder(schemaVersion string) *IntegrityManifestInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("integrity_manifest")
+	fieldOrder := instance_builders.FieldOrderFromSpec("integrity_manifest")
 
 	// Create base builder
 	builder := &IntegrityManifestInstanceBuilder{
@@ -354,8 +354,4 @@ func (b *IntegrityManifestInstanceBuilder) Version(value int) *IntegrityManifest
 // SetVersion is a compatibility alias for Version.
 func (b *IntegrityManifestInstanceBuilder) SetVersion(value int) *IntegrityManifestInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewIntegrityManifestInstanceBuilder(objects.DefaultSchemaVersion))
 }

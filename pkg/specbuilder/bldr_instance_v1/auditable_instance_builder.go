@@ -21,7 +21,7 @@ type AuditableInstanceBuilder struct {
 func NewAuditableInstanceBuilder(schemaVersion string) *AuditableInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("auditable")
+	fieldOrder := instance_builders.FieldOrderFromSpec("auditable")
 
 	// Create base builder
 	builder := &AuditableInstanceBuilder{
@@ -112,8 +112,4 @@ func (b *AuditableInstanceBuilder) Provenance(value map[string]any) *AuditableIn
 // SetProvenance is a compatibility alias for Provenance.
 func (b *AuditableInstanceBuilder) SetProvenance(value map[string]any) *AuditableInstanceBuilder {
 	return b.Provenance(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewAuditableInstanceBuilder(objects.DefaultSchemaVersion))
 }

@@ -21,7 +21,7 @@ type ExtensibleObjectInstanceBuilder struct {
 func NewExtensibleObjectInstanceBuilder(schemaVersion string) *ExtensibleObjectInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("extensible_object")
+	fieldOrder := instance_builders.FieldOrderFromSpec("extensible_object")
 
 	// Create base builder
 	builder := &ExtensibleObjectInstanceBuilder{
@@ -365,8 +365,4 @@ func (b *ExtensibleObjectInstanceBuilder) Version(value int) *ExtensibleObjectIn
 // SetVersion is a compatibility alias for Version.
 func (b *ExtensibleObjectInstanceBuilder) SetVersion(value int) *ExtensibleObjectInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewExtensibleObjectInstanceBuilder(objects.DefaultSchemaVersion))
 }

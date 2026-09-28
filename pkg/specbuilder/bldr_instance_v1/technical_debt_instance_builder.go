@@ -21,7 +21,7 @@ type TechnicalDebtInstanceBuilder struct {
 func NewTechnicalDebtInstanceBuilder(schemaVersion string) *TechnicalDebtInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("technical_debt")
+	fieldOrder := instance_builders.FieldOrderFromSpec("technical_debt")
 
 	// Create base builder
 	builder := &TechnicalDebtInstanceBuilder{
@@ -497,8 +497,4 @@ func (b *TechnicalDebtInstanceBuilder) Version(value int) *TechnicalDebtInstance
 // SetVersion is a compatibility alias for Version.
 func (b *TechnicalDebtInstanceBuilder) SetVersion(value int) *TechnicalDebtInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewTechnicalDebtInstanceBuilder(objects.DefaultSchemaVersion))
 }

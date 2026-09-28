@@ -21,7 +21,7 @@ type CodeReferenceInstanceBuilder struct {
 func NewCodeReferenceInstanceBuilder(schemaVersion string) *CodeReferenceInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("code_reference")
+	fieldOrder := instance_builders.FieldOrderFromSpec("code_reference")
 
 	// Create base builder
 	builder := &CodeReferenceInstanceBuilder{
@@ -508,8 +508,4 @@ func (b *CodeReferenceInstanceBuilder) WorkstreamRefs(value []string) *CodeRefer
 // SetWorkstreamRefs is a compatibility alias for WorkstreamRefs.
 func (b *CodeReferenceInstanceBuilder) SetWorkstreamRefs(value []string) *CodeReferenceInstanceBuilder {
 	return b.WorkstreamRefs(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewCodeReferenceInstanceBuilder(objects.DefaultSchemaVersion))
 }

@@ -21,7 +21,7 @@ type ShockwaveRouterInstanceBuilder struct {
 func NewShockwaveRouterInstanceBuilder(schemaVersion string) *ShockwaveRouterInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("shockwave_router")
+	fieldOrder := instance_builders.FieldOrderFromSpec("shockwave_router")
 
 	// Create base builder
 	builder := &ShockwaveRouterInstanceBuilder{
@@ -354,8 +354,4 @@ func (b *ShockwaveRouterInstanceBuilder) Version(value int) *ShockwaveRouterInst
 // SetVersion is a compatibility alias for Version.
 func (b *ShockwaveRouterInstanceBuilder) SetVersion(value int) *ShockwaveRouterInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewShockwaveRouterInstanceBuilder(objects.DefaultSchemaVersion))
 }

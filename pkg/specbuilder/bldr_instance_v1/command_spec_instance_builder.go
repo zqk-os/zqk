@@ -21,7 +21,7 @@ type CommandSpecInstanceBuilder struct {
 func NewCommandSpecInstanceBuilder(schemaVersion string) *CommandSpecInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("command_spec")
+	fieldOrder := instance_builders.FieldOrderFromSpec("command_spec")
 
 	// Create base builder
 	builder := &CommandSpecInstanceBuilder{
@@ -376,8 +376,4 @@ func (b *CommandSpecInstanceBuilder) Version(value int) *CommandSpecInstanceBuil
 // SetVersion is a compatibility alias for Version.
 func (b *CommandSpecInstanceBuilder) SetVersion(value int) *CommandSpecInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewCommandSpecInstanceBuilder(objects.DefaultSchemaVersion))
 }

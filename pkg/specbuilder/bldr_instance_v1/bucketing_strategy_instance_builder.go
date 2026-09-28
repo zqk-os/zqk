@@ -21,7 +21,7 @@ type BucketingStrategyInstanceBuilder struct {
 func NewBucketingStrategyInstanceBuilder(schemaVersion string) *BucketingStrategyInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("bucketing_strategy")
+	fieldOrder := instance_builders.FieldOrderFromSpec("bucketing_strategy")
 
 	// Create base builder
 	builder := &BucketingStrategyInstanceBuilder{
@@ -189,8 +189,4 @@ func (b *BucketingStrategyInstanceBuilder) StrategyType(value any) *BucketingStr
 // SetStrategyType is a compatibility alias for StrategyType.
 func (b *BucketingStrategyInstanceBuilder) SetStrategyType(value any) *BucketingStrategyInstanceBuilder {
 	return b.StrategyType(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewBucketingStrategyInstanceBuilder(objects.DefaultSchemaVersion))
 }

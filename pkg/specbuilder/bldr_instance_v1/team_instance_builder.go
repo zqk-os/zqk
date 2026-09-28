@@ -21,7 +21,7 @@ type TeamInstanceBuilder struct {
 func NewTeamInstanceBuilder(schemaVersion string) *TeamInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("team")
+	fieldOrder := instance_builders.FieldOrderFromSpec("team")
 
 	// Create base builder
 	builder := &TeamInstanceBuilder{
@@ -420,8 +420,4 @@ func (b *TeamInstanceBuilder) WorkstreamRefs(value []string) *TeamInstanceBuilde
 // SetWorkstreamRefs is a compatibility alias for WorkstreamRefs.
 func (b *TeamInstanceBuilder) SetWorkstreamRefs(value []string) *TeamInstanceBuilder {
 	return b.WorkstreamRefs(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewTeamInstanceBuilder(objects.DefaultSchemaVersion))
 }

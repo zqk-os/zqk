@@ -21,7 +21,7 @@ type ImportTrackingInstanceBuilder struct {
 func NewImportTrackingInstanceBuilder(schemaVersion string) *ImportTrackingInstanceBuilder {
 	// Derive canonical field order from spec (follows architecture pattern)
 	// System fields first, then spec-defined fields in sorted order
-	fieldOrder := buildFieldOrderFromSpec("import_tracking")
+	fieldOrder := instance_builders.FieldOrderFromSpec("import_tracking")
 
 	// Create base builder
 	builder := &ImportTrackingInstanceBuilder{
@@ -354,8 +354,4 @@ func (b *ImportTrackingInstanceBuilder) Version(value int) *ImportTrackingInstan
 // SetVersion is a compatibility alias for Version.
 func (b *ImportTrackingInstanceBuilder) SetVersion(value int) *ImportTrackingInstanceBuilder {
 	return b.Version(value)
-}
-
-func init() {
-	instance_builders.RegisterBuilder(NewImportTrackingInstanceBuilder(objects.DefaultSchemaVersion))
 }
