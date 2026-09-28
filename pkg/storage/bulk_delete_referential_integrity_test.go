@@ -12,8 +12,10 @@
 package storage
 
 import (
+	"fmt"
 	"strings"
 	"testing"
+	"time"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -43,8 +45,9 @@ func bulkDeleteRefIntegrityFixture(t *testing.T) (f *FileObjectStorage, referenc
 	ctx := WithCLIOperation(pkgctx.NewSystemContext())
 	secCtx := pkgctx.NewSystemSecurityContext()
 
-	referenced = "CRIT-REFINT-001"
-	referrer = "BLI-REFINT-001"
+	suffix := fmt.Sprintf("%d", time.Now().UnixNano())
+	referenced = "CRIT-REFINT-" + suffix
+	referrer = "BLI-REFINT-" + suffix
 
 	if err := f.Create(ctx, secCtx, map[string]any{
 		objects.FieldKeyID:          referenced,

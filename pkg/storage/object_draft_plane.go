@@ -548,17 +548,3 @@ func (f *FileObjectStorage) deleteObjectDraftPlane(kind, id string) error {
 	return nil
 }
 
-// DeleteObjectDraftFile removes a draft-plane file and cleans up empty shard dirs.
-func DeleteObjectDraftFile(projectRoot, kind, id string) error {
-	if projectRoot == emptyValue || kind == emptyValue || id == emptyValue {
-		return nil
-	}
-	path := ObjectDraftPlanePath(projectRoot, kind, id)
-	if err := fileutil.Remove(path); err != nil && !fileutil.IsNotExist(err) {
-		return errfmt.Newf("object draft plane: delete %s", id).Wrap(err)
-	}
-	shardDir := filepath.Dir(path)
-	_ = fileutil.Remove(shardDir)
-	_ = fileutil.Remove(filepath.Dir(shardDir))
-	return nil
-}
