@@ -540,8 +540,14 @@ func runWhatsNextSyncSweep(cmd *cobra.Command, args []string, proc *cli.Processo
 		}
 	}
 
-	// Materialized View: Probe zero-cost projection and trigger async background recovery if disrupted
-	if lite, _ := whatsnext.GetOrRecoverPayload(ctx, sp, projectRoot, whatsnext.DefaultStalenessTolerance); lite != nil {
+	// Materialized View: Synchronously rebuild and persist zero-cost projection
+	rebuildView := whatsnext.NewWhatsNextMaterializedView(projectRoot)
+	if err := rebuildView.ScanFromStorageWithSecurity(ctx, sp, secCtx); err == nil {
+		_ = rebuildView.SaveToLiteFile()
+		out.MaterializedViewStale = false
+		out.MaterializedViewRecovering = false
+		out.MaterializedViewDegradedReason = ""
+	} else if lite, _ := whatsnext.GetOrRecoverPayload(ctx, sp, projectRoot, whatsnext.DefaultStalenessTolerance); lite != nil {
 		out.MaterializedViewStale = lite.Stale
 		out.MaterializedViewRecovering = lite.Recovering
 		out.MaterializedViewDegradedReason = lite.DegradedReason
