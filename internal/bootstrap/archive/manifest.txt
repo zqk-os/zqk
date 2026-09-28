@@ -142,6 +142,9 @@
 ./cli_specs/kernel/steward/sweep_command.yaml
 ./cli_specs/kernel/steward_command.yaml
 ./cli_specs/kernel_command.yaml
+./cli_specs/kind_pack/
+./cli_specs/kind_pack/install_command.yaml
+./cli_specs/kind_pack_command.yaml
 ./cli_specs/mcp/
 ./cli_specs/mcp/ensure_command.yaml
 ./cli_specs/mcp/supervise_command.yaml
