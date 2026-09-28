@@ -102,6 +102,8 @@ type ServiceStatus struct {
 }
 
 // ServiceAdapter represents the pluggable host/vendor OS contract for service management.
+// It establishes a zero-coupling interface and DTO specification with zero internal
+// kernel dependencies, allowing seamless extraction and multi-platform host adaptation.
 // Implementations exist for Darwin (launchd), Linux (systemd), and process supervisors.
 type ServiceAdapter interface {
 	// Name returns the identifier of this adapter (e.g., "launchd", "systemd", "supervisor").
