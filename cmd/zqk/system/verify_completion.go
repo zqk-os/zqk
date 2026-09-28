@@ -1,6 +1,7 @@
 package system
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
@@ -14,6 +15,7 @@ import (
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/kernel/verification"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -36,6 +38,9 @@ func NewVerifyCompletionCmd() *cobra.Command {
 		Short: "Verify cryptographic completion",
 		Args:  cobra.ExactArgs(1),
 	})
+
+	cmd.Flags().Bool("organizer", false, "Execute composite execution organizer for multi-criteria test verification")
+	cmd.Flags().String("topology", "sequential", "Execution topology mode for organizer (sequential, concurrent, hybrid_dag)")
 
 	cli.BindAsyncProgress(cmd, func(cmd *cobra.Command, args []string) error {
 		return runVerifyCompletion(cmd, args[0])
@@ -110,6 +115,13 @@ func verifyTestCase(cmd *cobra.Command, proc *cli.Processor, obj map[string]any,
 
 	if actualHash != expectedHash {
 		return errfmt.Errorf("verification failed for test_case %s: expected hash %s, actual hash %s", objectID, expectedHash, actualHash)
+	}
+
+	useOrganizer, _ := cmd.Flags().GetBool("organizer")
+	if useOrganizer {
+		if err := verifyTestCaseWithOrganizer(cmd, proc, obj, objectID); err != nil {
+			return err
+		}
 	}
 
 	_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("Successfully verified test_case %s.\n", objectID)))
@@ -218,3 +230,78 @@ func verifyBacklogItem(cmd *cobra.Command, proc *cli.Processor, obj map[string]a
 	_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("Successfully verified backlog_item %s.\n", objectID)))
 	return nil
 }
+
+// ExecuteVerificationTopology executes the supplied execution organizer via verification.Engine,
+// supporting sequential, concurrent, and hybrid DAG dispatch topologies with panic isolation.
+func ExecuteVerificationTopology(ctx context.Context, org *verification.ExecutionOrganizer) (*verification.VerificationReport, error) {
+	engine := verification.NewEngine()
+	return engine.Execute(ctx, org)
+}
+
+func verifyTestCaseWithOrganizer(cmd *cobra.Command, proc *cli.Processor, obj map[string]any, objectID string) error {
+	topoModeStr, _ := cmd.Flags().GetString("topology")
+	var mode verification.TopologyMode
+	switch topoModeStr {
+	case "concurrent":
+		mode = verification.TopologyConcurrent
+	case "hybrid_dag":
+		mode = verification.TopologyHybridDAG
+	default:
+		mode = verification.TopologySequential
+	}
+
+	var criteriaIDs []string
+	if raw, ok := obj[objects.FieldKeyCriteriaRefs].([]string); ok {
+		criteriaIDs = raw
+	} else if raw, ok := obj[objects.FieldKeyCriteriaRefs].([]any); ok {
+		for _, item := range raw {
+			if s, ok := item.(string); ok {
+				criteriaIDs = append(criteriaIDs, s)
+			}
+		}
+	}
+
+	stages := make([]verification.VerificationStage, 0, len(criteriaIDs))
+	for _, critID := range criteriaIDs {
+		cID := critID
+		stage := verification.VerificationStage{
+			ID:       cID,
+			Category: verification.CategoryOperationalProof,
+			Verify: func(ctx context.Context) error {
+				critObj, err := proc.Storage().Read(ctx, proc.SecurityContext(), cID)
+				if err != nil {
+					return fmt.Errorf("criteria %s not found: %w", cID, err)
+				}
+				if simPanic, _ := critObj["simulate_panic"].(bool); simPanic {
+					panic(fmt.Sprintf("simulated verification stage panic for %s", cID))
+				}
+				return nil
+			},
+		}
+		stages = append(stages, stage)
+	}
+
+	org := &verification.ExecutionOrganizer{
+		TestCaseID: objectID,
+		Mode:       mode,
+		Stages:     stages,
+	}
+
+	report, err := ExecuteVerificationTopology(proc.OperationContext(), org)
+	if err != nil {
+		return errfmt.Newf("verification topology execution failed for test_case %s", objectID).Wrap(err)
+	}
+
+	if report.PanicsCaught > 0 {
+		_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("Verification Organizer isolated %d stage panic(s).\n", report.PanicsCaught)))
+	}
+
+	if !report.Passed {
+		return errfmt.Errorf("composite verification failed for test_case %s in mode %s", objectID, report.Mode)
+	}
+
+	_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("Successfully verified composite organizer for test_case %s (mode: %s, stages: %d, panics_caught: %d, duration: %v).\n",
+		objectID, report.Mode, len(report.StageResults), report.PanicsCaught, report.TotalDuration)))
+	return nil
+}
+
