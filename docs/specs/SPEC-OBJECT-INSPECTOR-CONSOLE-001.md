@@ -147,11 +147,54 @@ Evaluates `proc.SecurityContext()` against the target object to present authoriz
 
 ## 5. Live Policy Rule Studio (`--policy-studio`)
 
-### 5.1 Concept & Workflow
+### 5.1 Concept & 3-Stage Governance Lifecycle
 
-Writing validation policies in raw YAML is error-prone. The **Policy Rule Studio** turns policy creation and testing into an interactive, fail-closed IDE experience.
+Writing validation policies in raw YAML is error-prone and risks introducing breaking constraints that deadlock active agent workstreams. The **Policy Rule Studio** turns policy creation, dry-run evaluation, and atomic promotion into an interactive, fail-closed IDE experience.
 
-#### Visual Terminal Screenshot: Policy Rule Studio
+The Studio implements a strict 3-stage governance lifecycle:
+
+```
+┌───────────────────────────┐      ┌───────────────────────────┐      ┌───────────────────────────┐
+│          STAGE 1          │      │          STAGE 2          │      │          STAGE 3          │
+│  Interactive DSL Creation │ ───► │   Live Dry-Run Audit      │ ───► │    Atomic CAS Promotion   │
+│  & Schema Autocomplete    │      │ Across Active Population  │      │  & Pre-Commit Enforcement │
+└───────────────────────────┘      └───────────────────────────┘      └───────────────────────────┘
+```
+
+1. **Stage 1 (Creation & Autocomplete)**: Operators draft declarative rule expressions using the ISO/IEC 14977 Validation Rule DSL. Contextual autocompletion introspects the schema registry in real time to suggest valid attributes, predicates, and enums.
+2. **Stage 2 (Dry-Run Audit Matrix)**: Before any policy is written to disk, the engine evaluates the expression in-memory against 100% of existing objects in the repository, calculating population compliance percentages and illuminating exact violation deltas.
+3. **Stage 3 (Atomic CAS Promotion & Gate Registration)**: Once validated, the policy is cryptographically hashed, written into CAS storage (`.zqk/process/policy/`), and automatically bound to git pre-commit check-valves and the ZQL mutation membrane.
+
+---
+
+### 5.2 Stage 1: Interactive Rule Creation & DSL Autocompletion
+
+Operators launch the creation modal via `zqk object inspect --policy-studio` or by pressing <kbd>p</kbd> from within the Object Inspector scoreboard.
+
+#### Visual Terminal Screenshot: Interactive Rule Creation & Autocomplete
+
+![Interactive Rule Creation & Autocomplete](../manual/screenshots/ui_policy_studio_create.svg)
+
+#### Datapoint Breakdown & Operator Guidance
+
+| Datapoint / Component | Visual Format | Semantic Meaning | Why It Is Useful & Operational Purpose |
+| :--- | :--- | :--- | :--- |
+| **Rule ID Field** | Cyan tag (`[POL-MUTATION-002]`) | Unique policy identifier | Canonical object ID under which the policy rule is indexed in `.zqk/process/policy/`. |
+| **Target Kind Selector** | Green badge (`[backlog_item]`) | Schema kind evaluated by this rule | Binds DSL field autocompletion to the exact attribute definitions of this kind. Press <kbd>Tab</kbd> to cycle. |
+| **Severity Tier** | Red badge (`[ERROR / REJECT]`) | Enforcement severity classification | Dictates check-valve behavior: `ERROR` rejects non-compliant mutations; `WARN` logs audit telemetry without blocking. |
+| **Expression Prompt** | Cyan prompt with yellow cursor (`█`) | Active editing prompt for Validation DSL | Real-time declarative boolean invariant (e.g. `status == "in_progress" ==> claimed_by != "" && criteria_linked`). |
+| **Autocomplete Popup** | Floating bordered menu with active row (`▶`) | Schema-driven token suggestions | Dynamically introspects `FieldRegistry` to suggest attributes, predicates, and enums as the operator types. |
+| **Predicate Annotations** | Dim helper text with return types | Inline documentation for selected token | Explains semantics and type signature (e.g. `criteria_linked_or_acceptance_present() -> boolean`). |
+| **Syntax & Type Receipt** | Green status check (`✓ SYNTAX: OK`) | Compile-time static type receipt | Confirms ISO/IEC 14977 grammar compliance and $O(1)$ bounded termination proof before execution. |
+| **Action Hotkeys** | Keycap menu (`[Enter] Accept`, `[t] Dry-Run`, `[s] Save`) | Available keyboard accelerator bindings | Enables rapid, seamless keyboard-only DSL composition without switching to an external editor. |
+
+---
+
+### 5.3 Stage 2: Live Population Dry-Run Evaluation Matrix
+
+Pressing <kbd>t</kbd> triggers an instant, zero-cost dry-run evaluation across all repository entities matching the target kind.
+
+#### Visual Terminal Screenshot: Dry-Run Evaluation Matrix
 
 ![Policy Rule Studio](../manual/screenshots/ui_policy_studio.svg)
 
@@ -159,17 +202,40 @@ Writing validation policies in raw YAML is error-prone. The **Policy Rule Studio
 
 | Datapoint / Component | Visual Format | Semantic Meaning | Why It Is Useful & Operational Purpose |
 | :--- | :--- | :--- | :--- |
-| **Header Banner** | Double-line cyan box (`╔...╗`) | Policy Studio subsystem identifier | Confirms active governance and DSL editing environment. |
-| **Target Kind** | White badge (`[backlog_item]`) | Schema kind evaluated by the active rule | Binds DSL field autocompletion to the exact attribute definitions of this kind. |
-| **Active Rules** | Yellow count pill (`3 loaded`) | Number of active policies registered for this kind | Indicates existing governance coverage. |
-| **Evaluation Mode** | Green badge (`[DRY-RUN]`) | Execution safety plane | Confirms evaluations execute in memory across CAS live projections without mutating disk state. |
-| **Expression DSL** | Cyan prompt & formatted expression string | Live boolean predicate condition | Declarative governance invariant (e.g. `status == "in_progress" && claimed_by != ""`). |
-| **Autocomplete Bar** | Dim & highlighted tokens (`[claimed_by]`, `priority_plan_ref`, etc.) | Context-aware schema attributes and enums | Press <kbd>Tab</kbd> to insert valid field names discovered from the kind's schema specification. |
-| **Evaluation Matrix** | Summary metrics (`194 / 196 objects COMPLIANT (99.0%)`) | Real-time population compliance rate | Immediate visual proof of policy impact across the entire repository. |
-| **Violation Triage** | Red bulleted list (`✗ 2 objects VIOLATE RULE:`) | Specific entity IDs and descriptive failure reasons | Identifies non-compliant entities (e.g. `BLI-AUTH-004`, `BLI-UI-012`) needing operator remediation. |
-| **Action Hotkeys** | Keyboard shortcuts (`[c] Edit`, `[t] Dry-Run`, `[s] Save`, `[Esc] Return`) | Interactive studio control commands | Enables rapid test-driven policy iteration and certified promotion to `.zqk/process/policy/`. |
+| **Header Banner** | Double-line cyan box (`╔...╗`) | Subsystem banner and console context | Confirms active governance and DSL editing environment. |
+| **Active Rule Counter** | Yellow count pill (`3 loaded`) | Active rules registered for this kind | Indicates existing governance coverage for the target kind. |
+| **Evaluation Mode** | Green badge (`[DRY-RUN]`) | In-memory execution safety plane | Confirms evaluations execute in memory across CAS live projections without mutating disk state. |
+| **Expression DSL** | Formatted string with highlighted tokens | Active boolean predicate condition | Declarative governance invariant under evaluation across the repository. |
+| **Compliance Scoreboard** | Green summary metric (`194 / 196 (99.0%)`) | Real-time population compliance rate | Immediate visual proof of policy impact across the entire repository. |
+| **Violation Triage** | Red bulleted list (`✗ 2 objects VIOLATE`) | Specific entity IDs and failure explanations | Identifies non-compliant entities (e.g. `BLI-AUTH-004`, `BLI-UI-012`) requiring operator remediation. |
+| **Failure Diagnostics** | Dim contextual failure reason | Missing attribute or invariant mismatch | Pinpoints exact causes (e.g. `status is 'in_progress' but 'claimed_by' is empty`). |
+| **Action Hotkeys** | Keycap menu (`[c] Edit`, `[t] Dry-Run`, `[s] Save`) | Interactive studio control commands | Enables rapid test-driven policy iteration and promotion. |
 
-### 5.2 Autocompletion Engine
+---
+
+### 5.4 Stage 3: Atomic Policy Save, CAS Promotion & Gate Enforcement
+
+Once the operator confirms that the dry-run results are sound, pressing <kbd>s</kbd> brings up the **Save & Promotion Confirmation Dialog**. Saving commits the policy to CAS storage and binds it to the system check-valves.
+
+#### Visual Terminal Screenshot: Save & Atomic CAS Promotion Receipt
+
+![Save & Atomic CAS Promotion Receipt](../manual/screenshots/ui_policy_studio_save.svg)
+
+#### Datapoint Breakdown & Operator Guidance
+
+| Datapoint / Component | Visual Format | Semantic Meaning | Why It Is Useful & Operational Purpose |
+| :--- | :--- | :--- | :--- |
+| **Policy Specification** | Structured metadata panel | Canonical rule ID, kind, and severity | Final audit confirmation of the policy's operational parameters before disk serialization. |
+| **Target Storage Path** | File path (`.zqk/process/policy/*.yaml`) | File-plane destination path | Verifies that the rule adheres to the canonical Declarative Policy Schema v1 layout. |
+| **Pre-Commit Audit Receipt** | Green metric with grandfathering pill | Population safety certification | Confirms enforcement mode: existing non-compliant items are grandfathered until their next state transition. |
+| **CAS Content Hash** | Hex SHA-256 digest (`sha256:7f4a2b9...`) | Cryptographic content-addressed hash | Guarantees tamper-evident immutability and CAS provenance in the authoritative storage plane. |
+| **Gate Binding Status** | Green checkmark with hook details | Active enforcement hooks | Confirms immediate registration with git pre-commit hooks, ZQL mutation membranes, and `zqk do` check-valves. |
+| **Audit Log Reference** | Path to audit event (`AUD-POL-002-INIT`) | Traceable audit trail object | Records who authored the policy, timestamp, and evaluation receipt into the append-only audit stream. |
+| **Post-Commit Hotkeys** | Keycap menu (`[Enter] Inspect`, `[l] List All`) | Post-save navigation accelerators | Allows immediate inspection of the minted policy node in the Object Inspector or return to the main console. |
+
+---
+
+### 5.5 Autocompletion Engine, Standard Library & Complexity Guarantees
 
 The autocompletion engine inspects `objects.GetGlobalFieldRegistry()` dynamically:
 
@@ -178,7 +244,11 @@ The autocompletion engine inspects `objects.GetGlobalFieldRegistry()` dynamicall
   - `status` suggests `["draft", "planned", "in_progress", "complete", "blocked"]`.
   - `priority_tier` suggests `["P0", "P1", "P2", "P3"]`.
 - **Operator Selection**: Suggests valid comparison and membership operators (`==`, `!=`, `>`, `<`, `in`, `matches_regex`, `all_satisfied`).
-- **In-Memory Validation**: Uses `pkg/when` and the Validation Rule DSL engine to evaluate rules against active kernel objects in memory without mutating repository state.
+- **Standard Predicate Library**: Exposes built-in pure functions:
+  - `criteria_linked_or_acceptance_present()`: Confirms at least one DoD criteria node is bound.
+  - `tests_ok_per_customization()`: Validates that all associated test cases pass.
+  - `security_gate_ok_or_na()`: Evaluates required security credentials and role scopes.
+- **Purity & Termination Guarantees**: All expressions are restricted to ISO/IEC 14977 non-looping, side-effect-free predicates, guaranteeing deterministic $O(1)$ evaluation complexity per object.
 
 ---
 
