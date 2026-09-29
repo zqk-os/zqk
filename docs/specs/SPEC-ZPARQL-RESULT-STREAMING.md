@@ -20,6 +20,23 @@ This specification formalizes:
 
 The result envelope is segmented into three sequential frames:
 
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Producer as Traversal Engine (Producer)
+    participant Channel as Bounded Buffer (C_cap)
+    participant Consumer as Client / Agent (Consumer)
+
+    Producer->>Consumer: HeaderFrame {query_hash, columns, types}
+    loop For each chunk (batch size B)
+        Producer->>Channel: ChunkFrame {seq: i, records: [...]}
+        Channel-->>Consumer: Stream chunk with backpressure
+        Note over Producer,Consumer: Memory bounded at O(C_cap * B) = O(1)
+    end
+    Producer->>Consumer: TrailerFrame {total_records, checksum, end_token: "EOS_FINALIZED"}
+    Consumer->>Consumer: Verify integrity & record count (fail-closed)
+```
+
 ### 2.1 Header Frame
 The initial frame describes query metadata, projection column definitions, and data types:
 ```json
