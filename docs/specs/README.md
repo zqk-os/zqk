@@ -15,6 +15,9 @@ This directory contains formal engineering and architectural specifications for 
 - **[ZQL Preflight Validation](./SPEC-ZQL-PREFLIGHT-VALIDATION.md)**: Pre-commit schema checks, policy compliance verifications, and fail-closed gate evaluation.
 - **[ZQL Transaction Execution](./SPEC-ZQL-TRANSACTION-EXECUTION.md)**: Two-phase commit protocol, atomic WAL logging, rollback mechanics, and crash-resilient CAS updates.
 
+### Validation & Policy Rule DSL
+- **[Validation Rule DSL Grammar](./SPEC-VALIDATION-RULE-DSL-GRAMMAR.md)**: Formal ISO/IEC 14977 EBNF grammar, AST JSON Schema (Draft 2020-12), type checking semantics, built-in predicate catalog, and Policy Rule Studio integration.
+
 ### Interactive Tools & Consoles
 - **[Object Inspector Console (SPEC-OBJECT-INSPECTOR-CONSOLE-001)](./SPEC-OBJECT-INSPECTOR-CONSOLE-001.md)**: Interactive terminal user interface (TUI) architecture, radar graphs, Policy Studio integration, and role-gated action palette.
 
