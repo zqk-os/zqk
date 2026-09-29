@@ -12,6 +12,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // NewAgentOnboardCmd wires system agent-onboard (Vector A/B first-contact sync).
