@@ -301,10 +301,42 @@ def render_markdown_to_html(content: str, current_html_rel: str, link_map: dict,
     
     if HAS_MARKDOWN:
         try:
+            # 1. Mask fenced code blocks and inline code to avoid false math matching
+            code_tokens = []
+            def _save_code(m):
+                token = f"ZZZCODETOKEN{len(code_tokens)}ZZZ"
+                code_tokens.append(m.group(0))
+                return token
+
+            text_masked = re.sub(r'```[\s\S]*?```', _save_code, transformed)
+            text_masked = re.sub(r'`[^`\n]+`', _save_code, text_masked)
+
+            # 2. Protect display and inline math from markdown emphasis/italics mangling
+            math_tokens = []
+            def _save_math(m):
+                token = f"ZZZMATHTOKEN{len(math_tokens)}ZZZ"
+                math_tokens.append(m.group(0))
+                return token
+
+            # Display math ($$...$$)
+            text_masked = re.sub(r'\$\$([\s\S]*?)\$\$', _save_math, text_masked)
+            # Inline math ($...$) - ensuring non-empty and non-whitespace bounded
+            text_masked = re.sub(r'(?<!\$)\$(?!\$)([^\s$](?:[^\n$]*?[^\s$])?)(?<!\$)\$(?!\$)', _save_math, text_masked)
+
+            # 3. Restore code blocks before markdown processing so fenced blocks are properly converted
+            for idx, code_str in enumerate(code_tokens):
+                text_masked = text_masked.replace(f"ZZZCODETOKEN{idx}ZZZ", code_str)
+
             rendered = markdown.markdown(
-                transformed,
+                text_masked,
                 extensions=['fenced_code', 'tables', 'toc', 'sane_lists']
             )
+
+            # 4. Restore math blocks and sanitize any toc heading IDs
+            for idx, math_str in enumerate(math_tokens):
+                slug = re.sub(r'[^a-zA-Z0-9]+', '', math_str).lower() or 'math'
+                rendered = re.sub(rf'(id="[^"]*?)zzzmathtoken{idx}zzz([^"]*?")', rf'\1{slug}\2', rendered)
+                rendered = rendered.replace(f"ZZZMATHTOKEN{idx}ZZZ", math_str)
             # Transform fenced mermaid code blocks to <pre class="mermaid">
             # markdown fenced_code generates: <pre><code class="language-mermaid">...</code></pre>
             def _mermaid_replacer(match):
@@ -1355,16 +1387,21 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="initKaTeX()"></script>
   <script>
+    let katexRendered = false;
     function initKaTeX() {{
+      if (katexRendered) return;
       if (typeof renderMathInElement === 'function') {{
         renderMathInElement(document.body, {{
           delimiters: [
             {{left: '$$', right: '$$', display: true}},
-            {{left: '$', right: '$', display: false}}
+            {{left: '$', right: '$', display: false}},
+            {{left: '\\(', right: '\\)', display: false}},
+            {{left: '\\[', right: '\\]', display: true}}
           ],
           ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
           throwOnError: false
         }});
+        katexRendered = true;
       }}
     }}
     if (document.readyState === 'loading') {{
@@ -1500,16 +1537,21 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="initKaTeX()"></script>
   <script>
+    let katexRendered = false;
     function initKaTeX() {{
+      if (katexRendered) return;
       if (typeof renderMathInElement === 'function') {{
         renderMathInElement(document.body, {{
           delimiters: [
             {{left: '$$', right: '$$', display: true}},
-            {{left: '$', right: '$', display: false}}
+            {{left: '$', right: '$', display: false}},
+            {{left: '\\(', right: '\\)', display: false}},
+            {{left: '\\[', right: '\\]', display: true}}
           ],
           ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
           throwOnError: false
         }});
+        katexRendered = true;
       }}
     }}
     if (document.readyState === 'loading') {{
