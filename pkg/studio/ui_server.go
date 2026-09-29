@@ -916,8 +916,8 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
 
       <!-- Density Filter -->
       <select id="density-filter" class="select-input" onchange="onDensityChange()" title="Control Graph Density">
-        <option value="backbone" selected>Backbone (Plans & Milestones)</option>
-        <option value="execution">Execution (+ Backlog Items)</option>
+        <option value="backbone">Backbone (Plans & Milestones)</option>
+        <option value="execution" selected>Execution (+ Backlog Items)</option>
         <option value="all">Full Mesh (All Objects)</option>
       </select>
 
@@ -1035,7 +1035,7 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
     let focusedNodeId = null; // Causal subgraph focus
     let activeKindFilter = 'all';
     let activeWorkstreamFilter = 'all';
-    let activeDensity = 'backbone'; // 'backbone', 'execution', 'all'
+    let activeDensity = 'execution'; // 'backbone', 'execution', 'all'
     let currentMainView = 'dag'; // 'dag' or 'gantt'
     let searchQuery = '';
 
@@ -1071,11 +1071,15 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
         maxY = Math.max(maxY, p.y + p.height);
       });
       const rect = svg.getBoundingClientRect();
+      if (!rect || rect.width <= 0 || rect.height <= 0) return;
       const contentW = maxX - minX + 80;
       const contentH = maxY - minY + 80;
       scale = Math.min(rect.width / contentW, rect.height / contentH, 1.2);
+      if (!isFinite(scale) || scale <= 0) scale = 1.0;
       translateX = (rect.width - contentW * scale) / 2 - minX * scale + 40 * scale;
       translateY = (rect.height - contentH * scale) / 2 - minY * scale + 40 * scale;
+      if (!isFinite(translateX)) translateX = 40;
+      if (!isFinite(translateY)) translateY = 40;
       updateTransform();
     }
 
@@ -1086,6 +1090,12 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       panStartX = e.clientX - translateX;
       panStartY = e.clientY - translateY;
       svg.classList.add('grabbing');
+    });
+
+    svg.addEventListener('dblclick', (e) => {
+      if (e.target.closest('.node-group')) return;
+      clearFocus();
+      resetZoom();
     });
 
     window.addEventListener('mousemove', (e) => {
@@ -1269,12 +1279,52 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
         if (!graphData.nodes) graphData.nodes = [];
         if (!graphData.edges) graphData.edges = [];
 
+        // Propagate workstream associations downstream along DAG edges
+        const wsMap = new Map();
+        graphData.nodes.forEach(n => {
+          if (n.kind === 'workstream') {
+            if (!wsMap.has(n.id)) wsMap.set(n.id, new Set());
+            wsMap.get(n.id).add(n.id);
+          }
+          if (n.workstreamRefs) {
+            if (!wsMap.has(n.id)) wsMap.set(n.id, new Set());
+            n.workstreamRefs.forEach(w => wsMap.get(n.id).add(w));
+          }
+        });
+        const outgoing = new Map();
+        graphData.edges.forEach(e => {
+          if (!outgoing.has(e.source)) outgoing.set(e.source, []);
+          outgoing.get(e.source).push(e.target);
+        });
+        let changed = true;
+        let iters = 0;
+        while (changed && iters < 12) {
+          changed = false;
+          iters++;
+          wsMap.forEach((wsSet, sourceId) => {
+            const targets = outgoing.get(sourceId) || [];
+            targets.forEach(targetId => {
+              if (!wsMap.has(targetId)) wsMap.set(targetId, new Set());
+              const targetSet = wsMap.get(targetId);
+              const prevSize = targetSet.size;
+              wsSet.forEach(w => targetSet.add(w));
+              if (targetSet.size > prevSize) changed = true;
+            });
+          });
+        }
+        graphData.nodes.forEach(n => {
+          if (wsMap.has(n.id) && wsMap.get(n.id).size > 0) {
+            n.workstreamRefs = Array.from(wsMap.get(n.id));
+          }
+        });
+
         populateWorkstreamsDropdown();
         applyFilters();
 
         if (graphData.nodes.length > 0 && !selectedNodeId) {
           selectNode(graphData.nodes[0].id, false);
         }
+        setTimeout(() => fitGraph(), 100);
       } catch (err) {
         console.error('Failed to load DAG', err);
       }
@@ -1592,23 +1642,27 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
 
     function renderObjectsList() {
       const container = document.getElementById('objects-list-container');
+      container.innerHTML = '';
       if (filteredNodes.length === 0) {
         container.innerHTML = '<div style="padding: 24px; color: var(--text-muted); text-align: center;">No matching objects.</div>';
         return;
       }
 
-      container.innerHTML = filteredNodes.map(n => {
+      filteredNodes.forEach(n => {
         const isSel = n.id === selectedNodeId;
         const kindClass = 'kind-' + n.kind;
-        return '<div class="node-card' + (isSel ? ' selected' : '') + '" onclick="selectNode('' + n.id + '', true)">' +
+        const card = document.createElement('div');
+        card.className = 'node-card' + (isSel ? ' selected' : '');
+        card.innerHTML =
           '<div class="node-card-top">' +
             '<span class="kind-pill ' + kindClass + '">' + n.kind.replace('_', ' ') + '</span>' +
             '<span class="status-pill-mini">' + (n.status || '') + '</span>' +
           '</div>' +
           '<div class="node-card-id">' + n.id + '</div>' +
-          '<div class="node-card-title">' + (n.title || '') + '</div>' +
-        '</div>';
-      }).join('');
+          '<div class="node-card-title">' + (n.title || '') + '</div>';
+        card.addEventListener('click', () => selectNode(n.id, true));
+        container.appendChild(card);
+      });
     }
 
     async function selectNode(nodeId, panTo) {
@@ -1644,37 +1698,93 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
 
     function renderInspector(node) {
       const inspector = document.getElementById('inspector-content');
+      inspector.innerHTML = '';
       const kindClass = 'kind-' + (node.kind || 'default');
 
-      let refsHTML = '';
+      const header = document.createElement('div');
+      header.className = 'inspector-header';
+
+      const topRow = document.createElement('div');
+      topRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center;';
+      topRow.innerHTML =
+        '<span class="kind-pill ' + kindClass + '">' + (node.kind || 'object').replace('_', ' ') + '</span>' +
+        '<span class="status-pill-mini">' + (node.status || '') + '</span>';
+
+      const idRow = document.createElement('div');
+      idRow.className = 'inspector-id-row';
+      const idSpan = document.createElement('span');
+      idSpan.className = 'inspector-id';
+      idSpan.textContent = node.id;
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'btn btn-sm';
+      copyBtn.textContent = 'Copy';
+      copyBtn.addEventListener('click', () => navigator.clipboard.writeText(node.id));
+      idRow.appendChild(idSpan);
+      idRow.appendChild(copyBtn);
+
+      header.appendChild(topRow);
+      header.appendChild(idRow);
+
+      if (node.title) {
+        const titleDiv = document.createElement('div');
+        titleDiv.className = 'inspector-title';
+        titleDiv.textContent = node.title;
+        header.appendChild(titleDiv);
+      }
+
+      const actions = document.createElement('div');
+      actions.className = 'inspector-actions';
+      const focusBtn = document.createElement('button');
+      focusBtn.className = 'btn btn-sm btn-accent';
+      focusBtn.textContent = '🎯 Focus Subgraph';
+      focusBtn.addEventListener('click', () => {
+        focusNode(node.id);
+        switchMainView('dag');
+      });
+      actions.appendChild(focusBtn);
+
+      if (focusedNodeId) {
+        const clearBtn = document.createElement('button');
+        clearBtn.className = 'btn btn-sm';
+        clearBtn.textContent = '✕ Show All';
+        clearBtn.addEventListener('click', () => clearFocus());
+        actions.appendChild(clearBtn);
+      }
+      header.appendChild(actions);
+      inspector.appendChild(header);
+
       if (node.references && Object.keys(node.references).length > 0) {
         for (const [rel, targets] of Object.entries(node.references)) {
-          refsHTML += '<div class="section-title">' + rel.replace('_', ' ') + '</div><div>';
+          if (!Array.isArray(targets) || targets.length === 0) continue;
+          const sectionTitle = document.createElement('div');
+          sectionTitle.className = 'section-title';
+          sectionTitle.textContent = rel.replace('_', ' ');
+          inspector.appendChild(sectionTitle);
+
+          const chipsDiv = document.createElement('div');
           targets.forEach(targetId => {
-            refsHTML += '<span class="ref-chip" onclick="selectNode('' + targetId + '', true); focusNode('' + targetId + '');">↗ ' + targetId + '</span>';
+            const chip = document.createElement('span');
+            chip.className = 'ref-chip';
+            chip.textContent = '↗ ' + targetId;
+            chip.addEventListener('click', () => {
+              selectNode(targetId, true);
+              focusNode(targetId);
+            });
+            chipsDiv.appendChild(chip);
           });
-          refsHTML += '</div>';
+          inspector.appendChild(chipsDiv);
         }
       }
 
-      inspector.innerHTML =
-        '<div class="inspector-header">' +
-          '<div style="display: flex; justify-content: space-between; align-items: center;">' +
-            '<span class="kind-pill ' + kindClass + '">' + (node.kind || 'object').replace('_', ' ') + '</span>' +
-            '<span class="status-pill-mini">' + (node.status || '') + '</span>' +
-          '</div>' +
-          '<div class="inspector-id-row">' +
-            '<span class="inspector-id">' + node.id + '</span>' +
-            '<button class="btn btn-sm" onclick="navigator.clipboard.writeText('' + node.id + '')">Copy</button>' +
-          '</div>' +
-          (node.title ? '<div class="inspector-title">' + node.title + '</div>' : '') +
-          '<div class="inspector-actions">' +
-            '<button class="btn btn-sm btn-accent" onclick="focusNode('' + node.id + ''); switchMainView('dag');">🎯 Focus Subgraph</button>' +
-          '</div>' +
-        '</div>' +
-        refsHTML +
-        '<div class="section-title">Attributes</div>' +
-        '<div class="code-box">' + JSON.stringify(node.attributes || node, null, 2) + '</div>';
+      const attrTitle = document.createElement('div');
+      attrTitle.className = 'section-title';
+      attrTitle.textContent = 'Attributes';
+      inspector.appendChild(attrTitle);
+
+      const codeBox = document.createElement('div');
+      codeBox.className = 'code-box';
+      codeBox.textContent = JSON.stringify(node.attributes || node, null, 2);
+      inspector.appendChild(codeBox);
     }
 
     // Initial Load
