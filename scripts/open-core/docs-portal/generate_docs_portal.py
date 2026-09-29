@@ -351,7 +351,7 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
   <script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
     mermaid.initialize({{
-      startOnLoad: true,
+      startOnLoad: false,
       securityLevel: 'loose',
       theme: 'dark',
       themeVariables: {{
@@ -365,6 +365,36 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
         tertiaryColor: '#0d1117'
       }}
     }});
+
+    async function initMermaid() {{
+      document.querySelectorAll('pre code.language-mermaid').forEach(el => {{
+        const pre = el.parentElement;
+        pre.className = 'mermaid';
+        pre.textContent = el.textContent;
+      }});
+      document.querySelectorAll('.mermaid').forEach(el => {{
+        if (el.querySelector('br')) {{
+          let raw = '';
+          el.childNodes.forEach(n => {{
+            if (n.nodeType === 3) raw += n.nodeValue;
+            else if (n.nodeName === 'BR') raw += '<br/>';
+            else raw += n.textContent;
+          }});
+          el.textContent = raw;
+        }}
+      }});
+      try {{
+        await mermaid.run({{ querySelector: '.mermaid' }});
+      }} catch (err) {{
+        console.warn('Mermaid rendering:', err);
+      }}
+    }}
+
+    if (document.readyState === 'loading') {{
+      document.addEventListener('DOMContentLoaded', initMermaid);
+    }} else {{
+      initMermaid();
+    }}
   </script>
 </head>
 <body data-root-rel="{root_rel}">
@@ -400,15 +430,6 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
     </article>
   </main>
   <script src="{root_rel}search/search-index.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {{
-      document.querySelectorAll('pre code.language-mermaid').forEach(el => {{
-        const pre = el.parentElement;
-        pre.className = 'mermaid';
-        pre.textContent = el.textContent;
-      }});
-    }});
-  </script>
 </body>
 </html>
 """
@@ -449,7 +470,7 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
   <script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
     mermaid.initialize({{
-      startOnLoad: true,
+      startOnLoad: false,
       securityLevel: 'loose',
       theme: 'dark',
       themeVariables: {{
@@ -463,6 +484,36 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
         tertiaryColor: '#0d1117'
       }}
     }});
+
+    async function initMermaid() {{
+      document.querySelectorAll('pre code.language-mermaid').forEach(el => {{
+        const pre = el.parentElement;
+        pre.className = 'mermaid';
+        pre.textContent = el.textContent;
+      }});
+      document.querySelectorAll('.mermaid').forEach(el => {{
+        if (el.querySelector('br')) {{
+          let raw = '';
+          el.childNodes.forEach(n => {{
+            if (n.nodeType === 3) raw += n.nodeValue;
+            else if (n.nodeName === 'BR') raw += '<br/>';
+            else raw += n.textContent;
+          }});
+          el.textContent = raw;
+        }}
+      }});
+      try {{
+        await mermaid.run({{ querySelector: '.mermaid' }});
+      }} catch (err) {{
+        console.warn('Mermaid rendering:', err);
+      }}
+    }}
+
+    if (document.readyState === 'loading') {{
+      document.addEventListener('DOMContentLoaded', initMermaid);
+    }} else {{
+      initMermaid();
+    }}
   </script>
 </head>
 <body data-root-rel="">

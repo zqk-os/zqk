@@ -164,16 +164,16 @@ echo "  🔍 Verifying checksum manifest integrity"
 # Generate Homebrew tap formula
 echo ""
 echo "  🍺 Generating Homebrew formula"
-DARWIN_ARM64_SHA="$(grep "darwin_arm64.tar.gz" "${DIST_DIR}/checksums.txt" | awk '{print $1}')"
-DARWIN_AMD64_SHA="$(grep "darwin_amd64.tar.gz" "${DIST_DIR}/checksums.txt" | awk '{print $1}')"
-LINUX_ARM64_SHA="$(grep "linux_arm64.tar.gz" "${DIST_DIR}/checksums.txt" | awk '{print $1}')"
-LINUX_AMD64_SHA="$(grep "linux_amd64.tar.gz" "${DIST_DIR}/checksums.txt" | awk '{print $1}')"
+DARWIN_ARM64_SHA="$(grep -F "zqk-community_${VER_NUM}_darwin_arm64.tar.gz" "${DIST_DIR}/checksums.txt" | awk '{print $1}' | head -n 1)"
+DARWIN_AMD64_SHA="$(grep -F "zqk-community_${VER_NUM}_darwin_amd64.tar.gz" "${DIST_DIR}/checksums.txt" | awk '{print $1}' | head -n 1)"
+LINUX_ARM64_SHA="$(grep -F "zqk-community_${VER_NUM}_linux_arm64.tar.gz" "${DIST_DIR}/checksums.txt" | awk '{print $1}' | head -n 1)"
+LINUX_AMD64_SHA="$(grep -F "zqk-community_${VER_NUM}_linux_amd64.tar.gz" "${DIST_DIR}/checksums.txt" | awk '{print $1}' | head -n 1)"
 
 mkdir -p "${DIST_DIR}/Formula"
 cat <<EOF > "${DIST_DIR}/Formula/zqk.rb"
 class Zqk < Formula
   desc "Kernel and orchestration CLI for AI-human hybrid software engineering"
-  homepage "https://github.com/zqk-os/zqk"
+  homepage "https://zqk.dev"
   version "${VER_NUM}"
   license "Apache-2.0"
 
@@ -198,7 +198,11 @@ class Zqk < Formula
   end
 
   def install
-    bin.install "zqk-community" => "zqk"
+    if File.exist?("zqk")
+      bin.install "zqk"
+    else
+      bin.install "zqk-community" => "zqk"
+    end
   end
 
   test do
@@ -242,13 +246,12 @@ The Zen Quantum Kernel Community Edition.
 
 **Homebrew (Recommended):**
 \`\`\`bash
-brew tap zqk-os/zqk
-brew install zqk
+brew install zqk-os/tap/zqk
 \`\`\`
 
 **Manual Checksum Verification:**
 \`\`\`bash
-curl -fsSL https://github.com/zqk-os/zqk/releases/download/community-${VERSION}/checksums.txt | sha256sum -c
+curl -fsSL https://github.com/zqk-os/zqk/releases/download/${VERSION}/checksums.txt | sha256sum -c
 \`\`\`
 EOF
 
@@ -267,8 +270,8 @@ cat "$DIST_DIR/checksums.txt"
 if [ "$DRY_RUN" = "--dry" ]; then
   echo ""
   echo "🏁 Dry run complete. To create the release:"
-  echo "   git tag community-${VERSION} && git push origin community-${VERSION}"
-  echo "   gh release create community-${VERSION} dist-community/*.tar.gz dist-community/checksums.txt dist-community/Formula/zqk.rb --title 'Community Edition ${VERSION}' --notes-file -"
+  echo "   git tag ${VERSION} && git push origin ${VERSION}"
+  echo "   gh release create ${VERSION} dist-community/*.tar.gz dist-community/checksums.txt dist-community/Formula/zqk.rb --title 'ZQK Core ${VERSION}' --notes-file -"
   exit 0
 fi
 
@@ -280,33 +283,38 @@ if [ -f "$HOLD_FILE" ] && grep -q '"hold": true' "$HOLD_FILE"; then
 fi
 
 echo ""
-echo "🚀 Creating GitHub release community-${VERSION}..."
+echo "🚀 Creating GitHub release ${VERSION}..."
 
 # Tag if not already tagged
-TAG_NAME="community-${VERSION}"
+TAG_NAME="${VERSION}"
 if ! git -C "$REPO_ROOT" rev-parse "$TAG_NAME" &>/dev/null; then
   git -C "$REPO_ROOT" tag "$TAG_NAME"
   git -C "$REPO_ROOT" push origin "$TAG_NAME"
 fi
 
+RELEASE_ASSETS=(
+  "${DIST_DIR}"/*.tar.gz
+  "${DIST_DIR}/checksums.txt"
+  "${DIST_DIR}/Formula/zqk.rb"
+)
+[ -f "${DIST_DIR}/openvex.json" ] && RELEASE_ASSETS+=("${DIST_DIR}/openvex.json")
+for tgz in "${DIST_DIR}"/*.tgz; do
+  [ -f "$tgz" ] && RELEASE_ASSETS+=("$tgz")
+done
+
 # Create release with gh CLI
 gh release create "$TAG_NAME" \
-  "${DIST_DIR}"/*.tar.gz \
-  "${DIST_DIR}"/*.tgz \
-  "${DIST_DIR}/openvex.json" \
-  "${DIST_DIR}/checksums.txt" \
-  "${DIST_DIR}/Formula/zqk.rb" \
-  --title "ZQK Community Edition ${VERSION}" \
-  --notes "## ZQK Community Edition ${VERSION}
+  "${RELEASE_ASSETS[@]}" \
+  --title "ZQK Core ${VERSION}" \
+  --notes "## ZQK Core ${VERSION}
 
-The Zen Quantum Kernel Community Edition.
+The Cellular Knowledge Operating System for autonomous agent swarms.
 
 ### Install
 
 **Homebrew (Recommended):**
 \`\`\`bash
-brew tap zqk-os/zqk
-brew install zqk
+brew install zqk-os/tap/zqk
 \`\`\`
 
 **Manual:** Download the archive for your platform below and verify checksums:

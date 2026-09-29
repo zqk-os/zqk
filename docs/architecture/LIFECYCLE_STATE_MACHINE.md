@@ -14,11 +14,11 @@ A `backlog_item` represents a concrete execution work unit. It flows through fiv
 
 ```mermaid
 flowchart TD
-    subgraph Draft Plane
+    subgraph DraftPlane["Draft Plane"]
         A["conceptual (Draft / Exploratory)"]
     end
 
-    subgraph CAS Membrane Qualification
+    subgraph CASQualification["CAS Membrane Qualification"]
         B["originated (CAS Membrane Crossed)"]
         C["exploring (Problem Framing)"]
         D["validated (Accepted Architecture)"]
@@ -26,18 +26,18 @@ flowchart TD
         DEF["deferred (Paused Scope)"]
     end
 
-    subgraph Execution Pipeline
-        E["planned (Shovel-Ready: Milestone & Plan Linked)"]
+    subgraph ExecutionPipeline["Execution Pipeline"]
+        E["planned (Shovel-Ready: Milestone and Plan Linked)"]
         F["testing (Red Phase: TDD Test Written)"]
         G["in_progress (Green/Refactor: Active Dev)"]
     end
 
-    subgraph Terminal States
-        H["complete (QA-Audited & Git Evidence Present)"]
+    subgraph TerminalStates["Terminal States"]
+        H["complete (QA-Audited and Git Evidence Present)"]
         I["archived (Pruned to History Membrane)"]
     end
 
-    subgraph System Hold
+    subgraph SystemHold["System Hold"]
         ERR["error (Validation Incoherency Halted)"]
     end
 
@@ -107,10 +107,10 @@ Priority plans aggregate backlog items into strategic delivery blocks:
 
 ```mermaid
 flowchart TD
-    P1["grooming (Scope Definition & BLI Creation)"]
-    P2["active (Execution Sealed & In Flight)"]
-    P3["complete (All Child BLIs Validated & Complete)"]
-    P4["archived (Plan & Children Archived Together)"]
+    P1["grooming (Scope Definition and BLI Creation)"]
+    P2["active (Execution Sealed and In Flight)"]
+    P3["complete (All Child BLIs Validated and Complete)"]
+    P4["archived (Plan and Children Archived Together)"]
 
     P1 -->|Promote / Seal Scope| P2
     P2 -->|Shockwave Auto-Complete| P3

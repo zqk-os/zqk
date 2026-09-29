@@ -9,7 +9,7 @@ import (
 
 // LaunchAgentsDir is unsupported on non-Darwin platforms.
 func LaunchAgentsDir() (string, error) {
-	return "", errfmt.Newf("LaunchAgents are only supported on macOS (darwin)")
+	return "", errfmt.Errorf("LaunchAgents are only supported on macOS (darwin)")
 }
 
 // CleanLegacyLaunchAgents is a no-op on non-Darwin platforms.
@@ -19,12 +19,12 @@ func CleanLegacyLaunchAgents() ([]string, error) {
 
 // InstallOverseerLaunchAgent is unsupported on non-Darwin platforms.
 func InstallOverseerLaunchAgent(projectRoot, binaryPath string) (*LaunchAgentStatus, error) {
-	return nil, errfmt.Newf("LaunchAgent service management is only supported on macOS (darwin); on Linux use systemd units")
+	return nil, errfmt.Errorf("LaunchAgent service management is only supported on macOS (darwin); on Linux use systemd units")
 }
 
 // UninstallOverseerLaunchAgent is unsupported on non-Darwin platforms.
 func UninstallOverseerLaunchAgent() error {
-	return errfmt.Newf("LaunchAgent service management is only supported on macOS (darwin); on Linux use systemd units")
+	return errfmt.Errorf("LaunchAgent service management is only supported on macOS (darwin); on Linux use systemd units")
 }
 
 // StatusOverseerLaunchAgent reports unsupported on non-Darwin platforms.
