@@ -145,14 +145,18 @@ type GraphPayload struct {
 
 // GraphNode represents an entity in the visual graph.
 type GraphNode struct {
-	ID             string              `json:"id"`
-	Kind           string              `json:"kind"`
-	Status         string              `json:"status"`
-	Title          string              `json:"title"`
-	CreatedAt      string              `json:"createdAt,omitempty"`
-	UpdatedAt      string              `json:"updatedAt,omitempty"`
-	References     map[string][]string `json:"references,omitempty"`
-	WorkstreamRefs []string            `json:"workstreamRefs,omitempty"`
+	ID              string              `json:"id"`
+	Kind            string              `json:"kind"`
+	Status          string              `json:"status"`
+	Title           string              `json:"title"`
+	CreatedAt       string              `json:"createdAt,omitempty"`
+	UpdatedAt       string              `json:"updatedAt,omitempty"`
+	StartDate       string              `json:"startDate,omitempty"`
+	TargetDate      string              `json:"targetDate,omitempty"`
+	DueDate         string              `json:"dueDate,omitempty"`
+	EstimatedEffort string              `json:"estimatedEffort,omitempty"`
+	References      map[string][]string `json:"references,omitempty"`
+	WorkstreamRefs  []string            `json:"workstreamRefs,omitempty"`
 }
 
 // GraphEdge represents a directed relationship in the visual graph.
@@ -188,15 +192,34 @@ func (s *Server) handleGraph(w http.ResponseWriter, r *http.Request) {
 			if refs, ok := node.References["workstream_refs"]; ok {
 				wsRefs = refs
 			}
+			var sd, td, dd, eff string
+			if node.Attributes != nil {
+				if v, ok := node.Attributes["start_date"].(string); ok {
+					sd = v
+				}
+				if v, ok := node.Attributes["target_date"].(string); ok {
+					td = v
+				}
+				if v, ok := node.Attributes["due_date"].(string); ok {
+					dd = v
+				}
+				if v, ok := node.Attributes["estimated_effort"].(string); ok {
+					eff = v
+				}
+			}
 			nodes = append(nodes, GraphNode{
-				ID:             node.ID,
-				Kind:           node.Kind,
-				Status:         node.Status,
-				Title:          node.Title,
-				CreatedAt:      ca,
-				UpdatedAt:      ua,
-				References:     node.References,
-				WorkstreamRefs: wsRefs,
+				ID:              node.ID,
+				Kind:            node.Kind,
+				Status:          node.Status,
+				Title:           node.Title,
+				CreatedAt:       ca,
+				UpdatedAt:       ua,
+				StartDate:       sd,
+				TargetDate:      td,
+				DueDate:         dd,
+				EstimatedEffort: eff,
+				References:      node.References,
+				WorkstreamRefs:  wsRefs,
 			})
 
 			for rel, targets := range node.References {
@@ -636,6 +659,55 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       border-color: var(--accent);
       color: var(--accent);
       font-weight: 600;
+    }
+    .gantt-legend-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 16px;
+      background: #0d1117;
+      border-bottom: 1px solid var(--border);
+      font-size: 11px;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+    .gantt-legend-title {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .gantt-legend-items {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .gantt-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .gantt-legend-icon {
+      font-size: 11px;
+      line-height: 1;
+    }
+    .gantt-legend-swatch {
+      width: 14px;
+      height: 9px;
+      border-radius: 2px;
+      display: inline-block;
+    }
+    .gantt-legend-text {
+      color: var(--text-muted);
+      font-size: 11px;
+    }
+    .gantt-legend-today-line {
+      width: 14px;
+      height: 0;
+      border-top: 2px dashed #f85149;
+      display: inline-block;
     }
     .gantt-header-row {
       display: grid;
@@ -1107,6 +1179,48 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
           <div style="flex: 1;"></div>
           <span id="gantt-task-count" style="font-size: 11px; color: var(--text-muted); font-weight: 500;">0 items</span>
         </div>
+
+        <!-- Gantt Legend Bar -->
+        <div class="gantt-legend-bar">
+          <span class="gantt-legend-title">Legend:</span>
+          <div class="gantt-legend-items">
+            <div class="gantt-legend-item">
+              <span class="gantt-legend-icon" style="color: #f0883e;">◆</span>
+              <span class="gantt-legend-swatch gantt-bar-milestone"></span>
+              <span class="gantt-legend-text">Milestone</span>
+            </div>
+            <div class="gantt-legend-item">
+              <span class="gantt-legend-icon" style="color: #58a6ff;">🌐</span>
+              <span class="gantt-legend-swatch gantt-bar-workstream"></span>
+              <span class="gantt-legend-text">Workstream</span>
+            </div>
+            <div class="gantt-legend-item">
+              <span class="gantt-legend-icon" style="color: #58a6ff;">▶</span>
+              <span class="gantt-legend-swatch gantt-bar-inprogress"></span>
+              <span class="gantt-legend-text">In Progress</span>
+            </div>
+            <div class="gantt-legend-item">
+              <span class="gantt-legend-icon" style="color: #8b949e;">⏳</span>
+              <span class="gantt-legend-swatch gantt-bar-planned"></span>
+              <span class="gantt-legend-text">Planned</span>
+            </div>
+            <div class="gantt-legend-item">
+              <span class="gantt-legend-icon" style="color: #3fb950;">✓</span>
+              <span class="gantt-legend-swatch gantt-bar-complete"></span>
+              <span class="gantt-legend-text">Completed</span>
+            </div>
+            <div class="gantt-legend-item">
+              <span class="gantt-legend-icon" style="color: #bc8cff;">⚙</span>
+              <span class="gantt-legend-swatch gantt-bar-testing"></span>
+              <span class="gantt-legend-text">Testing</span>
+            </div>
+            <div class="gantt-legend-item">
+              <span class="gantt-legend-today-line"></span>
+              <span class="gantt-legend-text" style="color: #f85149; font-weight: 600;">Today Line</span>
+            </div>
+          </div>
+        </div>
+
         <div class="gantt-header-row">
           <div class="gantt-header-title">
             <span>Work Item Hierarchy</span>
@@ -1691,41 +1805,76 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
         let start = null;
         let end = null;
 
+        // 1. Check explicit date fields from object attributes
         if (item.startDate) {
           const d = Date.parse(item.startDate);
           if (!isNaN(d)) start = d;
         }
-        if (!start && item.createdAt) {
-          const d = Date.parse(item.createdAt);
-          if (!isNaN(d)) start = d;
-        }
-
         if (item.targetDate) {
           const d = Date.parse(item.targetDate);
           if (!isNaN(d)) end = d;
-        }
-        if (!end && (item.status === 'complete' || item.status === 'verified') && item.updatedAt) {
-          const d = Date.parse(item.updatedAt);
+        } else if (item.dueDate) {
+          const d = Date.parse(item.dueDate);
           if (!isNaN(d)) end = d;
         }
 
-        // Duration heuristics if missing dates
-        const defaultDurationDays = item.kind === 'workstream' ? 45 :
-                                    item.kind === 'milestone' ? 3 :
-                                    item.kind === 'priority_plan' ? 21 : 7;
+        const status = (item.status || 'planned').toLowerCase();
+        const isDone = ['complete', 'verified', 'approved', 'done', 'sealed', 'archived'].includes(status);
+        const isActive = ['in_progress', 'active', 'testing', 'metrics_captured'].includes(status);
 
-        if (!start && !end) {
-          const offsetDays = (idx % 6) * 4;
-          start = now - (7 * MS_PER_DAY) + (offsetDays * MS_PER_DAY);
-          end = start + (defaultDurationDays * MS_PER_DAY);
-        } else if (!start && end) {
-          start = end - (defaultDurationDays * MS_PER_DAY);
-        } else if (start && !end) {
-          end = start + (defaultDurationDays * MS_PER_DAY);
+        // Duration heuristics
+        const defaultDurationDays = item.kind === 'workstream' ? 45 :
+                                    item.kind === 'milestone' ? 6 :
+                                    item.kind === 'priority_plan' ? 21 : 7;
+        const durationMs = defaultDurationDays * MS_PER_DAY;
+
+        if (isDone) {
+          // Completed items belong in the past leading up to their completion date
+          if (!end && item.updatedAt) {
+            const d = Date.parse(item.updatedAt);
+            if (!isNaN(d)) end = Math.min(now, d);
+          }
+          if (!end) end = now - (1 * MS_PER_DAY);
+          if (!start && item.createdAt) {
+            const d = Date.parse(item.createdAt);
+            if (!isNaN(d) && d < end) start = d;
+          }
+          if (!start) start = end - durationMs;
+        } else if (isActive) {
+          // In-Progress / Active items: active NOW, spanning across TODAY
+          // A milestone or task currently in progress must NOT be scheduled in the past!
+          if (item.kind === 'milestone') {
+            // Milestone is a target checkpoint: targets completion ahead of today
+            if (!end) end = now + (5 * MS_PER_DAY);
+            if (!start) start = now - (2 * MS_PER_DAY);
+          } else if (item.kind === 'workstream') {
+            if (!start) start = now - (14 * MS_PER_DAY);
+            if (!end) end = start + durationMs;
+            if (end <= now) end = now + (15 * MS_PER_DAY);
+          } else {
+            // Active task / backlog item / plan
+            if (!start) {
+              if (item.createdAt) {
+                const d = Date.parse(item.createdAt);
+                if (!isNaN(d) && d <= now) start = Math.max(now - (3 * MS_PER_DAY), d);
+              }
+              if (!start) start = now - (2 * MS_PER_DAY);
+            }
+            if (!end) end = now + Math.max(2 * MS_PER_DAY, durationMs - (now - start));
+          }
+        } else {
+          // Planned / upcoming items: scheduled from TODAY onwards into the future
+          // Planned items MUST NOT sit in the past!
+          const planOffsetDays = (idx % 8) * 3;
+          if (!start || start < now) {
+            start = now + (planOffsetDays * MS_PER_DAY);
+          }
+          if (!end) end = start + durationMs;
         }
 
+        // Safety guarantee: end must be after start
         if (end <= start) {
-          end = start + (defaultDurationDays * MS_PER_DAY);
+          end = start + Math.max(MS_PER_DAY, durationMs);
         }
 
         return { ...item, startTime: start, endTime: end };
@@ -1888,7 +2037,8 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
           bar.className = 'gantt-bar ' + barClass;
           bar.style.left = leftPercent + '%';
           bar.style.width = widthPercent + '%';
-          bar.setAttribute('title', item.id + ': ' + (item.title || '') + '\nKind: ' + item.kind + ' | Status: ' + status + '\nSchedule: ' + startDateStr + ' → ' + endDateStr + ' (' + durationDays + ' days)');
+          const effortStr = item.estimatedEffort ? '\nEffort: ' + item.estimatedEffort : '';
+          bar.setAttribute('title', item.id + ': ' + (item.title || '') + '\nKind: ' + item.kind.replace('_', ' ') + ' | Status: ' + status + '\nSchedule: ' + startDateStr + ' → ' + endDateStr + ' (' + durationDays + ' days)' + effortStr);
 
           bar.textContent = statusIcon + ' ' + item.id;
 

@@ -34,6 +34,10 @@ func setupTestStudioServer(t *testing.T) (*studio.Server, *storage.PureGoIndexer
 		Kind:   "milestone",
 		Status: "in_progress",
 		Title:  "Phase 1 Visual Studio UI",
+		Attributes: map[string]any{
+			"target_date":      "2026-10-15",
+			"estimated_effort": "2w",
+		},
 		References: map[string][]string{
 			"goal_refs": {"GOAL-TEST-001"},
 		},
@@ -102,13 +106,17 @@ func TestServer_GraphEndpoint(t *testing.T) {
 	assert.NotEmpty(t, payload.Edges)
 
 	// Validate nodes contain seeded objects
-	nodeIDs := make(map[string]bool)
+	nodeMap := make(map[string]studio.GraphNode)
 	for _, n := range payload.Nodes {
-		nodeIDs[n.ID] = true
+		nodeMap[n.ID] = n
 	}
-	assert.True(t, nodeIDs["GOAL-TEST-001"])
-	assert.True(t, nodeIDs["MIL-TEST-001"])
-	assert.True(t, nodeIDs["BLI-TEST-001"])
+	assert.Contains(t, nodeMap, "GOAL-TEST-001")
+	assert.Contains(t, nodeMap, "MIL-TEST-001")
+	assert.Contains(t, nodeMap, "BLI-TEST-001")
+
+	// Validate attributes mapped to GraphNode fields
+	assert.Equal(t, "2026-10-15", nodeMap["MIL-TEST-001"].TargetDate)
+	assert.Equal(t, "2w", nodeMap["MIL-TEST-001"].EstimatedEffort)
 
 	// Validate directed edge
 	var foundEdge bool
@@ -133,8 +141,12 @@ func TestServer_DashboardHTML(t *testing.T) {
 
 	body, err := io.ReadAll(resp.Body)
 	require.NoError(t, err)
-	assert.Contains(t, string(body), "ZQK Knowledge Kernel Visual Studio")
-	assert.Contains(t, string(body), "Interactive Knowledge Graph DAG")
+	bodyStr := string(body)
+	assert.Contains(t, bodyStr, "ZQK Knowledge Kernel Visual Studio")
+	assert.Contains(t, bodyStr, "Interactive Knowledge Graph DAG")
+	assert.Contains(t, bodyStr, "gantt-legend-bar")
+	assert.Contains(t, bodyStr, "Milestone")
+	assert.Contains(t, bodyStr, "Today Line")
 }
 
 func TestServer_ObjectsEndpoint(t *testing.T) {
