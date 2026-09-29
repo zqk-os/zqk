@@ -1,7 +1,10 @@
 package do
 
 import (
+	"strings"
 	"testing"
+
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
 )
 
 func TestNewDoCmd(t *testing.T) {
@@ -20,5 +23,39 @@ func TestNewDoCmd(t *testing.T) {
 	}
 	if cmd.Flags().Lookup("verify") == nil {
 		t.Error("expected --verify flag")
+	}
+}
+
+func TestRenderDoSummary(t *testing.T) {
+	cmd := NewDoCmd()
+	var buf strings.Builder
+	cmd.SetOut(&buf)
+
+	res := &clipkg.AutoExecResult{
+		TargetBLIID:     "BLI-TEST-001",
+		Status:          "in_progress",
+		Claimant:        "ACC-SYSTEM",
+		VerifiedTestIDs: []string{"TST-001"},
+		LatchedCritIDs:  []string{"CRIT-001"},
+		Steps: []clipkg.AutoExecStepResult{
+			{Step: "discovery", StepStatus: "ok", Detail: "Resolved BLI-TEST-001"},
+			{Step: "claim", StepStatus: "ok", Detail: "Claimed for ACC-SYSTEM"},
+		},
+	}
+
+	renderDoSummary(cmd, res)
+	out := buf.String()
+
+	if !strings.Contains(out, "BLI-TEST-001") {
+		t.Errorf("expected target BLI in output: %s", out)
+	}
+	if !strings.Contains(out, "Hand off to your agent") {
+		t.Errorf("expected agent handoff instructions in output: %s", out)
+	}
+	if !strings.Contains(out, "Prompt:") {
+		t.Errorf("expected agent prompt in output: %s", out)
+	}
+	if !strings.Contains(out, "TST-001") {
+		t.Errorf("expected verified test ID in output: %s", out)
 	}
 }

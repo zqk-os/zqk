@@ -21,11 +21,11 @@ Use `zqk` (or `./bin/zqk` from this tree). **Do not** `export ZQK_PROJECT_ROOT` 
 
 ```bash
 zqk init                                          # Greenfield setup (skip if .zqk/ exists)
-zqk system agent-onboard --format json
-zqk quickstart
-zqk mcp install
-zqk object list
-zqk workflow whats-next --format json
+zqk system agent-onboard                          # Detect IDE, prime rules, & seat agent
+zqk quickstart                                    # Walkthrough
+zqk workflow whats-next                           # Discover active plan and shovel-ready tasks
+zqk do                                            # Autonomously claim and execute work
+zqk ui -w                                         # Launch visual Web Studio (timeline & DAG)
 zqk state stream --dashboard                      # Real-time ANSI visual seismograph
 ```
 

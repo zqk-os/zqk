@@ -137,13 +137,27 @@ func renderAgentOnboardSummary(cmd *cobra.Command, res *agentonboard.Result) {
 	buf.WriteString("  • Git pre-commit verification hook: active\n")
 	buf.WriteString("  • Ambient event-driven daemon: running\n")
 
-	// 5. Next steps
+	// 5. Connect Your AI Agent
 	cmdName := paths.CLICommandName
+	buf.WriteString("\n🔌 Connect Your AI Agent (Seating Guide):\n")
+	buf.WriteString("  • Cursor:             Pre-configured! Reads .agents/AGENTS.md and .cursor/mcp.json.\n")
+	buf.WriteString(fmt.Sprintf("  • Claude Desktop:     Run '%s mcp install --client claude-desktop' then restart Claude.\n", cmdName))
+	buf.WriteString(fmt.Sprintf("  • Claude Code (CLI):  Run 'claude mcp add %s -- %s mcp serve'.\n", cmdName, cmdName))
+	buf.WriteString("  • Windsurf (Cascade): Pre-configured! Reads .windsurfrules and mcp_config.json.\n")
+	buf.WriteString("  • Cline / Roo Code:   Pre-configured! Reads .clinerules and cline_mcp_settings.json.\n")
+	buf.WriteString("  • Gemini/Antigravity: Native workspace integration via .agents/AGENTS.md.\n")
+	buf.WriteString(fmt.Sprintf("  • Hermes / OpenClaw:  Direct CLI ('%s workflow whats-next') or TCP ('%s mcp proxy --tcp 127.0.0.1:7777').\n", cmdName, cmdName))
+
+	buf.WriteString("\n💬 Prompt to seat your AI agent:\n")
+	buf.WriteString(fmt.Sprintf("   \"You are paired with the ZQK Knowledge Kernel. Run '%s workflow whats-next' to discover active goals and tasks, then run '%s do' to claim and execute work.\"\n", cmdName, cmdName))
+
+	// 6. Next steps
 	buf.WriteString("\nNext Steps:\n")
 	buf.WriteString(fmt.Sprintf("  1. Launch Visual Web Studio:  %s ui -w  (http://127.0.0.1:8080)\n", cmdName))
 	buf.WriteString(fmt.Sprintf("  2. Discover Mission & Tasks:  %s workflow whats-next\n", cmdName))
-	buf.WriteString(fmt.Sprintf("  3. Connect MCP (if Claude):   %s mcp install --client claude-desktop\n", cmdName))
+	buf.WriteString(fmt.Sprintf("  3. Claim & Execute Work:      %s do\n", cmdName))
 	buf.WriteString(fmt.Sprintf("  4. Start Scheduler Daemons:   %s scheduler start\n", cmdName))
+	buf.WriteString("\nDetailed Guide: docs/onboarding/AI_AGENT_ONBOARDING.md\n")
 
 	_ = cli.WriteOutput(cmd, []byte(buf.String()))
 }

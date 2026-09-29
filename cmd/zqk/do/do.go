@@ -1,12 +1,15 @@
 package do
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/brand"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
@@ -77,5 +80,50 @@ func runDo(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 		return err
 	}
 
-	return cli.FormatOutput(cmd, res)
+	format := cli.GetFormat(cmd)
+	if format == cli.FormatJSON || format == cli.FormatYAML || format == cli.FormatJSONL {
+		return cli.FormatOutput(cmd, res)
+	}
+
+	renderDoSummary(cmd, res)
+	return nil
+}
+
+func renderDoSummary(cmd *cobra.Command, res *clipkg.AutoExecResult) {
+	var buf strings.Builder
+	target := res.TargetBLIID
+	if target == "" {
+		target = res.TargetTaskID
+	}
+	buf.WriteString(fmt.Sprintf("🎯 ZQK Autonomous Execution: %s\n", target))
+	buf.WriteString("=====================================================\n")
+	buf.WriteString(fmt.Sprintf("Status: %s (Claimant: %s)\n\n", res.Status, res.Claimant))
+
+	buf.WriteString("Execution Steps:\n")
+	for _, s := range res.Steps {
+		icon := "✓"
+		if s.StepStatus != "ok" && s.StepStatus != "dry_run" {
+			icon = "❌"
+		}
+		buf.WriteString(fmt.Sprintf("  %s [%-12s] %s\n", icon, s.Step, s.Detail))
+	}
+
+	if len(res.VerifiedTestIDs) > 0 {
+		buf.WriteString(fmt.Sprintf("\n✓ Verified Tests: %s\n", strings.Join(res.VerifiedTestIDs, ", ")))
+	}
+	if len(res.LatchedCritIDs) > 0 {
+		buf.WriteString(fmt.Sprintf("✓ Latched Criteria: %s\n", strings.Join(res.LatchedCritIDs, ", ")))
+	}
+
+	exe := brand.ExecutableName()
+	buf.WriteString("\n👉 Next Steps for You & Your AI Agent:\n")
+	buf.WriteString("  1. Hand off to your agent (Cursor, Claude, Windsurf, Gemini, Cline, Hermes, etc.):\n")
+	buf.WriteString(fmt.Sprintf("     Prompt: \"I've claimed %s. Implement the code and satisfy its criteria.\"\n", target))
+	buf.WriteString("  2. Verify implementation & latch criteria:\n")
+	buf.WriteString(fmt.Sprintf("     $ %s do %s --verify\n", exe, target))
+	buf.WriteString("  3. Discover next tasks:\n")
+	buf.WriteString(fmt.Sprintf("     $ %s workflow whats-next\n\n", exe))
+	buf.WriteString(fmt.Sprintf("💡 Need to connect your agent? Run '%s' or check ZQK_GETTING_STARTED.md\n", paths.CLIUsage("system", "agent-onboard")))
+
+	fmt.Fprint(cmd.OutOrStdout(), buf.String())
 }

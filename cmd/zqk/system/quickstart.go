@@ -30,23 +30,22 @@ Follow these 4 simple steps to get immediate value:
    $ %s ui -w
    ➜ Open http://127.0.0.1:8080 to inspect your Workstreams, Milestones, and Gantt timeline.
 
-2. Onboard & Connect your AI Agents (MCP):
+2. Onboard & Connect your AI Agents:
    $ %s system agent-onboard
-   ➜ Automatically detects Cursor, VS Code, Cline, Windsurf and primes .agents/AGENTS.md.
-   To pair with Claude Desktop or standalone MCP clients:
-   $ %s mcp install --client claude-desktop
+   ➜ Detects Cursor, VS Code, Cline, Windsurf, Gemini, and primes .agents/AGENTS.md.
+   ➜ See ZQK_GETTING_STARTED.md for copy-paste MCP configs for each agent host.
 
 3. Discover What's Next & Execute Tasks:
    $ %s workflow whats-next        # view the active priority plan and shovel-ready tasks
-   $ %s agent claim-work           # claim the next backlog item atomically
-   $ %s test run                   # run test verification suites
+   $ %s do                         # autonomously discover and claim the next backlog item
+   $ %s do <BLI-ID> --verify       # verify implementation and latch acceptance criteria
 
 4. Start Background Services & Verify System Health:
    $ %s scheduler start            # start background scheduler daemons
    $ %s system status              # verify system health and active plan
 
-Documentation & Guides: docs/INDEX.md
-`, projectRoot, exe, exe, exe, exe, exe, exe, exe, exe)
+Documentation & Guides: docs/INDEX.md and docs/onboarding/AI_AGENT_ONBOARDING.md
+`, projectRoot, exe, exe, exe, exe, exe, exe, exe)
 	}
 
 	initFlag := ""
