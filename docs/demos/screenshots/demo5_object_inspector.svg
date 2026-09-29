@@ -110,7 +110,7 @@
       <tspan x="0" y="1476">│  Milestone:     (none)                                                       │</tspan>
       <tspan x="0" y="1496">│  Requirement:   (none)                                                       │</tspan>
       <tspan x="0" y="1516">│  Priority Plan: (none)                                                       │</tspan>
-      <tspan x="0" y="1536">│  Lineage Intact: <tspan fill="#f9e2af" font-weight="bold">[⚠️  WARN]</tspan>                                                   │</tspan>
+      <tspan x="0" y="1536">│  Lineage Intact: <tspan fill="#f9e2af" font-weight="bold">[⚠️  WARN]</tspan>                                                  │</tspan>
       <tspan x="0" y="1556">│                                                                              │</tspan>
       <tspan x="0" y="1576">│Available Actions: [transition_status, claim, edit_properties]                │</tspan>
       <tspan x="0" y="1596">╰──────────────────────────────────────────────────────────────────────────────╯</tspan>

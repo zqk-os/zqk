@@ -143,17 +143,15 @@ func RenderScreenToSVG(filename, title string, screenText string, widthCols int)
 		lines = lines[:len(lines)-1]
 	}
 
-	charWidth := 8.4
-	lineHeight := 19.0
-	padX := 20.0
-	padY := 14.0
-	topBarH := 38.0
+	charWidth := 7.82
+	lineHeight := 19.5
+	padX := 24.0
+	padY := 16.0
+	topBarH := 40.0
 
-	totalW := int(float64(widthCols)*charWidth + padX*2)
-	if totalW < 960 {
-		totalW = 960
-	}
-	totalH := int(topBarH + padY*2 + float64(len(lines))*lineHeight + 8)
+	contentW := float64(widthCols) * charWidth
+	totalW := int(contentW + padX*2 + 0.5)
+	totalH := int(topBarH + padY*2 + float64(len(lines))*lineHeight + 10)
 
 	var sb strings.Builder
 	sb.WriteString(fmt.Sprintf(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" width="%d" height="%d">`+"\n",
@@ -165,8 +163,9 @@ func RenderScreenToSVG(filename, title string, screenText string, widthCols int)
       .dot-red { fill: #f38ba8; }
       .dot-yellow { fill: #f9e2af; }
       .dot-green { fill: #a6e3a1; }
-      .term-text { font-family: "JetBrains Mono", "Fira Code", "Menlo", "Monaco", "Consolas", monospace;
-                   font-size: 13px; fill: #cdd6f4; white-space: pre; }
+      .term-text { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace;
+                   font-size: 13px; fill: #cdd6f4; letter-spacing: 0px; white-space: pre; }
+      .term-bg-reverse { fill: #89b4fa; rx: 3px; }
       .title-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
                     font-size: 12px; fill: #a6adc8; font-weight: 500; text-anchor: middle; }
     </style>
@@ -182,25 +181,33 @@ func RenderScreenToSVG(filename, title string, screenText string, widthCols int)
 		totalW-14, totalW-4, totalW-4, int(topBarH), int(topBarH)))
 	sb.WriteString(fmt.Sprintf(`  <line x1="4" y1="%d" x2="%d" y2="%d" stroke="#313244" stroke-width="1"/>`+"\n",
 		int(topBarH), totalW-4, int(topBarH)))
-	sb.WriteString(`  <circle cx="22" cy="21" r="5.5" class="dot-red"/>
-  <circle cx="40" cy="21" r="5.5" class="dot-yellow"/>
-  <circle cx="58" cy="21" r="5.5" class="dot-green"/>
+	sb.WriteString(`  <circle cx="22" cy="22" r="5.5" class="dot-red"/>
+  <circle cx="40" cy="22" r="5.5" class="dot-yellow"/>
+  <circle cx="58" cy="22" r="5.5" class="dot-green"/>
 `)
-	sb.WriteString(fmt.Sprintf(`  <text x="%f" y="25" class="title-text">%s</text>`+"\n",
+	sb.WriteString(fmt.Sprintf(`  <text x="%f" y="26" class="title-text">%s</text>`+"\n",
 		float64(totalW)/2.0, html.EscapeString(title)))
 
 	sb.WriteString(fmt.Sprintf(`  <g transform="translate(%f, %f)">`+"\n", padX, topBarH+padY))
-	sb.WriteString(`    <text class="term-text">` + "\n")
 
 	for rowIdx, line := range lines {
 		spans := parseANSILine(line)
-		yPos := float64(rowIdx+1)*lineHeight - 4.0
+		yPos := float64(rowIdx+1)*lineHeight - 4.5
 
+		// Pass 1: Render background highlight pill for reverse-video spans (e.g. active tabs)
+		for _, sp := range spans {
+			if sp.Reverse {
+				spanW := float64(runewidth.StringWidth(sp.Text)) * charWidth
+				spanX := float64(sp.Col) * charWidth
+				sb.WriteString(fmt.Sprintf(`    <rect x="%.1f" y="%.1f" width="%.1f" height="17" class="term-bg-reverse"/>`+"\n",
+					spanX, yPos-13.0, spanW))
+			}
+		}
+
+		// Pass 2: Render continuous monospace text line preserving character-grid alignment
+		sb.WriteString(fmt.Sprintf(`    <text x="0" y="%.1f" class="term-text" xml:space="preserve">`, yPos))
 		for _, sp := range spans {
 			var attrs []string
-			attrs = append(attrs, fmt.Sprintf(`x="%.1f"`, float64(sp.Col)*charWidth))
-			attrs = append(attrs, fmt.Sprintf(`y="%.1f"`, yPos))
-
 			fill := sp.Color
 			if sp.Dim {
 				fill = "#6c7086"
@@ -210,19 +217,23 @@ func RenderScreenToSVG(filename, title string, screenText string, widthCols int)
 			}
 			attrs = append(attrs, fmt.Sprintf(`fill="%s"`, fill))
 
-			if sp.Bold {
+			if sp.Bold || sp.Reverse {
 				attrs = append(attrs, `font-weight="bold"`)
 			}
 
 			escapedText := html.EscapeString(sp.Text)
 			escapedText = strings.ReplaceAll(escapedText, "\x1b", "")
 
-			sb.WriteString(fmt.Sprintf(`      <tspan %s>%s</tspan>`+"\n", strings.Join(attrs, " "), escapedText))
+			if len(attrs) > 0 {
+				sb.WriteString(fmt.Sprintf(`<tspan %s>%s</tspan>`, strings.Join(attrs, " "), escapedText))
+			} else {
+				sb.WriteString(escapedText)
+			}
 		}
+		sb.WriteString("</text>\n")
 	}
 
-	sb.WriteString(`    </text>
-  </g>
+	sb.WriteString(`  </g>
 </svg>
 `)
 
@@ -236,8 +247,8 @@ func RenderScreenToSVG(filename, title string, screenText string, widthCols int)
 }
 
 func RenderWebStudioSVG(filename string) error {
-	width := 1040
-	height := 720
+	width := 1100
+	height := 700
 
 	var sb strings.Builder
 	sb.WriteString(fmt.Sprintf(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" width="%d" height="%d">`+"\n",
@@ -255,248 +266,307 @@ func RenderWebStudioSVG(filename string) error {
       .url-host { fill: #f0f6fc; font-weight: 500; }
       .app-header { fill: #161b22; }
       .header-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px; font-weight: 600; fill: #f0f6fc; }
-      .nav-tab-active { fill: #21262d; stroke: #58a6ff; stroke-width: 1; rx: 4px; }
-      .nav-tab-inactive { fill: transparent; rx: 4px; }
-      .nav-text-active { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 12px; font-weight: 600; fill: #58a6ff; }
-      .nav-text-inactive { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 12px; font-weight: 500; fill: #8b949e; }
-      .search-box { fill: #0d1117; stroke: #30363d; stroke-width: 1; rx: 6px; }
-      .search-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 11px; fill: #8b949e; }
+      .view-switcher { fill: #0d1117; stroke: #30363d; stroke-width: 1; rx: 6px; }
+      .view-tab-active { fill: #21262d; rx: 4px; }
+      .view-tab-text-active { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 12px; font-weight: 600; fill: #58a6ff; }
+      .view-tab-text-inactive { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 12px; font-weight: 500; fill: #8b949e; }
+      .ctrl-input { fill: #0d1117; stroke: #30363d; stroke-width: 1; rx: 6px; }
+      .ctrl-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 11px; fill: #f0f6fc; font-weight: 500; }
+      .ctrl-placeholder { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 11px; fill: #8b949e; }
       .status-pill-bg { fill: rgba(63, 185, 80, 0.12); rx: 12px; }
-      .status-pill-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 11px; font-weight: 600; fill: #3fb950; }
-      .filter-chip { fill: #21262d; stroke: #30363d; stroke-width: 1; rx: 4px; }
+      .status-pill-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 11px; font-weight: 500; fill: #3fb950; }
+      .btn-header { fill: #21262d; stroke: #30363d; stroke-width: 1; rx: 6px; }
+      .btn-header-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 11px; font-weight: 500; fill: #f0f6fc; text-anchor: middle; }
+      .canvas-panel { fill: #0d1117; }
+      .toolbar-box { fill: rgba(22, 27, 34, 0.92); stroke: #30363d; stroke-width: 1; rx: 8px; }
+      .toolbar-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 12px; fill: #c9d1d9; font-weight: 500; }
+      .filter-chip { fill: transparent; rx: 4px; }
       .filter-chip-active { fill: #58a6ff; rx: 4px; }
-      .chip-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 10px; font-weight: 600; fill: #8b949e; }
-      .chip-text-active { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 10px; font-weight: 600; fill: #ffffff; }
-      .node-card { fill: #161b22; stroke: #30363d; stroke-width: 1.5; rx: 8px; }
-      .node-card-selected { fill: #1c2128; stroke: #58a6ff; stroke-width: 2.5; rx: 8px; }
-      .node-kind { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 9px; font-weight: 700; letter-spacing: 0.5px; }
-      .node-status { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 9px; font-weight: 600; fill: #8b949e; text-anchor: end; }
-      .node-id { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 11px; font-weight: 700; fill: #f0f6fc; }
-      .node-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 11px; fill: #c9d1d9; }
-      .edge { fill: none; stroke: #30363d; stroke-width: 1.8; }
-      .edge-active { fill: none; stroke: #58a6ff; stroke-width: 2.4; }
-      .drawer-bg { fill: #161b22; stroke: #30363d; stroke-width: 1; }
-      .drawer-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 12px; font-weight: 700; fill: #f0f6fc; letter-spacing: 0.5px; }
-      .drawer-label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 11px; font-weight: 500; fill: #8b949e; }
-      .drawer-val { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 11px; fill: #c9d1d9; }
+      .chip-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 11px; font-weight: 500; fill: #8b949e; text-anchor: middle; }
+      .chip-text-active { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 11px; font-weight: 600; fill: #ffffff; text-anchor: middle; }
+      .focus-banner { fill: rgba(33, 38, 45, 0.95); stroke: #58a6ff; stroke-width: 1; rx: 14px; }
+      .focus-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 11px; fill: #f0f6fc; }
+      .btn-clear-focus { fill: #58a6ff; rx: 4px; }
+      .btn-clear-focus-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 10px; font-weight: 600; fill: #ffffff; text-anchor: middle; }
+      .node-bg { fill: #161b22; stroke: #30363d; stroke-width: 1; rx: 6px; }
+      .node-bg-selected { fill: #1c2128; stroke: #58a6ff; stroke-width: 2.5; rx: 6px; }
+      .node-badge { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+      .node-status { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 9px; font-weight: 500; fill: #8b949e; text-anchor: end; }
+      .node-text-id { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 11px; font-weight: 600; fill: #f0f6fc; }
+      .node-text-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 11px; fill: #c9d1d9; }
+      .edge { fill: none; stroke: #484f58; stroke-width: 1.5; }
+      .edge-active { fill: none; stroke: #58a6ff; stroke-width: 2.2; }
+      .sidebar-panel { fill: #161b22; }
+      .tab-bar-bg { fill: #11151c; }
+      .sidebar-tab-active { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 12px; font-weight: 600; fill: #f0f6fc; text-anchor: middle; }
+      .sidebar-tab-inactive { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 12px; font-weight: 500; fill: #8b949e; text-anchor: middle; }
+      .prop-header { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; fill: #8b949e; }
+      .prop-label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 11px; font-weight: 500; fill: #8b949e; }
+      .prop-val { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 11px; fill: #c9d1d9; }
+      .ref-chip { fill: #21262d; stroke: #30363d; stroke-width: 1; rx: 4px; }
+      .ref-chip-text { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 10px; font-weight: 500; fill: #58a6ff; }
       .btn-primary { fill: #238636; rx: 6px; }
       .btn-sec { fill: #21262d; stroke: #30363d; stroke-width: 1; rx: 6px; }
+      .btn-accent { fill: #58a6ff; rx: 6px; }
       .btn-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 11px; font-weight: 600; fill: #ffffff; text-anchor: middle; }
     </style>
     <filter id="win-shadow" x="-5%" y="-5%" width="110%" height="110%">
       <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#000000" flood-opacity="0.55"/>
     </filter>
-    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1 L 9 5 L 0 9 z" fill="#30363d"/>
+    <filter id="node-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#58a6ff" flood-opacity="0.4"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#484f58"/>
     </marker>
-    <marker id="arrow-active" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1 L 9 5 L 0 9 z" fill="#58a6ff"/>
+    <marker id="arrow-active" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#58a6ff"/>
     </marker>
   </defs>
 
   <!-- Browser Window Frame -->
-  <rect x="4" y="4" width="1032" height="712" class="browser-bg" filter="url(#win-shadow)" stroke="#30363d" stroke-width="1"/>
-  <path d="M 4 16 A 12 12 0 0 1 16 4 L 1024 4 A 12 12 0 0 1 1036 16 L 1036 44 L 4 44 Z" class="browser-top"/>
-  <line x1="4" y1="44" x2="1036" y2="44" stroke="#30363d" stroke-width="1"/>
+  <rect x="4" y="4" width="1092" height="692" class="browser-bg" filter="url(#win-shadow)" stroke="#30363d" stroke-width="1"/>
+  <path d="M 4 16 A 12 12 0 0 1 16 4 L 1084 4 A 12 12 0 0 1 1096 16 L 1096 42 L 4 42 Z" class="browser-top"/>
+  <line x1="4" y1="42" x2="1096" y2="42" stroke="#30363d" stroke-width="1"/>
 
   <!-- macOS Window Controls -->
-  <circle cx="22" cy="24" r="5.5" class="dot-red"/>
-  <circle cx="40" cy="24" r="5.5" class="dot-yellow"/>
-  <circle cx="58" cy="24" r="5.5" class="dot-green"/>
+  <circle cx="22" cy="23" r="5.5" class="dot-red"/>
+  <circle cx="40" cy="23" r="5.5" class="dot-yellow"/>
+  <circle cx="58" cy="23" r="5.5" class="dot-green"/>
 
   <!-- Browser URL Bar -->
-  <rect x="240" y="10" width="560" height="26" class="url-bar"/>
-  <text x="256" y="27" class="url-text"><tspan fill="#3fb950">🔒 </tspan><tspan class="url-host">http://127.0.0.1:8080</tspan>/studio/dag-visualizer</text>
+  <rect x="280" y="8" width="540" height="26" class="url-bar"/>
+  <text x="296" y="25" class="url-text"><tspan fill="#3fb950">🔒 </tspan><tspan class="url-host">http://127.0.0.1:8080/</tspan></text>
 
   <!-- App Header -->
-  <rect x="4" y="45" width="1032" height="48" class="app-header"/>
-  <line x1="4" y1="93" x2="1036" y2="93" stroke="#30363d" stroke-width="1"/>
+  <rect x="4" y="43" width="1092" height="48" class="app-header"/>
+  <line x1="4" y1="91" x2="1096" y2="91" stroke="#30363d" stroke-width="1"/>
 
-  <!-- Brand -->
-  <text x="24" y="75" class="header-title"><tspan fill="#58a6ff">⚡</tspan> ZQK Knowledge Kernel Visual Studio</text>
+  <!-- Brand (Left) -->
+  <text x="22" y="72" class="header-title"><tspan fill="#58a6ff">⚡</tspan> ZQK Knowledge Kernel Visual Studio</text>
 
-  <!-- View Switcher Tabs -->
-  <g transform="translate(320, 56)">
-    <rect x="0" y="0" width="124" height="26" class="nav-tab-inactive"/>
-    <text x="10" y="17" class="nav-text-inactive">📅 Timeline &amp; Gantt</text>
-
-    <rect x="130" y="0" width="154" height="26" class="nav-tab-active"/>
-    <text x="140" y="17" class="nav-text-active">🕸️ Ontology DAG Visualizer</text>
-
-    <rect x="290" y="0" width="134" height="26" class="nav-tab-inactive"/>
-    <text x="300" y="17" class="nav-text-inactive">🛡️ System Health &amp; DoD</text>
-
-    <rect x="430" y="0" width="118" height="26" class="nav-tab-inactive"/>
-    <text x="440" y="17" class="nav-text-inactive">📊 Metrics &amp; Trace</text>
+  <!-- View Mode Switcher (Center-Left) -->
+  <g transform="translate(340, 53)">
+    <rect x="0" y="0" width="248" height="28" class="view-switcher"/>
+    <rect x="2" y="2" width="104" height="24" class="view-tab-active"/>
+    <text x="14" y="18" class="view-tab-text-active">☊ DAG Graph</text>
+    <text x="120" y="18" class="view-tab-text-inactive">▤ Timeline &amp; Gantt</text>
   </g>
 
-  <!-- Right App Controls -->
-  <g transform="translate(890, 56)">
-    <rect x="0" y="0" width="130" height="26" class="status-pill-bg"/>
-    <circle cx="12" cy="13" r="3.5" fill="#3fb950"/>
-    <text x="22" y="17" class="status-pill-text">● Live CAS (185 nodes)</text>
+  <!-- Header Controls (Right) -->
+  <g transform="translate(605, 53)">
+    <!-- Workstream Dropdown -->
+    <rect x="0" y="0" width="130" height="28" class="ctrl-input"/>
+    <text x="10" y="18" class="ctrl-text">🌐 All Workstreams ▾</text>
+
+    <!-- Density Filter Dropdown -->
+    <rect x="138" y="0" width="154" height="28" class="ctrl-input"/>
+    <text x="148" y="18" class="ctrl-text">Execution (+ BLIs) ▾</text>
+
+    <!-- Global Search -->
+    <rect x="300" y="0" width="78" height="28" class="ctrl-input"/>
+    <text x="308" y="18" class="ctrl-placeholder">🔍 Search...</text>
+
+    <!-- Live Status Pill -->
+    <rect x="386" y="1" width="94" height="26" class="status-pill-bg"/>
+    <circle cx="398" cy="14" r="3.5" fill="#3fb950"/>
+    <text x="408" y="18" class="status-pill-text">Connected</text>
   </g>
 
-  <!-- Main Viewport Grid: Left Canvas (660px) | Right Inspector (372px) -->
-  <g transform="translate(4, 94)">
-    <!-- Canvas Background -->
-    <rect x="0" y="0" width="660" height="622" fill="#0d1117"/>
-    <line x1="660" y1="0" x2="660" y2="622" stroke="#30363d" stroke-width="1"/>
+  <!-- Main Viewport: Left Canvas (720px) | Right Sidebar (372px) -->
+  <g transform="translate(4, 92)">
+    <!-- DAG Graph Canvas -->
+    <rect x="0" y="0" width="720" height="604" class="canvas-panel"/>
+    <line x1="720" y1="0" x2="720" y2="604" stroke="#30363d" stroke-width="1"/>
 
-    <!-- Graph Canvas Toolbar -->
-    <g transform="translate(18, 16)">
-      <rect x="0" y="0" width="144" height="30" fill="#161b22" stroke="#30363d" stroke-width="1" rx="6"/>
-      <text x="12" y="20" font-family="-apple-system, sans-serif" font-size="12" fill="#c9d1d9">🔍 Zoom: 100% │ ☊ DAG</text>
+    <!-- Canvas Toolbar (Top-Left: Zoom & Fit) -->
+    <g transform="translate(16, 14)">
+      <rect x="0" y="0" width="120" height="30" class="toolbar-box"/>
+      <text x="12" y="20" class="toolbar-text">+   −   ⟲   ⛶</text>
     </g>
 
-    <!-- Filter Chips -->
-    <g transform="translate(240, 18)">
-      <rect x="0" y="0" width="56" height="24" class="filter-chip-active"/>
-      <text x="12" y="16" class="chip-text-active">All (185)</text>
-
-      <rect x="62" y="0" width="62" height="24" class="filter-chip"/>
-      <text x="72" y="16" class="chip-text">Goals (10)</text>
-
-      <rect x="130" y="0" width="64" height="24" class="filter-chip"/>
-      <text x="140" y="16" class="chip-text">Plans (85)</text>
-
-      <rect x="200" y="0" width="94" height="24" class="filter-chip"/>
-      <text x="210" y="16" class="chip-text">Backlog (196)</text>
-
-      <rect x="300" y="0" width="102" height="24" class="filter-chip"/>
-      <text x="310" y="16" class="chip-text">Test Cases (14)</text>
+    <!-- Focus Subgraph Banner (Top-Center) -->
+    <g transform="translate(150, 14)">
+      <rect x="0" y="0" width="300" height="30" class="focus-banner"/>
+      <text x="14" y="19" class="focus-text">🎯 Subgraph: <tspan fill="#58a6ff" font-weight="600">BLI-COMMUNITY-FIRST-RUN</tspan></text>
+      <rect x="238" y="5" width="52" height="20" class="btn-clear-focus"/>
+      <text x="264" y="18" class="btn-clear-focus-text">✕ All</text>
     </g>
 
-    <!-- Connecting Edges (Smooth Bezier Splines) -->
-    <!-- Edge 1: Goal -> Req 1 -->
-    <path d="M 200 130 C 240 130, 240 130, 280 130" class="edge-active" marker-end="url(#arrow-active)"/>
-    <!-- Edge 2: Goal -> Req 2 -->
-    <path d="M 200 130 C 240 130, 240 260, 280 260" class="edge" marker-end="url(#arrow)"/>
-    <!-- Edge 3: Req 1 -> BLI-001 -->
-    <path d="M 460 130 C 490 130, 490 180, 520 180" class="edge-active" marker-end="url(#arrow-active)"/>
-    <!-- Edge 4: BLI-001 -> Test Case -->
-    <path d="M 640 180 C 650 180, 650 330, 520 330" class="edge-active" marker-end="url(#arrow-active)"/>
-    <!-- Edge 5: Test Case -> Criteria -->
-    <path d="M 520 330 C 470 330, 470 450, 420 450" class="edge-active" marker-end="url(#arrow-active)"/>
-
-    <!-- DAG Node 1: GOAL-COMMUNITY-LAUNCH -->
-    <g transform="translate(30, 95)">
-      <rect width="170" height="70" class="node-card"/>
-      <rect x="0" y="0" width="4" height="70" fill="#3fb950" rx="2"/>
-      <text x="14" y="20" class="node-kind" fill="#3fb950">GOAL</text>
-      <text x="156" y="20" class="node-status">active</text>
-      <text x="14" y="38" class="node-id">GOAL-COMMUNITY</text>
-      <text x="14" y="55" class="node-title">Open-Core Community Gate</text>
+    <!-- Kind Filter Chips (Top-Right) -->
+    <g transform="translate(465, 14)">
+      <rect x="0" y="0" width="242" height="30" class="toolbar-box"/>
+      <rect x="4" y="4" width="32" height="22" class="filter-chip-active"/>
+      <text x="20" y="19" class="chip-text-active">All</text>
+      <text x="68" y="19" class="chip-text">WS (2)</text>
+      <text x="116" y="19" class="chip-text">Goals (4)</text>
+      <text x="166" y="19" class="chip-text">Plans (8)</text>
+      <text x="214" y="19" class="chip-text">BLIs (16)</text>
     </g>
 
-    <!-- DAG Node 2: REQ-LAUNCH-DOCS -->
-    <g transform="translate(280, 95)">
-      <rect width="180" height="70" class="node-card"/>
-      <rect x="0" y="0" width="4" height="70" fill="#d29922" rx="2"/>
-      <text x="14" y="20" class="node-kind" fill="#d29922">REQUIREMENT</text>
-      <text x="166" y="20" class="node-status">active</text>
-      <text x="14" y="38" class="node-id">REQ-LAUNCH-DOCS</text>
-      <text x="14" y="55" class="node-title">100% Documentation Accuracy</text>
+    <!-- Directed Graph Edges (Smooth Bezier Splines) -->
+    <!-- Edge 1: WS -> Goal -->
+    <path d="M 210 115 C 240 115, 240 115, 270 115" class="edge-active" marker-end="url(#arrow-active)"/>
+    <!-- Edge 2: Goal -> Priority Plan -->
+    <path d="M 460 115 C 490 115, 490 225, 270 225" class="edge-active" marker-end="url(#arrow-active)"/>
+    <!-- Edge 3: Priority Plan -> Milestone -->
+    <path d="M 460 225 C 490 225, 490 335, 270 335" class="edge-active" marker-end="url(#arrow-active)"/>
+    <!-- Edge 4: Milestone -> BLI (Selected) -->
+    <path d="M 460 335 C 490 335, 490 225, 510 225" class="edge-active" marker-end="url(#arrow-active)"/>
+    <!-- Edge 5: BLI -> Test Case -->
+    <path d="M 605 260 C 605 310, 605 360, 470 445" class="edge-active" marker-end="url(#arrow-active)"/>
+    <!-- Edge 6: Test Case -> Criteria -->
+    <path d="M 280 445 C 250 445, 250 445, 220 445" class="edge-active" marker-end="url(#arrow-active)"/>
+
+    <!-- DAG Node 1: Workstream (kind color #39c5bb) -->
+    <g transform="translate(25, 82)">
+      <rect width="185" height="66" class="node-bg"/>
+      <rect x="0" y="0" width="4" height="66" fill="#39c5bb" rx="2"/>
+      <text x="14" y="18" class="node-badge" fill="#39c5bb">WORKSTREAM</text>
+      <text x="173" y="18" class="node-status">active</text>
+      <text x="14" y="36" class="node-text-id">WS-CORE-LAUNCH</text>
+      <text x="14" y="52" class="node-text-title">Community Core Readiness</text>
     </g>
 
-    <!-- DAG Node 3: REQ-STORAGE-PUREGO -->
-    <g transform="translate(280, 225)">
-      <rect width="180" height="70" class="node-card"/>
-      <rect x="0" y="0" width="4" height="70" fill="#d29922" rx="2"/>
-      <text x="14" y="20" class="node-kind" fill="#d29922">REQUIREMENT</text>
-      <text x="166" y="20" class="node-status">complete</text>
-      <text x="14" y="38" class="node-id">REQ-STORAGE-PUREGO</text>
-      <text x="14" y="55" class="node-title">Pure-Go Storage Engine</text>
+    <!-- DAG Node 2: Goal (kind color #a371f7) -->
+    <g transform="translate(275, 82)">
+      <rect width="185" height="66" class="node-bg"/>
+      <rect x="0" y="0" width="4" height="66" fill="#a371f7" rx="2"/>
+      <text x="14" y="18" class="node-badge" fill="#a371f7">GOAL</text>
+      <text x="173" y="18" class="node-status">active</text>
+      <text x="14" y="36" class="node-text-id">GOAL-COMMUNITY</text>
+      <text x="14" y="52" class="node-text-title">Open-Core Community Gate</text>
     </g>
 
-    <!-- DAG Node 4: BLI-COMMUNITY-FIRST-RUN (Selected Node) -->
-    <g transform="translate(480, 145)">
-      <rect width="170" height="70" class="node-card-selected"/>
-      <rect x="0" y="0" width="4" height="70" fill="#39c5bb" rx="2"/>
-      <text x="14" y="20" class="node-kind" fill="#39c5bb">BACKLOG ITEM</text>
-      <text x="156" y="20" class="node-status" fill="#58a6ff">planned</text>
-      <text x="14" y="38" class="node-id">BLI-FIRST-RUN</text>
-      <text x="14" y="55" class="node-title">First-run tutorial walkthrough</text>
+    <!-- DAG Node 3: Priority Plan (kind color #58a6ff) -->
+    <g transform="translate(275, 192)">
+      <rect width="185" height="66" class="node-bg"/>
+      <rect x="0" y="0" width="4" height="66" fill="#58a6ff" rx="2"/>
+      <text x="14" y="18" class="node-badge" fill="#58a6ff">PRIORITY PLAN</text>
+      <text x="173" y="18" class="node-status">in_progress</text>
+      <text x="14" y="36" class="node-text-id">PRI-LAUNCH-READY</text>
+      <text x="14" y="52" class="node-text-title">Kernel Launch Readiness</text>
     </g>
 
-    <!-- DAG Node 5: TST-COMMUNITY-FIRST-RUN -->
-    <g transform="translate(360, 295)">
-      <rect width="175" height="70" class="node-card"/>
-      <rect x="0" y="0" width="4" height="70" fill="#db61a2" rx="2"/>
-      <text x="14" y="20" class="node-kind" fill="#db61a2">TEST CASE</text>
-      <text x="161" y="20" class="node-status">active</text>
-      <text x="14" y="38" class="node-id">TST-FIRST-RUN</text>
-      <text x="14" y="55" class="node-title">Verify Start-Here Tutorial</text>
+    <!-- DAG Node 4: Milestone (kind color #d29922) -->
+    <g transform="translate(275, 302)">
+      <rect width="185" height="66" class="node-bg"/>
+      <rect x="0" y="0" width="4" height="66" fill="#d29922" rx="2"/>
+      <text x="14" y="18" class="node-badge" fill="#d29922">MILESTONE</text>
+      <text x="173" y="18" class="node-status">active</text>
+      <text x="14" y="36" class="node-text-id">MLS-M1-DOCS</text>
+      <text x="14" y="52" class="node-text-title">100% Verified Manual &amp; Specs</text>
     </g>
 
-    <!-- DAG Node 6: CRIT-COMMUNITY-TUTORIAL -->
-    <g transform="translate(180, 415)">
-      <rect width="180" height="70" class="node-card"/>
-      <rect x="0" y="0" width="4" height="70" fill="#3fb950" rx="2"/>
-      <text x="14" y="20" class="node-kind" fill="#3fb950">CRITERIA</text>
-      <text x="166" y="20" class="node-status">complete</text>
-      <text x="14" y="38" class="node-id">CRIT-TUTORIAL</text>
-      <text x="14" y="55" class="node-title">Criteria satisfied by test</text>
+    <!-- DAG Node 5: Backlog Item (SELECTED / FOCUSED) (kind color #3fb950) -->
+    <g transform="translate(510, 192)" filter="url(#node-glow)">
+      <rect width="195" height="66" class="node-bg-selected"/>
+      <rect x="0" y="0" width="4" height="66" fill="#3fb950" rx="2"/>
+      <text x="14" y="18" class="node-badge" fill="#3fb950">BACKLOG ITEM</text>
+      <text x="181" y="18" class="node-status" fill="#58a6ff">planned</text>
+      <text x="14" y="36" class="node-text-id">BLI-COMMUNITY-FIRST-RUN</text>
+      <text x="14" y="52" class="node-text-title">First-run tutorial walkthrough</text>
     </g>
 
-    <!-- Focus Halo Label -->
-    <g transform="translate(180, 550)">
-      <rect x="0" y="0" width="310" height="32" fill="#161b22" stroke="#58a6ff" stroke-width="1" rx="16"/>
-      <text x="20" y="20" font-family="-apple-system, sans-serif" font-size="12" fill="#f0f6fc">🔍 Focus Chain: <tspan fill="#3fb950">Goal</tspan> ➔ <tspan fill="#d29922">Req</tspan> ➔ <tspan fill="#39c5bb">BLI</tspan> ➔ <tspan fill="#db61a2">Test</tspan> ➔ <tspan fill="#3fb950">Crit</tspan></text>
+    <!-- DAG Node 6: Test Case (kind color #db61a2) -->
+    <g transform="translate(285, 412)">
+      <rect width="185" height="66" class="node-bg"/>
+      <rect x="0" y="0" width="4" height="66" fill="#db61a2" rx="2"/>
+      <text x="14" y="18" class="node-badge" fill="#db61a2">TEST CASE</text>
+      <text x="173" y="18" class="node-status">active</text>
+      <text x="14" y="36" class="node-text-id">TST-FIRST-RUN</text>
+      <text x="14" y="52" class="node-text-title">Verify Start-Here DoD</text>
     </g>
 
-    <!-- Right Side: Object Inspector Drawer (372px) -->
-    <g transform="translate(660, 0)">
-      <rect x="0" y="0" width="372" height="622" class="drawer-bg"/>
+    <!-- DAG Node 7: Criteria (kind color #3fb950) -->
+    <g transform="translate(35, 412)">
+      <rect width="185" height="66" class="node-bg"/>
+      <rect x="0" y="0" width="4" height="66" fill="#3fb950" rx="2"/>
+      <text x="14" y="18" class="node-badge" fill="#3fb950">CRITERIA</text>
+      <text x="173" y="18" class="node-status">complete</text>
+      <text x="14" y="36" class="node-text-id">CRIT-COMMUNITY-001</text>
+      <text x="14" y="52" class="node-text-title">Zero-defect DoD satisfaction</text>
+    </g>
 
-      <!-- Drawer Header -->
-      <g transform="translate(20, 24)">
-        <text x="0" y="0" class="drawer-title">🔍 OBJECT INSPECTOR</text>
-        <text x="320" y="0" font-family="-apple-system, sans-serif" font-size="14" fill="#8b949e" cursor="pointer">✕</text>
-      </g>
-      <line x1="0" y1="42" x2="372" y2="42" stroke="#30363d" stroke-width="1"/>
+    <!-- Right Sidebar Panel: Inspector & Objects -->
+    <g transform="translate(720, 0)">
+      <rect x="0" y="0" width="372" height="604" class="sidebar-panel"/>
 
-      <!-- Selected Entity Hero Card -->
-      <g transform="translate(20, 60)">
-        <rect x="0" y="0" width="332" height="96" fill="#0d1117" stroke="#30363d" stroke-width="1" rx="8"/>
-        <rect x="0" y="0" width="4" height="96" fill="#39c5bb" rx="2"/>
-        <text x="16" y="24" class="node-kind" fill="#39c5bb">BACKLOG ITEM</text>
-        <rect x="236" y="10" width="80" height="20" fill="rgba(88, 166, 255, 0.15)" stroke="#58a6ff" stroke-width="1" rx="10"/>
-        <text x="276" y="24" font-family="-apple-system, sans-serif" font-size="10" font-weight="600" fill="#58a6ff" text-anchor="middle">planned</text>
-        <text x="16" y="48" font-family="ui-monospace, monospace" font-size="13" font-weight="700" fill="#f0f6fc">BLI-COMMUNITY-FIRST-RUN</text>
-        <text x="16" y="70" class="drawer-val">Complete Start Here tutorial walkthrough</text>
-      </g>
+      <!-- Tab Bar -->
+      <rect x="0" y="0" width="372" height="38" class="tab-bar-bg"/>
+      <line x1="0" y1="38" x2="372" y2="38" stroke="#30363d" stroke-width="1"/>
+      <text x="92" y="24" class="sidebar-tab-active">Inspector</text>
+      <line x1="16" y1="37" x2="168" y2="37" stroke="#58a6ff" stroke-width="2"/>
+      <text x="270" y="24" class="sidebar-tab-inactive">Kernel Objects (185)</text>
 
-      <!-- Inspector Property Fields -->
-      <g transform="translate(20, 180)">
-        <text x="0" y="0" class="drawer-label">CAS HASH DIGEST</text>
-        <text x="0" y="18" class="drawer-val">sha256:e3b0c44298fc1c149afbf4c8...</text>
+      <!-- Inspector Content Body -->
+      <g transform="translate(18, 52)">
+        <!-- Top Row: Kind Pill & Status -->
+        <rect x="0" y="0" width="94" height="20" fill="rgba(63, 185, 80, 0.15)" stroke="#3fb950" stroke-width="1" rx="10"/>
+        <text x="47" y="14" font-family="-apple-system, sans-serif" font-size="9" font-weight="600" fill="#3fb950" text-anchor="middle">BACKLOG ITEM</text>
+        <rect x="272" y="0" width="64" height="20" fill="rgba(88, 166, 255, 0.15)" stroke="#58a6ff" stroke-width="1" rx="10"/>
+        <text x="304" y="14" font-family="-apple-system, sans-serif" font-size="9" font-weight="600" fill="#58a6ff" text-anchor="middle">planned</text>
 
-        <text x="0" y="48" class="drawer-label">STORAGE PLANE</text>
-        <text x="0" y="66" class="drawer-val" fill="#3fb950">PlanePromoted (CAS Master)</text>
+        <!-- ID Row + Copy Button -->
+        <text x="0" y="42" font-family="ui-monospace, monospace" font-size="13" font-weight="700" fill="#f0f6fc">BLI-COMMUNITY-FIRST-RUN</text>
+        <rect x="286" y="28" width="50" height="20" class="btn-sec"/>
+        <text x="311" y="42" class="btn-text" fill="#c9d1d9">Copy</text>
 
-        <text x="0" y="96" class="drawer-label">AUTHOR / SEATED ACTOR</text>
-        <text x="0" y="114" class="drawer-val">PER-DEFAULT-LEAD (verified)</text>
+        <!-- Title -->
+        <text x="0" y="66" font-family="-apple-system, sans-serif" font-size="12" fill="#c9d1d9">Complete Start Here tutorial walkthrough</text>
 
-        <text x="0" y="144" class="drawer-label">TRACEABILITY RADAR</text>
-        <text x="0" y="162" class="drawer-val">Upstream Goal: [🟢 GOAL-COMMUNITY]</text>
-        <text x="0" y="180" class="drawer-val">Requirement  : [🟢 REQ-LAUNCH-DOCS]</text>
-        <text x="0" y="198" class="drawer-val">Test Target  : [🟢 TST-FIRST-RUN]</text>
-        <text x="0" y="216" class="drawer-val">Acceptance   : [🟢 CRIT-TUTORIAL] (Satisfied)</text>
-      </g>
+        <!-- Focus Subgraph Action Button -->
+        <rect x="0" y="82" width="138" height="26" class="btn-accent"/>
+        <text x="69" y="99" class="btn-text">🎯 Focus Subgraph</text>
 
-      <line x1="20" y1="440" x2="352" y2="440" stroke="#30363d" stroke-width="1"/>
+        <line x1="0" y1="122" x2="336" y2="122" stroke="#30363d" stroke-width="1"/>
 
-      <!-- Action Buttons Palette -->
-      <g transform="translate(20, 460)">
-        <rect x="0" y="0" width="332" height="34" class="btn-primary"/>
-        <text x="166" y="22" class="btn-text">` + html.EscapeString(paths.RewriteCanonicalCLIInvocations("🚀 Promote Object (zqk object promote)")) + `</text>
+        <!-- Properties Section -->
+        <text x="0" y="142" class="prop-header">PROPERTIES</text>
+        <text x="0" y="162" class="prop-label">KIND</text>
+        <text x="120" y="162" class="prop-val">backlog_item</text>
+        <text x="0" y="184" class="prop-label">STATUS</text>
+        <text x="120" y="184" class="prop-val" fill="#58a6ff">planned</text>
+        <text x="0" y="206" class="prop-label">CREATED</text>
+        <text x="120" y="206" class="prop-val">2026-09-29T12:00:00Z</text>
+        <text x="0" y="228" class="prop-label">PLAN REF</text>
+        <text x="120" y="228" class="prop-val">PRI-LAUNCH-READY</text>
 
-        <rect x="0" y="44" width="160" height="32" class="btn-sec"/>
-        <text x="80" y="64" class="btn-text" fill="#c9d1d9">🔗 Add Reference</text>
+        <line x1="0" y1="248" x2="336" y2="248" stroke="#30363d" stroke-width="1"/>
 
-        <rect x="172" y="44" width="160" height="32" class="btn-sec"/>
-        <text x="252" y="64" class="btn-text" fill="#c9d1d9">📜 Raw CAS JSON</text>
+        <!-- Lineage & Traceability Section -->
+        <text x="0" y="268" class="prop-header">DOWNWARD / UPSTREAM LINEAGE &amp; DOD</text>
+        <text x="0" y="288" class="prop-label">Upstream Milestone</text>
+        <g transform="translate(0, 296)">
+          <rect x="0" y="0" width="132" height="20" class="ref-chip"/>
+          <text x="8" y="14" class="ref-chip-text">◆ MLS-M1-DOCS</text>
+        </g>
+
+        <text x="0" y="336" class="prop-label">Bound Test Case</text>
+        <g transform="translate(0, 344)">
+          <rect x="0" y="0" width="156" height="20" class="ref-chip"/>
+          <text x="8" y="14" class="ref-chip-text">🧪 TST-FIRST-RUN</text>
+        </g>
+
+        <text x="0" y="384" class="prop-label">DoD Acceptance Criteria</text>
+        <g transform="translate(0, 392)">
+          <rect x="0" y="0" width="220" height="20" class="ref-chip"/>
+          <text x="8" y="14" class="ref-chip-text">✓ CRIT-COMMUNITY-001 (Satisfied)</text>
+        </g>
+
+        <line x1="0" y1="432" x2="336" y2="432" stroke="#30363d" stroke-width="1"/>
+
+        <!-- Action Buttons Section -->
+        <g transform="translate(0, 448)">
+          <rect x="0" y="0" width="336" height="32" class="btn-primary"/>
+          <text x="168" y="21" class="btn-text">` + html.EscapeString(paths.RewriteCanonicalCLIInvocations("🚀 Promote Object (zqk object promote)")) + `</text>
+
+          <rect x="0" y="42" width="162" height="30" class="btn-sec"/>
+          <text x="81" y="61" class="btn-text" fill="#c9d1d9">🔗 Add Reference</text>
+
+          <rect x="174" y="42" width="162" height="30" class="btn-sec"/>
+          <text x="255" y="61" class="btn-text" fill="#c9d1d9">📜 Raw CAS JSON</text>
+        </g>
       </g>
     </g>
   </g>
@@ -520,11 +590,13 @@ func main() {
 	}
 	_ = os.MkdirAll(outDir, paths.DirPerm755)
 
+	termWidth := 120
+
 	// 1. Tab 1: State
 	{
 		m := ui.NewUIModel(".", "state")
-		m.Width = 100
-		m.Height = 24
+		m.Width = termWidth
+		m.Height = 25
 		m.AutoScroll = true
 		m.Mutations = []state.JournalMutation{
 			{CreatedAt: time.Now().Add(-180 * time.Second).Unix(), ChangeType: "PROMOTE", ObjectRef: "BLI-COMMUNITY-FIRST-RUN", DiffSummary: "Promoted draft to CAS master (hash: e3b0c442)"},
@@ -535,7 +607,7 @@ func main() {
 		}
 		m.SelectedIndex = 4
 		out := ui.Render(m)
-		if err := RenderScreenToSVG(filepath.Join(outDir, "ui_tab1_state.svg"), "zqk ui (Tab 1: ⚡ State) — Real-Time State Seismograph & Mutation WAL", out, 100); err != nil {
+		if err := RenderScreenToSVG(filepath.Join(outDir, "ui_tab1_state.svg"), "zqk ui (Tab 1: ⚡ State) — Real-Time State Seismograph & Mutation WAL", out, termWidth); err != nil {
 			fmt.Printf("Error rendering Tab 1: %v\n", err)
 		} else {
 			fmt.Println("✅ Generated ui_tab1_state.svg")
@@ -545,8 +617,8 @@ func main() {
 	// 2. Tab 2: Audit
 	{
 		m := ui.NewUIModel(".", "audit")
-		m.Width = 100
-		m.Height = 24
+		m.Width = termWidth
+		m.Height = 25
 		m.AutoScroll = true
 		m.AuditEvents = []state.JournalMutation{
 			{CreatedAt: time.Now().Add(-240 * time.Second).Unix(), Actor: "PER-DEFAULT-LEAD", ChangeType: "claim_work", ObjectRef: "BLI-STARTER-001", DiffSummary: "Claimed item for execution loop"},
@@ -557,7 +629,7 @@ func main() {
 		}
 		m.SelectedIndex = 4
 		out := ui.Render(m)
-		if err := RenderScreenToSVG(filepath.Join(outDir, "ui_tab2_audit.svg"), "zqk ui (Tab 2: 📜 Audit) — Cryptographic Provenance & Operational Audit Trail", out, 100); err != nil {
+		if err := RenderScreenToSVG(filepath.Join(outDir, "ui_tab2_audit.svg"), "zqk ui (Tab 2: 📜 Audit) — Cryptographic Provenance & Operational Audit Trail", out, termWidth); err != nil {
 			fmt.Printf("Error rendering Tab 2: %v\n", err)
 		} else {
 			fmt.Println("✅ Generated ui_tab2_audit.svg")
@@ -567,8 +639,8 @@ func main() {
 	// 3. Tab 3: Swarm
 	{
 		m := ui.NewUIModel(".", "swarm")
-		m.Width = 100
-		m.Height = 24
+		m.Width = termWidth
+		m.Height = 25
 		m.DaemonHealth = []ui.DaemonHealthRow{
 			{Name: "ambient", DesiredState: "enabled", ActualState: "running", PID: 84912, RestartCount: 0, Uptime: "4h12m", Status: "HEALTHY"},
 			{Name: "privileged-writer", DesiredState: "enabled", ActualState: "running", PID: 84915, RestartCount: 0, Uptime: "4h12m", Status: "HEALTHY"},
@@ -578,7 +650,7 @@ func main() {
 		}
 		m.SelectedIndex = 0
 		out := ui.Render(m)
-		if err := RenderScreenToSVG(filepath.Join(outDir, "ui_tab3_swarm.svg"), "zqk ui (Tab 3: 🤖 Swarm) — Multi-Agent Swarm Topology & Seating", out, 100); err != nil {
+		if err := RenderScreenToSVG(filepath.Join(outDir, "ui_tab3_swarm.svg"), "zqk ui (Tab 3: 🤖 Swarm) — Multi-Agent Swarm Topology & Seating", out, termWidth); err != nil {
 			fmt.Printf("Error rendering Tab 3: %v\n", err)
 		} else {
 			fmt.Println("✅ Generated ui_tab3_swarm.svg")
@@ -588,8 +660,8 @@ func main() {
 	// 4. Tab 4: PM
 	{
 		m := ui.NewUIModel(".", "pm")
-		m.Width = 100
-		m.Height = 25
+		m.Width = termWidth
+		m.Height = 26
 		m.RecentBacklog = []ui.PMBacklogRow{
 			{ID: "BLI-COMMUNITY-FIRST-RUN", Title: "Community first-run tutorial verification", Status: "in_progress", Priority: "P0", ClaimedBy: "agent-alpha", PlanRef: "PRI-STARTER-COMMUNITY-001"},
 			{ID: "BLI-STORAGE-PUREGO-001", Title: "Pure-Go embedded storage backend & WAL engine", Status: "complete", Priority: "P0", ClaimedBy: "ACC-SYSTEM", PlanRef: "PRI-STORAGE-PUREGO-001"},
@@ -605,7 +677,7 @@ func main() {
 		}
 		m.SelectedIndex = 0
 		out := ui.Render(m)
-		if err := RenderScreenToSVG(filepath.Join(outDir, "ui_tab4_pm.svg"), "zqk ui (Tab 4: 📋 PM) — Technical Program Management & Shovel-Ready Backlog", out, 100); err != nil {
+		if err := RenderScreenToSVG(filepath.Join(outDir, "ui_tab4_pm.svg"), "zqk ui (Tab 4: 📋 PM) — Technical Program Management & Shovel-Ready Backlog", out, termWidth); err != nil {
 			fmt.Printf("Error rendering Tab 4: %v\n", err)
 		} else {
 			fmt.Println("✅ Generated ui_tab4_pm.svg")
@@ -615,8 +687,8 @@ func main() {
 	// 5. Tab 5: Metrics
 	{
 		m := ui.NewUIModel(".", "metrics")
-		m.Width = 100
-		m.Height = 24
+		m.Width = termWidth
+		m.Height = 25
 		m.CommandMetrics = []ui.CommandMetricRow{
 			{CommandName: paths.RewriteCanonicalCLIInvocations("zqk system check"), ExecCount: 142, AvgDuration: "42ms", LastRunAt: "12:15:02", Status: "pass"},
 			{CommandName: paths.RewriteCanonicalCLIInvocations("zqk object list"), ExecCount: 389, AvgDuration: "18ms", LastRunAt: "12:15:10", Status: "pass"},
@@ -629,7 +701,7 @@ func main() {
 		}
 		m.SelectedIndex = 0
 		out := ui.Render(m)
-		if err := RenderScreenToSVG(filepath.Join(outDir, "ui_tab5_metrics.svg"), "zqk ui (Tab 5: 📊 Metrics) — Kernel Latency & Execution Performance Telemetry", out, 100); err != nil {
+		if err := RenderScreenToSVG(filepath.Join(outDir, "ui_tab5_metrics.svg"), "zqk ui (Tab 5: 📊 Metrics) — Kernel Latency & Execution Performance Telemetry", out, termWidth); err != nil {
 			fmt.Printf("Error rendering Tab 5: %v\n", err)
 		} else {
 			fmt.Println("✅ Generated ui_tab5_metrics.svg")
@@ -639,8 +711,8 @@ func main() {
 	// 6. Tab 6: Scheduler
 	{
 		m := ui.NewUIModel(".", "sched")
-		m.Width = 100
-		m.Height = 24
+		m.Width = termWidth
+		m.Height = 25
 		m.SchedulerJobs = []ui.SchedulerJobRow{
 			{ID: "SCH-001", Title: "change_journal_compaction", Schedule: "@every 5m", LastRunAt: "12:10:00", NextRunAt: "12:15:00", Status: "active"},
 			{ID: "SCH-002", Title: "audit_aggregation", Schedule: "@every 1h", LastRunAt: "12:00:00", NextRunAt: "13:00:00", Status: "active"},
@@ -650,7 +722,7 @@ func main() {
 		}
 		m.SelectedIndex = 0
 		out := ui.Render(m)
-		if err := RenderScreenToSVG(filepath.Join(outDir, "ui_tab6_scheduler.svg"), "zqk ui (Tab 6: ⏱️ Sched) — Autonomous Background Daemons & Maintenance Jobs", out, 100); err != nil {
+		if err := RenderScreenToSVG(filepath.Join(outDir, "ui_tab6_scheduler.svg"), "zqk ui (Tab 6: ⏱️ Sched) — Autonomous Background Daemons & Maintenance Jobs", out, termWidth); err != nil {
 			fmt.Printf("Error rendering Tab 6: %v\n", err)
 		} else {
 			fmt.Println("✅ Generated ui_tab6_scheduler.svg")
@@ -660,8 +732,8 @@ func main() {
 	// 7. Tab 7: QA
 	{
 		m := ui.NewUIModel(".", "qa")
-		m.Width = 100
-		m.Height = 24
+		m.Width = termWidth
+		m.Height = 25
 		m.TestCases = []*test.TestCaseModel{
 			{ID: "TST-STORAGE-PUREGO-001", Title: "Verify Pure-Go Indexing Engine Performance", Status: "complete", TotalCriteria: 1, CompletedCriteria: 1, Lineage: &test.LineageChain{IsIntact: true}},
 			{ID: "TST-ZQL-ACID-TRANSACT-01", Title: "Verify Multi-Object Atomic Rollbacks", Status: "complete", TotalCriteria: 3, CompletedCriteria: 3, Lineage: &test.LineageChain{IsIntact: true}},
@@ -669,7 +741,7 @@ func main() {
 		}
 		m.SelectedIndex = 0
 		out := ui.Render(m)
-		if err := RenderScreenToSVG(filepath.Join(outDir, "ui_tab7_qa.svg"), "zqk ui (Tab 7: 🧪 QA) — Definition of Done & Traceability Verification Radar", out, 100); err != nil {
+		if err := RenderScreenToSVG(filepath.Join(outDir, "ui_tab7_qa.svg"), "zqk ui (Tab 7: 🧪 QA) — Definition of Done & Traceability Verification Radar", out, termWidth); err != nil {
 			fmt.Printf("Error rendering Tab 7: %v\n", err)
 		} else {
 			fmt.Println("✅ Generated ui_tab7_qa.svg")
@@ -679,8 +751,8 @@ func main() {
 	// 8. Tab 8: Health
 	{
 		m := ui.NewUIModel(".", "health")
-		m.Width = 100
-		m.Height = 24
+		m.Width = termWidth
+		m.Height = 25
 		m.HealthSummary = ui.HealthSummary{
 			LastChecked:     time.Now().Add(-2 * time.Minute),
 			CheckFreshness:  "FRESH (2m ago)",
@@ -696,7 +768,7 @@ func main() {
 		}
 		m.SelectedIndex = 0
 		out := ui.Render(m)
-		if err := RenderScreenToSVG(filepath.Join(outDir, "ui_tab8_health.svg"), "zqk ui (Tab 8: 🛡️ Health) — 4-Layer Compliance Cake & CAS Storage Health", out, 100); err != nil {
+		if err := RenderScreenToSVG(filepath.Join(outDir, "ui_tab8_health.svg"), "zqk ui (Tab 8: 🛡️ Health) — 4-Layer Compliance Cake & CAS Storage Health", out, termWidth); err != nil {
 			fmt.Printf("Error rendering Tab 8: %v\n", err)
 		} else {
 			fmt.Println("✅ Generated ui_tab8_health.svg")
@@ -706,7 +778,7 @@ func main() {
 	// 9. Object Inspector (7-Panel Detail Modal rendered via actual tds.Panel & ui.Render)
 	{
 		m := ui.NewUIModel(".", "pm")
-		m.Width = 100
+		m.Width = termWidth
 		m.Height = 28
 		m.DetailModal = &ui.ItemDetailModel{
 			Kind:      "backlog_item",
@@ -735,7 +807,7 @@ func main() {
 		}
 		out := ui.Render(m)
 		inspectorTitle := paths.RewriteCanonicalCLIInvocations("zqk object inspect") + " — 7-Panel Interactive Object Inspector Console"
-		if err := RenderScreenToSVG(filepath.Join(outDir, "ui_object_inspector.svg"), inspectorTitle, out, 100); err != nil {
+		if err := RenderScreenToSVG(filepath.Join(outDir, "ui_object_inspector.svg"), inspectorTitle, out, termWidth); err != nil {
 			fmt.Printf("Error rendering Object Inspector: %v\n", err)
 		} else {
 			fmt.Println("✅ Generated ui_object_inspector.svg")
@@ -750,9 +822,9 @@ func main() {
 		yellowBold := color.New(color.FgYellow, color.Bold).SprintFunc()
 		dimStyle := color.New(color.Faint).SprintFunc()
 
-		buf.WriteString(cyanBold("====================================================================================================") + "\n")
+		buf.WriteString(cyanBold(strings.Repeat("=", termWidth)) + "\n")
 		buf.WriteString(cyanBold("🚀 ZQK TEST & DEFINITION OF DONE (DoD) DASHBOARD | [ACTIVE WORKING SET]") + "\n")
-		buf.WriteString(cyanBold("====================================================================================================") + "\n")
+		buf.WriteString(cyanBold(strings.Repeat("=", termWidth)) + "\n")
 		buf.WriteString(fmt.Sprintf("Working Set: 3 In-Flight Tests │ Regression Pool: 160 Verified Chains (Green) │ DoD: %s\n\n", greenBold("100% PASS")))
 
 		buf.WriteString(fmt.Sprintf("▶ %s  %s  %s\n", cyanBold("TST-STORAGE-PUREGO-001"), yellowBold("[ACTIVE]"), "Verify Pure-Go Indexing Engine Performance"))
@@ -770,17 +842,17 @@ func main() {
 		buf.WriteString(greenBold("🛡️  REGRESSION TESTING POOL: 160 verified chains green & passing") + "\n")
 		buf.WriteString(dimStyle(paths.RewriteCanonicalCLIInvocations("[Pruned from active view — inspect full regression suite with: zqk test dashboard --view regression]")) + "\n\n")
 
-		buf.WriteString(dimStyle(strings.Repeat("─", 100)) + "\n")
+		buf.WriteString(dimStyle(strings.Repeat("─", termWidth)) + "\n")
 		buf.WriteString("📡 RECENT CRITERIA SATISFACTION & SHOCKWAVE EVENTS\n")
-		buf.WriteString(dimStyle(strings.Repeat("─", 100)) + "\n")
+		buf.WriteString(dimStyle(strings.Repeat("─", termWidth)) + "\n")
 		buf.WriteString("  ⚡ [12:14:01] CRITERION SATISFIED: CRIT-STORAGE-PUREGO-EMBEDDED-001\n")
 		buf.WriteString("  ⚡ [12:14:01] TEST CASE TST-STORAGE-PUREGO-001: active -> complete\n")
 		buf.WriteString("  ⚡ [12:14:01] TRACEABILITY CHAIN GRADUATED: TST-STORAGE-PUREGO-001 ➔ Moved to Regression Pool\n")
 		buf.WriteString("  ⚡ [12:14:02] SHOCKWAVE PROPAGATED: Latch complete on requirement REQ-STORAGE-PUREGO\n")
-		buf.WriteString(dimStyle(strings.Repeat("─", 100)) + "\n")
+		buf.WriteString(dimStyle(strings.Repeat("─", termWidth)) + "\n")
 
 		testDashTitle := paths.RewriteCanonicalCLIInvocations("zqk test dashboard") + " — Definition of Done & Live Test Verification Matrix"
-		if err := RenderScreenToSVG(filepath.Join(outDir, "ui_test_dashboard.svg"), testDashTitle, buf.String(), 100); err != nil {
+		if err := RenderScreenToSVG(filepath.Join(outDir, "ui_test_dashboard.svg"), testDashTitle, buf.String(), termWidth); err != nil {
 			fmt.Printf("Error rendering Test Dashboard: %v\n", err)
 		} else {
 			fmt.Println("✅ Generated ui_test_dashboard.svg")
