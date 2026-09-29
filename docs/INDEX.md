@@ -108,6 +108,21 @@ Welcome to the canonical documentation for **ZQK Core**, the Cellular Knowledge 
 
 ---
 
+## 📦 Kernel Subsystems & Package Architecture
+
+| Subsystem / Package | Architectural Focus |
+| :--- | :--- |
+| **[Storage Subsystem](../pkg/storage/README.md)** | Unified storage abstraction, pluggable file/graph providers, and change journals. |
+| **[Graph Backend](../pkg/graph/README.md)** | MemGraph P2P provider, connection pooling, and Cypher query execution. |
+| **[MCP Server Architecture](../pkg/mcp/README.md)** | Model Context Protocol engine, tool dispatch, and client adapters. |
+| **[Concurrency & Synchronization](../pkg/concurrency/README.md)** | Lock contention management, timeouts, and goroutine leak prevention. |
+| **[Pipeline Execution Engine](../pkg/pipeline/README.md)** | Step-based mutation pipelines, stage checkpoints, and rollback handlers. |
+| **[Telemetry & Diagnostics](../pkg/telemetry/README.md)** | Structured metrics, performance telemetry, and event streaming. |
+| **[Bootstrap Subsystem](../internal/bootstrap/README.md)** | Embedded tarball packaging, unpack logic, and zero-friction initialization. |
+| **[CLI Kernel Architecture](../internal/cli/README.md)** | Command routing, context profiles, and fail-closed CLI execution contracts. |
+
+---
+
 ## ⚖️ Open Core Governance
 
 | Document | Description |
