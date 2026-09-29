@@ -108,3 +108,61 @@ func TestLifecycleDocs(t *testing.T) {
 		t.Errorf("expected mermaid diagrams in lifecycle doc")
 	}
 }
+
+// TestAmbientSignalRubricDoc verifies the presence and required precedence sections of the anti-thrashing protocol.
+func TestAmbientSignalRubricDoc(t *testing.T) {
+	root := paths.ResolveProjectRoot(".")
+	docPath := filepath.Join(root, "docs/architecture/AMBIENT_SIGNAL_ACTION_RUBRIC.md")
+	if !fileutil.Exists(docPath) {
+		t.Fatalf("expected ambient signal rubric at %s", docPath)
+	}
+
+	contentBytes, err := os.ReadFile(docPath)
+	if err != nil {
+		t.Fatalf("failed to read ambient signal rubric: %v", err)
+	}
+	content := string(contentBytes)
+	if len(content) < minDocByteLength {
+		t.Errorf("ambient signal rubric content is too short (%d bytes)", len(content))
+	}
+
+	precedenceTokens := []string{"P0:", "P1:", "P2:", "P3:", "P4:", "P5:"}
+	for _, tok := range precedenceTokens {
+		if !strings.Contains(content, tok) {
+			t.Errorf("expected precedence token '%s' in ambient signal rubric", tok)
+		}
+	}
+}
+
+// TestDocsIndexCompleteness verifies that docs/INDEX.md links to the critical launch surfaces.
+func TestDocsIndexCompleteness(t *testing.T) {
+	root := paths.ResolveProjectRoot(".")
+	indexPath := filepath.Join(root, docsIndexRelPath)
+	if !fileutil.Exists(indexPath) {
+		t.Fatalf("expected docs index at %s", indexPath)
+	}
+
+	indexBytes, err := os.ReadFile(indexPath)
+	if err != nil {
+		t.Fatalf("failed to read docs index: %v", err)
+	}
+	content := string(indexBytes)
+
+	requiredLinks := []string{
+		"COMMUNITY_FIRST_RUN.md",
+		"QUICKSTART.md",
+		"AI_AGENT_ONBOARDING.md",
+		"AMBIENT_SIGNAL_ACTION_RUBRIC.md",
+		"PACK_COMPOSITION_AND_EXTENSIBILITY.md",
+		"LIFECYCLE_STATE_MACHINE.md",
+		"ZPARQL_QUERY_LANGUAGE.md",
+		"ZQL_MUTATIONS.md",
+		"OBJECT_INSPECTOR_AND_POLICY_STUDIO.md",
+	}
+
+	for _, req := range requiredLinks {
+		if !strings.Contains(content, req) {
+			t.Errorf("expected link to '%s' in docs/INDEX.md", req)
+		}
+	}
+}

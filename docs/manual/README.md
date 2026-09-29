@@ -1,9 +1,18 @@
-# Manual & CLI Reference
+# Reference Manual
 
-Reference documentation for the ZQK command surface:
+This directory contains authoritative reference manuals for the ZQK Knowledge Kernel query languages, declarative mutation syntax, and interactive diagnostic consoles.
 
-- [Documentation Index](../INDEX.md)
-- [Object Inspector & Policy Studio Reference](./OBJECT_INSPECTOR_AND_POLICY_STUDIO.md)
-- [Architecture Overview](../architecture/README.md)
+## Manual Catalog
+
+- **[ZPARQL Query Language Reference](./ZPARQL_QUERY_LANGUAGE.md)**: Comprehensive manual for querying the Knowledge Kernel graph. Includes pattern matching, graph traversal syntax, relational operators, projection semantics, and execution plans.
+- **[ZQL Declarative Mutations Reference](./ZQL_MUTATIONS.md)**: Complete specification for declarative state mutations, atomic two-phase CAS commits, preflight validation gates, and Write-Ahead Log (WAL) mechanics.
+- **[Object Inspector & Policy Studio Reference](./OBJECT_INSPECTOR_AND_POLICY_STUDIO.md)**: Full reference manual for the interactive TUI console, lineage radar, and Policy Studio. Includes complete CLI flags, keyboard navigation, role-gated action palette, and policy dry-run evaluation.
+
+---
+
+## Related Documentation
+- [Developer & Agent Guides](../guides/README.md)
+- [Architecture Specifications](../specs/README.md)
+- [Interactive Tutorials](../tutorials/README.md)
 - [CLI Command Taxonomy & Standards](../architecture/CLI_COMMAND_TAXONOMY_STANDARDS.md)
-- Live help: `./bin/zqk --help` and `./bin/zqk system validate-command-specs`
+- [Documentation Index](../INDEX.md)
