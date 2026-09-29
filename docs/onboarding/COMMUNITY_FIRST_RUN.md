@@ -17,6 +17,21 @@ make                 # → ./bin/zqk  (or ./bin/<brand.executable_name>)
 
 Use `zqk` (or `./bin/zqk` from this tree). **Do not** `export ZQK_PROJECT_ROOT` in your shell profile.
 
+## Quickstart (2–3 Commands)
+
+**New Project (Greenfield):**
+```bash
+zqk system init --with-onboarding-roadmap
+zqk ui -w
+zqk do
+```
+
+**Existing Project:**
+```bash
+zqk ui -w
+zqk do
+```
+
 ## Fail-closed sequence
 
 ```bash

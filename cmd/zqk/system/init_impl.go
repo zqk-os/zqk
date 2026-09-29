@@ -1295,7 +1295,7 @@ Most multi-agent setups pass ungrounded context through brittle markdown files (
 ## Policies & Invariant Gates
 When an agent or tool attempts to mutate state (claiming work, modifying code, or promoting tasks), %s enforces deterministic policies and validation gates. If an agent tries to skip verification or bypass invariants, the kernel fails closed.
 
-## Quickstart Walkthrough: From Greenfield to Full Mesh (< 3 Minutes)
+## Quickstart: Up and Running in 2 Commands
 
 ### 1. Launch the Visual Web Studio
 Inspect your workstreams, milestones, and real-time Gantt timeline:
@@ -1304,15 +1304,20 @@ Inspect your workstreams, milestones, and real-time Gantt timeline:
 `+"```"+`
 Open [http://127.0.0.1:8080](http://127.0.0.1:8080) in your browser.
 
-### 2. Connect Your AI Agent (Seating Guide)
-Run agent onboarding to detect your editor and prime workspace directives:
+### 2. Execute Shovel-Ready Work
+Autonomously discover, claim, and begin executing tasks:
 `+"```bash"+`
-%s system agent-onboard
+%s do
 `+"```"+`
+Or prompt your AI assistant:
+> *"You are paired with the ZQK Knowledge Kernel. Run '%s do' to claim and implement work."*
 
-Follow the configuration below for your AI assistant:
+---
 
-- **Cursor**: Pre-configured! Automatically detects '.agents/AGENTS.md' and '.cursor/mcp.json'. Prompt Cursor Composer: *"You are paired with the ZQK Knowledge Kernel. Run '%s workflow whats-next' to discover tasks, then run '%s do' to claim and execute work."*
+## AI Agent Seating & MCP Setup (Optional / Advanced)
+Your editor was automatically detected and configured during initialization. If you ever switch editors or add a new agent host, run `+"`"+`%s system agent-onboard`+"`"+` to detect and prime rules.
+
+- **Cursor**: Pre-configured! Automatically detects '.agents/AGENTS.md' and '.cursor/mcp.json'. Prompt Cursor Composer: *"You are paired with the ZQK Knowledge Kernel. Run '%s do' to claim and execute work."*
 - **Claude Desktop**: Auto-install the MCP server:
   `+"```bash"+`
   %s mcp install --client claude-desktop
@@ -1332,29 +1337,8 @@ Follow the configuration below for your AI assistant:
     %s mcp proxy --tcp 127.0.0.1:7777
     `+"```"+`
 
-### 3. Discover What's Next & Execute Tasks
-Query the knowledge kernel to discover your active priority plan and the next prioritized backlog items:
-`+"```bash"+`
-%s workflow whats-next
-`+"```"+`
-To autonomously discover, claim, and begin executing a backlog item:
-`+"```bash"+`
-%s do
-`+"```"+`
-Or target a specific backlog item:
-`+"```bash"+`
-%s do <BLI-ID>
-`+"```"+`
-
-### 4. Background Services & Continuous Verification
-Run background maintenance and telemetry daemons:
-`+"```bash"+`
-%s scheduler start
-%s system status
-`+"```"+`
-
 *Need full CLI help? Run `+"`"+`%s --help`+"`"+` or consult docs/INDEX.md.*
-`, prod, prod, prod, prod, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe)
+`, prod, prod, prod, prod, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe)
 
 	return fileutil.WriteSecureFile(path, []byte(template))
 }

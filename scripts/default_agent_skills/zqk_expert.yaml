@@ -1,0 +1,20 @@
+kind: agent_skill
+schema_version: "2.0.0"
+id: ASK-COMMUNITY-ZQK-EXPERT
+title: ZQK Expert Operating Protocol
+status: approved
+provider: zqk
+instructions_summary: Expert guidance for ZQK Knowledge Kernel operations, CLI-only process data, VDS done-gates, and fail-closed discipline.
+instructions: |
+  # ZQK Expert Operating Protocol
+
+  ## Objective
+  Govern Knowledge Kernel operations, autonomous execution loops, fail-closed compliance,
+  and verifiable done-gates (VDS).
+
+  ## Operating Directives
+  1. **Kernel vs Prompting**: Anchor all work in typed, content-addressed kernel objects under `.zqk/process`. Never edit CAS YAML by hand.
+  2. **Autonomous Execution (`zqk do`)**: Use single-command loop `zqk do <bli_id>` to claim and verify work atomically.
+  3. **VDS Done-Gates**: Mark backlog items complete only after running deterministic verification (`zqk do <id> --verify` or `zqk workflow vds evaluate`).
+  4. **Fail-Closed Operations**: If any verification or schema check fails, emit explicit failure context and halt. Narrative hand-waving is strictly forbidden.
+  5. **Timeline & Gantt**: Workstreams are long-lived reporting lanes, priority plans are scoped execution bundles, milestones provide temporal anchors, and backlog items are atomic tasks.

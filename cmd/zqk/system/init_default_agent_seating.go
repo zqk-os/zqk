@@ -53,6 +53,13 @@ func SeedDefaultAgentSeatingPack(projectRoot string, logger logging.Logger) (cre
 		})
 	}
 
+	// Ensure zqk-expert skill pack files exist in .zqk/skills and .agent/skills
+	if serr := EnsureDefaultSkillsFiles(projectRoot, logger); serr != nil {
+		if logger != nil {
+			logging.Fluent(logger).Warn("Could not ensure default skill files").WithError(serr).Log()
+		}
+	}
+
 	personaTmpls, perr := loadYAMLTemplates(projectRoot, defaultPersonasRelDir, embeddedDefaultPersonaTemplates)
 	if perr != nil {
 		return 0, perr
@@ -232,6 +239,25 @@ func embeddedDefaultAgentSkillTemplates() []map[string]any {
 
 After init, use %s / %s with zqk feed steer and emit-status --persona-ref.
 Do not invent role enums; agent-id is the unique swarm seat.`, objects.ConstPersonaDefaultOperator, objects.ConstPersonaDefaultAgent)),
+		},
+		{
+			objects.FieldKeyID:                  "ASK-DEFAULT-ZQK-EXPERT",
+			objects.FieldKeyTitle:               "ZQK Expert Operating Protocol (Community Default)",
+			objects.FieldKeyStatus:              objects.ObjectStatusApproved,
+			objects.FieldKeyProvider:            "zqk",
+			objects.FieldKeyInstructionsSummary: paths.RewriteCanonicalCLIInvocations("Expert guidance for Knowledge Kernel operations, CLI-only process data, VDS done-gates, and fail-closed discipline."),
+			objects.FieldKeyInstructions: paths.RewriteCanonicalCLIInvocations(`# ZQK Expert Operating Protocol
+
+## Objective
+Govern Knowledge Kernel operations, autonomous execution loops, fail-closed compliance,
+and verifiable done-gates (VDS).
+
+## Operating Directives
+1. **Kernel vs Prompting**: Anchor all work in typed, content-addressed kernel objects under .zqk/process. Never edit CAS YAML by hand.
+2. **Autonomous Execution (zqk do)**: Use single-command loop zqk do <bli_id> to claim and verify work atomically.
+3. **VDS Done-Gates**: Mark backlog items complete only after running deterministic verification (zqk do <id> --verify or zqk workflow vds evaluate).
+4. **Fail-Closed Operations**: If any verification or schema check fails, emit explicit failure context and halt. Narrative hand-waving is strictly forbidden.
+5. **Timeline & Gantt**: Workstreams are long-lived reporting lanes, priority plans are scoped execution bundles, milestones provide temporal anchors, and backlog items are atomic tasks.`),
 		},
 	}
 }

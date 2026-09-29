@@ -740,6 +740,7 @@
 ./scripts/default_agent_skills/qa_verification.yaml
 ./scripts/default_agent_skills/security_linter.yaml
 ./scripts/default_agent_skills/tpm_orchestration.yaml
+./scripts/default_agent_skills/zqk_expert.yaml
 ./scripts/default_personas/
 ./scripts/default_personas/code_reviewer.yaml
 ./scripts/default_personas/community_agent.yaml

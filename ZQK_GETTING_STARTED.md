@@ -1,14 +1,25 @@
 # Welcome to ZQK
 
-Initialized. Next steps:
+Initialization complete. Up and running in 2 commands:
 
-1. `./bin/zqk system agent-onboard --format json`
-2. `./bin/zqk system start-here`
-3. `./bin/zqk mcp install`
-4. `./bin/zqk object list`
-5. `./bin/zqk workflow whats-next --format json`
+### 1. Launch Visual Web Studio
+```bash
+./bin/zqk ui -w
+```
+Inspect workstreams, milestones, and the real-time Gantt timeline at http://127.0.0.1:8080.
 
-Kernel data stays under `.zqk/`. Process YAML goes through the CLI, not a text editor.
-Do not export `ZQK_PROJECT_ROOT` in your shell profile.
+### 2. Execute Shovel-Ready Work
+```bash
+./bin/zqk do
+```
+Or prompt your paired AI assistant:
+> *"You are paired with the ZQK Knowledge Kernel. Run 'zqk do' to claim and implement work."*
 
-If this checkout ships onboarding docs, start at [docs/onboarding/COMMUNITY_FIRST_RUN.md](docs/onboarding/COMMUNITY_FIRST_RUN.md).
+---
+
+### Ambient & Agent Integration (Optional)
+- **Agent Seating & Directives**: Run `./bin/zqk system agent-onboard` to detect and prime editor directives.
+- **Model Context Protocol (MCP)**: Run `./bin/zqk mcp install` to register local MCP endpoints.
+- **Task Discovery**: Run `./bin/zqk workflow whats-next` to inspect shovel-ready items.
+- **Knowledge Kernel**: Kernel data stays under `.zqk/`. Process YAML goes through the CLI, not a text editor.
+- **Onboarding Guide**: Full documentation at [docs/onboarding/COMMUNITY_FIRST_RUN.md](docs/onboarding/COMMUNITY_FIRST_RUN.md).
