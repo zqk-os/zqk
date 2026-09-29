@@ -187,36 +187,58 @@ For deep continuous integration and automated test-matrix auditing, run the dedi
 
 ---
 
-## Step 6: Visual Web Studio (DAG Visualizer & Gantt Roadmap)
+## Step 6: Visual Web Studio (Timeline & Gantt Roadmap & DAG Visualizer)
 
-For complex graphical topologies and browser-based exploration, launch the **Visual Web Studio**:
+For graphical topologies and interactive roadmap navigation, launch the **Visual Web Studio**:
 
 ```bash
 ./bin/zqk ui -w
 ```
 
-Open `http://127.0.0.1:8080/studio/dag-visualizer` in your web browser.
+Web Studio provides two specialized views accessible via browser tabs:
+1. **Timeline & Gantt Roadmap**: `http://127.0.0.1:8080/studio/gantt`
+2. **Ontology DAG Visualizer**: `http://127.0.0.1:8080/studio/dag-visualizer`
 
-### Visual Overview: Visual Web Studio
+### Part 1: Chronological Timeline & Gantt Roadmap (`/studio/gantt`)
 
-![Visual Web Studio: Timeline, Gantt Roadmap & DAG Visualizer](../manual/screenshots/ui_web_studio.svg)
+![Visual Web Studio: Timeline & Gantt Roadmap](../manual/screenshots/ui_web_studio_gantt.svg)
 
-### UI Element & Datapoint Overview:
+### UI Element & Datapoint Overview (Gantt View):
+
+| Visual Component | Visual Location | Semantic Meaning & Operator Value |
+| :--- | :--- | :--- |
+| **Status Filter Pills** | Sub-Toolbar (Left) | Interactive buttons (`All`, `In Progress`, `Planned`, `Completed`) filtering visible roadmap items by lifecycle status. |
+| **Grouping Selector** | Sub-Toolbar (Center) | Reorganizes timeline rows into swimlanes by `Workstream`, `Priority Plan`, or `Milestone`. |
+| **Interactive Legend Bar** | Top Bar | Semantic legend: `◆ Milestone` (Orange), `🌐 Workstream` (Blue), `▶ In Progress` (Blue), `⏳ Planned` (Gray), `✓ Completed` (Green), `| Today Line` (Red). |
+| **Calendar Axis & Day Ticks** | Header Grid (Top) | Seven-day continuous calendar axis (`Sep 26` to `Oct 02`) with proportional day columns. |
+| **Vertical "Today" Line** | Full Height Line | High-contrast red dashed vertical line (`#f85149`) anchoring current execution time against scheduled tasks. |
+| **Swimlane Section Headers** | Canvas Bands | Dark container bars grouping related backlog items under top-level workstream themes (`WS-CORE-LAUNCH`, `WS-STORAGE`). |
+| **Milestone Diamond Markers** | Timeline Grid | Diamond markers (`◆`) indicating critical release gates and achievement status (`✓ Achieved`). |
+| **Horizontal Gantt Bars** | Timeline Grid | Proportional progress bars displaying duration, state, and percentage complete (e.g. `▶ 75% complete`). |
+| **Gantt Inspector Drawer** | Right Sidebar (372px) | Expandable detail drawer displaying selected entity properties, scheduled dates, parent milestones, and downward backlog chains. |
+
+---
+
+### Part 2: Ontology & Causal Dependency DAG Visualizer (`/studio/dag-visualizer`)
+
+![Visual Web Studio: Ontology DAG Dependency Graph](../manual/screenshots/ui_web_studio_dag.svg)
+
+### UI Element & Datapoint Overview (DAG Visualizer):
 
 | Visual Component | Visual Location | Semantic Meaning & Operator Value |
 | :--- | :--- | :--- |
 | **Browser Chrome & URL Bar** | Top Frame | Displays local host connection (`http://127.0.0.1:8080/studio/dag-visualizer`) and dark-mode styling (`#0d1117`). |
-| **App Header & Logo** | Top Left | Emerald green ZQK cursor logo and kernel title. |
-| **View Switcher Tabs** | Header Center | Switches between views: `📅 Timeline & Gantt`, `🕸️ Ontology DAG Visualizer`, `🛡️ System Health & DoD`, and `📊 Metrics & Trace`. |
-| **CAS Master Status Pill** | Header Right | Live status indicator (`🟢 CAS Master: Healthy`) displaying storage membrane state and active lock count. |
-| **DAG Canvas Toolbar** | Sub-header | Contains layout controls (hierarchical, force-directed), zoom/pan resets, search filter input, and kind visibility checkboxes. |
+| **View Switcher Tabs** | Header Center | Switches between views: `☊ DAG Graph` and `▤ Timeline & Gantt`. |
+| **Status Connection Pill** | Header Right | Live status indicator (`🟢 Connected`) confirming real-time SSE stream with Knowledge Kernel. |
+| **DAG Canvas Toolbar** | Sub-header | Layout controls (`+`, `−`, `⟲`, `⛶`), Subgraph focus banner, and node kind filter chips (`All`, `WS`, `Goals`, `Plans`, `BLIs`). |
 | **Node Kind Color Badges** | DAG Canvas | Color-coded nodes matching ZQK's authoritative ontology palette: |
-| | • `goal` (Green `#3fb950`) | Strategic product/engineering goals. |
-| | • `requirement` (Yellow `#d29922`) | Formal functional requirements. |
-| | • `backlog_item` (Teal `#39c5bb`) | Executable work tasks assigned to agents or engineers. |
-| | • `test_case` (Pink `#db61a2`) | Automated test code suites. |
-| | • `criteria` (Emerald `#3fb950`) | Verification latches and Definition of Done done-gates. |
-| **Directed Bezier Splines** | DAG Canvas | Smooth cubic Bezier curves (`M... C...`) with directional arrowheads showing upstream-to-downstream lineage flow. |
+| | • `WORKSTREAM` (Teal `#39c5bb`) | Top-level architectural themes and program boundaries. |
+| | • `GOAL` (Purple `#a371f7`) | Strategic product/engineering goals. |
+| | • `PRIORITY PLAN` (Blue `#58a6ff`) | Groomed, shovel-ready milestones scheduled for execution. |
+| | • `BACKLOG ITEM` (Green `#3fb950`) | Discrete work units claimed and executed by agents. |
+| | • `TEST CASE` (Pink `#db61a2`) | Automated test code suites. |
+| | • `CRITERIA` (Emerald `#3fb950`) | Verification latches and Definition of Done done-gates. |
+| **Directed Bezier Splines** | DAG Canvas | Smooth cubic Bezier curves (`M... C...`) with directional arrowheads showing upstream-to-downstream causal flow. |
 | **Object Inspector Drawer** | Right Sidebar (372px) | Expandable drawer showing deep attributes for the currently clicked node: CAS SHA-256 digest, properties table, lineage radar, and action buttons (`Promote Object`, `Add Reference`, `Raw CAS JSON`). |
 
 ---

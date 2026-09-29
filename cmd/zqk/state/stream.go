@@ -219,7 +219,7 @@ func BuildDashboardView(projectRoot string, recent []JournalMutation) string {
 
 	sparkline := generateSparkline(len(displaySlice))
 
-	buf.WriteString(tds.Panel("⚡ ZQK STATE SEISMOGRAPH & TELEMETRY DASHBOARD", []string{
+	buf.WriteString(tds.Panel("ZQK STATE SEISMOGRAPH & TELEMETRY DASHBOARD", []string{
 		" " + tds.StatRow([]tds.StatItem{
 			{Label: "Root", Value: projectRoot},
 			{Label: "Status", Value: "ACTIVE", Extra: tds.Badge("OK")},
