@@ -1,80 +1,180 @@
-# Functional Error Handling with Metrics
+# Functional Error Handling with Metrics (`pkg/functional`)
 
-A fluent, functional-style API for error handling with automatic metrics integration via the coordinator pattern.
+A fluent, functional-style Go API for monadic error handling, safe map operations, and telemetry-integrated execution with automatic metrics capture via the coordinator pattern.
+
+---
 
 ## Overview
 
-This package provides a Rust-inspired `Result` type and functional combinators for clean error handling, with built-in metrics collection for observability.
+Go's idiomatic `(value, error)` convention frequently leads to verbose, repetitive boilerplate and deeply nested conditional branches. The `pkg/functional` package provides:
 
-## Core Types
+1. **`Result[T]` Monad**: A generic, type-safe container encapsulating either a successful value (`T`) or an `error`, inspired by Rust's `Result<T, E>`.
+2. **Functional Combinators**: Composable operators (`Map`, `MapErr`, `AndThen`, `OrElse`, `OrElseGet`) that transform and chain computations without manual error branching.
+3. **Telemetry-Integrated Execution**: Higher-order functions (`Apply`, `Do`, `Get`) that execute operations while automatically recording execution duration, status, and error metadata into the ZQK coordinator event pipeline.
+4. **Nil-Safe Map Utilities**: Helper functions for pointer maps, default lookups, and key/value slice extractions.
+5. **Fluent Conditional Execution**: Re-exported `When` builder for expressive conditional pipelines.
 
-### Result[T]
+---
 
-A generic type representing either a value or an error:
+## Core Types & API Contract
+
+### 1. `Result[T any]`
+
+The primary generic type representing either an operation's successful payload or an error:
 
 ```go
 type Result[T any] struct {
-    value T
-    err   error
+    value T     // Encapsulated success value (unexported)
+    err   error // Encapsulated error state (unexported)
 }
 ```
 
+#### Constructors
+
+| Constructor | Signature | Description |
+| :--- | :--- | :--- |
+| `Ok` | `func Ok[T any](value T) Result[T]` | Wraps a successful value into a `Result[T]` with `err = nil`. |
+| `Err` | `func Err[T any](err error) Result[T]` | Wraps an error into a `Result[T]` with zero-value `T`. |
+| `From` | `func From[T any](value T, err error) Result[T]` | Lifts a standard Go `(T, error)` tuple directly into `Result[T]`. |
+
+#### Inspection & Unwrapping Methods
+
+| Method | Signature | Description |
+| :--- | :--- | :--- |
+| `IsOk()` | `func (r Result[T]) IsOk() bool` | Returns `true` if the result represents a success (`err == nil`). |
+| `IsErr()` | `func (r Result[T]) IsErr() bool` | Returns `true` if the result represents an error (`err != nil`). |
+| `Value()` | `func (r Result[T]) Value() (T, error)` | Unpacks the `Result[T]` back into a standard Go `(T, error)` tuple. |
+| `Unwrap()` | `func (r Result[T]) Unwrap() T` | Returns the inner value. **Panics** with error details if `IsErr() == true`. |
+| `UnwrapOr()` | `func (r Result[T]) UnwrapOr(defaultValue T) T` | Returns the inner value if successful; otherwise returns `defaultValue`. |
+| `UnwrapOrElse()` | `func (r Result[T]) UnwrapOrElse(fn func(error) T) T` | Returns the inner value if successful; otherwise computes fallback value via `fn(err)`. |
+
+---
+
+### 2. Functional Combinators
+
+Combinators allow transforming and chaining `Result` values declaratively:
+
+| Function | Signature | Semantic Meaning |
+| :--- | :--- | :--- |
+| `Map` | `func Map[T, U any](r Result[T], fn func(T) U) Result[U]` | Applies `fn` to the inner value if `IsOk()`. If `IsErr()`, propagates the error. |
+| `MapErr` | `func MapErr[T any](r Result[T], fn func(error) error) Result[T]` | Applies `fn` to the error if `IsErr()`. If `IsOk()`, leaves value untouched. |
+| `AndThen` | `func AndThen[T, U any](r Result[T], fn func(T) Result[U]) Result[U]` | Chains an operation that returns another `Result[U]` (monadic flatMap). |
+| `OrElse` | `func OrElse[T any](r Result[T], alternative Result[T]) Result[T]` | Returns `r` if `IsOk()`; otherwise returns `alternative`. |
+| `OrElseGet` | `func OrElseGet[T any](r Result[T], fn func(error) Result[T]) Result[T]` | Returns `r` if `IsOk()`; otherwise evaluates `fn(err)` to produce a fallback `Result[T]`. |
+
+---
+
+### 3. Telemetry Configuration Types
+
+`Apply`, `Do`, and `Get` accept functional options to configure metrics and event routing:
+
+```go
+// ApplyConfig holds runtime configuration for telemetry-enabled operations
+type ApplyConfig struct {
+    coordinator   coordination.EventCoordinator // Coordinator destination for metrics
+    operationType string                        // Telemetry label identifying the operation
+}
+
+// ApplyOption modifies ApplyConfig
+type ApplyOption func(*ApplyConfig)
+```
+
+#### Available Options
+
+- `WithCoordinator(c coordination.EventCoordinator) ApplyOption`: Sets an explicit event coordinator.
+- `WithOperationType(opType string) ApplyOption`: Labels the emitted metric event (e.g. `"storage_init"`, `"query_exec"`).
+- `WithoutMetrics() ApplyOption`: Disables metrics collection (useful in lightweight inner loops or unit tests).
+
+---
+
 ## Basic Usage
 
-### Creating Results
+### Constructing and Inspecting Results
 
 ```go
-// Success
-result := functional.Ok(42)
+package main
 
-// Error
-result := functional.Err[int](fmt.Errorf("failed"))
+import (
+    "errors"
+    "fmt"
 
-// From value and error
-value, err := someFunction()
-result := functional.From(value, err)
+    "github.com/zqk-os/zqk/pkg/functional"
+)
+
+func main() {
+    // 1. Success result
+    res1 := functional.Ok(42)
+    fmt.Println(res1.IsOk()) // true
+    fmt.Println(res1.Unwrap()) // 42
+
+    // 2. Error result
+    res2 := functional.Err[int](errors.New("disk full"))
+    fmt.Println(res2.IsErr()) // true
+    fmt.Println(res2.UnwrapOr(0)) // 0
+
+    // 3. From standard Go call
+    value, err := computeSomething()
+    res3 := functional.From(value, err)
+    
+    // 4. Safe fallback with error inspect
+    finalVal := res3.UnwrapOrElse(func(err error) int {
+        fmt.Printf("Computation failed: %v, using default\n", err)
+        return -1
+    })
+    _ = finalVal
+}
+
+func computeSomething() (int, error) {
+    return 100, nil
+}
 ```
 
-### Unwrapping Values
+### Transforming and Chaining Results
 
 ```go
-// Panic on error
-value := result.Unwrap()
-
-// Default value on error
-value := result.UnwrapOr(0)
-
-// Compute default from error
-value := result.UnwrapOrElse(func(err error) int {
-    return -1
-})
-```
-
-### Transforming Results
-
-```go
-// Map successful value
-doubled := functional.Map(result, func(x int) int {
+// Map value: double the integer if Ok
+doubled := functional.Map(res1, func(x int) int {
     return x * 2
 })
 
-// Map error
-betterErr := functional.MapErr(result, func(err error) error {
-    return fmt.Errorf("wrapped: %w", err)
+// Map error: annotate failure context
+betterErr := functional.MapErr(res2, func(err error) error {
+    return fmt.Errorf("storage layer failure: %w", err)
 })
 
-// Chain operations
-final := functional.AndThen(result, func(x int) functional.Result[string] {
-    return functional.Ok(fmt.Sprintf("%d", x))
+// AndThen: Monadic chain returning a different Result type
+stringified := functional.AndThen(res1, func(x int) functional.Result[string] {
+    if x < 0 {
+        return functional.Err[string](errors.New("negative value"))
+    }
+    return functional.Ok(fmt.Sprintf("val=%d", x))
 })
 ```
 
-## Metrics Integration
+---
 
-### Apply Operations
+## Metrics Integration & Telemetry Execution
 
-`Apply` executes a function and automatically records metrics via the coordinator:
+`pkg/functional` bridges execution with the ZQK **coordination** spinal cord. Any operation wrapped via `Apply`, `Do`, or `Get` automatically measures duration, handles error states, and emits an event to the metrics channel.
 
+```
+Caller
+  │
+  ▼
+functional.Apply(ctx, target, fn, WithOperationType("storage_init"))
+  │
+  ├── 1. time.Now()
+  ├── 2. fn(target) ──> (U, error)
+  ├── 3. duration = time.Since(start)
+  ├── 4. coordinator.Emit(ctx, eventCtx)  ──> Metrics / Event Stream
+  │
+  ▼
+Result[U] (Ok or Err)
+```
+
+### 1. `Apply` Family (Transforms Input `T` to Output `U`)
+
+#### Standard Apply
 ```go
 storageProvider := functional.Apply(
     ctx,
@@ -86,253 +186,155 @@ storageProvider := functional.Apply(
 ).UnwrapOr(nil)
 ```
 
-**Before (messy)**:
-```go
-var storageProvider storage.ObjectStorageProvider
-if projectRoot != "" {
-    var storageErr error
-    storageProvider, storageErr = storage.NewFileObjectStorage(projectRoot)
-    if storageErr != nil {
-        storageProvider = nil
-    }
-}
-```
-
-**After (clean)**:
-```go
-storageProvider := functional.Apply(
-    ctx,
-    projectRoot,
-    storage.NewFileObjectStorage,
-    functional.WithOperationType("storage_init"),
-).UnwrapOr(nil)
-```
-
-### ApplyOrElse
-
-Apply with fallback:
-
+#### Apply with Fallback (`ApplyOrElse`)
+Executes the primary function, falling back to an alternative if it fails:
 ```go
 result := functional.ApplyOrElse(
     ctx,
     target,
     primaryFunction,
-    fallbackFunction,
-    functional.WithOperationType("operation"),
+    func(err error) (Output, error) {
+        logger.Warn("Primary failed, attempting fallback", "err", err)
+        return fallbackFunction(target)
+    },
+    functional.WithOperationType("resilient_operation"),
 )
 ```
 
-### ApplyAndThen
-
-Chain operations:
-
+#### Chained Apply (`ApplyAndThen`)
+Pipelines two functions sequentially with automatic propagation:
 ```go
 result := functional.ApplyAndThen(
     ctx,
-    target,
-    step1,
-    step2,
-    functional.WithOperationType("pipeline"),
+    rawInput,
+    parseStage,   // func(Raw) (Parsed, error)
+    enrichStage,  // func(Parsed) (Enriched, error)
+    functional.WithOperationType("pipeline_stage"),
 )
 ```
 
-## Do Operations
+---
 
-For operations that only return errors:
+### 2. `Do` Family (Side Effects Returning Only `error`)
+
+For operations that do not yield values, only errors:
 
 ```go
-// Execute operation
+// Execute side-effect operation
 err := functional.Do(
     ctx,
-    target,
-    func(t Target) error {
-        return t.Operation()
+    task,
+    func(t Task) error {
+        return t.Execute()
     },
-    functional.WithOperationType("operation"),
+    functional.WithOperationType("task_execution"),
 )
 
-// With fallback
-err := functional.DoOrElse(
+// Do with fallback
+err = functional.DoOrElse(
     ctx,
-    target,
-    primaryOperation,
-    fallbackOperation,
-    functional.WithOperationType("operation"),
+    task,
+    primaryAction,
+    fallbackAction,
+    functional.WithOperationType("task_recovery"),
 )
 
-// Chain operations
-err := functional.DoAndThen(
+// Chained Do: step1 produces U, step2 consumes U and returns error
+err = functional.DoAndThen(
     ctx,
-    target,
-    step1,  // Returns (U, error)
-    step2,  // Takes U, returns error
-    functional.WithOperationType("pipeline"),
+    input,
+    func(in Input) (Intermediate, error) {
+        return buildIntermediate(in)
+    },
+    func(inter Intermediate) error {
+        return commitIntermediate(inter)
+    },
+    functional.WithOperationType("commit_pipeline"),
 )
 ```
 
-## Get Operations
+---
 
-For operations that return values:
+### 3. `Get` Family (Value Producers Without Input Target)
+
+For zero-argument producer functions:
 
 ```go
-// Get value
-result := functional.Get(
+// Fetch value with metrics
+res := functional.Get(
     ctx,
-    func() (Value, error) {
-        return fetchValue()
-    },
-    functional.WithOperationType("fetch"),
+    fetchRemoteConfig,
+    functional.WithOperationType("fetch_config"),
 )
 
-// Get with default
-value := functional.GetOrElse(
+// Get with static fallback
+val := functional.GetOrElse(
     ctx,
-    fetchValue,
-    defaultValue,
-    functional.WithOperationType("fetch"),
+    fetchRemoteConfig,
+    defaultConfig,
+    functional.WithOperationType("fetch_config"),
 )
 
 // Get with computed fallback
-result := functional.GetOrElseGet(
+res = functional.GetOrElseGet(
     ctx,
-    fetchValue,
-    func(err error) (Value, error) {
-        return fetchFallbackValue()
+    fetchRemoteConfig,
+    func(err error) (Config, error) {
+        return loadLocalCacheConfig()
     },
-    functional.WithOperationType("fetch"),
+    functional.WithOperationType("fetch_config"),
 )
 ```
 
-## Options
+---
 
-### WithCoordinator
+## Nil-Safe Map Utilities (`maps.go`)
 
-Set a specific coordinator for metrics:
-
-```go
-coordinator := coordination.GetCoordinator()
-result := functional.Apply(
-    ctx,
-    target,
-    fn,
-    functional.WithCoordinator(coordinator),
-    functional.WithOperationType("operation"),
-)
-```
-
-### WithOperationType
-
-Set the operation type for metrics:
+`pkg/functional` provides nil-tolerant and generic map helper routines:
 
 ```go
-result := functional.Apply(
-    ctx,
-    target,
-    fn,
-    functional.WithOperationType("storage_init"),
-)
+import "github.com/zqk-os/zqk/pkg/functional"
+
+// 1. Pointer Map Lookup (nil-safe, returns nil if absent or val is nil)
+var ptrMap map[string]*Session
+session := functional.MapGetPtr(ptrMap, "session-123") // nil, does not panic
+
+// 2. Pointer Map Membership Check (true only if present AND pointer != nil)
+hasValidSession := functional.MapHasPtr(ptrMap, "session-123")
+
+// 3. Map Get With Fallback
+portMap := map[string]int{"http": 8080}
+grpcPort := functional.MapGetOrDefault(portMap, "grpc", 9090) // 9090
+
+// 4. Map Keys Extraction
+keys := functional.MapKeys(portMap) // []string{"http"}
+
+// 5. Map Values Extraction
+vals := functional.MapValues(portMap) // []int{8080}
 ```
 
-### WithoutMetrics
+---
 
-Disable metrics collection:
+## Fluent Conditional Execution (`when.go`)
+
+Re-exports `When` from `pkg/when` to enable clean, declarative conditional execution without multi-tier `if` statements:
 
 ```go
-result := functional.Apply(
-    ctx,
-    target,
-    fn,
-    functional.WithoutMetrics(),
-)
+import "github.com/zqk-os/zqk/pkg/functional"
+
+functional.When(func() bool {
+    return isProduction && featureFlagEnabled
+}).Then(func() {
+    startHighFrequencyMonitor()
+})
 ```
 
-## Metrics Collection
+---
 
-When using `Apply`, `Do`, or `Get` operations with metrics enabled:
+## Benefits & Architectural Alignment
 
-1. **Operation start**: Timestamp recorded
-2. **Operation execution**: Function executed
-3. **Operation completion**: Duration calculated
-4. **Event emission**: Event emitted via coordinator with:
-   - Operation type
-   - Duration
-   - Status (complete/error)
-   - Error details (if any)
-
-Metrics are automatically routed to the metrics channel via the coordinator pattern.
-
-## Examples
-
-### Storage Initialization
-
-```go
-// Clean, metrics-enabled storage initialization
-storageProvider := functional.Get(
-    ctx,
-    func() (storage.ObjectStorageProvider, error) {
-        if projectRoot == "" {
-            return nil, nil // Not an error, just no root
-        }
-        return storage.NewFileObjectStorage(projectRoot)
-    },
-    functional.WithOperationType("mcp_storage_init"),
-).UnwrapOr(nil)
-
-if storageProvider != nil {
-    setupCoordinator(storageProvider)
-}
-```
-
-### Chained Operations
-
-```go
-// Chain multiple operations with metrics
-result := functional.ApplyAndThen(
-    ctx,
-    input,
-    func(input Input) (Intermediate, error) {
-        return processStep1(input)
-    },
-    func(intermediate Intermediate) (Output, error) {
-        return processStep2(intermediate)
-    },
-    functional.WithOperationType("processing_pipeline"),
-)
-
-output := result.UnwrapOr(defaultOutput)
-```
-
-### Error Recovery
-
-```go
-// Try primary, fallback on error
-result := functional.ApplyOrElse(
-    ctx,
-    target,
-    primaryOperation,
-    func(err error) (Value, error) {
-        // Log error, try fallback
-        logger.Warn("Primary failed, using fallback", logging.Error(err))
-        return fallbackOperation()
-    },
-    functional.WithOperationType("operation_with_fallback"),
-)
-```
-
-## Benefits
-
-1. **Clean Syntax**: No more nested if-else error handling
-2. **Automatic Metrics**: Metrics collected automatically via coordinator
-3. **Composable**: Chain operations easily
-4. **Type Safe**: Generic types ensure type safety
-5. **Functional Style**: Inspired by Rust's Result type
-6. **Observability**: Built-in integration with coordinator pattern
-
-## Integration with Coordinator
-
-The functional API automatically integrates with the coordinator pattern:
-
-- Operations emit events via coordinator
-- Metrics include operation type, duration, and status
-- Errors are captured and included in metrics
-- All metrics flow through the unified observability system
+1. **Elimination of Defensive Boilerplate**: Replaces 5-line `if err != nil` nesting with clean, one-line functional transformations.
+2. **First-Class Observability**: Built directly into the `Apply`, `Do`, and `Get` dispatch mechanisms, ensuring uniform latency and error tracking.
+3. **Rust-Grade Type Safety**: Generics ensure compile-time type verification with zero runtime reflection overhead.
+4. **Resilient Failure Recovery**: Seamless fallback chains with `ApplyOrElse`, `OrElseGet`, and `UnwrapOrElse`.
+5. **Zero Magic Literals**: Perfectly integrates with domain constants and `coordination.EventContext`.
