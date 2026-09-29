@@ -23,7 +23,7 @@ func TestTelemetryCollector_FunctionalAcceptance(t *testing.T) {
 	fakeToken := "ghp_" + "11223344556677889900aabbccddeeff0011"
 	rawAttrs := map[string]any{
 		"developer": "dev@internal.corp",
-		"work_dir":  "/Users/lanceettl/workspace/zqk",
+		"work_dir":  "/Users/developer/workspace/zqk",
 		"cli_cmd":   "zqk workflow whats-next",
 		"token":     fakeToken,
 	}
@@ -50,7 +50,7 @@ func TestTelemetryCollector_FunctionalAcceptance(t *testing.T) {
 	}
 
 	dirAttr := ev.Metrics["work_dir"].(string)
-	if strings.Contains(dirAttr, "/Users/lanceettl") {
+	if strings.Contains(dirAttr, "/Users/developer") {
 		t.Errorf("user directory should be redacted, got: %s", dirAttr)
 	}
 

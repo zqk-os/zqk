@@ -77,6 +77,6 @@ If any assertion fails during a multi-object mutation batch:
 ---
 
 ## Canonical References
-- [ZPARQL Query Language](file:///Users/lanceettl/zqk-public-candidate/docs/manual/ZPARQL_QUERY_LANGUAGE.md)
-- [Lifecycle State Machine Specification](file:///Users/lanceettl/zqk-public-candidate/docs/architecture/LIFECYCLE_STATE_MACHINE.md)
-- [Architecture Index](file:///Users/lanceettl/zqk-public-candidate/docs/INDEX.md)
+- [ZPARQL Query Language](ZPARQL_QUERY_LANGUAGE.md)
+- [Lifecycle State Machine Specification](../architecture/LIFECYCLE_STATE_MACHINE.md)
+- [Architecture Index](../INDEX.md)

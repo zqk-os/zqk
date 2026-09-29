@@ -6,7 +6,7 @@ import pathlib
 import re
 import sys
 
-ROOT = pathlib.Path("/Users/lanceettl/zqk-public-candidate")
+ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
 
 
 def read(rel: str) -> str:

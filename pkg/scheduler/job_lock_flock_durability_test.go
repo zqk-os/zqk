@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -152,10 +153,12 @@ func TestJobLock_ConcurrentMutualExclusionAndInodeConflict(t *testing.T) {
 
 	for i := 0; i < concurrentWorkers; i++ {
 		wg.Add(1)
-		go func(workerCtx context.Context, workerID int) {
+		wID := i
+		wCtx := ctx
+		goroutinelabels.NewGoroutine("test.job_lock_worker", "flock durability concurrent worker").StartSimple(func() {
 			defer wg.Done()
 			select {
-			case <-workerCtx.Done():
+			case <-wCtx.Done():
 				return
 			case <-startSignal:
 			}
@@ -168,7 +171,7 @@ func TestJobLock_ConcurrentMutualExclusionAndInodeConflict(t *testing.T) {
 
 			acquired, err := jl.TryAcquire()
 			if err != nil {
-				t.Errorf(errTestWorkerTryAcquire, workerID, err)
+				t.Errorf(errTestWorkerTryAcquire, wID, err)
 				return
 			}
 
@@ -185,7 +188,7 @@ func TestJobLock_ConcurrentMutualExclusionAndInodeConflict(t *testing.T) {
 				activeHolders.Add(-1)
 				_ = jl.Release()
 			}
-		}(ctx, i)
+		})
 	}
 
 	close(startSignal)

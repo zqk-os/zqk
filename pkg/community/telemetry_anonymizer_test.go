@@ -16,7 +16,7 @@ user_email=developer@example.com
 server_ip=192.168.1.105
 github_token=` + fakeGhp + `
 authorization: Bearer mysecretbearerauthstring123456789
-file_path=/Users/lanceettl/project/code.go
+file_path=/Users/developer/project/code.go
 api_key: secret-api-key-999
 `
 
@@ -34,7 +34,7 @@ api_key: secret-api-key-999
 	if strings.Contains(sanitized, "mysecretbearerauthstring") {
 		t.Errorf("expected Bearer auth to be redacted, got:\n%s", sanitized)
 	}
-	if strings.Contains(sanitized, "/Users/lanceettl") {
+	if strings.Contains(sanitized, "/Users/developer") {
 		t.Errorf("expected user home directory to be redacted, got:\n%s", sanitized)
 	}
 	if strings.Contains(sanitized, "secret-api-key-999") {
