@@ -1,5 +1,6 @@
 # Diamond Scale: Multi-Axis Quality Grading Model
 
+> [!NOTE]
 > **Purpose:** Multidimensional architectural quality grading system separating independent software engineering concerns into eight primary vector axes and a five-tier evaluation ladder.
 
 | Specification Metadata | Value |
