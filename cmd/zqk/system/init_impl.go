@@ -76,18 +76,9 @@ func runInit(cmd *cobra.Command, projectName, template string, force bool, snaps
 
 	// Auto-detect legacy mode for existing codebases (Painless Drop-In)
 	if !legacy && snapshotPath == emptyValue {
-		if _, err := fileutil.Stat(filepath.Join(projectRoot, paths.ProjectDataDir)); fileutil.IsNotExist(err) {
-			entries, err := fileutil.ReadDir(projectRoot)
-			if err == nil {
-				for _, entry := range entries {
-					name := entry.Name()
-					if name != ".git" && !strings.HasPrefix(name, paths.ProjectDataDir) {
-						legacy = true
-						logging.Fluent(logger).Info("Detected existing codebase; automatically enabling legacy mode for painless drop-in").Log()
-						break
-					}
-				}
-			}
+		if detectLegacyCodebase(projectRoot) {
+			legacy = true
+			logging.Fluent(logger).Info("Detected existing codebase; automatically enabling legacy mode for painless drop-in").Log()
 		}
 	}
 
@@ -128,16 +119,14 @@ func runInit(cmd *cobra.Command, projectName, template string, force bool, snaps
 			String(initLogFieldProject, projectName).
 			String(initLogFieldDirectory, projectRoot).
 			Log()
-		progress.Step(1, 4, "Restoring ZQK project from snapshot...")
-		initErr = runSnapshotInit(projectRoot, projectName, snapshotPath, merge, wipe, force, logger)
+		initErr = runSnapshotInit(projectRoot, projectName, snapshotPath, merge, wipe, force, logger, progress)
 	case InitModeLegacy:
 		logging.Fluent(logger).Info("Initializing ZQK project (legacy mode)").
 			String(initLogFieldMode, string(mode)).
 			String(initLogFieldProject, projectName).
 			String(initLogFieldDirectory, projectRoot).
 			Log()
-		progress.Step(1, 7, "Initializing project workspace (legacy drop-in mode)...")
-		initErr = runLegacyInit(projectRoot, projectName, template, force, logger)
+		initErr = runLegacyInit(projectRoot, projectName, template, force, logger, progress)
 	default:
 		logging.Fluent(logger).Info("Initializing ZQK project").
 			String(initLogFieldMode, string(mode)).
@@ -443,9 +432,11 @@ func runGreenfieldInit(projectRoot, projectName, template string, force bool, lo
 }
 
 // runLegacyInit handles legacy project initialization
-func runLegacyInit(projectRoot, projectName, template string, force bool, logger logging.Logger) error {
+func runLegacyInit(projectRoot, projectName, template string, force bool, logger logging.Logger, progress *initProgress) error {
 	projectDataDir := filepath.Join(projectRoot, paths.ProjectDataDir)
 	processDir := datacell.ProcessPrimaryDir(projectRoot)
+
+	progress.Step(1, 7, "Initializing project workspace (legacy drop-in mode)...")
 
 	// Create project data directory if it doesn't exist
 	if _, err := fileutil.Stat(projectDataDir); fileutil.IsNotExist(err) {
@@ -501,6 +492,8 @@ func runLegacyInit(projectRoot, projectName, template string, force bool, logger
 		logging.Fluent(logger).Info("Config file already exists, skipping (use --force to overwrite)").Log()
 	}
 
+	progress.Step(2, 7, "Extracting bootstrap specs, lifecycles, and documentation...")
+
 	// Extract bootstrap files when _internal is missing, or when _internal exists but is empty
 	// (e.g. addMissingProcessDirectories created empty _internal/object_specs), or when --force.
 	internalDir := filepath.Join(processDir, initInternalDirName)
@@ -541,6 +534,9 @@ func runLegacyInit(projectRoot, projectName, template string, force bool, logger
 			Int("skipped", skip).
 			Log()
 	}
+
+	progress.Step(3, 7, "Seeding starter kernel graph (goals, plans, milestones)...")
+
 	// Create system account if missing
 	if err := writeSystemAccount(projectRoot); err != nil {
 		logging.Fluent(logger).Warn("Failed to create system account").WithError(err).Log()
@@ -555,13 +551,6 @@ func runLegacyInit(projectRoot, projectName, template string, force bool, logger
 		logging.Fluent(logger).Warn("Failed to write root isolation files").WithError(err).Log()
 	}
 
-	// Automatically configure MCP for supported IDEs and Agents
-	if err := mcp.AutoInstall(projectRoot, logger); err != nil {
-		logging.Fluent(logger).Warn("Failed to auto-install MCP server configuration").
-			WithError(err).
-			Log()
-	}
-
 	// Discovery wizard runs when --discover is set (see runInit); use "zqk system check --auto-fix" to register hashes for discovered objects.
 
 	logging.Fluent(logger).Info("Legacy project initialized successfully").
@@ -571,7 +560,9 @@ func runLegacyInit(projectRoot, projectName, template string, force bool, logger
 }
 
 // runSnapshotInit handles snapshot-based initialization
-func runSnapshotInit(projectRoot, projectName, snapshotPath string, merge, wipe, force bool, logger logging.Logger) error {
+func runSnapshotInit(projectRoot, projectName, snapshotPath string, merge, wipe, force bool, logger logging.Logger, progress *initProgress) error {
+	progress.Step(1, 7, "Preparing project workspace and loading snapshot...")
+
 	// Validate snapshot file exists
 	if err := validateSnapshotFile(snapshotPath); err != nil {
 		return err
@@ -640,6 +631,8 @@ func runSnapshotInit(projectRoot, projectName, snapshotPath string, merge, wipe,
 		return err
 	}
 
+	progress.Step(2, 7, "Extracting bootstrap specs, lifecycles, and documentation...")
+
 	// Extract bootstrap files (snapshot init also needs bootstrap files for validation)
 	internalDir := filepath.Join(projectRoot, paths.ProcessInternalDir)
 	if _, err := fileutil.Stat(internalDir); fileutil.IsNotExist(err) || force {
@@ -661,6 +654,8 @@ func runSnapshotInit(projectRoot, projectName, snapshotPath string, merge, wipe,
 	if err := writeProjectConfigFiles(projectDataDir, projectName, "standard", force); err != nil {
 		return errfmt.Errorf(initErrCreateConfigFileFmt, err)
 	}
+
+	progress.Step(3, 7, "Restoring objects from snapshot into kernel graph...")
 
 	// Restore objects from snapshot
 	if err := restoreObjectsFromSnapshot(projectRoot, snapshotObjects, merge, logger); err != nil {
@@ -1342,3 +1337,58 @@ Your editor was automatically detected and configured during initialization. If 
 
 	return fileutil.WriteSecureFile(path, []byte(template))
 }
+
+// detectLegacyCodebase checks if the projectRoot contains existing project assets
+// (source files, manifests, etc.) that indicate an existing codebase rather than
+// an empty/greenfield workspace.
+func detectLegacyCodebase(projectRoot string) bool {
+	if _, err := fileutil.Stat(filepath.Join(projectRoot, paths.ProjectDataDir)); !fileutil.IsNotExist(err) {
+		return false
+	}
+	entries, err := fileutil.ReadDir(projectRoot)
+	if err != nil {
+		return false
+	}
+	for _, entry := range entries {
+		if !isIgnoredInitEntry(projectRoot, entry) {
+			return true
+		}
+	}
+	return false
+}
+
+func isIgnoredInitEntry(projectRoot string, entry fileutil.DirEntry) bool {
+	name := entry.Name()
+	if name == ".git" || strings.HasPrefix(name, paths.ProjectDataDir) {
+		return true
+	}
+	switch name {
+	case ".agent", ".agents", ".ide", ".cursor", ".vscode", ".windsurf", ".cline", ".zed":
+		return true
+	case ".clinerules", ".cursorrules", ".windsurfrules", ".iderules":
+		return true
+	case "ANTIGRAVITY.md", "GEMINI.md", "CLAUDE.md", "ZQK_GETTING_STARTED.md", ".gitignore", ".gitattributes":
+		return true
+	case "zqk", "zqk-community", "zqk-mcp":
+		return true
+	}
+	// If it's a "bin" directory, check if it only contains zqk binary artifacts
+	if name == "bin" && entry.IsDir() {
+		binEntries, err := fileutil.ReadDir(filepath.Join(projectRoot, "bin"))
+		if err == nil {
+			allZQK := true
+			for _, be := range binEntries {
+				bName := be.Name()
+				if !strings.HasPrefix(bName, "zqk") {
+					allZQK = false
+					break
+				}
+			}
+			if allZQK {
+				return true
+			}
+		}
+	}
+	return false
+}
+
