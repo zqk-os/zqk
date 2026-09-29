@@ -1,4 +1,4 @@
-# Technical Specification: ZPARQL Index-Accelerated Query Planner and Cycle-Safe Traversal Engine
+# Technical Specification: ZPARQL Query Planner Architecture & Complexity Proof
 
 **Document ID:** `SPEC-ZPARQL-QUERY-PLANNER`  
 **Status:** Approved Architectural Specification  
@@ -9,8 +9,8 @@
 
 The **ZPARQL Query Planner and Traversal Engine** translates high-level graph pattern queries (defined in `SPEC-ZPARQL-GRAPH-TRAVERSAL-GRAMMAR`) into optimized physical execution plans that execute against the ZQK Knowledge Kernel.
 
-Naïve graph traversals traverse graphs using full-scan BFS or DFS loops:
-$$\text{Cost}_{\text{naïve}} = O(|V| + |E|)$$
+Naive graph traversals traverse graphs using full-scan BFS or DFS loops:
+$$\text{Cost}_{\text{naive}} = O(|V| + |E|)$$
 In large enterprise kernels ($|V| > 10^5$, $|E| > 10^6$), full graph scans introduce intolerable latency and memory pressure. Furthermore, cyclic topologies (e.g. mutual dependencies, reciprocal review cycles, bidirectional links) trigger infinite recursion or stack overflows unless strictly bounded.
 
 The ZPARQL Planner solves these challenges via:
@@ -24,39 +24,12 @@ The ZPARQL Planner solves these challenges via:
 
 ### 2.1 Planner Phases
 
-```
-  [ ZPARQL Query AST ]
-           │
-           ▼
-┌─────────────────────────┐
-│ 1. Logical Planner      │
-│  - Pattern Decomposition│
-│  - Predicate Pushdown   │
-│  - Join Tree Selection  │
-└──────────┬──────────────┘
-           │
-           ▼
-┌─────────────────────────┐
-│ 2. Cost Estimator       │
-│  - Cardinality Matrix   │
-│  - Index Affinity Score │
-└──────────┬──────────────┘
-           │
-           ▼
-┌─────────────────────────┐
-│ 3. Physical Planner     │
-│  - IndexSeekOp          │
-│  - TraverseEdgeOp       │
-│  - FilterOp / HashJoinOp│
-└──────────┬──────────────┘
-           │
-           ▼
-┌─────────────────────────┐
-│ 4. Traversal Engine     │
-│  - Visited Bitset       │
-│  - Depth Enforcer       │
-│  - Cycle Guard          │
-└─────────────────────────┘
+```mermaid
+flowchart TD
+    AST["ZPARQL Query AST"] --> LP["1. Logical Planner<br/>• Pattern Decomposition<br/>• Predicate Pushdown<br/>• Join Tree Selection"]
+    LP --> CE["2. Cost Estimator<br/>• Cardinality Matrix<br/>• Index Affinity Score"]
+    CE --> PP["3. Physical Planner<br/>• IndexSeekOp<br/>• TraverseEdgeOp<br/>• FilterOp / HashJoinOp"]
+    PP --> TE["4. Traversal Engine<br/>• Visited Bitset<br/>• Depth Enforcer<br/>• Cycle Guard"]
 ```
 
 ### 2.2 Core Interfaces

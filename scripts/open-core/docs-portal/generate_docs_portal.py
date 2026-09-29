@@ -899,6 +899,18 @@ body {
   height: auto !important;
 }
 
+/* KaTeX Mathematical Formulas Styling */
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.75rem 0;
+  margin: 1.25rem 0;
+}
+.katex {
+  font-size: 1.1em;
+  color: var(--text-main);
+}
+
 /* GitHub Alert Callouts */
 .alert {
   border-left: 4px solid var(--border-color);
