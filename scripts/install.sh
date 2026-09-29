@@ -298,12 +298,21 @@ _place_binary() {
     install -m 755 "$bin" "${INSTALL_DIR}/zqk"
     [ -f "$mcp_bin" ] && install -m 755 "$mcp_bin" "${INSTALL_DIR}/zqk-mcp"
   fi
-  # Remove macOS quarantine flag
-  if [ "$OS" = "darwin" ] && command -v xattr >/dev/null 2>&1; then
-    if [ ! -w "$INSTALL_DIR" ]; then
-      sudo xattr -d com.apple.quarantine "${INSTALL_DIR}/zqk" 2>/dev/null || true
-    else
-      xattr -d com.apple.quarantine "${INSTALL_DIR}/zqk" 2>/dev/null || true
+  # Remove macOS quarantine flag and ensure valid ad-hoc signature on Darwin
+  if [ "$OS" = "darwin" ]; then
+    if command -v xattr >/dev/null 2>&1; then
+      if [ ! -w "$INSTALL_DIR" ]; then
+        sudo xattr -d com.apple.quarantine "${INSTALL_DIR}/zqk" 2>/dev/null || true
+      else
+        xattr -d com.apple.quarantine "${INSTALL_DIR}/zqk" 2>/dev/null || true
+      fi
+    fi
+    if command -v codesign >/dev/null 2>&1; then
+      if [ ! -w "$INSTALL_DIR" ]; then
+        sudo codesign --force --sign - "${INSTALL_DIR}/zqk" 2>/dev/null || true
+      else
+        codesign --force --sign - "${INSTALL_DIR}/zqk" 2>/dev/null || true
+      fi
     fi
   fi
 }
