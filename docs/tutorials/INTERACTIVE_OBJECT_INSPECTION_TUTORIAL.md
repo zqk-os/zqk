@@ -27,24 +27,7 @@ The **Object Inspector** is the primary terminal interface for exploring, filter
 
 The inspector displays an interactive Terminal Design System (TDS) table with live filtering, keyboard navigation, and property inspection:
 
-```
-╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-║                             🔎 ZQK KNOWLEDGE KERNEL — OBJECT INSPECTOR CONSOLE                                ║
-╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
-KIND: [backlog_item]  │  FILTER: [ALL] [ACTIVE] [DRAFT] [BLOCKED] [COMPLETE]  │  SORT: [updated_at ▼]
-─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-🔍 SEARCH: [/storage█]  (Press Enter to lock search, Esc to cancel)
-─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  ID                     │ STATUS      │ PRI │ TITLE                                       │ UPDATED
-─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-> BLI-STORAGE-PUREGO-001 │ complete    │ P0  │ Implement pure-Go CAS storage backend       │ 2m ago
-  BLI-STORAGE-PUREGO-002 │ complete    │ P1  │ Wire change journal dictionary compaction   │ 14m ago
-  BLI-LAUNCH-DOCS-001    │ in_progress │ P0  │ Comprehensive visual UI & mutation manual   │ 1m ago
-  BLI-ONBOARD-ROADMAP-01 │ planned     │ P1  │ Greenfield onboarding roadmap seed          │ 45m ago
-  BLI-ECOSYSTEM-SYNC-001 │ blocked     │ P2  │ Linear/GitHub bidirectional bridge          │ 2h ago
-─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-[Enter] Deep Inspection Modal │ [Tab] Next Kind │ [f] Filter │ [s] Sort │ [p] Policy Studio │ [q] Quit
-```
+![Object Inspector Table](../manual/screenshots/ui_object_inspector_table.svg)
 
 ### UI Element & Datapoint Overview:
 
@@ -104,23 +87,7 @@ Press `[Esc]` to close the modal.
 
 Press `[p]` while in the Object Inspector to enter the **Live Policy Rule Studio**. This studio lets you write governance rules in the ZQK Policy DSL and evaluate them across the entire kernel in real time:
 
-```
-╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-║                              🛡️ ZQK POLICY RULE STUDIO — REAL-TIME GOVERNANCE DSL                              ║
-╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
-TARGET KIND: [backlog_item]  │  ACTIVE RULES: 3 loaded  │  EVALUATION MODE: [DRY-RUN]
-─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-EXPRESSION: status == "in_progress" && claimed_by != ""
-AUTOCOMPLETE: [claimed_by]  priority_plan_ref  effort_estimate  milestone_refs  description
-─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-EVALUATION RESULTS:
-  ✓ 194 / 196 objects COMPLIANT
-  ✗ 2 objects VIOLATE RULE:
-    • BLI-AUTH-004: status is 'in_progress' but 'claimed_by' is empty
-    • BLI-UI-012:   status is 'in_progress' but 'claimed_by' is empty
-─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-[c] Edit Expression │ [t] Trigger Dry-Run │ [Tab] Autocomplete │ [s] Save Rule │ [Esc] Return
-```
+![Policy Rule Studio](../manual/screenshots/ui_policy_studio.svg)
 
 ### UI Element & Datapoint Overview:
 

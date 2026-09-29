@@ -1,0 +1,48 @@
+Launches an interactive terminal user interface (TUI) or outputs semantic
+machine-readable
+
+projections for inspecting and navigating kernel object instances.
+
+
+
+Provides modular display modules for lineage, storage profile, CAS digests, and
+metadata.
+
+Includes an interactive Policy Rule Studio for authoring, dry-running, and
+testing validation DSLs.
+
+  Launch interactive object inspector
+  zqk object inspect
+  Inspect backlog items with quick filters
+  zqk object inspect backlog_item
+  Inspect specific requirement details
+  zqk object inspect requirement REQ-012
+  Launch Policy Rule Studio
+  zqk object inspect policy --policy-studio
+  Semantic agent-friendly JSON projection
+  zqk object inspect backlog_item --format json
+
+Usage:
+  zqk object inspect [flags]
+
+Aliases:
+  inspect, ins
+
+Flags:
+      --fields stringArray   Keys to include per object (repeat or comma-separated); omit for full rows
+      --filter stringArray   Initial filter expressions (field=value, field!=value)
+  -f, --format string        Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+      --id string            Specific object identifier to inspect immediately in modal detail
+      --kind string          Initial object kind to inspect (e.g. backlog_item, requirement, test_case, policy)
+  -o, --output string        Write output to file
+      --policy-studio        Launch directly into the interactive Policy Rule Studio
+      --rule-expr string     Evaluate a custom DSL predicate expression across repository objects in real time
+      --sort-asc             Sort ascending (default is descending/newest first)
+      --sort-by string       Initial sort field (default "updated_at") (default "updated_at")
+      --suggest-dsl string   Get autocomplete suggestions for a DSL input prefix
+      --timeout duration     Timeout for command execution (0 = auto-calculate)
+  -v, --verbose              Verbose output
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --internal         Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)

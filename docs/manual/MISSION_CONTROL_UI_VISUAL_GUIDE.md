@@ -31,15 +31,17 @@ The State Tab provides a real-time seismograph of kernel mutations flowing throu
 
 ![Tab 1: State Seismograph & Mutation WAL](./screenshots/ui_tab1_state.svg)
 
-### Datapoints & Diagnostics:
-- **Rate Sparkline (`Rate: ▄▆█▇▅▃ `)**: Moving 60-second mutation frequency. Sudden tall bars indicate active batch ingestion or agent swarms committing work.
-- **Active Plane**: Identifies whether the displayed view represents `PlaneDraft` (unverified agent workspace) or `PlanePromoted` (CAS authoritative master).
-- **Auto-Scroll Mode**: When active (`[AUTO-SCROLL: ON]`), the viewport tracks the live stream tail. Press `[Space]` or `[↑]` to pause the stream and inspect past diffs without missing new records.
-- **Event Badges**:
-  - `[CREATE]`: New entity originated.
-  - `[UPDATE]`: Scalar attribute or reference modified.
-  - `[PROMOTE]`: Entity graduated across membrane from draft to CAS master.
-  - `[LATCH]`: Acceptance criterion satisfied by an objective verification test.
+### Datapoint Breakdown & Operator Guidance:
+
+| Datapoint / Component | Visual Format | Semantic Meaning | Why It Is Useful & Action Required |
+| :--- | :--- | :--- | :--- |
+| **Status Badge** | Green bold `Status: ENFORCING` | Kernel admission controller policy enforcement status. | Confirms all incoming mutations pass structural schema validation and invariant checks. |
+| **Buffer Counter** | `Buffer: 5 state mutations` | Total count of mutations retained in memory journal buffer. | Monitors WAL buffer depth before disk sync or memory compaction. |
+| **Rate Sparkline** | `Rate: [ ▂▂▃▄▄▅▆]` | Moving 60-second mutation frequency across all active planes. | Spikes indicate heavy autonomous swarm ingestion or batch commits. |
+| **Auto-Scroll Mode** | `[AUTO-SCROLL: ON]` / `[PAUSED: +N]` | Viewport tracking behavior for the live event stream. | Press `[Space]` or `[↑]` to pause live tracking and inspect specific records; press `[Space]` to resume. |
+| **Types Counter** | `Types: none` / `BLI: 3, REQ: 1` | Per-kind event breakdown across the current buffer. | Quickly shows which entity types are undergoing rapid evolution. |
+| **Event Badges** | `⚡ PROMOTE`, `⚡ UPDATE`, `⚡ CREATE`, `⚡ LATCH`, `⚡ TRANSITION` | Mutation category and state plane membrane transition. | `PROMOTE` marks graduation from draft to CAS master; `LATCH` marks test criterion satisfaction; `CREATE` mints new entities. |
+| **Cursor Marker** | `> [TIME]` (Cyan bold) | Currently selected row in the mutation stream. | Navigate with `[↑]`/`[↓]`; press `[Enter]` to open the 7-panel modal inspector for this object. |
 
 ---
 
@@ -51,10 +53,16 @@ The Audit Tab provides non-repudiable audit logs tracking which human or AI agen
 
 ![Tab 2: Operational Audit Trail & CAS Provenance](./screenshots/ui_tab2_audit.svg)
 
-### Datapoints & Diagnostics:
-- **Actor Breakdown**: Summarizes event volume by persona or system process (`ACC-SYSTEM`, `agent-alpha`, etc.). Unbalanced event distributions point to thrashing agents or runaway loops.
-- **Operation Column**: Precise API verb executed.
-- **Cryptographic Provenance**: Selecting any row and pressing `[Enter]` displays the full JSON cryptographic receipt: including parent hash, caller account ID, signature, and immutable timestamp.
+### Datapoint Breakdown & Operator Guidance:
+
+| Datapoint / Component | Visual Format | Semantic Meaning | Why It Is Useful & Action Required |
+| :--- | :--- | :--- | :--- |
+| **Stream Channel** | Cyan bold `Stream: audit_event` | Dedicated high-volume operational audit stream channel. | Disambiguates audit logs from domain object mutations. |
+| **Buffer Depth** | `Buffer: 5 audit events` | Count of cryptographic audit records retained in active ring buffer. | High volume indicates active multi-agent pipeline activity. |
+| **Actor Breakdown** | `Actors: ACC-SYSTEM (2), agent-alpha (2)...` | Aggregate event counts grouped by caller persona or daemon. | Detects unbalanced actor activity, runaway agent loops, or rogue background workers. |
+| **Actor Badge** | `PER-DEFAULT-LEAD`, `ACC-SYSTEM`, `agent-alpha` | Cryptographically attributed identity of the actor initiating the operation. | Non-repudiation tracking for governance, security audits, and multi-agent coordination. |
+| **Operation Column** | `claim_work`, `ref_add`, `promote`, `scheduler_tick`, `cas_verify` | Fine-grained API mutation verb executed against the kernel. | Audits exact command actions; helps identify failed assertions or unauthorized mutation attempts. |
+| **Cryptographic Provenance** | Row selection `[Enter]` | Opens complete JSON modal displaying SHA-256 CAS hash, parent hash, and timestamp. | Verify immutable cryptographic provenance before signing off on release candidates. |
 
 ---
 
@@ -66,13 +74,18 @@ The Swarm Tab visualizes running agent processes, seated roles, active task assi
 
 ![Tab 3: Swarm Topology & Agent Seating](./screenshots/ui_tab3_swarm.svg)
 
-### Datapoints & Diagnostics:
-- **Status Column**:
-  - `IDLE`: Holon waiting for Shovel-Ready work. If runway > 0 and agents remain idle, verify agent seating with `zqk system agent-onboard`.
-  - `EXECUTING`: Actively modifying workspace files within a claimed `BLI-*` envelope.
-  - `VALIDATING`: Running tests (`zqk test run`) or waiting for VDS Done-Gate evaluation.
-  - `BLOCKED`: Work is paused due to an unmet precondition or locked dependency.
-- **Heartbeat Age**: Time since last ambient ping. Agents older than `60s` are flagged yellow; older than `180s` are highlighted in red as potentially hung.
+### Datapoint Breakdown & Operator Guidance:
+
+| Datapoint / Component | Visual Format | Semantic Meaning | Why It Is Useful & Action Required |
+| :--- | :--- | :--- | :--- |
+| **Throughput Status** | Green bold `executing [✓ ACTIVE]` | Live state of the continuous autonomous multi-agent loop (CAP). | Verifies that the autonomous execution engine is actively driving backlog delivery. |
+| **Active Priority Plans** | Numeric count `3` | Number of active priority plans currently being executed by swarm agents. | Confirms program alignment and active workstream progress. |
+| **Executing Tasks** | Numeric count `5` | Concurrently executing agent instructions and holon work units. | Quantifies swarm parallelism across the workspace. |
+| **Total Instructions** | Numeric count `12` | Total instruction messages queued, in-flight, or latched in the swarm. | Tracks task pipeline depth; warns if work queue is starving or congested. |
+| **Bound Personas** | `Bound Personas: 5 [✓ OK]` | Count of agent personas with valid skills and tools attached. | Unbound personas indicate misconfigured seating; run `zqk system agent-onboard` to repair. |
+| **CAP Orchestrator** | `SCH-cap-orchestrator [✓ ACTIVE]` | Background CAP orchestrator daemon status. | Drives autonomous work claiming, evaluation, and progression without human intervention. |
+| **Instruction Queue** | `PROPOSED`, `APPROVED`, `EXECUTING`, `COMPLETED` | State distribution of agent instruction objects. | Monitors throughput bottlenecks across the instruction lifecycle. |
+| **Managed Daemons** | `ambient`, `privileged-writer`, `scheduler`, `steward` | Process table showing PID, uptime, restart counts, and health. | Restart count > 0 indicates crashes or OOM; triage with `zqk doctor`. |
 
 ---
 
@@ -84,13 +97,17 @@ The PM Tab displays the Technical Program Management (TPM) Gantt matrix and back
 
 ![Tab 4: TPM Gantt Matrix & Shovel-Ready Backlog](./screenshots/ui_tab4_pm.svg)
 
-### Datapoints & Diagnostics:
-- **Runway Depth**: Number of shovel-ready tasks with all prerequisites met. A runway depth `<= 1` triggers TPM replenishment warnings.
-- **Priority Tier (`P0`–`P3`)**:
-  - `P0`: Critical blocker. Halts ordinary grooming until resolved.
-  - `P1`: Milestone core deliverable.
-  - `P2`: Secondary polish and optimization.
-  - `P3`: Hygiene, documentation formatting, housekeeping.
+### Datapoint Breakdown & Operator Guidance:
+
+| Datapoint / Component | Visual Format | Semantic Meaning | Why It Is Useful & Action Required |
+| :--- | :--- | :--- | :--- |
+| **Mission Alignment** | `Mission: Continuous Autonomous Development` | Top-level organizational mission guiding autonomous program execution. | Root intent node anchored in the knowledge kernel graph. |
+| **BLI Pipeline Vitals** | `Pipeline (10)`, `Planned: 4`, `InProg: 3`, `Blocked: 0`, `Done: 3` | Global delivery breakdown of all backlog items in the active priority plans. | Highlights pipeline bottlenecks and claimant saturation across the swarm. |
+| **Priority Plans Table** | `PLAN ID`, `STATUS`, `BLIS`, `WORKSTREAMS`, `TITLE` | Active priority plans grouping strategic milestones and workstreams. | Press `[Enter]` to inspect plan details, causal dependency tree, and deliverable runway. |
+| **Runway Depth** | Shovel-ready count in `BLIS` | Number of unblocked backlog items ready for immediate claiming. | Runway depth `<= 1` triggers TPM replenishment warnings. |
+| **Priority Tiers** | `P0` (Critical), `P1` (Core deliverable), `P2` (Polish), `P3` (Hygiene) | Strict precedence tier for swarm work selection. | Swarm agents must strictly claim P0 items before grooming lower tiers. |
+| **Work Units Table** | `BLI ID`, `PRIO`, `STATUS`, `CLAIMANT`, `TITLE` | Shovel-ready backlog items ready for or currently under autonomous execution. | Select and press `[Enter]` to drill down into acceptance criteria and test cases. |
+| **Technical Debt Table** | `DEBT ID`, `PRIORITY`, `CATEGORY`, `TITLE` | Code hygiene, deprecated references, and cleanup tasks. | Ensures engineering hygiene items are addressed systematically between feature milestones. |
 
 ---
 
@@ -102,9 +119,15 @@ The Metrics Tab reports operational telemetry, execution latencies, and cache ef
 
 ![Tab 5: Kernel Telemetry & Latency Histograms](./screenshots/ui_tab5_metrics.svg)
 
-### Datapoints & Diagnostics:
-- **Latency Histogram**: Tracks execution responsiveness. A shift in the P99 latency past 250ms indicates file lock contention or heavy unindexed query traversals.
-- **Cache Hit Rates**: Low hit rates (<80%) on the Schema Registry indicate redundant spec reloading. Run `zqk system check` to verify index health.
+### Datapoint Breakdown & Operator Guidance:
+
+| Datapoint / Component | Visual Format | Semantic Meaning | Why It Is Useful & Action Required |
+| :--- | :--- | :--- | :--- |
+| **Resource Hygiene** | `385 process objects`, `24 kinds`, `52 files`, `6 lanes` | Low-level storage and kernel process layer footprint. | Monitors disk usage and stream file growth in `.zqk/process/`. |
+| **Command Telemetry** | `COMMAND`, `CALLS`, `DURATION`, `LAST RUN` | High-resolution latency profiling of CLI and API commands. | Identifies slow operations indicating lock contention or missing indices. |
+| **Duration Metric** | `42ms`, `18ms`, `124ms`, `28ms`, `8ms` | Mean wall-clock duration per command invocation. | A shift in P99 latency past 250ms indicates file lock contention or heavy unindexed traversals. |
+| **Cache Hit Rates** | Percentage badge in telemetry | Hit rate on the in-memory Schema Registry and object index. | Hit rates below 80% indicate redundant spec reloading; run `zqk system check` to verify index health. |
+| **CAS File Locks** | `Target Kind`, `Contention Count`, `Duration`, `Status` | File lock contention and wait times for CAS and change journals. | High contention indicates simultaneous uncoordinated writers; review daemon concurrency. |
 
 ---
 
@@ -116,11 +139,16 @@ The Sched Tab monitors autonomous background jobs, self-healing timers, and rete
 
 ![Tab 6: Scheduler Daemons & Maintenance Jobs](./screenshots/ui_tab6_scheduler.svg)
 
-### Datapoints & Diagnostics:
-- **Daemon Health**: If the daemon displays `STOPPED`, background self-healing is suspended. Start it immediately using `zqk scheduler start`.
-- **Status Badges**:
-  - `[PASS]`: Execution completed within SLA and zero errors.
-  - `[FAIL]`: Job failed. Selecting the row and pressing `[Enter]` displays error stack traces. Refer to runbook [`RB-SCH-001`](../runbooks/RB-SCH-001-SCHEDULER-DAEMON-TRIAGE.md).
+### Datapoint Breakdown & Operator Guidance:
+
+| Datapoint / Component | Visual Format | Semantic Meaning | Why It Is Useful & Action Required |
+| :--- | :--- | :--- | :--- |
+| **Job Identifier** | `SCH-001` through `SCH-005` | Registered cron or interval maintenance jobs. | Primary daemon tasks responsible for self-healing and data integrity. |
+| **Schedule Expression** | `@every 5m`, `@every 1h`, `@every 6h`, `@every 1m` | Configured trigger interval or cron expression. | Ensures compaction, audit aggregation, and hygiene sweeps execute predictably. |
+| **Last Run / Next Run** | Timestamps `12:10:00` / `12:15:00` | Execution timing tracking daemon cadence. | If `Next Run` is in the past, daemon is frozen; restart with `zqk scheduler restart`. |
+| **Job Status** | Green bold `active` / Red bold `failed` | Health state of the scheduled maintenance job. | Press `[t]` to trigger immediate manual execution; press `[d]` to delay execution by 10s. |
+| **Compaction Job** | `change_journal_compaction` | Compresses historical journal entries into immutable CAS chunks. | Prevents change journal files from exceeding the 10MB memory-mapped ceiling. |
+| **Memory Watchdog** | `memory_leak_watchdog` | Monitors RSS footprint of running agent holons and daemons. | Automatically triggers graceful recycling if a daemon exceeds 512MB RAM. |
 
 ---
 
@@ -132,11 +160,17 @@ The QA Tab provides full downward traceability verification: proving every backl
 
 ![Tab 7: QA Done-Gates & Verification Radar](./screenshots/ui_tab7_qa.svg)
 
-### Datapoints & Diagnostics:
-- **DoD Compliance Score**: Percentage of active work units with closed acceptance criteria. Projects cannot be released if DoD compliance is below 100%.
-- **Lineage Health (`✓ INTACT` vs `✗ BROKEN`)**:
-  - `✓ INTACT`: Fully grounded from `Goal` ➔ `Requirement` ➔ `BLI` ➔ `TestCase` ➔ `Criteria`.
-  - `✗ BROKEN`: Missing parent requirement or floating test case. Fails VDS Done-Gate.
+### Datapoint Breakdown & Operator Guidance:
+
+| Datapoint / Component | Visual Format | Semantic Meaning | Why It Is Useful & Action Required |
+| :--- | :--- | :--- | :--- |
+| **Traceability DoD** | `0%` – `100% [PENDING / MET]` | Mathematical percentage of acceptance criteria satisfied by test suites. | Strict gate: code cannot graduate to stable without 100% DoD satisfaction. |
+| **Intact Chains** | `N / M [INTACT / BROKEN]` | Causal lineage chains connecting Goals ➔ REQs ➔ BLIs ➔ TSTs ➔ CRITs. | Broken chains indicate orphaned requirements or floating tests; run `zqk test bind` to link. |
+| **Unbound Criteria** | `0 [✓ OK]` | Acceptance criteria lacking binding test case implementations. | Must be 0 for release readiness. |
+| **BLI Coverage Bar** | `[░░░░░░░░] 0%` – `[████████] 100%` | Graphical progress bar indicating test coverage over active backlog items. | Provides at-a-glance delivery confidence. |
+| **Lineage Badge** | `✓ INTACT` vs `✗ BROKEN` | Cryptographically latched requirement-to-test lineage. | Fails VDS Done-Gate if any chain is `✗ BROKEN`. |
+| **Criteria Counter** | `1/1 ok`, `3/3 ok` | Ratio of latched criteria to total required criteria for this test case. | All criteria must be `ok` before PR merge is permitted. |
+| **Test Suites Table** | `TEST CASE ID`, `STATUS`, `LINEAGE`, `CRITERIA`, `TITLE` | Downward traceability matrix showing all verified test functions. | Press `[t]` to trigger re-scan; press `[Enter]` to inspect test definition and criteria. |
 
 ---
 
@@ -148,9 +182,17 @@ The Health Tab reports storage plane consistency, filesystem watcher health, and
 
 ![Tab 8: Kernel Storage & Membrane Integrity](./screenshots/ui_tab8_health.svg)
 
-### Datapoints & Diagnostics:
-- **CAS Integrity**: Confirms every hash-addressed file in `.zqk/process/` matches its payload content. A mismatch indicates disk corruption; repair immediately with runbook [`RB-CAS-001`](../runbooks/RB-CAS-001-CAS-CORRUPTION-RECOVERY.md).
-- **Integrity Score**: Measures strategic alignment between committed code and documented intent.
+### Datapoint Breakdown & Operator Guidance:
+
+| Datapoint / Component | Visual Format | Semantic Meaning | Why It Is Useful & Action Required |
+| :--- | :--- | :--- | :--- |
+| **Overall Status** | Green bold `HEALTHY` / Yellow `DEGRADED` | Unified health verdict across all 4 layers of the compliance cake. | If degraded or unhealthy, inspect violations table below for remediation steps. |
+| **Freshness Indicator** | `FRESH (2m ago)` | Time elapsed since last full kernel integrity scan. | Yellow or red warnings indicate stale diagnostics; run `zqk system check` to refresh. |
+| **Storage Vitals** | `26,920 files`, `200MiB` | Content-Addressable Storage (CAS) blob volume and disk footprint. | Detects runaway blob leaks or storage bloat. |
+| **File Descriptors** | `10 / 245,760 open [CLEAN]` | Operating system file descriptor consumption. | Guards against file descriptor leaks during intense concurrent operations. |
+| **Process Overseer** | `4/4 running [STANDBY]` | Status of daemon overseer maintaining background services. | Overseer guarantees background daemons automatically respawn if terminated. |
+| **Storage Membrane** | `200MiB (26920 objs)` | Authoritative CAS store size and object count. | Runbook [`RB-CAS-001`](../runbooks/RB-CAS-001-CAS-CORRUPTION-RECOVERY.md) applies if hash mismatch occurs. |
+| **Active Violations** | `0 total (0 fixable)` | Count of structural or ontological invariant failures. | Must remain 0; any non-zero count triggers fail-closed execution locks. |
 
 ---
 
@@ -162,10 +204,14 @@ For dedicated CI/CD runs and local terminal verification, `zqk test dashboard --
 
 ![Test Verification Dashboard](./screenshots/ui_test_dashboard.svg)
 
-### Key Elements & Interpretation:
-1. **Target Line**: Specifies exact Go test function and execution scope (`unit`, `integration`, `e2e`).
-2. **Criteria Pills (`[🟢 CRIT-*]`)**: Real-time representation of acceptance criteria. Green indicates verified; yellow indicates currently testing; white indicates unverified.
-3. **Chain Graduation**: When all criteria in a test case are green, the entire chain automatically graduates into the **Regression Testing Pool**, preventing test output noise.
+### Datapoint Breakdown & Operator Guidance:
+
+| Datapoint / Component | Visual Format | Semantic Meaning | Why It Is Useful & Action Required |
+| :--- | :--- | :--- | :--- |
+| **Target Line** | `Target: TestPureGoIndex (unit)` | Test function name, file path, and testing category (`unit`, `integration`, `e2e`). | Pinpoints exact test execution context and isolation boundaries. |
+| **Criteria Pills** | `[🟢 CRIT-STORAGE-PUREGO]` | Real-time criteria latch states evaluated during test execution. | Green indicates verified; yellow indicates testing; red indicates failure. |
+| **Chain Graduation** | `[REGRESSION POOL]` badge | Automatic promotion of satisfied test cases into the regression pool. | Prevents redundant test execution and keeps CI/CD test passes rapid. |
+| **DoD Compliance** | Progress counter `[3/3 criteria latched]` | Overall Definition of Done satisfaction for the active branch. | When 100%, branch passes pre-merge validation gate. |
 
 ---
 

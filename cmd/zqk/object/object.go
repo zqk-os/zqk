@@ -35,7 +35,9 @@ Examples:
   %s object create backlog_item --file item.yaml
   %s object list backlog_item --filter status=exploring
   %s object get BLI-626
-  %s object update BLI-626 --field status=validated
+  %s object promote BLI-626
+  %s object ref add BLI-626 REQ-101
+  %s object update BLI-626 --field description="Implement resilient cache"
   %s object delete BLI-626
   %s object count backlog_item
   %s object backlog_item fields
@@ -48,11 +50,12 @@ Examples:
   %s object bulk update --file updates.yaml
   # Elevated access (Enterprise license or zqk-admin): include internal kinds
   %s object list --internal
-  %s object create object_spec --internal --file spec.yaml`, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName)
+  %s object create object_spec --internal --file spec.yaml`, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName, paths.CLICommandName)
 	objectCmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewObjectCommandBuilder(), &cobra.Command{
-		Use:   "object",
-		Short: "Object operations (CRUD, query, and management)",
-		Long:  objectCmdLong,
+		Use:     "object",
+		Aliases: []string{"objects"},
+		Short:   "Object operations (CRUD, query, and management)",
+		Long:    objectCmdLong,
 	})
 	objectCmd.AddGroup(
 		&cobra.Group{ID: objectHelpGroupVerbs, Title: "Core Verbs:"},

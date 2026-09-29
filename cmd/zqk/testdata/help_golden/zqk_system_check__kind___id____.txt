@@ -57,6 +57,7 @@ Usage:
 Flags:
       --auto-fix                     Automatically fix recoverable issues (missing hashes and hash mismatches)
       --auto-fix-scheduler           Use scheduler for auto-fix batching (provides status updates and timeout handling, default: true for batches >= 10 issues) (default true)
+      --auto-remedy                  Automatically diagnose and safely apply precondition and hygiene fixes (stale locks, orphaned tmp files, unseeded essentials)
       --background                   Run in background: return immediately with operation ID; check continues and completion is reported via coordinator (default: wait and show progress)
       --cache-only                   Show cached validation results only (do not run validation, trigger background scan)
       --check-refs                   Check reference integrity (enabled by default; --fast disables). Combined with --auto-fix/--force, refs are re-enabled (default true)
@@ -80,6 +81,7 @@ Flags:
   -o, --output string                Write output to file
   -q, --quiet                        Suppress non-essential output
       --refresh-cache                Rebuild object-id cache and validation-related caches; honored with --fast (fast still skips refs only). Also auto-applied when a significant CAS/cache change marker is present
+      --skip-if-locked               Cleanly exit with code 0 if auto-fix lock is held by another process
       --snapshot string              Save check results as snapshot to test-scenario folder (e.g., 'test-scenarios/check-violations')
       --surface string               Filter issues by fitness surface (auth, agent_dispatch, system_check_l0, system_check_l1, admin_form, whats_next, list_default); annotates issue_class
       --tier int                     Filter results to only show objects with issues of the specified tier (1=blocking, 2=warning, 3=informational, 4=recommendation, 0=all)
