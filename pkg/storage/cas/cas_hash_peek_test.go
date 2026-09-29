@@ -39,7 +39,7 @@ title: 'Fixture: domain_registry #4'
 // activity_log; a fixed 8KiB peek missed the id and CAS discovery failed to index the object.
 func TestCasHashFilePeekContainsObjectID_IDAfterLongPrefix(t *testing.T) {
 	dir := t.TempDir()
-	id := "[REDACTED-ID]"
+	id := "CVS-1776080000000000000-a1b2c3d4"
 	var body strings.Builder
 	for body.Len() < 9000 {
 		body.WriteString("# filler line for test\n")

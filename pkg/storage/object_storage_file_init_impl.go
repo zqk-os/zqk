@@ -159,7 +159,7 @@ func NewFileObjectStorage(projectRoot string, opts ...*FileObjectStorageOptions)
 
 	// Reverse-ref dependents cache: load disk snapshot for this project so cross-process
 	// lookups (promote membership, shockwave) see prior CUD. Incremental SaveCache follows
-	// create/update/delete. TRACK: [REDACTED-ID]
+	// create/update/delete. TRACK: core-backlog
 	BindReverseReferenceIndexProjectRoot(projectRoot)
 
 	// Set fileStorage on the global audit event buffer for CAS routing
@@ -242,7 +242,7 @@ func NewFileObjectStorage(projectRoot string, opts ...*FileObjectStorageOptions)
 	// Initialize async validation strategies for high-volume CAS kinds (audit_event, mcp_session, doc_entry).
 	// This starts background file scanners that maintain a cache of existing files, reducing
 	// os.Stat calls during index persistence. Skipped in test mode to avoid global state.
-	// See [REDACTED-ID] for design details.
+	// See core-backlog for design details.
 	if !f.skipGlobalWiring {
 		InitializeAsyncValidationStrategies(projectRoot)
 	}

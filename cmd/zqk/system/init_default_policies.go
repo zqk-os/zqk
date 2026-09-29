@@ -23,7 +23,7 @@ import (
 const defaultPoliciesRelDir = "scripts/default_policies"
 
 // SeedDefaultPolicyPack creates curated default policy objects after greenfield init
-// ([REDACTED-ID] / [REDACTED-ID]).
+// (core-backlog / core-backlog).
 // Sources YAML from scripts/default_policies (project or source repo), falling back to
 // an embedded minimal pack when the directory is absent.
 // Idempotent: skips when a policy with the same stable title already exists.

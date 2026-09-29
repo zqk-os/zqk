@@ -73,13 +73,13 @@ Peers execute the system-proposed plan and scale subagents (`WFL-SUBAGENT-DISPAT
 
 ## Branch collaboration (one plan → one integration branch)
 
-Policy: **`POL-CODE-1784784370706305000-e3e7245a`** (Strict TPM Branch Collaboration). Mega-branch pattern: onboarding § branching mandate.
+Policy: **`POL-CODE-BRANCH-001`** (Strict TPM Branch Collaboration). Mega-branch pattern: onboarding § branching mandate.
 
 1. **TPM provisions** one collaboration / feature branch per plan (pre-PR trunk; e.g. `integration/pri-…`). Agents must not invent ad-hoc integration branches.
 2. **Workers** operate in isolated git worktrees / agent branches **off that plan branch** — never race `main` or steal peers' tips.
 3. **Merge up** into the plan branch when pedantic/build/policy gates pass.
 4. **TPM opens the single PR** to `main` — not one PR per agent.
-5. **Ship-exit (mandatory per column):** local `./scripts/pre-commit-policy.sh` + `./scripts/pre-commit-lint.sh` → targeted TDD (`go test -timeout ≤60s` probes + `zqk scheduler scan-tests --package …` with job id/log) → commit (agent identity) → push → PR → **automerge when criteria met** (`POL-CODE-1784784979738408000-233b96e3` local validation green; optional `[ZQK_AGENT_STAMP]` / `.github/workflows/auto-merge.yml`; else `gh pr merge --squash` after gates). Objectify claims when process objects ship.
+5. **Ship-exit (mandatory per column):** local pre-commit checks (`zqk system check`, `make verify`) → targeted TDD (`go test -timeout ≤60s` probes) → commit (agent identity) → push → PR → **automerge when criteria met** (local validation green; optional `[ZQK_AGENT_STAMP]` / `.github/workflows/auto-merge.yml`; else `gh pr merge --squash` after gates). Objectify claims when process objects ship.
 6. **No idle:** hourglass on directed steers; while waiting, advance the next health/capability action. Peers self-serve `whats-next`; TPM process-admin only (`POL-AGENT-TPM-PROCESS-ADMIN-001`).
 
 Value signal: swarm builds significant momentum without random blockers from poor process orchestration (branch fights, open-ended plan scope, TPM ATK babysitting).

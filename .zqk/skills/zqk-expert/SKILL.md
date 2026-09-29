@@ -20,18 +20,18 @@ When this file disagrees with live CLI help or an active `POL-*` object, **trust
 **Canonical path:** `.zqk/skills/zqk-expert/` (keep `skills/zqk-expert/` in sync).
 
 
-**Kernel registration:** orchestration loads `agent_skill` (`ASK-*`) objects, not filesystem packs alone. Current twins (approved):
-- `ASK-1785642072074959000-a1dfbde9` — ZQK Expert Operating Protocol (`[orchestration-boot]`)
-- `ASK-1786081148616665000-c78bdd4d` — ZQK Orchestration — Plan Primary Protocol (`.zqk/skills/zqk-orchestration/`)
-- `ASK-1785642073632982000-e7c81062` — Scheduler Expert Protocol
-- `ASK-1785642074896778000-83af9fd2` — Go Architect Protocol
-- `ASK-1785642076100778000-b4459584` — DevOps Expert Protocol
-- `ASK-1785642077281504000-9cda2d52` — ZQK QA Traceability Auditor Protocol
-- `ASK-1785642078724330000-9a788725` — Adversarial Auditor Protocol
+**Kernel registration:** orchestration loads `agent_skill` (`ASK-*`) objects, not filesystem packs alone. Core approved skills:
+- `ASK-COMMUNITY-ZQK-EXPERT` — ZQK Expert Operating Protocol (`[orchestration-boot]`)
+- `ASK-COMMUNITY-TPM-ORCHESTRATION` — Technical Program Management & Orchestration Protocol
+- `ASK-COMMUNITY-ARCH-DESIGN` — System Architecture & Package Boundary Protocol
+- `ASK-COMMUNITY-CODE-CRAFTSMAN` — Software Engineering & Code Craftsmanship Protocol
+- `ASK-COMMUNITY-QA-VERIFICATION` — QA Audit & Traceability Verification Protocol
+- `ASK-COMMUNITY-OBJECT-STEWARD` — Kernel Object Stewardship Protocol
+- `ASK-DEFAULT-FEED-CORRESPONDENCE` — Agent Feed Correspondence Protocol
 
-Personas (e.g. `PER-1781486429759398000-a79939a1` ZQK Expert) link these via `related_object_refs`. Keep SKILL.md and ASK `instructions` in sync when refreshing.
+Personas (e.g. `PER-DEFAULT-AGENT`, `PER-DEFAULT-OPERATOR`) link these via `agent_skill_refs`. Keep SKILL.md and ASK `instructions` in sync when refreshing.
 
-**Trust / seal (planned):** skills should be cryptographically sealed (hash + version/date + issuer) before swarm load — tracked `[REDACTED-ID]` (REQ-SYM-021). Periodic skill refresh under maint policy: `[REDACTED-ID]`. Until seals enforce fail-closed, treat skill text as advisory against live CLI/POL objects.
+**Trust / seal:** skills should be cryptographically sealed (hash + version/date + issuer) before swarm load (REQ-SYM-021). Periodic skill refresh follows kernel maintenance policies. Until seals enforce fail-closed, treat skill text as advisory against live CLI/POL objects.
 
 
 ## 1. Orchestration Hygiene & Critical Sections
@@ -80,7 +80,7 @@ Infer next work from **whats-next JSON**, not from chat memory. Active `converge
 | Rule | Do | Do not |
 |------|----|--------|
 | Process data | `zqk object create\|update\|promote\|bulk …` | Edit instance YAML under `.zqk/process/` by hand |
-| Kind formalization | Use `StageCrossMembrane` and cite snag catalog `GLS-1786413953213934000-1c0fb3ff` | Hand-edit `id_prefixes` / advertise kinds missing a storage membrane |
+| Kind formalization | Use `StageCrossMembrane` and cite snag catalog | Hand-edit `id_prefixes` / advertise kinds missing a storage membrane |
 | Done claims | `zqk workflow vds evaluate` (+ evidence) | Mark BLI/CVS/CAP done from chat alone |
 | Tests | `zqk test run --all` or `make test-cases` | Foreground `go test ./…` / multi-minute waits |
 | CLI surface | Edit `.zqk/cli/specs/…` then regenerate builders | Hand-edit `pkg/cli/bldr_cli_cmd_v1/*_command_builder.go` |
@@ -143,7 +143,7 @@ Detail (TPM): [references/tpm-orchestration.md](references/tpm-orchestration.md)
 
 **Ownership:** hand each plan to a primary (`zqk agent orchestrate <PRI>` … to completion). TPM stewards roadmaps/workstreams/conflicts and PR gates — **not** ATK babysitting / conveyor minting.
 
-**Branch collaboration** (`POL-CODE-1784784370706305000-e3e7245a`):
+**Branch collaboration** (`POL-CODE-BRANCH-001`):
 
 1. After any merge to `main`, fetch `origin/main`. TPM provisions **one collaboration branch per plan** from **that tip** (pre-PR trunk; e.g. `integration/pri-…`). Never mint from a feature HEAD or stale local `main`.
 2. Agents work in isolated **git worktrees** off that branch — never `git checkout` between seats in the studio tree, never race `main` or peer tips.

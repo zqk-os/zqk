@@ -117,7 +117,7 @@ func (f *FileObjectStorage) listCASPathGeneral(ctx context.Context, secCtx *pkgc
 		}
 		// Draft-plane IDs are intentionally omitted from normal List: only objects that
 		// have left preliminary (materialized into CAS) appear here. Draft enumeration
-		// is a separate plane/cache if needed — TRACK: [REDACTED-ID].
+		// is a separate plane/cache if needed — TRACK: core-backlog.
 	}
 
 	// Write-behind: merge pending create/update IDs and exclude pending deletes

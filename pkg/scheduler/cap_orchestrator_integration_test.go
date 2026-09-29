@@ -16,7 +16,7 @@ import (
 )
 
 // TestCapOrchestrator_Integration verifies the cap_orchestrator job lifecycle
-// inside a full scheduler instance. It addresses [REDACTED-ID].
+// inside a full scheduler instance. It addresses core-backlog.
 func TestCapOrchestrator_Integration(t *testing.T) {
 
 	sched, testRoot, cleanup := setupTestScheduler(t)

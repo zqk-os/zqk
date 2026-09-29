@@ -36,7 +36,7 @@ func TestMaybeRunOrchestrateRollupAfterTick_WriteJobOutcome_success(t *testing.T
 			EnvKeyConvergenceTickRollup: "1",
 		},
 	}
-	sid := "[REDACTED-ID]"
+	sid := "CVS-STARTER-001"
 	h.MaybeRunOrchestrateRollupAfterTick(context.Background(), job, sid)
 
 	raw, err := fileutil.ReadFile(JobEventsFilePath(tmp, job.ID))
@@ -76,7 +76,7 @@ func TestMaybeRunOrchestrateRollupAfterTick_WriteJobOutcome_failure(t *testing.T
 			EnvKeyConvergenceTickRollup: "true",
 		},
 	}
-	h.MaybeRunOrchestrateRollupAfterTick(context.Background(), job, "[REDACTED-ID]")
+	h.MaybeRunOrchestrateRollupAfterTick(context.Background(), job, "CVS-STARTER-001")
 
 	raw, err := fileutil.ReadFile(JobEventsFilePath(tmp, job.ID))
 	if err != nil {

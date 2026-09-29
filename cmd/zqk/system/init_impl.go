@@ -234,7 +234,7 @@ func runInit(cmd *cobra.Command, projectName, template string, force bool, snaps
 
 	progress.Step(6, 7, "Ensuring maintenance schedulers and agent boot protocol...")
 	// After init, ensure maintenance jobs (retention_tolerance, audit_event_aggregation) if requested.
-	// Fail loudly when --with-maintenance-jobs is set but jobs cannot be ensured ([REDACTED-ID]).
+	// Fail loudly when --with-maintenance-jobs is set but jobs cannot be ensured (core-backlog).
 	if withMaintenanceJobs {
 		result, err := EnsureRetentionJobsInProject(projectRoot, logger, nil)
 		if err != nil {
@@ -983,7 +983,7 @@ func runInteractiveWizard(projectRoot string, logger logging.Logger) error {
 	draft.ImportantDateReason = promptWizard(reader, out, "Important Date Reason (e.g., Product Launch)", draft.ImportantDateReason)
 	saveDiscoveryDraft(projectRoot, draft)
 
-	// Save the objects ([REDACTED-ID]: create first-class mission/vision).
+	// Save the objects (core-backlog: create first-class mission/vision).
 	ctx := pkgctx.NewSystemContext()
 	factory, err := storage.NewStorageFactory(ctx, projectRoot)
 	if err != nil {

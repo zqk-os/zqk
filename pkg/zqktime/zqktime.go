@@ -2,7 +2,7 @@
 //
 // Policy: use these helpers (or time.ParseInLocation with explicit UTC) instead of ad hoc
 // time.Now().Format(time.RFC3339), which uses local zone. See docs/enforcement/AGENT_GUIDELINES.md
-// and [REDACTED-ID].
+// and core-backlog.
 //
 // This package must not import other zqk packages to avoid cycles.
 package zqktime

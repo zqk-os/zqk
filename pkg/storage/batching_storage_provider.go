@@ -21,7 +21,7 @@ import (
 // CLI / SkipWriteBehind creates always pass through synchronously. Batching +
 // BulkCreate was observed ACKing create→get ghosts: ensureObjectID ran, FileObjectStorage.Create
 // did not, and BulkCreate's nil error was broadcast to every waiter (repair_draft with
-// id/kind/title only). TRACK: [REDACTED-ID]
+// id/kind/title only). TRACK: core-backlog
 type BatchingObjectStorage struct {
 	ObjectStorageProvider
 

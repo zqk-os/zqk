@@ -6,7 +6,7 @@ import (
 )
 
 // TestResourcesListResultNeverMarshalsNull ensures resources/list returns [] not null
-// ([REDACTED-ID] / IDE schema validation).
+// (core-backlog / IDE schema validation).
 func TestResourcesListResultNeverMarshalsNull(t *testing.T) {
 	t.Parallel()
 	resources := make([]Resource, 0)

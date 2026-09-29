@@ -14,7 +14,7 @@ import (
 
 // TestSchedulerJobSeedDataConformance validates that all scheduler_job seed
 // data objects conform to their object specifications.
-// It addresses [REDACTED-ID] by running 'zqk system check scheduler_job'.
+// It addresses core-backlog by running 'zqk system check scheduler_job'.
 func TestSchedulerJobSeedDataConformance(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping seed data conformance test in short mode")

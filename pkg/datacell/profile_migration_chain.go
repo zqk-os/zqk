@@ -7,7 +7,7 @@ import "fmt"
 //
 // Physical migration (CAS rewrites, segment rebuilds, path moves) stays in pkg/storage / stream tooling;
 // this ordering matches profile contracts (MigrationMode / WriteMode) and is documented for operators in
-// docs/architecture/DATA_CELL_CROSS_PROFILE_MIGRATION_RUNBOOK.md ([REDACTED-ID]).
+// docs/architecture/DATA_CELL_CROSS_PROFILE_MIGRATION_RUNBOOK.md.
 func OperatorProfileMigrationChain() []StorageProfile {
 	// Canonical escalation path
 	return []StorageProfile{

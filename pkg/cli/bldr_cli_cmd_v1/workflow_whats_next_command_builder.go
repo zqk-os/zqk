@@ -22,7 +22,7 @@ func NewWorkflowWhatsNextCommandBuilder() *cobra.Command {
 	help.WithDescriptionLines("Default measure session: data-cell CVS if present among active/paused rows, else the first row.")
 	help.AddExample("Full composite JSON (default plan + measure)", "%s workflow whats-next --format json")
 	help.AddExample("Objects only (no health.jsonl / measure)", "%s workflow whats-next --format json --skip-measure")
-	help.AddExample("Explicit plan and CVS for measure", "%s workflow whats-next --format json --priority-plan [REDACTED-ID] --session-id [REDACTED-ID]")
+	help.AddExample("Explicit plan and CVS for measure", "%s workflow whats-next --format json --priority-plan PRI-STARTER-COMMUNITY-001 --session-id CVS-STARTER-001")
 	help.AddExample("Seat-scoped mesh correspondence", "%s workflow whats-next --format json --skip-measure --persona-id PER-DEFAULT-AGENT --agent-id peer-agent-01")
 	help.ExcludeFlag("output")
 	help.ExcludeFlag("verbose")

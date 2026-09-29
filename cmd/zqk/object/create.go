@@ -182,7 +182,7 @@ func runCreate(cmd *cobra.Command, args []string) error {
 		if k, ok := objData[objects.FieldKeyKind].(string); ok && k != emptyValue {
 		}
 
-		// Prove membrane visibility (or land repair draft). TRACK: [REDACTED-ID]
+		// Prove membrane visibility (or land repair draft).
 		return finalizeCLIObjectCreate(cmd, proc, objData, kind, objID, filePath)
 	})(cmd, args)
 }

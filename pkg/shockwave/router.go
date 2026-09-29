@@ -5,7 +5,6 @@ import (
 )
 
 // ShockwaveRouter is the primary struct for distributed Shockwave Protocol mesh routing.
-// Implements requirements defined in [REDACTED-ID].
 type ShockwaveRouter struct {
 	NodeID         string
 	Rules          PropagationRules

@@ -3,7 +3,7 @@
 **Status:** Implemented  
 **Purpose:** Avoid CAS overhead for high-volume kinds by writing to append-only segment files (multiple records per file). Uses the **change journal pattern** where only deltas are stored for `change_journal_entry`. The **legacy one-file-per-object (CAS) format is deprecated** for high-volume kinds; see [HIGH_VOLUME_STORAGE_DEPRECATION.md](./HIGH_VOLUME_STORAGE_DEPRECATION.md). References: BYPASS_KIND_STORAGE.md, AUDIT_STREAM_FORMAT.md, INTERNAL_OBJECTS_AS_DEDICATED_WALS.md, HIGH_VOLUME_EVENT_INDEXES.md.
 
-**Vocabulary:** End-to-end policy-driven maintenance of these streams (compaction, retention, overlays) is **object stream stewardship** (synonym: *stream maintainer pattern*). Canonical `glossary_term`: **GLS-1774059548288204000-31cf7bc6** (`zqk object get GLS-1774059548288204000-31cf7bc6`). Template for new environments: `scripts/templates/glossary_object_stream_stewardship.yaml`. Requirement articulation: **REQ-STREAM-001**.
+**Vocabulary:** End-to-end policy-driven maintenance of these streams (compaction, retention, overlays) is **object stream stewardship** (synonym: *stream maintainer pattern*). Requirement articulation: **REQ-STREAM-001**. Template for new environments: `scripts/templates/glossary_object_stream_stewardship.yaml`.
 
 **Implementation hook:** After retention, the scheduler maintenance runner invokes **`storage.PostRetentionStreamStewardship`** (`pkg/storage/stream_stewardship.go`) — registry compaction, orphaned segment GC, runtime-delta backfill and overlay GC. Steward wake is **per stream-backed kind** (see [STREAM_KIND_STEWARDSHIP.md](./STREAM_KIND_STEWARDSHIP.md)). Same entry point is safe to call from tests on an empty tree.
 
@@ -125,7 +125,7 @@ When stream storage is **enabled** for a kind, that kind must **not** be written
 
 ## 9. References
 
-- **Glossary (logical data paths):** **Data stream summary** — `GLS-1774504419525806000-78a9c2e4` (`zqk object get GLS-1774504419525806000-78a9c2e4`); **Data cell** (coordinator membrane around stream/CAS nucleus) — `GLS-1774504405009664000-c1c04629`. Requirements: **REQ-DATASTREAM-001**, **REQ-DATACELL-001**; backlog: **[REDACTED-ID]**.
+- **Glossary (logical data paths):** **Data stream summary**, **Data cell** (coordinator membrane around stream/CAS nucleus). Requirements: **REQ-DATASTREAM-001**, **REQ-DATACELL-001**.
 - [DATA_STORAGE_PRODUCTION_ROADMAP.md](./DATA_STORAGE_PRODUCTION_ROADMAP.md) — Optimize first, then timestamp compression and timeseries wiring
 - [BYPASS_KIND_STORAGE.md](./BYPASS_KIND_STORAGE.md) – Motivation and aggregate storage
 - [AUDIT_STREAM_FORMAT.md](./AUDIT_STREAM_FORMAT.md) – Audit stream file format

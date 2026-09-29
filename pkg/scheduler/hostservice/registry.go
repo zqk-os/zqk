@@ -211,7 +211,7 @@ func (a UnsupportedAdapter) Status(Entry) (string, error) {
 type WindowsStubAdapter struct{}
 
 func (WindowsStubAdapter) Install(Entry) error {
-	return errfmt.Errorf("Windows host service backend not implemented yet (TRACK [REDACTED-ID]); registry/CLI verbs are ready")
+	return errfmt.Errorf("Windows host service backend not implemented yet; registry/CLI verbs are ready")
 }
 func (a WindowsStubAdapter) Uninstall(Entry) error { return a.Install(Entry{}) }
 func (a WindowsStubAdapter) Start(Entry) error     { return a.Install(Entry{}) }

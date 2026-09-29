@@ -277,7 +277,7 @@ func init() {
 		}
 	})
 
-	// Set change notification handler ([REDACTED-ID])
+	// Set change notification handler (core-backlog)
 	// Batch validation triggers and flush by size or time so SCH-val runs once per batch (see validation_trigger_batch.go).
 	// No new scheduler_job is created—avoids recursion and one-off job proliferation (see BLI reusable validation job).
 	storage.SetChangeNotificationHandler(func(ctx context.Context, operation, kind, id string, objectData map[string]any) error {
@@ -556,7 +556,7 @@ func Execute() {
 	// This also prevents tests from racing on index persistence.
 	//
 	// CRITICAL: Flush BEFORE error handling - otherwise os.Exit(1) prevents flush and creates
-	// stale index entries (files written but index not persisted). See [REDACTED-ID].
+	// stale index entries (files written but index not persisted). See core-backlog.
 	if !isHelpOrVersion {
 		drainCtx, drainCancel := context.WithTimeout(context.Background(), 5*time.Second) // Background: shutdown drain // Background: request-or-shutdown derived
 		if drainErr := storage.GetGlobalShutdownCoordinator().DrainAll(drainCtx); drainErr != nil {

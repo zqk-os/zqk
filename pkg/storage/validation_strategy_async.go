@@ -30,7 +30,7 @@ import (
 // Fallback behavior: If the cache is empty (initial startup or after errors), the strategy
 // falls back to synchronous validation to ensure correctness.
 //
-// See [REDACTED-ID] for the design rationale.
+// See core-backlog for the design rationale.
 type AsyncCacheValidationStrategy struct {
 	// Configuration
 	scanInterval time.Duration // How often to check for changes

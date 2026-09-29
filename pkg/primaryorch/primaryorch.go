@@ -2,7 +2,7 @@
 // them through pluggable vendor adapters (script, agent chat channel, inbox).
 //
 // Binding lives at .zqk/agent-runtime/primary_orchestrator.json — not in vendor brain dirs.
-// See [REDACTED-ID].
+// See core-backlog.
 package primaryorch
 
 import (

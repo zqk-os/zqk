@@ -20,7 +20,7 @@ import (
 )
 
 // skipObjectGetFieldACL: CLI defaults to system/admin or planner/orchestrator; SpecLoader+SAC on every get
-// dominated warm latency ([REDACTED-ID]). Non-admin/non-orchestrator callers still filter.
+// dominated warm latency (core-backlog). Non-admin/non-orchestrator callers still filter.
 func skipObjectGetFieldACL(sec *pkgctx.SecurityContext) bool {
 	if sec == nil {
 		return false
@@ -116,7 +116,7 @@ func runGet(cmd *cobra.Command, args []string) error {
 		}
 
 		// BLI-642: field-level permissions — filter to fields the security context can read
-		// (skip SpecLoader+SAC for system/admin CLI path — [REDACTED-ID]).
+		// (skip SpecLoader+SAC for system/admin CLI path — core-backlog).
 		if proc.ProjectRoot() != emptyValue && !skipObjectGetFieldACL(proc.SecurityContext()) {
 			specsDir := filepath.Join(proc.ProjectRoot(), paths.ProcessInternalObjectSpecsDir)
 			loader := objects.NewSpecLoader(specsDir)

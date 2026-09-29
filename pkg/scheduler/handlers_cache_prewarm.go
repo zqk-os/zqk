@@ -199,7 +199,7 @@ func (h *CachePrewarmHandler) executeCachePrewarmCore(ctx context.Context, job *
 
 	// Tier 0: Path alias cache (highest priority, first in order). Any path uses aliases and scheme
 	// (prefix:, abs:, web:) resolved from this cache at runtime before resolving on the local system.
-	// See [REDACTED-ID] and POL-.
+	// See core-backlog and POL-.
 	h.runSequentialTier(ctx, job.ID, "path alias cache (Tier 0)", 30*time.Second, 5*time.Second, h.prewarmPathAliasCache)
 
 	// Tier 1: Base cache (sequential, no dependencies)

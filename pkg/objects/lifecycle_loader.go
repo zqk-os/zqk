@@ -81,7 +81,7 @@ func (s *StringOrSlice) UnmarshalYAML(value *yaml.Node) error {
 }
 
 // DependentStatusTrigger matches a one-level dependency_ref shockwave
-// (dependent kind reaches one of To). TRACK: [REDACTED-ID]
+// (dependent kind reaches one of To). TRACK: core-backlog
 type DependentStatusTrigger struct {
 	Kind string        `yaml:"kind"`
 	To   StringOrSlice `yaml:"to"`

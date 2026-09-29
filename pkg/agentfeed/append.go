@@ -25,7 +25,7 @@ const (
 	FeedSenderDelivery        = "delivery"
 	FeedSenderPeerAck         = "peer_ack"
 	FeedSenderMessagingBridge = "messaging_bridge" // Phase C enterprise ingress (optionally _slack/_teams/…)
-	FeedSenderHTTPAPI         = "http_api"         // Phase D private/public HTTP surface ([REDACTED-ID])
+	FeedSenderHTTPAPI         = "http_api"         // Phase D private/public HTTP surface
 	FeedSenderCoordinator     = "coordinator"
 
 	FeedEventTypeSteering        = "steering"

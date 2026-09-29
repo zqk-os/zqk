@@ -36,7 +36,7 @@ func (p *testStorageProvider) Read(ctx context.Context, secCtx *pkgctx.SecurityC
 }
 
 func TestPersonaContextFilter_HydrationVariesByPersona(t *testing.T) {
-	// Satisfies [REDACTED-ID] (Verify prompt hydration varies strictly by assignee_persona_ref)
+	// Satisfies core-backlog (Verify prompt hydration varies strictly by assignee_persona_ref)
 	ctx := &ProjectContext{
 		Mission: &MissionContext{ID: "M-1", Title: "Mission 1", Statement: "Mission Statement"},
 		Vision:  &VisionContext{ID: "V-1", Title: "Vision 1", Statement: "Vision Statement"},
@@ -104,7 +104,7 @@ func TestPersonaContextFilter_HydrationVariesByPersona(t *testing.T) {
 }
 
 func TestPersonaContextFilter_HydrationPerformance(t *testing.T) {
-	// Satisfies [REDACTED-ID] (Ensure hydration logic takes < 50ms)
+	// Satisfies core-backlog (Ensure hydration logic takes < 50ms)
 	ctx := &ProjectContext{
 		Mission: &MissionContext{ID: "M-1", Title: "Mission 1"},
 		CurrentState: &CurrentStateContext{

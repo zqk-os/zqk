@@ -10,7 +10,7 @@ import (
 )
 
 // verifyMaintenanceJobsPresent confirms at least one scheduler_job exists after
-// --with-maintenance-jobs ([REDACTED-ID]).
+// --with-maintenance-jobs (core-backlog).
 func verifyMaintenanceJobsPresent(projectRoot string, logger logging.Logger) error {
 	ctx := pkgctx.NewSystemContext()
 	factory, err := storage.NewStorageFactory(ctx, projectRoot)

@@ -11,7 +11,7 @@ import (
 // CVS id used only for prefix inference (need not exist in CAS).
 
 func TestBuildObjectGetArgv(t *testing.T) {
-	id := "[REDACTED-ID]"
+	id := "CVS-STARTER-001"
 	got := BuildObjectGetArgv(id, Options{
 		Binary:    "zqk",
 		Format:    "json",

@@ -92,7 +92,7 @@ func (s *Server) setupHandlers() *MethodRouter {
 	router.RegisterFunc("notifications/cancelled", s.handleNotificationCancelled)
 	// IPC / mesh wake: inbound notifications/event (PublishDaemonEvent) → EventEmitter.
 	// Must not return MethodNotFound (-32601); that logged noise and paired with Writer
-	// rebind bugs that dropped IDE's MCP session ([REDACTED-ID]).
+	// rebind bugs that dropped IDE's MCP session (core-backlog).
 	router.RegisterFunc(notificationMethodEvent, s.handleNotificationEvent)
 
 	return router

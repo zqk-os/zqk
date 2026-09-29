@@ -48,7 +48,7 @@ func (f *FileObjectStorage) getObjectFilePath(id, kind string) (string, error) {
 
 	// Check if this kind uses content-addressable storage
 	// Resolve via CAS index first. Do NOT full-scan the kind dir on every index miss —
-	// that is O(files) and hang-prone (see [REDACTED-ID]). Bulk
+	// that is O(files) and hang-prone (see core-backlog). Bulk
 	// repair paths use discoverCASFilePathsByScanning once for many IDs.
 	if f.usesContentAddressableStorage(kind) {
 		var cas *filecas.ContentAddressableStorage

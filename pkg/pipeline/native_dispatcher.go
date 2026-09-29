@@ -22,7 +22,7 @@ type SwarmEngine interface {
 
 // NativeSwarmDispatcher implements the AgentDispatcher interface by
 // natively bridging the pipeline payload into the ZQK swarm orchestration logic.
-// This fulfills [REDACTED-ID] (Complete Native Pipeline Integration).
+// Complete Native Pipeline Integration.
 type NativeSwarmDispatcher struct {
 	SwarmConfig map[string]any
 	Engine      SwarmEngine

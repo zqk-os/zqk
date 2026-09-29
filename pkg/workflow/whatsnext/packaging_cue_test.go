@@ -10,7 +10,7 @@ import (
 func TestPriorityPlanPackagingCue(t *testing.T) {
 	t.Parallel()
 
-	planID := "[REDACTED-ID]"
+	planID := "PRI-STARTER-COMMUNITY-001"
 	title := "State machine cleanup"
 
 	tests := []struct {
