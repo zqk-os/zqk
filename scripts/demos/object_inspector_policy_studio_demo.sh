@@ -38,10 +38,17 @@ echo -e "${BOLD}═════════════════════�
 
 sleep 0.5
 
-# Dynamically discover an active backlog item from the live kernel
-TARGET_BLI=$("${ZQK_BIN}" object list backlog_item --format json 2>/dev/null | grep -o '"id": *"[^"]*"' | head -n 1 | cut -d'"' -f4 || true)
-if [[ -z "${TARGET_BLI}" ]]; then
-  TARGET_BLI="BLI-CORE-001"
+# Target dedicated demo backlog item with zero private lineage leaks
+TARGET_BLI="BLI-MEMBRANE-001"
+if ! "${ZQK_BIN}" object inspect backlog_item "${TARGET_BLI}" >/dev/null 2>&1; then
+  "${ZQK_BIN}" object create backlog_item --data '
+id: BLI-MEMBRANE-001
+title: "Enforce Cellular Microkernel Membrane Isolation"
+description: "Verify fail-closed boundary containment against path traversal and prompt injection."
+category: feature
+priority: critical
+priority_tier: P0
+' --promote --force >/dev/null 2>&1 || true
 fi
 
 echo -e "${BOLD}[SCENE 1: DUAL HUMAN / AGENT SEMANTIC PROJECTIONS]${NC}"
