@@ -36,9 +36,10 @@ Result: Workstream created with system-assigned ID (e.g. `WS-XXX`). **Capture th
 
 ```bash
 zqk object create milestone --file scripts/onboarding_roadmap/milestone_onboarding.yaml
-# Capture MIL-ID from output, then:
-zqk object update <MIL-ID> --field "workstream_refs=[<WS-ID>]"
+# Capture MIL-ID from output, then link workstream:
+zqk object ref add <MIL-ID> <WS-ID>
 ```
+*(Legacy alternative: `zqk object update <MIL-ID> --field "workstream_refs=[<WS-ID>]"`)*
 
 ### 4. Create backlog items (with `milestone_refs`) and link the workstream
 
@@ -48,22 +49,24 @@ zqk object create backlog_item --file scripts/onboarding_roadmap/backlog_item_02
 zqk object create backlog_item --file scripts/onboarding_roadmap/backlog_item_03_system_health.yaml --field "milestone_refs=[<MIL-ID>]"
 ```
 
-Then set the workstream on each item:
+Then link the workstream to each item using the schema-aware reference command:
 
 ```bash
-zqk object update <BLI-ID-1> --field "workstream_refs=[<WS-ID>]"
-zqk object update <BLI-ID-2> --field "workstream_refs=[<WS-ID>]"
-zqk object update <BLI-ID-3> --field "workstream_refs=[<WS-ID>]"
+zqk object ref add <BLI-ID-1> <WS-ID>
+zqk object ref add <BLI-ID-2> <WS-ID>
+zqk object ref add <BLI-ID-3> <WS-ID>
 ```
 
 ### 5. Create the goal and link milestone + backlog
 
 ```bash
 zqk object create goal --file scripts/onboarding_roadmap/goal_onboarding.yaml
-# Capture GOAL-ID, then link milestone and goal per your IDs:
-zqk object update <MIL-ID> --field "workstream_refs=[<WS-ID>]" --field "backlog_item_refs=[<BLI-1>,<BLI-2>,<BLI-3>]"
-zqk object update <GOAL-ID> --field "workstream_refs=[<WS-ID>]" --field "backlog_item_refs=[<BLI-1>,<BLI-2>,<BLI-3>]"
+# Capture GOAL-ID, then link relationships cleanly via object ref add:
+zqk object ref add <GOAL-ID> <WS-ID>
+zqk object ref add <GOAL-ID> <BLI-1> <BLI-2> <BLI-3>
+zqk object ref add <MIL-ID> <BLI-1> <BLI-2> <BLI-3>
 ```
+*(Legacy alternative: `zqk object update <GOAL-ID> --field "workstream_refs=[<WS-ID>]" --field "backlog_item_refs=[<BLI-1>,<BLI-2>,<BLI-3>]"`)*
 
 ### 6. Optional: agent_onboarding_preparation
 
