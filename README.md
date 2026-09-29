@@ -128,7 +128,7 @@ ZQK follows the classical operating system boundary: **POSIX/Kernel primitives a
 
 - **Website:** [zqk.dev](https://zqk.dev)
 - **Documentation Portal:** [docs.zqk.dev](https://docs.zqk.dev)
-- **Public Contact:** [hello@zqk-os.com](mailto:hello@zqk-os.com)
+- **Public Contact:** [hello@zqkos.com](mailto:hello@zqkos.com)
 - **Schedule a Call:** [Book a ZQK Inquiry](https://calendar.app.google/VhhrKgXqrukr48Kg7)
 - **GitHub:** [zqk-os/zqk](https://github.com/zqk-os/zqk)
 

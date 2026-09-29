@@ -35,7 +35,7 @@ func TestSealAndVerifyPack_Success(t *testing.T) {
 	}
 
 	// Seal the pack
-	integrity, err := SealPack(tmpDir, priv, "signer@zqk-os.com")
+	integrity, err := SealPack(tmpDir, priv, "signer@zqkos.com")
 	if err != nil {
 		t.Fatalf("SealPack failed: %v", err)
 	}
@@ -43,8 +43,8 @@ func TestSealAndVerifyPack_Success(t *testing.T) {
 	if integrity.Algorithm != "ed25519" {
 		t.Errorf("expected algorithm ed25519, got %s", integrity.Algorithm)
 	}
-	if integrity.SignerID != "signer@zqk-os.com" {
-		t.Errorf("expected signer_id signer@zqk-os.com, got %s", integrity.SignerID)
+	if integrity.SignerID != "signer@zqkos.com" {
+		t.Errorf("expected signer_id signer@zqkos.com, got %s", integrity.SignerID)
 	}
 
 	// Verify the pack
@@ -80,7 +80,7 @@ func TestVerifyPack_TamperTemplateFailsClosed(t *testing.T) {
 	}
 
 	// Seal
-	if _, err := SealPack(tmpDir, priv, "signer@zqk-os.com"); err != nil {
+	if _, err := SealPack(tmpDir, priv, "signer@zqkos.com"); err != nil {
 		t.Fatalf("SealPack failed: %v", err)
 	}
 
@@ -112,7 +112,7 @@ func TestVerifyPack_TamperManifestFailsClosed(t *testing.T) {
 	}
 
 	// Seal
-	if _, err := SealPack(tmpDir, priv, "signer@zqk-os.com"); err != nil {
+	if _, err := SealPack(tmpDir, priv, "signer@zqkos.com"); err != nil {
 		t.Fatalf("SealPack failed: %v", err)
 	}
 
@@ -145,7 +145,7 @@ func TestVerifyPack_InvalidSignatureFailsClosed(t *testing.T) {
 	_ = EnsureSampleSwarm(manifestPath)
 
 	// Seal with priv key
-	_, err := SealPack(tmpDir, priv, "signer@zqk-os.com")
+	_, err := SealPack(tmpDir, priv, "signer@zqkos.com")
 	if err != nil {
 		t.Fatalf("SealPack failed: %v", err)
 	}

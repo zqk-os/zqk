@@ -2,7 +2,7 @@ schema_version: 1.0.0
 name: code-eval-swarm
 version: 0.1.0
 description: Autonomous Code Evaluation Framework swarm for multi-axis diamond analysis
-author: ZQK Community <community@zqk-os.com>
+author: ZQK Community <community@zqkos.com>
 license: Apache-2.0
 entrypoint: eval-orchestrator
 
