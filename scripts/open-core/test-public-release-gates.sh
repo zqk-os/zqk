@@ -134,6 +134,32 @@ if sh "$DOC_REPO/scripts/open-core/check-public-release-payload.sh" "$DOC_REPO" 
 fi
 grep -F 'studio process item or governing lineage reference remains in public documentation' "$DOC_REPO/result.log" >/dev/null
 
+# Prove tracked CEF run artifacts fail closed.
+CEF_REPO=$(mktemp -d "${TMPDIR:-/tmp}/zqk-public-gate-cef.XXXXXX")
+trap 'rm -f "$TMP_BIN"; rm -rf "$TMP_REPO" "$TRACK_REPO" "$HEX_REPO" "$DOC_REPO" "$CEF_REPO"' EXIT HUP INT TERM
+mkdir -p "$CEF_REPO/cmd/zqk" "$CEF_REPO/config" "$CEF_REPO/docs/onboarding" "$CEF_REPO/docs/quality/cef-runs/2026-09-25-RUN" "$CEF_REPO/scripts/open-core"
+for path in README.md LICENSE NOTICE SECURITY.md CODE_OF_CONDUCT.md CONTRIBUTING.md; do
+	printf '%s\n' "fixture" >"$CEF_REPO/$path"
+done
+printf '%s\n' 'module github.com/zqk-os/zqk' >"$CEF_REPO/go.mod"
+printf '%s\n' 'brand:' '  executable_name: zqk' >"$CEF_REPO/config/zqk.yaml"
+printf '%s\n' 'package main' >"$CEF_REPO/cmd/zqk/main.go"
+printf '%s\n' 'fixture' >"$CEF_REPO/docs/INDEX.md"
+printf '%s\n' 'fixture' >"$CEF_REPO/docs/onboarding/COMMUNITY_FIRST_RUN.md"
+cp "$ROOT/scripts/open-core/check-public-release-payload.sh" "$CEF_REPO/scripts/open-core/"
+cat >"$CEF_REPO/scripts/open-core/police-community-tree.sh" <<'EOF'
+#!/bin/sh
+exit 0
+EOF
+printf '%s\n' '{"run_id":"test"}' >"$CEF_REPO/docs/quality/cef-runs/2026-09-25-RUN/scorecard.json"
+git -C "$CEF_REPO" init -q
+git -C "$CEF_REPO" add .
+if sh "$CEF_REPO/scripts/open-core/check-public-release-payload.sh" "$CEF_REPO" >"$CEF_REPO/result.log" 2>&1; then
+	printf '%s\n' "payload gate accepted tracked CEF run artifacts" >&2
+	exit 1
+fi
+grep -F 'project-specific CEF run artifacts are tracked in git' "$CEF_REPO/result.log" >/dev/null
+
 if [ "$MODE" = "payload-only" ]; then
 	printf '%s\n' "PUBLIC PAYLOAD GATES: PASS"
 	exit 0

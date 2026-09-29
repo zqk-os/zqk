@@ -1,7 +1,0 @@
-{"finding_id":"F-ARCH-001","resolution":"stand","notes":"Severance from /tmp/zqk-privileged-writer.sock is absolute; verified by export-gate and socket membrane tests.","counter_citations":[]}
-{"finding_id":"F-ARCH-002","resolution":"stand","notes":"Verified across cmd/zqk/system/compact_wal.go and all canonical builder files.","counter_citations":[]}
-{"finding_id":"F-REL-001","resolution":"stand","notes":"Dual-plane write-behind verified clean; 0 stale locks and 0 temp leaks in system check.","counter_citations":[]}
-{"finding_id":"F-SEC-001","resolution":"stand","notes":"IPC server strictly validates projectRoot path matching.","counter_citations":[]}
-{"finding_id":"F-SEC-002","resolution":"stand","notes":"Zero prohibited patterns or sensitive paths detected across all 8381 files.","counter_citations":[]}
-{"finding_id":"F-TST-001","resolution":"stand","notes":"TPM DoD passes 100% with 0 unbound criteria across all test chains.","counter_citations":[]}
-{"finding_id":"F-TST-002","resolution":"stand","notes":"Polyglot test discovery operates natively without compiler dependencies.","counter_citations":[]}
