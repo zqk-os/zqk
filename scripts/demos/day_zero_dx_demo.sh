@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ZQK Killer Demo 1: Day-0 Greenfield DX & Instant Agent Orientation
+# ZQK Demonstration 1: Day-0 Greenfield DX & Instant Agent Orientation
 # Demonstrates: Single-command project initialization, agent host detection & seating,
 # instant CAS object minting, autonomous workflow discovery, and zero-defect system health.
 set -euo pipefail

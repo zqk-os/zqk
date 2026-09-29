@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ZQK Killer Demo 3: Dynamic Membrane & Prompt Injection Intercept
+# ZQK Demonstration 3: Dynamic Membrane & Prompt Injection Intercept
 # Demonstrates: Holonic boundary containment, MCP sandbox directory jail, and live fail-closed defense against prompt injections.
 set -euo pipefail
 

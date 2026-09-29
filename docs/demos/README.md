@@ -1,4 +1,4 @@
-# ZQK Core Killer Demos & Visual Showcase
+# ZQK Core Interactive Demonstrations & Visual Showcase
 
 > **Principle:** Agents manage the work. ZQK enforces the physics.
 

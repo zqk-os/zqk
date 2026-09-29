@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ZQK Killer Demo 2: The "Kill -9" Resurrection & Crash Consistency
+# ZQK Demonstration 2: The "Kill -9" Resurrection & Crash Consistency
 # Demonstrates: Crash-consistency, WAL/journal durability, abandoned process lock recovery, and zero-loss state resumption.
 set -euo pipefail
 

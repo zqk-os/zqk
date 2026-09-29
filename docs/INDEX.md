@@ -81,7 +81,7 @@ Welcome to the canonical documentation for **ZQK Core**, the Cellular Knowledge 
 | **[Scheduler & Maintenance Jobs](./howto/SCHEDULER_AND_MAINTENANCE.md)** | Configuring background daemons, cron intervals, and kernel self-healing jobs. |
 | **[Tutorials Overview](./tutorials/README.md)** | Learning-oriented walkthroughs exploring kernel capabilities step-by-step. |
 | **[Object Inspector Tutorial](./tutorials/INTERACTIVE_OBJECT_INSPECTION_TUTORIAL.md)** | Hands-on walkthrough: navigating the graph, authoring policies, and verifying constraints. |
-| **[Killer Demos & Visual Showcase](./demos/README.md)** | Visual showcase with authentic terminal SVG recordings and command walk-throughs. |
+| **[Interactive Demonstrations & Visual Showcase](./demos/README.md)** | Visual showcase with authentic terminal SVG recordings and command walk-throughs. |
 
 ---
 

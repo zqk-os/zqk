@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ZQK Killer Demo 5: Interactive Object Inspector, Live Policy Studio & Unified QA
+# ZQK Demonstration 5: Interactive Object Inspector, Live Policy Studio & Unified QA
 # Demonstrates:
 #   1. Human-friendly Interactive Object Inspector (zqk object inspect)
 #   2. Dual Semantic Agent JSON Projections (-f json) with reduced token footprint
