@@ -88,7 +88,7 @@ func ExtractTo(projectRoot string, logger logging.Logger, force bool) error {
 		} else if after, ok := strings.CutPrefix(name, ".\\"); ok {
 			name = after
 		}
-		// Community edition: omit internal/dev-only command specs ([REDACTED-ID]).
+		// Community edition: omit internal/dev-only command specs (core-backlog).
 		if zqkenv.IsCommunityEdition && strings.HasPrefix(name, archivePrefixCLISpecs) && shouldExcludeCommunityCommandSpec(name) {
 			if hdr.Typeflag == tar.TypeReg && hdr.Size > 0 {
 				if _, err := io.CopyN(io.Discard, tr, hdr.Size); err != nil {

@@ -1,6 +1,6 @@
-# CLI Package
+# Internal CLI Utilities & Context
 
-This package provides shared utilities and context management for the ZQK CLI.
+This package provides shared internal utilities, layered context resolution, and output helpers for the ZQK CLI.
 
 ## Context System
 

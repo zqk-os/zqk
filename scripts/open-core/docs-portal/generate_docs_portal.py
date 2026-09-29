@@ -20,6 +20,13 @@ try:
 except ImportError:
     HAS_MARKDOWN = False
 
+# Import dynamic package readme index generator
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+try:
+    from generate_code_readme_index import generate_readme_index
+except ImportError:
+    generate_readme_index = None
+
 ZQK_LOGO_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
   <defs>
     <filter id="cursor-glow" x="-30%" y="-30%" width="160%" height="160%">
@@ -176,6 +183,21 @@ def render_markdown_to_html(content: str, current_html_rel: str, link_map: dict,
                 rel_url = target_html_rel
             return f"{prefix}({rel_url}{anchor})"
 
+        # Check if target is an image asset or if this is an image link (![...])
+        img_exts = (".svg", ".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".bmp", ".avif")
+        is_img_target = any(target.lower().endswith(ext) or (ext + "#") in target.lower() for ext in img_exts)
+        is_img_link = prefix.startswith("!")
+
+        if is_img_target or is_img_link:
+            clean_res = resolved_repo_rel.replace("\\", "/")
+            if repo_root and os.path.exists(os.path.join(repo_root, clean_res)):
+                if current_dir:
+                    rel_url = os.path.relpath(clean_res, current_dir).replace("\\", "/")
+                else:
+                    rel_url = clean_res
+                return f"{prefix}({rel_url}{anchor})"
+            return f"{prefix}({target}{anchor})"
+
         # Check if target is a source code or config file in the repository (e.g. .go, .yaml, .json, .sh, .md)
         clean_res = resolved_repo_rel.replace("\\", "/")
         if not clean_res.startswith(".."):
@@ -189,7 +211,7 @@ def render_markdown_to_html(content: str, current_html_rel: str, link_map: dict,
 
         return match.group(0)
 
-    transformed = re.sub(r'(\[[^\]]+\])\(([^)]+)\)', replace_md_link, content)
+    transformed = re.sub(r'(!?\[[^\]]*\])\(([^)]+)\)', replace_md_link, content)
     
     if HAS_MARKDOWN:
         try:
@@ -259,6 +281,15 @@ def build_portal(repo_root: str, target_dir: str):
     
     if os.path.exists(target_dir):
         shutil.rmtree(target_dir)
+
+    # Dynamically regenerate package indexes to ensure package catalog never goes stale
+    if generate_readme_index:
+        try:
+            print("📦 Dynamically generating comprehensive package indexes (pkg/ and internal/)...")
+            generate_readme_index(repo_root, "pkg")
+            generate_readme_index(repo_root, "internal")
+        except Exception as e:
+            print(f"Warning: could not dynamically update package catalogs: {e}", file=sys.stderr)
     
     assets_dir = os.path.join(target_dir, "assets")
     search_dir = os.path.join(target_dir, "search")
@@ -1349,6 +1380,16 @@ body {
 .markdown-body th {
   background: var(--bg-tertiary);
   color: #fff;
+}
+
+.markdown-body img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  margin: 1.5rem 0;
+  display: block;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
 /* Mermaid Architectural Diagram Styling */
