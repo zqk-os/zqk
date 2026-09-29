@@ -1,25 +1,24 @@
-# Codebase Evaluation Framework (CEF) v0
+# Codebase Evaluation Framework (CEF) Overview
 
-**Purpose:** Produce a cold, harsh, reusable **truth map** of any software codebase — readable, maintainable, testable, reliable, observable, recoverable, secure, and robust — with **cited rubrics**, **evidence-graded findings**, **specialist + adversarial prompt pairs**, and **mandatory architecture diagrams**.
+> **Purpose:** Authoritative truth map protocol assessing software codebase quality across eight independent Diamond Scale dimensions with cited rubrics, evidence-graded findings, paired specialist/adversarial auditors, and referentially anchored architecture diagrams.
 
-**Non-goals (v0):**
-- Not a launch/open-core decision kit (optional later extension).
-- Not biased to any one language or product (language packs are **adapters**).
-- Not a mandate to fix code during analysis.
-- Not exhaustive philosophical debate disguised as pedantry.
-
-**Primary mode:** Truth map (Mode A). Launch triage (Mode B) is deferred.
+| Specification Metadata | Value |
+| :--- | :--- |
+| **Framework Version** | CEF v0.1.0 |
+| **Governance Tier** | Authoritative Core (Framework Index) |
+| **Target Roles** | Solo Operators, Evaluation Evaluators, Benchmark Harnesses, System Architects |
+| **Primary Mode** | Truth Map (Objective, portable assessment decoupled from product launch roadmaps) |
 
 ---
 
-## Quick start
+## Quickstart & Evaluation Lifecycle
 
-1. Read [`CONSTITUTION.md`](./CONSTITUTION.md) (binding rules for all agents).
-2. Skim [`DIAMOND_SCALE.md`](./DIAMOND_SCALE.md) (multi-axis grades).
-3. Run Wave 0 mechanical inventory per [`WAVE_PLAN.md`](./WAVE_PLAN.md).
-4. Dispatch lens specialists + adversarial twins from [`prompts/`](./prompts/).
-5. Emit findings conforming to [`schemas/finding.schema.json`](./schemas/finding.schema.json).
-6. Integrator merges **E3** (or waived E2) into [`HANDOFF_SCHEMA.md`](./HANDOFF_SCHEMA.md) for downstream process systems (ZQK or otherwise).
+1. **Constitutional Binding:** Review [`CONSTITUTION.md`](./CONSTITUTION.md) for non-negotiable evaluation rules and evidence grades.
+2. **Quality Grading Scale:** Consult [`DIAMOND_SCALE.md`](./DIAMOND_SCALE.md) for the 1–5 scoring ladder across the eight quality dimensions.
+3. **Preflight Inventory:** Execute Wave 0 mechanical inventory and AST discovery per [`WAVE_PLAN.md`](./WAVE_PLAN.md).
+4. **Lens Specialist & Adversarial Passes:** Dispatch paired evaluator and auditor agents from [`prompts/`](./prompts/).
+5. **Schema Validation:** Verify all findings against `schemas/finding.schema.json`.
+6. **Integrator Synthesis:** Assemble validated findings and multi-axis scorecards into [`HANDOFF_SCHEMA.md`](./HANDOFF_SCHEMA.md).
 
 ---
 

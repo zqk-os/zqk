@@ -1,81 +1,91 @@
-# Wave plan
+# Multi-Wave Evaluation Execution Plan
 
-**cef_version:** 0.1.0  
+> **Purpose:** Phased, five-wave evaluation orchestrator sequencing analysis from mechanical preflight inventory through structural foundations, runtime semantics, craftsmanship, and final integration synthesis.
 
-Waves are sequential. Do not start Wave N+1 until Wave N integrator gate passes (or operator waives in `run_log.md`).
-
----
-
-## Wave 0 — Mechanical preflight (D-HIGH)
-
-**Agents:** 1 mechanical operator (can be human or script-assisted agent).  
-**Lens:** `L-PREFLIGHT`  
-**Outputs:** `preflight.json`, draft context/container diagrams, initial `tooling_gaps.md`, `run_scope.yaml` filled.
-
-**Gate:** Languages detected; include/exclude globs frozen; available tools listed.
+| Specification Metadata | Value |
+| :--- | :--- |
+| **Framework Version** | CEF v0.1.0 |
+| **Governance Tier** | Authoritative Core (Execution Sequencing) |
+| **Target Roles** | Mechanical Operators, Lens Specialists, Adversarial Auditors, Integrators |
+| **Concurrency Ceiling** | Maximum 4 concurrent specialist seats per evaluation wave |
 
 ---
 
-## Wave 1 — Structure & risk skeleton
+## 1. Execution Phasing Invariants
 
-**Lenses (parallel OK):**
-- `L-ARCHITECTURE` (specialist → adversarial)
-- `L-SECURITY` (specialist → adversarial)
-- `L-SUPPLY-RELEASE` (specialist → adversarial)
+Evaluation waves are strictly sequential. An evaluation wave $N+1$ may not commence until the wave $N$ gate passes validation or is explicitly waived in `run_log.md`:
 
-**Gate:** C4-L1/L2 anchored; critical/high security & supply findings have E2+ pending adversarial; architecture Top N emitted.
+```mermaid
+flowchart LR
+    W0["Wave 0<br/>Mechanical Preflight"] --> W1["Wave 1<br/>Structure & Risk"]
+    W1 --> W2["Wave 2<br/>Runtime Qualities"]
+    W2 --> W3["Wave 3<br/>Craft & Usability"]
+    W3 --> W4["Wave 4<br/>Integrator Synthesis"]
 
----
-
-## Wave 2 — Production qualities
-
-**Lenses (parallel OK):**
-- `L-RELIABILITY`
-- `L-OBSERVABILITY`
-- `L-CONCURRENCY`
-- `L-PERFORMANCE`
-
-**Gate:** Fail-path sequences for top reliability/concurrency hotspots; false-green OBS findings flagged.
+    style W0 fill:#161b22,stroke:#58a6ff,stroke-width:1.5px
+    style W1 fill:#161b22,stroke:#00e5ff,stroke-width:1.5px
+    style W2 fill:#161b22,stroke:#e3b341,stroke-width:1.5px
+    style W3 fill:#161b22,stroke:#bc8cff,stroke-width:1.5px
+    style W4 fill:#161b22,stroke:#00e676,stroke-width:1.5px
+```
 
 ---
 
-## Wave 3 — Changeability & stranger experience
+## 2. Wave Definitions & Quality Gates
 
-**Lenses (parallel OK):**
-- `L-CODE-QUALITY` (D-HIGH exhaustive subset first, then D-LOW Top N)
-- `L-TESTING`
-- `L-USABILITY`
-- `L-DOCS-MODEL`
+### Wave 0 — Mechanical Preflight (`D-HIGH`)
 
-**Gate:** Exhaustive literal/secret/banned scans complete within scope; usability/docs Top N ready.
-
----
-
-## Wave 4 — Integrator judgment
-
-**Agent:** Integrator only (see `prompts/L-INTEGRATOR/specialist.md`).
-
-**Tasks:**
-1. Apply adversarial resolutions to findings.  
-2. Dedupe cross-lens duplicates.  
-3. Assign diamond axis grades with drivers.  
-4. Emit `scorecard.json`, consolidated `findings.jsonl`, `HANDOFF` package.
-
-**Gate:** No E0 in handoff; no unresolved critical without `stand` or explicit waive.
+- **Assigned Role:** Mechanical Operator (Scripted or CLI-assisted agent).
+- **Active Lens:** `L-PREFLIGHT`
+- **Output Artifacts:** `preflight.json`, draft system context and container diagrams, initial `tooling_gaps.md`, and frozen `run_scope.yaml`.
+- **Validation Done-Gate:** All repository languages detected; file scope globs frozen; available linter and AST analysis tools inventoried.
 
 ---
 
-## Parallelism & seats
+### Wave 1 — Structural Architecture & Risk Skeleton
 
-- Max recommended concurrent specialist seats: **4** (token control).  
-- Adversarial should be a **different** agent instance than the specialist for the same lens.  
-- Integrator must not have authored the findings it judges.
+- **Active Lenses:** `L-ARCHITECTURE`, `L-SECURITY`, `L-SUPPLY-RELEASE` (Specialist and adversarial pairs executed concurrently).
+- **Validation Done-Gate:** C4-L1 and C4-L2 architectural diagrams anchored to source symbols; all critical and high security/supply findings verified at grade `E2` or higher; Top-N architecture findings emitted.
 
-## Pros / cons
+---
 
-| Pros | Cons |
-|------|------|
-| Front-loads inventory and security | Longer calendar time than one megaprompt |
-| Matches density rule | Operators may skip Wave 4 — forbid “specialist-only” as final |
+### Wave 2 — Production Qualities & Runtime Semantics
 
-**Why this order:** Structure and abuse surface first (what can hurt you), then production semantics, then craft/usability — matching how international quality models separate characteristics while controlling token burn.
+- **Active Lenses:** `L-RELIABILITY`, `L-OBSERVABILITY`, `L-CONCURRENCY`, `L-PERFORMANCE`.
+- **Validation Done-Gate:** Fail-path sequence diagrams completed for top concurrency and reliability hotspots; false-positive observability claims eliminated.
+
+---
+
+### Wave 3 — Changeability, Craftsmanship & Developer Experience
+
+- **Active Lenses:** `L-CODE-QUALITY`, `L-TESTING`, `L-USABILITY`, `L-DOCS-MODEL`.
+- **Validation Done-Gate:** Exhaustive `D-HIGH` scans (literals, secrets, banned APIs) completed across scope roots; developer usability and documentation Top-N findings finalized.
+
+---
+
+### Wave 4 — Integrator Judgment & Package Assembly
+
+- **Assigned Role:** Lead Integrator exclusively (conforming to `prompts/L-INTEGRATOR/specialist.md`).
+- **Core Operations:**
+  1. Apply adversarial resolution enums (`stand`, `downgrade`, `retract`, `reframe`) to all specialist findings.
+  2. Deduplicate cross-lens findings and eliminate redundant defects.
+  3. Formulate Diamond Scale axis grades, confidence factors, and top driver finding citations.
+  4. Generate `scorecard.json`, consolidated `findings.jsonl`, and downstream `HANDOFF` package.
+- **Validation Done-Gate:** Zero `E0` findings permitted in handoff; zero unresolved critical findings without validated `stand` resolution or explicit human waiver.
+
+---
+
+## 3. Concurrency Governance & Operational Seats
+
+- **Seat Concurrency Ceiling:** Maximum 4 concurrent specialist agent seats to balance analysis velocity with resource consumption.
+- **Seat Independence Invariant:** The adversarial auditor for any lens must be a distinct agent instance from the lens specialist.
+- **Integrator Impartiality:** The lead integrator must not have authored individual specialist findings being judged.
+
+---
+
+## 4. Architectural Analysis & Tradeoffs
+
+| Advantage | Operational Consideration |
+| :--- | :--- |
+| Front-loads structural architecture and security threat modeling before examining styling. | Sequential phasing requires disciplined orchestration rather than running a single unconstrained prompt. |
+| Directly reinforces budget density rules across distinct lifecycle stages. | Integrators must strictly gate transitions to prevent specialist-only premature termination. |

@@ -94,8 +94,6 @@ def get_category_info(rel_path: str) -> tuple[str, str]:
             return "Architecture & Foundation", "architecture"
         if rel_path == "ZQK_GETTING_STARTED.md":
             return "Getting Started", "getting-started"
-        if rel_path == "ANTIGRAVITY.md":
-            return "Maintenance & Development", "development"
         return "Open Core Governance", "governance"
 
     if len(parts) == 2:
@@ -857,6 +855,8 @@ body {
   font-size: 0.9rem;
   color: var(--accent-green);
   margin-top: 1rem;
+}
+
 .skill-spec-card {
   background: rgba(31, 111, 235, 0.07);
   border: 1px solid rgba(88, 166, 255, 0.22);
@@ -1137,17 +1137,25 @@ body {
   width: 100%;
   border-collapse: collapse;
   margin: 1.5rem 0;
+  display: table;
 }
 
 .markdown-body th, .markdown-body td {
   border: 1px solid var(--border-color);
-  padding: 8px 12px;
+  padding: 10px 14px;
   text-align: left;
+  vertical-align: top;
 }
 
 .markdown-body th {
   background: var(--bg-tertiary);
   color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.markdown-body td code {
+  word-break: break-word;
 }
 
 .markdown-body img {
@@ -1308,7 +1316,7 @@ def build_portal(repo_root: str, target_dir: str):
             continue
         doc_files.append(df)
 
-    for root_doc in ["README.md", "CONTRIBUTING.md", "SECURITY.md", "GOVERNANCE.md", "CODE_OF_CONDUCT.md", "PACK-COMPOSITION.md", "ZQK_GETTING_STARTED.md", "ANTIGRAVITY.md"]:
+    for root_doc in ["README.md", "CONTRIBUTING.md", "SECURITY.md", "GOVERNANCE.md", "CODE_OF_CONDUCT.md", "PACK-COMPOSITION.md", "ZQK_GETTING_STARTED.md"]:
         p = os.path.join(repo_root, root_doc)
         if os.path.isfile(p):
             doc_files.append(p)
