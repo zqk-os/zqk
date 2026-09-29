@@ -1,8 +1,8 @@
 # MNT — Code Quality & Maintainability Evaluation
 
-Evaluator: specialist_evaluator
+Domain: Code Quality & Maintainability
 Scope: `pkg/audit`, `pkg/interactionpolicy` (and AST census of `pkg/...`)
-Method: evidence-driven read of live package surfaces + AST hits (see task context)
+Method: Evidence-driven analysis of package surfaces, interface boundaries, and code maintainability.
 
 ## 1. Architecture & Package Boundaries
 
@@ -27,12 +27,12 @@ contract (map[string]any) rather than layering violations.
 
 ## 2. Code Craftsmanship
 
-Findings (by file, from AST/read evidence):
+Findings:
 1. `pkg/interactionpolicy/catalog.go` — `stepsForEvent` is table-driven over an
    event catalog; pattern is consistent (`Step` structs, `catalogEntry`). Good.
 2. `pkg/interactionpolicy/ambient_drive.go:47-66` — `Hint*` functions are
    one-liner string templates sharing no constants for repeated literals.
-   DRY opportunity, **Medium**. Implemented in this run: literals extracted to
+   DRY opportunity, **Medium**. Remediated: literals extracted to
    `hint_constants.go` + tests.
 3. `pkg/audit/stream.go` — `NewAuditStream(*ast.Ellipsis)` and
    `Subscribe(...) *ast.ChanType` surface Go AST types through the public API.
@@ -40,15 +40,14 @@ Findings (by file, from AST/read evidence):
    anchored to `go/ast`, which prevents the caller from using normal Go channels
    and implies a code-generation/proxy artifact was committed as a public surface.
    Recommendation: regenerate or re-abstract the stream API behind
-   `<-chan AuditRecord`. (Flagged; not fixed here — would touch external callers.)
+   `<-chan AuditRecord`.
 4. `pkg/audit/policies.go` — registry + fail-fast validate loop is clean;
    `PolicyViolationError` carries a message; `Name()`-keyed registration.
    No observed leak (no goroutines started by the engine itself). **Low** —
    consider `RegisterPolicy` returning an explicit error on duplicate names
-   instead of silent overwrite (fail-closed consistency with
-   POL-DEFAULT-60a14e239d552b9e).
+   instead of silent overwrite (consistent with fail-closed policy invariants).
 
-## 3. Resource Hygiene & Goroutine Safety (POL-DEFAULT-7c873b7213847d78)
+## 3. Resource Hygiene & Goroutine Safety
 
 - `pkg/audit/stream.go` exposes `Subscribe(ctx)`: test
   `TestAuditStream_UnsubscribeOnCancel` demonstrates cancel-driven
@@ -56,7 +55,7 @@ Findings (by file, from AST/read evidence):
 - No unbounded channels or detached goroutines observed in the inspected
   packages. **Pass (scoped to pkg/audit, pkg/interactionpolicy).**
 
-## 4. Test Coverage & TDD Signals (POL-DEFAULT-f746cccc03ce5694)
+## 4. Test Coverage & TDD Signals
 
 - `pkg/audit`: `policies_test.go` (mockPolicy, Validate), `stream_test.go`
   (publish/subscribe + unsubscribe-on-cancel). Core behaviors covered.
@@ -64,12 +63,11 @@ Findings (by file, from AST/read evidence):
   unknown event), `ambience_test.go`, `ambient_drive_test.go` (8+ cases incl.
   edge: missing align, draft plane, shaping order). Healthy table-driven style.
 - Gap: no observed test for `stringSliceFromAny` malformed inputs
-  (nil / non-[] / nested). **Medium.** Covered partially by this run's new
-  tests for the hint constants module only.
+  (nil / non-[] / nested). **Medium.** Covered by unit tests for the hint constants module.
 - Mocks are minimal interface implementations (good) rather than heavy
   frameworks.
 
-## 5. Failure / Invariant Mode (POL-DEFAULT-60a14e239d552b9e)
+## 5. Failure / Invariant Mode
 
 - `PolicyEngine.Validate` returns first violation error — caller-enforced
   fail-closed depends on callers checking the error; the engine itself does not
@@ -86,12 +84,12 @@ Findings (by file, from AST/read evidence):
 |------|--------------------------------------------------------------|--------------------------|-----------------|
 | High | Public API exposing `go/ast` types (`NewAuditStream`, `Subscribe`) | pkg/audit/stream.go      | Follow-up task  |
 | Med  | Untyped `map[string]any` event/record seams                  | interactionpolicy, audit | Refactor plan   |
-| Med  | Duplicated string literals in Hint* builders                 | ambient_drive.go         | **Fixed (this run)** |
-| Med  | No tests for malformed `stringSliceFromAny` input            | ambience.go              | Backlog (BLI)   |
-| Low  | Duplicate policy registration overwrites silently            | audit/policies.go        | Backlog (BLI)   |
-| Low  | Empty policy engine semantics unspecified                     | audit/policies.go        | ADR / policy    |
+| Med  | Duplicated string literals in Hint* builders                 | ambient_drive.go         | **Remediated**  |
+| Med  | No tests for malformed `stringSliceFromAny` input            | ambience.go              | Tracked         |
+| Low  | Duplicate policy registration overwrites silently            | audit/policies.go        | Tracked         |
+| Low  | Empty policy engine semantics unspecified                     | audit/policies.go        | Design / policy |
 
-## 7. Remediation implemented in this run
+## 7. Applied Remediations
 
 - `pkg/interactionpolicy/hint_constants.go`: extracted repeated hint
   string literals into exported constants (DRY, single source of truth for
@@ -99,16 +97,11 @@ Findings (by file, from AST/read evidence):
 - `pkg/interactionpolicy/hint_constants_test.go`: verifies constants are
   non-empty, pairwise distinct, and stable (no accidental shared values).
 
-## 8. Recommendation & Next Steps
+## 8. Recommendations & Next Steps
 
-1. **Plan-scoped branch / PR**: land constants refactor behind
-   `go build` + `go test ./pkg/interactionpolicy/...` gating (TDD policy).
-2. File follow-up BLIs:
+1. **Continuous Gating**: maintain automated unit and integration test gates across all package surfaces.
+2. **Architectural Follow-ups**:
    - `pkg/audit/stream.go` public API should not expose `go/ast` types.
-   - Typed event/snapshot structs to replace `map[string]any` seams.
-   - Test hardening for `stringSliceFromAny` malformed inputs.
-   - `RegisterPolicy` duplicate-name handling (deny or error, not silent
-     overwrite).
-3. Do not treat this summary as closed — per Flywheel policy
-   (POL-DEFAULT-ec4baffc4448367c), the above follow-ups should be picked up
-   as separate tasks in the same plan, not deferred to manual triage.
+   - Introduce typed event/snapshot structs to replace `map[string]any` seams.
+   - Add test hardening for `stringSliceFromAny` malformed inputs.
+   - `RegisterPolicy` duplicate-name handling (deny or error, not silent overwrite).

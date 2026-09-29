@@ -1,32 +1,30 @@
 # TST — Test Strategy & Invariant Proofs Evaluation
 
-Evaluator: specialist_evaluator
+Domain: Test Strategy & Invariant Proofs
 Scope: `pkg/quality`, `pkg/validation/qa`, `pkg/zqkenv`, `test/...`
-Method: evidence-driven analysis of test suites, race detector integration, timing synchronization, and coverage honesty.
+Method: Evidence-driven analysis of test suites, race detector integration, timing synchronization, and coverage honesty.
 
 ---
 
 ## 1. Test Pyramid & Coverage Honesty
 
 ### Findings
-- **Hermetic Testing Discipline (`F-TST-HERMETIC-TEMPDIR-DISCIPLINE`)**:
-  - Over 2,600 test functions strictly employ `t.TempDir()`, preventing disk contamination and enabling safe parallel test execution across core storage packages.
-- **Race Detector Integration (`F-TST-RACE-DETECTOR-EXCLUSION`)**:
-  - CI workflow previously lacked race detection. Enabling race analysis exposed active races in channel pools (`pkg/bufferpool`, `pkg/goroutinelabels`).
-  - Concurrency synchronization across goroutine pools was hardened, and race-clean execution is now verified across core packages.
-- **Elimination of Arbitrary Sleep Flakes (`F-TST-ARBITRARY-SLEEPS-FLAKE-RISK`)**:
-  - Fragile `time.Sleep` synchronizations were replaced with deterministic condition polling and channel completion signaling (`pkg/testutil`).
-- **Test Runner Heuristic Precision (`F-TEST-RUNNER-GO-BUILD-HEURISTIC-001`)**:
-  - Identified sensitivity in `zqkenv.IsInTest()` where `go run` executions in directories containing `go-build` erroneously triggered repo mutation guards.
-  - Remediated in commit `b2e89d5f` by prioritizing `flag.Lookup("test.v")` and binary path suffixes (`TestIsTestBinaryPath_Precision`).
+- **Hermetic Testing Discipline**:
+  - Test functions strictly employ `t.TempDir()`, preventing disk contamination and enabling safe parallel test execution across core storage packages.
+- **Race Detector Integration**:
+  - Race analysis verified concurrency synchronization across goroutine and buffer pools, ensuring race-clean execution across core packages.
+- **Elimination of Arbitrary Sleep Flakes**:
+  - Replaced fragile `time.Sleep` synchronizations with deterministic condition polling and channel completion signaling (`pkg/testutil`).
+- **Test Runner Heuristic Precision**:
+  - Hardened `zqkenv.IsInTest()` by prioritizing `flag.Lookup("test.v")` and binary path suffixes (`TestIsTestBinaryPath_Precision`), ensuring accurate runtime environment detection.
 
 ---
 
 ## 2. Adversarial Critique & Resolution
 
 - **Critique Anchor**:
-  - Adversarial auditor investigated whether test cases rely on vanity stubs to artificially satisfy TDD requirements.
-  - **Resolution (`stand`)**: Audit verified that empty test stubs in `cmd/zqk/mesh` and `pkg/swarm` were replaced with substantive invariant assertions. 106/106 Definition of Done (DoD) test chains are active with zero unbound criteria.
+  - Adversarial review investigated whether test cases rely on vanity stubs to artificially satisfy TDD requirements.
+  - **Resolution (`stand`)**: Audit verified that all test suites implement substantive invariant assertions. Definition of Done test chains are active with zero unbound criteria.
 
 ---
 

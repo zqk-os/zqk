@@ -1,19 +1,19 @@
 # REL — Reliability & Error Recovery Evaluation
 
-Evaluator: specialist_evaluator
+Domain: Reliability & Error Recovery
 Scope: `pkg/storage`, `pkg/storage/wal`, `pkg/concurrency`, `pkg/lifecycle`
-Method: stress-testing failure recovery, write-ahead log replay, concurrent transaction rollbacks, and lifecycle integrity.
+Method: Stress-testing failure recovery, write-ahead log replay, concurrent transaction rollbacks, and lifecycle integrity.
 
 ---
 
 ## 1. Storage Integrity & Transaction Atomicity
 
 ### Findings
-- **Atomic Multi-Operation Rollback (`F-REL-TX-PARTIAL-APPLY-ATOMICTY-VIOLATION`)**:
+- **Atomic Multi-Operation Rollback**:
   - `FileObjectTransaction` was hardened to track created, updated, and deleted objects across multi-entity mutations. Upon any step failure or validation rejection, all mutations are atomically reverted to pre-transaction states.
-- **WAL Write-Behind Checkpoint Protection (`F-REL-WAL-DROP-AND-ADVANCE-DATA-LOSS`)**:
+- **WAL Write-Behind Checkpoint Protection**:
   - Fixed defect where `ObjectWriteBehindWorker` advanced `applied_seq` even when write queues were full (`ConstStreamSaveQueueIsFull`). Checkpoint sequencing now guarantees zero data loss under disk backpressure.
-- **Darwin Async Fsync Flush on Exit (`F-REL-DARWIN-CAS-SYNC-DROP-ON-EXIT`)**:
+- **Darwin Async Fsync Flush on Exit**:
   - Addressed macOS-specific asynchronous fsync queue behavior by ensuring CLI exit handlers execute a synchronous barrier flush before terminating.
 
 ---
@@ -21,8 +21,8 @@ Method: stress-testing failure recovery, write-ahead log replay, concurrent tran
 ## 2. Robustness & Lifecycle State Machines (ROB)
 
 ### Findings
-- **Lifecycle Status Default Completion Map (`F-LIFECYCLE-QA-COMPLETION-MAP-001`)**:
-  - `.zqk/specs/lifecycles/qa/qa_success_lifecycle.yaml` lacked `percent_complete.default_by_status`, blocking automated token promotions.
+- **Lifecycle Status Default Completion Map**:
+  - `qa_success_lifecycle.yaml` lacked `percent_complete.default_by_status`, blocking automated token promotions.
   - Integration of explicit defaults restored fail-closed state machine progression.
 - **Process Group Reaping & Orphan Prevention**:
   - Implemented process group supervision in `pkg/runner` to ensure child processes and background daemons are cleanly terminated during timeout or abort events.
