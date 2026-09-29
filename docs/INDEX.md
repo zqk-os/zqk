@@ -10,6 +10,7 @@ Start in **onboarding**.
 | **[Quickstart](./onboarding/QUICKSTART.md)** | Same text as `./bin/zqk system start-here` |
 | **[First-run object tutorial](./onboarding/FIRST_RUN_OBJECT_TUTORIAL.md)** | Create / get / update a `question` |
 | **[AI Agent Onboarding](./onboarding/AI_AGENT_ONBOARDING.md)** | Directives and workflow discipline for autonomous agents |
+| **[Showcase Demos](./demos/README.md)** | 5-part authentic killer demos with terminal SVG screenshots |
 | **[Architecture](./architecture/README.md)** | Core system architecture, Knowledge Kernel, and daemon topology |
 | **[Modular Pack Composition](./architecture/PACK_COMPOSITION_AND_EXTENSIBILITY.md)** | Pack manifests (`pack.yaml`), builder codegen (`bldr_cli_cmd_v1`), and composition root |
 | **[Lifecycle State Machines](./architecture/LIFECYCLE_STATE_MACHINE.md)** | Visual state machines, check-valves, roles, and cryptographic quality gates |
