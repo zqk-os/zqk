@@ -1,59 +1,259 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 666" width="960" height="666">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 720" width="1040" height="720">
   <defs>
     <style>
-      .window-bg { fill: #1e1e2e; rx: 12px; }
-      .top-bar { fill: #181825; }
-      .dot-red { fill: #f38ba8; }
-      .dot-yellow { fill: #f9e2af; }
-      .dot-green { fill: #a6e3a1; }
-      .term-text { font-family: "JetBrains Mono", "Fira Code", "Menlo", "Monaco", "Consolas", monospace;
-                   font-size: 13px; fill: #cdd6f4; white-space: pre; }
-      .title-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-                    font-size: 12px; fill: #a6adc8; font-weight: 500; text-anchor: middle; }
+      .browser-bg { fill: #0d1117; rx: 12px; }
+      .browser-top { fill: #161b22; }
+      .dot-red { fill: #ff5f56; }
+      .dot-yellow { fill: #ffbd2e; }
+      .dot-green { fill: #27c93f; }
+      .url-bar { fill: #0d1117; stroke: #30363d; stroke-width: 1; rx: 6px; }
+      .url-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 11px; fill: #8b949e; }
+      .url-host { fill: #f0f6fc; font-weight: 500; }
+      .app-header { fill: #161b22; }
+      .header-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px; font-weight: 600; fill: #f0f6fc; }
+      .nav-tab-active { fill: #21262d; stroke: #58a6ff; stroke-width: 1; rx: 4px; }
+      .nav-tab-inactive { fill: transparent; rx: 4px; }
+      .nav-text-active { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 12px; font-weight: 600; fill: #58a6ff; }
+      .nav-text-inactive { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 12px; font-weight: 500; fill: #8b949e; }
+      .search-box { fill: #0d1117; stroke: #30363d; stroke-width: 1; rx: 6px; }
+      .search-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 11px; fill: #8b949e; }
+      .status-pill-bg { fill: rgba(63, 185, 80, 0.12); rx: 12px; }
+      .status-pill-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 11px; font-weight: 600; fill: #3fb950; }
+      .filter-chip { fill: #21262d; stroke: #30363d; stroke-width: 1; rx: 4px; }
+      .filter-chip-active { fill: #58a6ff; rx: 4px; }
+      .chip-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 10px; font-weight: 600; fill: #8b949e; }
+      .chip-text-active { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 10px; font-weight: 600; fill: #ffffff; }
+      .node-card { fill: #161b22; stroke: #30363d; stroke-width: 1.5; rx: 8px; }
+      .node-card-selected { fill: #1c2128; stroke: #58a6ff; stroke-width: 2.5; rx: 8px; }
+      .node-kind { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 9px; font-weight: 700; letter-spacing: 0.5px; }
+      .node-status { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 9px; font-weight: 600; fill: #8b949e; text-anchor: end; }
+      .node-id { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 11px; font-weight: 700; fill: #f0f6fc; }
+      .node-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 11px; fill: #c9d1d9; }
+      .edge { fill: none; stroke: #30363d; stroke-width: 1.8; }
+      .edge-active { fill: none; stroke: #58a6ff; stroke-width: 2.4; }
+      .drawer-bg { fill: #161b22; stroke: #30363d; stroke-width: 1; }
+      .drawer-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 12px; font-weight: 700; fill: #f0f6fc; letter-spacing: 0.5px; }
+      .drawer-label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 11px; font-weight: 500; fill: #8b949e; }
+      .drawer-val { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 11px; fill: #c9d1d9; }
+      .btn-primary { fill: #238636; rx: 6px; }
+      .btn-sec { fill: #21262d; stroke: #30363d; stroke-width: 1; rx: 6px; }
+      .btn-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 11px; font-weight: 600; fill: #ffffff; text-anchor: middle; }
     </style>
-    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
-      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#000000" flood-opacity="0.45"/>
+    <filter id="win-shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#000000" flood-opacity="0.55"/>
     </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#30363d"/>
+    </marker>
+    <marker id="arrow-active" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#58a6ff"/>
+    </marker>
   </defs>
 
-  <rect x="4" y="4" width="952" height="658" class="window-bg" filter="url(#shadow)" stroke="#313244" stroke-width="1"/>
-  <path d="M 4 16 A 12 12 0 0 1 16 4 L 944 4 A 12 12 0 0 1 956 16 L 956 42 L 4 42 Z" class="top-bar"/>
-  <line x1="4" y1="42" x2="956" y2="42" stroke="#313244" stroke-width="1"/>
-  <circle cx="24" cy="23" r="6" class="dot-red"/>
-  <circle cx="44" cy="23" r="6" class="dot-yellow"/>
-  <circle cx="64" cy="23" r="6" class="dot-green"/>
-  <text x="480.0" y="27" class="title-text">zqk ui -w — Visual Web Studio: Timeline, Gantt &amp; DAG Visualizer</text>
-  <g transform="translate(24, 58)">
-    <text class="term-text">
-      <tspan x="0" y="16"><tspan fill="#94e2d5">┌────────────────────────────────────────────────────────────────────────────────────────────────────────┐</tspan></tspan>
-      <tspan x="0" y="36"><tspan fill="#94e2d5">│ </tspan><tspan fill="#ffffff" font-weight="bold">⚡ ZQK STUDIO  │  Timeline &amp; Gantt  │  Ontology DAG Visualizer  │  System Health  │  Port: 8080        </tspan><tspan fill="#94e2d5">│</tspan></tspan>
-      <tspan x="0" y="56"><tspan fill="#94e2d5">├────────────────────────────────────────────────────────────────────────────────────────────────────────┤</tspan></tspan>
-      <tspan x="0" y="76"><tspan fill="#94e2d5">│                                                                                                        │</tspan></tspan>
-      <tspan x="0" y="96"><tspan fill="#94e2d5">│  </tspan><tspan fill="#94e2d5" font-weight="bold">TIMELINE &amp; GANTT ROADMAP</tspan><tspan fill="#94e2d5">                                                                              │</tspan></tspan>
-      <tspan x="0" y="116"><tspan fill="#94e2d5">│                                                                                                        │</tspan></tspan>
-      <tspan x="0" y="136"><tspan fill="#6c7086">│  Sep 25                   Sep 28                   Today (Sep 29)           Oct 02             Oct 05  │</tspan></tspan>
-      <tspan x="0" y="156"><tspan fill="#585b70">│  ────────┼────────────────────────┼───────────────────────▼────────────────────────┼────────────────── │</tspan></tspan>
-      <tspan x="0" y="176"><tspan fill="#94e2d5">│                                                           │                                            │</tspan></tspan>
-      <tspan x="0" y="196"><tspan fill="#94e2d5">│  </tspan><tspan fill="#ffffff" font-weight="bold">WS-LAUNCH (Launch Readiness)                             </tspan><tspan fill="#94e2d5">│                                            │</tspan></tspan>
-      <tspan x="0" y="216"><tspan fill="#94e2d5">│  ├─ </tspan><tspan fill="#94e2d5" font-weight="bold">[◆ MIL-COMMUNITY-LAUNCH]                              </tspan><tspan fill="#94e2d5">│                                            │</tspan></tspan>
-      <tspan x="0" y="236"><tspan fill="#94e2d5">│  │  └─ </tspan><tspan fill="#f9e2af" font-weight="bold">[■ PRI-STARTER-COMMUNITY-001]                      </tspan><tspan fill="#94e2d5">│                                            │</tspan></tspan>
-      <tspan x="0" y="256"><tspan fill="#94e2d5">│  │     └─ </tspan><tspan fill="#cdd6f4">[■ BLI-001] Community launch testing            </tspan><tspan fill="#a6e3a1" font-weight="bold">│  (Active Shovel-Ready)                     </tspan><tspan fill="#94e2d5">│</tspan></tspan>
-      <tspan x="0" y="276"><tspan fill="#94e2d5">│  │                                                        │                                            │</tspan></tspan>
-      <tspan x="0" y="296"><tspan fill="#94e2d5">│  </tspan><tspan fill="#ffffff" font-weight="bold">WS-KERNEL (Core Subsystems)                              </tspan><tspan fill="#94e2d5">│                                            │</tspan></tspan>
-      <tspan x="0" y="316"><tspan fill="#94e2d5">│  ├─ </tspan><tspan fill="#94e2d5" font-weight="bold">[◆ MIL-PUREGO-STORAGE]                                </tspan><tspan fill="#94e2d5">│                                            │</tspan></tspan>
-      <tspan x="0" y="336"><tspan fill="#94e2d5">│  │  └─ </tspan><tspan fill="#f9e2af">[■ PRI-STORAGE-PUREGO-001] </tspan><tspan fill="#a6e3a1">════════════════════════╡ (Complete)                                 </tspan><tspan fill="#94e2d5">│</tspan></tspan>
-      <tspan x="0" y="356"><tspan fill="#94e2d5">│                                                           │                                            │</tspan></tspan>
-      <tspan x="0" y="376"><tspan fill="#6c7086">│  STATUS LEGEND:  </tspan><tspan fill="#89b4fa">■ Planned   </tspan><tspan fill="#f9e2af">■ In Progress   </tspan><tspan fill="#f38ba8">■ Blocked   </tspan><tspan fill="#a6e3a1">■ Complete   </tspan><tspan fill="#94e2d5">◆ Milestone Marker               </tspan><tspan fill="#94e2d5">│</tspan></tspan>
-      <tspan x="0" y="396"><tspan fill="#94e2d5">│                                                                                                        │</tspan></tspan>
-      <tspan x="0" y="416"><tspan fill="#94e2d5">├────────────────────────────────────────────────────────────────────────────────────────────────────────┤</tspan></tspan>
-      <tspan x="0" y="436"><tspan fill="#94e2d5">│                                                                                                        │</tspan></tspan>
-      <tspan x="0" y="456"><tspan fill="#94e2d5">│  </tspan><tspan fill="#94e2d5" font-weight="bold">ONTOLOGY DAG DEPENDENCY GRAPH</tspan><tspan fill="#94e2d5">                                                                         │</tspan></tspan>
-      <tspan x="0" y="476"><tspan fill="#94e2d5">│                                                                                                        │</tspan></tspan>
-      <tspan x="0" y="496"><tspan fill="#94e2d5">│  </tspan><tspan fill="#a6e3a1" font-weight="bold">[GOAL-STARTER] </tspan><tspan fill="#585b70">──► </tspan><tspan fill="#89b4fa" font-weight="bold">[REQ-LAUNCH-DOCS] </tspan><tspan fill="#585b70">──► </tspan><tspan fill="#f9e2af" font-weight="bold">[BLI-001] </tspan><tspan fill="#585b70">──► </tspan><tspan fill="#cba6f7" font-weight="bold">[TST-COMMUNITY-001] </tspan><tspan fill="#585b70">──► </tspan><tspan fill="#94e2d5" font-weight="bold">[CRIT-DOCS-VERIFIED]   </tspan><tspan fill="#94e2d5">│</tspan></tspan>
-      <tspan x="0" y="516"><tspan fill="#94e2d5">│         │                                                                                              │</tspan></tspan>
-      <tspan x="0" y="536"><tspan fill="#585b70">│         └─────────► </tspan><tspan fill="#89b4fa" font-weight="bold">[REQ-AIRGAP-BUILD] </tspan><tspan fill="#585b70">──► </tspan><tspan fill="#f9e2af" font-weight="bold">[BLI-002] </tspan><tspan fill="#585b70">──► </tspan><tspan fill="#cba6f7" font-weight="bold">[TST-AIRGAP-REPRO]  </tspan><tspan fill="#585b70">──► </tspan><tspan fill="#94e2d5" font-weight="bold">[CRIT-REPRO-TARBALL]  </tspan><tspan fill="#94e2d5">│</tspan></tspan>
-      <tspan x="0" y="556"><tspan fill="#94e2d5">│                                                                                                        │</tspan></tspan>
-      <tspan x="0" y="576"><tspan fill="#94e2d5">└────────────────────────────────────────────────────────────────────────────────────────────────────────┘</tspan></tspan>
-    </text>
+  <!-- Browser Window Frame -->
+  <rect x="4" y="4" width="1032" height="712" class="browser-bg" filter="url(#win-shadow)" stroke="#30363d" stroke-width="1"/>
+  <path d="M 4 16 A 12 12 0 0 1 16 4 L 1024 4 A 12 12 0 0 1 1036 16 L 1036 44 L 4 44 Z" class="browser-top"/>
+  <line x1="4" y1="44" x2="1036" y2="44" stroke="#30363d" stroke-width="1"/>
+
+  <!-- macOS Window Controls -->
+  <circle cx="22" cy="24" r="5.5" class="dot-red"/>
+  <circle cx="40" cy="24" r="5.5" class="dot-yellow"/>
+  <circle cx="58" cy="24" r="5.5" class="dot-green"/>
+
+  <!-- Browser URL Bar -->
+  <rect x="240" y="10" width="560" height="26" class="url-bar"/>
+  <text x="256" y="27" class="url-text"><tspan fill="#3fb950">🔒 </tspan><tspan class="url-host">http://127.0.0.1:8080</tspan>/studio/dag-visualizer</text>
+
+  <!-- App Header -->
+  <rect x="4" y="45" width="1032" height="48" class="app-header"/>
+  <line x1="4" y1="93" x2="1036" y2="93" stroke="#30363d" stroke-width="1"/>
+
+  <!-- Brand -->
+  <text x="24" y="75" class="header-title"><tspan fill="#58a6ff">⚡</tspan> ZQK Knowledge Kernel Visual Studio</text>
+
+  <!-- View Switcher Tabs -->
+  <g transform="translate(320, 56)">
+    <rect x="0" y="0" width="124" height="26" class="nav-tab-inactive"/>
+    <text x="10" y="17" class="nav-text-inactive">📅 Timeline &amp; Gantt</text>
+
+    <rect x="130" y="0" width="154" height="26" class="nav-tab-active"/>
+    <text x="140" y="17" class="nav-text-active">🕸️ Ontology DAG Visualizer</text>
+
+    <rect x="290" y="0" width="134" height="26" class="nav-tab-inactive"/>
+    <text x="300" y="17" class="nav-text-inactive">🛡️ System Health &amp; DoD</text>
+
+    <rect x="430" y="0" width="118" height="26" class="nav-tab-inactive"/>
+    <text x="440" y="17" class="nav-text-inactive">📊 Metrics &amp; Trace</text>
+  </g>
+
+  <!-- Right App Controls -->
+  <g transform="translate(890, 56)">
+    <rect x="0" y="0" width="130" height="26" class="status-pill-bg"/>
+    <circle cx="12" cy="13" r="3.5" fill="#3fb950"/>
+    <text x="22" y="17" class="status-pill-text">● Live CAS (185 nodes)</text>
+  </g>
+
+  <!-- Main Viewport Grid: Left Canvas (660px) | Right Inspector (372px) -->
+  <g transform="translate(4, 94)">
+    <!-- Canvas Background -->
+    <rect x="0" y="0" width="660" height="622" fill="#0d1117"/>
+    <line x1="660" y1="0" x2="660" y2="622" stroke="#30363d" stroke-width="1"/>
+
+    <!-- Graph Canvas Toolbar -->
+    <g transform="translate(18, 16)">
+      <rect x="0" y="0" width="144" height="30" fill="#161b22" stroke="#30363d" stroke-width="1" rx="6"/>
+      <text x="12" y="20" font-family="-apple-system, sans-serif" font-size="12" fill="#c9d1d9">🔍 Zoom: 100% │ ☊ DAG</text>
+    </g>
+
+    <!-- Filter Chips -->
+    <g transform="translate(240, 18)">
+      <rect x="0" y="0" width="56" height="24" class="filter-chip-active"/>
+      <text x="12" y="16" class="chip-text-active">All (185)</text>
+
+      <rect x="62" y="0" width="62" height="24" class="filter-chip"/>
+      <text x="72" y="16" class="chip-text">Goals (10)</text>
+
+      <rect x="130" y="0" width="64" height="24" class="filter-chip"/>
+      <text x="140" y="16" class="chip-text">Plans (85)</text>
+
+      <rect x="200" y="0" width="94" height="24" class="filter-chip"/>
+      <text x="210" y="16" class="chip-text">Backlog (196)</text>
+
+      <rect x="300" y="0" width="102" height="24" class="filter-chip"/>
+      <text x="310" y="16" class="chip-text">Test Cases (14)</text>
+    </g>
+
+    <!-- Connecting Edges (Smooth Bezier Splines) -->
+    <!-- Edge 1: Goal -> Req 1 -->
+    <path d="M 200 130 C 240 130, 240 130, 280 130" class="edge-active" marker-end="url(#arrow-active)"/>
+    <!-- Edge 2: Goal -> Req 2 -->
+    <path d="M 200 130 C 240 130, 240 260, 280 260" class="edge" marker-end="url(#arrow)"/>
+    <!-- Edge 3: Req 1 -> BLI-001 -->
+    <path d="M 460 130 C 490 130, 490 180, 520 180" class="edge-active" marker-end="url(#arrow-active)"/>
+    <!-- Edge 4: BLI-001 -> Test Case -->
+    <path d="M 640 180 C 650 180, 650 330, 520 330" class="edge-active" marker-end="url(#arrow-active)"/>
+    <!-- Edge 5: Test Case -> Criteria -->
+    <path d="M 520 330 C 470 330, 470 450, 420 450" class="edge-active" marker-end="url(#arrow-active)"/>
+
+    <!-- DAG Node 1: GOAL-COMMUNITY-LAUNCH -->
+    <g transform="translate(30, 95)">
+      <rect width="170" height="70" class="node-card"/>
+      <rect x="0" y="0" width="4" height="70" fill="#3fb950" rx="2"/>
+      <text x="14" y="20" class="node-kind" fill="#3fb950">GOAL</text>
+      <text x="156" y="20" class="node-status">active</text>
+      <text x="14" y="38" class="node-id">GOAL-COMMUNITY</text>
+      <text x="14" y="55" class="node-title">Open-Core Community Gate</text>
+    </g>
+
+    <!-- DAG Node 2: REQ-LAUNCH-DOCS -->
+    <g transform="translate(280, 95)">
+      <rect width="180" height="70" class="node-card"/>
+      <rect x="0" y="0" width="4" height="70" fill="#d29922" rx="2"/>
+      <text x="14" y="20" class="node-kind" fill="#d29922">REQUIREMENT</text>
+      <text x="166" y="20" class="node-status">active</text>
+      <text x="14" y="38" class="node-id">REQ-LAUNCH-DOCS</text>
+      <text x="14" y="55" class="node-title">100% Documentation Accuracy</text>
+    </g>
+
+    <!-- DAG Node 3: REQ-STORAGE-PUREGO -->
+    <g transform="translate(280, 225)">
+      <rect width="180" height="70" class="node-card"/>
+      <rect x="0" y="0" width="4" height="70" fill="#d29922" rx="2"/>
+      <text x="14" y="20" class="node-kind" fill="#d29922">REQUIREMENT</text>
+      <text x="166" y="20" class="node-status">complete</text>
+      <text x="14" y="38" class="node-id">REQ-STORAGE-PUREGO</text>
+      <text x="14" y="55" class="node-title">Pure-Go Storage Engine</text>
+    </g>
+
+    <!-- DAG Node 4: BLI-COMMUNITY-FIRST-RUN (Selected Node) -->
+    <g transform="translate(480, 145)">
+      <rect width="170" height="70" class="node-card-selected"/>
+      <rect x="0" y="0" width="4" height="70" fill="#39c5bb" rx="2"/>
+      <text x="14" y="20" class="node-kind" fill="#39c5bb">BACKLOG ITEM</text>
+      <text x="156" y="20" class="node-status" fill="#58a6ff">planned</text>
+      <text x="14" y="38" class="node-id">BLI-FIRST-RUN</text>
+      <text x="14" y="55" class="node-title">First-run tutorial walkthrough</text>
+    </g>
+
+    <!-- DAG Node 5: TST-COMMUNITY-FIRST-RUN -->
+    <g transform="translate(360, 295)">
+      <rect width="175" height="70" class="node-card"/>
+      <rect x="0" y="0" width="4" height="70" fill="#db61a2" rx="2"/>
+      <text x="14" y="20" class="node-kind" fill="#db61a2">TEST CASE</text>
+      <text x="161" y="20" class="node-status">active</text>
+      <text x="14" y="38" class="node-id">TST-FIRST-RUN</text>
+      <text x="14" y="55" class="node-title">Verify Start-Here Tutorial</text>
+    </g>
+
+    <!-- DAG Node 6: CRIT-COMMUNITY-TUTORIAL -->
+    <g transform="translate(180, 415)">
+      <rect width="180" height="70" class="node-card"/>
+      <rect x="0" y="0" width="4" height="70" fill="#3fb950" rx="2"/>
+      <text x="14" y="20" class="node-kind" fill="#3fb950">CRITERIA</text>
+      <text x="166" y="20" class="node-status">complete</text>
+      <text x="14" y="38" class="node-id">CRIT-TUTORIAL</text>
+      <text x="14" y="55" class="node-title">Criteria satisfied by test</text>
+    </g>
+
+    <!-- Focus Halo Label -->
+    <g transform="translate(180, 550)">
+      <rect x="0" y="0" width="310" height="32" fill="#161b22" stroke="#58a6ff" stroke-width="1" rx="16"/>
+      <text x="20" y="20" font-family="-apple-system, sans-serif" font-size="12" fill="#f0f6fc">🔍 Focus Chain: <tspan fill="#3fb950">Goal</tspan> ➔ <tspan fill="#d29922">Req</tspan> ➔ <tspan fill="#39c5bb">BLI</tspan> ➔ <tspan fill="#db61a2">Test</tspan> ➔ <tspan fill="#3fb950">Crit</tspan></text>
+    </g>
+
+    <!-- Right Side: Object Inspector Drawer (372px) -->
+    <g transform="translate(660, 0)">
+      <rect x="0" y="0" width="372" height="622" class="drawer-bg"/>
+
+      <!-- Drawer Header -->
+      <g transform="translate(20, 24)">
+        <text x="0" y="0" class="drawer-title">🔍 OBJECT INSPECTOR</text>
+        <text x="320" y="0" font-family="-apple-system, sans-serif" font-size="14" fill="#8b949e" cursor="pointer">✕</text>
+      </g>
+      <line x1="0" y1="42" x2="372" y2="42" stroke="#30363d" stroke-width="1"/>
+
+      <!-- Selected Entity Hero Card -->
+      <g transform="translate(20, 60)">
+        <rect x="0" y="0" width="332" height="96" fill="#0d1117" stroke="#30363d" stroke-width="1" rx="8"/>
+        <rect x="0" y="0" width="4" height="96" fill="#39c5bb" rx="2"/>
+        <text x="16" y="24" class="node-kind" fill="#39c5bb">BACKLOG ITEM</text>
+        <rect x="236" y="10" width="80" height="20" fill="rgba(88, 166, 255, 0.15)" stroke="#58a6ff" stroke-width="1" rx="10"/>
+        <text x="276" y="24" font-family="-apple-system, sans-serif" font-size="10" font-weight="600" fill="#58a6ff" text-anchor="middle">planned</text>
+        <text x="16" y="48" font-family="ui-monospace, monospace" font-size="13" font-weight="700" fill="#f0f6fc">BLI-COMMUNITY-FIRST-RUN</text>
+        <text x="16" y="70" class="drawer-val">Complete Start Here tutorial walkthrough</text>
+      </g>
+
+      <!-- Inspector Property Fields -->
+      <g transform="translate(20, 180)">
+        <text x="0" y="0" class="drawer-label">CAS HASH DIGEST</text>
+        <text x="0" y="18" class="drawer-val">sha256:e3b0c44298fc1c149afbf4c8...</text>
+
+        <text x="0" y="48" class="drawer-label">STORAGE PLANE</text>
+        <text x="0" y="66" class="drawer-val" fill="#3fb950">PlanePromoted (CAS Master)</text>
+
+        <text x="0" y="96" class="drawer-label">AUTHOR / SEATED ACTOR</text>
+        <text x="0" y="114" class="drawer-val">PER-DEFAULT-LEAD (verified)</text>
+
+        <text x="0" y="144" class="drawer-label">TRACEABILITY RADAR</text>
+        <text x="0" y="162" class="drawer-val">Upstream Goal: [🟢 GOAL-COMMUNITY]</text>
+        <text x="0" y="180" class="drawer-val">Requirement  : [🟢 REQ-LAUNCH-DOCS]</text>
+        <text x="0" y="198" class="drawer-val">Test Target  : [🟢 TST-FIRST-RUN]</text>
+        <text x="0" y="216" class="drawer-val">Acceptance   : [🟢 CRIT-TUTORIAL] (Satisfied)</text>
+      </g>
+
+      <line x1="20" y1="440" x2="352" y2="440" stroke="#30363d" stroke-width="1"/>
+
+      <!-- Action Buttons Palette -->
+      <g transform="translate(20, 460)">
+        <rect x="0" y="0" width="332" height="34" class="btn-primary"/>
+        <text x="166" y="22" class="btn-text">🚀 Promote Object (zqk object promote)</text>
+
+        <rect x="0" y="44" width="160" height="32" class="btn-sec"/>
+        <text x="80" y="64" class="btn-text" fill="#c9d1d9">🔗 Add Reference</text>
+
+        <rect x="172" y="44" width="160" height="32" class="btn-sec"/>
+        <text x="252" y="64" class="btn-text" fill="#c9d1d9">📜 Raw CAS JSON</text>
+      </g>
+    </g>
   </g>
 </svg>
