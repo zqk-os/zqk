@@ -13,7 +13,7 @@ import (
 )
 
 // TestLifecycleRoles_AllStatusesAnnotated ensures every status in every lifecycle
-// YAML carries a cross-kind role (TRACK: [REDACTED-ID]).
+// YAML carries a cross-kind role (TRACK: core-backlog).
 func TestLifecycleRoles_AllStatusesAnnotated(t *testing.T) {
 	wd, err := fileutil.Getwd()
 	if err != nil {

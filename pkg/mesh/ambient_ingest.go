@@ -1,4 +1,4 @@
-// Traceability: BLI-SYM-031 / [REDACTED-ID]
+// Traceability: BLI-SYM-031
 package mesh
 
 import (

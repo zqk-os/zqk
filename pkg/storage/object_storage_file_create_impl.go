@@ -288,4 +288,4 @@ func (f *FileObjectStorage) Create(ctx context.Context, secCtx *pkgctx.SecurityC
 }
 
 // proveCreateVisibility fail-closes create→get: draft plane via Stat+ReadFile (not Read, which
-// can hit write-behind/pending), CAS via hash Stat+Read. TRACK: [REDACTED-ID]
+// can hit write-behind/pending), CAS via hash Stat+Read. TRACK: core-backlog

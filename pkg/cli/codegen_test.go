@@ -88,7 +88,7 @@ func TestGenerateCommandBuilderFromYAML(t *testing.T) {
 
 // criticalCommandBuildersMustHaveUse are leaf builders whose cobra Use comes
 // only from generated code (no hand Use overlay). Empty Use here breaks swarm
-// CLI surfaces (see [REDACTED-ID] / #1102 object list).
+// CLI surfaces (see core-backlog / #1102 object list).
 //
 // Many other bldr_cli_cmd_v1 files still have NewCommandBuilder("") and are
 // intentional: ApplyBuilder overlays Use in cmd/zqk. Do not ban all empties.

@@ -108,7 +108,7 @@ func renderIDEMDC(ctx context.Context, prov VendorProvider, opt ProjectOptions) 
 	var b strings.Builder
 	b.WriteString("# Verifiable Decomposition Spine (VDS)\n\n")
 	b.WriteString("<!-- " + marker + " — do not hand-edit body; update kernel objects then re-run. -->\n")
-	b.WriteString("<!-- SSOT: POL-WORKFLOW-VDS + glossary titles + docs/quality VDS profiles. TRACK: [REDACTED-ID] -->\n\n")
+	b.WriteString("<!-- SSOT: POL-WORKFLOW-VDS + glossary titles + docs/quality VDS profiles. -->\n\n")
 	fmt.Fprintf(&b, "**Policy:** `%s` — %s (%s)\n", PolicyID, polTitle, polEnforcement)
 	fmt.Fprintf(&b, "**%s**\n", glsLine)
 	b.WriteString("**Contract:** `docs/architecture/VERIFIABLE_DECOMPOSITION_SPINE.md`\n")

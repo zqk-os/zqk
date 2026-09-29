@@ -368,10 +368,10 @@ func (iq *indexQueue) processBatch(batch []*indexUpdateRequest) error {
 
 	// Validate mappings before save: remove entries pointing to non-existent files.
 	// This prevents stale entries from being persisted (e.g., files deleted externally).
-	// See [REDACTED-ID] for root cause analysis.
+	// See core-backlog for root cause analysis.
 	//
 	// Uses ValidationStrategy pattern to allow sync (default) or async validation.
-	// See [REDACTED-ID] for strategy abstraction design.
+	// See core-backlog for strategy abstraction design.
 	validationStart := time.Now()
 	strategy := GlobalValidationRegistry.GetStrategy(iq.kind)
 	mappingsCopy, bucketKeysCopy, staleCount := strategy.ValidateMappings(cas.GetKindDir(), mappingsCopy, bucketKeysCopy)

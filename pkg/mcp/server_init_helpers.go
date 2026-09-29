@@ -26,7 +26,7 @@ func (s *Server) prepareReinitialization() {
 	}
 
 	// TCP/proxy daemon: a second client's initialize must not wipe tools for live peers
-	// (IDE proxy hang). TRACK: [REDACTED-ID] — per-connection Server.
+	// (IDE proxy hang). TRACK: core-backlog — per-connection Server.
 	if s.multiClient.Load() {
 		s.traceLogf("[MCP_DEBUG] prepareReinitialization: multi-client mode, keeping tools (count=%d)", s.getToolCount())
 		return

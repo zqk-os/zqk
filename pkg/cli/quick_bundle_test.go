@@ -9,8 +9,8 @@ import (
 )
 
 func TestQuickBundle(t *testing.T) {
-	// Satisfies [REDACTED-ID]
-	// Satisfies [REDACTED-ID]
+	// Satisfies core-backlog
+	// Satisfies core-backlog
 	bundleContent := []byte(`
 backlog_item:
   title: Test BLI

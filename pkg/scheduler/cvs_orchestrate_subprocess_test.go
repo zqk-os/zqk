@@ -62,7 +62,7 @@ func TestNewCVSOrchestrateRollupOnlyCommand_fields(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
 	root := filepath.Join(t.TempDir(), "repo")
-	sid := "[REDACTED-ID]"
+	sid := "CVS-STARTER-001"
 	cmd := newCVSOrchestrateRollupOnlyCommand(ctx, root, sid, "")
 	if cmd.Dir != root {
 		t.Fatalf("Dir: got %q want %q", cmd.Dir, root)
@@ -94,7 +94,7 @@ func TestNewCVSOrchestrateRollupOnlyCommand_envRollupOut(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
 	root := filepath.Join(t.TempDir(), "repo")
-	sid := "[REDACTED-ID]"
+	sid := "CVS-STARTER-001"
 	wantOut := filepath.Join(root, "custom", "rollup.json")
 	cmd := newCVSOrchestrateRollupOnlyCommand(ctx, root, sid, wantOut)
 	rollupPrefix := EnvKeyCVSOrchestrateRollupOut + "="

@@ -1,6 +1,6 @@
 // Package transceiver implements protocol routing for scheduler integration.
 //
-// TODO([REDACTED-ID]): Multiplexing router + transceiver tie into assembly pipeline (storage, metrics, events, notifications); see docs/architecture/DATA_CELL_RUNTIME_ORGANISM.md and pkg/datacell.
+// TODO(core-backlog): Multiplexing router + transceiver tie into assembly pipeline (storage, metrics, events, notifications); see docs/architecture/DATA_CELL_RUNTIME_ORGANISM.md and pkg/datacell.
 package transceiver
 
 import (

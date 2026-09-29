@@ -37,7 +37,7 @@ func TestContractForProfile_UnknownProfile(t *testing.T) {
 	}
 }
 
-// [REDACTED-ID]: profileContracts must stay in lockstep with KnownStorageProfiles
+// Invariant: profileContracts must stay in lockstep with KnownStorageProfiles
 // (table-driven gate — no orphan map entries or missing contracts).
 func TestProfileContractsMapMatchesKnownStorageProfiles(t *testing.T) {
 	t.Parallel()

@@ -1,8 +1,8 @@
 // Package lifecycle: transition rules define when a criterion (with scope) triggers a status transition.
 //
-// Process traceability: formal requirement [REDACTED-ID] (goal [REDACTED-ID])
-// requires extending this set with milestone-scoped CriterionSatisfied → milestone complete when the
-// verification WAL emits events (see docs/architecture/LIFECYCLE_EVENT_LISTENER_AND_CRITERIA.md).
+// Process traceability: formal requirements require extending this set with milestone-scoped
+// CriterionSatisfied → milestone complete when the verification WAL emits events
+// (see docs/architecture/LIFECYCLE_EVENT_LISTENER_AND_CRITERIA.md).
 // Today only all_backlog_items_complete_for_plan → priority_plan complete is wired (REQ-014).
 
 package lifecycle
@@ -18,7 +18,7 @@ type TransitionRule struct {
 }
 
 // DefaultTransitionRules returns the in-code transition rules (REQ-014 priority plan completion;
-// [REDACTED-ID] milestone completion when linked criteria are satisfied).
+// milestone completion when linked criteria are satisfied).
 func DefaultTransitionRules() []TransitionRule {
 	return []TransitionRule{
 		{

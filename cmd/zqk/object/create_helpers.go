@@ -257,7 +257,7 @@ func writeCreateRepairDraft(projectRoot, kind, objID string, objData map[string]
 	}
 	ts := zqktime.NowLayoutUTC(zqktime.LayoutLogRotateStamp)
 	out := filepath.Join(dir, fmt.Sprintf("create-repair-%s-%s-%s.yaml", kind, safeID, ts))
-	header := paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("# Create repair draft — not yet in the membrane (TRACK: [REDACTED-ID])\n# Retry: zqk object create %s\n# Or: zqk system sync-cas-index --file <cas-hash.yaml> if the file exists\n\n", kind))
+	header := paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("# Create repair draft — not yet in the membrane\n# Retry: zqk object create %s\n# Or: zqk system sync-cas-index --file <cas-hash.yaml> if the file exists\n\n", kind))
 	if err := fileutil.WriteSecureFile(out, append([]byte(header), raw...)); err != nil {
 		return "", errfmt.Newf("write create repair draft").Wrap(err)
 	}

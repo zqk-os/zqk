@@ -10,7 +10,7 @@ import (
 // Chat paste is an **opt-in** wake/ack ring only (delivery_mode=paste / --chat) — full steer
 // bodies stay on the agent feed. Ship default is notify (--notify-only / MCP ActionRequired).
 // Escape hatch: MESH_WAKE_PASTE_FULL=1 pastes the raw message when paste mode is already on.
-// TRACK closed (default): [REDACTED-ID] Phase A / [REDACTED-ID].
+// TRACK closed (default): core-backlog Phase A / core-backlog.
 
 const (
 	// Paste roles mirror the seat kinds in wake_adapter.go rather than vendor names: which vendor

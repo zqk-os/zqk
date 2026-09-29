@@ -23,8 +23,8 @@ import (
 	"github.com/zqk-os/zqk/pkg/tpm"
 )
 
-// Default CLI alpha readiness plan (repo lane); still resolved when status is paused.
-const defaultAlphaPriorityPlanID = "[REDACTED-ID]"
+// Default starter community plan (repo lane); still resolved when status is paused.
+const defaultAlphaPriorityPlanID = "PRI-STARTER-COMMUNITY-001"
 
 const WhatsNextSchema = "zqk_whats_next_v1"
 

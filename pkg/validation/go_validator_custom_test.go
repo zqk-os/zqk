@@ -64,7 +64,7 @@ func TestGoValidator_OwnerRefPrototypeRejection(t *testing.T) {
 	}
 }
 
-// TestGoValidator_OrphanRejection validates [REDACTED-ID]
+// TestGoValidator_OrphanRejection validates core-backlog
 func TestGoValidator_OrphanRejection(t *testing.T) {
 	gv := NewGoValidator()
 

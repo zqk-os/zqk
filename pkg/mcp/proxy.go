@@ -554,7 +554,7 @@ func (p *ProxyDaemon) PublishDaemonEvent(ctx context.Context, message, agentID, 
 
 // QueryEventsSubscriberCount calls events/list on the MCP daemon and returns subscriberCount.
 // Used by feed steer to fail-loud when notify mode has zero live IDE subscribers
-// (CRIT-COMMS-003 / [REDACTED-ID]).
+// (CRIT-COMMS-003 / core-backlog).
 //
 // New TCP sessions need an initialize handshake before request/response methods;
 // notifications/event alone does not. Auth elicitation on initialize is OK —

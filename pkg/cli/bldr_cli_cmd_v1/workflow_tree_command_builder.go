@@ -17,7 +17,7 @@ func NewWorkflowTreeCommandBuilder() *cobra.Command {
 	help.WithDescriptionLines("To prevent massive graphs, traversal is bounded by depth and summaries are rolled up.")
 	help.AddExample("Show dependency tree for the active priority plan", "%s workflow tree")
 	help.AddExample("Show dependency tree with recursive depth of 2", "%s workflow tree --depth 2")
-	help.AddExample("Show dependency tree for a specific plan", "%s workflow tree --priority-plan [REDACTED-ID]")
+	help.AddExample("Show dependency tree for a specific plan", "%s workflow tree --priority-plan PRI-STARTER-COMMUNITY-001")
 	help.ExcludeFlag("output")
 	help.ExcludeFlag("verbose")
 	help.ExcludeFlag("quiet")

@@ -160,7 +160,7 @@ func (s *Server) handleEventsSubscribe(_ context.Context, _ string, params json.
 	}
 
 	// IDE seats (IDE proxy) stay subscribed across long idle Composer turns.
-	// Short idle made "live MCP" look permanently broken. TRACK: [REDACTED-ID].
+	// Short idle made "live MCP" look permanently broken. TRACK: core-backlog.
 	maxIdle := 5 * time.Minute
 	if subscribeParams.ClientID == ideProxySubscriberClientID {
 		maxIdle = 24 * time.Hour

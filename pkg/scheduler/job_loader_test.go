@@ -543,10 +543,10 @@ func TestJobLoader_RefreshEnvironmentVariablesFromRaw(t *testing.T) {
 		EnvironmentVariables: map[string]string{"STALE": "yes"},
 	}
 	raw := map[string]any{
-		objects.FieldKeyEnvironmentVariables: map[string]any{EnvKeyConvergenceSessionID: "[REDACTED-ID]"},
+		objects.FieldKeyEnvironmentVariables: map[string]any{EnvKeyConvergenceSessionID: "CVS-STARTER-001"},
 	}
 	jl.RefreshEnvironmentVariablesFromRaw(job, raw)
-	if job.EnvironmentVariables[EnvKeyConvergenceSessionID] != "[REDACTED-ID]" {
+	if job.EnvironmentVariables[EnvKeyConvergenceSessionID] != "CVS-STARTER-001" {
 		t.Fatalf("missing CVS env, got %#v", job.EnvironmentVariables)
 	}
 	if _, ok := job.EnvironmentVariables["STALE"]; ok {

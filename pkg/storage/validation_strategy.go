@@ -15,7 +15,7 @@ import (
 // performance requirements. When StaleValidationTimeNs metrics show validation is slow,
 // an async strategy with background file scanning can be used instead.
 //
-// See [REDACTED-ID] for the full design and phases.
+// See core-backlog for the full design and phases.
 type ValidationStrategy interface {
 	// ValidateMappings filters out stale entries (files that don't exist) from the mappings.
 	// Returns:
