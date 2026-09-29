@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 1802" width="960" height="1802">
+  <defs>
+    <style>
+      .window-bg { fill: #1e1e2e; rx: 12px; }
+      .top-bar { fill: #181825; }
+      .dot-red { fill: #f38ba8; }
+      .dot-yellow { fill: #f9e2af; }
+      .dot-green { fill: #a6e3a1; }
+      .term-text { font-family: "JetBrains Mono", "Fira Code", "Menlo", "Monaco", "Consolas", monospace;
+                   font-size: 13px; fill: #cdd6f4; white-space: pre; }
+      .title-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                    font-size: 12px; fill: #a6adc8; font-weight: 500; text-anchor: middle; }
+    </style>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <!-- Terminal Window Background -->
+  <rect x="4" y="4" width="952" height="1794" class="window-bg" filter="url(#shadow)" stroke="#313244" stroke-width="1"/>
+
+  <!-- Title Bar -->
+  <path d="M 4 16 A 12 12 0 0 1 16 4 L 944 4 A 12 12 0 0 1 956 16 L 956 42 L 4 42 Z" class="top-bar"/>
+  <line x1="4" y1="42" x2="956" y2="42" stroke="#313244" stroke-width="1"/>
+
+  <!-- Window Buttons -->
+  <circle cx="24" cy="23" r="6" class="dot-red"/>
+  <circle cx="44" cy="23" r="6" class="dot-yellow"/>
+  <circle cx="64" cy="23" r="6" class="dot-green"/>
+
+  <!-- Window Title -->
+  <text x="480.0" y="27" class="title-text">zqk — Demo 4: Cryptographic Ledger &amp; OpenVEX</text>
+
+  <!-- Terminal Text Content -->
+  <g transform="translate(24, 62)">
+    <text class="term-text">
+      <tspan x="0" y="16">[3J[H[2J<tspan font-weight="bold">===========================================================================</tspan></tspan>
+      <tspan x="0" y="36"><tspan fill="#94e2d5">  ZQK DEMO 4: THE VERIFIABLE CRYPTOGRAPHIC LEDGER &amp; OPENVEX ATTESTATION    </tspan></tspan>
+      <tspan x="0" y="56"><tspan font-weight="bold">===========================================================================</tspan></tspan>
+      <tspan x="0" y="76">  <tspan fill="#f9e2af" font-weight="bold">Thesis:</tspan> Anyone can generate code. ZQK generates cryptographically</tspan>
+      <tspan x="0" y="96">  verifiable proof of how the code was made. You don&#x27;t have to trust the LLM;</tspan>
+      <tspan x="0" y="116">  you can mathematically verify the exact constraint and seating path taken.</tspan>
+      <tspan x="0" y="136"><tspan font-weight="bold">===========================================================================</tspan></tspan>
+      <tspan x="0" y="156"></tspan>
+      <tspan x="0" y="176"><tspan font-weight="bold">[SCENE 1: INITIALIZING CRYPTOGRAPHIC VAULT WORKSPACE]</tspan></tspan>
+      <tspan x="0" y="196"></tspan>
+      <tspan x="0" y="216"><tspan font-weight="bold">[SCENE 2: MULTI-AGENT CRYPTOGRAPHIC SEAT ISSUANCE]</tspan></tspan>
+      <tspan x="0" y="236">  Issuing unique cryptographic API key and seating file for Architect agent:</tspan>
+      <tspan x="0" y="256">  $ <tspan font-weight="bold">zqk keystore issue --account-id ACC-ARCH-01 --title &quot;Swarm-Architect&quot;</tspan></tspan>
+      <tspan x="0" y="276"></tspan>
+      <tspan x="0" y="296">✅ API key issued (plaintext shown once)</tspan>
+      <tspan x="0" y="316"></tspan>
+      <tspan x="0" y="336">Key ID:       KEY-1790649508047138000-da4491ac</tspan>
+      <tspan x="0" y="356">Account:      ACC-ARCH-01</tspan>
+      <tspan x="0" y="376">Fingerprint:  sha256:ef712b981ec1c027af45fd67187c74e4758a5ac9f4e6ce4b4f7175d28841f3f2</tspan>
+      <tspan x="0" y="396">Credential:   zqk_ak_0fac0ee19e0c952d40f70aad05e079161fa7465e7960bbac</tspan>
+      <tspan x="0" y="416">Seating file: /tmp/zqk-crypto-demo-dYmXxd/.zqk/seating/credentials/ACC-ARCH-01</tspan>
+      <tspan x="0" y="436"></tspan>
+      <tspan x="0" y="456">Export for this seat:</tspan>
+      <tspan x="0" y="476">  export ZQK_API_KEY=zqk_ak_0fac0ee19e0c952d40f70aad05e079161fa7465e7960bbac</tspan>
+      <tspan x="0" y="496"></tspan>
+      <tspan x="0" y="516">  Issuing unique cryptographic API key and seating file for Security Reviewer agent:</tspan>
+      <tspan x="0" y="536">  $ <tspan font-weight="bold">zqk keystore issue --account-id ACC-REV-02 --title &quot;Swarm-Security-Reviewer&quot;</tspan></tspan>
+      <tspan x="0" y="556"></tspan>
+      <tspan x="0" y="576">✅ API key issued (plaintext shown once)</tspan>
+      <tspan x="0" y="596"></tspan>
+      <tspan x="0" y="616">Key ID:       KEY-1790649508622405000-dc1441d3</tspan>
+      <tspan x="0" y="636">Account:      ACC-REV-02</tspan>
+      <tspan x="0" y="656">Fingerprint:  sha256:d9089dda3802ee7074383032cec4fdf278a7a3c53023124fa8ad57f30aa63832</tspan>
+      <tspan x="0" y="676">Credential:   zqk_ak_a08efe531e4e5b61eebad22fad19f91cc710d266f64cf2ff</tspan>
+      <tspan x="0" y="696">Seating file: /tmp/zqk-crypto-demo-dYmXxd/.zqk/seating/credentials/ACC-REV-02</tspan>
+      <tspan x="0" y="716"></tspan>
+      <tspan x="0" y="736">Export for this seat:</tspan>
+      <tspan x="0" y="756">  export ZQK_API_KEY=zqk_ak_a08efe531e4e5b61eebad22fad19f91cc710d266f64cf2ff</tspan>
+      <tspan x="0" y="776"></tspan>
+      <tspan x="0" y="796"><tspan font-weight="bold">[SCENE 3: INSPECTING LOCAL VAULT KEYSTORE LEDGER]</tspan></tspan>
+      <tspan x="0" y="816">  Querying active keystore entries and verified agent identities:</tspan>
+      <tspan x="0" y="836">  $ <tspan font-weight="bold">zqk keystore list</tspan></tspan>
+      <tspan x="0" y="856"></tspan>
+      <tspan x="0" y="876">Found 2 keystore entries:</tspan>
+      <tspan x="0" y="896"></tspan>
+      <tspan x="0" y="916">1. KEY-1790649508047138000-da4491ac</tspan>
+      <tspan x="0" y="936">   Title: Swarm-Architect</tspan>
+      <tspan x="0" y="956">   Type: api_key</tspan>
+      <tspan x="0" y="976">   Account: ACC-ARCH-01</tspan>
+      <tspan x="0" y="996">   Status: Active</tspan>
+      <tspan x="0" y="1016"></tspan>
+      <tspan x="0" y="1036">2. KEY-1790649508622405000-dc1441d3</tspan>
+      <tspan x="0" y="1056">   Title: Swarm-Security-Reviewer</tspan>
+      <tspan x="0" y="1076">   Type: api_key</tspan>
+      <tspan x="0" y="1096">   Account: ACC-REV-02</tspan>
+      <tspan x="0" y="1116">   Status: Active</tspan>
+      <tspan x="0" y="1136"></tspan>
+      <tspan x="0" y="1156">⚠️  Sensitive fields (credential_hash, salt) are never displayed</tspan>
+      <tspan x="0" y="1176"></tspan>
+      <tspan x="0" y="1196"><tspan font-weight="bold">[SCENE 4: GENERATING CISA OPENVEX ATTESTATION &amp; SBOM]</tspan></tspan>
+      <tspan x="0" y="1216">  Minting CISA OpenVEX v0.2.0 attestation for product release:</tspan>
+      <tspan x="0" y="1236">  $ <tspan font-weight="bold">./scripts/generate-openvex.sh v0.1.0 /tmp/zqk-crypto-demo-dYmXxd/openvex.json</tspan></tspan>
+      <tspan x="0" y="1256"></tspan>
+      <tspan x="0" y="1276">🛡️ Generating OpenVEX attestation document for ZQK v0.1.0 into /tmp/zqk-crypto-demo-dYmXxd/openvex.json...</tspan>
+      <tspan x="0" y="1296">✅ OpenVEX document validation passed: conforms to OpenVEX v0.2.0 specification.</tspan>
+      <tspan x="0" y="1316">✅ OpenVEX attestation successfully generated and validated at /tmp/zqk-crypto-demo-dYmXxd/openvex.json</tspan>
+      <tspan x="0" y="1336"></tspan>
+      <tspan x="0" y="1356">  Attestation preview (first 25 lines of OpenVEX JSON):</tspan>
+      <tspan x="0" y="1376">{</tspan>
+      <tspan x="0" y="1396">  &quot;@context&quot;: &quot;https://openvex.dev/ns/v0.2.0&quot;,</tspan>
+      <tspan x="0" y="1416">  &quot;@id&quot;: &quot;https://openvex.dev/docs/public/vex/zqk-0.1.0&quot;,</tspan>
+      <tspan x="0" y="1436">  &quot;author&quot;: &quot;Zen Quantum Kernel Security Response Team &lt;security@zqk-os.org&gt;&quot;,</tspan>
+      <tspan x="0" y="1456">  &quot;role&quot;: &quot;Project Maintainer&quot;,</tspan>
+      <tspan x="0" y="1476">  &quot;timestamp&quot;: &quot;2026-09-29T02:38:30Z&quot;,</tspan>
+      <tspan x="0" y="1496">  &quot;version&quot;: 1,</tspan>
+      <tspan x="0" y="1516">  &quot;tooling&quot;: &quot;zqk-openvex-generator/1.0&quot;,</tspan>
+      <tspan x="0" y="1536">  &quot;statements&quot;: [</tspan>
+      <tspan x="0" y="1556">    {</tspan>
+      <tspan x="0" y="1576">      &quot;vulnerability&quot;: {</tspan>
+      <tspan x="0" y="1596">        &quot;name&quot;: &quot;CVE-2023-45288&quot;</tspan>
+      <tspan x="0" y="1616">      },</tspan>
+      <tspan x="0" y="1636">      &quot;products&quot;: [</tspan>
+      <tspan x="0" y="1656">        {</tspan>
+      <tspan x="0" y="1676">          &quot;@id&quot;: &quot;pkg:golang/github.com/zqk-os/zqk@0.1.0&quot;,</tspan>
+      <tspan x="0" y="1696">          &quot;subcomponents&quot;: []</tspan>
+      <tspan x="0" y="1716"><tspan opacity="0.65">... [terminal session output truncated for screenshot] ...</tspan></tspan>
+    </text>
+  </g>
+</svg>
