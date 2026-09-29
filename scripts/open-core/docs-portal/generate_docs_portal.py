@@ -857,6 +857,62 @@ body {
   font-size: 0.9rem;
   color: var(--accent-green);
   margin-top: 1rem;
+.skill-spec-card {
+  background: rgba(31, 111, 235, 0.07);
+  border: 1px solid rgba(88, 166, 255, 0.22);
+  border-left: 4px solid var(--accent-cyan);
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  margin: 1.25rem 0 1.75rem 0;
+}
+
+.skill-spec-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 0.6rem;
+}
+
+.skill-spec-tag {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  background: rgba(0, 229, 255, 0.12);
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.skill-spec-name {
+  font-family: monospace;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--bg-tertiary);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+.skill-seal-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent-green);
+  background: rgba(0, 230, 118, 0.12);
+  border: 1px solid rgba(0, 230, 118, 0.3);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.skill-spec-desc {
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--text-main);
+  margin: 0;
 }
 
 .quadrant-grid {
@@ -1378,10 +1434,17 @@ def build_portal(repo_root: str, target_dir: str):
                 mf.write(content)
 
         clean_content = content
+        frontmatter = {}
         if clean_content.startswith("---"):
             fm_end = clean_content.find("\n---", 3)
             if fm_end != -1:
+                fm_raw = clean_content[3:fm_end].strip()
                 clean_content = clean_content[fm_end + 4:].strip()
+                try:
+                    import yaml
+                    frontmatter = yaml.safe_load(fm_raw) or {}
+                except Exception:
+                    pass
 
         lines = [line.strip() for line in clean_content.splitlines() if line.strip()]
         title = ""
@@ -1406,6 +1469,32 @@ def build_portal(repo_root: str, target_dir: str):
             else:
                 title = os.path.splitext(base_name)[0].replace("_", " ").replace("-", " ").title()
 
+        if frontmatter and isinstance(frontmatter, dict) and "name" in frontmatter:
+            skill_name = html.escape(str(frontmatter.get("name", "")))
+            skill_desc = html.escape(str(frontmatter.get("description", "")))
+            seal_pill = ""
+            if "seal_hash" in frontmatter:
+                seal_ver = html.escape(str(frontmatter.get("seal_version", "1.0.0")))
+                seal_hash_short = html.escape(str(frontmatter.get("seal_hash", ""))[:12])
+                seal_pill = f'<span class="skill-seal-badge" title="Cryptographically sealed skill protocol">🔒 Sealed v{seal_ver} ({seal_hash_short}…)</span>'
+            
+            banner_md = f"""
+<div class="skill-spec-card">
+  <div class="skill-spec-header">
+    <span class="skill-spec-tag">Agent Skill Protocol</span>
+    <code class="skill-spec-name">{skill_name}</code>
+    {seal_pill}
+  </div>
+  <p class="skill-spec-desc">{skill_desc}</p>
+</div>
+"""
+            h1_match = re.search(r'^(#\s+[^\n]+)', clean_content, re.MULTILINE)
+            if h1_match:
+                end_pos = h1_match.end()
+                clean_content = clean_content[:end_pos] + "\n\n" + banner_md + "\n" + clean_content[end_pos:]
+            else:
+                clean_content = banner_md + "\n\n" + clean_content
+
         snippet = " ".join(" ".join(lines[:15]).split())[:200]
         cat_name, cat_key = get_category_info(rel_path)
 
@@ -1415,7 +1504,7 @@ def build_portal(repo_root: str, target_dir: str):
             "clean_md_rel": clean_md_rel,
             "html_rel": html_rel,
             "title": title,
-            "content": content,
+            "content": clean_content,
             "snippet": snippet,
             "category": cat_name,
             "category_key": cat_key
