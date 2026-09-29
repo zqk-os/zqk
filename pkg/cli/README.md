@@ -4,10 +4,11 @@ This package provides the command-line interface infrastructure for zqk, followi
 
 ## Architecture Overview
 
-The CLI package follows the same architectural pattern as the specbuilder system:
-
-```
-YAML Specs → Codegen → Generated Builders → Runtime Usage
+```mermaid
+flowchart LR
+  Specs["YAML Specs<br/><code>.zqk/cli/specs/*.yaml</code>"] --> Codegen["Codegen Engine<br/><code>pkg/cli/codegen.go</code>"]
+  Codegen --> Builders["Generated Builders<br/><code>bldr_cli_cmd_v1/</code>"]
+  Builders --> Runtime["CLI Runtime Commands<br/><code>cmd/zqk/*</code>"]
 ```
 
 ### Directory Structure

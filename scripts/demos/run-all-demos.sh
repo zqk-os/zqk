@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ZQK Showcase Demo Suite: Master Runner
-# Runs the official ZQK killer demos demonstrating:
+# Runs the official ZQK interactive demonstrations:
 # 1. Day-0 Greenfield DX & Instant Agent Orientation
 # 2. Crash-Consistency ("Kill -9") & Transactional Resurrection
 # 3. Dynamic Membrane & Fail-Closed Prompt Injection Intercept

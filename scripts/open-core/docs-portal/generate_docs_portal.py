@@ -73,8 +73,14 @@ def get_category_info(rel_path: str) -> tuple[str, str]:
         return "Agent Directives & Packs", "agent-directives"
     if path == ".agents/AGENTS.md" or path == "agents/AGENTS.md":
         return "Agent Directives & Packs", "agent-directives"
-    if path.startswith("pkg/") or path.startswith("internal/") or path.startswith("cmd/"):
-        return "Kernel Subsystems & Go Packages", "subsystems"
+    if path.startswith("cmd/"):
+        return "Kernel Subsystems — CLI Commands & Tooling", "subsystems-cli"
+    if path.startswith("internal/"):
+        return "Kernel Subsystems — Internal Runtime", "subsystems-internal"
+    if path.startswith("pkg/"):
+        if path.startswith("pkg/specbuilder/") or path.startswith("pkg/cli/"):
+            return "Kernel Subsystems — Spec & Command Builders", "subsystems-builders"
+        return "Kernel Subsystems — Core Engines", "subsystems-core"
     if path.startswith(".zqk/specs/") or (path.startswith("specs/") and any(k in path for k in ("objects", "traits", "lifecycles", "configs"))):
         return "Kernel DNA & Object Schemas", "schemas"
     if path == "scripts/onboarding_roadmap/README.md":
@@ -251,6 +257,65 @@ def get_clean_nav_title(title: str, rel_path: str = "") -> str:
             }
             if base in nav_titles:
                 return nav_titles[base]
+
+    if path.startswith("docs/guides/"):
+        guide_nav_titles = {
+            "README.md": "Developer & Agent Guides Index",
+            "ZQL_ZPARQL_AGENT_GUIDE.md": "ZQL & ZPARQL Graph Operations",
+            "OBJECT_LIFECYCLE_AND_CAS_STORAGE_GUIDE.md": "Object Lifecycle, States & CAS",
+            "POLICY_CREATION_AND_VALIDATION_DSL_GUIDE.md": "Custom Policy & Rule DSL",
+            "SINGLE_COMMAND_EXECUTION_LOOP_GUIDE.md": "Single-Command Loop (zqk do)",
+            "AGENT_ORCHESTRATION_AND_SWARM_COLLABORATION_GUIDE.md": "Swarm Orchestration & Mesh",
+            "DIAGNOSTICS_SELF_HEALING_AND_REMEDY_GUIDE.md": "Diagnostics & Self-Healing"
+        }
+        base = os.path.basename(path)
+        if base in guide_nav_titles:
+            return guide_nav_titles[base]
+
+    subsystem_nav_titles = {
+        "pkg/README.md": "Packages Directory (pkg/)",
+        "pkg/storage/README.md": "Storage Subsystem & Providers",
+        "pkg/storage/DATACELL_MIGRATION.md": "Storage — DataCell Migration Plan",
+        "pkg/storage/change_journal_compaction.md": "Storage — Journal Compaction",
+        "pkg/graph/README.md": "Graph Backend & In-Memory Graph",
+        "pkg/coordination/README.md": "Event Coordination (Spinal Cord)",
+        "pkg/concurrency/README.md": "Concurrency & Synchronization",
+        "pkg/pipeline/README.md": "Autonomous Pipelines & Steps",
+        "pkg/mcp/README.md": "Model Context Protocol (MCP) Server",
+        "pkg/mcp/testing/README.md": "MCP Test Verification Harness",
+        "pkg/functional/README.md": "Functional Error Monad (Result[T])",
+        "pkg/logging/README.md": "Structured Zero-Allocation Logger",
+        "pkg/telemetry/README.md": "Kernel Telemetry & Metrics",
+        "pkg/validation/README.md": "Schema & Rule Validation Engine",
+        "pkg/translation/README.md": "Query & AST Translation Engine",
+        "pkg/loader/README.md": "Object & Specification Loader",
+        "pkg/migration/README.md": "Database & Schema Migration",
+        "pkg/migration/detector/README.md": "Migration Binary Detector",
+        "pkg/goroutinelabels/README.md": "Goroutine Thread Tracking",
+        "pkg/domain/organizational/README.md": "Organizational Domain Models",
+        "pkg/testing/README.md": "Kernel Testing Harness",
+        # Spec & Command Builders
+        "pkg/specbuilder/README.md": "Spec-Driven Builder Pattern",
+        "pkg/cli/README.md": "CLI Architecture & Spec Framework",
+        "pkg/cli/bldr_cli_cmd_v1/README.md": "CLI Command Builders (bldr_cli_cmd_v1)",
+        "pkg/specbuilder/bldr_v2/README.md": "Object Spec Builders (bldr_v2)",
+        "pkg/specbuilder/builders/README.md": "Versioned Spec Builders Engine",
+        "pkg/specbuilder/instance_builders/README.md": "Runtime Instance Builders",
+        "pkg/specbuilder/bootstrap/README.md": "Specbuilder Bootstrap Package",
+        # CLI Commands & Tooling
+        "cmd/zqk/README.md": "zqk Primary CLI Commands",
+        "cmd/zqk-shim/README.md": "zqk-shim Compatibility Shim",
+        "cmd/zqk/system/METRICS_ANALYSIS_README.md": "System Lock Metrics Analysis",
+        "cmd/zqk/system/TESTING.md": "System Test Suite & Diagnostics",
+        "cmd/zqk/system/INTEGRITY_RESOLUTION_PLAN.md": "System Integrity Resolution",
+        # Internal Runtime
+        "internal/README.md": "Internal Packages Directory (internal/)",
+        "internal/bootstrap/README.md": "Kernel Bootstrap Seeding",
+        "internal/cli/README.md": "Internal CLI Framework",
+        "internal/cli/context/README.md": "Execution Context & Signals",
+    }
+    if path in subsystem_nav_titles:
+        return subsystem_nav_titles[path]
 
     prefixes = [
         "Technical Specification: ",
@@ -1382,7 +1447,10 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
         ("Getting Started", "getting-started"),
         ("Architecture & Foundation", "architecture"),
         ("Specifications & Grammars", "specs"),
-        ("Kernel Subsystems & Go Packages", "subsystems"),
+        ("Kernel Subsystems — Core Engines", "subsystems-core"),
+        ("Kernel Subsystems — Spec & Command Builders", "subsystems-builders"),
+        ("Kernel Subsystems — CLI Commands & Tooling", "subsystems-cli"),
+        ("Kernel Subsystems — Internal Runtime", "subsystems-internal"),
         ("Kernel DNA & Object Schemas", "schemas"),
         ("Reference Manuals", "manual"),
         ("How-To & Incident Runbooks", "operations"),
@@ -1416,6 +1484,44 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
     # Sort items within each category
     def sort_key(entry):
         rel = entry["rel_path"]
+        if entry["category"] == "Kernel Subsystems — Core Engines":
+            pkg_flow = [
+                "pkg/README.md", "pkg/storage/README.md", "pkg/graph/README.md",
+                "pkg/coordination/README.md", "pkg/concurrency/README.md",
+                "pkg/pipeline/README.md", "pkg/mcp/README.md", "pkg/functional/README.md",
+                "pkg/logging/README.md", "pkg/telemetry/README.md", "pkg/validation/README.md",
+                "pkg/translation/README.md", "pkg/loader/README.md", "pkg/migration/README.md",
+                "pkg/migration/detector/README.md", "pkg/goroutinelabels/README.md",
+                "pkg/domain/organizational/README.md", "pkg/testing/README.md",
+                "pkg/mcp/testing/README.md", "pkg/storage/change_journal_compaction.md",
+                "pkg/storage/DATACELL_MIGRATION.md"
+            ]
+            if rel in pkg_flow:
+                return (0, pkg_flow.index(rel))
+        if entry["category"] == "Kernel Subsystems — Spec & Command Builders":
+            bldr_flow = [
+                "pkg/specbuilder/README.md", "pkg/cli/README.md",
+                "pkg/cli/bldr_cli_cmd_v1/README.md", "pkg/specbuilder/bldr_v2/README.md",
+                "pkg/specbuilder/builders/README.md", "pkg/specbuilder/instance_builders/README.md",
+                "pkg/specbuilder/bootstrap/README.md"
+            ]
+            if rel in bldr_flow:
+                return (0, bldr_flow.index(rel))
+        if entry["category"] == "Kernel Subsystems — CLI Commands & Tooling":
+            cmd_flow = [
+                "cmd/zqk/README.md", "cmd/zqk-shim/README.md",
+                "cmd/zqk/system/METRICS_ANALYSIS_README.md", "cmd/zqk/system/TESTING.md",
+                "cmd/zqk/system/INTEGRITY_RESOLUTION_PLAN.md"
+            ]
+            if rel in cmd_flow:
+                return (0, cmd_flow.index(rel))
+        if entry["category"] == "Kernel Subsystems — Internal Runtime":
+            internal_flow = [
+                "internal/README.md", "internal/bootstrap/README.md",
+                "internal/cli/README.md", "internal/cli/context/README.md"
+            ]
+            if rel in internal_flow:
+                return (0, internal_flow.index(rel))
         if entry["category"] == "Codebase Evaluation — Framework & Governance":
             cef_flow = [
                 "README.md", "CONSTITUTION.md", "DIAMOND_SCALE.md", "WAVE_PLAN.md",
@@ -1459,7 +1565,7 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
             contains_active = any(it["html_rel"] == current_html_rel for it in items)
             # Default open for core categories, or if this category contains the active page
             # Keep CEF closed by default unless active page is inside it
-            is_open = contains_active or (cat_key in ("getting-started", "architecture", "specs", "manual", "operations", "skills", "agent-directives", "tutorials", "subsystems", "schemas") and current_html_rel == "index.html")
+            is_open = contains_active or (cat_key in ("getting-started", "architecture", "specs", "manual", "operations", "skills", "agent-directives", "tutorials", "subsystems-core", "subsystems-builders", "subsystems-cli", "subsystems-internal", "schemas") and current_html_rel == "index.html")
             open_attr = ' open' if is_open else ''
 
             nav_html.append(f'<details class="sidebar-group"{open_attr}>')
@@ -1626,6 +1732,10 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
         if len(items) > 4:
             preview_links += f'<li class="more-link"><a href="{first_doc["html_rel"]}">+ {len(items)-4} more guides &rarr;</a></li>'
         cat_desc_map = {
+            "Kernel Subsystems — Core Engines": "Architectural design, interface contracts, and core engine implementations across the Go microkernel.",
+            "Kernel Subsystems — Spec & Command Builders": "Spec-driven builder patterns, versioned code generation engines, and generated Cobra command builders.",
+            "Kernel Subsystems — CLI Commands & Tooling": "Command-line interfaces, daemon shims, operational diagnostics, and system test suites under cmd/.",
+            "Kernel Subsystems — Internal Runtime": "Internal Go runtime utilities, embedded seed archives, and CLI context managers under internal/.",
             "Codebase Evaluation — Framework & Governance": "Constitutional invariants, multi-axis Diamond Scale grading, wave orchestration, and handoff contracts.",
             "Codebase Evaluation — Evaluation Rubrics": "Standardized, cited quality rubrics defining observable failure modes and criteria across 12 engineering dimensions.",
             "Codebase Evaluation — Specialist Prompts": "Lens-specialized investigation prompts for deep, evidence-backed codebase analysis.",
@@ -1797,10 +1907,11 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
           <p>Complete syntax reference, CLI options, and developer field guides.</p>
           <ul>
             <li><a href="docs/manual/README.html">Manual & CLI Reference</a></li>
-            <li><a href="docs/manual/ZPARQL_QUERY_LANGUAGE.html">ZPARQL Query Language Manual</a></li>
-            <li><a href="docs/manual/ZQL_MUTATIONS.html">ZQL Declarative Mutations Manual</a></li>
-            <li><a href="docs/manual/OBJECT_INSPECTOR_AND_POLICY_STUDIO.html">Object Inspector & Policy Studio</a></li>
-            <li><a href="docs/guides/ZQL_ZPARQL_AGENT_GUIDE.html">ZQL & ZPARQL Agent Guide</a></li>
+            <li><a href="docs/guides/README.html">Developer & Agent Guides Index</a></li>
+            <li><a href="docs/guides/ZQL_ZPARQL_AGENT_GUIDE.html">ZQL & ZPARQL Graph Operations</a></li>
+            <li><a href="docs/guides/OBJECT_LIFECYCLE_AND_CAS_STORAGE_GUIDE.html">Object Lifecycle & CAS Storage</a></li>
+            <li><a href="docs/guides/POLICY_CREATION_AND_VALIDATION_DSL_GUIDE.html">Custom Policy & Rule DSL</a></li>
+            <li><a href="docs/guides/SINGLE_COMMAND_EXECUTION_LOOP_GUIDE.html">Single-Command Loop (zqk do)</a></li>
           </ul>
         </div>
         <div class="quad-box">
@@ -1836,15 +1947,15 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
           </ul>
         </div>
         <div class="quad-box">
-          <h3>📦 Kernel Subsystems & Packages</h3>
+          <h3>📦 Kernel Subsystems & Core Engines</h3>
           <p>Architectural design, interface contracts, and storage implementations across the Go microkernel.</p>
           <ul>
+            <li><a href="pkg/README.html">Go Packages Master Index (pkg/)</a></li>
             <li><a href="pkg/storage/README.html">Storage Subsystem & Providers</a></li>
             <li><a href="pkg/graph/README.html">Graph Backend & MemGraph Provider</a></li>
+            <li><a href="pkg/coordination/README.html">Event Coordination System (Spinal Cord)</a></li>
             <li><a href="pkg/mcp/README.html">Model Context Protocol (MCP) Server</a></li>
-            <li><a href="pkg/concurrency/README.html">Concurrency & Synchronization</a></li>
-            <li><a href="pkg/pipeline/README.html">Pipeline & Step Execution</a></li>
-            <li><a href="internal/bootstrap/README.html">Bootstrap Archive & Seeding</a></li>
+            <li><a href="pkg/cli/bldr_cli_cmd_v1/README.html">CLI Command Builders (bldr_cli_cmd_v1)</a></li>
           </ul>
         </div>
         <div class="quad-box">
@@ -1853,9 +1964,9 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
           <ul>
             <li><a href="docs/onboarding/AI_AGENT_ONBOARDING.html">AI Agent Directives & Seating</a></li>
             <li><a href="docs/architecture/AMBIENT_SIGNAL_ACTION_RUBRIC.html">Ambient Signal Action Rubric</a></li>
-            <li><a href="docs/quality/README.html">Verification Done-Gates (VDS)</a></li>
-            <li><a href="docs/guides/ZQL_ZPARQL_AGENT_GUIDE.html">ZQL & ZPARQL Agent Guide</a></li>
-            <li><a href="docs/onboarding/EDGE_HEADLESS_FIRST_RUN.html">Edge / Headless Mode</a></li>
+            <li><a href="docs/guides/AGENT_ORCHESTRATION_AND_SWARM_COLLABORATION_GUIDE.html">Swarm Orchestration & Mesh</a></li>
+            <li><a href="docs/guides/SINGLE_COMMAND_EXECUTION_LOOP_GUIDE.html">Single-Command Loop (zqk do)</a></li>
+            <li><a href="docs/guides/DIAGNOSTICS_SELF_HEALING_AND_REMEDY_GUIDE.html">Diagnostics & Self-Healing</a></li>
           </ul>
         </div>
         <div class="quad-box">

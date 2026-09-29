@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ZQK Killer Demo 4: The Verifiable Cryptographic Ledger & CISA OpenVEX Attestation
+# ZQK Demonstration 4: The Verifiable Cryptographic Ledger & CISA OpenVEX Attestation
 # Demonstrates: Multi-agent cryptographic seating, SHA-256 fingerprinting, vault keystore, and CISA OpenVEX attestation.
 set -euo pipefail
 
