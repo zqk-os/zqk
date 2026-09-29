@@ -15,6 +15,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/state"
 	"github.com/zqk-os/zqk/cmd/zqk/test"
 	"github.com/zqk-os/zqk/cmd/zqk/ui"
+	"github.com/zqk-os/zqk/cmd/zqk/ui/tds"
 	"github.com/zqk-os/zqk/pkg/paths"
 )
 
@@ -1328,42 +1329,55 @@ func main() {
 		whiteBold := color.New(color.FgWhite, color.Bold).SprintFunc()
 
 		bannerText := "ZQK KNOWLEDGE KERNEL — OBJECT INSPECTOR CONSOLE"
-		bannerPad := (termWidth - 2 - len(bannerText)) / 2
 		buf.WriteString(cyanBold("╔" + strings.Repeat("═", termWidth-2) + "╗") + "\n")
-		buf.WriteString(cyanBold("║") + strings.Repeat(" ", bannerPad) + whiteBold(bannerText) + strings.Repeat(" ", termWidth-2-bannerPad-len(bannerText)) + cyanBold("║") + "\n")
+		buf.WriteString(cyanBold("║") + tds.PadCenter(whiteBold(bannerText), termWidth-2) + cyanBold("║") + "\n")
 		buf.WriteString(cyanBold("╚" + strings.Repeat("═", termWidth-2) + "╝") + "\n")
 
-		buf.WriteString(fmt.Sprintf("%s %s  │  %s %s %s %s %s %s  │  %s %s\n",
-			cyanBold("KIND:"), whiteBold("[backlog_item]"),
-			dimStyle("FILTER:"), whiteBold("[ALL]"), dimStyle("[ACTIVE]"), dimStyle("[DRAFT]"), dimStyle("[BLOCKED]"), dimStyle("[COMPLETE]"),
-			cyanBold("SORT:"), yellowBold("[updated_at ▼]"),
-		))
-		buf.WriteString(dimStyle(strings.Repeat("─", termWidth)) + "\n")
-		buf.WriteString(fmt.Sprintf("🔍 %s %s %s\n", cyanBold("SEARCH:"), greenBold("[/cas█]"), dimStyle("(Press Enter to lock search, Esc to cancel)")))
-		buf.WriteString(dimStyle(strings.Repeat("─", termWidth)) + "\n")
-		buf.WriteString(fmt.Sprintf("  %-24s │ %-12s │ %-4s │ %-48s │ %s\n",
-			dimStyle("ID"), dimStyle("STATUS"), dimStyle("PRI"), dimStyle("TITLE"), dimStyle("UPDATED")))
-		buf.WriteString(dimStyle(strings.Repeat("─", termWidth)) + "\n")
+		filterLines := []string{
+			fmt.Sprintf("%s %s   │   %s %s %s %s %s %s   │   %s %s",
+				cyanBold("KIND:"), whiteBold("[backlog_item]"),
+				dimStyle("FILTER:"), whiteBold("[ALL]"), dimStyle("[ACTIVE]"), dimStyle("[DRAFT]"), dimStyle("[BLOCKED]"), dimStyle("[COMPLETE]"),
+				cyanBold("SORT:"), yellowBold("[updated_at ▼]"),
+			),
+			fmt.Sprintf("🔍 %s %s %s", cyanBold("SEARCH:"), greenBold("[/cas█]"), dimStyle("(Press Enter to lock search, Esc to cancel)")),
+		}
+		buf.WriteString(tds.Panel("FILTER & SEARCH", filterLines, termWidth, tds.BorderLight))
 
-		buf.WriteString(fmt.Sprintf("%s %-24s │ %-12s │ %-4s │ %-48s │ %s\n",
-			cyanBold(">"), whiteBold("BLI-STORAGE-PUREGO-001"), greenBold("complete"), redBold("P0"), "Implement pure-Go CAS storage backend", dimStyle("2m ago")))
-		buf.WriteString(fmt.Sprintf("  %-24s │ %-12s │ %-4s │ %-48s │ %s\n",
-			whiteBold("BLI-STORAGE-PUREGO-002"), greenBold("complete"), yellowBold("P1"), "Wire change journal dictionary compaction", dimStyle("14m ago")))
-		buf.WriteString(fmt.Sprintf("  %-24s │ %-12s │ %-4s │ %-48s │ %s\n",
-			whiteBold("BLI-LAUNCH-DOCS-001"), cyanBold("in_progress"), redBold("P0"), "Comprehensive visual UI & mutation manual", dimStyle("1m ago")))
-		buf.WriteString(fmt.Sprintf("  %-24s │ %-12s │ %-4s │ %-48s │ %s\n",
-			whiteBold("BLI-ONBOARD-ROADMAP-01"), yellowBold("planned"), yellowBold("P1"), "Greenfield onboarding roadmap seed", dimStyle("45m ago")))
-		buf.WriteString(fmt.Sprintf("  %-24s │ %-12s │ %-4s │ %-48s │ %s\n",
-			whiteBold("BLI-ECOSYSTEM-SYNC-001"), redBold("blocked"), dimStyle("P2"), "Linear/GitHub bidirectional bridge", dimStyle("2h ago")))
-		buf.WriteString(dimStyle(strings.Repeat("─", termWidth)) + "\n")
-		buf.WriteString(fmt.Sprintf("%s │ %s │ %s │ %s │ %s │ %s\n",
-			cyanBold("[Enter] Deep Inspection Modal"),
-			dimStyle("[Tab] Next Kind"),
-			dimStyle("[f] Filter"),
-			dimStyle("[s] Sort"),
-			greenBold("[p] Policy Studio"),
-			dimStyle("[q] Quit"),
-		))
+		tbl := tds.NewTable(termWidth)
+		tbl.AddColumn("ID", tds.AlignLeft, 26, 2.5)
+		tbl.AddColumn("STATUS", tds.AlignLeft, 12, 1.0)
+		tbl.AddColumn("PRI", tds.AlignCenter, 6, 0.5)
+		tbl.AddColumn("TITLE", tds.AlignLeft, 48, 4.0)
+		tbl.AddColumn("UPDATED", tds.AlignRight, 10, 1.0)
+
+		tbl.AddRow([]string{
+			cyanBold("> ") + whiteBold("BLI-STORAGE-PUREGO-001"), greenBold("complete"), redBold("P0"), "Implement pure-Go CAS storage backend", dimStyle("2m ago"),
+		})
+		tbl.AddRow([]string{
+			"  " + whiteBold("BLI-STORAGE-PUREGO-002"), greenBold("complete"), yellowBold("P1"), "Wire change journal dictionary compaction", dimStyle("14m ago"),
+		})
+		tbl.AddRow([]string{
+			"  " + whiteBold("BLI-LAUNCH-DOCS-001"), cyanBold("in_progress"), redBold("P0"), "Comprehensive visual UI & mutation manual", dimStyle("1m ago"),
+		})
+		tbl.AddRow([]string{
+			"  " + whiteBold("BLI-ONBOARD-ROADMAP-01"), yellowBold("planned"), yellowBold("P1"), "Greenfield onboarding roadmap seed", dimStyle("45m ago"),
+		})
+		tbl.AddRow([]string{
+			"  " + whiteBold("BLI-ECOSYSTEM-SYNC-001"), redBold("blocked"), dimStyle("P2"), "Linear/GitHub bidirectional bridge", dimStyle("2h ago"),
+		})
+		buf.WriteString(tbl.Render())
+
+		actionLines := []string{
+			fmt.Sprintf("%s │ %s │ %s │ %s │ %s │ %s",
+				cyanBold("[Enter] Deep Inspection Modal"),
+				dimStyle("[Tab] Next Kind"),
+				dimStyle("[f] Filter"),
+				dimStyle("[s] Sort"),
+				greenBold("[p] Policy Studio"),
+				dimStyle("[q] Quit"),
+			),
+		}
+		buf.WriteString(tds.Panel("KEYBOARD SHORTCUTS", actionLines, termWidth, tds.BorderLight))
 
 		inspectorTableTitle := paths.RewriteCanonicalCLIInvocations("zqk object inspect") + " — Interactive Object Inspector Scoreboard"
 		if err := RenderScreenToSVG(filepath.Join(outDir, "ui_object_inspector_table.svg"), inspectorTableTitle, buf.String(), termWidth); err != nil {
@@ -1384,34 +1398,44 @@ func main() {
 		whiteBold := color.New(color.FgWhite, color.Bold).SprintFunc()
 
 		bannerText := "ZQK POLICY RULE STUDIO — REAL-TIME GOVERNANCE DSL"
-		bannerPad := (termWidth - 2 - len(bannerText)) / 2
 		buf.WriteString(cyanBold("╔" + strings.Repeat("═", termWidth-2) + "╗") + "\n")
-		buf.WriteString(cyanBold("║") + strings.Repeat(" ", bannerPad) + whiteBold(bannerText) + strings.Repeat(" ", termWidth-2-bannerPad-len(bannerText)) + cyanBold("║") + "\n")
+		buf.WriteString(cyanBold("║") + tds.PadCenter(whiteBold(bannerText), termWidth-2) + cyanBold("║") + "\n")
 		buf.WriteString(cyanBold("╚" + strings.Repeat("═", termWidth-2) + "╝") + "\n")
 
-		buf.WriteString(fmt.Sprintf("%s %s  │  %s %s  │  %s %s\n",
-			cyanBold("TARGET KIND:"), whiteBold("[backlog_item]"),
-			dimStyle("ACTIVE RULES:"), yellowBold("3 loaded"),
-			cyanBold("EVALUATION MODE:"), greenBold("[DRY-RUN]"),
-		))
-		buf.WriteString(dimStyle(strings.Repeat("─", termWidth)) + "\n")
-		buf.WriteString(fmt.Sprintf("%s %s\n", cyanBold("EXPRESSION:"), whiteBold(`status == "in_progress" && claimed_by != ""`)))
-		buf.WriteString(fmt.Sprintf("%s %s  %s  %s  %s  %s\n",
-			dimStyle("AUTOCOMPLETE:"), greenBold("[claimed_by]"), dimStyle("priority_plan_ref"), dimStyle("effort_estimate"), dimStyle("milestone_refs"), dimStyle("description")))
-		buf.WriteString(dimStyle(strings.Repeat("─", termWidth)) + "\n")
-		buf.WriteString(whiteBold("EVALUATION RESULTS:\n"))
-		buf.WriteString(fmt.Sprintf("  %s %s\n", greenBold("✓"), greenBold("194 / 196 objects COMPLIANT (99.0%)")))
-		buf.WriteString(fmt.Sprintf("  %s %s\n", redBold("✗"), redBold("2 objects VIOLATE RULE:")))
-		buf.WriteString(fmt.Sprintf("    • %s: %s\n", yellowBold("BLI-AUTH-004"), dimStyle("status is 'in_progress' but 'claimed_by' is empty")))
-		buf.WriteString(fmt.Sprintf("    • %s: %s\n", yellowBold("BLI-UI-012"), dimStyle("status is 'in_progress' but 'claimed_by' is empty")))
-		buf.WriteString(dimStyle(strings.Repeat("─", termWidth)) + "\n")
-		buf.WriteString(fmt.Sprintf("%s │ %s │ %s │ %s │ %s\n",
-			cyanBold("[c] Edit Expression"),
-			greenBold("[t] Trigger Dry-Run"),
-			dimStyle("[Tab] Autocomplete"),
-			yellowBold("[s] Save Rule"),
-			dimStyle("[Esc] Return"),
-		))
+		configLines := []string{
+			fmt.Sprintf("%s %s   │   %s %s   │   %s %s",
+				cyanBold("TARGET KIND:"), whiteBold("[backlog_item]"),
+				dimStyle("ACTIVE RULES:"), yellowBold("3 loaded"),
+				cyanBold("EVALUATION MODE:"), greenBold("[DRY-RUN]"),
+			),
+		}
+		buf.WriteString(tds.Panel("TARGET & CONFIGURATION", configLines, termWidth, tds.BorderLight))
+
+		dslLines := []string{
+			fmt.Sprintf("%s %s", cyanBold("EXPRESSION:"), whiteBold(`status == "in_progress" && claimed_by != ""`)),
+			fmt.Sprintf("%s %s  %s  %s  %s  %s",
+				dimStyle("AUTOCOMPLETE:"), greenBold("[claimed_by]"), dimStyle("priority_plan_ref"), dimStyle("effort_estimate"), dimStyle("milestone_refs"), dimStyle("description")),
+		}
+		buf.WriteString(tds.Panel("POLICY EXPRESSION DSL", dslLines, termWidth, tds.BorderLight))
+
+		evalLines := []string{
+			fmt.Sprintf("  %s %s", greenBold("✓"), greenBold("194 / 196 objects COMPLIANT (99.0%)")),
+			fmt.Sprintf("  %s %s", redBold("✗"), redBold("2 objects VIOLATE RULE:")),
+			fmt.Sprintf("    • %s: %s", yellowBold("BLI-AUTH-004"), dimStyle("status is 'in_progress' but 'claimed_by' is empty")),
+			fmt.Sprintf("    • %s: %s", yellowBold("BLI-UI-012"), dimStyle("status is 'in_progress' but 'claimed_by' is empty")),
+		}
+		buf.WriteString(tds.Panel("EVALUATION RESULTS", evalLines, termWidth, tds.BorderLight))
+
+		actionLines := []string{
+			fmt.Sprintf("%s │ %s │ %s │ %s │ %s",
+				cyanBold("[c] Edit Expression"),
+				greenBold("[t] Trigger Dry-Run"),
+				dimStyle("[Tab] Autocomplete"),
+				yellowBold("[s] Save Rule"),
+				dimStyle("[Esc] Return"),
+			),
+		}
+		buf.WriteString(tds.Panel("KEYBOARD SHORTCUTS", actionLines, termWidth, tds.BorderLight))
 
 		policyStudioTitle := paths.RewriteCanonicalCLIInvocations("zqk object inspect --policy-studio") + " — Real-Time Governance DSL Studio"
 		if err := RenderScreenToSVG(filepath.Join(outDir, "ui_policy_studio.svg"), policyStudioTitle, buf.String(), termWidth); err != nil {

@@ -80,6 +80,7 @@ func TestServer_HealthEndpoint(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	assert.Equal(t, "application/json", resp.Header.Get("Content-Type"))
+	assert.Contains(t, resp.Header.Get("Cache-Control"), "no-cache")
 
 	var data struct {
 		Status    string `json:"status"`
@@ -98,6 +99,7 @@ func TestServer_GraphEndpoint(t *testing.T) {
 	defer resp.Body.Close()
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	assert.Contains(t, resp.Header.Get("Cache-Control"), "no-cache")
 
 	var payload studio.GraphPayload
 	require.NoError(t, json.NewDecoder(resp.Body).Decode(&payload))
@@ -138,6 +140,7 @@ func TestServer_DashboardHTML(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	assert.Contains(t, resp.Header.Get("Content-Type"), "text/html")
+	assert.Contains(t, resp.Header.Get("Cache-Control"), "no-cache")
 
 	body, err := io.ReadAll(resp.Body)
 	require.NoError(t, err)
@@ -158,6 +161,7 @@ func TestServer_ObjectsEndpoint(t *testing.T) {
 	defer resp.Body.Close()
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	assert.Contains(t, resp.Header.Get("Cache-Control"), "no-cache")
 	var objects []*storage.IndexedNode
 	require.NoError(t, json.NewDecoder(resp.Body).Decode(&objects))
 	require.Len(t, objects, 1)

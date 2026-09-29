@@ -8,6 +8,7 @@ from the canonical public open-core documentation base.
 import os
 import sys
 import glob
+import hashlib
 import html
 import json
 import re
@@ -141,7 +142,84 @@ def get_clean_nav_title(title: str) -> str:
             break
     return cleaned
 
-def render_markdown_to_html(content: str, current_html_rel: str, link_map: dict, repo_root: str = "") -> str:
+
+_asset_hash_cache = {}
+
+def get_asset_hash(file_path: str) -> str:
+    """Return an 8-character sha256 hash of the file contents for cache busting."""
+    if not file_path:
+        return ""
+    if file_path in _asset_hash_cache:
+        return _asset_hash_cache[file_path]
+    try:
+        if os.path.isfile(file_path):
+            with open(file_path, "rb") as f:
+                h = hashlib.sha256(f.read()).hexdigest()[:8]
+                _asset_hash_cache[file_path] = h
+                return h
+    except Exception:
+        pass
+    return ""
+
+def resolve_asset_path(target: str, current_dir: str, repo_root: str) -> str:
+    """Resolve an asset file path to a physical file on disk."""
+    if not repo_root or not target:
+        return ""
+    clean_target = target.split("?")[0].split("#")[0]
+    resolved_repo_rel = os.path.normpath(os.path.join(current_dir, clean_target)) if current_dir else os.path.normpath(clean_target)
+    clean_res = resolved_repo_rel.replace("\\", "/")
+    
+    candidates = [
+        os.path.join(repo_root, clean_res),
+        os.path.join(repo_root, "docs", clean_res),
+        os.path.join(repo_root, clean_target.lstrip("/")),
+        os.path.join(repo_root, "docs", clean_target.lstrip("/")),
+    ]
+    for cand in candidates:
+        if os.path.isfile(cand):
+            return cand
+    return ""
+
+def bust_html_img_cache(html_content: str, current_html_rel: str, repo_root: str, default_hash: str = "") -> str:
+    """Ensure any raw <img> tags or un-busted image references have content-hash cache-busting."""
+    current_dir = os.path.dirname(current_html_rel)
+    img_exts = (".svg", ".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".bmp", ".avif")
+
+    def _replace_img(match):
+        pre = match.group(1)
+        src = match.group(2)
+        post = match.group(3)
+        if src.startswith("http://") or src.startswith("https://") or src.startswith("//") or src.startswith("data:"):
+            return match.group(0)
+        if "?v=" in src or "&v=" in src:
+            return match.group(0)
+        src_path_no_query = src.split("?")[0].split("#")[0]
+        if not any(src_path_no_query.lower().endswith(ext) for ext in img_exts):
+            return match.group(0)
+        matched = resolve_asset_path(src_path_no_query, current_dir, repo_root)
+        h = get_asset_hash(matched) if matched else default_hash
+        if not h:
+            return match.group(0)
+        sep = "&" if "?" in src else "?v="
+        if "#" in src:
+            base, anch = src.split("#", 1)
+            new_src = f"{base}{sep}{h}#{anch}"
+        else:
+            new_src = f"{src}{sep}{h}"
+        return f"{pre}{new_src}{post}"
+
+    return re.sub(r'(<img\b[^>]*?\bsrc=["\'])([^"\']+?)(["\'])', _replace_img, html_content)
+
+def get_git_commit_sha(repo_root: str) -> str:
+    try:
+        out = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], cwd=repo_root, text=True, stderr=subprocess.DEVNULL).strip()
+        if out:
+            return out
+    except Exception:
+        pass
+    return "zqk"
+
+def render_markdown_to_html(content: str, current_html_rel: str, link_map: dict, repo_root: str = "", default_hash: str = "") -> str:
     current_dir = os.path.dirname(current_html_rel)
 
     # Rewrite markdown links to generated html paths
@@ -189,14 +267,22 @@ def render_markdown_to_html(content: str, current_html_rel: str, link_map: dict,
         is_img_link = prefix.startswith("!")
 
         if is_img_target or is_img_link:
+            matched_file = resolve_asset_path(target, current_dir, repo_root)
+            asset_hash = get_asset_hash(matched_file) if matched_file else default_hash
+            cache_bust = f"?v={asset_hash}" if asset_hash else ""
+
             clean_res = resolved_repo_rel.replace("\\", "/")
             if repo_root and os.path.exists(os.path.join(repo_root, clean_res)):
                 if current_dir:
                     rel_url = os.path.relpath(clean_res, current_dir).replace("\\", "/")
                 else:
                     rel_url = clean_res
-                return f"{prefix}({rel_url}{anchor})"
-            return f"{prefix}({target}{anchor})"
+                return f"{prefix}({rel_url}{cache_bust}{anchor})"
+            elif matched_file and repo_root:
+                rel_from = os.path.join(repo_root, current_dir) if current_dir else repo_root
+                rel_url = os.path.relpath(matched_file, rel_from).replace("\\", "/")
+                return f"{prefix}({rel_url}{cache_bust}{anchor})"
+            return f"{prefix}({target}{cache_bust}{anchor})"
 
         # Check if target is a source code or config file in the repository (e.g. .go, .yaml, .json, .sh, .md)
         clean_res = resolved_repo_rel.replace("\\", "/")
@@ -270,652 +356,16 @@ def render_markdown_to_html(content: str, current_html_rel: str, link_map: dict,
                 _alert_replacer,
                 rendered
             )
+            rendered = bust_html_img_cache(rendered, current_html_rel, repo_root, default_hash)
             return rendered
         except Exception:
             pass
             
-    return f"<pre class=\"markdown-preview\">{html.escape(content)}</pre>"
+    preview = f"<pre class=\"markdown-preview\">{html.escape(content)}</pre>"
+    return bust_html_img_cache(preview, current_html_rel, repo_root, default_hash)
 
-def build_portal(repo_root: str, target_dir: str):
-    print(f"📚 Generating ZQK Core Documentation Portal into {target_dir}...")
-    
-    if os.path.exists(target_dir):
-        shutil.rmtree(target_dir)
-
-    # Dynamically regenerate package indexes to ensure package catalog never goes stale
-    if generate_readme_index:
-        try:
-            print("📦 Dynamically generating comprehensive package indexes (pkg/ and internal/)...")
-            generate_readme_index(repo_root, "pkg")
-            generate_readme_index(repo_root, "internal")
-        except Exception as e:
-            print(f"Warning: could not dynamically update package catalogs: {e}", file=sys.stderr)
-    
-    assets_dir = os.path.join(target_dir, "assets")
-    search_dir = os.path.join(target_dir, "search")
-    os.makedirs(assets_dir, exist_ok=True)
-    os.makedirs(search_dir, exist_ok=True)
-
-    # Write authentic ZQK logo asset
-    with open(os.path.join(assets_dir, "zqk-logo.svg"), "w", encoding="utf-8") as f:
-        f.write(ZQK_LOGO_SVG.strip() + "\n")
-
-    # Collect documentation files strictly from Core, excluding archive/internal dirs
-    raw_doc_files = sorted(glob.glob(os.path.join(repo_root, "docs", "**", "*.md"), recursive=True))
-    doc_files = []
-    exclude_parts = {"archive", "_archive", "_archive-cef-runs", "cef-runs", ".zqk", "audit", "templates", "package_skeleton", "testdata"}
-    for df in raw_doc_files:
-        rel = os.path.relpath(df, repo_root)
-        parts = set(rel.split(os.sep))
-        if parts.intersection(exclude_parts):
-            continue
-        doc_files.append(df)
-
-    for root_doc in ["README.md", "CONTRIBUTING.md", "SECURITY.md", "GOVERNANCE.md", "CODE_OF_CONDUCT.md", "PACK-COMPOSITION.md", "ZQK_GETTING_STARTED.md", "ANTIGRAVITY.md"]:
-        p = os.path.join(repo_root, root_doc)
-        if os.path.isfile(p):
-            doc_files.append(p)
-
-    agents_file = os.path.join(repo_root, ".agents", "AGENTS.md")
-    if os.path.isfile(agents_file):
-        doc_files.append(agents_file)
-
-    raw_skill_files = sorted(glob.glob(os.path.join(repo_root, ".zqk", "skills", "**", "*.md"), recursive=True))
-    for sf in raw_skill_files:
-        doc_files.append(sf)
-
-    # Subsystem and Go package documentation (pkg/, internal/, cmd/)
-    for sub_dir in ["pkg", "internal", "cmd"]:
-        sub_path = os.path.join(repo_root, sub_dir)
-        if not os.path.isdir(sub_path):
-            continue
-        for root, dirs, files in os.walk(sub_path):
-            dirs[:] = [d for d in dirs if d not in exclude_parts and not d.startswith(".")]
-            for f in files:
-                if f.endswith(".md") and not f.startswith("REFACTORING_PLAN_"):
-                    doc_files.append(os.path.join(root, f))
-
-    # Kernel DNA specs (.zqk/specs/)
-    spec_mds = sorted(glob.glob(os.path.join(repo_root, ".zqk", "specs", "**", "*.md"), recursive=True))
-    for sm in spec_mds:
-        doc_files.append(sm)
-
-    # Agent Packs (.zqk/agent_packs/)
-    agent_pack_mds = sorted(glob.glob(os.path.join(repo_root, ".zqk", "agent_packs", "**", "*.md"), recursive=True))
-    for ap in agent_pack_mds:
-        doc_files.append(ap)
-
-    # Operational Guides in scripts/
-    for script_doc in ["scripts/onboarding_roadmap/README.md", "scripts/scheduler_jobs/README.md"]:
-        sp = os.path.join(repo_root, script_doc)
-        if os.path.isfile(sp):
-            doc_files.append(sp)
-
-    # Scrutinizer filter: reject empty stubs, placeholder text, or template scaffolds
-    FORBIDDEN_DOC_PATTERNS = [
-        re.compile(r'\btest content\b', re.IGNORECASE),
-        re.compile(r'\bTODO_OVERWRITE\b'),
-        re.compile(r'\bREPLACE_ME\b'),
-        re.compile(r'\blorem ipsum\b', re.IGNORECASE),
-    ]
-
-    def is_substantive_doc(file_path: str) -> bool:
-        try:
-            sz = os.path.getsize(file_path)
-            if sz < 60:
-                print(f"⚠️ [DOC-SCRUTINIZER] Dropping stub file (< 60b): {file_path}")
-                return False
-            # Only apply placeholder token rejection to template scaffolds
-            if "templates" in file_path or "skeleton" in file_path:
-                with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
-                    content = f.read()
-                for pat in FORBIDDEN_DOC_PATTERNS:
-                    if pat.search(content):
-                        print(f"⚠️ [DOC-SCRUTINIZER] Dropping template scaffold with placeholder '{pat.pattern}': {file_path}")
-                        return False
-            return True
-        except Exception:
-            return False
-
-    # Deduplicate while preserving order and applying quality scrutiny
-    doc_files = [df for df in sorted(list(dict.fromkeys(doc_files))) if is_substantive_doc(df)]
-
-    # Collect and mirror all static/non-markdown files in docs/ (YAML, JSON, images, etc.)
-    for root, dirs, files in os.walk(os.path.join(repo_root, "docs")):
-        dirs[:] = [d for d in dirs if d not in exclude_parts and not d.startswith(".")]
-        for f in files:
-            if f.endswith(".md") or f == "CNAME":
-                continue
-            src_path = os.path.join(root, f)
-            rel_path = os.path.relpath(src_path, repo_root)
-            dest_path = os.path.join(target_dir, rel_path)
-            os.makedirs(os.path.dirname(dest_path), exist_ok=True)
-            shutil.copy2(src_path, dest_path)
-
-    # Also copy root project files like LICENSE and NOTICE
-    for rf in ["LICENSE", "NOTICE"]:
-        rp = os.path.join(repo_root, rf)
-        if os.path.isfile(rp):
-            shutil.copy2(rp, os.path.join(target_dir, rf))
-
-    link_map = {}
-    doc_entries = []
-
-    # First pass: Build link map, extract titles, and copy raw markdown files
-    for doc in doc_files:
-        rel_path = os.path.relpath(doc, repo_root)
-        html_rel = get_html_relpath(rel_path)
-        base_name = os.path.basename(rel_path)
-        clean_md_rel = html_rel[:-5] + ".md" if html_rel.endswith(".html") else html_rel + ".md"
-
-        link_map[rel_path] = html_rel
-        link_map["./" + rel_path] = html_rel
-        link_map[clean_md_rel] = html_rel
-        link_map["./" + clean_md_rel] = html_rel
-        if base_name not in ("README.md", "INDEX.md", "SKILL.md") and base_name not in link_map:
-            link_map[base_name] = html_rel
-            link_map["./" + base_name] = html_rel
-
-        try:
-            with open(doc, "r", encoding="utf-8", errors="replace") as f:
-                content = f.read()
-        except Exception as e:
-            print(f"Warning: could not read {doc}: {e}", file=sys.stderr)
-            continue
-
-        # Mirror the raw .md file into target_dir so raw markdown is accessible
-        target_md_path = os.path.join(target_dir, rel_path)
-        os.makedirs(os.path.dirname(target_md_path), exist_ok=True)
-        with open(target_md_path, "w", encoding="utf-8") as mf:
-            mf.write(content)
-
-        # Also write clean non-dot path for web accessibility
-        clean_md_path = os.path.join(target_dir, clean_md_rel)
-        if clean_md_path != target_md_path:
-            os.makedirs(os.path.dirname(clean_md_path), exist_ok=True)
-            with open(clean_md_path, "w", encoding="utf-8") as mf:
-                mf.write(content)
-
-        clean_content = content
-        if clean_content.startswith("---"):
-            fm_end = clean_content.find("\n---", 3)
-            if fm_end != -1:
-                clean_content = clean_content[fm_end + 4:].strip()
-
-        lines = [line.strip() for line in clean_content.splitlines() if line.strip()]
-        title = ""
-        for line in lines[:25]:
-            if line.startswith("# "):
-                title = line[2:].strip()
-                break
-        if rel_path.startswith(".zqk/agent_packs/"):
-            pack_name = rel_path.split("/")[2]
-            p_display = pack_name.upper() if pack_name in ("ide", "mcp") else pack_name.replace("_", " ").title()
-            title = f"{p_display} Agent Boot Protocol"
-        elif rel_path == "scripts/onboarding_roadmap/README.md":
-            title = "Curriculum as Data: Onboarding Roadmap"
-        elif rel_path == "scripts/scheduler_jobs/README.md":
-            title = "Scheduler Job Templates"
-        elif not title:
-            fm_name_match = re.search(r'^name:\s*(.+)$', content, re.MULTILINE)
-            if fm_name_match:
-                title = fm_name_match.group(1).strip().replace("-", " ").title()
-            else:
-                title = os.path.splitext(base_name)[0].replace("_", " ").replace("-", " ").title()
-
-        snippet = " ".join(" ".join(lines[:15]).split())[:200]
-        cat_name, cat_key = get_category_info(rel_path)
-
-        doc_entries.append({
-            "doc": doc,
-            "rel_path": rel_path,
-            "clean_md_rel": clean_md_rel,
-            "html_rel": html_rel,
-            "title": title,
-            "content": content,
-            "snippet": snippet,
-            "category": cat_name,
-            "category_key": cat_key
-        })
-
-    # Canonical README.md for the docs repository root
-    portal_readme_content = """# ZQK Core Documentation Portal
-
-Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), deployed at **[docs.zqk.dev](https://docs.zqk.dev/)**.
-
-## Structure
-- Canonical web documentation: `*.html`
-- Source Markdown mirrors: `docs/**/*.md`
-- Deployed via GitHub Pages.
-"""
-    with open(os.path.join(target_dir, "README.md"), "w", encoding="utf-8") as f:
-        f.write(portal_readme_content)
-
-    # CNAME and .nojekyll for GitHub Pages deployment
-    with open(os.path.join(target_dir, "CNAME"), "w", encoding="utf-8") as f:
-        f.write("docs.zqk.dev\n")
-    with open(os.path.join(target_dir, ".nojekyll"), "w", encoding="utf-8") as f:
-        f.write("")
-
-    pages = []
-    category_counts = {}
-
-    CATEGORY_ORDER = [
-        ("Getting Started", "getting-started"),
-        ("Architecture & Foundation", "architecture"),
-        ("Specifications & Grammars", "specs"),
-        ("Kernel Subsystems & Go Packages", "subsystems"),
-        ("Kernel DNA & Object Schemas", "schemas"),
-        ("Reference Manuals", "manual"),
-        ("How-To & Incident Runbooks", "operations"),
-        ("Tutorials, Demos & Guides", "tutorials"),
-        ("Agent Skills & Protocols", "skills"),
-        ("Agent Directives & Packs", "agent-directives"),
-        ("Maintenance & Development", "development"),
-        ("Quality & Evaluation", "quality"),
-        ("Codebase Evaluation Framework", "codebase-eval"),
-        ("Open Core Governance", "governance"),
-    ]
-
-    grouped_docs = {cat_name: [] for cat_name, _ in CATEGORY_ORDER}
-    for item in doc_entries:
-        cat_name = item["category"]
-        if cat_name not in grouped_docs:
-            grouped_docs[cat_name] = []
-        grouped_docs[cat_name].append(item)
-
-    # Dynamic category safeguard: ensure all populated categories appear in navigation
-    ordered_cat_names = set(c[0] for c in CATEGORY_ORDER)
-    for cat_name in grouped_docs:
-        if cat_name not in ordered_cat_names and grouped_docs[cat_name]:
-            cat_slug = cat_name.lower().replace(" ", "-").replace("&", "").replace("--", "-")
-            CATEGORY_ORDER.append((cat_name, cat_slug))
-
-    # Sort items within each category
-    def sort_key(entry):
-        rel = entry["rel_path"]
-        # Pin index or overview docs to top of their category
-        if "README.md" in rel or "INDEX.md" in rel or rel == "index.html":
-            return (0, entry["title"])
-        if "COMMUNITY_FIRST_RUN" in rel or "QUICKSTART" in rel or "ZQK_GETTING_STARTED" in rel or "zqk-expert/SKILL" in rel or "CONTRIBUTING" in rel:
-            return (1, entry["title"])
-        return (2, entry["title"])
-
-    for cat_name in grouped_docs:
-        grouped_docs[cat_name].sort(key=sort_key)
-
-    def get_sidebar_nav_html(root_rel: str, current_html_rel: str) -> str:
-        nav_html = ['<nav class="sidebar-nav">']
-        # Top-level Overview
-        active_home = ' class="active"' if current_html_rel == "index.html" else ''
-        nav_html.append(f'<div class="sidebar-home"><a href="{root_rel}index.html"{active_home}>🏠 Portal Overview</a></div>')
-
-        for cat_name, cat_key in CATEGORY_ORDER:
-            items = grouped_docs.get(cat_name, [])
-            if not items:
-                continue
-
-            contains_active = any(it["html_rel"] == current_html_rel for it in items)
-            # Default open for core categories, or if this category contains the active page
-            # Keep CEF closed by default unless active page is inside it
-            is_open = contains_active or (cat_key in ("getting-started", "architecture", "specs", "manual", "operations", "skills", "agent-directives", "tutorials", "subsystems", "schemas") and current_html_rel == "index.html")
-            open_attr = ' open' if is_open else ''
-
-            nav_html.append(f'<details class="sidebar-group"{open_attr}>')
-            nav_html.append(f'<summary><span class="group-title">{html.escape(cat_name)}</span><span class="group-count">{len(items)}</span></summary>')
-            nav_html.append('<ul>')
-            for it in items:
-                is_active = (it["html_rel"] == current_html_rel)
-                active_cls = ' class="active"' if is_active else ''
-                nav_title = html.escape(get_clean_nav_title(it["title"]))
-                full_title = html.escape(it["title"])
-                href = f"{root_rel}{it['html_rel']}"
-                nav_html.append(f'<li><a href="{href}"{active_cls} title="{full_title}">{nav_title}</a></li>')
-            nav_html.append('</ul>')
-            nav_html.append('</details>')
-
-        nav_html.append('</nav>')
-        return "\n".join(nav_html)
-
-    for item in doc_entries:
-        cat_name = item["category"]
-        category_counts[cat_name] = category_counts.get(cat_name, 0) + 1
-        
-        rendered_body = render_markdown_to_html(item["content"], item["html_rel"], link_map, repo_root)
-        escaped_title = html.escape(item["title"])
-        
-        depth = item["html_rel"].count("/")
-        root_rel = "../" * depth if depth > 0 else ""
-        sidebar_nav_html = get_sidebar_nav_html(root_rel, item["html_rel"])
-        
-        page_html = f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{escaped_title} - ZQK Core Documentation</title>
-  <link rel="stylesheet" href="{root_rel}assets/style.css">
-  <link rel="icon" type="image/svg+xml" href="{root_rel}assets/zqk-logo.svg">
-  <script type="module">
-    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-    mermaid.initialize({{
-      startOnLoad: false,
-      securityLevel: 'loose',
-      theme: 'dark',
-      themeVariables: {{
-        darkMode: true,
-        background: '#0d1117',
-        primaryColor: '#1f6feb',
-        primaryTextColor: '#c9d1d9',
-        primaryBorderColor: '#30363d',
-        lineColor: '#58a6ff',
-        secondaryColor: '#161b22',
-        tertiaryColor: '#0d1117'
-      }}
-    }});
-
-    async function initMermaid() {{
-      const els = document.querySelectorAll('.mermaid, pre code.language-mermaid');
-      if (!els.length) return;
-      document.querySelectorAll('pre code.language-mermaid').forEach(el => {{
-        const pre = el.parentElement;
-        pre.className = 'mermaid';
-        pre.textContent = el.textContent;
-      }});
-      try {{
-        await mermaid.run({{ querySelector: '.mermaid' }});
-      }} catch (err) {{
-        console.warn('Mermaid rendering:', err);
-      }}
-    }}
-
-    if (document.readyState === 'loading') {{
-      document.addEventListener('DOMContentLoaded', initMermaid);
-    }} else {{
-      initMermaid();
-    }}
-  </script>
-</head>
-<body data-root-rel="{root_rel}">
-  <header class="header">
-    <div class="nav-container">
-      <div class="brand">
-        <a href="{root_rel}index.html" class="logo">
-          {ZQK_HEADER_LOGO_SVG}
-          <span class="logo-text">ZQK <span class="logo-accent">Core</span></span>
-        </a>
-        <span class="badge-tag">{html.escape(item["category"])}</span>
-      </div>
-      <div class="search-box">
-        <input type="text" id="search-input" placeholder="Search core documentation..." onkeyup="runSearch()">
-        <div id="search-results"></div>
-      </div>
-    </div>
-  </header>
-  <main class="content-container">
-    <aside class="sidebar">
-      {sidebar_nav_html}
-    </aside>
-    <article class="doc-body">
-      <div class="breadcrumb">
-        <div class="breadcrumb-trail">
-          <a href="{root_rel}index.html">Docs</a> &raquo; <span>{html.escape(item["category"])}</span> &raquo; <span class="current">{escaped_title}</span>
-        </div>
-        <a href="{root_rel}{item['clean_md_rel']}" class="raw-md-link" title="View canonical Markdown source">Raw .md</a>
-      </div>
-      <div class="markdown-body">
-        {rendered_body}
-      </div>
-    </article>
-  </main>
-  <script src="{root_rel}search/search-index.js"></script>
-</body>
-</html>
-"""
-        target_file_path = os.path.join(target_dir, item["html_rel"])
-        os.makedirs(os.path.dirname(target_file_path), exist_ok=True)
-        with open(target_file_path, "w", encoding="utf-8") as f:
-            f.write(page_html)
-
-        pages.append({
-            "title": item["title"],
-            "path": item["html_rel"],
-            "category": item["category"],
-            "snippet": item["snippet"]
-        })
-
-    # Build categories table for landing page
-    cat_cards_html = ""
-    for cat_name, cat_key in CATEGORY_ORDER:
-        items = grouped_docs.get(cat_name, [])
-        if not items:
-            continue
-        first_doc = items[0]
-        preview_links = "".join([f'<li><a href="{it["html_rel"]}">{html.escape(get_clean_nav_title(it["title"]))}</a></li>' for it in items[:4]])
-        if len(items) > 4:
-            preview_links += f'<li class="more-link"><a href="{first_doc["html_rel"]}">+ {len(items)-4} more guides &rarr;</a></li>'
-        cat_cards_html += f"""
-        <div class="cat-card">
-          <div class="cat-card-header">
-            <h4><a href="{first_doc['html_rel']}">{html.escape(cat_name)}</a></h4>
-            <span class="cat-card-count">{len(items)} articles</span>
-          </div>
-          <p>Authoritative open-core specifications and guides for {html.escape(cat_name.lower())}.</p>
-          <ul class="cat-card-links">
-            {preview_links}
-          </ul>
-        </div>
-        """
-
-    index_sidebar_html = get_sidebar_nav_html("", "index.html")
-    index_html = f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ZQK Core Documentation Portal</title>
-  <link rel="stylesheet" href="assets/style.css">
-  <link rel="icon" type="image/svg+xml" href="assets/zqk-logo.svg">
-  <script type="module">
-    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-    mermaid.initialize({{
-      startOnLoad: false,
-      securityLevel: 'loose',
-      theme: 'dark',
-      themeVariables: {{
-        darkMode: true,
-        background: '#0d1117',
-        primaryColor: '#1f6feb',
-        primaryTextColor: '#c9d1d9',
-        primaryBorderColor: '#30363d',
-        lineColor: '#58a6ff',
-        secondaryColor: '#161b22',
-        tertiaryColor: '#0d1117'
-      }}
-    }});
-
-    async function initMermaid() {{
-      const els = document.querySelectorAll('.mermaid, pre code.language-mermaid');
-      if (!els.length) return;
-      document.querySelectorAll('pre code.language-mermaid').forEach(el => {{
-        const pre = el.parentElement;
-        pre.className = 'mermaid';
-        pre.textContent = el.textContent;
-      }});
-      try {{
-        await mermaid.run({{ querySelector: '.mermaid' }});
-      }} catch (err) {{
-        console.warn('Mermaid rendering:', err);
-      }}
-    }}
-
-    if (document.readyState === 'loading') {{
-      document.addEventListener('DOMContentLoaded', initMermaid);
-    }} else {{
-      initMermaid();
-    }}
-  </script>
-</head>
-<body data-root-rel="">
-  <header class="header">
-    <div class="nav-container">
-      <div class="brand">
-        <a href="index.html" class="logo">
-          {ZQK_HEADER_LOGO_SVG}
-          <span class="logo-text">ZQK <span class="logo-accent">Core</span> <span style="font-size: 0.82rem; color: #8b949e; font-weight: normal; margin-left: 6px;">Community Docs</span></span>
-        </a>
-      </div>
-      <div class="search-box">
-        <input type="text" id="search-input" placeholder="Search core documentation..." onkeyup="runSearch()">
-        <div id="search-results"></div>
-      </div>
-    </div>
-  </header>
-  <main class="content-container">
-    <aside class="sidebar">
-      {index_sidebar_html}
-    </aside>
-    <article class="doc-body">
-      <div class="hero-box">
-        <h1>ZQK Community Docs</h1>
-        <p class="hero-desc">
-          The Cellular Knowledge Operating System for autonomous AI agent swarms and human engineering teams.
-        </p>
-        <div class="portal-stat-badge">
-          <strong>{len(pages)}</strong> official open-core documentation guides and specifications
-        </div>
-      </div>
-
-      <h2>Core Documentation Quadrants</h2>
-      <div class="quadrant-grid">
-        <div class="quad-box">
-          <h3>🚀 Onboarding & First-Run</h3>
-          <p>Get up and running with the ZQK Core CLI, daemons, and autonomous agent seating.</p>
-          <ul>
-            <li><a href="docs/onboarding/COMMUNITY_FIRST_RUN.html">Community First-Run Guide</a></li>
-            <li><a href="docs/onboarding/QUICKSTART.html">Quickstart & MCP Configuration</a></li>
-            <li><a href="docs/onboarding/AI_AGENT_ONBOARDING.html">AI Agent Directives & Seating</a></li>
-            <li><a href="docs/onboarding/FIRST_RUN_OBJECT_TUTORIAL.html">First-Run Object Tutorial</a></li>
-            <li><a href="docs/onboarding/EDGE_HEADLESS_FIRST_RUN.html">Edge / Headless Mode</a></li>
-          </ul>
-        </div>
-        <div class="quad-box">
-          <h3>🏛️ Core Architecture</h3>
-          <p>Deep foundational specifications governing the Knowledge Kernel.</p>
-          <ul>
-            <li><a href="docs/architecture/README.html">Core Architecture Overview</a></li>
-            <li><a href="docs/architecture/AMBIENT_SIGNAL_ACTION_RUBRIC.html">Ambient Signal Action Rubric</a></li>
-            <li><a href="docs/architecture/LIFECYCLE_STATE_MACHINE.html">Visual Lifecycle State Machines</a></li>
-            <li><a href="docs/architecture/PACK_COMPOSITION_AND_EXTENSIBILITY.html">Modular Pack Composition</a></li>
-            <li><a href="docs/architecture/CELLULAR_MEMBRANE_MODE_B_CONFIGURATION.html">Cellular Membrane Mode B Runbook</a></li>
-            <li><a href="docs/architecture/CLI_COMMAND_TAXONOMY_STANDARDS.html">CLI Command Taxonomy & Standards</a></li>
-          </ul>
-        </div>
-        <div class="quad-box">
-          <h3>📜 Specifications & Grammars</h3>
-          <p>Formal AST grammars, execution engines, and query planning algorithms.</p>
-          <ul>
-            <li><a href="docs/specs/SPEC-ZPARQL-GRAPH-TRAVERSAL-GRAMMAR.html">ZPARQL Graph Traversal Grammar</a></li>
-            <li><a href="docs/specs/SPEC-ZPARQL-QUERY-PLANNER.html">ZPARQL Indexed Query Planner</a></li>
-            <li><a href="docs/specs/SPEC-ZQL-DECLARATIVE-MUTATION-GRAMMAR.html">ZQL Mutation Grammar & AST</a></li>
-            <li><a href="docs/specs/SPEC-ZQL-TRANSACTION-EXECUTION.html">ZQL ACID Transaction Execution</a></li>
-            <li><a href="docs/specs/SPEC-OBJECT-INSPECTOR-CONSOLE-001.html">Interactive Object Inspector Spec</a></li>
-          </ul>
-        </div>
-        <div class="quad-box">
-          <h3>📖 Reference Manuals & Guides</h3>
-          <p>Complete syntax reference, CLI options, and developer field guides.</p>
-          <ul>
-            <li><a href="docs/manual/README.html">Manual & CLI Reference</a></li>
-            <li><a href="docs/manual/ZPARQL_QUERY_LANGUAGE.html">ZPARQL Query Language Manual</a></li>
-            <li><a href="docs/manual/ZQL_MUTATIONS.html">ZQL Declarative Mutations Manual</a></li>
-            <li><a href="docs/manual/OBJECT_INSPECTOR_AND_POLICY_STUDIO.html">Object Inspector & Policy Studio</a></li>
-            <li><a href="docs/guides/ZQL_ZPARQL_AGENT_GUIDE.html">ZQL & ZPARQL Agent Guide</a></li>
-          </ul>
-        </div>
-        <div class="quad-box">
-          <h3>🚨 Incident Runbooks & Operations</h3>
-          <p>Operational triage recipes, crash recovery, and daemon health management.</p>
-          <ul>
-            <li><a href="docs/runbooks/README.html">Operational Incident Runbooks</a></li>
-            <li><a href="docs/runbooks/RB-CAS-001-CAS-CORRUPTION-RECOVERY.html">RB-CAS-001: CAS Hash Recovery</a></li>
-            <li><a href="docs/runbooks/RB-LCK-001-LOCK-CONTENTION-DEADLOCKS.html">RB-LCK-001: Lock Contention</a></li>
-            <li><a href="docs/runbooks/RB-SCH-001-SCHEDULER-DAEMON-TRIAGE.html">RB-SCH-001: Scheduler Triage</a></li>
-            <li><a href="docs/runbooks/RB-WAL-001-WAL-COMPACTION-FAILURES.html">RB-WAL-001: WAL Failures</a></li>
-          </ul>
-        </div>
-        <div class="quad-box">
-          <h3>🔬 Quality & Codebase Evaluation</h3>
-          <p>Multi-agent evaluation framework (CEF), Diamond Scale, and 52 lens rubrics.</p>
-          <ul>
-            <li><a href="docs/quality/README.html">Quality & Verification Gates (DoD/VDS)</a></li>
-            <li><a href="docs/eval/README.html">Multi-Axis Benchmark Synthesis</a></li>
-            <li><a href="docs/quality/codebase_evaluation/README.html">CEF Multi-Agent Evaluation Framework</a></li>
-            <li><a href="docs/quality/codebase_evaluation/CONSTITUTION.html">CEF Evaluation Constitution</a></li>
-            <li><a href="docs/quality/codebase_evaluation/DIAMOND_SCALE.html">Diamond Scale Multi-Axis Quality</a></li>
-          </ul>
-        </div>
-        <div class="quad-box">
-          <h3>🔧 Maintenance & Development</h3>
-          <p>Foundational engineering conventions, policy durability models, and AST gates.</p>
-          <ul>
-            <li><a href="docs/development/README.html">Maintenance & Development Overview</a></li>
-            <li><a href="docs/development/POLICY_GOVERNANCE_AND_DURABILITY.html">Policy Governance & Durability</a></li>
-            <li><a href="docs/howto/SCHEDULER_AND_MAINTENANCE.html">Scheduler & Maintenance Jobs</a></li>
-            <li><a href="docs/explanation/README.html">System Architecture Philosophy</a></li>
-          </ul>
-        </div>
-        <div class="quad-box">
-          <h3>📦 Kernel Subsystems & Packages</h3>
-          <p>Architectural design, interface contracts, and storage implementations across the Go microkernel.</p>
-          <ul>
-            <li><a href="pkg/storage/README.html">Storage Subsystem & Providers</a></li>
-            <li><a href="pkg/graph/README.html">Graph Backend & MemGraph Provider</a></li>
-            <li><a href="pkg/mcp/README.html">Model Context Protocol (MCP) Server</a></li>
-            <li><a href="pkg/concurrency/README.html">Concurrency & Synchronization</a></li>
-            <li><a href="pkg/pipeline/README.html">Pipeline & Step Execution</a></li>
-            <li><a href="internal/bootstrap/README.html">Bootstrap Archive & Seeding</a></li>
-          </ul>
-        </div>
-        <div class="quad-box">
-          <h3>🤖 Agent Operating Protocols</h3>
-          <p>Directives, MCP integration, persona seating, and continuous autonomous loop discipline.</p>
-          <ul>
-            <li><a href="docs/onboarding/AI_AGENT_ONBOARDING.html">AI Agent Directives & Seating</a></li>
-            <li><a href="docs/architecture/AMBIENT_SIGNAL_ACTION_RUBRIC.html">Ambient Signal Action Rubric</a></li>
-            <li><a href="docs/quality/README.html">Verification Done-Gates (VDS)</a></li>
-            <li><a href="docs/guides/ZQL_ZPARQL_AGENT_GUIDE.html">ZQL & ZPARQL Agent Guide</a></li>
-            <li><a href="docs/onboarding/EDGE_HEADLESS_FIRST_RUN.html">Edge / Headless Mode</a></li>
-          </ul>
-        </div>
-        <div class="quad-box">
-          <h3>⚖️ Open Core Governance</h3>
-          <p>Open-source policies, contributing guidelines, and security disclosures.</p>
-          <ul>
-            <li><a href="CONTRIBUTING.html">Contributing & DCO Compliance</a></li>
-            <li><a href="SECURITY.html">Security Vulnerability Disclosures</a></li>
-            <li><a href="GOVERNANCE.html">Open-Core Decision Making</a></li>
-            <li><a href="CODE_OF_CONDUCT.html">Contributor Code of Conduct</a></li>
-          </ul>
-        </div>
-      </div>
-
-      <h2>Core Documentation Directory</h2>
-      <p>Explore all {len(pages)} canonical guides published in ZQK Core:</p>
-      <div class="category-grid">
-        {cat_cards_html}
-      </div>
-    </article>
-  </main>
-  <script src="search/search-index.js"></script>
-</body>
-</html>
-"""
-    with open(os.path.join(target_dir, "index.html"), "w", encoding="utf-8") as f:
-        f.write(index_html)
-
-    # Write CSS
-    style_css = """
+def get_portal_style_css() -> str:
+    return """
 :root {
   --bg-primary: #05070c;
   --bg-secondary: #0d1117;
@@ -1521,8 +971,660 @@ body {
   color: #f85149;
 }
 """
+
+def build_portal(repo_root: str, target_dir: str):
+    print(f"📚 Generating ZQK Core Documentation Portal into {target_dir}...")
+    
+    if os.path.exists(target_dir):
+        shutil.rmtree(target_dir)
+
+    # Dynamically regenerate package indexes to ensure package catalog never goes stale
+    if generate_readme_index:
+        try:
+            print("📦 Dynamically generating comprehensive package indexes (pkg/ and internal/)...")
+            generate_readme_index(repo_root, "pkg")
+            generate_readme_index(repo_root, "internal")
+        except Exception as e:
+            print(f"Warning: could not dynamically update package catalogs: {e}", file=sys.stderr)
+    
+    assets_dir = os.path.join(target_dir, "assets")
+    search_dir = os.path.join(target_dir, "search")
+    os.makedirs(assets_dir, exist_ok=True)
+    os.makedirs(search_dir, exist_ok=True)
+
+    portal_build_id = get_git_commit_sha(repo_root)
+    logo_hash = hashlib.sha256(ZQK_LOGO_SVG.encode("utf-8")).hexdigest()[:8]
+    style_css = get_portal_style_css()
+    style_hash = hashlib.sha256(style_css.encode("utf-8")).hexdigest()[:8]
+
+    # Write authentic ZQK logo asset
+    with open(os.path.join(assets_dir, "zqk-logo.svg"), "w", encoding="utf-8") as f:
+        f.write(ZQK_LOGO_SVG.strip() + "\n")
+
+    # Collect documentation files strictly from Core, excluding archive/internal dirs
+    raw_doc_files = sorted(glob.glob(os.path.join(repo_root, "docs", "**", "*.md"), recursive=True))
+    doc_files = []
+    exclude_parts = {"archive", "_archive", "_archive-cef-runs", "cef-runs", ".zqk", "audit", "templates", "package_skeleton", "testdata"}
+    for df in raw_doc_files:
+        rel = os.path.relpath(df, repo_root)
+        parts = set(rel.split(os.sep))
+        if parts.intersection(exclude_parts):
+            continue
+        doc_files.append(df)
+
+    for root_doc in ["README.md", "CONTRIBUTING.md", "SECURITY.md", "GOVERNANCE.md", "CODE_OF_CONDUCT.md", "PACK-COMPOSITION.md", "ZQK_GETTING_STARTED.md", "ANTIGRAVITY.md"]:
+        p = os.path.join(repo_root, root_doc)
+        if os.path.isfile(p):
+            doc_files.append(p)
+
+    agents_file = os.path.join(repo_root, ".agents", "AGENTS.md")
+    if os.path.isfile(agents_file):
+        doc_files.append(agents_file)
+
+    raw_skill_files = sorted(glob.glob(os.path.join(repo_root, ".zqk", "skills", "**", "*.md"), recursive=True))
+    for sf in raw_skill_files:
+        doc_files.append(sf)
+
+    # Subsystem and Go package documentation (pkg/, internal/, cmd/)
+    for sub_dir in ["pkg", "internal", "cmd"]:
+        sub_path = os.path.join(repo_root, sub_dir)
+        if not os.path.isdir(sub_path):
+            continue
+        for root, dirs, files in os.walk(sub_path):
+            dirs[:] = [d for d in dirs if d not in exclude_parts and not d.startswith(".")]
+            for f in files:
+                if f.endswith(".md") and not f.startswith("REFACTORING_PLAN_"):
+                    doc_files.append(os.path.join(root, f))
+
+    # Kernel DNA specs (.zqk/specs/)
+    spec_mds = sorted(glob.glob(os.path.join(repo_root, ".zqk", "specs", "**", "*.md"), recursive=True))
+    for sm in spec_mds:
+        doc_files.append(sm)
+
+    # Agent Packs (.zqk/agent_packs/)
+    agent_pack_mds = sorted(glob.glob(os.path.join(repo_root, ".zqk", "agent_packs", "**", "*.md"), recursive=True))
+    for ap in agent_pack_mds:
+        doc_files.append(ap)
+
+    # Operational Guides in scripts/
+    for script_doc in ["scripts/onboarding_roadmap/README.md", "scripts/scheduler_jobs/README.md"]:
+        sp = os.path.join(repo_root, script_doc)
+        if os.path.isfile(sp):
+            doc_files.append(sp)
+
+    # Scrutinizer filter: reject empty stubs, placeholder text, or template scaffolds
+    FORBIDDEN_DOC_PATTERNS = [
+        re.compile(r'\btest content\b', re.IGNORECASE),
+        re.compile(r'\bTODO_OVERWRITE\b'),
+        re.compile(r'\bREPLACE_ME\b'),
+        re.compile(r'\blorem ipsum\b', re.IGNORECASE),
+    ]
+
+    def is_substantive_doc(file_path: str) -> bool:
+        try:
+            sz = os.path.getsize(file_path)
+            if sz < 60:
+                print(f"⚠️ [DOC-SCRUTINIZER] Dropping stub file (< 60b): {file_path}")
+                return False
+            # Only apply placeholder token rejection to template scaffolds
+            if "templates" in file_path or "skeleton" in file_path:
+                with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+                    content = f.read()
+                for pat in FORBIDDEN_DOC_PATTERNS:
+                    if pat.search(content):
+                        print(f"⚠️ [DOC-SCRUTINIZER] Dropping template scaffold with placeholder '{pat.pattern}': {file_path}")
+                        return False
+            return True
+        except Exception:
+            return False
+
+    # Deduplicate while preserving order and applying quality scrutiny
+    doc_files = [df for df in sorted(list(dict.fromkeys(doc_files))) if is_substantive_doc(df)]
+
+    # Collect and mirror all static/non-markdown files in docs/ (YAML, JSON, images, etc.)
+    for root, dirs, files in os.walk(os.path.join(repo_root, "docs")):
+        dirs[:] = [d for d in dirs if d not in exclude_parts and not d.startswith(".")]
+        for f in files:
+            if f.endswith(".md") or f == "CNAME":
+                continue
+            src_path = os.path.join(root, f)
+            rel_path = os.path.relpath(src_path, repo_root)
+            dest_path = os.path.join(target_dir, rel_path)
+            os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+            shutil.copy2(src_path, dest_path)
+
+    # Also copy root project files like LICENSE and NOTICE
+    for rf in ["LICENSE", "NOTICE"]:
+        rp = os.path.join(repo_root, rf)
+        if os.path.isfile(rp):
+            shutil.copy2(rp, os.path.join(target_dir, rf))
+
+    link_map = {}
+    doc_entries = []
+
+    # First pass: Build link map, extract titles, and copy raw markdown files
+    for doc in doc_files:
+        rel_path = os.path.relpath(doc, repo_root)
+        html_rel = get_html_relpath(rel_path)
+        base_name = os.path.basename(rel_path)
+        clean_md_rel = html_rel[:-5] + ".md" if html_rel.endswith(".html") else html_rel + ".md"
+
+        link_map[rel_path] = html_rel
+        link_map["./" + rel_path] = html_rel
+        link_map[clean_md_rel] = html_rel
+        link_map["./" + clean_md_rel] = html_rel
+        if base_name not in ("README.md", "INDEX.md", "SKILL.md") and base_name not in link_map:
+            link_map[base_name] = html_rel
+            link_map["./" + base_name] = html_rel
+
+        try:
+            with open(doc, "r", encoding="utf-8", errors="replace") as f:
+                content = f.read()
+        except Exception as e:
+            print(f"Warning: could not read {doc}: {e}", file=sys.stderr)
+            continue
+
+        # Mirror the raw .md file into target_dir so raw markdown is accessible
+        target_md_path = os.path.join(target_dir, rel_path)
+        os.makedirs(os.path.dirname(target_md_path), exist_ok=True)
+        with open(target_md_path, "w", encoding="utf-8") as mf:
+            mf.write(content)
+
+        # Also write clean non-dot path for web accessibility
+        clean_md_path = os.path.join(target_dir, clean_md_rel)
+        if clean_md_path != target_md_path:
+            os.makedirs(os.path.dirname(clean_md_path), exist_ok=True)
+            with open(clean_md_path, "w", encoding="utf-8") as mf:
+                mf.write(content)
+
+        clean_content = content
+        if clean_content.startswith("---"):
+            fm_end = clean_content.find("\n---", 3)
+            if fm_end != -1:
+                clean_content = clean_content[fm_end + 4:].strip()
+
+        lines = [line.strip() for line in clean_content.splitlines() if line.strip()]
+        title = ""
+        for line in lines[:25]:
+            if line.startswith("# "):
+                title = line[2:].strip()
+                break
+        if rel_path.startswith(".zqk/agent_packs/"):
+            pack_name = rel_path.split("/")[2]
+            p_display = pack_name.upper() if pack_name in ("ide", "mcp") else pack_name.replace("_", " ").title()
+            title = f"{p_display} Agent Boot Protocol"
+        elif rel_path == "scripts/onboarding_roadmap/README.md":
+            title = "Curriculum as Data: Onboarding Roadmap"
+        elif rel_path == "scripts/scheduler_jobs/README.md":
+            title = "Scheduler Job Templates"
+        elif not title:
+            fm_name_match = re.search(r'^name:\s*(.+)$', content, re.MULTILINE)
+            if fm_name_match:
+                title = fm_name_match.group(1).strip().replace("-", " ").title()
+            else:
+                title = os.path.splitext(base_name)[0].replace("_", " ").replace("-", " ").title()
+
+        snippet = " ".join(" ".join(lines[:15]).split())[:200]
+        cat_name, cat_key = get_category_info(rel_path)
+
+        doc_entries.append({
+            "doc": doc,
+            "rel_path": rel_path,
+            "clean_md_rel": clean_md_rel,
+            "html_rel": html_rel,
+            "title": title,
+            "content": content,
+            "snippet": snippet,
+            "category": cat_name,
+            "category_key": cat_key
+        })
+
+    # Canonical README.md for the docs repository root
+    portal_readme_content = """# ZQK Core Documentation Portal
+
+Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), deployed at **[docs.zqk.dev](https://docs.zqk.dev/)**.
+
+## Structure
+- Canonical web documentation: `*.html`
+- Source Markdown mirrors: `docs/**/*.md`
+- Deployed via GitHub Pages.
+"""
+    with open(os.path.join(target_dir, "README.md"), "w", encoding="utf-8") as f:
+        f.write(portal_readme_content)
+
+    # CNAME and .nojekyll for GitHub Pages deployment
+    with open(os.path.join(target_dir, "CNAME"), "w", encoding="utf-8") as f:
+        f.write("docs.zqk.dev\n")
+    with open(os.path.join(target_dir, ".nojekyll"), "w", encoding="utf-8") as f:
+        f.write("")
+
+    pages = []
+    category_counts = {}
+
+    CATEGORY_ORDER = [
+        ("Getting Started", "getting-started"),
+        ("Architecture & Foundation", "architecture"),
+        ("Specifications & Grammars", "specs"),
+        ("Kernel Subsystems & Go Packages", "subsystems"),
+        ("Kernel DNA & Object Schemas", "schemas"),
+        ("Reference Manuals", "manual"),
+        ("How-To & Incident Runbooks", "operations"),
+        ("Tutorials, Demos & Guides", "tutorials"),
+        ("Agent Skills & Protocols", "skills"),
+        ("Agent Directives & Packs", "agent-directives"),
+        ("Maintenance & Development", "development"),
+        ("Quality & Evaluation", "quality"),
+        ("Codebase Evaluation Framework", "codebase-eval"),
+        ("Open Core Governance", "governance"),
+    ]
+
+    grouped_docs = {cat_name: [] for cat_name, _ in CATEGORY_ORDER}
+    for item in doc_entries:
+        cat_name = item["category"]
+        if cat_name not in grouped_docs:
+            grouped_docs[cat_name] = []
+        grouped_docs[cat_name].append(item)
+
+    # Dynamic category safeguard: ensure all populated categories appear in navigation
+    ordered_cat_names = set(c[0] for c in CATEGORY_ORDER)
+    for cat_name in grouped_docs:
+        if cat_name not in ordered_cat_names and grouped_docs[cat_name]:
+            cat_slug = cat_name.lower().replace(" ", "-").replace("&", "").replace("--", "-")
+            CATEGORY_ORDER.append((cat_name, cat_slug))
+
+    # Sort items within each category
+    def sort_key(entry):
+        rel = entry["rel_path"]
+        # Pin index or overview docs to top of their category
+        if "README.md" in rel or "INDEX.md" in rel or rel == "index.html":
+            return (0, entry["title"])
+        if "COMMUNITY_FIRST_RUN" in rel or "QUICKSTART" in rel or "ZQK_GETTING_STARTED" in rel or "zqk-expert/SKILL" in rel or "CONTRIBUTING" in rel:
+            return (1, entry["title"])
+        return (2, entry["title"])
+
+    for cat_name in grouped_docs:
+        grouped_docs[cat_name].sort(key=sort_key)
+
+    def get_sidebar_nav_html(root_rel: str, current_html_rel: str) -> str:
+        nav_html = ['<nav class="sidebar-nav">']
+        # Top-level Overview
+        active_home = ' class="active"' if current_html_rel == "index.html" else ''
+        nav_html.append(f'<div class="sidebar-home"><a href="{root_rel}index.html"{active_home}>🏠 Portal Overview</a></div>')
+
+        for cat_name, cat_key in CATEGORY_ORDER:
+            items = grouped_docs.get(cat_name, [])
+            if not items:
+                continue
+
+            contains_active = any(it["html_rel"] == current_html_rel for it in items)
+            # Default open for core categories, or if this category contains the active page
+            # Keep CEF closed by default unless active page is inside it
+            is_open = contains_active or (cat_key in ("getting-started", "architecture", "specs", "manual", "operations", "skills", "agent-directives", "tutorials", "subsystems", "schemas") and current_html_rel == "index.html")
+            open_attr = ' open' if is_open else ''
+
+            nav_html.append(f'<details class="sidebar-group"{open_attr}>')
+            nav_html.append(f'<summary><span class="group-title">{html.escape(cat_name)}</span><span class="group-count">{len(items)}</span></summary>')
+            nav_html.append('<ul>')
+            for it in items:
+                is_active = (it["html_rel"] == current_html_rel)
+                active_cls = ' class="active"' if is_active else ''
+                nav_title = html.escape(get_clean_nav_title(it["title"]))
+                full_title = html.escape(it["title"])
+                href = f"{root_rel}{it['html_rel']}"
+                nav_html.append(f'<li><a href="{href}"{active_cls} title="{full_title}">{nav_title}</a></li>')
+            nav_html.append('</ul>')
+            nav_html.append('</details>')
+
+        nav_html.append('</nav>')
+        return "\n".join(nav_html)
+
+    for item in doc_entries:
+        cat_name = item["category"]
+        category_counts[cat_name] = category_counts.get(cat_name, 0) + 1
+        
+        rendered_body = render_markdown_to_html(item["content"], item["html_rel"], link_map, repo_root, portal_build_id)
+        escaped_title = html.escape(item["title"])
+        
+        depth = item["html_rel"].count("/")
+        root_rel = "../" * depth if depth > 0 else ""
+        sidebar_nav_html = get_sidebar_nav_html(root_rel, item["html_rel"])
+        
+        page_html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>{escaped_title} - ZQK Core Documentation</title>
+  <link rel="stylesheet" href="{root_rel}assets/style.css?v={style_hash}">
+  <link rel="icon" type="image/svg+xml" href="{root_rel}assets/zqk-logo.svg?v={logo_hash}">
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({{
+      startOnLoad: false,
+      securityLevel: 'loose',
+      theme: 'dark',
+      themeVariables: {{
+        darkMode: true,
+        background: '#0d1117',
+        primaryColor: '#1f6feb',
+        primaryTextColor: '#c9d1d9',
+        primaryBorderColor: '#30363d',
+        lineColor: '#58a6ff',
+        secondaryColor: '#161b22',
+        tertiaryColor: '#0d1117'
+      }}
+    }});
+
+    async function initMermaid() {{
+      const els = document.querySelectorAll('.mermaid, pre code.language-mermaid');
+      if (!els.length) return;
+      document.querySelectorAll('pre code.language-mermaid').forEach(el => {{
+        const pre = el.parentElement;
+        pre.className = 'mermaid';
+        pre.textContent = el.textContent;
+      }});
+      try {{
+        await mermaid.run({{ querySelector: '.mermaid' }});
+      }} catch (err) {{
+        console.warn('Mermaid rendering:', err);
+      }}
+    }}
+
+    if (document.readyState === 'loading') {{
+      document.addEventListener('DOMContentLoaded', initMermaid);
+    }} else {{
+      initMermaid();
+    }}
+  </script>
+</head>
+<body data-root-rel="{root_rel}">
+  <header class="header">
+    <div class="nav-container">
+      <div class="brand">
+        <a href="{root_rel}index.html" class="logo">
+          {ZQK_HEADER_LOGO_SVG}
+          <span class="logo-text">ZQK <span class="logo-accent">Core</span></span>
+        </a>
+        <span class="badge-tag">{html.escape(item["category"])}</span>
+      </div>
+      <div class="search-box">
+        <input type="text" id="search-input" placeholder="Search core documentation..." onkeyup="runSearch()">
+        <div id="search-results"></div>
+      </div>
+    </div>
+  </header>
+  <main class="content-container">
+    <aside class="sidebar">
+      {sidebar_nav_html}
+    </aside>
+    <article class="doc-body">
+      <div class="breadcrumb">
+        <div class="breadcrumb-trail">
+          <a href="{root_rel}index.html">Docs</a> &raquo; <span>{html.escape(item["category"])}</span> &raquo; <span class="current">{escaped_title}</span>
+        </div>
+        <a href="{root_rel}{item['clean_md_rel']}" class="raw-md-link" title="View canonical Markdown source">Raw .md</a>
+      </div>
+      <div class="markdown-body">
+        {rendered_body}
+      </div>
+    </article>
+  </main>
+  <script src="{root_rel}search/search-index.js?v={portal_build_id}"></script>
+</body>
+</html>
+"""
+        target_file_path = os.path.join(target_dir, item["html_rel"])
+        os.makedirs(os.path.dirname(target_file_path), exist_ok=True)
+        with open(target_file_path, "w", encoding="utf-8") as f:
+            f.write(page_html)
+
+        pages.append({
+            "title": item["title"],
+            "path": item["html_rel"],
+            "category": item["category"],
+            "snippet": item["snippet"]
+        })
+
+    # Build categories table for landing page
+    cat_cards_html = ""
+    for cat_name, cat_key in CATEGORY_ORDER:
+        items = grouped_docs.get(cat_name, [])
+        if not items:
+            continue
+        first_doc = items[0]
+        preview_links = "".join([f'<li><a href="{it["html_rel"]}">{html.escape(get_clean_nav_title(it["title"]))}</a></li>' for it in items[:4]])
+        if len(items) > 4:
+            preview_links += f'<li class="more-link"><a href="{first_doc["html_rel"]}">+ {len(items)-4} more guides &rarr;</a></li>'
+        cat_cards_html += f"""
+        <div class="cat-card">
+          <div class="cat-card-header">
+            <h4><a href="{first_doc['html_rel']}">{html.escape(cat_name)}</a></h4>
+            <span class="cat-card-count">{len(items)} articles</span>
+          </div>
+          <p>Authoritative open-core specifications and guides for {html.escape(cat_name.lower())}.</p>
+          <ul class="cat-card-links">
+            {preview_links}
+          </ul>
+        </div>
+        """
+
+    index_sidebar_html = get_sidebar_nav_html("", "index.html")
+    index_html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>ZQK Core Documentation Portal</title>
+  <link rel="stylesheet" href="assets/style.css?v={style_hash}">
+  <link rel="icon" type="image/svg+xml" href="assets/zqk-logo.svg?v={logo_hash}">
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({{
+      startOnLoad: false,
+      securityLevel: 'loose',
+      theme: 'dark',
+      themeVariables: {{
+        darkMode: true,
+        background: '#0d1117',
+        primaryColor: '#1f6feb',
+        primaryTextColor: '#c9d1d9',
+        primaryBorderColor: '#30363d',
+        lineColor: '#58a6ff',
+        secondaryColor: '#161b22',
+        tertiaryColor: '#0d1117'
+      }}
+    }});
+
+    async function initMermaid() {{
+      const els = document.querySelectorAll('.mermaid, pre code.language-mermaid');
+      if (!els.length) return;
+      document.querySelectorAll('pre code.language-mermaid').forEach(el => {{
+        const pre = el.parentElement;
+        pre.className = 'mermaid';
+        pre.textContent = el.textContent;
+      }});
+      try {{
+        await mermaid.run({{ querySelector: '.mermaid' }});
+      }} catch (err) {{
+        console.warn('Mermaid rendering:', err);
+      }}
+    }}
+
+    if (document.readyState === 'loading') {{
+      document.addEventListener('DOMContentLoaded', initMermaid);
+    }} else {{
+      initMermaid();
+    }}
+  </script>
+</head>
+<body data-root-rel="">
+  <header class="header">
+    <div class="nav-container">
+      <div class="brand">
+        <a href="index.html" class="logo">
+          {ZQK_HEADER_LOGO_SVG}
+          <span class="logo-text">ZQK <span class="logo-accent">Core</span> <span style="font-size: 0.82rem; color: #8b949e; font-weight: normal; margin-left: 6px;">Community Docs</span></span>
+        </a>
+      </div>
+      <div class="search-box">
+        <input type="text" id="search-input" placeholder="Search core documentation..." onkeyup="runSearch()">
+        <div id="search-results"></div>
+      </div>
+    </div>
+  </header>
+  <main class="content-container">
+    <aside class="sidebar">
+      {index_sidebar_html}
+    </aside>
+    <article class="doc-body">
+      <div class="hero-box">
+        <h1>ZQK Community Docs</h1>
+        <p class="hero-desc">
+          The Cellular Knowledge Operating System for autonomous AI agent swarms and human engineering teams.
+        </p>
+        <div class="portal-stat-badge">
+          <strong>{len(pages)}</strong> official open-core documentation guides and specifications
+        </div>
+      </div>
+
+      <h2>Core Documentation Quadrants</h2>
+      <div class="quadrant-grid">
+        <div class="quad-box">
+          <h3>🚀 Onboarding & First-Run</h3>
+          <p>Get up and running with the ZQK Core CLI, daemons, and autonomous agent seating.</p>
+          <ul>
+            <li><a href="docs/onboarding/COMMUNITY_FIRST_RUN.html">Community First-Run Guide</a></li>
+            <li><a href="docs/onboarding/QUICKSTART.html">Quickstart & MCP Configuration</a></li>
+            <li><a href="docs/onboarding/AI_AGENT_ONBOARDING.html">AI Agent Directives & Seating</a></li>
+            <li><a href="docs/onboarding/FIRST_RUN_OBJECT_TUTORIAL.html">First-Run Object Tutorial</a></li>
+            <li><a href="docs/onboarding/EDGE_HEADLESS_FIRST_RUN.html">Edge / Headless Mode</a></li>
+          </ul>
+        </div>
+        <div class="quad-box">
+          <h3>🏛️ Core Architecture</h3>
+          <p>Deep foundational specifications governing the Knowledge Kernel.</p>
+          <ul>
+            <li><a href="docs/architecture/README.html">Core Architecture Overview</a></li>
+            <li><a href="docs/architecture/AMBIENT_SIGNAL_ACTION_RUBRIC.html">Ambient Signal Action Rubric</a></li>
+            <li><a href="docs/architecture/LIFECYCLE_STATE_MACHINE.html">Visual Lifecycle State Machines</a></li>
+            <li><a href="docs/architecture/PACK_COMPOSITION_AND_EXTENSIBILITY.html">Modular Pack Composition</a></li>
+            <li><a href="docs/architecture/CELLULAR_MEMBRANE_MODE_B_CONFIGURATION.html">Cellular Membrane Mode B Runbook</a></li>
+            <li><a href="docs/architecture/CLI_COMMAND_TAXONOMY_STANDARDS.html">CLI Command Taxonomy & Standards</a></li>
+          </ul>
+        </div>
+        <div class="quad-box">
+          <h3>📜 Specifications & Grammars</h3>
+          <p>Formal AST grammars, execution engines, and query planning algorithms.</p>
+          <ul>
+            <li><a href="docs/specs/SPEC-ZPARQL-GRAPH-TRAVERSAL-GRAMMAR.html">ZPARQL Graph Traversal Grammar</a></li>
+            <li><a href="docs/specs/SPEC-ZPARQL-QUERY-PLANNER.html">ZPARQL Indexed Query Planner</a></li>
+            <li><a href="docs/specs/SPEC-ZQL-DECLARATIVE-MUTATION-GRAMMAR.html">ZQL Mutation Grammar & AST</a></li>
+            <li><a href="docs/specs/SPEC-ZQL-TRANSACTION-EXECUTION.html">ZQL ACID Transaction Execution</a></li>
+            <li><a href="docs/specs/SPEC-OBJECT-INSPECTOR-CONSOLE-001.html">Interactive Object Inspector Spec</a></li>
+          </ul>
+        </div>
+        <div class="quad-box">
+          <h3>📖 Reference Manuals & Guides</h3>
+          <p>Complete syntax reference, CLI options, and developer field guides.</p>
+          <ul>
+            <li><a href="docs/manual/README.html">Manual & CLI Reference</a></li>
+            <li><a href="docs/manual/ZPARQL_QUERY_LANGUAGE.html">ZPARQL Query Language Manual</a></li>
+            <li><a href="docs/manual/ZQL_MUTATIONS.html">ZQL Declarative Mutations Manual</a></li>
+            <li><a href="docs/manual/OBJECT_INSPECTOR_AND_POLICY_STUDIO.html">Object Inspector & Policy Studio</a></li>
+            <li><a href="docs/guides/ZQL_ZPARQL_AGENT_GUIDE.html">ZQL & ZPARQL Agent Guide</a></li>
+          </ul>
+        </div>
+        <div class="quad-box">
+          <h3>🚨 Incident Runbooks & Operations</h3>
+          <p>Operational triage recipes, crash recovery, and daemon health management.</p>
+          <ul>
+            <li><a href="docs/runbooks/README.html">Operational Incident Runbooks</a></li>
+            <li><a href="docs/runbooks/RB-CAS-001-CAS-CORRUPTION-RECOVERY.html">RB-CAS-001: CAS Hash Recovery</a></li>
+            <li><a href="docs/runbooks/RB-LCK-001-LOCK-CONTENTION-DEADLOCKS.html">RB-LCK-001: Lock Contention</a></li>
+            <li><a href="docs/runbooks/RB-SCH-001-SCHEDULER-DAEMON-TRIAGE.html">RB-SCH-001: Scheduler Triage</a></li>
+            <li><a href="docs/runbooks/RB-WAL-001-WAL-COMPACTION-FAILURES.html">RB-WAL-001: WAL Failures</a></li>
+          </ul>
+        </div>
+        <div class="quad-box">
+          <h3>🔬 Quality & Codebase Evaluation</h3>
+          <p>Multi-agent evaluation framework (CEF), Diamond Scale, and 52 lens rubrics.</p>
+          <ul>
+            <li><a href="docs/quality/README.html">Quality & Verification Gates (DoD/VDS)</a></li>
+            <li><a href="docs/eval/README.html">Multi-Axis Benchmark Synthesis</a></li>
+            <li><a href="docs/quality/codebase_evaluation/README.html">CEF Multi-Agent Evaluation Framework</a></li>
+            <li><a href="docs/quality/codebase_evaluation/CONSTITUTION.html">CEF Evaluation Constitution</a></li>
+            <li><a href="docs/quality/codebase_evaluation/DIAMOND_SCALE.html">Diamond Scale Multi-Axis Quality</a></li>
+          </ul>
+        </div>
+        <div class="quad-box">
+          <h3>🔧 Maintenance & Development</h3>
+          <p>Foundational engineering conventions, policy durability models, and AST gates.</p>
+          <ul>
+            <li><a href="docs/development/README.html">Maintenance & Development Overview</a></li>
+            <li><a href="docs/development/POLICY_GOVERNANCE_AND_DURABILITY.html">Policy Governance & Durability</a></li>
+            <li><a href="docs/howto/SCHEDULER_AND_MAINTENANCE.html">Scheduler & Maintenance Jobs</a></li>
+            <li><a href="docs/explanation/README.html">System Architecture Philosophy</a></li>
+          </ul>
+        </div>
+        <div class="quad-box">
+          <h3>📦 Kernel Subsystems & Packages</h3>
+          <p>Architectural design, interface contracts, and storage implementations across the Go microkernel.</p>
+          <ul>
+            <li><a href="pkg/storage/README.html">Storage Subsystem & Providers</a></li>
+            <li><a href="pkg/graph/README.html">Graph Backend & MemGraph Provider</a></li>
+            <li><a href="pkg/mcp/README.html">Model Context Protocol (MCP) Server</a></li>
+            <li><a href="pkg/concurrency/README.html">Concurrency & Synchronization</a></li>
+            <li><a href="pkg/pipeline/README.html">Pipeline & Step Execution</a></li>
+            <li><a href="internal/bootstrap/README.html">Bootstrap Archive & Seeding</a></li>
+          </ul>
+        </div>
+        <div class="quad-box">
+          <h3>🤖 Agent Operating Protocols</h3>
+          <p>Directives, MCP integration, persona seating, and continuous autonomous loop discipline.</p>
+          <ul>
+            <li><a href="docs/onboarding/AI_AGENT_ONBOARDING.html">AI Agent Directives & Seating</a></li>
+            <li><a href="docs/architecture/AMBIENT_SIGNAL_ACTION_RUBRIC.html">Ambient Signal Action Rubric</a></li>
+            <li><a href="docs/quality/README.html">Verification Done-Gates (VDS)</a></li>
+            <li><a href="docs/guides/ZQL_ZPARQL_AGENT_GUIDE.html">ZQL & ZPARQL Agent Guide</a></li>
+            <li><a href="docs/onboarding/EDGE_HEADLESS_FIRST_RUN.html">Edge / Headless Mode</a></li>
+          </ul>
+        </div>
+        <div class="quad-box">
+          <h3>⚖️ Open Core Governance</h3>
+          <p>Open-source policies, contributing guidelines, and security disclosures.</p>
+          <ul>
+            <li><a href="CONTRIBUTING.html">Contributing & DCO Compliance</a></li>
+            <li><a href="SECURITY.html">Security Vulnerability Disclosures</a></li>
+            <li><a href="GOVERNANCE.html">Open-Core Decision Making</a></li>
+            <li><a href="CODE_OF_CONDUCT.html">Contributor Code of Conduct</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>Core Documentation Directory</h2>
+      <p>Explore all {len(pages)} canonical guides published in ZQK Core:</p>
+      <div class="category-grid">
+        {cat_cards_html}
+      </div>
+    </article>
+  </main>
+  <script src="search/search-index.js?v={portal_build_id}"></script>
+</body>
+</html>
+"""
+    with open(os.path.join(target_dir, "index.html"), "w", encoding="utf-8") as f:
+        f.write(index_html)
+
+    # Write CSS
     with open(os.path.join(assets_dir, "style.css"), "w", encoding="utf-8") as f:
         f.write(style_css)
+
 
     # Write search index
     pages_json_str = json.dumps(pages, ensure_ascii=False)
@@ -1601,9 +1703,12 @@ document.addEventListener('click', function(e) {{
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Page Not Found — ZQK Documentation</title>
-  <link rel="stylesheet" href="/assets/style.css">
-  <link rel="icon" type="image/svg+xml" href="/assets/zqk-logo.svg">
+  <link rel="stylesheet" href="/assets/style.css?v={style_hash}">
+  <link rel="icon" type="image/svg+xml" href="/assets/zqk-logo.svg?v={logo_hash}">
   <script>
     // Automatic intelligent client-side redirect for links missing /docs/ or missing .html
     (function() {{
@@ -1642,7 +1747,7 @@ document.addEventListener('click', function(e) {{
       <a href="/" style="display:inline-block; padding: 10px 20px; background: #00e5ff; color: #05070a; font-weight: 600; border-radius: 6px; text-decoration: none;">&larr; Return to Documentation Portal</a>
     </div>
   </main>
-  <script src="/search/search-index.js"></script>
+  <script src="/search/search-index.js?v={portal_build_id}"></script>
 </body>
 </html>
 """

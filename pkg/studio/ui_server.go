@@ -126,7 +126,14 @@ func (s *Server) Shutdown(ctx context.Context) error {
 	return err
 }
 
+func setNoCacheHeaders(w http.ResponseWriter) {
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", "0")
+}
+
 func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
+	setNoCacheHeaders(w)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(w).Encode(map[string]any{
@@ -167,6 +174,7 @@ type GraphEdge struct {
 }
 
 func (s *Server) handleGraph(w http.ResponseWriter, r *http.Request) {
+	setNoCacheHeaders(w)
 	w.Header().Set("Content-Type", "application/json")
 
 	kinds := []string{
@@ -246,6 +254,7 @@ func (s *Server) handleGraph(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleObjects(w http.ResponseWriter, r *http.Request) {
+	setNoCacheHeaders(w)
 	w.Header().Set("Content-Type", "application/json")
 
 	kindFilter := r.URL.Query().Get("kind")
@@ -273,6 +282,7 @@ func (s *Server) handleObjects(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleObjectByID(w http.ResponseWriter, r *http.Request) {
+	setNoCacheHeaders(w)
 	w.Header().Set("Content-Type", "application/json")
 
 	id := strings.TrimPrefix(r.URL.Path, "/api/objects/")
@@ -297,6 +307,7 @@ func (s *Server) handleDashboard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	setNoCacheHeaders(w)
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 	_, _ = w.Write([]byte(embeddedDashboardHTML))
@@ -307,6 +318,9 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>ZQK Knowledge Kernel Visual Studio</title>
   <style>
     :root {
@@ -1508,7 +1522,7 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
 
     async function loadDAG() {
       try {
-        const res = await fetch('/api/graph');
+        const res = await fetch('/api/graph?_t=' + Date.now(), { cache: 'no-store' });
         const data = await res.json();
         graphData = data || { nodes: [], edges: [] };
         if (!graphData.nodes) graphData.nodes = [];
@@ -2091,7 +2105,7 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       inspector.innerHTML = '<div style="padding: 24px; color: var(--text-muted);">Fetching object details...</div>';
 
       try {
-        const res = await fetch('/api/objects/' + encodeURIComponent(nodeId));
+        const res = await fetch('/api/objects/' + encodeURIComponent(nodeId) + '?_t=' + Date.now(), { cache: 'no-store' });
         if (!res.ok) throw new Error('Object not found');
         const node = await res.json();
         renderInspector(node);
