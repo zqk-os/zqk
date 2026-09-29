@@ -303,7 +303,7 @@ def build_portal(repo_root: str, target_dir: str):
     # Collect documentation files strictly from Core, excluding archive/internal dirs
     raw_doc_files = sorted(glob.glob(os.path.join(repo_root, "docs", "**", "*.md"), recursive=True))
     doc_files = []
-    exclude_parts = {"archive", "_archive", "_archive-cef-runs", "cef-runs", ".zqk", "audit"}
+    exclude_parts = {"archive", "_archive", "_archive-cef-runs", "cef-runs", ".zqk", "audit", "templates", "package_skeleton", "testdata"}
     for df in raw_doc_files:
         rel = os.path.relpath(df, repo_root)
         parts = set(rel.split(os.sep))
@@ -351,8 +351,32 @@ def build_portal(repo_root: str, target_dir: str):
         if os.path.isfile(sp):
             doc_files.append(sp)
 
-    # Deduplicate while preserving order
-    doc_files = sorted(list(dict.fromkeys(doc_files)))
+    # Scrutinizer filter: reject empty stubs, placeholder text, or template scaffolds
+    FORBIDDEN_DOC_PATTERNS = [
+        re.compile(r'\btest content\b', re.IGNORECASE),
+        re.compile(r'\bTODO_OVERWRITE\b'),
+        re.compile(r'\bREPLACE_ME\b'),
+        re.compile(r'\blorem ipsum\b', re.IGNORECASE),
+    ]
+
+    def is_substantive_doc(file_path: str) -> bool:
+        try:
+            sz = os.path.getsize(file_path)
+            if sz < 60:
+                print(f"⚠️ [DOC-SCRUTINIZER] Dropping stub file (< 60b): {file_path}")
+                return False
+            with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+                content = f.read()
+            for pat in FORBIDDEN_DOC_PATTERNS:
+                if pat.search(content):
+                    print(f"⚠️ [DOC-SCRUTINIZER] Dropping file with forbidden stub marker '{pat.pattern}': {file_path}")
+                    return False
+            return True
+        except Exception:
+            return False
+
+    # Deduplicate while preserving order and applying quality scrutiny
+    doc_files = [df for df in sorted(list(dict.fromkeys(doc_files))) if is_substantive_doc(df)]
 
     # Collect and mirror all static/non-markdown files in docs/ (YAML, JSON, images, etc.)
     for root, dirs, files in os.walk(os.path.join(repo_root, "docs")):

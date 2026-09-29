@@ -3,6 +3,7 @@ package vet
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -136,6 +137,95 @@ func CheckTreePolice(root string, cfg *GatesConfig) ([]Finding, error) {
 					Severity: SeverityError,
 				})
 			}
+		}
+	}
+
+	// 6. Check documentation quality & hygiene (reject stubs, empty scratch folders, and placeholder rubbish)
+	docScanRoots := []string{"docs", "pkg", "internal"}
+	forbiddenPhrases := []string{
+		"test content",
+		"lorem ipsum",
+	}
+	for _, sr := range docScanRoots {
+		srPath := filepath.Join(root, sr)
+		if fi, err := os.Stat(srPath); err == nil && fi.IsDir() {
+			_ = filepath.WalkDir(srPath, func(path string, d fs.DirEntry, err error) error {
+				if err != nil {
+					return nil
+				}
+				rel, _ := filepath.Rel(root, path)
+				relSlash := filepath.ToSlash(rel)
+
+				// Disallow unstructured "docs" directory inside pkg/ or internal/
+				if d.IsDir() && d.Name() == "docs" && (strings.HasPrefix(relSlash, "pkg/") || strings.HasPrefix(relSlash, "internal/")) {
+					findings = append(findings, Finding{
+						CheckID:  "tree/forbidden-pkg-docs-dir",
+						Suite:    "tree_police",
+						File:     relSlash,
+						Message:  "unstructured docs directory inside package tree; package docs must reside in README.md",
+						Severity: SeverityError,
+					})
+					return nil
+				}
+
+				if d.IsDir() || !strings.HasSuffix(d.Name(), ".md") {
+					return nil
+				}
+
+				// Allow CEF scaffolding and evaluation framework docs
+				if strings.Contains(relSlash, "quality/codebase_evaluation/") {
+					return nil
+				}
+
+				info, err := d.Info()
+				if err != nil {
+					return nil
+				}
+
+				// Enforce minimum documentation substance (min 50 bytes)
+				if info.Size() < 50 {
+					findings = append(findings, Finding{
+						CheckID:  "tree/doc-stub",
+						Suite:    "tree_police",
+						File:     relSlash,
+						Message:  fmt.Sprintf("documentation file is an unacceptable stub (%d bytes; min 50 bytes required)", info.Size()),
+						Severity: SeverityError,
+					})
+					return nil
+				}
+
+				// Scan file content for placeholder strings
+				contentBytes, err := os.ReadFile(path)
+				if err != nil {
+					return nil
+				}
+				contentLower := strings.ToLower(string(contentBytes))
+				for _, phrase := range forbiddenPhrases {
+					if strings.Contains(contentLower, phrase) {
+						findings = append(findings, Finding{
+							CheckID:  "tree/doc-placeholder-rubbish",
+							Suite:    "tree_police",
+							File:     relSlash,
+							Message:  fmt.Sprintf("documentation file contains forbidden placeholder rubbish %q", phrase),
+							Severity: SeverityError,
+						})
+						break
+					}
+				}
+
+				// Check unexpanded template markers outside templates directory
+				if strings.Contains(string(contentBytes), "TODO_OVERWRITE") || strings.Contains(string(contentBytes), "REPLACE_ME") {
+					findings = append(findings, Finding{
+						CheckID:  "tree/doc-unexpanded-template",
+						Suite:    "tree_police",
+						File:     relSlash,
+						Message:  "documentation file contains unexpanded template markers (TODO_OVERWRITE / REPLACE_ME)",
+						Severity: SeverityError,
+					})
+				}
+
+				return nil
+			})
 		}
 	}
 
