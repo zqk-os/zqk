@@ -9,7 +9,12 @@ import (
 
 // ObjectSpecDomainDirs are the on-disk buckets under object specs (studio layout).
 // Community kernels may keep specs flat beside these names. Lifecycles use the same buckets.
-var ObjectSpecDomainDirs = []string{"dna", "kernel", "pm", "qa", "agent", "platform"}
+var ObjectSpecDomainDirs = []string{
+	"dna", "kernel", "pm", "qa", "agent", "platform",
+	"work", "org", "decision", "display", "evolution",
+	"interface", "library", "metric", "pipeline", "release",
+	"vocabulary", "workflow", "code-eval",
+}
 
 // domainFiles is keyed by dir+\0+fileName (closed spec/lifecycle tree). Stamp is the parent dir.
 var domainFiles stampmemo.Table[string]

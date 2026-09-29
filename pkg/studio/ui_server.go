@@ -145,10 +145,14 @@ type GraphPayload struct {
 
 // GraphNode represents an entity in the visual graph.
 type GraphNode struct {
-	ID     string `json:"id"`
-	Kind   string `json:"kind"`
-	Status string `json:"status"`
-	Title  string `json:"title"`
+	ID             string              `json:"id"`
+	Kind           string              `json:"kind"`
+	Status         string              `json:"status"`
+	Title          string              `json:"title"`
+	CreatedAt      string              `json:"createdAt,omitempty"`
+	UpdatedAt      string              `json:"updatedAt,omitempty"`
+	References     map[string][]string `json:"references,omitempty"`
+	WorkstreamRefs []string            `json:"workstreamRefs,omitempty"`
 }
 
 // GraphEdge represents a directed relationship in the visual graph.
@@ -162,9 +166,9 @@ func (s *Server) handleGraph(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	kinds := []string{
-		"mission", "vision", "goal", "roadmap", "milestone",
+		"mission", "vision", "workstream", "goal", "roadmap", "milestone",
 		"priority_plan", "backlog_item", "requirement", "criteria", "test_case",
-		"decision", "workstream", "agent_task",
+		"decision", "agent_task",
 	}
 
 	nodes := make([]GraphNode, 0)
@@ -173,11 +177,26 @@ func (s *Server) handleGraph(w http.ResponseWriter, r *http.Request) {
 
 	for _, kind := range kinds {
 		for _, node := range s.indexer.GetNodesByKind(kind) {
+			var ca, ua string
+			if !node.CreatedAt.IsZero() {
+				ca = node.CreatedAt.UTC().Format(time.RFC3339)
+			}
+			if !node.UpdatedAt.IsZero() {
+				ua = node.UpdatedAt.UTC().Format(time.RFC3339)
+			}
+			var wsRefs []string
+			if refs, ok := node.References["workstream_refs"]; ok {
+				wsRefs = refs
+			}
 			nodes = append(nodes, GraphNode{
-				ID:     node.ID,
-				Kind:   node.Kind,
-				Status: node.Status,
-				Title:  node.Title,
+				ID:             node.ID,
+				Kind:           node.Kind,
+				Status:         node.Status,
+				Title:          node.Title,
+				CreatedAt:      ca,
+				UpdatedAt:      ua,
+				References:     node.References,
+				WorkstreamRefs: wsRefs,
 			})
 
 			for rel, targets := range node.References {
@@ -213,9 +232,9 @@ func (s *Server) handleObjects(w http.ResponseWriter, r *http.Request) {
 		results = s.indexer.GetNodesByKind(kindFilter)
 	} else {
 		kinds := []string{
-			"mission", "vision", "goal", "roadmap", "milestone",
+			"mission", "vision", "workstream", "goal", "roadmap", "milestone",
 			"priority_plan", "backlog_item", "requirement", "criteria", "test_case",
-			"decision", "workstream", "agent_task",
+			"decision", "agent_task",
 		}
 		for _, k := range kinds {
 			results = append(results, s.indexer.GetNodesByKind(k)...)
@@ -265,7 +284,7 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ZQK Knowledge Kernel Studio</title>
+  <title>ZQK Knowledge Kernel Visual Studio</title>
   <style>
     :root {
       --bg: #0d1117;
@@ -283,6 +302,7 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       --purple: #a371f7;
       --teal: #39c5bb;
       --pink: #db61a2;
+      --orange: #f0883e;
     }
     * { box-sizing: border-box; }
     body {
@@ -297,72 +317,97 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       user-select: none;
     }
     header {
-      padding: 12px 20px;
+      padding: 10px 18px;
       background: var(--card-bg);
       border-bottom: 1px solid var(--border);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
       flex-shrink: 0;
+      z-index: 20;
     }
     .brand {
       display: flex;
       align-items: center;
       gap: 10px;
     }
-    .brand-icon {
-      font-size: 18px;
-    }
+    .brand-icon { font-size: 18px; }
     h1 {
       margin: 0;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
       color: var(--text-bright);
-      letter-spacing: -0.2px;
+      white-space: nowrap;
+    }
+    .view-switcher {
+      display: flex;
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 2px;
+      gap: 2px;
+    }
+    .view-tab {
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+    .view-tab:hover { color: var(--text-bright); }
+    .view-tab.active {
+      background: #21262d;
+      color: var(--accent);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
     }
     .header-controls {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
+      flex-wrap: wrap;
     }
-    .search-box {
-      position: relative;
+    .select-input {
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-bright);
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 500;
+      outline: none;
+      cursor: pointer;
     }
+    .select-input:focus { border-color: var(--accent); }
     .search-input {
       background: #0d1117;
       border: 1px solid var(--border);
       border-radius: 6px;
       color: var(--text-bright);
-      padding: 6px 12px 6px 30px;
-      font-size: 13px;
-      width: 240px;
+      padding: 5px 10px 5px 28px;
+      font-size: 12px;
+      width: 180px;
       outline: none;
-      transition: border-color 0.15s, width 0.2s;
+      transition: all 0.2s;
     }
     .search-input:focus {
       border-color: var(--accent);
-      width: 300px;
+      width: 240px;
     }
+    .search-box { position: relative; }
     .search-icon {
       position: absolute;
-      left: 10px;
+      left: 8px;
       top: 50%;
       transform: translateY(-50%);
       color: var(--text-muted);
-      font-size: 12px;
+      font-size: 11px;
       pointer-events: none;
-    }
-    .stats-badge {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      color: var(--text-muted);
-      background: #0d1117;
-      border: 1px solid var(--border);
-      padding: 5px 10px;
-      border-radius: 6px;
     }
     .status-pill {
       display: inline-flex;
@@ -370,17 +415,17 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       gap: 6px;
       background: rgba(63, 185, 80, 0.12);
       color: var(--success);
-      padding: 4px 10px;
+      padding: 4px 8px;
       border-radius: 12px;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 500;
     }
     .pulse-dot {
-      width: 7px;
-      height: 7px;
+      width: 6px;
+      height: 6px;
       background: var(--success);
       border-radius: 50%;
-      box-shadow: 0 0 8px var(--success);
+      box-shadow: 0 0 6px var(--success);
       animation: pulse 2s infinite;
     }
     @keyframes pulse {
@@ -401,28 +446,36 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       gap: 5px;
       transition: background 0.15s, border-color 0.15s;
     }
-    .btn:hover {
-      background: #30363d;
-      border-color: var(--border-bright);
-    }
+    .btn:hover { background: #30363d; border-color: var(--border-bright); }
+    .btn-sm { padding: 3px 8px; font-size: 11px; }
+    .btn-accent { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-accent:hover { background: #4090ed; }
+
     main {
       flex: 1;
       display: grid;
       grid-template-columns: 1fr 380px;
-      gap: 0;
       overflow: hidden;
       position: relative;
     }
-    .panel {
-      background: var(--bg);
+    .content-view {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      display: none;
+    }
+    .content-view.active {
       display: flex;
       flex-direction: column;
-      overflow: hidden;
-      position: relative;
     }
+
+    /* DAG Graph View */
     .panel-graph {
-      border-right: 1px solid var(--border);
       background: radial-gradient(circle at 50% 50%, #161b22 0%, #0d1117 100%);
+      flex: 1;
+      position: relative;
+      overflow: hidden;
     }
     .graph-toolbar {
       position: absolute;
@@ -431,7 +484,7 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       z-index: 10;
       display: flex;
       gap: 6px;
-      background: rgba(22, 27, 34, 0.9);
+      background: rgba(22, 27, 34, 0.92);
       backdrop-filter: blur(8px);
       padding: 4px;
       border-radius: 8px;
@@ -444,11 +497,13 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       z-index: 10;
       display: flex;
       gap: 4px;
-      background: rgba(22, 27, 34, 0.9);
+      background: rgba(22, 27, 34, 0.92);
       backdrop-filter: blur(8px);
       padding: 4px;
       border-radius: 8px;
       border: 1px solid var(--border);
+      max-width: 60%;
+      flex-wrap: wrap;
     }
     .filter-chip {
       padding: 3px 8px;
@@ -462,16 +517,32 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       background: var(--accent);
       color: #fff;
     }
+    .focus-banner {
+      position: absolute;
+      top: 56px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 12;
+      background: rgba(33, 38, 45, 0.95);
+      border: 1px solid var(--accent);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5), 0 0 12px var(--accent-glow);
+      padding: 6px 14px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--text-bright);
+    }
     .graph-canvas {
       flex: 1;
       width: 100%;
       height: 100%;
       cursor: grab;
     }
-    .graph-canvas.grabbing {
-      cursor: grabbing;
-    }
-    /* SVG graph styles */
+    .graph-canvas.grabbing { cursor: grabbing; }
+
+    /* SVG graph nodes & edges */
     .edge-line {
       fill: none;
       stroke: #30363d;
@@ -482,17 +553,14 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       stroke: var(--accent);
       stroke-width: 2.5;
     }
-    .node-group {
-      cursor: pointer;
-      transition: transform 0.15s;
-    }
+    .node-group { cursor: pointer; }
     .node-bg {
       fill: #161b22;
       stroke: #30363d;
       stroke-width: 1.5;
       rx: 8;
       ry: 8;
-      transition: stroke 0.2s, fill 0.2s, filter 0.2s;
+      transition: all 0.15s;
     }
     .node-group:hover .node-bg {
       fill: #21262d;
@@ -502,9 +570,6 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       stroke: var(--accent);
       stroke-width: 2.5;
       filter: drop-shadow(0 0 10px var(--accent-glow));
-    }
-    .node-group.dimmed {
-      opacity: 0.25;
     }
     .node-text-id {
       fill: var(--text-bright);
@@ -522,9 +587,151 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
+
+    /* Gantt / Timeline View */
+    .gantt-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      overflow: hidden;
+    }
+    .gantt-header-row {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      height: 44px;
+      flex-shrink: 0;
+    }
+    .gantt-header-title {
+      padding: 12px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-bright);
+      border-right: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .gantt-timeline-ticks {
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      padding: 0 12px;
+      position: relative;
+    }
+    .gantt-tick {
+      flex: 1;
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-muted);
+      border-left: 1px dashed var(--border);
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .gantt-body {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    .gantt-section-header {
+      background: #11151c;
+      padding: 8px 16px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .gantt-row {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      border-bottom: 1px solid rgba(48, 54, 61, 0.4);
+      min-height: 40px;
+      align-items: center;
+      transition: background 0.1s;
+      cursor: pointer;
+    }
+    .gantt-row:hover { background: rgba(88, 166, 255, 0.04); }
+    .gantt-row.selected { background: rgba(88, 166, 255, 0.08); }
+    .gantt-row-info {
+      padding: 6px 16px;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      overflow: hidden;
+    }
+    .gantt-row-title-line {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow: hidden;
+    }
+    .gantt-row-id {
+      font-size: 11px;
+      font-weight: 600;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: var(--text-bright);
+    }
+    .gantt-row-title {
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .gantt-bar-cell {
+      padding: 6px 14px;
+      position: relative;
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+    .gantt-bar {
+      height: 22px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      font-size: 10px;
+      font-weight: 600;
+      color: #fff;
+      position: absolute;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .gantt-bar:hover {
+      transform: scaleY(1.15);
+      box-shadow: 0 0 8px rgba(0,0,0,0.5);
+      z-index: 5;
+    }
+    .gantt-bar-complete {
+      background: linear-gradient(90deg, #238636 0%, #2ea043 100%);
+      border: 1px solid #3fb950;
+    }
+    .gantt-bar-inprogress {
+      background: linear-gradient(90deg, #1f6feb 0%, #388bfd 100%);
+      border: 1px solid #58a6ff;
+    }
+    .gantt-bar-planned {
+      background: #21262d;
+      border: 1px solid var(--border-bright);
+      color: var(--text-muted);
+    }
+    .gantt-bar-testing {
+      background: linear-gradient(90deg, #8957e5 0%, #a371f7 100%);
+      border: 1px solid #bc8cff;
+    }
+
     /* Right Side Panel */
     .sidebar-panel {
       background: var(--card-bg);
+      border-left: 1px solid var(--border);
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -557,9 +764,8 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       padding: 14px;
       display: none;
     }
-    .tab-content.active {
-      display: block;
-    }
+    .tab-content.active { display: block; }
+
     /* Object Card List */
     .node-card {
       padding: 10px 12px;
@@ -568,7 +774,7 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       border: 1px solid var(--border);
       border-radius: 6px;
       cursor: pointer;
-      transition: background 0.15s, border-color 0.15s, transform 0.1s;
+      transition: all 0.12s;
     }
     .node-card:hover {
       background: var(--card-hover);
@@ -593,33 +799,17 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       border-radius: 4px;
     }
     .kind-mission, .kind-vision { background: rgba(163, 113, 247, 0.2); color: var(--purple); }
+    .kind-workstream { background: rgba(240, 136, 62, 0.2); color: var(--orange); }
     .kind-goal, .kind-roadmap { background: rgba(63, 185, 80, 0.2); color: var(--success); }
     .kind-priority_plan, .kind-milestone { background: rgba(88, 166, 255, 0.2); color: var(--accent); }
-    .kind-backlog_item, .kind-workstream { background: rgba(57, 197, 187, 0.2); color: var(--teal); }
+    .kind-backlog_item { background: rgba(57, 197, 187, 0.2); color: var(--teal); }
     .kind-requirement { background: rgba(210, 153, 34, 0.2); color: var(--warning); }
     .kind-criteria { background: rgba(63, 185, 80, 0.2); color: var(--success); }
     .kind-test_case { background: rgba(219, 97, 162, 0.2); color: var(--pink); }
     .kind-default { background: #30363d; color: var(--text-muted); }
-    .status-pill-mini {
-      font-size: 10px;
-      color: var(--text-muted);
-    }
-    .node-card-id {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-bright);
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    }
-    .node-card-title {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 4px;
-      line-height: 1.4;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    /* Inspector View */
+    .status-pill-mini { font-size: 10px; color: var(--text-muted); }
+
+    /* Inspector */
     .inspector-header {
       padding-bottom: 12px;
       border-bottom: 1px solid var(--border);
@@ -632,18 +822,23 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       margin-top: 8px;
     }
     .inspector-id {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       color: var(--text-bright);
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
       word-break: break-all;
     }
     .inspector-title {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 500;
       color: var(--text);
       margin-top: 6px;
       line-height: 1.4;
+    }
+    .inspector-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
     }
     .section-title {
       font-size: 11px;
@@ -691,10 +886,7 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       text-align: center;
       color: var(--text-muted);
     }
-    .empty-state-icon {
-      font-size: 32px;
-      margin-bottom: 8px;
-    }
+    .empty-state-icon { font-size: 32px; margin-bottom: 8px; }
     .empty-state-title {
       font-size: 14px;
       font-weight: 600;
@@ -709,59 +901,106 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       <span class="brand-icon">⚡</span>
       <h1>ZQK Knowledge Kernel Visual Studio</h1>
     </div>
+
+    <!-- View Mode Switcher -->
+    <div class="view-switcher">
+      <div class="view-tab active" id="tab-nav-dag" onclick="switchMainView('dag')">☊ DAG Graph</div>
+      <div class="view-tab" id="tab-nav-gantt" onclick="switchMainView('gantt')">▤ Timeline & Gantt</div>
+    </div>
+
     <div class="header-controls">
+      <!-- Workstream Filter Dropdown -->
+      <select id="workstream-filter" class="select-input" onchange="onWorkstreamChange()" title="Filter by Workstream">
+        <option value="all">🌐 All Workstreams</option>
+      </select>
+
+      <!-- Density Filter -->
+      <select id="density-filter" class="select-input" onchange="onDensityChange()" title="Control Graph Density">
+        <option value="backbone" selected>Backbone (Plans & Milestones)</option>
+        <option value="execution">Execution (+ Backlog Items)</option>
+        <option value="all">Full Mesh (All Objects)</option>
+      </select>
+
       <div class="search-box">
         <span class="search-icon">🔍</span>
-        <input type="text" id="global-search" class="search-input" placeholder="Search DAG (press /) ...">
+        <input type="text" id="global-search" class="search-input" placeholder="Search (press /) ...">
       </div>
-      <div class="stats-badge">
-        <span id="stat-nodes">0 Nodes</span>
-        <span>•</span>
-        <span id="stat-edges">0 Edges</span>
-      </div>
+
       <div class="status-pill" id="live-indicator">
         <span class="pulse-dot"></span>
         <span>Connected</span>
       </div>
+
       <button class="btn" id="btn-refresh" onclick="loadDAG()">⟳ Refresh</button>
     </div>
   </header>
 
   <main>
-    <!-- Left: Interactive Graph Canvas -->
-    <div class="panel panel-graph">
-      <div class="panel-header" style="display:none;" id="dag-panel-title">Interactive Knowledge Graph DAG</div>
-      <div class="graph-toolbar">
-        <button class="btn" onclick="zoomIn()" title="Zoom In">+</button>
-        <button class="btn" onclick="zoomOut()" title="Zoom Out">-</button>
-        <button class="btn" onclick="resetZoom()" title="Reset Zoom">⟲</button>
-        <button class="btn" onclick="fitGraph()" title="Fit to Screen">⛶</button>
+    <!-- View 1: Interactive DAG Graph -->
+    <div class="content-view active" id="view-dag">
+      <div class="panel-graph" id="graph-panel">
+        <div class="panel-header" style="display:none;" id="dag-panel-title">Interactive Knowledge Graph DAG</div>
+
+        <!-- Zoom Controls -->
+        <div class="graph-toolbar">
+          <button class="btn" onclick="zoomIn()" title="Zoom In">+</button>
+          <button class="btn" onclick="zoomOut()" title="Zoom Out">-</button>
+          <button class="btn" onclick="resetZoom()" title="Reset Zoom">⟲</button>
+          <button class="btn" onclick="fitGraph()" title="Fit to Screen">⛶</button>
+        </div>
+
+        <!-- Focus Subgraph Banner -->
+        <div id="focus-banner" class="focus-banner" style="display:none;">
+          <span id="focus-banner-text">🎯 Focused Subgraph: </span>
+          <button class="btn btn-sm btn-accent" onclick="clearFocus()">✕ Show All</button>
+        </div>
+
+        <!-- Kind Filter Chips -->
+        <div class="filter-bar" id="kind-filters">
+          <span class="filter-chip active" data-kind="all" onclick="filterKind('all')">All</span>
+          <span class="filter-chip" data-kind="workstream" onclick="filterKind('workstream')">Workstreams</span>
+          <span class="filter-chip" data-kind="goal" onclick="filterKind('goal')">Goals</span>
+          <span class="filter-chip" data-kind="priority_plan" onclick="filterKind('priority_plan')">Plans</span>
+          <span class="filter-chip" data-kind="milestone" onclick="filterKind('milestone')">Milestones</span>
+          <span class="filter-chip" data-kind="backlog_item" onclick="filterKind('backlog_item')">BLIs</span>
+        </div>
+
+        <svg id="dag-svg" class="graph-canvas">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#484f58" />
+            </marker>
+            <marker id="arrow-highlight" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#58a6ff" />
+            </marker>
+          </defs>
+          <g id="viewport">
+            <g id="edges-layer"></g>
+            <g id="nodes-layer"></g>
+          </g>
+        </svg>
       </div>
-      <div class="filter-bar" id="kind-filters">
-        <span class="filter-chip active" data-kind="all" onclick="filterKind('all')">All</span>
-        <span class="filter-chip" data-kind="goal" onclick="filterKind('goal')">Goals</span>
-        <span class="filter-chip" data-kind="priority_plan" onclick="filterKind('priority_plan')">Plans</span>
-        <span class="filter-chip" data-kind="backlog_item" onclick="filterKind('backlog_item')">BLIs</span>
-        <span class="filter-chip" data-kind="requirement" onclick="filterKind('requirement')">Reqs</span>
-        <span class="filter-chip" data-kind="criteria" onclick="filterKind('criteria')">Crits</span>
-      </div>
-      <svg id="dag-svg" class="graph-canvas">
-        <defs>
-          <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-            <path d="M 0 1 L 10 5 L 0 9 z" fill="#484f58" />
-          </marker>
-          <marker id="arrow-highlight" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-            <path d="M 0 1 L 10 5 L 0 9 z" fill="#58a6ff" />
-          </marker>
-        </defs>
-        <g id="viewport">
-          <g id="edges-layer"></g>
-          <g id="nodes-layer"></g>
-        </g>
-      </svg>
     </div>
 
-    <!-- Right: Multi-Tab Sidebar -->
+    <!-- View 2: Timeline & Gantt View -->
+    <div class="content-view" id="view-gantt">
+      <div class="gantt-container">
+        <div class="gantt-header-row">
+          <div class="gantt-header-title">
+            <span>Workstream & Execution Plan</span>
+            <span id="gantt-task-count" style="font-size: 11px; color: var(--text-muted);">0 items</span>
+          </div>
+          <div class="gantt-timeline-ticks" id="gantt-timeline-ticks">
+            <!-- Dynamic date ticks -->
+          </div>
+        </div>
+        <div class="gantt-body" id="gantt-body">
+          <!-- Dynamic grouped rows -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Multi-Tab Sidebar (Shared) -->
     <div class="sidebar-panel">
       <div class="tab-bar">
         <div class="tab-btn active" id="tab-btn-inspector" onclick="switchTab('inspector')">Inspector</div>
@@ -774,7 +1013,7 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
           <div class="empty-state">
             <div class="empty-state-icon">🎯</div>
             <div class="empty-state-title">No Object Selected</div>
-            <div style="font-size: 12px; margin-top: 4px;">Click any node in the DAG or select an object from the list to view provenance lineage.</div>
+            <div style="font-size: 12px; margin-top: 4px;">Click any item in the DAG or Gantt timeline to inspect its causal dependencies.</div>
           </div>
         </div>
       </div>
@@ -793,7 +1032,11 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
     let graphData = { nodes: [], edges: [] };
     let filteredNodes = [];
     let selectedNodeId = null;
+    let focusedNodeId = null; // Causal subgraph focus
     let activeKindFilter = 'all';
+    let activeWorkstreamFilter = 'all';
+    let activeDensity = 'backbone'; // 'backbone', 'execution', 'all'
+    let currentMainView = 'dag'; // 'dag' or 'gantt'
     let searchQuery = '';
 
     // Transform state
@@ -804,9 +1047,7 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
     let panStartX = 0;
     let panStartY = 0;
 
-    // Node layout positions: nodeId -> { x, y, width, height }
     let nodePositions = new Map();
-
     const svg = document.getElementById('dag-svg');
     const viewport = document.getElementById('viewport');
     const nodesLayer = document.getElementById('nodes-layer');
@@ -816,8 +1057,8 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       viewport.setAttribute('transform', 'translate(' + translateX + ',' + translateY + ') scale(' + scale + ')');
     }
 
-    function zoomIn() { scale = Math.min(scale * 1.25, 3.0); updateTransform(); }
-    function zoomOut() { scale = Math.max(scale / 1.25, 0.2); updateTransform(); }
+    function zoomIn() { scale = Math.min(scale * 1.25, 3.5); updateTransform(); }
+    function zoomOut() { scale = Math.max(scale / 1.25, 0.15); updateTransform(); }
     function resetZoom() { scale = 1.0; translateX = 40; translateY = 40; updateTransform(); }
 
     function fitGraph() {
@@ -865,7 +1106,7 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       const rect = svg.getBoundingClientRect();
       const mouseX = e.clientX - rect.left;
       const mouseY = e.clientY - rect.top;
-      const newScale = Math.min(Math.max(scale * zoomFactor, 0.15), 3.5);
+      const newScale = Math.min(Math.max(scale * zoomFactor, 0.1), 4.0);
       translateX = mouseX - (mouseX - translateX) * (newScale / scale);
       translateY = mouseY - (mouseY - translateY) * (newScale / scale);
       scale = newScale;
@@ -879,9 +1120,7 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
         document.getElementById('global-search').focus();
       }
       if (e.key === 'Escape') {
-        selectedNodeId = null;
-        renderGraph();
-        renderObjectsList();
+        clearFocus();
       }
     });
 
@@ -889,6 +1128,29 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       searchQuery = e.target.value.toLowerCase().trim();
       applyFilters();
     });
+
+    function switchMainView(view) {
+      currentMainView = view;
+      document.getElementById('tab-nav-dag').classList.toggle('active', view === 'dag');
+      document.getElementById('tab-nav-gantt').classList.toggle('active', view === 'gantt');
+      document.getElementById('view-dag').classList.toggle('active', view === 'dag');
+      document.getElementById('view-gantt').classList.toggle('active', view === 'gantt');
+      if (view === 'gantt') {
+        renderGantt();
+      } else {
+        fitGraph();
+      }
+    }
+
+    function onWorkstreamChange() {
+      activeWorkstreamFilter = document.getElementById('workstream-filter').value;
+      applyFilters();
+    }
+
+    function onDensityChange() {
+      activeDensity = document.getElementById('density-filter').value;
+      applyFilters();
+    }
 
     function filterKind(k) {
       activeKindFilter = k;
@@ -908,9 +1170,10 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
     function getKindColor(kind) {
       switch(kind) {
         case 'mission': case 'vision': return 'var(--purple)';
+        case 'workstream': return 'var(--orange)';
         case 'goal': case 'roadmap': return 'var(--success)';
         case 'priority_plan': case 'milestone': return 'var(--accent)';
-        case 'backlog_item': case 'workstream': return 'var(--teal)';
+        case 'backlog_item': return 'var(--teal)';
         case 'requirement': return 'var(--warning)';
         case 'criteria': return 'var(--success)';
         case 'test_case': return 'var(--pink)';
@@ -921,14 +1184,81 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
     function getKindTier(kind) {
       switch(kind) {
         case 'mission': case 'vision': return 0;
-        case 'goal': case 'roadmap': return 1;
-        case 'milestone': case 'priority_plan': return 2;
-        case 'backlog_item': case 'workstream': return 3;
-        case 'requirement': return 4;
-        case 'criteria': return 5;
-        case 'test_case': return 6;
-        default: return 3;
+        case 'workstream': return 1;
+        case 'goal': case 'roadmap': return 2;
+        case 'milestone': case 'priority_plan': return 3;
+        case 'backlog_item': return 4;
+        case 'requirement': return 5;
+        case 'criteria': return 6;
+        case 'test_case': return 7;
+        default: return 4;
       }
+    }
+
+    // Causal Subgraph Isolation
+    function focusNode(nodeId) {
+      focusedNodeId = nodeId;
+      const banner = document.getElementById('focus-banner');
+      const text = document.getElementById('focus-banner-text');
+      banner.style.display = 'flex';
+      text.textContent = '🎯 Focused Subgraph: ' + nodeId;
+      applyFilters();
+      fitGraph();
+    }
+
+    function clearFocus() {
+      focusedNodeId = null;
+      document.getElementById('focus-banner').style.display = 'none';
+      applyFilters();
+    }
+
+    function getCausalSubtreeNodeIds(centerId) {
+      const activeIds = new Set();
+      activeIds.add(centerId);
+
+      // Build adjacency maps
+      const outgoing = new Map(); // id -> set of target ids
+      const incoming = new Map(); // id -> set of source ids
+
+      graphData.edges.forEach(e => {
+        if (!outgoing.has(e.source)) outgoing.set(e.source, new Set());
+        outgoing.get(e.source).add(e.target);
+
+        if (!incoming.has(e.target)) incoming.set(e.target, new Set());
+        incoming.get(e.target).add(e.source);
+      });
+
+      // BFS upstream (ancestors)
+      let queue = [centerId];
+      while (queue.length > 0) {
+        const cur = queue.shift();
+        const parents = incoming.get(cur);
+        if (parents) {
+          parents.forEach(p => {
+            if (!activeIds.has(p)) {
+              activeIds.add(p);
+              queue.push(p);
+            }
+          });
+        }
+      }
+
+      // BFS downstream (descendants)
+      queue = [centerId];
+      while (queue.length > 0) {
+        const cur = queue.shift();
+        const children = outgoing.get(cur);
+        if (children) {
+          children.forEach(c => {
+            if (!activeIds.has(c)) {
+              activeIds.add(c);
+              queue.push(c);
+            }
+          });
+        }
+      }
+
+      return activeIds;
     }
 
     async function loadDAG() {
@@ -939,11 +1269,9 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
         if (!graphData.nodes) graphData.nodes = [];
         if (!graphData.edges) graphData.edges = [];
 
-        document.getElementById('stat-nodes').textContent = graphData.nodes.length + ' Nodes';
-        document.getElementById('stat-edges').textContent = graphData.edges.length + ' Edges';
-        document.getElementById('objects-count').textContent = graphData.nodes.length;
-
+        populateWorkstreamsDropdown();
         applyFilters();
+
         if (graphData.nodes.length > 0 && !selectedNodeId) {
           selectNode(graphData.nodes[0].id, false);
         }
@@ -952,35 +1280,80 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       }
     }
 
+    function populateWorkstreamsDropdown() {
+      const select = document.getElementById('workstream-filter');
+      const wsNodes = graphData.nodes.filter(n => n.kind === 'workstream');
+      const current = select.value;
+
+      select.innerHTML = '<option value="all">🌐 All Workstreams</option>' +
+        wsNodes.map(w => '<option value="' + w.id + '">' + w.id + ' (' + (w.title || w.kind) + ')</option>').join('');
+
+      if (current && wsNodes.some(w => w.id === current)) {
+        select.value = current;
+      }
+    }
+
     function applyFilters() {
+      // 1. Causal Subgraph Isolation
+      let focusSet = null;
+      if (focusedNodeId) {
+        focusSet = getCausalSubtreeNodeIds(focusedNodeId);
+      }
+
       filteredNodes = graphData.nodes.filter(n => {
+        // Subgraph focus takes priority
+        if (focusSet && !focusSet.has(n.id)) return false;
+
+        // Workstream Filter
+        if (activeWorkstreamFilter !== 'all') {
+          const isWS = n.id === activeWorkstreamFilter;
+          const refsWS = n.workstreamRefs && n.workstreamRefs.includes(activeWorkstreamFilter);
+          if (!isWS && !refsWS) return false;
+        }
+
+        // Density Filter
+        if (!focusedNodeId) {
+          const tier = getKindTier(n.kind);
+          if (activeDensity === 'backbone' && tier > 3) return false;
+          if (activeDensity === 'execution' && tier > 4) return false;
+        }
+
+        // Kind Filter Pill
         const matchKind = activeKindFilter === 'all' || n.kind === activeKindFilter;
+        if (!matchKind) return false;
+
+        // Search Filter
         const matchSearch = !searchQuery ||
           n.id.toLowerCase().includes(searchQuery) ||
           (n.title && n.title.toLowerCase().includes(searchQuery)) ||
           n.kind.toLowerCase().includes(searchQuery);
-        return matchKind && matchSearch;
+
+        return matchSearch;
       });
+
+      document.getElementById('objects-count').textContent = filteredNodes.length;
 
       calculateLayout();
       renderGraph();
       renderObjectsList();
+      if (currentMainView === 'gantt') {
+        renderGantt();
+      }
     }
 
     function calculateLayout() {
       nodePositions.clear();
-      const tiers = [[], [], [], [], [], [], []];
+      const tiers = [[], [], [], [], [], [], [], []];
       const NODE_WIDTH = 220;
       const NODE_HEIGHT = 68;
       const COL_GAP = 90;
       const ROW_GAP = 28;
 
       filteredNodes.forEach(node => {
-        const t = Math.min(getKindTier(node.kind), 6);
+        const t = Math.min(getKindTier(node.kind), 7);
         tiers[t].push(node);
       });
 
-      // Filter out empty tiers for tighter column alignment
       let colIndex = 0;
       tiers.forEach((tierNodes) => {
         if (tierNodes.length === 0) return;
@@ -998,13 +1371,16 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       edgesLayer.innerHTML = '';
 
       if (filteredNodes.length === 0) {
-        nodesLayer.innerHTML = '<text x="100" y="100" fill="var(--text-muted)" font-size="14">No nodes match the active filter or search query.</text>';
+        nodesLayer.innerHTML = '<text x="60" y="100" fill="var(--text-muted)" font-size="14">No nodes match the active filter or focus criteria.</text>';
         return;
       }
+
+      const activeSet = new Set(filteredNodes.map(n => n.id));
 
       // Draw Edges
       const renderedEdges = new Set();
       graphData.edges.forEach(edge => {
+        if (!activeSet.has(edge.source) || !activeSet.has(edge.target)) return;
         const p1 = nodePositions.get(edge.source);
         const p2 = nodePositions.get(edge.target);
         if (!p1 || !p2) return;
@@ -1021,15 +1397,8 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
 
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         path.setAttribute('d', 'M ' + x1 + ' ' + y1 + ' C ' + (x1 + dx) + ' ' + y1 + ', ' + (x2 - dx) + ' ' + y2 + ', ' + x2 + ' ' + y2);
-        path.setAttribute('class', 'edge-line');
-        path.setAttribute('marker-end', 'url(#arrow)');
-        path.setAttribute('data-source', edge.source);
-        path.setAttribute('data-target', edge.target);
-
-        if (selectedNodeId && (edge.source === selectedNodeId || edge.target === selectedNodeId)) {
-          path.classList.add('highlight');
-          path.setAttribute('marker-end', 'url(#arrow-highlight)');
-        }
+        path.setAttribute('class', 'edge-line' + ((selectedNodeId && (edge.source === selectedNodeId || edge.target === selectedNodeId)) ? ' highlight' : ''));
+        path.setAttribute('marker-end', (selectedNodeId && (edge.source === selectedNodeId || edge.target === selectedNodeId)) ? 'url(#arrow-highlight)' : 'url(#arrow)');
 
         edgesLayer.appendChild(path);
       });
@@ -1050,9 +1419,7 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
         rect.setAttribute('class', 'node-bg');
         rect.setAttribute('width', pos.width);
         rect.setAttribute('height', pos.height);
-        rect.setAttribute('style', 'border-left: 4px solid ' + color);
 
-        // Accent indicator bar on left
         const bar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
         bar.setAttribute('x', 0);
         bar.setAttribute('y', 0);
@@ -1061,7 +1428,6 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
         bar.setAttribute('fill', color);
         bar.setAttribute('rx', 2);
 
-        // Kind badge
         const kindText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         kindText.setAttribute('x', 14);
         kindText.setAttribute('y', 18);
@@ -1069,7 +1435,6 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
         kindText.setAttribute('fill', color);
         kindText.textContent = node.kind.replace('_', ' ');
 
-        // Status pill text
         const statusText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         statusText.setAttribute('x', pos.width - 12);
         statusText.setAttribute('y', 18);
@@ -1078,14 +1443,12 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
         statusText.setAttribute('fill', 'var(--text-muted)');
         statusText.textContent = node.status || '';
 
-        // ID Text
         const idText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         idText.setAttribute('x', 14);
         idText.setAttribute('y', 36);
         idText.setAttribute('class', 'node-text-id');
         idText.textContent = node.id.length > 24 ? node.id.slice(0, 22) + '…' : node.id;
 
-        // Title Text
         const titleText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         titleText.setAttribute('x', 14);
         titleText.setAttribute('y', 52);
@@ -1103,9 +1466,127 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
         g.addEventListener('click', (e) => {
           e.stopPropagation();
           selectNode(node.id, true);
+          // Auto-focus on click: isolate subgraph
+          focusNode(node.id);
         });
 
         nodesLayer.appendChild(g);
+      });
+    }
+
+    // Gantt / Timeline Renderer
+    function renderGantt() {
+      const body = document.getElementById('gantt-body');
+      const ticks = document.getElementById('gantt-timeline-ticks');
+      body.innerHTML = '';
+      ticks.innerHTML = '';
+
+      // Collect execution items: workstreams, priority plans, milestones, backlog items
+      const validKinds = new Set(['workstream', 'milestone', 'priority_plan', 'backlog_item']);
+      const items = filteredNodes.filter(n => validKinds.has(n.kind));
+      document.getElementById('gantt-task-count').textContent = items.length + ' items';
+
+      if (items.length === 0) {
+        body.innerHTML = '<div style="padding: 40px; color: var(--text-muted); text-align: center;">No execution items to display in timeline. Switch to "Full Mesh" or select "All Workstreams".</div>';
+        return;
+      }
+
+      // Timeline scale: 6 dynamic checkpoints
+      const tickLabels = ['Stage 1: Inception', 'Stage 2: Objectives', 'Stage 3: Planning', 'Stage 4: Execution', 'Stage 5: Verification', 'Stage 6: Done'];
+      ticks.innerHTML = tickLabels.map(t => '<div class="gantt-tick">' + t + '</div>').join('');
+
+      // Group items by Workstream or Milestone
+      const groups = new Map();
+      const unassigned = [];
+
+      items.forEach(item => {
+        let ws = (item.workstreamRefs && item.workstreamRefs[0]) || (item.kind === 'workstream' ? item.id : null);
+        if (!ws && item.kind === 'milestone') ws = 'Milestones';
+        if (ws) {
+          if (!groups.has(ws)) groups.set(ws, []);
+          groups.get(ws).push(item);
+        } else {
+          unassigned.push(item);
+        }
+      });
+      if (unassigned.length > 0) groups.set('General Tasks', unassigned);
+
+      // Render rows
+      groups.forEach((groupItems, groupName) => {
+        const header = document.createElement('div');
+        header.className = 'gantt-section-header';
+        header.innerHTML = '<span>⚡ ' + groupName + '</span> <span style="font-size: 11px; font-weight: normal; color: var(--text-muted);">(' + groupItems.length + ' tasks)</span>';
+        body.appendChild(header);
+
+        groupItems.forEach(item => {
+          const row = document.createElement('div');
+          row.className = 'gantt-row' + (item.id === selectedNodeId ? ' selected' : '');
+
+          const kindClass = 'kind-' + item.kind;
+
+          // Left info cell
+          const info = document.createElement('div');
+          info.className = 'gantt-row-info';
+          info.innerHTML =
+            '<div class="gantt-row-title-line">' +
+              '<span class="kind-pill ' + kindClass + '">' + item.kind.replace('_', ' ') + '</span>' +
+              '<span class="gantt-row-id">' + item.id + '</span>' +
+            '</div>' +
+            '<div class="gantt-row-title">' + (item.title || '') + '</div>';
+
+          // Right timeline bar cell
+          const cell = document.createElement('div');
+          cell.className = 'gantt-bar-cell';
+
+          // Position calculation based on kind tier & status
+          let leftPercent = 5;
+          let widthPercent = 30;
+          const status = (item.status || 'planned').toLowerCase();
+
+          if (item.kind === 'workstream') {
+            leftPercent = 2;
+            widthPercent = 95;
+          } else if (item.kind === 'milestone') {
+            leftPercent = 10;
+            widthPercent = 75;
+          } else if (item.kind === 'priority_plan') {
+            leftPercent = 25;
+            widthPercent = 60;
+          } else {
+            // Backlog Item
+            if (status === 'complete') {
+              leftPercent = 20;
+              widthPercent = 75;
+            } else if (status === 'in_progress') {
+              leftPercent = 45;
+              widthPercent = 35;
+            } else {
+              leftPercent = 60;
+              widthPercent = 30;
+            }
+          }
+
+          let barClass = 'gantt-bar-planned';
+          if (status === 'complete' || status === 'verified') barClass = 'gantt-bar-complete';
+          else if (status === 'in_progress' || status === 'active') barClass = 'gantt-bar-inprogress';
+          else if (status === 'testing' || status === 'metrics_captured') barClass = 'gantt-bar-testing';
+
+          const bar = document.createElement('div');
+          bar.className = 'gantt-bar ' + barClass;
+          bar.style.left = leftPercent + '%';
+          bar.style.width = widthPercent + '%';
+          bar.textContent = status.replace('_', ' ');
+
+          cell.appendChild(bar);
+          row.appendChild(info);
+          row.appendChild(cell);
+
+          row.addEventListener('click', () => {
+            selectNode(item.id, true);
+          });
+
+          body.appendChild(row);
+        });
       });
     }
 
@@ -1119,7 +1600,7 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       container.innerHTML = filteredNodes.map(n => {
         const isSel = n.id === selectedNodeId;
         const kindClass = 'kind-' + n.kind;
-        return '<div class="node-card' + (isSel ? ' selected' : '') + '" onclick="selectNode(\'' + n.id + '\', true)">' +
+        return '<div class="node-card' + (isSel ? ' selected' : '') + '" onclick="selectNode('' + n.id + '', true)">' +
           '<div class="node-card-top">' +
             '<span class="kind-pill ' + kindClass + '">' + n.kind.replace('_', ' ') + '</span>' +
             '<span class="status-pill-mini">' + (n.status || '') + '</span>' +
@@ -1134,6 +1615,7 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       selectedNodeId = nodeId;
       renderGraph();
       renderObjectsList();
+      if (currentMainView === 'gantt') renderGantt();
       switchTab('inspector');
 
       const inspector = document.getElementById('inspector-content');
@@ -1145,7 +1627,7 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
         const node = await res.json();
         renderInspector(node);
 
-        if (panTo) {
+        if (panTo && currentMainView === 'dag') {
           const pos = nodePositions.get(nodeId);
           if (pos) {
             const rect = svg.getBoundingClientRect();
@@ -1155,7 +1637,6 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
           }
         }
       } catch (err) {
-        // Fallback to graph node info
         const gNode = graphData.nodes.find(n => n.id === nodeId);
         if (gNode) renderInspector(gNode);
       }
@@ -1170,7 +1651,7 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
         for (const [rel, targets] of Object.entries(node.references)) {
           refsHTML += '<div class="section-title">' + rel.replace('_', ' ') + '</div><div>';
           targets.forEach(targetId => {
-            refsHTML += '<span class="ref-chip" onclick="selectNode(\'' + targetId + '\', true)">↗ ' + targetId + '</span>';
+            refsHTML += '<span class="ref-chip" onclick="selectNode('' + targetId + '', true); focusNode('' + targetId + '');">↗ ' + targetId + '</span>';
           });
           refsHTML += '</div>';
         }
@@ -1184,9 +1665,12 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
           '</div>' +
           '<div class="inspector-id-row">' +
             '<span class="inspector-id">' + node.id + '</span>' +
-            '<button class="btn" onclick="navigator.clipboard.writeText(\'' + node.id + '\')">Copy</button>' +
+            '<button class="btn btn-sm" onclick="navigator.clipboard.writeText('' + node.id + '')">Copy</button>' +
           '</div>' +
           (node.title ? '<div class="inspector-title">' + node.title + '</div>' : '') +
+          '<div class="inspector-actions">' +
+            '<button class="btn btn-sm btn-accent" onclick="focusNode('' + node.id + ''); switchMainView('dag');">🎯 Focus Subgraph</button>' +
+          '</div>' +
         '</div>' +
         refsHTML +
         '<div class="section-title">Attributes</div>' +

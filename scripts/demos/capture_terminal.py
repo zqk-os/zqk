@@ -2,6 +2,7 @@
 """
 Terminal Session Capture & High-Fidelity SVG/PNG Screenshot Generator
 Captures terminal output from demo runs and converts it to a styled SVG terminal window.
+Ensures 100% XML 1.0 validation conformance (zero unescaped control codes or invalid PCDATA).
 Also supports macOS native screencapture when running in desktop environments.
 """
 
@@ -13,6 +14,7 @@ import re
 import select
 import subprocess
 import sys
+import xml.etree.ElementTree as ET
 
 # ANSI SGR color mapping (Catppuccin Mocha / Modern Dark palette)
 COLOR_MAP = {
@@ -34,25 +36,46 @@ COLOR_MAP = {
     97: "#ffffff",  # bright white
 }
 
-ANSI_REGEX = re.compile(r'\x1b\[([0-9;]*)m')
+# Regex for stripping non-SGR terminal sequences (CSI commands, clear screen, cursor controls, OSC titles)
+NON_SGR_REGEX = re.compile(r'\x1b(\[[0-9;?]*[A-Za-ln-z]|\][^\x07\x1b]*(\x07|\x1b\\)|[()][AB012]|[@-Z\\-_])')
+
+# Regex for matching SGR color/style sequences
+ANSI_SGR_REGEX = re.compile(r'\x1b\[([0-9;]*)m')
+
+
+def clean_xml_chars(text: str) -> str:
+    """Filters out any characters that are illegal in XML 1.0 documents (e.g. byte 27 ESC)."""
+    return "".join(
+        c for c in text
+        if c in ("\t", "\n", "\r")
+        or (0x20 <= ord(c) <= 0xD7FF)
+        or (0xE000 <= ord(c) <= 0xFFFD)
+        or (0x10000 <= ord(c) <= 0x10FFFF)
+    )
 
 
 def strip_ansi(text: str) -> str:
-    return ANSI_REGEX.sub('', text)
+    text = NON_SGR_REGEX.sub('', text)
+    text = ANSI_SGR_REGEX.sub('', text)
+    return clean_xml_chars(text)
 
 
 def ansi_to_svg_spans(line: str) -> str:
-    """Converts a line of ANSI-colored text into SVG tspans."""
+    """Converts a line of ANSI-colored text into strict XML-valid SVG tspans."""
+    # 1. Strip all non-SGR sequences (clearing screen, cursor moves, OSC)
+    line = NON_SGR_REGEX.sub('', line)
+
     result = []
     current_color = None
     is_bold = False
     is_dim = False
 
     last_idx = 0
-    for match in ANSI_REGEX.finditer(line):
+    for match in ANSI_SGR_REGEX.finditer(line):
         text_chunk = line[last_idx:match.start()]
         if text_chunk:
-            escaped = html.escape(text_chunk)
+            # Escape HTML entities, then strip any characters illegal in XML
+            escaped = clean_xml_chars(html.escape(text_chunk))
             attrs = []
             if current_color:
                 attrs.append(f'fill="{current_color}"')
@@ -62,7 +85,8 @@ def ansi_to_svg_spans(line: str) -> str:
                 attrs.append('opacity="0.65"')
 
             if attrs:
-                result.append(f'<tspan {" ".join(attrs)}>{escaped}</tspan>')
+                attr_str = " ".join(attrs)
+                result.append(f'<tspan {attr_str}>{escaped}</tspan>')
             else:
                 result.append(escaped)
 
@@ -88,10 +112,10 @@ def ansi_to_svg_spans(line: str) -> str:
 
         last_idx = match.end()
 
-    # Remaining text
+    # Remaining text chunk
     text_chunk = line[last_idx:]
     if text_chunk:
-        escaped = html.escape(text_chunk)
+        escaped = clean_xml_chars(html.escape(text_chunk))
         attrs = []
         if current_color:
             attrs.append(f'fill="{current_color}"')
@@ -100,7 +124,8 @@ def ansi_to_svg_spans(line: str) -> str:
         if is_dim:
             attrs.append('opacity="0.65"')
         if attrs:
-            result.append(f'<tspan {" ".join(attrs)}>{escaped}</tspan>')
+            attr_str = " ".join(attrs)
+            result.append(f'<tspan {attr_str}>{escaped}</tspan>')
         else:
             result.append(escaped)
 
@@ -143,24 +168,24 @@ def render_svg(lines: list, title: str = "zqk terminal", width: int = 960) -> st
         '    </filter>',
         '  </defs>',
         '',
-        f'  <!-- Terminal Window Background -->',
+        '  <!-- Terminal Window Background -->',
         f'  <rect x="4" y="4" width="{width - 8}" height="{total_height - 8}" class="window-bg" filter="url(#shadow)" stroke="#313244" stroke-width="1"/>',
         '',
-        f'  <!-- Title Bar -->',
+        '  <!-- Title Bar -->',
         f'  <path d="M 4 16 A 12 12 0 0 1 16 4 L {width - 16} 4 A 12 12 0 0 1 {width - 4} 16 L {width - 4} {top_bar_height} L 4 {top_bar_height} Z" class="top-bar"/>',
-        '  <line x1="4" y1="' + str(top_bar_height) + f'" x2="{width - 4}" y2="{top_bar_height}" stroke="#313244" stroke-width="1"/>',
+        f'  <line x1="4" y1="{top_bar_height}" x2="{width - 4}" y2="{top_bar_height}" stroke="#313244" stroke-width="1"/>',
         '',
         '  <!-- Window Buttons -->',
         '  <circle cx="24" cy="23" r="6" class="dot-red"/>',
         '  <circle cx="44" cy="23" r="6" class="dot-yellow"/>',
         '  <circle cx="64" cy="23" r="6" class="dot-green"/>',
         '',
-        f'  <!-- Window Title -->',
-        f'  <text x="{width / 2}" y="27" class="title-text">{html.escape(title)}</text>',
+        '  <!-- Window Title -->',
+        f'  <text x="{width / 2}" y="27" class="title-text">{clean_xml_chars(html.escape(title))}</text>',
         '',
-        f'  <!-- Terminal Text Content -->',
+        '  <!-- Terminal Text Content -->',
         f'  <g transform="translate({padding_x}, {top_bar_height + padding_y})">',
-        f'    <text class="term-text">'
+        '    <text class="term-text">'
     ]
 
     for idx, raw_line in enumerate(displayed_lines):
@@ -174,7 +199,15 @@ def render_svg(lines: list, title: str = "zqk terminal", width: int = 960) -> st
         '</svg>'
     ])
 
-    return '\n'.join(svg_parts)
+    svg_content = '\n'.join(svg_parts)
+
+    # Strictly validate XML conformance before returning
+    try:
+        ET.fromstring(svg_content)
+    except ET.ParseError as err:
+        raise RuntimeError(f"Generated SVG failed XML validation: {err}") from err
+
+    return svg_content
 
 
 def run_and_capture(cmd: list, output_svg: str, title: str, capture_native_png: bool = False, output_png: str = None):
@@ -228,19 +261,18 @@ def run_and_capture(cmd: list, output_svg: str, title: str, capture_native_png: 
 
     # Reconstruct raw output lines
     full_output = ''.join(captured_chunks)
-    # Normalize CRLF and remove trailing spaces
     raw_lines = [line.rstrip() for line in full_output.replace('\r\n', '\n').replace('\r', '\n').split('\n')]
     
-    # Filter out initial clear screen ansi or empty prefix lines
-    while raw_lines and not raw_lines[0].strip():
+    # Filter out initial empty lines
+    while raw_lines and not strip_ansi(raw_lines[0]).strip():
         raw_lines.pop(0)
 
-    # Render SVG
+    # Render and validate SVG
     os.makedirs(os.path.dirname(os.path.abspath(output_svg)), exist_ok=True)
     svg_content = render_svg(raw_lines, title=title)
     with open(output_svg, 'w', encoding='utf-8') as f:
         f.write(svg_content)
-    print(f"\n\x1b[1;32m✔ Terminal screenshot saved:\x1b[0m {output_svg}")
+    print(f"\n\x1b[1;32m✔ Terminal screenshot saved (XML validated):\x1b[0m {output_svg}")
 
     # If requested and on macOS, also capture native window screenshot
     if capture_native_png and output_png:
@@ -255,17 +287,33 @@ def run_and_capture(cmd: list, output_svg: str, title: str, capture_native_png: 
     return exit_code
 
 
+def validate_svg_file(path: str) -> bool:
+    """Validates an SVG file against the standard XML parser."""
+    try:
+        ET.parse(path)
+        return True
+    except ET.ParseError as err:
+        print(f"\x1b[1;31m✖ XML error in {path}: {err}\x1b[0m", file=sys.stderr)
+        return False
+
+
 def main():
     parser = argparse.ArgumentParser(description="Capture terminal output and generate styled SVG/PNG screenshots")
-    parser.add_argument("--output-svg", "-s", required=True, help="Path to output SVG screenshot file")
+    parser.add_argument("--output-svg", "-s", help="Path to output SVG screenshot file")
     parser.add_argument("--output-png", "-p", help="Optional path to output native PNG screenshot file")
     parser.add_argument("--title", "-t", default="zqk terminal", help="Terminal window title")
     parser.add_argument("--capture-native-png", action="store_true", help="Also capture macOS display screenshot via screencapture")
+    parser.add_argument("--validate-svg", help="Validate an existing SVG file against XML specification")
     parser.add_argument("command", nargs=argparse.REMAINDER, help="Command to run and capture")
 
     args = parser.parse_args()
-    if not args.command:
-        parser.error("No command specified to run")
+
+    if args.validate_svg:
+        valid = validate_svg_file(args.validate_svg)
+        sys.exit(0 if valid else 1)
+
+    if not args.output_svg or not args.command:
+        parser.error("Both --output-svg and command are required when running a session capture")
 
     exit_code = run_and_capture(
         cmd=args.command,

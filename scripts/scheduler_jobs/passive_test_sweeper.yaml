@@ -1,6 +1,7 @@
 # Passive Test Sweeper job (SCH-passive-test-sweeper). Used by: zqk system ensure-retention-jobs
 # Scans in_progress backlog items with linked test cases and cascades Shockwave criteria status.
 id: SCH-passive-test-sweeper
+kind: scheduler_job
 title: Passive Background Test Sweeper
 description: |
   Passively scans for in_progress backlog items with linked test cases, executes test verification
@@ -12,5 +13,11 @@ category: maintenance
 execution_mode: reusable
 max_runtime_seconds: 300
 enabled: true
+status: active
+created_by: ACC-SYSTEM
+updated_by: ACC-SYSTEM
+created_at: "2026-01-01T00:00:00Z"
+updated_at: "2026-01-01T00:00:00Z"
 namespace_id: zqk:kernel
 schema_version: "2.0.0"
+

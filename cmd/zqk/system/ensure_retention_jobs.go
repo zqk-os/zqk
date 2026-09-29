@@ -318,6 +318,22 @@ func ensureJobFromTemplateInProcess(logger logging.Logger, provider storage.Obje
 	if obj[objects.FieldKeySourceType] == nil {
 		obj[objects.FieldKeySourceType] = "internal"
 	}
+	now := time.Now().UTC().Format(time.RFC3339)
+	if obj[objects.FieldKeyStatus] == nil || obj[objects.FieldKeyStatus] == "" {
+		obj[objects.FieldKeyStatus] = "active"
+	}
+	if obj[objects.FieldKeyCreatedBy] == nil || obj[objects.FieldKeyCreatedBy] == "" {
+		obj[objects.FieldKeyCreatedBy] = pkgctx.SystemAccountID
+	}
+	if obj[objects.FieldKeyUpdatedBy] == nil || obj[objects.FieldKeyUpdatedBy] == "" {
+		obj[objects.FieldKeyUpdatedBy] = pkgctx.SystemAccountID
+	}
+	if obj[objects.FieldKeyCreatedAt] == nil || obj[objects.FieldKeyCreatedAt] == "" {
+		obj[objects.FieldKeyCreatedAt] = now
+	}
+	if obj[objects.FieldKeyUpdatedAt] == nil || obj[objects.FieldKeyUpdatedAt] == "" {
+		obj[objects.FieldKeyUpdatedAt] = now
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), ensureJobsCreateTimeout) // Background: request-or-shutdown derived
 	defer cancel()
 	// Sync create so jobs persist to stream registry immediately (avoid write-behind; list/daemon see them).

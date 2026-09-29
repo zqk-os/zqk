@@ -37,6 +37,25 @@ if [ -d "$CLI_SPECS_DIR" ]; then
 	mkdir -p "$STAGING/cli_specs"
 	cp -r "$CLI_SPECS_DIR"/* "$STAGING/cli_specs/" 2>/dev/null || true
 fi
+# Pack lifecycles and specs (work, org, agent, qa, decision, etc.)
+if [ -d "${REPO_ROOT}/packs" ]; then
+	for pack_dir in "${REPO_ROOT}/packs"/*; do
+		if [ -d "$pack_dir" ]; then
+			pack_name="$(basename "$pack_dir")"
+			if [ -d "${pack_dir}/lifecycles" ]; then
+				mkdir -p "$STAGING/lifecycles/${pack_name}"
+				cp "${pack_dir}/lifecycles"/*.yaml "$STAGING/lifecycles/${pack_name}/" 2>/dev/null || true
+				cp "${pack_dir}/lifecycles"/*.yaml "$STAGING/lifecycles/" 2>/dev/null || true
+			fi
+			if [ -d "${pack_dir}/specs" ]; then
+				mkdir -p "$STAGING/objects/${pack_name}"
+				cp "${pack_dir}/specs"/*.yaml "$STAGING/objects/${pack_name}/" 2>/dev/null || true
+				cp "${pack_dir}/specs"/*.yaml "$STAGING/objects/" 2>/dev/null || true
+			fi
+		fi
+	done
+fi
+
 # Maintenance job templates so init --with-maintenance-jobs works in greenfield (no repo scripts to copy from)
 if [ -d "$SCRIPTS_SCHEDULER_JOBS_DIR" ]; then
 	mkdir -p "$STAGING/scripts/scheduler_jobs"
