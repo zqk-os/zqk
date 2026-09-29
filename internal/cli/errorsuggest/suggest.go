@@ -1,5 +1,5 @@
 // Package errorsuggest provides a shared service for CLI error understanding and
-// actionable suggestions (BLI-659, [REDACTED-ID]).
+// actionable suggestions (BLI-659, core-backlog).
 // The service can be used across all commands and adapts output to verbosity
 // and user experience level.
 package errorsuggest

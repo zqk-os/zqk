@@ -3,7 +3,7 @@ package bootstrap
 import "strings"
 
 // communityCommandSpecDenylist path fragments excluded from community bootstrap extract
-// ([REDACTED-ID]). Matched case-insensitively against archive entry paths.
+// (core-backlog). Matched case-insensitively against archive entry paths.
 var communityCommandSpecDenylist = []string{
 	"print_cursor_paste_applescript",
 	"record_cvs_orchestrate_run",

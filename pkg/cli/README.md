@@ -1,4 +1,4 @@
-# CLI Package
+# CLI Architecture & Spec Command Builders
 
 This package provides the command-line interface infrastructure for zqk, following the spec-driven builder pattern established in `pkg/specbuilder`.
 
