@@ -61,9 +61,13 @@ Read **title**, not the opaque id. `scheduler list` shows both. The id is a hand
 | `SCH-passive-test-sweeper` | Passive test sweeper | Idle test-bundle hygiene |
 | `SCH-cap-orchestrator` | CAP orchestrator | Continuous agent loop tick (when CAP is in use) |
 
-If a custom job's command or script is not present on your system, disable it rather than leaving an erroring timer:
+If a custom job's command or script is not present on your system, park it or disable it rather than leaving an erroring timer:
 
 ```bash
+# Preferred: park the job so it is safely deferred
+./bin/zqk object park SCH-that-job --to deferred
+
+# Alternative: disable execution flag directly
 ./bin/zqk object update SCH-that-job --field "enabled=false"
 ```
 

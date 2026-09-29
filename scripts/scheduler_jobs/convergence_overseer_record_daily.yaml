@@ -9,7 +9,7 @@
 #   COORDINATOR_SESSION_ID — parent/coordinator CVS-* (required for overseer)
 #   OVERSEER_SKIP_ROLLUP_GATES — default fast path (1 = --skip-rollup-gates)
 #
-# Suspend: zqk object update SCH-convergence-overseer-record --field enabled=false
+# Suspend: zqk object park SCH-convergence-overseer-record --to deferred (or: zqk object update SCH-convergence-overseer-record --field enabled=false)
 #
 # Index: scripts/README.md (section "Convergence promotion and overseer helpers") for script env, --help, related jobs.
 
