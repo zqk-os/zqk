@@ -112,15 +112,146 @@ def get_category_info(rel_path: str) -> tuple[str, str]:
         return "Maintenance & Development", "development"
     elif sub == "quality":
         if len(parts) > 2 and parts[2] == "codebase_evaluation":
-            return "Codebase Evaluation Framework", "codebase-eval"
+            if len(parts) > 3:
+                if parts[3] == "rubrics":
+                    return "Codebase Evaluation — Evaluation Rubrics", "cef-rubrics"
+                elif parts[3] == "prompts":
+                    if "adversarial.md" in path:
+                        return "Codebase Evaluation — Adversarial Prompts", "cef-adversarial"
+                    return "Codebase Evaluation — Specialist Prompts", "cef-specialists"
+            return "Codebase Evaluation — Framework & Governance", "cef-framework"
         return "Quality & Evaluation", "quality"
     elif sub == "eval":
-        return "Quality & Evaluation", "quality"
+        return "Codebase Evaluation — Audit Reports", "cef-reports"
 
     return sub.replace("_", " ").title(), sub
 
-def get_clean_nav_title(title: str) -> str:
+CEF_LENS_NAMES = {
+    'L-ARCHITECTURE': 'Architecture & Abstractions',
+    'L-CODE-QUALITY': 'Code Quality & Maintainability',
+    'L-CONCURRENCY': 'Concurrency & Synchronization',
+    'L-DOCS-MODEL': 'Documentation & Domain Model',
+    'L-OBSERVABILITY': 'Observability & Diagnostics',
+    'L-PERFORMANCE': 'Performance & Complexity',
+    'L-PREFLIGHT': 'Preflight & Inventory',
+    'L-RELIABILITY': 'Reliability & Error Recovery',
+    'L-SECURITY': 'Security & Threat Modeling',
+    'L-SUPPLY-RELEASE': 'Supply Chain & Packaging',
+    'L-TESTING': 'Test Strategy & Invariant Proofs',
+    'L-USABILITY': 'Developer Usability & Ergonomics'
+}
+
+def get_cef_doc_title(rel_path: str, fallback_title: str) -> str:
+    path = rel_path.replace("\\", "/")
+    base = os.path.basename(path)
+    if path.startswith("docs/eval/"):
+        if base == "README.md":
+            return "Architecture & Codebase Evaluations Index"
+        elif base.startswith("MNT"):
+            return "Maintainability Audit Report (MNT)"
+        elif base.startswith("OBS"):
+            return "Observability & Diagnostics Audit Report (OBS)"
+        elif base.startswith("RDB"):
+            return "Package Boundaries & Architecture Audit Report (RDB)"
+        elif base.startswith("REL"):
+            return "Reliability & Error Recovery Audit Report (REL)"
+        elif base.startswith("SEC"):
+            return "Security Threat Vectors & Hardening Audit Report (SEC)"
+        elif base.startswith("TST"):
+            return "Test Strategy & Invariant Proofs Audit Report (TST)"
+        elif base.startswith("SYNTHESIS"):
+            return "Diamond Scale Multi-Dimensional Quality Convergence Synthesis"
+    elif "docs/quality/codebase_evaluation/" in path:
+        parts = path.split("/")
+        if "/rubrics/" in path:
+            lens = os.path.splitext(base)[0]
+            name = CEF_LENS_NAMES.get(lens, lens)
+            return f"{name} Rubric ({lens})"
+        elif "/prompts/" in path:
+            if base == "_SHARED_PREAMBLE.md":
+                return "CEF Shared Agent Preamble"
+            lens = parts[-2]
+            if lens == "L-INTEGRATOR":
+                return "Lead Integrator & Synthesis Specialist Prompt"
+            name = CEF_LENS_NAMES.get(lens, lens)
+            if base == "adversarial.md":
+                return f"{name} Adversarial Auditor Prompt ({lens})"
+            elif base == "specialist.md":
+                return f"{name} Specialist Evaluator Prompt ({lens})"
+        else:
+            titles = {
+                "README.md": "Codebase Evaluation Framework (CEF) Overview",
+                "CONSTITUTION.md": "CEF Constitution (Binding Rules & Evidence Grades)",
+                "DIAMOND_SCALE.md": "Diamond Scale Multi-Axis Quality Grading",
+                "WAVE_PLAN.md": "Multi-Wave Analysis Execution Plan",
+                "LENSES.md": "Evaluation Lens Catalog & Density Rules",
+                "DIAGRAM_CONTRACT.md": "Diagram Contract & Architecture Anchoring",
+                "OPERATOR.md": "Operator Quickstart Runbook",
+                "KICKOFF_PROMPT.md": "Solo Operator Kickoff Prompt",
+                "HANDOFF_SCHEMA.md": "Handoff Schema & Downstream Integration",
+                "EXTENSIONS.md": "Framework Extensions & Adapter Architecture",
+                "go.md": "Go Language Adapter Specification"
+            }
+            if base in titles:
+                return titles[base]
+    return fallback_title
+
+def get_clean_nav_title(title: str, rel_path: str = "") -> str:
     """Returns a concise, scannable title for sidebar navigation."""
+    path = rel_path.replace("\\", "/")
+    if path.startswith("docs/eval/"):
+        base = os.path.basename(path)
+        if base == "README.md":
+            return "Evaluations Index"
+        elif base.startswith("MNT"):
+            return "MNT — Maintainability"
+        elif base.startswith("OBS"):
+            return "OBS — Observability"
+        elif base.startswith("RDB"):
+            return "RDB — Package Boundaries"
+        elif base.startswith("REL"):
+            return "REL — Reliability"
+        elif base.startswith("SEC"):
+            return "SEC — Security Threat Vectors"
+        elif base.startswith("TST"):
+            return "TST — Test Strategy"
+        elif base.startswith("SYNTHESIS"):
+            return "SYNTHESIS — Diamond Convergence"
+    elif "docs/quality/codebase_evaluation/" in path:
+        parts = path.split("/")
+        base = os.path.basename(path)
+        if "/rubrics/" in path:
+            lens = os.path.splitext(base)[0]
+            name = CEF_LENS_NAMES.get(lens, lens)
+            return f"{lens} — {name}"
+        elif "/prompts/" in path:
+            if base == "_SHARED_PREAMBLE.md":
+                return "Shared Agent Preamble"
+            lens = parts[-2]
+            if lens == "L-INTEGRATOR":
+                return "L-INTEGRATOR — Lead Integrator"
+            name = CEF_LENS_NAMES.get(lens, lens)
+            if base == "adversarial.md":
+                return f"{lens} — {name} (Adversarial)"
+            elif base == "specialist.md":
+                return f"{lens} — {name} (Specialist)"
+        else:
+            nav_titles = {
+                "README.md": "Overview & Quickstart",
+                "CONSTITUTION.md": "Constitution (Binding Rules)",
+                "DIAMOND_SCALE.md": "Diamond Scale Grading",
+                "WAVE_PLAN.md": "Multi-Wave Plan",
+                "LENSES.md": "Evaluation Lens Catalog",
+                "DIAGRAM_CONTRACT.md": "Diagram Contract",
+                "OPERATOR.md": "Operator Runbook",
+                "KICKOFF_PROMPT.md": "Solo Kickoff Prompt",
+                "HANDOFF_SCHEMA.md": "Handoff Schema",
+                "EXTENSIONS.md": "Extensions & Adapters",
+                "go.md": "Go Language Adapter"
+            }
+            if base in nav_titles:
+                return nav_titles[base]
+
     prefixes = [
         "Technical Specification: ",
         "Technical Specification — ",
@@ -1201,6 +1332,8 @@ def build_portal(repo_root: str, target_dir: str):
             title = "Curriculum as Data: Onboarding Roadmap"
         elif rel_path == "scripts/scheduler_jobs/README.md":
             title = "Scheduler Job Templates"
+        elif rel_path.startswith("docs/quality/codebase_evaluation/") or rel_path.startswith("docs/eval/"):
+            title = get_cef_doc_title(rel_path, title)
         elif not title:
             fm_name_match = re.search(r'^name:\s*(.+)$', content, re.MULTILINE)
             if fm_name_match:
@@ -1258,7 +1391,11 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
         ("Agent Directives & Packs", "agent-directives"),
         ("Maintenance & Development", "development"),
         ("Quality & Evaluation", "quality"),
-        ("Codebase Evaluation Framework", "codebase-eval"),
+        ("Codebase Evaluation — Framework & Governance", "cef-framework"),
+        ("Codebase Evaluation — Evaluation Rubrics", "cef-rubrics"),
+        ("Codebase Evaluation — Specialist Prompts", "cef-specialists"),
+        ("Codebase Evaluation — Adversarial Prompts", "cef-adversarial"),
+        ("Codebase Evaluation — Audit Reports", "cef-reports"),
         ("Open Core Governance", "governance"),
     ]
 
@@ -1279,6 +1416,25 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
     # Sort items within each category
     def sort_key(entry):
         rel = entry["rel_path"]
+        if entry["category"] == "Codebase Evaluation — Framework & Governance":
+            cef_flow = [
+                "README.md", "CONSTITUTION.md", "DIAMOND_SCALE.md", "WAVE_PLAN.md",
+                "LENSES.md", "DIAGRAM_CONTRACT.md", "OPERATOR.md", "KICKOFF_PROMPT.md",
+                "HANDOFF_SCHEMA.md", "EXTENSIONS.md", "go.md"
+            ]
+            base = os.path.basename(rel)
+            if base in cef_flow:
+                return (0, cef_flow.index(base))
+        if entry["category"] == "Codebase Evaluation — Audit Reports":
+            eval_flow = [
+                "README.md", "MNT-code-quality-maintainability.md",
+                "OBS-observability-diagnostics.md", "RDB-architecture-package-boundaries.md",
+                "REL-reliability-error-recovery.md", "SEC-security-threat-vectors.md",
+                "TST-test-strategy-invariant-proofs.md", "SYNTHESIS-diamond-envelope-convergence.md"
+            ]
+            base = os.path.basename(rel)
+            if base in eval_flow:
+                return (0, eval_flow.index(base))
         # Pin index or overview docs to top of their category
         if "README.md" in rel or "INDEX.md" in rel or rel == "index.html":
             return (0, entry["title"])
@@ -1312,7 +1468,7 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
             for it in items:
                 is_active = (it["html_rel"] == current_html_rel)
                 active_cls = ' class="active"' if is_active else ''
-                nav_title = html.escape(get_clean_nav_title(it["title"]))
+                nav_title = html.escape(get_clean_nav_title(it["title"], it["rel_path"]))
                 full_title = html.escape(it["title"])
                 href = f"{root_rel}{it['html_rel']}"
                 nav_html.append(f'<li><a href="{href}"{active_cls} title="{full_title}">{nav_title}</a></li>')
@@ -1466,16 +1622,24 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
         if not items:
             continue
         first_doc = items[0]
-        preview_links = "".join([f'<li><a href="{it["html_rel"]}">{html.escape(get_clean_nav_title(it["title"]))}</a></li>' for it in items[:4]])
+        preview_links = "".join([f'<li><a href="{it["html_rel"]}">{html.escape(get_clean_nav_title(it["title"], it["rel_path"]))}</a></li>' for it in items[:4]])
         if len(items) > 4:
             preview_links += f'<li class="more-link"><a href="{first_doc["html_rel"]}">+ {len(items)-4} more guides &rarr;</a></li>'
+        cat_desc_map = {
+            "Codebase Evaluation — Framework & Governance": "Constitutional invariants, multi-axis Diamond Scale grading, wave orchestration, and handoff contracts.",
+            "Codebase Evaluation — Evaluation Rubrics": "Standardized, cited quality rubrics defining observable failure modes and criteria across 12 engineering dimensions.",
+            "Codebase Evaluation — Specialist Prompts": "Lens-specialized investigation prompts for deep, evidence-backed codebase analysis.",
+            "Codebase Evaluation — Adversarial Prompts": "Falsifiable adversarial auditor prompts designed to challenge, stress-test, and verify specialist findings.",
+            "Codebase Evaluation — Audit Reports": "Authoritative multi-dimensional evaluation audit findings, security threat models, and convergence syntheses.",
+        }
+        card_desc = cat_desc_map.get(cat_name, f"Authoritative open-core specifications and guides for {html.escape(cat_name.lower())}.")
         cat_cards_html += f"""
         <div class="cat-card">
           <div class="cat-card-header">
             <h4><a href="{first_doc['html_rel']}">{html.escape(cat_name)}</a></h4>
             <span class="cat-card-count">{len(items)} articles</span>
           </div>
-          <p>Authoritative open-core specifications and guides for {html.escape(cat_name.lower())}.</p>
+          <p>{card_desc}</p>
           <ul class="cat-card-links">
             {preview_links}
           </ul>
