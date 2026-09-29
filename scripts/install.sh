@@ -286,6 +286,9 @@ install_source() {
 # ---------------------------------------------------------------------------
 _place_binary() {
   local bin="$1" mcp_bin="$2"
+  if [ ! -d "$INSTALL_DIR" ]; then
+    mkdir -p "$INSTALL_DIR" 2>/dev/null || sudo mkdir -p "$INSTALL_DIR"
+  fi
   if [ ! -w "$INSTALL_DIR" ]; then
     echo "🔑 Installing to ${INSTALL_DIR} (requires sudo)..."
     sudo install -m 755 "$bin" "${INSTALL_DIR}/zqk"
@@ -347,7 +350,7 @@ esac
 # ---------------------------------------------------------------------------
 # 4. Post-install verification and quick-start hint
 # ---------------------------------------------------------------------------
-if command -v zqk >/dev/null 2>&1 || [ -f "${INSTALL_DIR}/zqk" ]; then
+if [ -f "${INSTALL_DIR}/zqk" ]; then
   ZQK_BIN="${INSTALL_DIR}/zqk"
   ZQK_VER="$("$ZQK_BIN" version 2>/dev/null || echo 'installed')"
   echo ""
@@ -355,9 +358,12 @@ if command -v zqk >/dev/null 2>&1 || [ -f "${INSTALL_DIR}/zqk" ]; then
   echo ""
   echo "Quick start (< 2 min):"
   echo "  mkdir my-project && cd my-project"
-  echo "  zqk system init --project-name my-project"
+  echo "  zqk init"
   echo "  zqk workflow whats-next          # discover mission + next tasks"
   echo "  zqk mcp proxy --tcp 127.0.0.1:7777 # expose MCP securely on loopback"
   echo ""
   echo "Docs: https://github.com/${REPO}#readme"
+else
+  echo "❌ Error: zqk binary not found in ${INSTALL_DIR}/zqk" >&2
+  exit 1
 fi
