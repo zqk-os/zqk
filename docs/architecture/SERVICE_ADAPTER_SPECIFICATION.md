@@ -7,16 +7,16 @@ The `pkg/service` package defines a pure, zero-coupling contract for managing OS
 
 ```mermaid
 flowchart TD
-    subgraph Client [Consumers]
+    subgraph Client["Consumers"]
         CLI["zqk system service / daemon CLI"]
         Daemon["Background Supervisor Daemon"]
     end
 
-    subgraph Facade [Service Management Layer]
-        Mgr["service.Manager (Auto-detecting Façade)"]
+    subgraph FacadeLayer["Service Management Layer"]
+        Mgr["service.Manager (Auto-detecting Facade)"]
     end
 
-    subgraph Adapters [Host Platform Adapters]
+    subgraph Adapters["Host Platform Adapters"]
         Darwin["LaunchdAdapter (macOS)"]
         Linux["SystemdAdapter (Linux)"]
         Fallback["SupervisorAdapter (Process Fallback)"]

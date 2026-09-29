@@ -24,32 +24,32 @@ This architecture introduces **Tiered Storage and Subgraph Archival**, convertin
 
 ```mermaid
 flowchart TD
-    subgraph Tier0 ["Tier 0: HOT STORAGE (Active CAS Plane)"]
+    subgraph Tier0["Tier 0: HOT STORAGE (Active CAS Plane)"]
         H1[".zqk/process/[kind]/[hash].yaml"]
-        H2["Loose CAS Blobs | Mutable Edges | 0ms Read/Write"]
+        H2["Loose CAS Blobs - Mutable Edges - 0ms Read/Write"]
     end
 
-    subgraph Tier1 ["Tier 1: WARM STORAGE (Local Capsule Archive)"]
+    subgraph Tier1["Tier 1: WARM STORAGE (Local Capsule Archive)"]
         W1[".zqk/archive/bundles/[ROOT-ID].capsule.zst"]
-        W2["Apoptotic Plane | Strictly Immutable | Transparent Read-Through"]
-        W3["85-92% Storage & File Reduction"]
+        W2["Apoptotic Plane - Strictly Immutable - Transparent Read-Through"]
+        W3["85-92% Storage and File Reduction"]
     end
 
-    subgraph Tier2 ["Tier 2: COLD STORAGE (Detached Remote Vault)"]
+    subgraph Tier2["Tier 2: COLD STORAGE (Detached Remote Vault)"]
         C1["Remote Object Store (S3 / GCS / Git LFS / ~/.zqk/cold-vault)"]
-        C2["0 Bytes Local Payload | Tombstone Locator in Index"]
+        C2["0 Bytes Local Payload - Tombstone Locator in Index"]
         C3["On-Demand Fetch: zqk archive fetch [ROOT-ID]"]
     end
 
-    subgraph Tier3 ["Tier 3: THE ABYSS (A-Bits / Cryptographic Purge)"]
-        A1["Erased Data Payload (0 Bytes Local & Remote)"]
+    subgraph Tier3["Tier 3: THE ABYSS (A-Bits / Cryptographic Purge)"]
+        A1["Erased Data Payload (0 Bytes Local and Remote)"]
         A2["Immutable Merkle Receipt in .zqk/streams/ WAL"]
-        A3["Non-Repudiation & Cryptographic Audit Proof"]
+        A3["Non-Repudiation and Cryptographic Audit Proof"]
     end
 
-    Tier0 -->|"Inactivity / Storage Watermark Trigger"| Tier1
-    Tier1 -->|"Warm Retention Expiry / Local Quota Breach"| Tier2
-    Tier2 -->|"Policy Expiration / Retention Purge"| Tier3
+    Tier0 -->|Inactivity / Storage Watermark Trigger| Tier1
+    Tier1 -->|Warm Retention Expiry / Local Quota Breach| Tier2
+    Tier2 -->|Policy Expiration / Retention Purge| Tier3
 ```
 
 ### Storage Tier Specification
@@ -79,24 +79,24 @@ flowchart LR
     subgraph Loose["Loose CAS Objects (100+ files)"]
         direction TB
         L_GOAL["GOAL-001 (Root)"]
-        L_MIL["• MIL-001, MIL-002"]
-        L_REQ["• REQ-010..030"]
-        L_BLI["• BLI-100..150"]
-        L_QA["• QA-001..090"]
+        L_MIL["- MIL-001, MIL-002"]
+        L_REQ["- REQ-010..030"]
+        L_BLI["- BLI-100..150"]
+        L_QA["- QA-001..090"]
     end
 
     subgraph Capsule["Immutable Semantic Capsule"]
         direction TB
         C_CAP["GOAL-001.capsule.zst"]
-        C_MAN["• manifest.json"]
-        C_TOP["• topology.json"]
-        C_NAR["• narrative_summary.md"]
-        C_BLOB["• blobs.bin.zst"]
+        C_MAN["- manifest.json"]
+        C_TOP["- topology.json"]
+        C_NAR["- narrative_summary.md"]
+        C_BLOB["- blobs.bin.zst"]
     end
 
-    Loose -->|"Archival Compactor<br/>(Flatten & Compress)"| Capsule
-    Loose -.->|"Pruned from .zqk/process/<br/>(Zero inodes, zero scan lag)"| Pruned["Clean Working Tree"]
-    Capsule -.->|"Lightweight Tombstone Pointer"| Index["Index Entry in<br/>.zqk/process/goals/.goal.index"]
+    Loose -->|Archival Compactor: Flatten and Compress| Capsule
+    Loose -.->|Pruned from .zqk/process/| Pruned["Clean Working Tree"]
+    Capsule -.->|Lightweight Tombstone Pointer| Index["Index Entry in .zqk/process/goals/.goal.index"]
 ```
 
 ### 3.1 Pipeline Execution Stages

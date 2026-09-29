@@ -43,18 +43,18 @@ pkg/storage/
 ```mermaid
 flowchart TD
     A["Start: Current Working Directory"] --> B{"Direct .zqk directory exists?"}
-    B -- Yes --> C["Return directory as Project Root"]
-    B -- No --> D{"Direct .git file exists?"}
-    D -- Yes --> E["resolveGitWorktreeFile(.git)"]
-    D -- No --> F{"Reached Filesystem Root?"}
-    F -- No --> G["Step up to Parent Directory"] --> B
-    F -- Yes --> H["Fallback: Check Git Worktree Root"]
+    B -->|Yes| C["Return directory as Project Root"]
+    B -->|No| D{"Direct .git file exists?"}
+    D -->|Yes| E["resolveGitWorktreeFile(.git)"]
+    D -->|No| F{"Reached Filesystem Root?"}
+    F -->|No| G["Step up to Parent Directory"] --> B
+    F -->|Yes| H["Fallback: Check Git Worktree Root"]
     
-    E --> I{"Valid gitdir & commondir?"}
-    I -- Yes --> J{"Primary repo has .zqk?"}
-    J -- Yes --> K["Return Primary Repo Root"]
-    J -- No --> L["Return Failure / Empty"]
-    I -- No --> L
+    E --> I{"Valid gitdir and commondir?"}
+    I -->|Yes| J{"Primary repo has .zqk?"}
+    J -->|Yes| K["Return Primary Repo Root"]
+    J -->|No| L["Return Failure / Empty"]
+    I -->|No| L
 ```
 
 ---

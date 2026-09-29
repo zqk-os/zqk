@@ -21,10 +21,10 @@ To eliminate keystore fallback vulnerabilities while accommodating Day-0 bootstr
 ```mermaid
 flowchart TD
   Start["Resolve Auditor Key (AuditorGate.trustedPubHex)"] --> CheckCAS{"Key Present in CAS?<br/>(KEY-AUDITOR-001)"}
-  CheckCAS -- Yes --> ValidCAS["Use Authenticated CAS Key: PASS"]
-  CheckCAS -- No --> CheckMode{"Is Strict Fallback Mode Active?<br/>(WithStrictFallback(true))"}
-  CheckMode -- Yes --> Reject["FAIL CLOSED:<br/>ErrMsgDiskFallbackDisallowed<br/>(Disk Keystore Fallback Prohibited)"]
-  CheckMode -- No (Bootstrap Only) --> DiskFallback["Lenient Mode:<br/>Read .zqk/keystore/auditor.pub"]
+  CheckCAS -->|Yes| ValidCAS["Use Authenticated CAS Key: PASS"]
+  CheckCAS -->|No| CheckMode{"Is Strict Fallback Mode Active?<br/>(WithStrictFallback(true))"}
+  CheckMode -->|Yes| Reject["FAIL CLOSED:<br/>ErrMsgDiskFallbackDisallowed<br/>(Disk Keystore Fallback Prohibited)"]
+  CheckMode -->|No: Bootstrap Only| DiskFallback["Lenient Mode:<br/>Read .zqk/keystore/auditor.pub"]
 ```
 
 ### Invariant 1: Fail-Closed Strict Verification Mode
