@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 466" width="960" height="466">
+  <defs>
+    <style>
+      .window-bg { fill: #1e1e2e; rx: 12px; }
+      .top-bar { fill: #181825; }
+      .dot-red { fill: #f38ba8; }
+      .dot-yellow { fill: #f9e2af; }
+      .dot-green { fill: #a6e3a1; }
+      .term-text { font-family: "JetBrains Mono", "Fira Code", "Menlo", "Monaco", "Consolas", monospace;
+                   font-size: 13px; fill: #cdd6f4; white-space: pre; }
+      .title-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                    font-size: 12px; fill: #a6adc8; font-weight: 500; text-anchor: middle; }
+    </style>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <rect x="4" y="4" width="952" height="458" class="window-bg" filter="url(#shadow)" stroke="#313244" stroke-width="1"/>
+  <path d="M 4 16 A 12 12 0 0 1 16 4 L 944 4 A 12 12 0 0 1 956 16 L 956 42 L 4 42 Z" class="top-bar"/>
+  <line x1="4" y1="42" x2="956" y2="42" stroke="#313244" stroke-width="1"/>
+  <circle cx="24" cy="23" r="6" class="dot-red"/>
+  <circle cx="44" cy="23" r="6" class="dot-yellow"/>
+  <circle cx="64" cy="23" r="6" class="dot-green"/>
+  <text x="480.0" y="27" class="title-text">zqk ui — Tab 4: TPM Gantt Matrix &amp; Backlog</text>
+  <g transform="translate(24, 58)">
+    <text class="term-text">
+      <tspan x="0" y="16"><tspan fill="#94e2d5" font-weight="bold">╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════╗</tspan></tspan>
+      <tspan x="0" y="36"><tspan fill="#94e2d5" font-weight="bold">║</tspan><tspan fill="#ffffff" font-weight="bold">                             ⚡ ZQK KNOWLEDGE KERNEL — MISSION CONTROL CONSOLE                                 </tspan><tspan fill="#94e2d5" font-weight="bold">║</tspan></tspan>
+      <tspan x="0" y="56"><tspan fill="#94e2d5" font-weight="bold">╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════╝</tspan></tspan>
+      <tspan x="0" y="76"><tspan fill="#6c7086"> 1: ⚡ State </tspan> │ <tspan fill="#6c7086"> 2: 📜 Audit </tspan> │ <tspan fill="#6c7086"> 3: 🤖 Swarm </tspan> │ <tspan fill="#a6e3a1" font-weight="bold">[4: 📋 PM]</tspan> │ <tspan fill="#6c7086"> 5: 📊 Metrics </tspan> │ <tspan fill="#6c7086"> 6: ⏱️ Sched </tspan> │ <tspan fill="#6c7086"> 7: 🧪 QA </tspan> │ <tspan fill="#6c7086"> 8: 🛡️ Health </tspan></tspan>
+      <tspan x="0" y="96"><tspan fill="#585b70">─────────────────────────────────────────────────────────────────────────────────────────────────────────────────</tspan></tspan>
+      <tspan x="0" y="116"><tspan fill="#f9e2af" font-weight="bold">🔔 MESSAGE: </tspan><tspan fill="#cdd6f4">Lead priority plan active — 100% shovel-ready runway verified</tspan></tspan>
+      <tspan x="0" y="136"><tspan fill="#585b70">─────────────────────────────────────────────────────────────────────────────────────────────────────────────────</tspan></tspan>
+      <tspan x="0" y="156"><tspan fill="#6c7086">Strategic Plan: SPL-LAUNCH-2026 │ Lead Priority Plan: </tspan><tspan fill="#a6e3a1" font-weight="bold">PRI-STARTER-001 [ACTIVE]</tspan></tspan>
+      <tspan x="0" y="176"><tspan fill="#ffffff">Runway Depth: 1 shovel-ready │ Backlog: 1 planned, 0 in_progress, 0 blocked, 196 complete</tspan></tspan>
+      <tspan x="0" y="196"><tspan fill="#585b70">─────────────────────────────────────────────────────────────────────────────────────────────────────────────────</tspan></tspan>
+      <tspan x="0" y="216"><tspan fill="#94e2d5" font-weight="bold">  WORKSTREAM │ PRIORITY PLAN           │ ITEM ID │ STATUS      │ PRI │ TITLE</tspan></tspan>
+      <tspan x="0" y="236"><tspan fill="#585b70">─────────────────────────────────────────────────────────────────────────────────────────────────────────────────</tspan></tspan>
+      <tspan x="0" y="256"><tspan fill="#cdd6f4">&gt; WS-LAUNCH  │ PRI-STARTER-001         │ BLI-001 │ </tspan><tspan fill="#f9e2af" font-weight="bold">planned     </tspan><tspan fill="#6c7086">│ </tspan><tspan fill="#f38ba8" font-weight="bold">P0  </tspan><tspan fill="#cdd6f4">│ Community launch testing and vetting</tspan></tspan>
+      <tspan x="0" y="276"><tspan fill="#cdd6f4">  WS-KERNEL  │ PRI-STORAGE-PUREGO-001  │ BLI-042 │ </tspan><tspan fill="#a6e3a1">complete    </tspan><tspan fill="#cdd6f4">│ P1  │ Implement pure-Go CAS storage backend</tspan></tspan>
+      <tspan x="0" y="296"><tspan fill="#cdd6f4">  WS-KERNEL  │ PRI-STORAGE-PUREGO-001  │ BLI-043 │ </tspan><tspan fill="#a6e3a1">complete    </tspan><tspan fill="#cdd6f4">│ P1  │ Storage concurrency stress test suite</tspan></tspan>
+      <tspan x="0" y="316"><tspan fill="#cdd6f4">  WS-DOCS    │ PRI-DOC-EXPANSION-001   │ BLI-088 │ </tspan><tspan fill="#a6e3a1">complete    </tspan><tspan fill="#cdd6f4">│ P2  │ Multi-category documentation portal (187 arts)</tspan></tspan>
+      <tspan x="0" y="336"><tspan fill="#cdd6f4">  WS-SECURITY│ PRI-CRYPTO-AUDIT-001    │ BLI-112 │ </tspan><tspan fill="#a6e3a1">complete    </tspan><tspan fill="#cdd6f4">│ P0  │ Keystore tamper-proof signature verification</tspan></tspan>
+      <tspan x="0" y="356"><tspan fill="#585b70">─────────────────────────────────────────────────────────────────────────────────────────────────────────────────</tspan></tspan>
+      <tspan x="0" y="376"><tspan fill="#6c7086">[Enter] Inspect Backlog Item │ [c] Claim Work (zqk do) │ [p] Promote Status │ [q] Quit</tspan></tspan>
+    </text>
+  </g>
+</svg>

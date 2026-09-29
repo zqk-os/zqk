@@ -37,6 +37,9 @@ When launched in a terminal (`zqk ui`), Mission Control renders a responsive ANS
 The State Tab provides a real-time seismograph of kernel mutations flowing through the change journal Write-Ahead Log (WAL).
 
 ### Visual Terminal Screenshot: Tab 1
+
+![Tab 1: State Seismograph & Mutation WAL](./screenshots/ui_tab1_state.svg)
+
 ```
 Stream: change_journal │ Buffer: 48 mutations │ Rate: ▄▆█▇▅▃  │ [AUTO-SCROLL: ON]
 Active Plane: PlanePromoted (CAS Master) │ Retention Watermark: 2m0s (fresh)
@@ -69,6 +72,9 @@ Active Plane: PlanePromoted (CAS Master) │ Retention Watermark: 2m0s (fresh)
 The Audit Tab provides non-repudiable audit logs tracking which human or AI agent performed each action.
 
 ### Visual Terminal Screenshot: Tab 2
+
+![Tab 2: Operational Audit Trail & CAS Provenance](./screenshots/ui_tab2_audit.svg)
+
 ```
 Stream: audit_event │ Buffer: 124 audit events │ Rate: ▃▄▅▃▂  │ [AUTO-SCROLL: ON]
 Actors: ACC-SYSTEM (82), PER-DEFAULT-LEAD (24), agent-alpha (18)
@@ -96,6 +102,9 @@ Actors: ACC-SYSTEM (82), PER-DEFAULT-LEAD (24), agent-alpha (18)
 The Swarm Tab visualizes running agent processes, seated roles, active task assignments, and message queues.
 
 ### Visual Terminal Screenshot: Tab 3
+
+![Tab 3: Swarm Topology & Agent Seating](./screenshots/ui_tab3_swarm.svg)
+
 ```
 Swarm Population: 3 Active Holons │ Mesh Topology: P2P Sovereign Cell │ Mailbox Status: 0 Pending
 ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -128,6 +137,9 @@ Swarm Population: 3 Active Holons │ Mesh Topology: P2P Sovereign Cell │ Mail
 The PM Tab displays the Technical Program Management (TPM) Gantt matrix and backlog status breakdown.
 
 ### Visual Terminal Screenshot: Tab 4
+
+![Tab 4: TPM Gantt Matrix & Shovel-Ready Backlog](./screenshots/ui_tab4_pm.svg)
+
 ```
 Strategic Plan: SPL-LAUNCH-2026 │ Lead Priority Plan: PRI-STARTER-COMMUNITY-001 [ACTIVE]
 Runway Depth: 1 shovel-ready │ Backlog: 1 planned, 0 in_progress, 0 blocked, 42 complete
@@ -157,6 +169,9 @@ Runway Depth: 1 shovel-ready │ Backlog: 1 planned, 0 in_progress, 0 blocked, 4
 The Metrics Tab reports operational telemetry, execution latencies, and cache efficiency.
 
 ### Visual Terminal Screenshot: Tab 5
+
+![Tab 5: Kernel Telemetry & Latency Histograms](./screenshots/ui_tab5_metrics.svg)
+
 ```
 Memory: 48.2 MB │ CAS Objects: 185 objects (1.4 MB) │ WAL Journal: 14.8 KB │ Uptime: 4h 12m
 Token Burn Velocity: 1,420 tokens/hr │ CLI Command Throughput: 42.4 cmd/min
@@ -186,6 +201,9 @@ Token Burn Velocity: 1,420 tokens/hr │ CLI Command Throughput: 42.4 cmd/min
 The Sched Tab monitors autonomous background jobs, self-healing timers, and retention sweeps.
 
 ### Visual Terminal Screenshot: Tab 6
+
+![Tab 6: Scheduler Daemons & Maintenance Jobs](./screenshots/ui_tab6_scheduler.svg)
+
 ```
 Scheduler Daemon: RUNNING (PID: 84920) │ Worker Pool: 4 workers │ Ticks: 60/min
 Active Cron Jobs: 8 registered │ Last Maintenance Sweep: 42s ago [PASS]
@@ -214,6 +232,9 @@ Active Cron Jobs: 8 registered │ Last Maintenance Sweep: 42s ago [PASS]
 The QA Tab provides full downward traceability verification: proving every backlog item is grounded in verifiable test cases and acceptance criteria.
 
 ### Visual Terminal Screenshot: Tab 7
+
+![Tab 7: QA Done-Gates & Verification Radar](./screenshots/ui_tab7_qa.svg)
+
 ```
 DoD Compliance: 100% [PASS] │ Intact Lineage Chains: 159/159 │ Unbound Criteria: 0 [OK]
 Test Coverage: 100% BLI Coverage (43/43 Backlog Items grounded in executable test_case objects)
@@ -248,6 +269,9 @@ Test Coverage: 100% BLI Coverage (43/43 Backlog Items grounded in executable tes
 The Health Tab reports storage plane consistency, filesystem watcher health, and lock state.
 
 ### Visual Terminal Screenshot: Tab 8
+
+![Tab 8: Kernel Storage & Membrane Integrity](./screenshots/ui_tab8_health.svg)
+
 ```
 Knowledge Kernel State: HEALTHY │ Storage Backend: file (hybrid CAS) │ Lock Contention: 0 deadlocks
 Membrane Isolation: Mode B (Strict CAS Verification) │ Integrity Score: 95.4 / 100
@@ -273,6 +297,9 @@ Membrane Isolation: Mode B (Strict CAS Verification) │ Integrity Score: 95.4 /
 For dedicated CI/CD runs and local terminal verification, `zqk test dashboard --check-dod` provides a live stream of test execution and criteria latches.
 
 ### Visual Terminal Screenshot: Test Dashboard
+
+![Test Verification Dashboard](./screenshots/ui_test_dashboard.svg)
+
 ```
 ================================================================================
 🚀 ZQK TEST & DEFINITION OF DONE (DoD) DASHBOARD
@@ -315,6 +342,8 @@ Working Set: 12 In-Flight Tests │ Regression Pool: 159 Verified Chains (Green)
 When launched with the `-w` flag (`zqk ui -w`), ZQK starts a zero-dependency HTTP server providing interactive visual timelines, Gantt matrices, and DAG graphs.
 
 ### Web Studio Layout & Visual Components:
+
+![Visual Web Studio: Timeline, Gantt Roadmap & DAG Visualizer](./screenshots/ui_web_studio.svg)
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────────────────────┐

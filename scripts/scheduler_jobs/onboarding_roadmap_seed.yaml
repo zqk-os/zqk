@@ -51,7 +51,7 @@ command_args:
       M_ID=$(echo "$M_OUT" | awk '/created successfully/{print $2}')
     fi
     [ -n "$M_ID" ] || { echo "Failed to resolve or create milestone" >&2; exit 1; }
-    "$ZQK" object update "$M_ID" --field "workstream_refs=[\"$WS_ID\"]"
+    "$ZQK" object ref add "$M_ID" "$WS_ID"
     # Backlog items (resolve by title or create with milestone_refs)
     _resolve_or_create_backlog() {
       _TITLE="$1"
@@ -67,7 +67,7 @@ command_args:
         rm -f "$_TMP"
         _BID=$(echo "$_OUT" | awk '/created successfully/{print $2}')
       else
-        "$ZQK" object update "$_BID" --field "milestone_refs=[\"$M_ID\"]" >/dev/null
+        "$ZQK" object ref add "$_BID" "$M_ID" >/dev/null
       fi
       printf '%s\n' "$_BID"
     }
@@ -75,9 +75,9 @@ command_args:
     B2=$(_resolve_or_create_backlog 'Complete Start Here tutorial' backlog_item_02_start_here.yaml)
     B3=$(_resolve_or_create_backlog 'Run retention-status and system check' backlog_item_03_system_health.yaml)
     [ -n "$B1" ] && [ -n "$B2" ] && [ -n "$B3" ] || { echo "Failed to resolve or create backlog items" >&2; exit 1; }
-    "$ZQK" object update "$B1" --field "workstream_refs=[\"$WS_ID\"]"
-    "$ZQK" object update "$B2" --field "workstream_refs=[\"$WS_ID\"]"
-    "$ZQK" object update "$B3" --field "workstream_refs=[\"$WS_ID\"]"
+    "$ZQK" object ref add "$B1" "$WS_ID"
+    "$ZQK" object ref add "$B2" "$WS_ID"
+    "$ZQK" object ref add "$B3" "$WS_ID"
     # Goal
     G_ID=$("$ZQK" object list goal --filter 'title=Onboard agents and users to the project' --format json | _first_id_sorted)
     if [ -z "$G_ID" ]; then
@@ -85,6 +85,6 @@ command_args:
       G_ID=$(echo "$G_OUT" | awk '/created successfully/{print $2}')
     fi
     [ -n "$G_ID" ] || { echo "Failed to resolve or create goal" >&2; exit 1; }
-    "$ZQK" object update "$M_ID" --field "workstream_refs=[\"$WS_ID\"]" --field "backlog_item_refs=[\"$B1\",\"$B2\",\"$B3\"]"
-    "$ZQK" object update "$G_ID" --field "workstream_refs=[\"$WS_ID\"]" --field "backlog_item_refs=[\"$B1\",\"$B2\",\"$B3\"]"
+    "$ZQK" object ref add "$M_ID" "$WS_ID" "$B1" "$B2" "$B3"
+    "$ZQK" object ref add "$G_ID" "$WS_ID" "$B1" "$B2" "$B3"
     echo "Onboarding roadmap ensured: workstream $WS_ID, backlog $B1 $B2 $B3, milestone $M_ID, goal $G_ID"
