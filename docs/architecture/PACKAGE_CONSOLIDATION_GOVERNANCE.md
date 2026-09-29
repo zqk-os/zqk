@@ -1,6 +1,6 @@
 # Package Consolidation Governance and Codebase Complexity Budget
 
-This document establishes the official architectural governance policies, package consolidation rules, and complexity limits for the ZQK kernel repository, resolving `F-ARCH-006` and `F-MNT-MONOLITH-PACKAGE-OUTLIERS`.
+This document establishes the official architectural governance policies, package consolidation rules, and complexity limits for the ZQK kernel repository.
 
 ## 1. 3-Tier Layering Model
 
@@ -19,7 +19,7 @@ All Go packages within `pkg/` and `cmd/` must conform to the 3-Tier Layering Mod
    - Exposes user-facing commands, HTTP/JSON-RPC protocols, and IDE integrations.
    - Consumes Tier 1 and Tier 2 engines.
 
-## 2. Anti-Atomization & Package Sprawl Governance (`F-ARCH-006`)
+## 2. Anti-Atomization & Package Sprawl Governance
 
 - **Prohibition on Micro-Package Generation**: Code generation pipelines (such as `pkg/specbuilder/bldr_enum_v1`) must not emit single-file packages consisting solely of a single type or enum definition.
 - **Grouping Rule**: Domain enums, constants, and builders must be grouped logically by subsystem or domain boundary (e.g., `pkg/specbuilder/enums`).

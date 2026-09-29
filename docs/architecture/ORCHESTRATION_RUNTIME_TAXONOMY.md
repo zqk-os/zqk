@@ -1,6 +1,6 @@
 # Orchestration, Swarm, and Agent Execution Runtime Taxonomy
 
-This document clarifies the architectural boundaries, ownership responsibilities, and routing paths across orchestration packages in the ZQK codebase, resolving finding `F-ARCH-007`.
+This document clarifies the architectural boundaries, ownership responsibilities, and routing paths across orchestration packages in the ZQK codebase.
 
 ## Core Orchestration Responsibilities
 
