@@ -29,7 +29,7 @@
   <circle cx="64" cy="23" r="6" class="dot-green"/>
 
   <!-- Window Title -->
-  <text x="480.0" y="27" class="title-text">zqk — Demo 5: Object Inspector &amp; Policy Studio</text>
+  <text x="480.0" y="27" class="title-text">zqk — Demo 5: Object Inspector, Policy Studio &amp; Unified QA</text>
 
   <!-- Terminal Text Content -->
   <g transform="translate(24, 62)">
@@ -45,22 +45,22 @@
       <tspan x="0" y="176"></tspan>
       <tspan x="0" y="196"><tspan font-weight="bold">[SCENE 1: DUAL HUMAN / AGENT SEMANTIC PROJECTIONS]</tspan></tspan>
       <tspan x="0" y="216">  Autonomous agents need high signal, low token overhead.</tspan>
-      <tspan x="0" y="236">  Querying target object <tspan fill="#94e2d5">BLI-1790035729274492000-75d78502</tspan> with agent-reduced projection (-f json):</tspan>
+      <tspan x="0" y="236">  Querying target object <tspan fill="#94e2d5">BLI-MEMBRANE-001</tspan> with agent-reduced projection (-f json):</tspan>
       <tspan x="0" y="256"></tspan>
-      <tspan x="0" y="276">  $ <tspan font-weight="bold">zqk object inspect backlog_item BLI-1790035729274492000-75d78502 -f json</tspan></tspan>
+      <tspan x="0" y="276">  $ <tspan font-weight="bold">zqk object inspect backlog_item BLI-MEMBRANE-001 -f json</tspan></tspan>
       <tspan x="0" y="296"></tspan>
       <tspan x="0" y="316">{</tspan>
       <tspan x="0" y="336">  &quot;kind&quot;: &quot;backlog_item&quot;,</tspan>
-      <tspan x="0" y="356">  &quot;id&quot;: &quot;BLI-1790035729274492000-75d78502&quot;,</tspan>
-      <tspan x="0" y="376">  &quot;status&quot;: &quot;complete&quot;,</tspan>
-      <tspan x="0" y="396">  &quot;priority&quot;: &quot;medium&quot;,</tspan>
-      <tspan x="0" y="416">  &quot;title&quot;: &quot;Elevate statement test coverage for domain/organizational, verification, config_builders, and bldr_instance_v1&quot;,</tspan>
+      <tspan x="0" y="356">  &quot;id&quot;: &quot;BLI-MEMBRANE-001&quot;,</tspan>
+      <tspan x="0" y="376">  &quot;status&quot;: &quot;originated&quot;,</tspan>
+      <tspan x="0" y="396">  &quot;priority&quot;: &quot;critical&quot;,</tspan>
+      <tspan x="0" y="416">  &quot;title&quot;: &quot;Enforce Cellular Microkernel Membrane Isolation&quot;,</tspan>
       <tspan x="0" y="436">  &quot;storage_profile&quot;: {</tspan>
-      <tspan x="0" y="456">    &quot;cas_hash&quot;: &quot;02e2b104ca250da8802cbd0f3d6ead36654e8871d364b3588241ee487fd20368&quot;,</tspan>
+      <tspan x="0" y="456">    &quot;cas_hash&quot;: &quot;aafb6d9f4c688e9e2a1d29f13be03bcd1ee9feb991a4a1ea513b57519efc4644&quot;,</tspan>
       <tspan x="0" y="476">    &quot;storage_plane&quot;: &quot;cas&quot;,</tspan>
-      <tspan x="0" y="496">    &quot;byte_size&quot;: 1178,</tspan>
+      <tspan x="0" y="496">    &quot;byte_size&quot;: 499,</tspan>
       <tspan x="0" y="516">    &quot;permissions&quot;: &quot;-rw-r--r--&quot;,</tspan>
-      <tspan x="0" y="536">    &quot;last_modified&quot;: &quot;2026-09-22T13:42:03Z&quot;</tspan>
+      <tspan x="0" y="536">    &quot;last_modified&quot;: &quot;2026-09-29T05:04:25Z&quot;</tspan>
       <tspan x="0" y="556">  },</tspan>
       <tspan x="0" y="576">  &quot;ontology&quot;: {</tspan>
       <tspan x="0" y="596">    &quot;namespace&quot;: &quot;zqk:kernel&quot;,</tspan>
@@ -75,30 +75,30 @@
       <tspan x="0" y="776">    &quot;registered_fields_count&quot;: 66</tspan>
       <tspan x="0" y="796">  },</tspan>
       <tspan x="0" y="816">  &quot;lineage&quot;: {</tspan>
-      <tspan x="0" y="836">    &quot;goal&quot;: &quot;GOAL-STARTER-COMMUNITY-001&quot;,</tspan>
-      <tspan x="0" y="856">    &quot;requirement&quot;: &quot;REQ-STARTER-COMMUNITY-001&quot;,</tspan>
-      <tspan x="0" y="876">    &quot;milestone&quot;: &quot;MIL-1790035725343412000-f3061142&quot;,</tspan>
-      <tspan x="0" y="896">    &quot;priority_plan&quot;: &quot;PRI-1790035722018347000-e89c3fb2&quot;,</tspan>
-      <tspan x="0" y="916">    &quot;is_intact&quot;: true</tspan>
-      <tspan x="0" y="936">  },</tspan>
-      <tspan x="0" y="956">  &quot;criteria_summary&quot;: {</tspan>
-      <tspan x="0" y="976">    &quot;total&quot;: 1,</tspan>
-      <tspan x="0" y="996">    &quot;satisfied&quot;: 1,</tspan>
+      <tspan x="0" y="836">    &quot;is_intact&quot;: false</tspan>
+      <tspan x="0" y="856">  },</tspan>
+      <tspan x="0" y="876">  &quot;criteria_summary&quot;: {</tspan>
+      <tspan x="0" y="896">    &quot;total&quot;: 0,</tspan>
+      <tspan x="0" y="916">    &quot;satisfied&quot;: 0,</tspan>
+      <tspan x="0" y="936">    &quot;pending&quot;: 0</tspan>
+      <tspan x="0" y="956">  },</tspan>
+      <tspan x="0" y="976">  &quot;actions_available&quot;: [</tspan>
+      <tspan x="0" y="996">    &quot;transition_status&quot;,</tspan>
       <tspan x="0" y="1016"><tspan opacity="0.65">  ... [stream continues with storage profile, ontology &amp; lineage]</tspan></tspan>
       <tspan x="0" y="1036"></tspan>
       <tspan x="0" y="1056"><tspan font-weight="bold">[SCENE 2: HUMAN INTERACTIVE OBJECT INSPECTOR (TDS FORMAT)]</tspan></tspan>
       <tspan x="0" y="1076">  Human operators receive structured TDS panel views with Modular Cards:</tspan>
       <tspan x="0" y="1096"></tspan>
-      <tspan x="0" y="1116">  $ <tspan font-weight="bold">zqk object inspect backlog_item BLI-1790035729274492000-75d78502</tspan></tspan>
+      <tspan x="0" y="1116">  $ <tspan font-weight="bold">zqk object inspect backlog_item BLI-MEMBRANE-001</tspan></tspan>
       <tspan x="0" y="1136"></tspan>
-      <tspan x="0" y="1156">╭─ OBJECT INSPECTOR: BLI-1790035729274492000-75d78502 ─────────────────────────╮</tspan>
-      <tspan x="0" y="1176">│<tspan opacity="0.65">Kind: </tspan><tspan fill="#cdd6f4" font-weight="bold">backlog_item</tspan>       <tspan opacity="0.65">Status: </tspan><tspan fill="#cdd6f4" font-weight="bold">complete</tspan> <tspan fill="#94e2d5">[complete]</tspan><tspan opacity="0.65">Priority: </tspan><tspan fill="#cdd6f4" font-weight="bold">medium</tspan>          │</tspan>
+      <tspan x="0" y="1156">╭─ OBJECT INSPECTOR: BLI-MEMBRANE-001 ─────────────────────────────────────────╮</tspan>
+      <tspan x="0" y="1176">│<tspan opacity="0.65">Kind: </tspan><tspan fill="#cdd6f4" font-weight="bold">backlog_item</tspan>       <tspan opacity="0.65">Status: </tspan><tspan fill="#cdd6f4" font-weight="bold">originated</tspan> <tspan fill="#94e2d5">[originated]</tspan><tspan opacity="0.65">Priority: </tspan><tspan fill="#cdd6f4" font-weight="bold">critical</tspan>    │</tspan>
       <tspan x="0" y="1196">│                                                                              │</tspan>
-      <tspan x="0" y="1216">│Title: Elevate statement test coverage for domain/organizational, verificatio…│</tspan>
+      <tspan x="0" y="1216">│Title: Enforce Cellular Microkernel Membrane Isolation                        │</tspan>
       <tspan x="0" y="1236">│                                                                              │</tspan>
       <tspan x="0" y="1256">│── CAS Storage &amp; Data-Cell Profile ──                                         │</tspan>
-      <tspan x="0" y="1276">│  Storage Plane: <tspan fill="#94e2d5">[cas]</tspan>  │ CAS Hash: 02e2b104ca25…487fd20368                   │</tspan>
-      <tspan x="0" y="1296">│  Content Size:  1178 bytes  │ Mode: -rw-r--r--  │ Modified: 2026-09-22T13:42…│</tspan>
+      <tspan x="0" y="1276">│  Storage Plane: <tspan fill="#94e2d5">[cas]</tspan>  │ CAS Hash: aafb6d9f4c68…519efc4644                   │</tspan>
+      <tspan x="0" y="1296">│  Content Size:  499 bytes  │ Mode: -rw-r--r--  │ Modified: 2026-09-29T05:04:…│</tspan>
       <tspan x="0" y="1316">│                                                                              │</tspan>
       <tspan x="0" y="1336">│── Ontology &amp; Schema Profile ──                                               │</tspan>
       <tspan x="0" y="1356">│  Namespace:     zqk:kernel  │ Version: default  │ Storage: cas_entity        │</tspan>
@@ -106,19 +106,19 @@
       <tspan x="0" y="1396">│  Traits:        [base_object_traits, manipulatable, constrainable, effort_aw…│</tspan>
       <tspan x="0" y="1416">│                                                                              │</tspan>
       <tspan x="0" y="1436">│── Lineage &amp; Traceability Radar ──                                            │</tspan>
-      <tspan x="0" y="1456">│  Goal:          GOAL-STARTER-COMMUNITY-001                                   │</tspan>
-      <tspan x="0" y="1476">│  Milestone:     MIL-1790035725343412000-f3061142                             │</tspan>
-      <tspan x="0" y="1496">│  Requirement:   REQ-STARTER-COMMUNITY-001                                    │</tspan>
-      <tspan x="0" y="1516">│  Priority Plan: PRI-1790035722018347000-e89c3fb2                             │</tspan>
-      <tspan x="0" y="1536">│  Lineage Intact: <tspan fill="#a6e3a1" font-weight="bold">[✓ PASS]</tspan>                                                    │</tspan>
+      <tspan x="0" y="1456">│  Goal:          (none)                                                       │</tspan>
+      <tspan x="0" y="1476">│  Milestone:     (none)                                                       │</tspan>
+      <tspan x="0" y="1496">│  Requirement:   (none)                                                       │</tspan>
+      <tspan x="0" y="1516">│  Priority Plan: (none)                                                       │</tspan>
+      <tspan x="0" y="1536">│  Lineage Intact: <tspan fill="#f9e2af" font-weight="bold">[⚠️  WARN]</tspan>                                                   │</tspan>
       <tspan x="0" y="1556">│                                                                              │</tspan>
-      <tspan x="0" y="1576">│── Acceptance Criteria (1 total, 1 satisfied, 0 pending) ──                   │</tspan>
-      <tspan x="0" y="1596">│                                                                              │</tspan>
-      <tspan x="0" y="1616">│Available Actions: [claim, edit_properties]                                   │</tspan>
-      <tspan x="0" y="1636">╰──────────────────────────────────────────────────────────────────────────────╯</tspan>
-      <tspan x="0" y="1656"></tspan>
-      <tspan x="0" y="1676"></tspan>
-      <tspan x="0" y="1696"><tspan font-weight="bold">[SCENE 3: LIVE POLICY RULE STUDIO &amp; DSL EVALUATION ENGINE]</tspan></tspan>
+      <tspan x="0" y="1576">│Available Actions: [transition_status, claim, edit_properties]                │</tspan>
+      <tspan x="0" y="1596">╰──────────────────────────────────────────────────────────────────────────────╯</tspan>
+      <tspan x="0" y="1616"></tspan>
+      <tspan x="0" y="1636"></tspan>
+      <tspan x="0" y="1656"><tspan font-weight="bold">[SCENE 3: LIVE POLICY RULE STUDIO &amp; DSL EVALUATION ENGINE]</tspan></tspan>
+      <tspan x="0" y="1676">  Validating active backlog items against kernel policy rules in real time:</tspan>
+      <tspan x="0" y="1696"></tspan>
       <tspan x="0" y="1716"><tspan opacity="0.65">... [terminal session output truncated for screenshot] ...</tspan></tspan>
     </text>
   </g>
