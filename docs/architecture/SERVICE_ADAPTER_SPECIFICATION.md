@@ -61,7 +61,7 @@ flowchart TD
 - Operates when native system init is unavailable or in containerized sandboxes.
 - Tracks process states (running, stopped, failed) with PID files and signal handling.
 
-## ServiceManager Façade API
+## ServiceManager Facade API
 
 The `service.Manager` struct provides high-level unified lifecycle orchestration:
 - `Install(ctx, spec)`: Validates spec invariants and delegates to the active platform adapter.

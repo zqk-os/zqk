@@ -1,4 +1,4 @@
-# Technical Specification: ZPARQL Index-Accelerated Query Planner and Cycle-Safe Traversal Engine
+# Technical Specification: ZPARQL Indexed Secondary Query Planner & Traversal Contract
 
 **Document ID:** `SPEC-ZPARQL-INDEXED-QUERY-PLANNER`  
 **Status:** Approved Architectural Specification  
