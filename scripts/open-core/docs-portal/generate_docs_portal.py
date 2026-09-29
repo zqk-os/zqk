@@ -413,7 +413,28 @@ def get_git_commit_sha(repo_root: str) -> str:
         pass
     return "zqk"
 
-def render_markdown_to_html(content: str, current_html_rel: str, link_map: dict, repo_root: str = "", default_hash: str = "") -> str:
+def is_likely_math(expr: str) -> bool:
+    s = expr.strip()
+    if not s:
+        return False
+    # If it contains LaTeX commands
+    if re.search(r'\\[a-zA-Z]+', s):
+        return True
+    # If it contains math relations, superscripts, subscripts, or LaTeX braces
+    if re.search(r'[\^_{}\\]', s):
+        return True
+    if re.search(r'[=<>]\s*[\d\w]', s) or re.search(r'[\d\w]\s*[=<>]', s):
+        return True
+    if re.search(r'\|[A-Za-z0-9]+\|', s):
+        return True
+    if re.search(r'O\([^)]+\)', s):
+        return True
+    # Single mathematical letters or sets (e.g., $Q$, $V$, $S$, $C$)
+    if re.match(r'^[A-Z](_[a-z0-9]+)?$', s):
+        return True
+    return False
+
+def render_markdown_to_html(content: str, current_html_rel: str, link_map: dict, repo_root: str = "", default_hash: str = "") -> tuple:
     current_dir = os.path.dirname(current_html_rel)
 
     # Rewrite markdown links to generated html paths
@@ -493,6 +514,7 @@ def render_markdown_to_html(content: str, current_html_rel: str, link_map: dict,
 
     transformed = re.sub(r'(!?\[[^\]]*\])\(([^)]+)\)', replace_md_link, content)
     
+    has_math = False
     if HAS_MARKDOWN:
         try:
             # 1. Mask fenced code blocks and inline code to avoid false math matching
@@ -507,15 +529,28 @@ def render_markdown_to_html(content: str, current_html_rel: str, link_map: dict,
 
             # 2. Protect display and inline math from markdown emphasis/italics mangling
             math_tokens = []
-            def _save_math(m):
+            def _save_display_math(m):
+                nonlocal has_math
+                has_math = True
                 token = f"ZZZMATHTOKEN{len(math_tokens)}ZZZ"
-                math_tokens.append(m.group(0))
+                inner = m.group(1).strip()
+                math_tokens.append(f'<div class="katex-display">\\[{inner}\\]</div>')
                 return token
 
+            def _save_inline_math(m):
+                nonlocal has_math
+                inner = m.group(1).strip()
+                if is_likely_math(inner):
+                    has_math = True
+                    token = f"ZZZMATHTOKEN{len(math_tokens)}ZZZ"
+                    math_tokens.append(f"\\({inner}\\)")
+                    return token
+                return m.group(0)
+
             # Display math ($$...$$)
-            text_masked = re.sub(r'\$\$([\s\S]*?)\$\$', _save_math, text_masked)
+            text_masked = re.sub(r'\$\$([\s\S]*?)\$\$', _save_display_math, text_masked)
             # Inline math ($...$) - ensuring non-empty and non-whitespace bounded
-            text_masked = re.sub(r'(?<!\$)\$(?!\$)([^\s$](?:[^\n$]*?[^\s$])?)(?<!\$)\$(?!\$)', _save_math, text_masked)
+            text_masked = re.sub(r'(?<!\$)\$(?!\$)([^\s$](?:[^\n$]*?[^\s$])?)(?<!\$)\$(?!\$)', _save_inline_math, text_masked)
 
             # 3. Restore code blocks before markdown processing so fenced blocks are properly converted
             for idx, code_str in enumerate(code_tokens):
@@ -528,9 +563,15 @@ def render_markdown_to_html(content: str, current_html_rel: str, link_map: dict,
 
             # 4. Restore math blocks and sanitize any toc heading IDs
             for idx, math_str in enumerate(math_tokens):
-                slug = re.sub(r'[^a-zA-Z0-9]+', '', math_str).lower() or 'math'
+                slug = 'math'
                 rendered = re.sub(rf'(id="[^"]*?)zzzmathtoken{idx}zzz([^"]*?")', rf'\1{slug}\2', rendered)
                 rendered = rendered.replace(f"ZZZMATHTOKEN{idx}ZZZ", math_str)
+
+            # 5. Wrap all markdown tables in responsive containers
+            def _wrap_table(m):
+                return f'<div class="table-container">{m.group(0)}</div>'
+            rendered = re.sub(r'<table>[\s\S]*?</table>', _wrap_table, rendered)
+
             # Transform fenced mermaid code blocks to <pre class="mermaid">
             # markdown fenced_code generates: <pre><code class="language-mermaid">...</code></pre>
             def _mermaid_replacer(match):
@@ -583,12 +624,12 @@ def render_markdown_to_html(content: str, current_html_rel: str, link_map: dict,
                 rendered
             )
             rendered = bust_html_img_cache(rendered, current_html_rel, repo_root, default_hash)
-            return rendered
+            return rendered, has_math
         except Exception:
             pass
             
     preview = f"<pre class=\"markdown-preview\">{html.escape(content)}</pre>"
-    return bust_html_img_cache(preview, current_html_rel, repo_root, default_hash)
+    return bust_html_img_cache(preview, current_html_rel, repo_root, default_hash), False
 
 def get_portal_style_css() -> str:
     return """
@@ -1133,6 +1174,51 @@ body {
   padding: 0;
 }
 
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-container table {
+  width: 100%;
+  min-width: 580px;
+  border-collapse: collapse;
+  margin: 0;
+  display: table;
+}
+
+.table-container th, .table-container td {
+  border: 1px solid var(--border-color);
+  padding: 10px 14px;
+  text-align: left;
+  vertical-align: top;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.table-container th {
+  background: var(--bg-tertiary);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.table-container tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.table-container td code {
+  white-space: nowrap;
+}
+
 .markdown-body table {
   width: 100%;
   border-collapse: collapse;
@@ -1151,12 +1237,23 @@ body {
   background: var(--bg-tertiary);
   color: #fff;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .markdown-body td code {
   word-break: break-word;
 }
+
+sub, sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+sub { bottom: -0.25em; }
+sup { top: -0.5em; }
 
 .markdown-body img {
   max-width: 100%;
@@ -1197,9 +1294,10 @@ body {
   overflow-y: hidden;
   padding: 0.75rem 0;
   margin: 1.25rem 0;
+  text-align: center;
 }
 .katex {
-  font-size: 1.1em;
+  font-size: 1.05em;
   color: var(--text-main);
 }
 
@@ -1685,13 +1783,43 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
         cat_name = item["category"]
         category_counts[cat_name] = category_counts.get(cat_name, 0) + 1
         
-        rendered_body = render_markdown_to_html(item["content"], item["html_rel"], link_map, repo_root, portal_build_id)
+        rendered_body, has_math = render_markdown_to_html(item["content"], item["html_rel"], link_map, repo_root, portal_build_id)
         escaped_title = html.escape(item["title"])
         
         depth = item["html_rel"].count("/")
         root_rel = "../" * depth if depth > 0 else ""
         sidebar_nav_html = get_sidebar_nav_html(root_rel, item["html_rel"])
         
+        katex_tags = ""
+        if has_math:
+            katex_tags = """  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="initKaTeX()"></script>
+  <script>
+    let katexRendered = false;
+    function initKaTeX() {
+      if (katexRendered) return;
+      const target = document.querySelector('.markdown-body');
+      if (target && typeof renderMathInElement === 'function') {
+        renderMathInElement(target, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '\\\\(', right: '\\\\)', display: false},
+            {left: '\\\\[', right: '\\\\]', display: true}
+          ],
+          ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+          throwOnError: false
+        });
+        katexRendered = true;
+      }
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initKaTeX);
+    } else {
+      initKaTeX();
+    }
+  </script>"""
+
         page_html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1742,33 +1870,7 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
       initMermaid();
     }}
   </script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="initKaTeX()"></script>
-  <script>
-    let katexRendered = false;
-    function initKaTeX() {{
-      if (katexRendered) return;
-      if (typeof renderMathInElement === 'function') {{
-        renderMathInElement(document.body, {{
-          delimiters: [
-            {{left: '$$', right: '$$', display: true}},
-            {{left: '$', right: '$', display: false}},
-            {{left: '\\(', right: '\\)', display: false}},
-            {{left: '\\[', right: '\\]', display: true}}
-          ],
-          ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-          throwOnError: false
-        }});
-        katexRendered = true;
-      }}
-    }}
-    if (document.readyState === 'loading') {{
-      document.addEventListener('DOMContentLoaded', initKaTeX);
-    }} else {{
-      initKaTeX();
-    }}
-  </script>
+{katex_tags}
 </head>
 <body data-root-rel="{root_rel}">
   <header class="header">
@@ -1902,33 +2004,6 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
       document.addEventListener('DOMContentLoaded', initMermaid);
     }} else {{
       initMermaid();
-    }}
-  </script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="initKaTeX()"></script>
-  <script>
-    let katexRendered = false;
-    function initKaTeX() {{
-      if (katexRendered) return;
-      if (typeof renderMathInElement === 'function') {{
-        renderMathInElement(document.body, {{
-          delimiters: [
-            {{left: '$$', right: '$$', display: true}},
-            {{left: '$', right: '$', display: false}},
-            {{left: '\\(', right: '\\)', display: false}},
-            {{left: '\\[', right: '\\]', display: true}}
-          ],
-          ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-          throwOnError: false
-        }});
-        katexRendered = true;
-      }}
-    }}
-    if (document.readyState === 'loading') {{
-      document.addEventListener('DOMContentLoaded', initKaTeX);
-    }} else {{
-      initKaTeX();
     }}
   </script>
 </head>

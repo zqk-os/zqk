@@ -1,5 +1,6 @@
 # CEF Constitution: Binding Rules & Evidence Protocol
 
+> [!NOTE]
 > **Purpose:** Non-negotiable constitutional invariants, evidence grades (E0–E3), budget density rules, and zero-fix discipline governing all codebase evaluations. All specialist evaluators, adversarial auditors, and lead integrators must adhere to this specification before producing findings.
 
 | Specification Metadata | Value |

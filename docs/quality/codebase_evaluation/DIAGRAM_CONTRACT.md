@@ -1,5 +1,6 @@
 # Diagram Contract & Architectural Anchoring
 
+> [!NOTE]
 > **Purpose:** Rigorous architectural illumination contract mandating referentially anchored diagrams, falsifiable claims, and sequence failure paths across major subsystems.
 
 | Specification Metadata | Value |
