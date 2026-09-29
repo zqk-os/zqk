@@ -8,6 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/studio"
@@ -30,11 +31,33 @@ func NewUICmd() *cobra.Command {
 				if port <= 0 {
 					port = 8080
 				}
-				addr := fmt.Sprintf("127.0.0.1:%d", port)
 				server := studio.NewServer(projectRoot)
-				if err := server.Start(addr); err != nil {
-					return err
+				var err error
+
+				if cmd.Flags().Changed("port") {
+					// User explicitly requested this port: fail with helpful guidance if bound
+					addr := fmt.Sprintf("127.0.0.1:%d", port)
+					err = server.Start(addr)
+					if err != nil {
+						return fmt.Errorf("port %d is already in use. Specify a different port with: %s ui -w --port <port> (or -p <port>): %w", port, brand.ExecutableName(), err)
+					}
+				} else {
+					// Default port: try 8080, and if in use, auto-fallback to next available ports (8081-8095)
+					for p := port; p <= port+15; p++ {
+						addr := fmt.Sprintf("127.0.0.1:%d", p)
+						err = server.Start(addr)
+						if err == nil {
+							if p != port {
+								fmt.Printf("ℹ️  Port %d was in use; automatically selected port %d (use --port / -p to override)\n", port, p)
+							}
+							break
+						}
+					}
+					if err != nil {
+						return fmt.Errorf("ports %d-%d are already in use. Specify an open port with: %s ui -w --port <port> (or -p <port>): %w", port, port+15, brand.ExecutableName(), err)
+					}
 				}
+
 				fmt.Printf("⚡ ZQK Knowledge Kernel Visual Studio running at http://%s (Press Ctrl+C to stop)\n", server.Addr())
 				sigCh := make(chan os.Signal, 1)
 				signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
