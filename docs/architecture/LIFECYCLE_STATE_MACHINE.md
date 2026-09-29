@@ -124,6 +124,6 @@ flowchart TD
 ---
 
 ## Canonical References
-- [Modular Pack Composition Architecture](file:///Users/lanceettl/zqk-public-candidate/docs/architecture/PACK_COMPOSITION_AND_EXTENSIBILITY.md)
-- [Ambient Signal Interpretation & Action Rubric](file:///Users/lanceettl/zqk-public-candidate/docs/architecture/AMBIENT_SIGNAL_ACTION_RUBRIC.md)
-- [Architecture Index](file:///Users/lanceettl/zqk-public-candidate/docs/INDEX.md)
+- [Modular Pack Composition Architecture](PACK_COMPOSITION_AND_EXTENSIBILITY.md)
+- [Ambient Signal Interpretation & Action Rubric](AMBIENT_SIGNAL_ACTION_RUBRIC.md)
+- [Architecture Index](../INDEX.md)

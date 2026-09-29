@@ -60,6 +60,7 @@ COMMIT_MSG*
 .zqk/seating/
 .zqk/credentials
 .zqk/streams/
+.zqk/scenarios/
 .zqk/tmp/
 # Ephemeral scratch at .zqk root (CLI --file payloads, scans). Use .zqk/tmp/ instead.
 /.zqk/tmp-*

@@ -140,6 +140,6 @@ To create and integrate an extension pack:
 ---
 
 ## Canonical References
-- [Architecture Index](file:///Users/lanceettl/zqk-public-candidate/docs/INDEX.md)
-- [Lifecycle State Machine Specification](file:///Users/lanceettl/zqk-public-candidate/docs/architecture/LIFECYCLE_STATE_MACHINE.md)
-- [Pack Composition Workspace](file:///Users/lanceettl/zqk-public-candidate/PACK-COMPOSITION.md)
+- [Architecture Index](../INDEX.md)
+- [Lifecycle State Machine Specification](LIFECYCLE_STATE_MACHINE.md)
+- [Pack Composition Workspace](../../PACK-COMPOSITION.md)

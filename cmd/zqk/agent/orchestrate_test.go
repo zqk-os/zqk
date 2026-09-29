@@ -595,7 +595,7 @@ func TestBuildOrchestrationExecutorArgs(t *testing.T) {
 func TestOrchestrationExecutorChildEnv_bindsSeatedKernelNotWorktree(t *testing.T) {
 	t.Parallel()
 
-	kernel := "/Users/lanceettl/zqk-public-candidate"
+	kernel := t.TempDir()
 	worktree := filepath.Join(fileutil.TempDir(), "zqk-worktrees", "repo", "ATK-1789868091203586000-7b8ea42c")
 	parent := []string{
 		"PATH=/usr/bin",

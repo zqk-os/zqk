@@ -78,5 +78,5 @@ zqk query zparql --file queries/active_blockers.zparql --format json
 ---
 
 ## Canonical References
-- [ZQL Mutations Manual](file:///Users/lanceettl/zqk-public-candidate/docs/manual/ZQL_MUTATIONS.md)
-- [Architecture Index](file:///Users/lanceettl/zqk-public-candidate/docs/INDEX.md)
+- [ZQL Mutations Manual](ZQL_MUTATIONS.md)
+- [Architecture Index](../INDEX.md)

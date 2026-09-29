@@ -105,7 +105,6 @@ if git -C "$ROOT" grep -n -E '[A-Z]{2,12}-[0-9]{15,}-[0-9a-fA-F]{8}' -- \
 	'.zqk/cli/specs' \
 	'pkg/cli/bldr_cli_cmd_v1' \
 	':!*_test.go' \
-	':!scripts/open-core/setup_scripts/**' \
 	':!scripts/open-core/check-public-release-payload.sh' \
 	':!scripts/open-core/test-public-release-gates.sh'; then
 	fail "studio nanos-hex kernel object id remains in production cmd, docs, scripts, CLI specs, or command builders"

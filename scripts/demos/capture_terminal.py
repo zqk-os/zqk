@@ -60,8 +60,20 @@ def strip_ansi(text: str) -> str:
     return clean_xml_chars(text)
 
 
+def sanitize_paths(text: str) -> str:
+    """Strips absolute developer home and repo paths to maintain clean public presentation."""
+    try:
+        cwd = os.path.abspath(os.getcwd())
+        if cwd and len(cwd) > 1:
+            text = text.replace(cwd + "/", "").replace(cwd, ".")
+    except Exception:
+        pass
+    return re.sub(r'/(?:Users|home)/[a-zA-Z0-9._\-]+/', '~/', text)
+
+
 def ansi_to_svg_spans(line: str) -> str:
     """Converts a line of ANSI-colored text into strict XML-valid SVG tspans."""
+    line = sanitize_paths(line)
     # 1. Strip all non-SGR sequences (clearing screen, cursor moves, OSC)
     line = NON_SGR_REGEX.sub('', line)
 

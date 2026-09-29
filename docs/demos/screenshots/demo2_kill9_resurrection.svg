@@ -83,7 +83,7 @@
       <tspan x="0" y="936">  <tspan fill="#f38ba8">&gt;&gt; Executing: kill -9 52387 &lt;&lt;</tspan></tspan>
       <tspan x="0" y="956">  <tspan fill="#a6e3a1">✔ Host process terminated abruptly (SIGKILL). Workspace left with abandoned lock.</tspan></tspan>
       <tspan x="0" y="976"></tspan>
-      <tspan x="0" y="996">/Users/lanceettl/zqk-public-candidate/scripts/demos/time_travel_demo.sh: line 93: 52387 Killed: 9               sleep 100</tspan>
+      <tspan x="0" y="996">scripts/demos/time_travel_demo.sh: line 93: 52387 Killed: 9               sleep 100</tspan>
       <tspan x="0" y="1016"><tspan font-weight="bold">[SCENE 5: AUTONOMOUS KERNEL SELF-REMEDY &amp; CAS RECONSTRUCTION]</tspan></tspan>
       <tspan x="0" y="1036">  Running self-healing system check to detect abandoned locks and verify CAS leaves:</tspan>
       <tspan x="0" y="1056">  $ <tspan font-weight="bold">zqk system check --auto-remedy</tspan></tspan>
