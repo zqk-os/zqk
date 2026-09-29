@@ -185,7 +185,7 @@ Operators launch the creation modal via `zqk object inspect --policy-studio` or 
 | **Expression Prompt** | Cyan prompt with yellow cursor (`█`) | Active editing prompt for Validation DSL | Real-time declarative boolean invariant (e.g. `status == "in_progress" ==> claimed_by != "" && criteria_linked`). |
 | **Autocomplete Popup** | Floating bordered menu with active row (`▶`) | Schema-driven token suggestions | Dynamically introspects `FieldRegistry` to suggest attributes, predicates, and enums as the operator types. |
 | **Predicate Annotations** | Dim helper text with return types | Inline documentation for selected token | Explains semantics and type signature (e.g. `criteria_linked_or_acceptance_present() -> boolean`). |
-| **Syntax & Type Receipt** | Green status check (`✓ SYNTAX: OK`) | Compile-time static type receipt | Confirms ISO/IEC 14977 grammar compliance and $O(1)$ bounded termination proof before execution. |
+| **Syntax & Type Receipt** | Green status check (`✓ SYNTAX: OK`) | Compile-time static type receipt | Confirms ISO/IEC 14977 grammar compliance and `O(1)` bounded termination proof before execution. |
 | **Action Hotkeys** | Keycap menu (`[Enter] Accept`, `[t] Dry-Run`, `[s] Save`) | Available keyboard accelerator bindings | Enables rapid, seamless keyboard-only DSL composition without switching to an external editor. |
 
 ---
@@ -248,7 +248,7 @@ The autocompletion engine inspects `objects.GetGlobalFieldRegistry()` dynamicall
   - `criteria_linked_or_acceptance_present()`: Confirms at least one DoD criteria node is bound.
   - `tests_ok_per_customization()`: Validates that all associated test cases pass.
   - `security_gate_ok_or_na()`: Evaluates required security credentials and role scopes.
-- **Purity & Termination Guarantees**: All expressions are restricted to ISO/IEC 14977 non-looping, side-effect-free predicates, guaranteeing deterministic $O(1)$ evaluation complexity per object.
+- **Purity & Termination Guarantees**: All expressions are restricted to ISO/IEC 14977 non-looping, side-effect-free predicates, guaranteeing deterministic `O(1)` evaluation complexity per object.
 
 ---
 

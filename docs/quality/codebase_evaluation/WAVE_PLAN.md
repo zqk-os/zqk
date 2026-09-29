@@ -13,7 +13,7 @@
 
 ## 1. Execution Phasing Invariants
 
-Evaluation waves are strictly sequential. An evaluation wave $N+1$ may not commence until the wave $N$ gate passes validation or is explicitly waived in `run_log.md`:
+Evaluation waves are strictly sequential. An evaluation wave N+1 may not commence until the wave N gate passes validation or is explicitly waived in `run_log.md`:
 
 ```mermaid
 flowchart LR
