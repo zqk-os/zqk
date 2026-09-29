@@ -230,6 +230,35 @@ func TestPureGoIndexer_IndexProjectDir(t *testing.T) {
 	assert.Equal(t, []string{"MIL-TEST-001"}, node.References["milestone_refs"])
 }
 
+func TestPureGoIndexer_IndexProjectDir_ProcessSubdirectory(t *testing.T) {
+	tmpDir := t.TempDir()
+	processDir := filepath.Join(tmpDir, paths.ProjectDataDir, "process", "goals")
+	require.NoError(t, fileutil.MkdirAll(processDir, paths.DirPerm755))
+
+	goalData := map[string]any{
+		"id":          "GOAL-TEST-001",
+		"kind":        "goal",
+		"status":      "active",
+		"title":       "Test Goal",
+		"vision_refs": []any{"VIS-TEST-001"},
+	}
+	rawYAML, err := yaml.Marshal(goalData)
+	require.NoError(t, err)
+
+	filePath := filepath.Join(processDir, "GOAL-TEST-001.yaml")
+	require.NoError(t, os.WriteFile(filePath, rawYAML, paths.FilePerm644))
+
+	indexer := storage.NewPureGoIndexer()
+	count, err := indexer.IndexProjectDir(context.Background(), tmpDir)
+	require.NoError(t, err)
+	assert.Equal(t, 1, count)
+
+	node, ok := indexer.GetNode("GOAL-TEST-001")
+	require.True(t, ok)
+	assert.Equal(t, "active", node.Status)
+	assert.Equal(t, []string{"VIS-TEST-001"}, node.References["vision_refs"])
+}
+
 func TestPureGoIndexer_UnindexBidirectionalAndSelfLoopEdges(t *testing.T) {
 	t.Parallel()
 	indexer := storage.NewPureGoIndexer()

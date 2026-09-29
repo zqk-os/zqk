@@ -412,66 +412,81 @@ func (p *PureGoIndexer) TraverseRecursive(ctx context.Context, startID string, r
 	return results, nil
 }
 
-// IndexProjectDir walks projectRoot/.zqk/data (and related storage directories) and indexes
+// IndexProjectDir walks projectRoot/.zqk/process (and related storage directories) and indexes
 // all valid YAML objects into the pure-Go indexer.
 func (p *PureGoIndexer) IndexProjectDir(ctx context.Context, projectRoot string) (int, error) {
-	dataDir := filepath.Join(projectRoot, paths.ProjectDataDir, "data")
-	if fi, err := fileutil.Stat(dataDir); err != nil || !fi.IsDir() {
-		// Fallback to checking paths.ProjectDataDir
-		dataDir = filepath.Join(projectRoot, paths.ProjectDataDir)
-		if fi, err := fileutil.Stat(dataDir); err != nil || !fi.IsDir() {
-			return 0, nil
+	candidates := []string{
+		filepath.Join(projectRoot, paths.ProjectDataDir, "process"),
+		filepath.Join(projectRoot, paths.ProjectDataDir, "data"),
+	}
+
+	var dataDirs []string
+	for _, dir := range candidates {
+		if fi, err := fileutil.Stat(dir); err == nil && fi.IsDir() {
+			dataDirs = append(dataDirs, dir)
+		}
+	}
+
+	if len(dataDirs) == 0 {
+		base := filepath.Join(projectRoot, paths.ProjectDataDir)
+		if fi, err := fileutil.Stat(base); err == nil && fi.IsDir() {
+			dataDirs = append(dataDirs, base)
 		}
 	}
 
 	indexedCount := 0
-	err := filepath.WalkDir(dataDir, func(path string, d fileutil.DirEntry, walkErr error) error {
-		if walkErr != nil {
-			return walkErr
-		}
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		default:
-		}
+	for _, searchDir := range dataDirs {
+		err := filepath.WalkDir(searchDir, func(path string, d fileutil.DirEntry, walkErr error) error {
+			if walkErr != nil {
+				return walkErr
+			}
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			default:
+			}
 
-		if d.IsDir() {
-			name := d.Name()
-			if strings.HasPrefix(name, ".") || name == "cache" || name == "logs" {
-				return filepath.SkipDir
+			if d.IsDir() {
+				name := d.Name()
+				if path != searchDir && (strings.HasPrefix(name, ".") || name == "cache" || name == "logs" || name == "wal" || name == "_internal" || name == "scheduler" || name == "keystore") {
+					return filepath.SkipDir
+				}
+				return nil
+			}
+
+			ext := filepath.Ext(path)
+			if ext != ".yaml" && ext != ".yml" {
+				return nil
+			}
+
+			data, err := fileutil.ReadFile(path)
+			if err != nil {
+				return nil
+			}
+
+			var obj map[string]any
+			if err := yaml.Unmarshal(data, &obj); err != nil || len(obj) == 0 {
+				return nil
+			}
+
+			id, _ := obj["id"].(string)
+			kind, _ := obj["kind"].(string)
+			if id == "" || kind == "" {
+				return nil
+			}
+
+			node := parseIndexedNodeFromMap(id, kind, obj)
+			if err := p.IndexNode(node); err == nil {
+				indexedCount++
 			}
 			return nil
-		}
-
-		ext := filepath.Ext(path)
-		if ext != ".yaml" && ext != ".yml" {
-			return nil
-		}
-
-		data, err := fileutil.ReadFile(path)
+		})
 		if err != nil {
-			return nil
+			return indexedCount, err
 		}
+	}
 
-		var obj map[string]any
-		if err := yaml.Unmarshal(data, &obj); err != nil || len(obj) == 0 {
-			return nil
-		}
-
-		id, _ := obj["id"].(string)
-		kind, _ := obj["kind"].(string)
-		if id == "" || kind == "" {
-			return nil
-		}
-
-		node := parseIndexedNodeFromMap(id, kind, obj)
-		if err := p.IndexNode(node); err == nil {
-			indexedCount++
-		}
-		return nil
-	})
-
-	return indexedCount, err
+	return indexedCount, nil
 }
 
 // SaveSnapshot serializes the entire index state into a binary gob format.
