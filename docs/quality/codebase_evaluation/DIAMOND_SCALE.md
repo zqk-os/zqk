@@ -1,86 +1,106 @@
-# Diamond Scale — multi-axis quality grading
+# Diamond Scale: Multi-Axis Quality Grading Model
 
-**cef_version:** 0.1.0  
+> **Purpose:** Multidimensional architectural quality grading system separating independent software engineering concerns into eight primary vector axes and a five-tier evaluation ladder.
 
-“World-class” is **not** a single slogan. Like diamond grading, quality is a **vector** of axes. A codebase may be secure yet unreadable, or elegant yet unrecoverable. CEF forbids collapsing the vector into one marketing number without showing the axes.
-
-Inspiration: gemological practice separates **independent** attributes (e.g. GIA’s cut / color / clarity / carat weight) rather than a single adjective ([GIA Diamond Grading](https://www.gia.edu/diamond-grading)). Software quality similarly separates concerns in ISO/IEC 25010 product quality model (functional suitability, performance efficiency, compatibility, usability, reliability, security, maintainability, portability).
-
----
-
-## 1. Axes (the “Cs” for code)
-
-| Axis ID | Name | Plain meaning |
-|---------|------|---------------|
-| `RDB` | Readability | Can a skilled stranger understand intent without tribal knowledge? |
-| `MNT` | Maintainability | Can change land safely with local reasoning? |
-| `TST` | Testability | Can behavior be locked with fast, deterministic checks? |
-| `REL` | Reliability | Does it behave correctly under expected load and failure? |
-| `OBS` | Observability | Can operators see health, causality, and failure modes? |
-| `RCV` | Recoverability | Can the system and humans recover from faults/data loss? |
-| `SEC` | Security | Are confidentiality, integrity, and abuse resistance engineered? |
-| `ROB` | Robustness | Does it fail closed, bound resources, and reject garbage inputs? |
-
-Optional axes (report separately; do not bury inside the eight):
-
-| Axis ID | Name | When to use |
-|---------|------|-------------|
-| `CMP` | Completeness | Advertised surface vs implemented/tested reality (truthfulness) |
-| `OPS` | Operability | Install, configure, upgrade, debug by a non-author |
-| `MOD` | Modularity | Boundary clarity; cost to extract/replace a subsystem |
+| Specification Metadata | Value |
+| :--- | :--- |
+| **Framework Version** | CEF v0.1.0 |
+| **Governance Tier** | Authoritative Core (Grading Engine) |
+| **Target Roles** | Lead Integrators, Lens Specialists, Technical Program Managers |
+| **Foundational Standards** | ISO/IEC 25010 Product Quality Model, Gemological Multi-Axis Evaluation Principles |
 
 ---
 
-## 2. Grade ladder (per axis)
+## 1. Quality Axes Overview
 
-Use **integer 1–5** plus a **confidence** 0–1.
+True engineering quality cannot be collapsed into a single scalar score or marketing slogan. In gemological practice, independent attributes (such as the GIA cut, color, clarity, and carat weight) are assessed separately to ensure objective appraisal. Similarly, software quality requires evaluating independent, often competing dimensions derived from the ISO/IEC 25010 product quality standard.
 
-| Grade | Label | Definition |
-|------:|-------|------------|
-| **5** | Flawless (exhibition) | Exemplary under the axis rubric; few/no material findings; evidence-rich |
-| **4** | Fine | Solid professional quality; minor issues; no systemic failure mode |
-| **3** | Commercial | Shipable with known debts; mixed patterns; material but contained findings |
-| **2** | Rough / industrial | Significant structural problems; high change risk; weak evidence of control |
-| **1** | Cull | Dangerous or opaque under this axis; do not trust without remediation |
+### Core Diamond Axes
 
-**Mapping note:** ISO/IEC 25010 provides *which* qualities matter; the 1–5 ladder is CEF’s operationalization for agent scoring (not an ISO conformance claim).
+| Axis ID | Dimension Name | Evaluation Invariant |
+| :--- | :--- | :--- |
+| `RDB` | Readability | Can a skilled engineer unfamiliar with the codebase understand architectural intent without tribal knowledge? |
+| `MNT` | Maintainability | Can changes and refactors land safely with local reasoning and bounded blast radius? |
+| `TST` | Testability | Can system behavior and invariants be locked with fast, deterministic, reproducible automated tests? |
+| `REL` | Reliability | Does the system behave correctly and consistently under expected load, edge cases, and component failures? |
+| `OBS` | Observability | Can operators inspect runtime state, trace causality, and diagnose failure modes without attaching debuggers? |
+| `RCV` | Recoverability | Can operators and automation recover state, heal partitions, and resume consistent execution after unexpected faults? |
+| `SEC` | Security | Are confidentiality, integrity, authorization barriers, and abuse resistance engineered by default? |
+| `ROB` | Robustness | Does the system fail closed, bound resource consumption, and reject malformed inputs deterministically? |
+
+### Optional Extension Axes
+
+Optional axes must be reported alongside the core eight and never buried within other scores:
+
+| Axis ID | Dimension Name | Applicability & Criteria |
+| :--- | :--- | :--- |
+| `CMP` | Completeness | Advertised public interface surface versus actual implemented and tested reality. |
+| `OPS` | Operability | Ease of installation, configuration, operational upgrade, and administrative diagnostics. |
+| `MOD` | Modularity | Boundary clarity, decoupling strength, and the mechanical cost to replace or extract a subsystem. |
 
 ---
 
-## 3. Scorecard rules
+## 2. Grade Ladder & Calibration Definitions
 
-1. **Grade each axis independently.** Do not average away a SEC=1 with RDB=5.  
-2. **Record confidence.** Low evidence ⇒ low confidence, not a fake mid-grade.  
-3. **List top drivers.** Each axis grade cites ≤5 finding_ids that drove it.  
-4. **Conflict callouts.** If two axes trade off (e.g. ROB fail-closed vs usability), state the tradeoff explicitly.  
-5. **No single “GPA” in v0.** Optional composite may be added later as an extension; v0 publishes the radar/vector only.
+Each axis is assigned an integer rating between 1 and 5, accompanied by an explicit confidence factor between 0.0 and 1.0:
 
-### Scorecard shape
+| Grade | Rating Tier | Operational Definition & Criteria |
+| :---: | :--- | :--- |
+| `5` | Flawless (Exhibition) | Exemplary engineering under the axis rubric. Negligible material findings; comprehensive evidence and test proofs. |
+| `4` | Fine (Production-Grade) | Solid professional quality with minor contained issues. Zero systemic failure modes or critical architectural defects. |
+| `3` | Commercial (Acceptable Debt) | Fully deployable with documented technical debts. Mixed architectural patterns with bounded, manageable risks. |
+| `2` | Rough (High Change Risk) | Significant structural vulnerabilities, brittle contracts, or high regression risk. Weak automated verification. |
+| `1` | Cull (Untrusted) | Dangerous, unstable, or opaque under this axis. System must not be trusted in production without major remediation. |
 
-See `schemas/scorecard.schema.json`.
+> [!NOTE]
+> **ISO/IEC 25010 Alignment:** While ISO/IEC 25010 informs which quality attributes are evaluated, the 1–5 grading ladder represents the operational scoring mechanism for agentic and human evaluators.
+
+---
+
+## 3. Scorecard Operational Rules
+
+Lead integrators must observe the following rules when constructing the evaluation scorecard:
+
+1. **Independent Evaluation** — Grade every axis strictly independently. Never average a critical security defect (`SEC=1`) with high readability (`RDB=5`).
+2. **Mandatory Confidence Disclosure** — Scant or ambiguous evidence yields a low confidence score, not an inflated middle grade.
+3. **Traceable Top Drivers** — Every axis score must cite up to five specific finding IDs that directly influenced the grade.
+4. **Explicit Tradeoff Documentation** — When two dimensions trade off (such as fail-closed robustness versus ergonomic usability), explicitly document the architectural tradeoff in the axis notes.
+5. **Radar Projection Standard** — The framework publishes the complete multidimensional radar vector. Composite single-number GPA summaries are strictly disallowed.
+
+### Scorecard Data Schema
+
+The canonical scorecard format conforms to `schemas/scorecard.schema.json`:
 
 ```json
 {
   "cef_version": "0.1.0",
   "axes": {
-    "RDB": {"grade": 3, "confidence": 0.7, "drivers": ["F-…"], "notes": ""},
-    "MNT": {"grade": 2, "confidence": 0.8, "drivers": [], "notes": ""}
+    "RDB": {
+      "grade": 3,
+      "confidence": 0.7,
+      "drivers": ["F-CODE-001", "F-DOCS-004"],
+      "notes": "Clear core abstractions but inconsistent naming conventions in legacy adapters."
+    },
+    "MNT": {
+      "grade": 2,
+      "confidence": 0.8,
+      "drivers": ["F-ARCH-002"],
+      "notes": "Tight coupling between transport and storage layers."
+    }
   },
   "optional_axes": {},
   "integrator": "role:integrator",
-  "assessed_at": "ISO-8601"
+  "assessed_at": "2026-09-29T16:00:00Z"
 }
 ```
 
 ---
 
-## 4. Pros / cons of this scale
+## 4. Architectural Analysis & Tradeoffs
 
-| Pros | Cons |
-|------|------|
-| Separates “pretty code” from “safe in production” | Agents may still halo-bias across axes without adversarial review |
-| Portable across languages | 1–5 is coarse; two “3”s can differ widely |
-| Aligns with ISO 25010 vocabulary for international readers | Not a certification; must not be marketed as GIA/ISO audit |
-| Forces explicit completeness/operability as optional axes | Teams may ignore optional axes that matter for strangers |
-
-**Why this recommendation:** A single “world-class” bit recreates the ambiguity you called out. Multi-axis grading matches both gemology practice (independent attributes) and ISO/IEC 25010 (product quality characteristics), giving a cold comparative language without pretending one number captures truth.
+| Advantage | Consideration & Risk Mitigation |
+| :--- | :--- |
+| Decouples cosmetic readability from runtime safety and crash recoverability. | Mitigates halo-effect bias by requiring independent adversarial auditing per lens. |
+| Fully portable across languages, runtimes, and distributed architectures. | Coarse 1–5 scale requires mandatory finding driver citations to explain nuances. |
+| Adheres to internationally recognized ISO/IEC 25010 quality taxonomy. | Clarifies that evaluations provide objective diagnostic truth maps rather than marketing badges. |
+| Exposes completeness and operability explicitly as first-class metrics. | Prevents silent omissions of deployment and operational usability concerns. |

@@ -1,34 +1,55 @@
-# Handoff schema (tool-agnostic)
+# Handoff Schema & Downstream Integration Contract
 
-**cef_version:** 0.1.0  
+> **Purpose:** Formal specifications for packaging evaluation results into an authoritative, tool-agnostic handoff manifest ready for downstream remediation, technical program management, and automated backlog minting.
 
-After Wave 4, package results for a **downstream process engineer / expert system** (ZQK swarm objectify, Jira importer, plain markdown program, etc.). CEF does **not** require ZQK.
+| Specification Metadata | Value |
+| :--- | :--- |
+| **Framework Version** | CEF v0.1.0 |
+| **Governance Tier** | Authoritative Core (Handoff Boundary) |
+| **Target Roles** | Lead Integrators, Process Engineers, Swarm Orchestrators |
+| **Target Systems** | ZQK Knowledge Kernel, Issue Trackers, CI/CD Gate Orchestrators |
 
 ---
 
-## Package layout
+## 1. Handoff Package Directory Structure
 
-```
+Upon completion of Wave 4, the lead integrator packages evaluation artifacts into a versioned, self-contained directory:
+
+```text
 cef-run-<timestamp>/
-  run_scope.yaml
-  scorecard.json
-  findings.jsonl              # post-adversarial, integrator-accepted
-  adversarial_resolutions.jsonl
-  diagrams/**
-  tooling_gaps.md
-  run_log.md
-  handoff_manifest.json
+  run_scope.yaml                  # Frozen scope configuration
+  scorecard.json                  # Multi-axis Diamond Scale scores
+  findings.jsonl                  # Validated, post-adversarial findings
+  adversarial_resolutions.jsonl   # Auditor verification log
+  diagrams/**                     # Anchored architectural diagrams
+  tooling_gaps.md                 # Discovered scanner and tooling deficiencies
+  run_log.md                      # Operational execution journal
+  handoff_manifest.json           # Canonical integration manifest
 ```
 
-## `handoff_manifest.json`
+---
+
+## 2. Handoff Manifest Schema (`handoff_manifest.json`)
+
+The `handoff_manifest.json` file serves as the canonical contract between evaluation analysis and downstream remediation execution:
 
 ```json
 {
   "cef_version": "0.1.0",
   "mode": "truth_map",
-  "repo_fingerprint": "git sha or archive hash",
-  "accepted_finding_ids": ["F-..."],
-  "waived": [{"finding_id": "F-...", "reason": "...", "by": "..."}],
+  "repo_fingerprint": "7e51cb7a61d15dfb8efb36873bcdd74bf93f2f51",
+  "accepted_finding_ids": [
+    "F-ARCH-001",
+    "F-SEC-002",
+    "F-CONC-003"
+  ],
+  "waived": [
+    {
+      "finding_id": "F-PERF-004",
+      "reason": "Bounded by memory limits in container runtime.",
+      "by": "lead-architect"
+    }
+  ],
   "suggested_program_shape": {
     "missions": [],
     "workstreams": [],
@@ -42,26 +63,31 @@ cef-run-<timestamp>/
     "agent_tasks": [],
     "agent_instructions": []
   },
-  "notes": "Integrator narrative for process engineers"
+  "notes": "Consolidated evaluation synthesis for engineering remediation."
 }
 ```
 
-## Mapping guidance (generic)
+---
 
-| Finding shape | Suggested work types |
-|---------------|----------------------|
-| Discrete defect with clear done-test | requirement + criterion + test_case + work_item |
-| Architectural conflict | goal + workstream + milestone + tech_debt |
-| Tooling gap | tooling_gap + work_item |
-| Doc/mental model | work_item + agent_instruction (how to keep docs honest) |
+## 3. Work Item Mapping Guidance
 
-**Rule:** Do not mint objects during CEF. Downstream systems choose IDs and lifecycles.
+Downstream process engineers and orchestration pipelines map findings to work structures using the following taxonomy:
 
-## Pros / cons
+| Finding Shape | Suggested Downstream Artifact Types |
+| :--- | :--- |
+| Discrete defect with clear automated verification gate | `requirement` + `criterion` + `test_case` + `work_item` |
+| Systemic architectural conflict or boundary violation | `goal` + `workstream` + `milestone` + `tech_debt` |
+| Missing automated linter, scanner, or analyzer | `tooling_gap` + `work_item` |
+| Documentation inaccuracy or mental model conflict | `work_item` + `agent_instruction` |
 
-| Pros | Cons |
-|------|------|
-| Prevents analysis agents from flooding trackers | Requires a competent process engineer downstream |
-| Portable across orgs | Mapping is guidance, not automation — v1 may add importers |
+> [!IMPORTANT]
+> **Minting Isolation Invariant:** Evaluation agents must never mint tracker objects or backlog items directly during analysis. Decoupling the objective truth map from backlog creation prevents issue tracker sprawl and maintains evaluation objectivity.
 
-**Why:** You asked for objectify *after* analysis. Separating truth map from minting prevents the backlog sprawl that motivated this pivot.
+---
+
+## 4. Architectural Analysis & Tradeoffs
+
+| Advantage | Operational Consideration |
+| :--- | :--- |
+| Prevents evaluation swarms from polluting production issue trackers with speculative tasks. | Requires a downstream process engineer or automation to ingest and objectify the handoff package. |
+| Tool-agnostic architecture integrates cleanly with ZQK, GitHub Issues, Jira, or plain Markdown plans. | Mapping taxonomy provides guidance rather than rigid enforcement, accommodating varied organizational workflows. |

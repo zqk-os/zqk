@@ -1,11 +1,19 @@
-# CEF kickoff prompt (copy-paste)
+# Solo Operator Kickoff Prompt & A/B Benchmark Protocol
 
-**cef_version:** 0.1.0  
-Use this verbatim after a reboot. Change only the **FILL-INS** (agent id + output home). Keep everything else identical when running A/B comparisons.
+> **Purpose:** Standardized, deterministic prompt template and execution protocol for solo-operator runs and reproducible A/B evaluation benchmarks across independent agent swarms.
+
+| Specification Metadata | Value |
+| :--- | :--- |
+| **Framework Version** | CEF v0.1.0 |
+| **Governance Tier** | Authoritative Core (Kickoff Template) |
+| **Target Roles** | Solo Operators, Evaluation Evaluators, Benchmark Harnesses |
+| **Determinism Guarantee** | Identical baseline prompt ensures objective comparison across model generations |
 
 ---
 
-## Prompt (reuse)
+## 1. Standardized Solo Operator Prompt
+
+Copy and paste the following prompt verbatim when executing an evaluation or initializing an agent session. Only alter the declared `agent_run_id` and `output_home` parameters:
 
 ```text
 You are executing the Codebase Evaluation Framework (CEF) v0.1.0 as a SOLO OPERATOR on this repository.
@@ -104,13 +112,28 @@ Begin with Wave 0 now.
 
 ---
 
-## A/B compare protocol
+## 2. A/B Benchmark Evaluation Protocol
 
-1. Paste the prompt into Agent A with `AGENT_A` / its `output_home`.
-2. After reboot (or in a fresh chat), paste the **same** prompt into Agent B with only Identity changed.
-3. Do not share Agent A’s findings with Agent B before B finishes.
-4. Compare: axis grades, finding overlap by theme/path, severity deltas, and evidence-grade honesty.
+When comparing evaluation efficacy between models, agent frameworks, or prompt updates:
 
-## Optional: freeze git SHA for fairness
+1. **Deterministic Initialization:** Initialize Agent A with declared identity `AGENT_A` and target directory `docs/quality/cef-runs/<date>-AGENT_A`.
+2. **Independent Replication:** Initialize Agent B with identical prompt text, changing only `agent_run_id: AGENT_B` and its corresponding output directory.
+3. **Partitioned Isolation:** Prevent Agent B from accessing Agent A's artifacts or findings before its evaluation run is completed.
+4. **Comparative Analysis:** Compare results across four primary vectors:
+   - Consistency of 1–5 Diamond Scale axis scores.
+   - Finding overlap and duplication across identical file paths.
+   - Severity calibration and delta distribution.
+   - Evidence-grade rigor and adherence to adversarial challenge.
 
-Before either run, note `git rev-parse HEAD` in both `run_scope.yaml` notes (or `run_log.md`). If the tree moves between A and B, the comparison is contaminated.
+---
+
+## 3. Commit SHA Freezing Invariant
+
+To preserve benchmark validity, both evaluation runs must execute against an identical commit hash:
+
+```bash
+# Record active commit hash before launching evaluation
+git rev-parse HEAD
+```
+
+The resulting commit SHA must be recorded in both `run_scope.yaml` and `run_log.md`. Any tree modifications or commits during evaluation contaminate comparison validity.

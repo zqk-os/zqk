@@ -1,34 +1,44 @@
-# Lens catalog
+# Evaluation Lens Catalog & Density Matrix
 
-**cef_version:** 0.1.0  
+> **Purpose:** Comprehensive directory of the twelve evaluation lenses, mapping each assessment focus to its budget density class, primary Diamond Scale quality axes, authoritative rubrics, and agent prompts.
 
-Each lens has a **density class** controlling thoroughness (see Constitution §6).
-
-| Lens ID | Name | Density | Primary diamond axes | Rubric | Prompts |
-|---------|------|---------|----------------------|--------|---------|
-| `L-PREFLIGHT` | Mechanical preflight / inventory | D-HIGH | CMP, MOD | [`rubrics/L-PREFLIGHT.md`](./rubrics/L-PREFLIGHT.md) | Wave 0 scripted |
-| `L-ARCHITECTURE` | Architecture & abstractions | D-LOW | MNT, MOD, RDB | [`rubrics/L-ARCHITECTURE.md`](./rubrics/L-ARCHITECTURE.md) | [`prompts/L-ARCHITECTURE/`](./prompts/L-ARCHITECTURE/) |
-| `L-CODE-QUALITY` | Code quality & consistency | D-MED / D-HIGH* | RDB, MNT | [`rubrics/L-CODE-QUALITY.md`](./rubrics/L-CODE-QUALITY.md) | [`prompts/L-CODE-QUALITY/`](./prompts/L-CODE-QUALITY/) |
-| `L-SECURITY` | Security & abuse resistance | D-MED | SEC, ROB | [`rubrics/L-SECURITY.md`](./rubrics/L-SECURITY.md) | [`prompts/L-SECURITY/`](./prompts/L-SECURITY/) |
-| `L-RELIABILITY` | Reliability & robustness | D-MED | REL, ROB, RCV | [`rubrics/L-RELIABILITY.md`](./rubrics/L-RELIABILITY.md) | [`prompts/L-RELIABILITY/`](./prompts/L-RELIABILITY/) |
-| `L-OBSERVABILITY` | Observability & operability | D-MED | OBS, OPS, RCV | [`rubrics/L-OBSERVABILITY.md`](./rubrics/L-OBSERVABILITY.md) | [`prompts/L-OBSERVABILITY/`](./prompts/L-OBSERVABILITY/) |
-| `L-TESTING` | Test strategy & testability | D-MED | TST, REL | [`rubrics/L-TESTING.md`](./rubrics/L-TESTING.md) | [`prompts/L-TESTING/`](./prompts/L-TESTING/) |
-| `L-USABILITY` | Usability of product surfaces | D-LOW | OPS, RDB, CMP | [`rubrics/L-USABILITY.md`](./rubrics/L-USABILITY.md) | [`prompts/L-USABILITY/`](./prompts/L-USABILITY/) |
-| `L-SUPPLY-RELEASE` | Supply chain & release hygiene | D-HIGH | SEC, OPS, RCV | [`rubrics/L-SUPPLY-RELEASE.md`](./rubrics/L-SUPPLY-RELEASE.md) | [`prompts/L-SUPPLY-RELEASE/`](./prompts/L-SUPPLY-RELEASE/) |
-| `L-PERFORMANCE` | Performance & resource bounds | D-MED | REL, ROB | [`rubrics/L-PERFORMANCE.md`](./rubrics/L-PERFORMANCE.md) | [`prompts/L-PERFORMANCE/`](./prompts/L-PERFORMANCE/) |
-| `L-CONCURRENCY` | Concurrency & failure semantics | D-MED | ROB, REL, RCV | [`rubrics/L-CONCURRENCY.md`](./rubrics/L-CONCURRENCY.md) | [`prompts/L-CONCURRENCY/`](./prompts/L-CONCURRENCY/) |
-| `L-DOCS-MODEL` | Docs & mental model | D-LOW | RDB, OPS, CMP | [`rubrics/L-DOCS-MODEL.md`](./rubrics/L-DOCS-MODEL.md) | [`prompts/L-DOCS-MODEL/`](./prompts/L-DOCS-MODEL/) |
-
-\* `L-CODE-QUALITY` splits: **literal/secret/banned-API scans = D-HIGH exhaustive**; naming/style philosophy = D-LOW top-N.
+| Specification Metadata | Value |
+| :--- | :--- |
+| **Framework Version** | CEF v0.1.0 |
+| **Governance Tier** | Authoritative Core (Lens Directory) |
+| **Target Roles** | Mechanical Operators, Lens Specialists, Adversarial Auditors, Integrators |
+| **Foundational Standards** | ISO/IEC 25010, OWASP ASVS, Google SRE Reliability Engineering |
 
 ---
 
-## Pros / cons of this catalog
+## 1. Lens Directory & Density Classifications
 
-| Pros | Cons |
-|------|------|
-| Covers ISO 25010-ish concerns without being a formal audit | Overlap between reliability/concurrency/performance — integrator must dedupe |
-| Density class prevents “pedantic architecture essays” | Agents may mis-classify density to avoid hard work — wave plan assigns class |
-| Separates usability/docs from code beauty | Easy to skip L-USABILITY on libraries — still required for CLIs/services with UX |
+Each evaluation lens targets a discrete architectural dimension and operates under an assigned budget density class (governed by Constitution §6) to calibrate thoroughness against operational budget:
 
-**Why:** Your brief named quality, architecture, security, usability; industry practice (ISO/IEC 25010; OWASP for SEC; Google SRE for REL/OBS) adds observability, recoverability, release hygiene, and concurrency as first-class — otherwise “world-class” silently ignores production reality.
+| Lens ID | Focus Dimension | Density Class | Primary Axes | Authoritative Rubric | Agent Prompt Pairs |
+| :--- | :--- | :---: | :--- | :--- | :--- |
+| `L-PREFLIGHT` | Mechanical Preflight & Inventory | `D-HIGH` | `CMP`, `MOD` | [`rubrics/L-PREFLIGHT.md`](./rubrics/L-PREFLIGHT.md) | Handled in Wave 0 Preflight |
+| `L-ARCHITECTURE` | Architecture & Package Boundaries | `D-LOW` | `MNT`, `MOD`, `RDB` | [`rubrics/L-ARCHITECTURE.md`](./rubrics/L-ARCHITECTURE.md) | [`prompts/L-ARCHITECTURE/`](./prompts/L-ARCHITECTURE/) |
+| `L-CODE-QUALITY` | Code Quality & Craftsmanship | `D-MED` / `D-HIGH`* | `RDB`, `MNT` | [`rubrics/L-CODE-QUALITY.md`](./rubrics/L-CODE-QUALITY.md) | [`prompts/L-CODE-QUALITY/`](./prompts/L-CODE-QUALITY/) |
+| `L-SECURITY` | Security & Threat Modeling | `D-MED` | `SEC`, `ROB` | [`rubrics/L-SECURITY.md`](./rubrics/L-SECURITY.md) | [`prompts/L-SECURITY/`](./prompts/L-SECURITY/) |
+| `L-RELIABILITY` | Reliability & Crash Recovery | `D-MED` | `REL`, `ROB`, `RCV` | [`rubrics/L-RELIABILITY.md`](./rubrics/L-RELIABILITY.md) | [`prompts/L-RELIABILITY/`](./prompts/L-RELIABILITY/) |
+| `L-OBSERVABILITY` | Observability & Diagnostics | `D-MED` | `OBS`, `OPS`, `RCV` | [`rubrics/L-OBSERVABILITY.md`](./rubrics/L-OBSERVABILITY.md) | [`prompts/L-OBSERVABILITY/`](./prompts/L-OBSERVABILITY/) |
+| `L-TESTING` | Test Strategy & Invariant Proofs | `D-MED` | `TST`, `REL` | [`rubrics/L-TESTING.md`](./rubrics/L-TESTING.md) | [`prompts/L-TESTING/`](./prompts/L-TESTING/) |
+| `L-USABILITY` | Developer Ergonomics & UX | `D-LOW` | `OPS`, `RDB`, `CMP` | [`rubrics/L-USABILITY.md`](./rubrics/L-USABILITY.md) | [`prompts/L-USABILITY/`](./prompts/L-USABILITY/) |
+| `L-SUPPLY-RELEASE` | Supply Chain & Packaging | `D-HIGH` | `SEC`, `OPS`, `RCV` | [`rubrics/L-SUPPLY-RELEASE.md`](./rubrics/L-SUPPLY-RELEASE.md) | [`prompts/L-SUPPLY-RELEASE/`](./prompts/L-SUPPLY-RELEASE/) |
+| `L-PERFORMANCE` | Performance & Resource Bounds | `D-MED` | `REL`, `ROB` | [`rubrics/L-PERFORMANCE.md`](./rubrics/L-PERFORMANCE.md) | [`prompts/L-PERFORMANCE/`](./prompts/L-PERFORMANCE/) |
+| `L-CONCURRENCY` | Concurrency & Race Safety | `D-MED` | `ROB`, `REL`, `RCV` | [`rubrics/L-CONCURRENCY.md`](./rubrics/L-CONCURRENCY.md) | [`prompts/L-CONCURRENCY/`](./prompts/L-CONCURRENCY/) |
+| `L-DOCS-MODEL` | Documentation & Mental Model | `D-LOW` | `RDB`, `OPS`, `CMP` | [`rubrics/L-DOCS-MODEL.md`](./rubrics/L-DOCS-MODEL.md) | [`prompts/L-DOCS-MODEL/`](./prompts/L-DOCS-MODEL/) |
+
+> [!NOTE]
+> **Density Split for `L-CODE-QUALITY`:** Discrete scans (such as hardcoded literals, secret leaks, and banned APIs) are executed at `D-HIGH` exhaustive density. Broad code style, formatting philosophies, and naming patterns are evaluated at `D-LOW` Top-N density.
+
+---
+
+## 2. Architectural Analysis & Governance
+
+| Evaluation Benefit | Operational Risk & Governance Invariant |
+| :--- | :--- |
+| Comprehensive coverage of ISO/IEC 25010 and real-world production engineering disciplines. | Overlap between concurrency, reliability, and performance is arbitrated and deduped by the lead integrator in Wave 4. |
+| Budget density classes prevent agents from producing unproductive, speculative essays. | Wave execution plans freeze density classes to prevent evaluators from arbitrarily downgrading thoroughness. |
+| Decouples superficial code appearance from production operability, observability, and recoverability. | Developer usability (`L-USABILITY`) remains mandatory for systems with CLI, API, or configuration interfaces. |

@@ -94,8 +94,6 @@ def get_category_info(rel_path: str) -> tuple[str, str]:
             return "Architecture & Foundation", "architecture"
         if rel_path == "ZQK_GETTING_STARTED.md":
             return "Getting Started", "getting-started"
-        if rel_path == "ANTIGRAVITY.md":
-            return "Maintenance & Development", "development"
         return "Open Core Governance", "governance"
 
     if len(parts) == 2:
@@ -1318,7 +1316,7 @@ def build_portal(repo_root: str, target_dir: str):
             continue
         doc_files.append(df)
 
-    for root_doc in ["README.md", "CONTRIBUTING.md", "SECURITY.md", "GOVERNANCE.md", "CODE_OF_CONDUCT.md", "PACK-COMPOSITION.md", "ZQK_GETTING_STARTED.md", "ANTIGRAVITY.md"]:
+    for root_doc in ["README.md", "CONTRIBUTING.md", "SECURITY.md", "GOVERNANCE.md", "CODE_OF_CONDUCT.md", "PACK-COMPOSITION.md", "ZQK_GETTING_STARTED.md"]:
         p = os.path.join(repo_root, root_doc)
         if os.path.isfile(p):
             doc_files.append(p)
