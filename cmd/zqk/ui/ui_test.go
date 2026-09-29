@@ -1116,7 +1116,7 @@ func TestUI_EditorProfiles_NewbProJedi(t *testing.T) {
 	m.Height = 30
 	renderedNewb := Render(m)
 	assert.Contains(t, renderedNewb, "╔═════")
-	assert.Contains(t, renderedNewb, "⚡ ZQK KNOWLEDGE KERNEL — MISSION CONTROL CONSOLE")
+	assert.Contains(t, renderedNewb, "ZQK KNOWLEDGE KERNEL — MISSION CONTROL CONSOLE")
 	assert.Contains(t, renderedNewb, "Legend:")
 	assert.Contains(t, renderedNewb, "Profile (newb)")
 
@@ -1132,7 +1132,7 @@ func TestUI_EditorProfiles_NewbProJedi(t *testing.T) {
 	m.SetEditorProfile(ProfileJedi)
 	renderedJedi := Render(m)
 	assert.NotContains(t, renderedJedi, "╔═════════")
-	assert.NotContains(t, renderedJedi, "⚡ ZQK KNOWLEDGE KERNEL")
+	assert.NotContains(t, renderedJedi, "ZQK KNOWLEDGE KERNEL")
 	assert.NotContains(t, renderedJedi, "Legend:")
 	assert.NotContains(t, renderedJedi, "Switch View")
 	assert.NotContains(t, renderedJedi, "[q/Esc] Exit")

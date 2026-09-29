@@ -217,7 +217,7 @@ func renderHeader(b *strings.Builder, m *UIModel) {
 
 	// 3. Newb Mode (Default): full decorative double-box banner + full tabs bar
 	b.WriteString("╔" + strings.Repeat("═", w-2) + "╗\n")
-	title := "⚡ ZQK KNOWLEDGE KERNEL — MISSION CONTROL CONSOLE"
+	title := "ZQK KNOWLEDGE KERNEL — MISSION CONTROL CONSOLE"
 	innerW := w - 2
 	if tds.VisibleWidth(title) > innerW-2 {
 		title = tds.TruncateVisible(title, innerW-4, "…")
@@ -562,7 +562,7 @@ func renderSwarmTab(b *strings.Builder, m *UIModel) {
 	}
 
 	if m.SwarmData == nil {
-		b.WriteString(tds.Panel("🤖 Multi-Agent Swarm Orchestration & Throughput (MMORCH)", []string{
+		b.WriteString(tds.Panel("Multi-Agent Swarm Orchestration & Throughput (MMORCH)", []string{
 			"  [Swarm status initializing or storage unavailable...]",
 		}, w, tds.BorderRounded))
 		b.WriteString("\n")
@@ -585,7 +585,7 @@ func renderSwarmTab(b *strings.Builder, m *UIModel) {
 		tds.StatRow(vitals[:2], w-4),
 		tds.StatRow(vitals[2:], w-4),
 	}
-	b.WriteString(tds.Panel("🤖 Multi-Agent Swarm Orchestration & Throughput (MMORCH)", vitalsLines, w, tds.BorderRounded))
+	b.WriteString(tds.Panel("Multi-Agent Swarm Orchestration & Throughput (MMORCH)", vitalsLines, w, tds.BorderRounded))
 	b.WriteString("\n")
 
 	// 2. Seating & Personas Card
@@ -611,7 +611,7 @@ func renderSwarmTab(b *strings.Builder, m *UIModel) {
 		seatingLines = append(seatingLines, tds.StatRow(capItem, w-4))
 	}
 	if len(seatingLines) > 0 {
-		b.WriteString(tds.Panel("👥 Agent Swarm Seating & Continuous Autonomous Loop (CAP)", seatingLines, w, tds.BorderRounded))
+		b.WriteString(tds.Panel("Agent Swarm Seating & Continuous Autonomous Loop (CAP)", seatingLines, w, tds.BorderRounded))
 		b.WriteString("\n")
 	}
 
@@ -632,7 +632,7 @@ func renderSwarmTab(b *strings.Builder, m *UIModel) {
 			}
 			breakdownLines = append(breakdownLines, tds.StatRow(instItems[i:end], w-4))
 		}
-		b.WriteString(tds.Panel("📨 Instruction Queue & Backlog Breakdown", breakdownLines, w, tds.BorderRounded))
+		b.WriteString(tds.Panel("Instruction Queue & Backlog Breakdown", breakdownLines, w, tds.BorderRounded))
 		b.WriteString("\n")
 	}
 }
@@ -936,7 +936,7 @@ func renderMetricsTab(b *strings.Builder, m *UIModel) {
 		}
 		vitalsLines = append(vitalsLines, tds.StatRow([]tds.StatItem{row1, row2}, w-4))
 	}
-	b.WriteString(tds.Panel("📊 Knowledge Kernel Telemetry & Resource Hygiene", vitalsLines, w, tds.BorderRounded))
+	b.WriteString(tds.Panel("Knowledge Kernel Telemetry & Resource Hygiene", vitalsLines, w, tds.BorderRounded))
 	b.WriteString("\n")
 
 	// 2. Kernel Object Volumes (CAS Storage)
@@ -1420,7 +1420,7 @@ func renderQATab(b *strings.Builder, m *UIModel) {
 		tds.StatRow(row1, w-4),
 		tds.StatRow(row2, w-4),
 	}
-	b.WriteString(tds.Panel("🧪 QA, Verification & Lineage Traceability (DoD Gate)", panelLines, w, tds.BorderRounded))
+	b.WriteString(tds.Panel("QA, Verification & Lineage Traceability (DoD Gate)", panelLines, w, tds.BorderRounded))
 	b.WriteString("\n")
 
 	// 2. Active Test Cases Table
@@ -1684,7 +1684,7 @@ func renderHealthTab(b *strings.Builder, m *UIModel) {
 			tds.StatRow(row2[1:], w-4),
 		}
 	}
-	b.WriteString(tds.Panel("🛡️  Kernel Integrity Radar & System Health", panelLines, w, tds.BorderRounded))
+	b.WriteString(tds.Panel("Kernel Integrity Radar & System Health", panelLines, w, tds.BorderRounded))
 	b.WriteString("\n")
 
 	// 2. Process Group Overseer & Managed Daemons Section
