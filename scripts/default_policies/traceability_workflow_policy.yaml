@@ -9,7 +9,7 @@ body: |
 
   - Prefer an active priority plan with ordered backlog items.
   - Link work to goals/milestones when moving beyond exploration.
-  - Keep status honest (exploring → planned → in_progress → complete) via object updates.
+  - Keep status honest (exploring → planned → in_progress → complete) via object promote, demote, or park lifecycle commands.
   - Related objects (requirements, criteria, agent tasks) should reference the backlog item they serve.
 
   Agents and humans should be able to answer "why are we doing this?" by walking
