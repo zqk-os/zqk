@@ -1350,21 +1350,21 @@ func main() {
 		tbl.AddColumn("TITLE", tds.AlignLeft, 48, 4.0)
 		tbl.AddColumn("UPDATED", tds.AlignRight, 10, 1.0)
 
-		tbl.AddRow([]string{
+		tbl.AddRow(
 			cyanBold("> ") + whiteBold("BLI-STORAGE-PUREGO-001"), greenBold("complete"), redBold("P0"), "Implement pure-Go CAS storage backend", dimStyle("2m ago"),
-		})
-		tbl.AddRow([]string{
+		)
+		tbl.AddRow(
 			"  " + whiteBold("BLI-STORAGE-PUREGO-002"), greenBold("complete"), yellowBold("P1"), "Wire change journal dictionary compaction", dimStyle("14m ago"),
-		})
-		tbl.AddRow([]string{
+		)
+		tbl.AddRow(
 			"  " + whiteBold("BLI-LAUNCH-DOCS-001"), cyanBold("in_progress"), redBold("P0"), "Comprehensive visual UI & mutation manual", dimStyle("1m ago"),
-		})
-		tbl.AddRow([]string{
+		)
+		tbl.AddRow(
 			"  " + whiteBold("BLI-ONBOARD-ROADMAP-01"), yellowBold("planned"), yellowBold("P1"), "Greenfield onboarding roadmap seed", dimStyle("45m ago"),
-		})
-		tbl.AddRow([]string{
+		)
+		tbl.AddRow(
 			"  " + whiteBold("BLI-ECOSYSTEM-SYNC-001"), redBold("blocked"), dimStyle("P2"), "Linear/GitHub bidirectional bridge", dimStyle("2h ago"),
-		})
+		)
 		buf.WriteString(tbl.Render())
 
 		actionLines := []string{
