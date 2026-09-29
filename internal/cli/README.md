@@ -39,8 +39,8 @@ profile: ai-agent
 #### Project Config (`config/zqk.yaml`)
 ```yaml
 format: table
-priority_plan: PRI-208
-workstream: WS-007
+priority_plan: PRI-001
+workstream: WS-001
 ```
 
 ### Command Flags

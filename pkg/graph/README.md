@@ -46,7 +46,7 @@ defer pool.Close()
 // Execute operation
 err = pool.Execute(ctx, func(conn provider.GraphConnection) error {
     return conn.CreateNode(ctx, provider.Node{
-        ID: "BLI-237",
+        ID: "BLI-001",
         Labels: []string{"BacklogItem"},
         Properties: map[string]any{
             "title": "Define System Ontology",
@@ -69,7 +69,7 @@ err = pool.Execute(ctx, func(conn provider.GraphConnection) error {
 - ✅ Connection pooling with transaction safety
 - ✅ Metrics collection and health diagnosis
 - ✅ Retry logic and timeout handling
-- ✅ MemGraph client integration (BLI-624) - **Complete**
+- ✅ MemGraph client integration - **Complete**
 - ✅ CRUD operations implementation - **Complete**
 - ✅ Transaction support (Bolt protocol) - **Complete**
 - ✅ Vector similarity search - **Complete**
@@ -82,12 +82,6 @@ To verify bulk write batching behavior under high concurrency/swarm load:
 - The graph provider automatically collects batch metrics (`TotalBatches`, `TotalItems`, `TotalChunks`, `FallbackSingleCount`, `AvgBatchSize`, `AvgDuration`) via `GetGlobalGraphProviderMetricsCollector()`.
 - Metrics are exposed in `MetricsSnapshot.Batch` and logged via metrics JSONL output.
 - Chunking automatically merges consecutive `create_node` and `create_edge` operations into bulk `UNWIND` Cypher queries (up to 500 ops per chunk). If operations are non-chunkable, fallback single-operation execution increments `FallbackSingleCount`.
-
-## Related Work Items
-
-- **BLI-624**: Implement MemGraph Backend Driver
-- **BLI-623**: Implement File-Based to Graph Migration Tools
-- **PRI-208**: Graph Backend Pivot - Phase 2: Interface Layer & MemGraph Implementation
 
 ## Testing
 

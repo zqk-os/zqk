@@ -1,7 +1,6 @@
 # Migration Binary Detector
 
-**Status**: Implemented  
-**Related**: BLI-623, Migration Binary Detection Strategy v1.0
+**Status**: Implemented
 
 This package provides binary detection and integrity verification for the `zqk-migrate` binary. It ensures that only properly signed and verified binaries are executed.
 
