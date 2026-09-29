@@ -341,8 +341,10 @@ mcp.yaml
 
 *.test
 
-# CEF remesure evidence (override global *.jsonl ignore)
-!docs/quality/cef-runs/**/*.jsonl
+# Project-specific Codebase Evaluation Framework (CEF) runs & evaluation evidence
+docs/quality/cef-runs/
+cef-runs/
+_archive-cef-runs/
 
 # ---------------------------------------------------------
 # Agent Scratch / Ephemeral Scripts

@@ -1,2 +1,0 @@
-{"finding_id":"F-ARCH-001","resolution":"stand","notes":"Severance from /tmp/zqk-privileged-writer.sock is absolute; verified by export-gate and socket membrane tests.","counter_citations":[]}
-{"finding_id":"F-ARCH-002","resolution":"stand","notes":"Verified across cmd/zqk/system/compact_wal.go and all canonical builder files.","counter_citations":[]}
