@@ -1,26 +1,24 @@
 package system
 
 import (
-	"os"
-
-	"github.com/zqk-os/zqk/pkg/datacell"
-	"github.com/zqk-os/zqk/pkg/storage/migration"
-	"github.com/zqk-os/zqk/pkg/zqkenv"
-
 	"bufio"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
 
 	"github.com/zqk-os/zqk/cmd/zqk/ambient"
+	"github.com/zqk-os/zqk/internal/cli"
 	clicontext "github.com/zqk-os/zqk/internal/cli/context"
 	"github.com/zqk-os/zqk/pkg/appledouble"
 	"github.com/zqk-os/zqk/pkg/brand"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/docman"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
@@ -28,7 +26,9 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/storage/migration"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // InitMode represents the type of initialization
@@ -56,7 +56,7 @@ const (
 )
 
 // runInit handles all three init scenarios plus optional discovery wizard, optional maintenance jobs, and optional onboarding roadmap job.
-func runInit(_ *cobra.Command, projectName, template string, force bool, snapshotPath, answerFilePath string, legacy, merge, wipe, discover, withMaintenanceJobs, withOnboardingRoadmap, simple, advanced bool, importOntology string) error {
+func runInit(cmd *cobra.Command, projectName, template string, force bool, snapshotPath, answerFilePath string, legacy, merge, wipe, discover, withMaintenanceJobs, withOnboardingRoadmap, simple, advanced bool, importOntology string) error {
 	logger := logging.GetLoggerFromProfile(systemProfileHuman)
 
 	// Determine project root (respect ZQK_TEST_ROOT or ZQK_PROJECT_ROOT)
@@ -93,26 +93,52 @@ func runInit(_ *cobra.Command, projectName, template string, force bool, snapsho
 
 	// Determine and execute init mode
 	var mode InitMode
-	var initErr error
 	switch {
 	case snapshotPath != emptyValue:
 		mode = InitModeSnapshot
+	case legacy:
+		mode = InitModeLegacy
+	default:
+		mode = InitModeGreenfield
+	}
+
+	var out io.Writer = os.Stdout
+	isInteractive := true
+	if cmd != nil {
+		out = cmd.OutOrStdout()
+		format := cli.GetFormat(cmd)
+		if format == cli.FormatJSON || format == cli.FormatYAML || format == cli.FormatJSONL {
+			isInteractive = false
+		}
+	}
+	var cmdCtx context.Context = context.Background()
+	if cmd != nil && cmd.Context() != nil {
+		cmdCtx = cmd.Context()
+	}
+	progress := newInitProgress(cmdCtx, out, isInteractive)
+	defer progress.Done()
+
+	progress.Header(projectName, mode)
+
+	var initErr error
+	switch mode {
+	case InitModeSnapshot:
 		logging.Fluent(logger).Info("Initializing ZQK project from snapshot").
 			String(initLogFieldMode, string(mode)).
 			String(initLogFieldProject, projectName).
 			String(initLogFieldDirectory, projectRoot).
 			Log()
+		progress.Step(1, 4, "Restoring ZQK project from snapshot...")
 		initErr = runSnapshotInit(projectRoot, projectName, snapshotPath, merge, wipe, force, logger)
-	case legacy:
-		mode = InitModeLegacy
+	case InitModeLegacy:
 		logging.Fluent(logger).Info("Initializing ZQK project (legacy mode)").
 			String(initLogFieldMode, string(mode)).
 			String(initLogFieldProject, projectName).
 			String(initLogFieldDirectory, projectRoot).
 			Log()
+		progress.Step(1, 7, "Initializing project workspace (legacy drop-in mode)...")
 		initErr = runLegacyInit(projectRoot, projectName, template, force, logger)
 	default:
-		mode = InitModeGreenfield
 		logging.Fluent(logger).Info("Initializing ZQK project").
 			String(initLogFieldMode, string(mode)).
 			String(initLogFieldProject, projectName).
@@ -146,7 +172,7 @@ func runInit(_ *cobra.Command, projectName, template string, force bool, snapsho
 			}
 		}
 
-		initErr = runGreenfieldInit(projectRoot, projectName, template, force, logger)
+		initErr = runGreenfieldInit(projectRoot, projectName, template, force, logger, progress)
 
 		if initErr == nil {
 			// Phase 1 Semantic Bridge: Create base ontology templates
@@ -165,6 +191,7 @@ func runInit(_ *cobra.Command, projectName, template string, force bool, snapsho
 		return initErr
 	}
 
+	progress.Step(4, 7, "Installing default policy packs and agent seating...")
 	if err := clicontext.EnsureTestRootBrandSettingsFiles(projectRoot); err != nil {
 		logging.Fluent(logger).Warn("Failed to write test-root config (config/zqk-test.yaml); scheduler may fail until it exists").
 			WithError(err).
@@ -209,6 +236,14 @@ func runInit(_ *cobra.Command, projectName, template string, force bool, snapsho
 		}
 	}
 
+	progress.Step(5, 7, "Configuring MCP server and IDE integrations...")
+	if err := mcp.AutoInstall(projectRoot, logger); err != nil {
+		logging.Fluent(logger).Warn("Failed to auto-install MCP server configuration").
+			WithError(err).
+			Log()
+	}
+
+	progress.Step(6, 7, "Ensuring maintenance schedulers and agent boot protocol...")
 	// After init, ensure maintenance jobs (retention_tolerance, audit_event_aggregation) if requested.
 	// Fail loudly when --with-maintenance-jobs is set but jobs cannot be ensured ([REDACTED-ID]).
 	if withMaintenanceJobs {
@@ -252,6 +287,7 @@ func runInit(_ *cobra.Command, projectName, template string, force bool, snapsho
 		logging.Fluent(logger).Warn("Failed to ensure git pre-commit hook on init").WithError(err).Log()
 	}
 
+	progress.Step(7, 7, "Starting ambient filesystem and heuristics daemon...")
 	// Ensure ambient daemon is running
 	if err := ambient.EnsureDaemon(projectRoot, logger); err != nil {
 		logging.Fluent(logger).Warn("Failed to ensure ambient daemon on init").WithError(err).Log()
@@ -271,6 +307,9 @@ func runInit(_ *cobra.Command, projectName, template string, force bool, snapsho
 	if err := generateGettingStartedGuide(projectRoot, logger); err != nil {
 		logging.Fluent(logger).Warn("Failed to generate ZQK_GETTING_STARTED.md").WithError(err).Log()
 	}
+
+	progress.Done()
+	progress.Summary(projectRoot)
 
 	welcomeMsg := fmt.Sprintf("Welcome to %s; initialization complete", brand.ProductName())
 	tutorialNote := fmt.Sprintf("Run '%s system start-here' for the interactive onboarding tutorial", brand.ExecutableName())
@@ -305,7 +344,7 @@ func determineProjectRoot() string {
 }
 
 // runGreenfieldInit handles greenfield project initialization
-func runGreenfieldInit(projectRoot, projectName, template string, force bool, logger logging.Logger) error {
+func runGreenfieldInit(projectRoot, projectName, template string, force bool, logger logging.Logger, progress *initProgress) error {
 	projectDataDir := filepath.Join(projectRoot, paths.ProjectDataDir)
 	processDir := datacell.ProcessPrimaryDir(projectRoot)
 
@@ -319,6 +358,7 @@ func runGreenfieldInit(projectRoot, projectName, template string, force bool, lo
 		}
 	}
 
+	progress.Step(1, 7, "Preparing project workspace and directory layout...")
 	// Create directory structure
 	if err := createProjectDataDir(projectDataDir, force); err != nil {
 		return errfmt.Errorf(initErrCreateProjectDataDirFmt, err)
@@ -334,6 +374,7 @@ func runGreenfieldInit(projectRoot, projectName, template string, force bool, lo
 		return errfmt.Errorf("failed to create "+initInternalDirName+" directory: %w", err)
 	}
 
+	progress.Step(2, 7, "Extracting bootstrap specs, lifecycles, and documentation...")
 	if err := ExtractBootstrapFiles(projectRoot, logger, force); err != nil {
 		logging.Fluent(logger).Warn("Failed to extract bootstrap files").
 			WithError(err).
@@ -342,6 +383,26 @@ func runGreenfieldInit(projectRoot, projectName, template string, force bool, lo
 		// Don't fail init if bootstrap extraction fails - user can fix manually
 	}
 
+	// Persist bundled object_spec rows from .zqk/specs/objects.
+	if _, err := migration.EnsureBundledObjectSpecsMigrated(context.Background(), projectRoot, logger); err != nil {
+		logging.Fluent(logger).Warn("Bundled object_spec migration did not complete").
+			WithError(err).
+			String("note", paths.RewriteCanonicalCLIInvocations("Run from repo after fixing storage, or use zqk spec list (file fallback)")).
+			Log()
+	}
+
+	// Register shipped documentation in doc_entry graph (architecture, best-practices, onboarding).
+	// Skips archive trees and docs/launch.
+	if reg, skip, err := docman.RegisterShippedDocs(context.Background(), projectRoot, logger); err != nil {
+		return errfmt.Newf("failed to register shipped documentation in kernel graph").Wrap(err)
+	} else if reg > 0 || skip > 0 {
+		logging.Fluent(logger).Info("Shipped documentation registered in graph").
+			Int("registered", reg).
+			Int("skipped", skip).
+			Log()
+	}
+
+	progress.Step(3, 7, "Seeding starter kernel graph (goals, plans, milestones)...")
 	if err := writeSystemAccount(projectRoot); err != nil {
 		logging.Fluent(logger).Warn("Failed to create system account").WithError(err).Log()
 	}
@@ -365,25 +426,6 @@ func runGreenfieldInit(projectRoot, projectName, template string, force bool, lo
 		logging.Fluent(logger).Warn("Failed to write root isolation files").WithError(err).Log()
 	}
 
-	// Persist bundled object_spec rows from .zqk/specs/objects.
-	if _, err := migration.EnsureBundledObjectSpecsMigrated(context.Background(), projectRoot, logger); err != nil {
-		logging.Fluent(logger).Warn("Bundled object_spec migration did not complete").
-			WithError(err).
-			String("note", paths.RewriteCanonicalCLIInvocations("Run from repo after fixing storage, or use zqk spec list (file fallback)")).
-			Log()
-	}
-
-	// Register shipped documentation in doc_entry graph (architecture, best-practices, onboarding).
-	// Skips archive trees and docs/launch.
-	if reg, skip, err := docman.RegisterShippedDocs(context.Background(), projectRoot, logger); err != nil {
-		return errfmt.Newf("failed to register shipped documentation in kernel graph").Wrap(err)
-	} else if reg > 0 || skip > 0 {
-		logging.Fluent(logger).Info("Shipped documentation registered in graph").
-			Int("registered", reg).
-			Int("skipped", skip).
-			Log()
-	}
-
 	// Update .gitignore if .git exists
 	if _, err := fileutil.Stat(filepath.Join(projectRoot, ".git")); err == nil {
 		gitignorePath := filepath.Join(projectRoot, ".gitignore")
@@ -392,13 +434,6 @@ func runGreenfieldInit(projectRoot, projectName, template string, force bool, lo
 				WithError(err).
 				Log()
 		}
-	}
-
-	// Automatically configure MCP for supported IDEs and Agents
-	if err := mcp.AutoInstall(projectRoot, logger); err != nil {
-		logging.Fluent(logger).Warn("Failed to auto-install MCP server configuration").
-			WithError(err).
-			Log()
 	}
 
 	logging.Fluent(logger).Info("Greenfield project initialized successfully").
