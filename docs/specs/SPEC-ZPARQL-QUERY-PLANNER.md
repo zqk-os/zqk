@@ -1,16 +1,6 @@
 # Technical Specification: ZPARQL Index-Accelerated Query Planner and Cycle-Safe Traversal Engine
 
 **Document ID:** `SPEC-ZPARQL-QUERY-PLANNER`  
-**Governing Goal:** `GOAL-ZPARQL-GRAPH-QUERY-AND-TRAVERSAL-ENGINE` (Declarative Graph Query and Traversal Engine)  
-**Governing Requirement:** `REQ-ZPARQL-INDEXED-TRAVERSAL-PLANNER` (Index-Accelerated Query Planner and Cycle-Safe Traversal Engine)  
-**Governing Priority Plan:** `PRI-ZQL-ZPARQL-DECLARATIVE-ENGINES` (Language-Agnostic ZQL and ZPARQL Declarative Engines)  
-**Governing Backlog Item:** `BLI-1790382723982760000-9a602379` (`Implement: Index-Accelerated Query Planner and Cycle-Safe Traversal Engine`)  
-**Governing Test Case:** `TST-1790382723982760001-2f2be0ec` (`Test Suite: Index-Accelerated Query Planner and Cycle-Safe Traversal Engine`)  
-**Criteria Traceability (3 Facets):**  
-1. `CRIT-ZPARQL-PLANNER-CONTRACT-SPEC` (Static Floor: Index-Accelerated Query Execution Plan Contract)  
-2. `CRIT-ZPARQL-INDEX-SCAN-COMPLEXITY-PROOF` (Dynamic Behavior: O(K) Matched Subgraph Traversal Complexity)  
-3. `CRIT-ZPARQL-CYCLIC-TRAVERSAL-RECURSION-NEGATIVE` (Negative Invariant: Depth-Bounded Traversal Cycle and Infinite Recursion Protection)  
-**Authoring Personas:** `PER-COMMUNITY-SYSTEM-ARCHITECT`, `PER-COMMUNITY-SOFTWARE-ENGINEER`, `PER-COMMUNITY-QA-AUDITOR`  
 **Status:** Approved Architectural Specification  
 
 ---
@@ -126,12 +116,12 @@ To prevent unbounded recursion and resource exhaustion on cyclic graphs:
 
 ---
 
-## 5. Verification Traceability Matrix
+## 5. Verification Matrix
 
-| Requirement / Criterion | Verification Suite | Target Code Location | Invariant Verified |
+| Verification Target | Test Suite | Target Code Location | Invariant Verified |
 | :--- | :--- | :--- | :--- |
-| `CRIT-ZPARQL-PLANNER-CONTRACT-SPEC` | `TestPlanner_ContractSpecification` | `pkg/semantic/graph/planner.go` | Planner compiles AST to physical plan with predicate pushdown and cost scoring. |
-| `CRIT-ZPARQL-INDEX-SCAN-COMPLEXITY-PROOF` | `TestPlanner_IndexScanComplexityProof` | `pkg/semantic/graph/planner.go` | $O(K)$ execution step count independent of background graph scale $N$. |
-| `CRIT-ZPARQL-CYCLIC-TRAVERSAL-RECURSION-NEGATIVE` | `TestPlanner_CyclicTraversalNegative` | `pkg/semantic/graph/planner.go` | Cycle detection triggers fail-closed error and depth limiter aborts unbounded recursion. |
+| Query Plan Contract | `TestPlanner_ContractSpecification` | `pkg/semantic/graph/planner.go` | Planner compiles AST to physical plan with predicate pushdown and cost scoring. |
+| Index Scan Complexity Proof | `TestPlanner_IndexScanComplexityProof` | `pkg/semantic/graph/planner.go` | $O(K)$ execution step count independent of background graph scale $N$. |
+| Cyclic Traversal Negative | `TestPlanner_CyclicTraversalNegative` | `pkg/semantic/graph/planner.go` | Cycle detection triggers fail-closed error and depth limiter aborts unbounded recursion. |
 
 ---

@@ -31,7 +31,7 @@ graph TD
 
     subgraph FileStorageSubsystem["FileObjectStorage Multi-Tier Hierarchy"]
         FOS -->|Pre-Commit Re-entry| KCAS["kernelcas.RunCreate (Mutation Pipeline)"]
-        KCAS -->|Commit Callback (WithCommit)| FOS
+        KCAS -->|"Commit Callback (WithCommit)"| FOS
         
         FOS -->|StreamStorageEnabledForKind| Stream["Stream Storage (Append-only logs)"]
         FOS -->|UseObjectDraftPlane| Draft["Draft Plane (.zqk/draft/...)"]

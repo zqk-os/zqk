@@ -1,4 +1,4 @@
-# REL — Reliability & Error Recovery Evaluation (code-eval / PRI-CODE_EVAL)
+# REL — Reliability & Error Recovery Evaluation
 
 Evaluator: specialist_evaluator
 Scope: `pkg/storage`, `pkg/storage/wal`, `pkg/concurrency`, `pkg/lifecycle`
@@ -31,7 +31,7 @@ Method: stress-testing failure recovery, write-ahead log replay, concurrent tran
 
 ## 3. Adversarial Critique & Resolution
 
-- **Critique Anchor (`BLI-CODE_EVAL-WAVE_3_RELIABILITY`)**:
+- **Critique Anchor**:
   - Adversarial auditor tested whether concurrent read-modify-write operations could result in split-brain state or corrupt WAL segments.
   - **Resolution (`stand`)**: Verified that FileObjectStorage uses flock mutual exclusion and CRC-checksummed WAL entries with automatic corruption quarantine.
 

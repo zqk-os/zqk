@@ -119,7 +119,22 @@ def render_markdown_to_html(content: str, current_html_rel: str, link_map: dict)
             # markdown fenced_code generates: <pre><code class="language-mermaid">...</code></pre>
             def _mermaid_replacer(match):
                 code_text = match.group(1)
-                return f'<pre class="mermaid">{html.unescape(code_text)}</pre>'
+                raw_code = html.unescape(code_text)
+
+                # Auto-quote link labels containing special characters if unquoted:
+                # e.g., -->|apply()| => -->|"apply()"|
+                def _quote_link_label(m):
+                    arrow = m.group(1)
+                    label = m.group(2).strip()
+                    if (label.startswith('"') and label.endswith('"')) or (label.startswith("'") and label.endswith("'")):
+                        return f"{arrow}|{label}|"
+                    if any(c in label for c in '()[]{}') or '->' in label:
+                        safe = label.replace('"', '\\"')
+                        return f'{arrow}|"{safe}"|'
+                    return f"{arrow}|{label}|"
+
+                raw_code = re.sub(r'(-->|--|-\.->|==>)\|([^|\n]+)\|', _quote_link_label, raw_code)
+                return f'<pre class="mermaid">{html.escape(raw_code, quote=False)}</pre>'
 
             rendered = re.sub(
                 r'<pre><code class="(?:language-)?mermaid">([\s\S]*?)</code></pre>',
@@ -367,21 +382,12 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
     }});
 
     async function initMermaid() {{
+      const els = document.querySelectorAll('.mermaid, pre code.language-mermaid');
+      if (!els.length) return;
       document.querySelectorAll('pre code.language-mermaid').forEach(el => {{
         const pre = el.parentElement;
         pre.className = 'mermaid';
         pre.textContent = el.textContent;
-      }});
-      document.querySelectorAll('.mermaid').forEach(el => {{
-        if (el.querySelector('br')) {{
-          let raw = '';
-          el.childNodes.forEach(n => {{
-            if (n.nodeType === 3) raw += n.nodeValue;
-            else if (n.nodeName === 'BR') raw += '<br/>';
-            else raw += n.textContent;
-          }});
-          el.textContent = raw;
-        }}
       }});
       try {{
         await mermaid.run({{ querySelector: '.mermaid' }});
@@ -486,21 +492,12 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
     }});
 
     async function initMermaid() {{
+      const els = document.querySelectorAll('.mermaid, pre code.language-mermaid');
+      if (!els.length) return;
       document.querySelectorAll('pre code.language-mermaid').forEach(el => {{
         const pre = el.parentElement;
         pre.className = 'mermaid';
         pre.textContent = el.textContent;
-      }});
-      document.querySelectorAll('.mermaid').forEach(el => {{
-        if (el.querySelector('br')) {{
-          let raw = '';
-          el.childNodes.forEach(n => {{
-            if (n.nodeType === 3) raw += n.nodeValue;
-            else if (n.nodeName === 'BR') raw += '<br/>';
-            else raw += n.textContent;
-          }});
-          el.textContent = raw;
-        }}
       }});
       try {{
         await mermaid.run({{ querySelector: '.mermaid' }});
@@ -1014,15 +1011,20 @@ body {
 
 /* Mermaid Architectural Diagram Styling */
 .mermaid {
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
   background: var(--bg-secondary) !important;
   border: 1px solid var(--border-color) !important;
   border-radius: 8px !important;
   padding: 1.75rem 1rem !important;
   margin: 1.75rem 0 !important;
   overflow-x: auto !important;
+  white-space: pre !important;
+}
+
+.mermaid[data-processed="true"] {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  white-space: normal !important;
 }
 
 .mermaid svg {

@@ -31,7 +31,7 @@ enabled: true
 status: active
 namespace_id: zqk:kernel
 environment_variables:
-  COORDINATOR_SESSION_ID: CVS-1776058539101059000-ffbcee8f
+  COORDINATOR_SESSION_ID: CVS-OVERSEER-DAILY
   OVERSEER_SKIP_ROLLUP_GATES: "1"
 command: /bin/sh
 command_args:

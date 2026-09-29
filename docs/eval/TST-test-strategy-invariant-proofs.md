@@ -1,4 +1,4 @@
-# TST — Test Strategy & Invariant Proofs Evaluation (code-eval / PRI-CODE_EVAL)
+# TST — Test Strategy & Invariant Proofs Evaluation
 
 Evaluator: specialist_evaluator
 Scope: `pkg/quality`, `pkg/validation/qa`, `pkg/zqkenv`, `test/...`
@@ -24,7 +24,7 @@ Method: evidence-driven analysis of test suites, race detector integration, timi
 
 ## 2. Adversarial Critique & Resolution
 
-- **Critique Anchor (`BLI-CODE_EVAL-WAVE_2_TESTING_CRITIQUE`)**:
+- **Critique Anchor**:
   - Adversarial auditor investigated whether test cases rely on vanity stubs to artificially satisfy TDD requirements.
   - **Resolution (`stand`)**: Audit verified that empty test stubs in `cmd/zqk/mesh` and `pkg/swarm` were replaced with substantive invariant assertions. 106/106 Definition of Done (DoD) test chains are active with zero unbound criteria.
 

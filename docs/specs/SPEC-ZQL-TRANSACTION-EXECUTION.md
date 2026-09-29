@@ -1,16 +1,6 @@
 # Technical Specification: ZQL ACID Transaction Execution, Staged Isolation, and Atomic Rollback
 
 **Document ID:** `SPEC-ZQL-TRANSACTION-EXECUTION`  
-**Governing Goal:** `GOAL-ZQL-DECLARATIVE-MUTATIONS-AND-TRANSACTIONS` (Declarative ZQL Mutations and ACID Storage Transactions)  
-**Governing Requirement:** `REQ-ZQL-TRANSACTION-EXECUTION-MODEL` (ACID Transaction Execution, Staged Isolation, and Atomic Rollback)  
-**Governing Priority Plan:** `PRI-ZQL-ZPARQL-DECLARATIVE-ENGINES` (Language-Agnostic ZQL and ZPARQL Declarative Engines)  
-**Governing Backlog Item:** `BLI-1790382668716148000-6fa28424` (`Implement: ACID Transaction Execution, Staged Isolation, and Atomic Rollback`)  
-**Governing Test Case:** `TST-1790382668716148001-dc96e357` (`Test Suite: ACID Transaction Execution, Staged Isolation, and Atomic Rollback`)  
-**Criteria Traceability (3 Facets):**  
-1. `CRIT-ZQL-TXN-ISOLATION-SPEC` (Static Floor: Transaction Execution Lifecycle and Isolation Mode Specification)  
-2. `CRIT-ZQL-ALL-OR-NOTHING-ROLLBACK-PROOF` (Dynamic Behavior: Complete Atomic Rollback on Downstream Constraint Failure)  
-3. `CRIT-ZQL-DIRTY-READ-CONCURRENCY-NEGATIVE` (Negative Invariant: Zero Dirty Read Leakage and Isolation Invariant Enforcement)  
-**Authoring Personas:** `PER-COMMUNITY-SYSTEM-ARCHITECT`, `PER-COMMUNITY-SOFTWARE-ENGINEER`, `PER-COMMUNITY-QA-AUDITOR`  
 **Status:** Approved Architectural Specification  
 
 ---

@@ -33,7 +33,7 @@ flowchart TD
         PreCommit --> GateCAS["1. CAS Membrane Gate"]
         PreCommit --> GateKernel["2. Kernel Integrity Gate"]
         PreCommit --> GateTDD["3. Test Matrix DoD Gate"]
-        SecretScanScript["scripts/scan-secrets.sh"] -.->|NOT WIRED (F-SUPPLY-RELEASE-003)| PreCommit
+        SecretScanScript["scripts/scan-secrets.sh"] -.->|"NOT WIRED (F-SUPPLY-RELEASE-003)"| PreCommit
     end
 
     subgraph CI ["GitHub Actions CI (.github/workflows/)"]
@@ -52,7 +52,7 @@ flowchart TD
         TagPush["Tag Push (v*)"] --> GoReleaser["goreleaser/goreleaser-action (~> v2)"]
         GoReleaser --> BadLdflags["ldflags: -X main.version (MISMATCH: F-SUPPLY-RELEASE-001)"]
         BadLdflags --> BuiltArchive["Tar.gz Archives & checksums.txt"]
-        BuiltArchive -.->|Unsigned: No Cosign / No SLSA (F-SUPPLY-RELEASE-009)| GitHubRelease["GitHub Releases (Public/Private)"]
+        BuiltArchive -.->|"Unsigned: No Cosign / No SLSA (F-SUPPLY-RELEASE-009)"| GitHubRelease["GitHub Releases (Public/Private)"]
     end
 
     subgraph ConsumerInstall ["Consumer Installation (install.sh)"]

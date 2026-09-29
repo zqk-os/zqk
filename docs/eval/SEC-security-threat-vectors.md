@@ -1,4 +1,4 @@
-# SEC — Security & Threat Vectors Evaluation (code-eval / PRI-CODE_EVAL)
+# SEC — Security & Threat Vectors Evaluation
 
 Evaluator: specialist_evaluator
 Scope: `pkg/crypto`, `pkg/daemon/overseer`, `pkg/service`, `pkg/agent`, `pkg/validation/qa`

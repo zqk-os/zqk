@@ -58,15 +58,3 @@ The strict fallback guard is verified by comprehensive unit and integration test
   1. Rejection of disk fallback when `KEY-AUDITOR-001` is missing from CAS in strict mode.
   2. Successful resolution when `KEY-AUDITOR-001` is present in CAS.
   3. Controlled fallback only when lenient mode is explicitly enabled (`WithStrictFallback(false)`).
-
-### Ontological Traceability Matrix
-- **Goal**: `GOAL-CEF-CYCLE2-REMEDIATION`
-- **Milestone**: `MIL-CEF-CYCLE2-REMEDIATION`
-- **Requirement**: `REQ-CEF-KEYSTORE-STRICT-FALLBACK-GUARD`
-- **Criteria**:
-  - `CRIT-1790601833527796000-1ad095db` (Functional Acceptance: CAS resolution and strict mode enforcement)
-  - `CRIT-1790601833527797000-63bbf09c` (Boundary & Error Handling: Rejection of missing keys without fallback)
-  - `CRIT-1790601833527798000-21a925e2` (Integration & Conformance: End-to-end verification under truth sentinel)
-- **Test Case**: `TST-1790601833527796001-819ee566`
-- **Backlog Item**: `BLI-1790601833527796000-c7b713bc`
-- **Priority Plan**: `PRI-AUTO-1790601844837656000`

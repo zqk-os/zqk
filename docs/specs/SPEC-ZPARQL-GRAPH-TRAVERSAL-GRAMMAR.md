@@ -1,16 +1,6 @@
 # Technical Specification: ZQK Declarative Graph Query & Traversal Engine (ZPARQL)
 
 **Document ID:** `SPEC-ZPARQL-GRAPH-TRAVERSAL-GRAMMAR`  
-**Governing Goal:** `GOAL-ZPARQL-GRAPH-QUERY-AND-TRAVERSAL-ENGINE` (Declarative Graph Query and Traversal Engine)  
-**Governing Requirement:** `REQ-ZPARQL-PATTERN-GRAMMAR-ALGEBRA` (Graph Pattern Grammar and Relational Subgraph Algebra)  
-**Governing Priority Plan:** `PRI-ZQL-ZPARQL-DECLARATIVE-ENGINES` (Language-Agnostic ZQL and ZPARQL Declarative Engines)  
-**Governing Backlog Item:** `BLI-1790382704216481000-1fa37fb5` (`Implement: Graph Pattern Grammar, Path Expressions, and Relational Subgraph Algebra`)  
-**Governing Test Case:** `TST-1790382704216481001-8a61b536` (`Test Suite: Graph Pattern Grammar, Path Expressions, and Relational Subgraph Algebra`)  
-**Criteria Traceability (3 Facets):**  
-1. `CRIT-ZPARQL-GRAMMAR-SYNTAX-SPEC` (Static Floor: Formal Pattern Matching and Traversal Grammar for ZPARQL)  
-2. `CRIT-ZPARQL-PATTERN-MATCHING-PROOF` (Dynamic Behavior: Multi-Hop Subgraph Pattern Matching and Binding)  
-3. `CRIT-ZPARQL-MALFORMED-PATTERN-NEGATIVE` (Negative Invariant: Parser Rejection of Unclosed or Ambiguous Patterns)  
-**Authoring Personas:** `PER-COMMUNITY-SYSTEM-ARCHITECT`, `PER-COMMUNITY-SOFTWARE-ENGINEER`, `PER-COMMUNITY-QA-AUDITOR`  
 **Status:** Approved Architectural Specification  
 
 ---

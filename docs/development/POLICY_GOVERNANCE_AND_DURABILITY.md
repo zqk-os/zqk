@@ -203,7 +203,7 @@ if sel.Sel.Name == "Println" || sel.Sel.Name == "Printf" {
 When adding new policies or modifying existing systems, follow these conventions:
 
 ### Rule 1: Never Hardcode Ephemeral Nanos IDs
-- **Forbidden**: Hardcoding `POL-1789334232564133000-02789aa2` into Go code, documentation guides, or public CLI help outputs.
+- **Forbidden**: Hardcoding ephemeral instance IDs like `POL-<nanos>-<hex>` into Go code, documentation guides, or public CLI help outputs.
 - **Allowed**: Referencing authoritative constants (`POL-DOC-001`, `POL-CODE-007`) or querying dynamic objects at runtime via `zqk object get <id>`.
 
 ### Rule 2: Explicit Titles and Mandatory Descriptions

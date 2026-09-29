@@ -55,15 +55,15 @@ flowchart TD
 
     subgraph Lock_Lifecycle["3. Distributed JobLock Inode Race"]
         ProcA["Process A: NewJobLock()"] -->|Open File Inode 101| FDA[FD held for Inode 101]
-        ProcA -->|Acquire() -> age > 1h| Unlink["fileutil.Remove(lockPath)<br/>(Inode 101 Unlinked)"]
+        ProcA -->|"Acquire() -> age > 1h"| Unlink["fileutil.Remove(lockPath)<br/>(Inode 101 Unlinked)"]
         ProcB["Process B: NewJobLock()"] -->|OpenFile O_CREATE| FDB["Created New Inode 102"]
-        Unlink -->|flock(LOCK_EX)| LockA["Proc A locks Inode 101"]
-        FDB -->|flock(LOCK_EX)| LockB["Proc B locks Inode 102"]
+        Unlink -->|"flock(LOCK_EX)"| LockA["Proc A locks Inode 101"]
+        FDB -->|"flock(LOCK_EX)"| LockB["Proc B locks Inode 102"]
         LockA & LockB -->|MUTUAL EXCLUSION DESTROYED| SplitBrain["❌ BOTH PROCESSES RUN CONCURRENTLY<br/>(DUPLICATE AGGREGATION & RACES)"]
     end
 
     subgraph WAL_Lifecycle["4. Write-Behind Queue-Full Data Loss"]
-        WBWorker[Write-Behind Worker] -->|apply()| HashReg["applyCreateFromBuffer() -> HashRegistry Save"]
+        WBWorker[Write-Behind Worker] -->|"apply()"| HashReg["applyCreateFromBuffer() -> HashRegistry Save"]
         HashReg -->|Queue Full| QueueFullErr["ConstStreamSaveQueueIsFull Error"]
         QueueFullErr -->|isRetryableWriteBehindApplyDrop| DropOp["w.buf.RemoveFront(op)"]
         DropOp -->|flushCheckpoint| Checkpoint["WriteAppliedSeq(op.Seq)"]

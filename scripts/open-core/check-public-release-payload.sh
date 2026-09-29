@@ -84,15 +84,50 @@ if git -C "$ROOT" grep -n -E 'TRACK:.*(BLI|REQ|CRIT|PRI|TDE|ATK|CAP|CVS)-' -- \
 	fail "studio TRACK comment with kernel object id remains in cmd or scripts"
 fi
 
-# Studio CAS nanos-hex instance ids belong in kernel CAS, not production cmd/,
+# Studio CAS nanos-hex instance ids belong in kernel CAS, not production cmd/, docs/, scripts/,
 # command DNA, or generated builders. Tests may still mint synthetic ids.
 if git -C "$ROOT" grep -n -E '[A-Z]{2,12}-[0-9]{15,}-[0-9a-fA-F]{8}' -- \
 	'cmd' \
+	'docs/architecture' \
+	'docs/specs' \
+	'docs/onboarding' \
+	'docs/howto' \
+	'docs/manual' \
+	'docs/tutorials' \
+	'docs/development' \
+	'docs/eval' \
+	'scripts' \
 	'.zqk/cli/specs' \
 	'pkg/cli/bldr_cli_cmd_v1' \
 	':!*_test.go' \
-	':!scripts/open-core/check-public-release-payload.sh'; then
-	fail "studio nanos-hex kernel object id remains in production cmd, CLI specs, or command builders"
+	':!scripts/open-core/setup_scripts/**' \
+	':!scripts/open-core/check-public-release-payload.sh' \
+	':!scripts/open-core/test-public-release-gates.sh'; then
+	fail "studio nanos-hex kernel object id remains in production cmd, docs, scripts, CLI specs, or command builders"
+fi
+
+# Public documentation must not reference studio/isolated project process items:
+# Priority plans, Backlog items, Governing Goals, Governing Requirements, or nanosecond kernel IDs.
+if git -C "$ROOT" grep -n -E '(Priority Plan|Backlog Items? Verified|Governing (Goal|Requirement|Priority Plan|Backlog Item)):.*(PRI|BLI|REQ|CRIT|GOAL|WKS)-' -- \
+	'docs' \
+	':!scripts/open-core/check-public-release-payload.sh' \
+	':!scripts/open-core/test-public-release-gates.sh'; then
+	fail "studio process item or governing lineage reference remains in public documentation"
+fi
+
+# Isolated project-specific process items (e.g. PRI-CLI-*, BLI-CLI-*, PRI-IO-*, BLI-IO-*, etc.)
+# minted in isolated private context must not appear in public documentation.
+if git -C "$ROOT" grep -n -E '\b(PRI|BLI)-(CLI|IO|ERGONOMICS|OBJECT-INSPECT|LAUNCH)-[A-Z0-9_-]+' -- \
+	'docs/architecture' \
+	'docs/specs' \
+	'docs/onboarding' \
+	'docs/howto' \
+	'docs/manual' \
+	'docs/tutorials' \
+	'docs/development' \
+	':!scripts/open-core/check-public-release-payload.sh' \
+	':!scripts/open-core/test-public-release-gates.sh'; then
+	fail "isolated project-specific process item remains in public documentation"
 fi
 
 # CEF program ids are studio-only; keep them out of shipped cmd/scripts (not tests).
@@ -104,8 +139,8 @@ if git -C "$ROOT" grep -n -E '(BLI|REQ|CRIT|TDE)-CEF-' -- \
 	fail "studio CEF kernel object id remains in production cmd or scripts"
 fi
 
-if git -C "$ROOT" grep -n -E 'Traceability:.*(BLI|REQ|CRIT)-' -- cmd; then
-	fail "studio Traceability header with kernel object id remains in cmd"
+if git -C "$ROOT" grep -n -E 'Traceability:.*(BLI|REQ|CRIT)-' -- 'cmd' 'docs'; then
+	fail "studio Traceability header with kernel object id remains in cmd or docs"
 fi
 
 if grep -E 'APPENDIX A|Proprietary|Commercial Enterprise|OPEN_CORE_PROPRIETARY_SPLIT' \

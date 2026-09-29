@@ -1,4 +1,4 @@
-# MNT — Code Quality & Maintainability Evaluation (code-eval / PRI-CODE_EVAL)
+# MNT — Code Quality & Maintainability Evaluation
 
 Evaluator: specialist_evaluator
 Scope: `pkg/audit`, `pkg/interactionpolicy` (and AST census of `pkg/...`)

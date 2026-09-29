@@ -875,6 +875,18 @@ func TriggerAsyncRebuild(projectRoot string, sp storage.ObjectStorageProvider) b
 	return true
 }
 
+// WaitForReconcile blocks until any active background reconciliation completes or timeout is exceeded.
+func WaitForReconcile(timeout time.Duration) bool {
+	deadline := time.Now().Add(timeout)
+	for time.Now().Before(deadline) {
+		if atomic.LoadUint32(&isReconciling) == 0 {
+			return true
+		}
+		time.Sleep(5 * time.Millisecond)
+	}
+	return atomic.LoadUint32(&isReconciling) == 0
+}
+
 // SubscribeWAL starts an incremental background listener on lifecycle_events.wal.
 func (v *WhatsNextMaterializedView) SubscribeWAL(ctx context.Context, updateCh chan<- struct{}) {
 	if v.engine != nil {

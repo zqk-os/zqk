@@ -15,14 +15,12 @@ The system operates in one of two distinct modes:
 ```mermaid
 flowchart TD
   subgraph ModeA["Mode A: Developer Standalone (Open-Core)"]
-    direction TD
     ClientA["Client Process / Agent Session<br/>(CLI / MCP Tools)"]
     DiskA[".zqk/process/ (CAS Blobs)<br/>and .zqk/streams/ (WAL Logs)"]
-    ClientA -->|"Direct File I/O (Local Disk)"| DiskA
+    ClientA -->|Direct File I/O (Local Disk)| DiskA
   end
 
   subgraph ModeB["Mode B: Cellular Membrane Lockdown (Swarm / Multi-Tenant Sandbox)"]
-    direction TD
     ClientB["Untrusted Agent / Client Process<br/>(Read-Only / Sandboxed)"]
     DaemonB["PrivilegedWriterDaemon (zqk object daemon)<br/>- Dedicated Service User<br/>- ValidateAllIntakeObjects and Mandatory Description<br/>- SHA-256 CAS Calculation and Atomic Serialization"]
     DiskB[".zqk/process/ (0750 / 0640)<br/>and .zqk/streams/ (0700)"]
