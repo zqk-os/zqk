@@ -120,13 +120,33 @@ Press <kbd>s</kbd> to commit the policy:
 3. **Hook Binding**: Automatically binds the rule to `scripts/git-hooks/pre-commit` and `zqk do` mutation preflight checks.
 
 ```yaml
-schema_version: 1.0.0
+schema_version: 2.0.0
 id: POL-SAFETY-OWNERSHIP-001
 kind: policy
-target_kind: backlog_item
-severity: error
 title: "Strict Owner Assignment for High-Priority Workstreams"
-expression: "(status == 'in_progress' && priority_tier in ['P0', 'P1']) ==> (claimed_by != '' && criteria_linked_or_acceptance_present() == true)"
-enforcement_mode: check_valve_on_transition
-created_at_epoch: 1790220000000
+status: active
+policy_type: standard
+category: workflow
+description: "Enforce claimant assignment and criteria DoD linkage for high-priority backlog items entering in_progress state."
+body: |
+  Every Backlog Item marked as P0 or P1 that transitions into `in_progress` must have an assigned claimant and an unbroken criteria chain before work commences.
+applicability:
+  object_types:
+    - backlog_item
+enforcement:
+  automated: true
+  severity: error
+  reminder_enabled: true
+validation_overlays:
+  - "(status == 'in_progress' && priority_tier in ['P0', 'P1']) ==> (claimed_by != '' && criteria_linked_or_acceptance_present() == true)"
+created_at: "2026-09-29T16:00:00Z"
+created_by: ACC-SYSTEM
+updated_at: "2026-09-29T16:00:00Z"
+updated_by: ACC-SYSTEM
 ```
+
+> [!NOTE]
+> **Kernel Storage vs. In-Memory Studio Projection**:
+> - In authoritative CAS storage (`.zqk/process/policies/*.yaml`), policies adhere strictly to the Kernel Policy Schema (`schema_version: 2.0.0`), utilizing `applicability.object_types` for target binding, `enforcement` for check-valve severity, and standard ISO-8601 UTC timestamps (`created_at`, `updated_at`).
+> - When evaluated interactively inside the Policy Rule Studio console, rules are mapped into the in-memory `PolicyRule` evaluator projection (`id`, `name`, `target_kind`, `expression`, `severity`).
+

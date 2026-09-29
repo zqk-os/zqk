@@ -16,7 +16,7 @@ Currently, human developers and autonomous agents inspect objects using CLI list
 
 While powerful and scriptable, these existing surfaces impose high cognitive friction:
 
-- **Human Friction**: Memorizing column widths, quoting filter arguments, and parsing massive raw YAML dumps cluttered with transport boilerplate (`metadata`, `etag`, `storage_profile`, `created_at_epoch`).
+- **Human Friction**: Memorizing column widths, quoting filter arguments, and parsing massive raw YAML dumps cluttered with transport boilerplate (`metadata`, `etag`, `storage_profile`, `status_history`).
 - **Agent Friction**: Token waste ingesting noisy unstructured YAML payloads when only essential attributes, relations, and current lifecycle state are needed.
 - **Governance Friction**: Writing and validating policy constraints and CPCP boundary rules in text files without live dry-run validation against repository state.
 

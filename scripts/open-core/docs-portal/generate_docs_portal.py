@@ -552,7 +552,29 @@ def render_markdown_to_html(content: str, current_html_rel: str, link_map: dict,
             # Inline math ($...$) - ensuring non-empty and non-whitespace bounded
             text_masked = re.sub(r'(?<!\$)\$(?!\$)([^\s$](?:[^\n$]*?[^\s$])?)(?<!\$)\$(?!\$)', _save_inline_math, text_masked)
 
-            # 3. Restore code blocks before markdown processing so fenced blocks are properly converted
+            # 3. Ensure list items preceded by a paragraph without a blank line are separated
+            def separate_unseparated_lists(text: str) -> str:
+                lines = text.split('\n')
+                new_lines = []
+                list_marker_re = re.compile(r'^[ \t]*(?:\d+\.|\*|\-|\+)\s+')
+                for i, line in enumerate(lines):
+                    if i > 0 and list_marker_re.match(line):
+                        prev = lines[i-1]
+                        prev_stripped = prev.strip()
+                        if (prev_stripped and 
+                            not list_marker_re.match(prev) and 
+                            not prev_stripped.startswith('#') and 
+                            not prev_stripped.startswith('>') and 
+                            not prev_stripped.startswith('|') and 
+                            not prev_stripped.startswith('---') and
+                            not prev_stripped.startswith('```')):
+                            new_lines.append('')
+                    new_lines.append(line)
+                return '\n'.join(new_lines)
+
+            text_masked = separate_unseparated_lists(text_masked)
+
+            # 4. Restore code blocks before markdown processing so fenced blocks are properly converted
             for idx, code_str in enumerate(code_tokens):
                 text_masked = text_masked.replace(f"ZZZCODETOKEN{idx}ZZZ", code_str)
 
@@ -561,13 +583,13 @@ def render_markdown_to_html(content: str, current_html_rel: str, link_map: dict,
                 extensions=['fenced_code', 'tables', 'toc', 'sane_lists']
             )
 
-            # 4. Restore math blocks and sanitize any toc heading IDs
+            # 5. Restore math blocks and sanitize any toc heading IDs
             for idx, math_str in enumerate(math_tokens):
                 slug = 'math'
                 rendered = re.sub(rf'(id="[^"]*?)zzzmathtoken{idx}zzz([^"]*?")', rf'\1{slug}\2', rendered)
                 rendered = rendered.replace(f"ZZZMATHTOKEN{idx}ZZZ", math_str)
 
-            # 5. Wrap all markdown tables in responsive containers
+            # 6. Wrap all markdown tables in responsive containers
             def _wrap_table(m):
                 return f'<div class="table-container">{m.group(0)}</div>'
             rendered = re.sub(r'<table>[\s\S]*?</table>', _wrap_table, rendered)
@@ -1135,6 +1157,39 @@ body {
 
 .markdown-body {
   color: var(--text-main);
+  line-height: 1.6;
+}
+
+.markdown-body p, .markdown-body ul, .markdown-body ol {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.markdown-body ul, .markdown-body ol {
+  padding-left: 2rem;
+}
+
+.markdown-body ol {
+  list-style-type: decimal;
+}
+
+.markdown-body ul {
+  list-style-type: disc;
+}
+
+.markdown-body li {
+  margin-bottom: 0.35rem;
+  line-height: 1.6;
+}
+
+.markdown-body li > p {
+  margin-top: 0.35rem;
+  margin-bottom: 0.35rem;
+}
+
+.markdown-body ul ul, .markdown-body ol ol, .markdown-body ul ol, .markdown-body ol ul {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
 }
 
 .markdown-body h1, .markdown-body h2, .markdown-body h3 {
