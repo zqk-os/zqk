@@ -119,7 +119,7 @@ func TestCLITaxonomyGovernance_StandardsAndPersonas(t *testing.T) {
 		"DOC-CLI-COMMAND-TAXONOMY-STANDARDS-001",
 		"PER-INFORMATION-ARCHITECT",
 		"PER-TECHNICAL-DOCUMENTARIAN",
-		"REQ-CLI-TAXONOMY-HARMONIZATION-001",
+		"Canonical CLI Command Taxonomy",
 		"100% Declarative Spec Coverage Mandatory",
 	}
 

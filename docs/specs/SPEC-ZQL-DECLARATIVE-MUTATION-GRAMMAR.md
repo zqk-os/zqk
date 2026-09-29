@@ -1,16 +1,6 @@
 # Technical Specification: ZQK Declarative Mutation Language (ZQL) Grammar, AST, and Variable Resolution
 
 **Document ID:** `SPEC-ZQL-DECLARATIVE-MUTATION-GRAMMAR`  
-**Governing Goal:** `GOAL-ZQL-DECLARATIVE-MUTATIONS-AND-TRANSACTIONS` (Declarative ZQL Mutations and ACID Storage Transactions)  
-**Governing Requirement:** `REQ-ZQL-DECLARATIVE-GRAMMAR-AST` (Declarative Mutation Grammar and Abstract Syntax Tree)  
-**Governing Priority Plan:** `PRI-ZQL-ZPARQL-DECLARATIVE-ENGINES` (Language-Agnostic ZQL and ZPARQL Declarative Engines)  
-**Governing Backlog Item:** `BLI-1790382579491517000-03738950` (`Implement: Declarative ZQL Mutation Grammar, AST Parser, and Variable Resolution`)  
-**Governing Test Case:** `TST-1790382579491517001-4011b225` (`Test Suite: Declarative ZQL Mutation Grammar, AST Parser, and Variable Resolution`)  
-**Criteria Traceability (3 Facets):**  
-1. `CRIT-ZQL-GRAMMAR-STATIC-SPEC` (Static Floor: Formal EBNF Grammar and Draft 2020-12 AST Specification)  
-2. `CRIT-ZQL-AST-VARIABLE-RESOLUTION` (Dynamic Behavior: Deterministic Forward and Backward Variable Resolution)  
-3. `CRIT-ZQL-UNBOUND-VARIABLE-NEGATIVE` (Negative Invariant: Strict Rejection of Circular or Unbound Variable References)  
-**Authoring Personas:** `PER-COMMUNITY-SYSTEM-ARCHITECT`, `PER-COMMUNITY-SOFTWARE-ENGINEER`, `PER-COMMUNITY-QA-AUDITOR`  
 **Status:** Approved Architectural Specification  
 
 ---

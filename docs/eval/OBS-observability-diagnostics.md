@@ -1,4 +1,4 @@
-# OBS — Observability & Diagnostics Evaluation (code-eval / PRI-CODE_EVAL)
+# OBS — Observability & Diagnostics Evaluation
 
 Evaluator: specialist_evaluator
 Scope: `cmd/zqk/system`, `pkg/agentfeed`, `pkg/telemetry`, `pkg/logging`
@@ -22,7 +22,7 @@ Method: evidence-driven validation of structured telemetry, status reporting tru
 
 ## 2. Adversarial Critique & Resolution
 
-- **Critique Anchor (`BLI-CODE_EVAL-WAVE_3_OBSERVABILITY`)**:
+- **Critique Anchor**:
   - Adversarial auditor verified whether high-frequency telemetry generates unmitigated disk bloat or resource starvation.
   - **Resolution (`stand`)**: Verified that telemetry sinks enforce rotation and retention policies (`retention_tolerance.yaml`), with background compaction pruning expired journals and temp artifacts.
 

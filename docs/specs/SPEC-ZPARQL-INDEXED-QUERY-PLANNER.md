@@ -1,16 +1,6 @@
 # Technical Specification: ZPARQL Index-Accelerated Query Planner and Cycle-Safe Traversal Engine
 
 **Document ID:** `SPEC-ZPARQL-INDEXED-QUERY-PLANNER`  
-**Governing Goal:** `GOAL-ZPARQL-GRAPH-QUERY-AND-TRAVERSAL-ENGINE` (Declarative Graph Query and Traversal Engine)  
-**Governing Requirement:** `REQ-ZPARQL-INDEXED-TRAVERSAL-PLANNER` (Index-Accelerated Query Planner and Cycle-Safe Traversal Engine)  
-**Governing Priority Plan:** `PRI-ZQL-ZPARQL-DECLARATIVE-ENGINES` (Language-Agnostic ZQL and ZPARQL Declarative Engines)  
-**Governing Backlog Item:** `BLI-1790382723982760000-9a602379` (`Implement: Index-Accelerated Query Planner and Cycle-Safe Traversal Engine`)  
-**Governing Test Case:** `TST-1790382723982760001-2f2be0ec` (`Test Suite: Index-Accelerated Query Planner and Cycle-Safe Traversal Engine`)  
-**Criteria Traceability (3 Facets):**  
-1. `CRIT-ZPARQL-PLANNER-CONTRACT-SPEC` (Static Floor: Index-Accelerated Query Execution Plan Contract)  
-2. `CRIT-ZPARQL-INDEX-SCAN-COMPLEXITY-PROOF` (Dynamic Behavior: O(K) Matched Subgraph Traversal Complexity)  
-3. `CRIT-ZPARQL-CYCLIC-TRAVERSAL-RECURSION-NEGATIVE` (Negative Invariant: Depth-Bounded Traversal Cycle and Infinite Recursion Protection)  
-**Authoring Personas:** `PER-COMMUNITY-SYSTEM-ARCHITECT`, `PER-COMMUNITY-SOFTWARE-ENGINEER`, `PER-COMMUNITY-QA-AUDITOR`  
 **Status:** Approved Architectural Specification  
 
 ---

@@ -1,7 +1,6 @@
-# SYNTHESIS — Diamond Envelope & Convergence Certification (code-eval / PRI-CODE_EVAL)
+# SYNTHESIS — Diamond Envelope & Convergence Certification
 
 Evaluator: lead_integrator
-Convergence Session: `CVS-1790229733769514000-d92fc2aa`
 Target Baseline: Diamond Envelope Minimum >= 4.0 across all 8 quality axes
 
 ---
@@ -35,7 +34,7 @@ Every standing finding has an assigned owner, adversarial resolution (`stand` or
 
 ## 3. Convergence Certification
 
-Under convergence session `CVS-1790229733769514000-d92fc2aa`:
+Under final convergence audit:
 1. **Desired End State**: All 8 diamond quality axes achieve minimum score of 4 with zero unresolved E0 findings and complete adversarial verification.
 2. **Current State**: Envelope minimum = 4.0, zero blocking findings, all 106 DoD test chains unbroken.
 3. **Outcome**: Convergence achieved.

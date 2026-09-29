@@ -1,4 +1,4 @@
-# RDB — Architecture & Package Boundaries Evaluation (code-eval / PRI-CODE_EVAL)
+# RDB — Architecture & Package Boundaries Evaluation
 
 Evaluator: specialist_evaluator
 Scope: `pkg/storage`, `pkg/objects`, `pkg/query`, `pkg/mutate`, `pkg/workflow`
@@ -35,7 +35,7 @@ Method: evidence-driven analysis of package dependencies, domain interfaces, and
 
 ## 3. Adversarial Critique & Resolution
 
-- **Critique Anchor (`BLI-CODE_EVAL-WAVE_2_ARCHITECTURE_CRITIQUE`)**:
+- **Critique Anchor**:
   - Adversarial auditor challenged whether graph query execution should leverage an external graph database (e.g. Neo4j/QLever) rather than an embedded traversal engine.
   - **Resolution (`stand`)**: ZQK's architectural mandate is a Cellular Knowledge Operating System (KOS), not an analytical graph database. An embedded, deterministic graph engine operating directly against Content-Addressed Storage (CAS) with WAL integrity provides single-binary portability and zero external daemon dependencies.
 

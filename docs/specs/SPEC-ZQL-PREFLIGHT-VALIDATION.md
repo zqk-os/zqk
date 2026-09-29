@@ -1,16 +1,6 @@
 # Technical Specification: ZQL In-Memory Preflight Validation and Diagnostic Receipt Protocol
 
 **Document ID:** `SPEC-ZQL-PREFLIGHT-VALIDATION`  
-**Governing Goal:** `GOAL-ZQL-DECLARATIVE-MUTATIONS-AND-TRANSACTIONS` (Declarative ZQL Mutations and ACID Storage Transactions)  
-**Governing Requirement:** `REQ-ZQL-PREFLIGHT-VALIDATION-HOOK` (In-Memory Preflight Validation and Diagnostic Receipts)  
-**Governing Priority Plan:** `PRI-ZQL-ZPARQL-DECLARATIVE-ENGINES` (Language-Agnostic ZQL and ZPARQL Declarative Engines)  
-**Governing Backlog Item:** `BLI-1790382685932031000-4a7028c6` (`Implement: In-Memory Preflight Validation and Diagnostic Receipt Protocol`)  
-**Governing Test Case:** `TST-1790382685932031001-e4ba68b4` (`Test Suite: In-Memory Preflight Validation and Diagnostic Receipt Protocol`)  
-**Criteria Traceability (3 Facets):**  
-1. `CRIT-ZQL-INMEMORY-VALIDATION-CONTRACT` (Static Floor: Pre-Persistence In-Memory Semantic Validator Contract)  
-2. `CRIT-ZQL-PREFLIGHT-DIAGNOSTIC-RECEIPT` (Dynamic Behavior: Structured Pre-Flight Diagnostic Receipt Generation)  
-3. `CRIT-ZQL-SCHEMA-CORRUPTION-FAILCLOSED-NEGATIVE` (Negative Invariant: Fail-Closed Boundary for Type and Enum Violations)  
-**Authoring Personas:** `PER-COMMUNITY-SYSTEM-ARCHITECT`, `PER-COMMUNITY-SOFTWARE-ENGINEER`, `PER-COMMUNITY-QA-AUDITOR`  
 **Status:** Approved Architectural Specification  
 
 ---

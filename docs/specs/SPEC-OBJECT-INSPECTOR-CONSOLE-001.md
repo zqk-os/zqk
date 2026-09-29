@@ -1,18 +1,7 @@
 # Technical Specification: ZQK Interactive Object Inspector Console & Policy Studio
 
 **Document ID:** `SPEC-OBJECT-INSPECTOR-CONSOLE-001`  
-**Governing Goal:** `GOAL-OBJECT-INSPECTOR-001` (Universal Interactive Object Inspection, Semantic Agent Projection, and Live Policy Studio)  
-**Governing Requirement:** `REQ-OBJECT-INSPECTOR-001` (Interactive Object Inspector Console and Live Policy Rule Studio)  
-**Governing Priority Plan:** `PRI-OBJECT-INSPECTOR-GROOM` (Grooming: Interactive Object Inspector Console & Policy Studio)  
-**Scaffolded Lineage Pipeline:** Scaffolding executed via canonical `zqk workflow gen-trace-pipeline` (POL-AGENT-TPM-TRACE-PIPELINE-001)  
-- **Governing Backlog Item:** `BLI-1790193716463242000-a2b08acb` (`Implement: Interactive Object Inspector Console and Live Policy Rule Studio`)  
-- **Governing Test Case:** `TST-1790193716463242001-ef989579` (`Test Suite: Interactive Object Inspector Console and Live Policy Rule Studio`)  
-- **Multi-Criteria Ratio (3 Facets):**  
-  1. `CRIT-1790193716463242000-777a8136` (Functional Acceptance: Object Inspector TUI & CLI Projections)  
-  2. `CRIT-1790193716463243000-383a63c4` (Boundary & Error Handling: Invalid kinds, unparseable filters, security role rejection)  
-  3. `CRIT-1790193716463244000-e006648d` (Integration & Conformance: Policy Studio DSL auto-complete & repository dry-run evaluation)  
-**Authoring Personas:** `PER-CHIEF-ARCHITECT`, `PER-UI-UX-DESIGNER`, `PER-INFORMATION-ARCHITECT`  
-**Status:** Canonical / Approved Architecture Spec  
+**Status:** Approved Architectural Specification  
 
 ---
 
@@ -201,48 +190,39 @@ Autonomous agents calling `./bin/zqk object inspect <kind> [id] -f json` receive
 
 ---
 
-## 7. Delivery Plan & Granular Work Breakdown
+## 7. Implementation Components
 
-The priority plan [`PRI-OBJECT-INSPECTOR-001`](file:///Users/lanceettl/zqk-public-candidate/docs/specs/SPEC-OBJECT-INSPECTOR-CONSOLE-001.md#L204-L245) is decomposed into 8 granular, shovel-ready Backlog Items across five execution horizons, bound to milestone [`MIL-1790195729790621000-df34fc47`](file:///Users/lanceettl/zqk-public-candidate/.zqk/object_drafts/milestone/d4/MIL-1790195729790621000-df34fc47.yaml) and requirement [`REQ-OBJECT-INSPECTOR-001`](file:///Users/lanceettl/zqk-public-candidate/docs/specs/SPEC-OBJECT-INSPECTOR-CONSOLE-001.md):
+The Object Inspector and Policy Studio architecture is structured into the following modular components:
 
-1. **BLI-1: CLI Core & Dual Semantic Agent Projection** (`BLI-1790193716463242000-a2b08acb` | `P1`)
+1. **CLI Core & Dual Semantic Agent Projection**
    - CLI command handler in `cmd/zqk/object/inspect.go`.
    - Argument & flag validation (`--fields`, `--sort-by`, `--group-by`, `--filter`).
    - High-signal semantic reduced JSON projection (`-f json`) for autonomous agents.
-   - *Traceability*: `CRIT-1790193716463242000-777a8136` (Functional Acceptance).
 
-2. **BLI-2: TUI Shell, Dynamic Field Registry & Drill-Down Navigation** (`BLI-OBJECT-INSPECT-TUI-001` | `P1`)
+2. **TUI Shell, Dynamic Field Registry & Drill-Down Navigation**
    - Master-detail TUI model powered by `FieldRegistry` auto-discovery.
    - Quick-filter bar (`[f]`), inline search (`[/]`), and sort cycling (`[s]`).
    - Line-item drill-down navigation paradigm stepping into verbose record details.
-   - *Traceability*: `CRIT-1790193716463242000-777a8136` (Functional Acceptance).
 
-3. **BLI-3: Universal Dynamic Message Line & TUI Continuity Fixes** (`BLI-OBJECT-INSPECT-MSG-001` | `P1`)
+3. **Universal Dynamic Message Line & TUI Continuity Fixes**
    - Universal Line 6 dynamic message notification pipeline across all tabs.
    - Fix tab-switching lifecycle defects (header disappearance, agent tab buffer clearing, spacing/icon misalignment).
-   - *Traceability*: `CRIT-1790193716463243000-383a63c4` (Boundary & Error Handling).
 
-4. **BLI-4: Modular Display Cards & Role-Gated Action Palette** (`BLI-OBJECT-INSPECT-CARDS-001` | `P1`)
+4. **Modular Display Cards & Role-Gated Action Palette**
    - Reusable display modules: Lineage & Traceability Radar, CAS Storage Profile, Ontology Card.
    - Interactive action palette (`[Enter]`) gated by user/agent role and permissions.
-   - *Traceability*: `CRIT-1790193716463242000-777a8136` (Functional Acceptance).
 
-5. **BLI-5: Unified QA Tab & Test Dashboard Integration** (`BLI-OBJECT-INSPECT-QA-001` | `P2`)
+5. **Unified QA Tab & Test Dashboard Integration**
    - Promote test dashboard into a dedicated TUI QA tab.
    - Unify look, feel, and navigation behaviors across all views with interactive test case inspection.
-   - *Traceability*: `CRIT-1790193716463244000-e006648d` (Integration & Conformance).
 
-6. **BLI-6: Policy Rule Studio & Field DSL Autocompleter** (`BLI-OBJECT-INSPECT-POL-001` | `P1`)
+6. **Policy Rule Studio & Field DSL Autocompleter**
    - Interactive `--policy-studio` modal.
    - DSL token autocompleter sourced directly from `objects.GetGlobalFieldRegistry()`.
    - Real-time repository dry-run evaluation engine across active objects.
-   - *Traceability*: `CRIT-1790193716463244000-e006648d` (Integration & Conformance).
 
-7. **BLI-7: E2E Verification Suite & Release DoD Gate** (`BLI-OBJECT-INSPECT-TST-001` | `P1`)
+7. **E2E Verification Suite**
    - Comprehensive unit and integration test suite in `cmd/zqk/object/inspect_test.go`.
-   - Verification across all three criteria facets and 100% Definition of Done satisfaction.
-   - *Traceability*: `CRIT-1790193716463242000-777a8136`, `...383a63c4`, `...e006648d`, `TST-1790193716463242001-ef989579`.
 
-8. **BLI-8: Site Demo & Comprehensive Documentation Revamp** (`BLI-OBJECT-INSPECT-DOC-001` | `P2`)
-   - Complete rewrite of site demo walkthroughs, documentation in `docs/`, and user tutorials showcasing the Object Inspector, Policy Studio, and refreshed TUI experience.
-   - *Traceability*: `CRIT-1790193716463244000-e006648d` (Integration & Conformance).
+8. **User Documentation & Interactive Tutorials**
+   - Interactive tutorials and reference documentation under `docs/tutorials/` and `docs/manual/`.

@@ -103,7 +103,36 @@ if sh "$HEX_REPO/scripts/open-core/check-public-release-payload.sh" "$HEX_REPO" 
 	printf '%s\n' "payload gate accepted nanos-hex kernel id in production cmd" >&2
 	exit 1
 fi
-grep -F 'studio nanos-hex kernel object id remains in production cmd, CLI specs, or command builders' "$HEX_REPO/result.log" >/dev/null
+grep -F 'studio nanos-hex kernel object id remains in production cmd, docs, scripts, CLI specs, or command builders' "$HEX_REPO/result.log" >/dev/null
+
+# Prove studio process items in public documentation fail closed.
+DOC_REPO=$(mktemp -d "${TMPDIR:-/tmp}/zqk-public-gate-doc.XXXXXX")
+trap 'rm -f "$TMP_BIN"; rm -rf "$TMP_REPO" "$TRACK_REPO" "$HEX_REPO" "$DOC_REPO"' EXIT HUP INT TERM
+mkdir -p "$DOC_REPO/cmd/zqk" "$DOC_REPO/config" "$DOC_REPO/docs/architecture" "$DOC_REPO/docs/onboarding" "$DOC_REPO/scripts/open-core"
+for path in README.md LICENSE NOTICE SECURITY.md CODE_OF_CONDUCT.md CONTRIBUTING.md; do
+	printf '%s\n' "fixture" >"$DOC_REPO/$path"
+done
+printf '%s\n' 'module github.com/zqk-os/zqk' >"$DOC_REPO/go.mod"
+printf '%s\n' 'brand:' '  executable_name: zqk' >"$DOC_REPO/config/zqk.yaml"
+printf '%s\n' 'package main' >"$DOC_REPO/cmd/zqk/main.go"
+printf '%s\n' 'fixture' >"$DOC_REPO/docs/INDEX.md"
+printf '%s\n' 'fixture' >"$DOC_REPO/docs/onboarding/COMMUNITY_FIRST_RUN.md"
+cp "$ROOT/scripts/open-core/check-public-release-payload.sh" "$DOC_REPO/scripts/open-core/"
+cat >"$DOC_REPO/scripts/open-core/police-community-tree.sh" <<'EOF'
+#!/bin/sh
+exit 0
+EOF
+{
+	printf '%s\n' '# Taxonomy'
+	printf '%s\n' '- **Priority Plan:** '"PRI-CLI-TAXONOMY-OVERHAUL-001"
+} >"$DOC_REPO/docs/architecture/TAXONOMY.md"
+git -C "$DOC_REPO" init -q
+git -C "$DOC_REPO" add .
+if sh "$DOC_REPO/scripts/open-core/check-public-release-payload.sh" "$DOC_REPO" >"$DOC_REPO/result.log" 2>&1; then
+	printf '%s\n' "payload gate accepted Priority Plan in public documentation" >&2
+	exit 1
+fi
+grep -F 'studio process item or governing lineage reference remains in public documentation' "$DOC_REPO/result.log" >/dev/null
 
 if [ "$MODE" = "payload-only" ]; then
 	printf '%s\n' "PUBLIC PAYLOAD GATES: PASS"

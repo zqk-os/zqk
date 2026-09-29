@@ -99,6 +99,9 @@ func (m *extendedMockStorage) List(ctx context.Context, secCtx *storagepkg.Secur
 
 func TestWhatsNextExtended_Execute(t *testing.T) {
 	tmp := t.TempDir()
+	t.Cleanup(func() {
+		WaitForReconcile(5 * time.Second)
+	})
 	mock := newExtendedMockStorage()
 
 	plan := map[string]any{

@@ -4,8 +4,6 @@
 **Authoring Personas:**  
 - `PER-INFORMATION-ARCHITECT` (Information Architect)  
 - `PER-TECHNICAL-DOCUMENTARIAN` (Technical Documentarian)  
-**Governing Goal:** `GOAL-CLI-TAXONOMY-CANONICAL-001`  
-**Governing Requirement:** `REQ-CLI-TAXONOMY-HARMONIZATION-001`  
 **Status:** Canonical / Enforced  
 
 ---
@@ -117,16 +115,3 @@ All commands must implement the standard **Command DNA**:
 ## 5. Verification & Acceptance Reference
 
 This standard is verified by the automated test suite in `cmd/zqk/system/validate_command_specs_test.go` and executed via `zqk system validate-command-specs`.
-
-- **Priority Plan:** `PRI-CLI-TAXONOMY-OVERHAUL-001`
-- **Backlog Items Verified:**
-  - `BLI-CLI-TAXONOMY-HARMONIZE-001` (Harmonized CLI Taxonomy & 100% Spec Coverage)
-  - `BLI-CLI-AGENT-FEED-001` (Unify Swarm & Feed Families)
-  - `BLI-CLI-CONVERGENCE-001` (Convergence Management Parent)
-  - `BLI-CLI-DEPRECATE-PURGE-001` (Purge Obsolete Commands & Specs)
-  - `BLI-CLI-SCHEDULER-REORG-001` (Job & State Management Reorg)
-  - `BLI-CLI-SERVICES-MGT-001` (Services Management Daemon Lifecycle)
-  - `BLI-CLI-SPECS-LAYOUT-001` (Specs Directory Layout Restructuring)
-  - `BLI-CLI-SPECS-COVERAGE-001` (100% Command Spec Coverage Audit)
-  - `BLI-CLI-TAXONOMY-STANDARDS-001` (Taxonomy Standards Governance)
-  - `BLI-CLI-VENDOR-ISOLATION-001` (Vendor Adapter Pluggable Isolation)

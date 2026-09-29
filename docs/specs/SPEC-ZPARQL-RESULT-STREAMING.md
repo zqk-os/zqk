@@ -1,16 +1,6 @@
 # Technical Specification: ZPARQL Portable Result Envelopes, Reactive Streaming, and Backpressure Protocol
 
 **Document ID:** `SPEC-ZPARQL-RESULT-STREAMING`  
-**Governing Goal:** `GOAL-ZPARQL-GRAPH-QUERY-AND-TRAVERSAL-ENGINE` (Declarative Graph Query and Traversal Engine)  
-**Governing Requirement:** `REQ-ZPARQL-PORTABLE-RESULT-STREAMING` (Portable Result Envelopes, Reactive Streaming, and Backpressure Protocol)  
-**Governing Priority Plan:** `PRI-ZQL-ZPARQL-DECLARATIVE-ENGINES` (Language-Agnostic ZQL and ZPARQL Declarative Engines)  
-**Governing Backlog Item:** `BLI-1790382738854350000-c91fdb2e` (`Implement: Portable Result Envelopes, Reactive Streaming, and Backpressure Protocol`)  
-**Governing Test Case:** `TST-1790382738854350001-b212ffbe` (`Test Suite: Portable Result Envelopes, Reactive Streaming, and Backpressure Protocol`)  
-**Criteria Traceability (3 Facets):**  
-1. `CRIT-ZPARQL-RESULT-SCHEMA-SPEC` (Static Floor: Standardized Query Result Schema and Tabular/Stream Encodings)  
-2. `CRIT-ZPARQL-STREAMING-BACKPRESSURE-PROOF` (Dynamic Behavior: Chunked Reactive Traversal Streaming with Constant Memory)  
-3. `CRIT-ZPARQL-TRUNCATED-STREAM-NEGATIVE` (Negative Invariant: End-of-Stream Integrity Token and Truncation Detection)  
-**Authoring Personas:** `PER-COMMUNITY-SYSTEM-ARCHITECT`, `PER-COMMUNITY-SOFTWARE-ENGINEER`, `PER-COMMUNITY-QA-AUDITOR`  
 **Status:** Approved Architectural Specification  
 
 ---
