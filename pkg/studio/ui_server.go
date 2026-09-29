@@ -596,66 +596,149 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       background: var(--bg);
       overflow: hidden;
     }
+    .gantt-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 8px 16px;
+      background: #11151c;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .gantt-filter-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .gantt-toolbar-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .gantt-filter-pill {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .gantt-filter-pill:hover {
+      border-color: var(--accent);
+      color: var(--text-bright);
+    }
+    .gantt-filter-pill.active {
+      background: rgba(88, 166, 255, 0.15);
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+    }
     .gantt-header-row {
       display: grid;
-      grid-template-columns: 360px 1fr;
+      grid-template-columns: 380px 1fr;
       background: var(--card-bg);
-      border-bottom: 1px solid var(--border);
+      border-bottom: 2px solid var(--border);
       height: 44px;
       flex-shrink: 0;
     }
     .gantt-header-title {
-      padding: 12px 16px;
+      padding: 10px 16px;
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 700;
       color: var(--text-bright);
       border-right: 1px solid var(--border);
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      letter-spacing: 0.3px;
     }
     .gantt-timeline-ticks {
-      display: flex;
-      align-items: center;
-      overflow: hidden;
-      padding: 0 12px;
       position: relative;
+      height: 100%;
+      overflow: hidden;
     }
     .gantt-tick {
-      flex: 1;
-      text-align: center;
-      font-size: 11px;
-      color: var(--text-muted);
-      border-left: 1px dashed var(--border);
-      height: 100%;
+      position: absolute;
+      top: 0;
+      bottom: 0;
       display: flex;
-      align-items: center;
+      flex-direction: column;
       justify-content: center;
+      padding-left: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-left: 1px dashed rgba(48, 54, 61, 0.6);
+      white-space: nowrap;
+      user-select: none;
+    }
+    .gantt-tick-sub {
+      font-size: 9px;
+      font-weight: 400;
+      color: #6e7681;
     }
     .gantt-body {
       flex: 1;
       overflow-y: auto;
       overflow-x: hidden;
+      position: relative;
+    }
+    .gantt-today-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #f85149;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .gantt-today-badge {
+      position: absolute;
+      top: 4px;
+      transform: translateX(-50%);
+      background: #f85149;
+      color: #fff;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+      z-index: 12;
+    }
+    .gantt-grid-col {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      border-left: 1px dashed rgba(48, 54, 61, 0.25);
+      pointer-events: none;
     }
     .gantt-section-header {
       background: #11151c;
-      padding: 8px 16px;
+      padding: 10px 16px;
       font-size: 12px;
       font-weight: 700;
       color: var(--accent);
       border-bottom: 1px solid var(--border);
+      border-top: 1px solid var(--border);
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: space-between;
+      user-select: none;
     }
     .gantt-row {
       display: grid;
-      grid-template-columns: 360px 1fr;
+      grid-template-columns: 380px 1fr;
       border-bottom: 1px solid rgba(48, 54, 61, 0.4);
-      min-height: 40px;
+      min-height: 42px;
       align-items: center;
       transition: background 0.1s;
       cursor: pointer;
+      position: relative;
     }
     .gantt-row:hover { background: rgba(88, 166, 255, 0.04); }
     .gantt-row.selected { background: rgba(88, 166, 255, 0.08); }
@@ -664,7 +747,7 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 3px;
       overflow: hidden;
     }
     .gantt-row-title-line {
@@ -687,28 +770,33 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       text-overflow: ellipsis;
     }
     .gantt-bar-cell {
-      padding: 6px 14px;
+      padding: 6px 0;
       position: relative;
       height: 100%;
       display: flex;
       align-items: center;
     }
     .gantt-bar {
-      height: 22px;
+      height: 24px;
       border-radius: 4px;
       display: flex;
       align-items: center;
-      padding: 0 8px;
-      font-size: 10px;
+      padding: 0 10px;
+      font-size: 11px;
       font-weight: 600;
       color: #fff;
       position: absolute;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
       transition: transform 0.15s, box-shadow 0.15s;
+      z-index: 2;
     }
     .gantt-bar:hover {
-      transform: scaleY(1.15);
-      box-shadow: 0 0 8px rgba(0,0,0,0.5);
-      z-index: 5;
+      transform: scaleY(1.1);
+      box-shadow: 0 0 12px rgba(88, 166, 255, 0.4);
+      z-index: 6;
     }
     .gantt-bar-complete {
       background: linear-gradient(90deg, #238636 0%, #2ea043 100%);
@@ -720,12 +808,26 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
     }
     .gantt-bar-planned {
       background: #21262d;
-      border: 1px solid var(--border-bright);
-      color: var(--text-muted);
+      border: 1px dashed #484f58;
+      color: #8b949e;
     }
     .gantt-bar-testing {
       background: linear-gradient(90deg, #8957e5 0%, #a371f7 100%);
       border: 1px solid #bc8cff;
+    }
+    .gantt-bar-milestone {
+      height: 20px;
+      background: linear-gradient(90deg, #d29922 0%, #e3b341 100%);
+      border: 1px solid #f0883e;
+      color: #0d1117;
+      font-weight: 700;
+      border-radius: 10px;
+    }
+    .gantt-bar-workstream {
+      height: 14px;
+      background: rgba(88, 166, 255, 0.25);
+      border: 1px solid var(--accent);
+      border-radius: 3px;
     }
 
     /* Right Side Panel */
@@ -985,10 +1087,29 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
     <!-- View 2: Timeline & Gantt View -->
     <div class="content-view" id="view-gantt">
       <div class="gantt-container">
+        <!-- Gantt Sub-Toolbar -->
+        <div class="gantt-toolbar">
+          <div class="gantt-filter-group">
+            <span class="gantt-toolbar-label">Status:</span>
+            <button class="gantt-filter-pill active" id="gantt-pill-all" onclick="setGanttStatusFilter('all')">All</button>
+            <button class="gantt-filter-pill" id="gantt-pill-active" onclick="setGanttStatusFilter('active')">In Progress</button>
+            <button class="gantt-filter-pill" id="gantt-pill-planned" onclick="setGanttStatusFilter('planned')">Planned</button>
+            <button class="gantt-filter-pill" id="gantt-pill-done" onclick="setGanttStatusFilter('done')">Completed</button>
+          </div>
+          <div class="gantt-filter-group">
+            <span class="gantt-toolbar-label">Grouping:</span>
+            <select id="gantt-grouping" class="select-input" onchange="renderGantt()">
+              <option value="workstream">By Workstream</option>
+              <option value="plan">By Priority Plan</option>
+              <option value="flat">Flat (Chronological)</option>
+            </select>
+          </div>
+          <div style="flex: 1;"></div>
+          <span id="gantt-task-count" style="font-size: 11px; color: var(--text-muted); font-weight: 500;">0 items</span>
+        </div>
         <div class="gantt-header-row">
           <div class="gantt-header-title">
-            <span>Workstream & Execution Plan</span>
-            <span id="gantt-task-count" style="font-size: 11px; color: var(--text-muted);">0 items</span>
+            <span>Work Item Hierarchy</span>
           </div>
           <div class="gantt-timeline-ticks" id="gantt-timeline-ticks">
             <!-- Dynamic date ticks -->
@@ -1524,57 +1645,196 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       });
     }
 
-    // Gantt / Timeline Renderer
+    let ganttStatusFilter = 'all';
+
+    function setGanttStatusFilter(filter) {
+      ganttStatusFilter = filter;
+      document.querySelectorAll('.gantt-filter-pill').forEach(btn => {
+        btn.classList.toggle('active', btn.id === 'gantt-pill-' + filter);
+      });
+      renderGantt();
+    }
+
+    // Chronological Timeline & Gantt Renderer
     function renderGantt() {
       const body = document.getElementById('gantt-body');
-      const ticks = document.getElementById('gantt-timeline-ticks');
+      const ticksContainer = document.getElementById('gantt-timeline-ticks');
+      if (!body || !ticksContainer) return;
       body.innerHTML = '';
-      ticks.innerHTML = '';
+      ticksContainer.innerHTML = '';
 
-      // Collect execution items: workstreams, priority plans, milestones, backlog items
-      const validKinds = new Set(['workstream', 'milestone', 'priority_plan', 'backlog_item']);
-      const items = filteredNodes.filter(n => validKinds.has(n.kind));
+      // Collect execution items: workstreams, priority plans, milestones, backlog items, tasks
+      const validKinds = new Set(['workstream', 'milestone', 'priority_plan', 'backlog_item', 'agent_task']);
+      let items = filteredNodes.filter(n => validKinds.has(n.kind));
+
+      // Apply Gantt status filter
+      if (ganttStatusFilter === 'active') {
+        items = items.filter(n => ['in_progress', 'active', 'testing', 'metrics_captured'].includes((n.status || '').toLowerCase()));
+      } else if (ganttStatusFilter === 'planned') {
+        items = items.filter(n => ['planned', 'originated', 'draft', 'pending'].includes((n.status || '').toLowerCase()));
+      } else if (ganttStatusFilter === 'done') {
+        items = items.filter(n => ['complete', 'verified', 'approved', 'done', 'sealed'].includes((n.status || '').toLowerCase()));
+      }
+
       document.getElementById('gantt-task-count').textContent = items.length + ' items';
 
       if (items.length === 0) {
-        body.innerHTML = '<div style="padding: 40px; color: var(--text-muted); text-align: center;">No execution items to display in timeline. Switch to "Full Mesh" or select "All Workstreams".</div>';
+        body.innerHTML = '<div style="padding: 40px; color: var(--text-muted); text-align: center;">No execution items match current filters. Select "All" or adjust density.</div>';
         return;
       }
 
-      // Timeline scale: 6 dynamic checkpoints
-      const tickLabels = ['Stage 1: Inception', 'Stage 2: Objectives', 'Stage 3: Planning', 'Stage 4: Execution', 'Stage 5: Verification', 'Stage 6: Done'];
-      ticks.innerHTML = tickLabels.map(t => '<div class="gantt-tick">' + t + '</div>').join('');
+      // 1. Establish chronological schedule for every item
+      const now = Date.now();
+      const MS_PER_DAY = 86400000;
 
-      // Group items by Workstream or Milestone
-      const groups = new Map();
-      const unassigned = [];
+      const parsedItems = items.map((item, idx) => {
+        let start = null;
+        let end = null;
 
-      items.forEach(item => {
-        let ws = (item.workstreamRefs && item.workstreamRefs[0]) || (item.kind === 'workstream' ? item.id : null);
-        if (!ws && item.kind === 'milestone') ws = 'Milestones';
-        if (ws) {
-          if (!groups.has(ws)) groups.set(ws, []);
-          groups.get(ws).push(item);
-        } else {
-          unassigned.push(item);
+        if (item.startDate) {
+          const d = Date.parse(item.startDate);
+          if (!isNaN(d)) start = d;
         }
-      });
-      if (unassigned.length > 0) groups.set('General Tasks', unassigned);
+        if (!start && item.createdAt) {
+          const d = Date.parse(item.createdAt);
+          if (!isNaN(d)) start = d;
+        }
 
-      // Render rows
+        if (item.targetDate) {
+          const d = Date.parse(item.targetDate);
+          if (!isNaN(d)) end = d;
+        }
+        if (!end && (item.status === 'complete' || item.status === 'verified') && item.updatedAt) {
+          const d = Date.parse(item.updatedAt);
+          if (!isNaN(d)) end = d;
+        }
+
+        // Duration heuristics if missing dates
+        const defaultDurationDays = item.kind === 'workstream' ? 45 :
+                                    item.kind === 'milestone' ? 3 :
+                                    item.kind === 'priority_plan' ? 21 : 7;
+
+        if (!start && !end) {
+          const offsetDays = (idx % 6) * 4;
+          start = now - (7 * MS_PER_DAY) + (offsetDays * MS_PER_DAY);
+          end = start + (defaultDurationDays * MS_PER_DAY);
+        } else if (!start && end) {
+          start = end - (defaultDurationDays * MS_PER_DAY);
+        } else if (start && !end) {
+          end = start + (defaultDurationDays * MS_PER_DAY);
+        }
+
+        if (end <= start) {
+          end = start + (defaultDurationDays * MS_PER_DAY);
+        }
+
+        return { ...item, startTime: start, endTime: end };
+      });
+
+      // 2. Compute global timeline window
+      let minTime = Infinity;
+      let maxTime = -Infinity;
+      parsedItems.forEach(i => {
+        if (i.startTime < minTime) minTime = i.startTime;
+        if (i.endTime > maxTime) maxTime = i.endTime;
+      });
+
+      // Ensure today is within visible window
+      if (now < minTime) minTime = now - (3 * MS_PER_DAY);
+      if (now > maxTime) maxTime = now + (7 * MS_PER_DAY);
+
+      // Margins
+      minTime -= 2 * MS_PER_DAY;
+      maxTime += 6 * MS_PER_DAY;
+      const totalDuration = Math.max(MS_PER_DAY * 14, maxTime - minTime);
+
+      // 3. Render Calendar Date Ticks across header
+      const tickStepDays = totalDuration > (90 * MS_PER_DAY) ? 14 : (totalDuration > (30 * MS_PER_DAY) ? 7 : 3);
+      const tickStepMs = tickStepDays * MS_PER_DAY;
+
+      const ticks = [];
+      const firstTickTime = Math.ceil(minTime / tickStepMs) * tickStepMs;
+      for (let t = firstTickTime; t <= maxTime; t += tickStepMs) {
+        const leftPercent = ((t - minTime) / totalDuration) * 100;
+        if (leftPercent >= 0 && leftPercent <= 98) {
+          ticks.push({ time: t, left: leftPercent });
+        }
+      }
+
+      ticksContainer.innerHTML = ticks.map(tick => {
+        const d = new Date(tick.time);
+        const month = d.toLocaleString('en-US', { month: 'short' });
+        const day = d.getDate();
+        const weekday = d.toLocaleString('en-US', { weekday: 'short' });
+        return '<div class="gantt-tick" style="left: ' + tick.left + '%;">' +
+          '<span>' + month + ' ' + day + '</span>' +
+          '<span class="gantt-tick-sub">' + weekday + '</span>' +
+        '</div>';
+      }).join('');
+
+      // Add Today vertical marker badge in header
+      const todayPercent = ((now - minTime) / totalDuration) * 100;
+      if (todayPercent >= 0 && todayPercent <= 100) {
+        const todayHeaderBadge = document.createElement('div');
+        todayHeaderBadge.className = 'gantt-today-badge';
+        todayHeaderBadge.style.left = todayPercent + '%';
+        todayHeaderBadge.textContent = 'TODAY';
+        ticksContainer.appendChild(todayHeaderBadge);
+      }
+
+      // 4. Grouping
+      const groupingSelect = document.getElementById('gantt-grouping');
+      const groupingMode = groupingSelect ? groupingSelect.value : 'workstream';
+
+      const groups = new Map();
+      if (groupingMode === 'flat') {
+        groups.set('All Tasks (Chronological)', parsedItems.sort((a, b) => a.startTime - b.startTime));
+      } else if (groupingMode === 'plan') {
+        parsedItems.forEach(item => {
+          let p = (item.references && item.references.priority_plan_ref && item.references.priority_plan_ref[0]) ||
+                  (item.kind === 'priority_plan' ? item.id : 'Other Work Items');
+          if (!groups.has(p)) groups.set(p, []);
+          groups.get(p).push(item);
+        });
+      } else {
+        // By Workstream
+        const unassigned = [];
+        parsedItems.forEach(item => {
+          let ws = (item.workstreamRefs && item.workstreamRefs[0]) || (item.kind === 'workstream' ? item.id : null);
+          if (ws) {
+            if (!groups.has(ws)) groups.set(ws, []);
+            groups.get(ws).push(item);
+          } else {
+            unassigned.push(item);
+          }
+        });
+        if (unassigned.length > 0) groups.set('General Tasks & Milestones', unassigned);
+      }
+
+      // 5. Render Rows with Today Line and Grid
+      if (todayPercent >= 0 && todayPercent <= 100) {
+        const todayLine = document.createElement('div');
+        todayLine.className = 'gantt-today-line';
+        todayLine.style.left = 'calc(380px + (100% - 380px) * ' + (todayPercent / 100) + ')';
+        body.appendChild(todayLine);
+      }
+
       groups.forEach((groupItems, groupName) => {
         const header = document.createElement('div');
         header.className = 'gantt-section-header';
-        header.innerHTML = '<span>⚡ ' + groupName + '</span> <span style="font-size: 11px; font-weight: normal; color: var(--text-muted);">(' + groupItems.length + ' tasks)</span>';
+        header.innerHTML = '<span>⚡ ' + groupName + '</span> <span style="font-size: 11px; font-weight: normal; color: var(--text-muted);">' + groupItems.length + ' items</span>';
         body.appendChild(header);
+
+        groupItems.sort((a, b) => a.startTime - b.startTime);
 
         groupItems.forEach(item => {
           const row = document.createElement('div');
           row.className = 'gantt-row' + (item.id === selectedNodeId ? ' selected' : '');
 
           const kindClass = 'kind-' + item.kind;
+          const status = (item.status || 'planned').toLowerCase();
 
-          // Left info cell
+          // Left Info Cell
           const info = document.createElement('div');
           info.className = 'gantt-row-info';
           info.innerHTML =
@@ -1582,50 +1842,55 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
               '<span class="kind-pill ' + kindClass + '">' + item.kind.replace('_', ' ') + '</span>' +
               '<span class="gantt-row-id">' + item.id + '</span>' +
             '</div>' +
-            '<div class="gantt-row-title">' + (item.title || '') + '</div>';
+            '<div class="gantt-row-title" title="' + (item.title || '') + '">' + (item.title || '') + '</div>';
 
-          // Right timeline bar cell
+          // Right Bar Cell
           const cell = document.createElement('div');
           cell.className = 'gantt-bar-cell';
 
-          // Position calculation based on kind tier & status
-          let leftPercent = 5;
-          let widthPercent = 30;
-          const status = (item.status || 'planned').toLowerCase();
+          // Grid lines inside row
+          ticks.forEach(t => {
+            const gridCol = document.createElement('div');
+            gridCol.className = 'gantt-grid-col';
+            gridCol.style.left = t.left + '%';
+            cell.appendChild(gridCol);
+          });
 
-          if (item.kind === 'workstream') {
-            leftPercent = 2;
-            widthPercent = 95;
-          } else if (item.kind === 'milestone') {
-            leftPercent = 10;
-            widthPercent = 75;
-          } else if (item.kind === 'priority_plan') {
-            leftPercent = 25;
-            widthPercent = 60;
-          } else {
-            // Backlog Item
-            if (status === 'complete') {
-              leftPercent = 20;
-              widthPercent = 75;
-            } else if (status === 'in_progress') {
-              leftPercent = 45;
-              widthPercent = 35;
-            } else {
-              leftPercent = 60;
-              widthPercent = 30;
-            }
-          }
+          // Horizontal placement
+          const leftPercent = Math.max(0, Math.min(96, ((item.startTime - minTime) / totalDuration) * 100));
+          const rightPercent = Math.max(leftPercent + 2.5, Math.min(100, ((item.endTime - minTime) / totalDuration) * 100));
+          const widthPercent = Math.max(2.5, rightPercent - leftPercent);
+
+          const startDateStr = new Date(item.startTime).toISOString().slice(0, 10);
+          const endDateStr = new Date(item.endTime).toISOString().slice(0, 10);
+          const durationDays = Math.max(1, Math.round((item.endTime - item.startTime) / MS_PER_DAY));
 
           let barClass = 'gantt-bar-planned';
-          if (status === 'complete' || status === 'verified') barClass = 'gantt-bar-complete';
-          else if (status === 'in_progress' || status === 'active') barClass = 'gantt-bar-inprogress';
-          else if (status === 'testing' || status === 'metrics_captured') barClass = 'gantt-bar-testing';
+          let statusIcon = '⏳';
+          if (item.kind === 'milestone') {
+            barClass = 'gantt-bar-milestone';
+            statusIcon = '◆';
+          } else if (item.kind === 'workstream') {
+            barClass = 'gantt-bar-workstream';
+            statusIcon = '🌐';
+          } else if (status === 'complete' || status === 'verified') {
+            barClass = 'gantt-bar-complete';
+            statusIcon = '✓';
+          } else if (status === 'in_progress' || status === 'active') {
+            barClass = 'gantt-bar-inprogress';
+            statusIcon = '▶';
+          } else if (status === 'testing' || status === 'metrics_captured') {
+            barClass = 'gantt-bar-testing';
+            statusIcon = '⚙';
+          }
 
           const bar = document.createElement('div');
           bar.className = 'gantt-bar ' + barClass;
           bar.style.left = leftPercent + '%';
           bar.style.width = widthPercent + '%';
-          bar.textContent = status.replace('_', ' ');
+          bar.setAttribute('title', item.id + ': ' + (item.title || '') + '\nKind: ' + item.kind + ' | Status: ' + status + '\nSchedule: ' + startDateStr + ' → ' + endDateStr + ' (' + durationDays + ' days)');
+
+          bar.textContent = statusIcon + ' ' + item.id;
 
           cell.appendChild(bar);
           row.appendChild(info);

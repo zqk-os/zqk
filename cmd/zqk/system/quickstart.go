@@ -19,61 +19,50 @@ func renderQuickstartGuide(projectRoot string) string {
 	}
 
 	if isInit {
-		return fmt.Sprintf(`🚀 ZQK Greenfield Quickstart & Walkthrough
+		return fmt.Sprintf(`🚀 ZQK Quickstart
 
 Project Status: Initialized (%s)
-The Knowledge Kernel is active and managing your graph of goals, plans, and tasks.
 
-Follow these 4 simple steps to get immediate value:
+Get started in 2 commands:
 
-1. Launch the Visual Web Studio (Timeline & DAG):
+1. Launch Visual Web Studio:
    $ %s ui -w
-   ➜ Open http://127.0.0.1:8080 to inspect your Workstreams, Milestones, and Gantt timeline.
+   ➜ Open http://127.0.0.1:8080 to inspect your roadmap, DAG, and Gantt timeline.
 
-2. Onboard & Connect your AI Agents:
-   $ %s system agent-onboard
-   ➜ Detects Cursor, VS Code, Cline, Windsurf, Gemini, and primes .agents/AGENTS.md.
-   ➜ See ZQK_GETTING_STARTED.md for copy-paste MCP configs for each agent host.
+2. Execute Shovel-Ready Work:
+   $ %s do
+   ➜ Discovers active priorities, claims the next backlog item, and executes.
+   ➜ Or prompt your AI agent: "Run '%s do' to claim and implement work."
 
-3. Discover What's Next & Execute Tasks:
-   $ %s workflow whats-next        # view the active priority plan and shovel-ready tasks
-   $ %s do                         # autonomously discover and claim the next backlog item
-   $ %s do <BLI-ID> --verify       # verify implementation and latch acceptance criteria
-
-4. Start Background Services & Verify System Health:
-   $ %s scheduler start            # start background scheduler daemons
-   $ %s system status              # verify system health and active plan
-
-Documentation & Guides: docs/INDEX.md and docs/onboarding/AI_AGENT_ONBOARDING.md
-`, projectRoot, exe, exe, exe, exe, exe, exe, exe)
+(Optional: run '%s system agent-onboard' if adding a new AI editor or agent host)
+Docs & Guides: docs/INDEX.md
+`, projectRoot, exe, exe, exe, exe)
 	}
 
 	initFlag := ""
 	if exe == "zqk" {
 		initFlag = " --with-onboarding-roadmap"
 	}
-	return fmt.Sprintf(`🚀 ZQK 5-Minute Quickstart
+	return fmt.Sprintf(`🚀 ZQK Quickstart
 
 No initialized ZQK project detected in this directory.
 
-Follow these 4 simple steps to get started:
+Get started in 3 commands:
 
-1. Initialize your project kernel:
-   $ %s system init --project-name <your-project>%s
+1. Initialize your project & AI agent directives:
+   $ %s system init%s
+   ➜ Initializes kernel, seeds starter roadmap, and auto-configures MCP & agents.
 
-2. Onboard your AI Agents & IDE:
-   $ %s system agent-onboard
-   ➜ Automatically configures Cursor, VS Code, Cline, or Windsurf.
-
-3. Launch the Visual Web Studio:
+2. Launch Visual Web Studio:
    $ %s ui -w
-   ➜ Open http://127.0.0.1:8080 to inspect your Gantt timeline and graph.
+   ➜ Open http://127.0.0.1:8080 to inspect your roadmap, DAG, and Gantt timeline.
 
-4. Discover priority plan and next tasks:
-   $ %s workflow whats-next
+3. Execute Shovel-Ready Work:
+   $ %s do
+   ➜ Autonomously claims and begins the next task (or prompt your AI agent).
 
-Documentation & Guides: docs/INDEX.md
-`, exe, initFlag, exe, exe, exe)
+Docs & Guides: docs/INDEX.md
+`, exe, initFlag, exe, exe)
 }
 
 // NewQuickstartCmd returns the 'zqk quickstart' command which provides a zero-friction
@@ -100,24 +89,20 @@ func runQuickstart(cmd *cobra.Command, args []string) error {
 	if format == "json" {
 		exe := brand.ExecutableName()
 		isInit := projectRoot != "" && paths.IsValidProjectRoot(projectRoot)
-		initStep := fmt.Sprintf("1. Initialize: %s system init --project-name <name>", exe)
+		initStep := fmt.Sprintf("1. Initialize: %s system init", exe)
 		if exe == "zqk" {
 			initStep += " --with-onboarding-roadmap"
 		}
 		steps := []string{
 			initStep,
-			fmt.Sprintf("2. Discover priority plan: %s workflow whats-next", exe),
-			fmt.Sprintf("3. Pair MCP server: %s mcp serve", exe),
-			fmt.Sprintf("4. Verify health: %s system check", exe),
+			fmt.Sprintf("2. Web Studio: %s ui -w", exe),
+			fmt.Sprintf("3. Execute Work: %s do", exe),
 		}
 		var activeSteps []string
 		if isInit {
 			activeSteps = []string{
 				fmt.Sprintf("1. Web Studio: %s ui -w", exe),
-				fmt.Sprintf("2. Agent Onboard: %s system agent-onboard", exe),
-				fmt.Sprintf("3. What's Next: %s workflow whats-next", exe),
-				fmt.Sprintf("4. Scheduler: %s scheduler start", exe),
-				fmt.Sprintf("5. Verify: %s system check", exe),
+				fmt.Sprintf("2. Execute Work: %s do", exe),
 			}
 		}
 		payload := map[string]any{

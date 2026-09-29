@@ -128,9 +128,8 @@ func (p *initProgress) Summary(projectRoot string) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	fmt.Fprintf(p.out, "\n✅ %s Kernel initialized successfully in %s\n\n", brand.ProductName(), projectRoot)
-	fmt.Fprintln(p.out, "Next steps:")
-	fmt.Fprintf(p.out, "  1. Discover mission and next tasks:\n     $ %s workflow whats-next\n\n", brand.ExecutableName())
-	fmt.Fprintf(p.out, "  2. Onboard and pair with your IDE / AI agent mesh:\n     $ %s system agent-onboard\n\n", brand.ExecutableName())
-	fmt.Fprintf(p.out, "  3. Verify kernel compliance and system health:\n     $ %s system check\n\n", brand.ExecutableName())
+	fmt.Fprintln(p.out, "Get started in 2 commands:")
+	fmt.Fprintf(p.out, "  1. Launch Visual Web Studio (timeline & DAG):\n     $ %s ui -w  (http://127.0.0.1:8080)\n\n", brand.ExecutableName())
+	fmt.Fprintf(p.out, "  2. Execute shovel-ready work:\n     $ %s do\n\n", brand.ExecutableName())
 	fmt.Fprintln(p.out, "Docs & Architecture: docs/INDEX.md")
 }
