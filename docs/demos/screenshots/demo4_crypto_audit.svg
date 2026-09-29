@@ -34,7 +34,7 @@
   <!-- Terminal Text Content -->
   <g transform="translate(24, 62)">
     <text class="term-text">
-      <tspan x="0" y="16">[3J[H[2J<tspan font-weight="bold">===========================================================================</tspan></tspan>
+      <tspan x="0" y="16"><tspan font-weight="bold">===========================================================================</tspan></tspan>
       <tspan x="0" y="36"><tspan fill="#94e2d5">  ZQK DEMO 4: THE VERIFIABLE CRYPTOGRAPHIC LEDGER &amp; OPENVEX ATTESTATION    </tspan></tspan>
       <tspan x="0" y="56"><tspan font-weight="bold">===========================================================================</tspan></tspan>
       <tspan x="0" y="76">  <tspan fill="#f9e2af" font-weight="bold">Thesis:</tspan> Anyone can generate code. ZQK generates cryptographically</tspan>

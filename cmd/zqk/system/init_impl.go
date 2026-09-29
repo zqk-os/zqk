@@ -1244,37 +1244,60 @@ func generateGettingStartedGuide(projectRoot string, logger logging.Logger) erro
 	exe := brand.ExecutableName()
 	prod := brand.ProductName()
 
-	template := fmt.Sprintf(`# Welcome to %s (The Zen Way)
+	template := fmt.Sprintf(`# Welcome to %s
 
-You have successfully initialized %s Community Edition. This is not just another project management tool—it is a **Knowledge Kernel** designed to safely orchestrate AI agents.
+You have successfully initialized %s Community Edition. This is not another prompt wrapper—it is a local, content-addressed **Knowledge Kernel** that coordinates humans and AI agent mesh with mathematical rigor.
 
-## The Zen Way: Objects over Markdown
-Most AI setups rely on chaotic markdown files (e.g., '.iderules' or 'prompt.txt'). Markdown is brittle and untraceable.
-%s uses **Objects**. Every goal, requirement, task, and policy in this project is a rigid, cryptographically-hashed object stored in the local '.csnap' graph. When an AI agent connects via MCP, it reads these objects directly. It cannot hallucinate requirements, because the core engine will reject any code that doesn't map to a valid object.
+## Core Mental Model: Objects Over Prompt Promiscuity
+Most multi-agent setups pass ungrounded context through brittle markdown files ('.cursorrules', 'prompt.txt'), leading to context rot, loop hallucination, and uncontained blast radiuses.
 
-## Policies & The Validation DSL
-How do you stop an AI agent from going rogue? **Policies.**
+%s anchors all cognition in **typed, cryptographically-hashed kernel objects** stored locally in '.zqk/process':
+- **Missions & Goals:** Strategic intent anchored from the top of the hierarchy.
+- **Workstreams & Priority Plans:** Isolated lanes of execution with explicit ownership.
+- **Requirements & Criteria:** Verifiable acceptance criteria and test cases.
+- **Backlog Items (BLIs):** Atomic, shovel-ready work units that agents claim with CAS locks.
 
-A Policy is a programmable contract. When an agent attempts to mutate the system (e.g., merging code or promoting a task status), %s intercepts the action and evaluates it against your Policies using the **Validation DSL**.
+## Policies & Invariant Gates
+When an agent or tool attempts to mutate state (claiming work, modifying code, or promoting tasks), %s enforces deterministic policies and validation gates. If an agent tries to skip verification or bypass invariants, the kernel fails closed.
 
-Example of a Validation DSL rule inside a Policy object:
-`+"```yaml"+`
-validation_rules:
-  - rule: "requires access:confidential"
-    enforcement: "block"
-    message: "Agents cannot touch this subsystem without explicit clearance."
+## Quickstart Walkthrough: From Greenfield to Full Mesh (< 3 Minutes)
+
+### 1. Launch the Visual Web Studio
+Inspect your workstreams, milestones, and real-time Gantt timeline:
+`+"```bash"+`
+%s ui -w
+`+"```"+`
+Open [http://127.0.0.1:8080](http://127.0.0.1:8080) in your browser.
+
+### 2. Onboard Your AI Agents & IDE Mesh
+Automatically detect your agent hosts (Cursor, VS Code, Cline, Windsurf) and sync kernel directives into '.agents/AGENTS.md':
+`+"```bash"+`
+%s system agent-onboard
+`+"```"+`
+To connect Claude Desktop or external MCP clients:
+`+"```bash"+`
+%s mcp install --client claude-desktop
 `+"```"+`
 
-If the agent doesn't have the required clearance, %s's core engine throws a cryptographic validation error and blocks the transaction. **No hallucinations, no devastation.**
+### 3. Discover What's Next & Execute Tasks
+Query the knowledge kernel to discover your active priority plan and the next prioritized backlog items:
+`+"```bash"+`
+%s workflow whats-next
+`+"```"+`
+To claim a task atomically:
+`+"```bash"+`
+%s agent claim-work
+`+"```"+`
 
-## Your First Steps
-1. **Interactive Tutorial:** Run `+"`"+`%s system start-here`+"`"+` to complete the interactive onboarding tutorial and understand the operational philosophy.
-2. **Connect your IDE:** Run `+"`"+`%s mcp serve`+"`"+` and point your AI assistant (IDE, Claude) to it.
-3. **Set the Goal:** Run `+"`"+`%s object create goal --field title="Build an awesome app"`+"`"+`
-4. **Let the Agent Work:** Just tell your AI to "Start working on the goal." It will read the graph, break the goal into requirements, and execute them under the strict governance of your policies.
+### 4. Background Services & Continuous Verification
+Run background maintenance and telemetry daemons:
+`+"```bash"+`
+%s scheduler start
+%s system status
+`+"```"+`
 
-*For more CLI tools, type `+"`"+`%s --help`+"`"+`.*
-`, prod, prod, prod, prod, prod, exe, exe, exe, exe)
+*Need full CLI help? Run `+"`"+`%s --help`+"`"+` or consult docs/INDEX.md.*
+`, prod, prod, prod, prod, exe, exe, exe, exe, exe, exe, exe, exe)
 
 	return fileutil.WriteSecureFile(path, []byte(template))
 }

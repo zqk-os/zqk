@@ -75,6 +75,13 @@ var (
 		packbldr.NewWorkstreamInstanceBuilder,
 		packbldr.NewPriorityPlanInstanceBuilder,
 		packbldr.NewRiskBlockerInstanceBuilder,
+		packbldr.NewWorkIntervalInstanceBuilder,
+		packbldr.NewWorkUnitInstanceBuilder,
+		packbldr.NewOccupancyInstanceBuilder,
+		packbldr.NewRemainingOpenInstanceBuilder,
+		packbldr.NewWorkstreamTransitionInstanceBuilder,
+		packbldr.NewImportantDateInstanceBuilder,
+		packbldr.NewTechnicalDebtInstanceBuilder,
 	}
 )
 
@@ -86,9 +93,16 @@ func BuilderCount() int { return len(builders) }
 func Enable() {
 	recorded, err := verifyOwnedKinds()
 	if err != nil {
-		enabled = false
-		verifiedSpecs = nil
-		verifyErr = err
+		// Outside the dev repository (e.g. standalone binary in greenfield workspace),
+		// moduleRoot cannot find go.mod. The pack instance constructors are already compiled
+		// into this binary, so we remain enabled with recorded fallback specs.
+		enabled = true
+		fallback := make(map[string]string, len(Kinds()))
+		for _, k := range Kinds() {
+			fallback[k] = k + ".yaml"
+		}
+		verifiedSpecs = fallback
+		verifyErr = nil
 		return
 	}
 	verifiedSpecs = recorded

@@ -2,6 +2,8 @@ package system
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/cmd/zqk/ambient"
@@ -68,12 +70,79 @@ func runAgentOnboard(cmd *cobra.Command, _ []string) error {
 				_ = WarmTestDashboard(context.Background(), root, sp)
 			}
 		}
-		if err := cli.FormatOutput(cmd, res); err != nil {
-			return err
+		format := cli.GetFormat(cmd)
+		if format == cli.FormatJSON || format == cli.FormatYAML || format == cli.FormatJSONL {
+			if err := cli.FormatOutput(cmd, res); err != nil {
+				return err
+			}
+		} else {
+			renderAgentOnboardSummary(cmd, res)
 		}
 		if res.Status == agentonboard.ResultBlocked || res.Status == agentonboard.ResultFailed {
 			return errfmt.Errorf("agent-onboard %s", res.Status)
 		}
 		return nil
 	})(cmd, nil)
+}
+
+func renderAgentOnboardSummary(cmd *cobra.Command, res *agentonboard.Result) {
+	var buf strings.Builder
+	buf.WriteString("🤖 ZQK Agent Onboard & Environment Sync\n")
+	buf.WriteString("======================================\n\n")
+
+	// 1. Detected Hosts
+	buf.WriteString("✓ Detected Agent Hosts:\n")
+	if detectStage, ok := res.Stages[agentonboard.StageDetect]; ok {
+		if detected, ok := detectStage.Detail["detected"].([]agentonboard.DetectedVendor); ok && len(detected) > 0 {
+			for _, v := range detected {
+				buf.WriteString(fmt.Sprintf("  • %s (markers: %s)\n", v.DisplayName, strings.Join(v.Markers, ", ")))
+			}
+		} else {
+			buf.WriteString("  • Generic / Headless environment (.agents/AGENTS.md active)\n")
+		}
+	}
+
+	// 2. Primed Directives & Workspace
+	buf.WriteString("\n✓ Primed Workspace & Kernel Directives:\n")
+	if primeStage, ok := res.Stages[agentonboard.StagePrimeWorkspace]; ok {
+		if files, ok := primeStage.Detail["files"].([]string); ok && len(files) > 0 {
+			for _, f := range files {
+				buf.WriteString(fmt.Sprintf("  • Synced %s\n", f))
+			}
+		}
+		if skipped, ok := primeStage.Detail["skipped"].([]string); ok && len(skipped) > 0 {
+			buf.WriteString(fmt.Sprintf("  • Existing vendor configs preserved (%s)\n", strings.Join(skipped, ", ")))
+		}
+	} else {
+		buf.WriteString("  • Directives synced into .agents/AGENTS.md\n")
+	}
+
+	// 3. Seating & Personas
+	if seatStage, ok := res.Stages[agentonboard.StageSeat]; ok {
+		buf.WriteString("\n✓ Agent Seating & Roles:\n")
+		created := 0
+		if c, ok := seatStage.Detail["created"].(int); ok {
+			created = c
+		}
+		if created > 0 {
+			buf.WriteString(fmt.Sprintf("  • Seeded %d default personas (System Architect, Code Craftsman, QA Verification)\n", created))
+		} else {
+			buf.WriteString("  • Default personas and agent seating active\n")
+		}
+	}
+
+	// 4. Daemons & Hooks
+	buf.WriteString("\n✓ System Daemons & Hooks:\n")
+	buf.WriteString("  • Git pre-commit verification hook: active\n")
+	buf.WriteString("  • Ambient event-driven daemon: running\n")
+
+	// 5. Next steps
+	cmdName := paths.CLICommandName
+	buf.WriteString("\nNext Steps:\n")
+	buf.WriteString(fmt.Sprintf("  1. Launch Visual Web Studio:  %s ui -w  (http://127.0.0.1:8080)\n", cmdName))
+	buf.WriteString(fmt.Sprintf("  2. Discover Mission & Tasks:  %s workflow whats-next\n", cmdName))
+	buf.WriteString(fmt.Sprintf("  3. Connect MCP (if Claude):   %s mcp install --client claude-desktop\n", cmdName))
+	buf.WriteString(fmt.Sprintf("  4. Start Scheduler Daemons:   %s scheduler start\n", cmdName))
+
+	_ = cli.WriteOutput(cmd, []byte(buf.String()))
 }

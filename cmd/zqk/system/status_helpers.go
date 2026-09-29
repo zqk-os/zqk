@@ -249,14 +249,6 @@ func getSystemHealthData(projectRoot string) map[string]any {
 		healthData["check_failed"] = true
 		return healthData
 	}
-	if err != nil {
-		// If command failed, return error status
-		healthData[objects.FieldKeyStatus] = "error"
-		healthData["error"] = err.Error()
-		healthData["check_failed"] = true
-		return healthData
-	}
-
 	// Parse JSON output to extract health summary (from a PARTIAL --fast check).
 	var checkResult struct {
 		PartialCheck bool `json:"partial_check"`
@@ -270,17 +262,15 @@ func getSystemHealthData(projectRoot string) map[string]any {
 		} `json:"summary"`
 	}
 
-	// Try to parse JSON from output
+	parsedJSON := false
 	outputStr := string(output)
-	// Find JSON in output (might have log messages before/after)
 	jsonStart := strings.Index(outputStr, "{")
 	if jsonStart >= 0 {
 		jsonEnd := strings.LastIndex(outputStr, "}")
 		if jsonEnd > jsonStart {
 			jsonData := outputStr[jsonStart : jsonEnd+1]
 			if err := json.Unmarshal([]byte(jsonData), &checkResult); err == nil {
-				// Never claim "healthy" from --fast: reduced surface is not authoritative.
-				// Critical/warning still surface problems found on that surface.
+				parsedJSON = true
 				healthStatus := "partial_ok"
 				if checkResult.Summary.BlockingIssues > 0 {
 					healthStatus = "critical"
@@ -298,15 +288,21 @@ func getSystemHealthData(projectRoot string) map[string]any {
 				healthData["total_objects"] = checkResult.Summary.TotalObjects
 				healthData["objects_with_issues"] = checkResult.Summary.ObjectsWithIssues
 				if vis, msg, action := GetRetentionDriftReminder(stdctx.Background(), projectRoot); vis {
-					healthData["retention_over_target"] = true
-					healthData["retention_message"] = msg
-					healthData["retention_suggested_action"] = action
-				} else {
-					healthData["retention_over_target"] = false
+					healthData["retention_drift"] = true
+					healthData["retention_drift_message"] = msg
+					healthData["retention_drift_action"] = action
 				}
 				return healthData
 			}
 		}
+	}
+
+	if err != nil && !parsedJSON {
+		// If command failed and no JSON could be parsed, return error status
+		healthData[objects.FieldKeyStatus] = "error"
+		healthData["error"] = err.Error()
+		healthData["check_failed"] = true
+		return healthData
 	}
 
 	// If parsing failed, return unknown status
@@ -569,7 +565,7 @@ func formatStatusTableHealth(statusData map[string]any) string {
 		if r, ok := sched["running"].(bool); ok {
 			schedStatus := "running"
 			if !r {
-				schedStatus = "stopped"
+				schedStatus = fmt.Sprintf("stopped (run '%s scheduler start' to start background daemon)", paths.CLICommandName)
 			}
 			buf.WriteString(fmt.Sprintf("  Scheduler: %s\n", schedStatus))
 		}

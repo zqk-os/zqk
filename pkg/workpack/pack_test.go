@@ -28,6 +28,13 @@ func TestKindsArePlanningAndVerification(t *testing.T) {
 		objects.KindWorkstream,
 		objects.KindPriorityPlan,
 		objects.KindRiskBlocker,
+		objects.KindWorkInterval,
+		objects.KindWorkUnit,
+		objects.KindOccupancy,
+		objects.KindRemainingOpen,
+		objects.KindWorkstreamTransition,
+		objects.KindImportantDate,
+		objects.KindTechnicalDebt,
 	}
 	if len(got) != len(want) {
 		t.Fatalf("kinds %v", got)
