@@ -19,15 +19,19 @@
 
 ## 2. Segment layout
 
-| Kind                  | Directory / file pattern |
-|-----------------------|---------------------------|
-| audit_event           | `.zqk/streams/audit_event/audit_stream_YYYY-MM-DD.jsonl` |
-| change_journal_entry  | `.zqk/streams/change_journal_entry/change_journal_YYYY-MM-DD.jsonl` |
-| *_metric              | `.zqk/streams/<kind>/<kind>_YYYY-MM-DD.jsonl` (e.g. audit_aggregation_metric_YYYY-MM-DD.jsonl) |
-| verification_matrix   | `.zqk/streams/verification_matrix/<yyyy-mm-dd>_stream.json` (same per-kind directory pattern; updates use `stream_current` — see `stream_current_state.go`) |
+All stream-backed kinds are organized under `.zqk/streams/<kind>/` with UTC daily segment rolling:
 
-- **Window:** Daily (UTC). One file per day; next day rolls to a new file.
-- **Format:** JSONL (one JSON object per line, UTF-8, `\n` terminator). Append-only; mutex per kind for concurrent appends.
+| Kind Identifier | Segment Directory | Canonical Filename Pattern | Description & Notes |
+| :--- | :--- | :--- | :--- |
+| `audit_event` | `.zqk/streams/audit_event/` | `<yyyy-mm-dd>_stream.json` | High-volume append-only audit stream. Legacy `audit_stream_YYYY-MM-DD.jsonl` files are automatically migrated to canonical format. |
+| `change_journal_entry` | `.zqk/streams/change_journal_entry/` | `<yyyy-mm-dd>_stream.json` | Delta-only change journal records. |
+| `*_metric` *(High-volume metrics)* | `.zqk/streams/<kind>/` | `<yyyy-mm-dd>_stream.json` | Covers `audit_aggregation_metric`, `base_metric`, `command_metric`, `file_lock_metric`, `code_quality_metric`, and `scheduler_health_metric`. |
+| `verification_matrix` | `.zqk/streams/verification_matrix/` | `<yyyy-mm-dd>_stream.json` | Verification matrix snapshots; active updates resolve via `stream_current` (`stream_current_state.go`). |
+| `mcp_session` / `zqk_session` | `.zqk/streams/<kind>/` | `<yyyy-mm-dd>_stream.json` | Session lifecycle event journals. |
+
+- **Rolling Window:** Daily (UTC). One primary file per calendar day; next day rolls to a new file. When concurrent worker processes write to the same daily stream, process IDs are disambiguated as `<yyyy-mm-dd>_pid<pid>_stream.json`.
+- **Format:** JSONL (one JSON object per line, UTF-8 encoded, `\n` line terminator).
+- **Concurrency:** Append-only with per-kind thread synchronization mutex.
 
 ---
 
