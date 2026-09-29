@@ -229,10 +229,10 @@ func renderHeader(b *strings.Builder, m *UIModel) {
 	var tabLine string
 	if w >= 120 {
 		tabLine = buildTabLine("full", " │ ")
-	} else if w >= 105 {
+	} else if w >= 110 {
 		tabLine = buildTabLine("full", "│")
-	} else if w >= 90 {
-		tabLine = buildTabLine("tight", "│")
+	} else if w >= 92 {
+		tabLine = buildTabLine("compact", " │ ")
 	} else {
 		tabLine = buildTabLine("compact", "│")
 	}
@@ -1264,31 +1264,34 @@ func renderFooter(b *strings.Builder, m *UIModel) {
 	b.WriteString(tds.PadRight(legendLine, w) + "\n")
 
 	var navLine string
-	if w >= 120 {
-		navLine = whiteBold("[Tab/1-8]") + " Switch View  " +
+	if w >= 135 {
+		navLine = whiteBold("[Tab/1-8]") + " View  " +
 			whiteBold("[↑/↓/j/k]") + " Select  " +
-			whiteBold("[g/G]") + " Top/Bottom  " +
 			whiteBold("[/]") + " Search  " +
 			whiteBold("[Enter]") + " Inspect  " +
 			whiteBold(triggerActionHint) + "  " +
-			whiteBold("[z/?]") + " Profile (newb)  " +
 			whiteBold("[Space]") + " Pause  " +
 			whiteBold("[r]") + " Refresh  " +
-			whiteBold("[q/Esc]") + " Exit"
-	} else if w >= 90 {
-		navLine = whiteBold("[Tab/1-8]") + " Switch  " +
-			whiteBold("[↑/↓]") + " Scroll  " +
-			whiteBold("[/]") + " Search  " +
+			whiteBold("[z/?]") + " Profile (newb)  " +
+			whiteBold("[q]") + " Exit"
+	} else if w >= 115 {
+		navLine = whiteBold("[Tab/1-8]") + " Switch View  " +
+			whiteBold("[↑/↓]") + " Select  " +
 			whiteBold("[Enter]") + " Inspect  " +
 			whiteBold(triggerActionHint) + "  " +
 			whiteBold("[z/?]") + " Profile (newb)  " +
+			whiteBold("[r]") + " Refresh  " +
+			whiteBold("[q]") + " Exit"
+	} else if w >= 75 {
+		navLine = whiteBold("[Tab/1-8]") + " View  " +
+			whiteBold("[↑/↓]") + " Select  " +
+			whiteBold("[Enter]") + " Inspect  " +
 			whiteBold("[r]") + " Refresh  " +
 			whiteBold("[q]") + " Exit"
 	} else {
 		navLine = whiteBold("[Tab]") + " Nav  " +
 			whiteBold("[↑/↓]") + " Select  " +
 			whiteBold("[Enter]") + " Inspect  " +
-			whiteBold("[z]") + " Mode  " +
 			whiteBold("[q]") + " Exit"
 	}
 	if tds.VisibleWidth(navLine) > w {
@@ -1668,9 +1671,18 @@ func renderHealthTab(b *strings.Builder, m *UIModel) {
 		{Label: "File Descriptors", Value: fmt.Sprintf("%d / %d", hs.OpenFileDesc, hs.MaxFileDesc), Extra: tds.Badge(ternary(hs.StaleLocksCount == 0, "CLEAN", "LOCKS"))},
 	}
 
-	panelLines := []string{
-		tds.StatRow(row1, w-4),
-		tds.StatRow(row2, w-4),
+	var panelLines []string
+	if w >= 125 {
+		panelLines = []string{
+			tds.StatRow(row1, w-4),
+			tds.StatRow(row2, w-4),
+		}
+	} else {
+		panelLines = []string{
+			tds.StatRow(row1[:2], w-4),
+			tds.StatRow([]tds.StatItem{row1[2], row2[0]}, w-4),
+			tds.StatRow(row2[1:], w-4),
+		}
 	}
 	b.WriteString(tds.Panel("🛡️  Kernel Integrity Radar & System Health", panelLines, w, tds.BorderRounded))
 	b.WriteString("\n")

@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 549" width="960" height="549">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 986 589" width="986" height="589">
   <defs>
     <style>
       .window-bg { fill: #1e1e2e; rx: 12px; }
@@ -6,8 +6,9 @@
       .dot-red { fill: #f38ba8; }
       .dot-yellow { fill: #f9e2af; }
       .dot-green { fill: #a6e3a1; }
-      .term-text { font-family: "JetBrains Mono", "Fira Code", "Menlo", "Monaco", "Consolas", monospace;
-                   font-size: 13px; fill: #cdd6f4; white-space: pre; }
+      .term-text { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace;
+                   font-size: 13px; fill: #cdd6f4; letter-spacing: 0px; white-space: pre; }
+      .term-bg-reverse { fill: #89b4fa; rx: 3px; }
       .title-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
                     font-size: 12px; fill: #a6adc8; font-weight: 500; text-anchor: middle; }
     </style>
@@ -15,230 +16,40 @@
       <feDropShadow dx="0" dy="6" stdDeviation="12" flood-color="#000000" flood-opacity="0.45"/>
     </filter>
   </defs>
-  <rect x="4" y="4" width="952" height="541" class="window-bg" filter="url(#shadow)" stroke="#313244" stroke-width="1"/>
-  <path d="M 4 14 A 10 10 0 0 1 14 4 L 946 4 A 10 10 0 0 1 956 14 L 956 38 L 4 38 Z" class="top-bar"/>
-  <line x1="4" y1="38" x2="956" y2="38" stroke="#313244" stroke-width="1"/>
-  <circle cx="22" cy="21" r="5.5" class="dot-red"/>
-  <circle cx="40" cy="21" r="5.5" class="dot-yellow"/>
-  <circle cx="58" cy="21" r="5.5" class="dot-green"/>
-  <text x="480.000000" y="25" class="title-text">zqk ui (Tab 4: 📋 PM) — Technical Program Management &amp; Shovel-Ready Backlog</text>
-  <g transform="translate(20.000000, 52.000000)">
-    <text class="term-text">
-      <tspan x="0.0" y="15.0" fill="#cdd6f4">╔══════════════════════════════════════════════════════════════════════════════════════════════════╗</tspan>
-      <tspan x="0.0" y="34.0" fill="#cdd6f4">║                        </tspan>
-      <tspan x="210.0" y="34.0" fill="#94e2d5" font-weight="bold">⚡ ZQK KNOWLEDGE KERNEL — MISSION CONTROL CONSOLE</tspan>
-      <tspan x="621.6" y="34.0" fill="#cdd6f4">                         ║</tspan>
-      <tspan x="0.0" y="53.0" fill="#cdd6f4">╚══════════════════════════════════════════════════════════════════════════════════════════════════╝</tspan>
-      <tspan x="0.0" y="72.0" fill="#6c7086"> 1: ⚡ State </tspan>
-      <tspan x="109.2" y="72.0" fill="#cdd6f4">│</tspan>
-      <tspan x="117.6" y="72.0" fill="#6c7086"> 2: 📜 Audit </tspan>
-      <tspan x="226.8" y="72.0" fill="#cdd6f4">│</tspan>
-      <tspan x="235.2" y="72.0" fill="#6c7086"> 3: 🤖 Swarm </tspan>
-      <tspan x="344.4" y="72.0" fill="#cdd6f4">│</tspan>
-      <tspan x="352.8" y="72.0" fill="#11111b">[4: 📋 PM]</tspan>
-      <tspan x="436.8" y="72.0" fill="#cdd6f4">│</tspan>
-      <tspan x="445.2" y="72.0" fill="#6c7086"> 5: 📊 Metrics </tspan>
-      <tspan x="571.2" y="72.0" fill="#cdd6f4">│</tspan>
-      <tspan x="579.6" y="72.0" fill="#6c7086"> 6: ⏱ Sched </tspan>
-      <tspan x="680.4" y="72.0" fill="#cdd6f4">│</tspan>
-      <tspan x="688.8" y="72.0" fill="#6c7086"> 7: 🧪 QA </tspan>
-      <tspan x="772.8" y="72.0" fill="#cdd6f4">│</tspan>
-      <tspan x="781.2" y="72.0" fill="#6c7086"> 8: 🛡 H</tspan>
-      <tspan x="0.0" y="91.0" fill="#6c7086">────────────────────────────────────────────────────────────────────────────────────────────────────</tspan>
-      <tspan x="0.0" y="110.0" fill="#94e2d5" font-weight="bold">🔔 MESSAGE: </tspan>
-      <tspan x="100.8" y="110.0" fill="#94e2d5">System operating normally — ambient telemetry stream active</tspan>
-      <tspan x="596.4" y="110.0" fill="#cdd6f4">                             </tspan>
-      <tspan x="0.0" y="129.0" fill="#6c7086">────────────────────────────────────────────────────────────────────────────────────────────────────</tspan>
-      <tspan x="0.0" y="148.0" fill="#ffffff" font-weight="bold">📋 PM &amp; Process Administration</tspan>
-      <tspan x="252.0" y="148.0" fill="#cdd6f4"> │ </tspan>
-      <tspan x="277.2" y="148.0" fill="#94e2d5" font-weight="bold">Mission</tspan>
-      <tspan x="336.0" y="148.0" fill="#cdd6f4">: </tspan>
-      <tspan x="352.8" y="148.0" fill="#94e2d5" font-weight="bold">Continuous Autonomous Development</tspan>
-      <tspan x="0.0" y="167.0" fill="#ffffff" font-weight="bold">BLI Pipeline (0)</tspan>
-      <tspan x="134.4" y="167.0" fill="#cdd6f4"> │ </tspan>
-      <tspan x="159.6" y="167.0" fill="#94e2d5" font-weight="bold">Planned</tspan>
-      <tspan x="218.4" y="167.0" fill="#cdd6f4">: 0  </tspan>
-      <tspan x="260.4" y="167.0" fill="#f9e2af" font-weight="bold">InProg</tspan>
-      <tspan x="310.8" y="167.0" fill="#cdd6f4">: 0  </tspan>
-      <tspan x="352.8" y="167.0" fill="#f38ba8" font-weight="bold">Blocked</tspan>
-      <tspan x="411.6" y="167.0" fill="#cdd6f4">: 0  </tspan>
-      <tspan x="453.6" y="167.0" fill="#a6e3a1" font-weight="bold">Done</tspan>
-      <tspan x="487.2" y="167.0" fill="#cdd6f4">: 0  (</tspan>
-      <tspan x="537.6" y="167.0" fill="#a6e3a1" font-weight="bold">0</tspan>
-      <tspan x="546.0" y="167.0" fill="#cdd6f4"> claimed)</tspan>
-      <tspan x="0.0" y="186.0" fill="#6c7086">─── </tspan>
-      <tspan x="33.6" y="186.0" fill="#cdd6f4">ACTIVE PRIORITY PLANS (Press Enter to inspect) </tspan>
-      <tspan x="428.4" y="186.0" fill="#6c7086">─────────────────────────────────────────────────</tspan>
-      <tspan x="0.0" y="205.0" fill="#6c7086">┌</tspan>
-      <tspan x="8.4" y="205.0" fill="#6c7086">─────────────────────</tspan>
-      <tspan x="184.8" y="205.0" fill="#6c7086">┬</tspan>
-      <tspan x="193.2" y="205.0" fill="#6c7086">────────────────</tspan>
-      <tspan x="327.6" y="205.0" fill="#6c7086">┬</tspan>
-      <tspan x="336.0" y="205.0" fill="#6c7086">─────────</tspan>
-      <tspan x="411.6" y="205.0" fill="#6c7086">┬</tspan>
-      <tspan x="420.0" y="205.0" fill="#6c7086">──────────────────</tspan>
-      <tspan x="571.2" y="205.0" fill="#6c7086">┬</tspan>
-      <tspan x="579.6" y="205.0" fill="#6c7086">──────────────────────────────</tspan>
-      <tspan x="831.6" y="205.0" fill="#6c7086">┐</tspan>
-      <tspan x="0.0" y="224.0" fill="#6c7086">│ </tspan>
-      <tspan x="16.8" y="224.0" fill="#ffffff" font-weight="bold">PLAN ID</tspan>
-      <tspan x="75.6" y="224.0" fill="#cdd6f4">            </tspan>
-      <tspan x="176.4" y="224.0" fill="#6c7086"> │ </tspan>
-      <tspan x="201.6" y="224.0" fill="#cdd6f4">    </tspan>
-      <tspan x="235.2" y="224.0" fill="#ffffff" font-weight="bold">STATUS</tspan>
-      <tspan x="285.6" y="224.0" fill="#cdd6f4">    </tspan>
-      <tspan x="319.2" y="224.0" fill="#6c7086"> │ </tspan>
-      <tspan x="344.4" y="224.0" fill="#cdd6f4">   </tspan>
-      <tspan x="369.6" y="224.0" fill="#ffffff" font-weight="bold">BLIS</tspan>
-      <tspan x="403.2" y="224.0" fill="#6c7086"> │ </tspan>
-      <tspan x="428.4" y="224.0" fill="#ffffff" font-weight="bold">WORKSTREAMS</tspan>
-      <tspan x="520.8" y="224.0" fill="#cdd6f4">     </tspan>
-      <tspan x="562.8" y="224.0" fill="#6c7086"> │ </tspan>
-      <tspan x="588.0" y="224.0" fill="#ffffff" font-weight="bold">TITLE</tspan>
-      <tspan x="630.0" y="224.0" fill="#cdd6f4">                       </tspan>
-      <tspan x="823.2" y="224.0" fill="#6c7086"> │</tspan>
-      <tspan x="0.0" y="243.0" fill="#6c7086">├</tspan>
-      <tspan x="8.4" y="243.0" fill="#6c7086">─────────────────────</tspan>
-      <tspan x="184.8" y="243.0" fill="#6c7086">┼</tspan>
-      <tspan x="193.2" y="243.0" fill="#6c7086">────────────────</tspan>
-      <tspan x="327.6" y="243.0" fill="#6c7086">┼</tspan>
-      <tspan x="336.0" y="243.0" fill="#6c7086">─────────</tspan>
-      <tspan x="411.6" y="243.0" fill="#6c7086">┼</tspan>
-      <tspan x="420.0" y="243.0" fill="#6c7086">──────────────────</tspan>
-      <tspan x="571.2" y="243.0" fill="#6c7086">┼</tspan>
-      <tspan x="579.6" y="243.0" fill="#6c7086">──────────────────────────────</tspan>
-      <tspan x="831.6" y="243.0" fill="#6c7086">┤</tspan>
-      <tspan x="0.0" y="262.0" fill="#6c7086">│ </tspan>
-      <tspan x="16.8" y="262.0" fill="#94e2d5" font-weight="bold">&gt; </tspan>
-      <tspan x="33.6" y="262.0" fill="#cdd6f4">PRI-STARTER-COMM</tspan>
-      <tspan x="168.0" y="262.0" fill="#cdd6f4">…</tspan>
-      <tspan x="176.4" y="262.0" fill="#6c7086"> │ </tspan>
-      <tspan x="201.6" y="262.0" fill="#cdd6f4"> </tspan>
-      <tspan x="210.0" y="262.0" fill="#f9e2af" font-weight="bold">in_progress</tspan>
-      <tspan x="302.4" y="262.0" fill="#cdd6f4">  </tspan>
-      <tspan x="319.2" y="262.0" fill="#6c7086"> │ </tspan>
-      <tspan x="344.4" y="262.0" fill="#cdd6f4">      3</tspan>
-      <tspan x="403.2" y="262.0" fill="#6c7086"> │ </tspan>
-      <tspan x="428.4" y="262.0" fill="#cdd6f4">WS-LAUNCH       </tspan>
-      <tspan x="562.8" y="262.0" fill="#6c7086"> │ </tspan>
-      <tspan x="588.0" y="262.0" fill="#cdd6f4">Community Launch Gate &amp; Sta</tspan>
-      <tspan x="814.8" y="262.0" fill="#cdd6f4">…</tspan>
-      <tspan x="823.2" y="262.0" fill="#6c7086"> │</tspan>
-      <tspan x="0.0" y="281.0" fill="#6c7086">│ </tspan>
-      <tspan x="16.8" y="281.0" fill="#cdd6f4">  PRI-STORAGE-PURE</tspan>
-      <tspan x="168.0" y="281.0" fill="#cdd6f4">…</tspan>
-      <tspan x="176.4" y="281.0" fill="#6c7086"> │ </tspan>
-      <tspan x="201.6" y="281.0" fill="#cdd6f4">   </tspan>
-      <tspan x="226.8" y="281.0" fill="#a6e3a1" font-weight="bold">complete</tspan>
-      <tspan x="294.0" y="281.0" fill="#cdd6f4">   </tspan>
-      <tspan x="319.2" y="281.0" fill="#6c7086"> │ </tspan>
-      <tspan x="344.4" y="281.0" fill="#cdd6f4">      2</tspan>
-      <tspan x="403.2" y="281.0" fill="#6c7086"> │ </tspan>
-      <tspan x="428.4" y="281.0" fill="#cdd6f4">WS-KERNEL       </tspan>
-      <tspan x="562.8" y="281.0" fill="#6c7086"> │ </tspan>
-      <tspan x="588.0" y="281.0" fill="#cdd6f4">Storage Engine Pure-Go Mode</tspan>
-      <tspan x="814.8" y="281.0" fill="#cdd6f4">…</tspan>
-      <tspan x="823.2" y="281.0" fill="#6c7086"> │</tspan>
-      <tspan x="0.0" y="300.0" fill="#6c7086">└</tspan>
-      <tspan x="8.4" y="300.0" fill="#6c7086">─────────────────────</tspan>
-      <tspan x="184.8" y="300.0" fill="#6c7086">┴</tspan>
-      <tspan x="193.2" y="300.0" fill="#6c7086">────────────────</tspan>
-      <tspan x="327.6" y="300.0" fill="#6c7086">┴</tspan>
-      <tspan x="336.0" y="300.0" fill="#6c7086">─────────</tspan>
-      <tspan x="411.6" y="300.0" fill="#6c7086">┴</tspan>
-      <tspan x="420.0" y="300.0" fill="#6c7086">──────────────────</tspan>
-      <tspan x="571.2" y="300.0" fill="#6c7086">┴</tspan>
-      <tspan x="579.6" y="300.0" fill="#6c7086">──────────────────────────────</tspan>
-      <tspan x="831.6" y="300.0" fill="#6c7086">┘</tspan>
-      <tspan x="0.0" y="319.0" fill="#6c7086">─── </tspan>
-      <tspan x="33.6" y="319.0" fill="#cdd6f4">RECENT WORK UNITS (BACKLOG ITEMS) </tspan>
-      <tspan x="319.2" y="319.0" fill="#6c7086">──────────────────────────────────────────────────────────────</tspan>
-      <tspan x="0.0" y="338.0" fill="#6c7086">┌</tspan>
-      <tspan x="8.4" y="338.0" fill="#6c7086">────────────────────</tspan>
-      <tspan x="176.4" y="338.0" fill="#6c7086">┬</tspan>
-      <tspan x="184.8" y="338.0" fill="#6c7086">─────────</tspan>
-      <tspan x="260.4" y="338.0" fill="#6c7086">┬</tspan>
-      <tspan x="268.8" y="338.0" fill="#6c7086">───────────────</tspan>
-      <tspan x="394.8" y="338.0" fill="#6c7086">┬</tspan>
-      <tspan x="403.2" y="338.0" fill="#6c7086">─────────────</tspan>
-      <tspan x="512.4" y="338.0" fill="#6c7086">┬</tspan>
-      <tspan x="520.8" y="338.0" fill="#6c7086">─────────────────────────────────────</tspan>
-      <tspan x="831.6" y="338.0" fill="#6c7086">┐</tspan>
-      <tspan x="0.0" y="357.0" fill="#6c7086">│ </tspan>
-      <tspan x="16.8" y="357.0" fill="#ffffff" font-weight="bold">BLI ID</tspan>
-      <tspan x="67.2" y="357.0" fill="#cdd6f4">            </tspan>
-      <tspan x="168.0" y="357.0" fill="#6c7086"> │ </tspan>
-      <tspan x="193.2" y="357.0" fill="#cdd6f4"> </tspan>
-      <tspan x="201.6" y="357.0" fill="#ffffff" font-weight="bold">PRIO</tspan>
-      <tspan x="235.2" y="357.0" fill="#cdd6f4">  </tspan>
-      <tspan x="252.0" y="357.0" fill="#6c7086"> │ </tspan>
-      <tspan x="277.2" y="357.0" fill="#cdd6f4">   </tspan>
-      <tspan x="302.4" y="357.0" fill="#ffffff" font-weight="bold">STATUS</tspan>
-      <tspan x="352.8" y="357.0" fill="#cdd6f4">    </tspan>
-      <tspan x="386.4" y="357.0" fill="#6c7086"> │ </tspan>
-      <tspan x="411.6" y="357.0" fill="#ffffff" font-weight="bold">CLAIMANT</tspan>
-      <tspan x="478.8" y="357.0" fill="#cdd6f4">   </tspan>
-      <tspan x="504.0" y="357.0" fill="#6c7086"> │ </tspan>
-      <tspan x="529.2" y="357.0" fill="#ffffff" font-weight="bold">TITLE</tspan>
-      <tspan x="571.2" y="357.0" fill="#cdd6f4">                              </tspan>
-      <tspan x="823.2" y="357.0" fill="#6c7086"> │</tspan>
-      <tspan x="0.0" y="376.0" fill="#6c7086">├</tspan>
-      <tspan x="8.4" y="376.0" fill="#6c7086">────────────────────</tspan>
-      <tspan x="176.4" y="376.0" fill="#6c7086">┼</tspan>
-      <tspan x="184.8" y="376.0" fill="#6c7086">─────────</tspan>
-      <tspan x="260.4" y="376.0" fill="#6c7086">┼</tspan>
-      <tspan x="268.8" y="376.0" fill="#6c7086">───────────────</tspan>
-      <tspan x="394.8" y="376.0" fill="#6c7086">┼</tspan>
-      <tspan x="403.2" y="376.0" fill="#6c7086">─────────────</tspan>
-      <tspan x="512.4" y="376.0" fill="#6c7086">┼</tspan>
-      <tspan x="520.8" y="376.0" fill="#6c7086">─────────────────────────────────────</tspan>
-      <tspan x="831.6" y="376.0" fill="#6c7086">┤</tspan>
-      <tspan x="0.0" y="395.0" fill="#6c7086">│ </tspan>
-      <tspan x="16.8" y="395.0" fill="#cdd6f4">  BLI-COMMUNITY-F</tspan>
-      <tspan x="159.6" y="395.0" fill="#cdd6f4">…</tspan>
-      <tspan x="168.0" y="395.0" fill="#6c7086"> │ </tspan>
-      <tspan x="193.2" y="395.0" fill="#cdd6f4">  P0   </tspan>
-      <tspan x="252.0" y="395.0" fill="#6c7086"> │ </tspan>
-      <tspan x="277.2" y="395.0" fill="#cdd6f4"> </tspan>
-      <tspan x="285.6" y="395.0" fill="#f9e2af" font-weight="bold">in_progress</tspan>
-      <tspan x="378.0" y="395.0" fill="#cdd6f4"> </tspan>
-      <tspan x="386.4" y="395.0" fill="#6c7086"> │ </tspan>
-      <tspan x="411.6" y="395.0" fill="#cdd6f4">agent-alpha</tspan>
-      <tspan x="504.0" y="395.0" fill="#6c7086"> │ </tspan>
-      <tspan x="529.2" y="395.0" fill="#cdd6f4">Community first-run tutorial verif</tspan>
-      <tspan x="814.8" y="395.0" fill="#cdd6f4">…</tspan>
-      <tspan x="823.2" y="395.0" fill="#6c7086"> │</tspan>
-      <tspan x="0.0" y="414.0" fill="#6c7086">│ </tspan>
-      <tspan x="16.8" y="414.0" fill="#cdd6f4">  BLI-STORAGE-PUR</tspan>
-      <tspan x="159.6" y="414.0" fill="#cdd6f4">…</tspan>
-      <tspan x="168.0" y="414.0" fill="#6c7086"> │ </tspan>
-      <tspan x="193.2" y="414.0" fill="#cdd6f4">  P0   </tspan>
-      <tspan x="252.0" y="414.0" fill="#6c7086"> │ </tspan>
-      <tspan x="277.2" y="414.0" fill="#cdd6f4">  </tspan>
-      <tspan x="294.0" y="414.0" fill="#a6e3a1" font-weight="bold">complete</tspan>
-      <tspan x="361.2" y="414.0" fill="#cdd6f4">   </tspan>
-      <tspan x="386.4" y="414.0" fill="#6c7086"> │ </tspan>
-      <tspan x="411.6" y="414.0" fill="#cdd6f4">ACC-SYSTEM </tspan>
-      <tspan x="504.0" y="414.0" fill="#6c7086"> │ </tspan>
-      <tspan x="529.2" y="414.0" fill="#cdd6f4">Pure-Go embedded storage backend &amp;</tspan>
-      <tspan x="814.8" y="414.0" fill="#cdd6f4">…</tspan>
-      <tspan x="823.2" y="414.0" fill="#6c7086"> │</tspan>
-      <tspan x="0.0" y="433.0" fill="#6c7086">────────────────────────────────────────────────────────────────────────────────────────────────────</tspan>
-      <tspan x="0.0" y="452.0" fill="#6c7086">Tabs: </tspan>
-      <tspan x="50.4" y="452.0" fill="#cdd6f4">1:State │ 2:Audit │ 3:Swarm │ 4:PM │ 5:Metrics │ 6:Sched │ 7:QA │ 8:Health                    </tspan>
-      <tspan x="0.0" y="471.0" fill="#ffffff" font-weight="bold">[Tab/1-8]</tspan>
-      <tspan x="75.6" y="471.0" fill="#cdd6f4"> Switch  </tspan>
-      <tspan x="151.2" y="471.0" fill="#ffffff" font-weight="bold">[↑/↓]</tspan>
-      <tspan x="193.2" y="471.0" fill="#cdd6f4"> Scroll  </tspan>
-      <tspan x="268.8" y="471.0" fill="#ffffff" font-weight="bold">[/]</tspan>
-      <tspan x="294.0" y="471.0" fill="#cdd6f4"> Search  </tspan>
-      <tspan x="369.6" y="471.0" fill="#ffffff" font-weight="bold">[Enter]</tspan>
-      <tspan x="428.4" y="471.0" fill="#cdd6f4"> Inspect  </tspan>
-      <tspan x="512.4" y="471.0" fill="#ffffff" font-weight="bold">[Keys] Action</tspan>
-      <tspan x="621.6" y="471.0" fill="#cdd6f4">  </tspan>
-      <tspan x="638.4" y="471.0" fill="#ffffff" font-weight="bold">[z/?]</tspan>
-      <tspan x="680.4" y="471.0" fill="#cdd6f4"> Profile (newb)  </tspan>
-      <tspan x="823.2" y="471.0" fill="#ffffff" font-weight="bold">[r</tspan>
-    </text>
+  <rect x="4" y="4" width="978" height="581" class="window-bg" filter="url(#shadow)" stroke="#313244" stroke-width="1"/>
+  <path d="M 4 14 A 10 10 0 0 1 14 4 L 972 4 A 10 10 0 0 1 982 14 L 982 40 L 4 40 Z" class="top-bar"/>
+  <line x1="4" y1="40" x2="982" y2="40" stroke="#313244" stroke-width="1"/>
+  <circle cx="22" cy="22" r="5.5" class="dot-red"/>
+  <circle cx="40" cy="22" r="5.5" class="dot-yellow"/>
+  <circle cx="58" cy="22" r="5.5" class="dot-green"/>
+  <text x="493.000000" y="26" class="title-text">zqk ui (Tab 4: 📋 PM) — Technical Program Management &amp; Shovel-Ready Backlog</text>
+  <g transform="translate(24.000000, 56.000000)">
+    <text x="0" y="15.0" class="term-text" xml:space="preserve"><tspan fill="#cdd6f4">╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗</tspan></text>
+    <text x="0" y="34.5" class="term-text" xml:space="preserve"><tspan fill="#cdd6f4">║                                  </tspan><tspan fill="#94e2d5" font-weight="bold">⚡ ZQK KNOWLEDGE KERNEL — MISSION CONTROL CONSOLE</tspan><tspan fill="#cdd6f4">                                   ║</tspan></text>
+    <text x="0" y="54.0" class="term-text" xml:space="preserve"><tspan fill="#cdd6f4">╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝</tspan></text>
+    <rect x="375.4" y="60.5" width="78.2" height="17" class="term-bg-reverse"/>
+    <text x="0" y="73.5" class="term-text" xml:space="preserve"><tspan fill="#6c7086"> 1: ⚡ State </tspan><tspan fill="#cdd6f4"> │ </tspan><tspan fill="#6c7086"> 2: 📜 Audit </tspan><tspan fill="#cdd6f4"> │ </tspan><tspan fill="#6c7086"> 3: 🤖 Swarm </tspan><tspan fill="#cdd6f4"> │ </tspan><tspan fill="#11111b" font-weight="bold">[4: 📋 PM]</tspan><tspan fill="#cdd6f4"> │ </tspan><tspan fill="#6c7086"> 5: 📊 Metrics </tspan><tspan fill="#cdd6f4"> │ </tspan><tspan fill="#6c7086"> 6: ⏱ Sched </tspan><tspan fill="#cdd6f4"> │ </tspan><tspan fill="#6c7086"> 7: 🧪 QA </tspan><tspan fill="#cdd6f4"> │ </tspan><tspan fill="#6c7086"> 8: 🛡 Health </tspan></text>
+    <text x="0" y="93.0" class="term-text" xml:space="preserve"><tspan fill="#6c7086">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</tspan></text>
+    <text x="0" y="112.5" class="term-text" xml:space="preserve"><tspan fill="#94e2d5" font-weight="bold">🔔 MESSAGE: </tspan><tspan fill="#94e2d5">System operating normally — ambient telemetry stream active</tspan><tspan fill="#cdd6f4">                                                 </tspan></text>
+    <text x="0" y="132.0" class="term-text" xml:space="preserve"><tspan fill="#6c7086">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</tspan></text>
+    <text x="0" y="151.5" class="term-text" xml:space="preserve"><tspan fill="#ffffff" font-weight="bold">📋 PM &amp; Process Administration</tspan><tspan fill="#cdd6f4"> │ </tspan><tspan fill="#94e2d5" font-weight="bold">Mission</tspan><tspan fill="#cdd6f4">: </tspan><tspan fill="#94e2d5" font-weight="bold">Continuous Autonomous Development</tspan></text>
+    <text x="0" y="171.0" class="term-text" xml:space="preserve"><tspan fill="#ffffff" font-weight="bold">BLI Pipeline (0)</tspan><tspan fill="#cdd6f4"> │ </tspan><tspan fill="#94e2d5" font-weight="bold">Planned</tspan><tspan fill="#cdd6f4">: 0  </tspan><tspan fill="#f9e2af" font-weight="bold">InProg</tspan><tspan fill="#cdd6f4">: 0  </tspan><tspan fill="#f38ba8" font-weight="bold">Blocked</tspan><tspan fill="#cdd6f4">: 0  </tspan><tspan fill="#a6e3a1" font-weight="bold">Done</tspan><tspan fill="#cdd6f4">: 0  (</tspan><tspan fill="#a6e3a1" font-weight="bold">0</tspan><tspan fill="#cdd6f4"> claimed)</tspan></text>
+    <text x="0" y="190.5" class="term-text" xml:space="preserve"><tspan fill="#6c7086">─── </tspan><tspan fill="#cdd6f4">ACTIVE PRIORITY PLANS (Press Enter to inspect) </tspan><tspan fill="#6c7086">─────────────────────────────────────────────────────────────────────</tspan></text>
+    <text x="0" y="210.0" class="term-text" xml:space="preserve"><tspan fill="#6c7086">┌</tspan><tspan fill="#6c7086">──────────────────────────</tspan><tspan fill="#6c7086">┬</tspan><tspan fill="#6c7086">───────────────────</tspan><tspan fill="#6c7086">┬</tspan><tspan fill="#6c7086">──────────</tspan><tspan fill="#6c7086">┬</tspan><tspan fill="#6c7086">─────────────────────</tspan><tspan fill="#6c7086">┬</tspan><tspan fill="#6c7086">──────────────────────────────────────</tspan><tspan fill="#6c7086">┐</tspan></text>
+    <text x="0" y="229.5" class="term-text" xml:space="preserve"><tspan fill="#6c7086">│ </tspan><tspan fill="#ffffff" font-weight="bold">PLAN ID</tspan><tspan fill="#cdd6f4">                 </tspan><tspan fill="#6c7086"> │ </tspan><tspan fill="#cdd6f4">     </tspan><tspan fill="#ffffff" font-weight="bold">STATUS</tspan><tspan fill="#cdd6f4">      </tspan><tspan fill="#6c7086"> │ </tspan><tspan fill="#cdd6f4">    </tspan><tspan fill="#ffffff" font-weight="bold">BLIS</tspan><tspan fill="#6c7086"> │ </tspan><tspan fill="#ffffff" font-weight="bold">WORKSTREAMS</tspan><tspan fill="#cdd6f4">        </tspan><tspan fill="#6c7086"> │ </tspan><tspan fill="#ffffff" font-weight="bold">TITLE</tspan><tspan fill="#cdd6f4">                               </tspan><tspan fill="#6c7086"> │</tspan></text>
+    <text x="0" y="249.0" class="term-text" xml:space="preserve"><tspan fill="#6c7086">├</tspan><tspan fill="#6c7086">──────────────────────────</tspan><tspan fill="#6c7086">┼</tspan><tspan fill="#6c7086">───────────────────</tspan><tspan fill="#6c7086">┼</tspan><tspan fill="#6c7086">──────────</tspan><tspan fill="#6c7086">┼</tspan><tspan fill="#6c7086">─────────────────────</tspan><tspan fill="#6c7086">┼</tspan><tspan fill="#6c7086">──────────────────────────────────────</tspan><tspan fill="#6c7086">┤</tspan></text>
+    <text x="0" y="268.5" class="term-text" xml:space="preserve"><tspan fill="#6c7086">│ </tspan><tspan fill="#94e2d5" font-weight="bold">&gt; </tspan><tspan fill="#cdd6f4">PRI-STARTER-COMMUNITY</tspan><tspan fill="#cdd6f4">…</tspan><tspan fill="#6c7086"> │ </tspan><tspan fill="#cdd6f4">   </tspan><tspan fill="#f9e2af" font-weight="bold">in_progress</tspan><tspan fill="#cdd6f4">   </tspan><tspan fill="#6c7086"> │ </tspan><tspan fill="#cdd6f4">       3</tspan><tspan fill="#6c7086"> │ </tspan><tspan fill="#cdd6f4">WS-LAUNCH          </tspan><tspan fill="#6c7086"> │ </tspan><tspan fill="#cdd6f4">Community Launch Gate &amp; Starter Exp</tspan><tspan fill="#cdd6f4">…</tspan><tspan fill="#6c7086"> │</tspan></text>
+    <text x="0" y="288.0" class="term-text" xml:space="preserve"><tspan fill="#6c7086">│ </tspan><tspan fill="#cdd6f4">  PRI-STORAGE-PUREGO-001</tspan><tspan fill="#6c7086"> │ </tspan><tspan fill="#cdd6f4">    </tspan><tspan fill="#a6e3a1" font-weight="bold">complete</tspan><tspan fill="#cdd6f4">     </tspan><tspan fill="#6c7086"> │ </tspan><tspan fill="#cdd6f4">       2</tspan><tspan fill="#6c7086"> │ </tspan><tspan fill="#cdd6f4">WS-KERNEL          </tspan><tspan fill="#6c7086"> │ </tspan><tspan fill="#cdd6f4">Storage Engine Pure-Go Modernization</tspan><tspan fill="#6c7086"> │</tspan></text>
+    <text x="0" y="307.5" class="term-text" xml:space="preserve"><tspan fill="#6c7086">└</tspan><tspan fill="#6c7086">──────────────────────────</tspan><tspan fill="#6c7086">┴</tspan><tspan fill="#6c7086">───────────────────</tspan><tspan fill="#6c7086">┴</tspan><tspan fill="#6c7086">──────────</tspan><tspan fill="#6c7086">┴</tspan><tspan fill="#6c7086">─────────────────────</tspan><tspan fill="#6c7086">┴</tspan><tspan fill="#6c7086">──────────────────────────────────────</tspan><tspan fill="#6c7086">┘</tspan></text>
+    <text x="0" y="327.0" class="term-text" xml:space="preserve"><tspan fill="#6c7086">─── </tspan><tspan fill="#cdd6f4">RECENT WORK UNITS (BACKLOG ITEMS) </tspan><tspan fill="#6c7086">──────────────────────────────────────────────────────────────────────────────────</tspan></text>
+    <text x="0" y="346.5" class="term-text" xml:space="preserve"><tspan fill="#6c7086">┌</tspan><tspan fill="#6c7086">────────────────────────</tspan><tspan fill="#6c7086">┬</tspan><tspan fill="#6c7086">──────────</tspan><tspan fill="#6c7086">┬</tspan><tspan fill="#6c7086">──────────────────</tspan><tspan fill="#6c7086">┬</tspan><tspan fill="#6c7086">───────────────</tspan><tspan fill="#6c7086">┬</tspan><tspan fill="#6c7086">───────────────────────────────────────────────</tspan><tspan fill="#6c7086">┐</tspan></text>
+    <text x="0" y="366.0" class="term-text" xml:space="preserve"><tspan fill="#6c7086">│ </tspan><tspan fill="#ffffff" font-weight="bold">BLI ID</tspan><tspan fill="#cdd6f4">                </tspan><tspan fill="#6c7086"> │ </tspan><tspan fill="#cdd6f4">  </tspan><tspan fill="#ffffff" font-weight="bold">PRIO</tspan><tspan fill="#cdd6f4">  </tspan><tspan fill="#6c7086"> │ </tspan><tspan fill="#cdd6f4">     </tspan><tspan fill="#ffffff" font-weight="bold">STATUS</tspan><tspan fill="#cdd6f4">     </tspan><tspan fill="#6c7086"> │ </tspan><tspan fill="#ffffff" font-weight="bold">CLAIMANT</tspan><tspan fill="#cdd6f4">     </tspan><tspan fill="#6c7086"> │ </tspan><tspan fill="#ffffff" font-weight="bold">TITLE</tspan><tspan fill="#cdd6f4">                                        </tspan><tspan fill="#6c7086"> │</tspan></text>
+    <text x="0" y="385.5" class="term-text" xml:space="preserve"><tspan fill="#6c7086">├</tspan><tspan fill="#6c7086">────────────────────────</tspan><tspan fill="#6c7086">┼</tspan><tspan fill="#6c7086">──────────</tspan><tspan fill="#6c7086">┼</tspan><tspan fill="#6c7086">──────────────────</tspan><tspan fill="#6c7086">┼</tspan><tspan fill="#6c7086">───────────────</tspan><tspan fill="#6c7086">┼</tspan><tspan fill="#6c7086">───────────────────────────────────────────────</tspan><tspan fill="#6c7086">┤</tspan></text>
+    <text x="0" y="405.0" class="term-text" xml:space="preserve"><tspan fill="#6c7086">│ </tspan><tspan fill="#cdd6f4">  BLI-COMMUNITY-FIRST</tspan><tspan fill="#cdd6f4">…</tspan><tspan fill="#6c7086"> │ </tspan><tspan fill="#cdd6f4">   P0   </tspan><tspan fill="#6c7086"> │ </tspan><tspan fill="#cdd6f4">  </tspan><tspan fill="#f9e2af" font-weight="bold">in_progress</tspan><tspan fill="#cdd6f4">   </tspan><tspan fill="#6c7086"> │ </tspan><tspan fill="#cdd6f4">agent-alpha  </tspan><tspan fill="#6c7086"> │ </tspan><tspan fill="#cdd6f4">Community first-run tutorial verification    </tspan><tspan fill="#6c7086"> │</tspan></text>
+    <text x="0" y="424.5" class="term-text" xml:space="preserve"><tspan fill="#6c7086">│ </tspan><tspan fill="#cdd6f4">  BLI-STORAGE-PUREGO-</tspan><tspan fill="#cdd6f4">…</tspan><tspan fill="#6c7086"> │ </tspan><tspan fill="#cdd6f4">   P0   </tspan><tspan fill="#6c7086"> │ </tspan><tspan fill="#cdd6f4">    </tspan><tspan fill="#a6e3a1" font-weight="bold">complete</tspan><tspan fill="#cdd6f4">    </tspan><tspan fill="#6c7086"> │ </tspan><tspan fill="#cdd6f4">ACC-SYSTEM   </tspan><tspan fill="#6c7086"> │ </tspan><tspan fill="#cdd6f4">Pure-Go embedded storage backend &amp; WAL engine</tspan><tspan fill="#6c7086"> │</tspan></text>
+    <text x="0" y="444.0" class="term-text" xml:space="preserve"><tspan fill="#6c7086">│ </tspan><tspan fill="#cdd6f4">  BLI-ZQL-ACID-TRANSA</tspan><tspan fill="#cdd6f4">…</tspan><tspan fill="#6c7086"> │ </tspan><tspan fill="#cdd6f4">   P1   </tspan><tspan fill="#6c7086"> │ </tspan><tspan fill="#cdd6f4">    </tspan><tspan fill="#a6e3a1" font-weight="bold">complete</tspan><tspan fill="#cdd6f4">    </tspan><tspan fill="#6c7086"> │ </tspan><tspan fill="#cdd6f4">ACC-SYSTEM   </tspan><tspan fill="#6c7086"> │ </tspan><tspan fill="#cdd6f4">Multi-object atomic transactional mutations  </tspan><tspan fill="#6c7086"> │</tspan></text>
+    <text x="0" y="463.5" class="term-text" xml:space="preserve"><tspan fill="#6c7086">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</tspan></text>
+    <text x="0" y="483.0" class="term-text" xml:space="preserve"><tspan fill="#6c7086">Legend: </tspan><tspan fill="#cdd6f4">⚡ State │ 📜 Audit │ 🤖 Swarm │ 📋 PM │ 📊 Metrics │ ⏱ Sched │ 🧪 QA │ 🛡 Health/Actions                        </tspan></text>
+    <text x="0" y="502.5" class="term-text" xml:space="preserve"><tspan fill="#ffffff" font-weight="bold">[Tab/1-8]</tspan><tspan fill="#cdd6f4"> Switch View  </tspan><tspan fill="#ffffff" font-weight="bold">[↑/↓]</tspan><tspan fill="#cdd6f4"> Select  </tspan><tspan fill="#ffffff" font-weight="bold">[Enter]</tspan><tspan fill="#cdd6f4"> Inspect  </tspan><tspan fill="#ffffff" font-weight="bold">[Keys] Action</tspan><tspan fill="#cdd6f4">  </tspan><tspan fill="#ffffff" font-weight="bold">[z/?]</tspan><tspan fill="#cdd6f4"> Profile (newb)  </tspan><tspan fill="#ffffff" font-weight="bold">[r]</tspan><tspan fill="#cdd6f4"> Refresh  </tspan><tspan fill="#ffffff" font-weight="bold">[q]</tspan><tspan fill="#cdd6f4"> Exit        </tspan></text>
   </g>
 </svg>

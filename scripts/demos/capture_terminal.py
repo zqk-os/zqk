@@ -170,8 +170,8 @@ def render_svg(lines: list, title: str = "zqk terminal", width: int = 960) -> st
         '      .dot-red { fill: #f38ba8; }',
         '      .dot-yellow { fill: #f9e2af; }',
         '      .dot-green { fill: #a6e3a1; }',
-        '      .term-text { font-family: "JetBrains Mono", "Fira Code", "Menlo", "Monaco", "Consolas", monospace;',
-        '                   font-size: 13px; fill: #cdd6f4; white-space: pre; }',
+        '      .term-text { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace;',
+        '                   font-size: 13px; fill: #cdd6f4; letter-spacing: 0px; white-space: pre; }',
         '      .title-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;',
         '                    font-size: 12px; fill: #a6adc8; font-weight: 500; text-anchor: middle; }',
         '    </style>',
@@ -197,7 +197,7 @@ def render_svg(lines: list, title: str = "zqk terminal", width: int = 960) -> st
         '',
         '  <!-- Terminal Text Content -->',
         f'  <g transform="translate({padding_x}, {top_bar_height + padding_y})">',
-        '    <text class="term-text">'
+        '    <text class="term-text" xml:space="preserve">'
     ]
 
     for idx, raw_line in enumerate(displayed_lines):
