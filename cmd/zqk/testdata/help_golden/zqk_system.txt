@@ -34,6 +34,7 @@ Available Commands:
   cleanup-quarantine             Remove old files from the quarantine folder
   cli-hooks                      CLI hook profile (built-in hooks + optional tray entry)
   compact-journal                Compact change journal entries into dictionary-compressed artifacts
+  compact-wal                    Compact the WAL file by removing applied entries
   dashboard                      dashboard command
   disk-usage                     Report directory sizes (cross-platform du-style scan)
   emergency-manager              Monitors the health of the CAP orchestrator and Kernel Steward. Executes safe rollbacks or stashes untracked files if the main managers fail continuously.
@@ -88,6 +89,7 @@ Available Commands:
   validate-agent-rules           Validate IDE agent rules manifest vs rules directory
   validate-command-specs         Validate live CLI commands against canonical command specs
   validate-scenario              Execute a programmatic validation scenario
+  verify-completion              Verify completion of an object
   whoami                         Display the current user account information
 
 Flags:

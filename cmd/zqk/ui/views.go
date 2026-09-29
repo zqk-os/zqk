@@ -327,29 +327,25 @@ func renderStateTab(b *strings.Builder, m *UIModel) {
 		scrollMode = yellowBold(fmt.Sprintf("[PAUSED: +%d]", m.ScrollOffset))
 	}
 
-	b.WriteString(fmt.Sprintf("Status: %s │ Buffer: %d state mutations │ Rate: %s │ %s\n",
-		greenBold("ENFORCING"), len(mutations), sparkline, scrollMode))
-	b.WriteString(fmt.Sprintf("Types:  %s\n", symbolCounters))
-	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
+	vitals := []tds.StatItem{
+		{Label: "Status", Value: greenBold("ENFORCING")},
+		{Label: "Buffer", Value: fmt.Sprintf("%d state mutations", len(mutations))},
+		{Label: "Rate", Value: sparkline},
+		{Label: "Mode", Value: scrollMode},
+	}
+	b.WriteString(tds.Panel("State Engine & Real-Time Mutation Journal (WAL)", []string{
+		tds.StatRow(vitals, w-4),
+		tds.StatRow([]tds.StatItem{
+			{Label: "Types", Value: symbolCounters},
+		}, w-4),
+	}, w, tds.BorderRounded))
+	b.WriteString("\n")
 
-	timeW := 10
-	eventW := 12
-	refW := 24
-	if w >= 110 {
-		refW = 32
-	}
-	sumW := w - timeW - eventW - refW - 9
-	if sumW < 14 {
-		refW = 18
-		sumW = w - timeW - eventW - refW - 9
-	}
-	if sumW < 10 {
-		sumW = 10
-	}
-
-	b.WriteString(fmt.Sprintf("  %-*s │ %-*s │ %-*s │ %s\n",
-		timeW, "TIME", eventW, "EVENT", refW, "OBJECT REF", "SUMMARY / DIFF"))
-	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
+	stateTable := tds.NewTable(w).
+		AddColumn("TIME", tds.AlignLeft, 12, 0.12).
+		AddColumn("EVENT", tds.AlignLeft, 14, 0.16).
+		AddColumn("OBJECT REF", tds.AlignLeft, 28, 0.32).
+		AddColumn("SUMMARY / DIFF", tds.AlignLeft, 30, 0.40)
 
 	availRows := m.Height - 12 + m.ProfileSpacingBonus()
 	if availRows < 6 {
@@ -360,11 +356,11 @@ func renderStateTab(b *strings.Builder, m *UIModel) {
 	var visible []state.JournalMutation
 
 	if total == 0 {
+		msg := "[No state mutations recorded in stream buffer yet]"
 		if m.SearchQuery != "" {
-			b.WriteString(dim(fmt.Sprintf("  [No state mutations matching search query \"%s\"]\n", m.SearchQuery)))
-		} else {
-			b.WriteString(dim("  [No state mutations recorded in stream buffer yet]\n"))
+			msg = fmt.Sprintf("[No state mutations matching search query \"%s\"]", m.SearchQuery)
 		}
+		stateTable.AddRow("-", "-", "-", msg)
 	} else {
 		start := 0
 		if m.AutoScroll {
@@ -398,23 +394,20 @@ func renderStateTab(b *strings.Builder, m *UIModel) {
 				summary = mut.ChangeType
 			}
 
-			cursor := "  "
-			if start+i == m.SelectedIndex || (m.AutoScroll && (m.SelectedIndex < start || m.SelectedIndex >= total) && start+i == total-1) {
-				cursor = cyanBold("> ")
-			}
+			actualIdx := start + i
+			isSel := actualIdx == m.SelectedIndex || (m.AutoScroll && (m.SelectedIndex < start || m.SelectedIndex >= total) && actualIdx == total-1)
+			timeCell := tds.RowCursor(isSel, fmt.Sprintf("[%s]", tStr))
 
-			b.WriteString(fmt.Sprintf("%s[%s] │ %s │ %s │ %s\n",
-				cursor,
-				tStr,
-				tds.PadRight(badge, eventW),
-				tds.PadRight(tds.TruncateVisible(ref, refW, "…"), refW),
-				tds.TruncateVisible(summary, sumW, "…")))
+			stateTable.AddRow(
+				timeCell,
+				badge,
+				ref,
+				summary,
+			)
 		}
 	}
 
-	for i := len(visible); i < availRows; i++ {
-		b.WriteString("\n")
-	}
+	b.WriteString(stateTable.Render())
 }
 
 // renderAuditTab renders the dedicated high-volume operational audit stream.
@@ -453,28 +446,26 @@ func renderAuditTab(b *strings.Builder, m *UIModel) {
 		scrollMode = yellowBold(fmt.Sprintf("[PAUSED: +%d]", m.ScrollOffset))
 	}
 
-	b.WriteString(fmt.Sprintf("Stream: %s │ Buffer: %d audit events │ Rate: %s │ %s\n",
-		cyanBold("audit_event"), len(auditEvents), sparkline, scrollMode))
-	b.WriteString(fmt.Sprintf("Actors: %s\n", actorLine))
-	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
-
-	timeW := 10
-	actorW := 16
-	opW := 18
-	refW := 22
-	if w >= 110 {
-		actorW = 18
-		opW = 20
-		refW = 26
+	vitals := []tds.StatItem{
+		{Label: "Stream", Value: cyanBold("audit_event")},
+		{Label: "Buffer", Value: fmt.Sprintf("%d audit events", len(auditEvents))},
+		{Label: "Rate", Value: sparkline},
+		{Label: "Mode", Value: scrollMode},
 	}
-	detailW := w - timeW - actorW - opW - refW - 12
-	if detailW < 12 {
-		detailW = 12
-	}
+	b.WriteString(tds.Panel("Operational Audit Stream & Cryptographic Provenance", []string{
+		tds.StatRow(vitals, w-4),
+		tds.StatRow([]tds.StatItem{
+			{Label: "Actors", Value: actorLine},
+		}, w-4),
+	}, w, tds.BorderRounded))
+	b.WriteString("\n")
 
-	b.WriteString(fmt.Sprintf("  %-*s │ %-*s │ %-*s │ %-*s │ %s\n",
-		timeW, "TIME", actorW, "ACTOR", opW, "OPERATION", refW, "OBJECT REF", "DETAILS / PAYLOAD"))
-	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
+	auditTable := tds.NewTable(w).
+		AddColumn("TIME", tds.AlignLeft, 10, 0.10).
+		AddColumn("ACTOR", tds.AlignLeft, 14, 0.15).
+		AddColumn("OPERATION", tds.AlignLeft, 14, 0.15).
+		AddColumn("OBJECT REF", tds.AlignLeft, 26, 0.30).
+		AddColumn("DETAILS / PAYLOAD", tds.AlignLeft, 24, 0.30)
 
 	availRows := m.Height - 12 + m.ProfileSpacingBonus()
 	if availRows < 6 {
@@ -485,11 +476,11 @@ func renderAuditTab(b *strings.Builder, m *UIModel) {
 	var visible []state.JournalMutation
 
 	if total == 0 {
+		msg := "[No audit events recorded in audit stream yet]"
 		if m.SearchQuery != "" {
-			b.WriteString(dim(fmt.Sprintf("  [No audit events matching search query \"%s\"]\n", m.SearchQuery)))
-		} else {
-			b.WriteString(dim("  [No audit events recorded in audit stream yet]\n"))
+			msg = fmt.Sprintf("[No audit events matching search query \"%s\"]", m.SearchQuery)
 		}
+		auditTable.AddRow("-", "-", "-", "-", msg)
 	} else {
 		start := 0
 		if m.AutoScroll {
@@ -535,24 +526,21 @@ func renderAuditTab(b *strings.Builder, m *UIModel) {
 			}
 			ref := strings.ReplaceAll(strings.ReplaceAll(aud.ObjectRef, "\r", ""), "\n", " ")
 
-			cursor := "  "
-			if start+i == m.SelectedIndex || (m.AutoScroll && (m.SelectedIndex < start || m.SelectedIndex >= total) && start+i == total-1) {
-				cursor = cyanBold("> ")
-			}
+			actualIdx := start + i
+			isSel := actualIdx == m.SelectedIndex || (m.AutoScroll && (m.SelectedIndex < start || m.SelectedIndex >= total) && actualIdx == total-1)
+			timeCell := tds.RowCursor(isSel, fmt.Sprintf("[%s]", tStr))
 
-			b.WriteString(fmt.Sprintf("%s[%s] │ %s │ %s │ %s │ %s\n",
-				cursor,
-				tStr,
-				tds.PadRight(tds.TruncateVisible(act, actorW, "…"), actorW),
-				tds.PadRight(tds.TruncateVisible(op, opW, "…"), opW),
-				tds.PadRight(tds.TruncateVisible(ref, refW, "…"), refW),
-				tds.TruncateVisible(detail, detailW, "…")))
+			auditTable.AddRow(
+				timeCell,
+				act,
+				op,
+				ref,
+				detail,
+			)
 		}
 	}
 
-	for i := len(visible); i < availRows; i++ {
-		b.WriteString("\n")
-	}
+	b.WriteString(auditTable.Render())
 }
 
 func renderSwarmTab(b *strings.Builder, m *UIModel) {
@@ -1132,8 +1120,7 @@ func renderSchedulerTab(b *strings.Builder, m *UIModel) {
 	if w < 70 {
 		w = 80
 	}
-	b.WriteString(whiteBold("⏱️  Autonomous Scheduler & Background Daemons") + dim("  (Press [Enter] to inspect, [t] to trigger now, [d] for 10s delay)\n"))
-	b.WriteString(dim(strings.Repeat("─", w)) + "\n")
+	b.WriteString(tds.SectionDivider("Autonomous Scheduler & Background Daemons (Press [Enter] to inspect, [t] to trigger)", w))
 
 	jobs := m.GetVisibleSchedulerJobs()
 	if len(jobs) == 0 {

@@ -36,6 +36,10 @@ status and lifecycle order.
 
 - --add-missing-fields: Automatically add missing fields based on object spec
 
+- Best Practice: Prefer 'zqk object promote' or 'zqk object demote' for
+lifecycle status changes, and 'zqk object ref add/remove' for graph
+relationships.
+
 - stdin: YAML data piped from another command
 
   Update from file
@@ -44,10 +48,10 @@ status and lifecycle order.
   zqk update BLI-626 --data 'title: "Updated Title"'
   Update a single field
   zqk update BLI-626 --field title="Updated Title"
-  Update multiple fields
-  zqk update BLI-626 --field title="New Title" --field status=validated
+  Update multiple scalar fields
+  zqk update BLI-626 --field title="New Title" --field description="Updated implementation details"
   Update many IDs (comma-separated)
-  zqk update ATK-001,ATK-002 --field assignee_persona_ref=PER-DEFAULT-AGENT
+  zqk update ATK-001,ATK-002 --field description="Synchronized task update"
   Text with colons (JSON string value)
   zqk update CVS-001 --field 'next_action="Closed: matrix updated"'
   Update all objects of a kind

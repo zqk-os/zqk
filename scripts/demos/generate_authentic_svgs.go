@@ -110,7 +110,7 @@ func parseANSILine(raw string) []Span {
 		idx++
 
 		isEmojiOrWide := rw > 1
-		isBoxBorder := r == '│' || r == '║' || r == '╮' || r == '╯' || r == '┐' || r == '┘' || r == '╗' || r == '╝' || r == '╭' || r == '╰' || r == '┌' || r == '└' || r == '╔' || r == '╚'
+		isBoxBorder := r == '│' || r == '║' || r == '╮' || r == '╯' || r == '┐' || r == '┘' || r == '╗' || r == '╝' || r == '╭' || r == '╰' || r == '┌' || r == '└' || r == '╔' || r == '╚' || r == '├' || r == '┤' || r == '┬' || r == '┴' || r == '┼'
 
 		if !isEmojiOrWide && !isBoxBorder {
 			for idx < len(runes) {
@@ -123,7 +123,7 @@ func parseANSILine(raw string) []Span {
 					idx++
 					continue
 				}
-				if nrw > 1 || nr == '│' || nr == '║' || nr == '╮' || nr == '╯' || nr == '┐' || nr == '┘' || nr == '╗' || nr == '╝' || nr == '╭' || nr == '╰' || nr == '┌' || nr == '└' || nr == '╔' || nr == '╚' {
+				if nrw > 1 || nr == '│' || nr == '║' || nr == '╮' || nr == '╯' || nr == '┐' || nr == '┘' || nr == '╗' || nr == '╝' || nr == '╭' || nr == '╰' || nr == '┌' || nr == '└' || nr == '╔' || nr == '╚' || nr == '├' || nr == '┤' || nr == '┬' || nr == '┴' || nr == '┼' {
 					break
 				}
 				b.WriteRune(nr)
@@ -1074,7 +1074,7 @@ func main() {
 	{
 		m := ui.NewUIModel(".", "state")
 		m.Width = termWidth
-		m.Height = 25
+		m.Height = 0
 		m.AutoScroll = true
 		m.Mutations = []state.JournalMutation{
 			{CreatedAt: time.Now().Add(-180 * time.Second).Unix(), ChangeType: "PROMOTE", ObjectRef: "BLI-COMMUNITY-FIRST-RUN", DiffSummary: "Promoted draft to CAS master (hash: e3b0c442)"},
@@ -1096,7 +1096,7 @@ func main() {
 	{
 		m := ui.NewUIModel(".", "audit")
 		m.Width = termWidth
-		m.Height = 25
+		m.Height = 0
 		m.AutoScroll = true
 		m.AuditEvents = []state.JournalMutation{
 			{CreatedAt: time.Now().Add(-240 * time.Second).Unix(), Actor: "PER-DEFAULT-LEAD", ChangeType: "claim_work", ObjectRef: "BLI-STARTER-001", DiffSummary: "Claimed item for execution loop"},
@@ -1118,7 +1118,16 @@ func main() {
 	{
 		m := ui.NewUIModel(".", "swarm")
 		m.Width = termWidth
-		m.Height = 25
+		m.Height = 0
+		m.SwarmData = map[string]any{
+			"throughput_hint":              "executing",
+			"active_priority_plans":        3,
+			"executing_agent_tasks":        5,
+			"agent_instructions_total":     12,
+			"agent_instructions_by_status": map[string]any{"proposed": 2, "approved": 4, "executing": 5, "completed": 1},
+			"persona_skill_bound":          map[string]any{"bound": 5, "unbound": 0, "total": 5},
+			"cap_orchestrator_job":         map[string]any{"id": "SCH-cap-orchestrator", "present": true},
+		}
 		m.DaemonHealth = []ui.DaemonHealthRow{
 			{Name: "ambient", DesiredState: "enabled", ActualState: "running", PID: 84912, RestartCount: 0, Uptime: "4h12m", Status: "HEALTHY"},
 			{Name: "privileged-writer", DesiredState: "enabled", ActualState: "running", PID: 84915, RestartCount: 0, Uptime: "4h12m", Status: "HEALTHY"},
@@ -1139,7 +1148,17 @@ func main() {
 	{
 		m := ui.NewUIModel(".", "pm")
 		m.Width = termWidth
-		m.Height = 26
+		m.Height = 0
+		m.MissionTitle = "Continuous Autonomous Development"
+		m.BacklogSummary = ui.PMBacklogSummary{
+			Total:      10,
+			Planned:    4,
+			InProgress: 3,
+			Blocked:    0,
+			Done:       3,
+			Claimed:    3,
+			Unclaimed:  7,
+		}
 		m.RecentBacklog = []ui.PMBacklogRow{
 			{ID: "BLI-COMMUNITY-FIRST-RUN", Title: "Community first-run tutorial verification", Status: "in_progress", Priority: "P0", ClaimedBy: "agent-alpha", PlanRef: "PRI-STARTER-COMMUNITY-001"},
 			{ID: "BLI-STORAGE-PUREGO-001", Title: "Pure-Go embedded storage backend & WAL engine", Status: "complete", Priority: "P0", ClaimedBy: "ACC-SYSTEM", PlanRef: "PRI-STORAGE-PUREGO-001"},
@@ -1166,7 +1185,13 @@ func main() {
 	{
 		m := ui.NewUIModel(".", "metrics")
 		m.Width = termWidth
-		m.Height = 25
+		m.Height = 0
+		m.Hygiene = ui.ResourceHygieneRow{
+			ProcessObjectCount: 385,
+			KindCount:          24,
+			StreamFileCount:    52,
+			ActiveStreams:      6,
+		}
 		m.CommandMetrics = []ui.CommandMetricRow{
 			{CommandName: paths.RewriteCanonicalCLIInvocations("zqk system check"), ExecCount: 142, AvgDuration: "42ms", LastRunAt: "12:15:02", Status: "pass"},
 			{CommandName: paths.RewriteCanonicalCLIInvocations("zqk object list"), ExecCount: 389, AvgDuration: "18ms", LastRunAt: "12:15:10", Status: "pass"},
@@ -1190,7 +1215,7 @@ func main() {
 	{
 		m := ui.NewUIModel(".", "sched")
 		m.Width = termWidth
-		m.Height = 25
+		m.Height = 0
 		m.SchedulerJobs = []ui.SchedulerJobRow{
 			{ID: "SCH-001", Title: "change_journal_compaction", Schedule: "@every 5m", LastRunAt: "12:10:00", NextRunAt: "12:15:00", Status: "active"},
 			{ID: "SCH-002", Title: "audit_aggregation", Schedule: "@every 1h", LastRunAt: "12:00:00", NextRunAt: "13:00:00", Status: "active"},
@@ -1211,7 +1236,7 @@ func main() {
 	{
 		m := ui.NewUIModel(".", "qa")
 		m.Width = termWidth
-		m.Height = 25
+		m.Height = 0
 		m.TestCases = []*test.TestCaseModel{
 			{ID: "TST-STORAGE-PUREGO-001", Title: "Verify Pure-Go Indexing Engine Performance", Status: "complete", TotalCriteria: 1, CompletedCriteria: 1, Lineage: &test.LineageChain{IsIntact: true}},
 			{ID: "TST-ZQL-ACID-TRANSACT-01", Title: "Verify Multi-Object Atomic Rollbacks", Status: "complete", TotalCriteria: 3, CompletedCriteria: 3, Lineage: &test.LineageChain{IsIntact: true}},
@@ -1230,7 +1255,7 @@ func main() {
 	{
 		m := ui.NewUIModel(".", "health")
 		m.Width = termWidth
-		m.Height = 25
+		m.Height = 0
 		m.HealthSummary = ui.HealthSummary{
 			LastChecked:     time.Now().Add(-2 * time.Minute),
 			CheckFreshness:  "FRESH (2m ago)",
@@ -1289,6 +1314,110 @@ func main() {
 			fmt.Printf("Error rendering Object Inspector: %v\n", err)
 		} else {
 			fmt.Println("✅ Generated ui_object_inspector.svg")
+		}
+	}
+
+	// 9b. Object Inspector Main Scoreboard Table
+	{
+		var buf strings.Builder
+		cyanBold := color.New(color.FgCyan, color.Bold).SprintFunc()
+		greenBold := color.New(color.FgGreen, color.Bold).SprintFunc()
+		yellowBold := color.New(color.FgYellow, color.Bold).SprintFunc()
+		redBold := color.New(color.FgRed, color.Bold).SprintFunc()
+		dimStyle := color.New(color.Faint).SprintFunc()
+		whiteBold := color.New(color.FgWhite, color.Bold).SprintFunc()
+
+		bannerText := "ZQK KNOWLEDGE KERNEL — OBJECT INSPECTOR CONSOLE"
+		bannerPad := (termWidth - 2 - len(bannerText)) / 2
+		buf.WriteString(cyanBold("╔" + strings.Repeat("═", termWidth-2) + "╗") + "\n")
+		buf.WriteString(cyanBold("║") + strings.Repeat(" ", bannerPad) + whiteBold(bannerText) + strings.Repeat(" ", termWidth-2-bannerPad-len(bannerText)) + cyanBold("║") + "\n")
+		buf.WriteString(cyanBold("╚" + strings.Repeat("═", termWidth-2) + "╝") + "\n")
+
+		buf.WriteString(fmt.Sprintf("%s %s  │  %s %s %s %s %s %s  │  %s %s\n",
+			cyanBold("KIND:"), whiteBold("[backlog_item]"),
+			dimStyle("FILTER:"), whiteBold("[ALL]"), dimStyle("[ACTIVE]"), dimStyle("[DRAFT]"), dimStyle("[BLOCKED]"), dimStyle("[COMPLETE]"),
+			cyanBold("SORT:"), yellowBold("[updated_at ▼]"),
+		))
+		buf.WriteString(dimStyle(strings.Repeat("─", termWidth)) + "\n")
+		buf.WriteString(fmt.Sprintf("🔍 %s %s %s\n", cyanBold("SEARCH:"), greenBold("[/cas█]"), dimStyle("(Press Enter to lock search, Esc to cancel)")))
+		buf.WriteString(dimStyle(strings.Repeat("─", termWidth)) + "\n")
+		buf.WriteString(fmt.Sprintf("  %-24s │ %-12s │ %-4s │ %-48s │ %s\n",
+			dimStyle("ID"), dimStyle("STATUS"), dimStyle("PRI"), dimStyle("TITLE"), dimStyle("UPDATED")))
+		buf.WriteString(dimStyle(strings.Repeat("─", termWidth)) + "\n")
+
+		buf.WriteString(fmt.Sprintf("%s %-24s │ %-12s │ %-4s │ %-48s │ %s\n",
+			cyanBold(">"), whiteBold("BLI-STORAGE-PUREGO-001"), greenBold("complete"), redBold("P0"), "Implement pure-Go CAS storage backend", dimStyle("2m ago")))
+		buf.WriteString(fmt.Sprintf("  %-24s │ %-12s │ %-4s │ %-48s │ %s\n",
+			whiteBold("BLI-STORAGE-PUREGO-002"), greenBold("complete"), yellowBold("P1"), "Wire change journal dictionary compaction", dimStyle("14m ago")))
+		buf.WriteString(fmt.Sprintf("  %-24s │ %-12s │ %-4s │ %-48s │ %s\n",
+			whiteBold("BLI-LAUNCH-DOCS-001"), cyanBold("in_progress"), redBold("P0"), "Comprehensive visual UI & mutation manual", dimStyle("1m ago")))
+		buf.WriteString(fmt.Sprintf("  %-24s │ %-12s │ %-4s │ %-48s │ %s\n",
+			whiteBold("BLI-ONBOARD-ROADMAP-01"), yellowBold("planned"), yellowBold("P1"), "Greenfield onboarding roadmap seed", dimStyle("45m ago")))
+		buf.WriteString(fmt.Sprintf("  %-24s │ %-12s │ %-4s │ %-48s │ %s\n",
+			whiteBold("BLI-ECOSYSTEM-SYNC-001"), redBold("blocked"), dimStyle("P2"), "Linear/GitHub bidirectional bridge", dimStyle("2h ago")))
+		buf.WriteString(dimStyle(strings.Repeat("─", termWidth)) + "\n")
+		buf.WriteString(fmt.Sprintf("%s │ %s │ %s │ %s │ %s │ %s\n",
+			cyanBold("[Enter] Deep Inspection Modal"),
+			dimStyle("[Tab] Next Kind"),
+			dimStyle("[f] Filter"),
+			dimStyle("[s] Sort"),
+			greenBold("[p] Policy Studio"),
+			dimStyle("[q] Quit"),
+		))
+
+		inspectorTableTitle := paths.RewriteCanonicalCLIInvocations("zqk object inspect") + " — Interactive Object Inspector Scoreboard"
+		if err := RenderScreenToSVG(filepath.Join(outDir, "ui_object_inspector_table.svg"), inspectorTableTitle, buf.String(), termWidth); err != nil {
+			fmt.Printf("Error rendering Object Inspector Table: %v\n", err)
+		} else {
+			fmt.Println("✅ Generated ui_object_inspector_table.svg")
+		}
+	}
+
+	// 9c. Policy Rule Studio & Governance DSL
+	{
+		var buf strings.Builder
+		cyanBold := color.New(color.FgCyan, color.Bold).SprintFunc()
+		greenBold := color.New(color.FgGreen, color.Bold).SprintFunc()
+		yellowBold := color.New(color.FgYellow, color.Bold).SprintFunc()
+		redBold := color.New(color.FgRed, color.Bold).SprintFunc()
+		dimStyle := color.New(color.Faint).SprintFunc()
+		whiteBold := color.New(color.FgWhite, color.Bold).SprintFunc()
+
+		bannerText := "ZQK POLICY RULE STUDIO — REAL-TIME GOVERNANCE DSL"
+		bannerPad := (termWidth - 2 - len(bannerText)) / 2
+		buf.WriteString(cyanBold("╔" + strings.Repeat("═", termWidth-2) + "╗") + "\n")
+		buf.WriteString(cyanBold("║") + strings.Repeat(" ", bannerPad) + whiteBold(bannerText) + strings.Repeat(" ", termWidth-2-bannerPad-len(bannerText)) + cyanBold("║") + "\n")
+		buf.WriteString(cyanBold("╚" + strings.Repeat("═", termWidth-2) + "╝") + "\n")
+
+		buf.WriteString(fmt.Sprintf("%s %s  │  %s %s  │  %s %s\n",
+			cyanBold("TARGET KIND:"), whiteBold("[backlog_item]"),
+			dimStyle("ACTIVE RULES:"), yellowBold("3 loaded"),
+			cyanBold("EVALUATION MODE:"), greenBold("[DRY-RUN]"),
+		))
+		buf.WriteString(dimStyle(strings.Repeat("─", termWidth)) + "\n")
+		buf.WriteString(fmt.Sprintf("%s %s\n", cyanBold("EXPRESSION:"), whiteBold(`status == "in_progress" && claimed_by != ""`)))
+		buf.WriteString(fmt.Sprintf("%s %s  %s  %s  %s  %s\n",
+			dimStyle("AUTOCOMPLETE:"), greenBold("[claimed_by]"), dimStyle("priority_plan_ref"), dimStyle("effort_estimate"), dimStyle("milestone_refs"), dimStyle("description")))
+		buf.WriteString(dimStyle(strings.Repeat("─", termWidth)) + "\n")
+		buf.WriteString(whiteBold("EVALUATION RESULTS:\n"))
+		buf.WriteString(fmt.Sprintf("  %s %s\n", greenBold("✓"), greenBold("194 / 196 objects COMPLIANT (99.0%)")))
+		buf.WriteString(fmt.Sprintf("  %s %s\n", redBold("✗"), redBold("2 objects VIOLATE RULE:")))
+		buf.WriteString(fmt.Sprintf("    • %s: %s\n", yellowBold("BLI-AUTH-004"), dimStyle("status is 'in_progress' but 'claimed_by' is empty")))
+		buf.WriteString(fmt.Sprintf("    • %s: %s\n", yellowBold("BLI-UI-012"), dimStyle("status is 'in_progress' but 'claimed_by' is empty")))
+		buf.WriteString(dimStyle(strings.Repeat("─", termWidth)) + "\n")
+		buf.WriteString(fmt.Sprintf("%s │ %s │ %s │ %s │ %s\n",
+			cyanBold("[c] Edit Expression"),
+			greenBold("[t] Trigger Dry-Run"),
+			dimStyle("[Tab] Autocomplete"),
+			yellowBold("[s] Save Rule"),
+			dimStyle("[Esc] Return"),
+		))
+
+		policyStudioTitle := paths.RewriteCanonicalCLIInvocations("zqk object inspect --policy-studio") + " — Real-Time Governance DSL Studio"
+		if err := RenderScreenToSVG(filepath.Join(outDir, "ui_policy_studio.svg"), policyStudioTitle, buf.String(), termWidth); err != nil {
+			fmt.Printf("Error rendering Policy Studio: %v\n", err)
+		} else {
+			fmt.Println("✅ Generated ui_policy_studio.svg")
 		}
 	}
 

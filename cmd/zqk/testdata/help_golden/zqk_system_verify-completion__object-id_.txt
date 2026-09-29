@@ -1,0 +1,24 @@
+Objectively verify the cryptographic completion hash of an object against disk
+state.
+
+This command verifies that the verification_hash of a test_case or backlog_item matches
+the actual cryptographic hash of its referenced artifacts on disk.
+
+Flags:
+    --organizer
+      Execute composite execution organizer for multi-criteria test verification
+    --topology <string> (default: sequential)
+      Execution topology mode for organizer (sequential, concurrent, hybrid_dag)
+
+  Verify a backlog item
+  zqk system verify-completion BLI-123
+
+Usage:
+  zqk system verify-completion <object-id> [flags]
+
+Flags:
+      --organizer         Execute composite execution organizer for multi-criteria test verification
+      --topology string   Execution topology mode for organizer (sequential, concurrent, hybrid_dag) (default "sequential")
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

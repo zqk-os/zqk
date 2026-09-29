@@ -10,7 +10,9 @@ Examples:
   zqk object create backlog_item --file item.yaml
   zqk object list backlog_item --filter status=exploring
   zqk object get BLI-626
-  zqk object update BLI-626 --field status=validated
+  zqk object promote BLI-626
+  zqk object ref add BLI-626 REQ-101
+  zqk object update BLI-626 --field description="Implement resilient cache"
   zqk object delete BLI-626
   zqk object count backlog_item
   zqk object backlog_item fields
@@ -28,6 +30,9 @@ Examples:
 Usage:
   zqk object [command]
 
+Aliases:
+  object, objects
+
 Core Verbs:
   count       Count objects by kind
   create      Create a new object
@@ -35,6 +40,7 @@ Core Verbs:
   demote      Demote one or more objects to a lower lifecycle status
   fields      List object kinds or explore fields (use object <kind> fields for a specific kind)
   get         Get an object by ID
+  inspect     Interactive terminal object inspector and semantic projection viewer
   list        List objects of a specific kind
   move        Move an object to a different directory/kind
   park        Park one or more objects along an intentional lifecycle exit

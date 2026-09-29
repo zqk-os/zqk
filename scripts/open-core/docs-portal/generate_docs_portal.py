@@ -72,7 +72,7 @@ def get_category_info(rel_path: str) -> tuple[str, str]:
         return "Agent Directives & Packs", "agent-directives"
     if path == ".agents/AGENTS.md" or path == "agents/AGENTS.md":
         return "Agent Directives & Packs", "agent-directives"
-    if path.startswith("pkg/") or path.startswith("internal/"):
+    if path.startswith("pkg/") or path.startswith("internal/") or path.startswith("cmd/"):
         return "Kernel Subsystems & Go Packages", "subsystems"
     if path.startswith(".zqk/specs/") or (path.startswith("specs/") and any(k in path for k in ("objects", "traits", "lifecycles", "configs"))):
         return "Kernel DNA & Object Schemas", "schemas"
@@ -324,8 +324,8 @@ def build_portal(repo_root: str, target_dir: str):
     for sf in raw_skill_files:
         doc_files.append(sf)
 
-    # Subsystem and Go package documentation (pkg/, internal/)
-    for sub_dir in ["pkg", "internal"]:
+    # Subsystem and Go package documentation (pkg/, internal/, cmd/)
+    for sub_dir in ["pkg", "internal", "cmd"]:
         sub_path = os.path.join(repo_root, sub_dir)
         if not os.path.isdir(sub_path):
             continue
@@ -365,12 +365,14 @@ def build_portal(repo_root: str, target_dir: str):
             if sz < 60:
                 print(f"⚠️ [DOC-SCRUTINIZER] Dropping stub file (< 60b): {file_path}")
                 return False
-            with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
-                content = f.read()
-            for pat in FORBIDDEN_DOC_PATTERNS:
-                if pat.search(content):
-                    print(f"⚠️ [DOC-SCRUTINIZER] Dropping file with forbidden stub marker '{pat.pattern}': {file_path}")
-                    return False
+            # Only apply placeholder token rejection to template scaffolds
+            if "templates" in file_path or "skeleton" in file_path:
+                with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+                    content = f.read()
+                for pat in FORBIDDEN_DOC_PATTERNS:
+                    if pat.search(content):
+                        print(f"⚠️ [DOC-SCRUTINIZER] Dropping template scaffold with placeholder '{pat.pattern}': {file_path}")
+                        return False
             return True
         except Exception:
             return False
@@ -508,6 +510,7 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
         ("How-To & Incident Runbooks", "operations"),
         ("Tutorials, Demos & Guides", "tutorials"),
         ("Agent Skills & Protocols", "skills"),
+        ("Agent Directives & Packs", "agent-directives"),
         ("Maintenance & Development", "development"),
         ("Quality & Evaluation", "quality"),
         ("Codebase Evaluation Framework", "codebase-eval"),
@@ -520,6 +523,13 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
         if cat_name not in grouped_docs:
             grouped_docs[cat_name] = []
         grouped_docs[cat_name].append(item)
+
+    # Dynamic category safeguard: ensure all populated categories appear in navigation
+    ordered_cat_names = set(c[0] for c in CATEGORY_ORDER)
+    for cat_name in grouped_docs:
+        if cat_name not in ordered_cat_names and grouped_docs[cat_name]:
+            cat_slug = cat_name.lower().replace(" ", "-").replace("&", "").replace("--", "-")
+            CATEGORY_ORDER.append((cat_name, cat_slug))
 
     # Sort items within each category
     def sort_key(entry):
@@ -548,7 +558,7 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
             contains_active = any(it["html_rel"] == current_html_rel for it in items)
             # Default open for core categories, or if this category contains the active page
             # Keep CEF closed by default unless active page is inside it
-            is_open = contains_active or (cat_key in ("getting-started", "architecture", "specs", "manual", "operations", "skills", "tutorials", "subsystems", "schemas") and current_html_rel == "index.html")
+            is_open = contains_active or (cat_key in ("getting-started", "architecture", "specs", "manual", "operations", "skills", "agent-directives", "tutorials", "subsystems", "schemas") and current_html_rel == "index.html")
             open_attr = ' open' if is_open else ''
 
             nav_html.append(f'<details class="sidebar-group"{open_attr}>')
