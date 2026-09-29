@@ -39,32 +39,84 @@ ZQK_HEADER_LOGO_SVG = ZQK_LOGO_SVG.replace('width="100%" height="100%"', 'width=
 
 def get_html_relpath(rel_md_path: str) -> str:
     """Converts a markdown file relative path into an HTML relative path preserving folders."""
-    if rel_md_path.endswith(".md"):
-        return rel_md_path[:-3] + ".html"
-    elif not rel_md_path.endswith(".html"):
-        return rel_md_path + ".html"
-    return rel_md_path
+    path = rel_md_path.replace("\\", "/")
+    if path.startswith(".zqk/skills/"):
+        path = path[len(".zqk/"):]
+    elif path.startswith(".agents/"):
+        path = "agents/" + path[len(".agents/"):]
+    elif path.startswith("./"):
+        path = path[2:]
 
-def get_category_info(rel_path: str):
-    parts = rel_path.split(os.sep)
+    if path.endswith(".md"):
+        return path[:-3] + ".html"
+    elif not path.endswith(".html"):
+        return path + ".html"
+    return path
+
+def get_category_info(rel_path: str) -> tuple[str, str]:
+    path = rel_path.replace("\\", "/")
+    if path.startswith(".zqk/skills/") or path.startswith("skills/"):
+        return "Agent Skills & Protocols", "skills"
+    if path == ".agents/AGENTS.md" or path == "agents/AGENTS.md":
+        return "Agent Directives", "agent-directives"
+
+    parts = path.split("/")
     if parts[0] != "docs":
-        return "Core & Governance", "core"
+        if rel_path == "PACK-COMPOSITION.md":
+            return "Architecture & Foundation", "architecture"
+        if rel_path == "ZQK_GETTING_STARTED.md":
+            return "Getting Started", "getting-started"
+        return "Open Core Governance", "governance"
+
     if len(parts) == 2:
         return "Getting Started", "getting-started"
+
     sub = parts[1]
-    category_map = {
-        "onboarding": ("Onboarding & First-Run", "onboarding"),
-        "architecture": ("Architecture & Foundation", "architecture"),
-        "development": ("Maintenance & Development", "development"),
-        "howto": ("How-To Guides", "howto"),
-        "tutorials": ("Tutorials", "tutorials"),
-        "manual": ("Reference Manual", "manual"),
-        "explanation": ("Explanation & Philosophy", "explanation"),
-        "enforcement": ("Enforcement & Policies", "enforcement"),
-        "planning": ("Product Planning", "planning"),
-        "quality": ("Quality & Evaluation", "quality"),
-    }
-    return category_map.get(sub, (sub.replace("_", " ").title(), sub))
+    if sub == "onboarding":
+        return "Getting Started", "getting-started"
+    elif sub == "architecture":
+        return "Architecture & Foundation", "architecture"
+    elif sub == "specs":
+        return "Specifications & Grammars", "specs"
+    elif sub == "manual":
+        return "Reference Manuals", "manual"
+    elif sub in ("howto", "runbooks"):
+        return "How-To & Incident Runbooks", "operations"
+    elif sub in ("tutorials", "demos", "guides"):
+        return "Tutorials, Demos & Guides", "tutorials"
+    elif sub in ("development", "explanation"):
+        return "Maintenance & Development", "development"
+    elif sub == "quality":
+        if len(parts) > 2 and parts[2] == "codebase_evaluation":
+            return "Codebase Evaluation Framework", "codebase-eval"
+        return "Quality & Evaluation", "quality"
+    elif sub == "eval":
+        return "Quality & Evaluation", "quality"
+
+    return sub.replace("_", " ").title(), sub
+
+def get_clean_nav_title(title: str) -> str:
+    """Returns a concise, scannable title for sidebar navigation."""
+    prefixes = [
+        "Technical Specification: ",
+        "Technical Specification — ",
+        "Manual: ",
+        "Tutorial: ",
+        "Guide: ",
+        "Agent & Developer Guide: ",
+        "Rubric: ",
+        "Adversarial prompt — ",
+        "Specialist prompt — ",
+        "First-run object tutorial (template → create → get → update)",
+    ]
+    if title == "First-run object tutorial (template → create → get → update)":
+        return "First-Run Object Tutorial"
+    cleaned = title
+    for p in prefixes:
+        if cleaned.startswith(p):
+            cleaned = cleaned[len(p):].strip()
+            break
+    return cleaned
 
 def render_markdown_to_html(content: str, current_html_rel: str, link_map: dict) -> str:
     current_dir = os.path.dirname(current_html_rel)
@@ -75,7 +127,7 @@ def render_markdown_to_html(content: str, current_html_rel: str, link_map: dict)
         target = match.group(2)
         
         # Don't touch external or anchor-only links
-        if target.startswith("http://") or target.startswith("https://") or target.startswith("mailto:"):
+        if target.startswith("http://") or target.startswith("https://") or target.startswith("mailto:") or target.startswith("javascript:"):
             return match.group(0)
         if target.startswith("#"):
             return match.group(0)
@@ -88,8 +140,13 @@ def render_markdown_to_html(content: str, current_html_rel: str, link_map: dict)
         target_norm = os.path.normpath(target)
         target_base = os.path.basename(target)
 
+        # Resolve target relative to current_dir to get repo-relative path
+        resolved_repo_rel = os.path.normpath(os.path.join(current_dir, target))
+
         target_html_rel = None
-        if target in link_map:
+        if resolved_repo_rel in link_map:
+            target_html_rel = link_map[resolved_repo_rel]
+        elif target in link_map:
             target_html_rel = link_map[target]
         elif target_norm in link_map:
             target_html_rel = link_map[target_norm]
@@ -198,10 +255,18 @@ def build_portal(repo_root: str, target_dir: str):
             continue
         doc_files.append(df)
 
-    for root_doc in ["README.md", "CONTRIBUTING.md", "SECURITY.md", "GOVERNANCE.md"]:
+    for root_doc in ["README.md", "CONTRIBUTING.md", "SECURITY.md", "GOVERNANCE.md", "CODE_OF_CONDUCT.md", "PACK-COMPOSITION.md", "ZQK_GETTING_STARTED.md"]:
         p = os.path.join(repo_root, root_doc)
         if os.path.isfile(p):
             doc_files.append(p)
+
+    agents_file = os.path.join(repo_root, ".agents", "AGENTS.md")
+    if os.path.isfile(agents_file):
+        doc_files.append(agents_file)
+
+    raw_skill_files = sorted(glob.glob(os.path.join(repo_root, ".zqk", "skills", "**", "*.md"), recursive=True))
+    for sf in raw_skill_files:
+        doc_files.append(sf)
 
     # Collect and mirror all static/non-markdown files in docs/ (YAML, JSON, images, etc.)
     for root, dirs, files in os.walk(os.path.join(repo_root, "docs")):
@@ -229,12 +294,16 @@ def build_portal(repo_root: str, target_dir: str):
         rel_path = os.path.relpath(doc, repo_root)
         html_rel = get_html_relpath(rel_path)
         base_name = os.path.basename(rel_path)
-        
+        clean_md_rel = html_rel[:-5] + ".md" if html_rel.endswith(".html") else html_rel + ".md"
+
         link_map[rel_path] = html_rel
         link_map["./" + rel_path] = html_rel
-        link_map[base_name] = html_rel
-        link_map["./" + base_name] = html_rel
-        
+        link_map[clean_md_rel] = html_rel
+        link_map["./" + clean_md_rel] = html_rel
+        if base_name not in ("README.md", "INDEX.md", "SKILL.md") and base_name not in link_map:
+            link_map[base_name] = html_rel
+            link_map["./" + base_name] = html_rel
+
         try:
             with open(doc, "r", encoding="utf-8", errors="replace") as f:
                 content = f.read()
@@ -248,21 +317,39 @@ def build_portal(repo_root: str, target_dir: str):
         with open(target_md_path, "w", encoding="utf-8") as mf:
             mf.write(content)
 
-        lines = [line.strip() for line in content.splitlines() if line.strip()]
+        # Also write clean non-dot path for web accessibility
+        clean_md_path = os.path.join(target_dir, clean_md_rel)
+        if clean_md_path != target_md_path:
+            os.makedirs(os.path.dirname(clean_md_path), exist_ok=True)
+            with open(clean_md_path, "w", encoding="utf-8") as mf:
+                mf.write(content)
+
+        clean_content = content
+        if clean_content.startswith("---"):
+            fm_end = clean_content.find("\n---", 3)
+            if fm_end != -1:
+                clean_content = clean_content[fm_end + 4:].strip()
+
+        lines = [line.strip() for line in clean_content.splitlines() if line.strip()]
         title = ""
-        for line in lines[:15]:
+        for line in lines[:25]:
             if line.startswith("# "):
                 title = line[2:].strip()
                 break
         if not title:
-            title = os.path.splitext(base_name)[0].replace("_", " ").replace("-", " ").title()
+            fm_name_match = re.search(r'^name:\s*(.+)$', content, re.MULTILINE)
+            if fm_name_match:
+                title = fm_name_match.group(1).strip().replace("-", " ").title()
+            else:
+                title = os.path.splitext(base_name)[0].replace("_", " ").replace("-", " ").title()
 
         snippet = " ".join(" ".join(lines[:15]).split())[:200]
         cat_name, cat_key = get_category_info(rel_path)
-        
+
         doc_entries.append({
             "doc": doc,
             "rel_path": rel_path,
+            "clean_md_rel": clean_md_rel,
             "html_rel": html_rel,
             "title": title,
             "content": content,
@@ -293,56 +380,71 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
     pages = []
     category_counts = {}
 
-    def get_sidebar_nav_html(root_rel: str) -> str:
-        return f"""
-      <nav>
-        <div class="sidebar-section">
-          <h3>Getting Started</h3>
-          <ul>
-            <li><a href="{root_rel}index.html">Overview</a></li>
-            <li><a href="{root_rel}docs/INDEX.html">Core Docs Index</a></li>
-            <li><a href="{root_rel}docs/onboarding/COMMUNITY_FIRST_RUN.html">Community First-Run</a></li>
-            <li><a href="{root_rel}docs/onboarding/QUICKSTART.html">Quickstart & MCP</a></li>
-            <li><a href="{root_rel}docs/onboarding/AI_AGENT_ONBOARDING.html">AI Agent Directives</a></li>
-            <li><a href="{root_rel}docs/onboarding/FIRST_RUN_OBJECT_TUTORIAL.html">First-Run Object Tutorial</a></li>
-          </ul>
-        </div>
-        <div class="sidebar-section">
-          <h3>Core Architecture</h3>
-          <ul>
-            <li><a href="{root_rel}docs/architecture/README.html">Architecture Overview</a></li>
-            <li><a href="{root_rel}docs/architecture/CELLULAR_MEMBRANE_MODE_B_CONFIGURATION.html">Cellular Membrane Mode B</a></li>
-            <li><a href="{root_rel}docs/architecture/CLI_COMMAND_TAXONOMY_STANDARDS.html">CLI Command Taxonomy</a></li>
-            <li><a href="{root_rel}docs/architecture/TIERED_STORAGE_AND_ARCHIVAL_LIFECYCLE.html">Tiered Storage Lifecycle</a></li>
-            <li><a href="{root_rel}docs/architecture/TRAY_COMMAND_CRYPTOGRAPHIC_SECURITY.html">Tray Cryptographic Security</a></li>
-          </ul>
-        </div>
-        <div class="sidebar-section">
-          <h3>Maintenance & Development</h3>
-          <ul>
-            <li><a href="{root_rel}docs/development/README.html">Development Overview</a></li>
-            <li><a href="{root_rel}docs/development/POLICY_GOVERNANCE_AND_DURABILITY.html">Policy Governance & Durability</a></li>
-          </ul>
-        </div>
-        <div class="sidebar-section">
-          <h3>Operations & Guides</h3>
-          <ul>
-            <li><a href="{root_rel}docs/howto/README.html">How-To Overview</a></li>
-            <li><a href="{root_rel}docs/howto/SCHEDULER_AND_MAINTENANCE.html">Scheduler & Maintenance</a></li>
-            <li><a href="{root_rel}docs/onboarding/EDGE_HEADLESS_FIRST_RUN.html">Edge / Headless Mode</a></li>
-            <li><a href="{root_rel}docs/quality/README.html">Quality & Verification Gates</a></li>
-          </ul>
-        </div>
-        <div class="sidebar-section">
-          <h3>Open Core Governance</h3>
-          <ul>
-            <li><a href="{root_rel}CONTRIBUTING.html">Contributing & DCO</a></li>
-            <li><a href="{root_rel}SECURITY.html">Security Policy</a></li>
-            <li><a href="{root_rel}GOVERNANCE.html">Open-Core Governance</a></li>
-          </ul>
-        </div>
-      </nav>
-        """
+    CATEGORY_ORDER = [
+        ("Getting Started", "getting-started"),
+        ("Architecture & Foundation", "architecture"),
+        ("Specifications & Grammars", "specs"),
+        ("Reference Manuals", "manual"),
+        ("How-To & Incident Runbooks", "operations"),
+        ("Tutorials, Demos & Guides", "tutorials"),
+        ("Maintenance & Development", "development"),
+        ("Quality & Evaluation", "quality"),
+        ("Codebase Evaluation Framework", "codebase-eval"),
+        ("Open Core Governance", "governance"),
+    ]
+
+    grouped_docs = {cat_name: [] for cat_name, _ in CATEGORY_ORDER}
+    for item in doc_entries:
+        cat_name = item["category"]
+        if cat_name not in grouped_docs:
+            grouped_docs[cat_name] = []
+        grouped_docs[cat_name].append(item)
+
+    # Sort items within each category
+    def sort_key(entry):
+        rel = entry["rel_path"]
+        # Pin index or overview docs to top of their category
+        if "README.md" in rel or "INDEX.md" in rel or rel == "index.html":
+            return (0, entry["title"])
+        if "COMMUNITY_FIRST_RUN" in rel or "QUICKSTART" in rel or "ZQK_GETTING_STARTED" in rel or "zqk-expert/SKILL" in rel or "CONTRIBUTING" in rel:
+            return (1, entry["title"])
+        return (2, entry["title"])
+
+    for cat_name in grouped_docs:
+        grouped_docs[cat_name].sort(key=sort_key)
+
+    def get_sidebar_nav_html(root_rel: str, current_html_rel: str) -> str:
+        nav_html = ['<nav class="sidebar-nav">']
+        # Top-level Overview
+        active_home = ' class="active"' if current_html_rel == "index.html" else ''
+        nav_html.append(f'<div class="sidebar-home"><a href="{root_rel}index.html"{active_home}>🏠 Portal Overview</a></div>')
+
+        for cat_name, cat_key in CATEGORY_ORDER:
+            items = grouped_docs.get(cat_name, [])
+            if not items:
+                continue
+
+            contains_active = any(it["html_rel"] == current_html_rel for it in items)
+            # Default open for core categories, or if this category contains the active page
+            # Keep CEF closed by default unless active page is inside it
+            is_open = contains_active or (cat_key in ("getting-started", "architecture", "specs", "manual", "operations", "skills", "tutorials") and current_html_rel == "index.html")
+            open_attr = ' open' if is_open else ''
+
+            nav_html.append(f'<details class="sidebar-group"{open_attr}>')
+            nav_html.append(f'<summary><span class="group-title">{html.escape(cat_name)}</span><span class="group-count">{len(items)}</span></summary>')
+            nav_html.append('<ul>')
+            for it in items:
+                is_active = (it["html_rel"] == current_html_rel)
+                active_cls = ' class="active"' if is_active else ''
+                nav_title = html.escape(get_clean_nav_title(it["title"]))
+                full_title = html.escape(it["title"])
+                href = f"{root_rel}{it['html_rel']}"
+                nav_html.append(f'<li><a href="{href}"{active_cls} title="{full_title}">{nav_title}</a></li>')
+            nav_html.append('</ul>')
+            nav_html.append('</details>')
+
+        nav_html.append('</nav>')
+        return "\n".join(nav_html)
 
     for item in doc_entries:
         cat_name = item["category"]
@@ -353,7 +455,7 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
         
         depth = item["html_rel"].count("/")
         root_rel = "../" * depth if depth > 0 else ""
-        sidebar_nav_html = get_sidebar_nav_html(root_rel)
+        sidebar_nav_html = get_sidebar_nav_html(root_rel, item["html_rel"])
         
         page_html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -428,7 +530,7 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
         <div class="breadcrumb-trail">
           <a href="{root_rel}index.html">Docs</a> &raquo; <span>{html.escape(item["category"])}</span> &raquo; <span class="current">{escaped_title}</span>
         </div>
-        <a href="{root_rel}{item['rel_path']}" class="raw-md-link" title="View canonical Markdown source">Raw .md</a>
+        <a href="{root_rel}{item['clean_md_rel']}" class="raw-md-link" title="View canonical Markdown source">Raw .md</a>
       </div>
       <div class="markdown-body">
         {rendered_body}
@@ -453,18 +555,28 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
 
     # Build categories table for landing page
     cat_cards_html = ""
-    for cname, count in sorted(category_counts.items(), key=lambda x: -x[1]):
+    for cat_name, cat_key in CATEGORY_ORDER:
+        items = grouped_docs.get(cat_name, [])
+        if not items:
+            continue
+        first_doc = items[0]
+        preview_links = "".join([f'<li><a href="{it["html_rel"]}">{html.escape(get_clean_nav_title(it["title"]))}</a></li>' for it in items[:4]])
+        if len(items) > 4:
+            preview_links += f'<li class="more-link"><a href="{first_doc["html_rel"]}">+ {len(items)-4} more guides &rarr;</a></li>'
         cat_cards_html += f"""
         <div class="cat-card">
           <div class="cat-card-header">
-            <h4>{html.escape(cname)}</h4>
-            <span class="cat-card-count">{count} articles</span>
+            <h4><a href="{first_doc['html_rel']}">{html.escape(cat_name)}</a></h4>
+            <span class="cat-card-count">{len(items)} articles</span>
           </div>
-          <p>Authoritative open-core specifications and guides for {html.escape(cname.lower())}.</p>
+          <p>Authoritative open-core specifications and guides for {html.escape(cat_name.lower())}.</p>
+          <ul class="cat-card-links">
+            {preview_links}
+          </ul>
         </div>
         """
 
-    index_sidebar_html = get_sidebar_nav_html("")
+    index_sidebar_html = get_sidebar_nav_html("", "index.html")
     index_html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -561,10 +673,55 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
           <p>Deep foundational specifications governing the Knowledge Kernel.</p>
           <ul>
             <li><a href="docs/architecture/README.html">Core Architecture Overview</a></li>
+            <li><a href="docs/architecture/AMBIENT_SIGNAL_ACTION_RUBRIC.html">Ambient Signal Action Rubric</a></li>
+            <li><a href="docs/architecture/LIFECYCLE_STATE_MACHINE.html">Visual Lifecycle State Machines</a></li>
+            <li><a href="docs/architecture/PACK_COMPOSITION_AND_EXTENSIBILITY.html">Modular Pack Composition</a></li>
             <li><a href="docs/architecture/CELLULAR_MEMBRANE_MODE_B_CONFIGURATION.html">Cellular Membrane Mode B Runbook</a></li>
             <li><a href="docs/architecture/CLI_COMMAND_TAXONOMY_STANDARDS.html">CLI Command Taxonomy & Standards</a></li>
-            <li><a href="docs/architecture/TIERED_STORAGE_AND_ARCHIVAL_LIFECYCLE.html">Tiered Storage & Capsule Archival</a></li>
-            <li><a href="docs/architecture/TRAY_COMMAND_CRYPTOGRAPHIC_SECURITY.html">Tray Cryptographic Security</a></li>
+          </ul>
+        </div>
+        <div class="quad-box">
+          <h3>📜 Specifications & Grammars</h3>
+          <p>Formal AST grammars, execution engines, and query planning algorithms.</p>
+          <ul>
+            <li><a href="docs/specs/SPEC-ZPARQL-GRAPH-TRAVERSAL-GRAMMAR.html">ZPARQL Graph Traversal Grammar</a></li>
+            <li><a href="docs/specs/SPEC-ZPARQL-QUERY-PLANNER.html">ZPARQL Indexed Query Planner</a></li>
+            <li><a href="docs/specs/SPEC-ZQL-DECLARATIVE-MUTATION-GRAMMAR.html">ZQL Mutation Grammar & AST</a></li>
+            <li><a href="docs/specs/SPEC-ZQL-TRANSACTION-EXECUTION.html">ZQL ACID Transaction Execution</a></li>
+            <li><a href="docs/specs/SPEC-OBJECT-INSPECTOR-CONSOLE-001.html">Interactive Object Inspector Spec</a></li>
+          </ul>
+        </div>
+        <div class="quad-box">
+          <h3>📖 Reference Manuals & Guides</h3>
+          <p>Complete syntax reference, CLI options, and developer field guides.</p>
+          <ul>
+            <li><a href="docs/manual/README.html">Manual & CLI Reference</a></li>
+            <li><a href="docs/manual/ZPARQL_QUERY_LANGUAGE.html">ZPARQL Query Language Manual</a></li>
+            <li><a href="docs/manual/ZQL_MUTATIONS.html">ZQL Declarative Mutations Manual</a></li>
+            <li><a href="docs/manual/OBJECT_INSPECTOR_AND_POLICY_STUDIO.html">Object Inspector & Policy Studio</a></li>
+            <li><a href="docs/guides/ZQL_ZPARQL_AGENT_GUIDE.html">ZQL & ZPARQL Agent Guide</a></li>
+          </ul>
+        </div>
+        <div class="quad-box">
+          <h3>🚨 Incident Runbooks & Operations</h3>
+          <p>Operational triage recipes, crash recovery, and daemon health management.</p>
+          <ul>
+            <li><a href="docs/runbooks/README.html">Operational Incident Runbooks</a></li>
+            <li><a href="docs/runbooks/RB-CAS-001-CAS-CORRUPTION-RECOVERY.html">RB-CAS-001: CAS Hash Recovery</a></li>
+            <li><a href="docs/runbooks/RB-LCK-001-LOCK-CONTENTION-DEADLOCKS.html">RB-LCK-001: Lock Contention</a></li>
+            <li><a href="docs/runbooks/RB-SCH-001-SCHEDULER-DAEMON-TRIAGE.html">RB-SCH-001: Scheduler Triage</a></li>
+            <li><a href="docs/runbooks/RB-WAL-001-WAL-COMPACTION-FAILURES.html">RB-WAL-001: WAL Failures</a></li>
+          </ul>
+        </div>
+        <div class="quad-box">
+          <h3>🔬 Quality & Codebase Evaluation</h3>
+          <p>Multi-agent evaluation framework (CEF), Diamond Scale, and 52 lens rubrics.</p>
+          <ul>
+            <li><a href="docs/quality/README.html">Quality & Verification Gates (DoD/VDS)</a></li>
+            <li><a href="docs/eval/README.html">Multi-Axis Benchmark Synthesis</a></li>
+            <li><a href="docs/quality/codebase_evaluation/README.html">CEF Multi-Agent Evaluation Framework</a></li>
+            <li><a href="docs/quality/codebase_evaluation/CONSTITUTION.html">CEF Evaluation Constitution</a></li>
+            <li><a href="docs/quality/codebase_evaluation/DIAMOND_SCALE.html">Diamond Scale Multi-Axis Quality</a></li>
           </ul>
         </div>
         <div class="quad-box">
@@ -573,26 +730,29 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
           <ul>
             <li><a href="docs/development/README.html">Maintenance & Development Overview</a></li>
             <li><a href="docs/development/POLICY_GOVERNANCE_AND_DURABILITY.html">Policy Governance & Durability</a></li>
-            <li><a href="docs/architecture/CLI_COMMAND_TAXONOMY_STANDARDS.html">CLI Taxonomy Standards</a></li>
             <li><a href="docs/howto/SCHEDULER_AND_MAINTENANCE.html">Scheduler & Maintenance Jobs</a></li>
+            <li><a href="docs/explanation/README.html">System Architecture Philosophy</a></li>
           </ul>
         </div>
         <div class="quad-box">
-          <h3>🛠️ How-To & Operations</h3>
-          <p>Operational task recipes for running daemons and background organisms.</p>
+          <h3>🤖 Agent Operating Protocols</h3>
+          <p>Directives, MCP integration, persona seating, and continuous autonomous loop discipline.</p>
           <ul>
-            <li><a href="docs/howto/README.html">How-To Guides Overview</a></li>
-            <li><a href="docs/howto/SCHEDULER_AND_MAINTENANCE.html">Scheduler & Maintenance Jobs Guide</a></li>
-            <li><a href="docs/quality/README.html">First-Run Quality & Verification Gates</a></li>
+            <li><a href="docs/onboarding/AI_AGENT_ONBOARDING.html">AI Agent Directives & Seating</a></li>
+            <li><a href="docs/architecture/AMBIENT_SIGNAL_ACTION_RUBRIC.html">Ambient Signal Action Rubric</a></li>
+            <li><a href="docs/quality/README.html">Verification Done-Gates (VDS)</a></li>
+            <li><a href="docs/guides/ZQL_ZPARQL_AGENT_GUIDE.html">ZQL & ZPARQL Agent Guide</a></li>
+            <li><a href="docs/onboarding/EDGE_HEADLESS_FIRST_RUN.html">Edge / Headless Mode</a></li>
           </ul>
         </div>
         <div class="quad-box">
-          <h3>⚖️ Governance & Repository</h3>
+          <h3>⚖️ Open Core Governance</h3>
           <p>Open-source policies, contributing guidelines, and security disclosures.</p>
           <ul>
             <li><a href="CONTRIBUTING.html">Contributing & DCO Compliance</a></li>
             <li><a href="SECURITY.html">Security Vulnerability Disclosures</a></li>
-            <li><a href="GOVERNANCE.html">Open-Core Decision Making & Boundaries</a></li>
+            <li><a href="GOVERNANCE.html">Open-Core Decision Making</a></li>
+            <li><a href="CODE_OF_CONDUCT.html">Contributor Code of Conduct</a></li>
           </ul>
         </div>
       </div>
@@ -694,51 +854,116 @@ body {
 }
 
 .sidebar {
-  width: 280px;
+  width: 300px;
   flex-shrink: 0;
   border-right: 1px solid var(--border-color);
-  padding-right: 1.5rem;
-  max-height: calc(100vh - 100px);
+  padding-right: 1rem;
+  max-height: calc(100vh - 90px);
   position: sticky;
   top: 70px;
   overflow-y: auto;
 }
 
-.sidebar-section {
-  margin-bottom: 1.75rem;
+.sidebar-home {
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.sidebar-section h3 {
+.sidebar-home a {
+  color: var(--accent-cyan);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: rgba(0, 229, 255, 0.06);
+  border: 1px solid rgba(0, 229, 255, 0.15);
+  transition: all 0.15s ease;
+}
+
+.sidebar-home a:hover, .sidebar-home a.active {
+  background: rgba(0, 229, 255, 0.15);
+  border-color: var(--accent-cyan);
+}
+
+.sidebar-group {
+  margin-bottom: 0.85rem;
+}
+
+.sidebar-group summary {
+  cursor: pointer;
   font-size: 0.8rem;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-muted);
-  margin-bottom: 0.5rem;
+  padding: 4px 6px;
+  border-radius: 4px;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.15s ease;
 }
 
-.sidebar ul {
+.sidebar-group summary:hover {
+  color: #fff;
+  background: var(--bg-tertiary);
+}
+
+.sidebar-group summary .group-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sidebar-group summary .group-count {
+  font-size: 0.7rem;
+  font-weight: 500;
+  background: var(--bg-tertiary);
+  color: var(--accent-cyan);
+  padding: 1px 6px;
+  border-radius: 8px;
+}
+
+.sidebar-group ul {
   list-style: none;
-  padding: 0;
-  margin: 0;
+  padding: 0 0 0 10px;
+  margin: 0.4rem 0 0.6rem 4px;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.sidebar li {
-  margin-bottom: 0.4rem;
+.sidebar-group li {
+  margin-bottom: 0.25rem;
 }
 
-.sidebar a {
+.sidebar-group a {
   color: var(--text-main);
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 0.86rem;
   display: block;
   padding: 4px 8px;
   border-radius: 4px;
   transition: all 0.15s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.sidebar a:hover {
+.sidebar-group a:hover {
   background: var(--bg-tertiary);
   color: var(--accent-cyan);
+}
+
+.sidebar-group a.active {
+  background: rgba(0, 229, 255, 0.12);
+  color: var(--accent-cyan);
+  font-weight: 600;
+  border-left: 2px solid var(--accent-cyan);
 }
 
 .doc-body {
@@ -879,6 +1104,15 @@ body {
   color: #fff;
 }
 
+.cat-card h4 a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.cat-card h4 a:hover {
+  color: var(--accent-cyan);
+}
+
 .cat-card-count {
   font-size: 0.75rem;
   background: var(--bg-tertiary);
@@ -891,6 +1125,36 @@ body {
   margin: 0;
   font-size: 0.8rem;
   color: var(--text-muted);
+}
+
+.cat-card-links {
+  list-style: none;
+  padding: 0;
+  margin: 0.75rem 0 0;
+}
+
+.cat-card-links li {
+  margin-bottom: 0.35rem;
+}
+
+.cat-card-links a {
+  color: var(--accent-blue);
+  text-decoration: none;
+  font-size: 0.82rem;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cat-card-links a:hover {
+  text-decoration: underline;
+}
+
+.cat-card-links .more-link a {
+  color: var(--accent-cyan);
+  font-weight: 500;
+  margin-top: 4px;
 }
 
 .search-box {
