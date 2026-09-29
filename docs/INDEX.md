@@ -55,6 +55,7 @@ Welcome to the canonical documentation for **ZQK Core**, the Cellular Knowledge 
 | **[ZPARQL Query Language Manual](./manual/ZPARQL_QUERY_LANGUAGE.md)** | Developer manual and syntax guide for querying the Knowledge Kernel graph. |
 | **[ZQL Declarative Mutations Manual](./manual/ZQL_MUTATIONS.md)** | Developer manual for crafting declarative atomic mutations and batch updates. |
 | **[Object Inspector & Policy Studio](./manual/OBJECT_INSPECTOR_AND_POLICY_STUDIO.md)** | Reference manual for the interactive object inspector, keybindings, and policy testing. |
+| **[Mission Control UI & Diagnostics Visual Guide](./manual/MISSION_CONTROL_UI_VISUAL_GUIDE.md)** | Complete visual walkthrough of all 8 TUI tabs, Web Studio timeline/DAG, and test dashboards with ASCII captures. |
 | **[ZQL & ZPARQL Agent Guide](./guides/ZQL_ZPARQL_AGENT_GUIDE.md)** | Field guide for AI agents executing queries, mutating graph state, and handling errors. |
 
 ---
