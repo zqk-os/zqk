@@ -1,8 +1,8 @@
 # SEC — Security & Threat Vectors Evaluation
 
-Evaluator: specialist_evaluator
+Domain: Security & Threat Vectors
 Scope: `pkg/crypto`, `pkg/daemon/overseer`, `pkg/service`, `pkg/agent`, `pkg/validation/qa`
-Method: evidence-driven threat modeling, static inspection of authorization boundaries, IPC channels, and secret handling.
+Method: Evidence-driven threat modeling, static inspection of authorization boundaries, IPC channels, and secret handling.
 
 ---
 
@@ -68,7 +68,7 @@ Method: evidence-driven threat modeling, static inspection of authorization boun
   - This eliminates deserialization pollution and parameter tampering across the graph store.
 
 - **Git Commit Evidence Verification (`pkg/gitevidence/commit_refs.go`)**:
-  - Backlog item completion gates verify that commit SHAs exist in the git object database, mutate real product files outside metadata paths, and explicitly reference the corresponding `BLI-*` identifier.
+  - Backlog item completion gates verify that commit SHAs exist in the git object database, mutate real product files outside metadata paths, and explicitly reference the corresponding task or work item identifier.
   - This prevents phantom milestone closure without verifiable cryptographic git evidence.
 
 ---
