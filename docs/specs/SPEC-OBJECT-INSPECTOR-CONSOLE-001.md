@@ -58,30 +58,40 @@ zqk object browser [kind]
 
 ### 3.1 Master-Detail Layout Specification
 
-```
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ 🔍 ZQK OBJECT INSPECTOR — [Kind: backlog_item] (28 items)                    │
-├──────────────────────────────────────────────────────────────────────────────┤
-│ Filters: [All Status] [P0/P1] [My Claimed]  │ Sort: [updated_at ▼]  │ Page: 1/3│
-├──────────────────────────────────────────────────────────────────────────────┤
-│   ID             PRIO  STATUS       OWNER         TITLE                      │
-│ ▶ BLI-001        P0    in_progress  agent-alpha   Implement TUI 7-Tab View   │
-│   BLI-002        P1    planned      unassigned    Idle I/O Stamp Skip Opt    │
-│   BLI-003        P2    blocked      agent-beta    Refactor CAS Gate Mutex    │
-├──────────────────────────────────────────────────────────────────────────────┤
-│ ─── INSPECTED OBJECT: BLI-001 (Press Enter to open Action Palette [o]) ────── │
-│ Kind     : backlog_item        │ Status: 🟡 in_progress                      │
-│ Title    : Implement TUI 7-Tab View                                          │
-│ Owner    : agent-alpha         │ Plan  : PRI-TPM-CONV (Swarm Convergence)    │
-│ ┌─────────────────────────────┐ ┌──────────────────────────────────────────┐ │
-│ │ Modular Attribute Viewer    │ │ Lineage & Traceability Radar             │ │
-│ │ • Priority  : P0 (Critical) │ │ • Root: [goal GOAL-01] World-Class UX    │ │
-│ │ • Category  : feature       │ │ • Req : [req REQ-012] TUI Seismograph    │ │
-│ │ • Story Pts : 3 SP          │ │ • Test: [test TST-030-01] 3/3 Passing ✓   │ │
-│ └─────────────────────────────┘ └──────────────────────────────────────────┘ │
-│ Navigation: [Tab] Switch Kind │ [/] Search │ [f] Filter │ [e] Edit │ [Esc] Back │
-└──────────────────────────────────────────────────────────────────────────────┘
-```
+The Object Inspector operates in two primary modes: the **Main Scoreboard Table** for browsing entities of a selected kind, and the **Deep Inspection Modal** for drilling down into an entity's internal attributes, lineage, CAS provenance, and action palette.
+
+#### Visual Terminal Screenshot: Object Inspector Scoreboard
+
+![Interactive Object Inspector Scoreboard](../manual/screenshots/ui_object_inspector_table.svg)
+
+#### Datapoint Breakdown & Operator Guidance:
+
+| Datapoint / Component | Visual Format | Semantic Meaning | Why It Is Useful & Operational Purpose |
+| :--- | :--- | :--- | :--- |
+| **Header Banner** | Double-line cyan box (`╔...╗`) | Active console context and application title | Confirms console subsystem identity and terminal width bounds. |
+| **Kind Selector** | Cyan tag (`[backlog_item]`) | Active object kind being browsed | Indicates which schema registry definition governs displayed columns and filters. Press `[Tab]` to cycle. |
+| **Filter Pills** | Pill list (`[ALL]`, `[ACTIVE]`, `[DRAFT]`, `[BLOCKED]`, `[COMPLETE]`) | Active lifecycle status filter | Prunes clutter so operators and agents focus on actionable workstreams. Press `[f]` to cycle. |
+| **Sort Criterion** | Yellow badge (`[updated_at ▼]`) | Ordering property and sort direction | Identifies temporal or priority ranking. Press `[s]` to toggle ascending/descending. |
+| **Inline Search** | Green prompt (`[/cas█]`) | Interactive substring and regex filter query | Filters rows in real-time across ID, title, and body attributes. |
+| **Cursor Indicator** | Bright cyan arrow (`>`) | Currently focused object row | Marks the item that will be targeted upon pressing `[Enter]` for deep inspection. |
+| **Table Scoreboard** | Standardized TDS Table (`┌...┐`) | Multi-column entity overview | Displays ID, lifecycle status, priority tier, title, and relative age with guaranteed column width bounds. |
+| **Status Badge** | Color-coded status pill (`complete`, `in_progress`, `planned`, `blocked`) | Lifecycle state machine position | Visual indication of workflow progression. |
+| **Priority Tier** | Color pill (`P0`, `P1`, `P2`) | Urgency and triage classification | Highlights mission-critical blockers (`P0`) vs standard backlog tasks. |
+| **Action Footer** | Keycap menu (`[Enter] Deep Inspection`, `[p] Policy Studio`, `[q] Quit`) | Available keyboard accelerator bindings | Provides single-keypress hotkeys for fast operator navigation without leaving the terminal. |
+
+#### Visual Terminal Screenshot: Deep Inspection Modal (`[Enter]`)
+
+![Deep Inspection Modal Console](../manual/screenshots/ui_object_inspector.svg)
+
+#### Datapoint Breakdown & Operator Guidance:
+
+| Datapoint / Component | Visual Format | Semantic Meaning | Why It Is Useful & Operational Purpose |
+| :--- | :--- | :--- | :--- |
+| **Entity Title & Status** | Top status banner with state icon | Selected object ID and current lifecycle state | Immediate identification of inspected node and its operational readiness. |
+| **Lineage Radar** | Upward/downward tree nodes | Complete graph chain (`Goal ➔ Req ➔ BLI ➔ Test ➔ Criteria`) | Guarantees unbroken traceability and Definition of Done compliance before promotion. |
+| **Integrity Badge** | Green check (`✓ 100% INTACT`) | Graph connectivity and constraint health | Confirms that the entity has no orphaned references or cyclic dependencies. |
+| **CAS Provenance** | Hex SHA-256 hash & byte metrics | Content-addressed storage fingerprint and plane (`authoritative` vs `draft`) | Cryptographic audit trail verifying immutable CAS storage state. |
+| **Action Palette** | Interactive hotkey list (`[p] Promote`, `[c] Claim`, `[e] Edit`) | Valid next-state lifecycle mutations | Executes atomic state transitions directly from keyboard without manual CLI typing. |
 
 ### 3.2 Navigation & Keyboard Shortcuts
 - `Tab` / `Shift+Tab`: Cycle through registered kinds (`backlog_item` ➔ `requirement` ➔ `policy` ➔ `test_case`...).
@@ -126,23 +136,23 @@ Evaluates `proc.SecurityContext()` against the target object:
 ### 5.1 Concept & Workflow
 Writing validation policies in raw YAML is error-prone. The **Policy Rule Studio** turns policy creation and testing into an interactive, fail-closed IDE experience.
 
-```
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ 🛡️  ZQK POLICY RULE STUDIO — [Policy: POL-SAFETY-001]                        │
-├──────────────────────────────────────────────────────────────────────────────┤
-│ Rule Target Kind : [ backlog_item ]                                          │
-│ Field Expression : [ status == "complete" => criteria.all_satisfied == true ]│
-├──────────────────────────────────────────────────────────────────────────────┤
-│ ─── LIVE DRY-RUN EVALUATION MATRIX (Across 28 repository objects) ─────────── │
-│ PASS: 26 objects (92.8%) │ FAIL: 2 objects (7.2%)                            │
-│                                                                              │
-│ Violations:                                                                  │
-│ • [BLI-014] "Refactor CAS Gate" (status=complete, criteria open: CRIT-022)   │
-│ • [BLI-021] "Update Auth Creds" (status=complete, criteria open: CRIT-049)   │
-├──────────────────────────────────────────────────────────────────────────────┤
-│ [c] Edit Condition │ [t] Test Expression │ [s] Save Policy │ [Esc] Close     │
-└──────────────────────────────────────────────────────────────────────────────┘
-```
+#### Visual Terminal Screenshot: Policy Rule Studio
+
+![Policy Rule Studio](../manual/screenshots/ui_policy_studio.svg)
+
+#### Datapoint Breakdown & Operator Guidance:
+
+| Datapoint / Component | Visual Format | Semantic Meaning | Why It Is Useful & Operational Purpose |
+| :--- | :--- | :--- | :--- |
+| **Header Banner** | Double-line cyan box (`╔...╗`) | Policy Studio subsystem identifier | Confirms active governance and DSL editing environment. |
+| **Target Kind** | White badge (`[backlog_item]`) | Schema kind evaluated by the active rule | Binds DSL field autocompletion to the exact attribute definitions of this kind. |
+| **Active Rules** | Yellow count pill (`3 loaded`) | Number of active policies registered for this kind | Indicates existing governance coverage. |
+| **Evaluation Mode** | Green badge (`[DRY-RUN]`) | Execution safety plane | Confirms evaluations execute in memory across CAS live projections without mutating disk state. |
+| **Expression DSL** | Cyan prompt & formatted expression string | Live boolean predicate condition | Declarative governance invariant (e.g. `status == "in_progress" && claimed_by != ""`). |
+| **Autocomplete Bar** | Dim & highlighted tokens (`[claimed_by]`, `priority_plan_ref`, etc.) | Context-aware schema attributes and enums | Press `[Tab]` to insert valid field names discovered from the kind's schema specification. |
+| **Evaluation Matrix** | Summary metrics (`194 / 196 objects COMPLIANT (99.0%)`) | Real-time population compliance rate | Immediate visual proof of policy impact across the entire repository. |
+| **Violation Triage** | Red bulleted list (`✗ 2 objects VIOLATE RULE:`) | Specific entity IDs and descriptive failure reasons | Identifies non-compliant entities (e.g. `BLI-AUTH-004`, `BLI-UI-012`) needing operator remediation. |
+| **Action Hotkeys** | Keyboard shortcuts (`[c] Edit`, `[t] Dry-Run`, `[s] Save`, `[Esc] Return`) | Interactive studio control commands | Enables rapid test-driven policy iteration and certified promotion to `.zqk/process/policy/`. |
 
 ### 5.2 Autocompletion Engine
 - Utilizes `objects.GetGlobalFieldRegistry()`:
