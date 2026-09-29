@@ -1304,24 +1304,46 @@ Inspect your workstreams, milestones, and real-time Gantt timeline:
 `+"```"+`
 Open [http://127.0.0.1:8080](http://127.0.0.1:8080) in your browser.
 
-### 2. Onboard Your AI Agents & IDE Mesh
-Automatically detect your agent hosts (Cursor, VS Code, Cline, Windsurf) and sync kernel directives into '.agents/AGENTS.md':
+### 2. Connect Your AI Agent (Seating Guide)
+Run agent onboarding to detect your editor and prime workspace directives:
 `+"```bash"+`
 %s system agent-onboard
 `+"```"+`
-To connect Claude Desktop or external MCP clients:
-`+"```bash"+`
-%s mcp install --client claude-desktop
-`+"```"+`
+
+Follow the configuration below for your AI assistant:
+
+- **Cursor**: Pre-configured! Automatically detects '.agents/AGENTS.md' and '.cursor/mcp.json'. Prompt Cursor Composer: *"You are paired with the ZQK Knowledge Kernel. Run '%s workflow whats-next' to discover tasks, then run '%s do' to claim and execute work."*
+- **Claude Desktop**: Auto-install the MCP server:
+  `+"```bash"+`
+  %s mcp install --client claude-desktop
+  `+"```"+`
+  Restart Claude Desktop; the ZQK tools icon will appear.
+- **Claude Code (CLI)**: Register MCP in Claude Code:
+  `+"```bash"+`
+  claude mcp add %s -- %s mcp serve
+  `+"```"+`
+- **Windsurf (Cascade)**: Pre-configured via '.windsurfrules' and 'mcp_config.json'.
+- **Cline / Roo Code**: Pre-configured via '.clinerules' and 'cline_mcp_settings.json'.
+- **Gemini / Antigravity**: Native workspace directives in '.agents/AGENTS.md'. Direct CLI or MCP via '%s mcp serve'.
+- **Hermes / OpenClaw / Headless Swarms**:
+  - Direct CLI: Agent runs '%s workflow whats-next' and '%s do <bli-id>' via shell.
+  - Loopback TCP Proxy: Expose MCP securely on localhost:
+    `+"```bash"+`
+    %s mcp proxy --tcp 127.0.0.1:7777
+    `+"```"+`
 
 ### 3. Discover What's Next & Execute Tasks
 Query the knowledge kernel to discover your active priority plan and the next prioritized backlog items:
 `+"```bash"+`
 %s workflow whats-next
 `+"```"+`
-To claim a task atomically:
+To autonomously discover, claim, and begin executing a backlog item:
 `+"```bash"+`
-%s agent claim-work
+%s do
+`+"```"+`
+Or target a specific backlog item:
+`+"```bash"+`
+%s do <BLI-ID>
 `+"```"+`
 
 ### 4. Background Services & Continuous Verification
@@ -1332,7 +1354,7 @@ Run background maintenance and telemetry daemons:
 `+"```"+`
 
 *Need full CLI help? Run `+"`"+`%s --help`+"`"+` or consult docs/INDEX.md.*
-`, prod, prod, prod, prod, exe, exe, exe, exe, exe, exe, exe, exe)
+`, prod, prod, prod, prod, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe)
 
 	return fileutil.WriteSecureFile(path, []byte(template))
 }
