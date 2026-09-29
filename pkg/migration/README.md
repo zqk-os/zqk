@@ -1,7 +1,6 @@
 # Migration Tools Package
 
-**Status**: Complete  
-**Related**: BLI-623, BLI-240
+**Status**: Complete
 
 This package implements the file-based to graph backend migration tools as defined in the Migration Strategy v1.0.
 

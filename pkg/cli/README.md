@@ -74,7 +74,7 @@ args:
 help:
   examples:
     - comment: "Get a backlog item"
-      command: "%s get BLI-626"
+      command: "%s get BLI-001"
 
 run_e: "runGet"
 common_flags: true

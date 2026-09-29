@@ -170,9 +170,9 @@ Autonomous agents calling `./bin/zqk object inspect <kind> [id] -f json` receive
   "title": "Implement TUI 7-Tab View",
   "claimed_by": "agent-alpha",
   "lineage": {
-    "goal": "GOAL-STARTER-COMMUNITY-001",
-    "requirement": "REQ-STARTER-COMMUNITY-012",
-    "test_cases": ["TST-STARTER-COMMUNITY-030-01"],
+    "goal": "GOAL-001",
+    "requirement": "REQ-012",
+    "test_cases": ["TST-030-01"],
     "is_intact": true
   },
   "criteria_summary": {

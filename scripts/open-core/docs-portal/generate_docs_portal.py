@@ -44,6 +44,8 @@ def get_html_relpath(rel_md_path: str) -> str:
         path = path[len(".zqk/"):]
     elif path.startswith(".zqk/specs/"):
         path = "kernel-specs/" + path[len(".zqk/specs/"):]
+    elif path.startswith(".zqk/agent_packs/"):
+        path = "agent-packs/" + path[len(".zqk/agent_packs/"):]
     elif path.startswith(".agents/"):
         path = "agents/" + path[len(".agents/"):]
     elif path.startswith("./"):
@@ -59,12 +61,18 @@ def get_category_info(rel_path: str) -> tuple[str, str]:
     path = rel_path.replace("\\", "/")
     if path.startswith(".zqk/skills/") or path.startswith("skills/"):
         return "Agent Skills & Protocols", "skills"
+    if path.startswith(".zqk/agent_packs/") or path.startswith("agent-packs/"):
+        return "Agent Directives & Packs", "agent-directives"
     if path == ".agents/AGENTS.md" or path == "agents/AGENTS.md":
-        return "Agent Directives", "agent-directives"
-    if path.startswith("pkg/") or path.startswith("internal/") or path.startswith("cmd/"):
+        return "Agent Directives & Packs", "agent-directives"
+    if path.startswith("pkg/") or path.startswith("internal/"):
         return "Kernel Subsystems & Go Packages", "subsystems"
     if path.startswith(".zqk/specs/") or (path.startswith("specs/") and any(k in path for k in ("objects", "traits", "lifecycles", "configs"))):
         return "Kernel DNA & Object Schemas", "schemas"
+    if path == "scripts/onboarding_roadmap/README.md":
+        return "Getting Started", "getting-started"
+    if path == "scripts/scheduler_jobs/README.md":
+        return "How-To & Incident Runbooks", "operations"
 
     parts = path.split("/")
     if parts[0] != "docs":
@@ -285,8 +293,8 @@ def build_portal(repo_root: str, target_dir: str):
     for sf in raw_skill_files:
         doc_files.append(sf)
 
-    # Subsystem and Go package documentation (pkg/, internal/, cmd/)
-    for sub_dir in ["pkg", "internal", "cmd"]:
+    # Subsystem and Go package documentation (pkg/, internal/)
+    for sub_dir in ["pkg", "internal"]:
         sub_path = os.path.join(repo_root, sub_dir)
         if not os.path.isdir(sub_path):
             continue
@@ -300,6 +308,17 @@ def build_portal(repo_root: str, target_dir: str):
     spec_mds = sorted(glob.glob(os.path.join(repo_root, ".zqk", "specs", "**", "*.md"), recursive=True))
     for sm in spec_mds:
         doc_files.append(sm)
+
+    # Agent Packs (.zqk/agent_packs/)
+    agent_pack_mds = sorted(glob.glob(os.path.join(repo_root, ".zqk", "agent_packs", "**", "*.md"), recursive=True))
+    for ap in agent_pack_mds:
+        doc_files.append(ap)
+
+    # Operational Guides in scripts/
+    for script_doc in ["scripts/onboarding_roadmap/README.md", "scripts/scheduler_jobs/README.md"]:
+        sp = os.path.join(repo_root, script_doc)
+        if os.path.isfile(sp):
+            doc_files.append(sp)
 
     # Deduplicate while preserving order
     doc_files = sorted(list(dict.fromkeys(doc_files)))
@@ -372,7 +391,15 @@ def build_portal(repo_root: str, target_dir: str):
             if line.startswith("# "):
                 title = line[2:].strip()
                 break
-        if not title:
+        if rel_path.startswith(".zqk/agent_packs/"):
+            pack_name = rel_path.split("/")[2]
+            p_display = pack_name.upper() if pack_name in ("ide", "mcp") else pack_name.replace("_", " ").title()
+            title = f"{p_display} Agent Boot Protocol"
+        elif rel_path == "scripts/onboarding_roadmap/README.md":
+            title = "Curriculum as Data: Onboarding Roadmap"
+        elif rel_path == "scripts/scheduler_jobs/README.md":
+            title = "Scheduler Job Templates"
+        elif not title:
             fm_name_match = re.search(r'^name:\s*(.+)$', content, re.MULTILINE)
             if fm_name_match:
                 title = fm_name_match.group(1).strip().replace("-", " ").title()

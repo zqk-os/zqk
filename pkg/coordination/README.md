@@ -71,7 +71,7 @@ The coordinator integrates with:
 - `pkg/mcp.EventEmitter` - Operational events for MCP clients
 - `pkg/scheduler` - Process coordination
 
-### Scheduler coordination kernel (PRI-220 / BLI-901)
+### Scheduler coordination kernel
 
 The scheduler participates in the same coordination spine as the rest of the CLI:
 

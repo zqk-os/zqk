@@ -40,7 +40,7 @@ export ZQK_SPECIALIZATION_TIER=neuron   # or muscle|heart|lung — see pkg/speci
 
 ## Market probes (open until evidence)
 
-Returned under `market_probe_open` in `agent-onboard` JSON. Canonical list also in the strategy doc. **Do not** ship organ-named community binaries until human ACK on these signals (`BLI-AGENT-ONBOARD-VEC-B-001`).
+Returned under `market_probe_open` in `agent-onboard` JSON. Canonical list also in the strategy doc. **Do not** ship organ-named community binaries until human ACK on these signals.
 
 ## Wake / interrupt
 
