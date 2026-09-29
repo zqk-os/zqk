@@ -77,7 +77,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [federation](./federation/) | `github.com/zqk-os/zqk/pkg/federation` | 5+2 | 2 | meshbroker | ❌ - | Cross-kernel mesh federation, remote project peering, and distributed sync. |
 | [filter](./filter/) | `github.com/zqk-os/zqk/pkg/filter` | 2+2 | 2 | - | ❌ - | Lexical filter expressions, object predicate evaluation, and search query compilation. |
 | [fitness](./fitness/) | `github.com/zqk-os/zqk/pkg/fitness` | 4+2 | 2 | - | ❌ - | Architecture fitness functions and automated compliance scoring. |
-| [functional](./functional/) | `github.com/zqk-os/zqk/pkg/functional` | 3+1 | 1 | - | ✅ [README](./functional/README.md) | A fluent, functional-style API for error handling with automatic metrics integration via the coordinator pattern. |
+| [functional](./functional/) | `github.com/zqk-os/zqk/pkg/functional` | 3+1 | 1 | - | ✅ [README](./functional/README.md) | A fluent, functional-style Go API for monadic error handling, safe map operations, and telemetry-integrated execution with auto... |
 | [gantt](./gantt/) | `github.com/zqk-os/zqk/pkg/gantt` | 2+3 | 3 | - | ❌ - | Gantt timeline generation, SVG visual rendering, and roadmap scheduling displays. |
 | [git](./git/) | `github.com/zqk-os/zqk/pkg/git` | 7+8 | 8 | - | ❌ - | Git operations wrapper, branch inspection, worktree management, and status reporting. |
 | [gitconstants](./gitconstants/) | `github.com/zqk-os/zqk/pkg/gitconstants` | 1+1 | 1 | - | ❌ - | Centralized Git command, subcommand, flag, and option constant definitions. |
@@ -318,7 +318,7 @@ pkg/
 │   └── meshbroker/
 ├── filter/          # Lexical filter expressions, object predicate evaluation, and
 ├── fitness/          # Architecture fitness functions and automated compliance scor
-├── functional/          # A fluent, functional-style API for error handling with autom
+├── functional/          # A fluent, functional-style Go API for monadic error handling
 ├── gantt/          # Gantt timeline generation, SVG visual rendering, and roadmap
 ├── git/          # Git operations wrapper, branch inspection, worktree manageme
 ├── gitconstants/          # Centralized Git command, subcommand, flag, and option consta
