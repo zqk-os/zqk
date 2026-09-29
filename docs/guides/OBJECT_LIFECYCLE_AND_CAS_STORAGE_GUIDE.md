@@ -18,7 +18,7 @@ This guide provides both human engineers and autonomous AI agents with actionabl
 Every kernel object is serialized on disk as a YAML or JSON document containing standard architectural envelopes:
 
 ```yaml
-schema_version: 1.0.0
+schema_version: 2.0.0
 id: BLI-AUTH-004
 kind: backlog_item
 status: in_progress
@@ -34,7 +34,7 @@ criteria_refs:
   - CRIT-049
 test_case_refs:
   - TST-030-01
-created_at_epoch: 1790220000000
+created_at: "2026-09-29T14:00:00Z"
 updated_at: "2026-09-29T14:30:00Z"
 storage_profile:
   cas_hash: "sha256:d8a9f4e2c8104598bfaaa107ac635e1070be99d5c10eba5793cac0baf38ba8a1"

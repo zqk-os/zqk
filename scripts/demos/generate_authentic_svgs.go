@@ -152,7 +152,7 @@ func RenderScreenToSVG(filename, title string, screenText string, widthCols int)
 		lines = lines[:len(lines)-1]
 	}
 
-	charWidth := 7.82
+	charWidth := 8.05
 	lineHeight := 19.5
 	padX := 24.0
 	padY := 16.0
@@ -1387,7 +1387,82 @@ func main() {
 		}
 	}
 
-	// 9c. Policy Rule Studio & Governance DSL
+	// 9c. Policy Rule Studio: Step 1 (Creation & Autocomplete)
+	{
+		var buf strings.Builder
+		cyanBold := color.New(color.FgCyan, color.Bold).SprintFunc()
+		greenBold := color.New(color.FgGreen, color.Bold).SprintFunc()
+		yellowBold := color.New(color.FgYellow, color.Bold).SprintFunc()
+		redBold := color.New(color.FgRed, color.Bold).SprintFunc()
+		dimStyle := color.New(color.Faint).SprintFunc()
+		whiteBold := color.New(color.FgWhite, color.Bold).SprintFunc()
+
+		bannerText := "ZQK POLICY RULE STUDIO — STEP 1: INTERACTIVE RULE CREATION & DSL DRAFTING"
+		buf.WriteString(cyanBold("╔" + strings.Repeat("═", termWidth-2) + "╗") + "\n")
+		buf.WriteString(cyanBold("║") + tds.PadCenter(whiteBold(bannerText), termWidth-2) + cyanBold("║") + "\n")
+		buf.WriteString(cyanBold("╚" + strings.Repeat("═", termWidth-2) + "╝") + "\n")
+
+		targetLines := []string{
+			fmt.Sprintf("%s %s   │   %s %s %s   │   %s %s",
+				cyanBold("RULE ID:"), whiteBold("[POL-MUTATION-002]"),
+				cyanBold("TARGET KIND:"), greenBold("[backlog_item]"), dimStyle("(Tab to cycle)"),
+				cyanBold("SEVERITY:"), redBold("[ERROR / REJECT]"),
+			),
+			fmt.Sprintf("%s %s",
+				dimStyle("DESCRIPTION:"), dimStyle(`"Enforce claimant assignment and criteria DoD linkage before in_progress state transition"`),
+			),
+		}
+		buf.WriteString(tds.Panel("1. TARGET SPECIFICATION & RULE METADATA", targetLines, termWidth, tds.BorderLight))
+
+		subTop := "  " + dimStyle("┌─ SCHEMA SUGGESTIONS (FieldRegistry Discovery) "+strings.Repeat("─", 56)+"┐")
+		subRow1 := "  " + dimStyle("│") + greenBold(" ▶ criteria_linked_or_acceptance_present()  ") + dimStyle("│") + yellowBold(" Built-in Predicate: true if DoD criteria is satisfied    ") + dimStyle("│")
+		subRow2 := "  " + dimStyle("│") + dimStyle("   criteria_refs                            │ Attribute ([]string): registered criteria object IDs     │")
+		subRow3 := "  " + dimStyle("│") + dimStyle("   claimed_by                               │ Attribute (string): current assignee agent/user identity │")
+		subBottom := "  " + dimStyle("└"+strings.Repeat("─", 103)+"┘")
+
+		dslLines := []string{
+			fmt.Sprintf("%s %s%s",
+				cyanBold("EXPRESSION:"),
+				whiteBold(`status == "in_progress" ==> claimed_by != "" && criteria_linked`),
+				yellowBold("█"),
+			),
+			subTop,
+			subRow1,
+			subRow2,
+			subRow3,
+			subBottom,
+		}
+		buf.WriteString(tds.Panel("2. DECLARATIVE RULE EXPRESSION & REAL-TIME AUTOCOMPLETE", dslLines, termWidth, tds.BorderLight))
+
+		syntaxLines := []string{
+			fmt.Sprintf("%s %s │ %s %s │ %s %s",
+				greenBold("✓"), greenBold("ISO/IEC 14977 SYNTAX: OK"),
+				cyanBold("TYPE SIGNATURE:"), whiteBold("(backlog_item) -> boolean"),
+				greenBold("COMPLEXITY PROOF:"), dimStyle("O(1) bounded execution"),
+			),
+		}
+		buf.WriteString(tds.Panel("3. SYNTAX VALIDATION & COMPILE-TIME TYPE RECEIPT", syntaxLines, termWidth, tds.BorderLight))
+
+		actionLines := []string{
+			fmt.Sprintf("%s │ %s │ %s │ %s │ %s",
+				cyanBold("[Enter] Accept Suggestion"),
+				dimStyle("[Tab] Next Match"),
+				greenBold("[t] Trigger Dry-Run"),
+				yellowBold("[s] Proceed to Save"),
+				dimStyle("[Esc] Cancel"),
+			),
+		}
+		buf.WriteString(tds.Panel("KEYBOARD SHORTCUTS", actionLines, termWidth, tds.BorderLight))
+
+		createTitle := paths.RewriteCanonicalCLIInvocations("zqk object inspect --policy-studio") + " — Interactive Policy Rule Creation & Autocomplete"
+		if err := RenderScreenToSVG(filepath.Join(outDir, "ui_policy_studio_create.svg"), createTitle, buf.String(), termWidth); err != nil {
+			fmt.Printf("Error rendering Policy Studio Create: %v\n", err)
+		} else {
+			fmt.Println("✅ Generated ui_policy_studio_create.svg")
+		}
+	}
+
+	// 9d. Policy Rule Studio: Step 2 (Live Dry-Run Evaluation Matrix)
 	{
 		var buf strings.Builder
 		cyanBold := color.New(color.FgCyan, color.Bold).SprintFunc()
@@ -1442,6 +1517,80 @@ func main() {
 			fmt.Printf("Error rendering Policy Studio: %v\n", err)
 		} else {
 			fmt.Println("✅ Generated ui_policy_studio.svg")
+		}
+	}
+
+	// 9e. Policy Rule Studio: Step 3 (Atomic CAS Promotion Receipt)
+	{
+		var buf strings.Builder
+		cyanBold := color.New(color.FgCyan, color.Bold).SprintFunc()
+		greenBold := color.New(color.FgGreen, color.Bold).SprintFunc()
+		yellowBold := color.New(color.FgYellow, color.Bold).SprintFunc()
+		redBold := color.New(color.FgRed, color.Bold).SprintFunc()
+		dimStyle := color.New(color.Faint).SprintFunc()
+		whiteBold := color.New(color.FgWhite, color.Bold).SprintFunc()
+
+		bannerText := "ZQK POLICY RULE STUDIO — STEP 3: ATOMIC CAS COMMIT & GATE PROMOTION"
+		buf.WriteString(cyanBold("╔" + strings.Repeat("═", termWidth-2) + "╗") + "\n")
+		buf.WriteString(cyanBold("║") + tds.PadCenter(whiteBold(bannerText), termWidth-2) + cyanBold("║") + "\n")
+		buf.WriteString(cyanBold("╚" + strings.Repeat("═", termWidth-2) + "╝") + "\n")
+
+		specLines := []string{
+			fmt.Sprintf("%s %s   │   %s %s   │   %s %s",
+				cyanBold("POLICY ID:"), whiteBold("POL-MUTATION-002"),
+				cyanBold("TARGET KIND:"), greenBold("[backlog_item]"),
+				cyanBold("SEVERITY:"), redBold("ERROR (Reject Non-Compliant Mutations)"),
+			),
+			fmt.Sprintf("%s %s",
+				dimStyle("TARGET FILE:"), whiteBold(paths.ProcessPoliciesDir+"/POL-MUTATION-002.yaml (Declarative Policy Schema v1)"),
+			),
+			fmt.Sprintf("%s %s",
+				cyanBold("EXPRESSION:"), whiteBold(`status == "in_progress" ==> claimed_by != "" && criteria_linked_or_acceptance_present == true`),
+			),
+		}
+		buf.WriteString(tds.Panel("1. POLICY COMMIT SPECIFICATION", specLines, termWidth, tds.BorderLight))
+
+		auditLines := []string{
+			fmt.Sprintf("%s %s │ %s %s",
+				greenBold("✓"), greenBold("194 / 196 entities COMPLIANT (99.0% safe)"),
+				yellowBold("⚠️"), yellowBold("2 entities FLAGGED (Grandfathered until next mutation)"),
+			),
+			fmt.Sprintf("%s %s",
+				cyanBold("ENFORCEMENT MODE:"), dimStyle("[CHECK_VALVE_ON_TRANSITION] — Zero retroactive disruption to planned work"),
+			),
+		}
+		buf.WriteString(tds.Panel("2. PRE-COMMIT POPULATION DRY-RUN AUDIT (196 Active Entities Evaluated)", auditLines, termWidth, tds.BorderLight))
+
+		receiptLines := []string{
+			fmt.Sprintf("%s %s %s",
+				cyanBold("CAS HASH:"), whiteBold("sha256:7f4a2b9e810459c03842d0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1"), greenBold("(Plane: authoritative)"),
+			),
+			fmt.Sprintf("%s %s %s",
+				cyanBold("GATE BINDING:"), greenBold("✓"), dimStyle("Registered with pre-commit hook, ZQL mutation membrane, and `zqk do` check-valves"),
+			),
+			fmt.Sprintf("%s %s │ %s %s │ %s %s",
+				dimStyle("ETAG:"), whiteBold(`"rev-001-c8104"`),
+				dimStyle("PERMISSIONS:"), dimStyle("0644"),
+				dimStyle("AUDIT LOG:"), dimStyle(paths.ProcessDir+"/audit_event/AUD-POL-002-INIT.yaml"),
+			),
+		}
+		buf.WriteString(tds.Panel("3. ATOMIC CAS STORAGE PROMOTION RECEIPT", receiptLines, termWidth, tds.BorderLight))
+
+		navLines := []string{
+			fmt.Sprintf("%s │ %s │ %s │ %s",
+				cyanBold("[Enter] View in Object Inspector"),
+				dimStyle("[e] Re-Edit Expression"),
+				greenBold("[l] List All Policies"),
+				dimStyle("[Esc] Return to Console"),
+			),
+		}
+		buf.WriteString(tds.Panel("POST-COMMIT NAVIGATION", navLines, termWidth, tds.BorderLight))
+
+		saveTitle := paths.RewriteCanonicalCLIInvocations("zqk object inspect --policy-studio") + " — Step 3: Save & Atomic CAS Promotion Receipt"
+		if err := RenderScreenToSVG(filepath.Join(outDir, "ui_policy_studio_save.svg"), saveTitle, buf.String(), termWidth); err != nil {
+			fmt.Printf("Error rendering Policy Studio Save: %v\n", err)
+		} else {
+			fmt.Println("✅ Generated ui_policy_studio_save.svg")
 		}
 	}
 
