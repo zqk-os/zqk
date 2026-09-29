@@ -36,7 +36,7 @@ func TestMetabolismEngine_IngestAndSynthesize(t *testing.T) {
 	}
 
 	// Seal pack
-	if _, err := pack.SealPack(tmpDir, priv, "architect@zqk-os.com"); err != nil {
+	if _, err := pack.SealPack(tmpDir, priv, "architect@zqkos.com"); err != nil {
 		t.Fatalf("SealPack failed: %v", err)
 	}
 
@@ -175,7 +175,7 @@ tasks:
 		if err := fileutil.WriteFile(filepath.Join(tmpDir, "swarm.yaml"), []byte(manifestContent), paths.FilePerm644); err != nil {
 			t.Fatalf("write failed: %v", err)
 		}
-		if _, err := pack.SealPack(tmpDir, priv, "signer@zqk-os.com"); err != nil {
+		if _, err := pack.SealPack(tmpDir, priv, "signer@zqkos.com"); err != nil {
 			t.Fatalf("seal failed: %v", err)
 		}
 
@@ -226,7 +226,7 @@ tasks:
 		if err := fileutil.WriteFile(filepath.Join(tmpDir, "swarm.yaml"), []byte(manifestContent), paths.FilePerm644); err != nil {
 			t.Fatalf("write failed: %v", err)
 		}
-		if _, err := pack.SealPack(tmpDir, priv, "signer@zqk-os.com"); err != nil {
+		if _, err := pack.SealPack(tmpDir, priv, "signer@zqkos.com"); err != nil {
 			t.Fatalf("seal failed: %v", err)
 		}
 
@@ -317,7 +317,7 @@ tasks:
 		t.Fatalf("failed to write rewrite template: %v", err)
 	}
 
-	if _, err := pack.SealPack(tmpDir, priv, "author@zqk-os.com"); err != nil {
+	if _, err := pack.SealPack(tmpDir, priv, "author@zqkos.com"); err != nil {
 		t.Fatalf("SealPack failed: %v", err)
 	}
 

@@ -20,7 +20,7 @@ parameters:
         description: Directory path for catabolic exhaust (findings, scorecards, traces)
 integrity:
     algorithm: ed25519
-    signer_id: cef-curator@zqk-os.com
+    signer_id: cef-curator@zqkos.com
     content_digest: sha256:a50a65362b200b56e78cd9d8304d67ab4584875437ddb0008fcec064cdaf1ca3
     signature: 718bc457abdb72651cbb1bb8832aaac88a2f49bde795cb0480507dd36a47d042fc67d3600a86ad8a2c0f40965dfba3308e978399237843a1eeb3c9f9a7c78b0f
 team_configuration_ref: TCFG-CEF-DIAMOND-EVALUATION

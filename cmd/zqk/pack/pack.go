@@ -219,7 +219,7 @@ func newSealCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&signerID, "signer-id", "architect@zqk-os.com", "Signer identity or email")
+	cmd.Flags().StringVar(&signerID, "signer-id", "architect@zqkos.com", "Signer identity or email")
 	cmd.Flags().StringVar(&keyPath, "key", "", "Path to Ed25519 private key (optional)")
 	cmd.Flags().StringVar(&pubOut, "pubkey-out", "", "Path to write public key hex (optional)")
 
