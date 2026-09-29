@@ -162,3 +162,64 @@ func TestRunner(t *testing.T) {
 		t.Errorf("expected output to contain RESULT: PASS, got:\n%s", buf.String())
 	}
 }
+
+func TestCheckTreePolice_DocHygiene(t *testing.T) {
+	tempDir := t.TempDir()
+	cfg := &GatesConfig{}
+
+	// 1. Stub file < 50 bytes
+	stubDir := filepath.Join(tempDir, "docs", "guide")
+	_ = os.MkdirAll(stubDir, 0755)
+	_ = os.WriteFile(filepath.Join(stubDir, "stub.md"), []byte("short"), 0644)
+
+	// 2. Forbidden placeholder string (test content)
+	pkgDir := filepath.Join(tempDir, "pkg", "sample")
+	_ = os.MkdirAll(pkgDir, 0755)
+	_ = os.WriteFile(filepath.Join(pkgDir, "README.md"), []byte("# Sample Package\n\nThis is test content that must fail."), 0644)
+
+	// 3. Unstructured docs dir inside pkg/
+	pkgDocsDir := filepath.Join(tempDir, "pkg", "sample", "docs")
+	_ = os.MkdirAll(pkgDocsDir, 0755)
+	_ = os.WriteFile(filepath.Join(pkgDocsDir, "readme.md"), []byte("test content"), 0644)
+
+	// 4. Unexpanded template marker
+	intDir := filepath.Join(tempDir, "internal", "foo")
+	_ = os.MkdirAll(intDir, 0755)
+	_ = os.WriteFile(filepath.Join(intDir, "README.md"), []byte("# Foo Internal\n\nTODO_OVERWRITE with real content.\nThis line adds bytes."), 0644)
+
+	findings, err := CheckTreePolice(tempDir, cfg)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	foundStub := false
+	foundRubbish := false
+	foundPkgDocs := false
+	foundTemplate := false
+
+	for _, f := range findings {
+		switch f.CheckID {
+		case "tree/doc-stub":
+			foundStub = true
+		case "tree/doc-placeholder-rubbish":
+			foundRubbish = true
+		case "tree/forbidden-pkg-docs-dir":
+			foundPkgDocs = true
+		case "tree/doc-unexpanded-template":
+			foundTemplate = true
+		}
+	}
+
+	if !foundStub {
+		t.Errorf("expected tree/doc-stub finding")
+	}
+	if !foundRubbish {
+		t.Errorf("expected tree/doc-placeholder-rubbish finding")
+	}
+	if !foundPkgDocs {
+		t.Errorf("expected tree/forbidden-pkg-docs-dir finding")
+	}
+	if !foundTemplate {
+		t.Errorf("expected tree/doc-unexpanded-template finding")
+	}
+}
