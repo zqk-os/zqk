@@ -42,6 +42,8 @@ def get_html_relpath(rel_md_path: str) -> str:
     path = rel_md_path.replace("\\", "/")
     if path.startswith(".zqk/skills/"):
         path = path[len(".zqk/"):]
+    elif path.startswith(".zqk/specs/"):
+        path = "kernel-specs/" + path[len(".zqk/specs/"):]
     elif path.startswith(".agents/"):
         path = "agents/" + path[len(".agents/"):]
     elif path.startswith("./"):
@@ -59,6 +61,10 @@ def get_category_info(rel_path: str) -> tuple[str, str]:
         return "Agent Skills & Protocols", "skills"
     if path == ".agents/AGENTS.md" or path == "agents/AGENTS.md":
         return "Agent Directives", "agent-directives"
+    if path.startswith("pkg/") or path.startswith("internal/") or path.startswith("cmd/"):
+        return "Kernel Subsystems & Go Packages", "subsystems"
+    if path.startswith(".zqk/specs/") or (path.startswith("specs/") and any(k in path for k in ("objects", "traits", "lifecycles", "configs"))):
+        return "Kernel DNA & Object Schemas", "schemas"
 
     parts = path.split("/")
     if parts[0] != "docs":
@@ -66,6 +72,8 @@ def get_category_info(rel_path: str) -> tuple[str, str]:
             return "Architecture & Foundation", "architecture"
         if rel_path == "ZQK_GETTING_STARTED.md":
             return "Getting Started", "getting-started"
+        if rel_path == "ANTIGRAVITY.md":
+            return "Maintenance & Development", "development"
         return "Open Core Governance", "governance"
 
     if len(parts) == 2:
@@ -118,7 +126,7 @@ def get_clean_nav_title(title: str) -> str:
             break
     return cleaned
 
-def render_markdown_to_html(content: str, current_html_rel: str, link_map: dict) -> str:
+def render_markdown_to_html(content: str, current_html_rel: str, link_map: dict, repo_root: str = "") -> str:
     current_dir = os.path.dirname(current_html_rel)
 
     # Rewrite markdown links to generated html paths
@@ -152,8 +160,6 @@ def render_markdown_to_html(content: str, current_html_rel: str, link_map: dict)
             target_html_rel = link_map[target_norm]
         elif target_base in link_map:
             target_html_rel = link_map[target_base]
-        elif target.endswith(".md"):
-            target_html_rel = get_html_relpath(target)
 
         if target_html_rel:
             if current_dir:
@@ -161,6 +167,17 @@ def render_markdown_to_html(content: str, current_html_rel: str, link_map: dict)
             else:
                 rel_url = target_html_rel
             return f"{prefix}({rel_url}{anchor})"
+
+        # Check if target is a source code or config file in the repository (e.g. .go, .yaml, .json, .sh, .md)
+        clean_res = resolved_repo_rel.replace("\\", "/")
+        if not clean_res.startswith(".."):
+            if repo_root and os.path.exists(os.path.join(repo_root, clean_res)):
+                gh_url = f"https://github.com/zqk-os/zqk/blob/main/{clean_res}{anchor}"
+                return f"{prefix}({gh_url})"
+            code_exts = (".go", ".yaml", ".yml", ".json", ".sh", ".proto", ".sql", ".toml", ".mod", ".sum", ".md")
+            if target.endswith(code_exts) or any(target.endswith(ext + anchor) for ext in code_exts):
+                gh_url = f"https://github.com/zqk-os/zqk/blob/main/{clean_res}{anchor}"
+                return f"{prefix}({gh_url})"
 
         return match.group(0)
 
@@ -255,7 +272,7 @@ def build_portal(repo_root: str, target_dir: str):
             continue
         doc_files.append(df)
 
-    for root_doc in ["README.md", "CONTRIBUTING.md", "SECURITY.md", "GOVERNANCE.md", "CODE_OF_CONDUCT.md", "PACK-COMPOSITION.md", "ZQK_GETTING_STARTED.md"]:
+    for root_doc in ["README.md", "CONTRIBUTING.md", "SECURITY.md", "GOVERNANCE.md", "CODE_OF_CONDUCT.md", "PACK-COMPOSITION.md", "ZQK_GETTING_STARTED.md", "ANTIGRAVITY.md"]:
         p = os.path.join(repo_root, root_doc)
         if os.path.isfile(p):
             doc_files.append(p)
@@ -267,6 +284,25 @@ def build_portal(repo_root: str, target_dir: str):
     raw_skill_files = sorted(glob.glob(os.path.join(repo_root, ".zqk", "skills", "**", "*.md"), recursive=True))
     for sf in raw_skill_files:
         doc_files.append(sf)
+
+    # Subsystem and Go package documentation (pkg/, internal/, cmd/)
+    for sub_dir in ["pkg", "internal", "cmd"]:
+        sub_path = os.path.join(repo_root, sub_dir)
+        if not os.path.isdir(sub_path):
+            continue
+        for root, dirs, files in os.walk(sub_path):
+            dirs[:] = [d for d in dirs if d not in exclude_parts and not d.startswith(".")]
+            for f in files:
+                if f.endswith(".md") and not f.startswith("REFACTORING_PLAN_"):
+                    doc_files.append(os.path.join(root, f))
+
+    # Kernel DNA specs (.zqk/specs/)
+    spec_mds = sorted(glob.glob(os.path.join(repo_root, ".zqk", "specs", "**", "*.md"), recursive=True))
+    for sm in spec_mds:
+        doc_files.append(sm)
+
+    # Deduplicate while preserving order
+    doc_files = sorted(list(dict.fromkeys(doc_files)))
 
     # Collect and mirror all static/non-markdown files in docs/ (YAML, JSON, images, etc.)
     for root, dirs, files in os.walk(os.path.join(repo_root, "docs")):
@@ -384,9 +420,12 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
         ("Getting Started", "getting-started"),
         ("Architecture & Foundation", "architecture"),
         ("Specifications & Grammars", "specs"),
+        ("Kernel Subsystems & Go Packages", "subsystems"),
+        ("Kernel DNA & Object Schemas", "schemas"),
         ("Reference Manuals", "manual"),
         ("How-To & Incident Runbooks", "operations"),
         ("Tutorials, Demos & Guides", "tutorials"),
+        ("Agent Skills & Protocols", "skills"),
         ("Maintenance & Development", "development"),
         ("Quality & Evaluation", "quality"),
         ("Codebase Evaluation Framework", "codebase-eval"),
@@ -427,7 +466,7 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
             contains_active = any(it["html_rel"] == current_html_rel for it in items)
             # Default open for core categories, or if this category contains the active page
             # Keep CEF closed by default unless active page is inside it
-            is_open = contains_active or (cat_key in ("getting-started", "architecture", "specs", "manual", "operations", "skills", "tutorials") and current_html_rel == "index.html")
+            is_open = contains_active or (cat_key in ("getting-started", "architecture", "specs", "manual", "operations", "skills", "tutorials", "subsystems", "schemas") and current_html_rel == "index.html")
             open_attr = ' open' if is_open else ''
 
             nav_html.append(f'<details class="sidebar-group"{open_attr}>')
@@ -450,7 +489,7 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
         cat_name = item["category"]
         category_counts[cat_name] = category_counts.get(cat_name, 0) + 1
         
-        rendered_body = render_markdown_to_html(item["content"], item["html_rel"], link_map)
+        rendered_body = render_markdown_to_html(item["content"], item["html_rel"], link_map, repo_root)
         escaped_title = html.escape(item["title"])
         
         depth = item["html_rel"].count("/")
@@ -732,6 +771,18 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
             <li><a href="docs/development/POLICY_GOVERNANCE_AND_DURABILITY.html">Policy Governance & Durability</a></li>
             <li><a href="docs/howto/SCHEDULER_AND_MAINTENANCE.html">Scheduler & Maintenance Jobs</a></li>
             <li><a href="docs/explanation/README.html">System Architecture Philosophy</a></li>
+          </ul>
+        </div>
+        <div class="quad-box">
+          <h3>📦 Kernel Subsystems & Packages</h3>
+          <p>Architectural design, interface contracts, and storage implementations across the Go microkernel.</p>
+          <ul>
+            <li><a href="pkg/storage/README.html">Storage Subsystem & Providers</a></li>
+            <li><a href="pkg/graph/README.html">Graph Backend & MemGraph Provider</a></li>
+            <li><a href="pkg/mcp/README.html">Model Context Protocol (MCP) Server</a></li>
+            <li><a href="pkg/concurrency/README.html">Concurrency & Synchronization</a></li>
+            <li><a href="pkg/pipeline/README.html">Pipeline & Step Execution</a></li>
+            <li><a href="internal/bootstrap/README.html">Bootstrap Archive & Seeding</a></li>
           </ul>
         </div>
         <div class="quad-box">
@@ -1413,6 +1464,88 @@ document.addEventListener('click', function(e) {{
 """
     with open(os.path.join(search_dir, "search-index.js"), "w", encoding="utf-8") as f:
         f.write(search_js)
+
+    # Generate clean root-level aliases and redirect stubs for all docs/* pages
+    # So that URLs like https://docs.zqk.dev/onboarding/COMMUNITY_FIRST_RUN or /specs/... work seamlessly
+    for item in doc_entries:
+        html_rel = item["html_rel"]
+        if html_rel.startswith("docs/"):
+            clean_alias_rel = html_rel[len("docs/"):]
+            alias_path = os.path.join(target_dir, clean_alias_rel)
+            if not os.path.exists(alias_path):
+                os.makedirs(os.path.dirname(alias_path), exist_ok=True)
+                alias_dir = os.path.dirname(clean_alias_rel)
+                rel_to_canonical = os.path.relpath(html_rel, alias_dir) if alias_dir else html_rel
+                redirect_html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="refresh" content="0; url={rel_to_canonical}">
+  <link rel="canonical" href="https://docs.zqk.dev/{html_rel[:-5] if html_rel.endswith('.html') else html_rel}">
+  <script>window.location.replace('{rel_to_canonical}' + window.location.hash);</script>
+  <title>Redirecting to {html.escape(item['title'])} — ZQK Docs</title>
+</head>
+<body style="background:#05070a;color:#c9d1d9;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;">
+  <p>Redirecting to <a href="{rel_to_canonical}" style="color:#00e5ff;">canonical documentation</a>...</p>
+</body>
+</html>
+"""
+                with open(alias_path, "w", encoding="utf-8") as f:
+                    f.write(redirect_html)
+
+    # Write custom 404.html for GitHub Pages with smart path resolution and branded fallback
+    custom_404_html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page Not Found — ZQK Documentation</title>
+  <link rel="stylesheet" href="/assets/style.css">
+  <link rel="icon" type="image/svg+xml" href="/assets/zqk-logo.svg">
+  <script>
+    // Automatic intelligent client-side redirect for links missing /docs/ or missing .html
+    (function() {{
+      var path = window.location.pathname;
+      if (!path.startsWith('/docs/') && path !== '/' && !path.startsWith('/assets/') && !path.startsWith('/search/')) {{
+        var cleanPath = path;
+        if (!cleanPath.endsWith('.html') && !cleanPath.endsWith('/')) {{
+          cleanPath += '.html';
+        }}
+        var candidate = '/docs' + (cleanPath.startsWith('/') ? cleanPath : '/' + cleanPath);
+        window.location.replace(candidate + window.location.search + window.location.hash);
+      }}
+    }})();
+  </script>
+</head>
+<body class="docs-page">
+  <header class="header">
+    <div class="nav-container">
+      <div class="brand">
+        <a href="/" class="logo">
+          {ZQK_HEADER_LOGO_SVG}
+          <span class="logo-text">ZQK <span class="logo-accent">Core</span> <span style="font-size: 0.82rem; color: #8b949e; font-weight: normal; margin-left: 6px;">Community Docs</span></span>
+        </a>
+      </div>
+      <div class="search-box">
+        <input type="text" id="search-input" placeholder="Search documentation... (Press '/' to focus)" oninput="runSearch()">
+        <div id="search-results"></div>
+      </div>
+    </div>
+  </header>
+  <main class="content-container" style="justify-content:center; text-align:center; padding: 4rem 1rem;">
+    <div style="max-width: 600px; margin: 0 auto;">
+      <h1 style="font-size: 3.5rem; color: #00e5ff; margin-bottom: 1rem;">404</h1>
+      <h2 style="color: #fff; margin-bottom: 1rem;">Documentation Page Not Found</h2>
+      <p style="color: #8b949e; line-height: 1.6; margin-bottom: 2rem;">The requested page could not be located. You can search our documentation above or return to the portal homepage.</p>
+      <a href="/" style="display:inline-block; padding: 10px 20px; background: #00e5ff; color: #05070a; font-weight: 600; border-radius: 6px; text-decoration: none;">&larr; Return to Documentation Portal</a>
+    </div>
+  </main>
+  <script src="/search/search-index.js"></script>
+</body>
+</html>
+"""
+    with open(os.path.join(target_dir, "404.html"), "w", encoding="utf-8") as f:
+        f.write(custom_404_html)
 
     print(f"✅ ZQK Core docs portal successfully generated ({len(pages)} articles).")
 
