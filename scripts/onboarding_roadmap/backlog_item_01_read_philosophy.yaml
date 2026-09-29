@@ -6,7 +6,7 @@ description: |
   Get and read the policy "Operational Philosophy - Object-First, Discoverable, Auditable"
   so you understand that everything substantive starts from a system object.
 priority_plan_ref: PRIO-onboarding
-workstream_refs: []   # Replace with [<WS-ID>] after creating workstream; or update via zqk object update <BLI-ID> --field "workstream_refs=[WS-XXX]"
+workstream_refs: []   # Replace with [<WS-ID>] after creating workstream; or link via: zqk object ref add <BLI-ID> <WS-ID>
 priority_tier: P0
 status: planned
 category: Developer Experience

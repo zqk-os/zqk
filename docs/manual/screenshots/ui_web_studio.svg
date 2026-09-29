@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 666" width="960" height="666">
+  <defs>
+    <style>
+      .window-bg { fill: #1e1e2e; rx: 12px; }
+      .top-bar { fill: #181825; }
+      .dot-red { fill: #f38ba8; }
+      .dot-yellow { fill: #f9e2af; }
+      .dot-green { fill: #a6e3a1; }
+      .term-text { font-family: "JetBrains Mono", "Fira Code", "Menlo", "Monaco", "Consolas", monospace;
+                   font-size: 13px; fill: #cdd6f4; white-space: pre; }
+      .title-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                    font-size: 12px; fill: #a6adc8; font-weight: 500; text-anchor: middle; }
+    </style>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <rect x="4" y="4" width="952" height="658" class="window-bg" filter="url(#shadow)" stroke="#313244" stroke-width="1"/>
+  <path d="M 4 16 A 12 12 0 0 1 16 4 L 944 4 A 12 12 0 0 1 956 16 L 956 42 L 4 42 Z" class="top-bar"/>
+  <line x1="4" y1="42" x2="956" y2="42" stroke="#313244" stroke-width="1"/>
+  <circle cx="24" cy="23" r="6" class="dot-red"/>
+  <circle cx="44" cy="23" r="6" class="dot-yellow"/>
+  <circle cx="64" cy="23" r="6" class="dot-green"/>
+  <text x="480.0" y="27" class="title-text">zqk ui -w — Visual Web Studio: Timeline, Gantt &amp; DAG Visualizer</text>
+  <g transform="translate(24, 58)">
+    <text class="term-text">
+      <tspan x="0" y="16"><tspan fill="#94e2d5">┌────────────────────────────────────────────────────────────────────────────────────────────────────────┐</tspan></tspan>
+      <tspan x="0" y="36"><tspan fill="#94e2d5">│ </tspan><tspan fill="#ffffff" font-weight="bold">⚡ ZQK STUDIO  │  Timeline &amp; Gantt  │  Ontology DAG Visualizer  │  System Health  │  Port: 8080        </tspan><tspan fill="#94e2d5">│</tspan></tspan>
+      <tspan x="0" y="56"><tspan fill="#94e2d5">├────────────────────────────────────────────────────────────────────────────────────────────────────────┤</tspan></tspan>
+      <tspan x="0" y="76"><tspan fill="#94e2d5">│                                                                                                        │</tspan></tspan>
+      <tspan x="0" y="96"><tspan fill="#94e2d5">│  </tspan><tspan fill="#94e2d5" font-weight="bold">TIMELINE &amp; GANTT ROADMAP</tspan><tspan fill="#94e2d5">                                                                              │</tspan></tspan>
+      <tspan x="0" y="116"><tspan fill="#94e2d5">│                                                                                                        │</tspan></tspan>
+      <tspan x="0" y="136"><tspan fill="#6c7086">│  Sep 25                   Sep 28                   Today (Sep 29)           Oct 02             Oct 05  │</tspan></tspan>
+      <tspan x="0" y="156"><tspan fill="#585b70">│  ────────┼────────────────────────┼───────────────────────▼────────────────────────┼────────────────── │</tspan></tspan>
+      <tspan x="0" y="176"><tspan fill="#94e2d5">│                                                           │                                            │</tspan></tspan>
+      <tspan x="0" y="196"><tspan fill="#94e2d5">│  </tspan><tspan fill="#ffffff" font-weight="bold">WS-LAUNCH (Launch Readiness)                             </tspan><tspan fill="#94e2d5">│                                            │</tspan></tspan>
+      <tspan x="0" y="216"><tspan fill="#94e2d5">│  ├─ </tspan><tspan fill="#94e2d5" font-weight="bold">[◆ MIL-COMMUNITY-LAUNCH]                              </tspan><tspan fill="#94e2d5">│                                            │</tspan></tspan>
+      <tspan x="0" y="236"><tspan fill="#94e2d5">│  │  └─ </tspan><tspan fill="#f9e2af" font-weight="bold">[■ PRI-STARTER-COMMUNITY-001]                      </tspan><tspan fill="#94e2d5">│                                            │</tspan></tspan>
+      <tspan x="0" y="256"><tspan fill="#94e2d5">│  │     └─ </tspan><tspan fill="#cdd6f4">[■ BLI-001] Community launch testing            </tspan><tspan fill="#a6e3a1" font-weight="bold">│  (Active Shovel-Ready)                     </tspan><tspan fill="#94e2d5">│</tspan></tspan>
+      <tspan x="0" y="276"><tspan fill="#94e2d5">│  │                                                        │                                            │</tspan></tspan>
+      <tspan x="0" y="296"><tspan fill="#94e2d5">│  </tspan><tspan fill="#ffffff" font-weight="bold">WS-KERNEL (Core Subsystems)                              </tspan><tspan fill="#94e2d5">│                                            │</tspan></tspan>
+      <tspan x="0" y="316"><tspan fill="#94e2d5">│  ├─ </tspan><tspan fill="#94e2d5" font-weight="bold">[◆ MIL-PUREGO-STORAGE]                                </tspan><tspan fill="#94e2d5">│                                            │</tspan></tspan>
+      <tspan x="0" y="336"><tspan fill="#94e2d5">│  │  └─ </tspan><tspan fill="#f9e2af">[■ PRI-STORAGE-PUREGO-001] </tspan><tspan fill="#a6e3a1">════════════════════════╡ (Complete)                                 </tspan><tspan fill="#94e2d5">│</tspan></tspan>
+      <tspan x="0" y="356"><tspan fill="#94e2d5">│                                                           │                                            │</tspan></tspan>
+      <tspan x="0" y="376"><tspan fill="#6c7086">│  STATUS LEGEND:  </tspan><tspan fill="#89b4fa">■ Planned   </tspan><tspan fill="#f9e2af">■ In Progress   </tspan><tspan fill="#f38ba8">■ Blocked   </tspan><tspan fill="#a6e3a1">■ Complete   </tspan><tspan fill="#94e2d5">◆ Milestone Marker               </tspan><tspan fill="#94e2d5">│</tspan></tspan>
+      <tspan x="0" y="396"><tspan fill="#94e2d5">│                                                                                                        │</tspan></tspan>
+      <tspan x="0" y="416"><tspan fill="#94e2d5">├────────────────────────────────────────────────────────────────────────────────────────────────────────┤</tspan></tspan>
+      <tspan x="0" y="436"><tspan fill="#94e2d5">│                                                                                                        │</tspan></tspan>
+      <tspan x="0" y="456"><tspan fill="#94e2d5">│  </tspan><tspan fill="#94e2d5" font-weight="bold">ONTOLOGY DAG DEPENDENCY GRAPH</tspan><tspan fill="#94e2d5">                                                                         │</tspan></tspan>
+      <tspan x="0" y="476"><tspan fill="#94e2d5">│                                                                                                        │</tspan></tspan>
+      <tspan x="0" y="496"><tspan fill="#94e2d5">│  </tspan><tspan fill="#a6e3a1" font-weight="bold">[GOAL-STARTER] </tspan><tspan fill="#585b70">──► </tspan><tspan fill="#89b4fa" font-weight="bold">[REQ-LAUNCH-DOCS] </tspan><tspan fill="#585b70">──► </tspan><tspan fill="#f9e2af" font-weight="bold">[BLI-001] </tspan><tspan fill="#585b70">──► </tspan><tspan fill="#cba6f7" font-weight="bold">[TST-COMMUNITY-001] </tspan><tspan fill="#585b70">──► </tspan><tspan fill="#94e2d5" font-weight="bold">[CRIT-DOCS-VERIFIED]   </tspan><tspan fill="#94e2d5">│</tspan></tspan>
+      <tspan x="0" y="516"><tspan fill="#94e2d5">│         │                                                                                              │</tspan></tspan>
+      <tspan x="0" y="536"><tspan fill="#585b70">│         └─────────► </tspan><tspan fill="#89b4fa" font-weight="bold">[REQ-AIRGAP-BUILD] </tspan><tspan fill="#585b70">──► </tspan><tspan fill="#f9e2af" font-weight="bold">[BLI-002] </tspan><tspan fill="#585b70">──► </tspan><tspan fill="#cba6f7" font-weight="bold">[TST-AIRGAP-REPRO]  </tspan><tspan fill="#585b70">──► </tspan><tspan fill="#94e2d5" font-weight="bold">[CRIT-REPRO-TARBALL]  </tspan><tspan fill="#94e2d5">│</tspan></tspan>
+      <tspan x="0" y="556"><tspan fill="#94e2d5">│                                                                                                        │</tspan></tspan>
+      <tspan x="0" y="576"><tspan fill="#94e2d5">└────────────────────────────────────────────────────────────────────────────────────────────────────────┘</tspan></tspan>
+    </text>
+  </g>
+</svg>

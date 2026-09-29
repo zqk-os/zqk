@@ -71,6 +71,9 @@ KIND: [backlog_item]  │  FILTER: [ALL] [ACTIVE] [DRAFT] [BLOCKED] [COMPLETE]  
 Pressing `[Enter]` on any row opens the deep inspection modal, decomposing raw YAML into standardized visual modules:
 
 ### Visual Terminal Screenshot: Deep Inspection Modal
+
+![Object Inspector Console](./screenshots/ui_object_inspector.svg)
+
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ 🔎 OBJECT INSPECTION MODAL — [BLI-STORAGE-PUREGO-001]                                                  │

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 506" width="960" height="506">
+  <defs>
+    <style>
+      .window-bg { fill: #1e1e2e; rx: 12px; }
+      .top-bar { fill: #181825; }
+      .dot-red { fill: #f38ba8; }
+      .dot-yellow { fill: #f9e2af; }
+      .dot-green { fill: #a6e3a1; }
+      .term-text { font-family: "JetBrains Mono", "Fira Code", "Menlo", "Monaco", "Consolas", monospace;
+                   font-size: 13px; fill: #cdd6f4; white-space: pre; }
+      .title-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                    font-size: 12px; fill: #a6adc8; font-weight: 500; text-anchor: middle; }
+    </style>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <rect x="4" y="4" width="952" height="498" class="window-bg" filter="url(#shadow)" stroke="#313244" stroke-width="1"/>
+  <path d="M 4 16 A 12 12 0 0 1 16 4 L 944 4 A 12 12 0 0 1 956 16 L 956 42 L 4 42 Z" class="top-bar"/>
+  <line x1="4" y1="42" x2="956" y2="42" stroke="#313244" stroke-width="1"/>
+  <circle cx="24" cy="23" r="6" class="dot-red"/>
+  <circle cx="44" cy="23" r="6" class="dot-yellow"/>
+  <circle cx="64" cy="23" r="6" class="dot-green"/>
+  <text x="480.0" y="27" class="title-text">zqk ui — Tab 1: State Seismograph &amp; Mutation WAL</text>
+  <g transform="translate(24, 58)">
+    <text class="term-text">
+      <tspan x="0" y="16"><tspan fill="#94e2d5" font-weight="bold">╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════╗</tspan></tspan>
+      <tspan x="0" y="36"><tspan fill="#94e2d5" font-weight="bold">║</tspan><tspan fill="#ffffff" font-weight="bold">                             ⚡ ZQK KNOWLEDGE KERNEL — MISSION CONTROL CONSOLE                                 </tspan><tspan fill="#94e2d5" font-weight="bold">║</tspan></tspan>
+      <tspan x="0" y="56"><tspan fill="#94e2d5" font-weight="bold">╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════╝</tspan></tspan>
+      <tspan x="0" y="76"><tspan fill="#a6e3a1" font-weight="bold">[1: ⚡ State]</tspan> │ <tspan fill="#6c7086"> 2: 📜 Audit </tspan> │ <tspan fill="#6c7086"> 3: 🤖 Swarm </tspan> │ <tspan fill="#6c7086"> 4: 📋 PM </tspan> │ <tspan fill="#6c7086"> 5: 📊 Metrics </tspan> │ <tspan fill="#6c7086"> 6: ⏱️ Sched </tspan> │ <tspan fill="#6c7086"> 7: 🧪 QA </tspan> │ <tspan fill="#6c7086"> 8: 🛡️ Health </tspan></tspan>
+      <tspan x="0" y="96"><tspan fill="#585b70">─────────────────────────────────────────────────────────────────────────────────────────────────────────────────</tspan></tspan>
+      <tspan x="0" y="116"><tspan fill="#f9e2af" font-weight="bold">🔔 MESSAGE: </tspan><tspan fill="#cdd6f4">WAL change journal tail streaming — 0 corruptions detected</tspan></tspan>
+      <tspan x="0" y="136"><tspan fill="#585b70">─────────────────────────────────────────────────────────────────────────────────────────────────────────────────</tspan></tspan>
+      <tspan x="0" y="156"><tspan fill="#94e2d5">Stream: </tspan><tspan fill="#ffffff" font-weight="bold">change_journal</tspan><tspan fill="#6c7086"> │ Buffer: 48 mutations │ Rate: </tspan><tspan fill="#a6e3a1">▄▆█▇▅▃  </tspan><tspan fill="#f9e2af">│ [AUTO-SCROLL: ON]</tspan></tspan>
+      <tspan x="0" y="176"><tspan fill="#6c7086">Active Plane: </tspan><tspan fill="#a6e3a1" font-weight="bold">PlanePromoted (CAS Master)</tspan><tspan fill="#6c7086"> │ Retention Watermark: 2m0s (fresh)</tspan></tspan>
+      <tspan x="0" y="196"><tspan fill="#585b70">─────────────────────────────────────────────────────────────────────────────────────────────────────────────────</tspan></tspan>
+      <tspan x="0" y="216"><tspan fill="#94e2d5" font-weight="bold">  TIME     │ EVENT              │ OBJECT REF             │ SUMMARY / DIFF</tspan></tspan>
+      <tspan x="0" y="236"><tspan fill="#585b70">─────────────────────────────────────────────────────────────────────────────────────────────────────────────────</tspan></tspan>
+      <tspan x="0" y="256"><tspan fill="#6c7086">&gt; [11:42:01] │ </tspan><tspan fill="#a6e3a1" font-weight="bold">[PROMOTE]</tspan><tspan fill="#cdd6f4">          │ BLI-ECOSYSTEM-001      │ Promoted draft to CAS master (hash: e3b0c442)</tspan></tspan>
+      <tspan x="0" y="276"><tspan fill="#6c7086">  [11:42:08] │ </tspan><tspan fill="#89b4fa" font-weight="bold">[UPDATE]</tspan><tspan fill="#cdd6f4">           │ REQ-DATA-PLANE-004     │ Added requirement_ref CRIT-019</tspan></tspan>
+      <tspan x="0" y="296"><tspan fill="#6c7086">  [11:42:15] │ </tspan><tspan fill="#94e2d5" font-weight="bold">[CREATE]</tspan><tspan fill="#cdd6f4">           │ QUE-199-FIRST-RUN      │ Minted new object on PlaneDraft</tspan></tspan>
+      <tspan x="0" y="316"><tspan fill="#6c7086">  [11:42:22] │ </tspan><tspan fill="#f9e2af" font-weight="bold">[LATCH]</tspan><tspan fill="#cdd6f4">            │ CRIT-STORAGE-PUREGO    │ Latch satisfied: TestPureGoIndex passed</tspan></tspan>
+      <tspan x="0" y="336"><tspan fill="#6c7086">  [11:42:30] │ </tspan><tspan fill="#cba6f7" font-weight="bold">[TRANSITION]</tspan><tspan fill="#cdd6f4">       │ PRI-LAUNCH-READINESS   │ Status planned -&gt; in_progress</tspan></tspan>
+      <tspan x="0" y="356"><tspan fill="#6c7086">  [11:42:45] │ </tspan><tspan fill="#a6e3a1" font-weight="bold">[PROMOTE]</tspan><tspan fill="#cdd6f4">          │ BLI-MEMBRANE-001       │ Promoted to validated (CAS: c32587dd)</tspan></tspan>
+      <tspan x="0" y="376"><tspan fill="#6c7086">  [11:42:58] │ </tspan><tspan fill="#89b4fa" font-weight="bold">[UPDATE]</tspan><tspan fill="#cdd6f4">           │ GOAL-001               │ Updated percent_complete: 95% -&gt; 100%</tspan></tspan>
+      <tspan x="0" y="396"><tspan fill="#585b70">─────────────────────────────────────────────────────────────────────────────────────────────────────────────────</tspan></tspan>
+      <tspan x="0" y="416"><tspan fill="#6c7086">[Enter] Inspect Row │ [Space] Pause/Resume Stream │ [c] Compact WAL │ [g/G] Top/Bottom │ [q] Quit</tspan></tspan>
+    </text>
+  </g>
+</svg>
