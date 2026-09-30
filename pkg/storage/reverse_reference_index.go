@@ -84,8 +84,11 @@ func (r *ReverseReferenceIndex) getCacheFilePath(projectRoot string) string {
 		cacheDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.CacheDir)
 		return filepath.Join(cacheDir, reverseReferenceIndexFile)
 	}
-	if r.cacheDir != emptyValue {
-		return filepath.Join(r.cacheDir, reverseReferenceIndexFile)
+	r.mu.RLock()
+	dir := r.cacheDir
+	r.mu.RUnlock()
+	if dir != emptyValue {
+		return filepath.Join(dir, reverseReferenceIndexFile)
 	}
 	return ""
 }

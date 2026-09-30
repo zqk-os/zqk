@@ -27,14 +27,15 @@ func TestCreateWithRelaxed(t *testing.T) {
 	// Create an object that references another object that doesn't exist yet
 	// With --relaxed, this should succeed (non-blocking reference validation)
 	testID := generateTestID(pplanKindBacklogItem)
-	referencedID := generateTestID(pplanKindBacklogItem)
+	referencedID := "CRIT-NONEXISTENT-999"
 
 	obj := map[string]any{
 		objects.FieldKeyID:            testID,
 		objects.FieldKeyKind:          pplanKindBacklogItem,
 		objects.FieldKeyTitle:         "Object with forward reference",
+		objects.FieldKeyDescription:   "Test backlog item description with valid content",
 		objects.FieldKeyGoalRefs:      []string{"G-123"},
-		"related_refs":                []string{referencedID}, // Forward reference
+		objects.FieldKeyCriteriaRefs:  []string{referencedID}, // Forward reference
 		objects.FieldKeySchemaVersion: objectSchemaV2,
 	}
 
@@ -47,20 +48,16 @@ func TestCreateWithRelaxed(t *testing.T) {
 		t.Fatalf("failed to write object file: %v", err)
 	}
 
-	// Try to create without --relaxed (should fail due to missing reference)
-	cmd := execwrap.Command(cliBinary, "object", "create", pplanKindBacklogItem, "--file", objFile)
+	// Try to create without --relaxed (should fail due to missing forward reference under CAS promotion)
+	cmd := execwrap.Command(cliBinary, "object", "create", pplanKindBacklogItem, "--file", objFile, "--relaxed=false", "--promote")
 	wireExecForTest(cmd, tmpDir)
 	output, err := cmd.CombinedOutput()
 	if err == nil {
-		// If it succeeds without --relaxed, that's okay (reference validation might be non-blocking by default)
-		// But we should still test that --relaxed works
-		t.Logf("Note: Create succeeded without --relaxed (reference validation may be non-blocking by default)")
-	} else {
-		// Expected to fail without --relaxed
-		outputStr := string(output)
-		if !strings.Contains(outputStr, "reference") && !strings.Contains(outputStr, "not found") {
-			t.Logf("Create failed for unexpected reason: %v\nOutput: %s", err, outputStr)
-		}
+		t.Fatalf("expected create with --relaxed=false to fail on missing reference under CAS promotion, but succeeded; output: %s", string(output))
+	}
+	outputStr := string(output)
+	if !strings.Contains(outputStr, "reference") && !strings.Contains(outputStr, "not found") && !strings.Contains(outputStr, "integrity") {
+		t.Logf("Create failed with diagnostic: %s", outputStr)
 	}
 
 	// Generate a new ID and write a new file for the relaxed run to prevent "object already exists" collision
@@ -76,7 +73,7 @@ func TestCreateWithRelaxed(t *testing.T) {
 	}
 
 	// Now try with --relaxed (should succeed)
-	cmd = execwrap.Command(cliBinary, "object", "create", pplanKindBacklogItem, "--file", objFile2, "--relaxed")
+	cmd = execwrap.Command(cliBinary, "object", "create", pplanKindBacklogItem, "--file", objFile2, "--relaxed", "--promote")
 	wireExecForTest(cmd, tmpDir)
 	output, err = cmd.CombinedOutput()
 	if err != nil {
