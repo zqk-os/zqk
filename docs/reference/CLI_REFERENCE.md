@@ -1,0 +1,1 @@
+../manual/CLI_REFERENCE.md

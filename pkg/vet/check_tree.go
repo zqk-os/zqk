@@ -181,6 +181,11 @@ func CheckTreePolice(root string, cfg *GatesConfig) ([]Finding, error) {
 				if err != nil {
 					return nil
 				}
+				if d.Type()&os.ModeSymlink != 0 {
+					if targetInfo, err := os.Stat(path); err == nil {
+						info = targetInfo
+					}
+				}
 
 				// Enforce minimum documentation substance (min 50 bytes)
 				if info.Size() < 50 {

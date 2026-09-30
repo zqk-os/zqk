@@ -4,6 +4,7 @@ This directory contains authoritative reference manuals for the ZQK Knowledge Ke
 
 ## Manual Catalog
 
+- **[CLI Reference Manual](./CLI_REFERENCE.md)**: Comprehensive reference manual covering all `zqk` command families, global flags, exit codes, and environment variables.
 - **[Knowledge Kernel Object Model & Usage Guide](../guides/KERNEL_OBJECT_USAGE_GUIDE.md)**: Comprehensive guide and taxonomy across all 14 ontological domains and packs (70+ kinds), standard envelopes, VDS cascade, and copy-pasteable CLI recipes for every lifecycle stage.
 - **[Knowledge Management, Vocabularies & Semantic Recall Guide](../guides/KNOWLEDGE_MANAGEMENT_AND_SEMANTIC_RECALL_GUIDE.md)**: Comprehensive guide to operational glossaries, lens taxonomies, composable libraries, `docman` CAS verification, and on-demand recall protocols.
 - **[ZPARQL Query Language Reference](./ZPARQL_QUERY_LANGUAGE.md)**: Comprehensive manual for querying the Knowledge Kernel graph. Includes pattern matching, graph traversal syntax, relational operators, projection semantics, and execution plans.

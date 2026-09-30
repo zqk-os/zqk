@@ -53,7 +53,7 @@ Welcome to the canonical documentation for **ZQK Core**, the Cellular Knowledge 
 | :--- | :--- |
 | **[Knowledge Kernel Object Model & Usage Guide](./guides/KERNEL_OBJECT_USAGE_GUIDE.md)** | Comprehensive taxonomy across all 14 ontological domains and packs (70+ kinds), standard envelopes, VDS cascade, and copy-pasteable CLI recipes. |
 | **[Knowledge Management, Vocabularies & Semantic Recall](./guides/KNOWLEDGE_MANAGEMENT_AND_SEMANTIC_RECALL_GUIDE.md)** | Operational glossaries, lens taxonomies, composable libraries, `docman` CAS verification, and on-demand recall protocols. |
-| **[Manual & CLI Reference](./manual/README.md)** | Comprehensive CLI command flags, environment variables, and exit codes. |
+| **[CLI Reference Manual](./manual/CLI_REFERENCE.md)** | Comprehensive CLI command flags, environment variables, and exit codes. |
 | **[ZPARQL Query Language Manual](./manual/ZPARQL_QUERY_LANGUAGE.md)** | Developer manual and syntax guide for querying the Knowledge Kernel graph. |
 | **[ZQL Declarative Mutations Manual](./manual/ZQL_MUTATIONS.md)** | Developer manual for crafting declarative atomic mutations and batch updates. |
 | **[Object Inspector & Policy Studio](./manual/OBJECT_INSPECTOR_AND_POLICY_STUDIO.md)** | Reference manual for the interactive object inspector, keybindings, and policy testing. |
