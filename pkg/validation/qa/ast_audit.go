@@ -37,6 +37,7 @@ func (a *ASTAuditor) AuditFile(path string) ([]Violation, error) {
 	}
 
 	var violations []Violation
+	var funcs []*ast.FuncDecl
 
 	ast.Inspect(node, func(n ast.Node) bool {
 		switch x := n.(type) {
@@ -71,6 +72,7 @@ func (a *ASTAuditor) AuditFile(path string) ([]Violation, error) {
 			violations = append(violations, a.auditHardcodedValues(x)...)
 
 		case *ast.FuncDecl:
+			funcs = append(funcs, x)
 			violations = append(violations, a.auditInterfaceUsage(x)...)
 			violations = append(violations, a.auditFunctionComplexity(x)...)
 
@@ -83,6 +85,9 @@ func (a *ASTAuditor) AuditFile(path string) ([]Violation, error) {
 		}
 		return true
 	})
+
+	// Rule: Structural statement-sequence and function-body duplication checking.
+	violations = append(violations, a.auditStructuralDuplication(funcs)...)
 
 	return violations, nil
 }
@@ -256,3 +261,5 @@ func (a *ASTAuditor) auditSwallowedErrors(stmt *ast.AssignStmt) []Violation {
 	}
 	return nil
 }
+
+

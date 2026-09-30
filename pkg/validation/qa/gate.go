@@ -3,11 +3,9 @@ package qa
 import (
 	"context"
 	"fmt"
-	"path/filepath"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/validation"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
@@ -142,7 +140,7 @@ func (g *AuditorGate) trustedPubHex(ctx context.Context, secCtx *pkgctx.Security
 		}
 		return "", fmt.Errorf(validation.ConstMagic60ea95db, AuditorKeyID)
 	}
-	privPath := filepath.Join(g.projectRoot, paths.ProjectDataDir, "keystore", "auditor.priv")
+	privPath := AuditorPrivateKeyPath(g.projectRoot)
 	signer, signErr := NewAuditorSigner(privPath)
 	if signErr != nil {
 		if err != nil {

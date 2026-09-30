@@ -108,3 +108,156 @@ func TestAuditStudioInbox(t *testing.T) {
 		t.Fatalf("Found %d violations in inbox.go", len(violations))
 	}
 }
+
+func TestASTAuditor_StructuralDuplication(t *testing.T) {
+	t.Parallel()
+	auditor := NewASTAuditor()
+
+	t.Run("Identical Function Body Flagged", func(t *testing.T) {
+		code := `package sample
+
+func stepAlpha() int {
+	a := 1
+	b := 2
+	c := a + b
+	return c
+}
+
+func stepBeta() int {
+	a := 1
+	b := 2
+	c := a + b
+	return c
+}
+`
+		tmpDir := t.TempDir()
+		path := filepath.Join(tmpDir, "dup_body.go")
+		if err := fileutil.WriteStandardFile(path, []byte(code)); err != nil {
+			t.Fatalf("Failed to write file: %v", err)
+		}
+
+		violations, err := auditor.AuditFile(path)
+		if err != nil {
+			t.Fatalf("AuditFile failed: %v", err)
+		}
+
+		found := false
+		for _, v := range violations {
+			if v.Type == ViolationTypeDuplication {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Fatalf("Expected %s violation for identical function bodies, got: %v", ViolationTypeDuplication, violations)
+		}
+	})
+
+	t.Run("Subsequence Statement Duplication Flagged", func(t *testing.T) {
+		code := `package sample
+
+func runWorkerA() {
+	setup()
+	stepOne()
+	stepTwo()
+	stepThree()
+	stepFour()
+	teardownA()
+}
+
+func runWorkerB() {
+	initB()
+	stepOne()
+	stepTwo()
+	stepThree()
+	stepFour()
+	finalizeB()
+}
+
+func setup() {}
+func stepOne() {}
+func stepTwo() {}
+func stepThree() {}
+func stepFour() {}
+func teardownA() {}
+func initB() {}
+func finalizeB() {}
+`
+		tmpDir := t.TempDir()
+		path := filepath.Join(tmpDir, "dup_seq.go")
+		if err := fileutil.WriteStandardFile(path, []byte(code)); err != nil {
+			t.Fatalf("Failed to write file: %v", err)
+		}
+
+		violations, err := auditor.AuditFile(path)
+		if err != nil {
+			t.Fatalf("AuditFile failed: %v", err)
+		}
+
+		found := false
+		for _, v := range violations {
+			if v.Type == ViolationTypeDuplication {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Fatalf("Expected %s violation for duplicated statement sequence, got: %v", ViolationTypeDuplication, violations)
+		}
+	})
+
+	t.Run("Distinct Functions Not Flagged", func(t *testing.T) {
+		code := `package sample
+
+func calculateArea(w, h int) int {
+	return w * h
+}
+
+func calculateVolume(w, h, d int) int {
+	area := calculateArea(w, h)
+	return area * d
+}
+`
+		tmpDir := t.TempDir()
+		path := filepath.Join(tmpDir, "distinct.go")
+		if err := fileutil.WriteStandardFile(path, []byte(code)); err != nil {
+			t.Fatalf("Failed to write file: %v", err)
+		}
+
+		violations, err := auditor.AuditFile(path)
+		if err != nil {
+			t.Fatalf("AuditFile failed: %v", err)
+		}
+
+		for _, v := range violations {
+			if v.Type == ViolationTypeDuplication {
+				t.Fatalf("Unexpected duplication violation on distinct functions: %v", v)
+			}
+		}
+	})
+}
+
+func TestAuditQASurfacesCleanliness(t *testing.T) {
+	t.Parallel()
+	auditor := NewASTAuditor()
+	files := []string{
+		"service.go",
+		"gate.go",
+		"helpers.go",
+		"ast_audit.go",
+		"ast_audit_duplication.go",
+	}
+
+	for _, file := range files {
+		violations, err := auditor.AuditFile(file)
+		if err != nil {
+			t.Fatalf("AuditFile failed for %s: %v", file, err)
+		}
+		for _, v := range violations {
+			if v.Type == ViolationTypeDuplication {
+				t.Fatalf("Found unexpected duplication violation in %s: %s", file, v.Message)
+			}
+		}
+	}
+}
+

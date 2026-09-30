@@ -109,3 +109,24 @@ func ValidateDeliverableArtifacts(obj map[string]any, projectRoot string) ([]str
 
 	return paths, nil
 }
+
+// IsCompleteStatus reports whether a lifecycle status represents a completed state.
+func IsCompleteStatus(status string) bool {
+	norm := strings.ToLower(strings.TrimSpace(status))
+	return norm == objects.ObjectStatusComplete ||
+		norm == objects.ObjectStatusCompleted ||
+		norm == "complete" ||
+		norm == "completed"
+}
+
+// IsCompletedStatus is an alias for IsCompleteStatus.
+func IsCompletedStatus(status string) bool {
+	return IsCompleteStatus(status)
+}
+
+// HasStringEvidence reports whether the value contains at least one non-empty string reference.
+func HasStringEvidence(value any) bool {
+	return len(ExtractArtifactList(value)) > 0
+}
+
+

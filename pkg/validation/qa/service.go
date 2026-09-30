@@ -186,7 +186,7 @@ func (s *AuditorService) performAuditWithMode(ctx context.Context, id string, ki
 	}
 
 	status, _ := obj[objects.FieldKeyStatus].(string)
-	isComplete := status == objects.ObjectStatusComplete || status == objects.ObjectStatusCompleted || status == "complete" || status == "completed"
+	isComplete := IsCompleteStatus(status)
 	artifactPaths := ExtractObjectArtifacts(obj)
 
 	// 1.3 Requirement Criteria Verification
@@ -215,7 +215,7 @@ func (s *AuditorService) performAuditWithMode(ctx context.Context, id string, ki
 				return
 			}
 			cStatus, _ := criterion[objects.FieldKeyStatus].(string)
-			if cStatus != objects.ObjectStatusComplete && cStatus != objects.ObjectStatusCompleted && cStatus != "complete" && cStatus != "completed" {
+			if !IsCompleteStatus(cStatus) {
 				reason := fmt.Sprintf("Referenced criterion %s is not complete (status=%s)", cID, cStatus)
 				logging.FluentEvent(logger).Warn(fmt.Sprintf(LogFmtAuditorContentDisparity, id, reason)).Log()
 				if s.emitter != nil {
@@ -235,13 +235,9 @@ func (s *AuditorService) performAuditWithMode(ctx context.Context, id string, ki
 		testRefs := extractArtifactPaths(obj[objects.FieldKeyTestCaseRefs])
 		for _, tID := range testRefs {
 			tc, err := s.storage.Read(ctx, secCtx, tID)
-			if err == nil && tc != nil {
-				tStatus, _ := tc[objects.FieldKeyStatus].(string)
-				remOpen, _ := tc["remaining_open_count"].(int)
-				if (tStatus == objects.ObjectStatusComplete || tStatus == objects.ObjectStatusCompleted || tStatus == "complete" || tStatus == "completed") && remOpen == 0 {
-					hasTestProof = true
-					break
-				}
+			if err == nil && IsTestCaseProven(tc) {
+				hasTestProof = true
+				break
 			}
 		}
 		if !hasTestProof {
@@ -259,13 +255,9 @@ func (s *AuditorService) performAuditWithMode(ctx context.Context, id string, ki
 							break
 						}
 					}
-					if match {
-						tStatus, _ := tc[objects.FieldKeyStatus].(string)
-						remOpen, _ := tc["remaining_open_count"].(int)
-						if (tStatus == objects.ObjectStatusComplete || tStatus == objects.ObjectStatusCompleted || tStatus == "complete" || tStatus == "completed") && remOpen == 0 {
-							hasTestProof = true
-							break
-						}
+					if match && IsTestCaseProven(tc) {
+						hasTestProof = true
+						break
 					}
 				}
 			}
@@ -285,7 +277,7 @@ func (s *AuditorService) performAuditWithMode(ctx context.Context, id string, ki
 
 	// 1.5 Traceability Check
 	if kind == objects.KindBacklogItem && (isComplete || isTerminalAudit) {
-		hasTraceability := hasStringEvidence(obj[objects.FieldKeyCommitHashes])
+		hasTraceability := HasStringEvidence(obj[objects.FieldKeyCommitHashes])
 		hasTestAsset := false
 		for _, path := range artifactPaths {
 			if strings.HasSuffix(path, "_test.go") {
@@ -451,24 +443,6 @@ func (s *AuditorService) performAuditWithMode(ctx context.Context, id string, ki
 
 
 
-func hasStringEvidence(value any) bool {
-	switch refs := value.(type) {
-	case []any:
-		for _, ref := range refs {
-			if text, ok := ref.(string); ok && strings.TrimSpace(text) != "" {
-				return true
-			}
-		}
-	case []string:
-		for _, ref := range refs {
-			if strings.TrimSpace(ref) != "" {
-				return true
-			}
-		}
-	}
-	return false
-}
-
 func (s *AuditorService) hasCompletedCriterion(
 	ctx context.Context,
 	secCtx *pkgctx.SecurityContext,
@@ -492,7 +466,7 @@ func (s *AuditorService) hasCompletedCriterion(
 			continue
 		}
 		criterionStatus, _ := criterion[objects.FieldKeyStatus].(string)
-		if criterionStatus == objects.ObjectStatusComplete || criterionStatus == objects.ObjectStatusCompleted {
+		if IsCompleteStatus(criterionStatus) {
 			return true
 		}
 	}
