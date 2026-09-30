@@ -733,7 +733,9 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 
 			// 6. HIL Gate Safety Check
 			if vErr := validator.ValidateAndRoute(ctx, taskID, &mut); vErr != nil {
-				_ = sp.Update(ctx, secCtx, taskID, map[string]any{objects.FieldKeyStatus: objects.ObjectStatusBlocked})
+				if bErr := sp.Update(ctx, secCtx, taskID, map[string]any{objects.FieldKeyStatus: objects.ObjectStatusBlocked}); bErr != nil {
+					logging.FluentEvent(logging.GetLogger()).Error("Failed to set task status to blocked", bErr).Log()
+				}
 				if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("Mutation blocked by safety gate: %v\n", vErr))); wErr != nil {
 					logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
 				}
@@ -746,15 +748,24 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 				return errfmt.Newf("failed to begin tx").Wrap(txErr)
 			}
 
-			_ = createIdempotencyAuditStamp(ctx, secCtx, tx, ik, taskID, &mut)
+			if auditErr := createIdempotencyAuditStamp(ctx, secCtx, tx, ik, taskID, &mut); auditErr != nil {
+				_ = tx.Rollback(ctx)
+				return errfmt.Newf("failed to create idempotency stamp").Wrap(auditErr)
+			}
 
 			switch mut.Action {
 			case mutation.ActionUpdateNode:
 				if len(mut.Fields) > 0 {
-					_ = tx.Update(ctx, secCtx, mut.TargetID, mut.Fields)
+					if uErr := tx.Update(ctx, secCtx, mut.TargetID, mut.Fields); uErr != nil {
+						_ = tx.Rollback(ctx)
+						return errfmt.Newf("failed to update node %s", mut.TargetID).Wrap(uErr)
+					}
 				}
 			case mutation.ActionCreateNode:
-				_ = tx.Create(ctx, secCtx, mut.Fields)
+				if cErr := tx.Create(ctx, secCtx, mut.Fields); cErr != nil {
+					_ = tx.Rollback(ctx)
+					return errfmt.Newf("failed to create node").Wrap(cErr)
+				}
 			}
 
 			if cErr := tx.Commit(ctx); cErr != nil {
@@ -770,7 +781,9 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 			})
 
 			if mut.StatusTransition != "" && !koi.IsStatus(currentTask, mut.StatusTransition) {
-				_ = sp.Update(ctx, secCtx, taskID, map[string]any{objects.FieldKeyStatus: mut.StatusTransition})
+				if sErr := sp.Update(ctx, secCtx, taskID, map[string]any{objects.FieldKeyStatus: mut.StatusTransition}); sErr != nil {
+					logging.FluentEvent(logging.GetLogger()).Error("Failed to transition task status", sErr).Log()
+				}
 			}
 
 			if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("Committed mutation %s\n", ik))); wErr != nil {

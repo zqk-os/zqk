@@ -755,7 +755,6 @@ func TestInstanceValidator_validateSemanticType(t *testing.T) {
 }
 
 func TestInstanceValidator_checkPrecondition(t *testing.T) {
-	t.Parallel()
 	iv := &InstanceValidator{}
 
 	// is set
@@ -792,9 +791,24 @@ func TestInstanceValidator_checkPrecondition(t *testing.T) {
 		t.Errorf("expected false for at least one goal_ref linked")
 	}
 
-	// unknown precondition defaults to true (permissive)
+	// unknown precondition fails closed by default
+	if iv.checkPrecondition("unknown custom precondition rule", objAtLeast) {
+		t.Errorf("expected false for unknown precondition in fail-closed mode")
+	}
+	t.Setenv("ZQK_PRECONDITIONS_FAIL_OPEN", "1")
 	if !iv.checkPrecondition("unknown custom precondition rule", objAtLeast) {
-		t.Errorf("expected true for unknown precondition")
+		t.Errorf("expected true for unknown precondition when fail-open is enabled")
+	}
+
+	// canonical DSL predicates
+	objDSL := map[string]any{
+		"priority_plan_ref": "PLAN-1",
+	}
+	if !iv.checkPrecondition("field_nonempty:priority_plan_ref", objDSL) {
+		t.Errorf("expected true for field_nonempty:priority_plan_ref")
+	}
+	if iv.checkPrecondition("field_cleared:priority_plan_ref", objDSL) {
+		t.Errorf("expected false for field_cleared:priority_plan_ref when field is populated")
 	}
 }
 

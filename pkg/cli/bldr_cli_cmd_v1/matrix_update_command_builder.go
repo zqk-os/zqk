@@ -22,7 +22,7 @@ func NewMatrixUpdateCommandBuilder() *cobra.Command {
 	help.AddExample("Keep a .bak copy before writing", "%s matrix update --file-path pkg/x.go --set fully_vetted=yes --backup")
 	help.AddExample("Append matrix update note to a CVS activity_log after write", "%s matrix update --file-path pkg/x.go --set fully_vetted=yes --append-cvs-activity --cvs-id CVS-abc123")
 	builder.WithHelpBuilder(help)
-	builder.AddStringFlag("name", "", "codebase_vetting", "Matrix alias from matrix_registry.yaml")
+	builder.AddStringFlag("name", "", "", "Matrix alias from matrix_registry.yaml (default: resolved from registry default)")
 	builder.AddStringFlag("registry", "", "", "Path to matrix_registry.yaml (repo-relative or absolute)")
 	builder.AddStringFlag("matrix", "", "", "Override CSV path (requires --profile)")
 	builder.AddStringFlag("profile", "", "", "Override profile YAML when using --matrix")

@@ -59,8 +59,8 @@ The Audit Tab provides non-repudiable audit logs tracking which human or AI agen
 | :--- | :--- | :--- | :--- |
 | **Stream Channel** | Cyan bold `Stream: audit_event` | Dedicated high-volume operational audit stream channel. | Disambiguates audit logs from domain object mutations. |
 | **Buffer Depth** | `Buffer: 5 audit events` | Count of cryptographic audit records retained in active ring buffer. | High volume indicates active multi-agent pipeline activity. |
-| **Actor Breakdown** | `Actors: ACC-SYSTEM (2), agent-alpha (2)...` | Aggregate event counts grouped by caller persona or daemon. | Detects unbalanced actor activity, runaway agent loops, or rogue background workers. |
-| **Actor Badge** | `PER-DEFAULT-LEAD`, `ACC-SYSTEM`, `agent-alpha` | Cryptographically attributed identity of the actor initiating the operation. | Non-repudiation tracking for governance, security audits, and multi-agent coordination. |
+| **Actor Breakdown** | `Actors: ACC-SYSTEM (2), PER-DEFAULT-LEAD (1), PER-DEFAULT-OPERATOR (2)...` | Aggregate event counts grouped by caller persona or daemon. | Detects unbalanced actor activity, runaway agent loops, or rogue background workers. |
+| **Actor Badge** | `PER-DEFAULT-LEAD`, `ACC-SYSTEM`, `PER-DEFAULT-OPERATOR` | Cryptographically attributed identity of the actor initiating the operation. | Non-repudiation tracking for governance, security audits, and multi-agent coordination. |
 | **Operation Column** | `claim_work`, `ref_add`, `promote`, `scheduler_tick`, `cas_verify` | Fine-grained API mutation verb executed against the kernel. | Audits exact command actions; helps identify failed assertions or unauthorized mutation attempts. |
 | **Cryptographic Provenance** | Row selection `[Enter]` | Opens complete JSON modal displaying SHA-256 CAS hash, parent hash, and timestamp. | Verify immutable cryptographic provenance before signing off on release candidates. |
 
@@ -85,7 +85,7 @@ The Swarm Tab visualizes running agent processes, seated roles, active task assi
 | **Bound Personas** | `Bound Personas: 5 [✓ OK]` | Count of agent personas with valid skills and tools attached. | Unbound personas indicate misconfigured seating; run `zqk system agent-onboard` to repair. |
 | **CAP Orchestrator** | `SCH-cap-orchestrator [✓ ACTIVE]` | Background CAP orchestrator daemon status. | Drives autonomous work claiming, evaluation, and progression without human intervention. |
 | **Instruction Queue** | `PROPOSED`, `APPROVED`, `EXECUTING`, `COMPLETED` | State distribution of agent instruction objects. | Monitors throughput bottlenecks across the instruction lifecycle. |
-| **Managed Daemons** | `ambient`, `privileged-writer`, `scheduler`, `steward` | Process table showing PID, uptime, restart counts, and health. | Restart count > 0 indicates crashes or OOM; triage with `zqk doctor`. |
+| **Managed Daemons** | `ambient`, `privileged-writer`, `scheduler`, `steward` | Process table showing PID, uptime, restart counts, and health. | Restart count > 0 indicates crashes or OOM; triage with `zqk system check --details`, `zqk scheduler health-check`, or `zqk feed doctor`. |
 
 ---
 
@@ -145,7 +145,7 @@ The Sched Tab monitors autonomous background jobs, self-healing timers, and rete
 | :--- | :--- | :--- | :--- |
 | **Job Identifier** | `SCH-001` through `SCH-005` | Registered cron or interval maintenance jobs. | Primary daemon tasks responsible for self-healing and data integrity. |
 | **Schedule Expression** | `@every 5m`, `@every 1h`, `@every 6h`, `@every 1m` | Configured trigger interval or cron expression. | Ensures compaction, audit aggregation, and hygiene sweeps execute predictably. |
-| **Last Run / Next Run** | Timestamps `12:10:00` / `12:15:00` | Execution timing tracking daemon cadence. | If `Next Run` is in the past, daemon is frozen; restart with `zqk scheduler restart`. |
+| **Last Run / Next Run** | Timestamps `12:10:00` / `12:15:00` | Execution timing tracking daemon cadence. | If `Next Run` is in the past, daemon is frozen; restart with `zqk scheduler stop && zqk scheduler start`. |
 | **Job Status** | Green bold `active` / Red bold `failed` | Health state of the scheduled maintenance job. | Press `[t]` to trigger immediate manual execution; press `[d]` to delay execution by 10s. |
 | **Compaction Job** | `change_journal_compaction` | Compresses historical journal entries into immutable CAS chunks. | Prevents change journal files from exceeding the 10MB memory-mapped ceiling. |
 | **Memory Watchdog** | `memory_leak_watchdog` | Monitors RSS footprint of running agent holons and daemons. | Automatically triggers graceful recycling if a daemon exceeds 512MB RAM. |

@@ -30,49 +30,72 @@ func (rc *ResourceCache[T]) GetResourceCacheStats() (hits, misses, creations int
 type cachedResource[T any] struct {
 	key      string
 	resource T
-	once     sync.Once
 	initErr  error
+	ready    chan struct{}
 }
 
-// GetOrCreate retrieves a cached resource or creates it if it doesn't exist
-// initFunc is called exactly once per key (thread-safe)
-// Returns the resource and any initialization error
+// GetOrCreate retrieves a cached resource or creates it if it doesn't exist.
+// initFunc is called lazily. If initialization succeeds, the resource is cached and shared.
+// If initialization fails due to a transient error, the entry is evicted atomically via CompareAndDelete
+// allowing concurrent or subsequent callers to retry rather than permanently poisoning the cache.
 func (rc *ResourceCache[T]) GetOrCreate(ctx context.Context, key string, initFunc func(ctx context.Context, key string) (T, error)) (T, error) {
 	var zero T
 
-	// Get or create cached entry for this key (thread-safe using sync.Map)
-	cachedVal, isLoaded := rc.cache.LoadOrStore(key, &cachedResource[T]{
-		key: key,
-	})
-	if isLoaded {
-		rc.hitsTotal.Add(1)
-	} else {
-		rc.missesTotal.Add(1)
-	}
-	cached := cachedVal.(*cachedResource[T])
-
-	// Initialize once per key (thread-safe, no mutex needed)
-	cached.once.Do(func() {
-		rc.creationsTotal.Add(1)
-		resource, err := initFunc(ctx, key)
-		if err != nil {
-			cached.initErr = err
-			return
+	for {
+		if ctx.Err() != nil {
+			return zero, ctx.Err()
 		}
-		cached.resource = resource
-	})
 
-	// Return cached resource if initialization succeeded
-	if cached.initErr == nil {
-		return cached.resource, nil
+		newEntry := &cachedResource[T]{
+			key:   key,
+			ready: make(chan struct{}),
+		}
+
+		cachedVal, isLoaded := rc.cache.LoadOrStore(key, newEntry)
+		cached := cachedVal.(*cachedResource[T])
+
+		if !isLoaded {
+			// This goroutine won the race to initialize the resource.
+			rc.missesTotal.Add(1)
+			rc.creationsTotal.Add(1)
+
+			resource, err := initFunc(ctx, key)
+			if err != nil {
+				cached.initErr = err
+				close(cached.ready)
+				// Atomically evict this failed entry so future attempts can retry cleanly.
+				rc.cache.CompareAndDelete(key, cached)
+				return zero, err
+			}
+
+			cached.resource = resource
+			close(cached.ready)
+			return cached.resource, nil
+		}
+
+		// Another goroutine is currently initializing or has already initialized the resource.
+		select {
+		case <-ctx.Done():
+			return zero, ctx.Err()
+		case <-cached.ready:
+		}
+
+		// Check if initialization succeeded.
+		if cached.initErr == nil {
+			rc.hitsTotal.Add(1)
+			return cached.resource, nil
+		}
+
+		// The in-flight initialization attempt failed.
+		// That attempt will have evicted itself via CompareAndDelete.
+		// Loop and retry initialization.
 	}
-
-	// Initialization failed - return error
-	return zero, cached.initErr
 }
 
-// Get retrieves a cached resource without creating it
-// Returns the resource and true if found, or zero value and false if not found
+// Get retrieves a cached resource without creating it.
+// Returns the resource and true if found and fully initialized.
+// If the resource is not present, initialization failed, or initialization is still in-flight,
+// returns zero value and false.
 func (rc *ResourceCache[T]) Get(key string) (T, bool) {
 	var zero T
 
@@ -83,13 +106,19 @@ func (rc *ResourceCache[T]) Get(key string) (T, bool) {
 	}
 
 	cached := val.(*cachedResource[T])
-	if cached.initErr != nil {
+	select {
+	case <-cached.ready:
+		if cached.initErr != nil {
+			rc.missesTotal.Add(1)
+			return zero, false
+		}
+		rc.hitsTotal.Add(1)
+		return cached.resource, true
+	default:
+		// Initialization is still in flight; resource is not ready.
 		rc.missesTotal.Add(1)
 		return zero, false
 	}
-
-	rc.hitsTotal.Add(1)
-	return cached.resource, true
 }
 
 // Delete removes a cached resource

@@ -7,6 +7,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/when"
 )
@@ -135,7 +136,7 @@ func projectRootHintFromCachePath(filePath string) string {
 	dir := filepath.Dir(filePath)
 	for i := 0; i < 6 && dir != emptyValue && dir != "/" && dir != "."; i++ {
 		base := filepath.Base(dir)
-		if base == "docs" || base == ".zqk" {
+		if base == "docs" || base == paths.ProjectDataDir {
 			return filepath.Dir(dir)
 		}
 		dir = filepath.Dir(dir)

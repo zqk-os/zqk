@@ -79,6 +79,7 @@ type RequirementTemplate struct {
 	Body            string   `yaml:"body,omitempty" json:"body,omitempty"`
 	Priority        string   `yaml:"priority,omitempty" json:"priority,omitempty"` // p0..p3
 	PriorityPlanRef string   `yaml:"priority_plan_ref,omitempty" json:"priority_plan_ref,omitempty"`
+	DocEntryRefs    []string `yaml:"doc_entry_refs,omitempty" json:"doc_entry_refs,omitempty"`
 }
 
 // CriteriaTemplate describes a criteria object. Parent linkage is a bundle hint only
@@ -139,6 +140,7 @@ type BacklogTemplate struct {
 	CriteriaRefs    []string `yaml:"criteria_refs,omitempty" json:"criteria_refs,omitempty"`
 	TestCaseRefs    []string `yaml:"test_case_refs,omitempty" json:"test_case_refs,omitempty"`
 	MilestoneRefs   []string `yaml:"milestone_refs,omitempty" json:"milestone_refs,omitempty"`
+	DocEntryRefs    []string `yaml:"doc_entry_refs,omitempty" json:"doc_entry_refs,omitempty"`
 	KindUnderTest   string   `yaml:"kind_under_test,omitempty" json:"kind_under_test,omitempty"`
 	Priority        string   `yaml:"priority,omitempty" json:"priority,omitempty"`
 	PriorityTier    string   `yaml:"priority_tier,omitempty" json:"priority_tier,omitempty"`

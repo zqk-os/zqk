@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -15,18 +16,29 @@ type StateLocker interface {
 	Lock(ctx context.Context, resourceID string, lockTTL time.Duration, waitTimeout time.Duration) (release func() error, err error)
 }
 
+// FencedStateLocker extends StateLocker to support monotonic fencing tokens and lease validity checking.
+type FencedStateLocker interface {
+	StateLocker
+	// LockWithFence acquires a lock and issues a monotonically increasing fencing token.
+	LockWithFence(ctx context.Context, resourceID string, lockTTL time.Duration, waitTimeout time.Duration) (release func() error, fenceToken int64, err error)
+	// ValidateFence reports whether the issued fencing token is still the valid, unexpired active lease for the resource.
+	ValidateFence(resourceID string, fenceToken int64) bool
+}
+
 // ErrLockTimeout is returned when waiting for a lock exceeds the timeout.
 var ErrLockTimeout = fmt.Errorf("timeout waiting for lock")
 
 // memoryStateLocker provides an in-memory implementation of StateLocker.
 type memoryStateLocker struct {
-	mu    sync.Mutex
-	locks map[string]lockState
+	mu           sync.Mutex
+	locks        map[string]lockState
+	tokenCounter atomic.Int64
 }
 
 type lockState struct {
-	expiresAt time.Time
-	ch        chan struct{}
+	expiresAt  time.Time
+	ch         chan struct{}
+	fenceToken int64
 }
 
 // NewMemoryStateLocker creates a new in-memory StateLocker.
@@ -37,7 +49,15 @@ func NewMemoryStateLocker() StateLocker {
 }
 
 func (l *memoryStateLocker) Lock(ctx context.Context, resourceID string, lockTTL time.Duration, waitTimeout time.Duration) (func() error, error) {
+	rel, _, err := l.LockWithFence(ctx, resourceID, lockTTL, waitTimeout)
+	return rel, err
+}
+
+func (l *memoryStateLocker) LockWithFence(ctx context.Context, resourceID string, lockTTL time.Duration, waitTimeout time.Duration) (func() error, int64, error) {
 	waitDeadline := time.Now().Add(waitTimeout)
+	timer := time.NewTimer(waitTimeout)
+	defer timer.Stop()
+
 	for {
 		l.mu.Lock()
 		state, exists := l.locks[resourceID]
@@ -51,9 +71,11 @@ func (l *memoryStateLocker) Lock(ctx context.Context, resourceID string, lockTTL
 
 		if !exists {
 			ch := make(chan struct{})
+			token := l.tokenCounter.Add(1)
 			l.locks[resourceID] = lockState{
-				expiresAt: time.Now().Add(lockTTL),
-				ch:        ch,
+				expiresAt:  time.Now().Add(lockTTL),
+				ch:         ch,
+				fenceToken: token,
 			}
 			l.mu.Unlock()
 			return func() error {
@@ -64,18 +86,36 @@ func (l *memoryStateLocker) Lock(ctx context.Context, resourceID string, lockTTL
 					close(ch)
 				}
 				return nil
-			}, nil
+			}, token, nil
 		}
 		waitCh := state.ch
 		l.mu.Unlock()
+
+		remaining := time.Until(waitDeadline)
+		if remaining <= 0 {
+			return nil, 0, ErrLockTimeout
+		}
 
 		select {
 		case <-waitCh:
 			// Lock was released or expired, try again
 		case <-ctx.Done():
-			return nil, ctx.Err()
-		case <-time.After(time.Until(waitDeadline)):
-			return nil, ErrLockTimeout
+			return nil, 0, ctx.Err()
+		case <-timer.C:
+			return nil, 0, ErrLockTimeout
 		}
 	}
+}
+
+func (l *memoryStateLocker) ValidateFence(resourceID string, fenceToken int64) bool {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	st, exists := l.locks[resourceID]
+	if !exists {
+		return false
+	}
+	if time.Now().After(st.expiresAt) {
+		return false
+	}
+	return st.fenceToken == fenceToken
 }

@@ -152,6 +152,10 @@ func applyRequirements(
 		if t.PriorityPlanRef != emptyValue {
 			builder.SetField(objects.FieldKeyPriorityPlanRef, t.PriorityPlanRef)
 		}
+		docEntryRefs := resolveRefs(t.DocEntryRefs, summary.HintToID)
+		if len(docEntryRefs) > 0 {
+			builder.SetField(objects.FieldKeyDocEntryRefs, docEntryRefs)
+		}
 		setOriginIfNeeded(builder)
 		obj, err := builder.Build()
 		if err != nil {
@@ -404,6 +408,10 @@ func applyBacklogItems(
 		}
 		if t.PriorityTier != emptyValue {
 			builder.SetField(objects.FieldKeyPriorityTier, t.PriorityTier)
+		}
+		docEntryRefs := resolveRefs(t.DocEntryRefs, summary.HintToID)
+		if len(docEntryRefs) > 0 {
+			builder.SetField(objects.FieldKeyDocEntryRefs, docEntryRefs)
 		}
 		setOriginIfNeeded(builder)
 		obj, err := builder.Build()

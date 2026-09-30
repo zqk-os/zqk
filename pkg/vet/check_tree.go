@@ -172,14 +172,19 @@ func CheckTreePolice(root string, cfg *GatesConfig) ([]Finding, error) {
 					return nil
 				}
 
-				// Allow CEF scaffolding and evaluation framework docs
-				if strings.Contains(relSlash, "quality/codebase_evaluation/") {
+				// Allow CEF scaffolding, evaluation framework docs, and local run workspaces
+				if strings.Contains(relSlash, "quality/codebase_evaluation/") || strings.Contains(relSlash, "quality/cef-runs/") {
 					return nil
 				}
 
 				info, err := d.Info()
 				if err != nil {
 					return nil
+				}
+				if d.Type()&os.ModeSymlink != 0 {
+					if targetInfo, err := os.Stat(path); err == nil {
+						info = targetInfo
+					}
 				}
 
 				// Enforce minimum documentation substance (min 50 bytes)

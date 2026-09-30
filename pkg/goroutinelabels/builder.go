@@ -2,10 +2,56 @@ package goroutinelabels
 
 import (
 	"context"
+	"fmt"
+	"os"
+	"runtime/debug"
 	"sync"
+	"sync/atomic"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 )
+
+// PanicHandlerFunc defines the signature for custom panic handling with stack traces.
+type PanicHandlerFunc func(name, purpose string, r any, stack []byte)
+
+var (
+	unhandledPanicsTotal atomic.Int64
+	defaultPanicHandler  atomic.Pointer[PanicHandlerFunc]
+)
+
+// GetUnhandledPanicsTotal returns the count of all recovered panics across goroutines.
+func GetUnhandledPanicsTotal() int64 {
+	return unhandledPanicsTotal.Load()
+}
+
+// ResetUnhandledPanicsTotal resets the recovered panics counter (primarily for test assertions).
+func ResetUnhandledPanicsTotal() {
+	unhandledPanicsTotal.Store(0)
+}
+
+// SetDefaultPanicHandler configures a global fallback handler for goroutine panics.
+func SetDefaultPanicHandler(handler PanicHandlerFunc) {
+	if handler == nil {
+		defaultPanicHandler.Store(nil)
+	} else {
+		defaultPanicHandler.Store(&handler)
+	}
+}
+
+func handlePanic(name, purpose string, onPanic func(any), r any) {
+	unhandledPanicsTotal.Add(1)
+	if onPanic != nil {
+		onPanic(r)
+		return
+	}
+	stack := debug.Stack()
+	if fn := defaultPanicHandler.Load(); fn != nil && *fn != nil {
+		(*fn)(name, purpose, r, stack)
+		return
+	}
+	// Fail-closed observability: never swallow panics silently
+	_, _ = fmt.Fprintf(os.Stderr, "goroutinelabels: unhandled panic in goroutine %q (%s): %v\n%s\n", name, purpose, r, string(stack))
+}
 
 // GoroutineBuilder provides a fluent API for creating goroutines with consistent patterns.
 // This ensures all goroutines have labels and follow best practices for:
@@ -296,18 +342,15 @@ func (b *GoroutineBuilder) Start(fn func() error) {
 		// Always set goroutine label first
 		SetGoroutineLabel(name, purpose)
 
+		// Ensure Done() is called on all exit paths
+		defer done()
+
 		// Recover from panics
 		defer func() {
 			if r := recover(); r != nil {
-				if onPanic != nil {
-					onPanic(r)
-				}
-				// If no handler, panic is silently recovered (label helps with debugging)
+				handlePanic(name, purpose, onPanic, r)
 			}
 		}()
-
-		// Ensure Done() is called on all exit paths
-		defer done()
 
 		// Pre-cleanup
 		if preCleanup != nil {
@@ -414,17 +457,15 @@ func (b *GoroutineBuilder) StartWithContext(ctx context.Context, fn func(ctx con
 		// Always set goroutine label first
 		SetGoroutineLabel(name, purpose)
 
+		// Ensure Done() is called on all exit paths
+		defer done()
+
 		// Recover from panics
 		defer func() {
 			if r := recover(); r != nil {
-				if onPanic != nil {
-					onPanic(r)
-				}
+				handlePanic(name, purpose, onPanic, r)
 			}
 		}()
-
-		// Ensure Done() is called on all exit paths
-		defer done()
 
 		// Pre-cleanup
 		if preCleanup != nil {
@@ -519,17 +560,15 @@ func (b *GoroutineBuilder) StartSimple(fn func()) {
 		// Always set goroutine label first
 		SetGoroutineLabel(name, purpose)
 
+		// Ensure Done() is called on all exit paths
+		defer done()
+
 		// Recover from panics
 		defer func() {
 			if r := recover(); r != nil {
-				if onPanic != nil {
-					onPanic(r)
-				}
+				handlePanic(name, purpose, onPanic, r)
 			}
 		}()
-
-		// Ensure Done() is called on all exit paths
-		defer done()
 
 		// Signal completion on any exit (so tests can wait without manual signals in every return path)
 		if signalOnExit != nil {
@@ -603,9 +642,7 @@ func (b *GoroutineBuilder) StartWithResult(resultChan chan<- any) func(func() (a
 			// Recover from panics
 			defer func() {
 				if r := recover(); r != nil {
-					if b.onPanic != nil {
-						b.onPanic(r)
-					}
+					handlePanic(b.name, b.purpose, b.onPanic, r)
 					// Send error result on panic
 					if resultChan != nil {
 						resultChan <- errfmt.Errorf("panic in goroutine %s: %v", b.name, r)

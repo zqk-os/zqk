@@ -23,6 +23,8 @@ type ReplayStats struct {
 	Cursor    ReplayCursor
 	Delivered int // records passed to fn (seq > cursor.Seq)
 	Scanned   int // lines read this pass
+	Corrupted int // unparseable or malformed records
+	Oversized int // lines exceeding maxLineSize
 }
 
 // ReplayFrom reads records from the WAL starting at seqAfter (exclusive).
@@ -54,7 +56,7 @@ func ReplayFromCursor[T any](
 		return stats, err
 	}
 	size := info.Size()
-	// Stamp skip: at EOF there are no new bytes. Stat is cheaper than Open (CRIT-1790151410719520000-18e0643b).
+	// Stamp skip: at EOF there are no new bytes. Stat is cheaper than Open (CRIT-CEF-WAL-CURSOR-EOF).
 	if size == cursor.Offset {
 		return stats, nil
 	}
@@ -113,6 +115,7 @@ func replayLines[T any](
 				payload = payload[:len(payload)-1]
 			}
 			if maxLineSize > 0 && len(payload) > maxLineSize {
+				stats.Oversized++
 				stats.Cursor.Offset = offset
 				continue
 			}
@@ -124,6 +127,7 @@ func replayLines[T any](
 			}
 			rec, parseErr := parse(payload)
 			if parseErr != nil || rec == nil {
+				stats.Corrupted++
 				stats.Cursor.Offset = offset
 				continue
 			}

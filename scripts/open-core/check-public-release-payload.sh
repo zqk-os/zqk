@@ -93,6 +93,7 @@ fi
 # command DNA, or generated builders. Tests may still mint synthetic ids.
 if git -C "$ROOT" grep -n -E '[A-Z]{2,12}-[0-9]{15,}-[0-9a-fA-F]{8}' -- \
 	'cmd' \
+	'pkg' \
 	'docs/architecture' \
 	'docs/specs' \
 	'docs/onboarding' \
@@ -105,9 +106,10 @@ if git -C "$ROOT" grep -n -E '[A-Z]{2,12}-[0-9]{15,}-[0-9a-fA-F]{8}' -- \
 	'.zqk/cli/specs' \
 	'pkg/cli/bldr_cli_cmd_v1' \
 	':!*_test.go' \
+	':!pkg/**/testdata/*' \
 	':!scripts/open-core/check-public-release-payload.sh' \
 	':!scripts/open-core/test-public-release-gates.sh'; then
-	fail "studio nanos-hex kernel object id remains in production cmd, docs, scripts, CLI specs, or command builders"
+	fail "studio nanos-hex kernel object id remains in production pkg, cmd, docs, scripts, CLI specs, or command builders"
 fi
 
 # Public documentation must not reference studio/isolated project process items:

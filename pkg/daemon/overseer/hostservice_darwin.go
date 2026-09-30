@@ -179,7 +179,7 @@ func InstallOverseerLaunchAgent(projectRoot, binaryPath string) (*LaunchAgentSta
 `, OverseerLaunchAgentLabel, bin, absRoot, home, envPath, absRoot, stdoutLog, stderrLog)
 
 	plistPath := filepath.Join(dir, OverseerLaunchAgentLabel+".plist")
-	if err := fileutil.WriteFile(plistPath, []byte(plistBody), paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(plistPath, []byte(plistBody), paths.FilePerm600); err != nil {
 		return nil, errfmt.Newf("write %s", plistPath).Wrap(err)
 	}
 

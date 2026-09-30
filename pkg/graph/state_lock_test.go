@@ -90,3 +90,51 @@ func TestStateLocking(t *testing.T) {
 		t.Fatalf("Expected counter to be 50, but got %d (concurrent collision)", counter)
 	}
 }
+
+func TestFencedStateLocking(t *testing.T) {
+	locker := NewMemoryStateLocker().(FencedStateLocker)
+	ctx := context.Background()
+	resourceID := "fenced-res-42"
+
+	// 1. Acquire lock with fence
+	release, token1, err := locker.LockWithFence(ctx, resourceID, 200*time.Millisecond, 500*time.Millisecond)
+	if err != nil {
+		t.Fatalf("LockWithFence: %v", err)
+	}
+	if token1 <= 0 {
+		t.Fatalf("expected positive fence token, got %d", token1)
+	}
+
+	// Token must be valid while lease is active
+	if !locker.ValidateFence(resourceID, token1) {
+		t.Fatalf("expected token %d to be valid", token1)
+	}
+
+	// 2. Wait for lease to expire
+	time.Sleep(250 * time.Millisecond)
+
+	// Token must NOT be valid after expiration
+	if locker.ValidateFence(resourceID, token1) {
+		t.Fatalf("expected token %d to be invalid after expiration", token1)
+	}
+	_ = release()
+
+	// 3. Acquire new lease - must receive strictly greater monotonic token
+	release2, token2, err := locker.LockWithFence(ctx, resourceID, 200*time.Millisecond, 500*time.Millisecond)
+	if err != nil {
+		t.Fatalf("LockWithFence second: %v", err)
+	}
+	defer release2()
+
+	if token2 <= token1 {
+		t.Fatalf("expected monotonic token token2 (%d) > token1 (%d)", token2, token1)
+	}
+	if !locker.ValidateFence(resourceID, token2) {
+		t.Fatalf("expected token %d to be valid", token2)
+	}
+	// Old token remains invalid
+	if locker.ValidateFence(resourceID, token1) {
+		t.Fatalf("old token %d must not validate against new lease", token1)
+	}
+}
+

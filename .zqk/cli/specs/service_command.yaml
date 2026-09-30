@@ -10,11 +10,11 @@ description: |
 help:
   examples:
     - comment: "Install a LaunchAgent/systemd unit for this project root"
-      command: "%s scheduler service install --root ."
+      command: "%s service install --root ."
     - comment: "List registered units"
-      command: "%s scheduler service list"
+      command: "%s service list"
     - comment: "Garbage-collect units whose roots are gone"
-      command: "%s scheduler service gc"
+      command: "%s service gc"
   exclude_flags:
     - "format"
     - "output"

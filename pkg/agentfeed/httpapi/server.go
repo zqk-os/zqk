@@ -69,6 +69,12 @@ func New(cfg Config) (*Server, error) {
 	if cfg.ListenAddr == "" {
 		cfg.ListenAddr = "127.0.0.1:8787"
 	}
+	isLoopback := mcp.IsLoopbackAddr(cfg.ListenAddr)
+	hasTLS := strings.TrimSpace(cfg.TLSCertFile) != "" && strings.TrimSpace(cfg.TLSKeyFile) != ""
+	hasToken := strings.TrimSpace(cfg.Token) != ""
+	if !isLoopback && (!hasTLS || !hasToken) {
+		return nil, errfmt.Errorf("refusing to bind unauthenticated plain HTTP feed server to non-loopback address %q; both TLS and token authentication are required for network exposure (CRIT-CEF-R2-SEC-FEED-AUTH / F-SEC-005)", cfg.ListenAddr)
+	}
 	s := &Server{cfg: cfg, mux: http.NewServeMux()}
 	s.mux.HandleFunc(pathHealth, s.handleHealth)
 	s.mux.HandleFunc(pathOpenAPI, s.handleOpenAPI)
@@ -128,12 +134,16 @@ func (s *Server) ListenAndServe(ctx context.Context) error {
 
 func (s *Server) withAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if tok := strings.TrimSpace(s.cfg.Token); tok != "" {
+		tok := strings.TrimSpace(s.cfg.Token)
+		if tok != "" {
 			got := strings.TrimSpace(strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer"))
 			if got == "" || subtle.ConstantTimeCompare([]byte(got), []byte(tok)) != 1 {
 				writeErr(w, http.StatusUnauthorized, "unauthorized")
 				return
 			}
+		} else if !mcp.IsLoopbackAddr(s.cfg.ListenAddr) {
+			writeErr(w, http.StatusUnauthorized, "unauthorized: token required for non-loopback interface")
+			return
 		}
 		next(w, r)
 	}

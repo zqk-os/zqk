@@ -112,7 +112,7 @@ func (b *DocEntryLifecycleBuilder) addDocEntryLifecycleData() {
 		Manual:      true,
 		Auto:        true,
 		Preconditions: []string{
-			"Target document file exists and is reachable on disk",
+			"path_exists:file_path",
 		},
 	})
 
@@ -123,7 +123,9 @@ func (b *DocEntryLifecycleBuilder) addDocEntryLifecycleData() {
 		Manual:      true,
 		Auto:        false,
 		Preconditions: []string{
-			"Title, summary, and path are populated",
+			"field_nonempty:title",
+			"field_nonempty:summary",
+			"field_nonempty:path",
 		},
 	})
 
@@ -134,9 +136,9 @@ func (b *DocEntryLifecycleBuilder) addDocEntryLifecycleData() {
 		Manual:      true,
 		Auto:        false,
 		Preconditions: []string{
-			"Target file reachable and readable",
-			"Cryptographic content_hash computed and sealed",
-			"Document content_size measured",
+			"path_exists:file_path",
+			"field_nonempty:content_hash",
+			"content_size_positive:content_size",
 		},
 	})
 
@@ -147,7 +149,7 @@ func (b *DocEntryLifecycleBuilder) addDocEntryLifecycleData() {
 		Manual:      true,
 		Auto:        false,
 		Preconditions: []string{
-			"Cryptographic content_hash matches target file on disk",
+			"content_hash_matches:file_path",
 		},
 	})
 

@@ -65,7 +65,7 @@ When an agent wakes up or completes a task iteration, it evaluates ambient signa
 - **Mandated Action**: Self-discover what's next, claim the lead backlog item atomically, and begin execution:
   ```bash
   zqk workflow whats-next
-  zqk agent claim-work --plan <PRI-ID> --agent-id <SEAT-ID>
+  zqk do <BLI-ID>
   ```
 - **Validation Gate**: Object transition committed to change journal with valid HMAC / author signature.
 
@@ -73,7 +73,7 @@ When an agent wakes up or completes a task iteration, it evaluates ambient signa
 - **Trigger**: Active priority plan has 0 planned items remaining, but open milestones or unfulfilled requirements exist.
 - **Mandated Action**: Groom next tranche of requirements into shovel-ready backlog items (Definition of Ready: clear description, linked criteria, linked verification tests):
   ```bash
-  zqk plan groom --plan <PRI-ID>
+  zqk workflow add <BLI-ID> [PRI-ID]
   ```
 - **Validation Gate**: Minimum 2 shovel-ready backlog items planned with validated criteria before executing work.
 
@@ -97,8 +97,8 @@ When an agent wakes up or completes a task iteration, it evaluates ambient signa
 | `SCHEDULER_STOPPED` | `zqk system status` | **P1** | `zqk scheduler start` | Scheduler daemon PID active in `.zqk/state` |
 | `VIEW_LAG_EXCEEDED` | `zqk workflow whats-next` | **P1** | `zqk system align` | Watermark age < 120s |
 | `BLI_IN_PROGRESS` | `zqk object list --kind bli` | **P2** | `zqk do <BLI_ID>` | Criteria latched; BLI status: `implemented` |
-| `PLAN_SHOVEL_READY` | `zqk workflow whats-next` | **P3** | `zqk agent claim-work` | BLI claimed by seat; status: `in_progress` |
-| `PLAN_EXHAUSTED` | `zqk plan show` | **P4** | `zqk plan groom` | Shovel-ready queue replenished |
+| `PLAN_SHOVEL_READY` | `zqk workflow whats-next` | **P3** | `zqk do <BLI-ID>` or `zqk agent claim <ATK-ID>` | BLI claimed by seat; status: `in_progress` |
+| `PLAN_EXHAUSTED` | `zqk pplan current` | **P4** | `zqk workflow add <BLI-ID>` | Shovel-ready queue replenished |
 | `MILESTONE_MERGED` | Git commit / PR | **P5** | Promote binary & query `whats-next` | Continuous loop advances without idleness |
 
 ---
@@ -114,7 +114,7 @@ Upon completing a backlog item or merging an integration branch:
 1. Build updated binaries and refresh background daemons:
    ```bash
    make build
-   zqk scheduler restart
+   zqk scheduler stop && zqk scheduler start
    ```
 2. Query the Knowledge Kernel for the next priority:
    ```bash
@@ -126,7 +126,7 @@ Upon completing a backlog item or merging an integration branch:
    ```
 4. Claim the first shovel-ready backlog item atomically:
    ```bash
-   zqk agent claim-work --plan <PRI-ID>
+   zqk do <BLI-ID>
    ```
 5. Resume execution chain (`zqk do <BLI-ID>`) without yielding control.
 
@@ -137,3 +137,55 @@ Upon completing a backlog item or merging an integration branch:
 1. **No Out-of-Kernel State**: Ambient state, claimed work, and priority signals exist strictly within the Knowledge Kernel (`.zqk/`). Local vendor scratchpads or agent memory files are not authoritative.
 2. **Fail-Closed Verification**: An item is never marked completed unless all associated criteria are cryptographically latched and verified by automated tests.
 3. **Idempotent Self-Healing**: Auto-remedy operations must be idempotent and safe to execute repeatedly under high concurrency.
+4. **Anti-Bloat Cardinality Invariant**: Symptom lists, evaluation findings, and bug reports MUST be synthesized into root-cause engineering packages ($\ge 5:1$ symptom-to-BLI ratio). Mechanical 1:1 symptom-mirroring is prohibited.
+5. **Deterministic Cybernetic Steering**: Agents evaluate whether candidate actions bring the target projection closer or farther away, execute the most promising hypothesis, re-measure deltas, calculate gain/loss, feed ambient signals to the kernel, and dynamically execute the highest kernel priority.
+
+---
+
+## 6. The Deterministic Cybernetic Steering Loop
+
+```
+                     ┌───────────────────────────────┐
+                     │ 1. State Projection           │
+                     │    Measure delta vs target    │
+                     │    (CEF Diamond, VDS, Align)  │
+                     └───────────────┬───────────────┘
+                                     │
+                                     ▼
+                     ┌───────────────────────────────┐
+                     │ 2. Hypothesis Formulation     │
+                     │    Evaluate candidate actions │
+                     │    Select max-gain hypothesis │
+                     └───────────────┬───────────────┘
+                                     │
+                                     ▼
+                     ┌───────────────────────────────┐
+                     │ 3. Deterministic Execution    │
+                     │    Atomic TDD mutation        │
+                     │    (zqk do <BLI-ID>)          │
+                     └───────────────┬───────────────┘
+                                     │
+                                     ▼
+                     ┌───────────────────────────────┐
+                     │ 4. Re-Evaluation & Measure    │
+                     │    Run empirical benchmarks   │
+                     │    (test-race, CEF eval)      │
+                     └───────────────┬───────────────┘
+                                     │
+                                     ▼
+                     ┌───────────────────────────────┐
+                     │ 5. Delta & Gain Calculation   │
+                     │    Compare to prior baseline  │
+                     │    Quantify empirical delta   │
+                     └───────────────┬───────────────┘
+                                     │
+                                     ▼
+                     ┌───────────────────────────────┐
+                     │ 6. Ambient Feedback & Steer   │
+                     │    zqk system align           │
+                     │    zqk workflow whats-next    │
+                     │    Mint next highest-priority │
+                     └───────────────┬───────────────┘
+                                     │
+                                     └─────── Loop back to 1
+```

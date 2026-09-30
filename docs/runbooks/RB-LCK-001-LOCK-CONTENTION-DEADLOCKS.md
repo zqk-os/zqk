@@ -20,9 +20,9 @@
 ### Step 1: Capture Goroutine Stack Trace
 Dump active goroutines to locate blocking locks:
 ```bash
-./bin/zqk diagnostics dump --include-goroutines
+./bin/zqk scheduler dump
 ```
-Inspect generated diagnostics under `.zqk/diagnostics/` for mutex contention.
+Inspect generated diagnostics under `.zqk/scheduler/diagnostics/` for mutex contention.
 
 ### Step 2: Identify Contended Lock Names
 Filter the recent daemon logs for slow lock acquisitions:

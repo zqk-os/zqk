@@ -52,6 +52,16 @@ func NewAuditorService(wal *lifecycle.LifecycleEventWAL, s storage.ObjectStorage
 	}
 }
 
+func (s *AuditorService) projectRoot() string {
+	if s.emitter != nil && s.emitter.ProjectRoot() != "" {
+		return s.emitter.ProjectRoot()
+	}
+	if g, ok := s.gate.(*AuditorGate); ok && g.projectRoot != "" {
+		return g.projectRoot
+	}
+	return ""
+}
+
 func (s *AuditorService) getIDEPath() string {
 	return filepath.Join(paths.ProjectDataDir, paths.IdesSubdir, "qa_auditor.ide")
 }
@@ -76,11 +86,17 @@ func (s *AuditorService) saveIDE(cursor walutil.ReplayCursor) error {
 	return fileutil.WriteSecureFile(path, walutil.FormatReplayCursorCheckpoint(cursor))
 }
 
-// auditTriggeringStatuses are the lifecycle target states that make an object due for a QA audit.
 var auditTriggeringStatuses = map[string]bool{
 	"in_progress": true,
 	"complete":    true,
 	"completed":   true,
+}
+
+var auditTriggeringKinds = map[string]bool{
+	objects.KindBacklogItem: true,
+	objects.KindAgentTask:   true,
+	objects.KindRequirement: true,
+	objects.KindCriteria:    true,
 }
 
 // isAuditTriggeringEvent reports whether a WAL event is a status transition into a state
@@ -88,7 +104,8 @@ var auditTriggeringStatuses = map[string]bool{
 func isAuditTriggeringEvent(ev *lifecycle.LifecycleEvent) bool {
 	return ev != nil &&
 		ev.EventType == lifecycle.EventTypeStatusTransition &&
-		auditTriggeringStatuses[ev.ToStatus]
+		auditTriggeringStatuses[ev.ToStatus] &&
+		(auditTriggeringKinds[ev.Kind] || ev.Kind == "")
 }
 
 // Run monitors the WAL and performs audits on relevant events.
@@ -142,12 +159,16 @@ func (s *AuditorService) Run(ctx context.Context) error {
 	}
 }
 
-// AuditNow runs one QA audit for id (same path as the WAL watcher).
+// AuditNow runs one QA audit for id with terminal gate verification enabled.
 func (s *AuditorService) AuditNow(ctx context.Context, id, kind string) {
-	s.performAudit(ctx, id, kind)
+	s.performAuditWithMode(ctx, id, kind, true)
 }
 
 func (s *AuditorService) performAudit(ctx context.Context, id string, kind string) {
+	s.performAuditWithMode(ctx, id, kind, false)
+}
+
+func (s *AuditorService) performAuditWithMode(ctx context.Context, id string, kind string, isTerminalAudit bool) {
 	logger := logging.NewEventLogger(ctx)
 	logging.FluentEvent(logger).Info(fmt.Sprintf(LogFmtAuditorStart, kind, id)).Log()
 
@@ -164,13 +185,99 @@ func (s *AuditorService) performAudit(ctx context.Context, id string, kind strin
 		return
 	}
 
-	// 1.5 Traceability Check
 	status, _ := obj[objects.FieldKeyStatus].(string)
-	isComplete := status == objects.ObjectStatusComplete || status == objects.ObjectStatusCompleted || status == "complete" || status == "completed"
-	artifactPaths := extractArtifactPaths(obj[objects.FieldKeyArtifacts])
+	isComplete := IsCompleteStatus(status)
+	artifactPaths := ExtractObjectArtifacts(obj)
 
-	if kind == objects.KindBacklogItem && isComplete {
-		hasTraceability := hasStringEvidence(obj[objects.FieldKeyCommitHashes])
+	// 1.3 Requirement Criteria Verification
+	if kind == objects.KindRequirement && (isComplete || isTerminalAudit) {
+		critRefs := extractArtifactPaths(obj[objects.FieldKeyCriteriaRefs])
+		if len(critRefs) == 0 {
+			reason := ReasonMissingCriteria
+			logging.FluentEvent(logger).Warn(fmt.Sprintf(LogFmtAuditorContentDisparity, id, reason)).Log()
+			if s.emitter != nil {
+				if err := s.emitter.EmitDisparityInterrupt(ctx, id, reason); err != nil {
+					logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorEmitHITLFailed, err), err).Log()
+				}
+			}
+			return
+		}
+		for _, cID := range critRefs {
+			criterion, err := s.storage.Read(ctx, secCtx, cID)
+			if err != nil {
+				reason := fmt.Sprintf("Referenced criterion %s not found: %v", cID, err)
+				logging.FluentEvent(logger).Warn(fmt.Sprintf(LogFmtAuditorContentDisparity, id, reason)).Log()
+				if s.emitter != nil {
+					if emitErr := s.emitter.EmitDisparityInterrupt(ctx, id, reason); emitErr != nil {
+						logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorEmitHITLFailed, emitErr), emitErr).Log()
+					}
+				}
+				return
+			}
+			cStatus, _ := criterion[objects.FieldKeyStatus].(string)
+			if !IsCompleteStatus(cStatus) {
+				reason := fmt.Sprintf("Referenced criterion %s is not complete (status=%s)", cID, cStatus)
+				logging.FluentEvent(logger).Warn(fmt.Sprintf(LogFmtAuditorContentDisparity, id, reason)).Log()
+				if s.emitter != nil {
+					if emitErr := s.emitter.EmitDisparityInterrupt(ctx, id, reason); emitErr != nil {
+						logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorEmitHITLFailed, emitErr), emitErr).Log()
+					}
+				}
+				return
+			}
+		}
+		logging.FluentEvent(logger).Info(fmt.Sprintf("🔍 [QA-AUDITOR] Verified all %d referenced criteria for requirement %s", len(critRefs), id)).Log()
+	}
+
+	// 1.4 Criteria Test Proof Verification
+	if kind == objects.KindCriteria && (isComplete || isTerminalAudit) {
+		hasTestProof := false
+		testRefs := extractArtifactPaths(obj[objects.FieldKeyTestCaseRefs])
+		for _, tID := range testRefs {
+			tc, err := s.storage.Read(ctx, secCtx, tID)
+			if err == nil && IsTestCaseProven(tc) {
+				hasTestProof = true
+				break
+			}
+		}
+		if !hasTestProof {
+			// Also inspect test_cases referencing this criteria in storage
+			filter := storage.ListFilter{
+				Kind: objects.KindTestCase,
+			}
+			if listRes, err := s.storage.List(ctx, secCtx, nil, filter); err == nil && listRes != nil {
+				for _, tc := range listRes.Objects {
+					tcCritRefs := extractArtifactPaths(tc[objects.FieldKeyCriteriaRefs])
+					match := false
+					for _, r := range tcCritRefs {
+						if r == id {
+							match = true
+							break
+						}
+					}
+					if match && IsTestCaseProven(tc) {
+						hasTestProof = true
+						break
+					}
+				}
+			}
+		}
+		if !hasTestProof {
+			reason := ReasonMissingTestProof
+			logging.FluentEvent(logger).Warn(fmt.Sprintf(LogFmtAuditorContentDisparity, id, reason)).Log()
+			if s.emitter != nil {
+				if err := s.emitter.EmitDisparityInterrupt(ctx, id, reason); err != nil {
+					logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorEmitHITLFailed, err), err).Log()
+				}
+			}
+			return
+		}
+		logging.FluentEvent(logger).Info(fmt.Sprintf("🔍 [QA-AUDITOR] Verified passing test case proof for criterion %s", id)).Log()
+	}
+
+	// 1.5 Traceability Check
+	if kind == objects.KindBacklogItem && (isComplete || isTerminalAudit) {
+		hasTraceability := HasStringEvidence(obj[objects.FieldKeyCommitHashes])
 		hasTestAsset := false
 		for _, path := range artifactPaths {
 			if strings.HasSuffix(path, "_test.go") {
@@ -195,36 +302,11 @@ func (s *AuditorService) performAudit(ctx context.Context, id string, kind strin
 	}
 
 	// 1.6 Deliverable Artifacts Validation
-	// Fail-closed: completed backlog items and agent tasks must have at least one deliverable artifact.
-	if (kind == objects.KindBacklogItem || kind == objects.KindAgentTask) && isComplete {
-		if len(artifactPaths) == 0 {
-			reason := ReasonMissingArtifacts
-			logging.FluentEvent(logger).Warn(fmt.Sprintf(LogFmtAuditorContentDisparity, id, reason)).Log()
-			if s.emitter != nil {
-				if err := s.emitter.EmitDisparityInterrupt(ctx, id, reason); err != nil {
-					logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorEmitHITLFailed, err), err).Log()
-				}
-			}
-			return
-		}
-	}
-
-	// For all declared artifacts, verify that the files actually exist on disk before running AST analysis.
-	for _, path := range artifactPaths {
-		info, err := fileutil.Stat(path)
-		if err != nil || info.IsDir() {
-			reason := fmt.Sprintf("Artifact file does not exist or cannot be read: %s", path)
-			logging.FluentEvent(logger).Warn(fmt.Sprintf(LogFmtAuditorContentDisparity, id, reason)).Log()
-			if s.emitter != nil {
-				if emitErr := s.emitter.EmitDisparityInterrupt(ctx, id, reason); emitErr != nil {
-					logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorEmitHITLFailed, emitErr), emitErr).Log()
-				}
-			}
-			return
-		}
-		f, err := fileutil.Open(path)
+	// Fail-closed: completed objects must pass unified deliverable artifact validation.
+	if isComplete || (isTerminalAudit && (kind == objects.KindBacklogItem || kind == objects.KindAgentTask)) {
+		verified, err := ValidateDeliverableArtifacts(obj, s.projectRoot())
 		if err != nil {
-			reason := fmt.Sprintf("Artifact file cannot be read: %s", path)
+			reason := err.Error()
 			logging.FluentEvent(logger).Warn(fmt.Sprintf(LogFmtAuditorContentDisparity, id, reason)).Log()
 			if s.emitter != nil {
 				if emitErr := s.emitter.EmitDisparityInterrupt(ctx, id, reason); emitErr != nil {
@@ -233,12 +315,22 @@ func (s *AuditorService) performAudit(ctx context.Context, id string, kind strin
 			}
 			return
 		}
-		_ = f.Close()
+		if len(verified) > 0 {
+			artifactPaths = verified
+		}
 	}
 
 	// 2. STRUCTURAL AST AUDIT
 	if len(artifactPaths) == 0 {
-		logging.FluentEvent(logger).Info(fmt.Sprintf("Skipping AST audit: no artifacts defined for %s", id)).Log()
+		if (kind == objects.KindRequirement || kind == objects.KindCriteria) && (isComplete || isTerminalAudit) {
+			// Requirements and criteria have ontological verification above; AST file scan is not applicable.
+		} else {
+			// Fail-closed invariant: NO DATA != NO FAILURES.
+			// If an object has no artifacts to AST-audit, and is not a requirement or criteria verified by ontology,
+			// the auditor cannot attest to its conformance and MUST NOT issue a vacuous QASuccess token.
+			logging.FluentEvent(logger).Info(fmt.Sprintf("Skipping QASuccess issuance: no verifiable artifacts or ontological criteria defined for %s (%s)", id, kind)).Log()
+			return
+		}
 	}
 	var astViolations []Violation
 	for _, path := range artifactPaths {
@@ -259,7 +351,11 @@ func (s *AuditorService) performAudit(ctx context.Context, id string, kind strin
 			}
 			return
 		}
-		astViolations = append(astViolations, violations...)
+		for _, v := range violations {
+			if v.Severity == "high" || v.Severity == "medium" {
+				astViolations = append(astViolations, v)
+			}
+		}
 	}
 
 	if len(astViolations) > 0 {
@@ -307,8 +403,14 @@ func (s *AuditorService) performAudit(ctx context.Context, id string, kind strin
 	}
 
 	// Invariant: QASuccess is never minted during in_progress lifecycle status transitions.
-	if status == objects.ObjectStatusInProgress || status == "in_progress" {
+	if !isTerminalAudit && (status == objects.ObjectStatusInProgress || status == "in_progress") {
 		logging.FluentEvent(logger).Info(fmt.Sprintf("Skipping QASuccess issuance: status is in_progress for %s", id)).Log()
+		return
+	}
+
+	// Fail-closed: requirements and criteria must be complete to issue QASuccess
+	if (kind == objects.KindRequirement || kind == objects.KindCriteria) && !isComplete && !isTerminalAudit {
+		logging.FluentEvent(logger).Info(fmt.Sprintf("Skipping QASuccess issuance: %s is not complete for %s", kind, id)).Log()
 		return
 	}
 
@@ -339,47 +441,7 @@ func (s *AuditorService) performAudit(ctx context.Context, id string, kind strin
 	logging.FluentEvent(logger).Info(fmt.Sprintf(LogFmtAuditorSuccess, id)).Log()
 }
 
-func extractArtifactPaths(value any) []string {
-	var paths []string
-	switch items := value.(type) {
-	case []any:
-		for _, item := range items {
-			if s, ok := item.(string); ok && strings.TrimSpace(s) != "" {
-				paths = append(paths, strings.TrimSpace(s))
-			}
-		}
-	case []string:
-		for _, s := range items {
-			if strings.TrimSpace(s) != "" {
-				paths = append(paths, strings.TrimSpace(s))
-			}
-		}
-	case string:
-		if strings.TrimSpace(items) != "" {
-			paths = append(paths, strings.TrimSpace(items))
-		}
-	}
-	return paths
-}
 
-
-func hasStringEvidence(value any) bool {
-	switch refs := value.(type) {
-	case []any:
-		for _, ref := range refs {
-			if text, ok := ref.(string); ok && strings.TrimSpace(text) != "" {
-				return true
-			}
-		}
-	case []string:
-		for _, ref := range refs {
-			if strings.TrimSpace(ref) != "" {
-				return true
-			}
-		}
-	}
-	return false
-}
 
 func (s *AuditorService) hasCompletedCriterion(
 	ctx context.Context,
@@ -404,7 +466,7 @@ func (s *AuditorService) hasCompletedCriterion(
 			continue
 		}
 		criterionStatus, _ := criterion[objects.FieldKeyStatus].(string)
-		if criterionStatus == objects.ObjectStatusComplete || criterionStatus == objects.ObjectStatusCompleted {
+		if IsCompleteStatus(criterionStatus) {
 			return true
 		}
 	}

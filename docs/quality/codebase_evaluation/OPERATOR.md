@@ -13,17 +13,35 @@
 
 ## 1. Step-by-Step Operator Workflow
 
-### Step 1: Materialize Output Package Skeleton
+### Step 1: Initialize Evaluation Package (Native Swarm or Manual Skeleton)
 
-Materialize the complete evaluation package directory before launching analysis agents:
+You can orchestrate the evaluation either natively through the ZQK Knowledge Kernel swarm engine, or manually via the template skeleton:
+
+#### Option A: Native Kernel Swarm Dispatch (Recommended)
+The framework includes a fully declared swarm package under [`packs/code-eval/`](../../../packs/code-eval/swarm.yaml) with 12 pipeline tasks and pre-rendered prompt templates across all lenses:
 
 ```bash
-# Materialize package skeleton with agent identity and freeze commit SHA
-sh ./scripts/cef/materialize-package.sh <output_home> <AGENT_ID> <freeze_sha>
+# Validate the evaluation swarm package and inspect task topology
+zqk swarm run packs/code-eval --dry-run
+
+# Stage the evaluation pipeline and prompt templates into the kernel without launching
+zqk swarm run packs/code-eval --stage-only
+
+# Or launch the automated multi-agent swarm in background
+zqk swarm run packs/code-eval -y
 ```
 
-> [!NOTE]
-> All scaffolded stub markers (`REPLACE_ME`, `UNGRADED`, `F-STUB-000`) must be fully populated and validated before each wave is marked complete.
+#### Option B: Manual Directory Skeleton & Prompt Dispatch
+To run an evaluation with an external or solo AI operator without orchestrating through the background swarm engine:
+
+```bash
+# Copy template skeleton to target evaluation run directory
+mkdir -p <output_home>
+cp -R docs/quality/codebase_evaluation/templates/package_skeleton/* <output_home>/
+cp docs/quality/codebase_evaluation/templates/run_scope.example.yaml <output_home>/run_scope.yaml
+```
+
+Feed [`KICKOFF_PROMPT.md`](./KICKOFF_PROMPT.md) to initialize the operator session, and dispatch individual prompts from [`prompts/`](./prompts/) for each wave.
 
 ---
 

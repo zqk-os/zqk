@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // IPCWriterArgs defines the arguments for daemon RPC calls.
@@ -88,17 +90,24 @@ func (d *PrivilegedWriterDaemon) RenameObject(args *IPCWriterArgs, reply *bool) 
 	return err
 }
 
-// StartIPCServer starts listening on the given socket path.
+// StartIPCServer starts listening on the given socket path with secure permissions.
 func StartIPCServer(socketPath string, daemon *PrivilegedWriterDaemon) (net.Listener, error) {
 	server := rpc.NewServer()
 	if err := server.Register(daemon); err != nil {
 		return nil, fmt.Errorf("failed to register daemon RPC: %w", err)
 	}
 
+	dir := filepath.Dir(socketPath)
+	if err := fileutil.MkdirAll(dir, paths.DirPerm700); err != nil {
+		return nil, fmt.Errorf("failed to create socket directory %s: %w", dir, err)
+	}
+
+	_ = fileutil.Remove(socketPath)
 	listener, err := net.Listen("unix", socketPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to listen on %s: %w", socketPath, err)
 	}
+	_ = fileutil.Chmod(socketPath, paths.FilePerm600)
 
 	goroutinelabels.NewGoroutine("storage.ipc_server_accept", "accepting IPC server connections").StartSimple(func() {
 		server.Accept(listener)

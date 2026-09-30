@@ -1,0 +1,141 @@
+(* ========================================================================== *)
+(* ZQK Kernel Predicate DSL Formal Grammar (ISO/IEC 14977)                    *)
+(* Defines the unified deterministic predicate syntax across VDS done-gates,  *)
+(* lifecycle preconditions, criteria completeness validation, and CI checks.   *)
+(* ========================================================================== *)
+
+predicate_expression
+    = predicate , { ( ";" | "," ) , predicate } ;
+
+predicate_list
+    = "[" , [ predicate , { "," , predicate } ] , "]" ;
+
+predicate
+    = object_predicate
+    | path_predicate
+    | metric_predicate
+    | execution_predicate
+    | ast_predicate
+    | gate_predicate ;
+
+(* --- 1. Object & Field Predicates --- *)
+object_predicate
+    = "object_exists:" , object_identifier
+    | "field_nonempty:" , [ object_identifier , ":" ] , field_name
+    | "field_cleared:" , [ object_identifier , ":" ] , field_name
+    | "any_nonempty:" , field_name , { ( ":" | "," ) , field_name }
+    | "field_matches:" , field_name , ":" , regex_pattern
+    | "role_is:" , role_name
+    | "active_ref:" , field_name
+    | "link_back:" , field_name , ":" , field_name
+    | "at_least:" , digit , { digit } , ":" , field_name ;
+
+role_name
+    = "grooming" | "shovel_ready" | "execution_locked" | "enforced" | "realign" | "halted" | "terminal" | "testing" | "draft" | "conceptual" ;
+
+(* --- 2. Filesystem & Artifact Predicates --- *)
+path_predicate
+    = "path_exists:" , relative_path
+    | "content_hash_matches:" , relative_path
+    | "content_size_positive:" , field_name ;
+
+(* --- 3. Metric Predicates --- *)
+metric_predicate
+    = "query_metric:" , metric_name , comparison_operator , number_literal ;
+
+(* --- 4. Execution & Exit Code Predicates --- *)
+execution_predicate
+    = "command_exit_code:" , shell_command ;
+
+(* --- 5. AST & Semantic Code Predicates --- *)
+ast_predicate
+    = "ast_semantic_match:" , package_or_file_path , ":" , symbol_constraint ;
+
+symbol_constraint
+    = ( "symbol_present:" | "symbol_absent:" | "type_implements:" | "no_raw_panics" ) , symbol_name ;
+
+(* --- 6. Standalone Gate Predicates --- *)
+gate_predicate
+    = "tests_ok_per_customization"
+    | "lint_ok_per_customization"
+    | "criteria_linked_or_acceptance_present"
+    | "git_diff_nonempty_or_waiver"
+    | "ci_required_checks_green_or_na"
+    | "security_gate_ok_or_na"
+    | "performance_gate_ok_or_na"
+    | "publish_ack_present_if_public"
+    | "standard_checks_pass"
+    | "shovel_ready"
+    | "tdd_test_red_phase"
+    | "criteria_active_test_case"
+    | "ready_backlog_references_plan"
+    | "linked_backlog_ready_or_later"
+    | "linked_backlog_all_terminal"
+    | "no_linked_backlog_in_progress_or_complete"
+    | "workflow_constraints_if_set"
+    | "priority_plan_validated"
+    | "team_or_persona_dispatch_refs"
+    | "git_mutation_evidence_present"
+    | "branch_is_ancestor_of_trunk"
+    | "machine_checkable_closure_evidence"
+    | "linked_criteria_validated_or_complete"
+    | "priority_plan_archived_when_set"
+    | "priority_plan_execution_facing"
+    | "work_done"
+    | "title_body_cohesion" , [ ":" , digit , { digit } ] ;
+
+(* --- Lexical Tokens --- *)
+object_identifier
+    = uppercase_letter , { uppercase_letter | digit | "_" | "-" } ;
+
+field_name
+    = lowercase_letter , { lowercase_letter | digit | "_" } ;
+
+metric_name
+    = lowercase_letter , { lowercase_letter | digit | "_" } ;
+
+symbol_name
+    = ( letter | "_" ) , { letter | digit | "_" } ;
+
+comparison_operator
+    = "==" | "!=" | "<" | "<=" | ">" | ">=" ;
+
+number_literal
+    = [ "-" ] , digit , { digit } , [ "." , digit , { digit } ] ;
+
+relative_path
+    = path_character , { path_character } ;
+
+package_or_file_path
+    = path_character , { path_character } ;
+
+shell_command
+    = character_no_semicolon , { character_no_semicolon } ;
+
+regex_pattern
+    = character_no_colon , { character_no_colon } ;
+
+path_character
+    = letter | digit | "/" | "." | "_" | "-" ;
+
+character_no_semicolon
+    = ? any character except ';' and newline ? ;
+
+character_no_colon
+    = ? any character except ':' and newline ? ;
+
+letter
+    = uppercase_letter | lowercase_letter ;
+
+uppercase_letter
+    = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J"
+    | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T"
+    | "U" | "V" | "W" | "X" | "Y" | "Z" ;
+
+lowercase_letter
+    = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j"
+    | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t"
+    | "u" | "v" | "w" | "x" | "y" | "z" ;
+
+digit
+    = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;

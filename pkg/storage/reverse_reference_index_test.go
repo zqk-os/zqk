@@ -1,18 +1,17 @@
 package storage
 
 import (
-	"github.com/zqk-os/zqk/pkg/datacell"
-	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
-
+	stdcontext "context"
 	"path/filepath"
 	"sort"
 	"testing"
+	"time"
 
-	"github.com/zqk-os/zqk/pkg/paths"
-
-	"gopkg.in/yaml.v3"
-
+	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"gopkg.in/yaml.v3"
 )
 
 // TestReverseReferenceIndex_AddReference_GetDependents tests AddReference and GetDependents.
@@ -168,7 +167,10 @@ func TestReverseReferenceIndex_BuildFromScan(t *testing.T) {
 		objects.FieldKeyTitle:         "Parent",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 	}
-	parentData, _ := yaml.Marshal(parent)
+	parentData, err := yaml.Marshal(parent)
+	if err != nil {
+		t.Fatalf("Marshal parent: %v", err)
+	}
 	if err := fileutil.WriteFile(filepath.Join(backlogDir, "BLI-002.yaml"), parentData, paths.FilePerm644); err != nil {
 		t.Fatalf("Write parent: %v", err)
 	}
@@ -180,7 +182,10 @@ func TestReverseReferenceIndex_BuildFromScan(t *testing.T) {
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		"test_parent_ref":             "BLI-002",
 	}
-	childData, _ := yaml.Marshal(child)
+	childData, err := yaml.Marshal(child)
+	if err != nil {
+		t.Fatalf("Marshal child: %v", err)
+	}
 	if err := fileutil.WriteFile(filepath.Join(backlogDir, "BLI-003.yaml"), childData, paths.FilePerm644); err != nil {
 		t.Fatalf("Write child: %v", err)
 	}
@@ -343,3 +348,35 @@ func TestReverseReferenceIndex_BuildFromScanThenSaveCache(t *testing.T) {
 		t.Errorf("Cache file not created after BuildFromScan+SaveCache: %v", err)
 	}
 }
+
+// TestReverseReferenceIndex_GetDependentsWithError_Contention tests that GetDependentsWithContext
+// fails closed with a non-nil error when the index lock cannot be acquired within the timeout.
+func TestReverseReferenceIndex_GetDependentsWithError_Contention(t *testing.T) {
+	index := NewReverseReferenceIndex()
+	index.AddReference("BLI-CHILD", "BLI-PARENT")
+
+	// 1. Success case: dependents returned cleanly
+	deps, err := index.GetDependentsWithError("BLI-PARENT")
+	if err != nil {
+		t.Fatalf("unexpected error getting dependents: %v", err)
+	}
+	if len(deps) != 1 || deps[0] != "BLI-CHILD" {
+		t.Fatalf("expected [BLI-CHILD], got %v", deps)
+	}
+
+	// 2. Timeout / contention case: holding exclusive lock causes fail-closed error
+	index.mu.Lock()
+	defer index.mu.Unlock()
+
+	ctx, cancel := stdcontext.WithTimeout(stdcontext.Background(), 20*time.Millisecond)
+	defer cancel()
+
+	blockedDeps, lockErr := index.GetDependentsWithContext(ctx, "BLI-PARENT")
+	if lockErr == nil {
+		t.Fatalf("expected lock acquisition timeout error, got nil error with deps %v", blockedDeps)
+	}
+	if blockedDeps != nil {
+		t.Fatalf("expected nil dependents on lock failure, got %v", blockedDeps)
+	}
+}
+

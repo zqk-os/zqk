@@ -41,7 +41,7 @@ const (
 )
 
 // walReplayIdle memos a ReplayWALChunk pass so idle polls skip Open while the WAL stamp
-// and appliedSeq have not moved. TRACK: BLI-1790151410719520000-fdb19989
+// and appliedSeq have not moved.
 type walReplayIdle struct {
 	appliedSeq int64
 	hitLimit   bool
@@ -536,8 +536,13 @@ func ReplayWALChunk(projectRoot string, appliedSeq int64, limit int, fn func(rec
 
 		records, err := parseWALLine(lineBytes)
 		if err != nil {
+			quarantineDir := filepath.Join(filepath.Dir(path), "quarantine")
+			_ = fileutil.EnsureDir(quarantineDir)
+			quarantineFile := filepath.Join(quarantineDir, fmt.Sprintf("corrupt_wal_replay_%d.log", time.Now().UnixNano()))
+			_ = fileutil.WriteFile(quarantineFile, append(append([]byte(nil), lineBytes...), '\n'), paths.FilePerm644)
 			StorageLog(logger).Warn(LogEventStorageObjectWALReplaySkipLineWarn).
 				String("line", sc.Text()).
+				String("quarantine_file", quarantineFile).
 				WithError(err).
 				Log()
 			continue

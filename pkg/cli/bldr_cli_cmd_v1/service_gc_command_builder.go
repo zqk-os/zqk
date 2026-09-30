@@ -13,7 +13,7 @@ func NewServiceGcCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("gc")
 	builder.WithShort("Remove host units whose project roots are gone or desired_state=absent")
 	help := clipkg.DynamicHelpBuilder("Remove host units whose project roots are gone or desired_state=absent")
-	help.AddExample("Garbage-collect orphans", "%s scheduler service gc")
+	help.AddExample("Garbage-collect orphans", "%s service gc")
 	help.ExcludeFlag("format")
 	help.ExcludeFlag("output")
 	help.ExcludeFlag("verbose")

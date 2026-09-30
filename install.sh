@@ -111,14 +111,30 @@ _verify_archive_sha256() {
 _verify_checksums_signature() {
   local checksums_path="$1"
   local sig_path="${checksums_path}.sig" # verifies checksums.txt.sig
+  local cert_path="${checksums_path}.pem"
   if [ ! -f "$sig_path" ]; then
+    if [ "${ZQK_REQUIRE_COSIGN:-0}" = "1" ]; then
+      echo "Error: signature file ${sig_path} not found and ZQK_REQUIRE_COSIGN=1" >&2
+      exit 1
+    fi
     return 0
   fi
   if command -v cosign >/dev/null 2>&1; then
     echo "🔒 Verifying checksums signature with cosign..."
-    if ! cosign verify-blob --signature "$sig_path" "$checksums_path" >/dev/null 2>&1; then
-      echo "Warning: cosign signature verification failed for checksums.txt (checksums.txt.sig)" >&2
+    local verify_failed=0
+    if [ -f "$cert_path" ]; then
+      cosign verify-blob --certificate "$cert_path" --signature "$sig_path" "$checksums_path" >/dev/null 2>&1 || verify_failed=1
+    else
+      cosign verify-blob --signature "$sig_path" "$checksums_path" >/dev/null 2>&1 || verify_failed=1
     fi
+    if [ "$verify_failed" -ne 0 ]; then
+      echo "Error: cosign signature verification failed for checksums.txt (checksums.txt.sig). Aborting install for safety." >&2
+      exit 1
+    fi
+    echo "✓ Cosign signature verified successfully."
+  elif [ "${ZQK_REQUIRE_COSIGN:-0}" = "1" ]; then
+    echo "Error: cosign command not found but ZQK_REQUIRE_COSIGN=1" >&2
+    exit 1
   fi
 }
 
@@ -142,9 +158,13 @@ install_binary() {
   local base_url="https://github.com/${REPO}/releases/download/${ver}"
   if curl -sSLf "${base_url}/${archive}" -o "${archive_path}" 2>/dev/null && \
      curl -sSLf "${base_url}/checksums.txt" -o "${checksums_path}" 2>/dev/null; then
+    curl -sSLf "${base_url}/checksums.txt.sig" -o "${checksums_path}.sig" 2>/dev/null || true
+    curl -sSLf "${base_url}/checksums.txt.pem" -o "${checksums_path}.pem" 2>/dev/null || true
     : # downloaded from public release URL
   elif curl -sSLf "${base_url}/${comm_archive}" -o "${archive_path}" 2>/dev/null && \
      curl -sSLf "${base_url}/checksums.txt" -o "${checksums_path}" 2>/dev/null; then
+    curl -sSLf "${base_url}/checksums.txt.sig" -o "${checksums_path}.sig" 2>/dev/null || true
+    curl -sSLf "${base_url}/checksums.txt.pem" -o "${checksums_path}.pem" 2>/dev/null || true
     : # downloaded community-prefixed archive from public release URL
   elif [ -n "$GITHUB_TOKEN" ] || command -v gh >/dev/null 2>&1; then
     if ! _download_private "$ver" "$archive" "${archive_path}"; then
@@ -157,6 +177,8 @@ install_binary() {
       echo "Checksums file not found in release ${ver}" >&2
       exit 1
     }
+    _download_private "$ver" "checksums.txt.sig" "${checksums_path}.sig" || true
+    _download_private "$ver" "checksums.txt.pem" "${checksums_path}.pem" || true
   else
     echo "Binary release not found for ${ver}. Try ZQK_INSTALL_METHOD=source or set GITHUB_TOKEN." >&2
     exit 1

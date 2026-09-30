@@ -1,0 +1,21 @@
+# ZQK Ambient Watcher Ignore Rules
+# Project-specific source, build, and documentation directories excluded from recursive ambient watching.
+pkg
+cmd
+internal
+bin
+tools
+scripts
+packs
+dist
+dist-docs
+dist-community
+ext
+docs
+examples
+config
+.agent
+.agents
+.cursor
+.ide
+.github

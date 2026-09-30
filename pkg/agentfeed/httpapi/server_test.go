@@ -244,3 +244,22 @@ func TestServer_Timeouts(t *testing.T) {
 		t.Errorf("expected IdleTimeout > 0, got %v", httpSrv.IdleTimeout)
 	}
 }
+
+func TestServer_NonLoopback_RejectsUnauthenticated(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir()
+	// Non-loopback without token/TLS must fail
+	if _, err := New(Config{ProjectRoot: root, ListenAddr: "0.0.0.0:8787"}); err == nil {
+		t.Fatal("expected error binding to 0.0.0.0 without token and TLS (F-SEC-005)")
+	}
+	// Non-loopback with token and TLS succeeds
+	if _, err := New(Config{
+		ProjectRoot: root,
+		ListenAddr:  "0.0.0.0:8787",
+		Token:       "secret",
+		TLSCertFile: "/tmp/cert.pem",
+		TLSKeyFile:  "/tmp/key.pem",
+	}); err != nil {
+		t.Fatalf("expected success with token and TLS on 0.0.0.0: %v", err)
+	}
+}

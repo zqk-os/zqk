@@ -2,19 +2,11 @@ package qa
 
 import (
 	"context"
-	"crypto/ecdsa"
-	"crypto/elliptic"
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
-	"math/big"
-	"path/filepath"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
-	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/validation"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
@@ -68,19 +60,8 @@ func (g *AuditorGate) VerifyComplete(ctx context.Context, itemID string) error {
 
 	// 1. LATCH 1 (Data Existence): If item exists in storage, verify required artifacts exist on disk.
 	if obj, readErr := g.storage.Read(ctx, secCtx, itemID); readErr == nil && obj != nil {
-		paths := extractArtifactPaths(obj[objects.FieldKeyArtifacts])
-		if len(paths) == 0 && (obj[objects.FieldKeyKind] == objects.KindBacklogItem || obj[objects.FieldKeyKind] == objects.KindAgentTask) {
-			return fmt.Errorf(errFmtLatch1MissingArtifacts, itemID)
-		}
-		for _, p := range paths {
-			targetPath := p
-			if !filepath.IsAbs(targetPath) && g.projectRoot != "" {
-				targetPath = filepath.Join(g.projectRoot, targetPath)
-			}
-			info, statErr := fileutil.Stat(targetPath)
-			if statErr != nil || info.IsDir() {
-				return fmt.Errorf(errFmtLatch1ArtifactNotFound, p)
-			}
+		if _, err := ValidateDeliverableArtifacts(obj, g.projectRoot); err != nil {
+			return fmt.Errorf("latch 1 failed (data existence): %w", err)
 		}
 	}
 
@@ -90,13 +71,7 @@ func (g *AuditorGate) VerifyComplete(ctx context.Context, itemID string) error {
 	}
 
 	// 2. LATCH 2 (AST / Invariant Clean): Query for QASuccess object referencing this itemID
-	filter := storage.ListFilter{
-		Kind: KindQASuccess,
-		Filters: map[string]any{
-			objects.FieldKeyItemID: itemID,
-			objects.FieldKeyStatus: objects.ObjectStatusSuccess,
-		},
-	}
+	filter := QASuccessFilter(itemID)
 	res, err := g.storage.List(ctx, secCtx, nil, filter)
 	if err != nil {
 		return fmt.Errorf(validation.ConstMagic55cde375, itemID, err)
@@ -107,13 +82,7 @@ func (g *AuditorGate) VerifyComplete(ctx context.Context, itemID string) error {
 	}
 
 	// 3. Verify Cryptographic Signature against the TRUSTED key
-	reportObj := res.Objects[0]
-	report := QAReport{
-		ItemID:    reportObj[objects.FieldKeyItemID].(string),
-		Status:    reportObj[objects.FieldKeyStatus].(string),
-		Signature: reportObj[objects.FieldKeySignature].(string),
-		PublicKey: reportObj[objects.FieldKeyPublicKey].(string),
-	}
+	report := ExtractQAReport(res.Objects[0])
 
 	// SENSITIVE CHECK: Ensure the report's public key matches the TRUSTED public key
 	if report.PublicKey != trustedPubHex {
@@ -121,6 +90,34 @@ func (g *AuditorGate) VerifyComplete(ctx context.Context, itemID string) error {
 	}
 
 	return g.verifySignature(report, trustedPubHex)
+}
+
+// QASuccessFilter returns a storage.ListFilter for finding verified QASuccess records for itemID.
+func QASuccessFilter(itemID string) storage.ListFilter {
+	return storage.ListFilter{
+		Kind: KindQASuccess,
+		Filters: map[string]any{
+			objects.FieldKeyItemID: itemID,
+			objects.FieldKeyStatus: objects.ObjectStatusSuccess,
+		},
+	}
+}
+
+// ExtractQAReport extracts a typed QAReport from an untyped object map.
+func ExtractQAReport(reportObj map[string]any) QAReport {
+	if reportObj == nil {
+		return QAReport{}
+	}
+	itemID, _ := reportObj[objects.FieldKeyItemID].(string)
+	status, _ := reportObj[objects.FieldKeyStatus].(string)
+	sig, _ := reportObj[objects.FieldKeySignature].(string)
+	pubKey, _ := reportObj[objects.FieldKeyPublicKey].(string)
+	return QAReport{
+		ItemID:    itemID,
+		Status:    status,
+		Signature: sig,
+		PublicKey: pubKey,
+	}
 }
 
 func (g *AuditorGate) trustedPubHex(ctx context.Context, secCtx *pkgctx.SecurityContext) (string, error) {
@@ -143,7 +140,7 @@ func (g *AuditorGate) trustedPubHex(ctx context.Context, secCtx *pkgctx.Security
 		}
 		return "", fmt.Errorf(validation.ConstMagic60ea95db, AuditorKeyID)
 	}
-	privPath := filepath.Join(g.projectRoot, paths.ProjectDataDir, "keystore", "auditor.priv")
+	privPath := AuditorPrivateKeyPath(g.projectRoot)
 	signer, signErr := NewAuditorSigner(privPath)
 	if signErr != nil {
 		if err != nil {
@@ -155,32 +152,5 @@ func (g *AuditorGate) trustedPubHex(ctx context.Context, secCtx *pkgctx.Security
 }
 
 func (g *AuditorGate) verifySignature(report QAReport, pubHex string) error {
-	sig, err := hex.DecodeString(report.Signature)
-	if err != nil {
-		return fmt.Errorf(validation.ConstMagic2d0ec3c6, err)
-	}
-
-	if len(pubHex) < 64 {
-		return fmt.Errorf(validation.ConstMagic37c27833)
-	}
-
-	x := new(big.Int)
-	y := new(big.Int)
-	x.SetString(pubHex[:len(pubHex)/2], 16)
-	y.SetString(pubHex[len(pubHex)/2:], 16)
-
-	pub := &ecdsa.PublicKey{
-		Curve: elliptic.P256(),
-		X:     x,
-		Y:     y,
-	}
-
-	data := []byte(report.ItemID + report.Status)
-	hash := sha256.Sum256(data)
-
-	if !ecdsa.VerifyASN1(pub, hash[:], sig) {
-		return fmt.Errorf(validation.ConstMagic9f963b73, report.ItemID)
-	}
-
-	return nil
+	return VerifyQAReportSignature(report, pubHex)
 }

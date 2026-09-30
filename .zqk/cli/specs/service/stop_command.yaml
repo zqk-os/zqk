@@ -10,7 +10,7 @@ flags:
 help:
   examples:
     - comment: "Stop by path"
-      command: "%s scheduler service stop --root ."
+      command: "%s service stop --root ."
   exclude_flags: ["format", "output", "verbose", "quiet", "timeout", "columns"]
 run_e: "runSchedulerServiceStop"
 common_flags: false

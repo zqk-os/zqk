@@ -2,6 +2,7 @@ package workflow
 
 import (
 	"slices"
+	"strings"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -220,4 +221,32 @@ func TestGenerateTracePipelineBundle_MilestoneTarget_SetsMilestoneRefs(t *testin
 		t.Errorf("expected BacklogItem MilestoneRefs ['MIL-001'], got %v", bli.MilestoneRefs)
 	}
 }
+
+func TestGenerateTracePipelineBundle_MandatoryDocumentationCriteria(t *testing.T) {
+	reqObj := map[string]any{
+		"_kind":               objects.KindRequirement,
+		objects.FieldKeyTitle: "Public Core Launch",
+	}
+
+	bundle, _, needCriteria := generateTracePipelineBundle("REQ-DOC-TEST", reqObj, nil)
+	if bundle == nil || !needCriteria {
+		t.Fatal("expected bundle to be generated")
+	}
+
+	hasDocCriteria := false
+	for _, crit := range bundle.Objects.Criteria {
+		if strings.Contains(crit.Title, "Documentation") && strings.Contains(crit.Description, "doc_entry") {
+			hasDocCriteria = true
+			if crit.Category != "compliance" && crit.Category != "acceptance" {
+				t.Errorf("expected documentation criteria to have compliance or acceptance category, got %q", crit.Category)
+			}
+			break
+		}
+	}
+
+	if !hasDocCriteria {
+		t.Error("expected base criteria to include mandatory documentation and doc_entry criterion (POL-DOC-001)")
+	}
+}
+
 

@@ -517,20 +517,48 @@ func applyLifecycleStatusMapping(mapping map[string]string, raw, afterBuiltin st
 	return afterBuiltin
 }
 
-// GetTransitionPreconditions returns the preconditions for a transition
-func (ll *LifecycleLoader) GetTransitionPreconditions(kind, from, to string) ([]string, error) {
+// GetTransition returns the transition matching from and to for a kind
+func (ll *LifecycleLoader) GetTransition(kind, from, to string) (*Transition, error) {
 	lifecycle, err := ll.LoadLifecycle(kind)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, transition := range lifecycle.Transitions {
-		if transition.From == from && transition.To == to {
-			return transition.Preconditions, nil
+	var wildcardMatch *Transition
+	for i := range lifecycle.Transitions {
+		t := &lifecycle.Transitions[i]
+		if t.To == to {
+			if t.From == from {
+				return t, nil
+			}
+			if t.From == "*" {
+				wildcardMatch = t
+			}
 		}
+	}
+	if wildcardMatch != nil {
+		return wildcardMatch, nil
 	}
 
 	return nil, errfmt.Errorf("transition not found: %s -> %s", from, to)
+}
+
+// GetTransitionPreconditions returns the preconditions for a transition
+func (ll *LifecycleLoader) GetTransitionPreconditions(kind, from, to string) ([]string, error) {
+	t, err := ll.GetTransition(kind, from, to)
+	if err != nil {
+		return nil, err
+	}
+	return t.Preconditions, nil
+}
+
+// GetTransitionPostconditions returns the postconditions for a transition
+func (ll *LifecycleLoader) GetTransitionPostconditions(kind, from, to string) ([]string, error) {
+	t, err := ll.GetTransition(kind, from, to)
+	if err != nil {
+		return nil, err
+	}
+	return t.Postconditions, nil
 }
 
 // GetStatusPreconditions returns the preconditions for a status
@@ -815,7 +843,7 @@ func (ll *LifecycleLoader) mergeLifecycles(parent, child *Lifecycle) Lifecycle {
 	// Child-owned from-statuses already declare their own hops. A rewritten
 	// parent edge must not invent a second hop (priority_plan maps approved
 	// onto grooming, so approved→in_progress became grooming→in_progress and
-	// skipped shovel-ready). TRACK: BLI-1785439369431933000-f0cccd6c
+	// skipped shovel-ready).
 	childOwnsFrom := make(map[string]bool, len(child.Transitions))
 	for _, transition := range child.Transitions {
 		if transition.From != emptyValue {

@@ -9,6 +9,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/predicate"
 )
 
 // KindUniversal is the wildcard kind matching all object kinds.
@@ -443,19 +444,46 @@ func (h *UniversalQualityValidationHandler) Validate(ctx context.Context, obj ma
 		})
 	}
 
-	// 4. Refactor / extraction criteria measured deltas
-	titleLower := strings.ToLower(title)
-	if kind == objects.KindCriteria && (strings.Contains(titleLower, "refactor") || strings.Contains(titleLower, "extraction")) {
-		valid := false
+	// 4. Criteria completeness validation using unified Kernel Predicate DSL
+	if kind == objects.KindCriteria {
 		vals := stringSliceField(obj[objects.FieldKeyCompletenessValidation])
+		titleLower := strings.ToLower(title)
+		isRefactor := strings.Contains(titleLower, "refactor") || strings.Contains(titleLower, "extraction")
+		hasMeasuredDelta := false
+
 		for _, v := range vals {
-			str := strings.ToLower(v)
-			if strings.Contains(str, "measure") || strings.Contains(str, "count") || strings.Contains(str, "assert") {
-				valid = true
-				break
+			vTrim := strings.TrimSpace(v)
+			if vTrim == "" {
+				continue
+			}
+
+			// Validate that predicate expression conforms to Kernel Predicate DSL grammar
+			if err := predicate.ValidatePredicateSyntax(vTrim); err != nil {
+				// Allow legacy measured delta prose fallback if it contains explicit assertion keywords
+				vLower := strings.ToLower(vTrim)
+				if !strings.Contains(vLower, "assert") && !strings.Contains(vLower, "measure") && !strings.Contains(vLower, "count") {
+					errs = append(errs, ValidationError{
+						Field:   objects.FieldKeyCompletenessValidation,
+						Message: fmt.Sprintf("completeness_validation predicate %q does not conform to Kernel Predicate DSL: %v", vTrim, err),
+						Rule:    "criteria_completeness_dsl_syntax",
+					})
+				}
+			}
+
+			// Check for measured delta assertion (canonical AST/metric/execution or legacy assertion)
+			vLower := strings.ToLower(vTrim)
+			if strings.HasPrefix(vLower, "ast_semantic_match:") ||
+				strings.HasPrefix(vLower, "command_exit_code:") ||
+				strings.HasPrefix(vLower, "query_metric:") ||
+				strings.HasPrefix(vLower, "content_size_positive:") ||
+				strings.Contains(vLower, "measure") ||
+				strings.Contains(vLower, "count") ||
+				strings.Contains(vLower, "assert") {
+				hasMeasuredDelta = true
 			}
 		}
-		if !valid {
+
+		if isRefactor && !hasMeasuredDelta {
 			errs = append(errs, ValidationError{
 				Field:   objects.FieldKeyCompletenessValidation,
 				Message: "Refactor or extraction criteria must assert measured deltas (e.g. file count down by N, symbol absent), not mere existence prose.",

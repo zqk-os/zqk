@@ -150,15 +150,20 @@ func IsValidProjectRoot(dir string) bool {
 
 func isIgnoredNestedProjectRoot(dir string) bool {
 	d := filepath.Clean(dir)
-	if filepath.Base(d) != "system" {
-		return false
+	slash := filepath.ToSlash(d)
+	for _, part := range strings.Split(slash, "/") {
+		if part == "testdata" || strings.HasPrefix(part, ".tmp") {
+			return true
+		}
 	}
-	d = filepath.Dir(d)
-	if filepath.Base(d) != "zqk" {
-		return false
+	if filepath.Base(d) == "system" {
+		d = filepath.Dir(d)
+		if filepath.Base(d) == "zqk" {
+			d = filepath.Dir(d)
+			return filepath.Base(d) == "cmd"
+		}
 	}
-	d = filepath.Dir(d)
-	return filepath.Base(d) == "cmd"
+	return false
 }
 
 // FindNearestProjectRoot discovers a project root by walking up from startPath and collecting every

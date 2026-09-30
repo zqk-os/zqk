@@ -12,7 +12,6 @@ This directory contains evaluation reports and architectural synthesis across th
 | **Reliability** | **[REL Report](./REL-reliability-error-recovery.md)** | Crash resilience, WAL compaction, lock safety, and fail-closed recovery proofs | Evaluated |
 | **Security** | **[SEC Report](./SEC-security-threat-vectors.md)** | Threat model, CAS sandboxing, Mode B privilege isolation, and cryptographic integrity | Evaluated |
 | **Testing** | **[TST Report](./TST-test-strategy-invariant-proofs.md)** | TDD test coverage, invariant regression prevention, race detection, and DoD gates | Evaluated |
-| **Convergence** | **[SYNTHESIS Report](./SYNTHESIS-diamond-envelope-convergence.md)** | Multi-dimensional quality convergence synthesis and production launch readiness | Converged |
 
 ---
 

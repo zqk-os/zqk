@@ -98,7 +98,8 @@ type IOQueueManager struct {
 	config      *IOQueueConfig
 	projectRoot atomic.Value    // Stores string (lock-free reads)
 	storage     atomic.Value    // Stores any (lock-free reads)
-	ctx         context.Context // Parent context from command entry point
+	ctx         context.Context // Dedicated daemon lifecycle context
+	cancel      context.CancelFunc
 	// testOverride controls whether Enqueue should honor global shutdown
 	// state when running under tests (ZQK_TEST_ROOT is set). By default,
 	// tests ignore shutdown to avoid cross-test interference; specific
@@ -144,18 +145,21 @@ func getIOQueueStateChangeEventCallback() IOQueueStateChangeEventCallback {
 }
 
 // GetGlobalIOQueueManager returns the global I/O queue manager (singleton)
-// ctx: parent context from command entry point (should not be created here)
-// Note: For init() functions, context.Background() is acceptable as they run before command context exists // Background: request-or-shutdown derived
+// Uses a dedicated background daemon lifecycle context rather than borrowing
+// an ephemeral CLI command context, preventing background queues from being
+// cancelled upon command completion.
 func GetGlobalIOQueueManager(ctx context.Context) *IOQueueManager {
 	globalIOQueueOnce.Do(func() {
+		daemonCtx, cancel := context.WithCancel(context.Background())
 		globalIOQueueManager = &IOQueueManager{
 			queues: make([]*ioQueue, 0),
 			config: DefaultIOQueueConfig(),
-			ctx:    ctx,
+			ctx:    daemonCtx,
+			cancel: cancel,
 		}
-		// Initialize with minimum queues
+		// Initialize with minimum queues using daemon lifecycle context
 		for i := 0; i < globalIOQueueManager.config.MinQueues; i++ {
-			globalIOQueueManager.addQueue(ctx)
+			globalIOQueueManager.addQueue(daemonCtx)
 		}
 		// Register with shutdown coordinator so InitiateShutdown() propagates to all queues
 		coordinator := GetGlobalShutdownCoordinator()
@@ -232,15 +236,21 @@ func (m *IOQueueManager) GetStorage() any {
 }
 
 // addQueue creates a new I/O queue and starts its worker
-// ctx: parent context from command entry point (should not be created here)
 func (m *IOQueueManager) addQueue(ctx context.Context) *ioQueue {
-	// Derive cancellation context from parent (command context)
-	ctx, cancel := context.WithCancel(ctx) //nolint:gosec // G118: cancel stored on ioQueue
+	parent := m.ctx
+	if parent == nil {
+		parent = ctx
+	}
+	if parent == nil {
+		parent = context.Background()
+	}
+	// Derive cancellation context from manager's daemon lifecycle context
+	queueCtx, cancel := context.WithCancel(parent) //nolint:gosec // G118: cancel stored on ioQueue
 	queueID := fmt.Sprintf(ConstMiscIoQueueDD, len(m.queues), time.Now().UnixNano())
 	queue := &ioQueue{
 		operations: make(chan *IOOperation, m.config.MaxQueueDepth),
 		// workerRunning and queueDepth start at 0 (default for atomic types)
-		ctx:          ctx,
+		ctx:          queueCtx,
 		cancel:       cancel,
 		wgManager:    NewWaitGroupManager(),
 		queueID:      queueID,

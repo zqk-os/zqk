@@ -93,6 +93,60 @@ func TestFailClosedPreconditions_FunctionalAcceptance(t *testing.T) {
 		}
 	})
 
+	t.Run("CanonicalDSL_Evaluation", func(t *testing.T) {
+		obj := map[string]any{
+			objects.FieldKeyID:       "DOC-001",
+			objects.FieldKeyKind:     objects.KindDocEntry,
+			objects.FieldKeyStatus:   "draft",
+			objects.FieldKeyTitle:    "DSL Architecture",
+			objects.FieldKeySummary:  "DSL migration overview",
+			objects.FieldKeyPath:     "docs/architecture/dsl.md",
+			objects.FieldKeyPriority: "high",
+			objects.FieldKeyOwnerRef: "ACC-001",
+			"content_size":           2048,
+			"content_hash":           "d41d8cd98f00b204e9800998ecf8427e",
+		}
+		// Test canonical forms directly
+		canonicalCases := []string{
+			"standard_checks_pass",
+			"field_nonempty:title",
+			"field_nonempty:summary",
+			"field_nonempty:path",
+			"content_size_positive:content_size",
+			"content_size_positive",
+			"field_nonempty:content_hash",
+			"role_is:realign",
+			"role is realign",
+			"field_cleared:priority_plan_ref",
+			"priority_plan_ref is cleared",
+			"owner identified",
+			"priority assigned",
+		}
+		for _, expr := range canonicalCases {
+			met, recognized := gv.evaluatePrecondition(expr, obj, nil)
+			if !recognized {
+				t.Fatalf("expected canonical expression %q to be recognized", expr)
+			}
+			if !met {
+				t.Fatalf("expected canonical expression %q to be satisfied", expr)
+			}
+		}
+	})
+
+	t.Run("Postcondition_RuntimeVerification", func(t *testing.T) {
+		docObj := map[string]any{
+			objects.FieldKeyID:     "DOC-TEST-001",
+			objects.FieldKeyKind:   objects.KindDocEntry,
+			objects.FieldKeyStatus: "draft",
+			objects.FieldKeyTitle:  "Test",
+		}
+		// Transition draft -> review has postcondition: role is realign
+		errs := gv.appendUnmetLifecyclePostconditions(nil, objects.KindDocEntry, "draft", "review", docObj, nil)
+		if len(errs) > 0 {
+			t.Fatalf("expected review status with role realign to satisfy postconditions, got: %v", errs)
+		}
+	})
+
 	t.Run("UnrecognizedPrecondition_FailsClosedByDefault", func(t *testing.T) {
 		met, recognized := gv.evaluatePrecondition("some arbitrary unknown check", map[string]any{}, nil)
 		if recognized {

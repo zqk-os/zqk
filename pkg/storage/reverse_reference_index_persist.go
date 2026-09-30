@@ -152,13 +152,11 @@ func (r *ReverseReferenceIndex) SaveCache(projectRoot string) error {
 			return nil
 		},
 	)
-	if err_swallow_118 !=
-
-		// Marshal to JSON
-		nil {
-		logging.LogSwallowedError(err_swallow_118)
+	if err_swallow_118 != nil {
+		return errfmt.Errorf("reverse reference index lock timeout preparing save cache: %w", err_swallow_118)
 	}
 
+	// Marshal to JSON
 	data, err := json.MarshalIndent(cacheData, "", "  ")
 	if err != nil {
 		return errfmt.Newf(ConstMiscFailedToMarshalCache).Wrap(err)

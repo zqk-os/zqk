@@ -106,6 +106,40 @@ func (gv *GoValidator) validateCustomRules(ctx stdcontext.Context, kind string, 
 			errs = append(errs, validationErr)
 		}
 	}
+
+	if kind == objects.KindCriteria {
+		title, _ := obj[objects.FieldKeyTitle].(string)
+		titleLower := strings.ToLower(title)
+		if strings.Contains(titleLower, "refactor") || strings.Contains(titleLower, "extraction") {
+			valid := false
+			vals := stringSliceField(obj[objects.FieldKeyCompletenessValidation])
+			for _, v := range vals {
+				vTrim := strings.TrimSpace(v)
+				if vTrim == "" {
+					continue
+				}
+				vLower := strings.ToLower(vTrim)
+				if strings.HasPrefix(vLower, "ast_semantic_match:") ||
+					strings.HasPrefix(vLower, "command_exit_code:") ||
+					strings.HasPrefix(vLower, "query_metric:") ||
+					strings.HasPrefix(vLower, "content_size_positive:") ||
+					strings.Contains(vLower, "measure") ||
+					strings.Contains(vLower, "count") ||
+					strings.Contains(vLower, "assert") {
+					valid = true
+					break
+				}
+			}
+			if !valid {
+				errs = append(errs, ValidationError{
+					Field:   objects.FieldKeyCompletenessValidation,
+					Message: "Refactor or extraction criteria must assert measured deltas (e.g. file count down by N, symbol absent), not mere existence prose.",
+					Rule:    "criteria_refactor_measured_deltas",
+				})
+			}
+		}
+	}
+
 	return errs
 }
 

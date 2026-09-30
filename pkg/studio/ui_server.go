@@ -83,6 +83,9 @@ func (s *Server) Start(addr string) error {
 	mux.HandleFunc("/api/graph", s.handleGraph)
 	mux.HandleFunc("/api/objects", s.handleObjects)
 	mux.HandleFunc("/api/objects/", s.handleObjectByID)
+	mux.HandleFunc("/api/inbox", s.handleInbox)
+	mux.HandleFunc("/api/inbox/ack", s.handleInboxAck)
+	mux.HandleFunc("/api/inbox/respond", s.handleInboxRespond)
 
 	s.httpServer = &http.Server{
 		Handler:      mux,
@@ -1254,6 +1257,7 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       <div class="tab-bar">
         <div class="tab-btn active" id="tab-btn-inspector" onclick="switchTab('inspector')">Inspector</div>
         <div class="tab-btn" id="tab-btn-objects" onclick="switchTab('objects')">Kernel Objects (<span id="objects-count">0</span>)</div>
+        <div class="tab-btn" id="tab-btn-inbox" onclick="switchTab('inbox')">Inbox (<span id="inbox-count">0</span>)</div>
       </div>
 
       <!-- Tab 1: Selected Object Inspector -->
@@ -1271,6 +1275,17 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       <div class="tab-content" id="tab-objects">
         <div id="objects-list-container">
           <div style="padding: 16px; color: var(--text-muted);">Loading objects...</div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Swarm & Operator Inbox -->
+      <div class="tab-content" id="tab-inbox">
+        <div style="padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border);">
+          <span style="font-weight: 600; font-size: 13px;">Agent & Operator Inbox</span>
+          <button class="btn btn-sm" onclick="fetchInbox()">↻ Refresh</button>
+        </div>
+        <div id="inbox-list-container" style="overflow-y: auto; max-height: calc(100vh - 180px); padding: 8px;">
+          <div style="padding: 16px; color: var(--text-muted);">Loading inbox...</div>
         </div>
       </div>
     </div>
@@ -1422,8 +1437,18 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
     function switchTab(tab) {
       document.getElementById('tab-btn-inspector').classList.toggle('active', tab === 'inspector');
       document.getElementById('tab-btn-objects').classList.toggle('active', tab === 'objects');
+      document.getElementById('tab-btn-inbox').classList.toggle('active', tab === 'inbox');
       document.getElementById('tab-inspector').classList.toggle('active', tab === 'inspector');
       document.getElementById('tab-objects').classList.toggle('active', tab === 'objects');
+      document.getElementById('tab-inbox').classList.toggle('active', tab === 'inbox');
+      if (tab === 'inbox') {
+        fetchInbox();
+      }
+    }
+
+    function escapeHtml(s) {
+      if (!s) return '';
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
     function getKindColor(kind) {
@@ -2214,6 +2239,106 @@ const embeddedDashboardHTML = `<!DOCTYPE html>
       codeBox.className = 'code-box';
       codeBox.textContent = JSON.stringify(node.attributes || node, null, 2);
       inspector.appendChild(codeBox);
+    }
+
+    async function fetchInbox() {
+      const container = document.getElementById('inbox-list-container');
+      try {
+        const res = await fetch('/api/inbox?_t=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) throw new Error('Failed to load inbox');
+        const data = await res.json();
+        const unacked = data.inbox_unacked || [];
+        const envelopes = data.staged_envelopes || [];
+        const count = unacked.length + envelopes.length;
+        document.getElementById('inbox-count').textContent = count;
+
+        if (count === 0) {
+          container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-title">Inbox Empty</div><div style="font-size: 12px; margin-top: 4px;">No unacknowledged correspondence or staged envelopes.</div></div>';
+          return;
+        }
+
+        let html = '';
+        if (envelopes.length > 0) {
+          html += '<div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--warning); margin: 8px 4px;">⚡ Staged Envelopes (' + envelopes.length + ')</div>';
+          envelopes.forEach(env => {
+            html += '<div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px; margin-bottom: 8px;">' +
+              '<div style="display: flex; justify-content: space-between; align-items: center;">' +
+                '<span style="font-weight: 600; color: var(--accent); font-size: 12px;">' + escapeHtml(env.id) + '</span>' +
+                '<span class="status-pill-mini">' + escapeHtml(env.status) + '</span>' +
+              '</div>' +
+              '<div style="font-size: 12px; margin-top: 4px; color: var(--text);">' + escapeHtml(env.operation) + ' ' + escapeHtml(env.kind) + ' (' + escapeHtml(env.target_id) + ')</div>' +
+              '<div style="margin-top: 8px; display: flex; gap: 6px;">' +
+                '<button class="btn btn-sm" onclick="ackEnvelope(\'' + escapeHtml(env.id) + '\')">Commit / Ack</button>' +
+              '</div>' +
+            '</div>';
+          });
+        }
+
+        if (unacked.length > 0) {
+          html += '<div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin: 8px 4px;">📬 Unacknowledged Messages (' + unacked.length + ')</div>';
+          unacked.forEach(item => {
+            const sender = item.from_agent_id || item.sender || 'agent';
+            html += '<div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px; margin-bottom: 8px;">' +
+              '<div style="display: flex; justify-content: space-between; align-items: center;">' +
+                '<span style="font-weight: 600; color: var(--teal); font-size: 12px;">From: ' + escapeHtml(sender) + '</span>' +
+                '<span style="font-size: 10px; color: var(--text-muted);">' + escapeHtml(item.timestamp || '') + '</span>' +
+              '</div>' +
+              '<div style="font-size: 12px; margin-top: 6px; color: var(--text-bright); line-height: 1.4;">' + escapeHtml(item.message || item.summary || '') + '</div>' +
+              '<div style="margin-top: 8px; display: flex; gap: 6px;">' +
+                '<button class="btn btn-sm" onclick="ackInboxItem(\'' + escapeHtml(item.event_id) + '\')">✓ Ack</button>' +
+                '<button class="btn btn-sm" onclick="promptRespond(\'' + escapeHtml(sender) + '\', \'' + escapeHtml(item.event_id) + '\')">💬 Reply</button>' +
+              '</div>' +
+            '</div>';
+          });
+        }
+        container.innerHTML = html;
+      } catch (err) {
+        container.innerHTML = '<div style="padding: 16px; color: var(--text-muted);">Failed to load inbox: ' + escapeHtml(err.message) + '</div>';
+      }
+    }
+
+    async function ackEnvelope(envId) {
+      try {
+        const res = await fetch('/api/inbox/ack', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ envelope_id: envId })
+        });
+        if (!res.ok) throw new Error('Ack failed');
+        await fetchInbox();
+      } catch (err) {
+        alert('Failed to ack envelope: ' + err.message);
+      }
+    }
+
+    async function ackInboxItem(eventId) {
+      try {
+        const res = await fetch('/api/inbox/ack', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ in_reply_to: eventId })
+        });
+        if (!res.ok) throw new Error('Ack failed');
+        await fetchInbox();
+      } catch (err) {
+        alert('Failed to ack inbox item: ' + err.message);
+      }
+    }
+
+    async function promptRespond(toAgent, replyTo) {
+      const msg = prompt('Enter response to agent ' + toAgent + ':');
+      if (!msg || !msg.trim()) return;
+      try {
+        const res = await fetch('/api/inbox/respond', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ to_agent_id: toAgent, message: msg.trim(), in_reply_to: replyTo })
+        });
+        if (!res.ok) throw new Error('Respond failed');
+        await fetchInbox();
+      } catch (err) {
+        alert('Failed to send response: ' + err.message);
+      }
     }
 
     // Initial Load

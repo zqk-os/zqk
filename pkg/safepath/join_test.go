@@ -133,3 +133,23 @@ func TestJoinUnderRoot(t *testing.T) {
 		})
 	}
 }
+
+func TestJoinUnderRoot_SymlinkEscape(t *testing.T) {
+	root := t.TempDir()
+	outside := t.TempDir()
+	outsideFile := filepath.Join(outside, "secret.txt")
+	if err := fileutil.WriteFile(outsideFile, []byte("secret"), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	symlinkPath := filepath.Join(root, "link_to_outside")
+	if err := fileutil.Symlink(outsideFile, symlinkPath); err != nil {
+		t.Fatal(err)
+	}
+
+	// Joining to the symlink that points outside root must be rejected
+	_, err := JoinUnderRoot(root, "link_to_outside")
+	if err == nil {
+		t.Fatal("expected error when joining path traversing symlink pointing outside root (F-SEC-006)")
+	}
+}

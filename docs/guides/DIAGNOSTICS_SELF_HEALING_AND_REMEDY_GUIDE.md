@@ -57,35 +57,36 @@ zqk system check --auto-remedy
 
 ---
 
-## 4. Deep System Diagnostics (`zqk system doctor`)
+## 4. Deep System Diagnostics (`zqk system check --details` & `zqk feed doctor`)
 
 For comprehensive environment verification across compiler versions, git configurations, and daemon sockets:
 
 ```bash
-zqk system doctor
+zqk system check --details
+zqk feed doctor
 ```
 
 ### Diagnostic Check Categories
-- **Toolchain Health**: Verifies Go compiler version, git binary, python3 runtime, and required linters.
-- **Daemon Telemetry**: Tests connectivity to the background scheduler daemon (`.zqk/scheduler/daemon.sock`).
-- **Storage Backend**: Confirms file-based storage permissions (`0644` files, `0755` directories) or graph database endpoints (Neo4j / MemGraph).
+- **Toolchain & Storage Health**: Verifies CAS integrity, draft plane objects, file descriptors, and storage volume footprint.
+- **Daemon Telemetry**: Tests connectivity to the background scheduler daemon (`zqk scheduler health-check`).
+- **Storage Backend**: Confirms file-based storage permissions and Content-Addressable Storage (CAS) digest verification.
 - **Git Hook Integrity**: Verifies that `pre-commit` and `pre-push` check-valves are executable and properly linked to `zqk-vet`.
 
 ---
 
 ## 5. Recovering from CAS Corruptions & Quarantine
 
-If a power outage or interrupted disk write results in a CAS hash mismatch:
+If an unexpected power loss or interrupted disk write results in a CAS hash mismatch:
 
 ```bash
-# 1. Detect corrupted objects
-zqk verify cas
+# 1. Detect corrupted objects and integrity blockers
+zqk system check
 
 # 2. Inspect quarantined objects
-ls -la .zqk/quarantine/
+zqk system quarantine-report
 
-# 3. Rebuild object digest from canonical disk contents
-zqk object repair --kind backlog_item --id BLI-AUTH-004
+# 3. Repair CAS filename and content hash mismatches
+zqk system repair-cas-corruption
 ```
 
 The repair engine re-parses the YAML payload, validates attributes against the schema registry, re-stamps a valid SHA-256 CAS hash, and re-admits the object into the authoritative storage plane.

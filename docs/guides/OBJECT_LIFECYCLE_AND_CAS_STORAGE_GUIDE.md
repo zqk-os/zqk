@@ -23,7 +23,7 @@ id: BLI-AUTH-004
 kind: backlog_item
 status: in_progress
 title: "Implement Content-Addressed Storage Membrane Check-Valves"
-claimed_by: "agent-alpha"
+claimed_by: "PER-DEFAULT-OPERATOR"
 priority_tier: P0
 priority_plan_ref: PRI-TPM-CONV
 goal_refs:
@@ -52,9 +52,19 @@ storage_profile:
 | `backlog_item` | Actionable unit of work (BLI) executed by agents | `.zqk/process/backlog_item/` |
 | `criteria` | Verifiable Definition of Done (DoD) acceptance item | `.zqk/process/criteria/` |
 | `test_case` | Automated test suite verifying criteria satisfaction | `.zqk/process/test_case/` |
+| `milestone` | Formal phase boundary anchoring deliverables and done-gates | `.zqk/process/milestone/` |
+| `release` | Release packaging manifests, artifacts, and sign-off gates | `.zqk/process/release/` |
+| `workflow` | Orchestrated multi-step graph workflows & automation chains | `.zqk/process/workflow/` |
+| `doc_entry` | First-class CAS object representing tracked documentation | `.zqk/process/doc_entry/` |
+| `glossary_term` | Context-scoped definition embedding agent prompts & machine hints | `.zqk/process/glossary_term/` |
+| `vocabulary_scheme` | Lens taxonomy and navigation graph scoping terms | `.zqk/process/vocabulary_scheme/` |
+| `library` | Composable architectural pattern catalogs & specifications | `.zqk/process/library/` |
 | `policy` | Declarative governance invariant and boundary rule | `.zqk/process/policy/` |
 | `risk_blocker` | Active impediment obstructing workstream completion | `.zqk/process/risk_blocker/` |
 | `audit_event` | Append-only cryptographic log of state mutations | `.zqk/process/audit_event/` |
+
+> [!NOTE]
+> For a complete directory of all 70+ object kinds across all 14 ontological domains and packs, see the **[Knowledge Kernel Object Model & Usage Guide](./KERNEL_OBJECT_USAGE_GUIDE.md)** and **[Knowledge Management & Semantic Recall Guide](./KNOWLEDGE_MANAGEMENT_AND_SEMANTIC_RECALL_GUIDE.md)**.
 
 ---
 

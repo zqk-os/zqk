@@ -19,6 +19,9 @@ type HygieneConfig struct {
 	CheckPaths             bool     `yaml:"check_paths"`
 	CheckPerms             bool     `yaml:"check_perms"`
 	CheckDups              bool     `yaml:"check_dups"`
+	DupMinStatements       int      `yaml:"dup_min_statements"`
+	DupMinLines            int      `yaml:"dup_min_lines"`
+	DupExemptions          []string `yaml:"dup_exemptions"`
 	CheckCLINames          bool     `yaml:"check_cli_names"`
 	CheckSubprocessHygiene bool     `yaml:"check_subprocess_hygiene"`
 	CheckCommandSpecs      bool     `yaml:"check_command_specs"`
@@ -87,6 +90,10 @@ func DefaultConfig() *GatesConfig {
 		Hygiene: HygieneConfig{
 			CheckPaths:             true,
 			CheckPerms:             true,
+			CheckDups:              true,
+			DupMinStatements:       5,
+			DupMinLines:            8,
+			DupExemptions:          []string{"*_test.go", "vendor/*", "*/testdata/*", "*/mock/*"},
 			CheckCLINames:          true,
 			CheckSubprocessHygiene: true,
 			CheckCommandSpecs:      true,

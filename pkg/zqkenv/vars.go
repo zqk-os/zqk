@@ -823,6 +823,19 @@ func DemoMode() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxDemoMode)} }
 // EnableAmbientWatcher returns the environment variable name for ENABLE_AMBIENT_WATCHER (brand-prefixed).
 func EnableAmbientWatcher() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxEnableAmbientWatcher)} }
 
+const _sfxAmbientIgnoreDirs = "AMBIENT_IGNORE_DIRS"
+const _sfxAmbientIgnorePaths = "AMBIENT_IGNORE_PATHS"
+const _sfxAmbientWatchDirs = "AMBIENT_WATCH_DIRS"
+
+// AmbientIgnoreDirs returns the environment variable name for AMBIENT_IGNORE_DIRS (brand-prefixed, e.g. ZQK_AMBIENT_IGNORE_DIRS).
+func AmbientIgnoreDirs() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxAmbientIgnoreDirs)} }
+
+// AmbientIgnorePaths returns the environment variable name for AMBIENT_IGNORE_PATHS (brand-prefixed, e.g. ZQK_AMBIENT_IGNORE_PATHS).
+func AmbientIgnorePaths() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxAmbientIgnorePaths)} }
+
+// AmbientWatchDirs returns the environment variable name for AMBIENT_WATCH_DIRS (brand-prefixed, e.g. ZQK_AMBIENT_WATCH_DIRS).
+func AmbientWatchDirs() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxAmbientWatchDirs)} }
+
 // FalAPIKey returns the environment variable name for FAL_API_KEY (brand-prefixed).
 func FalAPIKey() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxFalAPIKey)} }
 
@@ -871,6 +884,17 @@ func TestAllowCASFallthrough() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxTest
 // PrivilegedWriterSocket returns the env name for PRIVILEGED_WRITER_SOCKET (brand-prefixed).
 // When set, overrides the default UNIX socket path for the PrivilegedWriter helper.
 func PrivilegedWriterSocket() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxPrivilegedWriterSocket)} }
+
+const _sfxCellularMembraneModeB = "MODE_B"
+const _sfxEnforceCellularMembrane = "ENFORCE_CELLULAR_MEMBRANE"
+
+// CellularMembraneModeB returns the env name for MODE_B (brand-prefixed).
+// When set to "1", enforces Mode B cellular membrane lockdown where CAS writes
+// require an active PrivilegedWriter daemon and will fail-closed if the socket is missing.
+func CellularMembraneModeB() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxCellularMembraneModeB)} }
+
+// EnforceCellularMembrane returns the env name for ENFORCE_CELLULAR_MEMBRANE (brand-prefixed).
+func EnforceCellularMembrane() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxEnforceCellularMembrane)} }
 
 const _sfxIsParentZqk = "IS_PARENT_ZQK"
 

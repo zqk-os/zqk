@@ -60,14 +60,14 @@ var catalog = []catalogEntry{
 		},
 	},
 	{
-		// Idle with planned>0 is not an empty priority_plan. Do not share GROOM-AHEAD
-		// text — OverlayFromPolicy would tell TPM to groom when the PRI already has planned BLIs.
-		// TRACK: follow-up in kernel backlog
+		// Idle with planned>0: lead priority_plan has planned BLIs with resolved ambiguity.
+		// Anti-piecemeal invariant: mandate/suggest deterministic swarm orchestration over onsie-twosie claiming.
+		// TRACK: POL-DEFAULT-ec693f64f7c81640
 		events: []string{EventIdle},
 		step: Step{
 			PolicyID:    PolicyTPMProcessAdmin,
-			GuidingStep: "Lead priority_plan has planned BLIs. Do not remint ORCHESTRATE_PLAN unless the plan has a live ATK (pending/in_progress/approved/proposed). Terminal-only ATKs (implemented/archived/error) are inventory, not a dispatch signal. If fill_item is present, do that kernel fill instead of shutdown. Chat is not the scheduler. Do not claim orch-bound work. Do not re-groom items already planned.",
-			CommandHint: "",
+			GuidingStep: "Lead priority_plan has planned BLIs with resolved ambiguity. Anti-piecemeal invariant: hand off batch to deterministic swarm orchestration (agent swarm-init / orchestrate) for parallel TDD, race verification, and canonical doc entry generation rather than onsie-twosie task claiming. Terminal-only ATKs (implemented/archived/error) are inventory, not a dispatch signal. If fill_item is present, do that kernel fill instead of shutdown.",
+			CommandHint: hintSwarmInitSuffix,
 		},
 	},
 	{

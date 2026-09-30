@@ -103,20 +103,23 @@ func TestStreamTable_Comprehensive(t *testing.T) {
 }
 
 func TestRenderTableWithTitleAndWrap(t *testing.T) {
-	title := "Wrapped Table"
-	columns := []string{"H1", "H2"}
-	widths := []int{10, 10}
-	rows := [][]string{
-		{"Short", "Another short"},
-		{"Very long value that will definitely wrap to the next line", "Value 2"},
+	layer4Rows := [][]string{
+		{"Open File Descriptors", "9 / 245760", "\x1b[32m✓ healthy\x1b[0m"},
+		{".zqk Storage Volume", "26559 files (208MiB)", "\x1b[36m✓ tracked\x1b[0m"},
+		{"Stale Lock Files", "1", "\x1b[33m⚠️ attention (1 stale .lock files)\x1b[0m"},
+		{"Orphaned Temp Files", "0", "\x1b[32m✓ clean (0 orphaned)\x1b[0m"},
 	}
 
-	out := RenderTableWithTitleAndWrap(title, columns, widths, rows)
-	if !strings.Contains(out, "Wrapped Table") {
-		t.Errorf("missing title in rendered wrapped table: %q", out)
+	out := RenderTableWithTitleAndWrap("Layer 4: I/O Resource Hygiene & Storage Telemetry", []string{"METRIC", "VALUE", "STATUS"}, []int{30, 20, 40}, layer4Rows)
+	lines := strings.Split(out, "\n")
+	if len(lines) == 0 {
+		t.Fatal("expected rendered table lines, got empty")
 	}
-	if !strings.Contains(out, "H1") || !strings.Contains(out, "H2") {
-		t.Errorf("missing headers in rendered wrapped table: %q", out)
+
+	for i, line := range lines {
+		if strings.HasPrefix(line, "│") && !strings.HasSuffix(line, "│") {
+			t.Errorf("line %d does not end with closing border: %q", i, line)
+		}
 	}
 }
 

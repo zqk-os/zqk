@@ -23,15 +23,18 @@ const HeapAllocWarningThresholdBytes = 512 * 1024 * 1024
 // (e.g. triggered jobs, or before starting a list operation) so the process doesn't grow unbounded.
 // If ceiling <= 0, returns immediately (ceiling disabled).
 func WaitUnderGoroutineCeiling(ctx context.Context, ceiling int, pollInterval time.Duration) error {
-	if ceiling <= 0 {
+	if ceiling <= 0 || runtime.NumGoroutine() < ceiling {
 		return nil
 	}
+	timer := time.NewTimer(pollInterval)
+	defer timer.Stop()
+
 	for runtime.NumGoroutine() >= ceiling {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
-		case <-time.After(pollInterval):
-			// Re-check
+		case <-timer.C:
+			timer.Reset(pollInterval)
 		}
 	}
 	return nil

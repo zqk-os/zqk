@@ -15,21 +15,36 @@ The **ZQK Command Interface** is the primary human-agent operating surface for t
 This document establishes the **authoritative ground rules, naming taxonomy, behavioral standards, and governance protocols** for all commands in `zqk`.
 
 > [!IMPORTANT]
-> **Zero Tolerance for Un-specced Commands:**  
-> Every command in `zqk` must have a valid declarative specification in `.zqk/cli/specs/`. Any command added without a specification is treated as a build-breaking defect and trapped by `zqk system validate-command-specs`.
+> **Zero Tolerance for New Un-specced Commands (Ratcheting Baseline Freeze):**  
+> Every new or modified command in `zqk` must have a valid declarative specification in `.zqk/cli/specs/`. Active command coverage is governed by a ratcheting baseline freeze file (`.zqk/cli/command_spec_coverage_baseline.json`). Any new command added without a specification or any coverage regression is treated as a build-breaking defect and trapped by `zqk system validate-command-specs`. Legacy grandfathered commands are progressively migrated to achieve 100% parity.
 
 ---
 
 ## 2. Core Architectural Ground Rules & Standards
 
-### Rule 1: 100% Declarative Spec Coverage Mandatory
+### Rule 1: Declarative Spec Coverage & Ratcheting Baseline Parity
 1. **Spec Location:** Every command and subcommand MUST have a matching YAML specification in `.zqk/cli/specs/<domain>/<command>_command.yaml`.
 2. **Spec Completeness:** Specifications must document the command purpose, positional arguments, flags (with defaults and descriptions), expected output schema, and at least two realistic usage examples.
-3. **Automated Verification:** The pre-commit gate and local CI run `zqk system validate-command-specs`. Commits that introduce un-specced commands or spec drift will fail closed.
+3. **Automated Verification:** The pre-commit gate and local CI run `zqk system validate-command-specs`. Commits that introduce un-specced commands beyond the baseline freeze or introduce spec drift fail closed.
+4. **Ratcheting Migration Baseline:** Legacy commands without specs are frozen in `.zqk/cli/command_spec_coverage_baseline.json`. The baseline permits zero new un-specced commands (`new_drift_count == 0`), and automatically ratchets forward as grandfathered commands receive specifications until full parity (`parity: true`) is reached.
 
 ### Rule 2: Strict Domain-Resource Grammar & Noun-Verb Hierarchy
-1. **No Orphan Root Verbs:**  
-   Root-level commands must represent distinct architectural **domains** (`system`, `agent`, `workflow`, `object`, `test`, `job`, `service`, `vendor`). Unqualified verbs (such as `use`, `run`, `check`, `execute`) are prohibited at the root level unless defined as explicitly documented, universal ergonomics aliases.
+1. **Domain Hierarchy & Approved Ergonomics Shortcuts:**  
+   Primary root-level commands represent distinct architectural **domains** (`system`, `agent`, `workflow`, `object`, `test`, `job`, `service`, `vendor`). Unqualified verbs are prohibited at the root level unless explicitly designated as approved universal ergonomics shortcuts:
+   - **`zqk do`**: Autonomous CAP loop execution shorthand (`zqk workflow vds do`).
+   - **`zqk inspect`**: Interactive TUI Object Inspector and Policy Studio shortcut (`zqk object inspect`).
+   - **`zqk mutate`**: ZQL declarative mutation engine shortcut (`zqk object mutate`).
+   - **`zqk query`**: ZPARQL graph query language engine shortcut (`zqk graph query`).
+   - **`zqk validate`**: Invariant gate and schema validation shortcut (`zqk system validate`).
+   - **`zqk rollback`**: Transaction rollback journal restoration shortcut (`zqk object rollback`).
+   - **`zqk completion`**: Shell completion script generator (`zqk system completion`).
+   - **`zqk sync`**: Storage CAS and P2P mesh synchronization shortcut (`zqk mesh sync`).
+   - **`zqk pre-commit`**: Local pre-commit release gate and secret scan runner (`zqk system pre-commit`).
+   - **`zqk learn`**: Institutional memory and operational lessons capture shortcut (`zqk agent learn`).
+   - **`zqk new`**: Scaffolding wizard for new packs, adapters, and schemas (`zqk object new`).
+   - **`zqk reports`**: Quality evaluation and engineering velocity reporting tool (`zqk system reports`).
+   - **`zqk tray`**: macOS status bar daemon companion (`zqk service tray`).
+   - **`zqk join`**: Multi-domain relational projection and graph join engine (`zqk graph join`).
 2. **Hierarchical Naming:**  
    Subcommands must follow either:
    - `<domain> <resource> <verb>` (e.g. `zqk object requirement create`, `zqk job trigger list`)
@@ -115,3 +130,8 @@ All commands must implement the standard **Command DNA**:
 ## 5. Verification & Acceptance Reference
 
 This standard is verified by the automated test suite in `cmd/zqk/system/validate_command_specs_test.go` and executed via `zqk system validate-command-specs`.
+
+### Traceability & Plan Alignment
+- **Priority Plan:** `PRI-CEF-DOCS-USABILITY`
+- **Backlog Item:** `BLI-1790738311605478000-b82d46ca`
+- **Test Suite:** `cmd/zqk/help_parity_test.go` (`TST-1790738311605478001-807e7884`)

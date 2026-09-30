@@ -42,12 +42,20 @@ const (
 	// skips test cases and the multi-criteria base structure.
 	// TRACK: POL-AGENT-TPM-TRACE-PIPELINE-001
 	hintTracePipelineSuffix = "new object requirement --title \"...\" && workflow gen-trace-pipeline <REQ-id>"
+	hintSwarmInitSuffix     = "agent swarm-init --allow-chat"
 )
 
 func HintAlignRefresh() string  { return paths.CLIInvocation(hintAlignRefreshSuffix) }
 func HintDraftClassify() string { return paths.CLIInvocation(hintDraftClassifySuffix) }
 func HintHourglass() string     { return paths.CLIInvocation(hintHourglassSuffix) }
 func HintTracePipeline() string { return paths.CLIInvocation(hintTracePipelineSuffix) }
+func HintSwarmInit(planID string) string {
+	planID = strings.TrimSpace(planID)
+	if planID == "" {
+		return paths.CLIInvocation(hintSwarmInitSuffix)
+	}
+	return paths.CLIUsage("agent", "swarm-init", "--plan-id", planID, "--allow-chat")
+}
 
 // HintOrchestratePlan is the machine first line. Empty seat stays a placeholder
 // so stop-hunger can still name the protocol when persona→seat is unknown.

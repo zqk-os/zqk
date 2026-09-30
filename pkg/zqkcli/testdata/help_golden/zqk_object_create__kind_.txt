@@ -12,14 +12,15 @@ The object data can be provided via:
 
 
 
-Note: Source files are automatically removed after successful creation.
+Note: Temporary scratch files (matching tmp-*.yaml) are cleaned up automatically
+after creation.
 
-Use --keep-file to preserve the source file.
+User source files are left untouched. Use --keep-file to preserve scratch files.
 
-  Create from file (file auto-removed)
+  Create from file
   zqk create backlog_item --file item.yaml
-  Create from file and keep it
-  zqk create backlog_item --file item.yaml --keep-file
+  Create from scratch template and keep it
+  zqk create backlog_item --file tmp-item.yaml --keep-file
   Create from inline data
   zqk create backlog_item --data 'title: "New Item"'
   Create from stdin
@@ -45,9 +46,12 @@ Flags:
   -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
       --ignore-scheduler-down   Ignore scheduler down warning/lockdown
   -i, --interactive             Launch interactive wizard to create object
-      --keep-file               Keep the source file after creation (default: files are removed automatically)
+      --keep-file               Keep temporary scratch file after creation (files matching tmp-*.yaml are removed by default)
   -o, --output string           Write output to file
+      --override                Break-glass override to allow manual status assignment on create
+      --promote                 Promote object immediately to first shovel-ready lifecycle status (bypasses draft plane)
   -q, --quiet                   Suppress non-essential output
+      --reason-code string      Reason code required when using --override
       --relaxed                 Relax integrity constraints during creation (allow references to objects that will be created later in batch operations) [Default: true] (default true)
       --timeout duration        Timeout for command execution (0 = auto-calculate)
   -v, --verbose                 Verbose output

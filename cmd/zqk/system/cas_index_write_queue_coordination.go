@@ -129,7 +129,10 @@ func emitListingIndexStateChangeEventViaCoordinator(
 	storageProviderCas caspkg.CASFacade,
 	changeType string,
 ) {
-	storageProvider := storageProviderCas.(storage.ObjectStorageProvider)
+	var storageProvider storage.ObjectStorageProvider
+	if sp, ok := storageProviderCas.(storage.ObjectStorageProvider); ok {
+		storageProvider = sp
+	}
 	projectRoot = ProjectRootOrResolveDot(projectRoot)
 	if projectRoot == emptyValue {
 		return

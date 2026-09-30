@@ -10,7 +10,7 @@ flags:
 help:
   examples:
     - comment: "Uninstall"
-      command: "%s scheduler service uninstall --root ."
+      command: "%s service uninstall --root ."
   exclude_flags: ["format", "output", "verbose", "quiet", "timeout", "columns"]
 run_e: "runSchedulerServiceUninstall"
 common_flags: false

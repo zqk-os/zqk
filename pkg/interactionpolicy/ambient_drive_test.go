@@ -156,3 +156,16 @@ func TestRankNextPlanLabels_ShapedAnnotation(t *testing.T) {
 		t.Fatalf("got %v", got)
 	}
 }
+
+func TestHintSwarmInit(t *testing.T) {
+	t.Parallel()
+	got := HintSwarmInit("PRI-PUBLIC-LAUNCH-READINESS-100")
+	if !strings.Contains(got, "swarm-init") || !strings.Contains(got, "PRI-PUBLIC-LAUNCH-READINESS-100") || !strings.Contains(got, "--allow-chat") {
+		t.Fatalf("unexpected swarm-init hint: %q", got)
+	}
+	gotEmpty := HintSwarmInit("")
+	if !strings.Contains(gotEmpty, "swarm-init") || !strings.Contains(gotEmpty, "--allow-chat") {
+		t.Fatalf("unexpected fallback swarm-init hint: %q", gotEmpty)
+	}
+}
+

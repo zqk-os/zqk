@@ -5,20 +5,16 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"path/filepath"
 	"strings"
 	"syscall"
 	"time"
 
-	"github.com/fsnotify/fsnotify"
 	"golang.org/x/term"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
-	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // RunTUI starts the interactive full-screen mission control session.
@@ -87,17 +83,6 @@ func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp stora
 	// Render initial frame
 	writeScreen(Render(m))
 
-	// Setup reactive filesystem watcher across tracked stream directories
-	watcher, _ := fsnotify.NewWatcher()
-	if watcher != nil {
-		defer watcher.Close()
-		for _, kind := range []string{"change_journal_entry", "audit_event", "agent_instruction", "process_lifecycle"} {
-			sDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.StreamsDir, kind)
-			_ = fileutil.MkdirAll(sDir, paths.DirPerm755)
-			_ = watcher.Add(sDir)
-		}
-	}
-
 	// Non-blocking keyboard input loop
 	keyCh := make(chan []byte, 16)
 	goroutinelabels.NewGoroutine("tui_stdin_reader", "reading keyboard input for live dashboard TUI").
@@ -123,11 +108,6 @@ func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp stora
 
 	refreshTicker := time.NewTicker(1 * time.Second)
 	defer refreshTicker.Stop()
-
-	var fsEvents <-chan fsnotify.Event
-	if watcher != nil {
-		fsEvents = watcher.Events
-	}
 
 	renderScreen := func() {
 		curW, curH, sErr := term.GetSize(stdoutFd)
@@ -161,12 +141,6 @@ func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp stora
 				m.RefreshScheduler(ctx, sp, sec)
 			}
 			renderScreen()
-		case ev, ok := <-fsEvents:
-			if ok && (ev.Has(fsnotify.Write) || ev.Has(fsnotify.Create)) {
-				m.RefreshMutations()
-				m.RefreshAuditEvents()
-				renderScreen()
-			}
 		}
 	}
 }
@@ -211,6 +185,18 @@ func handleInput(m *UIModel, key []byte) bool {
 		if m.DetailModal.Kind == objects.KindTestCase {
 			if len(key) == 1 && (key[0] == 't' || key[0] == 'T') {
 				m.TriggerQARescan()
+				return false
+			}
+		}
+		if m.DetailModal.Kind == "inbox_item" || m.DetailModal.Kind == "correspondence" || m.DetailModal.Kind == "tde_envelope" {
+			if len(key) == 1 && (key[0] == 'a' || key[0] == 'A') {
+				m.AcknowledgeInboxItem(m.DetailModal.ID)
+				m.DetailModal = nil
+				return false
+			}
+			if len(key) == 1 && (key[0] == 'r' || key[0] == 'R') {
+				m.RespondInboxItem(m.DetailModal.ID, "Acknowledged and resolved via Mission Control Console")
+				m.DetailModal = nil
 				return false
 			}
 		}
@@ -388,13 +374,21 @@ func handleInput(m *UIModel, key []byte) bool {
 		case 'z', 'Z', '?': // Cycle editor profile: newb -> pro -> jedi
 			m.CycleEditorProfile()
 			_, _ = os.Stdout.WriteString(AnsiClearScreen)
-		case 'r', 'R': // Force refresh
+		case 'r', 'R': // Force refresh or reply on TabSwarm if items exist
+			if m.ActiveTab == TabSwarm {
+				items := m.GetVisibleInboxItems()
+				if m.SelectedIndex < len(items) {
+					m.RespondInboxItem(items[m.SelectedIndex].ID, "Acknowledged and resolved via Mission Control Console")
+					return false
+				}
+			}
 			ctx := context.Background()
 			m.RefreshMutations()
 			m.RefreshAuditEvents()
 			m.RefreshObjects()
 			m.RefreshQA(ctx, m.Storage, m.SecCtx)
 			m.RefreshHealth()
+			m.RefreshInbox()
 			if m.Storage != nil && m.SecCtx != nil {
 				m.RefreshSwarm(ctx, m.Storage, m.SecCtx)
 				m.RefreshPM(ctx, m.Storage, m.SecCtx)
@@ -410,13 +404,18 @@ func handleInput(m *UIModel, key []byte) bool {
 			} else if m.ActiveTab == TabQA {
 				m.TriggerQARescan()
 			}
-		case 'c', 'C', 'a', 'A', 'w', 'W', 'd', 'D', 'p', 'P', 'm', 'M', 's', 'S', 'b', 'B': // Action Center (Tab 8) / Delayed Trigger (Tab 6)
+		case 'c', 'C', 'a', 'A', 'w', 'W', 'd', 'D', 'p', 'P', 'm', 'M', 's', 'S', 'b', 'B': // Action Center (Tab 8) / Delayed Trigger (Tab 6) / Swarm Ack (Tab 3)
 			if m.ActiveTab == TabHealth {
 				m.TriggerActionCenter(string(key[0]))
 			} else if m.ActiveTab == TabScheduler && (key[0] == 'd' || key[0] == 'D') {
 				jobs := m.GetVisibleSchedulerJobs()
 				if m.SelectedIndex < len(jobs) {
 					m.TriggerScheduledJob(jobs[m.SelectedIndex].ID, 10)
+				}
+			} else if m.ActiveTab == TabSwarm && (key[0] == 'a' || key[0] == 'A') {
+				items := m.GetVisibleInboxItems()
+				if m.SelectedIndex < len(items) {
+					m.AcknowledgeInboxItem(items[m.SelectedIndex].ID)
 				}
 			}
 		case 'k', 'K': // Cursor up / Scroll up

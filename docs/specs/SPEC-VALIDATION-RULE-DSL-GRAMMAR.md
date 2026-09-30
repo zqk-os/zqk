@@ -433,6 +433,8 @@ The Validation DSL standard library provides specialized predicates for kernel e
 ### 5.3 Knowledge Kernel & Graph Integrity Predicates
 - `object_exists(id: Ref) -> Bool`: Queries the in-memory CAS live index to verify that the target object exists.
 - `field_nonempty(field_name: String) -> Bool`: Asserts that `field_name` exists and is non-empty.
+- `field_cleared(field_name: String) -> Bool`: Asserts that `field_name` is absent, null, or empty string.
+- `any_nonempty(field_names: List<String>) -> Bool`: Asserts that at least one of the specified field names contains a non-empty value (supports comma- or colon-delimited field names in predicate strings, e.g. `any_nonempty:workstream_ref,milestone_ref` or `any_nonempty:workstream_ref:milestone_ref`), with automatic singular/plural fallback matching.
 - `ref_valid(ref: Ref, expected_kind: String) -> Bool`: Confirms that the target object exists and matches the expected kind.
 
 ### 5.4 VDS Done-Gate Predicates

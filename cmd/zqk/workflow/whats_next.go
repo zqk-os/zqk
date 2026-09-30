@@ -204,6 +204,13 @@ func runWhatsNextLite(cmd *cobra.Command, args []string, proc *cli.Processor, pr
 				Title:  lite.LeadPlan.Title,
 				Status: lite.LeadPlan.Status,
 			}
+		} else if len(out.ActivePlans) > 0 {
+			p := out.ActivePlans[0]
+			out.PriorityPlan = &whatsNextPriorityPlan{
+				ID:     p.ID,
+				Title:  p.Title,
+				Status: p.Status,
+			}
 		}
 
 		if out.PriorityPlan != nil {
@@ -1267,10 +1274,22 @@ func compileWhatsNextDrive(out *whatsNextOut, ctx context.Context, sp workflowSt
 		if outbox > 0 {
 			drive = strings.TrimSpace(drive + " Outbox awaiting peer_ack: do not remint the same wake; keep working other kernel items.")
 		}
-		hint = ""
-		if fill != nil && fill.CommandHint != "" {
-			hint = fill.CommandHint
-			drive = strings.TrimSpace(drive + " Do this fill instead of shutdown or reminting ORCHESTRATE_PLAN: " + fill.Reason + ".")
+		targetPlanID := ""
+		if out.PriorityPlan != nil && out.PriorityPlan.ID != "" {
+			targetPlanID = out.PriorityPlan.ID
+		} else if len(out.ActivePlans) > 0 && out.ActivePlans[0].ID != "" {
+			targetPlanID = out.ActivePlans[0].ID
+		}
+
+		if targetPlanID != "" && planned > 0 {
+			hint = interactionpolicy.HintSwarmInit(targetPlanID)
+			drive = fmt.Sprintf("Shovel-ready batch detected on %s (%d planned backlog items with resolved ambiguity). Swarm orchestration mandated over single-task claiming: hand off to deterministic swarm for concurrent TDD, race-free implementation, and canonical doc entry generation.", targetPlanID, planned)
+		} else {
+			hint = ""
+			if fill != nil && fill.CommandHint != "" {
+				hint = fill.CommandHint
+				drive = strings.TrimSpace(drive + " Do this fill instead of shutdown or reminting ORCHESTRATE_PLAN: " + fill.Reason + ".")
+			}
 		}
 	}
 	if event == interactionpolicy.EventShovelReadyEmpty || event == interactionpolicy.EventStratplanAhead {

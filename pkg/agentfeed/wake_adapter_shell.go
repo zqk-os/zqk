@@ -21,6 +21,8 @@ type ShellPeerWakeAdapter struct {
 	// WorkerScript / CoordinatorScript override basenames under paths.ScriptsDirPath.
 	WorkerScript      string
 	CoordinatorScript string
+	// Fallback optionally provides an in-process wake fallback when shell scripts are absent.
+	Fallback PeerWakeAdapter
 }
 
 const (
@@ -33,6 +35,16 @@ func NewShellPeerWakeAdapter() *ShellPeerWakeAdapter {
 	return &ShellPeerWakeAdapter{
 		WorkerScript:      shellWakeWorkerScript,
 		CoordinatorScript: shellWakeCoordinatorScript,
+		Fallback:          NewNativePeerWakeAdapter(),
+	}
+}
+
+// NewShellPeerWakeAdapterWithFallback returns a shell membrane adapter with a fallback adapter for missing scripts.
+func NewShellPeerWakeAdapterWithFallback(fallback PeerWakeAdapter) *ShellPeerWakeAdapter {
+	return &ShellPeerWakeAdapter{
+		WorkerScript:      shellWakeWorkerScript,
+		CoordinatorScript: shellWakeCoordinatorScript,
+		Fallback:          fallback,
 	}
 }
 
@@ -43,6 +55,9 @@ func (a *ShellPeerWakeAdapter) Wake(ctx context.Context, req PeerWakeRequest) (P
 	}
 	script := a.scriptPath(req.ProjectRoot, req.SeatKind)
 	if !fileutil.IsRegularFile(script) {
+		if a.Fallback != nil {
+			return a.Fallback.Wake(ctx, req)
+		}
 		return PeerWakeAdapterResult{Endpoint: script}, errfmt.Errorf("wake membrane missing: %s", script)
 	}
 	args := a.args(req)

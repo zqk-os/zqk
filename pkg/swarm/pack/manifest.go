@@ -263,7 +263,7 @@ func DraftSwarmManifestYAML(opts SwarmDraftOptions) ([]byte, error) {
 		License:     license,
 		Entrypoint:  "task-execute",
 		Membranes: []MembraneRule{
-			{Path: ".zqk/process/", Mode: "read_only"},
+			{Path: paths.ProcessDir + "/", Mode: "read_only"},
 		},
 		Parameters: map[string]ParameterDef{
 			"baseline": {

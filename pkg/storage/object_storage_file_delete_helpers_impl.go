@@ -14,7 +14,10 @@ import (
 
 func (f *FileObjectStorage) findDependents(ctx context.Context, id, _ string) ([]string, error) {
 	index := GetGlobalReverseReferenceIndex()
-	dependents := index.GetDependents(id)
+	dependents, err := index.GetDependentsWithError(id)
+	if err != nil {
+		return nil, errfmt.Errorf("findDependents: failed to get dependents for %s: %w", id, err)
+	}
 
 	if len(dependents) > 0 {
 		existingDependents := make([]string, 0, len(dependents))
@@ -54,7 +57,10 @@ func (f *FileObjectStorage) findDependents(ctx context.Context, id, _ string) ([
 			index.isReady.Store(true)
 			return nil, nil
 		}
-		dependents = index.GetDependents(id)
+		dependents, err = index.GetDependentsWithError(id)
+		if err != nil {
+			return nil, errfmt.Errorf("findDependents: failed to get dependents for %s: %w", id, err)
+		}
 		if len(dependents) == 0 {
 			return nil, nil
 		}

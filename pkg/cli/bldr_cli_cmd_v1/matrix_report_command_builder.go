@@ -19,7 +19,7 @@ func NewMatrixReportCommandBuilder() *cobra.Command {
 	help.AddExample("Report test-bundle matrix", "%s matrix report --name test_bundle")
 	help.AddExample("Go files only", "%s matrix report --go-only")
 	builder.WithHelpBuilder(help)
-	builder.AddStringFlag("name", "", "codebase_vetting", "Matrix alias from matrix_registry.yaml (default: codebase_vetting)")
+	builder.AddStringFlag("name", "", "", "Matrix alias from matrix_registry.yaml (default: resolved from registry default)")
 	builder.AddStringFlag("registry", "", "", "Path to matrix_registry.yaml (repo-relative or absolute); default docs/quality/matrix_registry.yaml")
 	builder.AddStringFlag("matrix", "", "", "Override CSV path (bypasses registry name resolution)")
 	builder.AddStringFlag("profile", "", "", "Override profile YAML path when using --matrix")

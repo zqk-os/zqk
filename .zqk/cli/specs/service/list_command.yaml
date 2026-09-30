@@ -14,7 +14,7 @@ flags:
 help:
   examples:
     - comment: "List all"
-      command: "%s scheduler service list"
+      command: "%s service list"
   exclude_flags:
     - "format"
     - "output"

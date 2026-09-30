@@ -13,7 +13,7 @@ func NewServiceStartCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("start")
 	builder.WithShort("Start a registered scheduler host unit")
 	help := clipkg.DynamicHelpBuilder("Start a registered scheduler host unit")
-	help.AddExample("Start by path", "%s scheduler service start --root .")
+	help.AddExample("Start by path", "%s service start --root .")
 	help.ExcludeFlag("format")
 	help.ExcludeFlag("output")
 	help.ExcludeFlag("verbose")

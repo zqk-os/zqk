@@ -16,6 +16,9 @@ import (
 func (m *IOQueueManager) InitiateShutdown() error {
 	var queues []*ioQueue
 	_ = concurrency.RunInLockOrLog(&m.mu, locknames.LockNameIoQueueInitiateShutdown, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
+		if m.cancel != nil {
+			m.cancel()
+		}
 		queues = make([]*ioQueue, len(m.queues))
 		copy(queues, m.queues)
 		for _, queue := range queues {

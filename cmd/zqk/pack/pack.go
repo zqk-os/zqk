@@ -92,8 +92,8 @@ func newInitCmd() *cobra.Command {
 					},
 				},
 				Membranes: []pack.MembraneRule{
-					{Path: ".zqk/process/", Mode: "read_only"},
-					{Path: ".zqk/audit/", Mode: "audit_log"},
+					{Path: paths.ProcessDir + "/", Mode: "read_only"},
+					{Path: filepath.ToSlash(filepath.Join(paths.ProjectDataDir, "audit")) + "/", Mode: "audit_log"},
 				},
 				Agents: []pack.AgentConfig{
 					{

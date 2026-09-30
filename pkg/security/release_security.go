@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -59,7 +60,7 @@ func DefaultAuditOptions() AuditOptions {
 			".git",
 			"vendor",
 			".oc-sun-quarantine",
-			".zqk",
+			paths.ProjectDataDir,
 		},
 	}
 }

@@ -14,7 +14,7 @@ func NewServiceListCommandBuilder() *cobra.Command {
 	builder.WithShort("List registered scheduler host service units")
 	help := clipkg.DynamicHelpBuilder("List registered scheduler host service units")
 	help.WithDescriptionLines("Lists host registry entries. Use --orphans to show units whose abs_root is missing.")
-	help.AddExample("List all", "%s scheduler service list")
+	help.AddExample("List all", "%s service list")
 	help.ExcludeFlag("format")
 	help.ExcludeFlag("output")
 	help.ExcludeFlag("verbose")

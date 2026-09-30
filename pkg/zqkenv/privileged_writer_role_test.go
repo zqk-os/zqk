@@ -46,6 +46,14 @@ func TestPrivilegedWriterDaemonRole_Neither(t *testing.T) {
 	}
 }
 
+func TestPrivilegedWriterDaemonRole_EnvAloneDoesNotGrantRole(t *testing.T) {
+	t.Setenv(IsDaemon().Name(), "1")
+	setCommandArgs(t, []string{"zqk", "object", "update", "CRIT-1"})
+	if PrivilegedWriterDaemonRole() {
+		t.Fatal("IS_DAEMON=1 alone must NOT grant privileged writer role (F-SEC-002)")
+	}
+}
+
 func TestPrivilegedWriterRequiredLaunchEnv(t *testing.T) {
 	t.Parallel()
 	env := PrivilegedWriterRequiredLaunchEnv()

@@ -30,9 +30,9 @@ type Query struct {
 }
 
 var skipDirNames = map[string]struct{}{
-	".git":         {},
-	".zqk":         {},
-	"vendor":       {},
+	".git":               {},
+	paths.ProjectDataDir: {},
+	"vendor":             {},
 	"node_modules": {},
 	"testdata":     {},
 	"dist":         {},
@@ -150,17 +150,42 @@ func collectQueryFiles(ctx context.Context, absRoot, relPath string) ([]string, 
 		return collectGoFiles(ctx, target)
 	}
 	var files []string
-	for _, sub := range []string{"pkg", "cmd"} {
+	defaultSrcDirs := []string{"pkg", "cmd", "internal", "src", "lib", "app", "core", "api", "services", "server"}
+	foundAny := false
+	for _, sub := range defaultSrcDirs {
 		dir := filepath.Join(absRoot, sub)
 		info, err := fileutil.Stat(dir)
 		if err != nil || !info.IsDir() {
 			continue
 		}
+		foundAny = true
 		found, err := collectGoFiles(ctx, dir)
 		if err != nil {
 			return nil, err
 		}
 		files = append(files, found...)
+	}
+	if !foundAny {
+		entries, err := fileutil.ReadDir(absRoot)
+		if err == nil {
+			for _, entry := range entries {
+				if ctx.Err() != nil {
+					return nil, ctx.Err()
+				}
+				name := entry.Name()
+				if entry.IsDir() {
+					if _, skip := skipDirNames[name]; skip || strings.HasPrefix(name, ".") {
+						continue
+					}
+					found, err := collectGoFiles(ctx, filepath.Join(absRoot, name))
+					if err == nil {
+						files = append(files, found...)
+					}
+				} else if strings.EqualFold(filepath.Ext(name), goFileSuffix) {
+					files = append(files, filepath.Join(absRoot, name))
+				}
+			}
+		}
 	}
 	return files, nil
 }
@@ -240,11 +265,18 @@ func SearchTokens(title string) []string {
 	return out
 }
 
-// InferSourcePath returns the first pkg/ or cmd/ path fragment in text.
+// InferSourcePath returns the first likely source path fragment in text.
+var candidateSourcePrefixes = []string{"pkg/", "cmd/", "internal/", "src/", "lib/", "app/", "core/", "api/", "services/", "server/"}
+
 func InferSourcePath(text string) string {
 	for _, field := range strings.Fields(text) {
-		field = strings.Trim(field, "`\"'")
-		if strings.HasPrefix(field, "pkg/") || strings.HasPrefix(field, "cmd/") {
+		field = strings.Trim(field, "`\"'(),[]")
+		for _, prefix := range candidateSourcePrefixes {
+			if strings.HasPrefix(field, prefix) {
+				return strings.TrimRight(field, ".,;:")
+			}
+		}
+		if strings.HasSuffix(field, ".go") && !strings.Contains(field, "://") {
 			return strings.TrimRight(field, ".,;:")
 		}
 	}

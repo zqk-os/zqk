@@ -69,14 +69,16 @@ transitions:
     auto: true
     catalyst: System initialization
     preconditions:
-      - Target document file exists and is reachable on disk
+      - path_exists:file_path
   - from: draft
     to: review
     description: Document entry is submitted for review
     manual: true
     auto: false
     preconditions:
-      - Title, summary, and path are populated
+      - field_nonempty:title
+      - field_nonempty:summary
+      - field_nonempty:path
     postconditions:
       - role is realign
   - from: review
@@ -85,9 +87,9 @@ transitions:
     manual: true
     auto: false
     preconditions:
-      - Target file reachable and readable
-      - Cryptographic content_hash computed and sealed
-      - Document content_size measured
+      - path_exists:file_path
+      - field_nonempty:content_hash
+      - content_size_positive:content_size
     postconditions:
       - role is shovel_ready
   - from: published
@@ -96,7 +98,7 @@ transitions:
     manual: true
     auto: false
     preconditions:
-      - Cryptographic content_hash matches target file on disk
+      - content_hash_matches:file_path
     postconditions:
       - role is shovel_ready
   - from: '*'

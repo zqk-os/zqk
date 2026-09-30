@@ -8,9 +8,9 @@ import (
 // NewWorkflowCommandBuilder creates a new workflow command
 func NewWorkflowCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("workflow")
-	builder.WithShort("workflow command")
-	help := clipkg.DynamicHelpBuilder("workflow command")
-	help.WithDescriptionLines("workflow command")
+	builder.WithShort("Manage and execute autonomous engineering workflows and lifecycle pipelines")
+	help := clipkg.DynamicHelpBuilder("Manage and execute autonomous engineering workflows and lifecycle pipelines")
+	help.WithDescriptionLines("Coordinates mission execution, priority plan delivery, Done-gate verification, and autonomous agent loops.")
 	builder.WithHelpBuilder(help)
 	builder.WithCommonFlags(false, nil)
 	cmd := builder.Build()

@@ -13,7 +13,7 @@ func NewServiceStopCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("stop")
 	builder.WithShort("Stop a registered scheduler host unit")
 	help := clipkg.DynamicHelpBuilder("Stop a registered scheduler host unit")
-	help.AddExample("Stop by path", "%s scheduler service stop --root .")
+	help.AddExample("Stop by path", "%s service stop --root .")
 	help.ExcludeFlag("format")
 	help.ExcludeFlag("output")
 	help.ExcludeFlag("verbose")

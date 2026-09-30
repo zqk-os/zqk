@@ -184,7 +184,7 @@ func (b *BacklogItemLifecycleBuilder) addBacklogItemLifecycleData() {
 		Manual:      true,
 		Auto:        false,
 		Preconditions: []string{
-			"Standard checks pass",
+			"standard_checks_pass",
 		},
 		Shockwave: objects.ShockwavePolicy{
 			Mode: "propagate",
@@ -198,7 +198,7 @@ func (b *BacklogItemLifecycleBuilder) addBacklogItemLifecycleData() {
 		Manual:      true,
 		Auto:        false,
 		Preconditions: []string{
-			"Standard checks pass",
+			"standard_checks_pass",
 		},
 		Shockwave: objects.ShockwavePolicy{
 			Mode: "propagate",
@@ -212,7 +212,7 @@ func (b *BacklogItemLifecycleBuilder) addBacklogItemLifecycleData() {
 		Manual:      true,
 		Auto:        false,
 		Preconditions: []string{
-			"Standard checks pass",
+			"standard_checks_pass",
 		},
 		Shockwave: objects.ShockwavePolicy{
 			Mode: "propagate",
@@ -237,7 +237,7 @@ func (b *BacklogItemLifecycleBuilder) addBacklogItemLifecycleData() {
 		Manual:      true,
 		Auto:        false,
 		Preconditions: []string{
-			"Standard checks pass",
+			"standard_checks_pass",
 		},
 		Shockwave: objects.ShockwavePolicy{
 			Mode: "propagate",
@@ -251,7 +251,7 @@ func (b *BacklogItemLifecycleBuilder) addBacklogItemLifecycleData() {
 		Manual:      true,
 		Auto:        false,
 		Preconditions: []string{
-			"Standard checks pass",
+			"standard_checks_pass",
 		},
 		Shockwave: objects.ShockwavePolicy{
 			Mode: "propagate",
@@ -298,7 +298,7 @@ func (b *BacklogItemLifecycleBuilder) addBacklogItemLifecycleData() {
 		Manual:      true,
 		Auto:        false,
 		Preconditions: []string{
-			"Standard checks pass",
+			"standard_checks_pass",
 		},
 		Shockwave: objects.ShockwavePolicy{
 			Mode: "propagate",
@@ -312,7 +312,7 @@ func (b *BacklogItemLifecycleBuilder) addBacklogItemLifecycleData() {
 		Manual:      true,
 		Auto:        false,
 		Preconditions: []string{
-			"Standard checks pass",
+			"standard_checks_pass",
 		},
 		Shockwave: objects.ShockwavePolicy{
 			Mode: "propagate",
@@ -337,7 +337,7 @@ func (b *BacklogItemLifecycleBuilder) addBacklogItemLifecycleData() {
 		Manual:      true,
 		Auto:        false,
 		Preconditions: []string{
-			"Standard checks pass",
+			"standard_checks_pass",
 		},
 		SideEffects: []objects.TransitionSideEffect{
 			{Clear: "priority_plan_ref"},
@@ -354,7 +354,7 @@ func (b *BacklogItemLifecycleBuilder) addBacklogItemLifecycleData() {
 		Manual:      true,
 		Auto:        false,
 		Preconditions: []string{
-			"Standard checks pass",
+			"standard_checks_pass",
 		},
 		SideEffects: []objects.TransitionSideEffect{
 			{Clear: "priority_plan_ref"},
@@ -382,7 +382,7 @@ func (b *BacklogItemLifecycleBuilder) addBacklogItemLifecycleData() {
 		Manual:      true,
 		Auto:        false,
 		Preconditions: []string{
-			"Standard checks pass",
+			"standard_checks_pass",
 		},
 		Shockwave: objects.ShockwavePolicy{
 			Mode: "propagate",
@@ -396,7 +396,7 @@ func (b *BacklogItemLifecycleBuilder) addBacklogItemLifecycleData() {
 		Manual:      true,
 		Auto:        false,
 		Preconditions: []string{
-			"Standard checks pass",
+			"standard_checks_pass",
 			"all linked criteria_refs bound to active test_case_refs (tdd red phase)",
 		},
 		Shockwave: objects.ShockwavePolicy{
@@ -425,7 +425,7 @@ func (b *BacklogItemLifecycleBuilder) addBacklogItemLifecycleData() {
 		Manual:      true,
 		Auto:        false,
 		Preconditions: []string{
-			"Standard checks pass",
+			"standard_checks_pass",
 		},
 		Shockwave: objects.ShockwavePolicy{
 			Mode: "propagate",
@@ -495,7 +495,7 @@ func (b *BacklogItemLifecycleBuilder) addBacklogItemLifecycleData() {
 		Manual:      true,
 		Auto:        false,
 		Preconditions: []string{
-			"Standard checks pass",
+			"standard_checks_pass",
 			"linked priority_plan is archived when priority_plan_ref is set",
 		},
 		Shockwave: objects.ShockwavePolicy{
@@ -521,7 +521,7 @@ func (b *BacklogItemLifecycleBuilder) addBacklogItemLifecycleData() {
 		Manual:      true,
 		Auto:        false,
 		Preconditions: []string{
-			"Standard checks pass",
+			"standard_checks_pass",
 		},
 		Shockwave: objects.ShockwavePolicy{
 			Mode: "propagate",
@@ -549,7 +549,7 @@ func (b *BacklogItemLifecycleBuilder) addBacklogItemLifecycleData() {
 		Manual:      true,
 		Auto:        false,
 		Preconditions: []string{
-			"Standard checks pass",
+			"standard_checks_pass",
 			"linked priority_plan is archived when priority_plan_ref is set",
 		},
 		Shockwave: objects.ShockwavePolicy{
@@ -564,7 +564,7 @@ func (b *BacklogItemLifecycleBuilder) addBacklogItemLifecycleData() {
 		Manual:      false,
 		Auto:        false,
 		Preconditions: []string{
-			"Standard checks pass",
+			"standard_checks_pass",
 		},
 		Shockwave: objects.ShockwavePolicy{
 			Mode: "propagate",

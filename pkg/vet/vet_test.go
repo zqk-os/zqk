@@ -110,6 +110,84 @@ func Bad() {
 	}
 }
 
+func TestCheckPathsAndPerms_NonCallStringLiterals(t *testing.T) {
+	tempDir := t.TempDir()
+	cfg := &GatesConfig{
+		Hygiene: HygieneConfig{
+			CheckPaths: true,
+			CheckPerms: false,
+		},
+	}
+
+	badGo := `package test
+var (
+	myPath = ".zqk"
+	mySlice = []string{".zqk/foo", "safe"}
+)
+type Config struct {
+	Dir string
+}
+var myConfig = Config{Dir: ".zqk/bar"}
+`
+	badDir := filepath.Join(tempDir, "pkg", "badlit")
+	if err := os.MkdirAll(badDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(badDir, "bad.go"), []byte(badGo), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	findings, err := CheckPathsAndPerms(tempDir, cfg)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if len(findings) != 3 {
+		t.Errorf("expected 3 findings for non-call path literals, got %d: %+v", len(findings), findings)
+	}
+}
+
+func TestCheckPathsAndPerms_WorkstationPathLiterals(t *testing.T) {
+	tempDir := t.TempDir()
+	cfg := &GatesConfig{
+		Hygiene: HygieneConfig{
+			CheckPaths: true,
+			CheckPerms: false,
+		},
+	}
+
+	badGo := `package test
+var (
+	macUserPath   = "/Users/developer/project"
+	linuxHomePath = "/home/developer/app"
+	varFolders    = "/var/folders/zz/zyxvpxvq6csfxvn_n0000000000000/T/temp"
+	privateVar    = "/private/var/tmp/run"
+	safePath      = "pkg/paths/data"
+)
+`
+	badDir := filepath.Join(tempDir, "pkg", "workstation")
+	if err := os.MkdirAll(badDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(badDir, "workstation.go"), []byte(badGo), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	findings, err := CheckPathsAndPerms(tempDir, cfg)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if len(findings) != 4 {
+		t.Errorf("expected 4 workstation path findings, got %d: %+v", len(findings), findings)
+	}
+	for _, f := range findings {
+		if f.CheckID != "hygiene/hardcoded-workstation-path" {
+			t.Errorf("expected check ID hygiene/hardcoded-workstation-path, got %s", f.CheckID)
+		}
+	}
+}
+
 func TestCheckCLINames(t *testing.T) {
 	tempDir := t.TempDir()
 	badGo := `package test

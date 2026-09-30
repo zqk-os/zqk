@@ -20,6 +20,14 @@ func NewInterruptEmitter(projectRoot string) *InterruptEmitter {
 	return &InterruptEmitter{projectRoot: projectRoot}
 }
 
+// ProjectRoot returns the configured project root directory.
+func (e *InterruptEmitter) ProjectRoot() string {
+	if e == nil {
+		return ""
+	}
+	return e.projectRoot
+}
+
 // EmitDisparityInterrupt triggers a high-severity policy interrupt for a structural disparity.
 func (e *InterruptEmitter) EmitDisparityInterrupt(ctx context.Context, itemID string, reason string) error {
 	record := policyinterrupt.InterruptRecord{

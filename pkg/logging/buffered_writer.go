@@ -100,7 +100,7 @@ func (bw *BufferedWriter) writeLocked(p []byte, forceFlush bool) (int, error) {
 
 // Flush flushes the buffer to the underlying writer.
 // Plain mutex: timeout-context wrappers belong on contended locks, not the 1s log flusher
-// (REQ-1790151409621692000-007e7255). bufio.Writer is not concurrent-safe, so
+// (REQ-CEF-MUTEX-DISCIPLINE). bufio.Writer is not concurrent-safe, so
 // Buffered/Available also take this lock rather than racing b.n.
 func (bw *BufferedWriter) Flush() error {
 	bw.mu.Lock()

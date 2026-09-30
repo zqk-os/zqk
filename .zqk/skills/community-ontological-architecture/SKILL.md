@@ -79,3 +79,23 @@ Govern the scrupulous breakdown of high-level intents and composite packs into o
   COMMIT TRANSACTION;
   ```
   Forward and backward variable references (`$plan.id`, `$bli.id`) are resolved via Kahn's algorithm with preflight validation and atomic rollback.
+
+## 7. Anti-Bloat Cardinality Discipline & Epistemic Synthesis
+- **Strict Prohibition on 1:1 Symptom-Mirroring**:
+  Under no circumstances may an agent convert an evaluation report or list of defects into a 1:1 constellation of requirements, criteria, and backlog items. Doing so causes epistemic sprawl, inflates graph traversal costs, and produces trivial micro-tickets that mask root causes.
+- **Root-Cause Clustering Target Ratios**:
+  - **Symptom-to-BLI Ratio**: $\ge 5:1$ (At least 5 to 10 findings/symptoms per Backlog Item).
+  - **Requirement-to-Criteria Ratio**: $1:3$ (Every requirement MUST be supported by at least 3 orthogonal criteria: Static, Dynamic, Negative).
+  - **Requirement-to-BLI Ratio**: $1:2$ to $1:3$ (A requirement defines a major system invariant or capability, executed by 2–3 cohesive backlog items).
+- **Metadata Binding**:
+  Map original finding IDs (e.g. `F-CONC-001`) into the `description`, `notes`, or `tags` of the consolidated Backlog Item rather than minting duplicate micro-objects.
+
+## 8. Deterministic Cybernetic Steering Loop
+All planning and execution agents operate as closed-loop controllers:
+1. **Target State Projection**: Project the delta between current state and target state using empirical indicators (CEF scorecard, VDS done-gates, alignment score).
+2. **Hypothesis Evaluation**: Formulate candidate action sets. Select the hypothesis that names the actions most likely to bring the state projection closer to target with minimum blast radius.
+3. **Deterministic Execution**: Execute changes cleanly under TDD discipline.
+4. **Re-Evaluation & Measurement**: Execute objective measurement tools and compare directly against prior run output.
+5. **Gain/Loss Delta Calculation**: Quantify empirical gain or loss from the execution cycle.
+6. **Ambient Signal Feedback**: Inject measurement signals ambiently into the kernel graph (`zqk system align`, feed, convergence sessions).
+7. **Dynamic Task Minting & Steering**: Query `zqk workflow whats-next` to mint or advance the next highest-priority task dictated by the kernel.
