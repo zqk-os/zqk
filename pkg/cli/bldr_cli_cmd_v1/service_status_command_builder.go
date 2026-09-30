@@ -13,7 +13,7 @@ func NewServiceStatusCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("status")
 	builder.WithShort("Show OS unit status for a registered root")
 	help := clipkg.DynamicHelpBuilder("Show OS unit status for a registered root")
-	help.AddExample("Status", "%s scheduler service status --root .")
+	help.AddExample("Status", "%s service status --root .")
 	help.ExcludeFlag("format")
 	help.ExcludeFlag("output")
 	help.ExcludeFlag("verbose")

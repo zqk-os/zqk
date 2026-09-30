@@ -10,7 +10,7 @@ flags:
 help:
   examples:
     - comment: "Status"
-      command: "%s scheduler service status --root ."
+      command: "%s service status --root ."
   exclude_flags: ["format", "output", "verbose", "quiet", "timeout", "columns"]
 run_e: "runSchedulerServiceStatus"
 common_flags: false

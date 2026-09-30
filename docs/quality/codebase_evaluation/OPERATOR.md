@@ -18,7 +18,7 @@
 You can orchestrate the evaluation either natively through the ZQK Knowledge Kernel swarm engine, or manually via the template skeleton:
 
 #### Option A: Native Kernel Swarm Dispatch (Recommended)
-The framework includes a fully declared swarm package under [`packs/code-eval/`](../../packs/code-eval/swarm.yaml) with 12 pipeline tasks and pre-rendered prompt templates across all lenses:
+The framework includes a fully declared swarm package under [`packs/code-eval/`](../../../packs/code-eval/swarm.yaml) with 12 pipeline tasks and pre-rendered prompt templates across all lenses:
 
 ```bash
 # Validate the evaluation swarm package and inspect task topology

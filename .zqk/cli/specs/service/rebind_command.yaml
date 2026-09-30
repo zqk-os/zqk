@@ -14,7 +14,7 @@ flags:
 help:
   examples:
     - comment: "Rebind after directory move"
-      command: "%s scheduler service rebind --root-id <id> --new-path /new/path"
+      command: "%s service rebind --root-id <id> --new-path /new/path"
   exclude_flags: ["format", "output", "verbose", "quiet", "timeout", "columns"]
 run_e: "runSchedulerServiceRebind"
 common_flags: false

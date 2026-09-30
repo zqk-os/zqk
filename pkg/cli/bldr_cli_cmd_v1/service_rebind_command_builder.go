@@ -13,7 +13,7 @@ func NewServiceRebindCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("rebind")
 	builder.WithShort("Update abs_root for an existing root_id (path rename/move)")
 	help := clipkg.DynamicHelpBuilder("Update abs_root for an existing root_id (path rename/move)")
-	help.AddExample("Rebind after directory move", "%s scheduler service rebind --root-id <id> --new-path /new/path")
+	help.AddExample("Rebind after directory move", "%s service rebind --root-id <id> --new-path /new/path")
 	help.ExcludeFlag("format")
 	help.ExcludeFlag("output")
 	help.ExcludeFlag("verbose")

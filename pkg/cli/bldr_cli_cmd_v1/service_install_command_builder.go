@@ -17,7 +17,7 @@ func NewServiceInstallCommandBuilder() *cobra.Command {
 	help.WithDescriptionLines("host registry, and enables KeepAlive/Restart. Prefers workshop stable")
 	help.WithDescriptionLines("(.zqk/bin/zqk-stable) when present so host units match MCP/scheduler daemons;")
 	help.WithDescriptionLines("falls back to tip bin/zqk when stable is absent.")
-	help.AddExample("Install for current directory", "%s scheduler service install --root .")
+	help.AddExample("Install for current directory", "%s service install --root .")
 	help.ExcludeFlag("format")
 	help.ExcludeFlag("output")
 	help.ExcludeFlag("verbose")

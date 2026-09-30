@@ -5,7 +5,7 @@ short: "Remove host units whose project roots are gone or desired_state=absent"
 help:
   examples:
     - comment: "Garbage-collect orphans"
-      command: "%s scheduler service gc"
+      command: "%s service gc"
   exclude_flags: ["format", "output", "verbose", "quiet", "timeout", "columns"]
 run_e: "runSchedulerServiceGC"
 common_flags: false

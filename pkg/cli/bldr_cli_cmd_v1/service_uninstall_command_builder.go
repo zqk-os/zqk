@@ -13,7 +13,7 @@ func NewServiceUninstallCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("uninstall")
 	builder.WithShort("Uninstall a registered scheduler host unit (leaves project data)")
 	help := clipkg.DynamicHelpBuilder("Uninstall a registered scheduler host unit (leaves project data)")
-	help.AddExample("Uninstall", "%s scheduler service uninstall --root .")
+	help.AddExample("Uninstall", "%s service uninstall --root .")
 	help.ExcludeFlag("format")
 	help.ExcludeFlag("output")
 	help.ExcludeFlag("verbose")

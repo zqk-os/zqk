@@ -10,7 +10,7 @@ flags:
 help:
   examples:
     - comment: "Start by path"
-      command: "%s scheduler service start --root ."
+      command: "%s service start --root ."
   exclude_flags: ["format", "output", "verbose", "quiet", "timeout", "columns"]
 run_e: "runSchedulerServiceStart"
 common_flags: false

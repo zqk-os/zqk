@@ -17,7 +17,7 @@ flags:
 help:
   examples:
     - comment: "Install for current directory"
-      command: "%s scheduler service install --root ."
+      command: "%s service install --root ."
   exclude_flags:
     - "format"
     - "output"
