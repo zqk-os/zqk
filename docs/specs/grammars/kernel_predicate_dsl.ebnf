@@ -22,7 +22,12 @@ predicate
 object_predicate
     = "object_exists:" , object_identifier
     | "field_nonempty:" , [ object_identifier , ":" ] , field_name
-    | "field_matches:" , field_name , ":" , regex_pattern ;
+    | "field_cleared:" , [ object_identifier , ":" ] , field_name
+    | "field_matches:" , field_name , ":" , regex_pattern
+    | "role_is:" , role_name ;
+
+role_name
+    = "grooming" | "shovel_ready" | "execution_locked" | "enforced" | "realign" | "halted" | "terminal" | "testing" | "draft" | "conceptual" ;
 
 (* --- 2. Filesystem & Artifact Predicates --- *)
 path_predicate

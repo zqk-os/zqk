@@ -143,6 +143,20 @@ func validateSinglePredicate(p string) error {
 		}
 		return validateIdentifier(arg, "field_nonempty")
 
+	case "field_cleared":
+		// Syntax: field_cleared:[id:]field
+		if strings.Contains(arg, ":") {
+			parts := strings.Split(arg, ":")
+			if len(parts) != 2 || strings.TrimSpace(parts[0]) == "" || strings.TrimSpace(parts[1]) == "" {
+				return fmt.Errorf("field_cleared with object ID must be 'field_cleared:<object_id>:<field>'")
+			}
+			return nil
+		}
+		return validateIdentifier(arg, "field_cleared")
+
+	case "role_is":
+		return validateIdentifier(arg, "role_is")
+
 	case "field_matches":
 		// Syntax: field_matches:<field>:<regex>
 		field, pattern, ok := strings.Cut(arg, ":")
@@ -284,6 +298,57 @@ func CompilePrecondition(p string) (string, bool) {
 		if len(canonicals) > 0 {
 			return strings.Join(canonicals, ";"), true
 		}
+	}
+
+	// 7. Role postcondition: "role is <role>"
+	if strings.HasPrefix(lower, "role is ") {
+		role := strings.TrimSpace(strings.TrimPrefix(lower, "role is "))
+		if role != "" && !strings.Contains(role, " ") {
+			return "role_is:" + role, true
+		}
+	}
+
+	// 8. Field cleared postcondition: "<field> is cleared", "clear <field>"
+	if strings.HasSuffix(lower, " is cleared") {
+		f := strings.TrimSpace(strings.TrimSuffix(lower, " is cleared"))
+		if f != "" && !strings.Contains(f, " ") {
+			return "field_cleared:" + f, true
+		}
+	}
+	if strings.HasPrefix(lower, "clear ") {
+		f := strings.TrimSpace(strings.TrimPrefix(lower, "clear "))
+		if f != "" && !strings.Contains(f, " ") {
+			return "field_cleared:" + f, true
+		}
+	}
+
+	// 9. Field is set / not empty: "<field> is set", "<field> is not empty"
+	if strings.HasSuffix(lower, " is set") {
+		f := strings.TrimSpace(strings.TrimSuffix(lower, " is set"))
+		if f != "" && !strings.Contains(f, " ") {
+			return "field_nonempty:" + f, true
+		}
+	}
+	if strings.HasSuffix(lower, " is not empty") {
+		f := strings.TrimSpace(strings.TrimSuffix(lower, " is not empty"))
+		if f != "" && !strings.Contains(f, " ") {
+			return "field_nonempty:" + f, true
+		}
+	}
+
+	// 10. Owner identified / set
+	if lower == "owner identified" || lower == "owner is set" {
+		return "field_nonempty:owner_ref", true
+	}
+
+	// 11. Priority assigned
+	if lower == "priority assigned" {
+		return "field_matches:priority:^(high|medium|low)$", true
+	}
+
+	// 12. Problem statement and acceptance considerations populated
+	if strings.Contains(lower, "problem statement") && strings.Contains(lower, "acceptance") {
+		return "field_nonempty:problem_statement;field_nonempty:acceptance_considerations", true
 	}
 
 	return "", false

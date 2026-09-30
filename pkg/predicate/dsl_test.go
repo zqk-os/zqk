@@ -28,8 +28,12 @@ func TestValidatePredicateSyntax(t *testing.T) {
 		{"path_exists", false},
 		{"content_hash_matches", false},
 		{"content_size_positive", false},
+		{"role_is:shovel_ready", false},
+		{"role_is:realign", false},
+		{"field_cleared:priority_plan_ref", false},
 		// Compound expressions
 		{"standard_checks_pass; path_exists:pkg/vds/predicates.go; query_metric:loc_count<=1000", false},
+		{"role_is:shovel_ready; field_cleared:priority_plan_ref", false},
 		// Legacy prose compilable to canonical
 		{"standard checks pass", false},
 		{"target document file exists and is reachable on disk", false},
@@ -38,6 +42,12 @@ func TestValidatePredicateSyntax(t *testing.T) {
 		{"content_size measured", false},
 		{"title is populated", false},
 		{"title, summary are populated", false},
+		{"role is shovel_ready", false},
+		{"role is realign", false},
+		{"priority_plan_ref is cleared", false},
+		{"clear priority_plan_ref", false},
+		{"owner identified", false},
+		{"priority assigned", false},
 		// Invalid expressions
 		{"", true},
 		{"unknown_predicate_without_args", true},
@@ -67,6 +77,11 @@ func TestCompilePrecondition(t *testing.T) {
 		{"cryptographic content_hash computed and sealed", "field_nonempty:content_hash", true},
 		{"content_size measured", "content_size_positive:content_size", true},
 		{"name is populated", "field_nonempty:name", true},
+		{"role is shovel_ready", "role_is:shovel_ready", true},
+		{"priority_plan_ref is cleared", "field_cleared:priority_plan_ref", true},
+		{"clear priority_plan_ref", "field_cleared:priority_plan_ref", true},
+		{"owner identified", "field_nonempty:owner_ref", true},
+		{"priority assigned", "field_matches:priority:^(high|medium|low)$", true},
 		{"unrecognized arbitrary condition", "", false},
 	}
 

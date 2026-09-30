@@ -20,6 +20,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/gitevidence"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/predicate"
 	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -779,11 +780,13 @@ func (gv *GoValidator) validateLifecycleState(ctx context.Context, kind, status,
 			}
 
 			errors = gv.appendUnmetLifecyclePreconditions(errors, kind, currentState, status, obj, options, false)
+			errors = gv.appendUnmetLifecyclePostconditions(errors, kind, currentState, status, obj, options)
 		} else if strings.EqualFold(status, objects.ObjectStatusComplete) &&
 			(kind == objects.KindPriorityPlan || kind == objects.KindBacklogItem) {
 			// Override may skip the auto-only edge check; still enforce complete preconditions
 			// (linked CRITs validated/complete; plan children terminal).
 			errors = gv.appendUnmetLifecyclePreconditions(errors, kind, currentState, status, obj, options, false)
+			errors = gv.appendUnmetLifecyclePostconditions(errors, kind, currentState, status, obj, options)
 		}
 	}
 
@@ -829,6 +832,57 @@ func (gv *GoValidator) appendUnmetLifecyclePreconditions(
 		errors = append(errors, ValidationError{
 			Field:   objects.FieldKeyStatus,
 			Message: fmt.Sprintf(msgFmt, status, precondition),
+			Rule:    validationRuleLifecycle(),
+		})
+	}
+	return errors
+}
+
+// appendUnmetLifecyclePostconditions evaluates declarative and DSL postcondition contracts on the destination state.
+func (gv *GoValidator) appendUnmetLifecyclePostconditions(
+	errors []ValidationError,
+	kind, currentState, status string,
+	obj map[string]any,
+	options *ValidationOptions,
+) []ValidationError {
+	if gv.lifecycleLoader == nil {
+		return errors
+	}
+	postconditions, err := gv.lifecycleLoader.GetTransitionPostconditions(kind, currentState, status)
+	if err != nil || len(postconditions) == 0 {
+		return errors
+	}
+
+	destObj := make(map[string]any, len(obj)+2)
+	for k, v := range obj {
+		destObj[k] = v
+	}
+	destObj[objects.FieldKeyStatus] = status
+	destObj[objects.FieldKeyKind] = kind
+
+	for _, postcondition := range postconditions {
+		trimmed := strings.TrimSpace(postcondition)
+		if trimmed == "" {
+			continue
+		}
+		// Attempt compilation or direct syntax check
+		canon, ok := predicate.CompilePrecondition(trimmed)
+		if !ok {
+			if err := predicate.ValidatePredicateSyntax(trimmed); err == nil {
+				canon = trimmed
+				ok = true
+			}
+		}
+		if !ok {
+			// Informational descriptive postconditions remain non-enforcing
+			continue
+		}
+		if gv.checkPrecondition(canon, destObj, options) {
+			continue
+		}
+		errors = append(errors, ValidationError{
+			Field:   objects.FieldKeyStatus,
+			Message: fmt.Sprintf("postcondition %q not satisfied upon entering status %q", postcondition, status),
 			Rule:    validationRuleLifecycle(),
 		})
 	}

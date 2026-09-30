@@ -1,8 +1,10 @@
 package validation
 
 import (
+	"fmt"
 	"os"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -91,6 +93,59 @@ func evalOverlayDSLStage(gv *GoValidator, p string, obj map[string]any, options 
 			v := reflect.ValueOf(val)
 			if (v.Kind() == reflect.Slice || v.Kind() == reflect.Array) && v.Len() == 0 {
 				return true, false
+			}
+
+		case "field_cleared":
+			field := arg
+			if strings.Contains(arg, ":") {
+				_, field, _ = strings.Cut(arg, ":")
+			}
+			val, exists := obj[field]
+			if exists && val != nil {
+				if str, ok := val.(string); ok && strings.TrimSpace(str) != "" {
+					return true, false
+				}
+				v := reflect.ValueOf(val)
+				if (v.Kind() == reflect.Slice || v.Kind() == reflect.Array || v.Kind() == reflect.Map) && v.Len() > 0 {
+					return true, false
+				}
+			}
+
+		case "role_is":
+			targetRole := strings.ToLower(strings.TrimSpace(arg))
+			status, _ := obj[objects.FieldKeyStatus].(string)
+			kind, _ := obj[objects.FieldKeyKind].(string)
+			if kind == "" {
+				id, _ := obj[objects.FieldKeyID].(string)
+				if id != "" {
+					if gv != nil {
+						kind = gv.kindFromID()(id)
+					} else {
+						kind = GetIDValidator().InferKindFromID(id)
+					}
+				}
+			}
+			role := objects.GetGlobalStatusChecker().Role(kind, status)
+			if role == "" {
+				if !strings.EqualFold(status, targetRole) {
+					return true, false
+				}
+			} else if !strings.EqualFold(role, targetRole) {
+				return true, false
+			}
+
+		case "field_matches":
+			field, pattern, ok := strings.Cut(arg, ":")
+			if ok {
+				val, exists := obj[strings.TrimSpace(field)]
+				if !exists || val == nil {
+					return true, false
+				}
+				strVal := fmt.Sprintf("%v", val)
+				re, err := regexp.Compile(strings.TrimSpace(pattern))
+				if err != nil || !re.MatchString(strVal) {
+					return true, false
+				}
 			}
 
 		case "title_body_cohesion":
