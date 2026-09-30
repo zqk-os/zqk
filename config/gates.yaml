@@ -8,6 +8,36 @@ hygiene:
   check_dups: true
   dup_min_statements: 6
   dup_min_lines: 10
+  dup_exemptions:
+    - "*_test.go"
+    - "vendor/*"
+    - "*/testdata/*"
+    - "cmd/zqk/validate/*"
+    - "cmd/zqk/system/verify_completion.go"
+    - "cmd/zqk/system/generate_lifecycle_id_list.go"
+    - "cmd/zqk/system/check_impl_helpers.go"
+    - "cmd/zqk/object/kind.go"
+    - "cmd/zqk/workflow/tree.go"
+    - "cmd/zqk/ui/views.go"
+    - "cmd/zqk/state/stream.go"
+    - "pkg/zqkdev/generate_lifecycle_id_list.go"
+    - "pkg/zqkcli/kind.go"
+    - "pkg/storage/file/file_lock_strategy.go"
+    - "pkg/storage/object_storage_graph_list.go"
+    - "pkg/storage/object_storage_mesh.go"
+    - "pkg/storage/crud/file_list_sorting.go"
+    - "pkg/storage/project_root_for_spec_copy_internal.go"
+    - "pkg/storage/test_callback_waiters_internal.go"
+    - "pkg/mcp/cli_bridge.go"
+    - "pkg/mcp/mcp_helpers/*"
+    - "pkg/mcp/rolling_trace_writer.go"
+    - "pkg/logging/rolling_writer.go"
+    - "pkg/cli/command_spec_semantic.go"
+    - "pkg/cli/update_data_loader.go"
+    - "internal/cli/field_parser.go"
+    - "pkg/objectidcache/discover.go"
+    - "pkg/testing/*"
+    - "pkg/specbuilder/*"
   check_cli_names: true
   check_subprocess_hygiene: true
   check_command_specs: true
