@@ -7,6 +7,19 @@ import (
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
+func TestAuditSingletonLock(t *testing.T) {
+	auditor := NewASTAuditor()
+	violations, err := auditor.AuditFile("../../daemon/singleton/lock.go")
+	if err != nil {
+		t.Fatalf("AuditFile failed: %v", err)
+	}
+	for _, v := range violations {
+		if v.Severity == "high" || v.Severity == "medium" {
+			t.Errorf("unwanted AST violation [%s] %s: %s", v.Severity, v.Pos, v.Message)
+		}
+	}
+}
+
 func TestASTAuditor_AuditFile(t *testing.T) {
 	t.Parallel()
 	auditor := NewASTAuditor()

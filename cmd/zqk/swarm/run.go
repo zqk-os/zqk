@@ -4,6 +4,7 @@ import (
 	"bufio"
 	stdcontext "context"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"sort"
@@ -66,20 +67,9 @@ func NewTopLevelRunCmd() *cobra.Command {
 func runSwarmPackage(cmd *cobra.Command, targetPath string, dryRun bool, entrypointOverride string, stageOnly bool, autoLaunch bool) error {
 	logger := logging.GetLoggerFromContext(cmd.Context())
 
-	manifestPath := targetPath
-	if remote.IsRemoteTarget(targetPath) {
-		logging.FluentEvent(logger).Info(fmt.Sprintf("Resolving remote swarm package from %s", targetPath)).Log()
-		resolved, err := remote.Resolve(cmd.Context(), targetPath, remote.ResolveOptions{})
-		if err != nil {
-			return errfmt.Newf("failed to resolve remote swarm %s", targetPath).Wrap(err)
-		}
-		manifestPath = resolved
-	} else if st, err := fileutil.Stat(targetPath); err == nil && st.IsDir() {
-		manifestPath = filepath.Join(targetPath, "swarm.yaml")
-	}
-
-	if !fileutil.Exists(manifestPath) {
-		return errfmt.Errorf("swarm package manifest not found: %s", manifestPath)
+	manifestPath, err := resolveSwarmManifest(cmd.Context(), targetPath, logger)
+	if err != nil {
+		return err
 	}
 
 	pkg, err := pack.LoadManifestFile(manifestPath)
@@ -92,8 +82,77 @@ func runSwarmPackage(cmd *cobra.Command, targetPath string, dryRun bool, entrypo
 		selectedEntrypoint = entrypointOverride
 	}
 
-	// Structured summary
 	out := cmd.OutOrStdout()
+	printSwarmSummary(out, pkg, selectedEntrypoint)
+	if dryRun {
+		fmt.Fprintf(out, "\n✓ Swarm validation successful (dry-run mode).\n")
+		return nil
+	}
+
+	logging.FluentEvent(logger).Info(fmt.Sprintf("Launching swarm package %s (entrypoint: %s)", pkg.Name, selectedEntrypoint)).Log()
+
+	sp, secCtx, opCtx, projectRoot, err := resolveSwarmStorage(cmd)
+	if err != nil {
+		return err
+	}
+
+	outputDir, sortedObjects, objectsPersisted, templatesStored, err := ingestAndPersistSwarmPack(opCtx, secCtx, sp, projectRoot, manifestPath, pkg, logger)
+	if err != nil {
+		return err
+	}
+
+	cleanName := strings.ToUpper(strings.ReplaceAll(pkg.Name, "-", "_"))
+	planID := fmt.Sprintf("PRI-%s", cleanName)
+
+	if err := activateSwarmPriorityPlan(opCtx, secCtx, sp, projectRoot, planID, sortedObjects); err != nil {
+		return err
+	}
+
+	refreshSwarmMaterializedView(opCtx, secCtx, sp, projectRoot)
+	emitSwarmFeedEvent(projectRoot, pkg, planID, selectedEntrypoint)
+
+	fmt.Fprintf(out, "\n✓ Swarm initialized and dispatch ready for %d agents.\n", len(pkg.Agents))
+	fmt.Fprintf(out, "  • Graph Ingested:    %d kernel objects persisted, %d prompt templates stored\n", objectsPersisted, templatesStored)
+	fmt.Fprintf(out, "  • Active Plan:       %s\n", planID)
+	fmt.Fprintf(out, "  • Output Directory:  %s\n", outputDir)
+
+	if stageOnly || !confirmSwarmLaunch(out, autoLaunch) {
+		fmt.Fprintf(out, "\nSwarm staged. Launch anytime with:\n  %s\n", paths.CLIInvocation("agent orchestrate "+planID))
+		return nil
+	}
+
+	pid, logRelPath, err := launchSwarmBackground(projectRoot, planID, cleanName)
+	if err != nil {
+		return err
+	}
+
+	fmt.Fprintf(out, "\n🚀 Swarm launched in background (PID: %d)\n", pid)
+	fmt.Fprintf(out, "  • Plan:     %s\n", planID)
+	fmt.Fprintf(out, "  • Logs:     %s\n", logRelPath)
+	fmt.Fprintf(out, "  • Monitor:  %s  OR  %s\n", paths.CLIInvocation("agent status"), paths.CLIInvocation("ui"))
+	return nil
+}
+
+func resolveSwarmManifest(ctx stdcontext.Context, targetPath string, logger *logging.EventLogger) (string, error) {
+	manifestPath := targetPath
+	if remote.IsRemoteTarget(targetPath) {
+		logging.FluentEvent(logger).Info(fmt.Sprintf("Resolving remote swarm package from %s", targetPath)).Log()
+		resolved, err := remote.Resolve(ctx, targetPath, remote.ResolveOptions{})
+		if err != nil {
+			return "", errfmt.Newf("failed to resolve remote swarm %s", targetPath).Wrap(err)
+		}
+		manifestPath = resolved
+	} else if st, err := fileutil.Stat(targetPath); err == nil && st.IsDir() {
+		manifestPath = filepath.Join(targetPath, "swarm.yaml")
+	}
+
+	if !fileutil.Exists(manifestPath) {
+		return "", errfmt.Errorf("swarm package manifest not found: %s", manifestPath)
+	}
+	return manifestPath, nil
+}
+
+func printSwarmSummary(out io.Writer, pkg *pack.SwarmPackage, selectedEntrypoint string) {
 	fmt.Fprintf(out, "Swarm Package: %s v%s\n", pkg.Name, pkg.Version)
 	fmt.Fprintf(out, "Description:   %s\n", pkg.Description)
 	if pkg.License != "" {
@@ -129,15 +188,9 @@ func runSwarmPackage(cmd *cobra.Command, targetPath string, dryRun bool, entrypo
 			fmt.Fprintf(out, "  • %s: %s%s\n", t.ID, t.Title, deps)
 		}
 	}
+}
 
-	if dryRun {
-		fmt.Fprintf(out, "\n✓ Swarm validation successful (dry-run mode).\n")
-		return nil
-	}
-
-	logging.FluentEvent(logger).Info(fmt.Sprintf("Launching swarm package %s (entrypoint: %s)", pkg.Name, selectedEntrypoint)).Log()
-
-	// Resolve project root and storage provider
+func resolveSwarmStorage(cmd *cobra.Command) (storage.ObjectStorageProvider, *pkgctx.SecurityContext, stdcontext.Context, string, error) {
 	opCtx := cmd.Context()
 	if opCtx == nil {
 		opCtx = stdcontext.Background()
@@ -162,38 +215,15 @@ func runSwarmPackage(cmd *cobra.Command, targetPath string, dryRun bool, entrypo
 		var err error
 		sp, err = storage.GetGlobalStorageProviderCache().GetOrCreate(opCtx, projectRoot)
 		if err != nil {
-			return errfmt.Newf("failed to initialize storage provider for project %s", projectRoot).Wrap(err)
+			return nil, nil, nil, "", errfmt.Newf("failed to initialize storage provider for project %s", projectRoot).Wrap(err)
 		}
 		secCtx = pkgctx.NewSystemSecurityContext()
 	}
 	opCtx = pkgctx.WithPromoteOnCreate(opCtx)
+	return sp, secCtx, opCtx, projectRoot, nil
+}
 
-	packDir := filepath.Dir(manifestPath)
-	params := make(map[string]interface{})
-	for k, def := range pkg.Parameters {
-		if def.Default != nil {
-			params[k] = def.Default
-		}
-	}
-
-	outputDir := filepath.Join(projectRoot, paths.ProjectDataDir, "runs", fmt.Sprintf("%s-latest", pkg.Name))
-	if outVal, ok := params["output_dir"].(string); ok && outVal != "" {
-		if filepath.IsAbs(outVal) {
-			outputDir = outVal
-		} else {
-			outputDir = filepath.Join(projectRoot, outVal)
-		}
-	}
-	_ = fileutil.MkdirAll(outputDir, paths.DirPerm755)
-
-	reg := metabolism.NewReceptorRegistry()
-	engine := metabolism.NewMetabolismEngine(reg)
-	verifySeal := (pkg.Integrity != nil)
-	// Ensure default agent seating (personas and skills) is seeded
-	sysLogger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	_, _ = system.SeedDefaultAgentSeatingPack(projectRoot, sysLogger)
-
-	// Ensure valid active account for workstream owner_ref
+func ensureValidSwarmAccount(opCtx stdcontext.Context, secCtx *pkgctx.SecurityContext, sp storage.ObjectStorageProvider) string {
 	accountID := secCtx.AccountID
 	validAccount := false
 	if accountID != "" {
@@ -235,6 +265,36 @@ func runSwarmPackage(cmd *cobra.Command, targetPath string, dryRun bool, entrypo
 			objects.FieldKeyCreatedBy: accountID,
 		})
 	}
+	return accountID
+}
+
+func ingestAndPersistSwarmPack(opCtx stdcontext.Context, secCtx *pkgctx.SecurityContext, sp storage.ObjectStorageProvider, projectRoot, manifestPath string, pkg *pack.SwarmPackage, logger *logging.EventLogger) (string, []map[string]any, int, int, error) {
+	packDir := filepath.Dir(manifestPath)
+	params := make(map[string]interface{})
+	for k, def := range pkg.Parameters {
+		if def.Default != nil {
+			params[k] = def.Default
+		}
+	}
+
+	outputDir := filepath.Join(projectRoot, paths.ProjectDataDir, "runs", fmt.Sprintf("%s-latest", pkg.Name))
+	if outVal, ok := params["output_dir"].(string); ok && outVal != "" {
+		if filepath.IsAbs(outVal) {
+			outputDir = outVal
+		} else {
+			outputDir = filepath.Join(projectRoot, outVal)
+		}
+	}
+	_ = fileutil.MkdirAll(outputDir, paths.DirPerm755)
+
+	reg := metabolism.NewReceptorRegistry()
+	engine := metabolism.NewMetabolismEngine(reg)
+	verifySeal := (pkg.Integrity != nil)
+
+	sysLogger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+	_, _ = system.SeedDefaultAgentSeatingPack(projectRoot, sysLogger)
+
+	accountID := ensureValidSwarmAccount(opCtx, secCtx, sp)
 
 	digest, err := engine.Ingest(metabolism.IngestionOptions{
 		PackDir:    packDir,
@@ -244,10 +304,9 @@ func runSwarmPackage(cmd *cobra.Command, targetPath string, dryRun bool, entrypo
 		AccountID:  accountID,
 	})
 	if err != nil {
-		return errfmt.Newf("metabolism ingestion failed for swarm package %s", pkg.Name).Wrap(err)
+		return "", nil, 0, 0, errfmt.Newf("metabolism ingestion failed for swarm package %s", pkg.Name).Wrap(err)
 	}
 
-	// Persist prompt templates into Storage
 	templatesStored := 0
 	for _, tpl := range digest.PromptTemplates {
 		if tpl.ID == "" {
@@ -275,7 +334,6 @@ func runSwarmPackage(cmd *cobra.Command, targetPath string, dryRun bool, entrypo
 		}
 	}
 
-	// Persist Synthesized Kernel Objects in Topological Order derived from spec index
 	distinctKinds := make([]string, 0)
 	kindSeen := make(map[string]bool)
 	for _, obj := range digest.KernelObjects {
@@ -321,16 +379,15 @@ func runSwarmPackage(cmd *cobra.Command, targetPath string, dryRun bool, entrypo
 			continue
 		}
 		if err := sp.Create(opCtx, secCtx, obj); err != nil {
-			return errfmt.Newf("failed to persist synthesized %s object %s", kind, id).Wrap(err)
+			return "", nil, 0, 0, errfmt.Newf("failed to persist synthesized %s object %s", kind, id).Wrap(err)
 		}
 		objectsPersisted++
 	}
 
-	// Promote Priority Plan to Active
-	cleanName := strings.ToUpper(strings.ReplaceAll(pkg.Name, "-", "_"))
-	planID := fmt.Sprintf("PRI-%s", cleanName)
+	return outputDir, sortedObjects, objectsPersisted, templatesStored, nil
+}
 
-	// Ensure reverse reference index has all child backlog items linked to planID
+func activateSwarmPriorityPlan(opCtx stdcontext.Context, secCtx *pkgctx.SecurityContext, sp storage.ObjectStorageProvider, projectRoot, planID string, sortedObjects []map[string]any) error {
 	revIndex := storage.GetGlobalReverseReferenceIndex()
 	for _, obj := range sortedObjects {
 		if k, _ := obj[objects.FieldKeyKind].(string); k == objects.KindBacklogItem {
@@ -343,7 +400,6 @@ func runSwarmPackage(cmd *cobra.Command, targetPath string, dryRun bool, entrypo
 		_ = revIndex.SaveCache(projectRoot)
 	}
 
-	// Promote Priority Plan to Active if not already active or in_progress
 	planObj, planErr := sp.Read(opCtx, secCtx, planID)
 	curStatus := ""
 	if planErr == nil && planObj != nil {
@@ -357,16 +413,19 @@ func runSwarmPackage(cmd *cobra.Command, targetPath string, dryRun bool, entrypo
 			return errfmt.Newf("failed to activate priority plan %s", planID).Wrap(err)
 		}
 	}
+	return nil
+}
 
-	// Invalidate and refresh materialized view cache so whats-next and scheduler see the plan and tasks immediately
+func refreshSwarmMaterializedView(opCtx stdcontext.Context, secCtx *pkgctx.SecurityContext, sp storage.ObjectStorageProvider, projectRoot string) {
 	if projectRoot != "" && sp != nil {
 		mv := whatsnext.NewWhatsNextMaterializedView(projectRoot)
 		if scanErr := mv.ScanFromStorageWithSecurity(opCtx, sp, secCtx); scanErr == nil {
 			_ = mv.SaveToLiteFile()
 		}
 	}
+}
 
-	// Emit Swarm Launch Steering to Agent Feed
+func emitSwarmFeedEvent(projectRoot string, pkg *pack.SwarmPackage, planID, selectedEntrypoint string) {
 	feedMsg := fmt.Sprintf("SWARM DISPATCH: Initialized swarm package %s v%s. Active Plan: %s with %d tasks. Entrypoint: %s.",
 		pkg.Name, pkg.Version, planID, len(pkg.Tasks), selectedEntrypoint)
 	_, _ = agentfeed.AppendEvent(agentfeed.AppendEventInput{
@@ -378,41 +437,28 @@ func runSwarmPackage(cmd *cobra.Command, targetPath string, dryRun bool, entrypo
 		EventType:   agentfeed.FeedEventTypeMeshStatus,
 		SelfACK:     true,
 	})
+}
 
-	fmt.Fprintf(out, "\n✓ Swarm initialized and dispatch ready for %d agents.\n", len(pkg.Agents))
-	fmt.Fprintf(out, "  • Graph Ingested:    %d kernel objects persisted, %d prompt templates stored\n", objectsPersisted, templatesStored)
-	fmt.Fprintf(out, "  • Active Plan:       %s\n", planID)
-	fmt.Fprintf(out, "  • Output Directory:  %s\n", outputDir)
-
-	if stageOnly {
-		fmt.Fprintf(out, "\nSwarm staged (stage-only mode). Launch anytime with:\n  %s\n", paths.CLIInvocation("agent orchestrate "+planID))
-		return nil
+func confirmSwarmLaunch(out io.Writer, autoLaunch bool) bool {
+	if autoLaunch {
+		return true
 	}
-
-	launch := autoLaunch
-	if !launch {
-		if term.IsTerminal(int(os.Stdin.Fd())) {
-			fmt.Fprintf(out, "\nLaunch the swarm now? [Y/n]: ")
-			reader := bufio.NewReader(os.Stdin)
-			ans, err := reader.ReadString('\n')
-			if err == nil {
-				ans = strings.TrimSpace(strings.ToLower(ans))
-				if ans == "" || ans == "y" || ans == "yes" {
-					launch = true
-				}
+	if term.IsTerminal(int(os.Stdin.Fd())) {
+		fmt.Fprintf(out, "\nLaunch the swarm now? [Y/n]: ")
+		reader := bufio.NewReader(os.Stdin)
+		ans, err := reader.ReadString('\n')
+		if err == nil {
+			ans = strings.TrimSpace(strings.ToLower(ans))
+			if ans == "" || ans == "y" || ans == "yes" {
+				return true
 			}
-		} else {
-			// In non-interactive environments without --stage-only, execute by default
-			launch = true
 		}
+		return false
 	}
+	return true
+}
 
-	if !launch {
-		fmt.Fprintf(out, "\nSwarm staged. Launch anytime with:\n  %s\n", paths.CLIInvocation("agent orchestrate "+planID))
-		return nil
-	}
-
-	// Launch swarm orchestration in the background
+func launchSwarmBackground(projectRoot, planID, cleanName string) (int, string, error) {
 	exe, err := os.Executable()
 	if err != nil {
 		exe = paths.BrandExecutableName()
@@ -422,7 +468,7 @@ func runSwarmPackage(cmd *cobra.Command, targetPath string, dryRun bool, entrypo
 	_ = fileutil.EnsureDir(filepath.Dir(logPath))
 	logFile, err := fileutil.OpenAppend(logPath)
 	if err != nil {
-		return errfmt.Newf("failed to open swarm orchestrate log %s", logPath).Wrap(err)
+		return 0, "", errfmt.Newf("failed to open swarm orchestrate log %s", logPath).Wrap(err)
 	}
 
 	orchCmd := execwrap.Command(exe, "agent", "orchestrate", planID)
@@ -433,13 +479,8 @@ func runSwarmPackage(cmd *cobra.Command, targetPath string, dryRun bool, entrypo
 
 	if err := orchCmd.Start(); err != nil {
 		_ = logFile.Close()
-		return errfmt.Newf("failed to launch swarm orchestrator").Wrap(err)
+		return 0, "", errfmt.Newf("failed to launch swarm orchestrator").Wrap(err)
 	}
 	_ = logFile.Close()
-
-	fmt.Fprintf(out, "\n🚀 Swarm launched in background (PID: %d)\n", orchCmd.Process.Pid)
-	fmt.Fprintf(out, "  • Plan:     %s\n", planID)
-	fmt.Fprintf(out, "  • Logs:     %s\n", logRelPath)
-	fmt.Fprintf(out, "  • Monitor:  %s  OR  %s\n", paths.CLIInvocation("agent status"), paths.CLIInvocation("ui"))
-	return nil
+	return orchCmd.Process.Pid, logRelPath, nil
 }

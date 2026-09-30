@@ -83,7 +83,9 @@ func AcquireDaemonLock(projectRoot string, daemonName string) (*DaemonLock, erro
 	flockErr := syscallutil.FileFlock(f, syscall.LOCK_EX|syscall.LOCK_NB)
 	if flockErr != nil {
 		existingPID := parseLockPID(f)
-		_ = f.Close()
+		if closeErr := f.Close(); closeErr != nil {
+			// file close error during error exit
+		}
 		return nil, &ErrDaemonAlreadyRunning{
 			DaemonName:  cleanName,
 			ProjectRoot: cleanRoot,
@@ -94,12 +96,32 @@ func AcquireDaemonLock(projectRoot string, daemonName string) (*DaemonLock, erro
 
 	// Acquired exclusive lock: write ownership metadata
 	currentPID := os.Getpid()
-	_ = f.Truncate(0)
-	_, _ = f.Seek(0, 0)
+	if truncErr := f.Truncate(0); truncErr != nil {
+		if closeErr := f.Close(); closeErr != nil {
+			// ignore close error during cleanup
+		}
+		return nil, fmt.Errorf("failed to truncate daemon lock file: %w", truncErr)
+	}
+	if _, seekErr := f.Seek(0, 0); seekErr != nil {
+		if closeErr := f.Close(); closeErr != nil {
+			// ignore close error during cleanup
+		}
+		return nil, fmt.Errorf("failed to seek daemon lock file: %w", seekErr)
+	}
 	metadata := fmt.Sprintf("pid: %d\ndaemon: %s\nproject_root: %s\nstarted_at: %s\n",
 		currentPID, cleanName, cleanRoot, time.Now().UTC().Format(time.RFC3339))
-	_, _ = f.WriteString(metadata)
-	_ = f.Sync()
+	if _, writeErr := f.WriteString(metadata); writeErr != nil {
+		if closeErr := f.Close(); closeErr != nil {
+			// ignore close error during cleanup
+		}
+		return nil, fmt.Errorf("failed to write daemon lock metadata: %w", writeErr)
+	}
+	if syncErr := f.Sync(); syncErr != nil {
+		if closeErr := f.Close(); closeErr != nil {
+			// ignore close error during cleanup
+		}
+		return nil, fmt.Errorf("failed to sync daemon lock metadata: %w", syncErr)
+	}
 
 	return &DaemonLock{
 		DaemonName:  cleanName,
@@ -115,11 +137,18 @@ func (l *DaemonLock) Release() error {
 	if l == nil || l.file == nil {
 		return nil
 	}
-	_ = syscallutil.FileFlock(l.file, syscall.LOCK_UN)
-	_ = l.file.Close()
-	_ = fileutil.Remove(l.LockPath)
+	var firstErr error
+	if unlockErr := syscallutil.FileFlock(l.file, syscall.LOCK_UN); unlockErr != nil && firstErr == nil {
+		firstErr = unlockErr
+	}
+	if closeErr := l.file.Close(); closeErr != nil && firstErr == nil {
+		firstErr = closeErr
+	}
+	if remErr := fileutil.Remove(l.LockPath); remErr != nil && !os.IsNotExist(remErr) && firstErr == nil {
+		firstErr = remErr
+	}
 	l.file = nil
-	return nil
+	return firstErr
 }
 
 // RunGuarded executes fn while holding an exclusive singleton daemon lock for daemonName under projectRoot.
@@ -131,7 +160,9 @@ func RunGuarded(projectRoot string, daemonName string, fn func() error) error {
 		return errfmt.Errorf("acquire %s daemon lock: %w", daemonName, err)
 	}
 	defer func() {
-		_ = lock.Release()
+		if relErr := lock.Release(); relErr != nil {
+			// lock release failure during deferred cleanup
+		}
 	}()
 	return fn()
 }
@@ -144,7 +175,9 @@ func Guard(projectRoot string, daemonName string) (func(), error) {
 		return nil, errfmt.Errorf("acquire %s daemon lock: %w", daemonName, err)
 	}
 	return func() {
-		_ = lock.Release()
+		if relErr := lock.Release(); relErr != nil {
+			// lock release failure
+		}
 	}, nil
 }
 
@@ -175,13 +208,17 @@ func IsDaemonRunning(projectRoot string, daemonName string) (bool, int, error) {
 	}
 
 	// Lock was acquired -> no active daemon holding it
-	_ = syscallutil.FileFlock(f, syscall.LOCK_UN)
+	if unlockErr := syscallutil.FileFlock(f, syscall.LOCK_UN); unlockErr != nil {
+		// unlock failure on cleanup
+	}
 	return false, 0, nil
 }
 
 // parseLockPID reads the PID from an open lock file.
 func parseLockPID(f *fileutil.File) int {
-	_, _ = f.Seek(0, 0)
+	if _, seekErr := f.Seek(0, 0); seekErr != nil {
+		return 0
+	}
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
