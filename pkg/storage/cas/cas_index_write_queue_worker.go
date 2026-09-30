@@ -1,6 +1,7 @@
 package cas
 
 import (
+	"context"
 	"fmt"
 	"maps"
 	"time"
@@ -45,26 +46,15 @@ func (iq *indexQueue) startWorker() {
 		// Note: wg.Done() is called by goroutinelabels.WithWaitGroup() on goroutine exit
 	}()
 
-	// Emit worker start event via coordinator
-	callback := getListingIndexBatchEventCallback()
-	projectRoot := iq.getProjectRoot()
-	if callback != nil && projectRoot != emptyValue {
-		// Use system context for background event emission
-		ctx := pkgctx.NewSystemContext()
-		goroutinelabels.NewGoroutine(ConstStreamCasIndexWorkerLifecycle, fmt.Sprintf(ConstStreamEmittingWorkerStartEventForStr, iq.kind)).
-			StartSimple(func() {
-				callback(
-					ctx,
-					projectRoot,
-					iq.getStorage(),
-					iq.kind,
-					0, // No batch
-					0, // No duration
-					"start",
-					nil,
-				)
-			})
-	}
+	// Emit worker start event via coordinator/listeners
+	iq.dispatchBatchEvent(
+		ConstStreamCasIndexWorkerLifecycle,
+		fmt.Sprintf(ConstStreamEmittingWorkerStartEventForStr, iq.kind),
+		0,
+		0,
+		"start",
+		nil,
+	)
 
 	batch := make([]*indexUpdateRequest, 0, iq.batchSize)
 	batchTicker := time.NewTicker(iq.timeout)
@@ -103,24 +93,14 @@ func (iq *indexQueue) startWorker() {
 				iq.pendingItems.Add(int64(-len(batch)))
 			}
 			// Emit worker stop event
-			projectRoot := iq.getProjectRoot()
-			if callback != nil && projectRoot != emptyValue {
-				// Use system context for background event emission
-				ctx := pkgctx.NewSystemContext()
-				goroutinelabels.NewGoroutine(ConstStreamCasIndexWorkerLifecycle, fmt.Sprintf(ConstStreamEmittingWorkerShutdownEventForStr, iq.kind)).
-					StartSimple(func() {
-						callback(
-							ctx,
-							projectRoot,
-							iq.getStorage(),
-							iq.kind,
-							0,
-							0,
-							"shutdown",
-							nil,
-						)
-					})
-			}
+			iq.dispatchBatchEvent(
+				ConstStreamCasIndexWorkerLifecycle,
+				fmt.Sprintf(ConstStreamEmittingWorkerShutdownEventForStr, iq.kind),
+				0,
+				0,
+				"shutdown",
+				nil,
+			)
 			return
 
 		case req, ok := <-iq.queue:
@@ -137,15 +117,14 @@ func (iq *indexQueue) startWorker() {
 					iq.pendingItems.Add(int64(-len(batch)))
 				}
 				// Emit worker stop event
-				projectRoot := iq.getProjectRoot()
-				if callback != nil && projectRoot != emptyValue {
-					// Use system context for background event emission
-					ctx := pkgctx.NewSystemContext()
-					goroutinelabels.NewGoroutine(ConstStreamCasIndexWorkerLifecycle, fmt.Sprintf(ConstStreamEmittingWorkerShutdownEventForStr, iq.kind)).
-						StartSimple(func() {
-							callback(ctx, projectRoot, iq.getStorage(), iq.kind, 0, 0, "shutdown", nil)
-						})
-				}
+				iq.dispatchBatchEvent(
+					ConstStreamCasIndexWorkerLifecycle,
+					fmt.Sprintf(ConstStreamEmittingWorkerShutdownEventForStr, iq.kind),
+					0,
+					0,
+					"shutdown",
+					nil,
+				)
 				return
 			}
 			// New work arrived - reset idle timer
@@ -197,24 +176,14 @@ func (iq *indexQueue) startWorker() {
 				if idleDuration >= casIndexIdleTimeout {
 					// Been idle long enough - shut down worker (on-demand pattern)
 					// Worker will wake up again when new work arrives (via wakeWorkerIfNeeded)
-					projectRoot := iq.getProjectRoot()
-					if callback != nil && projectRoot != emptyValue {
-						// Use system context for background event emission
-						ctx := pkgctx.NewSystemContext()
-						goroutinelabels.NewGoroutine(ConstStreamCasIndexWorkerLifecycle, fmt.Sprintf(ConstStreamEmittingWorkerShutdownEventForStr, iq.kind)).
-							StartSimple(func() {
-								callback(
-									ctx,
-									projectRoot,
-									iq.getStorage(),
-									iq.kind,
-									0,
-									0,
-									"shutdown",
-									nil,
-								)
-							})
-					}
+					iq.dispatchBatchEvent(
+						ConstStreamCasIndexWorkerLifecycle,
+						fmt.Sprintf(ConstStreamEmittingWorkerShutdownEventForStr, iq.kind),
+						0,
+						0,
+						"shutdown",
+						nil,
+					)
 					return // Exit worker goroutine
 				}
 				// Not idle long enough yet - reset timer
@@ -247,26 +216,15 @@ func (iq *indexQueue) processBatch(batch []*indexUpdateRequest) error {
 	startTime := time.Now()
 	batchSize := len(batch)
 
-	// Emit batch start event via coordinator (async, non-blocking)
-	callback := getListingIndexBatchEventCallback()
-	projectRoot := iq.getProjectRoot()
-	if callback != nil && projectRoot != emptyValue {
-		// Use system context for background event emission
-		ctx := pkgctx.NewSystemContext()
-		goroutinelabels.NewGoroutine(ConstStreamListingIndexBatchEvent, fmt.Sprintf(ConstStreamEmittingBatchStartEventForStrSizeInt, iq.kind, batchSize)).
-			StartSimple(func() {
-				callback(
-					ctx,
-					projectRoot,
-					iq.getStorage(),
-					iq.kind,
-					batchSize,
-					0, // Duration not known yet
-					"start",
-					nil,
-				)
-			})
-	}
+	// Emit batch start event via coordinator/listeners (async, non-blocking)
+	iq.dispatchBatchEvent(
+		ConstStreamListingIndexBatchEvent,
+		fmt.Sprintf(ConstStreamEmittingBatchStartEventForStrSizeInt, iq.kind, batchSize),
+		batchSize,
+		0,
+		"start",
+		nil,
+	)
 
 	// Emit worker lifecycle event (start) if this is the first batch after wake
 	// Note: We could track this more precisely, but for now we emit on first batch
@@ -284,6 +242,19 @@ func (iq *indexQueue) processBatch(batch []*indexUpdateRequest) error {
 		return nil
 	}); err != nil {
 		logging.FluentEvent(logging.GetLogger()).Error(fmt.Sprintf(ConstStreamFailedToSnapshotCasPointerValN, err), nil).Log()
+	}
+
+	if cas == nil || cas.GetIndex() == nil {
+		err := fmt.Errorf("cas instance or index is nil for kind %s", iq.kind)
+		iq.dispatchBatchEvent(
+			ConstStreamListingIndexBatchEvent,
+			fmt.Sprintf(ConstStreamEmittingBatchStrEventForStrSizeInt, "error", iq.kind, batchSize),
+			batchSize,
+			time.Since(startTime),
+			"error",
+			err,
+		)
+		return err
 	}
 
 	// Merge batch into in-memory index under lock. Hold idx.mu only for the brief merge/copy.
@@ -606,31 +577,19 @@ func (iq *indexQueue) processBatch(batch []*indexUpdateRequest) error {
 		metrics.IndexReloadsDuringSetMapping.Add(1)
 	}
 
-	// Emit batch completion event via coordinator (async, non-blocking).
-	// Use a separate variable so the "start" event callback's capture of projectRoot is not overwritten (avoids data race).
-	callbackComplete := getListingIndexBatchEventCallback()
-	projectRootComplete := iq.getProjectRoot()
-	if callbackComplete != nil && projectRootComplete != emptyValue {
-		// Use system context for background event emission
-		ctx := pkgctx.NewSystemContext()
-		status := "complete"
-		if err != nil {
-			status = "error"
-		}
-		goroutinelabels.NewGoroutine(ConstStreamListingIndexBatchEvent, fmt.Sprintf(ConstStreamEmittingBatchStrEventForStrSizeInt, status, iq.kind, batchSize)).
-			StartSimple(func() {
-				callbackComplete(
-					ctx,
-					projectRootComplete,
-					iq.getStorage(),
-					iq.kind,
-					batchSize,
-					duration,
-					status,
-					err,
-				)
-			})
+	// Emit batch completion event via coordinator/listeners (async, non-blocking)
+	status := "complete"
+	if err != nil {
+		status = "error"
 	}
+	iq.dispatchBatchEvent(
+		ConstStreamListingIndexBatchEvent,
+		fmt.Sprintf(ConstStreamEmittingBatchStrEventForStrSizeInt, status, iq.kind, batchSize),
+		batchSize,
+		duration,
+		status,
+		err,
+	)
 
 	return err
 }
@@ -658,3 +617,33 @@ func signalIndexUpdateCompletion(req *indexUpdateRequest, err error) {
 		close(req.done)
 	}
 }
+
+func (iq *indexQueue) emitBatchEvent(ctx context.Context, projectRoot string, storageProvider CASFacade, batchSize int, duration time.Duration, status string, err error) {
+	var listeners []ListingIndexBatchEventListener
+	if iq.parentQueue != nil {
+		listeners = iq.parentQueue.getListeners()
+	}
+	legacyCb := getListingIndexBatchEventCallback()
+
+	for _, l := range listeners {
+		l.OnListingIndexBatchEvent(ctx, projectRoot, storageProvider, iq.kind, batchSize, duration, status, err)
+	}
+
+	if legacyCb != nil {
+		legacyCb(ctx, projectRoot, storageProvider, iq.kind, batchSize, duration, status, err)
+	}
+}
+
+func (iq *indexQueue) dispatchBatchEvent(category, eventName string, batchSize int, duration time.Duration, status string, err error) {
+	projectRoot := iq.getProjectRoot()
+	if projectRoot == emptyValue {
+		return
+	}
+	ctx := pkgctx.NewSystemContext()
+	storage := iq.getStorage()
+	goroutinelabels.NewGoroutine(category, eventName).
+		StartSimple(func() {
+			iq.emitBatchEvent(ctx, projectRoot, storage, batchSize, duration, status, err)
+		})
+}
+

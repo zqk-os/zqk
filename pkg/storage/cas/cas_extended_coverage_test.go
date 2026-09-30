@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -987,9 +988,9 @@ func TestCAS_AdditionalCoverageBoost(t *testing.T) {
 	_ = CasOrphanCleanupBatchSizeForTest
 
 	// 7. State change callbacks and queue factories
-	stateCalled := false
+	var stateCalled atomic.Bool
 	SetListingIndexStateChangeEventCallback(func(ctx context.Context, projectRoot string, storageProvider CASFacade, changeType string) {
-		stateCalled = true
+		stateCalled.Store(true)
 	})
 	scb := getListingIndexStateChangeEventCallback()
 	if scb == nil {
@@ -1003,7 +1004,7 @@ func TestCAS_AdditionalCoverageBoost(t *testing.T) {
 	q.SetStorage(nil)
 	_ = q.GetStorage()
 	time.Sleep(10 * time.Millisecond) // let background state change goroutine fire
-	_ = stateCalled
+	_ = stateCalled.Load()
 	SetListingIndexStateChangeEventCallback(nil)
 
 	// Factory per project root
