@@ -66,7 +66,13 @@ func (g *GanttViewComponent) RenderHTML() string {
 			pillActive, f.ID, statusKey, f.Label)
 	}
 	sb.WriteString("          </div>\n")
-
+	sb.WriteString("          <div class=\"gantt-filter-group\">\n")
+	sb.WriteString("            <span class=\"gantt-toolbar-label\">Timescale:</span>\n")
+	sb.WriteString("            <button class=\"gantt-filter-pill\" id=\"gantt-zoom-2w\" onclick=\"setGanttZoom('2w')\" title=\"2-Week Sprint Zoom\">2 Weeks</button>\n")
+	sb.WriteString("            <button class=\"gantt-filter-pill active\" id=\"gantt-zoom-1m\" onclick=\"setGanttZoom('1m')\" title=\"1-Month Active Horizon\">1 Month</button>\n")
+	sb.WriteString("            <button class=\"gantt-filter-pill\" id=\"gantt-zoom-3m\" onclick=\"setGanttZoom('3m')\" title=\"Quarter View\">Quarter</button>\n")
+	sb.WriteString("            <button class=\"gantt-filter-pill\" id=\"gantt-zoom-all\" onclick=\"setGanttZoom('all')\" title=\"Full Project Span\">Fit All</button>\n")
+	sb.WriteString("          </div>\n")
 	sb.WriteString("          <div class=\"gantt-filter-group\">\n")
 	sb.WriteString("            <span class=\"gantt-toolbar-label\">Grouping:</span>\n")
 	sb.WriteString("            <select id=\"gantt-grouping\" class=\"select-input\" onchange=\"renderGantt()\">\n")

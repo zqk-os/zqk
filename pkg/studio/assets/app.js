@@ -8,6 +8,7 @@
     let activeDensity = 'execution'; // 'backbone', 'execution', 'all'
     let currentMainView = 'dag'; // 'dag' or 'gantt'
     let searchQuery = '';
+    let ganttZoom = '1m'; // '2w', '1m', '3m', 'all'
 
     // Transform state
     let scale = 1.0;
@@ -162,9 +163,11 @@
         case 'mission': case 'vision': return 'var(--purple)';
         case 'workstream': return 'var(--orange)';
         case 'goal': case 'roadmap': return 'var(--success)';
-        case 'priority_plan': case 'milestone': return 'var(--accent)';
+        case 'priority_plan': return 'var(--accent)';
+        case 'milestone': return 'var(--warning)';
         case 'backlog_item': return 'var(--teal)';
-        case 'requirement': return 'var(--warning)';
+        case 'agent_task': return '#58a6ff';
+        case 'requirement': return '#d2a8ff';
         case 'criteria': return 'var(--success)';
         case 'test_case': return 'var(--pink)';
         default: return 'var(--text-muted)';
@@ -176,12 +179,13 @@
         case 'mission': case 'vision': return 0;
         case 'workstream': return 1;
         case 'goal': case 'roadmap': return 2;
-        case 'milestone': case 'priority_plan': return 3;
-        case 'backlog_item': return 4;
-        case 'requirement': return 5;
-        case 'criteria': return 6;
-        case 'test_case': return 7;
-        default: return 4;
+        case 'priority_plan': return 3;
+        case 'milestone': return 4;
+        case 'backlog_item': return 5;
+        case 'agent_task': return 6;
+        case 'requirement': return 7;
+        case 'criteria': case 'test_case': return 8;
+        default: return 5;
       }
     }
 
@@ -206,11 +210,14 @@
       const activeIds = new Set();
       activeIds.add(centerId);
 
-      // Build adjacency maps
-      const outgoing = new Map(); // id -> set of target ids
-      const incoming = new Map(); // id -> set of source ids
+      // Build adjacency maps strictly for structural lineage
+      const outgoing = new Map(); // child -> parent
+      const incoming = new Map(); // parent -> child
 
       graphData.edges.forEach(e => {
+        // Exclude loose metadata references (policies, personas, skills) from DAG causal focus
+        if (e.structural === false) return;
+
         if (!outgoing.has(e.source)) outgoing.set(e.source, new Set());
         outgoing.get(e.source).add(e.target);
 
@@ -218,11 +225,11 @@
         incoming.get(e.target).add(e.source);
       });
 
-      // BFS upstream (ancestors)
+      // BFS upstream (ancestors / parents)
       let queue = [centerId];
       while (queue.length > 0) {
         const cur = queue.shift();
-        const parents = incoming.get(cur);
+        const parents = outgoing.get(cur);
         if (parents) {
           parents.forEach(p => {
             if (!activeIds.has(p)) {
@@ -233,11 +240,11 @@
         }
       }
 
-      // BFS downstream (descendants)
+      // BFS downstream (descendants / children)
       queue = [centerId];
       while (queue.length > 0) {
         const cur = queue.shift();
-        const children = outgoing.get(cur);
+        const children = incoming.get(cur);
         if (children) {
           children.forEach(c => {
             if (!activeIds.has(c)) {
@@ -259,39 +266,61 @@
         if (!graphData.nodes) graphData.nodes = [];
         if (!graphData.edges) graphData.edges = [];
 
-        // Propagate workstream associations downstream along DAG edges
+        // Bidirectional workstream inheritance
         const wsMap = new Map();
+        const nodeById = new Map();
         graphData.nodes.forEach(n => {
+          nodeById.set(n.id, n);
+          if (!wsMap.has(n.id)) wsMap.set(n.id, new Set());
           if (n.kind === 'workstream') {
-            if (!wsMap.has(n.id)) wsMap.set(n.id, new Set());
             wsMap.get(n.id).add(n.id);
           }
           if (n.workstreamRefs) {
-            if (!wsMap.has(n.id)) wsMap.set(n.id, new Set());
-            n.workstreamRefs.forEach(w => wsMap.get(n.id).add(w));
+            n.workstreamRefs.forEach(w => { if (w) wsMap.get(n.id).add(w); });
+          }
+          if (n.references) {
+            ['workstream_ref', 'workstream_refs', 'from_workstream_ref', 'to_workstream_ref'].forEach(k => {
+              if (n.references[k]) {
+                n.references[k].forEach(w => { if (w) wsMap.get(n.id).add(w); });
+              }
+            });
           }
         });
-        const outgoing = new Map();
-        graphData.edges.forEach(e => {
-          if (!outgoing.has(e.source)) outgoing.set(e.source, []);
-          outgoing.get(e.source).push(e.target);
-        });
+
+        // Propagate across structural edges:
+        // In edge (source -> target), source is child and target is parent.
         let changed = true;
         let iters = 0;
-        while (changed && iters < 12) {
+        while (changed && iters < 15) {
           changed = false;
           iters++;
-          wsMap.forEach((wsSet, sourceId) => {
-            const targets = outgoing.get(sourceId) || [];
-            targets.forEach(targetId => {
-              if (!wsMap.has(targetId)) wsMap.set(targetId, new Set());
-              const targetSet = wsMap.get(targetId);
-              const prevSize = targetSet.size;
-              wsSet.forEach(w => targetSet.add(w));
-              if (targetSet.size > prevSize) changed = true;
+          graphData.edges.forEach(e => {
+            if (e.structural === false) return;
+            const childSet = wsMap.get(e.source);
+            const parentSet = wsMap.get(e.target);
+            if (!childSet || !parentSet) return;
+
+            // Downstream: Parent passes workstreams to Child
+            parentSet.forEach(wsId => {
+              if (!childSet.has(wsId)) {
+                childSet.add(wsId);
+                changed = true;
+              }
             });
+
+            // Upstream: Child passes workstreams to Parent (unless parent is another workstream)
+            const targetNode = nodeById.get(e.target);
+            if (targetNode && targetNode.kind !== 'workstream') {
+              childSet.forEach(wsId => {
+                if (!parentSet.has(wsId)) {
+                  parentSet.add(wsId);
+                  changed = true;
+                }
+              });
+            }
           });
         }
+
         graphData.nodes.forEach(n => {
           if (wsMap.has(n.id) && wsMap.get(n.id).size > 0) {
             n.workstreamRefs = Array.from(wsMap.get(n.id));

@@ -269,6 +269,14 @@ func pruneOrphans(ctx context.Context, projectRoot string, expectedPaths map[str
 			// Non-core prune still enters kernel.cas_object_erase (COMMIT = os.Remove).
 			id := strings.TrimSuffix(strings.TrimSuffix(info.Name(), ".yaml"), ".yml")
 			removePath := path
+			if kind == "" {
+				if err := fileutil.Remove(removePath); err != nil {
+					cmd.Printf("Failed to delete orphaned file %s: %v\n", path, err)
+				} else {
+					deletedCount++
+				}
+				return nil
+			}
 			if err := kernelcas.RunErase(ctx, nil, &kernelcas.Mutation{
 				Kind:   kind,
 				ID:     id,

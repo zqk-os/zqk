@@ -29,6 +29,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/pipeline"
+	"github.com/zqk-os/zqk/pkg/resourcehygiene"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/validation"
@@ -186,6 +187,14 @@ func runAutoFixProcessPending(cmd *cobra.Command, args []string) error {
 	processor := NewAutoFixBatchProcessor(projectRoot, logger, sharedProvider)
 	processed := 0
 	for _, batchFile := range batchFiles {
+		openFDs, maxFDs, fdErr := resourcehygiene.GetProcessFDUsage()
+		if fdErr == nil && maxFDs > 0 && openFDs > int(float64(maxFDs)*0.70) {
+			logging.Fluent(logger).Warn("Autofix batch processing paused due to high FD usage").
+				Int("open_fds", openFDs).
+				Int("max_fds", maxFDs).
+				Log()
+			time.Sleep(200 * time.Millisecond)
+		}
 		if err := processOneBatchFile(cmd, batchFile, projectRoot, ctx, processor, chunkSize); err != nil {
 			logging.Fluent(logger).Warn("Failed to process autofix batch file").
 				File(batchFile).
@@ -683,6 +692,17 @@ func (abp *AutoFixBatchProcessor) ProcessBatch(ctx *cli.Context, cmd *cobra.Comm
 
 	work := func(_ *pipeline.Context) error {
 		for chunkStart := 0; chunkStart < len(issues); chunkStart += chunkSize {
+			openFDs, maxFDs, fdErr := resourcehygiene.GetProcessFDUsage()
+			if fdErr == nil && maxFDs > 0 && openFDs > int(float64(maxFDs)*0.75) {
+				result.Errors = append(result.Errors, fmt.Sprintf("Autofix chunk processing throttled: FD usage %d/%d", openFDs, maxFDs))
+				time.Sleep(150 * time.Millisecond)
+				openFDs, maxFDs, _ = resourcehygiene.GetProcessFDUsage()
+				if maxFDs > 0 && openFDs > int(float64(maxFDs)*0.85) {
+					result.Errors = append(result.Errors, fmt.Sprintf("Autofix chunk processing aborted: critical FD usage %d/%d", openFDs, maxFDs))
+					break
+				}
+			}
+
 			chunkEnd := chunkStart + chunkSize
 			if chunkEnd > len(issues) {
 				chunkEnd = len(issues)

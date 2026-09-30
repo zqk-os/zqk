@@ -41,11 +41,7 @@ func CascadeOnObjectChange(ctx context.Context, projectRoot, operation, kind, id
 	// snapshotted issues after promote/status repair (stale-batch churn).
 	switch operation {
 	case storage.OpCreate, storage.OpUpdate, storage.OpDelete:
-		capturedRoot, capturedID := projectRoot, id
-		goroutinelabels.NewGoroutine("autofix_pending_prune", "Prune pending AUTOFIX batches for mutated object id").
-			StartSimple(func() {
-				PrunePendingAutofixBatchesForObjectID(capturedRoot, capturedID)
-			})
+		EnqueueAutofixPendingPrune(projectRoot, id)
 	}
 
 	switch operation {

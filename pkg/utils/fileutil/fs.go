@@ -62,6 +62,9 @@ func IsExist(err error) bool { return os.IsExist(err) }
 func IsPermission(err error) bool { return os.IsPermission(err) }
 
 func WriteFile(name string, data []byte, perm FileMode) error {
+	if err := ValidateSafePath(name); err != nil {
+		return err
+	}
 	guardRepoMutation(name)
 	t0 := nowIfMetricsEnabled()
 	err := os.WriteFile(name, data, perm)
@@ -74,6 +77,9 @@ func WriteFile(name string, data []byte, perm FileMode) error {
 }
 
 func Mkdir(path string, perm FileMode) error {
+	if err := ValidateSafePath(path); err != nil {
+		return err
+	}
 	guardRepoMutation(path)
 	t0 := nowIfMetricsEnabled()
 	err := os.Mkdir(path, perm)
@@ -82,6 +88,9 @@ func Mkdir(path string, perm FileMode) error {
 }
 
 func MkdirAll(path string, perm FileMode) error {
+	if err := ValidateSafePath(path); err != nil {
+		return err
+	}
 	info, err := os.Stat(path)
 	if err == nil && info.IsDir() {
 		return nil
@@ -95,17 +104,28 @@ func MkdirAll(path string, perm FileMode) error {
 
 func MkdirTemp(dir, pattern string) (string, error) {
 	if dir != "" {
+		if err := ValidateSafePath(dir); err != nil {
+			return "", err
+		}
 		guardRepoMutation(dir)
 	}
 	return os.MkdirTemp(dir, pattern)
 }
 
 func CreateTemp(dir, pattern string) (*File, error) {
-	guardRepoMutation(dir)
+	if dir != "" {
+		if err := ValidateSafePath(dir); err != nil {
+			return nil, err
+		}
+		guardRepoMutation(dir)
+	}
 	return os.CreateTemp(dir, pattern)
 }
 
 func Create(name string) (*File, error) {
+	if err := ValidateSafePath(name); err != nil {
+		return nil, err
+	}
 	guardRepoMutation(name)
 	return os.Create(name) //nolint:gosec
 }
@@ -126,11 +146,17 @@ func Truncate(name string, size int64) error {
 }
 
 func Link(oldname, newname string) error {
+	if err := ValidateSafePath(newname); err != nil {
+		return err
+	}
 	guardRepoMutation(newname)
 	return os.Link(oldname, newname)
 }
 
 func Symlink(oldname, newname string) error {
+	if err := ValidateSafePath(newname); err != nil {
+		return err
+	}
 	guardRepoMutation(newname)
 	return os.Symlink(oldname, newname)
 }
@@ -145,6 +171,9 @@ func Open(name string) (*File, error) {
 
 func OpenFile(name string, flag int, perm FileMode) (*File, error) {
 	if flag&writeOpenFlags() != 0 {
+		if err := ValidateSafePath(name); err != nil {
+			return nil, err
+		}
 		guardRepoMutation(name)
 	}
 	return os.OpenFile(name, flag, perm) //nolint:gosec
@@ -175,6 +204,9 @@ func RemoveFileIfExists(path string) error {
 }
 
 func Rename(oldPath, newPath string) error {
+	if err := ValidateSafePath(newPath); err != nil {
+		return err
+	}
 	guardRepoMutation(oldPath)
 	guardRepoMutation(newPath)
 	t0 := nowIfMetricsEnabled()

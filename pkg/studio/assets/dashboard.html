@@ -97,6 +97,13 @@
             <button class="gantt-filter-pill" id="gantt-pill-done" onclick="setGanttStatusFilter('done')">Completed</button>
           </div>
           <div class="gantt-filter-group">
+            <span class="gantt-toolbar-label">Timescale:</span>
+            <button class="gantt-filter-pill" id="gantt-zoom-2w" onclick="setGanttZoom('2w')" title="2-Week Sprint Zoom">2 Weeks</button>
+            <button class="gantt-filter-pill active" id="gantt-zoom-1m" onclick="setGanttZoom('1m')" title="1-Month Active Horizon">1 Month</button>
+            <button class="gantt-filter-pill" id="gantt-zoom-3m" onclick="setGanttZoom('3m')" title="Quarter View">Quarter</button>
+            <button class="gantt-filter-pill" id="gantt-zoom-all" onclick="setGanttZoom('all')" title="Full Project Span">Fit All</button>
+          </div>
+          <div class="gantt-filter-group">
             <span class="gantt-toolbar-label">Grouping:</span>
             <select id="gantt-grouping" class="select-input" onchange="renderGantt()">
               <option value="workstream">By Workstream</option>

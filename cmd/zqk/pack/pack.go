@@ -44,6 +44,9 @@ func newInitCmd() *cobra.Command {
 			targetDir := "."
 			if len(args) > 0 {
 				targetDir = args[0]
+				if err := fileutil.ValidateSafePath(targetDir); err != nil {
+					return fmt.Errorf("invalid target directory: %w", err)
+				}
 			}
 
 			if name == "" {
