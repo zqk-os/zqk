@@ -79,6 +79,10 @@ func init() {
 			if len(failedFiles) > 0 {
 				metadata["failed_files"] = failedFiles
 			}
+			createdBy := ""
+			if secCtx != nil {
+				createdBy = secCtx.AccountID
+			}
 			options := &AuditEventOptions{
 				EventType:  eventType,
 				Operation:  "cleaned up orphaned cas files",
@@ -86,7 +90,7 @@ func init() {
 				TargetKind: ConstStreamCasOrphanCleanup,
 				TargetID:   "batch",
 				Metadata:   metadata,
-				CreatedBy:  secCtx.AccountID,
+				CreatedBy:  createdBy,
 			}
 			_ = CreateAuditEventWithBuilder(ctx, projectRoot, secCtx, provider, options)
 		}

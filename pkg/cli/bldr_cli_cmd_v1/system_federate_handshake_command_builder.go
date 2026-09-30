@@ -8,9 +8,9 @@ import (
 // NewSystemFederateHandshakeCommandBuilder creates a new system_federate_handshake command
 func NewSystemFederateHandshakeCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("handshake")
-	builder.WithShort("handshake command")
-	help := clipkg.DynamicHelpBuilder("handshake command")
-	help.WithDescriptionLines("handshake command")
+	builder.WithShort("Execute bidirectional identity and credential handshake with remote peer")
+	help := clipkg.DynamicHelpBuilder("Execute bidirectional identity and credential handshake with remote peer")
+	help.WithDescriptionLines("Performs cryptographic verification and reciprocal credential attestation between federated knowledge kernel nodes.")
 	builder.WithHelpBuilder(help)
 	builder.WithCommonFlags(false, nil)
 	cmd := builder.Build()

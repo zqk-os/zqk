@@ -95,8 +95,18 @@ func SplitPredicates(expr string) ([]string, error) {
 				quoteChar = r
 			}
 			cur.WriteRune(r)
-		case ';', ',':
+		case ';':
 			if !inQuote {
+				part := strings.TrimSpace(cur.String())
+				if part != "" {
+					preds = append(preds, part)
+				}
+				cur.Reset()
+			} else {
+				cur.WriteRune(r)
+			}
+		case ',':
+			if !inQuote && !strings.HasPrefix(strings.TrimSpace(cur.String()), "any_nonempty:") {
 				part := strings.TrimSpace(cur.String())
 				if part != "" {
 					preds = append(preds, part)
@@ -145,119 +155,159 @@ func validateSinglePredicate(p string) error {
 		return fmt.Errorf("predicate %q requires argument", name)
 	}
 
+	if handled, err := validateFieldPredicate(name, arg); handled {
+		return err
+	}
+	if handled, err := validateLinkAndMatchPredicate(name, arg); handled {
+		return err
+	}
+	if handled, err := validateAstAndNumericPredicate(name, arg); handled {
+		return err
+	}
+
+	return fmt.Errorf("unknown predicate %q; must match kernel_predicate_dsl.ebnf", name)
+}
+
+func validateFieldPredicate(name, arg string) (bool, error) {
 	switch name {
 	case "object_exists":
-		return validateIdentifier(arg, "object_exists")
+		return true, validateIdentifier(arg, "object_exists")
 
 	case "field_nonempty":
 		// Syntax: field_nonempty:[id:]field
 		if strings.Contains(arg, ":") {
 			parts := strings.Split(arg, ":")
 			if len(parts) != 2 || strings.TrimSpace(parts[0]) == "" || strings.TrimSpace(parts[1]) == "" {
-				return fmt.Errorf("field_nonempty with object ID must be 'field_nonempty:<object_id>:<field>'")
+				return true, fmt.Errorf("field_nonempty with object ID must be 'field_nonempty:<object_id>:<field>'")
 			}
-			return nil
+			return true, nil
 		}
-		return validateIdentifier(arg, "field_nonempty")
+		return true, validateIdentifier(arg, "field_nonempty")
 
 	case "field_cleared":
 		// Syntax: field_cleared:[id:]field
 		if strings.Contains(arg, ":") {
 			parts := strings.Split(arg, ":")
 			if len(parts) != 2 || strings.TrimSpace(parts[0]) == "" || strings.TrimSpace(parts[1]) == "" {
-				return fmt.Errorf("field_cleared with object ID must be 'field_cleared:<object_id>:<field>'")
+				return true, fmt.Errorf("field_cleared with object ID must be 'field_cleared:<object_id>:<field>'")
 			}
-			return nil
+			return true, nil
 		}
-		return validateIdentifier(arg, "field_cleared")
+		return true, validateIdentifier(arg, "field_cleared")
+
+	case "any_nonempty":
+		fields := strings.FieldsFunc(arg, func(r rune) bool { return r == ',' || r == ':' })
+		if len(fields) == 0 {
+			return true, fmt.Errorf("any_nonempty requires at least one field identifier")
+		}
+		for _, f := range fields {
+			if err := validateIdentifier(strings.TrimSpace(f), "any_nonempty"); err != nil {
+				return true, err
+			}
+		}
+		return true, nil
 
 	case "role_is":
-		return validateIdentifier(arg, "role_is")
+		return true, validateIdentifier(arg, "role_is")
 
 	case "active_ref":
-		return validateIdentifier(arg, "active_ref")
+		return true, validateIdentifier(arg, "active_ref")
 
+	default:
+		return false, nil
+	}
+}
+
+func validateLinkAndMatchPredicate(name, arg string) (bool, error) {
+	switch name {
 	case "link_back":
 		// Syntax: link_back:<subject_field>:<target_field>
 		parts := strings.Split(arg, ":")
 		if len(parts) != 2 || strings.TrimSpace(parts[0]) == "" || strings.TrimSpace(parts[1]) == "" {
-			return fmt.Errorf("link_back requires 'link_back:<subject_field>:<target_field>'")
+			return true, fmt.Errorf("link_back requires 'link_back:<subject_field>:<target_field>'")
 		}
 		if err := validateIdentifier(parts[0], "link_back subject"); err != nil {
-			return err
+			return true, err
 		}
-		return validateIdentifier(parts[1], "link_back target")
+		return true, validateIdentifier(parts[1], "link_back target")
 
 	case "field_matches":
 		// Syntax: field_matches:<field>:<regex>
 		field, pattern, ok := strings.Cut(arg, ":")
 		if !ok || strings.TrimSpace(field) == "" || strings.TrimSpace(pattern) == "" {
-			return fmt.Errorf("field_matches requires 'field_matches:<field>:<regex>'")
+			return true, fmt.Errorf("field_matches requires 'field_matches:<field>:<regex>'")
 		}
 		if _, err := regexp.Compile(strings.TrimSpace(pattern)); err != nil {
-			return fmt.Errorf("field_matches regex invalid: %w", err)
+			return true, fmt.Errorf("field_matches regex invalid: %w", err)
 		}
-		return nil
+		return true, nil
 
 	case "path_exists", "content_hash_matches":
 		if len(arg) == 0 {
-			return fmt.Errorf("%s requires non-empty path", name)
+			return true, fmt.Errorf("%s requires non-empty path", name)
 		}
-		return nil
+		return true, nil
 
 	case "content_size_positive":
-		return validatePathOrIdentifier(arg, "content_size_positive")
+		return true, validatePathOrIdentifier(arg, "content_size_positive")
 
 	case "query_metric":
 		if !metricRegex.MatchString(arg) {
-			return fmt.Errorf("query_metric syntax must be 'query_metric:<metric_name><op><value>', got %q", arg)
+			return true, fmt.Errorf("query_metric syntax must be 'query_metric:<metric_name><op><value>', got %q", arg)
 		}
-		return nil
+		return true, nil
 
 	case "command_exit_code":
 		if len(arg) == 0 {
-			return fmt.Errorf("command_exit_code requires command string")
+			return true, fmt.Errorf("command_exit_code requires command string")
 		}
-		return nil
+		return true, nil
 
+	default:
+		return false, nil
+	}
+}
+
+func validateAstAndNumericPredicate(name, arg string) (bool, error) {
+	switch name {
 	case "ast_semantic_match":
 		// Syntax: ast_semantic_match:<path>:<constraint>
 		parts := strings.Split(arg, ":")
 		if len(parts) < 2 {
-			return fmt.Errorf("ast_semantic_match requires 'ast_semantic_match:<path>:<constraint>'")
+			return true, fmt.Errorf("ast_semantic_match requires 'ast_semantic_match:<path>:<constraint>'")
 		}
 		constraint := strings.TrimSpace(parts[len(parts)-2])
 		if constraint != "symbol_present" && constraint != "symbol_absent" && constraint != "type_implements" && constraint != "no_raw_panics" {
 			// check if last part is no_raw_panics
 			if strings.TrimSpace(parts[len(parts)-1]) == "no_raw_panics" {
-				return nil
+				return true, nil
 			}
-			return fmt.Errorf("ast_semantic_match unknown constraint: %s", constraint)
+			return true, fmt.Errorf("ast_semantic_match unknown constraint: %s", constraint)
 		}
-		return nil
+		return true, nil
 
 	case "criteria_linked_or_acceptance_present":
-		return nil
+		return true, nil
 
 	case "title_body_cohesion":
 		if _, err := strconv.Atoi(arg); err != nil {
-			return fmt.Errorf("title_body_cohesion requires integer minimum shared stems, got %q", arg)
+			return true, fmt.Errorf("title_body_cohesion requires integer minimum shared stems, got %q", arg)
 		}
-		return nil
+		return true, nil
 
 	case "at_least":
 		countStr, field, ok := strings.Cut(arg, ":")
 		if !ok {
-			return fmt.Errorf("at_least predicate requires 'at_least:<count>:<field>', got %q", arg)
+			return true, fmt.Errorf("at_least predicate requires 'at_least:<count>:<field>', got %q", arg)
 		}
 		count, err := strconv.Atoi(strings.TrimSpace(countStr))
 		if err != nil || count < 0 {
-			return fmt.Errorf("at_least count must be non-negative integer, got %q", countStr)
+			return true, fmt.Errorf("at_least count must be non-negative integer, got %q", countStr)
 		}
-		return validateIdentifier(strings.TrimSpace(field), "at_least")
+		return true, validateIdentifier(strings.TrimSpace(field), "at_least")
 
 	default:
-		return fmt.Errorf("unknown predicate %q; must match kernel_predicate_dsl.ebnf", name)
+		return false, nil
 	}
 }
 
@@ -294,37 +344,41 @@ func CompilePrecondition(p string) (string, bool) {
 	if lower == "" {
 		return "", true
 	}
+	if res, ok := compileDocAndFieldPrecondition(lower); ok {
+		return res, true
+	}
+	if res, ok := compileRoleAndClearedPrecondition(lower); ok {
+		return res, true
+	}
+	if res, ok := compileStatusAndEvidencePrecondition(lower); ok {
+		return res, true
+	}
+	if res, ok := compileRefAndDisjunctionPrecondition(lower); ok {
+		return res, true
+	}
+	return "", false
+}
 
-	// 1. Standard checks pass
+func compileDocAndFieldPrecondition(lower string) (string, bool) {
 	if strings.Contains(lower, "standard checks pass") {
 		return "standard_checks_pass", true
 	}
-
-	// 2. Doc entry file reachability
 	if strings.Contains(lower, "target document file exists and is reachable on disk") ||
 		strings.Contains(lower, "target file reachable and readable") {
 		return "path_exists:file_path", true
 	}
-
-	// 3. Doc entry metadata populated
 	if strings.Contains(lower, "title, summary, and path are populated") {
 		return "field_nonempty:title;field_nonempty:summary;field_nonempty:path", true
 	}
-
-	// 4. Content hash checks
 	if strings.Contains(lower, "cryptographic content_hash computed and sealed") {
 		return "field_nonempty:content_hash", true
 	}
 	if strings.Contains(lower, "cryptographic content_hash matches target file on disk") {
 		return "content_hash_matches:file_path", true
 	}
-
-	// 5. Content size measured
 	if strings.Contains(lower, "document content_size measured") || strings.Contains(lower, "content_size measured") {
 		return "content_size_positive:content_size", true
 	}
-
-	// 6. Generic field population patterns: "<field> is populated", "<f1>, <f2> are populated"
 	if strings.HasSuffix(lower, "is populated") || strings.HasSuffix(lower, "are populated") {
 		clause := strings.TrimSuffix(lower, "is populated")
 		clause = strings.TrimSuffix(clause, "are populated")
@@ -341,16 +395,16 @@ func CompilePrecondition(p string) (string, bool) {
 			return strings.Join(canonicals, ";"), true
 		}
 	}
+	return "", false
+}
 
-	// 7. Role postcondition: "role is <role>"
+func compileRoleAndClearedPrecondition(lower string) (string, bool) {
 	if strings.HasPrefix(lower, "role is ") {
 		role := strings.TrimSpace(strings.TrimPrefix(lower, "role is "))
 		if role != "" && !strings.Contains(role, " ") {
 			return "role_is:" + role, true
 		}
 	}
-
-	// 8. Field cleared postcondition: "<field> is cleared", "<field> is unset", "clear <field>", "unset <field>"
 	if strings.HasSuffix(lower, " is cleared") {
 		f := strings.TrimSpace(strings.TrimSuffix(lower, " is cleared"))
 		if f != "" && !strings.Contains(f, " ") {
@@ -375,8 +429,6 @@ func CompilePrecondition(p string) (string, bool) {
 			return "field_cleared:" + f, true
 		}
 	}
-
-	// 9. Field is set / not empty: "<field> is set", "<field> is not empty"
 	if strings.HasSuffix(lower, " is set") {
 		f := strings.TrimSpace(strings.TrimSuffix(lower, " is set"))
 		if f != "" && !strings.Contains(f, " ") {
@@ -389,43 +441,31 @@ func CompilePrecondition(p string) (string, bool) {
 			return "field_nonempty:" + f, true
 		}
 	}
-
-	// 10. Owner identified / set
 	if lower == "owner identified" || lower == "owner is set" {
 		return "field_nonempty:owner_ref", true
 	}
-
-	// 11. Priority assigned
 	if lower == "priority assigned" {
 		return "field_matches:priority:^(high|medium|low)$", true
 	}
-
-	// 12. Problem statement and acceptance considerations populated
 	if strings.Contains(lower, "problem statement") && strings.Contains(lower, "acceptance") {
 		return "field_nonempty:problem_statement;field_nonempty:acceptance_considerations", true
 	}
+	return "", false
+}
 
-	// 13. Terminal work done
+func compileStatusAndEvidencePrecondition(lower string) (string, bool) {
 	if lower == "work_done" || lower == "work is done" {
 		return "work_done", true
 	}
-
-	// 14. Shovel ready
 	if lower == "shovel ready" || lower == "shovel_ready" {
 		return "shovel_ready", true
 	}
-
-	// 15. TDD red phase
 	if strings.HasPrefix(lower, "all linked criteria_refs bound to active test_case_refs") || lower == "tdd red phase" {
 		return "tdd_test_red_phase", true
 	}
-
-	// 16. Criteria linked to active test case
 	if strings.HasPrefix(lower, "must link to an active test_case") || strings.HasPrefix(lower, "at least one active test_case_ref linked") {
 		return "criteria_active_test_case", true
 	}
-
-	// 17. Priority plan child / status gates
 	if strings.HasPrefix(lower, "at least one ready backlog_item references this plan") {
 		return "ready_backlog_references_plan", true
 	}
@@ -447,8 +487,6 @@ func CompilePrecondition(p string) (string, bool) {
 	if strings.HasPrefix(lower, "at least one team_configuration_ref or persona_refs") {
 		return "team_or_persona_dispatch_refs", true
 	}
-
-	// 18. Evidence gates
 	if strings.HasPrefix(lower, "commit_hashes have git mutation evidence") || strings.HasPrefix(lower, "commit_refs have git mutation evidence") {
 		return "git_mutation_evidence_present", true
 	}
@@ -458,8 +496,6 @@ func CompilePrecondition(p string) (string, bool) {
 	if strings.HasPrefix(lower, "machine-checkable evidence with green scheduler fingerprint") {
 		return "machine_checkable_closure_evidence", true
 	}
-
-	// 19. Ref status rules
 	if strings.HasPrefix(lower, "all linked criteria_refs are validated or complete") {
 		return "linked_criteria_validated_or_complete", true
 	}
@@ -469,8 +505,10 @@ func CompilePrecondition(p string) (string, bool) {
 	if strings.HasPrefix(lower, "priority_plan_ref target must be in active or in_progress status") {
 		return "priority_plan_execution_facing", true
 	}
+	return "", false
+}
 
-	// 20. Active refs
+func compileRefAndDisjunctionPrecondition(lower string) (string, bool) {
 	if strings.Contains(lower, "at least one active ") && strings.Contains(lower, "linked") {
 		for _, w := range strings.Fields(lower) {
 			clean := strings.Trim(w, ",.()[]{}'")
@@ -479,15 +517,23 @@ func CompilePrecondition(p string) (string, bool) {
 			}
 		}
 	}
-
-	// 21. Link back alignment
 	if strings.Contains(lower, "link back to") || strings.Contains(lower, "links back to") || strings.Contains(lower, "belongs to") {
 		if subj, tgt, ok := parseLinkBackTokens(lower); ok {
 			return "link_back:" + subj + ":" + tgt, true
 		}
 	}
-
-	// 22. Generic at least <N> <field> linked
+	if strings.HasPrefix(lower, "at least ") && strings.Contains(lower, " or ") {
+		var fields []string
+		for _, w := range strings.Fields(lower) {
+			clean := strings.Trim(w, ",.()[]{}'")
+			if strings.HasSuffix(clean, "_ref") || strings.HasSuffix(clean, "_refs") {
+				fields = append(fields, clean)
+			}
+		}
+		if len(fields) >= 2 {
+			return "any_nonempty:" + strings.Join(fields, ","), true
+		}
+	}
 	if strings.HasPrefix(lower, "at least ") {
 		for _, w := range strings.Fields(lower) {
 			clean := strings.Trim(w, ",.()[]{}'")
@@ -503,7 +549,6 @@ func CompilePrecondition(p string) (string, bool) {
 			}
 		}
 	}
-
 	return "", false
 }
 

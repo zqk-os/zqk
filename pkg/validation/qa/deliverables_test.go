@@ -103,7 +103,8 @@ func TestValidateDeliverableArtifacts(t *testing.T) {
 	}
 	_, err = ValidateDeliverableArtifacts(bliEmpty, "")
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "missing required deliverable artifacts for BLI-EMPTY")
+	require.Contains(t, err.Error(), ReasonMissingArtifacts)
+	require.Contains(t, err.Error(), "BLI-EMPTY")
 
 	// BacklogItem with valid artifact
 	bliValid := map[string]any{
@@ -128,3 +129,23 @@ func TestValidateDeliverableArtifacts(t *testing.T) {
 	legacyPaths := extractArtifactPaths([]any{validFile})
 	require.Equal(t, []string{validFile}, legacyPaths)
 }
+
+func TestCheckDuplication_QAConsolidation(t *testing.T) {
+	filter := QASuccessFilter("BLI-TEST-1")
+	require.Equal(t, KindQASuccess, filter.Kind)
+	require.Equal(t, "BLI-TEST-1", filter.Filters[objects.FieldKeyItemID])
+	require.Equal(t, objects.ObjectStatusSuccess, filter.Filters[objects.FieldKeyStatus])
+
+	reportMap := map[string]any{
+		objects.FieldKeyItemID:    "BLI-TEST-1",
+		objects.FieldKeyStatus:    objects.ObjectStatusSuccess,
+		objects.FieldKeySignature: "sig-test",
+		objects.FieldKeyPublicKey: "pub-test",
+	}
+	report := ExtractQAReport(reportMap)
+	require.Equal(t, "BLI-TEST-1", report.ItemID)
+	require.Equal(t, objects.ObjectStatusSuccess, report.Status)
+	require.Equal(t, "sig-test", report.Signature)
+	require.Equal(t, "pub-test", report.PublicKey)
+}
+

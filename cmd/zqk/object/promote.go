@@ -217,6 +217,7 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 				pkgctx.WithCacheUpdate(ctx, id, kind, ""),
 				"promote recover undefined status to lifecycle initial",
 			)
+			promoteCtx = storage.WithCLIOperation(storage.WithSkipWriteBehind(promoteCtx))
 			if err = proc.Storage().Update(promoteCtx, secCtx, id, updateMap); err != nil {
 				errors = append(errors, fmt.Sprintf("%s: failed to recover status '%s' → '%s': %v", id, currentStatus, recovered, err))
 				continue
@@ -385,6 +386,7 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 
 		finalStatus := bestStatus
 		promoteCtx := pkgctx.WithCacheUpdate(ctx, id, kind, "")
+		promoteCtx = storage.WithCLIOperation(storage.WithSkipWriteBehind(promoteCtx))
 
 		// Archive is a promote hop that owns the prune/cluster membrane burrito
 		// (children ride the parent; any member failure fails the hop).
@@ -436,8 +438,10 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 				finalStatus = st
 			}
 		}
-		// Sweep / unlink any preliminary draft file now that the object is promoted.
-		_ = storage.DeleteObjectDraftFile(proc.ProjectRoot(), kind, id)
+		// Sweep / unlink any preliminary draft file now that the object is promoted across the CAS membrane.
+		if isPrelim, _ := objects.GetGlobalLifecycleLoader().IsPreliminaryStatusForKind(kind, finalStatus); !isPrelim {
+			_ = storage.DeleteObjectDraftFile(proc.ProjectRoot(), kind, id)
+		}
 		fmt.Fprintf(cmd.OutOrStdout(), "✓ Promoted %s from '%s' to '%s'\n", color.CyanString(id), color.YellowString(currentStatus), color.GreenString(finalStatus))
 		if hook, ok := promoteCueHooks[kind]; ok {
 			if cue := hook(ctx, proc.Storage(), secCtx, id, current, finalStatus); cue != "" {

@@ -570,7 +570,7 @@ func normalizeErrorMessage(msg string) string {
 	msg = reObjID.ReplaceAllString(msg, "object <id>")
 
 	// 4. Normalize file paths (anything containing .zqk/process/ or absolute paths)
-	rePath := regexp.MustCompile(`/Users/[A-Za-z0-9_./-]+`)
+	rePath := regexp.MustCompile(`/(?:Users|home)/[A-Za-z0-9_./-]+`)
 	msg = rePath.ReplaceAllString(msg, "<path>")
 
 	// 5. Normalize modification durations, e.g. "file modified 4m31s ago"

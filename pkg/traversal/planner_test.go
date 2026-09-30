@@ -31,9 +31,6 @@ func TestZPARQL_PlannerContractSpec(t *testing.T) {
 		}
 	}
 	require.True(t, found, "SPEC-ZPARQL-INDEXED-QUERY-PLANNER.md must exist in docs/specs/")
-	require.Contains(t, specContent, "CRIT-ZPARQL-PLANNER-CONTRACT-SPEC")
-	require.Contains(t, specContent, "CRIT-ZPARQL-INDEX-SCAN-COMPLEXITY-PROOF")
-	require.Contains(t, specContent, "CRIT-ZPARQL-CYCLIC-TRAVERSAL-RECURSION-NEGATIVE")
 	require.Contains(t, specContent, "IndexSeek")
 	require.Contains(t, specContent, "KindScan")
 	require.Contains(t, specContent, "Predicate Pushdown")

@@ -13,7 +13,7 @@ func NewObjectCreateCommandBuilder() *cobra.Command {
 	builder.WithDryRunFlag()
 	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
 	builder.AddBoolFlag("keep-file", "", false, "Keep temporary scratch file after creation (files matching tmp-*.yaml are removed by default)")
-	builder.AddBoolFlag("relaxed", "", true, "Relax integrity constraints during creation (allow references to objects that will be created later in batch operations) [Default: true]")
+	builder.AddBoolFlag("relaxed", "", false, "Relax integrity constraints during creation (allow references to objects that will be created later in batch operations) [Default: false]")
 	builder.AddBoolFlag("force", "", false, "Force overwrite existing object (update instead of fail if object already exists)")
 	builder.AddBoolFlag("interactive", "i", false, "Launch interactive wizard to create object")
 	builder.AddBoolFlag("promote", "", false, "Promote object immediately to first shovel-ready lifecycle status (bypasses draft plane)")

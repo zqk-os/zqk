@@ -61,6 +61,16 @@ func (e *GuidanceEngine) Recommend(failureType string, context string) Guidance 
 			},
 			Reference: "docs/best-practices/coding/DRY_AND_CONSTANTS.md",
 		}
+	case "duplication_violation", "structural_duplication":
+		return Guidance{
+			Summary: "DRY Principle Violation: Structural Duplication Detected.",
+			Steps: []string{
+				fmt.Sprintf("Violation: %s", context),
+				"Extract duplicate statement sequence or identical function body into a shared helper function.",
+				"Consolidate common logic to eliminate drift and maintain single source of truth.",
+			},
+			Reference: "docs/best-practices/coding/DRY_AND_CONSTANTS.md",
+		}
 	case validation.ConstMagicExtracted_44:
 		if strings.Contains(context, validation.ConstMagiccd1ac283) {
 			return Guidance{

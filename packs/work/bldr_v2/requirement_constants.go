@@ -27,4 +27,6 @@ const (
 	RequirementFieldWorkstreamRefs = "workstream_refs"
 	// RequirementFieldEpicRefs is the field name for epic_refs
 	RequirementFieldEpicRefs = "epic_refs"
+	// RequirementFieldDocEntryRefs is the field name for doc_entry_refs
+	RequirementFieldDocEntryRefs = "doc_entry_refs"
 )

@@ -8,9 +8,12 @@ import (
 // NewAuthLogoutCommandBuilder creates a new auth_logout command
 func NewAuthLogoutCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("logout")
-	builder.WithShort("logout command")
-	help := clipkg.DynamicHelpBuilder("logout command")
-	help.WithDescriptionLines("logout command")
+	builder.WithShort("Log out and invalidate current authentication credentials")
+	help := clipkg.DynamicHelpBuilder("Log out and invalidate current authentication credentials")
+	help.WithDescriptionLines(
+		"Clear stored session tokens, credentials, and cached authentication state",
+		"for the current user or agent session.",
+	)
 	builder.WithHelpBuilder(help)
 	builder.WithCommonFlags(false, nil)
 	cmd := builder.Build()
