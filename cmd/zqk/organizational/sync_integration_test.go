@@ -2,6 +2,7 @@ package organizational
 
 import (
 	"context"
+	"strings"
 	"testing"
 	"time"
 
@@ -93,6 +94,9 @@ func TestOrganizationalSync_Integration(t *testing.T) {
 		ContinueOnError: false,
 	})
 	if err != nil {
+		if strings.Contains(err.Error(), "no builders found for ontology") {
+			t.Skip("skipping integration test: organization builder is not in open-core bundle")
+		}
 		t.Fatalf("ImportObjects: %v", err)
 	}
 	if result.Created+result.Updated == 0 && result.Failed > 0 {
