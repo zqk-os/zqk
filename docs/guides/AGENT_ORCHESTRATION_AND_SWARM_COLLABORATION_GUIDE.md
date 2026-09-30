@@ -46,7 +46,7 @@ zqk feed pending --agent-id peer-agent-1
 zqk feed emit-status --persona-ref PER-DEFAULT-AGENT --agent-id peer-agent-1 --summary "Executing CAS integrity validation"
 
 # Acknowledge or steer peer agent activities
-zqk feed ack --agent-id peer-agent-1 --in-reply-to AFE-1790728562589433000-51ec4b79
+zqk feed ack --agent-id peer-agent-1 --in-reply-to <EVENT-ID>
 ```
 
 ---
