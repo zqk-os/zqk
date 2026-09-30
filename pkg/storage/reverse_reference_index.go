@@ -110,11 +110,7 @@ func (r *ReverseReferenceIndex) ReferencedIDCount() int {
 			return nil
 		},
 	)
-	if err_swallow_119 !=
-
-		// GetDependents returns all objects that reference the given ID
-		// Returns empty slice if no dependents found
-		nil {
+	if err_swallow_119 != nil {
 		logging.LogSwallowedError(err_swallow_119)
 	}
 	return count
@@ -190,14 +186,12 @@ func (r *ReverseReferenceIndex) AddReference(objectID, referencedID string) {
 			return nil
 		},
 	)
-	if err_swallow_121 !=
-
-		// RemoveReference removes a reference relationship (objectID no longer references referencedID)
-		nil {
+	if err_swallow_121 != nil {
 		logging.LogSwallowedError(err_swallow_121)
 	}
 }
 
+// RemoveReference removes a reference relationship (objectID no longer references referencedID)
 func (r *ReverseReferenceIndex) RemoveReference(objectID, referencedID string) {
 	if referencedID == emptyValue || objectID == emptyValue {
 		return
@@ -232,14 +226,12 @@ func (r *ReverseReferenceIndex) RemoveReference(objectID, referencedID string) {
 			return nil
 		},
 	)
-	if err_swallow_122 !=
-
-		// RemoveObject removes all references for an object (when object is deleted)
-		nil {
+	if err_swallow_122 != nil {
 		logging.LogSwallowedError(err_swallow_122)
 	}
 }
 
+// RemoveObject removes all references for an object (when object is deleted)
 func (r *ReverseReferenceIndex) RemoveObject(objectID string) {
 	if objectID == emptyValue {
 		return
@@ -306,14 +298,12 @@ func (r *ReverseReferenceIndex) RemoveObject(objectID string) {
 			return nil
 		},
 	)
-	if err_swallow_123 !=
-
-		// UpdateReferences updates references for an object (removes old refs, adds new refs)
-		nil {
+	if err_swallow_123 != nil {
 		logging.LogSwallowedError(err_swallow_123)
 	}
 }
 
+// UpdateReferences updates references for an object (removes old refs, adds new refs)
 func (r *ReverseReferenceIndex) UpdateReferences(objectID string, oldRefs, newRefs []string) {
 	if objectID == emptyValue {
 		return
@@ -349,14 +339,12 @@ func (r *ReverseReferenceIndex) UpdateReferences(objectID string, oldRefs, newRe
 			return nil
 		},
 	)
-	if err_swallow_124 !=
-
-		// removeReferenceLocked removes a reference (must be called with lock held)
-		nil {
+	if err_swallow_124 != nil {
 		logging.LogSwallowedError(err_swallow_124)
 	}
 }
 
+// removeReferenceLocked removes a reference (must be called with lock held)
 func (r *ReverseReferenceIndex) removeReferenceLocked(objectID, referencedID string) {
 	deps := r.index[referencedID]
 	newDeps := make([]string, 0, len(deps))
@@ -437,17 +425,15 @@ func (r *ReverseReferenceIndex) Clear() {
 			return nil
 		},
 	)
-	if err_swallow_125 !=
-
-		// BuildFromScan populates the index by scanning all object YAML files under processDir for the given kinds.
-		// Clear is implied at the start so the index is fully replaced. Used when LoadCache returns false
-		// (e.g. cold start or cache invalid). projectRoot is used for cache path; processDir should be
-		// datacell.ProcessPrimaryDir(projectRoot).
-		nil {
+	if err_swallow_125 != nil {
 		logging.LogSwallowedError(err_swallow_125)
 	}
 }
 
+// BuildFromScan populates the index by scanning all object YAML files under processDir for the given kinds.
+// Clear is implied at the start so the index is fully replaced. Used when LoadCache returns false
+// (e.g. cold start or cache invalid). projectRoot is used for cache path; processDir should be
+// datacell.ProcessPrimaryDir(projectRoot).
 func (r *ReverseReferenceIndex) BuildFromScan(projectRoot, processDir string, kinds []string) error {
 	r.Clear()
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
