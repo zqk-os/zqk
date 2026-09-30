@@ -75,11 +75,11 @@ func NewDaemonCmd() *cobra.Command {
 				}
 
 				projectRoot := proc.ProjectRoot()
-				daemonLock, err := singleton.AcquireDaemonLock(projectRoot, "privileged-writer")
+				releaseLock, err := singleton.Guard(projectRoot, "privileged-writer")
 				if err != nil {
-					return errfmt.Errorf("failed to acquire daemon lock: %w", err)
+					return err
 				}
-				defer daemonLock.Release()
+				defer releaseLock()
 
 				adapter := &daemonAdapter{fileStorage: fileStorage}
 				daemon := storage.NewPrivilegedWriterDaemon(adapter, projectRoot)

@@ -11,6 +11,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/utils/syscallutil"
@@ -119,6 +120,32 @@ func (l *DaemonLock) Release() error {
 	_ = fileutil.Remove(l.LockPath)
 	l.file = nil
 	return nil
+}
+
+// RunGuarded executes fn while holding an exclusive singleton daemon lock for daemonName under projectRoot.
+// It guarantees deterministic lock acquisition, wraps any error with consistent error formatting,
+// and ensures the lock is safely released on return or panic.
+func RunGuarded(projectRoot string, daemonName string, fn func() error) error {
+	lock, err := AcquireDaemonLock(projectRoot, daemonName)
+	if err != nil {
+		return errfmt.Errorf("acquire %s daemon lock: %w", daemonName, err)
+	}
+	defer func() {
+		_ = lock.Release()
+	}()
+	return fn()
+}
+
+// Guard acquires an exclusive singleton daemon lock for daemonName under projectRoot and returns a release function.
+// If acquisition fails, a wrapped error is returned.
+func Guard(projectRoot string, daemonName string) (func(), error) {
+	lock, err := AcquireDaemonLock(projectRoot, daemonName)
+	if err != nil {
+		return nil, errfmt.Errorf("acquire %s daemon lock: %w", daemonName, err)
+	}
+	return func() {
+		_ = lock.Release()
+	}, nil
 }
 
 // IsDaemonRunning checks whether daemonName is actively running under projectRoot
