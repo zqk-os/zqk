@@ -55,12 +55,12 @@ func TestTestDeterminism_DeterministicSync_OperationalProof(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	doneCh := make(chan struct{})
 
-	go func() {
+	go func(opCtx context.Context) {
 		// Simulate immediate work
 		time.Sleep(5 * time.Millisecond)
 		cancel()
 		close(doneCh)
-	}()
+	}(ctx)
 
 	select {
 	case <-ctx.Done():

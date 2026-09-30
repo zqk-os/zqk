@@ -74,6 +74,11 @@ func runInit(cmd *cobra.Command, projectName, template string, force bool, snaps
 		projectName = filepath.Base(projectRoot)
 	}
 
+	// Project roots must never be nested
+	if err := paths.ValidateProjectRootNesting(projectRoot); err != nil {
+		return errfmt.Errorf("cannot initialize project: %w", err)
+	}
+
 	// Auto-detect legacy mode for existing codebases (Painless Drop-In)
 	if !legacy && snapshotPath == emptyValue {
 		if detectLegacyCodebase(projectRoot) {
