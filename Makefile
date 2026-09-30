@@ -137,9 +137,12 @@ vet: bin/zqk-vet
 	sh scripts/scan-secrets.sh .
 	./bin/zqk-vet --suite all
 
-verify: vet test-unit
+check-fd-leaks:
+	sh scripts/open-core/check-process-fd-leaks.sh
 
-gate-release: vet test-integration
+verify: vet check-fd-leaks test-unit
+
+gate-release: vet check-fd-leaks test-integration
 
 clean:
 	rm -rf bin/* coverage.out coverage.html

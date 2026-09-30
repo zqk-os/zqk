@@ -479,6 +479,12 @@ func TestExtraCoverage_AllEnvVars(t *testing.T) {
 	if v := EnableAmbientWatcher().Name(); v == "" {
 		t.Errorf("expected non-empty name for EnableAmbientWatcher")
 	}
+	if v := AmbientIgnoreDirs().Name(); v == "" {
+		t.Errorf("expected non-empty name for AmbientIgnoreDirs")
+	}
+	if v := AmbientIgnorePaths().Name(); v == "" {
+		t.Errorf("expected non-empty name for AmbientIgnorePaths")
+	}
 	if v := FalAPIKey().Name(); v == "" {
 		t.Errorf("expected non-empty name for FalAPIKey")
 	}

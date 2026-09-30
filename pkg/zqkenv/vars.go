@@ -823,6 +823,15 @@ func DemoMode() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxDemoMode)} }
 // EnableAmbientWatcher returns the environment variable name for ENABLE_AMBIENT_WATCHER (brand-prefixed).
 func EnableAmbientWatcher() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxEnableAmbientWatcher)} }
 
+const _sfxAmbientIgnoreDirs = "AMBIENT_IGNORE_DIRS"
+const _sfxAmbientIgnorePaths = "AMBIENT_IGNORE_PATHS"
+
+// AmbientIgnoreDirs returns the environment variable name for AMBIENT_IGNORE_DIRS (brand-prefixed, e.g. ZQK_AMBIENT_IGNORE_DIRS).
+func AmbientIgnoreDirs() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxAmbientIgnoreDirs)} }
+
+// AmbientIgnorePaths returns the environment variable name for AMBIENT_IGNORE_PATHS (brand-prefixed, e.g. ZQK_AMBIENT_IGNORE_PATHS).
+func AmbientIgnorePaths() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxAmbientIgnorePaths)} }
+
 // FalAPIKey returns the environment variable name for FAL_API_KEY (brand-prefixed).
 func FalAPIKey() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxFalAPIKey)} }
 

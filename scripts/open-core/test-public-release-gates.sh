@@ -175,6 +175,11 @@ fi
 		"$ROOT/scripts/check-hardcoded-paths-and-perms-repo.sh" --no-dups
 	fi
 
+	# 2. Audit process file descriptor hygiene and verify absence of descriptor leaks (lsof gate)
+	if [ -x "$ROOT/scripts/open-core/check-process-fd-leaks.sh" ]; then
+		sh "$ROOT/scripts/open-core/check-process-fd-leaks.sh"
+	fi
+
 	# 2. Build entire project (all packages across cmd and pkg)
 	CGO_ENABLED=0 go build -buildvcs=false ./...
 	CGO_ENABLED=0 go build -buildvcs=false -o "$TMP_BIN" ./cmd/zqk

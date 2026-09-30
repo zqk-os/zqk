@@ -16,9 +16,17 @@ For executable test-to-criteria lineage, run:
 ./bin/zqk test dashboard
 ```
 
-To run release gates and payload verification before preparing distribution artifacts:
+To run release gates, payload verification, and process descriptor hygiene before preparing distribution artifacts:
 
 ```bash
 sh scripts/open-core/check-public-release-payload.sh
+sh scripts/open-core/check-process-fd-leaks.sh
 sh scripts/open-core/test-public-release-gates.sh
+```
+
+Alternatively, run the unified Makefile release target:
+
+```bash
+make check-fd-leaks
+make gate-release
 ```
