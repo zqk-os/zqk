@@ -173,7 +173,7 @@ func TestOrganizationalAnalyzeImpact_Integration(t *testing.T) {
 
 	// Run impact analyzer
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	analyzer := orgdomain.NewImpactAnalyzer(store, logger, secCtx)
+	analyzer := orgdomain.NewImpactAnalyzer(storage.NewOrganizationalStorageAdapter(store), logger, secCtx)
 	impactID, err := analyzer.AnalyzeChange(ctx, changeID)
 	if err != nil {
 		t.Fatalf("AnalyzeChange: %v", err)

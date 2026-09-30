@@ -7,7 +7,6 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 const emptyRefValue = ""
@@ -15,36 +14,35 @@ const emptyRefValue = ""
 // findAffectedZqkObjects finds ZQK objects that reference the affected organizational objects
 //
 //nolint:unparam // Keep error return for future/consistency; currently best-effort and returns nil.
-func findAffectedZqkObjects(ctx context.Context, storageProvider storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, affectedObjects map[string]any) (map[string]any, error) {
+func findAffectedZqkObjects(ctx context.Context, repo Repository, secCtx *pkgctx.SecurityContext, affectedObjects map[string]any) (map[string]any, error) {
 	result := make(map[string]any)
-	storageCtx := pkgctx.NewStorageContext()
 
 	// Extract organizational object IDs from affected_objects map
 	orgObjectIDs := extractOrgObjectIDs(affectedObjects)
 
 	// Find workstreams that reference these organizational objects
-	if workstreams, err := findObjectsReferencingOrgObjects(ctx, storageProvider, objects.KindWorkstream, orgObjectIDs, secCtx, storageCtx); err == nil {
+	if workstreams, err := findObjectsReferencingOrgObjects(ctx, repo, objects.KindWorkstream, orgObjectIDs, secCtx); err == nil {
 		if len(workstreams) > 0 {
 			result["workstreams"] = workstreams
 		}
 	}
 
 	// Find goals that reference these organizational objects
-	if goals, err := findObjectsReferencingOrgObjects(ctx, storageProvider, objects.KindGoal, orgObjectIDs, secCtx, storageCtx); err == nil {
+	if goals, err := findObjectsReferencingOrgObjects(ctx, repo, objects.KindGoal, orgObjectIDs, secCtx); err == nil {
 		if len(goals) > 0 {
 			result["goals"] = goals
 		}
 	}
 
 	// Find backlog_items that reference these organizational objects
-	if backlogItems, err := findObjectsReferencingOrgObjects(ctx, storageProvider, objects.KindBacklogItem, orgObjectIDs, secCtx, storageCtx); err == nil {
+	if backlogItems, err := findObjectsReferencingOrgObjects(ctx, repo, objects.KindBacklogItem, orgObjectIDs, secCtx); err == nil {
 		if len(backlogItems) > 0 {
 			result["backlog_items"] = backlogItems
 		}
 	}
 
 	// Find milestones that reference these organizational objects
-	if milestones, err := findObjectsReferencingOrgObjects(ctx, storageProvider, objects.KindMilestone, orgObjectIDs, secCtx, storageCtx); err == nil {
+	if milestones, err := findObjectsReferencingOrgObjects(ctx, repo, objects.KindMilestone, orgObjectIDs, secCtx); err == nil {
 		if len(milestones) > 0 {
 			result["milestones"] = milestones
 		}
@@ -73,21 +71,17 @@ func extractOrgObjectIDs(affectedObjects map[string]any) []string {
 // findObjectsReferencingOrgObjects finds objects of a specific kind that reference any of the given organizational object IDs
 func findObjectsReferencingOrgObjects(
 	ctx context.Context,
-	storageProvider storage.ObjectStorageProvider,
+	repo Repository,
 	kind string,
 	orgObjectIDs []string,
 	secCtx *pkgctx.SecurityContext,
-	storageCtx *pkgctx.StorageContext,
 ) ([]any, error) {
 	if len(orgObjectIDs) == 0 {
 		return []any{}, nil
 	}
 
-	// List all objects of this kind
-	filter := storage.ListFilter{
-		Kind: kind,
-	}
-	result, err := storageProvider.List(ctx, secCtx, storageCtx, filter)
+	// List all objects of this kind via domain repository
+	objectsList, err := repo.ListByKind(ctx, secCtx, kind)
 	if err != nil {
 		return nil, errfmt.Errorf("failed to list %s objects: %w", kind, err)
 	}
@@ -106,7 +100,7 @@ func findObjectsReferencingOrgObjects(
 	// Determine which field to check based on object kind
 	referenceFields := getOrgReferenceFields(kind)
 
-	for _, obj := range result.Objects {
+	for _, obj := range objectsList {
 		if referencesAnyOrgObject(obj, orgIDSet, referenceFields) {
 			objID, _ := obj[objects.FieldKeyID].(string)
 			if objID != emptyRefValue {

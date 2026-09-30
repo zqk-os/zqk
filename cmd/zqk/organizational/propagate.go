@@ -123,7 +123,7 @@ func getOrCreateImpactAnalysis(ctx context.Context, store storage.ObjectStorageP
 		}
 	}
 	domainLogger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	analyzer := orgdomain.NewImpactAnalyzer(store, domainLogger, secCtx)
+	analyzer := orgdomain.NewImpactAnalyzer(storage.NewOrganizationalStorageAdapter(store), domainLogger, secCtx)
 	impactID, err := analyzer.AnalyzeChange(ctx, changeID)
 	if err != nil {
 		logging.Fluent(logger).Warn("Failed to create impact analysis for propagate").
