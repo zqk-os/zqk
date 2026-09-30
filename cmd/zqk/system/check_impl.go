@@ -82,9 +82,9 @@ func init() {
 		},
 	)
 
-	// Register CAS index write queue event callbacks for coordinator integration
-	// This allows the write queue to emit events via coordinator without import cycles
-	caspkg.SetListingIndexBatchEventCallback(emitListingIndexBatchEventViaCoordinator)
+	// Register CAS index write queue event listeners for coordinator integration.
+	// Wires the observer directly onto the queue instance, decoupling storage internals from presentation mutation.
+	caspkg.GetGlobalListingIndexWriteQueue().RegisterBatchEventListener(caspkg.ListingIndexBatchEventFunc(emitListingIndexBatchEventViaCoordinator))
 	caspkg.SetListingIndexStateChangeEventCallback(emitListingIndexStateChangeEventViaCoordinator)
 
 	// Register I/O queue state change event callback for coordinator integration

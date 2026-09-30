@@ -14,9 +14,49 @@ import (
 	"github.com/zqk-os/zqk/pkg/storage/locknames"
 )
 
-// ListingIndexBatchEventCallback is a callback function type for emitting batch processing events
-// This allows the write queue to emit events without creating import cycles
-// The callback is set by the CLI layer (cmd/zqk/system) which has access to coordination package
+// ListingIndexBatchEventListener is an observer interface for receiving batch processing events
+// from a ListingIndexWriteQueue instance without creating Go package import cycles.
+type ListingIndexBatchEventListener interface {
+	OnListingIndexBatchEvent(
+		ctx context.Context,
+		projectRoot string,
+		storageProvider CASFacade,
+		kind string,
+		batchSize int,
+		duration time.Duration,
+		status string,
+		err error,
+	)
+}
+
+// ListingIndexBatchEventFunc is an adapter to allow the use of ordinary functions as ListingIndexBatchEventListeners.
+type ListingIndexBatchEventFunc func(
+	ctx context.Context,
+	projectRoot string,
+	storageProvider CASFacade,
+	kind string,
+	batchSize int,
+	duration time.Duration,
+	status string,
+	err error,
+)
+
+// OnListingIndexBatchEvent calls f(ctx, projectRoot, storageProvider, kind, batchSize, duration, status, err).
+func (f ListingIndexBatchEventFunc) OnListingIndexBatchEvent(
+	ctx context.Context,
+	projectRoot string,
+	storageProvider CASFacade,
+	kind string,
+	batchSize int,
+	duration time.Duration,
+	status string,
+	err error,
+) {
+	f(ctx, projectRoot, storageProvider, kind, batchSize, duration, status, err)
+}
+
+// ListingIndexBatchEventCallback is a callback function type for emitting batch processing events.
+// Deprecated: Prefer registering a ListingIndexBatchEventListener on the ListingIndexWriteQueue instance.
 type ListingIndexBatchEventCallback func(
 	ctx context.Context,
 	projectRoot string,
@@ -125,6 +165,7 @@ type indexUpdateRequest struct {
 // indexQueue manages batched writes for a single kind's CAS index
 // Implements the "On-Demand Worker" pattern (wake-on-work with idle shutdown)
 type indexQueue struct {
+	parentQueue      *ListingIndexWriteQueue
 	kind             string
 	queue            chan *indexUpdateRequest
 	cas              *filecas.ContentAddressableStorage
@@ -156,6 +197,50 @@ type ListingIndexWriteQueue struct {
 	// SkipShutdownCoordinatorCheck when true skips the global coordinator check in enqueue.
 	// Set on queues created for tests so one test's global shutdown does not fail another test's updates.
 	SkipShutdownCoordinatorCheck atomic.Bool
+
+	listenersMu sync.RWMutex
+	listeners   []ListingIndexBatchEventListener
+}
+
+// RegisterBatchEventListener registers an observer to receive batch processing events from this write queue instance.
+func (q *ListingIndexWriteQueue) RegisterBatchEventListener(listener ListingIndexBatchEventListener) {
+	if listener == nil || q == nil {
+		return
+	}
+	q.listenersMu.Lock()
+	defer q.listenersMu.Unlock()
+	q.listeners = append(q.listeners, listener)
+}
+
+// UnregisterBatchEventListener removes an observer from this write queue instance.
+func (q *ListingIndexWriteQueue) UnregisterBatchEventListener(listener ListingIndexBatchEventListener) {
+	if listener == nil || q == nil {
+		return
+	}
+	q.listenersMu.Lock()
+	defer q.listenersMu.Unlock()
+	filtered := q.listeners[:0]
+	for _, l := range q.listeners {
+		if l != listener {
+			filtered = append(filtered, l)
+		}
+	}
+	q.listeners = filtered
+}
+
+// getListeners returns a snapshot of registered batch event listeners.
+func (q *ListingIndexWriteQueue) getListeners() []ListingIndexBatchEventListener {
+	if q == nil {
+		return nil
+	}
+	q.listenersMu.RLock()
+	defer q.listenersMu.RUnlock()
+	if len(q.listeners) == 0 {
+		return nil
+	}
+	res := make([]ListingIndexBatchEventListener, len(q.listeners))
+	copy(res, q.listeners)
+	return res
 }
 
 var (

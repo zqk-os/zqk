@@ -68,7 +68,8 @@ func (q *ListingIndexWriteQueue) getOrCreateQueue(kind string, cas *filecas.Cont
 		ctx, cancel := context.WithCancel(pkgctx.NewSystemContext()) //nolint:gosec // G118: cancel stored on indexQueue
 		queueID := fmt.Sprintf(ConstStreamCasIndexQueueStrInt, kind, time.Now().UnixNano())
 		createdQueue = &indexQueue{
-			kind:      kind,
+			parentQueue: q,
+			kind:        kind,
 			queue:     make(chan *indexUpdateRequest, 1000), // Buffered channel for high concurrency
 			cas:       cas,
 			batchSize: casIndexBatchSize,
