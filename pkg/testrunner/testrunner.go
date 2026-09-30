@@ -214,6 +214,9 @@ func ExecuteSubprocess(ctx context.Context, inv CriterionInvocation) CriterionRu
 	// Pass parent env plus test-friendly flags and isolated ephemeral TMPDIR
 	cmd.Env = os.Environ()
 	cmd.Env = append(cmd.Env,
+		"ZQK_JOB_ID=kernel-testrunner",
+		"ZQK_ALLOW_FOREGROUND_GO_TEST=1",
+		"ZQK_TEST_ALLOW_FOREGROUND_GO_TEST=1",
 		zqkenv.AllowForegroundGoTest().Name()+"=1",
 		zqkenv.InTest().Name()+"=1",
 	)
