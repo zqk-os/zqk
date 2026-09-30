@@ -142,20 +142,23 @@ func (f *FileObjectStorage) EnsureCASIndexFromPath(id, kind, filePath string) bo
 	return true
 }
 
-func (f *FileObjectStorage) EnsureCASIndexFromPaths(kind string, idToFilePath map[string]string) error {
-	if !f.usesContentAddressableStorage(kind) {
-		return nil
-	}
-	if len(idToFilePath) == 0 {
-		return nil
-	}
+// getCASAndKindDir returns the CAS instance and kind directory, or an error if missing.
+func (f *FileObjectStorage) getCASAndKindDir(kind string) (*filecas.ContentAddressableStorage, string, error) {
 	cas, err := f.getContentAddressableStorage(kind)
 	if filecas.ContentAddressableStorageOrIndexMissing(err, cas) {
-		return err
+		return nil, "", err
 	}
 	kindDir := f.GetKindDir(kind)
-	if kindDir == "" {
+	return cas, kindDir, nil
+}
+
+func (f *FileObjectStorage) EnsureCASIndexFromPaths(kind string, idToFilePath map[string]string) error {
+	if !f.usesContentAddressableStorage(kind) || len(idToFilePath) == 0 {
 		return nil
+	}
+	cas, kindDir, err := f.getCASAndKindDir(kind)
+	if err != nil || kindDir == "" {
+		return err
 	}
 
 	// Prefer in-memory/disk index when it already matches cache paths so warm does not
@@ -237,21 +240,94 @@ func casHashFileExistsAt(kindDir, filePath, hash string) bool {
 // the mapping for that id is taken from the file with the newer ModTime so the index cannot
 // flip to stale content based on readdir order.
 // If ctx is cancelled (e.g. job timeout), the scan aborts and returns ctx.Err() without updating the index.
-func (f *FileObjectStorage) EnsureCASIndexPopulatedFromScan(ctx context.Context, kind string) error {
-	if !f.usesContentAddressableStorage(kind) {
-		return nil
+// casScanBest tracks winning hash for an ID when multiple CAS files claim the same ID.
+type casScanBest struct {
+	hash      string
+	mtime     int64
+	bucketKey string
+}
+
+func scanCASDirEntries(ctx context.Context, dir, kind, bucketKey string, best map[string]casScanBest) bool {
+	entries, readErr := fileutil.ReadDir(dir)
+	if readErr != nil {
+		return true
 	}
-	// Stream-backed kinds: index is populated from stream registry; do not scan YAML dir.
-	if StreamStorageEnabledForKind(kind) {
-		return nil
+	const abortCheckInterval = 500
+	for i, e := range entries {
+		if ctx.Err() != nil {
+			return false
+		}
+		if e.IsDir() {
+			continue
+		}
+		name := e.Name()
+		stem := strings.TrimSuffix(name, filepath.Ext(name))
+		if !crud.IsHashBasedFilename(stem) {
+			continue
+		}
+		if (i+1)%abortCheckInterval == 0 {
+			process.TouchMeaningfulActivity()
+			if ctx.Err() != nil {
+				return false
+			}
+		}
+		path := filepath.Join(dir, name)
+		id, fileKind := crud.GetObjectIDAndKindFromPath(path, kind)
+		if id == emptyValue || (fileKind != emptyValue && fileKind != kind) {
+			continue
+		}
+		var mtime int64
+		if fi, infoErr := e.Info(); infoErr == nil {
+			mtime = fi.ModTime().UnixNano()
+		} else if fi, statErr := fileutil.Stat(path); statErr == nil {
+			mtime = fi.ModTime().UnixNano()
+		}
+		prev, ok := best[id]
+		better := !ok || mtime > prev.mtime || (mtime == prev.mtime && stem > prev.hash)
+		if !better {
+			continue
+		}
+		best[id] = casScanBest{hash: stem, mtime: mtime, bucketKey: bucketKey}
 	}
-	cas, err := f.getContentAddressableStorage(kind)
-	if filecas.ContentAddressableStorageOrIndexMissing(err, cas) {
+	return true
+}
+
+func (f *FileObjectStorage) scanBucketedCASDirs(ctx context.Context, kind, kindDir string, best map[string]casScanBest) error {
+	entries, err := fileutil.ReadDir(kindDir)
+	if err != nil {
 		return err
 	}
-	kindDir := f.GetKindDir(kind)
-	if kindDir == "" {
+	for _, e := range entries {
+		if ctx.Err() != nil {
+			return ctx.Err()
+		}
+		if !e.IsDir() {
+			continue
+		}
+		subDir := filepath.Join(kindDir, e.Name())
+		if !scanCASDirEntries(ctx, subDir, kind, e.Name(), best) {
+			return ctx.Err()
+		}
+	}
+	return nil
+}
+
+// EnsureCASIndexPopulatedFromScan scans the kind directory for hash-named (CAS) files,
+// reads each file's "id" field, and populates the CAS index via SetMappings. Used when
+// the index is empty so list and get see the same set of objects, and by background refresh
+// when disk and index counts disagree (see CAS_LIST_GET_CONSISTENCY.md).
+//
+// When two hash files contain the same logical id (e.g. old hash not yet removed after an update),
+// the mapping for that id is taken from the file with the newer ModTime so the index cannot
+// flip to stale content based on readdir order.
+// If ctx is cancelled (e.g. job timeout), the scan aborts and returns ctx.Err() without updating the index.
+func (f *FileObjectStorage) EnsureCASIndexPopulatedFromScan(ctx context.Context, kind string) error {
+	if !f.usesContentAddressableStorage(kind) || StreamStorageEnabledForKind(kind) {
 		return nil
+	}
+	cas, kindDir, err := f.getCASAndKindDir(kind)
+	if err != nil || kindDir == "" {
+		return err
 	}
 	if _, err := fileutil.Stat(kindDir); err != nil {
 		if fileutil.IsNotExist(err) {
@@ -260,85 +336,13 @@ func (f *FileObjectStorage) EnsureCASIndexPopulatedFromScan(ctx context.Context,
 		return err
 	}
 
-	// best id -> winning hash for that id when multiple CAS files claim the same id (orphan + new hash).
-	type casScanBest struct {
-		hash      string
-		mtime     int64
-		bucketKey string
-	}
 	best := make(map[string]casScanBest)
-
-	const abortCheckInterval = 500 // check ctx every N files so long scans can abort (e.g. SCH-002 timeout)
-	n := 0
-	scanDir := func(dir string, bucketKey string) bool {
-		entries, readErr := fileutil.ReadDir(dir)
-		if readErr != nil {
-			return true
-		}
-		for _, e := range entries {
-			if ctx.Err() != nil {
-				return false
-			}
-			if e.IsDir() {
-				continue
-			}
-			name := e.Name()
-			stem := strings.TrimSuffix(name, filepath.Ext(name))
-			if !crud.IsHashBasedFilename(stem) {
-				continue
-			}
-			n++
-			if n%abortCheckInterval == 0 {
-				process.TouchMeaningfulActivity()
-				if ctx.Err() != nil {
-					return false
-				}
-			}
-			path := filepath.Join(dir, name)
-			id, fileKind := crud.GetObjectIDAndKindFromPath(path, kind)
-			if id == emptyValue {
-				continue
-			}
-			// For shared dirs (e.g. metrics/), only index files whose kind matches this index.
-			// Otherwise the same file would be added to every kind's index and Count would be N×files.
-			if fileKind != emptyValue && fileKind != kind {
-				continue
-			}
-			var mtime int64
-			if fi, infoErr := e.Info(); infoErr == nil {
-				mtime = fi.ModTime().UnixNano()
-			} else if fi, statErr := fileutil.Stat(path); statErr == nil {
-				mtime = fi.ModTime().UnixNano()
-			}
-			prev, ok := best[id]
-			better := !ok || mtime > prev.mtime || (mtime == prev.mtime && stem > prev.hash)
-			if !better {
-				continue
-			}
-			best[id] = casScanBest{hash: stem, mtime: mtime, bucketKey: bucketKey}
-		}
-		return true
-	}
-
-	if !scanDir(kindDir, "") {
+	if !scanCASDirEntries(ctx, kindDir, kind, "", best) {
 		return ctx.Err()
 	}
 	if f.usesBucketedStorage(kind, kindDir) {
-		entries, err := fileutil.ReadDir(kindDir)
-		if err != nil {
+		if err := f.scanBucketedCASDirs(ctx, kind, kindDir, best); err != nil {
 			return err
-		}
-		for _, e := range entries {
-			if ctx.Err() != nil {
-				return ctx.Err()
-			}
-			if !e.IsDir() {
-				continue
-			}
-			subDir := filepath.Join(kindDir, e.Name())
-			if !scanDir(subDir, e.Name()) {
-				return ctx.Err()
-			}
 		}
 	}
 
