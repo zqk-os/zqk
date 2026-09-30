@@ -32,29 +32,38 @@ var inventedMutationTools = map[string]struct{}{
 	"commit":       {},
 }
 
-var inventedObjectKinds = map[string]struct{}{
+var inventedFileObjectKinds = map[string]struct{}{
 	objects.FieldKeySourceFile: {},
 	"code_file":                {},
 	"file":                     {},
 	objects.FieldKeySource:     {},
 	objects.FieldKeyCode:       {},
-	"eval_finding":             {},
-	"evaluation_finding":       {},
-	"evaluation_report":        {},
-	"eval_report":              {},
-	"evaluation":               {},
-	"finding":                  {},
-	"security_finding":         {},
-	"quality_finding":          {},
-	"architecture_finding":     {},
-	"docs_eval":                {},
-	"test_report":              {},
-	"report":                   {},
-	"deliverable":              {},
-	"document":                 {},
-	"documentation":            {},
-	"metric":                   {},
 }
+
+var inventedObjectKinds = func() map[string]struct{} {
+	kinds := map[string]struct{}{
+		"eval_finding":         {},
+		"evaluation_finding":   {},
+		"evaluation_report":    {},
+		"eval_report":          {},
+		"evaluation":           {},
+		"finding":              {},
+		"security_finding":     {},
+		"quality_finding":      {},
+		"architecture_finding": {},
+		"docs_eval":            {},
+		"test_report":          {},
+		"report":               {},
+		"deliverable":          {},
+		"document":             {},
+		"documentation":        {},
+		"metric":               {},
+	}
+	for k := range inventedFileObjectKinds {
+		kinds[k] = struct{}{}
+	}
+	return kinds
+}()
 
 // guardSwarmToolCall steers invented or lifecycle-illegal calls into guidance
 // so they do not become coordinator ERROR or "tool not found" loops.
@@ -270,7 +279,7 @@ func InventedObjectListKindGuidance() string {
 
 func InventedObjectKindGuidance(kind string) string {
 	p := DefaultToolPrefix()
-	if kind == "source_file" || kind == "code_file" || kind == "file" || kind == "source" || kind == "code" {
+	if _, ok := inventedFileObjectKinds[kind]; ok {
 		return fmt.Sprintf(
 			"GUIDANCE: source files are not kernel object kinds. Use %sread_code / %sread_file on a real repo path. "+
 				"%sobject_list is only for registered kinds (backlog_item, agent_task, …).",
