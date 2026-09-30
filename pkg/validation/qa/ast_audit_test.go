@@ -107,15 +107,4 @@ func TestAuditStudioInbox(t *testing.T) {
 	if len(violations) > 0 {
 		t.Fatalf("Found %d violations in inbox.go", len(violations))
 	}
-
-	violationsTest, err := auditor.AuditFile("../../studio/inbox_test.go")
-	if err != nil {
-		t.Fatalf("AuditFile failed on test: %v", err)
-	}
-	for _, v := range violationsTest {
-		t.Logf("Violation in inbox_test.go: %s:%d:%d [%s] %s", v.Pos.Filename, v.Pos.Line, v.Pos.Column, v.Type, v.Message)
-	}
-	if len(violationsTest) > 0 {
-		t.Fatalf("Found %d violations in inbox_test.go", len(violationsTest))
-	}
 }

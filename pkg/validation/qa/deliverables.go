@@ -78,7 +78,9 @@ func ValidateArtifactFiles(paths []string, projectRoot string) error {
 		if openErr != nil {
 			return fmt.Errorf("artifact file cannot be read: %s", p)
 		}
-		_ = f.Close()
+		if closeErr := f.Close(); closeErr != nil {
+			return fmt.Errorf("failed to close artifact file: %w", closeErr)
+		}
 	}
 	return nil
 }
@@ -96,7 +98,7 @@ func ValidateDeliverableArtifacts(obj map[string]any, projectRoot string) ([]str
 
 	if len(paths) == 0 && IsDeliverableBearingKind(kind) {
 		if id != "" {
-			return nil, fmt.Errorf("missing required deliverable artifacts for %s", id)
+			return nil, fmt.Errorf("%w for %s", ErrMissingDeliverables, id)
 		}
 		return nil, ErrMissingDeliverables
 	}

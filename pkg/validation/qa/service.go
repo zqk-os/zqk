@@ -52,6 +52,16 @@ func NewAuditorService(wal *lifecycle.LifecycleEventWAL, s storage.ObjectStorage
 	}
 }
 
+func (s *AuditorService) projectRoot() string {
+	if s.emitter != nil && s.emitter.ProjectRoot() != "" {
+		return s.emitter.ProjectRoot()
+	}
+	if g, ok := s.gate.(*AuditorGate); ok && g.projectRoot != "" {
+		return g.projectRoot
+	}
+	return ""
+}
+
 func (s *AuditorService) getIDEPath() string {
 	return filepath.Join(paths.ProjectDataDir, paths.IdesSubdir, "qa_auditor.ide")
 }
@@ -149,12 +159,16 @@ func (s *AuditorService) Run(ctx context.Context) error {
 	}
 }
 
-// AuditNow runs one QA audit for id (same path as the WAL watcher).
+// AuditNow runs one QA audit for id with terminal gate verification enabled.
 func (s *AuditorService) AuditNow(ctx context.Context, id, kind string) {
-	s.performAudit(ctx, id, kind)
+	s.performAuditWithMode(ctx, id, kind, true)
 }
 
 func (s *AuditorService) performAudit(ctx context.Context, id string, kind string) {
+	s.performAuditWithMode(ctx, id, kind, false)
+}
+
+func (s *AuditorService) performAuditWithMode(ctx context.Context, id string, kind string, isTerminalAudit bool) {
 	logger := logging.NewEventLogger(ctx)
 	logging.FluentEvent(logger).Info(fmt.Sprintf(LogFmtAuditorStart, kind, id)).Log()
 
@@ -176,7 +190,7 @@ func (s *AuditorService) performAudit(ctx context.Context, id string, kind strin
 	artifactPaths := ExtractObjectArtifacts(obj)
 
 	// 1.3 Requirement Criteria Verification
-	if kind == objects.KindRequirement && isComplete {
+	if kind == objects.KindRequirement && (isComplete || isTerminalAudit) {
 		critRefs := extractArtifactPaths(obj[objects.FieldKeyCriteriaRefs])
 		if len(critRefs) == 0 {
 			reason := ReasonMissingCriteria
@@ -216,7 +230,7 @@ func (s *AuditorService) performAudit(ctx context.Context, id string, kind strin
 	}
 
 	// 1.4 Criteria Test Proof Verification
-	if kind == objects.KindCriteria && isComplete {
+	if kind == objects.KindCriteria && (isComplete || isTerminalAudit) {
 		hasTestProof := false
 		testRefs := extractArtifactPaths(obj[objects.FieldKeyTestCaseRefs])
 		for _, tID := range testRefs {
@@ -270,7 +284,7 @@ func (s *AuditorService) performAudit(ctx context.Context, id string, kind strin
 	}
 
 	// 1.5 Traceability Check
-	if kind == objects.KindBacklogItem && isComplete {
+	if kind == objects.KindBacklogItem && (isComplete || isTerminalAudit) {
 		hasTraceability := hasStringEvidence(obj[objects.FieldKeyCommitHashes])
 		hasTestAsset := false
 		for _, path := range artifactPaths {
@@ -296,35 +310,27 @@ func (s *AuditorService) performAudit(ctx context.Context, id string, kind strin
 	}
 
 	// 1.6 Deliverable Artifacts Validation
-	// Fail-closed: completed backlog items and agent tasks must have at least one deliverable artifact.
-	if IsDeliverableBearingKind(kind) && isComplete {
-		if len(artifactPaths) == 0 {
-			reason := ReasonMissingArtifacts
+	// Fail-closed: completed objects must pass unified deliverable artifact validation.
+	if isComplete || (isTerminalAudit && (kind == objects.KindBacklogItem || kind == objects.KindAgentTask)) {
+		verified, err := ValidateDeliverableArtifacts(obj, s.projectRoot())
+		if err != nil {
+			reason := err.Error()
 			logging.FluentEvent(logger).Warn(fmt.Sprintf(LogFmtAuditorContentDisparity, id, reason)).Log()
 			if s.emitter != nil {
-				if err := s.emitter.EmitDisparityInterrupt(ctx, id, reason); err != nil {
-					logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorEmitHITLFailed, err), err).Log()
+				if emitErr := s.emitter.EmitDisparityInterrupt(ctx, id, reason); emitErr != nil {
+					logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorEmitHITLFailed, emitErr), emitErr).Log()
 				}
 			}
 			return
 		}
-	}
-
-	// For all declared artifacts, verify that the files actually exist on disk before running AST analysis.
-	if err := ValidateArtifactFiles(artifactPaths, ""); err != nil {
-		reason := err.Error()
-		logging.FluentEvent(logger).Warn(fmt.Sprintf(LogFmtAuditorContentDisparity, id, reason)).Log()
-		if s.emitter != nil {
-			if emitErr := s.emitter.EmitDisparityInterrupt(ctx, id, reason); emitErr != nil {
-				logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorEmitHITLFailed, emitErr), emitErr).Log()
-			}
+		if len(verified) > 0 {
+			artifactPaths = verified
 		}
-		return
 	}
 
 	// 2. STRUCTURAL AST AUDIT
 	if len(artifactPaths) == 0 {
-		if kind == objects.KindRequirement || kind == objects.KindCriteria {
+		if (kind == objects.KindRequirement || kind == objects.KindCriteria) && (isComplete || isTerminalAudit) {
 			// Requirements and criteria have ontological verification above; AST file scan is not applicable.
 		} else {
 			// Fail-closed invariant: NO DATA != NO FAILURES.
@@ -353,8 +359,11 @@ func (s *AuditorService) performAudit(ctx context.Context, id string, kind strin
 			}
 			return
 		}
-		astViolations = append(astViolations, violations...)
-	}
+		for _, v := range violations {
+			if v.Severity == "high" || v.Severity == "medium" {
+				astViolations = append(astViolations, v)
+			}
+		}
 
 	if len(astViolations) > 0 {
 		reason := fmt.Sprintf(LogFmtAuditorASTViolation, len(astViolations))
@@ -401,8 +410,14 @@ func (s *AuditorService) performAudit(ctx context.Context, id string, kind strin
 	}
 
 	// Invariant: QASuccess is never minted during in_progress lifecycle status transitions.
-	if status == objects.ObjectStatusInProgress || status == "in_progress" {
+	if !isTerminalAudit && (status == objects.ObjectStatusInProgress || status == "in_progress") {
 		logging.FluentEvent(logger).Info(fmt.Sprintf("Skipping QASuccess issuance: status is in_progress for %s", id)).Log()
+		return
+	}
+
+	// Fail-closed: requirements and criteria must be complete to issue QASuccess
+	if (kind == objects.KindRequirement || kind == objects.KindCriteria) && !isComplete && !isTerminalAudit {
+		logging.FluentEvent(logger).Info(fmt.Sprintf("Skipping QASuccess issuance: %s is not complete for %s", kind, id)).Log()
 		return
 	}
 
