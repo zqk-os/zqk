@@ -14,6 +14,9 @@ import (
 // CRIT-9042: Coordination kernel test coverage.
 // Evidence: scheduler pre-flight honors persisted policy default_action=skip when no execution state exists yet.
 func TestCRIT9042_SchedulerIntegration_PolicyDefaultActionSkip(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping integration test in short mode")
+	}
 	t.Parallel()
 
 	sched, testRoot, cleanup := setupTestScheduler(t)

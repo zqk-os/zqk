@@ -18,7 +18,6 @@ import (
 
 func (r *ReverseReferenceIndex) LoadCache(projectRoot string) (bool, error) {
 	cachePath := r.getCacheFilePath(projectRoot)
-	r.cacheDir = filepath.Dir(cachePath)
 
 	data, err := fileutil.ReadFile(cachePath)
 	if fileutil.IsNotExist(err) {
@@ -82,6 +81,7 @@ func (r *ReverseReferenceIndex) LoadCache(projectRoot string) (bool, error) {
 				}
 			}
 			r.metadata = cacheData.Metadata
+			r.cacheDir = filepath.Dir(cachePath)
 			r.isReady.Store(true)
 			entryCount = len(r.index)
 			return nil

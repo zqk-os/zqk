@@ -113,6 +113,14 @@ func TestSyncLoop_MaxVerificationAttempts(t *testing.T) {
 						return err
 					}
 					copyDir(t, srcSpecs, dstSpecs)
+					workSpecs := filepath.Join(repoRoot, "packs", "work", "specs")
+					if entries, err := fileutil.ReadDir(workSpecs); err == nil && len(entries) > 0 {
+						copyDir(t, workSpecs, dstSpecs)
+					}
+					agentSpecs := filepath.Join(repoRoot, "packs", "agent", "specs")
+					if entries, err := fileutil.ReadDir(agentSpecs); err == nil && len(entries) > 0 {
+						copyDir(t, agentSpecs, dstSpecs)
+					}
 
 					srcConfigs := filepath.Join(repoRoot, paths.ProcessInternalConfigsDir)
 					dstConfigs := filepath.Join(root, paths.ProcessInternalConfigsDir)
@@ -126,6 +134,15 @@ func TestSyncLoop_MaxVerificationAttempts(t *testing.T) {
 					// Argument order is (testRoot, projectRoot) — destination first.
 					if err := testenvroot.CopyLifecyclesFromProject(root, repoRoot); err != nil {
 						return err
+					}
+					dstLifecycles := filepath.Join(root, paths.ProcessInternalLifecyclesDir)
+					workLifecycles := filepath.Join(repoRoot, "packs", "work", "lifecycles")
+					if entries, err := fileutil.ReadDir(workLifecycles); err == nil && len(entries) > 0 {
+						copyDir(t, workLifecycles, dstLifecycles)
+					}
+					agentLifecycles := filepath.Join(repoRoot, "packs", "agent", "lifecycles")
+					if entries, err := fileutil.ReadDir(agentLifecycles); err == nil && len(entries) > 0 {
+						copyDir(t, agentLifecycles, dstLifecycles)
 					}
 					return nil
 				},

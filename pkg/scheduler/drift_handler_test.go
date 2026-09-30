@@ -66,14 +66,11 @@ func TestDriftEventHandler(t *testing.T) {
 		t.Fatalf("Failed to publish event: %v", err)
 	}
 
-	// Wait for the handler to process the event
-	time.Sleep(500 * time.Millisecond)
-
-	// Check if the job context was canceled
+	// Wait deterministically for the handler to process the event
 	select {
 	case <-jobCtx.Done():
-		// Success, job was canceled
-	default:
-		t.Fatal("Job context was not canceled after drift event")
+		// Success, job was canceled deterministically
+	case <-time.After(2 * time.Second):
+		t.Fatal("Job context was not canceled after drift event within timeout")
 	}
 }

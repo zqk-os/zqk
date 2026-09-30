@@ -15,6 +15,7 @@ import (
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/ambient"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/daemon/singleton"
 	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objectidcache"
@@ -38,6 +39,9 @@ func ambientLogFilePath(projectRoot string) string {
 }
 
 func readAmbientPID(projectRoot string) (int, bool) {
+	if running, pid, err := singleton.IsDaemonRunning(projectRoot, "ambient"); err == nil && running {
+		return pid, true
+	}
 	pidPath := ambientPIDFilePath(projectRoot)
 	data, err := fileutil.ReadFile(pidPath)
 	if err != nil {
@@ -77,6 +81,15 @@ func runAmbientDaemon(cmd *cobra.Command, args []string) error {
 	if projectRoot == "" {
 		return fmt.Errorf("project root not found")
 	}
+
+	// Enforce single instance of ambient daemon per project root
+	daemonLock, err := singleton.AcquireDaemonLock(projectRoot, "ambient")
+	if err != nil {
+		return err
+	}
+	defer func() {
+		_ = daemonLock.Release()
+	}()
 
 	pidPath := ambientPIDFilePath(projectRoot)
 	if err := fileutil.EnsureDir(filepath.Dir(pidPath)); err != nil {

@@ -1,6 +1,7 @@
 package paths
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -78,13 +79,15 @@ func ResolveProjectRoot(startPath string) string {
 	return root
 }
 
-// FindWorkspaceRoot returns the nearest directory (walking up from startPath) that contains .zqk.
+// FindWorkspaceRoot returns the topmost canonical directory (walking up from startPath) that contains .zqk.
 // If none is found and startPath is in a linked git worktree, it returns the main repository root.
+// Invariant: project roots must not be nested, so topmost workspace root always takes precedence.
 func FindWorkspaceRoot(startPath string) string {
 	dir, err := filepath.Abs(startPath)
 	if err != nil {
 		dir = startPath
 	}
+	var topmost string
 	for {
 		gitEntry := filepath.Join(dir, GitWorktreeMetadataEntry)
 		if st, err := fileutil.Stat(gitEntry); err == nil {
@@ -96,7 +99,7 @@ func FindWorkspaceRoot(startPath string) string {
 		}
 		if _, err := fileutil.Stat(filepath.Join(dir, ProjectDataDir)); err == nil {
 			if !isIgnoredNestedProjectRoot(dir) {
-				return dir
+				topmost = dir
 			}
 		}
 		if _, err := fileutil.Stat(gitEntry); err == nil {
@@ -107,6 +110,9 @@ func FindWorkspaceRoot(startPath string) string {
 			break
 		}
 		dir = parent
+	}
+	if topmost != "" {
+		return topmost
 	}
 	return emptyValue
 }
@@ -150,6 +156,16 @@ func IsValidProjectRoot(dir string) bool {
 
 func isIgnoredNestedProjectRoot(dir string) bool {
 	d := filepath.Clean(dir)
+	if d == "/" || d == "." || d == "/tmp" || d == "/var/tmp" || d == "/private/tmp" || d == "/private/var/tmp" {
+		return true
+	}
+	// System temporary directory ancestors can never be valid project roots
+	tempDir := filepath.Clean(os.TempDir())
+	for p := tempDir; p != "/" && p != "." && p != filepath.Dir(p); p = filepath.Dir(p) {
+		if d == p {
+			return true
+		}
+	}
 	slash := filepath.ToSlash(d)
 	for _, part := range strings.Split(slash, "/") {
 		if part == "testdata" || strings.HasPrefix(part, ".tmp") {
@@ -196,10 +212,14 @@ func FindNearestProjectRoot(startPath string) string {
 		}
 		dir = parent
 	}
+	var topmostCandidate string
 	for _, c := range candidates {
 		if !isIgnoredNestedProjectRoot(c) {
-			return c
+			topmostCandidate = c
 		}
+	}
+	if topmostCandidate != "" {
+		return topmostCandidate
 	}
 	if wtRoot := FindWorktreeProjectRoot(startPath); wtRoot != "" {
 		return wtRoot

@@ -18,6 +18,9 @@ import (
 // TestCapOrchestrator_Integration verifies the cap_orchestrator job lifecycle
 // inside a full scheduler instance. It addresses core-backlog.
 func TestCapOrchestrator_Integration(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping integration test in short mode")
+	}
 
 	sched, testRoot, cleanup := setupTestScheduler(t)
 	defer cleanup()
