@@ -378,6 +378,7 @@ func checkDocEntryFileReachable(obj map[string]any) bool {
 	if strings.TrimSpace(path) == "" {
 		return false
 	}
+	path = strings.TrimPrefix(strings.TrimSpace(path), "prefix:")
 	if strings.HasSuffix(os.Args[0], ".test") || config.TestingSkipValidation().OrDefault(false) {
 		return true
 	}

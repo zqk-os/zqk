@@ -9,11 +9,9 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 type memoryMockStorage struct {
-	storage.ObjectStorageProvider
 	objs      map[string]map[string]any
 	readErr   error
 	createErr error
@@ -59,17 +57,17 @@ func (m *memoryMockStorage) Update(ctx context.Context, secCtx *pkgctx.SecurityC
 	return nil
 }
 
-func (m *memoryMockStorage) List(ctx context.Context, secCtx *pkgctx.SecurityContext, storageCtx *pkgctx.StorageContext, filter storage.ListFilter) (*storage.QueryResult, error) {
+func (m *memoryMockStorage) ListByKind(ctx context.Context, secCtx *pkgctx.SecurityContext, kind string) ([]map[string]any, error) {
 	if m.listErr != nil {
 		return nil, m.listErr
 	}
 	var res []map[string]any
 	for _, obj := range m.objs {
-		if filter.Kind == "" || obj[objects.FieldKeyKind] == filter.Kind {
+		if kind == "" || obj[objects.FieldKeyKind] == kind {
 			res = append(res, obj)
 		}
 	}
-	return &storage.QueryResult{Objects: res}, nil
+	return res, nil
 }
 
 func TestImpactAnalyzer_AnalyzeChange(t *testing.T) {
@@ -233,7 +231,7 @@ func TestReferenceTraversal_HelperFunctions(t *testing.T) {
 
 	t.Run("findObjectsReferencingOrgObjects empty list", func(t *testing.T) {
 		m := newMemoryMockStorage()
-		res, err := findObjectsReferencingOrgObjects(context.Background(), m, objects.KindGoal, nil, nil, nil)
+		res, err := findObjectsReferencingOrgObjects(context.Background(), m, objects.KindGoal, nil, nil)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -245,7 +243,7 @@ func TestReferenceTraversal_HelperFunctions(t *testing.T) {
 	t.Run("findObjectsReferencingOrgObjects list error", func(t *testing.T) {
 		m := newMemoryMockStorage()
 		m.listErr = errors.New("list failed")
-		_, err := findObjectsReferencingOrgObjects(context.Background(), m, objects.KindGoal, []string{"DIV-1"}, nil, nil)
+		_, err := findObjectsReferencingOrgObjects(context.Background(), m, objects.KindGoal, []string{"DIV-1"}, nil)
 		if err == nil {
 			t.Fatal("expected error, got nil")
 		}

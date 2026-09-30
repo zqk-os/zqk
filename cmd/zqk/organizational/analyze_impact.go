@@ -11,6 +11,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 const emptyValue = ""
@@ -31,7 +32,7 @@ func runAnalyzeImpact(cmd *cobra.Command, args []string) error {
 
 		secCtx := proc.SecurityContext()
 		domainLogger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-		analyzer := orgdomain.NewImpactAnalyzer(proc.Storage(), domainLogger, secCtx)
+		analyzer := orgdomain.NewImpactAnalyzer(storage.NewOrganizationalStorageAdapter(proc.Storage()), domainLogger, secCtx)
 
 		impactAnalysisID, err := analyzer.AnalyzeChange(proc.OperationContext(), changeID)
 		if err != nil {

@@ -10,7 +10,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	instancebuilders "github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
-	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
@@ -18,15 +17,15 @@ const emptyValue = ""
 
 // ImpactAnalyzer analyzes organizational changes and their impact on ZQK objects
 type ImpactAnalyzer struct {
-	storage storage.ObjectStorageProvider
+	storage Repository
 	logger  logging.Logger
 	secCtx  *pkgctx.SecurityContext
 }
 
 // NewImpactAnalyzer creates a new impact analyzer
-func NewImpactAnalyzer(storage storage.ObjectStorageProvider, logger logging.Logger, secCtx *pkgctx.SecurityContext) *ImpactAnalyzer {
+func NewImpactAnalyzer(repo Repository, logger logging.Logger, secCtx *pkgctx.SecurityContext) *ImpactAnalyzer {
 	return &ImpactAnalyzer{
-		storage: storage,
+		storage: repo,
 		logger:  logger,
 		secCtx:  secCtx,
 	}
