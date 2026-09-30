@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/utils/syscallutil"
 )
 
 const (
@@ -140,6 +141,10 @@ func SweepAt(root string, threshold time.Duration, referenceNow time.Time) (Repo
 		}
 
 		if isStale(fileInfo.ModTime(), referenceNow, threshold) {
+			if isFlockHeld(fullPath) {
+				stats.PreservedActive++
+				continue
+			}
 			removeErr := fileutil.Remove(fullPath)
 			if removeErr == nil || fileutil.IsNotExist(removeErr) {
 				stats.RemovedStale++
@@ -151,6 +156,30 @@ func SweepAt(root string, threshold time.Duration, referenceNow time.Time) (Repo
 
 	stats.SweepDuration = time.Since(start)
 	return Report{Root: root, Stats: stats}, nil
+}
+
+// isFlockHeld probes whether an advisory flock is actively held by a live process.
+// If the lock is held, unlinking the file path is forbidden because detaching
+// the inode under a live holder breaks cross-process mutual exclusion.
+func isFlockHeld(path string) bool {
+	if runtime.GOOS == "windows" {
+		return false
+	}
+	f, err := fileutil.OpenFile(path, fileutil.O_RDWR, 0)
+	if err != nil {
+		f, err = fileutil.OpenFile(path, fileutil.O_RDONLY, 0)
+		if err != nil {
+			return false
+		}
+	}
+	defer f.Close()
+
+	if err := syscallutil.FileFlock(f, syscall.LOCK_EX|syscall.LOCK_NB); err != nil {
+		// Could not acquire exclusive non-blocking lock: another process holds it.
+		return true
+	}
+	_ = syscallutil.FileFlock(f, syscall.LOCK_UN)
+	return false
 }
 
 // isStale reports whether a lock file's modification time is older than

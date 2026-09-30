@@ -760,6 +760,7 @@
 ./scripts/default_policies/plane_isolation_policy.yaml
 ./scripts/default_policies/policy_coverage_meta_policy.yaml
 ./scripts/default_policies/pr_only_development_policy.yaml
+./scripts/default_policies/requirement_documentation_policy.yaml
 ./scripts/default_policies/resource_hygiene_policy.yaml
 ./scripts/default_policies/start_here_tutorial_policy.yaml
 ./scripts/default_policies/tdd_verification_policy.yaml

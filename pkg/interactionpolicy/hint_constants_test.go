@@ -13,6 +13,7 @@ const (
 	testNameOrchSuffix    = "orch_suffix"
 	testNameObjPrefix     = "object_prefix"
 	testNameObjSuffix     = "object_suffix"
+	testNameSwarmInit     = "swarm_init"
 
 	msgNotEmpty  = "hint constant %q must not be empty"
 	msgDuplicate = "hint constants %q and %q both = %q (must be distinct)"
@@ -35,6 +36,7 @@ func TestHintConstants_NonEmptyDistinct(t *testing.T) {
 		{testNameOrchSuffix, HintOrchestrateSuffix},
 		{testNameObjPrefix, HintObjectGetPrefix},
 		{testNameObjSuffix, HintObjectGetSuffix},
+		{testNameSwarmInit, HintSwarmInitText},
 	}
 	seen := map[string]string{}
 	for _, e := range entries {

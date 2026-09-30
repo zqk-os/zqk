@@ -2,11 +2,16 @@ package lockhealth
 
 import (
 	"errors"
-	"github.com/zqk-os/zqk/pkg/paths"
 	"os"
 	"path/filepath"
+	"runtime"
+	"syscall"
 	"testing"
 	"time"
+
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/utils/syscallutil"
 )
 
 // referenceNow is the pinned reference clock for deterministic age checks.
@@ -201,3 +206,53 @@ func TestSweep_RepeatedSweepIsIdempotent(t *testing.T) {
 			r2.Stats.RemovedStale, r2.Stats.ScannedFiles)
 	}
 }
+
+func TestSweep_PreservesHeldFlockEvenIfStale(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("flock probing not supported on windows")
+	}
+
+	dir := t.TempDir()
+	staleLock := writeLockFile(t, dir, "held_job.lock", referenceNow.Add(-2*time.Hour))
+
+	// Acquire advisory flock on the stale lock file
+	f, err := fileutil.OpenFile(staleLock, fileutil.O_RDWR, 0)
+	if err != nil {
+		t.Fatalf("open lock file: %v", err)
+	}
+	defer f.Close()
+
+	if err := syscallutil.FileFlock(f, syscall.LOCK_EX); err != nil {
+		t.Fatalf("acquire flock: %v", err)
+	}
+
+	// First sweep: modTime is stale, but lock is actively held. MUST NOT be removed!
+	rep1, err := SweepAt(dir, 30*time.Second, referenceNow)
+	if err != nil {
+		t.Fatalf("SweepAt: %v", err)
+	}
+	if rep1.Stats.RemovedStale != 0 {
+		t.Fatalf("expected 0 removed while flock is held, got %d", rep1.Stats.RemovedStale)
+	}
+	if rep1.Stats.PreservedActive != 1 {
+		t.Fatalf("expected 1 preserved active, got %d", rep1.Stats.PreservedActive)
+	}
+	mustExist(t, staleLock)
+
+	// Release flock
+	if err := syscallutil.FileFlock(f, syscall.LOCK_UN); err != nil {
+		t.Fatalf("release flock: %v", err)
+	}
+	_ = f.Close()
+
+	// Second sweep: flock is released. Now stale lock should be swept!
+	rep2, err := SweepAt(dir, 30*time.Second, referenceNow)
+	if err != nil {
+		t.Fatalf("SweepAt: %v", err)
+	}
+	if rep2.Stats.RemovedStale != 1 {
+		t.Fatalf("expected 1 removed after flock released, got %d", rep2.Stats.RemovedStale)
+	}
+	mustNotExist(t, staleLock)
+}
+

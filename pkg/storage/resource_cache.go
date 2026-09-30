@@ -67,7 +67,8 @@ func (rc *ResourceCache[T]) GetOrCreate(ctx context.Context, key string, initFun
 		return cached.resource, nil
 	}
 
-	// Initialization failed - return error
+	// Initialization failed - evict poisoned entry so future attempts can retry
+	rc.cache.Delete(key)
 	return zero, cached.initErr
 }
 

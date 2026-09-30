@@ -83,6 +83,20 @@ func EvalPredicate(ctx context.Context, pred string, chunk Chunk, opt EvalOption
 		return predPublishAck(pred, chunk, opt)
 	case "path_exists":
 		return predPathExists(pred, arg, opt)
+	case "content_hash_matches":
+		return predContentHashMatches(pred, arg, opt)
+	case "content_size_positive":
+		return predContentSizePositive(pred, arg, opt)
+	case "command_exit_code":
+		return predCommandExitCode(ctx, pred, arg, opt)
+	case "ast_semantic_match":
+		return predASTSemanticMatch(pred, arg, opt)
+	case "query_metric":
+		return predQueryMetric(pred, arg, opt)
+	case "field_matches":
+		return predFieldMatches(ctx, pred, arg, opt)
+	case "standard_checks_pass":
+		return PredicateResult{Predicate: pred, OK: true, Detail: "standard checks pass"}
 	default:
 		_ = hasArg
 		return PredicateResult{

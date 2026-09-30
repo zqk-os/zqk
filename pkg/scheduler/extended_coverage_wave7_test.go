@@ -92,7 +92,7 @@ func TestExtended_AuditAggregationSession_Execution(t *testing.T) {
 			objects.FieldKeyID:            "AUDIT-ev-" + string(rune('a'+i)),
 			objects.FieldKeyKind:          objects.KindAuditEvent,
 			objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
-			objects.FieldKeyStatus:        "recorded",
+			objects.FieldKeyStatus:        objects.ObjectStatusCompleted,
 			objects.FieldKeyCreatedAt:     time.Now().Add(-time.Duration(i+1) * time.Hour).Format(time.RFC3339),
 			"event_type":                  "scheduler_job_completed",
 			"target_kind":                 objects.KindSchedulerJob,

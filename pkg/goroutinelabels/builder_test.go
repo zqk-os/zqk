@@ -132,6 +132,54 @@ func TestGoroutineBuilder_StartWithPanicRecovery(t *testing.T) {
 	mu.Unlock()
 }
 
+func TestGoroutineBuilder_DefaultPanicHandlerAndMetric(t *testing.T) {
+	var (
+		mu              sync.Mutex
+		capturedName    string
+		capturedPurpose string
+		capturedVal     any
+		capturedStack   []byte
+	)
+
+	initialPanics := GetUnhandledPanicsTotal()
+	SetDefaultPanicHandler(func(name, purpose string, r any, stack []byte) {
+		mu.Lock()
+		defer mu.Unlock()
+		capturedName = name
+		capturedPurpose = purpose
+		capturedVal = r
+		capturedStack = stack
+	})
+	defer SetDefaultPanicHandler(nil)
+
+	var wg sync.WaitGroup
+	builder := NewGoroutine("worker_fault_test", "simulating unhandled panic")
+	builder.WithWaitGroup(&wg)
+	builder.StartSimple(func() {
+		panic("unhandled worker panic")
+	})
+
+	wg.Wait()
+
+	mu.Lock()
+	defer mu.Unlock()
+	if capturedName != "worker_fault_test" {
+		t.Fatalf("expected name worker_fault_test, got %s", capturedName)
+	}
+	if capturedPurpose != "simulating unhandled panic" {
+		t.Fatalf("expected purpose simulating unhandled panic, got %s", capturedPurpose)
+	}
+	if capturedVal != "unhandled worker panic" {
+		t.Fatalf("expected panic value 'unhandled worker panic', got %v", capturedVal)
+	}
+	if len(capturedStack) == 0 {
+		t.Fatalf("expected captured stack trace, got empty")
+	}
+	if GetUnhandledPanicsTotal() <= initialPanics {
+		t.Fatalf("expected panic metric to increment, got %d <= %d", GetUnhandledPanicsTotal(), initialPanics)
+	}
+}
+
 func TestGoroutineBuilder_StartWithCleanup(t *testing.T) {
 	t.Parallel()
 	var cleanupExecuted bool

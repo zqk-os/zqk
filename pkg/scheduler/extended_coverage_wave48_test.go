@@ -106,7 +106,7 @@ func TestExtended_HighVolumeFastPathRetention_Wave48(t *testing.T) {
 			objects.FieldKeyID:            filepath.Join("AUD-hv-", time.Now().Format("150405000000"), string(rune('a'+i))),
 			objects.FieldKeyKind:          objects.KindAuditEvent,
 			objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
-			objects.FieldKeyStatus:        objects.ObjectStatusActive,
+			objects.FieldKeyStatus:        objects.ObjectStatusCompleted,
 			objects.FieldKeyCreatedAt:     time.Now().Add(-10 * time.Hour).Format(time.RFC3339),
 		}
 		_ = sp.Create(ctx, secCtx, ev)

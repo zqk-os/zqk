@@ -401,10 +401,25 @@ func (s *DashboardState) ValidateTPMDefinitionOfDone(out, errOut ioWriter) error
 		if tc == nil || tc.Status == objects.ObjectStatusArchived || tc.Status == objects.ObjectStatusConceptual || tc.Status == objects.ObjectStatusDraft || sc.IsPreliminary(objects.KindTestCase, tc.Status) {
 			continue
 		}
-		checkedCount++
 		if tc.Lineage != nil && tc.Lineage.IsIntact {
+			checkedCount++
 			intactCount++
 		} else {
+			// If test case appears broken in lite-file projection, verify if it actually exists in storage.
+			// Orphaned test cases deleted from storage or ghost events must not fail the active DoD gate.
+			if s.projectRoot != "" {
+				ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+				if factory, err := storage.NewStorageFactory(ctx, s.projectRoot); err == nil && factory != nil {
+					sp := factory.GetStorage()
+					secCtx := pkgctx.NewSystemSecurityContext()
+					if obj, err := sp.Read(ctx, secCtx, tc.ID); err != nil || obj == nil {
+						cancel()
+						continue
+					}
+				}
+				cancel()
+			}
+			checkedCount++
 			reason := "incomplete lineage"
 			if tc.Lineage != nil && tc.Lineage.BrokenReason != "" {
 				reason = tc.Lineage.BrokenReason
@@ -1062,11 +1077,7 @@ func (s *DashboardState) handleReferenceLinkedLocked(ev *lifecycle.LifecycleEven
 		if !ok {
 			tc = s.hydrateTestCaseFromStorageLocked(tcID)
 			if tc == nil {
-				tc = &TestCaseModel{
-					ID:       tcID,
-					Status:   objects.ObjectStatusActive,
-					Criteria: make([]*CriterionState, 0),
-				}
+				return
 			}
 			s.TestCases[tcID] = tc
 		} else if tc.Title == "" || tc.Lineage == nil {
@@ -1109,11 +1120,7 @@ func (s *DashboardState) handleReferenceLinkedLocked(ev *lifecycle.LifecycleEven
 		if !ok {
 			tc = s.hydrateTestCaseFromStorageLocked(tcID)
 			if tc == nil {
-				tc = &TestCaseModel{
-					ID:       tcID,
-					Status:   objects.ObjectStatusActive,
-					Criteria: make([]*CriterionState, 0),
-				}
+				return
 			}
 			s.TestCases[tcID] = tc
 		} else if tc.Title == "" || tc.Lineage == nil {
@@ -1138,11 +1145,7 @@ func (s *DashboardState) handleReferenceLinkedLocked(ev *lifecycle.LifecycleEven
 		if !ok {
 			tc = s.hydrateTestCaseFromStorageLocked(tcID)
 			if tc == nil {
-				tc = &TestCaseModel{
-					ID:       tcID,
-					Status:   objects.ObjectStatusActive,
-					Criteria: make([]*CriterionState, 0),
-				}
+				return
 			}
 			s.TestCases[tcID] = tc
 		} else if tc.Title == "" || tc.Lineage == nil {

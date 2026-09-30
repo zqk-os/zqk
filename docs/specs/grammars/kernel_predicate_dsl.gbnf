@@ -1,0 +1,66 @@
+# ==============================================================================
+# ZQK Kernel Predicate DSL Grammar for llama.cpp / Local LLM Constrained Decoding (GBNF)
+# Defines the canonical grammar for deterministic generation of kernel predicates:
+# VDS done-gates, lifecycle preconditions, criteria completeness validation.
+# ==============================================================================
+
+root ::= predicate_expression
+
+predicate_expression ::= predicate ( delimiter predicate )*
+
+delimiter ::= ( ";" | "," ) " "?
+
+predicate ::= object_predicate
+            | path_predicate
+            | metric_predicate
+            | execution_predicate
+            | ast_predicate
+            | gate_predicate
+
+# --- 1. Object & Field Predicates ---
+object_predicate ::= "object_exists:" object_identifier
+                   | "field_nonempty:" ( object_identifier ":" )? field_name
+                   | "field_matches:" field_name ":" regex_pattern
+
+# --- 2. Filesystem & Artifact Predicates ---
+path_predicate ::= "path_exists:" relative_path
+                 | "content_hash_matches:" relative_path
+                 | "content_size_positive:" field_name
+
+# --- 3. Metric Predicates ---
+metric_predicate ::= "query_metric:" metric_name comparison_operator number_literal
+
+# --- 4. Execution & Exit Code Predicates ---
+execution_predicate ::= "command_exit_code:" shell_command
+
+# --- 5. AST & Semantic Code Predicates ---
+ast_predicate ::= "ast_semantic_match:" package_or_file_path ":" symbol_constraint
+
+symbol_constraint ::= "symbol_present:" symbol_name
+                    | "symbol_absent:" symbol_name
+                    | "type_implements:" symbol_name
+                    | "no_raw_panics"
+
+# --- 6. Standalone Gate Predicates ---
+gate_predicate ::= "tests_ok_per_customization"
+                 | "lint_ok_per_customization"
+                 | "criteria_linked_or_acceptance_present"
+                 | "git_diff_nonempty_or_waiver"
+                 | "ci_required_checks_green_or_na"
+                 | "security_gate_ok_or_na"
+                 | "performance_gate_ok_or_na"
+                 | "publish_ack_present_if_public"
+                 | "standard_checks_pass"
+                 | "title_body_cohesion" ( ":" [0-9]+ )?
+
+# --- Lexical Tokens ---
+object_identifier ::= [A-Z] [A-Za-z0-9_-]*
+field_name ::= [a-z] [a-z0-9_]*
+metric_name ::= [a-z] [a-z0-9_]*
+symbol_name ::= [A-Za-z_] [A-Za-z0-9_]*
+relative_path ::= [A-Za-z0-9_./-]+
+package_or_file_path ::= [A-Za-z0-9_./-]+
+regex_pattern ::= [^:\r\n]+
+shell_command ::= [^;\r\n]+
+comparison_operator ::= "==" | "!=" | "<=" | "<" | ">=" | ">"
+number_literal ::= "-"? [0-9]+ ("." [0-9]+)?

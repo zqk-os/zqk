@@ -11,6 +11,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/concurrency"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/migration/scanner"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -117,12 +118,14 @@ func (r *ReverseReferenceIndex) ReferencedIDCount() int {
 	return count
 }
 
-func (r *ReverseReferenceIndex) GetDependents(referencedID string) []string {
+// GetDependentsWithError retrieves all dependent object IDs with fail-closed error propagation
+// if the read lock times out or cannot be acquired.
+func (r *ReverseReferenceIndex) GetDependentsWithError(referencedID string) ([]string, error) {
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	var dependents []string
 	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
 	defer cancel()
-	var err_swallow_120 = concurrency.WithRLockTimeout(
+	err := concurrency.WithRLockTimeout(
 		&r.mu,
 		ctx,
 		nil,
@@ -134,20 +137,25 @@ func (r *ReverseReferenceIndex) GetDependents(referencedID string) []string {
 			}
 			deps, exists := r.index[referencedID]
 			if exists {
-
 				dependents = make([]string, len(deps))
 				copy(dependents, deps)
 			}
 			return nil
 		},
 	)
-	if err_swallow_120 != nil {
-		logging.
-
-			// AddReference adds a reference relationship (objectID references referencedID)
-			LogSwallowedError(err_swallow_120)
+	if err != nil {
+		return nil, errfmt.Errorf("reverse reference index lock timeout getting dependents for %s: %w", referencedID, err)
 	}
-	return dependents
+	return dependents, nil
+}
+
+func (r *ReverseReferenceIndex) GetDependents(referencedID string) []string {
+	deps, err := r.GetDependentsWithError(referencedID)
+	if err != nil {
+		logging.LogSwallowedError(err)
+		return nil
+	}
+	return deps
 }
 
 func (r *ReverseReferenceIndex) AddReference(objectID, referencedID string) {
@@ -249,7 +257,17 @@ func (r *ReverseReferenceIndex) RemoveObject(objectID string) {
 			}
 
 			for referencedID, deps := range r.index {
-				newDeps := make([]string, 0, len(deps))
+				found := false
+				for _, dep := range deps {
+					if dep == objectID {
+						found = true
+						break
+					}
+				}
+				if !found {
+					continue
+				}
+				newDeps := make([]string, 0, len(deps)-1)
 				for _, dep := range deps {
 					if dep != objectID {
 						newDeps = append(newDeps, dep)

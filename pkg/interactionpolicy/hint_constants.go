@@ -15,6 +15,7 @@ const (
 	HintOrchestrateSuffix   = " — lead executing"
 	HintObjectGetPrefix     = "object get "
 	HintObjectGetSuffix     = " (resolve body before acting)"
+	HintSwarmInitText       = "swarm init"
 )
 
 // IsKnownHint reports whether literal is one of the registered hint constants.
@@ -28,7 +29,8 @@ func IsKnownHint(literal string) bool {
 		HintOrchestratePrefix,
 		HintOrchestrateSuffix,
 		HintObjectGetPrefix,
-		HintObjectGetSuffix:
+		HintObjectGetSuffix,
+		HintSwarmInitText:
 		return true
 	}
 	return false

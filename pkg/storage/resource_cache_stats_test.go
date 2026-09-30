@@ -81,3 +81,34 @@ func TestStorageProviderCache_LifetimeCounters(t *testing.T) {
 		t.Fatalf("expected initial StorageProviderCache stats (0, 0, 0), got (%d, %d, %d)", hInit, mInit, cInit)
 	}
 }
+
+func TestResourceCache_TransientErrorEviction(t *testing.T) {
+	t.Parallel()
+
+	rc := &ResourceCache[string]{}
+	ctx := context.Background()
+
+	attempt := 0
+	initFn := func(ctx context.Context, key string) (string, error) {
+		attempt++
+		if attempt == 1 {
+			return "", context.DeadlineExceeded
+		}
+		return "recovered-resource", nil
+	}
+
+	// First attempt fails with transient error
+	val, err := rc.GetOrCreate(ctx, "res-1", initFn)
+	if err == nil {
+		t.Fatalf("expected transient error on first attempt, got val=%s", val)
+	}
+
+	// Entry must NOT be permanently poisoned: second attempt must retry and succeed
+	val2, err2 := rc.GetOrCreate(ctx, "res-1", initFn)
+	if err2 != nil {
+		t.Fatalf("expected success on second attempt after transient failure, got err: %v", err2)
+	}
+	if val2 != "recovered-resource" {
+		t.Fatalf("expected recovered-resource, got %s", val2)
+	}
+}
