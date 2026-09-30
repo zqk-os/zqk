@@ -245,6 +245,17 @@ func validateSinglePredicate(p string) error {
 		}
 		return nil
 
+	case "at_least":
+		countStr, field, ok := strings.Cut(arg, ":")
+		if !ok {
+			return fmt.Errorf("at_least predicate requires 'at_least:<count>:<field>', got %q", arg)
+		}
+		count, err := strconv.Atoi(strings.TrimSpace(countStr))
+		if err != nil || count < 0 {
+			return fmt.Errorf("at_least count must be non-negative integer, got %q", countStr)
+		}
+		return validateIdentifier(strings.TrimSpace(field), "at_least")
+
 	default:
 		return fmt.Errorf("unknown predicate %q; must match kernel_predicate_dsl.ebnf", name)
 	}
@@ -473,6 +484,23 @@ func CompilePrecondition(p string) (string, bool) {
 	if strings.Contains(lower, "link back to") || strings.Contains(lower, "links back to") || strings.Contains(lower, "belongs to") {
 		if subj, tgt, ok := parseLinkBackTokens(lower); ok {
 			return "link_back:" + subj + ":" + tgt, true
+		}
+	}
+
+	// 22. Generic at least <N> <field> linked
+	if strings.HasPrefix(lower, "at least ") {
+		for _, w := range strings.Fields(lower) {
+			clean := strings.Trim(w, ",.()[]{}'")
+			if strings.HasSuffix(clean, "_ref") || strings.HasSuffix(clean, "_refs") {
+				count := 1
+				words := strings.Fields(lower)
+				if len(words) >= 3 {
+					if n, err := strconv.Atoi(words[2]); err == nil && n > 0 {
+						count = n
+					}
+				}
+				return fmt.Sprintf("at_least:%d:%s", count, clean), true
+			}
 		}
 	}
 

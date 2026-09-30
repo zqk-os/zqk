@@ -294,6 +294,36 @@ func evalOverlayDSLStage(gv *GoValidator, p string, obj map[string]any, options 
 				return true, false
 			}
 
+		case "at_least":
+			countStr, field, ok := strings.Cut(arg, ":")
+			if !ok {
+				return true, false
+			}
+			count, err := strconv.Atoi(strings.TrimSpace(countStr))
+			if err != nil || count <= 0 {
+				count = 1
+			}
+			field = strings.TrimSpace(field)
+			if gv != nil {
+				return true, gv.checkAtLeastField(field, count, obj)
+			}
+			val, exists := obj[field]
+			if !exists || val == nil {
+				if !strings.HasSuffix(field, "s") {
+					val, exists = obj[field+"s"]
+				} else {
+					val, exists = obj[strings.TrimSuffix(field, "s")]
+				}
+			}
+			if !exists || val == nil {
+				return true, false
+			}
+			v := reflect.ValueOf(val)
+			if v.Kind() == reflect.Slice || v.Kind() == reflect.Array {
+				return true, v.Len() >= count
+			}
+			return true, val != ""
+
 		default:
 			// For any other predicates, mark as handled and passed if in test/relaxed mode,
 			// or fail if unsatisfied

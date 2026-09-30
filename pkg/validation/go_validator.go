@@ -1279,6 +1279,47 @@ func (gv *GoValidator) hasNonEmptyField(obj map[string]any, fieldName string) bo
 	}
 }
 
+// checkAtLeastField checks if a field has at least count non-empty entries.
+func (gv *GoValidator) checkAtLeastField(fieldName string, count int, obj map[string]any) bool {
+	if count <= 0 {
+		count = 1
+	}
+	checkField := func(f string) (int, bool) {
+		val, exists := obj[f]
+		if !exists || val == nil {
+			val, exists = obj["resolved_"+f]
+			if !exists || val == nil {
+				return 0, false
+			}
+		}
+		v := reflect.ValueOf(val)
+		if v.Kind() == reflect.Slice || v.Kind() == reflect.Array {
+			return v.Len(), true
+		}
+		if str, ok := val.(string); ok && strings.TrimSpace(str) != "" {
+			return 1, true
+		}
+		if val != nil && val != "" {
+			return 1, true
+		}
+		return 0, false
+	}
+	if n, ok := checkField(fieldName); ok && n >= count {
+		return true
+	}
+	if !strings.HasSuffix(fieldName, "s") {
+		if n, ok := checkField(fieldName + "s"); ok && n >= count {
+			return true
+		}
+	} else {
+		if n, ok := checkField(strings.TrimSuffix(fieldName, "s")); ok && n >= count {
+			return true
+		}
+	}
+	return false
+}
+
+
 // goValidatorFeatureLifecycle returns the SupportsFeature token for lifecycle validation.
 // Spelled without a string literal equal to object kind "lifecycle" for drift hotspot scans.
 func goValidatorFeatureLifecycle() string {

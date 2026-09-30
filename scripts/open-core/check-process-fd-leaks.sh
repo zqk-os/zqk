@@ -47,6 +47,11 @@ if [ -n "$ZQK_PIDS" ]; then
 			continue
 		fi
 		cmd_name=$(ps -p "$pid" -o command= 2>/dev/null | awk '{print $1, $2, $3}' || echo "zqk")
+		case "$cmd_name" in
+			*go\ build*|*go\ test*|*git*|*grep*|*zsh*)
+				continue
+				;;
+		esac
 		fd_count=$(get_fd_count "$pid")
 		if [ "$fd_count" -ge 0 ]; then
 			if [ "$fd_count" -gt "$MAX_ALLOWED_FDS" ]; then

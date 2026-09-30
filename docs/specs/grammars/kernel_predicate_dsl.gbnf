@@ -25,6 +25,7 @@ object_predicate ::= "object_exists:" object_identifier
                    | "role_is:" role_name
                    | "active_ref:" field_name
                    | "link_back:" field_name ":" field_name
+                   | "at_least:" [0-9]+ ":" field_name
 
 role_name ::= "grooming" | "shovel_ready" | "execution_locked" | "enforced" | "realign" | "halted" | "terminal" | "testing" | "draft" | "conceptual"
 

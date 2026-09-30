@@ -64,12 +64,17 @@ func TestValidatePredicateSyntax(t *testing.T) {
 		{"work_done", false},
 		{"active_ref:milestone_refs", false},
 		{"link_back:milestone_refs:goal_refs", false},
+		{"at_least:1:milestone_refs", false},
+		{"at_least:0:milestone_refs", false},
 		// Invalid expressions
 		{"", true},
 		{"unknown_predicate_without_args", true},
 		{"field_matches:invalid_regex:[", true},
 		{"query_metric:invalid_syntax", true},
 		{"link_back:onlyone", true},
+		{"at_least:invalid:milestone_refs", true},
+		{"at_least:-1:milestone_refs", true},
+		{"at_least:1:", true},
 	}
 
 	for _, tt := range tests {
@@ -116,6 +121,8 @@ func TestCompilePrecondition(t *testing.T) {
 		{"branch_name is an ancestor of trunk", "branch_is_ancestor_of_trunk", true},
 		{"machine-checkable evidence with green scheduler fingerprint is verified", "machine_checkable_closure_evidence", true},
 		{"at least one active milestone_ref linked", "active_ref:milestone_ref", true},
+		{"at least one milestone_ref linked", "at_least:1:milestone_ref", true},
+		{"at least 2 milestone_refs", "at_least:2:milestone_refs", true},
 		{"milestone_refs must link back to goal_refs", "link_back:milestone_refs:goal_refs", true},
 		{"unrecognized arbitrary condition", "", false},
 	}

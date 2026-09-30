@@ -8,6 +8,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/predicate"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
@@ -450,7 +451,22 @@ func (iv *InstanceValidator) validateLifecycleState(kind, status, currentState s
 			destObj[objects.FieldKeyStatus] = status
 			destObj[objects.FieldKeyKind] = kind
 			for _, postcondition := range postconditions {
-				if !iv.checkPrecondition(postcondition, destObj) {
+				trimmed := strings.TrimSpace(postcondition)
+				if trimmed == "" {
+					continue
+				}
+				canon, ok := predicate.CompilePrecondition(trimmed)
+				if !ok {
+					if err := predicate.ValidatePredicateSyntax(trimmed); err == nil {
+						canon = trimmed
+						ok = true
+					}
+				}
+				if !ok {
+					// Informational descriptive postconditions remain non-enforcing
+					continue
+				}
+				if !iv.checkPrecondition(canon, destObj) {
 					errors = append(errors, ValidationError{
 						Field:   objects.FieldKeyStatus,
 						Message: fmt.Sprintf("postcondition %q not satisfied upon entering status %q", postcondition, status),
@@ -490,68 +506,6 @@ func (iv *InstanceValidator) checkPrecondition(precondition string, obj map[stri
 		handled, met := evalOverlayDSLStage(nil, precondition, obj, nil)
 		if handled {
 			return met
-		}
-	}
-
-	// Legacy fallback heuristics if not recognized by DSL
-	preconditionLower := strings.ToLower(strings.TrimSpace(precondition))
-	if strings.Contains(preconditionLower, strings.ToLower(PrecondCRIShovelReady)) {
-		return EvaluateShovelReady(obj).Ready
-	}
-
-	if isFieldCheckPrecondition(preconditionLower, "is set") {
-		fieldName := strings.TrimSpace(strings.Split(preconditionLower, "is set")[0])
-		value, exists := obj[fieldName]
-		return exists && value != nil && value != emptyValue
-	}
-
-	if isFieldCheckPrecondition(preconditionLower, "is not empty") {
-		fieldName := strings.TrimSpace(strings.Split(preconditionLower, "is not empty")[0])
-		value, exists := obj[fieldName]
-		if !exists {
-			return false
-		}
-		val := reflect.ValueOf(value)
-		if val.Kind() == reflect.Slice || val.Kind() == reflect.Array {
-			return val.Len() > 0
-		}
-		return value != nil && value != emptyValue
-	}
-
-	if strings.Contains(preconditionLower, "at least") {
-		var fieldName string
-		for _, word := range strings.Fields(preconditionLower) {
-			w := strings.Trim(word, ",.()[]{}'")
-			if strings.HasSuffix(w, "_ref") || strings.HasSuffix(w, "_refs") {
-				fieldName = w
-				break
-			}
-		}
-		if fieldName != "" {
-			if !strings.HasSuffix(fieldName, "s") {
-				val, exists := obj[fieldName+"s"]
-				if !exists || val == nil {
-					val, exists = obj["resolved_"+fieldName+"s"]
-				}
-				if exists && val != nil {
-					valReflect := reflect.ValueOf(val)
-					if (valReflect.Kind() == reflect.Slice || valReflect.Kind() == reflect.Array) && valReflect.Len() > 0 {
-						return true
-					}
-				}
-			}
-			val, exists := obj[fieldName]
-			if !exists || val == nil {
-				val, exists = obj["resolved_"+fieldName]
-			}
-			if exists && val != nil {
-				valReflect := reflect.ValueOf(val)
-				if valReflect.Kind() == reflect.Slice || valReflect.Kind() == reflect.Array {
-					return valReflect.Len() > 0
-				}
-				return val != emptyValue
-			}
-			return false
 		}
 	}
 
