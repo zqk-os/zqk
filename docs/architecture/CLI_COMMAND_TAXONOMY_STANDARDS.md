@@ -29,8 +29,22 @@ This document establishes the **authoritative ground rules, naming taxonomy, beh
 4. **Ratcheting Migration Baseline:** Legacy commands without specs are frozen in `.zqk/cli/command_spec_coverage_baseline.json`. The baseline permits zero new un-specced commands (`new_drift_count == 0`), and automatically ratchets forward as grandfathered commands receive specifications until full parity (`parity: true`) is reached.
 
 ### Rule 2: Strict Domain-Resource Grammar & Noun-Verb Hierarchy
-1. **No Orphan Root Verbs:**  
-   Root-level commands must represent distinct architectural **domains** (`system`, `agent`, `workflow`, `object`, `test`, `job`, `service`, `vendor`). Unqualified verbs (such as `use`, `run`, `check`, `execute`) are prohibited at the root level unless defined as explicitly documented, universal ergonomics aliases.
+1. **Domain Hierarchy & Approved Ergonomics Shortcuts:**  
+   Primary root-level commands represent distinct architectural **domains** (`system`, `agent`, `workflow`, `object`, `test`, `job`, `service`, `vendor`). Unqualified verbs are prohibited at the root level unless explicitly designated as approved universal ergonomics shortcuts:
+   - **`zqk do`**: Autonomous CAP loop execution shorthand (`zqk workflow vds do`).
+   - **`zqk inspect`**: Interactive TUI Object Inspector and Policy Studio shortcut (`zqk object inspect`).
+   - **`zqk mutate`**: ZQL declarative mutation engine shortcut (`zqk object mutate`).
+   - **`zqk query`**: ZPARQL graph query language engine shortcut (`zqk graph query`).
+   - **`zqk validate`**: Invariant gate and schema validation shortcut (`zqk system validate`).
+   - **`zqk rollback`**: Transaction rollback journal restoration shortcut (`zqk object rollback`).
+   - **`zqk completion`**: Shell completion script generator (`zqk system completion`).
+   - **`zqk sync`**: Storage CAS and P2P mesh synchronization shortcut (`zqk mesh sync`).
+   - **`zqk pre-commit`**: Local pre-commit release gate and secret scan runner (`zqk system pre-commit`).
+   - **`zqk learn`**: Institutional memory and operational lessons capture shortcut (`zqk agent learn`).
+   - **`zqk new`**: Scaffolding wizard for new packs, adapters, and schemas (`zqk object new`).
+   - **`zqk reports`**: Quality evaluation and engineering velocity reporting tool (`zqk system reports`).
+   - **`zqk tray`**: macOS status bar daemon companion (`zqk service tray`).
+   - **`zqk join`**: Multi-domain relational projection and graph join engine (`zqk graph join`).
 2. **Hierarchical Naming:**  
    Subcommands must follow either:
    - `<domain> <resource> <verb>` (e.g. `zqk object requirement create`, `zqk job trigger list`)
