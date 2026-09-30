@@ -77,7 +77,6 @@ Completed multi-dimensional evaluation runs and verified evidence reports are ma
 - **[Reliability & Crash Recovery Report (REL)](../../eval/REL-reliability-error-recovery.md)**: WAL compaction, CAS assertions, and lock safety invariants.
 - **[Security Threat Vectors Report (SEC)](../../eval/SEC-security-threat-vectors.md)**: Cryptographic integrity, CAS isolation, and privilege escalation guards.
 - **[Test Strategy Invariant Proofs (TST)](../../eval/TST-test-strategy-invariant-proofs.md)**: Test-to-criteria lineage, race condition elimination, and DoD compliance.
-- **[Diamond Scale Convergence Synthesis](../../eval/SYNTHESIS-diamond-envelope-convergence.md)**: Overall quality convergence scorecard and release certification.
 
 ---
 

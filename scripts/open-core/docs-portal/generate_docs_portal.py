@@ -1786,7 +1786,7 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
                 "README.md", "MNT-code-quality-maintainability.md",
                 "OBS-observability-diagnostics.md", "RDB-architecture-package-boundaries.md",
                 "REL-reliability-error-recovery.md", "SEC-security-threat-vectors.md",
-                "TST-test-strategy-invariant-proofs.md", "SYNTHESIS-diamond-envelope-convergence.md"
+                "TST-test-strategy-invariant-proofs.md"
             ]
             base = os.path.basename(rel)
             if base in eval_flow:
