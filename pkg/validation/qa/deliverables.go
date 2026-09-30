@@ -96,7 +96,7 @@ func ValidateDeliverableArtifacts(obj map[string]any, projectRoot string) ([]str
 
 	if len(paths) == 0 && IsDeliverableBearingKind(kind) {
 		if id != "" {
-			return nil, fmt.Errorf("missing required deliverable artifacts for %s", id)
+			return nil, fmt.Errorf("%w for %s", ErrMissingDeliverables, id)
 		}
 		return nil, ErrMissingDeliverables
 	}

@@ -107,6 +107,19 @@ func CheckPathsAndPerms(root string, cfg *GatesConfig) ([]Finding, error) {
 						break
 					}
 				}
+
+				// Check hardcoded user/workstation path landmines (/Users/, /home/, /var/folders/, /private/var/)
+				if strings.HasPrefix(val, "/Users/") || strings.HasPrefix(val, "/home/") || strings.HasPrefix(val, "/var/folders/") || strings.HasPrefix(val, "/private/var/") {
+					pos := fset.Position(lit.Pos())
+					findings = append(findings, Finding{
+						CheckID:  "hygiene/hardcoded-workstation-path",
+						Suite:    "hygiene",
+						File:     rel,
+						Line:     pos.Line,
+						Message:  "hardcoded absolute workstation path literal (\"" + val + "\"); use paths, os.UserHomeDir(), or t.TempDir()",
+						Severity: SeverityError,
+					})
+				}
 			}
 
 			return true

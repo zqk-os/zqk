@@ -52,6 +52,16 @@ func NewAuditorService(wal *lifecycle.LifecycleEventWAL, s storage.ObjectStorage
 	}
 }
 
+func (s *AuditorService) projectRoot() string {
+	if s.emitter != nil && s.emitter.ProjectRoot() != "" {
+		return s.emitter.ProjectRoot()
+	}
+	if g, ok := s.gate.(*AuditorGate); ok && g.projectRoot != "" {
+		return g.projectRoot
+	}
+	return ""
+}
+
 func (s *AuditorService) getIDEPath() string {
 	return filepath.Join(paths.ProjectDataDir, paths.IdesSubdir, "qa_auditor.ide")
 }
@@ -296,30 +306,22 @@ func (s *AuditorService) performAudit(ctx context.Context, id string, kind strin
 	}
 
 	// 1.6 Deliverable Artifacts Validation
-	// Fail-closed: completed backlog items and agent tasks must have at least one deliverable artifact.
-	if IsDeliverableBearingKind(kind) && isComplete {
-		if len(artifactPaths) == 0 {
-			reason := ReasonMissingArtifacts
+	// Fail-closed: completed objects must pass unified deliverable artifact validation.
+	if isComplete {
+		verified, err := ValidateDeliverableArtifacts(obj, s.projectRoot())
+		if err != nil {
+			reason := err.Error()
 			logging.FluentEvent(logger).Warn(fmt.Sprintf(LogFmtAuditorContentDisparity, id, reason)).Log()
 			if s.emitter != nil {
-				if err := s.emitter.EmitDisparityInterrupt(ctx, id, reason); err != nil {
-					logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorEmitHITLFailed, err), err).Log()
+				if emitErr := s.emitter.EmitDisparityInterrupt(ctx, id, reason); emitErr != nil {
+					logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorEmitHITLFailed, emitErr), emitErr).Log()
 				}
 			}
 			return
 		}
-	}
-
-	// For all declared artifacts, verify that the files actually exist on disk before running AST analysis.
-	if err := ValidateArtifactFiles(artifactPaths, ""); err != nil {
-		reason := err.Error()
-		logging.FluentEvent(logger).Warn(fmt.Sprintf(LogFmtAuditorContentDisparity, id, reason)).Log()
-		if s.emitter != nil {
-			if emitErr := s.emitter.EmitDisparityInterrupt(ctx, id, reason); emitErr != nil {
-				logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorEmitHITLFailed, emitErr), emitErr).Log()
-			}
+		if len(verified) > 0 {
+			artifactPaths = verified
 		}
-		return
 	}
 
 	// 2. STRUCTURAL AST AUDIT
