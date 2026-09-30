@@ -83,6 +83,9 @@ func ReapStaleLocks(projectRoot string, threshold time.Duration, dryRun bool) (i
 		if !IsLockFileName(d.Name()) {
 			return nil
 		}
+		if strings.Contains(filepath.ToSlash(path), "/state/daemon_locks/") {
+			return nil
+		}
 		info, errStat := d.Info()
 		if errStat != nil {
 			return nil

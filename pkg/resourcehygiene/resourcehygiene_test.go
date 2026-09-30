@@ -250,3 +250,87 @@ func TestEnforceLogRetention_ProcessOutputsAndScheduler(t *testing.T) {
 	}
 }
 
+func TestInspectIOResources_HeldLockNotReportedStale(t *testing.T) {
+	tmpDir := t.TempDir()
+	zqkLocks := filepath.Join(tmpDir, paths.ProjectDataDir, "locks")
+	if err := fileutil.MkdirAll(zqkLocks, paths.DirPerm755); err != nil {
+		t.Fatalf("mkdir failed: %v", err)
+	}
+
+	staleLock := filepath.Join(zqkLocks, "unheld.lock")
+	activeLock := filepath.Join(zqkLocks, "held.lock")
+	_ = fileutil.WriteFile(staleLock, []byte(""), paths.FilePerm600)
+	_ = fileutil.WriteFile(activeLock, []byte(""), paths.FilePerm600)
+
+	oldTime := time.Now().Add(-2 * time.Hour)
+	_ = os.Chtimes(staleLock, oldTime, oldTime)
+	_ = os.Chtimes(activeLock, oldTime, oldTime)
+
+	// Actively hold flock on activeLock
+	f, errOpen := fileutil.OpenFile(activeLock, fileutil.O_RDWR, paths.FilePerm600)
+	if errOpen != nil {
+		t.Fatalf("failed to open active lock: %v", errOpen)
+	}
+	defer f.Close()
+	if err := syscallutil.FileFlock(f, syscall.LOCK_EX); err != nil {
+		t.Fatalf("failed to flock: %v", err)
+	}
+
+	report, err := InspectIOResources(context.Background(), tmpDir)
+	if err != nil {
+		t.Fatalf("InspectIOResources failed: %v", err)
+	}
+	if report.StaleLocksCount != 1 {
+		t.Fatalf("expected exactly 1 stale lock, got %d (%v)", report.StaleLocksCount, report.StaleLockPaths)
+	}
+	if !strings.Contains(report.StaleLockPaths[0], "unheld.lock") {
+		t.Fatalf("expected unheld.lock in StaleLockPaths, got %v", report.StaleLockPaths)
+	}
+}
+
+func TestInspectIOResources_DaemonLockNeverReportedStale(t *testing.T) {
+	tmpDir := t.TempDir()
+	daemonLocks := filepath.Join(tmpDir, paths.ProjectDataDir, paths.StateDir, "daemon_locks")
+	if err := fileutil.MkdirAll(daemonLocks, paths.DirPerm755); err != nil {
+		t.Fatalf("mkdir failed: %v", err)
+	}
+
+	ambientLock := filepath.Join(daemonLocks, "ambient.lock")
+	_ = fileutil.WriteFile(ambientLock, []byte(""), paths.FilePerm600)
+	oldTime := time.Now().Add(-24 * time.Hour)
+	_ = os.Chtimes(ambientLock, oldTime, oldTime)
+
+	report, err := InspectIOResources(context.Background(), tmpDir)
+	if err != nil {
+		t.Fatalf("InspectIOResources failed: %v", err)
+	}
+	if report.StaleLocksCount != 0 {
+		t.Fatalf("expected 0 stale locks for daemon singleton locks, got %d (%v)", report.StaleLocksCount, report.StaleLockPaths)
+	}
+}
+
+func TestReapStaleLocks_DaemonLockNeverReaped(t *testing.T) {
+	tmpDir := t.TempDir()
+	daemonLocks := filepath.Join(tmpDir, paths.ProjectDataDir, paths.StateDir, "daemon_locks")
+	if err := fileutil.MkdirAll(daemonLocks, paths.DirPerm755); err != nil {
+		t.Fatalf("mkdir failed: %v", err)
+	}
+
+	ambientLock := filepath.Join(daemonLocks, "ambient.lock")
+	_ = fileutil.WriteFile(ambientLock, []byte(""), paths.FilePerm600)
+	oldTime := time.Now().Add(-24 * time.Hour)
+	_ = os.Chtimes(ambientLock, oldTime, oldTime)
+
+	cnt, _, err := ReapStaleLocks(tmpDir, 1*time.Hour, false)
+	if err != nil {
+		t.Fatalf("ReapStaleLocks failed: %v", err)
+	}
+	if cnt != 0 {
+		t.Fatalf("expected 0 locks reaped, got %d", cnt)
+	}
+	if _, err := fileutil.Stat(ambientLock); err != nil {
+		t.Fatalf("daemon lock must not be reaped: %v", err)
+	}
+}
+
+

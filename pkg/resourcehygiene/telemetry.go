@@ -5,10 +5,13 @@ import (
 	"io/fs"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/operational"
 	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/utils/syscallutil"
 )
 
 // DefaultLockStaleAge is the default age at which a lock file without a holder is considered stale.
@@ -79,8 +82,23 @@ func InspectIOResources(ctx context.Context, projectRoot string) (*IOResourceTel
 		}
 		name := d.Name()
 		if IsLockFileName(name) {
+			if strings.Contains(filepath.ToSlash(path), "/state/daemon_locks/") {
+				return nil
+			}
 			if info, errStat := d.Info(); errStat == nil {
 				if info.ModTime().Before(lockCutoff) {
+					// Verify whether the lock is held by a live process before declaring it stale
+					file, errOpen := fileutil.OpenFile(path, fileutil.O_RDWR, paths.FilePerm600)
+					if errOpen == nil {
+						flockErr := syscallutil.FileFlock(file, syscall.LOCK_EX|syscall.LOCK_NB)
+						if flockErr != nil {
+							// Actively held by a live process: not stale!
+							_ = file.Close()
+							return nil
+						}
+						_ = syscallutil.FileFlock(file, syscall.LOCK_UN)
+						_ = file.Close()
+					}
 					rel, relErr := filepath.Rel(projectRoot, path)
 					if relErr == nil {
 						report.StaleLockPaths = append(report.StaleLockPaths, rel)

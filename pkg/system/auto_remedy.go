@@ -198,6 +198,11 @@ func (e *DiagnosticsRemedyEngine) Apply(ctx context.Context, plans []RemedyPlan)
 			cleanTarget := filepath.Clean(plan.Target)
 			zqkPrefix := filepath.Clean(filepath.Join(e.ProjectRoot, paths.ProjectDataDir))
 			if strings.HasPrefix(cleanTarget, zqkPrefix) {
+				if strings.Contains(filepath.ToSlash(cleanTarget), "/state/daemon_locks/") {
+					outcome.Applied = false
+					outcome.Detail = "refusing to remove daemon singleton lock file"
+					continue
+				}
 				if err := os.Remove(cleanTarget); err != nil && !os.IsNotExist(err) {
 					outcome.Error = err.Error()
 				} else {
