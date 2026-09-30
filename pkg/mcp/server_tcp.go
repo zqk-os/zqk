@@ -122,6 +122,16 @@ func (s *Server) handleTCPConnection(conn net.Conn) {
 	}
 }
 
+func (s *Server) prepareTLSCert(certFile, keyFile string) (tls.Certificate, error) {
+	s.multiClient.Store(true)
+	s.ensureServerInitialized()
+	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
+	if err != nil {
+		return tls.Certificate{}, errfmt.Newf("failed to load TLS key pair").Wrap(err)
+	}
+	return cert, nil
+}
+
 // ServeTLS starts the MCP server over a TLS-encrypted TCP socket
 func (s *Server) ServeTLS(addr, certFile, keyFile string) error {
 	if !IsLoopbackAddr(addr) {
@@ -130,11 +140,9 @@ func (s *Server) ServeTLS(addr, certFile, keyFile string) error {
 	if certFile == "" || keyFile == "" {
 		return errors.New("both certFile and keyFile are required for TLS")
 	}
-	s.multiClient.Store(true)
-	s.ensureServerInitialized()
-	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
+	cert, err := s.prepareTLSCert(certFile, keyFile)
 	if err != nil {
-		return errfmt.Newf("failed to load TLS key pair").Wrap(err)
+		return err
 	}
 
 	config := &tls.Config{
@@ -154,11 +162,9 @@ func (s *Server) ServeMTLS(addr, certFile, keyFile, caCertFile string) error {
 	if certFile == "" || keyFile == "" || caCertFile == "" {
 		return errors.New("certFile, keyFile, and caCertFile are all required for mTLS")
 	}
-	s.multiClient.Store(true)
-	s.ensureServerInitialized()
-	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
+	cert, err := s.prepareTLSCert(certFile, keyFile)
 	if err != nil {
-		return errfmt.Newf("failed to load TLS key pair").Wrap(err)
+		return err
 	}
 
 	caCert, err := fileutil.ReadFile(caCertFile)
