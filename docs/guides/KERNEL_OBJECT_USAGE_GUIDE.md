@@ -63,93 +63,187 @@ storage_profile:
 
 ---
 
-## 3. Comprehensive Pack & Kind Taxonomy Directory
+## 3. Comprehensive Ontological Domain & Kind Directory
 
-ZQK organizes its object ontologies into 10 modular packs:
+ZQK organizes its object ontologies into **14 comprehensive domains**: the **Core Platform & Kernel Membrane**, plus **13 specialized domain packs**. Together, they form an interconnected graph of over 70 distinct object kinds governing every layer of the operating system:
 
 ```
                                ┌─────────────────────────┐
                                │   KNOWLEDGE KERNEL      │
+                               │  Core Platform Membrane │
                                └────────────┬────────────┘
          ┌──────────────────────────────────┼──────────────────────────────────┐
          │                                  │                                  │
 ┌────────▼────────┐                ┌────────▼────────┐                ┌────────▼────────┐
-│   WORK PACK     │                │ KNOWLEDGE PACK  │                │   AGENT PACK    │
-│ goal, plan, req,│                │ glossary_term,  │                │ persona, task,  │
-│ criteria, bli   │                │ doc_entry, lib  │                │ feed, mcp_spec  │
+│   WORK & TPM    │                │ KNOWLEDGE & DOC │                │ AGENT & SWARM   │
+│ goal, milestone,│                │ glossary_term,  │                │ persona, task,  │
+│ req, crit, bli  │                │ doc_entry, lib  │                │ feed, mcp_spec  │
+└────────┬────────┘                └────────┬────────┘                └────────┬────────┘
+         │                                  │                                  │
+┌────────▼────────┐                ┌────────▼────────┐                ┌────────▼────────┐
+│ RELEASE & EVO   │                │ QA & VERIFY     │                │ DECISION & ORG  │
+│ release, evolve,│                │ scenario, test, │                │ decision, ADRs, │
+│ workflow        │                │ qa_success, mtx │                │ teams, orgs     │
 └─────────────────┘                └─────────────────┘                └─────────────────┘
 ```
 
-### 3.1 Work & Strategy Pack (`packs/work/`)
-The foundational spine for technical program management and execution:
+### 3.1 Core Platform & Kernel Governance (`.zqk/specs/objects/kernel/` & `platform/`)
+The underlying governance, security, and runtime primitives of the Knowledge Kernel:
+- **`account`** (`ACC-*`): Human and agent identities, authentication keys, and authorization bindings.
+- **`role`** (`ROL-*`): System authorities (`executive`, `owner`, `automation`, `steward`) governing command execution permissions.
+- **`policy`** (`POL-*`): Project-wide declarative invariants, constraints, and validation standards (e.g. `POL-DOC-001`).
+- **`rule`** (`RUL-*`): Operational boundary rules and governance policies.
+- **`auto_fix_rule`** (`AFR-*`): Automated remediation recipes executed by `zqk system check --auto-remedy`.
+- **`scheduler_job`** (`JOB-*`): Background cron jobs, maintenance workers, retention scanners, and callback routines.
+- **`scheduler_handler_binding`** (`SHB-*`): Dynamic dispatch bindings routing jobs to internal handlers.
+- **`namespace`** (`NSP-*`): Tenant and domain boundaries isolating objects (`zqk:kernel` vs `tenant:*`).
+- **`namespace_registry`** (`NSR-*`): Global authoritative index of all active namespaces.
+- **`remote_kernel`** (`RMK-*`): Remote peer kernel endpoints in the Federated Sovereign Mesh.
+- **`domain_registry`** (`DOM-*`): Authoritative registry tracking registered domain ontologies.
+- **`keystore_entry`** (`KEY-*`): Local cryptographic credential vault entries.
+- **`audit_event`** (`AUD-*`): Immutable append-only log of state mutations and security events.
+- **`audit_event_aggregation`** (`AEA-*`): Durable record of audit-event compaction passes.
+- **`change_journal_entry`** (`CJE-*`): Write-Ahead Log (WAL) records enabling crash recovery and point-in-time replay.
+- **`convergence_session`** (`CVS-*`): Multi-agent alignment sessions, consensus ballots, and convergence reports.
+- **`zqk_session`** (`SES-*`): Active CLI invocations, interactive sessions, and daemon runtime contexts.
+- **`shockwave_router`** (`SWR-*`): Micro-API Gateway router for semantic payloads and reactive events.
+- **`integrity_manifest`** (`INT-*`): Snapshot of critical file and object hashes for drift detection.
+- **`rollback_report`** (`RBR-*`): Summary receipts detailing rolled-back objects and state restorations.
+- **`template`** (`TPL-*`): Prompt and artifact generation templates.
+- **`watchdog_registration`** (`WDR-*`): Event-driven watchdog subscriptions and alerts.
+- **`kind_synonym`** (`SYN-*`): Convenient aliases for object kinds (e.g. `bli` for `backlog_item`).
+- **`brand`** (`BRD-*`): Brand and styling specifications for output generators.
+- **`certificate`** (`CRT-*`): Cryptographic completion certificates issued upon milestone completion.
+- **`resolver`** (`RES-*`): Reference scheme resolvers (`account:{id}`, `test://...`).
+- **`bucketing_strategy`** (`BKT-*`): Storage bucketing strategies for tiered storage.
+- **`base_object`**, **`auditable`**, **`object_spec`**, **`lifecycle`**, **`extensible_object`**, **`base_metric`**: Structural meta-types defining the schema system.
+
+### 3.2 Work & Technical Program Management Pack (`packs/work/`)
+The foundational spine for roadmap planning, requirement engineering, and task execution:
 - **`vision`** (`VIS-*`): Long-term strategic aspirations and market horizons.
 - **`mission`** (`MSN-*`): Operational charter operationalizing a vision.
 - **`goal`** (`GOAL-*`): Measurable milestone target supporting a mission.
-- **`roadmap`** (`RDM-*`): Multi-quarter grouping of goals and releases.
-- **`priority_plan`** (`PRI-*`): Tactical execution container scoping a focused set of requirements and backlog items.
+- **`milestone`** (`MIL-*`): Formal phase boundaries anchoring deliverables, releases, and done-gates.
+- **`roadmap`** (`RDM-*`): Multi-quarter grouping of goals, milestones, and releases.
+- **`priority_plan`** (`PRI-*`): Tactical execution container scoping an active set of requirements and backlog items.
 - **`workstream`** (`WKS-*`): Functional domain stream grouping related work.
-- **`requirement`** (`REQ-*`): Formal technical requirement specifying feature behavior.
+- **`workstream_transition`** (`WST-*`): Formal handoffs and boundary crossings between workstreams.
+- **`work_unit`** (`WKU-*`): Granular execution slices within a backlog item.
+- **`work_interval`** (`WKI-*`): Time-boxed iteration cycles and execution sprints.
+- **`occupancy`** (`OCC-*`): Agent seating, concurrency leases, and active workspace locks.
+- **`remaining_open`** (`REM-*`): Burn-down metrics tracking remaining open items.
+- **`strategic_plan`** (`STP-*`): High-level organizational strategy plans.
+- **`strategic_context`** (`STC-*`): Strategic framing, assumptions, and business drivers.
+- **`requirement`** (`REQ-*`): Formal technical requirement specifying feature behavior (linked via `doc_entry_refs`).
 - **`criteria`** (`CRIT-*`): Verifiable Definition of Done (DoD) acceptance condition.
 - **`test_case`** (`TST-*`): Automated verification test validating criteria.
-- **`backlog_item`** (`BLI-*`): Tactical, actionable unit of work claimed and executed by agents or engineers.
+- **`backlog_item`** (`BLI-*`): Tactical unit of work claimed and executed by agents or engineers.
 - **`epic`** (`EPC-*`): High-level feature epic aggregating multiple backlog items.
 - **`important_date`** (`DAT-*`): Deadlines, freeze windows, or release dates.
-- **`risk_blocker`** (`RSK-*`): Explicit impediment or dependency risk obstructing progress.
+- **`risk_blocker`** (`RSK-*`): Explicit impediments or dependency risks obstructing progress.
 - **`technical_debt`** (`DEB-*`): Tracked architectural debt requiring remediation.
 
-### 3.2 Semantic Vocabulary Pack (`packs/vocabulary/`)
-Shared terminology, machine hints, and disambiguation:
+### 3.3 Release & Deployment Pack (`packs/release/`)
+Formal release packaging, artifact manifests, and rollout governance:
+- **`release`** (`REL-*`): Release envelopes containing semver versions, release candidates, target artifact manifests, cryptographic sign-offs, and rollout gates.
+
+### 3.4 Evolution & Schema Migration Pack (`packs/evolution/`)
+Continuous schema evolution and backward compatibility:
+- **`evolution_management`** (`EVO-*`): Schema version migrations, field deprecation schedules, and database transformation plans.
+
+### 3.5 Orchestrated Workflow Pack (`packs/workflow/`)
+Multi-step automated workflows:
+- **`workflow`** (`WKF-*`): Orchestrated multi-step graph workflows, automation chains, and phase transitions.
+
+### 3.6 Semantic Vocabulary Pack (`packs/vocabulary/`)
+Shared terminology, machine hints, and semantic disambiguation:
 - **`glossary_term`** (`GLS-*`): Context-scoped definition embedding human explanations, `agent_prompts` for LLMs, and `machine_hints` for tools.
 - **`vocabulary_scheme`** (`VOC-*`): Scoped taxonomy or lens network (`inference`, `display`, `navigation`, `mixed`, `extension`).
-- **`glossary_term_relation`** (`GTR-*`): Directed typed relationships between glossary terms.
-- **`import_tracking`** (`IMP-*`): Provenance tracking for external ontology imports.
+- **`glossary_term_relation`** (`GTR-*`): Directed typed relationships between glossary terms (`broader`, `narrower`, `related`, `governs`).
+- **`import_tracking`** (`IMP-*`): Provenance tracking for external ontology imports (SKOS, OWL, Dublin Core).
 
-### 3.3 Library & Documentation Pack (`packs/library/`)
+### 3.7 Library & Documentation Pack (`packs/library/`)
 Documentation and composable architecture specifications:
 - **`doc_entry`** (`DOC-*`): First-class CAS object representing a documentation file, tracked with SHA-256 `content_hash` and verified via `zqk docman verify`.
-- **`library`** (`LIB-*`): Composable architectural pattern catalogs with cloneable configurations.
+- **`library`** (`LIB-*`): Composable architectural pattern catalogs with cloneable configurations and shared DNA propagation.
 - **`technical_spec`** (`TSP-*`): Detailed technical specifications attached to libraries.
 
-### 3.4 Autonomous Agent Pack (`packs/agent/`)
-Agent coordination, seating, and capabilities:
+### 3.8 Autonomous Agent Pack (`packs/agent/`)
+Agent coordination, workspace seating, and runtime capabilities:
 - **`persona`** (`PER-*`): Registered agent profile (e.g. `PER-DEFAULT-OPERATOR`, `PER-DEFAULT-ARCHITECT`).
 - **`agent_task`** (`TSK-*`): Subordinate execution task delegated to a subagent.
 - **`agent_feed`** (`FED-*`): Append-only correspondence log for agent-to-agent and human-to-agent steering.
 - **`agent_skill`** (`SKI-*`): Verified executable capability or workflow routine available to agents.
 - **`agent_instruction`** (`INS-*`): Standing operating procedure or ambient directive.
+- **`agent_architecture`** (`ARC-*`): Architectural topology and seating hierarchy for agent swarms.
+- **`agent_onboarding_preparation`** (`AOP-*`): Machine-ready agent workspace configurations and seating directives.
 - **`mcp_spec`** (`MCP-*`): Specification for Model Context Protocol servers.
 - **`mcp_session`** (`MCS-*`): Active runtime session with an MCP host.
+- **`mcp_built_in_tool`** (`MBT-*`): Built-in MCP tool manifests exposed to clients.
+- **`prompt_template`** (`PRT-*`): Parameterized LLM prompt templates.
+- **`provider_profile`** (`PRV-*`): LLM model and backend provider configuration.
+- **`context_refresh_schedule`** (`CRS-*`): Periodic context window refresh triggers preventing context rot.
 
-### 3.5 Decision & Rationalization Pack (`packs/decision/`)
-Architectural decision records and inquiry tracking:
+### 3.9 Decision & Rationalization Pack (`packs/decision/`)
+Architectural decision records and design inquiries:
 - **`decision`** (`DEC-*`): Authoritative architectural decision record (ADR).
 - **`question`** (`QST-*`): Open design inquiry or clarification probe requiring consensus.
 - **`impact_analysis`** (`IMP-*`): Formal risk and cost impact evaluation for architectural transitions.
 
-### 3.6 Quality & Verification Pack (`packs/qa/`)
+### 3.10 Quality & Verification Pack (`packs/qa/`)
 Continuous verification and done-gate enforcement:
 - **`scenario`** (`SCN-*`): End-to-end integration scenario or system test suite.
 - **`code_reference`** (`REF-*`): Semantic link connecting kernel objects to repository source lines (`file://...#L10-L20`).
 - **`validation_rule`** (`VRL-*`): Declarative rule DSL expression evaluated against kernel objects.
 - **`verification_matrix`** (`MTX-*`): Traceability matrix aggregating requirements, criteria, and test runs.
+- **`qa_success`** (`QAS-*`): Cryptographically recorded passing test execution receipts in CAS.
 - **`maturation_report`** (`MAT-*`): Audit report on object and codebase maturity.
+- **`process_hygiene_rule`** (`PHR-*`): Process hygiene and drift detection rules.
+- **`test_command_rule`** (`TCR-*`): Automated test execution recipes.
+- **`test_audit_aggregation_metric`** (`TAM-*`): Aggregated test audit rollups.
+- **`code_quality_metric`** (`CQM-*`): Static analysis and code quality scores.
 
-### 3.7 Organization & Stakeholders (`packs/org/`)
+### 3.11 Organization & Stakeholders Pack (`packs/org/`)
 Organizational structure and governance ownership:
 - **`organization`** (`ORG-*`), **`division`** (`DIV-*`), **`department`** (`DEP-*`), **`team`** (`TEM-*`): Structural hierarchy defining organizational boundaries.
+- **`team_configuration`** (`TCF-*`): Execution configurations and authority delegates for teams.
 - **`stakeholder_profile`** (`STK-*`): Person or role accountable for specific domains or decisions.
+- **`corporate_initiative`** (`CRP-*`): Cross-cutting corporate initiatives.
+- **`partnership`** (`PRN-*`): External ecosystem partner configurations.
+- **`organizational_change`** (`OCH-*`): Organization change impact records.
 
-### 3.8 Telemetry & Metrics (`packs/metric/`)
+### 3.12 Telemetry & Metrics Pack (`packs/metric/`)
 Kernel telemetry, performance metrics, and daemon health:
 - **`command_metric`** (`CMD-*`): Execution metrics (duration, exit code, resource utilization) per CLI command.
+- **`sampler_profile`** (`SMP-*`): Telemetry sampler profiles and sample rates.
 - **`status_history_metric_sampler`** (`SHM-*`): Time-series tracking of lifecycle state transitions across the graph.
 - **`scheduler_health_metric`** (`SHL-*`): Operational health of background daemons and cron workers.
+- **`file_lock_metric`** (`FLM-*`): Lock duration and contention metrics.
+- **`scalar_metric_sampler`** (`SMS-*`), **`list_metric_sampler`** (`LMS-*`), **`ordered_list_metric_sampler`** (`OMS-*`): Generic metric samplers.
+- **`kind_mapping_metric`** (`KMM-*`): Object-kind distribution metrics.
+- **`metadata_package`** (`MDP-*`): Packaged telemetry metadata bundles.
+- **`base_sampler`** (`BSM-*`): Base metric sampling configuration.
+- **`audit_aggregation_metric`** (`AAM-*`): Telemetry aggregation metrics.
+
+### 3.13 Pipeline Pack (`packs/pipeline/`)
+Multi-stage build, deployment, and data pipelines:
+- **`pipeline_definition`** (`PLD-*`): Declarative multi-stage pipeline definition.
+- **`pipeline`** (`PIP-*`): Concrete instantiated pipeline instance.
+- **`pipeline_execution`** (`PLX-*`): Execution run receipts with timing, stage outputs, and exit codes.
+- **`pipeline_stage`** (`PLS-*`): Individual stage in a pipeline execution graph.
+
+### 3.14 Interface & Display Pack (`packs/interface/`, `packs/display/`)
+CLI commands, APIs, and UI console interfaces:
+- **`command_spec`** (`CMS-*`): Canonical CLI command specifications.
+- **`api_spec`** (`API-*`): Public and internal API endpoint specifications.
+- **`display`** (`DSP-*`): TUI and GUI layout definitions.
+- **`component`** (`CMP-*`): Reusable UI/TUI components.
 
 ---
 
 ## 4. The Ontological Cascade: Verifiable Decomposition Spine (VDS)
 
-In ZQK, every unit of executable work must form an unbroken chain from strategic intent to automated test verification:
+In ZQK, every unit of executable work must form an unbroken chain from strategic intent down to automated test verification and production release:
 
 ```
 [ vision: VIS-* ]
@@ -159,6 +253,9 @@ In ZQK, every unit of executable work must form an unbroken chain from strategic
         │ operationalizes
         ▼
 [ goal: GOAL-* ]
+        │ decomposes into
+        ▼
+[ milestone: MIL-* ]
         │ drives
         ▼
 [ priority_plan: PRI-* ]
@@ -177,11 +274,20 @@ In ZQK, every unit of executable work must form an unbroken chain from strategic
         │ executed in
         ▼
 [ backlog_item: BLI-* ]
+        │ produces
+        ▼
+[ qa_success: QAS-* ]
+        │ seals
+        ▼
+[ release: REL-* ]
 ```
 
 > [!IMPORTANT]
 > **TPM Definition of Done Guardrail**:
-> Pre-commit hooks (`zqk pre-commit`) and release gates fail-closed if any test case or criterion lacks a complete, unbroken lineage to root objects, or if any active requirement lacks mandatory documentation criteria (`POL-DOC-001`).
+> Pre-commit hooks (`zqk pre-commit`) and release gates fail-closed if:
+> 1. Any test case or criterion lacks an unbroken lineage up to root milestone and goal objects.
+> 2. Any active requirement lacks mandatory documentation criteria (`POL-DOC-001`).
+> 3. Any promotion to `release` lacks cryptographically verified `qa_success` receipts.
 
 ---
 
