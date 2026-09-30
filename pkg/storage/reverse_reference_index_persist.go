@@ -73,6 +73,14 @@ func (r *ReverseReferenceIndex) LoadCache(projectRoot string) (bool, error) {
 				r.index = make(map[string][]string)
 			}
 			r.index = cacheData.Index
+			r.forwardIndex = make(map[string][]string)
+			if r.index != nil {
+				for referencedID, deps := range r.index {
+					for _, dep := range deps {
+						r.forwardIndex[dep] = append(r.forwardIndex[dep], referencedID)
+					}
+				}
+			}
 			r.metadata = cacheData.Metadata
 			r.isReady.Store(true)
 			entryCount = len(r.index)

@@ -119,6 +119,9 @@ func (r *ReverseReferenceIndex) ReferencedIDCount() int {
 // GetDependentsWithContext retrieves all dependent object IDs with fail-closed error propagation
 // using the provided context for lock acquisition timeout.
 func (r *ReverseReferenceIndex) GetDependentsWithContext(ctx stdcontext.Context, referencedID string) ([]string, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	var dependents []string
 	err := concurrency.WithRLockTimeout(
@@ -184,15 +187,10 @@ func (r *ReverseReferenceIndex) AddReference(objectID, referencedID string) {
 		if r.index == nil {
 			r.index = make(map[string][]string)
 		}
-
-		deps := r.index[referencedID]
-		for _, dep := range deps {
-			if dep == objectID {
-				return nil
-			}
+		if r.forwardIndex == nil {
+			r.forwardIndex = make(map[string][]string)
 		}
-
-		r.index[referencedID] = append(deps, objectID)
+		r.addReferenceLocked(objectID, referencedID)
 		return nil
 	})
 	if err != nil {
@@ -209,19 +207,7 @@ func (r *ReverseReferenceIndex) RemoveReference(objectID, referencedID string) {
 		if r.index == nil {
 			return nil
 		}
-		deps := r.index[referencedID]
-
-		newDeps := make([]string, 0, len(deps))
-		for _, dep := range deps {
-			if dep != objectID {
-				newDeps = append(newDeps, dep)
-			}
-		}
-		if len(newDeps) == 0 {
-			delete(r.index, referencedID)
-		} else {
-			r.index[referencedID] = newDeps
-		}
+		r.removeReferenceLocked(objectID, referencedID)
 		return nil
 	})
 	if err != nil {
@@ -240,27 +226,26 @@ func (r *ReverseReferenceIndex) RemoveObject(objectID string) {
 		}
 
 		if r.forwardIndex != nil {
-			if refs, ok := r.forwardIndex[objectID]; ok {
-				for _, referencedID := range refs {
-					deps := r.index[referencedID]
-					newDeps := make([]string, 0, len(deps))
-					for _, dep := range deps {
-						if dep != objectID {
-							newDeps = append(newDeps, dep)
-						}
-					}
-					if len(newDeps) == 0 {
-						delete(r.index, referencedID)
-					} else {
-						r.index[referencedID] = newDeps
+			refs := r.forwardIndex[objectID]
+			for _, referencedID := range refs {
+				deps := r.index[referencedID]
+				newDeps := make([]string, 0, len(deps))
+				for _, dep := range deps {
+					if dep != objectID {
+						newDeps = append(newDeps, dep)
 					}
 				}
-				delete(r.forwardIndex, objectID)
-				return nil
+				if len(newDeps) == 0 {
+					delete(r.index, referencedID)
+				} else {
+					r.index[referencedID] = newDeps
+				}
 			}
+			delete(r.forwardIndex, objectID)
+			return nil
 		}
 
-		// Fallback: full scan if forward index is not populated for this object
+		// Fallback: full scan only if forward index structure was not initialized
 		for referencedID, deps := range r.index {
 			found := false
 			for _, dep := range deps {
@@ -465,3 +450,34 @@ func (r *ReverseReferenceIndex) BuildFromScan(projectRoot, processDir string, ki
 
 // GetReferencedObjectIDs returns all object IDs referenced by the given object (one level).
 // Used by lifecycle dependency propagation to walk one level up (refs) or down (dependents).
+func (r *ReverseReferenceIndex) GetReferencedObjectIDs(objectID string) []string {
+	if objectID == emptyValue {
+		return nil
+	}
+	var refs []string
+	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
+	defer cancel()
+	err := concurrency.WithRLockTimeout(
+		&r.mu,
+		ctx,
+		nil,
+		logging.NewLockLoggerAdapter(logger),
+		"reverse_reference_index_get_references",
+		func() error {
+			if r.forwardIndex == nil {
+				return nil
+			}
+			if list, exists := r.forwardIndex[objectID]; exists {
+				refs = make([]string, len(list))
+				copy(refs, list)
+			}
+			return nil
+		},
+	)
+	if err != nil {
+		logging.LogSwallowedError(err)
+		return nil
+	}
+	return refs
+}
