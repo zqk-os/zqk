@@ -9,6 +9,7 @@ import (
 	"encoding/hex"
 	"encoding/pem"
 	"fmt"
+	"math/big"
 	"path/filepath"
 
 	"github.com/zqk-os/zqk/pkg/logging"
@@ -141,4 +142,45 @@ type QAReport struct {
 	Status    string `json:"status" yaml:"status"`
 	Signature string `json:"signature" yaml:"signature"`
 	PublicKey string `json:"public_key" yaml:"public_key"`
+}
+
+// VerifySignature verifies that the given hex-encoded ASN.1 signature is valid
+// for the given data bytes against a hex-encoded P-256 public key.
+func VerifySignature(pubHex string, data []byte, sigHex string) error {
+	sig, err := hex.DecodeString(sigHex)
+	if err != nil {
+		return fmt.Errorf(validation.ConstMagic2d0ec3c6, err)
+	}
+
+	if len(pubHex) < 64 {
+		return fmt.Errorf(validation.ConstMagic37c27833)
+	}
+
+	x := new(big.Int)
+	y := new(big.Int)
+	x.SetString(pubHex[:len(pubHex)/2], 16)
+	y.SetString(pubHex[len(pubHex)/2:], 16)
+
+	pub := &ecdsa.PublicKey{
+		Curve: elliptic.P256(),
+		X:     x,
+		Y:     y,
+	}
+
+	hash := sha256.Sum256(data)
+	if !ecdsa.VerifyASN1(pub, hash[:], sig) {
+		return fmt.Errorf("invalid signature")
+	}
+
+	return nil
+}
+
+// VerifyQAReportSignature verifies that a QAReport's signature matches its ItemID and Status
+// signed with the provided trusted public key hex.
+func VerifyQAReportSignature(report QAReport, trustedPubHex string) error {
+	data := []byte(report.ItemID + report.Status)
+	if err := VerifySignature(trustedPubHex, data, report.Signature); err != nil {
+		return fmt.Errorf(validation.ConstMagic9f963b73, report.ItemID)
+	}
+	return nil
 }

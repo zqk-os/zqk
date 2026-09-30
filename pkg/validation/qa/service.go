@@ -173,10 +173,7 @@ func (s *AuditorService) performAudit(ctx context.Context, id string, kind strin
 
 	status, _ := obj[objects.FieldKeyStatus].(string)
 	isComplete := status == objects.ObjectStatusComplete || status == objects.ObjectStatusCompleted || status == "complete" || status == "completed"
-	artifactPaths := extractArtifactPaths(obj[objects.FieldKeyArtifacts])
-	if len(artifactPaths) == 0 {
-		artifactPaths = extractArtifactPaths(obj[objects.FieldKeyCodeLocation])
-	}
+	artifactPaths := ExtractObjectArtifacts(obj)
 
 	// 1.3 Requirement Criteria Verification
 	if kind == objects.KindRequirement && isComplete {
@@ -300,7 +297,7 @@ func (s *AuditorService) performAudit(ctx context.Context, id string, kind strin
 
 	// 1.6 Deliverable Artifacts Validation
 	// Fail-closed: completed backlog items and agent tasks must have at least one deliverable artifact.
-	if (kind == objects.KindBacklogItem || kind == objects.KindAgentTask) && isComplete {
+	if IsDeliverableBearingKind(kind) && isComplete {
 		if len(artifactPaths) == 0 {
 			reason := ReasonMissingArtifacts
 			logging.FluentEvent(logger).Warn(fmt.Sprintf(LogFmtAuditorContentDisparity, id, reason)).Log()
@@ -314,30 +311,15 @@ func (s *AuditorService) performAudit(ctx context.Context, id string, kind strin
 	}
 
 	// For all declared artifacts, verify that the files actually exist on disk before running AST analysis.
-	for _, path := range artifactPaths {
-		info, err := fileutil.Stat(path)
-		if err != nil || info.IsDir() {
-			reason := fmt.Sprintf("Artifact file does not exist or cannot be read: %s", path)
-			logging.FluentEvent(logger).Warn(fmt.Sprintf(LogFmtAuditorContentDisparity, id, reason)).Log()
-			if s.emitter != nil {
-				if emitErr := s.emitter.EmitDisparityInterrupt(ctx, id, reason); emitErr != nil {
-					logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorEmitHITLFailed, emitErr), emitErr).Log()
-				}
+	if err := ValidateArtifactFiles(artifactPaths, ""); err != nil {
+		reason := err.Error()
+		logging.FluentEvent(logger).Warn(fmt.Sprintf(LogFmtAuditorContentDisparity, id, reason)).Log()
+		if s.emitter != nil {
+			if emitErr := s.emitter.EmitDisparityInterrupt(ctx, id, reason); emitErr != nil {
+				logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorEmitHITLFailed, emitErr), emitErr).Log()
 			}
-			return
 		}
-		f, err := fileutil.Open(path)
-		if err != nil {
-			reason := fmt.Sprintf("Artifact file cannot be read: %s", path)
-			logging.FluentEvent(logger).Warn(fmt.Sprintf(LogFmtAuditorContentDisparity, id, reason)).Log()
-			if s.emitter != nil {
-				if emitErr := s.emitter.EmitDisparityInterrupt(ctx, id, reason); emitErr != nil {
-					logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorEmitHITLFailed, emitErr), emitErr).Log()
-				}
-			}
-			return
-		}
-		_ = f.Close()
+		return
 	}
 
 	// 2. STRUCTURAL AST AUDIT
@@ -451,28 +433,6 @@ func (s *AuditorService) performAudit(ctx context.Context, id string, kind strin
 	logging.FluentEvent(logger).Info(fmt.Sprintf(LogFmtAuditorSuccess, id)).Log()
 }
 
-func extractArtifactPaths(value any) []string {
-	var paths []string
-	switch items := value.(type) {
-	case []any:
-		for _, item := range items {
-			if s, ok := item.(string); ok && strings.TrimSpace(s) != "" {
-				paths = append(paths, strings.TrimSpace(s))
-			}
-		}
-	case []string:
-		for _, s := range items {
-			if strings.TrimSpace(s) != "" {
-				paths = append(paths, strings.TrimSpace(s))
-			}
-		}
-	case string:
-		if strings.TrimSpace(items) != "" {
-			paths = append(paths, strings.TrimSpace(items))
-		}
-	}
-	return paths
-}
 
 
 func hasStringEvidence(value any) bool {

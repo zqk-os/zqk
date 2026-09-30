@@ -339,7 +339,7 @@ transitions:
     preconditions:
       - standard_checks_pass
     postconditions:
-      - role is testing
+      - role is execution_locked
     catalyst: Standard progression
     class_vs_specialty: class-agnostic
     shockwave: &id001

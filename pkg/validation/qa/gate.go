@@ -2,19 +2,13 @@ package qa
 
 import (
 	"context"
-	"crypto/ecdsa"
-	"crypto/elliptic"
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
-	"math/big"
 	"path/filepath"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
-	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/validation"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
@@ -68,22 +62,8 @@ func (g *AuditorGate) VerifyComplete(ctx context.Context, itemID string) error {
 
 	// 1. LATCH 1 (Data Existence): If item exists in storage, verify required artifacts exist on disk.
 	if obj, readErr := g.storage.Read(ctx, secCtx, itemID); readErr == nil && obj != nil {
-		paths := extractArtifactPaths(obj[objects.FieldKeyArtifacts])
-		if len(paths) == 0 {
-			paths = extractArtifactPaths(obj[objects.FieldKeyCodeLocation])
-		}
-		if len(paths) == 0 && (obj[objects.FieldKeyKind] == objects.KindBacklogItem || obj[objects.FieldKeyKind] == objects.KindAgentTask) {
-			return fmt.Errorf(errFmtLatch1MissingArtifacts, itemID)
-		}
-		for _, p := range paths {
-			targetPath := p
-			if !filepath.IsAbs(targetPath) && g.projectRoot != "" {
-				targetPath = filepath.Join(g.projectRoot, targetPath)
-			}
-			info, statErr := fileutil.Stat(targetPath)
-			if statErr != nil || info.IsDir() {
-				return fmt.Errorf(errFmtLatch1ArtifactNotFound, p)
-			}
+		if _, err := ValidateDeliverableArtifacts(obj, g.projectRoot); err != nil {
+			return fmt.Errorf("latch 1 failed (data existence): %w", err)
 		}
 	}
 
@@ -158,32 +138,5 @@ func (g *AuditorGate) trustedPubHex(ctx context.Context, secCtx *pkgctx.Security
 }
 
 func (g *AuditorGate) verifySignature(report QAReport, pubHex string) error {
-	sig, err := hex.DecodeString(report.Signature)
-	if err != nil {
-		return fmt.Errorf(validation.ConstMagic2d0ec3c6, err)
-	}
-
-	if len(pubHex) < 64 {
-		return fmt.Errorf(validation.ConstMagic37c27833)
-	}
-
-	x := new(big.Int)
-	y := new(big.Int)
-	x.SetString(pubHex[:len(pubHex)/2], 16)
-	y.SetString(pubHex[len(pubHex)/2:], 16)
-
-	pub := &ecdsa.PublicKey{
-		Curve: elliptic.P256(),
-		X:     x,
-		Y:     y,
-	}
-
-	data := []byte(report.ItemID + report.Status)
-	hash := sha256.Sum256(data)
-
-	if !ecdsa.VerifyASN1(pub, hash[:], sig) {
-		return fmt.Errorf(validation.ConstMagic9f963b73, report.ItemID)
-	}
-
-	return nil
+	return VerifyQAReportSignature(report, pubHex)
 }

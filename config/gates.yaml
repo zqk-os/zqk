@@ -5,7 +5,9 @@ version: "1.0.0"
 hygiene:
   check_paths: true
   check_perms: true
-  check_dups: false
+  check_dups: true
+  dup_min_statements: 6
+  dup_min_lines: 10
   check_cli_names: true
   check_subprocess_hygiene: true
   check_command_specs: true
