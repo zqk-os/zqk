@@ -11,8 +11,9 @@ This directory contains evaluation reports and architectural synthesis across th
 | **Package Boundaries** | **[RDB Report](./RDB-architecture-package-boundaries.md)** | Clean layering, package isolation, circular dependency avoidance, and modularity | Evaluated |
 | **Reliability** | **[REL Report](./REL-reliability-error-recovery.md)** | Crash resilience, WAL compaction, lock safety, and fail-closed recovery proofs | Evaluated |
 | **Security** | **[SEC Report](./SEC-security-threat-vectors.md)** | Threat model, CAS sandboxing, Mode B privilege isolation, and cryptographic integrity | Evaluated |
-| **Testing** | **[TST Report](./TST-test-strategy-invariant-proofs.md)** | TDD test coverage, invariant regression prevention, race detection, and DoD gates | Evaluated |
-| **Convergence** | **[SYNTHESIS Report](./SYNTHESIS-diamond-envelope-convergence.md)** | Multi-dimensional quality convergence synthesis and production launch readiness | Converged |
+| **Documentation** | **[DOC Report](./DOC-documentation-domain-model.md)** | Domain model accuracy, Divio 4-quadrant balance, zero CLI command drift, and authentic visual mockups | Evaluated & Verified |
+| **Usability** | **[USB Report](./USB-developer-usability-ergonomics.md)** | Time-to-first-success, fail-closed actionable guidance, multi-agent seating parity, and TUI ergonomics | Evaluated & Verified |
+| **Convergence** | **[SYNTHESIS Report](./SYNTHESIS-diamond-envelope-convergence.md)** | Multi-dimensional quality convergence synthesis and 100% public launch readiness certification | Converged (100% Ready) |
 
 ---
 

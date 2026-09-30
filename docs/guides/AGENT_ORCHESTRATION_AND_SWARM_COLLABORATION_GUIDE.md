@@ -29,7 +29,7 @@ The onboarding process:
 
 ### Checking Seating & Status
 ```bash
-zqk agent seat status
+zqk agent status
 ```
 
 ---
@@ -39,14 +39,14 @@ zqk agent seat status
 Agents do not rely on fragile shared chat histories. Instead, cross-agent coordination occurs through the **Agent Feed**—an append-only, content-addressed message bus:
 
 ```bash
-# Query recent messages and broadcast updates
-zqk agent feed list --limit 10
+# Query pending events and inbox status
+zqk feed pending --agent-id peer-agent-1
 
 # Post an operational status update
-zqk agent feed emit-status --state in_progress --bli BLI-AUTH-004 --message "Executing CAS integrity validation"
+zqk feed emit-status --persona-ref PER-DEFAULT-AGENT --agent-id peer-agent-1 --summary "Executing CAS integrity validation"
 
 # Acknowledge or steer peer agent activities
-zqk agent feed ack --msg-id MSG-89410 --response "Holding PR merge until schema compilation passes"
+zqk feed ack --agent-id peer-agent-1 --in-reply-to AFE-1790728562589433000-51ec4b79
 ```
 
 ---

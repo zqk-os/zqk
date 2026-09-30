@@ -38,7 +38,7 @@ flowchart TD
     subgraph Tier2["Tier 2: COLD STORAGE (Detached Remote Vault)"]
         C1["Remote Object Store (S3 / GCS / Git LFS / ~/.zqk/cold-vault)"]
         C2["0 Bytes Local Payload - Tombstone Locator in Index"]
-        C3["On-Demand Fetch: zqk archive fetch [ROOT-ID]"]
+        C3["On-Demand Fetch: Remote vault rehydration / zqk system state-restore"]
     end
 
     subgraph Tier3["Tier 3: THE ABYSS (A-Bits / Cryptographic Purge)"]
@@ -194,14 +194,15 @@ The CLI detects the tombstone record in the index:
 2. **Cold Storage:** If the local bundle was offloaded:
    ```
    ⚠️ Object GOAL-001 resides in COLD STORAGE (Vault: s3://zqk-archive-cold/vault/capsules/GOAL-001.capsule.zst)
-   Payload not present on local disk. Run:
-     zqk archive fetch GOAL-001
+   Payload not present on local disk. Restore state snapshot or fetch capsule:
+     zqk system state-restore --snapshot-file <path>
    ```
 
-### 5.2 Executive Timeline Inspection (`zqk archive inspect`)
-Rather than sifting through hundreds of raw YAMLs, operators inspect the synthesized narrative:
+### 5.2 Executive Timeline Inspection (`zqk object get` / `zqk system state-diff`)
+Rather than sifting through hundreds of raw YAMLs, operators inspect the synthesized narrative or compare snapshots:
 ```bash
-./bin/zqk archive inspect GOAL-001 --narrative
+./bin/zqk object get GOAL-001 --format yaml
+./bin/zqk system state-diff --snapshot-file .zqk-state/system-state.csnap
 ```
 Outputs the compiled executive history:
 - Objective and final deliverables
@@ -217,16 +218,16 @@ Attempts to modify an archived entity:
 Fails closed with immediate rejection:
 ```
 Error: plane boundary violation: object GOAL-001 resides in plane 'apoptotic'.
-Warm capsules are mathematically immutable. To modify this object, run:
-  zqk archive restore GOAL-001 --target-plane staged
+Warm capsules are mathematically immutable. To modify this object, unarchive or restore:
+  zqk system state-restore --snapshot-file <path>
 ```
 
-### 5.4 Rehydration / Unarchive Workflow (`zqk archive restore`)
+### 5.4 Rehydration / State Restoration Workflow (`zqk system state-restore`)
 If a project is revived or requires new active iteration:
 ```bash
-./bin/zqk archive restore GOAL-001 --target-plane staged
+./bin/zqk system state-restore --snapshot-file .zqk-state/system-state.csnap
 ```
-1. Decompresses `.zqk/archive/bundles/GOAL-001.capsule.zst`.
+1. Decompresses the snapshot archive.
 2. Restores individual objects back into `.zqk/process/<kind>/`.
 3. Computes CAS hashes and restores active index pointers.
 4. Transitions plane from `apoptotic` back to `staged` or `promoted`.

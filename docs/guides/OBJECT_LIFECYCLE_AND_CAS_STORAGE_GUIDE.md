@@ -23,7 +23,7 @@ id: BLI-AUTH-004
 kind: backlog_item
 status: in_progress
 title: "Implement Content-Addressed Storage Membrane Check-Valves"
-claimed_by: "agent-alpha"
+claimed_by: "PER-DEFAULT-OPERATOR"
 priority_tier: P0
 priority_plan_ref: PRI-TPM-CONV
 goal_refs:

@@ -27,7 +27,7 @@ Every guide is structured to serve both **human pair programmers** using the int
 
 | Guide | Focus Area | Target Audience | Primary CLI & MCP Commands |
 | :--- | :--- | :--- | :--- |
-| **[Custom Validation Policy Creation & Rule DSL](./POLICY_CREATION_AND_VALIDATION_DSL_GUIDE.md)** | Composing declarative Validation Rule DSL expressions, live population dry-run audits, grandfathering, and check-valve registration. | Tech Leads, Governance Stewards | `zqk object inspect --policy-studio`, `zqk verify policy` |
+| **[Custom Validation Policy Creation & Rule DSL](./POLICY_CREATION_AND_VALIDATION_DSL_GUIDE.md)** | Composing declarative Validation Rule DSL expressions, live population dry-run audits, grandfathering, and check-valve registration. | Tech Leads, Governance Stewards | `zqk object inspect --policy-studio`, `zqk system check-policy` |
 
 ---
 

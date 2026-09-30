@@ -269,7 +269,7 @@ Autonomous agents calling `./bin/zqk object inspect <kind> [id] -f json` receive
   "status": "in_progress",
   "priority": "P0",
   "title": "Implement TUI 7-Tab View",
-  "claimed_by": "agent-alpha",
+  "claimed_by": "PER-DEFAULT-OPERATOR",
   "lineage": {
     "goal": "GOAL-001",
     "requirement": "REQ-012",

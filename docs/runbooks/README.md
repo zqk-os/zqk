@@ -13,5 +13,5 @@ This directory contains standardized incident response and operational troublesh
 
 ## General Incident Triage Protocol
 1. **Assess System State**: Run `./bin/zqk system status` and `./bin/zqk scheduler status`.
-2. **Collect Diagnostics**: In emergencies, run `./bin/zqk diagnostics dump` to preserve traces before restarting daemons.
+2. **Collect Diagnostics**: In emergencies, run `./bin/zqk scheduler dump` and `./bin/zqk system snapshot --reason "<incident>"` to preserve traces before restarting daemons.
 3. **Consult Relevant Runbook**: Follow the Step-by-Step Resolution and Verification gates specified in the catalog.

@@ -1101,9 +1101,9 @@ func main() {
 		m.AutoScroll = true
 		m.AuditEvents = []state.JournalMutation{
 			{CreatedAt: time.Now().Add(-240 * time.Second).Unix(), Actor: "PER-DEFAULT-LEAD", ChangeType: "claim_work", ObjectRef: "BLI-STARTER-001", DiffSummary: "Claimed item for execution loop"},
-			{CreatedAt: time.Now().Add(-180 * time.Second).Unix(), Actor: "agent-alpha", ChangeType: "ref_add", ObjectRef: "BLI-STARTER-001", DiffSummary: "Linked target REQ-LAUNCH-DOCS"},
-			{CreatedAt: time.Now().Add(-120 * time.Second).Unix(), Actor: "agent-alpha", ChangeType: "promote", ObjectRef: "BLI-STARTER-001", DiffSummary: "Transition planned -> in_progress"},
-			{CreatedAt: time.Now().Add(-60 * time.Second).Unix(), Actor: "ACC-SYSTEM", ChangeType: "scheduler_tick", ObjectRef: "SCH-RETENTION", DiffSummary: "Scanned 185 objects; pruned 0 stale"},
+			{CreatedAt: time.Now().Add(-180 * time.Second).Unix(), Actor: "PER-DEFAULT-OPERATOR", ChangeType: "ref_add", ObjectRef: "BLI-STARTER-001", DiffSummary: "Linked target REQ-STARTER-COMMUNITY-001"},
+			{CreatedAt: time.Now().Add(-120 * time.Second).Unix(), Actor: "PER-DEFAULT-OPERATOR", ChangeType: "promote", ObjectRef: "BLI-STARTER-001", DiffSummary: "Transition planned -> in_progress"},
+			{CreatedAt: time.Now().Add(-60 * time.Second).Unix(), Actor: "ACC-SYSTEM", ChangeType: "scheduler_tick", ObjectRef: "SCH-retention-tolerance", DiffSummary: "Scanned 185 objects; pruned 0 stale"},
 			{CreatedAt: time.Now().Add(-10 * time.Second).Unix(), Actor: "ACC-SYSTEM", ChangeType: "cas_verify", ObjectRef: "CAS-BLOB-9821", DiffSummary: "Verified SHA-256 integrity match"},
 		}
 		m.SelectedIndex = 4
@@ -1161,7 +1161,7 @@ func main() {
 			Unclaimed:  7,
 		}
 		m.RecentBacklog = []ui.PMBacklogRow{
-			{ID: "BLI-COMMUNITY-FIRST-RUN", Title: "Community first-run tutorial verification", Status: "in_progress", Priority: "P0", ClaimedBy: "agent-alpha", PlanRef: "PRI-STARTER-COMMUNITY-001"},
+			{ID: "BLI-COMMUNITY-FIRST-RUN", Title: "Community first-run tutorial verification", Status: "in_progress", Priority: "P0", ClaimedBy: "PER-DEFAULT-OPERATOR", PlanRef: "PRI-STARTER-COMMUNITY-001"},
 			{ID: "BLI-STORAGE-PUREGO-001", Title: "Pure-Go embedded storage backend & WAL engine", Status: "complete", Priority: "P0", ClaimedBy: "ACC-SYSTEM", PlanRef: "PRI-STORAGE-PUREGO-001"},
 			{ID: "BLI-ZQL-ACID-TRANSACT", Title: "Multi-object atomic transactional mutations", Status: "complete", Priority: "P1", ClaimedBy: "ACC-SYSTEM", PlanRef: "PRI-STORAGE-PUREGO-001"},
 			{ID: "BLI-AIRGAP-BUILD-TARBALL", Title: "Zero-network hermetic build verification", Status: "planned", Priority: "P1", ClaimedBy: "", PlanRef: "PRI-STARTER-COMMUNITY-001"},
@@ -1218,11 +1218,11 @@ func main() {
 		m.Width = termWidth
 		m.Height = 0
 		m.SchedulerJobs = []ui.SchedulerJobRow{
-			{ID: "SCH-001", Title: "change_journal_compaction", Schedule: "@every 5m", LastRunAt: "12:10:00", NextRunAt: "12:15:00", Status: "active"},
-			{ID: "SCH-002", Title: "audit_aggregation", Schedule: "@every 1h", LastRunAt: "12:00:00", NextRunAt: "13:00:00", Status: "active"},
-			{ID: "SCH-003", Title: "cas_hygiene_scan", Schedule: "@every 6h", LastRunAt: "06:00:00", NextRunAt: "12:00:00", Status: "active"},
-			{ID: "SCH-004", Title: "memory_leak_watchdog", Schedule: "@every 1m", LastRunAt: "12:14:00", NextRunAt: "12:15:00", Status: "active"},
-			{ID: "SCH-005", Title: "test_matrix_prewarm", Schedule: "@every 2m", LastRunAt: "12:13:30", NextRunAt: "12:15:30", Status: "active"},
+			{ID: "SCH-audit-event-aggregation", Title: "audit_event_aggregation", Schedule: "*/15 * * * *", LastRunAt: "12:10:00", NextRunAt: "12:15:00", Status: "active"},
+			{ID: "SCH-cache-prewarm", Title: "cache_prewarm", Schedule: "*/10 * * * *", LastRunAt: "12:00:00", NextRunAt: "12:10:00", Status: "active"},
+			{ID: "SCH-cap-orchestrator", Title: "cap_orchestrator", Schedule: "0 */10 * * * *", LastRunAt: "12:00:00", NextRunAt: "12:10:00", Status: "active"},
+			{ID: "SCH-retention-tolerance", Title: "retention_tolerance", Schedule: "0 */4 * * *", LastRunAt: "08:00:00", NextRunAt: "12:00:00", Status: "active"},
+			{ID: "SCH-val", Title: "object_validation", Schedule: "event (WAL / mutate)", LastRunAt: "12:14:50", NextRunAt: "on-mutation", Status: "active"},
 		}
 		m.SelectedIndex = 0
 		out := ui.Render(m)
@@ -1299,12 +1299,12 @@ func main() {
 			},
 			Lineage: []string{
 				"Upstream Goal       : [🟢 GOAL-STARTER-COMMUNITY-001] Open-Core Community Gate",
-				"Parent Requirement  : [🟢 REQ-COMMUNITY-FIRST-RUN] 100% Documentation Accuracy",
-				"Bound Test Case     : [🟢 TST-COMMUNITY-FIRST-RUN] pkg/community/onboarding_test.go",
+				"Parent Requirement  : [🟢 REQ-STARTER-COMMUNITY-001] Community kernel launch-readiness",
+				"Bound Test Case     : [🟢 TST-COMMUNITY-FIRST-RUN] pkg/community/self_onboarding_test.go",
 				"Lineage Integrity   : ✓ 100% INTACT (Zero orphan references, zero cycles)",
 			},
 			Criteria: []string{
-				"[🟢 CRIT-COMMUNITY-001] (satisfied) Complete Start Here walkthrough succeeds without manual interventions",
+				"[🟢 CRIT-STARTER-COMMUNITY-001] (satisfied) Complete Start Here walkthrough succeeds without manual interventions",
 				"[🟢 CRIT-COMMUNITY-002] (satisfied) All 4 layers in system check pass with 0 warnings",
 				"[🟢 CRIT-COMMUNITY-003] (satisfied) Documentation portal compiles with 188 verified articles",
 			},
@@ -1571,7 +1571,7 @@ func main() {
 			fmt.Sprintf("%s %s │ %s %s │ %s %s",
 				dimStyle("ETAG:"), whiteBold(`"rev-001-c8104"`),
 				dimStyle("PERMISSIONS:"), dimStyle("0644"),
-				dimStyle("AUDIT LOG:"), dimStyle(paths.ProcessDir+"/audit_event/AUD-POL-002-INIT.yaml"),
+				dimStyle("AUDIT STREAM:"), dimStyle(paths.ProjectDataDir+"/streams/audit_event/AUD-POL-002-INIT.jsonl"),
 			),
 		}
 		buf.WriteString(tds.Panel("3. ATOMIC CAS STORAGE PROMOTION RECEIPT", receiptLines, termWidth, tds.BorderLight))
