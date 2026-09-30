@@ -8,7 +8,7 @@ import (
 // NewMatrixCommandBuilder creates a new matrix command
 func NewMatrixCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("")
-	builder.WithShort("Generated spec for matrix")
+	builder.WithShort("Inspect and update quality matrices and test-bundle registries")
 	builder.WithCommonFlags(false, nil)
 	cmd := builder.Build()
 	return cmd

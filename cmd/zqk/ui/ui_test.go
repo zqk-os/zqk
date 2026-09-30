@@ -3,6 +3,7 @@ package ui
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -12,7 +13,10 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/state"
 	"github.com/zqk-os/zqk/cmd/zqk/test"
 	"github.com/zqk-os/zqk/cmd/zqk/ui/tds"
+	"github.com/zqk-os/zqk/pkg/agentfeed"
+	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/tde"
 )
 
 func TestNewUICmd(t *testing.T) {
@@ -1345,6 +1349,114 @@ func TestUI_Render_NoScrollbackBleed(t *testing.T) {
 		visW := tds.VisibleWidth(line)
 		assert.LessOrEqual(t, visW, m.Width, "Line %d visible width (%d) must not exceed terminal width (%d)", i, visW, m.Width)
 	}
+}
+
+func TestUI_TabSwarm_InboxCompleteLifecycle(t *testing.T) {
+	tmpDir := t.TempDir()
+	channelDir := filepath.Join(tmpDir, ".zqk", "logs", "ide-hooks")
+	require.NoError(t, os.MkdirAll(channelDir, 0755))
+
+	require.NoError(t, datacell.WriteAgentChatChannelConfig(tmpDir, datacell.AgentChatChannelConfig{
+		SchemaVersion: datacell.AgentChatChannelSchemaVersion,
+		Enabled:       true,
+		DeliveryMode:  datacell.DeliveryModeNotify,
+		FeedID:        "AGF-test-ui",
+	}))
+
+	m := NewUIModel(tmpDir, "swarm")
+	m.ActiveTab = TabSwarm
+	m.Width = 120
+	m.Height = 30
+
+	// 1. Empty inbox state
+	renderedEmpty := Render(m)
+	assert.Contains(t, renderedEmpty, "SWARM & OPERATOR INBOX")
+	assert.Contains(t, renderedEmpty, "[No unacknowledged correspondence or staged envelopes in inbox]")
+	assert.Equal(t, 0, m.GetCurrentRowCount())
+
+	// 2. Footer action hints for TabSwarm
+	assert.Contains(t, renderedEmpty, "[a] Ack [r] Reply")
+
+	// 3. Inject inbox items: 1 correspondence and 1 staged envelope
+	evRes, err := agentfeed.AppendEvent(agentfeed.AppendEventInput{
+		ProjectRoot: tmpDir,
+		Message:     "Need review on schema proposal",
+		AgentID:     "lead-architect",
+		ToAgentID:   "operator",
+		Sender:      agentfeed.FeedSenderHumanSteer,
+		EventType:   agentfeed.FeedEventTypeMeshStatus,
+		SelfACK:     true,
+	})
+	require.NoError(t, err)
+
+	wal, err := tde.NewStagingWAL(tmpDir)
+	require.NoError(t, err)
+	err = wal.Stage(tde.Envelope{
+		ID:        "ENV-STAGED-001",
+		Kind:      objects.KindRequirement,
+		TargetID:  "REQ-001",
+		Operation: "update",
+		CreatedAt: time.Now(),
+		ExecuteAt: time.Now().Add(1 * time.Hour),
+	})
+	require.NoError(t, err)
+	require.NoError(t, wal.Sync())
+	require.NoError(t, wal.Close())
+
+	m.RefreshInbox()
+
+	// 4. Populated table rendering
+	renderedPop := Render(m)
+	assert.Contains(t, renderedPop, "SWARM & OPERATOR INBOX")
+	assert.Contains(t, renderedPop, "ENV-STAGED-001")
+	assert.Contains(t, renderedPop, "lead-archit")
+	assert.Contains(t, renderedPop, "Need review")
+	assert.Equal(t, 2, m.GetCurrentRowCount())
+
+	// 5. Search filtering
+	m.SearchQuery = "wal"
+	visible := m.GetVisibleInboxItems()
+	require.Len(t, visible, 1)
+	assert.Equal(t, "ENV-STAGED-001", visible[0].ID)
+	assert.Equal(t, 1, m.GetCurrentRowCount())
+	m.SearchQuery = ""
+
+	// 6. Drill-down detail modal inspection
+	m.SelectedIndex = 0
+	m.OpenSelectedItemDetail()
+	require.NotNil(t, m.DetailModal)
+	assert.Equal(t, evRes.EventID, m.DetailModal.ID)
+	assert.Equal(t, "correspondence", m.DetailModal.Kind)
+	assert.Equal(t, "lead-architect", m.DetailModal.Actor)
+
+	modalRendered := Render(m)
+	assert.Contains(t, modalRendered, "DETAILED RECORD INSPECTION")
+	assert.Contains(t, modalRendered, "[a] Acknowledge Item │ [r] Quick Reply")
+
+	// 7. In-modal acknowledgment via hotkey 'a'
+	handled := handleInput(m, []byte{'a'})
+	assert.False(t, handled)
+	assert.Nil(t, m.DetailModal, "Detail modal should be closed after ack")
+	assert.Contains(t, m.DynamicMessage, "Acknowledged inbox correspondence")
+
+	// 8. Re-open detail modal on envelope and test Esc dismissal
+	m.SelectedIndex = 0
+	m.OpenSelectedItemDetail()
+	require.NotNil(t, m.DetailModal)
+	assert.Equal(t, "ENV-STAGED-001", m.DetailModal.ID)
+	handleInput(m, []byte{KeyEsc})
+	assert.Nil(t, m.DetailModal)
+
+	// 9. Table-level response dispatch via hotkey 'r'
+	m.SelectedIndex = 0
+	handledReply := handleInput(m, []byte{'r'})
+	assert.False(t, handledReply)
+	assert.Contains(t, m.DynamicMessage, "Responded to")
+
+	// 10. Commit staged envelope via AcknowledgeInboxItem
+	success := m.AcknowledgeInboxItem("ENV-STAGED-001")
+	assert.True(t, success)
+	assert.Contains(t, m.DynamicMessage, "Committed staged envelope ENV-STAGED-001")
 }
 
 

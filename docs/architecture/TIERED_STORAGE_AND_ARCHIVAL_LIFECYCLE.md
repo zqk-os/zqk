@@ -249,3 +249,15 @@ The tiered storage engine integrates into **Layer 4 Storage & I/O Telemetry**:
 ## 7. Traceability & Backlog Verification
 
 This architecture is implemented and verified by `pkg/resourcehygiene` and CLI commands under `zqk system resource-hygiene`.
+
+---
+
+## 8. Hot Storage Resource Caching & Concurrency Hardening
+
+Within the active Tier 0 (Hot) storage plane, `storage.ResourceCache[T]` manages lazily initialized, long-lived resources (such as `ObjectStorageProvider` routing instances and CAS file handles).
+
+### Concurrency Invariants & Promise Model
+1. **Channel Promise Synchronization (`ready chan struct{}`)**: Rather than utilizing standard `sync.Once` which permanently records errors on initial failure, `ResourceCache` employs channel promise synchronizers. Waiting concurrent goroutines block on `<-cached.ready` or the caller's context (`select { case <-ctx.Done(): ... case <-cached.ready: ... }`).
+2. **Atomic Transient Error Eviction (`CompareAndDelete`)**: If an `initFunc` encounters a transient timeout, context cancellation, or I/O failure, the failed entry is evicted atomically via `sync.Map.CompareAndDelete(key, cached)`. This guarantees that subsequent or concurrent callers unwedge and retry initialization cleanly without poisoning the process-lifetime cache or deleting entries initialized by competing contenders.
+3. **In-Flight `Get()` Guarding**: Non-blocking `Get(key)` queries evaluate promise readiness via `select { case <-cached.ready: ... default: return zero, false }`. If initialization is in flight, `Get()` reports a cache miss (`false`) rather than returning zero-value uninitialized state as a false cache hit.
+

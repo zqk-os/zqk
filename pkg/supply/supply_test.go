@@ -69,13 +69,17 @@ func TestFailClosedCIGates_DeterministicAndVerified(t *testing.T) {
 				t.Errorf("expected open-core script %s to exist and be non-empty", script)
 			}
 		}
-		// Verify package-community.sh generates and verifies checksums
+		// Verify package-community.sh generates and verifies checksums and cosign signature
 		pkgCommunityData, err := fileutil.ReadFile("../../scripts/package-community.sh")
 		if err != nil {
 			t.Fatalf("failed to read package-community.sh: %v", err)
 		}
-		if !strings.Contains(string(pkgCommunityData), "shasum -a 256") || !strings.Contains(string(pkgCommunityData), "checksums.txt") {
+		pkgStr := string(pkgCommunityData)
+		if !strings.Contains(pkgStr, "shasum -a 256") || !strings.Contains(pkgStr, "checksums.txt") {
 			t.Errorf("package-community.sh missing sha256 checksum generation/verification")
+		}
+		if !strings.Contains(pkgStr, "cosign sign-blob") || !strings.Contains(pkgStr, "checksums.txt.sig") {
+			t.Errorf("package-community.sh missing cosign signature generation for checksums.txt.sig")
 		}
 		return
 	}

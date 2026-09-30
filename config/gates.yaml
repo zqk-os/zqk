@@ -238,3 +238,12 @@ payload:
       exemptions:
         - "scripts/open-core/check-public-release-payload.sh"
         - "config/gates.yaml"
+    - id: "hardcoded_workstation_path"
+      pattern: '(/Users/[a-zA-Z0-9_.-]+|/home/[a-zA-Z0-9_.-]+)'
+      message: "hardcoded absolute workstation path (/Users/... or /home/...) detected; use relative paths, os.UserHomeDir(), or env vars"
+      scope: ["cmd/**", "pkg/**", "internal/**", "scripts/**"]
+      exemptions:
+        - "*_test.go"
+        - "config/gates.yaml"
+        - "pkg/telemetry/anonymizer.go"
+        - "pkg/vet/*"

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // QueryResult holds tabular result data from a ZPARQL query execution.
@@ -24,44 +26,56 @@ func NewQueryExecutor(idx *GraphIndex) *QueryExecutor {
 	return &QueryExecutor{index: idx}
 }
 
-// Execute parses and runs a ZPARQL query string against the GraphIndex.
-func (e *QueryExecutor) Execute(ctx context.Context, ast *QueryAST) (*QueryResult, error) {
-	if ast == nil {
-		return nil, fmt.Errorf("nil QueryAST")
+func formatHeaderName(ret ProjectionItem) string {
+	if ret.Alias != "" {
+		return ret.Alias
 	}
+	if ret.Property != "" {
+		return fmt.Sprintf("%s.%s", ret.Variable, ret.Property)
+	}
+	if ret.Variable != "" {
+		return ret.Variable
+	}
+	return ret.Expression
+}
 
-	// 1. Solve path patterns to find all valid variable binding sets.
-	// Each binding is map[string]string: variable_name -> node_id
+func buildHeaders(returns []ProjectionItem) []string {
+	headers := make([]string, 0, len(returns))
+	for _, ret := range returns {
+		headers = append(headers, formatHeaderName(ret))
+	}
+	return headers
+}
+
+func (e *QueryExecutor) solvePathPatterns(ctx context.Context, patterns []PathPattern) ([]map[string]string, error) {
 	var allBindings []map[string]string
-
-	for i, pattern := range ast.Patterns {
+	for i, pattern := range patterns {
 		patternBindings, err := e.matchPathPattern(ctx, pattern)
 		if err != nil {
 			return nil, err
 		}
-
 		if i == 0 {
 			allBindings = patternBindings
 		} else {
-			// EquiJoin with previous bindings
 			allBindings = joinBindings(allBindings, patternBindings)
 		}
-
 		if len(allBindings) == 0 {
 			break
 		}
 	}
+	return allBindings, nil
+}
 
-	// 2. Filter bindings by WHERE clause
-	filteredBindings := make([]map[string]string, 0, len(allBindings))
-	for _, b := range allBindings {
+func (e *QueryExecutor) filterBindings(ctx context.Context, bindings []map[string]string, where Expr) ([]map[string]string, error) {
+	filtered := make([]map[string]string, 0, len(bindings))
+	for _, b := range bindings {
 		select {
 		case <-ctx.Done():
 			return nil, ctx.Err()
 		default:
 		}
-		if ast.Where != nil {
-			matched, err := e.evaluateExpr(b, ast.Where)
+		if where != nil {
+			matched, err := e.evaluateExpr(b, where)
 			if err != nil {
 				return nil, err
 			}
@@ -69,77 +83,77 @@ func (e *QueryExecutor) Execute(ctx context.Context, ast *QueryAST) (*QueryResul
 				continue
 			}
 		}
-		filteredBindings = append(filteredBindings, b)
+		filtered = append(filtered, b)
 	}
+	return filtered, nil
+}
 
-	// 3. Project results
-	headers := make([]string, 0, len(ast.Returns))
-	for _, ret := range ast.Returns {
-		hdr := ret.Alias
-		if hdr == "" {
-			if ret.Property != "" {
-				hdr = fmt.Sprintf("%s.%s", ret.Variable, ret.Property)
-			} else if ret.Variable != "" {
-				hdr = ret.Variable
-			} else {
-				hdr = ret.Expression
-			}
-		}
-		headers = append(headers, hdr)
-	}
-
-	// Check if any aggregate function is present
+func (e *QueryExecutor) projectRows(filtered []map[string]string, returns []ProjectionItem, headers []string) []map[string]any {
 	hasAggregates := false
-	for _, ret := range ast.Returns {
+	for _, ret := range returns {
 		if ret.Aggregate != "" {
 			hasAggregates = true
 			break
 		}
 	}
-
-	var outputRows []map[string]any
-
 	if hasAggregates {
-		outputRows = e.projectAggregates(filteredBindings, ast.Returns, headers)
-	} else {
-		outputRows = make([]map[string]any, 0, len(filteredBindings))
-		for _, b := range filteredBindings {
-			row := make(map[string]any, len(ast.Returns))
-			for i, ret := range ast.Returns {
-				val := e.resolveProjectionValue(b, ret)
-				row[headers[i]] = val
-			}
-			outputRows = append(outputRows, row)
+		return e.projectAggregates(filtered, returns, headers)
+	}
+	outputRows := make([]map[string]any, 0, len(filtered))
+	for _, b := range filtered {
+		row := make(map[string]any, len(returns))
+		for i, ret := range returns {
+			row[headers[i]] = e.resolveProjectionValue(b, ret)
 		}
+		outputRows = append(outputRows, row)
 	}
+	return outputRows
+}
 
-	// Handle DISTINCT deduplication
-	isDistinct := len(ast.Returns) > 0 && ast.Returns[0].Distinct
-	if isDistinct {
-		outputRows = deduplicateRows(outputRows, headers)
-	}
-
-	// 4. ORDER BY
-	if len(ast.OrderBy) > 0 {
-		e.sortRows(outputRows, ast.OrderBy, headers)
-	}
-
-	// 5. OFFSET and LIMIT
+func sliceRows(outputRows []map[string]any, offset, limit int) []map[string]any {
 	total := len(outputRows)
-	start := ast.Offset
+	start := offset
 	if start > total {
 		start = total
 	}
 	end := total
-	if ast.Limit > 0 && start+ast.Limit < total {
-		end = start + ast.Limit
+	if limit > 0 && start+limit < total {
+		end = start + limit
 	}
-	sliced := outputRows[start:end]
+	return outputRows[start:end]
+}
+
+// Execute parses and runs a ZPARQL query string against the GraphIndex.
+func (e *QueryExecutor) Execute(ctx context.Context, ast *QueryAST) (*QueryResult, error) {
+	if ast == nil {
+		return nil, fmt.Errorf("nil QueryAST")
+	}
+
+	allBindings, err := e.solvePathPatterns(ctx, ast.Patterns)
+	if err != nil {
+		return nil, err
+	}
+
+	filteredBindings, err := e.filterBindings(ctx, allBindings, ast.Where)
+	if err != nil {
+		return nil, err
+	}
+
+	headers := buildHeaders(ast.Returns)
+	outputRows := e.projectRows(filteredBindings, ast.Returns, headers)
+
+	if len(ast.Returns) > 0 && ast.Returns[0].Distinct {
+		outputRows = deduplicateRows(outputRows, headers)
+	}
+
+	if len(ast.OrderBy) > 0 {
+		e.sortRows(outputRows, ast.OrderBy, headers)
+	}
 
 	return &QueryResult{
 		Headers: headers,
-		Rows:    sliced,
-		Total:   total,
+		Rows:    sliceRows(outputRows, ast.Offset, ast.Limit),
+		Total:   len(outputRows),
 	}, nil
 }
 
@@ -227,7 +241,8 @@ func (e *QueryExecutor) nodeMatches(nodeID string, pattern NodePattern) bool {
 		return false
 	}
 	if pattern.Kind != "" {
-		if k, ok := node["kind"].(string); !ok || !strings.EqualFold(k, pattern.Kind) {
+		k := objects.GetString(node, "kind")
+		if !strings.EqualFold(k, pattern.Kind) {
 			return false
 		}
 	}
@@ -301,20 +316,24 @@ func (e *QueryExecutor) traverseEdge(startID string, edge EdgePattern) []string 
 }
 
 func joinBindings(a, b []map[string]string) []map[string]string {
-	var joined []map[string]string
-	for _, rowA := range a {
-		for _, rowB := range b {
-			// Check if common variables match
-			conflict := false
-			for k, vA := range rowA {
-				if vB, ok := rowB[k]; ok {
-					if vA != vB {
-						conflict = true
-						break
-					}
-				}
-			}
-			if !conflict {
+	if len(a) == 0 || len(b) == 0 {
+		return nil
+	}
+
+	// Discover shared join keys between the two binding sets.
+	var commonKeys []string
+	firstA, firstB := a[0], b[0]
+	for k := range firstA {
+		if _, ok := firstB[k]; ok {
+			commonKeys = append(commonKeys, k)
+		}
+	}
+
+	// If no common keys, perform Cartesian product.
+	if len(commonKeys) == 0 {
+		joined := make([]map[string]string, 0, len(a)*len(b))
+		for _, rowA := range a {
+			for _, rowB := range b {
 				merged := make(map[string]string, len(rowA)+len(rowB))
 				for k, v := range rowA {
 					merged[k] = v
@@ -324,6 +343,48 @@ func joinBindings(a, b []map[string]string) []map[string]string {
 				}
 				joined = append(joined, merged)
 			}
+		}
+		return joined
+	}
+
+	// Indexed Hash-Join (F-PERF-002):
+	// Build hash index on the smaller binding set, then probe with the larger set.
+	buildSet, probeSet := a, b
+	if len(a) > len(b) {
+		buildSet, probeSet = b, a
+	}
+
+	hashKey := func(row map[string]string) string {
+		if len(commonKeys) == 1 {
+			return row[commonKeys[0]]
+		}
+		var sb strings.Builder
+		for _, k := range commonKeys {
+			sb.WriteString(row[k])
+			sb.WriteByte(0)
+		}
+		return sb.String()
+	}
+
+	index := make(map[string][]map[string]string, len(buildSet))
+	for _, row := range buildSet {
+		key := hashKey(row)
+		index[key] = append(index[key], row)
+	}
+
+	var joined []map[string]string
+	for _, probeRow := range probeSet {
+		key := hashKey(probeRow)
+		matches := index[key]
+		for _, buildRow := range matches {
+			merged := make(map[string]string, len(buildRow)+len(probeRow))
+			for k, v := range buildRow {
+				merged[k] = v
+			}
+			for k, v := range probeRow {
+				merged[k] = v
+			}
+			joined = append(joined, merged)
 		}
 	}
 	return joined

@@ -121,3 +121,21 @@ func TestShellPeerWakeAdapter_FallbackToNative(t *testing.T) {
 		t.Errorf("expected native fallback outcome, got: %+v", res)
 	}
 }
+
+func TestShellPeerWakeAdapter_DefaultHasNativeFallback(t *testing.T) {
+	t.Parallel()
+	adapter := NewShellPeerWakeAdapter()
+
+	res, err := adapter.Wake(nil, PeerWakeRequest{
+		ProjectRoot:  t.TempDir(),
+		SeatKind:     SeatKindWorker,
+		DeliveryMode: "notify",
+	})
+	if err != nil {
+		t.Fatalf("expected default adapter to fall back to native without error, got: %v", err)
+	}
+	if !res.Live || res.Endpoint != "native://internal" {
+		t.Errorf("expected native fallback endpoint, got: %+v", res)
+	}
+}
+
