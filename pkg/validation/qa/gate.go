@@ -69,6 +69,9 @@ func (g *AuditorGate) VerifyComplete(ctx context.Context, itemID string) error {
 	// 1. LATCH 1 (Data Existence): If item exists in storage, verify required artifacts exist on disk.
 	if obj, readErr := g.storage.Read(ctx, secCtx, itemID); readErr == nil && obj != nil {
 		paths := extractArtifactPaths(obj[objects.FieldKeyArtifacts])
+		if len(paths) == 0 {
+			paths = extractArtifactPaths(obj[objects.FieldKeyCodeLocation])
+		}
 		if len(paths) == 0 && (obj[objects.FieldKeyKind] == objects.KindBacklogItem || obj[objects.FieldKeyKind] == objects.KindAgentTask) {
 			return fmt.Errorf(errFmtLatch1MissingArtifacts, itemID)
 		}

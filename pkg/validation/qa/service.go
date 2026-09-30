@@ -174,6 +174,9 @@ func (s *AuditorService) performAudit(ctx context.Context, id string, kind strin
 	status, _ := obj[objects.FieldKeyStatus].(string)
 	isComplete := status == objects.ObjectStatusComplete || status == objects.ObjectStatusCompleted || status == "complete" || status == "completed"
 	artifactPaths := extractArtifactPaths(obj[objects.FieldKeyArtifacts])
+	if len(artifactPaths) == 0 {
+		artifactPaths = extractArtifactPaths(obj[objects.FieldKeyCodeLocation])
+	}
 
 	// 1.3 Requirement Criteria Verification
 	if kind == objects.KindRequirement && isComplete {
