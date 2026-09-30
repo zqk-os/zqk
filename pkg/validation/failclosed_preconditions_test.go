@@ -93,6 +93,36 @@ func TestFailClosedPreconditions_FunctionalAcceptance(t *testing.T) {
 		}
 	})
 
+	t.Run("CanonicalDSL_Evaluation", func(t *testing.T) {
+		obj := map[string]any{
+			objects.FieldKeyID:      "DOC-001",
+			objects.FieldKeyTitle:   "DSL Architecture",
+			objects.FieldKeySummary: "DSL migration overview",
+			objects.FieldKeyPath:    "docs/architecture/dsl.md",
+			"content_size":          2048,
+			"content_hash":          "d41d8cd98f00b204e9800998ecf8427e",
+		}
+		// Test canonical forms directly
+		canonicalCases := []string{
+			"standard_checks_pass",
+			"field_nonempty:title",
+			"field_nonempty:summary",
+			"field_nonempty:path",
+			"content_size_positive:content_size",
+			"content_size_positive",
+			"field_nonempty:content_hash",
+		}
+		for _, expr := range canonicalCases {
+			met, recognized := gv.evaluatePrecondition(expr, obj, nil)
+			if !recognized {
+				t.Fatalf("expected canonical expression %q to be recognized", expr)
+			}
+			if !met {
+				t.Fatalf("expected canonical expression %q to be satisfied", expr)
+			}
+		}
+	})
+
 	t.Run("UnrecognizedPrecondition_FailsClosedByDefault", func(t *testing.T) {
 		met, recognized := gv.evaluatePrecondition("some arbitrary unknown check", map[string]any{}, nil)
 		if recognized {

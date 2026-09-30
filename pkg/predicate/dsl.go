@@ -20,6 +20,9 @@ var StandaloneGatePredicates = map[string]struct{}{
 	"publish_ack_present_if_public":         {},
 	"standard_checks_pass":                  {},
 	"title_body_cohesion":                   {},
+	"path_exists":                           {},
+	"content_hash_matches":                  {},
+	"content_size_positive":                 {},
 }
 
 var (

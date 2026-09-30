@@ -153,7 +153,7 @@ transitions:
     catalyst: Standard progression
     class_vs_specialty: class-agnostic
     preconditions:
-      - Standard checks pass
+      - standard_checks_pass
     shockwave:
       mode: propagate
   - from: exploring
@@ -166,7 +166,7 @@ transitions:
     catalyst: Standard progression
     class_vs_specialty: class-agnostic
     preconditions:
-      - Standard checks pass
+      - standard_checks_pass
     shockwave:
       mode: propagate
   - from: roadmap
@@ -179,7 +179,7 @@ transitions:
     catalyst: Standard progression
     class_vs_specialty: class-agnostic
     preconditions:
-      - Standard checks pass
+      - standard_checks_pass
     shockwave:
       mode: propagate
   - from: roadmap
@@ -203,7 +203,7 @@ transitions:
     catalyst: Standard progression
     class_vs_specialty: class-agnostic
     preconditions:
-      - Standard checks pass
+      - standard_checks_pass
     shockwave:
       mode: propagate
   - from: deferred
@@ -216,7 +216,7 @@ transitions:
     catalyst: Standard progression
     class_vs_specialty: class-agnostic
     preconditions:
-      - Standard checks pass
+      - standard_checks_pass
     shockwave:
       mode: propagate
   - from: exploring
@@ -263,7 +263,7 @@ transitions:
     catalyst: Standard progression
     class_vs_specialty: class-agnostic
     preconditions:
-      - Standard checks pass
+      - standard_checks_pass
     shockwave:
       mode: propagate
   - from: validated
@@ -276,7 +276,7 @@ transitions:
     catalyst: Standard progression
     class_vs_specialty: class-agnostic
     preconditions:
-      - Standard checks pass
+      - standard_checks_pass
     shockwave:
       mode: propagate
   - from: planned
@@ -302,7 +302,7 @@ transitions:
     catalyst: Standard progression
     class_vs_specialty: class-agnostic
     preconditions:
-      - Standard checks pass
+      - standard_checks_pass
     shockwave:
       mode: propagate
   - from: planned
@@ -317,7 +317,7 @@ transitions:
     catalyst: Standard progression
     class_vs_specialty: class-agnostic
     preconditions:
-      - Standard checks pass
+      - standard_checks_pass
     shockwave:
       mode: propagate
   - from: error
@@ -337,7 +337,7 @@ transitions:
     manual: true
     auto: false
     preconditions:
-      - Standard checks pass
+      - standard_checks_pass
     postconditions:
       - role is testing
     catalyst: Standard progression
@@ -350,7 +350,7 @@ transitions:
     manual: true
     auto: false
     preconditions:
-      - Standard checks pass
+      - standard_checks_pass
       - all linked criteria_refs bound to active test_case_refs (tdd red phase)
     postconditions:
       - role is execution_locked
@@ -375,7 +375,7 @@ transitions:
     manual: true
     auto: false
     preconditions:
-      - Standard checks pass
+      - standard_checks_pass
     postconditions:
       - role is shovel_ready
     catalyst: Standard progression
@@ -449,7 +449,7 @@ transitions:
     catalyst: Standard progression
     class_vs_specialty: class-agnostic
     preconditions:
-      - Standard checks pass
+      - standard_checks_pass
       - linked priority_plan is archived when priority_plan_ref is set
     shockwave:
       mode: propagate
@@ -472,7 +472,7 @@ transitions:
     manual: true
     auto: false
     preconditions:
-      - Standard checks pass
+      - standard_checks_pass
     postconditions:
       - role is execution_locked
       - terminal re-entry into execution_locked; new work interval, not rewind 
@@ -512,7 +512,7 @@ transitions:
     catalyst: Standard progression
     class_vs_specialty: class-agnostic
     preconditions:
-      - Standard checks pass
+      - standard_checks_pass
       - linked priority_plan is archived when priority_plan_ref is set
     shockwave:
       mode: propagate
@@ -526,7 +526,7 @@ transitions:
     catalyst: Standard progression
     class_vs_specialty: class-agnostic
     preconditions:
-      - Standard checks pass
+      - standard_checks_pass
     shockwave:
       mode: propagate
 percent_complete:

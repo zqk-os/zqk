@@ -25,6 +25,9 @@ func TestValidatePredicateSyntax(t *testing.T) {
 		{"tests_ok_per_customization", false},
 		{"lint_ok_per_customization", false},
 		{"standard_checks_pass", false},
+		{"path_exists", false},
+		{"content_hash_matches", false},
+		{"content_size_positive", false},
 		// Compound expressions
 		{"standard_checks_pass; path_exists:pkg/vds/predicates.go; query_metric:loc_count<=1000", false},
 		// Legacy prose compilable to canonical
