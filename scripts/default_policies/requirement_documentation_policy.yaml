@@ -1,0 +1,25 @@
+kind: policy
+schema_version: "2.0.0"
+title: Requirement Documentation Completeness and doc_entry Verification
+status: active
+category: documentation
+policy_type: requirement
+body: |
+  Every requirement deliverable must include a dedicated verification criterion mandating full
+  and complete documentation of the feature/requirement, along with a doc_entry reference (DOC-*)
+  pointing to the completed documentation.
+
+  Documentation generated during feature development ensures that public surfaces, user guides,
+  and internal architecture stay synchronized with code, preventing drift and post-launch verification debt.
+
+  **Enforcement & Rules**:
+  1. Base traceability generation (`gen-trace-pipeline`) scaffolds a mandatory documentation criterion
+     and ensures doc_entry_refs are bound.
+  2. Every requirement must maintain at least one documentation criterion (category: compliance or acceptance)
+     mandating full feature/requirement documentation.
+  3. Feature delivery and completion gates enforce that documentation criteria are validated before state promotion.
+effective_date: "2026-09-30"
+enforcement:
+  automated: true
+  reminder_enabled: true
+  severity: high

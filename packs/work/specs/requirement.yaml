@@ -217,4 +217,33 @@ fields:
     type: list
     validation:
       required: false
+  doc_entry_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner.
+      automation_hooks: used for documentation verification, doc discovery.
+      cardinality: many
+      criticality: association
+      default: []
+      dependencies: doc_entry registry.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Kernel pointers to doc_entry objects documenting this requirement deliverable.
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - documentation discovery
+      validation: Must reference existing doc_entry IDs (DOC-*).
+    field_profile_code: REQ-011
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
+
 

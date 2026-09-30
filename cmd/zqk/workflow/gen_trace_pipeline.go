@@ -28,7 +28,8 @@ type criteriaFacet struct {
 
 // defaultCriteriaFacets provides the base multi-criteria structure for requirements.
 // A requirement to criteria ratio is NOT 1:1; multiple orthogonal criteria are necessary
-// to verify functional acceptance, boundary conditions/negative cases, and integration/conformance.
+// to verify functional acceptance, boundary conditions/negative cases, documentation, and integration/conformance.
+// TRACK: POL-DOC-001 mandates that every requirement must have a documentation criterion with doc_entry refs.
 var defaultCriteriaFacets = []criteriaFacet{
 	{
 		suffix:      "Functional Acceptance",
@@ -41,6 +42,12 @@ var defaultCriteriaFacets = []criteriaFacet{
 		category:    "functional",
 		description: "Boundary condition validation, negative testing, invalid input rejection, and failure recovery.",
 		testSuffix:  "Boundary & Error Tests",
+	},
+	{
+		suffix:      "Documentation & Knowledge Base Entry",
+		category:    "compliance",
+		description: "Complete feature documentation, user guides, or architectural specifications authored and linked via doc_entry reference (DOC-*).",
+		testSuffix:  "Documentation Verification",
 	},
 	{
 		suffix:      "Integration & Conformance",
@@ -154,12 +161,13 @@ func generateTracePipelineBundle(targetID string, obj map[string]any, criteriaNe
 			reqHint := fmt.Sprintf("REQ-%d-%x", ts+2, reqBytes)
 			targetReqID = reqHint
 			bundle.Objects.Requirements = append(bundle.Objects.Requirements, scenario.RequirementTemplate{
-				ID:       reqHint,
-				IDHint:   reqHint,
-				Title:    fmt.Sprintf("Requirement: %s", title),
-				Status:   pipelineStatus,
-				GoalRefs: []string{targetID},
-				Priority: "p1",
+				ID:           reqHint,
+				IDHint:       reqHint,
+				Title:        fmt.Sprintf("Requirement: %s", title),
+				Status:       pipelineStatus,
+				GoalRefs:     []string{targetID},
+				Priority:     "p1",
+				DocEntryRefs: []string{},
 			})
 		}
 	}
@@ -250,6 +258,7 @@ func generateTracePipelineBundle(targetID string, obj map[string]any, criteriaNe
 			RequirementRefs: bliReqRefs,
 			MilestoneRefs:   bliMilRefs,
 			TestCaseRefs:    allTestCases,
+			DocEntryRefs:    []string{},
 			Priority:        "high",
 			PriorityTier:    "P1",
 		})
@@ -427,6 +436,9 @@ func applyGeneratedTracePipeline(cmd *cobra.Command, proc *cli.Processor, target
 			}
 		}
 		obj[objects.FieldKeyCriteriaRefs] = reqRefs
+		if _, hasDocRefs := obj[objects.FieldKeyDocEntryRefs]; !hasDocRefs {
+			obj[objects.FieldKeyDocEntryRefs] = []any{}
+		}
 		coerceRequirementPriorityForCASUpdate(obj)
 
 		if err := storageProvider.Update(ctx, secCtx, targetID, obj); err != nil {

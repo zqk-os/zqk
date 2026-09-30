@@ -309,6 +309,34 @@ func checkInstanceValidationWithValidatorAndData(ctx *cli.Context, stdCtx stdcon
 		}
 	}
 
+	// Invariant / Policy POL-DOC-001: Active requirements must include documentation criteria and doc_entry references
+	if kind == objects.KindRequirement && currentState != objects.ObjectStatusComplete && currentState != objects.ObjectStatusArchived && currentState != "rejected" {
+		critRefs := lifecycle.StringRefsFromAny(objMap[objects.FieldKeyCriteriaRefs])
+		hasDocCriteria := false
+		for _, cid := range critRefs {
+			cObj, cErr := options.ObjectLookup(cid)
+			if cErr == nil && cObj != nil {
+				cat, _ := cObj[objects.FieldKeyCategory].(string)
+				cTitle, _ := cObj[objects.FieldKeyTitle].(string)
+				cDesc, _ := cObj[objects.FieldKeyDescription].(string)
+				combined := strings.ToLower(cat + " " + cTitle + " " + cDesc)
+				if strings.Contains(combined, "doc_entry") || strings.Contains(combined, "documentation") || strings.Contains(combined, "knowledge base") {
+					hasDocCriteria = true
+					break
+				}
+			}
+		}
+		if len(critRefs) > 0 && !hasDocCriteria {
+			validationIssues = append(validationIssues, Issue{
+				Tier:        2,
+				Category:    "policy_compliance",
+				Message:     fmt.Sprintf("Requirement %s does not have a criterion mandating documentation and doc_entry ref (POL-DOC-001)", obj.ID),
+				AutoFixable: false,
+				FixCommand:  paths.CLIUsage("workflow", "gen-trace-pipeline", obj.ID),
+			})
+		}
+	}
+
 	return validationIssues
 }
 func checkPolicy(obj *parser.ParsedObject, kind string) []Issue {
