@@ -202,30 +202,33 @@ type ListingIndexWriteQueue struct {
 	listeners   []ListingIndexBatchEventListener
 }
 
-// RegisterBatchEventListener registers an observer to receive batch processing events from this write queue instance.
-func (q *ListingIndexWriteQueue) RegisterBatchEventListener(listener ListingIndexBatchEventListener) {
+func (q *ListingIndexWriteQueue) modifyListeners(listener ListingIndexBatchEventListener, action func()) {
 	if listener == nil || q == nil {
 		return
 	}
 	q.listenersMu.Lock()
 	defer q.listenersMu.Unlock()
-	q.listeners = append(q.listeners, listener)
+	action()
+}
+
+// RegisterBatchEventListener registers an observer to receive batch processing events from this write queue instance.
+func (q *ListingIndexWriteQueue) RegisterBatchEventListener(listener ListingIndexBatchEventListener) {
+	q.modifyListeners(listener, func() {
+		q.listeners = append(q.listeners, listener)
+	})
 }
 
 // UnregisterBatchEventListener removes an observer from this write queue instance.
 func (q *ListingIndexWriteQueue) UnregisterBatchEventListener(listener ListingIndexBatchEventListener) {
-	if listener == nil || q == nil {
-		return
-	}
-	q.listenersMu.Lock()
-	defer q.listenersMu.Unlock()
-	filtered := q.listeners[:0]
-	for _, l := range q.listeners {
-		if l != listener {
-			filtered = append(filtered, l)
+	q.modifyListeners(listener, func() {
+		filtered := q.listeners[:0]
+		for _, l := range q.listeners {
+			if l != listener {
+				filtered = append(filtered, l)
+			}
 		}
-	}
-	q.listeners = filtered
+		q.listeners = filtered
+	})
 }
 
 // getListeners returns a snapshot of registered batch event listeners.
@@ -313,16 +316,20 @@ func SetListingIndexWriteQueueFactoryToPerProjectRoot() {
 	})
 }
 
+const constErrFailedToRemoveQueue = "Failed to remove listing index write queue for project root: %v"
+
 // RemoveListingIndexWriteQueueForProjectRoot removes the queue for a given project root.
 func RemoveListingIndexWriteQueueForProjectRoot(projectRoot string) {
 	if err := concurrency.RunInLock(&perProjectRootQueuesMu, func() error {
 		if q, ok := perProjectRootQueues[projectRoot]; ok {
-			_ = q.Shutdown()
+			if shutdownErr := q.Shutdown(); shutdownErr != nil {
+				logging.LogSwallowedError(shutdownErr)
+			}
 			delete(perProjectRootQueues, projectRoot)
 		}
 		return nil
 	}); err != nil {
-		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error("Failed to remove listing index write queue for project root: %v", err).Log()
+		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(constErrFailedToRemoveQueue, err).Log()
 	}
 }
 

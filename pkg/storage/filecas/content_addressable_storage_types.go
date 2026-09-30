@@ -98,6 +98,9 @@ type IDIndex struct {
 // GetIndex returns the ID index for direct access (used by auto-fix)
 // This allows adding objects to the index when files exist but aren't indexed
 func (cas *ContentAddressableStorage) GetIndex() *IDIndex {
+	if cas == nil {
+		return nil
+	}
 	return cas.index
 }
 
