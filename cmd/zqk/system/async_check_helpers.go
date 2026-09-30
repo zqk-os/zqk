@@ -98,6 +98,25 @@ func initializeAsyncCheckContext(cmd *cobra.Command, ctx *cli.Context) (*AsyncCh
 	metrics := validation.NewValidationMetrics()
 	logger := getLoggerForSystemCheck(cmd, ctx.Profile)
 
+	// Invariant: project roots must not be nested
+	autoFix := false
+	if flag, err := cmd.Flags().GetBool("auto-fix"); err == nil {
+		autoFix = flag
+	}
+	if projectRoot != emptyValue {
+		if err := paths.ValidateProjectRootNesting(projectRoot); err != nil {
+			if autoFix {
+				if purged, purgeErr := paths.PurgeNestedProjectRoots(projectRoot); purgeErr == nil && len(purged) > 0 {
+					logging.Fluent(logger).Info("Purged rogue nested project roots").
+						Int("purged_count", len(purged)).
+						Log()
+				}
+			} else {
+				return nil, errfmt.Errorf("project root nesting violation: %w (remediate with --auto-fix or '%s')", err, paths.CLIUsage("system", "check-policy", "project-nesting"))
+			}
+		}
+	}
+
 	// Register cache event subscriber for debugging and monitoring
 	// This subscribes to cache-related operational events via the global coordinator
 	cacheSubscriber := NewCacheEventSubscriber(ctx.Profile)
@@ -108,10 +127,6 @@ func initializeAsyncCheckContext(cmd *cobra.Command, ctx *cli.Context) (*AsyncCh
 	// Starting the scheduler can block if the scheduler is misconfigured or its
 	// internal channels are not initialized; avoid doing this for pure read-only
 	// checks to keep `system check` responsive.
-	autoFix := false
-	if flag, err := cmd.Flags().GetBool("auto-fix"); err == nil {
-		autoFix = flag
-	}
 	useSchedulerBatching := true
 	if flag, err := cmd.Flags().GetBool("auto-fix-scheduler"); err == nil {
 		useSchedulerBatching = flag

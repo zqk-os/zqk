@@ -12,6 +12,7 @@ import (
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/daemon/overseer"
+	"github.com/zqk-os/zqk/pkg/daemon/singleton"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -443,6 +444,12 @@ func newRunCmd() *cobra.Command {
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		projectRoot := resolveProjectRoot(cmd)
 		logger := logging.GetLoggerFromProfile("human")
+
+		daemonLock, err := singleton.AcquireDaemonLock(projectRoot, "overseer")
+		if err != nil {
+			return errfmt.Newf("acquire overseer daemon lock").Wrap(err)
+		}
+		defer daemonLock.Release()
 
 		pgMgr, err := overseer.NewProcessGroupManager(true)
 		if err != nil {
