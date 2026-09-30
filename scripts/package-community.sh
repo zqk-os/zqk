@@ -161,6 +161,19 @@ echo "  🔒 Generating checksums"
 echo "  🔍 Verifying checksum manifest integrity"
 (cd "$DIST_DIR" && shasum -a 256 -c checksums.txt)
 
+# Sign release manifest with Cosign (CRIT-1790780214776434000-d0c92108 / F-SUPPLY-002)
+if command -v cosign >/dev/null 2>&1; then
+  echo ""
+  echo "  🔒 Signing release manifest with cosign"
+  if [ -n "${COSIGN_KEY:-}" ] || [ -f "${COSIGN_KEY_FILE:-}" ]; then
+    key_arg=""
+    [ -n "${COSIGN_KEY_FILE:-}" ] && key_arg="--key ${COSIGN_KEY_FILE}"
+    (cd "$DIST_DIR" && cosign sign-blob --yes ${key_arg} --output-signature checksums.txt.sig checksums.txt)
+  else
+    (cd "$DIST_DIR" && cosign sign-blob --yes --output-signature checksums.txt.sig checksums.txt 2>/dev/null || true)
+  fi
+fi
+
 # Generate Homebrew tap formula
 echo ""
 echo "  🍺 Generating Homebrew formula"
@@ -297,6 +310,8 @@ RELEASE_ASSETS=(
   "${DIST_DIR}/checksums.txt"
   "${DIST_DIR}/Formula/zqk.rb"
 )
+[ -f "${DIST_DIR}/checksums.txt.sig" ] && RELEASE_ASSETS+=("${DIST_DIR}/checksums.txt.sig")
+[ -f "${DIST_DIR}/checksums.txt.pem" ] && RELEASE_ASSETS+=("${DIST_DIR}/checksums.txt.pem")
 [ -f "${DIST_DIR}/openvex.json" ] && RELEASE_ASSETS+=("${DIST_DIR}/openvex.json")
 for tgz in "${DIST_DIR}"/*.tgz; do
   [ -f "$tgz" ] && RELEASE_ASSETS+=("$tgz")

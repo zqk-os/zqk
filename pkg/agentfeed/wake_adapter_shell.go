@@ -35,6 +35,7 @@ func NewShellPeerWakeAdapter() *ShellPeerWakeAdapter {
 	return &ShellPeerWakeAdapter{
 		WorkerScript:      shellWakeWorkerScript,
 		CoordinatorScript: shellWakeCoordinatorScript,
+		Fallback:          NewNativePeerWakeAdapter(),
 	}
 }
 
