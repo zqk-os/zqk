@@ -78,6 +78,12 @@ func TestExtraCoverage_ProjectRootDiscovery(t *testing.T) {
 	if !isIgnoredNestedProjectRoot(ignoredPath) {
 		t.Error("expected foo/cmd/zqk/system to be ignored")
 	}
+	if !isIgnoredNestedProjectRoot(filepath.Join("pkg", "mytest", "testdata", "fixture")) {
+		t.Error("expected testdata path to be ignored")
+	}
+	if !isIgnoredNestedProjectRoot(filepath.Join("pkg", ".tmp_build", "sub")) {
+		t.Error("expected .tmp path to be ignored")
+	}
 	if isIgnoredNestedProjectRoot(filepath.Join("foo", "cmd", "zqk", "other")) {
 		t.Error("expected foo/cmd/zqk/other not to be ignored")
 	}

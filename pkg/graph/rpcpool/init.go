@@ -4,10 +4,12 @@ import (
 	"net"
 	"net/rpc"
 	"net/rpc/jsonrpc"
+	"path/filepath"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/graph/provider"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -18,11 +20,17 @@ func StartServer(socketPath string, pool provider.ConnectionPool) error {
 		return err
 	}
 
+	dir := filepath.Dir(socketPath)
+	if err := fileutil.MkdirAll(dir, paths.DirPerm700); err != nil {
+		return err
+	}
+
 	_ = fileutil.Remove(socketPath)
 	listener, err := net.Listen("unix", socketPath)
 	if err != nil {
 		return err
 	}
+	_ = fileutil.Chmod(socketPath, paths.FilePerm600)
 
 	goroutinelabels.NewGoroutine("refactored_worker", "Refactored raw goroutine").
 		StartSimple(func() {

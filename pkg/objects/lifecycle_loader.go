@@ -815,7 +815,7 @@ func (ll *LifecycleLoader) mergeLifecycles(parent, child *Lifecycle) Lifecycle {
 	// Child-owned from-statuses already declare their own hops. A rewritten
 	// parent edge must not invent a second hop (priority_plan maps approved
 	// onto grooming, so approved→in_progress became grooming→in_progress and
-	// skipped shovel-ready). TRACK: BLI-1785439369431933000-f0cccd6c
+	// skipped shovel-ready).
 	childOwnsFrom := make(map[string]bool, len(child.Transitions))
 	for _, transition := range child.Transitions {
 		if transition.From != emptyValue {

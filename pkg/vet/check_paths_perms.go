@@ -46,13 +46,8 @@ func CheckPathsAndPerms(root string, cfg *GatesConfig) ([]Finding, error) {
 		}
 
 		ast.Inspect(node, func(n ast.Node) bool {
-			call, ok := n.(*ast.CallExpr)
-			if !ok {
-				return true
-			}
-
 			// Check magic file permissions
-			if cfg.Hygiene.CheckPerms {
+			if call, ok := n.(*ast.CallExpr); ok && cfg.Hygiene.CheckPerms {
 				funName := getCallFunctionName(call)
 				switch funName {
 				case "os.OpenFile", "fileutil.OpenFile", "OpenFile":
@@ -94,27 +89,22 @@ func CheckPathsAndPerms(root string, cfg *GatesConfig) ([]Finding, error) {
 				}
 			}
 
-			// Check configurable forbidden path literals
-			if cfg.Hygiene.CheckPaths {
-				for _, arg := range call.Args {
-					lit, ok := arg.(*ast.BasicLit)
-					if ok && lit.Kind == token.STRING {
-						val, _ := strconv.Unquote(lit.Value)
-						for _, fp := range forbiddenList {
-							prefix := strings.TrimSuffix(fp, "/") + "/"
-							if val == fp || strings.HasPrefix(val, prefix) {
-								pos := fset.Position(lit.Pos())
-								findings = append(findings, Finding{
-									CheckID:  "hygiene/hardcoded-path",
-									Suite:    "hygiene",
-									File:     rel,
-									Line:     pos.Line,
-									Message:  "hardcoded \"" + fp + "\" path literal used; use paths constants",
-									Severity: SeverityError,
-								})
-								break
-							}
-						}
+			// Check configurable forbidden path literals on all string literals
+			if lit, ok := n.(*ast.BasicLit); ok && lit.Kind == token.STRING && cfg.Hygiene.CheckPaths {
+				val, _ := strconv.Unquote(lit.Value)
+				for _, fp := range forbiddenList {
+					prefix := strings.TrimSuffix(fp, "/") + "/"
+					if val == fp || strings.HasPrefix(val, prefix) {
+						pos := fset.Position(lit.Pos())
+						findings = append(findings, Finding{
+							CheckID:  "hygiene/hardcoded-path",
+							Suite:    "hygiene",
+							File:     rel,
+							Line:     pos.Line,
+							Message:  "hardcoded \"" + fp + "\" path literal used; use paths constants",
+							Severity: SeverityError,
+						})
+						break
 					}
 				}
 			}

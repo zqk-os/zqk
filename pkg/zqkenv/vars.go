@@ -885,6 +885,17 @@ func TestAllowCASFallthrough() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxTest
 // When set, overrides the default UNIX socket path for the PrivilegedWriter helper.
 func PrivilegedWriterSocket() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxPrivilegedWriterSocket)} }
 
+const _sfxCellularMembraneModeB = "MODE_B"
+const _sfxEnforceCellularMembrane = "ENFORCE_CELLULAR_MEMBRANE"
+
+// CellularMembraneModeB returns the env name for MODE_B (brand-prefixed).
+// When set to "1", enforces Mode B cellular membrane lockdown where CAS writes
+// require an active PrivilegedWriter daemon and will fail-closed if the socket is missing.
+func CellularMembraneModeB() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxCellularMembraneModeB)} }
+
+// EnforceCellularMembrane returns the env name for ENFORCE_CELLULAR_MEMBRANE (brand-prefixed).
+func EnforceCellularMembrane() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxEnforceCellularMembrane)} }
+
 const _sfxIsParentZqk = "IS_PARENT_ZQK"
 
 // IsParentZqk returns the environment variable name for IS_PARENT_ZQK (brand-prefixed).

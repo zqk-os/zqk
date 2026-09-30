@@ -3,6 +3,7 @@ package scheduler
 import (
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 const emptyValue = ""
@@ -516,5 +517,6 @@ const (
 	zqkStableBinaryNamePattern = "stable"
 	zqkBinaryName              = "zqk"
 	zqkSchedulerBinaryName     = "zqk-scheduler"
-	zqkProjectDataDirName      = ".zqk"
 )
+
+var zqkProjectDataDirName = paths.ProjectDataDir

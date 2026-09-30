@@ -6,7 +6,6 @@ import (
 
 	"context"
 	"path/filepath"
-	"runtime"
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/brand"
@@ -43,10 +42,16 @@ func DefaultPrivilegedWriterSocketPath(projectRoots ...string) string {
 		return ProjectScopedPrivilegedWriterSocketPath(root)
 	}
 	name := brand.NamespacePrefix() + "-" + privilegedWriterSocketBasename + socketFileExtension
-	if runtime.GOOS == "windows" {
-		return filepath.Join(fileutil.TempDir(), name)
-	}
-	return filepath.Join("/tmp", name)
+	return filepath.Join(fileutil.TempDir(), name)
+}
+
+func isGlobalTempSocket(path string) bool {
+	clean := filepath.Clean(path)
+	tempDir := filepath.Clean(fileutil.TempDir())
+	return strings.HasPrefix(clean, tempDir) ||
+		strings.HasPrefix(clean, "/tmp") ||
+		strings.HasPrefix(clean, "/var/tmp") ||
+		strings.HasPrefix(clean, "/private/tmp")
 }
 
 func resolvePrivilegedWriterSocketPath(projectRoots ...string) string {
@@ -58,9 +63,9 @@ func resolvePrivilegedWriterSocketPath(projectRoots ...string) string {
 
 func privilegedWriterSocketExists(projectRoots ...string) bool {
 	path := resolvePrivilegedWriterSocketPath(projectRoots...)
-	// Standalone open-core must NEVER connect to a global /tmp socket unless explicitly configured via PRIVILEGED_WRITER_SOCKET.
+	// Standalone open-core must NEVER connect to a global tmp socket unless explicitly configured via PRIVILEGED_WRITER_SOCKET.
 	if strings.TrimSpace(zqkenv.PrivilegedWriterSocket().Get()) == "" {
-		if strings.HasPrefix(filepath.Clean(path), filepath.Clean("/tmp")) {
+		if isGlobalTempSocket(path) {
 			return false
 		}
 	}
@@ -95,6 +100,10 @@ func privilegedWriterLocalWriteAllowed(projectRoots ...string) bool {
 	if zqkenv.IsInTest() {
 		return true
 	}
+	// In Mode B / enforced cellular membrane, missing daemon socket is a failure, not a fallback (F-SEC-002).
+	if isCellularMembraneEnforced(projectRoots...) {
+		return false
+	}
 	// Socket-absent default: if PrivilegedWriter socket does not exist, write locally (open-core / standalone).
 	if !privilegedWriterSocketExists(projectRoots...) {
 		return true
@@ -102,11 +111,27 @@ func privilegedWriterLocalWriteAllowed(projectRoots ...string) bool {
 	return false
 }
 
+func isCellularMembraneEnforced(projectRoots ...string) bool {
+	if zqkenv.CellularMembraneModeB().Get() == "1" || zqkenv.EnforceCellularMembrane().Get() == "1" {
+		return true
+	}
+	for _, pr := range projectRoots {
+		if pr == "" {
+			continue
+		}
+		if fileutil.Exists(filepath.Join(pr, paths.ProjectDataDir, "mode_b")) ||
+			fileutil.Exists(filepath.Join(pr, paths.ProjectDataDir, "cellular_membrane_lockdown")) {
+			return true
+		}
+	}
+	return false
+}
+
 func dialPrivilegedWriter(projectRoots ...string) (*IPCWriter, error) {
 	path := resolvePrivilegedWriterSocketPath(projectRoots...)
-	// Standalone open-core must NEVER connect to a global /tmp socket unless explicitly configured via PRIVILEGED_WRITER_SOCKET.
+	// Standalone open-core must NEVER connect to a global tmp socket unless explicitly configured via PRIVILEGED_WRITER_SOCKET.
 	if strings.TrimSpace(zqkenv.PrivilegedWriterSocket().Get()) == "" {
-		if strings.HasPrefix(filepath.Clean(path), filepath.Clean("/tmp")) {
+		if isGlobalTempSocket(path) {
 			return nil, errfmt.Errorf("refusing to connect to global tmp socket: %s", path)
 		}
 	}

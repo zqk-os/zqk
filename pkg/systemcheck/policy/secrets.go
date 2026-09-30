@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // SecretsGate scans files for API tokens, private keys, and credential leaks.
@@ -25,12 +27,12 @@ func (g *SecretsGate) Description() string {
 var secretPatterns = regexp.MustCompile(`(ghp_[a-zA-Z0-9]{36}|gho_[a-zA-Z0-9]{36}|github_pat_[a-zA-Z0-9_]{82}|AKIA[0-9A-Z]{16}|-----BEGIN (?:RSA|EC|OPENSSH|DSA|PGP)? PRIVATE KEY-----|xox[baprs]-[0-9]{12}-[0-9]{12}-[a-zA-Z0-9]{24})`)
 
 var excludedDirNames = map[string]bool{
-	".git":     true,
-	".zqk":     true,
-	"vendor":   true,
-	"testdata": true,
-	".agent":   true,
-	".gemini":  true,
+	".git":                true,
+	paths.ProjectDataDir: true,
+	"vendor":              true,
+	"testdata":            true,
+	".agent":              true,
+	".gemini":             true,
 }
 
 var binaryExts = map[string]bool{

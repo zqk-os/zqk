@@ -54,7 +54,7 @@ func ReplayFromCursor[T any](
 		return stats, err
 	}
 	size := info.Size()
-	// Stamp skip: at EOF there are no new bytes. Stat is cheaper than Open (CRIT-1790151410719520000-18e0643b).
+	// Stamp skip: at EOF there are no new bytes. Stat is cheaper than Open (CRIT-CEF-WAL-CURSOR-EOF).
 	if size == cursor.Offset {
 		return stats, nil
 	}

@@ -74,6 +74,15 @@ func TestSearchTokens_andInferPath(t *testing.T) {
 	if InferSourcePath("touch pkg/scheduler/job.go now") != "pkg/scheduler/job.go" {
 		t.Fatal(InferSourcePath("touch pkg/scheduler/job.go now"))
 	}
+	if InferSourcePath("check internal/engine/core.go please") != "internal/engine/core.go" {
+		t.Fatal(InferSourcePath("check internal/engine/core.go please"))
+	}
+	if InferSourcePath("inspect src/index.go") != "src/index.go" {
+		t.Fatal(InferSourcePath("inspect src/index.go"))
+	}
+	if InferSourcePath("see main.go for details") != "main.go" {
+		t.Fatal(InferSourcePath("see main.go for details"))
+	}
 }
 
 func TestFormatHit(t *testing.T) {

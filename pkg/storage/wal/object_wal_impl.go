@@ -41,7 +41,7 @@ const (
 )
 
 // walReplayIdle memos a ReplayWALChunk pass so idle polls skip Open while the WAL stamp
-// and appliedSeq have not moved. TRACK: BLI-1790151410719520000-fdb19989
+// and appliedSeq have not moved.
 type walReplayIdle struct {
 	appliedSeq int64
 	hitLimit   bool

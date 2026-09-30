@@ -182,13 +182,13 @@ func (e *Engine) collectCandidateFiles(cleanRoot, canonicalRoot string, opts Dis
 
 	// Standard ignore directories
 	ignoreDirs := map[string]bool{
-		".git":         true,
-		"node_modules": true,
-		"vendor":       true,
-		".zqk":         true,
-		"dist":         true,
-		"build":        true,
-		"target":       true,
+		".git":               true,
+		"node_modules":      true,
+		"vendor":            true,
+		paths.ProjectDataDir: true,
+		"dist":              true,
+		"build":             true,
+		"target":            true,
 	}
 	for _, p := range opts.ExcludePaths {
 		ignoreDirs[p] = true

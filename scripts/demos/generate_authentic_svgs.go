@@ -1201,7 +1201,7 @@ func main() {
 			{CommandName: paths.RewriteCanonicalCLIInvocations("zqk scheduler trigger"), ExecCount: 28, AvgDuration: "8ms", LastRunAt: "12:13:40", Status: "pass"},
 		}
 		m.LockMetrics = []ui.FileLockMetricRow{
-			{ID: "1", TargetKind: ".zqk/process/CAS", Contention: 0, Duration: "2ms", Status: "healthy"},
+			{ID: "1", TargetKind: paths.ProcessDir + "/CAS", Contention: 0, Duration: "2ms", Status: "healthy"},
 		}
 		m.SelectedIndex = 0
 		out := ui.Render(m)

@@ -48,9 +48,12 @@ func commandTokensSkippingFlags(args []string) []string {
 }
 
 // PrivilegedWriterDaemonRole is the pipeline contract: this process is the
-// CAS membrane endpoint if IS_DAEMON=1 or argv is `object daemon`.
+// CAS membrane endpoint only if argv is `object daemon`.
+// Note: IS_DAEMON alone does NOT grant privileged writer status, as other daemons
+// (ambient, scheduler, steward) also set IS_DAEMON=1. Only the privileged writer
+// daemon process itself has this role (F-SEC-002).
 func PrivilegedWriterDaemonRole() bool {
-	return DaemonProcess() || PrivilegedWriterDaemonArgv(CommandArgs())
+	return PrivilegedWriterDaemonArgv(CommandArgs())
 }
 
 // PrivilegedWriterRequiredLaunchEnv is the env LaunchAgent / host install

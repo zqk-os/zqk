@@ -50,7 +50,7 @@ func NewCleanBranchesCmd() *cobra.Command {
 
 	cmd.Flags().IntVar(&inactiveHours, "inactive-hours", 24, "Minimum hours of inactivity required before deletion")
 	cmd.Flags().IntVar(&quarantineDays, "quarantine-days", 90, "Retention limit in days for soft-deleted quarantine refs/archive/ branches")
-	cmd.Flags().StringSliceVar(&targets, "targets", []string{"origin/main", "origin/integration/v1.1", "origin/integration/v1.2", "origin/integration/v1.3", "origin/integration/v1.4"}, "Target branches to check against")
+	cmd.Flags().StringSliceVar(&targets, "targets", []string{"origin/main"}, "Target branches to check against")
 
 	return cmd
 }
