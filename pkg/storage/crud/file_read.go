@@ -102,7 +102,7 @@ func ReadFileObject(f FileStorageReadFacade, ctx context.Context, secCtx *pkgctx
 		data, readErr := fileutil.ReadFile(filePath)
 		if readErr != nil {
 			if !fileutil.IsNotExist(readErr) {
-				return nil, errfmt.Errorf("STREAM_READ_AFTER_CAS_DISCOVERY_FAILED: %s %s: %w", id, kind, readErr)
+				return nil, errfmt.Errorf("read after CAS discovery failed: %s %s: %w", id, kind, readErr)
 			}
 			// Cached live path was race-deleted or superseded by a concurrent update; fall through to authoritative lookup.
 		} else {
@@ -172,7 +172,7 @@ func ReadFileObject(f FileStorageReadFacade, ctx context.Context, secCtx *pkgctx
 			if errors.Is(pathErr, ErrObjectNotFound) {
 				return nil, ErrObjectNotFound
 			}
-			return nil, errfmt.Errorf("STREAM_CAS_READ_FAILED: %s %s %w", id, kind, pathErr)
+			return nil, errfmt.Errorf("CAS read failed: %s %s %w", id, kind, pathErr)
 		}
 		// Stream-backed: path is "segmentPath::offset" or stream_current overlay file
 		if segmentPath, offset, ok := f.StreamPathAndOffset(filePath); ok && segmentPath != emptyValue {
@@ -181,7 +181,7 @@ func ReadFileObject(f FileStorageReadFacade, ctx context.Context, secCtx *pkgctx
 				if errors.Is(readErr, fileutil.ErrNotExist) || errors.Is(readErr, ErrObjectNotFound) {
 					return nil, ErrObjectNotFound
 				}
-				return nil, errfmt.Errorf("STREAM_READ_FAILED: %s %s %w", id, kind, readErr)
+				return nil, errfmt.Errorf("read failed: %s %s %w", id, kind, readErr)
 			}
 			obj[objects.FieldKeyKind] = kind
 			keystoreDir := objects.GetDirectoryFromKind(objects.KindKeystoreEntry)
@@ -249,6 +249,6 @@ func ReadFileObject(f FileStorageReadFacade, ctx context.Context, secCtx *pkgctx
 }
 
 const emptyValue = ""
-const ConstStreamFailedToLoadIdPatterns = "STREAM_FAILED_TO_LOAD_ID_PATTERNS"
-const ConstStreamCouldNotInferKindFromIdStr = "STREAM_COULD_NOT_INFER_KIND_FROM_ID_STR"
-const ConstStreamFailedToUnmarshalPendingObject = "STREAM_FAILED_TO_UNMARSHAL_PENDING_OBJECT"
+const ConstStreamFailedToLoadIdPatterns = "failed to load ID patterns"
+const ConstStreamCouldNotInferKindFromIdStr = "could not infer kind from ID"
+const ConstStreamFailedToUnmarshalPendingObject = "failed to unmarshal pending object"
