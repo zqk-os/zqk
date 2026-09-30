@@ -473,7 +473,7 @@ func EnhanceError(cmd *cobra.Command, err error) error {
 		CommandPath:     cmd.CommandPath(),
 	}
 	s := errorsuggest.Suggest(err, opts)
-	if s.Hint == emptyValue {
+	if s.Hint == emptyValue || strings.Contains(err.Error(), s.Hint) {
 		return errfmt.Errorf("%w", err)
 	}
 	// Return error that includes suggestion (single line for scripting, two-line for readability)
