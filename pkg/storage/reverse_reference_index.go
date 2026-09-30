@@ -35,11 +35,12 @@ type ReverseReferenceIndexMetadata struct {
 
 // ReverseReferenceIndex is a thread-safe cache for reverse references (referencedID -> []dependentIDs)
 type ReverseReferenceIndex struct {
-	mu       sync.RWMutex
-	index    map[string][]string // referencedID -> []dependentIDs
-	metadata *ReverseReferenceIndexMetadata
-	cacheDir string // Directory where cache file is stored
-	isReady  atomic.Bool
+	mu           sync.RWMutex
+	index        map[string][]string // referencedID -> []dependentIDs
+	forwardIndex map[string][]string // objectID -> []referencedIDs
+	metadata     *ReverseReferenceIndexMetadata
+	cacheDir     string // Directory where cache file is stored
+	isReady      atomic.Bool
 }
 
 // Global cache instance (similar to ObjectIDCache pattern)
@@ -59,9 +60,10 @@ func GetGlobalReverseReferenceIndex() *ReverseReferenceIndex {
 // NewReverseReferenceIndex creates a new reverse reference index
 func NewReverseReferenceIndex() *ReverseReferenceIndex {
 	return &ReverseReferenceIndex{
-		index:    make(map[string][]string),
-		metadata: nil,
-		cacheDir: "",
+		index:        make(map[string][]string),
+		forwardIndex: make(map[string][]string),
+		metadata:     nil,
+		cacheDir:     "",
 	}
 }
 
@@ -256,6 +258,28 @@ func (r *ReverseReferenceIndex) RemoveObject(objectID string) {
 				return nil
 			}
 
+			if r.forwardIndex != nil {
+				if refs, ok := r.forwardIndex[objectID]; ok {
+					for _, referencedID := range refs {
+						deps := r.index[referencedID]
+						newDeps := make([]string, 0, len(deps))
+						for _, dep := range deps {
+							if dep != objectID {
+								newDeps = append(newDeps, dep)
+							}
+						}
+						if len(newDeps) == 0 {
+							delete(r.index, referencedID)
+						} else {
+							r.index[referencedID] = newDeps
+						}
+					}
+					delete(r.forwardIndex, objectID)
+					return nil
+				}
+			}
+
+			// Fallback: full scan if forward index is not populated for this object
 			for referencedID, deps := range r.index {
 				found := false
 				for _, dep := range deps {
@@ -307,6 +331,9 @@ func (r *ReverseReferenceIndex) UpdateReferences(objectID string, oldRefs, newRe
 			if r.index == nil {
 				r.index = make(map[string][]string)
 			}
+			if r.forwardIndex == nil {
+				r.forwardIndex = make(map[string][]string)
+			}
 
 			for _, oldRef := range oldRefs {
 				if oldRef != emptyValue {
@@ -343,19 +370,52 @@ func (r *ReverseReferenceIndex) removeReferenceLocked(objectID, referencedID str
 	} else {
 		r.index[referencedID] = newDeps
 	}
+
+	if r.forwardIndex != nil {
+		refs := r.forwardIndex[objectID]
+		newRefs := make([]string, 0, len(refs))
+		for _, ref := range refs {
+			if ref != referencedID {
+				newRefs = append(newRefs, ref)
+			}
+		}
+		if len(newRefs) == 0 {
+			delete(r.forwardIndex, objectID)
+		} else {
+			r.forwardIndex[objectID] = newRefs
+		}
+	}
 }
 
 // addReferenceLocked adds a reference (must be called with lock held)
 func (r *ReverseReferenceIndex) addReferenceLocked(objectID, referencedID string) {
 	deps := r.index[referencedID]
 	// Check if already exists
+	alreadyDep := false
 	for _, dep := range deps {
 		if dep == objectID {
-			return
+			alreadyDep = true
+			break
 		}
 	}
-	// Add to list
-	r.index[referencedID] = append(deps, objectID)
+	if !alreadyDep {
+		r.index[referencedID] = append(deps, objectID)
+	}
+
+	if r.forwardIndex == nil {
+		r.forwardIndex = make(map[string][]string)
+	}
+	refs := r.forwardIndex[objectID]
+	alreadyRef := false
+	for _, ref := range refs {
+		if ref == referencedID {
+			alreadyRef = true
+			break
+		}
+	}
+	if !alreadyRef {
+		r.forwardIndex[objectID] = append(refs, referencedID)
+	}
 }
 
 // Clear clears the entire index (for rebuild)
@@ -371,6 +431,7 @@ func (r *ReverseReferenceIndex) Clear() {
 		locknames.LockNameReverseReferenceIndexClear,
 		func() error {
 			r.index = make(map[string][]string)
+			r.forwardIndex = make(map[string][]string)
 			r.metadata = nil
 			r.isReady.Store(false)
 			return nil

@@ -2,6 +2,8 @@ package logging
 
 import (
 	"sync"
+
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // Wire keys aligned with pkg/objects FieldKey* for scheduler log fields — kept as literals here to
@@ -1257,7 +1259,13 @@ func (e *fluentEntry) Log() {
 	case "info":
 		e.logger.Info(e.msg, e.fields...)
 	default:
-		panic("unlevelled log entry: explicit level required (CRIT-CEF-FLUENT-LEVEL-REQUIRED-001)")
+		// F-CQ-005: Do not crash production daemons if explicit log level is omitted.
+		// Panic during tests to catch unlevelled calls, but in production fallback gracefully to Info.
+		if zqkenv.IsInTest() {
+			panic("unlevelled log entry: explicit level required (CRIT-CEF-FLUENT-LEVEL-REQUIRED-001)")
+		}
+		e.fields = append(e.fields, String("log_warning", "unlevelled_entry_defaulted_to_info"))
+		e.logger.Info(e.msg, e.fields...)
 	}
 }
 
