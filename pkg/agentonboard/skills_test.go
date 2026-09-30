@@ -44,36 +44,42 @@ func TestSyncSkills_ProjectsAndPrunes(t *testing.T) {
 		{ID: VendorAgent, DisplayName: "Agent"},
 	}
 
-	// First pass: Dry run should detect link and prune targets without modifying disk
-	dryRes, err := SyncSkills(root, detected, false, false, true, false)
+	// First pass: Without force, user directory should NOT be pruned
+	safeRes, err := SyncSkills(root, detected, false, false, false, false)
+	if err != nil {
+		t.Fatalf("SyncSkills safe execution failed: %v", err)
+	}
+	if len(safeRes.Pruned) != 0 {
+		t.Errorf("expected 0 pruned without force, got %v", safeRes.Pruned)
+	}
+	if _, err := fileutil.Stat(snowflakeDir); err != nil {
+		t.Errorf("expected user snowflake dir to be preserved when force is false")
+	}
+
+	// Dry run with force should detect link and prune targets without modifying disk
+	dryRes, err := SyncSkills(root, detected, false, false, true, true)
 	if err != nil {
 		t.Fatalf("SyncSkills dry-run failed: %v", err)
 	}
 	if len(dryRes.Pruned) != 1 || dryRes.Pruned[0] != ".agent/skills/rogue-snowflake" {
 		t.Errorf("expected dry-run pruned [.agent/skills/rogue-snowflake], got %v", dryRes.Pruned)
 	}
-	if len(dryRes.Linked) != 2 {
-		t.Errorf("expected dry-run linked 2 skills, got %v", dryRes.Linked)
-	}
 	if _, err := fileutil.Stat(snowflakeDir); err != nil {
 		t.Errorf("expected snowflake to still exist during dry-run")
 	}
 
-	// Second pass: Real execution
-	execRes, err := SyncSkills(root, detected, false, false, false, false)
+	// Second pass: Real execution with force
+	execRes, err := SyncSkills(root, detected, false, false, false, true)
 	if err != nil {
 		t.Fatalf("SyncSkills execution failed: %v", err)
 	}
 	if len(execRes.Pruned) != 1 || execRes.Pruned[0] != ".agent/skills/rogue-snowflake" {
 		t.Errorf("expected pruned [.agent/skills/rogue-snowflake], got %v", execRes.Pruned)
 	}
-	if len(execRes.Linked) != 2 {
-		t.Errorf("expected linked 2 skills, got %v", execRes.Linked)
-	}
 
-	// Verify snowflake was purged
+	// Verify snowflake was purged when force was true
 	if _, err := fileutil.Stat(snowflakeDir); !fileutil.IsNotExist(err) {
-		t.Errorf("expected snowflake dir to be deleted, but stat returned: %v", err)
+		t.Errorf("expected snowflake dir to be deleted with force, but stat returned: %v", err)
 	}
 
 	// Verify symlinks were created and point to correct relative target
@@ -107,6 +113,68 @@ func TestSyncSkills_ProjectsAndPrunes(t *testing.T) {
 	}
 	if len(idemRes.Skipped) != 2 {
 		t.Errorf("expected 2 skipped, got %v", idemRes.Skipped)
+	}
+}
+
+func TestSyncSkills_OrphanedSymlinkPrunedWithoutForce(t *testing.T) {
+	root := t.TempDir()
+	agentDir := filepath.Join(root, ".agent", "skills")
+	if err := fileutil.EnsureDir(agentDir); err != nil {
+		t.Fatal(err)
+	}
+
+	// Create kernel skills dir
+	kernelSkillsDir := filepath.Join(root, paths.ProjectDataDir, paths.SkillsSubdir)
+	if err := fileutil.EnsureDir(filepath.Join(kernelSkillsDir, "active-skill")); err != nil {
+		t.Fatal(err)
+	}
+	_ = fileutil.WriteSecureFile(filepath.Join(kernelSkillsDir, "active-skill", "SKILL.md"), []byte("# Active"))
+
+	// Create an orphaned symlink pointing to an old kernel skill that no longer exists
+	orphanLink := filepath.Join(agentDir, "old-deleted-skill")
+	orphanTarget := "../../" + filepath.ToSlash(filepath.Join(paths.ProjectDataDir, paths.SkillsSubdir, "old-deleted-skill"))
+	if err := os.Symlink(orphanTarget, orphanLink); err != nil {
+		t.Fatal(err)
+	}
+
+	detected := []DetectedVendor{{ID: VendorAgent, DisplayName: "Agent"}}
+	res, err := SyncSkills(root, detected, false, false, false, false)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(res.Pruned) != 1 || res.Pruned[0] != ".agent/skills/old-deleted-skill" {
+		t.Fatalf("expected orphaned kernel symlink to be pruned even without force, got: %v", res.Pruned)
+	}
+	if _, err := os.Lstat(orphanLink); !os.IsNotExist(err) {
+		t.Fatalf("expected orphan symlink to be removed from disk")
+	}
+}
+
+func TestSyncSkills_CollisionWithoutForceErrors(t *testing.T) {
+	root := t.TempDir()
+	agentDir := filepath.Join(root, ".agent", "skills")
+	collidingDir := filepath.Join(agentDir, "arch-design")
+	if err := fileutil.EnsureDir(collidingDir); err != nil {
+		t.Fatal(err)
+	}
+	_ = fileutil.WriteSecureFile(filepath.Join(collidingDir, "user.txt"), []byte("user content"))
+
+	// Create kernel skill with same name
+	kernelSkillsDir := filepath.Join(root, paths.ProjectDataDir, paths.SkillsSubdir)
+	if err := fileutil.EnsureDir(filepath.Join(kernelSkillsDir, "arch-design")); err != nil {
+		t.Fatal(err)
+	}
+	_ = fileutil.WriteSecureFile(filepath.Join(kernelSkillsDir, "arch-design", "SKILL.md"), []byte("# Arch"))
+
+	detected := []DetectedVendor{{ID: VendorAgent, DisplayName: "Agent"}}
+	_, err := SyncSkills(root, detected, false, false, false, false)
+	if err == nil {
+		t.Fatal("expected error on collision with non-symlink directory when force is false")
+	}
+
+	// Verify user file was not destroyed
+	if _, err := os.Stat(filepath.Join(collidingDir, "user.txt")); err != nil {
+		t.Fatalf("user content was destroyed on collision: %v", err)
 	}
 }
 

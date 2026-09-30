@@ -98,7 +98,7 @@ func SyncSkills(projectRoot string, detected []DetectedVendor, allVendors, headl
 	for _, destRel := range dests {
 		destAbs := filepath.Join(projectRoot, filepath.FromSlash(destRel))
 
-		// Step A: Prune unmanaged snowflakes in destAbs
+		// Step A: Prune orphaned kernel skill symlinks (or unmanaged snowflakes if force is set)
 		if pathExists(destAbs) {
 			destEntries, err := fileutil.ReadDir(destAbs)
 			if err == nil {
@@ -108,11 +108,31 @@ func SyncSkills(projectRoot string, detected []DetectedVendor, allVendors, headl
 						continue
 					}
 					if !validSkills[name] {
-						// Unmanaged snowflake detected
+						entryPath := filepath.Join(destAbs, name)
+						fi, lerr := os.Lstat(entryPath)
+						if lerr != nil {
+							continue
+						}
+						isSymlink := fi.Mode()&os.ModeSymlink != 0
+						if !isSymlink && !force {
+							// Safeguard: Never delete user-created directories or files without --force
+							continue
+						}
+						if isSymlink && !force {
+							// Only prune symlinks that actually point to .zqk/skills (orphaned projections)
+							target, rerr := os.Readlink(entryPath)
+							if rerr != nil || !strings.Contains(filepath.ToSlash(target), paths.SkillsSubdir) {
+								continue
+							}
+						}
+
 						rel := filepath.ToSlash(filepath.Join(destRel, name))
 						res.Pruned = append(res.Pruned, rel)
 						if !dryRun {
-							_ = fileutil.RemoveAll(filepath.Join(destAbs, name))
+							if err := paths.MustNotDestroyProjectRoot(projectRoot, entryPath); err != nil {
+								return nil, err
+							}
+							_ = fileutil.RemoveAll(entryPath)
 						}
 					}
 				}
@@ -149,10 +169,17 @@ func SyncSkills(projectRoot string, detected []DetectedVendor, allVendors, headl
 						res.Skipped = append(res.Skipped, rel)
 						continue
 					}
+				} else if !force {
+					// Non-symlink existing file/directory collides with kernel skill!
+					// Refuse to clobber user content unless force is set.
+					return nil, errfmt.Errorf("cannot project skill %s: destination %s is an existing non-symlink file or directory (use --force to overwrite)", skillName, rel)
 				}
-				// Broken link or wrong target or non-symlink: update to symlink
+				// Broken link or wrong target or force overwrite: update to symlink
 				res.Linked = append(res.Linked, rel)
 				if !dryRun {
+					if err := paths.MustNotDestroyProjectRoot(projectRoot, linkAbs); err != nil {
+						return nil, err
+					}
 					_ = fileutil.RemoveAll(linkAbs)
 					if err := os.Symlink(targetRel, linkAbs); err != nil {
 						return nil, errfmt.Newf("create skill symlink %s", rel).Wrap(err)

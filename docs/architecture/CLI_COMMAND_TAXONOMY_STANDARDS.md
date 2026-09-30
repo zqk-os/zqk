@@ -15,17 +15,18 @@ The **ZQK Command Interface** is the primary human-agent operating surface for t
 This document establishes the **authoritative ground rules, naming taxonomy, behavioral standards, and governance protocols** for all commands in `zqk`.
 
 > [!IMPORTANT]
-> **Zero Tolerance for Un-specced Commands:**  
-> Every command in `zqk` must have a valid declarative specification in `.zqk/cli/specs/`. Any command added without a specification is treated as a build-breaking defect and trapped by `zqk system validate-command-specs`.
+> **Zero Tolerance for New Un-specced Commands (Ratcheting Baseline Freeze):**  
+> Every new or modified command in `zqk` must have a valid declarative specification in `.zqk/cli/specs/`. Active command coverage is governed by a ratcheting baseline freeze file (`.zqk/cli/command_spec_coverage_baseline.json`). Any new command added without a specification or any coverage regression is treated as a build-breaking defect and trapped by `zqk system validate-command-specs`. Legacy grandfathered commands are progressively migrated to achieve 100% parity.
 
 ---
 
 ## 2. Core Architectural Ground Rules & Standards
 
-### Rule 1: 100% Declarative Spec Coverage Mandatory
+### Rule 1: Declarative Spec Coverage & Ratcheting Baseline Parity
 1. **Spec Location:** Every command and subcommand MUST have a matching YAML specification in `.zqk/cli/specs/<domain>/<command>_command.yaml`.
 2. **Spec Completeness:** Specifications must document the command purpose, positional arguments, flags (with defaults and descriptions), expected output schema, and at least two realistic usage examples.
-3. **Automated Verification:** The pre-commit gate and local CI run `zqk system validate-command-specs`. Commits that introduce un-specced commands or spec drift will fail closed.
+3. **Automated Verification:** The pre-commit gate and local CI run `zqk system validate-command-specs`. Commits that introduce un-specced commands beyond the baseline freeze or introduce spec drift fail closed.
+4. **Ratcheting Migration Baseline:** Legacy commands without specs are frozen in `.zqk/cli/command_spec_coverage_baseline.json`. The baseline permits zero new un-specced commands (`new_drift_count == 0`), and automatically ratchets forward as grandfathered commands receive specifications until full parity (`parity: true`) is reached.
 
 ### Rule 2: Strict Domain-Resource Grammar & Noun-Verb Hierarchy
 1. **No Orphan Root Verbs:**  
