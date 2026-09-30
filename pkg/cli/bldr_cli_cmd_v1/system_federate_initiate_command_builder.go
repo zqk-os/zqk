@@ -8,9 +8,12 @@ import (
 // NewSystemFederateInitiateCommandBuilder creates a new system_federate_initiate command
 func NewSystemFederateInitiateCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("initiate")
-	builder.WithShort("initiate command")
-	help := clipkg.DynamicHelpBuilder("initiate command")
-	help.WithDescriptionLines("initiate command")
+	builder.WithShort("Initiate federation establishment with a remote peer system")
+	help := clipkg.DynamicHelpBuilder("Initiate federation establishment with a remote peer system")
+	help.WithDescriptionLines(
+		"Start the outbound federation protocol sequence to discover, establish,",
+		"and verify mutual trust and synchronization with a remote peer.",
+	)
 	builder.WithHelpBuilder(help)
 	builder.WithCommonFlags(false, nil)
 	cmd := builder.Build()

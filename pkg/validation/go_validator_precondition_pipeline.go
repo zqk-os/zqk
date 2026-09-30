@@ -136,70 +136,85 @@ type precondDecideRule struct {
 var precondDecideRules = []precondDecideRule{
 	{name: "ref_status_matrix", eval: evalRefStatusStage},
 	matchContains("tdd_test_red_phase", strings.ToLower(PrecondTDDTestRedPhase), func(gv *GoValidator, _ string, obj map[string]any, options *ValidationOptions) bool {
-		return gv.checkTDDTestRedPhase(obj, options)
+		_, met := evalOverlayDSLStage(gv, "tdd_test_red_phase", obj, options)
+		return met
 	}),
 	matchContains("criteria_active_test_case", strings.ToLower(PrecondCriteriaLinkedToActiveTestCase), func(gv *GoValidator, _ string, obj map[string]any, options *ValidationOptions) bool {
-		return gv.checkCriteriaLinkedToActiveTestCase(obj, options)
+		_, met := evalOverlayDSLStage(gv, "criteria_active_test_case", obj, options)
+		return met
 	}),
 	matchContains("criteria_active_test_case_formal", strings.ToLower(PrecondActiveTestCaseRefLinked), func(gv *GoValidator, _ string, obj map[string]any, options *ValidationOptions) bool {
 		if strings.ToLower(objects.GetString(obj, objects.FieldKeyKind)) == objects.KindCriteria {
-			return gv.checkCriteriaLinkedToActiveTestCase(obj, options)
+			_, met := evalOverlayDSLStage(gv, "criteria_active_test_case", obj, options)
+			return met
 		}
 		return false
 	}),
-	matchContains("shovel_ready", strings.ToLower(PrecondCRIShovelReady), func(_ *GoValidator, _ string, obj map[string]any, _ *ValidationOptions) bool {
-		return EvaluateShovelReady(obj).Ready
+	matchContains("shovel_ready", strings.ToLower(PrecondCRIShovelReady), func(gv *GoValidator, _ string, obj map[string]any, options *ValidationOptions) bool {
+		_, met := evalOverlayDSLStage(gv, "shovel_ready", obj, options)
+		return met
 	}),
 	matchExact("ready_backlog_references_plan", PrecondReadyBacklogReferencesPlan, func(gv *GoValidator, obj map[string]any, options *ValidationOptions) bool {
-		return gv.checkReadyBacklogReferencesPlan(obj, options)
+		_, met := evalOverlayDSLStage(gv, "ready_backlog_references_plan", obj, options)
+		return met
 	}),
 	matchExact("linked_backlog_ready_or_later", PrecondAllLinkedBacklogReadyOrLater, func(gv *GoValidator, obj map[string]any, options *ValidationOptions) bool {
-		return LinkedBacklogItemsAllReadyOrLater(objectID(obj), options, gv.kindFromID())
+		_, met := evalOverlayDSLStage(gv, "linked_backlog_ready_or_later", obj, options)
+		return met
 	}),
 	matchExact("linked_backlog_all_terminal", PrecondLinkedBacklogAllTerminal, func(gv *GoValidator, obj map[string]any, options *ValidationOptions) bool {
-		return LinkedBacklogItemsAllTerminal(objectID(obj), options, gv.kindFromID())
+		_, met := evalOverlayDSLStage(gv, "linked_backlog_all_terminal", obj, options)
+		return met
 	}),
 	matchExact("no_linked_backlog_in_progress_or_complete", PrecondNoLinkedBacklogInProgressOrComplete, func(gv *GoValidator, obj map[string]any, options *ValidationOptions) bool {
-		return LinkedBacklogItemsNoneInProgressOrComplete(objectID(obj), options, gv.kindFromID())
+		_, met := evalOverlayDSLStage(gv, "no_linked_backlog_in_progress_or_complete", obj, options)
+		return met
 	}),
 	matchExact("workflow_constraints_if_set", PrecondWorkflowConstraintsIfSet, func(gv *GoValidator, obj map[string]any, options *ValidationOptions) bool {
-		return gv.checkWorkflowConstraintsIfSet(obj, options)
+		_, met := evalOverlayDSLStage(gv, "workflow_constraints_if_set", obj, options)
+		return met
 	}),
 	matchExact("priority_plan_validated", PrecondPriorityPlanValidated, func(gv *GoValidator, obj map[string]any, options *ValidationOptions) bool {
-		return gv.checkPriorityPlanValidated(obj)
+		_, met := evalOverlayDSLStage(gv, "priority_plan_validated", obj, options)
+		return met
 	}),
 	matchExact("team_or_persona_dispatch_refs", PrecondTeamOrPersonaDispatchRefs, func(gv *GoValidator, obj map[string]any, options *ValidationOptions) bool {
-		return gv.checkAtLeastPrecondition(PrecondTeamOrPersonaDispatchRefs, obj)
+		_, met := evalOverlayDSLStage(gv, "team_or_persona_dispatch_refs", obj, options)
+		return met
 	}),
 	{name: "parent_child_link_back", eval: evalLinkBackStage},
 	{name: "active_ref", eval: evalActiveRefStage},
-	matchContains("problem_statement_and_acceptance", PrecondProblemStatementAndAcceptance, func(_ *GoValidator, _ string, obj map[string]any, _ *ValidationOptions) bool {
-		problem, _ := obj[objects.FieldKeyProblemStatement].(string)
-		considerations, _ := obj[objects.FieldKeyAcceptanceConsiderations].(string)
-		return strings.TrimSpace(problem) != "" && strings.TrimSpace(considerations) != ""
+	matchContains("problem_statement_and_acceptance", PrecondProblemStatementAndAcceptance, func(gv *GoValidator, _ string, obj map[string]any, options *ValidationOptions) bool {
+		_, met := evalOverlayDSLStage(gv, "field_nonempty:problem_statement;field_nonempty:acceptance_considerations", obj, options)
+		return met
 	}),
-	matchContains("priority_assigned", PrecondPriorityAssigned, func(_ *GoValidator, _ string, obj map[string]any, _ *ValidationOptions) bool {
-		priority, _ := obj[objects.FieldKeyPriority].(string)
-		return priority == "high" || priority == "medium" || priority == "low"
+	matchContains("priority_assigned", PrecondPriorityAssigned, func(gv *GoValidator, _ string, obj map[string]any, options *ValidationOptions) bool {
+		_, met := evalOverlayDSLStage(gv, "field_matches:priority:^(high|medium|low)$", obj, options)
+		return met
 	}),
 	{name: "owner_identified", eval: evalOwnerIdentifiedStage},
 	matchContains("commit_refs_git_mutation_evidence", PrecondCommitRefsGitMutationEvidence, func(gv *GoValidator, _ string, obj map[string]any, options *ValidationOptions) bool {
-		return gv.checkCommitHashesGitMutationEvidence(obj, options)
+		_, met := evalOverlayDSLStage(gv, "git_mutation_evidence_present", obj, options)
+		return met
 	}),
 	matchContains("commit_hashes_git_mutation_evidence", PrecondCommitHashesGitMutationEvidence, func(gv *GoValidator, _ string, obj map[string]any, options *ValidationOptions) bool {
-		return gv.checkCommitHashesGitMutationEvidence(obj, options)
+		_, met := evalOverlayDSLStage(gv, "git_mutation_evidence_present", obj, options)
+		return met
 	}),
 	matchExact("branch_ref_is_ancestor_of_trunk", PrecondBranchRefIsAncestorOfTrunk, func(gv *GoValidator, obj map[string]any, options *ValidationOptions) bool {
-		return gv.checkBranchNameIsAncestorOfTrunk(obj, options)
+		_, met := evalOverlayDSLStage(gv, "branch_is_ancestor_of_trunk", obj, options)
+		return met
 	}),
 	matchExact("branch_name_is_ancestor_of_trunk", PrecondBranchNameIsAncestorOfTrunk, func(gv *GoValidator, obj map[string]any, options *ValidationOptions) bool {
-		return gv.checkBranchNameIsAncestorOfTrunk(obj, options)
+		_, met := evalOverlayDSLStage(gv, "branch_is_ancestor_of_trunk", obj, options)
+		return met
 	}),
 	{name: "machine_checkable_closure_evidence", eval: evalMachineCheckableStage},
 	{name: "field_is_set", eval: evalFieldIsSetStage},
 	{name: "field_is_not_empty", eval: evalFieldIsNotEmptyStage},
-	matchContains("at_least", SubprecondAtLeast, func(gv *GoValidator, p string, obj map[string]any, _ *ValidationOptions) bool {
-		return gv.checkAtLeastPrecondition(p, obj)
+	matchContains("at_least", SubprecondAtLeast, func(gv *GoValidator, p string, obj map[string]any, options *ValidationOptions) bool {
+		_, met := evalOverlayDSLStage(gv, p, obj, options)
+		return met
 	}),
 	{name: "overlay_dsl", eval: evalOverlayDSLStage},
 }
@@ -258,14 +273,13 @@ func evalRefStatusStage(gv *GoValidator, p string, obj map[string]any, options *
 	return true, gv.evalRefStatus(rule, obj, options)
 }
 
-func evalOwnerIdentifiedStage(_ *GoValidator, p string, obj map[string]any, _ *ValidationOptions) (bool, bool) {
+func evalOwnerIdentifiedStage(gv *GoValidator, p string, obj map[string]any, options *ValidationOptions) (bool, bool) {
 	if !strings.Contains(p, PrecondOwnerIdentified) &&
 		!strings.Contains(p, PrecondOwnerRefIsSet) &&
 		p != strings.ToLower(PrecondOwnerIsSet) {
 		return false, false
 	}
-	ownerRef, _ := obj[objects.FieldKeyOwnerRef].(string)
-	return true, strings.TrimSpace(ownerRef) != ""
+	return evalOverlayDSLStage(gv, "field_nonempty:owner_ref", obj, options)
 }
 
 func evalMachineCheckableStage(gv *GoValidator, p string, obj map[string]any, options *ValidationOptions) (bool, bool) {
@@ -275,21 +289,21 @@ func evalMachineCheckableStage(gv *GoValidator, p string, obj map[string]any, op
 		!strings.Contains(p, strings.ToLower(PrecondMachineCheckableClosureEvidence)) {
 		return false, false
 	}
-	return true, gv.checkMachineCheckableClosureEvidence(obj, options)
+	return evalOverlayDSLStage(gv, "machine_checkable_closure_evidence", obj, options)
 }
 
 func evalFieldIsSetStage(gv *GoValidator, p string, obj map[string]any, options *ValidationOptions) (bool, bool) {
 	if !isFieldCheckPrecondition(p, SubprecondIsSet) {
 		return false, false
 	}
-	return true, gv.checkIsSetPrecondition(p, obj)
+	return evalOverlayDSLStage(gv, p, obj, options)
 }
 
 func evalFieldIsNotEmptyStage(gv *GoValidator, p string, obj map[string]any, options *ValidationOptions) (bool, bool) {
 	if !isFieldCheckPrecondition(p, SubprecondIsNotEmpty) {
 		return false, false
 	}
-	return true, gv.checkIsNotEmptyPrecondition(p, obj)
+	return evalOverlayDSLStage(gv, p, obj, options)
 }
 
 func evalLinkBackStage(gv *GoValidator, p string, obj map[string]any, options *ValidationOptions) (bool, bool) {

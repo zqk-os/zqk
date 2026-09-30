@@ -35,6 +35,16 @@ func NewShellPeerWakeAdapter() *ShellPeerWakeAdapter {
 	return &ShellPeerWakeAdapter{
 		WorkerScript:      shellWakeWorkerScript,
 		CoordinatorScript: shellWakeCoordinatorScript,
+		Fallback:          NewNativePeerWakeAdapter(),
+	}
+}
+
+// NewShellPeerWakeAdapterWithFallback returns a shell membrane adapter with a fallback adapter for missing scripts.
+func NewShellPeerWakeAdapterWithFallback(fallback PeerWakeAdapter) *ShellPeerWakeAdapter {
+	return &ShellPeerWakeAdapter{
+		WorkerScript:      shellWakeWorkerScript,
+		CoordinatorScript: shellWakeCoordinatorScript,
+		Fallback:          fallback,
 	}
 }
 

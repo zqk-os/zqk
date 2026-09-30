@@ -96,10 +96,11 @@ func TestInstanceValidator_ValidateInstanceWithState(t *testing.T) {
 	validator := NewGoValidatorWithLoaders(specLoader, lifecycleLoader)
 
 	validAuditFields := map[string]any{
-		objects.FieldKeyCreatedAt: ConstMagiccd842f93,
-		objects.FieldKeyCreatedBy: "ACC-TEST",
-		objects.FieldKeyUpdatedAt: ConstMagiccd842f93,
-		objects.FieldKeyUpdatedBy: "ACC-TEST",
+		objects.FieldKeyCreatedAt:   ConstMagiccd842f93,
+		objects.FieldKeyCreatedBy:   "ACC-TEST",
+		objects.FieldKeyUpdatedAt:   ConstMagiccd842f93,
+		objects.FieldKeyUpdatedBy:   "ACC-TEST",
+		objects.FieldKeyDescription: "Valid test description",
 	}
 
 	tests := []struct {
@@ -138,6 +139,7 @@ func TestInstanceValidator_ValidateInstanceWithState(t *testing.T) {
 					objects.FieldKeyTitle:         "Test Item",
 					objects.FieldKeyStatus:        "validated",
 					objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+					objects.FieldKeyGoalRefs:      []string{"GOAL-001"},
 				}
 				for k, v := range validAuditFields {
 					obj[k] = v
@@ -224,7 +226,7 @@ func TestInstanceValidator_ValidateInstanceWithState(t *testing.T) {
 	}
 }
 
-func TestInstanceValidator_checkPrecondition(t *testing.T) {
+func TestInstanceValidator_checkPrecondition_Lifecycle(t *testing.T) {
 	t.Parallel()
 	validator := &InstanceValidator{}
 
@@ -303,10 +305,11 @@ func TestInstanceValidator_ValidateInstanceWithState_GraphData(t *testing.T) {
 	validator := NewGoValidatorWithLoaders(specLoader, lifecycleLoader)
 
 	validAuditFields := map[string]any{
-		objects.FieldKeyCreatedAt: ConstMagiccd842f93,
-		objects.FieldKeyCreatedBy: "ACC-TEST",
-		objects.FieldKeyUpdatedAt: ConstMagiccd842f93,
-		objects.FieldKeyUpdatedBy: "ACC-TEST",
+		objects.FieldKeyCreatedAt:   ConstMagiccd842f93,
+		objects.FieldKeyCreatedBy:   "ACC-TEST",
+		objects.FieldKeyUpdatedAt:   ConstMagiccd842f93,
+		objects.FieldKeyUpdatedBy:   "ACC-TEST",
+		objects.FieldKeyDescription: "Valid test description",
 	}
 
 	// Test cases that would come from graph storage (same validation logic, different source)
@@ -346,7 +349,7 @@ func TestInstanceValidator_ValidateInstanceWithState_GraphData(t *testing.T) {
 					objects.FieldKeyID:            "REQ-999",
 					objects.FieldKeyKind:          "requirement",
 					objects.FieldKeyTitle:         ConstMagic585b2e57,
-					objects.FieldKeyStatus:        "planned",
+					objects.FieldKeyStatus:        "proposed",
 					objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 					objects.FieldKeyCriteriaRefs:  []string{"CRIT-001", "CRIT-002"},
 					objects.FieldKeyGoalRefs:      []string{"GOAL-001"},
@@ -368,10 +371,10 @@ func TestInstanceValidator_ValidateInstanceWithState_GraphData(t *testing.T) {
 					objects.FieldKeyID:            "REQ-998",
 					objects.FieldKeyKind:          "requirement",
 					objects.FieldKeyTitle:         ConstMagicaed366d8,
-					objects.FieldKeyStatus:        "planned",
+					objects.FieldKeyStatus:        "invalid_status",
 					objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 					objects.FieldKeyGoalRefs:      []string{"GOAL-001"},
-					// Missing criteria_refs - should fail validation
+					// Invalid status - should fail validation
 				}
 				for k, v := range validAuditFields {
 					obj[k] = v

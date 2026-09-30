@@ -603,7 +603,9 @@ func Execute() {
 			logging.Fluent(infoStderr).Info("Command execution unfulfilled").WithError(err).Log()
 			logging.Fluent(logger).Info("Command execution unfulfilled").WithError(err).Log()
 		} else {
-			logging.Fluent(stderrLogger).Error("ZQK_EXECUTION_ERR", err).Log()
+			if profile != profileHuman {
+				logging.Fluent(stderrLogger).Error("ZQK_EXECUTION_ERR", err).Log()
+			}
 			logging.Fluent(logger).Error("Command execution failed", err).Log()
 		}
 		os.Exit(exitCode)

@@ -35,6 +35,19 @@ const (
 	AuditorAccountID = objects.DefaultSystemAccountID + "-auditor"
 )
 
+// DefaultAuditorPrivKeyPath returns the canonical path to the auditor private key on disk.
+func DefaultAuditorPrivKeyPath(projectRoot string) string {
+	if projectRoot == "" {
+		return ""
+	}
+	return filepath.Join(projectRoot, paths.ProjectDataDir, "keystore", "auditor.priv")
+}
+
+// AuditorPrivateKeyPath is an alias for DefaultAuditorPrivKeyPath.
+func AuditorPrivateKeyPath(projectRoot string) string {
+	return DefaultAuditorPrivKeyPath(projectRoot)
+}
+
 // NewAuditorSigner creates a new signer. It attempts to load the private key from the provided path,
 // or generates a new one if missing.
 func NewAuditorSigner(keyPath string) (*AuditorSigner, error) {

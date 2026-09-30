@@ -13,6 +13,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/state"
 	"github.com/zqk-os/zqk/cmd/zqk/swarm"
 	"github.com/zqk-os/zqk/cmd/zqk/test"
+	"github.com/zqk-os/zqk/pkg/agentfeed"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/daemon/overseer"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -20,6 +21,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/tde"
 	"github.com/zqk-os/zqk/pkg/tray"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
@@ -62,6 +64,17 @@ type HealthViolationRow struct {
 	Message     string `json:"message"`
 	AutoFixable bool   `json:"auto_fixable"`
 	Path        string `json:"path"`
+}
+
+// InboxItemRow represents an unacknowledged correspondence item or interrupt envelope in TUI.
+type InboxItemRow struct {
+	ID        string `json:"id"`
+	Type      string `json:"type"` // "correspondence" or "tde_envelope"
+	Sender    string `json:"sender"`
+	Target    string `json:"target"`
+	Summary   string `json:"summary"`
+	Timestamp string `json:"timestamp"`
+	Status    string `json:"status"`
 }
 
 // ActionCenterItem represents a triggerable action shortcut backed by the tray and scheduler.
@@ -337,6 +350,9 @@ type UIModel struct {
 	// Dynamic ambient message banner (Line 6, viewable on any tab)
 	DynamicMessage string
 
+	// Swarm & Operator Inbox
+	InboxItems []InboxItemRow
+
 	// Human Editor Experience Profile: "newb" (full help/legend/banners), "pro" (compact header/footer), "jedi" (zen mode - full table view)
 	EditorProfile string
 
@@ -443,11 +459,173 @@ func (m *UIModel) RefreshMutations() {
 		muts[i], muts[j] = muts[j], muts[i]
 	}
 	m.Mutations = muts
+	// Refresh operator and agent inbox items
+	m.RefreshInbox()
 	// If dynamic message is empty, auto-populate from latest mutation, agent instruction, or chat feed
 	if m.DynamicMessage == "" {
 		m.RefreshDynamicMessage()
 	}
 	m.LastUpdated = time.Now()
+}
+
+// RefreshInbox queries the agentfeed and TDE staging WAL for unacknowledged inbox items and staged interrupt envelopes.
+func (m *UIModel) RefreshInbox() {
+	if m.ProjectRoot == "" {
+		return
+	}
+	var items []InboxItemRow
+	// 1. Check correspondence for coordinator / operator
+	snap, err := agentfeed.LoadCorrespondence(m.ProjectRoot, agentfeed.Seat{
+		AgentID: "operator",
+	}, 20)
+	if err == nil {
+		for _, u := range snap.InboxUnacked {
+			items = append(items, InboxItemRow{
+				ID:        u.EventID,
+				Type:      "correspondence",
+				Sender:    u.FromAgentID,
+				Target:    u.ToAgentID,
+				Summary:   u.Summary,
+				Timestamp: u.Timestamp,
+				Status:    "unacked",
+			})
+		}
+	}
+	// 2. Check staged TDE envelopes
+	activeEnvs, err := tde.LoadActive(m.ProjectRoot)
+	if err == nil {
+		for _, env := range activeEnvs {
+			items = append(items, InboxItemRow{
+				ID:        env.ID,
+				Type:      "tde_envelope",
+				Sender:    "wal",
+				Target:    env.TargetID,
+				Summary:   fmt.Sprintf("%s %s (%s)", env.Operation, env.Kind, env.TargetID),
+				Timestamp: env.CreatedAt.UTC().Format(time.RFC3339),
+				Status:    string(env.Status),
+			})
+		}
+	}
+	m.InboxItems = items
+}
+
+// GetVisibleInboxItems returns inbox items matching the active search query filter.
+func (m *UIModel) GetVisibleInboxItems() []InboxItemRow {
+	if m.SearchQuery == "" {
+		return m.InboxItems
+	}
+	var res []InboxItemRow
+	for _, it := range m.InboxItems {
+		if m.matchesQuery(it.ID, it.Sender, it.Target, it.Summary, it.Type, it.Status) {
+			res = append(res, it)
+		}
+	}
+	return res
+}
+
+// AcknowledgeInboxItem acknowledges an unacknowledged correspondence item or commits a staged TDE envelope.
+func (m *UIModel) AcknowledgeInboxItem(itemID string) bool {
+	if m.ProjectRoot == "" || strings.TrimSpace(itemID) == "" {
+		return false
+	}
+	trimmedID := strings.TrimSpace(itemID)
+
+	// Check if this is a staged TDE envelope
+	activeEnvs, err := tde.LoadActive(m.ProjectRoot)
+	if err == nil {
+		for _, env := range activeEnvs {
+			if env.ID == trimmedID {
+				wal, wErr := tde.NewStagingWAL(m.ProjectRoot)
+				if wErr != nil {
+					m.DynamicMessage = fmt.Sprintf("Error opening staging WAL: %v", wErr)
+					return false
+				}
+				defer wal.Close()
+				if cErr := wal.MarkCommitted(env.ID); cErr != nil {
+					m.DynamicMessage = fmt.Sprintf("Error committing envelope: %v", cErr)
+					return false
+				}
+				if sErr := wal.Sync(); sErr != nil {
+					m.DynamicMessage = fmt.Sprintf("Error syncing WAL: %v", sErr)
+					return false
+				}
+				m.DynamicMessage = fmt.Sprintf("Committed staged envelope %s", env.ID)
+				m.RefreshInbox()
+				return true
+			}
+		}
+	}
+
+	// Otherwise treat as agentfeed correspondence
+	agentID := "operator"
+	if coord := agentfeed.CoordinatorSeatID(m.ProjectRoot); coord != "" {
+		agentID = coord
+	}
+	personaRef := agentfeed.SeatPersonaRef(m.ProjectRoot, agentID)
+	if personaRef == "" {
+		personaRef = "PER-DEFAULT-OPERATOR"
+	}
+
+	_, pErr := agentfeed.AppendPeerAck(m.ProjectRoot, agentID, personaRef, trimmedID, "Acknowledged via Mission Control Console")
+	if pErr != nil {
+		m.DynamicMessage = fmt.Sprintf("Failed to ack inbox item: %v", pErr)
+		return false
+	}
+
+	if _, cErr := agentfeed.CompletePeerAckAwaits(m.ProjectRoot, trimmedID, agentID); cErr != nil {
+		m.DynamicMessage = fmt.Sprintf("Ack recorded; note: %v", cErr)
+	} else {
+		m.DynamicMessage = fmt.Sprintf("Acknowledged inbox correspondence %s", trimmedID)
+	}
+	m.RefreshInbox()
+	return true
+}
+
+// RespondInboxItem dispatches a response message to the sender of an inbox correspondence item.
+func (m *UIModel) RespondInboxItem(itemID, message string) bool {
+	if m.ProjectRoot == "" || strings.TrimSpace(itemID) == "" || strings.TrimSpace(message) == "" {
+		return false
+	}
+	trimmedID := strings.TrimSpace(itemID)
+	trimmedMsg := strings.TrimSpace(message)
+
+	agentID := "operator"
+	if coord := agentfeed.CoordinatorSeatID(m.ProjectRoot); coord != "" {
+		agentID = coord
+	}
+
+	// Find sender from loaded inbox items
+	targetAgent := "coordinator"
+	for _, it := range m.InboxItems {
+		if it.ID == trimmedID {
+			if it.Sender != "" && it.Sender != agentID && it.Sender != "wal" {
+				targetAgent = it.Sender
+			}
+			break
+		}
+	}
+
+	_, aErr := agentfeed.AppendEvent(agentfeed.AppendEventInput{
+		ProjectRoot: m.ProjectRoot,
+		Message:     trimmedMsg,
+		AgentID:     agentID,
+		ToAgentID:   targetAgent,
+		Sender:      agentfeed.FeedSenderHumanSteer,
+		EventType:   agentfeed.FeedEventTypeMeshStatus,
+		SelfACK:     true,
+	})
+	if aErr != nil {
+		m.DynamicMessage = fmt.Sprintf("Failed to dispatch inbox response: %v", aErr)
+		return false
+	}
+
+	if _, cErr := agentfeed.CompletePeerAckAwaits(m.ProjectRoot, trimmedID, agentID); cErr != nil {
+		m.DynamicMessage = fmt.Sprintf("Response dispatched to %s; note: %v", targetAgent, cErr)
+	} else {
+		m.DynamicMessage = fmt.Sprintf("Responded to %s (%s)", targetAgent, trimmedID)
+	}
+	m.RefreshInbox()
+	return true
 }
 
 // RefreshDynamicMessage refreshes the ambient Line 6 dynamic message notification pipeline from
@@ -1772,6 +1950,8 @@ func (m *UIModel) GetCurrentRowCount() int {
 		return len(m.GetVisibleMutations())
 	case TabAudit:
 		return len(m.GetVisibleAuditEvents())
+	case TabSwarm:
+		return len(m.GetVisibleInboxItems())
 	case TabPM:
 		return len(m.GetVisiblePriorityPlans()) + len(m.GetVisibleBlockers()) + len(m.GetVisibleBacklog()) + len(m.GetVisibleTechnicalDebt())
 	case TabMetrics:
@@ -1784,6 +1964,36 @@ func (m *UIModel) GetCurrentRowCount() int {
 		return len(m.GetVisibleHealthViolations())
 	default:
 		return 0
+	}
+}
+
+// openSwarmInboxDetail constructs an ItemDetailModel for the selected inbox item on TabSwarm.
+func (m *UIModel) openSwarmInboxDetail(idx int) {
+	items := m.GetVisibleInboxItems()
+	if idx < 0 || idx >= len(items) {
+		return
+	}
+	item := items[idx]
+	details := []string{
+		fmt.Sprintf("Item ID       : %s", item.ID),
+		fmt.Sprintf("Item Type     : %s", item.Type),
+		fmt.Sprintf("Sender        : %s", item.Sender),
+		fmt.Sprintf("Target        : %s", item.Target),
+		fmt.Sprintf("Status        : %s", item.Status),
+		fmt.Sprintf("Timestamp     : %s", item.Timestamp),
+	}
+	if item.Summary != "" {
+		details = append(details, fmt.Sprintf("Summary       : %s", item.Summary))
+	}
+	m.DetailModal = &ItemDetailModel{
+		Kind:      item.Type,
+		ID:        item.ID,
+		Status:    item.Status,
+		Title:     fmt.Sprintf("%s -> %s", item.Sender, item.Target),
+		Timestamp: item.Timestamp,
+		Actor:     item.Sender,
+		Summary:   item.Summary,
+		Details:   details,
 	}
 }
 
@@ -1856,6 +2066,9 @@ func (m *UIModel) OpenSelectedItemDetail() {
 				Details:   details,
 			}
 		}
+
+	case TabSwarm:
+		m.openSwarmInboxDetail(idx)
 
 	case TabPM:
 		plans := m.GetVisiblePriorityPlans()

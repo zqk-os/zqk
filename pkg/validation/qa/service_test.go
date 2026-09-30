@@ -244,13 +244,7 @@ func TestAuditorService_PerformAudit_Success(t *testing.T) {
 		t.Fatalf("create auditor key: %v", err)
 	}
 
-	res, err := realStorage.List(ctx, secCtx, nil, storage.ListFilter{
-		Kind: KindQASuccess,
-		Filters: map[string]any{
-			objects.FieldKeyItemID: "BLI-SUCCESS",
-			objects.FieldKeyStatus: objects.ObjectStatusSuccess,
-		},
-	})
+	res, err := realStorage.List(ctx, secCtx, nil, QASuccessFilter("BLI-SUCCESS"))
 	if err != nil {
 		t.Fatalf("list qa_success: %v", err)
 	}

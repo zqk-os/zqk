@@ -82,3 +82,19 @@ func TestGuard_firstFailureWins(t *testing.T) {
 		t.Errorf("Require should win: %q", err.Error())
 	}
 }
+
+func TestEnhanceError_deduplicatesHint(t *testing.T) {
+	cmd := pkgcli.NewCommandBuilder("object").Build()
+	e := errors.New("validation failed: field invalid")
+	err1 := EnhanceError(cmd, e)
+	if err1 == nil {
+		t.Fatal("expected non-nil error")
+	}
+	err2 := EnhanceError(cmd, err1)
+	if err2 == nil {
+		t.Fatal("expected non-nil error")
+	}
+	if strings.Count(err2.Error(), "Check field names and values") > 1 {
+		t.Errorf("expected suggestion to appear at most once, got %q", err2.Error())
+	}
+}

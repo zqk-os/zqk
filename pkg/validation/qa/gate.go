@@ -3,11 +3,9 @@ package qa
 import (
 	"context"
 	"fmt"
-	"path/filepath"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/validation"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
@@ -73,13 +71,7 @@ func (g *AuditorGate) VerifyComplete(ctx context.Context, itemID string) error {
 	}
 
 	// 2. LATCH 2 (AST / Invariant Clean): Query for QASuccess object referencing this itemID
-	filter := storage.ListFilter{
-		Kind: KindQASuccess,
-		Filters: map[string]any{
-			objects.FieldKeyItemID: itemID,
-			objects.FieldKeyStatus: objects.ObjectStatusSuccess,
-		},
-	}
+	filter := QASuccessFilter(itemID)
 	res, err := g.storage.List(ctx, secCtx, nil, filter)
 	if err != nil {
 		return fmt.Errorf(validation.ConstMagic55cde375, itemID, err)
@@ -90,13 +82,7 @@ func (g *AuditorGate) VerifyComplete(ctx context.Context, itemID string) error {
 	}
 
 	// 3. Verify Cryptographic Signature against the TRUSTED key
-	reportObj := res.Objects[0]
-	report := QAReport{
-		ItemID:    reportObj[objects.FieldKeyItemID].(string),
-		Status:    reportObj[objects.FieldKeyStatus].(string),
-		Signature: reportObj[objects.FieldKeySignature].(string),
-		PublicKey: reportObj[objects.FieldKeyPublicKey].(string),
-	}
+	report := ExtractQAReport(res.Objects[0])
 
 	// SENSITIVE CHECK: Ensure the report's public key matches the TRUSTED public key
 	if report.PublicKey != trustedPubHex {
@@ -104,6 +90,34 @@ func (g *AuditorGate) VerifyComplete(ctx context.Context, itemID string) error {
 	}
 
 	return g.verifySignature(report, trustedPubHex)
+}
+
+// QASuccessFilter returns a storage.ListFilter for finding verified QASuccess records for itemID.
+func QASuccessFilter(itemID string) storage.ListFilter {
+	return storage.ListFilter{
+		Kind: KindQASuccess,
+		Filters: map[string]any{
+			objects.FieldKeyItemID: itemID,
+			objects.FieldKeyStatus: objects.ObjectStatusSuccess,
+		},
+	}
+}
+
+// ExtractQAReport extracts a typed QAReport from an untyped object map.
+func ExtractQAReport(reportObj map[string]any) QAReport {
+	if reportObj == nil {
+		return QAReport{}
+	}
+	itemID, _ := reportObj[objects.FieldKeyItemID].(string)
+	status, _ := reportObj[objects.FieldKeyStatus].(string)
+	sig, _ := reportObj[objects.FieldKeySignature].(string)
+	pubKey, _ := reportObj[objects.FieldKeyPublicKey].(string)
+	return QAReport{
+		ItemID:    itemID,
+		Status:    status,
+		Signature: sig,
+		PublicKey: pubKey,
+	}
 }
 
 func (g *AuditorGate) trustedPubHex(ctx context.Context, secCtx *pkgctx.SecurityContext) (string, error) {
@@ -126,7 +140,7 @@ func (g *AuditorGate) trustedPubHex(ctx context.Context, secCtx *pkgctx.Security
 		}
 		return "", fmt.Errorf(validation.ConstMagic60ea95db, AuditorKeyID)
 	}
-	privPath := filepath.Join(g.projectRoot, paths.ProjectDataDir, "keystore", "auditor.priv")
+	privPath := AuditorPrivateKeyPath(g.projectRoot)
 	signer, signErr := NewAuditorSigner(privPath)
 	if signErr != nil {
 		if err != nil {
