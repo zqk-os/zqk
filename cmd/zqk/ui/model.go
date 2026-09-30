@@ -13,6 +13,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/state"
 	"github.com/zqk-os/zqk/cmd/zqk/swarm"
 	"github.com/zqk-os/zqk/cmd/zqk/test"
+	"github.com/zqk-os/zqk/pkg/agentfeed"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/daemon/overseer"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -20,6 +21,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/tde"
 	"github.com/zqk-os/zqk/pkg/tray"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
@@ -62,6 +64,17 @@ type HealthViolationRow struct {
 	Message     string `json:"message"`
 	AutoFixable bool   `json:"auto_fixable"`
 	Path        string `json:"path"`
+}
+
+// InboxItemRow represents an unacknowledged correspondence item or interrupt envelope in TUI.
+type InboxItemRow struct {
+	ID        string `json:"id"`
+	Type      string `json:"type"` // "correspondence" or "tde_envelope"
+	Sender    string `json:"sender"`
+	Target    string `json:"target"`
+	Summary   string `json:"summary"`
+	Timestamp string `json:"timestamp"`
+	Status    string `json:"status"`
 }
 
 // ActionCenterItem represents a triggerable action shortcut backed by the tray and scheduler.
@@ -337,6 +350,9 @@ type UIModel struct {
 	// Dynamic ambient message banner (Line 6, viewable on any tab)
 	DynamicMessage string
 
+	// Swarm & Operator Inbox
+	InboxItems []InboxItemRow
+
 	// Human Editor Experience Profile: "newb" (full help/legend/banners), "pro" (compact header/footer), "jedi" (zen mode - full table view)
 	EditorProfile string
 
@@ -443,11 +459,54 @@ func (m *UIModel) RefreshMutations() {
 		muts[i], muts[j] = muts[j], muts[i]
 	}
 	m.Mutations = muts
+	// Refresh operator and agent inbox items
+	m.RefreshInbox()
 	// If dynamic message is empty, auto-populate from latest mutation, agent instruction, or chat feed
 	if m.DynamicMessage == "" {
 		m.RefreshDynamicMessage()
 	}
 	m.LastUpdated = time.Now()
+}
+
+// RefreshInbox queries the agentfeed and TDE staging WAL for unacknowledged inbox items and staged interrupt envelopes.
+func (m *UIModel) RefreshInbox() {
+	if m.ProjectRoot == "" {
+		return
+	}
+	var items []InboxItemRow
+	// 1. Check correspondence for coordinator / operator
+	snap, err := agentfeed.LoadCorrespondence(m.ProjectRoot, agentfeed.Seat{
+		AgentID: "operator",
+	}, 20)
+	if err == nil {
+		for _, u := range snap.InboxUnacked {
+			items = append(items, InboxItemRow{
+				ID:        u.EventID,
+				Type:      "correspondence",
+				Sender:    u.FromAgentID,
+				Target:    u.ToAgentID,
+				Summary:   u.Summary,
+				Timestamp: u.Timestamp,
+				Status:    "unacked",
+			})
+		}
+	}
+	// 2. Check staged TDE envelopes
+	activeEnvs, err := tde.LoadActive(m.ProjectRoot)
+	if err == nil {
+		for _, env := range activeEnvs {
+			items = append(items, InboxItemRow{
+				ID:        env.ID,
+				Type:      "tde_envelope",
+				Sender:    "wal",
+				Target:    env.TargetID,
+				Summary:   fmt.Sprintf("%s %s (%s)", env.Operation, env.Kind, env.TargetID),
+				Timestamp: env.CreatedAt.UTC().Format(time.RFC3339),
+				Status:    string(env.Status),
+			})
+		}
+	}
+	m.InboxItems = items
 }
 
 // RefreshDynamicMessage refreshes the ambient Line 6 dynamic message notification pipeline from
