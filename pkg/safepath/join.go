@@ -46,5 +46,17 @@ func JoinUnderRoot(root string, elems ...string) (string, error) {
 	if rel == parentDirMarker || strings.HasPrefix(rel, parentDirMarker+string(fileutil.PathSeparator)) {
 		return emptyValue, errors.New(errPathEscapesRoot)
 	}
+
+	// F-SEC-006: Verify symlink containment when target exists
+	if realPath, err := filepath.EvalSymlinks(p); err == nil {
+		realRoot, rErr := filepath.EvalSymlinks(root)
+		if rErr == nil {
+			realRel, err := filepath.Rel(realRoot, realPath)
+			if err != nil || realRel == parentDirMarker || strings.HasPrefix(realRel, parentDirMarker+string(fileutil.PathSeparator)) {
+				return emptyValue, errors.New(errPathEscapesRoot)
+			}
+		}
+	}
+
 	return p, nil
 }

@@ -109,6 +109,24 @@ func (s *Sandbox) ValidatePath(unchecked string) (string, error) {
 	if err != nil {
 		return "", ErrSandboxPathDenied
 	}
+
+	// F-SEC-006: Verify symlink containment if target exists
+	if realPath, err := filepath.EvalSymlinks(validPath); err == nil {
+		matched := false
+		for _, root := range roots {
+			if realRoot, rErr := filepath.EvalSymlinks(root); rErr == nil {
+				realRel, relErr := filepath.Rel(realRoot, realPath)
+				if relErr == nil && realRel != ".." && !strings.HasPrefix(realRel, ".."+string(filepath.Separator)) {
+					matched = true
+					break
+				}
+			}
+		}
+		if !matched {
+			return "", ErrSandboxPathDenied
+		}
+	}
+
 	return validPath, nil
 }
 

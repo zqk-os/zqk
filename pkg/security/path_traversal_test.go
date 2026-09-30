@@ -2,6 +2,8 @@ package security
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"sync"
 	"testing"
 
@@ -205,4 +207,23 @@ func TestSandbox_ConcurrentAccess(t *testing.T) {
 	}
 
 	wg.Wait()
+}
+
+func TestSandbox_SymlinkEscape(t *testing.T) {
+	root := t.TempDir()
+	outside := t.TempDir()
+	outsideFile := filepath.Join(outside, "secret.txt")
+	if err := os.WriteFile(outsideFile, []byte("secret"), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	symlinkPath := filepath.Join(root, "link_to_outside")
+	if err := os.Symlink(outsideFile, symlinkPath); err != nil {
+		t.Fatal(err)
+	}
+
+	sb := NewSandbox(root)
+	if sb.IsAllowed(symlinkPath) {
+		t.Fatal("expected sandbox to reject symlink pointing outside allowed root (F-SEC-006)")
+	}
 }
