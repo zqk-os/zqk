@@ -92,26 +92,57 @@ func (r *ReverseReferenceIndex) getCacheFilePath(projectRoot string) string {
 
 // LoadCache loads the cache from disk if it exists and is still valid
 // Returns true if cache was successfully loaded, false if cache needs to be rebuilt
-func (r *ReverseReferenceIndex) ReferencedIDCount() int {
-	var count int
+func newReverseRefIndexLockContext() (stdcontext.Context, stdcontext.CancelFunc, logging.Logger) {
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
+	return ctx, cancel, logger
+}
+
+func (r *ReverseReferenceIndex) initMapsLocked() {
+	if r.index == nil {
+		r.index = make(map[string][]string)
+	}
+	if r.forwardIndex == nil {
+		r.forwardIndex = make(map[string][]string)
+	}
+}
+
+func (r *ReverseReferenceIndex) withReadLock(lockName string, op func() error) error {
+	ctx, cancel, logger := newReverseRefIndexLockContext()
 	defer cancel()
-	var err_swallow_119 = concurrency.WithRLockTimeout(
+	return concurrency.WithRLockTimeout(
 		&r.mu,
 		ctx,
 		nil,
 		logging.NewLockLoggerAdapter(logger),
-		locknames.LockNameReverseReferenceIndexReferencedIDCount,
-		func() error {
-			if r.index != nil {
-				count = len(r.index)
-			}
-			return nil
-		},
+		lockName,
+		op,
 	)
-	if err_swallow_119 != nil {
-		logging.LogSwallowedError(err_swallow_119)
+}
+
+func (r *ReverseReferenceIndex) withWriteLock(lockName string, op func() error) error {
+	ctx, cancel, logger := newReverseRefIndexLockContext()
+	defer cancel()
+	return concurrency.WithLockTimeout(
+		&r.mu,
+		ctx,
+		nil,
+		logging.NewLockLoggerAdapter(logger),
+		lockName,
+		op,
+	)
+}
+
+// ReferencedIDCount returns the total count of referenced IDs tracked in the index.
+func (r *ReverseReferenceIndex) ReferencedIDCount() int {
+	var count int
+	if err := r.withReadLock(locknames.LockNameReverseReferenceIndexReferencedIDCount, func() error {
+		if r.index != nil {
+			count = len(r.index)
+		}
+		return nil
+	}); err != nil {
+		logging.LogSwallowedError(err)
 	}
 	return count
 }
@@ -151,7 +182,7 @@ func (r *ReverseReferenceIndex) GetDependentsWithContext(ctx stdcontext.Context,
 // GetDependentsWithError retrieves all dependent object IDs with fail-closed error propagation
 // if the read lock times out or cannot be acquired.
 func (r *ReverseReferenceIndex) GetDependentsWithError(referencedID string) ([]string, error) {
-	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
+	ctx, cancel, _ := newReverseRefIndexLockContext()
 	defer cancel()
 	return r.GetDependentsWithContext(ctx, referencedID)
 }
@@ -165,31 +196,12 @@ func (r *ReverseReferenceIndex) GetDependents(referencedID string) []string {
 	return deps
 }
 
-func (r *ReverseReferenceIndex) withWriteLock(lockName string, op func() error) error {
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
-	defer cancel()
-	return concurrency.WithLockTimeout(
-		&r.mu,
-		ctx,
-		nil,
-		logging.NewLockLoggerAdapter(logger),
-		lockName,
-		op,
-	)
-}
-
 func (r *ReverseReferenceIndex) AddReference(objectID, referencedID string) {
 	if referencedID == emptyValue || objectID == emptyValue {
 		return
 	}
 	err := r.withWriteLock(locknames.LockNameReverseReferenceIndexAddReference, func() error {
-		if r.index == nil {
-			r.index = make(map[string][]string)
-		}
-		if r.forwardIndex == nil {
-			r.forwardIndex = make(map[string][]string)
-		}
+		r.initMapsLocked()
 		r.addReferenceLocked(objectID, referencedID)
 		return nil
 	})
@@ -282,12 +294,7 @@ func (r *ReverseReferenceIndex) UpdateReferences(objectID string, oldRefs, newRe
 		return
 	}
 	err := r.withWriteLock(locknames.LockNameReverseReferenceIndexUpdateReferences, func() error {
-		if r.index == nil {
-			r.index = make(map[string][]string)
-		}
-		if r.forwardIndex == nil {
-			r.forwardIndex = make(map[string][]string)
-		}
+		r.initMapsLocked()
 
 			for _, oldRef := range oldRefs {
 				if oldRef != emptyValue {
@@ -371,25 +378,14 @@ func (r *ReverseReferenceIndex) addReferenceLocked(objectID, referencedID string
 
 // Clear clears the entire index (for rebuild)
 func (r *ReverseReferenceIndex) Clear() {
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
-	defer cancel()
-	var err_swallow_125 = concurrency.WithLockTimeout(
-		&r.mu,
-		ctx,
-		nil,
-		logging.NewLockLoggerAdapter(logger),
-		locknames.LockNameReverseReferenceIndexClear,
-		func() error {
-			r.index = make(map[string][]string)
-			r.forwardIndex = make(map[string][]string)
-			r.metadata = nil
-			r.isReady.Store(false)
-			return nil
-		},
-	)
-	if err_swallow_125 != nil {
-		logging.LogSwallowedError(err_swallow_125)
+	if err := r.withWriteLock(locknames.LockNameReverseReferenceIndexClear, func() error {
+		r.index = make(map[string][]string)
+		r.forwardIndex = make(map[string][]string)
+		r.metadata = nil
+		r.isReady.Store(false)
+		return nil
+	}); err != nil {
+		logging.LogSwallowedError(err)
 	}
 }
 
@@ -455,27 +451,16 @@ func (r *ReverseReferenceIndex) GetReferencedObjectIDs(objectID string) []string
 		return nil
 	}
 	var refs []string
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
-	defer cancel()
-	err := concurrency.WithRLockTimeout(
-		&r.mu,
-		ctx,
-		nil,
-		logging.NewLockLoggerAdapter(logger),
-		"reverse_reference_index_get_references",
-		func() error {
-			if r.forwardIndex == nil {
-				return nil
-			}
-			if list, exists := r.forwardIndex[objectID]; exists {
-				refs = make([]string, len(list))
-				copy(refs, list)
-			}
+	if err := r.withReadLock(locknames.LockNameReverseReferenceIndexGetReferencedIDs, func() error {
+		if r.forwardIndex == nil {
 			return nil
-		},
-	)
-	if err != nil {
+		}
+		if list, exists := r.forwardIndex[objectID]; exists {
+			refs = make([]string, len(list))
+			copy(refs, list)
+		}
+		return nil
+	}); err != nil {
 		logging.LogSwallowedError(err)
 		return nil
 	}

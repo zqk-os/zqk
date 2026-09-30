@@ -268,6 +268,7 @@ const (
 	LockNameReverseReferenceIndexAddReference         = "reverse_reference_index_add_reference"
 	LockNameReverseReferenceIndexClear                = "reverse_reference_index_clear"
 	LockNameReverseReferenceIndexGetDependents        = "reverse_reference_index_get_dependents"
+	LockNameReverseReferenceIndexGetReferencedIDs     = "reverse_reference_index_get_referenced_ids"
 	LockNameReverseReferenceIndexLoad                 = "reverse_reference_index_load"
 	LockNameReverseReferenceIndexReferencedIDCount    = "reverse_reference_index_referenced_id_count"
 	LockNameReverseReferenceIndexRemoveObject         = "reverse_reference_index_remove_object"
