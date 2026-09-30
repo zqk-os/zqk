@@ -50,6 +50,7 @@ func TestCASOrphanCleanupQueue_CoordinatorIntegration(t *testing.T) {
 
 	// Track callback invocations (only for this test's project root so we ignore global-queue callbacks)
 	var callbackCalls atomic.Int32
+	var lastEventMu sync.Mutex
 	var lastEvent struct {
 		operationType string
 		status        string
@@ -76,11 +77,13 @@ func TestCASOrphanCleanupQueue_CoordinatorIntegration(t *testing.T) {
 			return
 		}
 		callbackCalls.Add(1)
+		lastEventMu.Lock()
 		lastEvent.operationType = operationType
 		lastEvent.status = status
 		lastEvent.batchSize = batchSize
 		lastEvent.successCount = successCount
 		lastEvent.failureCount = failureCount
+		lastEventMu.Unlock()
 	})
 	defer caspkg.SetOrphanCleanupEventCallback(nil)
 
@@ -105,6 +108,8 @@ func TestCASOrphanCleanupQueue_CoordinatorIntegration(t *testing.T) {
 	ctxTimeout, cancelTimeout := context.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
 	defer cancelTimeout()
 	callbackReceived := storage.WaitForConditionForTest(ctxTimeout, func() bool {
+		lastEventMu.Lock()
+		defer lastEventMu.Unlock()
 		return lastEvent.operationType == "orphan_cleanup_batch" && (lastEvent.status == "complete" || lastEvent.status == "partial_failure")
 	}, 100*time.Millisecond)
 
