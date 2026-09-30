@@ -554,6 +554,7 @@ func renderSwarmTab(b *strings.Builder, m *UIModel) {
 			"  [Swarm status initializing or storage unavailable...]",
 		}, w, tds.BorderRounded))
 		b.WriteString("\n")
+		renderSwarmInbox(b, m, w)
 		return
 	}
 
@@ -623,6 +624,48 @@ func renderSwarmTab(b *strings.Builder, m *UIModel) {
 		b.WriteString(tds.Panel("Instruction Queue & Backlog Breakdown", breakdownLines, w, tds.BorderRounded))
 		b.WriteString("\n")
 	}
+
+	// 4. Operator & Swarm Inbox Section
+	renderSwarmInbox(b, m, w)
+}
+
+// renderSwarmInbox renders the Swarm and Operator inbox table for correspondence and staged interrupt envelopes.
+func renderSwarmInbox(b *strings.Builder, m *UIModel, w int) {
+	inboxItems := m.GetVisibleInboxItems()
+	b.WriteString(tds.SectionDivider("SWARM & OPERATOR INBOX (Press Enter to inspect, [a] to ack, [r] to reply)", w))
+	if len(inboxItems) == 0 {
+		b.WriteString("  " + dim("[No unacknowledged correspondence or staged envelopes in inbox]") + "\n\n")
+		return
+	}
+
+	inboxTable := tds.NewTable(w).
+		AddColumn("ITEM ID", tds.AlignLeft, 24, 0.25).
+		AddColumn("TYPE", tds.AlignCenter, 14, 0.15).
+		AddColumn("SENDER", tds.AlignLeft, 14, 0.15).
+		AddColumn("TARGET", tds.AlignLeft, 14, 0.15).
+		AddColumn("STATUS", tds.AlignCenter, 10, 0.10).
+		AddColumn("SUMMARY", tds.AlignLeft, 20, 0.20)
+	for i, item := range inboxItems {
+		isSelected := (i == m.SelectedIndex)
+		statusBadge := yellowBold(item.Status)
+		if item.Status == "committed" || item.Status == "acked" {
+			statusBadge = greenBold(item.Status)
+		}
+		summary := strings.ReplaceAll(strings.ReplaceAll(item.Summary, "\r", ""), "\n", " ")
+		if len(summary) > 40 {
+			summary = summary[:37] + "..."
+		}
+		inboxTable.AddRow(
+			tds.RowCursor(isSelected, item.ID),
+			item.Type,
+			item.Sender,
+			item.Target,
+			statusBadge,
+			summary,
+		)
+	}
+	b.WriteString(inboxTable.Render())
+	b.WriteString("\n")
 }
 
 // renderPMTab renders the dedicated PM & Process Admin dashboard (Strategic cascade, delivery pipeline, blockers).
@@ -1202,6 +1245,8 @@ func renderFooter(b *strings.Builder, m *UIModel) {
 		triggerActionHint = "[t/d] Trigger Job"
 	} else if m.ActiveTab == TabQA {
 		triggerActionHint = "[t] Re-scan Matrix"
+	} else if m.ActiveTab == TabSwarm {
+		triggerActionHint = "[a] Ack [r] Reply"
 	}
 
 	// 2. Pro Mode: compact single-line help bar
@@ -1602,6 +1647,8 @@ func renderDetailModal(m *UIModel) string {
 		lines = append(lines, dim("  [t] Re-scan QA Matrix │ [Esc]/[q] Close Modal"))
 	} else if modal.Kind == objects.KindSchedulerJob {
 		lines = append(lines, dim("  [t] Run Immediately │ [d] Run in 10s │ [Esc]/[q] Close Modal"))
+	} else if modal.Kind == "correspondence" || modal.Kind == "tde_envelope" || modal.Kind == "inbox_item" {
+		lines = append(lines, dim("  [a] Acknowledge Item │ [r] Quick Reply │ [Esc]/[q] Close Modal"))
 	} else {
 		lines = append(lines, dim("  Press [Esc] or [Backspace] or [q] to close modal and return to table view"))
 	}
