@@ -61,6 +61,32 @@ func TestProcessEmptyReferenceFieldIssue(t *testing.T) {
 	}
 }
 
+func TestProcessEmptyReferenceFieldIssue_NonRefSuffix(t *testing.T) {
+	_, testRoot := setupSpecAutoFixerTest(t)
+	fixCtx := createTestAutoFixContext(t, testRoot, "PRI-EMPTY-PLAN-ID", objects.KindPriorityPlan)
+	fixCtx.AutoFix = true
+	fixCtx.Obj.Properties["previous_plan_id"] = ""
+	fixCtx.Obj.Properties["next_plan_id"] = ""
+	msg := processEmptyReferenceFieldIssue(fixCtx, Issue{
+		Message: "previous_plan_id: Semantic type validation: ontology validation failed: reference_type: reference cannot be empty",
+	})
+	if msg == "" || !strings.Contains(msg, "Unset empty reference") {
+		t.Fatalf("msg=%q", msg)
+	}
+	if _, ok := fixCtx.Obj.Properties["previous_plan_id"]; ok {
+		t.Fatal("expected previous_plan_id field removed")
+	}
+	msgNext := processEmptyReferenceFieldIssue(fixCtx, Issue{
+		Message: "next_plan_id: Semantic type validation: ontology validation failed: reference_type: reference cannot be empty",
+	})
+	if msgNext == "" || !strings.Contains(msgNext, "Unset empty reference") {
+		t.Fatalf("msgNext=%q", msgNext)
+	}
+	if _, ok := fixCtx.Obj.Properties["next_plan_id"]; ok {
+		t.Fatal("expected next_plan_id field removed")
+	}
+}
+
 func TestProcessInvalidLifecycleStatusIssue(t *testing.T) {
 	_, testRoot := setupSpecAutoFixerTest(t)
 	fixCtx := createTestAutoFixContext(t, testRoot, "ORG-BAD", objects.KindOrganization)

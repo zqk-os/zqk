@@ -473,7 +473,9 @@ func processEmptyReferenceFieldIssue(fixCtx *AutoFixContext, issue Issue) string
 		return ""
 	}
 	field := strings.TrimSpace(strings.Split(issue.Message, ":")[0])
-	if field == "" || (!strings.HasSuffix(field, "_ref") && !strings.HasSuffix(field, "_refs")) {
+	isRefIssue := strings.Contains(issue.Message, "reference cannot be empty") ||
+		strings.Contains(issue.Message, "reference_type: reference cannot be empty")
+	if field == "" || (!isRefIssue && !strings.HasSuffix(field, "_ref") && !strings.HasSuffix(field, "_refs")) {
 		return ""
 	}
 	val, ok := fixCtx.Obj.Properties[field]

@@ -3,6 +3,7 @@ package system
 import (
 	"fmt"
 	"maps"
+	"reflect"
 	"strings"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
@@ -209,7 +210,7 @@ func (saf *SpecBasedAutoFixer) attemptFixes(
 			tryFix: func() (any, string, bool) {
 				before := objMap[fieldName]
 				after := coerceType(fieldName, before, fieldMap, saf.logger)
-				if after == nil {
+				if after == nil || reflect.DeepEqual(before, after) {
 					return nil, "", false
 				}
 				return after, describeWireTypeNormalization(fieldName, before, after), false
