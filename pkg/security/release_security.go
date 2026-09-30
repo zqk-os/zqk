@@ -15,6 +15,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/security/secretpatterns"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -22,12 +23,8 @@ var (
 	// ErrSecurityGateViolation indicates one or more security or leak violations occurred.
 	ErrSecurityGateViolation = errors.New("security gate violation")
 
-	// Regular expressions for secret detection
-	awsKeyRegex     = regexp.MustCompile(`\bAKIA[0-9A-Z]{16}\b`)
-	githubPatRegex  = regexp.MustCompile(`\bghp_[0-9a-zA-Z]{36}\b`)
-	privateKeyRegex = regexp.MustCompile(`-----BEGIN [A-Z ]*PRIVATE KEY-----`)
-	slackHookRegex  = regexp.MustCompile(`https://hooks\.slack\.com/services/T[0-9a-zA-Z]+/B[0-9a-zA-Z]+/[0-9a-zA-Z]+`)
-	studioIDRegex   = regexp.MustCompile(`\b(BLI|REQ|DEC|PRI|ATK|CRIT|TEST|GOAL|CVS)-[0-9]{13,}-[a-f0-9]{6,}\b`)
+	// Regular expression for studio ID detection
+	studioIDRegex = regexp.MustCompile(`\b(BLI|REQ|DEC|PRI|ATK|CRIT|TEST|GOAL|CVS)-[0-9]{13,}-[a-f0-9]{6,}\b`)
 )
 
 // Violation represents a specific security rule breach in a release candidate payload.
@@ -194,37 +191,15 @@ func AuditPayload(root string, opts AuditOptions) (*AuditReport, error) {
 
 			// Secret detections
 			if opts.CheckSecrets {
-				if awsKeyRegex.MatchString(line) {
-					report.Violations = append(report.Violations, Violation{
-						Rule:     "AWS_KEY_LEAK",
-						Path:     rel,
-						Line:     lineNum,
-						Evidence: "detected AWS access key identifier",
-					})
-				}
-				if githubPatRegex.MatchString(line) {
-					report.Violations = append(report.Violations, Violation{
-						Rule:     "GITHUB_PAT_LEAK",
-						Path:     rel,
-						Line:     lineNum,
-						Evidence: "detected GitHub Personal Access Token",
-					})
-				}
-				if privateKeyRegex.MatchString(line) {
-					report.Violations = append(report.Violations, Violation{
-						Rule:     "PRIVATE_KEY_LEAK",
-						Path:     rel,
-						Line:     lineNum,
-						Evidence: "detected private key block",
-					})
-				}
-				if slackHookRegex.MatchString(line) {
-					report.Violations = append(report.Violations, Violation{
-						Rule:     "SLACK_WEBHOOK_LEAK",
-						Path:     rel,
-						Line:     lineNum,
-						Evidence: "detected Slack incoming webhook URL",
-					})
+				for _, def := range secretpatterns.Definitions {
+					if def.Regex.MatchString(line) {
+						report.Violations = append(report.Violations, Violation{
+							Rule:     def.Rule,
+							Path:     rel,
+							Line:     lineNum,
+							Evidence: def.Description,
+						})
+					}
 				}
 			}
 

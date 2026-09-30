@@ -5,8 +5,9 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"regexp"
 	"strings"
+
+	"github.com/zqk-os/zqk/pkg/security/secretpatterns"
 )
 
 // Verifier provides supply-chain verification and release integrity checks.
@@ -106,22 +107,7 @@ func (v *Verifier) VerifyChecksums(manifestData []byte, readFile func(filename s
 	return nil
 }
 
-var secretPatterns = []*regexp.Regexp{
-	regexp.MustCompile("gh" + "p_[a-zA-Z0-9]{36}"),
-	regexp.MustCompile("gh" + "o_[a-zA-Z0-9]{36}"),
-	regexp.MustCompile("git" + "hub_pat_[a-zA-Z0-9_]{82}"),
-	regexp.MustCompile("AK" + "IA[0-9A-Z]{16}"),
-	regexp.MustCompile("-----BEGIN " + "(?:RSA |EC )?" + "PRIVATE " + "KEY-----"),
-	regexp.MustCompile("xo" + "x[baprs]-[0-9]{12}-[0-9]{12}-[a-zA-Z0-9]{24}"),
-}
-
-// DetectSecretPatterns scans content for known credential patterns.
+// DetectSecretPatterns scans content for known credential patterns using the canonical security definitions.
 func (v *Verifier) DetectSecretPatterns(content string) []string {
-	var detected []string
-	for _, p := range secretPatterns {
-		if loc := p.FindString(content); loc != "" {
-			detected = append(detected, loc)
-		}
-	}
-	return detected
+	return secretpatterns.Detect(content)
 }

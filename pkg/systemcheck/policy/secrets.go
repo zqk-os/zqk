@@ -7,10 +7,10 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/security/secretpatterns"
 )
 
 // SecretsGate scans files for API tokens, private keys, and credential leaks.
@@ -24,7 +24,7 @@ func (g *SecretsGate) Description() string {
 	return "Scans repository files for API tokens, AWS keys, private keys, and credential leaks"
 }
 
-var secretPatterns = regexp.MustCompile(`(ghp_[a-zA-Z0-9]{36}|gho_[a-zA-Z0-9]{36}|github_pat_[a-zA-Z0-9_]{82}|AKIA[0-9A-Z]{16}|-----BEGIN (?:RSA|EC|OPENSSH|DSA|PGP)? PRIVATE KEY-----|xox[baprs]-[0-9]{12}-[0-9]{12}-[a-zA-Z0-9]{24})`)
+var secretPatterns = secretpatterns.CombinedRegex
 
 var excludedDirNames = map[string]bool{
 	".git":                true,
@@ -187,8 +187,5 @@ func scanFileForSecrets(filePath, root string) ([]string, error) {
 }
 
 func redactSecret(secret string) string {
-	if len(secret) <= 8 {
-		return strings.Repeat("*", len(secret))
-	}
-	return secret[:4] + strings.Repeat("*", len(secret)-8) + secret[len(secret)-4:]
+	return secretpatterns.Redact(secret)
 }
