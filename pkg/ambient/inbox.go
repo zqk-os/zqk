@@ -82,8 +82,7 @@ func NewAutonomyInbox(capacity ...int) *AutonomyInbox {
 		cap_ = capacity[0]
 	}
 	if cap_ < MinInboxCapacity {
-		// TRACK: [Invalid initialization capacity]
-		panic("inbox capacity below minimum")
+		cap_ = MinInboxCapacity
 	}
 	if cap_ > MaxInboxCapacity {
 		cap_ = MaxInboxCapacity

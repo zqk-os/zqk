@@ -117,14 +117,14 @@ func TestObjectVolumeMonitor_Run(t *testing.T) {
 		}
 	})
 
-	t.Run("missing_metrics_dir_returns_ok", func(t *testing.T) {
+	t.Run("missing_metrics_dir_returns_degraded", func(t *testing.T) {
 		tmpDir := t.TempDir()
 		res, err := m.Run(ctx, tmpDir)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if res.Status != "ok" {
-			t.Fatalf("expected status ok, got %s", res.Status)
+		if res.Status != "degraded" {
+			t.Fatalf("expected status degraded, got %s", res.Status)
 		}
 	})
 }
@@ -145,14 +145,14 @@ func TestStreamVolumeMonitor_Run(t *testing.T) {
 		}
 	})
 
-	t.Run("missing_metrics_dir_returns_ok", func(t *testing.T) {
+	t.Run("missing_metrics_dir_returns_degraded", func(t *testing.T) {
 		tmpDir := t.TempDir()
 		res, err := m.Run(ctx, tmpDir)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if res.Status != "ok" {
-			t.Fatalf("expected status ok, got %s", res.Status)
+		if res.Status != "degraded" {
+			t.Fatalf("expected status degraded, got %s", res.Status)
 		}
 	})
 }
@@ -173,14 +173,14 @@ func TestWalBacklogMonitor_Run(t *testing.T) {
 		}
 	})
 
-	t.Run("missing_wal_returns_ok", func(t *testing.T) {
+	t.Run("missing_wal_returns_degraded", func(t *testing.T) {
 		tmpDir := t.TempDir()
 		res, err := m.Run(ctx, tmpDir)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if res.Status != "ok" {
-			t.Fatalf("expected status ok, got %s", res.Status)
+		if res.Status != "degraded" {
+			t.Fatalf("expected status degraded, got %s", res.Status)
 		}
 	})
 }

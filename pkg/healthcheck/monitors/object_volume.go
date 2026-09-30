@@ -30,8 +30,8 @@ func (m *objectVolumeMonitor) Run(ctx context.Context, projectRoot string) (*hea
 	metricsDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.MetricsDir, paths.MetricsObjectVolumeSubdir)
 	if _, err := fileutil.Stat(metricsDir); err != nil {
 		if fileutil.IsNotExist(err) {
-			// No metrics yet; treat as ok but note absence.
-			return &healthcheck.Result{Status: statusOK, Summary: "no object_volume metrics yet"}, nil
+			// Uninitialized metrics must report degraded warning rather than false-green ok (TDE-F-OBS-002).
+			return &healthcheck.Result{Status: statusDegraded, Summary: "uninitialized: no object_volume metrics yet"}, nil
 		}
 		// Treat unexpected filesystem errors as degraded rather than hard failure so
 		// healthchk run continues and other monitors can still report.
@@ -85,7 +85,7 @@ func (m *objectVolumeMonitor) Run(ctx context.Context, projectRoot string) (*hea
 	}
 
 	if lastSample == nil {
-		return &healthcheck.Result{Status: statusOK, Summary: "no recent object_volume samples"}, nil
+		return &healthcheck.Result{Status: statusDegraded, Summary: "uninitialized: no recent object_volume samples"}, nil
 	}
 
 	currentCount := lastSample.Value

@@ -25,8 +25,8 @@ func (m *walBacklogMonitor) Run(ctx context.Context, projectRoot string) (*healt
 	walPath := storage.GetWALPath(projectRoot)
 	if _, err := fileutil.Stat(walPath); err != nil {
 		if fileutil.IsNotExist(err) {
-			// No WAL yet; treat as ok.
-			return &healthcheck.Result{Status: statusOK, Summary: "no object WAL"}, nil
+			// Uninitialized WAL must report degraded warning rather than false-green ok (TDE-F-OBS-002).
+			return &healthcheck.Result{Status: statusDegraded, Summary: "uninitialized: no object WAL"}, nil
 		}
 		return &healthcheck.Result{
 			Status:  statusDegraded,
