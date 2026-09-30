@@ -137,3 +137,55 @@ Upon completing a backlog item or merging an integration branch:
 1. **No Out-of-Kernel State**: Ambient state, claimed work, and priority signals exist strictly within the Knowledge Kernel (`.zqk/`). Local vendor scratchpads or agent memory files are not authoritative.
 2. **Fail-Closed Verification**: An item is never marked completed unless all associated criteria are cryptographically latched and verified by automated tests.
 3. **Idempotent Self-Healing**: Auto-remedy operations must be idempotent and safe to execute repeatedly under high concurrency.
+4. **Anti-Bloat Cardinality Invariant**: Symptom lists, evaluation findings, and bug reports MUST be synthesized into root-cause engineering packages ($\ge 5:1$ symptom-to-BLI ratio). Mechanical 1:1 symptom-mirroring is prohibited.
+5. **Deterministic Cybernetic Steering**: Agents evaluate whether candidate actions bring the target projection closer or farther away, execute the most promising hypothesis, re-measure deltas, calculate gain/loss, feed ambient signals to the kernel, and dynamically execute the highest kernel priority.
+
+---
+
+## 6. The Deterministic Cybernetic Steering Loop
+
+```
+                     ┌───────────────────────────────┐
+                     │ 1. State Projection           │
+                     │    Measure delta vs target    │
+                     │    (CEF Diamond, VDS, Align)  │
+                     └───────────────┬───────────────┘
+                                     │
+                                     ▼
+                     ┌───────────────────────────────┐
+                     │ 2. Hypothesis Formulation     │
+                     │    Evaluate candidate actions │
+                     │    Select max-gain hypothesis │
+                     └───────────────┬───────────────┘
+                                     │
+                                     ▼
+                     ┌───────────────────────────────┐
+                     │ 3. Deterministic Execution    │
+                     │    Atomic TDD mutation        │
+                     │    (zqk do <BLI-ID>)          │
+                     └───────────────┬───────────────┘
+                                     │
+                                     ▼
+                     ┌───────────────────────────────┐
+                     │ 4. Re-Evaluation & Measure    │
+                     │    Run empirical benchmarks   │
+                     │    (test-race, CEF eval)      │
+                     └───────────────┬───────────────┘
+                                     │
+                                     ▼
+                     ┌───────────────────────────────┐
+                     │ 5. Delta & Gain Calculation   │
+                     │    Compare to prior baseline  │
+                     │    Quantify empirical delta   │
+                     └───────────────┬───────────────┘
+                                     │
+                                     ▼
+                     ┌───────────────────────────────┐
+                     │ 6. Ambient Feedback & Steer   │
+                     │    zqk system align           │
+                     │    zqk workflow whats-next    │
+                     │    Mint next highest-priority │
+                     └───────────────┬───────────────┘
+                                     │
+                                     └─────── Loop back to 1
+```

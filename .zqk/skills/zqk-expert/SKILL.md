@@ -218,3 +218,5 @@ Do not publish unpublished Open-Core trees. Push toward public orgs requires hum
 - Expanding an `in_progress`/`active` plan with draft-plane BLIs (scope creep)
 - Agents inventing integration branches or opening many PRs to `main` instead of merging into the TPM plan branch
 - Plan primaries ignoring workstream balance (e.g. never scheduling tech-debt lanes) until sequencing collapses into mayhem
+- **1:1 Symptom-Mirroring (Epistemic Bloat)**: Mechanically turning a defect or evaluation finding list into a 1:1 constellation of requirements, criteria, and backlog items. Always cluster findings into root-cause work packages (target ratio: ≥ 5:1 findings-to-BLI).
+- **Open-Loop Action Drift**: Executing speculative actions without formulating a target state projection hypothesis, measuring empirical delta against baseline, or feeding signals ambiently back to the kernel.
