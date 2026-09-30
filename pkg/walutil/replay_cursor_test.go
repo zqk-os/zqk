@@ -167,3 +167,55 @@ func TestExtractSeqFromJSONLine(t *testing.T) {
 		t.Fatalf("got %d", got)
 	}
 }
+
+func TestReplayFromCursor_CorruptedAndOversizedLines(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "corrupt.wal")
+
+	// Write 1 good line, 1 corrupted line, 1 oversized line, 1 good line
+	content := "{\"seq\":1,\"v\":\"valid1\"}\n" +
+		"{this is corrupt not json}\n" +
+		"{\"seq\":3,\"v\":\"very long line that exceeds limit\"}\n" +
+		"{\"seq\":4,\"v\":\"valid4\"}\n"
+
+	if err := fileutil.WriteFile(path, []byte(content), paths.FilePerm600); err != nil {
+		t.Fatal(err)
+	}
+
+	var delivered []int64
+	stats, err := ReplayFromCursor[map[string]any](path, 30, ReplayCursor{},
+		func(b []byte) (*map[string]any, error) {
+			var m map[string]any
+			if err := json.Unmarshal(b, &m); err != nil {
+				return nil, err
+			}
+			return &m, nil
+		},
+		func(m *map[string]any) int64 {
+			return int64((*m)["seq"].(float64))
+		},
+		func(m *map[string]any) error {
+			delivered = append(delivered, int64((*m)["seq"].(float64)))
+			return nil
+		},
+	)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if stats.Scanned != 4 {
+		t.Errorf("expected 4 scanned, got %d", stats.Scanned)
+	}
+	if stats.Delivered != 2 {
+		t.Errorf("expected 2 delivered, got %d", stats.Delivered)
+	}
+	if stats.Corrupted != 1 {
+		t.Errorf("expected 1 corrupted, got %d", stats.Corrupted)
+	}
+	if stats.Oversized != 1 {
+		t.Errorf("expected 1 oversized, got %d", stats.Oversized)
+	}
+	if len(delivered) != 2 || delivered[0] != 1 || delivered[1] != 4 {
+		t.Errorf("expected delivered [1, 4], got %v", delivered)
+	}
+}

@@ -54,7 +54,30 @@ func TestSupplyChainReleaseIntegrity(t *testing.T) {
 // local and CI golangci runs are deterministic, and the pipeline fails closed on missing/inconsistent lint, checksum, or SBOM evidence.
 func TestFailClosedCIGates_DeterministicAndVerified(t *testing.T) {
 	if !fileutil.Exists("../../scripts/verify-binary-checksums.sh") {
-		t.Skip("skipping studio supply gate script check in open-core")
+		// Open-core supply chain gate verification (F-SUPPLY-003):
+		// Verify open-core release gates and supply chain scripts exist and are non-empty.
+		for _, script := range []string{
+			"../../scripts/open-core/test-public-release-gates.sh",
+			"../../scripts/open-core/check-public-release-payload.sh",
+			"../../scripts/open-core/police-community-tree.sh",
+			"../../scripts/package-community.sh",
+			"../../scripts/generate-openvex.sh",
+			"../../scripts/scan-secrets.sh",
+		} {
+			data, err := fileutil.ReadFile(script)
+			if err != nil || len(data) == 0 {
+				t.Errorf("expected open-core script %s to exist and be non-empty", script)
+			}
+		}
+		// Verify package-community.sh generates and verifies checksums
+		pkgCommunityData, err := fileutil.ReadFile("../../scripts/package-community.sh")
+		if err != nil {
+			t.Fatalf("failed to read package-community.sh: %v", err)
+		}
+		if !strings.Contains(string(pkgCommunityData), "shasum -a 256") || !strings.Contains(string(pkgCommunityData), "checksums.txt") {
+			t.Errorf("package-community.sh missing sha256 checksum generation/verification")
+		}
+		return
 	}
 	// 1. Verify .golangci.yml has adequate timeout for deterministic completion on large monorepo
 	golangciBytes, err := fileutil.ReadFile("../../.golangci.yml")

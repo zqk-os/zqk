@@ -23,6 +23,8 @@ type ReplayStats struct {
 	Cursor    ReplayCursor
 	Delivered int // records passed to fn (seq > cursor.Seq)
 	Scanned   int // lines read this pass
+	Corrupted int // unparseable or malformed records
+	Oversized int // lines exceeding maxLineSize
 }
 
 // ReplayFrom reads records from the WAL starting at seqAfter (exclusive).
@@ -113,6 +115,7 @@ func replayLines[T any](
 				payload = payload[:len(payload)-1]
 			}
 			if maxLineSize > 0 && len(payload) > maxLineSize {
+				stats.Oversized++
 				stats.Cursor.Offset = offset
 				continue
 			}
@@ -124,6 +127,7 @@ func replayLines[T any](
 			}
 			rec, parseErr := parse(payload)
 			if parseErr != nil || rec == nil {
+				stats.Corrupted++
 				stats.Cursor.Offset = offset
 				continue
 			}
