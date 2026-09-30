@@ -23,14 +23,12 @@ func TestAutonomyInbox_C2_DefaultCapacity(t *testing.T) {
 	}
 }
 
-// C3: Constructor Minimum Capacity Panic
-func TestAutonomyInbox_C3_MinCapacityPanic(t *testing.T) {
-	defer func() {
-		if r := recover(); r == nil {
-			t.Fatal("expected panic, got none")
-		}
-	}()
-	NewAutonomyInbox(4)
+// C3: Constructor Minimum Capacity Safe Clamping
+func TestAutonomyInbox_C3_MinCapacityClamping(t *testing.T) {
+	inbox := NewAutonomyInbox(4)
+	if inbox.Cap() != MinInboxCapacity {
+		t.Fatalf("expected clamped capacity %d, got %d", MinInboxCapacity, inbox.Cap())
+	}
 }
 
 // C4: Push Single Event

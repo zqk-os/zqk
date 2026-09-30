@@ -62,6 +62,9 @@ func TestBuildFollowupDraftConvergenceSessionObject(t *testing.T) {
 }
 
 func TestMaybeSpawnTerminalFollowupDraft_CreateIntegration(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping integration test in short mode")
+	}
 	env := setupSchedulerCompleteTestEnvironment(t, nil)
 	defer env.Cleanup()
 

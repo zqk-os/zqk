@@ -18,6 +18,9 @@ import (
 // CRIT-9040: ensure Scheduler integrates coordination kernel by persisting state
 // and publishing job execution events during a real TriggerJob run.
 func TestCRIT9040_SchedulerIntegration_PersistsStateAndPublishesEvents(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping integration test in short mode")
+	}
 	t.Parallel()
 
 	sched, testRoot, cleanup := setupTestScheduler(t)
