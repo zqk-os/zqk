@@ -22,7 +22,7 @@ func NewMatrixGetCommandBuilder() *cobra.Command {
 	help.AddExample("Only file_path and gate column in output", "%s matrix get --field file_path --field fully_vetted")
 	help.AddExample("Pipe-friendly CSV (header + data rows)", "%s matrix get --format csv --filter fully_vetted=pending")
 	builder.WithHelpBuilder(help)
-	builder.AddStringFlag("name", "", "codebase_vetting", "Matrix alias from matrix_registry.yaml")
+	builder.AddStringFlag("name", "", "", "Matrix alias from matrix_registry.yaml (default: resolved from registry default)")
 	builder.AddStringFlag("registry", "", "", "Path to matrix_registry.yaml (repo-relative or absolute)")
 	builder.AddStringFlag("matrix", "", "", "Override CSV path (requires --profile)")
 	builder.AddStringFlag("profile", "", "", "Override profile YAML when using --matrix")

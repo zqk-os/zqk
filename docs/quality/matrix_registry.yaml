@@ -1,6 +1,11 @@
+default_name: cef_diamond_scorecard
 default: cef_diamond_scorecard
 matrices:
   cef_diamond_scorecard:
+    csv: docs/quality/CEF_DIAMOND_SCORECARD_MATRIX.csv
+    profile: docs/quality/cef_diamond_scorecard_matrix_profile.yaml
+    session_ref_column: cvs_id
+  codebase_vetting:
     csv: docs/quality/CEF_DIAMOND_SCORECARD_MATRIX.csv
     profile: docs/quality/cef_diamond_scorecard_matrix_profile.yaml
     session_ref_column: cvs_id

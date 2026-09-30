@@ -25,6 +25,7 @@ var (
 type MatrixRegistry struct {
 	SchemaVersion string                         `yaml:"schema_version"`
 	DefaultName   string                         `yaml:"default_name"`
+	Default       string                         `yaml:"default"`
 	Matrices      map[string]MatrixRegistryEntry `yaml:"matrices"`
 }
 
@@ -131,6 +132,9 @@ func LoadMatrixRegistry(projectRoot, registryRel string) (*MatrixRegistry, error
 func (r *MatrixRegistry) Resolve(projectRoot, name string) (MatrixRegistryEntry, string, string, error) {
 	if strings.TrimSpace(name) == "" {
 		name = r.DefaultName
+		if strings.TrimSpace(name) == "" {
+			name = r.Default
+		}
 	}
 	name = strings.TrimSpace(name)
 	regPath := filepath.Join(paths.DocsQualityDir, "matrix_registry.yaml")

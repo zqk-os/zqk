@@ -75,6 +75,7 @@ type HighVolumeEventCache struct {
 var (
 	globalHighVolumeEventCache *HighVolumeEventCache
 	highVolumeCacheOnce        sync.Once
+	globalHighVolumeCacheMu    sync.RWMutex
 )
 
 // getHighVolumeCacheBuildWorkers returns worker count for cache build from index. Default 64; override
@@ -132,15 +133,26 @@ func newHighVolumeCacheGoroutine(name, purpose string) *goroutinelabels.Goroutin
 
 // GetGlobalHighVolumeEventCache returns the global high-volume event cache instance
 func GetGlobalHighVolumeEventCache() *HighVolumeEventCache {
-	highVolumeCacheOnce.Do(func() {
+	globalHighVolumeCacheMu.RLock()
+	c := globalHighVolumeEventCache
+	globalHighVolumeCacheMu.RUnlock()
+	if c != nil {
+		return c
+	}
+
+	globalHighVolumeCacheMu.Lock()
+	defer globalHighVolumeCacheMu.Unlock()
+	if globalHighVolumeEventCache == nil {
 		globalHighVolumeEventCache = NewHighVolumeEventCache()
-	})
+	}
 	return globalHighVolumeEventCache
 }
 
 // ResetGlobalHighVolumeEventCacheForTesting resets the global high-volume event cache instance for tests.
 func ResetGlobalHighVolumeEventCacheForTesting() {
 	StopHighVolumeEventCachePersistForTest(emptyValue)
+	globalHighVolumeCacheMu.Lock()
+	defer globalHighVolumeCacheMu.Unlock()
 	globalHighVolumeEventCache = nil
 	highVolumeCacheOnce = sync.Once{}
 }
