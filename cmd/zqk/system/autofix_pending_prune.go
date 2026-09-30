@@ -4,13 +4,57 @@ import (
 	"encoding/json"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/spf13/cobra"
 
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/resourcehygiene"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
+
+type pruneTask struct {
+	projectRoot string
+	objectID    string
+}
+
+var (
+	pruneMu         sync.Mutex
+	pruneQueue      = make(chan pruneTask, 256)
+	pruneWorkerOnce sync.Once
+)
+
+func initPruneWorker() {
+	goroutinelabels.NewGoroutine("autofix_prune_worker", "Background worker for coalesced autofix pending prune").
+		StartSimple(func() {
+			for task := range pruneQueue {
+				PrunePendingAutofixBatchesForObjectID(task.projectRoot, task.objectID)
+			}
+		})
+}
+
+// EnqueueAutofixPendingPrune adds an object ID to the bounded prune queue.
+// Drops non-blockingly if the queue is full or if the autofix directory does not exist.
+func EnqueueAutofixPendingPrune(projectRoot, objectID string) {
+	if projectRoot == "" || objectID == "" {
+		return
+	}
+	autofixDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.AutofixDir)
+	info, err := fileutil.Stat(autofixDir)
+	if err != nil || !info.IsDir() {
+		return // Fast skip: no autofix directory exists
+	}
+
+	pruneWorkerOnce.Do(initPruneWorker)
+
+	select {
+	case pruneQueue <- pruneTask{projectRoot: projectRoot, objectID: objectID}:
+	default:
+		// Queue full; do not spawn runaway goroutines or block the caller
+	}
+}
 
 // PrunePendingAutofixBatchesForObjectID removes objectID from pending AUTOFIX-*.json
 // batches under .zqk/autofix/. Empty batches are deleted. Best-effort sync for shockwave /
@@ -22,6 +66,20 @@ func PrunePendingAutofixBatchesForObjectID(projectRoot, objectID string) (rewrit
 		return 0, 0
 	}
 	autofixDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.AutofixDir)
+	info, err := fileutil.Stat(autofixDir)
+	if err != nil || !info.IsDir() {
+		return 0, 0
+	}
+
+	// Throttle if process file descriptors are running high to prevent EMFILE
+	openFDs, maxFDs, fdErr := resourcehygiene.GetProcessFDUsage()
+	if fdErr == nil && maxFDs > 0 && openFDs > int(float64(maxFDs)*0.70) {
+		return 0, 0
+	}
+
+	pruneMu.Lock()
+	defer pruneMu.Unlock()
+
 	entries, err := fileutil.ReadDir(autofixDir)
 	if err != nil {
 		return 0, 0

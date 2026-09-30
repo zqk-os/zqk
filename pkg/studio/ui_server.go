@@ -188,9 +188,27 @@ type GraphNode struct {
 
 // GraphEdge represents a directed relationship in the visual graph.
 type GraphEdge struct {
-	Source   string `json:"source"`
-	Target   string `json:"target"`
-	Relation string `json:"relation"`
+	Source     string `json:"source"`
+	Target     string `json:"target"`
+	Relation   string `json:"relation"`
+	Structural bool   `json:"structural"`
+}
+
+func isStructuralRelation(rel string) bool {
+	switch rel {
+	case "workstream_ref", "workstream_refs", "from_workstream_ref", "to_workstream_ref",
+		"goal_ref", "goal_refs",
+		"priority_plan_ref", "plan_ref", "plan_refs", "roadmap_ref",
+		"milestone_ref", "milestone_refs",
+		"backlog_item_ref", "backlog_item_refs", "parent_ref", "parent_task_ref",
+		"requirement_ref", "requirement_refs",
+		"criteria_ref", "criteria_refs",
+		"test_case_ref", "test_case_refs",
+		"depends_on", "blocked_by", "blocking_ref":
+		return true
+	default:
+		return false
+	}
 }
 
 func (s *Server) handleGraph(w http.ResponseWriter, r *http.Request) {
@@ -217,8 +235,14 @@ func (s *Server) handleGraph(w http.ResponseWriter, r *http.Request) {
 				ua = node.UpdatedAt.UTC().Format(time.RFC3339)
 			}
 			var wsRefs []string
-			if refs, ok := node.References["workstream_refs"]; ok {
-				wsRefs = refs
+			for _, k := range []string{"workstream_refs", "workstream_ref", "from_workstream_ref", "to_workstream_ref"} {
+				if refs, ok := node.References[k]; ok {
+					for _, r := range refs {
+						if r != "" {
+							wsRefs = append(wsRefs, r)
+						}
+					}
+				}
 			}
 			var sd, td, dd, eff string
 			if node.Attributes != nil {
@@ -251,14 +275,16 @@ func (s *Server) handleGraph(w http.ResponseWriter, r *http.Request) {
 			})
 
 			for rel, targets := range node.References {
+				structural := isStructuralRelation(rel)
 				for _, target := range targets {
 					edgeKey := fmt.Sprintf("%s->%s:%s", node.ID, target, rel)
 					if !seenEdges[edgeKey] {
 						seenEdges[edgeKey] = true
 						edges = append(edges, GraphEdge{
-							Source:   node.ID,
-							Target:   target,
-							Relation: rel,
+							Source:     node.ID,
+							Target:     target,
+							Relation:   rel,
+							Structural: structural,
 						})
 					}
 				}

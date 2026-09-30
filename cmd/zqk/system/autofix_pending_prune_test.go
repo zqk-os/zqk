@@ -233,3 +233,33 @@ func TestParseMustBeOneOfValues(t *testing.T) {
 		t.Fatalf("got %v", got)
 	}
 }
+
+func TestEnqueueAutofixPendingPrune(t *testing.T) {
+	// Fast skip when dir does not exist
+	EnqueueAutofixPendingPrune("", "")
+	EnqueueAutofixPendingPrune("/nonexistent/path", "QUE-1")
+
+	// When dir exists and has batch
+	root := t.TempDir()
+	autofixDir := filepath.Join(root, paths.ProjectDataDir, paths.AutofixDir)
+	if err := fileutil.MkdirAll(autofixDir, paths.DirPerm755); err != nil {
+		t.Fatal(err)
+	}
+	batchPath := filepath.Join(autofixDir, "AUTOFIX-async-test.json")
+	batchContent := `{"batch_id":"async-test","objects":[{"object_id":"QUE-async","title":"t"}]}`
+	if err := fileutil.WriteFile(batchPath, []byte(batchContent), paths.FilePerm644); err != nil {
+		t.Fatal(err)
+	}
+
+	EnqueueAutofixPendingPrune(root, "QUE-async")
+
+	// Wait briefly for the worker to process the queued prune task
+	deadline := time.Now().Add(3 * time.Second)
+	for time.Now().Before(deadline) {
+		if _, err := fileutil.Stat(batchPath); fileutil.IsNotExist(err) {
+			return // Successfully pruned and removed empty batch file
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
+	t.Fatalf("expected batch file %s to be pruned and removed", batchPath)
+}

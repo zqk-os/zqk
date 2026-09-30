@@ -8,6 +8,7 @@
     let activeDensity = 'execution'; // 'backbone', 'execution', 'all'
     let currentMainView = 'dag'; // 'dag' or 'gantt'
     let searchQuery = '';
+    let ganttZoom = '1m'; // '2w', '1m', '3m', 'all'
 
     // Transform state
     let scale = 1.0;
@@ -162,9 +163,11 @@
         case 'mission': case 'vision': return 'var(--purple)';
         case 'workstream': return 'var(--orange)';
         case 'goal': case 'roadmap': return 'var(--success)';
-        case 'priority_plan': case 'milestone': return 'var(--accent)';
+        case 'priority_plan': return 'var(--accent)';
+        case 'milestone': return 'var(--warning)';
         case 'backlog_item': return 'var(--teal)';
-        case 'requirement': return 'var(--warning)';
+        case 'agent_task': return '#58a6ff';
+        case 'requirement': return '#d2a8ff';
         case 'criteria': return 'var(--success)';
         case 'test_case': return 'var(--pink)';
         default: return 'var(--text-muted)';
@@ -176,12 +179,13 @@
         case 'mission': case 'vision': return 0;
         case 'workstream': return 1;
         case 'goal': case 'roadmap': return 2;
-        case 'milestone': case 'priority_plan': return 3;
-        case 'backlog_item': return 4;
-        case 'requirement': return 5;
-        case 'criteria': return 6;
-        case 'test_case': return 7;
-        default: return 4;
+        case 'priority_plan': return 3;
+        case 'milestone': return 4;
+        case 'backlog_item': return 5;
+        case 'agent_task': return 6;
+        case 'requirement': return 7;
+        case 'criteria': case 'test_case': return 8;
+        default: return 5;
       }
     }
 
@@ -206,11 +210,14 @@
       const activeIds = new Set();
       activeIds.add(centerId);
 
-      // Build adjacency maps
-      const outgoing = new Map(); // id -> set of target ids
-      const incoming = new Map(); // id -> set of source ids
+      // Build adjacency maps strictly for structural lineage
+      const outgoing = new Map(); // child -> parent
+      const incoming = new Map(); // parent -> child
 
       graphData.edges.forEach(e => {
+        // Exclude loose metadata references (policies, personas, skills) from DAG causal focus
+        if (e.structural === false) return;
+
         if (!outgoing.has(e.source)) outgoing.set(e.source, new Set());
         outgoing.get(e.source).add(e.target);
 
@@ -218,11 +225,11 @@
         incoming.get(e.target).add(e.source);
       });
 
-      // BFS upstream (ancestors)
+      // BFS upstream (ancestors / parents)
       let queue = [centerId];
       while (queue.length > 0) {
         const cur = queue.shift();
-        const parents = incoming.get(cur);
+        const parents = outgoing.get(cur);
         if (parents) {
           parents.forEach(p => {
             if (!activeIds.has(p)) {
@@ -233,11 +240,11 @@
         }
       }
 
-      // BFS downstream (descendants)
+      // BFS downstream (descendants / children)
       queue = [centerId];
       while (queue.length > 0) {
         const cur = queue.shift();
-        const children = outgoing.get(cur);
+        const children = incoming.get(cur);
         if (children) {
           children.forEach(c => {
             if (!activeIds.has(c)) {
@@ -259,39 +266,61 @@
         if (!graphData.nodes) graphData.nodes = [];
         if (!graphData.edges) graphData.edges = [];
 
-        // Propagate workstream associations downstream along DAG edges
+        // Bidirectional workstream inheritance
         const wsMap = new Map();
+        const nodeById = new Map();
         graphData.nodes.forEach(n => {
+          nodeById.set(n.id, n);
+          if (!wsMap.has(n.id)) wsMap.set(n.id, new Set());
           if (n.kind === 'workstream') {
-            if (!wsMap.has(n.id)) wsMap.set(n.id, new Set());
             wsMap.get(n.id).add(n.id);
           }
           if (n.workstreamRefs) {
-            if (!wsMap.has(n.id)) wsMap.set(n.id, new Set());
-            n.workstreamRefs.forEach(w => wsMap.get(n.id).add(w));
+            n.workstreamRefs.forEach(w => { if (w) wsMap.get(n.id).add(w); });
+          }
+          if (n.references) {
+            ['workstream_ref', 'workstream_refs', 'from_workstream_ref', 'to_workstream_ref'].forEach(k => {
+              if (n.references[k]) {
+                n.references[k].forEach(w => { if (w) wsMap.get(n.id).add(w); });
+              }
+            });
           }
         });
-        const outgoing = new Map();
-        graphData.edges.forEach(e => {
-          if (!outgoing.has(e.source)) outgoing.set(e.source, []);
-          outgoing.get(e.source).push(e.target);
-        });
+
+        // Propagate across structural edges:
+        // In edge (source -> target), source is child and target is parent.
         let changed = true;
         let iters = 0;
-        while (changed && iters < 12) {
+        while (changed && iters < 15) {
           changed = false;
           iters++;
-          wsMap.forEach((wsSet, sourceId) => {
-            const targets = outgoing.get(sourceId) || [];
-            targets.forEach(targetId => {
-              if (!wsMap.has(targetId)) wsMap.set(targetId, new Set());
-              const targetSet = wsMap.get(targetId);
-              const prevSize = targetSet.size;
-              wsSet.forEach(w => targetSet.add(w));
-              if (targetSet.size > prevSize) changed = true;
+          graphData.edges.forEach(e => {
+            if (e.structural === false) return;
+            const childSet = wsMap.get(e.source);
+            const parentSet = wsMap.get(e.target);
+            if (!childSet || !parentSet) return;
+
+            // Downstream: Parent passes workstreams to Child
+            parentSet.forEach(wsId => {
+              if (!childSet.has(wsId)) {
+                childSet.add(wsId);
+                changed = true;
+              }
             });
+
+            // Upstream: Child passes workstreams to Parent (unless parent is another workstream)
+            const targetNode = nodeById.get(e.target);
+            if (targetNode && targetNode.kind !== 'workstream') {
+              childSet.forEach(wsId => {
+                if (!parentSet.has(wsId)) {
+                  parentSet.add(wsId);
+                  changed = true;
+                }
+              });
+            }
           });
         }
+
         graphData.nodes.forEach(n => {
           if (wsMap.has(n.id) && wsMap.get(n.id).size > 0) {
             n.workstreamRefs = Array.from(wsMap.get(n.id));
@@ -336,16 +365,20 @@
 
         // Workstream Filter
         if (activeWorkstreamFilter !== 'all') {
-          const isWS = n.id === activeWorkstreamFilter;
-          const refsWS = n.workstreamRefs && n.workstreamRefs.includes(activeWorkstreamFilter);
+          const targetWs = activeWorkstreamFilter.toLowerCase();
+          const isWS = n.id.toLowerCase() === targetWs;
+          const refsWS = n.workstreamRefs && n.workstreamRefs.some(w => {
+            const wl = (w || '').toLowerCase();
+            return wl === targetWs || targetWs.includes(wl) || wl.includes(targetWs);
+          });
           if (!isWS && !refsWS) return false;
         }
 
         // Density Filter
         if (!focusedNodeId) {
           const tier = getKindTier(n.kind);
-          if (activeDensity === 'backbone' && tier > 3) return false;
-          if (activeDensity === 'execution' && tier > 4) return false;
+          if (activeDensity === 'backbone' && tier > 4) return false;
+          if (activeDensity === 'execution' && tier > 6) return false;
         }
 
         // Kind Filter Pill
@@ -373,21 +406,43 @@
 
     function calculateLayout() {
       nodePositions.clear();
-      const tiers = [[], [], [], [], [], [], [], []];
+      const tiers = [[], [], [], [], [], [], [], [], []];
       const NODE_WIDTH = 220;
       const NODE_HEIGHT = 68;
       const COL_GAP = 90;
       const ROW_GAP = 28;
 
       filteredNodes.forEach(node => {
-        const t = Math.min(getKindTier(node.kind), 7);
+        const t = Math.min(getKindTier(node.kind), 8);
         tiers[t].push(node);
       });
 
+      // Map child -> primary parent for vertical grouping alignment
+      const parentMap = new Map();
+      graphData.edges.forEach(e => {
+        if (e.structural === false) return;
+        if (!parentMap.has(e.source)) parentMap.set(e.source, e.target);
+      });
+
       let colIndex = 0;
+      const nodeOrderInPrevTier = new Map();
+
       tiers.forEach((tierNodes) => {
         if (tierNodes.length === 0) return;
+
+        // Sort nodes in this tier by their parent's order in previous tier to minimize edge crossings
+        tierNodes.sort((a, b) => {
+          const parentA = parentMap.get(a.id);
+          const parentB = parentMap.get(b.id);
+          const orderA = parentA && nodeOrderInPrevTier.has(parentA) ? nodeOrderInPrevTier.get(parentA) : 9999;
+          const orderB = parentB && nodeOrderInPrevTier.has(parentB) ? nodeOrderInPrevTier.get(parentB) : 9999;
+          if (orderA !== orderB) return orderA - orderB;
+          return a.id.localeCompare(b.id);
+        });
+
+        // Record positions for this tier
         tierNodes.forEach((node, rowIndex) => {
+          nodeOrderInPrevTier.set(node.id, rowIndex);
           const x = colIndex * (NODE_WIDTH + COL_GAP);
           const y = rowIndex * (NODE_HEIGHT + ROW_GAP);
           nodePositions.set(node.id, { x, y, width: NODE_WIDTH, height: NODE_HEIGHT });
@@ -410,6 +465,8 @@
       // Draw Edges
       const renderedEdges = new Set();
       graphData.edges.forEach(edge => {
+        // Exclude loose metadata (policies, personas, skills) from DAG unless full mesh is chosen
+        if (activeDensity !== 'all' && edge.structural === false) return;
         if (!activeSet.has(edge.source) || !activeSet.has(edge.target)) return;
         const p1 = nodePositions.get(edge.source);
         const p2 = nodePositions.get(edge.target);
@@ -419,16 +476,28 @@
         if (renderedEdges.has(edgeKey)) return;
         renderedEdges.add(edgeKey);
 
-        const x1 = p1.x + p1.width;
-        const y1 = p1.y + p1.height / 2;
-        const x2 = p2.x;
-        const y2 = p2.y + p2.height / 2;
-        const dx = Math.abs(x2 - x1) / 2;
+        // Always connect from earlier column (left) to later column (right)
+        let leftPos = p1;
+        let rightPos = p2;
+        if (p1.x < p2.x) {
+          leftPos = p1;
+          rightPos = p2;
+        } else if (p2.x < p1.x) {
+          leftPos = p2;
+          rightPos = p1;
+        }
+
+        const x1 = leftPos.x + leftPos.width;
+        const y1 = leftPos.y + leftPos.height / 2;
+        const x2 = rightPos.x;
+        const y2 = rightPos.y + rightPos.height / 2;
+        const dx = Math.max(30, Math.abs(x2 - x1) / 2);
 
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         path.setAttribute('d', 'M ' + x1 + ' ' + y1 + ' C ' + (x1 + dx) + ' ' + y1 + ', ' + (x2 - dx) + ' ' + y2 + ', ' + x2 + ' ' + y2);
-        path.setAttribute('class', 'edge-line' + ((selectedNodeId && (edge.source === selectedNodeId || edge.target === selectedNodeId)) ? ' highlight' : ''));
-        path.setAttribute('marker-end', (selectedNodeId && (edge.source === selectedNodeId || edge.target === selectedNodeId)) ? 'url(#arrow-highlight)' : 'url(#arrow)');
+        const isHighlight = selectedNodeId && (edge.source === selectedNodeId || edge.target === selectedNodeId);
+        path.setAttribute('class', 'edge-line' + (isHighlight ? ' highlight' : ''));
+        path.setAttribute('marker-end', isHighlight ? 'url(#arrow-highlight)' : 'url(#arrow)');
 
         edgesLayer.appendChild(path);
       });
@@ -495,8 +564,11 @@
 
         g.addEventListener('click', (e) => {
           e.stopPropagation();
-          selectNode(node.id, true);
-          // Auto-focus on click: isolate subgraph
+          selectNode(node.id, false);
+        });
+
+        g.addEventListener('dblclick', (e) => {
+          e.stopPropagation();
           focusNode(node.id);
         });
 
@@ -509,7 +581,19 @@
     function setGanttStatusFilter(filter) {
       ganttStatusFilter = filter;
       document.querySelectorAll('.gantt-filter-pill').forEach(btn => {
-        btn.classList.toggle('active', btn.id === 'gantt-pill-' + filter);
+        if (btn.id.startsWith('gantt-pill-')) {
+          btn.classList.toggle('active', btn.id === 'gantt-pill-' + filter);
+        }
+      });
+      renderGantt();
+    }
+
+    function setGanttZoom(zoom) {
+      ganttZoom = zoom;
+      document.querySelectorAll('.gantt-filter-pill').forEach(btn => {
+        if (btn.id.startsWith('gantt-zoom-')) {
+          btn.classList.toggle('active', btn.id === 'gantt-zoom-' + zoom);
+        }
       });
       renderGantt();
     }
@@ -528,11 +612,11 @@
 
       // Apply Gantt status filter
       if (ganttStatusFilter === 'active') {
-        items = items.filter(n => ['in_progress', 'active', 'testing', 'metrics_captured'].includes((n.status || '').toLowerCase()));
+        items = items.filter(n => ['in_progress', 'active', 'testing', 'metrics_captured', 'executing', 'started'].includes((n.status || '').toLowerCase()));
       } else if (ganttStatusFilter === 'planned') {
-        items = items.filter(n => ['planned', 'originated', 'draft', 'pending'].includes((n.status || '').toLowerCase()));
+        items = items.filter(n => ['planned', 'originated', 'draft', 'pending', 'queued', 'shovel_ready', 'ready'].includes((n.status || '').toLowerCase()));
       } else if (ganttStatusFilter === 'done') {
-        items = items.filter(n => ['complete', 'verified', 'approved', 'done', 'sealed'].includes((n.status || '').toLowerCase()));
+        items = items.filter(n => ['complete', 'completed', 'implemented', 'verified', 'approved', 'done', 'sealed', 'archived', 'resolved', 'satisfied', 'passed', 'closed'].includes((n.status || '').toLowerCase()));
       }
 
       document.getElementById('gantt-task-count').textContent = items.length + ' items';
@@ -564,22 +648,28 @@
         }
 
         const status = (item.status || 'planned').toLowerCase();
-        const isDone = ['complete', 'verified', 'approved', 'done', 'sealed', 'archived'].includes(status);
-        const isActive = ['in_progress', 'active', 'testing', 'metrics_captured'].includes(status);
+        const isDone = ['complete', 'completed', 'implemented', 'verified', 'approved', 'done', 'sealed', 'archived', 'resolved', 'satisfied', 'passed', 'closed'].includes(status);
+        const isActive = ['in_progress', 'active', 'testing', 'metrics_captured', 'executing', 'started'].includes(status);
 
         // Duration heuristics
         const defaultDurationDays = item.kind === 'workstream' ? 45 :
-                                    item.kind === 'milestone' ? 6 :
-                                    item.kind === 'priority_plan' ? 21 : 7;
+                                    item.kind === 'milestone' ? 5 :
+                                    item.kind === 'priority_plan' ? 21 :
+                                    item.kind === 'agent_task' ? 2 : 5;
         const durationMs = defaultDurationDays * MS_PER_DAY;
 
         if (isDone) {
-          // Completed items belong in the past leading up to their completion date
+          // Completed / Implemented items belong strictly in the past leading up to completion date
           if (!end && item.updatedAt) {
             const d = Date.parse(item.updatedAt);
             if (!isNaN(d)) end = Math.min(now, d);
           }
-          if (!end) end = now - (1 * MS_PER_DAY);
+          if (!end && item.createdAt) {
+            const d = Date.parse(item.createdAt);
+            if (!isNaN(d)) end = Math.min(now, d);
+          }
+          if (!end) end = now - (0.5 * MS_PER_DAY);
+
           if (!start && item.createdAt) {
             const d = Date.parse(item.createdAt);
             if (!isNaN(d) && d < end) start = d;
@@ -587,9 +677,7 @@
           if (!start) start = end - durationMs;
         } else if (isActive) {
           // In-Progress / Active items: active NOW, spanning across TODAY
-          // A milestone or task currently in progress must NOT be scheduled in the past!
           if (item.kind === 'milestone') {
-            // Milestone is a target checkpoint: targets completion ahead of today
             if (!end) end = now + (5 * MS_PER_DAY);
             if (!start) start = now - (2 * MS_PER_DAY);
           } else if (item.kind === 'workstream') {
@@ -609,8 +697,7 @@
           }
         } else {
           // Planned / upcoming items: scheduled from TODAY onwards into the future
-          // Planned items MUST NOT sit in the past!
-          const planOffsetDays = (idx % 8) * 3;
+          const planOffsetDays = (idx % 6) * 2 + 1;
           if (!start || start < now) {
             start = now + (planOffsetDays * MS_PER_DAY);
           }
@@ -625,25 +712,43 @@
         return { ...item, startTime: start, endTime: end };
       });
 
-      // 2. Compute global timeline window
-      let minTime = Infinity;
-      let maxTime = -Infinity;
-      parsedItems.forEach(i => {
-        if (i.startTime < minTime) minTime = i.startTime;
-        if (i.endTime > maxTime) maxTime = i.endTime;
-      });
-
-      // Ensure today is within visible window
-      if (now < minTime) minTime = now - (3 * MS_PER_DAY);
-      if (now > maxTime) maxTime = now + (7 * MS_PER_DAY);
-
-      // Margins
-      minTime -= 2 * MS_PER_DAY;
-      maxTime += 6 * MS_PER_DAY;
-      const totalDuration = Math.max(MS_PER_DAY * 14, maxTime - minTime);
+      // 2. Compute timeline window based on selected zoom
+      let minTime, maxTime;
+      if (ganttZoom === '2w') {
+        minTime = now - (5 * MS_PER_DAY);
+        maxTime = now + (9 * MS_PER_DAY);
+      } else if (ganttZoom === '1m') {
+        minTime = now - (10 * MS_PER_DAY);
+        maxTime = now + (20 * MS_PER_DAY);
+      } else if (ganttZoom === '3m') {
+        minTime = now - (20 * MS_PER_DAY);
+        maxTime = now + (70 * MS_PER_DAY);
+      } else {
+        // 'all': fit full range
+        minTime = Infinity;
+        maxTime = -Infinity;
+        parsedItems.forEach(i => {
+          if (i.startTime < minTime) minTime = i.startTime;
+          if (i.endTime > maxTime) maxTime = i.endTime;
+        });
+        if (now < minTime) minTime = now - (3 * MS_PER_DAY);
+        if (now > maxTime) maxTime = now + (7 * MS_PER_DAY);
+        minTime -= 2 * MS_PER_DAY;
+        maxTime += 6 * MS_PER_DAY;
+      }
+      const totalDuration = Math.max(MS_PER_DAY * 7, maxTime - minTime);
 
       // 3. Render Calendar Date Ticks across header
-      const tickStepDays = totalDuration > (90 * MS_PER_DAY) ? 14 : (totalDuration > (30 * MS_PER_DAY) ? 7 : 3);
+      let tickStepDays = 1;
+      if (ganttZoom === '2w') {
+        tickStepDays = 1;
+      } else if (ganttZoom === '1m') {
+        tickStepDays = 2;
+      } else if (ganttZoom === '3m') {
+        tickStepDays = 7;
+      } else {
+        tickStepDays = totalDuration > (90 * MS_PER_DAY) ? 14 : (totalDuration > (30 * MS_PER_DAY) ? 7 : 3);
+      }
       const tickStepMs = tickStepDays * MS_PER_DAY;
 
       const ticks = [];
@@ -716,10 +821,16 @@
       groups.forEach((groupItems, groupName) => {
         const header = document.createElement('div');
         header.className = 'gantt-section-header';
-        header.innerHTML = '<span>⚡ ' + groupName + '</span> <span style="font-size: 11px; font-weight: normal; color: var(--text-muted);">' + groupItems.length + ' items</span>';
+        header.innerHTML = '<span>⚡ ' + escapeHtml(groupName) + '</span> <span style="font-size: 11px; font-weight: normal; color: var(--text-muted);">' + groupItems.length + ' items</span>';
         body.appendChild(header);
 
-        groupItems.sort((a, b) => a.startTime - b.startTime);
+        // Sort items hierarchically: Tier first (Plans -> Milestones -> BLIs -> Tasks), then startTime
+        groupItems.sort((a, b) => {
+          const tierA = getKindTier(a.kind);
+          const tierB = getKindTier(b.kind);
+          if (tierA !== tierB) return tierA - tierB;
+          return a.startTime - b.startTime;
+        });
 
         groupItems.forEach(item => {
           const row = document.createElement('div');
@@ -727,16 +838,27 @@
 
           const kindClass = 'kind-' + item.kind;
           const status = (item.status || 'planned').toLowerCase();
+          const tier = getKindTier(item.kind);
 
-          // Left Info Cell
+          let indentPx = 0;
+          if (tier === 3) indentPx = 0; // Priority plan
+          else if (tier === 4) indentPx = 12; // Milestone
+          else if (tier === 5) indentPx = 24; // BLI
+          else if (tier === 6) indentPx = 36; // Agent Task
+          else if (tier > 6) indentPx = 48;
+
+          // Left Info Cell with hierarchy indentation
           const info = document.createElement('div');
           info.className = 'gantt-row-info';
+          info.style.paddingLeft = (16 + indentPx) + 'px';
           info.innerHTML =
             '<div class="gantt-row-title-line">' +
+              (indentPx > 0 ? '<span class="gantt-tree-elbow">↳</span>' : '') +
               '<span class="kind-pill ' + kindClass + '">' + item.kind.replace('_', ' ') + '</span>' +
               '<span class="gantt-row-id">' + item.id + '</span>' +
+              '<span class="status-pill-mini status-' + status + '">' + (item.status || '') + '</span>' +
             '</div>' +
-            '<div class="gantt-row-title" title="' + (item.title || '') + '">' + (item.title || '') + '</div>';
+            '<div class="gantt-row-title" title="' + escapeHtml(item.title || '') + '">' + escapeHtml(item.title || '') + '</div>';
 
           // Right Bar Cell
           const cell = document.createElement('div');
@@ -750,14 +872,18 @@
             cell.appendChild(gridCol);
           });
 
-          // Horizontal placement
-          const leftPercent = Math.max(0, Math.min(96, ((item.startTime - minTime) / totalDuration) * 100));
-          const rightPercent = Math.max(leftPercent + 2.5, Math.min(100, ((item.endTime - minTime) / totalDuration) * 100));
-          const widthPercent = Math.max(2.5, rightPercent - leftPercent);
+          // Horizontal placement relative to timeline window
+          const leftPercent = Math.max(0, Math.min(98, ((item.startTime - minTime) / totalDuration) * 100));
+          const rawRight = ((item.endTime - minTime) / totalDuration) * 100;
+          const rightPercent = Math.max(leftPercent + 1.8, Math.min(100, rawRight));
+          const widthPercent = Math.max(1.8, rightPercent - leftPercent);
 
           const startDateStr = new Date(item.startTime).toISOString().slice(0, 10);
           const endDateStr = new Date(item.endTime).toISOString().slice(0, 10);
           const durationDays = Math.max(1, Math.round((item.endTime - item.startTime) / MS_PER_DAY));
+
+          const isDone = ['complete', 'completed', 'implemented', 'verified', 'approved', 'done', 'sealed', 'archived', 'resolved', 'satisfied', 'passed', 'closed'].includes(status);
+          const isActive = ['in_progress', 'active', 'testing', 'metrics_captured', 'executing', 'started'].includes(status);
 
           let barClass = 'gantt-bar-planned';
           let statusIcon = '⏳';
@@ -767,10 +893,10 @@
           } else if (item.kind === 'workstream') {
             barClass = 'gantt-bar-workstream';
             statusIcon = '🌐';
-          } else if (status === 'complete' || status === 'verified') {
+          } else if (isDone) {
             barClass = 'gantt-bar-complete';
             statusIcon = '✓';
-          } else if (status === 'in_progress' || status === 'active') {
+          } else if (isActive) {
             barClass = 'gantt-bar-inprogress';
             statusIcon = '▶';
           } else if (status === 'testing' || status === 'metrics_captured') {
@@ -785,7 +911,8 @@
           const effortStr = item.estimatedEffort ? '\nEffort: ' + item.estimatedEffort : '';
           bar.setAttribute('title', item.id + ': ' + (item.title || '') + '\nKind: ' + item.kind.replace('_', ' ') + ' | Status: ' + status + '\nSchedule: ' + startDateStr + ' → ' + endDateStr + ' (' + durationDays + ' days)' + effortStr);
 
-          bar.textContent = statusIcon + ' ' + item.id;
+          bar.innerHTML = '<span style="margin-right: 4px;">' + statusIcon + '</span><span style="font-weight: 700;">' + item.id + '</span>' +
+            (widthPercent > 12 && item.title ? ': <span style="opacity: 0.9; font-weight: normal; margin-left: 3px;">' + escapeHtml(item.title) + '</span>' : '');
 
           cell.appendChild(bar);
           row.appendChild(info);
