@@ -524,7 +524,6 @@ func TestBatchNeedsCASReconcileBeforeTriggerReload(t *testing.T) {
 	run("mixed", []JobTriggerRequest{{JobID: "SCH-001"}, {JobID: "SCH-1774181824"}}, true)
 }
 
-// TRACK: BLI-CEF-R28-TESTING-SCHEDULER-001 / F-TS-001
 func TestJobTriggerQueue_ConcurrentEnqueueAndDequeue(t *testing.T) {
 	t.Parallel()
 	tmpDir := t.TempDir()

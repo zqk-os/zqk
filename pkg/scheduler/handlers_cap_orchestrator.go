@@ -401,7 +401,7 @@ func (h *CapOrchestratorHandler) Execute(ctx context.Context, job *ScheduledJob)
 	// deriveAgentInstructionFromBacklog ("continue" when any BLI is in_progress,
 	// "shutdown", "execute_tests"). Those cues are for agents; SCH-cap-orchestrator
 	// peeks/advances cap_cycle via SelectCAPInstruction (CAP_LOOP_CONTRACT).
-	// TRACK: BLI-CAPH-001 — keep whats-next agent_instruction vs cap_stage fields distinct.
+	// keep whats-next agent_instruction vs cap_stage fields distinct.
 	capStage := whatsnext.SelectCAPInstruction(h.projectRoot, result.BacklogCountsByStatus)
 	if strings.HasPrefix(capStage, "cap_stage_") {
 		if instruction != capStage {
@@ -666,7 +666,6 @@ func (h *CapOrchestratorHandler) hasOpenAgentInstruction(ctx context.Context, pl
 // which lives on the object draft plane, and List omits that plane by design (see
 // pkg/storage/object_draft_plane.go). A CAS-only snapshot therefore never sees what
 // CAP just created and re-mints every task on every tick.
-// TRACK: BLI-DRAFT-PLANE-ORCHESTRATE-GHOST-001
 type openAgentTaskIndex struct {
 	mu sync.RWMutex
 	// key: lower(plan)\0lower(task)
@@ -902,7 +901,6 @@ func criticalRootForPackagePath(pkgPath string) string {
 // Returns (passed, hardErrs, softErrs). softErrs are coverage gaps (missing jobs / no outcome yet) —
 // they keep review readiness red but must not fail the CAP job (notification spam). hardErrs are
 // real test failures or infrastructure list errors.
-// TRACK: MMORCH CAP ops / CRIT-CAPH-007 readiness vs job success.
 func (h *CapOrchestratorHandler) verifyCriticalPackagesHealth(ctx context.Context, secCtx *pkgctx.SecurityContext) (passed bool, hardErrs, softErrs []string) {
 	if secCtx == nil {
 		secCtx = pkgctx.NewSystemSecurityContext()

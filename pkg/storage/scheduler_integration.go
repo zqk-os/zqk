@@ -258,7 +258,7 @@ func (sjm *SchedulerJobManager) executeCascadeUpdateDirect(
 // GetSchedulerJobManager constructs a job manager without a scheduler handle.
 // The dead SetGlobalSchedulerInterface setter never had a caller, so this convenience
 // constructor always used a nil scheduler (direct-execution fallback).
-// TRACK: BLI-CEF-R2-ARCH-GLOBALS-DI — pass SchedulerInterface from the composition root
+// pass SchedulerInterface from the composition root
 // (NewCacheManager / NewSchedulerJobManager) instead of adding another global setter.
 func GetSchedulerJobManager(storage ObjectStorageProvider) *SchedulerJobManager {
 	return NewSchedulerJobManager(storage, nil)

@@ -23,7 +23,7 @@ type SynthesisService struct {
 }
 
 // synthesisIntentWorkers caps concurrent ProcessIntent goroutines.
-// TRACK: BLI-CAS-HAND-DUP-CHECK-001 — previously one goroutine per WAL intent.
+// previously one goroutine per WAL intent.
 func synthesisIntentWorkers() int {
 	n := runtime.GOMAXPROCS(0)
 	if n < 1 {

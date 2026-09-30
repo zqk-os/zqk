@@ -599,7 +599,6 @@ func (p *ProxyDaemon) QueryEventsSubscriberCount(ctx context.Context) (int, erro
 
 	// Use the feed-steer probe client so initialize skips credential elicitation
 	// (ide-ide-proxy elicitation hangs 1s probes → mcp_query_failed / stamp_not_live).
-	// TRACK: BLI-COMMS-TPM-LIVE-WAKE-001 / CRIT-COMMS-003
 	if err := writeRPC(1, "initialize", map[string]any{
 		"protocolVersion":            "2024-11-05",
 		objects.FieldKeyCapabilities: map[string]any{},

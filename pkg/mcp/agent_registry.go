@@ -102,7 +102,6 @@ func isHumanClient(clientName, clientID string) bool {
 // isTrustedLoopbackAdapter is the named local membrane allowed to initialize
 // on loopback TCP without credentials. Exact match only — substring "ide"
 // would punch a hole through CRIT-CEF-R15-MCP-LOOPBACK-AUTH-001.
-// TRACK: BLI-CEF-R2-REL-MCP-RECONNECT
 func isTrustedLoopbackAdapter(clientName, clientID string) bool {
 	name := strings.TrimSpace(clientName)
 	id := strings.TrimSpace(clientID)

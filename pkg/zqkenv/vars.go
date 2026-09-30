@@ -292,7 +292,7 @@ func TelemetryOptIn() EnvVar {
 
 // HostloadDisable returns the env name for HOSTLOAD_DISABLE (brand-prefixed).
 // When set to 1, scheduler and validation fan-out ignore live host CPU pressure
-// (always treat the host as having headroom). TRACK: TDE-CEF-HOST-CPU-BACKPRESSURE-001
+// (always treat the host as having headroom).
 func HostloadDisable() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxHostloadDisable)} }
 
 // HostCPUBackpressure returns the environment variable name for HOST_CPU_BACKPRESSURE (brand-prefixed).

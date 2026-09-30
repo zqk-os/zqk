@@ -38,7 +38,6 @@ type PeerWakeAdapterResult struct {
 // PeerWakeAdapter delivers a wake signal to a peer seat.
 // Core feed code must depend on this interface — not on vendor shell scripts.
 //
-// TRACK: CRIT-COMMS-003 / core-backlog — replace the default
 // shell membrane with MCP/HTTP adapters as those become the product transport.
 type PeerWakeAdapter interface {
 	Wake(ctx context.Context, req PeerWakeRequest) (PeerWakeAdapterResult, error)

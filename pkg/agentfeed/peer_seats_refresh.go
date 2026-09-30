@@ -20,7 +20,6 @@ import (
 // Keys match scripts/mesh/peer_seats.example.json (vendor-neutral). Never
 // peer-agent-01 — that collapse breaks COMMS. Vendor product names
 // (antigravity-*, composer, …) belong in an uploaded seat map, not here.
-// TRACK: TDE-MESH-DEFAULT-SEAT-PEER-AGENT-01-001
 var DefaultPeerSeatIDs = []string{"peer-agent-1", "peer-agent-2"}
 
 // peerExecutableNames are argv0 bases treated as peer worker seats (matches wake-agy.sh).

@@ -23,7 +23,6 @@ import (
 // that one path. List/Count use the CAS index and must omit draft-plane paths;
 // a draft-plane list view is a separate API if we build one.
 //
-// TRACK: TDE-CEF-CAS-IDENTITY-TXN-001
 
 const (
 	objectDraftShardHexLen = 2
@@ -45,7 +44,7 @@ type ObjectDraftPlaneInventory struct {
 	SampleIDs []string `json:"sample_ids,omitempty"`
 	// DualPlaneIDs are draft-plane ids that also have a CAS index entry (split-brain).
 	// Cache is SSOT for Get; this inventory flags the extra blob.
-	// TRACK: BLI-CAS-HAND-DUP-CHECK-001 — dual-plane detect after kernel rot incident 2026-08-12.
+	// dual-plane detect after kernel rot incident 2026-08-12.
 	DualPlaneIDs []string `json:"dual_plane_ids,omitempty"`
 }
 

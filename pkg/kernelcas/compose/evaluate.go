@@ -650,7 +650,6 @@ func evalRefuseExecutionFacingMembership(ctx context.Context, kind string, obj m
 	}
 	// Distinct rule id so system-check can map this to tier 1 (blocking summary).
 	// Generic composed_integrity defaults to warning and disappears from agent "pristine" glances.
-	// TRACK: BLI-KERNEL-CHECK-UNBLIND-MEMBERSHIP-001
 	return []ValidationError{{
 		Field:   objects.FieldKeyStatus,
 		Message: fmt.Sprintf(msgFmt, strings.ToLower(strings.TrimSpace(status)), strings.ToLower(strings.TrimSpace(planStatus)), planID),

@@ -6,7 +6,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
-// TRACK: BLI-1786689721908382000-6402a858
 
 func TestOmitDraftPlaneOnlyFromList_NilAndEmpty(t *testing.T) {
 	t.Parallel()

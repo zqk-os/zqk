@@ -23,7 +23,7 @@ func NewHyperScaleOrchestrator(maxConcurrent int) *HyperScaleOrchestrator {
 }
 
 // Orchestrate starts the orchestration process for the given task graphs in parallel.
-// TRACK: BLI-CEF-REL-GOROUTINE-LEAKS — REQ-CEF-REL-002 / CRIT-CEF-REL-002A:
+// REQ-CEF-REL-002 / CRIT-CEF-REL-002A:
 // concurrency is a labeled budgeted Pool (not raw go + WaitGroup/semaphore) so cancel
 // cannot strand accounting and MaxConcurrentAgents stays a real worker bound.
 func (h *HyperScaleOrchestrator) Orchestrate(ctx context.Context, taskIDs []string, dispatchFn func(ctx context.Context, taskID string) error) error {

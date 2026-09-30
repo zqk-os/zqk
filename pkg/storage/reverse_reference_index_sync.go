@@ -11,7 +11,7 @@ import (
 
 // Reverse-ref disk sync: CUD used to update memory only, so the next CLI process
 // loaded a stale .zqk/cache/reverse-reference-index.json (membership / dependents miss).
-// TRACK: REQ-CEF-R2-REL-REVINDEX-FAILOPEN — incremental invalidate + near-real-time persist.
+// incremental invalidate + near-real-time persist.
 
 const reverseReferencePersistDebounce = 250 * time.Millisecond
 
@@ -69,7 +69,7 @@ func ensureReverseReferenceIndexLoaded(projectRoot string) {
 			WithError(err).
 			String("op", "load_cache").
 			Log()
-		// TRACK: BLI-CEF-R2-REL-REVINDEX-FAILOPEN — I/O error must not mark ready-empty
+		// I/O error must not mark ready-empty
 		// (delete would treat "no dependents" as authoritative).
 		return
 	}

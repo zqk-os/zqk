@@ -117,12 +117,17 @@ _verify_checksums_signature() {
       echo "Error: signature file ${sig_path} not found and ZQK_REQUIRE_COSIGN=1" >&2
       exit 1
     fi
+    if command -v cosign >/dev/null 2>&1; then
+      echo "⚠️ Warning: signature file ${sig_path} not found; cosign verification cannot be performed." >&2
+    fi
     return 0
   fi
   if command -v cosign >/dev/null 2>&1; then
     echo "🔒 Verifying checksums signature with cosign..."
     local verify_failed=0
-    if [ -f "$cert_path" ]; then
+    if [ -n "${ZQK_COSIGN_KEY:-}" ]; then
+      cosign verify-blob --key "${ZQK_COSIGN_KEY}" --signature "$sig_path" "$checksums_path" >/dev/null 2>&1 || verify_failed=1
+    elif [ -f "$cert_path" ]; then
       cosign verify-blob --certificate "$cert_path" --signature "$sig_path" "$checksums_path" >/dev/null 2>&1 || verify_failed=1
     else
       cosign verify-blob --signature "$sig_path" "$checksums_path" >/dev/null 2>&1 || verify_failed=1
@@ -181,6 +186,11 @@ install_binary() {
     _download_private "$ver" "checksums.txt.pem" "${checksums_path}.pem" || true
   else
     echo "Binary release not found for ${ver}. Try ZQK_INSTALL_METHOD=source or set GITHUB_TOKEN." >&2
+    exit 1
+  fi
+
+  if [ "${ZQK_REQUIRE_COSIGN:-0}" = "1" ] && [ ! -f "${checksums_path}.sig" ]; then
+    echo "Error: checksums.txt.sig could not be downloaded and ZQK_REQUIRE_COSIGN=1" >&2
     exit 1
   fi
 

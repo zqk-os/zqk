@@ -318,7 +318,6 @@ func (f *FileObjectStorage) checkObjectExists(id, kind, filePath string) error {
 // errIfDraftCreateWouldDualPlane refuses a draft-plane Create when the CAS index
 // already maps id. checkObjectExists allows Create when the hash file is missing
 // (index repair); that repair must not land a draft shadow beside a live CAS blob.
-// TRACK: BLI-CAS-HAND-DUP-CHECK-001
 func (f *FileObjectStorage) errIfDraftCreateWouldDualPlane(id, kind string) error {
 	if f == nil || id == emptyValue || kind == emptyValue {
 		return nil

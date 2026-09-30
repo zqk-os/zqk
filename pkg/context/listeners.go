@@ -51,7 +51,7 @@ type ListenerConfig struct {
 // ContextListenerRegistry manages listeners for context objects.
 // Narrow scope: context pipeline pending→processing→completed only — not a general PubSub.
 // Prefer pkg/coordination for in-process fan-out and pkg/contextevents for durable JSONL.
-// See docs/architecture/CEF_EVENT_PATH_AND_GLOBALS.md (TRACK: BLI-CEF-ARCH-EVENTS-GLOBALS).
+// See docs/architecture/CEF_EVENT_PATH_AND_GLOBALS.md.
 type ContextListenerRegistry struct {
 	mu        sync.RWMutex
 	listeners map[ContextState][]registeredListener

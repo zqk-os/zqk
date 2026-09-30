@@ -180,7 +180,6 @@ func buildDefaultCommand(pathOrID, critID, projectRoot string) string {
 }
 
 // ExecuteSubprocess executes a test invocation in an isolated subprocess with PGID and TMPDIR sandboxing.
-// TRACK: BLI-TESTCASE-SANDBOX-PGID-001, BLI-TESTCASE-SANDBOX-TMPDIR-002
 func ExecuteSubprocess(ctx context.Context, inv CriterionInvocation) CriterionRunResult {
 	start := time.Now()
 	res := CriterionRunResult{

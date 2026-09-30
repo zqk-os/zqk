@@ -158,7 +158,7 @@ func (s *DependencyPropagationSubscriber) HandleEvent(event *coordination.Operat
 //     (class lock; destination is never validated)
 //   - linked backlog_item reopened to exploring/validated: plan active|in_progress|paused|blocked → grooming
 //   - last linked backlog_item → terminal: plan in_progress|active → complete (trusted open-children
-//     ledger; no List on this hot path — TRACK: BLI-CEF-ARCH-EVENTS-GLOBALS)
+//     ledger; no List on this hot path
 //
 // planning/prioritizing collapsed into grooming ().
 //

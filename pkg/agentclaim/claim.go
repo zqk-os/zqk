@@ -43,7 +43,7 @@ type ClaimOptions struct {
 // Occupancy is not a sidecar of the lifecycle: agent_task_lifecycle.yaml says proposed is
 // preliminary realign ("not yet approved for dispatch") and approved → in_progress is
 // "Begin work on task". Claim must refuse origin/preliminary and hop shovel-ready to
-// execution_locked. TRACK: BLI-COMPLETE-HOP-ATK-PARENT-SHOCKWAVE-001
+// execution_locked.
 func TryClaim(ctx context.Context, sp storage.ObjectStorageProvider, sec *pkgctx.SecurityContext, taskID, claimant string, opts ...ClaimOptions) (Result, error) {
 	claimant = strings.TrimSpace(claimant)
 	if claimant == "" {

@@ -51,7 +51,7 @@ type daemonSession struct {
 	lifeCtx    context.Context
 	lifeCancel context.CancelFunc
 
-	// Consecutive ping failures before closeConn. TRACK: BLI-CEF-R2-REL-MCP-RECONNECT
+	// Consecutive ping failures before closeConn.
 	heartbeatFails atomic.Int32
 }
 

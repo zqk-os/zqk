@@ -81,7 +81,7 @@ func (f *FileObjectStorage) EnsureCLIObjectMutationVisible(ctx context.Context, 
 	q := caspkg.GetListingIndexWriteQueueForProjectRoot(f.projectRoot)
 	if len(flushKinds) == 0 {
 		// Defense: callers that pass nil (historical promote/demote bug) still need CAS
-		// index durable across process boundaries. TRACK: REQ-CEF-R2-REL-CAS-FSYNC
+		// index durable across process boundaries.
 		if err := q.FlushAll(15 * time.Second); err != nil {
 			return errfmt.Errorf(ConstStreamFailedToFlushAllCasIndexesVal, err)
 		}

@@ -34,7 +34,7 @@ var (
 
 	// casIndexUpdateWaitTimeout limits how long Create/Update wait for the index write queue.
 	// Prevents scheduler_job (and other CAS) updates from hanging when the queue is congested (e.g. daemon + CLI).
-	// TRACK: BLI-CEF-R19-CAS-INTERMEDIATE-LEAK-001 — timeout after WriteFileWithSync must still sweep extras.
+	// timeout after WriteFileWithSync must still sweep extras.
 	casIndexUpdateWaitTimeout = 30 * time.Second
 )
 
@@ -402,11 +402,10 @@ func (cas *ContentAddressableStorage) Read(objectID string) ([]byte, error) {
 // data: The updated object content (which includes the new ID field)
 
 // Index + blob durable: one live YAML then object-id-cache. ACK only if both succeed.
-// TRACK: TDE-CEF-CAS-IDENTITY-TXN-001
 
 // sweepAfterDurableBlob enforces one live hash YAML per id after the new blob is on disk.
 // Index-queue timeout used to return here without sweeping, which is how untracked
-// restamps (updated_at-only) left dual CAS blobs. TRACK: BLI-CEF-R19-CAS-INTERMEDIATE-LEAK-001
+// restamps (updated_at-only) left dual CAS blobs.
 
 // No ID change - use regular Update
 

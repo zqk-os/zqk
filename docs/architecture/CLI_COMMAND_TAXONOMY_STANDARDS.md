@@ -131,7 +131,3 @@ All commands must implement the standard **Command DNA**:
 
 This standard is verified by the automated test suite in `cmd/zqk/system/validate_command_specs_test.go` and executed via `zqk system validate-command-specs`.
 
-### Traceability & Plan Alignment
-- **Priority Plan:** `PRI-CEF-DOCS-USABILITY`
-- **Backlog Item:** `BLI-1790738311605478000-b82d46ca`
-- **Test Suite:** `cmd/zqk/help_parity_test.go` (`TST-1790738311605478001-807e7884`)

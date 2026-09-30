@@ -156,7 +156,7 @@ func (r *DefaultRegistryImpl) Run(ctx context.Context, projectRoot string, id st
 			continue
 		}
 		if res == nil {
-			// TRACK: BLI-CEF-R2-OBS-HEALTHCHECK-FALSEGREEN — nil Result is not ok.
+			// nil Result is not ok.
 			summaries = append(summaries, m.ID()+summaryIDSeparator+summaryNilResult)
 			details[m.ID()] = map[string]any{detailsErrorKey: summaryNilResult}
 			worst = statusFail

@@ -172,7 +172,6 @@ func (ll *LifecycleLoader) EnsureReady(ctx context.Context) error {
 // doEnsureReady runs once per loader; sets lifecyclesDir if empty, preloads
 // base_object, then typed-parses every lifecycle YAML (and sibling startup
 // configs) so smashed files Warn at CLI init instead of only in contract tests.
-// TRACK: BLI-CEF-R26-REMAINING-KINDS-001
 func (ll *LifecycleLoader) doEnsureReady(ctx context.Context) error { //nolint:unparam // ctx for LoadFn signature
 	dir := ll.getLifecyclesDir()
 	_, _ = ll.LoadLifecycle(KindBaseObject)
@@ -410,7 +409,6 @@ func (ll *LifecycleLoader) IsValidTransition(kind, from, to string) (bool, error
 
 	if !fromValid {
 		// Illegally persisted from: allow re-entry onto a named park status.
-		// TRACK: BLI-KERNEL-UNPAIRED-DELETE-INBOUND-001
 		if IsRepairParkStatus(toCanonical) {
 			return true, nil
 		}

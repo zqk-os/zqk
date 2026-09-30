@@ -9,7 +9,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
-// TRACK: BLI-CEF-R14-RCV-CRASH-REPLAY-001 / CRIT-CEF-R14-RCV-CRASH-REPLAY-001 / REQ-CEF-R14-RCV-SEC-001
 func TestScheduler_CrashRecoveryJobStateReplay(t *testing.T) {
 	sched, testRoot, cleanup := setupTestScheduler(t)
 	defer cleanup()

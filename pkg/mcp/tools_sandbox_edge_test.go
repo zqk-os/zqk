@@ -42,7 +42,7 @@ func TestCheckAgentShellGuardEdgeCases(t *testing.T) {
 	})
 
 	// Fail-closed: any write token in the same bash string as a protected path is denied,
-	// even when the write target is outside .zqk/process (TRACK: BLI-CAS-MCP-DENY-PROCESS-001).
+	// even when the write target is outside .zqk/process.
 	t.Run("bash_write_token_with_process_path_denied", func(t *testing.T) {
 		cmd := "touch /tmp/output && cat .zqk/process/goals.yaml >> /tmp/output"
 		args := map[string]any{objects.FieldKeyCommand: cmd}

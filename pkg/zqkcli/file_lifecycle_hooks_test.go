@@ -309,7 +309,7 @@ func TestFileBackendAutoTransitionEvaluation(t *testing.T) {
 		milestone1 := completedMilestone(milestone1ID, "Test Milestone 1")
 		milestone2 := completedMilestone(milestone2ID, "Test Milestone 2")
 
-		// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+		//
 		storage.CreateCASVisible(t, fileStorage, ctx, secCtx, milestone1, objectStatusComplete)
 		storage.CreateCASVisible(t, fileStorage, ctx, secCtx, milestone2, objectStatusComplete)
 		// Flush CAS index so reference validation during backlog item create sees the new IDs.

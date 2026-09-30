@@ -69,7 +69,6 @@ func TestBatchRepairCASMismatch(t *testing.T) {
 	}
 }
 
-// TRACK: BLI-CEF-R14-RCV-CAS-REPAIR-001 / CRIT-CEF-R14-RCV-CAS-REPAIR-001 / REQ-CEF-R14-RCV-SEC-001
 func TestRepairCASHFilenameMismatch_RecoversCorruptedFile(t *testing.T) {
 	dir := t.TempDir()
 	kindDir := datacell.CellCASPrimaryDir(dir, "backlog")

@@ -9,7 +9,7 @@ import (
 // "brain" directories. Markers are data — add/remove as the IDE/agent market shifts
 // without rewriting doctor call sites.
 //
-// TRACK: CRIT-COMMS-007 — keep markers aligned with real vendor layout churn.
+// keep markers aligned with real vendor layout churn.
 type VendorPathPolicy struct {
 	// ForbiddenMarkers are path/content substrings that must not appear in
 	// project-root, resolved feed paths, or lite policy payloads.

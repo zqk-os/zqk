@@ -30,7 +30,6 @@ var streamMapPool = sync.Pool{
 }
 
 // DefaultMaxStreamListLimit is the upper bound on segment objects returned when limit <= 0 to prevent unbounded memory exhaustion.
-// TRACK: BLI-CEF-R2-PERF-LIMIT0 / REQ-CEF-R2-PERF-LIMIT0 / CRIT-CEF-R2-PERF-LIMIT0-A
 const DefaultMaxStreamListLimit = 10000
 
 // listStreamSegmentsWithLimit lists matching objects in stream segments using a parallel worker pool, up to a limit.

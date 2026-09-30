@@ -5,7 +5,6 @@
 // Seed at execution lock (cold List of members). Hops CAS this field. Non-zero: stop, no status
 // catalyst. Zero: YAML auto complete (new catalyst). Do not List members on the hop.
 // Unset field fail-closes.
-// TRACK: BLI-CEF-CONTAINER-REMAINING-OPEN-001
 
 package lifecycle
 
@@ -189,7 +188,6 @@ func isBacklogItemTerminalStatus(status string) bool {
 // SeedRemainingOpenCountFromMembers lists child→parent members once (cold path at
 // execution lock) and writes remaining_open_count. Does not write a sidecar.
 // Membership filter today is backlog_item.priority_plan_ref (only PRI composes remaining_open).
-// TRACK: BLI-CEF-CONTAINER-REMAINING-OPEN-001
 func SeedRemainingOpenCountFromMembers(ctx context.Context, provider storage.ObjectStorageProvider, containerID string, force bool) error {
 	if provider == nil || containerID == emptyValue {
 		return nil

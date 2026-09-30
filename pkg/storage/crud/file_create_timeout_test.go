@@ -82,7 +82,6 @@ func TestFileObjectStorage_Create_WithBlockedIOQueue(t *testing.T) {
 	}
 }
 
-// TRACK: BLI-CEF-R16-CREATE-CTXCANCEL-001 / CRIT-CEF-R16-CREATE-CTXCANCEL-001 / REQ-CEF-R2-REL-OIDCACHE-SWALLOW
 func TestFileObjectStorage_Create_HonestContextCancellationUnderContention(t *testing.T) {
 	tmpDir := t.TempDir()
 	storage.MustEnsureProcessSpecsLayoutForTest(t, tmpDir)

@@ -119,10 +119,8 @@ const (
 	// FieldCRIShovelReady is the overlay error field for CRI-SHOVEL-READY (not a spec FieldKey).
 	FieldCRIShovelReady = "cri_shovel_ready"
 	// OpRefuseDuplicateRefs refuses intra-object duplicate target IDs across or within reference fields.
-	// TRACK: TDE-CEF-CAS-SPEC-FIELD-DIFF-001
 	OpRefuseDuplicateRefs = "refuse_duplicate_refs"
 	// OpRefuseUnknownFields refuses fields not declared on the resolved object spec.
-	// TRACK: TDE-CEF-CAS-SPEC-FIELD-DIFF-001
 	OpRefuseUnknownFields = "refuse_unknown_fields"
 	// OpValidatePriorityValues validates priority and priority_tier are legitimate values if present.
 	OpValidatePriorityValues = "validate_priority_values"

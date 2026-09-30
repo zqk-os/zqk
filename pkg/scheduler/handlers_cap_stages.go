@@ -416,7 +416,7 @@ func (h *CapOrchestratorHandler) executeGroomingStage(ctx context.Context, exe s
 
 	// Stay ahead of the swarm: still wake TPM even when whats-next has no plan
 	// (starvation case). Stage advance remains gated on delivery evidence.
-	// TRACK: / BLI-ATK-MERGE-UP-HYGIENE-001 — kernel stage prompts.
+	// kernel stage prompts.
 	ambientCtx := h.capStageAGIInstruction(ctx, "cap_stage_grooming", planID)
 
 	// Anticipatory Runway Replenishment: evaluate delta_runway <= 1 watermark and feed shovel-ready bundles to TPM

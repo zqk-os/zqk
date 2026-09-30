@@ -140,7 +140,6 @@ func ProtocolField(p string) Field  { return String(logFieldKeyProtocol, p) }
 // maxLoggedErrorTextBytes caps error/arguments strings written into JSONL sinks
 // (e.g. .zqk/scheduler/diagnostics.jsonl). Unbounded MCP tool dumps previously
 // produced ~1MB lines that broke SCH-evag ("bufio.Scanner: token too long").
-// TRACK: BLI-CAS-HAND-DUP-CHECK-001
 const maxLoggedErrorTextBytes = 8 * 1024
 
 func truncateLoggedText(msg string) string {

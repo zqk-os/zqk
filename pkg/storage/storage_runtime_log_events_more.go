@@ -377,7 +377,7 @@ const (
 )
 
 // Object-id-cache pending journal ([object_id_cache_pending]).
-// TRACK: BLI-CEF-R2-REL-OIDCACHE-SWALLOW — load/persist I/O must not be silent.
+// load/persist I/O must not be silent.
 const storageObjectIDCachePendingWirePrefix = "storage_object_id_cache_pending"
 
 const (

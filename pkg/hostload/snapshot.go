@@ -57,7 +57,6 @@ func (s Snapshot) Level() Level {
 }
 
 // Disabled reports that live host sensing is opted out (always headroom).
-// TRACK: TDE-CEF-ZQKENV-AGENT-GUARD-SPLIT-001
 func Disabled() bool {
 	return zqkenv.HostloadDisable().Get() == enabledFlagValue
 }

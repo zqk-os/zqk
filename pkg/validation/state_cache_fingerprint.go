@@ -15,7 +15,7 @@ import (
 
 // runningExecutableFingerprint is the production identity mixed into the
 // validation cache checksum. A rebuild (size or mtime change) drops stale
-// Layer 1 hits on the next Load. TRACK: PRI-CEF-R26-LIFECYCLE-EXAM-001
+// Layer 1 hits on the next Load.
 func runningExecutableFingerprint() string {
 	exe, err := fileutil.Executable()
 	if err != nil || exe == emptyValue {
@@ -33,7 +33,7 @@ var fileContentHashes stampmemo.Table[[]byte] // keyed by checker/lifecycle path
 // computeValidationCodeChecksum fingerprints the running executable plus
 // checker/lifecycle sources so system check reloads when the verdict logic
 // changes. Globs are the coverage contract; ValidationCodeChecksumFiles is a
-// union for sparse test roots. TRACK: PRI-CEF-R26-LIFECYCLE-EXAM-001
+// union for sparse test roots.
 func computeValidationCodeChecksum(projectRoot string) string {
 	hasher := sha256.New()
 	anyMaterial := false

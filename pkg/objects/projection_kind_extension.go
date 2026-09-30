@@ -12,7 +12,7 @@ import (
 //
 // Work-envelope clocks/effort are **not** listed here: they follow KindHasTrait
 // (completable → started_at; effort_aware → estimated_effort, actual_effort).
-// completed_at stays a global slot. TRACK: BLI-KERNEL-WORK-ENVELOPE-001
+// completed_at stays a global slot.
 var kindProjectionExtensions = map[string][]string{
 	KindBacklogItem: {
 		FieldKeyPriorityTier,

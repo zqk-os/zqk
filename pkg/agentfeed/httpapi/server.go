@@ -268,7 +268,7 @@ func (s *Server) handleSteer(w http.ResponseWriter, r *http.Request) {
 		out[agentfeed.JSONFieldPeerAckAwaitID] = aw.ID
 		out[agentfeed.JSONFieldAwaitPeerAck] = true
 	}
-	// TRACK: CRIT-COMMS-003 — HTTP steer must match CLI: WakePeer + MCP ActionRequired evidence.
+	// HTTP steer must match CLI: WakePeer + MCP ActionRequired evidence.
 	s.attachPeerWake(r.Context(), out, req.Message, agentID, toAgentID, res)
 	writeJSON(w, http.StatusOK, out)
 }
@@ -415,7 +415,7 @@ func (s *Server) handleWake(w http.ResponseWriter, r *http.Request) {
 }
 
 // attachPeerWake runs the seat membrane wake (and MCP live interrupt for notify)
-// into out. TRACK: CRIT-COMMS-003 / BLI-COMMS-TPM-LIVE-WAKE-001.
+// into out.
 func (s *Server) attachPeerWake(ctx context.Context, out map[string]any, message, agentID, toAgentID string, res agentfeed.AppendEventResult) {
 	if !agentfeed.ShouldWakePeer(res.DeliveryMode) {
 		return

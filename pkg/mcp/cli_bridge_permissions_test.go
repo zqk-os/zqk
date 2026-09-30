@@ -6,7 +6,6 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
-// TRACK: BLI-CEF-R2-REL-MCP-PERMS-FAILOPEN
 func TestHasPermission_UnannotatedFailClosed(t *testing.T) {
 	t.Parallel()
 	unannotated := &DiscoveredCommand{Use: "mystery", Path: "mystery"}

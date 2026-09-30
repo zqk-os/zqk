@@ -19,7 +19,6 @@ type DarwinAdapter struct{}
 
 // keepAlivePlistXML is crash-only KeepAlive (SuccessfulExit=false).
 // Unconditional <true/> overrides intentional `scheduler stop` via launchd.
-// TRACK: BLI-CAS-PW-FAIL-CLOSED-001 / post-reboot hostservice disarm — keep crash-only.
 func keepAlivePlistXML() string {
 	return `  <key>KeepAlive</key>
   <dict>
@@ -138,7 +137,7 @@ func (a DarwinAdapter) Stop(e Entry) error {
 	_ = execwrap.Command("launchctl", "kill", "SIGTERM", target).Run()
 	// bootout (not launchctl stop): KeepAlive SuccessfulExit=false respawns after
 	// non-zero signal exits, so plain stop looks successful then immediately runs again.
-	// TRACK: BLI-SCHED-HOST-SERVICE-STOP-STICK-001 — intentional disable vs crash-only KeepAlive.
+	// intentional disable vs crash-only KeepAlive.
 	if err := execwrap.Command("launchctl", "bootout", domain, plist).Run(); err != nil {
 		_ = execwrap.Command("launchctl", "bootout", target).Run()
 		_ = execwrap.Command("launchctl", "unload", "-w", plist).Run()

@@ -167,7 +167,6 @@ func (f *FileObjectStorage) Create(ctx context.Context, secCtx *pkgctx.SecurityC
 
 	// Decide draft plane from the live object map (post-metadata), not a re-unmarshal of YAML.
 	// Incomplete criteria park off CAS unless --promote, which hits the membrane.
-	// TRACK: BLI-KERNEL-CRIT-CATEGORY-MINT-001
 	useDraftPlane := caspkg.UseObjectDraftPlane(kind, obj, pkgctx.GetPromoteOnCreate(ctx))
 	if StreamStorageEnabledForKind(kind) {
 		useDraftPlane = false

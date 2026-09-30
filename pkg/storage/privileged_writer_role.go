@@ -15,7 +15,6 @@ func (f *FileObjectStorage) ownsWriteBehind() bool {
 
 // rejectWriteBehindOnPrivilegedWriterRole is the constructor fail-closed:
 // a writer-daemon process must not own write-behind or object.wal.
-// TRACK: BLI-CEF-R20-SINGLE-WRITER-BLI-001
 func rejectWriteBehindOnPrivilegedWriterRole(f *FileObjectStorage) error {
 	if !zqkenv.PrivilegedWriterDaemonRole() {
 		return nil

@@ -66,7 +66,7 @@ func StartWorkerSession(
 // reference validation. Readability is not enough: stream-backed zqk_session
 // locators are segmentPath::offset, and Tier-2 os.Stat's that string as a file.
 // Kind membership comes from high_volume_kinds.yaml via StreamStorageEnabledForKind.
-// TRACK: BLI-COMMS-ORCH-EXECUTE-NOT-ACK-001 — restore the ref when stream
+// restore the ref when stream
 // locators are first-class persistable refs.
 func persistableParentSessionRef(ctx context.Context, sp storage.ObjectStorageProvider, parent string) string {
 	parent = strings.TrimSpace(parent)

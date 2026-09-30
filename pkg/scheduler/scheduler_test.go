@@ -327,7 +327,7 @@ func TestPriorityDispatchJob_TimerMaintenance(t *testing.T) {
 	if !priorityDispatchJob(&ScheduledJob{TriggerType: "timer", Category: CategoryDataCellEnvelope, JobType: JobTypeDataCellEnvelopeTick}) {
 		t.Error("data_cell_envelope_tick + data_cell_envelope category should use priority dispatch via critical job types")
 	}
-	// Immediate manual/user one-shots and callback-bearing jobs use priority dispatch. TRACK: TDE-1789630460110488000-1f2e7aa3
+	// Immediate manual/user one-shots and callback-bearing jobs use priority dispatch.
 	if !priorityDispatchJob(&ScheduledJob{TriggerType: "immediate", Category: CategoryManual, JobType: "run_wrapper"}) {
 		t.Error("immediate + CategoryManual should use priority dispatch")
 	}
@@ -1137,7 +1137,7 @@ func TestScheduler_TriggerJobByLifecycle_MilestoneAutoComplete(t *testing.T) {
 	sched.SetSecurityContext(secCtx)
 	ctx := pkgctx.NewSystemContext()
 
-	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+	//
 	milestoneID := "MIL-test-milestone"
 	milestoneData := map[string]any{
 		objects.FieldKeyID:              milestoneID,

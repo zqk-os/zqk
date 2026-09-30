@@ -11,7 +11,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/validation"
 )
 
-// TRACK: BLI-CEF-ARCH-SYSTEM-TRANCHE1 — registration/lifecycle check helpers
+// registration/lifecycle check helpers
 // extracted from cmd/zqk/system (F-ARCH-001).
 
 const emptyValue = ""

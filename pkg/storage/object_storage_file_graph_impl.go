@@ -243,7 +243,7 @@ func (f *FileObjectStorage) GetNeighbors(ctx context.Context, secCtx *pkgctx.Sec
 
 	// Handle incoming (objects that reference this)
 	if direction == "incoming" || direction == "both" {
-		// TRACK: BLI-PHASE3-GETNEIGHBORS-INDEX (F-ARCH-004) — use DependentsForID
+		// — use DependentsForID
 		// which queries in-memory ReverseReferenceIndex (O(1)) and candidate referencing
 		// kinds, eliminating unbounded O(N) full directory traversal and YAML deserialization storms.
 		deps := DependentsForID(ctx, f, normalizedID)

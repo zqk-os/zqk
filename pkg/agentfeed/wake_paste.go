@@ -26,7 +26,7 @@ const (
 
 	// Role placeholders when ToAgentID is empty and peer_seats.json has no matching
 	// duty. Match scripts/mesh/peer_seats.example.json — not a vendor product.
-	// TRACK: TDE-MESH-DEFAULT-SEAT-PEER-AGENT-01-001 — prefer live ToAgentID, then seating config.
+	// prefer live ToAgentID, then seating config.
 	FallbackPasteAgentWorker      = "peer-agent-1"
 	FallbackPasteAgentCoordinator = "peer-operator-1"
 )

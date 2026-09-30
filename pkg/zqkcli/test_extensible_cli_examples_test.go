@@ -180,7 +180,7 @@ func TestExtensibleCLIExamples(t *testing.T) {
 		ctx := pkgctx.NewSystemContext()
 		secCtx := pkgctx.NewSystemSecurityContext()
 		// CLI create lands on origin `created` (preliminary). Promote so Read/List see CAS.
-		// TRACK: BLI-1785443942668406000-1ec5c811
+		//
 		promoteCtx := pkgctx.WithLifecycleBreakGlass(ctx, "extensible CLI example promote off draft plane")
 		for _, id := range createdIDs {
 			if err := storageProvider.Update(promoteCtx, secCtx, id, map[string]any{objects.FieldKeyStatus: objects.ObjectStatusValidated}); err != nil {

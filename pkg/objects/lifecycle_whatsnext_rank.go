@@ -41,7 +41,7 @@ func PlanStatusEligibleForWhatsNext(kind, status string) bool {
 
 // PlanHasWrittenIdentity uses inherited title (base_object, required at create)
 // or specialized description. Do not require both — description is optional prose
-// on top of title. TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+// on top of title.
 func PlanHasWrittenIdentity(obj map[string]any) bool {
 	if obj == nil {
 		return false

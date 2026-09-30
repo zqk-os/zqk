@@ -23,7 +23,6 @@ import (
 
 // writeMeshLeaseDaemonStub installs a long-lived stub at projectRoot/bin/zqk so
 // ResolveSchedulerDaemonBinary can Start without requiring a full CLI build.
-// TRACK: BLI-1785443942668406000-1ec5c811 — mesh lease supervision integration spawn.
 func writeMeshLeaseDaemonStub(t *testing.T, projectRoot string) {
 	t.Helper()
 	binDir := filepath.Join(projectRoot, binDirName)

@@ -25,7 +25,7 @@ type IDLoaderLogger interface {
 // ExpandCommaSeparatedIDs expands positional / flag tokens that may contain
 // comma-separated object IDs (e.g. "ATK-1,ATK-2" or "ATK-1", "ATK-2,ATK-3").
 // Empty segments after trim are dropped. Used by object update/delete/get so
-// multi-ID CLI DNA matches (TRACK: BLI-CEF-CLI-MULTI-ID-UPDATE).
+// multi-ID CLI DNA matches.
 func ExpandCommaSeparatedIDs(tokens ...string) []string {
 	if len(tokens) == 0 {
 		return nil

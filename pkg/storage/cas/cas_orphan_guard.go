@@ -26,7 +26,6 @@ type CASOrphanGuardResult struct {
 // It checks that staged deletions under .zqk/process/ do not leave orphan references
 // in surviving objects. This is the Go equivalent of scripts/check-process-delete-refs-staged.sh.
 //
-// TRACK: BLI-CAS-GIT-PACKAGE-ORPHAN-GUARD-001
 type CASOrphanGuard struct {
 	RepoRoot string
 }

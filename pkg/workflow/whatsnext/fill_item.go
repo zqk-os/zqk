@@ -62,7 +62,6 @@ func FillCmdDraftPromoteDryRun() string {
 }
 
 // FillItem is one claimable kernel job when the lead has no live ATK.
-// TRACK: BLI-COMMS-TPM-DUTY-ORCHESTRATE-001
 type FillItem struct {
 	Kind         string `json:"kind"`
 	Reason       string `json:"reason"`

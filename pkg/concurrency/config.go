@@ -85,7 +85,6 @@ const defaultSchedulerTestJobParallelism = 2
 //
 // That static budget is the ceiling. Live host CPU pressure (AV, other tenants) further scales it
 // via pkg/hostload so ZQK does not pile on when the machine is already starved.
-// TRACK: TDE-CEF-HOST-CPU-BACKPRESSURE-001
 //
 // Clamped to [1, 8]: a single-core host must still make progress, and beyond 8 the limit stops being
 // the binding constraint — disk and the CAS index lock are, as a --all scan showed by timing out

@@ -162,7 +162,6 @@ func (f *FileObjectStorage) getContentAddressableStorage(kind string) (*filecas.
 	})
 
 	// Identity commit: required post-sync so ACK cannot outrun object-id-cache.
-	// TRACK: TDE-CEF-CAS-IDENTITY-TXN-001
 	cas.SetRequiredPostSyncCallback(func(objectID, casKind, hash, filePath string) error {
 		if cacheOperationHandler == nil {
 			return errfmt.Errorf(ErrMsgIdentityCacheHandlerRequired)

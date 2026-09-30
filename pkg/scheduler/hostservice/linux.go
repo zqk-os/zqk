@@ -70,7 +70,6 @@ func (a LinuxAdapter) Start(e Entry) error {
 
 func (a LinuxAdapter) Stop(e Entry) error {
 	// stop + disable so Restart=on-failure cannot race and desired_state=disabled sticks.
-	// TRACK: BLI-SCHED-HOST-SERVICE-STOP-STICK-001
 	_ = execwrap.Command("systemctl", "--user", "stop", e.UnitLabel+".service").Run()
 	if err := execwrap.Command("systemctl", "--user", "disable", e.UnitLabel+".service").Run(); err != nil {
 		return errfmt.Newf("systemctl disable").Wrap(err)

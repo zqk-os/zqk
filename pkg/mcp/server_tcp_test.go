@@ -73,7 +73,6 @@ func dialLoopbackTCP(t *testing.T, addr string) net.Conn {
 	return nil
 }
 
-// TRACK: BLI-CEF-R15-MCP-TCP-AUTH-001 / REQ-CEF-R2-SEC-MCP-TCP-AUTH
 func TestServeTCP_RefusesNonLoopback(t *testing.T) {
 	s := NewServer()
 	nonLoopbackAddrs := []string{
@@ -92,7 +91,6 @@ func TestServeTCP_RefusesNonLoopback(t *testing.T) {
 	}
 }
 
-// TRACK: CRIT-CEF-R2-SEC-MCP-TCP-AUTH-A
 func TestServeTLS_RefusesNonLoopback(t *testing.T) {
 	s := NewServer()
 	nonLoopbackAddrs := []string{
@@ -111,7 +109,6 @@ func TestServeTLS_RefusesNonLoopback(t *testing.T) {
 	}
 }
 
-// TRACK: BLI-CEF-R15-MCP-TCP-AUTH-001 / CRIT-CEF-R15-MCP-LOOPBACK-AUTH-001 / REQ-CEF-R2-SEC-MCP-TCP-AUTH
 func TestServeTCP_LoopbackRefusesUnauthenticatedToolsList(t *testing.T) {
 	s := NewServer()
 
@@ -167,7 +164,6 @@ func TestServeTCP_LoopbackRefusesUnauthenticatedToolsList(t *testing.T) {
 	s.RequestShutdown("test complete")
 }
 
-// TRACK: BLI-CEF-R15-MCP-TCP-AUTH-001 / CRIT-CEF-R15-MCP-LOOPBACK-AUTH-001 / REQ-CEF-R2-SEC-MCP-TCP-AUTH
 func TestServeTCP_LoopbackRefusesInitializeWithoutCredentialsThenToolsList(t *testing.T) {
 	s := NewServer()
 
@@ -263,7 +259,6 @@ func TestServeTCP_LoopbackRefusesInitializeWithoutCredentialsThenToolsList(t *te
 	s.RequestShutdown("test complete")
 }
 
-// TRACK: BLI-CEF-R2-REL-MCP-RECONNECT / CRIT-CEF-R15-MCP-LOOPBACK-AUTH-001
 func TestServeTCP_LoopbackAllowsNamedIDEAdapterWithoutCredentials(t *testing.T) {
 	s := NewServer()
 
@@ -321,7 +316,6 @@ func TestServeTCP_LoopbackAllowsNamedIDEAdapterWithoutCredentials(t *testing.T) 
 	s.RequestShutdown("test complete")
 }
 
-// TRACK: BLI-CEF-R15-MCP-TCP-AUTH-001 / CRIT-CEF-R15-MCP-LOOPBACK-AUTH-001 / REQ-CEF-R2-SEC-MCP-TCP-AUTH
 func TestServeTCP_LoopbackRefusesSpoofedClientIDWithoutCredentials(t *testing.T) {
 	s := NewServer()
 
@@ -419,7 +413,6 @@ func TestServeTCP_LoopbackRefusesSpoofedClientIDWithoutCredentials(t *testing.T)
 	s.RequestShutdown("test complete")
 }
 
-// TRACK: BLI-CEF-R14-SEC-MCP-SURFACE-001 / CRIT-CEF-R14-SEC-MCP-SURFACE-001 / REQ-CEF-R14-RCV-SEC-001
 func TestServeTCP_SecretsNotLoggedAndToolAuthorizationEnforced(t *testing.T) {
 	s := NewServer()
 

@@ -78,7 +78,7 @@ func (e *MembraneHopBlockedError) Error() string {
 // TransitionAllowed reports whether lifecycle declares an edge from→to (including '*' from).
 // Unknown `from` values (not named in the kind's statuses) may hop onto a park
 // target so illegally persisted statuses can re-enter the state machine.
-// TRACK: BLI-KERNEL-UNPAIRED-DELETE-INBOUND-001 — illegal status repair via park.
+// illegal status repair via park.
 func TransitionAllowed(lifecycle *objects.Lifecycle, from, to string) bool {
 	if lifecycle == nil {
 		return false

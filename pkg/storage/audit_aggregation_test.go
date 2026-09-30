@@ -387,7 +387,7 @@ func TestAuditAggregationService_QueryAuditEventsInWindow(t *testing.T) {
 	for _, ev := range events {
 		leave := objects.GetString(ev, objects.FieldKeyStatus)
 		// Create parks completed/failed intents on draft (origin pending); promote for List.
-		// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+		//
 		CreateCASVisible(t, fileStorage, ctx, secCtx, ev, leave)
 	}
 

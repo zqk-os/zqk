@@ -22,7 +22,6 @@ type objectReader interface {
 // priority_plan: only complete (last-child closeout) — promote→archived owns the prune burrito.
 // backlog_item with a live/complete plan_ref: skip; the plan promote shockwave archives children.
 // backlog_item under an already-archived plan (or orphan): eligible for direct archive.
-// TRACK: Layer1 archived-BLI-under-complete-PRI retention burrito
 func retentionArchiveCandidate(
 	ctx context.Context,
 	secCtx *pkgctx.SecurityContext,

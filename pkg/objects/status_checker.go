@@ -89,7 +89,7 @@ func (sc *StatusChecker) IsSystem(kind, status string) bool {
 }
 
 // IsWorkDone reports whether the status is a work-interval finish (not archive).
-// TRACK: BLI-KERNEL-WORK-ENVELOPE-001 — envelope autofill keys off this flag, not status==complete.
+// envelope autofill keys off this flag, not status==complete.
 func (sc *StatusChecker) IsWorkDone(kind, status string) bool {
 	if s, ok := sc.getStatusSpec(kind, status); ok {
 		return s.WorkDone && !s.Archive

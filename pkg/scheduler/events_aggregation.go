@@ -57,7 +57,7 @@ var (
 // Uses ReadBytes (not bufio.Scanner) so multi-MB JSONL lines — e.g. MCP tool errors that
 // dumped full object-list payloads into diagnostics.jsonl — do not abort SCH-evag with
 // "bufio.Scanner: token too long". Non-job lines are skipped without JSON unmarshal.
-// TRACK: BLI-CAS-HAND-DUP-CHECK-001 — pair with logging.ErrorTextField truncation.
+// pair with logging.ErrorTextField truncation.
 func AggregateEventsFromFile(eventsPath string) (*SchedulerMetricsSummary, int, error) {
 	f, err := fileutil.Open(eventsPath)
 	if err != nil {

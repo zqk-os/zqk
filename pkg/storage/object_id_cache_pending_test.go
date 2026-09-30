@@ -13,7 +13,6 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-// TRACK: BLI-1785895580100186000-c5539372
 func TestObjectIDCachePending_NoteClearIs(t *testing.T) {
 	root := t.TempDir()
 	ResetObjectIDCachePendingForTest()
@@ -120,7 +119,6 @@ func TestGetFilePathForID_DropsGhostMapping(t *testing.T) {
 	}
 }
 
-// TRACK: BLI-CEF-R16-OIDCACHE-SWALLOW-001 / CRIT-CEF-R2-REL-OIDCACHE-SWALLOW-A / REQ-CEF-R2-REL-OIDCACHE-SWALLOW
 func TestObjectIDCachePending_LoadErrorDoesNotClobberCorruptJournal(t *testing.T) {
 	root := t.TempDir()
 	ResetObjectIDCachePendingForTest()
@@ -148,7 +146,6 @@ func TestObjectIDCachePending_LoadErrorDoesNotClobberCorruptJournal(t *testing.T
 	}
 }
 
-// TRACK: BLI-CEF-R2-REL-OIDCACHE-SWALLOW
 func TestObjectIDCachePending_PersistErrorIsRetained(t *testing.T) {
 	root := t.TempDir()
 	ResetObjectIDCachePendingForTest()

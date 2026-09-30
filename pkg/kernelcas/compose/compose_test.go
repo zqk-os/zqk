@@ -438,7 +438,7 @@ func TestValidateObjectIntent_transitionRequiresShovelReady(t *testing.T) {
 	if err := WarmDefaultRegistry(""); err != nil {
 		t.Fatal(err)
 	}
-	// Hold overlays satisfied; CRI-SHOVEL-READY refs missing. TRACK: CRIT-SHOVEL-READY
+	// Hold overlays satisfied; CRI-SHOVEL-READY refs missing.
 	obj := map[string]any{
 		objects.FieldKeyKind:            objects.KindBacklogItem,
 		objects.FieldKeyStatus:          objects.ObjectStatusInProgress,

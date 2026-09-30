@@ -20,7 +20,6 @@ func resetReverseReferenceIndexSyncForTest(t *testing.T) {
 
 // TestReverseReferenceIndex_CUDPersistsAcrossProcessRestart proves the bugfix:
 // CUD must SaveCache so a fresh process LoadCache sees dependents (membership / promote).
-// TRACK: REQ-CEF-R2-REL-REVINDEX-FAILOPEN
 func TestReverseReferenceIndex_CriteriaRefsUpdateAddsDependent(t *testing.T) {
 	resetReverseReferenceIndexSyncForTest(t)
 	t.Cleanup(func() { resetReverseReferenceIndexSyncForTest(t) })

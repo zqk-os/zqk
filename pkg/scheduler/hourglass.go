@@ -408,7 +408,7 @@ func newMissedDeadlineRiskBlockerID() string {
 }
 
 // hourglassSourcePresent is the Exists gate for missed-deadline / silent-claim RIS mint.
-// TRACK: BLI-CEF-R26-DEADLINE-RIS-CLOSE-001 — process heal landed; mint still wrote
+// process heal landed; mint still wrote
 // GhostRefs when the ATK was already gone (2026-08-31 ).
 type hourglassExister interface {
 	Exists(ctx context.Context, secCtx *pkgctx.SecurityContext, id string) (bool, error)

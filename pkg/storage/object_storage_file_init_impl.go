@@ -252,7 +252,6 @@ func NewFileObjectStorage(projectRoot string, opts ...*FileObjectStorageOptions)
 	// renames leave deleted-inode FDs and explode handle counts (see object_wal_registry.go).
 	// Privileged-writer daemon is the CAS endpoint, not a second WAL owner: replay here
 	// is the 8GB / EMFILE footgun (sample 2026-08-26 zqk-stable object daemon).
-	// TRACK: BLI-CEF-R20-SINGLE-WRITER-BLI-001
 	if projectRoot != emptyValue && !f.skipGlobalWiring && !zqkenv.PrivilegedWriterDaemonRole() {
 		wal, err := AcquireObjectWAL(projectRoot)
 		if err != nil {

@@ -320,7 +320,7 @@ func TestFileObjectStorage_GetNeighbors(t *testing.T) {
 		{objects.FieldKeyID: "BLI-002", objects.FieldKeyKind: "backlog_item", objects.FieldKeyTitle: "Item 2", objects.FieldKeyStatus: objects.ObjectStatusExploring, objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion, objects.FieldKeyCategory: "development", objects.FieldKeyGoalRefs: []string{"GOAL-001"}},
 	}
 
-	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+	//
 	for _, obj := range neighborFixtures {
 		leave := ""
 		if obj[objects.FieldKeyKind] == "backlog_item" {

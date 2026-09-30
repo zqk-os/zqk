@@ -23,11 +23,9 @@ const TraitStatusReactive = "status_reactive"
 
 // TraitOpenCountable is the object-level remaining-open capability. Fields live on
 // the remaining_open mixin (remaining_open_count). Parallel: occupiable vs occupancy.
-// TRACK: POL-ARCH-20260901 / BLI-CEF-CONTAINER-REMAINING-OPEN-001
 const TraitOpenCountable = "open_countable"
 
 // TraitOccupiable indicates an object carries an occupancy slot (claimed_by, claimed_at).
-// TRACK: TDE-CEF-IN-PROGRESS-REQUIRES-CLAIM-001
 const TraitOccupiable = "occupiable"
 
 // TraitFieldReferenceGroup is the field-level group for kernel object pointers
@@ -418,7 +416,6 @@ func (tr *TraitRegistry) ValidateTraitsWithContext(traits []string, level string
 // TraitValidationCategoryRedundantInclude is emitted when an authored trait list
 // restates a name already conferred by another listed trait's Includes
 // (effort_aware/completable, base_object_traits/base_auditable_traits).
-// TRACK: TDE-CEF-TRAIT-INCLUDE-REDUNDANT-001
 const TraitValidationCategoryRedundantInclude = "redundant_include"
 
 // TraitValidationError represents a trait validation error
@@ -693,7 +690,7 @@ func parseTraitFile(filePath string) (*TraitDefinition, error) {
 		Category    string `yaml:"category"`
 		ObjectLevel bool   `yaml:"object_level"`
 		FieldLevel  bool   `yaml:"field_level"`
-		// TRACK: BLI-KERNEL-WORK-ENVELOPE-001 — drop concatenated aliases after traits/*.yaml are snake_case only.
+		// drop concatenated aliases after traits/*.yaml are snake_case only.
 		ObjectLevelLegacy bool           `yaml:"objectlevel"`
 		FieldLevelLegacy  bool           `yaml:"fieldlevel"`
 		Requires          []string       `yaml:"requires"`

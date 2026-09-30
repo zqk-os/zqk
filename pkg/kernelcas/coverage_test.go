@@ -12,7 +12,6 @@ import (
 // TestMutatorPackagesReferenceAllowlistedKinds is a lightweight coverage gate:
 // storage + system check/state-restore sources must mention at least one kernel.cas_* kind
 // (or the kernelcas package import path) so mutators stay on the pipeline allowlist.
-// TRACK: BLI-1785784868493840000-a8a0b4fc
 func TestMutatorPackagesReferenceAllowlistedKinds(t *testing.T) {
 	_, thisFile, _, ok := runtime.Caller(0)
 	if !ok {

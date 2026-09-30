@@ -6,7 +6,6 @@ import (
 	"time"
 )
 
-// TRACK: TST-CELLULAR-DNA-CORE-001 / BLI-CELLULAR-DNA-LIFECYCLE-SUITE-013 / CRIT-CELLULAR-METABOLIC-LIFECYCLE-006
 
 // MockEntity implements Auditable and Lifecycle for testing.
 type MockEntity struct {

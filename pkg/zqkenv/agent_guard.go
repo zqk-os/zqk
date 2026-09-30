@@ -9,7 +9,6 @@ import (
 
 // EnforceForegroundGoTestGuard panics if an agent executes foreground go test without bypass.
 // It is intended to be invoked by the agentguard package on import.
-// TRACK: TDE-CEF-ZQKENV-AGENT-GUARD-SPLIT-001
 func EnforceForegroundGoTestGuard() {
 	// Agent-facing poison pill: IDE/agent terminals must not run unbounded
 	// foreground `go test` as a substitute for kernel test_case runs.

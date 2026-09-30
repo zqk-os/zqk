@@ -7,7 +7,6 @@ import (
 	"strings"
 )
 
-// TRACK: BLI-CELLULAR-DNA-LIFECYCLE-SUITE-013 / CRIT-CELLULAR-METABOLIC-LIFECYCLE-006
 
 // Actor returns the canonical agent or actor identifier, preferring AgentURN if populated.
 func (p Provenance) Actor() string {

@@ -1054,7 +1054,6 @@ func resolveValidationProjectRoot(options *ValidationOptions) string {
 
 // checkMachineCheckableClosureEvidence requires valid scheduler job id, bundle log, and re-read green fingerprint.
 // When already holding status=complete, skip (grandfather historical completes); transitions into complete always enforce.
-// TRACK: BLI-CEF-R19-CLOSURE-GATE-001 / REQ-CEF-R19-EVIDENCE-001
 func (gv *GoValidator) checkMachineCheckableClosureEvidence(obj map[string]any, options *ValidationOptions) bool {
 	if options != nil {
 		cur := strings.ToLower(strings.TrimSpace(options.CurrentState))

@@ -11,7 +11,7 @@ import (
 )
 
 func TestTryEmitAllAcceptanceCriteriaMetForBacklogItem_AppendsCriterionSatisfied(t *testing.T) {
-	// TRACK: BLI-1785443942668406000-1ec5c811 — no t.Parallel: shared Memgraph + fixed fixture IDs.
+	//
 
 	projectRoot := t.TempDir()
 	ctx := context.Background()
@@ -64,7 +64,7 @@ func TestTryEmitAllAcceptanceCriteriaMetForBacklogItem_AppendsCriterionSatisfied
 }
 
 func TestTryEmitForBacklogItemsContainingCriterion_LoadsViaCriteriaRefsIndex(t *testing.T) {
-	// TRACK: BLI-1785443942668406000-1ec5c811 — no t.Parallel: shared Memgraph + fixed fixture IDs.
+	//
 
 	projectRoot := t.TempDir()
 	ctx := context.Background()

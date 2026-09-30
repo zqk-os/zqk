@@ -27,7 +27,7 @@ const highRiskBashPolicyID = "POL-CODE-HIGH-RISK-BASH-001"
 
 // fileSandboxRoot is where write/read/bash file I/O lands. Isolated ATK
 // worktrees set AGENT_WORKTREE_ROOT so the kernel PROJECT_ROOT (sessions,
-// objects) stays on studio. TRACK: BLI-COMMS-ORCH-EXECUTE-NOT-ACK-001
+// objects) stays on studio.
 func fileSandboxRoot(projectRoot string) string {
 	if wt := strings.TrimSpace(zqkenv.AgentWorktreeRoot().Get()); wt != "" {
 		return wt

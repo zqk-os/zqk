@@ -74,7 +74,6 @@ func (s *Scheduler) pollAndSpawnSwarmTasks(ctx context.Context) {
 	}
 
 	// Push status into the list filter — do not scan every ATK then discard in Go.
-	// TRACK: BLI-CEF-R27-DUAL-SEAT-REMEASURE-001
 	filter := storage.ListFilter{
 		Kind: objects.KindAgentTask,
 		Filters: map[string]any{

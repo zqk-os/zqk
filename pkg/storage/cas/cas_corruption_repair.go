@@ -41,7 +41,6 @@ type CASCorruptionRepairResult struct {
 // - Move the corrupt file to a quarantine directory for forensic inspection.
 //
 // This targets the Tier-1 "CAS file corruption detected" class of issues.
-// TRACK: BLI-CEF-R14-RCV-CAS-REPAIR-001 / CRIT-CEF-R14-RCV-CAS-REPAIR-001 / REQ-CEF-R14-RCV-SEC-001
 func RepairCASHFilenameMismatch(
 	_ context.Context,
 	projectRoot string,

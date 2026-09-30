@@ -22,7 +22,6 @@ type StorageProviderForCriterion func(projectRoot string) (storage.ObjectStorage
 
 // TryEmitRemainingOpenDrained emits criterion_satisfied when remaining_open_count is 0.
 // Unset field fail-closes (no member List).
-// TRACK: BLI-CEF-CONTAINER-REMAINING-OPEN-001
 func TryEmitRemainingOpenDrained(ctx context.Context, projectRoot, containerID string, getStorage StorageProviderForCriterion) {
 	if projectRoot == emptyValue || containerID == emptyValue || getStorage == nil {
 		return

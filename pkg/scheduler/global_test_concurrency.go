@@ -17,7 +17,7 @@ import (
 const globalTestJobSlotKey = "__global_test_jobs__"
 
 // globalTestJobLimit is the host-derived ceiling on concurrently dispatched run_wrapper jobs.
-// TRACK: TDE-CEF-HOST-CPU-BACKPRESSURE-001 — shrink when the host is already CPU-bound
+// shrink when the host is already CPU-bound
 // (AV, other tenants) instead of always using the static NumCPU/2 budget.
 func globalTestJobLimit() int {
 	n := concurrency.GetGlobalConcurrencyConfig().SchedulerMaxConcurrentTestJobs

@@ -1,6 +1,6 @@
 package storage
 
-// Facade boundary for upcoming decomposition. TRACK: BLI-TRACK-STORAGE-SPLIT-001
+// Facade boundary for upcoming decomposition.
 
 import (
 	"time"

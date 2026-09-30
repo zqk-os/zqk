@@ -425,7 +425,7 @@ func FormatAvailableToolsSuffix(toolNames []string, toolPrefix string) string {
 }
 
 // MarkdownToolCallConventionGuidance is injected after we recover a prose/JSON
-// tool call so the next step uses the native API. TRACK: BLI-COMMS-ORCH-EXECUTE-NOT-ACK-001
+// tool call so the next step uses the native API.
 func MarkdownToolCallConventionGuidance() string {
 	return "CONVENTION: You wrote a tool call in assistant text (markdown/JSON). " +
 		"The host executed it this once. Next step: empty text + native function-calling API. " +

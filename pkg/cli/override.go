@@ -72,7 +72,7 @@ func EnforceOverrideFriction(
 		fmt.Fprintf(cmd.ErrOrStderr(), "  %q\n\n", OverrideConfirmationPhrase)
 		fmt.Fprintf(cmd.ErrOrStderr(), "Type the phrase: ")
 
-		// TRACK: PRI-STABILIZE-FAILCLOSED-READS-001 — Cursor/IDE parent is not zqk; TimeoutHook
+		// Cursor/IDE parent is not zqk; TimeoutHook
 		// idle watchdog (~10s default) cancels OperationContext while the human types the phrase.
 		stopPulse := pulseMeaningfulActivityWhileWaiting()
 		reader := bufio.NewReader(os.Stdin)

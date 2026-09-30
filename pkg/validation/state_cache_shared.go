@@ -13,7 +13,6 @@ import (
 
 // sharedValidationCacheFlushDebounce coalesces dirty signals before JSON-marshal
 // + rename of the full cache. 50ms flushed ~8k entries on a check-completion timer.
-// TRACK: TDE-CEF-VALIDATION-CACHE-SAVE-STORM-001
 const sharedValidationCacheFlushDebounce = 2 * time.Second
 
 // sharedValidationCache wraps a ValidationStateCache with minimal

@@ -45,7 +45,7 @@ func CasHashFilePeekObjectID(path string) string {
 	defer f.Close()
 
 	scanner := bufio.NewScanner(f)
-	// TRACK: TDE-CEF-CHECK-CAS-DUP-SCAN-ON-PRINT-001 — peek only needs the top-level id:
+	// peek only needs the top-level id:
 	// line; 10MiB tokens were inflating RSS on the print-time dup walk.
 	buf := make([]byte, 0, casPeekScanBuf)
 	scanner.Buffer(buf, casPeekMaxToken)

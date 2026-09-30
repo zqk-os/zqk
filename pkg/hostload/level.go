@@ -44,7 +44,7 @@ func OverBudget(inUse, capacity int) bool {
 
 // OverBudgetExcludingSelf is OverBudget after removing already-held occupancy from
 // the host sample. want is the occupancy being requested (typically held+1).
-// TRACK: TDE-CEF-HOST-CPU-BACKPRESSURE-001 — do not bounce system-check slots
+// do not bounce system-check slots
 // because the check itself drove idle below idleTight.
 func OverBudgetExcludingSelf(want, capacity int) bool {
 	if capacity <= 0 {

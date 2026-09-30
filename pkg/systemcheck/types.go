@@ -21,7 +21,6 @@ type Issue struct {
 	FixCommand  string `json:"fix_command,omitempty"` // Command to fix this issue (generated at error time)
 	// IssueClass is the fitness plane class (process_failure, data_completeness, …).
 	// Omitted when empty; populated for surface-filtered projections.
-	// TRACK: REQ-KERNEL-LIFECYCLE-FITNESS-001 / BLI-KERNEL-LF-SURFACE-001
 	IssueClass string `json:"issue_class,omitempty"`
 }
 
