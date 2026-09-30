@@ -62,7 +62,10 @@ func (b *ServerLifecycleBuilder) WithReaderAndWriter(r io.Reader, w io.Writer) *
 
 // LoadConfig loads and applies MCP configuration
 func (b *ServerLifecycleBuilder) LoadConfig() *ServerLifecycleBuilder {
-	config, _ := LoadMCPConfig(b.server.GetProjectRoot()) // Ignore errors - use defaults
+	config, err := LoadMCPConfig(b.server.GetProjectRoot())
+	if err != nil && b.server.getTraceWriter() != nil {
+		b.server.traceLogf("[MCP_DEBUG] LoadMCPConfig using defaults: %v", err)
+	}
 	b.config = config
 	b.server.SetConfig(config) // Store config for security enforcement
 	return b
@@ -130,7 +133,13 @@ func (b *ServerLifecycleBuilder) InitializeClientMetrics() *ServerLifecycleBuild
 		metricsPath := filepath.Join(b.server.GetProjectRoot(), paths.ProjectDataDir, paths.MCPDir, paths.MCPLogsDir, "client-metrics.json")
 		// Pass shutdown context from ProcessGroupManager for proper shutdown handling
 		shutdownCtx := b.server.processGroupManager.GetShutdownContext()
-		store, _ := NewClientMetricsStore(metricsPath, shutdownCtx) //nolint:errcheck // Metrics failures shouldn't block server startup
+		store, err := NewClientMetricsStore(metricsPath, shutdownCtx)
+		if err != nil {
+			if b.server.getTraceWriter() != nil {
+				b.server.traceLogf("[MCP_WARN] Failed to initialize client metrics: %v", err)
+			}
+			return b
+		}
 		b.server.clientMetricsStore = store
 
 		// Start save worker via ProcessGroupManager (CRITICAL - must complete saves during shutdown)
@@ -159,13 +168,15 @@ func (b *ServerLifecycleBuilder) InitializeTraceLogging() *ServerLifecycleBuilde
 			// Closer will be handled by Cleanup
 		}
 		// Thread-safe update of trace writer
-		_ = concurrency.RunInLockWithLogger(
+		if err := concurrency.RunInLockWithLogger(
 			&b.server.traceWriterMu, LockNameMcpServerLifecycleSetTraceWriter, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 			func() error {
 				b.server.traceWriter = b.traceWriter
 				return nil
 			},
-		)
+		); err != nil && b.server.getTraceWriter() != nil {
+			b.server.traceLogf("[MCP_WARN] Failed to set trace writer: %v", err)
+		}
 
 		// Test write to verify trace file is actually writable
 		if b.traceWriter != nil && b.traceWriter != os.Stderr {
@@ -176,25 +187,29 @@ func (b *ServerLifecycleBuilder) InitializeTraceLogging() *ServerLifecycleBuilde
 				logging.Fluent(logger).Error("Trace file write test failed, falling back to stderr", err).
 					EmitComponent("mcp_trace_init").
 					Log()
-				_ = concurrency.RunInLockWithLogger(
+				if err := concurrency.RunInLockWithLogger(
 					&b.server.traceWriterMu, LockNameMcpServerLifecycleFallbackTraceWriter, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 					func() error {
 						b.server.traceWriter = os.Stderr
 						return nil
 					},
-				)
+				); err != nil {
+					logging.Fluent(logger).Warn(fmt.Sprintf("Failed to set fallback trace writer: %v", err)).Log()
+				}
 			}
 		}
 	} else {
 		// Even when trace is disabled, set stderr as the writer so traceLogf doesn't return early
 		// This ensures ERROR and WARN messages still get written to stderr
-		_ = concurrency.RunInLockWithLogger(
+		if err := concurrency.RunInLockWithLogger(
 			&b.server.traceWriterMu, LockNameMcpServerLifecycleSetStderrTrace, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 			func() error {
 				b.server.traceWriter = os.Stderr
 				return nil
 			},
-		)
+		); err != nil && b.server.getTraceWriter() != nil {
+			b.server.traceLogf("[MCP_WARN] Failed to set stderr trace: %v", err)
+		}
 	}
 	return b
 }
@@ -316,7 +331,9 @@ func (b *ServerLifecycleBuilder) Build() *ServerLifecycleBuilder {
 // Cleanup performs cleanup operations (deferred from Serve)
 func (b *ServerLifecycleBuilder) Cleanup() {
 	if b.traceCloser != nil {
-		_ = b.traceCloser.Close() //nolint:errcheck
+		if closeErr := b.traceCloser.Close(); closeErr != nil && b.server.getTraceWriter() != nil {
+			b.server.traceLogf("[MCP_DEBUG] trace closer cleanup error: %v", closeErr)
+		}
 	}
 	if b.mcpCtx != nil && !b.server.multiClient.Load() {
 		b.mcpCtx.SetServing(false)
