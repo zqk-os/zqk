@@ -95,8 +95,18 @@ func SplitPredicates(expr string) ([]string, error) {
 				quoteChar = r
 			}
 			cur.WriteRune(r)
-		case ';', ',':
+		case ';':
 			if !inQuote {
+				part := strings.TrimSpace(cur.String())
+				if part != "" {
+					preds = append(preds, part)
+				}
+				cur.Reset()
+			} else {
+				cur.WriteRune(r)
+			}
+		case ',':
+			if !inQuote && !strings.HasPrefix(strings.TrimSpace(cur.String()), "any_nonempty:") {
 				part := strings.TrimSpace(cur.String())
 				if part != "" {
 					preds = append(preds, part)
@@ -170,6 +180,18 @@ func validateSinglePredicate(p string) error {
 			return nil
 		}
 		return validateIdentifier(arg, "field_cleared")
+
+	case "any_nonempty":
+		fields := strings.FieldsFunc(arg, func(r rune) bool { return r == ',' || r == ':' })
+		if len(fields) == 0 {
+			return fmt.Errorf("any_nonempty requires at least one field identifier")
+		}
+		for _, f := range fields {
+			if err := validateIdentifier(strings.TrimSpace(f), "any_nonempty"); err != nil {
+				return err
+			}
+		}
+		return nil
 
 	case "role_is":
 		return validateIdentifier(arg, "role_is")
@@ -487,7 +509,21 @@ func CompilePrecondition(p string) (string, bool) {
 		}
 	}
 
-	// 22. Generic at least <N> <field> linked
+	// 22. Disjunctions: "at least one X or Y linked" / "at least one X or Y"
+	if strings.HasPrefix(lower, "at least ") && strings.Contains(lower, " or ") {
+		var fields []string
+		for _, w := range strings.Fields(lower) {
+			clean := strings.Trim(w, ",.()[]{}'")
+			if strings.HasSuffix(clean, "_ref") || strings.HasSuffix(clean, "_refs") {
+				fields = append(fields, clean)
+			}
+		}
+		if len(fields) >= 2 {
+			return "any_nonempty:" + strings.Join(fields, ","), true
+		}
+	}
+
+	// 23. Generic at least <N> <field> linked
 	if strings.HasPrefix(lower, "at least ") {
 		for _, w := range strings.Fields(lower) {
 			clean := strings.Trim(w, ",.()[]{}'")

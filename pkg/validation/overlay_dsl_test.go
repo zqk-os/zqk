@@ -108,6 +108,49 @@ func TestOverlayDSL_PreconditionConsolidation(t *testing.T) {
 		assert.False(t, met)
 	})
 
+	t.Run("any_nonempty disjunction predicate", func(t *testing.T) {
+		objWithWorkstream := map[string]any{
+			"id":              "BLI-101",
+			"workstream_refs": []string{"WS-100"},
+		}
+		objWithMilestone := map[string]any{
+			"id":            "BLI-102",
+			"milestone_ref": "MIL-200",
+		}
+		objWithNeither := map[string]any{
+			"id":              "BLI-103",
+			"workstream_refs": []string{},
+			"milestone_ref":   "",
+		}
+
+		// Comma-delimited
+		handled, met := evalOverlayDSLStage(gv, "any_nonempty:workstream_ref,milestone_ref", objWithWorkstream, opts)
+		assert.True(t, handled)
+		assert.True(t, met)
+
+		handled, met = evalOverlayDSLStage(gv, "any_nonempty:workstream_ref,milestone_ref", objWithMilestone, opts)
+		assert.True(t, handled)
+		assert.True(t, met)
+
+		handled, met = evalOverlayDSLStage(gv, "any_nonempty:workstream_ref,milestone_ref", objWithNeither, opts)
+		assert.True(t, handled)
+		assert.False(t, met)
+
+		// Colon-delimited
+		handled, met = evalOverlayDSLStage(gv, "any_nonempty:workstream_ref:milestone_ref", objWithWorkstream, opts)
+		assert.True(t, handled)
+		assert.True(t, met)
+
+		// Prose disjunction compilation
+		handled, met = evalOverlayDSLStage(gv, "at least one workstream_ref or milestone_ref linked", objWithMilestone, opts)
+		assert.True(t, handled)
+		assert.True(t, met)
+
+		handled, met = evalOverlayDSLStage(gv, "at least one workstream_ref or milestone_ref linked", objWithNeither, opts)
+		assert.True(t, handled)
+		assert.False(t, met)
+	})
+
 	t.Run("prose compilation to predicate DSL", func(t *testing.T) {
 		obj := map[string]any{
 			"id":           "BLI-999",
@@ -173,4 +216,92 @@ func TestOverlayDSL_LifecycleCorrespondenceCoverage(t *testing.T) {
 		}
 	}
 	assert.GreaterOrEqual(t, testedKinds, 20, "Should have verified lifecycles across at least 20 registered kinds")
+}
+
+// TestOverlayDSL_UnifiedPredicateLifecycles verifies:
+// - CRI-CEF-DSL-FIELD-PRESENCE: field_nonempty, field_cleared, is set, is not empty
+// - CRI-CEF-DSL-OR-CONDITIONS: any_nonempty disjunction and prose compilation
+// - CRI-CEF-DSL-SNOWFLAKE-ELIMINATION: go_validator delegation through evalOverlayDSLStage
+// - CRI-CEF-DSL-UNIFICATION-DOCS: grammar compliance and canonical expression validation
+func TestOverlayDSL_UnifiedPredicateLifecycles(t *testing.T) {
+	gv := NewGoValidator()
+
+	// 1. CRI-CEF-DSL-FIELD-PRESENCE: Proper string trimming, slice and map verification
+	t.Run("CRI-CEF-DSL-FIELD-PRESENCE", func(t *testing.T) {
+		obj := map[string]any{
+			"valid_str":     "  hello world  ",
+			"blank_str":     "   \t\n   ",
+			"empty_slice":   []string{},
+			"blank_slice":   []string{"", "   "},
+			"valid_slice":   []string{"   ", "item"},
+			"empty_map":     map[string]any{},
+			"valid_map":     map[string]any{"k": "v"},
+			"nil_field":     nil,
+		}
+
+		// Field nonempty verification
+		assert.True(t, gv.checkIsNotEmptyPrecondition("valid_str is not empty", obj))
+		assert.False(t, gv.checkIsNotEmptyPrecondition("blank_str is not empty", obj))
+		assert.False(t, gv.checkIsNotEmptyPrecondition("empty_slice is not empty", obj))
+		assert.False(t, gv.checkIsNotEmptyPrecondition("blank_slice is not empty", obj))
+		assert.True(t, gv.checkIsNotEmptyPrecondition("valid_slice is not empty", obj))
+		assert.False(t, gv.checkIsNotEmptyPrecondition("empty_map is not empty", obj))
+		assert.True(t, gv.checkIsNotEmptyPrecondition("valid_map is not empty", obj))
+		assert.False(t, gv.checkIsNotEmptyPrecondition("nil_field is not empty", obj))
+		assert.False(t, gv.checkIsNotEmptyPrecondition("nonexistent is not empty", obj))
+
+		// Field cleared verification
+		_, met := evalOverlayDSLStage(gv, "field_cleared:blank_str", obj, nil)
+		assert.True(t, met)
+		_, met = evalOverlayDSLStage(gv, "field_cleared:empty_slice", obj, nil)
+		assert.True(t, met)
+		_, met = evalOverlayDSLStage(gv, "field_cleared:valid_str", obj, nil)
+		assert.False(t, met)
+		_, met = evalOverlayDSLStage(gv, "field_cleared:valid_map", obj, nil)
+		assert.False(t, met)
+	})
+
+	// 2. CRI-CEF-DSL-OR-CONDITIONS: any_nonempty disjunction and compilePrecondition
+	t.Run("CRI-CEF-DSL-OR-CONDITIONS", func(t *testing.T) {
+		obj := map[string]any{
+			"milestone_refs": []string{"MIL-001"},
+		}
+
+		// Precondition with "or" compiles to any_nonempty
+		precond := "at least one workstream_ref or milestone_ref linked"
+		canon, ok := predicate.CompilePrecondition(precond)
+		require.True(t, ok)
+		assert.Equal(t, "any_nonempty:workstream_ref,milestone_ref", canon)
+
+		handled, met := evalOverlayDSLStage(gv, canon, obj, nil)
+		assert.True(t, handled)
+		assert.True(t, met)
+
+		// Empty object fails disjunction
+		handled, met = evalOverlayDSLStage(gv, canon, map[string]any{}, nil)
+		assert.True(t, handled)
+		assert.False(t, met)
+	})
+
+	// 3. CRI-CEF-DSL-SNOWFLAKE-ELIMINATION: methods route cleanly through evalOverlayDSLStage
+	t.Run("CRI-CEF-DSL-SNOWFLAKE-ELIMINATION", func(t *testing.T) {
+		obj := map[string]any{
+			"owner_ref": "ACC-001",
+			"status":    "in_progress",
+		}
+
+		assert.True(t, gv.checkIsSetPrecondition("owner_ref is set", obj))
+		assert.False(t, gv.checkIsSetPrecondition("missing is set", obj))
+		assert.True(t, gv.checkAtLeastPrecondition("at least one owner_ref", obj))
+		assert.False(t, gv.checkAtLeastPrecondition("at least one workstream_ref", obj))
+		assert.True(t, gv.checkAtLeastOrPrecondition("at least one owner_ref or author_ref", obj))
+		assert.False(t, gv.checkAtLeastOrPrecondition("at least one persona_ref or team_ref", obj))
+	})
+
+	// 4. CRI-CEF-DSL-UNIFICATION-DOCS: predicate grammar syntax checks
+	t.Run("CRI-CEF-DSL-UNIFICATION-DOCS", func(t *testing.T) {
+		assert.NoError(t, predicate.ValidatePredicateSyntax("any_nonempty:workstream_ref,milestone_ref"))
+		assert.NoError(t, predicate.ValidatePredicateSyntax("any_nonempty:a:b:c"))
+		assert.NoError(t, predicate.ValidatePredicateSyntax("field_nonempty:title; any_nonempty:workstream_ref,milestone_ref"))
+	})
 }

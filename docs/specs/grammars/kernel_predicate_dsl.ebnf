@@ -23,7 +23,7 @@ object_predicate
     = "object_exists:" , object_identifier
     | "field_nonempty:" , [ object_identifier , ":" ] , field_name
     | "field_cleared:" , [ object_identifier , ":" ] , field_name
-    | "any_nonempty:" , field_name , { ":" , field_name }
+    | "any_nonempty:" , field_name , { ( ":" | "," ) , field_name }
     | "field_matches:" , field_name , ":" , regex_pattern
     | "role_is:" , role_name
     | "active_ref:" , field_name

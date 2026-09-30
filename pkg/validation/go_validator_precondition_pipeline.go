@@ -212,8 +212,9 @@ var precondDecideRules = []precondDecideRule{
 	{name: "machine_checkable_closure_evidence", eval: evalMachineCheckableStage},
 	{name: "field_is_set", eval: evalFieldIsSetStage},
 	{name: "field_is_not_empty", eval: evalFieldIsNotEmptyStage},
-	matchContains("at_least", SubprecondAtLeast, func(gv *GoValidator, p string, obj map[string]any, _ *ValidationOptions) bool {
-		return gv.checkAtLeastPrecondition(p, obj)
+	matchContains("at_least", SubprecondAtLeast, func(gv *GoValidator, p string, obj map[string]any, options *ValidationOptions) bool {
+		_, met := evalOverlayDSLStage(gv, p, obj, options)
+		return met
 	}),
 	{name: "overlay_dsl", eval: evalOverlayDSLStage},
 }
@@ -295,14 +296,14 @@ func evalFieldIsSetStage(gv *GoValidator, p string, obj map[string]any, options 
 	if !isFieldCheckPrecondition(p, SubprecondIsSet) {
 		return false, false
 	}
-	return true, gv.checkIsSetPrecondition(p, obj)
+	return evalOverlayDSLStage(gv, p, obj, options)
 }
 
 func evalFieldIsNotEmptyStage(gv *GoValidator, p string, obj map[string]any, options *ValidationOptions) (bool, bool) {
 	if !isFieldCheckPrecondition(p, SubprecondIsNotEmpty) {
 		return false, false
 	}
-	return true, gv.checkIsNotEmptyPrecondition(p, obj)
+	return evalOverlayDSLStage(gv, p, obj, options)
 }
 
 func evalLinkBackStage(gv *GoValidator, p string, obj map[string]any, options *ValidationOptions) (bool, bool) {

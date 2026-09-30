@@ -1113,28 +1113,16 @@ func stringSliceField(v any) []string {
 	}
 }
 
-// checkIsSetPrecondition checks "is set" precondition
+// checkIsSetPrecondition checks "is set" precondition via unified Kernel Predicate DSL
 func (gv *GoValidator) checkIsSetPrecondition(precondition string, obj map[string]any) bool {
-	fieldName := strings.TrimSpace(strings.Split(precondition, SubprecondIsSet)[0])
-	value, exists := obj[fieldName]
-	return exists && value != nil && value != emptyValue
+	_, met := evalOverlayDSLStage(gv, precondition, obj, nil)
+	return met
 }
 
-// checkIsNotEmptyPrecondition checks "is not empty" precondition
+// checkIsNotEmptyPrecondition checks "is not empty" precondition via unified Kernel Predicate DSL
 func (gv *GoValidator) checkIsNotEmptyPrecondition(precondition string, obj map[string]any) bool {
-	fieldName := strings.TrimSpace(strings.Split(precondition, SubprecondIsNotEmpty)[0])
-	value, exists := obj[fieldName]
-	if !exists {
-		return false
-	}
-
-	// Check if it's a list/array
-	val := reflect.ValueOf(value)
-	if val.Kind() == reflect.Slice || val.Kind() == reflect.Array {
-		return val.Len() > 0
-	}
-
-	return value != nil && value != emptyValue
+	_, met := evalOverlayDSLStage(gv, precondition, obj, nil)
+	return met
 }
 
 // checkReadyBacklogReferencesPlan evaluates PrecondReadyBacklogReferencesPlan.
@@ -1204,58 +1192,22 @@ func (gv *GoValidator) checkPriorityPlanValidated(obj map[string]any) bool {
 	return objects.PlanHasWrittenIdentity(obj) && objects.PlanHasWorkstreamLane(obj)
 }
 
-// checkAtLeastPrecondition checks "at least" precondition
+// checkAtLeastPrecondition checks "at least" precondition via unified Kernel Predicate DSL
 func (gv *GoValidator) checkAtLeastPrecondition(precondition string, obj map[string]any) bool {
-	// Check for "or" logic (e.g., "at least one workstream_ref or milestone_ref linked")
-	if strings.Contains(precondition, SubprecondOr) {
-		return gv.checkAtLeastOrPrecondition(precondition, obj)
-	}
-
-	// Single field check
-	return gv.checkAtLeastSinglePrecondition(precondition, obj)
+	_, met := evalOverlayDSLStage(gv, precondition, obj, nil)
+	return met
 }
 
-// checkAtLeastOrPrecondition checks "at least one X or Y" precondition
+// checkAtLeastOrPrecondition checks "at least one X or Y" precondition via unified Kernel Predicate DSL
 func (gv *GoValidator) checkAtLeastOrPrecondition(precondition string, obj map[string]any) bool {
-	var refFields []string
-	for _, word := range strings.Fields(precondition) {
-		w := strings.Trim(word, ",.()[]{}'")
-		if strings.HasSuffix(w, "_ref") || strings.HasSuffix(w, "_refs") {
-			refFields = append(refFields, w)
-		}
-	}
-	for _, fieldName := range refFields {
-		if !strings.HasSuffix(fieldName, "s") {
-			if gv.hasNonEmptyField(obj, fieldName+"s") {
-				return true
-			}
-		}
-		if gv.hasNonEmptyField(obj, fieldName) {
-			return true
-		}
-	}
-	return false
+	_, met := evalOverlayDSLStage(gv, precondition, obj, nil)
+	return met
 }
 
-// checkAtLeastSinglePrecondition checks "at least one X" precondition for a single field
+// checkAtLeastSinglePrecondition checks "at least one X" precondition for a single field via unified Kernel Predicate DSL
 func (gv *GoValidator) checkAtLeastSinglePrecondition(precondition string, obj map[string]any) bool {
-	var fieldName string
-	for _, word := range strings.Fields(precondition) {
-		w := strings.Trim(word, ",.()[]{}'")
-		if strings.HasSuffix(w, "_ref") || strings.HasSuffix(w, "_refs") {
-			fieldName = w
-			break
-		}
-	}
-	if fieldName == "" {
-		return false
-	}
-	if !strings.HasSuffix(fieldName, "s") {
-		if gv.hasNonEmptyField(obj, fieldName+"s") {
-			return true
-		}
-	}
-	return gv.hasNonEmptyField(obj, fieldName)
+	_, met := evalOverlayDSLStage(gv, precondition, obj, nil)
+	return met
 }
 
 // hasNonEmptyField checks if a field exists and is non-empty (for lists/arrays)

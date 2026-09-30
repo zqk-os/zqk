@@ -113,18 +113,7 @@ func evalOverlayFieldStage(obj map[string]any, name, arg string, gv *GoValidator
 			_ = ok
 		}
 		field = strings.TrimSpace(field)
-		val, exists := obj[field]
-		if !exists || val == nil {
-			return true, false
-		}
-		if str, ok := val.(string); ok && strings.TrimSpace(str) == "" {
-			return true, false
-		}
-		v := reflect.ValueOf(val)
-		if (v.Kind() == reflect.Slice || v.Kind() == reflect.Array) && v.Len() == 0 {
-			return true, false
-		}
-		return true, true
+		return true, isFieldNonEmpty(obj, field)
 
 	case "field_cleared":
 		field := arg
@@ -134,17 +123,11 @@ func evalOverlayFieldStage(obj map[string]any, name, arg string, gv *GoValidator
 			_ = ok
 		}
 		field = strings.TrimSpace(field)
-		val, exists := obj[field]
-		if exists && val != nil {
-			if str, ok := val.(string); ok && strings.TrimSpace(str) != "" {
-				return true, false
-			}
-			v := reflect.ValueOf(val)
-			if (v.Kind() == reflect.Slice || v.Kind() == reflect.Array || v.Kind() == reflect.Map) && v.Len() > 0 {
-				return true, false
-			}
-		}
-		return true, true
+		return true, isFieldCleared(obj, field)
+
+	case "any_nonempty":
+		fields := strings.FieldsFunc(arg, func(r rune) bool { return r == ',' || r == ':' })
+		return true, evalAnyNonEmpty(obj, fields)
 
 	case "field_matches":
 		field, pattern, ok := strings.Cut(arg, ":")
@@ -267,10 +250,7 @@ func evalOverlayWorkflowStage(gv *GoValidator, obj map[string]any, options *Vali
 		}
 		return true, true
 	case "team_or_persona_dispatch_refs":
-		if gv != nil && !gv.checkAtLeastPrecondition(PrecondTeamOrPersonaDispatchRefs, obj) {
-			return true, false
-		}
-		return true, true
+		return true, evalAnyNonEmpty(obj, []string{"team_configuration_ref", "persona_refs"})
 	case "active_ref":
 		if gv != nil {
 			handled, met := evalActiveRefStage(gv, "active "+arg, obj, options)
@@ -420,4 +400,84 @@ func checkContentSizeMeasured(obj map[string]any) bool {
 	default:
 		return false
 	}
+}
+
+func isFieldNonEmpty(obj map[string]any, field string) bool {
+	if obj == nil {
+		return false
+	}
+	val, exists := obj[field]
+	if !exists || val == nil {
+		return false
+	}
+	if str, ok := val.(string); ok {
+		return strings.TrimSpace(str) != ""
+	}
+	v := reflect.ValueOf(val)
+	switch v.Kind() {
+	case reflect.Slice, reflect.Array:
+		if v.Len() == 0 {
+			return false
+		}
+		for i := 0; i < v.Len(); i++ {
+			elem := v.Index(i).Interface()
+			if str, ok := elem.(string); ok {
+				if strings.TrimSpace(str) != "" {
+					return true
+				}
+			} else if elem != nil {
+				return true
+			}
+		}
+		return false
+	case reflect.Map:
+		return v.Len() > 0
+	}
+	return true
+}
+
+func isFieldCleared(obj map[string]any, field string) bool {
+	if obj == nil {
+		return true
+	}
+	val, exists := obj[field]
+	if !exists || val == nil {
+		return true
+	}
+	if str, ok := val.(string); ok {
+		return strings.TrimSpace(str) == ""
+	}
+	v := reflect.ValueOf(val)
+	switch v.Kind() {
+	case reflect.Slice, reflect.Array:
+		return v.Len() == 0
+	case reflect.Map:
+		return v.Len() == 0
+	}
+	return false
+}
+
+func evalAnyNonEmpty(obj map[string]any, fields []string) bool {
+	if len(fields) == 0 {
+		return false
+	}
+	for _, f := range fields {
+		field := strings.TrimSpace(f)
+		if field == "" {
+			continue
+		}
+		if isFieldNonEmpty(obj, field) {
+			return true
+		}
+		if !strings.HasSuffix(field, "s") {
+			if isFieldNonEmpty(obj, field+"s") {
+				return true
+			}
+		} else {
+			if isFieldNonEmpty(obj, strings.TrimSuffix(field, "s")) {
+				return true
+			}
+		}
+	}
+	return false
 }
