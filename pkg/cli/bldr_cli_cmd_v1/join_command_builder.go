@@ -8,9 +8,12 @@ import (
 // NewJoinCommandBuilder creates a new join command
 func NewJoinCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("join")
-	builder.WithShort("join command")
-	help := clipkg.DynamicHelpBuilder("join command")
-	help.WithDescriptionLines("join command")
+	builder.WithShort("Join a node or agent into an existing federation or mesh network")
+	help := clipkg.DynamicHelpBuilder("Join a node or agent into an existing federation or mesh network")
+	help.WithDescriptionLines(
+		"Connect and register the local node or agent workspace into an existing",
+		"federated swarm or distributed mesh network.",
+	)
 	builder.WithHelpBuilder(help)
 	builder.WithCommonFlags(false, nil)
 	cmd := builder.Build()

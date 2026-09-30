@@ -8,9 +8,9 @@ import (
 // NewAuthCommandBuilder creates a new auth command
 func NewAuthCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("auth")
-	builder.WithShort("auth command")
-	help := clipkg.DynamicHelpBuilder("auth command")
-	help.WithDescriptionLines("auth command")
+	builder.WithShort("Manage authentication credentials, tokens, and identity profiles")
+	help := clipkg.DynamicHelpBuilder("Manage authentication credentials, tokens, and identity profiles")
+	help.WithDescriptionLines("Configures user authentication tokens, active credentials, and security contexts for the knowledge kernel.")
 	builder.WithHelpBuilder(help)
 	builder.WithCommonFlags(false, nil)
 	cmd := builder.Build()

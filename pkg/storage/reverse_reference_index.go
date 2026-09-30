@@ -116,13 +116,11 @@ func (r *ReverseReferenceIndex) ReferencedIDCount() int {
 	return count
 }
 
-// GetDependentsWithError retrieves all dependent object IDs with fail-closed error propagation
-// if the read lock times out or cannot be acquired.
-func (r *ReverseReferenceIndex) GetDependentsWithError(referencedID string) ([]string, error) {
+// GetDependentsWithContext retrieves all dependent object IDs with fail-closed error propagation
+// using the provided context for lock acquisition timeout.
+func (r *ReverseReferenceIndex) GetDependentsWithContext(ctx stdcontext.Context, referencedID string) ([]string, error) {
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	var dependents []string
-	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
-	defer cancel()
 	err := concurrency.WithRLockTimeout(
 		&r.mu,
 		ctx,
@@ -147,6 +145,14 @@ func (r *ReverseReferenceIndex) GetDependentsWithError(referencedID string) ([]s
 	return dependents, nil
 }
 
+// GetDependentsWithError retrieves all dependent object IDs with fail-closed error propagation
+// if the read lock times out or cannot be acquired.
+func (r *ReverseReferenceIndex) GetDependentsWithError(referencedID string) ([]string, error) {
+	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
+	defer cancel()
+	return r.GetDependentsWithContext(ctx, referencedID)
+}
+
 func (r *ReverseReferenceIndex) GetDependents(referencedID string) []string {
 	deps, err := r.GetDependentsWithError(referencedID)
 	if err != nil {
@@ -156,38 +162,41 @@ func (r *ReverseReferenceIndex) GetDependents(referencedID string) []string {
 	return deps
 }
 
-func (r *ReverseReferenceIndex) AddReference(objectID, referencedID string) {
-	if referencedID == emptyValue || objectID == emptyValue {
-		return
-	}
+func (r *ReverseReferenceIndex) withWriteLock(lockName string, op func() error) error {
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
 	defer cancel()
-	var err_swallow_121 = concurrency.WithLockTimeout(
+	return concurrency.WithLockTimeout(
 		&r.mu,
 		ctx,
 		nil,
 		logging.NewLockLoggerAdapter(logger),
-		locknames.LockNameReverseReferenceIndexAddReference,
-		func() error {
-			if r.index == nil {
-				r.index = make(map[string][]string)
-			}
-
-			deps := r.index[referencedID]
-			for _, dep := range deps {
-				if dep == objectID {
-
-					return nil
-				}
-			}
-
-			r.index[referencedID] = append(deps, objectID)
-			return nil
-		},
+		lockName,
+		op,
 	)
-	if err_swallow_121 != nil {
-		logging.LogSwallowedError(err_swallow_121)
+}
+
+func (r *ReverseReferenceIndex) AddReference(objectID, referencedID string) {
+	if referencedID == emptyValue || objectID == emptyValue {
+		return
+	}
+	err := r.withWriteLock(locknames.LockNameReverseReferenceIndexAddReference, func() error {
+		if r.index == nil {
+			r.index = make(map[string][]string)
+		}
+
+		deps := r.index[referencedID]
+		for _, dep := range deps {
+			if dep == objectID {
+				return nil
+			}
+		}
+
+		r.index[referencedID] = append(deps, objectID)
+		return nil
+	})
+	if err != nil {
+		logging.LogSwallowedError(err)
 	}
 }
 
@@ -196,38 +205,27 @@ func (r *ReverseReferenceIndex) RemoveReference(objectID, referencedID string) {
 	if referencedID == emptyValue || objectID == emptyValue {
 		return
 	}
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
-	defer cancel()
-	var err_swallow_122 = concurrency.WithLockTimeout(
-		&r.mu,
-		ctx,
-		nil,
-		logging.NewLockLoggerAdapter(logger),
-		locknames.LockNameReverseReferenceIndexRemoveReference,
-		func() error {
-			if r.index == nil {
-				return nil
-			}
-			deps := r.index[referencedID]
-
-			newDeps := make([]string, 0, len(deps))
-			for _, dep := range deps {
-				if dep != objectID {
-					newDeps = append(newDeps, dep)
-				}
-			}
-			if len(newDeps) == 0 {
-
-				delete(r.index, referencedID)
-			} else {
-				r.index[referencedID] = newDeps
-			}
+	err := r.withWriteLock(locknames.LockNameReverseReferenceIndexRemoveReference, func() error {
+		if r.index == nil {
 			return nil
-		},
-	)
-	if err_swallow_122 != nil {
-		logging.LogSwallowedError(err_swallow_122)
+		}
+		deps := r.index[referencedID]
+
+		newDeps := make([]string, 0, len(deps))
+		for _, dep := range deps {
+			if dep != objectID {
+				newDeps = append(newDeps, dep)
+			}
+		}
+		if len(newDeps) == 0 {
+			delete(r.index, referencedID)
+		} else {
+			r.index[referencedID] = newDeps
+		}
+		return nil
+	})
+	if err != nil {
+		logging.LogSwallowedError(err)
 	}
 }
 
@@ -236,70 +234,60 @@ func (r *ReverseReferenceIndex) RemoveObject(objectID string) {
 	if objectID == emptyValue {
 		return
 	}
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
-	defer cancel()
-	var err_swallow_123 = concurrency.WithLockTimeout(
-		&r.mu,
-		ctx,
-		nil,
-		logging.NewLockLoggerAdapter(logger),
-		locknames.LockNameReverseReferenceIndexRemoveObject,
-		func() error {
-			if r.index == nil {
+	err := r.withWriteLock(locknames.LockNameReverseReferenceIndexRemoveObject, func() error {
+		if r.index == nil {
+			return nil
+		}
+
+		if r.forwardIndex != nil {
+			if refs, ok := r.forwardIndex[objectID]; ok {
+				for _, referencedID := range refs {
+					deps := r.index[referencedID]
+					newDeps := make([]string, 0, len(deps))
+					for _, dep := range deps {
+						if dep != objectID {
+							newDeps = append(newDeps, dep)
+						}
+					}
+					if len(newDeps) == 0 {
+						delete(r.index, referencedID)
+					} else {
+						r.index[referencedID] = newDeps
+					}
+				}
+				delete(r.forwardIndex, objectID)
 				return nil
 			}
+		}
 
-			if r.forwardIndex != nil {
-				if refs, ok := r.forwardIndex[objectID]; ok {
-					for _, referencedID := range refs {
-						deps := r.index[referencedID]
-						newDeps := make([]string, 0, len(deps))
-						for _, dep := range deps {
-							if dep != objectID {
-								newDeps = append(newDeps, dep)
-							}
-						}
-						if len(newDeps) == 0 {
-							delete(r.index, referencedID)
-						} else {
-							r.index[referencedID] = newDeps
-						}
-					}
-					delete(r.forwardIndex, objectID)
-					return nil
+		// Fallback: full scan if forward index is not populated for this object
+		for referencedID, deps := range r.index {
+			found := false
+			for _, dep := range deps {
+				if dep == objectID {
+					found = true
+					break
 				}
 			}
-
-			// Fallback: full scan if forward index is not populated for this object
-			for referencedID, deps := range r.index {
-				found := false
-				for _, dep := range deps {
-					if dep == objectID {
-						found = true
-						break
-					}
-				}
-				if !found {
-					continue
-				}
-				newDeps := make([]string, 0, len(deps)-1)
-				for _, dep := range deps {
-					if dep != objectID {
-						newDeps = append(newDeps, dep)
-					}
-				}
-				if len(newDeps) == 0 {
-					delete(r.index, referencedID)
-				} else {
-					r.index[referencedID] = newDeps
+			if !found {
+				continue
+			}
+			newDeps := make([]string, 0, len(deps)-1)
+			for _, dep := range deps {
+				if dep != objectID {
+					newDeps = append(newDeps, dep)
 				}
 			}
-			return nil
-		},
-	)
-	if err_swallow_123 != nil {
-		logging.LogSwallowedError(err_swallow_123)
+			if len(newDeps) == 0 {
+				delete(r.index, referencedID)
+			} else {
+				r.index[referencedID] = newDeps
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		logging.LogSwallowedError(err)
 	}
 }
 
@@ -308,18 +296,12 @@ func (r *ReverseReferenceIndex) UpdateReferences(objectID string, oldRefs, newRe
 	if objectID == emptyValue {
 		return
 	}
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
-	defer cancel()
-	var err_swallow_124 = concurrency.WithLockTimeout(
-		&r.mu,
-		ctx,
-		nil,
-		logging.NewLockLoggerAdapter(logger),
-		locknames.LockNameReverseReferenceIndexUpdateReferences,
-		func() error {
-			if r.index == nil {
-				r.index = make(map[string][]string)
+	err := r.withWriteLock(locknames.LockNameReverseReferenceIndexUpdateReferences, func() error {
+		if r.index == nil {
+			r.index = make(map[string][]string)
+		}
+		if r.forwardIndex == nil {
+				r.forwardIndex = make(map[string][]string)
 			}
 			if r.forwardIndex == nil {
 				r.forwardIndex = make(map[string][]string)
@@ -337,10 +319,9 @@ func (r *ReverseReferenceIndex) UpdateReferences(objectID string, oldRefs, newRe
 				}
 			}
 			return nil
-		},
-	)
-	if err_swallow_124 != nil {
-		logging.LogSwallowedError(err_swallow_124)
+	})
+	if err != nil {
+		logging.LogSwallowedError(err)
 	}
 }
 

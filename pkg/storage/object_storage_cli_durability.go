@@ -117,6 +117,20 @@ func EnsureCLIObjectMutationVisibleForProvider(ctx context.Context, provider Obj
 		var nextProviders []ObjectStorageProvider
 		changed := false
 		for _, p := range providersToFlush {
+			if u, ok := p.(interface{ UnderlyingObjectStorageProvider() ObjectStorageProvider }); ok && u != nil {
+				if inner := u.UnderlyingObjectStorageProvider(); inner != nil {
+					nextProviders = append(nextProviders, inner)
+					changed = true
+					continue
+				}
+			}
+			if u, ok := p.(interface{ Unwrap() ObjectStorageProvider }); ok && u != nil {
+				if inner := u.Unwrap(); inner != nil {
+					nextProviders = append(nextProviders, inner)
+					changed = true
+					continue
+				}
+			}
 			switch v := p.(type) {
 			case *BatchingObjectStorage:
 				nextProviders = append(nextProviders, v.ObjectStorageProvider)

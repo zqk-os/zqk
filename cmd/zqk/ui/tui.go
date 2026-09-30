@@ -188,6 +188,18 @@ func handleInput(m *UIModel, key []byte) bool {
 				return false
 			}
 		}
+		if m.DetailModal.Kind == "inbox_item" || m.DetailModal.Kind == "correspondence" || m.DetailModal.Kind == "tde_envelope" {
+			if len(key) == 1 && (key[0] == 'a' || key[0] == 'A') {
+				m.AcknowledgeInboxItem(m.DetailModal.ID)
+				m.DetailModal = nil
+				return false
+			}
+			if len(key) == 1 && (key[0] == 'r' || key[0] == 'R') {
+				m.RespondInboxItem(m.DetailModal.ID, "Acknowledged and resolved via Mission Control Console")
+				m.DetailModal = nil
+				return false
+			}
+		}
 		if (len(key) == 1 && (key[0] == KeyEsc || key[0] == KeyBackspace || key[0] == 'q' || key[0] == 'Q')) ||
 			(len(key) >= 3 && key[0] == CSIPrefixEsc && key[1] == CSIPrefixBracket) {
 			m.DetailModal = nil
@@ -362,13 +374,21 @@ func handleInput(m *UIModel, key []byte) bool {
 		case 'z', 'Z', '?': // Cycle editor profile: newb -> pro -> jedi
 			m.CycleEditorProfile()
 			_, _ = os.Stdout.WriteString(AnsiClearScreen)
-		case 'r', 'R': // Force refresh
+		case 'r', 'R': // Force refresh or reply on TabSwarm if items exist
+			if m.ActiveTab == TabSwarm {
+				items := m.GetVisibleInboxItems()
+				if m.SelectedIndex < len(items) {
+					m.RespondInboxItem(items[m.SelectedIndex].ID, "Acknowledged and resolved via Mission Control Console")
+					return false
+				}
+			}
 			ctx := context.Background()
 			m.RefreshMutations()
 			m.RefreshAuditEvents()
 			m.RefreshObjects()
 			m.RefreshQA(ctx, m.Storage, m.SecCtx)
 			m.RefreshHealth()
+			m.RefreshInbox()
 			if m.Storage != nil && m.SecCtx != nil {
 				m.RefreshSwarm(ctx, m.Storage, m.SecCtx)
 				m.RefreshPM(ctx, m.Storage, m.SecCtx)
@@ -384,13 +404,18 @@ func handleInput(m *UIModel, key []byte) bool {
 			} else if m.ActiveTab == TabQA {
 				m.TriggerQARescan()
 			}
-		case 'c', 'C', 'a', 'A', 'w', 'W', 'd', 'D', 'p', 'P', 'm', 'M', 's', 'S', 'b', 'B': // Action Center (Tab 8) / Delayed Trigger (Tab 6)
+		case 'c', 'C', 'a', 'A', 'w', 'W', 'd', 'D', 'p', 'P', 'm', 'M', 's', 'S', 'b', 'B': // Action Center (Tab 8) / Delayed Trigger (Tab 6) / Swarm Ack (Tab 3)
 			if m.ActiveTab == TabHealth {
 				m.TriggerActionCenter(string(key[0]))
 			} else if m.ActiveTab == TabScheduler && (key[0] == 'd' || key[0] == 'D') {
 				jobs := m.GetVisibleSchedulerJobs()
 				if m.SelectedIndex < len(jobs) {
 					m.TriggerScheduledJob(jobs[m.SelectedIndex].ID, 10)
+				}
+			} else if m.ActiveTab == TabSwarm && (key[0] == 'a' || key[0] == 'A') {
+				items := m.GetVisibleInboxItems()
+				if m.SelectedIndex < len(items) {
+					m.AcknowledgeInboxItem(items[m.SelectedIndex].ID)
 				}
 			}
 		case 'k', 'K': // Cursor up / Scroll up

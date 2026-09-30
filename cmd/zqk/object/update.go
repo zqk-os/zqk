@@ -205,7 +205,7 @@ func runUpdate(cmd *cobra.Command, args []string) error {
 			if sac != nil {
 				filtered := make(map[string]any)
 				for k, v := range updates {
-					if sac.HasFieldAccess(k, current, proc.SecurityContext(), "write") {
+					if storage.IsFieldUnset(v) || sac.HasFieldAccess(k, current, proc.SecurityContext(), "write") {
 						filtered[k] = v
 					} else {
 						deniedFields = append(deniedFields, k)

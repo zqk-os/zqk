@@ -292,6 +292,29 @@ func (b *CriteriaBuilder) addCriteriaFields() {
 		WithPermissions("rwx").
 		WithSemanticType("expression").
 		WithProfileCode("CRT-003"))
+	b.AddFieldBuilder(builders.NewFieldBuilder("doc_entry_refs", "list").
+		WithChecklist(builders.NewChecklistBuilder().
+			Authority("owner.").
+			AutomationHooks("used for documentation verification, doc discovery.").
+			Cardinality("many").
+			Criticality("association").
+			Default([]any{}).
+			Dependencies("doc_entry registry.").
+			Lifecycle("mutable").
+			Observability("yes").
+			Purpose("Kernel pointers to doc_entry objects documenting this criterion deliverable.").
+			Security("non-sensitive").
+			Build()).
+		WithAccess(builders.NewAccessBuilder().
+			Requires("access:confidential").
+			Build()).
+		WithValidation(builders.NewValidationBuilder().
+			Required(false).
+			Build()).
+		WithTraits("field_mutable_group", "field_reference_group").
+		WithPermissions("r-x").
+		WithSemanticType("reference").
+		WithProfileCode("CRT-010"))
 }
 
 // Build builds the spec (inherited from BaseSpecBuilder)

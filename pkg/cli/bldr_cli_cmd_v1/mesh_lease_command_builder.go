@@ -8,9 +8,9 @@ import (
 // NewMeshLeaseCommandBuilder creates a new mesh_lease command
 func NewMeshLeaseCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("lease")
-	builder.WithShort("lease command")
-	help := clipkg.DynamicHelpBuilder("lease command")
-	help.WithDescriptionLines("lease command")
+	builder.WithShort("Acquire or release execution leases on shared swarm workstreams")
+	help := clipkg.DynamicHelpBuilder("Acquire or release execution leases on shared swarm workstreams")
+	help.WithDescriptionLines("Coordinates mutual exclusion and resource reservation for distributed tasks across concurrent agent seats.")
 	builder.WithHelpBuilder(help)
 	builder.WithCommonFlags(false, nil)
 	cmd := builder.Build()

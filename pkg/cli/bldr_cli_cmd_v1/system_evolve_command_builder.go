@@ -8,9 +8,9 @@ import (
 // NewSystemEvolveCommandBuilder creates a new system_evolve command
 func NewSystemEvolveCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("evolve")
-	builder.WithShort("evolve command")
-	help := clipkg.DynamicHelpBuilder("evolve command")
-	help.WithDescriptionLines("evolve command")
+	builder.WithShort("Run autonomous schema, ontology, and codebase evolution cycles")
+	help := clipkg.DynamicHelpBuilder("Run autonomous schema, ontology, and codebase evolution cycles")
+	help.WithDescriptionLines("Executes automated schema updates, dialect migrations, and architectural ontology evolution cycles.")
 	builder.WithHelpBuilder(help)
 	builder.WithCommonFlags(false, nil)
 	cmd := builder.Build()

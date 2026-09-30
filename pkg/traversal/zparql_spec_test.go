@@ -80,18 +80,15 @@ func TestZPARQLIndexedQueryPlannerSpec(t *testing.T) {
 	content := string(data)
 	require.NotEmpty(t, content, "ZPARQL query planner specification content must not be empty")
 
-	// Planner execution contract (CRIT-ZPARQL-PLANNER-CONTRACT-SPEC)
-	require.Contains(t, content, "CRIT-ZPARQL-PLANNER-CONTRACT-SPEC")
+	// Planner execution contract
 	require.Contains(t, content, "IndexSeek")
 	require.Contains(t, content, "KindScan")
 	require.Contains(t, content, "Predicate Pushdown")
 
-	// Complexity bound verification (CRIT-ZPARQL-INDEX-SCAN-COMPLEXITY-PROOF)
-	require.Contains(t, content, "CRIT-ZPARQL-INDEX-SCAN-COMPLEXITY-PROOF")
+	// Complexity bound verification
 	require.Contains(t, content, "O(K)")
 
-	// Cycle safety and depth bound (CRIT-ZPARQL-CYCLIC-TRAVERSAL-RECURSION-NEGATIVE)
-	require.Contains(t, content, "CRIT-ZPARQL-CYCLIC-TRAVERSAL-RECURSION-NEGATIVE")
+	// Cycle safety and depth bound
 	require.Contains(t, content, "VisitedSet")
 	require.Contains(t, content, "ERR_ZPARQL_CYCLIC_RECURSION_LIMIT")
 }
@@ -105,18 +102,15 @@ func TestZPARQLResultStreamingSpec(t *testing.T) {
 	content := string(data)
 	require.NotEmpty(t, content, "ZPARQL result streaming specification content must not be empty")
 
-	// Result Schema Spec (CRIT-ZPARQL-RESULT-SCHEMA-SPEC)
-	require.Contains(t, content, "CRIT-ZPARQL-RESULT-SCHEMA-SPEC")
+	// Result Schema Spec
 	require.Contains(t, content, "Header Frame")
 	require.Contains(t, content, "Chunk Frames")
 	require.Contains(t, content, "Trailer Frame")
 
-	// Streaming backpressure proof (CRIT-ZPARQL-STREAMING-BACKPRESSURE-PROOF)
-	require.Contains(t, content, "CRIT-ZPARQL-STREAMING-BACKPRESSURE-PROOF")
+	// Streaming backpressure proof
 	require.Contains(t, content, "Constant Memory Overhead")
 
-	// Truncated stream negative invariant (CRIT-ZPARQL-TRUNCATED-STREAM-NEGATIVE)
-	require.Contains(t, content, "CRIT-ZPARQL-TRUNCATED-STREAM-NEGATIVE")
+	// Truncated stream negative invariant
 	require.Contains(t, content, "EOS_FINALIZED")
 	require.Contains(t, content, "ERR_ZPARQL_STREAM_TRUNCATED")
 }

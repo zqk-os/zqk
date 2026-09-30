@@ -8,9 +8,12 @@ import (
 // NewUseCommandBuilder creates a new use command
 func NewUseCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("use")
-	builder.WithShort("use command")
-	help := clipkg.DynamicHelpBuilder("use command")
-	help.WithDescriptionLines("use command")
+	builder.WithShort("Switch active context or environment configuration")
+	help := clipkg.DynamicHelpBuilder("Switch active context or environment configuration")
+	help.WithDescriptionLines(
+		"Select and activate an operational context, target cluster, or environment",
+		"configuration for subsequent CLI invocations.",
+	)
 	builder.WithHelpBuilder(help)
 	builder.WithCommonFlags(false, nil)
 	cmd := builder.Build()

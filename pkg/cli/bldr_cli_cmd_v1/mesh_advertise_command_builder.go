@@ -8,9 +8,9 @@ import (
 // NewMeshAdvertiseCommandBuilder creates a new mesh_advertise command
 func NewMeshAdvertiseCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("advertise")
-	builder.WithShort("advertise command")
-	help := clipkg.DynamicHelpBuilder("advertise command")
-	help.WithDescriptionLines("advertise command")
+	builder.WithShort("Advertise local agent seat capabilities and availability to the swarm mesh")
+	help := clipkg.DynamicHelpBuilder("Advertise local agent seat capabilities and availability to the swarm mesh")
+	help.WithDescriptionLines("Publishes agent seat specifications, supported roles, and availability status to the peer-to-peer swarm mesh.")
 	builder.WithHelpBuilder(help)
 	builder.WithCommonFlags(false, nil)
 	cmd := builder.Build()

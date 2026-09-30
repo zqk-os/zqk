@@ -1,14 +1,15 @@
 package validation
 
 import (
+	"context"
 	"fmt"
 	"reflect"
 	"strings"
+	"sync"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/predicate"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
@@ -32,6 +33,8 @@ import (
 type InstanceValidator struct {
 	specLoader      *objects.SpecLoader
 	lifecycleLoader *objects.LifecycleLoader
+	gv              *GoValidator
+	mu              sync.RWMutex
 }
 
 // NewInstanceValidator creates a new instance validator
@@ -50,6 +53,30 @@ func NewInstanceValidatorWithLifecycle(specLoader *objects.SpecLoader, lifecycle
 		specLoader:      specLoader,
 		lifecycleLoader: lifecycleLoader,
 	}
+}
+
+func (iv *InstanceValidator) getGoValidator() *GoValidator {
+	if iv == nil {
+		return NewGoValidator()
+	}
+	iv.mu.RLock()
+	if iv.gv != nil {
+		defer iv.mu.RUnlock()
+		return iv.gv
+	}
+	iv.mu.RUnlock()
+
+	iv.mu.Lock()
+	defer iv.mu.Unlock()
+	if iv.gv != nil {
+		return iv.gv
+	}
+	if iv.specLoader != nil || iv.lifecycleLoader != nil {
+		iv.gv = NewGoValidatorWithLoaders(iv.specLoader, iv.lifecycleLoader)
+	} else {
+		iv.gv = NewGoValidator()
+	}
+	return iv.gv
 }
 
 // ValidationResult represents the result of validating an instance
@@ -372,131 +399,21 @@ func (iv *InstanceValidator) validateSemanticType(_ string, value any, semanticT
 }
 
 // validateLifecycleState validates the lifecycle state and transitions (Phase 2)
+// Delegates directly to GoValidator to ensure uniform lifecycle invariants and eliminate duplicated logic.
 func (iv *InstanceValidator) validateLifecycleState(kind, status, currentState string, obj map[string]any) ([]ValidationError, []ValidationWarning) {
-	var errors []ValidationError
-	var warnings []ValidationWarning
-
-	if iv.lifecycleLoader == nil {
-		// Lifecycle loader not available - skip lifecycle validation
-		return errors, warnings
+	if iv == nil || iv.lifecycleLoader == nil {
+		return nil, nil
 	}
-
-	// Validate that the status is valid for this kind
-	valid, err := iv.lifecycleLoader.IsValidStatus(kind, status)
-	if err != nil {
-		// If lifecycle file doesn't exist, that's OK - just warn
-		warnings = append(warnings, ValidationWarning{
-			Field:   objects.FieldKeyStatus,
-			Message: fmt.Sprintf(ConstMagic55f76aa6, err),
-			Rule:    validationRuleLifecycle(),
-		})
-		return errors, warnings
+	gv := iv.getGoValidator()
+	if gv == nil {
+		return nil, nil
 	}
-
-	if !valid {
-		errors = append(errors, ValidationError{
-			Field:   objects.FieldKeyStatus,
-			Message: fmt.Sprintf(ConstMagicc9d3d02d, status, kind),
-			Rule:    validationRuleLifecycle(),
-		})
-		return errors, warnings
-	}
-
-	// If we have a current state, validate the transition
-	if currentState != emptyValue && currentState != status {
-		validTransition, err := iv.lifecycleLoader.IsValidTransition(kind, currentState, status)
-		if err != nil {
-			// Transition validation error
-			errors = append(errors, ValidationError{
-				Field:   objects.FieldKeyStatus,
-				Message: fmt.Sprintf(ConstMagic655b306b, err),
-				Rule:    validationRuleLifecycle(),
-			})
-			return errors, warnings
-		}
-
-		if !validTransition {
-			errors = append(errors, ValidationError{
-				Field:   objects.FieldKeyStatus,
-				Message: fmt.Sprintf(ConstMagicd7b84ef1, currentState, status, kind),
-				Rule:    validationRuleLifecycle(),
-			})
-			return errors, warnings
-		}
-
-		// Check preconditions for the transition
-		preconditions, err := iv.lifecycleLoader.GetTransitionPreconditions(kind, currentState, status)
-		if err == nil && len(preconditions) > 0 {
-			// Validate preconditions (basic check - can be enhanced)
-			for _, precondition := range preconditions {
-				// Preconditions are typically field checks like "priority_plan_ref is set"
-				// This is a simplified check - full implementation would parse and validate
-				if !iv.checkPrecondition(precondition, obj) {
-					errors = append(errors, ValidationError{
-						Field:   objects.FieldKeyStatus,
-						Message: fmt.Sprintf(ConstMagica2dc9a5c, status, precondition),
-						Rule:    validationRuleLifecycle(),
-					})
-				}
-			}
-		}
-
-		// Check postconditions for the transition
-		postconditions, err := iv.lifecycleLoader.GetTransitionPostconditions(kind, currentState, status)
-		if err == nil && len(postconditions) > 0 {
-			destObj := make(map[string]any, len(obj)+2)
-			for k, v := range obj {
-				destObj[k] = v
-			}
-			destObj[objects.FieldKeyStatus] = status
-			destObj[objects.FieldKeyKind] = kind
-			for _, postcondition := range postconditions {
-				trimmed := strings.TrimSpace(postcondition)
-				if trimmed == "" {
-					continue
-				}
-				canon, ok := predicate.CompilePrecondition(trimmed)
-				if !ok {
-					if err := predicate.ValidatePredicateSyntax(trimmed); err == nil {
-						canon = trimmed
-						ok = true
-					}
-				}
-				if !ok {
-					// Informational descriptive postconditions remain non-enforcing
-					continue
-				}
-				if !iv.checkPrecondition(canon, destObj) {
-					errors = append(errors, ValidationError{
-						Field:   objects.FieldKeyStatus,
-						Message: fmt.Sprintf("postcondition %q not satisfied upon entering status %q", postcondition, status),
-						Rule:    validationRuleLifecycle(),
-					})
-				}
-			}
-		}
-	}
-
-	// Check preconditions for the target status
-	statusPreconditions, err := iv.lifecycleLoader.GetStatusPreconditions(kind, status)
-	if err == nil && len(statusPreconditions) > 0 {
-		for _, precondition := range statusPreconditions {
-			if !iv.checkPrecondition(precondition, obj) {
-				errors = append(errors, ValidationError{
-					Field:   objects.FieldKeyStatus,
-					Message: fmt.Sprintf(ConstMagica962242b, status, precondition),
-					Rule:    validationRuleLifecycle(),
-				})
-			}
-		}
-	}
-
-	return errors, warnings
+	return gv.validateLifecycleState(context.Background(), kind, status, currentState, obj, nil)
 }
 
 // checkPrecondition checks if a precondition or postcondition is met using the Unified Kernel Predicate DSL.
 func (iv *InstanceValidator) checkPrecondition(precondition string, obj map[string]any) bool {
-	gv := NewGoValidator()
+	gv := iv.getGoValidator()
 	if gv != nil {
 		met, recognized := gv.evaluatePrecondition(precondition, obj, nil)
 		if recognized {
