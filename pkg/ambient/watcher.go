@@ -37,8 +37,12 @@ func NewFSWatcher(rootPath string, eventHub EventHub) (*FSWatcher, error) {
 
 // isIgnoredDirName returns true if a directory name should never be walked or watched.
 func isIgnoredDirName(name string) bool {
+	if strings.HasPrefix(name, "dist") || strings.HasPrefix(name, ".tmp") {
+		return true
+	}
 	switch name {
-	case ".git", "node_modules", ".idea", ".vscode", "vendor", paths.ProjectDataDir, paths.DefaultProjectStateDir, ".tmp":
+	case ".git", "node_modules", ".idea", ".vscode", "vendor", paths.ProjectDataDir, paths.DefaultProjectStateDir, ".tmp",
+		"pkg", "cmd", "internal", "bin", "tools", "scripts", "packs", "ext", ".cache", "coverage":
 		return true
 	default:
 		return false
@@ -46,7 +50,7 @@ func isIgnoredDirName(name string) bool {
 }
 
 // isIgnoredFSPath returns true if the given path belongs to internal state, runtime directories,
-// or ignored trees that must never generate ambient events (prevents recursive write-event feedback loops).
+// or ignored trees that must never generate ambient events (prevents recursive write-event feedback loops and descriptor leaks).
 func isIgnoredFSPath(path string) bool {
 	clean := filepath.ToSlash(path)
 	return strings.Contains(clean, "/.git/") ||
@@ -56,6 +60,18 @@ func isIgnoredFSPath(path string) bool {
 		strings.Contains(clean, "/vendor/") ||
 		strings.Contains(clean, "/.idea/") ||
 		strings.Contains(clean, "/.vscode/") ||
+		strings.Contains(clean, "/pkg/") ||
+		strings.Contains(clean, "/cmd/") ||
+		strings.Contains(clean, "/internal/") ||
+		strings.Contains(clean, "/bin/") ||
+		strings.Contains(clean, "/dist/") ||
+		strings.Contains(clean, "/dist-") ||
+		strings.Contains(clean, "/packs/") ||
+		strings.Contains(clean, "/scripts/") ||
+		strings.Contains(clean, "/tools/") ||
+		strings.Contains(clean, "/ext/") ||
+		strings.Contains(clean, "/.cache/") ||
+		strings.Contains(clean, "/coverage/") ||
 		strings.HasSuffix(clean, "/.DS_Store") ||
 		strings.HasSuffix(clean, "/.git") ||
 		strings.HasSuffix(clean, "/"+paths.ProjectDataDir) ||

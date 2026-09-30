@@ -394,12 +394,41 @@ func TestOutputQueue_ConcurrentEnqueueDequeue(t *testing.T) {
 	}
 }
 
+type safeTestBuffer struct {
+	mu  sync.Mutex
+	buf bytes.Buffer
+}
+
+func (s *safeTestBuffer) Write(p []byte) (n int, err error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.buf.Write(p)
+}
+
+func (s *safeTestBuffer) WriteString(str string) (n int, err error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.buf.WriteString(str)
+}
+
+func (s *safeTestBuffer) Len() int {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.buf.Len()
+}
+
+func (s *safeTestBuffer) String() string {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.buf.String()
+}
+
 func TestOutputWriter_Routing(t *testing.T) {
 	t.Parallel()
 	// Create mock handlers
-	progressBuf := &bytes.Buffer{}
-	metricsBuf := &bytes.Buffer{}
-	stdoutBuf := &bytes.Buffer{}
+	progressBuf := &safeTestBuffer{}
+	metricsBuf := &safeTestBuffer{}
+	stdoutBuf := &safeTestBuffer{}
 
 	queue := NewOutputQueue(0)
 	ctx := pkgctx.NewSystemContext()
@@ -442,7 +471,7 @@ func TestOutputWriter_Routing(t *testing.T) {
 
 func TestOutputWriter_Flush(t *testing.T) {
 	t.Parallel()
-	buf := &bytes.Buffer{}
+	buf := &safeTestBuffer{}
 	queue := NewOutputQueue(0)
 	ctx := pkgctx.NewSystemContext()
 	logger := logging.GetLoggerFromProfile("test")
@@ -472,7 +501,7 @@ func TestOutputWriter_Flush(t *testing.T) {
 
 func TestOutputWriter_Shutdown(t *testing.T) {
 	t.Parallel()
-	buf := &bytes.Buffer{}
+	buf := &safeTestBuffer{}
 	queue := NewOutputQueue(0)
 	ctx := pkgctx.NewSystemContext()
 	logger := logging.GetLoggerFromProfile("test")
@@ -519,7 +548,7 @@ func TestOutputWriter_ConcurrentStress(t *testing.T) {
 		t.Skip(ConstMagic84e5fac2)
 	}
 
-	buf := &bytes.Buffer{}
+	buf := &safeTestBuffer{}
 	queue := NewOutputQueue(100000) // Larger queue for stress test
 	ctx := pkgctx.NewSystemContext()
 	logger := logging.GetLoggerFromProfile("test")
@@ -597,7 +626,7 @@ func TestOutputWriter_QueueFullBackpressure(t *testing.T) {
 	logger := logging.GetLoggerFromProfile("test")
 	writer := NewOutputWriter(ctx, queue, logger)
 
-	buf := &bytes.Buffer{}
+	buf := &safeTestBuffer{}
 	// Use a slower writer to ensure queue fills up
 	slowHandler := &slowWriterHandler{buf: buf, delay: 100 * time.Millisecond} // Very slow delay
 	writer.RegisterHandler("slow", slowHandler)
@@ -648,7 +677,7 @@ func TestOutputWriter_QueueFullBackpressure(t *testing.T) {
 
 // slowWriterHandler is a handler that adds delay to simulate slow I/O
 type slowWriterHandler struct {
-	buf   *bytes.Buffer
+	buf   *safeTestBuffer
 	delay time.Duration
 }
 
