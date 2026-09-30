@@ -28,7 +28,8 @@ func (m *streamVolumeMonitor) Run(ctx context.Context, projectRoot string) (*hea
 	metricsDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.MetricsDir, paths.MetricsStreamVolumeSubdir)
 	if _, err := fileutil.Stat(metricsDir); err != nil {
 		if fileutil.IsNotExist(err) {
-			return &healthcheck.Result{Status: statusOK, Summary: "no stream_volume metrics yet"}, nil
+			// Uninitialized metrics must report degraded warning rather than false-green ok (TDE-F-OBS-002).
+			return &healthcheck.Result{Status: statusDegraded, Summary: "uninitialized: no stream_volume metrics yet"}, nil
 		}
 		return &healthcheck.Result{
 			Status:  statusDegraded,
@@ -74,7 +75,7 @@ func (m *streamVolumeMonitor) Run(ctx context.Context, projectRoot string) (*hea
 	}
 
 	if lastSample == nil {
-		return &healthcheck.Result{Status: statusOK, Summary: "no recent stream_volume samples"}, nil
+		return &healthcheck.Result{Status: statusDegraded, Summary: "uninitialized: no recent stream_volume samples"}, nil
 	}
 
 	currentCount := lastSample.Value

@@ -88,6 +88,16 @@ type OperationNotifier interface {
 	NotifyCompletion(operation *Operation) error
 }
 
+// NoopOperationNotifier is a no-op OperationNotifier implementation that safely discards notifications.
+type NoopOperationNotifier struct{}
+
+func (NoopOperationNotifier) NotifyProgress(*Operation, int, string) error { return nil }
+func (NoopOperationNotifier) NotifyStatus(*Operation, OperationStatus, OperationStatus) error { return nil }
+func (NoopOperationNotifier) NotifyError(*Operation, error) error { return nil }
+func (NoopOperationNotifier) NotifyCompletion(*Operation) error { return nil }
+
+var _ OperationNotifier = NoopOperationNotifier{}
+
 // NewOperationQueue creates a new operation queue
 func NewOperationQueue(notifier OperationNotifier) *OperationQueue {
 	return &OperationQueue{

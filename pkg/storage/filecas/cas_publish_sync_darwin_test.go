@@ -172,4 +172,24 @@ func TestInitiateDarwinSyncShutdown_SynchronousFallback(t *testing.T) {
 	darwinSyncShutdown.Store(false)
 }
 
+func TestCasPublishSyncFileOS_StrictSyncDurability(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "cas-strict.yaml")
+	if err := fileutil.WriteFile(path, []byte("id: STRICT-1\n"), fileutil.StandardFilePerm); err != nil {
+		t.Fatalf("write fixture: %v", err)
+	}
+	f, err := fileutil.Open(path)
+	if err != nil {
+		t.Fatalf("open fixture: %v", err)
+	}
+	defer f.Close()
+
+	SetDarwinStrictSync(true)
+	defer SetDarwinStrictSync(false)
+
+	if err := CasPublishSyncFileOS(f); err != nil {
+		t.Fatalf("strict sync failed: %v", err)
+	}
+}
+
+
 

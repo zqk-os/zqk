@@ -4,9 +4,15 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
+	"path/filepath"
 	"strconv"
+	"time"
 
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -117,6 +123,7 @@ func replayLines[T any](
 			if maxLineSize > 0 && len(payload) > maxLineSize {
 				stats.Oversized++
 				stats.Cursor.Offset = offset
+				quarantineCorruptedWALLine(f.Name(), payload, "line exceeds max line size")
 				continue
 			}
 			// Cheap skip for already-applied records (avoid full unmarshal).
@@ -129,6 +136,7 @@ func replayLines[T any](
 			if parseErr != nil || rec == nil {
 				stats.Corrupted++
 				stats.Cursor.Offset = offset
+				quarantineCorruptedWALLine(f.Name(), payload, fmt.Sprintf("parse error: %v", parseErr))
 				continue
 			}
 			seq := extractSeq(rec)
@@ -208,3 +216,33 @@ func ParseReplayCursorCheckpoint(data []byte) (ReplayCursor, error) {
 	}
 	return ReplayCursor{Seq: seq}, nil
 }
+
+func quarantineCorruptedWALLine(walFilePath string, payload []byte, reason string) {
+	if walFilePath == "" || len(payload) == 0 {
+		return
+	}
+	quarantineDir := filepath.Join(filepath.Dir(walFilePath), "quarantine")
+	if err := fileutil.EnsureDir(quarantineDir); err != nil {
+		logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+		logging.Fluent(logger).Error("failed to create WAL quarantine directory", err).
+			String("quarantine_dir", quarantineDir).
+			Log()
+		return
+	}
+	quarantineFile := filepath.Join(quarantineDir, fmt.Sprintf("corrupt_cursor_line_%d.log", time.Now().UnixNano()))
+	content := append(append([]byte(nil), payload...), '\n')
+	if err := fileutil.WriteFile(quarantineFile, content, paths.FilePerm644); err != nil {
+		logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+		logging.Fluent(logger).Error("failed to write WAL quarantine file", err).
+			String("quarantine_file", quarantineFile).
+			Log()
+		return
+	}
+	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+	logging.Fluent(logger).Warn(fmt.Sprintf("WAL corruption detected during cursor replay (%s); quarantined", reason)).
+		String("wal_file", walFilePath).
+		String("quarantine_file", quarantineFile).
+		String("reason", reason).
+		Log()
+}
+

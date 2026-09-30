@@ -2,8 +2,11 @@ package agentfeed_test
 
 import (
 	"errors"
+	"fmt"
 	"path/filepath"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 	"github.com/zqk-os/zqk/pkg/agentfeed"
@@ -43,6 +46,27 @@ func TestInspectFeed_Doctor(t *testing.T) {
 		require.False(t, res.ContractPathsOK)
 		require.True(t, res.PeerWakeLive)
 		require.Contains(t, res.Issues, "vendor_path_leak: lite policy contains .claude")
+	})
+
+	t.Run("Stalled open awaits reports degraded feed health", func(t *testing.T) {
+		awaitsPath := paths.PeerAckAwaitsPath(tempDir)
+		require.NoError(t, fileutil.EnsureDir(filepath.Dir(awaitsPath)))
+		staleTime := time.Now().UTC().Add(-20 * time.Minute).Format(time.RFC3339)
+		awaitsContent := fmt.Sprintf(`{"awaits":[{"id":"AWAIT-1","event_id":"AFE-1","from_agent_id":"agent-1","action":"wake","status":"open","created_at":"%s"}]}`, staleTime)
+		require.NoError(t, fileutil.WriteStandardFile(awaitsPath, []byte(awaitsContent)))
+
+		res := agentfeed.InspectFeed(agentfeed.DoctorOptions{
+			ProjectRoot: tempDir,
+		})
+		require.Equal(t, "degraded", res.FeedHealth)
+		foundIssue := false
+		for _, issue := range res.Issues {
+			if strings.Contains(issue, "feed_unacked_awaits_stalled") {
+				foundIssue = true
+				break
+			}
+		}
+		require.True(t, foundIssue, "expected feed_unacked_awaits_stalled in issues")
 	})
 }
 

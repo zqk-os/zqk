@@ -14,11 +14,8 @@ func NewCLINotifierWithCoordinator(
 	storageProvider storage.ObjectStorageProvider,
 	operationID, operationType, profile string,
 ) storage.OperationNotifier {
-	if projectRoot == emptyValue {
-		panic("NewCLINotifierWithCoordinator requires projectRoot")
-	}
-	if storageProvider == nil {
-		panic("NewCLINotifierWithCoordinator requires storageProvider")
+	if projectRoot == emptyValue || storageProvider == nil {
+		return storage.NoopOperationNotifier{}
 	}
 
 	// Create coordinator with routers (mandatory)

@@ -5,6 +5,7 @@ package filecas
 import (
 	"context"
 	"errors"
+	"os"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -20,7 +21,21 @@ var (
 	darwinSyncWG        sync.WaitGroup
 	darwinSyncPending   atomic.Int64
 	darwinSyncShutdown  atomic.Bool
+	darwinStrictSync    atomic.Bool
 )
+
+// SetDarwinStrictSync configures whether Darwin CAS publishes execute synchronous fsync (TDE-F-REL-001).
+func SetDarwinStrictSync(strict bool) {
+	darwinStrictSync.Store(strict)
+}
+
+// IsDarwinStrictSync reports whether synchronous fsync is active for Darwin CAS publishes.
+func IsDarwinStrictSync() bool {
+	if darwinStrictSync.Load() {
+		return true
+	}
+	return os.Getenv("ZQK_DARWIN_CAS_SYNC_STRICT") == "1" || os.Getenv("ZQK_CAS_STRICT_DURABILITY") == "1"
+}
 
 func initDarwinSyncQueue() {
 	darwinSyncQueue = make(chan *fileutil.File, 1024)
@@ -128,6 +143,9 @@ func DrainDarwinSyncQueue(timeout time.Duration) error {
 func CasPublishSyncFileOS(f *fileutil.File) error {
 	if f == nil {
 		return nil
+	}
+	if IsDarwinStrictSync() {
+		return f.Sync()
 	}
 	darwinSyncQueueOnce.Do(initDarwinSyncQueue)
 	dupFD, err := fileutil.Open(f.Name())

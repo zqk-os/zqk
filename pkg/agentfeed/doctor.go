@@ -1,7 +1,9 @@
 package agentfeed
 
 import (
+	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -50,6 +52,23 @@ func InspectFeed(opts DoctorOptions) DoctorResult {
 	} else {
 		result.FeedHealth = "degraded"
 		result.Issues = append(result.Issues, "feed_file_missing_or_empty: "+feedPath)
+	}
+
+	// 2b. Inspect unacked / stalled message backlog (TDE-F-OBS-001)
+	if f, err := loadPeerAckAwaitFile(opts.ProjectRoot); err == nil {
+		stalled := 0
+		now := time.Now().UTC()
+		for _, a := range f.Awaits {
+			if a.Status == AwaitStatusOpen {
+				if t, parseErr := time.Parse(time.RFC3339, a.CreatedAt); parseErr == nil && now.Sub(t) > 10*time.Minute {
+					stalled++
+				}
+			}
+		}
+		if stalled > 0 {
+			result.FeedHealth = "degraded"
+			result.Issues = append(result.Issues, fmt.Sprintf("feed_unacked_awaits_stalled: %d open awaits exceeding 10m threshold", stalled))
+		}
 	}
 
 	// 3. Enforce project-data contract paths via VendorPathPolicy (not hardcoded vendor names).
