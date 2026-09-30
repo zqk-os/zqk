@@ -321,16 +321,13 @@ func (s *AuditorService) performAuditWithMode(ctx context.Context, id string, ki
 	}
 
 	// 2. STRUCTURAL AST AUDIT
-	if len(artifactPaths) == 0 {
-		if (kind == objects.KindRequirement || kind == objects.KindCriteria) && (isComplete || isTerminalAudit) {
-			// Requirements and criteria have ontological verification above; AST file scan is not applicable.
-		} else {
-			// Fail-closed invariant: NO DATA != NO FAILURES.
-			// If an object has no artifacts to AST-audit, and is not a requirement or criteria verified by ontology,
-			// the auditor cannot attest to its conformance and MUST NOT issue a vacuous QASuccess token.
-			logging.FluentEvent(logger).Info(fmt.Sprintf("Skipping QASuccess issuance: no verifiable artifacts or ontological criteria defined for %s (%s)", id, kind)).Log()
-			return
-		}
+	isOntologicalSpec := (kind == objects.KindRequirement || kind == objects.KindCriteria) && (isComplete || isTerminalAudit)
+	if len(artifactPaths) == 0 && !isOntologicalSpec {
+		// Fail-closed invariant: NO DATA != NO FAILURES.
+		// If an object has no artifacts to AST-audit, and is not a requirement or criteria verified by ontology,
+		// the auditor cannot attest to its conformance and MUST NOT issue a vacuous QASuccess token.
+		logging.FluentEvent(logger).Info(fmt.Sprintf("Skipping QASuccess issuance: no verifiable artifacts or ontological criteria defined for %s (%s)", id, kind)).Log()
+		return
 	}
 	var astViolations []Violation
 	for _, path := range artifactPaths {
