@@ -84,11 +84,11 @@ func newStewardDaemonCmd() *cobra.Command {
 			return errfmt.Errorf("project root not found")
 		}
 
-		daemonLock, err := singleton.AcquireDaemonLock(projectRoot, "steward")
+		releaseLock, err := singleton.Guard(projectRoot, "steward")
 		if err != nil {
-			return errfmt.Errorf("failed to acquire steward daemon lock: %w", err)
+			return err
 		}
-		defer daemonLock.Release()
+		defer releaseLock()
 
 		logger := logging.GetLoggerFromProfile(proc.Context().Profile)
 		logging.Fluent(logger).Info("Kernel steward daemon starting").

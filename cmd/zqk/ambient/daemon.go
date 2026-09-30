@@ -83,13 +83,11 @@ func runAmbientDaemon(cmd *cobra.Command, args []string) error {
 	}
 
 	// Enforce single instance of ambient daemon per project root
-	daemonLock, err := singleton.AcquireDaemonLock(projectRoot, "ambient")
+	releaseLock, err := singleton.Guard(projectRoot, "ambient")
 	if err != nil {
 		return err
 	}
-	defer func() {
-		_ = daemonLock.Release()
-	}()
+	defer releaseLock()
 
 	pidPath := ambientPIDFilePath(projectRoot)
 	if err := fileutil.EnsureDir(filepath.Dir(pidPath)); err != nil {
