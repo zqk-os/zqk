@@ -3,6 +3,7 @@ package vet
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -149,3 +150,115 @@ func DoSomethingComplex() int {
 	require.NoError(t, err)
 	require.Empty(t, findings)
 }
+
+func TestCheckDuplication_DetectsStatementSequence(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	fileA := filepath.Join(tmpDir, "pkg", "compose", "eval.go")
+	require.NoError(t, os.MkdirAll(filepath.Dir(fileA), 0755))
+	content := `package compose
+
+import "strings"
+
+func evalPredFieldNonEmpty(obj map[string]any, arg string) any {
+	field := arg
+	if strings.Contains(arg, ":") {
+		_, f, ok := strings.Cut(arg, ":")
+		field = f
+		_ = ok
+	}
+	field = strings.TrimSpace(field)
+	val, exists := obj[field]
+	if !exists || val == nil {
+		return "missing"
+	}
+	return val
+}
+
+func evalPredFieldCleared(obj map[string]any, arg string) any {
+	field := arg
+	if strings.Contains(arg, ":") {
+		_, f, ok := strings.Cut(arg, ":")
+		field = f
+		_ = ok
+	}
+	field = strings.TrimSpace(field)
+	val, exists := obj[field]
+	if exists && val != nil {
+		return "cleared"
+	}
+	return nil
+}
+`
+	require.NoError(t, os.WriteFile(fileA, []byte(content), 0644))
+
+	cfg := DefaultConfig()
+	cfg.Hygiene.GoScanDirs = []string{"pkg/"}
+	cfg.Hygiene.CheckDups = true
+	cfg.Hygiene.DupMinStatements = 3
+	cfg.Hygiene.DupMinLines = 4
+
+	findings, err := CheckDuplication(tmpDir, []string{"pkg/compose/eval.go"}, cfg)
+	require.NoError(t, err)
+	require.NotEmpty(t, findings)
+
+	foundSeq := false
+	for _, f := range findings {
+		if f.CheckID == "hygiene/duplication" && strings.Contains(f.Message, "duplicative statement sequence") {
+			foundSeq = true
+			require.Contains(t, f.Message, "evalPredFieldCleared")
+			require.Contains(t, f.Message, "evalPredFieldNonEmpty")
+			break
+		}
+	}
+	require.True(t, foundSeq, "Expected statement sequence duplication finding across eval functions")
+}
+
+func TestCheckDuplication_DetectsMapKeyReferenceDrift(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	fileA := filepath.Join(tmpDir, "pkg", "dsl", "dsl.go")
+	require.NoError(t, os.MkdirAll(filepath.Dir(fileA), 0755))
+	content := `package dsl
+
+var ValidModes = map[string]struct{}{
+	"mode_fast": {},
+	"mode_slow": {},
+	"mode_safe": {},
+}
+
+func CompileMode(m string) (string, bool) {
+	if m == "mode_fast" {
+		return "mode_fast", true
+	}
+	if m == "mode_slow" {
+		return "mode_slow", true
+	}
+	return "", false
+}
+`
+	require.NoError(t, os.WriteFile(fileA, []byte(content), 0644))
+
+	cfg := DefaultConfig()
+	cfg.Hygiene.GoScanDirs = []string{"pkg/"}
+	cfg.Hygiene.CheckDups = true
+
+	findings, err := CheckDuplication(tmpDir, []string{"pkg/dsl/dsl.go"}, cfg)
+	require.NoError(t, err)
+	require.NotEmpty(t, findings)
+
+	foundDrift := false
+	for _, f := range findings {
+		if f.CheckID == "hygiene/duplication" && strings.Contains(f.Message, "duplicates references to keys of map") {
+			foundDrift = true
+			require.Contains(t, f.Message, "CompileMode")
+			require.Contains(t, f.Message, "ValidModes")
+			require.Contains(t, f.Message, "mode_fast")
+			require.Contains(t, f.Message, "mode_slow")
+			break
+		}
+	}
+	require.True(t, foundDrift, "Expected map key drift finding for CompileMode")
+}
+
+

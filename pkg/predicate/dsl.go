@@ -7,39 +7,163 @@ import (
 	"strings"
 )
 
+// Canonical zero-argument standalone gate predicate identifiers.
+const (
+	GateTestsOkPerCustomization             = "tests_ok_per_customization"
+	GateLintOkPerCustomization              = "lint_ok_per_customization"
+	GateCriteriaLinkedOrAcceptancePresent   = "criteria_linked_or_acceptance_present"
+	GateGitDiffNonemptyOrWaiver             = "git_diff_nonempty_or_waiver"
+	GateSmokeOrIntegrationEvidencePresent   = "smoke_or_integration_evidence_present"
+	GateCIRequiredChecksGreenOrNA           = "ci_required_checks_green_or_na"
+	GateSecurityGateOkOrNA                  = "security_gate_ok_or_na"
+	GatePerformanceGateOkOrNA               = "performance_gate_ok_or_na"
+	GatePublishAckPresentIfPublic           = "publish_ack_present_if_public"
+	GateStandardChecksPass                  = "standard_checks_pass"
+	GateTitleBodyCohesion                   = "title_body_cohesion"
+	GatePathExists                          = "path_exists"
+	GateContentHashMatches                  = "content_hash_matches"
+	GateContentSizePositive                 = "content_size_positive"
+	GateShovelReady                         = "shovel_ready"
+	GateTddTestRedPhase                     = "tdd_test_red_phase"
+	GateCriteriaActiveTestCase              = "criteria_active_test_case"
+	GateReadyBacklogReferencesPlan          = "ready_backlog_references_plan"
+	GateLinkedBacklogReadyOrLater           = "linked_backlog_ready_or_later"
+	GateLinkedBacklogAllTerminal            = "linked_backlog_all_terminal"
+	GateNoLinkedBacklogInProgressOrComplete = "no_linked_backlog_in_progress_or_complete"
+	GateWorkflowConstraintsIfSet            = "workflow_constraints_if_set"
+	GatePriorityPlanValidated               = "priority_plan_validated"
+	GateTeamOrPersonaDispatchRefs           = "team_or_persona_dispatch_refs"
+	GateGitMutationEvidencePresent          = "git_mutation_evidence_present"
+	GateBranchIsAncestorOfTrunk             = "branch_is_ancestor_of_trunk"
+	GateMachineCheckableClosureEvidence     = "machine_checkable_closure_evidence"
+	GateLinkedCriteriaValidatedOrComplete   = "linked_criteria_validated_or_complete"
+	GatePriorityPlanArchivedWhenSet         = "priority_plan_archived_when_set"
+	GatePriorityPlanExecutionFacing         = "priority_plan_execution_facing"
+	GateWorkDone                            = "work_done"
+)
+
 // StandaloneGatePredicates lists canonical zero-argument predicate gates.
 var StandaloneGatePredicates = map[string]struct{}{
-	"tests_ok_per_customization":            {},
-	"lint_ok_per_customization":             {},
-	"criteria_linked_or_acceptance_present": {},
-	"git_diff_nonempty_or_waiver":           {},
-	"smoke_or_integration_evidence_present": {},
-	"ci_required_checks_green_or_na":        {},
-	"security_gate_ok_or_na":                {},
-	"performance_gate_ok_or_na":             {},
-	"publish_ack_present_if_public":         {},
-	"standard_checks_pass":                  {},
-	"title_body_cohesion":                   {},
-	"path_exists":                           {},
-	"content_hash_matches":                  {},
-	"content_size_positive":                 {},
-	"shovel_ready":                          {},
-	"tdd_test_red_phase":                    {},
-	"criteria_active_test_case":             {},
-	"ready_backlog_references_plan":         {},
-	"linked_backlog_ready_or_later":         {},
-	"linked_backlog_all_terminal":           {},
-	"no_linked_backlog_in_progress_or_complete": {},
-	"workflow_constraints_if_set":           {},
-	"priority_plan_validated":               {},
-	"team_or_persona_dispatch_refs":         {},
-	"git_mutation_evidence_present":         {},
-	"branch_is_ancestor_of_trunk":           {},
-	"machine_checkable_closure_evidence":    {},
-	"linked_criteria_validated_or_complete": {},
-	"priority_plan_archived_when_set":       {},
-	"priority_plan_execution_facing":        {},
-	"work_done":                             {},
+	GateTestsOkPerCustomization:             {},
+	GateLintOkPerCustomization:              {},
+	GateCriteriaLinkedOrAcceptancePresent:   {},
+	GateGitDiffNonemptyOrWaiver:             {},
+	GateSmokeOrIntegrationEvidencePresent:   {},
+	GateCIRequiredChecksGreenOrNA:           {},
+	GateSecurityGateOkOrNA:                  {},
+	GatePerformanceGateOkOrNA:               {},
+	GatePublishAckPresentIfPublic:           {},
+	GateStandardChecksPass:                  {},
+	GateTitleBodyCohesion:                   {},
+	GatePathExists:                          {},
+	GateContentHashMatches:                  {},
+	GateContentSizePositive:                 {},
+	GateShovelReady:                         {},
+	GateTddTestRedPhase:                     {},
+	GateCriteriaActiveTestCase:              {},
+	GateReadyBacklogReferencesPlan:          {},
+	GateLinkedBacklogReadyOrLater:           {},
+	GateLinkedBacklogAllTerminal:            {},
+	GateNoLinkedBacklogInProgressOrComplete: {},
+	GateWorkflowConstraintsIfSet:            {},
+	GatePriorityPlanValidated:               {},
+	GateTeamOrPersonaDispatchRefs:           {},
+	GateGitMutationEvidencePresent:          {},
+	GateBranchIsAncestorOfTrunk:             {},
+	GateMachineCheckableClosureEvidence:     {},
+	GateLinkedCriteriaValidatedOrComplete:   {},
+	GatePriorityPlanArchivedWhenSet:         {},
+	GatePriorityPlanExecutionFacing:         {},
+	GateWorkDone:                            {},
+}
+
+var proseToGateAliases = map[string]string{
+	"work is done":  GateWorkDone,
+	"tdd red phase": GateTddTestRedPhase,
+}
+
+var prosePrefixToGate = []struct {
+	prefixes []string
+	gate     string
+}{
+	{
+		prefixes: []string{"all linked criteria_refs bound to active test_case_refs"},
+		gate:     GateTddTestRedPhase,
+	},
+	{
+		prefixes: []string{
+			"must link to an active test_case",
+			"at least one active test_case_ref linked",
+		},
+		gate: GateCriteriaActiveTestCase,
+	},
+	{
+		prefixes: []string{"at least one ready backlog_item references this plan"},
+		gate:     GateReadyBacklogReferencesPlan,
+	},
+	{
+		prefixes: []string{"all linked backlog_items referencing this plan are ready or later"},
+		gate:     GateLinkedBacklogReadyOrLater,
+	},
+	{
+		prefixes: []string{"all linked backlog_items referencing this plan are terminal"},
+		gate:     GateLinkedBacklogAllTerminal,
+	},
+	{
+		prefixes: []string{"no linked backlog_items referencing this plan are in progress or complete"},
+		gate:     GateNoLinkedBacklogInProgressOrComplete,
+	},
+	{
+		prefixes: []string{"workflow constraints validated"},
+		gate:     GateWorkflowConstraintsIfSet,
+	},
+	{
+		prefixes: []string{"at least one team_configuration_ref or persona_refs"},
+		gate:     GateTeamOrPersonaDispatchRefs,
+	},
+	{
+		prefixes: []string{
+			"commit_hashes have git mutation evidence",
+			"commit_refs have git mutation evidence",
+		},
+		gate: GateGitMutationEvidencePresent,
+	},
+	{
+		prefixes: []string{
+			"branch_name is an ancestor of trunk",
+			"branch_ref is an ancestor of trunk",
+		},
+		gate: GateBranchIsAncestorOfTrunk,
+	},
+	{
+		prefixes: []string{"machine-checkable evidence with green scheduler fingerprint"},
+		gate:     GateMachineCheckableClosureEvidence,
+	},
+	{
+		prefixes: []string{"all linked criteria_refs are validated or complete"},
+		gate:     GateLinkedCriteriaValidatedOrComplete,
+	},
+	{
+		prefixes: []string{"linked priority_plan is archived when priority_plan_ref is set"},
+		gate:     GatePriorityPlanArchivedWhenSet,
+	},
+	{
+		prefixes: []string{"priority_plan_ref target must be in active or in_progress status"},
+		gate:     GatePriorityPlanExecutionFacing,
+	},
+}
+
+func init() {
+	for alias, gate := range proseToGateAliases {
+		if _, ok := StandaloneGatePredicates[gate]; !ok {
+			panic(fmt.Sprintf("predicate alias %q maps to unregistered gate %q", alias, gate))
+		}
+	}
+	for _, rule := range prosePrefixToGate {
+		if _, ok := StandaloneGatePredicates[rule.gate]; !ok {
+			panic(fmt.Sprintf("predicate prefix rule maps to unregistered gate %q", rule.gate))
+		}
+	}
 }
 
 var (
@@ -286,10 +410,10 @@ func validateAstAndNumericPredicate(name, arg string) (bool, error) {
 		}
 		return true, nil
 
-	case "criteria_linked_or_acceptance_present":
+	case GateCriteriaLinkedOrAcceptancePresent:
 		return true, nil
 
-	case "title_body_cohesion":
+	case GateTitleBodyCohesion:
 		if _, err := strconv.Atoi(arg); err != nil {
 			return true, fmt.Errorf("title_body_cohesion requires integer minimum shared stems, got %q", arg)
 		}
@@ -361,7 +485,7 @@ func CompilePrecondition(p string) (string, bool) {
 
 func compileDocAndFieldPrecondition(lower string) (string, bool) {
 	if strings.Contains(lower, "standard checks pass") {
-		return "standard_checks_pass", true
+		return GateStandardChecksPass, true
 	}
 	if strings.Contains(lower, "target document file exists and is reachable on disk") ||
 		strings.Contains(lower, "target file reachable and readable") {
@@ -454,56 +578,27 @@ func compileRoleAndClearedPrecondition(lower string) (string, bool) {
 }
 
 func compileStatusAndEvidencePrecondition(lower string) (string, bool) {
-	if lower == "work_done" || lower == "work is done" {
-		return "work_done", true
+	// 1. Direct match against canonical standalone gates
+	if _, ok := StandaloneGatePredicates[lower]; ok {
+		return lower, true
 	}
-	if lower == "shovel ready" || lower == "shovel_ready" {
-		return "shovel_ready", true
+	// 2. Normalized space-to-underscore match against canonical standalone gates
+	//    (handles e.g. "shovel ready" -> shovel_ready, "priority plan validated" -> priority_plan_validated)
+	underscored := strings.ReplaceAll(lower, " ", "_")
+	if _, ok := StandaloneGatePredicates[underscored]; ok {
+		return underscored, true
 	}
-	if strings.HasPrefix(lower, "all linked criteria_refs bound to active test_case_refs") || lower == "tdd red phase" {
-		return "tdd_test_red_phase", true
+	// 3. Known prose phrase aliases
+	if gate, ok := proseToGateAliases[lower]; ok {
+		return gate, true
 	}
-	if strings.HasPrefix(lower, "must link to an active test_case") || strings.HasPrefix(lower, "at least one active test_case_ref linked") {
-		return "criteria_active_test_case", true
-	}
-	if strings.HasPrefix(lower, "at least one ready backlog_item references this plan") {
-		return "ready_backlog_references_plan", true
-	}
-	if strings.HasPrefix(lower, "all linked backlog_items referencing this plan are ready or later") {
-		return "linked_backlog_ready_or_later", true
-	}
-	if strings.HasPrefix(lower, "all linked backlog_items referencing this plan are terminal") {
-		return "linked_backlog_all_terminal", true
-	}
-	if strings.HasPrefix(lower, "no linked backlog_items referencing this plan are in progress or complete") {
-		return "no_linked_backlog_in_progress_or_complete", true
-	}
-	if strings.HasPrefix(lower, "workflow constraints validated") {
-		return "workflow_constraints_if_set", true
-	}
-	if lower == "priority plan validated" {
-		return "priority_plan_validated", true
-	}
-	if strings.HasPrefix(lower, "at least one team_configuration_ref or persona_refs") {
-		return "team_or_persona_dispatch_refs", true
-	}
-	if strings.HasPrefix(lower, "commit_hashes have git mutation evidence") || strings.HasPrefix(lower, "commit_refs have git mutation evidence") {
-		return "git_mutation_evidence_present", true
-	}
-	if strings.HasPrefix(lower, "branch_name is an ancestor of trunk") || strings.HasPrefix(lower, "branch_ref is an ancestor of trunk") {
-		return "branch_is_ancestor_of_trunk", true
-	}
-	if strings.HasPrefix(lower, "machine-checkable evidence with green scheduler fingerprint") {
-		return "machine_checkable_closure_evidence", true
-	}
-	if strings.HasPrefix(lower, "all linked criteria_refs are validated or complete") {
-		return "linked_criteria_validated_or_complete", true
-	}
-	if strings.HasPrefix(lower, "linked priority_plan is archived when priority_plan_ref is set") {
-		return "priority_plan_archived_when_set", true
-	}
-	if strings.HasPrefix(lower, "priority_plan_ref target must be in active or in_progress status") {
-		return "priority_plan_execution_facing", true
+	// 4. Prefix patterns mapped to canonical gates
+	for _, rule := range prosePrefixToGate {
+		for _, prefix := range rule.prefixes {
+			if strings.HasPrefix(lower, prefix) {
+				return rule.gate, true
+			}
+		}
 	}
 	return "", false
 }

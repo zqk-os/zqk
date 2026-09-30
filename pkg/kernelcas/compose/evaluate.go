@@ -300,64 +300,49 @@ func evalPredicateDSL(_ context.Context, _ string, obj map[string]any, _ ObjectL
 	return errs
 }
 
-func evalPredFieldNonEmpty(obj map[string]any, arg, msgOverride string) *ValidationError {
+func extractTargetFieldAndValue(obj map[string]any, arg string) (string, any, bool) {
 	field := arg
 	if strings.Contains(arg, ":") {
-		_, f, ok := strings.Cut(arg, ":")
+		_, f, _ := strings.Cut(arg, ":")
 		field = f
-		_ = ok
 	}
 	field = strings.TrimSpace(field)
 	val, exists := obj[field]
+	return field, val, exists
+}
+
+func composedFieldError(field, override, defaultMsg string) *ValidationError {
+	msg := override
+	if msg == "" {
+		msg = defaultMsg
+	}
+	return &ValidationError{Field: field, Message: msg, Rule: "composed_integrity"}
+}
+
+func evalPredFieldNonEmpty(obj map[string]any, arg, msgOverride string) *ValidationError {
+	field, val, exists := extractTargetFieldAndValue(obj, arg)
 	if !exists || val == nil {
-		msg := msgOverride
-		if msg == "" {
-			msg = fmt.Sprintf("field %s must be populated", field)
-		}
-		return &ValidationError{Field: field, Message: msg, Rule: "composed_integrity"}
+		return composedFieldError(field, msgOverride, fmt.Sprintf("field %s must be populated", field))
 	}
 	if str, ok := val.(string); ok && strings.TrimSpace(str) == "" {
-		msg := msgOverride
-		if msg == "" {
-			msg = fmt.Sprintf("field %s must be populated", field)
-		}
-		return &ValidationError{Field: field, Message: msg, Rule: "composed_integrity"}
+		return composedFieldError(field, msgOverride, fmt.Sprintf("field %s must be populated", field))
 	}
 	v := reflect.ValueOf(val)
 	if (v.Kind() == reflect.Slice || v.Kind() == reflect.Array) && v.Len() == 0 {
-		msg := msgOverride
-		if msg == "" {
-			msg = fmt.Sprintf("field %s must not be empty", field)
-		}
-		return &ValidationError{Field: field, Message: msg, Rule: "composed_integrity"}
+		return composedFieldError(field, msgOverride, fmt.Sprintf("field %s must not be empty", field))
 	}
 	return nil
 }
 
 func evalPredFieldCleared(obj map[string]any, arg, msgOverride string) *ValidationError {
-	field := arg
-	if strings.Contains(arg, ":") {
-		_, f, ok := strings.Cut(arg, ":")
-		field = f
-		_ = ok
-	}
-	field = strings.TrimSpace(field)
-	val, exists := obj[field]
+	field, val, exists := extractTargetFieldAndValue(obj, arg)
 	if exists && val != nil {
 		if str, ok := val.(string); ok && strings.TrimSpace(str) != "" {
-			msg := msgOverride
-			if msg == "" {
-				msg = fmt.Sprintf("field %s must be cleared", field)
-			}
-			return &ValidationError{Field: field, Message: msg, Rule: "composed_integrity"}
+			return composedFieldError(field, msgOverride, fmt.Sprintf("field %s must be cleared", field))
 		}
 		v := reflect.ValueOf(val)
 		if (v.Kind() == reflect.Slice || v.Kind() == reflect.Array || v.Kind() == reflect.Map) && v.Len() > 0 {
-			msg := msgOverride
-			if msg == "" {
-				msg = fmt.Sprintf("field %s must be cleared", field)
-			}
-			return &ValidationError{Field: field, Message: msg, Rule: "composed_integrity"}
+			return composedFieldError(field, msgOverride, fmt.Sprintf("field %s must be cleared", field))
 		}
 	}
 	return nil
@@ -383,19 +368,11 @@ func evalPredFieldMatches(obj map[string]any, arg, msgOverride string) *Validati
 	f := strings.TrimSpace(field)
 	val, exists := obj[f]
 	if !exists || val == nil {
-		msg := msgOverride
-		if msg == "" {
-			msg = fmt.Sprintf("field %s must be set", f)
-		}
-		return &ValidationError{Field: f, Message: msg, Rule: "composed_integrity"}
+		return composedFieldError(f, msgOverride, fmt.Sprintf("field %s must be set", f))
 	}
 	re, err := regexp.Compile(strings.TrimSpace(pattern))
 	if err != nil || !re.MatchString(fmt.Sprintf("%v", val)) {
-		msg := msgOverride
-		if msg == "" {
-			msg = fmt.Sprintf("field %s does not match pattern %s", f, strings.TrimSpace(pattern))
-		}
-		return &ValidationError{Field: f, Message: msg, Rule: "composed_integrity"}
+		return composedFieldError(f, msgOverride, fmt.Sprintf("field %s does not match pattern %s", f, strings.TrimSpace(pattern)))
 	}
 	return nil
 }

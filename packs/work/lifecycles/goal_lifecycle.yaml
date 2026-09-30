@@ -109,7 +109,7 @@ transitions:
     to: complete
     description: Auto-transition when metric target met OR all workstreams 
       complete
-    manual: false
+    manual: true
     auto: true
     on_dependent_status:
       kind: requirement
@@ -123,7 +123,7 @@ transitions:
   - from: proposed
     to: complete
     description: Auto-transition when linked requirement completes
-    manual: false
+    manual: true
     auto: true
     on_dependent_status:
       kind: requirement
