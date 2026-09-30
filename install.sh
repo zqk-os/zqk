@@ -177,6 +177,8 @@ install_binary() {
       echo "Checksums file not found in release ${ver}" >&2
       exit 1
     }
+    _download_private "$ver" "checksums.txt.sig" "${checksums_path}.sig" || true
+    _download_private "$ver" "checksums.txt.pem" "${checksums_path}.pem" || true
   else
     echo "Binary release not found for ${ver}. Try ZQK_INSTALL_METHOD=source or set GITHUB_TOKEN." >&2
     exit 1

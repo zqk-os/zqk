@@ -15,4 +15,6 @@ const (
 	FieldValidationMethod = "validation_method"
 	// FieldValidationThreshold is the field name for validation_threshold
 	FieldValidationThreshold = "validation_threshold"
+	// CriteriaFieldDocEntryRefs is the field name for doc_entry_refs
+	CriteriaFieldDocEntryRefs = "doc_entry_refs"
 )

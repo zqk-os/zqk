@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
+	"reflect"
+	"regexp"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -13,6 +15,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects/koi"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/pipeline"
+	"github.com/zqk-os/zqk/pkg/predicate"
 	"github.com/zqk-os/zqk/pkg/shovelready"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -107,12 +110,12 @@ func applyDecideRule(ctx context.Context, out *DecideOutcome, in MutationInput, 
 			out.Plan = PlanBreakGlass
 			out.ErasePolicy = ErasePolicyBreak
 			out.UnlinkPlanned = true
-			if strings.TrimSpace(in.Reason) != "" {
-				out.BreakGlass = in.Reason
-			} else if elevated {
+			out.BreakGlass = "AllowCoreObjectDelete"
+			if elevated {
 				out.BreakGlass = "elevated_delete_privilege"
-			} else {
-				out.BreakGlass = "AllowCoreObjectDelete"
+			}
+			if r := strings.TrimSpace(in.Reason); r != "" {
+				out.BreakGlass = r
 			}
 			return
 		}
@@ -219,9 +222,182 @@ func evalOverlayRule(ctx context.Context, kind string, obj map[string]any, looku
 		return evalRefuseUnknownFields(kind, obj, cfg)
 	case OpValidatePriorityValues:
 		return evalValidatePriorityValues(obj, cfg)
+	case OpPredicateDSL:
+		return evalPredicateDSL(ctx, kind, obj, lookup, cfg)
 	default:
 		return nil
 	}
+}
+
+// evalPredicateDSL evaluates Kernel Predicate DSL expressions against an object in compose pipelines.
+func evalPredicateDSL(_ context.Context, _ string, obj map[string]any, _ ObjectLookup, cfg map[string]any) []ValidationError {
+	expr := koi.GetString(cfg, "expression")
+	if expr == "" {
+		expr = koi.GetString(cfg, "predicate")
+	}
+	if strings.TrimSpace(expr) == "" {
+		return nil
+	}
+
+	if statuses := koi.GetStringSlice(cfg, objects.FieldKeyStatuses); len(statuses) > 0 {
+		st := koi.Status(obj)
+		matched := false
+		for _, s := range statuses {
+			if strings.EqualFold(st, s) {
+				matched = true
+				break
+			}
+		}
+		if !matched {
+			return nil
+		}
+	}
+
+	canon, ok := predicate.CompilePrecondition(expr)
+	if !ok {
+		if err := predicate.ValidatePredicateSyntax(expr); err == nil {
+			canon = expr
+			ok = true
+		}
+	}
+	if !ok {
+		return nil
+	}
+
+	preds, err := predicate.SplitPredicates(canon)
+	if err != nil {
+		return nil
+	}
+
+	msgOverride := koi.GetString(cfg, "message")
+	var errs []ValidationError
+
+	for _, pred := range preds {
+		name, arg, ok := strings.Cut(strings.TrimSpace(pred), ":")
+		name = strings.TrimSpace(name)
+		arg = strings.TrimSpace(arg)
+		_ = ok
+
+		switch name {
+		case "field_nonempty":
+			if ve := evalPredFieldNonEmpty(obj, arg, msgOverride); ve != nil {
+				errs = append(errs, *ve)
+			}
+		case "field_cleared":
+			if ve := evalPredFieldCleared(obj, arg, msgOverride); ve != nil {
+				errs = append(errs, *ve)
+			}
+		case "shovel_ready":
+			if ve := evalPredShovelReady(obj, msgOverride); ve != nil {
+				errs = append(errs, *ve)
+			}
+		case "field_matches":
+			if ve := evalPredFieldMatches(obj, arg, msgOverride); ve != nil {
+				errs = append(errs, *ve)
+			}
+		}
+	}
+	return errs
+}
+
+func evalPredFieldNonEmpty(obj map[string]any, arg, msgOverride string) *ValidationError {
+	field := arg
+	if strings.Contains(arg, ":") {
+		_, f, ok := strings.Cut(arg, ":")
+		field = f
+		_ = ok
+	}
+	field = strings.TrimSpace(field)
+	val, exists := obj[field]
+	if !exists || val == nil {
+		msg := msgOverride
+		if msg == "" {
+			msg = fmt.Sprintf("field %s must be populated", field)
+		}
+		return &ValidationError{Field: field, Message: msg, Rule: "composed_integrity"}
+	}
+	if str, ok := val.(string); ok && strings.TrimSpace(str) == "" {
+		msg := msgOverride
+		if msg == "" {
+			msg = fmt.Sprintf("field %s must be populated", field)
+		}
+		return &ValidationError{Field: field, Message: msg, Rule: "composed_integrity"}
+	}
+	v := reflect.ValueOf(val)
+	if (v.Kind() == reflect.Slice || v.Kind() == reflect.Array) && v.Len() == 0 {
+		msg := msgOverride
+		if msg == "" {
+			msg = fmt.Sprintf("field %s must not be empty", field)
+		}
+		return &ValidationError{Field: field, Message: msg, Rule: "composed_integrity"}
+	}
+	return nil
+}
+
+func evalPredFieldCleared(obj map[string]any, arg, msgOverride string) *ValidationError {
+	field := arg
+	if strings.Contains(arg, ":") {
+		_, f, ok := strings.Cut(arg, ":")
+		field = f
+		_ = ok
+	}
+	field = strings.TrimSpace(field)
+	val, exists := obj[field]
+	if exists && val != nil {
+		if str, ok := val.(string); ok && strings.TrimSpace(str) != "" {
+			msg := msgOverride
+			if msg == "" {
+				msg = fmt.Sprintf("field %s must be cleared", field)
+			}
+			return &ValidationError{Field: field, Message: msg, Rule: "composed_integrity"}
+		}
+		v := reflect.ValueOf(val)
+		if (v.Kind() == reflect.Slice || v.Kind() == reflect.Array || v.Kind() == reflect.Map) && v.Len() > 0 {
+			msg := msgOverride
+			if msg == "" {
+				msg = fmt.Sprintf("field %s must be cleared", field)
+			}
+			return &ValidationError{Field: field, Message: msg, Rule: "composed_integrity"}
+		}
+	}
+	return nil
+}
+
+func evalPredShovelReady(obj map[string]any, msgOverride string) *ValidationError {
+	res := shovelready.Evaluate(obj)
+	if !res.Ready {
+		msg := msgOverride
+		if msg == "" {
+			msg = fmt.Sprintf("CRI-SHOVEL-READY: %s", strings.Join(res.Missing, "; "))
+		}
+		return &ValidationError{Field: FieldCRIShovelReady, Message: msg, Rule: "composed_integrity"}
+	}
+	return nil
+}
+
+func evalPredFieldMatches(obj map[string]any, arg, msgOverride string) *ValidationError {
+	field, pattern, ok := strings.Cut(arg, ":")
+	if !ok {
+		return nil
+	}
+	f := strings.TrimSpace(field)
+	val, exists := obj[f]
+	if !exists || val == nil {
+		msg := msgOverride
+		if msg == "" {
+			msg = fmt.Sprintf("field %s must be set", f)
+		}
+		return &ValidationError{Field: f, Message: msg, Rule: "composed_integrity"}
+	}
+	re, err := regexp.Compile(strings.TrimSpace(pattern))
+	if err != nil || !re.MatchString(fmt.Sprintf("%v", val)) {
+		msg := msgOverride
+		if msg == "" {
+			msg = fmt.Sprintf("field %s does not match pattern %s", f, strings.TrimSpace(pattern))
+		}
+		return &ValidationError{Field: f, Message: msg, Rule: "composed_integrity"}
+	}
+	return nil
 }
 
 func evalRefuseFieldPresent(obj map[string]any, cfg map[string]any) []ValidationError {

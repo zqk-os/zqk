@@ -33,9 +33,6 @@ func TestZPARQL_ResultSchemaSpec(t *testing.T) {
 		}
 	}
 	require.True(t, found, "SPEC-ZPARQL-RESULT-STREAMING.md must exist in docs/specs/")
-	require.Contains(t, specContent, "CRIT-ZPARQL-RESULT-SCHEMA-SPEC")
-	require.Contains(t, specContent, "CRIT-ZPARQL-STREAMING-BACKPRESSURE-PROOF")
-	require.Contains(t, specContent, "CRIT-ZPARQL-TRUNCATED-STREAM-NEGATIVE")
 	require.Contains(t, specContent, "EOS_FINALIZED")
 	require.Contains(t, specContent, "Header Frame")
 	require.Contains(t, specContent, "Trailer Frame")

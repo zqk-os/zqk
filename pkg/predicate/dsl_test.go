@@ -66,6 +66,8 @@ func TestValidatePredicateSyntax(t *testing.T) {
 		{"link_back:milestone_refs:goal_refs", false},
 		{"at_least:1:milestone_refs", false},
 		{"at_least:0:milestone_refs", false},
+		{"any_nonempty:workstream_ref,milestone_ref", false},
+		{"any_nonempty:workstream_ref:milestone_ref", false},
 		// Invalid expressions
 		{"", true},
 		{"unknown_predicate_without_args", true},
@@ -75,6 +77,8 @@ func TestValidatePredicateSyntax(t *testing.T) {
 		{"at_least:invalid:milestone_refs", true},
 		{"at_least:-1:milestone_refs", true},
 		{"at_least:1:", true},
+		{"any_nonempty:", true},
+		{"any_nonempty:invalid field!", true},
 	}
 
 	for _, tt := range tests {
@@ -122,6 +126,8 @@ func TestCompilePrecondition(t *testing.T) {
 		{"machine-checkable evidence with green scheduler fingerprint is verified", "machine_checkable_closure_evidence", true},
 		{"at least one active milestone_ref linked", "active_ref:milestone_ref", true},
 		{"at least one milestone_ref linked", "at_least:1:milestone_ref", true},
+		{"at least one workstream_ref or milestone_ref linked", "any_nonempty:workstream_ref,milestone_ref", true},
+		{"at least one owner_ref or author_ref", "any_nonempty:owner_ref,author_ref", true},
 		{"at least 2 milestone_refs", "at_least:2:milestone_refs", true},
 		{"milestone_refs must link back to goal_refs", "link_back:milestone_refs:goal_refs", true},
 		{"unrecognized arbitrary condition", "", false},

@@ -8,9 +8,12 @@ import (
 // NewSystemSyncIdPrefixesFromSpecsCommandBuilder creates a new system_sync_id_prefixes_from_specs command
 func NewSystemSyncIdPrefixesFromSpecsCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("sync-id-prefixes-from-specs")
-	builder.WithShort("sync-id-prefixes-from-specs command")
-	help := clipkg.DynamicHelpBuilder("sync-id-prefixes-from-specs command")
-	help.WithDescriptionLines("sync-id-prefixes-from-specs command")
+	builder.WithShort("Sync and reconcile ID prefixes in configuration with object specifications")
+	help := clipkg.DynamicHelpBuilder("Sync and reconcile ID prefixes in configuration with object specifications")
+	help.WithDescriptionLines(
+		"Synchronize and reconcile object ID prefixes in kernel configuration",
+		"against definitions parsed from schema and object specifications.",
+	)
 	builder.WithHelpBuilder(help)
 	builder.AddBoolFlag("apply", "", false, "Apply changes")
 	builder.AddBoolFlag("dry-run", "", false, "Dry run mode")
