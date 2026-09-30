@@ -259,6 +259,8 @@ def get_clean_nav_title(title: str, rel_path: str = "") -> str:
     if path.startswith("docs/guides/"):
         guide_nav_titles = {
             "README.md": "Developer & Agent Guides Index",
+            "KERNEL_OBJECT_USAGE_GUIDE.md": "Kernel Object Model & Usage Guide",
+            "KNOWLEDGE_MANAGEMENT_AND_SEMANTIC_RECALL_GUIDE.md": "Knowledge Management & Semantic Recall",
             "ZQL_ZPARQL_AGENT_GUIDE.md": "ZQL & ZPARQL Graph Operations",
             "OBJECT_LIFECYCLE_AND_CAS_STORAGE_GUIDE.md": "Object Lifecycle, States & CAS",
             "POLICY_CREATION_AND_VALIDATION_DSL_GUIDE.md": "Custom Policy & Rule DSL",
@@ -2135,6 +2137,8 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
           <ul>
             <li><a href="docs/manual/README.html">Manual & CLI Reference</a></li>
             <li><a href="docs/guides/README.html">Developer & Agent Guides Index</a></li>
+            <li><a href="docs/guides/KERNEL_OBJECT_USAGE_GUIDE.html">Kernel Object Model & Usage Guide</a></li>
+            <li><a href="docs/guides/KNOWLEDGE_MANAGEMENT_AND_SEMANTIC_RECALL_GUIDE.html">Knowledge Management & Semantic Recall</a></li>
             <li><a href="docs/guides/ZQL_ZPARQL_AGENT_GUIDE.html">ZQL & ZPARQL Graph Operations</a></li>
             <li><a href="docs/guides/OBJECT_LIFECYCLE_AND_CAS_STORAGE_GUIDE.html">Object Lifecycle & CAS Storage</a></li>
             <li><a href="docs/guides/POLICY_CREATION_AND_VALIDATION_DSL_GUIDE.html">Custom Policy & Rule DSL</a></li>

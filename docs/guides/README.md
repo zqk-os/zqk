@@ -18,6 +18,8 @@ Every guide is structured to serve both **human pair programmers** using the int
 
 | Guide | Focus Area | Target Audience | Primary CLI & MCP Commands |
 | :--- | :--- | :--- | :--- |
+| **[Knowledge Kernel Object Model & Usage Guide](./KERNEL_OBJECT_USAGE_GUIDE.md)** | Canonical taxonomy across all 10 packs, standard envelopes, VDS cascade, and copy-pasteable CLI recipes for every lifecycle stage. | All Engineers & Agents | `zqk object create`, `zqk object list`, `zqk object ref add`, `zqk object promote` |
+| **[Knowledge Management, Vocabularies & Semantic Recall](./KNOWLEDGE_MANAGEMENT_AND_SEMANTIC_RECALL_GUIDE.md)** | Operational glossaries, lens taxonomies, composable libraries, `docman` CAS verification, and on-demand recall protocols. | AI Agents, Architects, SREs | `zqk docman register`, `zqk docman verify`, `zqk object list glossary_term` |
 | **[Declarative Graph Queries (ZPARQL) & Atomic Mutations (ZQL)](./ZQL_ZPARQL_AGENT_GUIDE.md)** | Multi-hop graph traversals, Cypher-like pattern queries, and atomic multi-object ACID transactions. | AI Agents, Backend Devs | `zqk query`, `zqk mutate`, `query_zparql`, `mutate_zql` |
 | **[Object Lifecycle, State Machines & CAS Storage](./OBJECT_LIFECYCLE_AND_CAS_STORAGE_GUIDE.md)** | Schema contracts, Content-Addressed Storage (CAS) membrane, two-phase draft/authoritative isolation, and DoD criteria binding. | All Engineers & Agents | `zqk object create`, `zqk object inspect`, `zqk object promote` |
 

@@ -52,9 +52,16 @@ storage_profile:
 | `backlog_item` | Actionable unit of work (BLI) executed by agents | `.zqk/process/backlog_item/` |
 | `criteria` | Verifiable Definition of Done (DoD) acceptance item | `.zqk/process/criteria/` |
 | `test_case` | Automated test suite verifying criteria satisfaction | `.zqk/process/test_case/` |
+| `doc_entry` | First-class CAS object representing tracked documentation | `.zqk/process/doc_entry/` |
+| `glossary_term` | Context-scoped definition embedding agent prompts & machine hints | `.zqk/process/glossary_term/` |
+| `vocabulary_scheme` | Lens taxonomy and navigation graph scoping terms | `.zqk/process/vocabulary_scheme/` |
+| `library` | Composable architectural pattern catalogs & specifications | `.zqk/process/library/` |
 | `policy` | Declarative governance invariant and boundary rule | `.zqk/process/policy/` |
 | `risk_blocker` | Active impediment obstructing workstream completion | `.zqk/process/risk_blocker/` |
 | `audit_event` | Append-only cryptographic log of state mutations | `.zqk/process/audit_event/` |
+
+> [!NOTE]
+> For a complete directory of all object kinds across all 10 packs, see the **[Knowledge Kernel Object Model & Usage Guide](./KERNEL_OBJECT_USAGE_GUIDE.md)** and **[Knowledge Management & Semantic Recall Guide](./KNOWLEDGE_MANAGEMENT_AND_SEMANTIC_RECALL_GUIDE.md)**.
 
 ---
 
