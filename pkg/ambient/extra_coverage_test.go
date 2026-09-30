@@ -127,7 +127,7 @@ func TestEventHub_EnableEventSourcingAndPublish(t *testing.T) {
 		t.Fatalf("Publish ev3 failed: %v", err)
 	}
 
-	time.Sleep(50 * time.Millisecond)
+	time.Sleep(200 * time.Millisecond)
 }
 
 func TestCoachHeuristics_AppendTip(t *testing.T) {

@@ -1,0 +1,40 @@
+# ZQK Ambient Monitoring Configuration
+# Configures filesystem watcher scope and ignores to prevent kqueue/inotify descriptor exhaustion.
+watcher:
+  ignored_dirs:
+    - pkg
+    - cmd
+    - internal
+    - bin
+    - tools
+    - scripts
+    - packs
+    - dist
+    - dist-docs
+    - dist-community
+    - ext
+    - docs
+    - examples
+    - config
+    - .agent
+    - .agents
+    - .cursor
+    - .ide
+    - .github
+  ignored_paths:
+    - /pkg/
+    - /cmd/
+    - /internal/
+    - /bin/
+    - /tools/
+    - /scripts/
+    - /packs/
+    - /dist/
+    - /dist-
+    - /ext/
+    - /docs/
+    - /docs
+    - /examples/
+    - /examples
+    - /config/
+    - /config

@@ -5,20 +5,16 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"path/filepath"
 	"strings"
 	"syscall"
 	"time"
 
-	"github.com/fsnotify/fsnotify"
 	"golang.org/x/term"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
-	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // RunTUI starts the interactive full-screen mission control session.
@@ -87,17 +83,6 @@ func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp stora
 	// Render initial frame
 	writeScreen(Render(m))
 
-	// Setup reactive filesystem watcher across tracked stream directories
-	watcher, _ := fsnotify.NewWatcher()
-	if watcher != nil {
-		defer watcher.Close()
-		for _, kind := range []string{"change_journal_entry", "audit_event", "agent_instruction", "process_lifecycle"} {
-			sDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.StreamsDir, kind)
-			_ = fileutil.MkdirAll(sDir, paths.DirPerm755)
-			_ = watcher.Add(sDir)
-		}
-	}
-
 	// Non-blocking keyboard input loop
 	keyCh := make(chan []byte, 16)
 	goroutinelabels.NewGoroutine("tui_stdin_reader", "reading keyboard input for live dashboard TUI").
@@ -123,11 +108,6 @@ func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp stora
 
 	refreshTicker := time.NewTicker(1 * time.Second)
 	defer refreshTicker.Stop()
-
-	var fsEvents <-chan fsnotify.Event
-	if watcher != nil {
-		fsEvents = watcher.Events
-	}
 
 	renderScreen := func() {
 		curW, curH, sErr := term.GetSize(stdoutFd)
@@ -161,12 +141,6 @@ func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp stora
 				m.RefreshScheduler(ctx, sp, sec)
 			}
 			renderScreen()
-		case ev, ok := <-fsEvents:
-			if ok && (ev.Has(fsnotify.Write) || ev.Has(fsnotify.Create)) {
-				m.RefreshMutations()
-				m.RefreshAuditEvents()
-				renderScreen()
-			}
 		}
 	}
 }

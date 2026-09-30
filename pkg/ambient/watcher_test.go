@@ -207,3 +207,65 @@ func TestFSWatcher_CustomConfigFiltering(t *testing.T) {
 	}
 }
 
+func TestLoadWatcherConfig_ConfigAmbientYAMLAndGitIgnoreAndWatchDirs(t *testing.T) {
+	tmpDir, err := fileutil.MkdirTemp("", "fswatcher-cfg2-test-*")
+	if err != nil {
+		t.Fatalf("failed to create temp dir: %v", err)
+	}
+	defer fileutil.RemoveAll(tmpDir)
+
+	// 1. config/ambient.yaml
+	configDir := filepath.Join(tmpDir, "config")
+	_ = fileutil.EnsureDir(configDir)
+	yamlContent := `watcher:
+  watch_dirs:
+    - src
+    - internal
+  ignored_dirs:
+    - docs
+    - extra_noise
+  ignored_paths:
+    - /docs/
+`
+	_ = fileutil.WriteSecureFile(filepath.Join(configDir, "ambient.yaml"), []byte(yamlContent))
+
+	// 2. .gitignore
+	gitIgnoreContent := `# Gitignore
+build_output
+/coverage_report/
+`
+	_ = fileutil.WriteSecureFile(filepath.Join(tmpDir, ".gitignore"), []byte(gitIgnoreContent))
+
+	// 3. Env var for watch dirs
+	t.Setenv("ZQK_AMBIENT_WATCH_DIRS", "plugins, components")
+
+	cfg := LoadWatcherConfig(tmpDir)
+
+	hasItem := func(slice []string, target string) bool {
+		for _, s := range slice {
+			if s == target {
+				return true
+			}
+		}
+		return false
+	}
+
+	for _, expectedDir := range []string{"docs", "extra_noise", "build_output"} {
+		if !hasItem(cfg.IgnoredDirs, expectedDir) {
+			t.Errorf("missing expected ignored dir: %s in %+v", expectedDir, cfg.IgnoredDirs)
+		}
+	}
+
+	for _, expectedPath := range []string{"/docs/", "/coverage_report/"} {
+		if !hasItem(cfg.IgnoredPaths, expectedPath) {
+			t.Errorf("missing expected ignored path: %s in %+v", expectedPath, cfg.IgnoredPaths)
+		}
+	}
+
+	for _, expectedWatch := range []string{"src", "internal", "plugins", "components"} {
+		if !hasItem(cfg.WatchDirs, expectedWatch) {
+			t.Errorf("missing expected watch dir: %s in %+v", expectedWatch, cfg.WatchDirs)
+		}
+	}
+}
+

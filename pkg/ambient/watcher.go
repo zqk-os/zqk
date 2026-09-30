@@ -18,14 +18,18 @@ import (
 
 // WatcherConfig defines configuration for filesystem ambient monitoring.
 type WatcherConfig struct {
+	// WatchDirs is an optional list of specific directories or files to watch.
+	// If empty, the root directory is watched (respecting IgnoredDirs and IgnoredPaths).
+	WatchDirs []string `json:"watch_dirs" yaml:"watch_dirs"`
 	// IgnoredDirs is a list of directory names to skip during recursive directory walking.
 	IgnoredDirs []string `json:"ignored_dirs" yaml:"ignored_dirs"`
 	// IgnoredPaths is a list of path substrings or patterns to ignore for events and watching.
 	IgnoredPaths []string `json:"ignored_paths" yaml:"ignored_paths"`
 }
 
-// DefaultIgnoredDirNames returns the generic, universal directory names that are always ignored.
-// It includes repository source trees, documentation, and build artifacts to prevent Darwin kqueue descriptor exhaustion.
+// DefaultIgnoredDirNames returns the generic, universal toolchain and VCS directory names that are always ignored.
+// Project-specific source, build, and documentation directories should be configured via config/ambient.yaml,
+// .zqk/ambient.yaml, .ambientignore, or .gitignore.
 func DefaultIgnoredDirNames() []string {
 	return []string{
 		".git",
@@ -33,11 +37,6 @@ func DefaultIgnoredDirNames() []string {
 		".hg",
 		".idea",
 		".vscode",
-		".agent",
-		".agents",
-		".cursor",
-		".ide",
-		".github",
 		"node_modules",
 		"vendor",
 		paths.ProjectDataDir,
@@ -45,20 +44,6 @@ func DefaultIgnoredDirNames() []string {
 		".tmp",
 		".cache",
 		"coverage",
-		"pkg",
-		"cmd",
-		"internal",
-		"bin",
-		"tools",
-		"scripts",
-		"packs",
-		"dist",
-		"dist-docs",
-		"dist-community",
-		"ext",
-		"docs",
-		"examples",
-		"config",
 	}
 }
 
@@ -71,16 +56,6 @@ func DefaultIgnoredPaths() []string {
 		"/.hg/",
 		"/.idea/",
 		"/.vscode/",
-		"/.agent/",
-		"/.agent",
-		"/.agents/",
-		"/.agents",
-		"/.cursor/",
-		"/.cursor",
-		"/.ide/",
-		"/.ide",
-		"/.github/",
-		"/.github",
 		"/node_modules/",
 		"/vendor/",
 		"/.cache/",
@@ -91,22 +66,6 @@ func DefaultIgnoredPaths() []string {
 		"/" + paths.ProjectDataDir,
 		"/" + paths.DefaultProjectStateDir + "/",
 		"/" + paths.DefaultProjectStateDir,
-		"/pkg/",
-		"/cmd/",
-		"/internal/",
-		"/bin/",
-		"/tools/",
-		"/scripts/",
-		"/packs/",
-		"/dist/",
-		"/dist-",
-		"/ext/",
-		"/docs/",
-		"/docs",
-		"/examples/",
-		"/examples",
-		"/config/",
-		"/config",
 	}
 }
 
@@ -121,53 +80,95 @@ func DefaultWatcherConfig() WatcherConfig {
 type ambientConfigYAML struct {
 	IgnoredDirs  []string `yaml:"ignored_dirs"`
 	IgnoredPaths []string `yaml:"ignored_paths"`
+	WatchDirs    []string `yaml:"watch_dirs"`
 	Watcher      struct {
 		IgnoredDirs  []string `yaml:"ignored_dirs"`
 		IgnoredPaths []string `yaml:"ignored_paths"`
+		WatchDirs    []string `yaml:"watch_dirs"`
 	} `yaml:"watcher"`
+	Ambient struct {
+		IgnoredDirs  []string `yaml:"ignored_dirs"`
+		IgnoredPaths []string `yaml:"ignored_paths"`
+		WatchDirs    []string `yaml:"watch_dirs"`
+		Watcher      struct {
+			IgnoredDirs  []string `yaml:"ignored_dirs"`
+			IgnoredPaths []string `yaml:"ignored_paths"`
+			WatchDirs    []string `yaml:"watch_dirs"`
+		} `yaml:"watcher"`
+	} `yaml:"ambient"`
+}
+
+func parseIgnoreFileLines(data []byte, cfg *WatcherConfig) {
+	lines := strings.Split(string(data), "\n")
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		if strings.Contains(line, "/") || strings.Contains(line, "*") {
+			cfg.IgnoredPaths = append(cfg.IgnoredPaths, line)
+		} else {
+			cfg.IgnoredDirs = append(cfg.IgnoredDirs, line)
+		}
+	}
 }
 
 // LoadWatcherConfig loads watcher configuration starting with universal defaults,
-// layered with .zqk/ambient.yaml (or .ambientignore) and environment overrides.
+// layered with config/ambient.yaml, .zqk/ambient.yaml, .ambientignore, .gitignore, and environment overrides.
 func LoadWatcherConfig(rootPath string) WatcherConfig {
 	cfg := DefaultWatcherConfig()
 
-	// 1. Try .zqk/ambient.yaml or .zqk/ambient.yml
-	ambientYAMLPaths := []string{
+	// 1. Check YAML config candidates in priority order
+	yamlCandidates := []string{
+		filepath.Join(rootPath, "config", "ambient.yaml"),
+		filepath.Join(rootPath, "config", "ambient.yml"),
 		filepath.Join(rootPath, paths.ProjectDataDir, "ambient.yaml"),
 		filepath.Join(rootPath, paths.ProjectDataDir, "ambient.yml"),
+		filepath.Join(rootPath, "config", "zqk.yaml"),
 	}
-	for _, p := range ambientYAMLPaths {
+	for _, p := range yamlCandidates {
 		if data, err := fileutil.ReadFile(p); err == nil && len(data) > 0 {
 			var parsed ambientConfigYAML
 			if err := yaml.Unmarshal(data, &parsed); err == nil {
 				cfg.IgnoredDirs = append(cfg.IgnoredDirs, parsed.IgnoredDirs...)
 				cfg.IgnoredDirs = append(cfg.IgnoredDirs, parsed.Watcher.IgnoredDirs...)
+				cfg.IgnoredDirs = append(cfg.IgnoredDirs, parsed.Ambient.IgnoredDirs...)
+				cfg.IgnoredDirs = append(cfg.IgnoredDirs, parsed.Ambient.Watcher.IgnoredDirs...)
+
 				cfg.IgnoredPaths = append(cfg.IgnoredPaths, parsed.IgnoredPaths...)
 				cfg.IgnoredPaths = append(cfg.IgnoredPaths, parsed.Watcher.IgnoredPaths...)
+				cfg.IgnoredPaths = append(cfg.IgnoredPaths, parsed.Ambient.IgnoredPaths...)
+				cfg.IgnoredPaths = append(cfg.IgnoredPaths, parsed.Ambient.Watcher.IgnoredPaths...)
+
+				cfg.WatchDirs = append(cfg.WatchDirs, parsed.WatchDirs...)
+				cfg.WatchDirs = append(cfg.WatchDirs, parsed.Watcher.WatchDirs...)
+				cfg.WatchDirs = append(cfg.WatchDirs, parsed.Ambient.WatchDirs...)
+				cfg.WatchDirs = append(cfg.WatchDirs, parsed.Ambient.Watcher.WatchDirs...)
 			}
-			break
 		}
 	}
 
 	// 2. Try .ambientignore in rootPath
 	ambientIgnorePath := filepath.Join(rootPath, ".ambientignore")
 	if data, err := fileutil.ReadFile(ambientIgnorePath); err == nil {
-		lines := strings.Split(string(data), "\n")
-		for _, line := range lines {
-			line = strings.TrimSpace(line)
-			if line == "" || strings.HasPrefix(line, "#") {
-				continue
-			}
-			if strings.Contains(line, "/") {
-				cfg.IgnoredPaths = append(cfg.IgnoredPaths, line)
-			} else {
-				cfg.IgnoredDirs = append(cfg.IgnoredDirs, line)
+		parseIgnoreFileLines(data, &cfg)
+	}
+
+	// 3. Try .gitignore in rootPath to inherit git-ignored directories/build artifacts
+	gitIgnorePath := filepath.Join(rootPath, ".gitignore")
+	if data, err := fileutil.ReadFile(gitIgnorePath); err == nil {
+		parseIgnoreFileLines(data, &cfg)
+	}
+
+	// 4. Environment overrides
+	if envWatchDirs := zqkenv.AmbientWatchDirs().Get(); envWatchDirs != "" {
+		for _, d := range strings.Split(envWatchDirs, ",") {
+			d = strings.TrimSpace(d)
+			if d != "" {
+				cfg.WatchDirs = append(cfg.WatchDirs, d)
 			}
 		}
 	}
-
-	// 3. Environment overrides
 	if envDirs := zqkenv.AmbientIgnoreDirs().Get(); envDirs != "" {
 		for _, d := range strings.Split(envDirs, ",") {
 			d = strings.TrimSpace(d)
@@ -279,22 +280,48 @@ func isIgnoredFSPath(path string) bool {
 
 // Start begins watching the directory tree.
 func (fw *FSWatcher) Start(ctx context.Context) error {
-	// Walk the root directory and add all directories to watcher, ignoring noise and configured ignores
-	err := filepath.Walk(fw.rootPath, func(path string, info fileutil.FileInfo, err error) error {
-		if err != nil {
-			return nil
-		}
-		if info.IsDir() {
-			base := filepath.Base(path)
-			if fw.isIgnoredDirName(base) || fw.isIgnoredFSPath(path) {
-				return filepath.SkipDir
+	targets := []string{fw.rootPath}
+	if len(fw.config.WatchDirs) > 0 {
+		targets = make([]string, 0, len(fw.config.WatchDirs))
+		for _, wd := range fw.config.WatchDirs {
+			wd = strings.TrimSpace(wd)
+			if wd == "" {
+				continue
 			}
-			return fw.watcher.Add(path)
+			if filepath.IsAbs(wd) {
+				targets = append(targets, wd)
+			} else {
+				targets = append(targets, filepath.Join(fw.rootPath, wd))
+			}
 		}
-		return nil
-	})
-	if err != nil {
-		return err
+	}
+
+	for _, target := range targets {
+		info, err := fileutil.Stat(target)
+		if err != nil {
+			continue
+		}
+		if !info.IsDir() {
+			_ = fw.watcher.Add(target)
+			continue
+		}
+		// Walk the target directory and add all directories to watcher, ignoring configured ignores
+		err = filepath.Walk(target, func(path string, info fileutil.FileInfo, err error) error {
+			if err != nil {
+				return nil
+			}
+			if info.IsDir() {
+				base := filepath.Base(path)
+				if fw.isIgnoredDirName(base) || fw.isIgnoredFSPath(path) {
+					return filepath.SkipDir
+				}
+				return fw.watcher.Add(path)
+			}
+			return nil
+		})
+		if err != nil {
+			return err
+		}
 	}
 
 	goroutinelabels.NewGoroutine("fswatcher", "listen to filesystem events").StartSimple(func() {
