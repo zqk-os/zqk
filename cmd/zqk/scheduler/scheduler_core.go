@@ -216,11 +216,11 @@ func startScheduler(ctx *cli.Context, cmd *cobra.Command) error {
 		return errfmt.Errorf(schedulerErrBrandSettingsRequired, err)
 	}
 
-	daemonLock, err := singleton.AcquireDaemonLock(projectRoot, "scheduler")
+	releaseLock, err := singleton.Guard(projectRoot, "scheduler")
 	if err != nil {
-		return errfmt.Errorf("failed to acquire scheduler daemon lock: %w", err)
+		return err
 	}
-	defer daemonLock.Release()
+	defer releaseLock()
 
 	// Clear no-auto-restart so ensure-scheduler-running.sh (cron) may start the daemon again if it dies later
 	if err := schedulerpkg.RemoveNoAutoRestartFile(projectRoot); err != nil {

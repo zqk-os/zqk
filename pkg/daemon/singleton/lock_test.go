@@ -100,3 +100,67 @@ func TestAcquireDaemonLock_RejectsNestedProjectRoot(t *testing.T) {
 		t.Fatalf("expected error wrapping paths.ErrNestedProjectRoot, got: %v", err)
 	}
 }
+
+func TestRunGuarded_ExecutesAndReleases(t *testing.T) {
+	t.Parallel()
+	tmpDir := t.TempDir()
+	if err := fileutil.MkdirAll(filepath.Join(tmpDir, paths.ProjectDataDir), paths.DirPerm755); err != nil {
+		t.Fatalf("failed to create data dir: %v", err)
+	}
+
+	executed := false
+	err := RunGuarded(tmpDir, "steward", func() error {
+		executed = true
+		// Verify lock is held inside the closure
+		running, _, checkErr := IsDaemonRunning(tmpDir, "steward")
+		if checkErr != nil || !running {
+			t.Errorf("expected steward daemon to be running inside RunGuarded, running=%v, err=%v", running, checkErr)
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("RunGuarded returned unexpected error: %v", err)
+	}
+	if !executed {
+		t.Fatal("expected RunGuarded action to execute")
+	}
+
+	// Lock should be released after RunGuarded exits
+	running, _, checkErr := IsDaemonRunning(tmpDir, "steward")
+	if checkErr != nil || running {
+		t.Errorf("expected steward daemon lock to be released after RunGuarded, running=%v, err=%v", running, checkErr)
+	}
+}
+
+func TestGuard_AcquiresAndReleases(t *testing.T) {
+	t.Parallel()
+	tmpDir := t.TempDir()
+	if err := fileutil.MkdirAll(filepath.Join(tmpDir, paths.ProjectDataDir), paths.DirPerm755); err != nil {
+		t.Fatalf("failed to create data dir: %v", err)
+	}
+
+	release, err := Guard(tmpDir, "overseer")
+	if err != nil {
+		t.Fatalf("Guard failed unexpectedly: %v", err)
+	}
+
+	// Verify lock is held
+	running, _, checkErr := IsDaemonRunning(tmpDir, "overseer")
+	if checkErr != nil || !running {
+		t.Errorf("expected overseer daemon to be running while Guard is held, running=%v, err=%v", running, checkErr)
+	}
+
+	// Secondary acquisition should fail
+	_, err2 := Guard(tmpDir, "overseer")
+	if err2 == nil {
+		t.Fatal("expected secondary Guard acquisition to fail while held")
+	}
+
+	release()
+
+	// Lock should now be released
+	running, _, checkErr = IsDaemonRunning(tmpDir, "overseer")
+	if checkErr != nil || running {
+		t.Errorf("expected overseer daemon lock to be released after release(), running=%v, err=%v", running, checkErr)
+	}
+}

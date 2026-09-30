@@ -445,11 +445,11 @@ func newRunCmd() *cobra.Command {
 		projectRoot := resolveProjectRoot(cmd)
 		logger := logging.GetLoggerFromProfile("human")
 
-		daemonLock, err := singleton.AcquireDaemonLock(projectRoot, "overseer")
+		releaseLock, err := singleton.Guard(projectRoot, "overseer")
 		if err != nil {
-			return errfmt.Newf("acquire overseer daemon lock").Wrap(err)
+			return err
 		}
-		defer daemonLock.Release()
+		defer releaseLock()
 
 		pgMgr, err := overseer.NewProcessGroupManager(true)
 		if err != nil {
