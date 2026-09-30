@@ -92,26 +92,59 @@ func (r *ReverseReferenceIndex) getCacheFilePath(projectRoot string) string {
 
 // LoadCache loads the cache from disk if it exists and is still valid
 // Returns true if cache was successfully loaded, false if cache needs to be rebuilt
-func (r *ReverseReferenceIndex) ReferencedIDCount() int {
-	var count int
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
+func newReverseRefIndexLockContext() (stdcontext.Context, stdcontext.CancelFunc) {
+	return stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
+}
+
+func newReverseRefIndexLockLogger() logging.Logger {
+	return logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+}
+
+func (r *ReverseReferenceIndex) initMapsLocked() {
+	if r.index == nil {
+		r.index = make(map[string][]string)
+	}
+	if r.forwardIndex == nil {
+		r.forwardIndex = make(map[string][]string)
+	}
+}
+
+func (r *ReverseReferenceIndex) withReadLock(lockName string, op func() error) error {
+	ctx, cancel := newReverseRefIndexLockContext()
 	defer cancel()
-	var err_swallow_119 = concurrency.WithRLockTimeout(
+	return concurrency.WithRLockTimeout(
 		&r.mu,
 		ctx,
 		nil,
-		logging.NewLockLoggerAdapter(logger),
-		locknames.LockNameReverseReferenceIndexReferencedIDCount,
-		func() error {
-			if r.index != nil {
-				count = len(r.index)
-			}
-			return nil
-		},
+		logging.NewLockLoggerAdapter(newReverseRefIndexLockLogger()),
+		lockName,
+		op,
 	)
-	if err_swallow_119 != nil {
-		logging.LogSwallowedError(err_swallow_119)
+}
+
+func (r *ReverseReferenceIndex) withWriteLock(lockName string, op func() error) error {
+	ctx, cancel := newReverseRefIndexLockContext()
+	defer cancel()
+	return concurrency.WithLockTimeout(
+		&r.mu,
+		ctx,
+		nil,
+		logging.NewLockLoggerAdapter(newReverseRefIndexLockLogger()),
+		lockName,
+		op,
+	)
+}
+
+// ReferencedIDCount returns the total count of referenced IDs tracked in the index.
+func (r *ReverseReferenceIndex) ReferencedIDCount() int {
+	var count int
+	if err := r.withReadLock(locknames.LockNameReverseReferenceIndexReferencedIDCount, func() error {
+		if r.index != nil {
+			count = len(r.index)
+		}
+		return nil
+	}); err != nil {
+		logging.LogSwallowedError(err)
 	}
 	return count
 }
@@ -119,6 +152,9 @@ func (r *ReverseReferenceIndex) ReferencedIDCount() int {
 // GetDependentsWithContext retrieves all dependent object IDs with fail-closed error propagation
 // using the provided context for lock acquisition timeout.
 func (r *ReverseReferenceIndex) GetDependentsWithContext(ctx stdcontext.Context, referencedID string) ([]string, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	var dependents []string
 	err := concurrency.WithRLockTimeout(
@@ -148,7 +184,7 @@ func (r *ReverseReferenceIndex) GetDependentsWithContext(ctx stdcontext.Context,
 // GetDependentsWithError retrieves all dependent object IDs with fail-closed error propagation
 // if the read lock times out or cannot be acquired.
 func (r *ReverseReferenceIndex) GetDependentsWithError(referencedID string) ([]string, error) {
-	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
+	ctx, cancel := newReverseRefIndexLockContext()
 	defer cancel()
 	return r.GetDependentsWithContext(ctx, referencedID)
 }
@@ -162,37 +198,13 @@ func (r *ReverseReferenceIndex) GetDependents(referencedID string) []string {
 	return deps
 }
 
-func (r *ReverseReferenceIndex) withWriteLock(lockName string, op func() error) error {
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
-	defer cancel()
-	return concurrency.WithLockTimeout(
-		&r.mu,
-		ctx,
-		nil,
-		logging.NewLockLoggerAdapter(logger),
-		lockName,
-		op,
-	)
-}
-
 func (r *ReverseReferenceIndex) AddReference(objectID, referencedID string) {
 	if referencedID == emptyValue || objectID == emptyValue {
 		return
 	}
 	err := r.withWriteLock(locknames.LockNameReverseReferenceIndexAddReference, func() error {
-		if r.index == nil {
-			r.index = make(map[string][]string)
-		}
-
-		deps := r.index[referencedID]
-		for _, dep := range deps {
-			if dep == objectID {
-				return nil
-			}
-		}
-
-		r.index[referencedID] = append(deps, objectID)
+		r.initMapsLocked()
+		r.addReferenceLocked(objectID, referencedID)
 		return nil
 	})
 	if err != nil {
@@ -209,19 +221,7 @@ func (r *ReverseReferenceIndex) RemoveReference(objectID, referencedID string) {
 		if r.index == nil {
 			return nil
 		}
-		deps := r.index[referencedID]
-
-		newDeps := make([]string, 0, len(deps))
-		for _, dep := range deps {
-			if dep != objectID {
-				newDeps = append(newDeps, dep)
-			}
-		}
-		if len(newDeps) == 0 {
-			delete(r.index, referencedID)
-		} else {
-			r.index[referencedID] = newDeps
-		}
+		r.removeReferenceLocked(objectID, referencedID)
 		return nil
 	})
 	if err != nil {
@@ -240,27 +240,26 @@ func (r *ReverseReferenceIndex) RemoveObject(objectID string) {
 		}
 
 		if r.forwardIndex != nil {
-			if refs, ok := r.forwardIndex[objectID]; ok {
-				for _, referencedID := range refs {
-					deps := r.index[referencedID]
-					newDeps := make([]string, 0, len(deps))
-					for _, dep := range deps {
-						if dep != objectID {
-							newDeps = append(newDeps, dep)
-						}
-					}
-					if len(newDeps) == 0 {
-						delete(r.index, referencedID)
-					} else {
-						r.index[referencedID] = newDeps
+			refs := r.forwardIndex[objectID]
+			for _, referencedID := range refs {
+				deps := r.index[referencedID]
+				newDeps := make([]string, 0, len(deps))
+				for _, dep := range deps {
+					if dep != objectID {
+						newDeps = append(newDeps, dep)
 					}
 				}
-				delete(r.forwardIndex, objectID)
-				return nil
+				if len(newDeps) == 0 {
+					delete(r.index, referencedID)
+				} else {
+					r.index[referencedID] = newDeps
+				}
 			}
+			delete(r.forwardIndex, objectID)
+			return nil
 		}
 
-		// Fallback: full scan if forward index is not populated for this object
+		// Fallback: full scan only if forward index structure was not initialized
 		for referencedID, deps := range r.index {
 			found := false
 			for _, dep := range deps {
@@ -297,12 +296,7 @@ func (r *ReverseReferenceIndex) UpdateReferences(objectID string, oldRefs, newRe
 		return
 	}
 	err := r.withWriteLock(locknames.LockNameReverseReferenceIndexUpdateReferences, func() error {
-		if r.index == nil {
-			r.index = make(map[string][]string)
-		}
-		if r.forwardIndex == nil {
-			r.forwardIndex = make(map[string][]string)
-		}
+		r.initMapsLocked()
 
 			for _, oldRef := range oldRefs {
 				if oldRef != emptyValue {
@@ -386,25 +380,14 @@ func (r *ReverseReferenceIndex) addReferenceLocked(objectID, referencedID string
 
 // Clear clears the entire index (for rebuild)
 func (r *ReverseReferenceIndex) Clear() {
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
-	defer cancel()
-	var err_swallow_125 = concurrency.WithLockTimeout(
-		&r.mu,
-		ctx,
-		nil,
-		logging.NewLockLoggerAdapter(logger),
-		locknames.LockNameReverseReferenceIndexClear,
-		func() error {
-			r.index = make(map[string][]string)
-			r.forwardIndex = make(map[string][]string)
-			r.metadata = nil
-			r.isReady.Store(false)
-			return nil
-		},
-	)
-	if err_swallow_125 != nil {
-		logging.LogSwallowedError(err_swallow_125)
+	if err := r.withWriteLock(locknames.LockNameReverseReferenceIndexClear, func() error {
+		r.index = make(map[string][]string)
+		r.forwardIndex = make(map[string][]string)
+		r.metadata = nil
+		r.isReady.Store(false)
+		return nil
+	}); err != nil {
+		logging.LogSwallowedError(err)
 	}
 }
 
@@ -465,3 +448,23 @@ func (r *ReverseReferenceIndex) BuildFromScan(projectRoot, processDir string, ki
 
 // GetReferencedObjectIDs returns all object IDs referenced by the given object (one level).
 // Used by lifecycle dependency propagation to walk one level up (refs) or down (dependents).
+func (r *ReverseReferenceIndex) GetReferencedObjectIDs(objectID string) []string {
+	if objectID == emptyValue {
+		return nil
+	}
+	var refs []string
+	if err := r.withReadLock(locknames.LockNameReverseReferenceIndexGetReferencedIDs, func() error {
+		if r.forwardIndex == nil {
+			return nil
+		}
+		if list, exists := r.forwardIndex[objectID]; exists {
+			refs = make([]string, len(list))
+			copy(refs, list)
+		}
+		return nil
+	}); err != nil {
+		logging.LogSwallowedError(err)
+		return nil
+	}
+	return refs
+}
