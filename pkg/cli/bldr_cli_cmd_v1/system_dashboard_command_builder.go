@@ -8,9 +8,9 @@ import (
 // NewSystemDashboardCommandBuilder creates a new system_dashboard command
 func NewSystemDashboardCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("dashboard")
-	builder.WithShort("dashboard command")
-	help := clipkg.DynamicHelpBuilder("dashboard command")
-	help.WithDescriptionLines("dashboard command")
+	builder.WithShort("Display real-time system metrics, kernel vitality, and active jobs dashboard")
+	help := clipkg.DynamicHelpBuilder("Display real-time system metrics, kernel vitality, and active jobs dashboard")
+	help.WithDescriptionLines("Renders an interactive terminal dashboard monitoring daemon vitality, storage metrics, and active swarm tasks.")
 	builder.WithHelpBuilder(help)
 	builder.WithCommonFlags(false, nil)
 	cmd := builder.Build()

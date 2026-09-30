@@ -8,9 +8,9 @@ import (
 // NewVersionCommandBuilder creates a new version command
 func NewVersionCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("version")
-	builder.WithShort("version command")
-	help := clipkg.DynamicHelpBuilder("version command")
-	help.WithDescriptionLines("version command")
+	builder.WithShort("Display ZQK binary version, build commit, and architecture metadata")
+	help := clipkg.DynamicHelpBuilder("Display ZQK binary version, build commit, and architecture metadata")
+	help.WithDescriptionLines("Outputs semantic version, git commit SHA, build timestamp, Go toolchain version, and runtime platform architecture.")
 	builder.WithHelpBuilder(help)
 	builder.WithCommonFlags(false, nil)
 	cmd := builder.Build()

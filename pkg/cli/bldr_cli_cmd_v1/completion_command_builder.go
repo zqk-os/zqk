@@ -8,9 +8,12 @@ import (
 // NewCompletionCommandBuilder creates a new completion command
 func NewCompletionCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("completion")
-	builder.WithShort("completion command")
-	help := clipkg.DynamicHelpBuilder("completion command")
-	help.WithDescriptionLines("completion command")
+	builder.WithShort("Generate shell completion scripts for supported shells")
+	help := clipkg.DynamicHelpBuilder("Generate shell completion scripts for supported shells")
+	help.WithDescriptionLines(
+		"Generate shell auto-completion scripts for zqk CLI commands across",
+		"supported shells including bash, zsh, fish, and powershell.",
+	)
 	builder.WithHelpBuilder(help)
 	builder.WithCommonFlags(false, nil)
 	cmd := builder.Build()
