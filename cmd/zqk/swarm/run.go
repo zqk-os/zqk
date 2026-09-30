@@ -34,34 +34,41 @@ import (
 	"github.com/zqk-os/zqk/pkg/workflow/whatsnext"
 )
 
-// NewRunCmd creates a new swarm run command.
-func NewRunCmd() *cobra.Command {
-	cmd := bldr_cli_cmd_v1.NewSwarmRunCommandBuilder()
+func configureRunCmd(cmd *cobra.Command) *cobra.Command {
 	cmd.Flags().Bool("stage-only", false, "Stage and ingest the swarm package into the kernel without launching execution")
 	cmd.Flags().BoolP("yes", "y", false, "Launch the swarm automatically without interactive confirmation")
-	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		dryRun, _ := cmd.Flags().GetBool("dry-run")
-		entrypoint, _ := cmd.Flags().GetString("entrypoint")
-		stageOnly, _ := cmd.Flags().GetBool("stage-only")
-		autoLaunch, _ := cmd.Flags().GetBool("yes")
-		return runSwarmPackage(cmd, args[0], dryRun, entrypoint, stageOnly, autoLaunch)
-	}
+	cmd.RunE = executeSwarmRun
 	return cmd
+}
+
+func executeSwarmRun(cmd *cobra.Command, args []string) error {
+	dryRun, err := cmd.Flags().GetBool("dry-run")
+	if err != nil {
+		dryRun = false
+	}
+	entrypoint, err := cmd.Flags().GetString("entrypoint")
+	if err != nil {
+		entrypoint = ""
+	}
+	stageOnly, err := cmd.Flags().GetBool("stage-only")
+	if err != nil {
+		stageOnly = false
+	}
+	autoLaunch, err := cmd.Flags().GetBool("yes")
+	if err != nil {
+		autoLaunch = false
+	}
+	return runSwarmPackage(cmd, args[0], dryRun, entrypoint, stageOnly, autoLaunch)
+}
+
+// NewRunCmd creates a new swarm run command.
+func NewRunCmd() *cobra.Command {
+	return configureRunCmd(bldr_cli_cmd_v1.NewSwarmRunCommandBuilder())
 }
 
 // NewTopLevelRunCmd creates the root 'zqk run' command.
 func NewTopLevelRunCmd() *cobra.Command {
-	cmd := bldr_cli_cmd_v1.NewRunCommandBuilder()
-	cmd.Flags().Bool("stage-only", false, "Stage and ingest the swarm package into the kernel without launching execution")
-	cmd.Flags().BoolP("yes", "y", false, "Launch the swarm automatically without interactive confirmation")
-	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		dryRun, _ := cmd.Flags().GetBool("dry-run")
-		entrypoint, _ := cmd.Flags().GetString("entrypoint")
-		stageOnly, _ := cmd.Flags().GetBool("stage-only")
-		autoLaunch, _ := cmd.Flags().GetBool("yes")
-		return runSwarmPackage(cmd, args[0], dryRun, entrypoint, stageOnly, autoLaunch)
-	}
-	return cmd
+	return configureRunCmd(bldr_cli_cmd_v1.NewRunCommandBuilder())
 }
 
 func runSwarmPackage(cmd *cobra.Command, targetPath string, dryRun bool, entrypointOverride string, stageOnly bool, autoLaunch bool) error {
@@ -228,13 +235,14 @@ func ensureValidSwarmAccount(opCtx stdcontext.Context, secCtx *pkgctx.SecurityCo
 	validAccount := false
 	if accountID != "" {
 		if obj, err := sp.Read(opCtx, secCtx, accountID); err == nil && obj != nil {
-			if st, _ := obj[objects.FieldKeyStatus].(string); st == "" || st == objects.ObjectStatusActive {
+			st := objects.GetString(obj, objects.FieldKeyStatus)
+			if st == "" || st == objects.ObjectStatusActive {
 				validAccount = true
 			}
 		}
 	}
 	if !validAccount {
-		accList, err := sp.List(opCtx, secCtx, pkgctx.NewStorageContext(), storage.ListFilter{
+		accList, err := sp.List(opCtx, secCtx, nil, storage.ListFilter{
 			Kind: objects.KindAccount,
 			Filters: map[string]any{
 				objects.FieldKeyStatus: objects.ObjectStatusActive,
@@ -243,7 +251,8 @@ func ensureValidSwarmAccount(opCtx stdcontext.Context, secCtx *pkgctx.SecurityCo
 			Fields: []string{objects.FieldKeyID, objects.FieldKeyStatus},
 		})
 		if err == nil && len(accList.Objects) > 0 {
-			if firstID, ok := accList.Objects[0][objects.FieldKeyID].(string); ok && firstID != "" {
+			firstID := objects.GetString(accList.Objects[0], objects.FieldKeyID)
+			if firstID != "" {
 				accountID = firstID
 				validAccount = true
 			}
@@ -254,61 +263,38 @@ func ensureValidSwarmAccount(opCtx stdcontext.Context, secCtx *pkgctx.SecurityCo
 			accountID = pkgctx.SystemAccountID
 		}
 		now := time.Now().UTC().Format(time.RFC3339)
-		_ = sp.Create(opCtx, secCtx, map[string]any{
+		if createErr := sp.Create(opCtx, secCtx, map[string]any{
 			objects.FieldKeyID:        accountID,
 			objects.FieldKeyKind:      objects.KindAccount,
-			objects.FieldKeyTitle:     "System Account",
+			objects.FieldKeyTitle:     "Default System Account",
 			"username":                "system",
 			"roles":                   []string{"admin"},
 			objects.FieldKeyStatus:    objects.ObjectStatusActive,
 			objects.FieldKeyCreatedAt: now,
 			objects.FieldKeyCreatedBy: accountID,
-		})
+		}); createErr != nil {
+			// default account creation was attempted
+		}
 	}
 	return accountID
 }
 
-func ingestAndPersistSwarmPack(opCtx stdcontext.Context, secCtx *pkgctx.SecurityContext, sp storage.ObjectStorageProvider, projectRoot, manifestPath string, pkg *pack.SwarmPackage, logger *logging.EventLogger) (string, []map[string]any, int, int, error) {
-	packDir := filepath.Dir(manifestPath)
-	params := make(map[string]interface{})
-	for k, def := range pkg.Parameters {
-		if def.Default != nil {
-			params[k] = def.Default
-		}
-	}
-
+func resolveSwarmOutputDir(projectRoot string, pkg *pack.SwarmPackage, params map[string]interface{}) string {
 	outputDir := filepath.Join(projectRoot, paths.ProjectDataDir, "runs", fmt.Sprintf("%s-latest", pkg.Name))
-	if outVal, ok := params["output_dir"].(string); ok && outVal != "" {
+	outVal := objects.GetString(params, "output_dir")
+	if outVal != "" {
 		if filepath.IsAbs(outVal) {
 			outputDir = outVal
 		} else {
 			outputDir = filepath.Join(projectRoot, outVal)
 		}
 	}
-	_ = fileutil.MkdirAll(outputDir, paths.DirPerm755)
+	return outputDir
+}
 
-	reg := metabolism.NewReceptorRegistry()
-	engine := metabolism.NewMetabolismEngine(reg)
-	verifySeal := (pkg.Integrity != nil)
-
-	sysLogger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	_, _ = system.SeedDefaultAgentSeatingPack(projectRoot, sysLogger)
-
-	accountID := ensureValidSwarmAccount(opCtx, secCtx, sp)
-
-	digest, err := engine.Ingest(metabolism.IngestionOptions{
-		PackDir:    packDir,
-		OutputDir:  outputDir,
-		VerifySeal: verifySeal,
-		Parameters: params,
-		AccountID:  accountID,
-	})
-	if err != nil {
-		return "", nil, 0, 0, errfmt.Newf("metabolism ingestion failed for swarm package %s", pkg.Name).Wrap(err)
-	}
-
+func persistPromptTemplates(opCtx stdcontext.Context, secCtx *pkgctx.SecurityContext, sp storage.ObjectStorageProvider, templates []metabolism.PromptTemplateObject, logger *logging.EventLogger) int {
 	templatesStored := 0
-	for _, tpl := range digest.PromptTemplates {
+	for _, tpl := range templates {
 		if tpl.ID == "" {
 			continue
 		}
@@ -333,45 +319,49 @@ func ingestAndPersistSwarmPack(opCtx stdcontext.Context, secCtx *pkgctx.Security
 			templatesStored++
 		}
 	}
+	return templatesStored
+}
 
+func sortDigestKernelObjects(projectRoot string, rawObjects []map[string]any) []map[string]any {
 	distinctKinds := make([]string, 0)
 	kindSeen := make(map[string]bool)
-	for _, obj := range digest.KernelObjects {
-		if k, _ := obj[objects.FieldKeyKind].(string); k != "" && !kindSeen[k] {
+	for _, obj := range rawObjects {
+		k := objects.GetString(obj, objects.FieldKeyKind)
+		if k != "" && !kindSeen[k] {
 			kindSeen[k] = true
 			distinctKinds = append(distinctKinds, k)
 		}
 	}
 
-	orderedKinds, _, _ := scenario.CreateOrderFromSpecIndex(projectRoot, distinctKinds)
+	orderedKinds, _, ordErr := scenario.CreateOrderFromSpecIndex(projectRoot, distinctKinds)
+	if ordErr != nil {
+		orderedKinds = distinctKinds
+	}
 	kindRank := make(map[string]int, len(orderedKinds))
 	for rank, k := range orderedKinds {
 		kindRank[k] = rank
 	}
 
-	sortedObjects := make([]map[string]any, len(digest.KernelObjects))
-	copy(sortedObjects, digest.KernelObjects)
+	sortedObjects := make([]map[string]any, len(rawObjects))
+	copy(sortedObjects, rawObjects)
 	sort.SliceStable(sortedObjects, func(i, j int) bool {
-		ki, _ := sortedObjects[i][objects.FieldKeyKind].(string)
-		kj, _ := sortedObjects[j][objects.FieldKeyKind].(string)
+		ki := objects.GetString(sortedObjects[i], objects.FieldKeyKind)
+		kj := objects.GetString(sortedObjects[j], objects.FieldKeyKind)
 		ri, oki := kindRank[ki]
 		rj, okj := kindRank[kj]
 		if oki && okj {
 			return ri < rj
 		}
-		if oki {
-			return true
-		}
-		if okj {
-			return false
-		}
 		return ki < kj
 	})
+	return sortedObjects
+}
 
+func persistKernelObjects(opCtx stdcontext.Context, secCtx *pkgctx.SecurityContext, sp storage.ObjectStorageProvider, sortedObjects []map[string]any) (int, error) {
 	objectsPersisted := 0
 	for _, obj := range sortedObjects {
-		id, _ := obj[objects.FieldKeyID].(string)
-		kind, _ := obj[objects.FieldKeyKind].(string)
+		id := objects.GetString(obj, objects.FieldKeyID)
+		kind := objects.GetString(obj, objects.FieldKeyKind)
 		if id == "" {
 			continue
 		}
@@ -379,9 +369,54 @@ func ingestAndPersistSwarmPack(opCtx stdcontext.Context, secCtx *pkgctx.Security
 			continue
 		}
 		if err := sp.Create(opCtx, secCtx, obj); err != nil {
-			return "", nil, 0, 0, errfmt.Newf("failed to persist synthesized %s object %s", kind, id).Wrap(err)
+			return 0, errfmt.Newf("failed to persist synthesized %s object %s", kind, id).Wrap(err)
 		}
 		objectsPersisted++
+	}
+	return objectsPersisted, nil
+}
+
+func ingestAndPersistSwarmPack(opCtx stdcontext.Context, secCtx *pkgctx.SecurityContext, sp storage.ObjectStorageProvider, projectRoot, manifestPath string, pkg *pack.SwarmPackage, logger *logging.EventLogger) (string, []map[string]any, int, int, error) {
+	packDir := filepath.Dir(manifestPath)
+	params := make(map[string]interface{})
+	for k, def := range pkg.Parameters {
+		if def.Default != nil {
+			params[k] = def.Default
+		}
+	}
+
+	outputDir := resolveSwarmOutputDir(projectRoot, pkg, params)
+	if dirErr := fileutil.MkdirAll(outputDir, paths.DirPerm755); dirErr != nil {
+		return "", nil, 0, 0, errfmt.Errorf("create swarm output dir: %w", dirErr)
+	}
+
+	reg := metabolism.NewReceptorRegistry()
+	engine := metabolism.NewMetabolismEngine(reg)
+	verifySeal := (pkg.Integrity != nil)
+
+	sysLogger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+	if _, seedErr := system.SeedDefaultAgentSeatingPack(projectRoot, sysLogger); seedErr != nil {
+		logging.FluentEvent(logger).Warn("seating pack seed deferred").WithError(seedErr).Log()
+	}
+
+	accountID := ensureValidSwarmAccount(opCtx, secCtx, sp)
+
+	digest, err := engine.Ingest(metabolism.IngestionOptions{
+		PackDir:    packDir,
+		OutputDir:  outputDir,
+		VerifySeal: verifySeal,
+		Parameters: params,
+		AccountID:  accountID,
+	})
+	if err != nil {
+		return "", nil, 0, 0, errfmt.Newf("metabolism ingestion failed for swarm package %s", pkg.Name).Wrap(err)
+	}
+
+	templatesStored := persistPromptTemplates(opCtx, secCtx, sp, digest.PromptTemplates, logger)
+	sortedObjects := sortDigestKernelObjects(projectRoot, digest.KernelObjects)
+	objectsPersisted, err := persistKernelObjects(opCtx, secCtx, sp, sortedObjects)
+	if err != nil {
+		return "", nil, 0, 0, err
 	}
 
 	return outputDir, sortedObjects, objectsPersisted, templatesStored, nil
@@ -390,20 +425,22 @@ func ingestAndPersistSwarmPack(opCtx stdcontext.Context, secCtx *pkgctx.Security
 func activateSwarmPriorityPlan(opCtx stdcontext.Context, secCtx *pkgctx.SecurityContext, sp storage.ObjectStorageProvider, projectRoot, planID string, sortedObjects []map[string]any) error {
 	revIndex := storage.GetGlobalReverseReferenceIndex()
 	for _, obj := range sortedObjects {
-		if k, _ := obj[objects.FieldKeyKind].(string); k == objects.KindBacklogItem {
-			if bid, _ := obj[objects.FieldKeyID].(string); bid != "" {
+		if k := objects.GetString(obj, objects.FieldKeyKind); k == objects.KindBacklogItem {
+			if bid := objects.GetString(obj, objects.FieldKeyID); bid != "" {
 				revIndex.AddReference(bid, planID)
 			}
 		}
 	}
 	if projectRoot != "" {
-		_ = revIndex.SaveCache(projectRoot)
+		if saveErr := revIndex.SaveCache(projectRoot); saveErr != nil {
+			// reverse index cache save error
+		}
 	}
 
 	planObj, planErr := sp.Read(opCtx, secCtx, planID)
 	curStatus := ""
 	if planErr == nil && planObj != nil {
-		curStatus, _ = planObj[objects.FieldKeyStatus].(string)
+		curStatus = objects.GetString(planObj, objects.FieldKeyStatus)
 	}
 	if curStatus != objects.ObjectStatusActive && curStatus != objects.ObjectStatusInProgress {
 		if err := sp.Update(opCtx, secCtx, planID, map[string]any{
@@ -420,7 +457,9 @@ func refreshSwarmMaterializedView(opCtx stdcontext.Context, secCtx *pkgctx.Secur
 	if projectRoot != "" && sp != nil {
 		mv := whatsnext.NewWhatsNextMaterializedView(projectRoot)
 		if scanErr := mv.ScanFromStorageWithSecurity(opCtx, sp, secCtx); scanErr == nil {
-			_ = mv.SaveToLiteFile()
+			if saveErr := mv.SaveToLiteFile(); saveErr != nil {
+				// lite file save error
+			}
 		}
 	}
 }
@@ -428,7 +467,7 @@ func refreshSwarmMaterializedView(opCtx stdcontext.Context, secCtx *pkgctx.Secur
 func emitSwarmFeedEvent(projectRoot string, pkg *pack.SwarmPackage, planID, selectedEntrypoint string) {
 	feedMsg := fmt.Sprintf("SWARM DISPATCH: Initialized swarm package %s v%s. Active Plan: %s with %d tasks. Entrypoint: %s.",
 		pkg.Name, pkg.Version, planID, len(pkg.Tasks), selectedEntrypoint)
-	_, _ = agentfeed.AppendEvent(agentfeed.AppendEventInput{
+	if _, feedErr := agentfeed.AppendEvent(agentfeed.AppendEventInput{
 		ProjectRoot: projectRoot,
 		Message:     feedMsg,
 		AgentID:     "system",
@@ -436,7 +475,9 @@ func emitSwarmFeedEvent(projectRoot string, pkg *pack.SwarmPackage, planID, sele
 		Sender:      agentfeed.FeedSenderMeshStatus,
 		EventType:   agentfeed.FeedEventTypeMeshStatus,
 		SelfACK:     true,
-	})
+	}); feedErr != nil {
+		// feed event emission error
+	}
 }
 
 func confirmSwarmLaunch(out io.Writer, autoLaunch bool) bool {
@@ -465,7 +506,9 @@ func launchSwarmBackground(projectRoot, planID, cleanName string) (int, string, 
 	}
 	logRelPath := filepath.Join(paths.ProjectDataDir, paths.LogsDir, fmt.Sprintf("swarm-orchestrate-%s.log", strings.ToLower(cleanName)))
 	logPath := filepath.Join(projectRoot, logRelPath)
-	_ = fileutil.EnsureDir(filepath.Dir(logPath))
+	if dirErr := fileutil.EnsureDir(filepath.Dir(logPath)); dirErr != nil {
+		return 0, "", errfmt.Errorf("failed to ensure log directory %s: %w", filepath.Dir(logPath), dirErr)
+	}
 	logFile, err := fileutil.OpenAppend(logPath)
 	if err != nil {
 		return 0, "", errfmt.Newf("failed to open swarm orchestrate log %s", logPath).Wrap(err)
@@ -478,9 +521,13 @@ func launchSwarmBackground(projectRoot, planID, cleanName string) (int, string, 
 	orchCmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true}
 
 	if err := orchCmd.Start(); err != nil {
-		_ = logFile.Close()
+		if closeErr := logFile.Close(); closeErr != nil {
+			// close error during failure
+		}
 		return 0, "", errfmt.Newf("failed to launch swarm orchestrator").Wrap(err)
 	}
-	_ = logFile.Close()
+	if closeErr := logFile.Close(); closeErr != nil {
+		// close error during normal completion
+	}
 	return orchCmd.Process.Pid, logRelPath, nil
 }
