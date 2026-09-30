@@ -126,6 +126,8 @@ const (
 	OpRefuseUnknownFields = "refuse_unknown_fields"
 	// OpValidatePriorityValues validates priority and priority_tier are legitimate values if present.
 	OpValidatePriorityValues = "validate_priority_values"
+	// OpPredicateDSL evaluates declarative predicate DSL expressions against the object.
+	OpPredicateDSL = "predicate_dsl"
 )
 
 // AllPipelineKinds is the closed mutation kind set (mirrors kernelcas.AllKinds).

@@ -438,8 +438,10 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 				finalStatus = st
 			}
 		}
-		// Sweep / unlink any preliminary draft file now that the object is promoted.
-		_ = storage.DeleteObjectDraftFile(proc.ProjectRoot(), kind, id)
+		// Sweep / unlink any preliminary draft file now that the object is promoted across the CAS membrane.
+		if isPrelim, _ := objects.GetGlobalLifecycleLoader().IsPreliminaryStatusForKind(kind, finalStatus); !isPrelim {
+			_ = storage.DeleteObjectDraftFile(proc.ProjectRoot(), kind, id)
+		}
 		fmt.Fprintf(cmd.OutOrStdout(), "✓ Promoted %s from '%s' to '%s'\n", color.CyanString(id), color.YellowString(currentStatus), color.GreenString(finalStatus))
 		if hook, ok := promoteCueHooks[kind]; ok {
 			if cue := hook(ctx, proc.Storage(), secCtx, id, current, finalStatus); cue != "" {

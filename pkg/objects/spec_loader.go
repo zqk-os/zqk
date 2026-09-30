@@ -385,7 +385,7 @@ func (sl *SpecLoader) applicableExtraSpecRoots() []string {
 	}
 	mod, err := paths.ModuleRootFromPath(sl.specsDir)
 	if err != nil || mod == "" {
-		if fallback, ok := moduleRootForSpecs(); ok && fallback != "" {
+		if fallback, ok := moduleRootForSpecs(); ok && fallback != "" && strings.HasPrefix(sl.specsDir, fallback) {
 			mod = fallback
 		} else {
 			return nil

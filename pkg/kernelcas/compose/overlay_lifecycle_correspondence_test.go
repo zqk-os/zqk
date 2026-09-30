@@ -62,27 +62,39 @@ func repoRootFromCompose() string { return filepath.Join("..", "..", "..") }
 // than the filename so a renamed file cannot quietly drop a kind from the sweep.
 func lifecycleKinds(t *testing.T) []string {
 	t.Helper()
-	dir := filepath.Join(repoRootFromCompose(), paths.ProcessInternalLifecyclesDir)
+	root := repoRootFromCompose()
+	dirs := []string{filepath.Join(root, paths.ProcessInternalLifecyclesDir)}
+	for _, extra := range objects.ExtraLifecycleRoots() {
+		if filepath.IsAbs(extra) {
+			dirs = append(dirs, extra)
+		} else {
+			dirs = append(dirs, filepath.Join(root, extra))
+		}
+	}
 	var kinds []string
-	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-		if err != nil || info == nil || info.IsDir() || !strings.HasSuffix(info.Name(), ".yaml") {
+	seen := map[string]bool{}
+	for _, dir := range dirs {
+		err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+			if err != nil || info == nil || info.IsDir() || !strings.HasSuffix(info.Name(), ".yaml") {
+				return nil
+			}
+			raw, err := fileutil.ReadFile(path)
+			if err != nil {
+				t.Fatalf("read %s: %v", info.Name(), err)
+			}
+			var lc objects.Lifecycle
+			if err := yaml.Unmarshal(raw, &lc); err != nil {
+				return nil
+			}
+			if lc.ObjectType != "" && !seen[lc.ObjectType] {
+				seen[lc.ObjectType] = true
+				kinds = append(kinds, lc.ObjectType)
+			}
 			return nil
-		}
-		raw, err := fileutil.ReadFile(path)
+		})
 		if err != nil {
-			t.Fatalf("read %s: %v", info.Name(), err)
+			t.Fatalf("read lifecycles dir %s: %v", dir, err)
 		}
-		var lc objects.Lifecycle
-		if err := yaml.Unmarshal(raw, &lc); err != nil {
-			return nil
-		}
-		if lc.ObjectType != "" {
-			kinds = append(kinds, lc.ObjectType)
-		}
-		return nil
-	})
-	if err != nil {
-		t.Fatalf("read lifecycles dir: %v", err)
 	}
 	sort.Strings(kinds)
 	return kinds
