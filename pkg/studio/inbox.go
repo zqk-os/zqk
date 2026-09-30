@@ -13,6 +13,29 @@ import (
 	"github.com/zqk-os/zqk/pkg/tde"
 )
 
+const (
+	errMsgMethodNotAllowed     = "method not allowed"
+	errMsgLoadCorrespondence   = "Failed to load correspondence for inbox"
+	errMsgInvalidJSONPayload   = "invalid json payload: "
+	errMsgFailedStagingWAL     = "failed to open staging WAL: "
+	errMsgFailedCommitEnvelope = "failed to commit envelope: "
+	errMsgReplyOrEnvRequired   = "in_reply_to or envelope_id is required"
+	errMsgMessageRequired      = "message is required"
+	errMsgToAgentRequired      = "to_agent_id is required"
+	warnPeerAckAwaits          = "failed to complete peer ack awaits"
+	warnPeerAckAppend          = "failed to append peer ack"
+	defaultOperatorPersona     = "PER-DEFAULT-OPERATOR"
+	defaultStudioAckSummary    = "Acknowledged via Web Studio"
+	studioReplyPrefix          = "Replied via Web Studio: "
+	keyAcknowledgedEnvelope    = "acknowledged_envelope"
+	keyAwaitsCompleted         = "awaits_completed"
+	queryParamAgentID          = "agent_id"
+	queryParamPersonaRef       = "persona_ref"
+	queryParamLimit            = "limit"
+	defaultCoordinatorSeat     = "coordinator"
+	defaultOperatorSeat        = "operator"
+)
+
 // StagedEnvelopeItem summarizes a staged TDE envelope for UI inbox inspection.
 type StagedEnvelopeItem struct {
 	ID        string `json:"id"`
@@ -55,6 +78,20 @@ type InboxRespondRequest struct {
 	AwaitPeerAck bool   `json:"await_peer_ack,omitempty"`
 }
 
+func writeJSONResponse(w http.ResponseWriter, status int, payload any) {
+	w.WriteHeader(status)
+	if err := json.NewEncoder(w).Encode(payload); err != nil {
+		return
+	}
+}
+
+func writeJSONError(w http.ResponseWriter, status int, message string) {
+	writeJSONResponse(w, status, map[string]any{
+		objects.FieldKeyStatus: objects.ObjectStatusError,
+		"error":                message,
+	})
+}
+
 func (s *Server) handleInbox(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, `{"error": "method not allowed"}`, http.StatusMethodNotAllowed)
@@ -64,24 +101,24 @@ func (s *Server) handleInbox(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	q := r.URL.Query()
-	agentID := strings.TrimSpace(q.Get("agent_id"))
+	agentID := strings.TrimSpace(q.Get(queryParamAgentID))
 	if agentID == "" {
 		agentID = agentfeed.CoordinatorSeatID(s.projectRoot)
 		if agentID == "" && len(agentfeed.DefaultPeerSeatIDs) > 0 {
 			agentID = agentfeed.DefaultPeerSeatIDs[0]
 		}
 		if agentID == "" {
-			agentID = "coordinator"
+			agentID = defaultCoordinatorSeat
 		}
 	}
 
-	personaRef := strings.TrimSpace(q.Get("persona_ref"))
+	personaRef := strings.TrimSpace(q.Get(queryParamPersonaRef))
 	if personaRef == "" {
 		personaRef = agentfeed.SeatPersonaRef(s.projectRoot, agentID)
 	}
 
 	limit := 50
-	if lStr := q.Get("limit"); lStr != "" {
+	if lStr := q.Get(queryParamLimit); lStr != "" {
 		if l, err := strconv.Atoi(lStr); err == nil && l > 0 {
 			limit = l
 		}
@@ -92,7 +129,7 @@ func (s *Server) handleInbox(w http.ResponseWriter, r *http.Request) {
 		PersonaRef: personaRef,
 	}, limit)
 	if err != nil && s.logger != nil {
-		s.logger.Warn("Failed to load correspondence for inbox", logging.String("error", err.Error()))
+		s.logger.Warn(errMsgLoadCorrespondence, logging.String("error", err.Error()))
 	}
 
 	var staged []StagedEnvelopeItem
@@ -133,8 +170,7 @@ func (s *Server) handleInbox(w http.ResponseWriter, r *http.Request) {
 		NextActionHint:        snap.NextActionHint,
 	}
 
-	w.WriteHeader(http.StatusOK)
-	_ = json.NewEncoder(w).Encode(payload)
+	writeJSONResponse(w, http.StatusOK, payload)
 }
 
 func (s *Server) handleInboxAck(w http.ResponseWriter, r *http.Request) {
@@ -147,8 +183,7 @@ func (s *Server) handleInboxAck(w http.ResponseWriter, r *http.Request) {
 
 	var req InboxAckRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode(map[string]any{objects.FieldKeyStatus: objects.ObjectStatusError, "error": "invalid json payload: " + err.Error()})
+		writeJSONError(w, http.StatusBadRequest, errMsgInvalidJSONPayload+err.Error())
 		return
 	}
 
@@ -159,28 +194,27 @@ func (s *Server) handleInboxAck(w http.ResponseWriter, r *http.Request) {
 	if envID != "" {
 		wal, err := tde.NewStagingWAL(s.projectRoot)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_ = json.NewEncoder(w).Encode(map[string]any{objects.FieldKeyStatus: objects.ObjectStatusError, "error": "failed to open staging WAL: " + err.Error()})
+			writeJSONError(w, http.StatusInternalServerError, errMsgFailedStagingWAL+err.Error())
 			return
 		}
 		defer wal.Close()
 		if err := wal.MarkCommitted(envID); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			_ = json.NewEncoder(w).Encode(map[string]any{objects.FieldKeyStatus: objects.ObjectStatusError, "error": "failed to commit envelope: " + err.Error()})
+			writeJSONError(w, http.StatusInternalServerError, errMsgFailedCommitEnvelope+err.Error())
 			return
 		}
-		_ = wal.Sync()
-		w.WriteHeader(http.StatusOK)
-		_ = json.NewEncoder(w).Encode(map[string]any{
+		if err := wal.Sync(); err != nil {
+			writeJSONError(w, http.StatusInternalServerError, errMsgFailedCommitEnvelope+err.Error())
+			return
+		}
+		writeJSONResponse(w, http.StatusOK, map[string]any{
 			objects.FieldKeyStatus:  objects.ObjectStatusSuccess,
-			"acknowledged_envelope": envID,
+			keyAcknowledgedEnvelope: envID,
 		})
 		return
 	}
 
 	if inReplyTo == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode(map[string]any{objects.FieldKeyStatus: objects.ObjectStatusError, "error": "in_reply_to or envelope_id is required"})
+		writeJSONError(w, http.StatusBadRequest, errMsgReplyOrEnvRequired)
 		return
 	}
 
@@ -191,29 +225,31 @@ func (s *Server) handleInboxAck(w http.ResponseWriter, r *http.Request) {
 			agentID = agentfeed.DefaultPeerSeatIDs[0]
 		}
 		if agentID == "" {
-			agentID = "operator"
+			agentID = defaultOperatorSeat
 		}
 	}
 	personaRef := strings.TrimSpace(req.PersonaRef)
 	if personaRef == "" {
 		personaRef = agentfeed.SeatPersonaRef(s.projectRoot, agentID)
 		if personaRef == "" {
-			personaRef = "PER-DEFAULT-OPERATOR"
+			personaRef = defaultOperatorPersona
 		}
 	}
 	summary := strings.TrimSpace(req.Summary)
 	if summary == "" {
-		summary = "Acknowledged via Web Studio"
+		summary = defaultStudioAckSummary
 	}
 
 	res, err := agentfeed.AppendPeerAck(s.projectRoot, agentID, personaRef, inReplyTo, summary)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode(map[string]any{objects.FieldKeyStatus: objects.ObjectStatusError, "error": err.Error()})
+		writeJSONError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	completed, _ := agentfeed.CompletePeerAckAwaits(s.projectRoot, inReplyTo, agentID)
+	completed, cErr := agentfeed.CompletePeerAckAwaits(s.projectRoot, inReplyTo, agentID)
+	if cErr != nil && s.logger != nil {
+		logging.Fluent(s.logger).Warn(warnPeerAckAwaits).WithError(cErr).Log()
+	}
 	out := map[string]any{
 		objects.FieldKeyStatus: objects.ObjectStatusSuccess,
 		"event_id":             res.EventID,
@@ -227,11 +263,10 @@ func (s *Server) handleInboxAck(w http.ResponseWriter, r *http.Request) {
 		for _, a := range completed {
 			ids = append(ids, a.ID)
 		}
-		out["awaits_completed"] = ids
+		out[keyAwaitsCompleted] = ids
 	}
 
-	w.WriteHeader(http.StatusOK)
-	_ = json.NewEncoder(w).Encode(out)
+	writeJSONResponse(w, http.StatusOK, out)
 }
 
 func (s *Server) handleInboxRespond(w http.ResponseWriter, r *http.Request) {
@@ -244,35 +279,31 @@ func (s *Server) handleInboxRespond(w http.ResponseWriter, r *http.Request) {
 
 	var req InboxRespondRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode(map[string]any{objects.FieldKeyStatus: objects.ObjectStatusError, "error": "invalid json payload: " + err.Error()})
+		writeJSONError(w, http.StatusBadRequest, errMsgInvalidJSONPayload+err.Error())
 		return
 	}
 
 	msg := strings.TrimSpace(req.Message)
 	if msg == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode(map[string]any{objects.FieldKeyStatus: objects.ObjectStatusError, "error": "message is required"})
+		writeJSONError(w, http.StatusBadRequest, errMsgMessageRequired)
 		return
 	}
 
 	toAgentID := strings.TrimSpace(req.ToAgentID)
 	if toAgentID == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode(map[string]any{objects.FieldKeyStatus: objects.ObjectStatusError, "error": "to_agent_id is required"})
+		writeJSONError(w, http.StatusBadRequest, errMsgToAgentRequired)
 		return
 	}
 
 	// POL-AGENT-ORCH-HOURGLASS-001: directed collaboration requires await_peer_ack
 	if err := agentfeed.EnforceDirectedHourglass(toAgentID, req.AwaitPeerAck); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode(map[string]any{objects.FieldKeyStatus: objects.ObjectStatusError, "error": err.Error()})
+		writeJSONError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	agentID := strings.TrimSpace(req.AgentID)
 	if agentID == "" {
-		agentID = "operator"
+		agentID = defaultOperatorSeat
 	}
 
 	res, err := agentfeed.AppendEvent(agentfeed.AppendEventInput{
@@ -285,8 +316,7 @@ func (s *Server) handleInboxRespond(w http.ResponseWriter, r *http.Request) {
 		SelfACK:     true,
 	})
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode(map[string]any{objects.FieldKeyStatus: objects.ObjectStatusError, "error": err.Error()})
+		writeJSONError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -309,8 +339,7 @@ func (s *Server) handleInboxRespond(w http.ResponseWriter, r *http.Request) {
 			WakeMessage: agentfeed.PeerAckPasteStub(res.EventID),
 		})
 		if aerr != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			_ = json.NewEncoder(w).Encode(map[string]any{objects.FieldKeyStatus: objects.ObjectStatusError, "error": aerr.Error()})
+			writeJSONError(w, http.StatusBadRequest, aerr.Error())
 			return
 		}
 		out[agentfeed.JSONFieldPeerAckAwaitID] = aw.ID
@@ -321,15 +350,18 @@ func (s *Server) handleInboxRespond(w http.ResponseWriter, r *http.Request) {
 	if inReplyTo != "" {
 		personaRef := agentfeed.SeatPersonaRef(s.projectRoot, agentID)
 		if personaRef == "" {
-			personaRef = "PER-DEFAULT-OPERATOR"
+			personaRef = defaultOperatorPersona
 		}
-		_, _ = agentfeed.AppendPeerAck(s.projectRoot, agentID, personaRef, inReplyTo, "Replied via Web Studio: "+truncateText(msg, 60))
-		_, _ = agentfeed.CompletePeerAckAwaits(s.projectRoot, inReplyTo, agentID)
+		if _, ackErr := agentfeed.AppendPeerAck(s.projectRoot, agentID, personaRef, inReplyTo, studioReplyPrefix+truncateText(msg, 60)); ackErr != nil && s.logger != nil {
+			logging.Fluent(s.logger).Warn(warnPeerAckAppend).WithError(ackErr).Log()
+		}
+		if _, compErr := agentfeed.CompletePeerAckAwaits(s.projectRoot, inReplyTo, agentID); compErr != nil && s.logger != nil {
+			logging.Fluent(s.logger).Warn(warnPeerAckAwaits).WithError(compErr).Log()
+		}
 		out[agentfeed.JSONFieldInReplyTo] = inReplyTo
 	}
 
-	w.WriteHeader(http.StatusOK)
-	_ = json.NewEncoder(w).Encode(out)
+	writeJSONResponse(w, http.StatusOK, out)
 }
 
 func truncateText(s string, max int) string {
