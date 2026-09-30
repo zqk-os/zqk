@@ -92,7 +92,7 @@ transitions:
   - from: active
     to: complete
     description: Auto-transition when all linked milestones are complete
-    manual: false
+    manual: true
     auto: true
     postconditions:
       - role is terminal
@@ -120,7 +120,7 @@ percent_complete:
     archived: 100
     complete: 100
     draft: 10
-    published: calculated
+    published: 25
   milestone_based:
     calculation: (completed_milestones / total_milestones) * 100
     field: milestone_refs

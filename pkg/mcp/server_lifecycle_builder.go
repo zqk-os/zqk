@@ -17,6 +17,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
@@ -130,7 +131,15 @@ func (b *ServerLifecycleBuilder) InitializeClientMetrics() *ServerLifecycleBuild
 	b.server.compressionTickerMu.Lock()
 	defer b.server.compressionTickerMu.Unlock()
 	if b.server.clientMetricsStore == nil {
-		metricsPath := filepath.Join(b.server.GetProjectRoot(), paths.ProjectDataDir, paths.MCPDir, paths.MCPLogsDir, "client-metrics.json")
+		projectRoot := b.server.GetProjectRoot()
+		if zqkenv.IsInTest() {
+			if testRoot := zqkenv.TestRoot().Get(); testRoot != "" {
+				projectRoot = testRoot
+			} else {
+				projectRoot = filepath.Join(os.TempDir(), "zqk-mcp-test")
+			}
+		}
+		metricsPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.MCPDir, paths.MCPLogsDir, "client-metrics.json")
 		// Pass shutdown context from ProcessGroupManager for proper shutdown handling
 		shutdownCtx := b.server.processGroupManager.GetShutdownContext()
 		store, err := NewClientMetricsStore(metricsPath, shutdownCtx)

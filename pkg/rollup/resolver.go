@@ -71,6 +71,20 @@ func FetchChildrenForParent(ctx context.Context, secCtx *pkgctx.SecurityContext,
 				}
 			}
 		}
+
+	default:
+		res, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{})
+		if err == nil && res != nil {
+			for _, obj := range res.Objects {
+				id, _ := obj[objects.FieldKeyID].(string)
+				if id != "" && isChildOfParent(obj, parentKind, parentID) {
+					if _, exists := seen[id]; !exists {
+						seen[id] = struct{}{}
+						children = append(children, obj)
+					}
+				}
+			}
+		}
 	}
 
 	// 2. Generic reverse-reference fallback to capture any other child objects (e.g. custom kinds)
@@ -105,6 +119,10 @@ func isChildOfParent(obj map[string]any, parentKind, parentID string) bool {
 
 	switch parentKind {
 	case objects.KindMilestone:
+		kind, _ := obj[objects.FieldKeyKind].(string)
+		if kind == objects.KindRoadmap || kind == objects.KindGoal || kind == objects.KindStrategicPlan {
+			return false
+		}
 		if objects.GetString(obj, objects.FieldKeyMilestoneRef) == parentID {
 			return true
 		}

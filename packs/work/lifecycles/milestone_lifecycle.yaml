@@ -88,7 +88,7 @@ transitions:
   - from: in_progress
     to: complete
     description: Auto-transition when all linked backlog items are complete
-    manual: false
+    manual: true
     auto: true
     postconditions:
       - role is terminal

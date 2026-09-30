@@ -442,7 +442,7 @@ func (s *Server) GetCliInitializationContext() *pkgctx.CliInitializationContext 
 // GetProjectRoot returns the project root from the initialization context
 // Always returns a valid value (never empty, defaults to ".")
 func (s *Server) GetProjectRoot() string {
-	if s.initCtx != nil {
+	if s != nil && s.initCtx != nil {
 		return s.initCtx.GetProjectRoot()
 	}
 	return "." // Default fallback
