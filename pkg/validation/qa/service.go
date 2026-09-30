@@ -76,11 +76,17 @@ func (s *AuditorService) saveIDE(cursor walutil.ReplayCursor) error {
 	return fileutil.WriteSecureFile(path, walutil.FormatReplayCursorCheckpoint(cursor))
 }
 
-// auditTriggeringStatuses are the lifecycle target states that make an object due for a QA audit.
 var auditTriggeringStatuses = map[string]bool{
 	"in_progress": true,
 	"complete":    true,
 	"completed":   true,
+}
+
+var auditTriggeringKinds = map[string]bool{
+	objects.KindBacklogItem: true,
+	objects.KindAgentTask:   true,
+	objects.KindRequirement: true,
+	objects.KindCriteria:    true,
 }
 
 // isAuditTriggeringEvent reports whether a WAL event is a status transition into a state
@@ -88,7 +94,8 @@ var auditTriggeringStatuses = map[string]bool{
 func isAuditTriggeringEvent(ev *lifecycle.LifecycleEvent) bool {
 	return ev != nil &&
 		ev.EventType == lifecycle.EventTypeStatusTransition &&
-		auditTriggeringStatuses[ev.ToStatus]
+		auditTriggeringStatuses[ev.ToStatus] &&
+		(auditTriggeringKinds[ev.Kind] || ev.Kind == "")
 }
 
 // Run monitors the WAL and performs audits on relevant events.
@@ -164,11 +171,105 @@ func (s *AuditorService) performAudit(ctx context.Context, id string, kind strin
 		return
 	}
 
-	// 1.5 Traceability Check
 	status, _ := obj[objects.FieldKeyStatus].(string)
 	isComplete := status == objects.ObjectStatusComplete || status == objects.ObjectStatusCompleted || status == "complete" || status == "completed"
 	artifactPaths := extractArtifactPaths(obj[objects.FieldKeyArtifacts])
 
+	// 1.3 Requirement Criteria Verification
+	if kind == objects.KindRequirement && isComplete {
+		critRefs := extractArtifactPaths(obj[objects.FieldKeyCriteriaRefs])
+		if len(critRefs) == 0 {
+			reason := ReasonMissingCriteria
+			logging.FluentEvent(logger).Warn(fmt.Sprintf(LogFmtAuditorContentDisparity, id, reason)).Log()
+			if s.emitter != nil {
+				if err := s.emitter.EmitDisparityInterrupt(ctx, id, reason); err != nil {
+					logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorEmitHITLFailed, err), err).Log()
+				}
+			}
+			return
+		}
+		for _, cID := range critRefs {
+			criterion, err := s.storage.Read(ctx, secCtx, cID)
+			if err != nil {
+				reason := fmt.Sprintf("Referenced criterion %s not found: %v", cID, err)
+				logging.FluentEvent(logger).Warn(fmt.Sprintf(LogFmtAuditorContentDisparity, id, reason)).Log()
+				if s.emitter != nil {
+					if emitErr := s.emitter.EmitDisparityInterrupt(ctx, id, reason); emitErr != nil {
+						logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorEmitHITLFailed, emitErr), emitErr).Log()
+					}
+				}
+				return
+			}
+			cStatus, _ := criterion[objects.FieldKeyStatus].(string)
+			if cStatus != objects.ObjectStatusComplete && cStatus != objects.ObjectStatusCompleted && cStatus != "complete" && cStatus != "completed" {
+				reason := fmt.Sprintf("Referenced criterion %s is not complete (status=%s)", cID, cStatus)
+				logging.FluentEvent(logger).Warn(fmt.Sprintf(LogFmtAuditorContentDisparity, id, reason)).Log()
+				if s.emitter != nil {
+					if emitErr := s.emitter.EmitDisparityInterrupt(ctx, id, reason); emitErr != nil {
+						logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorEmitHITLFailed, emitErr), emitErr).Log()
+					}
+				}
+				return
+			}
+		}
+		logging.FluentEvent(logger).Info(fmt.Sprintf("🔍 [QA-AUDITOR] Verified all %d referenced criteria for requirement %s", len(critRefs), id)).Log()
+	}
+
+	// 1.4 Criteria Test Proof Verification
+	if kind == objects.KindCriteria && isComplete {
+		hasTestProof := false
+		testRefs := extractArtifactPaths(obj[objects.FieldKeyTestCaseRefs])
+		for _, tID := range testRefs {
+			tc, err := s.storage.Read(ctx, secCtx, tID)
+			if err == nil && tc != nil {
+				tStatus, _ := tc[objects.FieldKeyStatus].(string)
+				remOpen, _ := tc["remaining_open_count"].(int)
+				if (tStatus == objects.ObjectStatusComplete || tStatus == objects.ObjectStatusCompleted || tStatus == "complete" || tStatus == "completed") && remOpen == 0 {
+					hasTestProof = true
+					break
+				}
+			}
+		}
+		if !hasTestProof {
+			// Also inspect test_cases referencing this criteria in storage
+			filter := storage.ListFilter{
+				Kind: objects.KindTestCase,
+			}
+			if listRes, err := s.storage.List(ctx, secCtx, nil, filter); err == nil && listRes != nil {
+				for _, tc := range listRes.Objects {
+					tcCritRefs := extractArtifactPaths(tc[objects.FieldKeyCriteriaRefs])
+					match := false
+					for _, r := range tcCritRefs {
+						if r == id {
+							match = true
+							break
+						}
+					}
+					if match {
+						tStatus, _ := tc[objects.FieldKeyStatus].(string)
+						remOpen, _ := tc["remaining_open_count"].(int)
+						if (tStatus == objects.ObjectStatusComplete || tStatus == objects.ObjectStatusCompleted || tStatus == "complete" || tStatus == "completed") && remOpen == 0 {
+							hasTestProof = true
+							break
+						}
+					}
+				}
+			}
+		}
+		if !hasTestProof {
+			reason := ReasonMissingTestProof
+			logging.FluentEvent(logger).Warn(fmt.Sprintf(LogFmtAuditorContentDisparity, id, reason)).Log()
+			if s.emitter != nil {
+				if err := s.emitter.EmitDisparityInterrupt(ctx, id, reason); err != nil {
+					logging.FluentEvent(logger).Error(fmt.Sprintf(LogFmtAuditorEmitHITLFailed, err), err).Log()
+				}
+			}
+			return
+		}
+		logging.FluentEvent(logger).Info(fmt.Sprintf("🔍 [QA-AUDITOR] Verified passing test case proof for criterion %s", id)).Log()
+	}
+
+	// 1.5 Traceability Check
 	if kind == objects.KindBacklogItem && isComplete {
 		hasTraceability := hasStringEvidence(obj[objects.FieldKeyCommitHashes])
 		hasTestAsset := false
@@ -238,7 +339,15 @@ func (s *AuditorService) performAudit(ctx context.Context, id string, kind strin
 
 	// 2. STRUCTURAL AST AUDIT
 	if len(artifactPaths) == 0 {
-		logging.FluentEvent(logger).Info(fmt.Sprintf("Skipping AST audit: no artifacts defined for %s", id)).Log()
+		if kind == objects.KindRequirement || kind == objects.KindCriteria {
+			// Requirements and criteria have ontological verification above; AST file scan is not applicable.
+		} else {
+			// Fail-closed invariant: NO DATA != NO FAILURES.
+			// If an object has no artifacts to AST-audit, and is not a requirement or criteria verified by ontology,
+			// the auditor cannot attest to its conformance and MUST NOT issue a vacuous QASuccess token.
+			logging.FluentEvent(logger).Info(fmt.Sprintf("Skipping QASuccess issuance: no verifiable artifacts or ontological criteria defined for %s (%s)", id, kind)).Log()
+			return
+		}
 	}
 	var astViolations []Violation
 	for _, path := range artifactPaths {

@@ -8,6 +8,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // InstanceValidator validates object instances against their specifications.
@@ -438,6 +439,26 @@ func (iv *InstanceValidator) validateLifecycleState(kind, status, currentState s
 				}
 			}
 		}
+
+		// Check postconditions for the transition
+		postconditions, err := iv.lifecycleLoader.GetTransitionPostconditions(kind, currentState, status)
+		if err == nil && len(postconditions) > 0 {
+			destObj := make(map[string]any, len(obj)+2)
+			for k, v := range obj {
+				destObj[k] = v
+			}
+			destObj[objects.FieldKeyStatus] = status
+			destObj[objects.FieldKeyKind] = kind
+			for _, postcondition := range postconditions {
+				if !iv.checkPrecondition(postcondition, destObj) {
+					errors = append(errors, ValidationError{
+						Field:   objects.FieldKeyStatus,
+						Message: fmt.Sprintf("postcondition %q not satisfied upon entering status %q", postcondition, status),
+						Rule:    validationRuleLifecycle(),
+					})
+				}
+			}
+		}
 	}
 
 	// Check preconditions for the target status
@@ -457,31 +478,39 @@ func (iv *InstanceValidator) validateLifecycleState(kind, status, currentState s
 	return errors, warnings
 }
 
-// checkPrecondition checks if a precondition is met (simplified implementation)
-// Preconditions are strings like "priority_plan_ref is set" or "milestone_refs is not empty"
+// checkPrecondition checks if a precondition or postcondition is met using the Unified Kernel Predicate DSL.
 func (iv *InstanceValidator) checkPrecondition(precondition string, obj map[string]any) bool {
-	// Simple precondition checking - can be enhanced with a proper parser
-	precondition = strings.ToLower(strings.TrimSpace(precondition))
+	gv := NewGoValidator()
+	if gv != nil {
+		met, recognized := gv.evaluatePrecondition(precondition, obj, nil)
+		if recognized {
+			return met
+		}
+	} else {
+		handled, met := evalOverlayDSLStage(nil, precondition, obj, nil)
+		if handled {
+			return met
+		}
+	}
 
-	if strings.Contains(precondition, strings.ToLower(PrecondCRIShovelReady)) {
+	// Legacy fallback heuristics if not recognized by DSL
+	preconditionLower := strings.ToLower(strings.TrimSpace(precondition))
+	if strings.Contains(preconditionLower, strings.ToLower(PrecondCRIShovelReady)) {
 		return EvaluateShovelReady(obj).Ready
 	}
 
-	// Check for "is set" or "is not empty"
-	if isFieldCheckPrecondition(precondition, "is set") {
-		// Extract field name (e.g., "priority_plan_ref is set" -> "priority_plan_ref")
-		fieldName := strings.TrimSpace(strings.Split(precondition, "is set")[0])
+	if isFieldCheckPrecondition(preconditionLower, "is set") {
+		fieldName := strings.TrimSpace(strings.Split(preconditionLower, "is set")[0])
 		value, exists := obj[fieldName]
 		return exists && value != nil && value != emptyValue
 	}
 
-	if isFieldCheckPrecondition(precondition, "is not empty") {
-		fieldName := strings.TrimSpace(strings.Split(precondition, "is not empty")[0])
+	if isFieldCheckPrecondition(preconditionLower, "is not empty") {
+		fieldName := strings.TrimSpace(strings.Split(preconditionLower, "is not empty")[0])
 		value, exists := obj[fieldName]
 		if !exists {
 			return false
 		}
-		// Check if it's a list/array
 		val := reflect.ValueOf(value)
 		if val.Kind() == reflect.Slice || val.Kind() == reflect.Array {
 			return val.Len() > 0
@@ -489,12 +518,9 @@ func (iv *InstanceValidator) checkPrecondition(precondition string, obj map[stri
 		return value != nil && value != emptyValue
 	}
 
-	// Check for "at least" (e.g., "at least one milestone_ref linked")
-	if strings.Contains(precondition, "at least") {
-		// Extract field name and count
-		// This is a simplified parser - full implementation would be more robust
+	if strings.Contains(preconditionLower, "at least") {
 		var fieldName string
-		for _, word := range strings.Fields(precondition) {
+		for _, word := range strings.Fields(preconditionLower) {
 			w := strings.Trim(word, ",.()[]{}'")
 			if strings.HasSuffix(w, "_ref") || strings.HasSuffix(w, "_refs") {
 				fieldName = w
@@ -529,7 +555,6 @@ func (iv *InstanceValidator) checkPrecondition(precondition string, obj map[stri
 		}
 	}
 
-	// Default: assume precondition is met if we can't parse it
-	// This is permissive - full implementation would fail on unknown preconditions
-	return true
+	// Fail closed unless explicit fail-open is enabled
+	return zqkenv.PreconditionsFailOpen().Get() == "1"
 }

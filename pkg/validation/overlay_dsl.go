@@ -167,6 +167,133 @@ func evalOverlayDSLStage(gv *GoValidator, p string, obj map[string]any, options 
 				}
 			}
 
+		case "shovel_ready":
+			if !EvaluateShovelReady(obj).Ready {
+				return true, false
+			}
+
+		case "tdd_test_red_phase":
+			if gv != nil && !gv.checkTDDTestRedPhase(obj, options) {
+				return true, false
+			}
+
+		case "criteria_active_test_case":
+			if gv != nil && !gv.checkCriteriaLinkedToActiveTestCase(obj, options) {
+				return true, false
+			}
+
+		case "ready_backlog_references_plan":
+			if gv != nil && !gv.checkReadyBacklogReferencesPlan(obj, options) {
+				return true, false
+			}
+
+		case "linked_backlog_ready_or_later":
+			var kindFn func(string) string
+			if gv != nil {
+				kindFn = gv.kindFromID()
+			}
+			if !LinkedBacklogItemsAllReadyOrLater(objectID(obj), options, kindFn) {
+				return true, false
+			}
+
+		case "linked_backlog_all_terminal":
+			var kindFn func(string) string
+			if gv != nil {
+				kindFn = gv.kindFromID()
+			}
+			if !LinkedBacklogItemsAllTerminal(objectID(obj), options, kindFn) {
+				return true, false
+			}
+
+		case "no_linked_backlog_in_progress_or_complete":
+			var kindFn func(string) string
+			if gv != nil {
+				kindFn = gv.kindFromID()
+			}
+			if !LinkedBacklogItemsNoneInProgressOrComplete(objectID(obj), options, kindFn) {
+				return true, false
+			}
+
+		case "workflow_constraints_if_set":
+			if gv != nil && !gv.checkWorkflowConstraintsIfSet(obj, options) {
+				return true, false
+			}
+
+		case "priority_plan_validated":
+			if gv != nil && !gv.checkPriorityPlanValidated(obj) {
+				return true, false
+			}
+
+		case "team_or_persona_dispatch_refs":
+			if gv != nil && !gv.checkAtLeastPrecondition(PrecondTeamOrPersonaDispatchRefs, obj) {
+				return true, false
+			}
+
+		case "git_mutation_evidence_present":
+			if gv != nil && !gv.checkCommitHashesGitMutationEvidence(obj, options) {
+				return true, false
+			}
+
+		case "branch_is_ancestor_of_trunk":
+			if gv != nil && !gv.checkBranchNameIsAncestorOfTrunk(obj, options) {
+				return true, false
+			}
+
+		case "machine_checkable_closure_evidence":
+			if gv != nil && !gv.checkMachineCheckableClosureEvidence(obj, options) {
+				return true, false
+			}
+
+		case "linked_criteria_validated_or_complete":
+			if gv != nil {
+				if rule, ok := lookupRefStatusRule(PrecondAllLinkedCriteriaValidatedOrComplete); ok {
+					if !gv.evalRefStatus(rule, obj, options) {
+						return true, false
+					}
+				}
+			}
+
+		case "priority_plan_archived_when_set":
+			if gv != nil {
+				if rule, ok := lookupRefStatusRule(PrecondPriorityPlanArchivedWhenSet); ok {
+					if !gv.evalRefStatus(rule, obj, options) {
+						return true, false
+					}
+				}
+			}
+
+		case "priority_plan_execution_facing":
+			if gv != nil {
+				if rule, ok := lookupRefStatusRule(PrecondPriorityPlanRefExecutionFacing); ok {
+					if !gv.evalRefStatus(rule, obj, options) {
+						return true, false
+					}
+				}
+			}
+
+		case "active_ref":
+			if gv != nil {
+				handled, met := evalActiveRefStage(gv, "active "+arg, obj, options)
+				if handled && !met {
+					return true, false
+				}
+			}
+
+		case "link_back":
+			subj, tgt, ok := strings.Cut(arg, ":")
+			if ok && gv != nil {
+				if !gv.linkBackAligned(strings.TrimSpace(subj), strings.TrimSpace(tgt), obj, options) {
+					return true, false
+				}
+			}
+
+		case "work_done":
+			status, _ := obj[objects.FieldKeyStatus].(string)
+			workDone, _ := obj["work_done"].(bool)
+			if !workDone && !strings.EqualFold(status, objects.ObjectStatusComplete) {
+				return true, false
+			}
+
 		default:
 			// For any other predicates, mark as handled and passed if in test/relaxed mode,
 			// or fail if unsatisfied

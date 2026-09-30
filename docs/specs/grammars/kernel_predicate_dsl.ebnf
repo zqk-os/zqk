@@ -24,7 +24,9 @@ object_predicate
     | "field_nonempty:" , [ object_identifier , ":" ] , field_name
     | "field_cleared:" , [ object_identifier , ":" ] , field_name
     | "field_matches:" , field_name , ":" , regex_pattern
-    | "role_is:" , role_name ;
+    | "role_is:" , role_name
+    | "active_ref:" , field_name
+    | "link_back:" , field_name , ":" , field_name ;
 
 role_name
     = "grooming" | "shovel_ready" | "execution_locked" | "enforced" | "realign" | "halted" | "terminal" | "testing" | "draft" | "conceptual" ;
@@ -61,6 +63,23 @@ gate_predicate
     | "performance_gate_ok_or_na"
     | "publish_ack_present_if_public"
     | "standard_checks_pass"
+    | "shovel_ready"
+    | "tdd_test_red_phase"
+    | "criteria_active_test_case"
+    | "ready_backlog_references_plan"
+    | "linked_backlog_ready_or_later"
+    | "linked_backlog_all_terminal"
+    | "no_linked_backlog_in_progress_or_complete"
+    | "workflow_constraints_if_set"
+    | "priority_plan_validated"
+    | "team_or_persona_dispatch_refs"
+    | "git_mutation_evidence_present"
+    | "branch_is_ancestor_of_trunk"
+    | "machine_checkable_closure_evidence"
+    | "linked_criteria_validated_or_complete"
+    | "priority_plan_archived_when_set"
+    | "priority_plan_execution_facing"
+    | "work_done"
     | "title_body_cohesion" , [ ":" , digit , { digit } ] ;
 
 (* --- Lexical Tokens --- *)

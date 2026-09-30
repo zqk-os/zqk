@@ -23,6 +23,23 @@ var StandaloneGatePredicates = map[string]struct{}{
 	"path_exists":                           {},
 	"content_hash_matches":                  {},
 	"content_size_positive":                 {},
+	"shovel_ready":                          {},
+	"tdd_test_red_phase":                    {},
+	"criteria_active_test_case":             {},
+	"ready_backlog_references_plan":         {},
+	"linked_backlog_ready_or_later":         {},
+	"linked_backlog_all_terminal":           {},
+	"no_linked_backlog_in_progress_or_complete": {},
+	"workflow_constraints_if_set":           {},
+	"priority_plan_validated":               {},
+	"team_or_persona_dispatch_refs":         {},
+	"git_mutation_evidence_present":         {},
+	"branch_is_ancestor_of_trunk":           {},
+	"machine_checkable_closure_evidence":    {},
+	"linked_criteria_validated_or_complete": {},
+	"priority_plan_archived_when_set":       {},
+	"priority_plan_execution_facing":        {},
+	"work_done":                             {},
 }
 
 var (
@@ -156,6 +173,20 @@ func validateSinglePredicate(p string) error {
 
 	case "role_is":
 		return validateIdentifier(arg, "role_is")
+
+	case "active_ref":
+		return validateIdentifier(arg, "active_ref")
+
+	case "link_back":
+		// Syntax: link_back:<subject_field>:<target_field>
+		parts := strings.Split(arg, ":")
+		if len(parts) != 2 || strings.TrimSpace(parts[0]) == "" || strings.TrimSpace(parts[1]) == "" {
+			return fmt.Errorf("link_back requires 'link_back:<subject_field>:<target_field>'")
+		}
+		if err := validateIdentifier(parts[0], "link_back subject"); err != nil {
+			return err
+		}
+		return validateIdentifier(parts[1], "link_back target")
 
 	case "field_matches":
 		// Syntax: field_matches:<field>:<regex>
@@ -308,15 +339,27 @@ func CompilePrecondition(p string) (string, bool) {
 		}
 	}
 
-	// 8. Field cleared postcondition: "<field> is cleared", "clear <field>"
+	// 8. Field cleared postcondition: "<field> is cleared", "<field> is unset", "clear <field>", "unset <field>"
 	if strings.HasSuffix(lower, " is cleared") {
 		f := strings.TrimSpace(strings.TrimSuffix(lower, " is cleared"))
 		if f != "" && !strings.Contains(f, " ") {
 			return "field_cleared:" + f, true
 		}
 	}
+	if strings.HasSuffix(lower, " is unset") {
+		f := strings.TrimSpace(strings.TrimSuffix(lower, " is unset"))
+		if f != "" && !strings.Contains(f, " ") {
+			return "field_cleared:" + f, true
+		}
+	}
 	if strings.HasPrefix(lower, "clear ") {
 		f := strings.TrimSpace(strings.TrimPrefix(lower, "clear "))
+		if f != "" && !strings.Contains(f, " ") {
+			return "field_cleared:" + f, true
+		}
+	}
+	if strings.HasPrefix(lower, "unset ") {
+		f := strings.TrimSpace(strings.TrimPrefix(lower, "unset "))
 		if f != "" && !strings.Contains(f, " ") {
 			return "field_cleared:" + f, true
 		}
@@ -351,7 +394,121 @@ func CompilePrecondition(p string) (string, bool) {
 		return "field_nonempty:problem_statement;field_nonempty:acceptance_considerations", true
 	}
 
+	// 13. Terminal work done
+	if lower == "work_done" || lower == "work is done" {
+		return "work_done", true
+	}
+
+	// 14. Shovel ready
+	if lower == "shovel ready" || lower == "shovel_ready" {
+		return "shovel_ready", true
+	}
+
+	// 15. TDD red phase
+	if strings.HasPrefix(lower, "all linked criteria_refs bound to active test_case_refs") || lower == "tdd red phase" {
+		return "tdd_test_red_phase", true
+	}
+
+	// 16. Criteria linked to active test case
+	if strings.HasPrefix(lower, "must link to an active test_case") || strings.HasPrefix(lower, "at least one active test_case_ref linked") {
+		return "criteria_active_test_case", true
+	}
+
+	// 17. Priority plan child / status gates
+	if strings.HasPrefix(lower, "at least one ready backlog_item references this plan") {
+		return "ready_backlog_references_plan", true
+	}
+	if strings.HasPrefix(lower, "all linked backlog_items referencing this plan are ready or later") {
+		return "linked_backlog_ready_or_later", true
+	}
+	if strings.HasPrefix(lower, "all linked backlog_items referencing this plan are terminal") {
+		return "linked_backlog_all_terminal", true
+	}
+	if strings.HasPrefix(lower, "no linked backlog_items referencing this plan are in progress or complete") {
+		return "no_linked_backlog_in_progress_or_complete", true
+	}
+	if strings.HasPrefix(lower, "workflow constraints validated") {
+		return "workflow_constraints_if_set", true
+	}
+	if lower == "priority plan validated" {
+		return "priority_plan_validated", true
+	}
+	if strings.HasPrefix(lower, "at least one team_configuration_ref or persona_refs") {
+		return "team_or_persona_dispatch_refs", true
+	}
+
+	// 18. Evidence gates
+	if strings.HasPrefix(lower, "commit_hashes have git mutation evidence") || strings.HasPrefix(lower, "commit_refs have git mutation evidence") {
+		return "git_mutation_evidence_present", true
+	}
+	if strings.HasPrefix(lower, "branch_name is an ancestor of trunk") || strings.HasPrefix(lower, "branch_ref is an ancestor of trunk") {
+		return "branch_is_ancestor_of_trunk", true
+	}
+	if strings.HasPrefix(lower, "machine-checkable evidence with green scheduler fingerprint") {
+		return "machine_checkable_closure_evidence", true
+	}
+
+	// 19. Ref status rules
+	if strings.HasPrefix(lower, "all linked criteria_refs are validated or complete") {
+		return "linked_criteria_validated_or_complete", true
+	}
+	if strings.HasPrefix(lower, "linked priority_plan is archived when priority_plan_ref is set") {
+		return "priority_plan_archived_when_set", true
+	}
+	if strings.HasPrefix(lower, "priority_plan_ref target must be in active or in_progress status") {
+		return "priority_plan_execution_facing", true
+	}
+
+	// 20. Active refs
+	if strings.Contains(lower, "at least one active ") && strings.Contains(lower, "linked") {
+		for _, w := range strings.Fields(lower) {
+			clean := strings.Trim(w, ",.()[]{}'")
+			if strings.HasSuffix(clean, "_ref") || strings.HasSuffix(clean, "_refs") {
+				return "active_ref:" + clean, true
+			}
+		}
+	}
+
+	// 21. Link back alignment
+	if strings.Contains(lower, "link back to") || strings.Contains(lower, "links back to") || strings.Contains(lower, "belongs to") {
+		if subj, tgt, ok := parseLinkBackTokens(lower); ok {
+			return "link_back:" + subj + ":" + tgt, true
+		}
+	}
+
 	return "", false
+}
+
+func parseLinkBackTokens(p string) (subject, target string, ok bool) {
+	delimiter := "link back to"
+	if !strings.Contains(p, delimiter) {
+		delimiter = "links back to"
+	}
+	if !strings.Contains(p, delimiter) {
+		delimiter = "belongs to"
+	}
+	parts := strings.Split(p, delimiter)
+	if len(parts) != 2 {
+		return "", "", false
+	}
+	for _, w := range strings.Fields(parts[0]) {
+		clean := strings.Trim(w, ",.()[]{}'")
+		if strings.Contains(clean, "ref") {
+			subject = clean
+			break
+		}
+	}
+	for _, w := range strings.Fields(parts[1]) {
+		clean := strings.Trim(w, ",.()[]{}'")
+		if strings.Contains(clean, "ref") {
+			target = clean
+			break
+		}
+	}
+	if subject == "" || target == "" {
+		return "", "", false
+	}
+	return subject, target, true
 }
 
 // ParseMetricPredicate extracts the metric name, operator, and threshold from a query_metric predicate argument.

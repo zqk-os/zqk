@@ -961,4 +961,178 @@ func TestAuditorGate_ThreeLatchCountdown(t *testing.T) {
 	})
 }
 
+func TestAuditorService_RequirementAndCriteriaProof(t *testing.T) {
+	ctx := context.Background()
+	tmpDir := t.TempDir()
+	store := newMockQASuccessStore()
+	signer, err := NewAuditorSigner("")
+	if err != nil {
+		t.Fatalf("signer failed: %v", err)
+	}
+	emitter := NewInterruptEmitter(tmpDir)
+	engine := NewGuidanceEngine()
+	gate := NewAuditorGate(store)
+	wal, _ := lifecycle.GetOrCreateLifecycleWAL(tmpDir)
+	svc := NewAuditorService(wal, store, signer, emitter, engine, gate)
+
+	t.Run("requirement with no criteria is rejected", func(t *testing.T) {
+		reqID := "REQ-ZERO-CRIT"
+		store.objs[reqID] = map[string]any{
+			objects.FieldKeyID:     reqID,
+			objects.FieldKeyKind:   objects.KindRequirement,
+			objects.FieldKeyStatus: objects.ObjectStatusComplete,
+			objects.FieldKeyTitle:  "Requirement without criteria",
+		}
+		svc.performAudit(ctx, reqID, objects.KindRequirement)
+
+		for _, obj := range store.objs {
+			if obj[objects.FieldKeyKind] == KindQASuccess && obj[objects.FieldKeyItemID] == reqID {
+				t.Fatal("expected QASuccess NOT to be minted for requirement with zero criteria")
+			}
+		}
+	})
+
+	t.Run("requirement with incomplete criterion is rejected", func(t *testing.T) {
+		reqID := "REQ-INCOMPLETE-CRIT"
+		critID := "CRIT-INCOMPLETE"
+		store.objs[critID] = map[string]any{
+			objects.FieldKeyID:     critID,
+			objects.FieldKeyKind:   objects.KindCriteria,
+			objects.FieldKeyStatus: "in_progress",
+		}
+		store.objs[reqID] = map[string]any{
+			objects.FieldKeyID:           reqID,
+			objects.FieldKeyKind:         objects.KindRequirement,
+			objects.FieldKeyStatus:       objects.ObjectStatusComplete,
+			objects.FieldKeyTitle:        "Requirement with incomplete criterion",
+			objects.FieldKeyCriteriaRefs: []any{critID},
+		}
+		svc.performAudit(ctx, reqID, objects.KindRequirement)
+
+		for _, obj := range store.objs {
+			if obj[objects.FieldKeyKind] == KindQASuccess && obj[objects.FieldKeyItemID] == reqID {
+				t.Fatal("expected QASuccess NOT to be minted for requirement with incomplete criterion")
+			}
+		}
+	})
+
+	t.Run("requirement with complete criteria is issued QASuccess", func(t *testing.T) {
+		reqID := "REQ-COMPLETE-CRIT"
+		critID := "CRIT-COMPLETE"
+		store.objs[critID] = map[string]any{
+			objects.FieldKeyID:     critID,
+			objects.FieldKeyKind:   objects.KindCriteria,
+			objects.FieldKeyStatus: objects.ObjectStatusComplete,
+		}
+		store.objs[reqID] = map[string]any{
+			objects.FieldKeyID:           reqID,
+			objects.FieldKeyKind:         objects.KindRequirement,
+			objects.FieldKeyStatus:       objects.ObjectStatusComplete,
+			objects.FieldKeyTitle:        "Requirement with complete criterion",
+			objects.FieldKeyCriteriaRefs: []any{critID},
+		}
+		svc.performAudit(ctx, reqID, objects.KindRequirement)
+
+		found := false
+		for _, obj := range store.objs {
+			if obj[objects.FieldKeyKind] == KindQASuccess && obj[objects.FieldKeyItemID] == reqID {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Fatal("expected QASuccess to be minted for requirement with complete criteria")
+		}
+	})
+
+	t.Run("criterion with no test case is rejected", func(t *testing.T) {
+		critID := "CRIT-NO-TEST"
+		store.objs[critID] = map[string]any{
+			objects.FieldKeyID:     critID,
+			objects.FieldKeyKind:   objects.KindCriteria,
+			objects.FieldKeyStatus: objects.ObjectStatusComplete,
+			objects.FieldKeyTitle:  "Criterion without test",
+		}
+		svc.performAudit(ctx, critID, objects.KindCriteria)
+
+		for _, obj := range store.objs {
+			if obj[objects.FieldKeyKind] == KindQASuccess && obj[objects.FieldKeyItemID] == critID {
+				t.Fatal("expected QASuccess NOT to be minted for criterion without test case")
+			}
+		}
+	})
+
+	t.Run("criterion with incomplete test case is rejected", func(t *testing.T) {
+		critID := "CRIT-FAILING-TEST"
+		tcID := "TST-INCOMPLETE"
+		store.objs[tcID] = map[string]any{
+			objects.FieldKeyID:           tcID,
+			objects.FieldKeyKind:         objects.KindTestCase,
+			objects.FieldKeyStatus:       "in_progress",
+			"remaining_open_count":       1,
+			objects.FieldKeyCriteriaRefs: []any{critID},
+		}
+		store.objs[critID] = map[string]any{
+			objects.FieldKeyID:           critID,
+			objects.FieldKeyKind:         objects.KindCriteria,
+			objects.FieldKeyStatus:       objects.ObjectStatusComplete,
+			objects.FieldKeyTestCaseRefs: []any{tcID},
+		}
+		svc.performAudit(ctx, critID, objects.KindCriteria)
+
+		for _, obj := range store.objs {
+			if obj[objects.FieldKeyKind] == KindQASuccess && obj[objects.FieldKeyItemID] == critID {
+				t.Fatal("expected QASuccess NOT to be minted for criterion with incomplete test case")
+			}
+		}
+	})
+
+	t.Run("criterion with passing test case is issued QASuccess", func(t *testing.T) {
+		critID := "CRIT-PASSING-TEST"
+		tcID := "TST-COMPLETE"
+		store.objs[tcID] = map[string]any{
+			objects.FieldKeyID:           tcID,
+			objects.FieldKeyKind:         objects.KindTestCase,
+			objects.FieldKeyStatus:       objects.ObjectStatusComplete,
+			"remaining_open_count":       0,
+			objects.FieldKeyCriteriaRefs: []any{critID},
+		}
+		store.objs[critID] = map[string]any{
+			objects.FieldKeyID:           critID,
+			objects.FieldKeyKind:         objects.KindCriteria,
+			objects.FieldKeyStatus:       objects.ObjectStatusComplete,
+			objects.FieldKeyTestCaseRefs: []any{tcID},
+		}
+		svc.performAudit(ctx, critID, objects.KindCriteria)
+
+		found := false
+		for _, obj := range store.objs {
+			if obj[objects.FieldKeyKind] == KindQASuccess && obj[objects.FieldKeyItemID] == critID {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Fatal("expected QASuccess to be minted for criterion with passing test case")
+		}
+	})
+
+	t.Run("priority plan with zero artifacts does not receive QASuccess", func(t *testing.T) {
+		priID := "PRI-NO-ART"
+		store.objs[priID] = map[string]any{
+			objects.FieldKeyID:     priID,
+			objects.FieldKeyKind:   "priority_plan",
+			objects.FieldKeyStatus: objects.ObjectStatusComplete,
+			objects.FieldKeyTitle:  "Completed priority plan",
+		}
+		svc.performAudit(ctx, priID, "priority_plan")
+
+		for _, obj := range store.objs {
+			if obj[objects.FieldKeyKind] == KindQASuccess && obj[objects.FieldKeyItemID] == priID {
+				t.Fatal("expected QASuccess NOT to be minted for priority plan with zero artifacts")
+			}
+		}
+	})
+}
+
 

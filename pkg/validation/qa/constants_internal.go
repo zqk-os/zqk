@@ -21,5 +21,7 @@ const (
 	LogFmtAuditorCreateSuccessFailed = "❌ [QA-AUDITOR] Failed to create QASuccess for %s: %v\n"
 	LogFmtAuditorSuccess             = "✅ [QA-AUDITOR] Audit passed and QASuccess issued for %s\n"
 	ReasonMissingArtifacts           = "Missing required deliverable artifacts"
+	ReasonMissingCriteria            = "Missing required verification criteria"
+	ReasonMissingTestProof           = "Missing verified passing test case proof"
 )
 
