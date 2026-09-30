@@ -92,10 +92,12 @@ func (r *ReverseReferenceIndex) getCacheFilePath(projectRoot string) string {
 
 // LoadCache loads the cache from disk if it exists and is still valid
 // Returns true if cache was successfully loaded, false if cache needs to be rebuilt
-func newReverseRefIndexLockContext() (stdcontext.Context, stdcontext.CancelFunc, logging.Logger) {
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
-	return ctx, cancel, logger
+func newReverseRefIndexLockContext() (stdcontext.Context, stdcontext.CancelFunc) {
+	return stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
+}
+
+func newReverseRefIndexLockLogger() logging.Logger {
+	return logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 }
 
 func (r *ReverseReferenceIndex) initMapsLocked() {
@@ -108,26 +110,26 @@ func (r *ReverseReferenceIndex) initMapsLocked() {
 }
 
 func (r *ReverseReferenceIndex) withReadLock(lockName string, op func() error) error {
-	ctx, cancel, logger := newReverseRefIndexLockContext()
+	ctx, cancel := newReverseRefIndexLockContext()
 	defer cancel()
 	return concurrency.WithRLockTimeout(
 		&r.mu,
 		ctx,
 		nil,
-		logging.NewLockLoggerAdapter(logger),
+		logging.NewLockLoggerAdapter(newReverseRefIndexLockLogger()),
 		lockName,
 		op,
 	)
 }
 
 func (r *ReverseReferenceIndex) withWriteLock(lockName string, op func() error) error {
-	ctx, cancel, logger := newReverseRefIndexLockContext()
+	ctx, cancel := newReverseRefIndexLockContext()
 	defer cancel()
 	return concurrency.WithLockTimeout(
 		&r.mu,
 		ctx,
 		nil,
-		logging.NewLockLoggerAdapter(logger),
+		logging.NewLockLoggerAdapter(newReverseRefIndexLockLogger()),
 		lockName,
 		op,
 	)
@@ -182,7 +184,7 @@ func (r *ReverseReferenceIndex) GetDependentsWithContext(ctx stdcontext.Context,
 // GetDependentsWithError retrieves all dependent object IDs with fail-closed error propagation
 // if the read lock times out or cannot be acquired.
 func (r *ReverseReferenceIndex) GetDependentsWithError(referencedID string) ([]string, error) {
-	ctx, cancel, _ := newReverseRefIndexLockContext()
+	ctx, cancel := newReverseRefIndexLockContext()
 	defer cancel()
 	return r.GetDependentsWithContext(ctx, referencedID)
 }
