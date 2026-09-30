@@ -48,7 +48,6 @@ var (
 // fingerprint (sparse test roots still hash these when present). Production
 // coverage is ValidationCodeChecksumGlobs plus the running executable — do not
 // grow this list as the primary way to catch checker edits.
-// TRACK: PRI-CEF-R26-LIFECYCLE-EXAM-001 /
 var ValidationCodeChecksumFiles = []string{
 	PathCheckInstanceValidationHelpers,
 	PathCheckImplValidators,
@@ -65,7 +64,7 @@ var ValidationCodeChecksumFiles = []string{
 // check*.go is the Layer 1 checker tree (including check_references_helpers.go);
 // parser covers ExtractReferenceFields; validation package + all lifecycle YAMLs
 // cover validator and occupancy-machine edits. *_test.go is skipped.
-// TRACK: PRI-CEF-R26-LIFECYCLE-EXAM-001 — --clear-cache is break-glass, not the reload path.
+// --clear-cache is break-glass, not the reload path.
 var ValidationCodeChecksumGlobs = []string{
 	"cmd/zqk/system/check*.go",
 	"cmd/zqk/system/async_check*.go",
@@ -133,7 +132,6 @@ const (
 	PrecondBranchNameIsAncestorOfTrunk = "branch_name is an ancestor of trunk"
 	// PrecondMachineCheckableClosureEvidence gates promotion to complete on machine-checkable
 	// scheduler job id, bundle log, and re-read green fingerprint in health.jsonl.
-	// TRACK: BLI-CEF-R19-CLOSURE-GATE-001 / REQ-CEF-R19-EVIDENCE-001
 	PrecondMachineCheckableClosureEvidence = "machine-checkable evidence with green scheduler fingerprint is verified"
 	// PrecondAllLinkedCriteriaValidatedOrComplete gates backlog complete transitions/holds.
 	PrecondAllLinkedCriteriaValidatedOrComplete = "all linked criteria_refs are validated or complete"
@@ -144,7 +142,6 @@ const (
 	// PrecondPriorityPlanArchivedWhenSet gates backlog_item transitions to archived:
 	// when priority_plan_ref is set, the referenced priority_plan must be archived.
 	// Vacuous true when priority_plan_ref is unset.
-	// TRACK: BLI-COMMUNITY-ORG-SCOPE-001 / PRI-COMMUNITY-TDE-HARDENING-001
 	PrecondPriorityPlanArchivedWhenSet = "linked priority_plan is archived when priority_plan_ref is set"
 	// PrecondReadyBacklogReferencesPlan is child-owned priority_plan membership:
 	// ≥1 backlog_item with priority_plan_ref=this plan and status planned (conversational "ready").
@@ -176,7 +173,7 @@ const (
 	PrecondWorkflowConstraintsIfSet = "workflow constraints validated (if workflow_ref is set)"
 	// PrecondPriorityPlanValidated is the remaining grooming→active YAML token:
 	// inherited title or specialized description, plus workstream_refs or singular workstream_ref.
-	// Persona/team and planned-child are separate tokens. TRACK: BLI-CEF-R26-REMAINING-KINDS-001
+	// Persona/team and planned-child are separate tokens.
 	PrecondPriorityPlanValidated = "priority plan validated"
 )
 

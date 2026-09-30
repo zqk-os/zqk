@@ -274,7 +274,7 @@ func TestLifecycleLoader_IsValidTransition(t *testing.T) {
 		{"verification_matrix", "active", "draft", false},
 		{"verification_matrix", "archived", "active", false},
 		{"priority_plan", "active", "grooming", true},
-		{"priority_plan", "in_progress", "grooming", false}, // check valve; TRACK: BLI-1785439369431933000-f0cccd6c
+		{"priority_plan", "in_progress", "grooming", false}, // check valve
 		{"priority_plan", "grooming", "active", true},
 		{"priority_plan", "complete", "grooming", true},
 		{"priority_plan", "complete", "active", true},
@@ -283,7 +283,7 @@ func TestLifecycleLoader_IsValidTransition(t *testing.T) {
 		{"agent_task", "in_progress", "implemented", true},
 		{"agent_task", "pending_verification", "completed", false},
 		{"agent_task", "in_progress", "completed", false},
-		// Draft must not skip shovel-ready. TRACK: BLI-CEF-R27-DUAL-SEAT-REMEASURE-001
+		// Draft must not skip shovel-ready.
 		{"agent_task", "proposed", "in_progress", false},
 		{"agent_task", "proposed", "approved", true},
 		{"agent_task", "approved", "in_progress", true},

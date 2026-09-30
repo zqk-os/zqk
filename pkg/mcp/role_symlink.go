@@ -33,7 +33,7 @@ func MCPRoleBinPath(projectRoot, role string) string {
 
 // IDEMCPRoles are role symlinks IDE/IDE mcp.json may point at. Rebuilds
 // that only refresh zqk-mcp-daemon leave ide-adapter missing → red MCP.
-// TRACK: BLI-MCP-CURSOR-ADAPTER-SYMLINK-001 — keep ensure + stable install in sync.
+// keep ensure + stable install in sync.
 var IDEMCPRoles = []string{MCPRoleDaemon, MCPRoleIDEAdapter}
 
 // EnsureMCPIDERoleSymlinks refreshes daemon + ide-adapter role links against

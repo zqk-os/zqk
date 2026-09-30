@@ -17,7 +17,6 @@ import (
 // CheckTestRepoWriteGuard refuses Create/Update/Delete when a test is bound to a
 // non-isolated project root. Isolation is the existing classifier
 // (IsTestOrTempProjectRoot: t.TempDir / os.TempDir / "-test-"), not an env override.
-// TRACK: BLI-CEF-R13-NO-REPO-WRITE-GATE-001, CRIT-CEF-R13-NO-REPO-WRITE-GATE-001.
 func (f *FileObjectStorage) CheckTestRepoWriteGuard() error {
 	if f == nil || f.projectRoot == emptyValue {
 		return nil

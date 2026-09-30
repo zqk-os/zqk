@@ -1,7 +1,6 @@
 // Package closureevidence implements fail-closed machine-checkable evidence validation
 // for object completion (scheduler job ID, test bundle log path, and re-read green fingerprint in health.jsonl).
 //
-// TRACK: BLI-CEF-R19-CLOSURE-GATE-001 / REQ-CEF-R19-EVIDENCE-001
 package closureevidence
 
 import (

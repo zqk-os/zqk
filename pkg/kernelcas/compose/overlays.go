@@ -76,7 +76,6 @@ func kindOverlayRules(objectKind, intent string) []Rule {
 	rules = append(rules, traitOverlayRules(objectKind, intent)...)
 
 	// All narrative planning objects crossing CAS boundary require a description unless preliminary or terminal.
-	// TRACK: BLI-SPEC-CAS-DESC-GATE-001 / REQ-DATA-MODEL-CAS-DESC-001
 	if objects.KindRequiresDescription(objectKind) {
 		rules = append(rules, Rule{
 			ID: "require_description_cas_boundary",
@@ -93,7 +92,6 @@ func kindOverlayRules(objectKind, intent string) []Rule {
 }
 
 // selfDAGRules refuse ID==self and 2-cycles on a same-kind ref field.
-// TRACK: BLI-KERNEL-REF-GRAPH-ACYCLIC-001
 func selfDAGRules(field string) []Rule {
 	return []Rule{
 		{
@@ -304,7 +302,7 @@ func goalOverlay() []Rule {
 			},
 		},
 		{
-			// Occupancy is child-owned. TRACK: BLI-KERNEL-REF-GRAPH-ACYCLIC-001
+			// Occupancy is child-owned.
 			ID: "goal_no_backlog_item_refs",
 			Op: OpRefuseFieldPresent,
 			Config: map[string]any{
@@ -334,7 +332,7 @@ func goalOverlay() []Rule {
 func milestoneOverlay() []Rule {
 	rules := []Rule{
 		{
-			// Occupancy is child-owned. TRACK: BLI-KERNEL-REF-GRAPH-ACYCLIC-001
+			// Occupancy is child-owned.
 			ID: "mil_no_backlog_item_refs",
 			Op: OpRefuseFieldPresent,
 			Config: map[string]any{
@@ -369,7 +367,7 @@ func milestoneOverlay() []Rule {
 func workstreamOverlay() []Rule {
 	rules := []Rule{
 		{
-			// Occupancy is child-owned. TRACK: BLI-KERNEL-REF-GRAPH-ACYCLIC-001
+			// Occupancy is child-owned.
 			ID: "ws_no_requirement_refs",
 			Op: OpRefuseFieldPresent,
 			Config: map[string]any{
@@ -508,7 +506,7 @@ func requirementOverlay() []Rule {
 			},
 		},
 		{
-			// Occupancy is child-owned. TRACK: BLI-KERNEL-REF-GRAPH-ACYCLIC-001
+			// Occupancy is child-owned.
 			ID: "req_no_backlog_item_refs",
 			Op: OpRefuseFieldPresent,
 			Config: map[string]any{
@@ -566,7 +564,7 @@ func requirementTracePipelineOverlay() []Rule {
 func pipelineOverlay() []Rule {
 	return []Rule{
 		{
-			// Occupancy is child-owned. TRACK: BLI-KERNEL-REF-GRAPH-ACYCLIC-001
+			// Occupancy is child-owned.
 			ID: "pipeline_no_agent_task_refs",
 			Op: OpRefuseFieldPresent,
 			Config: map[string]any{
@@ -580,7 +578,7 @@ func pipelineOverlay() []Rule {
 func convergenceSessionOverlay() []Rule {
 	return []Rule{
 		{
-			// Occupancy is child-owned. TRACK: BLI-KERNEL-REF-GRAPH-ACYCLIC-001
+			// Occupancy is child-owned.
 			ID: "cvs_no_backlog_item_refs",
 			Op: OpRefuseFieldPresent,
 			Config: map[string]any{
@@ -594,7 +592,7 @@ func convergenceSessionOverlay() []Rule {
 func displayOverlay() []Rule {
 	return []Rule{
 		{
-			// Occupancy is child-owned. TRACK: BLI-KERNEL-REF-GRAPH-ACYCLIC-001
+			// Occupancy is child-owned.
 			ID: "display_no_component_refs",
 			Op: OpRefuseFieldPresent,
 			Config: map[string]any{
@@ -670,7 +668,7 @@ func organizationalChangeOverlay() []Rule {
 func missionOverlay() []Rule {
 	return []Rule{
 		{
-			// Occupancy is child-owned. TRACK: BLI-KERNEL-REF-GRAPH-ACYCLIC-001
+			// Occupancy is child-owned.
 			ID: "mission_no_persona_refs",
 			Op: OpRefuseFieldPresent,
 			Config: map[string]any{
@@ -709,7 +707,7 @@ func criteriaOverlay() []Rule {
 		{
 			// Hash CAS must not persist criteria without category. Create parks
 			// incomplete objects on the draft plane; this overlay refuses promote
-			// / update materialize. TRACK: BLI-KERNEL-CRIT-CATEGORY-MINT-001
+			// / update materialize.
 			ID: "crit_require_category",
 			Op: OpRequireField,
 			Config: map[string]any{
@@ -718,7 +716,7 @@ func criteriaOverlay() []Rule {
 			},
 		},
 		{
-			// Parent-owned composition. TRACK: BLI-KERNEL-REF-GRAPH-ACYCLIC-001
+			// Parent-owned composition.
 			ID: "crit_no_requirement_refs",
 			Op: OpRefuseFieldPresent,
 			Config: map[string]any{
@@ -747,7 +745,6 @@ func criteriaOverlay() []Rule {
 }
 
 // occupiableTransitionOverlay requires claimed_by when transitioning into in_progress on occupiable kinds.
-// TRACK: TDE-CEF-IN-PROGRESS-REQUIRES-CLAIM-001
 func occupiableTransitionOverlay() []Rule {
 	return []Rule{
 		{

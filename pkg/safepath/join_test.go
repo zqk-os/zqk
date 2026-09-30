@@ -71,7 +71,6 @@ func TestJoinUnderRoot(t *testing.T) {
 			errContains: errPathEscapesRoot,
 		},
 		{
-			// TRACK: BLI-CEF-R15-PATH-TRAVERSAL-001 / REQ-CEF-R2-SEC-PATH-TRAVERSAL
 			name:        "root relative traversal escape attempt",
 			root:        tempDir,
 			elems:       []string{"a/b/../../../../escape.txt"},

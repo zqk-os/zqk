@@ -10,7 +10,7 @@ const systemOntologyID = "zqk-system-ontology"
 
 // primarySystemOntologyKinds is the planning/Gantt slice this package historically
 // exposed. Properties are projected from live object specs, not a hand map.
-// TRACK: BLI-KERNEL-REF-GRAPH-ACYCLIC-001 — keep in lockstep with GRAPH_EDGE_OWNERSHIP.md
+// keep in lockstep with GRAPH_EDGE_OWNERSHIP.md
 var primarySystemOntologyKinds = []string{
 	objects.KindGoal,
 	objects.KindMilestone,

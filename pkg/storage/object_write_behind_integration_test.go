@@ -131,7 +131,6 @@ func TestWriteBehind_DisabledWhenSkipGlobalWiring(t *testing.T) {
 
 // TestWriteBehind_DisabledWhenPrivilegedWriterDaemon ensures object daemon does not
 // claim write-behind or replay object.wal (8GB RSS / EMFILE footgun).
-// TRACK: BLI-CEF-R20-SINGLE-WRITER-BLI-001
 func TestWriteBehind_DisabledWhenPrivilegedWriterDaemonArgvWithoutEnv(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv(zqkenv.TestRoot().Name(), tmpDir)

@@ -132,7 +132,7 @@ transitions:
 
 func TestGoValidator_ShippedBacklogCompleteRefusesInProgressCriteria(t *testing.T) {
 	t.Parallel()
-	// TRACK: BLI-CEF-POL007-FMT-001 — live YAML must refuse complete while CRITs are in_progress
+	// live YAML must refuse complete while CRITs are in_progress
 	loader := objects.NewLifecycleLoader(filepath.Join("..", "..", paths.ProcessInternalLifecyclesDir))
 	gv := NewGoValidatorWithLoaders(nil, loader)
 	obj := map[string]any{

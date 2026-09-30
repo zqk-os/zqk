@@ -60,7 +60,7 @@ func setupAppliedConvergenceLifecycleBundle(t *testing.T) (
 	cvsID = summary.CreatedConvergenceSessionIDs[0]
 	// Bundle stamps draft (scaffold / draft plane). Ticks persist measurements
 	// only on active (DEC Option A). Hop here so e2e ticks exercise the persist path.
-	// TRACK: BLI-1786686768606200000-31133cc3
+	//
 	cvsObj, err := provider.Read(ctx, secCtx, cvsID)
 	if err != nil {
 		t.Fatalf("Read CVS after apply: %v", err)

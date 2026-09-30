@@ -36,7 +36,6 @@ func LeaveAllowRecording() {
 // for the rest of this process until LeaveHotPathNoPersist. system check was
 // spawning hundreds of coordinator_metrics_router Gs that serialized on
 // FileObjectStorage.Create and timed out the 5m CLI floor.
-// TRACK: BLI-CEF-STORAGE-INDEX-CACHE-001
 func EnterHotPathNoPersist() {
 	atomic.AddInt32(&hotPathNoPersistRef, 1)
 }

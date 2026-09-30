@@ -15,7 +15,7 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-// TRACK: BLI-CEF-R26-REMAINING-KINDS-001 — smash (bool flag + leftover bullet on one
+// smash (bool flag + leftover bullet on one
 // line, unquoted ':' in a postcondition) used to surface only in loadAllLifecycleDocs.
 // EnsureReady now walks the dir so CLI init / system check Warns before a later LoadLifecycle.
 

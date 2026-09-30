@@ -270,7 +270,6 @@ func TestResolveInvocations_GoTestFileTargeting(t *testing.T) {
 	}
 }
 
-// TRACK: BLI-TESTCASE-SANDBOX-PGID-001
 func TestCRIT_PGID_Isolation_And_Teardown(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
 	defer cancel()
@@ -292,7 +291,6 @@ func TestCRIT_PGID_Isolation_And_Teardown(t *testing.T) {
 	}
 }
 
-// TRACK: BLI-TESTCASE-SANDBOX-TMPDIR-002
 func TestCRIT_Ephemeral_TMPDIR_Provisioning(t *testing.T) {
 	ctx := context.Background()
 

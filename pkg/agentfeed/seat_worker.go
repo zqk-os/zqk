@@ -29,7 +29,6 @@ type SeatWorkerOptions struct {
 	// ReplyToAgentID overrides challenge FromAgentID for WORK replies.
 	ReplyToAgentID string
 	// SessionID is the worker zqk_session binding runtime provenance for this process.
-	// TRACK: REQ-COMMS-RUNTIME-SESSION-001
 	SessionID string
 	// PriorityID is embedded in COMMS-CHECK-REPLY WORK (from whats-next).
 	PriorityID string
@@ -45,7 +44,6 @@ type SeatWorkerOptions struct {
 	OnNonComms NonCommsHandler
 	// OnNamedATK runs when the body names exactly one live ATK (or ONLY ATK-…).
 	// Wired even when --execute-non-comms is off so hourglass work is not skipped.
-	// TRACK: BLI-COMMS-ORCH-EXECUTE-NOT-ACK-001
 	OnNamedATK NonCommsHandler
 }
 
@@ -135,7 +133,7 @@ func writeSeatEventAttempts(path string, ledger map[string]int) error {
 // binary can run. ATK-only keys made assigned work unrecoverable once
 // three earlier hourglasses failed (new AFEs parked at attempts=3).
 // Reminting the same AFE is still forbidden (do not remint live orch).
-// TRACK: BLI-COMMS-ORCH-EXECUTE-NOT-ACK-001 — remove the event-first
+// remove the event-first
 // preference when: remint automation is gone and ATK close is honest.
 func SeatAttemptKey(eventID, taskID string) string {
 	if id := strings.TrimSpace(eventID); id != "" {

@@ -384,7 +384,7 @@ func TestCalculateCommitMetrics(t *testing.T) {
 		{objects.FieldKeyID: "BLI-002", objects.FieldKeyKind: "backlog_item", objects.FieldKeyTitle: "Item 2", objects.FieldKeyStatus: objects.ObjectStatusValidated, objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion, objects.FieldKeyCategory: "development"},
 	}
 
-	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+	//
 	for _, item := range backlogItems {
 		storage.CreateCASVisible(t, storageProvider, ctx, secCtx, item, objects.GetString(item, objects.FieldKeyStatus))
 	}
@@ -457,7 +457,7 @@ func TestCalculateCommitMetrics(t *testing.T) {
 		},
 	}
 
-	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+	//
 	for _, ref := range codeRefs {
 		storage.CreateCASVisible(t, storageProvider, ctx, secCtx, ref, objects.ObjectStatusOriginated)
 	}
@@ -608,7 +608,7 @@ func TestDetectCommitBasedDependencies(t *testing.T) {
 		{objects.FieldKeyID: "COD-011", objects.FieldKeyKind: objects.KindCodeReference, objects.FieldKeyTitle: "Ref 11", objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion, objects.FieldKeyStatus: objects.ObjectStatusConceptual, objects.FieldKeyFilePath: "pkg/c.go", objects.FieldKeyLineStart: float64(1), objects.FieldKeyLineEnd: float64(10), objects.FieldKeyCommitHash: "commit8", objects.FieldKeyCommitDate: now.AddDate(0, 0, -35).Format(time.RFC3339), objects.FieldKeyLinesAdded: float64(10)},
 	}
 
-	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+	//
 	for _, ref := range codeRefs {
 		storage.CreateCASVisible(t, storageProvider, ctx, secCtx, ref, objects.ObjectStatusOriginated)
 	}

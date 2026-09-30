@@ -279,7 +279,7 @@ func AppendPeerAck(projectRoot, agentID, personaRef, inReplyTo, summary string) 
 }
 
 // AppendPeerAckWithSession records a peer_ack stamped with the authoring zqk_session.
-// TRACK: REQ-COMMS-RUNTIME-SESSION-001 — provenance via session_id, not seat-name heuristics.
+// provenance via session_id, not seat-name heuristics.
 func AppendPeerAckWithSession(projectRoot, agentID, personaRef, sessionID, inReplyTo, summary string) (AppendEventResult, error) {
 	msg := strings.TrimSpace(summary)
 	if msg == "" {

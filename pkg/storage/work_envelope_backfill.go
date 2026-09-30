@@ -50,7 +50,7 @@ func effortAwareKindNames() []string {
 
 // BackfillWorkEnvelopeCompletedAt stamps completed_at from historical updated_at
 // on effort_aware work-done objects that never received the work clock.
-// Does not run on object get. TRACK: BLI-KERNEL-WORK-ENVELOPE-001
+// Does not run on object get.
 func BackfillWorkEnvelopeCompletedAt(
 	ctx context.Context,
 	sec *pkgctx.SecurityContext,

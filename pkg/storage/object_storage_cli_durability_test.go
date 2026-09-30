@@ -7,7 +7,6 @@ import (
 // TestEnsureCLIObjectMutationVisible_EmptyFlushKindsDoesNotSkipIndex documents the
 // promote/demote CAS miss: nil flushKinds used to skip listing-index FlushKind entirely.
 // Empty kinds now FlushAll so index updates survive process exit.
-// TRACK: REQ-CEF-R2-REL-CAS-FSYNC
 func TestEnsureCLIObjectMutationVisible_EmptyFlushKindsDoesNotSkipIndex(t *testing.T) {
 	tmp := t.TempDir()
 	f := &FileObjectStorage{projectRoot: tmp}

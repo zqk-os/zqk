@@ -47,7 +47,6 @@ const (
 )
 
 // IsStudioPackToolsEnabled returns true if studio ontology pack tools should be registered.
-// TRACK: BLI-KERNEL-PACK-MCP-001 / CRIT-KERNEL-PACK-MCP-001.
 // When false, default open-core MCP server excludes pack-tagged tools.
 func IsStudioPackToolsEnabled(secCtx *pkgctx.SecurityContext) bool {
 	if zqkenv.EnableStudioPackTools().Get() == "1" || zqkenv.StudioDogfood().Get() == "1" {

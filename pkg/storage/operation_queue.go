@@ -16,7 +16,6 @@ import (
 )
 
 // OperationType represents the type of operation
-// TRACK: BLI-CEF-R16-OPQUEUE-001 / CRIT-CEF-R2-CON-OPQUEUE-A / REQ-CEF-R2-CON-OPQUEUE
 type OperationType string
 
 const (

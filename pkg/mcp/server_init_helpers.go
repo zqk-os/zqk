@@ -283,7 +283,6 @@ func (s *Server) handleAuthenticationFlow(ctx context.Context, clientID string, 
 
 		// Named loopback membranes (ide-adapter / feed-steer) on TCP. Exact
 		// client name only — not isHumanClient (that list is substring-based).
-		// TRACK: BLI-CEF-R2-REL-MCP-RECONNECT
 		if s.multiClient.Load() && isTrustedLoopbackAdapter(initParams.ClientInfo.Name, clientID) {
 			accountID = SystemAccountID
 			clientInfo[clientInfoAccountID] = accountID

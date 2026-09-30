@@ -11,7 +11,7 @@ import (
 // steers/wakes leave both seats idle when delivery/ack fails.
 //
 // Untargeted (empty to_agent_id) broadcasts are allowed without await.
-// No env privilege override — TRACK: BLI-ENV-BREAKGLASS-REMOVE-001 /
+// No env privilege override
 // DEC-ENV-BREAKGLASS-TO-SIGNED-LOGIN-001.
 func EnforceDirectedHourglass(toAgentID string, awaitPeerAck bool) error {
 	if strings.TrimSpace(toAgentID) == "" {

@@ -76,10 +76,9 @@ func privilegedWriterSocketExists(projectRoots ...string) bool {
 // privilegedWriterLocalWriteAllowed reports whether CAS may write locally when the
 // PrivilegedWriter daemon is down. Production stays fail-closed; tests opt in via
 // ZQK_TEST_ALLOW_CAS_FALLTHROUGH=1 (see pkg/testing test setup).
-// TRACK: BLI-COMMS-CURSOR-TPM-DELIVER-ATTN-001 (test harness) — TestRoot auto-allow is
+// — TestRoot auto-allow is
 // belt-and-suspenders with zqkenv.ApplyIsolatedStorageEnv; prefer explicit fallthrough flag.
 func privilegedWriterLocalWriteAllowed(projectRoots ...string) bool {
-	// TRACK: BLI-CEF-R20-SINGLE-WRITER-BLI-001
 	if zqkenv.PrivilegedWriterDaemonRole() {
 		return true
 	}

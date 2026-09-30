@@ -142,7 +142,6 @@ func ParseFieldPermission(fieldDef map[string]any) *FieldPermission {
 
 	// Check checklist.security for sensitive fields.
 	// "non-sensitive" must not match the substring "sensitive".
-	// TRACK: BLI-KERNEL-CRIT-CATEGORY-MINT-001
 	if checklist, ok := fieldDef["checklist"].(map[string]any); ok {
 		if security, ok := checklist["security"].(string); ok {
 			if checklistSecurityRequiresConfidential(security) && len(fp.Requires) == 0 {

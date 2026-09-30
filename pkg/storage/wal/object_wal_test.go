@@ -448,7 +448,6 @@ func (w *walFlushFailWriter) Write([]byte) (int, error) {
 	return 0, w.err
 }
 
-// TRACK: BLI-CEF-R16-WAL-CLOSE-001 / CRIT-CEF-R2-REL-WAL-CLOSE-A / REQ-CEF-R2-REL-WAL-CLOSE
 func TestObjectWAL_CloseReturnsFlushError(t *testing.T) {
 	flushErr := errors.New("flush boom")
 	f, err := fileutil.CreateTemp(t.TempDir(), "object-wal")
@@ -468,7 +467,6 @@ func TestObjectWAL_CloseReturnsFlushError(t *testing.T) {
 	}
 }
 
-// TRACK: BLI-CEF-R14-RCV-CRASH-REPLAY-001 / CRIT-CEF-R14-RCV-CRASH-REPLAY-001 / REQ-CEF-R14-RCV-SEC-001
 func TestObjectWAL_CrashRecoveryMidWriteReplay(t *testing.T) {
 	tmpDir := t.TempDir()
 	w, err := NewObjectWAL(tmpDir)

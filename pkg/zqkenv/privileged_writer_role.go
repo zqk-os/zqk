@@ -7,7 +7,6 @@ import (
 
 // Privileged-writer process identity. Env (IS_DAEMON) is belt-and-suspenders;
 // argv `object daemon` is the source of truth that cannot lose a Setenv race.
-// TRACK: BLI-CEF-R20-SINGLE-WRITER-BLI-001
 const (
 	PrivilegedWriterCLIGroup = "object"
 	PrivilegedWriterCLIVerb  = "daemon"

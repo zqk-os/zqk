@@ -12,7 +12,7 @@ import (
 // 2026-08-20 scheduler dump (pid 95580, 3.2GB RSS, 651MB heap): 238 of 341
 // goroutines were (*BufferedWriter).autoFlush. Each 1s ticker could block in
 // write(2) and grow parked Darwin Ms that never shrink.
-// TRACK: BLI-CAS-HAND-DUP-CHECK-001 — same OS-thread class as scheduler state
+// same OS-thread class as scheduler state
 // retention; remove per-writer tickers. Shared loop is process-lifetime.
 type sharedBufferedFlusher struct {
 	once    sync.Once

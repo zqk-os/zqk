@@ -10,7 +10,6 @@ import (
 // Process-wide cap on concurrent object-YAML reads (open/read). List/CAS fast-paths
 // used to bypass the I/O queue; each blocked G mints an OS thread (M) that Darwin
 // never returns. Sample 2026-09-02: zqk-stable ~2041 parked Ms.
-// TRACK: BLI-CEF-STORAGE-INDEX-CACHE-001
 const (
 	defaultMaxObjectYAMLIO = 32
 	minMaxObjectYAMLIO     = 8

@@ -46,7 +46,7 @@ func getEvaluationSurfaceAdapter(id string) EvaluationSurfaceAdapter {
 }
 
 // Evaluation surface ids for pluggable convergence measure adapters.
-// TRACK: BLI-CVS-EVAL-SURFACE-ADAPTER-001 — registry growth beyond CEF + health.jsonl.
+// registry growth beyond CEF + health.jsonl.
 const (
 	// EvaluationSurfaceCEFDiamondScorecard measures dual-seat CEF diamond axes via matrix CSV.
 	EvaluationSurfaceCEFDiamondScorecard = "cef_diamond_scorecard"

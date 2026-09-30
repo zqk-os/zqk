@@ -10,8 +10,6 @@ import (
 
 // TestMCPSpecIntegration_Startup verifies that arbitrary mcp_spec objects
 // from storage are automatically loaded and applied during server initialization.
-// TRACK: CRIT-MCP-SPEC-NO-WARN-001
-// TRACK: CRIT-MCP-SPEC-STORAGE-FIRST-001
 func TestMCPSpecIntegration_Startup(t *testing.T) {
 	specObject := map[string]any{
 		objects.FieldKeyID:     "MCPSPEC-custom",

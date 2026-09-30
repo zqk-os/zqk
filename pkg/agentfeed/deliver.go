@@ -26,7 +26,7 @@ type PeerWakeResult struct {
 	Transport string `json:"transport,omitempty"`
 	// Live is true only when the membrane can resume a running peer turn
 	// (AGY agentapi notify / MCP ActionRequired with IDE subscribers / explicit paste).
-	// TPM stamp-only is NOT live — TRACK: CRIT-COMMS-003 / BLI-COMMS-TPM-LIVE-WAKE-001.
+	// TPM stamp-only is NOT live
 	Live bool `json:"live"`
 	// IdeBridgeQueued is true when a zqk.wake.attn control event was appended for the IDE bridge.
 	IdeBridgeQueued bool `json:"ide_bridge_queued,omitempty"`
@@ -272,7 +272,7 @@ func WakePeerOpts(ctx context.Context, opts WakePeerOptions) PeerWakeResult {
 // ApplyMCPLiveInterrupt upgrades a wake when the destination seat's membrane is MCP
 // and ActionRequired was published to ≥1 IDE events subscriber.
 // That is transport, not a Cursor Composer turn — the IDE bridge must still
-// inject via zqk.wake.attn (TRACK: BLI-COMMS-CURSOR-COMPOSER-INJECT-001).
+// inject via zqk.wake.attn.
 // Any seat may declare wake=mcp in peer_seats — not limited to IDE/TPM agent ids.
 // When probed is false, the shell-adapter result is left unchanged.
 func ApplyMCPLiveInterrupt(res *PeerWakeResult, membrane, deliveryMode string, ipcOK bool, subscribers int, probed bool) {
@@ -300,7 +300,7 @@ func ApplyMCPLiveInterrupt(res *PeerWakeResult, membrane, deliveryMode string, i
 
 // ApplyCoordinatorMCPInterrupt is a deprecated alias for ApplyMCPLiveInterrupt
 // that maps seatKind coordinator → mcp membrane.
-// TRACK: BLI-COMMS-TPM-LIVE-WAKE-001 — remove callers; use ApplyMCPLiveInterrupt.
+// remove callers; use ApplyMCPLiveInterrupt.
 func ApplyCoordinatorMCPInterrupt(res *PeerWakeResult, seatKind, deliveryMode string, ipcOK bool, subscribers int, probed bool) {
 	membrane := WakeMembraneAgentAPI
 	if seatKind == SeatKindCoordinator {

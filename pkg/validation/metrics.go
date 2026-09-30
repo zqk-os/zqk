@@ -727,7 +727,7 @@ func (vm *ValidationMetrics) String() string {
 // cacheHitRateSummaryLine is omitted when the check recorded no hits.
 // A constant 0.0% line looks like a broken cache even though system check
 // often counts every object as a miss (cold scan or starved warm path).
-// TRACK: BLI-CEF-LOG-SIGNAL-VS-NOISE-001 — print only when IncrementCacheHit ran.
+// print only when IncrementCacheHit ran.
 func cacheHitRateSummaryLine(hits, misses int) string {
 	if hits <= 0 {
 		return ""

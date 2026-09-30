@@ -89,7 +89,6 @@ func (tx *FileObjectTransaction) commitStageWriteBehindBatchWAL(ctx context.Cont
 // of lifecycle-preliminary objects reported success while the YAML stayed on disk and
 // readable by Get. The per-op path does not need this: it calls storage.Delete, which
 // already dual-deletes. Best-effort — a draft that is already gone is not an error.
-// TRACK: BLI-DRAFT-PLANE-ORCHESTRATE-GHOST-001
 func (tx *FileObjectTransaction) purgeDraftPlaneDeletes(f *FileObjectStorage) {
 	if f == nil {
 		return

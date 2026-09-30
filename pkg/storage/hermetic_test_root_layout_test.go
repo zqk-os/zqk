@@ -57,7 +57,6 @@ func seedSourceRoot(t *testing.T) (srcRoot, specPath string) {
 // The arguments to testenvroot.CopyObjectSpecsFromProject are (destination, source);
 // reversing them made an isolated test overwrite the repository's real object specs
 // with its own fixtures, which then read back as the kernel's schema.
-// TRACK: PRI-STABILIZE-FAILCLOSED-READS-001
 func TestEnsureHermeticTestRootLayoutNeverWritesIntoSourceRoot(t *testing.T) {
 	// Exercises the spec copy itself: an empty test root is the only state in which it
 	// runs, so a reversed direction is invisible to any case that pre-seeds specs.

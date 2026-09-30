@@ -19,7 +19,6 @@ import (
 
 // mcpListCacheTTL is how long a list result stays reusable inside the MCP
 // daemon. Zero-TTL (always miss) was the 2026-09-02 thread-bomb amplifier.
-// TRACK: BLI-CEF-STORAGE-INDEX-CACHE-001
 const mcpListCacheTTL = 2 * time.Second
 
 // listCacheEntry holds a cached list result (copy of QueryResult)
@@ -189,7 +188,6 @@ func GetListCache(projectRoot string, filter *ListFilter, effectiveLimit int) (*
 	}
 	// MCP used to bypass this cache entirely, so AgentX/hook object-list storms
 	// re-Walked CAS on every call. Keep a short TTL so daemon lists stay fresh.
-	// TRACK: BLI-CEF-STORAGE-INDEX-CACHE-001
 	if IsMCPMode() && time.Since(entry.AddedAt) > mcpListCacheTTL {
 		globalListCache.missesTotal.Add(1)
 		return nil, false

@@ -1,7 +1,7 @@
 // Package systemcheckwake evaluates system-check summaries and optionally wakes a mesh seat.
 //
 // Opt-in only via `zqk system check --notify [agent-id]` — never auto-fires on every check.
-// TRACK: BLI-COMMS-TPM-LIVE-WAKE-001 — ActionRequired/toast still do not auto-start a Cursor turn.
+// ActionRequired/toast still do not auto-start a Cursor turn.
 package systemcheckwake
 
 import (

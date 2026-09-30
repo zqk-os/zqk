@@ -78,10 +78,11 @@ fi
 # cmd/zqk-shim previously shipped BLI-CEF-* / REQ-CEF-* TRACK lines while this gate
 # only scanned TDE-nanos-hex under scripts/.
 if git -C "$ROOT" grep -n -E 'TRACK:.*(BLI|REQ|CRIT|PRI|TDE|ATK|CAP|CVS)-' -- \
-	'cmd' 'scripts' \
+	'cmd' 'scripts' 'pkg' \
 	':!scripts/open-core/check-public-release-payload.sh' \
-	':!scripts/open-core/test-public-release-gates.sh'; then
-	fail "studio TRACK comment with kernel object id remains in cmd or scripts"
+	':!scripts/open-core/test-public-release-gates.sh' \
+	':!pkg/**/testdata/*'; then
+	fail "studio TRACK comment with kernel object id remains in cmd, scripts, or pkg"
 fi
 
 # CEF run artifacts are project-specific and must not be tracked in git

@@ -191,7 +191,6 @@ func ClampActualEffortToWallClock(obj map[string]any) (clamped bool, previous, n
 // span. Callers must treat the result as a warning (or ignore it after clamp):
 // process admins cannot "fix" this field — the membrane autofills/clamps, and
 // only lifecycle override / break-glass may persist an overstated actual.
-// TRACK: / BLI-KERNEL-WORK-ENVELOPE-001
 func ValidateActualEffortWithinWallClock(obj map[string]any) []ValidationWarning {
 	if obj == nil {
 		return nil

@@ -100,7 +100,7 @@ func (f *FileObjectStorage) Exists(ctx context.Context, secCtx *pkgctx.SecurityC
 		}
 		cas, err := f.getContentAddressableStorage(kind)
 		if err == nil {
-			// Erase tombstone linger (TRACK: BLI-CAS-SW-LINGER-001): Exists stays true
+			// Erase tombstone linger: Exists stays true
 			// during erase shockwave until FINALIZE blob GC.
 			if cas.IsErasePending(id) {
 				return true, nil

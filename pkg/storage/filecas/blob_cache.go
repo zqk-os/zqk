@@ -10,7 +10,6 @@ import (
 
 // Immutable CAS blob cache keyed by content hash. Hash-named YAML never changes
 // for a given hash, so list/MCP can skip re-read/re-parse.
-// TRACK: BLI-CEF-STORAGE-INDEX-CACHE-001
 const maxCASBlobCacheEntries = 4096
 
 // BlobCache is a bounded, thread-safe byte KV with O(1) LRU eviction.

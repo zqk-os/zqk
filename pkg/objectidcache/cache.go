@@ -53,7 +53,7 @@ type ObjectIDCacheMetadata struct {
 
 // kindBucketEntry is one object in a kind bucket (v2 format). Kind implied by container; no "exists" (only missing listed separately).
 // Path is relative to the kind directory: filename (e.g. hash.yaml) or subpath for bucketed kinds (e.g. 2026-01/CHA-001.yaml).
-// Draft-plane live paths are stored absolute (outside the kind dir). TRACK: TDE-CEF-CAS-IDENTITY-TXN-001
+// Draft-plane live paths are stored absolute (outside the kind dir).
 type KindBucketEntry struct {
 	ID    string    `json:"id"`
 	Path  string    `json:"path"` // relative to kind dir, or absolute draft-plane path
@@ -107,7 +107,6 @@ func relWalksOutOfDir(rel string) bool {
 // kindBucketPathToStore keeps CAS/legacy paths relative to the kind dir.
 // Draft-plane YAML lives under .zqk/object_drafts; storing Base() would resolve
 // to a fake file in the kind dir and ValidateAndCleanStale would drop the id.
-// TRACK: TDE-CEF-CAS-IDENTITY-TXN-001
 func kindBucketPathToStore(processDir, kind, filePath string) string {
 	if filePath == emptyValue {
 		return emptyValue
@@ -638,7 +637,7 @@ func (c *ObjectIDCache) Get(id string) (*ObjectIDCacheEntry, bool) {
 }
 
 // Set stores a cache entry. CAS/legacy paths are relative to the kind dir;
-// draft-plane paths stay absolute. TRACK: TDE-CEF-CAS-IDENTITY-TXN-001
+// draft-plane paths stay absolute.
 func (c *ObjectIDCache) Set(id string, entry *ObjectIDCacheEntry) {
 	if entry == nil || entry.Kind == emptyValue {
 		return

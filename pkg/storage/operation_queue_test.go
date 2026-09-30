@@ -93,7 +93,6 @@ func TestOperationQueue_BoundedWakeCallbacks_HighLoad(t *testing.T) {
 	}
 }
 
-// TRACK: BLI-CEF-R16-OPQUEUE-001 / CRIT-CEF-R2-CON-OPQUEUE-A / REQ-CEF-R2-CON-OPQUEUE
 // TestOperationQueue_BLI_CEF_R16_OPQUEUE_001 explicitly validates that OperationQueue wake callbacks
 // remain bounded and context-aware under load without leaking goroutines or ignoring cancellation.
 func TestOperationQueue_BLI_CEF_R16_OPQUEUE_001(t *testing.T) {

@@ -14,7 +14,6 @@ import (
 // Each operation uses getListReadWorkers() syscalls (open/read). 16 slots × 64 workers
 // was 1024 concurrent opens — Darwin Ms parked after those bursts (2026-08-20 dump;
 // 2026-09-02 zqk-stable sample ~2041 parked Ms). Defaults are 4 slots × ≤8 workers.
-// TRACK: BLI-CAS-HAND-DUP-CHECK-001
 // Override via ZQK_LIST_COUNT_MAX_CONCURRENT / ZQK_LIST_READ_WORKERS.
 const defaultListCountMaxConcurrent = 4
 

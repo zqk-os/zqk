@@ -162,7 +162,6 @@ func (h *ProgressHelper) EmitProgress(
 
 // EmitProgressSummary emits a sparse progress-summary checkpoint (e.g. 25%, 50%).
 // Do not call this "milestone" — that is objects.KindMilestone (MIL-*).
-// TRACK: BLI-CEF-LOG-SIGNAL-VS-NOISE-001
 func (h *ProgressHelper) EmitProgressSummary(
 	ctx context.Context,
 	threshold string, // e.g., "25%", "50%", "75%", "complete"

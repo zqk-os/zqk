@@ -575,7 +575,7 @@ func TestUpdateID(t *testing.T) {
 	objJSON, _ := json.MarshalIndent(obj, "", "  ")
 	t.Logf("DEBUG: TestUpdateID object before create: %s", string(objJSON))
 
-	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+	//
 	CreateCASVisible(t, storage, ctx, secCtx, obj, objects.ObjectStatusPlanned)
 
 	// Verify object exists with old ID
@@ -719,7 +719,7 @@ func TestCacheInvalidationOnUpdate(t *testing.T) {
 		obj = instance
 	}
 
-	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+	//
 	CreateCASVisible(t, storage, ctx, secCtx, obj, objects.ObjectStatusValidated)
 
 	// List objects - this should populate any caches

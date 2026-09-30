@@ -30,7 +30,6 @@ import (
 // the check-ins accumulate the per-step provenance that would let estimate accuracy be
 // judged honestly later.
 //
-// TRACK: PRI-STABILIZE-FAILCLOSED-READS-001
 const (
 	// TimerTypeCheckin marks a cadence timer. The scheduler's hourglass watcher treats
 	// unrecognized types as stuck sync-loop processes and SIGKILLs the recorded pid, so

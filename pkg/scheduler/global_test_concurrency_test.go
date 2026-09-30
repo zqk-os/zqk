@@ -15,7 +15,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 )
 
-// TRACK: BLI-SCHED-GOROUTINE-DISCIPLINE-001 / CRIT-SCHED-NO-UNMANAGED-GOROUTINES-001
 // TestGlobalTestJobLimit_derivesFromHostAndStaysInBounds pins the sizing rule. The limit must leave
 // the machine usable (never all logical CPUs) while still making progress on small hosts.
 func TestGlobalTestJobLimit_derivesFromHostAndStaysInBounds(t *testing.T) {

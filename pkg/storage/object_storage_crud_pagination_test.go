@@ -70,7 +70,7 @@ func TestAllKindsCRUD(t *testing.T) {
 func testKindCRUD(t *testing.T, storage *FileObjectStorage, ctx context.Context, secCtx *pkgctx.SecurityContext, kind string, fieldRegistry *objects.FieldRegistry) {
 	// Field registry can list specs that lack kind→directory mappings; Create then fails
 	// with "unknown object kind". Skip those until kind_mappings_config is complete.
-	// TRACK: BLI-1785443942668406000-1ec5c811 — align field-registry kinds with directory map.
+	//
 	if objects.GetDirectoryFromKind(kind) == "" {
 		t.Skipf("skipping %s: no directory mapping (GetDirectoryFromKind empty)", kind)
 		return
@@ -100,7 +100,7 @@ func testKindCRUD(t *testing.T, storage *FileObjectStorage, ctx context.Context,
 			objects.FieldKeyStatus:        objects.ObjectStatusActive,
 			objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		}
-		// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+		//
 		EnsureCASVisibleRef(t, storage, cliCtx, secCtx, accountObj, "active")
 	case "agent_onboarding_preparation":
 		// Create referenced account and workstream for agent_onboarding_preparation
@@ -113,7 +113,7 @@ func testKindCRUD(t *testing.T, storage *FileObjectStorage, ctx context.Context,
 			objects.FieldKeyStatus:        objects.ObjectStatusActive,
 			objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		}
-		// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+		//
 		EnsureCASVisibleRef(t, storage, cliCtx, secCtx, accountObj, "active")
 		// Create referenced workstream
 		wsID := "WS-999"
@@ -211,7 +211,7 @@ func testKindCRUD(t *testing.T, storage *FileObjectStorage, ctx context.Context,
 			objects.FieldKeyStatus:        objects.ObjectStatusActive,
 			objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		}
-		// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+		//
 		EnsureCASVisibleRef(t, storage, cliCtx, secCtx, accountObj, "active")
 		// Create first workstream
 		ws1ID := "WS-999"
@@ -252,7 +252,7 @@ func testKindCRUD(t *testing.T, storage *FileObjectStorage, ctx context.Context,
 			objects.FieldKeyStatus:        objects.ObjectStatusActive,
 			objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		}
-		// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+		//
 		EnsureCASVisibleRef(t, storage, cliCtx, secCtx, policyObj, "active")
 	case "certificate":
 		// holder_ref defaults reference ACC-SYSTEM; create it before certificate Create (parallel subtests race otherwise)
@@ -265,7 +265,7 @@ func testKindCRUD(t *testing.T, storage *FileObjectStorage, ctx context.Context,
 			objects.FieldKeyStatus:        objects.ObjectStatusActive,
 			objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		}
-		// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+		//
 		EnsureCASVisibleRef(t, storage, cliCtx, secCtx, accountObj, "active")
 	case objects.KindGlossaryTermRelation:
 		// Ref fields require GLS- / VOC- ids; Create validates targets exist. Use the same ids as
@@ -345,7 +345,7 @@ func testKindCRUD(t *testing.T, storage *FileObjectStorage, ctx context.Context,
 			}
 		}
 
-		// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+		//
 		leave := DistinctLeaveStatusForTest(kind, objects.GetString(obj, objects.FieldKeyStatus))
 		CreateCASVisible(t, storage, ctx, secCtx, obj, leave)
 
@@ -602,7 +602,7 @@ func TestAllKindsPagination(t *testing.T) {
 
 // testKindPagination tests pagination for a specific kind
 func testKindPagination(t *testing.T, tmpDir string, storage *FileObjectStorage, ctx context.Context, secCtx *pkgctx.SecurityContext, kind string, fieldRegistry *objects.FieldRegistry) {
-	// TRACK: BLI-1785443942668406000-1ec5c811 — align field-registry kinds with directory map.
+	//
 	if objects.GetDirectoryFromKind(kind) == "" {
 		t.Skipf("skipping %s: no directory mapping (GetDirectoryFromKind empty)", kind)
 		return
@@ -618,7 +618,7 @@ func testKindPagination(t *testing.T, tmpDir string, storage *FileObjectStorage,
 	numObjects := 15
 	testObjects := []map[string]any{}
 
-	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+	//
 	for i := 0; i < numObjects; i++ {
 		testID := generateComprehensiveTestID(kind, i+1)
 		obj := createTestObjectForCRUD(kind, testID, kindFields, i)

@@ -3,7 +3,7 @@
 // data_cell_envelope_tick metrics and steward metrics.
 //
 // This is the durable evidence path — not in-process fan-out (use pkg/coordination for that).
-// See docs/architecture/CEF_EVENT_PATH_AND_GLOBALS.md (TRACK: BLI-CEF-ARCH-EVENTS-GLOBALS).
+// See docs/architecture/CEF_EVENT_PATH_AND_GLOBALS.md.
 package contextevents
 
 import (

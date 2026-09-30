@@ -9,7 +9,6 @@ import (
 // hierarchyParentRefKeys are the child→parent membership/composition fields the
 // status gateway and lifecycle occupancy fan-out walk. Singular "milestone_ref"
 // remains for ATK fixtures; production BLIs store FieldKeyMilestoneRefs.
-// TRACK: occupancy was PRI-only until hierarchy bubble.
 var hierarchyParentRefKeys = []string{
 	"parent_ref",
 	objects.FieldKeyPriorityPlanRef,

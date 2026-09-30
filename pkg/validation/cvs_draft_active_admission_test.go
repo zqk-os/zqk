@@ -9,7 +9,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 )
 
-// TRACK: BLI-1786686769839541000-f5a3260f — draft→active fail-closed on the real lifecycle YAML.
 func TestGoValidator_CVSDraftToActiveAdmission(t *testing.T) {
 	t.Parallel()
 	lifecyclesDir := filepath.Join("..", "..", paths.ProcessInternalLifecyclesDir)

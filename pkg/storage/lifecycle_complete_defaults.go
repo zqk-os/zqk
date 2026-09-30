@@ -9,7 +9,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
-// TRACK: BLI-KERNEL-WORK-ENVELOPE-001 — work-envelope defaults key off
+// work-envelope defaults key off
 // KindHasTrait + lifecycle work_done / execution_locked. Lift effort off
 // base_object remains CRIT-KERNEL-WORK-ENVELOPE-BASE-LIFT-001.
 

@@ -224,7 +224,6 @@ func (cas *ContentAddressableStorage) SetPostSyncCallback(callback PostSyncCallb
 
 // SetRequiredPostSyncCallback is the FileObjectStorage path: a missing or
 // failing callback aborts Create/Update so ACK cannot outrun object-id-cache.
-// TRACK: TDE-CEF-CAS-IDENTITY-TXN-001
 func (cas *ContentAddressableStorage) SetRequiredPostSyncCallback(callback PostSyncCallback) {
 	cas.setPostSyncCallback(callback, true)
 }
@@ -241,7 +240,6 @@ func (cas *ContentAddressableStorage) setPostSyncCallback(callback PostSyncCallb
 // FileObjectStorage sets identityCacheRequired: nil callback or handler error
 // fails the mutation. Raw CAS tests without a callback still ACK.
 // Always notes the pending journal before the handler (never for draft paths).
-// TRACK: TDE-CEF-CAS-IDENTITY-TXN-001
 func (cas *ContentAddressableStorage) invokeCASPostSync(objectID, hash, filePath string) error {
 	if objectID == emptyValue || hash == emptyValue || filePath == emptyValue {
 		return errfmt.Errorf("CAS identity post-sync requires object id, hash, and path")

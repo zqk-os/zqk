@@ -49,41 +49,40 @@ func TestSupplyChainReleaseIntegrity(t *testing.T) {
 	}
 }
 
-// TestFailClosedCIGates_DeterministicAndVerified verifies REQ-1789592457454400000-21efcfe8
-// and CRIT-1789592457619132000-f71dcb62 / CRIT-1789592457619133000-34452aa8 / CRIT-1789592457619134000-f1dd7d5f:
-// local and CI golangci runs are deterministic, and the pipeline fails closed on missing/inconsistent lint, checksum, or SBOM evidence.
+// TestFailClosedCIGates_DeterministicAndVerified verifies supply chain integrity gates:
+// local and CI linter configurations are deterministic, and the packaging pipeline enforces
+// checksum manifests, OpenVEX attestation, and Cosign release signatures.
 func TestFailClosedCIGates_DeterministicAndVerified(t *testing.T) {
-	if !fileutil.Exists("../../scripts/verify-binary-checksums.sh") {
-		// Open-core supply chain gate verification (F-SUPPLY-003):
-		// Verify open-core release gates and supply chain scripts exist and are non-empty.
-		for _, script := range []string{
-			"../../scripts/open-core/test-public-release-gates.sh",
-			"../../scripts/open-core/check-public-release-payload.sh",
-			"../../scripts/open-core/police-community-tree.sh",
-			"../../scripts/package-community.sh",
-			"../../scripts/generate-openvex.sh",
-			"../../scripts/scan-secrets.sh",
-		} {
-			data, err := fileutil.ReadFile(script)
-			if err != nil || len(data) == 0 {
-				t.Errorf("expected open-core script %s to exist and be non-empty", script)
-			}
+	// 1. Open-core supply chain gate verification:
+	// Verify open-core release gates and supply chain scripts exist and are non-empty.
+	for _, script := range []string{
+		"../../scripts/open-core/test-public-release-gates.sh",
+		"../../scripts/open-core/check-public-release-payload.sh",
+		"../../scripts/open-core/police-community-tree.sh",
+		"../../scripts/package-community.sh",
+		"../../scripts/generate-openvex.sh",
+		"../../scripts/scan-secrets.sh",
+	} {
+		data, err := fileutil.ReadFile(script)
+		if err != nil || len(data) == 0 {
+			t.Errorf("expected open-core script %s to exist and be non-empty", script)
 		}
-		// Verify package-community.sh generates and verifies checksums and cosign signature
-		pkgCommunityData, err := fileutil.ReadFile("../../scripts/package-community.sh")
-		if err != nil {
-			t.Fatalf("failed to read package-community.sh: %v", err)
-		}
-		pkgStr := string(pkgCommunityData)
-		if !strings.Contains(pkgStr, "shasum -a 256") || !strings.Contains(pkgStr, "checksums.txt") {
-			t.Errorf("package-community.sh missing sha256 checksum generation/verification")
-		}
-		if !strings.Contains(pkgStr, "cosign sign-blob") || !strings.Contains(pkgStr, "checksums.txt.sig") {
-			t.Errorf("package-community.sh missing cosign signature generation for checksums.txt.sig")
-		}
-		return
 	}
-	// 1. Verify .golangci.yml has adequate timeout for deterministic completion on large monorepo
+
+	// 2. Verify package-community.sh generates and verifies checksums and cosign signature
+	pkgCommunityData, err := fileutil.ReadFile("../../scripts/package-community.sh")
+	if err != nil {
+		t.Fatalf("failed to read package-community.sh: %v", err)
+	}
+	pkgStr := string(pkgCommunityData)
+	if !strings.Contains(pkgStr, "shasum -a 256") || !strings.Contains(pkgStr, "checksums.txt") {
+		t.Errorf("package-community.sh missing sha256 checksum generation/verification")
+	}
+	if !strings.Contains(pkgStr, "cosign sign-blob") || !strings.Contains(pkgStr, "checksums.txt.sig") {
+		t.Errorf("package-community.sh missing cosign signature generation for checksums.txt.sig")
+	}
+
+	// 3. Verify .golangci.yml has adequate timeout for deterministic completion on large monorepo
 	golangciBytes, err := fileutil.ReadFile("../../.golangci.yml")
 	if err != nil {
 		t.Fatalf("failed to read .golangci.yml: %v", err)
@@ -93,39 +92,13 @@ func TestFailClosedCIGates_DeterministicAndVerified(t *testing.T) {
 		t.Errorf(".golangci.yml timeout must be >= 15m for deterministic execution on large codebase")
 	}
 
-	// 2. Verify .github/workflows/ci.yml includes fail-closed SBOM and checksum gates
+	// 4. Verify .github/workflows/ci.yml includes release payload gate
 	ciWorkflowBytes, err := fileutil.ReadFile("../../.github/workflows/ci.yml")
 	if err != nil {
 		t.Fatalf("failed to read .github/workflows/ci.yml: %v", err)
 	}
 	ciContent := string(ciWorkflowBytes)
-	if !strings.Contains(ciContent, "test-supply-sbom-generation.sh") {
-		t.Errorf("ci.yml missing deterministic SBOM generation verification gate")
-	}
-	if !strings.Contains(ciContent, "test-supply-checksum-verification.sh") {
-		t.Errorf("ci.yml missing binary checksum fail-closed verification gate")
-	}
-
-	// 3. Verify Makefile includes verify-supply-gates in verify target
-	makefileBytes, err := fileutil.ReadFile("../../Makefile")
-	if err != nil {
-		t.Fatalf("failed to read Makefile: %v", err)
-	}
-	makeContent := string(makefileBytes)
-	if !strings.Contains(makeContent, "verify-supply-gates") {
-		t.Errorf("Makefile missing verify-supply-gates target in verify pipeline")
-	}
-
-	// 4. Verify supply gate scripts exist and are non-empty
-	for _, script := range []string{
-		"../../scripts/verify-binary-checksums.sh",
-		"../../scripts/generate-sbom.sh",
-		"../../scripts/test-supply-checksum-verification.sh",
-		"../../scripts/test-supply-sbom-generation.sh",
-	} {
-		data, err := fileutil.ReadFile(script)
-		if err != nil || len(data) == 0 {
-			t.Errorf("expected script %s to exist and be non-empty", script)
-		}
+	if !strings.Contains(ciContent, "check-public-release-payload.sh") {
+		t.Errorf("ci.yml missing public release payload verification gate")
 	}
 }

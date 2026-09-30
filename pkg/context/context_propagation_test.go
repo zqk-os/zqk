@@ -573,7 +573,6 @@ func TestContextPropagation_AllPermutations(t *testing.T) {
 	t.Logf("Tested %d context propagation permutations", permutationCount)
 }
 
-// TRACK: BLI-CEF-R15-HARDCODED-ACC-001 / REQ-CEF-R2-SEC-HARDCODED-ACC
 func TestSecurityContext_NoHardcodedFallback(t *testing.T) {
 	ctx := NewSecurityContext("ACC-CUSTOM-USER-001", []string{"developer"}, []string{"read:*"})
 	if ctx.AccountID != "ACC-CUSTOM-USER-001" {

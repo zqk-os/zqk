@@ -117,7 +117,6 @@ func (cas *ContentAddressableStorage) WriteFileWithSync(filePath string, data []
 	}
 	// Per-OS durability: Darwin queues file fsync to avoid blocking publication;
 	// other platforms fsync synchronously.
-	// TRACK: BLI-CEF-R2-REL-CAS-FSYNC
 	if err := CasPublishSyncFile(tmp); err != nil {
 		return err
 	}

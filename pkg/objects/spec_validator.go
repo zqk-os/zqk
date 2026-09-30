@@ -71,7 +71,6 @@ func (sv *SpecValidator) ValidateSpec(ctx context.Context, spec *Spec) []Validat
 	}
 	// Authored list only: ResolvedTraits merges parent groups (base_object_traits +
 	// inherited base_auditable_traits) even though Includes already compose them.
-	// TRACK: TDE-CEF-TRAIT-INCLUDE-REDUNDANT-001
 	if len(spec.Traits) > 0 {
 		for _, traitErr := range sv.traitRegistry.ValidateRedundantIncludes(spec.Traits) {
 			errors = append(errors, ValidationError{

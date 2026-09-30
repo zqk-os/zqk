@@ -1,6 +1,5 @@
 // Package fitness separates lifecycle process position from contextual fitness findings.
 //
-// TRACK: REQ-KERNEL-LIFECYCLE-FITNESS-001 / GLS-LIFECYCLE-FITNESS-PLANES-001 —
 // demote→error only for IssueClassProcessFailure; surfaces filter the rest.
 package fitness
 

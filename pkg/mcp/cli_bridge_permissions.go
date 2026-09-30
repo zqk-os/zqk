@@ -13,7 +13,6 @@ import (
 //
 // Unannotated commands (no roles and no permissions) are denied unless the
 // caller has an explicit allow: admin role or wildcard permission.
-// TRACK: BLI-CEF-R2-REL-MCP-PERMS-FAILOPEN
 func hasPermission(cmd *DiscoveredCommand, secCtx *pkgctx.SecurityContext) bool {
 	if secCtx == nil {
 		return false

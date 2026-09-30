@@ -11,7 +11,6 @@ import (
 )
 
 // TestPkgDNAMustNotImportCodegen verifies that pkg/dna does not import quarantined internal/codegen.
-// TRACK: BLI-CELLULAR-CODEGEN-BOUNDARIES-042 / CRIT-CELLULAR-PUBLIC-CONTRACTS-013
 func TestPkgDNAMustNotImportCodegen(t *testing.T) {
 	t.Parallel()
 	banned := []string{

@@ -95,7 +95,6 @@ func TestAuditorGate_FullLoop(t *testing.T) {
 	}
 }
 
-// TRACK: BLI-CEF-QA-SUCCESS-SPEC-001 / CRIT-CEF-QA-SUCCESS-SPEC-001
 func TestQASuccessSpec_BLI_CEF_QA_SUCCESS_SPEC_001(t *testing.T) {
 	t.Parallel()
 	itemID := "BLI-TEST-QA-001"

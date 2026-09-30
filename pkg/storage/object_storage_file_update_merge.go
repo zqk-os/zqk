@@ -163,7 +163,6 @@ func (f *FileObjectStorage) mergeFileObjectUpdate(p *fileObjectUpdatePrep) error
 		newState, _ = updates[objects.FieldKeyStatus].(string)
 	}
 	// Work-envelope autofill: started_at on execution-locked; completed_at/actual on work_done.
-	// TRACK: BLI-KERNEL-WORK-ENVELOPE-001 /
 	_ = applyCompleteTransitionDefaults(kind, existing, oldState, newState)
 
 	// Validate workflow constraints for workstream operations

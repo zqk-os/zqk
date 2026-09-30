@@ -192,7 +192,7 @@ func TestLifecycleContract_RoleInvariants(t *testing.T) {
 }
 
 func TestLifecycleContract_PolicyAndRoleActiveAreEnforced(t *testing.T) {
-	// TRACK: BLI-CEF-R26-POLICY-PRI-EXAM-001 — membrane live is not Gantt shovel_ready.
+	// membrane live is not Gantt shovel_ready.
 	want := map[string]struct{}{KindPolicy: {}, KindRole: {}}
 	found := map[string]string{}
 	for _, doc := range loadAllLifecycleDocs(t) {
@@ -223,7 +223,7 @@ func TestLifecycleContract_PriorityPlanInProgressEquivActiveOrderZero(t *testing
 }
 
 func TestLifecycleContract_PriorityPlanExecutionCheckValve(t *testing.T) {
-	// TRACK: BLI-1785439369431933000-f0cccd6c — in_progress is a check valve.
+	//
 	forbidden := map[string]struct{}{
 		ObjectStatusGrooming: {}, ObjectStatusActive: {},
 		"planning": {}, "prioritizing": {},
@@ -259,7 +259,7 @@ func TestLifecycleContract_PriorityPlanExecutionCheckValve(t *testing.T) {
 }
 
 func TestLifecycleContract_PriorityPlanHaltDoesNotResumeToShovelReady(t *testing.T) {
-	// TRACK: BLI-1785439369431933000-f0cccd6c — halt is not a launder back to active.
+	//
 	var doc lifecycleYAMLDoc
 	for _, d := range loadAllLifecycleDocs(t) {
 		if d.ObjectType == KindPriorityPlan {
@@ -297,7 +297,6 @@ func TestLifecycleContract_PriorityPlanHaltDoesNotResumeToShovelReady(t *testing
 }
 
 func TestLifecycleContract_GanttPartnersHavePostconditions(t *testing.T) {
-	// TRACK: BLI-CEF-R26-GANTT-PARTNERS-001 / CRIT-CEF-R26-GANTT-PARTNERS-001
 	partners := map[string]struct{}{
 		KindBacklogItem: {},
 		KindAgentTask:   {},
@@ -337,7 +336,6 @@ func TestLifecycleContract_GanttPartnersHavePostconditions(t *testing.T) {
 
 func TestLifecycleContract_WorkstreamHaltResumesToShovelReady(t *testing.T) {
 	// Lane pause is not a PRI check valve: paused → active (shovel_ready) is the resume.
-	// TRACK: BLI-CEF-R26-GANTT-PARTNERS-001
 	var doc lifecycleYAMLDoc
 	for _, d := range loadAllLifecycleDocs(t) {
 		if d.ObjectType == KindWorkstream {
@@ -361,7 +359,6 @@ func TestLifecycleContract_WorkstreamHaltResumesToShovelReady(t *testing.T) {
 
 func TestLifecycleContract_GoalBlockedResumesToActive(t *testing.T) {
 	// Live program target: blocked → active. Do not copy PRI halted↛shovel_ready.
-	// TRACK: BLI-CEF-R26-GANTT-PARTNERS-001
 	var doc lifecycleYAMLDoc
 	for _, d := range loadAllLifecycleDocs(t) {
 		if d.ObjectType == KindGoal {

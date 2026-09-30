@@ -9,7 +9,6 @@ import (
 )
 
 // TestGitStashGuardOverDocsProcess verifies that git stash operations targeting .zqk/process are forbidden.
-// TRACK: BLI-CEF-R20-STASH-CAS-GUARD-001, CRIT-CEF-R20-STASH-CAS-GUARD-001.
 func TestGitStashGuardOverDocsProcess(t *testing.T) {
 	t.Parallel()
 

@@ -209,7 +209,7 @@ func TestCapOrchestratorHandler_executeDispatchStage(t *testing.T) {
 	mockExe := filepath.Join(tempDir, "mock-zqk.sh")
 
 	// Plan must carry persona_refs (lifecycle / CAP dispatch identity) — no all-persona fallback.
-	// TRACK: BLI-1785915238591238000-619a2f9e
+	//
 	script := `#!/bin/bash
 echo "$@" >> ` + tempDir + `/calls.log
 
@@ -569,7 +569,6 @@ func TestCapOrchestratorHandler_hasOpenTaskForPlan(t *testing.T) {
 
 // CAP mints agent_task at the preliminary `proposed` origin, so its own tasks live on
 // the draft plane, which List omits. A CAS-only dedupe re-minted every task each tick.
-// TRACK: BLI-DRAFT-PLANE-ORCHESTRATE-GHOST-001
 func TestCapOrchestratorHandler_hasOpenTaskForPlan_DraftPlane(t *testing.T) {
 	t.Parallel()
 	tempDir := t.TempDir()

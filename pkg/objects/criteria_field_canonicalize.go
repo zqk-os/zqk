@@ -29,7 +29,6 @@ func CanonicalizeCriteriaFieldKeys(obj map[string]any) {
 // RejectCriteriaRequirementRelatedRefs fails if related_object_refs contains a
 // requirement id. Composition is parent-owned via requirement.criteria_refs.
 // Production enforcement is overlay crit_no_req_related_refs (kernelcas compose).
-// TRACK: BLI-KERNEL-REF-GRAPH-ACYCLIC-001.
 func RejectCriteriaRequirementRelatedRefs(obj map[string]any) error {
 	if obj == nil {
 		return nil

@@ -161,7 +161,7 @@ func (c *ValidationStateCache) Load() error {
 			currentChecksum := computeValidationCodeChecksum(c.projectRoot)
 			// Empty checksum is unknown generation: drop it. Matching
 			// NoSourceCodeAvailableChecksum is kept only when we still cannot
-			// fingerprint (no executable, no source). TRACK: PRI-CEF-R26-LIFECYCLE-EXAM-001
+			// fingerprint (no executable, no source).
 			if currentChecksum != NoSourceCodeAvailableChecksum && legacy.CodeChecksum != currentChecksum {
 				// Do not leave a poison on-disk file: empty Save() later can hit the
 				// empty-overwrite guard and preserve stale Tier-1 hits across processes.

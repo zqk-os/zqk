@@ -131,7 +131,6 @@ type precondDecideRule struct {
 // fail-closed path for other English. See docs/architecture/LIFECYCLE_SHOCKWAVE_MAP.md Plane A.
 // TRACK: storage-save compose ops are a
 // second plane; do not silently unify YAML prose dispatch with kernelcas/compose.
-// TRACK: PRI-CEF-PIP-KERNEL-DRIVE-001 / BLI-CEF-PIP-TEAR-SNOWFLAKE-001 —
 // from a PIP-* loader (or compose DECIDE) instead.
 var precondDecideRules = []precondDecideRule{
 	{name: "ref_status_matrix", eval: evalRefStatusStage},

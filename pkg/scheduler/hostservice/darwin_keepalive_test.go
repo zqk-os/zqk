@@ -32,7 +32,6 @@ func TestSchedulerEnvironmentPlistXMLMarksLongLivedDaemon(t *testing.T) {
 
 // TestDarwinStopDisarmsKeepAlive documents why Stop must bootout (not launchctl stop):
 // SuccessfulExit=false KeepAlive respawns after SIGTERM non-zero exits.
-// TRACK: BLI-SCHED-HOST-SERVICE-STOP-STICK-001
 func TestDarwinStopDisarmsKeepAlive(t *testing.T) {
 	t.Parallel()
 	src, err := fileutil.ReadFile("darwin.go")

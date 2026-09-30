@@ -232,7 +232,7 @@ func (cas *ContentAddressableStorage) ensureExactlyOneLiveBlob(objectID, keeperH
 
 // sweepAfterDurableBlob enforces one live hash YAML per id after the new blob is on disk.
 // Index-queue timeout used to return here without sweeping, which is how untracked
-// restamps (updated_at-only) left dual CAS blobs. TRACK: BLI-CEF-R19-CAS-INTERMEDIATE-LEAK-001
+// restamps (updated_at-only) left dual CAS blobs.
 func (cas *ContentAddressableStorage) sweepAfterDurableBlob(objectID, keeperHash string) {
 	if err := cas.ensureExactlyOneLiveBlob(objectID, keeperHash); err != nil {
 		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgSwallowedError, err).Log()

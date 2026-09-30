@@ -61,7 +61,6 @@ func ReadFileObject(f FileStorageReadFacade, ctx context.Context, secCtx *pkgctx
 	}
 
 	// Identity index first: one live path (draft YAML or CAS hash).
-	// TRACK: TDE-CEF-CAS-IDENTITY-TXN-001
 	if live := f.CachedLivePath(id); live != emptyValue {
 		if obj, err := readCachedLivePath(f, ctx, secCtx, id, kind, live); err == nil && obj != nil {
 			return obj, nil

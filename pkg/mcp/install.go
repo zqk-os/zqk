@@ -21,7 +21,7 @@ type mcpConfig struct {
 
 type mcpServerConfig struct {
 	// Type is required by Cursor 2026 Customize / Tools & MCP (stdio | sse | http).
-	// TRACK: BLI-MCP-CURSOR-ADAPTER-SYMLINK-001 — missing type → probe without spawn.
+	// missing type → probe without spawn.
 	Type     string            `json:"type,omitempty"`
 	Command  string            `json:"command"`
 	Args     []string          `json:"args"`
@@ -234,7 +234,6 @@ func InstallToIDE(ideName, configPath, execPath, projectRoot string, logger logg
 					Log()
 			}
 			// Interpolated paths: Cursor Customize + clones must not bake machine abs paths.
-			// TRACK: BLI-MCP-CURSOR-ADAPTER-SYMLINK-001
 			command = "${workspaceFolder}/bin/" + MCPRoleProcessName(MCPRoleIDEAdapter)
 			cwd = "${workspaceFolder}"
 			env = map[string]string{

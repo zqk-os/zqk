@@ -20,7 +20,7 @@ func NewSatisfiableBuilder() *SatisfiableBuilder {
 
 	// Configure the trait
 	builder.
-		SetDescription("Object-level predicate trait. Kinds with this trait have a done-state of\\n\\\"the proposition holds\\\" (evidence, not duration). Does not compose completable:\\ndo not stamp started_at / completed_at on the satisfaction hop.\\nCategory (acceptance, test, compliance, …) is a field, not a trait.\\nTRACK: BLI-KERNEL-WORK-ENVELOPE-001 / WORK_ENVELOPE_AND_EFFORT_FACETS.md.\\n").
+		SetDescription("Object-level predicate trait. Kinds with this trait have a done-state of\\n\\\"the proposition holds\\\" (evidence, not duration). Does not compose completable:\\ndo not stamp started_at / completed_at on the satisfaction hop.\\nCategory (acceptance, test, compliance, …) is a field, not a trait.\\n").
 		SetCategory("behavior").
 		SetObjectLevel(true).
 		SetFieldLevel(false)

@@ -270,7 +270,6 @@ func (dkm *DynamicKindMapper) EnsureReady(ctx context.Context) error {
 
 // discoverKindForDirectory tries to discover the object kind for a given directory.
 // Only explicit configuration and legacy directory mappings are supported (no spec-filename inference).
-// TRACK: TDE-CEF-KIND-MAP-SPEC-DISCOVERY-001 / BLI-TDE-KIND-MAP-SPEC-DISCOVERY-001
 func (dkm *DynamicKindMapper) discoverKindForDirectory(dirName string) string {
 	// Strategy 0: Check config mappings first (including multi-kind defaults)
 	if dkm.config != nil {

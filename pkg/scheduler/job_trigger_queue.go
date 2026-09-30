@@ -96,7 +96,6 @@ func (q *JobTriggerQueue) SetCASDebounceInterval(d time.Duration) {
 // retry three times at TriggerQueuePollInterval (500ms), so a 2s floor after daemon-start
 // reconcile made `scheduler submit` fail admission (not_in_cache_after_retries) while the
 // YAML was already on disk. Invalid IDs still stop after maxTestBundleTriggerRetries.
-// TRACK: TDE-CEF-SCHEDULER-CALLBACK-HOURGLASS-001
 func (q *JobTriggerQueue) shouldReconcileCASForBatch(hasMissingJob, needsCAS bool) bool {
 	if !needsCAS {
 		return false
@@ -600,14 +599,14 @@ func batchContainsTestBundleJobID(requests []JobTriggerRequest) bool {
 }
 
 // jobIDLooksLikeCrossProcessTimestampTestRunner matches scripts/test-runner.sh ids (SCH-<unix seconds>).
-// Exactly 10 digits: unix seconds through year 2286. TRACK: TDE-CEF-SCHEDULER-CALLBACK-HOURGLASS-001 —
+// Exactly 10 digits: unix seconds through year 2286.
 // remove when trigger classification uses category / trigger_origin only (no SCH-<digits> shape).
 func jobIDLooksLikeCrossProcessTimestampTestRunner(jobID string) bool {
 	return jobIDAllDigitSuffixLen(jobID, 10, 10)
 }
 
 // jobIDLooksLikeCLISubmitNanos matches `zqk scheduler submit` ids (SCH-<unix nano>, 16–19 digits).
-// Must not overlap the 10-digit test-runner shape. TRACK: TDE-CEF-SCHEDULER-CALLBACK-HOURGLASS-001
+// Must not overlap the 10-digit test-runner shape.
 func jobIDLooksLikeCLISubmitNanos(jobID string) bool {
 	return jobIDAllDigitSuffixLen(jobID, 16, 19)
 }

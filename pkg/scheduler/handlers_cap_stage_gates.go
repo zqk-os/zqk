@@ -522,7 +522,7 @@ func (h *CapOrchestratorHandler) dispatchDeliveryComplete(ctx context.Context, s
 	pending, _ := h.readPendingStage()
 	secCtx := pkgctx.NewSystemSecurityContext()
 	storageCtx := pkgctx.NewStorageContext()
-	// TRACK: BLI-CAPH-001 — prefer CAS file evidence for CAP gates; graph List can lag /
+	// prefer CAS file evidence for CAP gates; graph List can lag /
 	// omit status so design/orchestrating never advances despite implemented ATKs on disk.
 	store := h.capEvidenceStorage()
 	res, err := store.List(ctx, secCtx, storageCtx, storagepkg.ListFilter{Kind: objects.KindAgentTask})

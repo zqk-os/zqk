@@ -8,7 +8,6 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-// TRACK: BLI-1785895580100186000-c5539372
 func TestSignificantCacheChange_NotePeekConsume(t *testing.T) {
 	root := t.TempDir()
 	ResetSignificantCacheChangeForTest(root)
@@ -37,7 +36,6 @@ func TestSignificantCacheChange_NotePeekConsume(t *testing.T) {
 	}
 }
 
-// TRACK: BLI-1785895580100186000-c5539372
 func TestNoteObjectIDCachePending_BurstNotesSignificantChange(t *testing.T) {
 	root := t.TempDir()
 	ResetObjectIDCachePendingForTest()

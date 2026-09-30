@@ -31,7 +31,7 @@ type FeedSteerMCPWakeResult struct {
 }
 
 // ProbeFeedSteerMCPWake publishes ActionRequired and queries subscriber count.
-// TRACK: CRIT-COMMS-003 / BLI-COMMS-TPM-LIVE-WAKE-001 — shared by CLI steer and HTTP serve.
+// shared by CLI steer and HTTP serve.
 func ProbeFeedSteerMCPWake(ctx context.Context, tcpAddr, message, agentID, eventID string, logger logging.Logger) FeedSteerMCPWakeResult {
 	pd := NewProxyDaemon(ResolveDaemonTCP(tcpAddr), logger)
 	out := FeedSteerMCPWakeResult{SubscriberCount: -1}

@@ -84,7 +84,6 @@ func TestDynamicKindMapper_NonMappedDirectory(t *testing.T) {
 
 	// "decision" is not a mapped folder (the canonical folder is "decisions").
 	// Without spec-filename inference, GetKindFromDirectory("decision") must return "".
-	// TRACK: TDE-CEF-KIND-MAP-SPEC-DISCOVERY-001 / BLI-TDE-KIND-MAP-SPEC-DISCOVERY-001
 	if got := mapper.GetKindFromDirectory("decision"); got != "" {
 		t.Errorf("GetKindFromDirectory(\"decision\") = %q, want \"\"", got)
 	}

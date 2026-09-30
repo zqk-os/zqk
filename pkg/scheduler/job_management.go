@@ -563,7 +563,7 @@ func (s *Scheduler) tryScheduleJob(result map[string]any, h hydratedJob, reload 
 					// or reload floods the worker pool with hundreds of test bundles.
 					scheduleErr = s.registerTriggeredJob(job)
 				} else if reload {
-					// Callback-bearing CLI one-shots that never entered the pool must still start. TRACK: TDE-CEF-SCHEDULER-CALLBACK-HOURGLASS-001
+					// Callback-bearing CLI one-shots that never entered the pool must still start.
 					if oneTimeImmediateShouldStartOnReload(job, s.isImmediateDispatchPending(job.ID)) {
 						scheduleErr = s.scheduleImmediateJob(job)
 						if scheduleErr != nil {
@@ -571,7 +571,7 @@ func (s *Scheduler) tryScheduleJob(result map[string]any, h hydratedJob, reload 
 								WithFields(jobLogFieldsWithErr(job, scheduleErr)...).
 								Log()
 							// Keep the job in s.jobs so trigger-queue TriggerJob can retry instead of
-							// not_in_cache_after_retries. TRACK: TDE-CEF-SCHEDULER-CALLBACK-HOURGLASS-001
+							// not_in_cache_after_retries.
 							scheduleErr = s.registerTriggeredJob(job)
 						}
 					} else {

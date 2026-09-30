@@ -130,7 +130,6 @@ func (h *CapOrchestratorHandler) executeDispatchStage(ctx context.Context, exe, 
 	}
 	openAGI := shared.openAGI
 	// Stage label stays `instruction` for routing/reuse; AGI body is the kernel prompt template.
-	// TRACK: / BLI-ATK-MERGE-UP-HYGIENE-001
 	agiInstruction := h.capStageAGIInstruction(ctx, instruction, planID)
 
 	var activePersonas []string
@@ -168,7 +167,7 @@ func (h *CapOrchestratorHandler) executeDispatchStage(ctx context.Context, exe, 
 		// pass CRI-SHOVEL-READY field checks; counting them as "shovel-ready" caused
 		// false confidence, and counting only EvaluateShovelReady without status
 		// produced ATTN empty-column while planned>0 but DoR-incomplete (dor-gap).
-		// TRACK: PRI-GROOM-EVIDENCE-REOPEN-001 — empty-column vs dor-gap diagnostic split.
+		// empty-column vs dor-gap diagnostic split.
 		openCount := 0
 		shovelReadyOpen := 0
 		for _, bliObj := range bliMap {

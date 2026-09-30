@@ -29,7 +29,6 @@ rules:
       prefix: "ACC-"
 
   # Kernel CAS must not host classic test fixture object IDs (stewardship incident 2026-08-12).
-  # TRACK: BLI-CAS-HAND-DUP-CHECK-001
   - id: fixture_object_id_acc_test
     description: "Fixture account id ACC-TEST must not live in kernel CAS"
     match:
@@ -49,7 +48,6 @@ rules:
       equals: "GOAL-999"
 
   # Scenario-builder / timing-test pollution (2026-08-12): ACC-* with title "Test User".
-  # TRACK: BLI-CAS-HAND-DUP-CHECK-001
   - id: fixture_title_test_user
     description: "Fixture account title Test User must not live in kernel CAS"
     match:

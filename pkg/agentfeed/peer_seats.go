@@ -18,7 +18,7 @@ var PeerSeatsRelPath = filepath.Join(paths.ProjectDataDir, paths.StateDir, paths
 
 // PeerSeatRecord binds an agent_id to a local wake transport target.
 // Wake selects the interrupt membrane (vendor-agnostic). Persona/vendor names
-// must not be required for routing — TRACK: BLI-COMMS-TPM-LIVE-WAKE-001.
+// must not be required for routing
 type PeerSeatRecord struct {
 	PID          int    `json:"pid,omitempty"`
 	Conversation string `json:"conversation,omitempty"`

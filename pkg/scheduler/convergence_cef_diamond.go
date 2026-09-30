@@ -12,7 +12,6 @@ import (
 
 // CEFDiamondMeasureResult is the CEF diamond evaluation-surface payload for convergence measure.
 // Distinct from TestBundleConvergenceSnapshot so health.jsonl ticks stay untwinned.
-// TRACK: BLI-CVS-EVAL-SURFACE-ADAPTER-001.
 type CEFDiamondMeasureResult struct {
 	EvaluationSurfaceID             string         `json:"evaluation_surface_id"`
 	MatrixName                      string         `json:"matrix_name"`

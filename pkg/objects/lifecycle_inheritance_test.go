@@ -108,7 +108,7 @@ func TestLifecycleLoader_StatusMapping(t *testing.T) {
 		}
 	}
 	// Check valve: in_progress is a first-class sibling of active. status_mapping
-	// must not collapse it onto active (or grooming). TRACK: BLI-1785439369431933000-f0cccd6c
+	// must not collapse it onto active (or grooming).
 	if mapped, ok := lifecycle.StatusMapping["in_progress"]; ok && mapped != "in_progress" {
 		t.Error("priority_plan status_mapping must not include in_progress (would launder execution lock)")
 	}

@@ -18,7 +18,7 @@ type toolChoiceState struct {
 // nextToolChoice pins native function-calling while a 7B still owes work or
 // after it slipped into markdown. Empty omits the field (no tools registered).
 // Local servers that reject tool_choice are handled by a one-shot retry in
-// the OpenAI client — not an env toggle. TRACK: BLI-SWM-002
+// the OpenAI client — not an env toggle.
 func nextToolChoice(state toolChoiceState) string {
 	if !state.ToolsPresent {
 		return ""
@@ -42,7 +42,6 @@ func nextToolChoiceFunction(state toolChoiceState) string {
 // unpaidLookupBudget is how many consecutive non-write tools may execute
 // while a mutation pin is still unpaid. After this, the host hides
 // object_get/list/status on the wire, narrowing to code-drafting tools.
-// TRACK: BLI-SWM-002
 const unpaidLookupBudget = 4
 
 // unpaidLookupForceWrite hides read_code/observer_search too if a model

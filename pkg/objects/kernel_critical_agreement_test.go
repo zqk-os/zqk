@@ -62,7 +62,6 @@ func TestKernelCritical_indexAndLoaderAgreeForEveryKind(t *testing.T) {
 // keep the set from growing rather than to bless it.
 //
 // Do not add entries. Regenerate the index and delete rows instead.
-// TRACK: BLI-1785784863457357000-dda098ed
 var staleIndexKernelCriticalBaseline = map[string]bool{
 	"kind_synonym": true,
 	"qa_success":   true,

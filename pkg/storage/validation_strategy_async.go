@@ -150,7 +150,7 @@ func (s *AsyncCacheValidationStrategy) ValidateMappings(kindDir string, mappings
 			// Cache lag after concurrent create is common (scan interval 500ms). A miss is
 			// not proof the hash file is gone — Stat before dropping or we strip brand-new
 			// mappings, save an index without them, and Create returns success with a ghost.
-			// TRACK: REQ-CEF-FRIC-001 — async validate must not drop fresh CAS files.
+			// async validate must not drop fresh CAS files.
 			s.cacheMisses.Add(1)
 			hashFile := buildHashFilePath(kindDir, hash, bucketKey)
 			if _, err := fileutil.Stat(hashFile); err == nil {

@@ -217,14 +217,12 @@ func LinkedBacklogItemsNoneInProgressOrComplete(planID string, options *Validati
 		}
 		if !backlogDependentStillReferencesPlan(planID, depID, options) {
 			// Stale reverse-index: BLI exists but no longer references this plan.
-			// TRACK: BLI-OVERNIGHT-PR1522-VDS-REVERIFY-001
 			continue
 		}
 		st, err := options.ObjectStatusLookup(depID)
 		if err != nil {
 			// Ghost reverse-index entries (deleted BLIs) must not block plan/plan-promote.
 			// Fail-closed remains when DependentsLookup/ObjectStatusLookup are nil.
-			// TRACK: BLI-OVERNIGHT-PR1522-VDS-REVERIFY-001
 			continue
 		}
 		if BacklogItemStatusInProgressOrComplete(st) {

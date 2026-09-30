@@ -35,7 +35,6 @@ type RaceGateResult struct {
 }
 
 // RunRaceGate executes package tests under go test -race with strict isolation and timeout guarantees.
-// TRACK: BLI-TEST-ISOLATION-GATE-002, CRIT-TEST-ISOLATION-GATE-002
 func RunRaceGate(ctx context.Context, cfg RaceGateConfig) (*RaceGateResult, error) {
 	if cfg.PackagePath == "" {
 		return nil, errfmt.Errorf("package_path is required for race gate")

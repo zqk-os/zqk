@@ -12,7 +12,6 @@ const hostloadValidationYield = 50 * time.Millisecond
 // holdHostAwareValidationSlot acquires a semaphore token. Extra slots are refused
 // while *foreign* host CPU (AV, other tenants) is over budget. Held slots are never
 // released because this check heated the machine — that was self-throttle (~23/s).
-// TRACK: TDE-CEF-HOST-CPU-BACKPRESSURE-001
 func (av *AsyncValidator) holdHostAwareValidationSlot(objectID string) (held, timedOut bool) {
 	start := time.Now()
 	deadline := start.Add(semaphoreFullWaitTimeout)

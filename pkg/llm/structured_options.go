@@ -7,7 +7,7 @@ import (
 )
 
 // OpenAI-compatible tool_choice values. Empty means omit the field (provider default).
-// TRACK: BLI-SWM-002 — 7B native function-calling; markdown recovery is the self-heal.
+// 7B native function-calling; markdown recovery is the self-heal.
 const (
 	ToolChoiceAuto     = "auto"
 	ToolChoiceRequired = "required"

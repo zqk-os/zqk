@@ -41,7 +41,7 @@ func (f *FileObjectStorage) findDependents(ctx context.Context, id, _ string) ([
 
 	// Index not ready: try disk cache once. Align with ensureReverseReferenceIndexLoaded:
 	// missing cache → ready-empty (incremental CUD populates); LoadCache I/O error → fail closed.
-	// Never processDir scan. TRACK: / BLI-CEF-R2-REL-REVINDEX-FAILOPEN
+	// Never processDir scan.
 	if f.projectRoot != emptyValue {
 		loaded, err := index.LoadCache(f.projectRoot)
 		if err != nil {

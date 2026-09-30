@@ -42,8 +42,6 @@ func (s *listOmittingStorage) List(ctx context.Context, secCtx *storagepkg.Secur
 // TestExpediteOneShot_ReachesExecuteJobWhenCeilingReachedAndListOmitsID verifies that
 // immediate one-shot CLI jobs with callbacks reach executeJob even when runtime.NumGoroutine()
 // is at or above the concurrency ceiling and storage.List omits the job ID (CAS list lag).
-// TRACK: TDE-1789630460110488000-1f2e7aa3
-// TRACK: TDE-1789621330341821000-20a78769
 func TestExpediteOneShot_ReachesExecuteJobWhenCeilingReachedAndListOmitsID(t *testing.T) {
 	sched, testRoot, cleanup := setupTestScheduler(t)
 	t.Cleanup(cleanup)
@@ -152,7 +150,6 @@ func TestExpediteOneShot_ReachesExecuteJobWhenCeilingReachedAndListOmitsID(t *te
 // TestDrainAndProcessTriggerBatch_ReenqueuesOnDeadlineExceeded verifies that if TriggerJob
 // returns DeadlineExceeded (e.g. from resource contention), the trigger request is re-enqueued
 // rather than silently dropped.
-// TRACK: TDE-1789630460110488000-1f2e7aa3
 func TestDrainAndProcessTriggerBatch_ReenqueuesOnDeadlineExceeded(t *testing.T) {
 	setDispatchResourceWaitMaxForTest(50 * time.Millisecond)
 	t.Cleanup(func() { setDispatchResourceWaitMaxForTest(0) })

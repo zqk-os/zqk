@@ -54,7 +54,6 @@ func NewMCPExecutor(ctx context.Context, mcpPath string) (*MCPExecutor, error) {
 // NewMCPExecutorAt starts MCP with cwd and AGENT_WORKTREE_ROOT bound to workDir
 // when set. PROJECT_ROOT stays the studio kernel so session/object auth still
 // resolves (ZQK-8326-class failures). File writes use the worktree sandbox.
-// TRACK: BLI-COMMS-ORCH-EXECUTE-NOT-ACK-001
 func NewMCPExecutorAt(ctx context.Context, mcpPath, workDir string) (*MCPExecutor, error) {
 	ctx, cancel := context.WithCancel(ctx)
 

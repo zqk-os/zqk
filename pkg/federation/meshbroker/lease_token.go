@@ -7,7 +7,7 @@ import (
 )
 
 // newFederationLeaseToken mints an unpredictable lease token.
-// TRACK: BLI-CEF-SEC-TOKEN-RAND — REQ-CEF-SEC-004 / CRIT-CEF-SEC-004A
+// REQ-CEF-SEC-004 / CRIT-CEF-SEC-004A
 // (crypto/rand, not time.Now().UnixNano seed).
 func newFederationLeaseToken() (string, error) {
 	var buf [16]byte

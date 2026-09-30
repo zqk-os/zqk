@@ -30,7 +30,6 @@ const PreserveToolSchemas = 0
 // maxMutationNoToolCorrections is how many empty completions replay
 // write-now guidance before the run parks. Models often need a second
 // or third nudge after an initial status-only turn or dropped invalid probe.
-// TRACK: BLI-COMMS-ORCH-EXECUTE-NOT-ACK-001
 const maxMutationNoToolCorrections = 3
 
 // Engine defines the cognitive run loop bridging LLM and MCP Executor.
@@ -284,7 +283,7 @@ func (e *Engine) Run(ctx context.Context, systemPrompt, userPrompt string) (stri
 			// Live 3.6 paid the write pin then got the full eager menu back
 			// and spent the remaining timeout on object_get plus rewrites.
 			// Keep write/read/test only so the next turn is vet, not another
-			// kernel list. TRACK: BLI-SWM-002
+			// kernel list.
 			tools = filterToolsByAllowlist(tools, CodeDraftToolNames(DefaultToolPrefix()))
 		}
 

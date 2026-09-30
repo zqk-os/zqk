@@ -18,7 +18,6 @@ const (
 	schedulerTriggeredPoolStopTimeout = 5 * time.Second
 )
 
-// TRACK: BLI-CEF-LOGGING-POL007-001 / REQ-CEF-POL007-LOGGING-001: fluent logging compliance
 // Stop stops the scheduler daemon
 func (s *Scheduler) Stop() {
 	stopTime := time.Now()

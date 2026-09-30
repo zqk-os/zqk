@@ -393,7 +393,6 @@ func TestWithLockTimeout_ScanDirectoryScenario(t *testing.T) {
 	mu.Unlock()
 }
 
-// TRACK: BLI-CEF-R16-LOCK-TIMEOUT-001 / CRIT-CEF-R2-CON-LOCK-TIMEOUT-A / REQ-CEF-R2-CON-LOCK-TIMEOUT
 // TestWithLockTimeout_ContextCancellation tests that cancelled context aborts immediately during contention
 func TestWithLockTimeout_ContextCancellation(t *testing.T) {
 	t.Parallel()
@@ -429,7 +428,6 @@ func TestWithLockTimeout_ContextCancellation(t *testing.T) {
 	}
 }
 
-// TRACK: BLI-CEF-ARCH-CONCURRENCY-CTX-001 / CRIT-CEF-ARCH-CONCURRENCY-CTX-001 / REQ-CEF-R2-CON-LOCK-TIMEOUT
 // TestWithLockTimeout_BLI_CEF_ARCH_CONCURRENCY_CTX_001 verifies context cancellation aborts immediately
 func TestWithLockTimeout_BLI_CEF_ARCH_CONCURRENCY_CTX_001(t *testing.T) {
 	t.Parallel()

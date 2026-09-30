@@ -36,7 +36,6 @@ func DefaultValidationTierConfig() *ValidationTierConfig {
 			"partial_data":       1, // Partial/incomplete data
 			// validated/exploring×active|in_progress plan — was tier-2 warning and invisible to
 			// pristine glances that only read blocking_issues / error_status_objects.
-			// TRACK: BLI-KERNEL-CHECK-UNBLIND-MEMBERSHIP-001
 			"execution_facing_membership": 1,
 			"scope_creep_protection":      1,
 

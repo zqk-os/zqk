@@ -225,7 +225,7 @@ func Run(opts Options) (*Result, error) {
 		EdgeSignals:    edge,
 		SeatingCreated: seatingCreated,
 		SmokeOK:        smokeOK,
-		// TRACK: BLI-AGENT-ONBOARD-HYGIENE-001 — promote lite sync (+ fingerprint) to CAS object when multi-workspace needs graph identity
+		// promote lite sync (+ fingerprint) to CAS object when multi-workspace needs graph identity
 		Notes: []string{"workspace→kernel lite registration; packs under .zqk/agent_packs/; seating objects live in CAS"},
 	}
 

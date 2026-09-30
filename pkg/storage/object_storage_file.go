@@ -75,7 +75,6 @@ var (
 // cachedLivePath returns the object-id-cache path for id when that file still exists.
 // The cache is the identity index: Get/Exists follow this one path (draft YAML or CAS hash).
 // List-like operations must omit draft-plane paths unless a draft-plane list view is built on purpose.
-// TRACK: TDE-CEF-CAS-IDENTITY-TXN-001
 
 // SetLifecycleHookHandler sets the function to handle lifecycle transitions
 // This should be called by the CLI layer to wire up scheduler job triggers
@@ -109,7 +108,6 @@ func executeLifecycleHook(ctx context.Context, kind, fromState, toState string, 
 // coupleObjectIDCacheLivePath inserts or swaps object-id-cache for the live file path.
 // Draft-plane create has no CAS blob; the id still belongs in the cache (path is the
 // draft YAML). CAS Create/Update couple via invokeCASPostSync instead.
-// TRACK: TDE-CEF-CAS-IDENTITY-TXN-001
 
 // unwrapFileStorageFromContext is a soft hint; most callers rely on path-derived project root.
 func unwrapFileStorageFromContext(ctx context.Context) *FileObjectStorage {
@@ -418,7 +416,7 @@ const maxStreamEntriesForCacheBuild = 100000
 
 // getObjectFilePath returns the live file path for an object given its ID and kind.
 // Identity lookup is cache first (one path), then CAS index, then draft-plane heal on miss.
-// List-like callers must drop draft-plane paths. TRACK: TDE-CEF-CAS-IDENTITY-TXN-001
+// List-like callers must drop draft-plane paths.
 
 func withSkipWriteBehind(ctx context.Context) context.Context {
 	return context.WithValue(ctx, contextKeySkipWriteBehind{}, true)

@@ -307,7 +307,6 @@ func refuseOrphanCASHashDelete(filePath string, keeperHash ...string) bool {
 		}
 		// Update just wrote keeper; do not treat the predecessor as sole survivor
 		// when the replacement is not yet visible to a directory scan.
-		// TRACK: BLI-CEF-R19-CAS-INTERMEDIATE-LEAK-001
 		return false
 	}
 	oid := filecas.CasHashFilePeekObjectID(filePath)

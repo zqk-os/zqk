@@ -48,7 +48,7 @@ func TestRecomputeRefsFromScope_MalformedScopeID(t *testing.T) {
 }
 
 func TestRecomputeRefsFromScope_Lifecycle_BacklogItem(t *testing.T) {
-	// TRACK: BLI-1785443942668406000-1ec5c811 — no t.Parallel: shared Memgraph + fixed fixture IDs.
+	//
 	ctx := context.Background()
 	// backlog_item has no List expansion; should return single ref
 	refs := RecomputeRefsFromScope(ctx, rollback.ScopeTypeLifecycle, "backlog_item:BLI-1:complete", nil)
@@ -64,7 +64,7 @@ func TestRecomputeRefsFromScope_Lifecycle_BacklogItem(t *testing.T) {
 }
 
 func TestRecomputeRefsFromScope_Lifecycle_PriorityPlan(t *testing.T) {
-	// TRACK: BLI-1785443942668406000-1ec5c811 — no t.Parallel: shared Memgraph + fixed fixture IDs.
+	//
 	ctx := context.Background()
 	pool := testkit.PrepareGraphConnectionForTest(t)
 	realStorage := storage.NewPoolAwareGraphStorage(pool, t.TempDir())
@@ -118,7 +118,7 @@ func TestStatusRelevantRefs_PriorityPlan_EmptyID(t *testing.T) {
 }
 
 func TestStatusRelevantRefs_PriorityPlan_WithList(t *testing.T) {
-	// TRACK: BLI-1785443942668406000-1ec5c811 — no t.Parallel: shared Memgraph + fixed fixture IDs.
+	//
 	ctx := context.Background()
 	pool := testkit.PrepareGraphConnectionForTest(t)
 	realStorage := storage.NewPoolAwareGraphStorage(pool, t.TempDir())
@@ -154,7 +154,7 @@ func TestStatusRelevantRefs_PriorityPlan_WithList(t *testing.T) {
 }
 
 func TestStatusRelevantRefs_PriorityPlan_ListError(t *testing.T) {
-	// TRACK: BLI-1785443942668406000-1ec5c811 — no t.Parallel: shared Memgraph + fixed fixture IDs.
+	//
 	pool := testkit.PrepareGraphConnectionForTest(t)
 	realStorage := storage.NewPoolAwareGraphStorage(pool, t.TempDir())
 	// no backlog items created

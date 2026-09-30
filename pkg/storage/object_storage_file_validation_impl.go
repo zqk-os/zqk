@@ -51,7 +51,6 @@ func (f *FileObjectStorage) validateObjectBeforeCreation(ctx context.Context, ob
 	if err := f.validateObject(ctx, obj, kind, ""); err != nil {
 		// Non-draft-plane CAS objects must fail closed. Incomplete criteria park
 		// off CAS (create succeeds); hash persist is refused by the membrane.
-		// TRACK: BLI-KERNEL-CRIT-CATEGORY-MINT-001
 		useDraftPlane := caspkg.UseObjectDraftPlane(kind, obj, pkgctx.GetPromoteOnCreate(ctx))
 		if StreamStorageEnabledForKind(kind) {
 			useDraftPlane = false

@@ -39,7 +39,6 @@ package validation
 // lifecycles. All of it is unchanged from origin/main, so it is pre-existing debt this scan revealed
 // rather than anything the branch introduced.
 //
-// TRACK: BLI-1787565256503969000-f5604378 — validation plane unification covers the fixture sweep.
 // kinds below it get registry lifecycles, or the code is corrected to the ladder they have.
 var statusLiteralBaseline = map[string]int{
 	"agent_task=active":           1,

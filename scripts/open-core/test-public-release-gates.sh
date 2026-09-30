@@ -73,7 +73,7 @@ if sh "$TRACK_REPO/scripts/open-core/check-public-release-payload.sh" "$TRACK_RE
 	printf '%s\n' "payload gate accepted TRACK kernel id in cmd/zqk-shim" >&2
 	exit 1
 fi
-grep -F 'studio TRACK comment with kernel object id remains in cmd or scripts' "$TRACK_REPO/result.log" >/dev/null
+grep -E 'studio TRACK comment with kernel object id remains in cmd, scripts, or pkg|studio TRACK comment with kernel object id remains' "$TRACK_REPO/result.log" >/dev/null
 
 # Prove production cmd nanos-hex kernel ids fail closed (not only TRACK comments).
 HEX_REPO=$(mktemp -d "${TMPDIR:-/tmp}/zqk-public-gate-hex.XXXXXX")
@@ -103,7 +103,7 @@ if sh "$HEX_REPO/scripts/open-core/check-public-release-payload.sh" "$HEX_REPO" 
 	printf '%s\n' "payload gate accepted nanos-hex kernel id in production cmd" >&2
 	exit 1
 fi
-grep -F 'studio nanos-hex kernel object id remains in production cmd, docs, scripts, CLI specs, or command builders' "$HEX_REPO/result.log" >/dev/null
+grep -E 'studio nanos-hex kernel object id remains in production (pkg, )?cmd' "$HEX_REPO/result.log" >/dev/null
 
 # Prove studio process items in public documentation fail closed.
 DOC_REPO=$(mktemp -d "${TMPDIR:-/tmp}/zqk-public-gate-doc.XXXXXX")

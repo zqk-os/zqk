@@ -48,7 +48,7 @@ func (cas *ContentAddressableStorage) WithSweepLock(fn func() error) error {
 // ensureExactlyOneLiveCASBlob deletes every live hash YAML for objectID except
 // keeperHash.yaml, then fails if a second blob is still on disk.
 // Call after a successful CAS write, before Update returns.
-// TRACK: BLI-CEF-R19-CAS-INTERMEDIATE-LEAK-001 — write-path prevention; detection alone is not enough.
+// write-path prevention; detection alone is not enough.
 func ensureExactlyOneLiveCASBlob(objectID, keeperHash, kindDir string) error {
 	if objectID == emptyValue || keeperHash == emptyValue || kindDir == emptyValue {
 		return nil

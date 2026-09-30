@@ -332,7 +332,6 @@ func (f *FileObjectStorage) finalizeObjectCreation(ctx context.Context, id, kind
 	}
 	// Non-CAS files couple here. Live CAS blobs couple in PostSyncCallback (hash path).
 	// Draft-plane CAS kinds never hit PostSync; the id still belongs in object-id-cache.
-	// TRACK: TDE-CEF-CAS-IDENTITY-TXN-001
 	if f.objectDraftPlaneExists(kind, id) {
 		if err := coupleObjectIDCacheLivePath(id, kind, f.objectDraftPlanePath(kind, id)); err != nil {
 			_ = f.deleteObjectDraftPlane(kind, id)

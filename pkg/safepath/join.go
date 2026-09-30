@@ -1,6 +1,5 @@
 // Package safepath builds filesystem paths confined under a root directory to mitigate
 // directory traversal when joining untrusted or external segments (gosec G703).
-// TRACK: BLI-CEF-R15-PATH-TRAVERSAL-001 / REQ-CEF-R2-SEC-PATH-TRAVERSAL
 package safepath
 
 import (

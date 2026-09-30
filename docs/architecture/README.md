@@ -38,7 +38,7 @@ The architecture is built on four core pillars:
 ## Deterministic Testing & Race Verification
 
 - **Race Detection & Teardown Safety**: All background test workers run with explicit lifecycle synchronization (`sync.WaitGroup`, channels, or `goroutinelabels.Pool`) rather than arbitrary sleeps.
-- **Race Gate Verification**: Native verification via `zqk test run` ensures test suites execute cleanly under `-race` without memory races or orphaned goroutine leaks (`BLI-1790738351469512000-095a826e`, `PRI-CEF-TEST-DETERMINISM`).
+- **Race Gate Verification**: Native verification via `zqk test run` ensures test suites execute cleanly under `-race` without memory races or orphaned goroutine leaks.
 
 ---
 

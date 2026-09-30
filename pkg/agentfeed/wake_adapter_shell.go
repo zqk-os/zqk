@@ -16,7 +16,7 @@ import (
 // ShellPeerWakeAdapter is the legacy local membrane that invokes project scripts.
 // Kept as one replaceable adapter — do not scatter shell basenames through core feed logic.
 //
-// TRACK: CRIT-COMMS-003 — retire when MCP/HTTP wake adapters are the default product path.
+// retire when MCP/HTTP wake adapters are the default product path.
 type ShellPeerWakeAdapter struct {
 	// WorkerScript / CoordinatorScript override basenames under paths.ScriptsDirPath.
 	WorkerScript      string

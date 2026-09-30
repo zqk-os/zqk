@@ -26,7 +26,6 @@ const (
 
 var casCrashKillPayload = []byte("kind: scheduler_job\nid: SCH-cas-crash-kill\nstatus: active\n")
 
-// TRACK: BLI-CEF-R16-CAS-FSYNC-001 / CRIT-CEF-R2-REL-CAS-FSYNC-A / REQ-CEF-R2-REL-CAS-FSYNC
 func TestCAS_WriteFileWithSync_CallsPublishSyncHooks(t *testing.T) {
 	var fileN, dirN int
 	origFile, origDir := filecas.CasPublishSyncFile, filecas.CasPublishSyncDir

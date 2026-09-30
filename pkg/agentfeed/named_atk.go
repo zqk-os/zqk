@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// TRACK: BLI-COMMS-ORCH-EXECUTE-NOT-ACK-001 — hourglass bodies name one ATK plus a
+// hourglass bodies name one ATK plus a
 // "do not execute" sibling; only the ONLY-marked id (or a unique id) is live.
 var (
 	namedATKIDPattern = regexp.MustCompile(`\bATK-[0-9]+-[0-9a-fA-F]+\b`)

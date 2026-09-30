@@ -219,7 +219,6 @@ func TestServer_TLSConfig(t *testing.T) {
 	}
 }
 
-// TRACK: BLI-CEF-R15-HTTP-TIMEOUTS-001 / REQ-CEF-R2-SEC-HTTP-TIMEOUTS
 func TestServer_Timeouts(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()

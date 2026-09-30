@@ -68,7 +68,7 @@ func TestCASPostSyncCallback_CacheUpdate(t *testing.T) {
 
 	// Create a goal object (uses CAS). Draft-first create parks preliminary origin on draft;
 	// promote to active so CAS PostSyncCallback runs with the durable hash path.
-	// TRACK: BLI-1785443942668406000-1ec5c811 — draft-plane create / promote membrane.
+	//
 	secCtx := pkgctx.NewSecurityContext("ACC-TEST", []string{"admin"}, []string{"read:*", "write:*"})
 	ctx := context.Background()
 
@@ -131,7 +131,6 @@ func TestCASPostSyncCallback_CacheUpdate(t *testing.T) {
 
 // TestCASPostSyncCallback_UpdateRefreshesHashPath verifies Update fires post-sync
 // with the new hash path so object-id-cache cannot keep a deleted blob name.
-// TRACK: BLI-1785895580100186000-c5539372
 func TestCASPostSyncCallback_UpdateRefreshesHashPath(t *testing.T) {
 	tmpDir := t.TempDir()
 	processDir := datacell.ProcessPrimaryDir(tmpDir)

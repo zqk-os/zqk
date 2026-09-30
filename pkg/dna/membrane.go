@@ -12,7 +12,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
-// TRACK: BLI-CELLULAR-DNA-MEMBRANE-012 / CRIT-CELLULAR-MEMBRANE-002
 
 // IsRequired reports whether this field is marked required in its validation spec or flat attributes.
 func (f FieldMetaSpec) IsRequired() bool {

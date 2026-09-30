@@ -25,7 +25,6 @@ var claimTargetIDPattern = regexp.MustCompile(`\b(?:BLI|PRI)-[A-Za-z0-9-]+`)
 // stampClaimProvenance records branch_ref and base_sha on the claimed BLI and
 // its priority plan. Empty ProjectRoot skips (same as the check-in timer).
 // Already-set fields are left alone so a re-claim cannot move the provenance.
-// TRACK: BLI-CEF-R20-BRANCH-REF-SPEC-001
 func stampClaimProvenance(ctx context.Context, sp storage.ObjectStorageProvider, sec *pkgctx.SecurityContext, task map[string]any, opts []ClaimOptions) {
 	if sp == nil || len(opts) == 0 || strings.TrimSpace(opts[0].ProjectRoot) == "" {
 		return

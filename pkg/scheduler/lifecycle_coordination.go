@@ -764,7 +764,7 @@ func (s *Scheduler) TriggerJob(ctx context.Context, jobID string) error {
 		job, ok = s.lookupJobInCache(jobID)
 	}
 	if !ok {
-		// Get/Read can succeed while List still omits the id (CAS index lag). TRACK: TDE-CEF-SCHEDULER-CALLBACK-HOURGLASS-001
+		// Get/Read can succeed while List still omits the id (CAS index lag).
 		if s.AdmitJobFromStorage(ctx, jobID) {
 			job, ok = s.lookupJobInCache(jobID)
 		}
