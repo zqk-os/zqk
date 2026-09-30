@@ -91,6 +91,12 @@ func TestOverlayDSL_PreconditionConsolidation(t *testing.T) {
 		assert.True(t, handled)
 		assert.False(t, met)
 	})
+}
+
+// TestOverlayDSL_PreconditionCompoundAndProse verifies compound AND logic, disjunctions, and prose compilation.
+func TestOverlayDSL_PreconditionCompoundAndProse(t *testing.T) {
+	gv := NewGoValidator()
+	opts := &ValidationOptions{}
 
 	t.Run("compound predicates via AND combinator", func(t *testing.T) {
 		obj := map[string]any{

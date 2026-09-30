@@ -123,42 +123,17 @@ func (gv *GoValidator) Validate(ctx context.Context, obj map[string]any, kind st
 		Warnings: []ValidationWarning{},
 	}
 
-	// Load the spec for this kind (SHACL shape equivalent)
-	// Try version-aware loading first if instance has schema_version
-	var spec *objects.Spec
-	var err error
-
-	if schemaVersion := objects.GetString(obj, objects.FieldKeySchemaVersion); schemaVersion != emptyValue {
-		// Instance has a schema_version - use version-aware loading
-		// Don't fall back to file-based loading - if builder registry is configured,
-		// version-aware loading should work. Fail fast to expose configuration issues.
-		spec, err = gv.specLoader.LoadSpecByVersion(kind, schemaVersion)
-		if err != nil {
-			return nil, errfmt.Errorf(ConstMagic129864b4, kind, schemaVersion, err)
-		}
-	} else {
-		// No schema_version - use file-based loading (backward compatibility)
-		specFile := kind + ".yaml"
-		spec, err = gv.specLoader.LoadSpecWithInheritance(specFile)
-		if err != nil {
-			return nil, errfmt.Errorf(ConstMagic114b8c13, kind, err)
-		}
-		// Normalize: inject spec's schema_version so "required" passes for system-generated objects (e.g. change_journal_entry) that were written before schema_version was always persisted
-		if _, has := obj[objects.FieldKeySchemaVersion]; !has && spec.SchemaVersion != emptyValue {
-			obj[objects.FieldKeySchemaVersion] = spec.SchemaVersion
-		}
+	spec, err := gv.loadSpecForValidation(obj, kind)
+	if err != nil {
+		return nil, err
 	}
 
 	if options.ProgressCallback != nil {
 		options.ProgressCallback("spec", ConstMagic47c83337)
 	}
 
-	// Apply smart defaults: for required fields with a machine default, set obj[field] if missing so create can omit them.
-	// Only field-level `default` is applied — checklist.default is documentation prose and must not be written into instances.
 	gv.applySpecDefaults(obj, spec)
 
-	// Fail closed: never persist checklist prose as a real title (e.g. "required at creation").
-	// TRACK: fail closed on checklist prose titles.
 	if title, _ := obj[objects.FieldKeyTitle].(string); isDocumentationTitleProse(title) {
 		result.Errors = append(result.Errors, ValidationError{
 			Field:   objects.FieldKeyTitle,
@@ -167,54 +142,29 @@ func (gv *GoValidator) Validate(ctx context.Context, obj map[string]any, kind st
 		})
 	}
 
-	// Validate against resolved fields (property shapes)
-	for fieldName, fieldDef := range spec.ResolvedFields {
-		fieldMap, ok := fieldDef.(map[string]any)
-		if !ok {
-			continue
-		}
+	gv.validatePropertyShapes(spec, obj, kind, options, result)
 
-		// Get field value from object
-		fieldValue, exists := obj[fieldName]
-
-		// Validate field (property shape validation)
-		fieldErrors, fieldWarnings := gv.validatePropertyShape(fieldName, fieldValue, fieldMap, exists, obj, options, kind)
-		result.Errors = append(result.Errors, fieldErrors...)
-		result.Warnings = append(result.Warnings, fieldWarnings...)
-	}
-
-	// StrictMode: fail on unknown fields and intra-object duplicate refs (TDE-CEF-CAS-SPEC-FIELD-DIFF-001)
 	if options.StrictMode {
 		result.Errors = append(result.Errors, gv.validateUnknownFields(kind, obj, spec)...)
 		result.Errors = append(result.Errors, validateDuplicateRefs(obj)...)
 	}
 
-	// Apply custom integrity rules
-	customErrors := gv.validateCustomRules(ctx, kind, obj, options)
-	if len(customErrors) > 0 {
+	if customErrors := gv.validateCustomRules(ctx, kind, obj, options); len(customErrors) > 0 {
 		result.Errors = append(result.Errors, customErrors...)
 	}
 
-	// Apply registered extended validation handlers
-	extendedErrors := GetGlobalExtendedValidationRegistry().Validate(ctx, obj, kind, options)
-	if len(extendedErrors) > 0 {
+	if extendedErrors := GetGlobalExtendedValidationRegistry().Validate(ctx, obj, kind, options); len(extendedErrors) > 0 {
 		result.Errors = append(result.Errors, extendedErrors...)
 	}
 
-	// Cross-plane validation: CAS objects must not reference draft-plane-only objects (crossing the streams).
-	crossPlaneErrors := gv.validateCrossPlaneReferences(obj, kind, options)
-	if len(crossPlaneErrors) > 0 {
+	if crossPlaneErrors := gv.validateCrossPlaneReferences(obj, kind, options); len(crossPlaneErrors) > 0 {
 		result.Errors = append(result.Errors, crossPlaneErrors...)
 	}
-	// Work-envelope wall clock: clamp in-place unless lifecycle break-glass /
-	// trusted shockwave — same skip as auto-only status edges. Do not surface
-	// clamp or leftover detector as user diagnostics (POL-CODE-ACTIONABLE-DIAGNOSTICS-001).
-	// TRACK: BLI-KERNEL-WORK-ENVELOPE-001 /
+
 	objectID, _ := obj[objects.FieldKeyID].(string)
 	result.Warnings = append(result.Warnings, applyWorkEnvelopeWallClockPolicy(
 		lifecycleOverrideSkipsAutoOnlyEdge(ctx, objectID), obj)...)
-	customWarnings := gv.validateCustomWarnings(ctx, kind, obj, options)
-	if len(customWarnings) > 0 {
+	if customWarnings := gv.validateCustomWarnings(ctx, kind, obj, options); len(customWarnings) > 0 {
 		result.Warnings = append(result.Warnings, customWarnings...)
 	}
 
@@ -226,30 +176,63 @@ func (gv *GoValidator) Validate(ctx context.Context, obj map[string]any, kind st
 		options.ProgressCallback(goValidatorFeatureLifecycle(), ConstMagicb527a8b4)
 	}
 
-	// Validate lifecycle state (if enabled)
-	if options.ValidateLifecycle {
-		if statusValue := objects.GetString(obj, objects.FieldKeyStatus); statusValue != emptyValue {
-			currentState := options.CurrentState
-			lifecycleErrors, lifecycleWarnings := gv.validateLifecycleState(ctx, kind, statusValue, currentState, obj, options)
-			result.Errors = append(result.Errors, lifecycleErrors...)
-			result.Warnings = append(result.Warnings, lifecycleWarnings...)
+	gv.validateLifecycleAndDynamicRules(ctx, obj, kind, options, result)
 
-			// Load and evaluate dynamic validation rules
-			dynamicErrors := gv.validateDynamicRules(kind, statusValue, currentState, obj, options)
-			result.Errors = append(result.Errors, dynamicErrors...)
-		}
-	}
-
-	// If there are errors, mark as invalid
 	if len(result.Errors) > 0 {
 		result.IsValid = false
-
 		if options != nil && options.OnValidationFailure != nil {
 			options.OnValidationFailure(obj, kind, result.Errors)
 		}
 	}
 
 	return result, nil
+}
+
+func (gv *GoValidator) loadSpecForValidation(obj map[string]any, kind string) (*objects.Spec, error) {
+	if schemaVersion := objects.GetString(obj, objects.FieldKeySchemaVersion); schemaVersion != emptyValue {
+		spec, err := gv.specLoader.LoadSpecByVersion(kind, schemaVersion)
+		if err != nil {
+			return nil, errfmt.Errorf(ConstMagic129864b4, kind, schemaVersion, err)
+		}
+		return spec, nil
+	}
+	specFile := kind + ".yaml"
+	spec, err := gv.specLoader.LoadSpecWithInheritance(specFile)
+	if err != nil {
+		return nil, errfmt.Errorf(ConstMagic114b8c13, kind, err)
+	}
+	if _, has := obj[objects.FieldKeySchemaVersion]; !has && spec.SchemaVersion != emptyValue {
+		obj[objects.FieldKeySchemaVersion] = spec.SchemaVersion
+	}
+	return spec, nil
+}
+
+func (gv *GoValidator) validatePropertyShapes(spec *objects.Spec, obj map[string]any, kind string, options *ValidationOptions, result *ValidationResult) {
+	for fieldName, fieldDef := range spec.ResolvedFields {
+		fieldMap, ok := fieldDef.(map[string]any)
+		if !ok {
+			continue
+		}
+		fieldValue, exists := obj[fieldName]
+		fieldErrors, fieldWarnings := gv.validatePropertyShape(fieldName, fieldValue, fieldMap, exists, obj, options, kind)
+		result.Errors = append(result.Errors, fieldErrors...)
+		result.Warnings = append(result.Warnings, fieldWarnings...)
+	}
+}
+
+func (gv *GoValidator) validateLifecycleAndDynamicRules(ctx context.Context, obj map[string]any, kind string, options *ValidationOptions, result *ValidationResult) {
+	if !options.ValidateLifecycle {
+		return
+	}
+	if statusValue := objects.GetString(obj, objects.FieldKeyStatus); statusValue != emptyValue {
+		currentState := options.CurrentState
+		lifecycleErrors, lifecycleWarnings := gv.validateLifecycleState(ctx, kind, statusValue, currentState, obj, options)
+		result.Errors = append(result.Errors, lifecycleErrors...)
+		result.Warnings = append(result.Warnings, lifecycleWarnings...)
+
+		dynamicErrors := gv.validateDynamicRules(kind, statusValue, currentState, obj, options)
+		result.Errors = append(result.Errors, dynamicErrors...)
+	}
 }
 
 // applySpecDefaults sets required fields that have a machine default when the object is missing the value.
@@ -1055,17 +1038,18 @@ func (gv *GoValidator) checkCommitHashesGitMutationEvidence(obj map[string]any, 
 	if branchName == "" {
 		branchName, _ = obj[objects.FieldKeyBranchRef].(string)
 	}
-	root := ""
-	if options != nil {
-		root = strings.TrimSpace(options.ProjectRoot)
-	}
-	if root == "" {
-		root = paths.FindNearestProjectRoot(".")
-	}
+	root := resolveValidationProjectRoot(options)
 	if root == "" {
 		return false
 	}
 	return gitevidence.ValidateBacklogCommitHashesWithPlan(root, id, planRef, branchName, hashes) == nil
+}
+
+func resolveValidationProjectRoot(options *ValidationOptions) string {
+	if options != nil && strings.TrimSpace(options.ProjectRoot) != "" {
+		return strings.TrimSpace(options.ProjectRoot)
+	}
+	return paths.FindNearestProjectRoot(".")
 }
 
 // checkMachineCheckableClosureEvidence requires valid scheduler job id, bundle log, and re-read green fingerprint.
@@ -1080,13 +1064,7 @@ func (gv *GoValidator) checkMachineCheckableClosureEvidence(obj map[string]any, 
 			return true
 		}
 	}
-	root := ""
-	if options != nil {
-		root = strings.TrimSpace(options.ProjectRoot)
-	}
-	if root == "" {
-		root = paths.FindNearestProjectRoot(".")
-	}
+	root := resolveValidationProjectRoot(options)
 	if root == "" {
 		return false
 	}
@@ -1308,13 +1286,7 @@ func (gv *GoValidator) checkBranchNameIsAncestorOfTrunk(obj map[string]any, opti
 	branchName, _ := obj[objects.FieldKeyBranchName].(string)
 	branchName = strings.TrimSpace(branchName)
 
-	root := ""
-	if options != nil {
-		root = strings.TrimSpace(options.ProjectRoot)
-	}
-	if root == "" {
-		root = paths.FindNearestProjectRoot(".")
-	}
+	root := resolveValidationProjectRoot(options)
 	if root == "" {
 		return false
 	}
