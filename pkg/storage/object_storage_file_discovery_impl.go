@@ -305,7 +305,9 @@ func (f *FileObjectStorage) EnsureCASIndexPopulatedFromScan(ctx context.Context,
 				continue
 			}
 			var mtime int64
-			if fi, statErr := fileutil.Stat(path); statErr == nil {
+			if fi, infoErr := e.Info(); infoErr == nil {
+				mtime = fi.ModTime().UnixNano()
+			} else if fi, statErr := fileutil.Stat(path); statErr == nil {
 				mtime = fi.ModTime().UnixNano()
 			}
 			prev, ok := best[id]

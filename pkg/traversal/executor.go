@@ -301,20 +301,24 @@ func (e *QueryExecutor) traverseEdge(startID string, edge EdgePattern) []string 
 }
 
 func joinBindings(a, b []map[string]string) []map[string]string {
-	var joined []map[string]string
-	for _, rowA := range a {
-		for _, rowB := range b {
-			// Check if common variables match
-			conflict := false
-			for k, vA := range rowA {
-				if vB, ok := rowB[k]; ok {
-					if vA != vB {
-						conflict = true
-						break
-					}
-				}
-			}
-			if !conflict {
+	if len(a) == 0 || len(b) == 0 {
+		return nil
+	}
+
+	// Discover shared join keys between the two binding sets.
+	var commonKeys []string
+	firstA, firstB := a[0], b[0]
+	for k := range firstA {
+		if _, ok := firstB[k]; ok {
+			commonKeys = append(commonKeys, k)
+		}
+	}
+
+	// If no common keys, perform Cartesian product.
+	if len(commonKeys) == 0 {
+		joined := make([]map[string]string, 0, len(a)*len(b))
+		for _, rowA := range a {
+			for _, rowB := range b {
 				merged := make(map[string]string, len(rowA)+len(rowB))
 				for k, v := range rowA {
 					merged[k] = v
@@ -324,6 +328,48 @@ func joinBindings(a, b []map[string]string) []map[string]string {
 				}
 				joined = append(joined, merged)
 			}
+		}
+		return joined
+	}
+
+	// Indexed Hash-Join (F-PERF-002):
+	// Build hash index on the smaller binding set, then probe with the larger set.
+	buildSet, probeSet := a, b
+	if len(a) > len(b) {
+		buildSet, probeSet = b, a
+	}
+
+	hashKey := func(row map[string]string) string {
+		if len(commonKeys) == 1 {
+			return row[commonKeys[0]]
+		}
+		var sb strings.Builder
+		for _, k := range commonKeys {
+			sb.WriteString(row[k])
+			sb.WriteByte(0)
+		}
+		return sb.String()
+	}
+
+	index := make(map[string][]map[string]string, len(buildSet))
+	for _, row := range buildSet {
+		key := hashKey(row)
+		index[key] = append(index[key], row)
+	}
+
+	var joined []map[string]string
+	for _, probeRow := range probeSet {
+		key := hashKey(probeRow)
+		matches := index[key]
+		for _, buildRow := range matches {
+			merged := make(map[string]string, len(buildRow)+len(probeRow))
+			for k, v := range buildRow {
+				merged[k] = v
+			}
+			for k, v := range probeRow {
+				merged[k] = v
+			}
+			joined = append(joined, merged)
 		}
 	}
 	return joined
