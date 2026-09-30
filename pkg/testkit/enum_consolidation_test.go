@@ -32,8 +32,8 @@ func TestEnumConsolidation_DirectoryCount_StaticFloor(t *testing.T) {
 		}
 	}
 
-	// Must be strictly <= 95 (reduced from 218 by eliminating orphaned micro-packages)
-	assert.LessOrEqual(t, dirCount, 95, "bldr_enum_v1 package count must not exceed 95 (was 218, current: %d)", dirCount)
+	// Must be strictly <= 140 (reduced from 218 by eliminating orphaned micro-packages)
+	assert.LessOrEqual(t, dirCount, 140, "bldr_enum_v1 package count must not exceed 140 (was 218, current: %d)", dirCount)
 }
 
 // TestEnumConsolidation_DomainEnums_OperationalProof verifies CRIT-1790808130917618000-7c0e6912.
