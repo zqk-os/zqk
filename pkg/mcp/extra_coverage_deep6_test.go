@@ -10,6 +10,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -400,15 +401,15 @@ func TestDeep6_MessageProcessor_QueuesAndErrors(t *testing.T) {
 	// sendResponse via queue
 	resp := NewResponse(1)
 	resp.Result = map[string]any{"pong": true}
-	var writeCompleted bool
+	var writeCompleted atomic.Bool
 	err = mp.sendResponse(resp, format, writer, func() {
-		writeCompleted = true
+		writeCompleted.Store(true)
 	})
 	if err != nil {
 		t.Fatalf("sendResponse failed: %v", err)
 	}
 	time.Sleep(20 * time.Millisecond)
-	if !writeCompleted {
+	if !writeCompleted.Load() {
 		t.Log("note: async queue writer completed or pending")
 	}
 }

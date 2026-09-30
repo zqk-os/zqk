@@ -332,13 +332,13 @@ func (mp *MessageProcessor) handleRequest(ctx context.Context, req *JSONRPCReque
 	mp.server.traceLogf("[MCP_DEBUG] Request received: method=%s id=%v", req.Method, req.ID)
 
 	// BLI-645: rate limit check before handling
-	if mp.server.rateLimiter != nil {
+	if rl := mp.server.GetRateLimiter(); rl != nil {
 		perAccount := false
-		if mp.server.config != nil {
-			perAccount = mp.server.config.MCPServer.RateLimit.PerAccount
+		if cfg := mp.server.GetConfig(); cfg != nil {
+			perAccount = cfg.MCPServer.RateLimit.PerAccount
 		}
 		key := mp.server.getRateLimitKey(perAccount)
-		if !mp.server.rateLimiter.Allow(key) {
+		if !rl.Allow(key) {
 			resp := NewErrorResponse(req.ID, RateLimitExceeded, "rate limit exceeded", map[string]any{"retry_after_seconds": 60})
 			return mp.sendResponse(resp, format, writer, nil)
 		}

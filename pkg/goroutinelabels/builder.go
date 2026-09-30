@@ -53,6 +53,29 @@ func handlePanic(name, purpose string, onPanic func(any), r any) {
 	_, _ = fmt.Fprintf(os.Stderr, "goroutinelabels: unhandled panic in goroutine %q (%s): %v\n%s\n", name, purpose, r, string(stack))
 }
 
+// recoverGoroutine recovers from an active panic, reporting it to telemetry and custom handlers.
+func recoverGoroutine(name, purpose string, onPanic func(any), onRecovered ...func(r any)) {
+	if r := recover(); r != nil {
+		handlePanic(name, purpose, onPanic, r)
+		for _, fn := range onRecovered {
+			if fn != nil {
+				fn(r)
+			}
+		}
+	}
+}
+
+// deferDone returns a function that guarantees wg.Done() is executed at most once.
+func deferDone(wg *sync.WaitGroup) func() {
+	if wg == nil {
+		return func() {}
+	}
+	var once sync.Once
+	return func() {
+		once.Do(wg.Done)
+	}
+}
+
 // GoroutineBuilder provides a fluent API for creating goroutines with consistent patterns.
 // This ensures all goroutines have labels and follow best practices for:
 // - Automatic label setting for profiling
@@ -330,27 +353,11 @@ func (b *GoroutineBuilder) Start(fn func() error) {
 		if releaseBudget != nil {
 			defer releaseBudget()
 		}
-		// Track if we've called Done() to ensure it's called exactly once
-		doneCalled := false
-		done := func() {
-			if wg != nil && !doneCalled {
-				doneCalled = true
-				wg.Done()
-			}
-		}
+		defer deferDone(wg)()
+		defer recoverGoroutine(name, purpose, onPanic)
 
 		// Always set goroutine label first
 		SetGoroutineLabel(name, purpose)
-
-		// Ensure Done() is called on all exit paths
-		defer done()
-
-		// Recover from panics
-		defer func() {
-			if r := recover(); r != nil {
-				handlePanic(name, purpose, onPanic, r)
-			}
-		}()
 
 		// Pre-cleanup
 		if preCleanup != nil {
@@ -445,27 +452,11 @@ func (b *GoroutineBuilder) StartWithContext(ctx context.Context, fn func(ctx con
 		if releaseBudget != nil {
 			defer releaseBudget()
 		}
-		// Track if we've called Done() to ensure it's called exactly once
-		doneCalled := false
-		done := func() {
-			if wg != nil && !doneCalled {
-				doneCalled = true
-				wg.Done()
-			}
-		}
+		defer deferDone(wg)()
+		defer recoverGoroutine(name, purpose, onPanic)
 
 		// Always set goroutine label first
 		SetGoroutineLabel(name, purpose)
-
-		// Ensure Done() is called on all exit paths
-		defer done()
-
-		// Recover from panics
-		defer func() {
-			if r := recover(); r != nil {
-				handlePanic(name, purpose, onPanic, r)
-			}
-		}()
 
 		// Pre-cleanup
 		if preCleanup != nil {
@@ -548,27 +539,11 @@ func (b *GoroutineBuilder) StartSimple(fn func()) {
 		if releaseBudget != nil {
 			defer releaseBudget()
 		}
-		// Track if we've called Done() to ensure it's called exactly once
-		doneCalled := false
-		done := func() {
-			if wg != nil && !doneCalled {
-				doneCalled = true
-				wg.Done()
-			}
-		}
+		defer deferDone(wg)()
+		defer recoverGoroutine(name, purpose, onPanic)
 
 		// Always set goroutine label first
 		SetGoroutineLabel(name, purpose)
-
-		// Ensure Done() is called on all exit paths
-		defer done()
-
-		// Recover from panics
-		defer func() {
-			if r := recover(); r != nil {
-				handlePanic(name, purpose, onPanic, r)
-			}
-		}()
 
 		// Signal completion on any exit (so tests can wait without manual signals in every return path)
 		if signalOnExit != nil {
@@ -629,26 +604,15 @@ func (b *GoroutineBuilder) StartWithResult(resultChan chan<- any) func(func() (a
 			// Always set goroutine label first
 			SetGoroutineLabel(b.name, b.purpose)
 
-			// Defer cleanup and wait group decrement
-			defer func() {
-				if b.cleanupFunc != nil {
-					b.cleanupFunc()
+			defer deferDone(b.waitGroup)()
+			if b.cleanupFunc != nil {
+				defer b.cleanupFunc()
+			}
+			defer recoverGoroutine(b.name, b.purpose, b.onPanic, func(r any) {
+				if resultChan != nil {
+					resultChan <- errfmt.Errorf("panic in goroutine %s: %v", b.name, r)
 				}
-				if b.waitGroup != nil {
-					b.waitGroup.Done()
-				}
-			}()
-
-			// Recover from panics
-			defer func() {
-				if r := recover(); r != nil {
-					handlePanic(b.name, b.purpose, b.onPanic, r)
-					// Send error result on panic
-					if resultChan != nil {
-						resultChan <- errfmt.Errorf("panic in goroutine %s: %v", b.name, r)
-					}
-				}
-			}()
+			})
 
 			// Check context before executing
 			if b.ctx != nil {

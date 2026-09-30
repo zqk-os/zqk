@@ -173,13 +173,20 @@ func (s *Server) handleInbox(w http.ResponseWriter, r *http.Request) {
 	writeJSONResponse(w, http.StatusOK, payload)
 }
 
-func (s *Server) handleInboxAck(w http.ResponseWriter, r *http.Request) {
+func ensurePostJSON(w http.ResponseWriter, r *http.Request) bool {
 	if r.Method != http.MethodPost {
 		http.Error(w, `{"error": "method not allowed"}`, http.StatusMethodNotAllowed)
-		return
+		return false
 	}
 	setNoCacheHeaders(w)
 	w.Header().Set("Content-Type", "application/json")
+	return true
+}
+
+func (s *Server) handleInboxAck(w http.ResponseWriter, r *http.Request) {
+	if !ensurePostJSON(w, r) {
+		return
+	}
 
 	var req InboxAckRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -270,12 +277,9 @@ func (s *Server) handleInboxAck(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleInboxRespond(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, `{"error": "method not allowed"}`, http.StatusMethodNotAllowed)
+	if !ensurePostJSON(w, r) {
 		return
 	}
-	setNoCacheHeaders(w)
-	w.Header().Set("Content-Type", "application/json")
 
 	var req InboxRespondRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {

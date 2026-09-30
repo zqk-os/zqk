@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -66,8 +67,11 @@ func TestCheckAgentShellGuardEdgeCases(t *testing.T) {
 	})
 
 	t.Run("write_to_non_forbidden_docs_subdir_allowed", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		server.SetCliInitializationContext(&pkgctx.CliInitializationContext{ProjectRoot: tmpDir})
+		targetPath := filepath.Join(tmpDir, "docs", "readme.md")
 		args := map[string]any{
-			objects.FieldKeyPath:    "docs/readme.md",
+			objects.FieldKeyPath:    targetPath,
 			objects.FieldKeyContent: "test content",
 		}
 		result, err := server.handleAgentWriteFileTool(ctx, args)

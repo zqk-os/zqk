@@ -32,6 +32,7 @@ if [ -d "$TARGET" ]; then
 			':!pkg/systemcheck/policy/secrets.go' \
 			':!pkg/systemcheck/policy/secrets_test.go' \
 			':!pkg/systemcheck/policy/policy_test.go' \
+			':!pkg/security/secretpatterns/*' \
 			':!pkg/security/release_security.go' \
 			':!pkg/security/release_security_test.go' \
 			':!pkg/osslaunch/launch_prep_test.go' \
@@ -44,10 +45,13 @@ if [ -d "$TARGET" ]; then
 			--exclude-dir="build" \
 			--exclude-dir="dist" \
 			--exclude-dir="testdata" \
+			--exclude-dir="secretpatterns" \
 			--exclude="scan-secrets.sh" \
 			--exclude="secrets.go" \
 			--exclude="secrets_test.go" \
 			--exclude="policy_test.go" \
+			--exclude="patterns.go" \
+			--exclude="patterns_test.go" \
 			--exclude="release_security.go" \
 			--exclude="release_security_test.go" \
 			--exclude="launch_prep_test.go" \

@@ -471,14 +471,7 @@ func (h *UniversalQualityValidationHandler) Validate(ctx context.Context, obj ma
 			}
 
 			// Check for measured delta assertion (canonical AST/metric/execution or legacy assertion)
-			vLower := strings.ToLower(vTrim)
-			if strings.HasPrefix(vLower, "ast_semantic_match:") ||
-				strings.HasPrefix(vLower, "command_exit_code:") ||
-				strings.HasPrefix(vLower, "query_metric:") ||
-				strings.HasPrefix(vLower, "content_size_positive:") ||
-				strings.Contains(vLower, "measure") ||
-				strings.Contains(vLower, "count") ||
-				strings.Contains(vLower, "assert") {
+			if HasMeasuredDeltaAssertion(vTrim) {
 				hasMeasuredDelta = true
 			}
 		}
@@ -486,8 +479,8 @@ func (h *UniversalQualityValidationHandler) Validate(ctx context.Context, obj ma
 		if isRefactor && !hasMeasuredDelta {
 			errs = append(errs, ValidationError{
 				Field:   objects.FieldKeyCompletenessValidation,
-				Message: "Refactor or extraction criteria must assert measured deltas (e.g. file count down by N, symbol absent), not mere existence prose.",
-				Rule:    "criteria_refactor_measured_deltas",
+				Message: MsgCriteriaRefactorMeasuredDeltas,
+				Rule:    RuleCriteriaRefactorMeasuredDeltas,
 			})
 		}
 	}

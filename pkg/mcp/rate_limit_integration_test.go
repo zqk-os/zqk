@@ -15,18 +15,19 @@ func TestApplyRateLimitConfig_enabled(t *testing.T) {
 	b.config = config
 	b.ApplyRateLimitConfig()
 
-	if s.rateLimiter == nil {
+	rl := s.GetRateLimiter()
+	if rl == nil {
 		t.Fatal("expected rate limiter when enabled")
 	}
 
 	key := s.getRateLimitKey(false)
-	if !s.rateLimiter.Allow(key) {
+	if !rl.Allow(key) {
 		t.Error("first request should be allowed")
 	}
-	if !s.rateLimiter.Allow(key) {
+	if !rl.Allow(key) {
 		t.Error("second request should be allowed")
 	}
-	if s.rateLimiter.Allow(key) {
+	if rl.Allow(key) {
 		t.Error("third request should be denied")
 	}
 }
@@ -40,7 +41,7 @@ func TestApplyRateLimitConfig_disabled(t *testing.T) {
 	b.config = config
 	b.ApplyRateLimitConfig()
 
-	if s.rateLimiter != nil {
+	if s.GetRateLimiter() != nil {
 		t.Error("expected nil rate limiter when disabled")
 	}
 }
@@ -51,7 +52,7 @@ func TestApplyRateLimitConfig_nilConfig(t *testing.T) {
 	b.config = nil
 	b.ApplyRateLimitConfig()
 
-	if s.rateLimiter != nil {
+	if s.GetRateLimiter() != nil {
 		t.Error("expected nil rate limiter when config is nil")
 	}
 }

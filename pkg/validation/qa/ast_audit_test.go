@@ -206,6 +206,63 @@ func finalizeB() {}
 		}
 	})
 
+	t.Run("Closure Duplication Flagged", func(t *testing.T) {
+		code := `package sample
+
+func startWorkerOne(done func(), onPanic func(any)) {
+	go func() {
+		SetGoroutineLabel("worker_one", "processing")
+		defer done()
+		defer func() {
+			if r := recover(); r != nil {
+				handlePanic(onPanic, r)
+			}
+		}()
+		runOne()
+	}()
+}
+
+func startWorkerTwo(done func(), onPanic func(any)) {
+	go func() {
+		SetGoroutineLabel("worker_two", "processing")
+		defer done()
+		defer func() {
+			if r := recover(); r != nil {
+				handlePanic(onPanic, r)
+			}
+		}()
+		runTwo()
+	}()
+}
+
+func SetGoroutineLabel(name, purpose string) {}
+func handlePanic(onPanic func(any), r any) {}
+func runOne() {}
+func runTwo() {}
+`
+		tmpDir := t.TempDir()
+		path := filepath.Join(tmpDir, "dup_closure.go")
+		if err := fileutil.WriteStandardFile(path, []byte(code)); err != nil {
+			t.Fatalf("Failed to write file: %v", err)
+		}
+
+		violations, err := auditor.AuditFile(path)
+		if err != nil {
+			t.Fatalf("AuditFile failed: %v", err)
+		}
+
+		found := false
+		for _, v := range violations {
+			if v.Type == ViolationTypeDuplication {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Fatalf("Expected %s violation for duplicated closure statements, got: %v", ViolationTypeDuplication, violations)
+		}
+	})
+
 	t.Run("Distinct Functions Not Flagged", func(t *testing.T) {
 		code := `package sample
 
@@ -260,4 +317,50 @@ func TestAuditQASurfacesCleanliness(t *testing.T) {
 		}
 	}
 }
+
+func TestASTAuditor_MapKeyReferenceDrift(t *testing.T) {
+	t.Parallel()
+	auditor := NewASTAuditor()
+	tmpDir := t.TempDir()
+
+	code := `package sample
+
+var KnownCommands = map[string]struct{}{
+	"start":   {},
+	"stop":    {},
+	"restart": {},
+}
+
+func Handle(cmd string) string {
+	if cmd == "start" {
+		return "start"
+	}
+	if cmd == "stop" {
+		return "stop"
+	}
+	return "unknown"
+}
+`
+	path := filepath.Join(tmpDir, "sample.go")
+	if err := fileutil.WriteStandardFile(path, []byte(code)); err != nil {
+		t.Fatalf("Failed to write file: %v", err)
+	}
+
+	violations, err := auditor.AuditFile(path)
+	if err != nil {
+		t.Fatalf("AuditFile failed: %v", err)
+	}
+
+	found := false
+	for _, v := range violations {
+		if v.Type == ViolationTypeDuplication && len(v.Message) > 0 {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Fatalf("Expected map key drift violation in sample code, got: %v", violations)
+	}
+}
+
 

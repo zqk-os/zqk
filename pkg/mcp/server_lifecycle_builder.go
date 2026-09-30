@@ -17,6 +17,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
@@ -39,10 +40,16 @@ type ServerLifecycleBuilder struct {
 
 // NewServerLifecycleBuilder creates a new server lifecycle builder
 func NewServerLifecycleBuilder(server *Server) *ServerLifecycleBuilder {
+	var cfg *ServerConfig
+	if server != nil {
+		cfg = server.GetConfig()
+	}
 	return &ServerLifecycleBuilder{
 		server:      server,
+		config:      cfg,
 		reader:      bufio.NewReader(os.Stdin),
 		writer:      bufio.NewWriter(os.Stdout),
+		trace:       isMCPTraceEnabled(cfg),
 		initialized: false,
 	}
 }
@@ -56,20 +63,24 @@ func (b *ServerLifecycleBuilder) WithReaderAndWriter(r io.Reader, w io.Writer) *
 
 // LoadConfig loads and applies MCP configuration
 func (b *ServerLifecycleBuilder) LoadConfig() *ServerLifecycleBuilder {
-	config, _ := LoadMCPConfig(b.server.GetProjectRoot()) // Ignore errors - use defaults
+	config, err := LoadMCPConfig(b.server.GetProjectRoot())
+	if err != nil && b.server.getTraceWriter() != nil {
+		b.server.traceLogf("[MCP_DEBUG] LoadMCPConfig using defaults: %v", err)
+	}
 	b.config = config
-	b.server.config = config // Store config for security enforcement
+	b.server.SetConfig(config) // Store config for security enforcement
 	return b
 }
 
 // ApplyAsyncConfig applies async configuration from config file
 func (b *ServerLifecycleBuilder) ApplyAsyncConfig() *ServerLifecycleBuilder {
+	cfg := b.server.GetAsyncConfig()
 	if b.config != nil && b.config.MCPServer.Async.MaxConcurrent > 0 {
-		b.server.asyncConfig.MaxConcurrent = b.config.MCPServer.Async.MaxConcurrent
+		cfg.MaxConcurrent = b.config.MCPServer.Async.MaxConcurrent
 	}
 	if b.config != nil && b.config.MCPServer.Async.Timeout != emptyValue {
 		if timeout, err := time.ParseDuration(b.config.MCPServer.Async.Timeout); err == nil {
-			b.server.asyncConfig.Timeout = timeout
+			cfg.Timeout = timeout
 			// Log timeout configuration for debugging
 			if b.server.getTraceWriter() != nil {
 				b.server.traceLogf("[MCP_INFO] Async operation timeout configured: %v", timeout)
@@ -83,17 +94,19 @@ func (b *ServerLifecycleBuilder) ApplyAsyncConfig() *ServerLifecycleBuilder {
 	} else {
 		// Log default timeout if not configured
 		if b.server.getTraceWriter() != nil {
-			b.server.traceLogf("[MCP_DEBUG] Using default async operation timeout: %v", b.server.asyncConfig.Timeout)
+			b.server.traceLogf("[MCP_DEBUG] Using default async operation timeout: %v", cfg.Timeout)
 		}
 	}
+	b.server.SetAsyncConfig(cfg)
 	return b
 }
 
 // ApplyEventEmitterConfig applies event emitter configuration from config file
 func (b *ServerLifecycleBuilder) ApplyEventEmitterConfig() *ServerLifecycleBuilder {
 	if b.config != nil && b.config.MCPServer.Events.BufferSize > 0 {
-		if b.server.eventEmitter == nil || b.server.eventEmitter.GetBufferSize() != b.config.MCPServer.Events.BufferSize {
-			b.server.eventEmitter = NewEventEmitter(b.config.MCPServer.Events.BufferSize)
+		ee := b.server.GetEventEmitter()
+		if ee == nil || ee.GetBufferSize() != b.config.MCPServer.Events.BufferSize {
+			b.server.SetEventEmitter(NewEventEmitter(b.config.MCPServer.Events.BufferSize))
 		}
 	}
 	return b
@@ -102,24 +115,40 @@ func (b *ServerLifecycleBuilder) ApplyEventEmitterConfig() *ServerLifecycleBuild
 // ApplyRateLimitConfig applies rate limit configuration (BLI-645). When enabled, creates a fixed-window limiter.
 func (b *ServerLifecycleBuilder) ApplyRateLimitConfig() *ServerLifecycleBuilder {
 	if b.config == nil || !b.config.MCPServer.RateLimit.Enabled {
-		b.server.rateLimiter = nil
+		b.server.SetRateLimiter(nil)
 		return b
 	}
 	rpm := b.config.MCPServer.RateLimit.RequestsPerMinute
 	if rpm <= 0 {
 		rpm = 60
 	}
-	b.server.rateLimiter = circuitbreaker.NewFixedWindowLimiter(rpm, time.Minute)
+	b.server.SetRateLimiter(circuitbreaker.NewFixedWindowLimiter(rpm, time.Minute))
 	return b
 }
 
 // InitializeClientMetrics initializes client metrics store with thread-safe operations
 func (b *ServerLifecycleBuilder) InitializeClientMetrics() *ServerLifecycleBuilder {
+	b.server.compressionTickerMu.Lock()
+	defer b.server.compressionTickerMu.Unlock()
 	if b.server.clientMetricsStore == nil {
-		metricsPath := filepath.Join(b.server.GetProjectRoot(), paths.ProjectDataDir, paths.MCPDir, paths.MCPLogsDir, "client-metrics.json")
+		projectRoot := b.server.GetProjectRoot()
+		if zqkenv.IsInTest() {
+			if testRoot := zqkenv.TestRoot().Get(); testRoot != "" {
+				projectRoot = testRoot
+			} else {
+				projectRoot = filepath.Join(os.TempDir(), "zqk-mcp-test")
+			}
+		}
+		metricsPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.MCPDir, paths.MCPLogsDir, "client-metrics.json")
 		// Pass shutdown context from ProcessGroupManager for proper shutdown handling
 		shutdownCtx := b.server.processGroupManager.GetShutdownContext()
-		store, _ := NewClientMetricsStore(metricsPath, shutdownCtx) //nolint:errcheck // Metrics failures shouldn't block server startup
+		store, err := NewClientMetricsStore(metricsPath, shutdownCtx)
+		if err != nil {
+			if b.server.getTraceWriter() != nil {
+				b.server.traceLogf("[MCP_WARN] Failed to initialize client metrics: %v", err)
+			}
+			return b
+		}
 		b.server.clientMetricsStore = store
 
 		// Start save worker via ProcessGroupManager (CRITICAL - must complete saves during shutdown)
@@ -130,15 +159,9 @@ func (b *ServerLifecycleBuilder) InitializeClientMetrics() *ServerLifecycleBuild
 		ticker := store.StartPeriodicCompression(compressionCtx, DefaultMetricsCompressionInterval, DefaultMetricsRetentionPeriod)
 
 		// Thread-safe update of compression state
-		_ = concurrency.RunInLockWithLogger(
-			&b.server.compressionTickerMu, LockNameMcpServerLifecycleSetCompression, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
-			func() error {
-				b.server.compressionTicker = ticker
-				b.server.compressionCtx = compressionCtx
-				b.server.compressionCancel = compressionCancel
-				return nil
-			},
-		)
+		b.server.compressionTicker = ticker
+		b.server.compressionCtx = compressionCtx
+		b.server.compressionCancel = compressionCancel
 	}
 	return b
 }
@@ -154,13 +177,15 @@ func (b *ServerLifecycleBuilder) InitializeTraceLogging() *ServerLifecycleBuilde
 			// Closer will be handled by Cleanup
 		}
 		// Thread-safe update of trace writer
-		_ = concurrency.RunInLockWithLogger(
+		if err := concurrency.RunInLockWithLogger(
 			&b.server.traceWriterMu, LockNameMcpServerLifecycleSetTraceWriter, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 			func() error {
 				b.server.traceWriter = b.traceWriter
 				return nil
 			},
-		)
+		); err != nil && b.server.getTraceWriter() != nil {
+			b.server.traceLogf("[MCP_WARN] Failed to set trace writer: %v", err)
+		}
 
 		// Test write to verify trace file is actually writable
 		if b.traceWriter != nil && b.traceWriter != os.Stderr {
@@ -171,25 +196,29 @@ func (b *ServerLifecycleBuilder) InitializeTraceLogging() *ServerLifecycleBuilde
 				logging.Fluent(logger).Error("Trace file write test failed, falling back to stderr", err).
 					EmitComponent("mcp_trace_init").
 					Log()
-				_ = concurrency.RunInLockWithLogger(
+				if err := concurrency.RunInLockWithLogger(
 					&b.server.traceWriterMu, LockNameMcpServerLifecycleFallbackTraceWriter, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 					func() error {
 						b.server.traceWriter = os.Stderr
 						return nil
 					},
-				)
+				); err != nil {
+					logging.Fluent(logger).Warn(fmt.Sprintf("Failed to set fallback trace writer: %v", err)).Log()
+				}
 			}
 		}
 	} else {
 		// Even when trace is disabled, set stderr as the writer so traceLogf doesn't return early
 		// This ensures ERROR and WARN messages still get written to stderr
-		_ = concurrency.RunInLockWithLogger(
+		if err := concurrency.RunInLockWithLogger(
 			&b.server.traceWriterMu, LockNameMcpServerLifecycleSetStderrTrace, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 			func() error {
 				b.server.traceWriter = os.Stderr
 				return nil
 			},
-		)
+		); err != nil && b.server.getTraceWriter() != nil {
+			b.server.traceLogf("[MCP_WARN] Failed to set stderr trace: %v", err)
+		}
 	}
 	return b
 }
@@ -289,7 +318,7 @@ func (b *ServerLifecycleBuilder) SetupTransport() *ServerLifecycleBuilder {
 // SetupHandlers sets up method router and handlers with middleware
 func (b *ServerLifecycleBuilder) SetupHandlers() *ServerLifecycleBuilder {
 	router := b.server.setupHandlers()
-	asyncHandler := NewAsyncHandler(router, b.server.asyncConfig)
+	asyncHandler := NewAsyncHandler(router, b.server.GetAsyncConfig())
 
 	var handler Handler = asyncHandler
 	if b.trace {
@@ -311,9 +340,11 @@ func (b *ServerLifecycleBuilder) Build() *ServerLifecycleBuilder {
 // Cleanup performs cleanup operations (deferred from Serve)
 func (b *ServerLifecycleBuilder) Cleanup() {
 	if b.traceCloser != nil {
-		_ = b.traceCloser.Close() //nolint:errcheck
+		if closeErr := b.traceCloser.Close(); closeErr != nil && b.server.getTraceWriter() != nil {
+			b.server.traceLogf("[MCP_DEBUG] trace closer cleanup error: %v", closeErr)
+		}
 	}
-	if b.mcpCtx != nil {
+	if b.mcpCtx != nil && !b.server.multiClient.Load() {
 		b.mcpCtx.SetServing(false)
 	}
 }

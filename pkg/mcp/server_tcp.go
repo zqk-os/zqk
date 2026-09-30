@@ -42,23 +42,29 @@ func (s *Server) ServeTCP(addr string) error {
 	}
 
 	s.multiClient.Store(true)
+	s.ensureServerInitialized()
 
 	listener, err := net.Listen("tcp", addr)
 	if err != nil {
 		return errfmt.Newf("failed to listen on %s", addr).Wrap(err)
 	}
+	return s.serveListener(listener, "TCP", addr)
+}
 
+// serveListener handles accepting connections and coordinating shutdown for a network listener.
+func (s *Server) serveListener(listener net.Listener, scheme, addr string) error {
 	defer listener.Close()
 
 	if s.getTraceWriter() != nil {
-		s.traceLogf("[MCP_INFO] Listening for TCP connections on %s", addr)
+		s.traceLogf("[MCP_INFO] Listening for %s connections on %s", scheme, addr)
 	}
 
-	// Wait for shutdown to close the listener
-	goroutinelabels.NewGoroutine("mcp_tcp_shutdown", "wait for server shutdown to close TCP listener").
+	goroutinelabels.NewGoroutine("mcp_"+scheme+"_shutdown", "wait for server shutdown to close listener").
 		StartSimple(func() {
 			<-s.shutdownCtx.Done()
-			_ = listener.Close()
+			if closeErr := listener.Close(); closeErr != nil && s.getTraceWriter() != nil {
+				s.traceLogf("[MCP_DEBUG] %s listener close on shutdown: %v", scheme, closeErr)
+			}
 		})
 
 	for {
@@ -67,19 +73,18 @@ func (s *Server) ServeTCP(addr string) error {
 			if s.shutdownFlag.Load() == 1 {
 				return nil // Graceful shutdown
 			}
-			// Just log accept errors and continue
 			if s.getTraceWriter() != nil {
-				s.traceLogf("[MCP_ERROR] TCP accept error: %v", err)
+				s.traceLogf("[MCP_ERROR] %s accept error: %v", scheme, err)
 			}
 			continue
 		}
 
-		goroutinelabels.NewGoroutine("mcp_tcp_handler", "handle incoming TCP MCP connection").
+		goroutinelabels.NewGoroutine("mcp_"+scheme+"_handler", "handle incoming MCP connection").
 			StartSimple(func() {
 				defer func() {
 					if r := recover(); r != nil {
 						if s.getTraceWriter() != nil {
-							s.traceLogf("[MCP_ERROR] TCP connection handler panic (connection only): %v", r)
+							s.traceLogf("[MCP_ERROR] %s connection handler panic: %v", scheme, r)
 						}
 					}
 				}()
@@ -91,17 +96,11 @@ func (s *Server) ServeTCP(addr string) error {
 func (s *Server) handleTCPConnection(conn net.Conn) {
 	defer conn.Close()
 
-	// Build server lifecycle specifically for this connection
+	s.ensureServerInitialized()
+
+	// Build connection-scoped lifecycle specifically for this connection
 	lifecycle := NewServerLifecycleBuilder(s).
 		WithReaderAndWriter(conn, conn).
-		LoadConfig().
-		ApplyAsyncConfig().
-		ApplyEventEmitterConfig().
-		ApplyRateLimitConfig().
-		InitializeClientMetrics().
-		InitializeTraceLogging().
-		MarkServing().
-		LoadMCPSpecs().
 		SetupTransport().
 		SetupHandlers().
 		Build()
@@ -123,6 +122,16 @@ func (s *Server) handleTCPConnection(conn net.Conn) {
 	}
 }
 
+func (s *Server) prepareTLSCert(certFile, keyFile string) (tls.Certificate, error) {
+	s.multiClient.Store(true)
+	s.ensureServerInitialized()
+	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
+	if err != nil {
+		return tls.Certificate{}, errfmt.Newf("failed to load TLS key pair").Wrap(err)
+	}
+	return cert, nil
+}
+
 // ServeTLS starts the MCP server over a TLS-encrypted TCP socket
 func (s *Server) ServeTLS(addr, certFile, keyFile string) error {
 	if !IsLoopbackAddr(addr) {
@@ -131,10 +140,9 @@ func (s *Server) ServeTLS(addr, certFile, keyFile string) error {
 	if certFile == "" || keyFile == "" {
 		return errors.New("both certFile and keyFile are required for TLS")
 	}
-	s.multiClient.Store(true)
-	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
+	cert, err := s.prepareTLSCert(certFile, keyFile)
 	if err != nil {
-		return errfmt.Newf("failed to load TLS key pair").Wrap(err)
+		return err
 	}
 
 	config := &tls.Config{
@@ -146,45 +154,7 @@ func (s *Server) ServeTLS(addr, certFile, keyFile string) error {
 	if err != nil {
 		return errfmt.Newf("failed to listen on %s with TLS", addr).Wrap(err)
 	}
-
-	defer listener.Close()
-
-	if s.getTraceWriter() != nil {
-		s.traceLogf("[MCP_INFO] Listening for TLS connections on %s", addr)
-	}
-
-	// Wait for shutdown to close the listener
-	goroutinelabels.NewGoroutine("mcp_tls_shutdown", "wait for server shutdown to close TLS listener").
-		StartSimple(func() {
-			<-s.shutdownCtx.Done()
-			_ = listener.Close()
-		})
-
-	for {
-		conn, err := listener.Accept()
-		if err != nil {
-			if s.shutdownFlag.Load() == 1 {
-				return nil // Graceful shutdown
-			}
-			// Just log accept errors and continue
-			if s.getTraceWriter() != nil {
-				s.traceLogf("[MCP_ERROR] TLS accept error: %v", err)
-			}
-			continue
-		}
-
-		goroutinelabels.NewGoroutine("mcp_tls_handler", "handle incoming TLS MCP connection").
-			StartSimple(func() {
-				defer func() {
-					if r := recover(); r != nil {
-						if s.getTraceWriter() != nil {
-							s.traceLogf("[MCP_ERROR] TLS connection handler panic (connection only): %v", r)
-						}
-					}
-				}()
-				s.handleTCPConnection(conn)
-			})
-	}
+	return s.serveListener(listener, "TLS", addr)
 }
 
 // ServeMTLS starts the MCP server over a TLS-encrypted TCP socket requiring mutual authentication (mTLS)
@@ -192,10 +162,9 @@ func (s *Server) ServeMTLS(addr, certFile, keyFile, caCertFile string) error {
 	if certFile == "" || keyFile == "" || caCertFile == "" {
 		return errors.New("certFile, keyFile, and caCertFile are all required for mTLS")
 	}
-	s.multiClient.Store(true)
-	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
+	cert, err := s.prepareTLSCert(certFile, keyFile)
 	if err != nil {
-		return errfmt.Newf("failed to load TLS key pair").Wrap(err)
+		return err
 	}
 
 	caCert, err := fileutil.ReadFile(caCertFile)
@@ -219,43 +188,5 @@ func (s *Server) ServeMTLS(addr, certFile, keyFile, caCertFile string) error {
 	if err != nil {
 		return errfmt.Newf("failed to listen on %s with mTLS", addr).Wrap(err)
 	}
-
-	defer listener.Close()
-
-	if s.getTraceWriter() != nil {
-		s.traceLogf("[MCP_INFO] Listening for mTLS connections on %s", addr)
-	}
-
-	// Wait for shutdown to close the listener
-	goroutinelabels.NewGoroutine("mcp_mtls_shutdown", "wait for server shutdown to close mTLS listener").
-		StartSimple(func() {
-			<-s.shutdownCtx.Done()
-			_ = listener.Close()
-		})
-
-	for {
-		conn, err := listener.Accept()
-		if err != nil {
-			if s.shutdownFlag.Load() == 1 {
-				return nil // Graceful shutdown
-			}
-			// Just log accept errors and continue
-			if s.getTraceWriter() != nil {
-				s.traceLogf("[MCP_ERROR] mTLS accept error: %v", err)
-			}
-			continue
-		}
-
-		goroutinelabels.NewGoroutine("mcp_mtls_handler", "handle incoming mTLS MCP connection").
-			StartSimple(func() {
-				defer func() {
-					if r := recover(); r != nil {
-						if s.getTraceWriter() != nil {
-							s.traceLogf("[MCP_ERROR] mTLS connection handler panic (connection only): %v", r)
-						}
-					}
-				}()
-				s.handleTCPConnection(conn)
-			})
-	}
+	return s.serveListener(listener, "mTLS", addr)
 }

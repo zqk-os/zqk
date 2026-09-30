@@ -48,15 +48,6 @@ func NewShellPeerWakeAdapterWithFallback(fallback PeerWakeAdapter) *ShellPeerWak
 	}
 }
 
-// NewShellPeerWakeAdapterWithFallback returns a shell membrane adapter with a fallback adapter for missing scripts.
-func NewShellPeerWakeAdapterWithFallback(fallback PeerWakeAdapter) *ShellPeerWakeAdapter {
-	return &ShellPeerWakeAdapter{
-		WorkerScript:      shellWakeWorkerScript,
-		CoordinatorScript: shellWakeCoordinatorScript,
-		Fallback:          fallback,
-	}
-}
-
 // Wake implements PeerWakeAdapter.
 func (a *ShellPeerWakeAdapter) Wake(ctx context.Context, req PeerWakeRequest) (PeerWakeAdapterResult, error) {
 	if a == nil {

@@ -1,0 +1,203 @@
+  <header>
+    <div class="brand">
+      <span class="brand-icon">⚡</span>
+      <h1>ZQK Knowledge Kernel Visual Studio</h1>
+    </div>
+
+    <!-- View Mode Switcher -->
+    <div class="view-switcher">
+      <div class="view-tab active" id="tab-nav-dag" onclick="switchMainView('dag')">☊ DAG Graph</div>
+      <div class="view-tab" id="tab-nav-gantt" onclick="switchMainView('gantt')">▤ Timeline & Gantt</div>
+    </div>
+
+    <div class="header-controls">
+      <!-- Workstream Filter Dropdown -->
+      <select id="workstream-filter" class="select-input" onchange="onWorkstreamChange()" title="Filter by Workstream">
+        <option value="all">🌐 All Workstreams</option>
+      </select>
+
+      <!-- Density Filter -->
+      <select id="density-filter" class="select-input" onchange="onDensityChange()" title="Control Graph Density">
+        <option value="backbone">Backbone (Plans & Milestones)</option>
+        <option value="execution" selected>Execution (+ Backlog Items)</option>
+        <option value="all">Full Mesh (All Objects)</option>
+      </select>
+
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="global-search" class="search-input" placeholder="Search (press /) ...">
+      </div>
+
+      <div class="status-pill" id="live-indicator">
+        <span class="pulse-dot"></span>
+        <span>Connected</span>
+      </div>
+
+      <button class="btn" id="btn-refresh" onclick="loadDAG()">⟳ Refresh</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- View 1: Interactive DAG Graph -->
+    <div class="content-view active" id="view-dag">
+      <div class="panel-graph" id="graph-panel">
+        <div class="panel-header" style="display:none;" id="dag-panel-title">Interactive Knowledge Graph DAG</div>
+
+        <!-- Zoom Controls -->
+        <div class="graph-toolbar">
+          <button class="btn" onclick="zoomIn()" title="Zoom In">+</button>
+          <button class="btn" onclick="zoomOut()" title="Zoom Out">-</button>
+          <button class="btn" onclick="resetZoom()" title="Reset Zoom">⟲</button>
+          <button class="btn" onclick="fitGraph()" title="Fit to Screen">⛶</button>
+        </div>
+
+        <!-- Focus Subgraph Banner -->
+        <div id="focus-banner" class="focus-banner" style="display:none;">
+          <span id="focus-banner-text">🎯 Focused Subgraph: </span>
+          <button class="btn btn-sm btn-accent" onclick="clearFocus()">✕ Show All</button>
+        </div>
+
+        <!-- Kind Filter Chips -->
+        <div class="filter-bar" id="kind-filters">
+          <span class="filter-chip active" data-kind="all" onclick="filterKind('all')">All</span>
+          <span class="filter-chip" data-kind="workstream" onclick="filterKind('workstream')">Workstreams</span>
+          <span class="filter-chip" data-kind="goal" onclick="filterKind('goal')">Goals</span>
+          <span class="filter-chip" data-kind="priority_plan" onclick="filterKind('priority_plan')">Plans</span>
+          <span class="filter-chip" data-kind="milestone" onclick="filterKind('milestone')">Milestones</span>
+          <span class="filter-chip" data-kind="backlog_item" onclick="filterKind('backlog_item')">BLIs</span>
+        </div>
+
+        <svg id="dag-svg" class="graph-canvas">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#484f58" />
+            </marker>
+            <marker id="arrow-highlight" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#58a6ff" />
+            </marker>
+          </defs>
+          <g id="viewport">
+            <g id="edges-layer"></g>
+            <g id="nodes-layer"></g>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <!-- View 2: Timeline & Gantt View -->
+    <div class="content-view" id="view-gantt">
+      <div class="gantt-container">
+        <!-- Gantt Sub-Toolbar -->
+        <div class="gantt-toolbar">
+          <div class="gantt-filter-group">
+            <span class="gantt-toolbar-label">Status:</span>
+            <button class="gantt-filter-pill active" id="gantt-pill-all" onclick="setGanttStatusFilter('all')">All</button>
+            <button class="gantt-filter-pill" id="gantt-pill-active" onclick="setGanttStatusFilter('active')">In Progress</button>
+            <button class="gantt-filter-pill" id="gantt-pill-planned" onclick="setGanttStatusFilter('planned')">Planned</button>
+            <button class="gantt-filter-pill" id="gantt-pill-done" onclick="setGanttStatusFilter('done')">Completed</button>
+          </div>
+          <div class="gantt-filter-group">
+            <span class="gantt-toolbar-label">Grouping:</span>
+            <select id="gantt-grouping" class="select-input" onchange="renderGantt()">
+              <option value="workstream">By Workstream</option>
+              <option value="plan">By Priority Plan</option>
+              <option value="flat">Flat (Chronological)</option>
+            </select>
+          </div>
+          <div style="flex: 1;"></div>
+          <span id="gantt-task-count" style="font-size: 11px; color: var(--text-muted); font-weight: 500;">0 items</span>
+        </div>
+
+        <!-- Gantt Legend Bar -->
+        <div class="gantt-legend-bar">
+          <span class="gantt-legend-title">Legend:</span>
+          <div class="gantt-legend-items">
+            <div class="gantt-legend-item">
+              <span class="gantt-legend-icon" style="color: #f0883e;">◆</span>
+              <span class="gantt-legend-swatch gantt-bar-milestone"></span>
+              <span class="gantt-legend-text">Milestone</span>
+            </div>
+            <div class="gantt-legend-item">
+              <span class="gantt-legend-icon" style="color: #58a6ff;">🌐</span>
+              <span class="gantt-legend-swatch gantt-bar-workstream"></span>
+              <span class="gantt-legend-text">Workstream</span>
+            </div>
+            <div class="gantt-legend-item">
+              <span class="gantt-legend-icon" style="color: #58a6ff;">▶</span>
+              <span class="gantt-legend-swatch gantt-bar-inprogress"></span>
+              <span class="gantt-legend-text">In Progress</span>
+            </div>
+            <div class="gantt-legend-item">
+              <span class="gantt-legend-icon" style="color: #8b949e;">⏳</span>
+              <span class="gantt-legend-swatch gantt-bar-planned"></span>
+              <span class="gantt-legend-text">Planned</span>
+            </div>
+            <div class="gantt-legend-item">
+              <span class="gantt-legend-icon" style="color: #3fb950;">✓</span>
+              <span class="gantt-legend-swatch gantt-bar-complete"></span>
+              <span class="gantt-legend-text">Completed</span>
+            </div>
+            <div class="gantt-legend-item">
+              <span class="gantt-legend-icon" style="color: #bc8cff;">⚙</span>
+              <span class="gantt-legend-swatch gantt-bar-testing"></span>
+              <span class="gantt-legend-text">Testing</span>
+            </div>
+            <div class="gantt-legend-item">
+              <span class="gantt-legend-today-line"></span>
+              <span class="gantt-legend-text" style="color: #f85149; font-weight: 600;">Today Line</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="gantt-header-row">
+          <div class="gantt-header-title">
+            <span>Work Item Hierarchy</span>
+          </div>
+          <div class="gantt-timeline-ticks" id="gantt-timeline-ticks">
+            <!-- Dynamic date ticks -->
+          </div>
+        </div>
+        <div class="gantt-body" id="gantt-body">
+          <!-- Dynamic grouped rows -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Multi-Tab Sidebar (Shared) -->
+    <div class="sidebar-panel">
+      <div class="tab-bar">
+        <div class="tab-btn active" id="tab-btn-inspector" onclick="switchTab('inspector')">Inspector</div>
+        <div class="tab-btn" id="tab-btn-objects" onclick="switchTab('objects')">Kernel Objects (<span id="objects-count">0</span>)</div>
+        <div class="tab-btn" id="tab-btn-inbox" onclick="switchTab('inbox')">Inbox (<span id="inbox-count">0</span>)</div>
+      </div>
+
+      <!-- Tab 1: Selected Object Inspector -->
+      <div class="tab-content active" id="tab-inspector">
+        <div id="inspector-content">
+          <div class="empty-state">
+            <div class="empty-state-icon">🎯</div>
+            <div class="empty-state-title">No Object Selected</div>
+            <div style="font-size: 12px; margin-top: 4px;">Click any item in the DAG or Gantt timeline to inspect its causal dependencies.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Kernel Objects List -->
+      <div class="tab-content" id="tab-objects">
+        <div id="objects-list-container">
+          <div style="padding: 16px; color: var(--text-muted);">Loading objects...</div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Swarm & Operator Inbox -->
+      <div class="tab-content" id="tab-inbox">
+        <div style="padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border);">
+          <span style="font-weight: 600; font-size: 13px;">Agent & Operator Inbox</span>
+          <button class="btn btn-sm" onclick="fetchInbox()">↻ Refresh</button>
+        </div>
+        <div id="inbox-list-container" style="overflow-y: auto; max-height: calc(100vh - 180px); padding: 8px;">
+          <div style="padding: 16px; color: var(--text-muted);">Loading inbox...</div>
+        </div>
+      </div>
+    </div>
+  </main>

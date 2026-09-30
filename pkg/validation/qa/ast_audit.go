@@ -38,6 +38,8 @@ func (a *ASTAuditor) AuditFile(path string) ([]Violation, error) {
 
 	var violations []Violation
 	var funcs []*ast.FuncDecl
+	var callables []CallableBlock
+	var currentFunc string
 
 	ast.Inspect(node, func(n ast.Node) bool {
 		switch x := n.(type) {
@@ -72,9 +74,30 @@ func (a *ASTAuditor) AuditFile(path string) ([]Violation, error) {
 			violations = append(violations, a.auditHardcodedValues(x)...)
 
 		case *ast.FuncDecl:
+			currentFunc = x.Name.Name
 			funcs = append(funcs, x)
+			if x.Body != nil {
+				callables = append(callables, CallableBlock{
+					Name: x.Name.Name,
+					Pos:  a.fset.Position(x.Pos()),
+					Body: x.Body,
+				})
+			}
 			violations = append(violations, a.auditInterfaceUsage(x)...)
 			violations = append(violations, a.auditFunctionComplexity(x)...)
+
+		case *ast.FuncLit:
+			if x.Body != nil {
+				closureName := fmt.Sprintf("closure at L%d", a.fset.Position(x.Pos()).Line)
+				if currentFunc != "" {
+					closureName = fmt.Sprintf("closure in %s at L%d", currentFunc, a.fset.Position(x.Pos()).Line)
+				}
+				callables = append(callables, CallableBlock{
+					Name: closureName,
+					Pos:  a.fset.Position(x.Pos()),
+					Body: x.Body,
+				})
+			}
 
 		case *ast.IfStmt:
 			// Rule: Map extraction boilerplate.
@@ -86,8 +109,11 @@ func (a *ASTAuditor) AuditFile(path string) ([]Violation, error) {
 		return true
 	})
 
-	// Rule: Structural statement-sequence and function-body duplication checking.
-	violations = append(violations, a.auditStructuralDuplication(funcs)...)
+	// Rule: Structural statement-sequence and function-body duplication checking across functions and closures.
+	violations = append(violations, a.auditStructuralDuplication(callables)...)
+
+	// Rule: Duplication and drift risk from repeated individual checks against package-level map keys.
+	violations = append(violations, a.auditMapKeyReferenceDrift(node)...)
 
 	return violations, nil
 }

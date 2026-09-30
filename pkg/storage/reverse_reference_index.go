@@ -301,11 +301,8 @@ func (r *ReverseReferenceIndex) UpdateReferences(objectID string, oldRefs, newRe
 			r.index = make(map[string][]string)
 		}
 		if r.forwardIndex == nil {
-				r.forwardIndex = make(map[string][]string)
-			}
-			if r.forwardIndex == nil {
-				r.forwardIndex = make(map[string][]string)
-			}
+			r.forwardIndex = make(map[string][]string)
+		}
 
 			for _, oldRef := range oldRefs {
 				if oldRef != emptyValue {

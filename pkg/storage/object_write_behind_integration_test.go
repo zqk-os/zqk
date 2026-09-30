@@ -159,6 +159,7 @@ func TestWriteBehind_DisabledWhenPrivilegedWriterDaemon(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv(zqkenv.TestRoot().Name(), tmpDir)
 	t.Setenv(zqkenv.IsDaemon().Name(), "1")
+	setPrivilegedWriterCommandArgs(t, []string{"zqk-stable", "object", "daemon"})
 	t.Cleanup(func() {
 		if err := RunProjectTestTeardown(TempProjectTeardown(tmpDir, nil)); err != nil {
 			t.Logf("project test teardown: %v", err)

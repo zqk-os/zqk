@@ -104,6 +104,7 @@ func TestWriteCASThroughMembrane_DaemonWritesLocally(t *testing.T) {
 	t.Setenv(zqkenv.TestAllowCASFallthrough().Name(), "0")
 	t.Setenv(zqkenv.IsDaemon().Name(), "1")
 	t.Setenv(zqkenv.PrivilegedWriterSocket().Name(), zqkenv.UnreachableTestSocketPath())
+	setPrivilegedWriterCommandArgs(t, []string{"zqk-stable", "object", "daemon"})
 
 	called := false
 	err := writeCASThroughMembrane(context.Background(), "ID-123", "test_kind", []byte("data"), false, func() error {

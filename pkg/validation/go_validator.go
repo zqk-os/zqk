@@ -97,7 +97,7 @@ func (gv *GoValidator) SupportsFeature(feature string) bool {
 	switch feature {
 	case goValidatorFeatureLifecycle():
 		return true
-	case ConstMagicExtracted_15:
+	case "semantic_types":
 		return true
 	case "custom_rules":
 		return true
@@ -111,7 +111,7 @@ func (gv *GoValidator) SupportsFeature(feature string) bool {
 // Validate validates an object instance (implements Validator interface)
 func (gv *GoValidator) Validate(ctx context.Context, obj map[string]any, kind string, options *ValidationOptions) (*ValidationResult, error) {
 	if obj == nil {
-		return nil, errfmt.Errorf(ConstMagic437c4f93, kind)
+		return nil, errfmt.Errorf("validation failed: object map is nil for kind %s", kind)
 	}
 	if options == nil {
 		options = DefaultValidationOptions()
@@ -129,7 +129,7 @@ func (gv *GoValidator) Validate(ctx context.Context, obj map[string]any, kind st
 	}
 
 	if options.ProgressCallback != nil {
-		options.ProgressCallback("spec", ConstMagic47c83337)
+		options.ProgressCallback("spec", "Validating schema")
 	}
 
 	gv.applySpecDefaults(obj, spec)
@@ -173,7 +173,7 @@ func (gv *GoValidator) Validate(ctx context.Context, obj map[string]any, kind st
 	}
 
 	if options.ProgressCallback != nil && options.ValidateLifecycle {
-		options.ProgressCallback(goValidatorFeatureLifecycle(), ConstMagicb527a8b4)
+		options.ProgressCallback(goValidatorFeatureLifecycle(), "Validating lifecycle")
 	}
 
 	gv.validateLifecycleAndDynamicRules(ctx, obj, kind, options, result)
@@ -192,14 +192,14 @@ func (gv *GoValidator) loadSpecForValidation(obj map[string]any, kind string) (*
 	if schemaVersion := objects.GetString(obj, objects.FieldKeySchemaVersion); schemaVersion != emptyValue {
 		spec, err := gv.specLoader.LoadSpecByVersion(kind, schemaVersion)
 		if err != nil {
-			return nil, errfmt.Errorf(ConstMagic129864b4, kind, schemaVersion, err)
+			return nil, errfmt.Errorf("failed to load spec (shape) for kind %s version %s (builder registry may not be configured or builder not found): %w", kind, schemaVersion, err)
 		}
 		return spec, nil
 	}
 	specFile := kind + ".yaml"
 	spec, err := gv.specLoader.LoadSpecWithInheritance(specFile)
 	if err != nil {
-		return nil, errfmt.Errorf(ConstMagic114b8c13, kind, err)
+		return nil, errfmt.Errorf("failed to load spec (shape) for kind %s: %w", kind, err)
 	}
 	if _, has := obj[objects.FieldKeySchemaVersion]; !has && spec.SchemaVersion != emptyValue {
 		obj[objects.FieldKeySchemaVersion] = spec.SchemaVersion
@@ -379,7 +379,7 @@ func (gv *GoValidator) validateRequired(fieldName string, fieldValue any, exists
 	if err != nil {
 		// Preserve debug message format for specific fields
 		if fieldName == "category" || fieldName == "body" {
-			err.Message = fmt.Sprintf(ConstMagic746cc772, fieldName, exists, fieldValue, fieldValue)
+			err.Message = fmt.Sprintf("Field %s is required (minCount: 1) (exists: %v, value: %v, type: %T)", fieldName, exists, fieldValue, fieldValue)
 		}
 	}
 	return err
@@ -398,7 +398,7 @@ func (gv *GoValidator) validateDatatypeConstraint(fieldName string, fieldValue a
 
 	return &ValidationError{
 		Field:   fieldName,
-		Message: fmt.Sprintf(ConstMagic0d6f86dc, fieldName, fieldType, fieldValue),
+		Message: fmt.Sprintf("Field %s has invalid datatype: expected %s, got %T", fieldName, fieldType, fieldValue),
 		Rule:    "datatype",
 	}
 }
@@ -435,14 +435,14 @@ func (gv *GoValidator) validatePatternConstraint(fieldName string, fieldValue an
 		if err != nil {
 			return &ValidationError{
 				Field:   fieldName,
-				Message: fmt.Sprintf(ConstMagic43850ada, err),
+				Message: fmt.Sprintf("ID validation failed: %v", err),
 				Rule:    "pattern",
 			}, nil
 		}
 		if !valid {
 			return &ValidationError{
 				Field:   fieldName,
-				Message: fmt.Sprintf(ConstMagicd9b56a88, fieldName, kind),
+				Message: fmt.Sprintf("Field %s does not match ID pattern for kind %s", fieldName, kind),
 				Rule:    "pattern",
 			}, nil
 		}
@@ -455,7 +455,7 @@ func (gv *GoValidator) validatePatternConstraint(fieldName string, fieldValue an
 	if err != nil {
 		return nil, &ValidationWarning{
 			Field:   fieldName,
-			Message: fmt.Sprintf(ConstMagic1e0005e2, err),
+			Message: fmt.Sprintf("Invalid pattern in spec: %v", err),
 			Rule:    "pattern",
 		}
 	}
@@ -466,7 +466,7 @@ func (gv *GoValidator) validatePatternConstraint(fieldName string, fieldValue an
 
 	return &ValidationError{
 		Field:   fieldName,
-		Message: fmt.Sprintf(ConstMagic3bddafa1, fieldName, pattern),
+		Message: fmt.Sprintf("Field %s does not match pattern %s", fieldName, pattern),
 		Rule:    "pattern",
 	}, nil
 }
@@ -513,7 +513,7 @@ func (gv *GoValidator) validateMinLength(fieldName string, fieldValue any, minLe
 		if len(strValue) < minLength {
 			return &ValidationError{
 				Field:   fieldName,
-				Message: fmt.Sprintf(ConstMagic8701add6, fieldName, minLength),
+				Message: fmt.Sprintf("Field %s is too short: minimum length is %d", fieldName, minLength),
 				Rule:    "minLength",
 			}
 		}
@@ -525,7 +525,7 @@ func (gv *GoValidator) validateMinLength(fieldName string, fieldValue any, minLe
 		if val.Len() < minLength {
 			return &ValidationError{
 				Field:   fieldName,
-				Message: fmt.Sprintf(ConstMagic3a6e0a00, fieldName, minLength, val.Len()),
+				Message: fmt.Sprintf("Field %s requires at least %d items, got %d", fieldName, minLength, val.Len()),
 				Rule:    "minLength",
 			}
 		}
@@ -540,7 +540,7 @@ func (gv *GoValidator) validateMaxLength(fieldName string, fieldValue any, maxLe
 		if len(strValue) > maxLength {
 			return &ValidationError{
 				Field:   fieldName,
-				Message: fmt.Sprintf(ConstMagic7ae21f80, fieldName, maxLength),
+				Message: fmt.Sprintf("Field %s is too long: maximum length is %d", fieldName, maxLength),
 				Rule:    "maxLength",
 			}
 		}
@@ -552,7 +552,7 @@ func (gv *GoValidator) validateMaxLength(fieldName string, fieldValue any, maxLe
 		if val.Len() > maxLength {
 			return &ValidationError{
 				Field:   fieldName,
-				Message: fmt.Sprintf(ConstMagic2c58178b, fieldName, maxLength, val.Len()),
+				Message: fmt.Sprintf("Field %s exceeds maximum of %d items, got %d", fieldName, maxLength, val.Len()),
 				Rule:    "maxLength",
 			}
 		}
@@ -567,7 +567,7 @@ func (gv *GoValidator) validateDisplayLength(fieldName string, fieldValue any, v
 	const defaultDisplayLength = 50 // Default display length when not specified in spec
 
 	var displayLength int
-	switch dl := validation[ConstMagicExtracted_16].(type) {
+	switch dl := validation["display_length"].(type) {
 	case int:
 		displayLength = dl
 	case float64:
@@ -589,8 +589,8 @@ func (gv *GoValidator) validateDisplayLength(fieldName string, fieldValue any, v
 
 	return &ValidationWarning{
 		Field:   fieldName,
-		Message: fmt.Sprintf(ConstMagiceeea6b95, fieldName, len(strValue), displayLength),
-		Rule:    ConstMagicExtracted_16,
+		Message: fmt.Sprintf("Field %s value length (%d) exceeds display_length constraint (%d) - may be truncated in table displays", fieldName, len(strValue), displayLength),
+		Rule:    "display_length",
 	}
 }
 
@@ -620,7 +620,7 @@ func (gv *GoValidator) validateSemanticTypeConstraint(fieldName string, fieldVal
 	if err := gv.validateSemanticType(fieldName, fieldValue, semanticType, validationType); err != nil {
 		return &ValidationWarning{
 			Field:   fieldName,
-			Message: fmt.Sprintf(ConstMagic8d32cf06, err),
+			Message: fmt.Sprintf("Semantic type validation: %v", err),
 			Rule:    "semantic_type",
 		}
 	}
@@ -696,7 +696,7 @@ func (gv *GoValidator) validateSemanticTypeItem(_ string, value any, semanticTyp
 	// Use ontology registry for validation
 	registry := GetGlobalOntologyRegistry()
 	if err := registry.ValidateSemanticType(value, semanticType); err != nil {
-		return errfmt.Newf(ConstMagic83f17821).Wrap(err)
+		return errfmt.Newf("ontology validation failed").Wrap(err)
 	}
 
 	return nil
@@ -718,7 +718,7 @@ func (gv *GoValidator) validateLifecycleState(ctx context.Context, kind, status,
 		// If lifecycle file doesn't exist, that's OK - just warn
 		warnings = append(warnings, ValidationWarning{
 			Field:   objects.FieldKeyStatus,
-			Message: fmt.Sprintf(ConstMagic55f76aa6, err),
+			Message: fmt.Sprintf("Could not validate lifecycle: %v", err),
 			Rule:    validationRuleLifecycle(),
 		})
 		return errors, warnings
@@ -727,7 +727,7 @@ func (gv *GoValidator) validateLifecycleState(ctx context.Context, kind, status,
 	if !valid {
 		errors = append(errors, ValidationError{
 			Field:   objects.FieldKeyStatus,
-			Message: fmt.Sprintf(ConstMagicc9d3d02d, status, kind),
+			Message: fmt.Sprintf("Invalid lifecycle status '%s' for kind '%s'", status, kind),
 			Rule:    validationRuleLifecycle(),
 		})
 		return errors, warnings
@@ -747,7 +747,7 @@ func (gv *GoValidator) validateLifecycleState(ctx context.Context, kind, status,
 				// Transition validation error
 				errors = append(errors, ValidationError{
 					Field:   objects.FieldKeyStatus,
-					Message: fmt.Sprintf(ConstMagic655b306b, err),
+					Message: fmt.Sprintf("Invalid lifecycle transition: %v", err),
 					Rule:    validationRuleLifecycle(),
 				})
 				return errors, warnings
@@ -756,7 +756,7 @@ func (gv *GoValidator) validateLifecycleState(ctx context.Context, kind, status,
 			if !validTransition {
 				errors = append(errors, ValidationError{
 					Field:   objects.FieldKeyStatus,
-					Message: fmt.Sprintf(ConstMagicd7b84ef1, currentState, status, kind),
+					Message: fmt.Sprintf("Invalid lifecycle transition from '%s' to '%s' for kind '%s'", currentState, status, kind),
 					Rule:    validationRuleLifecycle(),
 				})
 				return errors, warnings
@@ -798,10 +798,10 @@ func (gv *GoValidator) appendUnmetLifecyclePreconditions(
 	}
 	var preconditions []string
 	var err error
-	msgFmt := ConstMagica2dc9a5c
+	msgFmt := "Precondition not met for transition to '%s' (Required: %s)"
 	if statusHolds {
 		preconditions, err = gv.lifecycleLoader.GetStatusPreconditions(kind, status)
-		msgFmt = ConstMagica962242b
+		msgFmt = "Precondition not met for status '%s' (Required: %s)"
 	} else {
 		preconditions, err = gv.lifecycleLoader.GetTransitionPreconditions(kind, currentState, status)
 	}

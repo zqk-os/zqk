@@ -50,6 +50,7 @@ type Server struct {
 	// CLI bridge support
 	rootCommand             any                              // *cobra.Command (avoid import cycle)
 	inProcessCLIRunner      InProcessCLIRunner               // optional: run CLI in-process via dispatch (no subprocess)
+	secCtxMu                sync.RWMutex
 	secCtx                  any                              // *pkgctx.SecurityContext (avoid import cycle)
 	requestsHandledTotal    atomic.Int64                     // Total requests handled by server
 	serverErrorsTotal       atomic.Int64                     // Total server errors encountered
@@ -59,9 +60,11 @@ type Server struct {
 	// Active serving state tracking removed - no longer needed
 	// Async operation management
 	operationTracker *OperationTracker
+	asyncConfigMu    sync.RWMutex
 	asyncConfig      AsyncHandlerConfig
 	// Security configuration
-	config *ServerConfig
+	configMu sync.RWMutex
+	config   *ServerConfig
 	// Permission cache for spec-based access control
 	permissionCache any // *PermissionCache (avoid import cycle)
 	// Spec access control for format permission checking
@@ -71,7 +74,8 @@ type Server struct {
 	// Allowed formats for this client (restricts output format)
 	allowedFormats []string // Formats this client is allowed to use (empty = all allowed)
 	// Event emitter for notifications/subscriptions
-	eventEmitter *EventEmitter
+	eventEmitterMu sync.RWMutex
+	eventEmitter   *EventEmitter
 	// Transport context for event notifications (set during Serve)
 	transportWriter *bufio.Writer
 	transportFormat *MessageFormat
@@ -122,7 +126,8 @@ type Server struct {
 	// MCP protocol metrics
 	mcpMetrics *MCPMetrics
 	// Rate limiter for request throttling (BLI-645); nil when disabled
-	rateLimiter interface{ Allow(key string) bool }
+	rateLimiterMu sync.RWMutex
+	rateLimiter   interface{ Allow(key string) bool }
 	// Process group manager for tracking and controlling all goroutines and subprocesses
 	// This ensures all spawned processes can be tracked and controlled during shutdown
 	processGroupManager *ProcessGroupManager
@@ -135,6 +140,8 @@ type Server struct {
 	mcpSpecProvenance string
 	mcpSpecConfigured atomic.Int32
 	mcpSpecDefault    atomic.Int32
+
+	serverInitOnce sync.Once
 }
 
 // GetServerStats returns lifetime counters for requests handled, server errors, and shutdowns initiated.
@@ -216,9 +223,18 @@ func NewServer() *Server {
 	return server
 }
 
-// SetAsyncConfig configures async operation handling
+// SetAsyncConfig configures async operation handling (thread-safe)
 func (s *Server) SetAsyncConfig(config AsyncHandlerConfig) {
+	s.asyncConfigMu.Lock()
+	defer s.asyncConfigMu.Unlock()
 	s.asyncConfig = config
+}
+
+// GetAsyncConfig returns the async operation configuration (thread-safe)
+func (s *Server) GetAsyncConfig() AsyncHandlerConfig {
+	s.asyncConfigMu.RLock()
+	defer s.asyncConfigMu.RUnlock()
+	return s.asyncConfig
 }
 
 // SetRootCommand sets the root CLI command for automatic tool discovery
@@ -244,14 +260,46 @@ func (s *Server) GetInProcessCLIRunner() InProcessCLIRunner {
 	return s.inProcessCLIRunner
 }
 
-// GetEventEmitter returns the server's event emitter
+// GetEventEmitter returns the server's event emitter (thread-safe)
 func (s *Server) GetEventEmitter() *EventEmitter {
+	s.eventEmitterMu.RLock()
+	defer s.eventEmitterMu.RUnlock()
 	return s.eventEmitter
 }
 
-// SetSecurityContext sets the security context for permission-based tool filtering
+// SetEventEmitter sets the server's event emitter (thread-safe)
+func (s *Server) SetEventEmitter(ee *EventEmitter) {
+	s.eventEmitterMu.Lock()
+	defer s.eventEmitterMu.Unlock()
+	s.eventEmitter = ee
+}
+
+// GetRateLimiter returns the rate limiter (thread-safe)
+func (s *Server) GetRateLimiter() interface{ Allow(key string) bool } {
+	s.rateLimiterMu.RLock()
+	defer s.rateLimiterMu.RUnlock()
+	return s.rateLimiter
+}
+
+// SetRateLimiter sets the rate limiter (thread-safe)
+func (s *Server) SetRateLimiter(rl interface{ Allow(key string) bool }) {
+	s.rateLimiterMu.Lock()
+	defer s.rateLimiterMu.Unlock()
+	s.rateLimiter = rl
+}
+
+// SetSecurityContext sets the security context for permission-based tool filtering (thread-safe)
 func (s *Server) SetSecurityContext(secCtx any) {
+	s.secCtxMu.Lock()
+	defer s.secCtxMu.Unlock()
 	s.secCtx = secCtx
+}
+
+// GetSecurityContext returns the security context (thread-safe)
+func (s *Server) GetSecurityContext() any {
+	s.secCtxMu.RLock()
+	defer s.secCtxMu.RUnlock()
+	return s.secCtx
 }
 
 // SetStorageProvider sets the storage provider for loading MCP specs from system objects
@@ -288,9 +336,9 @@ func (s *Server) getClientIDWithRole() string {
 
 	// Get roles from security context
 	var roles []string
-	if s.secCtx != nil {
-		if secCtx, ok := s.secCtx.(interface{ GetRoles() []string }); ok {
-			roles = secCtx.GetRoles()
+	if secCtx := s.GetSecurityContext(); secCtx != nil {
+		if sc, ok := secCtx.(interface{ GetRoles() []string }); ok {
+			roles = sc.GetRoles()
 		}
 	}
 
@@ -309,10 +357,11 @@ func (s *Server) getRateLimitKey(perAccount bool) string {
 	if !perAccount {
 		return "global"
 	}
-	if s.secCtx == nil {
+	secCtx := s.GetSecurityContext()
+	if secCtx == nil {
 		return "global"
 	}
-	if sc, ok := s.secCtx.(*pkgctx.SecurityContext); ok && sc.AccountID != emptyValue {
+	if sc, ok := secCtx.(*pkgctx.SecurityContext); ok && sc.AccountID != emptyValue {
 		return sc.AccountID
 	}
 	return "global"
@@ -322,10 +371,11 @@ func (s *Server) getRateLimitKey(perAccount bool) string {
 // if no security context is set. Used by chat and audit tools to stamp agent
 // identity on events.
 func (s *Server) GetCallerAccountID() string {
-	if s.secCtx == nil {
+	secCtx := s.GetSecurityContext()
+	if secCtx == nil {
 		return ""
 	}
-	if sc, ok := s.secCtx.(*pkgctx.SecurityContext); ok && sc.AccountID != emptyValue {
+	if sc, ok := secCtx.(*pkgctx.SecurityContext); ok && sc.AccountID != emptyValue {
 		return sc.AccountID
 	}
 	return ""
@@ -342,6 +392,8 @@ func (s *Server) SetTraceWriter(w io.Writer) {
 // SetConfig sets the MCP server configuration and applies resource URI scheme rules
 // This should be called before BootstrapCLITools() to ensure proper filtering
 func (s *Server) SetConfig(config *ServerConfig) {
+	s.configMu.Lock()
+	defer s.configMu.Unlock()
 	s.config = config
 
 	// Update resource URI scheme resolver with config rules
@@ -349,6 +401,20 @@ func (s *Server) SetConfig(config *ServerConfig) {
 		s.resourceURISchemeResolver = NewResourceURISchemeResolverFromConfig(config)
 		s.maxClients = config.MCPServer.MaxClients // 0 = unlimited
 	}
+}
+
+// GetConfig returns the MCP server configuration (thread-safe)
+func (s *Server) GetConfig() *ServerConfig {
+	s.configMu.RLock()
+	defer s.configMu.RUnlock()
+	return s.config
+}
+
+// GetClientMetricsStore returns the client metrics store (thread-safe)
+func (s *Server) GetClientMetricsStore() *ClientMetricsStore {
+	s.compressionTickerMu.Lock()
+	defer s.compressionTickerMu.Unlock()
+	return s.clientMetricsStore
 }
 
 // SetProjectRoot sets the project root for CLI command execution
@@ -376,7 +442,7 @@ func (s *Server) GetCliInitializationContext() *pkgctx.CliInitializationContext 
 // GetProjectRoot returns the project root from the initialization context
 // Always returns a valid value (never empty, defaults to ".")
 func (s *Server) GetProjectRoot() string {
-	if s.initCtx != nil {
+	if s != nil && s.initCtx != nil {
 		return s.initCtx.GetProjectRoot()
 	}
 	return "." // Default fallback
@@ -470,19 +536,30 @@ func (s *Server) HandleToolCall(ctx context.Context, name string, args map[strin
 	return res, err
 }
 
+// ensureServerInitialized performs server-level lifecycle setup once per server instance.
+// This loads configuration, specs, metrics store, and trace logging safely without per-connection races.
+func (s *Server) ensureServerInitialized() {
+	s.serverInitOnce.Do(func() {
+		NewServerLifecycleBuilder(s).
+			LoadConfig().
+			ApplyAsyncConfig().
+			ApplyEventEmitterConfig().
+			ApplyRateLimitConfig().
+			InitializeClientMetrics().
+			InitializeTraceLogging().
+			MarkServing().
+			LoadMCPSpecs().
+			Build()
+	})
+}
+
 // Serve starts the MCP server and handles requests from stdin
 // The server will gracefully shutdown if the context is cancelled (e.g., due to idle timeout)
 func (s *Server) Serve() error {
-	// Build server lifecycle using builder pattern
+	s.ensureServerInitialized()
+
+	// Build connection-scoped lifecycle for stdio
 	lifecycle := NewServerLifecycleBuilder(s).
-		LoadConfig().
-		ApplyAsyncConfig().
-		ApplyEventEmitterConfig().
-		ApplyRateLimitConfig().
-		InitializeClientMetrics().
-		InitializeTraceLogging().
-		MarkServing().
-		LoadMCPSpecs().
 		SetupTransport().
 		SetupHandlers().
 		Build()
@@ -577,7 +654,8 @@ func (s *Server) ClearCurrentSessionID() {
 
 // recordClientEvent records a client sequence event for metrics
 func (s *Server) recordClientEvent(sequenceID, clientID, eventType string, fields map[string]any) {
-	if s.clientMetricsStore == nil {
+	store := s.GetClientMetricsStore()
+	if store == nil {
 		return // Metrics not initialized
 	}
 	// Record asynchronously to avoid blocking
@@ -589,7 +667,7 @@ func (s *Server) recordClientEvent(sequenceID, clientID, eventType string, field
 		fmt.Sprintf("Records %s event for client %s", eventType, clientID),
 		false, // Not critical - can be cancelled during shutdown
 		func(ctx context.Context) {
-			_ = s.clientMetricsStore.RecordEvent(sequenceID, clientID, eventType, fields) //nolint:errcheck // Metrics recording errors are non-critical
+			_ = store.RecordEvent(sequenceID, clientID, eventType, fields) //nolint:errcheck // Metrics recording errors are non-critical
 		},
 	)
 }

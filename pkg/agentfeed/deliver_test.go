@@ -266,9 +266,9 @@ func TestWakePeer_pasteMode(t *testing.T) {
 }
 
 func TestWakePeer_missingMembraneSkipped(t *testing.T) {
-	// Default shell adapter with empty project: no scripts → skipped, not hard error.
+	// Shell adapter without fallback on empty project: no scripts → skipped, not hard error.
 	prev := CurrentPeerWakeAdapter()
-	SetPeerWakeAdapter(NewShellPeerWakeAdapter())
+	SetPeerWakeAdapter(NewShellPeerWakeAdapterWithFallback(nil))
 	t.Cleanup(func() { SetPeerWakeAdapter(prev) })
 
 	res := WakePeerOpts(context.Background(), WakePeerOptions{
