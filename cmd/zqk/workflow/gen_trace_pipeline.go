@@ -436,9 +436,6 @@ func applyGeneratedTracePipeline(cmd *cobra.Command, proc *cli.Processor, target
 			}
 		}
 		obj[objects.FieldKeyCriteriaRefs] = reqRefs
-		if _, hasDocRefs := obj[objects.FieldKeyDocEntryRefs]; !hasDocRefs {
-			obj[objects.FieldKeyDocEntryRefs] = []any{}
-		}
 		coerceRequirementPriorityForCASUpdate(obj)
 
 		if err := storageProvider.Update(ctx, secCtx, targetID, obj); err != nil {
