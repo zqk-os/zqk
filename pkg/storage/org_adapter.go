@@ -34,8 +34,7 @@ func (a *OrganizationalStorageAdapter) Update(ctx context.Context, secCtx *pkgct
 
 // ListByKind queries all objects of a given kind from the underlying storage provider.
 func (a *OrganizationalStorageAdapter) ListByKind(ctx context.Context, secCtx *pkgctx.SecurityContext, kind string) ([]map[string]any, error) {
-	storageCtx := pkgctx.NewStorageContext()
-	result, err := a.provider.List(ctx, secCtx, storageCtx, ListFilter{Kind: kind})
+	result, err := a.provider.List(ctx, secCtx, nil, ListFilter{Kind: kind})
 	if err != nil {
 		return nil, err
 	}
