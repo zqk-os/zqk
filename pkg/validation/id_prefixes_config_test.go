@@ -21,13 +21,13 @@ func TestGlobalIDPrefixesConfigReload(t *testing.T) {
 	// First, get the config without a file (should use default)
 	config1 := GetGlobalIDPrefixesConfig()
 	if config1 == nil {
-		t.Fatal(ConstMagica6b206af)
+		t.Fatal("GetGlobalIDPrefixesConfig() returned nil")
 	}
 
 	// Check that decision only has DEC- in default config
 	decisionPrefixes1 := config1.GetPrefixesForKind("decision")
 	if len(decisionPrefixes1) == 0 {
-		t.Fatal(ConstMagic2925f437)
+		t.Fatal("Default config should have DEC- for decision")
 	}
 	hasADR1 := false
 	for _, p := range decisionPrefixes1 {
@@ -37,18 +37,18 @@ func TestGlobalIDPrefixesConfigReload(t *testing.T) {
 		}
 	}
 	if hasADR1 {
-		t.Log(ConstMagicea723a87)
+		t.Log("Default config has ADR- (unexpected, but OK if default was updated)")
 	}
 
 	// Now create a config file with both DEC- and ADR-
 	tmpDir := t.TempDir()
 	configsDir := filepath.Join(tmpDir, paths.ProcessInternalConfigsDir)
 	if err := fileutil.MkdirAll(configsDir, paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagic2967e378, err)
+		t.Fatalf("Failed to create configs directory: %v", err)
 	}
 
 	// Config file should be in configs/ subdirectory per ProcessInternalConfigsDir
-	configFile := filepath.Join(configsDir, ConstMagic014a7ae7)
+	configFile := filepath.Join(configsDir, "id_prefixes_config.yaml")
 	configContent := `version: "1.0.0"
 kind_to_prefixes:
   decision:
@@ -56,24 +56,24 @@ kind_to_prefixes:
     - ADR-  # Architecture Decision Record format (backward compatibility)
 `
 	if err := fileutil.WriteFile(configFile, []byte(configContent), paths.FilePerm644); err != nil {
-		t.Fatalf(ConstMagic8e96c016, err)
+		t.Fatalf("Failed to write config file: %v", err)
 	}
 
 	// Create a marker file (go.mod) so findPathByWalkingUp can identify project root
 	goModFile := filepath.Join(tmpDir, "go.mod")
 	if err := fileutil.WriteFile(goModFile, []byte("module test\n"), paths.FilePerm644); err != nil {
-		t.Fatalf(ConstMagica76bb0bc, err)
+		t.Fatalf("Failed to create go.mod marker: %v", err)
 	}
 
 	// Change to the temp directory so findIDPrefixesConfig can find it
 	oldWd, err := fileutil.Getwd()
 	if err != nil {
-		t.Fatalf(ConstMagic25cbf3ea, err)
+		t.Fatalf("Failed to get current working directory: %v", err)
 	}
 	defer fileutil.Chdir(oldWd)
 
 	if err := fileutil.Chdir(tmpDir); err != nil {
-		t.Fatalf(ConstMagic0b7b38b2, err)
+		t.Fatalf("Failed to change working directory: %v", err)
 	}
 
 	// Reset the global configs to force reload
@@ -83,13 +83,13 @@ kind_to_prefixes:
 	// Now get the config again - it should load from file
 	config2 := GetGlobalIDPrefixesConfig()
 	if config2 == nil {
-		t.Fatal(ConstMagicc1d54dbd)
+		t.Fatal("GetGlobalIDPrefixesConfig() returned nil after reload")
 	}
 
 	// Check that decision now has both DEC- and ADR-
 	decisionPrefixes2 := config2.GetPrefixesForKind("decision")
 	if len(decisionPrefixes2) < 2 {
-		t.Errorf(ConstMagic8e1db388, decisionPrefixes2)
+		t.Errorf("Expected at least 2 prefixes for decision, got: %v", decisionPrefixes2)
 	}
 
 	hasDEC := false
@@ -104,10 +104,10 @@ kind_to_prefixes:
 	}
 
 	if !hasDEC {
-		t.Errorf(ConstMagic77520e0f, decisionPrefixes2)
+		t.Errorf("Expected DEC- in prefixes, got: %v", decisionPrefixes2)
 	}
 	if !hasADR {
-		t.Errorf(ConstMagic6d4fd7eb, decisionPrefixes2)
-		t.Log(ConstMagice4904ce0)
+		t.Errorf("Expected ADR- in prefixes after reload, got: %v", decisionPrefixes2)
+		t.Log("This indicates the config reload is not working correctly")
 	}
 }

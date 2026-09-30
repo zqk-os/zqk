@@ -26,13 +26,13 @@ func TestGoValidator_ValidateSemanticType(t *testing.T) {
 	}{
 		// List field types
 		{
-			name:         ConstMagicf28282ef,
+			name:         "list with valid items",
 			fieldName:    objects.FieldKeyMilestoneRefs,
 			value:        []string{"MIL-001", "MIL-002"},
 			semanticType: "reference",
 			fieldType:    "list",
 			wantErr:      false,
-			description:  ConstMagic2c3bf5c4,
+			description:  "List field with valid reference items",
 		},
 		{
 			name:         "empty list",
@@ -44,51 +44,51 @@ func TestGoValidator_ValidateSemanticType(t *testing.T) {
 			description:  "Empty list (handled by required/min_length)",
 		},
 		{
-			name:         ConstMagicc301f86b,
+			name:         "list with invalid items",
 			fieldName:    objects.FieldKeyMilestoneRefs,
 			value:        []string{"invalid-ref"},
 			semanticType: "reference",
 			fieldType:    "list",
 			wantErr:      false, // Ontology registry may be permissive for invalid references
-			description:  ConstMagicf8bf765f,
+			description:  "List field with invalid reference items (may be permissive)",
 		},
 		{
-			name:         ConstMagic2033b4a1,
+			name:         "non-list value with list fieldType",
 			fieldName:    objects.FieldKeyMilestoneRefs,
 			value:        "not-a-list",
 			semanticType: "reference",
 			fieldType:    "list",
 			wantErr:      false,
-			description:  ConstMagic28421cf7,
+			description:  "Non-list value with list type (handled by type validation)",
 		},
 
 		// Non-list field types
 		{
-			name:         ConstMagic2fd2c52b,
+			name:         "string field with valid reference",
 			fieldName:    objects.FieldKeyPriorityPlanRef,
 			value:        "PRI-001",
 			semanticType: "reference",
 			fieldType:    "string",
 			wantErr:      false,
-			description:  ConstMagic909be964,
+			description:  "String field with valid reference",
 		},
 		{
-			name:         ConstMagice80d397c,
+			name:         "string field with invalid reference",
 			fieldName:    objects.FieldKeyPriorityPlanRef,
 			value:        "invalid-ref",
 			semanticType: "reference",
 			fieldType:    "string",
 			wantErr:      false, // Ontology registry may be permissive for invalid references
-			description:  ConstMagic88e3ff48,
+			description:  "String field with invalid reference (may be permissive)",
 		},
 		{
-			name:         ConstMagice72389e0,
+			name:         "string field with statement",
 			fieldName:    "title",
 			value:        "Test Title",
 			semanticType: "statement",
 			fieldType:    "string",
 			wantErr:      false,
-			description:  ConstMagic8a4cac28,
+			description:  "String field with statement semantic type",
 		},
 	}
 
@@ -96,7 +96,7 @@ func TestGoValidator_ValidateSemanticType(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			err := validator.validateSemanticType(tt.fieldName, tt.value, tt.semanticType, tt.fieldType)
 			if (err != nil) != tt.wantErr {
-				t.Errorf(ConstMagicd1b562f6, tt.fieldName, tt.value, tt.semanticType, tt.fieldType, err, tt.wantErr, tt.description)
+				t.Errorf("validateSemanticType(%q, %v, %q, %q) error = %v, wantErr %v (%s)", tt.fieldName, tt.value, tt.semanticType, tt.fieldType, err, tt.wantErr, tt.description)
 			}
 		})
 	}
@@ -121,15 +121,15 @@ func TestGoValidator_ValidateSemanticTypeItem(t *testing.T) {
 			value:        "PRI-001",
 			semanticType: "reference",
 			wantErr:      false,
-			description:  ConstMagic190d2a64,
+			description:  "Valid reference ID",
 		},
 		{
-			name:         ConstMagic87933c9d,
+			name:         "invalid reference",
 			fieldName:    objects.FieldKeyPriorityPlanRef,
 			value:        "invalid-ref",
 			semanticType: "reference",
 			wantErr:      false, // Ontology registry may be permissive for invalid references
-			description:  ConstMagic60be8c1a,
+			description:  "Invalid reference ID format (may be permissive)",
 		},
 		{
 			name:         "valid statement",
@@ -137,7 +137,7 @@ func TestGoValidator_ValidateSemanticTypeItem(t *testing.T) {
 			value:        "Test Title",
 			semanticType: "statement",
 			wantErr:      false,
-			description:  ConstMagica3c691b5,
+			description:  "Valid statement (non-empty string)",
 		},
 		{
 			name:         "empty statement",
@@ -145,15 +145,15 @@ func TestGoValidator_ValidateSemanticTypeItem(t *testing.T) {
 			value:        "",
 			semanticType: "statement",
 			wantErr:      false, // Ontology registry may be permissive for empty statements
-			description:  ConstMagic7419fc96,
+			description:  "Empty statement (may be permissive)",
 		},
 		{
-			name:         ConstMagic62fd879c,
+			name:         "unknown semantic type",
 			fieldName:    "custom_field",
 			value:        "any value",
 			semanticType: "unknown_type",
 			wantErr:      false, // Ontology registry may be permissive for unknown types
-			description:  ConstMagic1ff84256,
+			description:  "Unknown semantic type (may be permissive)",
 		},
 	}
 
@@ -161,7 +161,7 @@ func TestGoValidator_ValidateSemanticTypeItem(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			err := validator.validateSemanticTypeItem(tt.fieldName, tt.value, tt.semanticType)
 			if (err != nil) != tt.wantErr {
-				t.Errorf(ConstMagic28bf4f54, tt.fieldName, tt.value, tt.semanticType, err, tt.wantErr, tt.description)
+				t.Errorf("validateSemanticTypeItem(%q, %v, %q) error = %v, wantErr %v (%s)", tt.fieldName, tt.value, tt.semanticType, err, tt.wantErr, tt.description)
 			}
 		})
 	}
@@ -181,68 +181,68 @@ func TestGoValidator_ValidatePattern(t *testing.T) {
 		description string
 	}{
 		{
-			name:        ConstMagicd72a976e,
+			name:        "valid pattern match",
 			value:       "BLI-001",
 			pattern:     `^BLI-\d{3,}$`,
 			want:        true,
 			wantErr:     false,
-			description: ConstMagicb923e28e,
+			description: "Value matches pattern",
 		},
 		{
-			name:        ConstMagic09a29b67,
+			name:        "pattern mismatch",
 			value:       "INVALID-001",
 			pattern:     `^BLI-\d{3,}$`,
 			want:        false,
 			wantErr:     false,
-			description: ConstMagic92aefd62,
+			description: "Value does not match pattern",
 		},
 		{
-			name:        ConstMagicfe145f27,
+			name:        "empty value with pattern",
 			value:       "",
 			pattern:     `^BLI-\d{3,}$`,
 			want:        false,
 			wantErr:     false,
-			description: ConstMagicaef1b4ca,
+			description: "Empty value does not match pattern",
 		},
 		{
-			name:        ConstMagic2ca198e0,
+			name:        "empty pattern (matches everything)",
 			value:       "any value",
 			pattern:     "",
 			want:        true,
 			wantErr:     false,
-			description: ConstMagicdb46551d,
+			description: "Empty pattern matches everything",
 		},
 		{
-			name:        ConstMagicbc429465,
-			value:       ConstMagic6d05be14,
+			name:        "complex pattern match",
+			value:       "2025-12-25T10:30:00Z",
 			pattern:     `^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$`,
 			want:        true,
 			wantErr:     false,
-			description: ConstMagic6593f9a5,
+			description: "Complex datetime pattern match",
 		},
 		{
-			name:        ConstMagicff83e5ca,
+			name:        "invalid regex pattern",
 			value:       "test",
 			pattern:     `[invalid`,
 			want:        false,
 			wantErr:     true,
-			description: ConstMagic839533b7,
+			description: "Invalid regex pattern returns error",
 		},
 		{
-			name:        ConstMagicc57c97c6,
+			name:        "case sensitive pattern",
 			value:       "test",
 			pattern:     `^TEST$`,
 			want:        false,
 			wantErr:     false,
-			description: ConstMagicffd46bce,
+			description: "Case sensitive pattern does not match lowercase",
 		},
 		{
-			name:        ConstMagic030cc24c,
+			name:        "case insensitive pattern",
 			value:       "test",
 			pattern:     `(?i)^test$`,
 			want:        true,
 			wantErr:     false,
-			description: ConstMagicdf941cdb,
+			description: "Case insensitive pattern matches",
 		},
 	}
 
@@ -250,11 +250,11 @@ func TestGoValidator_ValidatePattern(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := validator.validatePattern(tt.value, tt.pattern)
 			if (err != nil) != tt.wantErr {
-				t.Errorf(ConstMagicd26e90d1, tt.value, tt.pattern, err, tt.wantErr, tt.description)
+				t.Errorf("validatePattern(%q, %q) error = %v, wantErr %v (%s)", tt.value, tt.pattern, err, tt.wantErr, tt.description)
 				return
 			}
 			if got != tt.want {
-				t.Errorf(ConstMagic97aa1f45, tt.value, tt.pattern, got, tt.want, tt.description)
+				t.Errorf("validatePattern(%q, %q) = %v, want %v (%s)", tt.value, tt.pattern, got, tt.want, tt.description)
 			}
 		})
 	}
@@ -273,95 +273,95 @@ func TestGoValidator_ValidateIn(t *testing.T) {
 		description   string
 	}{
 		{
-			name:          ConstMagice2570710,
+			name:          "exact match string",
 			value:         "exploring",
 			allowedValues: []any{"exploring", "planned", "in_progress"},
 			want:          true,
-			description:   ConstMagic9def42d4,
+			description:   "String value matches exactly",
 		},
 		{
-			name:          ConstMagic86996bc7,
+			name:          "case insensitive match",
 			value:         "EXPLORING",
 			allowedValues: []any{"exploring", "planned", "in_progress"},
 			want:          true,
-			description:   ConstMagicae81db2c,
+			description:   "String value matches case-insensitively",
 		},
 		{
-			name:          ConstMagicc9f0e25f,
+			name:          "case insensitive match lowercase",
 			value:         "exploring",
 			allowedValues: []any{"EXPLORING", "PLANNED", "IN_PROGRESS"},
 			want:          true,
-			description:   ConstMagice22b10cb,
+			description:   "String value matches case-insensitively (lowercase in value)",
 		},
 		{
 			name:          "no match string",
 			value:         "invalid",
 			allowedValues: []any{"exploring", "planned", "in_progress"},
 			want:          false,
-			description:   ConstMagic10f3573f,
+			description:   "String value does not match",
 		},
 		{
 			name:          "exact match int",
 			value:         123,
 			allowedValues: []any{123, 456, 789},
 			want:          true,
-			description:   ConstMagicdbe97866,
+			description:   "Int value matches exactly",
 		},
 		{
 			name:          "no match int",
 			value:         999,
 			allowedValues: []any{123, 456, 789},
 			want:          false,
-			description:   ConstMagicb31d921e,
+			description:   "Int value does not match",
 		},
 		{
-			name:          ConstMagic4e071370,
+			name:          "exact match bool",
 			value:         true,
 			allowedValues: []any{true, false},
 			want:          true,
-			description:   ConstMagice9460a03,
+			description:   "Bool value matches exactly",
 		},
 		{
 			name:          "no match bool",
 			value:         true,
 			allowedValues: []any{false},
 			want:          false,
-			description:   ConstMagic58d0761b,
+			description:   "Bool value does not match",
 		},
 		{
-			name:          ConstMagic4d66bdc2,
+			name:          "empty allowed values",
 			value:         "any",
 			allowedValues: []any{},
 			want:          false,
-			description:   ConstMagic254d82c7,
+			description:   "Empty allowed values list",
 		},
 		{
-			name:          ConstMagicfa13729d,
+			name:          "mixed types in allowed values",
 			value:         "string",
 			allowedValues: []any{"string", 123, true},
 			want:          true,
-			description:   ConstMagicf83d8673,
+			description:   "String matches in mixed type list",
 		},
 		{
-			name:          ConstMagic27ec93df,
+			name:          "mixed types no match",
 			value:         456,
 			allowedValues: []any{"string", 123, true},
 			want:          false,
-			description:   ConstMagic704c9e98,
+			description:   "Int does not match in mixed type list",
 		},
 		{
 			name:          "nil value",
 			value:         nil,
 			allowedValues: []any{"string", 123, nil},
 			want:          true,
-			description:   ConstMagicf19a1639,
+			description:   "Nil value matches nil in allowed values",
 		},
 		{
-			name:          ConstMagicf47bfa28,
+			name:          "nil value no match",
 			value:         nil,
 			allowedValues: []any{"string", 123},
 			want:          false,
-			description:   ConstMagic369d3131,
+			description:   "Nil value does not match when nil not in allowed values",
 		},
 	}
 
@@ -369,7 +369,7 @@ func TestGoValidator_ValidateIn(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := validator.validateIn(tt.value, tt.allowedValues)
 			if got != tt.want {
-				t.Errorf(ConstMagic06ff700d, tt.value, tt.allowedValues, got, tt.want, tt.description)
+				t.Errorf("validateIn(%v, %v) = %v, want %v (%s)", tt.value, tt.allowedValues, got, tt.want, tt.description)
 			}
 		})
 	}
@@ -390,7 +390,7 @@ func TestGoValidator_ValidateLifecycleState(t *testing.T) {
 		description  string
 	}{
 		{
-			name:         ConstMagic404d9528,
+			name:         "no lifecycle loader",
 			kind:         "backlog_item",
 			status:       objects.ObjectStatusExploring,
 			currentState: "",
@@ -398,10 +398,10 @@ func TestGoValidator_ValidateLifecycleState(t *testing.T) {
 			setupLoader:  func(t *testing.T) *objects.LifecycleLoader { return nil },
 			wantErrors:   0,
 			wantWarnings: 0,
-			description:  ConstMagic22a48a13,
+			description:  "No lifecycle loader - skip validation",
 		},
 		{
-			name:         ConstMagicef736a0a,
+			name:         "valid status no transition",
 			kind:         "backlog_item",
 			status:       objects.ObjectStatusExploring,
 			currentState: "",
@@ -410,10 +410,10 @@ func TestGoValidator_ValidateLifecycleState(t *testing.T) {
 				tmpDir := t.TempDir()
 				lifecyclesDir := filepath.Join(tmpDir, paths.ProcessInternalLifecyclesDir)
 				if err := fileutil.MkdirAll(lifecyclesDir, paths.DirPerm755); err != nil {
-					t.Fatalf(ConstMagicc28fd1d3, err)
+					t.Fatalf("Failed to create lifecycles dir: %v", err)
 				}
 				// Create a simple lifecycle file (lifecycle loader expects {kind}_lifecycle.yaml)
-				lifecycleFile := filepath.Join(lifecyclesDir, ConstMagic7522f0e5)
+				lifecycleFile := filepath.Join(lifecyclesDir, "backlog_item_lifecycle.yaml")
 				lifecycleContent := `object_type: backlog_item
 statuses:
   - value: exploring
@@ -425,13 +425,13 @@ statuses:
     display: In Progress
 `
 				if err := fileutil.WriteFile(lifecycleFile, []byte(lifecycleContent), paths.FilePerm644); err != nil {
-					t.Fatalf(ConstMagic9356a1db, err)
+					t.Fatalf("Failed to write lifecycle file: %v", err)
 				}
 				return objects.NewLifecycleLoader(lifecyclesDir)
 			},
 			wantErrors:   0,
 			wantWarnings: 0,
-			description:  ConstMagic59f5e7c1,
+			description:  "Valid status without transition",
 		},
 		{
 			name:         "invalid status",
@@ -443,9 +443,9 @@ statuses:
 				tmpDir := t.TempDir()
 				lifecyclesDir := filepath.Join(tmpDir, paths.ProcessInternalLifecyclesDir)
 				if err := fileutil.MkdirAll(lifecyclesDir, paths.DirPerm755); err != nil {
-					t.Fatalf(ConstMagicc28fd1d3, err)
+					t.Fatalf("Failed to create lifecycles dir: %v", err)
 				}
-				lifecycleFile := filepath.Join(lifecyclesDir, ConstMagic7522f0e5)
+				lifecycleFile := filepath.Join(lifecyclesDir, "backlog_item_lifecycle.yaml")
 				lifecycleContent := `object_type: backlog_item
 statuses:
   - value: exploring
@@ -455,16 +455,16 @@ statuses:
     display: Planned
 `
 				if err := fileutil.WriteFile(lifecycleFile, []byte(lifecycleContent), paths.FilePerm644); err != nil {
-					t.Fatalf(ConstMagic9356a1db, err)
+					t.Fatalf("Failed to write lifecycle file: %v", err)
 				}
 				return objects.NewLifecycleLoader(lifecyclesDir)
 			},
 			wantErrors:   1,
 			wantWarnings: 0,
-			description:  ConstMagic5559d9f6,
+			description:  "Invalid status should return error",
 		},
 		{
-			name:         ConstMagiceff6168d,
+			name:         "valid transition",
 			kind:         "backlog_item",
 			status:       objects.ObjectStatusPlanned,
 			currentState: "exploring",
@@ -473,9 +473,9 @@ statuses:
 				tmpDir := t.TempDir()
 				lifecyclesDir := filepath.Join(tmpDir, paths.ProcessInternalLifecyclesDir)
 				if err := fileutil.MkdirAll(lifecyclesDir, paths.DirPerm755); err != nil {
-					t.Fatalf(ConstMagicc28fd1d3, err)
+					t.Fatalf("Failed to create lifecycles dir: %v", err)
 				}
-				lifecycleFile := filepath.Join(lifecyclesDir, ConstMagic7522f0e5)
+				lifecycleFile := filepath.Join(lifecyclesDir, "backlog_item_lifecycle.yaml")
 				lifecycleContent := `object_type: backlog_item
 statuses:
   - value: exploring
@@ -489,16 +489,16 @@ transitions:
     description: Move to planned
 `
 				if err := fileutil.WriteFile(lifecycleFile, []byte(lifecycleContent), paths.FilePerm644); err != nil {
-					t.Fatalf(ConstMagic9356a1db, err)
+					t.Fatalf("Failed to write lifecycle file: %v", err)
 				}
 				return objects.NewLifecycleLoader(lifecyclesDir)
 			},
 			wantErrors:   0,
 			wantWarnings: 0,
-			description:  ConstMagic3e325748,
+			description:  "Valid transition",
 		},
 		{
-			name:         ConstMagic28cd2152,
+			name:         "invalid transition",
 			kind:         "backlog_item",
 			status:       objects.ObjectStatusInProgress,
 			currentState: "exploring",
@@ -507,9 +507,9 @@ transitions:
 				tmpDir := t.TempDir()
 				lifecyclesDir := filepath.Join(tmpDir, paths.ProcessInternalLifecyclesDir)
 				if err := fileutil.MkdirAll(lifecyclesDir, paths.DirPerm755); err != nil {
-					t.Fatalf(ConstMagicc28fd1d3, err)
+					t.Fatalf("Failed to create lifecycles dir: %v", err)
 				}
-				lifecycleFile := filepath.Join(lifecyclesDir, ConstMagic7522f0e5)
+				lifecycleFile := filepath.Join(lifecyclesDir, "backlog_item_lifecycle.yaml")
 				lifecycleContent := `object_type: backlog_item
 statuses:
   - value: exploring
@@ -525,16 +525,16 @@ transitions:
     description: Move to planned
 `
 				if err := fileutil.WriteFile(lifecycleFile, []byte(lifecycleContent), paths.FilePerm644); err != nil {
-					t.Fatalf(ConstMagic9356a1db, err)
+					t.Fatalf("Failed to write lifecycle file: %v", err)
 				}
 				return objects.NewLifecycleLoader(lifecyclesDir)
 			},
 			wantErrors:   1,
 			wantWarnings: 0,
-			description:  ConstMagic0e6c0296,
+			description:  "Invalid transition should return error",
 		},
 		{
-			name:         ConstMagic8379b894,
+			name:         "transition with unmet precondition",
 			kind:         "backlog_item",
 			status:       objects.ObjectStatusPlanned,
 			currentState: "exploring",
@@ -543,9 +543,9 @@ transitions:
 				tmpDir := t.TempDir()
 				lifecyclesDir := filepath.Join(tmpDir, paths.ProcessInternalLifecyclesDir)
 				if err := fileutil.MkdirAll(lifecyclesDir, paths.DirPerm755); err != nil {
-					t.Fatalf(ConstMagicc28fd1d3, err)
+					t.Fatalf("Failed to create lifecycles dir: %v", err)
 				}
-				lifecycleFile := filepath.Join(lifecyclesDir, ConstMagic7522f0e5)
+				lifecycleFile := filepath.Join(lifecyclesDir, "backlog_item_lifecycle.yaml")
 				lifecycleContent := `object_type: backlog_item
 statuses:
   - value: exploring
@@ -561,16 +561,16 @@ transitions:
       - priority_plan_ref is set
 `
 				if err := fileutil.WriteFile(lifecycleFile, []byte(lifecycleContent), paths.FilePerm644); err != nil {
-					t.Fatalf(ConstMagic9356a1db, err)
+					t.Fatalf("Failed to write lifecycle file: %v", err)
 				}
 				return objects.NewLifecycleLoader(lifecyclesDir)
 			},
 			wantErrors:   1,
 			wantWarnings: 0,
-			description:  ConstMagiced3a3c4e,
+			description:  "Transition with unmet precondition should return error",
 		},
 		{
-			name:         ConstMagic1cd2d979,
+			name:         "transition with met precondition",
 			kind:         "backlog_item",
 			status:       objects.ObjectStatusPlanned,
 			currentState: "exploring",
@@ -579,9 +579,9 @@ transitions:
 				tmpDir := t.TempDir()
 				lifecyclesDir := filepath.Join(tmpDir, paths.ProcessInternalLifecyclesDir)
 				if err := fileutil.MkdirAll(lifecyclesDir, paths.DirPerm755); err != nil {
-					t.Fatalf(ConstMagicc28fd1d3, err)
+					t.Fatalf("Failed to create lifecycles dir: %v", err)
 				}
-				lifecycleFile := filepath.Join(lifecyclesDir, ConstMagic7522f0e5)
+				lifecycleFile := filepath.Join(lifecyclesDir, "backlog_item_lifecycle.yaml")
 				lifecycleContent := `object_type: backlog_item
 statuses:
   - value: exploring
@@ -597,16 +597,16 @@ transitions:
       - priority_plan_ref is set
 `
 				if err := fileutil.WriteFile(lifecycleFile, []byte(lifecycleContent), paths.FilePerm644); err != nil {
-					t.Fatalf(ConstMagic9356a1db, err)
+					t.Fatalf("Failed to write lifecycle file: %v", err)
 				}
 				return objects.NewLifecycleLoader(lifecyclesDir)
 			},
 			wantErrors:   0,
 			wantWarnings: 0,
-			description:  ConstMagice48d60cb,
+			description:  "Transition with met precondition should succeed",
 		},
 		{
-			name:         ConstMagic8d9bb694,
+			name:         "lifecycle file not found",
 			kind:         "unknown_kind",
 			status:       string("any_status"),
 			currentState: "",
@@ -615,14 +615,14 @@ transitions:
 				tmpDir := t.TempDir()
 				lifecyclesDir := filepath.Join(tmpDir, paths.ProcessInternalLifecyclesDir)
 				if err := fileutil.MkdirAll(lifecyclesDir, paths.DirPerm755); err != nil {
-					t.Fatalf(ConstMagicc28fd1d3, err)
+					t.Fatalf("Failed to create lifecycles dir: %v", err)
 				}
 				// No lifecycle file for unknown_kind
 				return objects.NewLifecycleLoader(lifecyclesDir)
 			},
 			wantErrors:   0,
 			wantWarnings: 1,
-			description:  ConstMagic427b26e8,
+			description:  "Lifecycle file not found should return warning",
 		},
 	}
 
@@ -634,10 +634,10 @@ transitions:
 			errors, warnings := validator.validateLifecycleState(context.Background(), tt.kind, tt.status, tt.currentState, tt.obj, nil)
 
 			if len(errors) != tt.wantErrors {
-				t.Errorf(ConstMagic8c2607fa, len(errors), tt.wantErrors, tt.description, errors)
+				t.Errorf("validateLifecycleState() errors = %d, want %d (%s). Errors: %v", len(errors), tt.wantErrors, tt.description, errors)
 			}
 			if len(warnings) != tt.wantWarnings {
-				t.Errorf(ConstMagic7fec669b, len(warnings), tt.wantWarnings, tt.description, warnings)
+				t.Errorf("validateLifecycleState() warnings = %d, want %d (%s). Warnings: %v", len(warnings), tt.wantWarnings, tt.description, warnings)
 			}
 		})
 	}

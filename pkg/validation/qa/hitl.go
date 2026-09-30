@@ -8,7 +8,6 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/policyinterrupt"
-	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // InterruptEmitter handles the emission of policy interrupts for QA disparities.
@@ -36,14 +35,14 @@ func (e *InterruptEmitter) EmitDisparityInterrupt(ctx context.Context, itemID st
 		Severity:    policyinterrupt.SeverityCritical,
 		AckRequired: true,
 		DedupeKey:   DisparityDedupeKey(itemID),
-		Message:     fmt.Sprintf(validation.ConstMagic3022c45f, itemID, reason),
+		Message:     fmt.Sprintf("QA Disparity Detected for %s: %s", itemID, reason),
 	}
 	return policyinterrupt.AppendInterrupt(e.projectRoot, record)
 }
 
 // DisparityDedupeKey is the policy-interrupt dedupe key for a QA disparity on itemID.
 func DisparityDedupeKey(itemID string) string {
-	return fmt.Sprintf(validation.ConstMagicExtracted_18, itemID)
+	return fmt.Sprintf("qa-disparity-%s", itemID)
 }
 
 // AckDisparityOnPass acknowledges any pending qa-disparity interrupt for itemID after a clean audit.

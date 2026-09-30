@@ -18,17 +18,17 @@ func TestConfigFileDiscovery(t *testing.T) {
 
 	configsDir := filepath.Join(projectRoot, paths.ProcessInternalConfigsDir)
 	if err := fileutil.MkdirAll(configsDir, paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagic2967e378, err)
+		t.Fatalf("Failed to create configs directory: %v", err)
 	}
 
 	// Create a marker file (go.mod) so findPathByWalkingUp can identify project root
 	goModFile := filepath.Join(projectRoot, "go.mod")
 	if err := fileutil.WriteFile(goModFile, []byte("module test\n"), paths.FilePerm644); err != nil {
-		t.Fatalf(ConstMagica76bb0bc, err)
+		t.Fatalf("Failed to create go.mod marker: %v", err)
 	}
 
 	// Config file should be in configs/ subdirectory per ProcessInternalConfigsDir
-	configFile := filepath.Join(configsDir, ConstMagic014a7ae7)
+	configFile := filepath.Join(configsDir, "id_prefixes_config.yaml")
 	configContent := `version: "1.0.0"
 kind_to_prefixes:
   decision:
@@ -36,44 +36,44 @@ kind_to_prefixes:
     - ADR-
 `
 	if err := fileutil.WriteFile(configFile, []byte(configContent), paths.FilePerm644); err != nil {
-		t.Fatalf(ConstMagic8e96c016, err)
+		t.Fatalf("Failed to write config file: %v", err)
 	}
 
 	oldWd, err := fileutil.Getwd()
 	if err != nil {
-		t.Fatalf(ConstMagic25cbf3ea, err)
+		t.Fatalf("Failed to get current working directory: %v", err)
 	}
 	defer fileutil.Chdir(oldWd)
 
 	// Test 1: From project root
 	if err := fileutil.Chdir(projectRoot); err != nil {
-		t.Fatalf(ConstMagic0b7b38b2, err)
+		t.Fatalf("Failed to change working directory: %v", err)
 	}
 
 	ResetGlobalIDPrefixesConfig()
 	ResetGlobalPathsConfig()
 	foundPath := findIDPrefixesConfig()
-	t.Logf(ConstMagic7b4155cb, foundPath)
+	t.Logf("From project root, found path: %s", foundPath)
 	if foundPath == emptyValue {
-		t.Error(ConstMagic50785345)
+		t.Error("Config file not found from project root")
 	}
 
 	// Test 2: From a subdirectory (simulating system check running from different location)
 	subDir := filepath.Join(projectRoot, "some", "sub", "directory")
 	if err := fileutil.MkdirAll(subDir, paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagicbc403569, err)
+		t.Fatalf("Failed to create subdirectory: %v", err)
 	}
 
 	if err := fileutil.Chdir(subDir); err != nil {
-		t.Fatalf(ConstMagic0b7b38b2, err)
+		t.Fatalf("Failed to change working directory: %v", err)
 	}
 
 	ResetGlobalIDPrefixesConfig()
 	ResetGlobalPathsConfig()
 	foundPath2 := findIDPrefixesConfig()
-	t.Logf(ConstMagic425ba67b, foundPath2)
+	t.Logf("From subdirectory, found path: %s", foundPath2)
 	if foundPath2 == emptyValue {
-		t.Error(ConstMagic8f630751)
+		t.Error("Config file not found from subdirectory (should walk up to find it)")
 	}
 
 	// Test 3: Load config and verify it has both prefixes
@@ -81,13 +81,13 @@ kind_to_prefixes:
 	ResetGlobalPathsConfig()
 	config := GetGlobalIDPrefixesConfig()
 	if config == nil {
-		t.Fatal(ConstMagica6b206af)
+		t.Fatal("GetGlobalIDPrefixesConfig() returned nil")
 	}
 
 	prefixes := config.GetPrefixesForKind("decision")
-	t.Logf(ConstMagic3e6eb5b5, prefixes)
+	t.Logf("Loaded prefixes: %v", prefixes)
 
 	if len(prefixes) != 2 {
-		t.Errorf(ConstMagicfdb60e48, len(prefixes), prefixes)
+		t.Errorf("Expected 2 prefixes, got %d: %v", len(prefixes), prefixes)
 	}
 }

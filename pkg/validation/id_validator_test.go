@@ -55,7 +55,7 @@ func getTestIDPrefixesConfig() *IDPrefixesConfig {
 			Patterns: []InferencePattern{},
 		},
 		DefaultStrategy: DefaultStrategyConfig{
-			Method: ConstMagicfa42609b,
+			Method: "first_part_upper_3",
 		},
 	}
 }
@@ -70,7 +70,7 @@ func getTestPathsConfig(t *testing.T) *PathsConfig {
 		Paths: map[string]string{
 			"object_specs":       specsDir,
 			"config_dir":         filepath.Join(projectRoot, paths.ProcessInternalConfigsDir),
-			"id_prefixes_config": filepath.Join(projectRoot, paths.ProcessInternalConfigsDir, ConstMagic014a7ae7),
+			"id_prefixes_config": filepath.Join(projectRoot, paths.ProcessInternalConfigsDir, "id_prefixes_config.yaml"),
 		},
 		SearchStrategy: SearchStrategyConfig{
 			RelativePaths: []string{"", "../", "../../", "../../../"},
@@ -85,7 +85,7 @@ func getTestSpecsDir(t *testing.T) string {
 	// Get the directory of this test file using runtime.Caller
 	_, testFile, _, ok := runtime.Caller(0)
 	if !ok {
-		t.Fatal(ConstMagic78e62a29)
+		t.Fatal("Failed to get test file location")
 	}
 	testDir := filepath.Dir(testFile)
 
@@ -116,7 +116,7 @@ func getTestSpecsDir(t *testing.T) string {
 	specsDir := filepath.Join(testDir, "..", "..", paths.ProcessInternalObjectSpecsDir)
 	absPath, err := filepath.Abs(specsDir)
 	if err != nil {
-		t.Fatalf(ConstMagic9cb22986, err)
+		t.Fatalf("Failed to get absolute path: %v", err)
 	}
 	return absPath
 }
@@ -158,11 +158,11 @@ func TestIDValidator_ValidateID(t *testing.T) {
 		t.Run(tt.id+"_"+tt.kind, func(t *testing.T) {
 			got, err := validator.ValidateID(tt.id, tt.kind)
 			if (err != nil) != tt.wantErr {
-				t.Errorf(ConstMagic978026a4, err, tt.wantErr)
+				t.Errorf("ValidateID() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf(ConstMagic6c552607, got, tt.want)
+				t.Errorf("ValidateID() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -201,7 +201,7 @@ func TestIDValidator_InferKindFromID(t *testing.T) {
 		t.Run(tt.id, func(t *testing.T) {
 			got := validator.InferKindFromID(tt.id)
 			if got != tt.want {
-				t.Errorf(ConstMagica035f7fc, got, tt.want)
+				t.Errorf("InferKindFromID() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -217,7 +217,7 @@ func TestIDValidator_InferKindFromID_LongestPrefix(t *testing.T) {
 			"namespace_registry": {"NSR-", "NAMESPACE-REGISTRY-"},
 		},
 		InferenceRules:  InferenceRulesConfig{Patterns: []InferencePattern{}},
-		DefaultStrategy: DefaultStrategyConfig{Method: ConstMagicfa42609b},
+		DefaultStrategy: DefaultStrategyConfig{Method: "first_part_upper_3"},
 	}
 	validator := NewIDValidatorWithConfigs(
 		getTestSpecsDir(t),
@@ -240,7 +240,7 @@ func TestIDValidator_InferKindFromID_LongestPrefix(t *testing.T) {
 		t.Run(tt.id, func(t *testing.T) {
 			got := validator.InferKindFromID(tt.id)
 			if got != tt.want {
-				t.Errorf(ConstMagic90b15e67, tt.id, got, tt.want)
+				t.Errorf("InferKindFromID(%q) = %q, want %q", tt.id, got, tt.want)
 			}
 		})
 	}
@@ -253,7 +253,7 @@ func TestIDValidator_InferKindFromID_DefaultPolicy(t *testing.T) {
 			"policy": {"POL-CODE-", "POL-DEFAULT-"},
 		},
 		InferenceRules:  InferenceRulesConfig{Patterns: []InferencePattern{}},
-		DefaultStrategy: DefaultStrategyConfig{Method: ConstMagicfa42609b},
+		DefaultStrategy: DefaultStrategyConfig{Method: "first_part_upper_3"},
 	}
 	validator := NewIDValidatorWithConfigs(
 		getTestSpecsDir(t),
@@ -274,7 +274,7 @@ func TestIDPrefixesConfigYAML_policyIncludesDefault(t *testing.T) {
 	if root == emptyValue {
 		t.Skip("project root not found")
 	}
-	data, err := fileutil.ReadFile(filepath.Join(root, paths.ProcessInternalConfigsDir, ConstMagic014a7ae7))
+	data, err := fileutil.ReadFile(filepath.Join(root, paths.ProcessInternalConfigsDir, "id_prefixes_config.yaml"))
 	if err != nil {
 		t.Fatalf("read id_prefixes_config.yaml: %v", err)
 	}
@@ -309,12 +309,12 @@ func TestIDValidator_GetValidPrefixes(t *testing.T) {
 		t.Run(tt.kind, func(t *testing.T) {
 			got := validator.GetValidPrefixes(tt.kind)
 			if len(got) != len(tt.want) {
-				t.Errorf(ConstMagicefb24fcb, got, tt.want)
+				t.Errorf("GetValidPrefixes() = %v, want %v", got, tt.want)
 				return
 			}
 			for i, prefix := range tt.want {
 				if got[i] != prefix {
-					t.Errorf(ConstMagic3d969abf, i, got[i], prefix)
+					t.Errorf("GetValidPrefixes()[%d] = %v, want %v", i, got[i], prefix)
 				}
 			}
 		})
@@ -330,31 +330,31 @@ func TestIDValidator_AuditAggregationMetric(t *testing.T) {
 		getTestPathsConfig(t),
 	)
 	if err := validator.LoadPatterns(); err != nil {
-		t.Fatalf(ConstMagic82cf76ae, err)
+		t.Fatalf("Failed to load patterns: %v", err)
 	}
 
 	// Test that audit_aggregation_metric pattern is loaded
-	prefixes := validator.GetValidPrefixes(ConstMagic6e4da1e4)
+	prefixes := validator.GetValidPrefixes("audit_aggregation_metric")
 	if len(prefixes) == 0 {
-		t.Fatal(ConstMagic22c30d1e)
+		t.Fatal("audit_aggregation_metric pattern not loaded")
 	}
 	if prefixes[0] != "AAM-" {
-		t.Errorf(ConstMagic2aa8ac7a, prefixes)
+		t.Errorf("Expected prefix 'AAM-', got %v", prefixes)
 	}
 
 	// Test ID validation
-	valid, err := validator.ValidateID("AAM-001", ConstMagic6e4da1e4)
+	valid, err := validator.ValidateID("AAM-001", "audit_aggregation_metric")
 	if err != nil {
-		t.Fatalf(ConstMagicad11a710, err)
+		t.Fatalf("ValidateID returned error: %v", err)
 	}
 	if !valid {
-		t.Error(ConstMagic02a9b88e)
+		t.Error("AAM-001 should be valid for audit_aggregation_metric")
 	}
 
 	// Test kind inference
 	kind := validator.InferKindFromID("AAM-001")
-	if kind != ConstMagic6e4da1e4 {
-		t.Errorf(ConstMagic92f3f7e6, kind)
+	if kind != "audit_aggregation_metric" {
+		t.Errorf("Expected kind 'audit_aggregation_metric', got %s", kind)
 	}
 }
 
@@ -367,13 +367,13 @@ func TestParseNamespace(t *testing.T) {
 		wantNil bool
 	}{
 		{
-			name:    ConstMagic5dedb792,
+			name:    "legacy format - no namespace",
 			id:      "GOAL-123",
 			want:    nil,
 			wantNil: true,
 		},
 		{
-			name: ConstMagic5251e453,
+			name: "short format - goal",
 			id:   "goal:GOAL-123",
 			want: &ParsedNamespace{
 				NamespaceID: "zqk:kernel",
@@ -386,79 +386,79 @@ func TestParseNamespace(t *testing.T) {
 			wantNil: false,
 		},
 		{
-			name: ConstMagic96666482,
-			id:   ConstMagic30a7cab5,
+			name: "full format - zqk kernel goal",
+			id:   "zqk:kernel:goal:GOAL-123",
 			want: &ParsedNamespace{
 				NamespaceID: "zqk:kernel",
 				Layer:       "zqk",
 				Domain:      "kernel",
 				ObjectType:  "goal",
 				ObjectID:    "GOAL-123",
-				FullID:      ConstMagic30a7cab5,
+				FullID:      "zqk:kernel:goal:GOAL-123",
 			},
 			wantNil: false,
 		},
 		{
-			name: ConstMagic6a185f28,
-			id:   ConstMagiccbd48a9f,
+			name: "full format - domain organizational",
+			id:   "domain:organizational:organization:ORG-001",
 			want: &ParsedNamespace{
-				NamespaceID: ConstMagic09ae1f1a,
+				NamespaceID: "domain:organizational",
 				Layer:       "domain",
 				Domain:      "organizational",
 				ObjectType:  "organization",
 				ObjectID:    "ORG-001",
-				FullID:      ConstMagiccbd48a9f,
+				FullID:      "domain:organizational:organization:ORG-001",
 			},
 			wantNil: false,
 		},
 		{
-			name: ConstMagic416ef4a4,
-			id:   ConstMagic1a3d600a,
+			name: "full format - domain with subdomain",
+			id:   "domain:financial:accounting:account:ACC-001",
 			want: &ParsedNamespace{
-				NamespaceID: ConstMagicc4d9d95f,
+				NamespaceID: "domain:financial:accounting",
 				Layer:       "domain",
 				Domain:      "financial",
 				Subdomain:   "accounting",
 				ObjectType:  "account",
 				ObjectID:    "ACC-001",
-				FullID:      ConstMagic1a3d600a,
+				FullID:      "domain:financial:accounting:account:ACC-001",
 			},
 			wantNil: false,
 		},
 		{
-			name: ConstMagic3e7d9106,
-			id:   ConstMagic3371d6e8,
+			name: "full format - integration jira",
+			id:   "integration:jira:issue:PROJ-123",
 			want: &ParsedNamespace{
-				NamespaceID: ConstMagic9e6fc747,
+				NamespaceID: "integration:jira",
 				Layer:       "integration",
 				Domain:      "jira",
 				ObjectType:  "issue",
 				ObjectID:    "PROJ-123",
-				FullID:      ConstMagic3371d6e8,
+				FullID:      "integration:jira:issue:PROJ-123",
 			},
 			wantNil: false,
 		},
 		{
-			name: ConstMagic64f13827,
-			id:   ConstMagic8c87e6e9,
+			name: "full format - zqk kernel without object type",
+			id:   "zqk:kernel:GOAL-123",
 			want: &ParsedNamespace{
 				NamespaceID: "zqk:kernel",
 				Layer:       "zqk",
 				Domain:      "kernel",
 				ObjectID:    "GOAL-123",
-				FullID:      ConstMagic8c87e6e9,
+				FullID:      "zqk:kernel:GOAL-123",
 			},
 			wantNil: false,
 		},
 		{
-			name: ConstMagicfa26bcc9,
-			id:   ConstMagic06797fb8,
+			name: "full format - domain without object type",
+			id:   "domain:organizational:ORG-001",
 			want: &ParsedNamespace{
-				NamespaceID: ConstMagic09ae1f1a,
+				NamespaceID: "domain:organizational",
 				Layer:       "domain",
 				Domain:      "organizational",
 				ObjectID:    "ORG-001",
-				FullID:      ConstMagic06797fb8,
+				FullID:      "domain:organizational:ORG-001",
 			},
 			wantNil: false,
 		},
@@ -469,33 +469,33 @@ func TestParseNamespace(t *testing.T) {
 			got := ParseNamespace(tt.id)
 			if tt.wantNil {
 				if got != nil {
-					t.Errorf(ConstMagic57917df7, got)
+					t.Errorf("ParseNamespace() = %+v, want nil", got)
 				}
 				return
 			}
 			if got == nil {
-				t.Fatal(ConstMagic4ba8b658)
+				t.Fatal("ParseNamespace() returned nil, expected non-nil")
 			}
 			if got.NamespaceID != tt.want.NamespaceID {
-				t.Errorf(ConstMagic080bbb9a, got.NamespaceID, tt.want.NamespaceID)
+				t.Errorf("ParseNamespace().NamespaceID = %v, want %v", got.NamespaceID, tt.want.NamespaceID)
 			}
 			if got.Layer != tt.want.Layer {
-				t.Errorf(ConstMagicba5c040d, got.Layer, tt.want.Layer)
+				t.Errorf("ParseNamespace().Layer = %v, want %v", got.Layer, tt.want.Layer)
 			}
 			if got.Domain != tt.want.Domain {
-				t.Errorf(ConstMagic044fe360, got.Domain, tt.want.Domain)
+				t.Errorf("ParseNamespace().Domain = %v, want %v", got.Domain, tt.want.Domain)
 			}
 			if got.Subdomain != tt.want.Subdomain {
-				t.Errorf(ConstMagic6f5e6aef, got.Subdomain, tt.want.Subdomain)
+				t.Errorf("ParseNamespace().Subdomain = %v, want %v", got.Subdomain, tt.want.Subdomain)
 			}
 			if got.ObjectType != tt.want.ObjectType {
-				t.Errorf(ConstMagic0a9c3671, got.ObjectType, tt.want.ObjectType)
+				t.Errorf("ParseNamespace().ObjectType = %v, want %v", got.ObjectType, tt.want.ObjectType)
 			}
 			if got.ObjectID != tt.want.ObjectID {
-				t.Errorf(ConstMagic9d8e5993, got.ObjectID, tt.want.ObjectID)
+				t.Errorf("ParseNamespace().ObjectID = %v, want %v", got.ObjectID, tt.want.ObjectID)
 			}
 			if got.FullID != tt.want.FullID {
-				t.Errorf(ConstMagic7b49139e, got.FullID, tt.want.FullID)
+				t.Errorf("ParseNamespace().FullID = %v, want %v", got.FullID, tt.want.FullID)
 			}
 		})
 	}
@@ -553,11 +553,11 @@ func TestIDValidator_ValidateID_WithNamespace(t *testing.T) {
 		t.Run(tt.id+"_"+tt.kind, func(t *testing.T) {
 			got, err := validator.ValidateID(tt.id, tt.kind)
 			if (err != nil) != tt.wantErr {
-				t.Errorf(ConstMagic1ecbb816, err, tt.wantErr, tt.description)
+				t.Errorf("ValidateID() error = %v, wantErr %v (%s)", err, tt.wantErr, tt.description)
 				return
 			}
 			if got != tt.want {
-				t.Errorf(ConstMagic1ebb29f2, got, tt.want, tt.description)
+				t.Errorf("ValidateID() = %v, want %v (%s)", got, tt.want, tt.description)
 			}
 		})
 	}
@@ -588,11 +588,11 @@ func TestIDValidator_ValidateID_AccountSpecialHandling(t *testing.T) {
 		t.Run(tt.id, func(t *testing.T) {
 			got, err := validator.ValidateID(tt.id, tt.kind)
 			if (err != nil) != tt.wantErr {
-				t.Errorf(ConstMagic1ecbb816, err, tt.wantErr, tt.description)
+				t.Errorf("ValidateID() error = %v, wantErr %v (%s)", err, tt.wantErr, tt.description)
 				return
 			}
 			if got != tt.want {
-				t.Errorf(ConstMagic1ebb29f2, got, tt.want, tt.description)
+				t.Errorf("ValidateID() = %v, want %v (%s)", got, tt.want, tt.description)
 			}
 		})
 	}
@@ -613,31 +613,31 @@ func TestIDValidator_ValidateID_ErrorPaths(t *testing.T) {
 		description string
 	}{
 		{
-			id:   ConstMagic7feff93d,
+			id:   "invalid:layer:goal:GOAL-123",
 			kind: "goal",
 			// ParseNamespace doesn't recognize "invalid" as a valid layer, so it returns nil
 			// Then the code checks if id contains ":" and has >2 parts, which it does
 			// So it returns an error with "unknown layer: invalid"
 			wantErr:     true,
 			errContains: "unknown layer",
-			description: ConstMagicf2b8865a,
+			description: "Invalid namespace layer should return error",
 		},
 		{
-			id:          ConstMagic0aaaf523,
+			id:          "zqk:INVALID_FORMAT:goal:GOAL-123",
 			kind:        "goal",
 			wantErr:     true,
-			errContains: ConstMagicdfbefa8d,
-			description: ConstMagic187ddfdc,
+			errContains: "invalid namespace format",
+			description: "Invalid namespace format (uppercase) should return error",
 		},
 		{
-			id:   ConstMagic5ba9c0a3,
+			id:   "unknown:GOAL-123",
 			kind: "goal",
 			// "unknown:GOAL-123" has 2 parts, so it's treated as short format
 			// ParseNamespace treats it as short format (unknown is not a valid layer)
 			// So it doesn't error, just validates GOAL-123
 			wantErr:     false,
 			errContains: "",
-			description: ConstMagicd4fa5eac,
+			description: "Unknown layer in 2-part format treated as short format (no error)",
 		},
 	}
 
@@ -645,12 +645,12 @@ func TestIDValidator_ValidateID_ErrorPaths(t *testing.T) {
 		t.Run(tt.id, func(t *testing.T) {
 			_, err := validator.ValidateID(tt.id, tt.kind)
 			if (err != nil) != tt.wantErr {
-				t.Errorf(ConstMagic1ecbb816, err, tt.wantErr, tt.description)
+				t.Errorf("ValidateID() error = %v, wantErr %v (%s)", err, tt.wantErr, tt.description)
 				return
 			}
 			if tt.wantErr && err != nil {
 				if tt.errContains != emptyValue && !strings.Contains(err.Error(), tt.errContains) {
-					t.Errorf(ConstMagicb8ec2b5f, err, tt.errContains, tt.description)
+					t.Errorf("ValidateID() error = %v, want error containing %q (%s)", err, tt.errContains, tt.description)
 				}
 			}
 		})
@@ -687,11 +687,11 @@ func TestIDValidator_ValidateID_PrefixValidation(t *testing.T) {
 		t.Run(tt.id+"_"+tt.kind, func(t *testing.T) {
 			got, err := validator.ValidateID(tt.id, tt.kind)
 			if err != nil {
-				t.Errorf(ConstMagic4f3078b5, err, tt.description)
+				t.Errorf("ValidateID() error = %v (%s)", err, tt.description)
 				return
 			}
 			if got != tt.want {
-				t.Errorf(ConstMagic1ebb29f2, got, tt.want, tt.description)
+				t.Errorf("ValidateID() = %v, want %v (%s)", got, tt.want, tt.description)
 			}
 		})
 	}
@@ -730,7 +730,7 @@ func TestIDValidator_InferKindFromID_WithNamespace(t *testing.T) {
 		t.Run(tt.id, func(t *testing.T) {
 			got := validator.InferKindFromID(tt.id)
 			if got != tt.want {
-				t.Errorf(ConstMagica035f7fc, got, tt.want)
+				t.Errorf("InferKindFromID() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -746,61 +746,61 @@ func TestExtractPrefixesFromPattern(t *testing.T) {
 		description string
 	}{
 		{
-			name:        ConstMagicffe0bd3e,
+			name:        "simple prefix pattern",
 			pattern:     "^PRI-\\d{3,}$",
 			want:        []string{"PRI-"},
-			description: ConstMagic597dac05,
+			description: "Pattern with simple prefix like ^PRI-",
 		},
 		{
-			name:        ConstMagice57a3797,
-			pattern:     ConstMagiccf318be0,
+			name:        "alternation pattern",
+			pattern:     "^(PRI|PRIO)-\\d{3,}$",
 			want:        []string{"PRI-", "PRIO-"},
-			description: ConstMagic8426ea92,
+			description: "Pattern with alternation like (PRI|PRIO)-",
 		},
 		{
-			name:        ConstMagic83b57f32,
-			pattern:     ConstMagice2e6989b,
+			name:        "alternation with multiple options",
+			pattern:     "^(REQ|REQU|REQUI)-\\d{3,}$",
 			want:        []string{"REQ-", "REQU-", "REQUI-"},
-			description: ConstMagic3e9a9415,
+			description: "Pattern with multiple alternation options",
 		},
 		{
 			name:        "generic pattern",
-			pattern:     ConstMagic2dc0038f,
+			pattern:     "^[A-Z]+-\\d{3,}$",
 			want:        []string{},
-			description: ConstMagic34e5c2d6,
+			description: "Generic pattern without literal prefix returns empty",
 		},
 		{
-			name:        ConstMagiceb49049d,
+			name:        "pattern without prefix",
 			pattern:     "^\\d{3,}$",
 			want:        []string{},
-			description: ConstMagicaaabe70a,
+			description: "Pattern without prefix returns empty",
 		},
 		{
 			name:        "empty pattern",
 			pattern:     "",
 			want:        []string{},
-			description: ConstMagic6d0ce55e,
+			description: "Empty pattern returns empty",
 		},
 		{
-			name:    ConstMagice2343aff,
-			pattern: ConstMagicd8aa3505,
+			name:    "pattern with spaces in alternation",
+			pattern: "^(PRI |PRIO )-\\d{3,}$",
 			// The regex `\(([A-Z\|]+)\)-` only matches [A-Z|], so spaces are not captured
 			// Actual behavior: pattern doesn't match because of space
 			want:        []string{},
-			description: ConstMagic829cd9fd,
+			description: "Pattern with spaces in alternation doesn't match [A-Z]+ pattern",
 		},
 		{
-			name:    ConstMagic9fb5deef,
-			pattern: ConstMagic047e0e08,
+			name:    "long prefix with underscore",
+			pattern: "^BACKLOG_ITEM-\\d{3,}$",
 			// The regex `\^([A-Z]+)-` only matches [A-Z]+, underscore breaks the match
 			want:        []string{},
-			description: ConstMagic56b62969,
+			description: "Pattern with underscore doesn't match [A-Z]+ pattern",
 		},
 		{
-			name:        ConstMagic86bd99ab,
+			name:        "lowercase prefix (not matched)",
 			pattern:     "^pri-\\d{3,}$",
 			want:        []string{},
-			description: ConstMagic9c56ee8b,
+			description: "Lowercase prefix not matched by [A-Z]+ pattern",
 		},
 	}
 
@@ -808,12 +808,12 @@ func TestExtractPrefixesFromPattern(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := extractPrefixesFromPattern(tt.pattern)
 			if len(got) != len(tt.want) {
-				t.Errorf(ConstMagicfa27491b, tt.pattern, got, tt.want, tt.description)
+				t.Errorf("extractPrefixesFromPattern(%q) = %v, want %v (%s)", tt.pattern, got, tt.want, tt.description)
 				return
 			}
 			for i, prefix := range tt.want {
 				if i >= len(got) || got[i] != prefix {
-					t.Errorf(ConstMagic8dd8ab18, tt.pattern, i, got[i], prefix, tt.description)
+					t.Errorf("extractPrefixesFromPattern(%q)[%d] = %v, want %v (%s)", tt.pattern, i, got[i], prefix, tt.description)
 				}
 			}
 		})
@@ -831,20 +831,20 @@ func TestDiscoverSpecsDir(t *testing.T) {
 		// If it found a directory, verify it exists and is a directory
 		info, err := fileutil.Stat(result)
 		if err != nil {
-			t.Errorf(ConstMagic4eca0b8c, result, err)
+			t.Errorf("discoverSpecsDir() returned path that doesn't exist: %q, error: %v", result, err)
 		} else if !info.IsDir() {
-			t.Errorf(ConstMagicb4eda10a, result)
+			t.Errorf("discoverSpecsDir() returned path that is not a directory: %q", result)
 		}
 
 		// The path should be absolute
 		if !filepath.IsAbs(result) {
-			t.Errorf(ConstMagica1b6c793, result)
+			t.Errorf("discoverSpecsDir() should return absolute path, got: %q", result)
 		}
 	}
 
 	// Test that the function is deterministic (calling it multiple times gives same result)
 	result2 := discoverSpecsDir()
 	if result != result2 {
-		t.Errorf(ConstMagic028cfae2, result, result2)
+		t.Errorf("discoverSpecsDir() returned different results: %q vs %q", result, result2)
 	}
 }

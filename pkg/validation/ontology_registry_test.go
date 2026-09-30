@@ -16,19 +16,19 @@ func TestOntologyRegistry_RegisterAndGetMapping(t *testing.T) {
 	// Test getting a default mapping
 	mapping, err := registry.GetMapping("statement")
 	if err != nil {
-		t.Fatalf(ConstMagicd2824190, err)
+		t.Fatalf("Expected to get 'statement' mapping, got error: %v", err)
 	}
 	if mapping.SemanticType != "statement" {
-		t.Errorf(ConstMagic14d9cf46, mapping.SemanticType)
+		t.Errorf("Expected semantic type 'statement', got %s", mapping.SemanticType)
 	}
 	if len(mapping.SchemaOrgTypes) == 0 {
-		t.Error(ConstMagica51b61a3)
+		t.Error("Expected Schema.org types, got empty slice")
 	}
 
 	// Test getting an unknown mapping
 	_, err = registry.GetMapping("unknown_type")
 	if err == nil {
-		t.Error(ConstMagic3023acad)
+		t.Error("Expected error for unknown semantic type, got nil")
 	}
 }
 
@@ -43,27 +43,27 @@ func TestOntologyRegistry_ValidateSemanticType(t *testing.T) {
 		wantError    bool
 	}{
 		{
-			name:         ConstMagic594a0640,
-			value:        ConstMagic9d20c957,
+			name:         "valid_statement_string",
+			value:        "This is a statement",
 			semanticType: "statement",
 			wantError:    false,
 		},
 		{
-			name: ConstMagic6e6a2ef4,
+			name: "valid_statement_object",
 			value: map[string]any{
-				"text": ConstMagic9d20c957,
+				"text": "This is a statement",
 			},
 			semanticType: "statement",
 			wantError:    false,
 		},
 		{
-			name:         ConstMagicab4ae39f,
+			name:         "valid_statement_int",
 			value:        123,
 			semanticType: "statement",
 			wantError:    false,
 		},
 		{
-			name:         ConstMagic8eb5d08f,
+			name:         "valid_statement_bool",
 			value:        true,
 			semanticType: "statement",
 			wantError:    false,
@@ -75,13 +75,13 @@ func TestOntologyRegistry_ValidateSemanticType(t *testing.T) {
 			wantError:    false,
 		},
 		{
-			name:         ConstMagic95bf92a8,
+			name:         "invalid_reference_empty",
 			value:        "",
 			semanticType: "reference",
 			wantError:    true,
 		},
 		{
-			name:         ConstMagiccd04678b,
+			name:         "invalid_reference_number",
 			value:        123,
 			semanticType: "reference",
 			wantError:    true,
@@ -93,31 +93,31 @@ func TestOntologyRegistry_ValidateSemanticType(t *testing.T) {
 			wantError:    false,
 		},
 		{
-			name:         ConstMagicb60a6709,
+			name:         "invalid_list_nil",
 			value:        nil,
 			semanticType: "list",
 			wantError:    true,
 		},
 		{
-			name:         ConstMagicb522cdc1,
+			name:         "valid_comparison",
 			value:        "greater_than",
 			semanticType: "comparison",
 			wantError:    false,
 		},
 		{
-			name:         ConstMagic033eecb9,
-			value:        ConstMagicda2da387,
+			name:         "invalid_comparison_operator",
+			value:        "invalid_operator",
 			semanticType: "comparison",
 			wantError:    true,
 		},
 		{
-			name:         ConstMagicea6a0352,
+			name:         "valid_expression",
 			value:        75,
 			semanticType: "expression",
 			wantError:    false,
 		},
 		{
-			name:         ConstMagic0d3cee92,
+			name:         "unknown_semantic_type",
 			value:        "any value",
 			semanticType: "unknown",
 			wantError:    false, // Permissive for unknown types
@@ -128,7 +128,7 @@ func TestOntologyRegistry_ValidateSemanticType(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			err := registry.ValidateSemanticType(tt.value, tt.semanticType)
 			if (err != nil) != tt.wantError {
-				t.Errorf(ConstMagic187d5860, err, tt.wantError)
+				t.Errorf("ValidateSemanticType() error = %v, wantError %v", err, tt.wantError)
 			}
 		})
 	}
@@ -140,10 +140,10 @@ func TestOntologyRegistry_GetSchemaOrgTypes(t *testing.T) {
 
 	schemaTypes, err := registry.GetSchemaOrgTypes("statement")
 	if err != nil {
-		t.Fatalf(ConstMagic1df53b7b, err)
+		t.Fatalf("Expected to get Schema.org types, got error: %v", err)
 	}
 	if len(schemaTypes) == 0 {
-		t.Error(ConstMagica51b61a3)
+		t.Error("Expected Schema.org types, got empty slice")
 	}
 
 	// Check that expected types are present
@@ -157,7 +157,7 @@ func TestOntologyRegistry_GetSchemaOrgTypes(t *testing.T) {
 			}
 		}
 		if !found {
-			t.Errorf(ConstMagic38c92052, expected, schemaTypes)
+			t.Errorf("Expected Schema.org type %s not found in %v", expected, schemaTypes)
 		}
 	}
 }
@@ -168,10 +168,10 @@ func TestOntologyRegistry_GetISO11179Type(t *testing.T) {
 
 	isoType, err := registry.GetISO11179Type("statement")
 	if err != nil {
-		t.Fatalf(ConstMagic6f99ea8d, err)
+		t.Fatalf("Expected to get ISO 11179 type, got error: %v", err)
 	}
 	if isoType != "Text" {
-		t.Errorf(ConstMagic19d6668a, isoType)
+		t.Errorf("Expected ISO 11179 type 'Text', got %s", isoType)
 	}
 }
 
@@ -181,10 +181,10 @@ func TestOntologyRegistry_GetBFOType(t *testing.T) {
 
 	bfoType, err := registry.GetBFOType("statement")
 	if err != nil {
-		t.Fatalf(ConstMagicd02a357b, err)
+		t.Fatalf("Expected to get BFO type, got error: %v", err)
 	}
 	if bfoType != "Continuant" {
-		t.Errorf(ConstMagicb2044ba2, bfoType)
+		t.Errorf("Expected BFO type 'Continuant', got %s", bfoType)
 	}
 }
 
@@ -195,7 +195,7 @@ func TestGlobalOntologyRegistry(t *testing.T) {
 
 	// Should return the same instance
 	if !reflect.DeepEqual(registry1, registry2) {
-		t.Error(ConstMagic0cfb63ef)
+		t.Error("Global ontology registry should return the same instance")
 	}
 }
 
@@ -205,25 +205,25 @@ func TestOntologyRegistry_StatementObjectValidation(t *testing.T) {
 
 	// Test valid structured statement with text field
 	validStatement := map[string]any{
-		"text": ConstMagic9d20c957,
+		"text": "This is a statement",
 	}
 	if err := registry.ValidateSemanticType(validStatement, "statement"); err != nil {
-		t.Errorf(ConstMagicc8b5ae91, err)
+		t.Errorf("Expected valid statement with 'text' field, got error: %v", err)
 	}
 
 	// Test valid structured statement with content field
 	validStatement2 := map[string]any{
-		objects.FieldKeyContent: ConstMagic9d20c957,
+		objects.FieldKeyContent: "This is a statement",
 	}
 	if err := registry.ValidateSemanticType(validStatement2, "statement"); err != nil {
-		t.Errorf(ConstMagic74d2a755, err)
+		t.Errorf("Expected valid statement with 'content' field, got error: %v", err)
 	}
 
 	// Test invalid structured statement without text or content
 	// Note: Current implementation is permissive (returns nil) to avoid false positives
 	// from YAML parsing artifacts. This behavior is documented in the code.
 	invalidStatement := map[string]any{
-		"other": ConstMagic8273feef,
+		"other": "This is not valid",
 	}
 	if err := registry.ValidateSemanticType(invalidStatement, "statement"); err != nil {
 		// The current implementation is permissive - this documents the behavior
@@ -253,13 +253,13 @@ func TestOntologyRegistry_ComparisonOperators(t *testing.T) {
 
 	for _, op := range validOperators {
 		if err := registry.ValidateSemanticType(op, "comparison"); err != nil {
-			t.Errorf(ConstMagice1abae87, op, err)
+			t.Errorf("Expected valid comparison operator '%s', got error: %v", op, err)
 		}
 	}
 
 	// Test invalid operator
-	if err := registry.ValidateSemanticType(ConstMagicda2da387, "comparison"); err == nil {
-		t.Error(ConstMagice623f00a)
+	if err := registry.ValidateSemanticType("invalid_operator", "comparison"); err == nil {
+		t.Error("Expected error for invalid comparison operator, got nil")
 	}
 }
 
@@ -276,11 +276,11 @@ func TestOntologyRegistry_RegisterMapping(t *testing.T) {
 		BFOType:        "Continuant",
 		ValidationRules: []OntologyValidationRule{
 			{
-				Name:        ConstMagic69a305b2,
-				Description: ConstMagicc13ab301,
+				Name:        "custom_validation",
+				Description: "Custom validation rule",
 				Validator: func(value any) error {
 					if value == nil {
-						return errors.New(ConstMagic203c8b8f)
+						return errors.New("custom_type cannot be nil")
 					}
 					return nil
 				},
@@ -293,18 +293,18 @@ func TestOntologyRegistry_RegisterMapping(t *testing.T) {
 	// Verify it was registered
 	mapping, err := registry.GetMapping("custom_type")
 	if err != nil {
-		t.Fatalf(ConstMagic6be7d415, err)
+		t.Fatalf("Expected to get custom mapping, got error: %v", err)
 	}
 	if mapping.SemanticType != "custom_type" {
-		t.Errorf(ConstMagic94375931, mapping.SemanticType)
+		t.Errorf("Expected semantic type 'custom_type', got %s", mapping.SemanticType)
 	}
 
 	// Test that custom validation works
 	if err := registry.ValidateSemanticType("valid", "custom_type"); err != nil {
-		t.Errorf(ConstMagic5d797fe7, err)
+		t.Errorf("Expected valid custom type, got error: %v", err)
 	}
 	if err := registry.ValidateSemanticType(nil, "custom_type"); err == nil {
-		t.Error(ConstMagica2630773)
+		t.Error("Expected error for nil custom type, got nil")
 	}
 }
 
@@ -315,7 +315,7 @@ func TestOntologyRegistry_GetSchemaOrgTypes_Error(t *testing.T) {
 
 	_, err := registry.GetSchemaOrgTypes("unknown_type")
 	if err == nil {
-		t.Error(ConstMagic3023acad)
+		t.Error("Expected error for unknown semantic type, got nil")
 	}
 }
 
@@ -326,7 +326,7 @@ func TestOntologyRegistry_GetISO11179Type_Error(t *testing.T) {
 
 	_, err := registry.GetISO11179Type("unknown_type")
 	if err == nil {
-		t.Error(ConstMagic3023acad)
+		t.Error("Expected error for unknown semantic type, got nil")
 	}
 }
 
@@ -337,7 +337,7 @@ func TestOntologyRegistry_GetBFOType_Error(t *testing.T) {
 
 	_, err := registry.GetBFOType("unknown_type")
 	if err == nil {
-		t.Error(ConstMagic3023acad)
+		t.Error("Expected error for unknown semantic type, got nil")
 	}
 }
 
@@ -350,7 +350,7 @@ func TestOntologyRegistry_ValidateSemanticType_TimeTime(t *testing.T) {
 	// (This is a special case to handle YAML datetime parsing)
 	now := time.Now()
 	if err := registry.ValidateSemanticType(now, "statement"); err != nil {
-		t.Errorf(ConstMagic206b3deb, err)
+		t.Errorf("Expected time.Time to be valid for statement semantic type, got error: %v", err)
 	}
 }
 
@@ -365,7 +365,7 @@ func TestOntologyRegistry_ValidateSemanticType_StatementReflection(t *testing.T)
 
 	// This should be accepted as a statement (special case for YAML datetime parsing)
 	if err := registry.ValidateSemanticType(timeValue.Interface(), "statement"); err != nil {
-		t.Errorf(ConstMagiccf176e4d, err)
+		t.Errorf("Expected time.Time (via reflection) to be valid for statement, got error: %v", err)
 	}
 }
 
@@ -397,14 +397,14 @@ func TestOntologyRegistry_NewOntologyRegistry_DefaultMappings(t *testing.T) {
 	for _, semanticType := range defaultTypes {
 		mapping, err := registry.GetMapping(semanticType)
 		if err != nil {
-			t.Errorf(ConstMagic4157ffdc, semanticType, err)
+			t.Errorf("Expected default mapping for %s, got error: %v", semanticType, err)
 			continue
 		}
 		if mapping.SemanticType != semanticType {
-			t.Errorf(ConstMagic39f7b95c, semanticType, mapping.SemanticType)
+			t.Errorf("Expected semantic type %s, got %s", semanticType, mapping.SemanticType)
 		}
 		if len(mapping.ValidationRules) == 0 {
-			t.Errorf(ConstMagic95ba1724, semanticType)
+			t.Errorf("Expected validation rules for %s, got none", semanticType)
 		}
 	}
 }

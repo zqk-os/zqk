@@ -26,6 +26,21 @@ func clean(ctx context.Context) error {
 			expectedTypes: nil,
 		},
 		{
+			name: "Synthetic ConstMagic Constant Declaration",
+			code: `package main
+const ConstMagic1234abcd = "synthetic"
+func clean() {}`,
+			expectedTypes: []string{"code_quality_debt"},
+		},
+		{
+			name: "Synthetic ConstMagic Identifier Reference",
+			code: `package main
+func bad() string {
+	return ConstMagic1234abcd
+}`,
+			expectedTypes: []string{"code_quality_debt"},
+		},
+		{
 			name: "Swallowed Error",
 			code: `package main
 func bad() {

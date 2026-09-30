@@ -80,7 +80,7 @@ func getDefaultPathsConfig() *PathsConfig {
 		Paths: map[string]string{
 			paths.PathKeyCommandSpecs: paths.CLICommandSpecsDir,
 			"object_specs":            paths.ProcessInternalObjectSpecsDir,
-			"config_dir":              paths.ProcessInternalDir, ConstMagicExtracted_66: filepath.Join(paths.ProcessInternalConfigsDir, paths.IdPrefixesConfigFile), ConstMagicExtracted_67: filepath.Join(paths.ProcessInternalConfigsDir, paths.KindMappingsConfigFile), "paths_config": filepath.Join(paths.ProcessInternalConfigsDir, paths.PathsConfigFile),
+			"config_dir":              paths.ProcessInternalDir, "id_prefixes_config": filepath.Join(paths.ProcessInternalConfigsDir, paths.IdPrefixesConfigFile), "kind_mappings_config": filepath.Join(paths.ProcessInternalConfigsDir, paths.KindMappingsConfigFile), "paths_config": filepath.Join(paths.ProcessInternalConfigsDir, paths.PathsConfigFile),
 		},
 		SearchStrategy: SearchStrategyConfig{
 			RelativePaths: []string{"", "../", "../../", "../../../"},

@@ -25,7 +25,7 @@ func TestCascadeDeletion_CriteriaNullify(t *testing.T) {
 
 	for _, dir := range []string{criteriaDir, testDir, reqDir} {
 		if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
-			t.Fatalf(ConstMagic43ec9c63, err)
+			t.Fatalf("failed to create directory: %v", err)
 		}
 	}
 
@@ -65,7 +65,7 @@ func TestCascadeDeletion_CriteriaNullify(t *testing.T) {
 		objects.FieldKeyKind:          "requirement",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyStatus:        objects.ObjectStatusPlanned,
-		objects.FieldKeyTitle:         ConstMagic94dced6f,
+		objects.FieldKeyTitle:         "Test Requirement",
 		objects.FieldKeyCriteriaRefs:  []string{"CRIT-001"},
 		objects.FieldKeyGoalRefs:      []string{"GOAL-001"}, // Required field
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
@@ -78,7 +78,7 @@ func TestCascadeDeletion_CriteriaNullify(t *testing.T) {
 	// Create goal (required by requirement)
 	goalDir := datacell.CellCASPrimaryDir(testRoot, "goals")
 	if err := fileutil.MkdirAll(goalDir, paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagic924c0707, err)
+		t.Fatalf("failed to create goal directory: %v", err)
 	}
 	goal := map[string]any{
 		objects.FieldKeyID:            "GOAL-001",
@@ -96,8 +96,8 @@ func TestCascadeDeletion_CriteriaNullify(t *testing.T) {
 	// Verify initial state
 	testData, _ := fileutil.ReadFile(testPath)
 	reqData, _ := fileutil.ReadFile(reqPath)
-	t.Logf(ConstMagica5378847, string(testData))
-	t.Logf(ConstMagicf5fc17da, string(reqData))
+	t.Logf("Initial test_case.criteria_refs: %s", string(testData))
+	t.Logf("Initial requirement.criteria_refs: %s", string(reqData))
 
 	// TODO: Implement cascade deletion logic
 	// When CRIT-001 is deleted:
@@ -105,7 +105,7 @@ func TestCascadeDeletion_CriteriaNullify(t *testing.T) {
 	// 2. REQ-001.criteria_refs should become []
 
 	// For now, this test documents the expected behavior
-	t.Skip(ConstMagicc33093a6)
+	t.Skip("Cascade deletion not yet implemented - test documents expected behavior for future implementation")
 }
 
 // TestCascadeDeletion_RequiredReferenceRestrict tests that deleting an object
@@ -119,7 +119,7 @@ func TestCascadeDeletion_RequiredReferenceRestrict(t *testing.T) {
 
 	for _, dir := range []string{goalDir, reqDir} {
 		if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
-			t.Fatalf(ConstMagic43ec9c63, err)
+			t.Fatalf("failed to create directory: %v", err)
 		}
 	}
 
@@ -143,7 +143,7 @@ func TestCascadeDeletion_RequiredReferenceRestrict(t *testing.T) {
 		objects.FieldKeyKind:          "requirement",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyStatus:        objects.ObjectStatusPlanned,
-		objects.FieldKeyTitle:         ConstMagic1fbc6c36,
+		objects.FieldKeyTitle:         "Requirement with Required Goal",
 		objects.FieldKeyGoalRefs:      []string{"GOAL-002"}, // Required field (min_length: 1)
 		objects.FieldKeyCriteriaRefs:  []string{"CRIT-001"}, // Also required (min_length: 1)
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
@@ -156,14 +156,14 @@ func TestCascadeDeletion_RequiredReferenceRestrict(t *testing.T) {
 	// Create criteria (required by requirement)
 	criteriaDir := datacell.CellCASPrimaryDir(testRoot, "criteria")
 	if err := fileutil.MkdirAll(criteriaDir, paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagic51ed9273, err)
+		t.Fatalf("failed to create criteria directory: %v", err)
 	}
 	criteria := map[string]any{
 		objects.FieldKeyID:            "CRIT-001",
 		objects.FieldKeyKind:          "criteria",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyStatus:        objects.ObjectStatusActive,
-		objects.FieldKeyTitle:         ConstMagic30cc1766,
+		objects.FieldKeyTitle:         "Required Criteria",
 		objects.FieldKeyCategory:      "functional",
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
 		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
@@ -175,7 +175,7 @@ func TestCascadeDeletion_RequiredReferenceRestrict(t *testing.T) {
 	// TODO: Attempt to delete GOAL-002 should fail with CASCADE_RESTRICT
 	// Error: "Cannot delete GOAL-002: required by REQ-002.goal_refs (use cascade=true to delete dependents)"
 
-	t.Log(ConstMagicb8163a6f)
+	t.Log("Cascade restrict not yet implemented - this test documents expected behavior")
 }
 
 // TestCascadeDeletion_SingleReferenceSetNull tests that deleting an object
@@ -189,7 +189,7 @@ func TestCascadeDeletion_SingleReferenceSetNull(t *testing.T) {
 
 	for _, dir := range []string{strategicPlanDir, milestoneDir} {
 		if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
-			t.Fatalf(ConstMagic43ec9c63, err)
+			t.Fatalf("failed to create directory: %v", err)
 		}
 	}
 
@@ -199,13 +199,13 @@ func TestCascadeDeletion_SingleReferenceSetNull(t *testing.T) {
 		objects.FieldKeyKind:          "strategic_plan",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyStatus:        objects.ObjectStatusActive,
-		objects.FieldKeyTitle:         ConstMagic04554a4d,
+		objects.FieldKeyTitle:         "Test Strategic Plan",
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
 		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
 		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
-	createObjectFile(t, strategicPlanDir, ConstMagic619b9687, strategicPlan)
+	createObjectFile(t, strategicPlanDir, "STRAT-PLAN-003.yaml", strategicPlan)
 
 	// Create milestone with single reference to strategic plan
 	milestone := map[string]any{
@@ -213,7 +213,7 @@ func TestCascadeDeletion_SingleReferenceSetNull(t *testing.T) {
 		objects.FieldKeyKind:          "milestone",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyStatus:        objects.ObjectStatusActive,
-		objects.FieldKeyTitle:         ConstMagicc6892214,
+		objects.FieldKeyTitle:         "Milestone with Strategic Plan",
 		"strategic_plan_ref":          "STRAT-PLAN-003", // Single optional reference
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
 		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
@@ -224,12 +224,12 @@ func TestCascadeDeletion_SingleReferenceSetNull(t *testing.T) {
 
 	// Verify initial state
 	milestoneData, _ := fileutil.ReadFile(milestonePath)
-	t.Logf(ConstMagic7c2e1c05, string(milestoneData))
+	t.Logf("Initial milestone.strategic_plan_ref: %s", string(milestoneData))
 
 	// TODO: When STRAT-PLAN-003 is deleted:
 	// MIL-003.strategic_plan_ref should be set to null
 
-	t.Log(ConstMagicad3786de)
+	t.Log("Cascade set null not yet implemented - this test documents expected behavior")
 }
 
 // TestCascadeDeletion_MultiLevelCascade tests cascade deletion through multiple levels
@@ -246,7 +246,7 @@ func TestCascadeDeletion_MultiLevelCascade(t *testing.T) {
 
 	for _, dir := range []string{strategicPlanDir, milestoneDir, goalDir, reqDir, backlogDir} {
 		if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
-			t.Fatalf(ConstMagic43ec9c63, err)
+			t.Fatalf("failed to create directory: %v", err)
 		}
 	}
 
@@ -256,13 +256,13 @@ func TestCascadeDeletion_MultiLevelCascade(t *testing.T) {
 		objects.FieldKeyKind:          "strategic_plan",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyStatus:        objects.ObjectStatusActive,
-		objects.FieldKeyTitle:         ConstMagic5ae7cf8c,
+		objects.FieldKeyTitle:         "Multi-Level Strategic Plan",
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
 		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
 		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
-	createObjectFile(t, strategicPlanDir, ConstMagicdf0fab09, sp)
+	createObjectFile(t, strategicPlanDir, "STRAT-PLAN-004.yaml", sp)
 
 	// Level 2: Milestone
 	mil := map[string]any{
@@ -270,7 +270,7 @@ func TestCascadeDeletion_MultiLevelCascade(t *testing.T) {
 		objects.FieldKeyKind:          "milestone",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyStatus:        objects.ObjectStatusActive,
-		objects.FieldKeyTitle:         ConstMagic814b5d70,
+		objects.FieldKeyTitle:         "Multi-Level Milestone",
 		"strategic_plan_ref":          "STRAT-PLAN-004",
 		objects.FieldKeyGoalRefs:      []string{"GOAL-004"},
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
@@ -286,7 +286,7 @@ func TestCascadeDeletion_MultiLevelCascade(t *testing.T) {
 		objects.FieldKeyKind:          "goal",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyStatus:        objects.ObjectStatusActive,
-		objects.FieldKeyTitle:         ConstMagicabb6bf12,
+		objects.FieldKeyTitle:         "Multi-Level Goal",
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
 		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
@@ -300,7 +300,7 @@ func TestCascadeDeletion_MultiLevelCascade(t *testing.T) {
 		objects.FieldKeyKind:          "requirement",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyStatus:        objects.ObjectStatusPlanned,
-		objects.FieldKeyTitle:         ConstMagicb90f9ef0,
+		objects.FieldKeyTitle:         "Multi-Level Requirement",
 		objects.FieldKeyGoalRefs:      []string{"GOAL-004"},
 		objects.FieldKeyCriteriaRefs:  []string{"CRIT-001"}, // Required
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
@@ -313,14 +313,14 @@ func TestCascadeDeletion_MultiLevelCascade(t *testing.T) {
 	// Create required criteria
 	criteriaDir := datacell.CellCASPrimaryDir(testRoot, "criteria")
 	if err := fileutil.MkdirAll(criteriaDir, paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagic51ed9273, err)
+		t.Fatalf("failed to create criteria directory: %v", err)
 	}
 	criteria := map[string]any{
 		objects.FieldKeyID:            "CRIT-001",
 		objects.FieldKeyKind:          "criteria",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyStatus:        objects.ObjectStatusActive,
-		objects.FieldKeyTitle:         ConstMagic30cc1766,
+		objects.FieldKeyTitle:         "Required Criteria",
 		objects.FieldKeyCategory:      "functional",
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
 		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
@@ -335,7 +335,7 @@ func TestCascadeDeletion_MultiLevelCascade(t *testing.T) {
 		objects.FieldKeyKind:            "backlog_item",
 		objects.FieldKeySchemaVersion:   objects.DefaultSchemaVersion,
 		objects.FieldKeyStatus:          objects.ObjectStatusPlanned,
-		objects.FieldKeyTitle:           ConstMagic18606553,
+		objects.FieldKeyTitle:           "Multi-Level Backlog Item",
 		objects.FieldKeyRequirementRefs: []string{"REQ-004"},
 		objects.FieldKeyCreatedAt:       time.Now().Format(time.RFC3339),
 		objects.FieldKeyCreatedBy:       "ACC-SYSTEM",
@@ -356,12 +356,12 @@ func TestCascadeDeletion_MultiLevelCascade(t *testing.T) {
 	reqData, _ := fileutil.ReadFile(reqPath)
 	bliData, _ := fileutil.ReadFile(bliPath)
 	t.Logf("Initial state:")
-	t.Logf(ConstMagic4b5cb220, string(milData))
-	t.Logf(ConstMagic4ebe838d, string(goalData))
-	t.Logf(ConstMagic84d189be, string(reqData))
-	t.Logf(ConstMagicfa69b3a3, string(bliData))
+	t.Logf("  MIL-004.strategic_plan_ref: %s", string(milData))
+	t.Logf("  GOAL-004.milestone_refs: %s", string(goalData))
+	t.Logf("  REQ-004.goal_refs: %s", string(reqData))
+	t.Logf("  BLI-005.requirement_refs: %s", string(bliData))
 
-	t.Skip(ConstMagic2082beff)
+	t.Skip("Multi-level cascade deletion not yet implemented - test documents expected behavior for future implementation")
 }
 
 // TestCascadeDeletion_ConcurrentCascade tests concurrent cascade operations
@@ -374,7 +374,7 @@ func TestCascadeDeletion_ConcurrentCascade(t *testing.T) {
 
 	for _, dir := range []string{criteriaDir, testDir} {
 		if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
-			t.Fatalf(ConstMagic43ec9c63, err)
+			t.Fatalf("failed to create directory: %v", err)
 		}
 	}
 
@@ -429,5 +429,5 @@ func TestCascadeDeletion_ConcurrentCascade(t *testing.T) {
 	// Each deletion should cascade update test cases
 	// This tests that concurrent cascade operations don't corrupt data
 
-	t.Log(ConstMagic481272df)
+	t.Log("Concurrent cascade deletion not yet implemented - this test documents expected behavior")
 }

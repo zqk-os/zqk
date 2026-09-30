@@ -21,7 +21,7 @@ func TestIDValidator_LoadPatternsFromGraph(t *testing.T) {
 
 	nodes := []provider.Node{
 		{
-			ID:     validation.ConstMagic55c9d1b2,
+			ID:     "spec_backlog_item",
 			Labels: []string{"ObjectSpec"},
 			Properties: map[string]any{
 				objects.FieldKeyOntology: "backlog_item",
@@ -29,7 +29,7 @@ func TestIDValidator_LoadPatternsFromGraph(t *testing.T) {
 			},
 		},
 		{
-			ID:     validation.ConstMagic7a7c4469,
+			ID:     "spec_priority_plan",
 			Labels: []string{"ObjectSpec"},
 			Properties: map[string]any{
 				objects.FieldKeyOntology: "priority_plan",
@@ -50,33 +50,33 @@ func TestIDValidator_LoadPatternsFromGraph(t *testing.T) {
 	validator := validation.NewIDValidatorWithGraph("", conn)
 	err = validator.LoadPatterns()
 	if err != nil {
-		t.Fatalf(validation.ConstMagic29dfaddc, err)
+		t.Fatalf("LoadPatterns() error = %v", err)
 	}
 
 	// Test backlog_item
 	valid, err := validator.ValidateID("BLI-001", "backlog_item")
 	if err != nil {
-		t.Errorf(validation.ConstMagicc3a9031f, err)
+		t.Errorf("ValidateID() error = %v", err)
 	}
 	if !valid {
-		t.Error(validation.ConstMagicae27b884)
+		t.Error("BLI-001 should be valid for backlog_item")
 	}
 
 	// Test priority_plan with both prefixes
 	valid, err = validator.ValidateID("PRI-208", "priority_plan")
 	if err != nil {
-		t.Errorf(validation.ConstMagicc3a9031f, err)
+		t.Errorf("ValidateID() error = %v", err)
 	}
 	if !valid {
-		t.Error(validation.ConstMagic214c3057)
+		t.Error("PRI-208 should be valid for priority_plan")
 	}
 
 	valid, err = validator.ValidateID("PRIO-002", "priority_plan")
 	if err != nil {
-		t.Errorf(validation.ConstMagicc3a9031f, err)
+		t.Errorf("ValidateID() error = %v", err)
 	}
 	if !valid {
-		t.Error(validation.ConstMagic59f32d4b)
+		t.Error("PRIO-002 should be valid for priority_plan")
 	}
 }
 
@@ -93,14 +93,14 @@ func TestIDValidator_GraphFallbackToFiles(t *testing.T) {
 	// If graph returns empty, should fall back to file-based or defaults
 	err = validator.LoadPatterns()
 	if err != nil {
-		t.Fatalf(validation.ConstMagic34fb2cbb, err)
+		t.Fatalf("LoadPatterns() should not error on fallback: %v", err)
 	}
 
 	// Should still have defaults loaded
 	//nolint:errcheck // Test helper - error acceptable
 	valid, _ := validator.ValidateID("BLI-001", "backlog_item")
 	if !valid {
-		t.Error(validation.ConstMagicb7163a28)
+		t.Error("Should have default patterns even if graph is empty")
 	}
 }
 
@@ -117,7 +117,7 @@ func TestParseGraphSpecNode(t *testing.T) {
 		description string
 	}{
 		{
-			name: validation.ConstMagica9eb8343,
+			name: "node with ontology property",
 			node: &provider.Node{
 				Properties: map[string]any{
 					objects.FieldKeyOntology: "backlog_item",
@@ -125,10 +125,10 @@ func TestParseGraphSpecNode(t *testing.T) {
 			},
 			wantKind:    "backlog_item",
 			wantNil:     false,
-			description: validation.ConstMagicdd568673,
+			description: "Node with ontology property",
 		},
 		{
-			name: validation.ConstMagic6a353d45,
+			name: "node with kind property (fallback)",
 			node: &provider.Node{
 				Properties: map[string]any{
 					objects.FieldKeyKind: "milestone",
@@ -136,10 +136,10 @@ func TestParseGraphSpecNode(t *testing.T) {
 			},
 			wantKind:    "milestone",
 			wantNil:     false,
-			description: validation.ConstMagic1db538b9,
+			description: "Node with kind property (ontology fallback)",
 		},
 		{
-			name: validation.ConstMagic91a766a7,
+			name: "node with type property (fallback)",
 			node: &provider.Node{
 				Properties: map[string]any{
 					objects.FieldKeyType: "goal",
@@ -147,10 +147,10 @@ func TestParseGraphSpecNode(t *testing.T) {
 			},
 			wantKind:    "goal",
 			wantNil:     false,
-			description: validation.ConstMagice5f3c624,
+			description: "Node with type property (kind fallback)",
 		},
 		{
-			name: validation.ConstMagiceacaf5dd,
+			name: "node with id_template",
 			node: &provider.Node{
 				Properties: map[string]any{
 					objects.FieldKeyOntology: "priority_plan",
@@ -159,10 +159,10 @@ func TestParseGraphSpecNode(t *testing.T) {
 			},
 			wantKind:    "priority_plan",
 			wantNil:     false,
-			description: validation.ConstMagicf5c12fa3,
+			description: "Node with id_template extracts prefix",
 		},
 		{
-			name: validation.ConstMagicc9269618,
+			name: "node with id_prefixes",
 			node: &provider.Node{
 				Properties: map[string]any{
 					objects.FieldKeyOntology: "requirement",
@@ -171,10 +171,10 @@ func TestParseGraphSpecNode(t *testing.T) {
 			},
 			wantKind:    "requirement",
 			wantNil:     false,
-			description: validation.ConstMagic72dbbaf5,
+			description: "Node with id_prefixes array",
 		},
 		{
-			name: validation.ConstMagicee8e2026,
+			name: "node with nested pattern",
 			node: &provider.Node{
 				Properties: map[string]any{
 					objects.FieldKeyOntology: "test_case",
@@ -189,10 +189,10 @@ func TestParseGraphSpecNode(t *testing.T) {
 			},
 			wantKind:    "test_case",
 			wantNil:     false,
-			description: validation.ConstMagic68c9a719,
+			description: "Node with nested pattern in fields.id.validation.pattern",
 		},
 		{
-			name: validation.ConstMagica04884e5,
+			name: "node with empty ontology",
 			node: &provider.Node{
 				Properties: map[string]any{
 					objects.FieldKeyOntology: "",
@@ -200,7 +200,7 @@ func TestParseGraphSpecNode(t *testing.T) {
 			},
 			wantKind:    "",
 			wantNil:     true,
-			description: validation.ConstMagiccbe38769,
+			description: "Node with empty ontology returns nil",
 		},
 		{
 			name: "node without ontology/kind/type",
@@ -214,16 +214,16 @@ func TestParseGraphSpecNode(t *testing.T) {
 			description: "Node without ontology/kind/type returns nil",
 		},
 		{
-			name: validation.ConstMagic3f4752e5,
+			name: "node with empty properties",
 			node: &provider.Node{
 				Properties: map[string]any{},
 			},
 			wantKind:    "",
 			wantNil:     true,
-			description: validation.ConstMagic08c60601,
+			description: "Node with empty properties returns nil",
 		},
 		{
-			name: validation.ConstMagic5b08df7d,
+			name: "node with id_prefixes containing non-strings",
 			node: &provider.Node{
 				Properties: map[string]any{
 					objects.FieldKeyOntology: "test_kind",
@@ -232,7 +232,7 @@ func TestParseGraphSpecNode(t *testing.T) {
 			},
 			wantKind:    "test_kind",
 			wantNil:     false,
-			description: validation.ConstMagic0e48b4bd,
+			description: "Node with id_prefixes filters out non-strings",
 		},
 	}
 
@@ -241,15 +241,15 @@ func TestParseGraphSpecNode(t *testing.T) {
 			got := validation.ParseGraphSpecNodeForTest(validator, tt.node)
 			if tt.wantNil {
 				if got != nil {
-					t.Errorf(validation.ConstMagic315f7ce3, got, tt.description)
+					t.Errorf("parseGraphSpecNode() = %+v, want nil (%s)", got, tt.description)
 				}
 				return
 			}
 			if got == nil {
-				t.Fatalf(validation.ConstMagice9320605, tt.description)
+				t.Fatalf("parseGraphSpecNode() returned nil, want non-nil (%s)", tt.description)
 			}
 			if got.Kind != tt.wantKind {
-				t.Errorf(validation.ConstMagic45bcc88b, got.Kind, tt.wantKind, tt.description)
+				t.Errorf("parseGraphSpecNode().Kind = %q, want %q (%s)", got.Kind, tt.wantKind, tt.description)
 			}
 		})
 	}

@@ -42,12 +42,12 @@ func runAsyncValidatorStopPipeline(workerTimeout, cacheTimeout time.Duration, av
 	pl := pipeline.NewBuilder(asyncValidatorShutdownPipelineKind, av.logger).
 		WithMetricsConfig(&pipeline.MetricsConfig{Sink: noopAsyncValidatorShutdownMetrics{}, Strategy: pipeline.NoopBucketing{}}).
 		WithProfile("system").
-		AddStage(ConstMagicf2506503, asyncValidatorStopStageLogShuttingDown).
-		AddStage(ConstMagic6c1e6557, asyncValidatorStopStageWaitWorkers).
-		AddStage(ConstMagic9410e177, asyncValidatorStopStageLogStopped).
-		AddStage(ConstMagicda2a5493, asyncValidatorStopStagePersistCache).
-		AddStage(ConstMagic79462eba, asyncValidatorStopStageCloseProgress).
-		AddStage(ConstMagic0be5e826, asyncValidatorStopStageCloseLoggerDestinations).
+		AddStage("FINALIZE_log_shutting_down", asyncValidatorStopStageLogShuttingDown).
+		AddStage("FINALIZE_wait_workers", asyncValidatorStopStageWaitWorkers).
+		AddStage("FINALIZE_log_stopped", asyncValidatorStopStageLogStopped).
+		AddStage("FINALIZE_persist_cache", asyncValidatorStopStagePersistCache).
+		AddStage("FINALIZE_close_progress", asyncValidatorStopStageCloseProgress).
+		AddStage("FINALIZE_close_logger_destinations", asyncValidatorStopStageCloseLoggerDestinations).
 		Build()
 
 	pctx := &pipeline.Context{
@@ -65,7 +65,7 @@ func asyncValidatorStopStageLogShuttingDown(_ *pipeline.Context, payload any) (a
 	queueSize := av.priorityQueue.Size()
 	activeWorkers := int(av.activeWorkers.Load())
 	activeGoroutines := int(getActiveGoroutines())
-	logging.Fluent(av.logger).Info(ConstMagic815ef83e).
+	logging.Fluent(av.logger).Info("Stopping async validator").
 		ActiveWorkers(activeWorkers).
 		ActiveGoroutines(activeGoroutines).
 		QueueSize(queueSize).
@@ -73,7 +73,7 @@ func asyncValidatorStopStageLogShuttingDown(_ *pipeline.Context, payload any) (a
 		Log()
 
 	av.workerStates.Range(func(key, value any) bool {
-		logging.Fluent(av.logger).Debug(ConstMagic5fb2802c).
+		logging.Fluent(av.logger).Debug("Worker state before stop").
 			WorkerID(key.(int)).
 			String("state", value.(string)).
 			Log()
@@ -91,7 +91,7 @@ func asyncValidatorStopStageWaitWorkers(_ *pipeline.Context, payload any) (any, 
 	defer stopCancel()
 
 	stopBud := goroutinelabels.DefaultBudget()
-	stopWaitBuilder := goroutinelabels.NewGoroutine(ConstMagica038bd3b, asyncValidatorShutdownPipelineKind+"/FINALIZE_wait_workers").
+	stopWaitBuilder := goroutinelabels.NewGoroutine("async_validator_stop_wait", asyncValidatorShutdownPipelineKind+"/FINALIZE_wait_workers").
 		WithCleanup(func() {
 			close(stopComplete)
 		})
@@ -105,13 +105,13 @@ func asyncValidatorStopStageWaitWorkers(_ *pipeline.Context, payload any) (any, 
 
 	select {
 	case <-stopComplete:
-		logging.Fluent(av.logger).Info(ConstMagicb7491cc8).Log()
+		logging.Fluent(av.logger).Info("All workers stopped").Log()
 	case <-stopCtx.Done():
 		av.workerStopTimedOut.Store(true)
 		remainingWorkers := int(av.activeWorkers.Load())
 		remainingGoroutines := int(getActiveGoroutines())
 		remainingQueueSize := av.priorityQueue.Size()
-		logging.Fluent(av.logger).Warn(ConstMagic68e5d73f).
+		logging.Fluent(av.logger).Warn("Timeout waiting for workers to stop - some workers may be stuck").
 			ActiveWorkers(remainingWorkers).
 			ActiveGoroutines(remainingGoroutines).
 			QueueSize(remainingQueueSize).
@@ -121,14 +121,14 @@ func asyncValidatorStopStageWaitWorkers(_ *pipeline.Context, payload any) (any, 
 		workerCount := 0
 		av.workerStates.Range(func(key, value any) bool {
 			workerCount++
-			logging.Fluent(av.logger).Warn(ConstMagic296d717c).
+			logging.Fluent(av.logger).Warn("Worker still active after stop timeout").
 				WorkerID(key.(int)).
 				WorkerStateLabel(value.(string)).
 				Log()
 			return true
 		})
 		if workerCount == 0 && remainingWorkers > 0 {
-			logging.Fluent(av.logger).Debug(ConstMagicbc6ece0d).
+			logging.Fluent(av.logger).Debug("Worker state snapshot empty at stop timeout (workers may have exited immediately after)").
 				ActiveWorkersRemainingAtTimeout(remainingWorkers).
 				Log()
 		}
@@ -139,7 +139,7 @@ func asyncValidatorStopStageWaitWorkers(_ *pipeline.Context, payload any) (any, 
 func asyncValidatorStopStageLogStopped(_ *pipeline.Context, payload any) (any, error) {
 	p := payload.(*asyncValidatorStopPayload)
 	av := p.av
-	logging.Fluent(av.logger).Info(ConstMagic956f6a3c).
+	logging.Fluent(av.logger).Info("Async validator stopped").
 		ActiveGoroutines(int(getActiveGoroutines())).
 		Log()
 	return payload, nil
@@ -165,7 +165,7 @@ func asyncValidatorStopStagePersistCache(_ *pipeline.Context, payload any) (any,
 	defer saveCancel()
 
 	cacheSaveBud := goroutinelabels.DefaultBudget()
-	cacheSaveBuilder := goroutinelabels.NewGoroutine(ConstMagic682ebd97, asyncValidatorShutdownPipelineKind+"/FINALIZE_persist_cache")
+	cacheSaveBuilder := goroutinelabels.NewGoroutine("async_validator_cache_saver", asyncValidatorShutdownPipelineKind+"/FINALIZE_persist_cache")
 	if cacheSaveBud != nil {
 		cacheSaveBuilder = cacheSaveBuilder.WithBudget(cacheSaveBud)
 	}
@@ -193,7 +193,7 @@ func asyncValidatorStopStagePersistCache(_ *pipeline.Context, payload any) (any,
 			if err == nil {
 				break
 			}
-			if !strings.Contains(err.Error(), ConstMagic8ae54b17) {
+			if !strings.Contains(err.Error(), "cache file is locked by another process") {
 				break
 			}
 		}
@@ -207,17 +207,17 @@ func asyncValidatorStopStagePersistCache(_ *pipeline.Context, payload any) (any,
 	select {
 	case err := <-saveDone:
 		if err != nil {
-			logging.Fluent(av.logger).Warn(ConstMagicaca662d0).
+			logging.Fluent(av.logger).Warn("Failed to save validation cache").
 				WithError(err).
 				Log()
 		}
 	case <-saveCtx.Done():
 		av.cacheSaveTimedOut.Store(true)
-		logging.Fluent(av.logger).Warn(ConstMagicc70e57f1).
+		logging.Fluent(av.logger).Warn("Timeout saving validation cache - cache may not be saved").
 			String("timeout", saveTimeout.String()).
 			Int("state_count", stateCount).
 			Int("stale_count", staleCount).
-			Int(ConstMagic0d21114d, withIssuesCount).
+			Int("with_issues_count", withIssuesCount).
 			String("diagnostic", "Cache save may be slow due to large state count, file locking, or disk I/O").
 			Log()
 	}
@@ -248,7 +248,7 @@ func asyncValidatorStopStageCloseLoggerDestinations(_ *pipeline.Context, payload
 	if err := logging.TryCloseLoggerDestinations(av.logger); err != nil {
 		// Last resort: primary logger may be partially closed; use system profile logger.
 		sys := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-		logging.Fluent(sys).Warn(ConstMagic2e43c983).
+		logging.Fluent(sys).Warn("Async validator: close logger destinations returned error").
 			WithError(err).
 			Log()
 	}

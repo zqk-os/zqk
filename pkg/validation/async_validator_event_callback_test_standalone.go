@@ -31,7 +31,7 @@ func TestAsyncValidator_EventCallback_Standalone(t *testing.T) {
 
 	testRoot, err := testenvroot.Setup(tmpDir)
 	if err != nil {
-		t.Fatalf(ConstMagic4c428257, err)
+		t.Fatalf("failed to setup test environment: %v", err)
 	}
 
 	validator := NewAsyncValidator(testRoot, 1, time.Hour)
@@ -55,7 +55,7 @@ func TestAsyncValidator_EventCallback_Standalone(t *testing.T) {
 	validator.SetEventCallback(callback)
 
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic4545ee2f, err)
+		t.Fatalf("failed to start validator: %v", err)
 	}
 	defer func() {
 		if err := validator.Stop(); err != //nolint:errcheck // Test cleanup
@@ -69,7 +69,7 @@ func TestAsyncValidator_EventCallback_Standalone(t *testing.T) {
 		}
 	}()
 
-	testFile := filepath.Join(testRoot, ConstMagic8293f515)
+	testFile := filepath.Join(testRoot, "nonexistent.yaml")
 	if err := validator.Enqueue("TEST-001", "test_object", testFile, 1); err !=
 
 		// Wait for validation to complete (file read error should be immediate)
@@ -83,23 +83,23 @@ func TestAsyncValidator_EventCallback_Standalone(t *testing.T) {
 	for !fileReadErrorFound {
 		select {
 		case <-timeout:
-			t.Fatal(ConstMagicfe3763fd)
+			t.Fatal("Timeout waiting for file read error event")
 		case <-tick:
 			mu.Lock()
 			for _, event := range events {
-				if event.eventType == ConstMagicExtracted_24 {
+				if event.eventType == "file_read_error" {
 					fileReadErrorFound = true
 					if event.objectID != "TEST-001" {
-						t.Errorf(ConstMagic8f55e09c, event.objectID)
+						t.Errorf("Expected objectID TEST-001, got %s", event.objectID)
 					}
 					if event.severity != "medium" {
-						t.Errorf(ConstMagicaa7f8c03, event.severity)
+						t.Errorf("Expected severity medium, got %s", event.severity)
 					}
 					if filePath := objects.GetString(event.fields, objects.FieldKeyFilePath); !ok || filePath != testFile {
-						t.Errorf(ConstMagicd891e2e7, testFile, event.fields[objects.FieldKeyFilePath])
+						t.Errorf("Expected file_path %s, got %v", testFile, event.fields[objects.FieldKeyFilePath])
 					}
 					if _, ok := event.fields["error"]; !ok {
-						t.Error(ConstMagic69ad2397)
+						t.Error("Expected error field in event fields")
 					}
 				}
 			}
@@ -110,7 +110,7 @@ func TestAsyncValidator_EventCallback_Standalone(t *testing.T) {
 	// Verify callback was called
 	mu.Lock()
 	if len(events) == 0 {
-		t.Error(ConstMagic38c59618)
+		t.Error("Expected at least one event callback to be invoked")
 	}
 	mu.Unlock()
 }

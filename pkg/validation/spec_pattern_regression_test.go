@@ -21,28 +21,28 @@ func TestSpecPatternRegression_DatetimePatternMatchesValidTimestamps(t *testing.
 	// because "^\d{4}-..." was stored as "^\\d{4}-..." (double backslash) in spec YAML.
 	obj := map[string]any{
 		objects.FieldKeyID:        "CHA-001",
-		objects.FieldKeyKind:      ConstMagic5777b6fd,
-		objects.FieldKeyStatus:    "published",
+		objects.FieldKeyKind:      "change_journal_entry",
+		objects.FieldKeyStatus:    "completed",
 		objects.FieldKeyTitle:     "test entry",
-		objects.FieldKeyCreatedAt: ConstMagicab92687d,
-		objects.FieldKeyUpdatedAt: ConstMagicab92687d,
+		objects.FieldKeyCreatedAt: "2026-03-14T07:30:16Z",
+		objects.FieldKeyUpdatedAt: "2026-03-14T07:30:16Z",
 		objects.FieldKeyCreatedBy: "ACC-SYSTEM",
 		objects.FieldKeyUpdatedBy: "ACC-SYSTEM",
-		objects.FieldKeySummary:   ConstMagic8fffcbad,
-		objects.FieldKeyBody:      ConstMagicf067ecf6,
+		objects.FieldKeySummary:   "test summary for regression",
+		objects.FieldKeyBody:      "test body content for regression test",
 		objects.FieldKeyCategory:  "fix",
 	}
 
 	opts := DefaultValidationOptions()
-	result, err := validator.Validate(context.Background(), obj, ConstMagic5777b6fd, opts)
+	result, err := validator.Validate(context.Background(), obj, "change_journal_entry", opts)
 	if err != nil {
-		t.Fatalf(ConstMagic3e4b83b8, err)
+		t.Fatalf("Validate returned unexpected error: %v", err)
 	}
 
 	// Ensure no pattern errors on the datetime fields that had broken patterns.
 	for _, e := range result.Errors {
 		if e.Rule == "pattern" && (e.Field == "created_at" || e.Field == "updated_at") {
-			t.Errorf(ConstMagic39ae39dc+ConstMagic17fd010f, e.Field, e.Message)
+			t.Errorf("Unexpected pattern error on %s: %s\n"+"This is the double-backslash regression — spec pattern should be \\d, not \\\\d", e.Field, e.Message)
 		}
 	}
 }
@@ -58,22 +58,22 @@ func TestSpecPatternRegression_SchemaVersionPatternMatchesValidVersion(t *testin
 	correctPattern := `^\d+\.\d+\.\d+$`
 	re, err := GetCachedRegexp(correctPattern)
 	if err != nil {
-		t.Fatalf(ConstMagicc869c274, correctPattern, err)
+		t.Fatalf("Failed to compile pattern %q: %v", correctPattern, err)
 	}
 
 	validVersions := []string{objects.DefaultSchemaVersion, "1.0.0", "10.3.2"}
 	for _, v := range validVersions {
 		if !re.MatchString(v) {
-			t.Errorf(ConstMagice402d1b0, correctPattern, v)
+			t.Errorf("Pattern %q should match %q but did not", correctPattern, v)
 		}
 	}
 
 	brokenPattern := `^\\d+\\.\\d+\\.\\d+$`
 	reBroken, err := GetCachedRegexp(brokenPattern)
 	if err != nil {
-		t.Fatalf(ConstMagic4cfc04de, err)
+		t.Fatalf("Failed to compile broken pattern: %v", err)
 	}
 	if reBroken.MatchString(objects.DefaultSchemaVersion) {
-		t.Errorf(ConstMagicb3d5c094, brokenPattern, objects.DefaultSchemaVersion)
+		t.Errorf("Broken pattern %q should NOT match %q (double backslash is literal)", brokenPattern, objects.DefaultSchemaVersion)
 	}
 }

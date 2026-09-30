@@ -36,12 +36,12 @@ func TestAsyncValidator_EventCallback(t *testing.T) {
 	validator.SetEventCallback(callback)
 
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic4545ee2f, err)
+		t.Fatalf("failed to start validator: %v", err)
 	}
 	defer func() { _ = validator.Stop() }() //nolint:errcheck // Test cleanup
 
 	// Test 1: File read error should trigger callback
-	testFile := filepath.Join(testRoot, ConstMagic8293f515)
+	testFile := filepath.Join(testRoot, "nonexistent.yaml")
 	_ = validator.Enqueue("TEST-001", "test_object", testFile, 1)
 
 	// Wait for validation to complete (file read error should be immediate)
@@ -51,23 +51,23 @@ func TestAsyncValidator_EventCallback(t *testing.T) {
 	for !fileReadErrorFound {
 		select {
 		case <-timeout:
-			t.Fatal(ConstMagicfe3763fd)
+			t.Fatal("Timeout waiting for file read error event")
 		case <-tick:
 			mu.Lock()
 			for _, event := range events {
 				if event.eventType == "file_read_error" {
 					fileReadErrorFound = true
 					if event.objectID != "TEST-001" {
-						t.Errorf(ConstMagic8f55e09c, event.objectID)
+						t.Errorf("Expected objectID TEST-001, got %s", event.objectID)
 					}
 					if event.severity != "medium" {
-						t.Errorf(ConstMagicaa7f8c03, event.severity)
+						t.Errorf("Expected severity medium, got %s", event.severity)
 					}
 					if filePath := objects.GetString(event.fields, objects.FieldKeyFilePath); filePath != testFile {
-						t.Errorf(ConstMagicd891e2e7, testFile, event.fields[objects.FieldKeyFilePath])
+						t.Errorf("Expected file_path %s, got %v", testFile, event.fields[objects.FieldKeyFilePath])
 					}
 					if _, ok := event.fields["error"]; !ok {
-						t.Error(ConstMagic69ad2397)
+						t.Error("Expected error field in event fields")
 					}
 				}
 			}
@@ -83,7 +83,7 @@ func TestAsyncValidator_EventCallback(t *testing.T) {
 
 	// Verify callback was called
 	if initialEventCount == 0 {
-		t.Error(ConstMagic38c59618)
+		t.Error("Expected at least one event callback to be invoked")
 	}
 
 	// Verify event structure
@@ -92,10 +92,10 @@ func TestAsyncValidator_EventCallback(t *testing.T) {
 	mu.Unlock()
 
 	if fileReadEvent.eventType != "file_read_error" {
-		t.Errorf(ConstMagicefeef39b, fileReadEvent.eventType)
+		t.Errorf("Expected eventType file_read_error, got %s", fileReadEvent.eventType)
 	}
 	if fileReadEvent.message == emptyValue {
-		t.Error(ConstMagicf670e3e1)
+		t.Error("Expected non-empty message in event")
 	}
 }
 
@@ -110,12 +110,12 @@ func TestAsyncValidator_EventCallbackNil(t *testing.T) {
 	validator.SetEventCallback(nil)
 
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic4545ee2f, err)
+		t.Fatalf("failed to start validator: %v", err)
 	}
 	defer func() { _ = validator.Stop() }() //nolint:errcheck // Test cleanup
 
 	// Enqueue a task that will fail (file read error)
-	testFile := filepath.Join(testRoot, ConstMagic8293f515)
+	testFile := filepath.Join(testRoot, "nonexistent.yaml")
 	_ = validator.Enqueue("TEST-001", "test_object", testFile, 1)
 
 	// Wait a bit - should not panic even with nil callback
@@ -142,13 +142,13 @@ func TestAsyncValidator_EventCallbackConcurrent(t *testing.T) {
 	validator.SetEventCallback(callback)
 
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic4545ee2f, err)
+		t.Fatalf("failed to start validator: %v", err)
 	}
 	defer func() { _ = validator.Stop() }() //nolint:errcheck // Test cleanup
 
 	// Enqueue multiple tasks concurrently
 	for i := 0; i < 10; i++ {
-		testFile := filepath.Join(testRoot, ConstMagic8293f515)
+		testFile := filepath.Join(testRoot, "nonexistent.yaml")
 		_ = validator.Enqueue("TEST-"+string(rune(i)), "test_object", testFile, 1)
 	}
 
@@ -158,7 +158,7 @@ func TestAsyncValidator_EventCallbackConcurrent(t *testing.T) {
 	for {
 		select {
 		case <-timeout:
-			t.Fatal(ConstMagic6c339b18)
+			t.Fatal("Timeout waiting for events")
 		case <-tick:
 			mu.Lock()
 			count := eventCount
@@ -200,12 +200,12 @@ func TestAsyncValidator_SetEventCallback(t *testing.T) {
 	validator.SetEventCallback(secondCallback)
 
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic4545ee2f, err)
+		t.Fatalf("failed to start validator: %v", err)
 	}
 	defer func() { _ = validator.Stop() }() //nolint:errcheck // Test cleanup
 
 	// Trigger an event
-	testFile := filepath.Join(testRoot, ConstMagic8293f515)
+	testFile := filepath.Join(testRoot, "nonexistent.yaml")
 	_ = validator.Enqueue("TEST-001", "test_object", testFile, 1)
 
 	// Wait for event
@@ -215,10 +215,10 @@ func TestAsyncValidator_SetEventCallback(t *testing.T) {
 	defer mu.Unlock()
 
 	if firstCallbackCalled {
-		t.Error(ConstMagic0488eb0f)
+		t.Error("First callback should not have been called after replacement")
 	}
 	if !secondCallbackCalled {
-		t.Error(ConstMagice208b5b5)
+		t.Error("Second callback should have been called")
 	}
 }
 

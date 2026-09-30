@@ -37,12 +37,12 @@ func TestAsyncValidator_BaselineComparison(t *testing.T) {
 	asyncDuration := time.Since(asyncStart)
 
 	// Compare results
-	t.Logf(ConstMagicc31d7b42, len(syncResults), syncDuration)
-	t.Logf(ConstMagicc204f80b, len(asyncResults), asyncDuration)
+	t.Logf("Synchronous validation: %d results in %v", len(syncResults), syncDuration)
+	t.Logf("Asynchronous validation: %d results in %v", len(asyncResults), asyncDuration)
 
 	// Verify same number of results
 	if len(syncResults) != len(asyncResults) {
-		t.Errorf(ConstMagic2456e492, len(syncResults), len(asyncResults))
+		t.Errorf("Result count mismatch: sync=%d, async=%d", len(syncResults), len(asyncResults))
 	}
 
 	// Verify same issues found
@@ -50,12 +50,12 @@ func TestAsyncValidator_BaselineComparison(t *testing.T) {
 	asyncIssues := countIssues(asyncResults)
 
 	if syncIssues != asyncIssues {
-		t.Errorf(ConstMagic5e6ad408, syncIssues, asyncIssues)
+		t.Errorf("Issue count mismatch: sync=%d, async=%d", syncIssues, asyncIssues)
 	}
 
 	// Verify async is faster (or at least not significantly slower)
 	if asyncDuration > syncDuration*2 {
-		t.Logf(ConstMagicaa92128c, asyncDuration, syncDuration)
+		t.Logf("Warning: Async validation took longer than expected: %v vs %v", asyncDuration, syncDuration)
 	}
 
 	// Verify all object IDs match
@@ -63,13 +63,13 @@ func TestAsyncValidator_BaselineComparison(t *testing.T) {
 	asyncIDs := getObjectIDs(asyncResults)
 
 	if len(syncIDs) != len(asyncIDs) {
-		t.Errorf(ConstMagic00b9a3e5, len(syncIDs), len(asyncIDs))
+		t.Errorf("Object ID count mismatch: sync=%d, async=%d", len(syncIDs), len(asyncIDs))
 	}
 
 	// Check that async found all objects sync found
 	for id := range syncIDs {
 		if !asyncIDs[id] {
-			t.Errorf(ConstMagic30dd0e1b, id)
+			t.Errorf("Async validation missed object: %s", id)
 		}
 	}
 }
@@ -78,7 +78,7 @@ func TestAsyncValidator_BaselineComparison(t *testing.T) {
 func createTestObjects(t *testing.T, testRoot string, count int) []string {
 	testDir := datacell.CellCASPrimaryDir(testRoot, "test")
 	if err := fileutil.MkdirAll(testDir, paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagic32b1c202, err)
+		t.Fatalf("failed to create test directory: %v", err)
 	}
 
 	objectIDs := make([]string, 0, count)
@@ -96,7 +96,7 @@ created_by: account:test
 `, objectID, i, objects.DefaultSchemaVersion, time.Now().Format(time.RFC3339))
 
 		if err := fileutil.WriteFile(filePath, []byte(content), paths.FilePerm644); err != nil {
-			t.Fatalf(ConstMagic3ef3a65c, err)
+			t.Fatalf("failed to create test object: %v", err)
 		}
 
 		objectIDs = append(objectIDs, objectID)
@@ -158,7 +158,7 @@ func runAsynchronousValidation(t *testing.T, testRoot string, objectIDs []string
 	validator.SetValidationFunc(validationFunc)
 
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic63bbaf4d, err)
+		t.Fatalf("failed to start async validator: %v", err)
 	}
 	defer func() {
 		_ = validator.Stop() //nolint:errcheck // Test cleanup - errors are acceptable

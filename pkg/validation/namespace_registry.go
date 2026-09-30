@@ -117,7 +117,7 @@ func (nr *NamespaceRegistry) isLoaded() bool {
 		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
 
 			// getSpecsDirForIO gets specs directory and releases lock before I/O
-			Error(ConstMagic78162d28, err).Log()
+			Error("lock failed in isLoaded: %v\n", err).Log()
 	}
 	return loaded
 }
@@ -136,7 +136,7 @@ func (nr *NamespaceRegistry) getSpecsDirForIO() string {
 		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
 
 			// loadNamespaceMappings loads namespace mappings from specs directory
-			Error(ConstMagicdcdacded, err).Log()
+			Error("lock failed in getSpecsDirForIO: %v\n", err).Log()
 	}
 	return specsDir
 }
@@ -331,7 +331,7 @@ func (nr *NamespaceRegistry) inferNamespaceFromKind(kind string) string {
 			return nil
 		},
 	); err != nil {
-		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ConstMagicea983954, err).Log()
+		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error("lock failed in inferNamespaceFromKind: %v\n", err).Log()
 	}
 
 	if found {
@@ -394,7 +394,7 @@ func (nr *NamespaceRegistry) GetNamespaceForKind(kind string) string {
 			return nil
 		},
 	); err != nil {
-		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ConstMagic2051a9d6, err).Log()
+		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error("lock failed in GetNamespaceForKind: %v\n", err).Log()
 	}
 
 	if !loaded {
@@ -421,7 +421,7 @@ func (nr *NamespaceRegistry) GetNamespaceForKind(kind string) string {
 			return nil
 		},
 	); err != nil {
-		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ConstMagic2051a9d6, err).Log()
+		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error("lock failed in GetNamespaceForKind: %v\n", err).Log()
 	}
 
 	if found {
@@ -447,13 +447,13 @@ func (nr *NamespaceRegistry) GetSubordinateNamespaces(parentNamespaceID string) 
 		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
 
 			// Load namespaces if not already loaded
-			Error(ConstMagic31c5ae4f, err).Log()
+			Error("lock failed in GetSubordinateNamespaces: %v\n", err).Log()
 	}
 
 	if !loaded {
 
 		if err := nr.LoadNamespaces(); err != nil {
-			logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ConstMagic5a2446d8, err).Log()
+			logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error("failed to LoadNamespaces in GetSubordinateNamespaces: %v\n", err).Log()
 		}
 	}
 
@@ -470,7 +470,7 @@ func (nr *NamespaceRegistry) GetSubordinateNamespaces(parentNamespaceID string) 
 			return nil
 		},
 	); err != nil {
-		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ConstMagic31c5ae4f, err).Log()
+		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error("lock failed in GetSubordinateNamespaces: %v\n", err).Log()
 	}
 
 	if found {
@@ -509,7 +509,7 @@ func (nr *NamespaceRegistry) RegisterNamespace(kind, namespaceID string) {
 		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.
 
 			// GetAllNamespaces returns all registered namespace mappings
-			ProfileSystem))).Error(ConstMagic1e4e6762, err).Log()
+			ProfileSystem))).Error("lock failed in RegisterNamespace: %v\n", err).Log()
 	}
 }
 
@@ -527,7 +527,7 @@ func (nr *NamespaceRegistry) GetAllNamespaces() map[string]string {
 			return nil
 		},
 	); err != nil {
-		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ConstMagic4fbca24c, err).Log()
+		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error("lock failed in GetAllNamespaces: %v\n", err).Log()
 	}
 	return result
 }

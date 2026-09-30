@@ -25,7 +25,7 @@ func TestAsyncValidator_Stop_NoDeadlock(t *testing.T) {
 
 	// Start validator
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic4545ee2f, err)
+		t.Fatalf("failed to start validator: %v", err)
 	}
 
 	// Enqueue many tasks to create realistic load
@@ -48,7 +48,7 @@ func TestAsyncValidator_Stop_NoDeadlock(t *testing.T) {
 	// Call Stop() from multiple goroutines concurrently
 	for i := 0; i < 3; i++ {
 		i := i
-		goroutinelabels.NewGoroutine(fmt.Sprintf(ConstMagic935221c4, i), fmt.Sprintf(ConstMagicc44500a3, i)).
+		goroutinelabels.NewGoroutine(fmt.Sprintf("test_validator_stop_%d", i), fmt.Sprintf("stopping validator %d in deadlock test", i)).
 			WithWaitGroup(&wg).
 			StartSimple(func() {
 				// Stop should be idempotent and not deadlock
@@ -58,7 +58,7 @@ func TestAsyncValidator_Stop_NoDeadlock(t *testing.T) {
 	}
 
 	// Also try concurrent operations while stopping
-	goroutinelabels.NewGoroutine(ConstMagic472ef763, ConstMagic2318f86c).
+	goroutinelabels.NewGoroutine("test_validator_stats", "getting validator stats during stop in deadlock test").
 		WithWaitGroup(&wg).
 		StartSimple(func() {
 			// Try to get stats while stopping
@@ -70,7 +70,7 @@ func TestAsyncValidator_Stop_NoDeadlock(t *testing.T) {
 
 	// Wait for all goroutines with timeout
 	done := make(chan struct{})
-	goroutinelabels.StartTestGoroutine(ConstMagicecfe21cf, ConstMagicade2a268, func() {
+	goroutinelabels.StartTestGoroutine("test_wait_collector", "waiting for test goroutines in deadlock test", func() {
 		wg.Wait()
 		close(done)
 	})
@@ -78,9 +78,9 @@ func TestAsyncValidator_Stop_NoDeadlock(t *testing.T) {
 	select {
 	case <-done:
 		// All goroutines completed - no deadlock
-		t.Log(ConstMagic0a3c921f)
+		t.Log("✅ No deadlock detected - all goroutines completed")
 	case <-time.After(5 * time.Second):
-		t.Fatal(ConstMagicf64efbb0)
+		t.Fatal("❌ DEADLOCK DETECTED: Stop() or concurrent operations hung for >5 seconds")
 	}
 
 	// Check that Stop() returned successfully
@@ -92,16 +92,16 @@ func TestAsyncValidator_Stop_NoDeadlock(t *testing.T) {
 		select {
 		case err := <-stopDone:
 			if err != nil {
-				t.Errorf(ConstMagic1a06a983, err)
+				t.Errorf("Stop() returned error: %v", err)
 			}
 			stopCount++
 		case <-timeout:
-			t.Errorf(ConstMagicaa4367b0, stopCount)
+			t.Errorf("Only %d Stop() calls completed within timeout (expected 3)", stopCount)
 			return
 		}
 	}
 	if stopCount != 3 {
-		t.Errorf(ConstMagicaac9a31e, stopCount)
+		t.Errorf("Expected 3 Stop() calls to complete, got %d", stopCount)
 	}
 }
 
@@ -114,7 +114,7 @@ func TestAsyncValidator_ProgressChannel_NoDeadlock(t *testing.T) {
 
 	// Start validator
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic4545ee2f, err)
+		t.Fatalf("failed to start validator: %v", err)
 	}
 	defer func() { _ = validator.Stop() }() //nolint:errcheck // Test cleanup
 
@@ -147,11 +147,11 @@ func TestAsyncValidator_ProgressChannel_NoDeadlock(t *testing.T) {
 				for {
 					select {
 					case <-ctx.Done():
-						t.Logf(ConstMagic329c1c5c, readerID, readCount)
+						t.Logf("Reader %d: context done, read %d messages", readerID, readCount)
 						return
 					case progress, ok := <-progressChan:
 						if !ok {
-							t.Logf(ConstMagic21cb7e84, readerID, readCount)
+							t.Logf("Reader %d: channel closed, read %d messages", readerID, readCount)
 							return
 						}
 						readCount++
@@ -166,16 +166,16 @@ func TestAsyncValidator_ProgressChannel_NoDeadlock(t *testing.T) {
 
 	// Wait for readers with timeout
 	done := make(chan struct{})
-	goroutinelabels.StartTestGoroutine(ConstMagicecfe21cf, ConstMagic02a67c63, func() {
+	goroutinelabels.StartTestGoroutine("test_wait_collector", "waiting for readers in deadlock test", func() {
 		wg.Wait()
 		close(done)
 	})
 
 	select {
 	case <-done:
-		t.Log(ConstMagic992faaad)
+		t.Log("✅ No deadlock detected - all progress readers completed")
 	case <-time.After(5 * time.Second):
-		t.Fatal(ConstMagic5830c38f)
+		t.Fatal("❌ DEADLOCK DETECTED: Progress channel readers hung for >5 seconds")
 	}
 }
 
@@ -188,7 +188,7 @@ func TestAsyncValidator_ConcurrentOperations_NoDeadlock(t *testing.T) {
 
 	// Start validator
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic4545ee2f, err)
+		t.Fatalf("failed to start validator: %v", err)
 	}
 	defer func() { _ = validator.Stop() }() //nolint:errcheck // Test cleanup
 
@@ -198,7 +198,7 @@ func TestAsyncValidator_ConcurrentOperations_NoDeadlock(t *testing.T) {
 	var wg sync.WaitGroup
 
 	// Concurrent Enqueue operations
-	goroutinelabels.NewGoroutine(ConstMagica0f977cf, ConstMagic02a701e9).
+	goroutinelabels.NewGoroutine("test_concurrent_enqueue", "enqueuing tasks concurrently in deadlock test").
 		WithWaitGroup(&wg).
 		StartWithContext(ctx, func(ctx context.Context) error {
 			for i := 0; i < 100; i++ {
@@ -220,7 +220,7 @@ func TestAsyncValidator_ConcurrentOperations_NoDeadlock(t *testing.T) {
 
 	// Concurrent GetCachedState operations
 	wg.Add(1)
-	goroutinelabels.NewGoroutine("validation_test", ConstMagic9c5c3127).StartSimple(func() {
+	goroutinelabels.NewGoroutine("validation_test", "concurrent get cached state").StartSimple(func() {
 		defer wg.Done()
 		for i := 0; i < 100; i++ {
 			select {
@@ -235,7 +235,7 @@ func TestAsyncValidator_ConcurrentOperations_NoDeadlock(t *testing.T) {
 
 	// Concurrent GetValidationStats operations
 	wg.Add(1)
-	goroutinelabels.NewGoroutine("validation_test", ConstMagic99464092).StartSimple(func() {
+	goroutinelabels.NewGoroutine("validation_test", "concurrent get validation stats").StartSimple(func() {
 		defer wg.Done()
 		for i := 0; i < 100; i++ {
 			select {
@@ -250,7 +250,7 @@ func TestAsyncValidator_ConcurrentOperations_NoDeadlock(t *testing.T) {
 
 	// Concurrent GetAllCachedStates operations
 	wg.Add(1)
-	goroutinelabels.NewGoroutine("validation_test", ConstMagic33e44b25).StartSimple(func() {
+	goroutinelabels.NewGoroutine("validation_test", "concurrent get all cached states").StartSimple(func() {
 		defer wg.Done()
 		for i := 0; i < 50; i++ {
 			select {
@@ -265,16 +265,16 @@ func TestAsyncValidator_ConcurrentOperations_NoDeadlock(t *testing.T) {
 
 	// Wait for all operations with timeout
 	done := make(chan struct{})
-	goroutinelabels.NewGoroutine("validation_test", ConstMagicdb562591).StartSimple(func() {
+	goroutinelabels.NewGoroutine("validation_test", "wait for completion").StartSimple(func() {
 		wg.Wait()
 		close(done)
 	})
 
 	select {
 	case <-done:
-		t.Log(ConstMagicd505196a)
+		t.Log("✅ No deadlock detected - all concurrent operations completed")
 	case <-time.After(5 * time.Second):
-		t.Fatal(ConstMagic11a7f2e3)
+		t.Fatal("❌ DEADLOCK DETECTED: Concurrent operations hung for >5 seconds")
 	}
 }
 
@@ -288,7 +288,7 @@ func TestAsyncValidator_Stop_WithActiveWorkers_NoDeadlock(t *testing.T) {
 
 	// Start validator
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic4545ee2f, err)
+		t.Fatalf("failed to start validator: %v", err)
 	}
 
 	// Enqueue many tasks to keep workers busy
@@ -310,15 +310,15 @@ func TestAsyncValidator_Stop_WithActiveWorkers_NoDeadlock(t *testing.T) {
 	stopDuration := time.Since(stopStart)
 
 	if stopErr != nil {
-		t.Errorf(ConstMagic1a06a983, stopErr)
+		t.Errorf("Stop() returned error: %v", stopErr)
 	}
 
 	// Stop should complete within timeout (2s worker timeout + 1s cache timeout + buffer)
 	maxExpectedDuration := 4 * time.Second
 	if stopDuration > maxExpectedDuration {
-		t.Errorf(ConstMagic929ff366, stopDuration)
+		t.Errorf("❌ Stop() took too long (%v), possible deadlock or hang", stopDuration)
 	} else {
-		t.Logf(ConstMagic2287369e, stopDuration, maxExpectedDuration)
+		t.Logf("✅ Stop() completed in %v (expected < %v)", stopDuration, maxExpectedDuration)
 	}
 }
 
@@ -332,29 +332,29 @@ func TestAsyncValidator_MultipleStopCalls_NoDeadlock(t *testing.T) {
 
 	// Start validator
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic4545ee2f, err)
+		t.Fatalf("failed to start validator: %v", err)
 	}
 
 	// Stop once
 	err1 := validator.Stop()
 	if err1 != nil {
-		t.Errorf(ConstMagic92137177, err1)
+		t.Errorf("First Stop() returned error: %v", err1)
 	}
 
 	// Stop again (should be idempotent)
 	err2 := validator.Stop()
 	if err2 != nil {
-		t.Errorf(ConstMagicac47dc77, err2)
+		t.Errorf("Second Stop() returned error: %v", err2)
 	}
 
 	// Stop a third time
 	err3 := validator.Stop()
 	if err3 != nil {
-		t.Errorf(ConstMagicfa4d35ff, err3)
+		t.Errorf("Third Stop() returned error: %v", err3)
 	}
 
 	// All should complete quickly (no deadlock)
-	t.Log(ConstMagic34484c24)
+	t.Log("✅ Multiple Stop() calls completed without deadlock")
 }
 
 // TestAsyncValidator_ProgressChannelClose_NoDeadlock tests that closing
@@ -366,7 +366,7 @@ func TestAsyncValidator_ProgressChannelClose_NoDeadlock(t *testing.T) {
 
 	// Start validator
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic4545ee2f, err)
+		t.Fatalf("failed to start validator: %v", err)
 	}
 
 	progressChan := validator.GetProgress()
@@ -378,7 +378,7 @@ func TestAsyncValidator_ProgressChannelClose_NoDeadlock(t *testing.T) {
 
 	for i := 0; i < readers; i++ {
 		wg.Add(1)
-		goroutinelabels.NewGoroutine("validation_test", ConstMagic4e4082e2).StartSimple(func() {
+		goroutinelabels.NewGoroutine("validation_test", "progress reader close test").StartSimple(func() {
 			func(readerID int) {
 				defer wg.Done()
 				readCount := 0
@@ -388,7 +388,7 @@ func TestAsyncValidator_ProgressChannelClose_NoDeadlock(t *testing.T) {
 					case progress, ok := <-progressChan:
 						if !ok {
 							// Channel closed - should exit gracefully
-							t.Logf(ConstMagic604ba3f3, readerID, readCount)
+							t.Logf("Reader %d: channel closed after %d reads", readerID, readCount)
 							return
 						}
 						readCount++
@@ -396,7 +396,7 @@ func TestAsyncValidator_ProgressChannelClose_NoDeadlock(t *testing.T) {
 					case <-validatorCtx.Done():
 						// Validator context cancelled (Stop() was called) - exit
 						// Channel should be closed soon, but don't wait for it
-						t.Logf(ConstMagic510838bc, readerID, readCount)
+						t.Logf("Reader %d: validator stopped after %d reads", readerID, readCount)
 						return
 					}
 				}
@@ -411,20 +411,20 @@ func TestAsyncValidator_ProgressChannelClose_NoDeadlock(t *testing.T) {
 	stopDuration := time.Since(stopStart)
 
 	if stopErr != nil {
-		t.Errorf(ConstMagic1a06a983, stopErr)
+		t.Errorf("Stop() returned error: %v", stopErr)
 	}
 
 	// Wait for all readers to finish (should exit when channel closes)
 	done := make(chan struct{})
-	goroutinelabels.NewGoroutine("validation_test", ConstMagic2c1c92fe).StartSimple(func() {
+	goroutinelabels.NewGoroutine("validation_test", "wait for readers").StartSimple(func() {
 		wg.Wait()
 		close(done)
 	})
 
 	select {
 	case <-done:
-		t.Logf(ConstMagic8ff029d5, stopDuration)
+		t.Logf("✅ All readers exited gracefully after channel close (Stop took %v)", stopDuration)
 	case <-time.After(3 * time.Second):
-		t.Fatal(ConstMagic4b6043c4)
+		t.Fatal("❌ DEADLOCK DETECTED: Readers didn't exit after channel close")
 	}
 }

@@ -13,7 +13,7 @@ import (
 func runZQKTempTestRootTeardown(t *testing.T, root string) {
 	t.Helper()
 	if err := projecttemp.RunIsolatedRootStrip(root); err != nil {
-		t.Logf(ConstMagic034593ae, err)
+		t.Logf("isolated root strip pipeline: %v", err)
 	}
 }
 
@@ -27,7 +27,7 @@ func registerZQKTestRootForTest(t *testing.T) string {
 	root, err := setupTestEnvironment(tmp)
 	if err != nil {
 		_ = zqkenv.TestRoot().Unset()
-		t.Fatalf(ConstMagicef54f9d1, err)
+		t.Fatalf("register ZQK test root: setup test environment: %v", err)
 	}
 	t.Cleanup(func() {
 		runZQKTempTestRootTeardown(t, root)

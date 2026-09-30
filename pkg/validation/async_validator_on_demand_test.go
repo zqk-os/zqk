@@ -17,13 +17,13 @@ func TestAsyncValidator_OnDemandPattern(t *testing.T) {
 
 	// Start validator (workers start on-demand)
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic939ff73d, err)
+		t.Fatalf("Failed to start async validator: %v", err)
 	}
 	defer func() { _ = validator.Stop() }() //nolint:errcheck // Test cleanup
 
 	// Initially no workers should be running
 	if validator.GetWorkerCount() != 0 {
-		t.Errorf(ConstMagic77e7f1de, validator.GetWorkerCount())
+		t.Errorf("Expected 0 workers running initially, got %d", validator.GetWorkerCount())
 	}
 
 	// Enqueue a task - should wake a worker
@@ -43,9 +43,9 @@ func TestAsyncValidator_OnDemandPattern(t *testing.T) {
 	workerCount := validator.GetWorkerCount()
 	if workerCount == 0 {
 		// Worker may have already processed and shut down - this is fine for on-demand pattern
-		t.Log(ConstMagic15cfb5a8)
+		t.Log("Worker count is 0 - may have already processed and shut down (on-demand pattern)")
 	} else {
-		t.Logf(ConstMagicc5a8c811, workerCount)
+		t.Logf("Worker is running: %d active workers", workerCount)
 	}
 
 	// Wait a bit more for processing
@@ -99,7 +99,7 @@ func TestAsyncValidator_CoordinatorIntegration(t *testing.T) {
 	})
 
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic939ff73d, err)
+		t.Fatalf("Failed to start async validator: %v", err)
 	}
 	defer func() { _ = validator.Stop() }() //nolint:errcheck // Test cleanup
 
@@ -114,7 +114,7 @@ func TestAsyncValidator_CoordinatorIntegration(t *testing.T) {
 	eventsMu.Unlock()
 
 	if eventCount == 0 {
-		t.Error(ConstMagic9fcfb5d9)
+		t.Error("Expected at least one lifecycle event (worker_start)")
 	}
 
 	// Check for worker_start event
@@ -124,7 +124,7 @@ func TestAsyncValidator_CoordinatorIntegration(t *testing.T) {
 		if event.eventType == "worker_start" {
 			foundStart = true
 			if event.workerCount == 0 {
-				t.Error(ConstMagicbae9358c)
+				t.Error("Expected worker_count > 0 for worker_start event")
 			}
 			break
 		}
@@ -132,7 +132,7 @@ func TestAsyncValidator_CoordinatorIntegration(t *testing.T) {
 	eventsMu.Unlock()
 
 	if !foundStart {
-		t.Error(ConstMagic600f787d)
+		t.Error("Expected worker_start event")
 	}
 }
 
@@ -142,16 +142,16 @@ func TestAsyncValidator_ShutdownCoordination(t *testing.T) {
 	validator := NewAsyncValidator(pkgctx.NewSystemContext(), testRoot, 3, 1*time.Hour)
 
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic939ff73d, err)
+		t.Fatalf("Failed to start async validator: %v", err)
 	}
 
 	// Test QueueShutdownHandler interface
 	if validator.GetName() != "async_validator" {
-		t.Errorf(ConstMagic7cc3e740, validator.GetName())
+		t.Errorf("Expected name 'async_validator', got '%s'", validator.GetName())
 	}
 
 	if !validator.IsCritical() {
-		t.Error(ConstMagic725355ca)
+		t.Error("Async validator should be critical")
 	}
 
 	// Enqueue some tasks
@@ -164,11 +164,11 @@ func TestAsyncValidator_ShutdownCoordination(t *testing.T) {
 
 	// Check pending count (may be 0 if workers processed them quickly)
 	pending := validator.GetPendingCount()
-	t.Logf(ConstMagic04d2ad0e, pending)
+	t.Logf("Pending tasks: %d", pending)
 
 	// Initiate shutdown
 	if err := validator.InitiateShutdown(); err != nil {
-		t.Fatalf(ConstMagicd4843615, err)
+		t.Fatalf("Failed to initiate shutdown: %v", err)
 	}
 
 	// Try to enqueue after shutdown - should fail (returns false for cache hit, but we can check shutdown)
@@ -183,9 +183,9 @@ func TestAsyncValidator_ShutdownCoordination(t *testing.T) {
 	if err != nil {
 		// Timeout is acceptable if workers are still processing validation goroutines
 		if err == context.DeadlineExceeded {
-			t.Logf(ConstMagic0cd43d03, err)
+			t.Logf("Drain timed out (acceptable if validation goroutines still processing): %v", err)
 		} else {
-			t.Errorf(ConstMagic58a3cb5c, err)
+			t.Errorf("Failed to drain queue: %v", err)
 		}
 	}
 
@@ -197,9 +197,9 @@ func TestAsyncValidator_ShutdownCoordination(t *testing.T) {
 		// Check if it's just validation goroutines still running
 		pending := validator.GetPendingCount()
 		if pending == 0 {
-			t.Log(ConstMagic06ba898f)
+			t.Log("Queue is empty but not fully drained (validation goroutines may still be running)")
 		} else {
-			t.Logf(ConstMagic70312515, pending)
+			t.Logf("Queue still has %d pending tasks after drain", pending)
 		}
 	}
 
@@ -212,7 +212,7 @@ func TestAsyncValidator_MultipleWorkers(t *testing.T) {
 	validator := NewAsyncValidator(pkgctx.NewSystemContext(), testRoot, 5, 1*time.Hour)
 
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic939ff73d, err)
+		t.Fatalf("Failed to start async validator: %v", err)
 	}
 	defer func() { _ = validator.Stop() }() //nolint:errcheck // Test cleanup
 
@@ -229,14 +229,14 @@ func TestAsyncValidator_MultipleWorkers(t *testing.T) {
 	maxWorkers := validator.GetMaxWorkers()
 
 	if workerCount == 0 {
-		t.Error(ConstMagicde8ba514)
+		t.Error("Expected at least one worker running")
 	}
 
 	if workerCount > maxWorkers {
-		t.Errorf(ConstMagic913f506d, maxWorkers, workerCount)
+		t.Errorf("Expected worker count <= max workers (%d), got %d", maxWorkers, workerCount)
 	}
 
-	t.Logf(ConstMagicf061218c, workerCount, maxWorkers)
+	t.Logf("Active workers: %d, Max workers: %d", workerCount, maxWorkers)
 }
 
 func TestAsyncValidator_ConcurrentOperations(t *testing.T) {
@@ -245,7 +245,7 @@ func TestAsyncValidator_ConcurrentOperations(t *testing.T) {
 	validator := NewAsyncValidator(pkgctx.NewSystemContext(), testRoot, 10, 1*time.Hour)
 
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic939ff73d, err)
+		t.Fatalf("Failed to start async validator: %v", err)
 	}
 	defer func() { _ = validator.Stop() }() //nolint:errcheck // Test cleanup
 
@@ -254,7 +254,7 @@ func TestAsyncValidator_ConcurrentOperations(t *testing.T) {
 	done := make(chan struct{}, numTasks)
 
 	for i := 0; i < numTasks; i++ {
-		goroutinelabels.NewGoroutine("validation_test", ConstMagic63f310c3).StartSimple(func() {
+		goroutinelabels.NewGoroutine("validation_test", "concurrent enqueue").StartSimple(func() {
 			func(id int) {
 				defer func() { done <- struct{}{} }()
 				validator.Enqueue("test_object", "test_object", "/test/path", 1)
@@ -273,10 +273,10 @@ func TestAsyncValidator_ConcurrentOperations(t *testing.T) {
 	// Verify no panic occurred and workers are running
 	workerCount := validator.GetWorkerCount()
 	if workerCount == 0 {
-		t.Error(ConstMagic34494990)
+		t.Error("Expected workers to be running after concurrent enqueues")
 	}
 
-	t.Logf(ConstMagic4251895b, workerCount)
+	t.Logf("Active workers after concurrent operations: %d", workerCount)
 }
 
 func TestAsyncValidator_GetMaxWorkers(t *testing.T) {
@@ -297,7 +297,7 @@ func TestAsyncValidator_GetMaxWorkers(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			validator := NewAsyncValidator(pkgctx.NewSystemContext(), testRoot, tc.maxWorkers, 1*time.Hour)
 			if validator.GetMaxWorkers() != tc.maxWorkers {
-				t.Errorf(ConstMagic91a512f5, tc.maxWorkers, validator.GetMaxWorkers())
+				t.Errorf("Expected max workers %d, got %d", tc.maxWorkers, validator.GetMaxWorkers())
 			}
 		})
 	}
@@ -309,13 +309,13 @@ func TestAsyncValidator_GetWorkerCount(t *testing.T) {
 	validator := NewAsyncValidator(pkgctx.NewSystemContext(), testRoot, 5, 1*time.Hour)
 
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic939ff73d, err)
+		t.Fatalf("Failed to start async validator: %v", err)
 	}
 	defer func() { _ = validator.Stop() }() //nolint:errcheck // Test cleanup
 
 	// Initially should be 0 (on-demand pattern)
 	if validator.GetWorkerCount() != 0 {
-		t.Errorf(ConstMagica60cd34b, validator.GetWorkerCount())
+		t.Errorf("Expected 0 workers initially, got %d", validator.GetWorkerCount())
 	}
 
 	// Enqueue task to wake worker
@@ -326,6 +326,6 @@ func TestAsyncValidator_GetWorkerCount(t *testing.T) {
 
 	// Should have at least one worker
 	if validator.GetWorkerCount() == 0 {
-		t.Error(ConstMagic87a6c230)
+		t.Error("Expected at least one worker after enqueueing task")
 	}
 }

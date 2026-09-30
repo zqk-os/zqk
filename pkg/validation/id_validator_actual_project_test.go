@@ -16,18 +16,18 @@ func TestActualProjectScenario(t *testing.T) {
 	// Find the actual project root
 	projectRoot := findProjectRoot()
 	if projectRoot == emptyValue {
-		t.Skip(ConstMagic69146e4a)
+		t.Skip("Could not find project root - skipping actual project test")
 	}
 
 	// Change to project root
 	oldWd, err := fileutil.Getwd()
 	if err != nil {
-		t.Fatalf(ConstMagic25cbf3ea, err)
+		t.Fatalf("Failed to get current working directory: %v", err)
 	}
 	defer fileutil.Chdir(oldWd)
 
 	if err := fileutil.Chdir(projectRoot); err != nil {
-		t.Fatalf(ConstMagic0b7b38b2, err)
+		t.Fatalf("Failed to change working directory: %v", err)
 	}
 
 	// Reset global config and validator to simulate fresh start
@@ -37,38 +37,38 @@ func TestActualProjectScenario(t *testing.T) {
 	// GetIDValidator (this is what system check does)
 	idValidator := GetIDValidator()
 	if idValidator == nil {
-		t.Fatal(ConstMagice7eb6ae2)
+		t.Fatal("GetIDValidator() returned nil")
 	}
 
-	t.Logf(ConstMagic83e1c533, idValidator.specsDir)
+	t.Logf("Validator specsDir: %s", idValidator.specsDir)
 
 	// Check if config file exists
 	configPath := findIDPrefixesConfig()
-	t.Logf(ConstMagicf0bc2244, configPath)
+	t.Logf("Config file path: %s", configPath)
 	if configPath == emptyValue {
-		t.Fatal(ConstMagic42673eb3)
+		t.Fatal("Config file not found")
 	}
 
 	// ReloadPatterns (this is what system check does)
 	if err := idValidator.ReloadPatterns(); err != nil {
-		t.Fatalf(ConstMagic342670e1, err)
+		t.Fatalf("ReloadPatterns() failed: %v", err)
 	}
 
 	// Check prefixes for decision
 	validPrefixes := idValidator.GetValidPrefixes("decision")
-	t.Logf(ConstMagica971d6d9, len(validPrefixes))
+	t.Logf("Valid prefixes for decision: %v", len(validPrefixes))
 
 	// Test validation
 	valid, err := idValidator.ValidateID("ADR-001", "decision")
 	if err != nil {
-		t.Fatalf(ConstMagice9712204, err)
+		t.Fatalf("ValidateID() error: %v", err)
 	}
 
-	t.Logf(ConstMagicb7be8b15, valid)
-	t.Logf(ConstMagic76a2973b, validPrefixes)
+	t.Logf("ADR-001 validation result: %v", valid)
+	t.Logf("Available prefixes: %v", validPrefixes)
 
 	if len(validPrefixes) < 2 {
-		t.Errorf(ConstMagic60d9a1e5, len(validPrefixes), validPrefixes)
+		t.Errorf("Expected at least 2 prefixes, got %d: %v", len(validPrefixes), validPrefixes)
 	}
 
 	hasADR := false
@@ -80,11 +80,11 @@ func TestActualProjectScenario(t *testing.T) {
 	}
 
 	if !hasADR {
-		t.Errorf(ConstMagicb4e8dac1, validPrefixes)
+		t.Errorf("Missing ADR- prefix (prefixes: %v)", validPrefixes)
 	}
 
 	if !valid {
-		t.Errorf(ConstMagic86b6b453, validPrefixes)
+		t.Errorf("ADR-001 should be valid (prefixes: %v)", validPrefixes)
 	}
 }
 

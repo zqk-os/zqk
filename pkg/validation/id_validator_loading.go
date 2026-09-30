@@ -66,7 +66,7 @@ func (v *IDValidator) doLoadPatterns(ctx context.Context) error {
 			return nil
 		},
 	); err != nil {
-		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ConstMagic5e0762ad, err).Log()
+		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error("Error acquiring read lock for ID patterns config: %v\n", err).Log()
 	}
 
 	loadCtx, loadCancel := context.WithTimeout(ctx, 15*time.Second)
@@ -90,7 +90,7 @@ func (v *IDValidator) doLoadPatterns(ctx context.Context) error {
 					return nil
 				},
 			); err != nil {
-				logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ConstMagice2041596, err).Log()
+				logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error("Error acquiring write lock for ID patterns (graph): %v\n", err).Log()
 			}
 			return nil
 		}
@@ -109,7 +109,7 @@ func (v *IDValidator) doLoadPatterns(ctx context.Context) error {
 					return nil
 				},
 			); err != nil {
-				logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ConstMagic0a1490d7, err).Log()
+				logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error("Error acquiring write lock for ID patterns (specs): %v\n", err).Log()
 			}
 			return nil
 		}
@@ -124,11 +124,11 @@ func (v *IDValidator) doLoadPatterns(ctx context.Context) error {
 			return nil
 		},
 	); err != nil {
-		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ConstMagic00e0659a, err).Log()
+		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error("Error acquiring write lock for ID patterns (defaults): %v\n", err).Log()
 	}
 
 	if loadErr != nil {
-		return errfmt.Newf(ConstMagic9c591dc6).Wrap(loadErr)
+		return errfmt.Newf("failed to load ID patterns").Wrap(loadErr)
 	}
 	return nil
 }
@@ -165,7 +165,7 @@ func (v *IDValidator) loadPatternsFromSpecsUnlocked(specsDir string) (map[string
 	}
 
 	eventLogger := v.getLogger()
-	logging.FluentEvent(eventLogger).Debug(ConstMagic44765f00).
+	logging.FluentEvent(eventLogger).Debug("Loading ID patterns from specs").
 		String("specs_dir", specsDir).
 		Log()
 
@@ -190,7 +190,7 @@ func (v *IDValidator) loadPatternsFromSpecsUnlocked(specsDir string) (map[string
 		config, err := v.parseSpecFile(path)
 		if err != nil {
 			// Skip files that can't be parsed
-			logging.FluentEvent(eventLogger).Warn(ConstMagic1be15168).
+			logging.FluentEvent(eventLogger).Warn("Failed to parse spec file").
 				File(info.Name()).
 				WithError(err).
 				Log()
@@ -198,7 +198,7 @@ func (v *IDValidator) loadPatternsFromSpecsUnlocked(specsDir string) (map[string
 		}
 		if config != nil {
 			patterns[config.Kind] = config
-			logging.FluentEvent(eventLogger).Debug(ConstMagica6523adc).
+			logging.FluentEvent(eventLogger).Debug("Loaded ID pattern").
 				Kind(config.Kind).
 				String("prefixes", fmt.Sprintf("%v", config.Prefixes)).
 				Log()
@@ -225,7 +225,7 @@ func (v *IDValidator) getLogger() *logging.EventLogger {
 			return nil
 		},
 	); err != nil {
-		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ConstMagic2eca0d34, err).Log()
+		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error("Error acquiring read lock for ID validator logger: %v\n", err).Log()
 	}
 
 	if logger != nil {
@@ -248,7 +248,7 @@ func (v *IDValidator) getLogger() *logging.EventLogger {
 		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
 
 			// parseSpecFile parses a spec file and extracts ID pattern configuration
-			Error(ConstMagic0e5c7b13, err).Log()
+			Error("Error acquiring write lock for ID validator logger initialization: %v\n", err).Log()
 	}
 	return logger
 }
@@ -298,7 +298,7 @@ func (v *IDValidator) parseSpecFile(path string) (*IDPatternConfig, error) {
 		return readSpecIDFile(path)
 	})
 	if err != nil {
-		logging.FluentEvent(eventLogger).Warn(ConstMagic2da1f67e).
+		logging.FluentEvent(eventLogger).Warn("Failed to read spec file").
 			File(path).
 			WithError(err).
 			Log()
@@ -307,7 +307,7 @@ func (v *IDValidator) parseSpecFile(path string) (*IDPatternConfig, error) {
 	spec.IDPrefixes = append([]string(nil), spec.IDPrefixes...)
 
 	if spec.skip {
-		logging.FluentEvent(eventLogger).Debug(ConstMagicac36e605).
+		logging.FluentEvent(eventLogger).Debug("Spec file has no ontology or kind, skipping").
 			File(filepath.Base(path)).
 			Log()
 		return nil, nil
@@ -320,7 +320,7 @@ func (v *IDValidator) parseSpecFile(path string) (*IDPatternConfig, error) {
 	}
 
 	if ontology == emptyValue {
-		logging.FluentEvent(eventLogger).Debug(ConstMagicac36e605).
+		logging.FluentEvent(eventLogger).Debug("Spec file has no ontology or kind, skipping").
 			File(filepath.Base(path)).
 			Log()
 		return nil, nil
@@ -333,7 +333,7 @@ func (v *IDValidator) parseSpecFile(path string) (*IDPatternConfig, error) {
 	// Use id_prefixes if explicitly provided (takes precedence)
 	if len(spec.IDPrefixes) > 0 {
 		config.Prefixes = spec.IDPrefixes
-		logging.FluentEvent(eventLogger).Debug(ConstMagic3a6f4b19).
+		logging.FluentEvent(eventLogger).Debug("Using id_prefixes from spec").
 			String("kind", ontology).
 			String("prefixes", fmt.Sprintf("%v", config.Prefixes)).
 			Log()
@@ -345,7 +345,7 @@ func (v *IDValidator) parseSpecFile(path string) (*IDPatternConfig, error) {
 			prefix := spec.IDTemplate[:idx+1]
 			config.Prefixes = []string{prefix}
 			config.Template = spec.IDTemplate
-			logging.FluentEvent(eventLogger).Debug(ConstMagic3d5c664c).
+			logging.FluentEvent(eventLogger).Debug("Extracted prefix from id_template").
 				String("kind", ontology).
 				String("id_template", spec.IDTemplate).
 				String("prefix", prefix).
@@ -369,7 +369,7 @@ func (v *IDValidator) parseSpecFile(path string) (*IDPatternConfig, error) {
 	// Note: inferPrefixesFromKind checks config first, so config values will be used if available
 	if len(config.Prefixes) == 0 {
 		config.Prefixes = v.inferPrefixesFromKind(spec.Ontology)
-		logging.FluentEvent(eventLogger).Debug(ConstMagic1c6cd02e).
+		logging.FluentEvent(eventLogger).Debug("Inferred prefix from ontology name").
 			String("kind", ontology).
 			String("prefixes", fmt.Sprintf("%v", config.Prefixes)).
 			Log()
@@ -404,18 +404,18 @@ func (v *IDValidator) parseSpecFile(path string) (*IDPatternConfig, error) {
 				config.Pattern = originalPattern // Restore pattern after setting prefixes
 				// Keep pattern for validation, but prefixes take precedence for matching
 				// Pattern will be used as fallback if prefixes don't match (see validateActualID)
-				logging.FluentEvent(eventLogger).Debug(ConstMagic688818e6).
+				logging.FluentEvent(eventLogger).Debug("Overriding with config prefixes (pattern preserved for fallback)").
 					String("kind", ontology).
 					String("prefixes", fmt.Sprintf("%v", config.Prefixes)).
 					String("pattern", config.Pattern).
-					String(ConstMagicddaa6689, fmt.Sprintf("%v", hasExplicitConfigMapping)).
-					String(ConstMagic49a25711, fmt.Sprintf("%v", specHasPrefixes)).
+					String("explicit_config_mapping", fmt.Sprintf("%v", hasExplicitConfigMapping)).
+					String("spec_had_prefixes", fmt.Sprintf("%v", specHasPrefixes)).
 					Log()
 			}
 		} else {
 			// Spec file has explicit id_prefixes and config doesn't have explicit mapping
 			// Keep spec prefixes (already set above)
-			logging.FluentEvent(eventLogger).Debug(ConstMagicce40573e).
+			logging.FluentEvent(eventLogger).Debug("Keeping spec file id_prefixes (config has no explicit mapping)").
 				String("kind", ontology).
 				String("spec_prefixes", fmt.Sprintf("%v", config.Prefixes)).
 				Log()
@@ -423,7 +423,7 @@ func (v *IDValidator) parseSpecFile(path string) (*IDPatternConfig, error) {
 	}
 
 	if len(config.Prefixes) > 0 {
-		logging.FluentEvent(eventLogger).Debug(ConstMagic9acf9d24).
+		logging.FluentEvent(eventLogger).Debug("Successfully parsed ID pattern").
 			Kind(config.Kind).
 			String("prefixes", fmt.Sprintf("%v", config.Prefixes)).
 			String("id_template", config.Template).
@@ -495,7 +495,7 @@ func (v *IDValidator) ensureDefaultPatterns() {
 //nolint:unused // Called conditionally in LoadPatterns - may not be detected by static analysis
 func (v *IDValidator) loadPatternsFromGraph(ctx context.Context) error {
 	if v.graphConn == nil {
-		return errfmt.Errorf(ConstMagic889511dc)
+		return errfmt.Errorf("graph connection not available")
 	}
 	patterns, err := v.loadPatternsFromGraphUnlocked(ctx, v.graphConn)
 	if err != nil {
@@ -513,7 +513,7 @@ func (v *IDValidator) loadPatternsFromGraphUnlocked(ctx context.Context, graphCo
 	patterns := make(map[string]*IDPatternConfig)
 
 	if graphConn == nil {
-		return patterns, errfmt.Errorf(ConstMagic889511dc)
+		return patterns, errfmt.Errorf("graph connection not available")
 	}
 
 	// Query for all ObjectSpec nodes
@@ -524,7 +524,7 @@ func (v *IDValidator) loadPatternsFromGraphUnlocked(ctx context.Context, graphCo
 
 	nodes, err := graphConn.ListNodes(ctx, filter)
 	if err != nil {
-		return patterns, errfmt.Newf(ConstMagic3cbfbca2).Wrap(err)
+		return patterns, errfmt.Newf("failed to query graph for specs").Wrap(err)
 	}
 
 	// If no nodes found with those labels, try querying by ontology property
@@ -537,7 +537,7 @@ func (v *IDValidator) loadPatternsFromGraphUnlocked(ctx context.Context, graphCo
 		}
 		nodes, err = graphConn.ListNodes(ctx, filter)
 		if err != nil {
-			return patterns, errfmt.Newf(ConstMagic3cbfbca2).Wrap(err)
+			return patterns, errfmt.Newf("failed to query graph for specs").Wrap(err)
 		}
 	}
 

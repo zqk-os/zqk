@@ -99,7 +99,7 @@ func (oq *OutputQueue) Dequeue() OutputPacket {
 				return nil
 			},
 		); err != nil {
-			logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ConstMagicb27a4cd0, err).Log()
+			logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error("failed to dequeue from output queue: %v\n", err).Log()
 		}
 
 		if found {
@@ -118,7 +118,7 @@ func (oq *OutputQueue) Dequeue() OutputPacket {
 		case <-ctx.Done():
 			// Timeout occurred
 			if logger != nil {
-				logger.Warn(ConstMagicf54eb174, concurrency.LockField{Key: "operation", Value: ConstMagic3fcd54ef},
+				logger.Warn("Dequeue timeout - queue empty for extended period", concurrency.LockField{Key: "operation", Value: "output_queue_dequeue"},
 					concurrency.LockField{Key: "timeout", Value: waitTimeout.String()})
 			}
 			return OutputPacket{} // Return empty to indicate timeout
@@ -147,7 +147,7 @@ func (oq *OutputQueue) DequeueNonBlocking() (OutputPacket, bool) {
 			return nil
 		},
 	); err != nil {
-		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ConstMagica5132a0d, err).Log()
+		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error("failed to dequeue non-blocking from output queue: %v\n", err).Log()
 	}
 	return packet, found
 }
@@ -181,7 +181,7 @@ func (oq *OutputQueue) DequeueBatch(maxItems int) ([]OutputPacket, bool) {
 			return nil
 		},
 	); err != nil {
-		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ConstMagic7629fd48, err).Log()
+		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error("failed to dequeue batch from output queue: %v\n", err).Log()
 	}
 	return batch, found
 }
@@ -201,7 +201,7 @@ func (oq *OutputQueue) Size() int {
 		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
 
 			// OutputHandler processes data for a specific channel
-			Error(ConstMagic6c35a6e7, err).Log()
+			Error("failed to get output queue size: %v\n", err).Log()
 	}
 	return size
 }
@@ -312,7 +312,7 @@ func (sb *syncBuffer) Write(p []byte) (int, error) {
 			return nil
 		},
 	); err != nil {
-		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ConstMagic36cc28a7, err).Log()
+		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error("failed to write to sync buffer: %v\n", err).Log()
 		return 0, err
 	}
 	return len(p), nil
@@ -344,7 +344,7 @@ func (sb *syncBuffer) Flush() error {
 		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
 
 			// Perform I/O outside lock
-			Error(ConstMagicd9d402a2, err).Log()
+			Error("failed to flush sync buffer: %v\n", err).Log()
 		return err
 	}
 
@@ -385,7 +385,7 @@ func (ow *OutputWriter) RegisterHandler(channelID string, handler OutputHandler)
 // Start begins the writer goroutine
 func (ow *OutputWriter) Start() {
 	bud := goroutinelabels.DefaultBudget()
-	writerBuilder := goroutinelabels.NewGoroutine("output_writer", ConstMagice07c773e).
+	writerBuilder := goroutinelabels.NewGoroutine("output_writer", "writing validation output to queue").
 		WithWaitGroup(&ow.wg)
 	if bud != nil {
 		writerBuilder = writerBuilder.WithBudget(bud)
@@ -445,7 +445,7 @@ func (ow *OutputWriter) processBatch(batch []OutputPacket) {
 		if handler != nil {
 			if err := handler.Write(packet.Data); err != nil {
 				if ow.logger != nil {
-					logging.Fluent(ow.logger).Warn(ConstMagic6f10ed29).
+					logging.Fluent(ow.logger).Warn("Failed to write output").
 						String("channel", packet.ChannelID).
 						WithError(err).
 						Log()
@@ -455,7 +455,7 @@ func (ow *OutputWriter) processBatch(batch []OutputPacket) {
 			if packet.FlushHint {
 				if err := handler.Flush(); err != nil {
 					if ow.logger != nil {
-						logging.Fluent(ow.logger).Warn(ConstMagicf3349cce).
+						logging.Fluent(ow.logger).Warn("Failed to flush output").
 							String("channel", packet.ChannelID).
 							WithError(err).
 							Log()
@@ -463,7 +463,7 @@ func (ow *OutputWriter) processBatch(batch []OutputPacket) {
 				}
 			}
 		} else if ow.logger != nil {
-			logging.Fluent(ow.logger).Debug(ConstMagic5211ff9e).
+			logging.Fluent(ow.logger).Debug("No handler registered for channel").
 				String("channel", packet.ChannelID).
 				Log()
 		}
@@ -475,7 +475,7 @@ func (ow *OutputWriter) flushAll() {
 	for channelID, handler := range ow.handlers {
 		if err := handler.Flush(); err != nil {
 			if ow.logger != nil {
-				logging.Fluent(ow.logger).Warn(ConstMagic8aca99ee).
+				logging.Fluent(ow.logger).Warn("Failed to flush handler on shutdown").
 					String("channel", channelID).
 					WithError(err).
 					Log()
@@ -492,7 +492,7 @@ func (ow *OutputWriter) Stop() error {
 	for channelID, handler := range ow.handlers {
 		if err := handler.Close(); err != nil {
 			if ow.logger != nil {
-				logging.Fluent(ow.logger).Warn(ConstMagic3a39b45f).
+				logging.Fluent(ow.logger).Warn("Failed to close handler").
 					String("channel", channelID).
 					WithError(err).
 					Log()
@@ -560,5 +560,5 @@ var ErrQueueFull = &QueueFullError{}
 type QueueFullError struct{}
 
 func (e *QueueFullError) Error() string {
-	return ConstMagica575a8fc
+	return "output queue is full"
 }

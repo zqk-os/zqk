@@ -15,7 +15,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/testkit"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
-	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 func newTraceabilityAuditorTest(
@@ -273,7 +272,7 @@ func TestAuditorService_PerformAudit_HITLTrigger(t *testing.T) {
 	secCtx := pkgctx.NewSystemSecurityContext()
 
 	_ = realStorage.Create(ctx, secCtx, map[string]any{
-		objects.FieldKeyID: "BLI-SMOKE", objects.FieldKeyKind: "backlog_item", objects.FieldKeyTitle: validation.ConstMagic6183a95d,
+		objects.FieldKeyID: "BLI-SMOKE", objects.FieldKeyKind: "backlog_item", objects.FieldKeyTitle: "Smoke and Mirrors Implementation",
 	})
 
 	signer, _ := NewAuditorSigner("")
@@ -290,8 +289,8 @@ func TestAuditorService_PerformAudit_HITLTrigger(t *testing.T) {
 	acks, _ := policyinterrupt.LoadAcksIncremental(tmpDir)
 	latest, _ := policyinterrupt.LoadLatestCriticalUnacked(tmpDir, acks)
 
-	if latest == nil || latest.DedupeKey != validation.ConstMagic59265a57 {
-		t.Errorf(validation.ConstMagic40b1c9a4)
+	if latest == nil || latest.DedupeKey != "qa-disparity-BLI-SMOKE" {
+		t.Errorf("expected HITL interrupt for smoke-and-mirrors item")
 	}
 }
 
@@ -334,6 +333,6 @@ func TestAuditorService_PerformAudit_ASTViolation(t *testing.T) {
 	latest, _ := policyinterrupt.LoadLatestCriticalUnacked(tmpDir, acks)
 
 	if latest == nil || !strings.Contains(latest.Message, "AST violations") {
-		t.Errorf(validation.ConstMagicc1e81cb3, latest)
+		t.Errorf("expected HITL interrupt for AST violation, got: %v", latest)
 	}
 }

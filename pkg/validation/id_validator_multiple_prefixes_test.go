@@ -29,13 +29,13 @@ func TestIDValidatorMultiplePrefixesFromSpec(t *testing.T) {
 	// Create object_specs directory
 	specsDir := filepath.Join(projectRoot, paths.ProcessInternalObjectSpecsDir)
 	if err := fileutil.MkdirAll(specsDir, paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagice9cc074e, err)
+		t.Fatalf("Failed to create specs directory: %v", err)
 	}
 
 	// Create configs directory (config file should be in configs/ subdirectory)
 	configsDir := filepath.Join(projectRoot, paths.ProcessInternalConfigsDir)
 	if err := fileutil.MkdirAll(configsDir, paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagic2967e378, err)
+		t.Fatalf("Failed to create configs directory: %v", err)
 	}
 
 	// Create a spec file for decision with id_prefixes defined (matching real spec)
@@ -47,11 +47,11 @@ id_prefixes:
   - ADR-
 `
 	if err := fileutil.WriteFile(specFile, []byte(specContent), paths.FilePerm644); err != nil {
-		t.Fatalf(ConstMagic186b95e3, err)
+		t.Fatalf("Failed to write spec file: %v", err)
 	}
 
 	// Create id_prefixes_config.yaml with both DEC- and ADR- prefixes (in configs/ subdirectory)
-	configFile := filepath.Join(configsDir, ConstMagic014a7ae7)
+	configFile := filepath.Join(configsDir, "id_prefixes_config.yaml")
 	configContent := `version: "1.0.0"
 kind_to_prefixes:
   decision:
@@ -59,18 +59,18 @@ kind_to_prefixes:
     - ADR-  # Architecture Decision Record format (backward compatibility)
 `
 	if err := fileutil.WriteFile(configFile, []byte(configContent), paths.FilePerm644); err != nil {
-		t.Fatalf(ConstMagic8e96c016, err)
+		t.Fatalf("Failed to write config file: %v", err)
 	}
 
 	// Set the working directory to the project root so findIDPrefixesConfig can find it
 	oldWd, err := fileutil.Getwd()
 	if err != nil {
-		t.Fatalf(ConstMagic25cbf3ea, err)
+		t.Fatalf("Failed to get current working directory: %v", err)
 	}
 	defer fileutil.Chdir(oldWd)
 
 	if err := fileutil.Chdir(projectRoot); err != nil {
-		t.Fatalf(ConstMagic0b7b38b2, err)
+		t.Fatalf("Failed to change working directory: %v", err)
 	}
 
 	// Create a validator with the test directory
@@ -78,13 +78,13 @@ kind_to_prefixes:
 
 	// Load patterns - this should load from our test config
 	if err := validator.LoadPatterns(); err != nil {
-		t.Fatalf(ConstMagic82cf76ae, err)
+		t.Fatalf("Failed to load patterns: %v", err)
 	}
 
 	// Test 1: Check that GetValidPrefixes returns BOTH DEC- and ADR-
 	prefixes := validator.GetValidPrefixes("decision")
 	if len(prefixes) == 0 {
-		t.Fatal(ConstMagicc1aec599)
+		t.Fatal("No prefixes found for decision")
 	}
 
 	// Both prefixes should be present
@@ -100,29 +100,29 @@ kind_to_prefixes:
 	}
 
 	if !foundDEC {
-		t.Errorf(ConstMagic77520e0f, prefixes)
+		t.Errorf("Expected DEC- in prefixes, got: %v", prefixes)
 	}
 	if !foundADR {
-		t.Errorf(ConstMagicf55860c4, prefixes)
-		t.Logf(ConstMagicc0789d77, prefixes)
+		t.Errorf("Expected ADR- in prefixes, got: %v", prefixes)
+		t.Logf("This is the bug: spec has both prefixes, but validator only shows: %v", prefixes)
 	}
 
 	// Test 2: Both DEC-001 and ADR-001 should be valid
 	valid, err := validator.ValidateID("DEC-001", "decision")
 	if err != nil {
-		t.Fatalf(ConstMagicbcc473f4, err)
+		t.Fatalf("Validation error: %v", err)
 	}
 	if !valid {
-		t.Errorf(ConstMagic55aab9c2, prefixes)
+		t.Errorf("DEC-001 should be valid for decision (prefixes: %v)", prefixes)
 	}
 
 	valid, err = validator.ValidateID("ADR-001", "decision")
 	if err != nil {
-		t.Fatalf(ConstMagicbcc473f4, err)
+		t.Fatalf("Validation error: %v", err)
 	}
 	if !valid {
-		t.Errorf(ConstMagica604e41b, prefixes)
-		t.Log(ConstMagic9e4d03a6)
+		t.Errorf("ADR-001 should be valid for decision (prefixes: %v)", prefixes)
+		t.Log("This is the bug: ADR-001 should be valid but validator rejected it")
 	}
 }
 
@@ -139,11 +139,11 @@ func TestIDValidatorMultiplePrefixesEvolutionManagement(t *testing.T) {
 	// Create object_specs directory
 	specsDir := filepath.Join(projectRoot, paths.ProcessInternalObjectSpecsDir)
 	if err := fileutil.MkdirAll(specsDir, paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagice9cc074e, err)
+		t.Fatalf("Failed to create specs directory: %v", err)
 	}
 
 	// Create a spec file for evolution_management with id_prefixes defined
-	specFile := filepath.Join(specsDir, ConstMagicfe1eed27)
+	specFile := filepath.Join(specsDir, "evolution_management.yaml")
 	specContent := `ontology: evolution_management
 schema_version: "` + objects.DefaultSchemaVersion + `"
 id_template: EVOL-{sequence}
@@ -152,17 +152,17 @@ id_prefixes:
   - EVOL-
 `
 	if err := fileutil.WriteFile(specFile, []byte(specContent), paths.FilePerm644); err != nil {
-		t.Fatalf(ConstMagic186b95e3, err)
+		t.Fatalf("Failed to write spec file: %v", err)
 	}
 
 	// Create configs directory (config file should be in configs/ subdirectory)
 	configsDir := filepath.Join(projectRoot, paths.ProcessInternalConfigsDir)
 	if err := fileutil.MkdirAll(configsDir, paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagic2967e378, err)
+		t.Fatalf("Failed to create configs directory: %v", err)
 	}
 
 	// Create id_prefixes_config.yaml with both EVO- and EVOL- prefixes (in configs/ subdirectory)
-	configFile := filepath.Join(configsDir, ConstMagic014a7ae7)
+	configFile := filepath.Join(configsDir, "id_prefixes_config.yaml")
 	configContent := `version: "1.0.0"
 kind_to_prefixes:
   evolution_management:
@@ -170,18 +170,18 @@ kind_to_prefixes:
     - EVOL-  # Alternative format (backward compatibility)
 `
 	if err := fileutil.WriteFile(configFile, []byte(configContent), paths.FilePerm644); err != nil {
-		t.Fatalf(ConstMagic8e96c016, err)
+		t.Fatalf("Failed to write config file: %v", err)
 	}
 
 	// Set the working directory to the project root
 	oldWd, err := fileutil.Getwd()
 	if err != nil {
-		t.Fatalf(ConstMagic25cbf3ea, err)
+		t.Fatalf("Failed to get current working directory: %v", err)
 	}
 	defer fileutil.Chdir(oldWd)
 
 	if err := fileutil.Chdir(projectRoot); err != nil {
-		t.Fatalf(ConstMagic0b7b38b2, err)
+		t.Fatalf("Failed to change working directory: %v", err)
 	}
 
 	// Create a validator with the test directory
@@ -189,13 +189,13 @@ kind_to_prefixes:
 
 	// Load patterns
 	if err := validator.LoadPatterns(); err != nil {
-		t.Fatalf(ConstMagic82cf76ae, err)
+		t.Fatalf("Failed to load patterns: %v", err)
 	}
 
 	// Check that GetValidPrefixes returns BOTH EVO- and EVOL-
-	prefixes := validator.GetValidPrefixes(ConstMagicb8e0a828)
+	prefixes := validator.GetValidPrefixes("evolution_management")
 	if len(prefixes) == 0 {
-		t.Fatal(ConstMagicc55105b2)
+		t.Fatal("No prefixes found for evolution_management")
 	}
 
 	// Both prefixes should be present
@@ -211,28 +211,28 @@ kind_to_prefixes:
 	}
 
 	if !foundEVO {
-		t.Errorf(ConstMagic615189e5, prefixes)
+		t.Errorf("Expected EVO- in prefixes, got: %v", prefixes)
 	}
 	if !foundEVOL {
-		t.Errorf(ConstMagic621fdee6, prefixes)
-		t.Logf(ConstMagicc0789d77, prefixes)
+		t.Errorf("Expected EVOL- in prefixes, got: %v", prefixes)
+		t.Logf("This is the bug: spec has both prefixes, but validator only shows: %v", prefixes)
 	}
 
 	// Both EVO-001 and EVOL-001 should be valid
-	valid, err := validator.ValidateID("EVO-001", ConstMagicb8e0a828)
+	valid, err := validator.ValidateID("EVO-001", "evolution_management")
 	if err != nil {
-		t.Fatalf(ConstMagicbcc473f4, err)
+		t.Fatalf("Validation error: %v", err)
 	}
 	if !valid {
-		t.Errorf(ConstMagic6ce90070, prefixes)
+		t.Errorf("EVO-001 should be valid for evolution_management (prefixes: %v)", prefixes)
 	}
 
-	valid, err = validator.ValidateID("EVOL-001", ConstMagicb8e0a828)
+	valid, err = validator.ValidateID("EVOL-001", "evolution_management")
 	if err != nil {
-		t.Fatalf(ConstMagicbcc473f4, err)
+		t.Fatalf("Validation error: %v", err)
 	}
 	if !valid {
-		t.Errorf(ConstMagic0becb71d, prefixes)
-		t.Log(ConstMagicd3b34758)
+		t.Errorf("EVOL-001 should be valid for evolution_management (prefixes: %v)", prefixes)
+		t.Log("This is the bug: EVOL-001 should be valid but validator rejected it")
 	}
 }

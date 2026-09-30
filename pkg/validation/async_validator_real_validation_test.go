@@ -21,7 +21,7 @@ import (
 func TestAsyncValidator_RealValidation_ReproducesHang(t *testing.T) {
 	t.Parallel()
 	if testing.Short() {
-		t.Skip(ConstMagic23611b72)
+		t.Skip("Skipping real validation test in short mode")
 	}
 
 	testRoot := registerZQKTestRootForTest(t)
@@ -40,7 +40,7 @@ func TestAsyncValidator_RealValidation_ReproducesHang(t *testing.T) {
 		// This is the redundant read that we fixed, but let's test if it causes issues
 		_, err := fileutil.ReadFile(filePath)
 		if err != nil {
-			return nil, fmt.Errorf(ConstMagic53124f63, err)
+			return nil, fmt.Errorf("failed to read file: %w", err)
 		}
 
 		// Simulate hash registry operations (like registry.Load() which does file I/O)
@@ -85,7 +85,7 @@ func TestAsyncValidator_RealValidation_ReproducesHang(t *testing.T) {
 
 	// Start validator
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic4545ee2f, err)
+		t.Fatalf("failed to start validator: %v", err)
 	}
 
 	// Create many test files (simulating 15k objects)
@@ -93,10 +93,10 @@ func TestAsyncValidator_RealValidation_ReproducesHang(t *testing.T) {
 	for i := 0; i < numObjects; i++ {
 		testFile := filepath.Join(datacell.CellCASPrimaryDir(testRoot, "test"), fmt.Sprintf("TEST-%d.yaml", i))
 		if err := fileutil.MkdirAll(filepath.Dir(testFile), paths.DirPerm755); err != nil {
-			t.Fatalf(ConstMagic32b1c202, err)
+			t.Fatalf("failed to create test directory: %v", err)
 		}
-		if err := fileutil.WriteFile(testFile, []byte(fmt.Sprintf(ConstMagicdb620444, i)), paths.FilePerm644); err != nil {
-			t.Fatalf(ConstMagic7a424835, err)
+		if err := fileutil.WriteFile(testFile, []byte(fmt.Sprintf("id: TEST-%d\nkind: test_object\n", i)), paths.FilePerm644); err != nil {
+			t.Fatalf("failed to write test file: %v", err)
 		}
 		_ = validator.Enqueue(
 			fmt.Sprintf("TEST-%d", i),
@@ -135,17 +135,17 @@ func TestAsyncValidator_RealValidation_ReproducesHang(t *testing.T) {
 	stopDuration := time.Since(stopStart)
 
 	if stopErr != nil {
-		t.Errorf(ConstMagic1a06a983, stopErr)
+		t.Errorf("Stop() returned error: %v", stopErr)
 	}
 
 	// Stop should complete quickly
 	maxExpectedDuration := 4 * time.Second
 	if stopDuration > maxExpectedDuration {
-		t.Errorf(ConstMagic3adab2c0, stopDuration)
+		t.Errorf("❌ Stop() took too long (%v), possible deadlock", stopDuration)
 	}
 
 	finalCount := validationCount.Load()
-	t.Logf(ConstMagic4091bbf6, finalCount, stopDuration)
+	t.Logf("✅ Test passed: %d validations completed, Stop() took %v", finalCount, stopDuration)
 }
 
 // TestAsyncValidator_HashRegistryContention tests the specific scenario where
@@ -154,10 +154,10 @@ func TestAsyncValidator_RealValidation_ReproducesHang(t *testing.T) {
 func TestAsyncValidator_HashRegistryContention(t *testing.T) {
 	t.Parallel()
 	if testing.Short() {
-		t.Skip(ConstMagic4d140d58)
+		t.Skip("Skipping integration test in short mode")
 	}
 	if testing.Short() {
-		t.Skip(ConstMagic33dcad2e)
+		t.Skip("Skipping hash registry contention test in short mode")
 	}
 
 	testRoot := registerZQKTestRootForTest(t)
@@ -167,14 +167,14 @@ func TestAsyncValidator_HashRegistryContention(t *testing.T) {
 	// share a hash registry
 	registryDir := datacell.CellCASPrimaryDir(testRoot, "test")
 	if err := fileutil.MkdirAll(registryDir, paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagic995ac1f6, err)
+		t.Fatalf("failed to create registry directory: %v", err)
 	}
-	registryFile := filepath.Join(registryDir, ConstMagic6951d5b6)
+	registryFile := filepath.Join(registryDir, ".test_object.hashes")
 
 	// Initialize registry with some data
 	initialData := []byte(`{"hashes":{}}`)
 	if err := fileutil.WriteFile(registryFile, initialData, paths.FilePerm644); err != nil {
-		t.Fatalf(ConstMagic95e4c8d4, err)
+		t.Fatalf("failed to create registry file: %v", err)
 	}
 
 	// Create validator
@@ -195,7 +195,7 @@ func TestAsyncValidator_HashRegistryContention(t *testing.T) {
 		loadCount.Add(1)
 		loadData, loadErr := fileutil.ReadFile(registryFile)
 		if loadErr != nil {
-			return nil, fmt.Errorf(ConstMagic7a52ca1c, loadErr)
+			return nil, fmt.Errorf("failed to load registry: %w", loadErr)
 		}
 		_ = loadData // Use the data
 
@@ -227,15 +227,15 @@ func TestAsyncValidator_HashRegistryContention(t *testing.T) {
 
 	// Start validator
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic4545ee2f, err)
+		t.Fatalf("failed to start validator: %v", err)
 	}
 
 	// Create many test files that will all access the same registry
 	numObjects := 200 // Enough to trigger contention
 	for i := 0; i < numObjects; i++ {
 		testFile := filepath.Join(registryDir, fmt.Sprintf("TEST-%d.yaml", i))
-		if err := fileutil.WriteFile(testFile, []byte(fmt.Sprintf(ConstMagicdb620444, i)), paths.FilePerm644); err != nil {
-			t.Fatalf(ConstMagic7a424835, err)
+		if err := fileutil.WriteFile(testFile, []byte(fmt.Sprintf("id: TEST-%d\nkind: test_object\n", i)), paths.FilePerm644); err != nil {
+			t.Fatalf("failed to write test file: %v", err)
 		}
 		_ = validator.Enqueue(
 			fmt.Sprintf("TEST-%d", i),
@@ -267,12 +267,12 @@ func TestAsyncValidator_HashRegistryContention(t *testing.T) {
 
 	// Stop validator
 	if stopErr := validator.Stop(); stopErr != nil {
-		t.Errorf(ConstMagic1a06a983, stopErr)
+		t.Errorf("Stop() returned error: %v", stopErr)
 	}
 
 	finalValidationCount := validationCount.Load()
 	finalLoadCount := loadCount.Load()
 	finalSaveCount := saveCount.Load()
 
-	t.Logf(ConstMagic99bcee61, finalValidationCount, finalLoadCount, finalSaveCount)
+	t.Logf("✅ Test passed: %d validations, %d loads, %d saves", finalValidationCount, finalLoadCount, finalSaveCount)
 }

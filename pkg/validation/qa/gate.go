@@ -7,7 +7,6 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
-	"github.com/zqk-os/zqk/pkg/validation"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
@@ -53,7 +52,7 @@ const (
 // AND that the signature is valid according to the trusted Auditor public key.
 func (g *AuditorGate) VerifyComplete(ctx context.Context, itemID string) error {
 	if g.storage == nil {
-		return fmt.Errorf(validation.ConstMagicd1380660)
+		return fmt.Errorf("QA Auditor Gate storage not initialized")
 	}
 
 	secCtx := pkgctx.NewSystemSecurityContext()
@@ -74,11 +73,11 @@ func (g *AuditorGate) VerifyComplete(ctx context.Context, itemID string) error {
 	filter := QASuccessFilter(itemID)
 	res, err := g.storage.List(ctx, secCtx, nil, filter)
 	if err != nil {
-		return fmt.Errorf(validation.ConstMagic55cde375, itemID, err)
+		return fmt.Errorf("failed to query QA success for %s: %w", itemID, err)
 	}
 
 	if len(res.Objects) == 0 {
-		return fmt.Errorf(validation.ConstMagicf244a94f, itemID)
+		return fmt.Errorf("QA Auditor has not issued a verified QASuccess for %s", itemID)
 	}
 
 	// 3. Verify Cryptographic Signature against the TRUSTED key
@@ -86,7 +85,7 @@ func (g *AuditorGate) VerifyComplete(ctx context.Context, itemID string) error {
 
 	// SENSITIVE CHECK: Ensure the report's public key matches the TRUSTED public key
 	if report.PublicKey != trustedPubHex {
-		return fmt.Errorf(validation.ConstMagic50f3bb1d, itemID)
+		return fmt.Errorf("CRITICAL SECURITY VULNERABILITY: report signed with UNTRUSTED key for %s", itemID)
 	}
 
 	return g.verifySignature(report, trustedPubHex)
@@ -124,7 +123,7 @@ func (g *AuditorGate) trustedPubHex(ctx context.Context, secCtx *pkgctx.Security
 	keyObj, err := g.storage.Read(ctx, secCtx, AuditorKeyID)
 	if err == nil {
 		trustedPubHex, ok := keyObj[objects.FieldKeyDescription].(string)
-		if ok && trustedPubHex != "" && trustedPubHex != validation.ConstMagic57bc28f9 {
+		if ok && trustedPubHex != "" && trustedPubHex != "Master public key for the QA Auditor" {
 			return trustedPubHex, nil
 		}
 	}
@@ -136,17 +135,17 @@ func (g *AuditorGate) trustedPubHex(ctx context.Context, secCtx *pkgctx.Security
 	}
 	if g.projectRoot == "" {
 		if err != nil {
-			return "", fmt.Errorf(validation.ConstMagic6fab60b4, err)
+			return "", fmt.Errorf("failed to load trusted auditor key: %w", err)
 		}
-		return "", fmt.Errorf(validation.ConstMagic60ea95db, AuditorKeyID)
+		return "", fmt.Errorf("trusted auditor public key not initialized in %s", AuditorKeyID)
 	}
 	privPath := AuditorPrivateKeyPath(g.projectRoot)
 	signer, signErr := NewAuditorSigner(privPath)
 	if signErr != nil {
 		if err != nil {
-			return "", fmt.Errorf(validation.ConstMagic6fab60b4, err)
+			return "", fmt.Errorf("failed to load trusted auditor key: %w", err)
 		}
-		return "", fmt.Errorf(validation.ConstMagic60ea95db, AuditorKeyID)
+		return "", fmt.Errorf("trusted auditor public key not initialized in %s", AuditorKeyID)
 	}
 	return signer.PublicKey(), nil
 }

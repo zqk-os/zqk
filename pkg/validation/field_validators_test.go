@@ -29,7 +29,7 @@ func TestResolveStringForPatternValidation(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			gotStr, gotOK := ResolveStringForPatternValidation(tt.fieldValue)
 			if gotStr != tt.wantStr || gotOK != tt.wantOK {
-				t.Errorf(ConstMagicd7604f57, tt.fieldValue, gotStr, gotOK, tt.wantStr, tt.wantOK)
+				t.Errorf("ResolveStringForPatternValidation(%v) = %q, %v; want %q, %v", tt.fieldValue, gotStr, gotOK, tt.wantStr, tt.wantOK)
 			}
 		})
 	}
@@ -61,7 +61,7 @@ func TestResolveStringForPatternValidationWithField(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			gotStr, gotOK := ResolveStringForPatternValidationWithField(tt.fieldName, tt.fieldVal)
 			if gotStr != tt.wantStr || gotOK != tt.wantOK {
-				t.Errorf(ConstMagic02e907b6, tt.fieldName, tt.fieldVal, gotStr, gotOK, tt.wantStr, tt.wantOK)
+				t.Errorf("ResolveStringForPatternValidationWithField(%q, %v) = %q, %v; want %q, %v", tt.fieldName, tt.fieldVal, gotStr, gotOK, tt.wantStr, tt.wantOK)
 			}
 		})
 	}

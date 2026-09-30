@@ -112,14 +112,14 @@ func (av *AsyncValidator) worker(id int) {
 				logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
 
 					// Use validator's context (or derived context) instead of creating new Background()
-					Error(ConstMagic42bbcbd4, err).Log()
+					Error("lock failed in worker shutdown callback: %v\n", err).Log()
 			}
 
 			callback(
 				av.ctx,
 				projectRoot,
 				nil, // Storage provider not available in validation package
-				fmt.Sprintf("worker_%d", id), ConstMagicExtracted_19, "stopped",
+				fmt.Sprintf("worker_%d", id), "worker_shutdown", "stopped",
 				int(av.activeWorkers.Load()),
 				processedCount,
 				failedCount,
@@ -127,7 +127,7 @@ func (av *AsyncValidator) worker(id int) {
 			)
 		}
 
-		logging.Fluent(av.logger).Debug(ConstMagicExtracted_20).
+		logging.Fluent(av.logger).Debug("Worker stopped").
 			WorkerID(id).
 			GoroutineID(int(goroutineID)).
 			ActiveGoroutines(int(getActiveGoroutines())).
@@ -135,7 +135,7 @@ func (av *AsyncValidator) worker(id int) {
 	}()
 
 	av.workerStates.Store(id, "running")
-	logging.Fluent(av.logger).Debug(ConstMagicExtracted_21).
+	logging.Fluent(av.logger).Debug("Worker started").
 		WorkerID(id).
 		GoroutineID(int(goroutineID)).
 		ActiveGoroutines(int(activeCount)).
@@ -154,7 +154,7 @@ func (av *AsyncValidator) worker(id int) {
 				return nil
 			},
 		); err != nil {
-			logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ConstMagica5c96b8a, err).Log()
+			logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error("lock failed in worker start callback: %v\n", err).Log()
 		}
 		callback(
 			av.ctx,
@@ -203,7 +203,7 @@ func (av *AsyncValidator) worker(id int) {
 					return nil
 				},
 			); err != nil {
-				logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ConstMagic4dbd9cb3, err).Log()
+				logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error("lock failed in queue empty check: %v\n", err).Log()
 			}
 
 			task := av.priorityQueue.Dequeue()
@@ -226,7 +226,7 @@ func (av *AsyncValidator) worker(id int) {
 				logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
 
 					// Fire callback if queue transitioned from non-empty to empty
-					Error(ConstMagicd5eab1ac, err).Log()
+					Error("lock failed in queue size update: %v\n", err).Log()
 			}
 
 			if wasNonEmpty && queueSizeAfter == 0 && qCallback != nil {
@@ -239,7 +239,7 @@ func (av *AsyncValidator) worker(id int) {
 				idleDuration := time.Since(idleStartTime)
 				if idleDuration >= asyncValidatorIdleTimeout {
 					// Idle timeout reached - shut down worker
-					logging.Fluent(av.logger).Info(ConstMagic01bd43e7).
+					logging.Fluent(av.logger).Info("Validation worker shutting down due to idle timeout").
 						WorkerID(id).
 						IdleDuration(idleDuration.String()).
 						ProcessedCount(processedCount).
@@ -262,14 +262,14 @@ func (av *AsyncValidator) worker(id int) {
 							logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
 
 								// Use validator's context (or derived context) instead of creating new Background()
-								Error(ConstMagicbcbfecc9, err).Log()
+								Error("lock failed in idle shutdown callback: %v\n", err).Log()
 						}
 
 						callback(
 							av.ctx,
 							projectRoot,
 							nil, // Storage provider not available in validation package
-							fmt.Sprintf("worker_%d", id), ConstMagic8118ad7d, "idle_shutdown",
+							fmt.Sprintf("worker_%d", id), "worker_idle_shutdown", "idle_shutdown",
 							int(av.activeWorkers.Load()),
 							processedCount,
 							failedCount,
@@ -308,8 +308,8 @@ func (av *AsyncValidator) worker(id int) {
 			// PERFORMANCE: Use semaphore to limit concurrent validation goroutines
 			av.workerStates.Store(id, fmt.Sprintf("launching:%s", task.ObjectID))
 			taskCopy := task // Capture task for goroutine
-			validationGoroutineName := fmt.Sprintf(ConstMagic319b4ba0, task.ObjectID)
-			validationGoroutinePurpose := fmt.Sprintf(ConstMagic018b055e, task.ObjectID, task.ObjectKind)
+			validationGoroutineName := fmt.Sprintf("validation_task_%s", task.ObjectID)
+			validationGoroutinePurpose := fmt.Sprintf("validating %s (%s)", task.ObjectID, task.ObjectKind)
 
 			// Acquire semaphore slot with timeout to prevent indefinite blocking.
 			// Foreign host CPU (AV, other tenants) can refuse extra slots; self-heat does not
@@ -342,16 +342,16 @@ func (av *AsyncValidator) worker(id int) {
 						Log()
 				}
 				if shouldWarn {
-					logSemaphoreFull(logging.Fluent(av.logger).Warn(ConstMagicf317420a))
+					logSemaphoreFull(logging.Fluent(av.logger).Warn("Semaphore full, validation goroutines may be stuck"))
 				} else {
-					logSemaphoreFull(logging.Fluent(av.logger).Debug(ConstMagicf317420a))
+					logSemaphoreFull(logging.Fluent(av.logger).Debug("Semaphore full, validation goroutines may be stuck"))
 				}
 
 				if shouldWarn && av.eventCallback != nil {
-					av.eventCallback(ConstMagicExtracted_22, taskCopy.ObjectID,
-						fmt.Sprintf(ConstMagic8f530026, cap(av.validationSemaphore)),
+					av.eventCallback("semaphore_full", taskCopy.ObjectID,
+						fmt.Sprintf("Semaphore full (capacity: %d), validation goroutines may be stuck", cap(av.validationSemaphore)),
 						map[string]any{
-							"queue_size": queueSize, ConstMagicExtracted_23: cap(av.validationSemaphore),
+							"queue_size": queueSize, "semaphore_capacity": cap(av.validationSemaphore),
 						}, "high")
 				}
 
@@ -394,10 +394,10 @@ func (av *AsyncValidator) worker(id int) {
 					logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
 
 						// Validate object (no locks held during validation)
-						Error(ConstMagic9fd12c74, err).Log()
+						Error("lock failed in getting callbacks: %v\n", err).Log()
 				}
 
-				logging.Fluent(av.logger).Debug(ConstMagicb0dc7afb).
+				logging.Fluent(av.logger).Debug("Validating object").
 					String("object_id", taskCopy.ObjectID).
 					String("object_kind", taskCopy.ObjectKind).
 					Log()
@@ -413,7 +413,7 @@ func (av *AsyncValidator) worker(id int) {
 					filename := filepath.Base(taskCopy.FilePath)
 					isCASFile := len(filename) == 69 && strings.HasSuffix(filename, ".yaml") && isHexString(filename[:64])
 
-					if isCASFile && strings.Contains(readErr.Error(), ConstMagic54779b0a) {
+					if isCASFile && strings.Contains(readErr.Error(), "no such file or directory") {
 						// Common case after discovery optimization: we may have constructed an incorrect
 						// bucket path for a CAS-style hash file (we know the hash from the filename, but
 						// picked the wrong bucket directory). Before declaring a stale entry, try to
@@ -464,14 +464,14 @@ func (av *AsyncValidator) worker(id int) {
 						if readErr != nil {
 							// Missing CAS blob and no live index mapping: ghost cache path or true
 							// stale listing-index entry (deleted object).
-							logging.Fluent(av.logger).Warn(ConstMagic7797b91f).
+							logging.Fluent(av.logger).Warn("Missing CAS file detected - stale index entry").
 								String("object_id", taskCopy.ObjectID).
 								String("object_kind", taskCopy.ObjectKind).
 								String("file_path", taskCopy.FilePath).
-								String("note", ConstMagiccc4ad9f7).
+								String("note", "CAS index entry exists but hash file is missing - recovery needed").
 								Log()
 
-							err = errfmt.Errorf("Missing CAS file detected: stale index entry for object %s (%s)", taskCopy.ObjectID, ConstMagiccc4ad9f7)
+							err = errfmt.Errorf("Missing CAS file detected: stale index entry for object %s (%s)", taskCopy.ObjectID, "CAS index entry exists but hash file is missing - recovery needed")
 						}
 					}
 
@@ -479,13 +479,13 @@ func (av *AsyncValidator) worker(id int) {
 						// File read errors are permanent - don't retry.
 						// Missing files, permission errors, etc. won't be fixed by retrying.
 						if err == nil {
-							err = errfmt.Newf(ConstMagic9713ffa0).Wrap(readErr)
+							err = errfmt.Newf("failed to read file").Wrap(readErr)
 						}
 
 						// Emit coordinator event for file read error
 						if av.eventCallback != nil {
-							av.eventCallback(ConstMagicExtracted_24, taskCopy.ObjectID,
-								fmt.Sprintf(ConstMagic120e0c48, taskCopy.FilePath),
+							av.eventCallback("file_read_error", taskCopy.ObjectID,
+								fmt.Sprintf("Failed to read file: %s", taskCopy.FilePath),
 								map[string]any{
 									objects.FieldKeyFilePath: taskCopy.FilePath,
 									"error":                  readErr.Error(),
@@ -535,8 +535,8 @@ func (av *AsyncValidator) worker(id int) {
 							err = nil
 						} else {
 							isTimeoutError = true
-							err = errfmt.Errorf(ConstMagice69b3c5b, validationTimeout, taskCopy.ObjectID)
-							logging.Fluent(av.logger).Warn(ConstMagic3eb4bae9).
+							err = errfmt.Errorf("validation timeout after %s for %s", validationTimeout, taskCopy.ObjectID)
+							logging.Fluent(av.logger).Warn("Validation timeout - validation function may be stuck").
 								String("object_id", taskCopy.ObjectID).
 								String("file_path", taskCopy.FilePath).
 								String("timeout", validationTimeout.String()).
@@ -549,7 +549,7 @@ func (av *AsyncValidator) worker(id int) {
 								Errors:        []string{err.Error()},
 							}) {
 								// Channel full - log but don't block
-								logging.Fluent(av.logger).Debug(ConstMagicd47cc7ff).
+								logging.Fluent(av.logger).Debug("Progress channel full on timeout, skipping update").
 									String("object_id", taskCopy.ObjectID).
 									Log()
 							}
@@ -567,7 +567,7 @@ func (av *AsyncValidator) worker(id int) {
 					// but we track it via the validation result callback if needed
 
 					// Log validation failure
-					logging.Fluent(av.logger).Error(ConstMagicd10fb60c, err).
+					logging.Fluent(av.logger).Error("Validation failed", err).
 						String("object_id", taskCopy.ObjectID).
 						String("object_kind", taskCopy.ObjectKind).
 						String("file_path", taskCopy.FilePath).
@@ -580,7 +580,7 @@ func (av *AsyncValidator) worker(id int) {
 						taskCopy.RetryCount++
 						av.priorityQueue.Enqueue(taskCopy)
 						av.notifyWorkers() // Signal workers for retry
-						logging.Fluent(av.logger).Debug(ConstMagic7fc49d59).
+						logging.Fluent(av.logger).Debug("Retrying validation").
 							String("object_id", taskCopy.ObjectID).
 							Int("retry_count", taskCopy.RetryCount).
 							Log()

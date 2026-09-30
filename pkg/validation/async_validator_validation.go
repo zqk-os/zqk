@@ -18,7 +18,7 @@ func (av *AsyncValidator) validateObject(ctx context.Context, objectID, objectKi
 	// Read file once
 	data, err := fileutil.ReadFile(filePath)
 	if err != nil {
-		return nil, errfmt.Newf(ConstMagic9713ffa0).Wrap(err)
+		return nil, errfmt.Newf("failed to read file").Wrap(err)
 	}
 
 	// Get validation function (acquire lock, read, release lock)
@@ -34,7 +34,7 @@ func (av *AsyncValidator) validateObject(ctx context.Context, objectID, objectKi
 	); err != nil {
 		logging.
 			// Log and continue with nil validationFunc (fallback logic will handle it)
-			Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ConstMagic316746f4, err).Log()
+			Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error("Error acquiring read lock for validation function: %v\n", err).Log()
 	}
 
 	return av.validateObjectWithFunc(ctx, objectID, objectKind, filePath, data, validationFunc)
@@ -58,7 +58,7 @@ func (av *AsyncValidator) validateObjectWithData(ctx context.Context, objectID, 
 	); err != nil {
 		logging.
 			// Log and continue with nil validationFunc (fallback logic will handle it)
-			Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ConstMagic2ed20aec, err).Log()
+			Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error("Error acquiring read lock for validation function in validateObjectWithData: %v\n", err).Log()
 	}
 
 	return av.validateObjectWithFunc(ctx, objectID, objectKind, filePath, data, validationFunc)
@@ -74,7 +74,7 @@ func (av *AsyncValidator) validateObjectWithFunc(ctx context.Context, objectID, 
 		// Use the provided validation function (real validation logic)
 		state, err := validationFunc(ctx, objectID, objectKind, filePath, data)
 		if err != nil {
-			return nil, errfmt.Newf(ConstMagic38f59d5e).Wrap(err)
+			return nil, errfmt.Newf("validation function failed").Wrap(err)
 		}
 		// Ensure checksum is set
 		if state.Checksum == emptyValue {

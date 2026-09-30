@@ -19,48 +19,48 @@ func TestGoValidator_DisplayLength_Warnings(t *testing.T) {
 		warningContains string
 	}{
 		{
-			name:          ConstMagic5b461091,
+			name:          "value within display_length generates no warning",
 			fieldName:     "job_type",
 			fieldValue:    "cache_prewarm",
 			displayLength: 28,
 			wantWarnings:  0,
 		},
 		{
-			name:          ConstMagicf60dd990,
+			name:          "value exactly at display_length generates no warning",
 			fieldName:     "job_type",
-			fieldValue:    ConstMagica04421fd,
+			fieldValue:    "audit_event_aggregation",
 			displayLength: 28,
 			wantWarnings:  0,
 		},
 		{
-			name:            ConstMagic0b65edd4,
+			name:            "value exceeding display_length generates warning",
 			fieldName:       "job_type",
-			fieldValue:      ConstMagica9ac7e48,
+			fieldValue:      "this_is_a_very_long_job_type_name_that_exceeds_display_length",
 			displayLength:   28,
 			wantWarnings:    1,
-			warningContains: ConstMagic93a6e6a4,
+			warningContains: "exceeds display_length constraint",
 		},
 		{
-			name:          ConstMagic36ae3ecd,
+			name:          "non-string value generates no warning",
 			fieldName:     "enabled",
 			fieldValue:    true,
 			displayLength: 8,
 			wantWarnings:  0,
 		},
 		{
-			name:          ConstMagic7981970a,
+			name:          "empty string generates no warning",
 			fieldName:     "schedule",
 			fieldValue:    "",
 			displayLength: 20,
 			wantWarnings:  0,
 		},
 		{
-			name:            ConstMagic95609356,
+			name:            "value one character over display_length generates warning",
 			fieldName:       "id",
 			fieldValue:      "SCH-123456789", // 13 chars, display_length is 12
 			displayLength:   12,
 			wantWarnings:    1,
-			warningContains: ConstMagic93a6e6a4,
+			warningContains: "exceeds display_length constraint",
 		},
 	}
 
@@ -89,7 +89,7 @@ func TestGoValidator_DisplayLength_Warnings(t *testing.T) {
 					if len(strValue) > displayLength {
 						warnings = append(warnings, ValidationWarning{
 							Field:   tt.fieldName,
-							Message: fmt.Sprintf(ConstMagiceeea6b95, tt.fieldName, len(strValue), displayLength),
+							Message: fmt.Sprintf("Field %s value length (%d) exceeds display_length constraint (%d) - may be truncated in table displays", tt.fieldName, len(strValue), displayLength),
 							Rule:    "display_length",
 						})
 					}
@@ -97,7 +97,7 @@ func TestGoValidator_DisplayLength_Warnings(t *testing.T) {
 			}
 
 			if len(warnings) != tt.wantWarnings {
-				t.Errorf(ConstMagic65915687, tt.wantWarnings, len(warnings))
+				t.Errorf("Expected %d warnings, got %d", tt.wantWarnings, len(warnings))
 				for _, w := range warnings {
 					t.Logf("  Warning: %s", w.Message)
 				}
@@ -112,7 +112,7 @@ func TestGoValidator_DisplayLength_Warnings(t *testing.T) {
 					}
 				}
 				if !found {
-					t.Errorf(ConstMagic5ebb6fed, tt.warningContains, warnings)
+					t.Errorf("Expected warning containing '%s', got warnings: %v", tt.warningContains, warnings)
 				}
 			}
 		})
@@ -158,16 +158,16 @@ func TestGoValidator_DisplayLength_Integration(t *testing.T) {
 		getTestPathsConfig(t),
 	)
 	if err := testIDValidator.LoadPatterns(); err != nil {
-		t.Logf(ConstMagicd3d06733, err)
+		t.Logf("Warning: Failed to load ID patterns: %v (ID validation may be permissive)", err)
 	}
 
 	validator := NewGoValidatorWithIDValidator(specLoader, lifecycleLoader, testIDValidator)
 
 	// Test with scheduler_job spec
-	spec, err := specLoader.LoadSpecWithInheritance(ConstMagic39541ea4)
+	spec, err := specLoader.LoadSpecWithInheritance("scheduler_job.yaml")
 	if err != nil {
 		// Skip if spec file doesn't exist (may not be available in all test environments)
-		t.Skipf(ConstMagic61a72cf6, err)
+		t.Skipf("Skipping test - scheduler_job spec not found: %v", err)
 	}
 
 	// Get display_length for job_type field
@@ -175,14 +175,14 @@ func TestGoValidator_DisplayLength_Integration(t *testing.T) {
 	if displayLen == 28 {
 		// If it returns default, the spec might not have display_length yet
 		// This is okay for now - we're testing the validation logic
-		t.Logf(ConstMagic2afaf1a1, displayLen)
+		t.Logf("job_type display_length: %d (may be default)", displayLen)
 	}
 
 	// Test object with value exceeding display_length
 	obj := map[string]any{
 		objects.FieldKeyID:          "SCH-TEST",
 		objects.FieldKeyKind:        "scheduler_job",
-		objects.FieldKeyJobType:     ConstMagice6f2fa18,
+		objects.FieldKeyJobType:     "this_is_a_very_long_job_type_name_that_exceeds_display_length_constraint",
 		objects.FieldKeyStatus:      objects.ObjectStatusActive,
 		objects.FieldKeyEnabled:     true,
 		objects.FieldKeyTriggerType: "timer",
@@ -194,7 +194,7 @@ func TestGoValidator_DisplayLength_Integration(t *testing.T) {
 
 	result, err := validator.Validate(pkgctx.NewSystemContext(), obj, "scheduler_job", options)
 	if err != nil {
-		t.Fatalf(ConstMagic3e287ade, err)
+		t.Fatalf("Validation failed: %v", err)
 	}
 
 	// Check for display_length warnings
@@ -202,7 +202,7 @@ func TestGoValidator_DisplayLength_Integration(t *testing.T) {
 	for _, warning := range result.Warnings {
 		if warning.Rule == "display_length" {
 			displayLengthWarnings++
-			t.Logf(ConstMagic3925089b, warning.Message)
+			t.Logf("Display length warning: %s", warning.Message)
 		}
 	}
 
@@ -215,7 +215,7 @@ func TestGoValidator_DisplayLength_Integration(t *testing.T) {
 	}
 	if expectedDisplayLen < len(obj[objects.FieldKeyJobType].(string)) {
 		if displayLengthWarnings == 0 {
-			t.Errorf(ConstMagicb751391e, len(obj[objects.FieldKeyJobType].(string)), expectedDisplayLen)
+			t.Errorf("Expected display_length warning for job_type (value length %d exceeds display_length %d), but got none", len(obj[objects.FieldKeyJobType].(string)), expectedDisplayLen)
 		}
 	}
 }

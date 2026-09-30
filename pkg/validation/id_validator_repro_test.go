@@ -23,13 +23,13 @@ func TestReproduceActualBug(t *testing.T) {
 
 	specsDir := filepath.Join(projectRoot, paths.ProcessInternalObjectSpecsDir)
 	if err := fileutil.MkdirAll(specsDir, paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagice9cc074e, err)
+		t.Fatalf("Failed to create specs directory: %v", err)
 	}
 
 	// Create configs directory (config file should be in configs/ subdirectory)
 	configsDir := filepath.Join(projectRoot, paths.ProcessInternalConfigsDir)
 	if err := fileutil.MkdirAll(configsDir, paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagic2967e378, err)
+		t.Fatalf("Failed to create configs directory: %v", err)
 	}
 
 	// Create spec with BOTH prefixes (matching actual project)
@@ -41,12 +41,12 @@ id_prefixes:
   - ADR-
 `
 	if err := fileutil.WriteFile(specFile, []byte(specContent), paths.FilePerm644); err != nil {
-		t.Fatalf(ConstMagic186b95e3, err)
+		t.Fatalf("Failed to write spec file: %v", err)
 	}
 
 	// Create config with BOTH prefixes (matching actual project)
 	// Config file should be in configs/ subdirectory per ProcessInternalConfigsDir
-	configFile := filepath.Join(configsDir, ConstMagic014a7ae7)
+	configFile := filepath.Join(configsDir, "id_prefixes_config.yaml")
 	configContent := `version: "1.0.0"
 kind_to_prefixes:
   decision:
@@ -54,23 +54,23 @@ kind_to_prefixes:
     - ADR-  # Architecture Decision Record format (backward compatibility)
 `
 	if err := fileutil.WriteFile(configFile, []byte(configContent), paths.FilePerm644); err != nil {
-		t.Fatalf(ConstMagic8e96c016, err)
+		t.Fatalf("Failed to write config file: %v", err)
 	}
 
 	oldWd, err := fileutil.Getwd()
 	if err != nil {
-		t.Fatalf(ConstMagic25cbf3ea, err)
+		t.Fatalf("Failed to get current working directory: %v", err)
 	}
 	defer fileutil.Chdir(oldWd)
 
 	if err := fileutil.Chdir(projectRoot); err != nil {
-		t.Fatalf(ConstMagic0b7b38b2, err)
+		t.Fatalf("Failed to change working directory: %v", err)
 	}
 
 	// Create go.mod marker file to help path discovery
 	goModFile := filepath.Join(projectRoot, "go.mod")
 	if err := fileutil.WriteFile(goModFile, []byte("module test\n"), paths.FilePerm644); err != nil {
-		t.Fatalf(ConstMagic920f5712, err)
+		t.Fatalf("Failed to create go.mod: %v", err)
 	}
 
 	// Reset global configs to ensure fresh loading (this is what ReloadPatterns does)
@@ -92,39 +92,39 @@ kind_to_prefixes:
 	// Step 1: Parse spec file (this is what loadPatternsFromSpecsUnlocked does)
 	config, err := validator.parseSpecFile(specFile)
 	if err != nil {
-		t.Fatalf(ConstMagicece4de57, err)
+		t.Fatalf("Failed to parse spec file: %v", err)
 	}
 
-	t.Logf(ConstMagic77dd3f03, config.Prefixes)
+	t.Logf("After parseSpecFile, prefixes: %v", config.Prefixes)
 
 	// Check what GetGlobalIDPrefixesConfig returns
 	globalConfig := GetGlobalIDPrefixesConfig()
 	if globalConfig == nil {
-		t.Fatal(ConstMagica6b206af)
+		t.Fatal("GetGlobalIDPrefixesConfig() returned nil")
 	}
 
 	configPrefixes := globalConfig.GetPrefixesForKind("decision")
-	t.Logf(ConstMagic391e9945, configPrefixes)
+	t.Logf("GetGlobalIDPrefixesConfig() returns prefixes: %v", configPrefixes)
 
 	// The bug: if config has fewer prefixes than spec, we shouldn't override
 	// But currently, parseSpecFile always overrides with config, even if config is default
 	if len(configPrefixes) < len(config.Prefixes) {
-		t.Errorf(ConstMagic9f91b93b, len(configPrefixes), len(config.Prefixes))
-		t.Errorf(ConstMagicda49d6a6, configPrefixes)
-		t.Errorf(ConstMagic888df74e, config.Prefixes)
-		t.Error(ConstMagic51a4e370)
+		t.Errorf("BUG REPRODUCED: Config has fewer prefixes (%d) than spec (%d)", len(configPrefixes), len(config.Prefixes))
+		t.Errorf("Config prefixes: %v", configPrefixes)
+		t.Errorf("Spec prefixes: %v", config.Prefixes)
+		t.Error("This means GetGlobalIDPrefixesConfig() returned default config instead of file config")
 	}
 
 	// After ensureDefaultPatterns (this is what ReloadPatterns does)
 	if err := validator.ReloadPatterns(); err != nil {
-		t.Fatalf(ConstMagic342670e1, err)
+		t.Fatalf("ReloadPatterns() failed: %v", err)
 	}
 
 	finalPrefixes := validator.GetValidPrefixes("decision")
-	t.Logf(ConstMagic5d994681, finalPrefixes)
+	t.Logf("After ReloadPatterns, final prefixes: %v", finalPrefixes)
 
 	if len(finalPrefixes) != 2 {
-		t.Errorf(ConstMagicfdb60e48, len(finalPrefixes), finalPrefixes)
+		t.Errorf("Expected 2 prefixes, got %d: %v", len(finalPrefixes), finalPrefixes)
 	}
 
 	hasADR := false
@@ -136,6 +136,6 @@ kind_to_prefixes:
 	}
 
 	if !hasADR {
-		t.Errorf(ConstMagic770197c6, finalPrefixes)
+		t.Errorf("BUG: Missing ADR- prefix after ReloadPatterns (prefixes: %v)", finalPrefixes)
 	}
 }

@@ -125,7 +125,7 @@ func SetValidationLifecycleEventCallback(callback ValidationLifecycleEventCallba
 		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.
 
 			// getValidationLifecycleEventCallback returns the global lifecycle event callback (if set)
-			ProfileSystem))).Error(ConstMagicc0e083e1, err).Log()
+			ProfileSystem))).Error("Error setting validation lifecycle callback: %v\n", err).Log()
 	}
 }
 
@@ -143,7 +143,7 @@ func getValidationLifecycleEventCallback() ValidationLifecycleEventCallback {
 		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
 
 			// AsyncValidator performs asynchronous validation of objects
-			Error(ConstMagic166fefa7, err).Log()
+			Error("Error getting validation lifecycle callback: %v\n", err).Log()
 	}
 	return callback
 }
@@ -205,7 +205,7 @@ func (av *AsyncValidator) IsRunning() bool {
 		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
 
 			// ValidationProgress represents progress of validation
-			Error(ConstMagic4e3f89aa, err).Log()
+			Error("Error checking if async validator is running: %v\n", err).Log()
 	}
 	return running
 }

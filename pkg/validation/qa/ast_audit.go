@@ -7,7 +7,6 @@ import (
 	"go/token"
 	"strings"
 
-	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // Violation represents a specific non-compliant code pattern.
@@ -44,10 +43,36 @@ func (a *ASTAuditor) AuditFile(path string) ([]Violation, error) {
 	ast.Inspect(node, func(n ast.Node) bool {
 		switch x := n.(type) {
 		case *ast.GenDecl:
-			// Rule: Ignore declarations (const, var, type, import). We only audit usage in functions.
-			// This prevents flagging constants themselves as magic strings.
-			if x.Tok == token.CONST || x.Tok == token.VAR || x.Tok == token.TYPE || x.Tok == token.IMPORT {
+			if x.Tok == token.CONST {
+				for _, spec := range x.Specs {
+					if vs, ok := spec.(*ast.ValueSpec); ok {
+						for _, name := range vs.Names {
+							if strings.HasPrefix(name.Name, "ConstMagic") {
+								violations = append(violations, Violation{
+									Pos:      a.fset.Position(name.Pos()),
+									Type:     "code_quality_debt",
+									Message:  fmt.Sprintf("Synthetic pseudo-constant %q violates readability governance (TDE-F-CQ-002)", name.Name),
+									Severity: "error",
+								})
+							}
+						}
+					}
+				}
 				return false
+			}
+			// Rule: Ignore declarations (var, type, import). We only audit usage in functions.
+			if x.Tok == token.VAR || x.Tok == token.TYPE || x.Tok == token.IMPORT {
+				return false
+			}
+
+		case *ast.Ident:
+			if strings.HasPrefix(x.Name, "ConstMagic") {
+				violations = append(violations, Violation{
+					Pos:      a.fset.Position(x.Pos()),
+					Type:     "code_quality_debt",
+					Message:  fmt.Sprintf("Reference to synthetic pseudo-constant %q violates readability governance (TDE-F-CQ-002)", x.Name),
+					Severity: "error",
+				})
 			}
 
 		case *ast.GoStmt:
@@ -151,7 +176,7 @@ func (a *ASTAuditor) auditConditionalChain(stmt *ast.IfStmt) []Violation {
 	if chainLen > 2 {
 		return []Violation{{
 			Pos:      a.fset.Position(stmt.Pos()),
-			Type:     validation.ConstMagic0af9968b,
+			Type:     "abstraction_violation",
 			Message:  fmt.Sprintf("Long conditional chain detected (%d branches). Abstract into a fluent, declarative utility like 'pkg/when.When' or 'pkg/when.Result[T]()'.", chainLen),
 			Severity: "medium",
 		}}
@@ -174,8 +199,8 @@ func (a *ASTAuditor) auditInterfaceUsage(fn *ast.FuncDecl) []Violation {
 				if strings.Contains(name, "Storage") || strings.Contains(name, "Manager") || strings.Contains(name, "Provider") {
 					violations = append(violations, Violation{
 						Pos:      a.fset.Position(field.Pos()),
-						Type:     validation.ConstMagic0af9968b,
-						Message:  fmt.Sprintf(validation.ConstMagic3764b830, field.Names[0].Name, sel.X, name),
+						Type:     "abstraction_violation",
+						Message:  fmt.Sprintf("Parameter '%s' uses concrete type '*%s.%s'. Prefer interface types for better decoupling and testability.", field.Names[0].Name, sel.X, name),
 						Severity: "medium",
 					})
 				}
@@ -199,7 +224,7 @@ func (a *ASTAuditor) auditHardcodedValues(lit *ast.BasicLit) []Violation {
 		return []Violation{{
 			Pos:      a.fset.Position(lit.Pos()),
 			Type:     "dry_violation",
-			Message:  fmt.Sprintf(validation.ConstMagicc5c4a96a, val),
+			Message:  fmt.Sprintf("Potential magic string '%s'. Extract to a named constant if used more than once.", val),
 			Severity: "low",
 		}}
 	}
@@ -215,8 +240,8 @@ func (a *ASTAuditor) auditFunctionComplexity(fn *ast.FuncDecl) []Violation {
 	if lineCount > 100 {
 		return []Violation{{
 			Pos:      a.fset.Position(fn.Pos()),
-			Type:     validation.ConstMagic0af9968b,
-			Message:  fmt.Sprintf(validation.ConstMagic263b84d5, fn.Name.Name, lineCount),
+			Type:     "abstraction_violation",
+			Message:  fmt.Sprintf("Function '%s' is too long (%d lines). Break down into smaller, well-abstracted components.", fn.Name.Name, lineCount),
 			Severity: "medium",
 		}}
 	}
@@ -239,8 +264,8 @@ func (a *ASTAuditor) auditGoroutine(stmt *ast.GoStmt) []Violation {
 	if !hasCtx {
 		return []Violation{{
 			Pos:      a.fset.Position(stmt.Pos()),
-			Type:     validation.ConstMagic9ae33b8e,
-			Message:  validation.ConstMagic8343db54,
+			Type:     "concurrency_violation",
+			Message:  "Unmanaged goroutine detected: background tasks must propagate context.Context.",
 			Severity: "high",
 		}}
 	}
@@ -256,7 +281,7 @@ func (a *ASTAuditor) auditServiceInstantiation(call *ast.CallExpr) []Violation {
 			return []Violation{{
 				Pos:      a.fset.Position(call.Pos()),
 				Type:     "di_violation",
-				Message:  fmt.Sprintf(validation.ConstMagic3286eac2, name),
+				Message:  fmt.Sprintf("Direct instantiation of %s detected. Use OrchestratorRegistry or specialized DI providers.", name),
 				Severity: "medium",
 			}}
 		}
@@ -278,8 +303,8 @@ func (a *ASTAuditor) auditSwallowedErrors(stmt *ast.AssignStmt) []Violation {
 			if _, ok := stmt.Rhs[0].(*ast.CallExpr); ok {
 				return []Violation{{
 					Pos:      a.fset.Position(stmt.Pos()),
-					Type:     validation.ConstMagic982e2a9f,
-					Message:  validation.ConstMagic01fb6a13,
+					Type:     "error_handling_debt",
+					Message:  "Potential swallowed error: the last return value is assigned to the blank identifier.",
 					Severity: "medium",
 				}}
 			}
@@ -287,5 +312,3 @@ func (a *ASTAuditor) auditSwallowedErrors(stmt *ast.AssignStmt) []Violation {
 	}
 	return nil
 }
-
-

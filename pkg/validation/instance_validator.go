@@ -113,7 +113,7 @@ func (iv *InstanceValidator) ValidateInstanceWithState(obj map[string]any, kind,
 	// Use the default Go validator for backward compatibility
 	validator := GetGlobalRegistry().Get("go")
 	if validator == nil {
-		return nil, errfmt.Errorf(ConstMagic0a39dd3c)
+		return nil, errfmt.Errorf("default validator not available")
 	}
 
 	options := &ValidationOptions{
@@ -146,13 +146,13 @@ func (iv *InstanceValidator) validateInstanceLegacy(obj map[string]any, kind, cu
 		// version-aware loading should work. Fail fast to expose configuration issues.
 		spec, err = iv.specLoader.LoadSpecByVersion(kind, schemaVersion)
 		if err != nil {
-			return nil, errfmt.Errorf(ConstMagic123ebc4c, kind, schemaVersion, err)
+			return nil, errfmt.Errorf("failed to load spec for kind %s version %s (builder registry may not be configured or builder not found): %w", kind, schemaVersion, err)
 		}
 	} else {
 		// No schema_version - use file-based loading (backward compatibility)
 		spec, err = iv.specLoader.LoadSpecWithInheritance(kind + ".yaml")
 		if err != nil {
-			return nil, errfmt.Errorf(ConstMagic73de3a61, kind, err)
+			return nil, errfmt.Errorf("failed to load spec for kind %s: %w", kind, err)
 		}
 	}
 
@@ -263,7 +263,7 @@ func (iv *InstanceValidator) validateFieldType(fieldName string, fieldValue any,
 
 	return &ValidationError{
 		Field:   fieldName,
-		Message: fmt.Sprintf(ConstMagicd5e5bce7, fieldName, fieldType, fieldValue),
+		Message: fmt.Sprintf("Field %s has invalid type: expected %s, got %T", fieldName, fieldType, fieldValue),
 		Rule:    "type",
 	}
 }
@@ -290,14 +290,14 @@ func (iv *InstanceValidator) validateFieldPattern(fieldName string, fieldValue a
 		if err != nil {
 			return &ValidationError{
 				Field:   fieldName,
-				Message: fmt.Sprintf(ConstMagic43850ada, err),
+				Message: fmt.Sprintf("ID validation failed: %v", err),
 				Rule:    "pattern",
 			}, nil
 		}
 		if !valid {
 			return &ValidationError{
 				Field:   fieldName,
-				Message: fmt.Sprintf(ConstMagicd9b56a88, fieldName, kind),
+				Message: fmt.Sprintf("Field %s does not match ID pattern for kind %s", fieldName, kind),
 				Rule:    "pattern",
 			}, nil
 		}
@@ -316,7 +316,7 @@ func (iv *InstanceValidator) validateFieldPattern(fieldName string, fieldValue a
 	if err != nil {
 		return nil, &ValidationWarning{
 			Field:   fieldName,
-			Message: fmt.Sprintf(ConstMagic1e0005e2, err),
+			Message: fmt.Sprintf("Invalid pattern in spec: %v", err),
 			Rule:    "pattern",
 		}
 	}
@@ -327,7 +327,7 @@ func (iv *InstanceValidator) validateFieldPattern(fieldName string, fieldValue a
 
 	return &ValidationError{
 		Field:   fieldName,
-		Message: fmt.Sprintf(ConstMagic3bddafa1, fieldName, pattern),
+		Message: fmt.Sprintf("Field %s does not match pattern %s", fieldName, pattern),
 		Rule:    "pattern",
 	}, nil
 }
@@ -354,7 +354,7 @@ func (iv *InstanceValidator) validateFieldSemanticType(fieldName string, fieldVa
 	if err := iv.validateSemanticType(fieldName, fieldValue, semanticType); err != nil {
 		return &ValidationWarning{
 			Field:   fieldName,
-			Message: fmt.Sprintf(ConstMagic8d32cf06, err),
+			Message: fmt.Sprintf("Semantic type validation: %v", err),
 			Rule:    "semantic_type",
 		}
 	}
@@ -392,7 +392,7 @@ func (iv *InstanceValidator) validateSemanticType(_ string, value any, semanticT
 	// Use ontology registry for validation
 	registry := GetGlobalOntologyRegistry()
 	if err := registry.ValidateSemanticType(value, semanticType); err != nil {
-		return errfmt.Newf(ConstMagic83f17821).Wrap(err)
+		return errfmt.Newf("ontology validation failed").Wrap(err)
 	}
 
 	return nil

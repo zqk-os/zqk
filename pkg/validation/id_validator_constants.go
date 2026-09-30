@@ -34,7 +34,7 @@ func getNamespaceValidationPattern() string {
 	// This ensures the spec file is the source of truth
 	specLoader := objects.GetGlobalSpecLoader()
 	if specLoader != nil {
-		spec, err := specLoader.LoadSpecWithInheritance(ConstMagic33bc3930)
+		spec, err := specLoader.LoadSpecWithInheritance("base_object.yaml")
 		if err == nil && spec != nil {
 			if fields, ok := spec.Fields[objects.FieldKeyNamespaceID].(map[string]any); ok {
 				if validation, ok := fields["validation"].(map[string]any); ok {
@@ -95,10 +95,10 @@ func getDefaultNamespaceOrganizational() string {
 	if config != nil {
 		layers := config.GetNamespaceLayers()
 		if len(layers) > 1 {
-			return layers[1] + ConstMagicExtracted_61
+			return layers[1] + ":organizational"
 		}
 	}
-	return ConstMagic09ae1f1a // Fallback
+	return "domain:organizational" // Fallback
 }
 
 // System origin constants - DEPRECATED: Use NamespacesConfig instead

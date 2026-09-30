@@ -17,7 +17,7 @@ func TestLoadNamespaceFromObject(t *testing.T) {
 		description  string
 	}{
 		{
-			name: ConstMagicefe83e7c,
+			name: "kernel namespace",
 			namespaceObj: map[string]any{
 				objects.FieldKeyNamespaceID: "zqk:kernel",
 				objects.FieldKeyLayer:       "kernel",
@@ -25,12 +25,12 @@ func TestLoadNamespaceFromObject(t *testing.T) {
 			wantErr:     false,
 			wantLayer:   "kernel",
 			wantDomain:  "",
-			description: ConstMagic99d7b1d6,
+			description: "Load kernel namespace object",
 		},
 		{
-			name: ConstMagice850b7a9,
+			name: "domain namespace with integration",
 			namespaceObj: map[string]any{
-				objects.FieldKeyNamespaceID: ConstMagic09ae1f1a,
+				objects.FieldKeyNamespaceID: "domain:organizational",
 				objects.FieldKeyLayer:       "domain",
 				objects.FieldKeyDomain:      "organizational",
 				objects.FieldKeyIntegration: map[string]any{
@@ -45,12 +45,12 @@ func TestLoadNamespaceFromObject(t *testing.T) {
 			wantErr:     false,
 			wantLayer:   "domain",
 			wantDomain:  "organizational",
-			description: ConstMagic783a66bd,
+			description: "Load domain namespace with integration rules",
 		},
 		{
-			name: ConstMagic6498e11a,
+			name: "namespace with isolation",
 			namespaceObj: map[string]any{
-				objects.FieldKeyNamespaceID: ConstMagic09ae1f1a,
+				objects.FieldKeyNamespaceID: "domain:organizational",
 				objects.FieldKeyLayer:       "domain",
 				objects.FieldKeyIsolation: map[string]any{
 					"validation": map[string]any{
@@ -62,15 +62,15 @@ func TestLoadNamespaceFromObject(t *testing.T) {
 			wantErr:     false,
 			wantLayer:   "domain",
 			wantDomain:  "",
-			description: ConstMagic73d219d0,
+			description: "Load namespace with isolation rules",
 		},
 		{
-			name: ConstMagicdf706097,
+			name: "missing namespace_id",
 			namespaceObj: map[string]any{
 				objects.FieldKeyLayer: "kernel",
 			},
 			wantErr:     true,
-			description: ConstMagic47312ed1,
+			description: "Error when namespace_id is missing",
 		},
 	}
 
@@ -78,20 +78,20 @@ func TestLoadNamespaceFromObject(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			info, err := LoadNamespaceFromObject(tt.namespaceObj)
 			if (err != nil) != tt.wantErr {
-				t.Errorf(ConstMagic47094adb, err, tt.wantErr, tt.description)
+				t.Errorf("LoadNamespaceFromObject() error = %v, wantErr %v (%s)", err, tt.wantErr, tt.description)
 				return
 			}
 			if tt.wantErr {
 				return
 			}
 			if info == nil {
-				t.Fatal(ConstMagicff457193)
+				t.Fatal("LoadNamespaceFromObject() returned nil info")
 			}
 			if info.Layer != tt.wantLayer {
-				t.Errorf(ConstMagicc8a71958, info.Layer, tt.wantLayer)
+				t.Errorf("LoadNamespaceFromObject() layer = %v, want %v", info.Layer, tt.wantLayer)
 			}
 			if info.Domain != tt.wantDomain {
-				t.Errorf(ConstMagic018ea6ea, info.Domain, tt.wantDomain)
+				t.Errorf("LoadNamespaceFromObject() domain = %v, want %v", info.Domain, tt.wantDomain)
 			}
 		})
 	}
@@ -100,8 +100,8 @@ func TestLoadNamespaceFromObject(t *testing.T) {
 func TestDiscoverNamespacesFromRegistry(t *testing.T) {
 	t.Parallel()
 	registryObj := map[string]any{
-		objects.FieldKeyID:    ConstMagiccf8fd093,
-		objects.FieldKeyTitle: ConstMagice2bf8ab7,
+		objects.FieldKeyID:    "NAMESPACE-REGISTRY-001",
+		objects.FieldKeyTitle: "ZQK Namespace Registry",
 	}
 
 	namespaceObjects := []map[string]any{
@@ -110,7 +110,7 @@ func TestDiscoverNamespacesFromRegistry(t *testing.T) {
 			objects.FieldKeyLayer:       "kernel",
 		},
 		{
-			objects.FieldKeyNamespaceID: ConstMagic09ae1f1a,
+			objects.FieldKeyNamespaceID: "domain:organizational",
 			objects.FieldKeyLayer:       "domain",
 			objects.FieldKeyDomain:      "organizational",
 		},
@@ -122,26 +122,26 @@ func TestDiscoverNamespacesFromRegistry(t *testing.T) {
 
 	result, err := DiscoverNamespacesFromRegistry(registryObj, namespaceObjects)
 	if err != nil {
-		t.Fatalf(ConstMagicbf991158, err)
+		t.Fatalf("DiscoverNamespacesFromRegistry() error = %v", err)
 	}
 
 	// Should have 2 valid namespaces (invalid one should be skipped)
 	if len(result) != 2 {
-		t.Errorf(ConstMagice8a53770, len(result))
+		t.Errorf("DiscoverNamespacesFromRegistry() returned %d namespaces, want 2", len(result))
 	}
 
 	// Check kernel namespace
 	if kernelNS, ok := result["zqk:kernel"]; !ok {
-		t.Error(ConstMagicea2d1b35)
+		t.Error("DiscoverNamespacesFromRegistry() missing zqk:kernel namespace")
 	} else if kernelNS.Layer != "kernel" {
-		t.Errorf(ConstMagic5f01ddb7, kernelNS.Layer)
+		t.Errorf("DiscoverNamespacesFromRegistry() kernel layer = %v, want kernel", kernelNS.Layer)
 	}
 
 	// Check organizational namespace
 	if orgNS, ok := result["domain:organizational"]; !ok {
-		t.Error(ConstMagic6bf36d1f)
+		t.Error("DiscoverNamespacesFromRegistry() missing domain:organizational namespace")
 	} else if orgNS.Domain != "organizational" {
-		t.Errorf(ConstMagic3fdb42cd, orgNS.Domain)
+		t.Errorf("DiscoverNamespacesFromRegistry() organizational domain = %v, want organizational", orgNS.Domain)
 	}
 }
 
@@ -155,33 +155,33 @@ func TestParseReferenceRules(t *testing.T) {
 			"validation":                "strict",
 		},
 		map[string]any{
-			objects.FieldKeyNamespaceID: ConstMagic09ae1f1a,
+			objects.FieldKeyNamespaceID: "domain:organizational",
 			// No object_types - means all types allowed
 		},
 	}
 
 	rules := parseReferenceRules(rulesRaw)
 	if len(rules) != 2 {
-		t.Fatalf(ConstMagic7e7b1c09, len(rules))
+		t.Fatalf("parseReferenceRules() returned %d rules, want 2", len(rules))
 	}
 
 	// Check first rule
 	if rules[0].NamespaceID != "zqk:kernel" {
-		t.Errorf(ConstMagic973a664a, rules[0].NamespaceID)
+		t.Errorf("parseReferenceRules() rule[0].NamespaceID = %v, want zqk:kernel", rules[0].NamespaceID)
 	}
 	if len(rules[0].ObjectTypes) != 2 {
-		t.Errorf(ConstMagicae246d5d, len(rules[0].ObjectTypes))
+		t.Errorf("parseReferenceRules() rule[0].ObjectTypes length = %v, want 2", len(rules[0].ObjectTypes))
 	}
 	if rules[0].ReferenceDirection != "outbound" {
-		t.Errorf(ConstMagic73c30bca, rules[0].ReferenceDirection)
+		t.Errorf("parseReferenceRules() rule[0].ReferenceDirection = %v, want outbound", rules[0].ReferenceDirection)
 	}
 
 	// Check second rule
-	if rules[1].NamespaceID != ConstMagic09ae1f1a {
-		t.Errorf(ConstMagic50016ee1, rules[1].NamespaceID)
+	if rules[1].NamespaceID != "domain:organizational" {
+		t.Errorf("parseReferenceRules() rule[1].NamespaceID = %v, want domain:organizational", rules[1].NamespaceID)
 	}
 	if len(rules[1].ObjectTypes) != 0 {
-		t.Errorf(ConstMagic7bc3f721, rules[1].ObjectTypes)
+		t.Errorf("parseReferenceRules() rule[1].ObjectTypes should be empty (all types allowed), got %v", rules[1].ObjectTypes)
 	}
 }
 
@@ -190,7 +190,7 @@ func TestNewNamespaceDiscovery(t *testing.T) {
 	t.Parallel()
 	discovery := NewNamespaceDiscovery()
 	if discovery == nil {
-		t.Fatal(ConstMagice0f65aa9)
+		t.Fatal("NewNamespaceDiscovery() returned nil")
 	}
 
 	// Verify it's a valid NamespaceDiscovery instance
@@ -216,12 +216,12 @@ func TestNewNamespaceDiscovery(t *testing.T) {
 	// This indirectly tests that NewNamespaceDiscovery creates a valid instance
 	result, err := DiscoverNamespacesFromRegistry(registryObj, namespaceObjects)
 	if err != nil {
-		t.Fatalf(ConstMagicc5c2cd8d, err)
+		t.Fatalf("DiscoverNamespacesFromRegistry() failed with NewNamespaceDiscovery instance: %v", err)
 	}
 
 	// Verify result is valid
 	if len(result) != 1 {
-		t.Errorf(ConstMagic3f9edd8c, len(result))
+		t.Errorf("DiscoverNamespacesFromRegistry() returned %d namespaces, want 1", len(result))
 	}
 
 	// Verify the discovery object is ready to use

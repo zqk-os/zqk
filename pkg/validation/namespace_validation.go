@@ -87,7 +87,7 @@ func ValidateCrossNamespaceReference(fromNamespaceID, toNamespaceID, objectType 
 	}
 
 	// Reference not explicitly allowed
-	return errfmt.Errorf(ConstMagicea3eff67, fromNamespaceID, objectType, toNamespaceID, toNamespaceID)
+	return errfmt.Errorf("cross-namespace reference not allowed: %s cannot reference %s:%s in %s", fromNamespaceID, objectType, toNamespaceID, toNamespaceID)
 }
 
 // ParseNamespaceFromReference parses namespace information from a reference string

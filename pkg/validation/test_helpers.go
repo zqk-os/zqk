@@ -13,7 +13,7 @@ import (
 func setupTestEnvironment(testRoot string) (string, error) {
 	absRoot, err := filepath.Abs(testRoot)
 	if err != nil {
-		return "", errfmt.Newf(ConstMagic8a3a4a62).Wrap(err)
+		return "", errfmt.Newf("failed to resolve test root path").Wrap(err)
 	}
 
 	if err := paths.LayoutUnder(absRoot).
@@ -21,7 +21,7 @@ func setupTestEnvironment(testRoot string) (string, error) {
 		Dir(paths.ProcessInternalObjectSpecsDir, paths.DirPerm755).
 		Dir(paths.ProcessInternalTraitsDir, paths.DirPerm755).
 		Err(); err != nil {
-		return "", errfmt.Newf(ConstMagic25824abd).Wrap(err)
+		return "", errfmt.Newf("failed to create validation test layout").Wrap(err)
 	}
 
 	return absRoot, nil

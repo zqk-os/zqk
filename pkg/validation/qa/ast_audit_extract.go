@@ -3,7 +3,6 @@ package qa
 import (
 	"go/ast"
 
-	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // auditMapExtractionAntiPattern checks for the pattern:
@@ -61,7 +60,7 @@ func (a *ASTAuditor) auditMapExtractionAntiPattern(stmt *ast.IfStmt) []Violation
 	if isAntiPattern {
 		return []Violation{{
 			Pos:      a.fset.Position(stmt.Pos()),
-			Type:     validation.ConstMagic0af9968b,
+			Type:     "abstraction_violation",
 			Message:  "Verbose map extraction detected (e.g. 'if val, ok := m[k].(string); ok ...'). Abstract this boilerplate into a fluent utility like 'pkg/objects.GetString(map, key)'.",
 			Severity: "medium",
 		}}

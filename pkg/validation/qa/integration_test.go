@@ -9,7 +9,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/testkit"
-	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 func TestAuditorGate_FullLoop(t *testing.T) {
@@ -84,15 +83,15 @@ func TestAuditorGate_FullLoop(t *testing.T) {
 	// 3. Verify via Gate (PASS)
 	err = gate.VerifyComplete(ctx, itemID)
 	if err != nil {
-		t.Fatalf(validation.ConstMagic3c4e5f09, err)
+		t.Fatalf("gate verification failed: %v", err)
 	}
 
 	// 4. Test SPOOFING attempt (FAIL)
 	err = gate.VerifyComplete(ctx, spoofedID)
 	if err == nil {
-		t.Errorf(validation.ConstMagic7b9fc533)
+		t.Errorf("SECURITY VULNERABILITY: gate allowed spoofed signature with untrusted key")
 	} else {
-		t.Logf(validation.ConstMagicd4e0732d, err)
+		t.Logf("Expected failure: %v", err)
 	}
 }
 
