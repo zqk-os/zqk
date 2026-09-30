@@ -364,6 +364,7 @@ func (s *AuditorService) performAuditWithMode(ctx context.Context, id string, ki
 				astViolations = append(astViolations, v)
 			}
 		}
+	}
 
 	if len(astViolations) > 0 {
 		reason := fmt.Sprintf(LogFmtAuditorASTViolation, len(astViolations))
