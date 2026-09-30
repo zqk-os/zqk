@@ -77,86 +77,95 @@ func CheckDuplication(projectRoot string, files []string, cfg *GatesConfig) ([]F
 	bodyHashMap := make(map[string]*dupGroup)
 
 	for _, rel := range files {
-		rel = filepath.ToSlash(rel)
-		if strings.HasSuffix(rel, "_test.go") ||
-			strings.HasPrefix(rel, "vendor/") ||
-			strings.Contains(rel, "/testdata/") ||
-			strings.HasPrefix(rel, "testdata/") ||
-			strings.Contains(rel, "/mock/") ||
-			isPathExempt(rel, exemptions) {
-			continue
-		}
-
-		abs := rel
-		if !filepath.IsAbs(rel) {
-			abs = filepath.Join(projectRoot, rel)
-		}
-
-		src, err := fileutil.ReadFile(abs)
-		if err != nil {
-			if os.IsNotExist(err) {
-				continue
-			}
+		if err := auditFileDuplication(fset, projectRoot, rel, exemptions, minStmts, minLines, bodyHashMap); err != nil {
 			return nil, err
-		}
-
-		if isGeneratedCode(src) {
-			continue
-		}
-
-		node, err := parser.ParseFile(fset, rel, src, 0)
-		if err != nil {
-			continue
-		}
-
-		for _, decl := range node.Decls {
-			fn, ok := decl.(*ast.FuncDecl)
-			if !ok || fn.Body == nil {
-				continue
-			}
-
-			stmtCount := len(fn.Body.List)
-			if stmtCount < minStmts {
-				continue
-			}
-
-			startPos := fset.Position(fn.Pos())
-			endPos := fset.Position(fn.End())
-			lineCount := endPos.Line - startPos.Line + 1
-			if lineCount < minLines {
-				continue
-			}
-
-			normalized, err := normalizeFuncBody(fn.Body)
-			if err != nil || normalized == "" {
-				continue
-			}
-
-			hashBytes := sha256.Sum256([]byte(normalized))
-			hash := hex.EncodeToString(hashBytes[:])
-
-			group, exists := bodyHashMap[hash]
-			if !exists {
-				group = &dupGroup{
-					Stmts: stmtCount,
-					Lines: lineCount,
-				}
-				bodyHashMap[hash] = group
-			}
-
-			group.Locations = append(group.Locations, FuncLocation{
-				File:  rel,
-				Line:  startPos.Line,
-				Name:  fn.Name.Name,
-				Stmts: stmtCount,
-				Lines: lineCount,
-			})
 		}
 	}
 
-	var findings []Finding
+	return collectDuplicationFindings(bodyHashMap), nil
+}
 
-	// Sort keys for deterministic output
+func auditFileDuplication(fset *token.FileSet, projectRoot, rel string, exemptions []string, minStmts, minLines int, bodyHashMap map[string]*dupGroup) error {
+	rel = filepath.ToSlash(rel)
+	if strings.HasSuffix(rel, "_test.go") ||
+		strings.HasPrefix(rel, "vendor/") ||
+		strings.Contains(rel, "/testdata/") ||
+		strings.HasPrefix(rel, "testdata/") ||
+		strings.Contains(rel, "/mock/") ||
+		isPathExempt(rel, exemptions) {
+		return nil
+	}
+
+	abs := rel
+	if !filepath.IsAbs(rel) {
+		abs = filepath.Join(projectRoot, rel)
+	}
+
+	src, err := fileutil.ReadFile(abs)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+
+	if isGeneratedCode(src) {
+		return nil
+	}
+
+	node, err := parser.ParseFile(fset, rel, src, 0)
+	if err != nil {
+		return nil
+	}
+
+	for _, decl := range node.Decls {
+		fn, ok := decl.(*ast.FuncDecl)
+		if !ok || fn.Body == nil {
+			continue
+		}
+
+		stmtCount := len(fn.Body.List)
+		if stmtCount < minStmts {
+			continue
+		}
+
+		startPos := fset.Position(fn.Pos())
+		endPos := fset.Position(fn.End())
+		lineCount := endPos.Line - startPos.Line + 1
+		if lineCount < minLines {
+			continue
+		}
+
+		normalized, err := normalizeFuncBody(fn.Body)
+		if err != nil || normalized == "" {
+			continue
+		}
+
+		hashBytes := sha256.Sum256([]byte(normalized))
+		hash := hex.EncodeToString(hashBytes[:])
+
+		group, exists := bodyHashMap[hash]
+		if !exists {
+			group = &dupGroup{
+				Stmts: stmtCount,
+				Lines: lineCount,
+			}
+			bodyHashMap[hash] = group
+		}
+
+		group.Locations = append(group.Locations, FuncLocation{
+			File:  rel,
+			Line:  startPos.Line,
+			Name:  fn.Name.Name,
+			Stmts: stmtCount,
+			Lines: lineCount,
+		})
+	}
+	return nil
+}
+
+func collectDuplicationFindings(bodyHashMap map[string]*dupGroup) []Finding {
+	var findings []Finding
 	var hashes []string
 	for h := range bodyHashMap {
 		hashes = append(hashes, h)
@@ -171,7 +180,6 @@ func CheckDuplication(projectRoot string, files []string, cfg *GatesConfig) ([]F
 
 		primary := group.Locations[0]
 		for _, dup := range group.Locations[1:] {
-			// Don't report if exactly the same file and line (e.g. redundant scan)
 			if dup.File == primary.File && dup.Line == primary.Line {
 				continue
 			}
@@ -189,8 +197,7 @@ func CheckDuplication(projectRoot string, files []string, cfg *GatesConfig) ([]F
 			})
 		}
 	}
-
-	return findings, nil
+	return findings
 }
 
 func normalizeFuncBody(body *ast.BlockStmt) (string, error) {
