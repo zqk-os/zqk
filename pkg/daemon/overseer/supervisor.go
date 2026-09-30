@@ -18,15 +18,17 @@ type CommandExecutor func(ctx context.Context, name string, args ...string) *exe
 
 // Supervisor runs the reconciliation loop, managing process lifecycles and crash recovery.
 type Supervisor struct {
-	mu          sync.Mutex
-	projectRoot string
-	registry    *Registry
-	pgMgr       *ProcessGroupManager
-	statuses    map[string]*DaemonStatus
-	processes   map[string]*exec.Cmd
-	cmdExecutor CommandExecutor
-	stopCh      chan struct{}
-	doneCh      chan struct{}
+	mu             sync.Mutex
+	projectRoot    string
+	registry       *Registry
+	pgMgr          *ProcessGroupManager
+	statuses       map[string]*DaemonStatus
+	processes      map[string]*exec.Cmd
+	cmdExecutor    CommandExecutor
+	stopCh         chan struct{}
+	doneCh         chan struct{}
+	lifetimeCtx    context.Context
+	lifetimeCancel context.CancelFunc
 }
 
 // NewSupervisor instantiates a daemon supervisor.
@@ -43,6 +45,7 @@ func NewSupervisor(projectRoot string, registry *Registry, pgMgr *ProcessGroupMa
 		stopCh: make(chan struct{}),
 		doneCh: make(chan struct{}),
 	}
+	sup.lifetimeCtx, sup.lifetimeCancel = context.WithCancel(context.Background())
 	sup.initStatuses()
 	return sup
 }
@@ -70,6 +73,13 @@ func (s *Supervisor) Start(ctx context.Context, pollInterval time.Duration) erro
 	if pollInterval <= 0 {
 		pollInterval = 100 * time.Millisecond
 	}
+
+	s.mu.Lock()
+	if s.lifetimeCancel != nil {
+		s.lifetimeCancel()
+	}
+	s.lifetimeCtx, s.lifetimeCancel = context.WithCancel(ctx)
+	s.mu.Unlock()
 
 	// Initial reconciliation
 	if err := s.Reconcile(ctx); err != nil {
@@ -101,6 +111,9 @@ func (s *Supervisor) Start(ctx context.Context, pollInterval time.Duration) erro
 // Stop terminates the supervisor and all managed daemons.
 func (s *Supervisor) Stop(ctx context.Context) error {
 	s.mu.Lock()
+	if s.lifetimeCancel != nil {
+		s.lifetimeCancel()
+	}
 	select {
 	case <-s.stopCh:
 		s.mu.Unlock()
@@ -229,7 +242,11 @@ func (s *Supervisor) launchDaemonLocked(ctx context.Context, spec *DaemonSpec, s
 		}
 	}
 
-	cmd := s.cmdExecutor(ctx, exe, args...)
+	spawnCtx := s.lifetimeCtx
+	if spawnCtx == nil {
+		spawnCtx = context.Background()
+	}
+	cmd := s.cmdExecutor(spawnCtx, exe, args...)
 	if spec.WorkingDir != "" {
 		cmd.Dir = spec.WorkingDir
 	} else {
@@ -368,7 +385,7 @@ func (s *Supervisor) Restart(ctx context.Context, name string) error {
 	s.mu.Unlock()
 
 	if pidToStop > 0 {
-		_ = s.pgMgr.TerminateGroup(ctx, pidToStop, 200*time.Millisecond)
+		_ = s.pgMgr.TerminateGroup(ctx, pidToStop, 500*time.Millisecond)
 	}
 
 	return s.Reconcile(ctx)

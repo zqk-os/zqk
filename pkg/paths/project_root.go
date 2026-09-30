@@ -148,8 +148,12 @@ func ReadPersistedCurrentRoot(workspaceRoot string) string {
 	return resolvedAbs
 }
 
-// IsValidProjectRoot returns true if dir contains .zqk (the project/workspace marker).
+// IsValidProjectRoot returns true if dir contains .zqk (the project/workspace marker)
+// and is not an ignored root (such as system root, temp directories, or user home).
 func IsValidProjectRoot(dir string) bool {
+	if isIgnoredNestedProjectRoot(dir) {
+		return false
+	}
 	_, err := fileutil.Stat(filepath.Join(dir, ProjectDataDir))
 	return err == nil
 }
@@ -158,6 +162,12 @@ func isIgnoredNestedProjectRoot(dir string) bool {
 	d := filepath.Clean(dir)
 	if d == "/" || d == "." || d == "/tmp" || d == "/var/tmp" || d == "/private/tmp" || d == "/private/var/tmp" {
 		return true
+	}
+	// User home directory can contain ~/.zqk for global config/credentials, but is never a project root.
+	if home, err := os.UserHomeDir(); err == nil && home != "" {
+		if d == filepath.Clean(home) {
+			return true
+		}
 	}
 	// System temporary directory ancestors can never be valid project roots
 	tempDir := filepath.Clean(os.TempDir())

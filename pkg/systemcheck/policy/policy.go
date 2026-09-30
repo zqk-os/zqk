@@ -37,6 +37,7 @@ var Registry = map[string]Gate{
 	"storage-boundaries": &StorageBoundariesGate{},
 	"goroutines":         &GoroutinesGate{},
 	"field-keys":         &FieldKeysGate{},
+	"project-nesting":    &ProjectNestingGate{},
 }
 
 // AvailableGates returns a list of all registered gate names.
@@ -51,7 +52,7 @@ func AvailableGates() []string {
 // RunGates executes the specified gates (or all if empty) and returns individual results.
 func RunGates(ctx context.Context, opts RunOptions, gateNames ...string) ([]*Result, bool) {
 	if len(gateNames) == 0 || (len(gateNames) == 1 && gateNames[0] == "all") {
-		gateNames = []string{"doc-links", "secrets", "storage-boundaries", "goroutines", "field-keys"}
+		gateNames = []string{"doc-links", "secrets", "storage-boundaries", "goroutines", "field-keys", "project-nesting"}
 	}
 
 	results := make([]*Result, 0, len(gateNames))

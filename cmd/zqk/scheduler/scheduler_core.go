@@ -19,6 +19,7 @@ import (
 	clicontext "github.com/zqk-os/zqk/internal/cli/context"
 	"github.com/zqk-os/zqk/pkg/config"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/daemon/singleton"
 	"github.com/zqk-os/zqk/pkg/diagnostics"
 	"github.com/zqk-os/zqk/pkg/dispatch"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -214,6 +215,12 @@ func startScheduler(ctx *cli.Context, cmd *cobra.Command) error {
 	if _, err := clicontext.LoadBrandSettings(projectRoot); err != nil {
 		return errfmt.Errorf(schedulerErrBrandSettingsRequired, err)
 	}
+
+	daemonLock, err := singleton.AcquireDaemonLock(projectRoot, "scheduler")
+	if err != nil {
+		return errfmt.Errorf("failed to acquire scheduler daemon lock: %w", err)
+	}
+	defer daemonLock.Release()
 
 	// Clear no-auto-restart so ensure-scheduler-running.sh (cron) may start the daemon again if it dies later
 	if err := schedulerpkg.RemoveNoAutoRestartFile(projectRoot); err != nil {

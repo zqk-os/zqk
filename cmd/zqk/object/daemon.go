@@ -12,6 +12,7 @@ import (
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/accumulator"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/daemon/singleton"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -74,6 +75,12 @@ func NewDaemonCmd() *cobra.Command {
 				}
 
 				projectRoot := proc.ProjectRoot()
+				daemonLock, err := singleton.AcquireDaemonLock(projectRoot, "privileged-writer")
+				if err != nil {
+					return errfmt.Errorf("failed to acquire daemon lock: %w", err)
+				}
+				defer daemonLock.Release()
+
 				adapter := &daemonAdapter{fileStorage: fileStorage}
 				daemon := storage.NewPrivilegedWriterDaemon(adapter, projectRoot)
 

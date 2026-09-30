@@ -11,6 +11,7 @@ import (
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/daemon/singleton"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/kernel/steward"
 	"github.com/zqk-os/zqk/pkg/logging"
@@ -82,6 +83,12 @@ func newStewardDaemonCmd() *cobra.Command {
 		if projectRoot == "" {
 			return errfmt.Errorf("project root not found")
 		}
+
+		daemonLock, err := singleton.AcquireDaemonLock(projectRoot, "steward")
+		if err != nil {
+			return errfmt.Errorf("failed to acquire steward daemon lock: %w", err)
+		}
+		defer daemonLock.Release()
 
 		logger := logging.GetLoggerFromProfile(proc.Context().Profile)
 		logging.Fluent(logger).Info("Kernel steward daemon starting").

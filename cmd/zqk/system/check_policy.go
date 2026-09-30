@@ -30,7 +30,7 @@ func runCheckPolicy(cmd *cobra.Command, args []string, proc *cli.Processor) erro
 
 	gates := args
 	if all || len(gates) == 0 {
-		gates = []string{"doc-links", "secrets", "storage-boundaries", "goroutines"}
+		gates = []string{"doc-links", "secrets", "storage-boundaries", "goroutines", "field-keys", "project-nesting"}
 	}
 
 	opts := policy.RunOptions{
