@@ -1044,6 +1044,8 @@ func TestHandlerAndMetricsRouter_Comprehensive(t *testing.T) {
 // 14. Server Lifecycle Builder Comprehensive
 func TestServerLifecycleBuilder_Comprehensive(t *testing.T) {
 	server := NewServer()
+	tmpDir := t.TempDir()
+	server.initCtx = &pkgctx.CliInitializationContext{ProjectRoot: tmpDir}
 	var inBuf, outBuf bytes.Buffer
 
 	builder := NewServerLifecycleBuilder(server).

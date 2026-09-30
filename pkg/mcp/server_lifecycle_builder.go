@@ -39,10 +39,16 @@ type ServerLifecycleBuilder struct {
 
 // NewServerLifecycleBuilder creates a new server lifecycle builder
 func NewServerLifecycleBuilder(server *Server) *ServerLifecycleBuilder {
+	var cfg *ServerConfig
+	if server != nil {
+		cfg = server.GetConfig()
+	}
 	return &ServerLifecycleBuilder{
 		server:      server,
+		config:      cfg,
 		reader:      bufio.NewReader(os.Stdin),
 		writer:      bufio.NewWriter(os.Stdout),
+		trace:       isMCPTraceEnabled(cfg),
 		initialized: false,
 	}
 }
@@ -58,18 +64,19 @@ func (b *ServerLifecycleBuilder) WithReaderAndWriter(r io.Reader, w io.Writer) *
 func (b *ServerLifecycleBuilder) LoadConfig() *ServerLifecycleBuilder {
 	config, _ := LoadMCPConfig(b.server.GetProjectRoot()) // Ignore errors - use defaults
 	b.config = config
-	b.server.config = config // Store config for security enforcement
+	b.server.SetConfig(config) // Store config for security enforcement
 	return b
 }
 
 // ApplyAsyncConfig applies async configuration from config file
 func (b *ServerLifecycleBuilder) ApplyAsyncConfig() *ServerLifecycleBuilder {
+	cfg := b.server.GetAsyncConfig()
 	if b.config != nil && b.config.MCPServer.Async.MaxConcurrent > 0 {
-		b.server.asyncConfig.MaxConcurrent = b.config.MCPServer.Async.MaxConcurrent
+		cfg.MaxConcurrent = b.config.MCPServer.Async.MaxConcurrent
 	}
 	if b.config != nil && b.config.MCPServer.Async.Timeout != emptyValue {
 		if timeout, err := time.ParseDuration(b.config.MCPServer.Async.Timeout); err == nil {
-			b.server.asyncConfig.Timeout = timeout
+			cfg.Timeout = timeout
 			// Log timeout configuration for debugging
 			if b.server.getTraceWriter() != nil {
 				b.server.traceLogf("[MCP_INFO] Async operation timeout configured: %v", timeout)
@@ -83,17 +90,19 @@ func (b *ServerLifecycleBuilder) ApplyAsyncConfig() *ServerLifecycleBuilder {
 	} else {
 		// Log default timeout if not configured
 		if b.server.getTraceWriter() != nil {
-			b.server.traceLogf("[MCP_DEBUG] Using default async operation timeout: %v", b.server.asyncConfig.Timeout)
+			b.server.traceLogf("[MCP_DEBUG] Using default async operation timeout: %v", cfg.Timeout)
 		}
 	}
+	b.server.SetAsyncConfig(cfg)
 	return b
 }
 
 // ApplyEventEmitterConfig applies event emitter configuration from config file
 func (b *ServerLifecycleBuilder) ApplyEventEmitterConfig() *ServerLifecycleBuilder {
 	if b.config != nil && b.config.MCPServer.Events.BufferSize > 0 {
-		if b.server.eventEmitter == nil || b.server.eventEmitter.GetBufferSize() != b.config.MCPServer.Events.BufferSize {
-			b.server.eventEmitter = NewEventEmitter(b.config.MCPServer.Events.BufferSize)
+		ee := b.server.GetEventEmitter()
+		if ee == nil || ee.GetBufferSize() != b.config.MCPServer.Events.BufferSize {
+			b.server.SetEventEmitter(NewEventEmitter(b.config.MCPServer.Events.BufferSize))
 		}
 	}
 	return b
@@ -102,19 +111,21 @@ func (b *ServerLifecycleBuilder) ApplyEventEmitterConfig() *ServerLifecycleBuild
 // ApplyRateLimitConfig applies rate limit configuration (BLI-645). When enabled, creates a fixed-window limiter.
 func (b *ServerLifecycleBuilder) ApplyRateLimitConfig() *ServerLifecycleBuilder {
 	if b.config == nil || !b.config.MCPServer.RateLimit.Enabled {
-		b.server.rateLimiter = nil
+		b.server.SetRateLimiter(nil)
 		return b
 	}
 	rpm := b.config.MCPServer.RateLimit.RequestsPerMinute
 	if rpm <= 0 {
 		rpm = 60
 	}
-	b.server.rateLimiter = circuitbreaker.NewFixedWindowLimiter(rpm, time.Minute)
+	b.server.SetRateLimiter(circuitbreaker.NewFixedWindowLimiter(rpm, time.Minute))
 	return b
 }
 
 // InitializeClientMetrics initializes client metrics store with thread-safe operations
 func (b *ServerLifecycleBuilder) InitializeClientMetrics() *ServerLifecycleBuilder {
+	b.server.compressionTickerMu.Lock()
+	defer b.server.compressionTickerMu.Unlock()
 	if b.server.clientMetricsStore == nil {
 		metricsPath := filepath.Join(b.server.GetProjectRoot(), paths.ProjectDataDir, paths.MCPDir, paths.MCPLogsDir, "client-metrics.json")
 		// Pass shutdown context from ProcessGroupManager for proper shutdown handling
@@ -130,15 +141,9 @@ func (b *ServerLifecycleBuilder) InitializeClientMetrics() *ServerLifecycleBuild
 		ticker := store.StartPeriodicCompression(compressionCtx, DefaultMetricsCompressionInterval, DefaultMetricsRetentionPeriod)
 
 		// Thread-safe update of compression state
-		_ = concurrency.RunInLockWithLogger(
-			&b.server.compressionTickerMu, LockNameMcpServerLifecycleSetCompression, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
-			func() error {
-				b.server.compressionTicker = ticker
-				b.server.compressionCtx = compressionCtx
-				b.server.compressionCancel = compressionCancel
-				return nil
-			},
-		)
+		b.server.compressionTicker = ticker
+		b.server.compressionCtx = compressionCtx
+		b.server.compressionCancel = compressionCancel
 	}
 	return b
 }
@@ -289,7 +294,7 @@ func (b *ServerLifecycleBuilder) SetupTransport() *ServerLifecycleBuilder {
 // SetupHandlers sets up method router and handlers with middleware
 func (b *ServerLifecycleBuilder) SetupHandlers() *ServerLifecycleBuilder {
 	router := b.server.setupHandlers()
-	asyncHandler := NewAsyncHandler(router, b.server.asyncConfig)
+	asyncHandler := NewAsyncHandler(router, b.server.GetAsyncConfig())
 
 	var handler Handler = asyncHandler
 	if b.trace {
@@ -313,7 +318,7 @@ func (b *ServerLifecycleBuilder) Cleanup() {
 	if b.traceCloser != nil {
 		_ = b.traceCloser.Close() //nolint:errcheck
 	}
-	if b.mcpCtx != nil {
+	if b.mcpCtx != nil && !b.server.multiClient.Load() {
 		b.mcpCtx.SetServing(false)
 	}
 }

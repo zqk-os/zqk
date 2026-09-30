@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"sync"
 	"testing"
 	"time"
 
@@ -288,10 +289,13 @@ func TestDeep13_AutoInstall_AndConfigs(t *testing.T) {
 }
 
 type mockEventCoordinatorDeep13 struct {
+	mu      sync.Mutex
 	emitted []any
 }
 
 func (m *mockEventCoordinatorDeep13) Emit(ctx context.Context, eventCtx any) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
 	m.emitted = append(m.emitted, eventCtx)
 	return nil
 }

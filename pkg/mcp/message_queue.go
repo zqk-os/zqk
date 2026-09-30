@@ -261,18 +261,26 @@ func (q *MessageQueue) writerLoop() {
 			}
 
 		case <-flushTickerC:
-			// Periodic flush
-			if err := q.writer.Flush(); err != nil {
-				q.errors.Add(1)
-				_ = concurrency.RunInLockWithLogger(
-					&q.mu, LockNameMessageQueueFlushError, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
-					func() error {
-						q.lastError = err
-						q.lastErrorAt = time.Now()
-						return nil
-					},
-				)
-			}
+			// Periodic flush under write lock to ensure writer is not nil or being released
+			_ = concurrency.RunInLockWithLogger(
+				&q.writeMu, LockNameMessageQueueWriteSerialize, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
+				func() error {
+					if q.writer != nil {
+						if err := q.writer.Flush(); err != nil {
+							q.errors.Add(1)
+							_ = concurrency.RunInLockWithLogger(
+								&q.mu, LockNameMessageQueueFlushError, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
+								func() error {
+									q.lastError = err
+									q.lastErrorAt = time.Now()
+									return nil
+								},
+							)
+						}
+					}
+					return nil
+				},
+			)
 		}
 	}
 }
@@ -313,9 +321,15 @@ func (q *MessageQueue) flushRemaining() {
 			_ = q.writeMessage(msg) //nolint:errcheck // Best effort - queue cleanup
 		default:
 			// Queue is empty
-			if err := q.writer.Flush(); err != nil {
-				// Ignore flush errors during shutdown
-			}
+			_ = concurrency.RunInLockWithLogger(
+				&q.writeMu, LockNameMessageQueueWriteSerialize, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
+				func() error {
+					if q.writer != nil {
+						_ = q.writer.Flush()
+					}
+					return nil
+				},
+			)
 			return
 		}
 	}
@@ -433,13 +447,19 @@ func (q *MessageQueue) Stop() {
 // UpdateWriter updates the writer and format (e.g., when client reconnects)
 func (q *MessageQueue) UpdateWriter(writer *bufio.Writer, format *MessageFormat) {
 	_ = concurrency.RunInLockWithLogger(
-		&q.mu, LockNameMessageQueueUpdateWriter, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
+		&q.writeMu, LockNameMessageQueueWriteSerialize, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 		func() error {
-			q.writer = writer
-			q.format = format
-			if writer != nil {
-				q.active.Store(true)
-			}
+			_ = concurrency.RunInLockWithLogger(
+				&q.mu, LockNameMessageQueueUpdateWriter, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
+				func() error {
+					q.writer = writer
+					q.format = format
+					if writer != nil {
+						q.active.Store(true)
+					}
+					return nil
+				},
+			)
 			return nil
 		},
 	)

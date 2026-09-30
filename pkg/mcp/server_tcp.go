@@ -42,6 +42,7 @@ func (s *Server) ServeTCP(addr string) error {
 	}
 
 	s.multiClient.Store(true)
+	s.ensureServerInitialized()
 
 	listener, err := net.Listen("tcp", addr)
 	if err != nil {
@@ -91,17 +92,11 @@ func (s *Server) ServeTCP(addr string) error {
 func (s *Server) handleTCPConnection(conn net.Conn) {
 	defer conn.Close()
 
-	// Build server lifecycle specifically for this connection
+	s.ensureServerInitialized()
+
+	// Build connection-scoped lifecycle specifically for this connection
 	lifecycle := NewServerLifecycleBuilder(s).
 		WithReaderAndWriter(conn, conn).
-		LoadConfig().
-		ApplyAsyncConfig().
-		ApplyEventEmitterConfig().
-		ApplyRateLimitConfig().
-		InitializeClientMetrics().
-		InitializeTraceLogging().
-		MarkServing().
-		LoadMCPSpecs().
 		SetupTransport().
 		SetupHandlers().
 		Build()
@@ -132,6 +127,7 @@ func (s *Server) ServeTLS(addr, certFile, keyFile string) error {
 		return errors.New("both certFile and keyFile are required for TLS")
 	}
 	s.multiClient.Store(true)
+	s.ensureServerInitialized()
 	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
 	if err != nil {
 		return errfmt.Newf("failed to load TLS key pair").Wrap(err)
@@ -193,6 +189,7 @@ func (s *Server) ServeMTLS(addr, certFile, keyFile, caCertFile string) error {
 		return errors.New("certFile, keyFile, and caCertFile are all required for mTLS")
 	}
 	s.multiClient.Store(true)
+	s.ensureServerInitialized()
 	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
 	if err != nil {
 		return errfmt.Newf("failed to load TLS key pair").Wrap(err)
