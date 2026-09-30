@@ -5,7 +5,7 @@ set -eu
 # Release Gate: Verifies that no running zqk process or background daemon
 # suffers from file descriptor leaks (e.g. unbounded kqueue/inotify directory walks).
 
-MAX_ALLOWED_FDS="${ZQK_MAX_ALLOWED_FDS:-800}"
+MAX_ALLOWED_FDS="${ZQK_MAX_ALLOWED_FDS:-100}"
 FAILED=0
 
 say() {

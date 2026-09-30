@@ -25,7 +25,7 @@ type WatcherConfig struct {
 }
 
 // DefaultIgnoredDirNames returns the generic, universal directory names that are always ignored.
-// It includes repository source trees and build artifacts to prevent Darwin kqueue descriptor exhaustion.
+// It includes repository source trees, documentation, and build artifacts to prevent Darwin kqueue descriptor exhaustion.
 func DefaultIgnoredDirNames() []string {
 	return []string{
 		".git",
@@ -33,6 +33,11 @@ func DefaultIgnoredDirNames() []string {
 		".hg",
 		".idea",
 		".vscode",
+		".agent",
+		".agents",
+		".cursor",
+		".ide",
+		".github",
 		"node_modules",
 		"vendor",
 		paths.ProjectDataDir,
@@ -51,6 +56,9 @@ func DefaultIgnoredDirNames() []string {
 		"dist-docs",
 		"dist-community",
 		"ext",
+		"docs",
+		"examples",
+		"config",
 	}
 }
 
@@ -63,6 +71,16 @@ func DefaultIgnoredPaths() []string {
 		"/.hg/",
 		"/.idea/",
 		"/.vscode/",
+		"/.agent/",
+		"/.agent",
+		"/.agents/",
+		"/.agents",
+		"/.cursor/",
+		"/.cursor",
+		"/.ide/",
+		"/.ide",
+		"/.github/",
+		"/.github",
 		"/node_modules/",
 		"/vendor/",
 		"/.cache/",
@@ -83,6 +101,12 @@ func DefaultIgnoredPaths() []string {
 		"/dist/",
 		"/dist-",
 		"/ext/",
+		"/docs/",
+		"/docs",
+		"/examples/",
+		"/examples",
+		"/config/",
+		"/config",
 	}
 }
 
@@ -213,7 +237,7 @@ func NewFSWatcher(rootPath string, eventHub EventHub) (*FSWatcher, error) {
 }
 
 func (fw *FSWatcher) isIgnoredDirName(name string) bool {
-	if strings.HasPrefix(name, ".tmp") {
+	if strings.HasPrefix(name, ".tmp") || strings.HasPrefix(name, "dist") {
 		return true
 	}
 	return fw.ignoredDirs[name]
@@ -231,7 +255,7 @@ func (fw *FSWatcher) isIgnoredFSPath(path string) bool {
 
 // isIgnoredDirName checks if a directory name matches universal default ignores (package-level compatibility helper).
 func isIgnoredDirName(name string) bool {
-	if strings.HasPrefix(name, ".tmp") {
+	if strings.HasPrefix(name, ".tmp") || strings.HasPrefix(name, "dist") {
 		return true
 	}
 	for _, d := range DefaultIgnoredDirNames() {
