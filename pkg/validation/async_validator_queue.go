@@ -19,7 +19,7 @@ func (av *AsyncValidator) Enqueue(objectID, objectKind, filePath string, priorit
 	// Check if shutdown has been initiated
 	select {
 	case <-av.shutdown:
-		logging.Fluent(av.logger).Warn(ConstMagic6fd76fb1).
+		logging.Fluent(av.logger).Warn("Cannot enqueue validation task - validator is shutting down").
 			String("object_id", objectID).
 			Log()
 		return false
@@ -112,7 +112,7 @@ func (av *AsyncValidator) Enqueue(objectID, objectKind, filePath string, priorit
 			return nil
 		},
 	); err != nil {
-		logging.Fluent(av.logger).Error(ConstMagic2553e5e8, err).
+		logging.Fluent(av.logger).Error("Failed to enqueue validation task", err).
 			String("object_id", objectID).
 			Log()
 	}
@@ -167,7 +167,7 @@ func (av *AsyncValidator) EnqueueBatch(tasks []ValidationTask) {
 			return nil
 		},
 	); err != nil {
-		logging.Fluent(av.logger).Error(ConstMagicc4c32c6b, err).
+		logging.Fluent(av.logger).Error("Failed to enqueue batch of validation tasks", err).
 			Int("task_count", len(tasks)).
 			Log()
 	}
@@ -253,7 +253,7 @@ func (av *AsyncValidator) wakeWorkerIfNeeded() {
 						return nil
 					},
 				); err != nil {
-					logging.Fluent(av.logger).Error(ConstMagic73205531, err).Log()
+					logging.Fluent(av.logger).Error("Failed to get project root for worker start event", err).Log()
 					// Continue anyway, projectRoot will be empty string which is handled by callback
 				}
 				// Use validator's context (or derived context) instead of creating new Background()
@@ -272,8 +272,8 @@ func (av *AsyncValidator) wakeWorkerIfNeeded() {
 			}
 
 			av.workerStates.Store(workerID, "starting")
-			workerName := fmt.Sprintf(ConstMagic883e5ec2, workerID)
-			workerPurpose := fmt.Sprintf(ConstMagic384a6a4c, workerID)
+			workerName := fmt.Sprintf("validation_worker_%d", workerID)
+			workerPurpose := fmt.Sprintf("processing validation queue (worker %d)", workerID)
 			queueBud := goroutinelabels.DefaultBudget()
 			queueWorkerBuilder := goroutinelabels.NewGoroutine(workerName, workerPurpose).
 				WithWaitGroup(&av.wg)
@@ -287,6 +287,6 @@ func (av *AsyncValidator) wakeWorkerIfNeeded() {
 			return nil
 		},
 	); err != nil {
-		logging.Fluent(av.logger).Error(ConstMagicd8246578, err).Log()
+		logging.Fluent(av.logger).Error("Failed to start validation worker", err).Log()
 	}
 }

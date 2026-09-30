@@ -26,7 +26,7 @@ func TestInstanceValidator_ValidateInstance(t *testing.T) {
 	// Validate dependency graph first
 	errors := specLoader.ValidateDependencyGraph()
 	if len(errors) > 0 {
-		t.Logf(ConstMagic7b8406ae, errors)
+		t.Logf("Warning: Spec dependency graph has errors: %v", errors)
 		// Continue anyway for testing
 	}
 
@@ -37,7 +37,7 @@ func TestInstanceValidator_ValidateInstance(t *testing.T) {
 		getTestPathsConfig(t),
 	)
 	if err := testIDValidator.LoadPatterns(); err != nil {
-		t.Logf(ConstMagicd3d06733, err)
+		t.Logf("Warning: Failed to load ID patterns: %v (ID validation may be permissive)", err)
 	}
 
 	// Create GoValidator with injected IDValidator for test isolation
@@ -61,9 +61,9 @@ func TestInstanceValidator_ValidateInstance(t *testing.T) {
 
 	// Helper to create a minimal valid object with all required audit fields
 	validAuditFields := map[string]any{
-		objects.FieldKeyCreatedAt: ConstMagiccd842f93,
+		objects.FieldKeyCreatedAt: "2025-12-25T00:00:00Z",
 		objects.FieldKeyCreatedBy: "ACC-TEST",
-		objects.FieldKeyUpdatedAt: ConstMagiccd842f93,
+		objects.FieldKeyUpdatedAt: "2025-12-25T00:00:00Z",
 		objects.FieldKeyUpdatedBy: "ACC-TEST",
 	}
 
@@ -75,7 +75,7 @@ func TestInstanceValidator_ValidateInstance(t *testing.T) {
 		wantValid bool
 	}{
 		{
-			name: ConstMagic89cc97f5,
+			name: "valid backlog item",
 			obj: func() map[string]any {
 				obj := map[string]any{
 					objects.FieldKeyID:            "BLI-001",
@@ -96,7 +96,7 @@ func TestInstanceValidator_ValidateInstance(t *testing.T) {
 			wantValid: true,
 		},
 		{
-			name: ConstMagicb26bea69,
+			name: "missing required field",
 			obj: func() map[string]any {
 				obj := map[string]any{
 					objects.FieldKeyID:            "BLI-002",
@@ -116,7 +116,7 @@ func TestInstanceValidator_ValidateInstance(t *testing.T) {
 			wantValid: false,
 		},
 		{
-			name: ConstMagiceaa72e25,
+			name: "invalid enum value",
 			obj: func() map[string]any {
 				obj := map[string]any{
 					objects.FieldKeyID:            "BLI-003",
@@ -161,13 +161,13 @@ func TestInstanceValidator_ValidateInstance(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := validator.ValidateInstance(tt.obj, tt.kind)
 			if (err != nil) != tt.wantErr {
-				t.Errorf(ConstMagicd6c62505, err, tt.wantErr)
+				t.Errorf("ValidateInstance() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if result != nil && result.IsValid != tt.wantValid {
-				t.Errorf(ConstMagic31defe61, result.IsValid, tt.wantValid)
+				t.Errorf("ValidateInstance() IsValid = %v, want %v", result.IsValid, tt.wantValid)
 				if len(result.Errors) > 0 {
-					t.Logf(ConstMagic6ad67277, result.Errors)
+					t.Logf("Validation errors: %+v", result.Errors)
 				}
 			}
 		})
@@ -181,7 +181,7 @@ func TestInstanceValidator_ValidateField(t *testing.T) {
 
 	specsDir := filepath.Join(testRoot, paths.ProcessInternalObjectSpecsDir)
 	if err := fileutil.MkdirAll(specsDir, paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagice81c38f8, err)
+		t.Fatalf("failed to create specs dir: %v", err)
 	}
 
 	specLoader := objects.NewSpecLoader(specsDir)
@@ -199,7 +199,7 @@ func TestInstanceValidator_ValidateField(t *testing.T) {
 		description  string
 	}{
 		{
-			name:         ConstMagic881eeb3b,
+			name:         "required field missing",
 			fieldName:    "title",
 			fieldValue:   nil,
 			fieldDef:     map[string]any{objects.FieldKeyType: "string", "validation": map[string]any{"required": true}},
@@ -207,10 +207,10 @@ func TestInstanceValidator_ValidateField(t *testing.T) {
 			obj:          map[string]any{},
 			wantErrors:   1,
 			wantWarnings: 0,
-			description:  ConstMagic5614c851,
+			description:  "Required field that doesn't exist should return error",
 		},
 		{
-			name:         ConstMagic71aff506,
+			name:         "required field present",
 			fieldName:    "title",
 			fieldValue:   "Test Title",
 			fieldDef:     map[string]any{objects.FieldKeyType: "string", "validation": map[string]any{"required": true}},
@@ -218,10 +218,10 @@ func TestInstanceValidator_ValidateField(t *testing.T) {
 			obj:          map[string]any{objects.FieldKeyTitle: "Test Title"},
 			wantErrors:   0,
 			wantWarnings: 0,
-			description:  ConstMagic4538a076,
+			description:  "Required field that exists should pass",
 		},
 		{
-			name:         ConstMagic2f072f33,
+			name:         "optional field missing",
 			fieldName:    "description",
 			fieldValue:   nil,
 			fieldDef:     map[string]any{objects.FieldKeyType: "string", "validation": map[string]any{"required": false}},
@@ -229,10 +229,10 @@ func TestInstanceValidator_ValidateField(t *testing.T) {
 			obj:          map[string]any{},
 			wantErrors:   0,
 			wantWarnings: 0,
-			description:  ConstMagic4235e89e,
+			description:  "Optional field that doesn't exist should pass",
 		},
 		{
-			name:         ConstMagic3e8e3dd1,
+			name:         "type validation pass",
 			fieldName:    "count",
 			fieldValue:   123,
 			fieldDef:     map[string]any{objects.FieldKeyType: "int", "validation": map[string]any{}},
@@ -240,10 +240,10 @@ func TestInstanceValidator_ValidateField(t *testing.T) {
 			obj:          map[string]any{"count": 123},
 			wantErrors:   0,
 			wantWarnings: 0,
-			description:  ConstMagic23e2d009,
+			description:  "Field with correct type should pass",
 		},
 		{
-			name:         ConstMagic884f86d7,
+			name:         "type validation fail",
 			fieldName:    "count",
 			fieldValue:   "not a number",
 			fieldDef:     map[string]any{objects.FieldKeyType: "int", "validation": map[string]any{}},
@@ -251,10 +251,10 @@ func TestInstanceValidator_ValidateField(t *testing.T) {
 			obj:          map[string]any{"count": "not a number"},
 			wantErrors:   1,
 			wantWarnings: 0,
-			description:  ConstMagic8eea0c95,
+			description:  "Field with incorrect type should return error",
 		},
 		{
-			name:         ConstMagic86e17216,
+			name:         "pattern validation pass",
 			fieldName:    "id",
 			fieldValue:   "BLI-001",
 			fieldDef:     map[string]any{objects.FieldKeyType: "string", "validation": map[string]any{"pattern": `^BLI-\d{3,}$`}},
@@ -262,10 +262,10 @@ func TestInstanceValidator_ValidateField(t *testing.T) {
 			obj:          map[string]any{objects.FieldKeyID: "BLI-001"},
 			wantErrors:   0,
 			wantWarnings: 0,
-			description:  ConstMagice4de4e3a,
+			description:  "Field matching pattern should pass",
 		},
 		{
-			name:         ConstMagic7f929358,
+			name:         "pattern validation fail",
 			fieldName:    "title", // Use non-id field so regex validation is used (id field uses IDValidator)
 			fieldValue:   "INVALID-001",
 			fieldDef:     map[string]any{objects.FieldKeyType: "string", "validation": map[string]any{"pattern": `^BLI-\d{3,}$`}},
@@ -273,10 +273,10 @@ func TestInstanceValidator_ValidateField(t *testing.T) {
 			obj:          map[string]any{objects.FieldKeyTitle: "INVALID-001"},
 			wantErrors:   1,
 			wantWarnings: 0,
-			description:  ConstMagic44721b77,
+			description:  "Field not matching pattern should return error",
 		},
 		{
-			name:         ConstMagic1989dd0c,
+			name:         "enum validation pass",
 			fieldName:    "status",
 			fieldValue:   "exploring",
 			fieldDef:     map[string]any{objects.FieldKeyType: "string", "validation": map[string]any{"enum": []any{"exploring", "planned", "in_progress"}}},
@@ -284,10 +284,10 @@ func TestInstanceValidator_ValidateField(t *testing.T) {
 			obj:          map[string]any{objects.FieldKeyStatus: "exploring"},
 			wantErrors:   0,
 			wantWarnings: 0,
-			description:  ConstMagic5fa5c9ad,
+			description:  "Field with valid enum value should pass",
 		},
 		{
-			name:         ConstMagic0c0fcfd4,
+			name:         "enum validation fail",
 			fieldName:    "status",
 			fieldValue:   "invalid",
 			fieldDef:     map[string]any{objects.FieldKeyType: "string", "validation": map[string]any{"enum": []any{"exploring", "planned", "in_progress"}}},
@@ -295,10 +295,10 @@ func TestInstanceValidator_ValidateField(t *testing.T) {
 			obj:          map[string]any{objects.FieldKeyStatus: "invalid"},
 			wantErrors:   1,
 			wantWarnings: 0,
-			description:  ConstMagic04a5571d,
+			description:  "Field with invalid enum value should return error",
 		},
 		{
-			name:         ConstMagic8962cc6d,
+			name:         "pattern validation error path",
 			fieldName:    "title", // Use non-id field so regex validation is used (id field uses IDValidator)
 			fieldValue:   "Test Title",
 			fieldDef:     map[string]any{objects.FieldKeyType: "string", "validation": map[string]any{"pattern": `[invalid`}},
@@ -306,10 +306,10 @@ func TestInstanceValidator_ValidateField(t *testing.T) {
 			obj:          map[string]any{objects.FieldKeyTitle: "Test Title"},
 			wantErrors:   0,
 			wantWarnings: 1,
-			description:  ConstMagic14af375a,
+			description:  "Invalid pattern should return warning",
 		},
 		{
-			name:         ConstMagica0c94438,
+			name:         "semantic type validation",
 			fieldName:    "title",
 			fieldValue:   "Test Title",
 			fieldDef:     map[string]any{objects.FieldKeyType: "string", "semantic_type": "statement"},
@@ -317,10 +317,10 @@ func TestInstanceValidator_ValidateField(t *testing.T) {
 			obj:          map[string]any{objects.FieldKeyTitle: "Test Title"},
 			wantErrors:   0,
 			wantWarnings: 0,
-			description:  ConstMagic530fb297,
+			description:  "Field with valid semantic type should pass",
 		},
 		{
-			name:         ConstMagicbd047d05,
+			name:         "no validation rules",
 			fieldName:    "optional_field",
 			fieldValue:   "value",
 			fieldDef:     map[string]any{objects.FieldKeyType: "string"},
@@ -328,7 +328,7 @@ func TestInstanceValidator_ValidateField(t *testing.T) {
 			obj:          map[string]any{"optional_field": "value"},
 			wantErrors:   0,
 			wantWarnings: 0,
-			description:  ConstMagice40bad19,
+			description:  "Field without validation rules should pass",
 		},
 	}
 
@@ -337,10 +337,10 @@ func TestInstanceValidator_ValidateField(t *testing.T) {
 			errors, warnings := validator.validateField(tt.fieldName, tt.fieldValue, tt.fieldDef, tt.exists, tt.obj, "test_kind")
 
 			if len(errors) != tt.wantErrors {
-				t.Errorf(ConstMagic79b256ff, len(errors), tt.wantErrors, tt.description, errors)
+				t.Errorf("validateField() errors = %d, want %d (%s). Errors: %v", len(errors), tt.wantErrors, tt.description, errors)
 			}
 			if len(warnings) != tt.wantWarnings {
-				t.Errorf(ConstMagic17bf0d84, len(warnings), tt.wantWarnings, tt.description, warnings)
+				t.Errorf("validateField() warnings = %d, want %d (%s). Warnings: %v", len(warnings), tt.wantWarnings, tt.description, warnings)
 			}
 		})
 	}
@@ -359,53 +359,53 @@ func TestInstanceValidator_ValidateEnum(t *testing.T) {
 		description string
 	}{
 		{
-			name:        ConstMagice2570710,
+			name:        "exact match string",
 			value:       "exploring",
 			enumValues:  []any{"exploring", "planned", "in_progress"},
 			want:        true,
-			description: ConstMagic9def42d4,
+			description: "String value matches exactly",
 		},
 		{
-			name:        ConstMagic86996bc7,
+			name:        "case insensitive match",
 			value:       "EXPLORING",
 			enumValues:  []any{"exploring", "planned", "in_progress"},
 			want:        true,
-			description: ConstMagicae81db2c,
+			description: "String value matches case-insensitively",
 		},
 		{
 			name:        "no match string",
 			value:       "invalid",
 			enumValues:  []any{"exploring", "planned", "in_progress"},
 			want:        false,
-			description: ConstMagic10f3573f,
+			description: "String value does not match",
 		},
 		{
 			name:        "exact match int",
 			value:       123,
 			enumValues:  []any{123, 456, 789},
 			want:        true,
-			description: ConstMagicdbe97866,
+			description: "Int value matches exactly",
 		},
 		{
 			name:        "no match int",
 			value:       999,
 			enumValues:  []any{123, 456, 789},
 			want:        false,
-			description: ConstMagicb31d921e,
+			description: "Int value does not match",
 		},
 		{
-			name:        ConstMagice162af11,
+			name:        "empty enum values",
 			value:       "any",
 			enumValues:  []any{},
 			want:        false,
-			description: ConstMagic02ae36a7,
+			description: "Empty enum values list",
 		},
 		{
 			name:        "nil value",
 			value:       nil,
 			enumValues:  []any{"exploring", "planned"},
 			want:        false,
-			description: ConstMagicbca5e6d7,
+			description: "Nil value does not match",
 		},
 	}
 
@@ -413,7 +413,7 @@ func TestInstanceValidator_ValidateEnum(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := validator.validateEnum(tt.value, tt.enumValues)
 			if got != tt.want {
-				t.Errorf(ConstMagiccf263a2f, tt.value, tt.enumValues, got, tt.want, tt.description)
+				t.Errorf("validateEnum(%v, %v) = %v, want %v (%s)", tt.value, tt.enumValues, got, tt.want, tt.description)
 			}
 		})
 	}
@@ -426,11 +426,11 @@ func TestInstanceValidator_ValidateInstanceLegacy(t *testing.T) {
 
 	specsDir := filepath.Join(testRoot, paths.ProcessInternalObjectSpecsDir)
 	if err := fileutil.MkdirAll(specsDir, paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagice81c38f8, err)
+		t.Fatalf("failed to create specs dir: %v", err)
 	}
 
 	// Create a simple test spec
-	specFile := filepath.Join(specsDir, ConstMagic507c7ab6)
+	specFile := filepath.Join(specsDir, "test_object.yaml")
 	specContent := `kind: test_object
 fields:
   id:
@@ -450,17 +450,17 @@ fields:
         - planned
 `
 	if err := fileutil.WriteFile(specFile, []byte(specContent), paths.FilePerm644); err != nil {
-		t.Fatalf(ConstMagic31f618d5, err)
+		t.Fatalf("failed to write spec file: %v", err)
 	}
 
 	// Create lifecycle directory and file for test_object to avoid lifecycle validation errors
 	lifecyclesDir := filepath.Join(testRoot, paths.ProcessInternalLifecyclesDir)
 	if err := fileutil.MkdirAll(lifecyclesDir, paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagicc92d317d, err)
+		t.Fatalf("failed to create lifecycles dir: %v", err)
 	}
 
 	// Lifecycle loader expects filename: {kind}_lifecycle.yaml
-	lifecycleFile := filepath.Join(lifecyclesDir, ConstMagica9fa0215)
+	lifecycleFile := filepath.Join(lifecyclesDir, "test_object_lifecycle.yaml")
 	lifecycleContent := `object_type: test_object
 statuses:
   - value: exploring
@@ -473,7 +473,7 @@ transitions:
     to: planned
 `
 	if err := fileutil.WriteFile(lifecycleFile, []byte(lifecycleContent), paths.FilePerm644); err != nil {
-		t.Fatalf(ConstMagicaf7f45a0, err)
+		t.Fatalf("failed to write lifecycle file: %v", err)
 	}
 
 	specLoader := objects.NewSpecLoader(specsDir)
@@ -484,7 +484,7 @@ transitions:
 	// validateInstanceLegacy uses IDValidator for id field validation
 	idValidator := GetIDValidator()
 	if err := idValidator.LoadPatterns(); err != nil {
-		t.Logf(ConstMagicd3d06733, err)
+		t.Logf("Warning: Failed to load ID patterns: %v (ID validation may be permissive)", err)
 	}
 
 	tests := []struct {
@@ -509,10 +509,10 @@ transitions:
 			wantValid:    true,
 			wantErrors:   0,
 			wantWarnings: 0, // Lifecycle file exists now
-			description:  ConstMagic5f134809,
+			description:  "Valid object should pass",
 		},
 		{
-			name: ConstMagicb26bea69,
+			name: "missing required field",
 			obj: map[string]any{
 				objects.FieldKeyID: "TEST-001",
 				// title missing
@@ -522,7 +522,7 @@ transitions:
 			wantValid:    false,
 			wantErrors:   1,
 			wantWarnings: 0,
-			description:  ConstMagic5f95c751,
+			description:  "Missing required field should return error",
 		},
 		{
 			name: "invalid pattern",
@@ -536,10 +536,10 @@ transitions:
 			wantValid:    false,
 			wantErrors:   1,
 			wantWarnings: 0, // Lifecycle file exists now
-			description:  ConstMagice0cd0b5d,
+			description:  "Invalid pattern should return error",
 		},
 		{
-			name: ConstMagiceaa72e25,
+			name: "invalid enum value",
 			obj: map[string]any{
 				objects.FieldKeyID:     "TEST-001",
 				objects.FieldKeyTitle:  "Test Title",
@@ -550,10 +550,10 @@ transitions:
 			wantValid:    false,
 			wantErrors:   2, // Both enum validation error and lifecycle validation error
 			wantWarnings: 0, // Lifecycle file exists now
-			description:  ConstMagic2e2f81a7,
+			description:  "Invalid enum value should return error (both enum and lifecycle)",
 		},
 		{
-			name: ConstMagic07df3c1a,
+			name: "spec file not found",
 			obj: map[string]any{
 				objects.FieldKeyID: "TEST-001",
 			},
@@ -562,7 +562,7 @@ transitions:
 			wantValid:    false,
 			wantErrors:   0, // Function returns error, not validation result
 			wantWarnings: 0,
-			description:  ConstMagicf7ebf2fb,
+			description:  "Spec file not found should return error",
 		},
 	}
 
@@ -570,31 +570,31 @@ transitions:
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := validator.validateInstanceLegacy(tt.obj, tt.kind, tt.currentState)
 
-			if tt.name == ConstMagic07df3c1a {
+			if tt.name == "spec file not found" {
 				if err == nil {
-					t.Error(ConstMagica3f25fa0)
+					t.Error("validateInstanceLegacy() expected error for unknown kind, got nil")
 				}
 				return
 			}
 
 			if err != nil {
-				t.Fatalf(ConstMagicd8f587ea, err, tt.description)
+				t.Fatalf("validateInstanceLegacy() error = %v (%s)", err, tt.description)
 			}
 
 			if result == nil {
-				t.Fatalf(ConstMagicb099800a, tt.description)
+				t.Fatalf("validateInstanceLegacy() returned nil result (%s)", tt.description)
 			}
 
 			if result.IsValid != tt.wantValid {
-				t.Errorf(ConstMagiccd7ba621, result.IsValid, tt.wantValid, tt.description)
+				t.Errorf("validateInstanceLegacy() IsValid = %v, want %v (%s)", result.IsValid, tt.wantValid, tt.description)
 			}
 
 			if len(result.Errors) != tt.wantErrors {
-				t.Errorf(ConstMagic70f66ee0, len(result.Errors), tt.wantErrors, tt.description, result.Errors)
+				t.Errorf("validateInstanceLegacy() errors = %d, want %d (%s). Errors: %v", len(result.Errors), tt.wantErrors, tt.description, result.Errors)
 			}
 
 			if len(result.Warnings) != tt.wantWarnings {
-				t.Errorf(ConstMagic221a33de, len(result.Warnings), tt.wantWarnings, tt.description, result.Warnings)
+				t.Errorf("validateInstanceLegacy() warnings = %d, want %d (%s). Warnings: %v", len(result.Warnings), tt.wantWarnings, tt.description, result.Warnings)
 			}
 		})
 	}
@@ -686,7 +686,7 @@ func TestInstanceValidator_validateType(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := validator.validateType(tt.value, tt.typ)
 			if got != tt.want {
-				t.Errorf(ConstMagic71343441, tt.value, tt.typ, got, tt.want)
+				t.Errorf("validateType(%v, %q) = %v, want %v", tt.value, tt.typ, got, tt.want)
 			}
 		})
 	}
@@ -713,7 +713,7 @@ func TestInstanceValidator_validateEnum(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := validator.validateEnum(tt.value, tt.enumValues)
 			if got != tt.want {
-				t.Errorf(ConstMagicfb5f0fe9, got, tt.want)
+				t.Errorf("validateEnum() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -748,7 +748,7 @@ func TestInstanceValidator_validateSemanticType(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			err := validator.validateSemanticType(tt.fieldName, tt.value, tt.semanticType)
 			if (err != nil) != tt.wantErr {
-				t.Errorf(ConstMagic1b8faf07, err, tt.wantErr)
+				t.Errorf("validateSemanticType() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -811,4 +811,3 @@ func TestInstanceValidator_checkPrecondition(t *testing.T) {
 		t.Errorf("expected false for field_cleared:priority_plan_ref when field is populated")
 	}
 }
-

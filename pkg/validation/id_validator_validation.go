@@ -19,11 +19,11 @@ import (
 //nolint:gocyclo // Function orchestrates multiple validation phases; complexity reduced via helper methods
 func (v *IDValidator) ValidateID(id, kind string) (bool, error) {
 	if len(id) > MaxObjectIDLength {
-		return false, errfmt.Errorf(ConstMagicc261433c, len(id), MaxObjectIDLength)
+		return false, errfmt.Errorf("object id length %d exceeds maximum %d", len(id), MaxObjectIDLength)
 	}
 	// Ensure patterns are loaded (non-blocking - if already loading, will use what's available)
 	if err := v.LoadPatterns(); err != nil {
-		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ConstMagicc30bc267, err).Log()
+		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error("Error loading ID patterns in ValidateID: %v\n", err).Log()
 	}
 
 	var config *IDPatternConfig
@@ -39,7 +39,7 @@ func (v *IDValidator) ValidateID(id, kind string) (bool, error) {
 			return nil
 		},
 	); err != nil {
-		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ConstMagic4a485c8d, err).Log()
+		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error("Error acquiring read lock for ID pattern validation: %v\n", err).Log()
 	}
 
 	if !exists {
@@ -77,7 +77,7 @@ func (v *IDValidator) validateAccountID(id string, config *IDPatternConfig) (boo
 	if config.Pattern != emptyValue {
 		re, err := GetCachedRegexp(config.Pattern)
 		if err != nil {
-			return false, errfmt.Newf(ConstMagicExtracted_25).Wrap(err)
+			return false, errfmt.Newf("invalid pattern").Wrap(err)
 		}
 		if re.MatchString(id) {
 			return true, nil
@@ -128,7 +128,7 @@ func (v *IDValidator) validateNamespaceFormat(parsed *ParsedNamespace) error {
 		pattern := getNamespaceValidationPattern()
 		namespacePattern := regexp.MustCompile(pattern)
 		if !namespacePattern.MatchString(parsed.NamespaceID) {
-			return errfmt.Errorf(ConstMagicb61f3198, parsed.NamespaceID)
+			return errfmt.Errorf("invalid namespace format: %s", parsed.NamespaceID)
 		}
 	} else if parsed.Layer != emptyValue {
 		// If we parsed a layer but didn't get a namespace ID, the format is invalid
@@ -139,7 +139,7 @@ func (v *IDValidator) validateNamespaceFormat(parsed *ParsedNamespace) error {
 		} else {
 			validLayers = []string{"zqk", "domain", "integration"} // Fallback
 		}
-		return errfmt.Errorf(ConstMagicc07bd0e8, parsed.Layer, validLayers)
+		return errfmt.Errorf("invalid namespace layer: %s (must be one of: %v)", parsed.Layer, validLayers)
 	}
 	return nil
 }
@@ -159,7 +159,7 @@ func (v *IDValidator) validateColonFormat(id string) error {
 		// Short format should have exactly 2 parts
 		if len(parts) > 2 {
 			validLayers := config.GetNamespaceLayers()
-			return errfmt.Errorf(ConstMagic1f7bffac, id, firstPart, validLayers)
+			return errfmt.Errorf("invalid namespace format: %s (unknown layer: %s, must be one of: %v)", id, firstPart, validLayers)
 		}
 	}
 	return nil
@@ -205,7 +205,7 @@ func (v *IDValidator) validateByPrefixes(id string, prefixes []string) bool {
 func (v *IDValidator) validateByPattern(id, pattern string) (bool, error) {
 	re, err := GetCachedRegexp(pattern)
 	if err != nil {
-		return false, errfmt.Newf(ConstMagicExtracted_25).Wrap(err)
+		return false, errfmt.Newf("invalid pattern").Wrap(err)
 	}
 	return re.MatchString(id), nil
 }

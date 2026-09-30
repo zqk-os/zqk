@@ -20,31 +20,31 @@ func TestValidationStateCache_StaleLockRecovery(t *testing.T) {
 
 	cache := NewValidationStateCache(testRoot, time.Hour)
 	// Get lock file path (same pattern as Save method)
-	cacheFile := filepath.Join(testRoot, paths.ProjectDataDir, paths.CacheDir, ConstMagic65c9aa69)
+	cacheFile := filepath.Join(testRoot, paths.ProjectDataDir, paths.CacheDir, "validation_cache.json")
 	lockFile := cacheFile + ".lock"
 
 	// Create cache directory first
 	if err := fileutil.MkdirAll(filepath.Dir(lockFile), paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagicf6bc6a9f, err)
+		t.Fatalf("failed to create cache directory: %v", err)
 	}
 
 	// Simulate a stale lock by creating an old lock file
 	// (In real scenario, this would be from a hung/dead process)
 	file, err := fileutil.OpenFile(lockFile, fileutil.O_CREATE|fileutil.O_RDWR, paths.FilePerm644)
 	if err != nil {
-		t.Fatalf(ConstMagic4c6c7c08, err)
+		t.Fatalf("failed to create lock file: %v", err)
 	}
 
 	// Acquire lock
 	err = syscallutil.FileFlock(file, syscall.LOCK_EX|syscall.LOCK_NB)
 	if err != nil {
-		t.Fatalf(ConstMagic5317124f, err)
+		t.Fatalf("failed to acquire initial lock: %v", err)
 	}
 
 	// Make the lock file appear old (simulating a hung process)
 	oldTime := time.Now().Add(-35 * time.Second) // Older than 30s stale timeout
 	if err := fileutil.Chtimes(lockFile, oldTime, oldTime); err != nil {
-		t.Fatalf(ConstMagicd3d341c6, err)
+		t.Fatalf("failed to set old modification time: %v", err)
 	}
 
 	// Close the file (simulating process death)
@@ -64,18 +64,18 @@ func TestValidationStateCache_StaleLockRecovery(t *testing.T) {
 
 	// Save should succeed (stale lock should be detected and removed)
 	if err := cache.Save(); err != nil {
-		t.Fatalf(ConstMagiccc213d91, err)
+		t.Fatalf("failed to save after stale lock recovery: %v", err)
 	}
 
 	// Verify cache was saved
 	cache2 := NewValidationStateCache(testRoot, time.Hour)
 	if err := cache2.Load(); err != nil {
-		t.Fatalf(ConstMagic969edc24, err)
+		t.Fatalf("failed to load cache: %v", err)
 	}
 
 	_, exists := cache2.Get("TEST-001")
 	if !exists {
-		t.Error(ConstMagic57de5885)
+		t.Error("expected TEST-001 to be in cache after save")
 	}
 }
 
@@ -85,24 +85,24 @@ func TestValidationStateCache_StaleLockRecovery(t *testing.T) {
 // NOTE: This test is complex and may be flaky - skip in short mode for now
 func TestValidationStateCache_ActiveLockRespected(t *testing.T) {
 	if testing.Short() {
-		t.Skip(ConstMagic0fa997a9)
+		t.Skip("Skipping complex lock test in short mode")
 	}
 	testRoot := registerZQKTestRootForTest(t)
 
 	cache := NewValidationStateCache(testRoot, time.Hour)
 	// Get lock file path (same pattern as Save method)
-	cacheFile := filepath.Join(testRoot, paths.ProjectDataDir, paths.CacheDir, ConstMagic65c9aa69)
+	cacheFile := filepath.Join(testRoot, paths.ProjectDataDir, paths.CacheDir, "validation_cache.json")
 	lockFile := cacheFile + ".lock"
 
 	// Create cache directory first
 	if err := fileutil.MkdirAll(filepath.Dir(lockFile), paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagicf6bc6a9f, err)
+		t.Fatalf("failed to create cache directory: %v", err)
 	}
 
 	// Create a lock file with recent modification time (simulating active process)
 	file, err := fileutil.OpenFile(lockFile, fileutil.O_CREATE|fileutil.O_RDWR, paths.FilePerm644)
 	if err != nil {
-		t.Fatalf(ConstMagic4c6c7c08, err)
+		t.Fatalf("failed to create lock file: %v", err)
 	}
 	// Don't defer close - we need to keep the file open to hold the lock
 	// We'll close it explicitly after the test
@@ -111,14 +111,14 @@ func TestValidationStateCache_ActiveLockRespected(t *testing.T) {
 	err = syscallutil.FileFlock(file, syscall.LOCK_EX|syscall.LOCK_NB)
 	if err != nil {
 		_ = file.Close()
-		t.Fatalf(ConstMagic2feb98d0, err)
+		t.Fatalf("failed to acquire lock: %v", err)
 	}
 
 	// Update lock file modification time to make it appear recent (active)
 	now := time.Now()
 	if err := fileutil.Chtimes(lockFile, now, now); err != nil {
 		_ = file.Close()
-		t.Fatalf(ConstMagice8dd555a, err)
+		t.Fatalf("failed to update lock file time: %v", err)
 	}
 
 	// Try to save - should fail because lock is active
@@ -135,10 +135,10 @@ func TestValidationStateCache_ActiveLockRespected(t *testing.T) {
 	err = cache.Save()
 	_ = file.Close() // Release lock after test
 	if err == nil {
-		t.Error(ConstMagic8bdc6d3e)
+		t.Error("expected save to fail when lock is actively held")
 	}
-	if err != nil && err.Error() != ConstMagic8ae54b17 {
-		t.Errorf(ConstMagic2903d8ec, err)
+	if err != nil && err.Error() != "cache file is locked by another process" {
+		t.Errorf("unexpected error: %v", err)
 	}
 }
 
@@ -150,24 +150,24 @@ func TestValidationStateCache_ProcessDeathLockRelease(t *testing.T) {
 
 	cache := NewValidationStateCache(testRoot, time.Hour)
 	// Get lock file path (same pattern as Save method)
-	cacheFile := filepath.Join(testRoot, paths.ProjectDataDir, paths.CacheDir, ConstMagic65c9aa69)
+	cacheFile := filepath.Join(testRoot, paths.ProjectDataDir, paths.CacheDir, "validation_cache.json")
 	lockFile := cacheFile + ".lock"
 
 	// Create cache directory first
 	if err := fileutil.MkdirAll(filepath.Dir(lockFile), paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagicf6bc6a9f, err)
+		t.Fatalf("failed to create cache directory: %v", err)
 	}
 
 	// Simulate process death by acquiring lock and then closing file
 	// On Unix, closing the file descriptor releases the lock automatically
 	file, err := fileutil.OpenFile(lockFile, fileutil.O_CREATE|fileutil.O_RDWR, paths.FilePerm644)
 	if err != nil {
-		t.Fatalf(ConstMagic4c6c7c08, err)
+		t.Fatalf("failed to create lock file: %v", err)
 	}
 
 	err = syscallutil.FileFlock(file, syscall.LOCK_EX|syscall.LOCK_NB)
 	if err != nil {
-		t.Fatalf(ConstMagic2feb98d0, err)
+		t.Fatalf("failed to acquire lock: %v", err)
 	}
 
 	// Close file (simulating process death)
@@ -189,6 +189,6 @@ func TestValidationStateCache_ProcessDeathLockRelease(t *testing.T) {
 	cache.Set(state)
 
 	if err := cache.Save(); err != nil {
-		t.Fatalf(ConstMagic06df57be, err)
+		t.Fatalf("failed to save after process death (lock should be released): %v", err)
 	}
 }

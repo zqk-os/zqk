@@ -83,7 +83,7 @@ func TestAsyncValidator_OutputQueue_NoDeadlock(t *testing.T) {
 
 	// Start validator
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic4545ee2f, err)
+		t.Fatalf("failed to start validator: %v", err)
 	}
 
 	// Create test files and enqueue many objects (simulating 15k objects, but use smaller number for test speed)
@@ -92,10 +92,10 @@ func TestAsyncValidator_OutputQueue_NoDeadlock(t *testing.T) {
 	for i := 0; i < numObjects; i++ {
 		testFile := filepath.Join(datacell.CellCASPrimaryDir(testRoot, "test"), fmt.Sprintf("TEST-%d.yaml", i))
 		if err := fileutil.MkdirAll(filepath.Dir(testFile), paths.DirPerm755); err != nil {
-			t.Fatalf(ConstMagic32b1c202, err)
+			t.Fatalf("failed to create test directory: %v", err)
 		}
-		if err := fileutil.WriteFile(testFile, []byte(fmt.Sprintf(ConstMagicdb620444, i)), paths.FilePerm644); err != nil {
-			t.Fatalf(ConstMagic7a424835, err)
+		if err := fileutil.WriteFile(testFile, []byte(fmt.Sprintf("id: TEST-%d\nkind: test_object\n", i)), paths.FilePerm644); err != nil {
+			t.Fatalf("failed to write test file: %v", err)
 		}
 		testFiles[i] = testFile
 		_ = validator.Enqueue(
@@ -117,7 +117,7 @@ func TestAsyncValidator_OutputQueue_NoDeadlock(t *testing.T) {
 
 	// Start progress monitor
 	// Use validator context to detect when Stop() is called
-	goroutinelabels.NewGoroutine(ConstMagic37ac5037, ConstMagicd8aef27a).
+	goroutinelabels.NewGoroutine("test_progress_monitor", "monitoring validation progress in test").
 		WithWaitGroup(&wg).
 		StartSimple(func() {
 			for {
@@ -146,29 +146,29 @@ func TestAsyncValidator_OutputQueue_NoDeadlock(t *testing.T) {
 	stopDuration := time.Since(stopStart)
 
 	if stopErr != nil {
-		t.Errorf(ConstMagic1a06a983, stopErr)
+		t.Errorf("Stop() returned error: %v", stopErr)
 	}
 
 	// Stop should complete within timeout
 	maxExpectedDuration := 4 * time.Second
 	if stopDuration > maxExpectedDuration {
-		t.Errorf(ConstMagic929ff366, stopDuration)
+		t.Errorf("❌ Stop() took too long (%v), possible deadlock or hang", stopDuration)
 	} else {
-		t.Logf(ConstMagic2287369e, stopDuration, maxExpectedDuration)
+		t.Logf("✅ Stop() completed in %v (expected < %v)", stopDuration, maxExpectedDuration)
 	}
 
 	// Wait for progress monitor to finish
 	done := make(chan struct{})
-	goroutinelabels.NewGoroutine("validation_test", ConstMagic7250d181).StartSimple(func() {
+	goroutinelabels.NewGoroutine("validation_test", "wait for progress monitor").StartSimple(func() {
 		wg.Wait()
 		close(done)
 	})
 
 	select {
 	case <-done:
-		t.Logf(ConstMagicdbcf88b8, progressCount.Load())
+		t.Logf("✅ Progress monitor completed (processed %d progress updates)", progressCount.Load())
 	case <-time.After(2 * time.Second):
-		t.Fatal(ConstMagicde739308)
+		t.Fatal("❌ DEADLOCK DETECTED: Progress monitor hung")
 	}
 
 	// Check results
@@ -234,7 +234,7 @@ func TestAsyncValidator_OutputQueue_FullQueue_NoDeadlock(t *testing.T) {
 
 	// Start validator
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic4545ee2f, err)
+		t.Fatalf("failed to start validator: %v", err)
 	}
 
 	// Create test files and enqueue many objects to fill the queue
@@ -242,10 +242,10 @@ func TestAsyncValidator_OutputQueue_FullQueue_NoDeadlock(t *testing.T) {
 	for i := 0; i < numObjects; i++ {
 		testFile := filepath.Join(datacell.CellCASPrimaryDir(testRoot, "test"), fmt.Sprintf("TEST-%d.yaml", i))
 		if err := fileutil.MkdirAll(filepath.Dir(testFile), paths.DirPerm755); err != nil {
-			t.Fatalf(ConstMagic32b1c202, err)
+			t.Fatalf("failed to create test directory: %v", err)
 		}
-		if err := fileutil.WriteFile(testFile, []byte(fmt.Sprintf(ConstMagicdb620444, i)), paths.FilePerm644); err != nil {
-			t.Fatalf(ConstMagic7a424835, err)
+		if err := fileutil.WriteFile(testFile, []byte(fmt.Sprintf("id: TEST-%d\nkind: test_object\n", i)), paths.FilePerm644); err != nil {
+			t.Fatalf("failed to write test file: %v", err)
 		}
 		_ = validator.Enqueue(
 			fmt.Sprintf("TEST-%d", i),
@@ -264,26 +264,26 @@ func TestAsyncValidator_OutputQueue_FullQueue_NoDeadlock(t *testing.T) {
 	stopDuration := time.Since(stopStart)
 
 	if stopErr != nil {
-		t.Errorf(ConstMagic1a06a983, stopErr)
+		t.Errorf("Stop() returned error: %v", stopErr)
 	}
 
 	// Stop should complete quickly
 	maxExpectedDuration := 4 * time.Second
 	if stopDuration > maxExpectedDuration {
-		t.Errorf(ConstMagic3adab2c0, stopDuration)
+		t.Errorf("❌ Stop() took too long (%v), possible deadlock", stopDuration)
 	} else {
-		t.Logf(ConstMagic2287369e, stopDuration, maxExpectedDuration)
+		t.Logf("✅ Stop() completed in %v (expected < %v)", stopDuration, maxExpectedDuration)
 	}
 
 	// Some results may have been dropped (expected with small queue)
-	t.Logf(ConstMagicd57cf154, droppedCount.Load())
+	t.Logf("Dropped results: %d (expected with small queue)", droppedCount.Load())
 }
 
 // TestAsyncValidator_OutputQueue_ConcurrentStop_NoDeadlock tests that calling Stop()
 // concurrently with active validation and output writing doesn't deadlock
 func TestAsyncValidator_OutputQueue_ConcurrentStop_NoDeadlock(t *testing.T) {
 	if testing.Short() {
-		t.Skip(ConstMagica31f9f1a)
+		t.Skip("Skipping heavy concurrent-stop test in short mode")
 	}
 	t.Parallel()
 	testRoot := registerZQKTestRootForTest(t)
@@ -335,7 +335,7 @@ func TestAsyncValidator_OutputQueue_ConcurrentStop_NoDeadlock(t *testing.T) {
 
 	// Start validator
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic4545ee2f, err)
+		t.Fatalf("failed to start validator: %v", err)
 	}
 
 	// Create test files and enqueue many objects
@@ -343,10 +343,10 @@ func TestAsyncValidator_OutputQueue_ConcurrentStop_NoDeadlock(t *testing.T) {
 	for i := 0; i < numObjects; i++ {
 		testFile := filepath.Join(datacell.CellCASPrimaryDir(testRoot, "test"), fmt.Sprintf("TEST-%d.yaml", i))
 		if err := fileutil.MkdirAll(filepath.Dir(testFile), paths.DirPerm755); err != nil {
-			t.Fatalf(ConstMagic32b1c202, err)
+			t.Fatalf("failed to create test directory: %v", err)
 		}
-		if err := fileutil.WriteFile(testFile, []byte(fmt.Sprintf(ConstMagicdb620444, i)), paths.FilePerm644); err != nil {
-			t.Fatalf(ConstMagic7a424835, err)
+		if err := fileutil.WriteFile(testFile, []byte(fmt.Sprintf("id: TEST-%d\nkind: test_object\n", i)), paths.FilePerm644); err != nil {
+			t.Fatalf("failed to write test file: %v", err)
 		}
 		_ = validator.Enqueue(
 			fmt.Sprintf("TEST-%d", i),
@@ -365,7 +365,7 @@ func TestAsyncValidator_OutputQueue_ConcurrentStop_NoDeadlock(t *testing.T) {
 
 	for i := 0; i < 3; i++ {
 		wg.Add(1)
-		goroutinelabels.NewGoroutine("validation_test", ConstMagic981fe807).StartSimple(func() {
+		goroutinelabels.NewGoroutine("validation_test", "concurrent stop call").StartSimple(func() {
 			defer wg.Done()
 			err := validator.Stop()
 			stopDone <- err
@@ -374,16 +374,16 @@ func TestAsyncValidator_OutputQueue_ConcurrentStop_NoDeadlock(t *testing.T) {
 
 	// Wait for all Stop() calls with timeout
 	done := make(chan struct{})
-	goroutinelabels.NewGoroutine("validation_test", ConstMagic05c10955).StartSimple(func() {
+	goroutinelabels.NewGoroutine("validation_test", "wait for concurrent stop").StartSimple(func() {
 		wg.Wait()
 		close(done)
 	})
 
 	select {
 	case <-done:
-		t.Log(ConstMagic0d04aa65)
+		t.Log("✅ All Stop() calls completed - no deadlock")
 	case <-time.After(5 * time.Second):
-		t.Fatal(ConstMagic952f39f9)
+		t.Fatal("❌ DEADLOCK DETECTED: Concurrent Stop() calls hung")
 	}
 
 	// Check results
@@ -391,11 +391,11 @@ func TestAsyncValidator_OutputQueue_ConcurrentStop_NoDeadlock(t *testing.T) {
 	stopCount := 0
 	for err := range stopDone {
 		if err != nil {
-			t.Errorf(ConstMagic1a06a983, err)
+			t.Errorf("Stop() returned error: %v", err)
 		}
 		stopCount++
 	}
 	if stopCount != 3 {
-		t.Errorf(ConstMagicaac9a31e, stopCount)
+		t.Errorf("Expected 3 Stop() calls to complete, got %d", stopCount)
 	}
 }

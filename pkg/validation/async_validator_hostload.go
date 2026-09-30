@@ -41,7 +41,7 @@ func (av *AsyncValidator) holdHostAwareValidationSlot(objectID string) (held, ti
 		case av.validationSemaphore <- struct{}{}:
 			timer.Stop()
 			if wait := time.Since(start); wait > 100*time.Millisecond {
-				logging.Fluent(av.logger).Debug(ConstMagic8d316b48).
+				logging.Fluent(av.logger).Debug("Semaphore acquisition delayed").
 					ObjectID(objectID).
 					WaitTime(wait.String()).
 					Log()

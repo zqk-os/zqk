@@ -16,7 +16,7 @@ func TestValidateBucketingStrategy_ArchiveStrategy(t *testing.T) {
 		errorField    string
 	}{
 		{
-			name: ConstMagic615cdbe3,
+			name: "valid simple archive strategy",
 			strategy: map[string]any{
 				objects.FieldKeyStrategyType: "chronological",
 				objects.FieldKeyField:        "created_at",
@@ -32,7 +32,7 @@ func TestValidateBucketingStrategy_ArchiveStrategy(t *testing.T) {
 			expectedError: false,
 		},
 		{
-			name: ConstMagic4033ad87,
+			name: "valid multi-tier archive strategy",
 			strategy: map[string]any{
 				objects.FieldKeyStrategyType: "chronological",
 				objects.FieldKeyField:        "created_at",
@@ -63,7 +63,7 @@ func TestValidateBucketingStrategy_ArchiveStrategy(t *testing.T) {
 			expectedError: false,
 		},
 		{
-			name: ConstMagicc9154a51,
+			name: "enabled archive strategy without archive_after or tier_progression",
 			strategy: map[string]any{
 				objects.FieldKeyStrategyType: "chronological",
 				objects.FieldKeyField:        "created_at",
@@ -75,10 +75,10 @@ func TestValidateBucketingStrategy_ArchiveStrategy(t *testing.T) {
 				},
 			},
 			expectedError: true,
-			errorField:    ConstMagic28bb28cf,
+			errorField:    "archive_strategy.archive_after",
 		},
 		{
-			name: ConstMagicaedebdd7,
+			name: "invalid archive_after duration format",
 			strategy: map[string]any{
 				objects.FieldKeyStrategyType: "chronological",
 				objects.FieldKeyField:        "created_at",
@@ -91,10 +91,10 @@ func TestValidateBucketingStrategy_ArchiveStrategy(t *testing.T) {
 				},
 			},
 			expectedError: true,
-			errorField:    ConstMagic28bb28cf,
+			errorField:    "archive_strategy.archive_after",
 		},
 		{
-			name: ConstMagic92d3ef68,
+			name: "invalid tier in tier_progression",
 			strategy: map[string]any{
 				objects.FieldKeyStrategyType: "chronological",
 				objects.FieldKeyField:        "created_at",
@@ -112,10 +112,10 @@ func TestValidateBucketingStrategy_ArchiveStrategy(t *testing.T) {
 				},
 			},
 			expectedError: true,
-			errorField:    ConstMagic047ebfbd,
+			errorField:    "archive_strategy.tier_progression[0].tier",
 		},
 		{
-			name: ConstMagic2c9a66b7,
+			name: "missing duration in tier_progression",
 			strategy: map[string]any{
 				objects.FieldKeyStrategyType: "chronological",
 				objects.FieldKeyField:        "created_at",
@@ -132,10 +132,10 @@ func TestValidateBucketingStrategy_ArchiveStrategy(t *testing.T) {
 				},
 			},
 			expectedError: true,
-			errorField:    ConstMagica16779b1,
+			errorField:    "archive_strategy.tier_progression[0].duration",
 		},
 		{
-			name: ConstMagic7c9b63e0,
+			name: "archive strategy disabled (no validation needed)",
 			strategy: map[string]any{
 				objects.FieldKeyStrategyType: "chronological",
 				objects.FieldKeyField:        "created_at",
@@ -149,7 +149,7 @@ func TestValidateBucketingStrategy_ArchiveStrategy(t *testing.T) {
 			expectedError: false,
 		},
 		{
-			name: ConstMagic26422d64,
+			name: "no archive strategy (optional field)",
 			strategy: map[string]any{
 				objects.FieldKeyStrategyType: "chronological",
 				objects.FieldKeyField:        "created_at",
@@ -167,7 +167,7 @@ func TestValidateBucketingStrategy_ArchiveStrategy(t *testing.T) {
 
 			if tc.expectedError {
 				if len(errors) == 0 {
-					t.Errorf(ConstMagice2cefe56, tc.name)
+					t.Errorf("Expected validation error for %s, got none", tc.name)
 				} else {
 					// Check if error is for the expected field
 					found := false
@@ -178,19 +178,19 @@ func TestValidateBucketingStrategy_ArchiveStrategy(t *testing.T) {
 						}
 					}
 					if !found && tc.errorField != emptyValue {
-						t.Errorf(ConstMagic637d5900, tc.errorField, errors)
+						t.Errorf("Expected error for field %s, got errors: %v", tc.errorField, errors)
 					}
 				}
 			} else {
 				// Filter out non-archive errors for this test
 				archiveErrors := []ValidationError{}
 				for _, err := range errors {
-					if containsArchiveField(err.Field, ConstMagicd539fe4a) {
+					if containsArchiveField(err.Field, "archive_strategy") {
 						archiveErrors = append(archiveErrors, err)
 					}
 				}
 				if len(archiveErrors) > 0 {
-					t.Errorf(ConstMagicff17526f, archiveErrors)
+					t.Errorf("Expected no archive strategy validation errors, got: %v", archiveErrors)
 				}
 			}
 		})

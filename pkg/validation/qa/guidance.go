@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // Guidance holds actionable remediation steps.
@@ -26,38 +25,38 @@ func (e *GuidanceEngine) Recommend(failureType string, context string) Guidance 
 	switch failureType {
 	case "coverage":
 		return Guidance{
-			Summary:   validation.ConstMagic14f2f5cc,
-			Steps:     []string{validation.ConstMagicExtracted_30, validation.ConstMagicExtracted_31, validation.ConstMagicExtracted_32, validation.ConstMagicExtracted_33},
+			Summary:   "Critical Test Coverage Deficit.",
+			Steps:     []string{"Run 'go test -coverprofile=coverage.out' to identify gaps.", "Target the specific module reported in the failure context.", "Implement adversarial test cases that verify both happy and failure paths.", "Threshold for 'Done' is strictly >= 80%."},
 			Reference: "docs/best-practices/testing/TDD_STANDARDS.md",
 		}
-	case validation.ConstMagicExtracted_34:
+	case "concurrency_violation":
 		return Guidance{
-			Summary: validation.ConstMagic25218325,
+			Summary: "Structural Integrity Violation: Unmanaged Concurrency.",
 			Steps: []string{
-				fmt.Sprintf(validation.ConstMagic88551cec, context), validation.ConstMagicExtracted_35, validation.ConstMagicExtracted_36,
+				fmt.Sprintf("Specific Violation: %s", context), "Ensure every 'go func()' propagates 'context.Context'.", "Wrap background goroutines in a 'concurrency.InterruptChecker' or manage them via the 'LifecycleManager'.",
 			},
 			Reference: "docs/architecture/concurrency/MANAGEMENT.md",
 		}
 	case "di_violation":
 		return Guidance{
-			Summary: validation.ConstMagicc82d0cca,
+			Summary: "Structural Integrity Violation: Dependency Injection.",
 			Steps: []string{
-				fmt.Sprintf(validation.ConstMagic88551cec, context), validation.ConstMagicExtracted_37, validation.ConstMagicExtracted_38,
+				fmt.Sprintf("Specific Violation: %s", context), "Refactor the component to use the 'OrchestratorRegistry' or a factory pattern.", "Avoid direct instantiation of core services (e.g., NewManager, NewFileObjectStorage).",
 			},
 			Reference: "docs/architecture/patterns/DEPENDENCY_INJECTION.md",
 		}
-	case validation.ConstMagicExtracted_39:
+	case "error_handling_debt":
 		return Guidance{
-			Summary: validation.ConstMagicb5962b4e,
+			Summary: "Technical Debt: Swallowed Error.",
 			Steps: []string{
-				fmt.Sprintf("Violation: %s", context), validation.ConstMagicExtracted_40, validation.ConstMagicExtracted_41,
+				fmt.Sprintf("Violation: %s", context), "Do not use the blank identifier '_' for error returns in critical paths.", "Properly handle the error or wrap it using 'errfmt.Newf'.",
 			},
 		}
 	case "dry_violation":
 		return Guidance{
-			Summary: validation.ConstMagic887ac3c2,
+			Summary: "DRY Principle Violation: Hardcoded Literal.",
 			Steps: []string{
-				fmt.Sprintf("Violation: %s", context), validation.ConstMagicExtracted_42, validation.ConstMagicExtracted_43,
+				fmt.Sprintf("Violation: %s", context), "Extract the hardcoded string or numeric literal to a named constant.", "Place constants in a dedicated 'constants.go' or at the top of the package if shared.",
 			},
 			Reference: "docs/best-practices/coding/DRY_AND_CONSTANTS.md",
 		}
@@ -71,13 +70,13 @@ func (e *GuidanceEngine) Recommend(failureType string, context string) Guidance 
 			},
 			Reference: "docs/best-practices/coding/DRY_AND_CONSTANTS.md",
 		}
-	case validation.ConstMagicExtracted_44:
-		if strings.Contains(context, validation.ConstMagiccd1ac283) {
+	case "abstraction_violation":
+		if strings.Contains(context, "conditional chain") {
 			return Guidance{
-				Summary: validation.ConstMagic8a57c7e1,
+				Summary: "Abstraction Violation: Repetitive Conditional Logic.",
 				Steps: []string{
-					fmt.Sprintf(validation.ConstMagic88551cec, context),
-					"Refactor the repetitive 'if/else if/else' chain using the 'pkg/when' or 'pkg/functional' fluent utility.", validation.ConstMagicExtracted_45, validation.ConstMagicExtracted_46,
+					fmt.Sprintf("Specific Violation: %s", context),
+					"Refactor the repetitive 'if/else if/else' chain using the 'pkg/when' or 'pkg/functional' fluent utility.", "This improves readability and aligns with our 'code as a story' architectural principle.", "Example: when.When(cond).Then(fn).OrElseWhen(cond).Then(fn).OrElse(fn).Run()",
 				},
 				Reference: "pkg/when/chain.go",
 			}
@@ -85,20 +84,20 @@ func (e *GuidanceEngine) Recommend(failureType string, context string) Guidance 
 		return Guidance{
 			Summary: "Abstraction Violation: Excessive Complexity/Length.",
 			Steps: []string{
-				fmt.Sprintf("Violation: %s", context), validation.ConstMagicExtracted_47, validation.ConstMagicExtracted_48, validation.ConstMagicExtracted_49,
+				fmt.Sprintf("Violation: %s", context), "The function is too long or complex, violating the single-responsibility principle.", "Refactor by extracting sub-logic into private helper functions.", "Consider if the logic belongs in a different package or should be abstracted behind an interface.",
 			},
 			Reference: "docs/architecture/patterns/ABSTRACTION.md",
 		}
-	case validation.ConstMagicExtracted_50:
+	case "smoke_and_mirrors":
 		return Guidance{
-			Summary:   validation.ConstMagic3b158fda,
-			Steps:     []string{validation.ConstMagicExtracted_51, validation.ConstMagicExtracted_52, validation.ConstMagicExtracted_53},
+			Summary:   "Disparity Detected: Incomplete Implementation.",
+			Steps:     []string{"A stub or 'TODO' was found in an object definition that is marked as 'active' or 'complete'.", "Remove the stub and implement the missing functional logic.", "If implementation is deferred, update the object status to 'stalled' or 'planned'."},
 			Reference: "docs/onboarding/AI_AGENT_ONBOARDING.md",
 		}
 	default:
 		return Guidance{
-			Summary: validation.ConstMagic23002f73,
-			Steps:   []string{validation.ConstMagicExtracted_54, validation.ConstMagicExtracted_55},
+			Summary: "General QA Audit Failure.",
+			Steps:   []string{"Review the raw audit log in the Knowledge Kernel.", "Consult with the 'adversarial-auditor' for a deep-dive forensic report."},
 		}
 	}
 }

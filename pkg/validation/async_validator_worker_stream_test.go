@@ -10,20 +10,20 @@ import (
 
 func TestReadValidationInput_StreamLocation(t *testing.T) {
 	dir := t.TempDir()
-	segmentPath := filepath.Join(dir, ConstMagicc0084aeb)
-	content := []byte(ConstMagica78cf0f2)
+	segmentPath := filepath.Join(dir, "2026-03-20_stream.json")
+	content := []byte("{\"id\":\"A\"}\n{\"id\":\"B\",\"kind\":\"audit_event\"}\n")
 	if err := fileutil.WriteSecureFile(segmentPath, content); err != nil {
-		t.Fatalf(ConstMagic4161ebb0, err)
+		t.Fatalf("write segment: %v", err)
 	}
 
 	// Offset to second JSON record.
-	offset := int64(len(ConstMagicdd709deb))
+	offset := int64(len("{\"id\":\"A\"}\n"))
 	data, err := readValidationInput(segmentPath + "::" + strconv.FormatInt(offset, 10))
 	if err != nil {
-		t.Fatalf(ConstMagic6e460a08, err)
+		t.Fatalf("readValidationInput error: %v", err)
 	}
 
-	if string(data) != ConstMagic411e1d5b {
-		t.Fatalf(ConstMagicb061e58e, string(data), offset)
+	if string(data) != "{\"id\":\"B\",\"kind\":\"audit_event\"}" {
+		t.Fatalf("unexpected record payload: %s (offset=%d)", string(data), offset)
 	}
 }

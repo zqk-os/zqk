@@ -40,9 +40,9 @@ func writeDecisionPrefixesConfig(t *testing.T, projectRoot string) (specsDir str
 		Err(); err != nil {
 		t.Fatalf("failed to create id-prefix test layout: %v", err)
 	}
-	configFile := filepath.Join(projectRoot, paths.ProcessInternalConfigsDir, ConstMagic014a7ae7)
+	configFile := filepath.Join(projectRoot, paths.ProcessInternalConfigsDir, "id_prefixes_config.yaml")
 	if err := fileutil.WriteStandardFile(configFile, []byte(decisionPrefixesConfigContent)); err != nil {
-		t.Fatalf(ConstMagic8e96c016, err)
+		t.Fatalf("Failed to write config file: %v", err)
 	}
 	return filepath.Join(projectRoot, paths.ProcessInternalObjectSpecsDir)
 }
@@ -53,7 +53,7 @@ func writeDecisionSpecAndPrefixesConfig(t *testing.T, projectRoot string) (specs
 	t.Helper()
 	specsDir = writeDecisionPrefixesConfig(t, projectRoot)
 	if err := fileutil.WriteStandardFile(filepath.Join(specsDir, decisionSpecFilename), []byte(decisionSpecContent)); err != nil {
-		t.Fatalf(ConstMagic186b95e3, err)
+		t.Fatalf("Failed to write spec file: %v", err)
 	}
 	return specsDir
 }
@@ -69,12 +69,12 @@ func TestStep1_ConfigLoadsBothPrefixes(t *testing.T) {
 
 	oldWd, err := fileutil.Getwd()
 	if err != nil {
-		t.Fatalf(ConstMagic25cbf3ea, err)
+		t.Fatalf("Failed to get current working directory: %v", err)
 	}
 	defer fileutil.Chdir(oldWd)
 
 	if err := fileutil.Chdir(tmpDir); err != nil {
-		t.Fatalf(ConstMagic0b7b38b2, err)
+		t.Fatalf("Failed to change working directory: %v", err)
 	}
 
 	// Reset global config
@@ -83,14 +83,14 @@ func TestStep1_ConfigLoadsBothPrefixes(t *testing.T) {
 	// Load config
 	config := GetGlobalIDPrefixesConfig()
 	if config == nil {
-		t.Fatal(ConstMagica6b206af)
+		t.Fatal("GetGlobalIDPrefixesConfig() returned nil")
 	}
 
 	prefixes := config.GetPrefixesForKind("decision")
-	t.Logf(ConstMagic1e58e3ca, prefixes)
+	t.Logf("Config prefixes for decision: %v", prefixes)
 
 	if len(prefixes) != 2 {
-		t.Errorf(ConstMagicfdb60e48, len(prefixes), prefixes)
+		t.Errorf("Expected 2 prefixes, got %d: %v", len(prefixes), prefixes)
 	}
 
 	hasDEC := false
@@ -105,10 +105,10 @@ func TestStep1_ConfigLoadsBothPrefixes(t *testing.T) {
 	}
 
 	if !hasDEC {
-		t.Error(ConstMagic1065eb8d)
+		t.Error("Missing DEC- prefix")
 	}
 	if !hasADR {
-		t.Error(ConstMagicc52897f1)
+		t.Error("Missing ADR- prefix")
 	}
 }
 
@@ -125,12 +125,12 @@ func TestStep2_ParseSpecFileOverridesWithConfig(t *testing.T) {
 
 	oldWd, err := fileutil.Getwd()
 	if err != nil {
-		t.Fatalf(ConstMagic25cbf3ea, err)
+		t.Fatalf("Failed to get current working directory: %v", err)
 	}
 	defer fileutil.Chdir(oldWd)
 
 	if err := fileutil.Chdir(projectRoot); err != nil {
-		t.Fatalf(ConstMagic0b7b38b2, err)
+		t.Fatalf("Failed to change working directory: %v", err)
 	}
 
 	// Reset global config
@@ -140,13 +140,13 @@ func TestStep2_ParseSpecFileOverridesWithConfig(t *testing.T) {
 	validator := NewIDValidator(specsDir)
 	config, err := validator.parseSpecFile(filepath.Join(specsDir, decisionSpecFilename))
 	if err != nil {
-		t.Fatalf(ConstMagicece4de57, err)
+		t.Fatalf("Failed to parse spec file: %v", err)
 	}
 
-	t.Logf(ConstMagicc3864760, config.Prefixes)
+	t.Logf("Parsed config prefixes: %v", config.Prefixes)
 
 	if len(config.Prefixes) != 2 {
-		t.Errorf(ConstMagic4d240d1c, len(config.Prefixes), config.Prefixes)
+		t.Errorf("Expected 2 prefixes after parseSpecFile, got %d: %v", len(config.Prefixes), config.Prefixes)
 	}
 
 	hasDEC := false
@@ -161,10 +161,10 @@ func TestStep2_ParseSpecFileOverridesWithConfig(t *testing.T) {
 	}
 
 	if !hasDEC {
-		t.Error(ConstMagic6c57eb89)
+		t.Error("Missing DEC- prefix after parseSpecFile")
 	}
 	if !hasADR {
-		t.Error(ConstMagic8892eac1)
+		t.Error("Missing ADR- prefix after parseSpecFile")
 	}
 }
 
@@ -181,12 +181,12 @@ func TestStep3_EnsureDefaultPatternsOverrides(t *testing.T) {
 
 	oldWd, err := fileutil.Getwd()
 	if err != nil {
-		t.Fatalf(ConstMagic25cbf3ea, err)
+		t.Fatalf("Failed to get current working directory: %v", err)
 	}
 	defer fileutil.Chdir(oldWd)
 
 	if err := fileutil.Chdir(projectRoot); err != nil {
-		t.Fatalf(ConstMagic0b7b38b2, err)
+		t.Fatalf("Failed to change working directory: %v", err)
 	}
 
 	// Reset global config
@@ -195,15 +195,15 @@ func TestStep3_EnsureDefaultPatternsOverrides(t *testing.T) {
 	// Create validator and load patterns
 	validator := NewIDValidator(specsDir)
 	if err := validator.LoadPatterns(); err != nil {
-		t.Fatalf(ConstMagic82cf76ae, err)
+		t.Fatalf("Failed to load patterns: %v", err)
 	}
 
 	// Check prefixes after ensureDefaultPatterns
 	prefixes := validator.GetValidPrefixes("decision")
-	t.Logf(ConstMagic9f3edb13, prefixes)
+	t.Logf("Prefixes after LoadPatterns: %v", prefixes)
 
 	if len(prefixes) != 2 {
-		t.Errorf(ConstMagic6308c4fe, len(prefixes), prefixes)
+		t.Errorf("Expected 2 prefixes after ensureDefaultPatterns, got %d: %v", len(prefixes), prefixes)
 	}
 
 	hasDEC := false
@@ -218,10 +218,10 @@ func TestStep3_EnsureDefaultPatternsOverrides(t *testing.T) {
 	}
 
 	if !hasDEC {
-		t.Error(ConstMagic570bc43b)
+		t.Error("Missing DEC- prefix after ensureDefaultPatterns")
 	}
 	if !hasADR {
-		t.Error(ConstMagic890b7800)
+		t.Error("Missing ADR- prefix after ensureDefaultPatterns")
 	}
 }
 
@@ -238,12 +238,12 @@ func TestStep4_ValidateIDAcceptsADR(t *testing.T) {
 
 	oldWd, err := fileutil.Getwd()
 	if err != nil {
-		t.Fatalf(ConstMagic25cbf3ea, err)
+		t.Fatalf("Failed to get current working directory: %v", err)
 	}
 	defer fileutil.Chdir(oldWd)
 
 	if err := fileutil.Chdir(projectRoot); err != nil {
-		t.Fatalf(ConstMagic0b7b38b2, err)
+		t.Fatalf("Failed to change working directory: %v", err)
 	}
 
 	// Reset global config
@@ -252,30 +252,30 @@ func TestStep4_ValidateIDAcceptsADR(t *testing.T) {
 	// Create validator and load patterns
 	validator := NewIDValidator(specsDir)
 	if err := validator.LoadPatterns(); err != nil {
-		t.Fatalf(ConstMagic82cf76ae, err)
+		t.Fatalf("Failed to load patterns: %v", err)
 	}
 
 	// Test validation
 	valid, err := validator.ValidateID("ADR-001", "decision")
 	if err != nil {
-		t.Fatalf(ConstMagicbcc473f4, err)
+		t.Fatalf("Validation error: %v", err)
 	}
 
 	prefixes := validator.GetValidPrefixes("decision")
-	t.Logf(ConstMagic76a2973b, prefixes)
-	t.Logf(ConstMagicb7be8b15, valid)
+	t.Logf("Available prefixes: %v", prefixes)
+	t.Logf("ADR-001 validation result: %v", valid)
 
 	if !valid {
-		t.Errorf(ConstMagica604e41b, prefixes)
+		t.Errorf("ADR-001 should be valid for decision (prefixes: %v)", prefixes)
 	}
 
 	// Also test DEC-001
 	valid, err = validator.ValidateID("DEC-001", "decision")
 	if err != nil {
-		t.Fatalf(ConstMagicbcc473f4, err)
+		t.Fatalf("Validation error: %v", err)
 	}
 	if !valid {
-		t.Error(ConstMagicd670938b)
+		t.Error("DEC-001 should be valid for decision")
 	}
 }
 
@@ -292,12 +292,12 @@ func TestStep5_ReloadPatternsResetsConfig(t *testing.T) {
 
 	oldWd, err := fileutil.Getwd()
 	if err != nil {
-		t.Fatalf(ConstMagic25cbf3ea, err)
+		t.Fatalf("Failed to get current working directory: %v", err)
 	}
 	defer fileutil.Chdir(oldWd)
 
 	if err := fileutil.Chdir(projectRoot); err != nil {
-		t.Fatalf(ConstMagic0b7b38b2, err)
+		t.Fatalf("Failed to change working directory: %v", err)
 	}
 
 	// Reset global config
@@ -308,23 +308,23 @@ func TestStep5_ReloadPatternsResetsConfig(t *testing.T) {
 
 	// Reload patterns (this should reset config and reload)
 	if err := validator.ReloadPatterns(); err != nil {
-		t.Fatalf(ConstMagic48b58fba, err)
+		t.Fatalf("Failed to reload patterns: %v", err)
 	}
 
 	// Check prefixes
 	prefixes := validator.GetValidPrefixes("decision")
-	t.Logf(ConstMagicd1f8dd2c, prefixes)
+	t.Logf("Prefixes after ReloadPatterns: %v", prefixes)
 
 	if len(prefixes) != 2 {
-		t.Errorf(ConstMagicc18be18d, len(prefixes), prefixes)
+		t.Errorf("Expected 2 prefixes after ReloadPatterns, got %d: %v", len(prefixes), prefixes)
 	}
 
 	// Test validation
 	valid, err := validator.ValidateID("ADR-001", "decision")
 	if err != nil {
-		t.Fatalf(ConstMagicbcc473f4, err)
+		t.Fatalf("Validation error: %v", err)
 	}
 	if !valid {
-		t.Errorf(ConstMagic294e4e64, prefixes)
+		t.Errorf("ADR-001 should be valid after ReloadPatterns (prefixes: %v)", prefixes)
 	}
 }

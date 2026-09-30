@@ -8,6 +8,6 @@ func TestValidatorRegistry_Get_normalizesTypedNil(t *testing.T) {
 	var nilGo *GoValidator
 	registry.Register("nilholder", nilGo)
 	if v := registry.Get("nilholder"); v != nil {
-		t.Fatalf(ConstMagic1f83fec1, v, v)
+		t.Fatalf("expected nil Validator, got %T %#v", v, v)
 	}
 }

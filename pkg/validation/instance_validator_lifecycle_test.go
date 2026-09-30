@@ -25,11 +25,11 @@ func setupBacklogItemLifecycle(t *testing.T) string {
 	tmpDir := t.TempDir()
 	lifecyclesDir := filepath.Join(tmpDir, "lifecycles")
 	if err := fileutil.MkdirAll(lifecyclesDir, paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagicc28fd1d3, err)
+		t.Fatalf("Failed to create lifecycles dir: %v", err)
 	}
 
 	// Create backlog_item_lifecycle.yaml with the statuses and transitions needed for tests
-	lifecycleFile := filepath.Join(lifecyclesDir, ConstMagic7522f0e5)
+	lifecycleFile := filepath.Join(lifecyclesDir, "backlog_item_lifecycle.yaml")
 	lifecycleContent := `object_type: backlog_item
 statuses:
   - value: exploring
@@ -55,11 +55,11 @@ transitions:
     to: complete
 `
 	if err := fileutil.WriteFile(lifecycleFile, []byte(lifecycleContent), paths.FilePerm644); err != nil {
-		t.Fatalf(ConstMagic9356a1db, err)
+		t.Fatalf("Failed to write lifecycle file: %v", err)
 	}
 
 	// Create milestone_lifecycle.yaml for milestone tests
-	milestoneFile := filepath.Join(lifecyclesDir, ConstMagicab09ec37)
+	milestoneFile := filepath.Join(lifecyclesDir, "milestone_lifecycle.yaml")
 	milestoneContent := `object_type: milestone
 statuses:
   - value: not_started
@@ -77,7 +77,7 @@ transitions:
     to: complete
 `
 	if err := fileutil.WriteFile(milestoneFile, []byte(milestoneContent), paths.FilePerm644); err != nil {
-		t.Fatalf(ConstMagic17c34cc2, err)
+		t.Fatalf("Failed to write milestone lifecycle file: %v", err)
 	}
 
 	return lifecyclesDir
@@ -96,9 +96,9 @@ func TestInstanceValidator_ValidateInstanceWithState(t *testing.T) {
 	validator := NewGoValidatorWithLoaders(specLoader, lifecycleLoader)
 
 	validAuditFields := map[string]any{
-		objects.FieldKeyCreatedAt:   ConstMagiccd842f93,
+		objects.FieldKeyCreatedAt:   "2025-12-25T00:00:00Z",
 		objects.FieldKeyCreatedBy:   "ACC-TEST",
-		objects.FieldKeyUpdatedAt:   ConstMagiccd842f93,
+		objects.FieldKeyUpdatedAt:   "2025-12-25T00:00:00Z",
 		objects.FieldKeyUpdatedBy:   "ACC-TEST",
 		objects.FieldKeyDescription: "Valid test description",
 	}
@@ -131,7 +131,7 @@ func TestInstanceValidator_ValidateInstanceWithState(t *testing.T) {
 			wantValid:    true,
 		},
 		{
-			name: ConstMagiceff6168d,
+			name: "valid transition",
 			obj: func() map[string]any {
 				obj := map[string]any{
 					objects.FieldKeyID:            "BLI-002",
@@ -171,7 +171,7 @@ func TestInstanceValidator_ValidateInstanceWithState(t *testing.T) {
 			wantLifecycleError: true,
 		},
 		{
-			name: ConstMagic28cd2152,
+			name: "invalid transition",
 			obj: func() map[string]any {
 				obj := map[string]any{
 					objects.FieldKeyID:            "BLI-004",
@@ -199,13 +199,13 @@ func TestInstanceValidator_ValidateInstanceWithState(t *testing.T) {
 			options.ValidateLifecycle = true
 			result, err := validator.Validate(pkgctx.NewSystemContext(), tt.obj, tt.kind, options)
 			if err != nil {
-				t.Fatalf(ConstMagic6762e2c0, err)
+				t.Fatalf("Validate() error = %v", err)
 			}
 
 			if result.IsValid != tt.wantValid {
-				t.Errorf(ConstMagicf5ed72f6, result.IsValid, tt.wantValid)
+				t.Errorf("Validate() IsValid = %v, want %v", result.IsValid, tt.wantValid)
 				if len(result.Errors) > 0 {
-					t.Logf(ConstMagic6ad67277, result.Errors)
+					t.Logf("Validation errors: %+v", result.Errors)
 				}
 			}
 
@@ -219,7 +219,7 @@ func TestInstanceValidator_ValidateInstanceWithState(t *testing.T) {
 					}
 				}
 				if !hasLifecycleError {
-					t.Error(ConstMagic93c59fac)
+					t.Error("Expected lifecycle validation error, but none found")
 				}
 			}
 		})
@@ -237,44 +237,44 @@ func TestInstanceValidator_checkPrecondition_Lifecycle(t *testing.T) {
 		want         bool
 	}{
 		{
-			name:         ConstMagic4b808820,
-			precondition: ConstMagic866d629a,
+			name:         "field is set - exists",
+			precondition: "priority_plan_ref is set",
 			obj:          map[string]any{objects.FieldKeyPriorityPlanRef: "PRI-208"},
 			want:         true,
 		},
 		{
-			name:         ConstMagicdd24908f,
-			precondition: ConstMagic866d629a,
+			name:         "field is set - missing",
+			precondition: "priority_plan_ref is set",
 			obj:          map[string]any{},
 			want:         false,
 		},
 		{
-			name:         ConstMagic1c585332,
-			precondition: ConstMagic866d629a,
+			name:         "field is set - empty",
+			precondition: "priority_plan_ref is set",
 			obj:          map[string]any{objects.FieldKeyPriorityPlanRef: ""},
 			want:         false,
 		},
 		{
-			name:         ConstMagicb0e02d21,
-			precondition: ConstMagic9ba826a5,
+			name:         "list is not empty - has items",
+			precondition: "milestone_refs is not empty",
 			obj:          map[string]any{objects.FieldKeyMilestoneRefs: []string{"MIL-001"}},
 			want:         true,
 		},
 		{
-			name:         ConstMagic390acc53,
-			precondition: ConstMagic9ba826a5,
+			name:         "list is not empty - empty",
+			precondition: "milestone_refs is not empty",
 			obj:          map[string]any{objects.FieldKeyMilestoneRefs: []string{}},
 			want:         false,
 		},
 		{
-			name:         ConstMagic7b5ca0a3,
-			precondition: ConstMagic35012048,
+			name:         "at least one milestone",
+			precondition: "at least one milestone_ref linked",
 			obj:          map[string]any{objects.FieldKeyMilestoneRefs: []string{"MIL-001"}},
 			want:         true,
 		},
 		{
-			name:         ConstMagica1e103ec,
-			precondition: ConstMagic35012048,
+			name:         "at least one milestone - missing",
+			precondition: "at least one milestone_ref linked",
 			obj:          map[string]any{},
 			want:         false,
 		},
@@ -284,7 +284,7 @@ func TestInstanceValidator_checkPrecondition_Lifecycle(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := validator.checkPrecondition(tt.precondition, tt.obj)
 			if got != tt.want {
-				t.Errorf(ConstMagicef5a723d, got, tt.want)
+				t.Errorf("checkPrecondition() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -305,9 +305,9 @@ func TestInstanceValidator_ValidateInstanceWithState_GraphData(t *testing.T) {
 	validator := NewGoValidatorWithLoaders(specLoader, lifecycleLoader)
 
 	validAuditFields := map[string]any{
-		objects.FieldKeyCreatedAt:   ConstMagiccd842f93,
+		objects.FieldKeyCreatedAt:   "2025-12-25T00:00:00Z",
 		objects.FieldKeyCreatedBy:   "ACC-TEST",
-		objects.FieldKeyUpdatedAt:   ConstMagiccd842f93,
+		objects.FieldKeyUpdatedAt:   "2025-12-25T00:00:00Z",
 		objects.FieldKeyUpdatedBy:   "ACC-TEST",
 		objects.FieldKeyDescription: "Valid test description",
 	}
@@ -323,7 +323,7 @@ func TestInstanceValidator_ValidateInstanceWithState_GraphData(t *testing.T) {
 		description        string
 	}{
 		{
-			name: ConstMagic67c27314,
+			name: "graph data - valid backlog item",
 			obj: func() map[string]any {
 				obj := map[string]any{
 					objects.FieldKeyID:            "BLI-999",
@@ -340,15 +340,15 @@ func TestInstanceValidator_ValidateInstanceWithState_GraphData(t *testing.T) {
 			kind:         "backlog_item",
 			currentState: "",
 			wantValid:    true,
-			description:  ConstMagic75ee9b40,
+			description:  "Validates that graph-stored backlog items pass validation",
 		},
 		{
-			name: ConstMagicba2ee397,
+			name: "graph data - valid requirement with criteria_refs",
 			obj: func() map[string]any {
 				obj := map[string]any{
 					objects.FieldKeyID:            "REQ-999",
 					objects.FieldKeyKind:          "requirement",
-					objects.FieldKeyTitle:         ConstMagic585b2e57,
+					objects.FieldKeyTitle:         "Graph Test Requirement",
 					objects.FieldKeyStatus:        "proposed",
 					objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 					objects.FieldKeyCriteriaRefs:  []string{"CRIT-001", "CRIT-002"},
@@ -362,15 +362,15 @@ func TestInstanceValidator_ValidateInstanceWithState_GraphData(t *testing.T) {
 			kind:         "requirement",
 			currentState: "",
 			wantValid:    true,
-			description:  ConstMagic8574ad8d,
+			description:  "Validates that graph-stored requirements with criteria_refs pass validation",
 		},
 		{
-			name: ConstMagicaff002ca,
+			name: "graph data - requirement missing criteria_refs",
 			obj: func() map[string]any {
 				obj := map[string]any{
 					objects.FieldKeyID:            "REQ-998",
 					objects.FieldKeyKind:          "requirement",
-					objects.FieldKeyTitle:         ConstMagicaed366d8,
+					objects.FieldKeyTitle:         "Invalid Requirement",
 					objects.FieldKeyStatus:        "invalid_status",
 					objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 					objects.FieldKeyGoalRefs:      []string{"GOAL-001"},
@@ -384,10 +384,10 @@ func TestInstanceValidator_ValidateInstanceWithState_GraphData(t *testing.T) {
 			kind:         "requirement",
 			currentState: "",
 			wantValid:    false,
-			description:  ConstMagicb9e29414,
+			description:  "Validates that graph-stored requirements without criteria_refs fail validation",
 		},
 		{
-			name: ConstMagica4a1cdbd,
+			name: "graph data - invalid lifecycle transition",
 			obj: func() map[string]any {
 				obj := map[string]any{
 					objects.FieldKeyID:            "BLI-998",
@@ -405,15 +405,15 @@ func TestInstanceValidator_ValidateInstanceWithState_GraphData(t *testing.T) {
 			currentState:       "exploring",
 			wantValid:          false,
 			wantLifecycleError: true,
-			description:        ConstMagic05d8272a,
+			description:        "Validates that graph-stored objects respect lifecycle transition rules",
 		},
 		{
-			name: ConstMagicb3179660,
+			name: "graph data - milestone with valid status",
 			obj: func() map[string]any {
 				obj := map[string]any{
 					objects.FieldKeyID:            "MIL-999",
 					objects.FieldKeyKind:          "milestone",
-					objects.FieldKeyTitle:         ConstMagica3d673a3,
+					objects.FieldKeyTitle:         "Graph Test Milestone",
 					objects.FieldKeyStatus:        "not_started",
 					objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 				}
@@ -425,7 +425,7 @@ func TestInstanceValidator_ValidateInstanceWithState_GraphData(t *testing.T) {
 			kind:         "milestone",
 			currentState: "",
 			wantValid:    true,
-			description:  ConstMagicb69c7fce,
+			description:  "Validates that graph-stored milestones pass validation",
 		},
 	}
 
@@ -440,13 +440,13 @@ func TestInstanceValidator_ValidateInstanceWithState_GraphData(t *testing.T) {
 			options.ValidateLifecycle = true
 			result, err := validator.Validate(pkgctx.NewSystemContext(), tt.obj, tt.kind, options)
 			if err != nil {
-				t.Fatalf(ConstMagic6762e2c0, err)
+				t.Fatalf("Validate() error = %v", err)
 			}
 
 			if result.IsValid != tt.wantValid {
-				t.Errorf(ConstMagicf5ed72f6, result.IsValid, tt.wantValid)
+				t.Errorf("Validate() IsValid = %v, want %v", result.IsValid, tt.wantValid)
 				if len(result.Errors) > 0 {
-					t.Logf(ConstMagic6ad67277, result.Errors)
+					t.Logf("Validation errors: %+v", result.Errors)
 				}
 			}
 
@@ -460,7 +460,7 @@ func TestInstanceValidator_ValidateInstanceWithState_GraphData(t *testing.T) {
 					}
 				}
 				if !hasLifecycleError {
-					t.Error(ConstMagic93c59fac)
+					t.Error("Expected lifecycle validation error, but none found")
 				}
 			}
 		})

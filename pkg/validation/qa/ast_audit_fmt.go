@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"go/ast"
 
-	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // auditFmtPrintAntiPattern checks for direct usage of fmt.Print, fmt.Println, fmt.Printf
@@ -16,7 +15,7 @@ func (a *ASTAuditor) auditFmtPrintAntiPattern(call *ast.CallExpr) []Violation {
 			if sel.Sel.Name == "Print" || sel.Sel.Name == "Printf" || sel.Sel.Name == "Println" {
 				return []Violation{{
 					Pos:      a.fset.Position(call.Pos()),
-					Type:     validation.ConstMagic27135519,
+					Type:     "policy_violation",
 					Message:  fmt.Sprintf("POL-CODE-007 violation: direct %s call detected. Use logger.Info/Warn/Error or cli.WriteOutput.", sel.Sel.Name),
 					Severity: "high",
 				}}
@@ -27,7 +26,7 @@ func (a *ASTAuditor) auditFmtPrintAntiPattern(call *ast.CallExpr) []Violation {
 				if isOsStderr(call.Args[0]) {
 					return []Violation{{
 						Pos:      a.fset.Position(call.Pos()),
-						Type:     validation.ConstMagic27135519,
+						Type:     "policy_violation",
 						Message:  fmt.Sprintf("POL-CODE-007 violation: %s(os.Stderr, ...) detected. Use structured logging (logging.Fluent) instead.", sel.Sel.Name),
 						Severity: "high",
 					}}

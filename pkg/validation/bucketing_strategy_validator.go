@@ -47,7 +47,7 @@ func validateStrategyType(strategy map[string]any) (string, *ValidationError) {
 	if !ok {
 		return "", &ValidationError{
 			Field:   "strategy_type",
-			Message: ConstMagic4ccf883b,
+			Message: "strategy_type is required and must be a string",
 		}
 	}
 
@@ -61,7 +61,7 @@ func validateStrategyType(strategy map[string]any) (string, *ValidationError) {
 	if !validTypes[strategyType] {
 		return strategyType, &ValidationError{
 			Field:   "strategy_type",
-			Message: fmt.Sprintf(ConstMagicb130c5d6, strategyType),
+			Message: fmt.Sprintf("strategy_type must be one of: chronological, state, size, composite, first_letter (got: %s)", strategyType),
 		}
 	}
 
@@ -74,7 +74,7 @@ func validateStrategyField(strategy map[string]any) []ValidationError {
 	if !ok || field == emptyValue {
 		return []ValidationError{{
 			Field:   "field",
-			Message: ConstMagic919ed776,
+			Message: "field is required and must be a non-empty string",
 		}}
 	}
 	return nil
@@ -90,7 +90,7 @@ func validateChronologicalFormat(strategy map[string]any, strategyType string) [
 	if !ok || format == emptyValue {
 		return []ValidationError{{
 			Field:   "format",
-			Message: ConstMagicf5a7941c,
+			Message: "format is required for chronological strategies",
 		}}
 	}
 
@@ -106,7 +106,7 @@ func validateAppliesTo(strategy map[string]any) []ValidationError {
 		if strategy[objects.FieldKeyAppliesTo] != nil {
 			errors = append(errors, ValidationError{
 				Field:   "applies_to",
-				Message: ConstMagicb9c8e212,
+				Message: "applies_to must be an array",
 			})
 		}
 		return errors
@@ -123,8 +123,8 @@ func validateAppliesTo(strategy map[string]any) []ValidationError {
 		kind, ok := kindVal.(string)
 		if !ok {
 			errors = append(errors, ValidationError{
-				Field:   fmt.Sprintf(ConstMagicExtracted_56, i),
-				Message: ConstMagice9ede67c,
+				Field:   fmt.Sprintf("applies_to[%d]", i),
+				Message: "applies_to items must be strings",
 			})
 			continue
 		}
@@ -133,8 +133,8 @@ func validateAppliesTo(strategy map[string]any) []ValidationError {
 		dir := kindMapper.GetDirectoryFromKind(kind)
 		if dir == emptyValue {
 			errors = append(errors, ValidationError{
-				Field:   fmt.Sprintf(ConstMagicExtracted_56, i),
-				Message: fmt.Sprintf(ConstMagicb65bb34f, kind),
+				Field:   fmt.Sprintf("applies_to[%d]", i),
+				Message: fmt.Sprintf("object kind '%s' is not a registered object kind", kind),
 			})
 		}
 	}
@@ -153,7 +153,7 @@ func validateEnabled(strategy map[string]any) []ValidationError {
 		if _, exists := strategy[objects.FieldKeyEnabled]; exists {
 			errors = append(errors, ValidationError{
 				Field:   "enabled",
-				Message: ConstMagic2adf7144,
+				Message: "enabled must be a boolean",
 			})
 		}
 		return errors
@@ -165,7 +165,7 @@ func validateEnabled(strategy map[string]any) []ValidationError {
 		if len(appliesTo) == 0 {
 			errors = append(errors, ValidationError{
 				Field:   "enabled",
-				Message: ConstMagicac1ef6ff,
+				Message: "enabled strategy must have at least one object kind in applies_to",
 			})
 		}
 	}
@@ -184,7 +184,7 @@ func validateArchiveStrategy(archiveStrategy map[string]any) []ValidationError {
 		return errors // Only validate if enabled
 	}
 
-	tierProgression, hasTierProgression := archiveStrategy[ConstMagicExtracted_57].([]any)
+	tierProgression, hasTierProgression := archiveStrategy["tier_progression"].([]any)
 
 	if !hasTierProgression || len(tierProgression) == 0 {
 		// Simple single-tier archival - requires archive_after
@@ -204,13 +204,13 @@ func validateSingleTierArchive(archiveStrategy map[string]any) []ValidationError
 	archiveAfter, ok := archiveStrategy["archive_after"].(string)
 	if !ok || archiveAfter == emptyValue {
 		errors = append(errors, ValidationError{
-			Field:   ConstMagic28bb28cf,
-			Message: ConstMagicf917e014,
+			Field:   "archive_strategy.archive_after",
+			Message: "archive_after is required when archive_strategy.enabled is true and tier_progression is not specified",
 		})
 	} else if !isValidDuration(archiveAfter) {
 		errors = append(errors, ValidationError{
-			Field:   ConstMagic28bb28cf,
-			Message: fmt.Sprintf(ConstMagic495e92e2, archiveAfter),
+			Field:   "archive_strategy.archive_after",
+			Message: fmt.Sprintf("archive_after must be a valid duration (e.g., '720h', '30d'), got: %s", archiveAfter),
 		})
 	}
 
@@ -225,8 +225,8 @@ func validateMultiTierArchive(tierProgression []any) []ValidationError {
 		tier, ok := tierVal.(map[string]any)
 		if !ok {
 			errors = append(errors, ValidationError{
-				Field:   fmt.Sprintf(ConstMagic6582e998, i),
-				Message: ConstMagic0b3d6e5d,
+				Field:   fmt.Sprintf("archive_strategy.tier_progression[%d]", i),
+				Message: "tier_progression items must be objects",
 			})
 			continue
 		}
@@ -259,16 +259,16 @@ func validateTierName(tier map[string]any, index int) *ValidationError {
 	tierName, ok := tier[objects.FieldKeyTier].(string)
 	if !ok || tierName == emptyValue {
 		return &ValidationError{
-			Field:   fmt.Sprintf(ConstMagic86880a74, index),
-			Message: ConstMagic70d504a9,
+			Field:   fmt.Sprintf("archive_strategy.tier_progression[%d].tier", index),
+			Message: "tier is required and must be one of: warm, cold, iced",
 		}
 	}
 
 	validTiers := map[string]bool{"warm": true, "cold": true, "iced": true}
 	if !validTiers[tierName] {
 		return &ValidationError{
-			Field:   fmt.Sprintf(ConstMagic86880a74, index),
-			Message: fmt.Sprintf(ConstMagic8caee6bb, tierName),
+			Field:   fmt.Sprintf("archive_strategy.tier_progression[%d].tier", index),
+			Message: fmt.Sprintf("tier must be one of: warm, cold, iced (got: %s)", tierName),
 		}
 	}
 
@@ -280,15 +280,15 @@ func validateTierDuration(tier map[string]any, index int) *ValidationError {
 	duration, ok := tier["duration"].(string)
 	if !ok || duration == emptyValue {
 		return &ValidationError{
-			Field:   fmt.Sprintf(ConstMagicafb2d3c7, index),
-			Message: ConstMagica4caf441,
+			Field:   fmt.Sprintf("archive_strategy.tier_progression[%d].duration", index),
+			Message: "duration is required (use '0' for final tier to keep indefinitely)",
 		}
 	}
 
 	if duration != "0" && !isValidDuration(duration) {
 		return &ValidationError{
-			Field:   fmt.Sprintf(ConstMagicafb2d3c7, index),
-			Message: fmt.Sprintf(ConstMagicd3ae9f6b, duration),
+			Field:   fmt.Sprintf("archive_strategy.tier_progression[%d].duration", index),
+			Message: fmt.Sprintf("duration must be a valid duration (e.g., '720h', '30d') or '0' for indefinite, got: %s", duration),
 		}
 	}
 

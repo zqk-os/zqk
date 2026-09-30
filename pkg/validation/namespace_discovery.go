@@ -24,7 +24,7 @@ func NewNamespaceDiscovery() *NamespaceDiscovery {
 func LoadNamespaceFromObject(namespaceObj map[string]any) (*NamespaceInfo, error) {
 	namespaceID, ok := namespaceObj[objects.FieldKeyNamespaceID].(string)
 	if !ok || namespaceID == emptyValue {
-		return nil, errfmt.Errorf(ConstMagic40cc4f1c)
+		return nil, errfmt.Errorf("namespace object missing namespace_id")
 	}
 
 	info := &NamespaceInfo{
@@ -51,7 +51,7 @@ func LoadNamespaceFromObject(namespaceObj map[string]any) (*NamespaceInfo, error
 		}
 
 		// Parse can_be_referenced_by
-		if canBeRefRaw, ok := integrationRaw[ConstMagicExtracted_62].([]any); ok {
+		if canBeRefRaw, ok := integrationRaw["can_be_referenced_by"].([]any); ok {
 			integration.CanBeReferencedBy = parseReferenceRules(canBeRefRaw)
 		}
 
@@ -63,10 +63,10 @@ func LoadNamespaceFromObject(namespaceObj map[string]any) (*NamespaceInfo, error
 		isolation := &NamespaceIsolation{}
 
 		if validationRaw, ok := isolationRaw["validation"].(map[string]any); ok {
-			if crossNS, ok := validationRaw[ConstMagicExtracted_63].(bool); ok {
+			if crossNS, ok := validationRaw["cross_namespace_validation"].(bool); ok {
 				isolation.Validation.CrossNamespaceValidation = crossNS
 			}
-			if refVal := objects.GetString(validationRaw, ConstMagicExtracted_64); ok {
+			if refVal := objects.GetString(validationRaw, "reference_validation"); ok {
 				isolation.Validation.ReferenceValidation = refVal
 			}
 		}
@@ -101,7 +101,7 @@ func parseReferenceRules(rulesRaw []any) []ReferenceRule {
 			}
 		}
 
-		if dir := objects.GetString(ruleMap, ConstMagicExtracted_65); ok {
+		if dir := objects.GetString(ruleMap, "reference_direction"); ok {
 			rule.ReferenceDirection = dir
 		}
 

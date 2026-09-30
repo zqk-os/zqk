@@ -80,7 +80,7 @@ func getSharedValidationCache(projectRoot string) *sharedValidationCache {
 	sharedCaches[projectRoot] = sc
 
 	// Use managed goroutine for flusher
-	builder := goroutinelabels.NewGoroutine(ConstMagicc54497bd, ConstMagicfabb6212)
+	builder := goroutinelabels.NewGoroutine("shared_validation_cache_flusher", "background flusher for shared validation state cache")
 	builder.StartSimple(func() {
 		sc.runFlusher(context.Background()) // System-wide shared instance uses background context
 	})
@@ -166,7 +166,7 @@ func InvalidateObjectsInGlobalValidationCacheWithContext(ctx context.Context, pr
 	if mode == pkgctx.CacheModeTestSync {
 		// Deterministic behavior for tests: persist immediately on return.
 		if err := sc.cache.Save(); err != nil {
-			logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Warn(ConstMagic055d9193).
+			logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Warn("Failed to save validation cache in test_sync mode").
 				ProjectRoot(projectRoot).
 				WithError(err).
 				Log()
@@ -217,7 +217,7 @@ func UpdateObjectInGlobalValidationCacheWithContext(ctx context.Context, project
 	mode := pkgctx.GetCacheMode(ctx)
 	if mode == pkgctx.CacheModeTestSync {
 		if err := sc.cache.Save(); err != nil {
-			logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Warn(ConstMagicc8a30dfe).
+			logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Warn("Failed to save validation cache in test_sync mode (update)").
 				ProjectRoot(projectRoot).
 				WithError(err).
 				Log()

@@ -69,7 +69,7 @@ func (pq *PriorityQueue) Enqueue(task *ValidationTask) {
 		},
 	); err != nil {
 		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
-			Error(ConstMagicb67edcad, err).Log()
+			Error("PriorityQueue.Enqueue: %v\n", err).Log()
 	}
 }
 

@@ -27,23 +27,23 @@ func TestAsyncValidator_ConcurrentAccess(t *testing.T) {
 
 	// Start validator
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic4545ee2f, err)
+		t.Fatalf("failed to start validator: %v", err)
 	}
 	defer func() { _ = validator.Stop() }() //nolint:errcheck // Test cleanup - errors are acceptable
 
 	// Create test files
 	testDir := datacell.CellCASPrimaryDir(testRoot, "test")
 	if err := fileutil.MkdirAll(testDir, paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagic32b1c202, err)
+		t.Fatalf("failed to create test directory: %v", err)
 	}
 
 	// Create 100 test objects
 	numObjects := 100
 	for i := 1; i <= numObjects; i++ {
 		testFile := filepath.Join(testDir, fmt.Sprintf("TEST-%03d.yaml", i))
-		content := fmt.Sprintf(ConstMagic28b7580d, i)
+		content := fmt.Sprintf("id: TEST-%03d\nkind: test_object\n", i)
 		if err := fileutil.WriteFile(testFile, []byte(content), paths.FilePerm644); err != nil {
-			t.Fatalf(ConstMagic7a424835, err)
+			t.Fatalf("failed to write test file: %v", err)
 		}
 	}
 
@@ -78,13 +78,13 @@ func TestAsyncValidator_ConcurrentAccess(t *testing.T) {
 	for {
 		select {
 		case <-timeout:
-			t.Fatal(ConstMagic16e76391)
+			t.Fatal("timeout waiting for validation to complete")
 		case <-ticker.C:
 			total, _, _, queueSize := validator.GetValidationStats()
 			if queueSize == 0 && total >= numObjects {
 				// All tasks processed
 				if enqueueErrors > 0 {
-					t.Errorf(ConstMagicb4110088, enqueueErrors)
+					t.Errorf("encountered %d enqueue errors", enqueueErrors)
 				}
 				return
 			}
@@ -149,27 +149,27 @@ func TestValidationStateCache_ConcurrentReadWrite(t *testing.T) {
 	// Verify cache integrity
 	total, stale, withIssues := cache.Count()
 	if total < numWriters*numObjects/2 {
-		t.Errorf(ConstMagic231af6c1, numWriters*numObjects/2, total)
+		t.Errorf("expected at least %d cached states, got %d", numWriters*numObjects/2, total)
 	}
 
 	// Save and reload to verify persistence
 	if err := cache.Save(); err != nil {
-		t.Fatalf(ConstMagic54fa5912, err)
+		t.Fatalf("failed to save cache: %v", err)
 	}
 
 	// Create new cache instance and load
 	cache2 := NewValidationStateCache(testRoot, time.Hour)
 	if err := cache2.Load(); err != nil {
-		t.Fatalf(ConstMagic969edc24, err)
+		t.Fatalf("failed to load cache: %v", err)
 	}
 
 	total2, _, _ := cache2.Count()
 	if total2 != total {
-		t.Errorf(ConstMagic897d8b59, total, total2)
+		t.Errorf("cache count mismatch after reload: expected %d, got %d", total, total2)
 	}
 
 	if writeErrors.Load() > 0 {
-		t.Errorf(ConstMagic9e334c4c, writeErrors.Load())
+		t.Errorf("encountered %d write errors", writeErrors.Load())
 	}
 	_ = stale
 	_ = withIssues
@@ -188,7 +188,7 @@ func TestValidationStateCache_MultipleProcesses(t *testing.T) {
 	for i := 0; i < numProcesses; i++ {
 		caches[i] = NewValidationStateCache(testRoot, time.Hour)
 		if err := caches[i].Load(); err != nil {
-			t.Fatalf(ConstMagic75206709, i, err)
+			t.Fatalf("process %d failed to load cache: %v", i, err)
 		}
 	}
 
@@ -205,11 +205,11 @@ func TestValidationStateCache_MultipleProcesses(t *testing.T) {
 				cache := caches[processID]
 
 				for j := 0; j < numObjectsPerProcess; j++ {
-					objID := fmt.Sprintf(ConstMagicc3c76e1f, processID, j)
+					objID := fmt.Sprintf("PROC-%d-OBJ-%03d", processID, j)
 					state := &ValidationState{
 						ObjectID:      objID,
 						ObjectKind:    "test_object",
-						FilePath:      fmt.Sprintf(ConstMagic569325a0, processID, j),
+						FilePath:      fmt.Sprintf("proc-%d-obj-%d.yaml", processID, j),
 						LastValidated: time.Now(),
 						Checksum:      fmt.Sprintf("checksum-%d-%d", processID, j),
 						Issues:        []ValidationIssue{},
@@ -238,21 +238,21 @@ func TestValidationStateCache_MultipleProcesses(t *testing.T) {
 	for i := 0; i < numProcesses; i++ {
 		cache := caches[i]
 		if err := cache.Load(); err != nil {
-			t.Fatalf(ConstMagic3ef8eb0e, i, err)
+			t.Fatalf("process %d failed to reload cache: %v", i, err)
 		}
 
 		// Check that this process can see its own objects
 		for j := 0; j < numObjectsPerProcess; j++ {
-			objID := fmt.Sprintf(ConstMagicc3c76e1f, i, j)
+			objID := fmt.Sprintf("PROC-%d-OBJ-%03d", i, j)
 			_, exists := cache.Get(objID)
 			if !exists {
-				t.Errorf(ConstMagicc4437867, i, objID)
+				t.Errorf("process %d cannot find its own object %s", i, objID)
 			}
 		}
 	}
 
 	if writeErrors.Load() > 0 {
-		t.Logf(ConstMagic656f3617, writeErrors.Load())
+		t.Logf("encountered %d write errors (expected due to concurrent writes)", writeErrors.Load())
 		// Some write errors are expected due to concurrent file access
 		// The important thing is that the cache file remains valid
 	}
@@ -260,12 +260,12 @@ func TestValidationStateCache_MultipleProcesses(t *testing.T) {
 	// Verify cache file is valid JSON
 	finalCache := NewValidationStateCache(testRoot, time.Hour)
 	if err := finalCache.Load(); err != nil {
-		t.Fatalf(ConstMagic266a1b3e, err)
+		t.Fatalf("failed to load final cache: %v", err)
 	}
 
 	total, _, _ := finalCache.Count()
 	if total == 0 {
-		t.Error(ConstMagicfefc8717)
+		t.Error("cache is empty after all processes wrote to it")
 	}
 }
 
@@ -279,28 +279,28 @@ func TestAsyncValidator_StressTest(t *testing.T) {
 
 	// Start validator
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic4545ee2f, err)
+		t.Fatalf("failed to start validator: %v", err)
 	}
 	defer func() { _ = validator.Stop() }() //nolint:errcheck // Test cleanup - errors are acceptable
 
 	// Create large dataset
 	testDir := datacell.CellCASPrimaryDir(testRoot, "test")
 	if err := fileutil.MkdirAll(testDir, paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagic32b1c202, err)
+		t.Fatalf("failed to create test directory: %v", err)
 	}
 
 	numObjects := 1000
-	t.Logf(ConstMagic8d564fa9, numObjects)
+	t.Logf("Creating %d test objects...", numObjects)
 
 	for i := 1; i <= numObjects; i++ {
 		testFile := filepath.Join(testDir, fmt.Sprintf("TEST-%04d.yaml", i))
-		content := fmt.Sprintf(ConstMagic4282f0c4, i)
+		content := fmt.Sprintf("id: TEST-%04d\nkind: test_object\n", i)
 		if err := fileutil.WriteFile(testFile, []byte(content), paths.FilePerm644); err != nil {
-			t.Fatalf(ConstMagic7a424835, err)
+			t.Fatalf("failed to write test file: %v", err)
 		}
 	}
 
-	t.Logf(ConstMagicdd296740, numObjects)
+	t.Logf("Enqueuing %d validation tasks...", numObjects)
 
 	// Enqueue all tasks with mixed priorities
 	for i := 1; i <= numObjects; i++ {
@@ -330,7 +330,7 @@ func TestAsyncValidator_StressTest(t *testing.T) {
 
 			if queueSize == 0 && total >= numObjects {
 				elapsed := time.Since(startTime)
-				t.Logf(ConstMagic246f958a, numObjects, elapsed)
+				t.Logf("Completed validation of %d objects in %v", numObjects, elapsed)
 				return
 			}
 		}
@@ -346,15 +346,15 @@ func TestAsyncValidator_ConcurrentValidators(t *testing.T) {
 	// Create test files
 	testDir := datacell.CellCASPrimaryDir(testRoot, "test")
 	if err := fileutil.MkdirAll(testDir, paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagic32b1c202, err)
+		t.Fatalf("failed to create test directory: %v", err)
 	}
 
 	numObjects := 200
 	for i := 1; i <= numObjects; i++ {
 		testFile := filepath.Join(testDir, fmt.Sprintf("TEST-%03d.yaml", i))
-		content := fmt.Sprintf(ConstMagic28b7580d, i)
+		content := fmt.Sprintf("id: TEST-%03d\nkind: test_object\n", i)
 		if err := fileutil.WriteFile(testFile, []byte(content), paths.FilePerm644); err != nil {
-			t.Fatalf(ConstMagic7a424835, err)
+			t.Fatalf("failed to write test file: %v", err)
 		}
 	}
 
@@ -364,7 +364,7 @@ func TestAsyncValidator_ConcurrentValidators(t *testing.T) {
 	for i := 0; i < numValidators; i++ {
 		validators[i] = NewAsyncValidator(pkgctx.NewSystemContext(), testRoot, 2, time.Hour)
 		if err := validators[i].Start(); err != nil {
-			t.Fatalf(ConstMagic06560e70, i, err)
+			t.Fatalf("validator %d failed to start: %v", i, err)
 		}
 	}
 	// Clean up all validators at end of test
@@ -406,18 +406,18 @@ func TestAsyncValidator_ConcurrentValidators(t *testing.T) {
 	for {
 		select {
 		case <-timeout:
-			t.Fatal(ConstMagic2be77c83)
+			t.Fatal("timeout waiting for validators to complete")
 		case <-ticker.C:
 			allDone := true
 			for i, validator := range validators {
 				_, _, _, queueSize := validator.GetValidationStats()
 				if queueSize > 0 {
 					allDone = false
-					t.Logf(ConstMagic551f0608, i, queueSize)
+					t.Logf("Validator %d: queue size %d", i, queueSize)
 				}
 			}
 			if allDone {
-				t.Log(ConstMagicf7c47cf6)
+				t.Log("All validators completed")
 				return
 			}
 		}
@@ -436,7 +436,7 @@ func TestValidationStateCache_FileLocking(t *testing.T) {
 	for i := 0; i < numCaches; i++ {
 		caches[i] = NewValidationStateCache(testRoot, time.Hour)
 		if err := caches[i].Load(); err != nil {
-			t.Fatalf(ConstMagic67c2c4a8, i, err)
+			t.Fatalf("cache %d failed to load: %v", i, err)
 		}
 	}
 
@@ -454,11 +454,11 @@ func TestValidationStateCache_FileLocking(t *testing.T) {
 
 				for j := 0; j < numSaves; j++ {
 					// Add some state
-					objID := fmt.Sprintf(ConstMagic7e20b8c7, cacheID, j)
+					objID := fmt.Sprintf("CACHE-%d-SAVE-%d", cacheID, j)
 					state := &ValidationState{
 						ObjectID:      objID,
 						ObjectKind:    "test_object",
-						FilePath:      fmt.Sprintf(ConstMagic2dc26e7d, cacheID, j),
+						FilePath:      fmt.Sprintf("cache-%d-save-%d.yaml", cacheID, j),
 						LastValidated: time.Now(),
 						Checksum:      fmt.Sprintf("checksum-%d-%d", cacheID, j),
 						Issues:        []ValidationIssue{},
@@ -482,20 +482,20 @@ func TestValidationStateCache_FileLocking(t *testing.T) {
 	// Verify cache file is still valid JSON
 	finalCache := NewValidationStateCache(testRoot, time.Hour)
 	if err := finalCache.Load(); err != nil {
-		t.Fatalf(ConstMagicc6a14713, err)
+		t.Fatalf("failed to load final cache (file may be corrupted): %v", err)
 	}
 
 	total, _, _ := finalCache.Count()
 	if total == 0 {
-		t.Error(ConstMagic0c5a32c6)
+		t.Error("cache is empty after concurrent saves")
 	}
 
 	// Some save errors are expected due to file locking (when multiple processes try to save simultaneously)
 	// The important thing is that the cache file remains valid and no data is corrupted
 	if saveErrors.Load() > int64(numCaches*numSaves) {
-		t.Errorf(ConstMagicc8a2ac11, saveErrors.Load())
+		t.Errorf("unexpectedly high save errors: %d (may indicate file locking issues)", saveErrors.Load())
 	} else if saveErrors.Load() > 0 {
-		t.Logf(ConstMagic39a35328, saveErrors.Load())
+		t.Logf("encountered %d save errors due to file locking (expected in concurrent scenarios)", saveErrors.Load())
 	}
 }
 
@@ -509,15 +509,15 @@ func TestAsyncValidator_ValidateNow_Concurrent(t *testing.T) {
 	// Create test files
 	testDir := datacell.CellCASPrimaryDir(testRoot, "test")
 	if err := fileutil.MkdirAll(testDir, paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagic32b1c202, err)
+		t.Fatalf("failed to create test directory: %v", err)
 	}
 
 	numObjects := 100
 	for i := 1; i <= numObjects; i++ {
 		testFile := filepath.Join(testDir, fmt.Sprintf("TEST-%03d.yaml", i))
-		content := fmt.Sprintf(ConstMagic28b7580d, i)
+		content := fmt.Sprintf("id: TEST-%03d\nkind: test_object\n", i)
 		if err := fileutil.WriteFile(testFile, []byte(content), paths.FilePerm644); err != nil {
-			t.Fatalf(ConstMagic7a424835, err)
+			t.Fatalf("failed to write test file: %v", err)
 		}
 	}
 
@@ -554,7 +554,7 @@ func TestAsyncValidator_ValidateNow_Concurrent(t *testing.T) {
 	wg.Wait()
 
 	if validationErrors.Load() > 0 {
-		t.Errorf(ConstMagicf1c16612, validationErrors.Load())
+		t.Errorf("encountered %d validation errors", validationErrors.Load())
 	}
 
 	// Verify all objects are cached
@@ -562,7 +562,7 @@ func TestAsyncValidator_ValidateNow_Concurrent(t *testing.T) {
 		objID := fmt.Sprintf("TEST-%03d", i)
 		_, exists := validator.GetCachedState(objID)
 		if !exists {
-			t.Errorf(ConstMagica1b53423, objID)
+			t.Errorf("object %s not cached after ValidateNow", objID)
 		}
 	}
 }

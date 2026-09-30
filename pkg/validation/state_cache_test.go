@@ -31,17 +31,17 @@ func TestValidationStateCache_BasicOperations(t *testing.T) {
 
 	retrieved, exists := cache.Get("TEST-001")
 	if !exists {
-		t.Error(ConstMagic1e44ef95)
+		t.Error("expected state to exist after Set")
 	}
 	if retrieved.ObjectID != "TEST-001" {
-		t.Errorf(ConstMagicb40fbdb4, retrieved.ObjectID)
+		t.Errorf("expected ObjectID TEST-001, got %s", retrieved.ObjectID)
 	}
 
 	// Test Invalidate
 	cache.Invalidate("TEST-001")
 	_, exists = cache.Get("TEST-001")
 	if exists {
-		t.Error(ConstMagicf2f2a4be)
+		t.Error("expected state to be invalidated")
 	}
 }
 
@@ -63,7 +63,7 @@ func TestValidationStateCache_SetRejectsOversizedID(t *testing.T) {
 
 	_, exists := cache.Get(longID)
 	if exists {
-		t.Error(ConstMagic3e2799e7)
+		t.Error("expected oversized ID to be rejected by Set; should not be in cache")
 	}
 }
 
@@ -103,28 +103,28 @@ func TestValidationStateCache_Persistence(t *testing.T) {
 
 	// Save cache
 	if err := cache.Save(); err != nil {
-		t.Fatalf(ConstMagic54fa5912, err)
+		t.Fatalf("failed to save cache: %v", err)
 	}
 
 	// Create new cache instance and load
 	cache2 := NewValidationStateCache(testRoot, time.Hour)
 	if err := cache2.Load(); err != nil {
-		t.Fatalf(ConstMagic969edc24, err)
+		t.Fatalf("failed to load cache: %v", err)
 	}
 
 	// Verify states were loaded
 	retrieved1, exists := cache2.Get("TEST-001")
 	if !exists {
-		t.Error(ConstMagic76cfc6c0)
+		t.Error("expected TEST-001 to exist after load")
 	} else if retrieved1.Checksum != "abc123" {
-		t.Errorf(ConstMagicac6bda64, retrieved1.Checksum)
+		t.Errorf("expected checksum abc123, got %s", retrieved1.Checksum)
 	}
 
 	retrieved2, exists := cache2.Get("TEST-002")
 	if !exists {
-		t.Error(ConstMagic14eff21d)
+		t.Error("expected TEST-002 to exist after load")
 	} else if len(retrieved2.Issues) != 1 {
-		t.Errorf(ConstMagic3b8229c4, len(retrieved2.Issues))
+		t.Errorf("expected 1 issue, got %d", len(retrieved2.Issues))
 	}
 }
 
@@ -149,7 +149,7 @@ func TestValidationStateCache_StaleDetection(t *testing.T) {
 	// Should exist immediately
 	_, exists := cache.Get("TEST-001")
 	if !exists {
-		t.Error(ConstMagic73eda4cd)
+		t.Error("expected state to exist immediately")
 	}
 
 	// Wait for it to become stale
@@ -158,13 +158,13 @@ func TestValidationStateCache_StaleDetection(t *testing.T) {
 	// Should not exist (stale)
 	_, exists = cache.Get("TEST-001")
 	if exists {
-		t.Error(ConstMagice636531d)
+		t.Error("expected state to be stale after max age")
 	}
 
 	// GetStale should return it
 	stale := cache.GetStale()
 	if len(stale) != 1 {
-		t.Errorf(ConstMagic523d4c81, len(stale))
+		t.Errorf("expected 1 stale entry, got %d", len(stale))
 	}
 }
 
@@ -203,17 +203,17 @@ func TestValidationStateCache_InvalidateByKind(t *testing.T) {
 	// backlog_item states should be gone
 	_, exists := cache.Get("TEST-001")
 	if exists {
-		t.Error(ConstMagicbf06e3ab)
+		t.Error("expected TEST-001 to be invalidated")
 	}
 	_, exists = cache.Get("TEST-002")
 	if exists {
-		t.Error(ConstMagic2977a18c)
+		t.Error("expected TEST-002 to be invalidated")
 	}
 
 	// goal state should still exist
 	_, exists = cache.Get("TEST-003")
 	if !exists {
-		t.Error(ConstMagic3d591540)
+		t.Error("expected TEST-003 to still exist")
 	}
 }
 
@@ -255,12 +255,12 @@ func TestValidationStateCache_GetByTier(t *testing.T) {
 	// Get by tier
 	tier1States := cache.GetByTier(1)
 	if len(tier1States) != 2 {
-		t.Errorf(ConstMagicd74d4c4b, len(tier1States))
+		t.Errorf("expected 2 Tier 1 states, got %d", len(tier1States))
 	}
 
 	tier2States := cache.GetByTier(2)
 	if len(tier2States) != 1 {
-		t.Errorf(ConstMagicc5c38600, len(tier2States))
+		t.Errorf("expected 1 Tier 2 state, got %d", len(tier2States))
 	}
 }
 
@@ -290,13 +290,13 @@ func TestValidationStateCache_Count(t *testing.T) {
 
 	total, stale, withIssues := cache.Count()
 	if total != 2 {
-		t.Errorf(ConstMagic844c9d15, total)
+		t.Errorf("expected total 2, got %d", total)
 	}
 	if stale != 0 {
-		t.Errorf(ConstMagic645416eb, stale)
+		t.Errorf("expected stale 0, got %d", stale)
 	}
 	if withIssues != 1 {
-		t.Errorf(ConstMagicbdd5d575, withIssues)
+		t.Errorf("expected withIssues 1, got %d", withIssues)
 	}
 }
 
@@ -319,13 +319,13 @@ func TestValidationStateCache_Save_ErrorPaths(t *testing.T) {
 
 	// Test successful save
 	if err := cache.Save(); err != nil {
-		t.Fatalf(ConstMagic993d14f2, err)
+		t.Fatalf("Save() failed: %v", err)
 	}
 
 	// Test save with empty cache
 	cache2 := NewValidationStateCache(testRoot, time.Hour)
 	if err := cache2.Save(); err != nil {
-		t.Errorf(ConstMagic53c1d535, err)
+		t.Errorf("Save() with empty cache failed: %v", err)
 	}
 
 	// Test save with stale lock handling
@@ -342,7 +342,7 @@ func TestValidationStateCache_Save_ErrorPaths(t *testing.T) {
 
 	// Save should succeed even if there's a stale lock file
 	if err := cache3.Save(); err != nil {
-		t.Errorf(ConstMagic9a6b0560, err)
+		t.Errorf("Save() with stale lock handling failed: %v", err)
 	}
 }
 
@@ -367,13 +367,13 @@ func TestValidationStateCache_Save_Concurrent(t *testing.T) {
 
 	// Save should handle multiple states correctly
 	if err := cache.Save(); err != nil {
-		t.Fatalf(ConstMagicdb7f4877, err)
+		t.Fatalf("Save() with multiple states failed: %v", err)
 	}
 
 	// Verify all states were saved
 	cache2 := NewValidationStateCache(testRoot, time.Hour)
 	if err := cache2.Load(); err != nil {
-		t.Fatalf(ConstMagic9e0f6418, err)
+		t.Fatalf("Load() failed: %v", err)
 	}
 
 	for i := 0; i < 10; i++ {
@@ -407,25 +407,25 @@ func TestValidationStateCache_CodeChangeInvalidation(t *testing.T) {
 
 	// Save cache with current code checksum
 	if err := cache.Save(); err != nil {
-		t.Fatalf(ConstMagic54fa5912, err)
+		t.Fatalf("failed to save cache: %v", err)
 	}
 
 	// Verify state is in cache
 	retrieved, exists := cache.Get("TEST-001")
 	if !exists {
-		t.Fatal(ConstMagic46c11a8f)
+		t.Fatal("expected state to exist after save")
 	}
 	if retrieved.ObjectID != "TEST-001" {
-		t.Errorf(ConstMagicb40fbdb4, retrieved.ObjectID)
+		t.Errorf("expected ObjectID TEST-001, got %s", retrieved.ObjectID)
 	}
 
 	// Simulate code change by modifying a validation code file
 	// We'll create a temporary file that will change the checksum
-	validationCodeFile := filepath.Join(testRoot, "cmd", "zqk", "system", ConstMagicd4badb3d)
+	validationCodeFile := filepath.Join(testRoot, "cmd", "zqk", "system", "check_instance_validation_helpers.go")
 
 	// Create directory if it doesn't exist
 	if err := fileutil.MkdirAll(filepath.Dir(validationCodeFile), paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagic43ec9c63, err)
+		t.Fatalf("failed to create directory: %v", err)
 	}
 
 	// Write a modified version of the file (simulating code change)
@@ -434,44 +434,44 @@ func TestValidationStateCache_CodeChangeInvalidation(t *testing.T) {
 
 	// First, write original content
 	if err := fileutil.WriteFile(validationCodeFile, originalContent, paths.FilePerm644); err != nil {
-		t.Fatalf(ConstMagic2f93fd0b, err)
+		t.Fatalf("failed to write original file: %v", err)
 	}
 
 	// Save cache again with original content
 	if err := cache.Save(); err != nil {
-		t.Fatalf(ConstMagica11fa40a, err)
+		t.Fatalf("failed to save cache with original content: %v", err)
 	}
 
 	// Load cache - should load successfully
 	cache2 := NewValidationStateCache(testRoot, time.Hour)
 	if err := cache2.Load(); err != nil {
-		t.Fatalf(ConstMagic969edc24, err)
+		t.Fatalf("failed to load cache: %v", err)
 	}
 
 	// Verify state is still in cache
 	retrieved2, exists := cache2.Get("TEST-001")
 	if !exists {
-		t.Fatal(ConstMagic5fd5037c)
+		t.Fatal("expected state to exist after load with original content")
 	}
 	if retrieved2.ObjectID != "TEST-001" {
-		t.Errorf(ConstMagicb40fbdb4, retrieved2.ObjectID)
+		t.Errorf("expected ObjectID TEST-001, got %s", retrieved2.ObjectID)
 	}
 
 	// Now modify the code file (simulating code change)
 	if err := fileutil.WriteFile(validationCodeFile, modifiedContent, paths.FilePerm644); err != nil {
-		t.Fatalf(ConstMagic1106fdcf, err)
+		t.Fatalf("failed to write modified file: %v", err)
 	}
 
 	// Load cache again - should detect code change and invalidate cache
 	cache3 := NewValidationStateCache(testRoot, time.Hour)
 	if err := cache3.Load(); err != nil {
-		t.Fatalf(ConstMagic969edc24, err)
+		t.Fatalf("failed to load cache: %v", err)
 	}
 
 	// Verify state is NOT in cache (cache was invalidated due to code change)
 	_, exists = cache3.Get("TEST-001")
 	if exists {
-		t.Error(ConstMagic70aeb1d1)
+		t.Error("expected state to be invalidated after code change, but it still exists in cache")
 	}
 	// Poison on-disk file must be removed so empty-save guards cannot resurrect it.
 	if _, err := fileutil.Stat(cache3.cacheFile); err == nil {
@@ -486,13 +486,13 @@ func TestShouldCacheValidationState(t *testing.T) {
 	// Excluded (high-volume/ephemeral) kinds
 	for _, k := range []string{"audit_event", "base_metric", "scheduler_health_metric", "command_metric", "zqk_session"} {
 		if ShouldCacheValidationState(k) {
-			t.Errorf(ConstMagic7fb96993, k)
+			t.Errorf("expected %q to be excluded from cache", k)
 		}
 	}
 	// Normal kinds should be cached
 	for _, k := range []string{"backlog_item", "requirement", "criteria", "milestone", "scheduler_job", ""} {
 		if !ShouldCacheValidationState(k) {
-			t.Errorf(ConstMagic5be5c990, k)
+			t.Errorf("expected %q to be cached", k)
 		}
 	}
 }
@@ -515,10 +515,10 @@ func TestValidationStateCache_LoadPrunesExcludedKinds(t *testing.T) {
 		t.Fatalf("Load: %v", err)
 	}
 	if _, ok := cache2.Get("AUD-001"); ok {
-		t.Error(ConstMagicf2a303fc)
+		t.Error("Load should not load audit_event (excluded kind)")
 	}
 	if _, ok := cache2.Get("REQ-001"); !ok {
-		t.Error(ConstMagic42f28d39)
+		t.Error("Load should load requirement (cached kind)")
 	}
 }
 

@@ -14,7 +14,7 @@ func TestValidateCrossNamespaceReference(t *testing.T) {
 			Integration: &NamespaceIntegration{
 				CanBeReferencedBy: []ReferenceRule{
 					{
-						NamespaceID:        ConstMagic09ae1f1a,
+						NamespaceID:        "domain:organizational",
 						ObjectTypes:        []string{"goal", "milestone", "workstream"},
 						ReferenceDirection: "inbound",
 						Validation:         "strict",
@@ -23,7 +23,7 @@ func TestValidateCrossNamespaceReference(t *testing.T) {
 			},
 		},
 		"domain:organizational": {
-			NamespaceID: ConstMagic09ae1f1a,
+			NamespaceID: "domain:organizational",
 			Layer:       "domain",
 			Domain:      "organizational",
 			Integration: &NamespaceIntegration{
@@ -49,40 +49,40 @@ func TestValidateCrossNamespaceReference(t *testing.T) {
 		description   string
 	}{
 		{
-			name:          ConstMagic496ddb73,
+			name:          "same namespace allowed",
 			fromNamespace: "zqk:kernel",
 			toNamespace:   "zqk:kernel",
 			objectType:    "goal",
 			namespaceInfo: namespaceInfo,
 			wantErr:       false,
-			description:   ConstMagic4b542487,
+			description:   "References within same namespace are always allowed",
 		},
 		{
-			name:          ConstMagic5f56273a,
-			fromNamespace: ConstMagic09ae1f1a,
+			name:          "allowed cross-namespace reference",
+			fromNamespace: "domain:organizational",
 			toNamespace:   "zqk:kernel",
 			objectType:    "goal",
 			namespaceInfo: namespaceInfo,
 			wantErr:       false,
-			description:   ConstMagic50c81e49,
+			description:   "Organizational domain can reference kernel goals",
 		},
 		{
-			name:          ConstMagic69ec3ffb,
-			fromNamespace: ConstMagic09ae1f1a,
+			name:          "kernel can always be referenced",
+			fromNamespace: "domain:organizational",
 			toNamespace:   "zqk:kernel",
 			objectType:    "backlog_item",
 			namespaceInfo: namespaceInfo,
 			wantErr:       false,
-			description:   ConstMagicabbc08fa,
+			description:   "Kernel namespace can always be referenced (default rule)",
 		},
 		{
-			name:          ConstMagic49eca976,
-			fromNamespace: ConstMagic2fcd08f9,
-			toNamespace:   ConstMagic09ae1f1a,
+			name:          "missing namespace info allows by default",
+			fromNamespace: "domain:financial",
+			toNamespace:   "domain:organizational",
 			objectType:    "organization",
 			namespaceInfo: namespaceInfo,
 			wantErr:       false,
-			description:   ConstMagicde3b4a10,
+			description:   "Missing namespace info allows reference (backward compatibility)",
 		},
 	}
 
@@ -90,7 +90,7 @@ func TestValidateCrossNamespaceReference(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			err := ValidateCrossNamespaceReference(tt.fromNamespace, tt.toNamespace, tt.objectType, tt.namespaceInfo)
 			if (err != nil) != tt.wantErr {
-				t.Errorf(ConstMagicd450eb79, err, tt.wantErr, tt.description)
+				t.Errorf("ValidateCrossNamespaceReference() error = %v, wantErr %v (%s)", err, tt.wantErr, tt.description)
 			}
 		})
 	}
@@ -108,13 +108,13 @@ func TestParseNamespaceFromReference(t *testing.T) {
 		description      string
 	}{
 		{
-			name:             ConstMagicbb66ed6c,
-			refID:            ConstMagic30a7cab5,
+			name:             "full namespace format",
+			refID:            "zqk:kernel:goal:GOAL-123",
 			defaultNamespace: "zqk:kernel",
 			wantNamespaceID:  "zqk:kernel",
 			wantObjectType:   "goal",
 			wantObjectID:     "GOAL-123",
-			description:      ConstMagicf37e2ea8,
+			description:      "Full namespace format with all components",
 		},
 		{
 			name:             "short format",
@@ -123,7 +123,7 @@ func TestParseNamespaceFromReference(t *testing.T) {
 			wantNamespaceID:  "zqk:kernel",
 			wantObjectType:   "goal",
 			wantObjectID:     "GOAL-123",
-			description:      ConstMagic42f04d07,
+			description:      "Short format assumes default namespace",
 		},
 		{
 			name:             "legacy format",
@@ -132,85 +132,85 @@ func TestParseNamespaceFromReference(t *testing.T) {
 			wantNamespaceID:  "zqk:kernel",
 			wantObjectType:   "",
 			wantObjectID:     "GOAL-123",
-			description:      ConstMagic9724ef5e,
+			description:      "Legacy format uses default namespace, no object type",
 		},
 		{
-			name:             ConstMagic21d4e8e5,
-			refID:            ConstMagiccbd48a9f,
+			name:             "domain namespace format",
+			refID:            "domain:organizational:organization:ORG-001",
 			defaultNamespace: "zqk:kernel",
-			wantNamespaceID:  ConstMagic09ae1f1a,
+			wantNamespaceID:  "domain:organizational",
 			wantObjectType:   "organization",
 			wantObjectID:     "ORG-001",
-			description:      ConstMagic2af5f76c,
+			description:      "Domain namespace format",
 		},
 		// Account reference handling (special case)
 		// Note: ParseNamespace treats "account:username" as short format (account is not a valid layer)
 		// So it returns zqk:kernel, account, username
 		// The !strings.HasPrefix check prevents further short format parsing, but ParseNamespace already parsed it
 		{
-			name:             ConstMagicc2564f04,
-			refID:            ConstMagica0ffc4c5,
+			name:             "account reference format",
+			refID:            "account:username",
 			defaultNamespace: "zqk:kernel",
 			wantNamespaceID:  "zqk:kernel",
 			wantObjectType:   "account",
 			wantObjectID:     "username",
-			description:      ConstMagic6289d969,
+			description:      "Account reference format (account:username) parsed as short format by ParseNamespace",
 		},
 		{
-			name:             ConstMagicda1747d6,
-			refID:            ConstMagic32be850a,
+			name:             "account reference with default",
+			refID:            "account:testuser",
 			defaultNamespace: "zqk:kernel",
 			wantNamespaceID:  "zqk:kernel",
 			wantObjectType:   "account",
 			wantObjectID:     "testuser",
-			description:      ConstMagic2c4b37c5,
+			description:      "Account reference parsed as short format (account is not a namespace layer)",
 		},
 		// Edge cases in short format
 		{
-			name:             ConstMagic24de4f7e,
+			name:             "short format with empty ID",
 			refID:            "goal:",
 			defaultNamespace: "zqk:kernel",
 			wantNamespaceID:  "zqk:kernel",
 			wantObjectType:   "goal",
 			wantObjectID:     "",
-			description:      ConstMagic451891a9,
+			description:      "Short format with empty ID",
 		},
 		{
-			name:             ConstMagicc1eddb6b,
-			refID:            ConstMagicb04d704b,
+			name:             "short format with complex ID",
+			refID:            "milestone:MIL-001-2024",
 			defaultNamespace: "zqk:kernel",
 			wantNamespaceID:  "zqk:kernel",
 			wantObjectType:   "milestone",
 			wantObjectID:     "MIL-001-2024",
-			description:      ConstMagicb705320a,
+			description:      "Short format with complex ID containing dashes",
 		},
 		{
-			name:             ConstMagic3dfd7c39,
-			refID:            ConstMagicf4559c13,
+			name:             "short format with underscore kind",
+			refID:            "backlog_item:BLI-123",
 			defaultNamespace: "zqk:kernel",
 			wantNamespaceID:  "zqk:kernel",
 			wantObjectType:   "backlog_item",
 			wantObjectID:     "BLI-123",
-			description:      ConstMagicba2c40bb,
+			description:      "Short format with underscore in kind name",
 		},
 		// Legacy format edge cases
 		{
-			name:             ConstMagic1cd56f48,
-			refID:            ConstMagic2c41ec06,
+			name:             "legacy format with complex ID",
+			refID:            "GOAL-123-2024-Q1",
 			defaultNamespace: "zqk:kernel",
 			wantNamespaceID:  "zqk:kernel",
 			wantObjectType:   "",
-			wantObjectID:     ConstMagic2c41ec06,
-			description:      ConstMagicdac25be2,
+			wantObjectID:     "GOAL-123-2024-Q1",
+			description:      "Legacy format with complex ID",
 		},
 		{
-			name:             ConstMagicead9fbbb,
+			name:             "legacy format with numeric ID",
 			refID:            "12345",
 			defaultNamespace: "zqk:kernel",
 			wantNamespaceID:  "zqk:kernel",
 			wantObjectType:   "",
 			wantObjectID:     "12345",
-			description:      ConstMagic63b71535,
+			description:      "Legacy format with purely numeric ID",
 		},
 		// Malformed reference formats
 		{
@@ -220,16 +220,16 @@ func TestParseNamespaceFromReference(t *testing.T) {
 			wantNamespaceID:  "zqk:kernel",
 			wantObjectType:   "",
 			wantObjectID:     "",
-			description:      ConstMagic084a4190,
+			description:      "Empty reference should use default namespace",
 		},
 		{
-			name:             ConstMagic4a880a8e,
-			refID:            ConstMagicafaf32e8,
+			name:             "multiple colons (malformed)",
+			refID:            "zqk:kernel:goal:GOAL-123:extra",
 			defaultNamespace: "zqk:kernel",
 			wantNamespaceID:  "zqk:kernel",
 			wantObjectType:   "goal",
 			wantObjectID:     "GOAL-123:extra",
-			description:      ConstMagica49884ad,
+			description:      "Multiple colons should be handled by ParseNamespace",
 		},
 		{
 			name:             "only colons",
@@ -244,28 +244,28 @@ func TestParseNamespaceFromReference(t *testing.T) {
 			wantNamespaceID: "zqk:kernel",
 			wantObjectType:  "",
 			wantObjectID:    "::",
-			description:     ConstMagic8047b852,
+			description:     "Only colons - malformed, actual behavior shows objectID = ::",
 		},
 		// Different default namespaces
 		{
-			name:             ConstMagic6becd536,
-			refID:            ConstMagic6a6c9a77,
-			defaultNamespace: ConstMagic09ae1f1a,
+			name:             "short format with different default",
+			refID:            "organization:ORG-001",
+			defaultNamespace: "domain:organizational",
 			// ParseNamespace treats "organization" as short format, returns zqk:kernel
 			// So it uses the parsed namespace, not the default
 			wantNamespaceID: "zqk:kernel",
 			wantObjectType:  "organization",
 			wantObjectID:    "ORG-001",
-			description:     ConstMagice38adf74,
+			description:     "Short format parsed by ParseNamespace (returns zqk:kernel, not default)",
 		},
 		{
-			name:             ConstMagicb85f60f9,
+			name:             "legacy format with different default",
 			refID:            "ORG-001",
-			defaultNamespace: ConstMagic09ae1f1a,
-			wantNamespaceID:  ConstMagic09ae1f1a,
+			defaultNamespace: "domain:organizational",
+			wantNamespaceID:  "domain:organizational",
 			wantObjectType:   "",
 			wantObjectID:     "ORG-001",
-			description:      ConstMagic5bc08d07,
+			description:      "Legacy format respects provided default namespace",
 		},
 	}
 
@@ -273,13 +273,13 @@ func TestParseNamespaceFromReference(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			gotNamespaceID, gotObjectType, gotObjectID := ParseNamespaceFromReference(tt.refID, tt.defaultNamespace)
 			if gotNamespaceID != tt.wantNamespaceID {
-				t.Errorf(ConstMagic6cd1457d, gotNamespaceID, tt.wantNamespaceID, tt.description)
+				t.Errorf("ParseNamespaceFromReference() namespaceID = %v, want %v (%s)", gotNamespaceID, tt.wantNamespaceID, tt.description)
 			}
 			if gotObjectType != tt.wantObjectType {
-				t.Errorf(ConstMagice8f6c978, gotObjectType, tt.wantObjectType, tt.description)
+				t.Errorf("ParseNamespaceFromReference() objectType = %v, want %v (%s)", gotObjectType, tt.wantObjectType, tt.description)
 			}
 			if gotObjectID != tt.wantObjectID {
-				t.Errorf(ConstMagica6f85afd, gotObjectID, tt.wantObjectID, tt.description)
+				t.Errorf("ParseNamespaceFromReference() objectID = %v, want %v (%s)", gotObjectID, tt.wantObjectID, tt.description)
 			}
 		})
 	}

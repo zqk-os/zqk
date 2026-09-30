@@ -17,22 +17,22 @@ func TestLoadConfigFromActualFile(t *testing.T) {
 	// Find project root
 	projectRoot := findProjectRootForTest()
 	if projectRoot == emptyValue {
-		t.Skip(ConstMagicc4ca6937)
+		t.Skip("Could not find project root - skipping actual file test")
 	}
 
-	configPath := filepath.Join(projectRoot, paths.ProcessInternalConfigsDir, ConstMagic014a7ae7)
+	configPath := filepath.Join(projectRoot, paths.ProcessInternalConfigsDir, "id_prefixes_config.yaml")
 	if _, err := fileutil.Stat(configPath); err != nil {
-		t.Skipf(ConstMagic61786fc7, configPath)
+		t.Skipf("Config file not found at %s - skipping", configPath)
 	}
 
 	oldWd, err := fileutil.Getwd()
 	if err != nil {
-		t.Fatalf(ConstMagic25cbf3ea, err)
+		t.Fatalf("Failed to get current working directory: %v", err)
 	}
 	defer fileutil.Chdir(oldWd)
 
 	if err := fileutil.Chdir(projectRoot); err != nil {
-		t.Fatalf(ConstMagic0b7b38b2, err)
+		t.Fatalf("Failed to change working directory: %v", err)
 	}
 
 	// Reset global config
@@ -41,19 +41,19 @@ func TestLoadConfigFromActualFile(t *testing.T) {
 	// Try to load the config file directly
 	config, err := LoadIDPrefixesConfig(configPath)
 	if err != nil {
-		t.Fatalf(ConstMagicbe132181, err)
+		t.Fatalf("LoadIDPrefixesConfig() failed: %v", err)
 	}
 
 	if config == nil {
-		t.Fatal(ConstMagic6c5ff97e)
+		t.Fatal("LoadIDPrefixesConfig() returned nil")
 	}
 
 	// Check decision prefixes
 	prefixes := config.GetPrefixesForKind("decision")
-	t.Logf(ConstMagic2609e252, prefixes)
+	t.Logf("Loaded prefixes from actual file: %v", prefixes)
 
 	if len(prefixes) < 2 {
-		t.Errorf(ConstMagic134ce651, len(prefixes), prefixes)
+		t.Errorf("Expected at least 2 prefixes for decision, got %d: %v", len(prefixes), prefixes)
 	}
 
 	hasDEC := false
@@ -68,24 +68,24 @@ func TestLoadConfigFromActualFile(t *testing.T) {
 	}
 
 	if !hasDEC {
-		t.Error(ConstMagic1065eb8d)
+		t.Error("Missing DEC- prefix")
 	}
 	if !hasADR {
-		t.Errorf(ConstMagicb4e8dac1, prefixes)
+		t.Errorf("Missing ADR- prefix (prefixes: %v)", prefixes)
 	}
 
 	// Now test GetGlobalIDPrefixesConfig
 	ResetGlobalIDPrefixesConfig()
 	globalConfig := GetGlobalIDPrefixesConfig()
 	if globalConfig == nil {
-		t.Fatal(ConstMagica6b206af)
+		t.Fatal("GetGlobalIDPrefixesConfig() returned nil")
 	}
 
 	globalPrefixes := globalConfig.GetPrefixesForKind("decision")
-	t.Logf(ConstMagic391e9945, globalPrefixes)
+	t.Logf("GetGlobalIDPrefixesConfig() returns prefixes: %v", globalPrefixes)
 
 	if len(globalPrefixes) < 2 {
-		t.Errorf(ConstMagic27683689, globalPrefixes)
+		t.Errorf("GetGlobalIDPrefixesConfig() returned fewer prefixes than expected: %v", globalPrefixes)
 	}
 }
 

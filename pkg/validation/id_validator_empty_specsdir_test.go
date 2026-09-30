@@ -21,13 +21,13 @@ func TestGetIDValidatorWithEmptySpecsDir(t *testing.T) {
 
 	specsDir := filepath.Join(projectRoot, paths.ProcessInternalObjectSpecsDir)
 	if err := fileutil.MkdirAll(specsDir, paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagice9cc074e, err)
+		t.Fatalf("Failed to create specs directory: %v", err)
 	}
 
 	// Create configs directory (config file should be in configs/ subdirectory)
 	configsDir := filepath.Join(projectRoot, paths.ProcessInternalConfigsDir)
 	if err := fileutil.MkdirAll(configsDir, paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagic2967e378, err)
+		t.Fatalf("Failed to create configs directory: %v", err)
 	}
 
 	// Create spec with both prefixes
@@ -39,11 +39,11 @@ id_prefixes:
   - ADR-
 `
 	if err := fileutil.WriteFile(specFile, []byte(specContent), paths.FilePerm644); err != nil {
-		t.Fatalf(ConstMagic186b95e3, err)
+		t.Fatalf("Failed to write spec file: %v", err)
 	}
 
 	// Create config with both prefixes (in configs/ subdirectory)
-	configFile := filepath.Join(configsDir, ConstMagic014a7ae7)
+	configFile := filepath.Join(configsDir, "id_prefixes_config.yaml")
 	configContent := `version: "1.0.0"
 kind_to_prefixes:
   decision:
@@ -51,17 +51,17 @@ kind_to_prefixes:
     - ADR-
 `
 	if err := fileutil.WriteFile(configFile, []byte(configContent), paths.FilePerm644); err != nil {
-		t.Fatalf(ConstMagic8e96c016, err)
+		t.Fatalf("Failed to write config file: %v", err)
 	}
 
 	oldWd, err := fileutil.Getwd()
 	if err != nil {
-		t.Fatalf(ConstMagic25cbf3ea, err)
+		t.Fatalf("Failed to get current working directory: %v", err)
 	}
 	defer fileutil.Chdir(oldWd)
 
 	if err := fileutil.Chdir(projectRoot); err != nil {
-		t.Fatalf(ConstMagic0b7b38b2, err)
+		t.Fatalf("Failed to change working directory: %v", err)
 	}
 
 	// Reset global config, paths config, and global validator
@@ -73,30 +73,30 @@ kind_to_prefixes:
 	// GetIDValidator with empty specsDir (this is what system check does)
 	idValidator := GetIDValidator()
 	if idValidator == nil {
-		t.Fatal(ConstMagice7eb6ae2)
+		t.Fatal("GetIDValidator() returned nil")
 	}
 
-	t.Logf(ConstMagic83e1c533, idValidator.specsDir)
+	t.Logf("Validator specsDir: %s", idValidator.specsDir)
 
 	// ReloadPatterns (this is what system check does)
 	if err := idValidator.ReloadPatterns(); err != nil {
-		t.Fatalf(ConstMagic342670e1, err)
+		t.Fatalf("ReloadPatterns() failed: %v", err)
 	}
 
 	// Check prefixes
 	validPrefixes := idValidator.GetValidPrefixes("decision")
-	t.Logf(ConstMagic217e901d, validPrefixes)
+	t.Logf("Valid prefixes: %v", validPrefixes)
 
 	if len(validPrefixes) != 2 {
-		t.Errorf(ConstMagicfdb60e48, len(validPrefixes), validPrefixes)
+		t.Errorf("Expected 2 prefixes, got %d: %v", len(validPrefixes), validPrefixes)
 	}
 
 	// Test validation
 	valid, err := idValidator.ValidateID("ADR-001", "decision")
 	if err != nil {
-		t.Fatalf(ConstMagice9712204, err)
+		t.Fatalf("ValidateID() error: %v", err)
 	}
 	if !valid {
-		t.Errorf(ConstMagic86b6b453, validPrefixes)
+		t.Errorf("ADR-001 should be valid (prefixes: %v)", validPrefixes)
 	}
 }

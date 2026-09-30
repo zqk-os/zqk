@@ -49,7 +49,7 @@ func DefaultValidationTierConfig() *ValidationTierConfig {
 			// Tier 3: Informational (allowed)
 			"min_length":    3,
 			"max_length":    3,
-			"semantic_type": 3, ConstMagicExtracted_69: // Tier 4: Recommendations (allowed)
+			"semantic_type": 3, "recommendation": // Tier 4: Recommendations (allowed)
 			4,
 		},
 	}
@@ -173,7 +173,7 @@ func (c *ValidationTierConfig) FormatBlockingErrors(errors []ValidationError) st
 	var messages []string
 	for _, err := range errors {
 		tier := c.GetTierForRule(err.Rule)
-		messages = append(messages, fmt.Sprintf(ConstMagic1ac9633d, err.Field, tier, err.Message))
+		messages = append(messages, fmt.Sprintf("%s (Tier %d): %s", err.Field, tier, err.Message))
 	}
-	return fmt.Sprintf(ConstMagic51a3accc, fmt.Sprintf("%v", messages))
+	return fmt.Sprintf("blocking validation errors: %s", fmt.Sprintf("%v", messages))
 }

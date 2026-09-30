@@ -22,17 +22,17 @@ func TestIDValidatorConfigOverride(t *testing.T) {
 	// Create object_specs directory
 	specsDir := filepath.Join(projectRoot, paths.ProcessInternalObjectSpecsDir)
 	if err := fileutil.MkdirAll(specsDir, paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagice9cc074e, err)
+		t.Fatalf("Failed to create specs directory: %v", err)
 	}
 
 	// Create configs directory (config file should be in configs/ subdirectory)
 	configsDir := filepath.Join(projectRoot, paths.ProcessInternalConfigsDir)
 	if err := fileutil.MkdirAll(configsDir, paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagic2967e378, err)
+		t.Fatalf("Failed to create configs directory: %v", err)
 	}
 
 	// Create a spec file for agent_architecture with id_pattern
-	specFile := filepath.Join(specsDir, ConstMagic6ee6fd0e)
+	specFile := filepath.Join(specsDir, "agent_architecture.yaml")
 	specContent := `ontology: agent_architecture
 schema_version: "` + objects.DefaultSchemaVersion + `"
 fields:
@@ -42,24 +42,24 @@ fields:
 id_template: AGENT-ARCH-{sequence}
 `
 	if err := fileutil.WriteFile(specFile, []byte(specContent), paths.FilePerm644); err != nil {
-		t.Fatalf(ConstMagic186b95e3, err)
+		t.Fatalf("Failed to write spec file: %v", err)
 	}
 
 	// Create id_prefixes_config.yaml with AGENT-ARCH- prefix (in configs/ subdirectory)
-	configFile := filepath.Join(configsDir, ConstMagic014a7ae7)
+	configFile := filepath.Join(configsDir, "id_prefixes_config.yaml")
 	configContent := `version: "1.0.0"
 kind_to_prefixes:
   agent_architecture:
     - AGENT-ARCH-  # Uses AGENT-ARCH-### format per spec
 `
 	if err := fileutil.WriteFile(configFile, []byte(configContent), paths.FilePerm644); err != nil {
-		t.Fatalf(ConstMagic8e96c016, err)
+		t.Fatalf("Failed to write config file: %v", err)
 	}
 
 	// Create a marker file (go.mod) so findPathByWalkingUp can identify project root
 	goModFile := filepath.Join(projectRoot, "go.mod")
 	if err := fileutil.WriteFile(goModFile, []byte("module test\n"), paths.FilePerm644); err != nil {
-		t.Fatalf(ConstMagica76bb0bc, err)
+		t.Fatalf("Failed to create go.mod marker: %v", err)
 	}
 
 	// Reset global configs BEFORE changing directory (they cache working directory)
@@ -69,12 +69,12 @@ kind_to_prefixes:
 	// Set the working directory to the project root so findIDPrefixesConfig can find it
 	oldWd, err := fileutil.Getwd()
 	if err != nil {
-		t.Fatalf(ConstMagic25cbf3ea, err)
+		t.Fatalf("Failed to get current working directory: %v", err)
 	}
 	defer fileutil.Chdir(oldWd)
 
 	if err := fileutil.Chdir(projectRoot); err != nil {
-		t.Fatalf(ConstMagic0b7b38b2, err)
+		t.Fatalf("Failed to change working directory: %v", err)
 	}
 
 	// Reset again after directory change to ensure fresh discovery
@@ -86,13 +86,13 @@ kind_to_prefixes:
 
 	// Load patterns - this should load from our test config
 	if err := validator.LoadPatterns(); err != nil {
-		t.Fatalf(ConstMagic82cf76ae, err)
+		t.Fatalf("Failed to load patterns: %v", err)
 	}
 
 	// Test 1: Check that GetValidPrefixes returns AGENT-ARCH-, not AGE-
-	prefixes := validator.GetValidPrefixes(ConstMagic3255806e)
+	prefixes := validator.GetValidPrefixes("agent_architecture")
 	if len(prefixes) == 0 {
-		t.Fatal(ConstMagic218b3979)
+		t.Fatal("No prefixes found for agent_architecture")
 	}
 
 	// The config should override the inferred prefix
@@ -107,32 +107,32 @@ kind_to_prefixes:
 	}
 
 	if !foundAGENTARCH {
-		t.Errorf(ConstMagic082c21ff, prefixes)
-		t.Log(ConstMagic400c8616)
-		t.Logf(ConstMagic69338a88, configFile)
-		t.Logf(ConstMagicfda8fd12, projectRoot)
+		t.Errorf("Expected AGENT-ARCH- in prefixes, got: %v", prefixes)
+		t.Log("This indicates the config override is not working correctly")
+		t.Logf("Config file location: %s", configFile)
+		t.Logf("Working directory: %s", projectRoot)
 	}
 
 	// Test 2: Validate that AGENT-ARCH-001 is valid
-	valid, err := validator.ValidateID("AGENT-ARCH-001", ConstMagic3255806e)
+	valid, err := validator.ValidateID("AGENT-ARCH-001", "agent_architecture")
 	if err != nil {
-		t.Fatalf(ConstMagicbcc473f4, err)
+		t.Fatalf("Validation error: %v", err)
 	}
 	if !valid {
-		t.Error(ConstMagic21b3fb21)
-		t.Logf(ConstMagicc5092f9f, prefixes)
+		t.Error("AGENT-ARCH-001 should be valid for agent_architecture, but validator returned false")
+		t.Logf("Prefixes available: %v", prefixes)
 	}
 
 	// Test 3: Validate that AGE-001 is NOT valid (if config override worked)
-	valid, err = validator.ValidateID("AGE-001", ConstMagic3255806e)
+	valid, err = validator.ValidateID("AGE-001", "agent_architecture")
 	if err != nil {
-		t.Fatalf(ConstMagicbcc473f4, err)
+		t.Fatalf("Validation error: %v", err)
 	}
 	// If config override worked, AGE-001 should be invalid
 	// If inference is still being used, AGE-001 might be valid (which is the bug)
 	if valid && foundAGENTARCH {
 		// This is inconsistent - we have AGENT-ARCH- in prefixes but AGE-001 is also valid
-		t.Errorf(ConstMagic0d7e82be, prefixes)
+		t.Errorf("AGE-001 should not be valid if config override worked (prefixes: %v)", prefixes)
 	}
 }
 
@@ -148,13 +148,13 @@ func TestIDValidatorConfigOverrideDecision(t *testing.T) {
 	// Create object_specs directory
 	specsDir := filepath.Join(projectRoot, paths.ProcessInternalObjectSpecsDir)
 	if err := fileutil.MkdirAll(specsDir, paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagice9cc074e, err)
+		t.Fatalf("Failed to create specs directory: %v", err)
 	}
 
 	// Create configs directory (config file should be in configs/ subdirectory)
 	configsDir := filepath.Join(projectRoot, paths.ProcessInternalConfigsDir)
 	if err := fileutil.MkdirAll(configsDir, paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagic2967e378, err)
+		t.Fatalf("Failed to create configs directory: %v", err)
 	}
 
 	// Create a spec file for decision
@@ -163,11 +163,11 @@ func TestIDValidatorConfigOverrideDecision(t *testing.T) {
 schema_version: "` + objects.DefaultSchemaVersion + `"
 `
 	if err := fileutil.WriteFile(specFile, []byte(specContent), paths.FilePerm644); err != nil {
-		t.Fatalf(ConstMagic186b95e3, err)
+		t.Fatalf("Failed to write spec file: %v", err)
 	}
 
 	// Create id_prefixes_config.yaml with both DEC- and ADR- prefixes (in configs/ subdirectory)
-	configFile := filepath.Join(configsDir, ConstMagic014a7ae7)
+	configFile := filepath.Join(configsDir, "id_prefixes_config.yaml")
 	configContent := `version: "1.0.0"
 kind_to_prefixes:
   decision:
@@ -175,13 +175,13 @@ kind_to_prefixes:
     - ADR-  # Architecture Decision Record format (backward compatibility)
 `
 	if err := fileutil.WriteFile(configFile, []byte(configContent), paths.FilePerm644); err != nil {
-		t.Fatalf(ConstMagic8e96c016, err)
+		t.Fatalf("Failed to write config file: %v", err)
 	}
 
 	// Create a marker file (go.mod) so findPathByWalkingUp can identify project root
 	goModFile := filepath.Join(projectRoot, "go.mod")
 	if err := fileutil.WriteFile(goModFile, []byte("module test\n"), paths.FilePerm644); err != nil {
-		t.Fatalf(ConstMagica76bb0bc, err)
+		t.Fatalf("Failed to create go.mod marker: %v", err)
 	}
 
 	// Reset global configs BEFORE changing directory (they cache working directory)
@@ -191,12 +191,12 @@ kind_to_prefixes:
 	// Set the working directory to the project root so findIDPrefixesConfig can find it
 	oldWd, err := fileutil.Getwd()
 	if err != nil {
-		t.Fatalf(ConstMagic25cbf3ea, err)
+		t.Fatalf("Failed to get current working directory: %v", err)
 	}
 	defer fileutil.Chdir(oldWd)
 
 	if err := fileutil.Chdir(projectRoot); err != nil {
-		t.Fatalf(ConstMagic0b7b38b2, err)
+		t.Fatalf("Failed to change working directory: %v", err)
 	}
 
 	// Reset again after directory change to ensure fresh discovery
@@ -208,13 +208,13 @@ kind_to_prefixes:
 
 	// Load patterns - this should load from our test config
 	if err := validator.LoadPatterns(); err != nil {
-		t.Fatalf(ConstMagic82cf76ae, err)
+		t.Fatalf("Failed to load patterns: %v", err)
 	}
 
 	// Check that GetValidPrefixes returns both DEC- and ADR-
 	prefixes := validator.GetValidPrefixes("decision")
 	if len(prefixes) == 0 {
-		t.Fatal(ConstMagicc1aec599)
+		t.Fatal("No prefixes found for decision")
 	}
 
 	// Both prefixes should be present
@@ -230,26 +230,26 @@ kind_to_prefixes:
 	}
 
 	if !foundDEC {
-		t.Errorf(ConstMagic77520e0f, prefixes)
+		t.Errorf("Expected DEC- in prefixes, got: %v", prefixes)
 	}
 	if !foundADR {
-		t.Errorf(ConstMagicf55860c4, prefixes)
+		t.Errorf("Expected ADR- in prefixes, got: %v", prefixes)
 	}
 
 	// Both DEC-001 and ADR-001 should be valid
 	valid, err := validator.ValidateID("DEC-001", "decision")
 	if err != nil {
-		t.Fatalf(ConstMagicbcc473f4, err)
+		t.Fatalf("Validation error: %v", err)
 	}
 	if !valid {
-		t.Error(ConstMagicd670938b)
+		t.Error("DEC-001 should be valid for decision")
 	}
 
 	valid, err = validator.ValidateID("ADR-001", "decision")
 	if err != nil {
-		t.Fatalf(ConstMagicbcc473f4, err)
+		t.Fatalf("Validation error: %v", err)
 	}
 	if !valid {
-		t.Errorf(ConstMagica604e41b, prefixes)
+		t.Errorf("ADR-001 should be valid for decision (prefixes: %v)", prefixes)
 	}
 }

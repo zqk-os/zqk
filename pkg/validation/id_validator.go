@@ -169,7 +169,7 @@ func (v *IDValidator) SetGraphConnection(conn provider.GraphConnection) {
 			// Must be called with lock held (read or write)
 			//
 			//nolint:unused // Called conditionally in loadPatternsUnlocked - may not be detected by static analysis
-			ProfileSystem))).Error(ConstMagic88972993, err).Log()
+			ProfileSystem))).Error("Error setting graph connection for ID validator: %v\n", err).Log()
 	}
 }
 

@@ -16,7 +16,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
-	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // Signer is the interface for signing QA reports.
@@ -55,9 +54,9 @@ func NewAuditorSigner(keyPath string) (*AuditorSigner, error) {
 		if data, err := fileutil.ReadFile(keyPath); err == nil {
 			block, rest := pem.Decode(data)
 			if len(rest) > 0 {
-				logging.FluentEvent(logging.GetLogger()).Error(fmt.Sprintf(validation.ConstMagic6d161184, keyPath), nil).Log()
+				logging.FluentEvent(logging.GetLogger()).Error(fmt.Sprintf("Warning: trailing data in QA key file %s\n", keyPath), nil).Log()
 			}
-			if block != nil && block.Type == validation.ConstMagicExtracted_68 {
+			if block != nil && block.Type == "EC PRIVATE KEY" {
 				priv, err := x509.ParseECPrivateKey(block.Bytes)
 				if err == nil {
 					return &AuditorSigner{privateKey: priv}, nil
@@ -74,15 +73,15 @@ func NewAuditorSigner(keyPath string) (*AuditorSigner, error) {
 	// Save new key if path provided
 	if keyPath != "" {
 		if err := fileutil.MkdirAll(filepath.Dir(keyPath), paths.DirPerm700); err != nil {
-			logging.FluentEvent(logging.GetLogger()).Error(fmt.Sprintf(validation.ConstMagic708b5a99, err), nil).Log()
+			logging.FluentEvent(logging.GetLogger()).Error(fmt.Sprintf("failed to create directory for QA key: %v\n", err), nil).Log()
 		}
 		der, err := x509.MarshalECPrivateKey(priv)
 		if err != nil {
-			logging.FluentEvent(logging.GetLogger()).Error(fmt.Sprintf(validation.ConstMagice0d28224, err), nil).Log()
+			logging.FluentEvent(logging.GetLogger()).Error(fmt.Sprintf("failed to marshal EC private key: %v\n", err), nil).Log()
 		} else {
-			block := &pem.Block{Type: validation.ConstMagicExtracted_68, Bytes: der}
+			block := &pem.Block{Type: "EC PRIVATE KEY", Bytes: der}
 			if err := fileutil.WriteSecureFile(keyPath, pem.EncodeToMemory(block)); err != nil {
-				logging.FluentEvent(logging.GetLogger()).Error(fmt.Sprintf(validation.ConstMagicc49c97b7, err), nil).Log()
+				logging.FluentEvent(logging.GetLogger()).Error(fmt.Sprintf("failed to write QA key file: %v\n", err), nil).Log()
 			}
 		}
 	}
@@ -134,7 +133,7 @@ func GetAuditorPublicKeyHex(keyPath string) (string, error) {
 		}
 		return "", fmt.Errorf("auditor public key is not ECDSA")
 	}
-	if block.Type == validation.ConstMagicExtracted_68 {
+	if block.Type == "EC PRIVATE KEY" {
 		priv, err := x509.ParseECPrivateKey(block.Bytes)
 		if err != nil {
 			return "", fmt.Errorf("parse EC private key: %w", err)
@@ -144,7 +143,6 @@ func GetAuditorPublicKeyHex(keyPath string) (string, error) {
 	}
 	return "", fmt.Errorf("unsupported PEM block type: %s", block.Type)
 }
-
 
 // QASuccess object kind.
 const KindQASuccess = "qa_success"
@@ -162,11 +160,11 @@ type QAReport struct {
 func VerifySignature(pubHex string, data []byte, sigHex string) error {
 	sig, err := hex.DecodeString(sigHex)
 	if err != nil {
-		return fmt.Errorf(validation.ConstMagic2d0ec3c6, err)
+		return fmt.Errorf("invalid signature hex: %w", err)
 	}
 
 	if len(pubHex) < 64 {
-		return fmt.Errorf(validation.ConstMagic37c27833)
+		return fmt.Errorf("invalid public key length")
 	}
 
 	x := new(big.Int)
@@ -193,7 +191,7 @@ func VerifySignature(pubHex string, data []byte, sigHex string) error {
 func VerifyQAReportSignature(report QAReport, trustedPubHex string) error {
 	data := []byte(report.ItemID + report.Status)
 	if err := VerifySignature(trustedPubHex, data, report.Signature); err != nil {
-		return fmt.Errorf(validation.ConstMagic9f963b73, report.ItemID)
+		return fmt.Errorf("cryptographic signature verification failed for %s", report.ItemID)
 	}
 	return nil
 }

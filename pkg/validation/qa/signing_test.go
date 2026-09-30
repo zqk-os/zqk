@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
-	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 func TestAuditorSigner_Sign(t *testing.T) {
@@ -13,31 +12,31 @@ func TestAuditorSigner_Sign(t *testing.T) {
 	keyPath := filepath.Join(tmpDir, "auditor.priv")
 	signer, err := NewAuditorSigner(keyPath)
 	if err != nil {
-		t.Fatalf(validation.ConstMagic2d053c17, err)
+		t.Fatalf("failed to create signer: %v", err)
 	}
 
 	// Verify file was created
 	if _, err := fileutil.Stat(keyPath); err != nil {
-		t.Errorf(validation.ConstMagic2c41d347, err)
+		t.Errorf("private key file not created: %v", err)
 	}
 
-	data := []byte(validation.ConstMagicc9dd2357)
+	data := []byte("audit-report-data")
 	sig, err := signer.Sign(data)
 	if err != nil {
-		t.Fatalf(validation.ConstMagic9ecf0de4, err)
+		t.Fatalf("failed to sign data: %v", err)
 	}
 
 	if sig == "" {
-		t.Error(validation.ConstMagiced297c89)
+		t.Error("expected non-empty signature")
 	}
 
 	// Reload signer from existing key
 	signer2, err := NewAuditorSigner(keyPath)
 	if err != nil {
-		t.Fatalf(validation.ConstMagic6b2dda5f, err)
+		t.Fatalf("failed to reload signer: %v", err)
 	}
 	if signer2.PublicKey() != signer.PublicKey() {
-		t.Error(validation.ConstMagic49fd2507)
+		t.Error("reloaded signer has different public key")
 	}
 
 	t.Logf("Signature: %s", sig)

@@ -13,26 +13,18 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
-	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 func TestGuidanceEngine_Recommend_AllBranches(t *testing.T) {
 	ge := NewGuidanceEngine()
 	types := []string{
-		"coverage",
-		validation.ConstMagicExtracted_34,
-		"di_violation",
-		validation.ConstMagicExtracted_39,
-		"dry_violation",
-		validation.ConstMagicExtracted_44,
-		validation.ConstMagicExtracted_50,
-		"unknown_failure_type",
+		"coverage", "concurrency_violation", "di_violation", "error_handling_debt", "dry_violation", "abstraction_violation", "smoke_and_mirrors", "unknown_failure_type",
 	}
 
 	for _, failureType := range types {
 		ctx := "test-context"
-		if failureType == validation.ConstMagicExtracted_44 {
-			g1 := ge.Recommend(failureType, validation.ConstMagiccd1ac283)
+		if failureType == "abstraction_violation" {
+			g1 := ge.Recommend(failureType, "conditional chain")
 			if g1.Summary == "" || len(g1.Steps) == 0 {
 				t.Errorf("empty guidance for %s with keyword", failureType)
 			}
@@ -559,10 +551,10 @@ func Bad() {
 		t.Fatal(err)
 	}
 	store.objs["BLI-PARSE-ERR"] = map[string]any{
-		objects.FieldKeyID:        "BLI-PARSE-ERR",
-		objects.FieldKeyTitle:     "Unparseable File Item",
-		objects.FieldKeyStatus:    objects.ObjectStatusComplete,
-		objects.FieldKeyArtifacts: []any{unparseableFile},
+		objects.FieldKeyID:           "BLI-PARSE-ERR",
+		objects.FieldKeyTitle:        "Unparseable File Item",
+		objects.FieldKeyStatus:       objects.ObjectStatusComplete,
+		objects.FieldKeyArtifacts:    []any{unparseableFile},
 		objects.FieldKeyCommitHashes: []any{"hash-1"},
 	}
 	svc.performAudit(ctx, "BLI-PARSE-ERR", objects.KindBacklogItem)
@@ -705,7 +697,7 @@ func doSomething() {}
 	}
 	found := false
 	for _, v := range violations {
-		if v.Type == validation.ConstMagic9ae33b8e {
+		if v.Type == "concurrency_violation" {
 			found = true
 			break
 		}
@@ -731,7 +723,7 @@ func doSomethingManaged(ctx context.Context) {}
 		t.Fatalf("AuditFile failed: %v", err)
 	}
 	for _, v := range violations {
-		if v.Type == validation.ConstMagic9ae33b8e {
+		if v.Type == "concurrency_violation" {
 			t.Error("unexpected unmanaged goroutine violation for managed code")
 		}
 	}
@@ -1134,5 +1126,3 @@ func TestAuditorService_RequirementAndCriteriaProof(t *testing.T) {
 		}
 	})
 }
-
-

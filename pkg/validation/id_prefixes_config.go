@@ -68,12 +68,12 @@ func LoadIDPrefixesConfig(configPath string) (*IDPrefixesConfig, error) {
 		configPath = findIDPrefixesConfig()
 		if configPath == emptyValue {
 			eventLogger := logging.NewEventLogger(pkgctx.NewSystemContext())
-			err := errfmt.Errorf(ConstMagic00fb6dac)
-			logging.FluentEvent(eventLogger).Error(ConstMagic060ff5a9, err).
+			err := errfmt.Errorf("ID prefixes config file not found")
+			logging.FluentEvent(eventLogger).Error("Failed to load ID prefixes config", err).
 				String("event", "config_load").
-				String("config_type", ConstMagic9d718edf).
-				String("error_type", ConstMagicExtracted_58).
-				String(ConstMagic5a9c8e34, "true").
+				String("config_type", "id_prefixes_config").
+				String("error_type", "file_not_found").
+				String("fallback_to_default", "true").
 				Log()
 			return nil, err
 		}
@@ -93,32 +93,32 @@ func parseIDPrefixesConfigFile(configPath string) (*IDPrefixesConfig, error) {
 
 	data, err := fileutil.ReadFile(configPath)
 	if err != nil {
-		loadErr := errfmt.Newf(ConstMagic148fda1b).Wrap(err)
+		loadErr := errfmt.Newf("failed to read ID prefixes config").Wrap(err)
 		errorType := "read_error"
 		if strings.Contains(loadErr.Error(), "permission") {
-			errorType = ConstMagice8ee8388
+			errorType = "permission_denied"
 		}
-		logging.FluentEvent(eventLogger).Error(ConstMagic060ff5a9, loadErr).
+		logging.FluentEvent(eventLogger).Error("Failed to load ID prefixes config", loadErr).
 			String("event", "config_load").
-			String("config_type", ConstMagic9d718edf).
+			String("config_type", "id_prefixes_config").
 			String("config_file", configPath).
 			String("error_type", errorType).
-			String(ConstMagic5a9c8e34, "true").
+			String("fallback_to_default", "true").
 			Log()
 		return nil, loadErr
 	}
 
 	var config IDPrefixesConfig
 	if err := yaml.Unmarshal(data, &config); err != nil {
-		parseErr := errfmt.Newf(ConstMagic026f9b38).Wrap(err)
+		parseErr := errfmt.Newf("failed to parse ID prefixes config").Wrap(err)
 		parseDetails := parseErr.Error()
-		logging.FluentEvent(eventLogger).Error(ConstMagic01d5ac58, parseErr).
+		logging.FluentEvent(eventLogger).Error("Failed to parse ID prefixes config", parseErr).
 			String("event", "config_load").
-			String("config_type", ConstMagic9d718edf).
+			String("config_type", "id_prefixes_config").
 			String("config_file", configPath).
 			String("error_type", "parse_error").
-			String(ConstMagic5c458148, parseDetails).
-			String(ConstMagic5a9c8e34, "true").
+			String("parse_error_details", parseDetails).
+			String("fallback_to_default", "true").
 			Log()
 		return nil, parseErr
 	}
@@ -134,10 +134,10 @@ func GetGlobalIDPrefixesConfig() *IDPrefixesConfig {
 	cfg, err := LoadIDPrefixesConfig(configPath)
 	if err != nil || cfg == nil {
 		eventLogger := logging.NewEventLogger(pkgctx.NewSystemContext())
-		eventLogger.LogWarning(ConstMagicb022a312, logging.String("event", "config_load"),
-			logging.String("config_type", ConstMagic9d718edf),
+		eventLogger.LogWarning("Falling back to default ID prefixes config", logging.String("event", "config_load"),
+			logging.String("config_type", "id_prefixes_config"),
 			logging.String("config_file", configPath),
-			logging.String(ConstMagic5a9c8e34, "true"))
+			logging.String("fallback_to_default", "true"))
 		return getDefaultIDPrefixesConfig()
 	}
 	return cfg
@@ -199,7 +199,7 @@ func getDefaultIDPrefixesConfig() *IDPrefixesConfig {
 			kindnames.PriorityPlan:        {"pplan", "p-plan", "plan", "pp"},
 			kindnames.TestCase:            {"test", "tc", "testcase"},
 			kindnames.AuditEvent:          {"ae", "audit", "event"},
-			kindnames.ChangeJournalEntry:  {"cje", "journal", ConstMagicExtracted_59},
+			kindnames.ChangeJournalEntry:  {"cje", "journal", "change_journal"},
 			kindnames.ObjectSpec:          {"spec", "ospec"},
 			kindnames.CorporateInitiative: {"ci", "initiative", "corp_init"},
 			// Single-word kinds
@@ -224,7 +224,7 @@ func getDefaultIDPrefixesConfig() *IDPrefixesConfig {
 			Patterns: []InferencePattern{},
 		},
 		DefaultStrategy: DefaultStrategyConfig{
-			Method: ConstMagicfa42609b,
+			Method: "first_part_upper_3",
 		},
 	}
 }
@@ -302,7 +302,7 @@ func (c *IDPrefixesConfig) inferSynonymsFromKind(kind string) []string {
 				if !strings.Contains(kind, "_") && len(kind) >= 4 {
 					synonyms = append(synonyms, kind[:4])
 				}
-			case ConstMagicExtracted_60:
+			case "two_word_abbrev":
 				// First letter of first two words (for two-word kinds)
 				if parts := strings.Split(kind, "_"); len(parts) == 2 {
 					if len(parts[0]) > 0 && len(parts[1]) > 0 {
@@ -384,7 +384,7 @@ func (c *IDPrefixesConfig) inferPrefixFromKind(kind string) []string {
 func findIDPrefixesConfig() string {
 	config := GetGlobalPathsConfig()
 	if config != nil {
-		if path := config.FindPath(ConstMagic9d718edf); path != emptyValue {
+		if path := config.FindPath("id_prefixes_config"); path != emptyValue {
 			return path
 		}
 	}

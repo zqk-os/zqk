@@ -24,7 +24,7 @@ func (av *AsyncValidator) InitiateShutdown() error {
 			return nil
 		},
 	); err != nil {
-		logging.Fluent(av.logger).Error(ConstMagic29d94cd0, err).Log()
+		logging.Fluent(av.logger).Error("Failed to initiate shutdown", err).Log()
 	}
 
 	if alreadyStopped {
@@ -62,7 +62,7 @@ func (av *AsyncValidator) Drain(ctx context.Context) error {
 
 	// Use callback pattern: wait in goroutine, notify via channel
 	drainBud := goroutinelabels.DefaultBudget()
-	drainBuilder := goroutinelabels.NewGoroutine(ConstMagice0c33bd5, ConstMagic261c9989).
+	drainBuilder := goroutinelabels.NewGoroutine("async_validator_drain_wait", "waiting for async validator workers to drain").
 		WithCleanup(func() {
 			close(drainComplete)
 		})
@@ -107,7 +107,7 @@ func (av *AsyncValidator) GetPendingCount() int64 {
 
 // GetName implements QueueShutdownHandler
 func (av *AsyncValidator) GetName() string {
-	return ConstMagicExtracted_14
+	return "async_validator"
 }
 
 // IsCritical implements QueueShutdownHandler

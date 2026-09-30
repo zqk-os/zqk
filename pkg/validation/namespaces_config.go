@@ -101,9 +101,9 @@ func GetGlobalNamespacesConfig() *NamespacesConfig {
 func getDefaultNamespacesConfig() *NamespacesConfig {
 	// Use hardcoded defaults to avoid circular dependency
 	defaultKernel := "zqk:kernel"
-	defaultKernelCLI := ConstMagicExtracted_26
-	defaultKernelMetrics := ConstMagic07379a5c
-	defaultOrganizational := ConstMagic09ae1f1a
+	defaultKernelCLI := "zqk:kernel:cli"
+	defaultKernelMetrics := "zqk:kernel:metrics"
+	defaultOrganizational := "domain:organizational"
 
 	config := &NamespacesConfig{
 		DefaultNamespace:           defaultKernel,
@@ -113,7 +113,7 @@ func getDefaultNamespacesConfig() *NamespacesConfig {
 		ProjectOrigin:              namespaceLayerZQK,
 		Namespaces: map[string]NamespaceConfig{
 			defaultKernel: {
-				Description: ConstMagice246c5d2,
+				Description: "ZQK kernel objects - core system functionality",
 				Kinds: []string{
 					kindnames.Goal, kindnames.Milestone, kindnames.Workstream, kindnames.PriorityPlan, kindnames.BacklogItem,
 					kindnames.Requirement, kindnames.Criteria, kindnames.TestCase,
@@ -133,7 +133,7 @@ func getDefaultNamespacesConfig() *NamespacesConfig {
 				},
 			},
 			defaultKernelCLI: {
-				Description:     ConstMagicb2fdcc34,
+				Description:     "CLI module - profiles, configurations, and CLI-specific resources",
 				ParentNamespace: defaultKernel,
 				Kinds: []string{
 					"cli_profile",
@@ -141,12 +141,12 @@ func getDefaultNamespacesConfig() *NamespacesConfig {
 				},
 			},
 			defaultKernelMetrics: {
-				Description:     ConstMagic9fb69e5c,
+				Description:     "Metrics module - sampler profiles, aggregation settings, and metrics-specific resources",
 				ParentNamespace: defaultKernel,
-				Kinds:           []string{ConstMagicExtracted_27, ConstMagicExtracted_28, ConstMagicExtracted_29},
+				Kinds:           []string{"metrics_profile", "sampler_profile", "sampler_config"},
 			},
 			defaultOrganizational: {
-				Description: ConstMagiceddb716c,
+				Description: "Organizational domain objects - organizational structure",
 				Kinds: []string{
 					kindnames.Organization, kindnames.Division, kindnames.Department, kindnames.Team, kindnames.Partnership,
 				},
@@ -154,12 +154,12 @@ func getDefaultNamespacesConfig() *NamespacesConfig {
 		},
 		InferenceRules: []NamespaceInferenceRule{
 			{
-				Pattern:   ConstMagicd182d411,
+				Pattern:   "^(organization|division|department|team|partnership)$",
 				Namespace: defaultOrganizational,
 			},
 			{
-				Pattern:           ConstMagic6e6ab915,
-				NamespaceTemplate: ConstMagic8cf4f0f2,
+				Pattern:           "^integration_.*|.*_integration$",
+				NamespaceTemplate: "integration:{domain}",
 			},
 		},
 	}
@@ -238,7 +238,7 @@ func (c *NamespacesConfig) GetNamespaceForKind(kind string) string {
 	for _, rule := range rules {
 		re, err := GetCachedRegexp(rule.Pattern)
 		if err != nil {
-			logging.FluentEvent(eventLogger).Warn(ConstMagiced9d41dc).
+			logging.FluentEvent(eventLogger).Warn("Failed to compile regex pattern in namespaces config").
 				String("pattern", rule.Pattern).
 				String("kind", kind).
 				WithError(err).

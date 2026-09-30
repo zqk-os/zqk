@@ -27,19 +27,19 @@ func TestOutputQueue_EnqueueDequeue(t *testing.T) {
 	}
 
 	if err := queue.Enqueue(packet); err != nil {
-		t.Fatalf(ConstMagic26b83542, err)
+		t.Fatalf("Enqueue failed: %v", err)
 	}
 
 	// Dequeue should return the same packet
 	dequeued := queue.Dequeue()
 	if dequeued.Data != packet.Data {
-		t.Errorf(ConstMagic7851e3ae, packet.Data, dequeued.Data)
+		t.Errorf("Expected data %v, got %v", packet.Data, dequeued.Data)
 	}
 	if dequeued.ChannelID != packet.ChannelID {
-		t.Errorf(ConstMagic028b2478, packet.ChannelID, dequeued.ChannelID)
+		t.Errorf("Expected channel %v, got %v", packet.ChannelID, dequeued.ChannelID)
 	}
 	if dequeued.FlushHint != packet.FlushHint {
-		t.Errorf(ConstMagicaf79893a, packet.FlushHint, dequeued.FlushHint)
+		t.Errorf("Expected flush hint %v, got %v", packet.FlushHint, dequeued.FlushHint)
 	}
 }
 
@@ -54,7 +54,7 @@ func TestOutputQueue_FIFO(t *testing.T) {
 			ChannelID: "test",
 		}
 		if err := queue.Enqueue(packet); err != nil {
-			t.Fatalf(ConstMagic2a85d89e, i, err)
+			t.Fatalf("Enqueue %d failed: %v", i, err)
 		}
 	}
 
@@ -63,7 +63,7 @@ func TestOutputQueue_FIFO(t *testing.T) {
 		dequeued := queue.Dequeue()
 		expected := fmt.Sprintf("data-%d", i)
 		if dequeued.Data != expected {
-			t.Errorf(ConstMagic70b15c6f, expected, dequeued.Data)
+			t.Errorf("Expected %s, got %v", expected, dequeued.Data)
 		}
 	}
 }
@@ -76,7 +76,7 @@ func TestOutputQueue_BlockingDequeue(t *testing.T) {
 	dequeued := make(chan OutputPacket, 1)
 	done := make(chan struct{})
 	started := make(chan struct{})
-	goroutinelabels.StartTestGoroutine("test_dequeue", ConstMagicaa1c813a, func() {
+	goroutinelabels.StartTestGoroutine("test_dequeue", "dequeuing from output queue in test", func() {
 		defer close(done)
 		close(started)
 		dequeued <- queue.Dequeue()
@@ -87,24 +87,24 @@ func TestOutputQueue_BlockingDequeue(t *testing.T) {
 	// Enqueue should unblock the goroutine
 	packet := OutputPacket{Data: "unblock", ChannelID: "test"}
 	if err := queue.Enqueue(packet); err != nil {
-		t.Fatalf(ConstMagic26b83542, err)
+		t.Fatalf("Enqueue failed: %v", err)
 	}
 
 	// Wait for dequeue to complete
 	select {
 	case result := <-dequeued:
 		if result.Data != packet.Data {
-			t.Errorf(ConstMagic9c502320, packet.Data, result.Data)
+			t.Errorf("Expected %v, got %v", packet.Data, result.Data)
 		}
 	case <-time.After(1 * time.Second):
-		t.Fatal(ConstMagicbf5629a5)
+		t.Fatal("Dequeue did not unblock")
 	}
 
 	select {
 	case <-done:
 		// Good
 	case <-time.After(100 * time.Millisecond):
-		t.Fatal(ConstMagicff37f06b)
+		t.Fatal("Goroutine did not finish")
 	}
 }
 
@@ -115,22 +115,22 @@ func TestOutputQueue_NonBlockingDequeue(t *testing.T) {
 	// Dequeue from empty queue should return false
 	_, ok := queue.DequeueNonBlocking()
 	if ok {
-		t.Error(ConstMagic72dc8cbf)
+		t.Error("Expected false for empty queue")
 	}
 
 	// Enqueue a packet
 	packet := OutputPacket{Data: "test", ChannelID: "test"}
 	if err := queue.Enqueue(packet); err != nil {
-		t.Fatalf(ConstMagic26b83542, err)
+		t.Fatalf("Enqueue failed: %v", err)
 	}
 
 	// Dequeue should return true
 	dequeued, ok := queue.DequeueNonBlocking()
 	if !ok {
-		t.Error(ConstMagic697eeb86)
+		t.Error("Expected true for non-empty queue")
 	}
 	if dequeued.Data != packet.Data {
-		t.Errorf(ConstMagic9c502320, packet.Data, dequeued.Data)
+		t.Errorf("Expected %v, got %v", packet.Data, dequeued.Data)
 	}
 }
 
@@ -145,51 +145,51 @@ func TestOutputQueue_DequeueBatch(t *testing.T) {
 			ChannelID: "test",
 		}
 		if err := queue.Enqueue(packet); err != nil {
-			t.Fatalf(ConstMagica71155e4, i, err)
+			t.Fatalf("Failed to enqueue packet %d: %v", i, err)
 		}
 	}
 
 	// Dequeue batch of 20 items
 	batch, ok := queue.DequeueBatch(20)
 	if !ok {
-		t.Fatal(ConstMagic7a9e5920)
+		t.Fatal("Expected batch to be dequeued")
 	}
 	if len(batch) != 20 {
-		t.Fatalf(ConstMagic9783900d, len(batch))
+		t.Fatalf("Expected batch size 20, got %d", len(batch))
 	}
 
 	// Verify FIFO order
 	for i := 0; i < 20; i++ {
 		expected := fmt.Sprintf("data-%d", i)
 		if batch[i].Data != expected {
-			t.Errorf(ConstMagice38b7dc3, i, batch[i].Data, expected)
+			t.Errorf("Batch[%d] = %v, want %v", i, batch[i].Data, expected)
 		}
 	}
 
 	// Dequeue remaining items
 	batch2, ok := queue.DequeueBatch(50)
 	if !ok {
-		t.Fatal(ConstMagic2713fa7c)
+		t.Fatal("Expected second batch to be dequeued")
 	}
 	if len(batch2) != 30 {
-		t.Fatalf(ConstMagicdfe84e5f, len(batch2))
+		t.Fatalf("Expected second batch size 30, got %d", len(batch2))
 	}
 
 	// Verify remaining items
 	for i := 0; i < 30; i++ {
 		expected := fmt.Sprintf("data-%d", i+20)
 		if batch2[i].Data != expected {
-			t.Errorf(ConstMagicce8851af, i, batch2[i].Data, expected)
+			t.Errorf("Batch2[%d] = %v, want %v", i, batch2[i].Data, expected)
 		}
 	}
 
 	// Queue should be empty now
 	batch3, ok := queue.DequeueBatch(10)
 	if ok {
-		t.Fatal(ConstMagic1f84cc3b)
+		t.Fatal("Expected no batch to be dequeued from empty queue")
 	}
 	if batch3 != nil {
-		t.Fatalf(ConstMagic05953759, batch3)
+		t.Fatalf("Expected nil batch, got %v", batch3)
 	}
 }
 
@@ -201,7 +201,7 @@ func TestOutputQueue_SizeLimit(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		packet := OutputPacket{Data: fmt.Sprintf("data-%d", i), ChannelID: "test"}
 		if err := queue.Enqueue(packet); err != nil {
-			t.Fatalf(ConstMagic2a85d89e, i, err)
+			t.Fatalf("Enqueue %d failed: %v", i, err)
 		}
 	}
 
@@ -209,12 +209,12 @@ func TestOutputQueue_SizeLimit(t *testing.T) {
 	packet := OutputPacket{Data: "overflow", ChannelID: "test"}
 	err := queue.Enqueue(packet)
 	if err != ErrQueueFull {
-		t.Errorf(ConstMagic845ba12a, err)
+		t.Errorf("Expected ErrQueueFull, got %v", err)
 	}
 
 	// Size should be 10
 	if size := queue.Size(); size != 10 {
-		t.Errorf(ConstMagicd819944f, size)
+		t.Errorf("Expected size 10, got %d", size)
 	}
 }
 
@@ -234,11 +234,11 @@ func TestOutputQueue_ConcurrentEnqueue(t *testing.T) {
 				defer wg.Done()
 				for j := 0; j < packetsPerWorker; j++ {
 					packet := OutputPacket{
-						Data:      fmt.Sprintf(ConstMagic6b7f8bea, workerID, j),
+						Data:      fmt.Sprintf("worker-%d-packet-%d", workerID, j),
 						ChannelID: "test",
 					}
 					if err := queue.Enqueue(packet); err != nil {
-						t.Errorf(ConstMagicc0f3e6bd, workerID, err)
+						t.Errorf("Worker %d enqueue failed: %v", workerID, err)
 					}
 				}
 			}(i)
@@ -250,14 +250,14 @@ func TestOutputQueue_ConcurrentEnqueue(t *testing.T) {
 	// Verify all packets are in queue
 	expectedSize := numWorkers * packetsPerWorker
 	if size := queue.Size(); size != expectedSize {
-		t.Errorf(ConstMagic240dcc6b, expectedSize, size)
+		t.Errorf("Expected size %d, got %d", expectedSize, size)
 	}
 }
 
 func TestOutputQueue_ConcurrentEnqueueDequeue(t *testing.T) {
 	t.Parallel()
 	if testing.Short() {
-		t.Skip(ConstMagic1da85688)
+		t.Skip("Skipping concurrent stress test in short mode")
 	}
 	// BLI-953: Skip with clear comment. This test had a deadlock: dequeuers don't always exit
 	// (race between enqueuersDone, queue.Size(), and DequeueNonBlocking). Fix would require
@@ -283,11 +283,11 @@ func TestOutputQueue_ConcurrentEnqueueDequeue(t *testing.T) {
 				defer enqueuerWg.Done()
 				for j := 0; j < packetsPerEnqueuer; j++ {
 					packet := OutputPacket{
-						Data:      fmt.Sprintf(ConstMagic6b7f8bea, workerID, j),
+						Data:      fmt.Sprintf("worker-%d-packet-%d", workerID, j),
 						ChannelID: "test",
 					}
 					if err := queue.Enqueue(packet); err != nil {
-						t.Errorf(ConstMagic26b83542, err)
+						t.Errorf("Enqueue failed: %v", err)
 					}
 					enqueued.Add(1)
 				}
@@ -312,7 +312,7 @@ func TestOutputQueue_ConcurrentEnqueueDequeue(t *testing.T) {
 
 	for i := 0; i < numDequeuers; i++ {
 		i := i
-		goroutinelabels.NewGoroutine(fmt.Sprintf(ConstMagic24a8dc76, i), fmt.Sprintf(ConstMagic494bb141, i)).
+		goroutinelabels.NewGoroutine(fmt.Sprintf("test_dequeuer_%d", i), fmt.Sprintf("dequeuing from output queue %d", i)).
 			WithWaitGroup(&dequeuerWg).
 			StartSimple(func() {
 				consecutiveEmpty := 0
@@ -380,17 +380,17 @@ func TestOutputQueue_ConcurrentEnqueueDequeue(t *testing.T) {
 	case <-done:
 		// Dequeuers finished
 	case <-time.After(30 * time.Second):
-		t.Error(ConstMagic9557e9ab)
+		t.Error("Dequeuers did not finish within timeout")
 	}
 
 	// Verify all packets were processed
 	if dequeued.Load() < expected {
-		t.Errorf(ConstMagicdbd62a8d, expected, dequeued.Load(), enqueued.Load())
+		t.Errorf("Expected at least %d dequeued, got %d (enqueued: %d)", expected, dequeued.Load(), enqueued.Load())
 	}
 
 	// Queue should be empty or nearly empty
 	if size := queue.Size(); size > 10 {
-		t.Errorf(ConstMagic528d026b, size)
+		t.Errorf("Queue should be nearly empty, got size %d", size)
 	}
 }
 
@@ -459,13 +459,13 @@ func TestOutputWriter_Routing(t *testing.T) {
 
 	// Verify routing
 	if progressBuf.String() != "progress-data" {
-		t.Errorf(ConstMagic8be009b2, progressBuf.String(), "progress-data")
+		t.Errorf("Progress handler got %q, expected %q", progressBuf.String(), "progress-data")
 	}
 	if metricsBuf.String() != "metrics-data" {
-		t.Errorf(ConstMagice4fab7ab, metricsBuf.String(), "metrics-data")
+		t.Errorf("Metrics handler got %q, expected %q", metricsBuf.String(), "metrics-data")
 	}
 	if stdoutBuf.String() != "stdout-data" {
-		t.Errorf(ConstMagic1ad7b7a1, stdoutBuf.String(), "stdout-data")
+		t.Errorf("Stdout handler got %q, expected %q", stdoutBuf.String(), "stdout-data")
 	}
 }
 
@@ -495,7 +495,7 @@ func TestOutputWriter_Flush(t *testing.T) {
 
 	// Data should be flushed
 	if buf.String() != "test-data" {
-		t.Errorf(ConstMagic1eb55122, buf.String())
+		t.Errorf("Expected flushed data, got %q", buf.String())
 	}
 }
 
@@ -515,7 +515,7 @@ func TestOutputWriter_Shutdown(t *testing.T) {
 	// Enqueue some packets
 	for i := 0; i < 10; i++ {
 		if err := queue.Enqueue(OutputPacket{Data: fmt.Sprintf("data-%d", i), ChannelID: "test"}); err != nil {
-			t.Fatalf(ConstMagica71155e4, i, err)
+			t.Fatalf("Failed to enqueue packet %d: %v", i, err)
 		}
 	}
 
@@ -529,7 +529,7 @@ func TestOutputWriter_Shutdown(t *testing.T) {
 
 	// All packets should be processed
 	if buf.Len() == 0 {
-		t.Error(ConstMagicdb2a5243)
+		t.Error("No data was written")
 	}
 
 	// Verify data was written
@@ -538,14 +538,14 @@ func TestOutputWriter_Shutdown(t *testing.T) {
 		expected += fmt.Sprintf("data-%d", i)
 	}
 	if buf.String() != expected {
-		t.Errorf(ConstMagic9113b884, expected, buf.String())
+		t.Errorf("Expected %q, got %q", expected, buf.String())
 	}
 }
 
 func TestOutputWriter_ConcurrentStress(t *testing.T) {
 	t.Parallel()
 	if testing.Short() {
-		t.Skip(ConstMagic84e5fac2)
+		t.Skip("Skipping stress test in short mode")
 	}
 
 	buf := &safeTestBuffer{}
@@ -575,7 +575,7 @@ func TestOutputWriter_ConcurrentStress(t *testing.T) {
 				defer wg.Done()
 				for j := 0; j < packetsPerWorker; j++ {
 					packet := OutputPacket{
-						Data:      fmt.Sprintf(ConstMagic7a0cd72c, workerID, j),
+						Data:      fmt.Sprintf("worker-%d-packet-%d\n", workerID, j),
 						ChannelID: "test",
 						FlushHint: j%10 == 0, // Flush every 10th packet
 					}
@@ -605,13 +605,13 @@ func TestOutputWriter_ConcurrentStress(t *testing.T) {
 	for {
 		select {
 		case <-timeout:
-			t.Fatalf(ConstMagicbb108c70, queue.Size())
+			t.Fatalf("Writer did not process all packets in time (queue size: %d)", queue.Size())
 		case <-ticker.C:
 			if queue.Size() == 0 {
 				// All processed
 				processTime := time.Since(start)
-				t.Logf(ConstMagice40efd16, enqueued.Load(), enqueueTime, failed.Load())
-				t.Logf(ConstMagiceb675652, processTime)
+				t.Logf("Enqueued %d packets in %v (failed: %d)", enqueued.Load(), enqueueTime, failed.Load())
+				t.Logf("Processed all packets in %v", processTime)
 				t.Logf("Throughput: %.0f packets/sec", float64(enqueued.Load())/processTime.Seconds())
 				return
 			}
@@ -642,7 +642,7 @@ func TestOutputWriter_QueueFullBackpressure(t *testing.T) {
 				// Queue filled up before we could enqueue all - this is what we want to test
 				break
 			}
-			t.Fatalf(ConstMagica71155e4, i, err)
+			t.Fatalf("Failed to enqueue packet %d: %v", i, err)
 		}
 		enqueued++
 	}
@@ -656,14 +656,14 @@ func TestOutputWriter_QueueFullBackpressure(t *testing.T) {
 	if err == ErrQueueFull {
 		// Good - backpressure working
 		if queueSize < 100 {
-			t.Logf(ConstMagic13b5ec0d, queueSize)
+			t.Logf("Queue reported full but size is %d (expected 100)", queueSize)
 		}
 	} else if err != nil {
-		t.Errorf(ConstMagicebd7555e, err, queueSize)
+		t.Errorf("Unexpected error: %v (queue size: %d)", err, queueSize)
 	} else if queueSize >= 100 {
 		// Enqueue succeeded - writer drained faster than we filled
 		// This is acceptable, just verify queue is not full
-		t.Errorf(ConstMagic1c258aef, queueSize)
+		t.Errorf("Enqueue succeeded but queue is full (size: %d)", queueSize)
 	}
 
 	// Wait for writer to process some packets
@@ -671,7 +671,7 @@ func TestOutputWriter_QueueFullBackpressure(t *testing.T) {
 
 	// Now enqueue should definitely succeed (queue has space)
 	if err := queue.Enqueue(OutputPacket{Data: "after-process", ChannelID: "slow"}); err != nil {
-		t.Errorf(ConstMagica911d628, err, queue.Size())
+		t.Errorf("Enqueue should succeed after processing: %v (queue size: %d)", err, queue.Size())
 	}
 }
 
@@ -703,18 +703,18 @@ func TestWriterOutputHandler_Buffered(t *testing.T) {
 	// Write multiple times
 	for i := 0; i < 10; i++ {
 		if err := handler.Write(fmt.Sprintf("data-%d", i)); err != nil {
-			t.Fatalf(ConstMagic87a08a04, err)
+			t.Fatalf("Write failed: %v", err)
 		}
 	}
 
 	// Buffer should not be written yet
 	if buf.Len() != 0 {
-		t.Error(ConstMagicca1f7f24)
+		t.Error("Buffer should not be written before flush")
 	}
 
 	// Flush should write all data
 	if err := handler.Flush(); err != nil {
-		t.Fatalf(ConstMagicff57a8b0, err)
+		t.Fatalf("Flush failed: %v", err)
 	}
 
 	// Verify all data is written
@@ -723,7 +723,7 @@ func TestWriterOutputHandler_Buffered(t *testing.T) {
 		expected += fmt.Sprintf("data-%d", i)
 	}
 	if buf.String() != expected {
-		t.Errorf(ConstMagic9113b884, expected, buf.String())
+		t.Errorf("Expected %q, got %q", expected, buf.String())
 	}
 }
 
@@ -734,11 +734,11 @@ func TestWriterOutputHandler_Unbuffered(t *testing.T) {
 
 	// Write should immediately write to buffer
 	if err := handler.Write("test-data"); err != nil {
-		t.Fatalf(ConstMagic87a08a04, err)
+		t.Fatalf("Write failed: %v", err)
 	}
 
 	if buf.String() != "test-data" {
-		t.Errorf(ConstMagic9113b884, "test-data", buf.String())
+		t.Errorf("Expected %q, got %q", "test-data", buf.String())
 	}
 }
 
@@ -819,7 +819,7 @@ func TestStringify(t *testing.T) {
 	for _, tt := range tests {
 		result := stringify(tt.input)
 		if result != tt.expected {
-			t.Errorf(ConstMagice395cd85, tt.input, result, tt.expected)
+			t.Errorf("stringify(%v) = %q, expected %q", tt.input, result, tt.expected)
 		}
 	}
 }

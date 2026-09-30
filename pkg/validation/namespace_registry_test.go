@@ -15,7 +15,7 @@ func TestNamespaceRegistry_GetNamespaceForKind(t *testing.T) {
 	t.Parallel()
 	registry := NewNamespaceRegistry("")
 	if err := registry.LoadNamespaces(); err != nil {
-		t.Fatalf(ConstMagicba706c3d, err)
+		t.Fatalf("Failed to load namespaces: %v", err)
 	}
 
 	tests := []struct {
@@ -46,7 +46,7 @@ func TestNamespaceRegistry_GetNamespaceForKind(t *testing.T) {
 		t.Run(tt.kind, func(t *testing.T) {
 			got := registry.GetNamespaceForKind(tt.kind)
 			if got != tt.want {
-				t.Errorf(ConstMagic6d2bcc56, tt.kind, got, tt.want, tt.description)
+				t.Errorf("GetNamespaceForKind(%q) = %q, want %q (%s)", tt.kind, got, tt.want, tt.description)
 			}
 		})
 	}
@@ -61,7 +61,7 @@ func TestNamespaceRegistry_RegisterNamespace(t *testing.T) {
 
 	got := registry.GetNamespaceForKind("custom_kind")
 	if got != "domain:custom" {
-		t.Errorf(ConstMagic52fa586b, got, "domain:custom")
+		t.Errorf("GetNamespaceForKind(\"custom_kind\") = %q, want %q", got, "domain:custom")
 	}
 }
 
@@ -69,23 +69,23 @@ func TestNamespaceRegistry_GetAllNamespaces(t *testing.T) {
 	t.Parallel()
 	registry := NewNamespaceRegistry("")
 	if err := registry.LoadNamespaces(); err != nil {
-		t.Fatalf(ConstMagicba706c3d, err)
+		t.Fatalf("Failed to load namespaces: %v", err)
 	}
 
 	namespaces := registry.GetAllNamespaces()
 
 	// Should have at least kernel and organizational namespaces
 	if len(namespaces) == 0 {
-		t.Error(ConstMagica7f9ff4d)
+		t.Error("GetAllNamespaces() returned empty map")
 	}
 
 	// Check that we have some expected mappings
 	if namespace, ok := namespaces["goal"]; !ok || namespace != DefaultNamespaceKernel {
-		t.Errorf(ConstMagic8a3e3dd1, namespace)
+		t.Errorf("Expected goal -> DefaultNamespaceKernel, got %q", namespace)
 	}
 
-	if namespace, ok := namespaces["organization"]; !ok || namespace != ConstMagic09ae1f1a {
-		t.Errorf(ConstMagic8dbd9fe4, namespace)
+	if namespace, ok := namespaces["organization"]; !ok || namespace != "domain:organizational" {
+		t.Errorf("Expected organization -> domain:organizational, got %q", namespace)
 	}
 }
 
@@ -133,7 +133,7 @@ func TestNamespaceRegistry_InferNamespaceFromKind(t *testing.T) {
 		t.Run(tt.kind, func(t *testing.T) {
 			got := registry.inferNamespaceFromKind(tt.kind)
 			if got != tt.want {
-				t.Errorf(ConstMagic9eac380c, tt.kind, got, tt.want, tt.description)
+				t.Errorf("inferNamespaceFromKind(%q) = %q, want %q (%s)", tt.kind, got, tt.want, tt.description)
 			}
 		})
 	}
@@ -150,13 +150,13 @@ func TestNamespaceRegistry_InferNamespaceFromKind_WithRegistered(t *testing.T) {
 	// Registered namespace should take precedence over inference
 	got := registry.inferNamespaceFromKind("custom_kind")
 	if got != "domain:custom" {
-		t.Errorf(ConstMagic5fca5cf2, got)
+		t.Errorf("inferNamespaceFromKind(\"custom_kind\") with registered namespace = %q, want domain:custom", got)
 	}
 
 	// Unregistered kind should still use inference
 	got = registry.inferNamespaceFromKind("organization")
-	if got != ConstMagic09ae1f1a {
-		t.Errorf(ConstMagic9640f267, got)
+	if got != "domain:organizational" {
+		t.Errorf("inferNamespaceFromKind(\"organization\") = %q, want domain:organizational", got)
 	}
 }
 
@@ -166,30 +166,30 @@ func TestGetNamespaceRegistry(t *testing.T) {
 	// First call should initialize the singleton
 	registry1 := GetNamespaceRegistry()
 	if registry1 == nil {
-		t.Fatal(ConstMagicff6a164f)
+		t.Fatal("GetNamespaceRegistry() returned nil")
 	}
 
 	// Second call should return the same instance (singleton)
 	registry2 := GetNamespaceRegistry()
 	if registry1 != registry2 {
-		t.Error(ConstMagic9a92f7f0)
+		t.Error("GetNamespaceRegistry() returned different instances (not a singleton)")
 	}
 
 	// Verify it's a valid registry by checking it can load namespaces
 	if err := registry1.LoadNamespaces(); err != nil {
-		t.Errorf(ConstMagic5e0026fd, err)
+		t.Errorf("GetNamespaceRegistry() returned registry that failed to load namespaces: %v", err)
 	}
 
 	// Verify it has default namespaces loaded
 	namespaces := registry1.GetAllNamespaces()
 	if len(namespaces) == 0 {
-		t.Error(ConstMagicef3a7cc7)
+		t.Error("GetNamespaceRegistry() returned registry with no namespaces")
 	}
 
 	// Verify it can resolve a known kind
 	namespace := registry1.GetNamespaceForKind("goal")
 	if namespace != DefaultNamespaceKernel {
-		t.Errorf(ConstMagicf6310275, namespace)
+		t.Errorf("GetNamespaceRegistry() registry returned wrong namespace for 'goal': got %q, want DefaultNamespaceKernel", namespace)
 	}
 }
 
@@ -200,10 +200,10 @@ func TestGetNamespaceRegistry_ConcurrentAccess(t *testing.T) {
 	done := make(chan bool, 10)
 	for i := 0; i < 10; i++ {
 		i := i
-		goroutinelabels.StartTestGoroutine(fmt.Sprintf(ConstMagic24f3efc0, i), fmt.Sprintf(ConstMagic6f51c6d1, i), func() {
+		goroutinelabels.StartTestGoroutine(fmt.Sprintf("test_registry_access_%d", i), fmt.Sprintf("accessing namespace registry %d", i), func() {
 			registry := GetNamespaceRegistry()
 			if registry == nil {
-				t.Error(ConstMagic7527c988)
+				t.Error("GetNamespaceRegistry() returned nil in concurrent access")
 			}
 			done <- true
 		})
@@ -218,7 +218,7 @@ func TestGetNamespaceRegistry_ConcurrentAccess(t *testing.T) {
 	registry1 := GetNamespaceRegistry()
 	registry2 := GetNamespaceRegistry()
 	if registry1 != registry2 {
-		t.Error(ConstMagicc789f10f)
+		t.Error("GetNamespaceRegistry() singleton pattern broken under concurrent access")
 	}
 }
 
@@ -230,7 +230,7 @@ func TestNamespaceRegistry_LoadDefaultNamespaces(t *testing.T) {
 
 	// LoadNamespaces should call loadDefaultNamespaces internally
 	if err := registry.LoadNamespaces(); err != nil {
-		t.Fatalf(ConstMagicc7c50a94, err)
+		t.Fatalf("LoadNamespaces() failed: %v", err)
 	}
 
 	// Verify default kernel namespaces are loaded
@@ -238,7 +238,7 @@ func TestNamespaceRegistry_LoadDefaultNamespaces(t *testing.T) {
 	for _, kind := range kernelKinds {
 		namespace := registry.GetNamespaceForKind(kind)
 		if namespace != DefaultNamespaceKernel {
-			t.Errorf(ConstMagic370f61d1, kind, namespace)
+			t.Errorf("Default namespace for %q = %q, want DefaultNamespaceKernel", kind, namespace)
 		}
 	}
 
@@ -246,8 +246,8 @@ func TestNamespaceRegistry_LoadDefaultNamespaces(t *testing.T) {
 	orgKinds := []string{"organization", "division", "department", "team", "partnership"}
 	for _, kind := range orgKinds {
 		namespace := registry.GetNamespaceForKind(kind)
-		if namespace != ConstMagic09ae1f1a {
-			t.Errorf(ConstMagic69498b33, kind, namespace)
+		if namespace != "domain:organizational" {
+			t.Errorf("Default namespace for %q = %q, want domain:organizational", kind, namespace)
 		}
 	}
 
@@ -255,7 +255,7 @@ func TestNamespaceRegistry_LoadDefaultNamespaces(t *testing.T) {
 	allNamespaces := registry.GetAllNamespaces()
 	expectedCount := len(kernelKinds) + len(orgKinds)
 	if len(allNamespaces) < expectedCount {
-		t.Errorf(ConstMagic71a89150, len(allNamespaces), expectedCount)
+		t.Errorf("GetAllNamespaces() returned %d namespaces, expected at least %d", len(allNamespaces), expectedCount)
 	}
 }
 
@@ -267,20 +267,20 @@ func TestDiscoverSpecsDirForRegistry(t *testing.T) {
 	// This exercises discoverSpecsDirForRegistry() which tries multiple paths
 	registry := NewNamespaceRegistry("")
 	if registry == nil {
-		t.Fatal(ConstMagic62c3b1b9)
+		t.Fatal("NewNamespaceRegistry(\"\") returned nil")
 	}
 
 	// The registry should be able to load namespaces if the directory is found
 	// If the directory is not found, it should still work with defaults
 	err := registry.LoadNamespaces()
 	if err != nil {
-		t.Logf(ConstMagic5262aa8b, err)
+		t.Logf("LoadNamespaces() failed (may be expected if specs dir not found): %v", err)
 	}
 
 	// Even if specs dir is not found, default namespaces should still work
 	namespace := registry.GetNamespaceForKind("goal")
 	if namespace != DefaultNamespaceKernel {
-		t.Errorf(ConstMagic34b93550, namespace)
+		t.Errorf("GetNamespaceForKind(\"goal\") = %q, want DefaultNamespaceKernel (should work even if specs dir not found)", namespace)
 	}
 }
 
@@ -292,19 +292,19 @@ func TestNewNamespaceRegistry_WithSpecsDir(t *testing.T) {
 
 	registry := NewNamespaceRegistry(specsDir)
 	if registry == nil {
-		t.Fatal(ConstMagic045a4789)
+		t.Fatal("NewNamespaceRegistry(specsDir) returned nil")
 	}
 
 	// Should be able to load namespaces
 	err := registry.LoadNamespaces()
 	if err != nil {
-		t.Logf(ConstMagic454eabeb, err)
+		t.Logf("LoadNamespaces() failed (may be expected if specs dir doesn't exist): %v", err)
 	}
 
 	// Should still have default namespaces
 	namespace := registry.GetNamespaceForKind("goal")
 	if namespace != DefaultNamespaceKernel {
-		t.Errorf(ConstMagic49b63b5f, namespace)
+		t.Errorf("GetNamespaceForKind(\"goal\") = %q, want DefaultNamespaceKernel", namespace)
 	}
 }
 
@@ -316,19 +316,19 @@ func TestNewNamespaceRegistry_WithInvalidSpecsDir(t *testing.T) {
 
 	registry := NewNamespaceRegistry(invalidDir)
 	if registry == nil {
-		t.Fatal(ConstMagic553fdfca)
+		t.Fatal("NewNamespaceRegistry(invalidDir) returned nil")
 	}
 
 	// Should still be able to load namespaces (using defaults)
 	err := registry.LoadNamespaces()
 	if err != nil {
-		t.Logf(ConstMagica3c11c59, err)
+		t.Logf("LoadNamespaces() failed (may be expected): %v", err)
 	}
 
 	// Default namespaces should still work
 	namespace := registry.GetNamespaceForKind("goal")
 	if namespace != DefaultNamespaceKernel {
-		t.Errorf(ConstMagicb511e1d8, namespace)
+		t.Errorf("GetNamespaceForKind(\"goal\") = %q, want DefaultNamespaceKernel (should work with defaults)", namespace)
 	}
 }
 
@@ -348,50 +348,50 @@ func TestNamespaceRegistry_LoadNamespaceFromSpec(t *testing.T) {
 		description string
 	}{
 		{
-			name: ConstMagice1b9b182,
+			name: "explicit namespace_id",
 			specContent: `kind: test_object
 namespace_id: domain:test`,
 			kind:        "test_object",
 			want:        "domain:test",
-			description: ConstMagic2b1fa03d,
+			description: "Spec with explicit namespace_id field",
 		},
 		{
 			name: "namespace field",
 			specContent: `kind: test_object
 namespace: domain:test_namespace`,
 			kind:        "test_object",
-			want:        ConstMagic7651f84a,
-			description: ConstMagicdf4ccdcd,
+			want:        "domain:test_namespace",
+			description: "Spec with namespace field (fallback)",
 		},
 		{
-			name: ConstMagicb26a4ec2,
+			name: "fields.namespace_id.validation.default",
 			specContent: `kind: test_object
 fields:
   namespace_id:
     validation:
       default: domain:test_fields`,
 			kind:        "test_object",
-			want:        ConstMagic49dd5602,
-			description: ConstMagic2d07774f,
+			want:        "domain:test_fields",
+			description: "Spec with default in fields.namespace_id.validation.default",
 		},
 		{
-			name: ConstMagicb184a1a6,
+			name: "ontology field used when kind missing",
 			specContent: `ontology: test_ontology_only
 # No kind field`,
 			kind:        "test_object",
 			want:        DefaultNamespaceKernel, // Will infer from ontology, then from kind parameter
-			description: ConstMagic294c6380,
+			description: "Spec with ontology but no kind field",
 		},
 		{
-			name: ConstMagic541e1108,
+			name: "infer from ontology",
 			specContent: `kind: test_object
 ontology: organization`,
 			kind:        "test_object",
-			want:        ConstMagic09ae1f1a, // Inferred from ontology
-			description: ConstMagic7dc70cf6,
+			want:        "domain:organizational", // Inferred from ontology
+			description: "Spec with ontology that maps to organizational domain",
 		},
 		{
-			name:        ConstMagic0b738db0,
+			name:        "infer from kind parameter",
 			specContent: `kind: test_object`,
 			kind:        "organization",
 			// When spec has kind="test_object" but parameter is "organization",
@@ -402,7 +402,7 @@ ontology: organization`,
 			// Actually, let me check the logic: if spec.Kind is "test_object", objectKind = "test_object"
 			// Then it infers from "test_object" which is unknown, so returns DefaultNamespaceKernel
 			want:        DefaultNamespaceKernel, // Spec has kind="test_object", not "organization"
-			description: ConstMagica72603c2,
+			description: "Spec with kind field takes precedence over parameter",
 		},
 		{
 			name: "invalid YAML",
@@ -410,33 +410,33 @@ ontology: organization`,
 invalid: yaml: [unclosed bracket`,
 			kind:        "test_object",
 			want:        "", // Invalid YAML should return empty string
-			description: ConstMagic5943e1e4,
+			description: "Spec with invalid YAML should return empty string",
 		},
 		{
 			name:        "missing file",
 			specContent: "",
 			kind:        "test_object",
 			want:        "", // Missing file should return empty string
-			description: ConstMagicc0184485,
+			description: "Non-existent spec file should return empty string",
 		},
 		{
 			name:        "empty spec",
 			specContent: `# Empty spec`,
 			kind:        "test_object",
 			want:        DefaultNamespaceKernel, // Empty spec should infer from kind parameter
-			description: ConstMagicfc0ae52b,
+			description: "Empty spec should infer from kind parameter",
 		},
 		{
-			name: ConstMagice13212b7,
+			name: "precedence: namespace_id over namespace",
 			specContent: `kind: test_object
 namespace_id: domain:test_id
 namespace: domain:test_namespace`,
 			kind:        "test_object",
 			want:        "domain:test_id", // namespace_id takes precedence
-			description: ConstMagic80021653,
+			description: "namespace_id should take precedence over namespace field",
 		},
 		{
-			name: ConstMagicc37550c9,
+			name: "precedence: namespace over fields default",
 			specContent: `kind: test_object
 namespace: domain:test_namespace
 fields:
@@ -444,8 +444,8 @@ fields:
     validation:
       default: domain:test_fields`,
 			kind:        "test_object",
-			want:        ConstMagic7651f84a, // namespace takes precedence over fields default
-			description: ConstMagica3b2fbb0,
+			want:        "domain:test_namespace", // namespace takes precedence over fields default
+			description: "namespace field should take precedence over fields default",
 		},
 	}
 
@@ -455,16 +455,16 @@ fields:
 			specPath := filepath.Join(tmpDir, tt.kind+".yaml")
 			if tt.specContent != emptyValue {
 				if err := fileutil.WriteFile(specPath, []byte(tt.specContent), paths.FilePerm644); err != nil {
-					t.Fatalf(ConstMagic186b95e3, err)
+					t.Fatalf("Failed to write spec file: %v", err)
 				}
 			} else {
 				// For missing file test, use a non-existent path
-				specPath = filepath.Join(tmpDir, ConstMagic8293f515)
+				specPath = filepath.Join(tmpDir, "nonexistent.yaml")
 			}
 
 			got := registry.loadNamespaceFromSpec(specPath, tt.kind)
 			if got != tt.want {
-				t.Errorf(ConstMagicda037864, specPath, tt.kind, got, tt.want, tt.description)
+				t.Errorf("loadNamespaceFromSpec(%q, %q) = %q, want %q (%s)", specPath, tt.kind, got, tt.want, tt.description)
 			}
 		})
 	}
@@ -475,7 +475,7 @@ func TestNamespaceRegistry_GetSubordinateNamespaces(t *testing.T) {
 	t.Parallel()
 	registry := NewNamespaceRegistry("")
 	if err := registry.LoadNamespaces(); err != nil {
-		t.Fatalf(ConstMagicba706c3d, err)
+		t.Fatalf("Failed to load namespaces: %v", err)
 	}
 
 	tests := []struct {
@@ -486,17 +486,17 @@ func TestNamespaceRegistry_GetSubordinateNamespaces(t *testing.T) {
 		{
 			parentNamespaceID: DefaultNamespaceKernel,
 			want:              []string{DefaultNamespaceKernelCLI, DefaultNamespaceKernelMetrics, DefaultNamespaceKernel + ":storage", DefaultNamespaceKernel + ":scheduler"},
-			description:       ConstMagic09f8262c,
+			description:       "DefaultNamespaceKernel should have subordinate namespaces",
 		},
 		{
-			parentNamespaceID: ConstMagic09ae1f1a,
+			parentNamespaceID: "domain:organizational",
 			want:              []string{},
-			description:       ConstMagice4cd4a74,
+			description:       "domain:organizational should have no subordinate namespaces",
 		},
 		{
-			parentNamespaceID: ConstMagic635d07d5,
+			parentNamespaceID: "nonexistent:namespace",
 			want:              []string{},
-			description:       ConstMagic35d83ba2,
+			description:       "Non-existent namespace should return empty slice",
 		},
 	}
 
@@ -504,7 +504,7 @@ func TestNamespaceRegistry_GetSubordinateNamespaces(t *testing.T) {
 		t.Run(tt.parentNamespaceID, func(t *testing.T) {
 			got := registry.GetSubordinateNamespaces(tt.parentNamespaceID)
 			if len(got) != len(tt.want) {
-				t.Errorf(ConstMagic82bad832, tt.parentNamespaceID, len(got), len(tt.want), tt.description)
+				t.Errorf("GetSubordinateNamespaces(%q) returned %d namespaces, want %d (%s)", tt.parentNamespaceID, len(got), len(tt.want), tt.description)
 				return
 			}
 
@@ -516,7 +516,7 @@ func TestNamespaceRegistry_GetSubordinateNamespaces(t *testing.T) {
 
 			for _, expected := range tt.want {
 				if !gotMap[expected] {
-					t.Errorf(ConstMagic3c937e62, tt.parentNamespaceID, expected, tt.description)
+					t.Errorf("GetSubordinateNamespaces(%q) missing expected namespace %q (%s)", tt.parentNamespaceID, expected, tt.description)
 				}
 			}
 		})
@@ -538,43 +538,43 @@ func TestNamespaceRegistry_IsSubordinateOf(t *testing.T) {
 			childNamespaceID:  DefaultNamespaceKernelCLI,
 			parentNamespaceID: DefaultNamespaceKernel,
 			want:              true,
-			description:       ConstMagicd46bdde5,
+			description:       "DefaultNamespaceKernel:cli is subordinate to DefaultNamespaceKernel",
 		},
 		{
 			childNamespaceID:  DefaultNamespaceKernelMetrics,
 			parentNamespaceID: DefaultNamespaceKernel,
 			want:              true,
-			description:       ConstMagic18ea8d3f,
+			description:       "DefaultNamespaceKernel:metrics is subordinate to DefaultNamespaceKernel",
 		},
 		{
 			childNamespaceID:  DefaultNamespaceKernel + ":storage",
 			parentNamespaceID: DefaultNamespaceKernel,
 			want:              true,
-			description:       ConstMagic88afd274,
+			description:       "DefaultNamespaceKernel:storage is subordinate to DefaultNamespaceKernel",
 		},
 		{
 			childNamespaceID:  DefaultNamespaceKernel,
 			parentNamespaceID: DefaultNamespaceKernel,
 			want:              false,
-			description:       ConstMagicd51a63ad,
+			description:       "Namespace is not subordinate to itself",
 		},
 		{
 			childNamespaceID:  DefaultNamespaceKernelCLI,
 			parentNamespaceID: DefaultNamespaceKernelMetrics,
 			want:              false,
-			description:       ConstMagic9b179651,
+			description:       "Sibling namespaces are not subordinate to each other",
 		},
 		{
-			childNamespaceID:  ConstMagic09ae1f1a,
+			childNamespaceID:  "domain:organizational",
 			parentNamespaceID: DefaultNamespaceKernel,
 			want:              false,
-			description:       ConstMagice6ac7562,
+			description:       "Domain namespace is not subordinate to kernel",
 		},
 		{
 			childNamespaceID:  DefaultNamespaceKernelCLI + ":sub",
 			parentNamespaceID: DefaultNamespaceKernelCLI,
 			want:              true,
-			description:       ConstMagic4bc8ebb1,
+			description:       "Nested subordinate namespace (DefaultNamespaceKernel:cli:sub is subordinate to DefaultNamespaceKernel:cli)",
 		},
 	}
 
@@ -582,7 +582,7 @@ func TestNamespaceRegistry_IsSubordinateOf(t *testing.T) {
 		t.Run(tt.description, func(t *testing.T) {
 			got := registry.IsSubordinateOf(tt.childNamespaceID, tt.parentNamespaceID)
 			if got != tt.want {
-				t.Errorf(ConstMagiccc51d34f, tt.childNamespaceID, tt.parentNamespaceID, got, tt.want, tt.description)
+				t.Errorf("IsSubordinateOf(%q, %q) = %v, want %v (%s)", tt.childNamespaceID, tt.parentNamespaceID, got, tt.want, tt.description)
 			}
 		})
 	}
@@ -601,42 +601,42 @@ func TestNamespaceRegistry_GetParentNamespace(t *testing.T) {
 		{
 			subordinateNamespaceID: DefaultNamespaceKernelCLI,
 			want:                   DefaultNamespaceKernel,
-			description:            ConstMagic2e6449e2,
+			description:            "DefaultNamespaceKernel:cli parent is DefaultNamespaceKernel",
 		},
 		{
 			subordinateNamespaceID: DefaultNamespaceKernelMetrics,
 			want:                   DefaultNamespaceKernel,
-			description:            ConstMagic3786bb1c,
+			description:            "DefaultNamespaceKernel:metrics parent is DefaultNamespaceKernel",
 		},
 		{
 			subordinateNamespaceID: DefaultNamespaceKernel + ":storage",
 			want:                   DefaultNamespaceKernel,
-			description:            ConstMagic9e3812e9,
+			description:            "DefaultNamespaceKernel:storage parent is DefaultNamespaceKernel",
 		},
 		{
 			subordinateNamespaceID: DefaultNamespaceKernelCLI + ":sub",
 			want:                   DefaultNamespaceKernelCLI,
-			description:            ConstMagic2bf523f1,
+			description:            "Nested subordinate namespace parent extraction",
 		},
 		{
 			subordinateNamespaceID: DefaultNamespaceKernel,
 			want:                   "zqk", // Root namespace (first layer)
-			description:            ConstMagic316c736f,
+			description:            "DefaultNamespaceKernel parent is zqk (root namespace)",
 		},
 		{
-			subordinateNamespaceID: ConstMagic09ae1f1a,
+			subordinateNamespaceID: "domain:organizational",
 			want:                   "domain",
-			description:            ConstMagiccfbc97a6,
+			description:            "domain:organizational parent is domain (root namespace)",
 		},
 		{
 			subordinateNamespaceID: "invalid",
 			want:                   "",
-			description:            ConstMagic1813c675,
+			description:            "Invalid format returns empty string",
 		},
 		{
 			subordinateNamespaceID: "",
 			want:                   "",
-			description:            ConstMagic41c9861e,
+			description:            "Empty string returns empty string",
 		},
 	}
 
@@ -644,7 +644,7 @@ func TestNamespaceRegistry_GetParentNamespace(t *testing.T) {
 		t.Run(tt.description, func(t *testing.T) {
 			got := registry.GetParentNamespace(tt.subordinateNamespaceID)
 			if got != tt.want {
-				t.Errorf(ConstMagic416be8fb, tt.subordinateNamespaceID, got, tt.want, tt.description)
+				t.Errorf("GetParentNamespace(%q) = %q, want %q (%s)", tt.subordinateNamespaceID, got, tt.want, tt.description)
 			}
 		})
 	}
@@ -655,13 +655,13 @@ func TestNamespaceRegistry_LoadSubordinateNamespaces(t *testing.T) {
 	t.Parallel()
 	registry := NewNamespaceRegistry("")
 	if err := registry.LoadNamespaces(); err != nil {
-		t.Fatalf(ConstMagicba706c3d, err)
+		t.Fatalf("Failed to load namespaces: %v", err)
 	}
 
 	// Verify that DefaultNamespaceKernel has subordinate namespaces loaded
 	subordinates := registry.GetSubordinateNamespaces(DefaultNamespaceKernel)
 	if len(subordinates) == 0 {
-		t.Error(ConstMagica65554e2)
+		t.Error("DefaultNamespaceKernel should have subordinate namespaces loaded from config")
 	}
 
 	// Verify expected subordinates are present
@@ -674,14 +674,14 @@ func TestNamespaceRegistry_LoadSubordinateNamespaces(t *testing.T) {
 
 	for _, subordinate := range subordinates {
 		if !expectedSubordinates[subordinate] {
-			t.Errorf(ConstMagic6817012c, subordinate)
+			t.Errorf("Unexpected subordinate namespace: %q", subordinate)
 		}
 		delete(expectedSubordinates, subordinate)
 	}
 
 	// Check that all expected subordinates were found
 	for missing := range expectedSubordinates {
-		t.Errorf(ConstMagic7088b332, missing)
+		t.Errorf("Missing expected subordinate namespace: %q", missing)
 	}
 }
 

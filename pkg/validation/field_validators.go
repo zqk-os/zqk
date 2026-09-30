@@ -34,7 +34,7 @@ func resolveStringForPatternValidationWithField(fieldName string, fieldValue any
 			if dt, ok := normalizeUnixTimestampStringForDateTimeField(fieldName, v); ok {
 				return dt, true
 			}
-			if fieldName == ConstMagicExtracted_0 {
+			if fieldName == "schema_version" {
 				if sv, ok := normalizeSchemaVersionString(v); ok {
 					return sv, true
 				}
@@ -56,7 +56,7 @@ func resolveStringForPatternValidationWithField(fieldName string, fieldValue any
 		return "", false
 	case float64:
 		// schema_version in YAML is often unmarshaled as float64 (e.g. 2.0.0 -> 2.0)
-		if fieldName == ConstMagicExtracted_0 {
+		if fieldName == "schema_version" {
 			return formatSchemaVersionFromFloat(v), true
 		}
 		// Unix seconds for datetime fields (plausible range: 2001–~33658)
@@ -89,7 +89,7 @@ func formatSchemaVersionFromFloat(f float64) string {
 
 func isDateTimePatternField(fieldName string) bool {
 	switch fieldName {
-	case "created_at", "updated_at", "last_seen", "first_seen", ConstMagicExtracted_1, ConstMagicExtracted_2, ConstMagicExtracted_3:
+	case "created_at", "updated_at", "last_seen", "first_seen", "aggregation_window_start", "aggregation_window_end", "aggregation_window_time":
 		return true
 	default:
 		return false
@@ -186,7 +186,7 @@ func ValidateRequiredField(fieldName string, fieldValue any, exists bool, checkE
 	if !exists || fieldValue == nil {
 		return &ValidationError{
 			Field:   fieldName,
-			Message: fmt.Sprintf(ConstMagicf14fc058, fieldName),
+			Message: fmt.Sprintf("Field %s is required", fieldName),
 			Rule:    "required",
 		}
 	}
@@ -197,7 +197,7 @@ func ValidateRequiredField(fieldName string, fieldValue any, exists bool, checkE
 		if trimmed == emptyValue {
 			return &ValidationError{
 				Field:   fieldName,
-				Message: fmt.Sprintf(ConstMagicf14fc058, fieldName),
+				Message: fmt.Sprintf("Field %s is required", fieldName),
 				Rule:    "required",
 			}
 		}
@@ -227,14 +227,14 @@ func ValidateRequiredField(fieldName string, fieldValue any, exists bool, checkE
 		if (val.Kind() == reflect.Slice || val.Kind() == reflect.Array) && val.Len() == 0 {
 			return &ValidationError{
 				Field:   fieldName,
-				Message: fmt.Sprintf(ConstMagicedfcb684, fieldName),
+				Message: fmt.Sprintf("Field %s is required (minCount: 1)", fieldName),
 				Rule:    "minCount",
 			}
 		}
 		if val.Kind() == reflect.Map && val.Len() == 0 {
 			return &ValidationError{
 				Field:   fieldName,
-				Message: fmt.Sprintf(ConstMagicedfcb684, fieldName),
+				Message: fmt.Sprintf("Field %s is required (minCount: 1)", fieldName),
 				Rule:    "minCount",
 			}
 		}
@@ -275,7 +275,7 @@ func ValidateEnumField(fieldName string, fieldValue any, enumValues []any) *Vali
 	enumStr := formatEnumValues(enumValues)
 	return &ValidationError{
 		Field:   fieldName,
-		Message: fmt.Sprintf(ConstMagic07f529da, fieldName, enumStr),
+		Message: fmt.Sprintf("Field %s must be one of: %s", fieldName, enumStr),
 		Rule:    "enum",
 	}
 }

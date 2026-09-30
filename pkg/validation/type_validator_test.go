@@ -23,7 +23,7 @@ func TestValidateType_NumberAcceptsIntsAndFloats(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			got := ValidateType(tc.value, "number")
 			if got != tc.want {
-				t.Fatalf(ConstMagic45a7767b, tc.value, got, tc.want)
+				t.Fatalf("ValidateType(%T, number)=%v, want %v", tc.value, got, tc.want)
 			}
 		})
 	}

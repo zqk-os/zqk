@@ -23,10 +23,10 @@ func createObjectFile(t *testing.T, dir, filename string, obj map[string]any) st
 	filePath := filepath.Join(dir, filename)
 	data, err := yaml.Marshal(obj)
 	if err != nil {
-		t.Fatalf(ConstMagic4e7cea54, err)
+		t.Fatalf("failed to marshal object: %v", err)
 	}
 	if err := fileutil.WriteFile(filePath, data, paths.FilePerm644); err != nil {
-		t.Fatalf(ConstMagicf7a7d3e4, err)
+		t.Fatalf("failed to write file: %v", err)
 	}
 	return filePath
 }
@@ -39,7 +39,7 @@ func TestAsyncValidator_CascadeDependencies(t *testing.T) {
 
 	validator := NewAsyncValidator(pkgctx.NewSystemContext(), testRoot, 4, time.Hour)
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic4545ee2f, err)
+		t.Fatalf("failed to start validator: %v", err)
 	}
 	defer func() { _ = validator.Stop() }() //nolint:errcheck // Test cleanup - errors are acceptable
 
@@ -51,7 +51,7 @@ func TestAsyncValidator_CascadeDependencies(t *testing.T) {
 
 	for _, dir := range []string{strategicPlanDir, milestoneDir, goalDir, backlogDir} {
 		if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
-			t.Fatalf(ConstMagic88d82f12, dir, err)
+			t.Fatalf("failed to create directory %s: %v", dir, err)
 		}
 	}
 
@@ -62,13 +62,13 @@ func TestAsyncValidator_CascadeDependencies(t *testing.T) {
 		objects.FieldKeyKind:          "strategic_plan",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyStatus:        "active",
-		objects.FieldKeyTitle:         ConstMagic04554a4d,
+		objects.FieldKeyTitle:         "Test Strategic Plan",
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
 		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
 		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
-	createObjectFile(t, strategicPlanDir, ConstMagicf8bc63fe, strategicPlan)
+	createObjectFile(t, strategicPlanDir, "STRAT-PLAN-001.yaml", strategicPlan)
 
 	// Level 2: Milestone (depends on strategic_plan)
 	milestone := map[string]any{
@@ -106,7 +106,7 @@ func TestAsyncValidator_CascadeDependencies(t *testing.T) {
 		objects.FieldKeyKind:          "backlog_item",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyStatus:        "planned",
-		objects.FieldKeyTitle:         ConstMagic416ec496,
+		objects.FieldKeyTitle:         "Test Backlog Item",
 		objects.FieldKeyGoalRefs:      []string{"GOAL-001"},
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
 		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
@@ -121,7 +121,7 @@ func TestAsyncValidator_CascadeDependencies(t *testing.T) {
 	_ = validator.Enqueue("BLI-001", "backlog_item", filepath.Join(backlogDir, "BLI-001.yaml"), 1)
 	_ = validator.Enqueue("GOAL-001", "goal", filepath.Join(goalDir, "GOAL-001.yaml"), 1)
 	_ = validator.Enqueue("MIL-001", "milestone", filepath.Join(milestoneDir, "MIL-001.yaml"), 1)
-	_ = validator.Enqueue("STRAT-PLAN-001", "strategic_plan", filepath.Join(strategicPlanDir, ConstMagicf8bc63fe), 1)
+	_ = validator.Enqueue("STRAT-PLAN-001", "strategic_plan", filepath.Join(strategicPlanDir, "STRAT-PLAN-001.yaml"), 1)
 
 	// Wait for validation to complete
 	timeout := time.After(10 * time.Second)
@@ -131,7 +131,7 @@ func TestAsyncValidator_CascadeDependencies(t *testing.T) {
 	for {
 		select {
 		case <-timeout:
-			t.Fatal(ConstMagic16e76391)
+			t.Fatal("timeout waiting for validation to complete")
 		case <-ticker.C:
 			_, _, _, queueSize := validator.GetValidationStats()
 			if queueSize == 0 {
@@ -149,9 +149,9 @@ func TestAsyncValidator_CascadeDependencies(t *testing.T) {
 				for _, obj := range objects {
 					state, exists := validator.GetCachedState(obj.id)
 					if !exists {
-						t.Errorf(ConstMagice493f559, obj.id, obj.kind)
+						t.Errorf("expected %s (%s) to be cached after validation", obj.id, obj.kind)
 					} else {
-						t.Logf(ConstMagicaaacd7cd, obj.id, obj.kind, len(state.Issues))
+						t.Logf("Validated %s (%s): %d issues", obj.id, obj.kind, len(state.Issues))
 					}
 				}
 				return
@@ -167,13 +167,13 @@ func TestAsyncValidator_MissingDependencies(t *testing.T) {
 
 	validator := NewAsyncValidator(pkgctx.NewSystemContext(), testRoot, 2, time.Hour)
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic4545ee2f, err)
+		t.Fatalf("failed to start validator: %v", err)
 	}
 	defer func() { _ = validator.Stop() }() //nolint:errcheck // Test cleanup - errors are acceptable
 
 	backlogDir := datacell.CellCASPrimaryDir(testRoot, "backlog")
 	if err := fileutil.MkdirAll(backlogDir, paths.DirPerm755); err != nil {
-		t.Fatalf(ConstMagic43ec9c63, err)
+		t.Fatalf("failed to create directory: %v", err)
 	}
 
 	// Create backlog item with reference to non-existent goal
@@ -182,7 +182,7 @@ func TestAsyncValidator_MissingDependencies(t *testing.T) {
 		objects.FieldKeyKind:          "backlog_item",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyStatus:        "planned",
-		objects.FieldKeyTitle:         ConstMagic1c2ffb9e,
+		objects.FieldKeyTitle:         "Backlog Item with Missing Goal",
 		objects.FieldKeyGoalRefs:      []string{"GOAL-999"}, // Non-existent goal
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
 		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
@@ -195,20 +195,20 @@ func TestAsyncValidator_MissingDependencies(t *testing.T) {
 	ctx := pkgctx.NewSystemContext()
 	state, err := validator.ValidateNow(ctx, "BLI-002", "backlog_item", filePath)
 	if err != nil {
-		t.Fatalf(ConstMagicbef26ac5, err)
+		t.Fatalf("validation should complete even with missing dependencies: %v", err)
 	}
 
 	// Should have reference integrity issues
 	hasReferenceIssue := false
 	for _, issue := range state.Issues {
-		if issue.Category == "reference" || issue.Category == ConstMagic5dca8b58 {
+		if issue.Category == "reference" || issue.Category == "reference_integrity" {
 			hasReferenceIssue = true
-			t.Logf(ConstMagicb763cb42, issue.Message, issue.Tier)
+			t.Logf("Found reference issue: %s (Tier %d)", issue.Message, issue.Tier)
 		}
 	}
 
 	if !hasReferenceIssue {
-		t.Log(ConstMagic6d5e76c1)
+		t.Log("No reference issues found (may be expected depending on validation implementation)")
 	}
 }
 
@@ -219,7 +219,7 @@ func TestAsyncValidator_DeepDependencyChain(t *testing.T) {
 
 	validator := NewAsyncValidator(pkgctx.NewSystemContext(), testRoot, 4, time.Hour)
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic4545ee2f, err)
+		t.Fatalf("failed to start validator: %v", err)
 	}
 	defer func() { _ = validator.Stop() }() //nolint:errcheck // Test cleanup - errors are acceptable
 
@@ -234,7 +234,7 @@ func TestAsyncValidator_DeepDependencyChain(t *testing.T) {
 
 	for _, dir := range dirs {
 		if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
-			t.Fatalf(ConstMagic43ec9c63, err)
+			t.Fatalf("failed to create directory: %v", err)
 		}
 	}
 
@@ -245,13 +245,13 @@ func TestAsyncValidator_DeepDependencyChain(t *testing.T) {
 		objects.FieldKeyKind:          "strategic_plan",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyStatus:        "active",
-		objects.FieldKeyTitle:         ConstMagic162cdfdc,
+		objects.FieldKeyTitle:         "Deep Chain Strategic Plan",
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
 		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
 		objects.FieldKeyUpdatedAt:     time.Now().Format(time.RFC3339),
 		objects.FieldKeyUpdatedBy:     "ACC-SYSTEM",
 	}
-	createObjectFile(t, dirs["strategic_plan"], ConstMagic880f563a, sp)
+	createObjectFile(t, dirs["strategic_plan"], "STRAT-PLAN-002.yaml", sp)
 
 	// Level 2: Milestone
 	mil := map[string]any{
@@ -259,7 +259,7 @@ func TestAsyncValidator_DeepDependencyChain(t *testing.T) {
 		objects.FieldKeyKind:          "milestone",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyStatus:        "active",
-		objects.FieldKeyTitle:         ConstMagic5a816c7d,
+		objects.FieldKeyTitle:         "Deep Chain Milestone",
 		"strategic_plan_ref":          "STRAT-PLAN-002",
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
 		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
@@ -289,7 +289,7 @@ func TestAsyncValidator_DeepDependencyChain(t *testing.T) {
 		objects.FieldKeyKind:          "requirement",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyStatus:        "planned",
-		objects.FieldKeyTitle:         ConstMagic06260a5f,
+		objects.FieldKeyTitle:         "Deep Chain Requirement",
 		objects.FieldKeyGoalRefs:      []string{"GOAL-002"},
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
 		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
@@ -304,7 +304,7 @@ func TestAsyncValidator_DeepDependencyChain(t *testing.T) {
 		objects.FieldKeyKind:            "backlog_item",
 		objects.FieldKeySchemaVersion:   objects.DefaultSchemaVersion,
 		objects.FieldKeyStatus:          "planned",
-		objects.FieldKeyTitle:           ConstMagic09b0be1b,
+		objects.FieldKeyTitle:           "Deep Chain Backlog Item",
 		objects.FieldKeyRequirementRefs: []string{"REQ-002"},
 		objects.FieldKeyCreatedAt:       time.Now().Format(time.RFC3339),
 		objects.FieldKeyCreatedBy:       "ACC-SYSTEM",
@@ -323,7 +323,7 @@ func TestAsyncValidator_DeepDependencyChain(t *testing.T) {
 		{"REQ-002", "requirement", filepath.Join(dirs["requirement"], "REQ-002.yaml")},
 		{"GOAL-002", "goal", filepath.Join(dirs["goal"], "GOAL-002.yaml")},
 		{"MIL-002", "milestone", filepath.Join(dirs["milestone"], "MIL-002.yaml")},
-		{"STRAT-PLAN-002", "strategic_plan", filepath.Join(dirs["strategic_plan"], ConstMagic880f563a)},
+		{"STRAT-PLAN-002", "strategic_plan", filepath.Join(dirs["strategic_plan"], "STRAT-PLAN-002.yaml")},
 	}
 
 	for _, obj := range objects {
@@ -338,7 +338,7 @@ func TestAsyncValidator_DeepDependencyChain(t *testing.T) {
 	for {
 		select {
 		case <-timeout:
-			t.Fatal(ConstMagicb7cdb6d4)
+			t.Fatal("timeout waiting for validation")
 		case <-ticker.C:
 			_, _, _, queueSize := validator.GetValidationStats()
 			if queueSize == 0 {
@@ -346,7 +346,7 @@ func TestAsyncValidator_DeepDependencyChain(t *testing.T) {
 				for _, obj := range objects {
 					state, exists := validator.GetCachedState(obj.id)
 					if !exists {
-						t.Errorf(ConstMagic4c4bb909, obj.id)
+						t.Errorf("expected %s to be cached", obj.id)
 					} else {
 						t.Logf("%s: %d issues", obj.id, len(state.Issues))
 					}
@@ -365,7 +365,7 @@ func TestAsyncValidator_ConcurrentCascadeValidation(t *testing.T) {
 
 	validator := NewAsyncValidator(pkgctx.NewSystemContext(), testRoot, 4, time.Hour)
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic4545ee2f, err)
+		t.Fatalf("failed to start validator: %v", err)
 	}
 	defer func() { _ = validator.Stop() }() //nolint:errcheck // Test cleanup - errors are acceptable
 
@@ -384,7 +384,7 @@ func TestAsyncValidator_ConcurrentCascadeValidation(t *testing.T) {
 
 	for _, dir := range []string{milestoneDir, goalDir, backlogDir} {
 		if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
-			t.Fatalf(ConstMagic43ec9c63, err)
+			t.Fatalf("failed to create directory: %v", err)
 		}
 	}
 
@@ -478,7 +478,7 @@ func TestAsyncValidator_ConcurrentCascadeValidation(t *testing.T) {
 		select {
 		case <-timeout:
 			total, stale, withIssues, queueSize := validator.GetValidationStats()
-			t.Fatalf(ConstMagicde797e83, total, queueSize, stale, withIssues)
+			t.Fatalf("timeout: processed %d, queue: %d, stale: %d, withIssues: %d", total, queueSize, stale, withIssues)
 		case <-ticker.C:
 			// Do not exit on queueSize==0 alone: work can still be publishing cached state.
 			// Wait until every object has a cached validation state or we hit the timeout above.
@@ -491,7 +491,7 @@ func TestAsyncValidator_ConcurrentCascadeValidation(t *testing.T) {
 				}
 			}
 			if validated == expected {
-				t.Logf(ConstMagica1e10070, validated, numChains)
+				t.Logf("Successfully validated %d objects across %d dependency chains", validated, numChains)
 				return
 			}
 		}
@@ -506,7 +506,7 @@ func TestAsyncValidator_DependencyUpdateCascade(t *testing.T) {
 
 	validator := NewAsyncValidator(pkgctx.NewSystemContext(), testRoot, 2, time.Hour)
 	if err := validator.Start(); err != nil {
-		t.Fatalf(ConstMagic4545ee2f, err)
+		t.Fatalf("failed to start validator: %v", err)
 	}
 	defer func() { _ = validator.Stop() }() //nolint:errcheck // Test cleanup - errors are acceptable
 
@@ -515,7 +515,7 @@ func TestAsyncValidator_DependencyUpdateCascade(t *testing.T) {
 
 	for _, dir := range []string{goalDir, backlogDir} {
 		if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
-			t.Fatalf(ConstMagic43ec9c63, err)
+			t.Fatalf("failed to create directory: %v", err)
 		}
 	}
 
@@ -539,7 +539,7 @@ func TestAsyncValidator_DependencyUpdateCascade(t *testing.T) {
 		objects.FieldKeyKind:          "backlog_item",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyStatus:        "planned",
-		objects.FieldKeyTitle:         ConstMagicdce36e2d,
+		objects.FieldKeyTitle:         "Dependent Backlog Item",
 		objects.FieldKeyGoalRefs:      []string{"GOAL-003"},
 		objects.FieldKeyCreatedAt:     time.Now().Format(time.RFC3339),
 		objects.FieldKeyCreatedBy:     "ACC-SYSTEM",
@@ -552,20 +552,20 @@ func TestAsyncValidator_DependencyUpdateCascade(t *testing.T) {
 	ctx := pkgctx.NewSystemContext()
 	goalState, err := validator.ValidateNow(ctx, "GOAL-003", "goal", goalPath)
 	if err != nil {
-		t.Fatalf(ConstMagic70c55c56, err)
+		t.Fatalf("failed to validate goal: %v", err)
 	}
 
 	_, err = validator.ValidateNow(ctx, "BLI-004", "backlog_item", bliPath)
 	if err != nil {
-		t.Fatalf(ConstMagic1b0c0473, err)
+		t.Fatalf("failed to validate backlog item: %v", err)
 	}
 
 	// Both should be cached
 	if _, exists := validator.GetCachedState("GOAL-003"); !exists {
-		t.Error(ConstMagiccab583ce)
+		t.Error("goal should be cached")
 	}
 	if _, exists := validator.GetCachedState("BLI-004"); !exists {
-		t.Error(ConstMagic293a7f25)
+		t.Error("backlog item should be cached")
 	}
 
 	// Update the goal (simulating a change)
@@ -576,21 +576,21 @@ func TestAsyncValidator_DependencyUpdateCascade(t *testing.T) {
 	// Re-validate goal (should update cache)
 	goalState2, err := validator.ValidateNow(ctx, "GOAL-003", "goal", goalPath)
 	if err != nil {
-		t.Fatalf(ConstMagic77391e99, err)
+		t.Fatalf("failed to re-validate goal: %v", err)
 	}
 
 	// Goal checksum should have changed
 	if goalState.Checksum == goalState2.Checksum {
-		t.Error(ConstMagic6b2552ba)
+		t.Error("goal checksum should have changed after update")
 	}
 
 	// Backlog item should still be cached (but may need revalidation if dependency changed)
 	// This tests that the system handles dependency updates correctly
 	bliState2, err := validator.ValidateNow(ctx, "BLI-004", "backlog_item", bliPath)
 	if err != nil {
-		t.Fatalf(ConstMagica081775e, err)
+		t.Fatalf("failed to re-validate backlog item: %v", err)
 	}
 
-	t.Logf(ConstMagic986a60c2, goalState.Checksum[:8], goalState2.Checksum[:8])
-	t.Logf(ConstMagicdd6e3d34, len(bliState2.Issues))
+	t.Logf("Goal updated: checksum changed from %s to %s", goalState.Checksum[:8], goalState2.Checksum[:8])
+	t.Logf("Backlog item re-validated: %d issues", len(bliState2.Issues))
 }

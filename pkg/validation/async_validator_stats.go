@@ -40,7 +40,7 @@ func (av *AsyncValidator) GetMaxWorkers() int {
 			return nil
 		},
 	); err != nil {
-		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ConstMagic8cfdad90, err).Log()
+		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error("lock failed in GetMaxWorkers: %v\n", err).Log()
 	}
 	return maxWorkers
 }
@@ -53,7 +53,7 @@ func (av *AsyncValidator) WaitForValidationCompletion(timeout time.Duration) boo
 	waitCtx, waitCancel := context.WithTimeout(av.ctx, timeout)
 	defer waitCancel()
 	statsBud := goroutinelabels.DefaultBudget()
-	statsBuilder := goroutinelabels.NewGoroutine(ConstMagic69760185, ConstMagic2264261e).
+	statsBuilder := goroutinelabels.NewGoroutine("async_validator_completion_wait", "waiting for validation completion").
 		WithCleanup(func() {
 			close(done)
 		})
@@ -71,9 +71,9 @@ func (av *AsyncValidator) WaitForValidationCompletion(timeout time.Duration) boo
 		return true
 	case <-waitCtx.Done():
 		// Timeout waiting for validation goroutines
-		logging.Fluent(av.logger).Debug(ConstMagica74a040f).
+		logging.Fluent(av.logger).Debug("Timeout waiting for validation goroutines to complete").
 			String("timeout", timeout.String()).
-			Int(ConstMagice4c6e9b7, int(getActiveGoroutines())).
+			Int("active_goroutines", int(getActiveGoroutines())).
 			Log()
 		return false
 	}

@@ -5,35 +5,34 @@ import (
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/policyinterrupt"
-	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 func TestInterruptEmitter_EmitDisparityInterrupt(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	emitter := NewInterruptEmitter(tmpDir)
-	err := emitter.EmitDisparityInterrupt(context.Background(), "BLI-123", validation.ConstMagic06bbd9e7)
+	err := emitter.EmitDisparityInterrupt(context.Background(), "BLI-123", "Stubbed test logic found.")
 	if err != nil {
-		t.Fatalf(validation.ConstMagic0e62b714, err)
+		t.Fatalf("failed to emit interrupt: %v", err)
 	}
 
 	// Verify append via LoadAcksIncremental and LoadLatestCriticalUnacked
 	acks, err := policyinterrupt.LoadAcksIncremental(tmpDir)
 	if err != nil {
-		t.Fatalf(validation.ConstMagic88f5a720, err)
+		t.Fatalf("failed to load acks: %v", err)
 	}
 
 	latest, err := policyinterrupt.LoadLatestCriticalUnacked(tmpDir, acks)
 	if err != nil {
-		t.Fatalf(validation.ConstMagic4ed228e0, err)
+		t.Fatalf("failed to load latest interrupt: %v", err)
 	}
 
 	if latest == nil {
-		t.Fatal(validation.ConstMagicd7b47ee2)
+		t.Fatal("expected an interrupt record, got nil")
 	}
 
-	if latest.DedupeKey != validation.ConstMagic34604fe1 {
-		t.Errorf(validation.ConstMagicb47f78ac, latest.DedupeKey)
+	if latest.DedupeKey != "qa-disparity-BLI-123" {
+		t.Errorf("unexpected dedupe key: %s", latest.DedupeKey)
 	}
 }
 

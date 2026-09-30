@@ -25,25 +25,25 @@ func TestValidatorRegistry(t *testing.T) {
 	// Test default validator
 	validator := registry.Get("")
 	if validator == nil {
-		t.Fatal(ConstMagiccbb2f856)
+		t.Fatal("Default validator should not be nil")
 	}
 	if validator.Name() != "go" {
-		t.Errorf(ConstMagic5e73ca8d, validator.Name())
+		t.Errorf("Expected default validator name 'go', got '%s'", validator.Name())
 	}
 
 	// Test getting by name
 	validator = registry.Get("go")
 	if validator == nil {
-		t.Fatal(ConstMagic374cc900)
+		t.Fatal("Go validator should not be nil")
 	}
 
 	// Test getting non-existent validator (should return default)
 	validator = registry.Get("nonexistent")
 	if validator == nil {
-		t.Fatal(ConstMagicefdf843e)
+		t.Fatal("Should return default validator for nonexistent name")
 	}
 	if validator.Name() != "go" {
-		t.Errorf(ConstMagic27caea8e, validator.Name())
+		t.Errorf("Expected default validator for nonexistent name, got '%s'", validator.Name())
 	}
 }
 
@@ -51,7 +51,7 @@ func TestGoValidator_Name(t *testing.T) {
 	t.Parallel()
 	validator := NewGoValidator()
 	if validator.Name() != "go" {
-		t.Errorf(ConstMagic3c38595a, validator.Name())
+		t.Errorf("Expected validator name 'go', got '%s'", validator.Name())
 	}
 }
 
@@ -74,7 +74,7 @@ func TestGoValidator_SupportsFeature(t *testing.T) {
 		t.Run(tt.feature, func(t *testing.T) {
 			got := validator.SupportsFeature(tt.feature)
 			if got != tt.want {
-				t.Errorf(ConstMagic734eefcd, tt.feature, got, tt.want)
+				t.Errorf("SupportsFeature(%s) = %v, want %v", tt.feature, got, tt.want)
 			}
 		})
 	}
@@ -98,21 +98,21 @@ func TestGoValidator_Validate(t *testing.T) {
 		objects.FieldKeyTitle:         "Test Item",
 		objects.FieldKeyStatus:        "exploring",
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
-		objects.FieldKeyCreatedAt:     ConstMagiccd842f93,
+		objects.FieldKeyCreatedAt:     "2025-12-25T00:00:00Z",
 		objects.FieldKeyCreatedBy:     "ACC-TEST",
-		objects.FieldKeyUpdatedAt:     ConstMagiccd842f93,
+		objects.FieldKeyUpdatedAt:     "2025-12-25T00:00:00Z",
 		objects.FieldKeyUpdatedBy:     "ACC-TEST",
 	}
 
 	options := DefaultValidationOptions()
 	result, err := validator.Validate(pkgctx.NewSystemContext(), obj, "backlog_item", options)
 	if err != nil {
-		t.Fatalf(ConstMagic6762e2c0, err)
+		t.Fatalf("Validate() error = %v", err)
 	}
 
 	// Should be valid (or have warnings only)
 	if result == nil {
-		t.Fatal(ConstMagic8428c61d)
+		t.Fatal("Validation result should not be nil")
 	}
 }
 
@@ -120,16 +120,16 @@ func TestValidationOptions_Default(t *testing.T) {
 	t.Parallel()
 	options := DefaultValidationOptions()
 	if options == nil {
-		t.Fatal(ConstMagicf16c4f98)
+		t.Fatal("DefaultValidationOptions() should not return nil")
 	}
 	if !options.ValidateLifecycle {
-		t.Error(ConstMagic7f073b98)
+		t.Error("Default should have ValidateLifecycle = true")
 	}
 	if !options.ValidateSemanticTypes {
-		t.Error(ConstMagicea3b0e49)
+		t.Error("Default should have ValidateSemanticTypes = true")
 	}
 	if options.StrictMode {
-		t.Error(ConstMagicaf2ebb3e)
+		t.Error("Default should have StrictMode = false")
 	}
 }
 
@@ -145,10 +145,10 @@ func TestValidatorRegistry_Register(t *testing.T) {
 	// Should be able to retrieve it
 	validator := registry.Get("custom")
 	if validator == nil {
-		t.Fatal(ConstMagice24758a9)
+		t.Fatal("Registered validator should not be nil")
 	}
 	if validator.Name() != "custom" {
-		t.Errorf(ConstMagic9b5c6493, validator.Name())
+		t.Errorf("Expected validator name 'custom', got '%s'", validator.Name())
 	}
 
 	// Registering again should overwrite
@@ -156,7 +156,7 @@ func TestValidatorRegistry_Register(t *testing.T) {
 	registry.Register("custom", anotherValidator)
 	validator = registry.Get("custom")
 	if validator.Name() != "custom2" {
-		t.Errorf(ConstMagic7ab24cc0, validator.Name())
+		t.Errorf("Expected validator name 'custom2' after re-register, got '%s'", validator.Name())
 	}
 }
 
@@ -175,17 +175,17 @@ func TestValidatorRegistry_SetDefault(t *testing.T) {
 	// Getting with empty name should return custom validator
 	validator := registry.Get("")
 	if validator == nil {
-		t.Fatal(ConstMagiccbb2f856)
+		t.Fatal("Default validator should not be nil")
 	}
 	if validator.Name() != "custom" {
-		t.Errorf(ConstMagic4f4315ea, validator.Name())
+		t.Errorf("Expected default validator name 'custom', got '%s'", validator.Name())
 	}
 
 	// Setting default to non-existent validator should not change default
 	registry.SetDefault("nonexistent")
 	validator = registry.Get("")
 	if validator.Name() != "custom" {
-		t.Errorf(ConstMagic4f73589c, validator.Name())
+		t.Errorf("Expected default validator to remain 'custom', got '%s'", validator.Name())
 	}
 }
 
@@ -197,7 +197,7 @@ func TestValidatorRegistry_List(t *testing.T) {
 	// Initially should have "go" and "default"
 	names := registry.List()
 	if len(names) < 2 {
-		t.Errorf(ConstMagicbab2b469, len(names))
+		t.Errorf("Expected at least 2 validators, got %d", len(names))
 	}
 
 	// Register additional validators
@@ -209,7 +209,7 @@ func TestValidatorRegistry_List(t *testing.T) {
 	// List should include all registered validators
 	names = registry.List()
 	if len(names) < 4 {
-		t.Errorf(ConstMagic4bc685e8, len(names))
+		t.Errorf("Expected at least 4 validators, got %d", len(names))
 	}
 
 	// Check that all registered validators are in the list
@@ -219,16 +219,16 @@ func TestValidatorRegistry_List(t *testing.T) {
 	}
 
 	if !nameMap["go"] {
-		t.Error(ConstMagic61c85e86)
+		t.Error("List() should include 'go' validator")
 	}
 	if !nameMap["default"] {
-		t.Error(ConstMagic109ae71f)
+		t.Error("List() should include 'default' validator")
 	}
 	if !nameMap["custom"] {
-		t.Error(ConstMagic5b56e601)
+		t.Error("List() should include 'custom' validator")
 	}
 	if !nameMap["another"] {
-		t.Error(ConstMagic96b34c12)
+		t.Error("List() should include 'another' validator")
 	}
 }
 
@@ -240,16 +240,16 @@ func TestGetGlobalRegistry(t *testing.T) {
 
 	// Should return the same instance
 	if registry1 != registry2 {
-		t.Error(ConstMagic0e94f572)
+		t.Error("GetGlobalRegistry() should return the same instance")
 	}
 
 	// Should have default validators
 	validator := registry1.Get("go")
 	if validator == nil {
-		t.Fatal(ConstMagicd0766367)
+		t.Fatal("Global registry should have 'go' validator")
 	}
 	if validator.Name() != "go" {
-		t.Errorf(ConstMagic3c38595a, validator.Name())
+		t.Errorf("Expected validator name 'go', got '%s'", validator.Name())
 	}
 }
 

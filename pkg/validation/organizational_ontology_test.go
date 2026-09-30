@@ -37,26 +37,26 @@ func TestOrganizationalOntology_SpecsLoadable(t *testing.T) {
 		t.Run(kind, func(t *testing.T) {
 			spec, err := specLoader.LoadSpecWithInheritance(kind + ".yaml")
 			if err != nil {
-				t.Fatalf(ConstMagicaca29340, kind, err)
+				t.Fatalf("Failed to load spec for %s: %v", kind, err)
 			}
 
 			if spec == nil {
-				t.Fatalf(ConstMagicc2e1cfca, kind)
+				t.Fatalf("Spec for %s is nil", kind)
 			}
 
 			// Verify it extends extensible_object
-			if spec.Extends != ConstMagic41fa5b86 {
-				t.Errorf(ConstMagicac31e02c, kind, spec.Extends)
+			if spec.Extends != "extensible_object" {
+				t.Errorf("Expected %s to extend extensible_object, got %s", kind, spec.Extends)
 			}
 
 			// Verify ontology is set (should match the kind name)
 			if spec.Ontology != kind {
-				t.Errorf(ConstMagicbb87926a, kind, kind, spec.Ontology)
+				t.Errorf("Expected ontology '%s' for %s, got %s", kind, kind, spec.Ontology)
 			}
 
 			// Verify spec has fields
 			if len(spec.ResolvedFields) == 0 {
-				t.Errorf(ConstMagicad5a4899, kind)
+				t.Errorf("Spec for %s should have resolved fields", kind)
 			}
 		})
 	}
@@ -76,9 +76,9 @@ func TestOrganizationalOntology_ValidInstances(t *testing.T) {
 
 	// Helper to create valid audit fields and extensible_object fields
 	validBaseFields := map[string]any{
-		objects.FieldKeyCreatedAt:         ConstMagic0206afbb,
+		objects.FieldKeyCreatedAt:         "2025-12-31T00:00:00Z",
 		objects.FieldKeyCreatedBy:         "ACC-TEST",
-		objects.FieldKeyUpdatedAt:         ConstMagic0206afbb,
+		objects.FieldKeyUpdatedAt:         "2025-12-31T00:00:00Z",
 		objects.FieldKeyUpdatedBy:         "ACC-TEST",
 		objects.FieldKeySchemaVersion:     objects.DefaultSchemaVersion,
 		objects.FieldKeyDomain:            "custom",  // Required by extensible_object
@@ -92,13 +92,13 @@ func TestOrganizationalOntology_ValidInstances(t *testing.T) {
 		kind string
 	}{
 		{
-			name: ConstMagic1436c43d,
+			name: "valid organization",
 			kind: "organization",
 			obj: func() map[string]any {
 				obj := map[string]any{
 					objects.FieldKeyID:               "ORG-001",
 					objects.FieldKeyKind:             "organization",
-					objects.FieldKeyTitle:            ConstMagice2e5cc46,
+					objects.FieldKeyTitle:            "Test Organization",
 					objects.FieldKeyStatus:           "proposed",
 					objects.FieldKeyOrganizationName: "Acme Corp",
 				}
@@ -115,7 +115,7 @@ func TestOrganizationalOntology_ValidInstances(t *testing.T) {
 				obj := map[string]any{
 					objects.FieldKeyID:           "DIV-001",
 					objects.FieldKeyKind:         "division",
-					objects.FieldKeyTitle:        ConstMagice9a1bdea,
+					objects.FieldKeyTitle:        "Engineering Division",
 					objects.FieldKeyStatus:       "proposed",
 					objects.FieldKeyDivisionName: "Engineering",
 				}
@@ -126,15 +126,15 @@ func TestOrganizationalOntology_ValidInstances(t *testing.T) {
 			}(),
 		},
 		{
-			name: ConstMagice8cd6577,
+			name: "valid department",
 			kind: "department",
 			obj: func() map[string]any {
 				obj := map[string]any{
 					objects.FieldKeyID:             "DEP-001",
 					objects.FieldKeyKind:           "department",
-					objects.FieldKeyTitle:          ConstMagic607c0574,
+					objects.FieldKeyTitle:          "Software Engineering",
 					objects.FieldKeyStatus:         "proposed",
-					objects.FieldKeyDepartmentName: ConstMagic607c0574,
+					objects.FieldKeyDepartmentName: "Software Engineering",
 					objects.FieldKeyDivisionRef:    "DIV-001",
 				}
 				for k, v := range validBaseFields {
@@ -162,16 +162,16 @@ func TestOrganizationalOntology_ValidInstances(t *testing.T) {
 			}(),
 		},
 		{
-			name: ConstMagicb55f3bac,
+			name: "valid partnership",
 			kind: "partnership",
 			obj: func() map[string]any {
 				obj := map[string]any{
 					objects.FieldKeyID:               "PAR-001",
 					objects.FieldKeyKind:             "partnership",
-					objects.FieldKeyTitle:            ConstMagic9dcf8fce,
+					objects.FieldKeyTitle:            "Strategic Partnership",
 					objects.FieldKeyStatus:           "proposed",
 					objects.FieldKeyPartnershipName:  "Tech Alliance",
-					objects.FieldKeyPartnershipType:  ConstMagic10155eec, // Fixed: must match enum
+					objects.FieldKeyPartnershipType:  "strategic_alliance", // Fixed: must match enum
 					objects.FieldKeyOrganizationRefs: []string{"ORG-001", "ORG-002"},
 				}
 				for k, v := range validBaseFields {
@@ -181,13 +181,13 @@ func TestOrganizationalOntology_ValidInstances(t *testing.T) {
 			}(),
 		},
 		{
-			name: ConstMagic9798e3ce,
+			name: "organization with division references",
 			kind: "organization",
 			obj: func() map[string]any {
 				obj := map[string]any{
 					objects.FieldKeyID:               "ORG-002",
 					objects.FieldKeyKind:             "organization",
-					objects.FieldKeyTitle:            ConstMagic3bbdce06,
+					objects.FieldKeyTitle:            "Test Org with Divisions",
 					objects.FieldKeyStatus:           "proposed",
 					objects.FieldKeyOrganizationName: "Test Corp",
 					objects.FieldKeyDivisionRefs:     []string{"DIV-001", "DIV-002"},
@@ -199,7 +199,7 @@ func TestOrganizationalOntology_ValidInstances(t *testing.T) {
 			}(),
 		},
 		{
-			name: ConstMagicdbd14688,
+			name: "division with parent and child references",
 			kind: "division",
 			obj: func() map[string]any {
 				obj := map[string]any{
@@ -225,11 +225,11 @@ func TestOrganizationalOntology_ValidInstances(t *testing.T) {
 			options := DefaultValidationOptions()
 			result, err := validator.Validate(pkgctx.NewSystemContext(), tt.obj, tt.kind, options)
 			if err != nil {
-				t.Fatalf(ConstMagic6762e2c0, err)
+				t.Fatalf("Validate() error = %v", err)
 			}
 
 			if !result.IsValid {
-				t.Errorf(ConstMagice324e829)
+				t.Errorf("Expected valid instance, but got validation errors:")
 				for _, validationErr := range result.Errors {
 					t.Errorf("  - %s: %s", validationErr.Field, validationErr.Message)
 				}
@@ -251,9 +251,9 @@ func TestOrganizationalOntology_InvalidInstances(t *testing.T) {
 	validator := NewGoValidatorWithLoaders(specLoader, lifecycleLoader)
 
 	validBaseFields := map[string]any{
-		objects.FieldKeyCreatedAt:         ConstMagic0206afbb,
+		objects.FieldKeyCreatedAt:         "2025-12-31T00:00:00Z",
 		objects.FieldKeyCreatedBy:         "ACC-TEST",
-		objects.FieldKeyUpdatedAt:         ConstMagic0206afbb,
+		objects.FieldKeyUpdatedAt:         "2025-12-31T00:00:00Z",
 		objects.FieldKeyUpdatedBy:         "ACC-TEST",
 		objects.FieldKeySchemaVersion:     objects.DefaultSchemaVersion,
 		objects.FieldKeyDomain:            "custom",
@@ -269,7 +269,7 @@ func TestOrganizationalOntology_InvalidInstances(t *testing.T) {
 		errorMsg  string // Expected error message substring
 	}{
 		{
-			name: ConstMagic075e5ba3,
+			name: "organization missing required organization_name",
 			kind: "organization",
 			obj: func() map[string]any {
 				obj := map[string]any{
@@ -285,10 +285,10 @@ func TestOrganizationalOntology_InvalidInstances(t *testing.T) {
 				return obj
 			}(),
 			wantValid: false,
-			errorMsg:  ConstMagicd71a8daf,
+			errorMsg:  "organization_name",
 		},
 		{
-			name: ConstMagicd5d1f80d,
+			name: "division missing required division_name",
 			kind: "division",
 			obj: func() map[string]any {
 				obj := map[string]any{
@@ -307,7 +307,7 @@ func TestOrganizationalOntology_InvalidInstances(t *testing.T) {
 			errorMsg:  "division_name",
 		},
 		{
-			name: ConstMagic8231a72e,
+			name: "department missing required department_name",
 			kind: "department",
 			obj: func() map[string]any {
 				obj := map[string]any{
@@ -326,7 +326,7 @@ func TestOrganizationalOntology_InvalidInstances(t *testing.T) {
 			errorMsg:  "department_name",
 		},
 		{
-			name: ConstMagicc95e323a,
+			name: "team missing required team_name",
 			kind: "team",
 			obj: func() map[string]any {
 				obj := map[string]any{
@@ -345,13 +345,13 @@ func TestOrganizationalOntology_InvalidInstances(t *testing.T) {
 			errorMsg:  "team_name",
 		},
 		{
-			name: ConstMagic5679d804,
+			name: "partnership missing required partnership_name",
 			kind: "partnership",
 			obj: func() map[string]any {
 				obj := map[string]any{
 					objects.FieldKeyID:     "PAR-002",
 					objects.FieldKeyKind:   "partnership",
-					objects.FieldKeyTitle:  ConstMagicd309ab32,
+					objects.FieldKeyTitle:  "Test Partnership",
 					objects.FieldKeyStatus: "proposed",
 					// Missing partnership_name
 				}
@@ -361,10 +361,10 @@ func TestOrganizationalOntology_InvalidInstances(t *testing.T) {
 				return obj
 			}(),
 			wantValid: false,
-			errorMsg:  ConstMagic502c58b6,
+			errorMsg:  "partnership_name",
 		},
 		{
-			name: ConstMagiccebc294f,
+			name: "invalid ID pattern",
 			kind: "organization",
 			obj: func() map[string]any {
 				obj := map[string]any{
@@ -389,11 +389,11 @@ func TestOrganizationalOntology_InvalidInstances(t *testing.T) {
 			options := DefaultValidationOptions()
 			result, err := validator.Validate(pkgctx.NewSystemContext(), tt.obj, tt.kind, options)
 			if err != nil {
-				t.Fatalf(ConstMagic6762e2c0, err)
+				t.Fatalf("Validate() error = %v", err)
 			}
 
 			if result.IsValid != tt.wantValid {
-				t.Errorf(ConstMagicf5ed72f6, result.IsValid, tt.wantValid)
+				t.Errorf("Validate() IsValid = %v, want %v", result.IsValid, tt.wantValid)
 			}
 
 			if !tt.wantValid {
@@ -406,7 +406,7 @@ func TestOrganizationalOntology_InvalidInstances(t *testing.T) {
 					}
 				}
 				if !found && tt.errorMsg != emptyValue {
-					t.Errorf(ConstMagic187a2cdc, tt.errorMsg, result.Errors)
+					t.Errorf("Expected error message containing '%s', but got errors: %+v", tt.errorMsg, result.Errors)
 				}
 			}
 		})
@@ -426,9 +426,9 @@ func TestOrganizationalOntology_ReferenceFields(t *testing.T) {
 	validator := NewGoValidatorWithLoaders(specLoader, lifecycleLoader)
 
 	validBaseFields := map[string]any{
-		objects.FieldKeyCreatedAt:         ConstMagic0206afbb,
+		objects.FieldKeyCreatedAt:         "2025-12-31T00:00:00Z",
 		objects.FieldKeyCreatedBy:         "ACC-TEST",
-		objects.FieldKeyUpdatedAt:         ConstMagic0206afbb,
+		objects.FieldKeyUpdatedAt:         "2025-12-31T00:00:00Z",
 		objects.FieldKeyUpdatedBy:         "ACC-TEST",
 		objects.FieldKeySchemaVersion:     objects.DefaultSchemaVersion,
 		objects.FieldKeyDomain:            "custom",
@@ -443,7 +443,7 @@ func TestOrganizationalOntology_ReferenceFields(t *testing.T) {
 		wantValid bool
 	}{
 		{
-			name: ConstMagic07dffd64,
+			name: "department with valid division reference",
 			kind: "department",
 			obj: func() map[string]any {
 				obj := map[string]any{
@@ -462,7 +462,7 @@ func TestOrganizationalOntology_ReferenceFields(t *testing.T) {
 			wantValid: true,
 		},
 		{
-			name: ConstMagic8a6bc9fb,
+			name: "team with valid division and department references",
 			kind: "team",
 			obj: func() map[string]any {
 				obj := map[string]any{
@@ -482,7 +482,7 @@ func TestOrganizationalOntology_ReferenceFields(t *testing.T) {
 			wantValid: true,
 		},
 		{
-			name: ConstMagica1f9d947,
+			name: "organization with multiple division references",
 			kind: "organization",
 			obj: func() map[string]any {
 				obj := map[string]any{
@@ -501,16 +501,16 @@ func TestOrganizationalOntology_ReferenceFields(t *testing.T) {
 			wantValid: true,
 		},
 		{
-			name: ConstMagic74c3b2e4,
+			name: "partnership with multiple organization references",
 			kind: "partnership",
 			obj: func() map[string]any {
 				obj := map[string]any{
 					objects.FieldKeyID:               "PAR-003",
 					objects.FieldKeyKind:             "partnership",
-					objects.FieldKeyTitle:            ConstMagicd309ab32,
+					objects.FieldKeyTitle:            "Test Partnership",
 					objects.FieldKeyStatus:           "proposed",
-					objects.FieldKeyPartnershipName:  ConstMagicd309ab32,
-					objects.FieldKeyPartnershipType:  ConstMagic10155eec,
+					objects.FieldKeyPartnershipName:  "Test Partnership",
+					objects.FieldKeyPartnershipType:  "strategic_alliance",
 					objects.FieldKeyOrganizationRefs: []string{"ORG-001", "ORG-002", "ORG-003"},
 				}
 				for k, v := range validBaseFields {
@@ -527,13 +527,13 @@ func TestOrganizationalOntology_ReferenceFields(t *testing.T) {
 			options := DefaultValidationOptions()
 			result, err := validator.Validate(pkgctx.NewSystemContext(), tt.obj, tt.kind, options)
 			if err != nil {
-				t.Fatalf(ConstMagic6762e2c0, err)
+				t.Fatalf("Validate() error = %v", err)
 			}
 
 			if result.IsValid != tt.wantValid {
-				t.Errorf(ConstMagicf5ed72f6, result.IsValid, tt.wantValid)
+				t.Errorf("Validate() IsValid = %v, want %v", result.IsValid, tt.wantValid)
 				if len(result.Errors) > 0 {
-					t.Logf(ConstMagic6ad67277, result.Errors)
+					t.Logf("Validation errors: %+v", result.Errors)
 				}
 			}
 		})
