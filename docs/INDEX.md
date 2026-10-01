@@ -122,6 +122,11 @@ Welcome to the canonical documentation for **ZQK Core**, the Cellular Knowledge 
 | **[Telemetry & Diagnostics](../pkg/telemetry/README.md)** | Structured metrics, performance telemetry, and event streaming. |
 | **[Bootstrap Subsystem](../pkg/bootstrap/README.md)** | Embedded tarball packaging, unpack logic, and zero-friction initialization. |
 | **[CLI Kernel Architecture](../pkg/cliapp/README.md)** | Command routing, context profiles, and fail-closed CLI execution contracts. |
+| **[In-Process Code Search Engine](../pkg/search/README.md)** | Pure-Go trigram inverted indexer, AST symbol search, and LLM token-budgeted output (`zqk grep`). |
+| **[Screen Capture & Terminal Automation](../pkg/screencap/README.md)** | OS-level window/region capture, interactive terminal timeline recording, and visual verification. |
+| **[Seat Worker Subsystem](../pkg/seatworker/README.md)** | Persistent background agent seat supervisor for launchd (macOS) and systemd (Linux). |
+| **[Cellular Specialization Tiers](../pkg/specialization/README.md)** | Biological node roles (neuron, muscle, heart, lung) and shielded simulation environments. |
+| **[Positional Binary Storage](../pkg/storage/binary/README.md)** | High-density binary object serialization using stable Field ID registries. |
 
 ---
 
