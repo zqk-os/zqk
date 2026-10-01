@@ -33,8 +33,8 @@ func NewStorageAuditRouter(projectRoot string, storageProvider storage.ObjectSto
 	}
 }
 
-// AuditRouter creates an audit router that uses storage.CreateAuditEventWithBuilder.
-func AuditRouter(projectRoot string, storageProvider storage.ObjectStorageProvider) *StorageAuditRouter {
+// DefaultAuditRouter creates a new audit router that uses storage.CreateAuditEventWithBuilder.
+func DefaultAuditRouter(projectRoot string, storageProvider storage.ObjectStorageProvider) AuditRouter {
 	return NewStorageAuditRouter(projectRoot, storageProvider)
 }
 

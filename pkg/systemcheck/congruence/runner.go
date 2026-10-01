@@ -242,7 +242,7 @@ func recordCongruenceMetrics(projectRoot string, report *operational.CongruenceR
 
 // EmitCongruenceAlertEvent emits operational congruence alert events to logging and audit streams.
 func EmitCongruenceAlertEvent(ctx context.Context, projectRoot string, storageProvider storage.ObjectStorageProvider, report *operational.CongruenceReport, logger logging.Logger) {
-	auditRouter := coordination.AuditRouter(projectRoot, storageProvider)
+	auditRouter := coordination.DefaultAuditRouter(projectRoot, storageProvider)
 	loggingRouter := &coordination.DefaultLoggingRouter{}
 
 	auditMetadata := map[string]any{
