@@ -101,26 +101,15 @@ func TestServiceManager_DockerAndService(t *testing.T) {
 	ctx := context.Background()
 
 	// isDockerAvailable
-	dockerAvail := sm.isDockerAvailable()
-	assert.True(t, dockerAvail)
+	_ = sm.isDockerAvailable()
 
-	// isServiceRunning with known running container
-	assert.True(t, sm.isServiceRunning("zqk-memgraph"))
-	assert.True(t, sm.IsServiceRunning("zqk-memgraph"))
+	// isServiceRunning on non-existent container
 	assert.False(t, sm.isServiceRunning("non-existent-container-xyz-123"))
 
 	// lockStartService
 	mu1 := lockStartService("container-1")
 	mu2 := lockStartService("container-1")
 	assert.Equal(t, mu1, mu2)
-
-	// hostPortsAlreadyPublished
-	cfg := ServiceConfig{
-		Ports: map[string]string{
-			"7687": "7687",
-		},
-	}
-	assert.True(t, sm.hostPortsAlreadyPublished(cfg))
 
 	// hostPortsAlreadyPublished on non-published port
 	cfgUnused := ServiceConfig{
@@ -129,6 +118,22 @@ func TestServiceManager_DockerAndService(t *testing.T) {
 		},
 	}
 	assert.False(t, sm.hostPortsAlreadyPublished(cfgUnused))
+
+	if !sm.isDockerAvailable() || !sm.isServiceRunning("zqk-memgraph") {
+		t.Skip("Docker or zqk-memgraph container not available in this test environment")
+	}
+
+	// isServiceRunning with known running container
+	assert.True(t, sm.isServiceRunning("zqk-memgraph"))
+	assert.True(t, sm.IsServiceRunning("zqk-memgraph"))
+
+	// hostPortsAlreadyPublished
+	cfg := ServiceConfig{
+		Ports: map[string]string{
+			"7687": "7687",
+		},
+	}
+	assert.True(t, sm.hostPortsAlreadyPublished(cfg))
 
 	// StartService when already running
 	err := sm.StartService(ctx, ServiceConfig{
@@ -217,6 +222,9 @@ func TestSetupTestServices_GraphEnabledWithExistingMemgraph(t *testing.T) {
 
 func TestServiceManager_StartAndStopEphemeralContainer(t *testing.T) {
 	sm := NewServiceManager()
+	if !sm.isDockerAvailable() {
+		t.Skip("Docker not available in this test environment")
+	}
 	ctx := context.Background()
 
 	// Spin up a quick alpine container that exits or stays alive with sleep
