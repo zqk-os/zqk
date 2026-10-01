@@ -280,6 +280,8 @@ func SyncToKernel(ctx context.Context, secCtx *pkgctx.SecurityContext, store sto
 		}
 
 		if err := store.Create(ctx, secCtx, objMap); err != nil {
+			delete(objMap, objects.FieldKeyCreatedAt)
+			delete(objMap, objects.FieldKeyUpdatedAt)
 			if updateErr := store.Update(ctx, secCtx, glossaryID, objMap); updateErr != nil {
 				return synced, fmt.Errorf("failed to create (%v) or update (%v) glossary term %s", err, updateErr, glossaryID)
 			}
