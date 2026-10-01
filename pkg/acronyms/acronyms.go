@@ -2,28 +2,26 @@ package acronyms
 
 import (
 	"context"
-	_ "embed"
 	"encoding/json"
 	"fmt"
+	"path/filepath"
 	"sort"
 	"strings"
 	"sync"
 	"time"
 
-	"gopkg.in/yaml.v3"
-
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/mutation"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
-
-//go:embed acronyms.yaml
-var rawAcronymsYAML []byte
 
 // KernelAcronymsSchemeID is the canonical ID of the acronym vocabulary scheme.
 const KernelAcronymsSchemeID = "VOC-KERNEL-ACRONYMS"
 
-// Acronym represents a lightweight projection of a glossary_term object
+// Acronym represents a typed projection of a glossary_term object
 // belonging to the "VOC-KERNEL-ACRONYMS" vocabulary scheme.
 type Acronym struct {
 	Code        string   `json:"code" yaml:"code"`
@@ -57,6 +55,7 @@ func (a Acronym) ToGlossaryTerm() map[string]any {
 		"category":                    a.Category,
 		"context_scope":               "operational",
 		"definition":                  a.Definition,
+		"description":                 a.Definition,
 		"agent_prompts":               fmt.Sprintf("Expanded meaning: %s. Use for progressive disclosure.", a.FullName),
 		"machine_hints":               string(hints),
 		objects.FieldKeyNamespaceID:   "zqk:kernel",
@@ -73,22 +72,19 @@ func FromGlossaryTerm(obj map[string]any) (Acronym, bool) {
 		return Acronym{}, false
 	}
 	scheme, _ := obj[objects.FieldKeySchemeRef].(string)
+	id, _ := obj[objects.FieldKeyID].(string)
 	cat, _ := obj["category"].(string)
-	if scheme != KernelAcronymsSchemeID && cat != "acronym" {
+
+	if scheme != KernelAcronymsSchemeID && !strings.HasPrefix(id, "GLS-ACRONYM-") && cat != "acronym" {
 		return Acronym{}, false
 	}
-	id, _ := obj[objects.FieldKeyID].(string)
+
 	code, _ := obj["acronym"].(string)
-	if code == "" {
-		code = strings.TrimPrefix(id, "GLS-ACRONYM-")
-	}
 	fullName, _ := obj["full_name"].(string)
-	if fullName == "" {
-		fullName, _ = obj[objects.FieldKeyTitle].(string)
-	}
 	def, _ := obj["definition"].(string)
 	ctxScope, _ := obj["context_scope"].(string)
 	var relatedRefs []string
+
 	if hintsStr, ok := obj["machine_hints"].(string); ok && hintsStr != "" {
 		var hints map[string]any
 		if err := json.Unmarshal([]byte(hintsStr), &hints); err == nil {
@@ -107,22 +103,43 @@ func FromGlossaryTerm(obj map[string]any) (Acronym, bool) {
 			}
 		}
 	}
+
+	if code == "" && strings.HasPrefix(id, "GLS-ACRONYM-") {
+		code = strings.TrimPrefix(id, "GLS-ACRONYM-")
+	}
+	if fullName == "" {
+		title, _ := obj[objects.FieldKeyTitle].(string)
+		if idx := strings.Index(title, "("); idx != -1 {
+			end := strings.Index(title, ")")
+			if end > idx {
+				fullName = strings.TrimSpace(title[idx+1 : end])
+			}
+		}
+		if fullName == "" {
+			fullName = title
+		}
+	}
+	if code == "" {
+		title, _ := obj[objects.FieldKeyTitle].(string)
+		if idx := strings.Index(title, " "); idx != -1 {
+			code = title[:idx]
+		} else {
+			code = title
+		}
+	}
 	if code == "" {
 		return Acronym{}, false
 	}
+
 	return Acronym{
 		Code:        strings.ToUpper(strings.TrimSpace(code)),
 		FullName:    fullName,
-		SchemeRef:   scheme,
+		SchemeRef:   KernelAcronymsSchemeID,
 		Category:    cat,
 		Definition:  def,
 		Context:     ctxScope,
 		RelatedRefs: relatedRefs,
 	}, true
-}
-
-type acronymsPayload struct {
-	Acronyms []Acronym `yaml:"acronyms"`
 }
 
 var (
@@ -133,16 +150,66 @@ var (
 )
 
 func init() {
-	var payload acronymsPayload
-	if err := yaml.Unmarshal(rawAcronymsYAML, &payload); err == nil {
-		for _, a := range payload.Acronyms {
-			code := strings.ToUpper(strings.TrimSpace(a.Code))
-			if a.SchemeRef == "" {
-				a.SchemeRef = KernelAcronymsSchemeID
+	loadDefaultSeed()
+}
+
+func loadDefaultSeed() {
+	root := paths.ResolveProjectRoot(".")
+	if root == "" {
+		return
+	}
+	p := filepath.Join(root, "packs", "vocabulary", "seeds", "kernel_vocabulary.zql")
+	data, err := fileutil.ReadFile(p)
+	if err == nil {
+		_ = LoadFromZQLSeed(string(data))
+	}
+}
+
+func exprToValue(expr mutation.ZQLExpression) any {
+	if expr == nil {
+		return nil
+	}
+	switch v := expr.(type) {
+	case mutation.LiteralExpr:
+		return v.Value
+	case *mutation.LiteralExpr:
+		return v.Value
+	default:
+		return nil
+	}
+}
+
+// LoadFromZQLSeed parses a declarative ZQL seed script and registers glossary_term objects.
+func LoadFromZQLSeed(script string) error {
+	prog, err := mutation.ParseZQL(script)
+	if err != nil {
+		return err
+	}
+	registryMu.Lock()
+	defer registryMu.Unlock()
+
+	for _, stmt := range prog.Statements {
+		if stmt.NodeType != mutation.StmtUpsert || stmt.Upsert == nil {
+			continue
+		}
+		if stmt.Upsert.Kind != "glossary_term" {
+			continue
+		}
+		objMap := make(map[string]any)
+		objMap["kind"] = "glossary_term"
+		if val := exprToValue(stmt.Upsert.ID); val != nil {
+			objMap["id"] = val
+		}
+		for k, expr := range stmt.Upsert.Payload.Fields {
+			if val := exprToValue(expr); val != nil {
+				objMap[k] = val
 			}
-			registry[code] = a
+		}
+		if a, ok := FromGlossaryTerm(objMap); ok {
+			registry[a.Code] = a
 		}
 	}
+	return nil
 }
 
 // LoadFromKernel queries live glossary_term objects under VOC-KERNEL-ACRONYMS
@@ -179,6 +246,11 @@ func LoadFromKernel(ctx context.Context, secCtx *pkgctx.SecurityContext, store s
 func Lookup(key string) (Acronym, bool) {
 	upper := strings.ToUpper(strings.TrimSpace(key))
 	registryMu.RLock()
+	if len(registry) == 0 {
+		registryMu.RUnlock()
+		loadDefaultSeed()
+		registryMu.RLock()
+	}
 	defer registryMu.RUnlock()
 	acronym, found := registry[upper]
 	return acronym, found
@@ -187,6 +259,11 @@ func Lookup(key string) (Acronym, bool) {
 // ListAll returns all documented acronyms sorted alphabetically by code.
 func ListAll() []Acronym {
 	registryMu.RLock()
+	if len(registry) == 0 {
+		registryMu.RUnlock()
+		loadDefaultSeed()
+		registryMu.RLock()
+	}
 	defer registryMu.RUnlock()
 	list := make([]Acronym, 0, len(registry))
 	for _, a := range registry {
@@ -202,6 +279,11 @@ func ListAll() []Acronym {
 func FindClosest(query string) []string {
 	upper := strings.ToUpper(strings.TrimSpace(query))
 	registryMu.RLock()
+	if len(registry) == 0 {
+		registryMu.RUnlock()
+		loadDefaultSeed()
+		registryMu.RLock()
+	}
 	defer registryMu.RUnlock()
 	var matches []string
 
@@ -240,7 +322,7 @@ func levenshtein(a, b string) int {
 			if a[i-1] == b[j-1] {
 				cost = 0
 			}
-			d[i][j] = min(d[i-1][j]+1, min(d[i][j-1]+1, d[i-1][j-1]+cost))
+			d[i][j] = min(d[i-1][j]+1, min(d[i-1][j-1]+1, d[i-1][j-1]+cost))
 		}
 	}
 	return d[la][lb]

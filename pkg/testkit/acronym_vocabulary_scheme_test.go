@@ -6,7 +6,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/pkg/acronyms"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -31,16 +30,13 @@ func TestAcronymVocabulary_StaticFloor(t *testing.T) {
 		assert.NotEmpty(t, a.Context, "context for %s must not be empty", a.Code)
 	}
 
-	// 3. Declarative definition verification on disk
+	// 3. Declarative definition verification on disk (ZQL migration seed)
 	projectRoot := paths.ResolveProjectRoot(".")
-	yamlPath := filepath.Join(projectRoot, "pkg", "acronyms", "acronyms.yaml")
-	data, err := fileutil.ReadFile(yamlPath)
+	zqlPath := filepath.Join(projectRoot, "packs", "vocabulary", "seeds", "kernel_vocabulary.zql")
+	data, err := fileutil.ReadFile(zqlPath)
 	require.NoError(t, err)
-	var raw struct {
-		Acronyms []acronyms.Acronym `yaml:"acronyms"`
-	}
-	require.NoError(t, yaml.Unmarshal(data, &raw))
-	assert.GreaterOrEqual(t, len(raw.Acronyms), 16)
+	require.Contains(t, string(data), "VOC-KERNEL-ACRONYMS")
+	require.Contains(t, string(data), "GLS-ACRONYM-BLI")
 }
 
 // TestAcronymVocabulary_OperationalProof verifies CRIT-1790814939731526000-641cda96.

@@ -246,14 +246,26 @@ func createGlossaryCandidate(cmd *cobra.Command, sp storage.ObjectStorageProvide
 		return false, errfmt.Errorf("generate glossary_term id: %w", err)
 	}
 
+	schemeRef := "VOC-KERNEL-ARCHITECTURE"
+	switch c.Category {
+	case "cli":
+		schemeRef = "VOC-KERNEL-CLI"
+	case "process":
+		schemeRef = "VOC-KERNEL-PROCESS"
+	case "acronym":
+		schemeRef = "VOC-KERNEL-ACRONYMS"
+	}
+
 	b := instance_builders.NewForKind(objects.KindGlossaryTerm, objects.DefaultSchemaVersion)
 	b.SetID(newID).
 		SetField(objects.FieldKeyTitle, c.Title).
 		SetField(objects.FieldKeyContextScope, c.Context).
 		SetField(objects.FieldKeyCategory, c.Category).
 		SetField(objects.FieldKeyDefinition, c.Definition).
+		SetField(objects.FieldKeyDescription, c.Definition).
 		SetField(objects.FieldKeyAgentPrompts, c.AgentPrompt).
 		SetField(objects.FieldKeyMachineHints, c.MachineHint).
+		SetField(objects.FieldKeySchemeRef, schemeRef).
 		SetField(objects.FieldKeySourceType, "internal").
 		SetField(objects.FieldKeyOriginProject, "zqk").
 		SetField(objects.FieldKeyOriginSystem, "zqk").
