@@ -34,7 +34,44 @@ func TestAuditDiscoveryGo(t *testing.T) {
 	}
 }
 
+func TestAuditAutoRemedy(t *testing.T) {
+	auditor := NewASTAuditor()
+	violations, err := auditor.AuditFile("../../system/auto_remedy.go")
+	if err != nil {
+		t.Fatalf("AuditFile failed: %v", err)
+	}
+	for _, v := range violations {
+		if v.Severity == "high" || v.Severity == "medium" {
+			t.Errorf("unwanted AST violation [%s] %s: %s", v.Severity, v.Pos, v.Message)
+		}
+	}
+}
 
+func TestAuditRpcGenerated(t *testing.T) {
+	auditor := NewASTAuditor()
+	violations, err := auditor.AuditFile("../../graph/rpcpool/rpc_generated.go")
+	if err != nil {
+		t.Fatalf("AuditFile failed: %v", err)
+	}
+	for _, v := range violations {
+		if v.Severity == "high" || v.Severity == "medium" {
+			t.Errorf("unwanted AST violation [%s] %s: %s", v.Severity, v.Pos, v.Message)
+		}
+	}
+}
+
+func TestAuditSupervisorGo(t *testing.T) {
+	auditor := NewASTAuditor()
+	violations, err := auditor.AuditFile("../../daemon/overseer/supervisor.go")
+	if err != nil {
+		t.Fatalf("AuditFile failed: %v", err)
+	}
+	for _, v := range violations {
+		if v.Severity == "high" || v.Severity == "medium" {
+			t.Errorf("unwanted AST violation [%s] %s: %s", v.Severity, v.Pos, v.Message)
+		}
+	}
+}
 func TestAuditSwarmRun(t *testing.T) {
 	auditor := NewASTAuditor()
 	violations, err := auditor.AuditFile("../../../cmd/zqk/swarm/run.go")

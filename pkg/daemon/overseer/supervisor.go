@@ -12,6 +12,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -101,7 +102,9 @@ func (s *Supervisor) Start(ctx context.Context, pollInterval time.Duration) erro
 				case <-ctx.Done():
 					return
 				case <-ticker.C:
-					_ = s.Reconcile(ctx)
+					if err := s.Reconcile(ctx); err != nil {
+						logging.LogSwallowedError(err)
+					}
 					s.pgMgr.ReapZombies()
 				}
 			}
@@ -149,7 +152,9 @@ func (s *Supervisor) Stop(ctx context.Context) error {
 
 	// Terminate process groups outside the supervisor lock
 	for _, pid := range pidsToKill {
-		_ = s.pgMgr.TerminateGroup(ctx, pid, 300*time.Millisecond)
+		if err := s.pgMgr.TerminateGroup(ctx, pid, 300*time.Millisecond); err != nil {
+			logging.LogSwallowedError(err)
+		}
 	}
 
 	return nil
@@ -209,7 +214,9 @@ func (s *Supervisor) Reconcile(ctx context.Context) error {
 	s.mu.Unlock()
 
 	for _, pid := range pidsToStop {
-		_ = s.pgMgr.TerminateGroup(ctx, pid, 200*time.Millisecond)
+		if err := s.pgMgr.TerminateGroup(ctx, pid, 200*time.Millisecond); err != nil {
+			logging.LogSwallowedError(err)
+		}
 	}
 
 	return nil
@@ -231,7 +238,7 @@ func (s *Supervisor) launchDaemonLocked(ctx context.Context, spec *DaemonSpec, s
 		selfExe = filepath.Join(s.projectRoot, "bin", brand.ExecutableName())
 	}
 
-	if brand.IsProductExecutable(exe) || exe == "zqk" || exe == "zqk-stable" {
+	if brand.IsProductExecutable(exe) {
 		exe = selfExe
 	} else if !filepath.IsAbs(exe) {
 		binCandidate := filepath.Join(s.projectRoot, "bin", exe)
@@ -387,7 +394,9 @@ func (s *Supervisor) Restart(ctx context.Context, name string) error {
 	s.mu.Unlock()
 
 	if pidToStop > 0 {
-		_ = s.pgMgr.TerminateGroup(ctx, pidToStop, 500*time.Millisecond)
+		if err := s.pgMgr.TerminateGroup(ctx, pidToStop, 500*time.Millisecond); err != nil {
+			logging.LogSwallowedError(err)
+		}
 	}
 
 	return s.Reconcile(ctx)
@@ -441,7 +450,9 @@ func (s *Supervisor) RemoveDaemon(ctx context.Context, name string) error {
 	s.mu.Unlock()
 
 	if pidToStop > 0 {
-		_ = s.pgMgr.TerminateGroup(ctx, pidToStop, 200*time.Millisecond)
+		if err := s.pgMgr.TerminateGroup(ctx, pidToStop, 200*time.Millisecond); err != nil {
+			logging.LogSwallowedError(err)
+		}
 	}
 
 	return s.registry.Delete(name)

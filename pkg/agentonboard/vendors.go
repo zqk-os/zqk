@@ -2,10 +2,14 @@
 package agentonboard
 
 import (
+	"net"
+	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // VendorID is a stable identifier for a detected public-facing agent host.
@@ -20,6 +24,7 @@ const (
 	VendorGemini     VendorID = "gemini"
 	VendorAgent      VendorID = "agent"
 	VendorOpenClaw   VendorID = "openclaw"
+	VendorOllama     VendorID = "ollama"
 )
 
 // Vendor describes detection markers and regenerable workspace directive paths.
@@ -84,6 +89,12 @@ func KnownVendors() []Vendor {
 			MarkerRelPaths: []string{".openclaw", "OPENCLAW.md"},
 			ConfigRelPaths: []string{"OPENCLAW.md"},
 		},
+		{
+			ID:             VendorOllama,
+			DisplayName:    "Ollama (Air-Gapped Local LLM)",
+			MarkerRelPaths: []string{".ollama", "OLLAMA.md"},
+			ConfigRelPaths: []string{"OLLAMA.md"},
+		},
 	}
 }
 
@@ -106,6 +117,11 @@ func DetectVendors(projectRoot string) []DetectedVendor {
 				hit = append(hit, filepath.ToSlash(rel))
 			}
 		}
+		if v.ID == VendorOllama && len(hit) == 0 {
+			if isOllamaRunningOrConfigured() {
+				hit = append(hit, "local:11434")
+			}
+		}
 		if len(hit) == 0 {
 			continue
 		}
@@ -117,6 +133,21 @@ func DetectVendors(projectRoot string) []DetectedVendor {
 		})
 	}
 	return out
+}
+
+func isOllamaRunningOrConfigured() bool {
+	if strings.TrimSpace(os.Getenv("OLLAMA_HOST")) != "" || strings.EqualFold(os.Getenv("LLM_PROVIDER"), "ollama") {
+		return true
+	}
+	if zqkenv.IsInTest() {
+		return false
+	}
+	conn, err := net.DialTimeout("tcp", "127.0.0.1:11434", 40*time.Millisecond)
+	if err == nil {
+		_ = conn.Close()
+		return true
+	}
+	return false
 }
 
 func pathExists(p string) bool {

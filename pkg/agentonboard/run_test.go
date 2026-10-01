@@ -31,6 +31,24 @@ func TestDetectVendors_IDE(t *testing.T) {
 	}
 }
 
+func TestDetectVendors_OllamaMarker(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir()
+	if err := fileutil.WriteSecureFile(filepath.Join(root, "OLLAMA.md"), []byte("# Ollama boot\n")); err != nil {
+		t.Fatal(err)
+	}
+	got := DetectVendors(root)
+	found := false
+	for _, d := range got {
+		if d.ID == VendorOllama {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatalf("expected ollama detection from OLLAMA.md marker, got %#v", got)
+	}
+}
+
 func TestDetectVendors_BareAgentsDirNotDetected(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
