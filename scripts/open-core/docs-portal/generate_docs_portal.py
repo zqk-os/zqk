@@ -937,7 +937,7 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
                 "pkg/storage/DATACELL_MIGRATION.md"
             ]
             if rel in pkg_flow:
-                return (0, pkg_flow.index(rel))
+                return (0, pkg_flow.index(rel), entry["title"])
         if entry["category"] == "Kernel Subsystems — Spec & Command Builders":
             bldr_flow = [
                 "pkg/specbuilder/README.md", "pkg/cli/README.md",
@@ -946,7 +946,7 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
                 "pkg/specbuilder/bootstrap/README.md"
             ]
             if rel in bldr_flow:
-                return (0, bldr_flow.index(rel))
+                return (0, bldr_flow.index(rel), entry["title"])
         if entry["category"] == "Kernel Subsystems — CLI Commands & Tooling":
             cmd_flow = [
                 "cmd/zqk/README.md", "cmd/zqk-shim/README.md",
@@ -954,13 +954,13 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
                 "cmd/zqk/system/INTEGRITY_RESOLUTION_PLAN.md"
             ]
             if rel in cmd_flow:
-                return (0, cmd_flow.index(rel))
+                return (0, cmd_flow.index(rel), entry["title"])
         if entry["category"] == "Kernel Subsystems — Internal Runtime":
             internal_flow = [
                 "internal/README.md",
             ]
             if rel in internal_flow:
-                return (0, internal_flow.index(rel))
+                return (0, internal_flow.index(rel), entry["title"])
         if entry["category"] == "Codebase Evaluation — Framework & Governance":
             cef_flow = [
                 "README.md", "CONSTITUTION.md", "DIAMOND_SCALE.md", "WAVE_PLAN.md",
@@ -969,7 +969,7 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
             ]
             base = os.path.basename(rel)
             if base in cef_flow:
-                return (0, cef_flow.index(base))
+                return (0, cef_flow.index(base), entry["title"])
         if entry["category"] == "Codebase Evaluation — Audit Reports":
             eval_flow = [
                 "README.md", "MNT-code-quality-maintainability.md",
@@ -979,13 +979,13 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
             ]
             base = os.path.basename(rel)
             if base in eval_flow:
-                return (0, eval_flow.index(base))
+                return (0, eval_flow.index(base), entry["title"])
         # Pin index or overview docs to top of their category
         if "README.md" in rel or "INDEX.md" in rel or rel == "index.html":
-            return (0, entry["title"])
+            return (0, 9999, entry["title"])
         if "COMMUNITY_FIRST_RUN" in rel or "QUICKSTART" in rel or "ZQK_GETTING_STARTED" in rel or "zqk-expert/SKILL" in rel or "CONTRIBUTING" in rel:
-            return (1, entry["title"])
-        return (2, entry["title"])
+            return (1, 0, entry["title"])
+        return (2, 0, entry["title"])
 
     for cat_name in grouped_docs:
         grouped_docs[cat_name].sort(key=sort_key)

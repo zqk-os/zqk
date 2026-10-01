@@ -35,6 +35,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [audit](./audit/) | `github.com/zqk-os/zqk/pkg/audit` | 2+2 | 2 | - | ❌ - | High-volume audit log streaming, event persistence, and validation policies. |
 | [authcred](./authcred/) | `github.com/zqk-os/zqk/pkg/authcred` | 16+14 | 14 | - | ❌ - | Secure credential storage, token management, and authentication provider integration. |
 | [batchaf](./batchaf/) | `github.com/zqk-os/zqk/pkg/batchaf` | 1+2 | 2 | - | ❌ - | Batch aggregation and resolution for orphaned requirements, goals, and backlog items. |
+| [bootstrap](./bootstrap/) | `github.com/zqk-os/zqk/pkg/bootstrap` | 4+6 | 6 | - | ✅ [README](./bootstrap/README.md) | Embedded bootstrap archive for zqk system init. |
 | [brand](./brand/) | `github.com/zqk-os/zqk/pkg/brand` | 2+4 | 4 | substitution | ❌ - | Product branding, executable names, channel flags, and environment variable namespace configuration. |
 | [bridge](./bridge/) | `github.com/zqk-os/zqk/pkg/bridge` | 3+3 | 3 | engine, impl | ❌ - | Bidirectional communication bridge connecting IDEs and external tools with the kernel. |
 | [bufferpool](./bufferpool/) | `github.com/zqk-os/zqk/pkg/bufferpool` | 1+1 | 1 | - | ❌ - | Reusable memory buffer pools for high-throughput zero-allocation I/O operations. |
@@ -42,6 +43,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [circuitbreaker](./circuitbreaker/) | `github.com/zqk-os/zqk/pkg/circuitbreaker` | 5+4 | 4 | - | ❌ - | Fault tolerance circuit breaker pattern preventing cascade failures in distributed calls. |
 | [cleanup](./cleanup/) | `github.com/zqk-os/zqk/pkg/cleanup` | 1+1 | 1 | - | ❌ - | Workspace cleanup, orphaned temp file purging, and transient artifact garbage collection. |
 | [cli](./cli/) | `github.com/zqk-os/zqk/pkg/cli` | 50+33 | 33 | bldr_cli_cmd_v1, commands, +3 more | ✅ [README](./cli/README.md) | This package provides the command-line interface infrastructure for zqk, following the spec-driven builder pattern established... |
+| [cliapp](./cliapp/) | `github.com/zqk-os/zqk/pkg/cliapp` | 24+14 | 14 | context, errorsuggest, flagutil | ✅ [README](./cliapp/README.md) | Import path: github.com/zqk-os/zqk/pkg/cliapp. |
 | [clihooks](./clihooks/) | `github.com/zqk-os/zqk/pkg/clihooks` | 2+2 | 2 | - | ❌ - | CLI execution hooks, pre/post-command intercepts, and telemetry emission. |
 | [closureevidence](./closureevidence/) | `github.com/zqk-os/zqk/pkg/closureevidence` | 1+1 | 1 | - | ❌ - | Evidence collection and cryptographic verification for backlog item closure. |
 | [community](./community/) | `github.com/zqk-os/zqk/pkg/community` | 16+47 | 47 | - | ❌ - | Open-source community distribution, telemetry anonymization, docs portal, and packaging. |
@@ -167,7 +169,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [runtime](./runtime/) | `github.com/zqk-os/zqk/pkg/runtime` | 4+4 | 4 | - | ❌ - | Runtime environment detection, OS capabilities, and hardware specs. |
 | [safepath](./safepath/) | `github.com/zqk-os/zqk/pkg/safepath` | 1+1 | 1 | - | ❌ - | Builds filesystem paths confined under a root directory to mitigate directory traversal when joining untrusted or external segm... |
 | [scenario](./scenario/) | `github.com/zqk-os/zqk/pkg/scenario` | 6+7 | 7 | - | ❌ - | Convergence lifecycle end-to-end tests (storage-backed CVS updates). Coverage: measure → BuildSuggestedConvergenceSessionFields... |
-| [scheduler](./scheduler/) | `github.com/zqk-os/zqk/pkg/scheduler` | 201+249 | 249 | clusterstatus, hostservice, transceiver | ❌ - | Distributed job scheduler, cron execution, maintenance tasks, and test scans. |
+| [scheduler](./scheduler/) | `github.com/zqk-os/zqk/pkg/scheduler` | 201+250 | 250 | clusterstatus, hostservice, transceiver | ❌ - | Distributed job scheduler, cron execution, maintenance tasks, and test scans. |
 | [screencap](./screencap/) | `github.com/zqk-os/zqk/pkg/screencap` | 2+3 | 3 | - | ❌ - | Headless browser automation and visual screenshot capture engine. |
 | [search](./search/) | `github.com/zqk-os/zqk/pkg/search` | 6+2 | 2 | - | ❌ - | Search component and domain abstractions for ZQK Core. |
 | [seatworker](./seatworker/) | `github.com/zqk-os/zqk/pkg/seatworker` | 1+2 | 2 | - | ❌ - | Installs OS supervisor units for `agent seat-worker`. Production must not exec scripts/mesh/install-seat-workers.sh. p |
@@ -193,7 +195,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [swarm](./swarm/) | `github.com/zqk-os/zqk/pkg/swarm` | 17+18 | 18 | metabolism, pack, remote | ❌ - | Multi-agent swarm coordination, task allocation, and consensus protocols. |
 | [swarminit](./swarminit/) | `github.com/zqk-os/zqk/pkg/swarminit` | 6+7 | 7 | - | ❌ - | Runs configurable mesh bring-up recipes stored as kernel pipeline (PIP-*) objects. It is a mesh ops runner, not the kernel CAS... |
 | [system](./system/) | `github.com/zqk-os/zqk/pkg/system` | 1+1 | 1 | - | ❌ - | System-level diagnostics, host environment inspection, and OS capabilities. |
-| [systemcheck](./systemcheck/) | `github.com/zqk-os/zqk/pkg/systemcheck` | 10+8 | 8 | autofix, integrity, policy | ❌ - | Holds shared types and helpers for zqk system check / validation surfaces that used to live only in cmd/zqk/system (F-ARCH-001)... |
+| [systemcheck](./systemcheck/) | `github.com/zqk-os/zqk/pkg/systemcheck` | 6+5 | 5 | autofix, integrity, +2 more | ❌ - | Holds shared types and helpers for zqk system check / validation surfaces that used to live only in cmd/zqk/system (F-ARCH-001)... |
 | [systemcheckwake](./systemcheckwake/) | `github.com/zqk-os/zqk/pkg/systemcheckwake` | 1+2 | 2 | - | ❌ - | Evaluates system-check summaries and optionally wakes a mesh seat. Opt-in only via `zqk system check --notify [agent-id]` — nev... |
 | [systempeel](./systempeel/) | `github.com/zqk-os/zqk/pkg/systempeel` | 1+1 | 1 | - | ❌ - | Layered system abstraction peeling and kernel introspection tools. |
 | [tde](./tde/) | `github.com/zqk-os/zqk/pkg/tde` | 5+4 | 4 | - | ❌ - | Tde component and domain abstractions for ZQK Core. |
@@ -203,6 +205,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [testenvroot](./testenvroot/) | `github.com/zqk-os/zqk/pkg/testenvroot` | 4+5 | 5 | - | ❌ - | A minimal test project layout (.zqk/process + test-settings) without importing pkg/testing (import-cycle hygiene for packages l... |
 | [testing](./testing/) | `github.com/zqk-os/zqk/pkg/testing` | 11+1 | 1 | - | ✅ [README](./testing/README.md) | This package provides test configuration support to isolate test data from actual project data. |
 | [testkit](./testkit/) | `github.com/zqk-os/zqk/pkg/testkit` | 18+18 | 18 | dummy_policy | ❌ - | Reusable test helpers intended for extraction into a shared Go testing library later. It composes storage/CAS/audit teardown us... |
+| [testpackageconcurrency](./testpackageconcurrency/) | `github.com/zqk-os/zqk/pkg/testpackageconcurrency` | 1+1 | 1 | - | ❌ - | Concurrency test fixtures, race detection harnesses, and synchronization benchmarks. |
 | [testrunner](./testrunner/) | `github.com/zqk-os/zqk/pkg/testrunner` | 6+7 | 7 | - | ❌ - | Automated test runner execution, timeout management, and report generation. |
 | [testservices](./testservices/) | `github.com/zqk-os/zqk/pkg/testservices` | 1+3 | 3 | - | ❌ - | Manages optional test-side services (e.g. MemGraph via Docker) without pulling in the full pkg/testing surface. p |
 | [tpm](./tpm/) | `github.com/zqk-os/zqk/pkg/tpm` | 1+2 | 2 | - | ❌ - | Technical Program Management scheduling, Gantt tracking, and priority plans. |
@@ -267,6 +270,7 @@ pkg/
 ├── audit/          # High-volume audit log streaming, event persistence, and vali
 ├── authcred/          # Secure credential storage, token management, and authenticat
 ├── batchaf/          # Batch aggregation and resolution for orphaned requirements, 
+├── bootstrap/          # Embedded bootstrap archive for zqk system init.
 ├── brand/          # Product branding, executable names, channel flags, and envir
 │   └── substitution/
 ├── bridge/          # Bidirectional communication bridge connecting IDEs and exter
@@ -282,6 +286,10 @@ pkg/
 │   └── flagutil/
 │   └── printer/
 │   └── ux/
+├── cliapp/          # Import path: github.com/zqk-os/zqk/pkg/cliapp.
+│   └── context/
+│   └── errorsuggest/
+│   └── flagutil/
 ├── clihooks/          # CLI execution hooks, pre/post-command intercepts, and teleme
 ├── closureevidence/          # Evidence collection and cryptographic verification for backl
 ├── community/          # Open-source community distribution, telemetry anonymization,
@@ -537,7 +545,9 @@ pkg/
 ├── system/          # System-level diagnostics, host environment inspection, and O
 ├── systemcheck/          # Holds shared types and helpers for zqk system check / valida
 │   └── autofix/
+│   └── integrity/
 │   └── policy/
+│   └── snapshot/
 ├── systemcheckwake/          # Evaluates system-check summaries and optionally wakes a mesh
 ├── systempeel/          # Layered system abstraction peeling and kernel introspection 
 ├── tde/          # Tde component and domain abstractions for ZQK Core.
@@ -548,6 +558,7 @@ pkg/
 ├── testing/          # This package provides test configuration support to isolate 
 ├── testkit/          # Reusable test helpers intended for extraction into a shared 
 │   └── dummy_policy/
+├── testpackageconcurrency/          # Concurrency test fixtures, race detection harnesses, and syn
 ├── testrunner/          # Automated test runner execution, timeout management, and rep
 ├── testservices/          # Manages optional test-side services (e.g. MemGraph via Docke
 ├── tpm/          # Technical Program Management scheduling, Gantt tracking, and

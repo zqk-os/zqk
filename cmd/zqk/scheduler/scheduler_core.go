@@ -218,6 +218,11 @@ func startScheduler(ctx *cli.Context, cmd *cobra.Command) error {
 
 	releaseLock, err := singleton.Guard(projectRoot, "scheduler")
 	if err != nil {
+		var alreadyRunning *singleton.ErrDaemonAlreadyRunning
+		if errors.As(err, &alreadyRunning) {
+			_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("Scheduler daemon is already running for %s (PID: %d). Existing instance retained.\n", projectRoot, alreadyRunning.PID)))
+			return nil
+		}
 		return err
 	}
 	defer releaseLock()
