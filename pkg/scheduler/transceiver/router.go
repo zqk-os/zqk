@@ -128,6 +128,24 @@ func (r *Router) UnregisterAdapter(protocol string) {
 	)
 }
 
+// HasAdapter reports whether a protocol adapter is registered.
+func (r *Router) HasAdapter(protocol string) bool {
+	if r == nil {
+		return false
+	}
+	var exists bool
+	_ = concurrency.RunInRLockWithLogger(
+		&r.adaptersMu,
+		LockNameRouterValidateAdapter,
+		logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
+		func() error {
+			_, exists = r.adapters[protocol]
+			return nil
+		},
+	)
+	return exists
+}
+
 // LoadRules loads routing rules (from config, storage, etc.)
 // Rules are sorted by priority (higher priority first)
 func (r *Router) LoadRules(rules []RoutingRule) {

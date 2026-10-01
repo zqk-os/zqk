@@ -52,6 +52,24 @@ func TestRouter_RegisterAdapter(t *testing.T) {
 	}
 }
 
+func TestRouter_HasAdapter(t *testing.T) {
+	t.Parallel()
+	if NewRouter(nil).HasAdapter("missing") {
+		t.Fatal("missing adapter")
+	}
+	router := NewRouter(logging.GetLoggerFromProfile("test"))
+	if err := router.RegisterAdapter(&MockAdapter{name: "test"}); err != nil {
+		t.Fatal(err)
+	}
+	if !router.HasAdapter("test") {
+		t.Fatal("registered adapter")
+	}
+	router.UnregisterAdapter("test")
+	if router.HasAdapter("test") {
+		t.Fatal("unregistered adapter")
+	}
+}
+
 func TestRouter_LoadRules(t *testing.T) {
 	t.Parallel()
 	router := NewRouter(logging.GetLoggerFromProfile("test"))
