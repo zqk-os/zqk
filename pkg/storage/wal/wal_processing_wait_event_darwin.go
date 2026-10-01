@@ -8,4 +8,3 @@ func waitForWALProcessingEventDriven(projectRoot string, timeout time.Duration) 
 	const stableThreshold = 3
 	return waitForWALProcessingCheckpoint(projectRoot, timeout, stableThreshold, 100*time.Millisecond)
 }
-
