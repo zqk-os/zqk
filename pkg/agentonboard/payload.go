@@ -15,7 +15,7 @@ func BootPayload() string {
 	return fmt.Sprintf(`# %s Agent Boot Protocol
 
 ## Orchestration & State Management
-- **NEVER use vendor-specific subagent tools for orchestration.**
+- **Context-Bound Subagent Orchestration:** Do not use any subagent tools for orchestration without ensuring proper initialization context is included. %s makes this easy with tooling targeting lean, adequate context provision for prompt generation (e.g. %s agent orchestrate, %s agent prepare-context)—attempting to orchestrate with inadequate or irrelevant context is where execution fails.
 - All multi-agent workflows, task generation, and background processes must be executed natively using the Knowledge Kernel (e.g. %s agent orchestrate, %s scheduler).
 - Do not store state, scripts, or loops in local vendor-specific brain directories (like .gemini/ or memory caches). If it's not an object in the kernel graph or an artifact managed by the CLI, it does not exist.
 
@@ -37,7 +37,7 @@ func BootPayload() string {
   3. Immediately create/checkout the next integration branch (`+"`"+`git checkout -b integration/<pri-id> origin/main`+"`"+`).
   4. Claim or shape the first BLI (`+"`"+paths.RewriteCanonicalCLIInvocations(`zqk agent claim-work ...`)+"`"+` or kernel object creation).
   5. Continue the execution chain without yielding control to an idle wait state.
-`, brand.ProductName(), exe, exe, exe, exe, exe)
+`, brand.ProductName(), brand.ProductName(), exe, exe, exe, exe, exe, exe, exe)
 }
 
 // SyncReportRelPath is the workspace→kernel sync artifact (lite file under .zqk/agent-runtime).
