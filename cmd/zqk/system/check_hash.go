@@ -96,6 +96,14 @@ type HashRegistryCacheType struct {
 	cache map[string]storage.HashRegistryProvider
 }
 
+// NewHashRegistryCache returns an empty kind-to-registry cache.
+// The map stays unexported; composition roots call this constructor.
+func NewHashRegistryCache() *HashRegistryCacheType {
+	return &HashRegistryCacheType{
+		cache: make(map[string]storage.HashRegistryProvider),
+	}
+}
+
 // deferredHashCheck represents a hash integrity check that should be performed
 // after all fixes are complete to prevent tail-chasing issues
 type deferredHashCheck struct {
