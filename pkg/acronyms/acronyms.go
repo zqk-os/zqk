@@ -2,16 +2,23 @@ package acronyms
 
 import (
 	"context"
+	_ "embed"
 	"encoding/json"
 	"fmt"
 	"sort"
 	"strings"
+	"sync"
 	"time"
+
+	"gopkg.in/yaml.v3"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
+
+//go:embed acronyms.yaml
+var rawAcronymsYAML []byte
 
 // KernelAcronymsSchemeID is the canonical ID of the acronym vocabulary scheme.
 const KernelAcronymsSchemeID = "VOC-KERNEL-ACRONYMS"
@@ -26,149 +33,114 @@ type Acronym struct {
 	RelatedRefs []string `json:"related_refs,omitempty" yaml:"related_refs,omitempty"`
 }
 
-// Registry stores all documented acronyms in the ZQK Knowledge Kernel.
-var Registry = map[string]Acronym{
-	"BLI": {
-		Code:        "BLI",
-		FullName:    "Backlog Item",
-		Category:    "work",
-		Definition:  "A discrete, tracked work package or deliverable scheduled within a Priority Plan.",
-		Context:     "BLIs decompose requirements into tangible engineering tasks with verifiable criteria.",
-		RelatedRefs: []string{"PRI", "REQ", "CRIT", "ATK"},
-	},
-	"PRI": {
-		Code:        "PRI",
-		FullName:    "Priority Plan",
-		Category:    "work",
-		Definition:  "A time-bounded execution plan defining prioritized work packages and delivery horizons.",
-		Context:     "Columns in the TPM Gantt matrix corresponding to active integration branches.",
-		RelatedRefs: []string{"BLI", "MIL", "PPLAN"},
-	},
-	"REQ": {
-		Code:        "REQ",
-		FullName:    "Requirement",
-		Category:    "specification",
-		Definition:  "A formal system invariant, capability, or architectural specification.",
-		Context:     "Root capability statement verified by at least three orthogonal criteria.",
-		RelatedRefs: []string{"CRIT", "TST", "BLI"},
-	},
-	"CRIT": {
-		Code:        "CRIT",
-		FullName:    "Criterion / Verification Criteria",
-		Category:    "verification",
-		Definition:  "An objective, verifiable acceptance condition proving a requirement.",
-		Context:     "Forms the Three-Fold Proof: Static Floor, Operational Proof, and Negative Boundary.",
-		RelatedRefs: []string{"REQ", "TST", "VDS"},
-	},
-	"VDS": {
-		Code:        "VDS",
-		FullName:    "Verification Definition of Done / Data Suite",
-		Category:    "verification",
-		Definition:  "Automated gate proving that all criteria and test lineages are green before promotion.",
-		Context:     "Enforces zero-unbound-criteria and strict traceability before pull requests merge.",
-		RelatedRefs: []string{"CRIT", "TST", "CEF"},
-	},
-	"TCFG": {
-		Code:        "TCFG",
-		FullName:    "Team Configuration",
-		Category:    "organization",
-		Definition:  "Approved team composition, agent roster, and operational permissions.",
-		Context:     "Defines agent seating, persona bindings, and autonomous operating boundaries.",
-		RelatedRefs: []string{"PER", "ASK"},
-	},
-	"CVS": {
-		Code:        "CVS",
-		FullName:    "Convergence Session",
-		Category:    "coordination",
-		Definition:  "A structured cybernetic feedback session that closes deltas between projected and actual state.",
-		Context:     "Employed by agent swarms to achieve consensus and resolve specification drift.",
-		RelatedRefs: []string{"CAP", "CEF"},
-	},
-	"ATK": {
-		Code:        "ATK",
-		FullName:    "Agent Task",
-		Category:    "execution",
-		Definition:  "A granular, autonomous unit of work assigned to and executed by an agent persona.",
-		Context:     "Atomic leaf execution element in the causal DAG subordinate to Backlog Items.",
-		RelatedRefs: []string{"BLI", "PER", "ASK"},
-	},
-	"PPLAN": {
-		Code:        "PPLAN",
-		FullName:    "Priority Plan (CLI Verb / Group)",
-		Category:    "cli",
-		Definition:  "CLI command shortcut group for inspecting active priority plans and current workloads.",
-		Context:     "Quickly reveals lead priority plan and uncompleted backlog items.",
-		RelatedRefs: []string{"PRI"},
-	},
-	"ZPARQL": {
-		Code:        "ZPARQL",
-		FullName:    "ZQK Pattern Query Language",
-		Category:    "graph",
-		Definition:  "Declarative graph pattern matching and query engine for traversing kernel object relationships.",
-		Context:     "Provides SPARQL/Cypher-like traversals over CAS nodes and typed reference fields.",
-		RelatedRefs: []string{"ZQL", "CAS"},
-	},
-	"ZQL": {
-		Code:        "ZQL",
-		FullName:    "ZQK Query Language",
-		Category:    "query",
-		Definition:  "Declarative object query, mutation, and filtering expression language.",
-		Context:     "Powers object search, filtering predicates, and lifecycle validation rules.",
-		RelatedRefs: []string{"ZPARQL"},
-	},
-	"CAS": {
-		Code:        "CAS",
-		FullName:    "Content-Addressable Storage",
-		Category:    "storage",
-		Definition:  "Immutable, cryptographic hash-indexed object storage layer forming the kernel membrane.",
-		Context:     "Every entity in .zqk/process is content-addressed by SHA-256 for integrity.",
-		RelatedRefs: []string{"WAL"},
-	},
-	"WAL": {
-		Code:        "WAL",
-		FullName:    "Write-Ahead Log",
-		Category:    "storage",
-		Definition:  "Append-only sequential ledger guaranteeing atomic state mutations and crash recovery.",
-		Context:     "All kernel modifications are written to WAL before index updates or CAS commits.",
-		RelatedRefs: []string{"CAS"},
-	},
-	"CAP": {
-		Code:        "CAP",
-		FullName:    "Continuous Autonomous Protocol",
-		Category:    "governance",
-		Definition:  "The self-driving cybernetic feedback loop steering agents without human intervention.",
-		Context:     "Governs anti-idleness, state-closing execution, and post-merge continuation.",
-		RelatedRefs: []string{"CEF", "CVS"},
-	},
-	"CEF": {
-		Code:        "CEF",
-		FullName:    "Community Evaluation Framework",
-		Category:    "evaluation",
-		Definition:  "Comprehensive quality scorecard, testing pyramid, and Diamond Scale grading rubric.",
-		Context:     "Evaluates architecture, concurrency, security, and supply-chain readiness.",
-		RelatedRefs: []string{"CAP", "VDS", "TDE"},
-	},
-	"TDE": {
-		Code:        "TDE",
-		FullName:    "Technical Debt Entry",
-		Category:    "hygiene",
-		Definition:  "An objectified defect, architectural smell, or maintainability liability tracked for resolution.",
-		Context:     "Aggregated into root-cause packages rather than 1:1 symptom work items.",
-		RelatedRefs: []string{"CEF", "BLI"},
-	},
+type acronymsPayload struct {
+	Acronyms []Acronym `yaml:"acronyms"`
+}
+
+var (
+	registryMu sync.RWMutex
+	registry   = make(map[string]Acronym)
+	// Registry is kept populated for direct map lookups across tests and tools.
+	Registry = registry
+)
+
+func init() {
+	var payload acronymsPayload
+	if err := yaml.Unmarshal(rawAcronymsYAML, &payload); err == nil {
+		for _, a := range payload.Acronyms {
+			code := strings.ToUpper(strings.TrimSpace(a.Code))
+			registry[code] = a
+		}
+	}
+}
+
+// LoadFromKernel queries live glossary_term objects under VOC-KERNEL-ACRONYMS
+// from storage, augmenting the registry dynamically from Knowledge Kernel state.
+func LoadFromKernel(ctx context.Context, secCtx *pkgctx.SecurityContext, store storage.ObjectStorageProvider) error {
+	if store == nil {
+		return fmt.Errorf("storage provider is nil")
+	}
+	if secCtx == nil {
+		secCtx = pkgctx.NewSystemSecurityContext()
+	}
+
+	res, err := store.List(ctx, secCtx, nil, storage.ListFilter{
+		Kind: "glossary_term",
+	})
+	if err != nil {
+		return fmt.Errorf("failed to query glossary terms: %w", err)
+	}
+
+	registryMu.Lock()
+	defer registryMu.Unlock()
+
+	for _, obj := range res.Objects {
+		cat, _ := obj["category"].(string)
+		if cat != "acronym" {
+			continue
+		}
+		code, _ := obj["acronym"].(string)
+		if code == "" {
+			// Extract from title "CODE (Full Name)" or ID "GLS-ACRONYM-CODE"
+			id, _ := obj[objects.FieldKeyID].(string)
+			code = strings.TrimPrefix(id, "GLS-ACRONYM-")
+		}
+		if code == "" {
+			continue
+		}
+		fullName, _ := obj["full_name"].(string)
+		if fullName == "" {
+			fullName, _ = obj[objects.FieldKeyTitle].(string)
+		}
+		cat, _ = obj["category"].(string)
+		def, _ := obj["definition"].(string)
+		ctxScope, _ := obj["context_scope"].(string)
+
+		var relatedRefs []string
+		if hintsStr, ok := obj["machine_hints"].(string); ok && hintsStr != "" {
+			var hints map[string]any
+			if err := json.Unmarshal([]byte(hintsStr), &hints); err == nil {
+				if refs, ok := hints["related_refs"].([]any); ok {
+					for _, r := range refs {
+						if s, ok := r.(string); ok {
+							relatedRefs = append(relatedRefs, s)
+						}
+					}
+				}
+				if fn, ok := hints["full_name"].(string); ok && fn != "" {
+					fullName = fn
+				}
+			}
+		}
+
+		entry := Acronym{
+			Code:        strings.ToUpper(strings.TrimSpace(code)),
+			FullName:    fullName,
+			Category:    cat,
+			Definition:  def,
+			Context:     ctxScope,
+			RelatedRefs: relatedRefs,
+		}
+		registry[entry.Code] = entry
+	}
+	return nil
 }
 
 // Lookup finds an acronym by case-insensitive key.
 func Lookup(key string) (Acronym, bool) {
 	upper := strings.ToUpper(strings.TrimSpace(key))
-	acronym, found := Registry[upper]
+	registryMu.RLock()
+	defer registryMu.RUnlock()
+	acronym, found := registry[upper]
 	return acronym, found
 }
 
 // ListAll returns all documented acronyms sorted alphabetically by code.
 func ListAll() []Acronym {
-	list := make([]Acronym, 0, len(Registry))
-	for _, a := range Registry {
+	registryMu.RLock()
+	defer registryMu.RUnlock()
+	list := make([]Acronym, 0, len(registry))
+	for _, a := range registry {
 		list = append(list, a)
 	}
 	sort.Slice(list, func(i, j int) bool {
@@ -180,18 +152,19 @@ func ListAll() []Acronym {
 // FindClosest suggests acronyms that are similar to an unknown query string.
 func FindClosest(query string) []string {
 	upper := strings.ToUpper(strings.TrimSpace(query))
+	registryMu.RLock()
+	defer registryMu.RUnlock()
 	var matches []string
 
 	// Check prefix / substring matches
-	for code := range Registry {
+	for code := range registry {
 		if strings.HasPrefix(code, upper) || strings.Contains(code, upper) {
 			matches = append(matches, code)
 		}
 	}
 
 	if len(matches) == 0 {
-		// Simple distance heuristic: off by 1 character
-		for code := range Registry {
+		for code := range registry {
 			if levenshtein(code, upper) <= 2 {
 				matches = append(matches, code)
 			}
@@ -290,4 +263,3 @@ func SyncToKernel(ctx context.Context, secCtx *pkgctx.SecurityContext, store sto
 	}
 	return synced, nil
 }
-
