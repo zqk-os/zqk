@@ -54,7 +54,7 @@ const (
 // writeLockFile creates <dir>/<safeJobID>.lock with mtime forced to now-age.
 func writeLockFile(t *testing.T, dir, jobID string, age time.Duration) string {
 	t.Helper()
-	p := filepath.Join(dir, lockFilenameForJobID(jobID))
+	p := filepath.Join(dir, LockFilenameForJobID(jobID))
 	if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
 		t.Fatalf(msgMkdir, err)
 	}
@@ -89,7 +89,7 @@ func TestCleanStaleLocksByAge_RemovesOldLocksAndKeepsFresh(t *testing.T) {
 		t.Fatalf(msgFreshKeep, err)
 	}
 	for _, id := range []string{"SCH-stale-1", "SCH-stale-2", "SCH-stale-3"} {
-		p := filepath.Join(dir, lockFilenameForJobID(id))
+		p := filepath.Join(dir, LockFilenameForJobID(id))
 		if _, err := fileutil.Stat(p); err == nil {
 			t.Errorf(msgStaleGone, id)
 		} else if !fileutil.IsNotExist(err) {
@@ -271,4 +271,3 @@ func TestCleanStaleLocksByAge_PreservesActivelyHeldLocks(t *testing.T) {
 		t.Fatalf("actively held lock file was unlinked: %v", err)
 	}
 }
-

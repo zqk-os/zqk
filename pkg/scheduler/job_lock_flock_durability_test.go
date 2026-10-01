@@ -16,27 +16,27 @@ import (
 )
 
 const (
-	testJobIDDurable                 = "flock-durable-job"
-	testJobIDConcurrent              = "flock-concurrent-job"
-	testJobIDExecution               = "flock-execution-job"
-	errTestCreateJobLockFailed       = "NewJobLockWithConfig failed: %v"
-	errTestAcquireFailed             = "JobLock.Acquire failed: %v"
-	errTestTryAcquireFailed          = "JobLock.TryAcquire failed: %v"
-	errTestStatFailed                = "failed to stat lock file: %v"
-	errTestInodeChanged              = "lock file inode changed during acquisition (unlink detected): old=%d new=%d"
-	errTestMultipleHoldersDetected   = "mutual exclusion breach: multiple concurrent holders detected (%d)"
-	errTestExpectedLockHeld          = "expected lock to be held by first caller"
-	errTestExpectedLockNotAcquired   = "expected second caller to fail to acquire held lock"
-	errTestCloseFailed               = "JobLock.Close failed: %v"
-	errTestReleaseFailed             = "JobLock.Release failed: %v"
-	errTestSyscallStatExtract        = "could not extract syscall.Stat_t from FileInfo"
-	errTestCreateLockDir             = "failed to create lock directory: %v"
-	errTestCreateFixtureLockFile     = "failed to create fixture lock file: %v"
-	errTestChtimesLockFile           = "failed to chtimes on lock file: %v"
-	errTestExpectedLockedTrue        = "expected jl.IsLocked() to be true"
-	errTestWorkerTryAcquire          = "worker %d TryAcquire error: %v"
-	errTestAtLeastOneAcquire         = "expected at least one successful TryAcquire across concurrent workers"
-	errTestPostCloseAcquireSuccess   = "expected jl2.TryAcquire to succeed after jl1 closed"
+	testJobIDDurable               = "flock-durable-job"
+	testJobIDConcurrent            = "flock-concurrent-job"
+	testJobIDExecution             = "flock-execution-job"
+	errTestCreateJobLockFailed     = "NewJobLockWithConfig failed: %v"
+	errTestAcquireFailed           = "JobLock.Acquire failed: %v"
+	errTestTryAcquireFailed        = "JobLock.TryAcquire failed: %v"
+	errTestStatFailed              = "failed to stat lock file: %v"
+	errTestInodeChanged            = "lock file inode changed during acquisition (unlink detected): old=%d new=%d"
+	errTestMultipleHoldersDetected = "mutual exclusion breach: multiple concurrent holders detected (%d)"
+	errTestExpectedLockHeld        = "expected lock to be held by first caller"
+	errTestExpectedLockNotAcquired = "expected second caller to fail to acquire held lock"
+	errTestCloseFailed             = "JobLock.Close failed: %v"
+	errTestReleaseFailed           = "JobLock.Release failed: %v"
+	errTestSyscallStatExtract      = "could not extract syscall.Stat_t from FileInfo"
+	errTestCreateLockDir           = "failed to create lock directory: %v"
+	errTestCreateFixtureLockFile   = "failed to create fixture lock file: %v"
+	errTestChtimesLockFile         = "failed to chtimes on lock file: %v"
+	errTestExpectedLockedTrue      = "expected jl.IsLocked() to be true"
+	errTestWorkerTryAcquire        = "worker %d TryAcquire error: %v"
+	errTestAtLeastOneAcquire       = "expected at least one successful TryAcquire across concurrent workers"
+	errTestPostCloseAcquireSuccess = "expected jl2.TryAcquire to succeed after jl1 closed"
 )
 
 // getFileInode returns the OS inode number for the given file path.
@@ -70,7 +70,7 @@ func TestJobLock_FlockDurabilityAndInodePreservation(t *testing.T) {
 		t.Fatalf(errTestCreateLockDir, err)
 	}
 
-	lockPath := filepath.Join(lockDir, lockFilenameForJobID(testJobIDDurable))
+	lockPath := filepath.Join(lockDir, LockFilenameForJobID(testJobIDDurable))
 
 	// Pre-create the lock file with an old modification timestamp to simulate a stale lock file.
 	f, err := fileutil.Create(lockPath)

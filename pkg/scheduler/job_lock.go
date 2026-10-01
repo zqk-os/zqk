@@ -69,10 +69,10 @@ func NewJobLock(jobID, projectRoot string) (JobLockInterface, error) {
 	return NewJobLockWithConfig(jobID, DefaultJobLockConfig(projectRoot))
 }
 
-// lockFilenameForJobID returns a filesystem-safe lock filename for the given job ID.
+// LockFilenameForJobID returns a filesystem-safe lock filename for the given job ID.
 // Long IDs (e.g. legacy SCH-<ts>-scheduler-job-<parent> chains) cause "file name too long";
 // we use a SHA256 hash (hex) for those so the lock still uniquely corresponds to the job.
-func lockFilenameForJobID(jobID string) string {
+func LockFilenameForJobID(jobID string) string {
 	if len(jobID) <= maxLockFilenameJobIDLen {
 		return jobID + ".lock"
 	}
@@ -88,7 +88,7 @@ func NewJobLockWithConfig(jobID string, config JobLockConfig) (JobLockInterface,
 	}
 
 	// Create lock file path: {LockDir}/{safeJobID}.lock (safe = jobID or hash if too long)
-	lockPath := filepath.Join(config.LockDir, lockFilenameForJobID(jobID))
+	lockPath := filepath.Join(config.LockDir, LockFilenameForJobID(jobID))
 
 	// Create file lock
 	fileLock, err := storagepkg.NewFileLock(lockPath)

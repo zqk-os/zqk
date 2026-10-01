@@ -53,7 +53,7 @@ func TestLockFilenameForJobID_LongID_UsesHash(t *testing.T) {
 	t.Parallel()
 	// Job IDs longer than maxLockFilenameJobIDLen get a hash-based filename to avoid "file name too long"
 	longID := "SCH-1772046602-scheduler-job-SCH-1772046601-scheduler-job-" + string(make([]byte, 300))
-	filename := lockFilenameForJobID(longID)
+	filename := LockFilenameForJobID(longID)
 	if len(filename) > 80 {
 		t.Errorf("lock filename for long job ID should be short (hash hex + .lock), got len %d", len(filename))
 	}
@@ -64,7 +64,7 @@ func TestLockFilenameForJobID_LongID_UsesHash(t *testing.T) {
 		t.Errorf("expected .lock suffix, got %q", filepath.Ext(filename))
 	}
 	// Same long ID must produce same filename
-	if lockFilenameForJobID(longID) != filename {
+	if LockFilenameForJobID(longID) != filename {
 		t.Error("same job ID must produce same lock filename")
 	}
 }
@@ -72,7 +72,7 @@ func TestLockFilenameForJobID_LongID_UsesHash(t *testing.T) {
 func TestLockFilenameForJobID_ShortID_UsesID(t *testing.T) {
 	t.Parallel()
 	shortID := "SCH-001"
-	filename := lockFilenameForJobID(shortID)
+	filename := LockFilenameForJobID(shortID)
 	expected := "SCH-001.lock"
 	if filename != expected {
 		t.Errorf("short job ID should use ID as filename, got %q", filename)
