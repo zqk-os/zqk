@@ -1,0 +1,8 @@
+$schema: ../_schemas/command_spec.schema.json
+name: demote
+short: Tear down the Local CI workdir and reset state
+description: |-
+    Removes the active Local CI worktree and associated state files.
+
+      Tear down local CI
+      zqk ci demote

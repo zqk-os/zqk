@@ -1,0 +1,8 @@
+$schema: _schemas/command_spec.schema.json
+name: callback
+short: Handle scheduler job callbacks and notifications
+description: |-
+    Handle scheduler job callbacks and notifications.
+
+    This command receives callback events from scheduler jobs and routes them
+    to designated log files based on the current account or specified path.

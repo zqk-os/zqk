@@ -1,0 +1,4 @@
+$schema: ../_schemas/command_spec.schema.json
+name: config-get [key]
+short: Print a project config value by key (e.g. logging.error_log_output)
+description: Print a project config value by key (e.g. logging.error_log_output)

@@ -1,0 +1,4 @@
+$schema: ../_schemas/command_spec.schema.json
+name: populate
+short: Extract entities and populate the knowledge kernel graph
+description: Extract code entities from source (Go AST), optionally enhance with semantics, then create graph nodes and edges (CodeEntity, SourceFile, Package, CONTAINS, METHOD_OF, CALLS, DEPENDS_ON, IMPORTS) in the knowledge kernel. Requires graph backend (BLI-OBS-002).

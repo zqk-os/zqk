@@ -1,0 +1,27 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: blockers
+short: Get Dependencies & Blockers (D&B)
+description: |-
+    Calculate and display Dependencies & Blockers (D&B), identifying potential
+    dependencies and blockers that may impact project delivery.
+
+    The D&B analysis is enhanced with Git commit data when available:
+      - Code-level dependencies from file co-changes
+      - Potential blockers from stale files or irregular patterns
+      - Commit relationship analysis
+
+    Dependencies are categorized by:
+      - Type: code, work_item, external
+      - Severity: low, medium, high, critical
+
+    Blockers are identified from:
+      - Risk/blocker objects in the system
+      - Code patterns indicating blocked work
+      - Commit frequency anomalies
+
+      Get dependencies and blockers
+      zqk reports blockers
+      Get as JSON
+      zqk reports blockers --format json
+      Get with commit data explicitly enabled
+      zqk reports blockers --include-commit-data

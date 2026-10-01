@@ -1,0 +1,14 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: policy-report
+short: Show last policy check output (logging/architecture violations)
+description: |-
+    Prints the contents of .zqk/pre-commit/policy-output.txt from the last run of
+
+    scripts/pre-commit-policy.sh. Use this to see exact violations when the policy
+
+    category fails (e.g. POL-CODE-007 or architecture compliance). If the file is
+
+    missing, run ./scripts/pre-commit-policy.sh first.
+
+      View policy output after policy check failed
+      zqk pre-commit policy-report

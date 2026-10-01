@@ -1,0 +1,18 @@
+$schema: ../_schemas/command_spec.schema.json
+name: validate-agent-rules
+short: Validate IDE agent rules manifest vs rules directory
+description: |-
+    Ensures the repo registry YAML matches *.mdc files on disk.
+
+    Happy path (no flags): run from the project root — validate matches the default rules directory,
+    or pass --write-manifest alone to regenerate the manifest after adding/renaming rule files.
+    Optional --rules-dir / AGENT_RULES_DIR only when rules are not under .cursor/rules.
+    If a workflow ever needs many steps or flags, prefer adding a thin veneer command rather than typing them every time.
+    Canonical manifest: .zqk/specs/configs/agent_rules_manifest.yaml.
+
+      Validate (no flags)
+      zqk system validate-agent-rules
+      Refresh manifest after editing rules (one flag)
+      zqk system validate-agent-rules --write-manifest
+      Alternate rules directory
+      zqk system validate-agent-rules --rules-dir .agent/rules

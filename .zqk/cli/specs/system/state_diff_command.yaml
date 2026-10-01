@@ -1,0 +1,14 @@
+$schema: ../_schemas/command_spec.schema.json
+name: state-diff <snapshot-a> [snapshot-b]
+short: Compare two system state snapshots or a snapshot against live state
+description: |-
+    Calculate and display the differences between two .csnap files, or between one
+    .csnap file and the current live system state.
+
+    This tool helps visualize administrative velocity and object mutation across
+    time boundaries.
+
+      Diff two csnap files
+      zqk system state-diff before.csnap after.csnap
+      Diff a csnap against current live system state
+      zqk system state-diff .zqk-state/system-state.csnap

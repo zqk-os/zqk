@@ -1,0 +1,12 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: completion <object-id>
+short: Verify completion of an object
+description: |-
+    Objectively verify the cryptographic completion hash of an object against disk
+    state.
+
+    This command verifies that the verification_hash of a test_case or backlog_item matches
+    the actual cryptographic hash of its referenced artifacts on disk.
+
+      Verify a backlog item
+      zqk system verify-completion BLI-123

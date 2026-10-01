@@ -1,0 +1,6 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: initiate
+short: Initiate federation establishment with a remote peer system
+description: |-
+    Start the outbound federation protocol sequence to discover, establish,
+    and verify mutual trust and synchronization with a remote peer.

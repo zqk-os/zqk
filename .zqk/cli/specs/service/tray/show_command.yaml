@@ -1,0 +1,4 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: show <name>
+short: Show one tray entry (name, description, argv)
+description: Show one tray entry (name, description, argv)

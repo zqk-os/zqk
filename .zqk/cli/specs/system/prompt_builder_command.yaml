@@ -1,0 +1,10 @@
+$schema: ../_schemas/command_spec.schema.json
+name: prompt-builder [query]
+short: Builds a topologically sorted context window prompt using the Vectorization Engine
+description: |-
+    Builds a topologically sorted context window prompt by querying the graph for
+    initial matches and then walking the structural graph up to the root Policies, returning
+    the optimal token-budgeted prompt context.
+
+    Example:
+      zqk system prompt-builder "authentication mechanisms" --budget 4000

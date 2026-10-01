@@ -1,0 +1,11 @@
+$schema: ../_schemas/command_spec.schema.json
+name: validate-scenario
+short: Execute a programmatic validation scenario
+description: |-
+    Execute a sequence of programmatic validation steps defined in a scenario file.
+
+    This command uses the scenario executor to run command, regex, and file existence checks
+    to natively verify that policies, architectural mandates, and tests are satisfied.
+
+      Run a specific scenario
+      zqk system validate-scenario --file scenarios/observability_check.yaml

@@ -1,0 +1,14 @@
+$schema: ../_schemas/command_spec.schema.json
+name: register
+short: Register a domain ontology
+description: |-
+    Register a domain ontology by creating or updating a domain_registry object.
+
+    Adds the domain to the registry so it appears in "domain discover".
+
+      Register organizational domain
+      zqk domain register --domain-id organizational --namespace domain:organizational:*
+      Register with spec file
+      zqk domain register --domain-id financial --spec-file financial_ontology.yaml
+      Dry run
+      zqk domain register --domain-id organizational --dry-run

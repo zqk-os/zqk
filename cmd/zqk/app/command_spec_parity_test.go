@@ -37,4 +37,10 @@ func TestCommandSpecParity(t *testing.T) {
 			coverage.NewSpecsWithoutCommands,
 		)
 	}
+	if len(coverage.CommandsWithoutSpecs) > 0 || len(coverage.SpecsWithoutCommands) > 0 {
+		t.Fatalf("full zero-drift parity required: %d un-specced commands remaining (%v), %d orphaned specs remaining (%v)",
+			len(coverage.CommandsWithoutSpecs), coverage.CommandsWithoutSpecs,
+			len(coverage.SpecsWithoutCommands), coverage.SpecsWithoutCommands)
+	}
 }
+

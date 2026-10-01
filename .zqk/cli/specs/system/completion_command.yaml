@@ -1,0 +1,14 @@
+$schema: ../_schemas/command_spec.schema.json
+name: completion [bash|zsh|fish]
+short: Generate shell completion script
+description: |-
+    Generate a shell completion script for zqk.
+
+    Supported shells: bash, zsh, fish.
+
+    Installation:
+      Bash:  zqk completion bash | sudo tee /etc/bash_completion.d/zqk  (or ~/.local/share/bash-completion/completions/)
+      Zsh:   zqk completion zsh > ~/.zsh/completions/_zqk
+      Fish:  zqk completion fish > ~/.config/fish/completions/zqk.fish
+
+    After installing, restart your shell or source your config.

@@ -1,0 +1,15 @@
+$schema: ../_schemas/command_spec.schema.json
+name: snapshot-expand [flags] <csnap-file>
+short: Expand a compressed snapshot file
+description: |-
+    Expand a compressed snapshot (.csnap) file back to original objects.
+
+    This command reads a compressed snapshot file and expands it, optionally
+    writing the expanded objects to a directory or outputting them.
+
+      Expand and show object count
+      zqk system snapshot-expand test-scenarios/my-snapshot/snapshot.csnap --verbose
+      Expand and write to directory
+      zqk system snapshot-expand snapshot.csnap --output-dir expanded/
+      Expand and show first object
+      zqk system snapshot-expand snapshot.csnap --show-object 0

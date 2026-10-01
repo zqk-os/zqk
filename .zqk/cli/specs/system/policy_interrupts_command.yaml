@@ -1,0 +1,4 @@
+$schema: ../_schemas/command_spec.schema.json
+name: policy-interrupts
+short: Generated spec for policy-interrupts
+description: Generated spec for policy-interrupts

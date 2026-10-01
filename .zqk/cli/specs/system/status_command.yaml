@@ -1,0 +1,17 @@
+$schema: ../_schemas/command_spec.schema.json
+name: status
+short: Show system status and health summary
+description: |-
+    Show system status and health summary.
+
+    This command displays:
+      - Project information
+      - Current priority plan
+      - System health (from system check)
+      - Recent activity
+      - Storage backend information
+
+      Basic status
+      zqk system status
+      Verbose status with detailed information
+      zqk system status --verbose

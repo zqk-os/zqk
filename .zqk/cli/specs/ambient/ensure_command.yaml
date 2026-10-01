@@ -1,0 +1,4 @@
+$schema: ../_schemas/command_spec.schema.json
+name: ensure
+short: Ensure the ambient daemon is running (idempotent)
+description: Ensure the ambient daemon is running (idempotent)

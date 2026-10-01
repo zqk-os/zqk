@@ -1,0 +1,10 @@
+$schema: _schemas/command_spec.schema.json
+name: domain
+short: Domain ontology discovery and registration
+description: |-
+    Domain operations for discovering and registering domain ontologies.
+
+    The domain command group provides tools for:
+    - Discovering registered domain ontologies (domain_registry objects)
+    - Registering domain object types (future)
+    - Validating cross-layer references (future)

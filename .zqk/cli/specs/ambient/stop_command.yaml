@@ -1,0 +1,4 @@
+$schema: ../_schemas/command_spec.schema.json
+name: stop
+short: Stop the background ambient daemon
+description: Stop the background ambient daemon

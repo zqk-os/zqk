@@ -1,0 +1,15 @@
+$schema: ../_schemas/command_spec.schema.json
+name: list
+short: List rollback points (most recent last)
+description: |-
+    List rollback points for the project. Points are ordered with most recent last.
+
+    Use --last to limit the number of points and --within to filter by time range
+    (e.g. 24h).
+
+      List all rollback points
+      zqk rollback list
+      List last 10 points
+      zqk rollback list --last 10
+      List points within 24 hours
+      zqk rollback list --within 24h

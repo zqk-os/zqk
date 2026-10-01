@@ -1,0 +1,9 @@
+$schema: ../_schemas/command_spec.schema.json
+name: health-data
+short: Output aggregated system-health data for dashboard
+description: |-
+    Outputs quarantine and other system-health data in one payload. Use --format
+    json or --format yaml for dashboard/consumer use; default is a short table
+    summary.
+
+    Additional sections (e.g. check summary) may be added in future.

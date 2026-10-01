@@ -1,0 +1,26 @@
+$schema: ../_schemas/command_spec.schema.json
+name: retention-tolerance
+short: Run retention tolerance (archive and cleanup by age and max_count)
+description: |-
+    Applies per-kind archive and cleanup from retention_tolerance.yaml: archive old objects, delete by age, enforce max_count.
+
+    Use --kind to process specific kinds (can be repeated). Without --kind, processes all configured kinds.
+
+    Examples:
+      # Process all configured kinds
+      zqk system retention-tolerance
+
+      # Process only mcp_session (high-frequency cleanup)
+      zqk system retention-tolerance --kind mcp_session
+
+      # Process multiple specific kinds
+      zqk system retention-tolerance --kind audit_event --kind mcp_session
+
+      # One-off aggressive cleanup (stop scheduler first): large batches, no job timeout
+      zqk system retention-tolerance --kind audit_event --batch-size 5000 --max-batches 20 --bulk-delete-workers 32
+
+      # Manual reset style catch-up: no artificial per-run batch cap (still bounded by process limits)
+      zqk system retention-tolerance --kind audit_event --batch-size 5000 --max-batches -1 --bulk-delete-workers 32
+
+    Schedule via scheduler job (job_type: retention_tolerance) with KINDS env var for kind filtering.
+    BATCH_SIZE, MAX_BATCHES, BULK_DELETE_WORKERS can also be set via environment (overridden by flags).

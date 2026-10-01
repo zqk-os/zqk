@@ -1,0 +1,22 @@
+$schema: _schemas/command_spec.schema.json
+name: system
+short: System operations (health, validation, and maintenance)
+description: |-
+    System operations for health checks, validation, and maintenance.
+
+    This command group provides operations for system-level management:
+      Common operations: check (object health and compliance), align (strategic alignment)
+      Specialized operations: init, status, validate, sync
+
+      Common operations
+      zqk system check
+      Strategic alignment
+      zqk system align --gaps
+      Specialized operations
+      zqk system init
+      Show status
+      zqk system status
+      Validate objects
+      zqk system validate
+      Sync system
+      zqk system sync

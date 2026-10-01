@@ -1,0 +1,4 @@
+$schema: ../_schemas/command_spec.schema.json
+name: emergency-manager
+short: Monitors the health of the CAP orchestrator and Kernel Steward. Executes safe rollbacks or stashes untracked files if the main managers fail continuously.
+description: Monitors the health of the CAP orchestrator and Kernel Steward. Executes safe rollbacks or stashes untracked files if the main managers fail continuously.

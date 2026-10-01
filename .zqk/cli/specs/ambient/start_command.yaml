@@ -1,0 +1,4 @@
+$schema: ../_schemas/command_spec.schema.json
+name: start
+short: Start the ambient daemon in the background
+description: Start the ambient daemon in the background

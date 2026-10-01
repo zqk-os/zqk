@@ -1,0 +1,4 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: emit
+short: Emit a policy interrupt (internal/testing)
+description: Emit a policy interrupt (internal/testing)

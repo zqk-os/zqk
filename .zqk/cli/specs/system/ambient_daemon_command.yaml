@@ -1,0 +1,4 @@
+$schema: ../_schemas/command_spec.schema.json
+name: ambient-daemon
+short: Generated spec for ambient-daemon
+description: Generated spec for ambient-daemon

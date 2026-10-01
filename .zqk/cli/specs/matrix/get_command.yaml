@@ -1,0 +1,28 @@
+$schema: ../_schemas/command_spec.schema.json
+name: get
+short: List matrix CSV rows matching filters
+description: |-
+    Resolves CSV + profile via docs/quality/matrix_registry.yaml (same as matrix
+    report), reads the
+
+    inventory, and returns rows matching optional --filter column=value (AND),
+    --glob on file_path
+
+    (filepath.Match), --go-only, and --cvs-id against the registry
+    session_ref_column. Use --field
+
+    (repeatable) to narrow output to specific CSV columns (order preserved). Does
+    not collide with
+
+    global --columns (table column widths).
+
+      All rows (default matrix)
+      zqk matrix get
+      Filter by gate column
+      zqk matrix get --filter fully_vetted=pending
+      Go files matching a path glob
+      zqk matrix get --go-only --glob 'pkg/*.go'
+      Only file_path and gate column in output
+      zqk matrix get --field file_path --field fully_vetted
+      Pipe-friendly CSV (header + data rows)
+      zqk matrix get --format csv --filter fully_vetted=pending

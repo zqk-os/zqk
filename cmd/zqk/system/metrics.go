@@ -42,14 +42,6 @@ func NewMetricsCmd() *cobra.Command {
 		RunE: runMetrics,
 	})
 
-	cmd.Flags().String("command", "", "Filter by specific command pattern")
-	cmd.Flags().String("filter", "", "Filter by type (failures, timeouts, slow)")
-	cmd.Flags().Int("limit", 0, "Limit number of results (0 = all)")
-	cmd.Flags().Bool("summary", false, "Generate detailed analysis summary report")
-	cmd.Flags().Bool("all-time", false, "Aggregate across current and all day-rolled historical chunks")
-	cmd.Flags().Duration("window", 0, "Window duration to look back across historical chunks (e.g. 24h, 72h, 168h)")
-	cmd.Flags().String("day", "", "View metrics for a specific date (YYYY-MM-DD or YYYYMMDD)")
-
 	// Apply help builder to command after flags are declared
 	helpBuilder.ApplyToCommand(cmd)
 

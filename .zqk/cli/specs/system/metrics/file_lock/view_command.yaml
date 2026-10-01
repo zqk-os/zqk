@@ -1,0 +1,8 @@
+$schema: ../../../_schemas/command_spec.schema.json
+name: view
+short: View current buffered file lock metrics
+description: |-
+    View the current state of file lock metrics accumulated in memory.
+
+    This shows metrics that have been recorded but not yet collected/flushed.
+    Metrics are accumulated atomically as file lock operations occur.

@@ -91,7 +91,6 @@ func NewSystemCmd() *cobra.Command {
 	if isAdminBinary {
 		codegenCmds := []*cobra.Command{
 			zqkdev.NewGenerateInstanceBuildersCmd(),
-			NewGenerateAgentConfigsCmd(),
 			zqkdev.NewGenerateLifecycleBuildersCmd(),
 			zqkdev.NewGenerateProfileBuildersCmd(),
 			zqkdev.NewGenerateTraitBuildersCmd(),
@@ -128,6 +127,7 @@ func NewSystemCmd() *cobra.Command {
 	systemCmd.AddCommand(NewStartHereCmd())
 	systemCmd.AddCommand(NewQuickstartCmd())
 	systemCmd.AddCommand(NewAgentOnboardCmd())
+	systemCmd.AddCommand(NewGenerateAgentConfigsCmd())
 	systemCmd.AddCommand(NewSeedDefaultAgentSeatingCmd())
 	systemCmd.AddCommand(NewRebuildGraphProjectionCmd())
 	systemCmd.AddCommand(NewStatusCmd())

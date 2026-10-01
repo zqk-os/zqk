@@ -1,0 +1,12 @@
+$schema: ../_schemas/command_spec.schema.json
+name: retain
+short: Trim rollback store to configured keep count and duration
+description: |-
+    Trims the rollback point store to the configured retain count and duration
+
+    (ZQK_ROLLBACK_RETAIN_COUNT, ZQK_ROLLBACK_RETAIN_DURATION). Call periodically
+
+    or after capture to keep storage bounded.
+
+      Trim rollback store to config
+      zqk rollback retain

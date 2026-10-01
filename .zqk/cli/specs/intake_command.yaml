@@ -1,0 +1,13 @@
+$schema: _schemas/command_spec.schema.json
+name: intake [context...]
+short: Semantic ingestion pipeline (Intent Capture)
+description: |-
+    Intake parses raw contextual text or key-value pairs into structured ZQK objects
+    using the configured ambient semantic engine (LLM). It natively supports bulk operations.
+    Every synthesized object must carry a non-empty description (base_object
+    description gate) — objects without one are rejected fail-closed and the
+    intake run aborts rather than persisting incomplete objects.
+
+    Examples:
+      zqk intake "We need a new sqlite connection and a metrics exporter"
+      cat meeting_notes.md | zqk intake

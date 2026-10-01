@@ -1,0 +1,12 @@
+$schema: ../_schemas/command_spec.schema.json
+name: snapshot
+short: Capture a sanitized telemetry snapshot for partner support
+description: |-
+    Capture a sanitized telemetry snapshot of the system state, explicitly redacting
+    .env files and sensitive keys, for secure transmission to engineering.
+
+    This command is explicitly designed for the Beta Curriculum's Sales & Feedback
+    loop.
+
+      Capture snapshot with reason
+      zqk system snapshot --reason "Partner X encountered graph timeout"

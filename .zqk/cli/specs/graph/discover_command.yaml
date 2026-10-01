@@ -1,0 +1,14 @@
+$schema: ../_schemas/command_spec.schema.json
+name: discover <id>
+short: Discover object relationships
+description: |-
+    Visually explore the relationship tree for an object, highlighting dependencies,
+    alignment, and references.
+
+    This command traverses the graph to map out all connections to the target object,
+    presenting them in an easily understandable tree format.
+
+      Discover all relationships up to depth 2
+      zqk graph discover BLI-123
+      Explore deeper relationships
+      zqk graph discover GOAL-456 --depth 3

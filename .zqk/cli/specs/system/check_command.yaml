@@ -1,0 +1,56 @@
+$schema: ../_schemas/command_spec.schema.json
+name: check [kind] [id...]
+short: 'Check object health: registration, lifecycle, and policy compliance'
+description: |-
+    Check object health and compliance.
+
+    Validates that an object:
+      - Is properly registered with the system
+      - Adheres to its lifecycle definition
+      - Complies with policies for its object kind
+      - Has valid references (default; --fast skips refs and is NOT an authoritative health verdict)
+      - Has file integrity verified using hash indexes by kind/type
+
+    Results are organized into a 4-Layer Compliance Cake:
+      - Layer 0: CAS and Registry Integrity Blockers (Registry, Hash Mismatches, Parse Errors)
+      - Layer 1: Objects Needing Fixes (Business Preconditions, missing attributes, broken relations)
+      - Layer 2: Objects Ready for Promotion/Execution (Clean objects with 0 validation issues)
+      - Layer 3: Completed & Validated Items (Terminal objects passing all validation gates)
+
+    --fast / --check-refs=false is a partial, read-only surface (skips reference integrity).
+    Combined with --auto-fix or --force, --fast is dropped and refs are enabled so mutation
+    uses the full surface. A green partial result does not mean the kernel is healthy.
+    Autofix demotes only process_failure findings to status=error (illegal lifecycle /
+    status preconditions), never data_completeness or employment_fitness; identity/
+    governance kinds never autofix-demote.
+
+    Usage patterns:
+      - For full-project checks with auto-fix, run with an explicit long timeout
+        (e.g., --timeout 3600s) so the run can complete and write results.
+      - Prefer background mode (--background) when running from CI or tools;
+        progress and completion are reported via the coordinator and logs.
+      - Avoid short timeouts (e.g., 30s, 60s) for 'check all --auto-fix' – they
+        almost always time out during CAS cleanup and validation.
+
+      Check a specific object (by ID)
+      zqk system check BLI-001
+      Check all objects of a kind
+      zqk system check backlog_item
+      Check all objects in the system
+      zqk system check all
+      Check with verbose output
+      zqk system check BLI-001 --verbose
+      Check with JSON output
+      zqk system check all --format json
+      Partial check (refs skipped; not authoritative)
+      zqk system check all --fast
+      Fast iteration: write failing IDs then re-check only those
+      zqk system check all --write-failing-ids tier1.txt --fast; zqk system check --ids-from-file tier1.txt --fast
+      Run in background (return immediately; completion via coordinator)
+      zqk system check all --auto-fix --background
+      Full-project auto-fix with long timeout
+      zqk system check all --auto-fix --timeout 3600s --format json -o .zqk/logs/system-check.json
+      Wake primary agent if draft/error/blocking/warning/info thresholds trip
+      zqk system check all --notify
+      Wake a specific seat when thresholds trip
+      zqk system check all --notify <seat-agent-id>

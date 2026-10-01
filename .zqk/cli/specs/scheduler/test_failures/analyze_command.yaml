@@ -1,0 +1,11 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: analyze
+short: Analyze test failures and create backlog items for persistent issues
+description: |-
+    Analyze test failure patterns and automatically create backlog items for:
+    - Persistent failures (tests that fail consistently)
+    - Flaky tests (tests that fail intermittently)
+    - High-frequency failures (tests that fail often)
+
+    This command reads test logs, identifies patterns, and creates backlog items
+    to track improvements needed in the system.

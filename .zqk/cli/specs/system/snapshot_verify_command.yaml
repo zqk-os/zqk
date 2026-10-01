@@ -1,0 +1,14 @@
+$schema: ../_schemas/command_spec.schema.json
+name: snapshot-verify [flags] <csnap-file>
+short: Verify compressed snapshot data integrity against live objects
+description: |-
+    Verify that a compressed snapshot's expanded data matches the current
+    live objects in the system. This validates that the snapshot accurately
+    captured the system state.
+
+      Verify snapshot against live objects
+      zqk system snapshot-verify test-scenarios/my-snapshot/snapshot.csnap
+      Verify with detailed comparison
+      zqk system snapshot-verify snapshot.csnap --verbose
+      Verify specific fields only
+      zqk system snapshot-verify snapshot.csnap --fields id,kind,status

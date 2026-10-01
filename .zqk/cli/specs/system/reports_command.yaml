@@ -1,0 +1,21 @@
+$schema: ../_schemas/command_spec.schema.json
+name: reports
+short: Generate AI metrics reports (PCS, EDD, D&B)
+description: |-
+    Generate AI metrics reports including Project Confidence Score (PCS),
+    Effort Distribution Discrepancy (EDD), and Dependencies & Blockers (D&B).
+
+    These metrics are enhanced with Git commit data when available, providing
+    predictive insights into project health, effort distribution, and potential
+    blockers or dependencies.
+
+      Get Project Confidence Score
+      zqk reports pcs
+      Get Effort Distribution Discrepancy
+      zqk reports edd
+      Get Dependencies & Blockers
+      zqk reports blockers
+      Get all metrics as JSON
+      zqk reports pcs --format json
+      Quick lifecycle report (questions or milestones-overdue)
+      zqk reports quick --preset questions

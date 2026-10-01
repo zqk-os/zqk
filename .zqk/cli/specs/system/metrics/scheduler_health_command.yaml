@@ -1,0 +1,18 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: scheduler-health
+short: Manage scheduler health metrics
+description: |-
+    Manage scheduler health metrics that track scheduler daemon reliability and
+    self-healing.
+
+    Scheduler health metrics track:
+      - Health check runs
+      - Missed job triggers
+      - Automatic job recoveries
+      - Cron scheduler restarts
+      - Health check duration
+
+      Create a test health metric for inspection
+      zqk system metrics scheduler-health test
+      View existing health metrics
+      zqk internal list scheduler_health_metric

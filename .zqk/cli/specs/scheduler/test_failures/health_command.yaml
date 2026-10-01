@@ -1,0 +1,9 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: health
+short: Summarize test-bundle run health
+description: |-
+    Reads the rolling health timeline written when SCH-run-* bundles complete.
+
+    Uses outcomes (pass, test_fail, timeout) and bundle command fingerprints so you can see
+    whether recent runs are green or need attention. For copy-paste re-runs, see events.jsonl
+    field suggested_rerun_commands on failed lines.

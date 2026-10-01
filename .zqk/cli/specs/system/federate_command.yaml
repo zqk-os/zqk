@@ -1,0 +1,6 @@
+$schema: ../_schemas/command_spec.schema.json
+name: federate
+short: Federate and synchronize kernel graph across distributed cluster nodes
+description: |-
+    Provides cluster federation controls, peer synchronization, and distributed
+    event coordination.

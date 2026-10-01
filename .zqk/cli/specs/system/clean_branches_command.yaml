@@ -1,0 +1,4 @@
+$schema: ../_schemas/command_spec.schema.json
+name: clean-branches
+short: Prune stale merged feature branches locally and remotely
+description: Prune stale merged feature branches locally and remotely

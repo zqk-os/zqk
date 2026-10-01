@@ -1,0 +1,4 @@
+$schema: ../_schemas/command_spec.schema.json
+name: coach
+short: Observer coach for generating dynamic workflow tips
+description: Acts as the real-time observer coach, generating dynamic tips by evaluating the system state.

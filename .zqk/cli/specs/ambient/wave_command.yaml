@@ -1,0 +1,9 @@
+$schema: ../_schemas/command_spec.schema.json
+name: wave
+short: Run overnight metrics wave rollup
+description: |-
+    Gathers command_metric, scheduler_health_metric, audit_aggregation_metric, and
+    system-check GhostRef/error/warn rollups.
+
+    Lands the digests into agent_feed and ambient/whats-next with a ranked
+    next_admin_action.

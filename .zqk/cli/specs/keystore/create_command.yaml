@@ -1,0 +1,19 @@
+$schema: ../_schemas/command_spec.schema.json
+name: create [flags]
+short: Create a new keystore entry
+description: |-
+    Create a new keystore entry for storing credentials.
+
+    The credential will be automatically hashed based on the key type:
+      - password: bcrypt hash
+      - api_key, oauth_token, personal_access_token: SHA256 hash
+
+    The entry will be associated with your account (from security context) unless
+    --account-id is explicitly provided (admin only).
+
+      Create an API key (credential will be SHA256 hashed)
+      zqk keystore create --key-type api_key --credential "my-secret-key" --title "Production API Key"
+      Create a password (credential will be bcrypt hashed)
+      zqk keystore create --key-type password --credential "my-password" --title "Database Password"
+      Create with expiration date
+      zqk keystore create --key-type api_key --credential "key" --title "Temporary Key" --expires-at "2024-12-31T23:59:59Z"

@@ -1,0 +1,12 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: write-result
+short: Write a category result file for pre-commit background checks
+description: |-
+    Writes .zqk/pre-commit/<category>.json. Use from scripts or scheduler jobs after
+
+    running a check (e.g. linter). Then run pre-commit aggregate to merge.
+
+      Write lint passed
+      zqk pre-commit write-result --category=lint --ok=true --summary=passed
+      Write lint failed
+      zqk pre-commit write-result --category=lint --ok=false --summary="3 issues"

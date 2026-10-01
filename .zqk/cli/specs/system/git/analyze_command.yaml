@@ -1,0 +1,14 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: analyze [commit-range]
+short: Analyze Git commits and link to work items
+description: |-
+    Analyze Git commits in the specified range and link them to work items.
+
+      Analyze last 10 commits
+      zqk system git analyze HEAD~10..HEAD
+      Analyze commits between branches
+      zqk system git analyze main..feature
+      Analyze last 20 commits
+      zqk system git analyze --recent 20
+      Analyze specific commit
+      zqk system git analyze --hash abc123

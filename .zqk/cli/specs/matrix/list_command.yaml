@@ -1,0 +1,12 @@
+$schema: ../_schemas/command_spec.schema.json
+name: list
+short: List named matrices from the matrix registry
+description: |-
+    Reads docs/quality/matrix_registry.yaml (or --registry) and prints each matrix
+    alias with its
+
+    description and repo-relative csv/profile paths. Use to discover --name values
+    for report, get, and update.
+
+      Show all registry entries
+      zqk matrix list

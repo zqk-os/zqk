@@ -1,0 +1,28 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: edd
+short: Get Effort Distribution Discrepancy (EDD)
+description: |-
+    Calculate and display the Effort Distribution Discrepancy (EDD), a metric
+    that indicates variance between estimated and actual effort distribution.
+
+    The EDD is enhanced with Git commit data when available:
+      - Commit-to-work-item ratios
+      - Code change patterns relative to work items
+      - Activity distribution across work items
+
+    Positive EDD values indicate:
+      - Underestimation (more effort than estimated)
+      - Work items may be under-scoped
+
+    Negative EDD values indicate:
+      - Overestimation (less effort than estimated)
+      - Work items may be over-scoped
+
+    Values closer to zero indicate better estimation accuracy.
+
+      Get EDD score
+      zqk reports edd
+      Get EDD as JSON
+      zqk reports edd --format json
+      Get EDD with commit data explicitly enabled
+      zqk reports edd --include-commit-data

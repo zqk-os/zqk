@@ -1,0 +1,15 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: rerun
+short: Re-run only failing tests
+description: |-
+    Re-run only the tests that failed in recent runs.
+
+    This command:
+    1. Analyzes recent test failures
+    2. Groups them by package
+    3. Schedules new test jobs to run only the failing tests
+
+      Re-run all failing tests
+      zqk scheduler test-failures rerun
+      Re-run failing tests for a specific package
+      zqk scheduler test-failures rerun --package ./pkg/storage

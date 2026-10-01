@@ -1,0 +1,15 @@
+$schema: ../_schemas/command_spec.schema.json
+name: issue [flags]
+short: Issue a unique API key for an account seat
+description: |-
+    Generate a one-time ZQK_API_KEY secret for an ACC-* account, store only its
+    fingerprint in keystore + account.tokens, and optionally write a local seating
+    credential for orchestrate/sync-loop injection.
+
+    The plaintext secret is printed once (and written under .zqk/seating/credentials/
+    unless --no-seating-file). It cannot be retrieved later — rotate to replace.
+
+      Issue a key for a swarm worker account
+      zqk keystore issue --account-id ACC-… --title "swarm_worker_1"
+      JSON (includes credential once)
+      zqk keystore issue --account-id ACC-… --title seat --format json

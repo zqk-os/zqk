@@ -1,0 +1,4 @@
+$schema: _schemas/command_spec.schema.json
+name: rollback
+short: List and apply rollback points (lifecycle/maintenance snapshots)
+description: List rollback points, apply a stored point (quick path), reconstruct state at a timestamp (beyond-threshold path), or trim the store (retain).

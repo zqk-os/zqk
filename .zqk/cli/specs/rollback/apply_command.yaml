@@ -1,0 +1,13 @@
+$schema: ../_schemas/command_spec.schema.json
+name: apply
+short: Apply a rollback point (restore object states from snapshot)
+description: |-
+    Apply a stored rollback point: restore object states from the snapshot to
+    storage (quick path).
+
+    The rollback point must exist in the project's rollback store.
+
+      Apply a rollback point
+      zqk rollback apply rb-20260102-120000.000000000
+      Apply with JSON output
+      zqk rollback apply rb-20260102-120000.000000000 --format json

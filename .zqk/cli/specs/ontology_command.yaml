@@ -1,0 +1,9 @@
+$schema: _schemas/command_spec.schema.json
+name: ontology
+short: Ontology import and translation
+description: |-
+    Ontology operations for importing and translating external ontologies.
+
+    The ontology command group provides tools for:
+    - Importing RDF/OWL (Turtle, RDF/XML, JSON-LD)
+    - Translation to the kernel domain ontology

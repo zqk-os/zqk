@@ -1,0 +1,13 @@
+$schema: ../_schemas/command_spec.schema.json
+name: recommend
+short: Recommend next semantic steps
+description: |-
+    Recommend next semantic maturity actions based on the current repository.
+
+    semantic recommend runs the same analysis as semantic assess and prints:
+    - Current semantic maturity level (0–4)
+    - Focused list of next-step recommendations tailored to that level
+
+    Examples:
+      # Recommend next steps for semantic maturity
+      zqk semantic recommend

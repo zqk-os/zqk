@@ -1,0 +1,19 @@
+$schema: _schemas/command_spec.schema.json
+name: automation
+short: Automation and integration operations (hooks, CI/CD, and scripts)
+description: |-
+    Automation and integration operations for use in git hooks, CI/CD pipelines, and
+    scripts.
+
+    This command group provides operations designed for automation contexts:
+      Common operations:
+        - lint-bypass-audit: Create audit events for lint bypasses
+        - docman-sync: Sync documentation registration (discover and register markdown files)
+      Specialized operations: (future: ci-validate, hook-setup, etc.)
+
+      Create audit event for lint bypass
+      zqk automation lint-bypass-audit --git-user "John Doe" --git-email "john@example.com" --commit-message "fix: update code" --files "pkg/storage/file.go"
+      Sync documentation registration
+      zqk automation docman-sync
+      Sync only if markdown files are staged
+      zqk automation docman-sync --git-aware

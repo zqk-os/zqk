@@ -1,0 +1,6 @@
+$schema: ../_schemas/command_spec.schema.json
+name: market
+short: Discover and browse available agent swarm capabilities in the mesh market
+description: |-
+    Lists, searches, and inspects agent services, capability advertisements, and
+    capability leases across the swarm mesh.

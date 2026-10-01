@@ -1,0 +1,4 @@
+$schema: ../_schemas/command_spec.schema.json
+name: audit-stream
+short: Stream real-time audit events
+description: Stream real-time audit events

@@ -1,0 +1,16 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: integrity-report
+short: Show last integrity check output (Tier 1 issues, hash mismatches, etc.)
+description: |-
+    Prints the contents of .zqk/pre-commit/integrity-output.txt from the last run of
+
+    scripts/pre-commit-integrity.sh. Use this to see exact violations when the
+    integrity
+
+    category fails (e.g. Tier 1 issues, hash mismatches, lifecycle violations). If
+    the file
+
+    is missing, run ./scripts/pre-commit-integrity.sh first.
+
+      View integrity output after integrity check failed
+      zqk pre-commit integrity-report

@@ -1,0 +1,17 @@
+$schema: ../_schemas/command_spec.schema.json
+name: register
+short: Discover and register documentation files as doc_entry objects
+description: |-
+    Discover all markdown files in the docs directory and register them as doc_entry
+    objects.
+
+    This command:
+      - Scans the docs/ directory for markdown files
+      - Extracts metadata (title, summary, group, category) from each file
+      - Creates doc_entry objects for files that don't already have entries
+      - Skips files that already have registered doc_entry objects
+
+      Register all documentation files
+      zqk docman register
+      Dry run to see what would be registered
+      zqk docman register --dry-run

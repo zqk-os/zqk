@@ -1,0 +1,22 @@
+$schema: ../_schemas/command_spec.schema.json
+name: audit-report
+short: Generate audit report from command metrics
+description: |-
+    Generate comprehensive audit reports analyzing command execution metrics.
+
+    This command analyzes command metrics to identify:
+      - Commands with high failure rates
+      - Frequent timeouts
+      - Slow commands
+      - Improvement opportunities
+      - Churn indicators (user confusion patterns)
+
+    The report helps identify areas for improvement and clarifications to reduce
+    churn.
+
+      Generate audit report
+      zqk system audit-report
+      Save report to file
+      zqk system audit-report --output report.md
+      Generate report with specific focus
+      zqk system audit-report --focus failures

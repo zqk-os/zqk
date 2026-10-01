@@ -1,0 +1,4 @@
+$schema: ../_schemas/command_spec.schema.json
+name: stream-gc
+short: Run garbage collector to prune orphaned JSONL stream segment files
+description: Run garbage collector to prune orphaned JSONL stream segment files

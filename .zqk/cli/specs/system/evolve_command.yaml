@@ -1,0 +1,6 @@
+$schema: ../_schemas/command_spec.schema.json
+name: evolve
+short: Run autonomous schema, ontology, and codebase evolution cycles
+description: |-
+    Executes automated schema updates, dialect migrations, and architectural
+    ontology evolution cycles.

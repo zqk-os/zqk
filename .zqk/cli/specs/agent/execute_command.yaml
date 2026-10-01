@@ -1,0 +1,4 @@
+$schema: ../_schemas/command_spec.schema.json
+name: execute
+short: Execute an agent task
+description: Execute an agent task by ID

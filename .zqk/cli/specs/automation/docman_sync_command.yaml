@@ -1,0 +1,29 @@
+$schema: ../_schemas/command_spec.schema.json
+name: docman-sync
+short: Sync documentation registration (discover and register markdown files)
+description: |-
+    Sync documentation registration by discovering and registering markdown files as
+    doc_entry objects.
+
+    This command is designed for automation contexts (git hooks, CI/CD pipelines, scripts) to ensure
+    documentation is automatically registered when new markdown files are added.
+
+    The command:
+      - Scans the docs/ directory for markdown files
+      - Extracts metadata (title, summary, group, category) from each file
+      - Creates doc_entry objects for files that don't already have entries
+      - Skips files that already have registered doc_entry objects
+
+    When --git-aware is enabled, the command only runs if markdown files are staged or changed.
+    This makes it safe to use in git hooks without unnecessary overhead.
+
+      Sync all documentation (register any new files)
+      zqk automation docman-sync
+      Only sync if markdown files are staged (for git hooks)
+      zqk automation docman-sync --git-aware
+      Check if registration is needed (exit 1 if needed, 0 if up-to-date)
+      zqk automation docman-sync --check-only
+      Dry run to see what would be registered
+      zqk automation docman-sync --dry-run
+      Update existing entries with missing reference fields
+      zqk automation docman-sync --update-existing

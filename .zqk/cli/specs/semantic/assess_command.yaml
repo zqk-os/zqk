@@ -1,0 +1,18 @@
+$schema: ../_schemas/command_spec.schema.json
+name: assess
+short: Assess organization's semantic maturity level
+description: |-
+    Assess the organization's semantic maturity level and provide recommendations.
+
+    The assessment analyzes:
+    - Structured data (YAML, JSON, etc.)
+    - Formal schemas (JSON Schema, XSD, etc.)
+    - Ontologies (RDF/OWL files)
+    - Semantic repositories (SPARQL endpoints)
+
+    Maturity levels:
+    - Level 0 (Naive): No structured data, no taxonomies
+    - Level 1 (Aware): Some structured data, basic taxonomies
+    - Level 2 (Practicing): Formal schemas, structured databases
+    - Level 3 (Advanced): RDF/OWL files, SPARQL endpoints
+    - Level 4 (Expert): Multiple ontologies, semantic reasoning

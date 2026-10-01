@@ -1,0 +1,12 @@
+$schema: ../_schemas/command_spec.schema.json
+name: import
+short: Import ontology from RDF/OWL or other format
+description: |-
+    Import an ontology from a file (RDF/OWL: Turtle, RDF/XML, JSON-LD).
+
+    Detects format and reports; full translation to the kernel domain ontology.
+
+      Import RDF/OWL file (auto-detect format)
+      zqk ontology import --file organizational.owl
+      Import Turtle file
+      zqk ontology import --file schema.ttl --input-format rdf_owl

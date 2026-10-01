@@ -1,0 +1,28 @@
+$schema: ../_schemas/command_spec.schema.json
+name: lint-bypass-audit
+short: Create an audit event for lint check bypasses
+description: |-
+    Create an audit event when lint checks are bypassed with --no-verify.
+
+    This command is designed to be called from git hooks and wrapper scripts to track
+    when lint checks are bypassed, helping identify when lint warnings increase and
+    who is not taking time to resolve lint checks.
+
+    The command creates a stream-backed audit_event with:
+      - Git user information (name and email)
+      - Commit message
+      - List of staged files
+      - Count of Go files affected
+
+    The command automatically detects:
+      - Git user name from 'git config user.name'
+      - Git email from 'git config user.email'
+      - Commit message from HEAD or COMMIT_EDITMSG
+      - Staged files from 'git diff --cached --name-only'
+
+      Fully automatic (all context auto-detected from git)
+      zqk automation lint-bypass-audit
+      Override specific values while auto-detecting others
+      zqk automation lint-bypass-audit --commit-message "Custom message"
+      Explicit values (disable auto-detection)
+      zqk automation lint-bypass-audit --auto-detect=false --git-user "John Doe" --git-email "john@example.com" --commit-message "fix: update code" --files "pkg/storage/file.go"
