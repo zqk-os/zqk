@@ -1,4 +1,4 @@
-package ui
+package tui
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/zqk-os/zqk/cmd/zqk/state"
-	"github.com/zqk-os/zqk/cmd/zqk/ui/tds"
+	"github.com/zqk-os/zqk/pkg/tui/tds"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 )

@@ -1,4 +1,4 @@
-package ui
+package tui
 
 // Canonical ANSI Escape Sequences and Terminal Control Codes.
 // Centralizing these constants ensures that low-level terminal operations

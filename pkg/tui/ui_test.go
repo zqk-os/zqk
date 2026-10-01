@@ -1,4 +1,4 @@
-package ui
+package tui
 
 import (
 	"fmt"
@@ -12,24 +12,14 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/zqk-os/zqk/cmd/zqk/state"
 	"github.com/zqk-os/zqk/cmd/zqk/test"
-	"github.com/zqk-os/zqk/cmd/zqk/ui/tds"
+	"github.com/zqk-os/zqk/pkg/tui/tds"
 	"github.com/zqk-os/zqk/pkg/agentfeed"
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/tde"
 )
 
-func TestNewUICmd(t *testing.T) {
-	cmd := NewUICmd()
-	require.NotNil(t, cmd)
-	assert.Equal(t, "ui", cmd.Name())
-	assert.Contains(t, cmd.Aliases, "dashboard")
-	assert.Contains(t, cmd.Aliases, "console")
 
-	tabFlag := cmd.Flag("tab")
-	require.NotNil(t, tabFlag)
-	assert.Equal(t, "seismograph", tabFlag.DefValue)
-}
 
 func TestAnsiConstants(t *testing.T) {
 	assert.Equal(t, "\033[?1049h", AnsiAltBufferEnter)

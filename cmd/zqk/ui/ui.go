@@ -12,6 +12,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/studio"
+	"github.com/zqk-os/zqk/pkg/tui"
 )
 
 // NewUICmd creates the 'zqk ui' command for interactive terminal mission control.
@@ -71,7 +72,7 @@ func NewUICmd() *cobra.Command {
 
 			format := proc.Format()
 			if format == cli.FormatJSON || format == cli.FormatJSONL || format == cli.FormatYAML {
-				m := NewUIModel(projectRoot, tab)
+				m := tui.NewUIModel(projectRoot, tab)
 				m.RefreshMutations()
 				m.RefreshAuditEvents()
 				m.RefreshObjects()
@@ -86,7 +87,7 @@ func NewUICmd() *cobra.Command {
 				return cli.FormatOutput(cmd, m)
 			}
 
-			return RunTUI(proc.OperationContext(), projectRoot, tab, sp, sec)
+			return tui.RunTUI(proc.OperationContext(), projectRoot, tab, sp, sec)
 		})(cmd, args)
 	}
 
