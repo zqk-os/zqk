@@ -298,6 +298,9 @@ def get_clean_nav_title(title: str, rel_path: str = "") -> str:
         "pkg/specbuilder/builders/README.md": "Versioned Spec Builders Engine",
         "pkg/specbuilder/instance_builders/README.md": "Runtime Instance Builders",
         "pkg/specbuilder/bootstrap/README.md": "Specbuilder Bootstrap Package",
+        "pkg/bootstrap/README.md": "Kernel Bootstrap Seeding",
+        "pkg/cliapp/README.md": "CLI Host",
+        "pkg/cliapp/context/README.md": "Execution Context & Signals",
         # CLI Commands & Tooling
         "cmd/zqk/README.md": "zqk Primary CLI Commands",
         "cmd/zqk-shim/README.md": "zqk-shim Compatibility Shim",
@@ -306,9 +309,6 @@ def get_clean_nav_title(title: str, rel_path: str = "") -> str:
         "cmd/zqk/system/INTEGRITY_RESOLUTION_PLAN.md": "System Integrity Resolution",
         # Internal Runtime
         "internal/README.md": "Internal Packages Directory (internal/)",
-        "internal/bootstrap/README.md": "Kernel Bootstrap Seeding",
-        "internal/cli/README.md": "Internal CLI Framework",
-        "internal/cli/context/README.md": "Execution Context & Signals",
     }
     if path in subsystem_nav_titles:
         return subsystem_nav_titles[path]
@@ -992,8 +992,7 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
                 return (0, cmd_flow.index(rel))
         if entry["category"] == "Kernel Subsystems — Internal Runtime":
             internal_flow = [
-                "internal/README.md", "internal/bootstrap/README.md",
-                "internal/cli/README.md", "internal/cli/context/README.md"
+                "internal/README.md",
             ]
             if rel in internal_flow:
                 return (0, internal_flow.index(rel))
@@ -1214,7 +1213,7 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
             "Kernel Subsystems — Core Engines": "Architectural design, interface contracts, and core engine implementations across the Go microkernel.",
             "Kernel Subsystems — Spec & Command Builders": "Spec-driven builder patterns, versioned code generation engines, and generated Cobra command builders.",
             "Kernel Subsystems — CLI Commands & Tooling": "Command-line interfaces, daemon shims, operational diagnostics, and system test suites under cmd/.",
-            "Kernel Subsystems — Internal Runtime": "Internal Go runtime utilities, embedded seed archives, and CLI context managers under internal/.",
+            "Kernel Subsystems — Internal Runtime": "Unexported packages: codegen quarantine, distribution doc checks, and stamp verification keys.",
             "Codebase Evaluation — Framework & Governance": "Constitutional invariants, multi-axis Diamond Scale grading, wave orchestration, and handoff contracts.",
             "Codebase Evaluation — Evaluation Rubrics": "Standardized, cited quality rubrics defining observable failure modes and criteria across 12 engineering dimensions.",
             "Codebase Evaluation — Specialist Prompts": "Lens-specialized investigation prompts for deep, evidence-backed codebase analysis.",

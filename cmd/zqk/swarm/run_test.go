@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/zqk-os/zqk/internal/bootstrap"
+	"github.com/zqk-os/zqk/pkg/bootstrap"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"

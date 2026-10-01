@@ -224,7 +224,7 @@ def main() -> int:
         '\t"github.com/zqk-os/zqk/pkg/zqkenv"\n)\n\nfunc init() {\n\t_ = os.Setenv(zqkenv.ZQKAllowForegroundGoTest().Key, "1")\n}\n',
         ")\n",
     )
-    sub_all("internal/bootstrap/polyglot_greenfield_test.go", 'cmd.Env = append(os.Environ(), "ZQK_ALLOW_FOREGROUND_GO_TEST=1")', 'cmd.Env = append(os.Environ(), "CGO_ENABLED=0")')
+    sub_all("pkg/bootstrap/polyglot_greenfield_test.go", 'cmd.Env = append(os.Environ(), "ZQK_ALLOW_FOREGROUND_GO_TEST=1")', 'cmd.Env = append(os.Environ(), "CGO_ENABLED=0")')
 
     sub_all("pkg/observer/semantic.go", 'zqkenv.Get("ZQK_OBSERVER_INCLUDE_TESTS")', "zqkenv.ObserverIncludeTests()")
     sub_all("pkg/observer/semantic.go", 'zqkenv.Get("ZQK_OBSERVER_CONCURRENCY")', "zqkenv.ObserverConcurrency()")

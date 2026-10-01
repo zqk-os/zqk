@@ -40,7 +40,7 @@ help:
 bootstrap-archive:
 	@if [ -f scripts/build-bootstrap-archive.sh ]; then \
 		$(SHELL) scripts/build-bootstrap-archive.sh "$$(pwd)" && echo "✓ Bootstrap archive ready"; \
-	elif [ -f internal/bootstrap/archive/bootstrap.tar.gz ]; then \
+	elif [ -f pkg/bootstrap/archive/bootstrap.tar.gz ]; then \
 		echo "✓ Pre-built bootstrap archive present"; \
 	else \
 		echo "Error: no bootstrap archive or builder found" >&2; exit 1; \
