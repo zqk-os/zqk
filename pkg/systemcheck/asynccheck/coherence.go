@@ -9,9 +9,10 @@ import (
 )
 
 const (
-	CategoryCacheLag       = "CacheLag"
-	CategoryCacheCoherence = "cache_coherence"
-	CategoryGhostRef       = validation.CategoryGhostRef
+	CategoryCacheLag           = "CacheLag"
+	CategoryCacheCoherence     = "cache_coherence"
+	CategoryGhostRef           = validation.CategoryGhostRef
+	msgValidationTimeoutPrefix = "validation timeout after"
 )
 
 // IsTransientCacheCoherenceIssue reports whether an issue describes cache state at validation
@@ -78,7 +79,7 @@ func isInvalidatingIssue(issue validation.ValidationIssue) bool {
 			issue.Category == validation.CategoryValidationTimeout {
 			return true
 		}
-		if strings.Contains(issue.Message, "validation timeout after") {
+		if strings.Contains(issue.Message, msgValidationTimeoutPrefix) {
 			return true
 		}
 		if issue.Category == CategoryGhostRef || strings.EqualFold(issue.Category, CategoryGhostRef) {

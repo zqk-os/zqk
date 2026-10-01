@@ -15,6 +15,14 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
+const (
+	logMsgSkippedContentionReads = "Skipping object ID extraction reads due to contention (fallback path)"
+	labelExtractRead             = "asynccheck_extract_read"
+	descExtractRead              = "reading file content for ID extraction"
+	logMsgTimeoutRead            = "Timeout reading file to extract ID"
+	logMsgSkipDupObjectID        = "Skipping duplicate object ID during discovery"
+)
+
 // Limit concurrent per-file content reads during discovery fallback.
 var extractObjectIDReadSem = make(chan struct{}, 32)
 
@@ -82,7 +90,7 @@ func extractIDFromContentWithSem(ctx context.Context, filePath, kind string, log
 	case <-time.After(50 * time.Millisecond):
 		skipped := atomic.AddUint64(&extractObjectIDSkippedReads, 1)
 		if skipped == 1 || skipped%1000 == 0 {
-			logging.Fluent(logger).Warn("Skipping object ID extraction reads due to contention (fallback path)").
+			logging.Fluent(logger).Warn(logMsgSkippedContentionReads).
 				String("skipped_reads", fmt.Sprintf("%d", skipped)).
 				Kind(kind).
 				Log()
@@ -91,7 +99,7 @@ func extractIDFromContentWithSem(ctx context.Context, filePath, kind string, log
 	}
 
 	resultChan := make(chan []byte, 1)
-	builder := goroutinelabels.NewGoroutine("asynccheck_extract_read", "reading file content for ID extraction").
+	builder := goroutinelabels.NewGoroutine(labelExtractRead, descExtractRead).
 		WithContext(ctx)
 	if bud := goroutinelabels.DefaultBudget(); bud != nil {
 		builder = builder.WithBudget(bud)
@@ -113,7 +121,7 @@ func extractIDFromContentWithSem(ctx context.Context, filePath, kind string, log
 		}
 		return parseIDFromYAMLBytes(data)
 	case <-time.After(2 * time.Second):
-		logging.Fluent(logger).Debug("Timeout reading file to extract ID").
+		logging.Fluent(logger).Debug(logMsgTimeoutRead).
 			File(filePath).
 			Kind(kind).
 			Log()
@@ -167,7 +175,7 @@ func DeduplicateFilesByObjectID(files []ScannedFile, logger logging.Logger) []Sc
 			continue
 		}
 		if seen[f.ObjectID] {
-			logging.Fluent(logger).Debug("Skipping duplicate object ID during discovery").
+			logging.Fluent(logger).Debug(logMsgSkipDupObjectID).
 				String("object_id", f.ObjectID).
 				Kind(f.Kind).
 				Log()
