@@ -74,6 +74,10 @@
 ./cli_specs/ambient/ingest_command.yaml
 ./cli_specs/ambient/status_command.yaml
 ./cli_specs/ambient_command.yaml
+./cli_specs/auth/
+./cli_specs/auth/login_command.yaml
+./cli_specs/auth/logout_command.yaml
+./cli_specs/auth_command.yaml
 ./cli_specs/ci/
 ./cli_specs/ci/checkout_command.yaml
 ./cli_specs/ci/run_command.yaml
@@ -146,6 +150,7 @@
 ./cli_specs/kind_pack/
 ./cli_specs/kind_pack/install_command.yaml
 ./cli_specs/kind_pack_command.yaml
+./cli_specs/learn_command.yaml
 ./cli_specs/mcp/
 ./cli_specs/mcp/ensure_command.yaml
 ./cli_specs/mcp/supervise_command.yaml
