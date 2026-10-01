@@ -1,0 +1,6 @@
+$schema: ../_schemas/command_spec.schema.json
+name: logout
+short: End the current CLI session and clear persisted state
+description: |
+  Ends the current session (status set to completed), removes .zqk/state/session,
+  and optionally unset ZQK_SESSION_ID in your shell.

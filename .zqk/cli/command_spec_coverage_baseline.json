@@ -1,14 +1,10 @@
 {
   "commands_without_specs": [
-    "agent learn",
     "ambient daemon",
     "ambient ensure",
     "ambient start",
     "ambient stop",
     "ambient wave",
-    "auth",
-    "auth login",
-    "auth logout",
     "automation",
     "automation docman-sync",
     "automation lint-bypass-audit",
@@ -33,7 +29,6 @@
     "keystore issue",
     "keystore list",
     "keystore rotate",
-    "learn",
     "matrix",
     "matrix get",
     "matrix list",
