@@ -11,6 +11,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/migration/parser"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/systemcheck/asynccheck"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -177,14 +178,7 @@ func checkIntegrityCAS(ctx *cli.Context, obj *parser.ParsedObject, filePath, kin
 	return issues, autoFixed
 }
 
-// isHexString checks if a string contains only hexadecimal characters
-//
-//nolint:unused // Helper function - reserved for future use
+// isHexString checks if a string contains only hexadecimal characters (delegates to asynccheck).
 func isHexString(s string) bool {
-	for _, c := range s {
-		if (c < '0' || c > '9') && (c < 'a' || c > 'f') && (c < 'A' || c > 'F') {
-			return false
-		}
-	}
-	return true
+	return asynccheck.IsHexString(s)
 }

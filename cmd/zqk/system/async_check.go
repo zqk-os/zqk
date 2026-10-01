@@ -28,14 +28,8 @@ import (
 	"github.com/zqk-os/zqk/pkg/when"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/systemcheck/asynccheck"
 )
-
-// Limit concurrent per-file content reads during discovery fallback.
-// This prevents goroutine/FD blowups when the filesystem is slow/uninterruptible.
-var extractObjectIDReadSem = make(chan struct{}, 32) // bounded, small; discovery should prefer CAS index
-
-// Track how often we skip reads due to contention (best-effort observability without log spam).
-var extractObjectIDSkippedReads uint64
 
 const (
 	progressStageLoading = "loading"
@@ -1226,111 +1220,15 @@ func scanObjectFilesWithContext(ctx stdcontext.Context, dir, kind string, logger
 	}
 }
 
-// scannedFile represents a scanned object file
-type scannedFile struct {
-	ObjectID string
-	Kind     string
-	Path     string
-}
+// scannedFile represents a scanned object file (aliased to asynccheck.ScannedFile)
+type scannedFile = asynccheck.ScannedFile
 
-// extractObjectIDFromFile extracts object ID from file path or content (legacy - use extractObjectIDFromFileWithContext)
+// extractObjectIDFromFile extracts object ID from file path or content (delegates to asynccheck)
 func extractObjectIDFromFile(filePath, kind string) string {
-	ctx := pkgctx.NewSystemContext()
-	return extractObjectIDFromFileWithContext(ctx, filePath, kind, logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem)))
+	return asynccheck.ExtractObjectIDFromFile(filePath, kind)
 }
 
-// extractObjectIDFromFileWithContext extracts object ID from file path or content with timeout
-// For CAS files (hash-based filenames), always extracts from content, not filename
+// extractObjectIDFromFileWithContext extracts object ID from file path or content with timeout (delegates to asynccheck)
 func extractObjectIDFromFileWithContext(ctx stdcontext.Context, filePath, kind string, logger logging.Logger) string {
-	base := filepath.Base(filePath)
-
-	// Check if this is a CAS file (hash-based filename)
-	// CAS files have 64-character hex hash as filename, so we must extract ID from content
-	isCASFile := len(base) == 69 && strings.HasSuffix(base, ".yaml") && isHexString(base[:64])
-
-	// For CAS files, skip filename extraction and go straight to content
-	// For non-CAS files, try filename first (e.g., "BLI-001.yaml" -> "BLI-001")
-	if !isCASFile {
-		if ext := filepath.Ext(base); ext != emptyValue {
-			id := base[:len(base)-len(ext)]
-			// Basic validation - check if it looks like an object ID (not a hash)
-			// Object IDs typically have format like "BLI-001", "CHA-002", etc.
-			// Hashes are 64 hex characters, so if it's that long, it's likely a hash
-			if id != emptyValue && len(id) < 64 {
-				return id
-			}
-		}
-	}
-
-	// Try to read file and extract ID from content (with timeout to prevent blocking)
-	type readResult struct {
-		data []byte
-		err  error
-	}
-	resultChan := make(chan readResult, 1)
-
-	// Acquire bounded semaphore before starting a read goroutine.
-	// If we can't acquire quickly (or context is cancelled), skip reading this file.
-	select {
-	case extractObjectIDReadSem <- struct{}{}:
-		// acquired
-	case <-ctx.Done():
-		return ""
-	case <-time.After(50 * time.Millisecond):
-		skipped := atomic.AddUint64(&extractObjectIDSkippedReads, 1)
-		// Log occasionally to avoid spam.
-		if skipped == 1 || skipped%1000 == 0 {
-			logging.Fluent(logger).Warn("Skipping object ID extraction reads due to contention (fallback path)").
-				String("skipped_reads", fmt.Sprintf("%d", skipped)).
-				Kind(kind).
-				Log()
-		}
-		return ""
-	}
-
-	extractBud := goroutinelabels.DefaultBudget()
-	extractBuilder := goroutinelabels.NewGoroutine("extract_object_id_read", fmt.Sprintf("reading file %s to extract ID", filepath.Base(filePath))).
-		WithContext(ctx)
-	if extractBud != nil {
-		extractBuilder = extractBuilder.WithBudget(extractBud)
-	}
-	extractBuilder.StartSimple(func() {
-		defer func() { <-extractObjectIDReadSem }()
-		data, err := fileutil.ReadFile(filePath)
-		resultChan <- readResult{data: data, err: err}
-	})
-
-	// Wait for read with timeout (2 seconds max per file to prevent blocking)
-	select {
-	case result := <-resultChan:
-		if result.err != nil {
-			return ""
-		}
-		data := result.data
-
-		// Simple YAML parsing to extract ID
-		for line := range strings.SplitSeq(string(data), "\n") {
-			line = strings.TrimSpace(line)
-			if strings.HasPrefix(line, "id:") {
-				parts := strings.SplitN(line, ":", 2)
-				if len(parts) == 2 {
-					id := strings.TrimSpace(parts[1])
-					if id != emptyValue {
-						return id
-					}
-				}
-			}
-		}
-		return ""
-	case <-time.After(2 * time.Second):
-		// Timeout - log but don't fail (skip this file)
-		logging.Fluent(logger).Debug("Timeout reading file to extract ID").
-			File(filePath).
-			Kind(kind).
-			Log()
-		return ""
-	case <-ctx.Done():
-		// Context cancelled
-		return ""
-	}
+	return asynccheck.ExtractObjectIDFromFileWithContext(ctx, filePath, kind, logger)
 }

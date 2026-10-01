@@ -85,6 +85,19 @@ const (
 	RuleTypeAlignment       = "alignment"
 )
 
+// Standard issue category names across validation and systemcheck (SSOT).
+const (
+	CategoryIntegrity          = "integrity"
+	CategoryInstanceValidation = "instance_validation"
+	CategoryValidationError    = "validation_error"
+	CategoryValidationTimeout  = "validation_timeout"
+	CategoryReference          = "reference"
+	CategoryRegistration       = "registration"
+	CategoryLifecycle          = "lifecycle"
+	CategoryPolicy             = "policy"
+	CategoryGhostRef           = "GhostRef"
+)
+
 // Lock operation names for validation state cache (used with RunInLockWithLogger).
 // Centralized so metrics/tracing use consistent names.
 const (
