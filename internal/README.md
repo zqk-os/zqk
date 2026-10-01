@@ -19,7 +19,6 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [codegen](./codegen/) | `github.com/zqk-os/zqk/internal/codegen` | 0+1 | 1 | ast, generators, macro | ❌ - | Automated code generation, schema-to-Go binding synthesis, and spec scaffolding. |
 | [distribution](./distribution/) | `github.com/zqk-os/zqk/internal/distribution` | 0+1 | 1 | - | ❌ - | Release packaging, archive bundling, and distribution asset compilation. |
 | [stamping](./stamping/) | `github.com/zqk-os/zqk/internal/stamping` | 1+1 | 1 | - | ❌ - | Binary build stamping, version metadata injection, and build environment provenance. |
-| [testpackageconcurrency](./testpackageconcurrency/) | `github.com/zqk-os/zqk/internal/testpackageconcurrency` | 1+1 | 1 | - | ❌ - | Concurrency test fixtures, race detection harnesses, and synchronization benchmarks. |
 
 ## Package Structure
 
@@ -36,7 +35,6 @@ internal/
 │   └── macro/
 ├── distribution/          # Release packaging, archive bundling, and distribution asset 
 ├── stamping/          # Binary build stamping, version metadata injection, and build
-├── testpackageconcurrency/          # Concurrency test fixtures, race detection harnesses, and syn
 ```
 
 ## Usage
