@@ -146,12 +146,20 @@ func (av *AsyncValidator) Start() error {
 func (av *AsyncValidator) Stop() error {
 	var stopErr error
 	av.stopOnce.Do(func() {
+		var wasRunning bool
 		var workerTimeout, cacheTimeout time.Duration
 		if err := concurrency.RunInLockWithLogger(
 			&av.mu,
 			LockNameAsyncValidatorStopInit,
 			lockLoggerSystem(),
 			func() error {
+				// A validator that never started has nothing to drain. Running the
+				// stop pipeline anyway cancels and closes channels the caller did
+				// not open a session for.
+				if !av.running {
+					return nil
+				}
+				wasRunning = true
 				av.cancel()
 				av.running = false
 
@@ -170,6 +178,10 @@ func (av *AsyncValidator) Stop() error {
 			},
 		); err != nil {
 			logging.Fluent(av.logger).Error(ErrMsgInitStopSeq, err).Log()
+		}
+
+		if !wasRunning {
+			return
 		}
 
 		stopErr = runAsyncValidatorStopPipeline(workerTimeout, cacheTimeout, av)
