@@ -6,7 +6,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/circuitbreaker"
 
-	"github.com/zqk-os/zqk/internal/testpackageconcurrency"
+	"github.com/zqk-os/zqk/pkg/testpackageconcurrency"
 	"github.com/zqk-os/zqk/pkg/nildecode"
 	"github.com/zqk-os/zqk/pkg/objects"
 )

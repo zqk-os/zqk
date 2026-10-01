@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/migration/parser"
 
 	"github.com/spf13/cobra"

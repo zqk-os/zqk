@@ -3,7 +3,7 @@ package object
 import (
 	"path/filepath"
 
-	clctx "github.com/zqk-os/zqk/internal/cli/context"
+	clctx "github.com/zqk-os/zqk/pkg/cliapp/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"

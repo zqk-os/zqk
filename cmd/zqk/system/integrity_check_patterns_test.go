@@ -9,7 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	cli "github.com/zqk-os/zqk/internal/cli"
+	cli "github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/migration/parser"
 	"github.com/zqk-os/zqk/pkg/objects"

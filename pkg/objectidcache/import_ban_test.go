@@ -13,7 +13,7 @@ import (
 func TestPkgObjectIDCacheMustNotImportCLI(t *testing.T) {
 	t.Parallel()
 	banned := []string{
-		"github.com/zqk-os/zqk/internal/cli",
+		"github.com/zqk-os/zqk/pkg/cliapp",
 		"github.com/zqk-os/zqk/pkg/cli",
 		"github.com/zqk-os/zqk/cmd/zqk",
 	}

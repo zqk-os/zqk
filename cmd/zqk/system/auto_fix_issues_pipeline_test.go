@@ -3,7 +3,7 @@ package system
 import (
 	"testing"
 
-	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/migration/parser"

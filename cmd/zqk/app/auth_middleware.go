@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/spf13/cobra"
-	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/authcred"
 	"github.com/zqk-os/zqk/pkg/brand"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"

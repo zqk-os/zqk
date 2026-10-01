@@ -11,7 +11,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/execwrap"
 
 	"github.com/spf13/cobra"
-	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/agentdelivery"
 	"github.com/zqk-os/zqk/pkg/agentprompt"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"

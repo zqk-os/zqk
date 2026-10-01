@@ -1,5 +1,4 @@
 // Package autofix provides remediation dependency ordering and rule evaluation.
-// Implements BLI-1790832042016811000-a4d8bd93 under PRI-GOD-PACKAGES-PHASE26.
 package autofix
 
 import (

@@ -15,8 +15,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/cmd/zqk/system"
-	"github.com/zqk-os/zqk/internal/cli"
-	clicontext "github.com/zqk-os/zqk/internal/cli/context"
+	"github.com/zqk-os/zqk/pkg/cliapp"
+	clicontext "github.com/zqk-os/zqk/pkg/cliapp/context"
 	"github.com/zqk-os/zqk/pkg/config"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/daemon/singleton"
