@@ -61,7 +61,7 @@ func (r *ReverseReferenceIndex) LoadCache(projectRoot string) (bool, error) {
 	var entryCount int
 	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
 	defer cancel()
-	var err_swallow_116 = concurrency.WithLockTimeout(
+	var errLock = concurrency.WithLockTimeout(
 		&r.mu,
 		ctx,
 		nil,
@@ -87,8 +87,8 @@ func (r *ReverseReferenceIndex) LoadCache(projectRoot string) (bool, error) {
 			return nil
 		},
 	)
-	if err_swallow_116 != nil {
-		logging.LogSwallowedError(err_swallow_116)
+	if errLock != nil {
+		return false, errfmt.Errorf("reverse reference index lock timeout during load: %w", errLock)
 	}
 
 	StorageLog(logger).Debug(LogEventStorageReverseRefIndexLoadedDebug).
@@ -106,7 +106,7 @@ func (r *ReverseReferenceIndex) SaveCache(projectRoot string) error {
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
 	defer cancel()
-	var err_swallow_117 = concurrency.WithRLockTimeout(
+	var errCount = concurrency.WithRLockTimeout(
 		&r.mu,
 		ctx,
 		nil,
@@ -117,8 +117,8 @@ func (r *ReverseReferenceIndex) SaveCache(projectRoot string) error {
 			return nil
 		},
 	)
-	if err_swallow_117 != nil {
-		logging.LogSwallowedError(err_swallow_117)
+	if errCount != nil {
+		return errfmt.Errorf("reverse reference index lock timeout getting count for save: %w", errCount)
 	}
 
 	cachePath := r.getCacheFilePath(projectRoot)
@@ -135,7 +135,7 @@ func (r *ReverseReferenceIndex) SaveCache(projectRoot string) error {
 	}
 	ctx2, cancel2 := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
 	defer cancel2()
-	var err_swallow_118 = concurrency.WithLockTimeout(
+	var errPrepare = concurrency.WithLockTimeout(
 		&r.mu,
 		ctx2,
 		nil,
@@ -160,8 +160,8 @@ func (r *ReverseReferenceIndex) SaveCache(projectRoot string) error {
 			return nil
 		},
 	)
-	if err_swallow_118 != nil {
-		return errfmt.Errorf("reverse reference index lock timeout preparing save cache: %w", err_swallow_118)
+	if errPrepare != nil {
+		return errfmt.Errorf("reverse reference index lock timeout preparing save cache: %w", errPrepare)
 	}
 
 	// Marshal to JSON
