@@ -1,6 +1,8 @@
 ## Summary
 
 - What changed and why (not a file list).
+- Priority Plan:
+- Backlog Items:
 
 ## Test plan
 

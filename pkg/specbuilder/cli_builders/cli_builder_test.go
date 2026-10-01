@@ -12,6 +12,9 @@ import (
 )
 
 func TestCLIBuilder_WrapsZQK(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping slow go run in short mode")
+	}
 	t.Setenv(zqkenv.TestBypassAuth().Name(), "1")
 	t.Setenv(zqkenv.APIKey().Name(), "ACC-SYSTEM")
 	// Execute the equivalent of `./bin/zqk object list policy`

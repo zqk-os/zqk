@@ -221,6 +221,9 @@ func TestSetupTestServices_GraphEnabledWithExistingMemgraph(t *testing.T) {
 }
 
 func TestServiceManager_StartAndStopEphemeralContainer(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping docker container test in short mode")
+	}
 	sm := NewServiceManager()
 	if !sm.isDockerAvailable() {
 		t.Skip("Docker not available in this test environment")

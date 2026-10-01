@@ -153,8 +153,8 @@ func TestAttemptFixes_RequiredStatus_LifecycleOrigin(t *testing.T) {
 	if !fixed {
 		t.Fatal("Expected fix for missing roadmap status")
 	}
-	if objMap[objects.FieldKeyStatus] != "draft" {
-		t.Fatalf("Expected lifecycle origin status draft, got %v", objMap[objects.FieldKeyStatus])
+	if objMap[objects.FieldKeyStatus] != "conceptual" {
+		t.Fatalf("Expected lifecycle origin status conceptual, got %v", objMap[objects.FieldKeyStatus])
 	}
 	if strings.Contains(msg, "from spec") {
 		t.Fatalf("status fill must not say from spec; got %q", msg)

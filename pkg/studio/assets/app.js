@@ -8,7 +8,8 @@
     let activeDensity = 'execution'; // 'backbone', 'execution', 'all'
     let currentMainView = 'dag'; // 'dag' or 'gantt'
     let searchQuery = '';
-    let ganttZoom = '1m'; // '2w', '1m', '3m', 'all'
+    let ganttZoom = 'fit'; // 'fit', '1w', '2w', '1m', 'all'
+    let ganttCollapsedGroups = new Set();
 
     // Transform state
     let scale = 1.0;
@@ -235,26 +236,27 @@
       const activeIds = new Set();
       activeIds.add(centerId);
 
-      // Build adjacency maps strictly for structural lineage
-      const outgoing = new Map(); // child -> parent
-      const incoming = new Map(); // parent -> child
+      // Adjacency maps for structural hierarchy:
+      // In canonical edges, e.source is Parent and e.target is Child.
+      const parentsOf = new Map(); // child -> Set of parents
+      const childrenOf = new Map(); // parent -> Set of children
 
       graphData.edges.forEach(e => {
         // Exclude loose metadata references (policies, personas, skills) from DAG causal focus
         if (e.structural === false) return;
 
-        if (!outgoing.has(e.source)) outgoing.set(e.source, new Set());
-        outgoing.get(e.source).add(e.target);
+        if (!parentsOf.has(e.target)) parentsOf.set(e.target, new Set());
+        parentsOf.get(e.target).add(e.source);
 
-        if (!incoming.has(e.target)) incoming.set(e.target, new Set());
-        incoming.get(e.target).add(e.source);
+        if (!childrenOf.has(e.source)) childrenOf.set(e.source, new Set());
+        childrenOf.get(e.source).add(e.target);
       });
 
-      // BFS upstream (ancestors / parents)
+      // BFS upstream: strictly ancestors (parents, grandparents up to root)
       let queue = [centerId];
       while (queue.length > 0) {
         const cur = queue.shift();
-        const parents = outgoing.get(cur);
+        const parents = parentsOf.get(cur);
         if (parents) {
           parents.forEach(p => {
             if (!activeIds.has(p)) {
@@ -265,11 +267,11 @@
         }
       }
 
-      // BFS downstream (descendants / children)
+      // BFS downstream: strictly descendants (children, subtasks down to test cases)
       queue = [centerId];
       while (queue.length > 0) {
         const cur = queue.shift();
-        const children = incoming.get(cur);
+        const children = childrenOf.get(cur);
         if (children) {
           children.forEach(c => {
             if (!activeIds.has(c)) {
@@ -312,18 +314,29 @@
           }
         });
 
-        // Propagate across structural edges:
-        // In edge (source -> target), source is child and target is parent.
+        // Seed workstreams by taxonomy/slug matching (e.g. WS-CODE_EVAL matches PRI-CODE_EVAL, GOAL-CODE_EVAL)
+        const wsNodes = graphData.nodes.filter(n => n.kind === 'workstream');
+        wsNodes.forEach(ws => {
+          const wsSlug = ws.id.replace(/^WS-/, '').toLowerCase();
+          graphData.nodes.forEach(n => {
+            if (n.id.toLowerCase().includes(wsSlug)) {
+              wsMap.get(n.id).add(ws.id);
+            }
+          });
+        });
+
+        // Propagate across canonical structural edges:
+        // In canonical edges, e.source is Parent and e.target is Child.
         let changed = true;
         let iters = 0;
-        while (changed && iters < 15) {
+        while (changed && iters < 25) {
           changed = false;
           iters++;
           graphData.edges.forEach(e => {
             if (e.structural === false) return;
-            const childSet = wsMap.get(e.source);
-            const parentSet = wsMap.get(e.target);
-            if (!childSet || !parentSet) return;
+            const parentSet = wsMap.get(e.source);
+            const childSet = wsMap.get(e.target);
+            if (!parentSet || !childSet) return;
 
             // Downstream: Parent passes workstreams to Child
             parentSet.forEach(wsId => {
@@ -334,8 +347,8 @@
             });
 
             // Upstream: Child passes workstreams to Parent (unless parent is another workstream)
-            const targetNode = nodeById.get(e.target);
-            if (targetNode && targetNode.kind !== 'workstream') {
+            const parentNode = nodeById.get(e.source);
+            if (parentNode && parentNode.kind !== 'workstream') {
               childSet.forEach(wsId => {
                 if (!parentSet.has(wsId)) {
                   parentSet.add(wsId);
@@ -391,10 +404,11 @@
         // Workstream Filter
         if (activeWorkstreamFilter !== 'all') {
           const targetWs = activeWorkstreamFilter.toLowerCase();
-          const isWS = n.id.toLowerCase() === targetWs;
+          const targetSlug = targetWs.replace(/^ws-/, '');
+          const isWS = n.id.toLowerCase() === targetWs || n.id.toLowerCase().includes(targetSlug);
           const refsWS = n.workstreamRefs && n.workstreamRefs.some(w => {
             const wl = (w || '').toLowerCase();
-            return wl === targetWs || targetWs.includes(wl) || wl.includes(targetWs);
+            return wl === targetWs || wl.includes(targetSlug) || targetSlug.includes(wl.replace(/^ws-/, ''));
           });
           if (!isWS && !refsWS) return false;
         }
@@ -446,7 +460,7 @@
       const parentMap = new Map();
       graphData.edges.forEach(e => {
         if (e.structural === false) return;
-        if (!parentMap.has(e.source)) parentMap.set(e.source, e.target);
+        if (!parentMap.has(e.target)) parentMap.set(e.target, e.source);
       });
 
       let colIndex = 0;
@@ -623,6 +637,22 @@
       renderGantt();
     }
 
+    function parseEffortDurationMs(effortStr, defaultDays) {
+      const MS_PER_HOUR = 3600000;
+      const MS_PER_DAY = 86400000;
+      if (!effortStr || typeof effortStr !== 'string') return defaultDays * MS_PER_DAY;
+      const s = effortStr.trim().toLowerCase();
+      const mMatch = s.match(/^(\d+(\.\d+)?)\s*m(in)?s?$/);
+      if (mMatch) return Math.max(15 * 60000, parseFloat(mMatch[1]) * 60000);
+      const hMatch = s.match(/^(\d+(\.\d+)?)\s*h(ours?)?$/);
+      if (hMatch) return Math.max(30 * 60000, parseFloat(hMatch[1]) * MS_PER_HOUR);
+      const dMatch = s.match(/^(\d+(\.\d+)?)\s*d(ays?)?$/);
+      if (dMatch) return Math.max(MS_PER_HOUR * 2, parseFloat(dMatch[1]) * MS_PER_DAY);
+      const wMatch = s.match(/^(\d+(\.\d+)?)\s*w(eeks?)?$/);
+      if (wMatch) return Math.max(MS_PER_DAY, parseFloat(wMatch[1]) * MS_PER_DAY * 7);
+      return defaultDays * MS_PER_DAY;
+    }
+
     // Chronological Timeline & Gantt Renderer
     function renderGantt() {
       const body = document.getElementById('gantt-body');
@@ -637,7 +667,7 @@
 
       // Apply Gantt status filter
       if (ganttStatusFilter === 'active') {
-        items = items.filter(n => ['in_progress', 'active', 'testing', 'metrics_captured', 'executing', 'started'].includes((n.status || '').toLowerCase()));
+        items = items.filter(n => ['in_progress', 'active', 'testing', 'pending_verification', 'metrics_captured', 'executing', 'started'].includes((n.status || '').toLowerCase()));
       } else if (ganttStatusFilter === 'planned') {
         items = items.filter(n => ['planned', 'originated', 'draft', 'pending', 'queued', 'shovel_ready', 'ready'].includes((n.status || '').toLowerCase()));
       } else if (ganttStatusFilter === 'done') {
@@ -653,38 +683,32 @@
 
       // 1. Establish chronological schedule for every item
       const now = Date.now();
+      const MS_PER_HOUR = 3600000;
       const MS_PER_DAY = 86400000;
 
       const parsedItems = items.map((item, idx) => {
         let start = null;
         let end = null;
 
-        // 1. Check explicit date fields from object attributes
-        if (item.startDate) {
-          const d = Date.parse(item.startDate);
-          if (!isNaN(d)) start = d;
-        }
-        if (item.targetDate) {
-          const d = Date.parse(item.targetDate);
-          if (!isNaN(d)) end = d;
-        } else if (item.dueDate) {
-          const d = Date.parse(item.dueDate);
-          if (!isNaN(d)) end = d;
-        }
-
         const status = (item.status || 'planned').toLowerCase();
         const isDone = ['complete', 'completed', 'implemented', 'verified', 'approved', 'done', 'sealed', 'archived', 'resolved', 'satisfied', 'passed', 'closed'].includes(status);
-        const isActive = ['in_progress', 'active', 'testing', 'metrics_captured', 'executing', 'started'].includes(status);
+        const isActive = ['in_progress', 'active', 'testing', 'pending_verification', 'metrics_captured', 'executing', 'started'].includes(status);
 
-        // Duration heuristics
-        const defaultDurationDays = item.kind === 'workstream' ? 45 :
-                                    item.kind === 'milestone' ? 5 :
-                                    item.kind === 'priority_plan' ? 21 :
-                                    item.kind === 'agent_task' ? 2 : 5;
-        const durationMs = defaultDurationDays * MS_PER_DAY;
+        // Fallback default duration in days by kind
+        const defaultDays = item.kind === 'workstream' ? 45 :
+                            item.kind === 'priority_plan' ? 21 :
+                            item.kind === 'milestone' ? 5 :
+                            item.kind === 'backlog_item' ? 4 :
+                            item.kind === 'agent_task' ? 1.5 : 3;
+        const durationMs = parseEffortDurationMs(item.actualEffort || item.estimatedEffort, defaultDays);
 
         if (isDone) {
-          // Completed / Implemented items belong strictly in the past leading up to completion date
+          // Completed / Implemented items strictly belong in the past leading up to completion date.
+          // Invariant: Completed work can NEVER end in the future.
+          if (item.completedAt) {
+            const d = Date.parse(item.completedAt);
+            if (!isNaN(d)) end = Math.min(now, d);
+          }
           if (!end && item.updatedAt) {
             const d = Date.parse(item.updatedAt);
             if (!isNaN(d)) end = Math.min(now, d);
@@ -693,45 +717,69 @@
             const d = Date.parse(item.createdAt);
             if (!isNaN(d)) end = Math.min(now, d);
           }
-          if (!end) end = now - (0.5 * MS_PER_DAY);
+          if (!end) end = now - (0.25 * MS_PER_DAY);
 
+          // Start time
+          if (item.startedAt) {
+            const d = Date.parse(item.startedAt);
+            if (!isNaN(d) && d < end) start = d;
+          }
+          if (!start && item.startDate) {
+            const d = Date.parse(item.startDate);
+            if (!isNaN(d) && d < end) start = d;
+          }
           if (!start && item.createdAt) {
             const d = Date.parse(item.createdAt);
             if (!isNaN(d) && d < end) start = d;
           }
           if (!start) start = end - durationMs;
         } else if (isActive) {
-          // In-Progress / Active items: active NOW, spanning across TODAY
-          if (item.kind === 'milestone') {
-            if (!end) end = now + (5 * MS_PER_DAY);
-            if (!start) start = now - (2 * MS_PER_DAY);
-          } else if (item.kind === 'workstream') {
-            if (!start) start = now - (14 * MS_PER_DAY);
-            if (!end) end = start + durationMs;
-            if (end <= now) end = now + (15 * MS_PER_DAY);
-          } else {
-            // Active task / backlog item / plan
-            if (!start) {
-              if (item.createdAt) {
-                const d = Date.parse(item.createdAt);
-                if (!isNaN(d) && d <= now) start = Math.max(now - (3 * MS_PER_DAY), d);
-              }
-              if (!start) start = now - (2 * MS_PER_DAY);
-            }
-            if (!end) end = now + Math.max(2 * MS_PER_DAY, durationMs - (now - start));
+          // Active / In-progress / Pending verification: actively executing right now!
+          if (item.startedAt) {
+            const d = Date.parse(item.startedAt);
+            if (!isNaN(d)) start = Math.min(now, d);
           }
+          if (!start && item.startDate) {
+            const d = Date.parse(item.startDate);
+            if (!isNaN(d)) start = Math.min(now, d);
+          }
+          if (!start && item.createdAt) {
+            const d = Date.parse(item.createdAt);
+            if (!isNaN(d) && d <= now) start = Math.max(now - (3 * MS_PER_DAY), d);
+          }
+          if (!start) start = now - (0.5 * MS_PER_DAY);
+
+          if (item.targetDate) {
+            const d = Date.parse(item.targetDate);
+            if (!isNaN(d) && d > start) end = d;
+          } else if (item.dueDate) {
+            const d = Date.parse(item.dueDate);
+            if (!isNaN(d) && d > start) end = d;
+          }
+          if (!end) end = Math.max(now + (0.5 * MS_PER_DAY), start + durationMs);
         } else {
-          // Planned / upcoming items: scheduled from TODAY onwards into the future
-          const planOffsetDays = (idx % 6) * 2 + 1;
+          // Planned / upcoming items: scheduled from now onwards into the future
+          if (item.startDate) {
+            const d = Date.parse(item.startDate);
+            if (!isNaN(d)) start = d;
+          }
           if (!start || start < now) {
+            const planOffsetDays = ((idx % 7) * 1.5) + 0.5;
             start = now + (planOffsetDays * MS_PER_DAY);
+          }
+          if (item.targetDate) {
+            const d = Date.parse(item.targetDate);
+            if (!isNaN(d) && d > start) end = d;
+          } else if (item.dueDate) {
+            const d = Date.parse(item.dueDate);
+            if (!isNaN(d) && d > start) end = d;
           }
           if (!end) end = start + durationMs;
         }
 
-        // Safety guarantee: end must be after start
+        // Safety guarantee: end must be strictly after start
         if (end <= start) {
-          end = start + Math.max(MS_PER_DAY, durationMs);
+          end = start + Math.max(MS_PER_HOUR * 2, durationMs);
         }
 
         return { ...item, startTime: start, endTime: end };
@@ -739,40 +787,71 @@
 
       // 2. Compute timeline window based on selected zoom
       let minTime, maxTime;
-      if (ganttZoom === '2w') {
-        minTime = now - (5 * MS_PER_DAY);
-        maxTime = now + (9 * MS_PER_DAY);
+      if (ganttZoom === '1w') {
+        minTime = now - (2 * MS_PER_DAY);
+        maxTime = now + (5 * MS_PER_DAY);
+      } else if (ganttZoom === '2w') {
+        minTime = now - (4 * MS_PER_DAY);
+        maxTime = now + (10 * MS_PER_DAY);
       } else if (ganttZoom === '1m') {
-        minTime = now - (10 * MS_PER_DAY);
-        maxTime = now + (20 * MS_PER_DAY);
-      } else if (ganttZoom === '3m') {
-        minTime = now - (20 * MS_PER_DAY);
-        maxTime = now + (70 * MS_PER_DAY);
-      } else {
-        // 'all': fit full range
+        minTime = now - (8 * MS_PER_DAY);
+        maxTime = now + (22 * MS_PER_DAY);
+      } else if (ganttZoom === 'all') {
+        // Full project span across all items
         minTime = Infinity;
         maxTime = -Infinity;
         parsedItems.forEach(i => {
           if (i.startTime < minTime) minTime = i.startTime;
           if (i.endTime > maxTime) maxTime = i.endTime;
         });
+        if (minTime === Infinity || maxTime === -Infinity) {
+          minTime = now - (7 * MS_PER_DAY);
+          maxTime = now + (30 * MS_PER_DAY);
+        }
         if (now < minTime) minTime = now - (3 * MS_PER_DAY);
         if (now > maxTime) maxTime = now + (7 * MS_PER_DAY);
         minTime -= 2 * MS_PER_DAY;
-        maxTime += 6 * MS_PER_DAY;
+        maxTime += 5 * MS_PER_DAY;
+      } else {
+        // Default: 'fit' (Auto-Fit active and visible tasks horizon)
+        // Focus on the items currently rendered (ignoring macro workstreams so 90-day workstreams don't squash tasks)
+        let focusItems = parsedItems.filter(i => i.kind !== 'workstream');
+        if (focusItems.length === 0) focusItems = parsedItems;
+
+        minTime = Infinity;
+        maxTime = -Infinity;
+        focusItems.forEach(i => {
+          if (i.startTime < minTime) minTime = i.startTime;
+          if (i.endTime > maxTime) maxTime = i.endTime;
+        });
+        if (minTime === Infinity || maxTime === -Infinity) {
+          minTime = now - (3 * MS_PER_DAY);
+          maxTime = now + (7 * MS_PER_DAY);
+        } else {
+          const span = Math.max(MS_PER_DAY * 3, maxTime - minTime);
+          const buf = Math.max(MS_PER_DAY, Math.round(span * 0.08));
+          minTime -= buf;
+          maxTime += buf;
+          if (now < minTime) minTime = now - MS_PER_DAY;
+          if (now > maxTime) maxTime = now + MS_PER_DAY;
+        }
       }
-      const totalDuration = Math.max(MS_PER_DAY * 7, maxTime - minTime);
+      const totalDuration = Math.max(MS_PER_DAY * 2, maxTime - minTime);
 
       // 3. Render Calendar Date Ticks across header
       let tickStepDays = 1;
-      if (ganttZoom === '2w') {
+      if (ganttZoom === '1w' || ganttZoom === '2w') {
         tickStepDays = 1;
       } else if (ganttZoom === '1m') {
         tickStepDays = 2;
-      } else if (ganttZoom === '3m') {
+      } else if (totalDuration <= 14 * MS_PER_DAY) {
+        tickStepDays = 1;
+      } else if (totalDuration <= 35 * MS_PER_DAY) {
+        tickStepDays = 3;
+      } else if (totalDuration <= 90 * MS_PER_DAY) {
         tickStepDays = 7;
       } else {
-        tickStepDays = totalDuration > (90 * MS_PER_DAY) ? 14 : (totalDuration > (30 * MS_PER_DAY) ? 7 : 3);
+        tickStepDays = 14;
       }
       const tickStepMs = tickStepDays * MS_PER_DAY;
 
@@ -844,10 +923,35 @@
       }
 
       groups.forEach((groupItems, groupName) => {
+        const isCollapsed = ganttCollapsedGroups.has(groupName);
+        const groupActiveCount = groupItems.filter(i => ['in_progress', 'active', 'testing', 'pending_verification', 'metrics_captured', 'executing', 'started'].includes((i.status || '').toLowerCase())).length;
+        const groupDoneCount = groupItems.filter(i => ['complete', 'completed', 'implemented', 'verified', 'approved', 'done', 'sealed', 'archived', 'resolved', 'satisfied', 'passed', 'closed'].includes((i.status || '').toLowerCase())).length;
+
         const header = document.createElement('div');
         header.className = 'gantt-section-header';
-        header.innerHTML = '<span>⚡ ' + escapeHtml(groupName) + '</span> <span style="font-size: 11px; font-weight: normal; color: var(--text-muted);">' + groupItems.length + ' items</span>';
+        header.style.cursor = 'pointer';
+        header.innerHTML =
+          '<div style="display: flex; align-items: center; gap: 8px;">' +
+            '<span class="gantt-collapse-arrow" style="display: inline-block; width: 14px; font-size: 10px; color: var(--text-muted);">' + (isCollapsed ? '▶' : '▼') + '</span>' +
+            '<span>⚡ ' + escapeHtml(groupName) + '</span>' +
+          '</div>' +
+          '<div style="display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: normal;">' +
+            (groupActiveCount > 0 ? '<span class="gantt-group-badge active">' + groupActiveCount + ' active</span>' : '') +
+            (groupDoneCount > 0 ? '<span class="gantt-group-badge done">' + groupDoneCount + ' done</span>' : '') +
+            '<span style="color: var(--text-muted);">' + groupItems.length + ' items</span>' +
+          '</div>';
+
+        header.addEventListener('click', () => {
+          if (ganttCollapsedGroups.has(groupName)) {
+            ganttCollapsedGroups.delete(groupName);
+          } else {
+            ganttCollapsedGroups.add(groupName);
+          }
+          renderGantt();
+        });
         body.appendChild(header);
+
+        if (isCollapsed) return;
 
         // Sort items hierarchically: Tier first (Plans -> Milestones -> BLIs -> Tasks), then startTime
         groupItems.sort((a, b) => {
@@ -903,12 +1007,8 @@
           const rightPercent = Math.max(leftPercent + 1.8, Math.min(100, rawRight));
           const widthPercent = Math.max(1.8, rightPercent - leftPercent);
 
-          const startDateStr = new Date(item.startTime).toISOString().slice(0, 10);
-          const endDateStr = new Date(item.endTime).toISOString().slice(0, 10);
-          const durationDays = Math.max(1, Math.round((item.endTime - item.startTime) / MS_PER_DAY));
-
           const isDone = ['complete', 'completed', 'implemented', 'verified', 'approved', 'done', 'sealed', 'archived', 'resolved', 'satisfied', 'passed', 'closed'].includes(status);
-          const isActive = ['in_progress', 'active', 'testing', 'metrics_captured', 'executing', 'started'].includes(status);
+          const isActive = ['in_progress', 'active', 'testing', 'pending_verification', 'metrics_captured', 'executing', 'started'].includes(status);
 
           let barClass = 'gantt-bar-planned';
           let statusIcon = '⏳';
@@ -921,23 +1021,38 @@
           } else if (isDone) {
             barClass = 'gantt-bar-complete';
             statusIcon = '✓';
+          } else if (status === 'testing' || status === 'pending_verification' || status === 'metrics_captured') {
+            barClass = 'gantt-bar-testing';
+            statusIcon = '⚙';
           } else if (isActive) {
             barClass = 'gantt-bar-inprogress';
             statusIcon = '▶';
-          } else if (status === 'testing' || status === 'metrics_captured') {
-            barClass = 'gantt-bar-testing';
-            statusIcon = '⚙';
           }
 
           const bar = document.createElement('div');
           bar.className = 'gantt-bar ' + barClass;
           bar.style.left = leftPercent + '%';
           bar.style.width = widthPercent + '%';
-          const effortStr = item.estimatedEffort ? '\nEffort: ' + item.estimatedEffort : '';
-          bar.setAttribute('title', item.id + ': ' + (item.title || '') + '\nKind: ' + item.kind.replace('_', ' ') + ' | Status: ' + status + '\nSchedule: ' + startDateStr + ' → ' + endDateStr + ' (' + durationDays + ' days)' + effortStr);
 
-          bar.innerHTML = '<span style="margin-right: 4px;">' + statusIcon + '</span><span style="font-weight: 700;">' + item.id + '</span>' +
-            (widthPercent > 12 && item.title ? ': <span style="opacity: 0.9; font-weight: normal; margin-left: 3px;">' + escapeHtml(item.title) + '</span>' : '');
+          const startDateStr = new Date(item.startTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+          const endDateStr = new Date(item.endTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+          const durHours = ((item.endTime - item.startTime) / MS_PER_HOUR).toFixed(1);
+          const durDays = ((item.endTime - item.startTime) / MS_PER_DAY).toFixed(1);
+          const durStr = durHours < 24 ? durHours + 'h' : durDays + 'd';
+
+          let tooltip = item.id + ': ' + (item.title || '') +
+            '\nKind: ' + item.kind.replace('_', ' ') + ' | Status: ' + status +
+            '\nSchedule: ' + startDateStr + ' → ' + endDateStr + ' (' + durStr + ')';
+          if (item.assignee) tooltip += '\nAssignee: ' + item.assignee;
+          if (item.actualEffort) tooltip += '\nActual Effort: ' + item.actualEffort;
+          else if (item.estimatedEffort) tooltip += '\nEstimated Effort: ' + item.estimatedEffort;
+          tooltip += '\n(Click to inspect in DAG)';
+          bar.setAttribute('title', tooltip);
+
+          bar.innerHTML = '<span style="margin-right: 5px; flex-shrink: 0;">' + statusIcon + '</span>' +
+            '<span style="font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 700; flex-shrink: 0;">' + escapeHtml(item.id) + '</span>' +
+            (widthPercent > 10 && item.title ? '<span style="opacity: 0.9; font-weight: normal; margin-left: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + escapeHtml(item.title) + '</span>' : '') +
+            (widthPercent > 20 && (item.actualEffort || item.estimatedEffort) ? '<span style="margin-left: auto; font-size: 10px; opacity: 0.85; padding-left: 6px; flex-shrink: 0; font-family: ui-monospace, monospace;">⏱ ' + escapeHtml(item.actualEffort || item.estimatedEffort) + '</span>' : '');
 
           cell.appendChild(bar);
           row.appendChild(info);

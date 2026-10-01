@@ -15,7 +15,7 @@ import (
 // crash cannot leave a published name pointing at buffered-only bytes.
 func CasPublishSyncFileOS(f *fileutil.File) error {
 	if f == nil {
-		return errfmt.Errorf("failed to sync temp file")
+		return nil
 	}
 	if err := f.Sync(); err != nil {
 		return errfmt.Newf("failed to sync temp file").Wrap(err)

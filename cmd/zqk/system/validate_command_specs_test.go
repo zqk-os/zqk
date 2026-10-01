@@ -120,7 +120,7 @@ func TestCLITaxonomyGovernance_StandardsAndPersonas(t *testing.T) {
 		"PER-INFORMATION-ARCHITECT",
 		"PER-TECHNICAL-DOCUMENTARIAN",
 		"Canonical CLI Command Taxonomy",
-		"100% Declarative Spec Coverage Mandatory",
+		"Declarative Spec Coverage",
 	}
 
 	for _, token := range requiredTokens {

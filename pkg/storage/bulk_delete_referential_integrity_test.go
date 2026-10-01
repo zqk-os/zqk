@@ -70,9 +70,12 @@ func bulkDeleteRefIntegrityFixture(t *testing.T) (f *FileObjectStorage, referenc
 
 	// Guard the fixture itself: if the reverse index never learned the edge, a later "refused"
 	// result would prove nothing and a "deleted" result would be a false alarm.
-	deps := GetGlobalReverseReferenceIndex().GetDependents(referenced)
-	if len(deps) == 0 {
-		t.Fatalf("fixture invalid: reverse index has no dependents for %s, so neither delete path has anything to refuse", referenced)
+	deadline := time.Now().Add(3 * time.Second)
+	for len(GetGlobalReverseReferenceIndex().GetDependents(referenced)) == 0 {
+		if time.Now().After(deadline) {
+			t.Fatalf("fixture invalid: reverse index has no dependents for %s, so neither delete path has anything to refuse", referenced)
+		}
+		time.Sleep(20 * time.Millisecond)
 	}
 	return f, referenced, referrer
 }

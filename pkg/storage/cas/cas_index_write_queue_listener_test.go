@@ -101,19 +101,15 @@ func TestListingIndexWriteQueue_OperationalProof(t *testing.T) {
 		t.Fatal("timed out waiting for batch update")
 	}
 
-	// Verify listener received start and/or complete events
+	// Verify listener received complete event
 	require.Eventually(t, func() bool {
-		return listener.EventCount() >= 1
-	}, 3*time.Second, 50*time.Millisecond, "expected at least 1 batch event delivered to listener")
-
-	var foundComplete bool
-	for _, ev := range listener.Events() {
-		if ev.Kind == kind && ev.Status == "complete" {
-			foundComplete = true
-			break
+		for _, ev := range listener.Events() {
+			if ev.Kind == kind && ev.Status == "complete" {
+				return true
+			}
 		}
-	}
-	require.True(t, foundComplete, "expected 'complete' batch event for kind %s", kind)
+		return false
+	}, 3*time.Second, 50*time.Millisecond, "expected 'complete' batch event for kind %s", kind)
 }
 
 // TestListingIndexWriteQueue_ConcurrencySafety verifies isolated execution across multiple queue instances.

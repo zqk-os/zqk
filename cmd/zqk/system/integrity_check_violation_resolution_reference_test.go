@@ -1,6 +1,7 @@
 package system
 
 import (
+	"regexp"
 	"strings"
 	"testing"
 
@@ -82,7 +83,13 @@ func TestViolationResolution_Reference_MissingReference(t *testing.T) {
 	}
 
 	// Add reference (this will create hash mismatch, but we'll check for reference violation)
-	modifiedContent := string(content) + "\npriority_plan_ref: PRI-999\n"
+	var modifiedContent string
+	if strings.Contains(string(content), "priority_plan_ref:") {
+		re := regexp.MustCompile(`(?m)^priority_plan_ref:.*$`)
+		modifiedContent = re.ReplaceAllString(string(content), "priority_plan_ref: PRI-999")
+	} else {
+		modifiedContent = string(content) + "\npriority_plan_ref: PRI-999\n"
+	}
 	if err := fileutil.WriteFile(objectFile, []byte(modifiedContent), paths.FilePerm644); err != nil { //nolint:gosec // Test files - 0600 is acceptable
 		t.Fatalf("Failed to modify file: %v", err)
 	}

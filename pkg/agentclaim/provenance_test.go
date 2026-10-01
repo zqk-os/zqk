@@ -13,11 +13,8 @@ func TestTryClaim_stampsBranchRefAndBaseSha(t *testing.T) {
 	ctx := context.Background()
 	sec := pkgctx.NewSystemSecurityContext()
 
-	t.Cleanup(func() {
-		if q := GetGlobalCheckinWriteQueue(); q != nil {
-			q.FlushWait()
-		}
-	})
+	root1 := tempDir(t)
+	root2 := tempDir(t)
 
 	orig := gitOutput
 	t.Cleanup(func() { gitOutput = orig })
@@ -45,7 +42,7 @@ func TestTryClaim_stampsBranchRefAndBaseSha(t *testing.T) {
 		},
 	}}
 
-	res, err := TryClaim(ctx, store, sec, "ATK-1", "agent-a", ClaimOptions{ProjectRoot: t.TempDir()})
+	res, err := TryClaim(ctx, store, sec, "ATK-1", "agent-a", ClaimOptions{ProjectRoot: root1})
 	if err != nil || !res.Claimed {
 		t.Fatalf("claim: %#v err=%v", res, err)
 	}
@@ -61,7 +58,7 @@ func TestTryClaim_stampsBranchRefAndBaseSha(t *testing.T) {
 
 	// Re-claim must not move an already-recorded location.
 	gitOutput = func(string, ...string) (string, error) { return "other", nil }
-	if _, err := TryClaim(ctx, store, sec, "ATK-1", "agent-a", ClaimOptions{ProjectRoot: t.TempDir()}); err != nil {
+	if _, err := TryClaim(ctx, store, sec, "ATK-1", "agent-a", ClaimOptions{ProjectRoot: root2}); err != nil {
 		t.Fatal(err)
 	}
 	if bli[objects.FieldKeyBranchName] != "integration/pri-r20" {

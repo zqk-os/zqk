@@ -181,10 +181,14 @@ type GraphNode struct {
 	Title           string              `json:"title"`
 	CreatedAt       string              `json:"createdAt,omitempty"`
 	UpdatedAt       string              `json:"updatedAt,omitempty"`
+	StartedAt       string              `json:"startedAt,omitempty"`
+	CompletedAt     string              `json:"completedAt,omitempty"`
 	StartDate       string              `json:"startDate,omitempty"`
 	TargetDate      string              `json:"targetDate,omitempty"`
 	DueDate         string              `json:"dueDate,omitempty"`
 	EstimatedEffort string              `json:"estimatedEffort,omitempty"`
+	ActualEffort    string              `json:"actualEffort,omitempty"`
+	Assignee        string              `json:"assignee,omitempty"`
 	References      map[string][]string `json:"references,omitempty"`
 	WorkstreamRefs  []string            `json:"workstreamRefs,omitempty"`
 }
@@ -197,20 +201,41 @@ type GraphEdge struct {
 	Structural bool   `json:"structural"`
 }
 
-func isStructuralRelation(rel string) bool {
+// canonicalizeStructuralEdge ensures all hierarchy edges are directed strictly from
+// Parent to Child (and prerequisite to dependent for execution order). This guarantees
+// a cycle-free DAG and prevents reverse pointers from ballooning the causal subtree.
+func canonicalizeStructuralEdge(nodeID, targetID, rel string) (source, target string, structural bool) {
 	switch rel {
+	// Downstream Parent -> Child relations
+	case "goal_refs", "plan_refs", "roadmap_refs", "milestone_refs", "backlog_item_refs",
+		"requirement_refs", "criteria_refs", "test_case_refs", "agent_task_refs", "task_refs":
+		return nodeID, targetID, true
+
+	// Upstream Child -> Parent pointer references (canonicalize direction to Parent -> Child)
 	case "workstream_ref", "workstream_refs", "from_workstream_ref", "to_workstream_ref",
-		"goal_ref", "goal_refs",
-		"priority_plan_ref", "plan_ref", "plan_refs", "roadmap_ref",
-		"milestone_ref", "milestone_refs",
-		"backlog_item_ref", "backlog_item_refs", "parent_ref", "parent_task_ref",
-		"requirement_ref", "requirement_refs",
-		"criteria_ref", "criteria_refs",
-		"test_case_ref", "test_case_refs",
-		"depends_on", "blocked_by", "blocking_ref":
-		return true
+		"goal_ref", "priority_plan_ref", "plan_ref", "roadmap_ref",
+		"milestone_ref", "backlog_item_ref", "parent_ref", "parent_task_ref",
+		"requirement_ref", "criteria_ref", "test_case_ref":
+		return targetID, nodeID, true
+
+	// Sequential execution order: Prerequisite -> Dependent
+	case "depends_on", "blocked_by":
+		return targetID, nodeID, true
+	case "blocking_ref", "blocks":
+		return nodeID, targetID, true
+
+	// Special case: related_object_refs between Agent Task and Backlog Item
+	case "related_object_refs", "related_objects":
+		if strings.HasPrefix(nodeID, "ATK-") && strings.HasPrefix(targetID, "BLI-") {
+			return targetID, nodeID, true
+		}
+		if strings.HasPrefix(nodeID, "BLI-") && strings.HasPrefix(targetID, "ATK-") {
+			return nodeID, targetID, true
+		}
+		return nodeID, targetID, false
+
 	default:
-		return false
+		return nodeID, targetID, false
 	}
 }
 
@@ -247,7 +272,7 @@ func (s *Server) handleGraph(w http.ResponseWriter, r *http.Request) {
 					}
 				}
 			}
-			var sd, td, dd, eff string
+			var sd, td, dd, eff, actEff, startAt, compAt, assignee string
 			if node.Attributes != nil {
 				if v, ok := node.Attributes["start_date"].(string); ok {
 					sd = v
@@ -258,8 +283,20 @@ func (s *Server) handleGraph(w http.ResponseWriter, r *http.Request) {
 				if v, ok := node.Attributes["due_date"].(string); ok {
 					dd = v
 				}
+				if v, ok := node.Attributes["started_at"].(string); ok {
+					startAt = v
+				}
+				if v, ok := node.Attributes["completed_at"].(string); ok {
+					compAt = v
+				}
 				if v, ok := node.Attributes["estimated_effort"].(string); ok {
 					eff = v
+				}
+				if v, ok := node.Attributes["actual_effort"].(string); ok {
+					actEff = v
+				}
+				if v, ok := node.Attributes["assignee_persona_ref"].(string); ok {
+					assignee = v
 				}
 			}
 			nodes = append(nodes, GraphNode{
@@ -269,23 +306,30 @@ func (s *Server) handleGraph(w http.ResponseWriter, r *http.Request) {
 				Title:           node.Title,
 				CreatedAt:       ca,
 				UpdatedAt:       ua,
+				StartedAt:       startAt,
+				CompletedAt:     compAt,
 				StartDate:       sd,
 				TargetDate:      td,
 				DueDate:         dd,
 				EstimatedEffort: eff,
+				ActualEffort:    actEff,
+				Assignee:        assignee,
 				References:      node.References,
 				WorkstreamRefs:  wsRefs,
 			})
 
 			for rel, targets := range node.References {
-				structural := isStructuralRelation(rel)
 				for _, target := range targets {
-					edgeKey := fmt.Sprintf("%s->%s:%s", node.ID, target, rel)
+					if target == "" {
+						continue
+					}
+					src, tgt, structural := canonicalizeStructuralEdge(node.ID, target, rel)
+					edgeKey := fmt.Sprintf("%s->%s:%s", src, tgt, rel)
 					if !seenEdges[edgeKey] {
 						seenEdges[edgeKey] = true
 						edges = append(edges, GraphEdge{
-							Source:     node.ID,
-							Target:     target,
+							Source:     src,
+							Target:     tgt,
 							Relation:   rel,
 							Structural: structural,
 						})
