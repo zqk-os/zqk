@@ -1,4 +1,4 @@
-# CODE-EVAL — Inventory, Tool Availability & Run Scope
+# Verification Gate Inventory & Code Evaluation Scope
 
 ## 1. Codebase Inventory
 

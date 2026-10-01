@@ -1,6 +1,6 @@
-# CODE-EVAL Run Scope & Convergence Certification
+# Code Evaluation Run Scope & Diamond Scale Envelope Specification
 
-Plan: PRI-CODE_EVAL • Role: lead_integrator (PER-CODE_EVAL-LEAD_INTEGRATOR) • Identity: ACC-SWARM-WORKER (lane: doer)
+This specification defines the canonical evaluation envelope, verification vertices, and certification standards for autonomous code evaluation swarms.
 
 ## 1. Codebase Inventory (live AST inspection, verified via observer_search + read, not copied from task objects)
 

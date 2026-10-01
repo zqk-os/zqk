@@ -165,10 +165,14 @@ func (a *MetricsAnalyzer) generateSuggestions(result *AnalysisResult) []Suggesti
 
 	// Suggestions for frequent timeouts
 	for _, issue := range result.FrequentTimeouts {
+		suggestedTimeout := "5m"
+		if issue.Baseline > 0 {
+			suggestedTimeout = (issue.Baseline * 2).Round(time.Second).String()
+		}
 		suggestions = append(suggestions, Suggestion{
 			Type:        "timeout",
 			Command:     issue.NormalizedCmd,
-			Description: fmt.Sprintf("Command times out %.1f%% of the time. Consider optimizing or increasing timeout.", issue.Value),
+			Description: fmt.Sprintf("Command times out %.1f%% of the time. Add an override to config/command_timeouts.yaml:\n  - pattern: %q\n    timeout: %s", issue.Value, issue.NormalizedCmd, suggestedTimeout),
 			Priority:    issue.Severity,
 			Impact:      "Improved command reliability and user experience",
 		})

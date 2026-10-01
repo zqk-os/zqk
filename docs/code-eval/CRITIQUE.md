@@ -1,7 +1,7 @@
-# Adversarial Critique — Code Quality Findings (Plan: code-eval / PRI-CODE_EVAL)
+# Adversarial Code Quality & Invariant Verification Rubric
 
-**Role:** adversarial_auditor (PER-CODE_EVAL-ADVERSARIAL_AUDITOR)
-**Mandates applied:** POL-DEFAULT-60a14e239d552b9e (Fail-Closed Safety), POL-DEFAULT-7c873b7213847d78 (Resource Hygiene / Goroutine Lifecycle), POL-DEFAULT-f746cccc03ce5694 (TDD), POL-DEFAULT-fae2cf45690d1343 (Traceable Work).
+**Purpose:** Defines the falsifiable invariant testing standards, fail-closed safety assertions, and resource hygiene criteria for adversarial code evaluation.
+**Governance Policies Applied:** Fail-Closed Safety, Goroutine Resource Hygiene, TDD Rigor, and Traceable Commits.
 
 ## 0. Scope & evidence boundary (honest attestation)
 

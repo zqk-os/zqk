@@ -109,3 +109,40 @@ func TestCoachHeuristics_GrepPipe(t *testing.T) {
 		t.Errorf("Expected grep_pipe telemetry event to be published")
 	}
 }
+
+func TestCoachHeuristics_CommandTimeout(t *testing.T) {
+	hub := newMockEventHub()
+	NewCoachHeuristics(hub)
+
+	err := hub.Publish(context.Background(), Event{
+		Type: EventTypeSession,
+		Payload: map[string]any{
+			objects.FieldKeySource:  "terminal",
+			objects.FieldKeyCommand: "object export --all",
+			"timed_out":             true,
+			"exit_code":             124,
+			"error":                 "command timed out after 30s",
+		},
+		Timestamp: time.Now(),
+	})
+
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	found := false
+	for _, e := range hub.events {
+		if e.Type == EventTypeSession {
+			payload, ok := e.Payload.(map[string]any)
+			if ok && payload[objects.FieldKeySource] == "coach_heuristics" && payload["heuristic_type"] == "command_timeout" {
+				found = true
+				break
+			}
+		}
+	}
+
+	if !found {
+		t.Errorf("Expected command_timeout telemetry event to be published")
+	}
+}
+

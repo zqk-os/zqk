@@ -62,7 +62,14 @@ func AnalyzeCommandSpecCoverage(root *cobra.Command, specsDir string) (CommandSp
 		if commandSpecCoverageIgnoredLoaded[id] || dynamicCommandGroup(id) {
 			continue
 		}
-		if _, ok := specs[id]; !ok {
+		hasSpec := false
+		for _, cand := range equivalentCommandIDs(id) {
+			if _, ok := specs[cand]; ok {
+				hasSpec = true
+				break
+			}
+		}
+		if !hasSpec {
 			result.CommandsWithoutSpecs = append(result.CommandsWithoutSpecs, commandPath)
 		}
 	}
@@ -70,7 +77,14 @@ func AnalyzeCommandSpecCoverage(root *cobra.Command, specsDir string) (CommandSp
 		if commandSpecCoverageIgnoredSpecs[id] || dynamicCommandGroup(id) {
 			continue
 		}
-		if _, ok := loaded[id]; !ok {
+		hasLoaded := false
+		for _, cand := range equivalentCommandIDs(id) {
+			if _, ok := loaded[cand]; ok {
+				hasLoaded = true
+				break
+			}
+		}
+		if !hasLoaded {
 			result.SpecsWithoutCommands = append(result.SpecsWithoutCommands, relativePath)
 		}
 	}
@@ -236,6 +250,91 @@ func commandSpecIDFromPath(relativePath string) string {
 func canonicalCommandID(value string) string {
 	replacer := strings.NewReplacer(" ", "_", "-", "_", "/", "_")
 	return replacer.Replace(value)
+}
+
+func equivalentCommandIDs(id string) []string {
+	cands := []string{id}
+
+	switch id {
+	case "do":
+		cands = append(cands, "workflow_do")
+	case "workflow_do":
+		cands = append(cands, "do")
+	case "inspect":
+		cands = append(cands, "object_inspect")
+	case "object_inspect":
+		cands = append(cands, "inspect")
+	case "mutate":
+		cands = append(cands, "object_mutate")
+	case "object_mutate":
+		cands = append(cands, "mutate")
+	case "query":
+		cands = append(cands, "graph_query")
+	case "graph_query":
+		cands = append(cands, "query")
+	case "rollback":
+		cands = append(cands, "object_rollback")
+	case "object_rollback":
+		cands = append(cands, "rollback")
+	case "completion":
+		cands = append(cands, "system_completion")
+	case "system_completion":
+		cands = append(cands, "completion")
+	case "learn":
+		cands = append(cands, "agent_learn")
+	case "agent_learn":
+		cands = append(cands, "learn")
+	case "new":
+		cands = append(cands, "object_new")
+	case "object_new":
+		cands = append(cands, "new")
+	case "join":
+		cands = append(cands, "graph_join")
+	case "graph_join":
+		cands = append(cands, "join")
+	case "mcp_cursor_adapter":
+		cands = append(cands, "vendor_cursor_adapter")
+	case "vendor_cursor_adapter":
+		cands = append(cands, "mcp_cursor_adapter")
+	}
+
+	if strings.HasPrefix(id, "sync_") {
+		cands = append(cands, "mesh_"+id)
+	} else if strings.HasPrefix(id, "mesh_sync_") {
+		cands = append(cands, strings.TrimPrefix(id, "mesh_"))
+	}
+
+	if strings.HasPrefix(id, "pre_commit_") {
+		cands = append(cands, "system_"+id)
+	} else if strings.HasPrefix(id, "system_pre_commit_") {
+		cands = append(cands, strings.TrimPrefix(id, "system_"))
+	}
+
+	if strings.HasPrefix(id, "reports_") {
+		cands = append(cands, "system_"+id)
+	} else if strings.HasPrefix(id, "system_reports_") {
+		cands = append(cands, strings.TrimPrefix(id, "system_"))
+	}
+
+	if strings.HasPrefix(id, "tray_") {
+		cands = append(cands, "service_"+id)
+	} else if strings.HasPrefix(id, "service_tray_") {
+		cands = append(cands, strings.TrimPrefix(id, "service_"))
+	}
+
+	if strings.HasPrefix(id, "validate_") {
+		cands = append(cands, "system_"+id)
+	} else if strings.HasPrefix(id, "system_validate_") {
+		cands = append(cands, strings.TrimPrefix(id, "system_"))
+	}
+
+	if strings.HasPrefix(id, "feed_") {
+		cands = append(cands, "agent_"+id)
+	} else if strings.HasPrefix(id, "agent_feed_") {
+		cands = append(cands, strings.TrimPrefix(id, "agent_"))
+	}
+
+	return cands
 }
 
 func dynamicCommandGroup(id string) bool {
