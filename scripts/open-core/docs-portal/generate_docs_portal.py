@@ -40,6 +40,12 @@ def _load_asset(filename: str, fallback: str = "") -> str:
 ZQK_LOGO_SVG = _load_asset("logo.svg", fallback='<svg viewBox="0 0 100 100" width="100%" height="100%"><rect width="100" height="100" rx="22" fill="#05070a"/></svg>')
 ZQK_HEADER_LOGO_SVG = ZQK_LOGO_SVG.replace('width="100%" height="100%"', 'width="28" height="28" class="logo-mark"')
 
+PAGE_TEMPLATE = _load_asset("page.html.template")
+INDEX_TEMPLATE = _load_asset("index.html.template")
+CUSTOM_404_TEMPLATE = _load_asset("404.html.template")
+SEARCH_JS_TEMPLATE = _load_asset("search.js.template")
+KATEX_HTML_TEMPLATE = _load_asset("katex.html")
+
 
 def get_html_relpath(rel_md_path: str) -> str:
     """Converts a markdown file relative path into an HTML relative path preserving folders."""
@@ -1034,124 +1040,18 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
         root_rel = "../" * depth if depth > 0 else ""
         sidebar_nav_html = get_sidebar_nav_html(root_rel, item["html_rel"])
         
-        katex_tags = ""
-        if has_math:
-            katex_tags = """  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="initKaTeX()"></script>
-  <script>
-    let katexRendered = false;
-    function initKaTeX() {
-      if (katexRendered) return;
-      const target = document.querySelector('.markdown-body');
-      if (target && typeof renderMathInElement === 'function') {
-        renderMathInElement(target, {
-          delimiters: [
-            {left: '$$', right: '$$', display: true},
-            {left: '\\\\(', right: '\\\\)', display: false},
-            {left: '\\\\[', right: '\\\\]', display: true}
-          ],
-          ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-          throwOnError: false
-        });
-        katexRendered = true;
-      }
-    }
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initKaTeX);
-    } else {
-      initKaTeX();
-    }
-  </script>"""
-
-        page_html = f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-  <title>{escaped_title} - ZQK Core Documentation</title>
-  <link rel="stylesheet" href="{root_rel}assets/style.css?v={style_hash}">
-  <link rel="icon" type="image/svg+xml" href="{root_rel}assets/zqk-logo.svg?v={logo_hash}">
-  <script type="module">
-    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-    mermaid.initialize({{
-      startOnLoad: false,
-      securityLevel: 'loose',
-      theme: 'dark',
-      themeVariables: {{
-        darkMode: true,
-        background: '#0d1117',
-        primaryColor: '#1f6feb',
-        primaryTextColor: '#c9d1d9',
-        primaryBorderColor: '#30363d',
-        lineColor: '#58a6ff',
-        secondaryColor: '#161b22',
-        tertiaryColor: '#0d1117'
-      }}
-    }});
-
-    async function initMermaid() {{
-      const els = document.querySelectorAll('.mermaid, pre code.language-mermaid');
-      if (!els.length) return;
-      document.querySelectorAll('pre code.language-mermaid').forEach(el => {{
-        const pre = el.parentElement;
-        pre.className = 'mermaid';
-        pre.textContent = el.textContent;
-      }});
-      try {{
-        await mermaid.run({{ querySelector: '.mermaid' }});
-      }} catch (err) {{
-        console.warn('Mermaid rendering:', err);
-      }}
-    }}
-
-    if (document.readyState === 'loading') {{
-      document.addEventListener('DOMContentLoaded', initMermaid);
-    }} else {{
-      initMermaid();
-    }}
-  </script>
-{katex_tags}
-</head>
-<body data-root-rel="{root_rel}">
-  <header class="header">
-    <div class="nav-container">
-      <div class="brand">
-        <a href="{root_rel}index.html" class="logo">
-          {ZQK_HEADER_LOGO_SVG}
-          <span class="logo-text">ZQK <span class="logo-accent">Core</span></span>
-        </a>
-        <span class="badge-tag">{html.escape(item["category"])}</span>
-      </div>
-      <div class="search-box">
-        <input type="text" id="search-input" placeholder="Search core documentation..." onkeyup="runSearch()">
-        <div id="search-results"></div>
-      </div>
-    </div>
-  </header>
-  <main class="content-container">
-    <aside class="sidebar">
-      {sidebar_nav_html}
-    </aside>
-    <article class="doc-body">
-      <div class="breadcrumb">
-        <div class="breadcrumb-trail">
-          <a href="{root_rel}index.html">Docs</a> &raquo; <span>{html.escape(item["category"])}</span> &raquo; <span class="current">{escaped_title}</span>
-        </div>
-        <a href="{root_rel}{item['clean_md_rel']}" class="raw-md-link" title="View canonical Markdown source">Raw .md</a>
-      </div>
-      <div class="markdown-body">
-        {rendered_body}
-      </div>
-    </article>
-  </main>
-  <script src="{root_rel}search/search-index.js?v={portal_build_id}"></script>
-</body>
-</html>
-"""
+        katex_tags = KATEX_HTML_TEMPLATE if (has_math and KATEX_HTML_TEMPLATE) else ""
+        page_html = PAGE_TEMPLATE.replace("{{ESCAPED_TITLE}}", escaped_title) \
+            .replace("{{ROOT_REL}}", root_rel) \
+            .replace("{{STYLE_HASH}}", style_hash) \
+            .replace("{{LOGO_HASH}}", logo_hash) \
+            .replace("{{KATEX_TAGS}}", katex_tags) \
+            .replace("{{HEADER_LOGO_SVG}}", ZQK_HEADER_LOGO_SVG) \
+            .replace("{{CATEGORY}}", html.escape(item["category"])) \
+            .replace("{{SIDEBAR_NAV_HTML}}", sidebar_nav_html) \
+            .replace("{{CLEAN_MD_REL}}", item['clean_md_rel']) \
+            .replace("{{RENDERED_BODY}}", rendered_body) \
+            .replace("{{PORTAL_BUILD_ID}}", portal_build_id)
         target_file_path = os.path.join(target_dir, item["html_rel"])
         os.makedirs(os.path.dirname(target_file_path), exist_ok=True)
         with open(target_file_path, "w", encoding="utf-8") as f:
@@ -1199,216 +1099,13 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
         """
 
     index_sidebar_html = get_sidebar_nav_html("", "index.html")
-    index_html = f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-  <title>ZQK Core Documentation Portal</title>
-  <link rel="stylesheet" href="assets/style.css?v={style_hash}">
-  <link rel="icon" type="image/svg+xml" href="assets/zqk-logo.svg?v={logo_hash}">
-  <script type="module">
-    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-    mermaid.initialize({{
-      startOnLoad: false,
-      securityLevel: 'loose',
-      theme: 'dark',
-      themeVariables: {{
-        darkMode: true,
-        background: '#0d1117',
-        primaryColor: '#1f6feb',
-        primaryTextColor: '#c9d1d9',
-        primaryBorderColor: '#30363d',
-        lineColor: '#58a6ff',
-        secondaryColor: '#161b22',
-        tertiaryColor: '#0d1117'
-      }}
-    }});
-
-    async function initMermaid() {{
-      const els = document.querySelectorAll('.mermaid, pre code.language-mermaid');
-      if (!els.length) return;
-      document.querySelectorAll('pre code.language-mermaid').forEach(el => {{
-        const pre = el.parentElement;
-        pre.className = 'mermaid';
-        pre.textContent = el.textContent;
-      }});
-      try {{
-        await mermaid.run({{ querySelector: '.mermaid' }});
-      }} catch (err) {{
-        console.warn('Mermaid rendering:', err);
-      }}
-    }}
-
-    if (document.readyState === 'loading') {{
-      document.addEventListener('DOMContentLoaded', initMermaid);
-    }} else {{
-      initMermaid();
-    }}
-  </script>
-</head>
-<body data-root-rel="">
-  <header class="header">
-    <div class="nav-container">
-      <div class="brand">
-        <a href="index.html" class="logo">
-          {ZQK_HEADER_LOGO_SVG}
-          <span class="logo-text">ZQK <span class="logo-accent">Core</span> <span style="font-size: 0.82rem; color: #8b949e; font-weight: normal; margin-left: 6px;">Community Docs</span></span>
-        </a>
-      </div>
-      <div class="search-box">
-        <input type="text" id="search-input" placeholder="Search core documentation..." onkeyup="runSearch()">
-        <div id="search-results"></div>
-      </div>
-    </div>
-  </header>
-  <main class="content-container">
-    <aside class="sidebar">
-      {index_sidebar_html}
-    </aside>
-    <article class="doc-body">
-      <div class="hero-box">
-        <h1>ZQK Community Docs</h1>
-        <p class="hero-desc">
-          The Cellular Knowledge Operating System for autonomous AI agent swarms and human engineering teams.
-        </p>
-        <div class="portal-stat-badge">
-          <strong>{len(pages)}</strong> official open-core documentation guides and specifications
-        </div>
-      </div>
-
-      <h2>Core Documentation Quadrants</h2>
-      <div class="quadrant-grid">
-        <div class="quad-box">
-          <h3>🚀 Onboarding & First-Run</h3>
-          <p>Get up and running with the ZQK Core CLI, daemons, and autonomous agent seating.</p>
-          <ul>
-            <li><a href="docs/onboarding/COMMUNITY_FIRST_RUN.html">Community First-Run Guide</a></li>
-            <li><a href="docs/onboarding/QUICKSTART.html">Quickstart & MCP Configuration</a></li>
-            <li><a href="docs/onboarding/AI_AGENT_ONBOARDING.html">AI Agent Directives & Seating</a></li>
-            <li><a href="docs/onboarding/FIRST_RUN_OBJECT_TUTORIAL.html">First-Run Object Tutorial</a></li>
-            <li><a href="docs/onboarding/EDGE_HEADLESS_FIRST_RUN.html">Edge / Headless Mode</a></li>
-          </ul>
-        </div>
-        <div class="quad-box">
-          <h3>🏛️ Core Architecture</h3>
-          <p>Deep foundational specifications governing the Knowledge Kernel.</p>
-          <ul>
-            <li><a href="docs/architecture/README.html">Core Architecture Overview</a></li>
-            <li><a href="docs/architecture/AMBIENT_SIGNAL_ACTION_RUBRIC.html">Ambient Signal Action Rubric</a></li>
-            <li><a href="docs/architecture/LIFECYCLE_STATE_MACHINE.html">Visual Lifecycle State Machines</a></li>
-            <li><a href="docs/architecture/PACK_COMPOSITION_AND_EXTENSIBILITY.html">Modular Pack Composition</a></li>
-            <li><a href="docs/architecture/CELLULAR_MEMBRANE_MODE_B_CONFIGURATION.html">Cellular Membrane Mode B Runbook</a></li>
-            <li><a href="docs/architecture/CLI_COMMAND_TAXONOMY_STANDARDS.html">CLI Command Taxonomy & Standards</a></li>
-          </ul>
-        </div>
-        <div class="quad-box">
-          <h3>📜 Specifications & Grammars</h3>
-          <p>Formal AST grammars, execution engines, and query planning algorithms.</p>
-          <ul>
-            <li><a href="docs/specs/SPEC-ZPARQL-GRAPH-TRAVERSAL-GRAMMAR.html">ZPARQL Graph Traversal Grammar</a></li>
-            <li><a href="docs/specs/SPEC-ZPARQL-QUERY-PLANNER.html">ZPARQL Indexed Query Planner</a></li>
-            <li><a href="docs/specs/SPEC-ZQL-DECLARATIVE-MUTATION-GRAMMAR.html">ZQL Mutation Grammar & AST</a></li>
-            <li><a href="docs/specs/SPEC-VALIDATION-RULE-DSL-GRAMMAR.html">Validation Rule DSL Grammar</a></li>
-            <li><a href="docs/specs/SPEC-ZQL-TRANSACTION-EXECUTION.html">ZQL ACID Transaction Execution</a></li>
-            <li><a href="docs/specs/SPEC-OBJECT-INSPECTOR-CONSOLE-001.html">Interactive Object Inspector Spec</a></li>
-          </ul>
-        </div>
-        <div class="quad-box">
-          <h3>📖 Reference Manuals & Guides</h3>
-          <p>Complete syntax reference, CLI options, and developer field guides.</p>
-          <ul>
-            <li><a href="docs/manual/README.html">Manual & CLI Reference</a></li>
-            <li><a href="docs/guides/README.html">Developer & Agent Guides Index</a></li>
-            <li><a href="docs/guides/KERNEL_OBJECT_USAGE_GUIDE.html">Kernel Object Model & Usage Guide</a></li>
-            <li><a href="docs/guides/KNOWLEDGE_MANAGEMENT_AND_SEMANTIC_RECALL_GUIDE.html">Knowledge Management & Semantic Recall</a></li>
-            <li><a href="docs/guides/ZQL_ZPARQL_AGENT_GUIDE.html">ZQL & ZPARQL Graph Operations</a></li>
-            <li><a href="docs/guides/OBJECT_LIFECYCLE_AND_CAS_STORAGE_GUIDE.html">Object Lifecycle & CAS Storage</a></li>
-            <li><a href="docs/guides/POLICY_CREATION_AND_VALIDATION_DSL_GUIDE.html">Custom Policy & Rule DSL</a></li>
-            <li><a href="docs/guides/SINGLE_COMMAND_EXECUTION_LOOP_GUIDE.html">Single-Command Loop (zqk do)</a></li>
-          </ul>
-        </div>
-        <div class="quad-box">
-          <h3>🚨 Incident Runbooks & Operations</h3>
-          <p>Operational triage recipes, crash recovery, and daemon health management.</p>
-          <ul>
-            <li><a href="docs/runbooks/README.html">Operational Incident Runbooks</a></li>
-            <li><a href="docs/runbooks/RB-CAS-001-CAS-CORRUPTION-RECOVERY.html">RB-CAS-001: CAS Hash Recovery</a></li>
-            <li><a href="docs/runbooks/RB-LCK-001-LOCK-CONTENTION-DEADLOCKS.html">RB-LCK-001: Lock Contention</a></li>
-            <li><a href="docs/runbooks/RB-SCH-001-SCHEDULER-DAEMON-TRIAGE.html">RB-SCH-001: Scheduler Triage</a></li>
-            <li><a href="docs/runbooks/RB-WAL-001-WAL-COMPACTION-FAILURES.html">RB-WAL-001: WAL Failures</a></li>
-          </ul>
-        </div>
-        <div class="quad-box">
-          <h3>🔬 Quality & Codebase Evaluation</h3>
-          <p>Multi-agent evaluation framework (CEF), Diamond Scale, and 52 lens rubrics.</p>
-          <ul>
-            <li><a href="docs/quality/README.html">Quality & Verification Gates (DoD/VDS)</a></li>
-            <li><a href="docs/quality/codebase_evaluation/README.html">CEF Multi-Agent Evaluation Framework</a></li>
-            <li><a href="docs/quality/codebase_evaluation/CONSTITUTION.html">CEF Evaluation Constitution</a></li>
-            <li><a href="docs/quality/codebase_evaluation/DIAMOND_SCALE.html">Diamond Scale Multi-Axis Quality</a></li>
-            <li><a href="docs/quality/codebase_evaluation/LENSES.html">52 Evaluation Dimensions & Lenses</a></li>
-          </ul>
-        </div>
-        <div class="quad-box">
-          <h3>🔧 Maintenance & Development</h3>
-          <p>Foundational engineering conventions, policy durability models, and AST gates.</p>
-          <ul>
-            <li><a href="docs/development/README.html">Maintenance & Development Overview</a></li>
-            <li><a href="docs/development/POLICY_GOVERNANCE_AND_DURABILITY.html">Policy Governance & Durability</a></li>
-            <li><a href="docs/howto/SCHEDULER_AND_MAINTENANCE.html">Scheduler & Maintenance Jobs</a></li>
-            <li><a href="docs/explanation/README.html">System Architecture Philosophy</a></li>
-          </ul>
-        </div>
-        <div class="quad-box">
-          <h3>📦 Kernel Subsystems & Core Engines</h3>
-          <p>Architectural design, interface contracts, and storage implementations across the Go microkernel.</p>
-          <ul>
-            <li><a href="pkg/README.html">Go Packages Master Index (pkg/)</a></li>
-            <li><a href="pkg/storage/README.html">Storage Subsystem & Providers</a></li>
-            <li><a href="pkg/graph/README.html">Graph Backend & MemGraph Provider</a></li>
-            <li><a href="pkg/coordination/README.html">Event Coordination System (Spinal Cord)</a></li>
-            <li><a href="pkg/mcp/README.html">Model Context Protocol (MCP) Server</a></li>
-            <li><a href="pkg/cli/bldr_cli_cmd_v1/README.html">CLI Command Builders (bldr_cli_cmd_v1)</a></li>
-          </ul>
-        </div>
-        <div class="quad-box">
-          <h3>🤖 Agent Operating Protocols</h3>
-          <p>Directives, MCP integration, persona seating, and continuous autonomous loop discipline.</p>
-          <ul>
-            <li><a href="docs/onboarding/AI_AGENT_ONBOARDING.html">AI Agent Directives & Seating</a></li>
-            <li><a href="docs/architecture/AMBIENT_SIGNAL_ACTION_RUBRIC.html">Ambient Signal Action Rubric</a></li>
-            <li><a href="docs/guides/AGENT_ORCHESTRATION_AND_SWARM_COLLABORATION_GUIDE.html">Swarm Orchestration & Mesh</a></li>
-            <li><a href="docs/guides/SINGLE_COMMAND_EXECUTION_LOOP_GUIDE.html">Single-Command Loop (zqk do)</a></li>
-            <li><a href="docs/guides/DIAGNOSTICS_SELF_HEALING_AND_REMEDY_GUIDE.html">Diagnostics & Self-Healing</a></li>
-          </ul>
-        </div>
-        <div class="quad-box">
-          <h3>⚖️ Open Core Governance</h3>
-          <p>Open-source policies, contributing guidelines, and security disclosures.</p>
-          <ul>
-            <li><a href="CONTRIBUTING.html">Contributing & DCO Compliance</a></li>
-            <li><a href="SECURITY.html">Security Vulnerability Disclosures</a></li>
-            <li><a href="GOVERNANCE.html">Open-Core Decision Making</a></li>
-            <li><a href="CODE_OF_CONDUCT.html">Contributor Code of Conduct</a></li>
-          </ul>
-        </div>
-      </div>
-
-      <h2>Core Documentation Directory</h2>
-      <p>Explore all {len(pages)} canonical guides published in ZQK Core:</p>
-      <div class="category-grid">
-        {cat_cards_html}
-      </div>
-    </article>
-  </main>
-  <script src="search/search-index.js?v={portal_build_id}"></script>
-</body>
-</html>
-"""
+    index_html = INDEX_TEMPLATE.replace("{{STYLE_HASH}}", style_hash) \
+        .replace("{{LOGO_HASH}}", logo_hash) \
+        .replace("{{HEADER_LOGO_SVG}}", ZQK_HEADER_LOGO_SVG) \
+        .replace("{{SIDEBAR_NAV_HTML}}", index_sidebar_html) \
+        .replace("{{DOC_COUNT}}", str(len(pages))) \
+        .replace("{{CATEGORY_CARDS_HTML}}", cat_cards_html) \
+        .replace("{{PORTAL_BUILD_ID}}", portal_build_id)
     with open(os.path.join(target_dir, "index.html"), "w", encoding="utf-8") as f:
         f.write(index_html)
 
@@ -1419,44 +1116,7 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
 
     # Write search index
     pages_json_str = json.dumps(pages, ensure_ascii=False)
-    search_js = f"""const docsIndex = {pages_json_str};
-
-function runSearch() {{
-  const query = document.getElementById('search-input').value.toLowerCase();
-  const resultsDiv = document.getElementById('search-results');
-  if (!query || query.length < 2) {{
-    resultsDiv.style.display = 'none';
-    resultsDiv.innerHTML = '';
-    return;
-  }}
-  const rootRel = document.body.getAttribute('data-root-rel') || '';
-  const matched = docsIndex.filter(d => 
-    d.title.toLowerCase().includes(query) || 
-    d.category.toLowerCase().includes(query) || 
-    d.snippet.toLowerCase().includes(query)
-  );
-  if (matched.length === 0) {{
-    resultsDiv.innerHTML = '<div style="padding: 12px; color: #8b949e;">No documentation matches found</div>';
-  }} else {{
-    resultsDiv.innerHTML = matched.slice(0, 20).map(m => 
-      '<div class="search-result-item">' +
-      '  <a href="' + rootRel + m.path + '">' + m.title + '</a>' +
-      '  <span class="search-result-category">[' + m.category + ']</span>' +
-      '  <p>' + m.snippet + '...</p>' +
-      '</div>'
-    ).join('');
-  }}
-  resultsDiv.style.display = 'block';
-}}
-
-document.addEventListener('click', function(e) {{
-  const searchBox = document.querySelector('.search-box');
-  const resultsDiv = document.getElementById('search-results');
-  if (searchBox && !searchBox.contains(e.target)) {{
-    resultsDiv.style.display = 'none';
-  }}
-}});
-"""
+    search_js = SEARCH_JS_TEMPLATE.replace("__DOCS_INDEX__", pages_json_str)
     with open(os.path.join(search_dir, "search-index.js"), "w", encoding="utf-8") as f:
         f.write(search_js)
 
@@ -1489,59 +1149,10 @@ document.addEventListener('click', function(e) {{
                     f.write(redirect_html)
 
     # Write custom 404.html for GitHub Pages with smart path resolution and branded fallback
-    custom_404_html = f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-  <title>Page Not Found — ZQK Documentation</title>
-  <link rel="stylesheet" href="/assets/style.css?v={style_hash}">
-  <link rel="icon" type="image/svg+xml" href="/assets/zqk-logo.svg?v={logo_hash}">
-  <script>
-    // Automatic intelligent client-side redirect for links missing /docs/ or missing .html
-    (function() {{
-      var path = window.location.pathname;
-      if (!path.startsWith('/docs/') && path !== '/' && !path.startsWith('/assets/') && !path.startsWith('/search/')) {{
-        var cleanPath = path;
-        if (!cleanPath.endsWith('.html') && !cleanPath.endsWith('/')) {{
-          cleanPath += '.html';
-        }}
-        var candidate = '/docs' + (cleanPath.startsWith('/') ? cleanPath : '/' + cleanPath);
-        window.location.replace(candidate + window.location.search + window.location.hash);
-      }}
-    }})();
-  </script>
-</head>
-<body class="docs-page">
-  <header class="header">
-    <div class="nav-container">
-      <div class="brand">
-        <a href="/" class="logo">
-          {ZQK_HEADER_LOGO_SVG}
-          <span class="logo-text">ZQK <span class="logo-accent">Core</span> <span style="font-size: 0.82rem; color: #8b949e; font-weight: normal; margin-left: 6px;">Community Docs</span></span>
-        </a>
-      </div>
-      <div class="search-box">
-        <input type="text" id="search-input" placeholder="Search documentation... (Press '/' to focus)" oninput="runSearch()">
-        <div id="search-results"></div>
-      </div>
-    </div>
-  </header>
-  <main class="content-container" style="justify-content:center; text-align:center; padding: 4rem 1rem;">
-    <div style="max-width: 600px; margin: 0 auto;">
-      <h1 style="font-size: 3.5rem; color: #00e5ff; margin-bottom: 1rem;">404</h1>
-      <h2 style="color: #fff; margin-bottom: 1rem;">Documentation Page Not Found</h2>
-      <p style="color: #8b949e; line-height: 1.6; margin-bottom: 2rem;">The requested page could not be located. You can search our documentation above or return to the portal homepage.</p>
-      <a href="/" style="display:inline-block; padding: 10px 20px; background: #00e5ff; color: #05070a; font-weight: 600; border-radius: 6px; text-decoration: none;">&larr; Return to Documentation Portal</a>
-    </div>
-  </main>
-  <script src="/search/search-index.js?v={portal_build_id}"></script>
-</body>
-</html>
-"""
+    custom_404_html = CUSTOM_404_TEMPLATE.replace("{{STYLE_HASH}}", style_hash) \
+        .replace("{{LOGO_HASH}}", logo_hash) \
+        .replace("{{HEADER_LOGO_SVG}}", ZQK_HEADER_LOGO_SVG) \
+        .replace("{{PORTAL_BUILD_ID}}", portal_build_id)
     with open(os.path.join(target_dir, "404.html"), "w", encoding="utf-8") as f:
         f.write(custom_404_html)
 

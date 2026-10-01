@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>ZQK Core Documentation Portal</title>
+  <link rel="stylesheet" href="assets/style.css?v={{STYLE_HASH}}">
+  <link rel="icon" type="image/svg+xml" href="assets/zqk-logo.svg?v={{LOGO_HASH}}">
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: 'loose',
+      theme: 'dark',
+      themeVariables: {
+        darkMode: true,
+        background: '#0d1117',
+        primaryColor: '#1f6feb',
+        primaryTextColor: '#c9d1d9',
+        primaryBorderColor: '#30363d',
+        lineColor: '#58a6ff',
+        secondaryColor: '#161b22',
+        tertiaryColor: '#0d1117'
+      }
+    });
+
+    async function initMermaid() {
+      const els = document.querySelectorAll('.mermaid, pre code.language-mermaid');
+      if (!els.length) return;
+      document.querySelectorAll('pre code.language-mermaid').forEach(el => {
+        const pre = el.parentElement;
+        pre.className = 'mermaid';
+        pre.textContent = el.textContent;
+      });
+      try {
+        await mermaid.run({ querySelector: '.mermaid' });
+      } catch (err) {
+        console.warn('Mermaid rendering:', err);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initMermaid);
+    } else {
+      initMermaid();
+    }
+  </script>
+</head>
+<body data-root-rel="">
+  <header class="header">
+    <div class="nav-container">
+      <div class="brand">
+        <a href="index.html" class="logo">
+          {{HEADER_LOGO_SVG}}
+          <span class="logo-text">ZQK <span class="logo-accent">Core</span> <span style="font-size: 0.82rem; color: #8b949e; font-weight: normal; margin-left: 6px;">Community Docs</span></span>
+        </a>
+      </div>
+      <div class="search-box">
+        <input type="text" id="search-input" placeholder="Search core documentation..." onkeyup="runSearch()">
+        <div id="search-results"></div>
+      </div>
+    </div>
+  </header>
+  <main class="content-container">
+    <aside class="sidebar">
+      {{SIDEBAR_NAV_HTML}}
+    </aside>
+    <article class="doc-body">
+      <div class="hero-box">
+        <h1>ZQK Community Docs</h1>
+        <p class="hero-desc">
+          The Cellular Knowledge Operating System for autonomous AI agent swarms and human engineering teams.
+        </p>
+        <div class="portal-stat-badge">
+          <strong>{{DOC_COUNT}}</strong> official open-core documentation guides and specifications
+        </div>
+      </div>
+
+      <h2>Core Documentation Quadrants</h2>
+      <div class="quadrant-grid">
+        <div class="quad-box">
+          <h3>🚀 Onboarding & First-Run</h3>
+          <p>Get up and running with the ZQK Core CLI, daemons, and autonomous agent seating.</p>
+          <ul>
+            <li><a href="docs/onboarding/COMMUNITY_FIRST_RUN.html">Community First-Run Guide</a></li>
+            <li><a href="docs/onboarding/QUICKSTART.html">Quickstart & MCP Configuration</a></li>
+            <li><a href="docs/onboarding/AI_AGENT_ONBOARDING.html">AI Agent Directives & Seating</a></li>
+            <li><a href="docs/onboarding/FIRST_RUN_OBJECT_TUTORIAL.html">First-Run Object Tutorial</a></li>
+            <li><a href="docs/onboarding/EDGE_HEADLESS_FIRST_RUN.html">Edge / Headless Mode</a></li>
+          </ul>
+        </div>
+        <div class="quad-box">
+          <h3>🏛️ Core Architecture</h3>
+          <p>Deep foundational specifications governing the Knowledge Kernel.</p>
+          <ul>
+            <li><a href="docs/architecture/README.html">Core Architecture Overview</a></li>
+            <li><a href="docs/architecture/AMBIENT_SIGNAL_ACTION_RUBRIC.html">Ambient Signal Action Rubric</a></li>
+            <li><a href="docs/architecture/LIFECYCLE_STATE_MACHINE.html">Visual Lifecycle State Machines</a></li>
+            <li><a href="docs/architecture/PACK_COMPOSITION_AND_EXTENSIBILITY.html">Modular Pack Composition</a></li>
+            <li><a href="docs/architecture/CELLULAR_MEMBRANE_MODE_B_CONFIGURATION.html">Cellular Membrane Mode B Runbook</a></li>
+            <li><a href="docs/architecture/CLI_COMMAND_TAXONOMY_STANDARDS.html">CLI Command Taxonomy & Standards</a></li>
+          </ul>
+        </div>
+        <div class="quad-box">
+          <h3>📜 Specifications & Grammars</h3>
+          <p>Formal AST grammars, execution engines, and query planning algorithms.</p>
+          <ul>
+            <li><a href="docs/specs/SPEC-ZPARQL-GRAPH-TRAVERSAL-GRAMMAR.html">ZPARQL Graph Traversal Grammar</a></li>
+            <li><a href="docs/specs/SPEC-ZPARQL-QUERY-PLANNER.html">ZPARQL Indexed Query Planner</a></li>
+            <li><a href="docs/specs/SPEC-ZQL-DECLARATIVE-MUTATION-GRAMMAR.html">ZQL Mutation Grammar & AST</a></li>
+            <li><a href="docs/specs/SPEC-VALIDATION-RULE-DSL-GRAMMAR.html">Validation Rule DSL Grammar</a></li>
+            <li><a href="docs/specs/SPEC-ZQL-TRANSACTION-EXECUTION.html">ZQL ACID Transaction Execution</a></li>
+            <li><a href="docs/specs/SPEC-OBJECT-INSPECTOR-CONSOLE-001.html">Interactive Object Inspector Spec</a></li>
+          </ul>
+        </div>
+        <div class="quad-box">
+          <h3>📖 Reference Manuals & Guides</h3>
+          <p>Complete syntax reference, CLI options, and developer field guides.</p>
+          <ul>
+            <li><a href="docs/manual/README.html">Manual & CLI Reference</a></li>
+            <li><a href="docs/guides/README.html">Developer & Agent Guides Index</a></li>
+            <li><a href="docs/guides/KERNEL_OBJECT_USAGE_GUIDE.html">Kernel Object Model & Usage Guide</a></li>
+            <li><a href="docs/guides/KNOWLEDGE_MANAGEMENT_AND_SEMANTIC_RECALL_GUIDE.html">Knowledge Management & Semantic Recall</a></li>
+            <li><a href="docs/guides/ZQL_ZPARQL_AGENT_GUIDE.html">ZQL & ZPARQL Graph Operations</a></li>
+            <li><a href="docs/guides/OBJECT_LIFECYCLE_AND_CAS_STORAGE_GUIDE.html">Object Lifecycle & CAS Storage</a></li>
+            <li><a href="docs/guides/POLICY_CREATION_AND_VALIDATION_DSL_GUIDE.html">Custom Policy & Rule DSL</a></li>
+            <li><a href="docs/guides/SINGLE_COMMAND_EXECUTION_LOOP_GUIDE.html">Single-Command Loop (zqk do)</a></li>
+          </ul>
+        </div>
+        <div class="quad-box">
+          <h3>🚨 Incident Runbooks & Operations</h3>
+          <p>Operational triage recipes, crash recovery, and daemon health management.</p>
+          <ul>
+            <li><a href="docs/runbooks/README.html">Operational Incident Runbooks</a></li>
+            <li><a href="docs/runbooks/RB-CAS-001-CAS-CORRUPTION-RECOVERY.html">RB-CAS-001: CAS Hash Recovery</a></li>
+            <li><a href="docs/runbooks/RB-LCK-001-LOCK-CONTENTION-DEADLOCKS.html">RB-LCK-001: Lock Contention</a></li>
+            <li><a href="docs/runbooks/RB-SCH-001-SCHEDULER-DAEMON-TRIAGE.html">RB-SCH-001: Scheduler Triage</a></li>
+            <li><a href="docs/runbooks/RB-WAL-001-WAL-COMPACTION-FAILURES.html">RB-WAL-001: WAL Failures</a></li>
+          </ul>
+        </div>
+        <div class="quad-box">
+          <h3>🔬 Quality & Codebase Evaluation</h3>
+          <p>Multi-agent evaluation framework (CEF), Diamond Scale, and 52 lens rubrics.</p>
+          <ul>
+            <li><a href="docs/quality/README.html">Quality & Verification Gates (DoD/VDS)</a></li>
+            <li><a href="docs/quality/codebase_evaluation/README.html">CEF Multi-Agent Evaluation Framework</a></li>
+            <li><a href="docs/quality/codebase_evaluation/CONSTITUTION.html">CEF Evaluation Constitution</a></li>
+            <li><a href="docs/quality/codebase_evaluation/DIAMOND_SCALE.html">Diamond Scale Multi-Axis Quality</a></li>
+            <li><a href="docs/quality/codebase_evaluation/LENSES.html">52 Evaluation Dimensions & Lenses</a></li>
+          </ul>
+        </div>
+        <div class="quad-box">
+          <h3>🔧 Maintenance & Development</h3>
+          <p>Foundational engineering conventions, policy durability models, and AST gates.</p>
+          <ul>
+            <li><a href="docs/development/README.html">Maintenance & Development Overview</a></li>
+            <li><a href="docs/development/POLICY_GOVERNANCE_AND_DURABILITY.html">Policy Governance & Durability</a></li>
+            <li><a href="docs/howto/SCHEDULER_AND_MAINTENANCE.html">Scheduler & Maintenance Jobs</a></li>
+            <li><a href="docs/explanation/README.html">System Architecture Philosophy</a></li>
+          </ul>
+        </div>
+        <div class="quad-box">
+          <h3>📦 Kernel Subsystems & Core Engines</h3>
+          <p>Architectural design, interface contracts, and storage implementations across the Go microkernel.</p>
+          <ul>
+            <li><a href="pkg/README.html">Go Packages Master Index (pkg/)</a></li>
+            <li><a href="pkg/storage/README.html">Storage Subsystem & Providers</a></li>
+            <li><a href="pkg/graph/README.html">Graph Backend & MemGraph Provider</a></li>
+            <li><a href="pkg/coordination/README.html">Event Coordination System (Spinal Cord)</a></li>
+            <li><a href="pkg/mcp/README.html">Model Context Protocol (MCP) Server</a></li>
+            <li><a href="pkg/cli/bldr_cli_cmd_v1/README.html">CLI Command Builders (bldr_cli_cmd_v1)</a></li>
+          </ul>
+        </div>
+        <div class="quad-box">
+          <h3>🤖 Agent Operating Protocols</h3>
+          <p>Directives, MCP integration, persona seating, and continuous autonomous loop discipline.</p>
+          <ul>
+            <li><a href="docs/onboarding/AI_AGENT_ONBOARDING.html">AI Agent Directives & Seating</a></li>
+            <li><a href="docs/architecture/AMBIENT_SIGNAL_ACTION_RUBRIC.html">Ambient Signal Action Rubric</a></li>
+            <li><a href="docs/guides/AGENT_ORCHESTRATION_AND_SWARM_COLLABORATION_GUIDE.html">Swarm Orchestration & Mesh</a></li>
+            <li><a href="docs/guides/SINGLE_COMMAND_EXECUTION_LOOP_GUIDE.html">Single-Command Loop (zqk do)</a></li>
+            <li><a href="docs/guides/DIAGNOSTICS_SELF_HEALING_AND_REMEDY_GUIDE.html">Diagnostics & Self-Healing</a></li>
+          </ul>
+        </div>
+        <div class="quad-box">
+          <h3>⚖️ Open Core Governance</h3>
+          <p>Open-source policies, contributing guidelines, and security disclosures.</p>
+          <ul>
+            <li><a href="CONTRIBUTING.html">Contributing & DCO Compliance</a></li>
+            <li><a href="SECURITY.html">Security Vulnerability Disclosures</a></li>
+            <li><a href="GOVERNANCE.html">Open-Core Decision Making</a></li>
+            <li><a href="CODE_OF_CONDUCT.html">Contributor Code of Conduct</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>Core Documentation Directory</h2>
+      <p>Explore all {{DOC_COUNT}} canonical guides published in ZQK Core:</p>
+      <div class="category-grid">
+        {{CATEGORY_CARDS_HTML}}
+      </div>
+    </article>
+  </main>
+  <script src="search/search-index.js?v={{PORTAL_BUILD_ID}}"></script>
+</body>
+</html>

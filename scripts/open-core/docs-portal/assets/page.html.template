@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>{{ESCAPED_TITLE}} - ZQK Core Documentation</title>
+  <link rel="stylesheet" href="{{ROOT_REL}}assets/style.css?v={{STYLE_HASH}}">
+  <link rel="icon" type="image/svg+xml" href="{{ROOT_REL}}assets/zqk-logo.svg?v={{LOGO_HASH}}">
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: 'loose',
+      theme: 'dark',
+      themeVariables: {
+        darkMode: true,
+        background: '#0d1117',
+        primaryColor: '#1f6feb',
+        primaryTextColor: '#c9d1d9',
+        primaryBorderColor: '#30363d',
+        lineColor: '#58a6ff',
+        secondaryColor: '#161b22',
+        tertiaryColor: '#0d1117'
+      }
+    });
+
+    async function initMermaid() {
+      const els = document.querySelectorAll('.mermaid, pre code.language-mermaid');
+      if (!els.length) return;
+      document.querySelectorAll('pre code.language-mermaid').forEach(el => {
+        const pre = el.parentElement;
+        pre.className = 'mermaid';
+        pre.textContent = el.textContent;
+      });
+      try {
+        await mermaid.run({ querySelector: '.mermaid' });
+      } catch (err) {
+        console.warn('Mermaid rendering:', err);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initMermaid);
+    } else {
+      initMermaid();
+    }
+  </script>
+{{KATEX_TAGS}}
+</head>
+<body data-root-rel="{{ROOT_REL}}">
+  <header class="header">
+    <div class="nav-container">
+      <div class="brand">
+        <a href="{{ROOT_REL}}index.html" class="logo">
+          {{HEADER_LOGO_SVG}}
+          <span class="logo-text">ZQK <span class="logo-accent">Core</span></span>
+        </a>
+        <span class="badge-tag">{{CATEGORY}}</span>
+      </div>
+      <div class="search-box">
+        <input type="text" id="search-input" placeholder="Search core documentation..." onkeyup="runSearch()">
+        <div id="search-results"></div>
+      </div>
+    </div>
+  </header>
+  <main class="content-container">
+    <aside class="sidebar">
+      {{SIDEBAR_NAV_HTML}}
+    </aside>
+    <article class="doc-body">
+      <div class="breadcrumb">
+        <div class="breadcrumb-trail">
+          <a href="{{ROOT_REL}}index.html">Docs</a> &raquo; <span>{{CATEGORY}}</span> &raquo; <span class="current">{{ESCAPED_TITLE}}</span>
+        </div>
+        <a href="{{ROOT_REL}}{{CLEAN_MD_REL}}" class="raw-md-link" title="View canonical Markdown source">Raw .md</a>
+      </div>
+      <div class="markdown-body">
+        {{RENDERED_BODY}}
+      </div>
+    </article>
+  </main>
+  <script src="{{ROOT_REL}}search/search-index.js?v={{PORTAL_BUILD_ID}}"></script>
+</body>
+</html>

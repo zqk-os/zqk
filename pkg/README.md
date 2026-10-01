@@ -101,7 +101,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [infrastructure](./infrastructure/) | `github.com/zqk-os/zqk/pkg/infrastructure` | 4+2 | 2 | crypto, hts | ❌ - | Core infrastructure components, hardware abstraction, and cryptographic storage. |
 | [ingestion](./ingestion/) | `github.com/zqk-os/zqk/pkg/ingestion` | 0+0 | 0 | adapters, translation | ❌ - | Data ingestion pipeline, file format adapters, and document translation. |
 | [integrity](./integrity/) | `github.com/zqk-os/zqk/pkg/integrity` | 4+3 | 3 | - | ❌ - | Kernel state integrity verification, hash validation, and tamper detection. |
-| [interactionpolicy](./interactionpolicy/) | `github.com/zqk-os/zqk/pkg/interactionpolicy` | 8+6 | 6 | - | ❌ - | User-agent interaction constraints, confirmation prompts, and safe intervention rules. |
+| [interactionpolicy](./interactionpolicy/) | `github.com/zqk-os/zqk/pkg/interactionpolicy` | 9+7 | 7 | - | ❌ - | User-agent interaction constraints, confirmation prompts, and safe intervention rules. |
 | [interactive](./interactive/) | `github.com/zqk-os/zqk/pkg/interactive` | 7+5 | 5 | - | ❌ - | Interactive terminal UI components, prompts, select menus, and survey wizards. |
 | [interfacepack](./interfacepack/) | `github.com/zqk-os/zqk/pkg/interfacepack` | 1+0 | 0 | - | ❌ - | Interface contract and API boundary specifications pack. |
 | [kernel](./kernel/) | `github.com/zqk-os/zqk/pkg/kernel` | 4+3 | 3 | intake, mutation, +2 more | ❌ - | Knowledge Kernel bootstrap sequence, runtime lifecycle, and core state coordination. |
@@ -195,7 +195,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [swarm](./swarm/) | `github.com/zqk-os/zqk/pkg/swarm` | 17+18 | 18 | metabolism, pack, remote | ❌ - | Multi-agent swarm coordination, task allocation, and consensus protocols. |
 | [swarminit](./swarminit/) | `github.com/zqk-os/zqk/pkg/swarminit` | 6+7 | 7 | - | ❌ - | Runs configurable mesh bring-up recipes stored as kernel pipeline (PIP-*) objects. It is a mesh ops runner, not the kernel CAS... |
 | [system](./system/) | `github.com/zqk-os/zqk/pkg/system` | 1+1 | 1 | - | ❌ - | System-level diagnostics, host environment inspection, and OS capabilities. |
-| [systemcheck](./systemcheck/) | `github.com/zqk-os/zqk/pkg/systemcheck` | 6+5 | 5 | autofix, congruence, +3 more | ❌ - | Holds shared types and helpers for zqk system check / validation surfaces that used to live only in cmd/zqk/system (F-ARCH-001)... |
+| [systemcheck](./systemcheck/) | `github.com/zqk-os/zqk/pkg/systemcheck` | 6+5 | 5 | asynccheck, autofix, +4 more | ❌ - | Holds shared types and helpers for zqk system check / validation surfaces that used to live only in cmd/zqk/system (F-ARCH-001)... |
 | [systemcheckwake](./systemcheckwake/) | `github.com/zqk-os/zqk/pkg/systemcheckwake` | 1+2 | 2 | - | ❌ - | Evaluates system-check summaries and optionally wakes a mesh seat. Opt-in only via `zqk system check --notify [agent-id]` — nev... |
 | [systempeel](./systempeel/) | `github.com/zqk-os/zqk/pkg/systempeel` | 1+1 | 1 | - | ❌ - | Layered system abstraction peeling and kernel introspection tools. |
 | [tde](./tde/) | `github.com/zqk-os/zqk/pkg/tde` | 5+4 | 4 | - | ❌ - | Tde component and domain abstractions for ZQK Core. |
@@ -544,6 +544,7 @@ pkg/
 ├── swarminit/          # Runs configurable mesh bring-up recipes stored as kernel pip
 ├── system/          # System-level diagnostics, host environment inspection, and O
 ├── systemcheck/          # Holds shared types and helpers for zqk system check / valida
+│   └── asynccheck/
 │   └── autofix/
 │   └── congruence/
 │   └── integrity/
