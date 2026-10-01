@@ -4,6 +4,7 @@ import (
 	stdcontext "context"
 	"path/filepath"
 	"sort"
+	"strings"
 	"testing"
 	"time"
 
@@ -467,5 +468,26 @@ func TestReverseReferenceIndex_MultiTenantConcurrentAccess(t *testing.T) {
 		<-done
 	}
 }
+
+// TestReverseReferenceIndex_SaveCache_LockContention_PropagatesError tests that SaveCache
+// fails closed with a non-nil error when the index lock cannot be acquired within the timeout.
+func TestReverseReferenceIndex_SaveCache_LockContention_PropagatesError(t *testing.T) {
+	projDir := t.TempDir()
+	index := NewReverseReferenceIndex()
+	index.AddReference("BLI-CHILD", "BLI-PARENT")
+
+	// Hold exclusive write lock so SaveCache's RLock or Lock cannot be acquired
+	index.mu.Lock()
+	defer index.mu.Unlock()
+
+	err := index.SaveCache(projDir)
+	if err == nil {
+		t.Fatal("expected error from SaveCache when lock is contended, got nil")
+	}
+	if !strings.Contains(err.Error(), "lock timeout") {
+		t.Errorf("expected error to mention 'lock timeout', got: %v", err)
+	}
+}
+
 
 
