@@ -222,10 +222,18 @@ func ScanObjectFiles(dir, kind string) ([]ScannedFile, error) {
 // ScanObjectFilesWithContext scans a directory for object files with context cancellation and timeout.
 // When storageProvider is non-nil and unwraps to *storage.FileObjectStorage, uses cached CAS to avoid loading the full index.
 func ScanObjectFilesWithContext(ctx context.Context, dir, kind string, logger logging.Logger, storageProvider storage.ObjectStorageProvider) ([]ScannedFile, error) {
-	// FAST PATH: Prefer CAS ID index over walking + reading files.
-	indexPath := filepath.Join(dir, fmt.Sprintf(".%s.index", kind))
+	files, found, err := scanFromCASIndex(ctx, dir, kind, storageProvider)
+	if err != nil {
+		return nil, err
+	}
+	if found {
+		return files, nil
+	}
+	return scanFromFilesystemWalk(ctx, dir, kind, logger)
+}
 
-	// Check for index file with timeout (non-blocking)
+func scanFromCASIndex(ctx context.Context, dir, kind string, storageProvider storage.ObjectStorageProvider) ([]ScannedFile, bool, error) {
+	indexPath := filepath.Join(dir, fmt.Sprintf(".%s.index", kind))
 	indexExists := false
 	statDone := make(chan bool, 1)
 	indexBud := goroutinelabels.DefaultBudget()
@@ -248,68 +256,79 @@ func ScanObjectFilesWithContext(ctx context.Context, dir, kind string, logger lo
 	select {
 	case indexExists = <-statDone:
 	case <-ctx.Done():
-		return nil, ctx.Err()
+		return nil, false, ctx.Err()
 	case <-time.After(1 * time.Second):
 		indexExists = false
 	}
 
-	if indexExists {
-		var cas *storage.ContentAddressableStorage
-		if fileStorage := storage.UnwrapToFileObjectStorage(storageProvider); fileStorage != nil {
-			if c, err := fileStorage.GetContentAddressableStorage(kind); err == nil && c != nil {
-				cas = c
-			}
+	if !indexExists {
+		return nil, false, nil
+	}
+
+	var cas *storage.ContentAddressableStorage
+	if fileStorage := storage.UnwrapToFileObjectStorage(storageProvider); fileStorage != nil {
+		if c, err := fileStorage.GetContentAddressableStorage(kind); err == nil && c != nil {
+			cas = c
 		}
-		if cas == nil {
-			cas = storage.NewContentAddressableStorage(dir, kind)
+	}
+	if cas == nil {
+		cas = storage.OpenContentAddressableStorage(dir, kind)
+	}
+
+	mappings, err := cas.GetAllMappings()
+	if err != nil || len(mappings) == 0 {
+		return nil, false, err
+	}
+
+	readDirDone := make(chan []fileutil.DirEntry, 1)
+	readDirBud := goroutinelabels.DefaultBudget()
+	readDirBuilder := goroutinelabels.NewGoroutine(labelScanReadDir, fmt.Sprintf(descScanReadDirFmt, dir)).
+		WithContext(ctx)
+	if readDirBud != nil {
+		readDirBuilder = readDirBuilder.WithBudget(readDirBud)
+	}
+	readDirBuilder.StartSimple(func() {
+		entries, readErr := fileutil.ReadDir(dir)
+		if readErr != nil {
+			readDirDone <- nil
+			return
 		}
-		mappings, _ := cas.GetAllMappings()
-		if len(mappings) > 0 {
-			readDirDone := make(chan []fileutil.DirEntry, 1)
-			readDirBud := goroutinelabels.DefaultBudget()
-			readDirBuilder := goroutinelabels.NewGoroutine(labelScanReadDir, fmt.Sprintf(descScanReadDirFmt, dir)).
-				WithContext(ctx)
-			if readDirBud != nil {
-				readDirBuilder = readDirBuilder.WithBudget(readDirBud)
-			}
-			readDirBuilder.StartSimple(func() {
-				entries, _ := fileutil.ReadDir(dir)
-				readDirDone <- entries
-			})
+		readDirDone <- entries
+	})
 
-			var entries []fileutil.DirEntry
-			select {
-			case entries = <-readDirDone:
-			case <-ctx.Done():
-				return nil, ctx.Err()
-			case <-time.After(2 * time.Second):
-				entries = []fileutil.DirEntry{}
-			}
+	var entries []fileutil.DirEntry
+	select {
+	case entries = <-readDirDone:
+	case <-ctx.Done():
+		return nil, false, ctx.Err()
+	case <-time.After(2 * time.Second):
+		entries = []fileutil.DirEntry{}
+	}
 
-			bucketDirs := make([]string, 0, len(entries))
-			for _, e := range entries {
-				if e.IsDir() && datePattern.MatchString(e.Name()) {
-					bucketDirs = append(bucketDirs, e.Name())
-				}
-			}
-
-			files := make([]ScannedFile, 0, len(mappings))
-			for objectID, hash := range mappings {
-				hashFile := filepath.Join(dir, hash+yamlExtShort)
-				if len(bucketDirs) > 0 {
-					mostRecentBucket := bucketDirs[len(bucketDirs)-1]
-					hashFile = filepath.Join(dir, mostRecentBucket, hash+yamlExtShort)
-				}
-				files = append(files, ScannedFile{
-					ObjectID: objectID,
-					Kind:     kind,
-					Path:     hashFile,
-				})
-			}
-			return files, nil
+	bucketDirs := make([]string, 0, len(entries))
+	for _, e := range entries {
+		if e.IsDir() && datePattern.MatchString(e.Name()) {
+			bucketDirs = append(bucketDirs, e.Name())
 		}
 	}
 
+	files := make([]ScannedFile, 0, len(mappings))
+	for objectID, hash := range mappings {
+		hashFile := filepath.Join(dir, hash+yamlExtShort)
+		if len(bucketDirs) > 0 {
+			mostRecentBucket := bucketDirs[len(bucketDirs)-1]
+			hashFile = filepath.Join(dir, mostRecentBucket, hash+yamlExtShort)
+		}
+		files = append(files, ScannedFile{
+			ObjectID: objectID,
+			Kind:     kind,
+			Path:     hashFile,
+		})
+	}
+	return files, true, nil
+}
+
+func scanFromFilesystemWalk(ctx context.Context, dir, kind string, logger logging.Logger) ([]ScannedFile, error) {
 	walkCtx, cancel := context.WithTimeout(ctx, 25*time.Second)
 	defer cancel()
 
@@ -331,15 +350,7 @@ func ScanObjectFilesWithContext(ctx context.Context, dir, kind string, logger lo
 			default:
 			}
 
-			if err != nil {
-				return nil
-			}
-
-			if info.IsDir() {
-				return nil
-			}
-
-			if appledouble.SkipPathInTreeWalk(path) {
+			if err != nil || info.IsDir() || appledouble.SkipPathInTreeWalk(path) {
 				return nil
 			}
 

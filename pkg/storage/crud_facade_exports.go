@@ -220,6 +220,7 @@ type IDIndex = crud.IDIndex
 type IndexWriteQueue = crud.IndexWriteQueue
 
 var NewContentAddressableStorage = crud.NewContentAddressableStorage
+var OpenContentAddressableStorage = crud.NewContentAddressableStorage
 var NewContentAddressableStorageWithIndex = crud.NewContentAddressableStorageWithIndex
 var SetSkipIndexUpdateWait = crud.SetSkipIndexUpdateWait
 var removeOrphanCASFilesForObjectID = crud.RemoveOrphanCASFilesForObjectID
