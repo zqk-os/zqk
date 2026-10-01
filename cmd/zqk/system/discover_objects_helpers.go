@@ -2,11 +2,11 @@ package system
 
 import (
 	stdcontext "context"
-	"runtime"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/systemcheck/asynccheck"
 )
 
 // fileStorageDiscovery is the interface used for strategy-based discovery (avoids importing storage in tests).
@@ -14,16 +14,9 @@ type fileStorageDiscovery interface {
 	ListPathsForDiscovery(ctx stdcontext.Context, kind string) ([]storage.PathWithID, error)
 }
 
-// calculateMaxConcurrentWorkers calculates the maximum number of concurrent workers
+// calculateMaxConcurrentWorkers calculates the maximum number of concurrent workers (delegates to asynccheck)
 func calculateMaxConcurrentWorkers(numKinds int) int {
-	maxConcurrent := runtime.NumCPU() * 2
-	if maxConcurrent > numKinds {
-		maxConcurrent = numKinds
-	}
-	if maxConcurrent < 1 {
-		maxConcurrent = 1
-	}
-	return maxConcurrent
+	return asynccheck.CalculateMaxConcurrentWorkers(numKinds)
 }
 
 // processKindForDiscovery processes a single kind for object discovery
@@ -133,61 +126,17 @@ func processKindForDiscovery(projectRoot, kind string, targetIDs []string, logge
 	return nil
 }
 
-// filterFilesByIDs filters files by target IDs
+// filterFilesByIDs filters files by target IDs (delegates to asynccheck)
 func filterFilesByIDs(files []scannedFile, targetIDs []string) []scannedFile {
-	filtered := make([]scannedFile, 0, len(files))
-	for _, file := range files {
-		for _, id := range targetIDs {
-			if file.ObjectID == id {
-				filtered = append(filtered, file)
-				break
-			}
-		}
-	}
-	return filtered
+	return asynccheck.FilterFilesByIDs(files, targetIDs)
 }
 
-// collectDiscoveryResults collects results from the files channel
+// collectDiscoveryResults collects results from the files channel (delegates to asynccheck)
 func collectDiscoveryResults(filesChan <-chan []scannedFile) []scannedFile {
-	var allFiles []scannedFile
-	for files := range filesChan {
-		allFiles = append(allFiles, files...)
-	}
-	return allFiles
+	return asynccheck.CollectDiscoveryResults(filesChan)
 }
 
-// deduplicateFilesByObjectID removes duplicate files that have the same object ID
-// When multiple files have the same object ID, we keep the first one encountered
-// This prevents processing the same object multiple times, which was causing
-// massive duplicate work (e.g., AUD-25803 appearing 682 times)
+// deduplicateFilesByObjectID removes duplicate files that have the same object ID (delegates to asynccheck)
 func deduplicateFilesByObjectID(files []scannedFile, logger logging.Logger) []scannedFile {
-	if len(files) == 0 {
-		return files
-	}
-
-	// Map to track which object IDs we've seen
-	seen := make(map[string]bool)
-	deduplicated := make([]scannedFile, 0, len(files))
-	duplicateCount := 0
-
-	for _, file := range files {
-		if seen[file.ObjectID] {
-			duplicateCount++
-			// Skip duplicate - no need to log each one individually
-			// Summary is logged below
-			continue
-		}
-		seen[file.ObjectID] = true
-		deduplicated = append(deduplicated, file)
-	}
-
-	if duplicateCount > 0 {
-		logging.Fluent(logger).Info("Deduplicated files by object ID").
-			Int("original_count", len(files)).
-			Int("deduplicated_count", len(deduplicated)).
-			Int("duplicates_removed", duplicateCount).
-			Log()
-	}
-
-	return deduplicated
+	return asynccheck.DeduplicateFilesByObjectID(files, logger)
 }

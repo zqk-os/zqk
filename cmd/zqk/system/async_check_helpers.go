@@ -26,6 +26,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/pipeline"
 	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/systemcheck/asynccheck"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/validation"
 	"github.com/zqk-os/zqk/pkg/when"
@@ -981,57 +982,11 @@ func discoverAndEnqueueObjectsImpl(checkCtx *AsyncCheckContext) error {
 // --refresh-cache (which rebuilds the object-id cache, not validation state) and only
 // --clear-cache clears it.
 func isTransientCacheCoherenceIssue(category string) bool {
-	return category == categoryCacheLag || category == categoryCacheCoherence
+	return asynccheck.IsTransientCacheCoherenceIssue(category)
 }
 
 func shouldUseCachedState(objectID, filePath string, state *validation.ValidationState, bypassCacheWithIssues bool) bool {
-	if state == nil {
-		return false
-	}
-	if bypassCacheWithIssues && len(state.Issues) > 0 {
-		return false
-	}
-	effectiveKind := inferKindFromID(objectID)
-	if effectiveKind != emptyValue && state.ObjectKind != effectiveKind {
-		return false
-	}
-	if state.FilePath != "" && filePath != "" && filepath.Clean(state.FilePath) != filepath.Clean(filePath) {
-		return false
-	}
-	info, err := fileutil.Stat(filePath)
-	if err != nil || info.ModTime().After(state.LastValidated) {
-		return false
-	}
-	for _, issue := range state.Issues {
-		if issue.Category == "integrity" {
-			return false
-		}
-		// Tier-1 instance_validation can be poisoned by fail-closed lookups (e.g.
-		// DependentsLookup nil → false "complete PRI children not terminal"). Never
-		// treat those as permanent hits; revalidate so a fixed binary self-heals
-		// without requiring --clear-cache every time.
-		if issue.Tier == 1 && issue.Category == "instance_validation" {
-			return false
-		}
-		// Same for budget timeouts / validation_error Tier-1 — never permanent hits.
-		if issue.Tier == 1 && (issue.Category == "validation_error" || issue.Category == "validation_timeout" ||
-			strings.Contains(issue.Message, "validation timeout after")) {
-			return false
-		}
-		// GhostRef is a cache-miss + Exists-false verdict at validation time, not a
-		// property of the referrer file. After object-id-cache refresh (or a peer
-		// restoring the target), the referrer mtime is unchanged so these must not
-		// replay as cache hits.
-		if issue.Tier == 1 && issue.Category == categoryGhostRef {
-			return false
-		}
-		// Cache-coherence noise written by an older binary: revalidate so the entry is
-		// rewritten without it instead of replaying until --clear-cache.
-		if isTransientCacheCoherenceIssue(issue.Category) {
-			return false
-		}
-	}
-	return true
+	return asynccheck.ShouldUseCachedState(objectID, filePath, state, bypassCacheWithIssues)
 }
 
 // enqueueOrUseCache either records a cache hit or enqueues the file for validation.
