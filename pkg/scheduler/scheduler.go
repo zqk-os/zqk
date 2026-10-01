@@ -328,6 +328,35 @@ func (j *ScheduledJob) IsRunning() bool {
 	return j.Running
 }
 
+// BindExecutionContext stores the context and cancel for the run in progress.
+// The caller holds RunningMu. Composition roots use this instead of the unexported fields.
+func (j *ScheduledJob) BindExecutionContext(ctx context.Context, cancel context.CancelFunc) {
+	if j == nil {
+		return
+	}
+	j.executionCtx = ctx
+	j.executionCancel = cancel
+}
+
+// ClearExecutionContext drops the stored context and cancel.
+// The caller holds RunningMu.
+func (j *ScheduledJob) ClearExecutionContext() {
+	if j == nil {
+		return
+	}
+	j.executionCtx = nil
+	j.executionCancel = nil
+}
+
+// ExecutionCancel returns the cancel function for the run in progress.
+// The caller holds RunningMu.
+func (j *ScheduledJob) ExecutionCancel() context.CancelFunc {
+	if j == nil {
+		return nil
+	}
+	return j.executionCancel
+}
+
 // NewScheduler creates a new scheduler instance
 func NewScheduler(storage storagepkg.ObjectStorageProvider, specLoader *objects.SpecLoader, lifecycleLoader *objects.LifecycleLoader) SchedulerInterface {
 	return NewSchedulerWithProjectRoot(storage, specLoader, lifecycleLoader, "", nil)

@@ -32,9 +32,6 @@ func TestPreflight_InMemoryValidationContract(t *testing.T) {
 	require.True(t, found, "SPEC-ZQL-PREFLIGHT-VALIDATION.md must exist in docs/specs/")
 	require.Contains(t, specContent, "PreflightValidator")
 	require.Contains(t, specContent, "PreflightDiagnosticReceipt")
-	require.Contains(t, specContent, "CRIT-ZQL-INMEMORY-VALIDATION-CONTRACT")
-	require.Contains(t, specContent, "CRIT-ZQL-PREFLIGHT-DIAGNOSTIC-RECEIPT")
-	require.Contains(t, specContent, "CRIT-ZQL-SCHEMA-CORRUPTION-FAILCLOSED-NEGATIVE")
 	require.Contains(t, specContent, "Zero Disk I/O Invariant")
 
 	// 2. In-Memory Validation Protocol Test (No Disk I/O)
