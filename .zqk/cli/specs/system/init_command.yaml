@@ -1,0 +1,81 @@
+$schema: ../_schemas/command_spec.schema.json
+name: init
+short: Initialize a new ZQK project
+description: |-
+  Initialize a new ZQK project in the current directory.
+
+  Supports three initialization scenarios:
+    1. Greenfield: Brand new project (default)
+    2. Legacy: Existing project being brought under ZQK management
+    3. Snapshot: Initialize from snapshot data (test scenarios)
+
+  This command creates the necessary directory structure and configuration files
+  for a new ZQK project. It sets up:
+    - .zqk/ directory for configuration and state
+    - .zqk/process/ directory structure for object storage
+    - Initial configuration files
+args:
+  type: no_args
+flags:
+  - name: advanced
+    type: bool
+    default: false
+    description: Initialize with an advanced, ontology-aware interface (Semantic Bridge Phase 1)
+  - name: answer-file
+    type: string
+    description: Declarative kernel seed answer file (.yaml or .json) for non-interactive swarm spawn
+  - name: discover
+    type: bool
+    default: false
+    description: Run the interactive Project Discovery Wizard to capture strategic context, stakeholders, and important dates. If --legacy is provided, it will instead scan and report existing objects.
+  - name: force
+    type: bool
+    default: false
+    description: Overwrite existing files
+  - name: from-snapshot
+    type: string
+    description: Initialize from snapshot file (.csnap or .json)
+  - name: import-ontology
+    type: string
+    description: Import an external ontology during initialization (requires --advanced)
+  - name: legacy
+    type: bool
+    default: false
+    description: Legacy project mode (preserve existing files)
+  - name: merge
+    type: bool
+    default: false
+    description: Merge snapshot data with existing (snapshot mode only)
+  - name: project-name
+    type: string
+    description: Project name (defaults to directory name)
+  - name: simple
+    type: bool
+    default: false
+    description: Initialize with a simple, guided interface (Semantic Bridge Phase 1)
+  - name: template
+    type: string
+    default: standard
+    description: Template to use (standard, minimal)
+  - name: wipe
+    type: bool
+    default: false
+    description: Wipe existing data before restoring snapshot (requires --force)
+  - name: with-maintenance-jobs
+    type: bool
+    default: false
+    description: After init, ensure retention and audit-aggregation scheduler jobs exist (same as running 'zqk system ensure-retention-jobs'). Puts the project in optimal maintenance configuration.
+  - name: with-onboarding-roadmap
+    type: bool
+    default: false
+    description: After init, create the onboarding roadmap seed scheduler job. Start the scheduler to run it once and create the priority plan, workstream, and backlog items.
+help:
+  examples:
+    - comment: Greenfield initialize in current directory
+      command: '%s system init'
+    - comment: Declarative seed with answer file
+      command: '%s system init --answer-file seed.yaml'
+    - comment: Legacy existing project initialization
+      command: '%s system init --legacy'
+run_e: runInit
+common_flags: true
