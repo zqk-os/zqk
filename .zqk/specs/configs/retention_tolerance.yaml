@@ -1,14 +1,26 @@
 kinds:
   audit_event:
-    max_count: 5
+    archive_after: "72h"
+    cleanup_after: "168h"
+    max_count: 1000
     protect_statuses: ["pending"]
   change_journal_entry:
-    archive_after: "0"
-    cleanup_after: "72h"
-    max_count: 200
+    archive_after: "24h"
+    cleanup_after: "168h"
+    max_count: 1000
     protect_statuses: []
   zqk_session:
-    archive_after: "0"
+    archive_after: "24h"
     cleanup_after: "168h"
-    max_count: 300
+    max_count: 500
+    protect_statuses: ["active"]
+  command_metric:
+    archive_after: "48h"
+    cleanup_after: "168h"
+    max_count: 2000
     protect_statuses: []
+  agent_instruction:
+    archive_after: "24h"
+    cleanup_after: "72h"
+    max_count: 500
+    protect_statuses: ["pending", "in_progress"]

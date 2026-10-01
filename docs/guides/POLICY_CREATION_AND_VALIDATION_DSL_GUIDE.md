@@ -4,7 +4,7 @@
 
 In a multi-agent autonomous engineering swarm, preventing regressions and architectural violations requires fail-closed governance. Rather than relying on fuzzy prompts or unverified code reviews, the **ZQK Knowledge Kernel** uses declarative, mathematically provable **Validation & Policy Rules**.
 
-Policies are written in the **Validation Rule DSL** (formalized under `SPEC-VALIDATION-RULE-DSL-GRAMMAR`), stored as first-class kernel objects in `.zqk/process/policy/`, and evaluated at:
+Policies are written in the **Validation Rule DSL** (formalized under the specification [`SPEC-VALIDATION-RULE-DSL-GRAMMAR`](../specs/SPEC-VALIDATION-RULE-DSL-GRAMMAR.md)), stored as first-class kernel objects in `.zqk/process/policy/`, and evaluated at:
 1. **Preflight**: In-memory checks during interactive authoring and ZQL mutation planning.
 2. **Pre-Commit**: Armed git pre-commit check-valves blocking non-compliant local commits.
 3. **Continuous Execution**: `zqk do` and scheduler loops guarding state transitions.

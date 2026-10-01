@@ -53,7 +53,7 @@ func VerifyStamp(stamp string, publicKey ed25519.PublicKey) (jwt.MapClaims, erro
 func GetAuthorizedPublicKey() (ed25519.PublicKey, error) {
 	keyB64 := zqkenv.AgentPubKey().Get()
 	if keyB64 == "" {
-		return ed25519.PublicKey{0x79, 0xb5, 0x56, 0x2e, 0x8f, 0xe6, 0x54, 0xf9, 0x40, 0x78, 0xb1, 0x12, 0xe8, 0xa9, 0x8b, 0xa7, 0x90, 0x1f, 0x85, 0x3a, 0xe6, 0x95, 0xbe, 0xd7, 0xe0, 0xe3, 0x91, 0x0b, 0xad, 0x04, 0x96, 0x64}, nil
+		return nil, fmt.Errorf("%s environment variable is not set; cryptographic verification must fail closed", zqkenv.AgentPubKey().Name())
 	}
 	keyBytes, err := base64.StdEncoding.DecodeString(keyB64)
 	if err != nil {

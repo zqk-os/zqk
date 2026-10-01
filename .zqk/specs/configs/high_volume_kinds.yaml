@@ -30,9 +30,10 @@ kinds:
     storage: stream
   - kind: code_quality_metric
     storage: stream
+    note: "Schema-registered code quality metric; reserved for static analysis integration."
   - kind: kind_mapping_metric
     storage: stream
-    note: "Extends base_metric; kind-mapping / config-load metrics."
+    note: "Schema-registered kind-mapping metric; extends base_metric for distribution telemetry."
   - kind: scheduler_health_metric
     storage: stream
   - kind: change_journal_entry
@@ -51,8 +52,8 @@ kinds:
     storage: stream
     note: "Session state; retention via retention_tolerance (max_count, cleanup_after)."
   - kind: verification_matrix
-    storage: stream
-    note: "Matrix definitions and frequent row/status updates; create→segment, updates→stream_current overlay."
+    storage: cas
+    note: "Structural traceability matrix linking requirements, criteria, and test cases; CAS-backed with standard lifecycle."
   - kind: agent_instruction
     storage: stream
     note: "Transient instructions submitted to Autonomy Inbox; retention prunes frequently."

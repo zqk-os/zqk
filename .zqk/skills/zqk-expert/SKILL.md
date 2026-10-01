@@ -34,31 +34,50 @@ Personas (e.g. `PER-DEFAULT-AGENT`, `PER-DEFAULT-OPERATOR`) link these via `agen
 **Trust / seal:** skills should be cryptographically sealed (hash + version/date + issuer) before swarm load (REQ-SYM-021). Periodic skill refresh follows kernel maintenance policies. Until seals enforce fail-closed, treat skill text as advisory against live CLI/POL objects.
 
 
-## 1. Orchestration Hygiene & Critical Sections
+## 1. High-Value Object Posture & Anti-Inflation Discipline
 
-You must execute all operations within a strict critical section to prevent race conditions.
-Structure your execution as a `try-catch-finally` block guaranteeing lock release on all paths.
+Kernel objects represent durable, version-controlled architecture assets—not ephemeral scratch notes. You must thoughtfully, scrupulously, and appropriately maximize the value and benefit of every kernel object:
 
-- **TRY:**
-  - Execute: `./bin/zqk agent claim <task_id>`
-  - IF exit_code != 0 THEN HALT and do not proceed.
-  - Append `--atomic --skip-parallel` to EVERY state-altering command you execute.
-- **CATCH (Exception/Failure):**
-  - IF any step fails, force lock release AND propagate failure.
-- **FINALLY:**
-  - ALWAYS execute lock release: `./bin/zqk agent release <task_id>`
+- **Strict Prohibition of 1:1 Object Inflation**: Never create a 1:1 constellation of every object kind (1 goal → 1 milestone → 1 workstream → 1 plan → 1 BLI → 1 REQ → 1 CRIT → 1 TC) for minor tasks. That produces epistemic bloat, high ceremony, and negative adoption.
+- **Appropriate Altitude & Grouping**:
+  - `goal` & `milestone`: Anchors major strategic initiatives and deliverables.
+  - `priority_plan` (`PRI-*`): Groups a cohesive, deliverable capability or architectural phase.
+  - `backlog_item` (`BLI-*`): Encapsulates an end-to-end unit of real engineering value. Cluster findings and related refactors (target ratio: ≥ 5:1 findings-to-BLI).
+  - `criteria` (`CRIT-*`): Defines the objective, verifiable Definition of Done boundary for the backlog item, not trivial line-by-line micro-tasks.
+  - `test_case` (`TC-*`): Re-runnable, automated specification tests.
 
-## 2. Fail-Closed Compliance
+## 2. Low-Friction Execution: The Single-Command Loop (`zqk do`)
 
-You must enforce strict fail-closed operations.
-- IF any command returns a non-zero exit code, "command not found", "timeout", or "network unreachable", THEN emit an explicit JSON failure payload to stderr AND HALT.
-- Standardize the error payload across all failure branches: `{"status": "FAIL_CLOSED", "cause": "<specific_cause>", "context": "<command_executed>"}`.
-- Narrative fallbacks are strictly FORBIDDEN. Never guess, assume completion, or hallucinate recovery logic for schema/validation failures.
+Prefer the modern, low-friction single-command execution pipeline over archaic multi-step manual ceremony:
 
-## 3. Kernel Traceability & Deterministic Checks
+```bash
+# Execute intent atomically with automated preflight, locking, execution, and verification
+zqk do "implement BLI-101: add criteria validation check-valves"
+```
 
-- **Deterministic Evaluation**: Before claiming success on any kernel object mutation, you MUST run deterministic checks. For example, execute `make verify` and ensure the exit code is 0.
-- **Event-Driven Traceability**: Shift from in-place mutation to event-driven logging where applicable. Update kernel objects via the CLI and ALWAYS use `--version <current>+1` to prevent race conditions. Ensure any changes trigger the appropriate CAS updates (`.zqk/cas-index.json`).
+`zqk do` automatically enforces the complete 5-phase execution engine:
+1. **Intent Resolution**: Resolves target objects and dependencies.
+2. **Preflight**: Validates git hygiene, locks, and active policies.
+3. **Lock Lease**: Acquires atomic leases in `.zqk/lock/` with automatic heartbeat protection.
+4. **Action Execution**: Stages mutations and intercepts execution telemetry.
+5. **Verification**: Executes `zqk-vet`, runs tests, validates CAS hashes, and rolls back atomically on failure.
+
+For manual/scripted operations where `zqk do` is not used, wrap work in strict critical sections:
+- Acquire lock: `./bin/zqk agent claim <task_id>`
+- Execute with `--atomic --skip-parallel`
+- On error: force lock release and propagate failure.
+- Finally: `./bin/zqk agent release <task_id>`
+
+## 3. Fail-Closed Compliance & Deterministic Checks
+
+- **Deterministic Evaluation**: Before claiming success on any kernel object mutation, you MUST run deterministic checks (e.g. `zqk test run --all` or `make verify` with exit code 0). Narrative assertions or chat claims of completion are strictly forbidden.
+- **Fail-Closed Operations**: If any command returns a non-zero exit code, timeout, or validation error, emit an explicit JSON failure payload and halt: `{"status": "FAIL_CLOSED", "cause": "<specific_cause>", "context": "<command_executed>"}`.
+- **Modern Ergonomic Primitives**: Always prefer the most capable, low-friction tooling:
+  - `zqk do`: Autonomous execution loop.
+  - `zqk workflow whats-next`: Next priority plan & convergence resolution.
+  - `zqk grep`: Sub-15ms Go AST and trigram code search.
+  - `zqk intake`: Direct semantic requirement intake.
+
 ## Session boot (do this first)
 
 ```bash

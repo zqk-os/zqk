@@ -16,7 +16,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	scsfacade "github.com/zqk-os/zqk/ext/facade/scs"
+	gitpkg "github.com/zqk-os/zqk/pkg/git"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
@@ -265,7 +265,7 @@ func generateBranchName(planID string) string {
 
 // ensureBranch ensures we're on the correct branch, creating it if needed
 func ensureBranch(projectRoot, expectedBranch string, logger *logging.EventLogger, dryRun bool) error {
-	gf := scsfacade.New(projectRoot)
+	gf := gitpkg.NewFacade(projectRoot)
 	// Get current branch
 	currentBranch, err := gf.CurrentBranch()
 	if err != nil {
@@ -324,7 +324,7 @@ func ensureBranch(projectRoot, expectedBranch string, logger *logging.EventLogge
 
 // gitStage stages all changes
 func gitStage(cmd *cobra.Command, projectRoot string, logger *logging.EventLogger, dryRun bool) error {
-	gf := scsfacade.New(projectRoot)
+	gf := gitpkg.NewFacade(projectRoot)
 	if dryRun {
 		// Show what would be staged
 		output, err := gf.StatusShort()
@@ -373,7 +373,7 @@ func generateCommitMessage(projectRoot string, _ storage.ObjectStorageProvider, 
 
 // gitCommit commits staged changes
 func gitCommit(cmd *cobra.Command, projectRoot, message string, logger *logging.EventLogger, dryRun bool) error {
-	gf := scsfacade.New(projectRoot)
+	gf := gitpkg.NewFacade(projectRoot)
 	if dryRun {
 		// Show what would be committed
 		output, err := gf.DiffCachedStat()
@@ -406,7 +406,7 @@ func gitCommit(cmd *cobra.Command, projectRoot, message string, logger *logging.
 }
 
 func gitPull(projectRoot string, verify bool, logger *logging.EventLogger, dryRun bool) error {
-	gf := scsfacade.New(projectRoot)
+	gf := gitpkg.NewFacade(projectRoot)
 	// Get current branch name
 	currentBranch, err := gf.CurrentBranch()
 	if err != nil {
@@ -443,7 +443,7 @@ func gitPull(projectRoot string, verify bool, logger *logging.EventLogger, dryRu
 }
 
 func gitPush(cmd *cobra.Command, projectRoot string, verify bool, logger *logging.EventLogger, dryRun bool) error {
-	gf := scsfacade.New(projectRoot)
+	gf := gitpkg.NewFacade(projectRoot)
 	// Get current branch name
 	currentBranch, err := gf.CurrentBranch()
 	if err != nil {
@@ -628,7 +628,7 @@ func parseTableOutput(output string, logger *logging.EventLogger) error {
 
 // detectGitHostingPlatform detects whether the repository is hosted on GitHub or GitLab
 func detectGitHostingPlatform(projectRoot string) (string, error) {
-	gf := scsfacade.New(projectRoot)
+	gf := gitpkg.NewFacade(projectRoot)
 	remoteURL, err := gf.OriginURL()
 	if err != nil {
 		return "", errfmt.Newf("failed to get remote URL").Wrap(err)
