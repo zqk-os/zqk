@@ -1,3 +1,5 @@
+# Canonical Domain Command Mapping & Ergonomic Shortcuts
+
 <!-- tags: cli, commands, taxonomy, ergonomics, domain-mapping, shortcuts -->
 
 This architectural specification details the relationship between ZQK's canonical domain command taxonomy (strict noun-verb hierarchy) and high-frequency root ergonomic shortcuts (`zqk do`, `zqk inspect`, `zqk mutate`).
