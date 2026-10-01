@@ -15,6 +15,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | Package | Import Path | Files | Tests | Subpackages | README | Description |
 |---------|-------------|-------|-------|-------------|--------|-------------|
 | [accumulator](./accumulator/) | `github.com/zqk-os/zqk/pkg/accumulator` | 4+2 | 2 | - | ❌ - | Aggregation and time-windowed rollups for execution metrics, status events, and telemetry. |
+| [acronyms](./acronyms/) | `github.com/zqk-os/zqk/pkg/acronyms` | 1+1 | 1 | - | ❌ - | Acronyms component and domain abstractions for ZQK Core. |
 | [adapters](./adapters/) | `github.com/zqk-os/zqk/pkg/adapters` | 4+1 | 1 | antigravity, gemini, +6 more | ❌ - | The vendor-neutral factory for host/IDE message delivery. Kernel code depends on [MessageDelivery] and [Resolve] only. Concrete... |
 | [agent](./agent/) | `github.com/zqk-os/zqk/pkg/agent` | 1+1 | 1 | - | ❌ - | Cryptographic utilities, key management, and security identity primitives for agents. |
 | [agentclaim](./agentclaim/) | `github.com/zqk-os/zqk/pkg/agentclaim` | 6+8 | 8 | - | ❌ - | Agent work claiming, cadence check-ins, lease acquisition, and write gating. |
@@ -192,7 +193,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [swarm](./swarm/) | `github.com/zqk-os/zqk/pkg/swarm` | 17+18 | 18 | metabolism, pack, remote | ❌ - | Multi-agent swarm coordination, task allocation, and consensus protocols. |
 | [swarminit](./swarminit/) | `github.com/zqk-os/zqk/pkg/swarminit` | 6+7 | 7 | - | ❌ - | Runs configurable mesh bring-up recipes stored as kernel pipeline (PIP-*) objects. It is a mesh ops runner, not the kernel CAS... |
 | [system](./system/) | `github.com/zqk-os/zqk/pkg/system` | 1+1 | 1 | - | ❌ - | System-level diagnostics, host environment inspection, and OS capabilities. |
-| [systemcheck](./systemcheck/) | `github.com/zqk-os/zqk/pkg/systemcheck` | 5+3 | 3 | policy | ❌ - | Holds shared types and helpers for zqk system check / validation surfaces that used to live only in cmd/zqk/system (F-ARCH-001)... |
+| [systemcheck](./systemcheck/) | `github.com/zqk-os/zqk/pkg/systemcheck` | 6+4 | 4 | policy | ❌ - | Holds shared types and helpers for zqk system check / validation surfaces that used to live only in cmd/zqk/system (F-ARCH-001)... |
 | [systemcheckwake](./systemcheckwake/) | `github.com/zqk-os/zqk/pkg/systemcheckwake` | 1+2 | 2 | - | ❌ - | Evaluates system-check summaries and optionally wakes a mesh seat. Opt-in only via `zqk system check --notify [agent-id]` — nev... |
 | [systempeel](./systempeel/) | `github.com/zqk-os/zqk/pkg/systempeel` | 1+1 | 1 | - | ❌ - | Layered system abstraction peeling and kernel introspection tools. |
 | [tde](./tde/) | `github.com/zqk-os/zqk/pkg/tde` | 5+4 | 4 | - | ❌ - | Tde component and domain abstractions for ZQK Core. |
@@ -201,7 +202,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [testdiscovery](./testdiscovery/) | `github.com/zqk-os/zqk/pkg/testdiscovery` | 7+8 | 8 | - | ❌ - | Import ( "context" "os" "path/filepath" "strings" "testing" "time" "github.com/zqk-os/zqk/pkg/objects" "github.com/zqk-os/zqk/p... |
 | [testenvroot](./testenvroot/) | `github.com/zqk-os/zqk/pkg/testenvroot` | 4+5 | 5 | - | ❌ - | A minimal test project layout (.zqk/process + test-settings) without importing pkg/testing (import-cycle hygiene for packages l... |
 | [testing](./testing/) | `github.com/zqk-os/zqk/pkg/testing` | 11+1 | 1 | - | ✅ [README](./testing/README.md) | This package provides test configuration support to isolate test data from actual project data. |
-| [testkit](./testkit/) | `github.com/zqk-os/zqk/pkg/testkit` | 18+14 | 14 | dummy_policy | ❌ - | Reusable test helpers intended for extraction into a shared Go testing library later. It composes storage/CAS/audit teardown us... |
+| [testkit](./testkit/) | `github.com/zqk-os/zqk/pkg/testkit` | 18+18 | 18 | dummy_policy | ❌ - | Reusable test helpers intended for extraction into a shared Go testing library later. It composes storage/CAS/audit teardown us... |
 | [testrunner](./testrunner/) | `github.com/zqk-os/zqk/pkg/testrunner` | 6+7 | 7 | - | ❌ - | Automated test runner execution, timeout management, and report generation. |
 | [testservices](./testservices/) | `github.com/zqk-os/zqk/pkg/testservices` | 1+3 | 3 | - | ❌ - | Manages optional test-side services (e.g. MemGraph via Docker) without pulling in the full pkg/testing surface. p |
 | [tpm](./tpm/) | `github.com/zqk-os/zqk/pkg/tpm` | 1+2 | 2 | - | ❌ - | Technical Program Management scheduling, Gantt tracking, and priority plans. |
@@ -210,6 +211,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [transport](./transport/) | `github.com/zqk-os/zqk/pkg/transport` | 3+4 | 4 | - | ❌ - | Transport component and domain abstractions for ZQK Core. |
 | [traversal](./traversal/) | `github.com/zqk-os/zqk/pkg/traversal` | 5+6 | 6 | - | ❌ - | Knowledge graph traversal algorithms, depth-bounded search, and cycle detection. |
 | [tray](./tray/) | `github.com/zqk-os/zqk/pkg/tray` | 3+3 | 3 | - | ❌ - | Loads named shortcuts ("Tray") that expand to zqk argv lists. Default entries are embedded; merge with .zqk/tray.yaml (see Load... |
+| [tui](./tui/) | `github.com/zqk-os/zqk/pkg/tui` | 4+1 | 1 | tds | ❌ - | Tui component and domain abstractions for ZQK Core. |
 | [utils](./utils/) | `github.com/zqk-os/zqk/pkg/utils` | 0+0 | 0 | chunking, fileutil, +3 more | ❌ - | Generic cross-cutting utility functions and data structures. |
 | [validation](./validation/) | `github.com/zqk-os/zqk/pkg/validation` | 67+98 | 98 | qa, scenario | ✅ [README](./validation/README.md) | This package provides object validation for zqk: instance validation (schema, lifecycle, semantic types), ID validation (prefix... |
 | [vds](./vds/) | `github.com/zqk-os/zqk/pkg/vds` | 10+6 | 6 | - | ❌ - | Verifiable Decomposition Spine (VDS) verification, traceability, and done-gates. |
@@ -234,6 +236,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 ```
 pkg/
 ├── accumulator/          # Aggregation and time-windowed rollups for execution metrics,
+├── acronyms/          # Acronyms component and domain abstractions for ZQK Core.
 ├── adapters/          # The vendor-neutral factory for host/IDE message delivery. Ke
 │   └── antigravity/
 │   └── gemini/
@@ -552,6 +555,8 @@ pkg/
 ├── transport/          # Transport component and domain abstractions for ZQK Core.
 ├── traversal/          # Knowledge graph traversal algorithms, depth-bounded search, 
 ├── tray/          # Loads named shortcuts ("Tray") that expand to zqk argv lists
+├── tui/          # Tui component and domain abstractions for ZQK Core.
+│   └── tds/
 ├── utils/          # Generic cross-cutting utility functions and data structures.
 │   └── chunking/
 │   └── fileutil/
