@@ -69,14 +69,18 @@ func runObjectCountReport(cmd *cobra.Command, args []string) error {
 
 func runObjectCountReportImpl(cmd *cobra.Command, _ []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, _ []string, proc *cli.Processor) error {
-		outputPath, _ := cmd.Flags().GetString("report-file")
-		emitEvents, _ := cmd.Flags().GetBool("emit-events")
-		includeInternal, _ := cmd.Flags().GetBool("include-internal")
-		disparityThreshold, _ := cmd.Flags().GetInt("disparity-threshold")
-		noCache, _ := cmd.Flags().GetBool("no-cache")
-		includeFilesystemSnapshot, _ := cmd.Flags().GetBool("include-filesystem-snapshot")
-		filesystemSnapshotScopeStr, _ := cmd.Flags().GetString("filesystem-snapshot-scope")
-		retentionDays, _ := cmd.Flags().GetInt("metrics-chunk-retention-days")
+		var flags clipkg.FlagBag
+		outputPath := flags.String(cmd, "report-file")
+		emitEvents := flags.Bool(cmd, "emit-events")
+		includeInternal := flags.Bool(cmd, "include-internal")
+		disparityThreshold := flags.Int(cmd, "disparity-threshold")
+		noCache := flags.Bool(cmd, "no-cache")
+		includeFilesystemSnapshot := flags.Bool(cmd, "include-filesystem-snapshot")
+		filesystemSnapshotScopeStr := flags.String(cmd, "filesystem-snapshot-scope")
+		retentionDays := flags.Int(cmd, "metrics-chunk-retention-days")
+		if err := flags.Err(); err != nil {
+			return err
+		}
 
 		projectRoot := ""
 		if cliCtx := cli.GetContext(cmd); cliCtx != nil {

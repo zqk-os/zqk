@@ -22,11 +22,7 @@ func WriteReportFile(path string, report *operational.CongruenceReport, cacheSta
 	}
 	defer f.Close()
 
-	fmt.Fprintf(f, "=== Object count report ===\n")
-	fmt.Fprintf(f, "generated: %s\n", report.GeneratedAt.Format(time.RFC3339))
-	fmt.Fprintf(f, "project_root: %s\n", report.ProjectRoot)
-	fmt.Fprintf(f, "output: %s\n\n", path)
-
+	writeReportHeader(f, path, report)
 	writeCacheStatusSection(f, cacheStatus)
 	fmt.Fprintf(f, "\n")
 
@@ -35,6 +31,20 @@ func WriteReportFile(path string, report *operational.CongruenceReport, cacheSta
 		fmt.Fprintf(f, "\n")
 	}
 
+	writeReportCounts(f, report)
+	writeReportDisparities(f, report)
+	writeReportAlertsAndSnapshots(f, report, fsSnap)
+	return nil
+}
+
+func writeReportHeader(f *fileutil.File, path string, report *operational.CongruenceReport) {
+	fmt.Fprintf(f, "=== Object count report ===\n")
+	fmt.Fprintf(f, "generated: %s\n", report.GeneratedAt.Format(time.RFC3339))
+	fmt.Fprintf(f, "project_root: %s\n", report.ProjectRoot)
+	fmt.Fprintf(f, "output: %s\n\n", path)
+}
+
+func writeReportCounts(f *fileutil.File, report *operational.CongruenceReport) {
 	if len(report.StrayDirs) > 0 {
 		fmt.Fprintf(f, "--- Stray process dirs (unmapped) ---\n")
 		for _, d := range report.StrayDirs {
@@ -87,8 +97,15 @@ func WriteReportFile(path string, report *operational.CongruenceReport, cacheSta
 		}
 		fmt.Fprintf(f, "\n")
 	}
+}
 
+func writeReportDisparities(f *fileutil.File, report *operational.CongruenceReport) {
 	fmt.Fprintf(f, "--- Disparity by dir (disk - object) ---\n")
+	var dirs []string
+	for d := range report.DiskCountByDir {
+		dirs = append(dirs, d)
+	}
+	sort.Strings(dirs)
 	for _, d := range dirs {
 		disp := report.DisparityByDir[d]
 		fmt.Fprintf(f, "  %s: %d\n", d, disp)
@@ -118,7 +135,9 @@ func WriteReportFile(path string, report *operational.CongruenceReport, cacheSta
 		fmt.Fprintf(f, "           scripts/delete_unmanaged_audit_yaml.py --execute  (audit/metrics)\n")
 		fmt.Fprintf(f, "\n")
 	}
+}
 
+func writeReportAlertsAndSnapshots(f *fileutil.File, report *operational.CongruenceReport, fsSnap *operational.FilesystemProjectSnapshot) {
 	if len(report.Alerts) > 0 {
 		fmt.Fprintf(f, "--- Alerts ---\n")
 		for _, a := range report.Alerts {
@@ -135,7 +154,6 @@ func WriteReportFile(path string, report *operational.CongruenceReport, cacheSta
 		fmt.Fprintf(f, "  Stream-backed dirs (object count from stream): legacy YAML in %s/<dir> is not the source of truth;\n", paths.ProcessDir)
 		fmt.Fprintf(f, "  you may prune legacy files or leave them; see %s.\n", filepath.Join(paths.DocsDir, "architecture", "HIGH_VOLUME_STORAGE_DEPRECATION.md"))
 	}
-	return nil
 }
 
 func hasIntegrityFindings(integrity ProcessIntegrity) bool {
@@ -213,17 +231,18 @@ func writeInterpretation(f *fileutil.File, report *operational.CongruenceReport)
 		fmt.Fprintf(f, "  See %s and %s.\n", filepath.Join(paths.DocsDir, "architecture", "OBJECT_COUNT_SELF_MAINTENANCE.md"), filepath.Join(paths.ProcessDir, "observability", "OBJECT_COUNT_MANAGEMENT.md"))
 	}
 	gap := report.TotalObject - report.TotalDisk
-	if gap > 1000 {
+	switch {
+	case gap > 1000:
 		fmt.Fprintf(f, "  Large gap (total_object - total_disk = %d): usually CAS index bloat or stream-backed counts.\n", gap)
 		fmt.Fprintf(f, "  Dirs like metrics/ and audit/ have stream-backed kinds (object from stream); disk is legacy YAML.\n")
 		fmt.Fprintf(f, "  If not stream-backed: when files are pruned/aggregated, index entries may not be removed. Run CAS\n")
 		fmt.Fprintf(f, "  reconcile or ensure retention/aggregation removes index entries when deleting files.\n")
-	} else if gap < -1000 {
+	case gap < -1000:
 		fmt.Fprintf(f, "  Large gap (total_disk - total_object = %d): more files than index/stream entries.\n", -gap)
 		fmt.Fprintf(f, "  If you recently deleted files manually (e.g. rm), object count may be from stale cache;\n")
 		fmt.Fprintf(f, "%s", paths.RewriteCanonicalCLIInvocations("  run 'zqk system check' to refresh caches and CAS indexes, or use --no-cache for this report.\n"))
 		fmt.Fprintf(f, "  Otherwise run CAS reconcile to repopulate indexes from disk, or investigate orphans.\n")
-	} else {
+	default:
 		fmt.Fprintf(f, "  Small gap between total_object and total_disk is normal (e.g. _internal, multi-object YAML, stream-backed legacy dirs).\n")
 	}
 	if d := report.DisparityByDir[StreamDirAudit]; d > 5000 {
@@ -302,8 +321,10 @@ func UpdateReportsIndex(reportDir, jsonPath string, report *operational.Congruen
 	}
 	indexPath := filepath.Join(reportDir, paths.ReportsIndexFile)
 	var index ObjectCountReportsIndex
-	if data, err := fileutil.ReadFile(indexPath); err == nil {
-		_ = json.Unmarshal(data, &index)
+	if data, readErr := fileutil.ReadFile(indexPath); readErr == nil {
+		if unmarshalErr := json.Unmarshal(data, &index); unmarshalErr != nil {
+			// Best-effort index recovery
+		}
 	}
 	index.Latest = &entry
 	newReports := make([]ObjectCountReportEntry, 0, len(index.Reports)+1)

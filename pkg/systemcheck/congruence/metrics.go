@@ -46,7 +46,9 @@ func RecordObjectVolumeMetrics(projectRoot string, report *operational.Congruenc
 				Kind(kind).
 				WithError(err).
 				Log()
-			_ = w.Close()
+			if closeErr := w.Close(); closeErr != nil {
+				logging.Fluent(logger).Debug("Object volume metrics: close after append failure failed").WithError(closeErr).Log()
+			}
 			continue
 		}
 		if err := w.Close(); err != nil {
@@ -97,7 +99,9 @@ func RecordStreamVolumeMetrics(projectRoot string, logger logging.Logger, retent
 				Kind(kind).
 				WithError(err).
 				Log()
-			_ = w.Close()
+			if closeErr := w.Close(); closeErr != nil {
+				logging.Fluent(logger).Debug("Stream volume metrics: close after append failure failed").WithError(closeErr).Log()
+			}
 			continue
 		}
 		if err := w.Close(); err != nil {
@@ -140,7 +144,9 @@ func RecordFilesystemSnapshotMetrics(projectRoot string, snap *operational.Files
 				String("series", series).
 				WithError(err).
 				Log()
-			_ = w.Close()
+			if closeErr := w.Close(); closeErr != nil {
+				logging.Fluent(logger).Debug("Filesystem snapshot metrics: close after append failure failed").WithError(closeErr).Log()
+			}
 			return
 		}
 		if err := w.Close(); err != nil {

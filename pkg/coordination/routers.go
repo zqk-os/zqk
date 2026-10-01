@@ -33,6 +33,11 @@ func NewStorageAuditRouter(projectRoot string, storageProvider storage.ObjectSto
 	}
 }
 
+// AuditRouter creates an audit router that uses storage.CreateAuditEventWithBuilder.
+func AuditRouter(projectRoot string, storageProvider storage.ObjectStorageProvider) *StorageAuditRouter {
+	return NewStorageAuditRouter(projectRoot, storageProvider)
+}
+
 // SetCallback sets an optional callback function to be called when audit events are created
 // This is useful for test verification and monitoring async operations
 func (r *StorageAuditRouter) SetCallback(callback AuditEventCallback) {

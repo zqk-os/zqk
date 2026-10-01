@@ -32,6 +32,57 @@ func RunCongruence(ctx context.Context, projectRoot string, storageProvider stor
 		secCtx = pkgctx.NewSystemSecurityContext()
 	}
 
+	report, streamDirs, err := executeCongruenceAnalysis(ctx, projectRoot, storageProvider, secCtx, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	reportDir, textPath, jsonPath, err := prepareReportPaths(projectRoot, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	cacheStatus := GatherCacheStatus(projectRoot)
+	integrity := scanIntegrityConcurrently(projectRoot, streamDirs)
+	fsProjectSnap := captureFilesystemSnapshot(ctx, projectRoot, opts)
+
+	appendCongruenceAlerts(report, integrity)
+
+	if err := WriteReportFile(textPath, report, cacheStatus, integrity, fsProjectSnap); err != nil {
+		return nil, errfmt.Newf("write report").Wrap(err)
+	}
+
+	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+	logging.Fluent(logger).Info("Object count report written").
+		String("path", textPath).
+		Int("total_disk", report.TotalDisk).
+		Int("total_object", report.TotalObject).
+		Int("alerts", len(report.Alerts)).
+		Log()
+
+	maybeEmitAlertEvent(ctx, projectRoot, storageProvider, report, logger, opts.EmitEvents)
+
+	if jsonErr := WriteReportJSON(jsonPath, report, cacheStatus, integrity, fsProjectSnap); jsonErr != nil {
+		logging.Fluent(logger).Debug("Could not write report JSON").Path(jsonPath).WithError(jsonErr).Log()
+	}
+
+	UpdateReportsIndex(reportDir, jsonPath, report, logger)
+	WriteDashboardSnapshot(reportDir, report, logger, fsProjectSnap)
+
+	ensureHighVolumeCacheAsync(ctx, projectRoot, storageProvider)
+	recordCongruenceMetrics(projectRoot, report, fsProjectSnap, logger, opts.MetricsChunkRetentionDays)
+
+	return &Result{
+		Report:                    report,
+		CacheStatus:               cacheStatus,
+		Integrity:                 integrity,
+		FilesystemProjectSnapshot: fsProjectSnap,
+		TextReportPath:            textPath,
+		JSONReportPath:            jsonPath,
+	}, nil
+}
+
+func executeCongruenceAnalysis(ctx context.Context, projectRoot string, storageProvider storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, opts Options) (*operational.CongruenceReport, []string, error) {
 	zqkBin := ""
 	if opts.IncludeInternal {
 		zqkBin = ResolveZQKBin(projectRoot)
@@ -52,25 +103,31 @@ func RunCongruence(ctx context.Context, projectRoot string, storageProvider stor
 
 	report, err := operational.Run(ctx, storageProvider, secCtx, opOpts)
 	if err != nil {
-		return nil, errfmt.Newf("congruence report").Wrap(err)
+		return nil, nil, errfmt.Newf("congruence report").Wrap(err)
 	}
 	process.TouchMeaningfulActivity()
 
-	// If cache was used and total_object > total_disk, cache is stale; clean and re-run.
 	if !opts.NoCache && objectCountByKindFromCache != nil && report.TotalObject > report.TotalDisk {
-		objectidcache.CleanStaleCacheEntries(projectRoot)
+		cleanCount := objectidcache.CleanStaleCacheEntries(projectRoot)
+		if cleanCount > 0 {
+			process.TouchMeaningfulActivity()
+		}
 		optsNoCache := opOpts
 		optsNoCache.ObjectCountByKindFromCache = nil
 		report, err = operational.Run(ctx, storageProvider, secCtx, optsNoCache)
 		if err != nil {
-			return nil, errfmt.Newf("congruence report (after stale cache cleanup)").Wrap(err)
+			return nil, nil, errfmt.Newf("congruence report (after stale cache cleanup)").Wrap(err)
 		}
 		process.TouchMeaningfulActivity()
 	}
 
-	reportDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.LogsDir, paths.LogsReportsSubdir)
-	if err := fileutil.MkdirAll(reportDir, paths.DirPerm750); err != nil {
-		return nil, errfmt.Newf("mkdir reports").Wrap(err)
+	return report, streamBackedDirsList, nil
+}
+
+func prepareReportPaths(projectRoot string, opts Options) (reportDir, textPath, jsonPath string, err error) {
+	reportDir = filepath.Join(projectRoot, paths.ProjectDataDir, paths.LogsDir, paths.LogsReportsSubdir)
+	if mkdirErr := fileutil.MkdirAll(reportDir, paths.DirPerm750); mkdirErr != nil {
+		return "", "", "", errfmt.Newf("mkdir reports").Wrap(mkdirErr)
 	}
 
 	outputPath := opts.OutputPath
@@ -78,8 +135,7 @@ func RunCongruence(ctx context.Context, projectRoot string, storageProvider stor
 		outputPath = filepath.Join(reportDir, fmt.Sprintf("object-count-report-%s.txt", zqktime.NowLayoutUTC(zqktime.LayoutLogRotateStamp)))
 	}
 
-	textPath := outputPath
-	jsonPath := ""
+	textPath = outputPath
 	if opts.UserProvidedReportFile && filepath.Ext(outputPath) == ReportExtJSON {
 		base := strings.TrimSuffix(outputPath, ReportExtJSON)
 		textPath = base + ReportExtTXT
@@ -92,15 +148,16 @@ func RunCongruence(ctx context.Context, projectRoot string, storageProvider stor
 			jsonPath += ReportExtJSON
 		}
 	}
+	return reportDir, textPath, jsonPath, nil
+}
 
-	cacheStatus := GatherCacheStatus(projectRoot)
-
+func scanIntegrityConcurrently(projectRoot string, streamBackedDirs []string) ProcessIntegrity {
 	var integrity ProcessIntegrity
 	integrityDone := make(chan bool, 1)
 	goroutinelabels.NewGoroutine("ocr_integrity_scan", "scan "+paths.ProcessDir+" for misplaced/unmanaged files").
 		WithSignalOnExit(integrityDone).
 		StartSimple(func() {
-			integrity = GatherProcessIntegrity(projectRoot, streamBackedDirsList)
+			integrity = GatherProcessIntegrity(projectRoot, streamBackedDirs)
 		})
 	select {
 	case <-integrityDone:
@@ -110,26 +167,31 @@ func RunCongruence(ctx context.Context, projectRoot string, storageProvider stor
 			String("timeout", IntegrityTimeout.String()).
 			Log()
 	}
+	return integrity
+}
 
-	var fsProjectSnap *operational.FilesystemProjectSnapshot
-	if opts.IncludeFilesystemSnapshot {
-		process.TouchMeaningfulActivity()
-		fsScope, scopeErr := operational.ParseFilesystemSnapshotScope(opts.FilesystemSnapshotScopeStr)
-		if scopeErr != nil {
-			return nil, errfmt.Newf("filesystem snapshot scope").Wrap(scopeErr)
-		}
-		fsLogger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-		snapCtx, cancel := context.WithTimeout(ctx, 20*time.Minute)
-		var snapErr error
-		fsProjectSnap, snapErr = operational.RunFilesystemProjectSnapshot(snapCtx, projectRoot, fsScope)
-		cancel()
-		if snapErr != nil {
-			logging.Fluent(fsLogger).Warn("Filesystem project snapshot failed; report omits full-tree counts").
-				WithError(snapErr).
-				Log()
-		}
+func captureFilesystemSnapshot(ctx context.Context, projectRoot string, opts Options) *operational.FilesystemProjectSnapshot {
+	if !opts.IncludeFilesystemSnapshot {
+		return nil
 	}
+	process.TouchMeaningfulActivity()
+	fsScope, scopeErr := operational.ParseFilesystemSnapshotScope(opts.FilesystemSnapshotScopeStr)
+	if scopeErr != nil {
+		return nil
+	}
+	fsLogger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+	snapCtx, cancel := context.WithTimeout(ctx, 20*time.Minute)
+	fsProjectSnap, snapErr := operational.RunFilesystemProjectSnapshot(snapCtx, projectRoot, fsScope)
+	cancel()
+	if snapErr != nil {
+		logging.Fluent(fsLogger).Warn("Filesystem project snapshot failed; report omits full-tree counts").
+			WithError(snapErr).
+			Log()
+	}
+	return fsProjectSnap
+}
 
+func appendCongruenceAlerts(report *operational.CongruenceReport, integrity ProcessIntegrity) {
 	var totalLegacy int
 	for _, n := range report.LegacyStreamBackedByDir {
 		totalLegacy += n
@@ -138,11 +200,6 @@ func RunCongruence(ctx context.Context, projectRoot string, storageProvider stor
 		report.Alerts = append(report.Alerts, paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("legacy pre-migration YAML files in stream-backed dirs: %d total (run 'zqk system migrate-legacy-to-stream --kind <kind> --remove-legacy' or 'scripts/delete_unmanaged_audit_yaml.py --execute')", totalLegacy)))
 	}
 
-	if err := WriteReportFile(textPath, report, cacheStatus, integrity, fsProjectSnap); err != nil {
-		return nil, errfmt.Newf("write report").Wrap(err)
-	}
-
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	if len(integrity.MisplacedByKind) > 0 {
 		var n int
 		for _, filePaths := range integrity.MisplacedByKind {
@@ -156,15 +213,10 @@ func RunCongruence(ctx context.Context, projectRoot string, storageProvider stor
 	if len(integrity.UnknownDirs) > 0 || len(integrity.FilesAtRoot) > 0 {
 		report.Alerts = append(report.Alerts, fmt.Sprintf("trash: %d unknown dirs, %d files at %s root", len(integrity.UnknownDirs), len(integrity.FilesAtRoot), paths.ProcessDir))
 	}
+}
 
-	logging.Fluent(logger).Info("Object count report written").
-		String("path", textPath).
-		Int("total_disk", report.TotalDisk).
-		Int("total_object", report.TotalObject).
-		Int("alerts", len(report.Alerts)).
-		Log()
-
-	if opts.EmitEvents && len(report.Alerts) > 0 {
+func maybeEmitAlertEvent(ctx context.Context, projectRoot string, storageProvider storage.ObjectStorageProvider, report *operational.CongruenceReport, logger logging.Logger, emitEvents bool) {
+	if emitEvents && len(report.Alerts) > 0 {
 		emitCtx := context.WithoutCancel(ctx)
 		goroutinelabels.NewGoroutine("ocr_emit_alert_event", "emit congruence alert event to audit storage").
 			StartWithContext(emitCtx, func(bgCtx context.Context) error {
@@ -172,37 +224,25 @@ func RunCongruence(ctx context.Context, projectRoot string, storageProvider stor
 				return nil
 			})
 	}
+}
 
-	if err := WriteReportJSON(jsonPath, report, cacheStatus, integrity, fsProjectSnap); err != nil {
-		logging.Fluent(logger).Debug("Could not write report JSON").Path(jsonPath).WithError(err).Log()
-	}
-
-	UpdateReportsIndex(reportDir, jsonPath, report, logger)
-	WriteDashboardSnapshot(reportDir, report, logger, fsProjectSnap)
-
+func ensureHighVolumeCacheAsync(ctx context.Context, projectRoot string, storageProvider storage.ObjectStorageProvider) {
 	goroutinelabels.NewGoroutine("ocr_hv_cache_ensure", "ensure high-volume event cache is ready for stream volume metrics").
 		StartWithContext(context.WithoutCancel(ctx), func(bgCtx context.Context) error {
 			return storage.EnsureHighVolumeEventCacheReady(bgCtx, projectRoot, storageProvider, false)
 		})
+}
 
-	retentionDays := ResolveMetricsChunkRetentionDays(opts.MetricsChunkRetentionDays)
+func recordCongruenceMetrics(projectRoot string, report *operational.CongruenceReport, fsProjectSnap *operational.FilesystemProjectSnapshot, logger logging.Logger, chunkRetentionDays int) {
+	retentionDays := ResolveMetricsChunkRetentionDays(chunkRetentionDays)
 	RecordObjectVolumeMetrics(projectRoot, report, logger, retentionDays)
 	RecordStreamVolumeMetrics(projectRoot, logger, retentionDays)
 	RecordFilesystemSnapshotMetrics(projectRoot, fsProjectSnap, logger, retentionDays)
-
-	return &Result{
-		Report:                    report,
-		CacheStatus:               cacheStatus,
-		Integrity:                 integrity,
-		FilesystemProjectSnapshot: fsProjectSnap,
-		TextReportPath:            textPath,
-		JSONReportPath:            jsonPath,
-	}, nil
 }
 
 // EmitCongruenceAlertEvent emits operational congruence alert events to logging and audit streams.
 func EmitCongruenceAlertEvent(ctx context.Context, projectRoot string, storageProvider storage.ObjectStorageProvider, report *operational.CongruenceReport, logger logging.Logger) {
-	auditRouter := coordination.NewStorageAuditRouter(projectRoot, storageProvider)
+	auditRouter := coordination.AuditRouter(projectRoot, storageProvider)
 	loggingRouter := &coordination.DefaultLoggingRouter{}
 
 	auditMetadata := map[string]any{
@@ -231,8 +271,13 @@ func EmitCongruenceAlertEvent(ctx context.Context, projectRoot string, storagePr
 		WithEventData(eventData).
 		WithContext(ctx).
 		WithChannels(true, true, true, false)
-	_ = loggingRouter.Emit(ctx, eventCtx)
-	_ = auditRouter.Emit(ctx, eventCtx)
+
+	if emitErr := loggingRouter.Emit(ctx, eventCtx); emitErr != nil {
+		logging.Fluent(logger).Debug("Failed to emit logging event").WithError(emitErr).Log()
+	}
+	if emitErr := auditRouter.Emit(ctx, eventCtx); emitErr != nil {
+		logging.Fluent(logger).Debug("Failed to emit audit event").WithError(emitErr).Log()
+	}
 }
 
 // ResolveZQKBin locates the zqk binary for internal commands.

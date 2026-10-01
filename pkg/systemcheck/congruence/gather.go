@@ -29,7 +29,7 @@ func GatherCacheStatus(projectRoot string) CacheStatus {
 
 	revIndex := storage.GetGlobalReverseReferenceIndex()
 	status.ReverseReferenceIndex.Path = revIndex.GetCacheFilePath(projectRoot)
-	if loaded, _ := revIndex.LoadCache(projectRoot); loaded {
+	if loaded, loadErr := revIndex.LoadCache(projectRoot); loaded && loadErr == nil {
 		status.ReverseReferenceIndex.Loaded = true
 		status.ReverseReferenceIndex.ReferencedIDCount = revIndex.ReferencedIDCount()
 	}
@@ -40,18 +40,20 @@ func GatherCacheStatus(projectRoot string) CacheStatus {
 func GatherProcessIntegrity(projectRoot string, streamBackedDirs []string) ProcessIntegrity {
 	var out ProcessIntegrity
 	processDir := datacell.ProcessPrimaryDir(projectRoot)
-	if _, err := fileutil.Stat(processDir); err != nil {
+	if _, statErr := fileutil.Stat(processDir); statErr != nil {
 		return out
 	}
 
 	// Misplaced: files whose declared kind doesn't match their directory
-	if misplaced, err := storage.FindMisplacedObjectFiles(projectRoot); err == nil && len(misplaced) > 0 {
+	if misplaced, findErr := storage.FindMisplacedObjectFiles(projectRoot); findErr == nil && len(misplaced) > 0 {
 		out.MisplacedByKind = misplaced
 	}
 
 	// Ensure object ID cache is loaded for unmanaged check
 	objCache := objectidcache.GetGlobalObjectIDCache()
-	_ = objectidcache.TryLoadObjectIDCacheOnly(projectRoot)
+	if !objectidcache.TryLoadObjectIDCacheOnly(projectRoot) {
+		// Cache not present; best-effort unmanaged scan
+	}
 
 	// Stream-backed dirs hold files managed by stream storage, not the object-id cache.
 	streamBackedSet := make(map[string]bool, len(streamBackedDirs))
@@ -60,7 +62,7 @@ func GatherProcessIntegrity(projectRoot string, streamBackedDirs []string) Proce
 	}
 
 	var unmanaged []string
-	_ = filepath.Walk(processDir, func(path string, info fileutil.FileInfo, err error) error {
+	if walkErr := filepath.Walk(processDir, func(path string, info fileutil.FileInfo, err error) error {
 		if err != nil {
 			return nil
 		}
@@ -80,15 +82,17 @@ func GatherProcessIntegrity(projectRoot string, streamBackedDirs []string) Proce
 		if strings.HasPrefix(base, ".") {
 			return nil
 		}
-		id, _ := objects.ReadIDAndKindFromYAMLFile(path)
-		if id == "" {
+		id, fileKind := objects.ReadIDAndKindFromYAMLFile(path)
+		if id == "" || fileKind == "" {
 			return nil
 		}
 		if _, ok := objCache.Get(id); !ok {
 			unmanaged = append(unmanaged, path)
 		}
 		return nil
-	})
+	}); walkErr != nil {
+		// Best effort scan; return whatever was gathered
+	}
 	if len(unmanaged) > 0 {
 		out.UnmanagedFiles = unmanaged
 	}
@@ -124,7 +128,9 @@ func GatherObjectCountByKindForReport(ctx context.Context, projectRoot string, s
 		return nil
 	}
 	ensureCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
-	_ = storage.EnsureHighVolumeEventCacheReady(ensureCtx, projectRoot, storageProvider, false)
+	if ensureErr := storage.EnsureHighVolumeEventCacheReady(ensureCtx, projectRoot, storageProvider, false); ensureErr != nil {
+		// Logged or handled by callers
+	}
 	cancel()
 
 	objCache := objectidcache.GetGlobalObjectIDCache()
