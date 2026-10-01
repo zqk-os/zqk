@@ -1,0 +1,8 @@
+$schema: _schemas/command_spec.schema.json
+name: auth
+short: Login and logout for CLI session lifecycle
+description: |
+  Login and logout for CLI session lifecycle.
+  Session ID can be stored in ZQK_SESSION_ID (env) or in .zqk/state/session (file).
+  Multiple terminals share the same session via the file; a file lock ensures consistency.
+  Use 'auth login' to create or reuse a session; use 'auth logout' to end it.

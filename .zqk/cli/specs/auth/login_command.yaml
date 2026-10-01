@@ -1,0 +1,7 @@
+$schema: ../_schemas/command_spec.schema.json
+name: login
+short: Create or reuse a CLI session (persisted for multiple terminals)
+description: |
+  Creates a new session or reuses the current one if still active.
+  Session is written to .zqk/state/session (under lock) so other terminals can reuse it.
+  Optionally set ZQK_SESSION_ID in your shell to tie the session to this process tree.
