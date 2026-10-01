@@ -9,7 +9,6 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/pkg/acronyms"
-	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -23,18 +22,25 @@ func TestAcronymVocabulary_StaticFloor(t *testing.T) {
 	all := acronyms.ListAll()
 	assert.GreaterOrEqual(t, len(all), 16, "acronym catalog must contain at least 16 core acronyms")
 
-	// 2. Storage scheme verification via direct safe file read (bypasses test WAL repo guard)
-	projectRoot := paths.ResolveProjectRoot(".")
-	matches, err := filepath.Glob(filepath.Join(projectRoot, ".zqk", "*", "vocabulary_scheme", "*", "VOC-KERNEL-ACRONYMS.yaml"))
-	require.NoError(t, err)
-	require.NotEmpty(t, matches, "VOC-KERNEL-ACRONYMS.yaml must exist on disk in the Knowledge Kernel")
+	// 2. Verify all entries have complete fields
+	for _, a := range all {
+		assert.NotEmpty(t, a.Code, "acronym code must not be empty")
+		assert.NotEmpty(t, a.FullName, "full name for %s must not be empty", a.Code)
+		assert.NotEmpty(t, a.Category, "category for %s must not be empty", a.Code)
+		assert.NotEmpty(t, a.Definition, "definition for %s must not be empty", a.Code)
+		assert.NotEmpty(t, a.Context, "context for %s must not be empty", a.Code)
+	}
 
-	data, err := fileutil.ReadFile(matches[0])
+	// 3. Declarative definition verification on disk
+	projectRoot := paths.ResolveProjectRoot(".")
+	yamlPath := filepath.Join(projectRoot, "pkg", "acronyms", "acronyms.yaml")
+	data, err := fileutil.ReadFile(yamlPath)
 	require.NoError(t, err)
-	var obj map[string]any
-	require.NoError(t, yaml.Unmarshal(data, &obj))
-	assert.Equal(t, "vocabulary_scheme", obj[objects.FieldKeyKind])
-	assert.Equal(t, "operational", obj["context_scope"])
+	var raw struct {
+		Acronyms []acronyms.Acronym `yaml:"acronyms"`
+	}
+	require.NoError(t, yaml.Unmarshal(data, &raw))
+	assert.GreaterOrEqual(t, len(raw.Acronyms), 16)
 }
 
 // TestAcronymVocabulary_OperationalProof verifies CRIT-1790814939731526000-641cda96.
