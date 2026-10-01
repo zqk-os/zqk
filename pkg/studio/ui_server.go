@@ -10,6 +10,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/acronyms"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/storage"
@@ -103,6 +104,8 @@ func (s *Server) Start(addr string) error {
 	mux.HandleFunc("/api/inbox", s.handleInbox)
 	mux.HandleFunc("/api/inbox/ack", s.handleInboxAck)
 	mux.HandleFunc("/api/inbox/respond", s.handleInboxRespond)
+	mux.HandleFunc("/api/acronyms", s.handleAcronyms)
+	mux.HandleFunc("/api/explain", s.handleExplain)
 
 	s.httpServer = &http.Server{
 		Handler:      mux,
@@ -384,3 +387,36 @@ func (s *Server) handleAsset(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 	}
 }
+
+func (s *Server) handleAcronyms(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	all := acronyms.ListAll()
+	_ = json.NewEncoder(w).Encode(map[string]any{
+		"scheme_id": acronyms.KernelAcronymsSchemeID,
+		"acronyms":  all,
+		"count":     len(all),
+	})
+}
+
+func (s *Server) handleExplain(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	q := strings.TrimSpace(r.URL.Query().Get("q"))
+	if q == "" {
+		s.handleAcronyms(w, r)
+		return
+	}
+	item, found := acronyms.Lookup(q)
+	if !found {
+		suggestions := acronyms.FindClosest(q)
+		w.WriteHeader(http.StatusNotFound)
+		_ = json.NewEncoder(w).Encode(map[string]any{
+			"error":       fmt.Sprintf("unknown acronym %q", q),
+			"suggestions": suggestions,
+		})
+		return
+	}
+	_ = json.NewEncoder(w).Encode(item)
+}
+

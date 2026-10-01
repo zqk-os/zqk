@@ -189,6 +189,31 @@
       }
     }
 
+    const KERNEL_ACRONYMS = {
+      'BLI': 'Backlog Item: A discrete, tracked work package scheduled within a Priority Plan.',
+      'PRI': 'Priority Plan: A time-bounded execution plan scoping work packages and delivery horizons.',
+      'REQ': 'Requirement: A formal system invariant, capability, or architectural specification.',
+      'CRIT': 'Criterion: An objective, verifiable acceptance condition proving a requirement.',
+      'VDS': 'Verification Definition of Done: Automated gate verifying criteria before promotion.',
+      'TCFG': 'Team Configuration: Approved team composition, agent roster, and permissions.',
+      'CVS': 'Convergence Session: Structured feedback session closing delta between states.',
+      'ATK': 'Agent Task: A granular autonomous unit of work executed by an agent persona.',
+      'PPLAN': 'Priority Plan: Command group for inspecting active plans and current workloads.',
+      'ZPARQL': 'ZQK Pattern Query Language: Declarative graph pattern matching and query engine.',
+      'ZQL': 'ZQK Query Language: Declarative object query, mutation, and filtering expression language.',
+      'CAS': 'Content-Addressable Storage: Immutable, cryptographic hash-indexed storage membrane.',
+      'WAL': 'Write-Ahead Log: Append-only ledger guaranteeing atomic state mutations and crash recovery.',
+      'CAP': 'Continuous Autonomous Protocol: Self-driving cybernetic feedback loop steering agents.',
+      'CEF': 'Community Evaluation Framework: Quality scorecard, testing pyramid, and grading rubric.',
+      'TDE': 'Technical Debt Entry: Tracked defect or architectural smell targeted for resolution.'
+    };
+
+    function getAcronymTooltip(str) {
+      if (!str) return '';
+      const prefix = str.split(/[-_]/)[0].toUpperCase();
+      return KERNEL_ACRONYMS[prefix] || KERNEL_ACRONYMS[str.toUpperCase()] || '';
+    }
+
     // Causal Subgraph Isolation
     function focusNode(nodeId) {
       focusedNodeId = nodeId;
@@ -854,8 +879,8 @@
           info.innerHTML =
             '<div class="gantt-row-title-line">' +
               (indentPx > 0 ? '<span class="gantt-tree-elbow">↳</span>' : '') +
-              '<span class="kind-pill ' + kindClass + '">' + item.kind.replace('_', ' ') + '</span>' +
-              '<span class="gantt-row-id">' + item.id + '</span>' +
+              '<span class="kind-pill ' + kindClass + '" title="' + escapeHtml(getAcronymTooltip(item.kind)) + '">' + item.kind.replace('_', ' ') + '</span>' +
+              '<span class="gantt-row-id" title="' + escapeHtml(getAcronymTooltip(item.id)) + '">' + item.id + '</span>' +
               '<span class="status-pill-mini status-' + status + '">' + (item.status || '') + '</span>' +
             '</div>' +
             '<div class="gantt-row-title" title="' + escapeHtml(item.title || '') + '">' + escapeHtml(item.title || '') + '</div>';
@@ -994,13 +1019,14 @@
       const topRow = document.createElement('div');
       topRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center;';
       topRow.innerHTML =
-        '<span class="kind-pill ' + kindClass + '">' + (node.kind || 'object').replace('_', ' ') + '</span>' +
+        '<span class="kind-pill ' + kindClass + '" title="' + escapeHtml(getAcronymTooltip(node.kind)) + '">' + (node.kind || 'object').replace('_', ' ') + '</span>' +
         '<span class="status-pill-mini">' + (node.status || '') + '</span>';
 
       const idRow = document.createElement('div');
       idRow.className = 'inspector-id-row';
       const idSpan = document.createElement('span');
       idSpan.className = 'inspector-id';
+      idSpan.setAttribute('title', getAcronymTooltip(node.id));
       idSpan.textContent = node.id;
       const copyBtn = document.createElement('button');
       copyBtn.className = 'btn btn-sm';

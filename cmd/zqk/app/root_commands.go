@@ -16,6 +16,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/docman"
 	"github.com/zqk-os/zqk/cmd/zqk/do"
 	"github.com/zqk-os/zqk/cmd/zqk/domain"
+	"github.com/zqk-os/zqk/cmd/zqk/explain"
 	"github.com/zqk-os/zqk/cmd/zqk/feed"
 	"github.com/zqk-os/zqk/cmd/zqk/graph"
 	"github.com/zqk-os/zqk/cmd/zqk/grep"
@@ -92,6 +93,11 @@ func registerCommands() {
 	inspectCmdInst := object.NewInspectCmd()
 	inspectCmdInst.GroupID = "everyday"
 	rootCmd.AddCommand(inspectCmdInst)
+
+	// Progressive disclosure acronym and ontology explain command (zqk explain / zqk glossary)
+	explainCmdInst := explain.NewExplainCmd()
+	explainCmdInst.GroupID = "everyday"
+	rootCmd.AddCommand(explainCmdInst)
 
 	// System operations group (health, validation, and maintenance)
 	systemCmdInst := system.NewSystemCmd()
