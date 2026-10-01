@@ -85,9 +85,9 @@ if git -C "$ROOT" grep -n -E 'TRACK:.*(BLI|REQ|CRIT|PRI|TDE|ATK|CAP|CVS)-' -- \
 	fail "studio TRACK comment with kernel object id remains in cmd, scripts, or pkg"
 fi
 
-# CEF run artifacts are project-specific and must not be tracked in git
-if git -C "$ROOT" ls-files 'docs/quality/cef-runs' | grep -q .; then
-	fail "project-specific CEF run artifacts are tracked in git"
+# CEF run artifacts and evaluation reports are project-specific and must not be tracked in git
+if git -C "$ROOT" ls-files 'docs/quality/cef-runs' 'docs/eval' | grep -q .; then
+	fail "project-specific CEF run artifacts or evaluation reports are tracked in git"
 fi
 
 # Studio CAS nanos-hex instance ids belong in kernel CAS, not production cmd/, docs/, scripts/,
@@ -102,7 +102,6 @@ if git -C "$ROOT" grep -n -E '[A-Z]{2,12}-[0-9]{15,}-[0-9a-fA-F]{8}' -- \
 	'docs/manual' \
 	'docs/tutorials' \
 	'docs/development' \
-	'docs/eval' \
 	'scripts' \
 	'.zqk/cli/specs' \
 	'pkg/cli/bldr_cli_cmd_v1' \

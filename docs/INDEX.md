@@ -94,7 +94,6 @@ Welcome to the canonical documentation for **ZQK Core**, the Cellular Knowledge 
 | **[Development Overview](./development/README.md)** | Contributor conventions, build instructions, and local testing workflows. |
 | **[Policy Governance & Durability](./development/POLICY_GOVERNANCE_AND_DURABILITY.md)** | Durability tiers, AST linters, and cryptographically verified policy packs. |
 | **[Quality & Verification Gates](./quality/README.md)** | Definition of Done (DoD), Verification Done-Gates (VDS), and chunk evaluation. |
-| **[Evaluation & Benchmarks](./eval/README.md)** | Multi-axis evaluation benchmarks: maintainability, observability, reliability, and security. |
 | **[Codebase Evaluation Framework (CEF)](./quality/codebase_evaluation/README.md)** | Multi-agent evaluation framework, 52 evaluation lens rubrics, and Diamond Scale grading. |
 | **[System Explanation & Philosophy](./explanation/README.md)** | Architectural philosophy: why ZQK is designed as a Cellular Knowledge Operating System. |
 
