@@ -4,8 +4,8 @@ package bldr_cli_cmd_v1
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/zqk-os/zqk/pkg/cliapp"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 )
 
 // NewExplainCommandBuilder creates a new explain command
@@ -16,19 +16,24 @@ func NewExplainCommandBuilder() *cobra.Command {
 	help := clipkg.DynamicHelpBuilder("Explain kernel acronyms, ontology terms, and architectural concepts")
 	help.WithDescriptionLines("Provides progressive disclosure and single-source-of-truth explanations")
 	help.WithDescriptionLines("for all core ZQK Knowledge Kernel acronyms (BLI, PRI, REQ, CRIT, VDS, TCFG, CVS,")
-	help.WithDescriptionLines("ATK, PPLAN, ZPARQL, ZQL, CAS, WAL, CAP, CEF, TDE).")
+	help.WithDescriptionLines("ATK, PPLAN, ZPARQL, ZQL, CAS, WAL, CAP, CEF, TDE) and domain vocabulary terms.")
 	help.WithDescriptionLines("")
-	help.WithDescriptionLines("  Explain a specific acronym")
+	help.WithDescriptionLines("  Explain a specific acronym or term")
 	help.WithDescriptionLines("  zqk explain BLI")
 	help.WithDescriptionLines("")
 	help.WithDescriptionLines("  List all documented acronyms")
 	help.WithDescriptionLines("  zqk explain")
+	help.WithDescriptionLines("")
+	help.WithDescriptionLines("  List terms under a specific vocabulary scheme")
+	help.WithDescriptionLines("  zqk explain --scheme VOC-KERNEL-ARCHITECTURE")
 	help.AddExample("Explain specific acronym", "%s explain BLI")
 	help.AddExample("List all acronyms", "%s explain")
+	help.AddExample("Filter by vocabulary scheme", "%s explain --scheme VOC-KERNEL-ACRONYMS")
 	builder.WithHelpBuilder(help)
 	builder.WithArgs(cobra.MaximumNArgs(1))
 	builder.AddBoolFlag("sync", "s", false, "Sync all acronym definitions to the Knowledge Kernel scheme (VOC-KERNEL-ACRONYMS)")
 	builder.AddStringFlag("format", "f", "table", "Output format (table, json, yaml)")
+	builder.AddStringFlag("scheme", "", "VOC-KERNEL-ACRONYMS", "Vocabulary scheme ID to query (default VOC-KERNEL-ACRONYMS)")
 	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
 	cmd := builder.Build()
 	return cmd
