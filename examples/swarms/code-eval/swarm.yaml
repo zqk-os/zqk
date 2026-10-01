@@ -1,3 +1,11 @@
+# ==============================================================================
+# Declarative Swarm Manifest: Code Evaluation Swarm
+# ==============================================================================
+# Note: This is a runtime multi-agent orchestration manifest interpreted by
+# `zqk swarm run` or `zqk agent orchestrate`. It is distinct from compile-time
+# Go code packages located under the repository's `packs/` directory (e.g.
+# `packs/work`, `packs/agent`, `packs/code-eval`).
+# ==============================================================================
 schema_version: 1.0.0
 name: code-eval-swarm
 version: 0.1.0

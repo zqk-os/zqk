@@ -410,7 +410,6 @@
 ./lifecycles/display_lifecycle.yaml
 ./lifecycles/division_lifecycle.yaml
 ./lifecycles/doc_entry_lifecycle.yaml
-./lifecycles/embedded.go
 ./lifecycles/epic_lifecycle.yaml
 ./lifecycles/evolution/
 ./lifecycles/evolution/evolution_management_lifecycle.yaml
@@ -429,6 +428,7 @@
 ./lifecycles/kernel/bucketing_strategy_lifecycle.yaml
 ./lifecycles/kernel/change_journal_entry_lifecycle.yaml
 ./lifecycles/kernel/convergence_session_lifecycle.yaml
+./lifecycles/kernel/domain_registry_lifecycle.yaml
 ./lifecycles/kernel/keystore_entry_lifecycle.yaml
 ./lifecycles/kernel/kind_synonym_lifecycle.yaml
 ./lifecycles/kernel/namespace_lifecycle.yaml
@@ -436,6 +436,7 @@
 ./lifecycles/kernel/policy_lifecycle.yaml
 ./lifecycles/kernel/role_lifecycle.yaml
 ./lifecycles/kernel/scheduler_job_lifecycle.yaml
+./lifecycles/kernel/zqk_session_lifecycle.yaml
 ./lifecycles/library/
 ./lifecycles/library/doc_entry_lifecycle.yaml
 ./lifecycles/mcp_built_in_tool_lifecycle.yaml
@@ -452,9 +453,6 @@
 ./lifecycles/org/stakeholder_profile_lifecycle.yaml
 ./lifecycles/organization_lifecycle.yaml
 ./lifecycles/persona_lifecycle.yaml
-./lifecycles/platform/
-./lifecycles/platform/domain_registry_lifecycle.yaml
-./lifecycles/platform/zqk_session_lifecycle.yaml
 ./lifecycles/priority_plan_lifecycle.yaml
 ./lifecycles/prompt_template_lifecycle.yaml
 ./lifecycles/qa/

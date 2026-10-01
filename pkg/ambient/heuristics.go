@@ -74,7 +74,7 @@ func (h *CoachHeuristics) handleSession(ctx context.Context, event Event) error 
 
 	cmd, _ := payload[objects.FieldKeyCommand].(string)
 
-	// Heuristic: Catch grep pipes or lookup commands to hint zqk grep
+	// Heuristic 1: Catch grep pipes or lookup commands to hint zqk grep
 	if (strings.Contains(cmd, "|") && strings.Contains(cmd, "grep")) || strings.HasPrefix(strings.TrimSpace(cmd), "grep ") {
 		if h.projectRoot != "" {
 			h.appendTip(paths.RewriteCanonicalCLIInvocations("ZQK Observer Tip: Utilize 'zqk grep' for faster, indexed, and kernel/AST-aware code and object lookups instead of shell grep."))
@@ -85,6 +85,29 @@ func (h *CoachHeuristics) handleSession(ctx context.Context, event Event) error 
 				objects.FieldKeySource:      "coach_heuristics",
 				"heuristic_type":            "grep_pipe",
 				objects.FieldKeyDescription: "Grep pipe detected: " + cmd,
+			},
+			Timestamp: time.Now(),
+		}); err != nil {
+			return err
+		}
+	}
+
+	// Heuristic 2: Catch command timeouts and suggest config/command_timeouts.yaml override
+	timedOut, _ := payload["timed_out"].(bool)
+	exitCode, _ := payload["exit_code"].(int)
+	errStr, _ := payload["error"].(string)
+	if timedOut || exitCode == 124 || strings.Contains(errStr, "timed out") || strings.Contains(errStr, "timeout exceeded") {
+		normCmd := strings.TrimSpace(cmd)
+		if normCmd != "" && h.projectRoot != "" {
+			h.appendTip(paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("ZQK Ambient Tip: Command '%s' timed out. Consider configuring an override rule in config/command_timeouts.yaml:\n  - pattern: %q\n    timeout: 5m", normCmd, normCmd)))
+		}
+		if err := h.hub.Publish(ctx, Event{
+			Type: EventTypeSession,
+			Payload: map[string]any{
+				objects.FieldKeySource:      "coach_heuristics",
+				"heuristic_type":            "command_timeout",
+				objects.FieldKeyCommand:     normCmd,
+				objects.FieldKeyDescription: fmt.Sprintf("Timeout detected on '%s'; suggested override in config/command_timeouts.yaml", normCmd),
 			},
 			Timestamp: time.Now(),
 		}); err != nil {
