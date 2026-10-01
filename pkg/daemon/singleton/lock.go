@@ -231,3 +231,31 @@ func parseLockPID(f *fileutil.File) int {
 	}
 	return 0
 }
+
+// ActiveDaemonPIDs returns a map of daemonName -> PID for all actively held daemon locks under projectRoot.
+func ActiveDaemonPIDs(projectRoot string) (map[string]int, error) {
+	if strings.TrimSpace(projectRoot) == "" {
+		return make(map[string]int), nil
+	}
+	locksDir := filepath.Join(filepath.Clean(projectRoot), paths.ProjectDataDir, paths.StateDir, "daemon_locks")
+	entries, err := fileutil.ReadDir(locksDir)
+	if err != nil {
+		if fileutil.IsNotExist(err) {
+			return make(map[string]int), nil
+		}
+		return nil, err
+	}
+
+	active := make(map[string]int)
+	for _, entry := range entries {
+		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".lock") {
+			continue
+		}
+		daemonName := strings.TrimSuffix(entry.Name(), ".lock")
+		running, pid, _ := IsDaemonRunning(projectRoot, daemonName)
+		if running && pid > 0 {
+			active[daemonName] = pid
+		}
+	}
+	return active, nil
+}

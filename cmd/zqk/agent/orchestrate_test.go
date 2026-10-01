@@ -2,6 +2,7 @@ package agent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -12,6 +13,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/authcred"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/daemon/singleton"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
@@ -668,5 +670,40 @@ func TestNativeSwarmEligible_ModelTierRouting(t *testing.T) {
 		if got != tc.want {
 			t.Errorf("nativeSwarmEligible(%q) = %v; want %v", tc.tier, got, tc.want)
 		}
+	}
+}
+
+func TestOrchestratorSingletonGuard(t *testing.T) {
+	t.Parallel()
+	tmpDir := t.TempDir()
+
+	guardName := "orchestrator-pri-test-123"
+	release1, err := singleton.Guard(tmpDir, guardName)
+	if err != nil {
+		t.Fatalf("first Guard failed: %v", err)
+	}
+	defer release1()
+
+	// Secondary acquisition must fail with ErrDaemonAlreadyRunning
+	_, err2 := singleton.Guard(tmpDir, guardName)
+	if err2 == nil {
+		t.Fatal("expected secondary Guard to fail")
+	}
+	var alreadyRunning *singleton.ErrDaemonAlreadyRunning
+	if !errors.As(err2, &alreadyRunning) {
+		t.Fatalf("expected ErrDaemonAlreadyRunning, got: %T (%v)", err2, err2)
+	}
+
+	// Verify orchestrate_run.go contains acquire_orchestrator_guard stage and signal context
+	data, err := os.ReadFile("orchestrate_run.go")
+	if err != nil {
+		t.Fatal(err)
+	}
+	src := string(data)
+	if !strings.Contains(src, "acquire_orchestrator_guard") {
+		t.Fatal("orchestrate_run.go missing acquire_orchestrator_guard stage")
+	}
+	if !strings.Contains(src, "signal.NotifyContext") {
+		t.Fatal("orchestrate_run.go missing signal.NotifyContext cancellation hook")
 	}
 }

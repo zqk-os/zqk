@@ -229,6 +229,7 @@ type orchestratorState struct {
 	routingPlan     map[string]any
 	isPipeline      bool
 	isStrategicPlan bool
+	releaseGuard    func()
 }
 
 //nolint:gocyclo

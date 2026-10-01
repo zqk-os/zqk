@@ -44,6 +44,7 @@ func InspectIOResources(ctx context.Context, projectRoot string) (*IOResourceTel
 		ZqkChildren:       make(map[string]ChildFolderUsage),
 		StaleLockPaths:    []string{},
 		OrphanedTempPaths: []string{},
+		OrphanedProcesses: []string{},
 	}
 
 	openFDs, maxFDs, _ := GetProcessFDUsage()
@@ -124,6 +125,12 @@ func InspectIOResources(ctx context.Context, projectRoot string) (*IOResourceTel
 
 	report.StaleLocksCount = len(report.StaleLockPaths)
 	report.OrphanedTempCount = len(report.OrphanedTempPaths)
+
+	cnt, orphanProcs, _ := ReapOrphanedProcesses(projectRoot, true)
+	report.OrphanedProcessCount = cnt
+	if len(orphanProcs) > 0 {
+		report.OrphanedProcesses = orphanProcs
+	}
 
 	return report, nil
 }

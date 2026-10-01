@@ -17,6 +17,7 @@ import (
 // NewResourceHygieneCmd creates the resource-hygiene command.
 func NewResourceHygieneCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewSystemResourceHygieneCommandBuilder()
+	cmd.Flags().Bool("reap-processes", true, "Reap orphaned background zqk processes")
 	cmd.RunE = runResourceHygiene
 	return cmd
 }
@@ -26,6 +27,7 @@ func runResourceHygiene(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		reapLocks, _ := cmd.Flags().GetBool("reap-locks")
 		reapTemp, _ := cmd.Flags().GetBool("reap-temp")
+		reapProcesses, _ := cmd.Flags().GetBool("reap-processes")
 		enforceRetention, _ := cmd.Flags().GetBool("enforce-retention")
 		lockThresholdStr, _ := cmd.Flags().GetString("lock-threshold")
 		tempThresholdStr, _ := cmd.Flags().GetString("temp-threshold")
@@ -71,6 +73,7 @@ func runResourceHygiene(cmd *cobra.Command, args []string) error {
 		opts := resourcehygiene.HygieneOptions{
 			ReapLocks:        reapLocks,
 			ReapTemp:         reapTemp,
+			ReapProcesses:    reapProcesses,
 			EnforceRetention: enforceRetention,
 			DryRun:           dryRun,
 			LockThreshold:    lockThreshold,
@@ -99,6 +102,7 @@ func runResourceHygiene(cmd *cobra.Command, args []string) error {
 		cmd.Printf("=========================================\n")
 		cmd.Printf("Locks reaped:     %d\n", report.LocksReaped)
 		cmd.Printf("Temp reaped:      %d\n", report.TempReaped)
+		cmd.Printf("Processes reaped: %d\n", report.ProcessesReaped)
 		cmd.Printf("Logs pruned:      %d\n", report.LogsPruned)
 		cmd.Printf("Bytes reclaimed:  %s (%d bytes)\n", diskusage.FormatBytes(report.BytesReclaimed), report.BytesReclaimed)
 		if len(report.ReapedPaths) > 0 {
@@ -113,6 +117,7 @@ func runResourceHygiene(cmd *cobra.Command, args []string) error {
 			cmd.Printf("  • .zqk Storage:      %d files (%s)\n", telemetry.TotalZqkFiles, diskusage.FormatBytes(telemetry.TotalZqkBytes))
 			cmd.Printf("  • Stale locks:       %d\n", telemetry.StaleLocksCount)
 			cmd.Printf("  • Orphaned temps:    %d\n", telemetry.OrphanedTempCount)
+			cmd.Printf("  • Orphaned procs:    %d\n", telemetry.OrphanedProcessCount)
 		}
 
 		return nil

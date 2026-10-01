@@ -170,3 +170,28 @@ func TestAutoRemedy_DiagnoseCheckIssues(t *testing.T) {
 		t.Fatalf("expected at least 2 plans from check issues, got %d", len(plans))
 	}
 }
+
+func TestAutoRemedy_ApplyKillProcess(t *testing.T) {
+	tmpDir := t.TempDir()
+	engine := system.NewDiagnosticsRemedyEngine(tmpDir)
+
+	plans := []system.RemedyPlan{
+		{
+			ID:          "REMEDY-ORPHAN-PROC-PID-9999",
+			Title:       "Terminate Orphaned Process",
+			ActionType:  system.ActionKillProcess,
+			Target:      "PID 9999: zqk",
+			Confidence:  1.0,
+			AutoApply:   true,
+		},
+	}
+
+	report, err := engine.Apply(context.Background(), plans)
+	if err != nil {
+		t.Fatalf("apply failed: %v", err)
+	}
+	if report.TotalApplied != 1 {
+		t.Errorf("expected 1 applied remedy, got %d", report.TotalApplied)
+	}
+}
+
