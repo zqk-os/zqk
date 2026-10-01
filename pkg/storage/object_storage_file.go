@@ -275,6 +275,9 @@ func (f *FileObjectStorage) augmentCtxForAuditDuringWriteBehindApply(ctx context
 // so init is bounded and the daemon does not hang. During WAL replay uses SaveAsync() so the
 // apply path stays fast. After init and replay, uses Save().
 func (f *FileObjectStorage) saveHashRegistry(hr *HashRegistry) error {
+	if hr == nil || StreamStorageEnabledForKind(hr.kind) {
+		return nil
+	}
 	if f.replayPhase.Load() || zqkenv.PrivilegedWriterDaemonRole() {
 		hr.SaveAsync()
 		return nil

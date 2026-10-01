@@ -12,15 +12,28 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage/locknames"
 )
+
+func isStreamKind(kind string) bool {
+	return kind == objects.KindAuditEvent || kind == objects.KindChangeJournalEntry || kind == objects.KindZqkSession || kind == objects.KindAgentFeed
+}
 
 // Save saves the ID index to disk.
 // Under the file lock, reload disk and merge so a stale in-memory snapshot cannot
 // clobber a fresher index written by another process (sync-cas-index / heal).
 // TRACK: follow-up in kernel backlog
 func (idx *IDIndex) Save() error {
+	if isStreamKind(idx.Kind) {
+		return nil
+	}
+	if len(idx.Mappings) == 0 {
+		if _, statErr := fileutil.Stat(filepath.Dir(idx.FilePath)); statErr != nil && fileutil.IsNotExist(statErr) {
+			return nil
+		}
+	}
 	metrics := getSafeMetrics()
 	lockStart := time.Now()
 	lockPath := idx.FilePath + ".lock"
@@ -72,12 +85,28 @@ func (idx *IDIndex) Save() error {
 // Internal helper for use by the CAS index write queue worker.
 // bucketKeys and createdAts may be nil; when non-nil they are written (created_at for OldestIDs).
 func (idx *IDIndex) SaveMappingsLocked(mappings, bucketKeys, createdAts map[string]string) error {
+	if isStreamKind(idx.Kind) {
+		return nil
+	}
+	if len(mappings) == 0 {
+		if _, statErr := fileutil.Stat(filepath.Dir(idx.FilePath)); statErr != nil && fileutil.IsNotExist(statErr) {
+			return nil
+		}
+	}
 	return idx.saveMappingsNoLock(mappings, bucketKeys, createdAts)
 }
 
 // saveMappingsNoLock saves the provided mappings, optional bucket keys, and optional created_at to disk (internal helper, no file locking).
 // Caller MUST hold the CAS index file lock.
 func (idx *IDIndex) saveMappingsNoLock(mappings, bucketKeys, createdAts map[string]string) error {
+	if isStreamKind(idx.Kind) {
+		return nil
+	}
+	if len(mappings) == 0 {
+		if _, statErr := fileutil.Stat(filepath.Dir(idx.FilePath)); statErr != nil && fileutil.IsNotExist(statErr) {
+			return nil
+		}
+	}
 	// Create index structure for marshaling
 	// CRITICAL: Access Version and Kind without lock (they're immutable after creation)
 	indexData := struct {
