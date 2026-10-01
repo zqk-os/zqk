@@ -26,7 +26,11 @@ This document establishes the **authoritative ground rules, naming taxonomy, beh
 1. **Spec Location:** Every command and subcommand MUST have a matching YAML specification in `.zqk/cli/specs/<domain>/<command>_command.yaml`.
 2. **Spec Completeness:** Specifications must document the command purpose, positional arguments, flags (with defaults and descriptions), expected output schema, and at least two realistic usage examples.
 3. **Automated Verification:** The pre-commit gate and local CI run `zqk system validate-command-specs`. Commits that introduce un-specced commands beyond the baseline freeze or introduce spec drift fail closed.
-4. **Ratcheting Migration Baseline:** Legacy commands without specs are frozen in `.zqk/cli/command_spec_coverage_baseline.json`. The baseline permits zero new un-specced commands (`new_drift_count == 0`), and automatically ratchets forward as grandfathered commands receive specifications until full parity (`parity: true`) is reached.
+4. **Ratcheting Migration Baseline & Current Metrics:** Legacy commands that predate declarative specification enforcement are governed by `.zqk/cli/command_spec_coverage_baseline.json`. The baseline strictly prohibits any new un-specced commands (`new_drift_count == 0`), failing closed on any regressions. As grandfathered commands receive declarative specs, the baseline ratchets forward until 100% full parity (`parity: true`) is achieved:
+   - **Loaded Command Inventory:** 518 commands
+   - **Declaratively Specced Commands:** 252 commands
+   - **Grandfathered Un-specced Commands:** 206 commands (frozen under baseline governance)
+   - **New Drift Permitted:** 0 (enforced by `zqk system validate-command-specs`)
 
 ### Rule 2: Strict Domain-Resource Grammar & Noun-Verb Hierarchy
 1. **Domain Hierarchy & Approved Ergonomics Shortcuts:**  
@@ -121,7 +125,7 @@ All commands must implement the standard **Command DNA**:
 ### Technical Documentarian Persona (`PER-TECHNICAL-DOCUMENTARIAN`)
 - **Mission:** Guarantee documentation completeness, spec-to-code alignment, manual page accuracy, and user clarity.
 - **Responsibilities:**
-  - Verifies that 100% of commands have up-to-date specs and accurate manual pages.
+  - Enforces zero new spec drift and ratchets grandfathered legacy commands toward 100% declarative specification coverage, maintaining accurate manual pages and verified baseline synchronization.
   - Audits help strings, flag descriptions, and usage examples.
   - Eliminates undocumented flags, hidden arguments, and stale guidance.
 
