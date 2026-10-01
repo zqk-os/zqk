@@ -168,7 +168,6 @@ func NewGuestSecurityContext() *SecurityContext {
 	}
 }
 
-
 // GetRoles returns the roles for this security context
 func (s *SecurityContext) GetRoles() []string {
 	return s.Roles

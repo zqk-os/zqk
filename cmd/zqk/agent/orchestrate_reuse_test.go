@@ -385,12 +385,12 @@ func TestOrchestrationTask_IdempotentDeduplication(t *testing.T) {
 	// 1. In-flight task is reused (no duplicate minting)
 	tasks := []map[string]any{
 		{
-			objects.FieldKeyID:             "ATK-LIVE-1",
-			objects.FieldKeyTitle:          title,
-			objects.FieldKeyStatus:         objects.ObjectStatusInProgress,
+			objects.FieldKeyID:              "ATK-LIVE-1",
+			objects.FieldKeyTitle:           title,
+			objects.FieldKeyStatus:          objects.ObjectStatusInProgress,
 			objects.FieldKeyPriorityPlanRef: planID,
-			objects.FieldKeyBacklogItemRef: itemID,
-			objects.FieldKeyUpdatedAt:      "2026-09-26T12:00:00Z",
+			objects.FieldKeyBacklogItemRef:  itemID,
+			objects.FieldKeyUpdatedAt:       "2026-09-26T12:00:00Z",
 		},
 	}
 	id, status, disp := pickExistingOrchestrationTask(tasks, title, planID, itemID)
@@ -401,12 +401,12 @@ func TestOrchestrationTask_IdempotentDeduplication(t *testing.T) {
 	// 2. Completed task is skipped (prevents rerun/remint)
 	doneTasks := []map[string]any{
 		{
-			objects.FieldKeyID:             "ATK-DONE-1",
-			objects.FieldKeyTitle:          title,
-			objects.FieldKeyStatus:         objects.ObjectStatusComplete,
+			objects.FieldKeyID:              "ATK-DONE-1",
+			objects.FieldKeyTitle:           title,
+			objects.FieldKeyStatus:          objects.ObjectStatusComplete,
 			objects.FieldKeyPriorityPlanRef: planID,
-			objects.FieldKeyBacklogItemRef: itemID,
-			objects.FieldKeyUpdatedAt:      "2026-09-26T12:00:00Z",
+			objects.FieldKeyBacklogItemRef:  itemID,
+			objects.FieldKeyUpdatedAt:       "2026-09-26T12:00:00Z",
 		},
 	}
 	id, status, disp = pickExistingOrchestrationTask(doneTasks, title, planID, itemID)
@@ -437,4 +437,3 @@ func TestOrchestrationExecutor_ParentZqkEnvShielding(t *testing.T) {
 		t.Fatalf("expected %s to be injected into child execution env", zqkenv.Bin().Name())
 	}
 }
-

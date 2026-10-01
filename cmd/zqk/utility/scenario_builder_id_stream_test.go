@@ -36,8 +36,8 @@ func TestResolveReferencesFromIDStream(t *testing.T) {
 
 	// Setup: Add some IDs to the stream
 	idStreamMu.Lock()
-	idStream["WS-001"] = "WS-001"                                                     // Workstream ID
-	idStream["GOAL-001"] = "GOAL-001"                                                 // Goal ID
+	idStream["WS-001"] = "WS-001"               // Workstream ID
+	idStream["GOAL-001"] = "GOAL-001"           // Goal ID
 	idStream["ACC-TEST-USER"] = "ACC-TEST-USER" // Account ID
 	idStreamMu.Unlock()
 

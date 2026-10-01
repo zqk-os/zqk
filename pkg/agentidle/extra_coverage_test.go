@@ -87,4 +87,3 @@ func TestRecordCVSSnapshot_Invoke(t *testing.T) {
 	// RecordCVSSnapshot calls CLI, will attempt exec and return an error or succeed if CLI is available
 	_ = RecordCVSSnapshot(store, "CVS-TEST-001")
 }
-

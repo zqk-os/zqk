@@ -120,7 +120,7 @@ type TaskPromptOptions struct {
 	InlineBodies bool
 	// IncludeObserver adds a live, task-scoped AST hint. Default is the tool-access
 	// pointer only. Never persist the hint on agent_task.
-	IncludeObserver bool
+	IncludeObserver      bool
 	TaskSteps            string // Pre-formatted task steps section (or synthesized mutation steps)
 	UpstreamDeliverables string // Markdown section of verified upstream deliverables from dependency shockwaves
 }

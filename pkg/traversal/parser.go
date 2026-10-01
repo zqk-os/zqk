@@ -26,27 +26,27 @@ const (
 	TokenNumber
 	TokenBool
 	TokenNull
-	TokenLParen   // (
-	TokenRParen   // )
-	TokenLBracket // [
-	TokenRBracket // ]
-	TokenLBrace   // {
-	TokenRBrace   // }
-	TokenColon    // :
-	TokenComma    // ,
-	TokenDot      // .
+	TokenLParen    // (
+	TokenRParen    // )
+	TokenLBracket  // [
+	TokenRBracket  // ]
+	TokenLBrace    // {
+	TokenRBrace    // }
+	TokenColon     // :
+	TokenComma     // ,
+	TokenDot       // .
 	TokenSemicolon // ;
-	TokenMinus    // -
-	TokenArrowR   // ->
-	TokenArrowL   // <-
-	TokenStar     // *
-	TokenDotDot   // ..
-	TokenEq       // = or ==
-	TokenNotEq    // !=
-	TokenLt       // <
-	TokenLte      // <=
-	TokenGt       // >
-	TokenGte      // >=
+	TokenMinus     // -
+	TokenArrowR    // ->
+	TokenArrowL    // <-
+	TokenStar      // *
+	TokenDotDot    // ..
+	TokenEq        // = or ==
+	TokenNotEq     // !=
+	TokenLt        // <
+	TokenLte       // <=
+	TokenGt        // >
+	TokenGte       // >=
 
 	// Keywords
 	TokenMatch
@@ -419,8 +419,8 @@ func (l *Lexer) scanIdent() (Token, error) {
 
 // Parser parses ZPARQL query string into QueryAST.
 type Parser struct {
-	tokens  []Token
-	pos     int
+	tokens    []Token
+	pos       int
 	boundVars map[string]bool
 }
 

@@ -404,5 +404,3 @@ func Handle(cmd string) string {
 		t.Fatalf("Expected map key drift violation in sample code, got: %v", violations)
 	}
 }
-
-

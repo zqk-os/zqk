@@ -7,7 +7,6 @@ import (
 	"strings"
 )
 
-
 // Actor returns the canonical agent or actor identifier, preferring AgentURN if populated.
 func (p Provenance) Actor() string {
 	if !p.AgentURN.IsZero() {

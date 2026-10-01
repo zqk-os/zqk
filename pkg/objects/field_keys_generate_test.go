@@ -62,7 +62,6 @@ func TestUnionFieldNamesFromSpecIndex(t *testing.T) {
 		},
 	}
 
-
 	names := UnionFieldNamesFromSpecIndex(idx)
 	if len(names) != 3 || names[0] != "field_a" || names[1] != "field_b" || names[2] != "field_c" {
 		t.Fatalf("unexpected sorted union: %v", names)

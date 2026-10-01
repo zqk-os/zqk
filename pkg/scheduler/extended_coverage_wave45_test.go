@@ -111,10 +111,10 @@ func TestExtended_RunWrapper_ExecutionAndRetries_Wave45(t *testing.T) {
 		Command:     "go test -v ./...",
 		CommandArgs: []string{"-v", "./..."},
 		EnvironmentVariables: map[string]string{
-			"COMMAND":                  "go test -v ./...",
-			"WRITE_JOB_LOG_FILES":      "true",
-			"WRITE_SEPARATE_JOB_LOGS":  "true",
-			"STREAM_LOG_DIR":           filepath.Join(tmpDir, "logs"),
+			"COMMAND":                          "go test -v ./...",
+			"WRITE_JOB_LOG_FILES":              "true",
+			"WRITE_SEPARATE_JOB_LOGS":          "true",
+			"STREAM_LOG_DIR":                   filepath.Join(tmpDir, "logs"),
 			"TEST_BUNDLE_METADATA_FINGERPRINT": "expected_fp",
 		},
 		Metadata: map[string]any{

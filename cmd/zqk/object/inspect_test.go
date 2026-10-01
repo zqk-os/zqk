@@ -744,19 +744,19 @@ func TestPolicyStudio_RunPolicyStudioDryRun(t *testing.T) {
 	mockStorage := &mockInspectStorage{
 		objects: map[string]map[string]any{
 			"BLI-POL-001": {
-				objects.FieldKeyID:       "BLI-POL-001",
-				objects.FieldKeyKind:     objects.KindBacklogItem,
-				objects.FieldKeyTitle:    "Valid Item",
-				objects.FieldKeyStatus:   "planned",
-				"requirement_refs":       []any{"REQ-1"},
-				"milestone_refs":         []any{"MIL-1"},
-				"estimated_effort":       "2d",
+				objects.FieldKeyID:     "BLI-POL-001",
+				objects.FieldKeyKind:   objects.KindBacklogItem,
+				objects.FieldKeyTitle:  "Valid Item",
+				objects.FieldKeyStatus: "planned",
+				"requirement_refs":     []any{"REQ-1"},
+				"milestone_refs":       []any{"MIL-1"},
+				"estimated_effort":     "2d",
 			},
 			"BLI-POL-002": {
-				objects.FieldKeyID:       "BLI-POL-002",
-				objects.FieldKeyKind:     objects.KindBacklogItem,
-				objects.FieldKeyTitle:    "Invalid Item (Missing lineage & effort)",
-				objects.FieldKeyStatus:   "planned",
+				objects.FieldKeyID:     "BLI-POL-002",
+				objects.FieldKeyKind:   objects.KindBacklogItem,
+				objects.FieldKeyTitle:  "Invalid Item (Missing lineage & effort)",
+				objects.FieldKeyStatus: "planned",
 			},
 		},
 	}
@@ -767,18 +767,18 @@ func TestPolicyStudio_RunPolicyStudioDryRun(t *testing.T) {
 
 	rules := []PolicyRule{
 		{
-			ID:          "POL-LINEAGE-CHECK",
-			Name:        "Lineage Intact",
-			TargetKind:  objects.KindBacklogItem,
-			Expression:  "requirement_refs is_not_empty && milestone_refs is_not_empty",
-			Severity:    "blocker",
+			ID:         "POL-LINEAGE-CHECK",
+			Name:       "Lineage Intact",
+			TargetKind: objects.KindBacklogItem,
+			Expression: "requirement_refs is_not_empty && milestone_refs is_not_empty",
+			Severity:   "blocker",
 		},
 		{
-			ID:          "POL-EFFORT-CHECK",
-			Name:        "Effort Populated",
-			TargetKind:  objects.KindBacklogItem,
-			Expression:  "estimated_effort is_populated",
-			Severity:    "warning",
+			ID:         "POL-EFFORT-CHECK",
+			Name:       "Effort Populated",
+			TargetKind: objects.KindBacklogItem,
+			Expression: "estimated_effort is_populated",
+			Severity:   "warning",
 		},
 	}
 
@@ -955,7 +955,3 @@ func TestInspectTUIModel_TestCaseInspection(t *testing.T) {
 	model.HandleInput([]byte{'q'})
 	assert.False(t, model.DetailModalOpen)
 }
-
-
-
-

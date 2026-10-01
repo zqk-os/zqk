@@ -27,7 +27,7 @@ func TestCPCPInterceptor_SafeToolCall(t *testing.T) {
 	safeParams := &ToolCallParams{
 		Name: "write_to_file",
 		Arguments: map[string]any{
-			"TargetFile": "/workspace/pkg/models/user.go",
+			"TargetFile":  "/workspace/pkg/models/user.go",
 			"CodeContent": "package models\n",
 		},
 	}

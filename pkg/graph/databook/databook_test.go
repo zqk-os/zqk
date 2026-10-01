@@ -16,12 +16,12 @@ func TestBuildDataBookFromObjects_Basic(t *testing.T) {
 			"acceptance_considerations": "Zero telemetry gaps and pass all gates",
 		},
 		{
-			"id":               "REQ-001",
-			"kind":             "requirement",
-			"title":            "W3C Holon Serialization Support",
-			"status":           "active",
-			"goal_refs":        []string{"GOAL-001"},
-			"criteria_refs":    []string{"CRIT-001"},
+			"id":            "REQ-001",
+			"kind":          "requirement",
+			"title":         "W3C Holon Serialization Support",
+			"status":        "active",
+			"goal_refs":     []string{"GOAL-001"},
+			"criteria_refs": []string{"CRIT-001"},
 		},
 	}
 

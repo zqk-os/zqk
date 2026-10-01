@@ -70,10 +70,10 @@ func (q *ListingIndexWriteQueue) getOrCreateQueue(kind string, cas *filecas.Cont
 		createdQueue = &indexQueue{
 			parentQueue: q,
 			kind:        kind,
-			queue:     make(chan *indexUpdateRequest, 1000), // Buffered channel for high concurrency
-			cas:       cas,
-			batchSize: casIndexBatchSize,
-			timeout:   casIndexBatchTimeout,
+			queue:       make(chan *indexUpdateRequest, 1000), // Buffered channel for high concurrency
+			cas:         cas,
+			batchSize:   casIndexBatchSize,
+			timeout:     casIndexBatchTimeout,
 			// workerRunning starts at 0 (default for atomic.Int32) - Start with worker not running
 			secCtx:    secCtx,
 			ctx:       ctx,

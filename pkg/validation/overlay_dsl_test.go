@@ -235,14 +235,14 @@ func TestOverlayDSL_UnifiedPredicateLifecycles(t *testing.T) {
 	// 1. CRI-CEF-DSL-FIELD-PRESENCE: Proper string trimming, slice and map verification
 	t.Run("CRI-CEF-DSL-FIELD-PRESENCE", func(t *testing.T) {
 		obj := map[string]any{
-			"valid_str":     "  hello world  ",
-			"blank_str":     "   \t\n   ",
-			"empty_slice":   []string{},
-			"blank_slice":   []string{"", "   "},
-			"valid_slice":   []string{"   ", "item"},
-			"empty_map":     map[string]any{},
-			"valid_map":     map[string]any{"k": "v"},
-			"nil_field":     nil,
+			"valid_str":   "  hello world  ",
+			"blank_str":   "   \t\n   ",
+			"empty_slice": []string{},
+			"blank_slice": []string{"", "   "},
+			"valid_slice": []string{"   ", "item"},
+			"empty_map":   map[string]any{},
+			"valid_map":   map[string]any{"k": "v"},
+			"nil_field":   nil,
 		}
 
 		// Field nonempty verification

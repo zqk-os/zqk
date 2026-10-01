@@ -34,24 +34,24 @@ var baseFields = map[string]struct{}{
 
 // Structural top-level spec keys that are not object fields.
 var specMetaKeys = map[string]struct{}{
-	"ontology":                 {},
-	"plane":                    {},
-	"status":                   {},
-	"lifecycle":                {},
-	"inherits":                 {},
-	"description":              {},
-	"summary":                  {},
-	"fields":                   {},
-	"completeness_validation":  {},
-	"change_log":               {},
-	"artifacts":                {},
-	"context":                  {},
+	"ontology":                {},
+	"plane":                   {},
+	"status":                  {},
+	"lifecycle":               {},
+	"inherits":                {},
+	"description":             {},
+	"summary":                 {},
+	"fields":                  {},
+	"completeness_validation": {},
+	"change_log":              {},
+	"artifacts":               {},
+	"context":                 {},
 }
 
 var (
-	camelAcronymRe = regexp.MustCompile(`([A-Z]+)([A-Z][a-z])`)
+	camelAcronymRe  = regexp.MustCompile(`([A-Z]+)([A-Z][a-z])`)
 	camelBoundaryRe = regexp.MustCompile(`([a-z0-9])([A-Z])`)
-	multiSepRe     = regexp.MustCompile(`[_\-]{2,}`)
+	multiSepRe      = regexp.MustCompile(`[_\-]{2,}`)
 )
 
 // NormalizeField reduces a field name to its canonical snake_case form so that

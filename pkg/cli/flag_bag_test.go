@@ -76,4 +76,3 @@ func TestFlagBag_AllTypes(t *testing.T) {
 		t.Fatal("expected error on nil cmd")
 	}
 }
-

@@ -248,5 +248,3 @@ func TestGenerateTracePipelineBundle_MandatoryDocumentationCriteria(t *testing.T
 		t.Error("expected base criteria to include mandatory documentation and doc_entry criterion (POL-DOC-001)")
 	}
 }
-
-

@@ -13,35 +13,35 @@ import (
 )
 
 const (
-	testGHOriginalTitle         = `Refactor cache eviction pipeline`
-	testGHOriginalBody          = `Cache eviction blocks background flushes under load.`
-	testGHResolvedTitle         = `Refactor cache eviction pipeline (Resolved)`
-	testGHResolvedBody          = `Fixed via lock-free queue.`
-	testGHNewerKernelTitle      = `Newer Kernel Data`
-	testGHStaleExternalTitle     = `Stale External Data`
+	testGHOriginalTitle      = `Refactor cache eviction pipeline`
+	testGHOriginalBody       = `Cache eviction blocks background flushes under load.`
+	testGHResolvedTitle      = `Refactor cache eviction pipeline (Resolved)`
+	testGHResolvedBody       = `Fixed via lock-free queue.`
+	testGHNewerKernelTitle   = `Newer Kernel Data`
+	testGHStaleExternalTitle = `Stale External Data`
 
-	testLinOriginalTitle        = `Original linear title`
-	testLinOriginalDesc         = `Original description`
-	testLinPushedTitle          = `Pushed title from zqk kernel`
-	testLinPushedDesc           = `Pushed description from zqk kernel`
+	testLinOriginalTitle = `Original linear title`
+	testLinOriginalDesc  = `Original description`
+	testLinPushedTitle   = `Pushed title from zqk kernel`
+	testLinPushedDesc    = `Pushed description from zqk kernel`
 
-	testLinStudioTitle          = `Support Web Studio Embedded UI`
-	testLinStudioDesc           = `Run lightweight web UI server from zqk ui --web.`
-	testLinStudioProject        = `Visual Studio Plane`
-	testLinStudioPlanRef        = `PRI-VISUAL-STUDIO-PLANE`
+	testLinStudioTitle   = `Support Web Studio Embedded UI`
+	testLinStudioDesc    = `Run lightweight web UI server from zqk ui --web.`
+	testLinStudioProject = `Visual Studio Plane`
+	testLinStudioPlanRef = `PRI-VISUAL-STUDIO-PLANE`
 
-	testUpdatedKernelTitle      = `Updated Title from Kernel`
-	testUpdatedKernelBody       = `Updated Problem Statement from Kernel`
+	testUpdatedKernelTitle = `Updated Title from Kernel`
+	testUpdatedKernelBody  = `Updated Problem Statement from Kernel`
 
-	testErrIssueNotFoundFmt     = "issue %d not found"
-	testErrLinearNotFoundFmt    = "linear issue %s not found"
-	testLinearEng204ID          = "linear-ENG-204"
-	testLinearEng300ID          = "linear-ENG-300"
-	testBliLinearEng300ID       = "BLI-LIN-ENG-300"
-	testFileGHLinearSrc         = "./github_linear.go"
-	testFileGHLinearTestSrc     = "./github_linear_test.go"
-	testMsgGHZeroViolations     = "github_linear.go must have zero violations"
-	testMsgTestZeroViolations   = "github_linear_test.go must have zero violations"
+	testErrIssueNotFoundFmt   = "issue %d not found"
+	testErrLinearNotFoundFmt  = "linear issue %s not found"
+	testLinearEng204ID        = "linear-ENG-204"
+	testLinearEng300ID        = "linear-ENG-300"
+	testBliLinearEng300ID     = "BLI-LIN-ENG-300"
+	testFileGHLinearSrc       = "./github_linear.go"
+	testFileGHLinearTestSrc   = "./github_linear_test.go"
+	testMsgGHZeroViolations   = "github_linear.go must have zero violations"
+	testMsgTestZeroViolations = "github_linear_test.go must have zero violations"
 )
 
 // mockGitHubClient is an in-memory test double for GitHubClient.

@@ -9,13 +9,13 @@ import (
 
 // MockAdapter is an in-memory thread-safe implementation of ServiceAdapter for unit testing.
 type MockAdapter struct {
-	mu           sync.RWMutex
-	name         string
-	available    bool
-	installed    map[string]ServiceSpec
-	running      map[string]ServiceStatus
+	mu            sync.RWMutex
+	name          string
+	available     bool
+	installed     map[string]ServiceSpec
+	running       map[string]ServiceStatus
 	legacyCleaned []string
-	
+
 	// Error injectors for testing negative cases
 	InstallErr   error
 	UninstallErr error

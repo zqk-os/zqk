@@ -8,9 +8,9 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/zqk-os/zqk/cmd/zqk/state"
-	"github.com/zqk-os/zqk/pkg/tui/tds"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/tui/tds"
 )
 
 var (
@@ -1891,4 +1891,3 @@ func renderHealthTab(b *strings.Builder, m *UIModel) {
 	b.WriteString(vTable.Render())
 	b.WriteString("\n")
 }
-

@@ -84,4 +84,3 @@ func VerifyNoSubprocessLeaks(t testing.TB) {
 			len(leaked), strings.Join(details, "\n"))
 	}
 }
-

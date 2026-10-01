@@ -500,7 +500,7 @@ func minimalCriteria(id string) map[string]any {
 	return map[string]any{
 		objects.FieldKeyID: id, objects.FieldKeyKind: "criteria", objects.FieldKeyTitle: "CRUD baseline criteria",
 		objects.FieldKeyDescription: "Valid criteria description exceeding ten characters",
-		objects.FieldKeyStatus: objects.ObjectStatusAwaitingVerification, objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion, objects.FieldKeyCategory: "functional",
+		objects.FieldKeyStatus:      objects.ObjectStatusAwaitingVerification, objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion, objects.FieldKeyCategory: "functional",
 		objects.FieldKeyCreatedAt: now, objects.FieldKeyCreatedBy: "ACC-TEST", objects.FieldKeyUpdatedAt: now, objects.FieldKeyUpdatedBy: "ACC-TEST",
 	}
 }

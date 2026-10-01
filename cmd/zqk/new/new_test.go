@@ -622,4 +622,3 @@ func TestRunNewCommandSpec_CustomFlagsAndExamples(t *testing.T) {
 		t.Errorf("unexpected example: %v", ex0)
 	}
 }
-

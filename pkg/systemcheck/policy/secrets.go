@@ -27,12 +27,12 @@ func (g *SecretsGate) Description() string {
 var secretPatterns = secretpatterns.CombinedRegex
 
 var excludedDirNames = map[string]bool{
-	".git":                true,
+	".git":               true,
 	paths.ProjectDataDir: true,
-	"vendor":              true,
-	"testdata":            true,
-	".agent":              true,
-	".gemini":             true,
+	"vendor":             true,
+	"testdata":           true,
+	".agent":             true,
+	".gemini":            true,
 }
 
 var binaryExts = map[string]bool{

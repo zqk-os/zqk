@@ -161,4 +161,3 @@ func TestKernel_ExtensionLifecycle(t *testing.T) {
 		t.Error("expected Shutdown to be called on extension")
 	}
 }
-

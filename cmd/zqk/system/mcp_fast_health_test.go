@@ -19,10 +19,10 @@ func TestGetSystemHealthDataMCPFast_WithCachedSummary(t *testing.T) {
 
 	payload := map[string]any{
 		"summary": map[string]any{
-			"total_objects":    1500,
-			"blocking_issues":  0,
-			"warnings":         2,
-			"informational":    5,
+			"total_objects":   1500,
+			"blocking_issues": 0,
+			"warnings":        2,
+			"informational":   5,
 			"recommendations": 10,
 		},
 	}

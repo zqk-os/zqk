@@ -4,13 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
-	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // LaunchdAdapter implements ServiceAdapter using Apple's launchd daemon/agent system.

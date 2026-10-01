@@ -29,7 +29,6 @@ import (
 // an update arrived before a wall-clock instant needs nobody's arithmetic to be true, and
 // the check-ins accumulate the per-step provenance that would let estimate accuracy be
 // judged honestly later.
-//
 const (
 	// TimerTypeCheckin marks a cadence timer. The scheduler's hourglass watcher treats
 	// unrecognized types as stuck sync-loop processes and SIGKILLs the recorded pid, so

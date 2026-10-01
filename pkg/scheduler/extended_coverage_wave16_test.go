@@ -119,7 +119,7 @@ func TestExtended_CapDispatch_VerificationAndMint(t *testing.T) {
 		objects.FieldKeySchemaVersion:   objects.DefaultSchemaVersion,
 		objects.FieldKeyStatus:          objects.ObjectStatusPendingVerification,
 		objects.FieldKeyPriorityPlanRef: planID,
-		objects.FieldKeyCommitHashes:     []any{"deadbeef1234"},
+		objects.FieldKeyCommitHashes:    []any{"deadbeef1234"},
 	})
 	t.Logf("taskWithCommits create: %v", crErr2)
 

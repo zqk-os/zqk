@@ -266,19 +266,19 @@ var (
 	ProcessPlanningDir                     = ProjectDataDir + "/process/planning"
 	// Audit events are stream-backed (.zqk/state/stream_current/audit_event and .zqk/streams/audit_event).
 	// There is no CAS folder under process/audit.
-	ProcessAccountsDir                     = ProjectDataDir + "/process/accounts"
-	ProcessPersonasDir                     = ProjectDataDir + "/process/personas"
-	ProcessAuthStrategiesDir               = ProjectDataDir + "/process/auth_strategies"
-	ProcessBacklogDir                      = ProjectDataDir + "/process/backlog_items"
-	ProcessTestCasesDir                    = ProjectDataDir + "/process/test_cases"
-	ProcessKeystoreDir                     = ProjectDataDir + "/process/keystore"
-	ProcessRolesDir                        = ProjectDataDir + "/process/roles"
-	ProcessMissionsDir                     = ProjectDataDir + "/process/missions"
-	ProcessVisionsDir                      = ProjectDataDir + "/process/visions"
-	ProcessGoalsDir                        = ProjectDataDir + "/process/goals"
-	ProcessWorkstreamsDir                  = ProjectDataDir + "/process/workstreams"
-	ProcessPriorityPlansDir                = ProjectDataDir + "/process/priority_plans"
-	ProcessAgentSkillsDir                  = ProjectDataDir + "/process/agent_skills"
+	ProcessAccountsDir       = ProjectDataDir + "/process/accounts"
+	ProcessPersonasDir       = ProjectDataDir + "/process/personas"
+	ProcessAuthStrategiesDir = ProjectDataDir + "/process/auth_strategies"
+	ProcessBacklogDir        = ProjectDataDir + "/process/backlog_items"
+	ProcessTestCasesDir      = ProjectDataDir + "/process/test_cases"
+	ProcessKeystoreDir       = ProjectDataDir + "/process/keystore"
+	ProcessRolesDir          = ProjectDataDir + "/process/roles"
+	ProcessMissionsDir       = ProjectDataDir + "/process/missions"
+	ProcessVisionsDir        = ProjectDataDir + "/process/visions"
+	ProcessGoalsDir          = ProjectDataDir + "/process/goals"
+	ProcessWorkstreamsDir    = ProjectDataDir + "/process/workstreams"
+	ProcessPriorityPlansDir  = ProjectDataDir + "/process/priority_plans"
+	ProcessAgentSkillsDir    = ProjectDataDir + "/process/agent_skills"
 )
 
 const (

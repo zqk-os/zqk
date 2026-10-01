@@ -379,5 +379,3 @@ tasks:
 		t.Errorf("expected rendered rewrite template, got %q", desc)
 	}
 }
-
-

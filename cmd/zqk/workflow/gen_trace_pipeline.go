@@ -393,7 +393,7 @@ func applyGeneratedTracePipeline(cmd *cobra.Command, proc *cli.Processor, target
 		TargetTitle:       targetTitle,
 		TargetPreExisted:  true,
 		LinkedExistingIDs: []string{targetID},
-		LinkageNote: fmt.Sprintf("Target %s %s pre-existed in Knowledge Kernel. Generated pipeline components are being linked to it.", targetKind, targetID),
+		LinkageNote:       fmt.Sprintf("Target %s %s pre-existed in Knowledge Kernel. Generated pipeline components are being linked to it.", targetKind, targetID),
 	}
 
 	stopPulse := pulseMeaningfulActivityWhileWaiting(proc)

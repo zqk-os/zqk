@@ -34,11 +34,11 @@ type JournalMutation struct {
 }
 
 type BacklogItemNode struct {
-	ID          string `json:"id"`
-	Title       string `json:"title"`
-	Status      string `json:"status"`
-	Priority    string `json:"priority,omitempty"`
-	ClaimedBy   string `json:"claimed_by,omitempty"`
+	ID          string   `json:"id"`
+	Title       string   `json:"title"`
+	Status      string   `json:"status"`
+	Priority    string   `json:"priority,omitempty"`
+	ClaimedBy   string   `json:"claimed_by,omitempty"`
 	CriteriaIDs []string `json:"criteria_ids,omitempty"`
 }
 

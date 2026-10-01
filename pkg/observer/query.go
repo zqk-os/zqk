@@ -33,10 +33,10 @@ var skipDirNames = map[string]struct{}{
 	".git":               {},
 	paths.ProjectDataDir: {},
 	"vendor":             {},
-	"node_modules": {},
-	"testdata":     {},
-	"dist":         {},
-	"bin":          {},
+	"node_modules":       {},
+	"testdata":           {},
+	"dist":               {},
+	"bin":                {},
 }
 
 // Search extracts matching Go entities from Root. Name or Path is required.

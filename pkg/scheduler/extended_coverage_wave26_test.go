@@ -204,14 +204,14 @@ func TestExtended_HandlersRetentionMaxCount_DeepCoverage(t *testing.T) {
 	for i := 1; i <= 6; i++ {
 		taskID := fmt.Sprintf("ATK-maxcount-del-%d", i)
 		if err := sp.Create(bgCtx, secCtx, map[string]any{
-			objects.FieldKeyID:                  taskID,
-			objects.FieldKeyKind:                objects.KindAgentTask,
-			objects.FieldKeySchemaVersion:       objects.DefaultSchemaVersion,
-			objects.FieldKeyStatus:              objects.ObjectStatusError,
-			objects.FieldKeyAssigneePersonaRef:  "software_engineer",
-			objects.FieldKeyTitle:               fmt.Sprintf("Deletable Task %d", i),
-			objects.FieldKeyDescription:         "Description for max count deletion",
-			objects.FieldKeyCreatedAt:           time.Now().Add(-time.Duration(10-i) * time.Hour).Format(time.RFC3339),
+			objects.FieldKeyID:                 taskID,
+			objects.FieldKeyKind:               objects.KindAgentTask,
+			objects.FieldKeySchemaVersion:      objects.DefaultSchemaVersion,
+			objects.FieldKeyStatus:             objects.ObjectStatusError,
+			objects.FieldKeyAssigneePersonaRef: "software_engineer",
+			objects.FieldKeyTitle:              fmt.Sprintf("Deletable Task %d", i),
+			objects.FieldKeyDescription:        "Description for max count deletion",
+			objects.FieldKeyCreatedAt:          time.Now().Add(-time.Duration(10-i) * time.Hour).Format(time.RFC3339),
 		}); err != nil {
 			t.Fatalf("create task failed: %v", err)
 		}
@@ -235,14 +235,14 @@ func TestExtended_HandlersRetentionMaxCount_DeepCoverage(t *testing.T) {
 	for i := 10; i <= 13; i++ {
 		taskID := fmt.Sprintf("ATK-maxcount-batch-%d", i)
 		if err := sp.Create(bgCtx, secCtx, map[string]any{
-			objects.FieldKeyID:                  taskID,
-			objects.FieldKeyKind:                objects.KindAgentTask,
-			objects.FieldKeySchemaVersion:       objects.DefaultSchemaVersion,
-			objects.FieldKeyStatus:              objects.ObjectStatusError,
-			objects.FieldKeyAssigneePersonaRef:  "software_engineer",
-			objects.FieldKeyTitle:               fmt.Sprintf("Batch Task %d", i),
-			objects.FieldKeyDescription:         "Description for batch task",
-			objects.FieldKeyCreatedAt:           time.Now().Add(-time.Duration(20-i) * time.Hour).Format(time.RFC3339),
+			objects.FieldKeyID:                 taskID,
+			objects.FieldKeyKind:               objects.KindAgentTask,
+			objects.FieldKeySchemaVersion:      objects.DefaultSchemaVersion,
+			objects.FieldKeyStatus:             objects.ObjectStatusError,
+			objects.FieldKeyAssigneePersonaRef: "software_engineer",
+			objects.FieldKeyTitle:              fmt.Sprintf("Batch Task %d", i),
+			objects.FieldKeyDescription:        "Description for batch task",
+			objects.FieldKeyCreatedAt:          time.Now().Add(-time.Duration(20-i) * time.Hour).Format(time.RFC3339),
 		}); err != nil {
 			t.Fatalf("create batch task failed: %v", err)
 		}

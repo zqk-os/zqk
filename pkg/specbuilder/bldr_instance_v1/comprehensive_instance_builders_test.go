@@ -112,4 +112,3 @@ func invokeAllBuilderSetters(b any) {
 		}()
 	}
 }
-

@@ -27,4 +27,3 @@ func IsTestCaseProven(tc map[string]any) bool {
 	remOpen, _ := tc["remaining_open_count"].(int)
 	return IsCompleteStatus(tStatus) && remOpen == 0
 }
-

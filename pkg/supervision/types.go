@@ -20,11 +20,11 @@ type FailureDiagnostic struct {
 	Attempt           int          `json:"attempt"`
 	ExitCode          int          `json:"exit_code"`
 	Phase             FailingPhase `json:"phase"`
-	FailureAnchor     string       `json:"failure_anchor,omitempty"`     // E.g. file, symbol, or command
+	FailureAnchor     string       `json:"failure_anchor,omitempty"` // E.g. file, symbol, or command
 	RawStderr         string       `json:"raw_stderr,omitempty"`
 	RawStdout         string       `json:"raw_stdout,omitempty"`
-	FocusedDiagnostic string       `json:"focused_diagnostic"`           // Extracted signal without noise
-	ObservedAnomaly   string       `json:"observed_anomaly,omitempty"`   // Contrastive description of failure
+	FocusedDiagnostic string       `json:"focused_diagnostic"`         // Extracted signal without noise
+	ObservedAnomaly   string       `json:"observed_anomaly,omitempty"` // Contrastive description of failure
 	Timestamp         time.Time    `json:"timestamp"`
 }
 

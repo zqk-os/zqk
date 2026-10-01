@@ -444,4 +444,3 @@ func (s *Supervisor) RemoveDaemon(ctx context.Context, name string) error {
 
 	return s.registry.Delete(name)
 }
-

@@ -17,11 +17,11 @@ func TestPromoteTransitionTargets(t *testing.T) {
 	lc := &Lifecycle{
 		Transitions: []Transition{
 			{From: "planned", To: "in_progress", Manual: true, Auto: false},
-			{From: "planned", To: "archived", Manual: false, Auto: true},       // auto-only: excluded
-			{From: "planned", To: "complete", Manual: true, Auto: true},         // dual: included
-			{From: "*", To: "rejected", Manual: true, Auto: false},             // wildcard: included
-			{From: "planned", To: ""},                                          // empty To: skipped
-			{From: "in_progress", To: "complete", Manual: true, Auto: false},    // from mismatch: skipped
+			{From: "planned", To: "archived", Manual: false, Auto: true},     // auto-only: excluded
+			{From: "planned", To: "complete", Manual: true, Auto: true},      // dual: included
+			{From: "*", To: "rejected", Manual: true, Auto: false},           // wildcard: included
+			{From: "planned", To: ""},                                        // empty To: skipped
+			{From: "in_progress", To: "complete", Manual: true, Auto: false}, // from mismatch: skipped
 		},
 	}
 

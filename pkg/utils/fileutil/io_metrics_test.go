@@ -8,7 +8,6 @@ import (
 	"time"
 )
 
-
 func TestClassifyPath(t *testing.T) {
 	tests := []struct {
 		path     string

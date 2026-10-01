@@ -61,13 +61,7 @@ transitions:
       - hop from any occupancy to error
       - system halt; repair before leaving halted
 percent_complete:
-  method: status_defaults
-  default_by_status:
-    conceptual: 0
-    originated: 25
-    active: 100
-    archived: 100
-    error: 0
+  method: ""
 
 created_at: 2026-07-01T18:00:00Z
 updated_at: 2026-07-01T18:00:00Z

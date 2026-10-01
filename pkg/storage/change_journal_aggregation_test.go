@@ -264,7 +264,6 @@ func TestChangeJournalAggregationService_CleanupAggregatedEntries_EmptyArchive(t
 	}
 }
 
-
 // TestChangeJournalAggregationService_AggregateChangeJournalEntries_Integration runs the full
 // aggregation workflow: create change journal entries, run aggregation, verify metric and entry updates.
 // BLI-635: Integration test for aggregation workflow.

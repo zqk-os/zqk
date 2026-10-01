@@ -3,7 +3,6 @@ package qa
 import (
 	"strings"
 	"testing"
-
 )
 
 func TestGuidanceEngine_Recommend(t *testing.T) {

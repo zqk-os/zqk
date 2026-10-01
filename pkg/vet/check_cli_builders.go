@@ -16,9 +16,9 @@ import (
 )
 
 // CheckCLIBuilders verifies:
-// 1. Every declarative command spec in .zqk/cli/specs/ has a generated builder in pkg/cli/bldr_cli_cmd_v1/.
-// 2. Command constructors in cmd/zqk/ follow the established builder pattern (using bldr_cli_cmd_v1 or clipkg.ApplyBuilder)
-//    rather than constructing ad-hoc &cobra.Command structs directly for specced or un-baselined commands.
+//  1. Every declarative command spec in .zqk/cli/specs/ has a generated builder in pkg/cli/bldr_cli_cmd_v1/.
+//  2. Command constructors in cmd/zqk/ follow the established builder pattern (using bldr_cli_cmd_v1 or clipkg.ApplyBuilder)
+//     rather than constructing ad-hoc &cobra.Command structs directly for specced or un-baselined commands.
 func CheckCLIBuilders(projectRoot string, cfg *GatesConfig, rootCmd any) ([]Finding, error) {
 	var findings []Finding
 

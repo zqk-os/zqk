@@ -38,12 +38,12 @@ func DefaultStagnationPolicy() StagnationPolicy {
 
 // StagnationAssessment represents the outcome of evaluating retry history.
 type StagnationAssessment struct {
-	IsStagnant             bool           `json:"is_stagnant"`
-	ConsecutiveZeroDelta   int            `json:"consecutive_zero_delta"`
-	IdenticalSigOccurrences int            `json:"identical_sig_occurrences"`
-	Escalate               bool           `json:"escalate"`
-	Recommendation         string         `json:"recommendation"`
-	Reason                 string         `json:"reason"`
+	IsStagnant              bool   `json:"is_stagnant"`
+	ConsecutiveZeroDelta    int    `json:"consecutive_zero_delta"`
+	IdenticalSigOccurrences int    `json:"identical_sig_occurrences"`
+	Escalate                bool   `json:"escalate"`
+	Recommendation          string `json:"recommendation"`
+	Reason                  string `json:"reason"`
 }
 
 // StateCheckpoint captures the state signature and entropy delta at an attempt boundary.
@@ -122,34 +122,34 @@ func EvaluateStagnation(history []FailureEnvelope, policy StagnationPolicy) Stag
 			rec = RecommendationEscalate
 		}
 		return StagnationAssessment{
-			IsStagnant:             true,
-			ConsecutiveZeroDelta:   consecutiveZeroDelta,
+			IsStagnant:              true,
+			ConsecutiveZeroDelta:    consecutiveZeroDelta,
 			IdenticalSigOccurrences: sigCount,
-			Escalate:               rec == RecommendationEscalate,
-			Recommendation:         rec,
-			Reason:                 ReasonZeroEntropyLoop,
+			Escalate:                rec == RecommendationEscalate,
+			Recommendation:          rec,
+			Reason:                  ReasonZeroEntropyLoop,
 		}
 	}
 
 	// Check condition 2: Overall identical signature frequency
 	if sigCount >= policy.MaxIdenticalSignatures {
 		return StagnationAssessment{
-			IsStagnant:             true,
-			ConsecutiveZeroDelta:   consecutiveZeroDelta,
+			IsStagnant:              true,
+			ConsecutiveZeroDelta:    consecutiveZeroDelta,
 			IdenticalSigOccurrences: sigCount,
-			Escalate:               true,
-			Recommendation:         RecommendationEscalate,
-			Reason:                 fmt.Sprintf(ReasonSignatureRepeated, sigCount, policy.MaxIdenticalSignatures),
+			Escalate:                true,
+			Recommendation:          RecommendationEscalate,
+			Reason:                  fmt.Sprintf(ReasonSignatureRepeated, sigCount, policy.MaxIdenticalSignatures),
 		}
 	}
 
 	return StagnationAssessment{
-		IsStagnant:             false,
-		ConsecutiveZeroDelta:   consecutiveZeroDelta,
+		IsStagnant:              false,
+		ConsecutiveZeroDelta:    consecutiveZeroDelta,
 		IdenticalSigOccurrences: sigCount,
-		Escalate:               false,
-		Recommendation:         RecommendationContinue,
-		Reason:                 ReasonActiveProgress,
+		Escalate:                false,
+		Recommendation:          RecommendationContinue,
+		Reason:                  ReasonActiveProgress,
 	}
 }
 

@@ -155,9 +155,9 @@ func TestExtended_RunWrapper_Execution_EdgePaths_Wave51(t *testing.T) {
 		Command:     "echo",
 		CommandArgs: []string{"edge_test"},
 		EnvironmentVariables: map[string]string{
-			"WRITE_JOB_LOG_FILES":      "true",
-			"WRITE_SEPARATE_JOB_LOGS":  "true",
-			"STREAM_LOG_DIR":           filepath.Join(tmpDir, "logs"),
+			"WRITE_JOB_LOG_FILES":              "true",
+			"WRITE_SEPARATE_JOB_LOGS":          "true",
+			"STREAM_LOG_DIR":                   filepath.Join(tmpDir, "logs"),
 			"TEST_BUNDLE_METADATA_FINGERPRINT": "expected_fp",
 		},
 	}

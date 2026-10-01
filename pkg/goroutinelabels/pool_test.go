@@ -388,4 +388,3 @@ func TestPool_WorkerRecoversFromPanic(t *testing.T) {
 
 	pool.Stop()
 }
-

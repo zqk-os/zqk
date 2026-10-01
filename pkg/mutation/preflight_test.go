@@ -73,7 +73,7 @@ func TestPreflight_DiagnosticReceiptGeneration(t *testing.T) {
 		TargetKind: "backlog_item",
 		TargetID:   "INVALID_ID_WITHOUT_HYPHEN",
 		Fields: map[string]any{
-			"priority_tier": "URGENT",  // Invalid enum
+			"priority_tier": "URGENT",   // Invalid enum
 			"status":        "exploded", // Invalid enum
 			"title":         12345,      // Type mismatch (int instead of string)
 			"criteria_refs": "CRIT-001", // Type mismatch (string instead of array)
@@ -549,4 +549,3 @@ func TestPreflight_LifecycleStateTransitionEnforcement(t *testing.T) {
 		require.True(t, bgReceipt.Valid, "break-glass allows emergency override")
 	})
 }
-

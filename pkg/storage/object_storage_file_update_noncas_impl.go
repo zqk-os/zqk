@@ -35,4 +35,3 @@ func (f *FileObjectStorage) UpdateNonCASPathIDChangeForTest(ctx context.Context,
 func (f *FileObjectStorage) UpdateNonCASPathForTest(ctx context.Context, secCtx *pkgctx.SecurityContext, kind, id, newID string, idUpdated bool, existing, updates, previousStateForJournal map[string]any, oldState, newState string, effectiveUpdates map[string]any, expectedUpdatedAt string) error {
 	return f.updateNonCASPath(ctx, secCtx, kind, id, newID, idUpdated, existing, updates, previousStateForJournal, oldState, newState, effectiveUpdates, expectedUpdatedAt)
 }
-

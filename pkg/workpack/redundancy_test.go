@@ -36,11 +36,11 @@ func wantList(got []string) []string {
 
 func TestNormalizeFieldCamelToSnake(t *testing.T) {
 	cases := map[string]string{
-		"ArchivedAt":      "archived_at",
-		"change_log":      "change_log",
-		"Source-Type":     "source_type",
-		"goalSummary":     "goal_summary",
-		"ID":              "id",
+		"ArchivedAt":         "archived_at",
+		"change_log":         "change_log",
+		"Source-Type":        "source_type",
+		"goalSummary":        "goal_summary",
+		"ID":                 "id",
 		msgCompletenessField: msgCompletenessField,
 	}
 	for in, want := range cases {
@@ -103,9 +103,9 @@ func TestAuditSpecTopLevelFallbackForFieldlessSpecs(t *testing.T) {
 	// Specs without an explicit fields map are audited on their top-level
 	// keys, minus structural meta keys.
 	spec := map[string]any{
-		"ontology":  "goal",
-		"plane":     "transactional",
-		"lifecycle": "goal.yaml",
+		"ontology":   "goal",
+		"plane":      "transactional",
+		"lifecycle":  "goal.yaml",
 		"created_at": map[string]any{"type": "timestamp"}, // redundant base field
 		"acceptance": map[string]any{"type": "string"},
 	}

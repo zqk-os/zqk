@@ -719,7 +719,6 @@ func TestEngine_VerifyCatastrophicErrorGuard(t *testing.T) {
 	})
 }
 
-
 // TST-1789075168791184000-fd8b6784 / CRIT-1789074573786400000-3483af38: Verify Hallucination Steering Post-Hook
 func TestEngine_VerifyHallucinationSteeringPostHook(t *testing.T) {
 	p := DefaultToolPrefix()

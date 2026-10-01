@@ -148,4 +148,3 @@ func TestCheckDuplication_QAConsolidation(t *testing.T) {
 	require.Equal(t, "sig-test", report.Signature)
 	require.Equal(t, "pub-test", report.PublicKey)
 }
-

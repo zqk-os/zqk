@@ -9,10 +9,10 @@ import (
 )
 
 var (
-	ErrCyclicGraphDetected    = errors.New("cyclic graph topology detected during traversal")
-	ErrMaxRecursionExceeded   = errors.New("maximum traversal recursion depth exceeded")
-	ErrInvalidQueryPattern    = errors.New("invalid or empty query pattern")
-	ErrUnsupportedOperator    = errors.New("unsupported physical operator")
+	ErrCyclicGraphDetected  = errors.New("cyclic graph topology detected during traversal")
+	ErrMaxRecursionExceeded = errors.New("maximum traversal recursion depth exceeded")
+	ErrInvalidQueryPattern  = errors.New("invalid or empty query pattern")
+	ErrUnsupportedOperator  = errors.New("unsupported physical operator")
 )
 
 // CyclePolicy defines how the traversal engine handles cyclic paths.
@@ -60,10 +60,10 @@ type EdgePattern struct {
 
 // QueryAST represents the parsed declarative ZPARQL query.
 type QueryAST struct {
-	StartNode   NodePattern   `json:"start_node"`
-	Steps       []TraversalStep `json:"steps,omitempty"`
-	Where       []Predicate   `json:"where,omitempty"`
-	ReturnVars  []string      `json:"return_vars"`
+	StartNode  NodePattern     `json:"start_node"`
+	Steps      []TraversalStep `json:"steps,omitempty"`
+	Where      []Predicate     `json:"where,omitempty"`
+	ReturnVars []string        `json:"return_vars"`
 }
 
 // TraversalStep represents an edge-node hop in a multi-hop pattern.
@@ -74,14 +74,14 @@ type TraversalStep struct {
 
 // PhysicalOperator represents an executable physical plan step.
 type PhysicalOperator struct {
-	Type          OperatorType        `json:"type"`
-	TargetKind    string              `json:"target_kind,omitempty"`
-	TargetID      string              `json:"target_id,omitempty"`
-	Relation      string              `json:"relation,omitempty"`
-	Direction     string              `json:"direction,omitempty"`
-	Filter        []Predicate         `json:"filter,omitempty"`
-	EstimatedCost float64             `json:"estimated_cost"`
-	Next          *PhysicalOperator   `json:"next,omitempty"`
+	Type          OperatorType      `json:"type"`
+	TargetKind    string            `json:"target_kind,omitempty"`
+	TargetID      string            `json:"target_id,omitempty"`
+	Relation      string            `json:"relation,omitempty"`
+	Direction     string            `json:"direction,omitempty"`
+	Filter        []Predicate       `json:"filter,omitempty"`
+	EstimatedCost float64           `json:"estimated_cost"`
+	Next          *PhysicalOperator `json:"next,omitempty"`
 }
 
 // PhysicalPlan contains the root operator and metadata for query execution.
@@ -215,12 +215,12 @@ func (p *DefaultQueryPlanner) Plan(ctx context.Context, query *QueryAST) (*Physi
 
 // IndexedGraphStorage provides an in-memory graph index mapping nodes and directed edges.
 type IndexedGraphStorage struct {
-	mu                   sync.RWMutex
-	nodes                map[string]map[string]any
-	outEdges             map[string][]Edge // sourceID -> edges
-	inEdges              map[string][]Edge // targetID -> edges
-	nodesInspectedCount  int
-	edgesInspectedCount  int
+	mu                  sync.RWMutex
+	nodes               map[string]map[string]any
+	outEdges            map[string][]Edge // sourceID -> edges
+	inEdges             map[string][]Edge // targetID -> edges
+	nodesInspectedCount int
+	edgesInspectedCount int
 }
 
 // NewIndexedGraphStorage creates a thread-safe indexed graph storage.

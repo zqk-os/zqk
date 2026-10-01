@@ -306,10 +306,10 @@ func TestInstanceValidator_Semantic_And_Preconditions(t *testing.T) {
 
 	// checkPrecondition
 	obj := map[string]any{
-		"test_field":     "present_value",
-		"empty_field":    "",
-		"bool_field":     true,
-		"status":         "planned",
+		"test_field":  "present_value",
+		"empty_field": "",
+		"bool_field":  true,
+		"status":      "planned",
 	}
 
 	if !iv.checkPrecondition("test_field is set", obj) {

@@ -101,4 +101,3 @@ func TestOrchestrate_ShockwaveDependencyGate(t *testing.T) {
 	require.Contains(t, deliverables, testArtifactPath)
 	require.Contains(t, deliverables, testUpstreamID)
 }
-

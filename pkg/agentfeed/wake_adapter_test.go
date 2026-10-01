@@ -138,4 +138,3 @@ func TestShellPeerWakeAdapter_DefaultHasNativeFallback(t *testing.T) {
 		t.Errorf("expected native fallback endpoint, got: %+v", res)
 	}
 }
-

@@ -646,4 +646,3 @@ func (iq *indexQueue) dispatchBatchEvent(category, eventName string, batchSize i
 			iq.emitBatchEvent(ctx, projectRoot, storage, batchSize, duration, status, err)
 		})
 }
-

@@ -149,5 +149,3 @@ func TestQueryCmd_VisualizeFlag(t *testing.T) {
 	require.NoError(t, err)
 	require.Contains(t, buf.String(), "ZPARQL Graph Path Visualization")
 }
-
-

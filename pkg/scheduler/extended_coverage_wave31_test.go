@@ -68,28 +68,28 @@ func TestExtended_MeshLeaseSupervision_DeepCoverage(t *testing.T) {
 
 	revokedLeaseID := "ZSN-lease-revoked"
 	_ = sp.Create(bgCtx, secCtx, map[string]any{
-		objects.FieldKeyID:                 revokedLeaseID,
-		objects.FieldKeyKind:               objects.KindZqkSession,
-		objects.FieldKeySchemaVersion:      objects.DefaultSchemaVersion,
-		objects.FieldKeySessionMode:        "federated_lease",
-		objects.FieldKeyStatus:             objects.ObjectStatusActive,
-		objects.FieldKeyRevokedAt:          time.Now().Format(time.RFC3339),
-		objects.FieldKeyTitle:              "Revoked Lease",
-		objects.FieldKeyDescription:        "Lease that was revoked",
+		objects.FieldKeyID:            revokedLeaseID,
+		objects.FieldKeyKind:          objects.KindZqkSession,
+		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+		objects.FieldKeySessionMode:   "federated_lease",
+		objects.FieldKeyStatus:        objects.ObjectStatusActive,
+		objects.FieldKeyRevokedAt:     time.Now().Format(time.RFC3339),
+		objects.FieldKeyTitle:         "Revoked Lease",
+		objects.FieldKeyDescription:   "Lease that was revoked",
 	})
 
 	exhaustedLeaseID := "ZSN-lease-exhausted"
 	_ = sp.Create(bgCtx, secCtx, map[string]any{
-		objects.FieldKeyID:                 exhaustedLeaseID,
-		objects.FieldKeyKind:               objects.KindZqkSession,
-		objects.FieldKeySchemaVersion:      objects.DefaultSchemaVersion,
-		objects.FieldKeySessionMode:        "federated_lease",
-		objects.FieldKeyStatus:             objects.ObjectStatusActive,
-		objects.FieldKeyMaxUnits:           100.0,
-		objects.FieldKeyConsumedUnits:      100.0,
-		objects.FieldKeyTermType:           "metered",
-		objects.FieldKeyTitle:              "Exhausted Lease",
-		objects.FieldKeyDescription:        "Lease with exhausted quota",
+		objects.FieldKeyID:            exhaustedLeaseID,
+		objects.FieldKeyKind:          objects.KindZqkSession,
+		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+		objects.FieldKeySessionMode:   "federated_lease",
+		objects.FieldKeyStatus:        objects.ObjectStatusActive,
+		objects.FieldKeyMaxUnits:      100.0,
+		objects.FieldKeyConsumedUnits: 100.0,
+		objects.FieldKeyTermType:      "metered",
+		objects.FieldKeyTitle:         "Exhausted Lease",
+		objects.FieldKeyDescription:   "Lease with exhausted quota",
 	})
 
 	// Execute should process the revoked and exhausted leases

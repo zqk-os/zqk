@@ -271,4 +271,3 @@ func (e *InProcessExecutor) CommandContext(ctx context.Context, name string, arg
 
 	return e.fallback.CommandContext(ctx, name, args...)
 }
-

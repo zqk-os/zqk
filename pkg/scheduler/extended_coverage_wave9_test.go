@@ -115,8 +115,8 @@ func TestExtended_CVSPipelineTickSync_Comprehensive(t *testing.T) {
 		objects.FieldKeyStatus:        "active",
 		objects.FieldKeyJobType:       JobTypeConvergenceSessionTick,
 		objects.FieldKeyEnvironmentVariables: map[string]any{
-			EnvKeyPipelineTickAutoRepoint:     "true",
-			EnvKeyConvergenceSessionID:        "CVS-prior",
+			EnvKeyPipelineTickAutoRepoint:    "true",
+			EnvKeyConvergenceSessionID:       "CVS-prior",
 			EnvKeyPipelineTickTitleSubstring: "core",
 		},
 	}

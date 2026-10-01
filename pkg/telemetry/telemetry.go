@@ -224,4 +224,3 @@ func (t *DefaultTracker) GetGhostDriftHistograms() map[string]*metrics.Prometheu
 	}
 	return result
 }
-

@@ -177,7 +177,7 @@ func TestExtended_RetentionToleranceWithRealStorage(t *testing.T) {
 	job := &ScheduledJob{
 		ID: "retention-live",
 		EnvironmentVariables: map[string]string{
-			"BATCH_SIZE": "2",
+			"BATCH_SIZE":  "2",
 			"MAX_BATCHES": "2",
 		},
 	}

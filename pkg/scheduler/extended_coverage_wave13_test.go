@@ -66,11 +66,11 @@ func TestExtended_RetentionMaxCount_DeepBranches(t *testing.T) {
 		kind,
 		2, // toDelete = 2
 		[]string{"in_progress"},
-		2,  // batchSize
-		10, // maxBatches
-		1,  // workers
-		6,  // count
-		4,  // maxCount
+		2,   // batchSize
+		10,  // maxBatches
+		1,   // workers
+		6,   // count
+		4,   // maxCount
 		nil, // allIDs nil -> trigger fallback
 	)
 	if err != nil {

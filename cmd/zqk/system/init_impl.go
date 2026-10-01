@@ -1396,4 +1396,3 @@ func isIgnoredInitEntry(projectRoot string, entry fileutil.DirEntry) bool {
 	}
 	return false
 }
-

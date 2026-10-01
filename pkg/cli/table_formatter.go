@@ -218,4 +218,3 @@ func adjustEmojiPadding(rendered string) string {
 	}
 	return strings.Join(lines, "\n")
 }
-

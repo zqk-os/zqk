@@ -80,7 +80,7 @@ func TestCacheCheckerTiming_RaceCondition(t *testing.T) {
 			objects.FieldKeyID:         "WS-TEST-001",
 			objects.FieldKeyTitle:      "Test Workstream",
 			objects.FieldKeyStatus:     scenarioBuilderStatusActive,
-			objects.FieldKeyEntryPoint: "main",                             // Required field
+			objects.FieldKeyEntryPoint: "main",          // Required field
 			objects.FieldKeyOwnerRef:   "ACC-TEST-USER", // References account created in same batch
 		},
 	}

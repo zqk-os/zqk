@@ -56,13 +56,13 @@ func TestExtended_LifecycleCoordination_Deep_Wave46(t *testing.T) {
 	// 4. Job collection & missed jobs logic
 	sched.jobsMu.Lock()
 	timerJob := &ScheduledJob{
-		ID:           "SCH-timer-job-1",
-		JobType:      JobTypeCachePrewarm,
-		Category:     CategoryMaintenance,
-		TriggerType:  "timer",
-		ScheduleExpr: "0 * * * *",
+		ID:            "SCH-timer-job-1",
+		JobType:       JobTypeCachePrewarm,
+		Category:      CategoryMaintenance,
+		TriggerType:   "timer",
+		ScheduleExpr:  "0 * * * *",
 		ExecutionMode: "reusable",
-		Enabled:      true,
+		Enabled:       true,
 	}
 	sched.jobs[timerJob.ID] = timerJob
 	sched.jobsMu.Unlock()

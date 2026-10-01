@@ -9,12 +9,12 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v3"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/swarm/pack"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"gopkg.in/yaml.v3"
 )
 
 // NewPackCmd creates the top-level 'zqk pack' command.
@@ -157,9 +157,9 @@ func newInitCmd() *cobra.Command {
 
 func newSealCmd() *cobra.Command {
 	var (
-		signerID  string
-		keyPath   string
-		pubOut    string
+		signerID string
+		keyPath  string
+		pubOut   string
 	)
 
 	cmd := &cobra.Command{

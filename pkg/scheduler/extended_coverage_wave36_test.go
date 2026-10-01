@@ -38,12 +38,12 @@ func TestExtended_AuditAggregationSession_DeepCoverage(t *testing.T) {
 		ID:      "SCH-audit-agg-1",
 		JobType: JobTypeAuditEventAggregation,
 		EnvironmentVariables: map[string]string{
-			EnvKeyBatchSize:          "50",
-			EnvKeyAggregationWindow:  "30m",
-			EnvKeyRetentionDuration:  "2h",
-			EnvKeyArchiveEnabled:     "true",
-			EnvKeyDeleteEnabled:      "false",
-			"MAX_RUNTIME_SECONDS":    "600",
+			EnvKeyBatchSize:         "50",
+			EnvKeyAggregationWindow: "30m",
+			EnvKeyRetentionDuration: "2h",
+			EnvKeyArchiveEnabled:    "true",
+			EnvKeyDeleteEnabled:     "false",
+			"MAX_RUNTIME_SECONDS":   "600",
 		},
 		MaxRuntimeSeconds: 600,
 	}

@@ -98,4 +98,3 @@ func TestPackCLI_Manifest(t *testing.T) {
 		}
 	}
 }
-

@@ -97,5 +97,3 @@ func TestLoadIDsFromFlags(t *testing.T) {
 		}
 	})
 }
-
-

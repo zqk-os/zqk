@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strings"
 
-	"gopkg.in/yaml.v3"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"gopkg.in/yaml.v3"
 )
 
 // SwarmPackage represents a portable, decentralized swarm manifest.

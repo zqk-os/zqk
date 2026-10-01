@@ -172,4 +172,3 @@ func (g *CatastrophicErrorGuard) OnSuccess(ctx context.Context, call llm.ToolCal
 	g.consecutiveFailures = 0
 	g.lastErrorSummary = ""
 }
-

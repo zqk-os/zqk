@@ -451,5 +451,3 @@ func TestObjectWriteBehindWorker_DrainRetryableQueueFullDoesNotDropOrAdvance(t *
 		t.Fatalf("data loss vulnerability! Checkpoint advanced to %d despite mutation not being durably applied during drain", seqAfter)
 	}
 }
-
-

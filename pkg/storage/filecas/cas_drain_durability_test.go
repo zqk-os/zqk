@@ -14,20 +14,20 @@ import (
 )
 
 const (
-	testFixtureFilenameDurable   = "cas-durable-fixture.yaml"
-	testFixtureFilenameBoundary  = "cas-boundary-fixture.yaml"
-	testFixtureFilenameConcur    = "cas-concurrent-fixture-%d.yaml"
-	testPayloadData              = "id: OBJ-CAS-DURABLE-PAYLOAD\nkind: object\n"
-	errTestWriteFixtureFailed    = "failed to write test fixture: %v"
-	errTestOpenFixtureFailed     = "failed to open test fixture: %v"
-	errTestDrainWithCtxFailed    = "DrainDarwinSyncQueueContext failed unexpectedly: %v"
-	errTestQueueNotDrained       = "expected Darwin sync queue to be fully drained, but pending count is %d"
-	errTestNilExpectedNoPanic    = "expected nil file to be handled safely, got %v"
-	errTestPrecancelledExpected  = "expected cancelled context error, got %v"
-	errTestConcurrentSyncFailed  = "concurrent publish sync failed: %v"
-	errTestDrainTimeoutFailed    = "expected DrainDarwinSyncQueue to succeed within timeout, got %v"
-	errTestShutdownInitiateFail  = "InitiateDarwinSyncShutdown failed: %v"
-	errTestSynchronousUnderShut  = "expected synchronous fallback under shutdown, got error: %v"
+	testFixtureFilenameDurable  = "cas-durable-fixture.yaml"
+	testFixtureFilenameBoundary = "cas-boundary-fixture.yaml"
+	testFixtureFilenameConcur   = "cas-concurrent-fixture-%d.yaml"
+	testPayloadData             = "id: OBJ-CAS-DURABLE-PAYLOAD\nkind: object\n"
+	errTestWriteFixtureFailed   = "failed to write test fixture: %v"
+	errTestOpenFixtureFailed    = "failed to open test fixture: %v"
+	errTestDrainWithCtxFailed   = "DrainDarwinSyncQueueContext failed unexpectedly: %v"
+	errTestQueueNotDrained      = "expected Darwin sync queue to be fully drained, but pending count is %d"
+	errTestNilExpectedNoPanic   = "expected nil file to be handled safely, got %v"
+	errTestPrecancelledExpected = "expected cancelled context error, got %v"
+	errTestConcurrentSyncFailed = "concurrent publish sync failed: %v"
+	errTestDrainTimeoutFailed   = "expected DrainDarwinSyncQueue to succeed within timeout, got %v"
+	errTestShutdownInitiateFail = "InitiateDarwinSyncShutdown failed: %v"
+	errTestSynchronousUnderShut = "expected synchronous fallback under shutdown, got error: %v"
 )
 
 // TestDrainDarwinSyncQueue_DurabilityAndCompleteness verifies primary functional acceptance:

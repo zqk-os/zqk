@@ -18,10 +18,10 @@ type testWGObserver struct {
 	completed atomic.Int32
 }
 
-func (o *testWGObserver) OnGroupCreated(id, operation string)                  { o.created.Add(1) }
-func (o *testWGObserver) OnGroupAdd(id string, delta int)                     { o.added.Add(int32(delta)) }
-func (o *testWGObserver) OnGroupDone(id string)                               { o.done.Add(1) }
-func (o *testWGObserver) OnGroupWait(id string)                               { o.waited.Add(1) }
+func (o *testWGObserver) OnGroupCreated(id, operation string)                { o.created.Add(1) }
+func (o *testWGObserver) OnGroupAdd(id string, delta int)                    { o.added.Add(int32(delta)) }
+func (o *testWGObserver) OnGroupDone(id string)                              { o.done.Add(1) }
+func (o *testWGObserver) OnGroupWait(id string)                              { o.waited.Add(1) }
 func (o *testWGObserver) OnGroupCompleted(id string, duration time.Duration) { o.completed.Add(1) }
 
 func TestWaitGroupManager(t *testing.T) {

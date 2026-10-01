@@ -15,12 +15,12 @@ const (
 	testNameObjSuffix     = "object_suffix"
 	testNameSwarmInit     = "swarm_init"
 
-	msgNotEmpty  = "hint constant %q must not be empty"
-	msgDuplicate = "hint constants %q and %q both = %q (must be distinct)"
-	msgKnownFalse = "IsKnownHint(%q) = false, want true"
+	msgNotEmpty    = "hint constant %q must not be empty"
+	msgDuplicate   = "hint constants %q and %q both = %q (must be distinct)"
+	msgKnownFalse  = "IsKnownHint(%q) = false, want true"
 	msgUnknownTrue = "IsKnownHint(%q) = true, want false"
-	msgEmptyTrue  = "IsKnownHint(empty) = true, want false"
-	unknownProbe  = "totally unrelated prose"
+	msgEmptyTrue   = "IsKnownHint(empty) = true, want false"
+	unknownProbe   = "totally unrelated prose"
 )
 
 func TestHintConstants_NonEmptyDistinct(t *testing.T) {

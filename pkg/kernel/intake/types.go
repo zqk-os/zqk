@@ -21,7 +21,7 @@ var (
 	ErrEmptyIntakeRequests      = errors.New("intake membrane: requests slice cannot be empty")
 	ErrRedundantOneToOneChains  = errors.New("intake membrane: rejected redundant 1:1 micro-chain proposals; cluster into unified workstream")
 	ErrConflictingFileMutations = errors.New("intake membrane: unresolvable write conflict in concurrent batch")
-	ErrMissingOperationalScope = errors.New("intake membrane: request missing operational scope or target paths")
+	ErrMissingOperationalScope  = errors.New("intake membrane: request missing operational scope or target paths")
 )
 
 // SimilarityThreshold defines the minimum Jaccard similarity score (0.0 to 1.0)
@@ -30,22 +30,22 @@ const SimilarityThreshold = 0.40
 
 // IntakeRequest represents an incoming work request entering the kernel intake membrane.
 type IntakeRequest struct {
-	ID               string            `json:"id"`
-	Title            string            `json:"title"`
-	Description      string            `json:"description"`
-	DomainCategory   string            `json:"domain_category"`
-	TargetPaths      []string          `json:"target_paths"`
-	RequestedTiers   []string          `json:"requested_tiers,omitempty"`
-	Metadata         map[string]string `json:"metadata,omitempty"`
+	ID             string            `json:"id"`
+	Title          string            `json:"title"`
+	Description    string            `json:"description"`
+	DomainCategory string            `json:"domain_category"`
+	TargetPaths    []string          `json:"target_paths"`
+	RequestedTiers []string          `json:"requested_tiers,omitempty"`
+	Metadata       map[string]string `json:"metadata,omitempty"`
 }
 
 // ClusteredWorkstream groups related intake requests into a cohesive execution container.
 type ClusteredWorkstream struct {
-	ClusterID        string           `json:"cluster_id"`
-	Title            string           `json:"title"`
-	DomainCategory   string           `json:"domain_category"`
-	Requests         []IntakeRequest  `json:"requests"`
-	CommonPaths      []string         `json:"common_paths"`
+	ClusterID         string          `json:"cluster_id"`
+	Title             string          `json:"title"`
+	DomainCategory    string          `json:"domain_category"`
+	Requests          []IntakeRequest `json:"requests"`
+	CommonPaths       []string        `json:"common_paths"`
 	AverageSimilarity float64         `json:"average_similarity"`
 }
 

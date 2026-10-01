@@ -78,7 +78,6 @@ func TestHelpBuilder(t *testing.T) {
 		}
 	})
 
-
 	t.Run("wrap_text_and_descriptions", func(t *testing.T) {
 		hb := NewHelpBuilder().
 			WithShort("short").

@@ -142,11 +142,11 @@ const (
 
 // PhysicalOperator represents an individual executable step in a query plan.
 type PhysicalOperator struct {
-	Type        OperatorType   `json:"type"`
-	TargetKind  string         `json:"target_kind,omitempty"`
-	Predicate   string         `json:"predicate,omitempty"`
-	CostEstimate int           `json:"cost_estimate"`
-	Children    []*PhysicalOperator `json:"children,omitempty"`
+	Type         OperatorType        `json:"type"`
+	TargetKind   string              `json:"target_kind,omitempty"`
+	Predicate    string              `json:"predicate,omitempty"`
+	CostEstimate int                 `json:"cost_estimate"`
+	Children     []*PhysicalOperator `json:"children,omitempty"`
 }
 
 // PhysicalPlan represents an optimized execution plan.
@@ -221,11 +221,11 @@ func (p *QueryPlanner) Plan(query QuerySpec) (*PhysicalPlan, error) {
 
 // TraversalResult contains matched nodes and telemetry evidence.
 type TraversalResult struct {
-	VisitedNodes    []string          `json:"visited_nodes"`
+	VisitedNodes    []string         `json:"visited_nodes"`
 	MatchedEntities []map[string]any `json:"matched_entities"`
-	OperationsCount int               `json:"operations_count"`
-	MaxDepthReached int               `json:"max_depth_reached"`
-	CycleDetected   bool              `json:"cycle_detected"`
+	OperationsCount int              `json:"operations_count"`
+	MaxDepthReached int              `json:"max_depth_reached"`
+	CycleDetected   bool             `json:"cycle_detected"`
 }
 
 // TraversalEngine executes cycle-safe graph traversals with bounded complexity.

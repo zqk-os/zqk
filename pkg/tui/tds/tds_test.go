@@ -141,4 +141,3 @@ func TestTable_SanitizesEmbeddedNewlines(t *testing.T) {
 		assert.Equal(t, 80, VisibleWidth(l), "Line %d width mismatch after newline sanitization", i)
 	}
 }
-

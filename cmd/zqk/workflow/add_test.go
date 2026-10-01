@@ -174,10 +174,10 @@ func TestWorkflowAddCommand(t *testing.T) {
 
 		milestoneID := "MIL-EXISTING-ADD"
 		milestone := map[string]any{
-			objects.FieldKeyID:               milestoneID,
-			objects.FieldKeyKind:             "milestone",
-			objects.FieldKeyTitle:            "Existing Milestone Test",
-			objects.FieldKeyDescription:      "Verify milestone links",
+			objects.FieldKeyID:                milestoneID,
+			objects.FieldKeyKind:              "milestone",
+			objects.FieldKeyTitle:             "Existing Milestone Test",
+			objects.FieldKeyDescription:       "Verify milestone links",
 			objects.FieldKeyStatus:            objects.ObjectStatusInProgress,
 			objects.FieldKeyRelatedObjectRefs: []any{planID},
 			objects.FieldKeyNamespaceID:       "zqk:kernel",

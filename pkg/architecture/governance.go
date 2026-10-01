@@ -21,9 +21,9 @@ const (
 
 // ComplexityBudget defines limits for package maintainability and sprawl.
 type ComplexityBudget struct {
-	MaxFileLines     int
-	MaxPackageFiles  int
-	MaxCyclomatic    int
+	MaxFileLines    int
+	MaxPackageFiles int
+	MaxCyclomatic   int
 }
 
 // DefaultComplexityBudget provides standard limits to prevent god packages.

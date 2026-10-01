@@ -308,10 +308,10 @@ func TestExtended_HourglassWatchAndEscalate(t *testing.T) {
 	// 2. Expired checkin timer file
 	checkinFile := filepath.Join(hgDir, "checkin-test.json")
 	cInfo := map[string]any{
-		"task_id":       "TASK-checkin-1",
-		"expires_at":    time.Now().Add(-10 * time.Minute).Format(time.RFC3339),
-		"type":          agentclaim.TimerTypeCheckin,
-		"claimed_by":    "agent-seat-1",
+		"task_id":        "TASK-checkin-1",
+		"expires_at":     time.Now().Add(-10 * time.Minute).Format(time.RFC3339),
+		"type":           agentclaim.TimerTypeCheckin,
+		"claimed_by":     "agent-seat-1",
 		"window_seconds": 60,
 	}
 	cBytes, _ := json.Marshal(cInfo)

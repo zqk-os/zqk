@@ -438,8 +438,6 @@ func (s *AuditorService) performAuditWithMode(ctx context.Context, id string, ki
 	logging.FluentEvent(logger).Info(fmt.Sprintf(LogFmtAuditorSuccess, id)).Log()
 }
 
-
-
 func (s *AuditorService) hasCompletedCriterion(
 	ctx context.Context,
 	secCtx *pkgctx.SecurityContext,

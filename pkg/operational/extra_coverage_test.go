@@ -281,7 +281,7 @@ func TestCongruenceRun_NoCacheStorageCount(t *testing.T) {
 	secCtx := pkgctx.NewSystemSecurityContext()
 	opts := RunOptions{
 		ProjectRoot:                tmpDir,
-		DisparityThreshold:         0, // test default threshold fallback
+		DisparityThreshold:         0,   // test default threshold fallback
 		ObjectCountByKindFromCache: nil, // exercises registry.LoadFields and storageProvider.Count
 	}
 

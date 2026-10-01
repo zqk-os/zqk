@@ -245,4 +245,3 @@ func quarantineCorruptedWALLine(walFilePath string, payload []byte, reason strin
 		String("reason", reason).
 		Log()
 }
-

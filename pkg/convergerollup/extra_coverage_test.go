@@ -206,7 +206,7 @@ func TestOverseer_BuildArbitratedParentMessage(t *testing.T) {
 
 	// rollup with recommended_next_action
 	rollup := map[string]any{
-		"recommended_next_action":    "Do this next",
+		"recommended_next_action":     "Do this next",
 		"ready_for_parent_completion": true,
 	}
 	msg2 := BuildArbitratedParentMessage(rollup, tree, "CVS-root")

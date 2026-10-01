@@ -128,5 +128,3 @@ func IsCompletedStatus(status string) bool {
 func HasStringEvidence(value any) bool {
 	return len(ExtractArtifactList(value)) > 0
 }
-
-

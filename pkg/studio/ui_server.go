@@ -419,4 +419,3 @@ func (s *Server) handleExplain(w http.ResponseWriter, r *http.Request) {
 	}
 	_ = json.NewEncoder(w).Encode(item)
 }
-

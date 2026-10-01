@@ -358,11 +358,11 @@ func TestWhatsNextExtended_EnrichWorkflowsAndStaleTasks(t *testing.T) {
 	mock := newExtendedMockStorage()
 
 	wfl := map[string]any{
-		objects.FieldKeyID:                 "WFL-DEPLOY",
-		objects.FieldKeyKind:               objects.KindWorkflow,
-		objects.FieldKeyTitle:              "Deploy Pipeline",
-		objects.FieldKeyStatus:             "active",
-		"trigger_on":                       []string{"whats-next"},
+		objects.FieldKeyID:                "WFL-DEPLOY",
+		objects.FieldKeyKind:              objects.KindWorkflow,
+		objects.FieldKeyTitle:             "Deploy Pipeline",
+		objects.FieldKeyStatus:            "active",
+		"trigger_on":                      []string{"whats-next"},
 		objects.FieldKeyRelatedObjectRefs: []string{"WFL-EXTRA"},
 	}
 	mock.add(wfl)

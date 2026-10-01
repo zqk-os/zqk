@@ -227,4 +227,3 @@ func TestFindCLIProfilesDir(t *testing.T) {
 		t.Errorf("expected absolute path from findCLIProfilesDir, got %s", got)
 	}
 }
-

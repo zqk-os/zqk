@@ -98,7 +98,7 @@ var CombinedRegex = regexp.MustCompile(`(` +
 	`-----BEGIN (?:[A-Z0-9_-]+ )*PRIVATE KEY-----|` +
 	`\bxox[baprs]-[0-9]{12}-[0-9]{12}-[a-zA-Z0-9]{24}\b|` +
 	`https://hooks\.slack\.com/services/T[0-9a-zA-Z]+/B[0-9a-zA-Z]+/[0-9a-zA-Z]+` +
-`)`)
+	`)`)
 
 // AllRegexes returns an ordered slice of all individual compiled regular expressions.
 func AllRegexes() []*regexp.Regexp {

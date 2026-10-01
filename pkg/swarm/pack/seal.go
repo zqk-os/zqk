@@ -11,9 +11,9 @@ import (
 	"sort"
 	"strings"
 
-	"gopkg.in/yaml.v3"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"gopkg.in/yaml.v3"
 )
 
 var (

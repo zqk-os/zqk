@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zqk-os/zqk/pkg/coordination"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/coordination"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/rollback"
@@ -1175,5 +1175,3 @@ func (f *failingStorageProvider) Read(ctx context.Context, secCtx *pkgctx.Securi
 func (f *failingStorageProvider) Update(ctx context.Context, secCtx *pkgctx.SecurityContext, id string, updates map[string]any) error {
 	return errors.New("simulated update failure")
 }
-
-

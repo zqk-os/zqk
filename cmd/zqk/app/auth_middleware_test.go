@@ -455,4 +455,3 @@ func TestAuthMiddleware_NoTestArgBypassInNonTestMode(t *testing.T) {
 		t.Fatalf("expected unauthorized error when passing -test.dummy without credentials, got nil (auth bypass detected!)")
 	}
 }
-

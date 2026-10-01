@@ -1329,9 +1329,9 @@ func main() {
 		whiteBold := color.New(color.FgWhite, color.Bold).SprintFunc()
 
 		bannerText := "ZQK KNOWLEDGE KERNEL — OBJECT INSPECTOR CONSOLE"
-		buf.WriteString(cyanBold("╔" + strings.Repeat("═", termWidth-2) + "╗") + "\n")
+		buf.WriteString(cyanBold("╔"+strings.Repeat("═", termWidth-2)+"╗") + "\n")
 		buf.WriteString(cyanBold("║") + tds.PadCenter(whiteBold(bannerText), termWidth-2) + cyanBold("║") + "\n")
-		buf.WriteString(cyanBold("╚" + strings.Repeat("═", termWidth-2) + "╝") + "\n")
+		buf.WriteString(cyanBold("╚"+strings.Repeat("═", termWidth-2)+"╝") + "\n")
 
 		filterLines := []string{
 			fmt.Sprintf("%s %s   │   %s %s %s %s %s %s   │   %s %s",
@@ -1351,19 +1351,19 @@ func main() {
 		tbl.AddColumn("UPDATED", tds.AlignRight, 10, 1.0)
 
 		tbl.AddRow(
-			cyanBold("> ") + whiteBold("BLI-STORAGE-PUREGO-001"), greenBold("complete"), redBold("P0"), "Implement pure-Go CAS storage backend", dimStyle("2m ago"),
+			cyanBold("> ")+whiteBold("BLI-STORAGE-PUREGO-001"), greenBold("complete"), redBold("P0"), "Implement pure-Go CAS storage backend", dimStyle("2m ago"),
 		)
 		tbl.AddRow(
-			"  " + whiteBold("BLI-STORAGE-PUREGO-002"), greenBold("complete"), yellowBold("P1"), "Wire change journal dictionary compaction", dimStyle("14m ago"),
+			"  "+whiteBold("BLI-STORAGE-PUREGO-002"), greenBold("complete"), yellowBold("P1"), "Wire change journal dictionary compaction", dimStyle("14m ago"),
 		)
 		tbl.AddRow(
-			"  " + whiteBold("BLI-LAUNCH-DOCS-001"), cyanBold("in_progress"), redBold("P0"), "Comprehensive visual UI & mutation manual", dimStyle("1m ago"),
+			"  "+whiteBold("BLI-LAUNCH-DOCS-001"), cyanBold("in_progress"), redBold("P0"), "Comprehensive visual UI & mutation manual", dimStyle("1m ago"),
 		)
 		tbl.AddRow(
-			"  " + whiteBold("BLI-ONBOARD-ROADMAP-01"), yellowBold("planned"), yellowBold("P1"), "Greenfield onboarding roadmap seed", dimStyle("45m ago"),
+			"  "+whiteBold("BLI-ONBOARD-ROADMAP-01"), yellowBold("planned"), yellowBold("P1"), "Greenfield onboarding roadmap seed", dimStyle("45m ago"),
 		)
 		tbl.AddRow(
-			"  " + whiteBold("BLI-ECOSYSTEM-SYNC-001"), redBold("blocked"), dimStyle("P2"), "Linear/GitHub bidirectional bridge", dimStyle("2h ago"),
+			"  "+whiteBold("BLI-ECOSYSTEM-SYNC-001"), redBold("blocked"), dimStyle("P2"), "Linear/GitHub bidirectional bridge", dimStyle("2h ago"),
 		)
 		buf.WriteString(tbl.Render())
 
@@ -1398,9 +1398,9 @@ func main() {
 		whiteBold := color.New(color.FgWhite, color.Bold).SprintFunc()
 
 		bannerText := "ZQK POLICY RULE STUDIO — STEP 1: INTERACTIVE RULE CREATION & DSL DRAFTING"
-		buf.WriteString(cyanBold("╔" + strings.Repeat("═", termWidth-2) + "╗") + "\n")
+		buf.WriteString(cyanBold("╔"+strings.Repeat("═", termWidth-2)+"╗") + "\n")
 		buf.WriteString(cyanBold("║") + tds.PadCenter(whiteBold(bannerText), termWidth-2) + cyanBold("║") + "\n")
-		buf.WriteString(cyanBold("╚" + strings.Repeat("═", termWidth-2) + "╝") + "\n")
+		buf.WriteString(cyanBold("╚"+strings.Repeat("═", termWidth-2)+"╝") + "\n")
 
 		targetLines := []string{
 			fmt.Sprintf("%s %s   │   %s %s %s   │   %s %s",
@@ -1473,9 +1473,9 @@ func main() {
 		whiteBold := color.New(color.FgWhite, color.Bold).SprintFunc()
 
 		bannerText := "ZQK POLICY RULE STUDIO — REAL-TIME GOVERNANCE DSL"
-		buf.WriteString(cyanBold("╔" + strings.Repeat("═", termWidth-2) + "╗") + "\n")
+		buf.WriteString(cyanBold("╔"+strings.Repeat("═", termWidth-2)+"╗") + "\n")
 		buf.WriteString(cyanBold("║") + tds.PadCenter(whiteBold(bannerText), termWidth-2) + cyanBold("║") + "\n")
-		buf.WriteString(cyanBold("╚" + strings.Repeat("═", termWidth-2) + "╝") + "\n")
+		buf.WriteString(cyanBold("╚"+strings.Repeat("═", termWidth-2)+"╝") + "\n")
 
 		configLines := []string{
 			fmt.Sprintf("%s %s   │   %s %s   │   %s %s",
@@ -1531,9 +1531,9 @@ func main() {
 		whiteBold := color.New(color.FgWhite, color.Bold).SprintFunc()
 
 		bannerText := "ZQK POLICY RULE STUDIO — STEP 3: ATOMIC CAS COMMIT & GATE PROMOTION"
-		buf.WriteString(cyanBold("╔" + strings.Repeat("═", termWidth-2) + "╗") + "\n")
+		buf.WriteString(cyanBold("╔"+strings.Repeat("═", termWidth-2)+"╗") + "\n")
 		buf.WriteString(cyanBold("║") + tds.PadCenter(whiteBold(bannerText), termWidth-2) + cyanBold("║") + "\n")
-		buf.WriteString(cyanBold("╚" + strings.Repeat("═", termWidth-2) + "╝") + "\n")
+		buf.WriteString(cyanBold("╚"+strings.Repeat("═", termWidth-2)+"╝") + "\n")
 
 		specLines := []string{
 			fmt.Sprintf("%s %s   │   %s %s   │   %s %s",

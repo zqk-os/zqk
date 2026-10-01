@@ -4,8 +4,8 @@
 package bldr_instance_v1
 
 import (
-	"github.com/zqk-os/zqk/pkg/objects"
 	enumv "github.com/zqk-os/zqk/packs/metric/bldr_enum_v1/audit_aggregation_metric"
+	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 )
 

@@ -37,9 +37,9 @@ func TestKindSynonymResolver_Extended(t *testing.T) {
 			{Kind: "goal", Synonym: "target", Priority: 10},
 			{Kind: "milestone", Synonym: "target", Priority: 20}, // higher priority wins for "target"
 			{Kind: "goal", Synonym: "obj", Priority: 5},
-			{Kind: "goal", Synonym: "obj", Priority: 15},         // duplicate within same kind with higher priority
-			{Kind: "", Synonym: "invalid", Priority: 1},          // empty kind, skipped
-			{Kind: "task", Synonym: "", Priority: 1},             // empty synonym, skipped
+			{Kind: "goal", Synonym: "obj", Priority: 15}, // duplicate within same kind with higher priority
+			{Kind: "", Synonym: "invalid", Priority: 1},  // empty kind, skipped
+			{Kind: "task", Synonym: "", Priority: 1},     // empty synonym, skipped
 		},
 	}
 	ksr.SetSynonymLoader(loader)

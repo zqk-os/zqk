@@ -104,4 +104,3 @@ func TestValidationStateCache_Methods(t *testing.T) {
 		t.Errorf("expected empty cache after Clear")
 	}
 }
-

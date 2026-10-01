@@ -751,12 +751,12 @@ func TestCommandBuilder_AdditionalMethods(t *testing.T) {
 	// ApplyBuilder
 	base := &cobra.Command{Use: "base"}
 	override := &cobra.Command{
-		Use:       "overridden",
-		Short:     "short desc",
-		Long:      "long desc",
-		Example:   "example usage",
-		Hidden:    true,
-		Aliases:   []string{"alias1"},
+		Use:        "overridden",
+		Short:      "short desc",
+		Long:       "long desc",
+		Example:    "example usage",
+		Hidden:     true,
+		Aliases:    []string{"alias1"},
 		Deprecated: "use other",
 	}
 	merged := ApplyBuilder(base, override)

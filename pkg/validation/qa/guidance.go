@@ -3,7 +3,6 @@ package qa
 import (
 	"fmt"
 	"strings"
-
 )
 
 // Guidance holds actionable remediation steps.

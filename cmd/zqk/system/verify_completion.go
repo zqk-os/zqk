@@ -304,4 +304,3 @@ func verifyTestCaseWithOrganizer(cmd *cobra.Command, proc *cli.Processor, obj ma
 		objectID, report.Mode, len(report.StageResults), report.PanicsCaught, report.TotalDuration)))
 	return nil
 }
-

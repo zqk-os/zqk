@@ -168,4 +168,3 @@ func TestHintSwarmInit(t *testing.T) {
 		t.Fatalf("unexpected fallback swarm-init hint: %q", gotEmpty)
 	}
 }
-

@@ -91,9 +91,11 @@ type OperationNotifier interface {
 type NoopOperationNotifier struct{}
 
 func (NoopOperationNotifier) NotifyProgress(*Operation, int, string) error { return nil }
-func (NoopOperationNotifier) NotifyStatus(*Operation, OperationStatus, OperationStatus) error { return nil }
+func (NoopOperationNotifier) NotifyStatus(*Operation, OperationStatus, OperationStatus) error {
+	return nil
+}
 func (NoopOperationNotifier) NotifyError(*Operation, error) error { return nil }
-func (NoopOperationNotifier) NotifyCompletion(*Operation) error { return nil }
+func (NoopOperationNotifier) NotifyCompletion(*Operation) error   { return nil }
 
 var _ OperationNotifier = NoopOperationNotifier{}
 
