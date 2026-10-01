@@ -3,6 +3,7 @@ package zqkdev
 import (
 	"context"
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -13,6 +14,7 @@ import (
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	instancebuilders "github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -70,51 +72,47 @@ func NewGenerateInstanceBuildersCmd() *cobra.Command {
 			return errfmt.Newf("failed to create output directory").Wrap(err)
 		}
 
-		// Find all YAML files
-		entries, err := fileutil.ReadDir(specsDir)
-		if err != nil {
-			return errfmt.Newf("failed to read specs directory").Wrap(err)
-		}
-
 		skipped := 0
-
-		// Build GenerateItems, filtering skips up front
 		var items []GenerateItem
-		for _, entry := range entries {
-			if entry.IsDir() {
-				continue
+
+		err := filepath.WalkDir(specsDir, func(path string, d os.DirEntry, walkErr error) error {
+			if walkErr != nil || d == nil {
+				return nil //nolint:nilerr // skip unreadable entries
+			}
+			if d.IsDir() {
+				if d.Name() == ".git" || d.Name() == "node_modules" {
+					return filepath.SkipDir
+				}
+				return nil
+			}
+			if appledouble.SkipNameInReadDir(d.Name()) {
+				return nil
+			}
+			if !strings.HasSuffix(d.Name(), ".yaml") && !strings.HasSuffix(d.Name(), ".yml") {
+				return nil
+			}
+			if d.Name() == "_placeholder.yaml" || objects.IsHashedFilename(d.Name()) {
+				return nil
 			}
 
-			// Skip macOS AppleDouble/resource-fork files (._*)
-			if appledouble.SkipNameInReadDir(entry.Name()) {
-				continue
-			}
-
-			if !strings.HasSuffix(entry.Name(), ".yaml") && !strings.HasSuffix(entry.Name(), ".yml") {
-				continue
-			}
-
-			// Skip placeholder files
-			if entry.Name() == "_placeholder.yaml" {
-				continue
-			}
-
-			yamlPath := filepath.Join(specsDir, entry.Name())
-
-			baseName := strings.TrimSuffix(entry.Name(), ".yaml")
+			baseName := strings.TrimSuffix(d.Name(), ".yaml")
 			baseName = strings.TrimSuffix(baseName, ".yml")
 			destDir, _ := instancebuilders.InstanceBuilderOutput(outputDir)
 			outputFile := filepath.Join(destDir, fmt.Sprintf("%s_instance_builder.go", baseName))
 
 			if !overwrite {
 				if _, err := fileutil.Stat(outputFile); err == nil {
-					logging.Fluent(logger).Info(fmt.Sprintf("Skipping %s (instance builder already exists, use --overwrite to replace)", entry.Name())).Log()
+					logging.Fluent(logger).Info(fmt.Sprintf("Skipping %s (instance builder already exists, use --overwrite to replace)", d.Name())).Log()
 					skipped++
-					continue
+					return nil
 				}
 			}
 
-			items = append(items, GenerateItem{YAMLPath: yamlPath, BaseName: baseName})
+			items = append(items, GenerateItem{YAMLPath: path, BaseName: baseName})
+			return nil
+		})
+		if err != nil {
+			return errfmt.Newf("failed to read specs directory").Wrap(err)
 		}
 
 		// Concurrent generation with bounded errgroup

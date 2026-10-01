@@ -4,7 +4,7 @@
 # Binary basename comes from brand.executable_name in
 # config/zqk-local.yaml (wins) then config/zqk.yaml (default zqk).
 
-.PHONY: help all bootstrap-archive compile-bin zqk clean test test-unit test-unit-all test-race test-integration test-integration-go test-coverage test-coverage-html lint vet verify gate-release zqk-vet
+.PHONY: help all bootstrap-archive compile-bin zqk clean test test-unit test-unit-all test-failclosed-audit test-race test-integration test-integration-go test-coverage test-coverage-html lint vet verify gate-release zqk-vet
 
 .DEFAULT_GOAL := all
 
@@ -99,9 +99,14 @@ zqk: compile-bin
 
 test-unit:
 	go test -short -p 2 -timeout 15m ./pkg/... ./cmd/... ./internal/... ./ext/...
+	(cd examples/swarms/code-eval/failclosed_audit && go test -short -timeout 1m .)
 
 test-unit-all:
 	go test -p 2 -timeout 20m ./pkg/... ./cmd/... ./internal/... ./ext/...
+	(cd examples/swarms/code-eval/failclosed_audit && go test -timeout 1m .)
+
+test-failclosed-audit:
+	(cd examples/swarms/code-eval/failclosed_audit && go test -v -timeout 1m .)
 
 test-race:
 	go test -race -short -timeout 10m ./pkg/goroutinelabels/... ./pkg/concurrency/... ./pkg/bufferpool/... ./pkg/coordination/... ./pkg/agentfeed/... ./pkg/mcp/... ./pkg/ambience/... ./pkg/storage/... ./pkg/scheduler/... ./pkg/ambient/... ./pkg/mesh/...

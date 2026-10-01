@@ -213,6 +213,9 @@ fi
 
 	# 4. Run storage package test suite
 	go test -short -p 4 -timeout 20m ./pkg/storage/...
+
+	# 5. Run adversarial failclosed audit invariant battery
+	go test -timeout 1m ./examples/swarms/code-eval/failclosed_audit/...
 )
 
 printf '%s\n' "PUBLIC RELEASE GATES: PASS"

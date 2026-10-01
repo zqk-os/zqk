@@ -3,6 +3,7 @@ package zqkdev
 import (
 	"context"
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -13,6 +14,7 @@ import (
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/specbuilder/lifecycle_builders"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -27,8 +29,8 @@ func NewGenerateLifecycleBuildersCmd() *cobra.Command {
 	)
 
 	helpBuilder := clipkg.DynamicHelpBuilder(
-		"Generate versioned lifecycle builder Go files from YAML lifecycle files",
-		"Generate versioned lifecycle builder Go files from YAML lifecycle files.",
+		"Generate lifecycle builder Go files from YAML lifecycle files",
+		"Generate lifecycle builder Go files from YAML lifecycle files.",
 		"",
 		"This command reads YAML lifecycle files and generates corresponding Go builder",
 		"files following the versioned builder pattern. Each builder is versioned at v1_0_0",
@@ -66,61 +68,60 @@ func NewGenerateLifecycleBuildersCmd() *cobra.Command {
 			return errfmt.Newf("failed to create output directory").Wrap(err)
 		}
 
-		// Find all YAML files
-		entries, err := fileutil.ReadDir(lifecyclesDir)
-		if err != nil {
-			return errfmt.Newf("failed to read lifecycles directory").Wrap(err)
+		parentDir := filepath.Dir(outputDir)
+		v1Dir := filepath.Join(parentDir, "bldr_lifecycle_v1")
+		if err := fileutil.MkdirAll(v1Dir, paths.DirPerm755); err != nil {
+			return errfmt.Newf("failed to create bldr_lifecycle_v1 directory").Wrap(err)
 		}
 
 		logging.Fluent(logger).Info("Starting lifecycle builder generation").Log()
 		skipped := 0
-
 		var items []GenerateItem
-		for _, entry := range entries {
-			if entry.IsDir() {
-				continue
+
+		err := filepath.WalkDir(lifecyclesDir, func(path string, d os.DirEntry, walkErr error) error {
+			if walkErr != nil || d == nil {
+				return nil
+			}
+			if d.IsDir() {
+				if d.Name() == ".git" || d.Name() == "node_modules" {
+					return filepath.SkipDir
+				}
+				return nil
+			}
+			if appledouble.SkipNameInReadDir(d.Name()) {
+				return nil
+			}
+			if !strings.HasSuffix(d.Name(), ".yaml") && !strings.HasSuffix(d.Name(), ".yml") {
+				return nil
+			}
+			if d.Name() == "_placeholder.yaml" || objects.IsHashedFilename(d.Name()) {
+				return nil
 			}
 
-			// Skip macOS AppleDouble/resource-fork files (._*)
-			if appledouble.SkipNameInReadDir(entry.Name()) {
-				continue
-			}
-
-			if !strings.HasSuffix(entry.Name(), ".yaml") && !strings.HasSuffix(entry.Name(), ".yml") {
-				continue
-			}
-
-			// Skip placeholder files
-			if entry.Name() == "_placeholder.yaml" {
-				continue
-			}
-
-			lifecyclePath := filepath.Join(lifecyclesDir, entry.Name())
-
-			// Check if output file already exists (unless overwrite is set)
-			baseName := strings.TrimSuffix(entry.Name(), ".yaml")
+			baseName := strings.TrimSuffix(d.Name(), ".yaml")
 			baseName = strings.TrimSuffix(baseName, ".yml")
 			baseName = strings.TrimSuffix(baseName, "_lifecycle")
-			// Output file is now in sibling directory: ../bldr_lifecycle_v1/{object_type}_builder.go
-			parentDir := filepath.Dir(outputDir)
 			outputFile := filepath.Join(parentDir, "bldr_lifecycle_v1", fmt.Sprintf("%s_builder.go", baseName))
 
 			if !overwrite {
 				if _, err := fileutil.Stat(outputFile); err == nil {
-					logging.Fluent(logger).Debug(fmt.Sprintf("Skipping %s (builder already exists, use --overwrite to replace)", entry.Name())).Log()
+					logging.Fluent(logger).Debug(fmt.Sprintf("Skipping %s (builder already exists, use --overwrite to replace)", d.Name())).Log()
 					skipped++
-					continue
+					return nil
 				}
 			}
 
-			items = append(items, GenerateItem{YAMLPath: lifecyclePath, BaseName: baseName})
+			items = append(items, GenerateItem{YAMLPath: path, BaseName: baseName})
+			return nil
+		})
+		if err != nil {
+			return errfmt.Newf("failed to read lifecycles directory").Wrap(err)
 		}
 
 		result := ConcurrentGenerate(cmd.Context(), items, func(_ context.Context, item GenerateItem) error {
 			return lifecycle_builders.GenerateBuilderFromYAML(item.YAMLPath, outputDir)
 		})
 
-		// Summary (done)
 		logging.Fluent(logger).Info(fmt.Sprintf("Summary: Generated %d, Skipped %d, Errors %d", result.Generated, skipped, result.Errors)).Log()
 
 		if result.Errors > 0 {
@@ -133,9 +134,9 @@ func NewGenerateLifecycleBuildersCmd() *cobra.Command {
 	// Apply help builder to command
 	helpBuilder.ApplyToCommand(cmd)
 
-	cmd.Flags().StringVar(&lifecyclesDir, "lifecycles-dir", "", "Directory containing YAML lifecycle files (default: "+paths.ProcessInternalLifecyclesDir+")")
-	cmd.Flags().StringVar(&outputDir, "output-dir", "", "Output directory for generated builder files (default: pkg/specbuilder/lifecycle_builders)")
-	cmd.Flags().BoolVar(&overwrite, "overwrite", false, "Overwrite existing builder files")
+	cmd.Flags().StringVar(&lifecyclesDir, "lifecycles-dir", "", "Directory containing lifecycle YAML files (default: "+paths.ProcessInternalLifecyclesDir+")")
+	cmd.Flags().StringVar(&outputDir, "output-dir", "", "Output directory for generated Go files (default: pkg/specbuilder/lifecycle_builders)")
+	cmd.Flags().BoolVar(&overwrite, "overwrite", false, "Overwrite existing lifecycle builder files")
 
 	cli.AddCommonFlags(cmd)
 	return cmd

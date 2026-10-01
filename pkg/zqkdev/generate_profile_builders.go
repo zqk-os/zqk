@@ -13,6 +13,7 @@ import (
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/specbuilder/profile_builders"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -69,6 +70,10 @@ func NewGenerateProfileBuildersCmd() *cobra.Command {
 		// Find all YAML files
 		entries, err := fileutil.ReadDir(profilesDir)
 		if err != nil {
+			if fileutil.IsNotExist(err) {
+				logging.Fluent(logger).Info("profiles directory does not exist, skipping profile builder generation").Log()
+				return nil
+			}
 			return errfmt.Newf("failed to read profiles directory").Wrap(err)
 		}
 
@@ -87,6 +92,10 @@ func NewGenerateProfileBuildersCmd() *cobra.Command {
 			}
 
 			if !strings.HasSuffix(entry.Name(), ".yaml") && !strings.HasSuffix(entry.Name(), ".yml") {
+				continue
+			}
+
+			if entry.Name() == "_placeholder.yaml" || objects.IsHashedFilename(entry.Name()) {
 				continue
 			}
 

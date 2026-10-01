@@ -96,6 +96,18 @@ if [ -d "$REPO_ROOT/.zqk" ]; then
 			exit 1
 		fi
 	fi
+
+	if command -v go >/dev/null 2>&1 && [ -d "$REPO_ROOT/examples/swarms/code-eval/failclosed_audit" ]; then
+		echo "🛡️  [ZQK PRE-PUSH] Running failclosed audit invariant battery..."
+		if ! (cd "$REPO_ROOT/examples/swarms/code-eval/failclosed_audit" && go test -timeout 1m .); then
+			echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+			echo "❌ [ZQK PRE-PUSH] FAILCLOSED AUDIT INVARIANT BATTERY FAILED" >&2
+			echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+			echo "Push aborted because failclosed runtime invariants were violated." >&2
+			echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+			exit 1
+		fi
+	fi
 fi
 
 exit 0

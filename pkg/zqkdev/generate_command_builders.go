@@ -1,12 +1,12 @@
 package zqkdev
 
 import (
-	"context"
 	"fmt"
 	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/appledouble"
@@ -17,29 +17,34 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
+var defaultCLISpecsDirRel = paths.CLICommandSpecsDir
+
 // NewGenerateCommandBuildersCmd creates a command to generate command builder files from YAML specs
 func NewGenerateCommandBuildersCmd() *cobra.Command {
 	var (
-		specsDir  string
-		outputDir string
-		overwrite bool
+		specsDir                   string
+		outputDir                  string
+		overwrite                  bool
+		includeProcessCommandSpecs bool
 	)
 
 	helpBuilder := clipkg.DynamicHelpBuilder(
 		"Generate command builder Go files from YAML command spec files",
 		"Generate command builder Go files from YAML command spec files.",
 		"",
-		"This command reads YAML command spec files and generates corresponding Go builder",
-		"files following the versioned builder pattern. Each builder is versioned at v1_0_0",
-		"(semantic versioning format).",
+		"This command reads YAML command DNA under .zqk/cli/specs (default) and generates",
+		"corresponding Go builder files following the versioned builder pattern.",
+		"",
+		"Do not point --specs-dir at process CAS trees — command DNA lives only under "+paths.CLICommandSpecsDir+" (paths_config command_specs).",
+		"--include-process-command-specs is retained as an escape hatch for any leftover CSPEC-* instances elsewhere.",
 		"",
 		"The generated builders use the CommandBuilder/CRUDCommandBuilder pattern and",
 		"can be used to create cobra.Command instances programmatically.",
 	).
-		AddExample("Generate builders for all command specs", "%s system generate-command-builders").
-		AddExample("Generate builders from a specific directory", "%s system generate-command-builders --specs-dir .zqk/cli/specs").
+		AddExample("Generate builders from CLI DNA (default)", "%s system generate-command-builders --overwrite").
+		AddExample("Generate builders from an explicit DNA directory", "%s system generate-command-builders --specs-dir "+paths.CLICommandSpecsDir+" --overwrite").
 		AddExample("Generate builders to a specific output directory", "%s system generate-command-builders --output-dir pkg/cli").
-		AddExample("Overwrite existing builder files", "%s system generate-command-builders --overwrite").
+		AddExample("Include leftover process CAS command_spec instances (escape hatch)", "%s system generate-command-builders --include-process-command-specs --overwrite").
 		ExcludeCommonFlags()
 
 	cmd := &cobra.Command{
@@ -53,22 +58,18 @@ func NewGenerateCommandBuildersCmd() *cobra.Command {
 			logger = logging.GetLoggerFromProfile(ctx.Profile)
 		}
 
-		// Default specs directory
+		projectRoot := cli.ResolveProjectRoot(".")
 		if specsDir == EmptyValue {
-			specsDir = paths.CLICommandSpecsDir
+			specsDir = filepath.Join(projectRoot, defaultCLISpecsDirRel)
+		}
+		if outputDir == "" {
+			outputDir = filepath.Join(projectRoot, "pkg/cli")
 		}
 
-		// Default output directory
-		if outputDir == EmptyValue {
-			outputDir = "pkg/cli"
-		}
-
-		// Ensure output directory exists
 		if err := fileutil.MkdirAll(outputDir, paths.DirPerm755); err != nil {
 			return errfmt.Newf("failed to create output directory").Wrap(err)
 		}
 
-		// Recursively find all YAML files in specs directory
 		var yamlFiles []string
 		err := filepath.Walk(specsDir, func(path string, info fileutil.FileInfo, err error) error {
 			if err != nil {
@@ -77,8 +78,7 @@ func NewGenerateCommandBuildersCmd() *cobra.Command {
 			if info.IsDir() {
 				return nil
 			}
-			// scheduler/convergence/*.yaml are spec_ref fragments for CommandSpecBuilder only; parent is scheduler/convergence_command.yaml.
-			if strings.Contains(path, "/scheduler/convergence/") || strings.Contains(path, "\\scheduler\\convergence\\") {
+			if strings.Contains(path, "/scheduler/") || strings.Contains(path, "\\scheduler\\") {
 				return nil
 			}
 			if appledouble.SkipPathInTreeWalk(path) {
@@ -93,24 +93,48 @@ func NewGenerateCommandBuildersCmd() *cobra.Command {
 			return errfmt.Newf("failed to walk specs directory").Wrap(err)
 		}
 
-		logging.Fluent(logger).Info("Starting command builder generation").Log()
+		logging.Fluent(logger).Info("Starting command builder generation").
+			String("specs_dir", specsDir).
+			Bool("include_process_command_specs", includeProcessCommandSpecs).
+			Log()
+		generated := 0
 		skipped := 0
+		errors := 0
 
-		// Build GenerateItems, filtering skips up front
-		var items []GenerateItem
 		for _, yamlPath := range yamlFiles {
 			relPath, err := filepath.Rel(specsDir, yamlPath)
 			if err != nil {
 				logging.Fluent(logger).Error(fmt.Sprintf("Failed to get relative path for %s", yamlPath), err).Log()
+				errors++
 				continue
 			}
 
-			baseName := strings.TrimSuffix(relPath, "_command.yaml")
-			baseName = strings.TrimSuffix(baseName, "_command.yml")
-			baseName = strings.TrimSuffix(baseName, ".yaml")
-			baseName = strings.TrimSuffix(baseName, ".yml")
-			baseName = strings.ReplaceAll(baseName, string(filepath.Separator), "_")
-			baseName = strings.ReplaceAll(baseName, "/", "_")
+			data, err := fileutil.ReadFile(yamlPath)
+			if err != nil {
+				logging.Fluent(logger).Error(fmt.Sprintf("Failed to read %s", yamlPath), err).Log()
+				errors++
+				continue
+			}
+
+			var tempSpec map[string]any
+			if err := yaml.Unmarshal(data, &tempSpec); err != nil {
+				logging.Fluent(logger).Error(fmt.Sprintf("Failed to parse YAML %s", yamlPath), err).Log()
+				errors++
+				continue
+			}
+
+			if clipkg.IsProcessCommandSpecCAS(tempSpec) && !includeProcessCommandSpecs {
+				logging.Fluent(logger).Info(fmt.Sprintf("Skipping process CAS command_spec %s (pass --include-process-command-specs to generate)", relPath)).Log()
+				skipped++
+				continue
+			}
+
+			baseName := clipkg.ResolveCommandBuilderName(tempSpec, yamlPath)
+			if baseName == "" || clipkg.IsNumericCASCommandStem(baseName) {
+				logging.Fluent(logger).Error(fmt.Sprintf("Refusing numeric/empty builder name for %s", relPath), errfmt.Errorf("unusable command builder stem")).Log()
+				errors++
+				continue
+			}
 
 			outputFile := filepath.Join(outputDir, "bldr_cli_cmd_v1", fmt.Sprintf("%s_command_builder.go", baseName))
 
@@ -122,30 +146,31 @@ func NewGenerateCommandBuildersCmd() *cobra.Command {
 				}
 			}
 
-			items = append(items, GenerateItem{YAMLPath: yamlPath, BaseName: baseName})
+			if err := clipkg.GenerateCommandBuilderFromYAML(yamlPath, outputDir); err != nil {
+				logging.Fluent(logger).Error(fmt.Sprintf("Failed to generate command builder for %s", relPath), err).Log()
+				errors++
+				continue
+			}
+
+			logging.Fluent(logger).Debug(fmt.Sprintf("Generated command builder for %s -> %s", relPath, baseName)).Log()
+			generated++
 		}
 
-		// Concurrent generation with bounded errgroup
-		result := ConcurrentGenerate(cmd.Context(), items, func(_ context.Context, item GenerateItem) error {
-			return clipkg.GenerateCommandBuilderFromYAML(item.YAMLPath, outputDir)
-		})
+		logging.Fluent(logger).Info(fmt.Sprintf("Summary: Generated %d, Skipped %d, Errors %d", generated, skipped, errors)).Log()
 
-		// Summary
-		logging.Fluent(logger).Info(fmt.Sprintf("Summary: Generated %d, Skipped %d, Errors %d", result.Generated, skipped, result.Errors)).Log()
-
-		if result.Errors > 0 {
-			return errfmt.Errorf("generation completed with %d errors", result.Errors)
+		if errors > 0 {
+			return errfmt.Errorf("generation completed with %d errors", errors)
 		}
 
 		return nil
 	})
 
-	// Apply help builder to command
 	helpBuilder.ApplyToCommand(cmd)
 
-	cmd.Flags().StringVar(&specsDir, "specs-dir", "", "Directory containing YAML command spec files (default: .zqk/cli/specs)")
-	cmd.Flags().StringVar(&outputDir, "output-dir", "", "Output directory for generated builder files (default: pkg/cli)")
+	cmd.Flags().StringVar(&specsDir, "specs-dir", "", fmt.Sprintf("Directory containing YAML command DNA (default: <project>/%s)", paths.CLICommandSpecsDir))
+	cmd.Flags().StringVar(&outputDir, "output-dir", "", "Output directory for generated builder files (default: <project>/pkg/cli)")
 	cmd.Flags().BoolVar(&overwrite, "overwrite", false, "Overwrite existing command builder files")
+	cmd.Flags().BoolVar(&includeProcessCommandSpecs, "include-process-command-specs", false, "Also generate from process CAS command_spec instances (CSPEC-*); off by default")
 
 	cli.AddCommonFlags(cmd)
 	return cmd
