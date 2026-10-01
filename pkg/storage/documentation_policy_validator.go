@@ -53,37 +53,7 @@ func ValidateDocumentationPolicy(projectRoot string) ([]DocumentationPolicyViola
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 
 	// Walk through all markdown files
-	err := filepath.Walk(projectRoot, func(path string, info fileutil.FileInfo, err error) error {
-		if err != nil {
-			return nil // Skip files we can't access
-		}
-
-		// Skip directories
-		if info.IsDir() {
-			return nil
-		}
-
-		if appledouble.SkipPathInTreeWalk(path) {
-			return nil
-		}
-
-		// Only check markdown files
-		if !strings.HasSuffix(path, paths.MarkdownExtension) && !strings.HasSuffix(path, paths.MarkdownAltExtension) {
-			return nil
-		}
-
-		// Skip excluded paths
-		relPath, err := filepath.Rel(projectRoot, path)
-		if err != nil {
-			return nil
-		}
-
-		for _, exclusion := range exclusions {
-			if strings.Contains(relPath, exclusion) {
-				return nil
-			}
-		}
-
+	err := walkMarkdownFiles(projectRoot, exclusions, func(path, relPath string) error {
 		// Check if file is in allowed location
 		inAllowedLocation := false
 		for _, prefix := range allowedPrefixes {
@@ -324,35 +294,7 @@ func FindUnregisteredDocumentation(projectRoot string, existingDocEntries map[st
 		".git",
 	}
 
-	err := filepath.Walk(projectRoot, func(path string, info fileutil.FileInfo, err error) error {
-		if err != nil {
-			return nil
-		}
-
-		if info.IsDir() {
-			return nil
-		}
-
-		if appledouble.SkipPathInTreeWalk(path) {
-			return nil
-		}
-
-		if !strings.HasSuffix(path, ".md") && !strings.HasSuffix(path, ".markdown") {
-			return nil
-		}
-
-		relPath, err := filepath.Rel(projectRoot, path)
-		if err != nil {
-			return nil
-		}
-
-		// Skip excluded paths
-		for _, exclusion := range exclusions {
-			if strings.Contains(relPath, exclusion) {
-				return nil
-			}
-		}
-
+	err := walkMarkdownFiles(projectRoot, exclusions, func(path, relPath string) error {
 		// Check if in allowed location
 		inAllowedLocation := false
 		for _, prefix := range allowedPrefixes {
@@ -376,3 +318,39 @@ func FindUnregisteredDocumentation(projectRoot string, existingDocEntries map[st
 
 	return unregistered, err
 }
+
+// walkMarkdownFiles walks projectRoot skipping ignored directories and AppleDouble files,
+// applying exclusions to relative paths, and calling visit on every markdown file.
+func walkMarkdownFiles(projectRoot string, exclusions []string, visit func(path, relPath string) error) error {
+	return filepath.Walk(projectRoot, func(path string, info fileutil.FileInfo, err error) error {
+		if err != nil {
+			return nil
+		}
+
+		if info.IsDir() {
+			return nil
+		}
+
+		if appledouble.SkipPathInTreeWalk(path) {
+			return nil
+		}
+
+		if !strings.HasSuffix(path, paths.MarkdownExtension) && !strings.HasSuffix(path, paths.MarkdownAltExtension) {
+			return nil
+		}
+
+		relPath, err := filepath.Rel(projectRoot, path)
+		if err != nil {
+			return nil
+		}
+
+		for _, exclusion := range exclusions {
+			if strings.Contains(relPath, exclusion) {
+				return nil
+			}
+		}
+
+		return visit(path, relPath)
+	})
+}
+

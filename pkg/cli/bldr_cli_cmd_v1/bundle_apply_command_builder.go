@@ -20,7 +20,7 @@ func NewBundleApplyCommandBuilder() *cobra.Command {
 	help.WithDescriptionLines("Project root is required: use --project-root or set ZQK_PROJECT_ROOT / ZQK_TEST_ROOT.")
 	help.WithDescriptionLines("A scenario summary is written to .zqk/scenarios/<bundle-name>/scenario-summary.json")
 	help.WithDescriptionLines("with hint_to_id mappings and created IDs.")
-	help.AddExample("Apply persistence traceability bundle", "%s bundle apply -b test-scenarios/persistence-bundle/persistence-bundle.yaml -R .")
+	help.AddExample("Apply persistence traceability bundle", "%s bundle apply -b examples/scenarios/persistence-bundle/persistence-bundle.yaml -R .")
 	help.AddExample("Apply with project root from environment", "%s bundle apply --file my-bundle.yaml")
 	help.ExcludeFlag("format")
 	help.ExcludeFlag("output")

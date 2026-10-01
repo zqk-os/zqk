@@ -40,10 +40,7 @@ func runAgentGuidingStep(cmd *cobra.Command, _ []string) error {
 		event = resolved
 
 		ctx := proc.OperationContext()
-		sec := proc.SecurityContext()
-		if sec == nil {
-			sec = pkgctx.NewSystemSecurityContext()
-		}
+		sec := procSecurity(proc)
 		sp := proc.Storage()
 
 		var persona map[string]any

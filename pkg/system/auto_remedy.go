@@ -200,7 +200,7 @@ func (e *DiagnosticsRemedyEngine) diagnoseCheckIssues(checkResults []systemcheck
 					Description: issue.Message,
 					ActionType:  ActionRunCommand,
 					Target:      cr.ObjectID,
-					Command:     paths.CLICommandName + " object fix " + cr.ObjectID,
+					Command:     paths.CLICommandName + " system check --auto-fix --ids " + cr.ObjectID,
 					Confidence:  0.90,
 					AutoApply:   false,
 				})

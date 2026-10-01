@@ -56,6 +56,13 @@ func NewServiceCmd() *cobra.Command {
 	return serviceCmd
 }
 
+func buildServiceSubcmd(bldr *cobra.Command, cmd *cobra.Command, helpBuilder *clipkg.HelpBuilder) *cobra.Command {
+	c := clipkg.ApplyBuilder(bldr, cmd)
+	helpBuilder.ApplyToCommand(c)
+	cli.AddCommonFlags(c)
+	return c
+}
+
 // NewServiceStartCmd creates a command to start a service
 func NewServiceStartCmd() *cobra.Command {
 	helpBuilder := clipkg.DynamicHelpBuilder(
@@ -68,17 +75,11 @@ func NewServiceStartCmd() *cobra.Command {
 		AddExample("Start MemGraph service", "%s system service start memgraph").
 		ExcludeCommonFlags()
 
-	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewSystemStartCommandBuilder(), &cobra.Command{
+	return buildServiceSubcmd(bldr_cli_cmd_v1.NewSystemStartCommandBuilder(), &cobra.Command{
 		Use:  "start <service>",
 		Args: cobra.ExactArgs(1),
 		RunE: runServiceStart,
-	})
-
-	// Apply help builder to command
-	helpBuilder.ApplyToCommand(cmd)
-
-	cli.AddCommonFlags(cmd)
-	return cmd
+	}, helpBuilder)
 }
 
 // NewServiceStopCmd creates a command to stop a service
@@ -93,17 +94,11 @@ func NewServiceStopCmd() *cobra.Command {
 		AddExample("Stop MemGraph service", "%s system service stop memgraph").
 		ExcludeCommonFlags()
 
-	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewSystemStopCommandBuilder(), &cobra.Command{
+	return buildServiceSubcmd(bldr_cli_cmd_v1.NewSystemStopCommandBuilder(), &cobra.Command{
 		Use:  "stop <service>",
 		Args: cobra.ExactArgs(1),
 		RunE: runServiceStop,
-	})
-
-	// Apply help builder to command
-	helpBuilder.ApplyToCommand(cmd)
-
-	cli.AddCommonFlags(cmd)
-	return cmd
+	}, helpBuilder)
 }
 
 // NewServiceStatusCmd creates a command to check service status
@@ -118,17 +113,11 @@ func NewServiceStatusCmd() *cobra.Command {
 		AddExample("Check MemGraph service status", "%s system service status memgraph").
 		ExcludeCommonFlags()
 
-	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewSystemStatusCommandBuilder(), &cobra.Command{
+	return buildServiceSubcmd(bldr_cli_cmd_v1.NewSystemStatusCommandBuilder(), &cobra.Command{
 		Use:  "status <service>",
 		Args: cobra.ExactArgs(1),
 		RunE: runServiceStatus,
-	})
-
-	// Apply help builder to command
-	helpBuilder.ApplyToCommand(cmd)
-
-	cli.AddCommonFlags(cmd)
-	return cmd
+	}, helpBuilder)
 }
 
 // NewServiceListCmd creates a command to list available services
@@ -140,17 +129,11 @@ func NewServiceListCmd() *cobra.Command {
 		AddExample("List all available services", "%s system service list").
 		ExcludeCommonFlags()
 
-	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewSystemListCommandBuilder(), &cobra.Command{
+	return buildServiceSubcmd(bldr_cli_cmd_v1.NewSystemListCommandBuilder(), &cobra.Command{
 		Use:  "list",
 		Args: cobra.NoArgs,
 		RunE: runServiceList,
-	})
-
-	// Apply help builder to command
-	helpBuilder.ApplyToCommand(cmd)
-
-	cli.AddCommonFlags(cmd)
-	return cmd
+	}, helpBuilder)
 }
 
 var activeServiceManagerFactory = func() *ServiceManager {

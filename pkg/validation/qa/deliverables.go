@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/safepath"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -68,7 +69,11 @@ func ValidateArtifactFiles(paths []string, projectRoot string) error {
 	for _, p := range paths {
 		targetPath := p
 		if !filepath.IsAbs(targetPath) && projectRoot != "" {
-			targetPath = filepath.Join(projectRoot, targetPath)
+			safe, err := safepath.JoinUnderRoot(projectRoot, targetPath)
+			if err != nil {
+				return fmt.Errorf("artifact file escapes project root: %s: %w", p, err)
+			}
+			targetPath = safe
 		}
 		info, err := fileutil.Stat(targetPath)
 		if err != nil || info.IsDir() {
