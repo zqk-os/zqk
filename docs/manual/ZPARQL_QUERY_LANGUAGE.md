@@ -46,7 +46,7 @@ WHERE {
     ?bli criteria_refs ?crit_id .
     ?crit a criteria .
     ?crit id ?crit_id .
-    FILTER (?plan_title = "PRI-LAUNCH-GAP-REMEDIATION")
+    FILTER (?plan_title = "PRI-CORE-REMEDIATION")
 }
 ```
 

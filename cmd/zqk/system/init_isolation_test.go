@@ -206,9 +206,8 @@ func TestPublicRelease_PackagingIntegrityAndGates(t *testing.T) {
 
 	requiredScripts := []string{
 		filepath.Join(root, "scripts", "package-community.sh"),
-		filepath.Join(root, "scripts", "test_package_community.sh"),
-		filepath.Join(root, "scripts", "test-public-push-gate-failclosed.sh"),
-		filepath.Join(root, "scripts", "check-public-release-payload.sh"),
+		filepath.Join(root, "scripts", "open-core", "test-public-release-gates.sh"),
+		filepath.Join(root, "scripts", "open-core", "check-public-release-payload.sh"),
 	}
 
 	for _, s := range requiredScripts {
@@ -224,6 +223,9 @@ func TestPublicRelease_PackagingIntegrityAndGates(t *testing.T) {
 }
 
 func TestCommunitySourceOverlay_IntegrityAndProcessPreservation(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping slow overlay test in short mode")
+	}
 	root, err := filepath.Abs("../../..")
 	if err != nil {
 		t.Fatalf("failed to determine repository root: %v", err)

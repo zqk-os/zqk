@@ -270,7 +270,15 @@ func TestIntegrityCheck_ForceFixPersistence(t *testing.T) {
 		if newHash == originalHash {
 			t.Error("Expected hash to be updated after --force fix, but it matches original hash")
 		}
-		expectedHash := calculateHashFromContent(contentAfterFix)
+		pathFromCAS, err := cas.GetFilePathForID("BLI-999")
+		if err != nil || pathFromCAS == emptyValue {
+			t.Fatal("Expected CAS to have path for BLI-999")
+		}
+		currentContent, err := fileutil.ReadFile(pathFromCAS)
+		if err != nil {
+			t.Fatalf("Failed to read current file: %v", err)
+		}
+		expectedHash := calculateHashFromContent(currentContent)
 		if newHash != expectedHash {
 			t.Errorf("New hash doesn't match file content: expected %s, got %s", expectedHash[:16], newHash[:16])
 		}
