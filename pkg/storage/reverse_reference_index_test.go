@@ -379,3 +379,93 @@ func TestReverseReferenceIndex_GetDependentsWithError_Contention(t *testing.T) {
 		t.Fatalf("expected nil dependents on lock failure, got %v", blockedDeps)
 	}
 }
+
+// TestReverseReferenceIndex_ProjectScopedIsolation verifies that project-scoped indices
+// maintain independent state and clearing one does not affect another (TDE-CEF-F-ARCH-003).
+func TestReverseReferenceIndex_ProjectScopedIsolation(t *testing.T) {
+	projA := "/tmp/project-alpha-" + t.Name()
+	projB := "/tmp/project-beta-" + t.Name()
+
+	idxA := GetReverseReferenceIndexForProject(projA)
+	idxB := GetReverseReferenceIndexForProject(projB)
+
+	if idxA == idxB {
+		t.Fatalf("expected distinct index instances for different projects, got identical pointer %p", idxA)
+	}
+	if idxA.ProjectRoot() != projA {
+		t.Errorf("idxA.ProjectRoot() = %q, want %q", idxA.ProjectRoot(), projA)
+	}
+	if idxB.ProjectRoot() != projB {
+		t.Errorf("idxB.ProjectRoot() = %q, want %q", idxB.ProjectRoot(), projB)
+	}
+
+	// Add references to project A
+	idxA.AddReference("BLI-ALPHA-1", "REQ-ALPHA-1")
+	// Add references to project B
+	idxB.AddReference("BLI-BETA-1", "REQ-BETA-1")
+
+	// Verify isolation
+	depsA := idxA.GetDependents("REQ-ALPHA-1")
+	if len(depsA) != 1 || depsA[0] != "BLI-ALPHA-1" {
+		t.Errorf("idxA.GetDependents(REQ-ALPHA-1) = %v, want [BLI-ALPHA-1]", depsA)
+	}
+	if len(idxA.GetDependents("REQ-BETA-1")) != 0 {
+		t.Errorf("idxA unexpectedly contains REQ-BETA-1 dependents")
+	}
+
+	depsB := idxB.GetDependents("REQ-BETA-1")
+	if len(depsB) != 1 || depsB[0] != "BLI-BETA-1" {
+		t.Errorf("idxB.GetDependents(REQ-BETA-1) = %v, want [BLI-BETA-1]", depsB)
+	}
+	if len(idxB.GetDependents("REQ-ALPHA-1")) != 0 {
+		t.Errorf("idxB unexpectedly contains REQ-ALPHA-1 dependents")
+	}
+
+	// Clear project A and verify project B is completely unaffected
+	idxA.Clear()
+	if len(idxA.GetDependents("REQ-ALPHA-1")) != 0 {
+		t.Errorf("idxA should be empty after Clear()")
+	}
+
+	depsBAfter := idxB.GetDependents("REQ-BETA-1")
+	if len(depsBAfter) != 1 || depsBAfter[0] != "BLI-BETA-1" {
+		t.Fatalf("destructive cross-project contamination: idxB lost entries after idxA.Clear(): %v", depsBAfter)
+	}
+}
+
+// TestReverseReferenceIndex_MultiTenantConcurrentAccess verifies thread-safe concurrent
+// operations on multiple project-scoped indices without deadlocks or state pollution.
+func TestReverseReferenceIndex_MultiTenantConcurrentAccess(t *testing.T) {
+	ctx, cancel := stdcontext.WithCancel(stdcontext.Background())
+	defer cancel()
+
+	const numProjects = 5
+	const numOps = 20
+
+	done := make(chan struct{})
+	for p := 0; p < numProjects; p++ {
+		projPath := filepath.Join("/tmp", "concurrent-proj", string(rune('a'+p)))
+		go func(ctx stdcontext.Context, path string, id int) {
+			defer func() { done <- struct{}{} }()
+			idx := GetReverseReferenceIndexForProject(path)
+			for i := 0; i < numOps; i++ {
+				child := "BLI-" + string(rune('A'+id))
+				parent := "REQ-" + string(rune('A'+id))
+				idx.AddReference(child, parent)
+				deps := idx.GetDependents(parent)
+				if len(deps) == 0 {
+					t.Errorf("expected non-empty dependents in project %s", path)
+				}
+				if i%5 == 0 {
+					idx.RemoveReference(child, parent)
+				}
+			}
+		}(ctx, projPath, p)
+	}
+
+	for p := 0; p < numProjects; p++ {
+		<-done
+	}
+}
+
+

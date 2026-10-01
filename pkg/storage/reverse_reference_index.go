@@ -40,16 +40,46 @@ type ReverseReferenceIndex struct {
 	forwardIndex map[string][]string // objectID -> []referencedIDs
 	metadata     *ReverseReferenceIndexMetadata
 	cacheDir     string // Directory where cache file is stored
+	projectRoot  string // Associated project root directory
 	isReady      atomic.Bool
 }
 
-// Global cache instance (similar to ObjectIDCache pattern)
+// Global cache instance and project-scoped registry
 var (
 	globalReverseReferenceIndex *ReverseReferenceIndex
 	reverseReferenceIndexOnce   sync.Once
+
+	projectScopedIndices   = make(map[string]*ReverseReferenceIndex)
+	projectScopedIndicesMu sync.RWMutex
 )
 
-// GetGlobalReverseReferenceIndex returns the global reverse reference index instance
+// GetReverseReferenceIndexForProject returns the isolated reverse reference index for the specified project root.
+func GetReverseReferenceIndexForProject(projectRoot string) *ReverseReferenceIndex {
+	normalized := filepath.Clean(projectRoot)
+	if projectRoot == "" {
+		normalized = ""
+	}
+
+	projectScopedIndicesMu.RLock()
+	idx, exists := projectScopedIndices[normalized]
+	projectScopedIndicesMu.RUnlock()
+	if exists && idx != nil {
+		return idx
+	}
+
+	projectScopedIndicesMu.Lock()
+	defer projectScopedIndicesMu.Unlock()
+	if idx, exists := projectScopedIndices[normalized]; exists && idx != nil {
+		return idx
+	}
+
+	idx = NewReverseReferenceIndexForProject(normalized)
+	projectScopedIndices[normalized] = idx
+	return idx
+}
+
+// GetGlobalReverseReferenceIndex returns the global reverse reference index instance.
+// Deprecated: Prefer GetReverseReferenceIndexForProject(projectRoot) or explicit dependency injection (TDE-CEF-F-ARCH-003).
 func GetGlobalReverseReferenceIndex() *ReverseReferenceIndex {
 	reverseReferenceIndexOnce.Do(func() {
 		globalReverseReferenceIndex = NewReverseReferenceIndex()
@@ -57,14 +87,32 @@ func GetGlobalReverseReferenceIndex() *ReverseReferenceIndex {
 	return globalReverseReferenceIndex
 }
 
-// NewReverseReferenceIndex creates a new reverse reference index
+// NewReverseReferenceIndex creates a new reverse reference index without a project root.
+// Deprecated: Prefer NewReverseReferenceIndexForProject(projectRoot) for project isolation (TDE-CEF-F-ARCH-003).
 func NewReverseReferenceIndex() *ReverseReferenceIndex {
+	return NewReverseReferenceIndexForProject("")
+}
+
+// NewReverseReferenceIndexForProject creates a new reverse reference index bound to an explicit project root.
+func NewReverseReferenceIndexForProject(projectRoot string) *ReverseReferenceIndex {
+	normalized := filepath.Clean(projectRoot)
+	if projectRoot == "" {
+		normalized = ""
+	}
 	return &ReverseReferenceIndex{
 		index:        make(map[string][]string),
 		forwardIndex: make(map[string][]string),
 		metadata:     nil,
 		cacheDir:     "",
+		projectRoot:  normalized,
 	}
+}
+
+// ProjectRoot returns the project root directory associated with this index instance.
+func (r *ReverseReferenceIndex) ProjectRoot() string {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.projectRoot
 }
 
 // IsReady returns true if the index has been successfully loaded from cache or built from scan.
@@ -80,8 +128,14 @@ func (r *ReverseReferenceIndex) GetCacheFilePath(projectRoot string) string {
 // getCacheFilePath returns the path to the cache file.
 // When projectRoot is non-empty, always use it so SaveCache(projectRoot) writes to the correct project.
 func (r *ReverseReferenceIndex) getCacheFilePath(projectRoot string) string {
-	if projectRoot != emptyValue {
-		cacheDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.CacheDir)
+	targetRoot := projectRoot
+	if targetRoot == emptyValue {
+		r.mu.RLock()
+		targetRoot = r.projectRoot
+		r.mu.RUnlock()
+	}
+	if targetRoot != emptyValue {
+		cacheDir := filepath.Join(targetRoot, paths.ProjectDataDir, paths.CacheDir)
 		return filepath.Join(cacheDir, reverseReferenceIndexFile)
 	}
 	r.mu.RLock()
@@ -400,6 +454,13 @@ func (r *ReverseReferenceIndex) Clear() {
 // datacell.ProcessPrimaryDir(projectRoot).
 func (r *ReverseReferenceIndex) BuildFromScan(projectRoot, processDir string, kinds []string) error {
 	r.Clear()
+	if projectRoot != emptyValue {
+		r.mu.Lock()
+		if r.projectRoot == emptyValue {
+			r.projectRoot = filepath.Clean(projectRoot)
+		}
+		r.mu.Unlock()
+	}
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	for _, kind := range kinds {
 		dirName := objects.GetDirectoryFromKind(kind)
