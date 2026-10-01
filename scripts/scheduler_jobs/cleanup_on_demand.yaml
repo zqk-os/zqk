@@ -16,5 +16,5 @@ enabled: true
 title: Cleanup (config-driven)
 description: |
   Runs cleanup steps from .zqk/cleanup/config.yaml: reap_temp_files, reap_stale_locks,
-  enforce_log_retention. Executes automatically every 4 hours or on demand.
+  enforce_log_retention, reap_orphaned_processes. Executes automatically every 4 hours or on demand.
 namespace_id: zqk:kernel
