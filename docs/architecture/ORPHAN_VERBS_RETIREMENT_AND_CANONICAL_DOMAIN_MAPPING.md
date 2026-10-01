@@ -2,7 +2,6 @@
 
 **Document ID:** `DOC-ORPHAN-VERBS-RETIREMENT`  
 **Requirement Reference:** `REQ-ORPHAN-VERBS-RETIREMENT`  
-**Backlog Item:** `BLI-1790814952688118000-a20ee76d`  
 **Status:** Canonical / Implemented  
 **Date:** 2026-10-01  
 

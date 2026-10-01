@@ -2,6 +2,7 @@ package workflow
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/cmd/zqk/do"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 )
 
@@ -16,5 +17,6 @@ func NewWorkflowCmd() *cobra.Command {
 	cmd.AddCommand(NewCoachCmd())
 	cmd.AddCommand(NewGenTracePipelineCmd())
 	cmd.AddCommand(NewLinkCmd())
+	cmd.AddCommand(do.NewDoCmd())
 	return cmd
 }

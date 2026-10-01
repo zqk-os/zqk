@@ -83,8 +83,9 @@ go test ./...
 ## 5. Pull Request Lifecycle & Definition of Done
 
 1. **Self-Contained Commits**: Group related changes logically; include test cases for all new functionality or bug fixes.
-2. **Pre-Commit Compliance**: Pre-commit hooks will automatically verify the Test Matrix Definition of Done and ensure unbroken lineage from criteria to root objects.
-3. **Review & Promotion**: Maintainers and TPMs will review the PR. Once merged, continuous autonomous workflows proceed with post-merge self-continuation.
+2. **Pull Request Template**: Adhere to the pull request checklist in [.github/PULL_REQUEST_TEMPLATE.md](.github/PULL_REQUEST_TEMPLATE.md).
+3. **Pre-Commit Compliance**: Pre-commit hooks will automatically verify the Test Matrix Definition of Done and ensure unbroken lineage from criteria to root objects.
+4. **Review & Promotion**: Maintainers and TPMs will review the PR. Once merged, continuous autonomous workflows proceed with post-merge self-continuation.
 
 ---
 

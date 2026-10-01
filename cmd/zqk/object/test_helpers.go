@@ -183,8 +183,15 @@ func SetupTestEnvironment(t *testing.T) *TestEnvironment {
 		t.Fatalf("failed to copy lifecycle files: %v", err)
 	}
 	_ = copySpecFiles(filepath.Join(projectRoot, paths.ProjectDataDir, "specs", "lifecycles"), lifecyclesDir)
-	_ = copySpecFiles(filepath.Join(projectRoot, "packs", "work", "lifecycles"), lifecyclesDir)
-	_ = copySpecFiles(filepath.Join(projectRoot, "packs", "work", "specs"), specsDir)
+	packsDir := filepath.Join(projectRoot, "packs")
+	if packEntries, err := fileutil.ReadDir(packsDir); err == nil {
+		for _, pe := range packEntries {
+			if pe.IsDir() {
+				_ = copySpecFiles(filepath.Join(packsDir, pe.Name(), "lifecycles"), lifecyclesDir)
+				_ = copySpecFiles(filepath.Join(packsDir, pe.Name(), "specs"), specsDir)
+			}
+		}
+	}
 
 	sourceCLISpecs := filepath.Join(projectRoot, paths.ProjectDataDir, paths.CLISpecsDir)
 	targetCLISpecs := filepath.Join(tmpDir, paths.ProjectDataDir, paths.CLISpecsDir)

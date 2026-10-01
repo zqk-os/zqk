@@ -107,7 +107,7 @@ func ComputePackDigest(packDir string) (string, error) {
 	hasher := sha256.New()
 	for _, fh := range hashes {
 		entry := fmt.Sprintf("%s:%s\n", fh.relPath, fh.hash)
-		io.WriteString(hasher, entry)
+		_, _ = io.WriteString(hasher, entry)
 	}
 	rootDigest := hex.EncodeToString(hasher.Sum(nil))
 	return "sha256:" + rootDigest, nil

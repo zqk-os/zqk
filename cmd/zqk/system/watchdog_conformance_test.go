@@ -32,8 +32,9 @@ func TestWatchdogSubagent_Conformance(t *testing.T) {
 
 	// 1. Create a matching error agent task
 	task := map[string]any{
-		objects.FieldKeyKind:   objects.KindAgentTask,
-		objects.FieldKeyStatus: objects.ObjectStatusError,
+		objects.FieldKeyKind:        objects.KindAgentTask,
+		objects.FieldKeyStatus:      objects.ObjectStatusError,
+		objects.FieldKeyDescription: "conformance test error task",
 	}
 	if err := provider.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, task); err != nil {
 		t.Fatalf("failed to create agent task: %v", err)

@@ -358,7 +358,23 @@ func evalRoleIs(gv *GoValidator, obj map[string]any, arg string) (handled, met b
 			}
 		}
 	}
-	role := objects.GetGlobalStatusChecker().Role(kind, status)
+	var role string
+	var isTerminal bool
+	if gv != nil && gv.lifecycleLoader != nil {
+		if st, err := gv.lifecycleLoader.ResolveStatusForKind(kind, status); err == nil {
+			role = strings.TrimSpace(st.Role)
+			isTerminal = st.Terminal
+		}
+	}
+	if role == "" {
+		role = objects.GetGlobalStatusChecker().Role(kind, status)
+		if !isTerminal {
+			isTerminal = objects.GetGlobalStatusChecker().IsTerminal(kind, status)
+		}
+	}
+	if targetRole == objects.LifecycleRoleTerminal && isTerminal {
+		return true, true
+	}
 	if role == "" {
 		if !strings.EqualFold(status, targetRole) {
 			return true, false

@@ -16,6 +16,9 @@ func TestRunRaceGate_MissingPackage(t *testing.T) {
 }
 
 func TestRunRaceGate_CleanPackage(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping slow race gate execution in short mode")
+	}
 	t.Parallel()
 	wd, err := os.Getwd()
 	if err != nil {

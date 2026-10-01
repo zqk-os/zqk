@@ -13,6 +13,7 @@ func TestCheckinWriteQueue(t *testing.T) {
 
 	queue := &CheckinWriteQueue{
 		items:      make(map[string]checkinWriteRequest),
+		flushing:   make(map[string]checkinWriteRequest),
 		shutdownCh: make(chan chan struct{}),
 		doneCh:     make(chan struct{}),
 	}

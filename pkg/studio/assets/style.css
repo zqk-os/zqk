@@ -490,6 +490,28 @@
       align-items: center;
       justify-content: space-between;
       user-select: none;
+      transition: background 0.15s;
+    }
+    .gantt-section-header:hover {
+      background: #161b22;
+    }
+    .gantt-group-badge {
+      font-size: 9px;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .gantt-group-badge.active {
+      background: rgba(88, 166, 255, 0.2);
+      color: #58a6ff;
+      border: 1px solid rgba(88, 166, 255, 0.4);
+    }
+    .gantt-group-badge.done {
+      background: rgba(46, 160, 67, 0.2);
+      color: #3fb950;
+      border: 1px solid rgba(46, 160, 67, 0.4);
     }
     .gantt-row {
       display: grid;
@@ -561,6 +583,12 @@
       background: rgba(88, 166, 255, 0.15);
       color: #58a6ff;
       border: 1px solid rgba(88, 166, 255, 0.3);
+    }
+    .status-pill-mini.status-pending_verification,
+    .status-pill-mini.status-testing {
+      background: rgba(188, 140, 255, 0.15);
+      color: #bc8cff;
+      border: 1px solid rgba(188, 140, 255, 0.3);
     }
     .gantt-bar-cell {
       padding: 6px 0;

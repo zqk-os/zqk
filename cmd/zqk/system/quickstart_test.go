@@ -146,16 +146,12 @@ func TestContributorGuide_IssueTemplates(t *testing.T) {
 		required []string
 	}{
 		{
-			filename: "bug_report.md",
-			required: []string{"Bug Report", "Reproduction Steps", "System Environment"},
+			filename: "bug.yml",
+			required: []string{"Bug report", "Reproduction", "Environment"},
 		},
 		{
-			filename: "feature_request.md",
-			required: []string{"Feature Request", "Feature Proposal", "Proposed Kernel / CLI Spec"},
-		},
-		{
-			filename: "rfc.md",
-			required: []string{"Request for Comments", "Architectural Design", "Security & Compliance"},
+			filename: "feature.yml",
+			required: []string{"Enhancement", "Problem", "Proposal"},
 		},
 	}
 

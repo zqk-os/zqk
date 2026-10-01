@@ -528,7 +528,8 @@ func TestInit_GreenfieldAnchorsToCWD(t *testing.T) {
 	if eval, err := filepath.EvalSymlinks(parentDir); err == nil {
 		parentDir = eval
 	}
-	// Create parent .zqk marker to simulate ~/.zqk or parent repo
+	// Create parent .zqk marker to simulate ~/.zqk
+	t.Setenv("HOME", parentDir)
 	if err := fileutil.MkdirAll(filepath.Join(parentDir, paths.ProjectDataDir), paths.DirPerm755); err != nil {
 		t.Fatalf("MkdirAll parent .zqk: %v", err)
 	}

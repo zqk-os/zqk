@@ -211,7 +211,12 @@ func LiveClaimIDs(projectRoot, claimant string) ([]string, error) {
 	if q := GetGlobalCheckinWriteQueue(); q != nil {
 		q.mu.Lock()
 		for _, req := range q.items {
-			if req.timer != nil && strings.EqualFold(req.timer.ClaimedBy, claimant) && req.timer.EvictedAt == "" {
+			if filepath.Clean(req.projectRoot) == filepath.Clean(projectRoot) && req.timer != nil && strings.EqualFold(req.timer.ClaimedBy, claimant) && req.timer.EvictedAt == "" {
+				add(req.timer.TaskID)
+			}
+		}
+		for _, req := range q.flushing {
+			if filepath.Clean(req.projectRoot) == filepath.Clean(projectRoot) && req.timer != nil && strings.EqualFold(req.timer.ClaimedBy, claimant) && req.timer.EvictedAt == "" {
 				add(req.timer.TaskID)
 			}
 		}

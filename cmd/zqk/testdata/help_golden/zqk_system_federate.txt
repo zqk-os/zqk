@@ -1,11 +1,12 @@
-federate command
+Provides cluster federation controls, peer synchronization, and distributed
+event coordination.
 
 Usage:
   zqk system federate [command]
 
 Available Commands:
-  handshake   handshake command
-  initiate    initiate command
+  handshake   Execute bidirectional identity and credential handshake with remote peer
+  initiate    Initiate federation establishment with a remote peer system
   status      Show the status of the federated sovereign mesh
 
 Global Flags:

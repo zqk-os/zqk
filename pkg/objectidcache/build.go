@@ -266,7 +266,7 @@ func buildCacheInParallel(ctx *CacheBuildContext, kinds []string) error {
 	var wg sync.WaitGroup
 	for _, job := range jobs {
 		wg.Add(1)
-		_ = pool.Submit(poolCtx, func(taskCtx context.Context) error {
+		err := pool.Submit(poolCtx, func(taskCtx context.Context) error {
 			defer wg.Done()
 			if err := processCacheJob(ctx, job); err != nil {
 				results <- err
@@ -275,6 +275,16 @@ func buildCacheInParallel(ctx *CacheBuildContext, kinds []string) error {
 			results <- nil
 			return nil
 		})
+		if err != nil {
+			func() {
+				defer wg.Done()
+				if err := processCacheJob(ctx, job); err != nil {
+					results <- err
+				} else {
+					results <- nil
+				}
+			}()
+		}
 	}
 	wg.Wait()
 	for i := 0; i < len(jobs); i++ {

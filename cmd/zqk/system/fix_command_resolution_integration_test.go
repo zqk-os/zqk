@@ -200,7 +200,7 @@ func TestFixCommandResolution_RealData(t *testing.T) {
 		for i := range issues {
 			if issues[i].FixCommand != emptyValue {
 				// Check if this is a milestone_refs issue
-				if containsSubstringInCommand(issues[i].FixCommand, "milestone_refs+=") {
+				if containsSubstringInCommand(issues[i].FixCommand, "milestone_refs+=") || containsSubstringInCommand(issues[i].FixCommand, "milestone_ref=") {
 					milestoneIssue = &issues[i]
 					break
 				}

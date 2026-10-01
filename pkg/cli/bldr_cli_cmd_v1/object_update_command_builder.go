@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // NewObjectUpdateCommandBuilder creates a new object_update command
@@ -44,7 +45,7 @@ func NewObjectUpdateCommandBuilder() *cobra.Command {
 	help.WithDescriptionLines("  - --auto-status: Advance to the next lifecycle-valid status based on current status and lifecycle order.")
 	help.WithDescriptionLines("  - --all: Update all objects of a kind (requires --kind)")
 	help.WithDescriptionLines("  - --add-missing-fields: Automatically add missing fields based on object spec")
-	help.WithDescriptionLines("  - Best Practice: Prefer 'zqk object promote' or 'zqk object demote' for lifecycle status changes, and 'zqk object ref add/remove' for graph relationships.")
+	help.WithDescriptionLines(paths.RewriteCanonicalCLIInvocations("  - Best Practice: Prefer 'zqk object promote' or 'zqk object demote' for lifecycle status changes, and 'zqk object ref add/remove' for graph relationships."))
 	help.WithDescriptionLines("  - stdin: YAML data piped from another command")
 	help.AddExample("Update from file", "%s update BLI-626 --file updates.yaml")
 	help.AddExample("Update from inline data", "%s update BLI-626 --data 'title: \"Updated Title\"'")

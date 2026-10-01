@@ -82,6 +82,9 @@ func registerCommands() {
 	objCmd := object.NewObjectCmd()
 	object.RegisterDynamicKindCommands(objCmd)
 	objCmd.GroupID = "everyday"
+	objCmd.AddCommand(mutatecmd.NewMutateCmd())
+	objCmd.AddCommand(rollbackcmd.NewRollbackCmd())
+	objCmd.AddCommand(newcmd.NewNewCmd())
 	rootCmd.AddCommand(objCmd)
 
 	// Top-level autonomous execution loop (zqk do / zqk auto-exec)
@@ -102,6 +105,10 @@ func registerCommands() {
 	// System operations group (health, validation, and maintenance)
 	systemCmdInst := system.NewSystemCmd()
 	systemCmdInst.GroupID = "everyday"
+	systemCmdInst.AddCommand(validate.NewValidateCmd())
+	systemCmdInst.AddCommand(precommit.NewPreCommitCmd())
+	systemCmdInst.AddCommand(reports.NewReportsCmd())
+	systemCmdInst.AddCommand(NewCompletionCmd(systemCmdInst))
 	rootCmd.AddCommand(systemCmdInst)
 
 	// In-process code search engine (grep / zgrep)
@@ -137,6 +144,8 @@ func registerCommands() {
 	// Graph operations group (reasoning and raw queries)
 	graphCmdInst := graph.NewGraphCmd()
 	graphCmdInst.GroupID = "advanced"
+	graphCmdInst.AddCommand(querycmd.NewQueryCmd())
+	graphCmdInst.AddCommand(NewJoinCmd())
 	rootCmd.AddCommand(graphCmdInst)
 
 	// Ambient operations group
@@ -299,6 +308,7 @@ func registerCommands() {
 	// Mesh: manage the federated economy
 	meshCmdInst := mesh.NewMeshCmd()
 	meshCmdInst.GroupID = "advanced"
+	meshCmdInst.AddCommand(synccmd.NewSyncCmd())
 	rootCmd.AddCommand(meshCmdInst)
 
 	// Autonomy Inbox: human-in-the-loop proposal review
@@ -343,6 +353,7 @@ func registerCommands() {
 	// Service management: background supervisor, host units, and daemon lifecycles
 	serviceCmdInst := scheduler.NewServiceCmd()
 	serviceCmdInst.GroupID = "advanced"
+	serviceCmdInst.AddCommand(tray.NewTrayCmd())
 	rootCmd.AddCommand(serviceCmdInst)
 
 	// Job management: background scheduler job triggers, queues, history, and status

@@ -16,19 +16,14 @@ import (
 )
 
 func TestExtended_RetentionCleanup_SlowPathAndProtectStatuses(t *testing.T) {
-	ctx := context.Background()
-	tmpDir, err := os.MkdirTemp("", "test-retention-cleanup-*")
-	if err != nil {
-		t.Fatalf("failed to create temp dir: %v", err)
-	}
+	ctx := t.Context()
+	tmpDir := t.TempDir()
 	sp, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	if err != nil {
-		_ = os.RemoveAll(tmpDir)
 		t.Fatalf("failed to create storage: %v", err)
 	}
 	defer func() {
 		_ = sp.Shutdown(context.Background())
-		_ = os.RemoveAll(tmpDir)
 	}()
 
 	secCtx := pkgctx.NewSystemSecurityContext()
@@ -159,18 +154,13 @@ func TestExtended_JobStateRegistry_MigrationAndDefer(t *testing.T) {
 
 func TestExtended_Hourglass_EscalationsAndSweeps(t *testing.T) {
 	ctx := context.Background()
-	tmpDir, err := os.MkdirTemp("", "test-hourglass-*")
-	if err != nil {
-		t.Fatalf("failed to create temp dir: %v", err)
-	}
+	tmpDir := t.TempDir()
 	sp, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	if err != nil {
-		_ = os.RemoveAll(tmpDir)
 		t.Fatalf("failed to create storage: %v", err)
 	}
 	defer func() {
 		_ = sp.Shutdown(context.Background())
-		_ = os.RemoveAll(tmpDir)
 	}()
 
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))

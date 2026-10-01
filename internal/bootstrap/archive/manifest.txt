@@ -108,6 +108,7 @@
 ./cli_specs/do_command.yaml
 ./cli_specs/docman/
 ./cli_specs/docman/verify_command.yaml
+./cli_specs/explain_command.yaml
 ./cli_specs/feed/
 ./cli_specs/feed/ack_command.yaml
 ./cli_specs/feed/bridge_ingest_command.yaml

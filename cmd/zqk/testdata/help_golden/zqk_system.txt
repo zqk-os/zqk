@@ -35,13 +35,13 @@ Available Commands:
   cli-hooks                      CLI hook profile (built-in hooks + optional tray entry)
   compact-journal                Compact change journal entries into dictionary-compressed artifacts
   compact-wal                    Compact the WAL file by removing applied entries
-  dashboard                      dashboard command
+  dashboard                      Display real-time system metrics, kernel vitality, and active jobs dashboard
   disk-usage                     Report directory sizes (cross-platform du-style scan)
   emergency-manager              Monitors the health of the CAP orchestrator and Kernel Steward. Executes safe rollbacks or stashes untracked files if the main managers fail continuously.
   ensure-retention-jobs          Ensure maintenance bundle scheduler jobs exist (retention, audit, cache_prewarm, autofix, etc.)
-  evolve                         evolve command
+  evolve                         Run autonomous schema, ontology, and codebase evolution cycles
   export-gate                    Audit candidate directory or open-core distribution against export gates
-  federate                       federate command
+  federate                       Federate and synchronize kernel graph across distributed cluster nodes
   fswatcher-daemon               Start the FSWatcher daemon
   git                            Git commit analysis and integration with work items
   health-data                    Output aggregated system-health data for dashboard

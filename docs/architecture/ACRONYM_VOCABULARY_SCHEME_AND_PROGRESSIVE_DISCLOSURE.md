@@ -77,6 +77,6 @@ Run 'zqk explain' without arguments to see all registered acronyms
 
 - **Requirement**: `REQ-ACRONYM-VOCABULARY-SCHEME`
 - **Criteria**:
-  - `CRIT-1790814939731525000-2151219e`: Functional Acceptance (verified by `pkg/acronyms/acronyms_test.go` and `cmd/zqk/explain/explain_test.go`).
-  - `CRIT-1790814939731526000-641cda96`: Boundary & Error Handling (fuzzy matching and unknown input rejection).
-  - `CRIT-1790814939731527000-d79aae82`: Documentation & Knowledge Base Entry (this specification).
+  - `CRIT-ACRONYM-VOCABULARY-ACCEPTANCE`: Functional Acceptance (verified by `pkg/acronyms/acronyms_test.go` and `cmd/zqk/explain/explain_test.go`).
+  - `CRIT-ACRONYM-VOCABULARY-BOUNDARY`: Boundary & Error Handling (fuzzy matching and unknown input rejection).
+  - `CRIT-ACRONYM-VOCABULARY-DOCS`: Documentation & Knowledge Base Entry (this specification).

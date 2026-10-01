@@ -197,9 +197,7 @@ func TestTestServices_CleanupWithErrors(t *testing.T) {
 
 func TestSetupTestServices_GraphEnabledWithExistingMemgraph(t *testing.T) {
 	// Create a temp project root with config/zqk.yaml setting storage.graph_enabled: true
-	tmpDir, err := os.MkdirTemp("", "testservices_graph_*")
-	require.NoError(t, err)
-	defer os.RemoveAll(tmpDir)
+	tmpDir := t.TempDir()
 
 	configDir := tmpDir + "/config"
 	require.NoError(t, os.MkdirAll(configDir, 0755))
@@ -221,6 +219,9 @@ func TestSetupTestServices_GraphEnabledWithExistingMemgraph(t *testing.T) {
 }
 
 func TestServiceManager_StartAndStopEphemeralContainer(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping docker container test in short mode")
+	}
 	sm := NewServiceManager()
 	if !sm.isDockerAvailable() {
 		t.Skip("Docker not available in this test environment")

@@ -220,6 +220,7 @@ func ClearCheckin(projectRoot, taskID string) error {
 	if q := globalQueue; q != nil {
 		q.mu.Lock()
 		delete(q.items, path)
+		delete(q.flushing, path)
 		q.mu.Unlock()
 	}
 
@@ -241,16 +242,24 @@ func LoadCheckin(projectRoot, taskID string) (*CheckinTimer, error) {
 	path := CheckinTimerPath(projectRoot, taskID)
 	// Check queue first for latest pending write
 	if q := globalQueue; q != nil {
-		q.mu.Lock()
-		req, ok := q.items[path]
-		q.mu.Unlock()
-		if ok {
-			// Return a copy so callers don't mutate the queued item
-			cp := *req.timer
+		if timer, ok := q.Get(path); ok {
+			return timer, nil
+		}
+	}
+	timer, err := LoadCheckinFile(path)
+	if err == nil && timer != nil {
+		return timer, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	if v, ok := walCache.Load(taskID); ok {
+		if t, ok := v.(*CheckinTimer); ok {
+			cp := *t
 			return &cp, nil
 		}
 	}
-	return LoadCheckinFile(path)
+	return nil, nil
 }
 
 // LoadCheckinFile reads a timer from an explicit path, for callers walking the directory.

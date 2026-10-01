@@ -14,6 +14,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 const (
@@ -46,7 +47,7 @@ func Install(src, projectRoot string) (Manifest, error) {
 		return Manifest{}, fmt.Errorf("pack record: %s is already recorded", manifest.Name)
 	}
 	if err := copyVerified(src, dest, manifest); err != nil {
-		_ = os.RemoveAll(dest)
+		_ = fileutil.RemoveAll(dest)
 		return Manifest{}, err
 	}
 	if err := register(dest); err != nil {
@@ -93,7 +94,7 @@ func Load(projectRoot string) error {
 }
 
 func verify(src string) (Manifest, error) {
-	data, err := os.ReadFile(filepath.Join(src, manifestName))
+	data, err := fileutil.ReadFile(filepath.Join(src, manifestName))
 	if err != nil {
 		return Manifest{}, fmt.Errorf("pack record: %w", err)
 	}
@@ -117,7 +118,7 @@ func verify(src string) (Manifest, error) {
 		}
 		seen[kind] = struct{}{}
 		specPath := filepath.Join(src, specSubdir, kind+".yaml")
-		specData, err := os.ReadFile(specPath)
+		specData, err := fileutil.ReadFile(specPath)
 		if err != nil {
 			return Manifest{}, fmt.Errorf("pack record: kind %s spec: %w", kind, err)
 		}
@@ -131,7 +132,7 @@ func verify(src string) (Manifest, error) {
 			return Manifest{}, fmt.Errorf("pack record: kind %s spec ontology is %q", kind, spec.Ontology)
 		}
 		lifePath := filepath.Join(src, lifecycleSubdir, kind+"_lifecycle.yaml")
-		lifeData, err := os.ReadFile(lifePath)
+		lifeData, err := fileutil.ReadFile(lifePath)
 		if err != nil {
 			return Manifest{}, fmt.Errorf("pack record: kind %s lifecycle: %w", kind, err)
 		}
@@ -154,7 +155,7 @@ func copyVerified(src, dest string, manifest Manifest) error {
 	if err != nil {
 		return err
 	}
-	if err := os.WriteFile(filepath.Join(dest, manifestName), encoded, filePerm); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(dest, manifestName), encoded, filePerm); err != nil {
 		return err
 	}
 	for _, kind := range manifest.Kinds {
@@ -171,7 +172,7 @@ func copyVerified(src, dest string, manifest Manifest) error {
 }
 
 func copyFile(src, dest string) error {
-	in, err := os.Open(src)
+	in, err := fileutil.Open(src)
 	if err != nil {
 		return err
 	}

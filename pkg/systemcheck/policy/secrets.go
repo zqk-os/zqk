@@ -79,6 +79,10 @@ func (g *SecretsGate) Run(ctx context.Context, opts RunOptions) (*Result, error)
 				fullPath = filepath.Join(root, f)
 			}
 
+			if isSecretScannerExemptTestFixture(fullPath) {
+				continue
+			}
+
 			v, err := scanFileForSecrets(fullPath, root)
 			if err != nil {
 				continue
@@ -110,9 +114,7 @@ func (g *SecretsGate) Run(ctx context.Context, opts RunOptions) (*Result, error)
 				return nil
 			}
 
-			// Skip self-tests and test fixture files for secret scanner
-			base := filepath.Base(path)
-			if (strings.Contains(base, "secret") || strings.Contains(base, "policy")) && (strings.HasSuffix(base, "_test.go") || strings.HasSuffix(base, ".sh")) {
+			if isSecretScannerExemptTestFixture(path) {
 				return nil
 			}
 
@@ -188,4 +190,18 @@ func scanFileForSecrets(filePath, root string) ([]string, error) {
 
 func redactSecret(secret string) string {
 	return secretpatterns.Redact(secret)
+}
+
+// isSecretScannerExemptTestFixture reports whether a file is a test or script fixture
+// that intentionally contains synthetic secret tokens (such as secret scanner unit tests,
+// security policy tests, or escalation test fixtures) and should be excluded from scanning.
+func isSecretScannerExemptTestFixture(path string) bool {
+	base := filepath.Base(path)
+	isTestOrScript := strings.HasSuffix(base, "_test.go") || strings.HasSuffix(base, ".sh")
+	if !isTestOrScript {
+		return false
+	}
+	return strings.Contains(base, "secret") ||
+		strings.Contains(base, "policy") ||
+		strings.Contains(base, "escalat")
 }

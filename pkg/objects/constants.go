@@ -268,6 +268,7 @@ const (
 	KindAgentFeed                  = kindnames.AgentFeed
 	KindAgentOnboardingPreparation = kindnames.AgentOnboardingPreparation
 	KindAuthStrategy               = kindnames.AuthStrategy
+	KindWatchdogRegistration       = kindnames.WatchdogRegistration
 	KindBaseSampler                = kindnames.BaseSampler
 	KindBucketingStrategy          = kindnames.BucketingStrategy
 	KindContextRefreshSchedule     = kindnames.ContextRefreshSchedule

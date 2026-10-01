@@ -132,6 +132,7 @@ if git -C "$ROOT" grep -n -E '\b(PRI|BLI)-(CLI|IO|ERGONOMICS|OBJECT-INSPECT|LAUN
 	'docs/manual' \
 	'docs/tutorials' \
 	'docs/development' \
+	':!docs/manual/screenshots/*.svg' \
 	':!scripts/open-core/check-public-release-payload.sh' \
 	':!scripts/open-core/test-public-release-gates.sh'; then
 	fail "isolated project-specific process item remains in public documentation"

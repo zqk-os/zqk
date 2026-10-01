@@ -210,7 +210,7 @@ func TestIntegrityCheck_ModificationPatterns(t *testing.T) {
 			name: "FieldAddition",
 			modifyFunc: func(content string) string {
 				// Add a new field
-				return content + "\ndescription: Added field\n"
+				return content + "\ncustom_field_addition: test_val\n"
 			},
 			description: "Adding a field should cause hash mismatch",
 		},
@@ -239,6 +239,9 @@ func TestIntegrityCheck_ModificationPatterns(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Failed to read original file: %v", err)
 			}
+			defer func() {
+				_ = fileutil.WriteFile(objectFile, originalContent, paths.FilePerm644)
+			}()
 
 			// Modify content
 			modifiedContent := tc.modifyFunc(string(originalContent))

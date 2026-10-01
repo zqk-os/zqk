@@ -18,7 +18,7 @@ import (
 func TestStrategicKindStatusVocabulary(t *testing.T) {
 	repoRoot := findRepoRoot(t)
 	lifecyclesDir := filepath.Join(repoRoot, paths.ProcessInternalLifecyclesDir)
-	packLifecyclesDir := filepath.Join(repoRoot, "packs", "work", "lifecycles")
+	packLifecyclesDir := filepath.Join(repoRoot, "packs")
 
 	strategicKinds := []string{
 		"goal_lifecycle.yaml",

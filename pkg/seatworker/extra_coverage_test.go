@@ -11,6 +11,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestInstall_EmptyRoot(t *testing.T) {
@@ -162,6 +163,9 @@ func TestExtraInstallWriteOnlyAndLoadDarwinCancel(t *testing.T) {
 	}); err == nil {
 		t.Fatal("expected worktree refuse")
 	}
+	t.Setenv("PATH", t.TempDir())
+	t.Setenv(zqkenv.Bin().Name(), "")
+	t.Setenv(zqkenv.StableBinaryPath().Name(), "")
 	if _, err := resolveWorkerBinary(root, ""); err == nil {
 		t.Fatal("missing product CLI")
 	}

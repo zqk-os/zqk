@@ -147,6 +147,7 @@ func TestObjectIDCache_RefreshAfterCLICreation(t *testing.T) {
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 		objects.FieldKeyStatus:        objects.ObjectStatusValidated,
 		objects.FieldKeyTitle:         "New Backlog Item Created After Cache",
+		objects.FieldKeyDescription:   "A non-empty description for BLI-9001",
 		objects.FieldKeyCriteriaRefs:  []string{"CRIT-9001", "CRIT-9002"},
 		objects.FieldKeyOriginSystem:  validation.DefaultOriginSystem,
 		objects.FieldKeyOriginProject: validation.DefaultOriginProject,

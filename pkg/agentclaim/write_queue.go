@@ -19,6 +19,7 @@ type checkinWriteRequest struct {
 type CheckinWriteQueue struct {
 	mu         sync.Mutex
 	items      map[string]checkinWriteRequest
+	flushing   map[string]checkinWriteRequest
 	shutdownCh chan chan struct{}
 	doneCh     chan struct{}
 }
@@ -32,12 +33,27 @@ func GetGlobalCheckinWriteQueue() *CheckinWriteQueue {
 	queueOnce.Do(func() {
 		globalQueue = &CheckinWriteQueue{
 			items:      make(map[string]checkinWriteRequest),
+			flushing:   make(map[string]checkinWriteRequest),
 			shutdownCh: make(chan chan struct{}),
 			doneCh:     make(chan struct{}),
 		}
 		goroutinelabels.NewGoroutine("checkin_write_queue", "batch agent checkin disk writes").StartSimple(globalQueue.worker)
 	})
 	return globalQueue
+}
+
+func (q *CheckinWriteQueue) Get(path string) (*CheckinTimer, bool) {
+	q.mu.Lock()
+	defer q.mu.Unlock()
+	if req, ok := q.items[path]; ok {
+		cp := *req.timer
+		return &cp, true
+	}
+	if req, ok := q.flushing[path]; ok {
+		cp := *req.timer
+		return &cp, true
+	}
+	return nil, false
 }
 
 func (q *CheckinWriteQueue) Enqueue(projectRoot string, timer *CheckinTimer) {
@@ -76,12 +92,29 @@ func (q *CheckinWriteQueue) worker() {
 
 func (q *CheckinWriteQueue) flush() {
 	q.mu.Lock()
-	items := q.items
+	if len(q.items) == 0 {
+		q.mu.Unlock()
+		return
+	}
+	if q.flushing == nil {
+		q.flushing = make(map[string]checkinWriteRequest)
+	}
+	for k, v := range q.items {
+		q.flushing[k] = v
+	}
 	q.items = make(map[string]checkinWriteRequest)
+	writes := make([]checkinWriteRequest, 0, len(q.flushing))
+	for _, req := range q.flushing {
+		writes = append(writes, req)
+	}
 	q.mu.Unlock()
 
-	for _, req := range items {
+	for _, req := range writes {
 		_ = q.writeDirect(req.projectRoot, req.timer)
+		path := CheckinTimerPath(req.projectRoot, req.timer.TaskID)
+		q.mu.Lock()
+		delete(q.flushing, path)
+		q.mu.Unlock()
 	}
 }
 

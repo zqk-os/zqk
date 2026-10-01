@@ -7,7 +7,6 @@ import (
 
 	"fmt"
 	"io"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -403,11 +402,8 @@ func setupCLITestEnvironmentForParity(t *testing.T) (tmpDir, cliBinary string) {
 	buildCmd := execwrap.Command("go", "build", "-o", cliBinary, "./cmd/zqk")
 	buildCmd.Dir = projectRoot
 	// buildCmd.Env = os.Environ() removed to preserve WireExecForIsolatedProject env
-	if err := buildCmd.Run(); err != nil {
-		if buildErr, ok := err.(*exec.ExitError); ok {
-			t.Fatalf("failed to build CLI (dir=%s): %v\n%s", projectRoot, err, string(buildErr.Stderr))
-		}
-		t.Fatalf("failed to build CLI (dir=%s): %v", projectRoot, err)
+	if out, err := buildCmd.CombinedOutput(); err != nil {
+		t.Fatalf("failed to build CLI (dir=%s): %v\n%s", projectRoot, err, string(out))
 	}
 
 	return tmpDir, cliBinary

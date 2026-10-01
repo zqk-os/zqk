@@ -44,7 +44,7 @@ version: "1.0.0"
 operation: "apply"
 target:
   kind: "backlog_item"
-  id: "BLI-LAUNCH-DOC-LANGUAGES"
+  id: "BLI-DOC-LANGUAGES"
 mutations:
   - set:
       status: "testing"

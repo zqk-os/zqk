@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/zqk-os/zqk/cmd/zqk/feed"
+	"github.com/zqk-os/zqk/cmd/zqk/learn"
 	"github.com/zqk-os/zqk/cmd/zqk/swarm"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
@@ -39,6 +40,7 @@ Enables task routing, context delegation to specialized sub-agents, and shared s
 	cmd.AddCommand(swarm.NewAgentSwarmInitCmd())
 	cmd.AddCommand(swarm.NewSwarmCmd())
 	cmd.AddCommand(feed.NewFeedCmd())
+	cmd.AddCommand(learn.NewLearnCmd())
 	cmd.AddCommand(NewAgentHookCmd())
 
 	return cmd

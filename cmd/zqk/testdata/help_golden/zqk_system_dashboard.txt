@@ -1,4 +1,5 @@
-dashboard command
+Renders an interactive terminal dashboard monitoring daemon vitality, storage
+metrics, and active swarm tasks.
 
 Usage:
   zqk system dashboard [flags]

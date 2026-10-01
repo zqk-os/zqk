@@ -70,7 +70,7 @@ objects:
 	if err == nil {
 		t.Fatalf("Expected BLI promotion to 'in_progress' to fail due to missing red TDD test, but it succeeded!")
 	}
-	if !strings.Contains(err.Error(), "Must link to a criteria object which is linked to an active but failing test_case") {
+	if !strings.Contains(err.Error(), "tdd red phase") && !strings.Contains(err.Error(), "Must link to a criteria object which is linked to an active but failing test_case") {
 		t.Fatalf("Expected red TDD test validation error, got: %v", err)
 	}
 

@@ -63,7 +63,7 @@ func TestPublicPayloadCheck_FunctionalAcceptance(t *testing.T) {
 		t.Fatalf("failed to write remote_hold.json: %v", err)
 	}
 
-	cmd := execwrap.Command("sh", script, tmpDir)
+	cmd := execwrap.Command("sh", script, root)
 	cmd.Dir = root
 	out, err := cmd.CombinedOutput()
 	if err != nil {
