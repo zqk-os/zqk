@@ -134,7 +134,6 @@ func TestFormatHandler_SanitizesNonFiniteFloats(t *testing.T) {
 	}
 }
 
-// TRACK: BLI-CEF-R28-USA-CLI-ERROR-001 / F-USA-QWEN-001
 func TestFormatOutput_JSONErrorUnifiedStructure(t *testing.T) {
 	t.Parallel()
 	h := GetFormatHandler(FormatJSON)
