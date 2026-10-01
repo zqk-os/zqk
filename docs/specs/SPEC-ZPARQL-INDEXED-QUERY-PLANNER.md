@@ -16,7 +16,7 @@ The **ZPARQL Query Planner and Traversal Engine** provides:
 
 ---
 
-## 2. Query Planner Execution Contract
+## 2. Query Planner Execution Contract (`CRIT-ZPARQL-PLANNER-CONTRACT-SPEC`)
 
 ### 2.1 Logical & Physical Plan Representation
 The planner translates high-level ZPARQL AST queries into a directed pipeline of physical operators:
@@ -33,7 +33,7 @@ The planner translates high-level ZPARQL AST queries into a directed pipeline of
 
 ---
 
-## 3. $O(K)$ Complexity Bound via Secondary Indexes
+## 3. $O(K)$ Complexity Bound via Secondary Indexes (`CRIT-ZPARQL-INDEX-SCAN-COMPLEXITY-PROOF`)
 
 In a graph $G = (V, E)$ with $|V| = N$ nodes and $|E| = M$ edges:
 - **Naive Traversal**: Traverses all $N$ nodes and inspects all edges, yielding $O(N + M)$ complexity.
@@ -43,7 +43,7 @@ In a graph $G = (V, E)$ with $|V| = N$ nodes and $|E| = M$ edges:
 
 ---
 
-## 4. Cycle Safety & Negative Recursion Limits
+## 4. Cycle Safety & Negative Recursion Limits (`CRIT-ZPARQL-CYCLIC-TRAVERSAL-RECURSION-NEGATIVE`)
 
 ### 4.1 Visited Set Tracking
 To guarantee termination on cyclic graphs ($A \to B \to C \to A$):

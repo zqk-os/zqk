@@ -56,14 +56,40 @@ func copyYAMLFilesFromProject(testRoot, projectRoot, relDir string) error {
 // CopyObjectSpecsFromProject copies YAML object specs from projectRoot into testRoot
 // (under .zqk/specs/objects).
 func CopyObjectSpecsFromProject(testRoot, projectRoot string) error {
-	return copyYAMLFilesFromProject(testRoot, projectRoot, paths.ProcessInternalObjectSpecsDir)
+	if err := copyYAMLFilesFromProject(testRoot, projectRoot, paths.ProcessInternalObjectSpecsDir); err != nil {
+		return err
+	}
+	packsDir := filepath.Join(projectRoot, "packs")
+	if entries, err := fileutil.ReadDir(packsDir); err == nil {
+		for _, entry := range entries {
+			if entry.IsDir() {
+				packSpecsDir := filepath.Join(packsDir, entry.Name(), "specs")
+				targetDir := filepath.Join(testRoot, paths.ProcessInternalObjectSpecsDir, entry.Name())
+				_ = copyYAMLFiles(packSpecsDir, targetDir)
+			}
+		}
+	}
+	return nil
 }
 
 // CopyLifecyclesFromProject copies YAML lifecycle files from projectRoot into testRoot.
 // FileObjectStorage binds a LifecycleLoader to <testRoot>/.zqk/specs/lifecycles;
 // empty TEST_ROOT dirs make Create fail with "failed to read lifecycle file".
 func CopyLifecyclesFromProject(testRoot, projectRoot string) error {
-	return copyYAMLFilesFromProject(testRoot, projectRoot, paths.ProcessInternalLifecyclesDir)
+	if err := copyYAMLFilesFromProject(testRoot, projectRoot, paths.ProcessInternalLifecyclesDir); err != nil {
+		return err
+	}
+	packsDir := filepath.Join(projectRoot, "packs")
+	if entries, err := fileutil.ReadDir(packsDir); err == nil {
+		for _, entry := range entries {
+			if entry.IsDir() {
+				packLifecyclesDir := filepath.Join(packsDir, entry.Name(), "lifecycles")
+				targetDir := filepath.Join(testRoot, paths.ProcessInternalLifecyclesDir, entry.Name())
+				_ = copyYAMLFiles(packLifecyclesDir, targetDir)
+			}
+		}
+	}
+	return nil
 }
 
 // CopyTraitsFromProject copies YAML trait files from projectRoot into testRoot

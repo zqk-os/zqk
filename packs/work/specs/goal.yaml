@@ -180,35 +180,6 @@ fields:
     type: list
     validation:
       required: false
-  requirement_refs:
-    access:
-      requires:
-        - access:confidential
-    checklist:
-      authority: owner/planner.
-      automation_hooks: connects strategic goals to requirement deliverables.
-      cardinality: many
-      criticality: composition
-      default: []
-      dependencies: requirement registry.
-      observability: "yes"
-      origin_lifecycle: mutable
-      purpose: Requirements fulfilling this strategic goal.
-      security: non-sensitive
-      system_usage:
-        - planning
-        - traceability
-        - alignment
-      validation: must reference existing requirement IDs.
-    field_profile_code: GOL-012
-    permissions: r-x
-    semantic_type: reference
-    traits:
-      - field_mutable_group
-      - field_reference_group
-    type: list
-    validation:
-      required: false
   success_criteria:
     access:
       requires:
