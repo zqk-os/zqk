@@ -76,6 +76,11 @@ This document illuminates all active configuration files across the ZQK Knowledg
   - `max_count`: Upper bound on objects retained per kind (oldest purged first).
   - `protect_statuses`: Statuses that must never be purged (e.g. `["pending", "active"]`).
 
+### `scanner_config.yaml`
+- **Location:** `.zqk/specs/configs/`
+- **Consuming Code:** `pkg/docman/discoverer.go`, `pkg/specbuilder/bldr_config_v1/`
+- **Why It Exists:** Centralized directory and file exclusion rules for repository scanners (such as documentation discoverers, YAML scanners, and AST analyzers). Prevents traversal of vendor/build trees (`.git`, `node_modules`, `__pycache__`, `.venv`, `.zqk`) without hardcoding exclusion patterns across Go packages.
+
 ---
 
 ## 3. Daemon, Scheduler & Watcher Configurations
