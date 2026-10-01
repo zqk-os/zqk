@@ -2,6 +2,7 @@ package dispatch
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -124,6 +125,11 @@ func runWithProgress(
 	heartbeatCancel()
 
 	if err != nil {
+		var exitCoder interface{ ExitCode() int }
+		if errors.As(err, &exitCoder) && exitCoder.ExitCode() == 3 {
+			_ = helper.EmitCompletion(ctxWithProgress, duration, "Complete with warnings", nil)
+			return err
+		}
 		_ = helper.EmitError(ctxWithProgress, err, errorMessage, nil)
 		return err
 	}
