@@ -2,6 +2,7 @@ package ambient
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -85,6 +86,11 @@ func runAmbientDaemon(cmd *cobra.Command, args []string) error {
 	// Enforce single instance of ambient daemon per project root
 	releaseLock, err := singleton.Guard(projectRoot, "ambient")
 	if err != nil {
+		var alreadyRunning *singleton.ErrDaemonAlreadyRunning
+		if errors.As(err, &alreadyRunning) {
+			_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("Ambient daemon is already running for %s (PID: %d). Existing instance retained.\n", projectRoot, alreadyRunning.PID)))
+			return nil
+		}
 		return err
 	}
 	defer releaseLock()

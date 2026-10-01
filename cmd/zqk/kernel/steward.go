@@ -2,6 +2,8 @@ package kernel
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -86,6 +88,11 @@ func newStewardDaemonCmd() *cobra.Command {
 
 		releaseLock, err := singleton.Guard(projectRoot, "steward")
 		if err != nil {
+			var alreadyRunning *singleton.ErrDaemonAlreadyRunning
+			if errors.As(err, &alreadyRunning) {
+				_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("Kernel steward daemon is already running for %s (PID: %d). Existing instance retained.\n", projectRoot, alreadyRunning.PID)))
+				return nil
+			}
 			return err
 		}
 		defer releaseLock()

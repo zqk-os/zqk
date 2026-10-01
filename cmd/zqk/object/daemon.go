@@ -2,6 +2,8 @@ package object
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -77,6 +79,11 @@ func NewDaemonCmd() *cobra.Command {
 				projectRoot := proc.ProjectRoot()
 				releaseLock, err := singleton.Guard(projectRoot, "privileged-writer")
 				if err != nil {
+					var alreadyRunning *singleton.ErrDaemonAlreadyRunning
+					if errors.As(err, &alreadyRunning) {
+						_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("Privileged-writer daemon is already running for %s (PID: %d). Existing instance retained.\n", projectRoot, alreadyRunning.PID)))
+						return nil
+					}
 					return err
 				}
 				defer releaseLock()
