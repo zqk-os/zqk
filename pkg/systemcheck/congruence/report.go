@@ -64,11 +64,7 @@ func writeReportCounts(f *fileutil.File, report *operational.CongruenceReport) {
 	fmt.Fprintf(f, "\n")
 
 	fmt.Fprintf(f, "--- Disk count by dir ---\n")
-	var dirs []string
-	for d := range report.DiskCountByDir {
-		dirs = append(dirs, d)
-	}
-	sort.Strings(dirs)
+	dirs := sortedDiskDirs(report)
 	for _, d := range dirs {
 		fmt.Fprintf(f, "  %s: %d\n", d, report.DiskCountByDir[d])
 	}
@@ -99,13 +95,18 @@ func writeReportCounts(f *fileutil.File, report *operational.CongruenceReport) {
 	}
 }
 
-func writeReportDisparities(f *fileutil.File, report *operational.CongruenceReport) {
-	fmt.Fprintf(f, "--- Disparity by dir (disk - object) ---\n")
+func sortedDiskDirs(report *operational.CongruenceReport) []string {
 	var dirs []string
 	for d := range report.DiskCountByDir {
 		dirs = append(dirs, d)
 	}
 	sort.Strings(dirs)
+	return dirs
+}
+
+func writeReportDisparities(f *fileutil.File, report *operational.CongruenceReport) {
+	fmt.Fprintf(f, "--- Disparity by dir (disk - object) ---\n")
+	dirs := sortedDiskDirs(report)
 	for _, d := range dirs {
 		disp := report.DisparityByDir[d]
 		fmt.Fprintf(f, "  %s: %d\n", d, disp)
