@@ -26,18 +26,16 @@ func StaleTestCatalystHint(testCaseID string) string {
 	return paths.CLIUsage("test", "run", testCaseID)
 }
 
-// DetectStaleInProgress identifies in-progress backlog items that have had no progress beyond staleThreshold.
-func DetectStaleInProgress(blis []map[string]any, testCases []map[string]any, now time.Time, staleThreshold time.Duration) []StaleInProgressItem {
+// DetectStaleInProgressTyped identifies in-progress backlog items that have had no progress beyond staleThreshold using typed summaries.
+func DetectStaleInProgressTyped(blis []BacklogItemSummary, testCases []TestCaseSummary, now time.Time, staleThreshold time.Duration) []StaleInProgressItem {
 	var results []StaleInProgressItem
 	for _, bli := range blis {
-		status, _ := bli[objects.FieldKeyStatus].(string)
-		if status != objects.ObjectStatusInProgress {
+		if bli.Status != objects.ObjectStatusInProgress {
 			continue
 		}
-		bliID, _ := bli[objects.FieldKeyID].(string)
-		updatedAtStr, _ := bli[objects.FieldKeyUpdatedAt].(string)
+		updatedAtStr := bli.UpdatedAt
 		if updatedAtStr == "" {
-			updatedAtStr, _ = bli[objects.FieldKeyCreatedAt].(string)
+			updatedAtStr = bli.CreatedAt
 		}
 		stale := false
 		var duration time.Duration
@@ -53,9 +51,9 @@ func DetectStaleInProgress(blis []map[string]any, testCases []map[string]any, no
 		}
 
 		if stale {
-			tcID := findMatchingTestCaseForBLI(bli, testCases)
+			tcID := findMatchingTestCaseForBLITyped(bli, testCases)
 			results = append(results, StaleInProgressItem{
-				BacklogItemID: bliID,
+				BacklogItemID: bli.ID,
 				TestCaseID:    tcID,
 				Reason:        "in_progress with no recent activity",
 				StaleDuration: duration,
@@ -65,22 +63,27 @@ func DetectStaleInProgress(blis []map[string]any, testCases []map[string]any, no
 	return results
 }
 
-// DetectStaleAgentTasks identifies in-progress agent_tasks that have had no progress beyond staleThreshold.
-func DetectStaleAgentTasks(tasks []map[string]any, now time.Time, staleThreshold time.Duration) []StaleInProgressItem {
+// DetectStaleInProgress identifies in-progress backlog items that have had no progress beyond staleThreshold.
+// It converts untyped maps into typed domain summaries at the boundary.
+func DetectStaleInProgress(blis []map[string]any, testCases []map[string]any, now time.Time, staleThreshold time.Duration) []StaleInProgressItem {
+	typedBLIs := BacklogItemSummariesFromMaps(blis)
+	typedTestCases := TestCaseSummariesFromMaps(testCases)
+	return DetectStaleInProgressTyped(typedBLIs, typedTestCases, now, staleThreshold)
+}
+
+// DetectStaleAgentTasksTyped identifies in-progress agent_tasks that have had no progress beyond staleThreshold using typed summaries.
+func DetectStaleAgentTasksTyped(tasks []AgentTaskSummary, now time.Time, staleThreshold time.Duration) []StaleInProgressItem {
 	var results []StaleInProgressItem
 	for _, task := range tasks {
-		status, _ := task[objects.FieldKeyStatus].(string)
-		if status != objects.ObjectStatusInProgress {
+		if task.Status != objects.ObjectStatusInProgress {
 			continue
 		}
-		taskID, _ := task[objects.FieldKeyID].(string)
-		bliID, _ := task[objects.FieldKeyBacklogItemRef].(string)
-		updatedAtStr, _ := task[objects.FieldKeyUpdatedAt].(string)
+		updatedAtStr := task.UpdatedAt
 		if updatedAtStr == "" {
-			updatedAtStr, _ = task[objects.FieldKeyClaimedAt].(string)
+			updatedAtStr = task.ClaimedAt
 		}
 		if updatedAtStr == "" {
-			updatedAtStr, _ = task[objects.FieldKeyCreatedAt].(string)
+			updatedAtStr = task.CreatedAt
 		}
 		stale := false
 		var duration time.Duration
@@ -97,8 +100,8 @@ func DetectStaleAgentTasks(tasks []map[string]any, now time.Time, staleThreshold
 
 		if stale {
 			results = append(results, StaleInProgressItem{
-				BacklogItemID: bliID,
-				TaskID:        taskID,
+				BacklogItemID: task.BacklogItemRef,
+				TaskID:        task.ID,
 				Reason:        "agent_task in_progress with no recent activity",
 				StaleDuration: duration,
 			})
@@ -107,37 +110,39 @@ func DetectStaleAgentTasks(tasks []map[string]any, now time.Time, staleThreshold
 	return results
 }
 
-func findMatchingTestCaseForBLI(bli map[string]any, testCases []map[string]any) string {
-	bliID, _ := bli[objects.FieldKeyID].(string)
-	var bliCrits []string
-	if raw, ok := bli[objects.FieldKeyCriteriaRefs]; ok {
-		bliCrits = stringSliceFromAny(raw)
-	}
+// DetectStaleAgentTasks identifies in-progress agent_tasks that have had no progress beyond staleThreshold.
+// It converts untyped maps into typed domain summaries at the boundary.
+func DetectStaleAgentTasks(tasks []map[string]any, now time.Time, staleThreshold time.Duration) []StaleInProgressItem {
+	typedTasks := AgentTaskSummariesFromMaps(tasks)
+	return DetectStaleAgentTasksTyped(typedTasks, now, staleThreshold)
+}
+
+func findMatchingTestCaseForBLITyped(bli BacklogItemSummary, testCases []TestCaseSummary) string {
+	bliID := bli.ID
+	bliCrits := bli.CriteriaRefs
 
 	for _, tc := range testCases {
-		tcID, _ := tc[objects.FieldKeyID].(string)
-		if tcID == "" {
+		if tc.ID == "" {
 			continue
 		}
-		if raw, ok := tc[objects.FieldKeyBacklogItemRefs]; ok {
-			for _, b := range stringSliceFromAny(raw) {
-				if b == bliID {
-					return tcID
-				}
+		for _, b := range tc.BacklogItemRefs {
+			if b == bliID {
+				return tc.ID
 			}
 		}
-		if raw, ok := tc[objects.FieldKeyCriteriaRefs]; ok {
-			tcCrits := stringSliceFromAny(raw)
-			for _, tcCrit := range tcCrits {
-				for _, bCrit := range bliCrits {
-					if tcCrit == bCrit {
-						return tcID
-					}
+		for _, tcCrit := range tc.CriteriaRefs {
+			for _, bCrit := range bliCrits {
+				if tcCrit == bCrit {
+					return tc.ID
 				}
 			}
 		}
 	}
 	return ""
+}
+
+func findMatchingTestCaseForBLI(bli map[string]any, testCases []map[string]any) string {
+	return findMatchingTestCaseForBLITyped(BacklogItemSummaryFromMap(bli), TestCaseSummariesFromMaps(testCases))
 }
 
 func stringSliceFromAny(val any) []string {

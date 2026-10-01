@@ -3,8 +3,6 @@ package interactionpolicy
 import (
 	"strings"
 	"unicode"
-
-	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // maxDriveRunes caps the compiled hunger signal so hooks stay short.
@@ -22,20 +20,29 @@ func SkipCASOverlay(event string) bool {
 	}
 }
 
-// OverlayFromPolicy replaces catalog GuidingStep with drive extracted from a
-// CAS policy body. Returns false when the body yields nothing useful — keep
-// the catalog reflex. TRACK
-func OverlayFromPolicy(step *Step, policy map[string]any) bool {
-	if step == nil || policy == nil {
+// OverlayFromPolicyTyped replaces catalog GuidingStep with drive extracted from a
+// typed PolicyDocument body. Returns false when the body yields nothing useful.
+func OverlayFromPolicyTyped(step *Step, policy PolicyDocument) bool {
+	if step == nil || strings.TrimSpace(policy.Body) == "" {
 		return false
 	}
-	body, _ := policy[objects.FieldKeyBody].(string)
-	drive := DriveFromPolicyBody(body)
+	drive := DriveFromPolicyBody(policy.Body)
 	if drive == "" {
 		return false
 	}
 	step.GuidingStep = drive
 	return true
+}
+
+// OverlayFromPolicy replaces catalog GuidingStep with drive extracted from a
+// CAS policy body. Returns false when the body yields nothing useful — keep
+// the catalog reflex.
+func OverlayFromPolicy(step *Step, policy map[string]any) bool {
+	if step == nil || policy == nil {
+		return false
+	}
+	doc := PolicyDocumentFromMap(policy)
+	return OverlayFromPolicyTyped(step, doc)
 }
 
 // DriveFromPolicyBody compiles policy markdown into one guiding paragraph.
