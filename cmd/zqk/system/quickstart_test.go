@@ -27,6 +27,10 @@ func TestQuickstartCommand(t *testing.T) {
 	if !bytes.Contains(buf.Bytes(), []byte("--with-onboarding-roadmap")) {
 		t.Errorf("expected json output to include --with-onboarding-roadmap in system init step, got: %s", buf.String())
 	}
+
+	if !bytes.Contains(buf.Bytes(), []byte("grep")) {
+		t.Errorf("expected json output to include grep code search step, got: %s", buf.String())
+	}
 }
 
 // BLI-1788987316012200000-5097aded: Deprecate 'quick' CLI command family in favor of 'new' / 'quickstart'

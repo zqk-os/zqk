@@ -23,7 +23,7 @@ func renderQuickstartGuide(projectRoot string) string {
 
 Project Status: Initialized (%s)
 
-Get started in 2 commands:
+Get started in 3 commands:
 
 1. Launch Visual Web Studio:
    $ %s ui -w
@@ -34,9 +34,13 @@ Get started in 2 commands:
    ➜ Discovers active priorities, claims the next backlog item, and executes.
    ➜ Or prompt your AI agent: "Run '%s do' to claim and implement work."
 
+3. In-Process Code Search & Token Conservation:
+   $ %s grep <query> (alias: %s zgrep)
+   ➜ Sub-15ms AST and trigram search with strict token budgeting for AI agents.
+
 (Optional: run '%s system agent-onboard' if adding a new AI editor or agent host)
 Docs & Guides: docs/INDEX.md
-`, projectRoot, exe, exe, exe, exe)
+`, projectRoot, exe, exe, exe, exe, exe, exe)
 	}
 
 	initFlag := ""
@@ -47,7 +51,7 @@ Docs & Guides: docs/INDEX.md
 
 No initialized ZQK project detected in this directory.
 
-Get started in 3 commands:
+Get started in 4 commands:
 
 1. Initialize your project & AI agent directives:
    $ %s system init%s
@@ -61,8 +65,12 @@ Get started in 3 commands:
    $ %s do
    ➜ Autonomously claims and begins the next task (or prompt your AI agent).
 
+4. In-Process Code Search & Token Conservation:
+   $ %s grep <query> (alias: %s zgrep)
+   ➜ Sub-15ms AST and trigram search with strict token budgeting.
+
 Docs & Guides: docs/INDEX.md
-`, exe, initFlag, exe, exe)
+`, exe, initFlag, exe, exe, exe, exe)
 }
 
 // NewQuickstartCmd returns the 'zqk quickstart' command which provides a zero-friction
@@ -97,12 +105,14 @@ func runQuickstart(cmd *cobra.Command, args []string) error {
 			initStep,
 			fmt.Sprintf("2. Web Studio: %s ui -w", exe),
 			fmt.Sprintf("3. Execute Work: %s do", exe),
+			fmt.Sprintf("4. In-Process Code Search: %s grep <query> (alias: %s zgrep)", exe, exe),
 		}
 		var activeSteps []string
 		if isInit {
 			activeSteps = []string{
 				fmt.Sprintf("1. Web Studio: %s ui -w", exe),
 				fmt.Sprintf("2. Execute Work: %s do", exe),
+				fmt.Sprintf("3. In-Process Code Search: %s grep <query> (alias: %s zgrep)", exe, exe),
 			}
 		}
 		payload := map[string]any{

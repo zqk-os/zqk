@@ -1206,6 +1206,14 @@ Autonomously discover, claim, and begin executing tasks:
 Or prompt your AI assistant:
 > *"You are paired with the ZQK Knowledge Kernel. Run '%s do' to claim and implement work."*
 
+### 3. In-Process Code Search & Token Conservation (`+"`"+`%s grep`+"`"+`)
+Search codebases with trigram indexing, Go AST structural queries, and token budgeting for LLMs:
+`+"```bash"+`
+%s grep "MaterializedView"
+%s grep --ast --kind struct
+%s grep "error" --max-tokens 2000 -f json
+`+"```"+`
+
 ---
 
 ## AI Agent Seating & MCP Setup (Optional / Advanced)
@@ -1232,7 +1240,7 @@ Your editor was automatically detected and configured during initialization. If 
     `+"```"+`
 
 *Need full CLI help? Run `+"`"+`%s --help`+"`"+` or consult docs/INDEX.md.*
-`, prod, prod, prod, prod, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe)
+`, prod, prod, prod, prod, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe)
 
 	return fileutil.WriteSecureFile(path, []byte(template))
 }
