@@ -3,13 +3,17 @@ package agent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"slices"
 	"strings"
+	"syscall"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/daemon/singleton"
 	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -80,9 +84,14 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 	// }
 	// ---> END CIRCUIT BREAKER <---
 
+	// Wrap OperationContext with OS signal cancellation (SIGINT/SIGTERM)
+	// so terminal closes or cancellations immediately kill child worker process groups.
+	sigCtx, sigCancel := signal.NotifyContext(proc.OperationContext(), os.Interrupt, syscall.SIGTERM)
+	defer sigCancel()
+
 	// Use a bounded orchestration context
 	effectiveTimeout := resolveOrchestrationTimeout(opts.Timeout, cmd)
-	ctx, ctxCancel := context.WithTimeout(proc.OperationContext(), effectiveTimeout)
+	ctx, ctxCancel := context.WithTimeout(sigCtx, effectiveTimeout)
 	defer ctxCancel()
 
 	b := pipeline.NewInstrumentedBuilder("cap_orchestrator", nil)
@@ -125,6 +134,22 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 		} else {
 			state.planID = planID
 		}
+		return state, nil
+	})
+
+	b.AddStage("acquire_orchestrator_guard", func(pctx *pipeline.Context, payload any) (any, error) {
+		state := payload.(*orchestratorState)
+		guardName := "orchestrator-" + strings.ToLower(state.planID)
+		release, err := singleton.Guard(state.proc.ProjectRoot(), guardName)
+		if err != nil {
+			var alreadyRunning *singleton.ErrDaemonAlreadyRunning
+			if errors.As(err, &alreadyRunning) {
+				_ = cli.WriteOutput(state.cmd, []byte(fmt.Sprintf("ℹ️  Orchestrator for %s is already running (PID: %d). Existing instance retained.\n", state.planID, alreadyRunning.PID)))
+				return nil, err
+			}
+			return nil, err
+		}
+		state.releaseGuard = release
 		return state, nil
 	})
 
@@ -1049,9 +1074,21 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 		opts:    opts,
 		planArg: planArg,
 	}
+	defer func() {
+		if initialState.releaseGuard != nil {
+			initialState.releaseGuard()
+		}
+	}()
 
 	_, err = pl.Run(pctx, initialState)
-	return err
+	if err != nil {
+		var alreadyRunning *singleton.ErrDaemonAlreadyRunning
+		if errors.As(err, &alreadyRunning) {
+			return nil
+		}
+		return err
+	}
+	return nil
 }
 
 func localSkillIDByTitle(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, title string) string {

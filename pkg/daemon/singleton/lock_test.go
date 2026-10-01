@@ -2,6 +2,7 @@ package singleton
 
 import (
 	"errors"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -162,5 +163,42 @@ func TestGuard_AcquiresAndReleases(t *testing.T) {
 	running, _, checkErr = IsDaemonRunning(tmpDir, "overseer")
 	if checkErr != nil || running {
 		t.Errorf("expected overseer daemon lock to be released after release(), running=%v, err=%v", running, checkErr)
+	}
+}
+
+func TestActiveDaemonPIDs(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	pids, err := ActiveDaemonPIDs(tmpDir)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(pids) != 0 {
+		t.Fatalf("expected 0 active pids, got %d", len(pids))
+	}
+
+	release1, err := Guard(tmpDir, "overseer")
+	if err != nil {
+		t.Fatalf("Guard failed: %v", err)
+	}
+	defer release1()
+
+	release2, err := Guard(tmpDir, "steward")
+	if err != nil {
+		t.Fatalf("Guard failed: %v", err)
+	}
+	defer release2()
+
+	pids, err = ActiveDaemonPIDs(tmpDir)
+	if err != nil {
+		t.Fatalf("ActiveDaemonPIDs failed: %v", err)
+	}
+	if len(pids) != 2 {
+		t.Fatalf("expected 2 active daemons, got %d", len(pids))
+	}
+
+	self := os.Getpid()
+	if pids["overseer"] != self || pids["steward"] != self {
+		t.Fatalf("expected overseer and steward PID %d, got %v", self, pids)
 	}
 }

@@ -332,3 +332,85 @@ func TestReapStaleLocks_DaemonLockNeverReaped(t *testing.T) {
 		t.Fatalf("daemon lock must not be reaped: %v", err)
 	}
 }
+
+func TestReapOrphanedProcesses(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	origList := listProcessesHook
+	origCmd := getCommandLineHook
+	origKill := killProcessHook
+	origAlive := isProcessAliveHook
+	defer func() {
+		listProcessesHook = origList
+		getCommandLineHook = origCmd
+		killProcessHook = origKill
+		isProcessAliveHook = origAlive
+	}()
+
+	killedSignals := make(map[int][]syscall.Signal)
+	aliveMap := map[int]bool{9999: true, 9998: true}
+
+	listProcessesHook = func() ([]procEntry, error) {
+		return []procEntry{
+			{pid: 1, ppid: 0, exe: "init"},
+			{pid: os.Getpid(), ppid: 1, exe: "zqk"}, // self PID must be skipped
+			{pid: 9999, ppid: 1, exe: "zqk"},        // orphan belonging to project
+			{pid: 9998, ppid: 1, exe: "zqk"},        // orphan belonging to other project
+			{pid: 9997, ppid: 1234, exe: "zqk"},     // not orphan (ppid != 1)
+			{pid: 9996, ppid: 1, exe: "bash"},       // not zqk executable
+		}, nil
+	}
+
+	getCommandLineHook = func(pid int) (string, error) {
+		if pid == 9999 {
+			return "zqk orchestrate " + tmpDir, nil
+		}
+		if pid == 9998 {
+			return "zqk orchestrate /other/project", nil
+		}
+		return "", nil
+	}
+
+	killProcessHook = func(pid int, sig syscall.Signal) error {
+		killedSignals[pid] = append(killedSignals[pid], sig)
+		if sig == syscall.SIGKILL {
+			aliveMap[pid] = false
+		}
+		return nil
+	}
+
+	isProcessAliveHook = func(pid int) bool {
+		return aliveMap[pid]
+	}
+
+	// 1. Dry run
+	countDry, pathsDry, err := ReapOrphanedProcesses(tmpDir, true)
+	if err != nil {
+		t.Fatalf("dry run failed: %v", err)
+	}
+	if countDry != 1 {
+		t.Fatalf("expected 1 orphan reported in dry run, got %d", countDry)
+	}
+	if len(killedSignals) != 0 {
+		t.Fatalf("expected no kills during dry run, got %v", killedSignals)
+	}
+	if !strings.Contains(pathsDry[0], "9999") {
+		t.Fatalf("expected PID 9999 in dry run paths: %v", pathsDry)
+	}
+
+	// 2. Live run
+	countLive, pathsLive, err := ReapOrphanedProcesses(tmpDir, false)
+	if err != nil {
+		t.Fatalf("live run failed: %v", err)
+	}
+	if countLive != 1 {
+		t.Fatalf("expected 1 orphan reaped in live run, got %d", countLive)
+	}
+	if len(killedSignals[9999]) < 1 {
+		t.Fatalf("expected signals sent to 9999, got %v", killedSignals[9999])
+	}
+	if !strings.Contains(pathsLive[0], "terminated") {
+		t.Fatalf("expected terminated message in live paths: %v", pathsLive)
+	}
+}
+

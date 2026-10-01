@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
@@ -63,6 +64,14 @@ func NewMCPExecutorAt(ctx context.Context, mcpPath, workDir string) (*MCPExecuto
 		return nil, fmt.Errorf("invalid mcp path")
 	}
 	cmd := execwrap.CommandContext(ctx, parts[0], parts[1:]...)
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+	cmd.Cancel = func() error {
+		if cmd.Process == nil {
+			return os.ErrProcessDone
+		}
+		return syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+	}
+	cmd.WaitDelay = 3 * time.Second
 
 	workDir = strings.TrimSpace(workDir)
 	projectRoot := getProjectRoot()

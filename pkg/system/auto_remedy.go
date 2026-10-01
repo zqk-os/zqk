@@ -18,10 +18,11 @@ import (
 type RemedyActionType string
 
 const (
-	ActionRemoveFile RemedyActionType = "remove_file"
-	ActionRunCommand RemedyActionType = "run_command"
-	ActionTouchFile  RemedyActionType = "touch_file"
-	ActionSeed       RemedyActionType = "seed"
+	ActionRemoveFile  RemedyActionType = "remove_file"
+	ActionRunCommand  RemedyActionType = "run_command"
+	ActionTouchFile   RemedyActionType = "touch_file"
+	ActionSeed        RemedyActionType = "seed"
+	ActionKillProcess RemedyActionType = "kill_process"
 )
 
 // RemedyPlan defines a concrete, executable recovery step for a system check or precondition anomaly.
@@ -104,6 +105,18 @@ func (e *DiagnosticsRemedyEngine) Diagnose(ctx context.Context, checkResults []s
 				Description: fmt.Sprintf("Remove abandoned temp file: %s", tmpPath),
 				ActionType:  ActionRemoveFile,
 				Target:      fullPath,
+				Confidence:  1.0,
+				AutoApply:   true,
+			})
+		}
+
+		for _, orphanProc := range ioTel.OrphanedProcesses {
+			plans = append(plans, RemedyPlan{
+				ID:          fmt.Sprintf("REMEDY-ORPHAN-PROC-%s", strings.ReplaceAll(orphanProc, " ", "-")),
+				Title:       fmt.Sprintf("Terminate Orphaned Process (%s)", orphanProc),
+				Description: fmt.Sprintf("Terminate orphaned process detached under PID 1: %s", orphanProc),
+				ActionType:  ActionKillProcess,
+				Target:      orphanProc,
 				Confidence:  1.0,
 				AutoApply:   true,
 			})
@@ -255,6 +268,16 @@ func (e *DiagnosticsRemedyEngine) Apply(ctx context.Context, plans []RemedyPlan)
 			} else {
 				outcome.Applied = false
 				outcome.Detail = "no seeder registered"
+			}
+
+		case ActionKillProcess:
+			cnt, reaped, err := resourcehygiene.ReapOrphanedProcesses(e.ProjectRoot, false)
+			if err != nil {
+				outcome.Error = err.Error()
+			} else {
+				outcome.Applied = true
+				outcome.Detail = fmt.Sprintf("terminated %d orphaned processes: %s", cnt, strings.Join(reaped, ", "))
+				report.TotalApplied++
 			}
 
 		case ActionRunCommand:

@@ -1,15 +1,60 @@
 package resourcehygiene
 
 import (
+	"context"
+	"fmt"
 	"io/fs"
+	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
 
+	"github.com/mitchellh/go-ps"
+	"github.com/zqk-os/zqk/pkg/daemon/singleton"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/process"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/utils/syscallutil"
+)
+
+type procEntry struct {
+	pid  int
+	ppid int
+	exe  string
+}
+
+var (
+	listProcessesHook = func() ([]procEntry, error) {
+		procs, err := ps.Processes()
+		if err != nil {
+			return nil, err
+		}
+		res := make([]procEntry, len(procs))
+		for i, p := range procs {
+			res[i] = procEntry{pid: p.Pid(), ppid: p.PPid(), exe: p.Executable()}
+		}
+		return res, nil
+	}
+	getCommandLineHook = func(pid int) (string, error) {
+		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		defer cancel()
+		out, err := execwrap.CommandContext(ctx, "ps", "-o", "command=", "-p", strconv.Itoa(pid)).Output()
+		if err != nil {
+			return "", err
+		}
+		return string(out), nil
+	}
+	killProcessHook = func(pid int, sig syscall.Signal) error {
+		_ = syscall.Kill(-pid, sig)
+		return syscall.Kill(pid, sig)
+	}
+	isProcessAliveHook = func(pid int) bool {
+		return syscall.Kill(pid, 0) == nil
+	}
 )
 
 // ReapOrphanedTempFiles traverses .zqk looking for temp files older than threshold,
@@ -283,5 +328,103 @@ func ExecuteHygiene(projectRoot string, opts HygieneOptions) (*HygieneExecutionR
 		}
 	}
 
+	if opts.ReapProcesses {
+		cnt, paths, err := ReapOrphanedProcesses(projectRoot, opts.DryRun)
+		report.ProcessesReaped += cnt
+		report.ReapedPaths = append(report.ReapedPaths, paths...)
+		if err != nil {
+			report.Errors = append(report.Errors, err.Error())
+		}
+	}
+
 	return report, nil
 }
+
+// ReapOrphanedProcesses detects and terminates orphaned zqk processes whose parent has died (PPID == 1)
+// that belong to projectRoot. Active daemons holding singleton locks, the Overseer, and the current
+// process/ancestors are explicitly protected.
+func ReapOrphanedProcesses(projectRoot string, dryRun bool) (int, []string, error) {
+	if strings.TrimSpace(projectRoot) == "" {
+		return 0, nil, nil
+	}
+	cleanRoot := filepath.Clean(projectRoot)
+
+	// Fetch all actively held daemon locks under projectRoot so legitimate daemons are never touched
+	activeDaemons, err := singleton.ActiveDaemonPIDs(cleanRoot)
+	if err != nil {
+		activeDaemons = make(map[string]int)
+	}
+	activePIDs := make(map[int]string, len(activeDaemons))
+	for name, pid := range activeDaemons {
+		activePIDs[pid] = name
+	}
+
+	procs, err := listProcessesHook()
+	if err != nil {
+		return 0, nil, errfmt.Newf("list system processes").Wrap(err)
+	}
+
+	selfPID := os.Getpid()
+	var count int
+	var reaped []string
+
+	for _, p := range procs {
+		pid := p.pid
+		if pid <= 1 || pid == selfPID {
+			continue
+		}
+
+		// Only processes whose parent has terminated and been reparented to 1 are orphans
+		if p.ppid != 1 {
+			continue
+		}
+
+		// Never touch current process ancestors
+		if process.IsAncestorPID(pid, selfPID) {
+			continue
+		}
+
+		// Never touch actively held daemons (overseer, steward, scheduler, etc.)
+		if _, isActiveDaemon := activePIDs[pid]; isActiveDaemon {
+			continue
+		}
+
+		// Executable name check: must be a zqk executable
+		base := filepath.Base(p.exe)
+		if base != "zqk" && base != "zqk-stable" && base != "zqk-mcp-daemon" && !strings.Contains(base, "zqk") {
+			continue
+		}
+
+		// Verify that this process belongs to this project root via its command line
+		cmdLine, errCmd := getCommandLineHook(pid)
+		if errCmd != nil || strings.TrimSpace(cmdLine) == "" {
+			continue
+		}
+		if !strings.Contains(cmdLine, cleanRoot) {
+			continue
+		}
+
+		// Confirmed: orphaned zqk process parented by 1 belonging to this project root!
+		label := fmt.Sprintf("PID %d: %s", pid, base)
+		if dryRun {
+			reaped = append(reaped, label)
+			count++
+			continue
+		}
+
+		// Live termination: attempt graceful SIGTERM first
+		_ = killProcessHook(pid, syscall.SIGTERM)
+		time.Sleep(150 * time.Millisecond)
+
+		// If still alive, escalate to SIGKILL
+		if isProcessAliveHook(pid) {
+			_ = killProcessHook(pid, syscall.SIGKILL)
+		}
+
+		reaped = append(reaped, label+" (terminated)")
+		count++
+	}
+
+	return count, reaped, nil
+}
+
