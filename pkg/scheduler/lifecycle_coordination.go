@@ -259,11 +259,18 @@ func (s *Scheduler) healthMonitor(ctx context.Context) {
 
 			// Check for missed triggers and recover
 			missedCount, recoveredCount := s.checkAndRecoverMissedJobs(ctx)
+
+			// Periodic stale lock sweep (clean unheld lock files older than 5 minutes)
+			if s.projectRoot != emptyValue {
+				_, _ = s.CleanStaleLocks(5 * time.Minute)
+			}
+
 			healthDuration := time.Since(healthStart)
 			s.recordHealthMetric(ctx, healthStart, 0, missedCount, recoveredCount, 0, healthDuration, goroutineCount, runtimeThreadCount, heapAllocBytes, sysMemoryBytes)
 		}
 	}
 }
+
 
 // checkAndRecoverMissedJobs checks for missed job triggers and recovers them
 // Returns: (missedCount, recoveredCount)

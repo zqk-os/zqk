@@ -7,9 +7,12 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"path/filepath"
 	"runtime"
+	"strings"
 	"sync"
 	"time"
+
 
 	"github.com/robfig/cron/v3"
 	"github.com/zqk-os/zqk/pkg/ambience"
@@ -24,7 +27,9 @@ import (
 	"github.com/zqk-os/zqk/pkg/metrics"
 	"github.com/zqk-os/zqk/pkg/nildecode"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/pipeline"
+
 	"github.com/zqk-os/zqk/pkg/scheduler/transceiver"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
@@ -683,11 +688,12 @@ func (s *Scheduler) Start(ctx context.Context) error {
 	priorityPool.Start(ctx)
 
 	// Clean up stale scheduler lock files on startup (older than 5 minutes)
-	if s.projectRoot != emptyValue && s.stateRegistry != nil {
-		if cleaned, err := s.stateRegistry.CleanStaleLocks(5 * time.Minute); err == nil && cleaned > 0 {
+	if s.projectRoot != emptyValue {
+		if cleaned, err := s.CleanStaleLocks(5 * time.Minute); err == nil && cleaned > 0 {
 			slog.Info("Cleaned up stale scheduler lock files on startup", "cleaned_count", cleaned)
 		}
 	}
+
 
 	// Contract-change shockwave: demote shovel_ready|execution_locked that fail new invariants.
 	// TRACK: follow-up in kernel backlog
@@ -954,3 +960,26 @@ func (s *Scheduler) Start(ctx context.Context) error {
 	s.Stop()
 	return nil
 }
+
+// CleanStaleLocks removes orphaned, unheld lock files in both the job locks directory (.zqk/scheduler/locks)
+// and the state locks directory (.zqk/scheduler/state/locks).
+func (s *Scheduler) CleanStaleLocks(threshold time.Duration) (int, error) {
+	if strings.TrimSpace(s.projectRoot) == emptyValue {
+		return 0, nil
+	}
+	if threshold <= 0 {
+		threshold = 5 * time.Minute
+	}
+	totalCleaned := 0
+	schedLocksDir := filepath.Join(s.projectRoot, paths.ProjectDataDir, paths.SchedulerDir, paths.SchedulerLocksDir)
+	if cleaned, err := CleanStaleLocksByAge(schedLocksDir, threshold); err == nil {
+		totalCleaned += cleaned
+	}
+	if s.stateRegistry != nil {
+		if cleaned, err := s.stateRegistry.CleanStaleLocks(threshold); err == nil {
+			totalCleaned += cleaned
+		}
+	}
+	return totalCleaned, nil
+}
+

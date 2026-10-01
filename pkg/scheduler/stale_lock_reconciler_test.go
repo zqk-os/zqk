@@ -271,3 +271,26 @@ func TestCleanStaleLocksByAge_PreservesActivelyHeldLocks(t *testing.T) {
 		t.Fatalf("actively held lock file was unlinked: %v", err)
 	}
 }
+
+func TestScheduler_CleanStaleLocks(t *testing.T) {
+	root := t.TempDir()
+	schedLocksDir := filepath.Join(root, paths.ProjectDataDir, paths.SchedulerDir, paths.SchedulerLocksDir)
+	if err := fileutil.MkdirAll(schedLocksDir, paths.DirPerm755); err != nil {
+		t.Fatalf(msgMkdir, err)
+	}
+
+	p := writeLockFile(t, schedLocksDir, "SCH-stale-job", 5*testStaleLockAge)
+
+	s := &Scheduler{projectRoot: root}
+	n, err := s.CleanStaleLocks(testStaleThreshold)
+	if err != nil {
+		t.Fatalf("CleanStaleLocks failed: %v", err)
+	}
+	if n != 1 {
+		t.Fatalf("expected 1 stale lock removed, got %d", n)
+	}
+	if _, err := fileutil.Stat(p); !fileutil.IsNotExist(err) {
+		t.Fatalf("expected lock file to be removed, got err: %v", err)
+	}
+}
+

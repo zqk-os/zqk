@@ -255,7 +255,9 @@ type SchedulerInterface interface {
 	EvaluateActiveConvergenceSessions(ctx context.Context)
 	EvaluateStaleConvergenceSessions(ctx context.Context)
 	GetRunningJobIDs() []string
+	CleanStaleLocks(threshold time.Duration) (int, error)
 }
+
 
 // PolicyEngineInterface defines the policy engine operations.
 type PolicyEngineInterface interface {
