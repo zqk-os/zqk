@@ -32,11 +32,21 @@ zqk ui -w
 zqk do
 ```
 
+**Air-Gapped / Sovereign Offline Execution (Ollama):**
+Run completely offline with zero WAN connectivity on Apple Silicon (M1–M4) or local GPU:
+```bash
+# Ensure local Ollama is running (127.0.0.1:11434) with e.g. qwen2.5-coder:32b
+zqk system init --with-onboarding-roadmap
+zqk system agent-onboard      # Detects Ollama, primes offline directives & seats personas
+zqk do                        # Executes autonomous loop locally with deterministic AST gating
+```
+See [Sovereign Air-Gapped AI Engineering Specification](../architecture/SOVEREIGN_AIRGAPPED_AI_ENGINEERING.md).
+
 ## Fail-closed sequence
 
 ```bash
 zqk init                                          # Greenfield setup (skip if .zqk/ exists)
-zqk system agent-onboard                          # Detect IDE, prime rules, & seat agent
+zqk system agent-onboard                          # Detect IDE/Ollama, prime rules, & seat agent
 zqk quickstart                                    # Walkthrough
 zqk workflow whats-next                           # Discover active plan and shovel-ready tasks
 zqk do                                            # Autonomously claim and execute work
@@ -46,7 +56,7 @@ zqk state stream --dashboard                      # Real-time ANSI visual seismo
 
 | Stage | What it does | If it fails |
 |-------|----------------|-------------|
-| **detect** | Find Cursor / Claude Code / Cline / Windsurf / Gemini markers | Continue without an IDE agent |
+| **detect** | Find Cursor / Claude Code / Cline / Windsurf / Gemini / Ollama markers | Continue without an IDE/local agent |
 | **auth** | Local system account. Leftover `~/.zqk/credentials` must not block an empty directory | `./bin/zqk system init` first, or run `./bin/zqk auth login` to create or reuse a session |
 | **seat** | Idempotent `PER-DEFAULT-*` seating (same as init) | `./bin/zqk system seed-default-agent-seating` |
 | **prime_workspace** | Write regenerable vendor directives into **missing** files only (`--force` to overwrite) | Fix permissions; re-run |

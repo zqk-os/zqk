@@ -379,7 +379,11 @@ func (p *RPCConnectionPool) Execute(ctx context.Context, fn func(conn provider.G
 	if err != nil {
 		return err
 	}
-	defer func() { _ = p.ReturnConnection(conn) }()
+	defer func() {
+		if retErr := p.ReturnConnection(conn); retErr != nil {
+			return
+		}
+	}()
 	return fn(conn)
 }
 
@@ -388,7 +392,9 @@ type StatsReply struct{ Stats provider.PoolStats }
 
 func (p *RPCConnectionPool) Stats() provider.PoolStats {
 	var reply StatsReply
-	_ = p.client.Call("GraphRPC.Stats", StatsArgs{}, &reply)
+	if err := p.client.Call("GraphRPC.Stats", StatsArgs{}, &reply); err != nil {
+		return provider.PoolStats{}
+	}
 	return reply.Stats
 }
 
@@ -676,12 +682,7 @@ func (s *GraphRPC) GetConnection(args *GetConnectionArgs, reply *GetConnectionRe
 		reply.ErrStr = err.Error()
 		return nil
 	}
-	s.mu.Lock()
-	s.nextID++
-	id := s.nextID
-	s.conns[id] = conn
-	s.mu.Unlock()
-	reply.ConnID = id
+	reply.ConnID = s.storeConn(conn)
 	return nil
 }
 
@@ -701,6 +702,36 @@ func (s *GraphRPC) ReturnConnection(args *ReturnConnectionArgs, reply *ReturnCon
 func (s *GraphRPC) Stats(args *StatsArgs, reply *StatsReply) error {
 	reply.Stats = s.pool.Stats()
 	return nil
+}
+
+func (s *GraphRPC) registerSlot(registerFn func(id int64)) int64 {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.nextID++
+	registerFn(s.nextID)
+	return s.nextID
+}
+
+func (s *GraphRPC) storeConn(conn provider.GraphConnection) int64 {
+	return s.registerSlot(func(id int64) { s.conns[id] = conn })
+}
+
+func (s *GraphRPC) storeTx(tx provider.GraphTransaction) int64 {
+	return s.registerSlot(func(id int64) { s.txs[id] = tx })
+}
+
+func (s *GraphRPC) recordTx(replyVal *int64, tx provider.GraphTransaction, err error) error {
+	if err != nil {
+		return err
+	}
+	*replyVal = s.storeTx(tx)
+	return nil
+}
+
+func (s *GraphRPC) deleteTx(targetID int64) {
+	s.mu.Lock()
+	delete(s.txs, targetID)
+	s.mu.Unlock()
 }
 
 func (s *GraphRPC) getConn(targetID int64) (provider.GraphConnection, string) {
@@ -723,518 +754,276 @@ func (s *GraphRPC) getTx(targetID int64) (provider.GraphTransaction, string) {
 	return target, ""
 }
 
-func (s *GraphRPC) ConnCreateNode(args *ConnCreateNodeArgs, reply *ConnCreateNodeReply) error {
-	target, errStr := s.getConn(args.TargetID)
+func (s *GraphRPC) execConn(targetID int64, replyErr *string, fn func(conn provider.GraphConnection) error) error {
+	conn, errStr := s.getConn(targetID)
 	if errStr != "" {
-		reply.ErrStr = errStr
+		*replyErr = errStr
 		return nil
 	}
-	err := target.CreateNode(context.Background(), args.Node)
-	if err != nil {
-		reply.ErrStr = err.Error()
+	if err := fn(conn); err != nil {
+		*replyErr = err.Error()
 	}
 	return nil
+}
+
+func (s *GraphRPC) execTx(targetID int64, replyErr *string, fn func(tx provider.GraphTransaction) error) error {
+	tx, errStr := s.getTx(targetID)
+	if errStr != "" {
+		*replyErr = errStr
+		return nil
+	}
+	if err := fn(tx); err != nil {
+		*replyErr = err.Error()
+	}
+	return nil
+}
+
+func (s *GraphRPC) closeTx(targetID int64, replyErr *string, fn func(tx provider.GraphTransaction) error) error {
+	return s.execTx(targetID, replyErr, func(tx provider.GraphTransaction) error {
+		if err := fn(tx); err != nil {
+			return err
+		}
+		s.deleteTx(targetID)
+		return nil
+	})
+}
+
+func (s *GraphRPC) ConnCreateNode(args *ConnCreateNodeArgs, reply *ConnCreateNodeReply) error {
+	return s.execConn(args.TargetID, &reply.ErrStr, func(c provider.GraphConnection) error {
+		return c.CreateNode(context.Background(), args.Node)
+	})
 }
 
 func (s *GraphRPC) ConnGetNode(args *ConnGetNodeArgs, reply *ConnGetNodeReply) error {
-	target, errStr := s.getConn(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
-		return nil
-	}
-	val, err := target.GetNode(context.Background(), args.Id, args.Labels)
-	if err != nil {
-		reply.ErrStr = err.Error()
-		return nil
-	}
-	reply.Val = val
-	return nil
+	return s.execConn(args.TargetID, &reply.ErrStr, func(c provider.GraphConnection) (err error) {
+		reply.Val, err = c.GetNode(context.Background(), args.Id, args.Labels)
+		return err
+	})
 }
 
 func (s *GraphRPC) ConnUpdateNode(args *ConnUpdateNodeArgs, reply *ConnUpdateNodeReply) error {
-	target, errStr := s.getConn(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
-		return nil
-	}
-	err := target.UpdateNode(context.Background(), args.Id, args.Updates)
-	if err != nil {
-		reply.ErrStr = err.Error()
-	}
-	return nil
+	return s.execConn(args.TargetID, &reply.ErrStr, func(c provider.GraphConnection) error {
+		return c.UpdateNode(context.Background(), args.Id, args.Updates)
+	})
 }
 
 func (s *GraphRPC) ConnDeleteNode(args *ConnDeleteNodeArgs, reply *ConnDeleteNodeReply) error {
-	target, errStr := s.getConn(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
-		return nil
-	}
-	err := target.DeleteNode(context.Background(), args.Id, args.Labels)
-	if err != nil {
-		reply.ErrStr = err.Error()
-	}
-	return nil
+	return s.execConn(args.TargetID, &reply.ErrStr, func(c provider.GraphConnection) error {
+		return c.DeleteNode(context.Background(), args.Id, args.Labels)
+	})
 }
 
 func (s *GraphRPC) ConnListNodes(args *ConnListNodesArgs, reply *ConnListNodesReply) error {
-	target, errStr := s.getConn(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
-		return nil
-	}
-	val, err := target.ListNodes(context.Background(), args.Filter)
-	if err != nil {
-		reply.ErrStr = err.Error()
-		return nil
-	}
-	reply.Val = val
-	return nil
+	return s.execConn(args.TargetID, &reply.ErrStr, func(c provider.GraphConnection) (err error) {
+		reply.Val, err = c.ListNodes(context.Background(), args.Filter)
+		return err
+	})
 }
 
 func (s *GraphRPC) ConnCreateEdge(args *ConnCreateEdgeArgs, reply *ConnCreateEdgeReply) error {
-	target, errStr := s.getConn(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
-		return nil
-	}
-	err := target.CreateEdge(context.Background(), args.Edge)
-	if err != nil {
-		reply.ErrStr = err.Error()
-	}
-	return nil
+	return s.execConn(args.TargetID, &reply.ErrStr, func(c provider.GraphConnection) error {
+		return c.CreateEdge(context.Background(), args.Edge)
+	})
 }
 
 func (s *GraphRPC) ConnGetEdge(args *ConnGetEdgeArgs, reply *ConnGetEdgeReply) error {
-	target, errStr := s.getConn(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
-		return nil
-	}
-	val, err := target.GetEdge(context.Background(), args.Fromid, args.Toid, args.Edgetype)
-	if err != nil {
-		reply.ErrStr = err.Error()
-		return nil
-	}
-	reply.Val = val
-	return nil
+	return s.execConn(args.TargetID, &reply.ErrStr, func(c provider.GraphConnection) (err error) {
+		reply.Val, err = c.GetEdge(context.Background(), args.Fromid, args.Toid, args.Edgetype)
+		return err
+	})
 }
 
 func (s *GraphRPC) ConnUpdateEdge(args *ConnUpdateEdgeArgs, reply *ConnUpdateEdgeReply) error {
-	target, errStr := s.getConn(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
-		return nil
-	}
-	err := target.UpdateEdge(context.Background(), args.Fromid, args.Toid, args.Edgetype, args.Updates)
-	if err != nil {
-		reply.ErrStr = err.Error()
-	}
-	return nil
+	return s.execConn(args.TargetID, &reply.ErrStr, func(c provider.GraphConnection) error {
+		return c.UpdateEdge(context.Background(), args.Fromid, args.Toid, args.Edgetype, args.Updates)
+	})
 }
 
 func (s *GraphRPC) ConnDeleteEdge(args *ConnDeleteEdgeArgs, reply *ConnDeleteEdgeReply) error {
-	target, errStr := s.getConn(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
-		return nil
-	}
-	err := target.DeleteEdge(context.Background(), args.Fromid, args.Toid, args.Edgetype)
-	if err != nil {
-		reply.ErrStr = err.Error()
-	}
-	return nil
+	return s.execConn(args.TargetID, &reply.ErrStr, func(c provider.GraphConnection) error {
+		return c.DeleteEdge(context.Background(), args.Fromid, args.Toid, args.Edgetype)
+	})
 }
 
 func (s *GraphRPC) ConnListEdges(args *ConnListEdgesArgs, reply *ConnListEdgesReply) error {
-	target, errStr := s.getConn(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
-		return nil
-	}
-	val, err := target.ListEdges(context.Background(), args.Filter)
-	if err != nil {
-		reply.ErrStr = err.Error()
-		return nil
-	}
-	reply.Val = val
-	return nil
+	return s.execConn(args.TargetID, &reply.ErrStr, func(c provider.GraphConnection) (err error) {
+		reply.Val, err = c.ListEdges(context.Background(), args.Filter)
+		return err
+	})
 }
 
 func (s *GraphRPC) ConnExecuteQuery(args *ConnExecuteQueryArgs, reply *ConnExecuteQueryReply) error {
-	target, errStr := s.getConn(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
-		return nil
-	}
-	val, err := target.ExecuteQuery(context.Background(), args.Query)
-	if err != nil {
-		reply.ErrStr = err.Error()
-		return nil
-	}
-	reply.Val = val
-	return nil
+	return s.execConn(args.TargetID, &reply.ErrStr, func(c provider.GraphConnection) (err error) {
+		reply.Val, err = c.ExecuteQuery(context.Background(), args.Query)
+		return err
+	})
 }
 
 func (s *GraphRPC) ConnExecuteVectorQuery(args *ConnExecuteVectorQueryArgs, reply *ConnExecuteVectorQueryReply) error {
-	target, errStr := s.getConn(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
-		return nil
-	}
-	val, err := target.ExecuteVectorQuery(context.Background(), args.Query)
-	if err != nil {
-		reply.ErrStr = err.Error()
-		return nil
-	}
-	reply.Val = val
-	return nil
+	return s.execConn(args.TargetID, &reply.ErrStr, func(c provider.GraphConnection) (err error) {
+		reply.Val, err = c.ExecuteVectorQuery(context.Background(), args.Query)
+		return err
+	})
 }
 
 func (s *GraphRPC) ConnExecuteTraversal(args *ConnExecuteTraversalArgs, reply *ConnExecuteTraversalReply) error {
-	target, errStr := s.getConn(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
-		return nil
-	}
-	val, err := target.ExecuteTraversal(context.Background(), args.Traversal)
-	if err != nil {
-		reply.ErrStr = err.Error()
-		return nil
-	}
-	reply.Val = val
-	return nil
+	return s.execConn(args.TargetID, &reply.ErrStr, func(c provider.GraphConnection) (err error) {
+		reply.Val, err = c.ExecuteTraversal(context.Background(), args.Traversal)
+		return err
+	})
 }
 
 func (s *GraphRPC) ConnBeginTransaction(args *ConnBeginTransactionArgs, reply *ConnBeginTransactionReply) error {
-	target, errStr := s.getConn(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
-		return nil
-	}
-	val, err := target.BeginTransaction(context.Background())
-	if err != nil {
-		reply.ErrStr = err.Error()
-		return nil
-	}
-	s.mu.Lock()
-	s.nextID++
-	id := s.nextID
-	s.txs[id] = val
-	s.mu.Unlock()
-	reply.Val = id
-	return nil
+	return s.execConn(args.TargetID, &reply.ErrStr, func(c provider.GraphConnection) error {
+		tx, err := c.BeginTransaction(context.Background())
+		return s.recordTx(&reply.Val, tx, err)
+	})
 }
 
 func (s *GraphRPC) ConnBeginNestedTransaction(args *ConnBeginNestedTransactionArgs, reply *ConnBeginNestedTransactionReply) error {
-	target, errStr := s.getConn(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
-		return nil
-	}
-	s.mu.Lock()
-	argTx := s.txs[args.Parent]
-	s.mu.Unlock()
-	val, err := target.BeginNestedTransaction(context.Background(), argTx)
-	if err != nil {
-		reply.ErrStr = err.Error()
-		return nil
-	}
-	s.mu.Lock()
-	s.nextID++
-	id := s.nextID
-	s.txs[id] = val
-	s.mu.Unlock()
-	reply.Val = id
-	return nil
+	return s.execConn(args.TargetID, &reply.ErrStr, func(c provider.GraphConnection) error {
+		s.mu.Lock()
+		argTx := s.txs[args.Parent]
+		s.mu.Unlock()
+		tx, err := c.BeginNestedTransaction(context.Background(), argTx)
+		return s.recordTx(&reply.Val, tx, err)
+	})
 }
 
 func (s *GraphRPC) ConnHasOpenTransaction(args *ConnHasOpenTransactionArgs, reply *ConnHasOpenTransactionReply) error {
-	target, errStr := s.getConn(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
+	return s.execConn(args.TargetID, &reply.ErrStr, func(c provider.GraphConnection) error {
+		reply.Val = c.HasOpenTransaction()
 		return nil
-	}
-	reply.Val = target.HasOpenTransaction()
-	return nil
+	})
 }
 
 func (s *GraphRPC) ConnGetOpenTransaction(args *ConnGetOpenTransactionArgs, reply *ConnGetOpenTransactionReply) error {
-	target, errStr := s.getConn(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
+	return s.execConn(args.TargetID, &reply.ErrStr, func(c provider.GraphConnection) error {
+		reply.Val = s.storeTx(c.GetOpenTransaction())
 		return nil
-	}
-	val := target.GetOpenTransaction()
-	s.mu.Lock()
-	s.nextID++
-	id := s.nextID
-	s.txs[id] = val
-	s.mu.Unlock()
-	reply.Val = id
-	return nil
+	})
 }
 
 func (s *GraphRPC) ConnHealthCheck(args *ConnHealthCheckArgs, reply *ConnHealthCheckReply) error {
-	target, errStr := s.getConn(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
-		return nil
-	}
-	err := target.HealthCheck(context.Background())
-	if err != nil {
-		reply.ErrStr = err.Error()
-	}
-	return nil
+	return s.execConn(args.TargetID, &reply.ErrStr, func(c provider.GraphConnection) error {
+		return c.HealthCheck(context.Background())
+	})
 }
 
 func (s *GraphRPC) ConnClose(args *ConnCloseArgs, reply *ConnCloseReply) error {
-	target, errStr := s.getConn(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
-		return nil
-	}
-	err := target.Close()
-	if err != nil {
-		reply.ErrStr = err.Error()
-	}
-	return nil
+	return s.execConn(args.TargetID, &reply.ErrStr, func(c provider.GraphConnection) error {
+		return c.Close()
+	})
 }
 
 func (s *GraphRPC) ConnExecuteBatch(args *ConnExecuteBatchArgs, reply *ConnExecuteBatchReply) error {
-	target, errStr := s.getConn(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
-		return nil
-	}
-	val, err := target.ExecuteBatch(context.Background(), args.Operations)
-	if err != nil {
-		reply.ErrStr = err.Error()
-		return nil
-	}
-	reply.Val = val
-	return nil
+	return s.execConn(args.TargetID, &reply.ErrStr, func(c provider.GraphConnection) (err error) {
+		reply.Val, err = c.ExecuteBatch(context.Background(), args.Operations)
+		return err
+	})
 }
 
 func (s *GraphRPC) TxCreateNode(args *TxCreateNodeArgs, reply *TxCreateNodeReply) error {
-	target, errStr := s.getTx(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
-		return nil
-	}
-	err := target.CreateNode(context.Background(), args.Node)
-	if err != nil {
-		reply.ErrStr = err.Error()
-	}
-	return nil
+	return s.execTx(args.TargetID, &reply.ErrStr, func(t provider.GraphTransaction) error {
+		return t.CreateNode(context.Background(), args.Node)
+	})
 }
 
 func (s *GraphRPC) TxGetNode(args *TxGetNodeArgs, reply *TxGetNodeReply) error {
-	target, errStr := s.getTx(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
-		return nil
-	}
-	val, err := target.GetNode(context.Background(), args.Id, args.Labels)
-	if err != nil {
-		reply.ErrStr = err.Error()
-		return nil
-	}
-	reply.Val = val
-	return nil
+	return s.execTx(args.TargetID, &reply.ErrStr, func(t provider.GraphTransaction) (err error) {
+		reply.Val, err = t.GetNode(context.Background(), args.Id, args.Labels)
+		return err
+	})
 }
 
 func (s *GraphRPC) TxUpdateNode(args *TxUpdateNodeArgs, reply *TxUpdateNodeReply) error {
-	target, errStr := s.getTx(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
-		return nil
-	}
-	err := target.UpdateNode(context.Background(), args.Id, args.Updates)
-	if err != nil {
-		reply.ErrStr = err.Error()
-	}
-	return nil
+	return s.execTx(args.TargetID, &reply.ErrStr, func(t provider.GraphTransaction) error {
+		return t.UpdateNode(context.Background(), args.Id, args.Updates)
+	})
 }
 
 func (s *GraphRPC) TxDeleteNode(args *TxDeleteNodeArgs, reply *TxDeleteNodeReply) error {
-	target, errStr := s.getTx(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
-		return nil
-	}
-	err := target.DeleteNode(context.Background(), args.Id, args.Labels)
-	if err != nil {
-		reply.ErrStr = err.Error()
-	}
-	return nil
+	return s.execTx(args.TargetID, &reply.ErrStr, func(t provider.GraphTransaction) error {
+		return t.DeleteNode(context.Background(), args.Id, args.Labels)
+	})
 }
 
 func (s *GraphRPC) TxCreateEdge(args *TxCreateEdgeArgs, reply *TxCreateEdgeReply) error {
-	target, errStr := s.getTx(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
-		return nil
-	}
-	err := target.CreateEdge(context.Background(), args.Edge)
-	if err != nil {
-		reply.ErrStr = err.Error()
-	}
-	return nil
+	return s.execTx(args.TargetID, &reply.ErrStr, func(t provider.GraphTransaction) error {
+		return t.CreateEdge(context.Background(), args.Edge)
+	})
 }
 
 func (s *GraphRPC) TxGetEdge(args *TxGetEdgeArgs, reply *TxGetEdgeReply) error {
-	target, errStr := s.getTx(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
-		return nil
-	}
-	val, err := target.GetEdge(context.Background(), args.Fromid, args.Toid, args.Edgetype)
-	if err != nil {
-		reply.ErrStr = err.Error()
-		return nil
-	}
-	reply.Val = val
-	return nil
+	return s.execTx(args.TargetID, &reply.ErrStr, func(t provider.GraphTransaction) (err error) {
+		reply.Val, err = t.GetEdge(context.Background(), args.Fromid, args.Toid, args.Edgetype)
+		return err
+	})
 }
 
 func (s *GraphRPC) TxUpdateEdge(args *TxUpdateEdgeArgs, reply *TxUpdateEdgeReply) error {
-	target, errStr := s.getTx(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
-		return nil
-	}
-	err := target.UpdateEdge(context.Background(), args.Fromid, args.Toid, args.Edgetype, args.Updates)
-	if err != nil {
-		reply.ErrStr = err.Error()
-	}
-	return nil
+	return s.execTx(args.TargetID, &reply.ErrStr, func(t provider.GraphTransaction) error {
+		return t.UpdateEdge(context.Background(), args.Fromid, args.Toid, args.Edgetype, args.Updates)
+	})
 }
 
 func (s *GraphRPC) TxDeleteEdge(args *TxDeleteEdgeArgs, reply *TxDeleteEdgeReply) error {
-	target, errStr := s.getTx(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
-		return nil
-	}
-	err := target.DeleteEdge(context.Background(), args.Fromid, args.Toid, args.Edgetype)
-	if err != nil {
-		reply.ErrStr = err.Error()
-	}
-	return nil
+	return s.execTx(args.TargetID, &reply.ErrStr, func(t provider.GraphTransaction) error {
+		return t.DeleteEdge(context.Background(), args.Fromid, args.Toid, args.Edgetype)
+	})
 }
 
 func (s *GraphRPC) TxExecuteQuery(args *TxExecuteQueryArgs, reply *TxExecuteQueryReply) error {
-	target, errStr := s.getTx(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
-		return nil
-	}
-	val, err := target.ExecuteQuery(context.Background(), args.Query)
-	if err != nil {
-		reply.ErrStr = err.Error()
-		return nil
-	}
-	reply.Val = val
-	return nil
+	return s.execTx(args.TargetID, &reply.ErrStr, func(t provider.GraphTransaction) (err error) {
+		reply.Val, err = t.ExecuteQuery(context.Background(), args.Query)
+		return err
+	})
 }
 
 func (s *GraphRPC) TxBeginNestedTransaction(args *TxBeginNestedTransactionArgs, reply *TxBeginNestedTransactionReply) error {
-	target, errStr := s.getTx(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
-		return nil
-	}
-	val, err := target.BeginNestedTransaction(context.Background())
-	if err != nil {
-		reply.ErrStr = err.Error()
-		return nil
-	}
-	s.mu.Lock()
-	s.nextID++
-	id := s.nextID
-	s.txs[id] = val
-	s.mu.Unlock()
-	reply.Val = id
-	return nil
+	return s.execTx(args.TargetID, &reply.ErrStr, func(t provider.GraphTransaction) error {
+		tx, err := t.BeginNestedTransaction(context.Background())
+		return s.recordTx(&reply.Val, tx, err)
+	})
 }
 
 func (s *GraphRPC) TxSupportsNestedTransactions(args *TxSupportsNestedTransactionsArgs, reply *TxSupportsNestedTransactionsReply) error {
-	target, errStr := s.getTx(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
+	return s.execTx(args.TargetID, &reply.ErrStr, func(t provider.GraphTransaction) error {
+		reply.Val = t.SupportsNestedTransactions()
 		return nil
-	}
-	reply.Val = target.SupportsNestedTransactions()
-	return nil
+	})
 }
 
 func (s *GraphRPC) TxCommit(args *TxCommitArgs, reply *TxCommitReply) error {
-	target, errStr := s.getTx(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
-		return nil
-	}
-	err := target.Commit(context.Background())
-	if err != nil {
-		reply.ErrStr = err.Error()
-	} else {
-		s.mu.Lock()
-		delete(s.txs, args.TargetID)
-		s.mu.Unlock()
-	}
-	return nil
+	return s.closeTx(args.TargetID, &reply.ErrStr, func(t provider.GraphTransaction) error {
+		return t.Commit(context.Background())
+	})
 }
 
 func (s *GraphRPC) TxRollback(args *TxRollbackArgs, reply *TxRollbackReply) error {
-	target, errStr := s.getTx(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
-		return nil
-	}
-	err := target.Rollback(context.Background())
-	if err != nil {
-		reply.ErrStr = err.Error()
-	} else {
-		s.mu.Lock()
-		delete(s.txs, args.TargetID)
-		s.mu.Unlock()
-	}
-	return nil
+	return s.closeTx(args.TargetID, &reply.ErrStr, func(t provider.GraphTransaction) error {
+		return t.Rollback(context.Background())
+	})
 }
 
 func (s *GraphRPC) TxIsCommitted(args *TxIsCommittedArgs, reply *TxIsCommittedReply) error {
-	target, errStr := s.getTx(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
+	return s.execTx(args.TargetID, &reply.ErrStr, func(t provider.GraphTransaction) error {
+		reply.Val = t.IsCommitted()
 		return nil
-	}
-	reply.Val = target.IsCommitted()
-	return nil
+	})
 }
 
 func (s *GraphRPC) TxIsRolledBack(args *TxIsRolledBackArgs, reply *TxIsRolledBackReply) error {
-	target, errStr := s.getTx(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
+	return s.execTx(args.TargetID, &reply.ErrStr, func(t provider.GraphTransaction) error {
+		reply.Val = t.IsRolledBack()
 		return nil
-	}
-	reply.Val = target.IsRolledBack()
-	return nil
+	})
 }
 
 func (s *GraphRPC) TxGetParent(args *TxGetParentArgs, reply *TxGetParentReply) error {
-	target, errStr := s.getTx(args.TargetID)
-	if errStr != "" {
-		reply.ErrStr = errStr
+	return s.execTx(args.TargetID, &reply.ErrStr, func(t provider.GraphTransaction) error {
+		reply.Val = s.storeTx(t.GetParent())
 		return nil
-	}
-	val := target.GetParent()
-	s.mu.Lock()
-	s.nextID++
-	id := s.nextID
-	s.txs[id] = val
-	s.mu.Unlock()
-	reply.Val = id
-	return nil
+	})
 }
+

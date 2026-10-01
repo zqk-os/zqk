@@ -53,6 +53,13 @@ func vendorAddendum(v Vendor) string {
 		return `## Vendor: OpenClaw
 - Prefer kernel seating + feed notify for multi-agent wake over vendor-only chat paste.
 `
+	case VendorOllama:
+		return fmt.Sprintf(`## Vendor: Ollama (Air-Gapped Local LLM)
+- Operates 100%% offline and sovereign without external network access.
+- Local model coordination via Ollama API at 127.0.0.1:11434 (Qwen 2.5 Coder, Llama 3, DeepSeek Coder).
+- Execute workflows directly via %s workflow whats-next and %s agent orchestrate.
+- All session directives, tests, and criteria remain strictly grounded in the Knowledge Kernel.
+`, exe, exe)
 	case VendorAgentsMD:
 		return `## Universal AGENTS.md
 - This file is the headless-safe directive surface (Vector B). IDE rule forests are optional packs.
