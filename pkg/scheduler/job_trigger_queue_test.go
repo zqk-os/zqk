@@ -706,3 +706,41 @@ func TestJobTriggerQueue_DrainAndProcessTriggerBatch_DebouncesCachedJobs(t *test
 		t.Errorf("expected CAS reconcile to be debounced, but lastCASReconcileAt changed from %v to %v", initialReconcileAt, currentReconcileAt)
 	}
 }
+
+func TestJobTriggerQueue_GetTriggerQueueMutex(t *testing.T) {
+	t.Parallel()
+
+	pathA := "/tmp/test-lock-path-a.lock"
+	pathB := "/tmp/test-lock-path-b.lock"
+
+	muA1 := getTriggerQueueMutex(pathA)
+	muA2 := getTriggerQueueMutex(pathA)
+	muB := getTriggerQueueMutex(pathB)
+
+	if muA1 == nil || muA2 == nil || muB == nil {
+		t.Fatal("expected non-nil mutexes from getTriggerQueueMutex")
+	}
+
+	if muA1 != muA2 {
+		t.Errorf("expected identical mutex instances for same path, got %p != %p", muA1, muA2)
+	}
+
+	if muA1 == muB {
+		t.Errorf("expected distinct mutex instances for different paths, got identical %p", muA1)
+	}
+
+	// Concurrent retrieval safety
+	var wg sync.WaitGroup
+	for i := 0; i < 50; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			m := getTriggerQueueMutex(pathA)
+			if m != muA1 {
+				t.Errorf("concurrent getTriggerQueueMutex returned inconsistent mutex pointer")
+			}
+		}()
+	}
+	wg.Wait()
+}
+
