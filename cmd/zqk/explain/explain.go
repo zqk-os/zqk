@@ -3,44 +3,22 @@ package explain
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/acronyms"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 )
 
 // NewExplainCmd creates the `zqk explain` (and `zqk glossary`) command.
 func NewExplainCmd() *cobra.Command {
-	var formatFlag string
-	var syncFlag bool
-
-	cmd := &cobra.Command{
-		Use:     "explain [ACRONYM]",
-		Aliases: []string{"glossary", "acronym", "acronyms"},
-		Short:   "Explain kernel acronyms, ontology terms, and architectural concepts",
-		Long: `Provides progressive disclosure and single-source-of-truth explanations
-for all core ZQK Knowledge Kernel acronyms (BLI, PRI, REQ, CRIT, VDS, TCFG, CVS,
-ATK, PPLAN, ZPARQL, ZQL, CAS, WAL, CAP, CEF, TDE).
-
-If an acronym is provided, displays its detailed definition, context, and related references.
-If called without arguments, lists all documented acronyms.`,
-		Example: `  # Explain a specific acronym
-  zqk explain BLI
-  zqk explain vds
-
-  # List all documented acronyms
-  zqk explain
-  zqk glossary
-
-  # Sync all acronym definitions to the Knowledge Kernel scheme (VOC-KERNEL-ACRONYMS)
-  zqk explain --sync
-
-  # Output in JSON format
-  zqk explain PRI --format json
-  zqk explain --format json`,
+	return clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewExplainCommandBuilder(), &cobra.Command{
 		RunE: func(cmd *cobra.Command, args []string) error {
+			syncFlag, _ := cmd.Flags().GetBool("sync")
+			formatFlag, _ := cmd.Flags().GetString("format")
+
 			if syncFlag {
 				runner := cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 					store := proc.GetStorageProvider()
@@ -51,8 +29,7 @@ If called without arguments, lists all documented acronyms.`,
 					if err != nil {
 						return fmt.Errorf("failed to synchronize acronyms to kernel: %w", err)
 					}
-					fmt.Printf("✓ Successfully synchronized %d acronym terms into scheme %s\n", synced, acronyms.KernelAcronymsSchemeID)
-					return nil
+					return cli.WriteOutput(cmd, []byte(fmt.Sprintf("✓ Successfully synchronized %d acronym terms into scheme %s\n", synced, acronyms.KernelAcronymsSchemeID)))
 				})
 				return runner(cmd, args)
 			}
@@ -60,12 +37,13 @@ If called without arguments, lists all documented acronyms.`,
 			if len(args) == 0 {
 				all := acronyms.ListAll()
 				if formatFlag == "json" {
-					enc := json.NewEncoder(os.Stdout)
-					enc.SetIndent("", "  ")
-					return enc.Encode(all)
+					data, err := json.MarshalIndent(all, "", "  ")
+					if err != nil {
+						return err
+					}
+					return cli.WriteOutput(cmd, append(data, '\n'))
 				}
-				fmt.Print(acronyms.FormatTable(all))
-				return nil
+				return cli.WriteOutput(cmd, []byte(acronyms.FormatTable(all)))
 			}
 
 			query := args[0]
@@ -80,25 +58,24 @@ If called without arguments, lists all documented acronyms.`,
 			}
 
 			if formatFlag == "json" {
-				enc := json.NewEncoder(os.Stdout)
-				enc.SetIndent("", "  ")
-				return enc.Encode(item)
+				data, err := json.MarshalIndent(item, "", "  ")
+				if err != nil {
+					return err
+				}
+				return cli.WriteOutput(cmd, append(data, '\n'))
 			}
 
-			fmt.Printf("ACRONYM    : %s\n", item.Code)
-			fmt.Printf("FULL NAME  : %s\n", item.FullName)
-			fmt.Printf("CATEGORY   : %s\n", item.Category)
-			fmt.Printf("DEFINITION : %s\n", item.Definition)
-			fmt.Printf("CONTEXT    : %s\n", item.Context)
+			var sb strings.Builder
+			sb.WriteString(fmt.Sprintf("ACRONYM    : %s\n", item.Code))
+			sb.WriteString(fmt.Sprintf("FULL NAME  : %s\n", item.FullName))
+			sb.WriteString(fmt.Sprintf("CATEGORY   : %s\n", item.Category))
+			sb.WriteString(fmt.Sprintf("DEFINITION : %s\n", item.Definition))
+			sb.WriteString(fmt.Sprintf("CONTEXT    : %s\n", item.Context))
 			if len(item.RelatedRefs) > 0 {
-				fmt.Printf("RELATED    : %s\n", strings.Join(item.RelatedRefs, ", "))
+				sb.WriteString(fmt.Sprintf("RELATED    : %s\n", strings.Join(item.RelatedRefs, ", ")))
+				sb.WriteString("\n")
 			}
-			return nil
+			return cli.WriteOutput(cmd, []byte(sb.String()))
 		},
-	}
-
-	cmd.Flags().StringVarP(&formatFlag, "format", "f", "table", "Output format (table, json)")
-	cmd.Flags().BoolVar(&syncFlag, "sync", false, "Synchronize all registered acronyms to the Knowledge Kernel scheme (VOC-KERNEL-ACRONYMS)")
-
-	return cmd
+	})
 }

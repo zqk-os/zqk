@@ -1,0 +1,39 @@
+$schema: schemas/command_spec.schema.json
+name: explain
+short: Explain kernel acronyms, ontology terms, and architectural concepts
+description: |-
+    Provides progressive disclosure and single-source-of-truth explanations
+    for all core ZQK Knowledge Kernel acronyms (BLI, PRI, REQ, CRIT, VDS, TCFG, CVS,
+    ATK, PPLAN, ZPARQL, ZQL, CAS, WAL, CAP, CEF, TDE).
+
+      Explain a specific acronym
+      zqk explain BLI
+
+      List all documented acronyms
+      zqk explain
+aliases:
+    - glossary
+    - acronym
+    - acronyms
+args:
+    type: maximum
+    max: 1
+flags:
+    - name: sync
+      shorthand: "s"
+      type: bool
+      default: "false"
+      description: Sync all acronym definitions to the Knowledge Kernel scheme (VOC-KERNEL-ACRONYMS)
+    - name: format
+      shorthand: "f"
+      type: string
+      default: "table"
+      description: Output format (table, json, yaml)
+help:
+    examples:
+        - comment: Explain specific acronym
+          command: '%s explain BLI'
+        - comment: List all acronyms
+          command: '%s explain'
+run_e: runExplain
+common_flags: true
