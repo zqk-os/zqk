@@ -47,11 +47,7 @@ func NewGenerateTraitBuildersCmd() *cobra.Command {
 	}
 	cli.RequireSession(cmd, false) // no storage/session; codegen only
 	cli.BindAsyncProgress(cmd, func(cmd *cobra.Command, args []string) error {
-		ctx := cli.GetContext(cmd)
-		logger := logging.GetLoggerFromProfile(SystemProfileHuman)
-		if ctx != nil && ctx.Profile != EmptyValue {
-			logger = logging.GetLoggerFromProfile(ctx.Profile)
-		}
+		logger := cmdLogger(cmd)
 
 		// Default traits directory
 		if traitsDir == EmptyValue {
@@ -129,14 +125,7 @@ func NewGenerateTraitBuildersCmd() *cobra.Command {
 			return nil
 		})
 
-		// Summary
-		logging.Fluent(logger).Info(fmt.Sprintf("Summary: Generated %d, Skipped %d, Errors %d", result.Generated, skipped+int(traitSkips.Load()), result.Errors)).Log()
-
-		if result.Errors > 0 {
-			return errfmt.Errorf("generation completed with %d errors", result.Errors)
-		}
-
-		return nil
+		return logSummaryAndCheckErrors(logger, result.Generated, skipped+int(traitSkips.Load()), result.Errors)
 	})
 
 	// Apply help builder to command

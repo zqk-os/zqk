@@ -43,11 +43,7 @@ func NewGenerateFieldKeysCmd() *cobra.Command {
 
 	cli.RequireSession(cmd, false)
 	cli.BindAsyncProgress(cmd, func(cmd *cobra.Command, args []string) error {
-		ctx := cli.GetContext(cmd)
-		logger := logging.GetLoggerFromProfile(SystemProfileHuman)
-		if ctx != nil && ctx.Profile != EmptyValue {
-			logger = logging.GetLoggerFromProfile(ctx.Profile)
-		}
+		logger := cmdLogger(cmd)
 
 		if specsDir == EmptyValue {
 			pathsConfig := validation.GetGlobalPathsConfig()
@@ -58,8 +54,9 @@ func NewGenerateFieldKeysCmd() *cobra.Command {
 		}
 
 		projectRoot := ""
-		if ctx != nil && ctx.ProjectRoot != EmptyValue {
-			projectRoot = ctx.ProjectRoot
+		cmdCtx := cli.GetContext(cmd)
+		if cmdCtx != nil && cmdCtx.ProjectRoot != EmptyValue {
+			projectRoot = cmdCtx.ProjectRoot
 		}
 		if projectRoot == EmptyValue {
 			if wd, err := fileutil.Getwd(); err == nil {
