@@ -215,7 +215,7 @@ func isZombieProcess(pid int) bool {
 		return false
 	}
 	if runtime.GOOS == "linux" {
-		b, err := os.ReadFile(fmt.Sprintf("/proc/%d/stat", pid))
+		b, err := fileutil.ReadFile(fmt.Sprintf("/proc/%d/stat", pid))
 		if err == nil {
 			fields := strings.Fields(string(b))
 			if len(fields) > 2 && fields[2] == "Z" {

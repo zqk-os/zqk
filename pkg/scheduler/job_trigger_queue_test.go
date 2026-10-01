@@ -733,13 +733,13 @@ func TestJobTriggerQueue_GetTriggerQueueMutex(t *testing.T) {
 	var wg sync.WaitGroup
 	for i := 0; i < 50; i++ {
 		wg.Add(1)
-		go func() {
+		goroutinelabels.NewGoroutine("scheduler_test", "trigger queue mutex retrieval").StartSimple(func() {
 			defer wg.Done()
 			m := getTriggerQueueMutex(pathA)
 			if m != muA1 {
 				t.Errorf("concurrent getTriggerQueueMutex returned inconsistent mutex pointer")
 			}
-		}()
+		})
 	}
 	wg.Wait()
 }

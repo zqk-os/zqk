@@ -252,8 +252,8 @@ func ActiveDaemonPIDs(projectRoot string) (map[string]int, error) {
 			continue
 		}
 		daemonName := strings.TrimSuffix(entry.Name(), ".lock")
-		running, pid, _ := IsDaemonRunning(projectRoot, daemonName)
-		if running && pid > 0 {
+		running, pid, checkErr := IsDaemonRunning(projectRoot, daemonName)
+		if checkErr == nil && running && pid > 0 {
 			active[daemonName] = pid
 		}
 	}

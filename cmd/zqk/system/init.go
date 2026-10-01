@@ -124,36 +124,13 @@ func createProjectDataDir(projectDataDir string, _ bool) error {
 }
 
 func createProcessDir(processDir string, _ bool) error {
-	// Create .zqk/process directory structure
+	if err := fileutil.MkdirAll(processDir, paths.DirPerm755); err != nil {
+		return err
+	}
+	// Seed essential directories for baseline workspace initialization
 	subdirs := []string{
-		filepath.Join(processDir, "_internal", "object_specs"),
-		filepath.Join(processDir, "_internal", "lifecycles"),
-		filepath.Join(processDir, "_internal", "documentation"),
-		filepath.Join(processDir, "_internal", "traits"),
 		filepath.Join(processDir, "backlog_items"),
 		filepath.Join(processDir, "policies"),
-		filepath.Join(processDir, "requirements"),
-		filepath.Join(processDir, objects.KindCriteria),
-		filepath.Join(processDir, "test_cases"),
-		filepath.Join(processDir, "decisions"),
-		filepath.Join(processDir, "goals"),
-		filepath.Join(processDir, "milestones"),
-		filepath.Join(processDir, "workstreams"),
-		filepath.Join(processDir, "priority_plans"),
-		filepath.Join(processDir, "questions"),
-		filepath.Join(processDir, "doc_entries"),
-		filepath.Join(processDir, "missions"),
-		filepath.Join(processDir, "visions"),
-		filepath.Join(processDir, "strategic_contexts"),
-		filepath.Join(processDir, "stakeholder_profiles"),
-		filepath.Join(processDir, "important_dates"),
-		filepath.Join(processDir, "strategic_plans"),
-		filepath.Join(processDir, "architecture"),
-		filepath.Join(processDir, "audit", "2025-12"),
-		filepath.Join(processDir, "change_journal", "2025-12"),
-		filepath.Join(processDir, "planning"),
-		filepath.Join(processDir, "scheduler_jobs"),
-		filepath.Join(processDir, "certificates"),
 	}
 
 	for _, dir := range subdirs {

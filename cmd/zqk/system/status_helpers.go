@@ -28,6 +28,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/scheduler"
 	"github.com/zqk-os/zqk/pkg/storage"
+	storageaudit "github.com/zqk-os/zqk/pkg/storage/audit"
 	"github.com/zqk-os/zqk/pkg/when"
 
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -313,14 +314,18 @@ func getSystemHealthData(projectRoot string) map[string]any {
 
 // getRecentActivity gets recent activity for verbose mode
 func getRecentActivity(projectRoot string) []string {
-	processDir, err := resolveProcessDirForProject(projectRoot)
-	if err != nil {
-		processDir = datacell.ProcessPrimaryDir(projectRoot)
-	}
-	auditDir := filepath.Join(processDir, "audit", time.Now().Format("2006-01"))
+	auditDir := storageaudit.MonthlyDir(projectRoot, time.Now())
 	entries, err := fileutil.ReadDir(auditDir)
 	if err != nil || len(entries) == 0 {
-		return nil
+		processDir, rErr := resolveProcessDirForProject(projectRoot)
+		if rErr != nil {
+			processDir = datacell.ProcessPrimaryDir(projectRoot)
+		}
+		auditDir = filepath.Join(processDir, "audit", time.Now().Format("2006-01"))
+		entries, err = fileutil.ReadDir(auditDir)
+		if err != nil || len(entries) == 0 {
+			return nil
+		}
 	}
 
 	count := len(entries)

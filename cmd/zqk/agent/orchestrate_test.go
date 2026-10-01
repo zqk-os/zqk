@@ -259,20 +259,20 @@ func TestCollectOrchestrationCommitManifestIgnoresDraftPlaneSymlink(t *testing.T
 
 	worktree := t.TempDir()
 	runTestGit(t, worktree, "init")
-	if err := os.WriteFile(filepath.Join(worktree, "result.txt"), []byte("base\n"), paths.FilePerm600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(worktree, "result.txt"), []byte("base\n"), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 	if err := fileutil.MkdirAll(filepath.Join(worktree, paths.ProjectDataDir), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(worktree, paths.ProjectDataDir, ".keep"), []byte("keep\n"), paths.FilePerm600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(worktree, paths.ProjectDataDir, ".keep"), []byte("keep\n"), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 	runTestGit(t, worktree, "add", "result.txt", filepath.Join(paths.ProjectDataDir, ".keep"))
 	runTestGit(t, worktree, "-c", "user.name=CAP Test", "-c", "user.email=cap@example.invalid", "commit", "-m", "base")
 	baseSHA := runTestGit(t, worktree, "rev-parse", "HEAD")
 
-	if err := os.WriteFile(filepath.Join(worktree, "result.txt"), []byte("delivered\n"), paths.FilePerm600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(worktree, "result.txt"), []byte("delivered\n"), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 	runTestGit(t, worktree, "add", "result.txt")
@@ -629,7 +629,7 @@ func TestOrchestrationExecutorChildEnv_bindsSeatedKernelNotWorktree(t *testing.T
 func TestOrchestrateRun_executorDoesNotBindProjectRootToWorktree(t *testing.T) {
 	t.Parallel()
 
-	data, err := os.ReadFile("orchestrate_run.go")
+	data, err := fileutil.ReadFile("orchestrate_run.go")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -695,7 +695,7 @@ func TestOrchestratorSingletonGuard(t *testing.T) {
 	}
 
 	// Verify orchestrate_run.go contains acquire_orchestrator_guard stage and signal context
-	data, err := os.ReadFile("orchestrate_run.go")
+	data, err := fileutil.ReadFile("orchestrate_run.go")
 	if err != nil {
 		t.Fatal(err)
 	}
