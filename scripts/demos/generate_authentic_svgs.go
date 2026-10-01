@@ -14,9 +14,9 @@ import (
 	"github.com/mattn/go-runewidth"
 	"github.com/zqk-os/zqk/cmd/zqk/state"
 	"github.com/zqk-os/zqk/cmd/zqk/test"
-	"github.com/zqk-os/zqk/cmd/zqk/ui"
-	"github.com/zqk-os/zqk/cmd/zqk/ui/tds"
 	"github.com/zqk-os/zqk/pkg/paths"
+	ui "github.com/zqk-os/zqk/pkg/tui"
+	"github.com/zqk-os/zqk/pkg/tui/tds"
 )
 
 type Span struct {
