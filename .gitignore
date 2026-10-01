@@ -239,6 +239,7 @@ docs/process/
 /.sandbox/
 .zqk/inbox/
 .zqk/test-bundles/
+.zqk/runs/
 docs/process/**/.next_*_seq
 docs/process/**/.*.index
 docs/process/**/.*.index.tmp*
