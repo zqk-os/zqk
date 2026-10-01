@@ -1,0 +1,37 @@
+const docsIndex = __DOCS_INDEX__;
+
+function runSearch() {
+  const query = document.getElementById('search-input').value.toLowerCase();
+  const resultsDiv = document.getElementById('search-results');
+  if (!query || query.length < 2) {
+    resultsDiv.style.display = 'none';
+    resultsDiv.innerHTML = '';
+    return;
+  }
+  const rootRel = document.body.getAttribute('data-root-rel') || '';
+  const matched = docsIndex.filter(d => 
+    d.title.toLowerCase().includes(query) || 
+    d.category.toLowerCase().includes(query) || 
+    d.snippet.toLowerCase().includes(query)
+  );
+  if (matched.length === 0) {
+    resultsDiv.innerHTML = '<div style="padding: 12px; color: #8b949e;">No documentation matches found</div>';
+  } else {
+    resultsDiv.innerHTML = matched.slice(0, 20).map(m => 
+      '<div class="search-result-item">' +
+      '  <a href="' + rootRel + m.path + '">' + m.title + '</a>' +
+      '  <span class="search-result-category">[' + m.category + ']</span>' +
+      '  <p>' + m.snippet + '...</p>' +
+      '</div>'
+    ).join('');
+  }
+  resultsDiv.style.display = 'block';
+}
+
+document.addEventListener('click', function(e) {
+  const searchBox = document.querySelector('.search-box');
+  const resultsDiv = document.getElementById('search-results');
+  if (searchBox && !searchBox.contains(e.target)) {
+    resultsDiv.style.display = 'none';
+  }
+});

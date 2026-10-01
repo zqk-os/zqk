@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Page Not Found — ZQK Documentation</title>
+  <link rel="stylesheet" href="/assets/style.css?v={{STYLE_HASH}}">
+  <link rel="icon" type="image/svg+xml" href="/assets/zqk-logo.svg?v={{LOGO_HASH}}">
+  <script>
+    // Automatic intelligent client-side redirect for links missing /docs/ or missing .html
+    (function() {
+      var path = window.location.pathname;
+      if (!path.startsWith('/docs/') && path !== '/' && !path.startsWith('/assets/') && !path.startsWith('/search/')) {
+        var cleanPath = path;
+        if (!cleanPath.endsWith('.html') && !cleanPath.endsWith('/')) {
+          cleanPath += '.html';
+        }
+        var candidate = '/docs' + (cleanPath.startsWith('/') ? cleanPath : '/' + cleanPath);
+        window.location.replace(candidate + window.location.search + window.location.hash);
+      }
+    })();
+  </script>
+</head>
+<body class="docs-page">
+  <header class="header">
+    <div class="nav-container">
+      <div class="brand">
+        <a href="/" class="logo">
+          {{HEADER_LOGO_SVG}}
+          <span class="logo-text">ZQK <span class="logo-accent">Core</span> <span style="font-size: 0.82rem; color: #8b949e; font-weight: normal; margin-left: 6px;">Community Docs</span></span>
+        </a>
+      </div>
+      <div class="search-box">
+        <input type="text" id="search-input" placeholder="Search documentation... (Press '/' to focus)" oninput="runSearch()">
+        <div id="search-results"></div>
+      </div>
+    </div>
+  </header>
+  <main class="content-container" style="justify-content:center; text-align:center; padding: 4rem 1rem;">
+    <div style="max-width: 600px; margin: 0 auto;">
+      <h1 style="font-size: 3.5rem; color: #00e5ff; margin-bottom: 1rem;">404</h1>
+      <h2 style="color: #fff; margin-bottom: 1rem;">Documentation Page Not Found</h2>
+      <p style="color: #8b949e; line-height: 1.6; margin-bottom: 2rem;">The requested page could not be located. You can search our documentation above or return to the portal homepage.</p>
+      <a href="/" style="display:inline-block; padding: 10px 20px; background: #00e5ff; color: #05070a; font-weight: 600; border-radius: 6px; text-decoration: none;">&larr; Return to Documentation Portal</a>
+    </div>
+  </main>
+  <script src="/search/search-index.js?v={{PORTAL_BUILD_ID}}"></script>
+</body>
+</html>
