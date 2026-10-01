@@ -4,13 +4,16 @@ short: Explain kernel acronyms, ontology terms, and architectural concepts
 description: |-
     Provides progressive disclosure and single-source-of-truth explanations
     for all core ZQK Knowledge Kernel acronyms (BLI, PRI, REQ, CRIT, VDS, TCFG, CVS,
-    ATK, PPLAN, ZPARQL, ZQL, CAS, WAL, CAP, CEF, TDE).
+    ATK, PPLAN, ZPARQL, ZQL, CAS, WAL, CAP, CEF, TDE) and domain vocabulary terms.
 
-      Explain a specific acronym
+      Explain a specific acronym or term
       zqk explain BLI
 
       List all documented acronyms
       zqk explain
+
+      List terms under a specific vocabulary scheme
+      zqk explain --scheme VOC-KERNEL-ARCHITECTURE
 aliases:
     - glossary
     - acronym
@@ -29,11 +32,17 @@ flags:
       type: string
       default: "table"
       description: Output format (table, json, yaml)
+    - name: scheme
+      type: string
+      default: "VOC-KERNEL-ACRONYMS"
+      description: Vocabulary scheme ID to query (default VOC-KERNEL-ACRONYMS)
 help:
     examples:
         - comment: Explain specific acronym
           command: '%s explain BLI'
         - comment: List all acronyms
           command: '%s explain'
+        - comment: Filter by vocabulary scheme
+          command: '%s explain --scheme VOC-KERNEL-ACRONYMS'
 run_e: runExplain
 common_flags: true

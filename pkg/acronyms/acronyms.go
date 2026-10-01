@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"path/filepath"
 	"sort"
 	"strings"
 	"sync"
@@ -13,9 +12,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/mutation"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
-	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // KernelAcronymsSchemeID is the canonical ID of the acronym vocabulary scheme.
@@ -150,18 +147,165 @@ var (
 )
 
 func init() {
-	loadDefaultSeed()
+	populateFallbackSeed()
 }
 
-func loadDefaultSeed() {
-	root := paths.ResolveProjectRoot(".")
-	if root == "" {
-		return
+func populateFallbackSeed() {
+	registryMu.Lock()
+	defer registryMu.Unlock()
+	for _, a := range CanonicalSeedTerms() {
+		registry[a.Code] = a
 	}
-	p := filepath.Join(root, "packs", "vocabulary", "seeds", "kernel_vocabulary.zql")
-	data, err := fileutil.ReadFile(p)
-	if err == nil {
-		_ = LoadFromZQLSeed(string(data))
+}
+
+// CanonicalSeedTerms returns the canonical bootstrap acronym definitions.
+// These serve as initial seed data and offline fallback when kernel storage is uninitialized.
+func CanonicalSeedTerms() []Acronym {
+	return []Acronym{
+		{
+			Code:        "BLI",
+			FullName:    "Backlog Item",
+			SchemeRef:   KernelAcronymsSchemeID,
+			Category:    "work",
+			Definition:  "A discrete, tracked work package or deliverable scheduled within a Priority Plan.",
+			Context:     "operational",
+			RelatedRefs: []string{"PRI", "REQ", "CRIT", "ATK"},
+		},
+		{
+			Code:        "PRI",
+			FullName:    "Priority Plan",
+			SchemeRef:   KernelAcronymsSchemeID,
+			Category:    "work",
+			Definition:  "A time-bounded execution plan defining prioritized work packages and delivery horizons.",
+			Context:     "operational",
+			RelatedRefs: []string{"BLI", "MIL", "PPLAN"},
+		},
+		{
+			Code:        "REQ",
+			FullName:    "Requirement",
+			SchemeRef:   KernelAcronymsSchemeID,
+			Category:    "specification",
+			Definition:  "A formal system invariant, capability, or architectural specification. Proven by at least three orthogonal criteria.",
+			Context:     "operational",
+			RelatedRefs: []string{"CRIT", "BLI", "GOAL"},
+		},
+		{
+			Code:        "CRIT",
+			FullName:    "Criterion",
+			SchemeRef:   KernelAcronymsSchemeID,
+			Category:    "verification",
+			Definition:  "An objective, verifiable acceptance condition proving a requirement (Static Floor, Operational Proof, Negative Boundary).",
+			Context:     "operational",
+			RelatedRefs: []string{"REQ", "TST", "VDS"},
+		},
+		{
+			Code:        "VDS",
+			FullName:    "Verification Definition of Done",
+			SchemeRef:   KernelAcronymsSchemeID,
+			Category:    "verification",
+			Definition:  "Automated gate proving that all criteria and test lineages are green before pull requests merge.",
+			Context:     "operational",
+			RelatedRefs: []string{"CRIT", "REQ", "BLI"},
+		},
+		{
+			Code:        "TCFG",
+			FullName:    "Team Configuration",
+			SchemeRef:   KernelAcronymsSchemeID,
+			Category:    "organization",
+			Definition:  "Approved team composition, agent roster, and operational permissions.",
+			Context:     "operational",
+			RelatedRefs: []string{"PER", "ACC", "ATK"},
+		},
+		{
+			Code:        "CVS",
+			FullName:    "Convergence Session",
+			SchemeRef:   KernelAcronymsSchemeID,
+			Category:    "coordination",
+			Definition:  "A structured cybernetic feedback session that closes deltas between projected and actual system state.",
+			Context:     "operational",
+			RelatedRefs: []string{"CAP", "PRI", "BLI"},
+		},
+		{
+			Code:        "ATK",
+			FullName:    "Agent Task",
+			SchemeRef:   KernelAcronymsSchemeID,
+			Category:    "execution",
+			Definition:  "A granular, autonomous unit of work assigned to and executed by an agent persona.",
+			Context:     "operational",
+			RelatedRefs: []string{"BLI", "PER", "TCFG"},
+		},
+		{
+			Code:        "PPLAN",
+			FullName:    "Priority Plan Verb",
+			SchemeRef:   KernelAcronymsSchemeID,
+			Category:    "cli",
+			Definition:  "CLI command shortcut group for inspecting active priority plans and current workloads.",
+			Context:     "operational",
+			RelatedRefs: []string{"PRI", "BLI"},
+		},
+		{
+			Code:        "ZPARQL",
+			FullName:    "ZQK Pattern Query Language",
+			SchemeRef:   KernelAcronymsSchemeID,
+			Category:    "graph",
+			Definition:  "Declarative graph pattern matching and query engine for traversing kernel object relationships.",
+			Context:     "operational",
+			RelatedRefs: []string{"ZQL", "CAS"},
+		},
+		{
+			Code:        "ZQL",
+			FullName:    "ZQK Query Language",
+			SchemeRef:   KernelAcronymsSchemeID,
+			Category:    "query",
+			Definition:  "Declarative object query, mutation, and filtering expression language.",
+			Context:     "operational",
+			RelatedRefs: []string{"ZPARQL", "CAS"},
+		},
+		{
+			Code:        "CAS",
+			FullName:    "Content-Addressable Storage",
+			SchemeRef:   KernelAcronymsSchemeID,
+			Category:    "storage",
+			Definition:  "Immutable, cryptographic hash-indexed object storage layer forming the kernel membrane.",
+			Context:     "operational",
+			RelatedRefs: []string{"WAL", "ZQL"},
+		},
+		{
+			Code:        "WAL",
+			FullName:    "Write-Ahead Log",
+			SchemeRef:   KernelAcronymsSchemeID,
+			Category:    "storage",
+			Definition:  "Append-only sequential ledger guaranteeing atomic state mutations and crash recovery.",
+			Context:     "operational",
+			RelatedRefs: []string{"CAS", "ZQL"},
+		},
+		{
+			Code:        "CAP",
+			FullName:    "Continuous Autonomous Protocol",
+			SchemeRef:   KernelAcronymsSchemeID,
+			Category:    "governance",
+			Definition:  "The self-driving cybernetic feedback loop steering agents without human intervention.",
+			Context:     "operational",
+			RelatedRefs: []string{"CVS", "ATK"},
+		},
+		{
+			Code:        "CEF",
+			FullName:    "Community Evaluation Framework",
+			SchemeRef:   KernelAcronymsSchemeID,
+			Category:    "evaluation",
+			Definition:  "Comprehensive quality scorecard, testing pyramid, and Diamond Scale grading rubric.",
+			Context:     "operational",
+			RelatedRefs: []string{"VDS", "CRIT"},
+		},
+		{
+			Code:        "TDE",
+			FullName:    "Technical Debt Entry",
+			SchemeRef:   KernelAcronymsSchemeID,
+			Category:    "hygiene",
+			Definition:  "An objectified defect, architectural smell, or maintainability liability tracked for resolution.",
+			Context:     "operational",
+			RelatedRefs: []string{"BLI", "REQ"},
+		},
 	}
 }
 
@@ -212,58 +356,155 @@ func LoadFromZQLSeed(script string) error {
 	return nil
 }
 
-// LoadFromKernel queries live glossary_term objects under VOC-KERNEL-ACRONYMS
-// from storage, augmenting the registry dynamically from Knowledge Kernel state.
-func LoadFromKernel(ctx context.Context, secCtx *pkgctx.SecurityContext, store storage.ObjectStorageProvider) error {
+// ListFromStore dynamically queries live glossary_term objects under the given schemeRef from storage.
+func ListFromStore(ctx context.Context, secCtx *pkgctx.SecurityContext, store storage.ObjectStorageProvider, schemeRef string) ([]Acronym, error) {
 	if store == nil {
-		return fmt.Errorf("storage provider is nil")
+		return ListAll(), nil
 	}
 	if secCtx == nil {
 		secCtx = pkgctx.NewSystemSecurityContext()
 	}
 
-	res, err := store.List(ctx, secCtx, nil, storage.ListFilter{
+	filter := storage.ListFilter{
 		Kind: "glossary_term",
-	})
+	}
+
+	res, err := store.List(ctx, secCtx, nil, filter)
 	if err != nil {
-		return fmt.Errorf("failed to query glossary terms: %w", err)
+		return nil, fmt.Errorf("failed to query glossary terms: %w", err)
+	}
+
+	targetScheme := schemeRef
+	if targetScheme == "" {
+		targetScheme = KernelAcronymsSchemeID
+	}
+
+	var items []Acronym
+	seen := make(map[string]bool)
+
+	for _, obj := range res.Objects {
+		sRef, _ := obj[objects.FieldKeySchemeRef].(string)
+		id, _ := obj[objects.FieldKeyID].(string)
+
+		// Filter by scheme unless wildcard requested
+		if targetScheme != "*" && targetScheme != "all" {
+			if sRef != targetScheme && !strings.HasPrefix(id, "GLS-ACRONYM-") {
+				continue
+			}
+		}
+
+		if a, ok := FromGlossaryTerm(obj); ok {
+			if !seen[a.Code] {
+				seen[a.Code] = true
+				items = append(items, a)
+			}
+		}
+	}
+
+	if len(items) == 0 && (targetScheme == KernelAcronymsSchemeID || targetScheme == "*" || targetScheme == "all") {
+		return ListAll(), nil
+	}
+
+	sort.Slice(items, func(i, j int) bool {
+		return items[i].Code < items[j].Code
+	})
+
+	return items, nil
+}
+
+// LookupInStore dynamically looks up an acronym/term in kernel storage.
+func LookupInStore(ctx context.Context, secCtx *pkgctx.SecurityContext, store storage.ObjectStorageProvider, query string, schemeRef string) (Acronym, bool, error) {
+	if store == nil {
+		a, found := Lookup(query)
+		return a, found, nil
+	}
+	if secCtx == nil {
+		secCtx = pkgctx.NewSystemSecurityContext()
+	}
+
+	upper := strings.ToUpper(strings.TrimSpace(query))
+
+	// 1. Direct ID lookup if prefixed
+	directID := upper
+	if !strings.HasPrefix(directID, "GLS-") {
+		directID = fmt.Sprintf("GLS-ACRONYM-%s", upper)
+	}
+	if obj, err := store.Read(ctx, secCtx, directID); err == nil && obj != nil {
+		if a, ok := FromGlossaryTerm(obj); ok {
+			return a, true, nil
+		}
+	}
+
+	// 2. Query terms in scheme
+	all, err := ListFromStore(ctx, secCtx, store, schemeRef)
+	if err != nil {
+		return Acronym{}, false, err
+	}
+
+	for _, a := range all {
+		if strings.EqualFold(a.Code, upper) || strings.EqualFold(a.FullName, query) {
+			return a, true, nil
+		}
+	}
+
+	return Acronym{}, false, nil
+}
+
+// FindClosestInStore suggests similar terms from live kernel storage.
+func FindClosestInStore(ctx context.Context, secCtx *pkgctx.SecurityContext, store storage.ObjectStorageProvider, query string, schemeRef string) ([]string, error) {
+	upper := strings.ToUpper(strings.TrimSpace(query))
+	all, err := ListFromStore(ctx, secCtx, store, schemeRef)
+	if err != nil {
+		return FindClosest(query), nil
+	}
+
+	var matches []string
+	for _, a := range all {
+		if strings.HasPrefix(a.Code, upper) || strings.Contains(a.Code, upper) {
+			matches = append(matches, a.Code)
+		}
+	}
+
+	if len(matches) == 0 {
+		for _, a := range all {
+			if levenshtein(a.Code, upper) <= 2 {
+				matches = append(matches, a.Code)
+			}
+		}
+	}
+
+	sort.Strings(matches)
+	return matches, nil
+}
+
+// LoadFromKernel queries live glossary_term objects under VOC-KERNEL-ACRONYMS
+// from storage, augmenting the registry dynamically from Knowledge Kernel state.
+func LoadFromKernel(ctx context.Context, secCtx *pkgctx.SecurityContext, store storage.ObjectStorageProvider) error {
+	items, err := ListFromStore(ctx, secCtx, store, KernelAcronymsSchemeID)
+	if err != nil {
+		return err
 	}
 
 	registryMu.Lock()
 	defer registryMu.Unlock()
-
-	for _, obj := range res.Objects {
-		entry, ok := FromGlossaryTerm(obj)
-		if !ok {
-			continue
-		}
-		registry[entry.Code] = entry
+	for _, a := range items {
+		registry[a.Code] = a
 	}
 	return nil
 }
 
-// Lookup finds an acronym by case-insensitive key.
+// Lookup finds an acronym by case-insensitive key from memory/fallback cache.
 func Lookup(key string) (Acronym, bool) {
 	upper := strings.ToUpper(strings.TrimSpace(key))
 	registryMu.RLock()
-	if len(registry) == 0 {
-		registryMu.RUnlock()
-		loadDefaultSeed()
-		registryMu.RLock()
-	}
 	defer registryMu.RUnlock()
 	acronym, found := registry[upper]
 	return acronym, found
 }
 
-// ListAll returns all documented acronyms sorted alphabetically by code.
+// ListAll returns all documented acronyms sorted alphabetically by code from memory/fallback cache.
 func ListAll() []Acronym {
 	registryMu.RLock()
-	if len(registry) == 0 {
-		registryMu.RUnlock()
-		loadDefaultSeed()
-		registryMu.RLock()
-	}
 	defer registryMu.RUnlock()
 	list := make([]Acronym, 0, len(registry))
 	for _, a := range registry {
@@ -279,15 +520,9 @@ func ListAll() []Acronym {
 func FindClosest(query string) []string {
 	upper := strings.ToUpper(strings.TrimSpace(query))
 	registryMu.RLock()
-	if len(registry) == 0 {
-		registryMu.RUnlock()
-		loadDefaultSeed()
-		registryMu.RLock()
-	}
 	defer registryMu.RUnlock()
 	var matches []string
 
-	// Check prefix / substring matches
 	for code := range registry {
 		if strings.HasPrefix(code, upper) || strings.Contains(code, upper) {
 			matches = append(matches, code)
@@ -356,8 +591,28 @@ func SyncToKernel(ctx context.Context, secCtx *pkgctx.SecurityContext, store sto
 		secCtx = pkgctx.NewSystemSecurityContext()
 	}
 
+	// Ensure the parent vocabulary_scheme exists
+	schemeObj := map[string]any{
+		objects.FieldKeyID:            KernelAcronymsSchemeID,
+		objects.FieldKeyKind:          "vocabulary_scheme",
+		objects.FieldKeyTitle:         "Kernel Acronym & Jargon Taxonomy",
+		objects.FieldKeyStatus:        "active",
+		"context_scope":               "operational",
+		"purpose":                     "mixed",
+		"summary":                     "Core system acronyms across architecture, process, and data planes.",
+		"machine_hints":               `{"glossary_type":"acronyms","cli_command":"zqk explain"}`,
+		objects.FieldKeyNamespaceID:   "zqk:kernel",
+		objects.FieldKeySchemaVersion: "2.0.0",
+		objects.FieldKeySourceType:    "internal",
+	}
+	if err := store.Create(ctx, secCtx, schemeObj); err != nil {
+		delete(schemeObj, objects.FieldKeyCreatedAt)
+		delete(schemeObj, objects.FieldKeyUpdatedAt)
+		_ = store.Update(ctx, secCtx, KernelAcronymsSchemeID, schemeObj)
+	}
+
 	synced := 0
-	for _, item := range ListAll() {
+	for _, item := range CanonicalSeedTerms() {
 		objMap := item.ToGlossaryTerm()
 		glossaryID := objMap[objects.FieldKeyID].(string)
 
