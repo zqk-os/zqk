@@ -134,17 +134,23 @@ func CreateChangeJournalEntryWithBuilder(
 
 	now := time.Now().UTC()
 
-	// Generate change journal entry ID and determine storage path using monthly bucketing
-	month := now.Format("2006-01")
-	processDir := paths.ResolvePath(projectRoot, ConstAuditPrefixProcess)
-	journalDir := filepath.Join(processDir, ConstAuditChangeJournal, month)
-	if err := fileutil.MkdirAll(journalDir, paths.DirPerm755); err != nil {
-		changeJournalEntriesFailedTotal.Add(1)
-		return nil // Best effort
+	// Generate change journal entry ID. When stream storage is enabled, sequence numbers are allocated
+	// from the state cache without touching .zqk/process/change_journal.
+	var journalID string
+	var err error
+	if projectRoot != emptyValue && StreamStorageEnabledForKind(objects.KindChangeJournalEntry) {
+		cache := getChangeJournalIDCache(ctx, projectRoot)
+		journalID, err = cache.nextID(ctx)
+	} else {
+		month := now.Format("2006-01")
+		processDir := paths.ResolvePath(projectRoot, ConstAuditPrefixProcess)
+		journalDir := filepath.Join(processDir, ConstAuditChangeJournal, month)
+		if err := fileutil.MkdirAll(journalDir, paths.DirPerm755); err != nil {
+			changeJournalEntriesFailedTotal.Add(1)
+			return nil // Best effort
+		}
+		journalID, err = findNextChangeJournalID(ctx, projectRoot, journalDir)
 	}
-
-	// Find next sequence number (month dir for scan; when stream enabled, sequence file under .zqk/state)
-	journalID, err := findNextChangeJournalID(ctx, projectRoot, journalDir)
 	if err != nil {
 		changeJournalEntriesFailedTotal.Add(1)
 		return nil // Best effort
