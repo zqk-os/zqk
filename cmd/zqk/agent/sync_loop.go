@@ -3,6 +3,7 @@ package agent
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -200,32 +201,41 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 
 	// Create coordination channel and publish process_started event
 	cc := scheduler.NewCoordinationChannel(proc.ProjectRoot())
-	_ = cc.PublishEvent(scheduler.Event{
+	if err := cc.PublishEvent(scheduler.Event{
 		Type:      "process_started",
 		JobID:     taskID,
 		Timestamp: time.Now().UTC(),
-	})
+	}); err != nil {
+		logging.FluentEvent(logging.GetLogger()).Warn("Failed to publish process_started event").
+			WithError(err).String("job_id", taskID).Log()
+	}
 
 	defer func() {
 		removeHourglass(ctx, secCtx, sp, taskID, proc.ProjectRoot())
 		if runErr != nil {
-			_ = cc.PublishEvent(scheduler.Event{
+			if err := cc.PublishEvent(scheduler.Event{
 				Type:      "process_errored",
 				JobID:     taskID,
 				Timestamp: time.Now().UTC(),
 				Metadata: map[string]any{
 					"error": runErr.Error(),
 				},
-			})
+			}); err != nil {
+				logging.FluentEvent(logging.GetLogger()).Warn("Failed to publish process_errored event").
+					WithError(err).String("job_id", taskID).Log()
+			}
 		} else {
 			// Read the task to see if it is implemented
 			currentTask, readErr := sp.Read(ctx, secCtx, taskID)
 			if readErr == nil && koi.IsStatus(currentTask, objects.ObjectStatusImplemented) {
-				_ = cc.PublishEvent(scheduler.Event{
+				if err := cc.PublishEvent(scheduler.Event{
 					Type:      "process_completed",
 					JobID:     taskID,
 					Timestamp: time.Now().UTC(),
-				})
+				}); err != nil {
+					logging.FluentEvent(logging.GetLogger()).Warn("Failed to publish process_completed event").
+						WithError(err).String("job_id", taskID).Log()
+				}
 			}
 		}
 	}()
@@ -304,7 +314,10 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 				// Transition to error state before aborting
 				currentTask, rErr := sp.Read(ctx, secCtx, taskID)
 				if rErr == nil {
-					_ = applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed)
+					if aErr := applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed); aErr != nil {
+						logging.FluentEvent(logging.GetLogger()).Error("Failed to apply failure state mutation on loop limit", aErr).
+							String("task_id", taskID).Log()
+					}
 				}
 				return fmt.Errorf("max sync loop limit reached (%d), aborting to prevent infinite cycle", guardCfg.MaxSyncLoops)
 			}
@@ -321,12 +334,18 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 				storePath := datacell.AgentIdleStorePath(proc.ProjectRoot())
 				if store, err := agentidle.NewFileStore(storePath); err == nil {
 					// Hardcoded 2s since the poller is 2s
-					_ = store.Accumulate("sync-loop-agent", taskID, 2*time.Second)
+					if accErr := store.Accumulate("sync-loop-agent", taskID, 2*time.Second); accErr != nil {
+						logging.FluentEvent(logging.GetLogger()).Warn("Failed to accumulate agent idle time").
+							WithError(accErr).String("task_id", taskID).Log()
+					}
 				}
 			}
 
 			if stagnation.Observe(fp) {
-				_ = applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed)
+				if aErr := applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed); aErr != nil {
+					logging.FluentEvent(logging.GetLogger()).Error("Failed to apply failure state mutation on stagnation", aErr).
+						String("task_id", taskID).Log()
+				}
 				return fmt.Errorf("sync-loop stagnation: no progress for %d ticks (fingerprint unchanged), aborting", guardCfg.MaxStagnantProgressTicks)
 			}
 
@@ -413,11 +432,16 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 					} else {
 						updates[objects.FieldKeyTaskSteps] = aggregatedValidationSteps
 					}
-					_ = sp.Update(ctx, secCtx, taskID, updates)
+					if uErr := sp.Update(ctx, secCtx, taskID, updates); uErr != nil {
+						logging.FluentEvent(logging.GetLogger()).Error("Failed to update validation steps", uErr).
+							String("task_id", taskID).Log()
+						return errfmt.Newf("failed to update validation steps for task %s", taskID).Wrap(uErr)
+					}
 				}
 				if err := applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusInProgress); err != nil {
 					if !strings.Contains(err.Error(), "already exists") {
 						logging.FluentEvent(logging.GetLogger()).Error("Failed to transition task to in_progress from pending_verification", err).Log()
+						return errfmt.Newf("failed to transition task %s to in_progress", taskID).Wrap(err)
 					}
 				}
 				status = objects.ObjectStatusInProgress
@@ -574,26 +598,36 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 					wtRoot := proc.ProjectRoot()
 					if bErr := worktreeBuildCheck(ctx, wtRoot); bErr != nil {
 						finalStatus = objects.ObjectStatusFailed
-						_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Worktree build gate failed for %s: %v\n", taskID, bErr)))
+						if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Worktree build gate failed for %s: %v\n", taskID, bErr))); wErr != nil {
+							logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
+						}
 					} else {
 						branchName := "agent/" + taskID
 						addCmd := execwrap.Command("git", "add", "-A")
 						addCmd.Dir = wtRoot
-						_ = addCmd.Run()
+						if addErr := addCmd.Run(); addErr != nil {
+							logging.FluentEvent(logging.GetLogger()).Warn("git add failed in worktree").WithError(addErr).Log()
+						}
 						commitCmd := execwrap.Command("git", "commit", "-m", "Agent implementation for "+taskID)
 						commitCmd.Dir = wtRoot
-						_ = commitCmd.Run()
+						if commitErr := commitCmd.Run(); commitErr != nil {
+							logging.FluentEvent(logging.GetLogger()).Warn("git commit failed in worktree").WithError(commitErr).Log()
+						}
 
 						mainRepo, rErr := agentWorktreeMainRepo(wtRoot)
 						if rErr != nil {
 							finalStatus = objects.ObjectStatusFailed
-							_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Worktree studio checkout unresolved for %s: %v\n", taskID, rErr)))
+							if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Worktree studio checkout unresolved for %s: %v\n", taskID, rErr))); wErr != nil {
+								logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
+							}
 						} else {
 							mergeCmd := execwrap.Command("git", "merge", branchName)
 							mergeCmd.Dir = mainRepo
 							if out, mErr := mergeCmd.CombinedOutput(); mErr != nil {
 								finalStatus = objects.ObjectStatusFailed
-								_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Worktree merge failed for %s: %v\n%s\n", taskID, mErr, string(out))))
+								if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Worktree merge failed for %s: %v\n%s\n", taskID, mErr, string(out)))); wErr != nil {
+									logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
+								}
 							}
 						}
 					}
@@ -603,10 +637,14 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 				if isAgentWorktree(proc.ProjectRoot()) {
 					mainRepo, rErr := agentWorktreeMainRepo(proc.ProjectRoot())
 					if rErr != nil {
-						_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Worktree teardown skipped for %s: %v\n", taskID, rErr)))
+						if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Worktree teardown skipped for %s: %v\n", taskID, rErr))); wErr != nil {
+							logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
+						}
 					} else {
 						maintenanceService := maintenance.NewGitMaintenanceService(mainRepo)
-						_ = maintenanceService.CleanupWorktreeAndBranchForID(ctx, taskID)
+						if cErr := maintenanceService.CleanupWorktreeAndBranchForID(ctx, taskID); cErr != nil {
+							logging.FluentEvent(logging.GetLogger()).Warn("Worktree cleanup failed").WithError(cErr).Log()
+						}
 					}
 				}
 				currentKind := koi.Kind(currentTask)
@@ -658,7 +696,11 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 				}
 				if hasNewInterjections {
 					currentTask[objects.FieldKeyInterjections] = interjections
-					_ = sp.Update(ctx, secCtx, taskID, currentTask)
+					if uErr := sp.Update(ctx, secCtx, taskID, currentTask); uErr != nil {
+						logging.FluentEvent(logging.GetLogger()).Error("Failed to update task interjections", uErr).
+							String("task_id", taskID).Log()
+						return errfmt.Newf("failed to persist interjections for task %s", taskID).Wrap(uErr)
+					}
 				}
 			}
 
@@ -684,7 +726,10 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 				if wErr := cli.WriteOutput(cmd, []byte(budgetErr.Error()+"\n")); wErr != nil {
 					logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
 				}
-				_ = applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed)
+				if mErr := applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed); mErr != nil {
+					logging.FluentEvent(logging.GetLogger()).Error("Failed to apply failure state mutation on token budget exceeded", mErr).
+						String("task_id", taskID).Log()
+				}
 				return budgetErr
 			}
 			prompt = fittedPrompt
@@ -694,7 +739,10 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 				if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("LLM error: %v\n", err))); wErr != nil {
 					logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
 				}
-				_ = applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed)
+				if mErr := applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed); mErr != nil {
+					logging.FluentEvent(logging.GetLogger()).Error("Failed to apply failure state mutation on LLM error", mErr).
+						String("task_id", taskID).Log()
+				}
 				return err
 			}
 
@@ -709,7 +757,10 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 				if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("Failed to parse mutation: %v\nRAW:\n%s\n", uErr, cleanResp))); wErr != nil {
 					logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
 				}
-				_ = applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed)
+				if mErr := applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed); mErr != nil {
+					logging.FluentEvent(logging.GetLogger()).Error("Failed to apply failure state mutation on unmarshal error", mErr).
+						String("task_id", taskID).Log()
+				}
 				continue
 			}
 
@@ -749,7 +800,9 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 			}
 
 			if auditErr := createIdempotencyAuditStamp(ctx, secCtx, tx, ik, taskID, &mut); auditErr != nil {
-				_ = tx.Rollback(ctx)
+				if rbErr := tx.Rollback(ctx); rbErr != nil {
+					return errfmt.Newf("failed to create idempotency stamp").Wrap(errors.Join(auditErr, rbErr))
+				}
 				return errfmt.Newf("failed to create idempotency stamp").Wrap(auditErr)
 			}
 
@@ -757,13 +810,17 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 			case mutation.ActionUpdateNode:
 				if len(mut.Fields) > 0 {
 					if uErr := tx.Update(ctx, secCtx, mut.TargetID, mut.Fields); uErr != nil {
-						_ = tx.Rollback(ctx)
+						if rbErr := tx.Rollback(ctx); rbErr != nil {
+							return errfmt.Newf("failed to update node %s", mut.TargetID).Wrap(errors.Join(uErr, rbErr))
+						}
 						return errfmt.Newf("failed to update node %s", mut.TargetID).Wrap(uErr)
 					}
 				}
 			case mutation.ActionCreateNode:
 				if cErr := tx.Create(ctx, secCtx, mut.Fields); cErr != nil {
-					_ = tx.Rollback(ctx)
+					if rbErr := tx.Rollback(ctx); rbErr != nil {
+						return errfmt.Newf("failed to create node").Wrap(errors.Join(cErr, rbErr))
+					}
 					return errfmt.Newf("failed to create node").Wrap(cErr)
 				}
 			}
@@ -783,6 +840,7 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 			if mut.StatusTransition != "" && !koi.IsStatus(currentTask, mut.StatusTransition) {
 				if sErr := sp.Update(ctx, secCtx, taskID, map[string]any{objects.FieldKeyStatus: mut.StatusTransition}); sErr != nil {
 					logging.FluentEvent(logging.GetLogger()).Error("Failed to transition task status", sErr).Log()
+					return errfmt.Newf("failed to transition task status to %s", mut.StatusTransition).Wrap(sErr)
 				}
 			}
 
@@ -844,12 +902,19 @@ func applyStateMutationWithFields(ctx context.Context, secCtx *storage.SecurityC
 		Timestamp: time.Now().Format(time.RFC3339),
 	})
 
-	_ = createIdempotencyAuditStamp(ctx, secCtx, tx, ik, taskID, &mut)
+	if auditErr := createIdempotencyAuditStamp(ctx, secCtx, tx, ik, taskID, &mut); auditErr != nil {
+		if rbErr := tx.Rollback(ctx); rbErr != nil {
+			return errors.Join(auditErr, rbErr)
+		}
+		return auditErr
+	}
 
 	mut.Fields[objects.FieldKeyID] = taskID
 	mut.Fields[objects.FieldKeyKind] = kind
 	if err := tx.Update(ctx, secCtx, taskID, mut.Fields); err != nil {
-		_ = tx.Rollback(ctx)
+		if rbErr := tx.Rollback(ctx); rbErr != nil {
+			return errors.Join(err, rbErr)
+		}
 		return err
 	}
 
@@ -893,37 +958,50 @@ func transitionToError(ctx context.Context, secCtx *storage.SecurityContext, sp 
 }
 
 func flipHourglass(ctx context.Context, secCtx *storage.SecurityContext, sp storage.ObjectStorageProvider, taskID string, projectRoot string) {
-	_ = sp.Update(ctx, secCtx, taskID, map[string]any{
+	if err := sp.Update(ctx, secCtx, taskID, map[string]any{
 		"agent_heartbeat": time.Now().Format(time.RFC3339),
 		"agent_pid":       os.Getpid(),
-	})
+	}); err != nil {
+		logging.FluentEvent(logging.GetLogger()).Warn("flipHourglass update failed").WithError(err).
+			String("task_id", taskID).Log()
+	}
 
 	if projectRoot != "" {
 		expiresAt := time.Now().Add(5 * time.Minute)
 		schedulerRoot := paths.ResolvePathFromCacheOrConstant(projectRoot, "scheduler", filepath.Join(paths.ProjectDataDir, paths.SchedulerDir))
 		hourglassDir := filepath.Join(schedulerRoot, "hourglass")
-		_ = fileutil.EnsureDir(hourglassDir)
+		if err := fileutil.EnsureDir(hourglassDir); err != nil {
+			logging.FluentEvent(logging.GetLogger()).Warn("flipHourglass ensure dir failed").WithError(err).Log()
+		}
 		filePath := filepath.Join(hourglassDir, taskID+".json")
 		data := map[string]any{
 			"task_id":                 taskID,
 			"pid":                     os.Getpid(),
 			objects.FieldKeyExpiresAt: expiresAt.Format(time.RFC3339),
 		}
-		b, _ := json.Marshal(data)
-		_ = fileutil.WriteStandardFile(filePath, b)
+		if b, err := json.Marshal(data); err == nil {
+			if wErr := fileutil.WriteStandardFile(filePath, b); wErr != nil {
+				logging.FluentEvent(logging.GetLogger()).Warn("flipHourglass write file failed").WithError(wErr).Log()
+			}
+		}
 	}
 }
 
 func removeHourglass(ctx context.Context, secCtx *storage.SecurityContext, sp storage.ObjectStorageProvider, taskID string, projectRoot string) {
 	// If sync-loop context is canceled (timeout or interrupt), sp.Update will fail. Use a detached context.
 	cleanupCtx := context.WithoutCancel(ctx)
-	_ = sp.Update(cleanupCtx, secCtx, taskID, map[string]any{
+	if err := sp.Update(cleanupCtx, secCtx, taskID, map[string]any{
 		"agent_pid": nil,
-	})
+	}); err != nil {
+		logging.FluentEvent(logging.GetLogger()).Warn("removeHourglass update failed").WithError(err).
+			String("task_id", taskID).Log()
+	}
 	if projectRoot != "" {
 		schedulerRoot := paths.ResolvePathFromCacheOrConstant(projectRoot, "scheduler", filepath.Join(paths.ProjectDataDir, paths.SchedulerDir))
 		hourglassDir := filepath.Join(schedulerRoot, "hourglass")
 		filePath := filepath.Join(hourglassDir, taskID+".json")
-		_ = fileutil.Remove(filePath)
+		if err := fileutil.Remove(filePath); err != nil && !os.IsNotExist(err) {
+			logging.FluentEvent(logging.GetLogger()).Warn("removeHourglass remove file failed").WithError(err).Log()
+		}
 	}
 }

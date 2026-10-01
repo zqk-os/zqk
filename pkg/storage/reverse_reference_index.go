@@ -249,7 +249,8 @@ func (r *ReverseReferenceIndex) GetDependentsWithError(referencedID string) ([]s
 func (r *ReverseReferenceIndex) GetDependents(referencedID string) []string {
 	deps, err := r.GetDependentsWithError(referencedID)
 	if err != nil {
-		logging.LogSwallowedError(err)
+		logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem)).
+			Error("reverse_ref_index_get_dependents_failed", err)
 		return nil
 	}
 	return deps
