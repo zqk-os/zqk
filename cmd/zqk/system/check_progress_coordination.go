@@ -56,9 +56,12 @@ func emitCheckProgressEventViaCoordinator(
 	}
 
 	// Calculate percentage
-	percent := float64(progress) / float64(totalTasks) * 100
-	if percent > 100 {
-		percent = 100
+	var percent float64
+	if totalTasks > 0 {
+		percent = float64(progress) / float64(totalTasks) * 100
+		if percent > 100 {
+			percent = 100
+		}
 	}
 
 	// Build logging fields

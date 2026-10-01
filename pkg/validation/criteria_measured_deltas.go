@@ -30,11 +30,28 @@ func HasMeasuredDeltaAssertion(predicateExpr string) bool {
 		strings.Contains(vLower, "assert")
 }
 
+// IsRefactorOrExtractionCriterion reports whether a criterion is targeted at refactoring or code extraction.
+// Milestone-scoped child criteria (e.g. "Verify: Milestone: ... - Documentation & Knowledge Base Entry",
+// "... - Boundary & Error Handling", "... - Functional Acceptance") inherit the parent milestone's title,
+// but standard documentation, boundary, and functional acceptance criteria are not refactoring tasks.
+func IsRefactorOrExtractionCriterion(title string) bool {
+	titleLower := strings.ToLower(title)
+	if !strings.Contains(titleLower, "refactor") && !strings.Contains(titleLower, "extraction") && !strings.Contains(titleLower, "extract ") {
+		return false
+	}
+	if strings.Contains(titleLower, "documentation") ||
+		strings.Contains(titleLower, "knowledge base") ||
+		strings.Contains(titleLower, "boundary & error") ||
+		strings.Contains(titleLower, "functional acceptance") {
+		return false
+	}
+	return true
+}
+
 // ValidateCriteriaRefactorMeasuredDeltas verifies that refactor or extraction criteria assert measured deltas.
 func ValidateCriteriaRefactorMeasuredDeltas(obj map[string]any) *ValidationError {
 	title, _ := obj[objects.FieldKeyTitle].(string)
-	titleLower := strings.ToLower(title)
-	if !strings.Contains(titleLower, "refactor") && !strings.Contains(titleLower, "extraction") {
+	if !IsRefactorOrExtractionCriterion(title) {
 		return nil
 	}
 	vals := stringSliceField(obj[objects.FieldKeyCompletenessValidation])

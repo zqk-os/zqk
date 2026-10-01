@@ -516,8 +516,8 @@ func NewDashboardCmd() *cobra.Command {
 			state := NewDashboardState()
 			projectRoot := proc.ProjectRoot()
 
-			// Fast-path: load materialized lite-file unless refresh or specific filters requested
-			useLite := !refresh && !showAll && statusFilter == "" && tcFilter == ""
+			// Fast-path: load materialized lite-file unless refresh, check-dod, or specific filters requested
+			useLite := !refresh && !checkDoD && !showAll && statusFilter == "" && tcFilter == ""
 			loaded := false
 			if useLite {
 				eng := state.EnsureEngine(projectRoot)

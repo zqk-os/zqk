@@ -141,7 +141,7 @@ func executeAutoFixIssuesCore(ctx *cli.Context, cmd *cobra.Command, obj *parser.
 					String("issue_category", issue.Category).
 					String("issue_message", issue.Message).
 					Log()
-			} else if issue.AutoFixable || issue.FixCommand != emptyValue {
+			} else if issue.AutoFixable {
 				logging.Fluent(fixCtx.Logger).Warn("Auto-fix returned empty message (fix may have failed)").
 					String("object_id", obj.ID).
 					String("issue_category", issue.Category).

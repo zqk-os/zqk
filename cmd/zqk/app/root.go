@@ -597,6 +597,9 @@ func Execute() {
 		if isExpectedObjectNotFound(err) {
 			// Get miss, feed-id infer-kind, or recycle MCP auth gap — fail-closed, not a crash.
 			logging.Fluent(stderrLogger).Warn("Expected client miss").WithError(err).Log()
+		} else if isNonBlockingWarningError(err) {
+			// Non-blocking warnings (exit code 3): clean completion with advisory findings, not a crash or command failure.
+			logging.Fluent(logger).Info("Command completed with non-blocking warnings").WithError(err).Log()
 		} else if isInformationalCommandError(err) {
 			// Informational client/routing/syntax errors: newspaper headline, not an unrecoverable system crash.
 			infoStderr := logging.NewLogger(os.Stderr, logging.InfoLevel, logging.NewTextFormatter(context.Background()))
@@ -610,6 +613,14 @@ func Execute() {
 		}
 		os.Exit(exitCode)
 	}
+}
+
+func isNonBlockingWarningError(err error) bool {
+	if err == nil {
+		return false
+	}
+	var exitCoder interface{ ExitCode() int }
+	return errors.As(err, &exitCoder) && exitCoder.ExitCode() == 3
 }
 
 func isExpectedObjectNotFound(err error) bool {
