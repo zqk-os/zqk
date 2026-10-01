@@ -68,18 +68,6 @@ Each evaluation dimension is governed by an authoritative rubric and paired with
 
 ---
 
-### 3. Historical Audit Reports & Verification Evidence
-
-Completed multi-dimensional evaluation runs and verified evidence reports are maintained in [`docs/eval/`](../../eval/README.md):
-- **[Maintainability Audit Report (MNT)](../../eval/MNT-code-quality-maintainability.md)**: Package consolidation, DRY compliance, and technical debt analysis.
-- **[Observability Audit Report (OBS)](../../eval/OBS-observability-diagnostics.md)**: Structured logging, change journals, and Prometheus metric telemetry.
-- **[Package Boundaries Audit Report (RDB)](../../eval/RDB-architecture-package-boundaries.md)**: Layering purity, cyclic graph checks, and module decoupling.
-- **[Reliability & Crash Recovery Report (REL)](../../eval/REL-reliability-error-recovery.md)**: WAL compaction, CAS assertions, and lock safety invariants.
-- **[Security Threat Vectors Report (SEC)](../../eval/SEC-security-threat-vectors.md)**: Cryptographic integrity, CAS isolation, and privilege escalation guards.
-- **[Test Strategy Invariant Proofs (TST)](../../eval/TST-test-strategy-invariant-proofs.md)**: Test-to-criteria lineage, race condition elimination, and DoD compliance.
-
----
-
 ## Relationship to other quality artifacts (this repo)
 
 If present in a host project, these are **optional sensors**, not CEF itself:

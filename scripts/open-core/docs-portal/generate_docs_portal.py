@@ -144,24 +144,7 @@ CEF_LENS_NAMES = {
 def get_cef_doc_title(rel_path: str, fallback_title: str) -> str:
     path = rel_path.replace("\\", "/")
     base = os.path.basename(path)
-    if path.startswith("docs/eval/"):
-        if base == "README.md":
-            return "Architecture & Codebase Evaluations Index"
-        elif base.startswith("MNT"):
-            return "Maintainability Audit Report (MNT)"
-        elif base.startswith("OBS"):
-            return "Observability & Diagnostics Audit Report (OBS)"
-        elif base.startswith("RDB"):
-            return "Package Boundaries & Architecture Audit Report (RDB)"
-        elif base.startswith("REL"):
-            return "Reliability & Error Recovery Audit Report (REL)"
-        elif base.startswith("SEC"):
-            return "Security Threat Vectors & Hardening Audit Report (SEC)"
-        elif base.startswith("TST"):
-            return "Test Strategy & Invariant Proofs Audit Report (TST)"
-        elif base.startswith("SYNTHESIS"):
-            return "Diamond Scale Multi-Dimensional Quality Convergence Synthesis"
-    elif "docs/quality/codebase_evaluation/" in path:
+    if "docs/quality/codebase_evaluation/" in path:
         parts = path.split("/")
         if "/rubrics/" in path:
             lens = os.path.splitext(base)[0]
@@ -199,25 +182,7 @@ def get_cef_doc_title(rel_path: str, fallback_title: str) -> str:
 def get_clean_nav_title(title: str, rel_path: str = "") -> str:
     """Returns a concise, scannable title for sidebar navigation."""
     path = rel_path.replace("\\", "/")
-    if path.startswith("docs/eval/"):
-        base = os.path.basename(path)
-        if base == "README.md":
-            return "Evaluations Index"
-        elif base.startswith("MNT"):
-            return "MNT — Maintainability"
-        elif base.startswith("OBS"):
-            return "OBS — Observability"
-        elif base.startswith("RDB"):
-            return "RDB — Package Boundaries"
-        elif base.startswith("REL"):
-            return "REL — Reliability"
-        elif base.startswith("SEC"):
-            return "SEC — Security Threat Vectors"
-        elif base.startswith("TST"):
-            return "TST — Test Strategy"
-        elif base.startswith("SYNTHESIS"):
-            return "SYNTHESIS — Diamond Convergence"
-    elif "docs/quality/codebase_evaluation/" in path:
+    if "docs/quality/codebase_evaluation/" in path:
         parts = path.split("/")
         base = os.path.basename(path)
         if "/rubrics/" in path:
@@ -846,7 +811,7 @@ def build_portal(repo_root: str, target_dir: str):
             title = "Curriculum as Data: Onboarding Roadmap"
         elif rel_path == "scripts/scheduler_jobs/README.md":
             title = "Scheduler Job Templates"
-        elif rel_path.startswith("docs/quality/codebase_evaluation/") or rel_path.startswith("docs/eval/"):
+        elif rel_path.startswith("docs/quality/codebase_evaluation/"):
             title = get_cef_doc_title(rel_path, title)
         elif not title:
             fm_name_match = re.search(r'^name:\s*(.+)$', content, re.MULTILINE)
@@ -1219,7 +1184,6 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
             "Codebase Evaluation — Evaluation Rubrics": "Standardized, cited quality rubrics defining observable failure modes and criteria across 12 engineering dimensions.",
             "Codebase Evaluation — Specialist Prompts": "Lens-specialized investigation prompts for deep, evidence-backed codebase analysis.",
             "Codebase Evaluation — Adversarial Prompts": "Falsifiable adversarial auditor prompts designed to challenge, stress-test, and verify specialist findings.",
-            "Codebase Evaluation — Audit Reports": "Authoritative multi-dimensional evaluation audit findings, security threat models, and convergence syntheses.",
         }
         card_desc = cat_desc_map.get(cat_name, f"Authoritative open-core specifications and guides for {html.escape(cat_name.lower())}.")
         cat_cards_html += f"""
@@ -1384,10 +1348,10 @@ Official documentation portal for [ZQK Core](https://github.com/zqk-os/zqk), dep
           <p>Multi-agent evaluation framework (CEF), Diamond Scale, and 52 lens rubrics.</p>
           <ul>
             <li><a href="docs/quality/README.html">Quality & Verification Gates (DoD/VDS)</a></li>
-            <li><a href="docs/eval/README.html">Multi-Axis Benchmark Synthesis</a></li>
             <li><a href="docs/quality/codebase_evaluation/README.html">CEF Multi-Agent Evaluation Framework</a></li>
             <li><a href="docs/quality/codebase_evaluation/CONSTITUTION.html">CEF Evaluation Constitution</a></li>
             <li><a href="docs/quality/codebase_evaluation/DIAMOND_SCALE.html">Diamond Scale Multi-Axis Quality</a></li>
+            <li><a href="docs/quality/codebase_evaluation/LENSES.html">52 Evaluation Dimensions & Lenses</a></li>
           </ul>
         </div>
         <div class="quad-box">
