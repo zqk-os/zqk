@@ -3,7 +3,7 @@ package cli
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/zqk-os/zqk/internal/cli/context"
+	"github.com/zqk-os/zqk/pkg/cliapp/context"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/paths"
 )

@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 
 	"github.com/spf13/cobra"
 

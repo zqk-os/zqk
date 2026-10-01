@@ -16,7 +16,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	clctx "github.com/zqk-os/zqk/internal/cli/context"
+	clctx "github.com/zqk-os/zqk/pkg/cliapp/context"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"

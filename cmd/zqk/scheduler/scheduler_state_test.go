@@ -3,7 +3,7 @@ package scheduler
 import (
 	"testing"
 
-	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 )
 
 func TestSchedulerStateCommandRegistered(t *testing.T) {

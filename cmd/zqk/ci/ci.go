@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/cobra"
 
 	testcmd "github.com/zqk-os/zqk/cmd/zqk/test"
-	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	bldr "github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"

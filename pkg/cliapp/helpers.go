@@ -15,8 +15,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"github.com/zqk-os/zqk/internal/cli/errorsuggest"
-	"github.com/zqk-os/zqk/internal/cli/flagutil"
+	"github.com/zqk-os/zqk/pkg/cliapp/errorsuggest"
+	"github.com/zqk-os/zqk/pkg/cliapp/flagutil"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
