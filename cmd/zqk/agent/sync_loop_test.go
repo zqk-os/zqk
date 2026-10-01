@@ -10,9 +10,11 @@ import (
 	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 
+	"github.com/zqk-os/zqk/pkg/audit"
 	"github.com/zqk-os/zqk/pkg/brand"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/mutation"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
@@ -77,7 +79,8 @@ func copyDir(t *testing.T, src, dst string) {
 	}
 }
 
-func TestSyncLoop_MaxVerificationAttempts(t *testing.T) {
+func setupSyncLoopTestProject(t *testing.T) (string, storage.ObjectStorageProvider) {
+	t.Helper()
 	brand.SetExecutableName("zqk")
 	storage.SetGraphConnectionProvider(nil)
 
@@ -89,7 +92,6 @@ func TestSyncLoop_MaxVerificationAttempts(t *testing.T) {
 	})
 
 	cwd, _ := fileutil.Getwd()
-	// Relative path to repository root from cmd/zqk/agent/
 	repoRoot := filepath.Join(cwd, "..", "..", "..")
 	project := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{
 		Kind:            "agent_sync_loop",
@@ -129,9 +131,6 @@ func TestSyncLoop_MaxVerificationAttempts(t *testing.T) {
 					}
 					copyDir(t, srcConfigs, dstConfigs)
 
-					// Same gap as the orchestrate seed: without lifecycles here, every Create
-					// fails with "failed to read lifecycle file ... persona_lifecycle.yaml".
-					// Argument order is (testRoot, projectRoot) — destination first.
 					if err := testenvroot.CopyLifecyclesFromProject(root, repoRoot); err != nil {
 						return err
 					}
@@ -162,16 +161,6 @@ func TestSyncLoop_MaxVerificationAttempts(t *testing.T) {
 	}
 	testkit.RegisterStorageTestCleanup(t, root, store)
 
-	// Resolve the built CLI binary under repository module root and set it to ZQK_BIN
-	if wd, err := fileutil.Getwd(); err == nil {
-		if modRoot, err := paths.ModuleRootFromPath(wd); err == nil {
-			candidate := filepath.Join(modRoot, "bin", "zqk")
-			if info, err := fileutil.Stat(candidate); err == nil && !info.IsDir() {
-				t.Setenv(zqkenv.Bin().Name(), candidate)
-			}
-		}
-	}
-
 	// Create an agent_skill to satisfy CRIT-PERSONA-SKILL-BOUND
 	skillCtx := storage.WithSyncCreateForKind(context.Background(), objects.KindAgentSkill)
 	skillCtx = storage.WithSkipWriteBehind(skillCtx)
@@ -199,6 +188,22 @@ func TestSyncLoop_MaxVerificationAttempts(t *testing.T) {
 		objects.FieldKeyAgentSkillRefs: []any{skillID},
 	}
 	storage.CreateCASVisible(t, store, personaCtx, pkgctx.NewSystemSecurityContext(), persona, objects.ObjectStatusImplemented)
+
+	return root, store
+}
+
+func TestSyncLoop_MaxVerificationAttempts(t *testing.T) {
+	root, store := setupSyncLoopTestProject(t)
+
+	// Resolve the built CLI binary under repository module root and set it to ZQK_BIN
+	if wd, err := fileutil.Getwd(); err == nil {
+		if modRoot, err := paths.ModuleRootFromPath(wd); err == nil {
+			candidate := filepath.Join(modRoot, "bin", "zqk")
+			if info, err := fileutil.Stat(candidate); err == nil && !info.IsDir() {
+				t.Setenv(zqkenv.Bin().Name(), candidate)
+			}
+		}
+	}
 
 	// Create a task that already has 3 verification attempts on its step
 	ctx := storage.WithSyncCreateForKind(context.Background(), objects.KindAgentTask)
@@ -282,3 +287,31 @@ func TestSyncLoop_MaxVerificationAttempts(t *testing.T) {
 		t.Errorf("Expected feedback to mention limit, got '%s'", feedback)
 	}
 }
+
+func TestApplyStateMutation_ErrorPropagation(t *testing.T) {
+	root, store := setupSyncLoopTestProject(t)
+
+	ctx := storage.WithSkipWriteBehind(context.Background())
+	secCtx := pkgctx.NewSystemSecurityContext()
+	taskID := "ATK-err-propagation-test"
+	task := map[string]any{
+		objects.FieldKeyID:                 taskID,
+		objects.FieldKeyKind:               objects.KindAgentTask,
+		objects.FieldKeyTitle:              "Error Propagation Test Task",
+		objects.FieldKeySchemaVersion:      "2.0.0",
+		objects.FieldKeyStatus:             objects.ObjectStatusInProgress,
+		objects.FieldKeyAssigneePersonaRef: objects.ConstPersonaOrchestratorAlpha,
+		objects.FieldKeyEstimatedEffort:    "1h",
+	}
+	storage.CreateCASVisible(t, store, ctx, secCtx, task, objects.ObjectStatusInProgress)
+
+	validator := mutation.NewValidator(nil)
+	auditStream := audit.NewAuditStream(root)
+
+	// An update to a non-existent object or failed transaction must fail closed and propagate an explicit error
+	err := applyStateMutation(ctx, secCtx, store, "ATK-nonexistent-missing-id", objects.KindAgentTask, validator, auditStream, objects.ObjectStatusInProgress)
+	if err == nil {
+		t.Fatal("expected error from applyStateMutation with non-existent object, got nil")
+	}
+}
+
