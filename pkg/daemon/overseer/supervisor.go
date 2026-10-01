@@ -231,7 +231,7 @@ func (s *Supervisor) launchDaemonLocked(ctx context.Context, spec *DaemonSpec, s
 		selfExe = filepath.Join(s.projectRoot, "bin", brand.ExecutableName())
 	}
 
-	if brand.IsProductExecutable(exe) || exe == "zqk" || exe == "zqk-stable" {
+	if brand.IsProductExecutable(exe) {
 		exe = selfExe
 	} else if !filepath.IsAbs(exe) {
 		binCandidate := filepath.Join(s.projectRoot, "bin", exe)
