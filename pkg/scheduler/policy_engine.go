@@ -114,6 +114,14 @@ func (pe *PolicyEngine) Reload() error {
 
 // Evaluate returns the policy decision for a given jobID.
 func (pe *PolicyEngine) Evaluate(jobID string, job *ScheduledJob) (*ExecutionDecision, error) {
+	return pe.EvaluateWithContext(context.Background(), jobID, job)
+}
+
+// EvaluateWithContext returns the policy decision for a given jobID using the supplied context.
+func (pe *PolicyEngine) EvaluateWithContext(ctx context.Context, jobID string, job *ScheduledJob) (*ExecutionDecision, error) {
+	if ctx == nil {
+		ctx = context.Background()
+	}
 	if pe == nil || pe.stateRegistry == nil {
 		return nil, errfmt.Errorf("policy engine requires JobStateRegistry")
 	}
@@ -127,7 +135,7 @@ func (pe *PolicyEngine) Evaluate(jobID string, job *ScheduledJob) (*ExecutionDec
 		if pe.qaGate == nil {
 			return &ExecutionDecision{Action: decisionSkip, Reason: "QA Gate Fail: QA Gate is not configured"}, nil
 		}
-		if err := pe.qaGate.VerifyComplete(context.TODO(), jobID); err != nil {
+		if err := pe.qaGate.VerifyComplete(ctx, jobID); err != nil {
 			return &ExecutionDecision{Action: decisionSkip, Reason: "QA Gate Fail: " + err.Error()}, nil
 		}
 	}
