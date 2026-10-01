@@ -7,6 +7,6 @@ Available Commands:
   object      Object operations (CRUD, query, and management)
   system      System operations (health, validation, and maintenance)
   utility     Utility operations (version, migration, and helpers)
-  version     Show ZQK version information
+  version     Print version, commit, and build timestamp
 
 Use "zqk [command] --help" for more information about a command.

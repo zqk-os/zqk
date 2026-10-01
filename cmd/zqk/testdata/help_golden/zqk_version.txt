@@ -1,13 +1,12 @@
-Display version information including executable name, build datetime, and git
-commit.
+Print the ZQK version, git commit hash, and build timestamp.
 
-Same behavior as `utility version`; provided at the top level for
-discoverability and scripting.
+Supports plain text, JSON, and YAML output formats for scripted automation and
+release verification.
 
-  Show version (top-level)
+  Print standard version string
   zqk version
-  Same output via utility group
-  zqk utility version
+  Print structured JSON version information
+  zqk version --format json
 
 Usage:
   zqk version

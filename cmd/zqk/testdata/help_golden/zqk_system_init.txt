@@ -11,6 +11,46 @@ for a new ZQK project. It sets up:
   - .zqk/process/ directory structure for object storage
   - Initial configuration files
 
+Flags:
+    --advanced
+      Initialize with an advanced, ontology-aware interface (Semantic Bridge
+      Phase 1)
+    --answer-file <string>
+      Declarative kernel seed answer file (.yaml or .json) for non-interactive
+      swarm spawn
+    --discover
+      Run the interactive Project Discovery Wizard to capture strategic context,
+      stakeholders, and important dates. If --legacy is provided, it will
+      instead scan and report existing objects.
+    --force
+      Overwrite existing files
+    --from-snapshot <string>
+      Initialize from snapshot file (.csnap or .json)
+    --ignore-scheduler-down
+      Ignore scheduler down warning/lockdown
+    --import-ontology <string>
+      Import an external ontology during initialization (requires --advanced)
+    --legacy
+      Legacy project mode (preserve existing files)
+    --merge
+      Merge snapshot data with existing (snapshot mode only)
+    --project-name <string>
+      Project name (defaults to directory name)
+    --simple
+      Initialize with a simple, guided interface (Semantic Bridge Phase 1)
+    --template <string> (default: standard)
+      Template to use (standard, minimal)
+    --wipe
+      Wipe existing data before restoring snapshot (requires --force)
+    --with-maintenance-jobs
+      After init, ensure retention and audit-aggregation scheduler jobs exist
+      (same as running 'zqk system ensure-retention-jobs'). Puts the project in
+      optimal maintenance configuration.
+    --with-onboarding-roadmap
+      After init, create the onboarding roadmap seed scheduler job. Start the
+      scheduler to run it once and create the priority plan, workstream, and
+      backlog items.
+
   Greenfield: Initialize in current directory
   zqk system init
   Declarative Seed: Initialize with answer file
@@ -34,15 +74,22 @@ Usage:
 Flags:
       --advanced                  Initialize with an advanced, ontology-aware interface (Semantic Bridge Phase 1)
       --answer-file string        Declarative kernel seed answer file (.yaml or .json) for non-interactive swarm spawn
+      --columns string            Override column widths for table output (format: field:width)
       --discover                  Run the interactive Project Discovery Wizard to capture strategic context, stakeholders, and important dates. If --legacy is provided, it will instead scan and report existing objects.
       --force                     Overwrite existing files
+  -f, --format string             Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
       --from-snapshot string      Initialize from snapshot file (.csnap or .json)
+      --ignore-scheduler-down     Ignore scheduler down warning/lockdown
       --import-ontology string    Import an external ontology during initialization (requires --advanced)
       --legacy                    Legacy project mode (preserve existing files)
       --merge                     Merge snapshot data with existing (snapshot mode only)
+  -o, --output string             Write output to file
       --project-name string       Project name (defaults to directory name)
+  -q, --quiet                     Suppress non-essential output
       --simple                    Initialize with a simple, guided interface (Semantic Bridge Phase 1)
       --template string           Template to use (standard, minimal) (default "standard")
+      --timeout duration          Timeout for command execution (0 = auto-calculate)
+  -v, --verbose                   Verbose output
       --wipe                      Wipe existing data before restoring snapshot (requires --force)
       --with-maintenance-jobs     After init, ensure retention and audit-aggregation scheduler jobs exist (same as running 'zqk system ensure-retention-jobs'). Puts the project in optimal maintenance configuration.
       --with-onboarding-roadmap   After init, create the onboarding roadmap seed scheduler job. Start the scheduler to run it once and create the priority plan, workstream, and backlog items.
