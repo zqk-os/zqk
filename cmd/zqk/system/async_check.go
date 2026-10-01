@@ -20,7 +20,6 @@ import (
 
 	"github.com/zqk-os/zqk/internal/cli"
 	"github.com/zqk-os/zqk/pkg/appledouble"
-	"github.com/zqk-os/zqk/pkg/concurrency"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
@@ -67,61 +66,9 @@ func getActiveGoroutines() int64 {
 	return validation.GetActiveGoroutines()
 }
 
-// GetAsyncValidator creates a new async validator instance for the given command context
-// Each command gets its own validator instance with a properly derived context hierarchy
-// ctx: parent context from command entry point - will be derived hierarchically (context.WithCancel)
-func GetAsyncValidator(ctx stdcontext.Context, projectRoot string, workerCount int) *validation.AsyncValidator {
-	// Use provided worker count, or calculate optimal default from global concurrency config
-	if workerCount <= 0 {
-		cfg := concurrency.GetGlobalConcurrencyConfig()
-		workerCount = cfg.ValidatorMaxWorkers
-	}
 
-	// Final safety clamp in case configuration was mis-set
-	if workerCount <= 0 {
-		workerCount = 2
-	}
 
-	// Create new validator instance with context derived from command context
-	// NewAsyncValidator will derive its internal context using context.WithCancel(ctx)
-	// This maintains proper hierarchical context derivation
-	// Note: Semaphore capacity is set at creation time and cannot be dynamically adjusted
-	// Metrics analysis will provide recommendations for next run
-	cfg := validation.DefaultAsyncValidatorConfig()
-	cfg.ProgressChannelSize = 50000
-	// Warm path relies on disk-backed ValidationStateCache across CLI processes.
-	// A 1h TTL made consecutive checks miss almost everything once LastValidated aged out
-	// (observed: cache_hits≈5 / ~5k objects). Mtime/checksum still gate freshness.
-	return validation.NewAsyncValidator(ctx, projectRoot, workerCount, validation.DefaultValidationStateCacheMaxAge, cfg)
-}
 
-// getRecommendedSemaphoreCapacity calculates recommended semaphore capacity based on metrics
-// This helps inform validator creation for future runs
-// Note: Semaphore capacity cannot be changed after validator creation, so this is informational
-func getRecommendedSemaphoreCapacity() int {
-	specLoader := objects.GetGlobalSpecLoader()
-	if specLoader == nil {
-		return 16 // Default: NumCPU * 2
-	}
-
-	metrics := specLoader.GetMetrics()
-	if metrics.TotalWaits == 0 {
-		return 16 // No data yet, use default
-	}
-
-	baseSemaphore := 16 // Current default (NumCPU * 2)
-
-	// Adjust based on contention rate
-	if metrics.ContentionRate > 0.3 {
-		// High contention - increase semaphore significantly
-		return baseSemaphore * 2
-	} else if metrics.ContentionRate > 0.1 {
-		// Moderate contention - slight increase
-		return int(float64(baseSemaphore) * 1.5)
-	}
-
-	return baseSemaphore
-}
 
 // runCheckAsync runs system check with async validation
 func runCheckAsync(cmd *cobra.Command, args []string) error {
@@ -576,39 +523,7 @@ func showValidationProgressWithMetrics(cmd *cobra.Command, ctx *cli.Context, val
 	}
 }
 
-// determineValidationPriority determines validation priority for an object
-func determineValidationPriority(kind, objectID string, validator *validation.AsyncValidator) int {
-	// Check cache for previous violations
-	if state, ok := validator.GetCachedState(objectID); ok {
-		// If object had Tier 1 issues, prioritize it
-		for _, issue := range state.Issues {
-			if issue.Tier == 1 && issue.ResolvedAt == nil {
-				return 1 // Highest priority
-			}
-		}
-		// If object had Tier 2 issues, medium-high priority
-		for _, issue := range state.Issues {
-			if issue.Tier == 2 && issue.ResolvedAt == nil {
-				return 2
-			}
-		}
-	}
 
-	// Default priority based on object kind importance
-	// Critical objects get higher priority
-	criticalKinds := map[string]bool{
-		objects.KindRole:         true,
-		objects.KindAccount:      true,
-		objects.KindPolicy:       true,
-		objects.KindSchedulerJob: true,
-	}
-
-	if criticalKinds[kind] {
-		return 2 // High priority for critical objects
-	}
-
-	return 3 // Default priority
-}
 
 // discoverObjectsParallel discovers objects in parallel across all kinds
 // Returns a channel that streams discovered files as they're found (for concurrent validation)

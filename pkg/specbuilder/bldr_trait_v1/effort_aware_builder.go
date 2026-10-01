@@ -20,7 +20,7 @@ func NewEffortAwareBuilder() *EffortAwareBuilder {
 
 	// Configure the trait
 	builder.
-		SetDescription("Object-level planned-vs-realized cost trait (estimated_effort, actual_effort).\\nComposes completable via includes: listing effort_aware is sufficient; do not\\nalso list completable on the object spec. Actual effort is only lawful against\\nthe work clock.\\nTRACK: BLI-KERNEL-WORK-ENVELOPE-001 / WORK_ENVELOPE_AND_EFFORT_FACETS.md.\\n").
+		SetDescription("Object-level planned-vs-realized cost trait (estimated_effort, actual_effort).\\nComposes completable via includes: listing effort_aware is sufficient; do not\\nalso list completable on the object spec. Actual effort is only lawful against\\nthe work clock.\\n").
 		SetCategory("behavior").
 		SetObjectLevel(true).
 		SetFieldLevel(false).

@@ -20,7 +20,7 @@ func NewCompletableBuilder() *CompletableBuilder {
 
 	// Configure the trait
 	builder.
-		SetDescription("Object-level work-interval trait. Kinds with this trait participate in a work\\nclock (started_at, completed_at). completed_at is done-of-work, not archive-of-record.\\nTRACK: BLI-KERNEL-WORK-ENVELOPE-001 / WORK_ENVELOPE_AND_EFFORT_FACETS.md.\\n").
+		SetDescription("Object-level work-interval trait. Kinds with this trait participate in a work\\nclock (started_at, completed_at). completed_at is done-of-work, not archive-of-record.\\n").
 		SetCategory("behavior").
 		SetObjectLevel(true).
 		SetFieldLevel(false)

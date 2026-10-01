@@ -51,3 +51,18 @@ type ResolutionResult struct {
 	Confidence   float64  `json:"confidence,omitempty"`  // Confidence level (0.0-1.0)
 	AutoLinkable bool     `json:"auto_linkable"`         // Whether it can be auto-linked
 }
+
+// HashMismatchInfo tracks hash mismatch information for batch processing.
+type HashMismatchInfo struct {
+	ObjectID     string `json:"object_id"`
+	Kind         string `json:"kind"`
+	FilePath     string `json:"file_path"`
+	OriginalHash string `json:"original_hash"`
+}
+
+// CheckResultDiff represents a modified check result between snapshot baselines.
+type CheckResultDiff struct {
+	ObjectID string      `json:"object_id"`
+	Baseline CheckResult `json:"baseline"`
+	Expanded CheckResult `json:"expanded"`
+}

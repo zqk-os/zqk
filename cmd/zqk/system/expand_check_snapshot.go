@@ -212,12 +212,6 @@ type CheckDiff struct {
 	Modified      []CheckResultDiff `json:"modified"`
 }
 
-// CheckResultDiff represents a modified check result
-type CheckResultDiff struct {
-	ObjectID string      `json:"object_id"`
-	Baseline CheckResult `json:"baseline"`
-	Expanded CheckResult `json:"expanded"`
-}
 
 // loadCheckResults loads check results from a JSONL file
 func loadCheckResults(filePath string) ([]CheckResult, error) {

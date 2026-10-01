@@ -6,7 +6,6 @@ description: |
   "the proposition holds" (evidence, not duration). Does not compose completable:
   do not stamp started_at / completed_at on the satisfaction hop.
   Category (acceptance, test, compliance, …) is a field, not a trait.
-  TRACK: BLI-KERNEL-WORK-ENVELOPE-001 / WORK_ENVELOPE_AND_EFFORT_FACETS.md.
 category: behavior
 requires: []
 conflicts: []

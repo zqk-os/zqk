@@ -4,7 +4,6 @@ name: completable
 description: |
   Object-level work-interval trait. Kinds with this trait participate in a work
   clock (started_at, completed_at). completed_at is done-of-work, not archive-of-record.
-  TRACK: BLI-KERNEL-WORK-ENVELOPE-001 / WORK_ENVELOPE_AND_EFFORT_FACETS.md.
 category: behavior
 requires: []
 conflicts: []

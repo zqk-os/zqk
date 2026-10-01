@@ -6,7 +6,6 @@ description: |
   Composes completable via includes: listing effort_aware is sufficient; do not
   also list completable on the object spec. Actual effort is only lawful against
   the work clock.
-  TRACK: BLI-KERNEL-WORK-ENVELOPE-001 / WORK_ENVELOPE_AND_EFFORT_FACETS.md.
 category: behavior
 requires:
   - completable
