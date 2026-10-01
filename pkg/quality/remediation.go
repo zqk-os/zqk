@@ -59,7 +59,7 @@ func FindingToRemediationBLI(finding metabolism.Finding, milestoneID string) (*R
 		objects.FieldKeyID:          critInvID,
 		objects.FieldKeyKind:        "criteria",
 		objects.FieldKeyTitle:       fmt.Sprintf("State Invariant for %s", finding.ID),
-		objects.FieldKeyDescription: fmt.Sprintf("Static schema invariants and configuration adhere to %s requirements without regression.", finding.Lens),
+		objects.FieldKeyDescription: fmt.Sprintf("Static schema invariants and configuration adhere to %s requirements without regression, with documentation recorded in doc_entry knowledge base.", finding.Lens),
 		objects.FieldKeyCategory:    "acceptance",
 		objects.FieldKeyStatus:      objects.ObjectStatusActive,
 	}

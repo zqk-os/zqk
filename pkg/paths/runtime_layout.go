@@ -31,14 +31,9 @@ func WorkshopBinDirPath(projectRoot string) string {
 	return ResolvePathFromCacheOrConstant(projectRoot, PathAliasWorkshopBin, fallback)
 }
 
-// StableBinaryName returns the binary name for stable execution.
-// If brand.ExecutableName() is "zcom", it uses "zcom", preserving ps distinctiveness
-// for community edition rather than collapsing to zqk-stable.
+// StableBinaryName returns the binary name for stable execution based on brand settings.
 func StableBinaryName() string {
-	if brand.ExecutableName() == "zcom" {
-		return "zcom"
-	}
-	return brand.ZqkStableName
+	return brand.StableExecutableName()
 }
 
 // StableBinaryPath returns the preferred workshop stable CLI path for projectRoot.

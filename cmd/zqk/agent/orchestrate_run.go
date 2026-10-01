@@ -26,6 +26,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/agentfeed"
 	"github.com/zqk-os/zqk/pkg/agentprompt"
 	"github.com/zqk-os/zqk/pkg/authcred"
+	"github.com/zqk-os/zqk/pkg/brand"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -779,10 +780,10 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 									// Must be absolute: sync-loop Dir is the worktree, so "./bin/zqk" breaks.
 									zqkBin, absErr := filepath.Abs(os.Args[0])
 									if absErr != nil || zqkBin == "" {
-										zqkBin = filepath.Join(state.proc.ProjectRoot(), "bin", "zqk")
+										zqkBin = filepath.Join(state.proc.ProjectRoot(), "bin", brand.ExecutableName())
 									}
 									if _, stErr := fileutil.Stat(zqkBin); stErr != nil {
-										stable := filepath.Join(state.proc.ProjectRoot(), paths.ProjectDataDir, "bin", "zqk-stable")
+										stable := paths.StableBinaryPath(state.proc.ProjectRoot())
 										if _, sErr := fileutil.Stat(stable); sErr == nil {
 											zqkBin = stable
 										}

@@ -21,8 +21,8 @@ parameters:
 integrity:
     algorithm: ed25519
     signer_id: cef-curator@zqkos.com
-    content_digest: sha256:a50a65362b200b56e78cd9d8304d67ab4584875437ddb0008fcec064cdaf1ca3
-    signature: 718bc457abdb72651cbb1bb8832aaac88a2f49bde795cb0480507dd36a47d042fc67d3600a86ad8a2c0f40965dfba3308e978399237843a1eeb3c9f9a7c78b0f
+    content_digest: sha256:4b3c11e0c464ed08e591c7280b4ef8b0c34133b33998f70badbf2b991bbc9c9a
+    signature: b7526add0001dae623217c9ac071065103532d8750bb115cafe82ffb33b80cec08579c369814d4bbd241ca9d3f3e00d7fab7b0301c1a9d9320d1981e78a7da0a
 team_configuration_ref: TCFG-CEF-DIAMOND-EVALUATION
 membranes:
     - path: .zqk/process/

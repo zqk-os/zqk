@@ -78,6 +78,83 @@ func ExecutableName() string {
 	return defaultExecutableName()
 }
 
+// StableExecutableName returns the stable channel binary name based on the current brand executable.
+// Defaults to "zqk-stable", or "zcom" if brand is "zcom", or "<brand>-stable".
+func StableExecutableName() string {
+	exe := ExecutableName()
+	if exe == "zcom" {
+		return "zcom"
+	}
+	if exe == emptyBrandValue || exe == defaultExecutableNameValue {
+		return ZqkStableName
+	}
+	return exe + "-stable"
+}
+
+// StablePrefix returns the prefix used by channel binaries for the brand (e.g. "zqk-stable-" or "<brand>-stable-").
+func StablePrefix() string {
+	exe := ExecutableName()
+	if exe == "zcom" {
+		return "zcom-"
+	}
+	if exe == emptyBrandValue || exe == defaultExecutableNameValue {
+		return ZqkStablePrefix
+	}
+	return exe + "-stable-"
+}
+
+// MCPExecutableName returns the binary name for the MCP standalone server (e.g. "zqk-mcp" or "<brand>-mcp").
+func MCPExecutableName() string {
+	exe := ExecutableName()
+	if exe == emptyBrandValue || exe == defaultExecutableNameValue {
+		return "zqk-mcp"
+	}
+	return exe + "-mcp"
+}
+
+// MCPDaemonExecutableName returns the binary name for the MCP daemon role (e.g. "zqk-mcp-daemon" or "<brand>-mcp-daemon").
+func MCPDaemonExecutableName() string {
+	exe := ExecutableName()
+	if exe == emptyBrandValue || exe == defaultExecutableNameValue {
+		return "zqk-mcp-daemon"
+	}
+	return exe + "-mcp-daemon"
+}
+
+// MCPIdeAdapterExecutableName returns the binary name for the MCP IDE adapter (e.g. "zqk-mcp-ide-adapter" or "<brand>-mcp-ide-adapter").
+func MCPIdeAdapterExecutableName() string {
+	exe := ExecutableName()
+	if exe == emptyBrandValue || exe == defaultExecutableNameValue {
+		return "zqk-mcp-ide-adapter"
+	}
+	return exe + "-mcp-ide-adapter"
+}
+
+// IsProductExecutable returns true if base matches any executable name belonging to the branded ecosystem.
+func IsProductExecutable(name string) bool {
+	base := filepath.Base(name)
+	if len(base) > 4 && strings.EqualFold(base[len(base)-4:], ".exe") {
+		base = base[:len(base)-4]
+	}
+	curExe := ExecutableName()
+	curStable := StableExecutableName()
+	curMCP := MCPExecutableName()
+	curDaemon := MCPDaemonExecutableName()
+	curAdapter := MCPIdeAdapterExecutableName()
+
+	if base == curExe || base == curStable || base == curMCP || base == curDaemon || base == curAdapter {
+		return true
+	}
+	// Always recognize canonical upstream names
+	if base == "zqk" || base == "zqk-stable" || base == "zqk-mcp" || base == "zqk-mcp-daemon" || base == "zqk-mcp-ide-adapter" || base == "zcom" {
+		return true
+	}
+	if strings.HasPrefix(base, curStable+"-") || strings.HasPrefix(base, ZqkStablePrefix) {
+		return true
+	}
+	return false
+}
+
 func SetExecutableName(name string) {
 	if name == emptyBrandValue {
 		return

@@ -536,7 +536,7 @@ func findExecutableBinary() (string, error) {
 	// When we are zqk-mcp (mcp-simple), use the full "zqk" binary for CLI tool execution.
 	// zqk-mcp has no subcommands (system status, object list, etc.)—only the MCP server.
 	// Otherwise we would spawn "zqk-mcp system status" which starts another MCP server, causing extra processes.
-	if execName == "zqk-mcp" {
+	if execName == brand.MCPExecutableName() || execName == "zqk-mcp" {
 		if path := findFullZqkBinary(); path != emptyValue {
 			return path, nil
 		}
@@ -592,7 +592,7 @@ func findExecutableBinary() (string, error) {
 	}
 
 	// Also try common executable names for compatibility
-	commonNames := []string{brand.ZqkStableName, brand.ExecutableName()}
+	commonNames := []string{brand.StableExecutableName(), brand.ExecutableName(), "zqk"}
 	for _, name := range commonNames {
 		if isUnsafeCLIBridgeBinary(name) {
 			continue
@@ -617,7 +617,7 @@ func findExecutableBinary() (string, error) {
 func findFullZqkBinary() string {
 	// Always include the product basename so a poisoned brand.ExecutableName
 	// (historically "mcp.test" under go test) cannot be the only candidate.
-	names := []string{brand.ZqkStableName, brand.ExecutableName(), "zqk"}
+	names := []string{brand.StableExecutableName(), brand.ExecutableName(), "zqk"}
 	seen := map[string]struct{}{}
 	if self, err := fileutil.Executable(); err == nil {
 		dir := filepath.Dir(self)

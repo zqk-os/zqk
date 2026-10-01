@@ -5,12 +5,15 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"syscall"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/process"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 
 	"github.com/mitchellh/go-ps"
@@ -208,6 +211,19 @@ func IsProcessRunning(pid int) bool {
 // isZombieProcess returns true when OS process state includes "Z" (zombie/defunct).
 // Uses a short timeout to keep status/start/stop paths responsive.
 func isZombieProcess(pid int) bool {
+	if runtime.GOOS == "windows" {
+		return false
+	}
+	if runtime.GOOS == "linux" {
+		b, err := os.ReadFile(fmt.Sprintf("/proc/%d/stat", pid))
+		if err == nil {
+			fields := strings.Fields(string(b))
+			if len(fields) > 2 && fields[2] == "Z" {
+				return true
+			}
+		}
+		return false
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond) // Background: request-or-shutdown derived
 	defer cancel()
 	out, err := execwrap.CommandContext(ctx, "ps", "-o", "stat=", "-p", strconv.Itoa(pid)).Output() //nolint:gosec // intentional command
@@ -220,13 +236,7 @@ func isZombieProcess(pid int) bool {
 // isSchedulerDaemonProcess checks if the given PID is running the scheduler start --foreground command.
 // This allows us to definitively separate legitimate daemon process doubles from other transient zqk commands.
 func isSchedulerDaemonProcess(pid int) bool {
-	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond) // Background: request-or-shutdown derived
-	defer cancel()
-	out, err := execwrap.CommandContext(ctx, "ps", "-o", "command=", "-p", strconv.Itoa(pid)).Output() //nolint:gosec
-	if err != nil {
-		return false
-	}
-	cmdLine := string(out)
+	cmdLine := process.ProcessCommandLine(pid)
 	// Only match --foreground to avoid the child process mistaking the parent ('zqk scheduler start')
 	// for an already-running daemon during the detachment phase.
 	return strings.Contains(cmdLine, "scheduler start --foreground")
@@ -234,10 +244,6 @@ func isSchedulerDaemonProcess(pid int) bool {
 
 // orphanScanTimeout limits how long the process-list scan may run so status never hangs.
 const orphanScanTimeout = 2 * time.Second
-
-// schedulerExecutableName is the executable name we look for when scanning for the daemon.
-// go-ps returns the base name (e.g. "zqk"), not the full path.
-const schedulerExecutableName = "zqk"
 
 // findSchedulerProcessesByCommand returns PIDs of running processes whose executable looks like
 // a scheduler binary. When projectRoot is non-empty, only PIDs whose command line embeds that
@@ -274,7 +280,7 @@ func findSchedulerProcessesByCommand(projectRoot string) (map[int]string, error)
 				}
 				exe := p.Executable()
 				base := filepath.Base(exe)
-				if base != schedulerExecutableName && base != "zqk-stable" && base != "zqk-scheduler" {
+				if !brand.IsProductExecutable(base) && base != "zqk-scheduler" {
 					continue
 				}
 				if !IsProcessRunning(pid) {
@@ -305,17 +311,7 @@ func processBelongsToProjectRoot(pid int, rootNorm string) bool {
 	if rootNorm == emptyValue {
 		return false
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), orphanScanTimeout) // Background: request-or-shutdown derived
-	defer cancel()
-	out, err := execwrap.CommandContext(ctx, "ps", "-o", "command=", "-E", "-p", strconv.Itoa(pid)).Output() //nolint:gosec
-	if err != nil {
-		// Fallback without -E (Linux ps may use different flags); try plain command.
-		out, err = execwrap.CommandContext(ctx, "ps", "-o", "command=", "-p", strconv.Itoa(pid)).Output() //nolint:gosec
-		if err != nil {
-			return false
-		}
-	}
-	cmdLine := string(out)
+	cmdLine := process.ProcessCommandLine(pid)
 	if !strings.Contains(cmdLine, "scheduler start --foreground") {
 		return false
 	}

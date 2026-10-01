@@ -3,13 +3,17 @@ package system
 import (
 	"os"
 	"path/filepath"
+	"strings"
 
+	"github.com/mitchellh/go-ps"
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/pkg/brand"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/process"
 	"github.com/zqk-os/zqk/pkg/service"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
@@ -30,7 +34,7 @@ func NewShutdownCmd() *cobra.Command {
 
 			exe, _ := os.Executable()
 			if exe == "" {
-				exe = "zqk"
+				exe = brand.ExecutableName()
 			}
 
 			absRoot, err := filepath.Abs(".")
@@ -53,8 +57,26 @@ func NewShutdownCmd() *cobra.Command {
 				logging.FluentEvent(logger).Info("Scheduler daemon stopped.").Log()
 			}
 
-			logging.FluentEvent(logger).Info("Terminating any stray ZQK background services for this project...").Log()
-			_ = execwrap.Command("pkill", "-f", "zqk.*scheduler start.*"+absRoot).Run()
+			logging.FluentEvent(logger).Info("Terminating any stray background services for this project...").Log()
+			if procs, err := ps.Processes(); err == nil {
+				curPid := os.Getpid()
+				for _, p := range procs {
+					pid := p.Pid()
+					if pid <= 1 || pid == curPid {
+						continue
+					}
+					base := filepath.Base(p.Executable())
+					if !brand.IsProductExecutable(base) {
+						continue
+					}
+					cmdLine := process.ProcessCommandLine(pid)
+					if strings.Contains(cmdLine, "scheduler start") && strings.Contains(cmdLine, absRoot) {
+						if proc, err := os.FindProcess(pid); err == nil {
+							_ = proc.Kill()
+						}
+					}
+				}
+			}
 
 			logging.FluentEvent(logger).Info("System shutdown complete.").Log()
 		},
