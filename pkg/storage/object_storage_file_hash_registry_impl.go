@@ -23,6 +23,9 @@ func hashRegistryCacheKey(kind, dir string) string {
 // not cancelled when the request context is cancelled.
 // ctx: parent context from command entry point (should not be created here)
 func (f *FileObjectStorage) newHashRegistry(ctx context.Context, kind, dir string) *HashRegistry {
+	if StreamStorageEnabledForKind(kind) {
+		return nil
+	}
 	key := hashRegistryCacheKey(kind, dir)
 	hr, err := f.hashRegistryCache.GetOrCreate(ctx, key, func(regCtx context.Context, cacheKey string) (*HashRegistry, error) {
 		parts := strings.SplitN(cacheKey, "\x00", 2)

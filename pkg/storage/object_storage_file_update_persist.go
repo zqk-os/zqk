@@ -308,7 +308,7 @@ func (f *FileObjectStorage) persistFileObjectUpdate(p *fileObjectUpdatePrep) err
 		f.InvalidateCachesForKind(kind)
 
 		// Update hash registry only when CAS object content changed.
-		if !runtimeDeltaOnly {
+		if !runtimeDeltaOnly && !StreamStorageEnabledForKind(kind) {
 			kindDir := f.GetKindDir(kind)
 			if kindDir != emptyValue {
 				hashRegistry := f.newHashRegistry(ctx, kind, kindDir)

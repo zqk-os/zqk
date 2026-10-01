@@ -242,28 +242,28 @@ func (f *FileObjectStorage) writeObjectToCAS(ctx context.Context, id, kind, file
 	// If the hash registry save fails (e.g. transient I/O error), log a warning and
 	// continue — the object IS created. `system check --auto-fix` repairs the missing
 	// hash entry on the next run. Do NOT roll back the create here.
-	hash := CalculateSHA256Hash(data)
-	kindDir := f.GetKindDir(kind)
-	if kindDir != "" {
-		hashRegistry := f.newHashRegistry(ctx, kind, kindDir)
-		// Load existing registry (ignore error if file doesn't exist yet)
-		if err := hashRegistry.Load(); err != nil && !IsExpectedMissingErr(err) {
-			logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
+	if !StreamStorageEnabledForKind(kind) {
+		hash := CalculateSHA256Hash(data)
+		kindDir := f.GetKindDir(kind)
+		if kindDir != "" {
+			hashRegistry := f.newHashRegistry(ctx, kind, kindDir)
+			// Load existing registry (ignore error if file doesn't exist yet)
+			if err := hashRegistry.Load(); err != nil && !IsExpectedMissingErr(err) {
+				logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
+					Error(ErrMsgSwallowedError, err).Log()
+			}
 
-				// Hash registry key: use path base (for CAS, prepareObjectPath may still pass a placeholder path; registry keys by object ID for integrity lookup).
-				Error(ErrMsgSwallowedError, err).Log()
-		}
-
-		filename := filepath.Base(filePath)
-		hashRegistry.SetHash(filename, hash)
-		if err := f.saveHashRegistryWithRetry(hashRegistry, id, filename, hash); err != nil {
-			logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-			StorageLog(logger).Warn(LogEventStorageObjectCreateHashRegistrySaveRetryExceeded).
-				WithError(err).
-				Kind(kind).
-				ObjectID(id).
-				Log()
-			// Do not return error: CAS create succeeded; hash entry will be repaired by system check.
+			filename := filepath.Base(filePath)
+			hashRegistry.SetHash(filename, hash)
+			if err := f.saveHashRegistryWithRetry(hashRegistry, id, filename, hash); err != nil {
+				logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+				StorageLog(logger).Warn(LogEventStorageObjectCreateHashRegistrySaveRetryExceeded).
+					WithError(err).
+					Kind(kind).
+					ObjectID(id).
+					Log()
+				// Do not return error: CAS create succeeded; hash entry will be repaired by system check.
+			}
 		}
 	}
 

@@ -65,6 +65,9 @@ func (f *FileObjectStorage) calculateHash(content []byte) string {
 //
 //nolint:unparam // expectedHash kept for API consistency and potential future verification
 func (f *FileObjectStorage) saveHashRegistryWithRetry(registry *HashRegistry, _, _, _ string) error {
+	if registry == nil || StreamStorageEnabledForKind(registry.kind) {
+		return nil
+	}
 	const maxAttempts = 3
 	const initialDelay = 50 * time.Millisecond
 	const maxDelay = 500 * time.Millisecond
