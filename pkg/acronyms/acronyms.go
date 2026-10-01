@@ -23,14 +23,102 @@ var rawAcronymsYAML []byte
 // KernelAcronymsSchemeID is the canonical ID of the acronym vocabulary scheme.
 const KernelAcronymsSchemeID = "VOC-KERNEL-ACRONYMS"
 
-// Acronym represents a documented kernel acronym with progressive disclosure details.
+// Acronym represents a lightweight projection of a glossary_term object
+// belonging to the "VOC-KERNEL-ACRONYMS" vocabulary scheme.
 type Acronym struct {
 	Code        string   `json:"code" yaml:"code"`
 	FullName    string   `json:"full_name" yaml:"full_name"`
+	SchemeRef   string   `json:"scheme_ref,omitempty" yaml:"scheme_ref,omitempty"`
 	Category    string   `json:"category" yaml:"category"`
 	Definition  string   `json:"definition" yaml:"definition"`
 	Context     string   `json:"context" yaml:"context"`
 	RelatedRefs []string `json:"related_refs,omitempty" yaml:"related_refs,omitempty"`
+}
+
+// ToGlossaryTerm converts an Acronym projection into a full spec-compliant glossary_term object map.
+func (a Acronym) ToGlossaryTerm() map[string]any {
+	scheme := a.SchemeRef
+	if scheme == "" {
+		scheme = KernelAcronymsSchemeID
+	}
+	hints, _ := json.Marshal(map[string]any{
+		"acronym":      a.Code,
+		"scheme_ref":   scheme,
+		"full_name":    a.FullName,
+		"related_refs": a.RelatedRefs,
+	})
+	now := time.Now().UTC().Format(time.RFC3339)
+	return map[string]any{
+		objects.FieldKeyID:            fmt.Sprintf("GLS-ACRONYM-%s", a.Code),
+		objects.FieldKeyKind:          "glossary_term",
+		objects.FieldKeyTitle:         fmt.Sprintf("%s (%s)", a.Code, a.FullName),
+		objects.FieldKeyStatus:        "active",
+		objects.FieldKeySchemeRef:     scheme,
+		"category":                    a.Category,
+		"context_scope":               "operational",
+		"definition":                  a.Definition,
+		"agent_prompts":               fmt.Sprintf("Expanded meaning: %s. Use for progressive disclosure.", a.FullName),
+		"machine_hints":               string(hints),
+		objects.FieldKeyNamespaceID:   "zqk:kernel",
+		objects.FieldKeySchemaVersion: "2.0.0",
+		objects.FieldKeySourceType:    "internal",
+		objects.FieldKeyCreatedAt:     now,
+		objects.FieldKeyUpdatedAt:     now,
+	}
+}
+
+// FromGlossaryTerm creates an Acronym projection from a glossary_term object map.
+func FromGlossaryTerm(obj map[string]any) (Acronym, bool) {
+	if obj == nil || obj[objects.FieldKeyKind] != "glossary_term" {
+		return Acronym{}, false
+	}
+	scheme, _ := obj[objects.FieldKeySchemeRef].(string)
+	cat, _ := obj["category"].(string)
+	if scheme != KernelAcronymsSchemeID && cat != "acronym" {
+		return Acronym{}, false
+	}
+	id, _ := obj[objects.FieldKeyID].(string)
+	code, _ := obj["acronym"].(string)
+	if code == "" {
+		code = strings.TrimPrefix(id, "GLS-ACRONYM-")
+	}
+	fullName, _ := obj["full_name"].(string)
+	if fullName == "" {
+		fullName, _ = obj[objects.FieldKeyTitle].(string)
+	}
+	def, _ := obj["definition"].(string)
+	ctxScope, _ := obj["context_scope"].(string)
+	var relatedRefs []string
+	if hintsStr, ok := obj["machine_hints"].(string); ok && hintsStr != "" {
+		var hints map[string]any
+		if err := json.Unmarshal([]byte(hintsStr), &hints); err == nil {
+			if refs, ok := hints["related_refs"].([]any); ok {
+				for _, r := range refs {
+					if s, ok := r.(string); ok {
+						relatedRefs = append(relatedRefs, s)
+					}
+				}
+			}
+			if fn, ok := hints["full_name"].(string); ok && fn != "" {
+				fullName = fn
+			}
+			if c, ok := hints["acronym"].(string); ok && c != "" {
+				code = c
+			}
+		}
+	}
+	if code == "" {
+		return Acronym{}, false
+	}
+	return Acronym{
+		Code:        strings.ToUpper(strings.TrimSpace(code)),
+		FullName:    fullName,
+		SchemeRef:   scheme,
+		Category:    cat,
+		Definition:  def,
+		Context:     ctxScope,
+		RelatedRefs: relatedRefs,
+	}, true
 }
 
 type acronymsPayload struct {
@@ -49,6 +137,9 @@ func init() {
 	if err := yaml.Unmarshal(rawAcronymsYAML, &payload); err == nil {
 		for _, a := range payload.Acronyms {
 			code := strings.ToUpper(strings.TrimSpace(a.Code))
+			if a.SchemeRef == "" {
+				a.SchemeRef = KernelAcronymsSchemeID
+			}
 			registry[code] = a
 		}
 	}
@@ -75,51 +166,9 @@ func LoadFromKernel(ctx context.Context, secCtx *pkgctx.SecurityContext, store s
 	defer registryMu.Unlock()
 
 	for _, obj := range res.Objects {
-		cat, _ := obj["category"].(string)
-		if cat != "acronym" {
+		entry, ok := FromGlossaryTerm(obj)
+		if !ok {
 			continue
-		}
-		code, _ := obj["acronym"].(string)
-		if code == "" {
-			// Extract from title "CODE (Full Name)" or ID "GLS-ACRONYM-CODE"
-			id, _ := obj[objects.FieldKeyID].(string)
-			code = strings.TrimPrefix(id, "GLS-ACRONYM-")
-		}
-		if code == "" {
-			continue
-		}
-		fullName, _ := obj["full_name"].(string)
-		if fullName == "" {
-			fullName, _ = obj[objects.FieldKeyTitle].(string)
-		}
-		cat, _ = obj["category"].(string)
-		def, _ := obj["definition"].(string)
-		ctxScope, _ := obj["context_scope"].(string)
-
-		var relatedRefs []string
-		if hintsStr, ok := obj["machine_hints"].(string); ok && hintsStr != "" {
-			var hints map[string]any
-			if err := json.Unmarshal([]byte(hintsStr), &hints); err == nil {
-				if refs, ok := hints["related_refs"].([]any); ok {
-					for _, r := range refs {
-						if s, ok := r.(string); ok {
-							relatedRefs = append(relatedRefs, s)
-						}
-					}
-				}
-				if fn, ok := hints["full_name"].(string); ok && fn != "" {
-					fullName = fn
-				}
-			}
-		}
-
-		entry := Acronym{
-			Code:        strings.ToUpper(strings.TrimSpace(code)),
-			FullName:    fullName,
-			Category:    cat,
-			Definition:  def,
-			Context:     ctxScope,
-			RelatedRefs: relatedRefs,
 		}
 		registry[entry.Code] = entry
 	}
@@ -227,30 +276,8 @@ func SyncToKernel(ctx context.Context, secCtx *pkgctx.SecurityContext, store sto
 
 	synced := 0
 	for _, item := range ListAll() {
-		glossaryID := fmt.Sprintf("GLS-ACRONYM-%s", item.Code)
-		hints, _ := json.Marshal(map[string]any{
-			"acronym":      item.Code,
-			"scheme_ref":   KernelAcronymsSchemeID,
-			"full_name":    item.FullName,
-			"related_refs": item.RelatedRefs,
-		})
-
-		objMap := map[string]any{
-			objects.FieldKeyID:            glossaryID,
-			objects.FieldKeyKind:          "glossary_term",
-			objects.FieldKeyTitle:         fmt.Sprintf("%s (%s)", item.Code, item.FullName),
-			objects.FieldKeyStatus:        "active",
-			"category":                    "acronym",
-			"context_scope":               "operational",
-			"definition":                  item.Definition,
-			"agent_prompts":               fmt.Sprintf("Expanded meaning: %s. Use for progressive disclosure.", item.FullName),
-			"machine_hints":               string(hints),
-			objects.FieldKeyNamespaceID:   "zqk:kernel",
-			objects.FieldKeySchemaVersion: "2.0.0",
-			objects.FieldKeySourceType:    "internal",
-			objects.FieldKeyCreatedAt:     time.Now().UTC().Format(time.RFC3339),
-			objects.FieldKeyUpdatedAt:     time.Now().UTC().Format(time.RFC3339),
-		}
+		objMap := item.ToGlossaryTerm()
+		glossaryID := objMap[objects.FieldKeyID].(string)
 
 		if err := store.Create(ctx, secCtx, objMap); err != nil {
 			delete(objMap, objects.FieldKeyCreatedAt)

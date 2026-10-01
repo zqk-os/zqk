@@ -84,3 +84,30 @@ func TestNegativeBoundary_UnknownAndFuzzySuggestions(t *testing.T) {
 		t.Errorf("expected 'BLI' in suggestions for 'BL', got: %v", suggestions)
 	}
 }
+
+// TestGlossaryTermProjection_RoundTrip verifies that Acronym functions as a spec-compliant projection of glossary_term.
+func TestGlossaryTermProjection_RoundTrip(t *testing.T) {
+	bli, found := Lookup("BLI")
+	if !found {
+		t.Fatal("BLI not found")
+	}
+	if bli.SchemeRef != KernelAcronymsSchemeID {
+		t.Errorf("expected SchemeRef %q, got %q", KernelAcronymsSchemeID, bli.SchemeRef)
+	}
+
+	obj := bli.ToGlossaryTerm()
+	if obj["kind"] != "glossary_term" {
+		t.Errorf("expected kind 'glossary_term', got %v", obj["kind"])
+	}
+	if obj["scheme_ref"] != KernelAcronymsSchemeID {
+		t.Errorf("expected scheme_ref %q, got %v", KernelAcronymsSchemeID, obj["scheme_ref"])
+	}
+
+	restored, ok := FromGlossaryTerm(obj)
+	if !ok {
+		t.Fatal("failed to restore Acronym from glossary_term object map")
+	}
+	if restored.Code != bli.Code || restored.FullName != bli.FullName || restored.SchemeRef != bli.SchemeRef {
+		t.Errorf("roundtrip mismatch: got %+v, want %+v", restored, bli)
+	}
+}

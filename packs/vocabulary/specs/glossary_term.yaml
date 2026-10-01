@@ -66,6 +66,18 @@ fields:
     type: string
     validation:
       required: true
+  scheme_ref:
+    default: ""
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_reference_group
+      - filterable
+      - groupable
+    type: string
+    validation:
+      pattern: ^VOC-
+      required: false
   semantic_tags:
     permissions: rwx
     semantic_type: statement

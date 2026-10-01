@@ -301,6 +301,17 @@ func (b *GlossaryTermInstanceBuilder) SetSchemaRef(value string) *GlossaryTermIn
 	return b.SchemaRef(value)
 }
 
+// SchemeRef sets the scheme_ref field
+func (b *GlossaryTermInstanceBuilder) SchemeRef(value string) *GlossaryTermInstanceBuilder {
+	b.SetField(objects.FieldKeySchemeRef, value)
+	return b
+}
+
+// SetSchemeRef is a compatibility alias for SchemeRef.
+func (b *GlossaryTermInstanceBuilder) SetSchemeRef(value string) *GlossaryTermInstanceBuilder {
+	return b.SchemeRef(value)
+}
+
 // SemanticTags sets the semantic_tags field
 func (b *GlossaryTermInstanceBuilder) SemanticTags(value []string) *GlossaryTermInstanceBuilder {
 	b.SetField(objects.FieldKeySemanticTags, value)
