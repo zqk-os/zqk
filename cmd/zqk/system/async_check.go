@@ -4,8 +4,6 @@ import (
 	stdcontext "context"
 	"fmt"
 	"os"
-	"path/filepath"
-	"regexp"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -14,12 +12,10 @@ import (
 	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
 	"github.com/zqk-os/zqk/pkg/paths"
-	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"github.com/spf13/cobra"
 
 	"github.com/zqk-os/zqk/pkg/cliapp"
-	"github.com/zqk-os/zqk/pkg/appledouble"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
@@ -1001,224 +997,17 @@ func discoverFromCache(ctx stdcontext.Context, projectRoot, operationID string, 
 	return streamChan, collectFinalResults
 }
 
-// scanObjectFiles scans a directory for object files (legacy - use scanObjectFilesWithContext)
+// scanObjectFiles scans a directory for object files (delegates to asynccheck)
 func scanObjectFiles(dir, kind string) ([]scannedFile, error) {
-	ctx := pkgctx.NewSystemContext()
-	return scanObjectFilesWithContext(ctx, dir, kind, logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem)), nil)
+	return asynccheck.ScanObjectFiles(dir, kind)
 }
 
 // scanObjectFilesWithContext scans a directory for object files with context cancellation and timeout.
 // When storageProvider is non-nil and *storage.FileObjectStorage, uses cached CAS to avoid loading the full index (OOM risk).
 func scanObjectFilesWithContext(ctx stdcontext.Context, dir, kind string, logger logging.Logger, storageProvider storage.ObjectStorageProvider) ([]scannedFile, error) {
-	// FAST PATH: Prefer CAS ID index over walking + reading files.
-	// For CAS kinds (hash-based filenames), extracting IDs by reading every file content is expensive
-	// and can stall on slow/uninterruptible filesystem operations. The CAS index provides ID -> hash.
-	indexPath := filepath.Join(dir, fmt.Sprintf(".%s.index", kind))
-
-	// Check for index file with timeout (non-blocking)
-	indexExists := false
-	statDone := make(chan bool, 1)
-	indexBud := goroutinelabels.DefaultBudget()
-	indexBuilder := goroutinelabels.NewGoroutine("scan_check_index", fmt.Sprintf("checking for index file %s", indexPath)).
-		WithContext(ctx)
-	if indexBud != nil {
-		indexBuilder = indexBuilder.WithBudget(indexBud)
-	}
-	indexBuilder.StartSimple(func() {
-		when.When(func() bool {
-			_, statErr := fileutil.Stat(indexPath)
-			return statErr == nil
-		}).Then(func() {
-			statDone <- true
-		}).OrElse(func() {
-			statDone <- false
-		}).Run()
-	})
-
-	select {
-	case indexExists = <-statDone:
-		// Got result
-	case <-ctx.Done():
-		return nil, ctx.Err()
-	case <-time.After(2 * time.Second):
-		// Stat timeout - assume no index, fall through to slow path
-		indexExists = false
-	}
-
-	if indexExists {
-		var cas *storage.ContentAddressableStorage
-		if fileStorage := extractFileStorage(storageProvider); fileStorage != nil {
-			if c, err := fileStorage.GetContentAddressableStorage(kind); err == nil && c != nil {
-				cas = c
-			}
-		}
-		if cas == nil {
-			cas = storage.NewContentAddressableStorage(dir, kind)
-		}
-		mappings, _ := cas.GetAllMappings()
-		if len(mappings) > 0 {
-			// Pre-scan bucket directories once (bucketed kinds store hash files under YYYY-MM or YYYY-MM-DD folders).
-			// Use timeout for ReadDir to prevent blocking
-			readDirDone := make(chan []fileutil.DirEntry, 1)
-			readDirBud := goroutinelabels.DefaultBudget()
-			readDirBuilder := goroutinelabels.NewGoroutine("scan_read_dir", fmt.Sprintf("reading directory %s", dir)).
-				WithContext(ctx)
-			if readDirBud != nil {
-				readDirBuilder = readDirBuilder.WithBudget(readDirBud)
-			}
-			readDirBuilder.StartSimple(func() {
-				entries, _ := fileutil.ReadDir(dir)
-				readDirDone <- entries
-			})
-
-			var entries []fileutil.DirEntry
-			select {
-			case entries = <-readDirDone:
-				// Got result
-			case <-ctx.Done():
-				return nil, ctx.Err()
-			case <-time.After(2 * time.Second):
-				// ReadDir timeout - use empty list, will fall back to non-bucketed layout
-				entries = []fileutil.DirEntry{}
-			}
-			datePattern := regexp.MustCompile(`^\d{4}-\d{2}(-\d{2})?$`)
-			bucketDirs := make([]string, 0, len(entries))
-			for _, e := range entries {
-				if e.IsDir() && datePattern.MatchString(e.Name()) {
-					bucketDirs = append(bucketDirs, e.Name())
-				}
-			}
-
-			// OPTIMIZATION: For CAS files with index, trust the index and skip file stat
-			// This dramatically speeds up discovery when we have 88k+ files
-			// File existence will be verified during validation if needed
-			files := make([]scannedFile, 0, len(mappings))
-			for objectID, hash := range mappings {
-				// Default path assumes non-bucketed layout
-				hashFile := filepath.Join(dir, hash+".yaml")
-
-				// If we have bucket directories, use most recent bucket (likely location)
-				// Skip expensive stat checks entirely - just construct the path
-				// Validation will verify file existence if needed
-				if len(bucketDirs) > 0 {
-					// Use most recent bucket (last in list, typically most recent date)
-					mostRecentBucket := bucketDirs[len(bucketDirs)-1]
-					hashFile = filepath.Join(dir, mostRecentBucket, hash+".yaml")
-				}
-
-				files = append(files, scannedFile{
-					ObjectID: objectID,
-					Kind:     kind,
-					Path:     hashFile,
-				})
-			}
-			return files, nil
-		}
-	}
-
-	// Use timeout to prevent indefinite blocking on slow filesystems
-	// Per-kind timeout is already applied by caller (30 seconds), so use shorter timeout here
-	// to ensure we don't block longer than the per-kind timeout
-	walkCtx, cancel := stdcontext.WithTimeout(ctx, 25*time.Second)
-	defer cancel()
-
-	// Channel to collect files from walk
-	filesChan := make(chan scannedFile, 100)
-	walkErrChan := make(chan error, 1)
-
-	// Run filepath.Walk in a goroutine to allow cancellation
-	walkBud := goroutinelabels.DefaultBudget()
-	walkBuilder := goroutinelabels.NewGoroutine("scan_object_files_walk", fmt.Sprintf("walking directory %s for kind %s", dir, kind)).
-		WithContext(walkCtx)
-	if walkBud != nil {
-		walkBuilder = walkBuilder.WithBudget(walkBud)
-	}
-	walkBuilder.StartSimple(func() {
-		defer close(filesChan)
-		walkErr := filepath.Walk(dir, func(path string, info fileutil.FileInfo, err error) error {
-			// Check for cancellation periodically (every file)
-			select {
-			case <-walkCtx.Done():
-				return walkCtx.Err()
-			default:
-			}
-
-			if err != nil {
-				return nil //nolint:nilerr // continue walking on error
-			}
-
-			if info.IsDir() {
-				return nil
-			}
-
-			if appledouble.SkipPathInTreeWalk(path) {
-				return nil
-			}
-
-			// Only process YAML files
-			if !strings.HasSuffix(path, ".yaml") && !strings.HasSuffix(path, ".yml") {
-				return nil
-			}
-
-			// Try to extract object ID from file (with timeout)
-			objectID := extractObjectIDFromFileWithContext(walkCtx, path, kind, logger)
-			if objectID == emptyValue {
-				return nil
-			}
-
-			// Send file to channel (non-blocking if channel has capacity)
-			select {
-			case filesChan <- scannedFile{
-				ObjectID: objectID,
-				Kind:     kind,
-				Path:     path,
-			}:
-			case <-walkCtx.Done():
-				return walkCtx.Err()
-			}
-
-			return nil
-		})
-		walkErrChan <- walkErr
-	})
-
-	// Collect files from channel until walk completes or times out
-	var files []scannedFile
-	collectDone := make(chan struct{})
-	collectWalkBud := goroutinelabels.DefaultBudget()
-	collectWalkBuilder := goroutinelabels.NewGoroutine("scan_object_files_collect", fmt.Sprintf("collecting files from walk for %s", kind)).
-		WithContext(walkCtx)
-	if collectWalkBud != nil {
-		collectWalkBuilder = collectWalkBuilder.WithBudget(collectWalkBud)
-	}
-	collectWalkBuilder.StartSimple(func() {
-		for file := range filesChan {
-			files = append(files, file)
-		}
-		close(collectDone)
-	})
-
-	// Wait for walk to complete or timeout
-	select {
-	case err := <-walkErrChan:
-		// Wait for collection to finish
-		<-collectDone
-		return files, err
-	case <-walkCtx.Done():
-		logging.Fluent(logger).Warn("Directory scan timed out or was cancelled").
-			String("dir", dir).
-			Kind(kind).
-			WithError(walkCtx.Err()).
-			Log()
-		// Wait a bit for collection to finish (with timeout)
-		select {
-		case <-collectDone:
-		case <-time.After(1 * time.Second):
-		}
-		// Return partial results if we got any
-		return files, walkCtx.Err()
-	}
+	return asynccheck.ScanObjectFilesWithContext(ctx, dir, kind, logger, storageProvider)
 }
+
 
 // scannedFile represents a scanned object file (aliased to asynccheck.ScannedFile)
 type scannedFile = asynccheck.ScannedFile

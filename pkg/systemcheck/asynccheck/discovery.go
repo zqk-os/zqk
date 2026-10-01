@@ -4,15 +4,19 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"strings"
 	"sync/atomic"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/appledouble"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/when"
 )
 
 const (
@@ -21,7 +25,20 @@ const (
 	descExtractRead              = "reading file content for ID extraction"
 	logMsgTimeoutRead            = "Timeout reading file to extract ID"
 	logMsgSkipDupObjectID        = "Skipping duplicate object ID during discovery"
+	labelScanReadDir             = "scan_read_dir"
+	descScanReadDirFmt           = "reading directory %s"
+	labelScanCheckIndex          = "scan_check_index"
+	descScanCheckIndexFmt        = "checking for index file %s"
+	labelScanObjectFilesWalk     = "scan_object_files_walk"
+	descScanObjectFilesWalkFmt   = "walking directory %s for kind %s"
+	labelScanObjectFilesColl     = "scan_object_files_collect"
+	descScanObjectFilesCollFmt   = "collecting files from walk for %s"
+	logWarnScanDirTimeout        = "Directory scan timed out or was cancelled"
+	yamlExtShort                 = ".yaml"
+	ymlExtShort                  = ".yml"
 )
+
+var datePattern = regexp.MustCompile(`^\d{4}-\d{2}(-\d{2})?$`)
 
 // Limit concurrent per-file content reads during discovery fallback.
 var extractObjectIDReadSem = make(chan struct{}, 32)
@@ -194,4 +211,191 @@ func CollectDiscoveryResults(filesChan <-chan []ScannedFile) []ScannedFile {
 		allFiles = append(allFiles, batch...)
 	}
 	return allFiles
+}
+
+// ScanObjectFiles scans a directory for object files (legacy wrapper).
+func ScanObjectFiles(dir, kind string) ([]ScannedFile, error) {
+	ctx := pkgctx.NewSystemContext()
+	return ScanObjectFilesWithContext(ctx, dir, kind, logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem)), nil)
+}
+
+// ScanObjectFilesWithContext scans a directory for object files with context cancellation and timeout.
+// When storageProvider is non-nil and unwraps to *storage.FileObjectStorage, uses cached CAS to avoid loading the full index.
+func ScanObjectFilesWithContext(ctx context.Context, dir, kind string, logger logging.Logger, storageProvider storage.ObjectStorageProvider) ([]ScannedFile, error) {
+	// FAST PATH: Prefer CAS ID index over walking + reading files.
+	indexPath := filepath.Join(dir, fmt.Sprintf(".%s.index", kind))
+
+	// Check for index file with timeout (non-blocking)
+	indexExists := false
+	statDone := make(chan bool, 1)
+	indexBud := goroutinelabels.DefaultBudget()
+	indexBuilder := goroutinelabels.NewGoroutine(labelScanCheckIndex, fmt.Sprintf(descScanCheckIndexFmt, indexPath)).
+		WithContext(ctx)
+	if indexBud != nil {
+		indexBuilder = indexBuilder.WithBudget(indexBud)
+	}
+	indexBuilder.StartSimple(func() {
+		when.When(func() bool {
+			_, statErr := fileutil.Stat(indexPath)
+			return statErr == nil
+		}).Then(func() {
+			statDone <- true
+		}).OrElse(func() {
+			statDone <- false
+		}).Run()
+	})
+
+	select {
+	case indexExists = <-statDone:
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	case <-time.After(1 * time.Second):
+		indexExists = false
+	}
+
+	if indexExists {
+		var cas *storage.ContentAddressableStorage
+		if fileStorage := storage.UnwrapToFileObjectStorage(storageProvider); fileStorage != nil {
+			if c, err := fileStorage.GetContentAddressableStorage(kind); err == nil && c != nil {
+				cas = c
+			}
+		}
+		if cas == nil {
+			cas = storage.NewContentAddressableStorage(dir, kind)
+		}
+		mappings, _ := cas.GetAllMappings()
+		if len(mappings) > 0 {
+			readDirDone := make(chan []fileutil.DirEntry, 1)
+			readDirBud := goroutinelabels.DefaultBudget()
+			readDirBuilder := goroutinelabels.NewGoroutine(labelScanReadDir, fmt.Sprintf(descScanReadDirFmt, dir)).
+				WithContext(ctx)
+			if readDirBud != nil {
+				readDirBuilder = readDirBuilder.WithBudget(readDirBud)
+			}
+			readDirBuilder.StartSimple(func() {
+				entries, _ := fileutil.ReadDir(dir)
+				readDirDone <- entries
+			})
+
+			var entries []fileutil.DirEntry
+			select {
+			case entries = <-readDirDone:
+			case <-ctx.Done():
+				return nil, ctx.Err()
+			case <-time.After(2 * time.Second):
+				entries = []fileutil.DirEntry{}
+			}
+
+			bucketDirs := make([]string, 0, len(entries))
+			for _, e := range entries {
+				if e.IsDir() && datePattern.MatchString(e.Name()) {
+					bucketDirs = append(bucketDirs, e.Name())
+				}
+			}
+
+			files := make([]ScannedFile, 0, len(mappings))
+			for objectID, hash := range mappings {
+				hashFile := filepath.Join(dir, hash+yamlExtShort)
+				if len(bucketDirs) > 0 {
+					mostRecentBucket := bucketDirs[len(bucketDirs)-1]
+					hashFile = filepath.Join(dir, mostRecentBucket, hash+yamlExtShort)
+				}
+				files = append(files, ScannedFile{
+					ObjectID: objectID,
+					Kind:     kind,
+					Path:     hashFile,
+				})
+			}
+			return files, nil
+		}
+	}
+
+	walkCtx, cancel := context.WithTimeout(ctx, 25*time.Second)
+	defer cancel()
+
+	filesChan := make(chan ScannedFile, 100)
+	walkErrChan := make(chan error, 1)
+
+	walkBud := goroutinelabels.DefaultBudget()
+	walkBuilder := goroutinelabels.NewGoroutine(labelScanObjectFilesWalk, fmt.Sprintf(descScanObjectFilesWalkFmt, dir, kind)).
+		WithContext(walkCtx)
+	if walkBud != nil {
+		walkBuilder = walkBuilder.WithBudget(walkBud)
+	}
+	walkBuilder.StartSimple(func() {
+		defer close(filesChan)
+		walkErr := filepath.Walk(dir, func(path string, info fileutil.FileInfo, err error) error {
+			select {
+			case <-walkCtx.Done():
+				return walkCtx.Err()
+			default:
+			}
+
+			if err != nil {
+				return nil
+			}
+
+			if info.IsDir() {
+				return nil
+			}
+
+			if appledouble.SkipPathInTreeWalk(path) {
+				return nil
+			}
+
+			if !strings.HasSuffix(path, yamlExtShort) && !strings.HasSuffix(path, ymlExtShort) {
+				return nil
+			}
+
+			objectID := ExtractObjectIDFromFileWithContext(walkCtx, path, kind, logger)
+			if objectID == "" {
+				return nil
+			}
+
+			select {
+			case filesChan <- ScannedFile{
+				ObjectID: objectID,
+				Kind:     kind,
+				Path:     path,
+			}:
+			case <-walkCtx.Done():
+				return walkCtx.Err()
+			}
+
+			return nil
+		})
+		walkErrChan <- walkErr
+	})
+
+	var files []ScannedFile
+	collectDone := make(chan struct{})
+	collectWalkBud := goroutinelabels.DefaultBudget()
+	collectWalkBuilder := goroutinelabels.NewGoroutine(labelScanObjectFilesColl, fmt.Sprintf(descScanObjectFilesCollFmt, kind)).
+		WithContext(walkCtx)
+	if collectWalkBud != nil {
+		collectWalkBuilder = collectWalkBuilder.WithBudget(collectWalkBud)
+	}
+	collectWalkBuilder.StartSimple(func() {
+		for file := range filesChan {
+			files = append(files, file)
+		}
+		close(collectDone)
+	})
+
+	select {
+	case err := <-walkErrChan:
+		<-collectDone
+		return files, err
+	case <-walkCtx.Done():
+		logging.Fluent(logger).Warn(logWarnScanDirTimeout).
+			String("dir", dir).
+			Kind(kind).
+			WithError(walkCtx.Err()).
+			Log()
+		select {
+		case <-collectDone:
+		case <-time.After(1 * time.Second):
+		}
+		return files, walkCtx.Err()
+	}
 }
