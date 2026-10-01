@@ -14,8 +14,6 @@ import (
 // projectRoot is the repository root. When the binary was built with the bootstrap archive,
 // the embedded archive is extracted (REQ-9009, REQ-9010). Otherwise, files are copied from
 // source when running from the repo (development).
-//
-// TRACK: BLI-CEF-ARCH-SYSTEM-TRANCHE1 — moved from cmd/zqk/system (God-package tranche-1).
 func ExtractFiles(projectRoot string, logger logging.Logger, force bool) error {
 	if err := ExtractTo(projectRoot, logger, force); err == nil {
 		return nil

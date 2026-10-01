@@ -33,7 +33,8 @@ var (
 	cleanupConfigSubdir = paths.ProjectDataDir + "/cleanup"
 )
 
-// ExtractTo extracts the embedded bootstrap archive into the project.
+// ExtractTo extracts the kernel's embedded bootstrap archive into the project.
+// Composition roots with their own archive call ExtractGzipTar.
 // projectRoot is the repo root. Archive entries are mapped as follows:
 //   - entries under "cli_specs/" -> projectRoot/.zqk/cli/specs/
 //   - entries under "scripts/" -> projectRoot/scripts/ (e.g. scheduler_jobs maintenance templates)
@@ -47,6 +48,13 @@ func ExtractTo(projectRoot string, logger logging.Logger, force bool) error {
 	if err != nil {
 		return errfmt.Newf("failed to read embedded bootstrap archive").Wrap(err)
 	}
+	return ExtractGzipTar(data, projectRoot, logger, force)
+}
+
+// ExtractGzipTar unpacks a gzip-compressed tar bootstrap archive into projectRoot.
+// The kernel binary passes its embedded archive through ExtractTo. A composition
+// root passes its own archive bytes and keeps this unpacker.
+func ExtractGzipTar(data []byte, projectRoot string, logger logging.Logger, force bool) error {
 	if len(data) == 0 {
 		return errfmt.Errorf("bootstrap archive is empty")
 	}

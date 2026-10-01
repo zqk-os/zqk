@@ -59,7 +59,7 @@ func TestArchiveGenerationIncludesNewObjectSpec(t *testing.T) {
 		t.Fatalf("write new spec: %v", err)
 	}
 
-	// Run the build script with temp dir as REPO_ROOT; it will create tmp/internal/bootstrap/archive
+	// Run the build script with temp dir as REPO_ROOT; it will create tmp/pkg/bootstrap/archive
 	cmd := execwrap.Command("sh", scriptPath, tmp)
 	cmd.Dir = moduleRoot
 	out, err := cmd.CombinedOutput()
@@ -67,7 +67,7 @@ func TestArchiveGenerationIncludesNewObjectSpec(t *testing.T) {
 		t.Fatalf("build-bootstrap-archive.sh failed: %v\n%s", err, out)
 	}
 
-	manifestPath := filepath.Join(tmp, "internal", "bootstrap", "archive", "manifest.txt")
+	manifestPath := filepath.Join(tmp, "pkg", "bootstrap", "archive", "manifest.txt")
 	data, err := fileutil.ReadFile(manifestPath)
 	if err != nil {
 		t.Fatalf("read manifest: %v", err)

@@ -17,7 +17,7 @@ else
 fi
 CLI_SPECS_DIR="${REPO_ROOT}/.zqk/cli/specs"
 SCRIPTS_SCHEDULER_JOBS_DIR="${REPO_ROOT}/scripts/scheduler_jobs"
-ARCHIVE_DIR="${REPO_ROOT}/internal/bootstrap/archive"
+ARCHIVE_DIR="${REPO_ROOT}/pkg/bootstrap/archive"
 ARCHIVE="${ARCHIVE_DIR}/bootstrap.tar.gz"
 MANIFEST="${ARCHIVE_DIR}/manifest.txt"
 
