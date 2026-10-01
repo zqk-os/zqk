@@ -10,7 +10,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
-
 func (p Plane) String() string {
 	switch p {
 	case PlaneDraft:

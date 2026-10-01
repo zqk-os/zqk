@@ -48,8 +48,8 @@ type Server struct {
 	shutdownHookManager *ShutdownHookManager
 	initialized         atomic.Bool
 	// CLI bridge support
-	rootCommand             any                              // *cobra.Command (avoid import cycle)
-	inProcessCLIRunner      InProcessCLIRunner               // optional: run CLI in-process via dispatch (no subprocess)
+	rootCommand             any                // *cobra.Command (avoid import cycle)
+	inProcessCLIRunner      InProcessCLIRunner // optional: run CLI in-process via dispatch (no subprocess)
 	secCtxMu                sync.RWMutex
 	secCtx                  any                              // *pkgctx.SecurityContext (avoid import cycle)
 	requestsHandledTotal    atomic.Int64                     // Total requests handled by server

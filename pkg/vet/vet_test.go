@@ -54,7 +54,7 @@ func TestCheckPayload(t *testing.T) {
 	tempDir := t.TempDir()
 	cfg := &GatesConfig{
 		Payload: PayloadConfig{
-			RequiredArtifacts: []string{"README.md", "MISSING.md"},
+			RequiredArtifacts:  []string{"README.md", "MISSING.md"},
 			ForbiddenArtifacts: []string{"FORBIDDEN.md"},
 		},
 	}

@@ -485,4 +485,3 @@ func TestGuardManualSystemProvenanceFields_overrideWithReasonCodePasses(t *testi
 		t.Fatalf("expected override with reason-code to pass, got %v", err)
 	}
 }
-

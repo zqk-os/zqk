@@ -28,23 +28,23 @@ type HygieneConfig struct {
 	CheckCLIBuilders       bool     `yaml:"check_cli_builders"`
 	CheckRawGoroutines     bool     `yaml:"check_raw_goroutines"`
 	GoroutineExemptions    []string `yaml:"goroutine_exemptions"`
-	ForbiddenPathLiterals []string `yaml:"forbidden_path_literals"`
-	GoScanDirs            []string `yaml:"go_scan_dirs"`
-	Exemptions            []string `yaml:"exemptions"`
-	CLIExemptFunctions    []string `yaml:"cli_exempt_functions"`
-	CLIExemptFiles        []string `yaml:"cli_exempt_files"`
+	ForbiddenPathLiterals  []string `yaml:"forbidden_path_literals"`
+	GoScanDirs             []string `yaml:"go_scan_dirs"`
+	Exemptions             []string `yaml:"exemptions"`
+	CLIExemptFunctions     []string `yaml:"cli_exempt_functions"`
+	CLIExemptFiles         []string `yaml:"cli_exempt_files"`
 }
 
 type TreePoliceConfig struct {
-	ForbiddenPaths             []string `yaml:"forbidden_paths"`
-	ForbiddenFiles             []string `yaml:"forbidden_files"`
-	ArchivedDocDirs            []string `yaml:"archived_doc_dirs"`
-	ArchivedDocNames           []string `yaml:"archived_doc_names"`
-	AllowedScripts             []string `yaml:"allowed_scripts"`
-	AllowedScriptPrefixes      []string `yaml:"allowed_script_prefixes"`
-	ForbiddenPatterns          []string `yaml:"forbidden_patterns"`
+	ForbiddenPaths            []string `yaml:"forbidden_paths"`
+	ForbiddenFiles            []string `yaml:"forbidden_files"`
+	ArchivedDocDirs           []string `yaml:"archived_doc_dirs"`
+	ArchivedDocNames          []string `yaml:"archived_doc_names"`
+	AllowedScripts            []string `yaml:"allowed_scripts"`
+	AllowedScriptPrefixes     []string `yaml:"allowed_script_prefixes"`
+	ForbiddenPatterns         []string `yaml:"forbidden_patterns"`
 	ForbiddenScriptReferences []string `yaml:"forbidden_script_references"`
-	GrepExemptions             []string `yaml:"grep_exemptions"`
+	GrepExemptions            []string `yaml:"grep_exemptions"`
 }
 
 type TokenRule struct {
@@ -100,11 +100,11 @@ func DefaultConfig() *GatesConfig {
 			CheckCLIBuilders:       true,
 			CheckRawGoroutines:     true,
 			GoroutineExemptions:    []string{"*_test.go", "vendor/*", "pkg/goroutinelabels/*", "*/testdata/*"},
-			ForbiddenPathLiterals: []string{".zqk", ".zqk/"},
-			GoScanDirs:            []string{"pkg/", "cmd/", "internal/", "scripts/", "packs/", "ext/"},
-			Exemptions:            []string{"*_test.go", "vendor/*", ".git/*", "pkg/paths/*", "pkg/brand/*", "pkg/vet/*"},
-			CLIExemptFunctions:    []string{"CLIUsage", "CLIInvocation", "RewriteCanonicalCLIInvocations"},
-			CLIExemptFiles:        []string{"*_test.go", "pkg/paths/cli_command_name.go", "pkg/vet/*"},
+			ForbiddenPathLiterals:  []string{".zqk", ".zqk/"},
+			GoScanDirs:             []string{"pkg/", "cmd/", "internal/", "scripts/", "packs/", "ext/"},
+			Exemptions:             []string{"*_test.go", "vendor/*", ".git/*", "pkg/paths/*", "pkg/brand/*", "pkg/vet/*"},
+			CLIExemptFunctions:     []string{"CLIUsage", "CLIInvocation", "RewriteCanonicalCLIInvocations"},
+			CLIExemptFiles:         []string{"*_test.go", "pkg/paths/cli_command_name.go", "pkg/vet/*"},
 		},
 		TreePolice: TreePoliceConfig{
 			ForbiddenPaths: []string{

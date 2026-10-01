@@ -310,4 +310,3 @@ func resolveGitWorktreeFile(worktreeDir, gitFilePath string) string {
 
 	return ""
 }
-

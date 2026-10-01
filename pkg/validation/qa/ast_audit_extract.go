@@ -2,7 +2,6 @@ package qa
 
 import (
 	"go/ast"
-
 )
 
 // auditMapExtractionAntiPattern checks for the pattern:

@@ -644,4 +644,3 @@ func TestRenderSystemPromptWithStorage_FallbackOnInvalidTemplateSyntax(t *testin
 		t.Errorf("expected fallback to render Worker ID, got: %s", res)
 	}
 }
-

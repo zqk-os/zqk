@@ -1,4 +1,4 @@
-package ui
+package tui
 
 // Canonical ANSI Escape Sequences and Terminal Control Codes.
 // Centralizing these constants ensures that low-level terminal operations
@@ -31,7 +31,7 @@ const (
 
 	// AnsiClearToBottom erases from the current cursor position to the end of the screen/display.
 	// Essential when switching from a taller view to a shorter view to prevent stale ghost lines.
-	AnsiClearToBottom = "\033[J"
+	AnsiClearToBottom       = "\033[J"
 	AnsiClearToScreenBottom = AnsiClearToBottom
 
 	// CRLF is the explicit Carriage Return + Line Feed required in raw terminal mode.

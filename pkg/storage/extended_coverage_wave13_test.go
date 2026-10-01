@@ -18,11 +18,11 @@ import (
 
 type inMemoryGraphConnWave13 struct {
 	provider.GraphConnection
-	mu             sync.Mutex
-	nodes          map[string]*provider.Node
-	getNodeErr     error
-	createNodeErr  error
-	updateNodeErr  error
+	mu            sync.Mutex
+	nodes         map[string]*provider.Node
+	getNodeErr    error
+	createNodeErr error
+	updateNodeErr error
 }
 
 func newInMemoryGraphConnWave13() *inMemoryGraphConnWave13 {

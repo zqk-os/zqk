@@ -271,4 +271,3 @@ func TestCleanStaleLocksByAge_PreservesActivelyHeldLocks(t *testing.T) {
 		t.Fatalf("actively held lock file was unlinked: %v", err)
 	}
 }
-

@@ -546,4 +546,3 @@ func (f *FileObjectStorage) deleteObjectDraftPlane(kind, id string) error {
 	_ = fileutil.Remove(filepath.Dir(shardDir))
 	return nil
 }
-

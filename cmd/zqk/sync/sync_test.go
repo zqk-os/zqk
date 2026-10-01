@@ -71,4 +71,3 @@ func TestSyncCmd_DryRunLinear(t *testing.T) {
 		t.Errorf("expected dry-run output mentioning team, got: %s", output)
 	}
 }
-

@@ -28,4 +28,3 @@ func NewStorageFactoryForTesting(provider ObjectStorageProvider) *StorageFactory
 		providers:      make(map[string]ObjectStorageProvider),
 	}
 }
-

@@ -68,4 +68,3 @@ func TestDaemonServiceCommandStructure(t *testing.T) {
 		require.NotNil(t, child, "expected daemon service subcommand %s", exp)
 	}
 }
-

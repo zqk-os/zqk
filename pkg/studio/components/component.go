@@ -37,8 +37,8 @@ type LegendItem struct {
 
 // SidebarTab represents a tab in the right sidebar.
 type SidebarTab struct {
-	ID       string
-	Label    string
-	CountID  string
-	Active   bool
+	ID      string
+	Label   string
+	CountID string
+	Active  bool
 }

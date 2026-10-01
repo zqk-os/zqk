@@ -9,8 +9,8 @@ import (
 	"github.com/zqk-os/zqk/pkg/testkit"
 	"gopkg.in/yaml.v3"
 
-	"github.com/zqk-os/zqk/pkg/paths"
 	_ "github.com/zqk-os/zqk/packs/work/bldr_v2"
+	"github.com/zqk-os/zqk/pkg/paths"
 	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )

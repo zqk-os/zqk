@@ -13,9 +13,10 @@ import (
 	cicmd "github.com/zqk-os/zqk/cmd/zqk/ci"
 	"github.com/zqk-os/zqk/cmd/zqk/convergence"
 	"github.com/zqk-os/zqk/cmd/zqk/daemon"
-	"github.com/zqk-os/zqk/cmd/zqk/docman"
 	"github.com/zqk-os/zqk/cmd/zqk/do"
+	"github.com/zqk-os/zqk/cmd/zqk/docman"
 	"github.com/zqk-os/zqk/cmd/zqk/domain"
+	"github.com/zqk-os/zqk/cmd/zqk/explain"
 	"github.com/zqk-os/zqk/cmd/zqk/feed"
 	"github.com/zqk-os/zqk/cmd/zqk/graph"
 	"github.com/zqk-os/zqk/cmd/zqk/grep"
@@ -24,8 +25,8 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/intake"
 	"github.com/zqk-os/zqk/cmd/zqk/job"
 	"github.com/zqk-os/zqk/cmd/zqk/kernel"
-	"github.com/zqk-os/zqk/cmd/zqk/kindpack"
 	"github.com/zqk-os/zqk/cmd/zqk/keystore"
+	"github.com/zqk-os/zqk/cmd/zqk/kindpack"
 	"github.com/zqk-os/zqk/cmd/zqk/learn"
 	matrixcmd "github.com/zqk-os/zqk/cmd/zqk/matrix"
 	"github.com/zqk-os/zqk/cmd/zqk/mcp"
@@ -46,8 +47,8 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/semantic"
 	"github.com/zqk-os/zqk/cmd/zqk/spec"
 	"github.com/zqk-os/zqk/cmd/zqk/state"
-	synccmd "github.com/zqk-os/zqk/cmd/zqk/sync"
 	"github.com/zqk-os/zqk/cmd/zqk/swarm"
+	synccmd "github.com/zqk-os/zqk/cmd/zqk/sync"
 	"github.com/zqk-os/zqk/cmd/zqk/system"
 	testcmd "github.com/zqk-os/zqk/cmd/zqk/test"
 	"github.com/zqk-os/zqk/cmd/zqk/tray"
@@ -92,6 +93,11 @@ func registerCommands() {
 	inspectCmdInst := object.NewInspectCmd()
 	inspectCmdInst.GroupID = "everyday"
 	rootCmd.AddCommand(inspectCmdInst)
+
+	// Progressive disclosure acronym and ontology explain command (zqk explain / zqk glossary)
+	explainCmdInst := explain.NewExplainCmd()
+	explainCmdInst.GroupID = "everyday"
+	rootCmd.AddCommand(explainCmdInst)
 
 	// System operations group (health, validation, and maintenance)
 	systemCmdInst := system.NewSystemCmd()

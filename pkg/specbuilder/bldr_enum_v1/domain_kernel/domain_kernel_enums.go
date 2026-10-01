@@ -8,8 +8,7 @@ import (
 )
 
 // Consolidated Domain Kernel Enums
-// Unifies disparate micro-package enums into a cohesive, typed domain package
-// in accordance with TDE-CEF-F-ARCH-005.
+// Unifies disparate micro-package enums into a cohesive, typed domain package.
 
 // Plane represents the CAS membrane lifecycle plane.
 type Plane = base_objectenum.Plane

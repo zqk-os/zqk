@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zqk-os/zqk/pkg/coordination"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/coordination"
 )
 
 func TestDispatch_Run_NilItem(t *testing.T) {

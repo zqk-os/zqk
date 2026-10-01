@@ -585,7 +585,6 @@ func formatStatusTableHealth(statusData map[string]any) string {
 	return buf.String()
 }
 
-
 // formatStatusTablePlan formats priority plan information for table output
 func formatStatusTablePlan(statusData map[string]any) string {
 	plan, ok := statusData["current_priority_plan"].(map[string]any)

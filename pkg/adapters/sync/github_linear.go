@@ -243,7 +243,7 @@ func MapLinearIssueToKernel(lin LinearIssue) *BacklogItemSyncData {
 
 	metadata := map[string]string{
 		metaKeyLinearID: lin.ID,
-		metaKeyState:     lin.State,
+		metaKeyState:    lin.State,
 	}
 	if lin.Assignee != "" {
 		metadata[metaKeyAssignee] = lin.Assignee

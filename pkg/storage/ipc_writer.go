@@ -77,4 +77,3 @@ func (w *IPCWriter) RenameObject(ctx context.Context, oldID, newID, kind string)
 	var reply bool
 	return w.callWithContext(ctx, "PrivilegedWriterDaemon.RenameObject", args, &reply)
 }
-

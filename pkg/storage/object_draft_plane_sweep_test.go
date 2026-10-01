@@ -10,7 +10,6 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-
 func TestSweepObjectDraftPlane_dryRunAndDelete(t *testing.T) {
 	tmpDir, fileStorage, _ := SetupTestingFactoryCompleteTestEnvironmentForTest(t)
 	secCtx := pkgctx.NewSystemSecurityContext()

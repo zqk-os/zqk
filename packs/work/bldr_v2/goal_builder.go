@@ -206,35 +206,6 @@ func (b *GoalBuilder) addGoalFields() {
 		WithPermissions("r-x").
 		WithSemanticType("reference").
 		WithProfileCode("GOL-011"))
-	b.AddFieldBuilder(builders.NewFieldBuilder("requirement_refs", "list").
-		WithChecklist(builders.NewChecklistBuilder().
-			Authority("owner/planner.").
-			AutomationHooks("connects strategic goals to requirement deliverables.").
-			Cardinality("many").
-			Criticality("composition").
-			Default([]any{}).
-			Dependencies("requirement registry.").
-			Lifecycle("mutable").
-			Observability("yes").
-			Purpose("Requirements fulfilling this strategic goal.").
-			Security("non-sensitive").
-			SystemUsage([]any{
-				"planning",
-				"traceability",
-				"alignment",
-			}).
-			Validation("must reference existing requirement IDs.").
-			Build()).
-		WithAccess(builders.NewAccessBuilder().
-			Requires("access:confidential").
-			Build()).
-		WithValidation(builders.NewValidationBuilder().
-			Required(false).
-			Build()).
-		WithTraits("field_mutable_group", "field_reference_group").
-		WithPermissions("r-x").
-		WithSemanticType("reference").
-		WithProfileCode("GOL-012"))
 	b.AddFieldBuilder(builders.NewFieldBuilder("success_criteria", "list").
 		WithChecklist(builders.NewChecklistBuilder().
 			Authority("owner/executive.").

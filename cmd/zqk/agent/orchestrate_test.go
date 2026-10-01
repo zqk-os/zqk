@@ -670,4 +670,3 @@ func TestNativeSwarmEligible_ModelTierRouting(t *testing.T) {
 		}
 	}
 }
-

@@ -26,7 +26,7 @@ func (LiteralExpr) isZQLExpr() {}
 
 // VariableRefExpr represents a variable reference like $plan.id.
 type VariableRefExpr struct {
-	VariableName string   `json:"variable_name"` // without leading $
+	VariableName string   `json:"variable_name"`  // without leading $
 	Path         []string `json:"path,omitempty"` // nested field path e.g. ["id"]
 }
 
@@ -59,16 +59,16 @@ func (UpsertExpr) isZQLExpr() {}
 
 // Statement represents an individual executable ZQL statement conforming to Draft 2020-12 AST.
 type Statement struct {
-	NodeType       StatementType     `json:"node_type"`
-	Line           int               `json:"line"`
-	Column         int               `json:"column"`
-	IsolationLevel IsolationMode     `json:"isolation_level,omitempty"`
-	VariableName   string            `json:"variable_name,omitempty"` // For LET
-	Expression     ZQLExpression     `json:"expression,omitempty"`    // For LET
-	Upsert         *UpsertExpr       `json:"upsert,omitempty"`        // For UPSERT
-	DeleteKind     string            `json:"kind,omitempty"`          // For DELETE
-	DeleteID       ZQLExpression     `json:"id,omitempty"`            // For DELETE
-	CascadeMode    string            `json:"cascade_mode,omitempty"`  // CASCADE or RESTRICT
+	NodeType       StatementType `json:"node_type"`
+	Line           int           `json:"line"`
+	Column         int           `json:"column"`
+	IsolationLevel IsolationMode `json:"isolation_level,omitempty"`
+	VariableName   string        `json:"variable_name,omitempty"` // For LET
+	Expression     ZQLExpression `json:"expression,omitempty"`    // For LET
+	Upsert         *UpsertExpr   `json:"upsert,omitempty"`        // For UPSERT
+	DeleteKind     string        `json:"kind,omitempty"`          // For DELETE
+	DeleteID       ZQLExpression `json:"id,omitempty"`            // For DELETE
+	CascadeMode    string        `json:"cascade_mode,omitempty"`  // CASCADE or RESTRICT
 }
 
 // ZQLProgram represents the top-level parsed AST.

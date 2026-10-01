@@ -86,4 +86,3 @@ func ResolvePolicyByIntent(ctx context.Context, sp storage.ObjectStorageProvider
 	}
 	return "", ""
 }
-

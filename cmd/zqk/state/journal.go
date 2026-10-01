@@ -23,43 +23,43 @@ func newJournalCmd() *cobra.Command {
 
 			mutations := readRecentJournalMutations(projectRoot, limit)
 
-				format, _ := cmd.Flags().GetString("format")
-				if format == "json" {
-					return cli.FormatOutputAs(cmd, cli.FormatJSON, map[string]any{
-						"count":     len(mutations),
-						"mutations": mutations,
-					})
+			format, _ := cmd.Flags().GetString("format")
+			if format == "json" {
+				return cli.FormatOutputAs(cmd, cli.FormatJSON, map[string]any{
+					"count":     len(mutations),
+					"mutations": mutations,
+				})
+			}
+
+			var buf strings.Builder
+			buf.WriteString(fmt.Sprintf("\n📜 Recent Change Journal Mutations (Total: %d)\n", len(mutations)))
+			buf.WriteString("──────────────────────────────────────────────────────────────────────────────────────────\n")
+			buf.WriteString(fmt.Sprintf("%-12s %-8s %-36s %s\n", "ID", "TYPE", "OBJECT REF", "DIFF / SUMMARY"))
+			buf.WriteString("──────────────────────────────────────────────────────────────────────────────────────────\n")
+
+			for _, m := range mutations {
+				diff := m.DiffSummary
+				if diff == "" {
+					diff = m.ChangeType
 				}
-
-				var buf strings.Builder
-				buf.WriteString(fmt.Sprintf("\n📜 Recent Change Journal Mutations (Total: %d)\n", len(mutations)))
-				buf.WriteString("──────────────────────────────────────────────────────────────────────────────────────────\n")
-				buf.WriteString(fmt.Sprintf("%-12s %-8s %-36s %s\n", "ID", "TYPE", "OBJECT REF", "DIFF / SUMMARY"))
-				buf.WriteString("──────────────────────────────────────────────────────────────────────────────────────────\n")
-
-				for _, m := range mutations {
-					diff := m.DiffSummary
-					if diff == "" {
-						diff = m.ChangeType
-					}
-					if len(diff) > 40 {
-						diff = diff[:37] + "..."
-					}
-					timeStr := ""
-					if m.CreatedAt > 0 {
-						t := time.Unix(m.CreatedAt, 0)
-						timeStr = t.Format("15:04:05")
-					}
-					ref := m.ObjectRef
-					if len(ref) > 35 {
-						ref = ref[:32] + "..."
-					}
-					buf.WriteString(fmt.Sprintf("%-12s %-8s %-36s %s (%s)\n", m.ID, m.ChangeType, ref, diff, timeStr))
+				if len(diff) > 40 {
+					diff = diff[:37] + "..."
 				}
-				buf.WriteString("──────────────────────────────────────────────────────────────────────────────────────────\n\n")
+				timeStr := ""
+				if m.CreatedAt > 0 {
+					t := time.Unix(m.CreatedAt, 0)
+					timeStr = t.Format("15:04:05")
+				}
+				ref := m.ObjectRef
+				if len(ref) > 35 {
+					ref = ref[:32] + "..."
+				}
+				buf.WriteString(fmt.Sprintf("%-12s %-8s %-36s %s (%s)\n", m.ID, m.ChangeType, ref, diff, timeStr))
+			}
+			buf.WriteString("──────────────────────────────────────────────────────────────────────────────────────────\n\n")
 
-				return cli.WriteOutput(cmd, []byte(buf.String()))
-			})(cmd, args)
-		}
+			return cli.WriteOutput(cmd, []byte(buf.String()))
+		})(cmd, args)
+	}
 	return cmd
 }

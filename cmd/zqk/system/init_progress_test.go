@@ -169,5 +169,3 @@ func TestInit_AllStepsProgressSequencing(t *testing.T) {
 		t.Errorf("expected 7 progress callbacks, got %d: %v", len(recordedSteps), recordedSteps)
 	}
 }
-
-

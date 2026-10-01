@@ -49,11 +49,11 @@ func OverseerServiceSpec(absRoot, binaryPath string) service.ServiceSpec {
 			"ZQK_IS_DAEMON":    "1",
 			"ZQK_API_KEY":      "ACC-SYSTEM",
 		},
-		StandardOutPath: stdoutLog,
+		StandardOutPath:   stdoutLog,
 		StandardErrorPath: stderrLog,
-		RunAtLoad:       true,
-		KeepAlive:       true,
-		RestartPolicy:   service.RestartOnFailure,
+		RunAtLoad:         true,
+		KeepAlive:         true,
+		RestartPolicy:     service.RestartOnFailure,
 	}
 }
 

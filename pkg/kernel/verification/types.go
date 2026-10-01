@@ -56,12 +56,12 @@ type ExecutionOrganizer struct {
 
 // StageResult captures the outcome of an individual verification stage.
 type StageResult struct {
-	StageID   string
-	Category  StageCategory
-	Passed    bool
-	Error     error
-	Panicked  bool
-	Duration  time.Duration
+	StageID  string
+	Category StageCategory
+	Passed   bool
+	Error    error
+	Panicked bool
+	Duration time.Duration
 }
 
 // VerificationReport contains aggregated diagnostics for the composite test case.

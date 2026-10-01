@@ -1432,15 +1432,15 @@ func TestRoleAwarePrompts_AllPersonas(t *testing.T) {
 func TestServerInitHelpers_ExtractAndPrepare(t *testing.T) {
 	initParams := InitializeParams{
 		Capabilities: map[string]any{
-			clientInfoAccountID: "ACC-001",
+			clientInfoAccountID:       "ACC-001",
 			objects.FieldKeySessionID: "sess-123",
-			clientInfoKeystoreKeyID: "key-99",
-			objects.FieldKeyUsername: "user-1",
-			"password": "secret-password",
-			"oauth_token": "token-xyz",
-			"personal_access_token": "pat-abc",
-			clientInfoRoles: []any{"developer", "operator"},
-			clientInfoPermissions: []any{"read:all", "write:code"},
+			clientInfoKeystoreKeyID:   "key-99",
+			objects.FieldKeyUsername:  "user-1",
+			"password":                "secret-password",
+			"oauth_token":             "token-xyz",
+			"personal_access_token":   "pat-abc",
+			clientInfoRoles:           []any{"developer", "operator"},
+			clientInfoPermissions:     []any{"read:all", "write:code"},
 		},
 	}
 	initParams.ClientInfo.Name = "agent-1"

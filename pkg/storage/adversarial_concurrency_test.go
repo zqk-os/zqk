@@ -157,4 +157,3 @@ func TestAdversarialConcurrency(t *testing.T) {
 		t.Errorf("expected storage entries for audit events, got %d (err: %v)", len(entries), err)
 	}
 }
-

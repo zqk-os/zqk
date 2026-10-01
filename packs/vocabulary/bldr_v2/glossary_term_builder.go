@@ -79,6 +79,15 @@ func (b *GlossaryTermBuilder) addGlossaryTermFields() {
 		WithTraits("readable", "writable").
 		WithPermissions("rwx").
 		WithSemanticType("statement"))
+	b.AddFieldBuilder(builders.NewFieldBuilder("scheme_ref", "string").
+		WithValidation(builders.NewValidationBuilder().
+			Required(false).
+			Pattern(`^VOC-`).
+			Build()).
+		WithDefault("").
+		WithTraits("field_reference_group", "filterable", "groupable").
+		WithPermissions("rwx").
+		WithSemanticType("reference"))
 	b.AddFieldBuilder(builders.NewFieldBuilder("semantic_tags", "list").
 		WithValidation(builders.NewValidationBuilder().
 			Required(false).

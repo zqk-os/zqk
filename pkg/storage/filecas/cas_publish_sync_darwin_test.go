@@ -190,6 +190,3 @@ func TestCasPublishSyncFileOS_StrictSyncDurability(t *testing.T) {
 		t.Fatalf("strict sync failed: %v", err)
 	}
 }
-
-
-

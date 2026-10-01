@@ -6,7 +6,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
-
 func TestOmitDraftPlaneOnlyFromList_NilAndEmpty(t *testing.T) {
 	t.Parallel()
 	f := &FileObjectStorage{projectRoot: t.TempDir()}

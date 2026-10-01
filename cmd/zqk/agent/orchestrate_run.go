@@ -1223,4 +1223,3 @@ func resolveVerifiedUpstreamDeliverables(ctx context.Context, sp storage.ObjectS
 	}
 	return sb.String()
 }
-

@@ -82,4 +82,3 @@ func TestLicenseHeaders(t *testing.T) {
 		}
 	}
 }
-

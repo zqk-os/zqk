@@ -6,7 +6,6 @@ import (
 	"go/parser"
 	"go/token"
 	"strings"
-
 )
 
 // Violation represents a specific non-compliant code pattern.

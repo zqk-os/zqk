@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
-	"github.com/zqk-os/zqk/pkg/observer"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/observer"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 

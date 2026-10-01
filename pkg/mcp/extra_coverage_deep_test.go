@@ -664,5 +664,3 @@ func TestDeep_SchemaResources_Registration(t *testing.T) {
 	}
 	_ = RegisterAllObjectSchemaResources(s)
 }
-
-

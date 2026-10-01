@@ -92,6 +92,11 @@ func InitiateDarwinSyncShutdown() error {
 	return nil
 }
 
+// ResetDarwinSyncShutdownForTesting resets the shutdown flag for testing.
+func ResetDarwinSyncShutdownForTesting() {
+	darwinSyncShutdown.Store(false)
+}
+
 // IsDarwinSyncQueueDrained reports whether there are zero pending sync operations.
 func IsDarwinSyncQueueDrained() bool {
 	return darwinSyncPending.Load() == 0

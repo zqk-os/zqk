@@ -82,4 +82,3 @@ func TestEnforceOverrideFriction(t *testing.T) {
 		stop()
 	})
 }
-

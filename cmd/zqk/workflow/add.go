@@ -419,18 +419,18 @@ func scaffoldPlanMilestoneGoal(ctx context.Context, proc *cli.Processor, activeO
 
 	// 3. Create Milestone
 	milestone := map[string]any{
-		objects.FieldKeyID:               milestoneID,
-		objects.FieldKeyKind:             "milestone",
-		objects.FieldKeyTitle:            fmt.Sprintf("Auto-generated Milestone %d", timestamp),
-		objects.FieldKeyDescription:      "Auto-generated Milestone linking auto plan and goal",
+		objects.FieldKeyID:                milestoneID,
+		objects.FieldKeyKind:              "milestone",
+		objects.FieldKeyTitle:             fmt.Sprintf("Auto-generated Milestone %d", timestamp),
+		objects.FieldKeyDescription:       "Auto-generated Milestone linking auto plan and goal",
 		objects.FieldKeyStatus:            objects.ObjectStatusNotStarted,
 		objects.FieldKeyRelatedObjectRefs: []any{planID},
 		objects.FieldKeyGoalRefs:          []any{goalID},
-		objects.FieldKeyNamespaceID:      "zqk:kernel",
-		objects.FieldKeyCreatedAt:        time.Now().Format(time.RFC3339),
-		objects.FieldKeyCreatedBy:        objects.DefaultSystemAccountID,
-		objects.FieldKeyUpdatedAt:        time.Now().Format(time.RFC3339),
-		objects.FieldKeyUpdatedBy:        objects.DefaultSystemAccountID,
+		objects.FieldKeyNamespaceID:       "zqk:kernel",
+		objects.FieldKeyCreatedAt:         time.Now().Format(time.RFC3339),
+		objects.FieldKeyCreatedBy:         objects.DefaultSystemAccountID,
+		objects.FieldKeyUpdatedAt:         time.Now().Format(time.RFC3339),
+		objects.FieldKeyUpdatedBy:         objects.DefaultSystemAccountID,
 	}
 	if err := proc.Storage().Create(ctx, secCtx, milestone); err != nil {
 		return "", "", "", errfmt.Newf("failed to create auto milestone").Wrap(err)

@@ -12,15 +12,15 @@ import (
 // without triggering runtime panics on mismatched, absent, or malformed map types (F-ARCH-005).
 func TestTypeAssertRemediation(t *testing.T) {
 	sample := map[string]any{
-		objects.FieldKeyID:          "REQ-001",
-		objects.FieldKeyKind:        "requirement",
-		objects.FieldKeyStatus:      "originated",
-		objects.FieldKeyTags:        []any{"core", "launch", 123},
-		"effort_count":              "42",
-		"is_active":                 "true",
-		objects.FieldKeyCreatedAt:   "2026-09-25T16:00:00Z",
-		"invalid_time":              12345,
-		"nil_field":                 nil,
+		objects.FieldKeyID:        "REQ-001",
+		objects.FieldKeyKind:      "requirement",
+		objects.FieldKeyStatus:    "originated",
+		objects.FieldKeyTags:      []any{"core", "launch", 123},
+		"effort_count":            "42",
+		"is_active":               "true",
+		objects.FieldKeyCreatedAt: "2026-09-25T16:00:00Z",
+		"invalid_time":            12345,
+		"nil_field":               nil,
 	}
 
 	t.Run("Safe string extraction without panic", func(t *testing.T) {

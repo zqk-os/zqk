@@ -137,4 +137,3 @@ func TestFencedStateLocking(t *testing.T) {
 		t.Fatalf("old token %d must not validate against new lease", token1)
 	}
 }
-

@@ -1,6 +1,5 @@
 // Package closureevidence implements fail-closed machine-checkable evidence validation
 // for object completion (scheduler job ID, test bundle log path, and re-read green fingerprint in health.jsonl).
-//
 package closureevidence
 
 import (

@@ -8,8 +8,7 @@ import (
 )
 
 // Consolidated Domain Platform Enums
-// Unifies platform daemon, scheduling, policy, and audit micro-packages
-// in accordance with TDE-CEF-F-ARCH-005.
+// Unifies platform daemon, scheduling, policy, and audit micro-packages.
 
 // AuditStatus represents lifecycle states for audit events.
 type AuditStatus = shared_auditenum.Status

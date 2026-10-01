@@ -58,11 +58,11 @@ func TestExtended_ConvergenceTestBundle_Wave43(t *testing.T) {
 			"duration_ms":  500.0,
 		},
 		{
-			"package_path": "pkg/storage",
-			"outcome":      "failed",
-			"passed_tests": 5,
-			"failed_tests": 2,
-			"duration_ms":  1200.0,
+			"package_path":      "pkg/storage",
+			"outcome":           "failed",
+			"passed_tests":      5,
+			"failed_tests":      2,
+			"duration_ms":       1200.0,
 			"failed_test_names": []any{"TestFail1"},
 		},
 	}

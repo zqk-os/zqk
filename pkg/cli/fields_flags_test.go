@@ -79,4 +79,3 @@ func TestFieldsHarnessFlagNames(t *testing.T) {
 		t.Errorf("expected 5 flags starting with filterable, got %v", withoutList)
 	}
 }
-

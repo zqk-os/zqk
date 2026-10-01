@@ -13,7 +13,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
-
 const objectStatusReview = "review"
 
 func draftPlaneDocEntry(id, title, status string) map[string]any {

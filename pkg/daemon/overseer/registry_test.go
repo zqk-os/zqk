@@ -300,4 +300,3 @@ func TestSupervisorAddRemoveDaemonViaIPC(t *testing.T) {
 	_, err = sup.GetStatus("seat-worker-dynamic")
 	assert.Error(t, err)
 }
-

@@ -67,9 +67,9 @@ func (ComparisonExpr) isExpr() {}
 
 // LogicalExpr evaluates AND/OR over sub-expressions.
 type LogicalExpr struct {
-	Op       string `json:"op"` // "AND" or "OR"
-	Left     Expr   `json:"left"`
-	Right    Expr   `json:"right"`
+	Op    string `json:"op"` // "AND" or "OR"
+	Left  Expr   `json:"left"`
+	Right Expr   `json:"right"`
 }
 
 func (LogicalExpr) isExpr() {}

@@ -7,11 +7,11 @@ import (
 
 // Lifecycle errors.
 var (
-	ErrInvalidStatusTransition  = errors.New("mutation gate: illegal status transition jump")
-	ErrIncompleteLineage        = errors.New("mutation gate: incomplete lineage; missing required milestone, workstream, or goal refs")
-	ErrUnboundCriteria          = errors.New("mutation gate: promotion rejected; object has unbound criteria")
-	ErrMissingRequiredField     = errors.New("mutation gate: required schema field missing")
-	ErrAtomicRollbackTriggered  = errors.New("mutation gate: shockwave rollback triggered")
+	ErrInvalidStatusTransition = errors.New("mutation gate: illegal status transition jump")
+	ErrIncompleteLineage       = errors.New("mutation gate: incomplete lineage; missing required milestone, workstream, or goal refs")
+	ErrUnboundCriteria         = errors.New("mutation gate: promotion rejected; object has unbound criteria")
+	ErrMissingRequiredField    = errors.New("mutation gate: required schema field missing")
+	ErrAtomicRollbackTriggered = errors.New("mutation gate: shockwave rollback triggered")
 )
 
 // ObjectKind defines supported kernel object kinds.
@@ -31,16 +31,16 @@ const (
 type ObjectStatus string
 
 const (
-	StatusConceptual  ObjectStatus = "conceptual"
-	StatusOriginated  ObjectStatus = "originated"
-	StatusGrooming    ObjectStatus = "grooming"
-	StatusPlanned     ObjectStatus = "planned"
-	StatusActive      ObjectStatus = "active"
-	StatusInProgress  ObjectStatus = "in_progress"
-	StatusComplete    ObjectStatus = "complete"
-	StatusArchived    ObjectStatus = "archived"
-	StatusBlocked     ObjectStatus = "blocked"
-	StatusPaused      ObjectStatus = "paused"
+	StatusConceptual ObjectStatus = "conceptual"
+	StatusOriginated ObjectStatus = "originated"
+	StatusGrooming   ObjectStatus = "grooming"
+	StatusPlanned    ObjectStatus = "planned"
+	StatusActive     ObjectStatus = "active"
+	StatusInProgress ObjectStatus = "in_progress"
+	StatusComplete   ObjectStatus = "complete"
+	StatusArchived   ObjectStatus = "archived"
+	StatusBlocked    ObjectStatus = "blocked"
+	StatusPaused     ObjectStatus = "paused"
 )
 
 // KernelMutationRequest represents an intent to transition an object's lifecycle status.

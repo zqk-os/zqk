@@ -847,4 +847,3 @@ func TestDashboardState_BuildPayload_EnsuresAllTestCasesInOrder(t *testing.T) {
 		t.Fatalf("expected TestCaseOrder to include TST-ORPHAN-01, got %v", payload.TestCaseOrder)
 	}
 }
-

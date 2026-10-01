@@ -332,5 +332,3 @@ func TestReapStaleLocks_DaemonLockNeverReaped(t *testing.T) {
 		t.Fatalf("daemon lock must not be reaped: %v", err)
 	}
 }
-
-

@@ -221,4 +221,3 @@ func TestRelayServer_BufferQueueBound(t *testing.T) {
 		t.Errorf("expected oldest payloads dropped; first element is %d, want 50", payloads[0][0])
 	}
 }
-

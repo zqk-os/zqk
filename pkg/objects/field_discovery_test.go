@@ -232,4 +232,3 @@ func TestFieldRegistry_MixinInheritanceNotSpecialized(t *testing.T) {
 		t.Errorf("expected authority in SpecializedFields for goal")
 	}
 }
-

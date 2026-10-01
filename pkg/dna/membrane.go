@@ -12,7 +12,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
-
 // IsRequired reports whether this field is marked required in its validation spec or flat attributes.
 func (f FieldMetaSpec) IsRequired() bool {
 	return f.Validation.Required || f.Required

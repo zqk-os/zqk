@@ -150,4 +150,3 @@ func TestIDValidator_LoadPatternsFromGraph(t *testing.T) {
 		t.Errorf("expected non-nil from NewIDValidatorWithConfigs")
 	}
 }
-

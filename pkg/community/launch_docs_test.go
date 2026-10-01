@@ -11,18 +11,18 @@ import (
 )
 
 const (
-	packCompDocRelPath     = "docs/architecture/PACK_COMPOSITION_AND_EXTENSIBILITY.md"
-	packCompStubRelPath    = "PACK-COMPOSITION.md"
-	docsIndexRelPath       = "docs/INDEX.md"
-	zparqlManualRelPath    = "docs/manual/ZPARQL_QUERY_LANGUAGE.md"
-	zqlManualRelPath       = "docs/manual/ZQL_MUTATIONS.md"
-	lifecycleDocRelPath    = "docs/architecture/LIFECYCLE_STATE_MACHINE.md"
-	tokenPackManifest      = "pack.yaml"
-	tokenBuilderCodegen    = "bldr_cli_cmd_v1"
-	tokenMermaidFlowchart  = "mermaid"
-	tokenZparqlSelect      = "SELECT"
-	tokenZqlApply          = "apply"
-	minDocByteLength       = 200
+	packCompDocRelPath    = "docs/architecture/PACK_COMPOSITION_AND_EXTENSIBILITY.md"
+	packCompStubRelPath   = "PACK-COMPOSITION.md"
+	docsIndexRelPath      = "docs/INDEX.md"
+	zparqlManualRelPath   = "docs/manual/ZPARQL_QUERY_LANGUAGE.md"
+	zqlManualRelPath      = "docs/manual/ZQL_MUTATIONS.md"
+	lifecycleDocRelPath   = "docs/architecture/LIFECYCLE_STATE_MACHINE.md"
+	tokenPackManifest     = "pack.yaml"
+	tokenBuilderCodegen   = "bldr_cli_cmd_v1"
+	tokenMermaidFlowchart = "mermaid"
+	tokenZparqlSelect     = "SELECT"
+	tokenZqlApply         = "apply"
+	minDocByteLength      = 200
 )
 
 // TestPackCompositionDocs verifies the existence and completeness of modular pack composition docs.

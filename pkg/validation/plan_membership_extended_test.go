@@ -148,15 +148,15 @@ func TestLinkedBacklogItemsEvaluation(t *testing.T) {
 	// Dependents with different statuses
 	objectsDB := map[string]map[string]any{
 		"BLI-1": {
-			"id":                          "BLI-1",
+			"id":                            "BLI-1",
 			objects.FieldKeyPriorityPlanRef: "PLAN-1",
 		},
 		"BLI-2": {
-			"id":                          "BLI-2",
+			"id":                            "BLI-2",
 			objects.FieldKeyPriorityPlanRef: "PLAN-OTHER", // unlinked
 		},
 		"BLI-3": {
-			"id":                          "BLI-3",
+			"id":                            "BLI-3",
 			objects.FieldKeyPriorityPlanRef: "PLAN-1",
 		},
 	}

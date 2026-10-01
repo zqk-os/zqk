@@ -1058,4 +1058,3 @@ func writeRemedySummary(buf *strings.Builder, cmd *cobra.Command, projectRoot st
 		}
 	}
 }
-

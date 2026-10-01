@@ -46,11 +46,11 @@ func FindingToRemediationBLI(finding metabolism.Finding, milestoneID string) (*R
 
 	// 1. Synthesize Requirement
 	reqObj := map[string]any{
-		objects.FieldKeyID:          reqID,
-		objects.FieldKeyKind:        "requirement",
-		objects.FieldKeyTitle:       fmt.Sprintf("Resolve %s Defect: %s", finding.Lens, finding.Title),
-		objects.FieldKeyDescription: fmt.Sprintf("Remediate defect %s observed in lens %s. Root cause: %s. Action: %s", finding.ID, finding.Lens, finding.Description, finding.Remediation),
-		objects.FieldKeyStatus:      objects.ObjectStatusActive,
+		objects.FieldKeyID:           reqID,
+		objects.FieldKeyKind:         "requirement",
+		objects.FieldKeyTitle:        fmt.Sprintf("Resolve %s Defect: %s", finding.Lens, finding.Title),
+		objects.FieldKeyDescription:  fmt.Sprintf("Remediate defect %s observed in lens %s. Root cause: %s. Action: %s", finding.ID, finding.Lens, finding.Description, finding.Remediation),
+		objects.FieldKeyStatus:       objects.ObjectStatusActive,
 		objects.FieldKeyCriteriaRefs: []string{critInvID, critDynID, critAdvID},
 	}
 
@@ -91,26 +91,26 @@ func FindingToRemediationBLI(finding metabolism.Finding, milestoneID string) (*R
 
 	// 3. Synthesize Test Case
 	tstObj := map[string]any{
-		objects.FieldKeyID:          tstID,
-		objects.FieldKeyKind:        "test_case",
-		objects.FieldKeyTitle:       fmt.Sprintf("Verification Suite for %s", finding.ID),
+		objects.FieldKeyID:           tstID,
+		objects.FieldKeyKind:         "test_case",
+		objects.FieldKeyTitle:        fmt.Sprintf("Verification Suite for %s", finding.ID),
 		objects.FieldKeyCriteriaRefs: []string{critInvID, critDynID, critAdvID},
-		objects.FieldKeyStatus:      objects.ObjectStatusActive,
+		objects.FieldKeyStatus:       objects.ObjectStatusActive,
 	}
 
 	// 4. Synthesize Backlog Item
 	bliObj := map[string]any{
-		objects.FieldKeyID:             bliID,
-		objects.FieldKeyKind:           "backlog_item",
-		objects.FieldKeyTitle:          fmt.Sprintf("Remediate [%s] %s", finding.Lens, finding.Title),
-		objects.FieldKeyDescription:    fmt.Sprintf("Fix defect %s (%s). Evidence: %s. Remediation: %s", finding.ID, finding.Title, finding.Evidence, finding.Remediation),
-		objects.FieldKeyMilestoneRefs:  []string{milestoneID},
+		objects.FieldKeyID:              bliID,
+		objects.FieldKeyKind:            "backlog_item",
+		objects.FieldKeyTitle:           fmt.Sprintf("Remediate [%s] %s", finding.Lens, finding.Title),
+		objects.FieldKeyDescription:     fmt.Sprintf("Fix defect %s (%s). Evidence: %s. Remediation: %s", finding.ID, finding.Title, finding.Evidence, finding.Remediation),
+		objects.FieldKeyMilestoneRefs:   []string{milestoneID},
 		objects.FieldKeyRequirementRefs: []string{reqID},
-		objects.FieldKeyCriteriaRefs:   []string{critInvID, critDynID, critAdvID},
-		objects.FieldKeyTestCaseRefs:   []string{tstID},
-		objects.FieldKeyPriority:       priority,
+		objects.FieldKeyCriteriaRefs:    []string{critInvID, critDynID, critAdvID},
+		objects.FieldKeyTestCaseRefs:    []string{tstID},
+		objects.FieldKeyPriority:        priority,
 		objects.FieldKeyEstimatedEffort: "medium",
-		objects.FieldKeyStatus:         objects.ObjectStatusPlanned,
+		objects.FieldKeyStatus:          objects.ObjectStatusPlanned,
 	}
 
 	return &RemediationBundle{

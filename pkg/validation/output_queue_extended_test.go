@@ -102,4 +102,3 @@ func TestOutputWriter_ErrorHandling(t *testing.T) {
 	})
 	writer.flushAll()
 }
-

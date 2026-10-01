@@ -180,7 +180,6 @@ func TestCASMigrationUtility_Comprehensive(t *testing.T) {
 		t.Errorf("expected error for unknown directory: %d, %v", migrated, errs)
 	}
 
-
 	// 8. MigrateAllToCAS
 	// Temporarily make a kind fail to cover error branch in MigrateAllToCAS
 	facade.kinds = append(facade.kinds, "unknown_kind_cas")
@@ -189,7 +188,6 @@ func TestCASMigrationUtility_Comprehensive(t *testing.T) {
 		t.Errorf("expected migrated kinds and error map in MigrateAllToCAS: %v, %v", migratedMap, errMap)
 	}
 	facade.kinds = []string{"backlog_item", "feature"}
-
 
 	// 9. MigrateObjectToCAS with relative oldFilePath
 	relFile := filepath.Join(".zqk", "process", "backlog_items", "BLI-REL.yaml")
@@ -328,7 +326,6 @@ func TestDSIAMigrationUtility_Comprehensive(t *testing.T) {
 	}
 	_ = os.Remove(badFile)
 
-
 	// 6. MigrateObjectToDSIA again with same object ID to trigger Update fallback
 	_ = util.MigrateObjectToDSIA(ctx, secCtx, "backlog_item", hex64_2, hashFilePath2, false)
 
@@ -413,7 +410,7 @@ func TestVerifyHashAndPromoteObjectSpec(t *testing.T) {
 		objects.FieldKeyID:          "OBJ-123456",
 		objects.FieldKeyDescription: "This is a valid long description for spec",
 		objects.FieldKeyFilePath:    ".zqk/specs/spec.yaml",
-		objects.FieldKeyOntology:   "spec_ontology",
+		objects.FieldKeyOntology:    "spec_ontology",
 		objects.FieldKeySourceType:  "internal",
 	}
 	if err := ValidateObjectSpecInstance(validSpec); err != nil {
@@ -448,7 +445,7 @@ func TestVerifyHashAndPromoteObjectSpec(t *testing.T) {
 			objects.FieldKeyStatus:      objects.ObjectStatusProposed,
 			objects.FieldKeyDescription: "Sample description for promotion",
 			objects.FieldKeyFilePath:    ".zqk/specs/spec.yaml",
-			objects.FieldKeyOntology:   "sample_ontology",
+			objects.FieldKeyOntology:    "sample_ontology",
 			objects.FieldKeySourceType:  "internal",
 		}
 		_ = store.Create(ctx, secCtx, baseSpec)
@@ -465,7 +462,7 @@ func TestVerifyHashAndPromoteObjectSpec(t *testing.T) {
 			objects.FieldKeyStatus:      objects.ObjectStatusApproved,
 			objects.FieldKeyDescription: "Sample description for promotion 2",
 			objects.FieldKeyFilePath:    ".zqk/specs/spec2.yaml",
-			objects.FieldKeyOntology:   "sample_ontology2",
+			objects.FieldKeyOntology:    "sample_ontology2",
 			objects.FieldKeySourceType:  "internal",
 		}
 		_ = store.Create(ctx, secCtx, baseSpec2)
@@ -487,7 +484,6 @@ func TestVerifyHashAndPromoteObjectSpec(t *testing.T) {
 	if err != nil || stats.Created != 0 {
 		t.Errorf("expected clean return for missing specsDir: %v, stats=%+v", err, stats)
 	}
-
 
 	// Test HashMigration with verbose, conflicts, and empty hash
 	hmDir := t.TempDir()
@@ -543,7 +539,6 @@ func TestVerifyHashAndPromoteObjectSpec(t *testing.T) {
 		t.Errorf("expected kinds processed in dry run")
 	}
 
-
 	// Test buildObjectSpecObjectFromBundledFile
 	// 1. Invalid YAML
 	if _, err := buildObjectSpecObjectFromBundledFile(tmpDir, "spec.yaml", []byte(":\n  invalid")); err == nil {
@@ -571,22 +566,22 @@ func TestVerifyHashAndPromoteObjectSpec(t *testing.T) {
 
 	// 5. Test bundledObjectSpecMatches variations
 	m1 := map[string]any{
-		"ontology":                   "sample",
-		"title":                      "sample",
-		"file_path":                  "p.yaml",
+		"ontology":                     "sample",
+		"title":                        "sample",
+		"file_path":                    "p.yaml",
 		storage.ConstMiscSchemaVersion: "1.0",
-		"status":                     "active",
-		"source_type":                "internal",
-		objects.FieldKeyVisibility:   "internal",
+		"status":                       "active",
+		"source_type":                  "internal",
+		objects.FieldKeyVisibility:     "internal",
 	}
 	m2 := map[string]any{
-		"ontology":                   "sample",
-		"title":                      "sample",
-		"file_path":                  "p.yaml",
+		"ontology":                     "sample",
+		"title":                        "sample",
+		"file_path":                    "p.yaml",
 		storage.ConstMiscSchemaVersion: "1.0",
-		"status":                     "active",
-		"source_type":                "internal",
-		objects.FieldKeyVisibility:   "internal",
+		"status":                       "active",
+		"source_type":                  "internal",
+		objects.FieldKeyVisibility:     "internal",
 	}
 	if !bundledObjectSpecMatches(m1, m2) {
 		t.Errorf("expected match for identical maps")

@@ -156,4 +156,3 @@ func TestStorageExtended_Wave22_MergeAndCompress(t *testing.T) {
 	assert.Equal(t, []string{"a", "b"}, compressed)
 	assert.Empty(t, svc.compressEntryIDs(nil))
 }
-

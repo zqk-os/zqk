@@ -950,8 +950,8 @@ func TestExtended_HandlersOperationExecution(t *testing.T) {
 	}
 	// Unknown operation type
 	ctxUnknown := context.WithValue(context.Background(), evtDataKey{}, map[string]any{
-		"operation_type":            "unknown_op",
-		"object_id":                 "obj-1",
+		"operation_type":           "unknown_op",
+		"object_id":                "obj-1",
 		objects.FieldKeyObjectKind: "kind-1",
 	})
 	if err := h.Execute(ctxUnknown, job); err == nil {
@@ -959,8 +959,8 @@ func TestExtended_HandlersOperationExecution(t *testing.T) {
 	}
 	// Create without data
 	ctxCreateNoData := context.WithValue(context.Background(), evtDataKey{}, map[string]any{
-		"operation_type":            "create",
-		"object_id":                 "obj-1",
+		"operation_type":           "create",
+		"object_id":                "obj-1",
 		objects.FieldKeyObjectKind: "kind-1",
 	})
 	if err := h.Execute(ctxCreateNoData, job); err == nil {
@@ -968,8 +968,8 @@ func TestExtended_HandlersOperationExecution(t *testing.T) {
 	}
 	// Update without data
 	ctxUpdateNoData := context.WithValue(context.Background(), evtDataKey{}, map[string]any{
-		"operation_type":            "update",
-		"object_id":                 "obj-1",
+		"operation_type":           "update",
+		"object_id":                "obj-1",
 		objects.FieldKeyObjectKind: "kind-1",
 	})
 	if err := h.Execute(ctxUpdateNoData, job); err == nil {

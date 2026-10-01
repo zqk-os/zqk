@@ -260,5 +260,3 @@ func CompileMode(m string) (string, bool) {
 	}
 	require.True(t, foundDrift, "Expected map key drift finding for CompileMode")
 }
-
-

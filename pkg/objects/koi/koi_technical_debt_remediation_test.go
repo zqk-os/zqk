@@ -16,13 +16,13 @@ import (
 
 const (
 	testIDDebtRemediation   = "REQ-STARTER-COMMUNITY-013"
-	testKindRequirement    = "requirement"
+	testKindRequirement     = "requirement"
 	testStatusOriginated    = "originated"
 	testStatusActive        = "active"
 	testStatusInProgress    = "in_progress"
 	testStatusComplete      = "complete"
 	testStatusArchived      = "archived"
-	testTitleRequirement   = "Remediate Technical Debt"
+	testTitleRequirement    = "Remediate Technical Debt"
 	testKeyTags             = "tags"
 	testKeyMetadata         = "metadata"
 	testKeyCount            = "count"

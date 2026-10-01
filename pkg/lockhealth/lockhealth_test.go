@@ -255,4 +255,3 @@ func TestSweep_PreservesHeldFlockEvenIfStale(t *testing.T) {
 	}
 	mustNotExist(t, staleLock)
 }
-

@@ -7,15 +7,15 @@ package interactionpolicy
 // reference the same tokens without duplicating wording, and makes drift
 // detection trivial: any new hint text MUST be registered here.
 const (
-	HintAlignRefreshText    = "align refresh"
-	HintDraftClassifyText   = "draft classify"
-	HintHourglassText       = "hourglass triage"
-	HintTracePipelineText   = "trace pipeline"
-	HintOrchestratePrefix   = "orchestrate plan "
-	HintOrchestrateSuffix   = " — lead executing"
-	HintObjectGetPrefix     = "object get "
-	HintObjectGetSuffix     = " (resolve body before acting)"
-	HintSwarmInitText       = "swarm init"
+	HintAlignRefreshText  = "align refresh"
+	HintDraftClassifyText = "draft classify"
+	HintHourglassText     = "hourglass triage"
+	HintTracePipelineText = "trace pipeline"
+	HintOrchestratePrefix = "orchestrate plan "
+	HintOrchestrateSuffix = " — lead executing"
+	HintObjectGetPrefix   = "object get "
+	HintObjectGetSuffix   = " (resolve body before acting)"
+	HintSwarmInitText     = "swarm init"
 )
 
 // IsKnownHint reports whether literal is one of the registered hint constants.

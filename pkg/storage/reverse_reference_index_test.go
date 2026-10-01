@@ -379,4 +379,3 @@ func TestReverseReferenceIndex_GetDependentsWithError_Contention(t *testing.T) {
 		t.Fatalf("expected nil dependents on lock failure, got %v", blockedDeps)
 	}
 }
-

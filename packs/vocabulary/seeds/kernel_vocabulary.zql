@@ -1,0 +1,197 @@
+BEGIN TRANSACTION;
+
+-- 1. Vocabulary Schemes
+UPSERT vocabulary_scheme ID "VOC-KERNEL-ACRONYMS" {
+    title: "Kernel Acronym & Jargon Taxonomy",
+    context_scope: "operational",
+    purpose: "mixed",
+    summary: "Core system acronyms across architecture, process, and data planes.",
+    machine_hints: "{\"glossary_type\":\"acronyms\",\"cli_command\":\"zqk explain\"}"
+};
+
+UPSERT vocabulary_scheme ID "VOC-KERNEL-ARCHITECTURE" {
+    title: "Kernel Architecture & Object Kinds Taxonomy",
+    context_scope: "operational",
+    purpose: "mixed",
+    summary: "Architectural object kinds, traits, and structural schemas.",
+    machine_hints: "{\"glossary_type\":\"architecture\",\"source_path\":\".zqk/specs/objects\"}"
+};
+
+UPSERT vocabulary_scheme ID "VOC-KERNEL-CLI" {
+    title: "Kernel CLI Command Taxonomy",
+    context_scope: "operational",
+    purpose: "navigation",
+    summary: "Commands, subcommands, and flags for the zqk command line interface.",
+    machine_hints: "{\"glossary_type\":\"cli\",\"source_path\":\".zqk/cli/specs\"}"
+};
+
+UPSERT vocabulary_scheme ID "VOC-KERNEL-PROCESS" {
+    title: "Kernel Process & Governance Taxonomy",
+    context_scope: "operational",
+    purpose: "mixed",
+    summary: "Process configurations, lifecycles, and operational governance entities.",
+    machine_hints: "{\"glossary_type\":\"process\",\"source_path\":\".zqk/specs/lifecycles\"}"
+};
+
+-- 2. Core Kernel Acronym Glossary Terms
+UPSERT glossary_term ID "GLS-ACRONYM-BLI" {
+    title: "BLI (Backlog Item)",
+    category: "work",
+    scheme_ref: "VOC-KERNEL-ACRONYMS",
+    context_scope: "operational",
+    definition: "A discrete, tracked work package or deliverable scheduled within a Priority Plan.",
+    agent_prompts: "Expanded meaning: Backlog Item. Use for progressive disclosure.",
+    machine_hints: "{\"acronym\":\"BLI\",\"full_name\":\"Backlog Item\",\"related_refs\":[\"PRI\",\"REQ\",\"CRIT\",\"ATK\"],\"scheme_ref\":\"VOC-KERNEL-ACRONYMS\"}"
+};
+
+UPSERT glossary_term ID "GLS-ACRONYM-PRI" {
+    title: "PRI (Priority Plan)",
+    category: "work",
+    scheme_ref: "VOC-KERNEL-ACRONYMS",
+    context_scope: "operational",
+    definition: "A time-bounded execution plan defining prioritized work packages and delivery horizons.",
+    agent_prompts: "Expanded meaning: Priority Plan. Use for progressive disclosure.",
+    machine_hints: "{\"acronym\":\"PRI\",\"full_name\":\"Priority Plan\",\"related_refs\":[\"BLI\",\"MIL\",\"PPLAN\"],\"scheme_ref\":\"VOC-KERNEL-ACRONYMS\"}"
+};
+
+UPSERT glossary_term ID "GLS-ACRONYM-REQ" {
+    title: "REQ (Requirement)",
+    category: "specification",
+    scheme_ref: "VOC-KERNEL-ACRONYMS",
+    context_scope: "operational",
+    definition: "A formal system invariant, capability, or architectural specification.",
+    agent_prompts: "Expanded meaning: Requirement. Use for progressive disclosure.",
+    machine_hints: "{\"acronym\":\"REQ\",\"full_name\":\"Requirement\",\"related_refs\":[\"CRIT\",\"TST\",\"BLI\"],\"scheme_ref\":\"VOC-KERNEL-ACRONYMS\"}"
+};
+
+UPSERT glossary_term ID "GLS-ACRONYM-CRIT" {
+    title: "CRIT (Criterion / Verification Criteria)",
+    category: "verification",
+    scheme_ref: "VOC-KERNEL-ACRONYMS",
+    context_scope: "operational",
+    definition: "An objective, verifiable acceptance condition proving a requirement.",
+    agent_prompts: "Expanded meaning: Criterion / Verification Criteria. Use for progressive disclosure.",
+    machine_hints: "{\"acronym\":\"CRIT\",\"full_name\":\"Criterion / Verification Criteria\",\"related_refs\":[\"REQ\",\"TST\",\"VDS\"],\"scheme_ref\":\"VOC-KERNEL-ACRONYMS\"}"
+};
+
+UPSERT glossary_term ID "GLS-ACRONYM-VDS" {
+    title: "VDS (Verification Definition of Done / Data Suite)",
+    category: "verification",
+    scheme_ref: "VOC-KERNEL-ACRONYMS",
+    context_scope: "operational",
+    definition: "Automated gate proving that all criteria and test lineages are green before promotion.",
+    agent_prompts: "Expanded meaning: Verification Definition of Done / Data Suite. Use for progressive disclosure.",
+    machine_hints: "{\"acronym\":\"VDS\",\"full_name\":\"Verification Definition of Done / Data Suite\",\"related_refs\":[\"CRIT\",\"TST\",\"CEF\"],\"scheme_ref\":\"VOC-KERNEL-ACRONYMS\"}"
+};
+
+UPSERT glossary_term ID "GLS-ACRONYM-TCFG" {
+    title: "TCFG (Team Configuration)",
+    category: "organization",
+    scheme_ref: "VOC-KERNEL-ACRONYMS",
+    context_scope: "operational",
+    definition: "Approved team composition, agent roster, and operational permissions.",
+    agent_prompts: "Expanded meaning: Team Configuration. Use for progressive disclosure.",
+    machine_hints: "{\"acronym\":\"TCFG\",\"full_name\":\"Team Configuration\",\"related_refs\":[\"PER\",\"ASK\"],\"scheme_ref\":\"VOC-KERNEL-ACRONYMS\"}"
+};
+
+UPSERT glossary_term ID "GLS-ACRONYM-CVS" {
+    title: "CVS (Convergence Session)",
+    category: "coordination",
+    scheme_ref: "VOC-KERNEL-ACRONYMS",
+    context_scope: "operational",
+    definition: "A structured cybernetic feedback session that closes deltas between projected and actual state.",
+    agent_prompts: "Expanded meaning: Convergence Session. Use for progressive disclosure.",
+    machine_hints: "{\"acronym\":\"CVS\",\"full_name\":\"Convergence Session\",\"related_refs\":[\"CAP\",\"CEF\"],\"scheme_ref\":\"VOC-KERNEL-ACRONYMS\"}"
+};
+
+UPSERT glossary_term ID "GLS-ACRONYM-ATK" {
+    title: "ATK (Agent Task)",
+    category: "execution",
+    scheme_ref: "VOC-KERNEL-ACRONYMS",
+    context_scope: "operational",
+    definition: "A granular, autonomous unit of work assigned to and executed by an agent persona.",
+    agent_prompts: "Expanded meaning: Agent Task. Use for progressive disclosure.",
+    machine_hints: "{\"acronym\":\"ATK\",\"full_name\":\"Agent Task\",\"related_refs\":[\"BLI\",\"PER\",\"ASK\"],\"scheme_ref\":\"VOC-KERNEL-ACRONYMS\"}"
+};
+
+UPSERT glossary_term ID "GLS-ACRONYM-PPLAN" {
+    title: "PPLAN (Priority Plan Verb)",
+    category: "cli",
+    scheme_ref: "VOC-KERNEL-ACRONYMS",
+    context_scope: "operational",
+    definition: "CLI command shortcut group for inspecting active priority plans and current workloads.",
+    agent_prompts: "Expanded meaning: Priority Plan (CLI Verb / Group). Use for progressive disclosure.",
+    machine_hints: "{\"acronym\":\"PPLAN\",\"full_name\":\"Priority Plan (CLI Verb / Group)\",\"related_refs\":[\"PRI\",\"BLI\",\"WORKFLOW\"],\"scheme_ref\":\"VOC-KERNEL-ACRONYMS\"}"
+};
+
+UPSERT glossary_term ID "GLS-ACRONYM-ZPARQL" {
+    title: "ZPARQL (ZQK Pattern Query Language)",
+    category: "graph",
+    scheme_ref: "VOC-KERNEL-ACRONYMS",
+    context_scope: "operational",
+    definition: "Declarative graph pattern matching and query engine for traversing kernel object relationships.",
+    agent_prompts: "Expanded meaning: ZQK Pattern Query Language. Use for progressive disclosure.",
+    machine_hints: "{\"acronym\":\"ZPARQL\",\"full_name\":\"ZQK Pattern Query Language\",\"related_refs\":[\"ZQL\",\"GRAPH\",\"OBJECT\"],\"scheme_ref\":\"VOC-KERNEL-ACRONYMS\"}"
+};
+
+UPSERT glossary_term ID "GLS-ACRONYM-ZQL" {
+    title: "ZQL (ZQK Query Language)",
+    category: "query",
+    scheme_ref: "VOC-KERNEL-ACRONYMS",
+    context_scope: "operational",
+    definition: "Declarative object query, mutation, and filtering expression language.",
+    agent_prompts: "Expanded meaning: ZQK Query Language. Use for progressive disclosure.",
+    machine_hints: "{\"acronym\":\"ZQL\",\"full_name\":\"ZQK Query Language\",\"related_refs\":[\"ZPARQL\",\"MUTATE\",\"QUERY\"],\"scheme_ref\":\"VOC-KERNEL-ACRONYMS\"}"
+};
+
+UPSERT glossary_term ID "GLS-ACRONYM-CAS" {
+    title: "CAS (Content-Addressable Storage)",
+    category: "storage",
+    scheme_ref: "VOC-KERNEL-ACRONYMS",
+    context_scope: "operational",
+    definition: "Immutable, cryptographic hash-indexed object storage layer forming the kernel membrane.",
+    agent_prompts: "Expanded meaning: Content-Addressable Storage. Use for progressive disclosure.",
+    machine_hints: "{\"acronym\":\"CAS\",\"full_name\":\"Content-Addressable Storage\",\"related_refs\":[\"WAL\",\"OBJECT\",\"SYSTEM\"],\"scheme_ref\":\"VOC-KERNEL-ACRONYMS\"}"
+};
+
+UPSERT glossary_term ID "GLS-ACRONYM-WAL" {
+    title: "WAL (Write-Ahead Log)",
+    category: "storage",
+    scheme_ref: "VOC-KERNEL-ACRONYMS",
+    context_scope: "operational",
+    definition: "Append-only sequential ledger guaranteeing atomic state mutations and crash recovery.",
+    agent_prompts: "Expanded meaning: Write-Ahead Log. Use for progressive disclosure.",
+    machine_hints: "{\"acronym\":\"WAL\",\"full_name\":\"Write-Ahead Log\",\"related_refs\":[\"CAS\",\"MUTATE\",\"SYSTEM\"],\"scheme_ref\":\"VOC-KERNEL-ACRONYMS\"}"
+};
+
+UPSERT glossary_term ID "GLS-ACRONYM-CAP" {
+    title: "CAP (Continuous Autonomous Protocol)",
+    category: "governance",
+    scheme_ref: "VOC-KERNEL-ACRONYMS",
+    context_scope: "operational",
+    definition: "The self-driving cybernetic feedback loop steering agents without human intervention.",
+    agent_prompts: "Expanded meaning: Continuous Autonomous Protocol. Use for progressive disclosure.",
+    machine_hints: "{\"acronym\":\"CAP\",\"full_name\":\"Continuous Autonomous Protocol\",\"related_refs\":[\"CVS\",\"CEF\",\"VDS\"],\"scheme_ref\":\"VOC-KERNEL-ACRONYMS\"}"
+};
+
+UPSERT glossary_term ID "GLS-ACRONYM-CEF" {
+    title: "CEF (Community Evaluation Framework)",
+    category: "evaluation",
+    scheme_ref: "VOC-KERNEL-ACRONYMS",
+    context_scope: "operational",
+    definition: "Comprehensive quality scorecard, testing pyramid, and Diamond Scale grading rubric.",
+    agent_prompts: "Expanded meaning: Community Evaluation Framework. Use for progressive disclosure.",
+    machine_hints: "{\"acronym\":\"CEF\",\"full_name\":\"Community Evaluation Framework\",\"related_refs\":[\"CAP\",\"VDS\",\"TDE\"],\"scheme_ref\":\"VOC-KERNEL-ACRONYMS\"}"
+};
+
+UPSERT glossary_term ID "GLS-ACRONYM-TDE" {
+    title: "TDE (Technical Debt Entry)",
+    category: "hygiene",
+    scheme_ref: "VOC-KERNEL-ACRONYMS",
+    context_scope: "operational",
+    definition: "An objectified defect, architectural smell, or maintainability liability tracked for resolution.",
+    agent_prompts: "Expanded meaning: Technical Debt Entry. Use for progressive disclosure.",
+    machine_hints: "{\"acronym\":\"TDE\",\"full_name\":\"Technical Debt Entry\",\"related_refs\":[\"BLI\",\"CEF\",\"PRI\"],\"scheme_ref\":\"VOC-KERNEL-ACRONYMS\"}"
+};
+
+COMMIT TRANSACTION;

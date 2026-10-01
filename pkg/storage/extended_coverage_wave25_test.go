@@ -614,5 +614,3 @@ func TestStorageExtended_Wave25_FileCASImpl(t *testing.T) {
 	mw.RecordIndexReload()
 	mw.RecordRemoveMapping(time.Millisecond, nil)
 }
-
-

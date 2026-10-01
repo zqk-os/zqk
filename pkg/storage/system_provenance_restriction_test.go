@@ -221,4 +221,3 @@ func TestSystemProvenanceFields_UnchangedProvenanceFieldsPermitted(t *testing.T)
 		t.Errorf("expected updated title, got %v", readBack[objects.FieldKeyTitle])
 	}
 }
-

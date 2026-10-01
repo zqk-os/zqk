@@ -137,28 +137,28 @@ func TestBaseLifecycleBuilder(t *testing.T) {
 	builder.SetExtends("base_parent").
 		SetStatusMapping(map[string]string{"orig": "target"}).
 		AddStatus(objects.Status{
-			Value:       "active",
-			Display:     "Active",
-			Origin:      true,
-			Terminal:    false,
-			Archive:     false,
-			WorkDone:    true,
-			Satisfied:   true,
-			System:      false,
-			Description: "Active state",
+			Value:         "active",
+			Display:       "Active",
+			Origin:        true,
+			Terminal:      false,
+			Archive:       false,
+			WorkDone:      true,
+			Satisfied:     true,
+			System:        false,
+			Description:   "Active state",
 			Preconditions: []string{"step1"},
 			Shockwave: objects.ShockwavePolicy{
-				Mode: "sync",
-				Fail: "halt",
+				Mode:         "sync",
+				Fail:         "halt",
 				LineageKinds: []string{"task"},
 			},
 		}).
 		AddTransition(objects.Transition{
-			From:        "orig",
-			To:          "active",
-			Description: "Start work",
-			Manual:      true,
-			Auto:        false,
+			From:          "orig",
+			To:            "active",
+			Description:   "Start work",
+			Manual:        true,
+			Auto:          false,
 			Preconditions: []string{"check1"},
 			OnDependentStatus: &objects.DependentStatusTrigger{
 				Kind: "dep",
@@ -172,7 +172,7 @@ func TestBaseLifecycleBuilder(t *testing.T) {
 			},
 		}).
 		SetPercentComplete(objects.PercentCompleteConfig{
-			Method: "status_based",
+			Method:          "status_based",
 			DefaultByStatus: map[string]any{"active": 50},
 			MilestoneBased:  map[string]any{"milestone1": 100},
 		})
@@ -273,39 +273,39 @@ func TestLifecycleCodegenHelpers(t *testing.T) {
 				"active": "in_progress",
 			},
 			PercentComplete: objects.PercentCompleteConfig{
-				Method: "status_based",
+				Method:          "status_based",
 				DefaultByStatus: map[string]any{"in_progress": 50},
 			},
 			Statuses: []objects.Status{
 				{
-					Value:       "open",
-					Display:     "Open",
-					Origin:      true,
-					Terminal:    false,
-					Archive:     false,
-					WorkDone:    false,
-					Satisfied:   false,
-					System:      true,
-					Description: "Initial open state",
+					Value:         "open",
+					Display:       "Open",
+					Origin:        true,
+					Terminal:      false,
+					Archive:       false,
+					WorkDone:      false,
+					Satisfied:     false,
+					System:        true,
+					Description:   "Initial open state",
 					Preconditions: []string{"check1"},
 					Shockwave: objects.ShockwavePolicy{
-						Mode: "sync",
-						Fail: "halt",
-						LineageKinds: []string{"task"},
-						ClusterKinds: []string{"group"},
+						Mode:             "sync",
+						Fail:             "halt",
+						LineageKinds:     []string{"task"},
+						ClusterKinds:     []string{"group"},
 						ClusterRefFields: []string{"group_ref"},
 						LineageRefFields: []string{"parent_ref"},
-						ExclusiveKinds: []string{"exclusive"},
+						ExclusiveKinds:   []string{"exclusive"},
 					},
 				},
 			},
 			Transitions: []objects.Transition{
 				{
-					From:        "open",
-					To:          "closed",
-					Description: "Close issue",
-					Manual:      true,
-					Auto:        false,
+					From:          "open",
+					To:            "closed",
+					Description:   "Close issue",
+					Manual:        true,
+					Auto:          false,
 					Preconditions: []string{"all_tasks_done"},
 					OnDependentStatus: &objects.DependentStatusTrigger{
 						Kind: "task",
@@ -372,4 +372,3 @@ func TestLifecycleCodegenHelpers(t *testing.T) {
 		}
 	})
 }
-

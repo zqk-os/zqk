@@ -788,10 +788,10 @@ func TestCAS_QueuesAndLifecycle_Comprehensive(t *testing.T) {
 	if err := q.FlushKind("backlog_item", 50*time.Millisecond); err != nil {
 		t.Errorf("FlushKind failed: %v", err)
 	}
-	if err := q.FlushAll(50*time.Millisecond); err != nil {
+	if err := q.FlushAll(50 * time.Millisecond); err != nil {
 		t.Errorf("FlushAll failed: %v", err)
 	}
-	if err := q.FlushAllWithDeadline(time.Now().Add(50*time.Millisecond)); err != nil {
+	if err := q.FlushAllWithDeadline(time.Now().Add(50 * time.Millisecond)); err != nil {
 		t.Errorf("FlushAllWithDeadline failed: %v", err)
 	}
 	if err := FlushAllListingIndexesForProjectRootWithTimeout(root, 50*time.Millisecond); err != nil {
@@ -1121,7 +1121,3 @@ func (m *mockStorageFacadeFailing) CASUsesContentAddressableStorage(kind string)
 func (m *mockStorageFacadeFailing) CASGenerateID(ctx context.Context, kind string) (string, error) {
 	return "CMD-FAIL", nil
 }
-
-
-
-

@@ -73,4 +73,3 @@ func TestSecurityContext_FailClosedIntegration(t *testing.T) {
 		t.Errorf("expected account %s, got %s", pkgctx.GuestAccountID, res.AccountID)
 	}
 }
-

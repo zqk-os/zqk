@@ -124,4 +124,3 @@ func TestFormatKindFieldsSegregatedYAML(t *testing.T) {
 		t.Errorf("expected descriptions in YAML: %s", s)
 	}
 }
-

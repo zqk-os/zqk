@@ -257,5 +257,3 @@ func TestRenderTable(t *testing.T) {
 		t.Errorf("expected title in table: %s", withTitle)
 	}
 }
-
-

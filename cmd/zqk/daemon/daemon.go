@@ -46,63 +46,63 @@ func resolveProjectRoot(cmd *cobra.Command) string {
 func newStatusCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewDaemonStatusCommandBuilder()
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-			projectRoot := resolveProjectRoot(cmd)
-			sockPath := overseer.SocketPath(projectRoot)
-			client := overseer.NewIPCClient(sockPath)
+		projectRoot := resolveProjectRoot(cmd)
+		sockPath := overseer.SocketPath(projectRoot)
+		client := overseer.NewIPCClient(sockPath)
 
-			var target string
-			if len(args) > 0 {
-				target = args[0]
-			}
+		var target string
+		if len(args) > 0 {
+			target = args[0]
+		}
 
-			ctx, cancel := context.WithTimeout(cmd.Context(), 3*time.Second)
-			defer cancel()
+		ctx, cancel := context.WithTimeout(cmd.Context(), 3*time.Second)
+		defer cancel()
 
-			if client.IsRunning() {
-				resp, err := client.Send(ctx, overseer.IPCRequest{
-					Action: "status",
-					Target: target,
-				})
-				if err != nil {
-					return errfmt.Newf("query overseer status").Wrap(err)
-				}
-				if !resp.Success {
-					return errfmt.Errorf("%s", resp.Error)
-				}
-				return cli.FormatOutput(cmd, map[string]any{
-					"overseer_running": true,
-					"daemons":          resp.Daemons,
-				})
-			}
-
-			// Overseer not running; fallback to reading persistent registry
-			regPath := overseer.DefaultRegistryPath(projectRoot)
-			reg := overseer.NewRegistry(regPath)
-			if err := reg.Load(); err != nil {
-				return errfmt.Newf("load daemon registry").Wrap(err)
-			}
-
-			specs := reg.List()
-			var statuses []overseer.DaemonStatus
-			for _, sp := range specs {
-				if target != "" && sp.Name != target {
-					continue
-				}
-				statuses = append(statuses, overseer.DaemonStatus{
-					Name:         sp.Name,
-					DesiredState: sp.DesiredState,
-					ActualState:  overseer.ActualStateStopped,
-				})
-			}
-
-			if target != "" && len(statuses) == 0 {
-				return errfmt.Errorf("daemon %q not found in registry", target)
-			}
-
-			return cli.FormatOutput(cmd, map[string]any{
-				"overseer_running": false,
-				"daemons":          statuses,
+		if client.IsRunning() {
+			resp, err := client.Send(ctx, overseer.IPCRequest{
+				Action: "status",
+				Target: target,
 			})
+			if err != nil {
+				return errfmt.Newf("query overseer status").Wrap(err)
+			}
+			if !resp.Success {
+				return errfmt.Errorf("%s", resp.Error)
+			}
+			return cli.FormatOutput(cmd, map[string]any{
+				"overseer_running": true,
+				"daemons":          resp.Daemons,
+			})
+		}
+
+		// Overseer not running; fallback to reading persistent registry
+		regPath := overseer.DefaultRegistryPath(projectRoot)
+		reg := overseer.NewRegistry(regPath)
+		if err := reg.Load(); err != nil {
+			return errfmt.Newf("load daemon registry").Wrap(err)
+		}
+
+		specs := reg.List()
+		var statuses []overseer.DaemonStatus
+		for _, sp := range specs {
+			if target != "" && sp.Name != target {
+				continue
+			}
+			statuses = append(statuses, overseer.DaemonStatus{
+				Name:         sp.Name,
+				DesiredState: sp.DesiredState,
+				ActualState:  overseer.ActualStateStopped,
+			})
+		}
+
+		if target != "" && len(statuses) == 0 {
+			return errfmt.Errorf("daemon %q not found in registry", target)
+		}
+
+		return cli.FormatOutput(cmd, map[string]any{
+			"overseer_running": false,
+			"daemons":          statuses,
+		})
 	}
 	cli.AddCommonFlags(cmd)
 	return cmd
@@ -581,4 +581,3 @@ func newServiceCleanupLegacyCmd() *cobra.Command {
 	}
 	return cmd
 }
-

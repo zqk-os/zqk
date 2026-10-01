@@ -301,18 +301,18 @@ func (r *ReverseReferenceIndex) UpdateReferences(objectID string, oldRefs, newRe
 	err := r.withWriteLock(locknames.LockNameReverseReferenceIndexUpdateReferences, func() error {
 		r.initMapsLocked()
 
-			for _, oldRef := range oldRefs {
-				if oldRef != emptyValue {
-					r.removeReferenceLocked(objectID, oldRef)
-				}
+		for _, oldRef := range oldRefs {
+			if oldRef != emptyValue {
+				r.removeReferenceLocked(objectID, oldRef)
 			}
+		}
 
-			for _, newRef := range newRefs {
-				if newRef != emptyValue {
-					r.addReferenceLocked(objectID, newRef)
-				}
+		for _, newRef := range newRefs {
+			if newRef != emptyValue {
+				r.addReferenceLocked(objectID, newRef)
 			}
-			return nil
+		}
+		return nil
 	})
 	if err != nil {
 		logging.LogSwallowedError(err)

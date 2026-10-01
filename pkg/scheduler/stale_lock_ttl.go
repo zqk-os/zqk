@@ -19,14 +19,14 @@ const (
 	// DefaultStaleLockTTL is the default duration after which an unattended lock is considered stale.
 	DefaultStaleLockTTL = 120 * time.Second
 
-	msgErrEmptyLockPath            = "lock path cannot be empty"
-	msgErrAcquireLockWithTimeout   = "failed to acquire lock within timeout: %w"
-	msgErrCreateFileLock           = "failed to create file lock: %w"
-	msgErrReadLockDir              = "failed to read lock directory: %w"
-	msgErrStatLockFile             = "failed to stat lock file: %w"
-	msgErrWriteLockMetadata        = "failed to write lock metadata: %w"
-	msgErrRemoveStaleLock          = "failed to remove stale lock file: %w"
-	msgErrLockAlreadyLocked        = "lock already acquired"
+	msgErrEmptyLockPath          = "lock path cannot be empty"
+	msgErrAcquireLockWithTimeout = "failed to acquire lock within timeout: %w"
+	msgErrCreateFileLock         = "failed to create file lock: %w"
+	msgErrReadLockDir            = "failed to read lock directory: %w"
+	msgErrStatLockFile           = "failed to stat lock file: %w"
+	msgErrWriteLockMetadata      = "failed to write lock metadata: %w"
+	msgErrRemoveStaleLock        = "failed to remove stale lock file: %w"
+	msgErrLockAlreadyLocked      = "lock already acquired"
 )
 
 // LockMetadata captures provenance information stored inside a self-healing lock file.

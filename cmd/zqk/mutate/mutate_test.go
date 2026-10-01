@@ -187,4 +187,3 @@ func TestMutateCmd_NonDryRun_CreateAndUpdatePersistence(t *testing.T) {
 	require.NoError(t, err)
 	require.Contains(t, updateBuf.String(), "COMMITTED")
 }
-

@@ -82,5 +82,3 @@ func TestAsyncValidator_HelpersExtended(t *testing.T) {
 		t.Errorf("Drain failed: %v", err)
 	}
 }
-
-

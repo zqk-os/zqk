@@ -1,4 +1,4 @@
-package ui
+package tui
 
 import (
 	"fmt"
@@ -12,24 +12,12 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/zqk-os/zqk/cmd/zqk/state"
 	"github.com/zqk-os/zqk/cmd/zqk/test"
-	"github.com/zqk-os/zqk/cmd/zqk/ui/tds"
 	"github.com/zqk-os/zqk/pkg/agentfeed"
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/tde"
+	"github.com/zqk-os/zqk/pkg/tui/tds"
 )
-
-func TestNewUICmd(t *testing.T) {
-	cmd := NewUICmd()
-	require.NotNil(t, cmd)
-	assert.Equal(t, "ui", cmd.Name())
-	assert.Contains(t, cmd.Aliases, "dashboard")
-	assert.Contains(t, cmd.Aliases, "console")
-
-	tabFlag := cmd.Flag("tab")
-	require.NotNil(t, tabFlag)
-	assert.Equal(t, "seismograph", tabFlag.DefValue)
-}
 
 func TestAnsiConstants(t *testing.T) {
 	assert.Equal(t, "\033[?1049h", AnsiAltBufferEnter)
@@ -1309,11 +1297,11 @@ func TestUI_Windowing_QA_Scheduler_Health(t *testing.T) {
 	var violations []HealthViolationRow
 	for i := 0; i < 25; i++ {
 		violations = append(violations, HealthViolationRow{
-			Tier:      1,
-			Severity:  "critical",
-			Kind:      "contract",
-			ObjectID:  fmt.Sprintf("VIO-%03d", i),
-			Message:   fmt.Sprintf("Violation %d", i),
+			Tier:     1,
+			Severity: "critical",
+			Kind:     "contract",
+			ObjectID: fmt.Sprintf("VIO-%03d", i),
+			Message:  fmt.Sprintf("Violation %d", i),
 		})
 	}
 	m.HealthViolations = violations
@@ -1458,9 +1446,3 @@ func TestUI_TabSwarm_InboxCompleteLifecycle(t *testing.T) {
 	assert.True(t, success)
 	assert.Contains(t, m.DynamicMessage, "Committed staged envelope ENV-STAGED-001")
 }
-
-
-
-
-
-

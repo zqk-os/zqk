@@ -269,4 +269,3 @@ func DarwinWaitKindDirYAMLFingerprintStableForTest(ctx context.Context, kindDir 
 func DarwinKindDirYAMLFingerprintForTest(kindDir string) (string, error) {
 	return darwinKindDirYAMLFingerprint(kindDir)
 }
-

@@ -26,15 +26,15 @@ var (
 
 // IndexedNode represents a normalized, searchable kernel object in the pure-Go index.
 type IndexedNode struct {
-	ID            string            `json:"id" gob:"id"`
-	Kind          string            `json:"kind" gob:"kind"`
-	SchemaVersion string            `json:"schema_version" gob:"schema_version"`
-	Status        string            `json:"status" gob:"status"`
-	Title         string            `json:"title" gob:"title"`
-	NamespaceID   string            `json:"namespace_id" gob:"namespace_id"`
-	CreatedAt     time.Time         `json:"created_at" gob:"created_at"`
-	UpdatedAt     time.Time         `json:"updated_at" gob:"updated_at"`
-	Attributes    map[string]any    `json:"attributes" gob:"attributes"`
+	ID            string              `json:"id" gob:"id"`
+	Kind          string              `json:"kind" gob:"kind"`
+	SchemaVersion string              `json:"schema_version" gob:"schema_version"`
+	Status        string              `json:"status" gob:"status"`
+	Title         string              `json:"title" gob:"title"`
+	NamespaceID   string              `json:"namespace_id" gob:"namespace_id"`
+	CreatedAt     time.Time           `json:"created_at" gob:"created_at"`
+	UpdatedAt     time.Time           `json:"updated_at" gob:"updated_at"`
+	Attributes    map[string]any      `json:"attributes" gob:"attributes"`
 	References    map[string][]string `json:"references" gob:"references"` // relationName -> []targetIDs
 }
 

@@ -494,9 +494,3 @@ parameters:
 		t.Errorf("expected 0 rules for nonexistent dir")
 	}
 }
-
-
-
-
-
-

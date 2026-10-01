@@ -75,7 +75,6 @@ func LoadBoundPolicies(ctx context.Context, sp storage.ObjectStorageProvider, se
 	return &PolicyEnforcement{ActivePolicies: policies}, nil
 }
 
-
 // GeneratePromptSection lists bound policies as ID+title refs. Bodies stay in the kernel.
 func (p *PolicyEnforcement) GeneratePromptSection() string {
 	return p.GeneratePromptSectionRefs()

@@ -27,8 +27,8 @@ const (
 	GoalFieldEpicRefs = "epic_refs"
 
 	// Deprecated / pruned goal fields retained for API compatibility
-	FieldAchievedAt = "achieved_at" // Deprecated: use completed_at
-	FieldCurrentValue = "current_value" // Deprecated
+	FieldAchievedAt       = "achieved_at"   // Deprecated: use completed_at
+	FieldCurrentValue     = "current_value" // Deprecated
 	GoalFieldCommitHashes = "commit_hashes" // Deprecated
-	GoalFieldCommitRefs = "commit_refs" // Deprecated
+	GoalFieldCommitRefs   = "commit_refs"   // Deprecated
 )

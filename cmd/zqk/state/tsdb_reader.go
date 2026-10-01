@@ -401,7 +401,7 @@ func generateDurationSparkline(vals []float64) string {
 	if diffPct > 15.0 {
 		return fmt.Sprintf("▲ +%.0f%%", diffPct) // Latency increased (slower)
 	} else if diffPct < -15.0 {
-		return fmt.Sprintf("▼ %.0f%%", diffPct)  // Latency decreased (faster)
+		return fmt.Sprintf("▼ %.0f%%", diffPct) // Latency decreased (faster)
 	}
 	return "→ STABLE"
 }
@@ -593,4 +593,3 @@ func readStreamVolumeStats(projectRoot string, telem *TSDBTelemetry) {
 
 	telem.StreamRates = rates
 }
-

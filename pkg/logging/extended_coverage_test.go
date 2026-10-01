@@ -850,4 +850,3 @@ func TestRouterInit_Global(t *testing.T) {
 		t.Errorf("CloseGlobalRouter failed: %v", err)
 	}
 }
-

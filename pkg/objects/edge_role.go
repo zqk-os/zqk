@@ -50,7 +50,7 @@ type GraphHop struct {
 
 // dnaFieldEdgeRoles is the runtime fallback when a spec field omits edge_role.
 // Kind-specific rows win. Keep in lockstep with object_specs annotations
-//.
+// .
 var dnaFieldEdgeRoles = map[string]EdgeRole{
 	FieldKeyPriorityPlanRef:   EdgeRoleMembership,
 	FieldKeyMilestoneRef:      EdgeRoleMembership,

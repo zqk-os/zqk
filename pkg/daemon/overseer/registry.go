@@ -349,4 +349,3 @@ func (r *Registry) Delete(name string) error {
 	delete(r.Daemons, name)
 	return r.saveLocked()
 }
-

@@ -33,8 +33,8 @@ const (
 
 	// Alias names corresponding to grammar tokens
 	IsolationStagedSnapshot IsolationMode = "STAGED_SNAPSHOT"
-	IsolationSerializable  IsolationMode = "SERIALIZABLE"
-	IsolationReadCommitted IsolationMode = "READ_COMMITTED"
+	IsolationSerializable   IsolationMode = "SERIALIZABLE"
+	IsolationReadCommitted  IsolationMode = "READ_COMMITTED"
 )
 
 // NormalizeIsolationMode maps any grammar alias to canonical isolation mode.

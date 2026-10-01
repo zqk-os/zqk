@@ -3,7 +3,6 @@ package qa
 import (
 	"fmt"
 	"go/ast"
-
 )
 
 // auditFmtPrintAntiPattern checks for direct usage of fmt.Print, fmt.Println, fmt.Printf

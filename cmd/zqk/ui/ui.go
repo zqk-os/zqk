@@ -12,6 +12,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/studio"
+	"github.com/zqk-os/zqk/pkg/tui"
 )
 
 // NewUICmd creates the 'zqk ui' command for interactive terminal mission control.
@@ -25,14 +26,16 @@ func NewUICmd() *cobra.Command {
 				projectRoot = cli.ResolveProjectRoot(".")
 			}
 
-			web, _ := cmd.Flags().GetBool("web")
+			web, err := cmd.Flags().GetBool("web")
+			if err != nil {
+				return err
+			}
 			if web {
-				port, _ := cmd.Flags().GetInt("port")
-				if port <= 0 {
+				port, err := cmd.Flags().GetInt("port")
+				if err != nil || port <= 0 {
 					port = 8080
 				}
 				server := studio.NewServer(projectRoot)
-				var err error
 
 				if cmd.Flags().Changed("port") {
 					// User explicitly requested this port: fail with helpful guidance if bound
@@ -48,7 +51,7 @@ func NewUICmd() *cobra.Command {
 						err = server.Start(addr)
 						if err == nil {
 							if p != port {
-								fmt.Printf("ℹ️  Port %d was in use; automatically selected port %d (use --port / -p to override)\n", port, p)
+								_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("ℹ️  Port %d was in use; automatically selected port %d (use --port / -p to override)\n", port, p)))
 							}
 							break
 						}
@@ -58,20 +61,23 @@ func NewUICmd() *cobra.Command {
 					}
 				}
 
-				fmt.Printf("⚡ ZQK Knowledge Kernel Visual Studio running at http://%s (Press Ctrl+C to stop)\n", server.Addr())
+				_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("⚡ ZQK Knowledge Kernel Visual Studio running at http://%s (Press Ctrl+C to stop)\n", server.Addr())))
 				sigCh := make(chan os.Signal, 1)
 				signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
 				<-sigCh
 				return server.Shutdown(proc.OperationContext())
 			}
 
-			tab, _ := cmd.Flags().GetString("tab")
+			tab, err := cmd.Flags().GetString("tab")
+			if err != nil {
+				return err
+			}
 			sec := pkgctx.NewSystemSecurityContext()
 			sp := proc.Storage()
 
 			format := proc.Format()
 			if format == cli.FormatJSON || format == cli.FormatJSONL || format == cli.FormatYAML {
-				m := NewUIModel(projectRoot, tab)
+				m := tui.NewUIModel(projectRoot, tab)
 				m.RefreshMutations()
 				m.RefreshAuditEvents()
 				m.RefreshObjects()
@@ -86,7 +92,7 @@ func NewUICmd() *cobra.Command {
 				return cli.FormatOutput(cmd, m)
 			}
 
-			return RunTUI(proc.OperationContext(), projectRoot, tab, sp, sec)
+			return tui.RunTUI(proc.OperationContext(), projectRoot, tab, sp, sec)
 		})(cmd, args)
 	}
 

@@ -113,4 +113,3 @@ func TestFindCommitHashesByGrep(t *testing.T) {
 		t.Fatalf(`expected 0 commit hashes, got %d`, len(empty))
 	}
 }
-

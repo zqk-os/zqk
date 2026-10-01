@@ -25,7 +25,6 @@ type CASOrphanGuardResult struct {
 // CASOrphanGuard enforces referential integrity for CAS objects during git commits.
 // It checks that staged deletions under .zqk/process/ do not leave orphan references
 // in surviving objects. This is the Go equivalent of scripts/check-process-delete-refs-staged.sh.
-//
 type CASOrphanGuard struct {
 	RepoRoot string
 }

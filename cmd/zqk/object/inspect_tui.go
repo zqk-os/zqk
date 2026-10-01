@@ -16,12 +16,12 @@ import (
 	"golang.org/x/term"
 	"gopkg.in/yaml.v3"
 
-	"github.com/zqk-os/zqk/cmd/zqk/ui/tds"
 	"github.com/zqk-os/zqk/internal/cli"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/tui/tds"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
@@ -46,29 +46,29 @@ var sortKeyOptions = []string{"updated_at", "created_at", "id", "priority", "sta
 
 // InspectTUIModel manages interactive full-screen TUI state for Object Inspector.
 type InspectTUIModel struct {
-	Storage           storage.ObjectStorageProvider
-	SecCtx            *pkgctx.SecurityContext
-	StorageCtx        *storage.StorageContext
-	Ctx               context.Context
-	ActiveKind        string
-	AvailableKinds    []string
-	KindIndex         int
-	AllObjects        []map[string]any
+	Storage            storage.ObjectStorageProvider
+	SecCtx             *pkgctx.SecurityContext
+	StorageCtx         *storage.StorageContext
+	Ctx                context.Context
+	ActiveKind         string
+	AvailableKinds     []string
+	KindIndex          int
+	AllObjects         []map[string]any
 	VisibleProjections []SemanticAgentProjection
-	RawVisibleObjects []map[string]any
-	SelectedIndex     int
-	ScrollOffset      int
-	Width             int
-	Height            int
-	Fields            []string
-	SortBy            string
-	SortAsc           bool
-	SortIndex         int
-	FilterPill        string
-	FilterIndex       int
-	SearchQuery       string
-	IsSearching       bool
-	SearchBuffer      string
+	RawVisibleObjects  []map[string]any
+	SelectedIndex      int
+	ScrollOffset       int
+	Width              int
+	Height             int
+	Fields             []string
+	SortBy             string
+	SortAsc            bool
+	SortIndex          int
+	FilterPill         string
+	FilterIndex        int
+	SearchQuery        string
+	IsSearching        bool
+	SearchBuffer       string
 	DetailModalOpen    bool
 	PolicyStudioOpen   bool
 	PolicyRules        []PolicyRule
@@ -1336,7 +1336,7 @@ func (m *InspectTUIModel) HandleInput(key []byte) bool {
 							parts[len(parts)-1] = token
 							m.DSLInputBuffer = strings.Join(parts, " ") + " "
 						} else {
-							m.DSLInputBuffer = strings.TrimSpace(m.DSLInputBuffer + " " + token) + " "
+							m.DSLInputBuffer = strings.TrimSpace(m.DSLInputBuffer+" "+token) + " "
 						}
 						m.DSLSuggestions = SuggestDSLTokens(m.ActiveKind, m.DSLInputBuffer)
 						m.DSLSuggestionIndex = 0

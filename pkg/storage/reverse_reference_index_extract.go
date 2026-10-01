@@ -178,4 +178,3 @@ func updateReverseReferenceIndexOnIDChange(oldID, newID string, obj map[string]a
 	}
 	afterReverseReferenceIndexMutation()
 }
-

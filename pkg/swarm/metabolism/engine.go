@@ -7,11 +7,11 @@ import (
 	"strings"
 	"time"
 
-	"gopkg.in/yaml.v3"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/swarm/pack"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"gopkg.in/yaml.v3"
 )
 
 // PromptTemplateObject represents an ingested prompt template ready for CAS storage.
@@ -28,13 +28,13 @@ type PromptTemplateObject struct {
 
 // IngestionOptions configures the metabolism engine ingestion run.
 type IngestionOptions struct {
-	PackDir     string
-	PublicKey   ed25519.PublicKey
-	SessionID   string
-	OutputDir   string
-	Parameters  map[string]interface{}
-	VerifySeal  bool
-	AccountID   string
+	PackDir    string
+	PublicKey  ed25519.PublicKey
+	SessionID  string
+	OutputDir  string
+	Parameters map[string]interface{}
+	VerifySeal bool
+	AccountID  string
 }
 
 // MetabolicDigest contains the fully decomposed kernel graph and active receptor lease.
@@ -136,10 +136,10 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 			tplID := fmt.Sprintf("TPL-%s-%s", cleanName, cleanBaseName)
 
 			tplObj := PromptTemplateObject{
-				ID:          tplID,
-				Kind:        "prompt_template",
-				Title:       fmt.Sprintf("Prompt Template for %s", baseName),
-				Template:    string(content),
+				ID:       tplID,
+				Kind:     "prompt_template",
+				Title:    fmt.Sprintf("Prompt Template for %s", baseName),
+				Template: string(content),
 				Metadata: map[string]string{
 					"pack_urn": urn.String(),
 					"file":     filepath.Base(path),
@@ -226,8 +226,8 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 		objects.FieldKeyKind:        "goal",
 		objects.FieldKeyTitle:       fmt.Sprintf("Swarm Goal: %s", manifest.Name),
 		objects.FieldKeyDescription: goalDesc,
-		"metric":                     goalMetric,
-		"target":                     goalTarget,
+		"metric":                    goalMetric,
+		"target":                    goalTarget,
 		objects.FieldKeyStatus:      objects.ObjectStatusActive,
 	}
 	kernelObjects = append(kernelObjects, goalObj)
@@ -279,13 +279,13 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 
 		// Requirement (persisted after criteria so criteria_refs exist)
 		reqObj := map[string]any{
-			objects.FieldKeyID:            reqID,
-			objects.FieldKeyKind:          "requirement",
-			objects.FieldKeyTitle:         task.Title,
-			objects.FieldKeyDescription:   fmt.Sprintf("Satisfy specification for task %s (%s)", task.ID, task.Title),
-			objects.FieldKeyGoalRefs:      []string{goalID},
-			objects.FieldKeyCriteriaRefs:  []string{critInvID, critDynID, critAdvID},
-			objects.FieldKeyStatus:        objects.ObjectStatusProposed,
+			objects.FieldKeyID:           reqID,
+			objects.FieldKeyKind:         "requirement",
+			objects.FieldKeyTitle:        task.Title,
+			objects.FieldKeyDescription:  fmt.Sprintf("Satisfy specification for task %s (%s)", task.ID, task.Title),
+			objects.FieldKeyGoalRefs:     []string{goalID},
+			objects.FieldKeyCriteriaRefs: []string{critInvID, critDynID, critAdvID},
+			objects.FieldKeyStatus:       objects.ObjectStatusProposed,
 		}
 		kernelObjects = append(kernelObjects, reqObj)
 
@@ -297,8 +297,8 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 			objects.FieldKeyPathOrID:        fmt.Sprintf("packs/%s/tasks/%s", manifest.Name, task.ID),
 			objects.FieldKeyCriteriaRefs:    []string{critInvID, critDynID, critAdvID},
 			objects.FieldKeyRequirementRefs: []string{reqID},
-			objects.FieldKeyBacklogItemRefs:  []string{bliID},
-			objects.FieldKeyGoalRefs:         []string{goalID},
+			objects.FieldKeyBacklogItemRefs: []string{bliID},
+			objects.FieldKeyGoalRefs:        []string{goalID},
 			objects.FieldKeyStatus:          objects.ObjectStatusDraft,
 		}
 		kernelObjects = append(kernelObjects, tstObj)
@@ -317,18 +317,18 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 
 		// Backlog Item (child owns priority_plan_ref)
 		bliObj := map[string]any{
-			objects.FieldKeyID:             bliID,
-			objects.FieldKeyKind:           "backlog_item",
-			objects.FieldKeyTitle:          task.Title,
-			objects.FieldKeyDescription:    bliDesc,
-			objects.FieldKeyMilestoneRefs:  []string{milestoneID},
+			objects.FieldKeyID:              bliID,
+			objects.FieldKeyKind:            "backlog_item",
+			objects.FieldKeyTitle:           task.Title,
+			objects.FieldKeyDescription:     bliDesc,
+			objects.FieldKeyMilestoneRefs:   []string{milestoneID},
 			objects.FieldKeyRequirementRefs: []string{reqID},
-			objects.FieldKeyCriteriaRefs:   []string{critInvID, critDynID, critAdvID},
-			objects.FieldKeyTestCaseRefs:   []string{tstID},
-			objects.FieldKeyPriority:       "p1",
+			objects.FieldKeyCriteriaRefs:    []string{critInvID, critDynID, critAdvID},
+			objects.FieldKeyTestCaseRefs:    []string{tstID},
+			objects.FieldKeyPriority:        "p1",
 			objects.FieldKeyEstimatedEffort: "medium",
 			objects.FieldKeyPriorityPlanRef: planID,
-			objects.FieldKeyStatus:         objects.ObjectStatusPlanned,
+			objects.FieldKeyStatus:          objects.ObjectStatusPlanned,
 		}
 		var taskPersonas []string
 		for _, a := range manifest.Agents {
@@ -348,13 +348,13 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 
 	// Milestone
 	mlsObj := map[string]any{
-		objects.FieldKeyID:          milestoneID,
-		objects.FieldKeyKind:        "milestone",
-		objects.FieldKeyTitle:       fmt.Sprintf("Milestone: %s Execution", manifest.Name),
-		objects.FieldKeyDescription: fmt.Sprintf("Execute all tasks and evaluations declared by %s v%s", manifest.Name, manifest.Version),
-		objects.FieldKeyGoalRefs:    []string{goalID},
+		objects.FieldKeyID:           milestoneID,
+		objects.FieldKeyKind:         "milestone",
+		objects.FieldKeyTitle:        fmt.Sprintf("Milestone: %s Execution", manifest.Name),
+		objects.FieldKeyDescription:  fmt.Sprintf("Execute all tasks and evaluations declared by %s v%s", manifest.Name, manifest.Version),
+		objects.FieldKeyGoalRefs:     []string{goalID},
 		objects.FieldKeyCriteriaRefs: allCritIDs,
-		objects.FieldKeyStatus:      objects.ObjectStatusNotStarted,
+		objects.FieldKeyStatus:       objects.ObjectStatusNotStarted,
 	}
 	kernelObjects = append(kernelObjects, mlsObj)
 
@@ -392,8 +392,8 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 			objects.FieldKeyID:                 tcfgID,
 			objects.FieldKeyKind:               "team_configuration",
 			objects.FieldKeyTitle:              fmt.Sprintf("Team Archetype for %s", manifest.Name),
-			"cell_type":                         manifest.TeamConfiguration.CellType,
-			"focus_area":                        manifest.TeamConfiguration.FocusArea,
+			"cell_type":                        manifest.TeamConfiguration.CellType,
+			"focus_area":                       manifest.TeamConfiguration.FocusArea,
 			objects.FieldKeyPersonaAllocations: allocations,
 			objects.FieldKeyStatus:             objects.ObjectStatusApproved,
 		}
@@ -432,8 +432,8 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 			objects.FieldKeyID:                 tcfgID,
 			objects.FieldKeyKind:               "team_configuration",
 			objects.FieldKeyTitle:              fmt.Sprintf("Team Archetype for %s", manifest.Name),
-			"cell_type":                         "neuron",
-			"focus_area":                        manifest.Name,
+			"cell_type":                        "neuron",
+			"focus_area":                       manifest.Name,
 			objects.FieldKeyPersonaAllocations: allocations,
 			objects.FieldKeyStatus:             objects.ObjectStatusApproved,
 		}
@@ -581,4 +581,3 @@ func resolveTaskTemplate(task pack.TaskConfig, manifest *pack.SwarmPackage, temp
 
 	return ""
 }
-

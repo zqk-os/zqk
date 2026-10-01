@@ -106,12 +106,12 @@ func runQuickstart(cmd *cobra.Command, args []string) error {
 			}
 		}
 		payload := map[string]any{
-			objects.FieldKeyTitle:      "ZQK Quickstart Guide",
-			"project_initialized":     isInit,
-			"project_root":            projectRoot,
-			"web_ui_url":              "http://127.0.0.1:8080",
-			"steps":                   steps,
-			"active_project_steps":    activeSteps,
+			objects.FieldKeyTitle:  "ZQK Quickstart Guide",
+			"project_initialized":  isInit,
+			"project_root":         projectRoot,
+			"web_ui_url":           "http://127.0.0.1:8080",
+			"steps":                steps,
+			"active_project_steps": activeSteps,
 			"starter_policies": []string{
 				"Spec-driven architecture",
 				"Structured logging",

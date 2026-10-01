@@ -191,16 +191,16 @@ func TestStorageUpdate_AcceptsValidLifecycleStatusTransition(t *testing.T) {
 	t.Run("accepts_backlog_item_exploring_to_validated", func(t *testing.T) {
 		bliID := "BLI-TRANS-003"
 		bliObj := map[string]any{
-			objects.FieldKeyID:                     bliID,
-			objects.FieldKeyKind:                   objects.KindBacklogItem,
-			objects.FieldKeyTitle:                  "Exploring backlog item",
-			objects.FieldKeyDescription:            "Detailed description of backlog item for testing",
-			objects.FieldKeyStatus:                 "exploring",
-			objects.FieldKeyProblemStatement:       "Substantive problem statement for validation testing.",
+			objects.FieldKeyID:                       bliID,
+			objects.FieldKeyKind:                     objects.KindBacklogItem,
+			objects.FieldKeyTitle:                    "Exploring backlog item",
+			objects.FieldKeyDescription:              "Detailed description of backlog item for testing",
+			objects.FieldKeyStatus:                   "exploring",
+			objects.FieldKeyProblemStatement:         "Substantive problem statement for validation testing.",
 			objects.FieldKeyAcceptanceConsiderations: "Clear acceptance considerations for validation testing.",
-			objects.FieldKeySchemaVersion:          objects.DefaultSchemaVersion,
-			objects.FieldKeyPriorityTier:           "P2",
-			objects.FieldKeyPriority:               "medium",
+			objects.FieldKeySchemaVersion:            objects.DefaultSchemaVersion,
+			objects.FieldKeyPriorityTier:             "P2",
+			objects.FieldKeyPriority:                 "medium",
 		}
 		require.NoError(t, fos.Create(ctx, secCtx, bliObj))
 

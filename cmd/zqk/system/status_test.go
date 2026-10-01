@@ -171,4 +171,3 @@ func TestFormatStatusTableHealth_DisplaysDetails(t *testing.T) {
 		t.Errorf("expected warnings count, got %q", out)
 	}
 }
-

@@ -32,16 +32,16 @@ type DataBook struct {
 
 // Holon represents an individual part-whole entity within the knowledge graph.
 type Holon struct {
-	AtID        string         `json:"@id"`
-	AtType      []string       `json:"@type"`
-	ID          string         `json:"holon:id"`
-	Title       string         `json:"holon:title,omitempty"`
-	Status      string         `json:"holon:status,omitempty"`
-	Kind        string         `json:"holon:kind"`
-	Parts       []string       `json:"holon:parts,omitempty"`
-	Wholes      []string       `json:"holon:wholes,omitempty"`
-	Invariants  []string       `json:"holon:invariants,omitempty"`
-	Properties  map[string]any `json:"holon:properties,omitempty"`
+	AtID       string         `json:"@id"`
+	AtType     []string       `json:"@type"`
+	ID         string         `json:"holon:id"`
+	Title      string         `json:"holon:title,omitempty"`
+	Status     string         `json:"holon:status,omitempty"`
+	Kind       string         `json:"holon:kind"`
+	Parts      []string       `json:"holon:parts,omitempty"`
+	Wholes     []string       `json:"holon:wholes,omitempty"`
+	Invariants []string       `json:"holon:invariants,omitempty"`
+	Properties map[string]any `json:"holon:properties,omitempty"`
 }
 
 // BuildDataBookFromObjects converts a slice of knowledge kernel objects into a W3C Holon DataBook.

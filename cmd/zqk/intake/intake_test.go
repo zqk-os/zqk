@@ -112,4 +112,3 @@ func TestSynthesizeIntakeMembrane_EmptyInput(t *testing.T) {
 		t.Fatal("expected error on empty input slice, got nil")
 	}
 }
-

@@ -170,4 +170,3 @@ func TestSystemStartShutdownCommands(t *testing.T) {
 		t.Fatal("expected NewShutdownCmd to return non-nil command")
 	}
 }
-

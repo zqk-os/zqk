@@ -331,4 +331,3 @@ func TestCheckSandboxAllowlist_EscapeDenials(t *testing.T) {
 		})
 	}
 }
-

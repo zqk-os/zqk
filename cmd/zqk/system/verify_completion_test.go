@@ -198,4 +198,3 @@ func TestVerifyCompletionCmdFlags(t *testing.T) {
 	require.NotNil(t, topologyFlag)
 	require.Equal(t, "sequential", topologyFlag.DefValue)
 }
-

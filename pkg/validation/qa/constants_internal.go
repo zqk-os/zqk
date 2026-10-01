@@ -24,4 +24,3 @@ const (
 	ReasonMissingCriteria            = "Missing required verification criteria"
 	ReasonMissingTestProof           = "Missing verified passing test case proof"
 )
-

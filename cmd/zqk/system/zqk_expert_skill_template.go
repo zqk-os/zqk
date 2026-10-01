@@ -97,7 +97,7 @@ You must enforce strict fail-closed operations.
 ## Session boot (do this first)
 
 ` + "```bash\n" +
-`zqk workflow whats-next --format json          # mission / PRI / cues; add --agent-id <seat>
+	`zqk workflow whats-next --format json          # mission / PRI / cues; add --agent-id <seat>
 zqk system policy-interrupts list              # before high-stakes work
 ` + "```\n" + `
 
@@ -118,7 +118,7 @@ Infer next work from **whats-next JSON**, not from chat memory.
 Policy: **POL-WORKFLOW-VDS**. Culture + DSL gate for "done."
 
 ` + "```bash\n" +
-`zqk workflow vds checklist --format json
+	`zqk workflow vds checklist --format json
 zqk workflow vds evaluate --format json          # exit non-zero on FAIL
 zqk workflow vds evaluate --format agent-prompt
 zqk workflow vds evaluate --apply-verify         # persist independent_verify=yes (surgical)

@@ -7,21 +7,21 @@ import (
 	"path/filepath"
 	"strings"
 
-	"gopkg.in/yaml.v3"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/swarm/metabolism"
 	"github.com/zqk-os/zqk/pkg/swarm/pack"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"gopkg.in/yaml.v3"
 )
 
 // CEFPromptDefinition pairs the source markdown path with metadata for conversion.
 type CEFPromptDefinition struct {
-	ID        string
-	Title     string
-	Category  string
-	Role      string // specialist, adversarial, coordinator
-	Lens      string
-	RelPath   string
+	ID       string
+	Title    string
+	Category string
+	Role     string // specialist, adversarial, coordinator
+	Lens     string
+	RelPath  string
 }
 
 // Canonical list of the 25 CEF prompt files

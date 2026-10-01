@@ -89,7 +89,6 @@ Write at 0x0001 by goroutine 1:
 		t.Fatalf("expected HasDataRace=true for unclosed race")
 	}
 
-
 	// 5. In-failure block ending via goBoundaryPackageOK or statusFail
 	failBoundaryOutput := `=== RUN   TestFailBoundary
 --- FAIL: TestFailBoundary (0.02s)

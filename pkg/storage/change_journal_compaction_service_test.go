@@ -191,4 +191,3 @@ fields:
 		t.Errorf("expected 0 entries in empty window, got %d", emptyRes.EntryCount)
 	}
 }
-

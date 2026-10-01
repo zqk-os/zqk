@@ -6,7 +6,6 @@ import (
 	"time"
 )
 
-
 // MockEntity implements Auditable and Lifecycle for testing.
 type MockEntity struct {
 	BaseObject

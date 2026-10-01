@@ -231,4 +231,3 @@ func TestDraftSwarmManifestYAML(t *testing.T) {
 		t.Fatal("expected error with invalid SemVer version")
 	}
 }
-

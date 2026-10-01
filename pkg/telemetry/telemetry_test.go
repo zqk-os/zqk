@@ -149,4 +149,3 @@ func TestHistogramAccessors(t *testing.T) {
 		}
 	}
 }
-

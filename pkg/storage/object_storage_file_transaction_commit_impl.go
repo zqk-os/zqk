@@ -340,4 +340,3 @@ func (tx *FileObjectTransaction) Rollback(ctx context.Context) error {
 	tx.ops = nil
 	return nil
 }
-

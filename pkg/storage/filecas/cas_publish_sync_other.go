@@ -65,3 +65,14 @@ func IsDarwinSyncQueueDrained() bool {
 func DarwinSyncQueuePendingCount() int64 {
 	return 0
 }
+
+// SetDarwinStrictSync is a no-op on non-darwin platforms.
+func SetDarwinStrictSync(_ bool) {}
+
+// IsDarwinStrictSync returns false on non-darwin platforms.
+func IsDarwinStrictSync() bool {
+	return false
+}
+
+// ResetDarwinSyncShutdownForTesting is a no-op on non-darwin platforms.
+func ResetDarwinSyncShutdownForTesting() {}

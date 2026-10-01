@@ -63,4 +63,3 @@ func TestIsInTest(t *testing.T) {
 		t.Errorf("expected IsInTest() to be true when executing inside 'go test'")
 	}
 }
-

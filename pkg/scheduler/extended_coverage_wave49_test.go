@@ -115,7 +115,7 @@ func TestExtended_ConvergenceSessionTick_Helpers_Wave49(t *testing.T) {
 		JobType:  JobTypeConvergenceSessionTick,
 		Category: CategoryMaintenance,
 		EnvironmentVariables: map[string]string{
-			"ROLLUP_ON_COMPLETE": "true",
+			"ROLLUP_ON_COMPLETE":     "true",
 			"CONVERGENCE_SESSION_ID": "CVS-tick-1",
 		},
 	}

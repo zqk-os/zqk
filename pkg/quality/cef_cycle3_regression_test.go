@@ -12,19 +12,19 @@ import (
 )
 
 type cycle3Scorecard struct {
-	CEFVersion         string                 `json:"cef_version"`
-	RunID              string                 `json:"run_id"`
-	AssessedAt         string                 `json:"assessed_at"`
-	FreezeSHA          string                 `json:"freeze_sha"`
-	RepoFingerprint    string                 `json:"repo_fingerprint"`
-	Integrator         string                 `json:"integrator"`
-	Notes              string                 `json:"notes"`
-	OverallGrade       float64                `json:"overall_grade"`
-	EnvelopeMin        float64                `json:"envelope_min"`
-	OverallEnvelopeMin float64                `json:"overall_envelope_min"`
-	Axes               map[string]cycle3Axis  `json:"axes"`
-	Lenses             map[string]cycle3Lens  `json:"lenses"`
-	Summary            cycle3Summary          `json:"summary"`
+	CEFVersion         string                `json:"cef_version"`
+	RunID              string                `json:"run_id"`
+	AssessedAt         string                `json:"assessed_at"`
+	FreezeSHA          string                `json:"freeze_sha"`
+	RepoFingerprint    string                `json:"repo_fingerprint"`
+	Integrator         string                `json:"integrator"`
+	Notes              string                `json:"notes"`
+	OverallGrade       float64               `json:"overall_grade"`
+	EnvelopeMin        float64               `json:"envelope_min"`
+	OverallEnvelopeMin float64               `json:"overall_envelope_min"`
+	Axes               map[string]cycle3Axis `json:"axes"`
+	Lenses             map[string]cycle3Lens `json:"lenses"`
+	Summary            cycle3Summary         `json:"summary"`
 }
 
 type cycle3Axis struct {
@@ -44,10 +44,10 @@ type cycle3Lens struct {
 }
 
 type cycle3Summary struct {
-	TotalFindings      int            `json:"total_findings"`
-	SeverityCounts     map[string]int `json:"severity_counts"`
-	RemediatedInCycle  int            `json:"remediated_in_cycle"`
-	RemainingOpen      int            `json:"remaining_open"`
+	TotalFindings     int            `json:"total_findings"`
+	SeverityCounts    map[string]int `json:"severity_counts"`
+	RemediatedInCycle int            `json:"remediated_in_cycle"`
+	RemainingOpen     int            `json:"remaining_open"`
 }
 
 // TestCEFCycle3RegressionAndScorecardIntegrity verifies the CEF matrix registry,
@@ -213,10 +213,10 @@ func TestCEFCycle3_HistoricalRemediationProof(t *testing.T) {
 	defer file.Close()
 
 	expectedRemediated := map[string]bool{
-		"F-TREE-POLICE-LINT-GAP-001":             false,
-		"F-LIFECYCLE-QA-COMPLETION-MAP-001":      false,
-		"F-SECURITY-AUDITOR-KEY-FALLBACK-001":    false,
-		"F-TEST-RUNNER-GO-BUILD-HEURISTIC-001":   false,
+		"F-TREE-POLICE-LINT-GAP-001":           false,
+		"F-LIFECYCLE-QA-COMPLETION-MAP-001":    false,
+		"F-SECURITY-AUDITOR-KEY-FALLBACK-001":  false,
+		"F-TEST-RUNNER-GO-BUILD-HEURISTIC-001": false,
 	}
 
 	scanner := bufio.NewScanner(file)

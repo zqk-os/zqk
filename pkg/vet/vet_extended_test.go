@@ -247,4 +247,3 @@ func TestCheckTreePolice_ArchivedDocsAndExtraScripts(t *testing.T) {
 	assert.True(t, hasArchived)
 	assert.True(t, hasExtraScript)
 }
-

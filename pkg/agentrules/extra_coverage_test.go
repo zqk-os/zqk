@@ -85,4 +85,3 @@ func TestWriteManifestFromDisk_AndLoadErrors(t *testing.T) {
 		t.Errorf("unexpected pDefault: %s", pDefault)
 	}
 }
-

@@ -280,7 +280,6 @@ func TestValidateBranchAncestorOfTrunk(t *testing.T) {
 	}
 }
 
-
 // TestReadmeLeadsWithStrangerUsablePath verifies that README.md opens with quickstart instructions
 // rather than internal kernel jargon (BLI-CEF-R18-DOC-JARGON-001, CRIT-CEF-R2-DOC-JARGON-A).
 func TestReadmeLeadsWithStrangerUsablePath(t *testing.T) {

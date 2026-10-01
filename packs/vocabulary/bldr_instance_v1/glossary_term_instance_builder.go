@@ -4,8 +4,8 @@
 package bldr_instance_v1
 
 import (
-	"github.com/zqk-os/zqk/pkg/objects"
 	enumv "github.com/zqk-os/zqk/packs/vocabulary/bldr_enum_v1/glossary_term"
+	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 )
 
@@ -299,6 +299,17 @@ func (b *GlossaryTermInstanceBuilder) SchemaRef(value string) *GlossaryTermInsta
 // SetSchemaRef is a compatibility alias for SchemaRef.
 func (b *GlossaryTermInstanceBuilder) SetSchemaRef(value string) *GlossaryTermInstanceBuilder {
 	return b.SchemaRef(value)
+}
+
+// SchemeRef sets the scheme_ref field
+func (b *GlossaryTermInstanceBuilder) SchemeRef(value string) *GlossaryTermInstanceBuilder {
+	b.SetField(objects.FieldKeySchemeRef, value)
+	return b
+}
+
+// SetSchemeRef is a compatibility alias for SchemeRef.
+func (b *GlossaryTermInstanceBuilder) SetSchemeRef(value string) *GlossaryTermInstanceBuilder {
+	return b.SchemeRef(value)
 }
 
 // SemanticTags sets the semantic_tags field

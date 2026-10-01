@@ -15,10 +15,10 @@ type testStateCallback struct {
 	timeout bool
 }
 
-func (c *testStateCallback) OnLoading()    { c.loading = true }
-func (c *testStateCallback) OnLoaded(any)  { c.loaded = true }
+func (c *testStateCallback) OnLoading()      { c.loading = true }
+func (c *testStateCallback) OnLoaded(any)    { c.loaded = true }
 func (c *testStateCallback) OnError(e error) { c.err = e }
-func (c *testStateCallback) OnTimeout()    { c.timeout = true }
+func (c *testStateCallback) OnTimeout()      { c.timeout = true }
 
 func TestLoadState_String(t *testing.T) {
 	if LoadStateUnloaded.String() != "unloaded" {

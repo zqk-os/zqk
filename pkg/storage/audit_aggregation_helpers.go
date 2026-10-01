@@ -236,4 +236,3 @@ func (s *AuditAggregationService) FindExistingMetricByOverlappingWindowForTest(c
 func (s *AuditAggregationService) MarkEventsAsAggregatedForTest(ctx context.Context, secCtx *pkgctx.SecurityContext, eventIDs []string) (int, error) {
 	return s.markEventsAsAggregated(ctx, secCtx, eventIDs)
 }
-

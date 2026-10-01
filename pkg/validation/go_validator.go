@@ -1248,7 +1248,6 @@ func (gv *GoValidator) checkAtLeastField(fieldName string, count int, obj map[st
 	return false
 }
 
-
 // goValidatorFeatureLifecycle returns the SupportsFeature token for lifecycle validation.
 // Spelled without a string literal equal to object kind "lifecycle" for drift hotspot scans.
 func goValidatorFeatureLifecycle() string {

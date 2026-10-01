@@ -1,4 +1,4 @@
-package ui
+package tui
 
 import (
 	"context"
@@ -260,18 +260,18 @@ type ResourceHygieneRow struct {
 
 // ItemDetailModel encapsulates a detailed object view for full-screen drill-down inspection.
 type ItemDetailModel struct {
-	Kind        string            `json:"kind"`
-	ID          string            `json:"id"`
-	Status      string            `json:"status"`
-	Title       string            `json:"title"`
-	Timestamp   string            `json:"timestamp,omitempty"`
-	Actor       string            `json:"actor,omitempty"`
-	Summary     string            `json:"summary,omitempty"`
-	Details     []string          `json:"details,omitempty"`
-	Lineage     []string          `json:"lineage,omitempty"`
-	Criteria    []string          `json:"criteria,omitempty"`
-	Metadata    map[string]string `json:"metadata,omitempty"`
-	RawPayload  string            `json:"raw_payload,omitempty"`
+	Kind       string            `json:"kind"`
+	ID         string            `json:"id"`
+	Status     string            `json:"status"`
+	Title      string            `json:"title"`
+	Timestamp  string            `json:"timestamp,omitempty"`
+	Actor      string            `json:"actor,omitempty"`
+	Summary    string            `json:"summary,omitempty"`
+	Details    []string          `json:"details,omitempty"`
+	Lineage    []string          `json:"lineage,omitempty"`
+	Criteria   []string          `json:"criteria,omitempty"`
+	Metadata   map[string]string `json:"metadata,omitempty"`
+	RawPayload string            `json:"raw_payload,omitempty"`
 }
 
 // QASummaryRow captures high-level test dashboard and traceability health.
@@ -1658,32 +1658,32 @@ func (m *UIModel) RefreshHealth() {
 	if err == nil && resp != nil && resp.Success {
 		overseerRunning = true
 		daemonsTotal = len(resp.Daemons)
-			for _, d := range resp.Daemons {
-				statusStr := "STOPPED"
-				uptimeStr := "--"
-				if d.ActualState == overseer.ActualStateRunning {
-					statusStr = "HEALTHY"
-					daemonsRunning++
-					if !d.StartedAt.IsZero() {
-						uptimeStr = time.Since(d.StartedAt).Round(time.Second).String()
-					}
-				} else if d.ActualState == overseer.ActualStateBackoff {
-					statusStr = "BACKOFF"
-				} else if d.ActualState == overseer.ActualStateCrashed {
-					statusStr = "CRASHED"
+		for _, d := range resp.Daemons {
+			statusStr := "STOPPED"
+			uptimeStr := "--"
+			if d.ActualState == overseer.ActualStateRunning {
+				statusStr = "HEALTHY"
+				daemonsRunning++
+				if !d.StartedAt.IsZero() {
+					uptimeStr = time.Since(d.StartedAt).Round(time.Second).String()
 				}
-
-				daemonRows = append(daemonRows, DaemonHealthRow{
-					Name:         d.Name,
-					DesiredState: string(d.DesiredState),
-					ActualState:  string(d.ActualState),
-					PID:          d.PID,
-					PGID:         d.PGID,
-					RestartCount: d.RestartCount,
-					Uptime:       uptimeStr,
-					Status:       statusStr,
-				})
+			} else if d.ActualState == overseer.ActualStateBackoff {
+				statusStr = "BACKOFF"
+			} else if d.ActualState == overseer.ActualStateCrashed {
+				statusStr = "CRASHED"
 			}
+
+			daemonRows = append(daemonRows, DaemonHealthRow{
+				Name:         d.Name,
+				DesiredState: string(d.DesiredState),
+				ActualState:  string(d.ActualState),
+				PID:          d.PID,
+				PGID:         d.PGID,
+				RestartCount: d.RestartCount,
+				Uptime:       uptimeStr,
+				Status:       statusStr,
+			})
+		}
 	} else {
 		// Fallback to registry on disk if overseer is offline / standby
 		regPath := overseer.DefaultRegistryPath(m.ProjectRoot)
@@ -2296,4 +2296,3 @@ func (m *UIModel) OpenSelectedItemDetail() {
 		}
 	}
 }
-

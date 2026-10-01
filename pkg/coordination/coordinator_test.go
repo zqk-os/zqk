@@ -292,4 +292,3 @@ func TestResolveLogLevel_QueueShutdownNoiseSuppression(t *testing.T) {
 		})
 	}
 }
-
