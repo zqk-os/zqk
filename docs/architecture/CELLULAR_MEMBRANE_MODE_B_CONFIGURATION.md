@@ -14,18 +14,18 @@ The system operates in one of two distinct modes:
 
 ```mermaid
 flowchart TD
-  subgraph ModeA["Mode A: Developer Standalone (Open-Core)"]
-    ClientA["Client Process / Agent Session<br/>(CLI / MCP Tools)"]
-    DiskA[".zqk/process/ (CAS Blobs)<br/>and .zqk/streams/ (WAL Logs)"]
+  subgraph ModeA["Mode A: Developer Standalone"]
+    ClientA["Client Process / Agent Session (CLI / MCP)"]
+    DiskA[".zqk/process (CAS Blobs) & .zqk/streams (WAL Logs)"]
     ClientA -->|"Direct File I/O (Local Disk)"| DiskA
   end
 
-  subgraph ModeB["Mode B: Cellular Membrane Lockdown (Swarm / Multi-Tenant Sandbox)"]
-    ClientB["Untrusted Agent / Client Process<br/>(Read-Only / Sandboxed)"]
-    DaemonB["PrivilegedWriterDaemon (zqk object daemon)<br/>- Dedicated Service User<br/>- ValidateAllIntakeObjects and Mandatory Description<br/>- SHA-256 CAS Calculation and Atomic Serialization"]
-    DiskB[".zqk/process/ (0750 / 0640)<br/>and .zqk/streams/ (0700)"]
-    ClientB -->|JSON-RPC over UNIX Socket| DaemonB
-    DaemonB -->|Privileged Write I/O Only| DiskB
+  subgraph ModeB["Mode B: Cellular Membrane Lockdown"]
+    ClientB["Untrusted Agent / Client Process (Read-Only)"]
+    DaemonB["PrivilegedWriterDaemon (Dedicated Service User)"]
+    DiskB[".zqk/process (0750 / 0640) & .zqk/streams (0700)"]
+    ClientB -->|"JSON-RPC over UNIX Socket"| DaemonB
+    DaemonB -->|"Privileged Write I/O Only"| DiskB
   end
 ```
 
@@ -195,25 +195,25 @@ In Mode B, agents do not construct CAS files directly on disk. Instead, agents s
 ```mermaid
 sequenceDiagram
   autonumber
-  actor Agent as "Agent / Operator"
-  participant Intake as "Semantic Intake (zqk intake)"
-  participant Reasoner as "Reasoner (pkg/intake)"
-  participant Gate as "Membrane Gate (ValidateAllIntakeObjects)"
-  participant Socket as "UNIX Domain Socket"
-  participant Daemon as "PrivilegedWriterDaemon"
-  participant CAS as "CAS Storage (.zqk/process & .zqk/streams)"
+  actor Agent as Agent / Operator
+  participant Intake as Semantic Intake (zqk intake)
+  participant Reasoner as Reasoner (pkg/intake)
+  participant Gate as Membrane Gate
+  participant Socket as UNIX Domain Socket
+  participant Daemon as PrivilegedWriterDaemon
+  participant CAS as CAS Storage (.zqk/process)
 
   Agent->>Intake: Submit raw text or requirement
   Intake->>Reasoner: Pass text & flags
-  Reasoner->>Reasoner: Coerce schema, synthesize description, assign ID & graph linkages
+  Reasoner->>Reasoner: Coerce schema, assign ID & linkages
   Reasoner->>Gate: Validate candidate objects
   alt Validation Fails
     Gate-->>Agent: Demote to Draft Plane (.zqk/object_drafts/)
   else Validation Passes
-    Gate->>Socket: Transmit payload via IPC (/tmp/zqk-privileged-writer.sock)
+    Gate->>Socket: Transmit payload via IPC
     Socket->>Daemon: Deliver payload
     Daemon->>Daemon: Calculate SHA-256 CAS digest
-    Daemon->>CAS: Atomic disk write (.zqk/process) & append WAL (.zqk/streams)
+    Daemon->>CAS: Atomic disk write & append WAL
     Daemon-->>Agent: Confirmation (Zero draft residue)
   end
 ```

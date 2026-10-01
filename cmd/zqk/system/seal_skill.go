@@ -13,8 +13,10 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/safepath"
 	"github.com/zqk-os/zqk/pkg/skill"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+
 )
 
 // NewSealSkillCmd wires seal-skill from the command-spec builder.
@@ -48,10 +50,14 @@ func runSealSkill(cmd *cobra.Command, args []string) error {
 		}
 
 		skillName := args[0]
-		skillDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.SkillsSubdir, skillName)
-		skillPath := filepath.Join(skillDir, "SKILL.md")
+		skillsBase := filepath.Join(projectRoot, paths.ProjectDataDir, paths.SkillsSubdir)
+		skillPath, err := safepath.JoinUnderRoot(skillsBase, skillName, "SKILL.md")
+		if err != nil {
+			return errfmt.Newf("invalid skill path for %s", skillName).Wrap(err)
+		}
 
 		contentBytes, err := fileutil.ReadFile(skillPath)
+
 		if err != nil {
 			return errfmt.Newf("read skill file %s", skillPath).Wrap(err)
 		}

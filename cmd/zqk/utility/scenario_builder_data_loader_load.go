@@ -8,8 +8,10 @@ import (
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/safepath"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
+
 
 // handleLoadDataFile handles loading objects from a YAML data file
 func handleLoadDataFile(cmd any, builder *ScenarioBuilder, flags *ScenarioBuilderFlags) error {
@@ -19,21 +21,24 @@ func handleLoadDataFile(cmd any, builder *ScenarioBuilder, flags *ScenarioBuilde
 		// Try to resolve relative to project root first
 		projectRoot := builder.projectRoot
 		if projectRoot != emptyValue {
-			absPath := filepath.Join(projectRoot, dataFilePath)
-			if _, err := fileutil.Stat(absPath); err == nil {
-				dataFilePath = absPath
+			if safePath, sErr := safepath.JoinUnderRoot(projectRoot, dataFilePath); sErr == nil {
+				if _, err := fileutil.Stat(safePath); err == nil {
+					dataFilePath = safePath
+				}
 			}
 		}
 		// If still not found, try current working directory
 		if _, err := fileutil.Stat(dataFilePath); fileutil.IsNotExist(err) {
 			if wd, err := fileutil.Getwd(); err == nil {
-				absPath := filepath.Join(wd, dataFilePath)
-				if _, err := fileutil.Stat(absPath); err == nil {
-					dataFilePath = absPath
+				if safePath, sErr := safepath.JoinUnderRoot(wd, dataFilePath); sErr == nil {
+					if _, err := fileutil.Stat(safePath); err == nil {
+						dataFilePath = safePath
+					}
 				}
 			}
 		}
 	}
+
 
 	// Emit start event
 	builder.emitCoordinatorEvent(pkgctx.NewSystemContext(), ScenarioBuilderProfileName, scenarioBuilderStatusProgress,
