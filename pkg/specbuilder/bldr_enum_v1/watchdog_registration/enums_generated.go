@@ -5,6 +5,7 @@ package watchdog_registration
 
 import (
 	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_watchdog_registrationsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_watchdog_registrations"
 )
 
 type Plane = base_objectenum.Plane
@@ -33,15 +34,15 @@ const (
 	SourceTypeInternal SourceType = base_objectenum.SourceTypeInternal
 )
 
-type Status = base_objectenum.Status
+type Status = shared_watchdog_registrationsenum.Status
 
 const (
-	StatusApproved    Status = base_objectenum.StatusApproved
-	StatusArchived    Status = base_objectenum.StatusArchived
-	StatusConceptual  Status = base_objectenum.StatusConceptual
-	StatusError       Status = base_objectenum.StatusError
-	StatusImplemented Status = base_objectenum.StatusImplemented
-	StatusInProgress  Status = base_objectenum.StatusInProgress
-	StatusOriginated  Status = base_objectenum.StatusOriginated
-	StatusProposed    Status = base_objectenum.StatusProposed
+	StatusApproved    Status = shared_watchdog_registrationsenum.StatusApproved
+	StatusArchived    Status = shared_watchdog_registrationsenum.StatusArchived
+	StatusConceptual  Status = shared_watchdog_registrationsenum.StatusConceptual
+	StatusError       Status = shared_watchdog_registrationsenum.StatusError
+	StatusImplemented Status = shared_watchdog_registrationsenum.StatusImplemented
+	StatusInProgress  Status = shared_watchdog_registrationsenum.StatusInProgress
+	StatusOriginated  Status = shared_watchdog_registrationsenum.StatusOriginated
+	StatusProposed    Status = shared_watchdog_registrationsenum.StatusProposed
 )
