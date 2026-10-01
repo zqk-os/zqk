@@ -11,7 +11,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/agentclaim"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -49,10 +48,7 @@ func runAgentClaimGate(cmd *cobra.Command, _ []string, proc *cli.Processor) erro
 	}
 
 	ctx := proc.OperationContext()
-	sec := proc.SecurityContext()
-	if sec == nil {
-		sec = pkgctx.NewSystemSecurityContext()
-	}
+	sec := procSecurity(proc)
 
 	opts := agentclaim.GateOptions{
 		Assignment:        assignment,

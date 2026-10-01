@@ -44,7 +44,7 @@ cmd/zqk/workflow/
 | Orphaned Temp File | `ActionRemoveFile` | Remove abandoned `.zqk/tmp/*.tmp` | Yes |
 | Unseeded Default Policy Pack | `ActionSeed` | Invoke registered `PolicySeeder` (`zqk system init --force`) | Safe in greenfield |
 | Unseeded Agent Seating Pack | `ActionSeed` | Invoke registered `PersonaSeeder` (`zqk system agent-onboard`) | Safe in greenfield |
-| Object Validation Issue | `ActionRunCommand` | Prescriptive `zqk object fix <id>` | Manual/Confirmed |
+| Object Validation Issue | `ActionRunCommand` | Prescriptive `zqk system check --auto-fix --ids <id>` | Manual/Confirmed |
 
 ---
 

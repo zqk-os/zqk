@@ -17,6 +17,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/concurrency"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/safepath"
 )
 
 // pathCacheSnapshot is an immutable snapshot of the alias map for one project root.
@@ -237,6 +238,9 @@ func resolvePrefix(projectRoot, alias string) string {
 	if s != emptyValue {
 		return s
 	}
+	if p, err := safepath.JoinUnderRoot(projectRoot, filepath.Clean(alias)); err == nil {
+		return p
+	}
 	return filepath.Join(projectRoot, filepath.Clean(alias))
 }
 
@@ -282,6 +286,9 @@ func resolvePrefixStrict(projectRoot, alias string) (string, error) {
 		return nil
 	})
 	if rel != emptyValue {
+		if p, err := safepath.JoinUnderRoot(projectRoot, rel); err == nil {
+			return p, nil
+		}
 		return filepath.Join(projectRoot, rel), nil
 	}
 	return "", ErrPathAliasNotInCache

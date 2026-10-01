@@ -11,7 +11,7 @@ import (
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
-func TestExtended_JobManagement_LoggingAndDispatch_Wave61(t *testing.T) {
+func TestJobManagement_LoggingAndDispatch(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 

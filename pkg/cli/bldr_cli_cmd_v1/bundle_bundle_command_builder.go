@@ -15,7 +15,7 @@ func NewBundleBundleCommandBuilder() *cobra.Command {
 	help.WithDescriptionLines("Bundles define requirements, criteria, backlog items, test cases, and fixtures")
 	help.WithDescriptionLines("in YAML; the apply subcommand creates those objects in the project using the")
 	help.WithDescriptionLines("same storage and validation as the main CLI. See docs/architecture/SCENARIO_BUNDLES_AND_TRACEABILITY.md.")
-	help.AddExample("Apply a bundle to the current project", "%s bundle apply -f test-scenarios/persistence-bundle/persistence-bundle.yaml -R .")
+	help.AddExample("Apply a bundle to the current project", "%s bundle apply -f examples/scenarios/persistence-bundle/persistence-bundle.yaml -R .")
 	help.ExcludeFlag("format")
 	help.ExcludeFlag("output")
 	help.ExcludeFlag("verbose")

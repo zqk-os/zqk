@@ -5,15 +5,13 @@ kinds:
     max_count: 1000
     protect_statuses: ["pending"]
   change_journal_entry:
-    archive_after: "24h"
     cleanup_after: "168h"
     max_count: 1000
     protect_statuses: []
   zqk_session:
-    archive_after: "24h"
     cleanup_after: "168h"
     max_count: 500
-    protect_statuses: ["active"]
+    protect_statuses: []
   command_metric:
     archive_after: "48h"
     cleanup_after: "168h"
@@ -24,3 +22,56 @@ kinds:
     cleanup_after: "72h"
     max_count: 500
     protect_statuses: ["pending", "in_progress"]
+  agent_execution_step:
+    archive_after: "24h"
+    cleanup_after: "72h"
+    max_count: 1000
+    protect_statuses: ["in_progress"]
+  agent_task_execution:
+    archive_after: "24h"
+    cleanup_after: "72h"
+    max_count: 500
+    protect_statuses: ["in_progress"]
+  tool_execution:
+    archive_after: "24h"
+    cleanup_after: "48h"
+    max_count: 2000
+    protect_statuses: ["in_progress"]
+  command_execution:
+    archive_after: "24h"
+    cleanup_after: "48h"
+    max_count: 2000
+    protect_statuses: ["in_progress"]
+  stream_delta:
+    cleanup_after: "72h"
+    max_count: 5000
+    protect_statuses: []
+  runtime_delta:
+    cleanup_after: "72h"
+    max_count: 5000
+    protect_statuses: []
+  mcp_session:
+    archive_after: "24h"
+    cleanup_after: "168h"
+    max_count: 50
+    protect_statuses: ["in_progress"]
+  mcp_message:
+    cleanup_after: "48h"
+    max_count: 2000
+    protect_statuses: []
+  storage_metric:
+    cleanup_after: "168h"
+    max_count: 1000
+    protect_statuses: []
+  code_quality_metric:
+    cleanup_after: "168h"
+    max_count: 1000
+    protect_statuses: []
+  kind_mapping_metric:
+    cleanup_after: "168h"
+    max_count: 1000
+    protect_statuses: []
+  scheduler_log:
+    cleanup_after: "168h"
+    max_count: 2000
+    protect_statuses: []

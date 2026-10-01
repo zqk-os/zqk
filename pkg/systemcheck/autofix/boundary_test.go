@@ -67,7 +67,7 @@ func TestAutoFixRuleLoader_DisabledAndMismatchedRules(t *testing.T) {
 				"condition_tier":            2,
 				"condition_rule":            "R2",
 				"condition_message_contains": "specific error",
-				"fix_command_template":       "zqk object fix {object_id}",
+				"fix_command_template":       "zqk system check {object_id} --auto-fix",
 				"priority":                  20,
 				"enabled":                   true,
 			},

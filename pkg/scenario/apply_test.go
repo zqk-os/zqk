@@ -15,7 +15,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/validation"
 )
 
-// persistenceBundleYAMLPath returns the path to persistence-bundle.yaml: tracked testdata first,
+// persistenceBundleYAMLPath returns the path to persistence-bundle.yaml: tracked examples/scenarios first,
 // then repo test-scenarios/ (often gitignored) for local runs.
 func persistenceBundleYAMLPath(t *testing.T) string {
 	t.Helper()
@@ -24,7 +24,7 @@ func persistenceBundleYAMLPath(t *testing.T) string {
 		return ""
 	}
 	dir := filepath.Dir(file)
-	p := filepath.Join(dir, "testdata", "persistence-bundle", "persistence-bundle.yaml")
+	p := filepath.Join(dir, "..", "..", "examples", "scenarios", "persistence-bundle", "persistence-bundle.yaml")
 	if _, err := fileutil.Stat(p); err == nil {
 		return p
 	}
@@ -33,9 +33,13 @@ func persistenceBundleYAMLPath(t *testing.T) string {
 		return ""
 	}
 	for d := cwd; d != emptyValue; d = filepath.Dir(d) {
-		alt := filepath.Join(d, "test-scenarios", "persistence-bundle", "persistence-bundle.yaml")
+		alt := filepath.Join(d, "examples", "scenarios", "persistence-bundle", "persistence-bundle.yaml")
 		if _, err := fileutil.Stat(alt); err == nil {
 			return alt
+		}
+		altOld := filepath.Join(d, "test-scenarios", "persistence-bundle", "persistence-bundle.yaml")
+		if _, err := fileutil.Stat(altOld); err == nil {
+			return altOld
 		}
 		if filepath.Dir(d) == d {
 			break
@@ -193,7 +197,7 @@ objects:
 	}
 }
 
-// processHygieneConfigTraceabilityBundlePath returns tracked testdata for the process hygiene config bundle.
+// processHygieneConfigTraceabilityBundlePath returns tracked examples/scenarios for the process hygiene config bundle.
 func processHygieneConfigTraceabilityBundlePath(t *testing.T) string {
 	t.Helper()
 	_, file, _, ok := runtime.Caller(0)
@@ -201,7 +205,7 @@ func processHygieneConfigTraceabilityBundlePath(t *testing.T) string {
 		return ""
 	}
 	dir := filepath.Dir(file)
-	return filepath.Join(dir, "testdata", "process-hygiene-config-traceability-bundle", "process-hygiene-config-traceability-bundle.yaml")
+	return filepath.Join(dir, "..", "..", "examples", "scenarios", "process-hygiene-config-traceability-bundle", "process-hygiene-config-traceability-bundle.yaml")
 }
 
 // TestApplyScenarioBundle_ProcessHygieneConfigTraceabilityBundleLoad decodes the hygiene traceability bundle and checks shape.
@@ -249,7 +253,7 @@ func TestApplyScenarioBundle_CapLoopHonestyTraceabilityBundleLoad(t *testing.T) 
 	if !ok {
 		t.Fatal("caller")
 	}
-	path := filepath.Join(filepath.Dir(file), "testdata", "cap-loop-honesty-traceability-bundle", "cap-loop-honesty-traceability-bundle.yaml")
+	path := filepath.Join(filepath.Dir(file), "..", "..", "examples", "scenarios", "cap-loop-honesty-traceability-bundle", "cap-loop-honesty-traceability-bundle.yaml")
 	data, err := fileutil.ReadFile(path)
 	if err != nil {
 		t.Fatalf("read bundle %q: %v", path, err)
@@ -388,7 +392,7 @@ objects:
 	}
 }
 
-// convergenceLifecycleBundlePath returns testdata convergence-lifecycle-bundle.yaml.
+// convergenceLifecycleBundlePath returns examples/scenarios convergence-lifecycle-bundle.yaml.
 func convergenceLifecycleBundlePath(t *testing.T) string {
 	t.Helper()
 	_, file, _, ok := runtime.Caller(0)
@@ -396,7 +400,7 @@ func convergenceLifecycleBundlePath(t *testing.T) string {
 		return ""
 	}
 	dir := filepath.Dir(file)
-	return filepath.Join(dir, "testdata", "convergence-lifecycle-bundle", "convergence-lifecycle-bundle.yaml")
+	return filepath.Join(dir, "..", "..", "examples", "scenarios", "convergence-lifecycle-bundle", "convergence-lifecycle-bundle.yaml")
 }
 
 // TestApplyScenarioBundle_ConvergenceLifecycleBundle applies the full convergence scaffold (goal, criteria,

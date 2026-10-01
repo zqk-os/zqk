@@ -10,7 +10,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/agentclaim"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
@@ -24,10 +23,7 @@ func NewClaimCmd() *cobra.Command {
 
 func runClaim(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 	ctx := proc.OperationContext()
-	sec := proc.SecurityContext()
-	if sec == nil {
-		sec = pkgctx.NewSystemSecurityContext()
-	}
+	sec := procSecurity(proc)
 	var flags clipkg.FlagBag
 	claimant := flags.String(cmd, "by")
 	forRef := flags.String(cmd, "for")
@@ -85,10 +81,7 @@ func NewReleaseCmd() *cobra.Command {
 
 func runRelease(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 	ctx := proc.OperationContext()
-	sec := proc.SecurityContext()
-	if sec == nil {
-		sec = pkgctx.NewSystemSecurityContext()
-	}
+	sec := procSecurity(proc)
 	var flags clipkg.FlagBag
 	claimant := flags.String(cmd, "by")
 	force := flags.Bool(cmd, "force")
@@ -137,10 +130,7 @@ func claimTaskForExecute(cmd *cobra.Command, proc *cli.Processor, taskID string,
 		return nil
 	}
 	who := resolveClaimantIdentity(cmd, proc)
-	sec := proc.SecurityContext()
-	if sec == nil {
-		sec = pkgctx.NewSystemSecurityContext()
-	}
+	sec := procSecurity(proc)
 	_, err := agentclaim.TryClaim(proc.OperationContext(), proc.Storage(), sec, taskID, who)
 	if err != nil {
 		return errfmt.Newf("work claim failed for %s", taskID).Wrap(err)
@@ -150,10 +140,7 @@ func claimTaskForExecute(cmd *cobra.Command, proc *cli.Processor, taskID string,
 
 // releaseTaskAfterNext clears claim when worker advances via agent next.
 func releaseTaskAfterNext(proc *cli.Processor, taskID, claimant string) error {
-	sec := proc.SecurityContext()
-	if sec == nil {
-		sec = pkgctx.NewSystemSecurityContext()
-	}
+	sec := procSecurity(proc)
 	who := strings.TrimSpace(claimant)
 	if who == "" {
 		who = resolveClaimantIdentity(nil, proc)

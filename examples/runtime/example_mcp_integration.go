@@ -1,8 +1,8 @@
-package runtime
+package examples
 
 // Example: Refactoring MCP Server to use GoroutineManager
 //
-// This example shows how to refactor the MCP server's periodic compression
+// This example shows how to refactor an MCP server's periodic compression
 // to use the GoroutineManager for proper lifecycle tracking.
 
 /*

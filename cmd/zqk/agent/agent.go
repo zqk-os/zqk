@@ -8,7 +8,19 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/swarm"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/cliapp"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
+
+// procSecurity extracts the security context from the processor or returns system context.
+func procSecurity(proc *cli.Processor) *pkgctx.SecurityContext {
+	if proc != nil {
+		if sec := proc.SecurityContext(); sec != nil {
+			return sec
+		}
+	}
+	return pkgctx.NewSystemSecurityContext()
+}
 
 // NewAgentCmd creates the agent command group for multi-agent orchestration
 func NewAgentCmd() *cobra.Command {
