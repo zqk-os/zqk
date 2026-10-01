@@ -27,7 +27,7 @@ func vendorAddendum(v Vendor) string {
 	case VendorIDE:
 		return fmt.Sprintf(`## Vendor: IDE
 - Prefer MCP via `+"`"+`%s mcp serve`+"`"+` over inventing parallel tool bridges.
-- Keep orchestration in the kernel (feed/scheduler), not IDE subagents.
+- Keep orchestration coordinated via the kernel (feed/scheduler/orchestrate), ensuring proper initialization context is provided.
 `, exe)
 	case VendorClaudeCode:
 		return `## Vendor: Claude Code
