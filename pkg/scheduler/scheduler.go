@@ -961,8 +961,8 @@ func (s *Scheduler) Start(ctx context.Context) error {
 	return nil
 }
 
-// CleanStaleLocks removes orphaned, unheld lock files in both the job locks directory (.zqk/scheduler/locks)
-// and the state locks directory (.zqk/scheduler/state/locks).
+// CleanStaleLocks removes orphaned, unheld lock files in the job locks directory (.zqk/scheduler/locks),
+// the triggers directory (.zqk/scheduler/triggers), and the state locks directory (.zqk/scheduler/state/locks).
 func (s *Scheduler) CleanStaleLocks(threshold time.Duration) (int, error) {
 	if strings.TrimSpace(s.projectRoot) == emptyValue {
 		return 0, nil
@@ -973,6 +973,10 @@ func (s *Scheduler) CleanStaleLocks(threshold time.Duration) (int, error) {
 	totalCleaned := 0
 	schedLocksDir := filepath.Join(s.projectRoot, paths.ProjectDataDir, paths.SchedulerDir, paths.SchedulerLocksDir)
 	if cleaned, err := CleanStaleLocksByAge(schedLocksDir, threshold); err == nil {
+		totalCleaned += cleaned
+	}
+	triggersDir := filepath.Join(s.projectRoot, paths.ProjectDataDir, paths.SchedulerDir, paths.SchedulerTriggersDir)
+	if cleaned, err := CleanStaleLocksByAge(triggersDir, threshold); err == nil {
 		totalCleaned += cleaned
 	}
 	if s.stateRegistry != nil {

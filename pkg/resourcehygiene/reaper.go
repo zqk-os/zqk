@@ -1,20 +1,19 @@
 package resourcehygiene
 
 import (
-	"context"
 	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
-	"strconv"
+	"runtime"
 	"strings"
 	"syscall"
 	"time"
 
 	"github.com/mitchellh/go-ps"
+	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/zqk-os/zqk/pkg/daemon/singleton"
 	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/process"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -40,19 +39,24 @@ var (
 		return res, nil
 	}
 	getCommandLineHook = func(pid int) (string, error) {
-		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-		defer cancel()
-		out, err := execwrap.CommandContext(ctx, "ps", "-o", "command=", "-p", strconv.Itoa(pid)).Output()
-		if err != nil {
-			return "", err
-		}
-		return string(out), nil
+		return process.ProcessCommandLine(pid), nil
 	}
 	killProcessHook = func(pid int, sig syscall.Signal) error {
+		if runtime.GOOS == "windows" {
+			p, err := os.FindProcess(pid)
+			if err == nil {
+				return p.Kill()
+			}
+			return err
+		}
 		_ = syscall.Kill(-pid, sig)
 		return syscall.Kill(pid, sig)
 	}
 	isProcessAliveHook = func(pid int) bool {
+		if runtime.GOOS == "windows" {
+			p, err := os.FindProcess(pid)
+			return err == nil && p != nil
+		}
 		return syscall.Kill(pid, 0) == nil
 	}
 )
@@ -389,9 +393,9 @@ func ReapOrphanedProcesses(projectRoot string, dryRun bool) (int, []string, erro
 			continue
 		}
 
-		// Executable name check: must be a zqk executable
+		// Executable name check: must be a branded or product executable
 		base := filepath.Base(p.exe)
-		if base != "zqk" && base != "zqk-stable" && base != "zqk-mcp-daemon" && !strings.Contains(base, "zqk") {
+		if !brand.IsProductExecutable(base) && !strings.Contains(base, brand.ExecutableName()) && !strings.Contains(base, "zqk") {
 			continue
 		}
 

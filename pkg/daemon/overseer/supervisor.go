@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
@@ -226,10 +227,10 @@ func (s *Supervisor) launchDaemonLocked(ctx context.Context, spec *DaemonSpec, s
 
 	selfExe, err := os.Executable()
 	if err != nil || selfExe == "" {
-		selfExe = filepath.Join(s.projectRoot, "bin", "zqk")
+		selfExe = filepath.Join(s.projectRoot, "bin", brand.ExecutableName())
 	}
 
-	if exe == "zqk" || exe == "zqk-stable" {
+	if brand.IsProductExecutable(exe) || exe == "zqk" || exe == "zqk-stable" {
 		exe = selfExe
 	} else if !filepath.IsAbs(exe) {
 		binCandidate := filepath.Join(s.projectRoot, "bin", exe)

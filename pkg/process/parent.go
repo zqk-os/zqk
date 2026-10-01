@@ -11,6 +11,8 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/mitchellh/go-ps"
+	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 
@@ -97,10 +99,18 @@ func ParentProcessName(pid int) string {
 	}
 	if runtime.GOOS == "linux" {
 		b, err := fileutil.ReadFile("/proc/" + strconv.Itoa(pid) + "/comm")
-		if err != nil {
-			return emptyValue
+		if err == nil {
+			return strings.TrimSpace(string(b))
 		}
-		return strings.TrimSpace(string(b))
+	}
+	// Try go-ps first across platforms
+	if p, err := ps.FindProcess(pid); err == nil && p != nil {
+		if exe := p.Executable(); exe != emptyValue {
+			return exe
+		}
+	}
+	if runtime.GOOS == "windows" {
+		return emptyValue
 	}
 	out, err := execwrap.Command("ps", "-p", strconv.Itoa(pid), "-o", "comm=").Output()
 	if err != nil {
@@ -124,22 +134,25 @@ func IsParentZqk() bool {
 		return false
 	}
 	parentBase := strings.TrimSpace(strings.ToLower(parentName))
+	if len(parentBase) > 4 && strings.EqualFold(parentBase[len(parentBase)-4:], ".exe") {
+		parentBase = parentBase[:len(parentBase)-4]
+	}
 	ourName := strings.TrimSpace(strings.ToLower(ourExecutableBaseName()))
-	if parentBase == ourName {
+	if parentBase == ourName || brand.IsProductExecutable(parentBase) {
 		return true
 	}
 	// Role symlinks (zqk-mcp-daemon, zqk-scheduler, …) are still the brand binary.
-	brand := ourName
-	if brand == emptyValue {
-		brand = "zqk"
+	brandPrefix := ourName
+	if brandPrefix == emptyValue {
+		brandPrefix = brand.ExecutableName()
 	}
-	return strings.HasPrefix(parentBase, brand+"-")
+	return strings.HasPrefix(parentBase, brandPrefix+"-")
 }
 
 func ourExecutableBaseName() string {
 	exe, err := fileutil.Executable()
 	if err != nil {
-		return "zqk"
+		return brand.ExecutableName()
 	}
 	base := filepath.Base(exe)
 	if len(base) > 4 && strings.EqualFold(base[len(base)-4:], ".exe") {

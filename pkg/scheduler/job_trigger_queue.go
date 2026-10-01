@@ -78,6 +78,22 @@ type JobTriggerQueue struct {
 	casDebounceInterval time.Duration
 }
 
+var (
+	triggerLockRegistryMu sync.Mutex
+	triggerLockRegistry   = make(map[string]*sync.Mutex)
+)
+
+func getTriggerQueueMutex(lockFile string) *sync.Mutex {
+	triggerLockRegistryMu.Lock()
+	defer triggerLockRegistryMu.Unlock()
+	m, exists := triggerLockRegistry[lockFile]
+	if !exists {
+		m = &sync.Mutex{}
+		triggerLockRegistry[lockFile] = m
+	}
+	return m
+}
+
 const (
 	// defaultCASReconcileDebounceInterval is the maximum rate at which full CAS filesystem scans
 	// are performed for trigger batches when all jobs are already in cache.
@@ -138,6 +154,10 @@ func NewJobTriggerQueue(projectRoot string) JobTriggerQueueInterface {
 
 // EnqueueLifecycleTrigger adds a lifecycle trigger request to the queue.
 func (q *JobTriggerQueue) EnqueueLifecycleTrigger(kind, fromState, toState string, objectData map[string]any) error {
+	inMemMu := getTriggerQueueMutex(q.lockFile)
+	inMemMu.Lock()
+	defer inMemMu.Unlock()
+
 	fileLock, err := storagepkg.NewFileLock(q.lockFile)
 	if err != nil {
 		return errfmt.Errorf(triggerQueueErrCreateLockFmt, err)
@@ -193,6 +213,10 @@ func (q *JobTriggerQueue) EnqueueTriggerRequest(jobID string) error {
 // When origin is TriggerOriginPreCommit ("pre_commit"), the scheduler will run the job's callback_on_completion
 // (and callback_on_error) only for this run. Use for pre-commit triggered runs so timer runs do not write pre-commit results.
 func (q *JobTriggerQueue) EnqueueTriggerRequestWithOrigin(jobID, triggerOrigin string) error {
+	inMemMu := getTriggerQueueMutex(q.lockFile)
+	inMemMu.Lock()
+	defer inMemMu.Unlock()
+
 	// Create file lock for cross-process coordination
 	fileLock, err := storagepkg.NewFileLock(q.lockFile)
 	if err != nil {
@@ -263,6 +287,10 @@ func (q *JobTriggerQueue) EnqueueTriggerRequests(jobIDs []string, triggerOrigin 
 	if len(jobIDs) == 0 {
 		return nil
 	}
+	inMemMu := getTriggerQueueMutex(q.lockFile)
+	inMemMu.Lock()
+	defer inMemMu.Unlock()
+
 	fileLock, err := storagepkg.NewFileLock(q.lockFile)
 	if err != nil {
 		return errfmt.Errorf(triggerQueueErrCreateLockFmt, err)
@@ -314,6 +342,10 @@ func (q *JobTriggerQueue) EnqueueTriggerRequestStructs(toAppend []JobTriggerRequ
 	if len(toAppend) == 0 {
 		return nil
 	}
+	inMemMu := getTriggerQueueMutex(q.lockFile)
+	inMemMu.Lock()
+	defer inMemMu.Unlock()
+
 	fileLock, err := storagepkg.NewFileLock(q.lockFile)
 	if err != nil {
 		return errfmt.Errorf(triggerQueueErrCreateLockFmt, err)
@@ -371,6 +403,7 @@ func (q *JobTriggerQueue) DequeueTriggerRequests(limit int) ([]JobTriggerRequest
 
 	type dequeueState struct {
 		fileLock  *storagepkg.FileLock
+		inMemMu   *sync.Mutex
 		acquired  bool
 		requests  []JobTriggerRequest
 		remainder []JobTriggerRequest
@@ -380,9 +413,15 @@ func (q *JobTriggerQueue) DequeueTriggerRequests(limit int) ([]JobTriggerRequest
 		WithMetricsConfig(pipeline.DefaultMetricsConfig(q.logger)).
 		WithProfile(string(pkgctx.ProfileSystem)).
 		AddStage(pipeline.StageIngest, func(pctx *pipeline.Context, payload any) (any, error) {
+			inMemMu := getTriggerQueueMutex(q.lockFile)
+			if !inMemMu.TryLock() {
+				return &dequeueState{acquired: false, requests: []JobTriggerRequest{}}, nil
+			}
+
 			// Create file lock for cross-process coordination
 			fileLock, err := storagepkg.NewFileLock(q.lockFile)
 			if err != nil {
+				inMemMu.Unlock()
 				return nil, errfmt.Errorf(triggerQueueErrCreateLockFmt, err)
 			}
 
@@ -390,17 +429,19 @@ func (q *JobTriggerQueue) DequeueTriggerRequests(limit int) ([]JobTriggerRequest
 			acquired, err := fileLock.TryLock()
 			if err != nil {
 				_ = fileLock.Close()
+				inMemMu.Unlock()
 				return nil, errfmt.Newf("failed to try lock").Wrap(err)
 			}
 			if !acquired {
 				_ = fileLock.Close()
+				inMemMu.Unlock()
 				// Lock is held by another process (likely enqueueing)
 				// Return empty slice - we'll try again next cycle
 				return &dequeueState{acquired: false, requests: []JobTriggerRequest{}}, nil
 			}
 
 			// Lock acquired: keep it held across subsequent stages.
-			return &dequeueState{fileLock: fileLock, acquired: true}, nil
+			return &dequeueState{fileLock: fileLock, inMemMu: inMemMu, acquired: true}, nil
 		}).
 		AddStage(StageReadQueue, func(pctx *pipeline.Context, payload any) (any, error) {
 			in, ok := nildecode.DecodeNonNilPayload[*dequeueState](payload)
@@ -468,6 +509,9 @@ func (q *JobTriggerQueue) DequeueTriggerRequests(limit int) ([]JobTriggerRequest
 				_ = in.fileLock.Unlock()
 				_ = in.fileLock.Close()
 			}
+			if in.inMemMu != nil {
+				in.inMemMu.Unlock()
+			}
 
 			if len(in.requests) > 0 {
 				jobIDs := extractJobIDs(in.requests)
@@ -526,6 +570,10 @@ func (q *JobTriggerQueue) HasPendingTriggerWithOrigin(jobID, triggerOrigin strin
 	if q == nil || jobID == "" {
 		return false, nil
 	}
+	inMemMu := getTriggerQueueMutex(q.lockFile)
+	inMemMu.Lock()
+	defer inMemMu.Unlock()
+
 	fileLock, err := storagepkg.NewFileLock(q.lockFile)
 	if err != nil {
 		return false, errfmt.Errorf(triggerQueueErrCreateLockFmt, err)

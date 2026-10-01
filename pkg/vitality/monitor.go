@@ -3,9 +3,9 @@ package vitality
 import (
 	"context"
 	"fmt"
+	"strings"
 
-	"github.com/zqk-os/zqk/pkg/execwrap"
-
+	"github.com/mitchellh/go-ps"
 	"github.com/zqk-os/zqk/pkg/logging"
 )
 
@@ -20,13 +20,17 @@ func NewVitalityMonitor(processName string) *VitalityMonitor {
 
 // EnsureRunning restarts the daemon if it is not active.
 func (v *VitalityMonitor) EnsureRunning(ctx context.Context) error {
-	// Simple check: ping process
-	cmd := execwrap.Command("pgrep", "-f", v.processName)
-	if err := cmd.Run(); err != nil {
-		logging.FluentEvent(logging.GetLogger()).Info(fmt.Sprintf("🚀 [VITALITY] Daemon %s not running, restarting...\n", v.processName)).Log()
-		return v.restart()
+	// Cross-platform check: scan processes
+	procs, err := ps.Processes()
+	if err == nil {
+		for _, p := range procs {
+			if strings.Contains(strings.ToLower(p.Executable()), strings.ToLower(v.processName)) {
+				return nil
+			}
+		}
 	}
-	return nil
+	logging.FluentEvent(logging.GetLogger()).Info(fmt.Sprintf("🚀 [VITALITY] Daemon %s not running, restarting...\n", v.processName)).Log()
+	return v.restart()
 }
 
 func (v *VitalityMonitor) restart() error {

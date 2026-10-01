@@ -248,12 +248,12 @@ func (e *MetabolismEngine) Ingest(opts IngestionOptions) (*MetabolicDigest, erro
 		allCritIDs = append(allCritIDs, critInvID, critDynID, critAdvID)
 		allReqIDs = append(allReqIDs, reqID)
 
-		// Criteria 1: Invariant
+		// Criteria 1: Invariant & Documentation (POL-DOC-001)
 		critInv := map[string]any{
 			objects.FieldKeyID:          critInvID,
 			objects.FieldKeyKind:        "criteria",
 			objects.FieldKeyTitle:       fmt.Sprintf("State Invariant for %s", task.ID),
-			objects.FieldKeyDescription: fmt.Sprintf("Specification schema and output structure are strictly valid for %s", task.ID),
+			objects.FieldKeyDescription: fmt.Sprintf("Specification schema and output structure are strictly valid for %s, with documentation recorded in doc_entry knowledge base.", task.ID),
 			objects.FieldKeyCategory:    "acceptance",
 			objects.FieldKeyStatus:      objects.ObjectStatusAwaitingVerification,
 		}
