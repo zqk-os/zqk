@@ -158,7 +158,7 @@ if sh "$CEF_REPO/scripts/open-core/check-public-release-payload.sh" "$CEF_REPO" 
 	printf '%s\n' "payload gate accepted tracked CEF run artifacts" >&2
 	exit 1
 fi
-grep -F 'project-specific CEF run artifacts are tracked in git' "$CEF_REPO/result.log" >/dev/null
+grep -E 'project-specific CEF run artifacts( or evaluation reports)? are tracked in git' "$CEF_REPO/result.log" >/dev/null
 
 if [ "$MODE" = "payload-only" ]; then
 	printf '%s\n' "PUBLIC PAYLOAD GATES: PASS"

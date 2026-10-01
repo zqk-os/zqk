@@ -80,6 +80,8 @@ func NewDefaultPreflightValidator() *DefaultPreflightValidator {
 		},
 		validStatuses: map[string]bool{
 			"originated":  true,
+			"conceptual":  true,
+			"grooming":    true,
 			"draft":       true,
 			"planned":     true,
 			"testing":     true,
@@ -88,6 +90,9 @@ func NewDefaultPreflightValidator() *DefaultPreflightValidator {
 			"complete":    true,
 			"active":      true,
 			"archived":    true,
+			"paused":      true,
+			"blocked":     true,
+			"cancelled":   true,
 		},
 		systemFields: map[string]bool{
 			"created_at":      true,
@@ -376,13 +381,38 @@ func (v *DefaultPreflightValidator) Validate(ctx context.Context, mut *Mutation)
 				}
 				// 2. Pattern regex check
 				if restr.PatternRegexp != nil {
-					valStr := fmt.Sprintf("%v", fVal)
-					if !restr.PatternRegexp.MatchString(valStr) {
+					matchVal := func(v any) bool {
+						return restr.PatternRegexp.MatchString(fmt.Sprintf("%v", v))
+					}
+					var mismatched bool
+					var actualStr string
+					switch v := fVal.(type) {
+					case []any:
+						for _, item := range v {
+							if !matchVal(item) {
+								mismatched = true
+								actualStr = fmt.Sprintf("%v", item)
+								break
+							}
+						}
+					case []string:
+						for _, item := range v {
+							if !restr.PatternRegexp.MatchString(item) {
+								mismatched = true
+								actualStr = item
+								break
+							}
+						}
+					default:
+						actualStr = fmt.Sprintf("%v", fVal)
+						mismatched = !restr.PatternRegexp.MatchString(actualStr)
+					}
+					if mismatched {
 						receipt.Violations = append(receipt.Violations, SchemaViolation{
 							FieldPath:         "fields." + fName,
 							FailingConstraint: "pattern_mismatch",
 							Expected:          fmt.Sprintf("value matching pattern %s", restr.Pattern),
-							Actual:            valStr,
+							Actual:            actualStr,
 							Remediation:       fmt.Sprintf("Format %s to match pattern %s", fName, restr.Pattern),
 						})
 					}

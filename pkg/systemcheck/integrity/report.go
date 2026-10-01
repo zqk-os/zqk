@@ -2,6 +2,7 @@ package integrity
 
 import (
 	"context"
+	"fmt"
 	"path/filepath"
 	"sort"
 
@@ -44,7 +45,9 @@ type KernelIntegrityReportPayload struct {
 func BuildKernelIntegrityReport(ctx context.Context, projectRoot string, store storage.ObjectStorageProvider, sec *pkgctx.SecurityContext) (KernelIntegrityReportPayload, error) {
 	kinds := kernelcas.AllKinds()
 	sort.Strings(kinds)
-	_ = compose.WarmDefaultRegistry(projectRoot)
+	if err := compose.WarmDefaultRegistry(projectRoot); err != nil {
+		return KernelIntegrityReportPayload{}, fmt.Errorf("failed to warm composition registry: %w", err)
+	}
 	criticalKinds := kernelcas.ListCriticalKinds()
 	expected := len(criticalKinds) * len(kinds)
 	payload := KernelIntegrityReportPayload{

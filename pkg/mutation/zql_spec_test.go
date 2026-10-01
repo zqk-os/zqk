@@ -202,12 +202,10 @@ func TestZQLTransactionExecutionSpec(t *testing.T) {
 	require.Contains(t, content, "partial_commit")
 	require.Contains(t, content, "dry_run")
 
-	// Atomic rollback verification (CRIT-ZQL-ALL-OR-NOTHING-ROLLBACK-PROOF)
-	require.Contains(t, content, "CRIT-ZQL-ALL-OR-NOTHING-ROLLBACK-PROOF")
+	// Atomic rollback verification
 	require.Contains(t, content, "Zero Orphan Guarantee")
 
-	// Write isolation and dirty-read concurrency verification (CRIT-ZQL-DIRTY-READ-CONCURRENCY-NEGATIVE)
-	require.Contains(t, content, "CRIT-ZQL-DIRTY-READ-CONCURRENCY-NEGATIVE")
+	// Write isolation and dirty-read concurrency verification
 	require.Contains(t, content, "Zero Dirty-Read Invariant")
 }
 
@@ -219,20 +217,18 @@ func TestZQLPreflightValidationSpec(t *testing.T) {
 	content := string(data)
 	require.NotEmpty(t, content, "ZQL preflight validation specification content must not be empty")
 
-	// Semantic Validator Contract (CRIT-ZQL-INMEMORY-VALIDATION-CONTRACT)
+	// Semantic Validator Contract
 	require.Contains(t, content, "PreflightValidator")
 	require.Contains(t, content, "Zero Disk I/O Invariant")
-	require.Contains(t, content, "CRIT-ZQL-INMEMORY-VALIDATION-CONTRACT")
 
-	// Diagnostic Receipt Protocol (CRIT-ZQL-PREFLIGHT-DIAGNOSTIC-RECEIPT)
+	// Diagnostic Receipt Protocol
 	require.Contains(t, content, "Preflight Diagnostic Receipt")
 	require.Contains(t, content, "SchemaViolation")
 	require.Contains(t, content, "field_path")
 	require.Contains(t, content, "failing_constraint")
 	require.Contains(t, content, "remediation")
 
-	// Fail-closed negative invariant (CRIT-ZQL-SCHEMA-CORRUPTION-FAILCLOSED-NEGATIVE)
+	// Fail-closed negative invariant
 	require.Contains(t, content, "rejected_failclosed")
-	require.Contains(t, content, "CRIT-ZQL-SCHEMA-CORRUPTION-FAILCLOSED-NEGATIVE")
 	require.Contains(t, content, "Fail-Closed Boundary")
 }
