@@ -390,6 +390,19 @@ func registerCommands() {
 	convergenceCmdInst.GroupID = "advanced"
 	rootCmd.AddCommand(convergenceCmdInst)
 
+	// Canonical domain host commands for universal ergonomics shortcuts (Rule 2 / REQ-ORPHAN-VERBS-RETIREMENT)
+	objCmd.AddCommand(mutatecmd.NewMutateCmd())
+	objCmd.AddCommand(rollbackcmd.NewRollbackCmd())
+	objCmd.AddCommand(newcmd.NewNewCmd())
+	systemCmdInst.AddCommand(precommit.NewPreCommitCmd())
+	systemCmdInst.AddCommand(reports.NewReportsCmd())
+	systemCmdInst.AddCommand(NewCompletionCmd(rootCmd))
+	graphCmdInst.AddCommand(NewJoinCmd())
+	meshCmdInst.AddCommand(synccmd.NewSyncCmd())
+	agentCmdInst.AddCommand(learn.NewLearnCmd())
+	workflowCmdInst.AddCommand(do.NewDoCmd())
+	serviceCmdInst.AddCommand(tray.NewTrayCmd())
+
 	// Only available in zqk-admin binary
 	isAdminBinary := false
 	if len(os.Args) > 0 && (strings.HasSuffix(os.Args[0], "zqk-admin") || strings.HasSuffix(os.Args[0], "zqk-admin.exe")) {
