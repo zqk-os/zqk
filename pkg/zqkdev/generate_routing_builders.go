@@ -13,6 +13,7 @@ import (
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/specbuilder/routing_builders"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -88,6 +89,9 @@ func NewGenerateRoutingBuildersCmd() *cobra.Command {
 			}
 
 			if !strings.HasSuffix(entry.Name(), ".yaml") && !strings.HasSuffix(entry.Name(), ".yml") {
+				continue
+			}
+			if objects.IsHashedFilename(entry.Name()) {
 				continue
 			}
 

@@ -1,6 +1,7 @@
 package zqkdev
 
 import (
+	"context"
 	"fmt"
 	"path/filepath"
 	"regexp"
@@ -72,9 +73,13 @@ func runGenerateLifecycleIDList(cmd *cobra.Command, outputFile string) error {
 	}
 
 	// Create storage provider
-	fileStorage, err := storage.NewFileObjectStorage(projectRoot)
+	factory, err := storage.NewStorageFactory(pkgctx.NewSystemContext(), projectRoot)
 	if err != nil {
-		return errfmt.Newf("failed to create storage").Wrap(err)
+		return errfmt.Newf("failed to create storage factory").Wrap(err)
+	}
+	fileStorage := factory.GetStorage()
+	if fileStorage != nil {
+		defer func() { _ = fileStorage.Shutdown(context.Background()) }()
 	}
 
 	// List all lifecycle objects

@@ -9,6 +9,7 @@ import (
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/zqkdev"
 )
 
 // NewSystemCmd creates a new system command group
@@ -89,16 +90,17 @@ func NewSystemCmd() *cobra.Command {
 
 	if isAdminBinary {
 		codegenCmds := []*cobra.Command{
-			NewGenerateInstanceBuildersCmd(),
+			zqkdev.NewGenerateInstanceBuildersCmd(),
 			NewGenerateAgentConfigsCmd(),
-			NewGenerateLifecycleBuildersCmd(),
-			NewGenerateProfileBuildersCmd(),
-			NewGenerateTraitBuildersCmd(),
-			NewGenerateConfigBuildersCmd(),
+			zqkdev.NewGenerateLifecycleBuildersCmd(),
+			zqkdev.NewGenerateProfileBuildersCmd(),
+			zqkdev.NewGenerateTraitBuildersCmd(),
+			zqkdev.NewGenerateRoutingBuildersCmd(),
+			zqkdev.NewGenerateConfigBuildersCmd(),
 			NewGenerateAPIBuildersCmd(),
-			NewGenerateCommandBuildersCmd(),
-			NewGenerateSpecIndexCmd(),
-			NewGenerateFieldKeysCmd(),
+			zqkdev.NewGenerateCommandBuildersCmd(),
+			zqkdev.NewGenerateSpecIndexCmd(),
+			zqkdev.NewGenerateFieldKeysCmd(),
 			NewGeneratePipelineOutcomeKeysCmd(),
 			NewHydrateGraphCmd(),
 			NewSyncGlossaryFromSpecsCmd(),

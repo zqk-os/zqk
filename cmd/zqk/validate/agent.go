@@ -238,7 +238,7 @@ func checkASTViolations(filePath string) error {
 		return err
 	}
 
-	isAllowedCobraExpr := strings.Contains(filePath, "pkg/cli") || strings.Contains(filePath, "cmd/")
+	isAllowedCobraExpr := strings.Contains(filePath, "pkg/cli") || strings.Contains(filePath, "cmd/") || strings.Contains(filePath, "pkg/zqkdev")
 
 	var walkErr error
 	ast.Inspect(node, func(n ast.Node) bool {
