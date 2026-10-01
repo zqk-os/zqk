@@ -86,3 +86,14 @@ func TestErrValues(t *testing.T) {
 		}
 	}
 }
+
+func TestGetAuthorizedPublicKey_FailClosed(t *testing.T) {
+	t.Setenv("ZQK_AGENT_PUB_KEY", "")
+	_, err := GetAuthorizedPublicKey()
+	if err == nil {
+		t.Fatal("expected error when ZQK_AGENT_PUB_KEY is empty, got nil")
+	}
+	if !strings.Contains(err.Error(), "cryptographic verification must fail closed") {
+		t.Fatalf("unexpected error message: %v", err)
+	}
+}

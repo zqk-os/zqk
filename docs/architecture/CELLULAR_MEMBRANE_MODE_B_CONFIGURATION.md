@@ -17,7 +17,7 @@ flowchart TD
   subgraph ModeA["Mode A: Developer Standalone (Open-Core)"]
     ClientA["Client Process / Agent Session<br/>(CLI / MCP Tools)"]
     DiskA[".zqk/process/ (CAS Blobs)<br/>and .zqk/streams/ (WAL Logs)"]
-    ClientA -->|Direct File I/O (Local Disk)| DiskA
+    ClientA -->|"Direct File I/O (Local Disk)"| DiskA
   end
 
   subgraph ModeB["Mode B: Cellular Membrane Lockdown (Swarm / Multi-Tenant Sandbox)"]
@@ -195,13 +195,13 @@ In Mode B, agents do not construct CAS files directly on disk. Instead, agents s
 ```mermaid
 sequenceDiagram
   autonumber
-  actor Agent as Agent / Operator
-  participant Intake as Semantic Intake (zqk intake)
-  participant Reasoner as Reasoner (pkg/intake)
-  participant Gate as Membrane Gate (ValidateAllIntakeObjects)
-  participant Socket as UNIX Domain Socket
-  participant Daemon as PrivilegedWriterDaemon
-  participant CAS as CAS Storage (.zqk/process & .zqk/streams)
+  actor Agent as "Agent / Operator"
+  participant Intake as "Semantic Intake (zqk intake)"
+  participant Reasoner as "Reasoner (pkg/intake)"
+  participant Gate as "Membrane Gate (ValidateAllIntakeObjects)"
+  participant Socket as "UNIX Domain Socket"
+  participant Daemon as "PrivilegedWriterDaemon"
+  participant CAS as "CAS Storage (.zqk/process & .zqk/streams)"
 
   Agent->>Intake: Submit raw text or requirement
   Intake->>Reasoner: Pass text & flags

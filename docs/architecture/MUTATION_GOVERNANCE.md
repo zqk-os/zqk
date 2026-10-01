@@ -26,9 +26,19 @@ State transitions across object lifecycles are strictly directed:
 - Out-of-order, unearned, or skipped states are rejected at preflight and admission.
 - Preconditions (such as criterion validation or test verification) must be satisfied prior to forward promotion.
 
-## 4. Break-Glass Emergency Elevation
-In break-glass scenarios where emergency state repair is required:
-- `--break-glass`: Activates elevated bypass capability.
-- `--break-glass-reason`: Requires an audit trail reason (minimum 10 characters).
-- Time-bounded: Elevation expires after 30 minutes.
-- All break-glass actions emit auditable events into the system WAL.
+## 4. Break-Glass Emergency Elevation & Override Flags
+
+In break-glass scenarios where emergency state repair is required, the CLI provides strictly audited mechanisms depending on the operation:
+
+### A. Declarative Script Mutations (`zqk mutate` / ZQL)
+- `--break-glass`: Activates elevated bypass capability in ZQL mutations to allow manual provenance or transition repairs.
+- `--break-glass-reason "<justification>"`: Mandatory justification string (minimum 10 characters required) explaining why emergency elevation is necessary.
+- Emits structured audit events (`audit_event`) into `.zqk/streams/` with the reason and actor identity.
+
+### B. Interactive Object Updates (`zqk object update`)
+- `--override`: Bypasses strict directed lifecycle precondition gates for single object updates.
+- **Human TTY Confirmation**: To prevent autonomous agents from silently bypassing governance, `--override` prompts for interactive confirmation on standard input (`tty`). Non-interactive/agent shells are blocked from using `--override` directly.
+
+### C. Core Object Deletions (`zqk object delete`)
+- `--reason-code "<justification>"`: Hard deletion of core kernel objects is guarded fail-closed and requires an explicit, audited reason (minimum 30 characters). Core objects should generally be archived rather than deleted.
+

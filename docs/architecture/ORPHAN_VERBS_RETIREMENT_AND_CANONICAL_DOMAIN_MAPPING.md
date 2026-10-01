@@ -1,22 +1,19 @@
-# CLI Orphan Verbs Retirement & Canonical Domain Mapping
+<!-- tags: cli, commands, taxonomy, ergonomics, domain-mapping, shortcuts -->
 
-**Document ID:** `DOC-ORPHAN-VERBS-RETIREMENT`  
-**Requirement Reference:** `REQ-ORPHAN-VERBS-RETIREMENT`  
-**Status:** Canonical / Implemented  
-**Date:** 2026-10-01  
+This architectural specification details the relationship between ZQK's canonical domain command taxonomy (strict noun-verb hierarchy) and high-frequency root ergonomic shortcuts (`zqk do`, `zqk inspect`, `zqk mutate`).
 
 ---
 
-## 1. Context & Rationale
+## 1. Context & Architectural Rationale
 
-As described in `docs/architecture/CLI_COMMAND_TAXONOMY_STANDARDS.md` (Rule 2) and CEF evaluation finding `F-DOC-ORPHAN-VERBS-RULE-VIOLATION-004`, unqualified verbs at the root level clutter the command namespace, introduce cognitive fatigue, and break clean noun-verb domain stratification.
+As established in [`CLI Command Taxonomy Standards`](./CLI_COMMAND_TAXONOMY_STANDARDS.md), an enterprise-scale CLI requires strict noun-verb stratification to prevent namespace collisions, maintain cognitive clarity, and ensure deterministic sub-agent tool calling. Unqualified verbs directly at the root level can introduce confusion across large distributed systems.
 
-However, completely deleting familiar root commands causes catastrophic friction for human engineers and agent muscle memory.
+At the same time, forcing human developers and autonomous agents to type lengthy commands for the most frequently executed operational verbs (`zqk workflow do`, `zqk object inspect`, `zqk object mutate`) introduces keystroke fatigue and breaks established workflow velocity.
 
-To resolve this conflict definitively:
-1. **Canonical Domain Homes:** Every single root command has a canonical home under its architectural domain group.
-2. **Approved Universal Ergonomics Shortcuts:** Root verbs are preserved as direct, documented shortcuts delegating to their canonical counterparts.
-3. **Spec Coverage & Parity:** All commands are validated against `.zqk/cli/specs/`.
+To achieve both architectural purity and maximum ergonomics:
+1. **Canonical Domain Homes**: Every single CLI command has a canonical home under its architectural domain group (`zqk workflow do`, `zqk object mutate`, `zqk graph query`).
+2. **Approved Universal Ergonomics Shortcuts**: A curated, stable set of root verbs are preserved as direct, documented shortcuts delegating to their canonical counterparts.
+3. **Spec Coverage & Parity**: All shortcuts and domain commands are fully specced in `.zqk/cli/specs/` and generated via `pkg/cli/bldr_cli_cmd_v1/`.
 
 ---
 

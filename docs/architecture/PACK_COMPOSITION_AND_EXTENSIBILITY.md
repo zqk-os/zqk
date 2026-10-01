@@ -4,11 +4,64 @@
 
 ZQK is architected around **Modular Pack Composition**. Rather than bundling every domain capability directly into a monolithic core, the ZQK Kernel acts as a universal, typed knowledge substrate. Functionality—such as work tracking, continuous autonomous programming (CAP), governance, and ecosystem adapters—is partitioned into cohesive, self-contained units termed **Packs**.
 
-This document outlines the architectural rules, directory structures, pack manifest contracts (`pack.yaml`), CLI command builder code generation (`pkg/cli/bldr_cli_cmd_v1`), and registration mechanisms at the composition root.
+This document outlines the architectural rules, directory structures, pack manifest contracts (`pack.yaml`), CLI command builder code generation (`pkg/cli/bldr_cli_cmd_v1`), registration mechanisms, and the crucial distinction between **Kernel Domain Packs** and **Swarm Orchestration Packs**.
 
 ---
 
-## 1. Core Principles of Pack Composition
+## 1. Disambiguation: Kernel Domain Packs vs. Swarm Orchestration Packs
+
+A frequent point of confusion is the dual usage of the word "Pack" in modern agentic architectures. In ZQK, these represent two entirely distinct layers:
+
+```
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│ 1. RUNTIME SWARM ORCHESTRATION PACKS (Declarative Multi-Agent Manifests)               │
+│ Location: examples/swarms/*/swarm.yaml, .zqk/swarms/, importable packs                │
+│ Content:  YAML definitions of agent seats, persona assignments, and task choreographies│
+│ Engine:   Executed by 'zqk swarm run' or 'zqk agent orchestrate'                       │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│ 2. KERNEL DOMAIN PACKS (Compile-Time Go Code Modules)                                  │
+│ Location: packs/<domain>/ (e.g., packs/agent/, packs/work/, packs/qa/, packs/code-eval/)│
+│ Content:  Schemas, lifecycles, Go instance builders, and domain business logic         │
+│ Engine:   Compiled into the static 'zqk' binary via composition root                   │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+| Dimension | Kernel Domain Packs (`packs/<domain>/`) | Swarm Orchestration Packs (`swarm.yaml`) |
+| :--- | :--- | :--- |
+| **Artifact Type** | Go source code, schemas, lifecycles, builders | Declarative YAML configuration |
+| **Lifecycle** | Compile-time static linking into `zqk` | Runtime interpretation by Swarm Engine |
+| **Purpose** | Extends the Knowledge Kernel type system | Choreographs multi-agent teamwork & seats |
+| **Modification** | Requires recompilation (`make`) | Dynamic; author and execute immediately |
+
+---
+
+## 2. Philosophy & Categorization of Kernel Domain Packs
+
+Kernel Domain Packs partition the system into cohesive, bounded contexts. They fall into three primary categories:
+
+### A. Core Operational Packs (Shipped with Core Kernel)
+Fundamental to all ZQK projects; required for basic functioning:
+- **`packs/agent`**: The agent runtime plane. Defines `agent_instruction`, `agent_feed`, persona bindings, and autonomous worker loops. Every agent seat requires this pack.
+- **`packs/work`**: The task & program management plane. Defines `goal`, `milestone`, `workstream`, `priority_plan`, and `backlog_item`.
+- **`packs/qa`**: The verification plane. Defines `requirement`, `criteria`, `test_case`, `verification_matrix`, and Definition of Done gates.
+- **`packs/workflow`**: Process automation, convergence sessions (`CVS-*`), and execution state machines.
+
+### B. Analytical & Measurement Packs
+Observability and time-series aggregation:
+- **`packs/metric`**: Metric primitives, samplers, and rollups.
+- **`packs/evolution`**: Schema migration, version evolution, and deprecation trackers.
+
+### C. Specialized Extension Packs
+Purpose-built capabilities that can be enabled, audited, or packaged independently:
+- **`packs/code-eval`**: Automated codebase critique, evaluation rubrics, and benchmark grading. Unlike `packs/agent` (which orchestrates live work), `packs/code-eval` provides scoring lenses and audit harnesses.
+- **Candidate Future Packs**:
+  - `packs/incident`: Post-mortems, incident tracking, and remediation runbooks.
+  - `packs/compliance`: Regulatory controls, SOC2/HIPAA evidence mapping.
+  - `packs/finops`: LLM token budget management and cost allocation matrices.
+
+---
+
+## 3. Core Principles of Pack Composition
 
 1. **Spec-Driven Knowledge Kernel**: The kernel interprets and validates objects dynamically based on declarative schemas (`.zqk/cli/specs/schemas/`). It does not hardcode domain types or vendor-specific data structures.
 2. **Deterministic Code Generation**: High-level declarative command and schema specs are compiled into strongly-typed Go builder patterns using `bldr_cli_cmd_v1`. Code generation is a build-time tool; generated code resides with the pack that owns the spec.
@@ -17,7 +70,7 @@ This document outlines the architectural rules, directory structures, pack manif
 
 ---
 
-## 2. Anatomy of a Pack
+## 4. Anatomy of a Pack
 
 A canonical pack resides within the `packs/` directory (or external module root) and follows this standardized layout:
 
@@ -60,7 +113,7 @@ commands:
 
 ---
 
-## 3. Declarative CLI Command Specs & Builder Generation
+## 5. Declarative CLI Command Specs & Builder Generation
 
 CLI commands in ZQK are not authored using ad-hoc `cobra.Command` structures. Instead, they are defined declaratively in `.zqk/cli/specs/` and generated via the builder toolchain into `pkg/cli/bldr_cli_cmd_v1/`.
 
@@ -109,7 +162,7 @@ This guarantees 100% compliance with CLI taxonomy standards, uniform `--help` ou
 
 ---
 
-## 4. Composition Root Registration
+## 6. Composition Root Registration
 
 At the composition root (`cmd/zqk/root.go` and `cmd/zqk/main.go`), packs register their CLI trees, object types, and lifecycle state machines into the central registries:
 
@@ -126,7 +179,7 @@ When new packs are incorporated into the system, developers execute `./scripts/b
 
 ---
 
-## 5. Adding a Custom Pack (Extensibility Walkthrough)
+## 7. Adding a Custom Pack (Extensibility Walkthrough)
 
 To create and integrate an extension pack:
 

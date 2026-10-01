@@ -1,6 +1,14 @@
 # How-To: Inspect, Link, and Validate Knowledge Kernel Objects
 
+<!-- tags: howto, inspect, validate, ontology, references, criteria, test-cases, vds -->
+
 This practical guide provides step-by-step recipes for inspecting objects, establishing semantic graph relationships, advancing lifecycle states, authoring validation policy rules, and verifying Definition of Done (DoD) compliance.
+
+> [!TIP]
+> **End-to-End Orchestration Walkthrough**:
+> For a complete, step-by-step narrative showing how human intent (*"Build X with expectations Y and constraints Z"*) transforms into a full roadmap, goals, requirements, criteria, test cases, and autonomous multi-agent swarm execution, see:  
+> **[From Vision to Code: Complete Multi-Agent Orchestration Walkthrough](../guides/VISION_TO_EXECUTION_ORCHESTRATION_GUIDE.md)**.
+
 
 ---
 
