@@ -12,3 +12,4 @@ steps:
   - type: enforce_log_retention
     max_age: 48h
     max_size_bytes: 10485760
+  - type: reap_orphaned_processes

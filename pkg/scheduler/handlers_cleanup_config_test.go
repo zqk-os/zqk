@@ -130,6 +130,7 @@ func TestCleanupConfigHandler_Execute_ResourceHygieneSteps(t *testing.T) {
     older_than: 1h
   - type: enforce_log_retention
     max_age: 7d
+  - type: reap_orphaned_processes
 `)
 	if err := fileutil.WriteFile(cfgPath, cfgData, paths.FilePerm644); err != nil {
 		t.Fatal(err)

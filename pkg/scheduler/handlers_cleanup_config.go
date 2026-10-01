@@ -94,6 +94,8 @@ func (h *CleanupConfigHandler) runStep(ctx context.Context, job *ScheduledJob, w
 		return h.runReapTempFiles(workDir, step.Params)
 	case "enforce_log_retention":
 		return h.runEnforceLogRetention(workDir, step.Params)
+	case "reap_orphaned_processes":
+		return h.runReapOrphanedProcesses(workDir, step.Params)
 	default:
 		SLog(h.logger).Debug(LogEventCleanupStepNotImplemented).
 			JobID(job.ID).
@@ -341,3 +343,17 @@ func (h *CleanupConfigHandler) runEnforceLogRetention(workDir string, params map
 	}
 	return nil
 }
+
+func (h *CleanupConfigHandler) runReapOrphanedProcesses(workDir string, params map[string]any) error {
+	cnt, _, err := resourcehygiene.ReapOrphanedProcesses(workDir, false)
+	if err != nil {
+		return err
+	}
+	if cnt > 0 {
+		SLog(h.logger).Info("cleanup_reaped_orphaned_processes").
+			Int("count", cnt).
+			Log()
+	}
+	return nil
+}
+
