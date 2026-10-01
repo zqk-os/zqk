@@ -20,6 +20,9 @@ func TestDraftPlaneHonestyZeroDraftOnCAS(t *testing.T) {
 
 	entries, err := fileutil.ReadDir(processDir)
 	if err != nil {
+		if fileutil.IsNotExist(err) {
+			return // Nothing on CAS in clean environment, invariant holds
+		}
 		t.Fatalf("ReadDir %s: %v", processDir, err)
 	}
 
@@ -73,6 +76,9 @@ func TestDraftPlaneHonestyRubricDocumentation(t *testing.T) {
 	rubricPath := filepath.Join(repoRoot, "docs", "architecture", "KERNEL_OBJECT_KIND_EVALUATION_RUBRIC.md")
 	data, err := fileutil.ReadFile(rubricPath)
 	if err != nil {
+		if fileutil.IsNotExist(err) {
+			t.Skip("skipping rubric doc test: KERNEL_OBJECT_KIND_EVALUATION_RUBRIC.md is not shipped in public open-core candidate")
+		}
 		t.Fatalf("ReadFile %s: %v", rubricPath, err)
 	}
 

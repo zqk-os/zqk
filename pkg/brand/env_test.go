@@ -39,6 +39,7 @@ func TestEnvPrefixForExecutable_stripsChannelSuffixes(t *testing.T) {
 		{"zqk-stable", "ZQK"},
 		{"zqk-community", "ZQK"},
 		{"zqk-dev", "ZQK"},
+		{"zqk.test", "ZQK"},
 		{"zqk-admin", "ZQK_ADMIN"},
 		{"acme-cli", "ACME_CLI"},
 	}

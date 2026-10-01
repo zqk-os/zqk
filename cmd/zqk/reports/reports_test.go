@@ -78,7 +78,7 @@ func createTestData(t *testing.T, storageProvider storage.ObjectStorageProvider)
 		objects.FieldKeyID:            critID,
 		objects.FieldKeyKind:          objects.KindCriteria,
 		objects.FieldKeyTitle:         "Reports fixture acceptance",
-		objects.FieldKeyCategory:      "testing",
+		objects.FieldKeyCategory:      "test",
 		objects.FieldKeyStatus:        objects.ObjectStatusValidated,
 		objects.FieldKeySchemaVersion: quickSchemaV2,
 	}, objects.ObjectStatusValidated)

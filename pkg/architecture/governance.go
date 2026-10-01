@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"go/parser"
 	"go/token"
-	"os"
 	"path/filepath"
 	"strings"
+
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // Layer represents the architectural tier of a package.
@@ -55,7 +56,7 @@ func ClassifyLayer(pkgPath string) Layer {
 
 // ValidateFileComplexity inspects a Go source file against line limit budgets.
 func ValidateFileComplexity(path string, maxLines int) (int, error) {
-	data, err := os.ReadFile(path)
+	data, err := fileutil.ReadFile(path)
 	if err != nil {
 		return 0, err
 	}

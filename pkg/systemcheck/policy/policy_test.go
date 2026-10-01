@@ -82,6 +82,26 @@ func TestSecretsGate(t *testing.T) {
 	}
 }
 
+func TestIsSecretScannerExemptTestFixture(t *testing.T) {
+	cases := []struct {
+		path   string
+		exempt bool
+	}{
+		{"pkg/systemcheck/policy/secrets_test.go", true},
+		{"pkg/auth/policy_test.go", true},
+		{"scripts/test-escalation.sh", true},
+		{"pkg/systemcheck/policy/secrets.go", false},
+		{"cmd/zqk/main.go", false},
+		{"README.md", false},
+		{"test_secret.txt", false},
+	}
+	for _, tc := range cases {
+		if got := isSecretScannerExemptTestFixture(tc.path); got != tc.exempt {
+			t.Errorf("isSecretScannerExemptTestFixture(%q) = %v, want %v", tc.path, got, tc.exempt)
+		}
+	}
+}
+
 func TestStorageBoundariesGate(t *testing.T) {
 	tempDir := t.TempDir()
 	storageDir := filepath.Join(tempDir, "pkg", "storage")

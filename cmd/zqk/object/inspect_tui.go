@@ -22,6 +22,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/tui/tds"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
@@ -929,7 +930,7 @@ func (m *InspectTUIModel) executeEditObject() {
 		_ = cmd.Run()
 	}
 
-	editedBytes, err := os.ReadFile(tmpPath)
+	editedBytes, err := fileutil.ReadFile(tmpPath)
 	if err != nil {
 		m.SetStatus("Failed to read edited file", 3*time.Second)
 		return
@@ -1630,7 +1631,7 @@ func RunInspectTUI(cmd *cobra.Command, initialKind string, fields, filters []str
 	// Non-interactive fallback
 	if !term.IsTerminal(stdinFd) || !term.IsTerminal(stdoutFd) {
 		m.Width, m.Height = 100, 30
-		fmt.Print(m.Render())
+		fmt.Fprint(os.Stdout, m.Render())
 		return nil
 	}
 

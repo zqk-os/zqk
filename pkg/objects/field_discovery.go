@@ -80,13 +80,19 @@ func (fr *FieldRegistry) snapshot() (fieldRegistrySnapshot, bool) {
 	return fieldRegistryMemos.Peek(fr.memoKey(), fr.memoStamp())
 }
 
+func (fr *FieldRegistry) loadSnapshot() (fieldRegistrySnapshot, error) {
+	snap, err := fieldRegistryMemos.Load(fr.memoKey(), fr.memoStamp(), fr.readFields)
+	if err != nil {
+		fieldRegistryMemos.Delete(fr.memoKey())
+		return fieldRegistrySnapshot{}, err
+	}
+	return snap, nil
+}
+
 // LoadFields loads and caches field information for all object kinds
 // Identifies common fields (from base_object, auditable) and specialized fields
 func (fr *FieldRegistry) LoadFields() error {
-	_, err := fieldRegistryMemos.Load(fr.memoKey(), fr.memoStamp(), fr.readFields)
-	if err != nil {
-		fieldRegistryMemos.Delete(fr.memoKey())
-	}
+	_, err := fr.loadSnapshot()
 	return err
 }
 
@@ -318,12 +324,9 @@ func (fr *FieldRegistry) GetFieldsForKindIfLoaded(kind string) (*KindFields, boo
 // Returns all fields (common + specialized), sorted by name.
 // NOTE: Call GetFieldsForKindIfLoaded on create/update hot path to avoid LoadFields().
 func (fr *FieldRegistry) GetFieldsForKind(kind string) (*KindFields, error) {
-	if err := fr.LoadFields(); err != nil {
+	snap, err := fr.loadSnapshot()
+	if err != nil {
 		return nil, err
-	}
-	snap, ok := fr.snapshot()
-	if !ok {
-		return nil, errfmt.Errorf("unknown object kind: %s", kind)
 	}
 	kindFields, exists := snap.cache[kind]
 	if !exists {
@@ -347,12 +350,9 @@ func (fr *FieldRegistry) TryReloadFromFindSpecsDir() bool {
 
 // GetAllKinds returns a list of all object kinds that have field information
 func (fr *FieldRegistry) GetAllKinds() ([]string, error) {
-	if err := fr.LoadFields(); err != nil {
+	snap, err := fr.loadSnapshot()
+	if err != nil {
 		return nil, err
-	}
-	snap, ok := fr.snapshot()
-	if !ok {
-		return nil, nil
 	}
 	kinds := make([]string, 0, len(snap.cache))
 	for kind := range snap.cache {
@@ -364,12 +364,9 @@ func (fr *FieldRegistry) GetAllKinds() ([]string, error) {
 
 // GetCommonFields returns fields common to all object kinds
 func (fr *FieldRegistry) GetCommonFields() ([]FieldInfo, error) {
-	if err := fr.LoadFields(); err != nil {
+	snap, err := fr.loadSnapshot()
+	if err != nil {
 		return nil, err
-	}
-	snap, ok := fr.snapshot()
-	if !ok {
-		return nil, nil
 	}
 	commonFields := make([]FieldInfo, len(snap.commonFields))
 	copy(commonFields, snap.commonFields)

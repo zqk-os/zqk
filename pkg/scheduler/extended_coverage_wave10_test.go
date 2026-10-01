@@ -3,7 +3,6 @@ package scheduler
 import (
 	"context"
 	"errors"
-	"os"
 	"testing"
 	"time"
 
@@ -27,19 +26,14 @@ func (m *mockExecHandler) Execute(ctx context.Context, job *ScheduledJob) error 
 }
 
 func TestExtended_JobExecution_RetryAndOutcomes(t *testing.T) {
-	ctx := context.Background()
-	tmpDir, err := os.MkdirTemp("", "test-job-exec-*")
-	if err != nil {
-		t.Fatalf("failed to create temp dir: %v", err)
-	}
+	ctx := t.Context()
+	tmpDir := t.TempDir()
 	sp, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	if err != nil {
-		_ = os.RemoveAll(tmpDir)
 		t.Fatalf("failed to create storage: %v", err)
 	}
 	defer func() {
 		_ = sp.Shutdown(context.Background())
-		_ = os.RemoveAll(tmpDir)
 	}()
 
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
@@ -144,23 +138,18 @@ func TestExtended_JobExecution_RetryAndOutcomes(t *testing.T) {
 }
 
 func TestExtended_CapOrchestrator_FailureTrackerAndIndex(t *testing.T) {
-	ctx := context.Background()
-	tmpDir, err := os.MkdirTemp("", "test-cap-orch-*")
-	if err != nil {
-		t.Fatalf("failed to create temp dir: %v", err)
-	}
+	tmpDir := t.TempDir()
 	sp, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	if err != nil {
-		_ = os.RemoveAll(tmpDir)
 		t.Fatalf("failed to create storage: %v", err)
 	}
 	defer func() {
 		_ = sp.Shutdown(context.Background())
-		_ = os.RemoveAll(tmpDir)
 	}()
 
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	secCtx := pkgctx.NewSystemSecurityContext()
+	ctx := context.Background()
 
 	h := NewCapOrchestratorHandler(sp, tmpDir, logger).(*CapOrchestratorHandler)
 

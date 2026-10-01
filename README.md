@@ -4,7 +4,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/zqk-os/zqk)](https://goreportcard.com/report/github.com/zqk-os/zqk)
 [![Documentation](https://img.shields.io/badge/docs-docs.zqk.dev-blue)](https://docs.zqk.dev)
 
-**The Cellular Knowledge Operating System for autonomous agent swarms.** This repository is **ZQK Core**, the open-core community microkernel. Canonical portal: [Community First-Run Guide](https://docs.zqk.dev/docs/onboarding/COMMUNITY_FIRST_RUN).
+**The Cellular Knowledge Operating System for autonomous agent swarms.** This repository is **ZQK Core**, the open-core community microkernel. Canonical portal: [Community First-Run Guide](docs/onboarding/COMMUNITY_FIRST_RUN.md).
 
 ## Quickstart (5 Minutes)
 

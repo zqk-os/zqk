@@ -197,9 +197,7 @@ func TestTestServices_CleanupWithErrors(t *testing.T) {
 
 func TestSetupTestServices_GraphEnabledWithExistingMemgraph(t *testing.T) {
 	// Create a temp project root with config/zqk.yaml setting storage.graph_enabled: true
-	tmpDir, err := os.MkdirTemp("", "testservices_graph_*")
-	require.NoError(t, err)
-	defer os.RemoveAll(tmpDir)
+	tmpDir := t.TempDir()
 
 	configDir := tmpDir + "/config"
 	require.NoError(t, os.MkdirAll(configDir, 0755))

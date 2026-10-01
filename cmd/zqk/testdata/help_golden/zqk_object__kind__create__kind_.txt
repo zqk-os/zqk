@@ -52,7 +52,7 @@ Flags:
       --promote                 Promote object immediately to first shovel-ready lifecycle status (bypasses draft plane)
   -q, --quiet                   Suppress non-essential output
       --reason-code string      Reason code required when using --override
-      --relaxed                 Relax integrity constraints during creation (allow references to objects that will be created later in batch operations) [Default: true] (default true)
+      --relaxed                 Relax integrity constraints during creation (allow references to objects that will be created later in batch operations) [Default: false]
       --timeout duration        Timeout for command execution (0 = auto-calculate)
   -v, --verbose                 Verbose output
 

@@ -11,6 +11,7 @@ import (
 
 func TestValidateReferenceWithCache_PendingSoftExclude(t *testing.T) {
 	root := t.TempDir()
+	t.Cleanup(func() { _ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(root, nil)) })
 	storage.ResetObjectIDCachePendingForTest()
 	t.Cleanup(storage.ResetObjectIDCachePendingForTest)
 
@@ -32,6 +33,7 @@ func TestValidateReferenceWithCache_PendingSoftExclude(t *testing.T) {
 
 func TestValidateReferenceWithCache_TrueMissStillTier1(t *testing.T) {
 	root := t.TempDir()
+	t.Cleanup(func() { _ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(root, nil)) })
 	storage.ResetObjectIDCachePendingForTest()
 	t.Cleanup(storage.ResetObjectIDCachePendingForTest)
 

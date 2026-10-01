@@ -72,6 +72,7 @@ func EnvPrefixForExecutable(name string) string {
 func stripEnvChannelSuffix(name string) string {
 	lower := strings.ToLower(strings.TrimSpace(name))
 	for _, suffix := range []string{
+		".test",
 		"-mcp-ide-adapter", "-mcp-proxy", "-mcp-daemon", "-mcp",
 		"-community", "-stable", "-dev", "-beta", "-alpha", "-rc",
 	} {

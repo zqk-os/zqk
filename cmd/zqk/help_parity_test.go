@@ -397,7 +397,7 @@ func compareWithGolden(t *testing.T, goldenDir, path, output string) {
 	goldenStr := string(goldenContent)
 	if output != goldenStr {
 		// Regenerate: overwrite golden file when env is set
-		if zqkenv.UpdateHelpGolden().Get() != emptyValue {
+		if zqkenv.UpdateHelpGolden().Get() != emptyValue || zqkenv.ZQKCLITestUpdateHelpGolden().Get() != emptyValue {
 			if err := fileutil.WriteFile(goldenPath, []byte(output), paths.FilePerm644); err != nil { //nolint:gosec // Test files - 0600 is acceptable
 				t.Errorf("failed to update golden file %s: %v", goldenPath, err)
 			}
@@ -407,49 +407,9 @@ func compareWithGolden(t *testing.T, goldenDir, path, output string) {
 
 		// Find differences
 		diff := findDifferences(goldenStr, output)
-
-		// Write diff to test-run.log file instead of printing to stderr
-		// This prevents the verbose diff output from polluting the debug log
-		// Use project root, not current directory
-		projectRoot := findProjectRootForTest()
-		testRunLogPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.LogsDir, "test-run.log")
-		if err := fileutil.MkdirAll(filepath.Dir(testRunLogPath), paths.DirPerm755); err == nil {
-			logEntry := fmt.Sprintf("=== %s: Help output differs from golden file ===\n%s\n\nTo regenerate golden files, run: %s=1 go test ./pkg/zqkcli/... -run TestHelpMenuParity/GoldenFileComparison\n\n", path, diff, zqkenv.UpdateHelpGolden())
-			if f, err := fileutil.OpenFile(testRunLogPath, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, paths.FilePerm644); err == nil { //nolint:gosec // Test files - 0600 is acceptable
-				_, _ = f.WriteString(logEntry)
-				_ = f.Close()
-			}
-		}
-
-		// Still report the failure, but without the verbose diff
-		logPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.LogsDir, "test-run.log")
-		t.Errorf("%s: Help output differs from golden file (see %s for details). To regenerate golden files, run: %s=1 go test ./pkg/zqkcli/... -run TestHelpMenuParity/GoldenFileComparison", path, logPath, zqkenv.UpdateHelpGolden())
+		t.Logf("=== %s: Help output differs from golden file ===\n%s", path, diff)
+		t.Errorf("%s: Help output differs from golden file.\nTo regenerate golden files, run: %s=1 go test ./cmd/zqk -run TestHelpMenuParity/GoldenFileComparison\nDiff:\n%s", path, zqkenv.UpdateHelpGolden().Name(), diff)
 	}
-}
-
-// findProjectRootForTest finds the project root for test logging
-// Uses the same discovery logic as ResolveProjectRoot's fallback (no cli import)
-func findProjectRootForTest() string {
-	dir, err := fileutil.Getwd()
-	if err != nil {
-		return "." // Fallback to current directory
-	}
-	for {
-		// Check for .zqk directory
-		if _, err := fileutil.Stat(filepath.Join(dir, paths.ProjectDataDir)); err == nil {
-			return dir
-		}
-		// Check for go.mod (fallback)
-		if _, err := fileutil.Stat(filepath.Join(dir, "go.mod")); err == nil {
-			return dir
-		}
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			break
-		}
-		dir = parent
-	}
-	return "." // Fallback to current directory if not found
 }
 
 // sanitizePath converts a command path to a safe filename
