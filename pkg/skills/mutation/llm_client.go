@@ -8,21 +8,42 @@ import (
 	"github.com/zqk-os/zqk/pkg/llm"
 )
 
-// realLLMClient is an implementation of the LLMClient interface using the central llm.Client.
-type realLLMClient struct {
-	client llm.Client
+const (
+	// DefaultSystemPromptCode is the default system prompt used when synthesizing Go skill implementations.
+	DefaultSystemPromptCode = "You are a specialized code synthesis AI. Your task is to generate Go code based on the provided prompt and optional parent skills. Only output valid Go code without markdown wrappers unless they are requested. The code should be a complete valid skill."
+
+	// DefaultSystemPromptDocs is the default system prompt used when synthesizing skill documentation.
+	DefaultSystemPromptDocs = "You are a technical documentation AI. Your task is to generate concise markdown documentation for the provided Go code."
+)
+
+// SkillSynthesisClient adapts ZQK's central llm.Client to synthesize skill code and markdown documentation.
+// It strips markdown fencing from model outputs to return compilable Go source code.
+type SkillSynthesisClient struct {
+	client           llm.Client
+	SystemPromptCode string
+	SystemPromptDocs string
 }
 
-// NewRealLLMClient creates a new realLLMClient.
-func NewRealLLMClient(client llm.Client) LLMClient {
-	return &realLLMClient{
-		client: client,
+// NewSkillSynthesisClient creates an exposed, configurable skill synthesis client.
+func NewSkillSynthesisClient(client llm.Client) *SkillSynthesisClient {
+	return &SkillSynthesisClient{
+		client:           client,
+		SystemPromptCode: DefaultSystemPromptCode,
+		SystemPromptDocs: DefaultSystemPromptDocs,
 	}
 }
 
+// NewRealLLMClient preserves backwards compatibility and returns the LLMClient interface.
+func NewRealLLMClient(client llm.Client) LLMClient {
+	return NewSkillSynthesisClient(client)
+}
+
 // GenerateCode mutates or combines existing skill code into new skill code.
-func (c *realLLMClient) GenerateCode(ctx context.Context, prompt string, parentCode ...string) (string, error) {
-	systemPrompt := "You are a specialized code synthesis AI. Your task is to generate Go code based on the provided prompt and optional parent skills. Only output valid Go code without markdown wrappers unless they are requested. The code should be a complete valid skill."
+func (c *SkillSynthesisClient) GenerateCode(ctx context.Context, prompt string, parentCode ...string) (string, error) {
+	systemPrompt := c.SystemPromptCode
+	if systemPrompt == "" {
+		systemPrompt = DefaultSystemPromptCode
+	}
 
 	var userPrompt strings.Builder
 	userPrompt.WriteString("Task: ")
@@ -56,8 +77,11 @@ func (c *realLLMClient) GenerateCode(ctx context.Context, prompt string, parentC
 }
 
 // GenerateDocs generates documentation for the newly created skill.
-func (c *realLLMClient) GenerateDocs(ctx context.Context, code string) (string, error) {
-	systemPrompt := "You are a technical documentation AI. Your task is to generate concise markdown documentation for the provided Go code."
+func (c *SkillSynthesisClient) GenerateDocs(ctx context.Context, code string) (string, error) {
+	systemPrompt := c.SystemPromptDocs
+	if systemPrompt == "" {
+		systemPrompt = DefaultSystemPromptDocs
+	}
 
 	userPrompt := fmt.Sprintf("Code:\n```go\n%s\n```\n\nPlease write clear, concise documentation explaining what this skill does.", code)
 
@@ -68,3 +92,4 @@ func (c *realLLMClient) GenerateDocs(ctx context.Context, code string) (string, 
 
 	return strings.TrimSpace(result), nil
 }
+
