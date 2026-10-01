@@ -298,39 +298,51 @@ func equivalentCommandIDs(id string) []string {
 		cands = append(cands, "mcp_cursor_adapter")
 	}
 
-	if strings.HasPrefix(id, "sync_") {
+	if id == "pplan" || strings.HasPrefix(id, "pplan_") {
+		cands = append(cands, "object_"+id)
+	} else if id == "object_pplan" || strings.HasPrefix(id, "object_pplan_") {
+		cands = append(cands, strings.TrimPrefix(id, "object_"))
+	}
+
+	if id == "spec" || strings.HasPrefix(id, "spec_") {
+		cands = append(cands, "object_"+id)
+	} else if id == "object_spec" || strings.HasPrefix(id, "object_spec_") {
+		cands = append(cands, strings.TrimPrefix(id, "object_"))
+	}
+
+	if id == "sync" || strings.HasPrefix(id, "sync_") {
 		cands = append(cands, "mesh_"+id)
-	} else if strings.HasPrefix(id, "mesh_sync_") {
+	} else if id == "mesh_sync" || strings.HasPrefix(id, "mesh_sync_") {
 		cands = append(cands, strings.TrimPrefix(id, "mesh_"))
 	}
 
-	if strings.HasPrefix(id, "pre_commit_") {
+	if id == "pre_commit" || strings.HasPrefix(id, "pre_commit_") {
 		cands = append(cands, "system_"+id)
-	} else if strings.HasPrefix(id, "system_pre_commit_") {
+	} else if id == "system_pre_commit" || strings.HasPrefix(id, "system_pre_commit_") {
 		cands = append(cands, strings.TrimPrefix(id, "system_"))
 	}
 
-	if strings.HasPrefix(id, "reports_") {
+	if id == "reports" || strings.HasPrefix(id, "reports_") {
 		cands = append(cands, "system_"+id)
-	} else if strings.HasPrefix(id, "system_reports_") {
+	} else if id == "system_reports" || strings.HasPrefix(id, "system_reports_") {
 		cands = append(cands, strings.TrimPrefix(id, "system_"))
 	}
 
-	if strings.HasPrefix(id, "tray_") {
+	if id == "tray" || strings.HasPrefix(id, "tray_") {
 		cands = append(cands, "service_"+id)
-	} else if strings.HasPrefix(id, "service_tray_") {
+	} else if id == "service_tray" || strings.HasPrefix(id, "service_tray_") {
 		cands = append(cands, strings.TrimPrefix(id, "service_"))
 	}
 
-	if strings.HasPrefix(id, "validate_") {
+	if id == "validate" || strings.HasPrefix(id, "validate_") {
 		cands = append(cands, "system_"+id)
-	} else if strings.HasPrefix(id, "system_validate_") {
+	} else if id == "system_validate" || strings.HasPrefix(id, "system_validate_") {
 		cands = append(cands, strings.TrimPrefix(id, "system_"))
 	}
 
-	if strings.HasPrefix(id, "feed_") {
+	if id == "feed" || strings.HasPrefix(id, "feed_") {
 		cands = append(cands, "agent_"+id)
-	} else if strings.HasPrefix(id, "agent_feed_") {
+	} else if id == "agent_feed" || strings.HasPrefix(id, "agent_feed_") {
 		cands = append(cands, strings.TrimPrefix(id, "agent_"))
 	}
 

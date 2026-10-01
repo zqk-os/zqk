@@ -34,6 +34,7 @@ Flags:
       --project-root string     Project root directory
   -q, --quiet                   Suppress non-essential output
       --reap-locks              Reap stale .lock files whose holding processes are dead (default true)
+      --reap-processes          Reap orphaned background zqk processes (default true)
       --reap-temp               Reap orphaned temporary files older than the threshold (default true)
       --temp-threshold string   Threshold duration for orphaned temp files (e.g. 30m, 2h) (default "30m")
       --timeout duration        Timeout for command execution (0 = auto-calculate)
