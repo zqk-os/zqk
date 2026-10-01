@@ -191,6 +191,8 @@
 ./cli_specs/pack_command.yaml
 ./cli_specs/query_command.yaml
 ./cli_specs/quickstart_command.yaml
+./cli_specs/root/
+./cli_specs/root/version_command.yaml
 ./cli_specs/run_command.yaml
 ./cli_specs/scheduler/
 ./cli_specs/scheduler/activity_command.yaml
@@ -295,6 +297,7 @@
 ./cli_specs/system/disk_usage_command.yaml
 ./cli_specs/system/export_gate_command.yaml
 ./cli_specs/system/generate_agent_configs_command.yaml
+./cli_specs/system/init_command.yaml
 ./cli_specs/system/kernel_integrity/
 ./cli_specs/system/kernel_integrity/backfill_work_envelope_command.yaml
 ./cli_specs/system/kernel_integrity/compose_command.yaml
@@ -344,6 +347,7 @@
 ./cli_specs/workflow/vds/init_command.yaml
 ./cli_specs/workflow/vds/project_command.yaml
 ./cli_specs/workflow/vds_command.yaml
+./cli_specs/workflow/whats_next_command.yaml
 ./configs/
 ./configs/agent_rules_manifest.yaml
 ./configs/blocking_check_config.yaml

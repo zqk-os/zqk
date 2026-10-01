@@ -71,26 +71,25 @@ func NewInitCmd() *cobra.Command {
 	cli.RequireSchedulerCheck(initCmd, false)
 
 	cli.BindAsyncProgress(initCmd, func(cmd *cobra.Command, args []string) error {
+		projectName, _ = cmd.Flags().GetString("project-name")
+		template, _ = cmd.Flags().GetString("template")
+		force, _ = cmd.Flags().GetBool("force")
+		snapshotPath, _ = cmd.Flags().GetString("from-snapshot")
+		answerFilePath, _ = cmd.Flags().GetString("answer-file")
+		legacy, _ = cmd.Flags().GetBool("legacy")
+		merge, _ = cmd.Flags().GetBool("merge")
+		wipe, _ = cmd.Flags().GetBool("wipe")
+		discover, _ = cmd.Flags().GetBool("discover")
+		withMaintenanceJobs, _ = cmd.Flags().GetBool("with-maintenance-jobs")
+		withOnboardingRoadmap, _ = cmd.Flags().GetBool("with-onboarding-roadmap")
+		simple, _ = cmd.Flags().GetBool("simple")
+		advanced, _ = cmd.Flags().GetBool("advanced")
+		importOntology, _ = cmd.Flags().GetString("import-ontology")
 		return runInit(cmd, projectName, template, force, snapshotPath, answerFilePath, legacy, merge, wipe, discover, withMaintenanceJobs, withOnboardingRoadmap, simple, advanced, importOntology)
 	})
 
 	// Apply help builder to command
 	helpBuilder.ApplyToCommand(initCmd)
-
-	initCmd.Flags().StringVar(&projectName, "project-name", "", "Project name (defaults to directory name)")
-	initCmd.Flags().StringVar(&template, objects.KindTemplate, "standard", "Template to use (standard, minimal)")
-	initCmd.Flags().BoolVar(&force, "force", false, "Overwrite existing files")
-	initCmd.Flags().StringVar(&snapshotPath, "from-snapshot", "", "Initialize from snapshot file (.csnap or .json)")
-	initCmd.Flags().StringVar(&answerFilePath, "answer-file", "", "Declarative kernel seed answer file (.yaml or .json) for non-interactive swarm spawn")
-	initCmd.Flags().BoolVar(&legacy, "legacy", false, "Legacy project mode (preserve existing files)")
-	initCmd.Flags().BoolVar(&merge, "merge", false, "Merge snapshot data with existing (snapshot mode only)")
-	initCmd.Flags().BoolVar(&wipe, "wipe", false, "Wipe existing data before restoring snapshot (requires --force)")
-	initCmd.Flags().BoolVar(&discover, "discover", false, "Run the interactive Project Discovery Wizard to capture strategic context, stakeholders, and important dates. If --legacy is provided, it will instead scan and report existing objects.")
-	initCmd.Flags().BoolVar(&withMaintenanceJobs, "with-maintenance-jobs", false, paths.RewriteCanonicalCLIInvocations("After init, ensure retention and audit-aggregation scheduler jobs exist (same as running 'zqk system ensure-retention-jobs'). Puts the project in optimal maintenance configuration."))
-	initCmd.Flags().BoolVar(&withOnboardingRoadmap, "with-onboarding-roadmap", false, "After init, create the onboarding roadmap seed scheduler job. Start the scheduler to run it once and create the priority plan, workstream, and backlog items.")
-	initCmd.Flags().BoolVar(&simple, "simple", false, "Initialize with a simple, guided interface (Semantic Bridge Phase 1)")
-	initCmd.Flags().BoolVar(&advanced, "advanced", false, "Initialize with an advanced, ontology-aware interface (Semantic Bridge Phase 1)")
-	initCmd.Flags().StringVar(&importOntology, "import-ontology", "", "Import an external ontology during initialization (requires --advanced)")
 
 	return initCmd
 }

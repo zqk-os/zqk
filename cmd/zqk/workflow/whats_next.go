@@ -110,10 +110,6 @@ type whatsNextCVSRow struct {
 func NewWhatsNextCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewWorkflowWhatsNextCommandBuilder()
 	cli.RequireSession(cmd, false)
-	cmd.Flags().String("persona-id", "", "Optional persona ID to evaluate what's next for a specific persona")
-	cmd.Flags().String("agent-id", "", "Swarm seat id: correspondence plus seated persona_ref for plan selection (peer_seats). Operator/TPM seats still compile the Gantt lead.")
-	cmd.Flags().Bool("sync-sweep", false, "Emergency diagnostics only: perform synchronous full storage sweep instead of reading materialized lite view")
-	cmd.Flags().Bool("auto-remedy", false, "Automatically diagnose and safely apply precondition and hygiene fixes (stale locks, orphaned tmp files)")
 	cli.BindAsyncProgress(cmd, runWhatsNext)
 	cli.RequireStorage(cmd, true)
 	return cmd
