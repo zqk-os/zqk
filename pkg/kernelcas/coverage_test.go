@@ -27,7 +27,7 @@ func TestMutatorPackagesReferenceAllowlistedKinds(t *testing.T) {
 		filepath.Join(repoRoot, "pkg", "storage", "object_storage_graph_crud.go"),
 		filepath.Join(repoRoot, "cmd", "zqk", "system", "state_restore.go"),
 		filepath.Join(repoRoot, "cmd", "zqk", "system", "check_orphaned_files.go"),
-		filepath.Join(repoRoot, "cmd", "zqk", "system", "kernel_integrity.go"),
+		filepath.Join(repoRoot, "pkg", "systemcheck", "integrity", "report.go"),
 	}
 	allow := AllKinds()
 	for _, p := range paths {

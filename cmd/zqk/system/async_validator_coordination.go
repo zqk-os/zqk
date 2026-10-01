@@ -5,150 +5,29 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/zqk-os/zqk/pkg/coordination"
-	"github.com/zqk-os/zqk/pkg/goroutinelabels"
-	"github.com/zqk-os/zqk/pkg/metrics"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/systemcheck/asynccheck"
 )
 
 // emitAsyncValidatorEventViaCoordinator emits async validator events via the coordination system
-// This provides unified event routing for validation errors, warnings, and metrics
 func emitAsyncValidatorEventViaCoordinator(
 	ctx context.Context,
 	projectRoot string,
 	storageProvider storage.ObjectStorageProvider,
 	operationID string,
-	eventType string, // "semaphore_full", "validation_timeout", "file_read_error", "worker_stuck", "metrics"
+	eventType string,
 	objectID string,
 	message string,
 	fields map[string]any,
-	severity string, // "low", "medium", "high", "critical"
-	profile string, // CLI context profile for logging format
+	severity string,
+	profile string,
 ) {
 	projectRoot = ProjectRootOrResolveDot(projectRoot)
-	if projectRoot == emptyValue {
-		// Best effort - skip if no project root
-		return
-	}
-
-	// Embed LoggingContext in context so coordinator logging respects --context profile
-	ctx = createContextWithLoggingProfile(ctx, profile)
-
-	// Create routers for coordinator
-	auditRouter := coordination.NewStorageAuditRouter(projectRoot, storageProvider)
-
-	// Create metrics pipeline for metrics router (if storage provider available)
-	var metricsRouter coordination.MetricsRouter
-	if storageProvider != nil {
-		metricsPipeline := metrics.MetricPipelineForProject(storageProvider, projectRoot)
-		metricsRouter = coordination.NewMetricPipelineRouter(metricsPipeline)
-	}
-
-	// Create coordinator with routers
-	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
-		LoggingRouter:     &coordination.DefaultLoggingRouter{},
-		AuditRouter:       auditRouter,
-		MetricsRouter:     metricsRouter,
-		OperationalRouter: &coordination.DefaultOperationalRouter{},
-	})
-
-	// Build logging fields
-	loggingFields := []coordination.LoggingField{
-		{Key: "operation_id", Value: operationID},
-		{Key: "operation_type", Value: eventTypeAsyncValidation},
-		{Key: eventKeyEventType, Value: eventType},
-	}
-	if objectID != emptyValue {
-		loggingFields = append(loggingFields, coordination.LoggingField{Key: "object_id", Value: objectID})
-	}
-	if message != emptyValue {
-		loggingFields = append(loggingFields, coordination.LoggingField{Key: "message", Value: message})
-	}
-	// Add custom fields
-	for k, v := range fields {
-		loggingFields = append(loggingFields, coordination.LoggingField{Key: k, Value: v})
-	}
-
-	// Build audit metadata (only for important events, not metrics)
-	auditMetadata := make(map[string]any)
-	shouldAudit := eventType != "metrics" && severity != severityLow
-	if shouldAudit {
-		auditMetadata[eventKeyEventType] = eventTypeSystemConfigChange
-		if message != emptyValue {
-			auditMetadata[eventKeyOperation] = fmt.Sprintf("Async validation %s: %s", eventType, message)
-		} else {
-			auditMetadata[eventKeyOperation] = fmt.Sprintf("Async validation %s", eventType)
-		}
-		if severity == emptyValue {
-			severity = severityMedium
-		}
-		auditMetadata[eventKeySeverity] = severity
-		auditMetadata[eventKeyTargetKind] = eventTypeAsyncValidation
-		if objectID != emptyValue {
-			auditMetadata[eventKeyObjectID] = objectID
-		}
-		// Add custom fields
-		mergeMetadata(auditMetadata, fields)
-	}
-
-	// Build metrics data (always include for metrics tracking)
-	metricsData := make(map[string]any)
-	metricsData[eventKeyOperation] = eventTypeAsyncValidation
-	metricsData[eventKeyEventType] = eventType
-	if objectID != emptyValue {
-		metricsData[eventKeyObjectID] = objectID
-	}
-	if message != emptyValue {
-		metricsData["message"] = message
-	}
-	if severity != emptyValue {
-		metricsData[eventKeySeverity] = severity
-	}
-	// Add custom fields
-	mergeMetadata(metricsData, fields)
-
-	// Create event data
-	eventData := &coordination.EventData{
-		LoggingFields: loggingFields,
-		AuditMetadata: auditMetadata,
-		MetricsData:   metricsData,
-	}
-
-	// Determine status based on event type
-	status := eventStatusInProg
-	switch eventType {
-	case "validation_timeout", "file_read_error", "worker_stuck":
-		status = eventStatusError
-	case "semaphore_full":
-		status = eventStatusWarning
-	case "metrics":
-		status = eventStatusComplete
-	}
-
-	// Create event context
-	eventCtx := coordination.NewEventContext(operationID, eventTypeAsyncValidation, status).
-		WithEventData(eventData).
-		WithContext(ctx)
-
-	// Enable channels based on event type
-	// Metrics: logging + metrics only (high frequency)
-	// Errors/warnings: all channels enabled
-	if shouldAudit {
-		eventCtx = eventCtx.WithChannels(true, true, true, true) // All channels for errors/warnings
-	} else {
-		eventCtx = eventCtx.WithChannels(true, false, true, true) // Logging, metrics, operational (no audit for metrics)
-	}
-
-	// Emit via coordinator (async, non-blocking)
-	bud := goroutinelabels.DefaultBudget()
-	builder := goroutinelabels.NewGoroutine("async_validator_metrics_emit", "emitting async validator metrics")
-	if bud != nil {
-		builder = builder.WithBudget(bud)
-	}
-	builder.StartSimple(func() {
-		_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
-	})
+	asynccheck.EmitAsyncValidatorEventViaCoordinator(
+		ctx, projectRoot, storageProvider, operationID,
+		eventType, objectID, message, fields, severity, profile,
+	)
 }
 
 // emitValidationMetricsViaCoordinator emits validation performance metrics via coordinator

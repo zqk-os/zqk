@@ -1,6 +1,7 @@
 package system
 
 import (
+	"errors"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/concurrency"
@@ -16,6 +17,11 @@ func reportSystemCheckCallback(cb concurrency.OperationCallback, operationID str
 		return
 	}
 	if checkErr != nil {
+		var exitCoder interface{ ExitCode() int }
+		if errors.As(checkErr, &exitCoder) && exitCoder.ExitCode() == 3 {
+			cb.OnComplete(operationID, map[string]any{"verdict": "warnings"}, duration)
+			return
+		}
 		cb.OnError(operationID, checkErr)
 		return
 	}

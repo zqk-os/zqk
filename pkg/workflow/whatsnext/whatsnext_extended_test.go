@@ -171,6 +171,9 @@ func TestWhatsNextExtended_Execute(t *testing.T) {
 
 func TestWhatsNextExtended_ExecuteWithSkipMeasureReason(t *testing.T) {
 	tmp := t.TempDir()
+	t.Cleanup(func() {
+		WaitForReconcile(5 * time.Second)
+	})
 	mock := newExtendedMockStorage()
 
 	req := &QueryRequest{
