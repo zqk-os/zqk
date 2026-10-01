@@ -5,8 +5,6 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/zqk-os/zqk/pkg/concurrency"
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/scheduler/transceiver/types"
 )
@@ -75,24 +73,11 @@ func validateAction(action types.Action, router *Router, index int) []Validation
 			Field:   prefix + ".protocol",
 			Message: "protocol is required",
 		})
-	} else if router != nil {
-		// Check if adapter exists
-		var exists bool
-		_ = concurrency.RunInRLockWithLogger(
-			&router.adaptersMu,
-			LockNameRouterValidateAdapter,
-			logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
-			func() error {
-				_, exists = router.adapters[action.Protocol]
-				return nil
-			},
-		)
-		if !exists {
-			errors = append(errors, ValidationError{
-				Field:   prefix + ".protocol",
-				Message: fmt.Sprintf("protocol adapter '%s' not registered", action.Protocol),
-			})
-		}
+	} else if router != nil && !router.HasAdapter(action.Protocol) {
+		errors = append(errors, ValidationError{
+			Field:   prefix + ".protocol",
+			Message: fmt.Sprintf("protocol adapter '%s' not registered", action.Protocol),
+		})
 	}
 
 	// Validate endpoint/target based on protocol
