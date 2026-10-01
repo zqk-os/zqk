@@ -83,20 +83,9 @@ func SubprocessEnvironWithTestRoot(testRoot string) []string {
 // WireExecForIsolatedProject sets cmd.Dir and cmd.Env so a zqk child process uses projectRoot
 // and cannot inherit a conflicting ZQK_PROJECT_ROOT / ZQK_TEST_DATA_DIR from the parent.
 func WireExecForIsolatedProject(cmd *exec.Cmd, projectRoot string) {
-	if cmd == nil {
-		return
-	}
-	cmd.Dir = projectRoot
-	initGoEnv()
-	var extras []string
-	if goPathCache != "" {
-		extras = append(extras, "GOPATH="+goPathCache)
-	}
-	if goCacheCache != "" {
-		extras = append(extras, "GOCACHE="+goCacheCache)
-	}
-	cmd.Env = SubprocessEnvironWithTestRootAndExtras(projectRoot, extras...)
+	WireExecForIsolatedProjectWithExtras(cmd, projectRoot)
 }
+
 
 // SubprocessEnvironWithTestRootAndExtras is like [SubprocessEnvironWithTestRoot] but merges
 // extra KEY=value pairs, replacing any prior environment entry with the same key.
