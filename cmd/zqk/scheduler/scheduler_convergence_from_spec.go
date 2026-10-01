@@ -7,8 +7,8 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 
-	"github.com/zqk-os/zqk/internal/cli"
-	clictx "github.com/zqk-os/zqk/internal/cli/context"
+	"github.com/zqk-os/zqk/pkg/cliapp"
+	clictx "github.com/zqk-os/zqk/pkg/cliapp/context"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/errfmt"

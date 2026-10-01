@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/scheduler/hostservice"

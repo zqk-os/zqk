@@ -1,6 +1,10 @@
-# Internal CLI Utilities & Context
+# CLI Package
 
-This package provides shared internal utilities, layered context resolution, and output helpers for the ZQK CLI.
+Import path: `github.com/zqk-os/zqk/pkg/cliapp`.
+
+This package is the CLI host shared by composition roots. Spec generators stay in `internal/codegen`.
+
+This package provides shared utilities, layered context resolution, and output helpers for the ZQK CLI.
 
 ## Context System
 

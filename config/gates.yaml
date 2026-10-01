@@ -34,7 +34,7 @@ hygiene:
     - "pkg/logging/rolling_writer.go"
     - "pkg/cli/command_spec_semantic.go"
     - "pkg/cli/update_data_loader.go"
-    - "internal/cli/field_parser.go"
+    - "pkg/cliapp/field_parser.go"
     - "pkg/objectidcache/discover.go"
     - "pkg/testing/*"
     - "pkg/specbuilder/*"

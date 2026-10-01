@@ -6,7 +6,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/paths"
 
-	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/logging"
 
 	"github.com/zqk-os/zqk/pkg/objects"

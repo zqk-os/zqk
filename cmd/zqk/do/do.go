@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/brand"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"

@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	schedpkg "github.com/zqk-os/zqk/pkg/scheduler"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"

@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/accumulator"
 	"github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/objects"

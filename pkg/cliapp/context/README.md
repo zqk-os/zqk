@@ -35,7 +35,7 @@ verboseCtx := ctx.WithVerbose(true)
 ## Package Structure
 
 ```
-internal/cli/context/
+pkg/cliapp/context/
 ├── context.go          # Core context types and interfaces
 ├── builder.go          # Context builder for flexible assembly
 ├── processor.go        # Context processing logic

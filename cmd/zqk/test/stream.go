@@ -2,7 +2,7 @@ package test
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	bldr "github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/errfmt"

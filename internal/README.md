@@ -15,7 +15,6 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | Package | Import Path | Files | Tests | Subpackages | README | Description |
 |---------|-------------|-------|-------|-------------|--------|-------------|
 | [bootstrap](./bootstrap/) | `github.com/zqk-os/zqk/internal/bootstrap` | 4+6 | 6 | - | ✅ [README](./bootstrap/README.md) | Embedded bootstrap archive for zqk system init. |
-| [cli](./cli/) | `github.com/zqk-os/zqk/internal/cli` | 24+14 | 14 | context, errorsuggest, flagutil | ✅ [README](./cli/README.md) | This package provides shared internal utilities, layered context resolution, and output helpers for the ZQK CLI. |
 | [codegen](./codegen/) | `github.com/zqk-os/zqk/internal/codegen` | 0+1 | 1 | ast, generators, macro | ❌ - | Automated code generation, schema-to-Go binding synthesis, and spec scaffolding. |
 | [distribution](./distribution/) | `github.com/zqk-os/zqk/internal/distribution` | 0+1 | 1 | - | ❌ - | Release packaging, archive bundling, and distribution asset compilation. |
 | [stamping](./stamping/) | `github.com/zqk-os/zqk/internal/stamping` | 1+1 | 1 | - | ❌ - | Binary build stamping, version metadata injection, and build environment provenance. |
@@ -26,10 +25,6 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 ```
 internal/
 ├── bootstrap/          # Embedded bootstrap archive for zqk system init.
-├── cli/          # This package provides shared internal utilities, layered con
-│   └── context/
-│   └── errorsuggest/
-│   └── flagutil/
 ├── codegen/          # Automated code generation, schema-to-Go binding synthesis, a
 │   └── ast/
 │   └── generators/
@@ -44,7 +39,7 @@ internal/
 Import packages using their canonical import path:
 
 ```go
-import "github.com/zqk-os/zqk/internal/cli"
+import "github.com/zqk-os/zqk/internal/bootstrap"
 ```
 
 ## Related Documentation

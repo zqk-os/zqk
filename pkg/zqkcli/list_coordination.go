@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/coordination"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/storage"

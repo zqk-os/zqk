@@ -75,7 +75,7 @@ func generateCommandBuilderCode(spec *CommandSpec, commandName, packageName stri
 	fmt.Fprintf(&buf, "import (\n\t\"github.com/spf13/cobra\"\n")
 	needsInternalCli := spec.CommonFlags || spec.RequiresStorage != nil || spec.RequiresSession != nil || spec.RequiresSchedulerCheck != nil
 	if needsInternalCli {
-		fmt.Fprintf(&buf, "\t\"github.com/zqk-os/zqk/internal/cli\"\n")
+		fmt.Fprintf(&buf, "\t\"github.com/zqk-os/zqk/pkg/cliapp\"\n")
 	}
 	fmt.Fprintf(&buf, "\tclipkg \"github.com/zqk-os/zqk/pkg/cli\"\n)\n\n")
 
@@ -196,7 +196,7 @@ func generateCRUDCommandBuilderCode(spec *CRUDCommandSpec, commandName, packageN
 	fmt.Fprintf(&buf, "import (\n\t\"github.com/spf13/cobra\"\n")
 	needsInternalCli := spec.CommonFlags || spec.RequiresStorage != nil || spec.RequiresSession != nil || spec.RequiresSchedulerCheck != nil
 	if needsInternalCli {
-		fmt.Fprintf(&buf, "\t\"github.com/zqk-os/zqk/internal/cli\"\n")
+		fmt.Fprintf(&buf, "\t\"github.com/zqk-os/zqk/pkg/cliapp\"\n")
 	}
 	fmt.Fprintf(&buf, "\tclipkg \"github.com/zqk-os/zqk/pkg/cli\"\n)\n\n")
 

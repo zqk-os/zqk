@@ -10,7 +10,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
-	"github.com/zqk-os/zqk/internal/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/config"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"

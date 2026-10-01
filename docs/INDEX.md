@@ -122,7 +122,7 @@ Welcome to the canonical documentation for **ZQK Core**, the Cellular Knowledge 
 | **[Pipeline Execution Engine](../pkg/pipeline/README.md)** | Step-based mutation pipelines, stage checkpoints, and rollback handlers. |
 | **[Telemetry & Diagnostics](../pkg/telemetry/README.md)** | Structured metrics, performance telemetry, and event streaming. |
 | **[Bootstrap Subsystem](../internal/bootstrap/README.md)** | Embedded tarball packaging, unpack logic, and zero-friction initialization. |
-| **[CLI Kernel Architecture](../internal/cli/README.md)** | Command routing, context profiles, and fail-closed CLI execution contracts. |
+| **[CLI Kernel Architecture](../pkg/cliapp/README.md)** | Command routing, context profiles, and fail-closed CLI execution contracts. |
 
 ---
 
