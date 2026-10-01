@@ -240,37 +240,6 @@ func (av *AsyncValidator) wakeWorkerIfNeeded() {
 			workerID := currentWorkers
 			av.activeWorkers.Add(1)
 
-			// Emit worker start event
-			callback := getValidationLifecycleEventCallback()
-			if callback != nil && av.projectRoot != emptyValue {
-				var projectRoot string
-				if err := concurrency.RunInRLockWithLogger(
-					&av.mu,
-					LockNameAsyncValidatorWorkerStartGetRoot,
-					lockLoggerSystem(),
-					func() error {
-						projectRoot = av.projectRoot
-						return nil
-					},
-				); err != nil {
-					logging.Fluent(av.logger).Error("Failed to get project root for worker start event", err).Log()
-					// Continue anyway, projectRoot will be empty string which is handled by callback
-				}
-				// Use validator's context (or derived context) instead of creating new Background()
-				callback(
-					av.ctx,
-					projectRoot,
-					nil, // Storage provider not available in validation package
-					fmt.Sprintf("worker_%d", workerID),
-					"worker_start",
-					"started",
-					int(av.activeWorkers.Load()),
-					0,
-					0,
-					0,
-				)
-			}
-
 			av.workerStates.Store(workerID, "starting")
 			workerName := fmt.Sprintf("validation_worker_%d", workerID)
 			workerPurpose := fmt.Sprintf("processing validation queue (worker %d)", workerID)

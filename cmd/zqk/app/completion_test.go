@@ -27,12 +27,18 @@ func moduleRoot(t *testing.T) string {
 // subprocess capture is the reliable way to test.
 func TestCompletionCommand(t *testing.T) {
 	t.Parallel()
-	root := moduleRoot(t)
-	exe := filepath.Join(t.TempDir(), "zqk-completion-test")
-	buildCmd := execwrap.Command("go", "build", "-o", exe, "./cmd/zqk")
-	zqkenv.WireExecForIsolatedProject(buildCmd, root)
-	if out, err := buildCmd.CombinedOutput(); err != nil {
-		t.Skipf("could not build zqk for completion test: %v\n%s", err, out)
+	exe := zqkenv.SharedTestBin().Get()
+	if exe == "" {
+		if testing.Short() {
+			t.Skip("skipping build in short mode without shared test binary")
+		}
+		root := moduleRoot(t)
+		exe = filepath.Join(t.TempDir(), "zqk-completion-test")
+		buildCmd := execwrap.Command("go", "build", "-o", exe, "./cmd/zqk")
+		zqkenv.WireExecForIsolatedProject(buildCmd, root)
+		if out, err := buildCmd.CombinedOutput(); err != nil {
+			t.Skipf("could not build zqk for completion test: %v\n%s", err, out)
+		}
 	}
 
 	t.Run("bash", func(t *testing.T) {

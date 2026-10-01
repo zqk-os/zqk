@@ -447,8 +447,7 @@ func (h *UniversalQualityValidationHandler) Validate(ctx context.Context, obj ma
 	// 4. Criteria completeness validation using unified Kernel Predicate DSL
 	if kind == objects.KindCriteria {
 		vals := stringSliceField(obj[objects.FieldKeyCompletenessValidation])
-		titleLower := strings.ToLower(title)
-		isRefactor := strings.Contains(titleLower, "refactor") || strings.Contains(titleLower, "extraction")
+		isRefactor := IsRefactorOrExtractionCriterion(title)
 		hasMeasuredDelta := false
 
 		for _, v := range vals {

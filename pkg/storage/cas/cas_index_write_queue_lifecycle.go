@@ -70,33 +70,7 @@ func (q *ListingIndexWriteQueue) FlushKindContext(ctx context.Context, kind stri
 		return err
 	}
 	if queue == nil {
-		if err := q.sleepCtx(ctx, 15*time.Millisecond); err != nil {
-			return err
-		}
-		if err := concurrency.RunInRLockWithLogger(&q.mu, locknames.LockNameListingIndexFlushGetRetry, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
-			if foundQueue, exists := q.queues[kind]; exists {
-				queue = foundQueue
-			}
-			return nil
-		}); err != nil {
-			return err
-		}
-		if queue == nil {
-			if err := q.sleepCtx(ctx, 35*time.Millisecond); err != nil {
-				return err
-			}
-			if err := concurrency.RunInRLockWithLogger(&q.mu, locknames.LockNameListingIndexFlushGetRetry2, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
-				if foundQueue, exists := q.queues[kind]; exists {
-					queue = foundQueue
-				}
-				return nil
-			}); err != nil {
-				return err
-			}
-		}
-		if queue == nil {
-			return nil // nothing to flush
-		}
+		return nil // nothing to flush
 	}
 
 	deadline := time.Now().Add(timeout)

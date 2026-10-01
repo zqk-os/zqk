@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -192,6 +193,11 @@ func RunWithAsyncProgress(
 	heartbeatCancel() // stop heartbeat as soon as runE returns
 
 	if err != nil {
+		var exitCoder interface{ ExitCode() int }
+		if errors.As(err, &exitCoder) && exitCoder.ExitCode() == 3 {
+			_ = helper.EmitCompletion(ctx, duration, "Complete with warnings", nil)
+			return err
+		}
 		_ = helper.EmitError(ctx, err, "Operation failed", nil)
 		return err
 	}

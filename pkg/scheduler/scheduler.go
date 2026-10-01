@@ -449,18 +449,15 @@ func NewSchedulerWithProjectRoot(storage storagepkg.ObjectStorageProvider, specL
 	ingestSvc.BindToMesh(ambienceMesh)
 
 	sched := &Scheduler{
-		cron:             c,
-		jobs:             make(map[string]*ScheduledJob),
-		storage:          storage,
-		projectRoot:      projectRoot,
-		specLoader:       specLoader,
-		lifecycleLoader:  lifecycleLoader,
-		logger:           logger,
-		samplingPipeline: metricsPipeline,
-		conflictMgr: &ConflictManager{
-			runningJobs: make(map[string]*ScheduledJob),
-			projectRoot: projectRoot,
-		},
+		cron:                         c,
+		jobs:                         make(map[string]*ScheduledJob),
+		storage:                      storage,
+		projectRoot:                  projectRoot,
+		specLoader:                   specLoader,
+		lifecycleLoader:              lifecycleLoader,
+		logger:                       logger,
+		samplingPipeline:             metricsPipeline,
+		conflictMgr:                  NewConflictManager(projectRoot),
 		secCtx:                       secCtx,
 		notificationContext:          notificationContext,
 		executor:                     &NativeExecutor{},

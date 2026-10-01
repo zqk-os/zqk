@@ -16,6 +16,15 @@ type ConflictManager struct {
 	projectRoot string
 }
 
+// NewConflictManager returns a conflict manager for in-process running jobs.
+// An empty projectRoot skips the running-jobs snapshot.
+func NewConflictManager(projectRoot string) *ConflictManager {
+	return &ConflictManager{
+		runningJobs: make(map[string]*ScheduledJob),
+		projectRoot: projectRoot,
+	}
+}
+
 // CanRun checks if a job can run (no conflicts)
 func (cm *ConflictManager) CanRun(job *ScheduledJob) bool {
 	var canRun bool

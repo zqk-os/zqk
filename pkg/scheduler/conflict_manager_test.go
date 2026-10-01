@@ -5,6 +5,16 @@ import (
 	"testing"
 )
 
+func TestNewConflictManager_RegisterRunning(t *testing.T) {
+	t.Parallel()
+	cm := NewConflictManager("")
+	job := &ScheduledJob{ID: "SCH-1", JobType: JobTypeRunWrapper, Running: true}
+	cm.RegisterRunning(job)
+	if !cm.HasRunningJob("SCH-1") {
+		t.Fatal("expected registered job")
+	}
+}
+
 func TestConflictManager_HasRunningJob(t *testing.T) {
 	t.Parallel()
 	cm := &ConflictManager{runningJobs: make(map[string]*ScheduledJob)}
