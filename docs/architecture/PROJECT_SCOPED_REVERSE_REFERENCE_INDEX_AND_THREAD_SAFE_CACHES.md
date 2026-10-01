@@ -37,3 +37,11 @@ The scoped registry guarantees:
 1. **Strict Project Isolation**: Cache mutations and index resets in one workspace never affect another workspace's index state.
 2. **Explicit Workspace Context**: Storage and caching abstractions must accept and normalize workspace roots (`filepath.Clean`).
 3. **Deprecation Path**: All newly authored components must use project-scoped constructors (`GetReverseReferenceIndexForProject`) rather than legacy process-wide singletons.
+
+## Phase 30 Traceability and Lineage
+
+- **Governing Plan**: `PRI-GOD-PACKAGES-PHASE30` / `PRI-GOD-PACKAGES-SCOPED-INDEX`
+- **Backlog Items**: `BLI-GOD-PACKAGES-P30-001`, `BLI-1790849035257943000-4f82ef12`
+- **Criteria**: `CRIT-GOD-PACKAGES-P30-001`, `CRIT-GOD-PACKAGES-P30-002`, `CRIT-GOD-PACKAGES-P30-003`
+- **Test Lineage**: `TST-GOD-PACKAGES-P30-001` / `pkg/storage/reverse_reference_index_test.go`
+- **Technical Debt**: `TDE-CEF-F-ARCH-003` (Resolved)
