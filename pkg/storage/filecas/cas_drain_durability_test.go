@@ -150,8 +150,6 @@ func TestDrainDarwinSyncQueue_ConcurrencyAndShutdownDrain(t *testing.T) {
 		t.Fatalf(errTestSynchronousUnderShut, err)
 	}
 
-	// Reset shutdown flag on darwin
-	if runtime.GOOS == "darwin" {
-		darwinSyncShutdown.Store(false)
-	}
+	// Reset shutdown flag
+	ResetDarwinSyncShutdownForTesting()
 }
