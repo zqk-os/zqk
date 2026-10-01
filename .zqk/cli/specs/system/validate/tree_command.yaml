@@ -1,0 +1,20 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: tree
+short: Show hierarchical view of a priority plan and its dependents
+description: |-
+    Renders a tree-like hierarchical representation of a priority plan, its goals,
+    requirements,
+
+    and backlog items, showing their titles and statuses.
+
+
+
+    To prevent massive graphs, traversal is bounded by depth and summaries are
+    rolled up.
+
+      Show dependency tree for the active priority plan
+      zqk workflow tree
+      Show dependency tree with recursive depth of 2
+      zqk workflow tree --depth 2
+      Show dependency tree for a specific plan
+      zqk workflow tree --priority-plan PRI-STARTER-COMMUNITY-001

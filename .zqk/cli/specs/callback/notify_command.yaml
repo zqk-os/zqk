@@ -1,0 +1,27 @@
+$schema: ../_schemas/command_spec.schema.json
+name: notify
+short: Receive and log scheduler job callback events
+description: |-
+    Receive scheduler job callback events and write them to a log file.
+
+    This command reads JSON payload from stdin (provided by scheduler callback system)
+    and writes formatted output to a log file. The log file location can be:
+    - Account-based: Automatically determined from current account (default)
+    - Custom: Specified via --log-file flag
+
+    The command is designed to be used as a callback handler:
+      %s scheduler submit "command" --callback-completion "%s callback notify"
+
+    Output formats:
+      - text (default): Human-readable formatted logs
+      - jsonl: JSONL format (newline-delimited JSON) - ideal for log aggregation
+      - json: Pretty-printed JSON format
+
+      Use account-based log file with default text format
+      zqk callback notify < callback-payload.json
+      Use JSONL format for structured logging
+      zqk callback notify --format jsonl --log-file event-log.json < callback-payload.json
+      Use custom log file with text format
+      zqk callback notify --log-file /tmp/job-results.log < callback-payload.json
+      Use as callback in scheduler submit with JSONL format
+      zqk scheduler submit "echo test" --callback-completion "zqk callback notify --format jsonl"

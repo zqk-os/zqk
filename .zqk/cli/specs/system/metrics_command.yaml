@@ -1,0 +1,39 @@
+$schema: ../_schemas/command_spec.schema.json
+name: metrics
+short: View command execution metrics and statistics
+description: |-
+    View command execution metrics including timing, frequency, success rates, and
+    timeout statistics.
+
+    This command provides insights into:
+      - Command execution times (baseline, fastest, slowest, average)
+      - Invocation frequency
+      - Success and failure rates
+      - Timeout occurrences
+      - Error rates
+
+    Flags:
+        --all-time
+          Aggregate across current and all day-rolled historical chunks
+        --command <string>
+          Filter by specific command pattern
+        --day <string>
+          View metrics for a specific date (YYYY-MM-DD or YYYYMMDD)
+        --filter <string>
+          Filter by type (failures, timeouts, slow)
+        --limit <int> (default: 0)
+          Limit number of results (0 = all)
+        --summary
+          Generate detailed analysis summary report
+        --window <duration> (default: 0s)
+          Window duration to look back across historical chunks (e.g. 24h, 72h,
+          168h)
+
+      List all command metrics
+      zqk system metrics
+      View metrics for a specific command
+      zqk system metrics --command "zqk system check"
+      Output as JSON
+      zqk system metrics --format json
+      Show only commands with failures
+      zqk system metrics --filter failures

@@ -1,0 +1,9 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: build-prompt
+short: Generate a fully policy-injected prompt for an agent task
+description: |-
+    Generates a markdown prompt for an agent task by injecting active project policies,
+    feedback, and architecture rules via the agentprompt builder.
+
+    This command acts as an injection hook to guarantee that external LLM calls or
+    orchestrators provide agents with context that strictly aligns with project policies.

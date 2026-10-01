@@ -1,0 +1,6 @@
+$schema: ../_schemas/command_spec.schema.json
+name: infer
+short: Infer semantic relationships and ontology classifications
+description: |-
+    Execute semantic inference across artifacts and kernel objects to discover
+    taxonomic relationships, dependencies, and classification mappings.

@@ -13,5 +13,5 @@ This document clarifies the architectural boundaries, ownership responsibilities
 
 ## Legacy & Deprecated Packages
 
-- **`pkg/agentorch`**: Deprecated skeletal stub retained strictly for legacy compile compatibility. Callers must migrate to `pkg/orchestration.Manager` or `pkg/swarm.Dispatcher`.
+- **`pkg/agentorch`**: Retired and removed. Callers must migrate to `pkg/orchestration.Manager` or `pkg/swarm.Dispatcher`.
 - **`pkg/agentclaim` / `pkg/agentdelivery` / `pkg/agentfeed`**: Domain-specific message routing wrappers designed to bridge agent feed communication to the kernel storage layer.

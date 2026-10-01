@@ -1,0 +1,14 @@
+$schema: ../_schemas/command_spec.schema.json
+name: improvement-report
+short: Generate system improvement report with comparative analysis and prioritized work items
+description: |-
+    Generates a comprehensive report to drive system improvement lifecycle and
+    focus.
+
+    Runs on a cadence and can optionally trigger remediation and adaptive
+    scheduler-cadence tuning.
+
+      Generate improvement report
+      zqk system improvement-report
+      Generate JSON report without remediation triggers
+      zqk system improvement-report --format json --trigger-remediation=false

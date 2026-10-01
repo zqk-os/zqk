@@ -1,0 +1,8 @@
+$schema: ../../../_schemas/command_spec.schema.json
+name: test
+short: Create a dummy scheduler health metric for inspection
+description: |-
+    Create a test/dummy scheduler health metric object to inspect the structure.
+
+    This command creates a sample health metric with example values to help you
+    understand the metric structure and fields.

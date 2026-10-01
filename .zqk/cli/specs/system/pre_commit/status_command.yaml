@@ -1,0 +1,11 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: status
+short: Show pre-commit results status and required actions
+description: |-
+    Reads .zqk/pre-commit/results.json and prints whether the hook would block,
+
+    when results were last updated, and what to do if setup is missing or checks
+    failed.
+
+      Show status and required actions
+      zqk pre-commit status

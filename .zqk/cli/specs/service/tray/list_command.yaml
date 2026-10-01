@@ -1,0 +1,4 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: list
+short: List tray entry names and descriptions
+description: List tray entry names and descriptions

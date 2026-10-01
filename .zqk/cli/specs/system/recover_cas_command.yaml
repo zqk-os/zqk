@@ -1,0 +1,23 @@
+$schema: ../_schemas/command_spec.schema.json
+name: recover-cas [object-id...]
+short: Recover CAS objects with missing files
+description: |-
+    Recover CAS objects that have index entries but missing files.
+
+    This command helps fix CAS index inconsistencies where:
+      - Objects exist in the CAS index but their hash files are missing
+      - Objects can be recovered from ID-based files (if they exist)
+      - Stale index entries need to be cleaned up
+
+    Examples:
+      # Recover a specific object
+      zqk system recover-cas AAM-009
+
+      # Recover all objects of a kind
+      zqk system recover-cas --kind command_metric
+
+      # Recover without removing from index (only recreate)
+      zqk system recover-cas --kind command_metric --no-remove-from-index
+
+      # Only remove from index, don't try to recreate
+      zqk system recover-cas --kind command_metric --no-recreate-from-id

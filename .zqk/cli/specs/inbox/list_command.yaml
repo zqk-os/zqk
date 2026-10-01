@@ -1,0 +1,6 @@
+$schema: ../_schemas/command_spec.schema.json
+name: list
+short: List items in the Autonomy Inbox
+description: |-
+    List agent_instruction proposals currently pending in the inbox. Supports
+    filtering by status and persona.

@@ -1,0 +1,4 @@
+$schema: ../_schemas/command_spec.schema.json
+name: issues
+short: issues command
+description: issues command

@@ -1,0 +1,20 @@
+$schema: ../_schemas/command_spec.schema.json
+name: auto-fix-process-pending
+short: Process all pending autofix batch files in .zqk/autofix/ (internal, scheduler)
+description: |-
+    Discovers all AUTOFIX-*.json under .zqk/autofix/ and processes each via the
+    standardized
+
+    pipeline (INGEST → NORMALIZE → COMMIT → FINALIZE) per
+    docs/architecture/data-pipeline-lifecycle.md.
+
+    Used by SCH-autofix-process-pending so autofix files don't build up; can be
+    triggered when
+
+    batches are submitted or run on a timer. Internal command (hidden from main
+    help).
+
+      Process pending (scheduler or manual)
+      zqk system auto-fix-process-pending
+      With explicit project root
+      zqk system auto-fix-process-pending --project-root /path/to/project

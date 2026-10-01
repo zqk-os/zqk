@@ -1,0 +1,4 @@
+$schema: ../_schemas/command_spec.schema.json
+name: extract
+short: Extract code entities from source (Go AST)
+description: Walk a directory and extract functions, methods, types, and interfaces from Go files. Output is structured for the knowledge kernel graph (BLI-OBS-001).

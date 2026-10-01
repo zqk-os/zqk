@@ -1,0 +1,4 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: pending
+short: List unacknowledged policy interrupts
+description: List unacknowledged policy interrupts

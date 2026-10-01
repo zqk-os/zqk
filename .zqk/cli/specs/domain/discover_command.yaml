@@ -1,0 +1,12 @@
+$schema: ../_schemas/command_spec.schema.json
+name: discover
+short: Discover registered domain ontologies
+description: |-
+    List domain_registry objects (registered domain ontologies) from storage.
+
+    Use to see which domains are registered and available for domain objects.
+
+      List registered domains
+      zqk domain discover
+      Discover with scan
+      zqk domain discover --scan

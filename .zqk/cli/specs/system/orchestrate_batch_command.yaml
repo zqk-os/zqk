@@ -1,0 +1,4 @@
+$schema: ../_schemas/command_spec.schema.json
+name: orchestrate-batch [priority_plan_id] [item_ids...]
+short: Generates the ontological cascade (Workstream, Requirement, Criteria, TestCase) for a batch of items
+description: Replaces bash script orchestration with generic, native CLI logic. Builds the required cascade per the system object granularity framework.

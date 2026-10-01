@@ -1,0 +1,6 @@
+$schema: _schemas/command_spec.schema.json
+name: workflow
+short: Manage and execute autonomous engineering workflows and lifecycle pipelines
+description: |-
+    Coordinates mission execution, priority plan delivery, Done-gate verification,
+    and autonomous agent loops.

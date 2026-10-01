@@ -1,0 +1,15 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: file-lock
+short: Manage file lock metrics (view buffer, flush)
+description: |-
+    Manage file lock metrics that are accumulated in memory.
+
+    File lock metrics track lock acquisition times, contention rates, wait times, and system busyness.
+    Metrics are accumulated in memory and can be collected/flushed to create metric objects.
+
+      View current buffered metrics
+      zqk system metrics file-lock view
+      Flush metrics to create a metric object
+      zqk system metrics file-lock flush
+      Flush with custom time window
+      zqk system metrics file-lock flush --window 1h

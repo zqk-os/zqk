@@ -1,0 +1,13 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: aggregate
+short: Merge category results into .zqk/pre-commit/results.json
+description: |-
+    Reads category files in .zqk/pre-commit/*.json (excluding results.json), sets
+    block if any blocking category has !ok,
+
+    writes .zqk/pre-commit/results.json. Run after background check jobs or scripts.
+
+      Merge category results into single file
+      zqk pre-commit aggregate
+      Specify project root
+      zqk pre-commit aggregate --project-root /path/to/repo

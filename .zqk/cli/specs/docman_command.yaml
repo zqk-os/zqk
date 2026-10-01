@@ -1,0 +1,17 @@
+$schema: _schemas/command_spec.schema.json
+name: docman
+short: Documentation management operations
+description: |-
+    Documentation management operations for discovering and registering
+    documentation files.
+
+    This command group provides operations for managing documentation:
+      - register: Discover and register markdown files as doc_entry objects
+      - verify: Cryptographically verify doc_entry objects against on-disk files and detect drift
+
+      Register all documentation files
+      zqk docman register
+      Dry run to see what would be registered
+      zqk docman register --dry-run
+      Verify shipped documentation integrity
+      zqk docman verify --shipped-only

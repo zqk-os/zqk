@@ -1,0 +1,4 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: ack
+short: Acknowledge a policy interrupt (or all pending with --all)
+description: Acknowledge a policy interrupt (or all pending with --all)

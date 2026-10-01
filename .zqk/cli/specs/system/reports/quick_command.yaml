@@ -1,0 +1,17 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: quick
+short: Quick report with preset (questions, milestones-overdue)
+description: |-
+    Generate a quick report for lifecycle reviews. Presets: questions (unanswered),
+    milestones-overdue (past target_date).
+
+    Presets:
+      questions         - Unanswered questions (status, owner, next steps, due date)
+      milestones-overdue - Milestones past target_date with assigned owners
+
+      Unanswered questions
+      zqk reports quick --preset questions
+      Overdue milestones
+      zqk reports quick --preset milestones-overdue
+      Exit non-zero when SLA exceeded
+      zqk reports quick --preset questions --strict

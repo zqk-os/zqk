@@ -52,12 +52,6 @@ func NewLintBypassAuditCmd() *cobra.Command {
 	// Apply help builder to command
 	helpBuilder.ApplyToCommand(cmd)
 
-	cmd.Flags().String("git-user", "", "Git user name (auto-detected from git config if not provided)")
-	cmd.Flags().String("git-email", "", "Git user email (auto-detected from git config if not provided)")
-	cmd.Flags().String("commit-message", "", "Commit message (auto-detected from HEAD or staged changes if not provided)")
-	cmd.Flags().StringArray("files", []string{}, "List of staged/changed files (auto-detected from git diff --cached if not provided)")
-	cmd.Flags().Bool("auto-detect", true, "Automatically detect context from git (default: true)")
-
 	return cmd
 }
 

@@ -1,0 +1,22 @@
+$schema: ../_schemas/command_spec.schema.json
+name: validate [object-id]
+short: Validate object(s) against schema
+description: |-
+    Validate object(s) against schema and check references.
+
+    This command validates objects against their schema definitions and checks
+    that all references are valid. It can validate:
+      - A specific object by ID
+      - All objects of a specific kind (--kind)
+      - All in-scope project objects (default when neither an ID nor --kind is given; same as --all)
+
+      Validate a specific object
+      zqk system validate BLI-657
+      Validate all backlog items
+      zqk system validate --kind backlog_item
+      Validate all in-scope objects (default)
+      zqk system validate
+      Validate all (explicit)
+      zqk system validate --all
+      Attempt to fix validation errors
+      zqk system validate --fix

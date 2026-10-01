@@ -1,0 +1,8 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: list
+short: List failing tests from recent runs
+description: |-
+    List failing tests from recent test job callbacks.
+
+    Analyzes callback log files to identify which tests failed and groups them
+    by package for easy identification.

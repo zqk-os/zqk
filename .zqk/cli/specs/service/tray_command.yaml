@@ -1,0 +1,18 @@
+$schema: ../_schemas/command_spec.schema.json
+name: tray
+short: Tray — configurable named shortcuts to zqk subcommands
+description: |-
+    Loads embedded defaults plus optional .zqk/tray.yaml. Each entry is a name,
+    description, and argv slice.
+
+    Use list/show to discover entries; explain prints the resolved command line; run
+    executes the same binary with those args.
+
+      List entries
+      zqk tray list
+      Show one entry
+      zqk tray show scheduler-status
+      Explain resolved argv
+      zqk tray explain scheduler-status
+      Run (dry run)
+      zqk tray run scheduler-status --dry-run

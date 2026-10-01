@@ -1,0 +1,12 @@
+$schema: ../_schemas/command_spec.schema.json
+name: git
+short: Git commit analysis and integration with work items
+description: |-
+    Analyze Git commits and link them to work items (backlog items, milestones,
+    goals).
+
+    This command analyzes Git commits to:
+      - Extract work item references from commit messages (BLI-*, MIL-*, GOAL-*)
+      - Create code_reference objects for changed files
+      - Link commits to work items
+      - Enable queries like "What code changes support goal X?"

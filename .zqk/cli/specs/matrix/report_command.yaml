@@ -1,0 +1,21 @@
+$schema: ../_schemas/command_spec.schema.json
+name: report
+short: Summarize a traceability matrix (gates, completion counts)
+description: |-
+    Loads docs/quality/matrix_registry.yaml (or --registry), resolves the named
+    matrix to a CSV + profile YAML,
+
+    and prints completion statistics (per-gate counts, fully-done rows). Aligns with
+    docs/architecture/MATRIX_CLI_STRATEGY.md.
+
+
+
+    For test-bundle inventories, outcomes such as pass/fail appear under "other"
+    unless listed in the profile done_values.
+
+      Report default codebase vetting matrix
+      zqk matrix report
+      Report test-bundle matrix
+      zqk matrix report --name test_bundle
+      Go files only
+      zqk matrix report --go-only

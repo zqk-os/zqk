@@ -1,0 +1,14 @@
+$schema: ../_schemas/command_spec.schema.json
+name: state-commit
+short: Commit the Knowledge Kernel state into a single compressed artifact
+description: |-
+    Snapshot all objects into a single compressed artifact (.csnap) for version
+    control.
+
+    Writes the tip to --snapshot-file (committed in git). Before overwrite, copies the
+    previous tip into an external backup directory and keeps only the newest N priors.
+    Backup location/keep: --backup-dir/--backup-keep, else config/zqk.yaml kernel_state.snapshot_backup_*,
+    else <parent>/<repo>-csnap-backups keep=3. Refuses a large shrink unless --allow-shrink.
+
+      Commit system state
+      zqk system state-commit

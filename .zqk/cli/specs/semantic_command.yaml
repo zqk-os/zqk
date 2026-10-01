@@ -1,0 +1,10 @@
+$schema: _schemas/command_spec.schema.json
+name: semantic
+short: Semantic operations and maturity assessment
+description: |-
+    Semantic operations for assessing and managing semantic maturity.
+
+    The semantic command group provides tools for:
+    - Assessing organization's semantic maturity level
+    - Importing and managing ontologies
+    - Working with semantic structures

@@ -1,0 +1,9 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: criteria-evidence
+short: Criteria verification evidence from bundle runs
+description: |-
+    Parses criteria_verification_evidence lines emitted when SCH-run-* bundles
+    complete with bundle JSON criteria_refs.
+
+    Shows the latest event per CRIT-* id in the scanned window. With --apply
+    --dry-run=false, sets criteria status to validated (force lifecycle override).

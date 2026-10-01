@@ -1,0 +1,38 @@
+$schema: ../_schemas/command_spec.schema.json
+name: next
+short: Return deterministic next workflow action
+description: |-
+    Return one deterministic next-step recommendation using explicit precedence:
+
+    1) critical unacknowledged policy interrupts
+
+    2) active convergence sessions
+
+    3) current priority-plan backlog routing
+
+
+
+    For the backlog branch, loads the in-progress priority plan and selected backlog
+    item
+
+    from storage and includes plan title, truncated descriptions, tier, goal_refs,
+    and optional
+
+    convergence_session_ref / convergence_session_profile in JSON/YAML; table output
+    adds a
+
+    work-context block and steering tip.
+
+
+
+    Also reports open_questions_count (question objects with status=open) as a
+    workspace signal.
+
+
+
+    Session context is keyed by ZQK_SESSION_ID and falls back to .zqk/state/session.
+
+      Get next workflow recommendation
+      zqk workflow next
+      Get JSON recommendation payload
+      zqk workflow next --format json

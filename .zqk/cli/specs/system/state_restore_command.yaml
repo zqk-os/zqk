@@ -1,0 +1,11 @@
+$schema: ../_schemas/command_spec.schema.json
+name: state-restore
+short: Restore the Knowledge Kernel state from a compressed artifact
+description: |-
+    Expands a state snapshot (.csnap) and writes it back to the process directory.
+
+    This enforces the policy of treating the compressed snapshot as the
+    only committable artifact, allowing full system restoration from it.
+
+      Restore system state
+      zqk system state-restore

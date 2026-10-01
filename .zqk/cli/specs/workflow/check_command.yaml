@@ -1,0 +1,6 @@
+$schema: ../_schemas/command_spec.schema.json
+name: check
+short: Validates adherence to the prescriptive workflow
+description: |-
+    Validates branch naming, active item in current plan, git state, and branch
+    base.

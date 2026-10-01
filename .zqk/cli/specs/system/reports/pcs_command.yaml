@@ -1,0 +1,28 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: pcs
+short: Get Project Confidence Score (PCS)
+description: |-
+    Calculate and display the Project Confidence Score (PCS), a metric that
+    indicates overall project health and confidence level (0-100).
+
+    The PCS is enhanced with Git commit data when available:
+      - Commit frequency and patterns
+      - Recent activity levels
+      - Code change momentum
+
+    Higher scores indicate:
+      - More completed work items
+      - Healthy commit patterns
+      - Positive development momentum
+
+    Lower scores may indicate:
+      - Low completion rates
+      - Irregular commit patterns
+      - Declining activity
+
+      Get PCS score
+      zqk reports pcs
+      Get PCS as JSON
+      zqk reports pcs --format json
+      Get PCS with commit data explicitly enabled
+      zqk reports pcs --include-commit-data

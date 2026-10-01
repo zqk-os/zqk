@@ -1,0 +1,6 @@
+$schema: ../_schemas/command_spec.schema.json
+name: dashboard
+short: Display real-time system metrics, kernel vitality, and active jobs dashboard
+description: |-
+    Renders an interactive terminal dashboard monitoring daemon vitality, storage
+    metrics, and active swarm tasks.

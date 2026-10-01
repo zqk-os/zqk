@@ -1,0 +1,4 @@
+$schema: _schemas/command_spec.schema.json
+name: observer
+short: Observer agent operations
+description: Extract code entities (functions, types) for the knowledge kernel (BLI-OBS-001).

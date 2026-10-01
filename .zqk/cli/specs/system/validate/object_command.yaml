@@ -1,0 +1,6 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: object <id>
+short: Executes embedded object machine_hints to verify completion
+description: |-
+    Reads an object and looks for an embedded CLI command inside its machine_hints field
+    (e.g., "CMD: zqk object list ...") and automatically executes it to derive its real-time status.

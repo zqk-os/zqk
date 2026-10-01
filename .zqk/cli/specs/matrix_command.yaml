@@ -1,0 +1,19 @@
+$schema: _schemas/command_spec.schema.json
+name: matrix
+short: Traceability matrices (CSV registries, validation, reports)
+description: |-
+    Work with named matrices defined in docs/quality/matrix_registry.yaml: reports, row updates (gate columns),
+    and validation. If the registry file is missing, a default template is initialized automatically.
+
+      Summarize default matrix report
+      zqk matrix report
+      Report for a specific matrix
+      zqk matrix report --name <matrix_name>
+      Update row status
+      zqk matrix update --file-path pkg/x.go --set status=completed
+      List pending rows
+      zqk matrix get --filter status=pending
+      List configured matrix names
+      zqk matrix list
+      Validate matrix CSVs and profiles
+      zqk matrix validate

@@ -1,0 +1,15 @@
+$schema: ../_schemas/command_spec.schema.json
+name: compact-journal
+short: Compact change journal entries into dictionary-compressed artifacts
+description: |-
+    Scans change journal entries within a specified time window, compacts them using
+    dictionary compression into a single artifact file, and removes original
+    entries.
+
+    This command reduces storage overhead and accelerates change journal historical
+    reads.
+
+      Compact last 24 hours of journal entries
+      zqk system compact-journal --window-hours=24
+      Compact into custom output directory
+      zqk system compact-journal --output-dir=/tmp/journal-compact

@@ -1,0 +1,21 @@
+$schema: ../_schemas/command_spec.schema.json
+name: snapshot-scenario [flags]
+short: Capture system state snapshot for test scenario creation
+description: |-
+    Capture a timestamp-based snapshot of system state for test scenario creation.
+
+    The snapshot capture system:
+      - Records a precise timestamp when snapshot is initiated
+      - Buffers write operations during capture (non-blocking)
+      - Captures critical metadata atomically (object IDs, mtimes, hashes)
+      - Reconstructs state from change journal if objects are modified
+      - Applies scenario adaptors to transform baseline state
+
+      Capture specific objects to test scenario
+      zqk system snapshot-scenario --target test-scenarios/scheduler-optimization --object-ids SCH-001,SCH-002,SCH-003 --change-policy include
+      Capture all scheduler jobs with adaptors
+      zqk system snapshot-scenario --target test-scenarios/scheduler-test --kinds scheduler_job --adaptors id-remap,field-override --id-prefix TEST- --field-override status=active
+      Dry run to preview what would be captured
+      zqk system snapshot-scenario --object-ids SCH-001,SCH-002 --dry-run
+      Capture with change journal reconstruction
+      zqk system snapshot-scenario --target test-scenarios/exact-state --object-ids SCH-001,SCH-002 --change-policy reconstruct

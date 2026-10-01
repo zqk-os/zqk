@@ -1,0 +1,4 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: steward
+short: Run the Roadmap Steward agent loop
+description: Runs the background agent responsible for grooming, pre-flighting plans, ensuring links, and maintaining roadmap governance before execution.

@@ -1,0 +1,20 @@
+$schema: ../_schemas/command_spec.schema.json
+name: analyze-impact
+short: Analyze impact of organizational changes on ZQK objects
+description: |-
+    Analyze the impact of an organizational change on ZQK kernel objects.
+
+
+
+    This command:
+
+    - Reads an organizational_change object
+
+    - Identifies affected organizational objects (divisions, teams)
+
+    - Finds related ZQK objects (workstreams, goals, backlog_items, milestones)
+
+    - Creates an impact_analysis object with the results
+
+      Analyze impact of a specific organizational change
+      zqk organizational analyze-impact --change CHANGE-001

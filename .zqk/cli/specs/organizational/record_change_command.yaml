@@ -1,0 +1,16 @@
+$schema: ../_schemas/command_spec.schema.json
+name: record-change
+short: Record an organizational change (creates organizational_change object)
+description: |-
+    Record an organizational change by creating an organizational_change object.
+
+    Use with "organizational analyze-impact" to identify affected kernel objects.
+
+    Use after structure sync or manual edits to track restructures, team moves, etc.
+
+      Record a division restructure
+      zqk organizational record-change --id OCH-001 --change-type division_restructure --title "Split Engineering"
+      Record with description and affected objects from file
+      zqk organizational record-change --id OCH-002 --change-type team_reassignment --title "Backend team move" --description "Moved to Platform" --affected-objects affected.yaml
+      Dry run
+      zqk organizational record-change --id OCH-001 --change-type division_restructure --title Split --dry-run

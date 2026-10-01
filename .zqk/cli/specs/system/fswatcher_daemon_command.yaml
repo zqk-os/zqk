@@ -1,0 +1,6 @@
+$schema: ../_schemas/command_spec.schema.json
+name: fswatcher-daemon
+short: Start the FSWatcher daemon
+description: |-
+    Starts a robust filesystem watcher daemon to monitor workspace events and
+    trigger ambient actions.

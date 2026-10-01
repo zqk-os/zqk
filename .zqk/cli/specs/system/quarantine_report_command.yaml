@@ -1,0 +1,10 @@
+$schema: ../_schemas/command_spec.schema.json
+name: quarantine-report
+short: Report contents of the quarantine folder (data for dashboard)
+description: |-
+    Outputs quarantine stats (file counts by source). Use --format json or --format
+    yaml for structured data suitable for a dashboard or other consumers; default is
+    a human-readable table.
+
+    See .zqk/process/system-health/QUARANTINE_AND_ANALYSIS.md for what goes in
+    quarantine and the dashboard data story.

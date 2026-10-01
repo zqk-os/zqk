@@ -1,0 +1,9 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: feed
+short: Push metrics digest to agent_feed with notify
+description: |-
+    Analyzes command metrics and pushes a digest to agent_feed so seats can
+    self-direct.
+
+      Push metrics digest
+      zqk system metrics feed

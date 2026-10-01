@@ -1,0 +1,4 @@
+$schema: ../_schemas/command_spec.schema.json
+name: semantic-bridge-daemon
+short: Generated spec for semantic-bridge-daemon
+description: Generated spec for semantic-bridge-daemon

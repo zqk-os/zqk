@@ -1,0 +1,18 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: write-result-from-last
+short: Read staging file and write category result then aggregate (for pre-commit callback)
+description: |-
+    Reads .zqk/pre-commit/.last-<category>.json written by the check script (lint,
+    policy, integrity),
+
+    writes the category file, then runs aggregate. Used by scheduler job callback
+    when the job was
+
+    triggered with --pre-commit so the hook sees up-to-date results.
+
+      Write lint category from last run and aggregate (callback)
+      zqk pre-commit write-result-from-last --category=lint
+      Write policy category from last run and aggregate
+      zqk pre-commit write-result-from-last --category=policy
+      Write integrity category from last run and aggregate
+      zqk pre-commit write-result-from-last --category=integrity

@@ -1,0 +1,15 @@
+$schema: ../_schemas/command_spec.schema.json
+name: pre-commit
+short: Pre-commit background results (aggregate and write category results)
+description: |-
+    Commands for the pre-commit hook that reads a single results file updated by
+    background jobs.
+
+    Background jobs (e.g. linter per package, integrity check, policy checks) write category
+    files to .zqk/pre-commit/<category>.json. The aggregate command merges them into
+    .zqk/pre-commit/results.json (under .zqk/pre-commit/) with one 'block' indicator that the hook reads.
+
+      Merge category results into single file
+      zqk pre-commit aggregate
+      Write lint result after running linter
+      zqk pre-commit write-result --category=lint --ok=false --summary="3 issues"

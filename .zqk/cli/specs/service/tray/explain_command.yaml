@@ -1,0 +1,4 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: explain <name>
+short: Print the shell-style command line for a tray entry
+description: Print the shell-style command line for a tray entry

@@ -1,0 +1,12 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: agent
+short: Validate codebase and optionally verify a cryptographic stamp
+description: |-
+    Runs agent-side validation of the codebase. When --stamp is set, verifies
+
+    the cryptographic stamp (optionally with a local offline fallback).
+
+      Validate the current tree
+      zqk agent validate
+      Verify a stamp with local fallback
+      zqk agent validate --stamp <stamp> --local-fallback

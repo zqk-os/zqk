@@ -1,0 +1,9 @@
+$schema: ../../../_schemas/command_spec.schema.json
+name: flush
+short: Flush buffered metrics to create a metric object
+description: |-
+    Flush buffered file lock metrics by creating a file_lock_metric object and
+    resetting counters.
+
+    This collects all accumulated metrics, creates a metric object, and resets the counters
+    for the next collection period.

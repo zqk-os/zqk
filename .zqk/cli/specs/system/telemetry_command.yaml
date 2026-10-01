@@ -1,0 +1,7 @@
+$schema: ../_schemas/command_spec.schema.json
+name: telemetry
+short: View telemetry from running agent tasks
+description: |-
+    View aggregated telemetry logs and metrics.
+
+    This command aggregates and queries telemetry data from all agent tasks.

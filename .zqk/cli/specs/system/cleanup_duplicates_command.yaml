@@ -1,0 +1,11 @@
+$schema: ../_schemas/command_spec.schema.json
+name: cleanup-duplicates [kind]
+short: Clean up duplicate traditional files that have hash-based equivalents
+description: |-
+    Scans hash-based files, extracts their object IDs, and removes traditional files (e.g., BLI-*.yaml)
+    that have the same object ID as a hash-based file.
+
+    This is useful for cleaning up after CAS migration where traditional files
+    weren't automatically removed.
+
+    If a kind is provided, only processes that kind. Otherwise processes all kinds.

@@ -1,0 +1,10 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: status
+short: Show the status of the federated sovereign mesh
+description: |-
+    Displays all established federated connections, their trust levels,
+
+    and shared capabilities.
+
+      Show federated mesh status
+      zqk system federate status

@@ -9,7 +9,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -48,7 +47,7 @@ func AnalyzeCommandSpecCoverage(root *cobra.Command, specsDir string) (CommandSp
 	loaded := make(map[string]string)
 	walkStaticCommands(root, "", loaded)
 
-	specs, err := loadCommandSpecIDs(specsDir)
+	specs, err := LoadCommandSpecIDs(specsDir)
 	if err != nil {
 		return CommandSpecCoverage{}, err
 	}
@@ -59,11 +58,11 @@ func AnalyzeCommandSpecCoverage(root *cobra.Command, specsDir string) (CommandSp
 		CommandSpecCount:   len(specs),
 	}
 	for id, commandPath := range loaded {
-		if commandSpecCoverageIgnoredLoaded[id] || dynamicCommandGroup(id) {
+		if DynamicCommandGroup(id) {
 			continue
 		}
 		hasSpec := false
-		for _, cand := range equivalentCommandIDs(id) {
+		for _, cand := range EquivalentCommandIDs(id) {
 			if _, ok := specs[cand]; ok {
 				hasSpec = true
 				break
@@ -74,11 +73,11 @@ func AnalyzeCommandSpecCoverage(root *cobra.Command, specsDir string) (CommandSp
 		}
 	}
 	for id, relativePath := range specs {
-		if commandSpecCoverageIgnoredSpecs[id] || dynamicCommandGroup(id) {
+		if DynamicCommandGroup(id) {
 			continue
 		}
 		hasLoaded := false
-		for _, cand := range equivalentCommandIDs(id) {
+		for _, cand := range EquivalentCommandIDs(id) {
 			if _, ok := loaded[cand]; ok {
 				hasLoaded = true
 				break
@@ -188,7 +187,7 @@ func walkStaticCommands(command *cobra.Command, parentPath string, commands map[
 		path = ""
 	}
 	if path != "" {
-		commands[canonicalCommandID(path)] = path
+		commands[CanonicalCommandID(path)] = path
 	}
 	for _, child := range command.Commands() {
 		if child.Name() == "help" || child.Use == "help [command]" || child.Use == "completion [command]" {
@@ -198,7 +197,7 @@ func walkStaticCommands(command *cobra.Command, parentPath string, commands map[
 	}
 }
 
-func loadCommandSpecIDs(specsDir string) (map[string]string, error) {
+func LoadCommandSpecIDs(specsDir string) (map[string]string, error) {
 	specs := make(map[string]string)
 	err := filepath.WalkDir(specsDir, func(path string, entry fileutil.DirEntry, walkErr error) error {
 		if walkErr != nil {
@@ -229,7 +228,7 @@ func commandSpecIDFromPath(relativePath string) string {
 	rawID = strings.TrimSuffix(rawID, commandSpecFilenameSuffix)
 	rawID = strings.TrimPrefix(rawID, "CSPEC-")
 	rawID = strings.TrimSuffix(rawID, "-command")
-	id := canonicalCommandID(rawID)
+	id := CanonicalCommandID(rawID)
 
 	parts := strings.Split(id, "_")
 	deduplicated := parts[:0]
@@ -247,12 +246,14 @@ func commandSpecIDFromPath(relativePath string) string {
 	return id
 }
 
-func canonicalCommandID(value string) string {
+// CanonicalCommandID normalizes command name/path into a canonical identifier.
+func CanonicalCommandID(value string) string {
 	replacer := strings.NewReplacer(" ", "_", "-", "_", "/", "_")
 	return replacer.Replace(value)
 }
 
-func equivalentCommandIDs(id string) []string {
+// EquivalentCommandIDs returns all equivalent IDs for aliases and root shortcuts.
+func EquivalentCommandIDs(id string) []string {
 	cands := []string{id}
 
 	switch id {
@@ -349,33 +350,8 @@ func equivalentCommandIDs(id string) []string {
 	return cands
 }
 
-func dynamicCommandGroup(id string) bool {
+// DynamicCommandGroup checks if a command group is dynamic (e.g. object, internal, new).
+func DynamicCommandGroup(id string) bool {
 	group, _, _ := strings.Cut(id, "_")
 	return group == "object" || group == "internal" || group == "new"
-}
-
-var commandSpecCoverageIgnoredLoaded = map[string]bool{
-	"agent_agent_new":               true,
-	"agent_execute":                 true,
-	"observer_coach":                true,
-	"system_generate_spec_index":    true,
-	"system_hydrate_graph":          true,
-	"system_policy_interrupts_emit": true,
-	"system_retention_tolerance":    true,
-	"system_state_restore":          true,
-	"system_sync_cas_index":         true,
-	"system_validate_scenario":      true,
-	"system_verify_completion":      true,
-}
-
-var commandSpecCoverageIgnoredSpecs = map[string]bool{
-	"agent_new":                        true,
-	"bundle":                           true,
-	"bundle_apply":                     true,
-	"project_use":                      true,
-	"scheduler_events_aggregate":       true,
-	"system_compact_maintenance_wal":   true,
-	"system_generate_agent_configs":    true,
-	"system_maintenance_request_cycle": true,
-	objects.FieldKeyVersion:            true,
 }

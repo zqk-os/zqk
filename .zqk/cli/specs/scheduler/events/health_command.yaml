@@ -1,0 +1,4 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: health
+short: Show health view over scheduler-metrics-summary (failures and slow jobs)
+description: Reads .zqk/scheduler/scheduler-metrics-summary.json and lists jobs with failures or average duration above threshold (e.g. > 5 min). The summary is updated automatically by the SCH-evag timer job; to run aggregation on demand, trigger that job.

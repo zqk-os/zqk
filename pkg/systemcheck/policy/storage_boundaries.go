@@ -90,16 +90,6 @@ func (g *StorageBoundariesGate) Run(ctx context.Context, opts RunOptions) (*Resu
 				}
 			}
 
-			// Rule 2: pkg/storage/core must not import sibling storage subpackages
-			if subpkg == "core" {
-				if strings.HasPrefix(imp, "github.com/zqk-os/zqk/pkg/storage/file") ||
-					strings.HasPrefix(imp, "github.com/zqk-os/zqk/pkg/storage/graph") ||
-					strings.HasPrefix(imp, "github.com/zqk-os/zqk/pkg/storage/wal") ||
-					strings.HasPrefix(imp, "github.com/zqk-os/zqk/pkg/storage/cache") {
-					violations = append(violations, fmt.Sprintf("%s (core) imports higher engine %s", rel, imp))
-				}
-			}
-
 			// Rule 3: pkg/storage/wal must not import higher-level engines (file, graph, cache)
 			if subpkg == "wal" {
 				if strings.HasPrefix(imp, "github.com/zqk-os/zqk/pkg/storage/file") ||

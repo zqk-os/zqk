@@ -1,0 +1,22 @@
+$schema: ../_schemas/command_spec.schema.json
+name: rotate <key-id> [flags]
+short: Rotate or revoke a keystore entry
+description: |-
+    Rotate or revoke a keystore entry.
+
+    Rotation:
+      - Updates the credential_hash with a new hashed credential
+      - Only system can rotate (credential_hash can only be set by system)
+      - New credential will be hashed based on key type (bcrypt for passwords, SHA256 for tokens)
+
+    Revocation:
+      - Marks the key as revoked
+      - Owner or admin can revoke keys
+      - Revoked keys cannot be used for authentication
+
+      Rotate a key with a new credential (system only)
+      zqk keystore rotate KEY-001 --new-credential "new-secret-key"
+      Revoke a key (owner or admin)
+      zqk keystore rotate KEY-001 --revoke
+      Rotate and revoke old key in one operation
+      zqk keystore rotate KEY-001 --new-credential "new-key" --revoke-old

@@ -1,0 +1,12 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: query [work-item-id]
+short: Query code changes for a work item
+description: |-
+    Query code changes (commits and files) linked to a work item.
+
+      Find commits for backlog item
+      zqk system git query BLI-625
+      Find commits for goal
+      zqk system git query GOAL-6369
+      Find commits for milestone
+      zqk system git query MIL-036

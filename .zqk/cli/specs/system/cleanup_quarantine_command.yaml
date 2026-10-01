@@ -1,0 +1,9 @@
+$schema: ../_schemas/command_spec.schema.json
+name: cleanup-quarantine
+short: Remove old files from the quarantine folder
+description: |-
+    Deletes quarantined files older than --older-than. Use --dry-run to see what
+    would be removed.
+
+    See .zqk/process/system-health/QUARANTINE_AND_ANALYSIS.md for what goes in
+    quarantine.

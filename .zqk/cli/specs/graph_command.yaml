@@ -1,0 +1,18 @@
+$schema: _schemas/command_spec.schema.json
+name: graph
+short: Graph-based operations and reasoning
+description: |-
+    Advanced operations leveraging the graph backend for relationship discovery and
+    reasoning.
+
+    The graph backend enables complex queries across object relationships, dependency chains,
+    and strategic alignment analysis that are difficult with traditional file-based storage.
+
+      Run a Cypher query
+      zqk graph query "MATCH (n:BacklogItem) RETURN n LIMIT 5"
+
+    Capabilities:
+      • raw Cypher queries
+    • relationship discovery
+    • impact analysis
+    • strategic gap detection

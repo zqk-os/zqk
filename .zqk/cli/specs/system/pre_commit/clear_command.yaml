@@ -1,0 +1,13 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: clear
+short: Clear pre-commit results after resolving blockers
+description: |-
+    Removes all category and results files under .zqk/pre-commit/ and writes a clean
+
+    results.json with block=false so the hook allows commits. Run after fixing
+    issues;
+
+    the next background script run will repopulate categories.
+
+      Clear results after resolving blockers
+      zqk pre-commit clear

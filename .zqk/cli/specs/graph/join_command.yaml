@@ -1,0 +1,6 @@
+$schema: ../_schemas/command_spec.schema.json
+name: join
+short: Join a node or agent into an existing federation or mesh network
+description: |-
+    Connect and register the local node or agent workspace into an existing
+    federated swarm or distributed mesh network.

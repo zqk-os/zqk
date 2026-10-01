@@ -1,0 +1,17 @@
+$schema: ../_schemas/command_spec.schema.json
+name: list [flags]
+short: List keystore entries
+description: |-
+    List keystore entries for the current user.
+
+    Access control:
+      - Users can only see their own entries
+      - Admins can see all entries
+      - Sensitive fields (credential_hash, salt) are never shown
+
+      List your keystore entries
+      zqk keystore list
+      List in JSON format
+      zqk keystore list --format json
+      List with filtering
+      zqk keystore list --filter key_type=api_key

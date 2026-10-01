@@ -1,0 +1,6 @@
+$schema: _schemas/command_spec.schema.json
+name: scheduler
+short: Manage background scheduler daemon, jobs, and recurrent tasks
+description: |-
+    Controls the background scheduler process, scheduled maintenance jobs, and
+    automated task execution pipelines.

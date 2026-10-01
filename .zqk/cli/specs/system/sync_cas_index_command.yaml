@@ -1,0 +1,12 @@
+$schema: ../_schemas/command_spec.schema.json
+name: sync-cas-index
+short: Sync CAS index from an existing hash-addressed file
+description: |-
+    Sync the content-addressable storage index so an object ID maps to the hash of an existing file.
+    Use when the index is out of sync (e.g. file was renamed to match content hash) and the correct file exists on disk.
+
+    Examples:
+      # Update index for a single file
+      zqk system sync-cas-index --file .zqk/process/backlog_items/<hash>.yaml
+      # Preview without writing
+      zqk system sync-cas-index --file .zqk/process/backlog_items/<hash>.yaml --dry-run

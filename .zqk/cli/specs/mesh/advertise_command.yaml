@@ -1,0 +1,6 @@
+$schema: ../_schemas/command_spec.schema.json
+name: advertise
+short: Advertise local agent seat capabilities and availability to the swarm mesh
+description: |-
+    Publishes agent seat specifications, supported roles, and availability status to
+    the peer-to-peer swarm mesh.

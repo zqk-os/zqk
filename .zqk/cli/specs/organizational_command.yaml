@@ -1,0 +1,11 @@
+$schema: _schemas/command_spec.schema.json
+name: organizational
+short: Organizational structure and change impact analysis
+description: |-
+    Organizational operations for managing organizational structure and analyzing
+    impact of changes.
+
+    The organizational command group provides tools for:
+    - Analyzing impact of organizational changes on kernel objects
+    - Detecting organizational changes
+    - Managing organizational structure relationships

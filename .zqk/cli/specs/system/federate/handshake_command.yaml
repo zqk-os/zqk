@@ -1,0 +1,6 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: handshake
+short: Execute bidirectional identity and credential handshake with remote peer
+description: |-
+    Performs cryptographic verification and reciprocal credential attestation
+    between federated knowledge kernel nodes.

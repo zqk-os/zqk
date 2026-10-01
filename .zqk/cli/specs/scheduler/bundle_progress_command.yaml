@@ -1,0 +1,6 @@
+$schema: ../_schemas/command_spec.schema.json
+name: bundle-progress
+short: Render live test bundle execution progress matrix
+description: |-
+    View live bundle execution progress
+      zqk scheduler bundle-progress

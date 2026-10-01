@@ -1,0 +1,4 @@
+$schema: ../_schemas/command_spec.schema.json
+name: daemon
+short: Run the ambient filesystem and heuristics daemon in the foreground
+description: Run the ambient filesystem and heuristics daemon in the foreground

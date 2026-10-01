@@ -1,0 +1,4 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: run <name> [args...]
+short: Run the zqk binary with the tray entry argv and optional additional arguments
+description: Run the zqk binary with the tray entry argv and optional additional arguments

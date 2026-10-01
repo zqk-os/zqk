@@ -1,0 +1,6 @@
+$schema: ../_schemas/command_spec.schema.json
+name: lease
+short: Acquire or release execution leases on shared swarm workstreams
+description: |-
+    Coordinates mutual exclusion and resource reservation for distributed tasks
+    across concurrent agent seats.

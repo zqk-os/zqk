@@ -1,0 +1,17 @@
+$schema: ../_schemas/command_spec.schema.json
+name: validate
+short: Validate matrix registry entries (CSV + profile)
+description: |-
+    Loads docs/quality/matrix_registry.yaml (or --registry), resolves csv and
+    profile paths, checks files
+
+    exist, parses the profile, reads the CSV header and rows, and verifies
+    session_ref_column when configured.
+
+    Exits with non-zero status if any matrix fails. Use --name to validate a single
+    alias.
+
+      Validate every registry matrix
+      zqk matrix validate
+      Validate only test_bundle
+      zqk matrix validate --name test_bundle

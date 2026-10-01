@@ -1,0 +1,20 @@
+$schema: ../_schemas/command_spec.schema.json
+name: sync
+short: Sync organizational structure from a file into ZQK storage
+description: |-
+    Sync organizational structure from a YAML or JSON file into ZQK storage.
+
+    Reads organization, division, department, team, partnership, or
+    organizational_change
+
+    objects and creates or updates them (domain:organizational). Use to load
+    structure
+
+    exported from zqk or another source.
+
+      Sync from YAML file (create new objects only)
+      zqk organizational sync --file org-structure.yaml --mode create_only
+      Sync with upsert (create or update)
+      zqk organizational sync --file org-structure.yaml --mode upsert
+      Dry run to validate file
+      zqk organizational sync --file org-structure.yaml --dry-run

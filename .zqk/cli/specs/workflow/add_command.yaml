@@ -1,0 +1,20 @@
+$schema: ../_schemas/command_spec.schema.json
+name: add
+short: Add backlog items to a priority plan
+description: |-
+    Add backlog items to a priority plan.
+
+    If the second argument is a plan ID (e.g. starting with PRI-), it links to that
+    plan.
+
+    If it is a number, it links to the active priority plan with that active order.
+
+    If no plan exists, the system automatically scaffolds a new priority plan,
+    milestone, and goal.
+
+      Add a backlog item to the default active priority plan
+      zqk workflow add BLI-SYM-901
+      Add a backlog item to the priority plan with active order 3
+      zqk workflow add BLI-SYM-901 3
+      Add multiple backlog items to an explicit plan ID
+      zqk workflow add BLI-1 BLI-2 PRI-001

@@ -1,0 +1,13 @@
+$schema: ../_schemas/command_spec.schema.json
+name: reconstruct
+short: Reconstruct object states at a timestamp (beyond-threshold path)
+description: |-
+    Recompute the status-relevant graph from scope, then reconstruct each object's
+    state
+
+    at the given timestamp using the change journal and apply. Use when the rollback
+
+    point was pruned (beyond retention).
+
+      Reconstruct at a timestamp for a priority plan
+      zqk rollback reconstruct --scope-id priority_plan:PRI-1:complete --timestamp 2026-01-02T12:00:00Z
