@@ -31,6 +31,11 @@ func TestNewResourceHygieneCmd(t *testing.T) {
 	if reapTempFlag == nil {
 		t.Fatal("missing --reap-temp flag")
 	}
+
+	reapProcessesFlag := cmd.Flag("reap-processes")
+	if reapProcessesFlag == nil {
+		t.Fatal("missing --reap-processes flag")
+	}
 }
 
 func TestRunResourceHygiene_Execution(t *testing.T) {
