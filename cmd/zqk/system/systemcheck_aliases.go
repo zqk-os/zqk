@@ -18,6 +18,8 @@ type (
 	CheckSnapshotMetadata = systemcheck.CheckSnapshotMetadata
 	ResolutionResult      = systemcheck.ResolutionResult
 	ViolationResolver     = systemcheck.ViolationResolver
+	HashMismatchInfo      = systemcheck.HashMismatchInfo
+	CheckResultDiff       = systemcheck.CheckResultDiff
 )
 
 // NewViolationResolver creates a violation resolver (pkg/systemcheck).

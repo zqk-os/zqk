@@ -24,13 +24,6 @@ type AutoFixContext struct {
 	HashMismatches   []HashMismatchInfo // Collect hash mismatches for batch processing
 }
 
-// HashMismatchInfo tracks hash mismatch information for batch processing
-type HashMismatchInfo struct {
-	ObjectID     string
-	Kind         string
-	FilePath     string
-	OriginalHash string
-}
 
 // initializeAutoFixContext sets up the auto-fix context
 func initializeAutoFixContext(ctx *cli.Context, cmd *cobra.Command, obj *parser.ParsedObject, filePath, kind string, hashRegistryCache *HashRegistryCacheType, objectIDCache *ObjectIDCache) *AutoFixContext {
