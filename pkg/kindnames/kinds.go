@@ -122,6 +122,7 @@ const (
 	TestCommandRule            = "test_command_rule"
 	WorkstreamTransition       = "workstream_transition"
 	VerificationMatrix         = "verification_matrix"
+	WatchdogRegistration       = "watchdog_registration"
 
 	// Spec-backed kinds (object_specs; Kind* in pkg/objects for builders/CLI)
 	CorporateInitiative   = "corporate_initiative"
