@@ -214,6 +214,9 @@ func (f *FileObjectStorage) ensureObjectID(ctx context.Context, obj map[string]a
 // For CAS kinds, we build the legacy path directly so Create does not call getObjectFilePath
 // for non-existing objects (getObjectFilePath returns an error when the object is not found and kind dir exists).
 func (f *FileObjectStorage) prepareObjectPath(id, kind string) (string, error) {
+	if StreamStorageEnabledForKind(kind) {
+		return "", nil
+	}
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	kindDir := f.GetKindDir(kind)
 	if kindDir == "" {

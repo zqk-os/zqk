@@ -2,12 +2,13 @@ package asynccheck
 
 import (
 	"context"
-	"os"
 	"path/filepath"
 	"testing"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/validation"
 )
 
@@ -45,7 +46,7 @@ func TestExtractObjectIDFromFile(t *testing.T) {
 
 	// 1. Non-CAS standard file name (e.g. BLI-123.yaml)
 	standardFile := filepath.Join(tmpDir, "BLI-123.yaml")
-	if err := os.WriteFile(standardFile, []byte("kind: backlog_item\nid: BLI-123\n"), 0600); err != nil {
+	if err := fileutil.WriteFile(standardFile, []byte("kind: backlog_item\nid: BLI-123\n"), paths.FilePerm600); err != nil {
 		t.Fatalf("failed to write test file: %v", err)
 	}
 	id := ExtractObjectIDFromFileWithContext(context.Background(), standardFile, "backlog_item", logger)
@@ -56,7 +57,7 @@ func TestExtractObjectIDFromFile(t *testing.T) {
 	// 2. CAS file (64 hex characters + .yaml)
 	casHash := "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
 	casFile := filepath.Join(tmpDir, casHash+".yaml")
-	if err := os.WriteFile(casFile, []byte("kind: criteria\nid: CRIT-999\n"), 0600); err != nil {
+	if err := fileutil.WriteFile(casFile, []byte("kind: criteria\nid: CRIT-999\n"), paths.FilePerm600); err != nil {
 		t.Fatalf("failed to write cas file: %v", err)
 	}
 	casID := ExtractObjectIDFromFileWithContext(context.Background(), casFile, "criteria", logger)
@@ -128,7 +129,7 @@ func TestIsTransientCacheCoherenceIssue(t *testing.T) {
 func TestShouldUseCachedState(t *testing.T) {
 	tmpDir := t.TempDir()
 	filePath := filepath.Join(tmpDir, "GOAL-1.yaml")
-	if err := os.WriteFile(filePath, []byte("id: GOAL-1\n"), 0600); err != nil {
+	if err := fileutil.WriteFile(filePath, []byte("id: GOAL-1\n"), paths.FilePerm600); err != nil {
 		t.Fatalf("failed to write test file: %v", err)
 	}
 
@@ -166,13 +167,13 @@ func TestScanObjectFilesWithContext_Walk(t *testing.T) {
 	f2 := filepath.Join(tmpDir, "GOAL-2.yml")
 	nonYaml := filepath.Join(tmpDir, "ignored.txt")
 
-	if err := os.WriteFile(f1, []byte("id: GOAL-1\nkind: goal\n"), 0600); err != nil {
+	if err := fileutil.WriteFile(f1, []byte("id: GOAL-1\nkind: goal\n"), paths.FilePerm600); err != nil {
 		t.Fatalf("failed to write test file: %v", err)
 	}
-	if err := os.WriteFile(f2, []byte("id: GOAL-2\nkind: goal\n"), 0600); err != nil {
+	if err := fileutil.WriteFile(f2, []byte("id: GOAL-2\nkind: goal\n"), paths.FilePerm600); err != nil {
 		t.Fatalf("failed to write test file: %v", err)
 	}
-	if err := os.WriteFile(nonYaml, []byte("not yaml"), 0600); err != nil {
+	if err := fileutil.WriteFile(nonYaml, []byte("not yaml"), paths.FilePerm600); err != nil {
 		t.Fatalf("failed to write non-yaml file: %v", err)
 	}
 

@@ -150,7 +150,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [precommit](./precommit/) | `github.com/zqk-os/zqk/pkg/precommit` | 1+2 | 2 | - | ❌ - | Types and logic for the pre-commit hook that reads background-check results. Category files are written by scheduler jobs (lint... |
 | [predicate](./predicate/) | `github.com/zqk-os/zqk/pkg/predicate` | 2+2 | 2 | - | ❌ - | Predicate component and domain abstractions for ZQK Core. |
 | [primaryorch](./primaryorch/) | `github.com/zqk-os/zqk/pkg/primaryorch` | 3+4 | 4 | - | ❌ - | Primary agent orchestration engine, session coordination, and run tracking. |
-| [process](./process/) | `github.com/zqk-os/zqk/pkg/process` | 2+2 | 2 | - | ❌ - | Operating system process management, PID tracking, and graceful signal handling. |
+| [process](./process/) | `github.com/zqk-os/zqk/pkg/process` | 3+3 | 3 | - | ❌ - | Operating system process management, PID tracking, and graceful signal handling. |
 | [processhygiene](./processhygiene/) | `github.com/zqk-os/zqk/pkg/processhygiene` | 6+15 | 15 | - | ❌ - | Workspace hygiene auditing, dead-code detection, and repository cleanliness. |
 | [processing](./processing/) | `github.com/zqk-os/zqk/pkg/processing` | 2+3 | 3 | - | ❌ - | Processing component and domain abstractions for ZQK Core. |
 | [projecttemp](./projecttemp/) | `github.com/zqk-os/zqk/pkg/projecttemp` | 3+1 | 1 | - | ❌ - | Hosts isolated temp-project teardown helpers that must not import pkg/storage (storage imports pkg/validation and other consume... |

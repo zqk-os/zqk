@@ -3,7 +3,6 @@ package system
 import (
 	"context"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -216,7 +215,7 @@ func (e *DiagnosticsRemedyEngine) Apply(ctx context.Context, plans []RemedyPlan)
 					outcome.Detail = "refusing to remove daemon singleton lock file"
 					continue
 				}
-				if err := os.Remove(cleanTarget); err != nil && !os.IsNotExist(err) {
+				if err := fileutil.Remove(cleanTarget); err != nil && !fileutil.IsNotExist(err) {
 					outcome.Error = err.Error()
 				} else {
 					outcome.Applied = true
@@ -231,13 +230,13 @@ func (e *DiagnosticsRemedyEngine) Apply(ctx context.Context, plans []RemedyPlan)
 			cleanTarget := filepath.Clean(plan.Target)
 			zqkPrefix := filepath.Clean(filepath.Join(e.ProjectRoot, paths.ProjectDataDir))
 			if strings.HasPrefix(cleanTarget, zqkPrefix) {
-				f, err := os.OpenFile(cleanTarget, os.O_RDWR|os.O_CREATE, paths.FilePerm644)
+				f, err := fileutil.OpenFile(cleanTarget, fileutil.O_RDWR|fileutil.O_CREATE, paths.FilePerm644)
 				if err != nil {
 					outcome.Error = err.Error()
 				} else {
 					_ = f.Close()
 					currentTime := time.Now().Local()
-					_ = os.Chtimes(cleanTarget, currentTime, currentTime)
+					_ = fileutil.Chtimes(cleanTarget, currentTime, currentTime)
 					outcome.Applied = true
 					outcome.Detail = fmt.Sprintf("touched %s", filepath.Base(cleanTarget))
 					report.TotalApplied++

@@ -2,7 +2,6 @@ package system_test
 
 import (
 	"context"
-	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -10,33 +9,34 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/system"
 	"github.com/zqk-os/zqk/pkg/systemcheck"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestAutoRemedy_DiagnoseStaleLocksAndTemps(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	zqkDir := filepath.Join(tmpDir, paths.ProjectDataDir)
-	if err := os.MkdirAll(zqkDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(zqkDir, paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create .zqk dir: %v", err)
 	}
 
 	// Create a stale lock file (older than DefaultLockStaleAge 15m)
 	staleLock := filepath.Join(zqkDir, "test.lock")
-	if err := os.WriteFile(staleLock, []byte("lock content"), 0644); err != nil {
+	if err := fileutil.WriteFile(staleLock, []byte("lock content"), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to create stale lock: %v", err)
 	}
 	oldTime := time.Now().Add(-20 * time.Minute)
-	if err := os.Chtimes(staleLock, oldTime, oldTime); err != nil {
+	if err := fileutil.Chtimes(staleLock, oldTime, oldTime); err != nil {
 		t.Fatalf("failed to set stale lock modtime: %v", err)
 	}
 
 	// Create an orphaned temp file (older than DefaultTempOrphanAge 30m)
 	orphanTmp := filepath.Join(zqkDir, "test.tmp")
-	if err := os.WriteFile(orphanTmp, []byte("temp content"), 0644); err != nil {
+	if err := fileutil.WriteFile(orphanTmp, []byte("temp content"), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to create orphan tmp: %v", err)
 	}
 	veryOldTime := time.Now().Add(-45 * time.Minute)
-	if err := os.Chtimes(orphanTmp, veryOldTime, veryOldTime); err != nil {
+	if err := fileutil.Chtimes(orphanTmp, veryOldTime, veryOldTime); err != nil {
 		t.Fatalf("failed to set orphan tmp modtime: %v", err)
 	}
 
@@ -77,10 +77,10 @@ func TestAutoRemedy_DiagnoseStaleLocksAndTemps(t *testing.T) {
 	}
 
 	// Verify files are cleaned up
-	if _, err := os.Stat(staleLock); !os.IsNotExist(err) {
+	if _, err := fileutil.Stat(staleLock); !fileutil.IsNotExist(err) {
 		t.Errorf("expected stale lock to be deleted, stat err: %v", err)
 	}
-	if _, err := os.Stat(orphanTmp); !os.IsNotExist(err) {
+	if _, err := fileutil.Stat(orphanTmp); !fileutil.IsNotExist(err) {
 		t.Errorf("expected orphan tmp to be deleted, stat err: %v", err)
 	}
 }

@@ -12,6 +12,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // CommandExecutor represents the interface for launching subprocesses.
@@ -225,7 +226,7 @@ func (s *Supervisor) launchDaemonLocked(ctx context.Context, spec *DaemonSpec, s
 		args = spec.Command[1:]
 	}
 
-	selfExe, err := os.Executable()
+	selfExe, err := fileutil.Executable()
 	if err != nil || selfExe == "" {
 		selfExe = filepath.Join(s.projectRoot, "bin", brand.ExecutableName())
 	}
@@ -234,7 +235,7 @@ func (s *Supervisor) launchDaemonLocked(ctx context.Context, spec *DaemonSpec, s
 		exe = selfExe
 	} else if !filepath.IsAbs(exe) {
 		binCandidate := filepath.Join(s.projectRoot, "bin", exe)
-		if _, err := os.Stat(binCandidate); err == nil {
+		if fileutil.Exists(binCandidate) {
 			exe = binCandidate
 		} else if _, err := exec.LookPath(exe); err != nil {
 			// Subcommand of zqk (e.g. "scheduler", "ambient", "object", "kernel")

@@ -343,14 +343,21 @@ type GetConnectionReply struct {
 	ErrStr string
 }
 
+// invokeRPC sends an RPC request and validates both network errors and application error strings.
+func invokeRPC(client *rpc.Client, method string, args any, reply any, errStr *string) error {
+	if err := client.Call(method, args, reply); err != nil {
+		return err
+	}
+	if *errStr != "" {
+		return fmt.Errorf("%s", *errStr)
+	}
+	return nil
+}
+
 func (p *RPCConnectionPool) GetConnection(ctx context.Context) (provider.GraphConnection, error) {
 	var reply GetConnectionReply
-	err := p.client.Call("GraphRPC.GetConnection", GetConnectionArgs{}, &reply)
-	if err != nil {
+	if err := invokeRPC(p.client, "GraphRPC.GetConnection", GetConnectionArgs{}, &reply, &reply.ErrStr); err != nil {
 		return nil, err
-	}
-	if reply.ErrStr != "" {
-		return nil, fmt.Errorf("%s", reply.ErrStr)
 	}
 	return &RPCConnection{client: p.client, connID: reply.ConnID}, nil
 }
@@ -364,14 +371,7 @@ func (p *RPCConnectionPool) ReturnConnection(conn provider.GraphConnection) erro
 		return nil
 	}
 	var reply ReturnConnectionReply
-	err := p.client.Call("GraphRPC.ReturnConnection", ReturnConnectionArgs{ConnID: c.connID}, &reply)
-	if err != nil {
-		return err
-	}
-	if reply.ErrStr != "" {
-		return fmt.Errorf("%s", reply.ErrStr)
-	}
-	return nil
+	return invokeRPC(p.client, "GraphRPC.ReturnConnection", ReturnConnectionArgs{ConnID: c.connID}, &reply, &reply.ErrStr)
 }
 
 func (p *RPCConnectionPool) Execute(ctx context.Context, fn func(conn provider.GraphConnection) error) error {
@@ -403,180 +403,102 @@ type RPCConnection struct {
 
 func (c *RPCConnection) CreateNode(ctx context.Context, node provider.Node) error {
 	var reply ConnCreateNodeReply
-	err := c.client.Call("GraphRPC.ConnCreateNode", ConnCreateNodeArgs{TargetID: c.connID, Node: node}, &reply)
-	if err != nil {
-		return err
-	}
-	if reply.ErrStr != "" {
-		return fmt.Errorf("%s", reply.ErrStr)
-	}
-	return nil
+	return invokeRPC(c.client, "GraphRPC.ConnCreateNode", ConnCreateNodeArgs{TargetID: c.connID, Node: node}, &reply, &reply.ErrStr)
 }
 
 func (c *RPCConnection) GetNode(ctx context.Context, id string, labels []string) (*provider.Node, error) {
 	var reply ConnGetNodeReply
-	err := c.client.Call("GraphRPC.ConnGetNode", ConnGetNodeArgs{TargetID: c.connID, Id: id, Labels: labels}, &reply)
-	if err != nil {
+	if err := invokeRPC(c.client, "GraphRPC.ConnGetNode", ConnGetNodeArgs{TargetID: c.connID, Id: id, Labels: labels}, &reply, &reply.ErrStr); err != nil {
 		return nil, err
-	}
-	if reply.ErrStr != "" {
-		return nil, fmt.Errorf("%s", reply.ErrStr)
 	}
 	return reply.Val, nil
 }
 
 func (c *RPCConnection) UpdateNode(ctx context.Context, id string, updates provider.NodeUpdates) error {
 	var reply ConnUpdateNodeReply
-	err := c.client.Call("GraphRPC.ConnUpdateNode", ConnUpdateNodeArgs{TargetID: c.connID, Id: id, Updates: updates}, &reply)
-	if err != nil {
-		return err
-	}
-	if reply.ErrStr != "" {
-		return fmt.Errorf("%s", reply.ErrStr)
-	}
-	return nil
+	return invokeRPC(c.client, "GraphRPC.ConnUpdateNode", ConnUpdateNodeArgs{TargetID: c.connID, Id: id, Updates: updates}, &reply, &reply.ErrStr)
 }
 
 func (c *RPCConnection) DeleteNode(ctx context.Context, id string, labels []string) error {
 	var reply ConnDeleteNodeReply
-	err := c.client.Call("GraphRPC.ConnDeleteNode", ConnDeleteNodeArgs{TargetID: c.connID, Id: id, Labels: labels}, &reply)
-	if err != nil {
-		return err
-	}
-	if reply.ErrStr != "" {
-		return fmt.Errorf("%s", reply.ErrStr)
-	}
-	return nil
+	return invokeRPC(c.client, "GraphRPC.ConnDeleteNode", ConnDeleteNodeArgs{TargetID: c.connID, Id: id, Labels: labels}, &reply, &reply.ErrStr)
 }
 
 func (c *RPCConnection) ListNodes(ctx context.Context, filter provider.NodeFilter) ([]*provider.Node, error) {
 	var reply ConnListNodesReply
-	err := c.client.Call("GraphRPC.ConnListNodes", ConnListNodesArgs{TargetID: c.connID, Filter: filter}, &reply)
-	if err != nil {
+	if err := invokeRPC(c.client, "GraphRPC.ConnListNodes", ConnListNodesArgs{TargetID: c.connID, Filter: filter}, &reply, &reply.ErrStr); err != nil {
 		return nil, err
-	}
-	if reply.ErrStr != "" {
-		return nil, fmt.Errorf("%s", reply.ErrStr)
 	}
 	return reply.Val, nil
 }
 
 func (c *RPCConnection) CreateEdge(ctx context.Context, edge provider.Edge) error {
 	var reply ConnCreateEdgeReply
-	err := c.client.Call("GraphRPC.ConnCreateEdge", ConnCreateEdgeArgs{TargetID: c.connID, Edge: edge}, &reply)
-	if err != nil {
-		return err
-	}
-	if reply.ErrStr != "" {
-		return fmt.Errorf("%s", reply.ErrStr)
-	}
-	return nil
+	return invokeRPC(c.client, "GraphRPC.ConnCreateEdge", ConnCreateEdgeArgs{TargetID: c.connID, Edge: edge}, &reply, &reply.ErrStr)
 }
 
 func (c *RPCConnection) GetEdge(ctx context.Context, fromID string, toID string, edgeType string) (*provider.Edge, error) {
 	var reply ConnGetEdgeReply
-	err := c.client.Call("GraphRPC.ConnGetEdge", ConnGetEdgeArgs{TargetID: c.connID, Fromid: fromID, Toid: toID, Edgetype: edgeType}, &reply)
-	if err != nil {
+	if err := invokeRPC(c.client, "GraphRPC.ConnGetEdge", ConnGetEdgeArgs{TargetID: c.connID, Fromid: fromID, Toid: toID, Edgetype: edgeType}, &reply, &reply.ErrStr); err != nil {
 		return nil, err
-	}
-	if reply.ErrStr != "" {
-		return nil, fmt.Errorf("%s", reply.ErrStr)
 	}
 	return reply.Val, nil
 }
 
 func (c *RPCConnection) UpdateEdge(ctx context.Context, fromID string, toID string, edgeType string, updates provider.EdgeUpdates) error {
 	var reply ConnUpdateEdgeReply
-	err := c.client.Call("GraphRPC.ConnUpdateEdge", ConnUpdateEdgeArgs{TargetID: c.connID, Fromid: fromID, Toid: toID, Edgetype: edgeType, Updates: updates}, &reply)
-	if err != nil {
-		return err
-	}
-	if reply.ErrStr != "" {
-		return fmt.Errorf("%s", reply.ErrStr)
-	}
-	return nil
+	return invokeRPC(c.client, "GraphRPC.ConnUpdateEdge", ConnUpdateEdgeArgs{TargetID: c.connID, Fromid: fromID, Toid: toID, Edgetype: edgeType, Updates: updates}, &reply, &reply.ErrStr)
 }
 
 func (c *RPCConnection) DeleteEdge(ctx context.Context, fromID string, toID string, edgeType string) error {
 	var reply ConnDeleteEdgeReply
-	err := c.client.Call("GraphRPC.ConnDeleteEdge", ConnDeleteEdgeArgs{TargetID: c.connID, Fromid: fromID, Toid: toID, Edgetype: edgeType}, &reply)
-	if err != nil {
-		return err
-	}
-	if reply.ErrStr != "" {
-		return fmt.Errorf("%s", reply.ErrStr)
-	}
-	return nil
+	return invokeRPC(c.client, "GraphRPC.ConnDeleteEdge", ConnDeleteEdgeArgs{TargetID: c.connID, Fromid: fromID, Toid: toID, Edgetype: edgeType}, &reply, &reply.ErrStr)
 }
 
 func (c *RPCConnection) ListEdges(ctx context.Context, filter provider.EdgeFilter) ([]*provider.Edge, error) {
 	var reply ConnListEdgesReply
-	err := c.client.Call("GraphRPC.ConnListEdges", ConnListEdgesArgs{TargetID: c.connID, Filter: filter}, &reply)
-	if err != nil {
+	if err := invokeRPC(c.client, "GraphRPC.ConnListEdges", ConnListEdgesArgs{TargetID: c.connID, Filter: filter}, &reply, &reply.ErrStr); err != nil {
 		return nil, err
-	}
-	if reply.ErrStr != "" {
-		return nil, fmt.Errorf("%s", reply.ErrStr)
 	}
 	return reply.Val, nil
 }
 
 func (c *RPCConnection) ExecuteQuery(ctx context.Context, query provider.Query) (*provider.QueryResult, error) {
 	var reply ConnExecuteQueryReply
-	err := c.client.Call("GraphRPC.ConnExecuteQuery", ConnExecuteQueryArgs{TargetID: c.connID, Query: query}, &reply)
-	if err != nil {
+	if err := invokeRPC(c.client, "GraphRPC.ConnExecuteQuery", ConnExecuteQueryArgs{TargetID: c.connID, Query: query}, &reply, &reply.ErrStr); err != nil {
 		return nil, err
-	}
-	if reply.ErrStr != "" {
-		return nil, fmt.Errorf("%s", reply.ErrStr)
 	}
 	return reply.Val, nil
 }
 
 func (c *RPCConnection) ExecuteVectorQuery(ctx context.Context, query provider.VectorQuery) (*provider.QueryResult, error) {
 	var reply ConnExecuteVectorQueryReply
-	err := c.client.Call("GraphRPC.ConnExecuteVectorQuery", ConnExecuteVectorQueryArgs{TargetID: c.connID, Query: query}, &reply)
-	if err != nil {
+	if err := invokeRPC(c.client, "GraphRPC.ConnExecuteVectorQuery", ConnExecuteVectorQueryArgs{TargetID: c.connID, Query: query}, &reply, &reply.ErrStr); err != nil {
 		return nil, err
-	}
-	if reply.ErrStr != "" {
-		return nil, fmt.Errorf("%s", reply.ErrStr)
 	}
 	return reply.Val, nil
 }
 
 func (c *RPCConnection) ExecuteTraversal(ctx context.Context, traversal provider.TraversalQuery) (*provider.QueryResult, error) {
 	var reply ConnExecuteTraversalReply
-	err := c.client.Call("GraphRPC.ConnExecuteTraversal", ConnExecuteTraversalArgs{TargetID: c.connID, Traversal: traversal}, &reply)
-	if err != nil {
+	if err := invokeRPC(c.client, "GraphRPC.ConnExecuteTraversal", ConnExecuteTraversalArgs{TargetID: c.connID, Traversal: traversal}, &reply, &reply.ErrStr); err != nil {
 		return nil, err
-	}
-	if reply.ErrStr != "" {
-		return nil, fmt.Errorf("%s", reply.ErrStr)
 	}
 	return reply.Val, nil
 }
 
 func (c *RPCConnection) BeginTransaction(ctx context.Context) (provider.GraphTransaction, error) {
 	var reply ConnBeginTransactionReply
-	err := c.client.Call("GraphRPC.ConnBeginTransaction", ConnBeginTransactionArgs{TargetID: c.connID}, &reply)
-	if err != nil {
+	if err := invokeRPC(c.client, "GraphRPC.ConnBeginTransaction", ConnBeginTransactionArgs{TargetID: c.connID}, &reply, &reply.ErrStr); err != nil {
 		return nil, err
-	}
-	if reply.ErrStr != "" {
-		return nil, fmt.Errorf("%s", reply.ErrStr)
 	}
 	return &RPCTransaction{client: c.client, txID: reply.Val}, nil
 }
 
 func (c *RPCConnection) BeginNestedTransaction(ctx context.Context, parent provider.GraphTransaction) (provider.GraphTransaction, error) {
 	var reply ConnBeginNestedTransactionReply
-	err := c.client.Call("GraphRPC.ConnBeginNestedTransaction", ConnBeginNestedTransactionArgs{TargetID: c.connID, Parent: parent.(*RPCTransaction).txID}, &reply)
-	if err != nil {
+	if err := invokeRPC(c.client, "GraphRPC.ConnBeginNestedTransaction", ConnBeginNestedTransactionArgs{TargetID: c.connID, Parent: parent.(*RPCTransaction).txID}, &reply, &reply.ErrStr); err != nil {
 		return nil, err
-	}
-	if reply.ErrStr != "" {
-		return nil, fmt.Errorf("%s", reply.ErrStr)
 	}
 	return &RPCTransaction{client: c.client, txID: reply.Val}, nil
 }
@@ -601,36 +523,18 @@ func (c *RPCConnection) GetOpenTransaction() provider.GraphTransaction {
 
 func (c *RPCConnection) HealthCheck(ctx context.Context) error {
 	var reply ConnHealthCheckReply
-	err := c.client.Call("GraphRPC.ConnHealthCheck", ConnHealthCheckArgs{TargetID: c.connID}, &reply)
-	if err != nil {
-		return err
-	}
-	if reply.ErrStr != "" {
-		return fmt.Errorf("%s", reply.ErrStr)
-	}
-	return nil
+	return invokeRPC(c.client, "GraphRPC.ConnHealthCheck", ConnHealthCheckArgs{TargetID: c.connID}, &reply, &reply.ErrStr)
 }
 
 func (c *RPCConnection) Close() error {
 	var reply ConnCloseReply
-	err := c.client.Call("GraphRPC.ConnClose", ConnCloseArgs{TargetID: c.connID}, &reply)
-	if err != nil {
-		return err
-	}
-	if reply.ErrStr != "" {
-		return fmt.Errorf("%s", reply.ErrStr)
-	}
-	return nil
+	return invokeRPC(c.client, "GraphRPC.ConnClose", ConnCloseArgs{TargetID: c.connID}, &reply, &reply.ErrStr)
 }
 
 func (c *RPCConnection) ExecuteBatch(ctx context.Context, operations []provider.Operation) (*provider.BatchResult, error) {
 	var reply ConnExecuteBatchReply
-	err := c.client.Call("GraphRPC.ConnExecuteBatch", ConnExecuteBatchArgs{TargetID: c.connID, Operations: operations}, &reply)
-	if err != nil {
+	if err := invokeRPC(c.client, "GraphRPC.ConnExecuteBatch", ConnExecuteBatchArgs{TargetID: c.connID, Operations: operations}, &reply, &reply.ErrStr); err != nil {
 		return nil, err
-	}
-	if reply.ErrStr != "" {
-		return nil, fmt.Errorf("%s", reply.ErrStr)
 	}
 	return reply.Val, nil
 }
@@ -642,120 +546,62 @@ type RPCTransaction struct {
 
 func (c *RPCTransaction) CreateNode(ctx context.Context, node provider.Node) error {
 	var reply TxCreateNodeReply
-	err := c.client.Call("GraphRPC.TxCreateNode", TxCreateNodeArgs{TargetID: c.txID, Node: node}, &reply)
-	if err != nil {
-		return err
-	}
-	if reply.ErrStr != "" {
-		return fmt.Errorf("%s", reply.ErrStr)
-	}
-	return nil
+	return invokeRPC(c.client, "GraphRPC.TxCreateNode", TxCreateNodeArgs{TargetID: c.txID, Node: node}, &reply, &reply.ErrStr)
 }
 
 func (c *RPCTransaction) GetNode(ctx context.Context, id string, labels []string) (*provider.Node, error) {
 	var reply TxGetNodeReply
-	err := c.client.Call("GraphRPC.TxGetNode", TxGetNodeArgs{TargetID: c.txID, Id: id, Labels: labels}, &reply)
-	if err != nil {
+	if err := invokeRPC(c.client, "GraphRPC.TxGetNode", TxGetNodeArgs{TargetID: c.txID, Id: id, Labels: labels}, &reply, &reply.ErrStr); err != nil {
 		return nil, err
-	}
-	if reply.ErrStr != "" {
-		return nil, fmt.Errorf("%s", reply.ErrStr)
 	}
 	return reply.Val, nil
 }
 
 func (c *RPCTransaction) UpdateNode(ctx context.Context, id string, updates provider.NodeUpdates) error {
 	var reply TxUpdateNodeReply
-	err := c.client.Call("GraphRPC.TxUpdateNode", TxUpdateNodeArgs{TargetID: c.txID, Id: id, Updates: updates}, &reply)
-	if err != nil {
-		return err
-	}
-	if reply.ErrStr != "" {
-		return fmt.Errorf("%s", reply.ErrStr)
-	}
-	return nil
+	return invokeRPC(c.client, "GraphRPC.TxUpdateNode", TxUpdateNodeArgs{TargetID: c.txID, Id: id, Updates: updates}, &reply, &reply.ErrStr)
 }
 
 func (c *RPCTransaction) DeleteNode(ctx context.Context, id string, labels []string) error {
 	var reply TxDeleteNodeReply
-	err := c.client.Call("GraphRPC.TxDeleteNode", TxDeleteNodeArgs{TargetID: c.txID, Id: id, Labels: labels}, &reply)
-	if err != nil {
-		return err
-	}
-	if reply.ErrStr != "" {
-		return fmt.Errorf("%s", reply.ErrStr)
-	}
-	return nil
+	return invokeRPC(c.client, "GraphRPC.TxDeleteNode", TxDeleteNodeArgs{TargetID: c.txID, Id: id, Labels: labels}, &reply, &reply.ErrStr)
 }
 
 func (c *RPCTransaction) CreateEdge(ctx context.Context, edge provider.Edge) error {
 	var reply TxCreateEdgeReply
-	err := c.client.Call("GraphRPC.TxCreateEdge", TxCreateEdgeArgs{TargetID: c.txID, Edge: edge}, &reply)
-	if err != nil {
-		return err
-	}
-	if reply.ErrStr != "" {
-		return fmt.Errorf("%s", reply.ErrStr)
-	}
-	return nil
+	return invokeRPC(c.client, "GraphRPC.TxCreateEdge", TxCreateEdgeArgs{TargetID: c.txID, Edge: edge}, &reply, &reply.ErrStr)
 }
 
 func (c *RPCTransaction) GetEdge(ctx context.Context, fromID string, toID string, edgeType string) (*provider.Edge, error) {
 	var reply TxGetEdgeReply
-	err := c.client.Call("GraphRPC.TxGetEdge", TxGetEdgeArgs{TargetID: c.txID, Fromid: fromID, Toid: toID, Edgetype: edgeType}, &reply)
-	if err != nil {
+	if err := invokeRPC(c.client, "GraphRPC.TxGetEdge", TxGetEdgeArgs{TargetID: c.txID, Fromid: fromID, Toid: toID, Edgetype: edgeType}, &reply, &reply.ErrStr); err != nil {
 		return nil, err
-	}
-	if reply.ErrStr != "" {
-		return nil, fmt.Errorf("%s", reply.ErrStr)
 	}
 	return reply.Val, nil
 }
 
 func (c *RPCTransaction) UpdateEdge(ctx context.Context, fromID string, toID string, edgeType string, updates provider.EdgeUpdates) error {
 	var reply TxUpdateEdgeReply
-	err := c.client.Call("GraphRPC.TxUpdateEdge", TxUpdateEdgeArgs{TargetID: c.txID, Fromid: fromID, Toid: toID, Edgetype: edgeType, Updates: updates}, &reply)
-	if err != nil {
-		return err
-	}
-	if reply.ErrStr != "" {
-		return fmt.Errorf("%s", reply.ErrStr)
-	}
-	return nil
+	return invokeRPC(c.client, "GraphRPC.TxUpdateEdge", TxUpdateEdgeArgs{TargetID: c.txID, Fromid: fromID, Toid: toID, Edgetype: edgeType, Updates: updates}, &reply, &reply.ErrStr)
 }
 
 func (c *RPCTransaction) DeleteEdge(ctx context.Context, fromID string, toID string, edgeType string) error {
 	var reply TxDeleteEdgeReply
-	err := c.client.Call("GraphRPC.TxDeleteEdge", TxDeleteEdgeArgs{TargetID: c.txID, Fromid: fromID, Toid: toID, Edgetype: edgeType}, &reply)
-	if err != nil {
-		return err
-	}
-	if reply.ErrStr != "" {
-		return fmt.Errorf("%s", reply.ErrStr)
-	}
-	return nil
+	return invokeRPC(c.client, "GraphRPC.TxDeleteEdge", TxDeleteEdgeArgs{TargetID: c.txID, Fromid: fromID, Toid: toID, Edgetype: edgeType}, &reply, &reply.ErrStr)
 }
 
 func (c *RPCTransaction) ExecuteQuery(ctx context.Context, query provider.Query) (*provider.QueryResult, error) {
 	var reply TxExecuteQueryReply
-	err := c.client.Call("GraphRPC.TxExecuteQuery", TxExecuteQueryArgs{TargetID: c.txID, Query: query}, &reply)
-	if err != nil {
+	if err := invokeRPC(c.client, "GraphRPC.TxExecuteQuery", TxExecuteQueryArgs{TargetID: c.txID, Query: query}, &reply, &reply.ErrStr); err != nil {
 		return nil, err
-	}
-	if reply.ErrStr != "" {
-		return nil, fmt.Errorf("%s", reply.ErrStr)
 	}
 	return reply.Val, nil
 }
 
 func (c *RPCTransaction) BeginNestedTransaction(ctx context.Context) (provider.GraphTransaction, error) {
 	var reply TxBeginNestedTransactionReply
-	err := c.client.Call("GraphRPC.TxBeginNestedTransaction", TxBeginNestedTransactionArgs{TargetID: c.txID}, &reply)
-	if err != nil {
+	if err := invokeRPC(c.client, "GraphRPC.TxBeginNestedTransaction", TxBeginNestedTransactionArgs{TargetID: c.txID}, &reply, &reply.ErrStr); err != nil {
 		return nil, err
-	}
-	if reply.ErrStr != "" {
-		return nil, fmt.Errorf("%s", reply.ErrStr)
 	}
 	return &RPCTransaction{client: c.client, txID: reply.Val}, nil
 }
@@ -771,26 +617,12 @@ func (c *RPCTransaction) SupportsNestedTransactions() bool {
 
 func (c *RPCTransaction) Commit(ctx context.Context) error {
 	var reply TxCommitReply
-	err := c.client.Call("GraphRPC.TxCommit", TxCommitArgs{TargetID: c.txID}, &reply)
-	if err != nil {
-		return err
-	}
-	if reply.ErrStr != "" {
-		return fmt.Errorf("%s", reply.ErrStr)
-	}
-	return nil
+	return invokeRPC(c.client, "GraphRPC.TxCommit", TxCommitArgs{TargetID: c.txID}, &reply, &reply.ErrStr)
 }
 
 func (c *RPCTransaction) Rollback(ctx context.Context) error {
 	var reply TxRollbackReply
-	err := c.client.Call("GraphRPC.TxRollback", TxRollbackArgs{TargetID: c.txID}, &reply)
-	if err != nil {
-		return err
-	}
-	if reply.ErrStr != "" {
-		return fmt.Errorf("%s", reply.ErrStr)
-	}
-	return nil
+	return invokeRPC(c.client, "GraphRPC.TxRollback", TxRollbackArgs{TargetID: c.txID}, &reply, &reply.ErrStr)
 }
 
 func (c *RPCTransaction) IsCommitted() bool {
@@ -871,12 +703,30 @@ func (s *GraphRPC) Stats(args *StatsArgs, reply *StatsReply) error {
 	return nil
 }
 
-func (s *GraphRPC) ConnCreateNode(args *ConnCreateNodeArgs, reply *ConnCreateNodeReply) error {
+func (s *GraphRPC) getConn(targetID int64) (provider.GraphConnection, string) {
 	s.mu.Lock()
-	target := s.conns[args.TargetID]
-	s.mu.Unlock()
+	defer s.mu.Unlock()
+	target := s.conns[targetID]
 	if target == nil {
-		reply.ErrStr = "target not found"
+		return nil, "target not found"
+	}
+	return target, ""
+}
+
+func (s *GraphRPC) getTx(targetID int64) (provider.GraphTransaction, string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	target := s.txs[targetID]
+	if target == nil {
+		return nil, "target not found"
+	}
+	return target, ""
+}
+
+func (s *GraphRPC) ConnCreateNode(args *ConnCreateNodeArgs, reply *ConnCreateNodeReply) error {
+	target, errStr := s.getConn(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	err := target.CreateNode(context.Background(), args.Node)
@@ -887,11 +737,9 @@ func (s *GraphRPC) ConnCreateNode(args *ConnCreateNodeArgs, reply *ConnCreateNod
 }
 
 func (s *GraphRPC) ConnGetNode(args *ConnGetNodeArgs, reply *ConnGetNodeReply) error {
-	s.mu.Lock()
-	target := s.conns[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getConn(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	val, err := target.GetNode(context.Background(), args.Id, args.Labels)
@@ -904,11 +752,9 @@ func (s *GraphRPC) ConnGetNode(args *ConnGetNodeArgs, reply *ConnGetNodeReply) e
 }
 
 func (s *GraphRPC) ConnUpdateNode(args *ConnUpdateNodeArgs, reply *ConnUpdateNodeReply) error {
-	s.mu.Lock()
-	target := s.conns[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getConn(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	err := target.UpdateNode(context.Background(), args.Id, args.Updates)
@@ -919,11 +765,9 @@ func (s *GraphRPC) ConnUpdateNode(args *ConnUpdateNodeArgs, reply *ConnUpdateNod
 }
 
 func (s *GraphRPC) ConnDeleteNode(args *ConnDeleteNodeArgs, reply *ConnDeleteNodeReply) error {
-	s.mu.Lock()
-	target := s.conns[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getConn(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	err := target.DeleteNode(context.Background(), args.Id, args.Labels)
@@ -934,11 +778,9 @@ func (s *GraphRPC) ConnDeleteNode(args *ConnDeleteNodeArgs, reply *ConnDeleteNod
 }
 
 func (s *GraphRPC) ConnListNodes(args *ConnListNodesArgs, reply *ConnListNodesReply) error {
-	s.mu.Lock()
-	target := s.conns[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getConn(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	val, err := target.ListNodes(context.Background(), args.Filter)
@@ -951,11 +793,9 @@ func (s *GraphRPC) ConnListNodes(args *ConnListNodesArgs, reply *ConnListNodesRe
 }
 
 func (s *GraphRPC) ConnCreateEdge(args *ConnCreateEdgeArgs, reply *ConnCreateEdgeReply) error {
-	s.mu.Lock()
-	target := s.conns[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getConn(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	err := target.CreateEdge(context.Background(), args.Edge)
@@ -966,11 +806,9 @@ func (s *GraphRPC) ConnCreateEdge(args *ConnCreateEdgeArgs, reply *ConnCreateEdg
 }
 
 func (s *GraphRPC) ConnGetEdge(args *ConnGetEdgeArgs, reply *ConnGetEdgeReply) error {
-	s.mu.Lock()
-	target := s.conns[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getConn(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	val, err := target.GetEdge(context.Background(), args.Fromid, args.Toid, args.Edgetype)
@@ -983,11 +821,9 @@ func (s *GraphRPC) ConnGetEdge(args *ConnGetEdgeArgs, reply *ConnGetEdgeReply) e
 }
 
 func (s *GraphRPC) ConnUpdateEdge(args *ConnUpdateEdgeArgs, reply *ConnUpdateEdgeReply) error {
-	s.mu.Lock()
-	target := s.conns[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getConn(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	err := target.UpdateEdge(context.Background(), args.Fromid, args.Toid, args.Edgetype, args.Updates)
@@ -998,11 +834,9 @@ func (s *GraphRPC) ConnUpdateEdge(args *ConnUpdateEdgeArgs, reply *ConnUpdateEdg
 }
 
 func (s *GraphRPC) ConnDeleteEdge(args *ConnDeleteEdgeArgs, reply *ConnDeleteEdgeReply) error {
-	s.mu.Lock()
-	target := s.conns[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getConn(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	err := target.DeleteEdge(context.Background(), args.Fromid, args.Toid, args.Edgetype)
@@ -1013,11 +847,9 @@ func (s *GraphRPC) ConnDeleteEdge(args *ConnDeleteEdgeArgs, reply *ConnDeleteEdg
 }
 
 func (s *GraphRPC) ConnListEdges(args *ConnListEdgesArgs, reply *ConnListEdgesReply) error {
-	s.mu.Lock()
-	target := s.conns[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getConn(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	val, err := target.ListEdges(context.Background(), args.Filter)
@@ -1030,11 +862,9 @@ func (s *GraphRPC) ConnListEdges(args *ConnListEdgesArgs, reply *ConnListEdgesRe
 }
 
 func (s *GraphRPC) ConnExecuteQuery(args *ConnExecuteQueryArgs, reply *ConnExecuteQueryReply) error {
-	s.mu.Lock()
-	target := s.conns[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getConn(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	val, err := target.ExecuteQuery(context.Background(), args.Query)
@@ -1047,11 +877,9 @@ func (s *GraphRPC) ConnExecuteQuery(args *ConnExecuteQueryArgs, reply *ConnExecu
 }
 
 func (s *GraphRPC) ConnExecuteVectorQuery(args *ConnExecuteVectorQueryArgs, reply *ConnExecuteVectorQueryReply) error {
-	s.mu.Lock()
-	target := s.conns[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getConn(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	val, err := target.ExecuteVectorQuery(context.Background(), args.Query)
@@ -1064,11 +892,9 @@ func (s *GraphRPC) ConnExecuteVectorQuery(args *ConnExecuteVectorQueryArgs, repl
 }
 
 func (s *GraphRPC) ConnExecuteTraversal(args *ConnExecuteTraversalArgs, reply *ConnExecuteTraversalReply) error {
-	s.mu.Lock()
-	target := s.conns[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getConn(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	val, err := target.ExecuteTraversal(context.Background(), args.Traversal)
@@ -1081,11 +907,9 @@ func (s *GraphRPC) ConnExecuteTraversal(args *ConnExecuteTraversalArgs, reply *C
 }
 
 func (s *GraphRPC) ConnBeginTransaction(args *ConnBeginTransactionArgs, reply *ConnBeginTransactionReply) error {
-	s.mu.Lock()
-	target := s.conns[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getConn(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	val, err := target.BeginTransaction(context.Background())
@@ -1103,11 +927,9 @@ func (s *GraphRPC) ConnBeginTransaction(args *ConnBeginTransactionArgs, reply *C
 }
 
 func (s *GraphRPC) ConnBeginNestedTransaction(args *ConnBeginNestedTransactionArgs, reply *ConnBeginNestedTransactionReply) error {
-	s.mu.Lock()
-	target := s.conns[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getConn(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	s.mu.Lock()
@@ -1128,11 +950,9 @@ func (s *GraphRPC) ConnBeginNestedTransaction(args *ConnBeginNestedTransactionAr
 }
 
 func (s *GraphRPC) ConnHasOpenTransaction(args *ConnHasOpenTransactionArgs, reply *ConnHasOpenTransactionReply) error {
-	s.mu.Lock()
-	target := s.conns[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getConn(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	reply.Val = target.HasOpenTransaction()
@@ -1140,11 +960,9 @@ func (s *GraphRPC) ConnHasOpenTransaction(args *ConnHasOpenTransactionArgs, repl
 }
 
 func (s *GraphRPC) ConnGetOpenTransaction(args *ConnGetOpenTransactionArgs, reply *ConnGetOpenTransactionReply) error {
-	s.mu.Lock()
-	target := s.conns[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getConn(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	val := target.GetOpenTransaction()
@@ -1158,11 +976,9 @@ func (s *GraphRPC) ConnGetOpenTransaction(args *ConnGetOpenTransactionArgs, repl
 }
 
 func (s *GraphRPC) ConnHealthCheck(args *ConnHealthCheckArgs, reply *ConnHealthCheckReply) error {
-	s.mu.Lock()
-	target := s.conns[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getConn(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	err := target.HealthCheck(context.Background())
@@ -1173,11 +989,9 @@ func (s *GraphRPC) ConnHealthCheck(args *ConnHealthCheckArgs, reply *ConnHealthC
 }
 
 func (s *GraphRPC) ConnClose(args *ConnCloseArgs, reply *ConnCloseReply) error {
-	s.mu.Lock()
-	target := s.conns[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getConn(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	err := target.Close()
@@ -1188,11 +1002,9 @@ func (s *GraphRPC) ConnClose(args *ConnCloseArgs, reply *ConnCloseReply) error {
 }
 
 func (s *GraphRPC) ConnExecuteBatch(args *ConnExecuteBatchArgs, reply *ConnExecuteBatchReply) error {
-	s.mu.Lock()
-	target := s.conns[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getConn(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	val, err := target.ExecuteBatch(context.Background(), args.Operations)
@@ -1205,11 +1017,9 @@ func (s *GraphRPC) ConnExecuteBatch(args *ConnExecuteBatchArgs, reply *ConnExecu
 }
 
 func (s *GraphRPC) TxCreateNode(args *TxCreateNodeArgs, reply *TxCreateNodeReply) error {
-	s.mu.Lock()
-	target := s.txs[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getTx(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	err := target.CreateNode(context.Background(), args.Node)
@@ -1220,11 +1030,9 @@ func (s *GraphRPC) TxCreateNode(args *TxCreateNodeArgs, reply *TxCreateNodeReply
 }
 
 func (s *GraphRPC) TxGetNode(args *TxGetNodeArgs, reply *TxGetNodeReply) error {
-	s.mu.Lock()
-	target := s.txs[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getTx(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	val, err := target.GetNode(context.Background(), args.Id, args.Labels)
@@ -1237,11 +1045,9 @@ func (s *GraphRPC) TxGetNode(args *TxGetNodeArgs, reply *TxGetNodeReply) error {
 }
 
 func (s *GraphRPC) TxUpdateNode(args *TxUpdateNodeArgs, reply *TxUpdateNodeReply) error {
-	s.mu.Lock()
-	target := s.txs[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getTx(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	err := target.UpdateNode(context.Background(), args.Id, args.Updates)
@@ -1252,11 +1058,9 @@ func (s *GraphRPC) TxUpdateNode(args *TxUpdateNodeArgs, reply *TxUpdateNodeReply
 }
 
 func (s *GraphRPC) TxDeleteNode(args *TxDeleteNodeArgs, reply *TxDeleteNodeReply) error {
-	s.mu.Lock()
-	target := s.txs[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getTx(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	err := target.DeleteNode(context.Background(), args.Id, args.Labels)
@@ -1267,11 +1071,9 @@ func (s *GraphRPC) TxDeleteNode(args *TxDeleteNodeArgs, reply *TxDeleteNodeReply
 }
 
 func (s *GraphRPC) TxCreateEdge(args *TxCreateEdgeArgs, reply *TxCreateEdgeReply) error {
-	s.mu.Lock()
-	target := s.txs[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getTx(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	err := target.CreateEdge(context.Background(), args.Edge)
@@ -1282,11 +1084,9 @@ func (s *GraphRPC) TxCreateEdge(args *TxCreateEdgeArgs, reply *TxCreateEdgeReply
 }
 
 func (s *GraphRPC) TxGetEdge(args *TxGetEdgeArgs, reply *TxGetEdgeReply) error {
-	s.mu.Lock()
-	target := s.txs[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getTx(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	val, err := target.GetEdge(context.Background(), args.Fromid, args.Toid, args.Edgetype)
@@ -1299,11 +1099,9 @@ func (s *GraphRPC) TxGetEdge(args *TxGetEdgeArgs, reply *TxGetEdgeReply) error {
 }
 
 func (s *GraphRPC) TxUpdateEdge(args *TxUpdateEdgeArgs, reply *TxUpdateEdgeReply) error {
-	s.mu.Lock()
-	target := s.txs[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getTx(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	err := target.UpdateEdge(context.Background(), args.Fromid, args.Toid, args.Edgetype, args.Updates)
@@ -1314,11 +1112,9 @@ func (s *GraphRPC) TxUpdateEdge(args *TxUpdateEdgeArgs, reply *TxUpdateEdgeReply
 }
 
 func (s *GraphRPC) TxDeleteEdge(args *TxDeleteEdgeArgs, reply *TxDeleteEdgeReply) error {
-	s.mu.Lock()
-	target := s.txs[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getTx(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	err := target.DeleteEdge(context.Background(), args.Fromid, args.Toid, args.Edgetype)
@@ -1329,11 +1125,9 @@ func (s *GraphRPC) TxDeleteEdge(args *TxDeleteEdgeArgs, reply *TxDeleteEdgeReply
 }
 
 func (s *GraphRPC) TxExecuteQuery(args *TxExecuteQueryArgs, reply *TxExecuteQueryReply) error {
-	s.mu.Lock()
-	target := s.txs[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getTx(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	val, err := target.ExecuteQuery(context.Background(), args.Query)
@@ -1346,11 +1140,9 @@ func (s *GraphRPC) TxExecuteQuery(args *TxExecuteQueryArgs, reply *TxExecuteQuer
 }
 
 func (s *GraphRPC) TxBeginNestedTransaction(args *TxBeginNestedTransactionArgs, reply *TxBeginNestedTransactionReply) error {
-	s.mu.Lock()
-	target := s.txs[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getTx(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	val, err := target.BeginNestedTransaction(context.Background())
@@ -1368,11 +1160,9 @@ func (s *GraphRPC) TxBeginNestedTransaction(args *TxBeginNestedTransactionArgs, 
 }
 
 func (s *GraphRPC) TxSupportsNestedTransactions(args *TxSupportsNestedTransactionsArgs, reply *TxSupportsNestedTransactionsReply) error {
-	s.mu.Lock()
-	target := s.txs[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getTx(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	reply.Val = target.SupportsNestedTransactions()
@@ -1380,11 +1170,9 @@ func (s *GraphRPC) TxSupportsNestedTransactions(args *TxSupportsNestedTransactio
 }
 
 func (s *GraphRPC) TxCommit(args *TxCommitArgs, reply *TxCommitReply) error {
-	s.mu.Lock()
-	target := s.txs[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getTx(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	err := target.Commit(context.Background())
@@ -1399,11 +1187,9 @@ func (s *GraphRPC) TxCommit(args *TxCommitArgs, reply *TxCommitReply) error {
 }
 
 func (s *GraphRPC) TxRollback(args *TxRollbackArgs, reply *TxRollbackReply) error {
-	s.mu.Lock()
-	target := s.txs[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getTx(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	err := target.Rollback(context.Background())
@@ -1418,11 +1204,9 @@ func (s *GraphRPC) TxRollback(args *TxRollbackArgs, reply *TxRollbackReply) erro
 }
 
 func (s *GraphRPC) TxIsCommitted(args *TxIsCommittedArgs, reply *TxIsCommittedReply) error {
-	s.mu.Lock()
-	target := s.txs[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getTx(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	reply.Val = target.IsCommitted()
@@ -1430,11 +1214,9 @@ func (s *GraphRPC) TxIsCommitted(args *TxIsCommittedArgs, reply *TxIsCommittedRe
 }
 
 func (s *GraphRPC) TxIsRolledBack(args *TxIsRolledBackArgs, reply *TxIsRolledBackReply) error {
-	s.mu.Lock()
-	target := s.txs[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getTx(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	reply.Val = target.IsRolledBack()
@@ -1442,11 +1224,9 @@ func (s *GraphRPC) TxIsRolledBack(args *TxIsRolledBackArgs, reply *TxIsRolledBac
 }
 
 func (s *GraphRPC) TxGetParent(args *TxGetParentArgs, reply *TxGetParentReply) error {
-	s.mu.Lock()
-	target := s.txs[args.TargetID]
-	s.mu.Unlock()
-	if target == nil {
-		reply.ErrStr = "target not found"
+	target, errStr := s.getTx(args.TargetID)
+	if errStr != "" {
+		reply.ErrStr = errStr
 		return nil
 	}
 	val := target.GetParent()

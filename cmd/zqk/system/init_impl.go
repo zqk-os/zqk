@@ -41,12 +41,6 @@ const (
 	initErrCreateDirectoryFmt               = "failed to create directory %s: %w"
 	initErrCreateProjectDataDirFmt          = "failed to create project data directory: %w"
 	initErrCreateConfigFileFmt              = "failed to create config file: %w"
-	initInternalDirName                     = "_internal"
-	initInternalObjectSpecsDir              = "object_specs"
-	initInternalLifecyclesDir               = "lifecycles"
-	initInternalDocumentationDir            = "documentation"
-	initBucketYearMonthA                    = "2025-12"
-	initBucketYearMonthB                    = "2026-01"
 	initLogFieldProject                     = "project"
 	initLogFieldDirectory                   = "directory"
 	initLogFieldMode                        = "mode"
@@ -363,9 +357,9 @@ func runGreenfieldInit(projectRoot, projectName, template string, force bool, lo
 	}
 
 	// Extract bootstrap files (.zqk/specs and .zqk/cli/specs)
-	internalDir := filepath.Join(processDir, initInternalDirName)
+	internalDir := filepath.Join(projectRoot, paths.ProcessInternalDir)
 	if err := fileutil.MkdirAll(internalDir, paths.DirPerm755); err != nil {
-		return errfmt.Errorf("failed to create "+initInternalDirName+" directory: %w", err)
+		return errfmt.Errorf("failed to create specs directory: %w", err)
 	}
 
 	progress.Step(2, 7, "Extracting bootstrap specs, lifecycles, and documentation...")
@@ -499,10 +493,9 @@ func runLegacyInit(projectRoot, projectName, template string, force bool, logger
 
 	progress.Step(2, 7, "Extracting bootstrap specs, lifecycles, and documentation...")
 
-	// Extract bootstrap files when _internal is missing, or when _internal exists but is empty
-	// (e.g. addMissingProcessDirectories created empty _internal/object_specs), or when --force.
-	internalDir := filepath.Join(processDir, initInternalDirName)
-	objectSpecsDir := filepath.Join(internalDir, initInternalObjectSpecsDir)
+	// Extract bootstrap files when specs are missing, or when specs dir exists but is empty, or when --force.
+	internalDir := filepath.Join(projectRoot, paths.ProcessInternalDir)
+	objectSpecsDir := filepath.Join(projectRoot, paths.ProcessInternalObjectSpecsDir)
 	runBootstrap := force
 	if _, err := fileutil.Stat(internalDir); fileutil.IsNotExist(err) {
 		runBootstrap = true
@@ -514,7 +507,7 @@ func runLegacyInit(projectRoot, projectName, template string, force bool, logger
 	}
 	if runBootstrap {
 		if err := fileutil.MkdirAll(internalDir, paths.DirPerm755); err != nil {
-			return errfmt.Errorf("failed to create "+initInternalDirName+" directory: %w", err)
+			return errfmt.Errorf("failed to create specs directory: %w", err)
 		}
 		if err := ExtractBootstrapFiles(projectRoot, logger, force); err != nil {
 			logging.Fluent(logger).Warn("Failed to extract bootstrap files").
@@ -642,7 +635,7 @@ func runSnapshotInit(projectRoot, projectName, snapshotPath string, merge, wipe,
 	internalDir := filepath.Join(projectRoot, paths.ProcessInternalDir)
 	if _, err := fileutil.Stat(internalDir); fileutil.IsNotExist(err) || force {
 		if err := fileutil.MkdirAll(internalDir, paths.DirPerm755); err != nil {
-			return errfmt.Errorf("failed to create "+initInternalDirName+" directory: %w", err)
+			return errfmt.Errorf("failed to create specs directory: %w", err)
 		}
 
 		if err := ExtractBootstrapFiles(projectRoot, logger, force); err != nil {
@@ -681,59 +674,10 @@ func runSnapshotInit(projectRoot, projectName, snapshotPath string, merge, wipe,
 	return nil
 }
 
-// createAllKindDirectories creates directories for all known object kinds
+// createAllKindDirectories ensures the process directory and essential base structures exist.
+// Object kind directories are created on demand by CAS when objects are written.
 func createAllKindDirectories(processDir string) error {
-	// Get all known kinds from kind mappings (use EnsureReady for loader pattern / timeouts)
-	mapper := objects.GetGlobalKindMapper()
-	if err := mapper.EnsureReady(pkgctx.NewSystemContext()); err != nil {
-		// If initialization fails, just create common directories
-		// This can happen if processDir doesn't exist yet
-		return nil //nolint:nilerr // kind mapper not ready during initial directory bootstrap
-	}
-	kinds := mapper.GetAllKinds()
-
-	// Create _internal directories first
-	internalDirs := []string{
-		filepath.Join(processDir, initInternalDirName, initInternalObjectSpecsDir),
-		filepath.Join(processDir, initInternalDirName, initInternalLifecyclesDir),
-		filepath.Join(processDir, initInternalDirName, initInternalDocumentationDir),
-	}
-	for _, dir := range internalDirs {
-		if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
-			return errfmt.Errorf(initErrCreateDirectoryFmt, dir, err)
-		}
-	}
-
-	// Create directories for each kind
-	createdDirs := make(map[string]bool)
-	for _, kind := range kinds {
-		dirName := objects.GetDirectoryFromKind(kind)
-		if dirName == emptyValue {
-			continue
-		}
-		kindDir := filepath.Join(processDir, dirName)
-		if !createdDirs[kindDir] {
-			if err := fileutil.MkdirAll(kindDir, paths.DirPerm755); err != nil {
-				return errfmt.Errorf(initErrCreateDirectoryFmt, kindDir, err)
-			}
-			createdDirs[kindDir] = true
-		}
-	}
-
-	// Also create common subdirectories (bucketed storage only; object-kind dirs e.g. scheduler_jobs come from kind list above)
-	commonSubdirs := []string{
-		filepath.Join(processDir, "audit", initBucketYearMonthA),
-		filepath.Join(processDir, "audit", initBucketYearMonthB),
-		filepath.Join(processDir, "change_journal", initBucketYearMonthA),
-		filepath.Join(processDir, "change_journal", initBucketYearMonthB),
-	}
-	for _, dir := range commonSubdirs {
-		if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
-			return errfmt.Errorf(initErrCreateDirectoryFmt, dir, err)
-		}
-	}
-
-	return nil
+	return createProcessDir(processDir, false)
 }
 
 // restoreObjectsFromSnapshot restores objects from snapshot to disk
@@ -829,60 +773,10 @@ func restoreObjectsFromSnapshot(projectRoot string, snapshotObjects []map[string
 	return nil
 }
 
-// addMissingProcessDirectories adds missing directories to existing process directory
+// addMissingProcessDirectories adds essential missing directories to existing process directory.
+// Object kind directories are created on demand by CAS when objects are written.
 func addMissingProcessDirectories(processDir string) error {
-	// Get all required directories from createProcessDir
-	requiredDirs := []string{
-		filepath.Join(processDir, initInternalDirName, initInternalObjectSpecsDir),
-		filepath.Join(processDir, initInternalDirName, initInternalLifecyclesDir),
-		filepath.Join(processDir, initInternalDirName, initInternalDocumentationDir),
-		filepath.Join(processDir, "backlog_items"),
-		filepath.Join(processDir, "policies"),
-		filepath.Join(processDir, "requirements"),
-		filepath.Join(processDir, objects.KindCriteria),
-		filepath.Join(processDir, "test_cases"),
-		filepath.Join(processDir, "decisions"),
-		filepath.Join(processDir, "goals"),
-		filepath.Join(processDir, "milestones"),
-		filepath.Join(processDir, "workstreams"),
-		filepath.Join(processDir, "priority_plans"),
-		filepath.Join(processDir, "questions"),
-		filepath.Join(processDir, "doc_entries"),
-		filepath.Join(processDir, "missions"),
-		filepath.Join(processDir, "visions"),
-		filepath.Join(processDir, "strategic_contexts"),
-		filepath.Join(processDir, "stakeholder_profiles"),
-		filepath.Join(processDir, "important_dates"),
-		filepath.Join(processDir, "strategic_plans"),
-		filepath.Join(processDir, "architecture"),
-		filepath.Join(processDir, "audit", initBucketYearMonthA),
-		filepath.Join(processDir, "change_journal", initBucketYearMonthA),
-		filepath.Join(processDir, "planning"),
-		filepath.Join(processDir, "scheduler_jobs"),
-	}
-
-	// Also add directories for all known kinds (use EnsureReady for loader pattern)
-	mapper := objects.GetGlobalKindMapper()
-	if err := mapper.EnsureReady(pkgctx.NewSystemContext()); err == nil {
-		kinds := mapper.GetAllKinds()
-		for _, kind := range kinds {
-			dirName := objects.GetDirectoryFromKind(kind)
-			if dirName != emptyValue {
-				requiredDirs = append(requiredDirs, filepath.Join(processDir, dirName))
-			}
-		}
-	}
-
-	// Create missing directories
-	for _, dir := range requiredDirs {
-		if _, err := fileutil.Stat(dir); fileutil.IsNotExist(err) {
-			if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
-				return errfmt.Errorf(initErrCreateDirectoryFmt, dir, err)
-			}
-		}
-	}
-
-	return nil
+	return createProcessDir(processDir, false)
 }
 
 type discoveryDraft struct {

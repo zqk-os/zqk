@@ -115,9 +115,13 @@ func runNext(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 			objects.FieldKeyKind:             objects.KindSchedulerJob,
 			objects.FieldKeyStatus:           objects.ObjectStatusPending,
 			objects.FieldKeyTitle:            fmt.Sprintf("Wake agent for %s verification failure", id),
+			objects.FieldKeyJobType:          "callback_listener",
+			objects.FieldKeyTriggerType:      "event",
 			objects.FieldKeyCallbackOnStatus: objects.ObjectStatusError, // Wake on error/failure
-			"target_ref":                     id,
-			"action":                         onVF,
+			objects.FieldKeyMetadata: map[string]any{
+				"target_ref": id,
+				"action":     onVF,
+			},
 		}
 
 		// Create the scheduler job outside the membrane if needed

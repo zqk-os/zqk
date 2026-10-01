@@ -22,6 +22,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
+	storageaudit "github.com/zqk-os/zqk/pkg/storage/audit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 	"github.com/zqk-os/zqk/pkg/zqktime"
@@ -235,13 +236,20 @@ func (b *AuditEventBuffer) findExistingAuditEvent(targetID, eventType string) (e
 		return nil, "", errfmt.Errorf("no target_id provided")
 	}
 
-	// Search in current month's audit directory
+	// Search in current month's audit directory (stream first, fallback to legacy)
 	now := time.Now().UTC()
-	month := now.Format("2006-01")
-	processBase := paths.ResolvePathFromCacheOrConstant(b.projectRoot, "process", paths.ProcessDir)
-	auditDir := filepath.Join(processBase, "audit", month)
-
+	auditDir := storageaudit.MonthlyDir(b.projectRoot, now)
 	entries, err := fileutil.ReadDir(auditDir)
+	if err != nil || len(entries) == 0 {
+		month := now.Format("2006-01")
+		processBase := paths.ResolvePathFromCacheOrConstant(b.projectRoot, "process", paths.ProcessDir)
+		legacyDir := filepath.Join(processBase, "audit", month)
+		if legacyEntries, lErr := fileutil.ReadDir(legacyDir); lErr == nil && len(legacyEntries) > 0 {
+			auditDir = legacyDir
+			entries = legacyEntries
+			err = nil
+		}
+	}
 	if err != nil {
 		return nil, "", err
 	}

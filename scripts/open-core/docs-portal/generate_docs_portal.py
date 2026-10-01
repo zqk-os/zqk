@@ -54,8 +54,6 @@ def get_html_relpath(rel_md_path: str) -> str:
         path = path[len(".zqk/"):]
     elif path.startswith(".zqk/specs/"):
         path = "kernel-specs/" + path[len(".zqk/specs/"):]
-    elif path.startswith(".zqk/agent_packs/"):
-        path = "agent-packs/" + path[len(".zqk/agent_packs/"):]
     elif path.startswith(".agents/"):
         path = "agents/" + path[len(".agents/"):]
     elif path.startswith("./"):
@@ -71,10 +69,8 @@ def get_category_info(rel_path: str) -> tuple[str, str]:
     path = rel_path.replace("\\", "/")
     if path.startswith(".zqk/skills/") or path.startswith("skills/"):
         return "Agent Skills & Protocols", "skills"
-    if path.startswith(".zqk/agent_packs/") or path.startswith("agent-packs/"):
-        return "Agent Directives & Packs", "agent-directives"
     if path == ".agents/AGENTS.md" or path == "agents/AGENTS.md":
-        return "Agent Directives & Packs", "agent-directives"
+        return "Agent Directives & Protocols", "agent-directives"
     if path.startswith("cmd/"):
         return "Kernel Subsystems — CLI Commands & Tooling", "subsystems-cli"
     if path.startswith("internal/"):
@@ -694,11 +690,6 @@ def build_portal(repo_root: str, target_dir: str):
     for sm in spec_mds:
         doc_files.append(sm)
 
-    # Agent Packs (.zqk/agent_packs/)
-    agent_pack_mds = sorted(glob.glob(os.path.join(repo_root, ".zqk", "agent_packs", "**", "*.md"), recursive=True))
-    for ap in agent_pack_mds:
-        doc_files.append(ap)
-
     # Operational Guides in scripts/
     for script_doc in ["scripts/onboarding_roadmap/README.md", "scripts/scheduler_jobs/README.md"]:
         sp = os.path.join(repo_root, script_doc)
@@ -809,11 +800,7 @@ def build_portal(repo_root: str, target_dir: str):
             if line.startswith("# "):
                 title = line[2:].strip()
                 break
-        if rel_path.startswith(".zqk/agent_packs/"):
-            pack_name = rel_path.split("/")[2]
-            p_display = pack_name.upper() if pack_name in ("ide", "mcp") else pack_name.replace("_", " ").title()
-            title = f"{p_display} Agent Boot Protocol"
-        elif rel_path == "scripts/onboarding_roadmap/README.md":
+        if rel_path == "scripts/onboarding_roadmap/README.md":
             title = "Curriculum as Data: Onboarding Roadmap"
         elif rel_path == "scripts/scheduler_jobs/README.md":
             title = "Scheduler Job Templates"

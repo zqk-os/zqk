@@ -3,13 +3,13 @@ package process
 import (
 	"context"
 	"fmt"
-	"os"
 	"runtime"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // ProcessCommandLine returns the command line string for a process PID across supported platforms.
@@ -21,7 +21,7 @@ func ProcessCommandLine(pid int) string {
 		return ""
 	}
 	if runtime.GOOS == "linux" {
-		data, err := os.ReadFile(fmt.Sprintf("/proc/%d/cmdline", pid))
+		data, err := fileutil.ReadFile(fmt.Sprintf("/proc/%d/cmdline", pid))
 		if err == nil && len(data) > 0 {
 			parts := strings.Split(string(data), "\x00")
 			return strings.TrimSpace(strings.Join(parts, " "))

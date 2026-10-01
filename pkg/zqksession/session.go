@@ -11,6 +11,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -99,12 +100,7 @@ func createSession(
 		accountID = pkgctx.SystemAccountID
 	}
 
-	processDir := paths.ResolvePathFromCacheOrConstant(projectRoot, "process", paths.ProcessDir)
-	dirName := objects.GetDirectoryFromKind(objects.KindZqkSession)
-	if dirName == EmptyValue {
-		return EmptyValue, fmt.Errorf("directory is not registered for kind %s", objects.KindZqkSession)
-	}
-	sessionsDir := filepath.Join(processDir, dirName)
+	sessionsDir := datacell.StreamCurrentKindDir(projectRoot, objects.KindZqkSession)
 	if err := fileutil.MkdirAll(sessionsDir, paths.DirPerm755); err != nil {
 		return EmptyValue, fmt.Errorf("create session directory: %w", err)
 	}
