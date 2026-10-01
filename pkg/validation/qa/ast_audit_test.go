@@ -20,6 +20,21 @@ func TestAuditSingletonLock(t *testing.T) {
 	}
 }
 
+func TestAuditDiscoveryGo(t *testing.T) {
+	auditor := NewASTAuditor()
+	violations, err := auditor.AuditFile("../../systemcheck/asynccheck/discovery.go")
+	if err != nil {
+		t.Fatalf("AuditFile failed: %v", err)
+	}
+	for _, v := range violations {
+		t.Logf("[%s] %s: %s", v.Severity, v.Pos, v.Message)
+		if v.Severity == "high" || v.Severity == "medium" {
+			t.Errorf("unwanted AST violation [%s] %s: %s", v.Severity, v.Pos, v.Message)
+		}
+	}
+}
+
+
 func TestAuditSwarmRun(t *testing.T) {
 	auditor := NewASTAuditor()
 	violations, err := auditor.AuditFile("../../../cmd/zqk/swarm/run.go")

@@ -156,3 +156,62 @@ func TestShouldUseCachedState(t *testing.T) {
 		t.Errorf("expected integrity issue to invalidate cache hit")
 	}
 }
+
+func TestScanObjectFilesWithContext_Walk(t *testing.T) {
+	tmpDir := t.TempDir()
+	logger := logging.GetLoggerFromProfile("system")
+
+	// Create test object files
+	f1 := filepath.Join(tmpDir, "GOAL-1.yaml")
+	f2 := filepath.Join(tmpDir, "GOAL-2.yml")
+	nonYaml := filepath.Join(tmpDir, "ignored.txt")
+
+	if err := os.WriteFile(f1, []byte("id: GOAL-1\nkind: goal\n"), 0600); err != nil {
+		t.Fatalf("failed to write test file: %v", err)
+	}
+	if err := os.WriteFile(f2, []byte("id: GOAL-2\nkind: goal\n"), 0600); err != nil {
+		t.Fatalf("failed to write test file: %v", err)
+	}
+	if err := os.WriteFile(nonYaml, []byte("not yaml"), 0600); err != nil {
+		t.Fatalf("failed to write non-yaml file: %v", err)
+	}
+
+	files, err := ScanObjectFilesWithContext(context.Background(), tmpDir, "goal", logger, nil)
+	if err != nil {
+		t.Fatalf("ScanObjectFilesWithContext failed: %v", err)
+	}
+	if len(files) != 2 {
+		t.Fatalf("expected 2 files, got %d", len(files))
+	}
+
+	idMap := make(map[string]bool)
+	for _, f := range files {
+		idMap[f.ObjectID] = true
+	}
+	if !idMap["GOAL-1"] || !idMap["GOAL-2"] {
+		t.Errorf("expected GOAL-1 and GOAL-2, got %v", idMap)
+	}
+
+	// Test legacy wrapper ScanObjectFiles
+	legacyFiles, err := ScanObjectFiles(tmpDir, "goal")
+	if err != nil {
+		t.Fatalf("ScanObjectFiles failed: %v", err)
+	}
+	if len(legacyFiles) != 2 {
+		t.Fatalf("expected 2 files from ScanObjectFiles, got %d", len(legacyFiles))
+	}
+}
+
+func TestScanObjectFilesWithContext_CancelledContext(t *testing.T) {
+	tmpDir := t.TempDir()
+	logger := logging.GetLoggerFromProfile("system")
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel() // cancel immediately
+
+	_, err := ScanObjectFilesWithContext(ctx, tmpDir, "goal", logger, nil)
+	if err == nil {
+		t.Fatalf("expected error from cancelled context, got nil")
+	}
+}
+
