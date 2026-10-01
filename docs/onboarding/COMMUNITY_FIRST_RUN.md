@@ -88,12 +88,17 @@ First-run CRUD, `object list`, and `whats-next` work without the daemon. Start i
 
 Init's maintenance jobs are **kernel survival** (retention, object validation, caches). They are not a prompt to configure linting. Lint, policy, and integrity timers are an optional source-code pack — see [Scheduler and maintenance](../howto/SCHEDULER_AND_MAINTENANCE.md).
 
-## Code search
+## In-Process Code Search (`zqk grep`)
+
+Use `zqk grep` (alias `zgrep`) instead of external `grep` or `find`. It runs sub-15ms in-process searches using persistent trigram indexing and Go AST parsing, preventing token blowup in AI agent context windows:
 
 ```bash
-zqk grep "MyStruct" pkg/
-zqk grep --ast "func Test*" .
+zqk grep "MyStruct" pkg/                       # Trigram indexed search
+zqk grep --ast --kind struct .                 # AST structural query (find all structs)
+zqk grep --ast --recv Engine .                 # AST method query (find methods on receiver)
+zqk grep "error" --max-tokens 2000 -f json     # Token-budgeted JSON output for AI agents
 ```
+
 
 ## After green
 

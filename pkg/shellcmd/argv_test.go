@@ -71,3 +71,31 @@ func TestNeedsShell(t *testing.T) {
 		}
 	}
 }
+
+func TestResolveShell(t *testing.T) {
+	t.Parallel()
+
+	// POSIX test
+	path, flag := ResolveShell("darwin", "")
+	if path != ShellPathPOSIX || flag != ShellFlagCPOSIX {
+		t.Errorf("ResolveShell(darwin) = (%s, %s), want (%s, %s)", path, flag, ShellPathPOSIX, ShellFlagCPOSIX)
+	}
+
+	path, flag = ResolveShell("linux", "")
+	if path != ShellPathPOSIX || flag != ShellFlagCPOSIX {
+		t.Errorf("ResolveShell(linux) = (%s, %s), want (%s, %s)", path, flag, ShellPathPOSIX, ShellFlagCPOSIX)
+	}
+
+	// Windows fallback (no COMSPEC)
+	path, flag = ResolveShell("windows", "")
+	if path != ShellPathWindows || flag != ShellFlagCWindows {
+		t.Errorf("ResolveShell(windows, empty) = (%s, %s), want (%s, %s)", path, flag, ShellPathWindows, ShellFlagCWindows)
+	}
+
+	// Windows with COMSPEC
+	path, flag = ResolveShell("windows", `C:\Windows\System32\cmd.exe`)
+	if path != `C:\Windows\System32\cmd.exe` || flag != ShellFlagCWindows {
+		t.Errorf("ResolveShell(windows, comspec) = (%s, %s), want (C:\\Windows\\System32\\cmd.exe, %s)", path, flag, ShellFlagCWindows)
+	}
+}
+

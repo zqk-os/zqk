@@ -148,6 +148,9 @@ func renderAgentOnboardSummary(cmd *cobra.Command, res *agentonboard.Result) {
 	buf.WriteString("  • Gemini/Antigravity: Native workspace integration via .agents/AGENTS.md.\n")
 	buf.WriteString(fmt.Sprintf("  • Hermes / OpenClaw:  Direct CLI ('%s workflow whats-next') or TCP ('%s mcp proxy --tcp 127.0.0.1:7777').\n", cmdName, cmdName))
 
+	buf.WriteString("\n⚡ Recommended Agent Tooling:\n")
+	buf.WriteString(fmt.Sprintf("  • Fast In-Process Code Search: Run '%s grep <pattern>' (sub-15ms trigram + AST search; token-budgeted JSON via -f json)\n", cmdName))
+
 	buf.WriteString("\n💬 Prompt your AI agent to begin:\n")
 	buf.WriteString(fmt.Sprintf("   \"You are paired with the ZQK Knowledge Kernel. Run '%s do' to claim and execute work.\"\n\n", cmdName))
 	buf.WriteString(fmt.Sprintf("Or run directly in terminal: %s do\n", cmdName))
@@ -156,3 +159,4 @@ func renderAgentOnboardSummary(cmd *cobra.Command, res *agentonboard.Result) {
 
 	_ = cli.WriteOutput(cmd, []byte(buf.String()))
 }
+
