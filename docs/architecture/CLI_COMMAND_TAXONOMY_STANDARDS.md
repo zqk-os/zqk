@@ -28,8 +28,8 @@ This document establishes the **authoritative ground rules, naming taxonomy, beh
 3. **Automated Verification:** The pre-commit gate and local CI run `zqk system validate-command-specs`. Commits that introduce un-specced commands beyond the baseline freeze or introduce spec drift fail closed.
 4. **Ratcheting Migration Baseline & Current Metrics:** Legacy commands that predate declarative specification enforcement are governed by `.zqk/cli/command_spec_coverage_baseline.json`. The baseline strictly prohibits any new un-specced commands (`new_drift_count == 0`), failing closed on any regressions. As grandfathered commands receive declarative specs, the baseline ratchets forward until 100% full parity (`parity: true`) is achieved:
    - **Loaded Command Inventory:** 518 commands
-   - **Declaratively Specced Commands:** 252 commands
-   - **Grandfathered Un-specced Commands:** 206 commands (frozen under baseline governance)
+   - **Declaratively Specced Commands:** 255 commands
+   - **Grandfathered Un-specced Commands:** 203 commands (frozen under baseline governance)
    - **New Drift Permitted:** 0 (enforced by `zqk system validate-command-specs`)
 
 ### Rule 2: Strict Domain-Resource Grammar & Noun-Verb Hierarchy

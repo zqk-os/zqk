@@ -1,0 +1,48 @@
+$schema: ../_schemas/command_spec.schema.json
+name: whats-next
+short: Composite PRI + backlog + CVS + compressed convergence measure
+description: |-
+  Single JSON snapshot for agent session start: current priority plan (when discoverable),
+  backlog counts for that plan, active/paused convergence sessions (summary), and an optional
+  compressed block from the same pipeline as zqk scheduler convergence measure.
+
+  Prefer this over ad-hoc shell wrappers: one binary, same working directory semantics.
+
+  Default priority plan when unset: CLI alpha readiness plan id (still loaded when paused).
+  Default measure session: data-cell CVS if present among active/paused rows, else the first row.
+args:
+  type: no_args
+flags:
+  - name: priority-plan
+    type: string
+    description: Priority plan id (PRI-*). When empty, resolves default alpha plan then in_progress / paused fallbacks.
+  - name: session-id
+    type: string
+    description: Convergence session id (CVS-*) for measure compression. When empty, uses data-cell heuristic or first active/paused session.
+  - name: skip-measure
+    type: bool
+    default: false
+    description: Omit scheduler convergence measure (objects plane only; faster).
+  - name: persona-id
+    type: string
+    description: Optional persona ID to evaluate what's next for a specific persona
+  - name: agent-id
+    type: string
+    description: Swarm seat id correspondence plus seated persona_ref for plan selection
+  - name: sync-sweep
+    type: bool
+    default: false
+    description: Emergency diagnostics only perform synchronous full storage sweep instead of reading materialized lite view
+  - name: auto-remedy
+    type: bool
+    default: false
+    description: Automatically diagnose and safely apply precondition and hygiene fixes
+help:
+  examples:
+    - comment: Full composite JSON (default plan + measure)
+      command: '%s workflow whats-next --format json'
+    - comment: Objects only (no health.jsonl / measure)
+      command: '%s workflow whats-next --format json --skip-measure'
+    - comment: Seat-scoped mesh correspondence
+      command: '%s workflow whats-next --format json --skip-measure --persona-id PER-DEFAULT-AGENT --agent-id peer-agent-01'
+common_flags: true

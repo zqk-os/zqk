@@ -131,7 +131,6 @@
     "system git query",
     "system health-data",
     "system improvement-report",
-    "system init",
     "system metrics",
     "system metrics feed",
     "system metrics file-lock",
@@ -198,14 +197,12 @@
     "validate steward",
     "validate tree",
     "validate workflow",
-    "version",
     "workflow",
     "workflow add",
     "workflow check",
     "workflow coach",
     "workflow do",
-    "workflow next",
-    "workflow whats-next"
+    "workflow next"
   ],
   "specs_without_commands": []
 }

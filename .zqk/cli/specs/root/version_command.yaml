@@ -1,0 +1,14 @@
+$schema: ../_schemas/command_spec.schema.json
+name: version
+short: Print version, commit, and build timestamp
+description: |-
+  Print the ZQK version, git commit hash, and build timestamp.
+  Supports plain text, JSON, and YAML output formats for scripted automation and release verification.
+args:
+  type: no_args
+help:
+  examples:
+    - comment: Print standard version string
+      command: '%s version'
+    - comment: Print structured JSON version information
+      command: '%s version --format json'
