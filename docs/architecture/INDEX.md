@@ -10,6 +10,7 @@ Welcome to the architectural specifications and design documents for the **ZQK K
 Documents governing Content-Addressable Storage (CAS), append-only WAL streams, memory isolation, and privileged filesystem access.
 
 - **[Cellular Membrane Mode B Configuration](./CELLULAR_MEMBRANE_MODE_B_CONFIGURATION.md)**: Mode A (developer standalone) vs Mode B (cellular membrane lockdown with isolated `PrivilegedWriterDaemon` and UNIX domain socket IPC).
+- **[Cellular Specialization Tiers & Rubber Room](./CELLULAR_SPECIALIZATION_TIERS.md)**: Biological organ specialization tiers (`Neuron`, `Muscle`, `Heart`, `Lung`) and sandboxed side-effect execution in the Rubber Room (`ModeShielded` / `ShadowSpine`).
 - **[Tiered Storage and Archival Lifecycle](./TIERED_STORAGE_AND_ARCHIVAL_LIFECYCLE.md)**: Three-tier storage hierarchy: hot active CAS, warm index layers, and cold compressed stream archives.
 - **[Storage Write Queue & Observer Governance](./STORAGE_WRITE_QUEUE_OBSERVER_GOVERNANCE.md)**: Non-blocking asynchronous event queues, observer fan-out, and memory hygiene.
 - **[Project-Scoped Reverse Reference Index and Thread-Safe Caches](./PROJECT_SCOPED_REVERSE_REFERENCE_INDEX_AND_THREAD_SAFE_CACHES.md)**: Reverse-reference graph lookup performance, atomic index caches, and memory-safe cache invalidation.
@@ -19,7 +20,7 @@ Documents governing Content-Addressable Storage (CAS), append-only WAL streams, 
 ## 2. Mutation & Data Integrity Governance
 Documents governing state transitions, provenance enforcement, and fail-closed validation.
 
-- **[Membrane Mutation Governance & Integrity Specification](./MUTATION_GOVERNANCE.md)**: System provenance fields (`created_at`, `cas_address`, `hash`), directed state graph transitions, `--break-glass` ZQL elevation, and interactive TTY `--override`.
+- **[Membrane Mutation Governance & Integrity Specification](./MUTATION_GOVERNANCE.md)**: System provenance fields (`created_at`, `cas_address`, `hash`), directed state graph transitions, audited `--override` elevation, and interactive TTY friction controls.
 - **[Lifecycle State Machine Architecture](./LIFECYCLE_STATE_MACHINE.md)**: Formal lifecycle definitions, state transitions, and precondition verification engines.
 - **[Fail-Closed Error Propagation & Transaction Resilience](./FAIL_CLOSED_ERROR_PROPAGATION_AND_TRANSACTION_RESILIENCE.md)**: Fail-closed boundary guarantees across storage, networking, and validation boundaries.
 - **[Fail-Closed Panic Resilience](./FAIL_CLOSED_PANIC_RESILIENCE.md)**: Subprocess and thread isolation preventing daemon crashes and unhandled panic propagation.
@@ -39,6 +40,7 @@ Documents governing the Cobra CLI command surface, taxonomy standards, builders,
 Documents governing persistent host processes, background watchers, and job concurrency.
 
 - **[Daemon Singleton Mutual Exclusion](./DAEMON_SINGLETON_MUTUAL_EXCLUSION.md)**: Cross-platform PID lock acquisition, single-instance enforcement, and automatic recovery of dead daemon leases.
+- **[Seat Worker Supervisor Architecture](./SEAT_WORKER_SUPERVISOR_ARCHITECTURE.md)**: OS-level supervisor daemons (`launchd` on macOS, `systemd` on Linux) managing persistent 24/7 background agent seats.
 - **[Ambient Signal Action Rubric](./AMBIENT_SIGNAL_ACTION_RUBRIC.md)**: Ambient filesystem watcher events, heuristics evaluation, and proactive maintenance signals.
 - **[Async Check Discovery Decoupling](./ASYNC_CHECK_DISCOVERY_DECOUPLING.md)**: Decoupling disk discovery from validation pipelines to prevent CLI timeout stalls.
 - **[Service Adapter Specification](./SERVICE_ADAPTER_SPECIFICATION.md)**: Unified abstraction across macOS `launchd`, Linux `systemd`, and standalone foreground runners.
@@ -49,6 +51,7 @@ Documents governing persistent host processes, background watchers, and job conc
 Documents governing multi-agent coordination, bounded domain packages, and extensible modules.
 
 - **[Pack Composition & Extensibility Architecture](./PACK_COMPOSITION_AND_EXTENSIBILITY.md)**: Architectural distinction between Go Code Packs (`packs/<domain>`) and Runtime Swarm Orchestration Packs (`swarm.yaml`), and composition rules.
+- **[Composite Execution Organizer Verification](./COMPOSITE_EXECUTION_ORGANIZER_VERIFICATION.md)**: End-to-end trace pipelines, deterministic goal hierarchy composition, and verification gates.
 - **[Adaptive Task Supervision Specification](./ADAPTIVE_TASK_SUPERVISION_SPECIFICATION.md)**: Multi-agent supervisor coordination, heartbeat monitoring, and automated unsticking protocols.
 - **[Adaptive Agent Disambiguation](./ADAPTIVE_AGENT_DISAMBIGUATION.md)**: Persona resolution, skill linkage, and intent disambiguation for agent execution seats.
 - **[Orchestration Runtime Taxonomy](./ORCHESTRATION_RUNTIME_TAXONOMY.md)**: Classification of swarm coordinators, seat workers, and task queues.
@@ -58,8 +61,10 @@ Documents governing multi-agent coordination, bounded domain packages, and exten
 
 ---
 
-## 6. Security, Stamping & Cryptography
-Documents governing cryptographic provenance, keys, and execution isolation.
+## 6. Security, Sovereign Execution & Cryptography
+Documents governing cryptographic provenance, keys, sovereign local execution, and execution isolation.
 
+- **[Sovereign Air-Gapped AI Engineering](./SOVEREIGN_AIRGAPPED_AI_ENGINEERING.md)**: Offline execution with local LLMs (Ollama / Apple Silicon), local CAS persistence, and deterministic AST verification.
 - **[Keystore Security & Fallback Specification](./KEYSTORE_SECURITY_AND_FALLBACK_SPECIFICATION.md)**: Ed25519 signing keys, fail-closed key discovery, and environment variable resolution.
 - **[Tray Command Cryptographic Security](./TRAY_COMMAND_CRYPTOGRAPHIC_SECURITY.md)**: Authenticated RPC protocol between background daemons and desktop tray applications.
+

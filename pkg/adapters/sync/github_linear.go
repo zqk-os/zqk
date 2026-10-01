@@ -352,189 +352,171 @@ func MapKernelToLinear(item *BacklogItemSyncData) LinearIssue {
 	}
 }
 
+func (e *SyncEngine) withSyncLock(fn func() (SyncStats, error)) (SyncStats, error) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	return fn()
+}
+
+func (e *SyncEngine) reconcileItem(
+	ctx context.Context,
+	source ExternalSource,
+	mapped *BacklogItemSyncData,
+	insertErrFmt, updateErrFmt string,
+	stats *SyncStats,
+) error {
+	existing, err := e.store.GetBacklogItemByExternalID(ctx, source, mapped.ExternalID)
+	if err != nil {
+		return fmt.Errorf(fmtErrQueryKernelStore, err)
+	}
+
+	if existing == nil {
+		if err := e.store.UpsertBacklogItem(ctx, mapped); err != nil {
+			return fmt.Errorf(insertErrFmt, err)
+		}
+		stats.CreatedCount++
+		return nil
+	}
+
+	if isEquivalent(existing, mapped) {
+		stats.SkippedCount++
+		return nil
+	}
+
+	if mapped.UpdatedAt.Before(existing.UpdatedAt) {
+		stats.ConflictCount++
+		stats.SkippedCount++
+		return nil
+	}
+
+	if existing.ID != "" {
+		mapped.ID = existing.ID
+	}
+	if err := e.store.UpsertBacklogItem(ctx, mapped); err != nil {
+		return fmt.Errorf(updateErrFmt, err)
+	}
+	stats.UpdatedCount++
+	return nil
+}
+
 // IngestGitHub synchronizes all issues from GitHub into the kernel store.
 // It resolves conflicts idempotently using monotonic timestamp resolution.
 func (e *SyncEngine) IngestGitHub(ctx context.Context) (SyncStats, error) {
-	e.mu.Lock()
-	defer e.mu.Unlock()
+	return e.withSyncLock(func() (SyncStats, error) {
+		var stats SyncStats
+		if e.ghClient == nil {
+			return stats, errors.New(errMsgGHClientNotConfigured)
+		}
 
-	var stats SyncStats
-	if e.ghClient == nil {
-		return stats, errors.New(errMsgGHClientNotConfigured)
-	}
-
-	issues, err := e.ghClient.ListIssues(ctx)
-	if err != nil {
-		return stats, fmt.Errorf(fmtErrListGitHubIssues, err)
-	}
-
-	for _, gh := range issues {
-		stats.IngestedCount++
-		mapped := MapGitHubIssueToKernel(gh)
-
-		existing, err := e.store.GetBacklogItemByExternalID(ctx, SourceGitHub, mapped.ExternalID)
+		issues, err := e.ghClient.ListIssues(ctx)
 		if err != nil {
-			return stats, fmt.Errorf(fmtErrQueryKernelStore, err)
+			return stats, fmt.Errorf(fmtErrListGitHubIssues, err)
 		}
 
-		if existing == nil {
-			if err := e.store.UpsertBacklogItem(ctx, mapped); err != nil {
-				return stats, fmt.Errorf(fmtErrInsertMappedItem, err)
+		for _, gh := range issues {
+			stats.IngestedCount++
+			mapped := MapGitHubIssueToKernel(gh)
+			if err := e.reconcileItem(ctx, SourceGitHub, mapped, fmtErrInsertMappedItem, fmtErrUpdateExistingItem, &stats); err != nil {
+				return stats, err
 			}
-			stats.CreatedCount++
-			continue
 		}
 
-		// Check idempotency: if no substantive changes, skip.
-		if isEquivalent(existing, mapped) {
-			stats.SkippedCount++
-			continue
-		}
-
-		// Conflict resolution: last-write-wins by UpdatedAt.
-		if mapped.UpdatedAt.Before(existing.UpdatedAt) {
-			stats.ConflictCount++
-			stats.SkippedCount++
-			continue
-		}
-
-		// Preserve internal kernel properties if set
-		if existing.ID != "" {
-			mapped.ID = existing.ID
-		}
-		if err := e.store.UpsertBacklogItem(ctx, mapped); err != nil {
-			return stats, fmt.Errorf(fmtErrUpdateExistingItem, err)
-		}
-		stats.UpdatedCount++
-	}
-
-	return stats, nil
+		return stats, nil
+	})
 }
 
 // IngestLinear synchronizes all issues from Linear into the kernel store.
 func (e *SyncEngine) IngestLinear(ctx context.Context) (SyncStats, error) {
-	e.mu.Lock()
-	defer e.mu.Unlock()
+	return e.withSyncLock(func() (SyncStats, error) {
+		var stats SyncStats
+		if e.linearClient == nil {
+			return stats, errors.New(errMsgLinearClientNotConfigured)
+		}
 
-	var stats SyncStats
-	if e.linearClient == nil {
-		return stats, errors.New(errMsgLinearClientNotConfigured)
-	}
-
-	issues, err := e.linearClient.ListIssues(ctx)
-	if err != nil {
-		return stats, fmt.Errorf(fmtErrListLinearIssues, err)
-	}
-
-	for _, lin := range issues {
-		stats.IngestedCount++
-		mapped := MapLinearIssueToKernel(lin)
-
-		existing, err := e.store.GetBacklogItemByExternalID(ctx, SourceLinear, mapped.ExternalID)
+		issues, err := e.linearClient.ListIssues(ctx)
 		if err != nil {
-			return stats, fmt.Errorf(fmtErrQueryKernelStore, err)
+			return stats, fmt.Errorf(fmtErrListLinearIssues, err)
 		}
 
-		if existing == nil {
-			if err := e.store.UpsertBacklogItem(ctx, mapped); err != nil {
-				return stats, fmt.Errorf(fmtErrInsertLinearItem, err)
+		for _, lin := range issues {
+			stats.IngestedCount++
+			mapped := MapLinearIssueToKernel(lin)
+			if err := e.reconcileItem(ctx, SourceLinear, mapped, fmtErrInsertLinearItem, fmtErrUpdateLinearItem, &stats); err != nil {
+				return stats, err
 			}
-			stats.CreatedCount++
-			continue
 		}
 
-		if isEquivalent(existing, mapped) {
-			stats.SkippedCount++
-			continue
-		}
-
-		if mapped.UpdatedAt.Before(existing.UpdatedAt) {
-			stats.ConflictCount++
-			stats.SkippedCount++
-			continue
-		}
-
-		if existing.ID != "" {
-			mapped.ID = existing.ID
-		}
-		if err := e.store.UpsertBacklogItem(ctx, mapped); err != nil {
-			return stats, fmt.Errorf(fmtErrUpdateLinearItem, err)
-		}
-		stats.UpdatedCount++
-	}
-
-	return stats, nil
+		return stats, nil
+	})
 }
 
 // PushKernelToGitHub pushes updated kernel backlog items originating from GitHub back to GitHub.
 func (e *SyncEngine) PushKernelToGitHub(ctx context.Context) (SyncStats, error) {
-	e.mu.Lock()
-	defer e.mu.Unlock()
-
-	var stats SyncStats
-	if e.ghClient == nil {
-		return stats, errors.New(errMsgGHClientNotConfigured)
-	}
-
-	items, err := e.store.ListBacklogItems(ctx)
-	if err != nil {
-		return stats, fmt.Errorf(fmtErrListBacklogItems, err)
-	}
-
-	for _, item := range items {
-		if item.ExternalSource != SourceGitHub {
-			continue
+	return e.withSyncLock(func() (SyncStats, error) {
+		var stats SyncStats
+		if e.ghClient == nil {
+			return stats, errors.New(errMsgGHClientNotConfigured)
 		}
 
-		var num int
-		n, scanErr := fmt.Sscanf(item.ExternalID, "gh-%d", &num)
-		if scanErr != nil || n != 1 || num <= 0 {
-			continue
+		items, err := e.store.ListBacklogItems(ctx)
+		if err != nil {
+			return stats, fmt.Errorf(fmtErrListBacklogItems, err)
 		}
 
-		ghPayload := MapKernelToGitHub(item)
-		if err := e.ghClient.UpdateIssue(ctx, num, ghPayload); err != nil {
-			return stats, fmt.Errorf(fmtErrUpdateGitHubIssue, num, err)
-		}
-		stats.PushedCount++
-	}
+		for _, item := range items {
+			if item.ExternalSource != SourceGitHub {
+				continue
+			}
 
-	return stats, nil
+			var num int
+			n, scanErr := fmt.Sscanf(item.ExternalID, "gh-%d", &num)
+			if scanErr != nil || n != 1 || num <= 0 {
+				continue
+			}
+
+			ghPayload := MapKernelToGitHub(item)
+			if err := e.ghClient.UpdateIssue(ctx, num, ghPayload); err != nil {
+				return stats, fmt.Errorf(fmtErrUpdateGitHubIssue, num, err)
+			}
+			stats.PushedCount++
+		}
+
+		return stats, nil
+	})
 }
 
 // PushKernelToLinear pushes updated kernel backlog items originating from Linear back to Linear.
 func (e *SyncEngine) PushKernelToLinear(ctx context.Context) (SyncStats, error) {
-	e.mu.Lock()
-	defer e.mu.Unlock()
-
-	var stats SyncStats
-	if e.linearClient == nil {
-		return stats, errors.New(errMsgLinearClientNotConfigured)
-	}
-
-	items, err := e.store.ListBacklogItems(ctx)
-	if err != nil {
-		return stats, fmt.Errorf(fmtErrListBacklogItems, err)
-	}
-
-	for _, item := range items {
-		if item.ExternalSource != SourceLinear {
-			continue
+	return e.withSyncLock(func() (SyncStats, error) {
+		var stats SyncStats
+		if e.linearClient == nil {
+			return stats, errors.New(errMsgLinearClientNotConfigured)
 		}
 
-		linID := strings.TrimPrefix(item.ExternalID, "linear-")
-		if linID == "" {
-			continue
+		items, err := e.store.ListBacklogItems(ctx)
+		if err != nil {
+			return stats, fmt.Errorf(fmtErrListBacklogItems, err)
 		}
 
-		linPayload := MapKernelToLinear(item)
-		if err := e.linearClient.UpdateIssue(ctx, linID, linPayload); err != nil {
-			return stats, fmt.Errorf(fmtErrUpdateLinearIssue, linID, err)
-		}
-		stats.PushedCount++
-	}
+		for _, item := range items {
+			if item.ExternalSource != SourceLinear {
+				continue
+			}
 
-	return stats, nil
+			linID := strings.TrimPrefix(item.ExternalID, "linear-")
+			if linID == "" {
+				continue
+			}
+
+			linPayload := MapKernelToLinear(item)
+			if err := e.linearClient.UpdateIssue(ctx, linID, linPayload); err != nil {
+				return stats, fmt.Errorf(fmtErrUpdateLinearIssue, linID, err)
+			}
+			stats.PushedCount++
+		}
+
+		return stats, nil
+	})
 }
 
 func isEquivalent(a, b *BacklogItemSyncData) bool {

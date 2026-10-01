@@ -26,19 +26,26 @@ State transitions across object lifecycles are strictly directed:
 - Out-of-order, unearned, or skipped states are rejected at preflight and admission.
 - Preconditions (such as criterion validation or test verification) must be satisfied prior to forward promotion.
 
-## 4. Break-Glass Emergency Elevation & Override Flags
+## 4. Emergency Governance Bypass & Override Friction (`--override`)
 
-In break-glass scenarios where emergency state repair is required, the CLI provides strictly audited mechanisms depending on the operation:
+In emergency break-glass scenarios where manual state repair or lifecycle precondition bypass is required, the CLI provides strictly audited friction controls via `--override` and `--reason-code`:
 
-### A. Declarative Script Mutations (`zqk mutate` / ZQL)
-- `--break-glass`: Activates elevated bypass capability in ZQL mutations to allow manual provenance or transition repairs.
-- `--break-glass-reason "<justification>"`: Mandatory justification string (minimum 10 characters required) explaining why emergency elevation is necessary.
-- Emits structured audit events (`audit_event`) into `.zqk/streams/` with the reason and actor identity.
+### A. Lifecycle Precondition & Gate Bypass (`zqk object update`)
+- `--override`: Activates emergency bypass mode, allowing transitions across lifecycle stages even when automated gates (e.g. test verification or criteria validation) are unfulfilled.
+- `--reason-code "<justification>"`: Mandatory audited justification explaining why the bypass is necessary.
+  - **Friction Gate**: Must be at least 30 characters and at least 5 words.
+  - **Non-TTY Block**: Non-interactive shells, background scripts, and autonomous agents are strictly blocked from using `--override`. It must be executed by a human in an authenticated interactive TTY.
+  - **Interactive Confirmation**: The operator must type the exact confirmation phrase: `"I acknowledge this bypass introduces process debt"`.
+  - **CI Block**: Completely blocked in CI environments (`CI=true`).
 
-### B. Interactive Object Updates (`zqk object update`)
-- `--override`: Bypasses strict directed lifecycle precondition gates for single object updates.
-- **Human TTY Confirmation**: To prevent autonomous agents from silently bypassing governance, `--override` prompts for interactive confirmation on standard input (`tty`). Non-interactive/agent shells are blocked from using `--override` directly.
+### B. Core Object Deletions (`zqk object delete`)
+- Hard deletion of core kernel objects is guarded fail-closed and requires `--reason-code "<justification>"` (minimum 30 characters, 5 words).
+- Core entities (e.g. `requirement`, `criteria`, `test_case`, `priority_plan`) must be archived (`status: archived`) rather than permanently deleted whenever possible to maintain audit lineage.
 
-### C. Core Object Deletions (`zqk object delete`)
-- `--reason-code "<justification>"`: Hard deletion of core kernel objects is guarded fail-closed and requires an explicit, audited reason (minimum 30 characters). Core objects should generally be archived rather than deleted.
+### C. Process Debt Minting & Audit Trails
+Whenever an `--override` is executed:
+1. A durable `process_debt` kernel object is automatically minted recording the bypass reason, target ID, and actor.
+2. A structured `audit_event` is appended to `.zqk/streams/` with the security context and timestamp.
+3. System check (`zqk system check`) flags active process debt until resolved or validated.
+
 

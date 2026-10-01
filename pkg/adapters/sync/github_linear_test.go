@@ -173,11 +173,24 @@ func (m *mockKernelStore) ListBacklogItems(ctx context.Context) ([]*BacklogItemS
 	return res, nil
 }
 
-func TestGitHubIngestAndIdempotency(t *testing.T) {
+func setupGitHubTestContext() (context.Context, *mockGitHubClient, *mockKernelStore, *SyncEngine) {
 	ctx := context.Background()
 	gh := newMockGitHubClient()
 	store := newMockKernelStore()
 	engine := NewSyncEngine(gh, nil, store)
+	return ctx, gh, store, engine
+}
+
+func setupLinearTestContext() (context.Context, *mockLinearClient, *mockKernelStore, *SyncEngine) {
+	ctx := context.Background()
+	lin := newMockLinearClient()
+	store := newMockKernelStore()
+	engine := NewSyncEngine(nil, lin, store)
+	return ctx, lin, store, engine
+}
+
+func TestGitHubIngestAndIdempotency(t *testing.T) {
+	ctx, gh, store, engine := setupGitHubTestContext()
 
 	t0 := time.Now().Add(-10 * time.Minute)
 	gh.issues[42] = GitHubIssue{
@@ -237,10 +250,7 @@ func TestGitHubIngestAndIdempotency(t *testing.T) {
 }
 
 func TestLinearIngestAndPlanMapping(t *testing.T) {
-	ctx := context.Background()
-	lin := newMockLinearClient()
-	store := newMockKernelStore()
-	engine := NewSyncEngine(nil, lin, store)
+	ctx, lin, store, engine := setupLinearTestContext()
 
 	t0 := time.Now().Add(-5 * time.Minute)
 	lin.issues["ENG-204"] = LinearIssue{
@@ -277,10 +287,7 @@ func TestLinearIngestAndPlanMapping(t *testing.T) {
 }
 
 func TestBidirectionalPushToGitHub(t *testing.T) {
-	ctx := context.Background()
-	gh := newMockGitHubClient()
-	store := newMockKernelStore()
-	engine := NewSyncEngine(gh, nil, store)
+	ctx, gh, store, engine := setupGitHubTestContext()
 
 	gh.issues[99] = GitHubIssue{
 		Number:    99,
@@ -316,10 +323,7 @@ func TestBidirectionalPushToGitHub(t *testing.T) {
 }
 
 func TestBidirectionalPushToLinear(t *testing.T) {
-	ctx := context.Background()
-	lin := newMockLinearClient()
-	store := newMockKernelStore()
-	engine := NewSyncEngine(nil, lin, store)
+	ctx, lin, store, engine := setupLinearTestContext()
 
 	lin.issues["ENG-300"] = LinearIssue{
 		ID:          "ENG-300",
@@ -352,10 +356,7 @@ func TestBidirectionalPushToLinear(t *testing.T) {
 }
 
 func TestConflictResolutionMonotonicPrecedence(t *testing.T) {
-	ctx := context.Background()
-	gh := newMockGitHubClient()
-	store := newMockKernelStore()
-	engine := NewSyncEngine(gh, nil, store)
+	ctx, gh, store, engine := setupGitHubTestContext()
 
 	baseTime := time.Now()
 

@@ -102,7 +102,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [ingestion](./ingestion/) | `github.com/zqk-os/zqk/pkg/ingestion` | 0+0 | 0 | adapters, translation | ❌ - | Data ingestion pipeline, file format adapters, and document translation. |
 | [integrity](./integrity/) | `github.com/zqk-os/zqk/pkg/integrity` | 4+3 | 3 | - | ❌ - | Kernel state integrity verification, hash validation, and tamper detection. |
 | [interactionpolicy](./interactionpolicy/) | `github.com/zqk-os/zqk/pkg/interactionpolicy` | 9+7 | 7 | - | ❌ - | User-agent interaction constraints, confirmation prompts, and safe intervention rules. |
-| [interactive](./interactive/) | `github.com/zqk-os/zqk/pkg/interactive` | 7+5 | 5 | - | ❌ - | Interactive terminal UI components, prompts, select menus, and survey wizards. |
+| [interactive](./interactive/) | `github.com/zqk-os/zqk/pkg/interactive` | 6+5 | 5 | - | ❌ - | Interactive terminal UI components, prompts, select menus, and survey wizards. |
 | [interfacepack](./interfacepack/) | `github.com/zqk-os/zqk/pkg/interfacepack` | 1+0 | 0 | - | ❌ - | Interface contract and API boundary specifications pack. |
 | [kernel](./kernel/) | `github.com/zqk-os/zqk/pkg/kernel` | 4+3 | 3 | intake, mutation, +2 more | ❌ - | Knowledge Kernel bootstrap sequence, runtime lifecycle, and core state coordination. |
 | [kernelcas](./kernelcas/) | `github.com/zqk-os/zqk/pkg/kernelcas` | 5+4 | 4 | compose | ❌ - | Kernel Content-Addressable Storage (CAS) integration and object hash trees. |
@@ -166,13 +166,13 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [resourcehygiene](./resourcehygiene/) | `github.com/zqk-os/zqk/pkg/resourcehygiene` | 5+2 | 2 | - | ❌ - | Resourcehygiene component and domain abstractions for ZQK Core. |
 | [rollback](./rollback/) | `github.com/zqk-os/zqk/pkg/rollback` | 6+3 | 3 | - | ❌ - | A reusable snapshot-and-rollback pattern for lifecycle transitions, maintenance tasks, and other operations. See docs/architect... |
 | [rollup](./rollup/) | `github.com/zqk-os/zqk/pkg/rollup` | 3+2 | 2 | - | ❌ - | Rollup component and domain abstractions for ZQK Core. |
-| [runtime](./runtime/) | `github.com/zqk-os/zqk/pkg/runtime` | 4+4 | 4 | - | ❌ - | Runtime environment detection, OS capabilities, and hardware specs. |
+| [runtime](./runtime/) | `github.com/zqk-os/zqk/pkg/runtime` | 3+4 | 4 | - | ❌ - | Runtime environment detection, OS capabilities, and hardware specs. |
 | [safepath](./safepath/) | `github.com/zqk-os/zqk/pkg/safepath` | 1+1 | 1 | - | ❌ - | Builds filesystem paths confined under a root directory to mitigate directory traversal when joining untrusted or external segm... |
 | [scenario](./scenario/) | `github.com/zqk-os/zqk/pkg/scenario` | 6+7 | 7 | - | ❌ - | Convergence lifecycle end-to-end tests (storage-backed CVS updates). Coverage: measure → BuildSuggestedConvergenceSessionFields... |
 | [scheduler](./scheduler/) | `github.com/zqk-os/zqk/pkg/scheduler` | 201+250 | 250 | clusterstatus, hostservice, transceiver | ❌ - | Distributed job scheduler, cron execution, maintenance tasks, and test scans. |
-| [screencap](./screencap/) | `github.com/zqk-os/zqk/pkg/screencap` | 2+3 | 3 | - | ❌ - | Headless browser automation and visual screenshot capture engine. |
+| [screencap](./screencap/) | `github.com/zqk-os/zqk/pkg/screencap` | 2+3 | 3 | - | ✅ [README](./screencap/README.md) | pkg/screencap provides headless and interactive terminal automation coupled with native screen, window, and rectangular region... |
 | [search](./search/) | `github.com/zqk-os/zqk/pkg/search` | 6+2 | 2 | - | ❌ - | Search component and domain abstractions for ZQK Core. |
-| [seatworker](./seatworker/) | `github.com/zqk-os/zqk/pkg/seatworker` | 1+2 | 2 | - | ❌ - | Installs OS supervisor units for `agent seat-worker`. Production must not exec scripts/mesh/install-seat-workers.sh. p |
+| [seatworker](./seatworker/) | `github.com/zqk-os/zqk/pkg/seatworker` | 1+2 | 2 | - | ✅ [README](./seatworker/README.md) | pkg/seatworker provides OS-level service supervision (via launchd on macOS and systemd on Linux) to run autonomous agent seats... |
 | [security](./security/) | `github.com/zqk-os/zqk/pkg/security` | 4+3 | 3 | secretpatterns | ❌ - | Security policies, credential isolation, and capability verification. |
 | [semantic](./semantic/) | `github.com/zqk-os/zqk/pkg/semantic` | 5+7 | 7 | graph, translator | ❌ - | Semantic component and domain abstractions for ZQK Core. |
 | [service](./service/) | `github.com/zqk-os/zqk/pkg/service` | 6+3 | 3 | - | ❌ - | Core service lifecycle, daemon startup, and background worker orchestration. |
@@ -180,9 +180,9 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [shockwave](./shockwave/) | `github.com/zqk-os/zqk/pkg/shockwave` | 4+7 | 7 | - | ❌ - | Event shockwave propagation, reactive state invalidation, and dependent notifications. |
 | [shovelready](./shovelready/) | `github.com/zqk-os/zqk/pkg/shovelready` | 1+2 | 2 | - | ❌ - | Shovel-ready work discovery, execution scoring, and backlog ranking. |
 | [skill](./skill/) | `github.com/zqk-os/zqk/pkg/skill` | 2+2 | 2 | - | ❌ - | Agent skill model definitions, capability declarations, and tool bindings. |
-| [skills](./skills/) | `github.com/zqk-os/zqk/pkg/skills` | 0+0 | 0 | breeding, mutation | ❌ - | Skill loading, registry resolution, and execution sandboxing. |
+| [skills](./skills/) | `github.com/zqk-os/zqk/pkg/skills` | 0+0 | 0 | breeding, mutation | ✅ [README](./skills/README.md) | This package tree (pkg/skills) implements autonomous agent skill maintenance, fitness-driven evolution, and generative synthesi... |
 | [specbuilder](./specbuilder/) | `github.com/zqk-os/zqk/pkg/specbuilder` | 3+3 | 3 | adapters, api_builders, +20 more | ✅ [README](./specbuilder/README.md) | This package provides the core infrastructure for the Spec-Driven Builder Pattern, a reusable pattern for generating artifacts... |
-| [specialization](./specialization/) | `github.com/zqk-os/zqk/pkg/specialization` | 6+4 | 4 | - | ❌ - | Agent specialization roles, domain competence, and persona assignment. |
+| [specialization](./specialization/) | `github.com/zqk-os/zqk/pkg/specialization` | 6+4 | 4 | - | ✅ [README](./specialization/README.md) | pkg/specialization governs horizontal node segregation, component filtering, and side-effect sandboxing within ZQK swarm deploy... |
 | [specorigination](./specorigination/) | `github.com/zqk-os/zqk/pkg/specorigination` | 6+5 | 5 | - | ❌ - | Stable stage names for spec origination pipelines. Wire these with pkg/pipeline.Builder.AddStage using pipeline kind PipelineKi... |
 | [stampmemo](./stampmemo/) | `github.com/zqk-os/zqk/pkg/stampmemo` | 6+1 | 1 | - | ❌ - | A stamp-invalidated memo: the key is a stable identity, the stamp is the generation. There is no size limit, LRU, or TTL. Maps... |
 | [stewardbase](./stewardbase/) | `github.com/zqk-os/zqk/pkg/stewardbase` | 1+1 | 1 | - | ❌ - | Base interfaces and common abstractions for stream storage stewards. |
@@ -473,9 +473,9 @@ pkg/
 │   └── clusterstatus/
 │   └── hostservice/
 │   └── transceiver/
-├── screencap/          # Headless browser automation and visual screenshot capture en
+├── screencap/          # pkg/screencap provides headless and interactive terminal aut
 ├── search/          # Search component and domain abstractions for ZQK Core.
-├── seatworker/          # Installs OS supervisor units for `agent seat-worker`. Produc
+├── seatworker/          # pkg/seatworker provides OS-level service supervision (via la
 ├── security/          # Security policies, credential isolation, and capability veri
 │   └── secretpatterns/
 ├── semantic/          # Semantic component and domain abstractions for ZQK Core.
@@ -486,7 +486,7 @@ pkg/
 ├── shockwave/          # Event shockwave propagation, reactive state invalidation, an
 ├── shovelready/          # Shovel-ready work discovery, execution scoring, and backlog 
 ├── skill/          # Agent skill model definitions, capability declarations, and 
-├── skills/          # Skill loading, registry resolution, and execution sandboxing
+├── skills/          # This package tree (pkg/skills) implements autonomous agent s
 │   └── breeding/
 │   └── mutation/
 ├── specbuilder/          # This package provides the core infrastructure for the Spec-D
@@ -512,7 +512,7 @@ pkg/
 │   └── routing_builders/
 │   └── trait_builders/
 │   └── yaml/
-├── specialization/          # Agent specialization roles, domain competence, and persona a
+├── specialization/          # pkg/specialization governs horizontal node segregation, comp
 ├── specorigination/          # Stable stage names for spec origination pipelines. Wire thes
 ├── stampmemo/          # A stamp-invalidated memo: the key is a stable identity, the 
 ├── stewardbase/          # Base interfaces and common abstractions for stream storage s
