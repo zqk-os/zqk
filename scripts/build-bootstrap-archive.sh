@@ -80,13 +80,11 @@ if [ -f "${INTERNAL_DIR}/configs/cleanup_config.yaml" ]; then
 	mkdir -p "$STAGING/cleanup_config"
 	cp "${INTERNAL_DIR}/configs/cleanup_config.yaml" "$STAGING/cleanup_config/config.yaml"
 fi
-# Onboarding roadmap templates (priority plan, workstream, backlog items); seed job creates them when run
+# Onboarding roadmap templates (priority plan, workstream, requirements, criteria, test cases, backlog items, zql seed)
 ONBOARDING_DIR="${REPO_ROOT}/scripts/onboarding_roadmap"
 if [ -d "$ONBOARDING_DIR" ]; then
 	mkdir -p "$STAGING/scripts/onboarding_roadmap"
-	for f in priority_plan_onboarding.yaml workstream_onboarding.yaml backlog_item_01_read_philosophy.yaml backlog_item_02_start_here.yaml backlog_item_03_system_health.yaml milestone_onboarding.yaml goal_onboarding.yaml README.md; do
-		[ -f "$ONBOARDING_DIR/$f" ] && cp "$ONBOARDING_DIR/$f" "$STAGING/scripts/onboarding_roadmap/"
-	done
+	cp "$ONBOARDING_DIR"/*.yaml "$ONBOARDING_DIR"/*.zql "$ONBOARDING_DIR"/*.md "$STAGING/scripts/onboarding_roadmap/" 2>/dev/null || true
 fi
 
 # Drop any AppleDouble sidecars that were already in the source tree (COPYFILE_DISABLE does not remove existing ._ files).

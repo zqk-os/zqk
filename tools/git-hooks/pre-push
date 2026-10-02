@@ -97,7 +97,29 @@ if [ -d "$REPO_ROOT/.zqk" ]; then
 		fi
 	fi
 
-	if command -v go >/dev/null 2>&1 && [ -d "$REPO_ROOT/examples/swarms/code-eval/failclosed_audit" ]; then
+	# ---------------------------------------------------------------------------
+	# Attention-Hailing Mechanism & Project-Specific Pre-Push Batteries
+	# ---------------------------------------------------------------------------
+	# Projects can register custom push gates without modifying template hooks by:
+	# 1. Placing executable scripts in .zqk/hooks/pre-push.d/
+	# 2. Or setting ZQK_PRE_PUSH_BATTERY="<command>" in your environment / project config.
+	if [ -d "$REPO_ROOT/.zqk/hooks/pre-push.d" ]; then
+		for hook in "$REPO_ROOT/.zqk/hooks/pre-push.d"/*; do
+			if [ -x "$hook" ]; then
+				echo "🛡️  [ZQK PRE-PUSH] Executing project hook: $(basename "$hook")..."
+				if ! "$hook"; then
+					echo "❌ [ZQK PRE-PUSH] Project hook $hook failed! Push aborted." >&2
+					exit 1
+				fi
+			fi
+		done
+	elif [ -n "${ZQK_PRE_PUSH_BATTERY:-}" ]; then
+		echo "🛡️  [ZQK PRE-PUSH] Executing configured battery: ${ZQK_PRE_PUSH_BATTERY}..."
+		if ! eval "${ZQK_PRE_PUSH_BATTERY}"; then
+			echo "❌ [ZQK PRE-PUSH] Configured battery failed! Push aborted." >&2
+			exit 1
+		fi
+	elif command -v go >/dev/null 2>&1 && [ -d "$REPO_ROOT/examples/swarms/code-eval/failclosed_audit" ]; then
 		echo "🛡️  [ZQK PRE-PUSH] Running failclosed audit invariant battery..."
 		if ! (cd "$REPO_ROOT/examples/swarms/code-eval/failclosed_audit" && go test -timeout 1m .); then
 			echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2

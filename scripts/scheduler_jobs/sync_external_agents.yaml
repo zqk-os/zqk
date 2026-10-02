@@ -1,6 +1,6 @@
 # Sync external agents job
 # Periodically syncs external agent configurations (e.g., .zqk/ or cursor rules).
-# Create: zqk new object scheduler_job --file scripts/scheduler_jobs/sync_external_agents.yaml --promote
+# Create: zqk object create scheduler_job --file scripts/scheduler_jobs/sync_external_agents.yaml --promote
 id: SCH-agent-sync
 title: Sync External Agents
 description: |

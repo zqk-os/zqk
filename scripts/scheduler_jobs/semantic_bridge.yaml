@@ -18,10 +18,15 @@ trigger_type: daemon
 execution_mode: reusable
 status: active
 enabled: false
-command: zqk
+command: /bin/sh
 command_args:
-  - system
-  - semantic-bridge-daemon
+  - "-c"
+  - |
+    set -euo pipefail
+    ROOT="${ZQK_PROJECT_ROOT:-.}"
+    cd "$ROOT"
+    BIN="${ZQK_BIN:-zqk}"
+    exec "$BIN" system semantic-bridge-daemon
 max_runtime_seconds: 0
 category: system
 namespace_id: zqk:kernel

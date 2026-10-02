@@ -966,9 +966,16 @@
 ./scripts/onboarding_roadmap/backlog_item_01_read_philosophy.yaml
 ./scripts/onboarding_roadmap/backlog_item_02_start_here.yaml
 ./scripts/onboarding_roadmap/backlog_item_03_system_health.yaml
+./scripts/onboarding_roadmap/criteria_onboarding_failclosed_boundary.yaml
+./scripts/onboarding_roadmap/criteria_onboarding_philosophy.yaml
+./scripts/onboarding_roadmap/criteria_onboarding_system_health.yaml
 ./scripts/onboarding_roadmap/goal_onboarding.yaml
 ./scripts/onboarding_roadmap/milestone_onboarding.yaml
+./scripts/onboarding_roadmap/onboarding_seed.zql
 ./scripts/onboarding_roadmap/priority_plan_onboarding.yaml
+./scripts/onboarding_roadmap/requirement_onboarding.yaml
+./scripts/onboarding_roadmap/test_case_onboarding_boundary.yaml
+./scripts/onboarding_roadmap/test_case_onboarding_health.yaml
 ./scripts/onboarding_roadmap/workstream_onboarding.yaml
 ./scripts/scheduler_jobs/
 ./scripts/scheduler_jobs/audit_event_aggregation_default.yaml
