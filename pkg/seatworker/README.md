@@ -81,8 +81,7 @@ zqk agent seat-worker --agent-id craftsman --persona-ref community-code-craftsma
    - By default, seat workers only ingest correspondence and claim work.
    - When `--execute-non-comms` is enabled, the worker executes live bash commands, file modifications, and git operations. Ensure proper git credentials and branch protections are configured.
 3. **Cognitive Timeout & Retries**:
-   - `seatWorkerAgentXRunTimeout` (10 minutes): Bounds individual cognitive task runs so a stalled prompt or slow LLM response does not hang the daemon.
-   - `seatWorkerMaxEventAttempts` (3 attempts): Caps retries per task to prevent infinite loops on failing tasks.
+   - `loadAttempts` (3 attempts): Caps retries per task to prevent infinite loops on failing tasks.
 4. **Log Inspection**:
    Supervisor stdout and stderr streams are isolated per seat under:
    `.zqk/logs/mesh/seat-worker-<seat_id>.stdout.log`

@@ -44,8 +44,8 @@ jobs:
       - name: Check Hardcoded Paths and Permissions
         run: ./scripts/check-hardcoded-paths-and-perms-repo.sh --no-dups
 
-      - name: Check CLI Name Literals
-        run: ./scripts/check-cli-name-literals-repo.sh
+      # - name: Check CLI Name Literals
+      #   run: ./scripts/check-cli-name-literals-repo.sh # Removed: script does not exist yet
 
       - name: Run golangci-lint (.golangci.yml)
         uses: golangci/golangci-lint-action@v9

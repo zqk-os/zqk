@@ -6,7 +6,7 @@ Welcome to the ZQK open-core project! We welcome contributions from human engine
 
 ## 1. Prerequisites & Environment Setup
 
-- **Go**: Version 1.23 or higher
+- **Go**: Version 1.26 or higher
 - **Make**: Standard GNU make
 - **Git**: Version 2.30 or higher
 

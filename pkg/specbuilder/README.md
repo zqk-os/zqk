@@ -70,9 +70,6 @@ The core package is extended by domain-specific packages:
 
 - `pkg/specbuilder/generators` - Test scenario generation (new implementation)
 - `pkg/mcp/testing` - Test scenario generation (legacy, being migrated)
-- `pkg/templates/builder` - Object template generation
-- `pkg/config/builder` - Configuration file generation
-- `pkg/validation/builder` - Validation rule generation
 - (more to come...)
 
 **Note**: The scenario generator has been migrated to use specbuilder infrastructure. See `MIGRATION_GUIDE.md` for migration details.

@@ -10,7 +10,7 @@
   - Spawns background CLI sessions with bidirectional pipe control (`stdin`, `stdout`, `stderr`).
   - Simulates interactive human typing with millisecond timestamps (`TypeCommand`, `AppendTimelineEvent`).
   - Records real-time timeline event traces (`TimelineEvent`) suitable for rendering animated terminal casts and SVG/GIF demos.
-  - Matches live stdout patterns (`WaitForOutput`, `WaitForOutputWithTimeout`) to synchronize execution phases.
+  - Matches live stdout patterns (`WaitForOutput`) to synchronize execution phases.
 - **Visual Capture Engine (`Capturer`)**:
   - `CaptureWindow(ctx, windowID, outputPath)`: Captures a specific application window by native OS window identifier.
   - `CaptureRegion(ctx, x, y, width, height, outputPath)`: Crops and records a designated screen bounding box without capturing full display real-estate.
@@ -53,9 +53,10 @@ if err := automator.Start(); err != nil {
 }
 
 // Type command and snapshot the terminal window
-ctx := context.Background()
+ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+defer cancel()
 _ = automator.TypeCommand("zqk workflow whats-next")
-_ = automator.WaitForOutput("Priority Plan", 3*time.Second)
+_ = automator.WaitForOutput(ctx, "Priority Plan")
 _ = capturer.CaptureScreen(ctx, "artifacts/whats_next_output.png")
 ```
 

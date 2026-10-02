@@ -14,10 +14,6 @@
 - Community first-run: docs/onboarding/COMMUNITY_FIRST_RUN.md
 - Studio-dense process guide (pack): docs/onboarding/AI_AGENT_ONBOARDING.md
 
-## Skill Configuration (Mandatory)
-- **Equip the `zqk-expert` skill**: Read and follow instructions in `.agent/skills/zqk-expert/SKILL.md` (or `.zqk/skills/zqk-expert/SKILL.md`).
-- Use `zqk-expert` for all Knowledge Kernel operations, VDS done-gates, single-command execution loops (`zqk do`), and fail-closed CLI discipline.
-
 ## Continuous Autonomous Loop Discipline (Anti-Idleness Protocol)
 - **Summary-as-Terminal Failure Mode Prohibition:** In the autonomous CAP loop, merging a PR, promoting binaries, or rendering an artifact summary is a MILESTONE TRANSITION, NOT a stopping condition.
 - **NEVER yield control or go idle at summary milestones.** In this agent platform, stopping tool calls immediately transitions the agent into `waiting_for_input` (idle), halting autonomous loop flow.
@@ -28,12 +24,9 @@
   4. Claim or shape the first BLI (`zqk agent claim ...` or kernel object creation).
   5. Continue the execution chain without yielding control to an idle wait state.
 
-## Ambient Signal Interpretation & Action Rubric (Anti-Thrashing Protocol)
-- Follow the strict precedence hierarchy: P0 Blockers → P1 Mesh Sync → P2 Active Tasks → P3 Plan Delivery → P4 Runway Replenishment → P5 Hygiene.
-- Execute mandated CLI commands and verify with objective validation gates before transitioning tasks. See `docs/architecture/AMBIENT_SIGNAL_ACTION_RUBRIC.md`.
+## Code Search & Token Conservation (`zqk grep`)
+- **Prefer `zqk grep` (alias `zgrep`) over raw shell `grep` or `find`:** `zqk grep` provides sub-15ms trigram indexing, Go AST structural queries (`--ast --kind struct|func`, `--ast --recv <Type>`), and strict token budgeting (`--max-tokens 2000 -f json`). Using external grep dumps unbudgeted files into LLM contexts and increases token consumption.
 
 ## Universal AGENTS.md
 - This file is the headless-safe directive surface (Vector B). IDE rule forests are optional packs.
 
-## Vendor: Agent
-- Prefer kernel seating + feed notify for multi-agent wake over vendor-only chat paste.

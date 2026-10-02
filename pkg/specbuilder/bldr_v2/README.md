@@ -12,7 +12,7 @@ This package contains **generated** spec builders for system object types. All f
 
 All changes must be made to the YAML spec files, then regenerated using:
 ```bash
-zqk system generate-builders --overwrite
+zqk system generate-instance-builders --overwrite
 ```
 
 ## Architecture
@@ -103,8 +103,8 @@ Builders generate `*objects.Spec` instances that are used by:
 The Makefile automatically regenerates these builders before each build:
 
 ```makefile
-generate-spec-builders:
-    go run ./cmd/zqk system generate-builders --overwrite
+codegen:
+    go run ./cmd/zqk system generate-instance-builders --overwrite
 ```
 
 This ensures generated code is always up-to-date.

@@ -15,9 +15,14 @@ All `zqk` commands accept standard global flags governing execution context, ser
 | `--context` | string | `ai-agent` | Active context profile: `ai-agent`, `human`, or `debug`. Governs token budgets and machine-readable output envelopes. |
 | `--format` | string | `table` | Serialization format for command output: `table`, `json`, `yaml`, `stream`, or `json-rpc`. |
 | `--timeout` | duration | `30s` | Maximum execution duration before timing out and failing closed. |
-| `--allow-degraded` | bool | `false` | When true, permits read-only command execution when secondary indices or cache services are degraded. |
 | `--help` | bool | `false` | Displays help message and flag taxonomy for any command or subcommand. |
 | `--version` | bool | `false` | Displays current ZQK binary version, build commit, and compiler metadata. |
+
+### Common Command-Specific Flags
+
+| Flag | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `--allow-degraded` | bool | `false` | Allow scheduler-dependent commands to run when scheduler daemon is not running. (Available on specific commands, e.g., `system`). |
 
 ### Context Profiles
 
@@ -39,6 +44,7 @@ All `zqk` commands accept standard global flags governing execution context, ser
 
 ### Initializing and Seating Workspaces
 
+- `zqk init`: Project initialization.
 - `zqk quickstart`: Interactive or automated onboarding wizard. Detects host environment, seats the default workspace, verifies prerequisites, and launches background daemons.
 
 ---
@@ -47,6 +53,11 @@ All `zqk` commands accept standard global flags governing execution context, ser
 
 The everyday command family covers core day-to-day interactions with the Knowledge Kernel:
 
+- `zqk do`: Autonomous execution loop.
+- `zqk query`: ZPARQL graph queries.
+- `zqk mutate`: ZQL atomic mutations.
+- `zqk run`: Swarm package execution.
+- `zqk ui`: Visual web studio.
 - `zqk workflow`: Manages workflow execution states, next actions (`whats-next`), and Verifiable Decomposition Spine (VDS) done-gates.
 - `zqk object`: Comprehensive CRUD, inspect, promote, and query operations for all kernel ontological objects.
 - `zqk system`: Inspects platform health (`system check`), performs secret scans, validates command specifications, and diagnoses daemons.
@@ -54,7 +65,6 @@ The everyday command family covers core day-to-day interactions with the Knowled
 - `zqk grep`: Ultra-fast native code search utilizing Go AST parsing, trigram indexing, and token-budgeted AI payloads.
 - `zqk test`: Test execution suite, runner harnesses, and verification matrix DoD checks.
 - `zqk auth`: Authentication, session token validation, credential stores, and agent capability bindings.
-- `zqk use`: Context switching and active project workspace binding.
 - `zqk validate`: Validates instance YAML files, schemas, and ontological invariants against specifications.
 - `zqk version`: Displays binary build commit, release version, and compiler toolchain information.
 
@@ -98,6 +108,12 @@ The everyday command family covers core day-to-day interactions with the Knowled
 - `zqk organizational`: Team configurations, persona assignments, and governance policies.
 - `zqk rollback`: Rollback journal execution, state restoration, and transaction recovery.
 - `zqk semantic`: Semantic recall, embeddings generation, vector search, and glossary lookups.
+- `zqk inspect`: Object inspection.
+- `zqk explain`: Glossary/concept explanation.
+- `zqk healthchk`: System health check.
+- `zqk state`: State management & streaming.
+- `zqk sync`: Synchronization.
+- `zqk pack`: Pack management.
 - `zqk spec`: Command specification generator, spec validation, and schema builders.
 
 ---
@@ -110,7 +126,7 @@ The everyday command family covers core day-to-day interactions with the Knowled
 zqk workflow whats-next --format json
 
 # 2. Claim next available backlog item atomically
-zqk agent claim BLI-12345 --atomic --skip-parallel
+zqk agent claim BLI-12345
 
 # 3. Execute implementation and continuous verification
 zqk test run --all
@@ -151,7 +167,4 @@ All behavior can be steered via standard environment variables:
 | Variable | Description | Default |
 | :--- | :--- | :--- |
 | `ZQK_PROJECT_ROOT` | Absolute path to the seated Knowledge Kernel project root directory. | Current working directory or parent traversal. |
-| `ZQK_CONTEXT_PROFILE` | Default context profile (`ai-agent`, `human`, `debug`). | `ai-agent` |
 | `ZQK_LOG_LEVEL` | Minimum log severity level (`debug`, `info`, `warn`, `error`). | `info` |
-| `ZQK_TIMEOUT` | Global default command execution timeout. | `30s` |
-| `ZQK_ALLOW_DEGRADED` | Enables degraded execution mode when secondary caches are offline. | `false` |

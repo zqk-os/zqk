@@ -32,7 +32,7 @@ Use `./bin/zqk` from the project directory. **Do not** `export ZQK_PROJECT_ROOT`
 | Stage | What it does | If it fails |
 |-------|----------------|-------------|
 | **detect** | Find Cursor / Claude Code / Cline / Windsurf / Gemini markers | Continue without an IDE agent |
-| **auth** | Local system account. Leftover `~/.zqk/credentials` must not block an empty directory | `./bin/zqk system init` first. There is no `auth login` command |
+| **auth** | Local system account. Leftover `~/.zqk/credentials` must not block an empty directory | `./bin/zqk system init` first, or run `./bin/zqk auth login` to create or reuse a session |
 | **seat** | Idempotent `PER-DEFAULT-*` seating (same as init) | `./bin/zqk system seed-default-agent-seating` |
 | **prime_workspace** | Write regenerable vendor directives into **missing** files only (`--force` to overwrite) | Fix permissions; re-run |
 | **prime_kernel** | Write `.zqk/agent-runtime/agent_workspace_sync.json` | Fix `.zqk/agent-runtime` writes |
@@ -77,4 +77,4 @@ First-run CRUD, `object list`, and `whats-next` work without the daemon. Start i
 5. `./bin/zqk test dashboard` — test_case ↔ criteria lineage.
 6. `./bin/zqk workflow whats-next --format json`.
 
-There is no `zqk agent new`, `zqk auth`, `zqk-admin`, or `system spec-origination` on this SKU. Scheduler **is** shipped: `zqk scheduler start|stop|status`. Spec origination and command codegen stay on the admin binary.
+ZQK Community provides the complete system kernel: object lifecycle, spec origination, command codegen, scheduler daemons (`zqk scheduler start|stop|status`), and Model Context Protocol (MCP) integration are fully native and offline-capable out of the box.

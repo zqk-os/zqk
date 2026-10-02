@@ -85,7 +85,7 @@ SCH-016 must use **bulk delete** instead of a per-ID loop to avoid re-creating s
 zqk object update SCH-016 --file scripts/sch016-command-patch.yaml
 ```
 
-To re-enable the job after patching, promote it along its lifecycle: `zqk object promote SCH-016` (or `zqk scheduler resume SCH-016`; legacy alternative: `zqk object update SCH-016 --field "status=active"`).
+To re-enable the job after patching, promote it along its lifecycle: `zqk object promote SCH-016` (legacy alternative: `zqk object update SCH-016 --field "status=active"`).
 
 See `scripts/sch016-command-patch.yaml` and rule `object-bulk-delete-not-loop.mdc`.
 

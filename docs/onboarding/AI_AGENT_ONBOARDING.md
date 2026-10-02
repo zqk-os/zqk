@@ -28,7 +28,7 @@ ZQK is built to interface seamlessly with any AI agent via the Model Context Pro
 - **Claude Desktop:**
   Auto-install the MCP server configuration:
   ```bash
-  zqk mcp install --client claude-desktop
+  zqk mcp install
   ```
   Restart Claude Desktop. The ZQK tools icon will appear in the input bar.
 - **Claude Code (CLI):**
