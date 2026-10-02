@@ -53,7 +53,7 @@ func NewInitCmd() *cobra.Command {
 		"  - "+paths.ProcessDir+"/ directory structure for object storage",
 		"  - Initial configuration files",
 	).
-		AddExample("Greenfield: Initialize in current directory (Note: 'zqk system init' is an alias)", "%s init").
+		AddExample("Greenfield: Initialize in current directory (Note: 'system init' is an alias)", "%s init").
 		AddExample("Declarative Seed: Initialize with answer file", "%s init --answer-file seed.yaml").
 		AddExample("Legacy: Initialize existing project", "%s init --legacy").
 		AddExample("Snapshot: Initialize from snapshot (test scenario)", zqkenv.TestRoot().Name()+"=test-scenarios/my-scenario %s init --from-snapshot snapshot.csnap --wipe").
