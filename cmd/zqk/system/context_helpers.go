@@ -103,7 +103,15 @@ func resolveContextProjectRoot(ctx *cli.Context) (string, error) {
 }
 
 func resolveCommandProjectRoot(cmd *cobra.Command) (string, error) {
-	return resolveContextProjectRoot(cli.GetContext(cmd))
+	return cli.ResolveCommandProjectRoot(cmd)
+}
+
+// getCommandSystemContext returns cmd.Context() or a fallback system context if nil.
+func getCommandSystemContext(cmd *cobra.Command) context.Context {
+	if cmd != nil && cmd.Context() != nil {
+		return cmd.Context()
+	}
+	return pkgctx.NewSystemContext()
 }
 
 // openStorageProvider creates a StorageFactory for projectRoot and returns its ObjectStorageProvider along with a deferrable cleanup function.
@@ -559,5 +567,68 @@ func getGlobalValidationLoaders() GlobalValidationLoaders {
 		Validator:       validation.GetGlobalRegistry().Get(""),
 	}
 }
+
+// unpackGlobalValidationLoaders returns the global spec loader, lifecycle loader, and validator.
+func unpackGlobalValidationLoaders() (*objects.SpecLoader, *objects.LifecycleLoader, validation.Validator) {
+	loaders := getGlobalValidationLoaders()
+	return loaders.SpecLoader, loaders.LifecycleLoader, loaders.Validator
+}
+
+// CheckSharedResources encapsulates loaders and caches shared across synchronous and baseline validation.
+type CheckSharedResources struct {
+	SpecLoader        *objects.SpecLoader
+	LifecycleLoader   *objects.LifecycleLoader
+	Validator         validation.Validator
+	HashRegistryCache *HashRegistryCacheType
+	ObjectIDCache     *ObjectIDCache
+}
+
+// initCheckSharedResources initializes shared loaders and caches.
+func initCheckSharedResources() *CheckSharedResources {
+	specLoader, lifecycleLoader, validator := unpackGlobalValidationLoaders()
+	return &CheckSharedResources{
+		SpecLoader:        specLoader,
+		LifecycleLoader:   lifecycleLoader,
+		Validator:         validator,
+		HashRegistryCache: &HashRegistryCacheType{
+			cache: make(map[string]storage.HashRegistryProvider),
+		},
+		ObjectIDCache: GetGlobalObjectIDCache(),
+	}
+}
+
+// addIncludeResultsFlag registers the standard --include-results flag.
+func addIncludeResultsFlag(cmd *cobra.Command) {
+	cmd.Flags().Bool("include-results", false, "Include full check results in output (increases file size)")
+}
+
+// getGuardedProcessorContext returns the processor and operation context, wrapped in cli.Guard on error.
+func getGuardedProcessorContext(cmd *cobra.Command) (*cli.Processor, context.Context, error) {
+	proc, err := cli.NewProcessor(cmd)
+	if err != nil {
+		return nil, nil, cli.Guard(cmd).Err(err).Wrapf("processor: %w").Return()
+	}
+	return proc, proc.OperationContext(), nil
+}
+
+// loadSnapshotFromProcessor loads and expands snapshot using the processor's project root.
+func loadSnapshotFromProcessor(cmd *cobra.Command, proc *cli.Processor) ([]map[string]any, error) {
+	return loadAndExpandSnapshot(cmd, proc.ProjectRoot())
+}
+
+// requireProjectRoot returns the processor's project root or an error if empty.
+func requireProjectRoot(proc *cli.Processor) (string, error) {
+	root := proc.ProjectRoot()
+	if root == emptyValue {
+		return "", errfmt.Errorf("project root not found")
+	}
+	return root, nil
+}
+
+// createSystemStorageProvider creates a storage factory and returns its ObjectStorageProvider.
+func createSystemStorageProvider(ctx context.Context, projectRoot string) (storage.ObjectStorageProvider, error) {
+	return cli.NewStorageProviderFromFactory(ctx, projectRoot)
+}
+
 
 

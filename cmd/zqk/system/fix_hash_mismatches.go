@@ -204,14 +204,8 @@ func listObjectIDsByKind(cmd *cobra.Command, kind string) ([]string, error) {
 	if err != nil {
 		return nil, errfmt.Newf("processor").Wrap(err)
 	}
-	secCtx := proc.SecurityContext()
-	if secCtx == nil {
-		secCtx = pkgctx.NewSystemSecurityContext()
-	}
-	storageCtx := proc.StorageContext()
-	if storageCtx == nil {
-		storageCtx = pkgctx.NewStorageContext()
-	}
+	secCtx := proc.ResolvedSecurityContext()
+	storageCtx := proc.ResolvedStorageContext()
 	result, err := proc.Storage().List(cmd.Context(), secCtx, storageCtx, storage.ListFilter{
 		Kind:  kind,
 		Limit: 0, // no limit — get all IDs for this kind

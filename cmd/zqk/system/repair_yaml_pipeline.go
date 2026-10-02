@@ -14,7 +14,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/nildecode"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/pipeline"
-	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -73,13 +72,9 @@ func executeRepairYAMLCorrectionCore(
 	stdctx := pkgctx.NewSystemContext()
 	stdctx = pkgctx.WithCacheUpdate(stdctx, objectID, repairKind, "")
 
-	storageFactory, err := storage.NewStorageFactory(stdctx, projectRoot)
+	storageProvider, err := createSystemStorageProvider(stdctx, projectRoot)
 	if err != nil {
-		return errfmt.Newf("failed to create storage factory").Wrap(err)
-	}
-	storageProvider := storageFactory.GetStorage()
-	if storageProvider == nil {
-		return errfmt.Errorf("storage provider is nil")
+		return err
 	}
 
 	secCtx := pkgctx.NewSystemSecurityContext()
@@ -127,11 +122,8 @@ func RunRepairYAMLViaPipeline(
 		return errfmt.Errorf("repair-yaml: projectRoot required")
 	}
 
+	baseCtx := getCommandSystemContext(cmd)
 	stageLogger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	baseCtx := cmd.Context()
-	if baseCtx == nil {
-		baseCtx = pkgctx.NewSystemContext()
-	}
 
 	payload := &repairYAMLPipelinePayload{
 		cmd:           cmd,

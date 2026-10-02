@@ -147,20 +147,15 @@ func runSubmit(cmd *cobra.Command, args []string) error {
 func submitJob(cliCtx *cli.Context, cmd *cobra.Command, args []string) error {
 	ctx := pkgctx.NewSystemContext()
 
-	projectRoot := cli.ResolveProjectRoot(".")
-	if projectRoot == emptyValue && cliCtx != nil {
-		projectRoot = cliCtx.ProjectRoot
-	}
-	if projectRoot == emptyValue {
-		return errfmt.Errorf("project root not found")
+	projectRoot, err := cli.ResolveCommandProjectRoot(cmd)
+	if err != nil {
+		return err
 	}
 
-	// Create storage provider
-	storageFactory, err := storage.NewStorageFactory(ctx, projectRoot)
+	storageProvider, err := cli.NewStorageProviderFromFactory(ctx, projectRoot)
 	if err != nil {
-		return errfmt.Newf("failed to create storage factory").Wrap(err)
+		return err
 	}
-	storageProvider := storageFactory.GetStorage()
 
 	secCtx := pkgctx.NewSystemSecurityContext()
 

@@ -191,16 +191,5 @@ func enqueueJobTriggerRequest(ctx *cli.Context, cmd *cobra.Command, jobID string
 }
 
 func resolveCommandProjectRoot(cmd *cobra.Command) (string, error) {
-	ctx := cli.GetContext(cmd)
-	if ctx == nil {
-		return "", errfmt.Errorf("failed to get context")
-	}
-	projectRoot := cli.ResolveProjectRoot(".")
-	if projectRoot == emptyValue {
-		projectRoot = ctx.ProjectRoot
-	}
-	if projectRoot == emptyValue {
-		return "", errfmt.Errorf("project root not found")
-	}
-	return projectRoot, nil
+	return cli.ResolveCommandProjectRoot(cmd)
 }

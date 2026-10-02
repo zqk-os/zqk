@@ -285,6 +285,14 @@ func (p *Processor) SecurityContext() *pkgctx.SecurityContext {
 	return p.secCtx
 }
 
+// ResolvedSecurityContext returns the security context, falling back to a new system security context if nil.
+func (p *Processor) ResolvedSecurityContext() *pkgctx.SecurityContext {
+	if p.secCtx != nil {
+		return p.secCtx
+	}
+	return pkgctx.NewSystemSecurityContext()
+}
+
 // Logger returns the logger
 func (p *Processor) Logger() *logging.EventLogger {
 	return p.logger
@@ -306,6 +314,14 @@ func (p *Processor) ResolvedProjectRoot() string {
 // StorageContext returns the storage context
 func (p *Processor) StorageContext() *pkgctx.StorageContext {
 	return p.storageCtx
+}
+
+// ResolvedStorageContext returns the storage context, falling back to a new storage context if nil.
+func (p *Processor) ResolvedStorageContext() *pkgctx.StorageContext {
+	if p.storageCtx != nil {
+		return p.storageCtx
+	}
+	return pkgctx.NewStorageContext()
 }
 
 // StorageFactory returns a new storage factory for the current project root.

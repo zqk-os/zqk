@@ -71,14 +71,19 @@ func runKernelIntegrityReport(cmd *cobra.Command, args []string) error {
 	})(cmd, args)
 }
 
+func parseKernelIntegrityFlags(cmd *cobra.Command) (dryRun bool, limit int) {
+	apply, _ := cmd.Flags().GetBool("apply")
+	dryRun, _ = cmd.Flags().GetBool("dry-run")
+	if apply {
+		dryRun = false
+	}
+	limit, _ = cmd.Flags().GetInt("limit")
+	return dryRun, limit
+}
+
 func runKernelIntegrityHealDangling(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-		apply, _ := cmd.Flags().GetBool("apply")
-		dryRun, _ := cmd.Flags().GetBool("dry-run")
-		if apply {
-			dryRun = false
-		}
-		limit, _ := cmd.Flags().GetInt("limit")
+		dryRun, limit := parseKernelIntegrityFlags(cmd)
 
 		ctx := proc.OperationContext()
 		sec := proc.SecurityContext()
@@ -182,12 +187,7 @@ func runKernelIntegrityHealDangling(cmd *cobra.Command, args []string) error {
 
 func runKernelIntegrityBackfillWorkEnvelope(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-		apply, _ := cmd.Flags().GetBool("apply")
-		dryRun, _ := cmd.Flags().GetBool("dry-run")
-		if apply {
-			dryRun = false
-		}
-		limit, _ := cmd.Flags().GetInt("limit")
+		dryRun, limit := parseKernelIntegrityFlags(cmd)
 		out := storage.BackfillWorkEnvelopeCompletedAt(
 			proc.OperationContext(),
 			proc.SecurityContext(),

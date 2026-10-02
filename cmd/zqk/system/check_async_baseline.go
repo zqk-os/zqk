@@ -617,7 +617,7 @@ func NewCheckAsyncBaselineCmd() *cobra.Command {
 	cmd.Flags().String("baseline-file", defaultBaselineFile, "Path to baseline metrics file")
 	cmd.Flags().String("comparison-output", "", "Output file for comparison results (JSON format)")
 	cmd.Flags().Int("workers", 4, "Number of validation workers")
-	cmd.Flags().Bool("include-results", false, "Include full check results in output (increases file size)")
+	addIncludeResultsFlag(cmd)
 
 	cli.AddCommonFlags(cmd)
 	return cmd

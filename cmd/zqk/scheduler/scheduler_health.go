@@ -73,13 +73,11 @@ func runHealthCheck(cmd *cobra.Command, args []string) error {
 		os.Exit(2)
 	}
 
-	storageFactory, err := storagepkg.NewStorageFactory(pkgctx.NewSystemContext(), projectRoot)
+	storageProvider, err := cli.NewStorageProviderFromFactory(pkgctx.NewSystemContext(), projectRoot)
 	if err != nil {
 		logging.Fluent(logger).Error("Failed to create storage factory", err).Log()
 		os.Exit(2)
 	}
-
-	storageProvider := storageFactory.GetStorage()
 	secCtx := pkgctx.NewSystemSecurityContext()
 	storageCtx := pkgctx.NewStorageContext()
 

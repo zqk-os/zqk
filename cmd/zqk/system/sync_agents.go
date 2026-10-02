@@ -23,11 +23,10 @@ func NewSyncAgentsCmd() *cobra.Command {
 }
 
 func runSyncAgents(cmd *cobra.Command, dir string) error {
-	proc, err := cli.NewProcessor(cmd)
+	_, ctx, err := getGuardedProcessorContext(cmd)
 	if err != nil {
-		return cli.Guard(cmd).Err(err).Wrapf("processor: %w").Return()
+		return err
 	}
-	ctx := proc.OperationContext()
 
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	adapter := adapters.NewGeminiAdapter(logger)

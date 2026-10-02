@@ -63,12 +63,11 @@ func runStateRestore(cmd *cobra.Command, args []string) error {
 
 		// Detach from the default 30s CLI timeout since restoring state can take longer
 		ctx := context.WithoutCancel(proc.OperationContext())
-		projectRoot := proc.ProjectRoot()
-
-		expanded, err := loadAndExpandSnapshot(cmd, projectRoot)
+		expanded, err := loadSnapshotFromProcessor(cmd, proc)
 		if err != nil {
 			return err
 		}
+		projectRoot := proc.ProjectRoot()
 
 		// Restore writes into the process tree; file modification updates CAS via discovery.
 		prune, _ := cmd.Flags().GetBool("prune")

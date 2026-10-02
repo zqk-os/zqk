@@ -27,14 +27,8 @@ func emitOperationExecutorEventViaCoordinator(
 		// Build audit metadata
 		auditMetadata := make(map[string]any)
 		auditMetadata[eventKeyEventType] = fmt.Sprintf("operation_executor_%s", operationType)
-		auditMetadata[eventKeyOperation] = fmt.Sprintf("Operation executor %s: %d workers, %d processed, %d failed", operationType, workerCount, processedCount, failedCount)
-		auditMetadata[eventKeyWorkerCount] = workerCount
-		auditMetadata[eventKeyProcessedCount] = processedCount
-		auditMetadata[eventKeyFailedCount] = failedCount
-		auditMetadata[eventKeyDurationSeconds] = duration.Seconds()
-		auditMetadata[eventKeyOperationType] = operationTypeOperationExecutor
-		auditMetadata[eventKeySource] = sourceBackgroundWorker
-		auditMetadata[eventKeySeverity] = determineFailureSeverity(status, failedCount, processedCount)
+		severity := determineFailureSeverity(status, failedCount, processedCount)
+		populateWorkerAuditMetadata(auditMetadata, operationTypeOperationExecutor, workerCount, processedCount, failedCount, duration, severity)
 
 		loggingFields, metricsData := buildWorkerLoggingAndMetrics(
 			operationType, status,

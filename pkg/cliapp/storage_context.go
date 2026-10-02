@@ -133,3 +133,16 @@ func GetObjectStorageForCommand(cmd *cobra.Command, projectRoot string) (storage
 	storageCache[projectRoot] = provider
 	return provider, nil
 }
+
+// NewStorageProviderFromFactory creates a storage provider via storage.NewStorageFactory.
+func NewStorageProviderFromFactory(ctx context.Context, projectRoot string) (storage.ObjectStorageProvider, error) {
+	storageFactory, err := storage.NewStorageFactory(ctx, projectRoot)
+	if err != nil {
+		return nil, errfmt.Newf("failed to create storage factory").Wrap(err)
+	}
+	storageProvider := storageFactory.GetStorage()
+	if storageProvider == nil {
+		return nil, errfmt.Errorf("storage provider is nil")
+	}
+	return storageProvider, nil
+}

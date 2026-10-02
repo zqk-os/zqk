@@ -30,9 +30,7 @@ func NewHydrateGraphCmd() *cobra.Command {
 func runHydrateGraph(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 		ctx := proc.OperationContext()
-		projectRoot := proc.ProjectRoot()
-
-		expanded, err := loadAndExpandSnapshot(cmd, projectRoot)
+		expanded, err := loadSnapshotFromProcessor(cmd, proc)
 		if err != nil {
 			return err
 		}

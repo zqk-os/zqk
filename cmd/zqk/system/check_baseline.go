@@ -123,21 +123,7 @@ func runCheckAllSynchronous(projectRoot string, cmd *cobra.Command, ctx *cli.Con
 
 	// Discover all object kinds
 	kinds := discoverObjectKinds(processDir)
-
-	// Create shared loaders
-	// Use global loaders to share caches across sync and async validation
-	loaders := getGlobalValidationLoaders()
-	specLoader := loaders.SpecLoader
-	lifecycleLoader := loaders.LifecycleLoader
-	validator := loaders.Validator
-
-	// Cache hash registries per kind
-	hashRegistryCache := &HashRegistryCacheType{
-		cache: make(map[string]storage.HashRegistryProvider),
-	}
-
-	// Build object ID cache
-	objectIDCache := GetGlobalObjectIDCache()
+	res := initCheckSharedResources()
 	checkRefs, _ := cmd.Flags().GetBool("check-refs") //nolint:errcheck // Flag parsing errors are non-critical
 	fastMode, _ := cmd.Flags().GetBool("fast")        //nolint:errcheck // Flag parsing errors are non-critical
 	if checkRefs && !fastMode {
@@ -158,7 +144,7 @@ func runCheckAllSynchronous(projectRoot string, cmd *cobra.Command, ctx *cli.Con
 
 	// Check each kind
 	for _, kind := range kinds {
-		results, _, err := CheckKindObjectsWithCache(internalCtx, pkgctx.NewSystemContext(), cmd, kind, nil, specLoader, lifecycleLoader, validator, hashRegistryCache, objectIDCache)
+		results, _, err := CheckKindObjectsWithCache(internalCtx, pkgctx.NewSystemContext(), cmd, kind, nil, res.SpecLoader, res.LifecycleLoader, res.Validator, res.HashRegistryCache, res.ObjectIDCache)
 		if err != nil {
 			logger := logging.GetLoggerFromProfile(ctx.Profile)
 			logging.Fluent(logger).Warn("Failed to check kind").
@@ -304,7 +290,7 @@ func NewCheckBaselineCmd() *cobra.Command {
 	helpBuilder.ApplyToCommand(cmd)
 
 	cmd.Flags().String("baseline-output", "", "Output file for baseline metrics (JSON format)")
-	cmd.Flags().Bool("include-results", false, "Include full check results in output (increases file size)")
+	addIncludeResultsFlag(cmd)
 
 	cli.AddCommonFlags(cmd)
 	return cmd
