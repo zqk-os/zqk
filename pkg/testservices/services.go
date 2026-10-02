@@ -101,20 +101,7 @@ func (sm *ServiceManager) StartService(ctx context.Context, config ServiceConfig
 	_ = execwrap.CommandContext(ctx, "docker", "rm", "-f", config.ContainerName).Run() //nolint:gosec // test container name from config
 
 	// Build docker run command
-	args := []string{"run", "-d", "--name", config.ContainerName}
-
-	// Add ports
-	for hostPort, containerPort := range config.Ports {
-		args = append(args, "-p", fmt.Sprintf("%s:%s", hostPort, containerPort))
-	}
-
-	// Add environment variables
-	for key, value := range config.Environment {
-		args = append(args, "-e", fmt.Sprintf("%s=%s", key, value))
-	}
-
-	// Add image
-	args = append(args, config.Image)
+	args := BuildDockerRunArgs(config.ContainerName, config.Image, config.Ports, config.Environment)
 
 	// Start container
 	sm.log("Starting test service: %s", config.Name)
@@ -247,20 +234,43 @@ func (sm *ServiceManager) checkCommandHealth(ctx context.Context, command []stri
 }
 
 // isDockerAvailable checks if Docker is available
-func (sm *ServiceManager) isDockerAvailable() bool {
-	cmd := exec.Command("docker", "info")
-	err := cmd.Run()
-	return err == nil
+// BuildDockerRunArgs builds the standard docker run CLI argument list.
+func BuildDockerRunArgs(containerName, image string, ports, env map[string]string, extraArgs ...string) []string {
+	args := []string{"run", "-d", "--name", containerName}
+	for hostPort, containerPort := range ports {
+		args = append(args, "-p", fmt.Sprintf("%s:%s", hostPort, containerPort))
+	}
+	for key, value := range env {
+		args = append(args, "-e", fmt.Sprintf("%s=%s", key, value))
+	}
+	args = append(args, extraArgs...)
+	args = append(args, image)
+	return args
 }
 
-// isServiceRunning checks if a service container is running
-func (sm *ServiceManager) isServiceRunning(containerName string) bool {
+// IsDockerAvailable checks if Docker is installed and running on the host.
+func IsDockerAvailable() bool {
+	cmd := exec.Command("docker", "info")
+	return cmd.Run() == nil
+}
+
+func (sm *ServiceManager) isDockerAvailable() bool {
+	return IsDockerAvailable()
+}
+
+// IsDockerContainerRunning checks if a docker container with the exact container name is running.
+func IsDockerContainerRunning(containerName string) bool {
 	cmd := exec.Command("docker", "ps", "--filter", fmt.Sprintf("name=%s", containerName), "--format", "{{.Names}}") //nolint:gosec // Docker command with sanitized container name
 	output, err := cmd.Output()
 	if err != nil {
 		return false
 	}
 	return strings.TrimSpace(string(output)) == containerName
+}
+
+// isServiceRunning checks if a service container is running
+func (sm *ServiceManager) isServiceRunning(containerName string) bool {
+	return IsDockerContainerRunning(containerName)
 }
 
 // hostPortsAlreadyPublished reports whether every host port in config is already

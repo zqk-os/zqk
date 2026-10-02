@@ -195,3 +195,31 @@ func TestFileUtil_DurableWrite(t *testing.T) {
 		}
 	}
 }
+
+func TestWriteSecureJSONIndent(t *testing.T) {
+	dir := t.TempDir()
+	p := filepath.Join(dir, "nested", "sub", "config.json")
+	payload := map[string]string{"foo": "bar"}
+
+	if err := WriteSecureJSONIndent(p, payload); err != nil {
+		t.Fatalf("WriteSecureJSONIndent failed: %v", err)
+	}
+
+	st, err := Stat(p)
+	if err != nil {
+		t.Fatalf("stat failed: %v", err)
+	}
+	if perm := st.Mode().Perm(); perm != 0600 {
+		t.Errorf("perm got %o, want 0600", perm)
+	}
+
+	data, err := ReadFile(p)
+	if err != nil {
+		t.Fatalf("ReadFile failed: %v", err)
+	}
+	expected := "{\n  \"foo\": \"bar\"\n}\n"
+	if string(data) != expected {
+		t.Errorf("content got %q, want %q", string(data), expected)
+	}
+}
+

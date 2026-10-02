@@ -1,8 +1,6 @@
 package testdiscovery
 
 import (
-	"bufio"
-	"bytes"
 	"context"
 	"fmt"
 	"path/filepath"
@@ -33,45 +31,25 @@ var (
 )
 
 func (d *CargoDiscoverer) Discover(ctx context.Context, projectRoot, relPath string, content []byte) ([]DiscoveredTarget, error) {
-	scanner := bufio.NewScanner(bytes.NewReader(content))
-	var targets []DiscoveredTarget
-	var currentSuite string
-	var pendingTags []string
-	var pendingCrit []string
-	var pendingReq []string
+	state := newLineDiscoveryState(content)
 	hasTestAttr := false
 
-	lineNum := 0
-	for scanner.Scan() {
-		lineNum++
-		line := scanner.Text()
+	for state.scanner.Scan() {
+		state.lineNum++
+		line := state.scanner.Text()
 		trimmed := strings.TrimSpace(line)
 
 		// Extract doc/line comments for criteria & requirements
 		if strings.HasPrefix(trimmed, "//") {
 			commentBody := strings.TrimPrefix(trimmed, "//")
-			if m := critRegex.FindStringSubmatch(commentBody); len(m) > 1 {
-				for _, p := range strings.Split(m[1], ",") {
-					p = strings.TrimSpace(p)
-					if p != "" {
-						pendingCrit = append(pendingCrit, p)
-					}
-				}
-			}
-			if m := reqRegex.FindStringSubmatch(commentBody); len(m) > 1 {
-				for _, p := range strings.Split(m[1], ",") {
-					p = strings.TrimSpace(p)
-					if p != "" {
-						pendingReq = append(pendingReq, p)
-					}
-				}
-			}
+			crit, req := extractCriteriaAndReqs(commentBody)
+			state.appendMetadata(crit, req, nil)
 			continue
 		}
 
 		// Detect test module: mod tests { ... }
 		if m := rustModTestRegex.FindStringSubmatch(line); len(m) > 1 {
-			currentSuite = m[1]
+			state.currentSuite = m[1]
 			continue
 		}
 
@@ -83,7 +61,7 @@ func (d *CargoDiscoverer) Discover(ctx context.Context, projectRoot, relPath str
 
 		// Check for #[ignore]
 		if rustIgnoreRegex.MatchString(trimmed) {
-			pendingTags = append(pendingTags, "ignore")
+			state.pendingTags = append(state.pendingTags, "ignore")
 			continue
 		}
 
@@ -91,7 +69,7 @@ func (d *CargoDiscoverer) Discover(ctx context.Context, projectRoot, relPath str
 		if hasTestAttr {
 			if m := rustFnRegex.FindStringSubmatch(line); len(m) > 1 {
 				fnName := m[1]
-				suite := currentSuite
+				suite := state.currentSuite
 				if suite == "" {
 					base := filepath.Base(relPath)
 					suite = strings.TrimSuffix(base, ".rs")
@@ -99,23 +77,21 @@ func (d *CargoDiscoverer) Discover(ctx context.Context, projectRoot, relPath str
 
 				cmd := fmt.Sprintf("cargo test %s", fnName)
 
-				targets = append(targets, DiscoveredTarget{
+				state.targets = append(state.targets, DiscoveredTarget{
 					ID:               fmt.Sprintf("rust:%s:%s", relPath, fnName),
 					Path:             relPath,
 					Language:         "rust",
 					Suite:            suite,
 					Function:         fnName,
-					Line:             lineNum,
-					Tags:             pendingTags,
-					CriteriaRefs:     pendingCrit,
-					RequirementRefs:  pendingReq,
+					Line:             state.lineNum,
+					Tags:             state.pendingTags,
+					CriteriaRefs:     state.pendingCrit,
+					RequirementRefs:  state.pendingReq,
 					ExecutionCommand: cmd,
 				})
 
 				hasTestAttr = false
-				pendingTags = nil
-				pendingCrit = nil
-				pendingReq = nil
+				state.resetPending()
 				continue
 			}
 
@@ -126,5 +102,5 @@ func (d *CargoDiscoverer) Discover(ctx context.Context, projectRoot, relPath str
 		}
 	}
 
-	return targets, scanner.Err()
+	return state.targets, state.scanner.Err()
 }

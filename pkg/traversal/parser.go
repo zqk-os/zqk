@@ -123,6 +123,10 @@ func (l *Lexer) advance() rune {
 	return ch
 }
 
+func (l *Lexer) lineCol() (int, int) {
+	return l.line, l.col
+}
+
 func (l *Lexer) skipWhitespaceAndComments() {
 	for l.pos < len(l.input) {
 		ch := l.current()
@@ -131,13 +135,7 @@ func (l *Lexer) skipWhitespaceAndComments() {
 			continue
 		}
 		// Single-line comment // or --
-		if ch == '/' && l.peek(1) == '/' {
-			for l.pos < len(l.input) && l.current() != '\n' {
-				l.advance()
-			}
-			continue
-		}
-		if ch == '-' && l.peek(1) == '-' {
+		if (ch == '/' && l.peek(1) == '/') || (ch == '-' && l.peek(1) == '-') {
 			for l.pos < len(l.input) && l.current() != '\n' {
 				l.advance()
 			}
@@ -169,8 +167,7 @@ func (l *Lexer) NextToken() (Token, error) {
 		return Token{Type: TokenEOF, Line: l.line, Column: l.col}, nil
 	}
 
-	startLine := l.line
-	startCol := l.col
+	startLine, startCol := l.lineCol()
 	ch := l.current()
 
 	// Handle arrows and punctuation
@@ -285,9 +282,27 @@ func (l *Lexer) NextToken() (Token, error) {
 	return Token{}, fmt.Errorf("%s: unexpected character %q at line %d, column %d", ErrCodeZPARQLSyntaxError, ch, startLine, startCol)
 }
 
+func decodeEscapeRune(escaped rune) rune {
+	switch escaped {
+	case 'n':
+		return '\n'
+	case 't':
+		return '\t'
+	case 'r':
+		return '\r'
+	case '\\':
+		return '\\'
+	case '"':
+		return '"'
+	case '\'':
+		return '\''
+	default:
+		return escaped
+	}
+}
+
 func (l *Lexer) scanString(quote rune) (Token, error) {
-	startLine := l.line
-	startCol := l.col
+	startLine, startCol := l.lineCol()
 	l.advance() // skip open quote
 
 	var sb strings.Builder
@@ -303,22 +318,7 @@ func (l *Lexer) scanString(quote rune) (Token, error) {
 				break
 			}
 			escaped := l.advance()
-			switch escaped {
-			case 'n':
-				sb.WriteRune('\n')
-			case 't':
-				sb.WriteRune('\t')
-			case 'r':
-				sb.WriteRune('\r')
-			case '\\':
-				sb.WriteRune('\\')
-			case '"':
-				sb.WriteRune('"')
-			case '\'':
-				sb.WriteRune('\'')
-			default:
-				sb.WriteRune(escaped)
-			}
+			sb.WriteRune(decodeEscapeRune(escaped))
 			continue
 		}
 		sb.WriteRune(ch)
@@ -329,8 +329,7 @@ func (l *Lexer) scanString(quote rune) (Token, error) {
 }
 
 func (l *Lexer) scanNumber() (Token, error) {
-	startLine := l.line
-	startCol := l.col
+	startLine, startCol := l.lineCol()
 	var sb strings.Builder
 
 	if l.current() == '-' {
@@ -349,8 +348,7 @@ func (l *Lexer) scanNumber() (Token, error) {
 }
 
 func (l *Lexer) scanIdent() (Token, error) {
-	startLine := l.line
-	startCol := l.col
+	startLine, startCol := l.lineCol()
 	var sb strings.Builder
 
 	for l.pos < len(l.input) {

@@ -82,9 +82,7 @@ func (m *WaitGroupManager) CreateGroupForGoroutine(id, operation string) *sync.W
 
 // GetGroup returns an existing WaitGroup by ID, or nil if it doesn't exist.
 func (m *WaitGroupManager) GetGroup(id string) *sync.WaitGroup {
-	m.mu.RLock()
-	defer m.mu.RUnlock()
-	entry, exists := m.wgs[id]
+	entry, _, exists := m.getEntryAndObserver(id)
 	if !exists {
 		return nil
 	}
@@ -92,17 +90,35 @@ func (m *WaitGroupManager) GetGroup(id string) *sync.WaitGroup {
 	return entry.wg
 }
 
+func (m *WaitGroupManager) getEntryAndObserver(id string) (*waitGroupEntry, WaitGroupObserver, bool) {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	entry, exists := m.wgs[id]
+	return entry, m.observer, exists
+}
+
+func (m *WaitGroupManager) recordCompleted(id string, observer WaitGroupObserver, start time.Time) {
+	if observer != nil {
+		observer.OnGroupCompleted(id, time.Since(start))
+	}
+}
+
+func (m *WaitGroupManager) waitAsync(entry *waitGroupEntry, label, desc string) <-chan struct{} {
+	done := make(chan struct{})
+	goroutinelabels.NewGoroutine(label, desc).
+		StartSimple(func() {
+			entry.wg.Wait()
+			close(done)
+		})
+	return done
+}
+
 // Add increments the WaitGroup counter for the given ID.
 func (m *WaitGroupManager) Add(id string, delta int) {
-	m.mu.RLock()
-	entry, exists := m.wgs[id]
-	observer := m.observer
-	m.mu.RUnlock()
-
+	entry, observer, exists := m.getEntryAndObserver(id)
 	if !exists {
 		return
 	}
-
 	entry.wg.Add(delta)
 	if observer != nil {
 		observer.OnGroupAdd(id, delta)
@@ -111,15 +127,10 @@ func (m *WaitGroupManager) Add(id string, delta int) {
 
 // Done decrements the WaitGroup counter for the given ID.
 func (m *WaitGroupManager) Done(id string) {
-	m.mu.RLock()
-	entry, exists := m.wgs[id]
-	observer := m.observer
-	m.mu.RUnlock()
-
+	entry, observer, exists := m.getEntryAndObserver(id)
 	if !exists {
 		return
 	}
-
 	entry.wg.Done()
 	if observer != nil {
 		observer.OnGroupDone(id)
@@ -128,35 +139,21 @@ func (m *WaitGroupManager) Done(id string) {
 
 // Wait blocks until the WaitGroup counter is zero.
 func (m *WaitGroupManager) Wait(id string) {
-	m.mu.RLock()
-	entry, exists := m.wgs[id]
-	observer := m.observer
-	m.mu.RUnlock()
-
+	entry, observer, exists := m.getEntryAndObserver(id)
 	if !exists {
 		return
 	}
-
 	start := time.Now()
 	if observer != nil {
 		observer.OnGroupWait(id)
 	}
-
 	entry.wg.Wait()
-
-	duration := time.Since(start)
-	if observer != nil {
-		observer.OnGroupCompleted(id, duration)
-	}
+	m.recordCompleted(id, observer, start)
 }
 
 // WaitWithTimeout blocks until the WaitGroup counter is zero or timeout expires.
 func (m *WaitGroupManager) WaitWithTimeout(id string, timeout time.Duration) bool {
-	m.mu.RLock()
-	entry, exists := m.wgs[id]
-	observer := m.observer
-	m.mu.RUnlock()
-
+	entry, observer, exists := m.getEntryAndObserver(id)
 	if !exists {
 		return true
 	}
@@ -166,19 +163,10 @@ func (m *WaitGroupManager) WaitWithTimeout(id string, timeout time.Duration) boo
 		observer.OnGroupWait(id)
 	}
 
-	done := make(chan struct{})
-	goroutinelabels.NewGoroutine("waitgroup_wait_timeout", "waiting for group completion").
-		StartSimple(func() {
-			entry.wg.Wait()
-			close(done)
-		})
-
+	done := m.waitAsync(entry, "waitgroup_wait_timeout", "waiting for group completion")
 	select {
 	case <-done:
-		duration := time.Since(start)
-		if observer != nil {
-			observer.OnGroupCompleted(id, duration)
-		}
+		m.recordCompleted(id, observer, start)
 		return true
 	case <-time.After(timeout):
 		return false
@@ -187,11 +175,7 @@ func (m *WaitGroupManager) WaitWithTimeout(id string, timeout time.Duration) boo
 
 // WaitWithContext blocks until the WaitGroup counter is zero or context is cancelled.
 func (m *WaitGroupManager) WaitWithContext(ctx context.Context, id string) error {
-	m.mu.RLock()
-	entry, exists := m.wgs[id]
-	observer := m.observer
-	m.mu.RUnlock()
-
+	entry, observer, exists := m.getEntryAndObserver(id)
 	if !exists {
 		return nil
 	}
@@ -201,19 +185,10 @@ func (m *WaitGroupManager) WaitWithContext(ctx context.Context, id string) error
 		observer.OnGroupWait(id)
 	}
 
-	done := make(chan struct{})
-	goroutinelabels.NewGoroutine("waitgroup_wait_context", "waiting for group completion with context").
-		StartSimple(func() {
-			entry.wg.Wait()
-			close(done)
-		})
-
+	done := m.waitAsync(entry, "waitgroup_wait_context", "waiting for group completion with context")
 	select {
 	case <-done:
-		duration := time.Since(start)
-		if observer != nil {
-			observer.OnGroupCompleted(id, duration)
-		}
+		m.recordCompleted(id, observer, start)
 		return nil
 	case <-ctx.Done():
 		return ctx.Err()

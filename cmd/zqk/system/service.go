@@ -21,6 +21,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/service"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testservices"
 )
 
 // NewServiceCmd creates a command for managing services (e.g., MemGraph)
@@ -261,35 +262,19 @@ func (sm *ServiceManager) Start(ctx context.Context, serviceName string, auth *S
 	}
 
 	// Build docker run command
-	args := []string{"run", "-d", "--name", config.ContainerName}
-
-	// Add ports
-	for hostPort, containerPort := range config.Ports {
-		args = append(args, "-p", fmt.Sprintf("%s:%s", hostPort, containerPort))
-	}
-
-	// Add environment variables
-	for key, value := range config.Environment {
-		args = append(args, "-e", fmt.Sprintf("%s=%s", key, value))
-	}
-
-	// Add authentication if provided
+	var extraArgs []string
 	if auth != nil {
 		if auth.Username != emptyValue {
-			args = append(args, "-e", fmt.Sprintf("MEMGRAPH_USERNAME=%s", auth.Username))
+			extraArgs = append(extraArgs, "-e", fmt.Sprintf("MEMGRAPH_USERNAME=%s", auth.Username))
 		}
 		if auth.Password != emptyValue {
-			args = append(args, "-e", fmt.Sprintf("MEMGRAPH_PASSWORD=%s", auth.Password))
+			extraArgs = append(extraArgs, "-e", fmt.Sprintf("MEMGRAPH_PASSWORD=%s", auth.Password))
 		}
 	}
-
-	// Add volumes
 	for hostPath, containerPath := range config.Volumes {
-		args = append(args, "-v", fmt.Sprintf("%s:%s", hostPath, containerPath))
+		extraArgs = append(extraArgs, "-v", fmt.Sprintf("%s:%s", hostPath, containerPath))
 	}
-
-	// Add image
-	args = append(args, config.Image)
+	args := testservices.BuildDockerRunArgs(config.ContainerName, config.Image, config.Ports, config.Environment, extraArgs...)
 
 	// Execute docker run
 	cmd := execwrap.Command("docker", args...)
@@ -392,20 +377,12 @@ func (sm *ServiceManager) Status(ctx context.Context, serviceName string) (bool,
 
 // isDockerAvailable checks if Docker is available
 func (sm *ServiceManager) isDockerAvailable() bool {
-	cmd := execwrap.Command("docker", "info")
-	err := cmd.Run()
-	return err == nil
+	return testservices.IsDockerAvailable()
 }
 
 // isServiceRunning checks if a service container is running
 func (sm *ServiceManager) isServiceRunning(containerName string) bool {
-	//nolint:gosec // G204: Docker command with fixed arguments - container name is validated
-	cmd := execwrap.Command("docker", "ps", "--filter", fmt.Sprintf("name=%s", containerName), "--format", "{{.Names}}")
-	output, err := cmd.Output()
-	if err != nil {
-		return false
-	}
-	return strings.TrimSpace(string(output)) == containerName
+	return testservices.IsDockerContainerRunning(containerName)
 }
 
 // ListServices returns a list of available services

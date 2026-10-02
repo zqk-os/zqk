@@ -116,18 +116,18 @@ func TestStorageBoundariesGate(t *testing.T) {
 		t.Fatalf("expected empty storage dir to pass, got: %v", res.Violations)
 	}
 
-	// Create subpackage core importing sibling file
-	coreDir := filepath.Join(storageDir, "core")
-	_ = os.MkdirAll(coreDir, paths.DirPerm755)
-	badFile := filepath.Join(coreDir, "bad.go")
-	_ = os.WriteFile(badFile, []byte(`package core
+	// Create subpackage wal importing sibling file
+	walDir := filepath.Join(storageDir, "wal")
+	_ = os.MkdirAll(walDir, paths.DirPerm755)
+	badFile := filepath.Join(walDir, "bad.go")
+	_ = os.WriteFile(badFile, []byte(`package wal
 
 import "github.com/zqk-os/zqk/pkg/storage/file"
 `), paths.FilePerm644)
 
 	resBad, _ := gate.Run(context.Background(), RunOptions{ProjectRoot: tempDir})
 	if resBad.Passed {
-		t.Fatal("expected storage boundary violation for core importing file, but passed")
+		t.Fatal("expected storage boundary violation for wal importing file, but passed")
 	}
 }
 

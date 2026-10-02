@@ -108,6 +108,10 @@ func (l *ZQLLexer) advance() rune {
 	return ch
 }
 
+func (l *ZQLLexer) lineCol() (int, int) {
+	return l.line, l.col
+}
+
 func (l *ZQLLexer) skipWhitespaceAndComments() {
 	for l.pos < len(l.input) {
 		ch := l.current()
@@ -116,13 +120,7 @@ func (l *ZQLLexer) skipWhitespaceAndComments() {
 			continue
 		}
 		// Single-line comment // or --
-		if ch == '/' && l.peek(1) == '/' {
-			for l.pos < len(l.input) && l.current() != '\n' {
-				l.advance()
-			}
-			continue
-		}
-		if ch == '-' && l.peek(1) == '-' {
+		if (ch == '/' && l.peek(1) == '/') || (ch == '-' && l.peek(1) == '-') {
 			for l.pos < len(l.input) && l.current() != '\n' {
 				l.advance()
 			}
@@ -154,8 +152,7 @@ func (l *ZQLLexer) NextToken() (ZQLToken, error) {
 		return ZQLToken{Type: ZQLTokenEOF, Line: l.line, Column: l.col}, nil
 	}
 
-	startLine := l.line
-	startCol := l.col
+	startLine, startCol := l.lineCol()
 	ch := l.current()
 
 	// Variable identifier $var
@@ -228,9 +225,27 @@ func (l *ZQLLexer) NextToken() (ZQLToken, error) {
 		ErrCodeZQLSyntaxError, startLine, startCol, ch)
 }
 
+func decodeZQLRune(escaped rune) rune {
+	switch escaped {
+	case 'n':
+		return '\n'
+	case 't':
+		return '\t'
+	case 'r':
+		return '\r'
+	case '\\':
+		return '\\'
+	case '"':
+		return '"'
+	case '\'':
+		return '\''
+	default:
+		return escaped
+	}
+}
+
 func (l *ZQLLexer) scanString(quote rune) (ZQLToken, error) {
-	startLine := l.line
-	startCol := l.col
+	startLine, startCol := l.lineCol()
 	l.advance() // skip open quote
 
 	var sb strings.Builder
@@ -246,22 +261,7 @@ func (l *ZQLLexer) scanString(quote rune) (ZQLToken, error) {
 				break
 			}
 			escaped := l.advance()
-			switch escaped {
-			case 'n':
-				sb.WriteRune('\n')
-			case 't':
-				sb.WriteRune('\t')
-			case 'r':
-				sb.WriteRune('\r')
-			case '\\':
-				sb.WriteRune('\\')
-			case '"':
-				sb.WriteRune('"')
-			case '\'':
-				sb.WriteRune('\'')
-			default:
-				sb.WriteRune(escaped)
-			}
+			sb.WriteRune(decodeZQLRune(escaped))
 			continue
 		}
 		sb.WriteRune(ch)
@@ -273,8 +273,7 @@ func (l *ZQLLexer) scanString(quote rune) (ZQLToken, error) {
 }
 
 func (l *ZQLLexer) scanNumber() (ZQLToken, error) {
-	startLine := l.line
-	startCol := l.col
+	startLine, startCol := l.lineCol()
 	var sb strings.Builder
 
 	if l.current() == '-' {
@@ -289,8 +288,7 @@ func (l *ZQLLexer) scanNumber() (ZQLToken, error) {
 }
 
 func (l *ZQLLexer) scanIdent() (ZQLToken, error) {
-	startLine := l.line
-	startCol := l.col
+	startLine, startCol := l.lineCol()
 	var sb strings.Builder
 
 	for l.pos < len(l.input) {

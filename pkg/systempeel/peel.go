@@ -37,18 +37,20 @@ func NewSystemInspector(rootDir string) *SystemInspector {
 	return &SystemInspector{RootDir: rootDir}
 }
 
-// InspectSystemPackage scans a system package directory and calculates file counts and LOC.
-func (si *SystemInspector) InspectSystemPackage(pkgRelPath string) (*PeeledCommandMetadata, error) {
+type goFileInfo struct {
+	baseName string
+	relPath  string
+	loc      int
+}
+
+func (si *SystemInspector) scanGoFiles(pkgRelPath string) ([]goFileInfo, error) {
 	fullPath := filepath.Join(si.RootDir, pkgRelPath)
 	entries, err := fileutil.ReadDir(fullPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read package dir %s: %w", fullPath, err)
 	}
 
-	totalLOC := 0
-	var subcommands []string
-	var largeFiles []LargeFileReport
-
+	var files []goFileInfo
 	for _, entry := range entries {
 		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".go") {
 			continue
@@ -59,16 +61,36 @@ func (si *SystemInspector) InspectSystemPackage(pkgRelPath string) (*PeeledComma
 			return nil, fmt.Errorf("failed to read file %s: %w", filePath, err)
 		}
 		lines := strings.Split(string(content), "\n")
-		loc := len(lines)
-		totalLOC += loc
-		base := strings.TrimSuffix(entry.Name(), ".go")
+		files = append(files, goFileInfo{
+			baseName: entry.Name(),
+			relPath:  filepath.Join(pkgRelPath, entry.Name()),
+			loc:      len(lines),
+		})
+	}
+	return files, nil
+}
+
+// InspectSystemPackage scans a system package directory and calculates file counts and LOC.
+func (si *SystemInspector) InspectSystemPackage(pkgRelPath string) (*PeeledCommandMetadata, error) {
+	files, err := si.scanGoFiles(pkgRelPath)
+	if err != nil {
+		return nil, err
+	}
+
+	totalLOC := 0
+	var subcommands []string
+	var largeFiles []LargeFileReport
+
+	for _, f := range files {
+		totalLOC += f.loc
+		base := strings.TrimSuffix(f.baseName, ".go")
 		subcommands = append(subcommands, base)
 
-		if loc > 1000 {
+		if f.loc > 1000 {
 			largeFiles = append(largeFiles, LargeFileReport{
-				RelativePath: filepath.Join(pkgRelPath, entry.Name()),
-				LinesOfCode:  loc,
-				BaseName:     entry.Name(),
+				RelativePath: f.relPath,
+				LinesOfCode:  f.loc,
+				BaseName:     f.baseName,
 			})
 		}
 	}
@@ -88,29 +110,18 @@ func (si *SystemInspector) InspectSystemPackage(pkgRelPath string) (*PeeledComma
 
 // FindFilesExceedingThreshold finds all Go files in pkgRelPath with LOC > maxLOC.
 func (si *SystemInspector) FindFilesExceedingThreshold(pkgRelPath string, maxLOC int) ([]LargeFileReport, error) {
-	fullPath := filepath.Join(si.RootDir, pkgRelPath)
-	entries, err := fileutil.ReadDir(fullPath)
+	files, err := si.scanGoFiles(pkgRelPath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read package dir %s: %w", fullPath, err)
+		return nil, err
 	}
 
 	var results []LargeFileReport
-	for _, entry := range entries {
-		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".go") {
-			continue
-		}
-		filePath := filepath.Join(fullPath, entry.Name())
-		content, err := fileutil.ReadFile(filePath)
-		if err != nil {
-			return nil, fmt.Errorf("failed to read file %s: %w", filePath, err)
-		}
-		lines := strings.Split(string(content), "\n")
-		loc := len(lines)
-		if loc > maxLOC {
+	for _, f := range files {
+		if f.loc > maxLOC {
 			results = append(results, LargeFileReport{
-				RelativePath: filepath.Join(pkgRelPath, entry.Name()),
-				LinesOfCode:  loc,
-				BaseName:     entry.Name(),
+				RelativePath: f.relPath,
+				LinesOfCode:  f.loc,
+				BaseName:     f.baseName,
 			})
 		}
 	}
