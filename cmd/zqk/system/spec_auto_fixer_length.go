@@ -24,67 +24,45 @@ func extractLengthConstraint(validation map[string]any, constraintName string) (
 	}
 }
 
-// truncateToDisplayLength truncates a string value to the display_length constraint
-// NOTE: Currently unused - display_length auto-fix is skipped (display fields are created on the fly)
-// Kept for potential future use or reference
-//
-//nolint:unused // Reserved for potential future use
-func truncateToDisplayLength(fieldName string, currentValue any, fieldMap map[string]any) any {
+func extractStringLengthConstraint(currentValue any, fieldMap map[string]any, constraintName string) (string, int, bool) {
 	strValue, ok := currentValue.(string)
 	if !ok {
-		return nil
+		return "", 0, false
 	}
-
 	validation, ok := getValidationMap(fieldMap)
 	if !ok {
-		return nil
+		return "", 0, false
 	}
+	length, ok := extractLengthConstraint(validation, constraintName)
+	if !ok {
+		return "", 0, false
+	}
+	return strValue, length, true
+}
 
-	var displayLength int
-	switch dl := validation["display_length"].(type) {
-	case int:
-		displayLength = dl
-	case float64:
-		displayLength = int(dl)
-	default:
-		// Default display length when not specified
-		displayLength = 50
+func extractArrayLengthConstraint(currentValue any, fieldMap map[string]any, constraintName string) (reflect.Value, int, bool) {
+	val := reflect.ValueOf(currentValue)
+	if val.Kind() != reflect.Slice && val.Kind() != reflect.Array {
+		return reflect.Value{}, 0, false
 	}
-
-	if len(strValue) <= displayLength {
-		return nil // No truncation needed
+	validation, ok := getValidationMap(fieldMap)
+	if !ok {
+		return reflect.Value{}, 0, false
 	}
-
-	// Truncate with ellipsis if needed
-	truncated := strValue[:displayLength]
-	if displayLength > 3 {
-		truncated = strValue[:displayLength-3] + "..."
+	length, ok := extractLengthConstraint(validation, constraintName)
+	if !ok {
+		return reflect.Value{}, 0, false
 	}
-	return truncated
+	return val, length, true
 }
 
 // padToMinLength pads a string value to meet the minimum length constraint
 func padToMinLength(fieldName string, currentValue any, fieldMap map[string]any, logger logging.Logger) any {
-	strValue, ok := currentValue.(string)
-	if !ok {
+	strValue, minLength, ok := extractStringLengthConstraint(currentValue, fieldMap, "min_length")
+	if !ok || len(strValue) >= minLength {
 		return nil
 	}
 
-	validation, ok := getValidationMap(fieldMap)
-	if !ok {
-		return nil
-	}
-
-	minLength, ok := extractLengthConstraint(validation, "min_length")
-	if !ok {
-		return nil // No min_length constraint
-	}
-
-	if len(strValue) >= minLength {
-		return nil // No padding needed
-	}
-
-	// Pad with spaces to meet minimum length
 	padded := strValue + strings.Repeat(" ", minLength-len(strValue))
 	logging.Fluent(logger).Debug("Padded string to meet min_length").
 		String("field", fieldName).
@@ -96,26 +74,11 @@ func padToMinLength(fieldName string, currentValue any, fieldMap map[string]any,
 
 // truncateToMaxLength truncates a string value to the maximum length constraint
 func truncateToMaxLength(fieldName string, currentValue any, fieldMap map[string]any, logger logging.Logger) any {
-	strValue, ok := currentValue.(string)
-	if !ok {
+	strValue, maxLength, ok := extractStringLengthConstraint(currentValue, fieldMap, "max_length")
+	if !ok || len(strValue) <= maxLength {
 		return nil
 	}
 
-	validation, ok := getValidationMap(fieldMap)
-	if !ok {
-		return nil
-	}
-
-	maxLength, ok := extractLengthConstraint(validation, "max_length")
-	if !ok {
-		return nil // No max_length constraint
-	}
-
-	if len(strValue) <= maxLength {
-		return nil // No truncation needed
-	}
-
-	// Truncate to max length
 	truncated := strValue[:maxLength]
 	logging.Fluent(logger).Debug("Truncated string to meet max_length").
 		String("field", fieldName).
@@ -127,49 +90,34 @@ func truncateToMaxLength(fieldName string, currentValue any, fieldMap map[string
 
 // padArrayToMinLength pads an array to meet the minimum length constraint
 func padArrayToMinLength(fieldName string, currentValue any, fieldMap map[string]any, logger logging.Logger) any {
-	val := reflect.ValueOf(currentValue)
-	if val.Kind() != reflect.Slice && val.Kind() != reflect.Array {
-		return nil
-	}
-
-	validation, ok := getValidationMap(fieldMap)
+	val, minLength, ok := extractArrayLengthConstraint(currentValue, fieldMap, "min_length")
 	if !ok {
 		return nil
-	}
-
-	minLength, ok := extractLengthConstraint(validation, "min_length")
-	if !ok {
-		return nil // No min_length constraint
 	}
 
 	currentLen := val.Len()
 	if currentLen >= minLength {
-		return nil // No padding needed
+		return nil
 	}
 
-	// Convert to slice for modification
 	slice := make([]any, currentLen)
 	for i := 0; i < currentLen; i++ {
 		slice[i] = val.Index(i).Interface()
 	}
 
-	// Get element type from spec to create default values
-	fieldType, _ := fieldMap[objects.FieldKeyType].(string)
+	fieldType, ok := fieldMap[objects.FieldKeyType].(string)
 	var defaultValue any
-	if fieldType == "list" || fieldType == "array" {
-		// Try to get item type from spec
-		if items, ok := fieldMap["items"].(map[string]any); ok {
+	if ok && (fieldType == "list" || fieldType == "array") {
+		if items, hasItems := fieldMap["items"].(map[string]any); hasItems {
 			if itemDefault := extractDefaultValue(items); itemDefault != nil {
 				defaultValue = itemDefault
 			}
 		}
-		// If no default, use empty string for string lists, 0 for number lists, etc.
 		if defaultValue == nil {
-			defaultValue = "" // Default to empty string for list items
+			defaultValue = ""
 		}
 	}
 
-	// Pad array with default values
 	for i := currentLen; i < minLength; i++ {
 		slice = append(slice, defaultValue)
 	}
@@ -184,27 +132,16 @@ func padArrayToMinLength(fieldName string, currentValue any, fieldMap map[string
 
 // truncateArrayToMaxLength truncates an array to meet the maximum length constraint
 func truncateArrayToMaxLength(fieldName string, currentValue any, fieldMap map[string]any, logger logging.Logger) any {
-	val := reflect.ValueOf(currentValue)
-	if val.Kind() != reflect.Slice && val.Kind() != reflect.Array {
-		return nil
-	}
-
-	validation, ok := getValidationMap(fieldMap)
+	val, maxLength, ok := extractArrayLengthConstraint(currentValue, fieldMap, "max_length")
 	if !ok {
 		return nil
-	}
-
-	maxLength, ok := extractLengthConstraint(validation, "max_length")
-	if !ok {
-		return nil // No max_length constraint
 	}
 
 	currentLen := val.Len()
 	if currentLen <= maxLength {
-		return nil // No truncation needed
+		return nil
 	}
 
-	// Convert to slice and truncate
 	slice := make([]any, maxLength)
 	for i := 0; i < maxLength; i++ {
 		slice[i] = val.Index(i).Interface()

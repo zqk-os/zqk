@@ -8,7 +8,6 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/appledouble"
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -84,16 +83,10 @@ func initializeValidationContext(cmd *cobra.Command, registerHashes bool) (*cli.
 		return nil, nil, nil
 	}
 
-	ctx := cli.GetContext(cmd)
-	if ctx == nil {
+	ctx, logger, _, err := initializeUtilityCommandContext(cmd)
+	if err != nil {
 		return nil, nil, errfmt.Errorf("failed to get context (required for --register-hashes)")
 	}
-
-	profile := ctx.Profile
-	if profile == emptyValue {
-		profile = string(pkgctx.ProfileHuman)
-	}
-	logger := logging.GetLoggerFromProfile(profile)
 
 	return ctx, logger, nil
 }
@@ -105,7 +98,9 @@ func outputValidationSummary(cmd *cobra.Command, result *ValidateYAMLResult) {
 		summary += fmt.Sprintf(", %d hashes registered", result.FixedCount)
 	}
 	summary += "\n"
-	_ = cli.WriteOutput(cmd, []byte(summary)) //nolint:errcheck
+	if err := cli.WriteOutput(cmd, []byte(summary)); err != nil {
+		return
+	}
 
 	// Print errors if any
 	if len(result.Errors) > 0 {
@@ -113,7 +108,9 @@ func outputValidationSummary(cmd *cobra.Command, result *ValidateYAMLResult) {
 		for _, err := range result.Errors {
 			errorMsg += fmt.Sprintf("  %s\n", err)
 		}
-		_ = cli.WriteOutput(cmd, []byte(errorMsg)) //nolint:errcheck
+		if err := cli.WriteOutput(cmd, []byte(errorMsg)); err != nil {
+			return
+		}
 	}
 
 	if !result.Quiet && result.ValidCount > 0 {
@@ -122,6 +119,8 @@ func outputValidationSummary(cmd *cobra.Command, result *ValidateYAMLResult) {
 			successMsg += fmt.Sprintf(" (%d hashes registered)", result.FixedCount)
 		}
 		successMsg += "\n"
-		_ = cli.WriteOutput(cmd, []byte(successMsg)) //nolint:errcheck
+		if err := cli.WriteOutput(cmd, []byte(successMsg)); err != nil {
+			return
+		}
 	}
 }

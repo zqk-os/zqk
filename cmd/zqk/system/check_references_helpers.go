@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/cliapp"
-	"github.com/zqk-os/zqk/pkg/appledouble"
 	"github.com/zqk-os/zqk/pkg/authcred"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/migration/parser"
@@ -488,16 +487,7 @@ func findObjectFile(projectRoot, objectID, kind string) string {
 		}
 
 		var foundPath string
-		_ = filepath.Walk(dir, func(path string, info fileutil.FileInfo, err error) error {
-			if err != nil {
-				return nil //nolint:nilerr // continue walking on error
-			}
-			if info.IsDir() {
-				return nil
-			}
-			if appledouble.SkipPathInTreeWalk(path) {
-				return nil
-			}
+		_ = walkYAMLFiles(dir, func(path string, info fileutil.FileInfo) error {
 			if filepath.Base(path) == objectID+".yaml" {
 				foundPath = path
 				return filepath.SkipAll // Stop walking once found

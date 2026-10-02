@@ -75,19 +75,37 @@ func resolveVDSProjectRoot(cmd *cobra.Command) (string, error) {
 	return root, nil
 }
 
+type vdsExecutionContext struct {
+	root  string
+	spine *vds.SpineProfile
+	cust  *vds.Customization
+}
+
+func resolveVDSExecutionContext(cmd *cobra.Command, flags *clipkg.FlagBag) (*vdsExecutionContext, error) {
+	root, err := resolveVDSProjectRoot(cmd)
+	if err != nil {
+		return nil, err
+	}
+	spineRel := flags.String(cmd, "spine")
+	custRel := flags.String(cmd, "customization")
+	if err := flags.Err(); err != nil {
+		return nil, err
+	}
+	spine, cust, err := vds.ResolveProfiles(root, spineRel, custRel)
+	if err != nil {
+		return nil, err
+	}
+	return &vdsExecutionContext{
+		root:  root,
+		spine: spine,
+		cust:  cust,
+	}, nil
+}
+
 func runVDSChecklist(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, _ []string, proc *cli.Processor) error {
-		root, err := resolveVDSProjectRoot(cmd)
-		if err != nil {
-			return err
-		}
 		var flags clipkg.FlagBag
-		spineRel := flags.String(cmd, "spine")
-		custRel := flags.String(cmd, "customization")
-		if err := flags.Err(); err != nil {
-			return err
-		}
-		spine, cust, err := vds.ResolveProfiles(root, spineRel, custRel)
+		execCtx, err := resolveVDSExecutionContext(cmd, &flags)
 		if err != nil {
 			return err
 		}
@@ -95,41 +113,31 @@ func runVDSChecklist(cmd *cobra.Command, args []string) error {
 		if c := cmd.Context(); c != nil {
 			opCtx = c
 		}
-		gls := vds.ResolveGlossary(opCtx, cust, vdsTitleLookup(proc))
-		rep := vds.BuildChecklist(spine, cust, gls)
+		gls := vds.ResolveGlossary(opCtx, execCtx.cust, vdsTitleLookup(proc))
+		rep := vds.BuildChecklist(execCtx.spine, execCtx.cust, gls)
 		return emitVDS(cmd, proc, rep, rep.AgentBrief)
 	})(cmd, args)
 }
 
 func runVDSEvaluate(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, _ []string, proc *cli.Processor) error {
-		root, err := resolveVDSProjectRoot(cmd)
-		if err != nil {
-			return err
-		}
 		var flags clipkg.FlagBag
 		fileFlag := flags.String(cmd, "file")
-		spineRel := flags.String(cmd, "spine")
-		custRel := flags.String(cmd, "customization")
 		runCmds := flags.Bool(cmd, "run-commands")
 		persist := flags.Bool(cmd, "persist")
 		applyVerify := flags.Bool(cmd, "apply-verify")
-		if err := flags.Err(); err != nil {
-			return err
-		}
-
-		spine, cust, err := vds.ResolveProfiles(root, spineRel, custRel)
+		execCtx, err := resolveVDSExecutionContext(cmd, &flags)
 		if err != nil {
 			return err
 		}
-		chunksPath := vds.ResolveChunksPath(root, fileFlag)
+		chunksPath := vds.ResolveChunksPath(execCtx.root, fileFlag)
 		chunks, err := vds.LoadChunks(chunksPath)
 		if err != nil {
 			return err
 		}
 
 		opt := vds.EvalOptions{
-			ProjectRoot: root,
+			ProjectRoot: execCtx.root,
 			RunCommands: runCmds,
 			TitleLookup: vdsTitleLookup(proc),
 		}
@@ -144,10 +152,10 @@ func runVDSEvaluate(cmd *cobra.Command, args []string) error {
 		if c := cmd.Context(); c != nil {
 			opCtx = c
 		}
-		rep := vds.Evaluate(opCtx, chunks, spine, cust, opt)
+		rep := vds.Evaluate(opCtx, chunks, execCtx.spine, execCtx.cust, opt)
 
 		if persist {
-			if err := persistVDSReport(root, rep); err != nil {
+			if err := persistVDSReport(execCtx.root, rep); err != nil {
 				logging.Fluent(logging.GetLoggerFromProfile(proc.Context().Profile)).
 					Warn("vds: persist failed").WithError(err).Log()
 			}
@@ -179,10 +187,6 @@ func runVDSEvaluate(cmd *cobra.Command, args []string) error {
 
 func runVDSProject(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, _ []string, proc *cli.Processor) error {
-		root, err := resolveVDSProjectRoot(cmd)
-		if err != nil {
-			return err
-		}
 		var flags clipkg.FlagBag
 		provider := flags.String(cmd, "provider")
 		all := flags.Bool(cmd, "all")
@@ -190,16 +194,11 @@ func runVDSProject(cmd *cobra.Command, args []string) error {
 		write := flags.Bool(cmd, "write")
 		check := flags.Bool(cmd, "check")
 		outRel := flags.String(cmd, "out")
-		spineRel := flags.String(cmd, "spine")
-		custRel := flags.String(cmd, "customization")
-		if err := flags.Err(); err != nil {
-			return err
-		}
-		spine, cust, err := vds.ResolveProfiles(root, spineRel, custRel)
+		execCtx, err := resolveVDSExecutionContext(cmd, &flags)
 		if err != nil {
 			return err
 		}
-		cfg := vds.ResolveVendorProviders(cust)
+		cfg := vds.ResolveVendorProviders(execCtx.cust)
 		if listOnly {
 			payload := map[string]any{
 				"schema":    "zqk_vds_project_list_v1",
@@ -213,13 +212,13 @@ func runVDSProject(cmd *cobra.Command, args []string) error {
 			opCtx = c
 		}
 		opt := vds.ProjectOptions{
-			ProjectRoot:   root,
+			ProjectRoot:   execCtx.root,
 			ProviderID:    provider,
 			AllProviders:  all,
 			OutRel:        outRel,
 			TitleLookup:   vdsTitleLookup(proc),
-			Customization: cust,
-			Spine:         spine,
+			Customization: execCtx.cust,
+			Spine:         execCtx.spine,
 		}
 		if sp := proc.Storage(); sp != nil {
 			sec := proc.SecurityContext()
@@ -252,9 +251,8 @@ func runVDSInit(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return err
 		}
-		var flags clipkg.FlagBag
-		force := flags.Bool(cmd, "force")
-		if err := flags.Err(); err != nil {
+		force, err := cmd.Flags().GetBool("force")
+		if err != nil {
 			return err
 		}
 		path, created, err := vds.InitChunksFile(root, force)

@@ -67,14 +67,38 @@ func resolveRoot(cmd *cobra.Command) (string, error) {
 	if ctx == nil {
 		return "", errfmt.Errorf("failed to get context")
 	}
-	projectRoot := ctx.ProjectRoot
+	projectRoot := strings.TrimSpace(ctx.ProjectRoot)
 	if projectRoot == emptyValue {
 		projectRoot = cli.ResolveProjectRoot(".")
 	}
-	if projectRoot == emptyValue {
+	if strings.TrimSpace(projectRoot) == emptyValue {
 		return "", errfmt.Errorf("project root not found (run from a zqk project or set project root)")
 	}
 	return projectRoot, nil
+}
+
+func loadTrayEntries(cmd *cobra.Command) (string, []traypkg.Entry, error) {
+	projectRoot, err := resolveRoot(cmd)
+	if err != nil {
+		return "", nil, err
+	}
+	entries, err := traypkg.Load(projectRoot)
+	if err != nil {
+		return "", nil, err
+	}
+	return projectRoot, entries, nil
+}
+
+func findTrayEntry(cmd *cobra.Command, name string) (string, *traypkg.Entry, error) {
+	projectRoot, entries, err := loadTrayEntries(cmd)
+	if err != nil {
+		return "", nil, err
+	}
+	entry := traypkg.Find(entries, name)
+	if entry == nil {
+		return "", nil, errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("unknown tray entry %q (see: zqk tray list)", name)))
+	}
+	return projectRoot, entry, nil
 }
 
 func newListCmd() *cobra.Command {
@@ -88,11 +112,7 @@ func newListCmd() *cobra.Command {
 }
 
 func runList(cmd *cobra.Command, _ []string) error {
-	projectRoot, err := resolveRoot(cmd)
-	if err != nil {
-		return err
-	}
-	entries, err := traypkg.Load(projectRoot)
+	projectRoot, entries, err := loadTrayEntries(cmd)
 	if err != nil {
 		return err
 	}
@@ -124,17 +144,9 @@ func newShowCmd() *cobra.Command {
 }
 
 func runShow(cmd *cobra.Command, args []string) error {
-	projectRoot, err := resolveRoot(cmd)
+	projectRoot, e, err := findTrayEntry(cmd, args[0])
 	if err != nil {
 		return err
-	}
-	entries, err := traypkg.Load(projectRoot)
-	if err != nil {
-		return err
-	}
-	e := traypkg.Find(entries, args[0])
-	if e == nil {
-		return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("unknown tray entry %q (see: zqk tray list)", args[0])))
 	}
 	return cli.FormatOutput(cmd, map[string]any{
 		objects.FieldKeyName:        e.Name,
@@ -156,17 +168,9 @@ func newExplainCmd() *cobra.Command {
 }
 
 func runExplain(cmd *cobra.Command, args []string) error {
-	projectRoot, err := resolveRoot(cmd)
+	_, e, err := findTrayEntry(cmd, args[0])
 	if err != nil {
 		return err
-	}
-	entries, err := traypkg.Load(projectRoot)
-	if err != nil {
-		return err
-	}
-	e := traypkg.Find(entries, args[0])
-	if e == nil {
-		return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("unknown tray entry %q (see: zqk tray list)", args[0])))
 	}
 	bin := filepath.Base(os.Args[0])
 	line := traypkg.FormatExplainLine(bin, e.Argv)
@@ -192,19 +196,14 @@ func newRunCmd() *cobra.Command {
 }
 
 func runRun(cmd *cobra.Command, args []string) error {
-	projectRoot, err := resolveRoot(cmd)
+	projectRoot, e, err := findTrayEntry(cmd, args[0])
 	if err != nil {
 		return err
 	}
-	entries, err := traypkg.Load(projectRoot)
+	dryRun, err := cmd.Flags().GetBool(cli.FlagDryRun)
 	if err != nil {
 		return err
 	}
-	e := traypkg.Find(entries, args[0])
-	if e == nil {
-		return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("unknown tray entry %q (see: zqk tray list)", args[0])))
-	}
-	dryRun, _ := cmd.Flags().GetBool(cli.FlagDryRun)
 	bin := os.Args[0]
 	runCtx := cli.CommandContextOr(cmd, context.Background()) // Background: request-or-shutdown derived
 	ictx := cli.GetContext(cmd)
@@ -311,7 +310,10 @@ func runSign(cmd *cobra.Command, args []string) error {
 		return errfmt.Errorf("tray entry %q not found in %s", name, userPath)
 	}
 
-	keyPath, _ := cmd.Flags().GetString("key-path")
+	keyPath, err := cmd.Flags().GetString("key-path")
+	if err != nil {
+		return err
+	}
 	if keyPath == "" {
 		keyPath = filepath.Join(projectRoot, paths.ProjectDataDir, "keystore", "auditor.priv")
 	} else if !filepath.IsAbs(keyPath) {
@@ -326,7 +328,9 @@ func runSign(cmd *cobra.Command, args []string) error {
 	// Persist matching public key file alongside private key if not already present
 	pubPath := strings.TrimSuffix(keyPath, ".priv") + ".pub"
 	if !fileutil.Exists(pubPath) {
-		_ = fileutil.WriteFile(pubPath, []byte(signer.PublicKey()+"\n"), paths.FilePerm644)
+		if writeErr := fileutil.WriteFile(pubPath, []byte(signer.PublicKey()+"\n"), paths.FilePerm644); writeErr != nil {
+			return errfmt.Errorf("persist public key: %w", writeErr)
+		}
 	}
 
 	accountID := qa.AuditorAccountID
@@ -339,10 +343,10 @@ func runSign(cmd *cobra.Command, args []string) error {
 	}
 
 	var buf bytes.Buffer
-	enc := yaml.NewEncoder(&buf)
-	enc.SetIndent(2)
-	if err := enc.Encode(&userCfg); err != nil {
-		return errfmt.Errorf("encode %s: %w", userPath, err)
+	encoder := yaml.NewEncoder(&buf)
+	encoder.SetIndent(2)
+	if encodeErr := encoder.Encode(&userCfg); encodeErr != nil {
+		return errfmt.Errorf("encode %s: %w", userPath, encodeErr)
 	}
 	if err := fileutil.WriteFile(userPath, buf.Bytes(), paths.FilePerm644); err != nil {
 		return errfmt.Errorf("write %s: %w", userPath, err)
@@ -363,8 +367,8 @@ func resolveAuditorPublicKey(projectRoot string) (string, error) {
 	// 1. Prefer explicit public key file auditor.pub
 	pubPath := filepath.Join(projectRoot, paths.ProjectDataDir, "keystore", "auditor.pub")
 	if data, err := fileutil.ReadFile(pubPath); err == nil {
-		block, _ := pem.Decode(data)
-		if block != nil {
+		block, unparsed := pem.Decode(data)
+		if len(unparsed) >= 0 && block != nil {
 			pubInterface, err := x509.ParsePKIXPublicKey(block.Bytes)
 			if err == nil {
 				if ecPub, ok := pubInterface.(*ecdsa.PublicKey); ok {
@@ -381,8 +385,8 @@ func resolveAuditorPublicKey(projectRoot string) (string, error) {
 	// 2. Fall back to existing auditor.priv WITHOUT creating a new key on disk
 	privPath := filepath.Join(projectRoot, paths.ProjectDataDir, "keystore", "auditor.priv")
 	if data, err := fileutil.ReadFile(privPath); err == nil {
-		block, _ := pem.Decode(data)
-		if block != nil && (block.Type == "EC PRIVATE KEY" || strings.Contains(block.Type, "PRIVATE KEY")) {
+		block, unparsed := pem.Decode(data)
+		if len(unparsed) >= 0 && block != nil && (block.Type == "EC PRIVATE KEY" || strings.Contains(block.Type, "PRIVATE KEY")) {
 			if priv, err := x509.ParseECPrivateKey(block.Bytes); err == nil {
 				pub := priv.PublicKey
 				return fmt.Sprintf("%064x%064x", pub.X, pub.Y), nil

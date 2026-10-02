@@ -15,7 +15,6 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/pkg/cliapp"
-	"github.com/zqk-os/zqk/pkg/appledouble"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -206,20 +205,7 @@ func findObjectFileByID(projectRoot, objectID string) (string, error) {
 
 	for _, dir := range searchDirs {
 		var foundPath string
-		err := filepath.Walk(dir, func(path string, info fileutil.FileInfo, err error) error {
-			if err != nil {
-				return nil //nolint:nilerr // continue walking on error
-			}
-			if info.IsDir() {
-				return nil
-			}
-			if appledouble.SkipPathInTreeWalk(path) {
-				return nil
-			}
-			if !strings.HasSuffix(path, ".yaml") && !strings.HasSuffix(path, ".yml") {
-				return nil
-			}
-
+		_ = walkYAMLFiles(dir, func(path string, info fileutil.FileInfo) error {
 			// Quick check: does filename contain the ID?
 			if strings.Contains(filepath.Base(path), objectID) {
 				// Read file and check ID field

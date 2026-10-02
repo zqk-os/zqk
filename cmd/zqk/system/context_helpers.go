@@ -8,6 +8,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/pkg/appledouble"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
@@ -336,3 +337,19 @@ func newConsoleColors() ConsoleColors {
 		Dim:    color.New(color.Faint).SprintFunc(),
 	}
 }
+
+// walkYAMLFiles walks dir and invokes fn for each non-skipped YAML file (.yaml or .yml).
+func walkYAMLFiles(dir string, fn func(path string, info fileutil.FileInfo) error) error {
+	return filepath.Walk(dir, func(path string, info fileutil.FileInfo, err error) error {
+		if err != nil || info == nil || info.IsDir() || appledouble.SkipPathInTreeWalk(path) {
+			return nil
+		}
+		ext := strings.ToLower(filepath.Ext(path))
+		if ext == ".yaml" || ext == ".yml" {
+			return fn(path, info)
+		}
+		return nil
+	})
+}
+
+
