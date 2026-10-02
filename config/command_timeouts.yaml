@@ -33,6 +33,13 @@ rules:
     timeout: 2m
     idle_shutdown_duration: 5m
 
+  # Object park: walks and writes large clusters (100+ objects); needs generous timeout and idle window
+  - pattern: "object park"
+    timeout: 5m
+    child_max_timeout_exempt: true
+    child_max_timeout_exempt_if_explicit: true
+    idle_shutdown_duration: 5m
+
   # Object delete: Memgraph set-delete is seconds; honor explicit --timeout past the 2m
   # childMaxTimeout when parent is not zqk (Cursor). Default 60s — not a 10m job.
   - pattern: "object delete"

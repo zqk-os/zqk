@@ -10,6 +10,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/process"
 )
 
 // TRACK: / /
@@ -605,6 +606,7 @@ func ApplyStageMembraneHop(
 		if m.Skip {
 			continue
 		}
+		process.TouchMeaningfulActivity()
 		if err := writer.Update(ctx, secCtx, m.ID, map[string]any{
 			objects.FieldKeyStatus: plan.To,
 		}); err != nil {
