@@ -3,7 +3,6 @@ package precommit
 import (
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
-	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/precommit"
 	"github.com/zqk-os/zqk/pkg/zqktime"
 )
@@ -16,13 +15,9 @@ func NewWriteResultCmd() *cobra.Command {
 }
 
 func runPreCommitWriteResult(cmd *cobra.Command, _ []string) error {
-	projectRoot, err := resolvePreCommitProjectRoot(cmd)
+	projectRoot, category, err := resolvePreCommitCategory(cmd, "e.g. lint, integrity, policy, docman")
 	if err != nil {
 		return err
-	}
-	category, _ := cmd.Flags().GetString("category")
-	if category == emptyValue {
-		return errfmt.Errorf("--category is required (e.g. lint, integrity, policy, docman)")
 	}
 	ok, _ := cmd.Flags().GetBool("ok")
 	summary, _ := cmd.Flags().GetString("summary")

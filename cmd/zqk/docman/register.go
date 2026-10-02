@@ -51,12 +51,12 @@ func NewRegisterCmd() *cobra.Command {
 }
 
 func runRegister(cmd *cobra.Command, args []string) error {
-	cmdCtx, profile, projectRoot, storageProvider, err := resolveDocmanContext(cmd)
+	env, err := initDocmanEnv(cmd)
 	if err != nil {
 		return err
 	}
 
-	logger := logging.GetLoggerFromProfile(profile)
+	logger := env.logger
 
 	// Get flags
 	dryRun, err := cmd.Flags().GetBool("dry-run")
@@ -67,25 +67,21 @@ func runRegister(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return errfmt.Newf("failed to get update-existing flag").Wrap(err)
 	}
-	subtrees, err := cmd.Flags().GetStringSlice("subtrees")
+	subtrees, shippedOnly, err := resolveSubtreesAndShipped(cmd)
 	if err != nil {
-		return errfmt.Newf("failed to get subtrees flag").Wrap(err)
-	}
-	shippedOnly, err := cmd.Flags().GetBool("shipped-only")
-	if err != nil {
-		return errfmt.Newf("failed to get shipped-only flag").Wrap(err)
+		return err
 	}
 	if shippedOnly && len(subtrees) == 0 {
 		subtrees = docman.ShippedInitDocSubtrees
 	}
 
 	// Create registry
-	registry := docman.NewRegistry(storageProvider, projectRoot)
+	registry := docman.NewRegistry(env.storageProvider, env.projectRoot)
 
 	// Update existing entries if requested
 	if updateExisting {
 		logging.Fluent(logger).Info("Updating existing doc_entries to include missing reference fields").Log()
-		updated, err := registry.UpdateExistingEntries(cmdCtx, profile)
+		updated, err := registry.UpdateExistingEntries(env.ctx, env.profile)
 		if err != nil {
 			return errfmt.Newf("failed to update existing entries").Wrap(err)
 		}
@@ -102,7 +98,7 @@ func runRegister(cmd *cobra.Command, args []string) error {
 		String("dry_run", fmt.Sprintf("%v", dryRun)).
 		Log()
 
-	created, skipped, err := registry.RegisterSubtrees(cmdCtx, profile, subtrees, dryRun)
+	created, skipped, err := registry.RegisterSubtrees(env.ctx, env.profile, subtrees, dryRun)
 	if err != nil {
 		if !dryRun && created > 0 {
 			msg := fmt.Sprintf("Created %d doc_entry objects before interruption\nSkipped %d files (already registered)\n", created, skipped)

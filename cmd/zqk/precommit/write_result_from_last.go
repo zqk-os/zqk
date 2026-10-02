@@ -17,13 +17,9 @@ func NewWriteResultFromLastCmd() *cobra.Command {
 }
 
 func runWriteResultFromLast(cmd *cobra.Command, _ []string) error {
-	projectRoot, err := resolvePreCommitProjectRoot(cmd)
+	projectRoot, category, err := resolvePreCommitCategory(cmd, "lint, policy, integrity")
 	if err != nil {
 		return err
-	}
-	category, _ := cmd.Flags().GetString("category")
-	if category == emptyValue {
-		return errfmt.Errorf("--category is required (lint, policy, integrity)")
 	}
 	result, err := precommit.ReadLastResult(projectRoot, category)
 	if err != nil {

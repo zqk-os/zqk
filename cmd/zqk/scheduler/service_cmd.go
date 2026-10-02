@@ -51,24 +51,47 @@ func requireSchedulerServiceControl(cmd *cobra.Command) error {
 	return errfmt.Errorf("scheduler service control requires %s (set %s=%s)", pkgctx.SystemAccountID, zqkenv.APIKey(), pkgctx.SystemAccountID)
 }
 
+func parseServiceRoot(cmd *cobra.Command) (string, error) {
+	var flags clipkg.FlagBag
+	root := flags.String(cmd, "root")
+	if err := flags.Err(); err != nil {
+		return "", err
+	}
+	return serviceRootOrCwd(root), nil
+}
+
+func resolveControlledServiceEntry(cmd *cobra.Command) (hostservice.Entry, error) {
+	if err := requireSchedulerServiceControl(cmd); err != nil {
+		return hostservice.Entry{}, err
+	}
+	target, err := parseServiceRoot(cmd)
+	if err != nil {
+		return hostservice.Entry{}, err
+	}
+	return hostservice.ResolveEntry(target)
+}
+
+func executeSchedulerServiceTransition(cmd *cobra.Command, action string, desiredState string, op func(adapter hostservice.PlatformAdapter, entry hostservice.Entry) error) error {
+	e, err := resolveControlledServiceEntry(cmd)
+	if err != nil {
+		return err
+	}
+	if err := op(hostservice.NewAdapter(), e); err != nil {
+		return err
+	}
+	if _, err := hostservice.SetEntryDesiredState(e.RootID, desiredState); err != nil {
+		return err
+	}
+	return cli.WriteOutput(cmd, []byte(fmt.Sprintf("%s %s\n", action, e.UnitLabel)))
+}
+
 func runSchedulerServiceInstall(cmd *cobra.Command, _ []string) error {
 	if err := requireSchedulerServiceControl(cmd); err != nil {
 		return err
 	}
-	var flags clipkg.FlagBag
-	root := flags.String(cmd, "root")
-	if err := flags.Err(); err != nil {
-		return err
-	}
-	if root == "" {
-		root = "."
-	}
-	abs, err := filepath.Abs(cli.ResolveProjectRoot(root))
+	abs, err := parseServiceRoot(cmd)
 	if err != nil {
-		return errfmt.Newf("resolve project root").Wrap(err)
-	}
-	if abs == "" {
-		abs, _ = filepath.Abs(root)
+		return err
 	}
 	e, err := hostservice.InstallRoot(abs)
 	if err != nil {
@@ -117,59 +140,25 @@ func runSchedulerServiceList(cmd *cobra.Command, _ []string) error {
 }
 
 func runSchedulerServiceStart(cmd *cobra.Command, _ []string) error {
-	if err := requireSchedulerServiceControl(cmd); err != nil {
-		return err
-	}
-	var flags clipkg.FlagBag
-	root := flags.String(cmd, "root")
-	if err := flags.Err(); err != nil {
-		return err
-	}
-	e, err := hostservice.ResolveEntry(serviceRootOrCwd(root))
-	if err != nil {
-		return err
-	}
-	if err := hostservice.NewAdapter().Start(e); err != nil {
-		return err
-	}
-	if _, err := hostservice.SetEntryDesiredState(e.RootID, hostservice.DesiredStateEnabled); err != nil {
-		return err
-	}
-	return cli.WriteOutput(cmd, []byte(fmt.Sprintf("started %s\n", e.UnitLabel)))
+	return executeSchedulerServiceTransition(cmd, "started", hostservice.DesiredStateEnabled, func(a hostservice.PlatformAdapter, e hostservice.Entry) error {
+		return a.Start(e)
+	})
 }
 
 func runSchedulerServiceStop(cmd *cobra.Command, _ []string) error {
-	if err := requireSchedulerServiceControl(cmd); err != nil {
-		return err
-	}
-	var flags clipkg.FlagBag
-	root := flags.String(cmd, "root")
-	if err := flags.Err(); err != nil {
-		return err
-	}
-	e, err := hostservice.ResolveEntry(serviceRootOrCwd(root))
-	if err != nil {
-		return err
-	}
-	if err := hostservice.NewAdapter().Stop(e); err != nil {
-		return err
-	}
-	if _, err := hostservice.SetEntryDesiredState(e.RootID, hostservice.DesiredStateDisabled); err != nil {
-		return err
-	}
-	return cli.WriteOutput(cmd, []byte(fmt.Sprintf("stopped %s\n", e.UnitLabel)))
+	return executeSchedulerServiceTransition(cmd, "stopped", hostservice.DesiredStateDisabled, func(a hostservice.PlatformAdapter, e hostservice.Entry) error {
+		return a.Stop(e)
+	})
 }
 
 func runSchedulerServiceUninstall(cmd *cobra.Command, _ []string) error {
 	if err := requireSchedulerServiceControl(cmd); err != nil {
 		return err
 	}
-	var flags clipkg.FlagBag
-	root := flags.String(cmd, "root")
-	if err := flags.Err(); err != nil {
+	target, err := parseServiceRoot(cmd)
+	if err != nil {
 		return err
 	}
-	target := serviceRootOrCwd(root)
 	if err := hostservice.UninstallRoot(target); err != nil {
 		return err
 	}
@@ -212,12 +201,11 @@ func runSchedulerServiceRebind(cmd *cobra.Command, _ []string) error {
 }
 
 func runSchedulerServiceStatus(cmd *cobra.Command, _ []string) error {
-	var flags clipkg.FlagBag
-	root := flags.String(cmd, "root")
-	if err := flags.Err(); err != nil {
+	target, err := parseServiceRoot(cmd)
+	if err != nil {
 		return err
 	}
-	e, err := hostservice.ResolveEntry(serviceRootOrCwd(root))
+	e, err := hostservice.ResolveEntry(target)
 	if err != nil {
 		return err
 	}

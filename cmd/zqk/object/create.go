@@ -87,21 +87,13 @@ func runCreate(cmd *cobra.Command, args []string) error {
 		// Drop get-time hydration keys so CAS stays sealed (hash = truth).
 		_ = objectget.StripReferenceResolverOverlayFields(objData)
 
-		// Ensure kind matches
-		if err := ensureKindMatches(objData, kind, proc); err != nil {
-			return cli.Guard(cmd).Err(err).Return()
-		}
-
-		// Handle dry-run
-		handled, err := handleDryRun(cmd, objData, kind, proc)
+		handled, err := prepareCreateAndDryRun(cmd, proc, kind, objData)
 		if err != nil {
-			return cli.Guard(cmd).Err(err).Return()
+			return err
 		}
 		if handled {
 			return nil
 		}
-
-		configureRelaxedMode(cmd, proc)
 
 		// Get object ID and kind for cache context
 		objID, _ := objData[objects.FieldKeyID].(string)

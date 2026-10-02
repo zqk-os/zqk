@@ -52,16 +52,9 @@ func runDelete(cmd *cobra.Command, args []string) error {
 			return executeBulkDelete(cmd, resolvedIDs, proc)
 		}
 
-		idArg := rawIDs[0]
-
-		var err error
-		_ = err
-
-		// Phase 17: Semantic CLI Routing
-		// Resolve natural language intents (e.g. "My Backlog Item") to exact CAS object IDs
-		id, err := proc.ResolveSemanticArgument(proc.OperationContext(), "", idArg)
+		id, err := resolveSingleObjectID(cmd, proc, rawIDs)
 		if err != nil {
-			return cli.Guard(cmd).Err(err).Wrapf("semantic routing failed").Return()
+			return err
 		}
 
 		delFlags, err := parseDeleteFlags(cmd, "delete refused: pass --unlink-references (strip inbound refs) or --cascade; refusing to leave GhostRefs")

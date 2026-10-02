@@ -10,8 +10,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
-	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // NewSpecFieldsCmd creates the "spec fields" subcommand.
@@ -28,26 +26,11 @@ func NewSpecFieldsCmd() *cobra.Command {
 
 func runSpecFields(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, _ []string, proc *cli.Processor) error {
-		kind := strings.TrimSpace(args[0])
-		kind = strings.TrimPrefix(kind, "SPEC-")
-		kind = strings.ToLower(kind)
-
-		specLoader := objects.NewSpecLoader(proc.ProjectRoot())
-		raw, _ := cmd.Flags().GetBool("raw")
-		requiredOnly, _ := cmd.Flags().GetBool("required-only")
-
-		spec, err := specLoader.LoadSpec(kind)
+		_, spec, fieldsMap, err := resolveSpecAndFields(cmd, proc, args[0])
 		if err != nil {
-			return cli.Guard(cmd).Err(err).Wrapf("failed to load spec: %w").Return()
+			return err
 		}
-		if spec == nil {
-			return cli.Guard(cmd).Err(errfmt.Errorf("spec not found for kind: %s", kind)).Return()
-		}
-
-		fieldsMap := spec.ResolvedFields
-		if raw || len(fieldsMap) == 0 {
-			fieldsMap = spec.Fields
-		}
+		requiredOnly, _ := cmd.Flags().GetBool("required-only")
 
 		type fieldItem struct {
 			Name         string         `json:"name" yaml:"name"`

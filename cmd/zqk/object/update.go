@@ -144,16 +144,9 @@ func runUpdate(cmd *cobra.Command, args []string) error {
 			return nil
 		}
 
-		idArg := rawIDs[0]
-
-		var err error
-		_ = err
-
-		// Phase 17: Semantic CLI Routing
-		// Resolve natural language intents (e.g. "My Backlog Item") to exact CAS object IDs
-		id, err := proc.ResolveSemanticArgument(proc.OperationContext(), "", idArg)
+		id, err := resolveSingleObjectID(cmd, proc, rawIDs)
 		if err != nil {
-			return cli.Guard(cmd).Err(err).Wrapf("semantic routing failed").Return()
+			return err
 		}
 
 		logging.FluentEvent(proc.Logger()).Debug("Updating object").
@@ -240,16 +233,15 @@ func runUpdate(cmd *cobra.Command, args []string) error {
 		// Add optimistic locking if provided
 		addOptimisticLocking(cmd, updates)
 
-		// Handle dry-run
-		handled, err := handleUpdateDryRun(cmd, id, current, updates, proc)
+		handled, err := handleDryRunAndRelaxed(cmd, proc, func() (bool, error) {
+			return handleUpdateDryRun(cmd, id, current, updates, proc)
+		})
 		if err != nil {
-			return cli.Guard(cmd).Err(err).Return()
+			return err
 		}
 		if handled {
 			return nil
 		}
-
-		configureRelaxedMode(cmd, proc)
 
 		// If object doesn't exist and --force is set, create it from updates
 		if current == nil && force {

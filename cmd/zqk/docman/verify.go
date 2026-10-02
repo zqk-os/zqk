@@ -22,24 +22,20 @@ func NewVerifyCmd() *cobra.Command {
 }
 
 func runVerify(cmd *cobra.Command, args []string) error {
-	cmdCtx, profile, projectRoot, storageProvider, err := resolveDocmanContext(cmd)
+	env, err := initDocmanEnv(cmd)
 	if err != nil {
 		return err
 	}
 
-	logger := logging.GetLoggerFromProfile(profile)
+	logger := env.logger
 
 	ids, err := cmd.Flags().GetStringArray("ids")
 	if err != nil {
 		return errfmt.Newf("failed to get ids flag").Wrap(err)
 	}
-	subtrees, err := cmd.Flags().GetStringArray("subtrees")
+	subtrees, shippedOnly, err := resolveSubtreesAndShipped(cmd)
 	if err != nil {
-		return errfmt.Newf("failed to get subtrees flag").Wrap(err)
-	}
-	shippedOnly, err := cmd.Flags().GetBool("shipped-only")
-	if err != nil {
-		return errfmt.Newf("failed to get shipped-only flag").Wrap(err)
+		return err
 	}
 	autoSeal, err := cmd.Flags().GetBool("auto-seal")
 	if err != nil {
@@ -50,7 +46,7 @@ func runVerify(cmd *cobra.Command, args []string) error {
 		return errfmt.Newf("failed to get strict flag").Wrap(err)
 	}
 
-	verifier := docman.NewVerifier(storageProvider, projectRoot)
+	verifier := docman.NewVerifier(env.storageProvider, env.projectRoot)
 
 	opts := docman.VerifyOptions{
 		IDs:         ids,
@@ -67,7 +63,7 @@ func runVerify(cmd *cobra.Command, args []string) error {
 		Bool("auto_seal", autoSeal).
 		Log()
 
-	res, err := verifier.Verify(cmdCtx, profile, opts)
+	res, err := verifier.Verify(env.ctx, env.profile, opts)
 	if err != nil {
 		return errfmt.Newf("verification failed").Wrap(err)
 	}

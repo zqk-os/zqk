@@ -11,14 +11,12 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/pkg/cliapp"
-	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	objkeys "github.com/zqk-os/zqk/pkg/objects"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
-	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/when"
 )
 
@@ -41,27 +39,17 @@ func NewBulkCreateCmd() *cobra.Command {
 
 func runBulkCreate(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-		var err error
-		_ = err
-
 		kind, err := resolvePositional0Kind(cmd, proc, args, "")
 		if err != nil {
 			return cli.Guard(cmd).Err(err).Return()
 		}
 
-		//nolint:errcheck // Flag get - error indicates flag not set, default used
-		filePath, _ := cmd.Flags().GetString("file")
-		if filePath == emptyValue {
-			return cli.Guard(cmd).Require(false, "--file is required").Return()
-		}
-
-		// Read file
-		data, err := fileutil.ReadFile(filePath)
+		filePath, data, err := readRequiredFileFlag(cmd)
 		if err != nil {
 			logging.FluentEvent(proc.Logger()).Error("Failed to read file", err).
 				File(filePath).
 				Log()
-			return cli.Guard(cmd).Err(err).Wrapf("failed to read file: %w").Return()
+			return err
 		}
 
 		// Parse YAML array
@@ -269,15 +257,9 @@ func runBulkCreate(cmd *cobra.Command, args []string) error {
 		}
 		proc.TriggerCacheFreshnessCheck("bulk_create", kindsList)
 
-		projectFields, perr := clipkg.FieldsFromCmd(cmd)
-		if perr != nil {
-			return cli.Guard(cmd).Err(perr).Return()
+		if err := projectAndOutputBulkResult(cmd, proc, result, "create"); err != nil {
+			return err
 		}
-		applyHybridProjectionToBulkResult(result, projectFields)
-
-		// Output results (format respects context precedence: system -> user -> project -> command)
-		format := string(proc.Format())
-		outputBulkResult(cmd, result, format, "create")
 
 		if len(result.Errors) > 0 {
 			return cli.Guard(cmd).Err(errfmt.Errorf("bulk create failed with %d errors", len(result.Errors))).Return()

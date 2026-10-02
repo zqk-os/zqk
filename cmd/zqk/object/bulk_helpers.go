@@ -92,3 +92,14 @@ func outputBulkResult(cmd *cobra.Command, result *storagepkg.BulkResult, format,
 		_ = cli.WriteOutput(cmd, output)
 	}
 }
+
+func projectAndOutputBulkResult(cmd *cobra.Command, proc *cli.Processor, result *storagepkg.BulkResult, operation string) error {
+	projectFields, perr := clipkg.FieldsFromCmd(cmd)
+	if perr != nil {
+		return cli.Guard(cmd).Err(perr).Return()
+	}
+	applyHybridProjectionToBulkResult(result, projectFields)
+	format := string(proc.Format())
+	outputBulkResult(cmd, result, format, operation)
+	return nil
+}

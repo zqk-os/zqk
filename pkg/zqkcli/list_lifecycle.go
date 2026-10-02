@@ -17,65 +17,42 @@ import (
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
-// listLifecycleDefinitionsForAll returns lifecycle definitions as QueryResult (for use in listAllInternalObjects)
-func listLifecycleDefinitionsForAll(cmd *cobra.Command, proc *cli.Processor, storageProvider storage.ObjectStorageProvider, projectRoot string, builtInOnly, internalOnly, allObjects bool) (*storage.QueryResult, error) {
-	_ = cmd // Reserved for future use (e.g., flag parsing)
-	// Check if this is a graph backend by trying to query for lifecycle objects
-	secCtx := proc.SecurityContext()
-	storageCtx := proc.StorageContext()
-
-	// Try to query lifecycle objects from storage
-	filter := storage.ListFilter{
-		Kind:    internalKindLifecycle,
-		Filters: make(map[string]any),
+func shouldIncludeLifecycle(isBuiltIn, isInternal, builtInOnly, internalOnly, allObjects bool) bool {
+	if allObjects {
+		return true
 	}
+	if builtInOnly {
+		return isBuiltIn
+	}
+	if internalOnly {
+		return isInternal
+	}
+	return true
+}
 
-	result, err := storageProvider.List(proc.OperationContext(), secCtx, storageCtx, filter)
-	if err == nil && len(result.Objects) > 0 {
-		// Graph backend has lifecycle objects stored as nodes
-		// Apply filters
-		filtered := make([]map[string]any, 0)
-		for _, obj := range result.Objects {
-			shouldInclude := false
-			if allObjects {
-				shouldInclude = true
-			} else if builtInOnly {
-				shouldInclude = storage.IsBuiltIn(obj)
-			} else if internalOnly {
-				shouldInclude = isInternalObject(obj)
-			} else {
-				shouldInclude = true
-			}
-			if shouldInclude {
-				filtered = append(filtered, obj)
-			}
+func filterStorageLifecycles(objects []map[string]any, builtInOnly, internalOnly, allObjects bool) []map[string]any {
+	filtered := make([]map[string]any, 0, len(objects))
+	for _, obj := range objects {
+		isBuiltIn := storage.IsBuiltIn(obj)
+		isInternal := isInternalObject(obj)
+		if shouldIncludeLifecycle(isBuiltIn, isInternal, builtInOnly, internalOnly, allObjects) {
+			filtered = append(filtered, obj)
 		}
-		result.Objects = filtered
-		result.Meta["total_count"] = len(filtered)
-		return result, nil
 	}
+	return filtered
+}
 
-	// Fall back to file-based scanning
-	lifecyclesDir := filepath.Join(projectRoot, paths.ProcessInternalLifecyclesDir)
+func scanLifecycleDirectory(lifecyclesDir string, builtInOnly, internalOnly, allObjects bool) ([]map[string]any, error) {
 	if _, err := fileutil.Stat(lifecyclesDir); err != nil {
 		if fileutil.IsNotExist(err) {
-			return &storage.QueryResult{
-				Objects: []map[string]any{},
-				Meta:    map[string]any{"total_count": 0},
-			}, nil
+			return []map[string]any{}, nil
 		}
 		return nil, errfmt.Newf("failed to access lifecycles directory").Wrap(err)
 	}
 
 	var lifecycleObjects []map[string]any
-	err = filepath.Walk(lifecyclesDir, func(path string, info fileutil.FileInfo, walkErr error) error {
-		if walkErr != nil {
-			return nil
-		}
-		if info.IsDir() {
-			return nil
-		}
-		if appledouble.SkipPathInTreeWalk(path) {
+	walkErr := filepath.Walk(lifecyclesDir, func(path string, info fileutil.FileInfo, err error) error {
+		if err != nil || info.IsDir() || appledouble.SkipPathInTreeWalk(path) {
 			return nil
 		}
 		if !strings.HasSuffix(info.Name(), ".yaml") && !strings.HasSuffix(info.Name(), ".yml") {
@@ -94,6 +71,14 @@ func listLifecycleDefinitionsForAll(cmd *cobra.Command, proc *cli.Processor, sto
 
 		id := strings.TrimSuffix(info.Name(), filepath.Ext(info.Name()))
 		isBuiltIn := strings.Contains(path, "/built-in/")
+		sourceType := internalSourceInternal
+		if isBuiltIn {
+			sourceType = internalSourceBuiltIn
+		}
+
+		if !shouldIncludeLifecycle(isBuiltIn, !isBuiltIn, builtInOnly, internalOnly, allObjects) {
+			return nil
+		}
 
 		obj := map[string]any{
 			objects.FieldKeyID:         id,
@@ -101,37 +86,47 @@ func listLifecycleDefinitionsForAll(cmd *cobra.Command, proc *cli.Processor, sto
 			objects.FieldKeyTitle:      fmt.Sprintf("%s Lifecycle", objectType),
 			objects.FieldKeyObjectType: objectType,
 			objects.FieldKeyFilePath:   path,
+			internalSourceType:         sourceType,
 		}
 
 		if schemaVersion, ok := lifecycleDef[objects.FieldKeySchemaVersion].(string); ok {
 			obj[objects.FieldKeySchemaVersion] = schemaVersion
 		}
 
-		if isBuiltIn {
-			obj[internalSourceType] = internalSourceBuiltIn
-		} else {
-			obj[internalSourceType] = internalSourceInternal
-		}
-
-		shouldInclude := false
-		if allObjects {
-			shouldInclude = true
-		} else if builtInOnly {
-			shouldInclude = isBuiltIn
-		} else {
-			// internalOnly or default: show all
-			shouldInclude = true
-		}
-
-		if shouldInclude {
-			lifecycleObjects = append(lifecycleObjects, obj)
-		}
-
+		lifecycleObjects = append(lifecycleObjects, obj)
 		return nil
 	})
 
-	if err != nil {
-		return nil, errfmt.Newf("failed to scan lifecycle directory").Wrap(err)
+	if walkErr != nil {
+		return nil, errfmt.Newf("failed to scan lifecycle directory").Wrap(walkErr)
+	}
+
+	return lifecycleObjects, nil
+}
+
+// listLifecycleDefinitionsForAll returns lifecycle definitions as QueryResult (for use in listAllInternalObjects)
+func listLifecycleDefinitionsForAll(cmd *cobra.Command, proc *cli.Processor, storageProvider storage.ObjectStorageProvider, projectRoot string, builtInOnly, internalOnly, allObjects bool) (*storage.QueryResult, error) {
+	_ = cmd // Reserved for future use (e.g., flag parsing)
+	secCtx := proc.SecurityContext()
+	storageCtx := proc.StorageContext()
+
+	filter := storage.ListFilter{
+		Kind:    internalKindLifecycle,
+		Filters: make(map[string]any),
+	}
+
+	result, err := storageProvider.List(proc.OperationContext(), secCtx, storageCtx, filter)
+	if err == nil && len(result.Objects) > 0 {
+		filtered := filterStorageLifecycles(result.Objects, builtInOnly, internalOnly, allObjects)
+		result.Objects = filtered
+		result.Meta["total_count"] = len(filtered)
+		return result, nil
+	}
+
+	lifecyclesDir := filepath.Join(projectRoot, paths.ProcessInternalLifecyclesDir)
+	lifecycleObjects, scanErr := scanLifecycleDirectory(lifecyclesDir, builtInOnly, internalOnly, allObjects)
+	if scanErr != nil {
+		return nil, scanErr
 	}
 
 	return &storage.QueryResult{

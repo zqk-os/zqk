@@ -34,13 +34,7 @@ func runInfer(cmd *cobra.Command, args []string) error {
 		sessionID, _ := cmd.Flags().GetString("session-id")
 
 		// 1. Maturity Assessment
-		assessor := semantic.NewMaturityAssessor([]semantic.MaturityScanner{
-			&semantic.StructuredDataScanner{},
-			&semantic.SchemaScanner{},
-			&semantic.OntologyScanner{},
-			&semantic.SemanticRepositoryScanner{},
-		})
-		assessment, err := assessor.Assess(projectRoot)
+		assessment, err := runMaturityAssessment(projectRoot)
 		if err != nil {
 			return errfmt.Newf("assessment failed").Wrap(err)
 		}

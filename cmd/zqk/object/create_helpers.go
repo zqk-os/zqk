@@ -41,19 +41,12 @@ func RunCreateWithData(cmd *cobra.Command, kind string, objData map[string]any) 
 		objData[objects.FieldKeyKind] = kind
 	}
 	normalizeObjectData(objData, kind, proc)
-	if err := ensureKindMatches(objData, kind, proc); err != nil {
-		return cli.Guard(cmd).Err(err).Return()
-	}
-	handled, err := handleDryRun(cmd, objData, kind, proc)
+	handled, err := prepareCreateAndDryRun(cmd, proc, kind, objData)
 	if err != nil {
-		return cli.Guard(cmd).Err(err).Return()
+		return err
 	}
 	if handled {
 		return nil
-	}
-	relaxed, _ := cmd.Flags().GetBool("relaxed")
-	if relaxed {
-		setCacheCheckerForBatchCreation(proc)
 	}
 	objID, _ := objData[objects.FieldKeyID].(string)
 	objKind, _ := objData[objects.FieldKeyKind].(string)
