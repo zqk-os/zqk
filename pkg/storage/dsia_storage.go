@@ -93,26 +93,28 @@ func (p *DSIAStorageProvider) Create(ctx context.Context, secCtx *SecurityContex
 	return p.writeWithChecksumAndRename(targetPath, obj)
 }
 
+func (p *DSIAStorageProvider) findObjectPath(id string) string {
+	entries, err := fileutil.ReadDir(p.baseDir)
+	if err != nil {
+		return ""
+	}
+	targetFile := id + ".yaml"
+	for _, entry := range entries {
+		if entry.IsDir() {
+			potentialPath := filepath.Join(p.baseDir, entry.Name(), targetFile)
+			if _, err := fileutil.Stat(potentialPath); err == nil {
+				return potentialPath
+			}
+		}
+	}
+	return ""
+}
+
 func (p *DSIAStorageProvider) Read(ctx context.Context, secCtx *SecurityContext, id string) (map[string]any, error) {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 
-	// Need a way to find kind... for now, we'll scan kinds or require it in a real implementation
-	// Assuming a simplified find or require kind as an extension. We'll search in subdirs of baseDir.
-	var foundPath string
-	entries, err := fileutil.ReadDir(p.baseDir)
-	if err == nil {
-		for _, entry := range entries {
-			if entry.IsDir() {
-				potentialPath := filepath.Join(p.baseDir, entry.Name(), id+".yaml")
-				if _, err := fileutil.Stat(potentialPath); err == nil {
-					foundPath = potentialPath
-					break
-				}
-			}
-		}
-	}
-
+	foundPath := p.findObjectPath(id)
 	if foundPath == "" {
 		return nil, ErrObjectNotFound
 	}
@@ -151,20 +153,7 @@ func (p *DSIAStorageProvider) Delete(ctx context.Context, secCtx *SecurityContex
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
-	var foundPath string
-	entries, err := fileutil.ReadDir(p.baseDir)
-	if err == nil {
-		for _, entry := range entries {
-			if entry.IsDir() {
-				potentialPath := filepath.Join(p.baseDir, entry.Name(), id+".yaml")
-				if _, err := fileutil.Stat(potentialPath); err == nil {
-					foundPath = potentialPath
-					break
-				}
-			}
-		}
-	}
-
+	foundPath := p.findObjectPath(id)
 	if foundPath == "" {
 		return ErrObjectNotFound
 	}
@@ -174,11 +163,18 @@ func (p *DSIAStorageProvider) Delete(ctx context.Context, secCtx *SecurityContex
 
 // Unimplemented methods to satisfy ObjectStorageProvider
 
+func (tx *DSIATransaction) ensureActive() error {
+	if !tx.active {
+		return fmt.Errorf("transaction inactive")
+	}
+	return nil
+}
+
 func (tx *DSIATransaction) Create(ctx context.Context, secCtx *SecurityContext, obj map[string]any) error {
 	tx.mu.Lock()
 	defer tx.mu.Unlock()
-	if !tx.active {
-		return fmt.Errorf("transaction inactive")
+	if err := tx.ensureActive(); err != nil {
+		return err
 	}
 	id, ok := obj[objects.FieldKeyID].(string)
 	if !ok {
@@ -192,8 +188,8 @@ func (tx *DSIATransaction) Create(ctx context.Context, secCtx *SecurityContext, 
 func (tx *DSIATransaction) Read(ctx context.Context, secCtx *SecurityContext, id string) (map[string]any, error) {
 	tx.mu.Lock()
 	defer tx.mu.Unlock()
-	if !tx.active {
-		return nil, fmt.Errorf("transaction inactive")
+	if err := tx.ensureActive(); err != nil {
+		return nil, err
 	}
 	if tx.deleted[id] {
 		return nil, ErrObjectNotFound
@@ -207,8 +203,8 @@ func (tx *DSIATransaction) Read(ctx context.Context, secCtx *SecurityContext, id
 func (tx *DSIATransaction) Update(ctx context.Context, secCtx *SecurityContext, id string, updates map[string]any) error {
 	tx.mu.Lock()
 	defer tx.mu.Unlock()
-	if !tx.active {
-		return fmt.Errorf("transaction inactive")
+	if err := tx.ensureActive(); err != nil {
+		return err
 	}
 	tx.staged[id] = updates
 	delete(tx.deleted, id)
@@ -218,8 +214,8 @@ func (tx *DSIATransaction) Update(ctx context.Context, secCtx *SecurityContext, 
 func (tx *DSIATransaction) Delete(ctx context.Context, secCtx *SecurityContext, id string, cascade bool) error {
 	tx.mu.Lock()
 	defer tx.mu.Unlock()
-	if !tx.active {
-		return fmt.Errorf("transaction inactive")
+	if err := tx.ensureActive(); err != nil {
+		return err
 	}
 	tx.deleted[id] = true
 	delete(tx.staged, id)
@@ -229,8 +225,8 @@ func (tx *DSIATransaction) Delete(ctx context.Context, secCtx *SecurityContext, 
 func (tx *DSIATransaction) Commit(ctx context.Context) error {
 	tx.mu.Lock()
 	defer tx.mu.Unlock()
-	if !tx.active {
-		return fmt.Errorf("transaction inactive")
+	if err := tx.ensureActive(); err != nil {
+		return err
 	}
 	// A failed commit may already have applied an earlier operation. Make the
 	// transaction terminal so callers cannot accidentally replay a partial
@@ -266,8 +262,8 @@ func (tx *DSIATransaction) Commit(ctx context.Context) error {
 func (tx *DSIATransaction) Rollback(ctx context.Context) error {
 	tx.mu.Lock()
 	defer tx.mu.Unlock()
-	if !tx.active {
-		return fmt.Errorf("transaction inactive")
+	if err := tx.ensureActive(); err != nil {
+		return err
 	}
 	tx.staged = nil
 	tx.deleted = nil
@@ -288,21 +284,7 @@ func (p *DSIAStorageProvider) Exists(ctx context.Context, secCtx *SecurityContex
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 
-	var foundPath string
-	entries, err := fileutil.ReadDir(p.baseDir)
-	if err == nil {
-		for _, entry := range entries {
-			if entry.IsDir() {
-				potentialPath := filepath.Join(p.baseDir, entry.Name(), id+".yaml")
-				if _, err := fileutil.Stat(potentialPath); err == nil {
-					foundPath = potentialPath
-					break
-				}
-			}
-		}
-	}
-
-	return foundPath != "", nil
+	return p.findObjectPath(id) != "", nil
 }
 
 func (p *DSIAStorageProvider) Count(ctx context.Context, secCtx *SecurityContext, filter ListFilter) (int, error) {

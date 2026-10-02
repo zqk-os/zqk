@@ -427,6 +427,26 @@ func (g *CLIExampleGenerator) substituteTemplate(template string, vars map[strin
 
 // GenerateCLICommandExamples generates CLI command examples for a kind using templates from disk
 func (g *CLIExampleGenerator) GenerateCLICommandExamples(kind string) ([]string, error) {
+	return g.generateCommandExamplesFromTemplates(kind, []string{
+		"create_from_file",
+		"create_from_stdin",
+		"list",
+		"get",
+		"update",
+		"delete",
+	})
+}
+
+// GenerateGraphCLICommandExamples generates CLI command examples for graph backend
+func (g *CLIExampleGenerator) GenerateGraphCLICommandExamples(kind string) ([]string, error) {
+	return g.generateCommandExamplesFromTemplates(kind, []string{
+		"graph_setup",
+		"graph_create_from_file",
+		"graph_query",
+	})
+}
+
+func (g *CLIExampleGenerator) generateCommandExamplesFromTemplates(kind string, templates []string) ([]string, error) {
 	var examples []string
 
 	// Generate example object
@@ -458,79 +478,6 @@ func (g *CLIExampleGenerator) GenerateCLICommandExamples(kind string) ([]string,
 		"yaml_example_commented": strings.TrimSpace(yamlCommented.String()),
 	}
 
-	// Load and render templates
-	templates := []string{
-		"create_from_file",
-		"create_from_stdin",
-		"list",
-		"get",
-		"update",
-		"delete",
-	}
-
-	for _, templateName := range templates {
-		template, err := g.loadTemplate(templateName)
-		if err != nil {
-			// If template doesn't exist, skip it (graceful degradation)
-			continue
-		}
-
-		rendered := g.substituteTemplate(template, vars)
-		for line := range strings.SplitSeq(rendered, "\n") {
-			if line != emptyValue || len(examples) == 0 || examples[len(examples)-1] != emptyValue {
-				examples = append(examples, line)
-			}
-		}
-		// Add separator between sections
-		if len(examples) > 0 && examples[len(examples)-1] != emptyValue {
-			examples = append(examples, "")
-		}
-	}
-
-	return examples, nil
-}
-
-// GenerateGraphCLICommandExamples generates CLI command examples for graph backend
-func (g *CLIExampleGenerator) GenerateGraphCLICommandExamples(kind string) ([]string, error) {
-	var examples []string
-
-	// Generate example object
-	exampleObj, err := g.GenerateExampleObject(kind, "")
-	if err != nil {
-		return nil, err
-	}
-
-	exampleID, _ := exampleObj[objects.FieldKeyID].(string)
-	exampleYAML, err := g.GenerateYAMLExample(kind, exampleID)
-	if err != nil {
-		return nil, err
-	}
-
-	// Prepare YAML with comment prefix for file example
-	var yamlCommented strings.Builder
-	for line := range strings.SplitSeq(exampleYAML, "\n") {
-		if line != emptyValue {
-			yamlCommented.WriteString("# " + line)
-		}
-		yamlCommented.WriteString("\n")
-	}
-
-	// Template variables
-	vars := map[string]string{
-		"cli":                    paths.CLICommandName,
-		objects.FieldKeyKind:     kind,
-		objects.FieldKeyID:       exampleID,
-		"yaml_example":           exampleYAML,
-		"yaml_example_commented": strings.TrimSpace(yamlCommented.String()),
-	}
-
-	// Load and render graph-specific templates
-	templates := []string{
-		"graph_setup",
-		"graph_create_from_file",
-		"graph_query",
-	}
-
 	for _, templateName := range templates {
 		template, err := g.loadTemplate(templateName)
 		if err != nil {
@@ -555,79 +502,19 @@ func (g *CLIExampleGenerator) GenerateGraphCLICommandExamples(kind string) ([]st
 
 // GenerateBootstrapScriptExample generates a bootstrap script example using templates from disk
 func (g *CLIExampleGenerator) GenerateBootstrapScriptExample(kind string, count int) ([]string, error) {
-	// Load bootstrap script template
-	template, err := g.loadTemplate("bootstrap_script")
-	if err != nil {
-		return nil, errfmt.Newf("failed to load bootstrap script template").Wrap(err)
-	}
-
-	// Generate example objects
-	exampleObj, err := g.GenerateExampleObject(kind, "")
-	if err != nil {
-		return nil, err
-	}
-
-	exampleID, _ := exampleObj[objects.FieldKeyID].(string)
-
-	// Generate root YAML
-	rootID := strings.Replace(exampleID, "001", "ROOT-001", 1)
-	rootYAML, err := g.GenerateYAMLExample(kind, rootID)
-	if err != nil {
-		return nil, errfmt.Newf("failed to generate root YAML").Wrap(err)
-	}
-
-	// Generate child YAML template (with placeholder for ID)
-	childID := strings.Replace(exampleID, "001", "CHILD-001", 1)
-	childYAML, err := g.GenerateYAMLExample(kind, childID)
-	if err != nil {
-		return nil, errfmt.Newf("failed to generate child YAML").Wrap(err)
-	}
-
-	// Replace child ID with shell variable pattern and indent for heredoc
-	childYAMLTemplate := strings.ReplaceAll(childYAML, childID, "${kind}-CHILD-00$i")
-	// Indent each line for proper heredoc formatting
-	childYAMLLines := strings.Split(childYAMLTemplate, "\n")
-	var indentedChildYAML strings.Builder
-	for _, line := range childYAMLLines {
-		if line != emptyValue {
-			indentedChildYAML.WriteString("  " + line)
-		}
-		indentedChildYAML.WriteString("\n")
-	}
-	childYAMLTemplate = strings.TrimRight(indentedChildYAML.String(), "\n")
-
-	// Prepare template variables (include cli so {cli} in template is substituted)
-	cliCmd := paths.CLICommandName
-	if cliCmd == emptyValue {
-		cliCmd = paths.CLICommandNameDefault
-	}
-	vars := map[string]string{
-		"cli":                 cliCmd,
-		objects.FieldKeyKind:  kind,
-		"count":               fmt.Sprintf("%d", count),
-		"root_yaml":           rootYAML,
-		"child_yaml_template": childYAMLTemplate,
-	}
-
-	// Substitute template variables
-	rendered := g.substituteTemplate(template, vars)
-
-	// Split into lines and return
-	lines := strings.Split(rendered, "\n")
-	// Remove trailing empty lines
-	for len(lines) > 0 && lines[len(lines)-1] == emptyValue {
-		lines = lines[:len(lines)-1]
-	}
-
-	return lines, nil
+	return g.generateBootstrapScriptFromTemplate("bootstrap_script", kind, count)
 }
 
 // GenerateGraphBootstrapScriptExample generates a bootstrap script example for graph backend using templates from disk
 func (g *CLIExampleGenerator) GenerateGraphBootstrapScriptExample(kind string, count int) ([]string, error) {
-	// Load graph bootstrap script template
-	template, err := g.loadTemplate("graph_bootstrap_script")
+	return g.generateBootstrapScriptFromTemplate("graph_bootstrap_script", kind, count)
+}
+
+func (g *CLIExampleGenerator) generateBootstrapScriptFromTemplate(templateName, kind string, count int) ([]string, error) {
+	// Load bootstrap script template
+	template, err := g.loadTemplate(templateName)
 	if err != nil {
-		return nil, errfmt.Newf("failed to load graph bootstrap script template").Wrap(err)
+		return nil, errfmt.Newf("failed to load %s template", templateName).Wrap(err)
 	}
 
 	// Generate example objects
@@ -690,3 +577,4 @@ func (g *CLIExampleGenerator) GenerateGraphBootstrapScriptExample(kind string, c
 
 	return lines, nil
 }
+
