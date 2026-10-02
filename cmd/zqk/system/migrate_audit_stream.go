@@ -32,14 +32,10 @@ See docs/architecture/AUDIT_STREAM_FORMAT.md.`,
 }
 
 func runMigrateAuditStream(cmd *cobra.Command, _ []string) error {
-	projectRoot, err := resolveRequiredProjectRoot(cmd)
+	projectRoot, logger, err := resolveMigrationProjectAndLogger(cmd)
 	if err != nil {
 		return err
 	}
-	logger, _ := resolveCommandLogger(cmd)
-
-	// Ensure path-cache is built so canonical path is used after migration.
-	storagepkg.BuildPathAliasCacheForProject(projectRoot)
 
 	moved, registryUpdated, err := storagepkg.MigrateAuditStreamToCanonicalLocation(projectRoot)
 	if err != nil {

@@ -62,14 +62,10 @@ func NewValidateCmd() *cobra.Command {
 }
 
 func runValidate(cmd *cobra.Command, args []string, all bool, kind string, fix, quiet bool) error {
-	ctx := cli.GetContext(cmd)
-	if ctx == nil {
-		// No logger available yet, but root.go will log this
-		return errfmt.Errorf("failed to get context")
+	ctx, logger, err := resolveContextAndLogger(cmd, systemProfileHuman)
+	if err != nil {
+		return err
 	}
-	// Use context profile for logging (respects MCP context)
-	profile := profileOrDefault(ctx.Profile, systemProfileHuman) // Default fallback
-	logger := logging.GetLoggerFromProfile(profile)
 
 	projectRoot := ProjectRootOrResolveDot(ctx.ProjectRoot)
 	if projectRoot == emptyValue {

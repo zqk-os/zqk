@@ -22,11 +22,8 @@ func NewSpecOriginationCmd() *cobra.Command {
 }
 
 func runSpecOriginationAsync(cmd *cobra.Command, _ []string) error {
-	ctx := cli.GetContext(cmd)
-	logger := logging.GetLoggerFromProfile(systemProfileHuman)
-	if ctx != nil && ctx.Profile != emptyValue {
-		logger = logging.GetLoggerFromProfile(ctx.Profile)
-	}
+	ctx, logger := resolveCommandLogger(cmd, systemProfileHuman)
+	_ = ctx
 
 	ontology, _ := cmd.Flags().GetString("ontology")
 	if ontology == emptyValue {

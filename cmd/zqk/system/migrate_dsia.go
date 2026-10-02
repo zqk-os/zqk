@@ -1,11 +1,13 @@
 package system
 
 import (
+	"context"
+
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
-	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/storage/migration"
 )
 
@@ -24,20 +26,7 @@ func NewMigrateDsiaCmd() *cobra.Command {
 }
 
 func runMigrateDsia(cmd *cobra.Command, removeOldFiles bool) error {
-	projectRoot := ProjectRootOrResolve("")
-	if projectRoot == "" {
-		return errfmt.Errorf("project root not found")
-	}
-
-	fileStorage, err := getFileObjectStorage(cmd.Context(), projectRoot)
-	if err != nil {
-		return err
-	}
-
-	ctx := pkgctx.NewSystemContext()
-	secCtx := pkgctx.NewSecurityContext("system", []string{"admin"}, []string{"read:*", "write:*", "execute:*"})
-
-	migratedByKind, errorsByKind := migration.NewDSIAMigrationUtility(fileStorage).MigrateAllToDSIA(ctx, secCtx, removeOldFiles)
-	summary := formatMigrationSummary("DSIA", "No legacy CAS objects found to migrate.", migratedByKind, errorsByKind, ctx)
-	return cli.WriteOutput(cmd, []byte(summary))
+	return runStorageMigration(cmd, "DSIA", "No legacy CAS objects found to migrate.", removeOldFiles, func(fileStorage *storage.FileObjectStorage, ctx context.Context, secCtx *pkgctx.SecurityContext) (map[string]int, map[string][]error) {
+		return migration.NewDSIAMigrationUtility(fileStorage).MigrateAllToDSIA(ctx, secCtx, removeOldFiles)
+	})
 }

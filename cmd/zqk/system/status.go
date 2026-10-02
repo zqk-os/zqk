@@ -7,7 +7,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
-	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/when"
@@ -48,14 +47,10 @@ func NewStatusCmd() *cobra.Command {
 }
 
 func runStatus(cmd *cobra.Command, verbose bool) error {
-	ctx := cli.GetContext(cmd)
-	if ctx == nil {
-		return cli.Guard(cmd).Err(errfmt.Errorf("failed to get context")).Return()
+	ctx, logger, err := resolveContextAndLogger(cmd, systemProfileHuman)
+	if err != nil {
+		return cli.Guard(cmd).Err(err).Return()
 	}
-
-	// Get logger for error logging
-	profile := profileOrDefault(ctx.Profile, systemProfileHuman)
-	logger := logging.GetLoggerFromProfile(profile)
 
 	// Check for CLI reminder FIRST (interrupt notification)
 	projectRoot := ProjectRootOrResolve(ctx.ProjectRoot)

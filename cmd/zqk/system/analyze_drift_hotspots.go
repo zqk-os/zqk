@@ -25,13 +25,10 @@ func NewAnalyzeDriftHotspotsCmd() *cobra.Command {
 }
 
 func runAnalyzeDriftHotspots(cmd *cobra.Command, _ []string) error {
-	ctx := cli.GetContext(cmd)
-	if ctx == nil {
-		return cli.Guard(cmd).Err(errfmt.Errorf("failed to get context")).Return()
+	ctx, logger, err := resolveContextAndLogger(cmd, systemProfileHuman)
+	if err != nil {
+		return cli.Guard(cmd).Err(err).Return()
 	}
-
-	profile := profileOrDefault(ctx.Profile, systemProfileHuman)
-	logger := logging.GetLoggerFromProfile(profile)
 
 	root, _ := cmd.Flags().GetString("root")
 	if when.IsEmpty(root) {

@@ -79,16 +79,14 @@ func runRetentionToleranceWithKinds(cmd *cobra.Command, kinds []string, batchSiz
 		bulkWorkersFlag = w
 	}
 
-	ctx := cli.GetContext(cmd)
-	if ctx == nil {
-		return errfmt.Errorf("failed to get context")
+	ctx, logger, err := resolveContextAndLogger(cmd, systemProfileHuman)
+	if err != nil {
+		return err
 	}
 	projectRoot := ProjectRootOrResolve(ctx.ProjectRoot)
 	if projectRoot == emptyValue {
 		return errfmt.Errorf("project root not found")
 	}
-	profile := profileOrDefault(ctx.Profile, systemProfileHuman)
-	logger := logging.GetLoggerFromProfile(profile)
 
 	logging.Fluent(logger).Info("Initializing storage...").Log()
 	storageProvider, err := getStorageProvider(cmd, projectRoot)

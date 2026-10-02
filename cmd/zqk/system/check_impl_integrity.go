@@ -134,21 +134,18 @@ func checkIntegrityWithRegistryAndContent(ctx *cli.Context, obj *parser.ParsedOb
 	// - internal index drift: CAS index hash != filename-hash (but filename-hash == content-hash)
 	filename := filepath.Base(filePath)
 	fileHashFromName := ""
-	{
-		ext := strings.ToLower(filepath.Ext(filename))
-		if ext == ".yaml" || ext == ".yml" {
-			base := strings.TrimSuffix(filename, ext)
-			if len(base) == 64 {
-				isHex := true
-				for _, c := range base {
-					if (c < '0' || c > '9') && (c < 'a' || c > 'f') && (c < 'A' || c > 'F') {
-						isHex = false
-						break
-					}
+	if fileutil.IsYAMLPath(strings.ToLower(filename)) {
+		base := strings.TrimSuffix(filename, filepath.Ext(filename))
+		if len(base) == 64 {
+			isHex := true
+			for _, c := range base {
+				if (c < '0' || c > '9') && (c < 'a' || c > 'f') && (c < 'A' || c > 'F') {
+					isHex = false
+					break
 				}
-				if isHex {
-					fileHashFromName = strings.ToLower(base)
-				}
+			}
+			if isHex {
+				fileHashFromName = strings.ToLower(base)
 			}
 		}
 	}

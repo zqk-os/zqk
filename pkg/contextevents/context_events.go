@@ -82,27 +82,11 @@ func Append(projectRoot string, rec *Record) error {
 	rec.Note = truncateNote(rec.Note)
 	normalizeSliceFields(rec)
 
-	line, err := json.Marshal(rec)
-	if err != nil {
-		return err
-	}
-
 	dir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.MetricsDir)
+	p := filepath.Join(dir, paths.ContextEventsJSONLFile)
 	appendMu.Lock()
 	defer appendMu.Unlock()
-	if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
-		return err
-	}
-	p := filepath.Join(dir, paths.ContextEventsJSONLFile)
-	f, err := fileutil.OpenFile(p, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, paths.FilePerm644)
-	if err != nil {
-		return err
-	}
-	defer func() { _ = f.Close() }()
-	if _, err := f.Write(append(line, '\n')); err != nil {
-		return err
-	}
-	return nil
+	return fileutil.AppendJSONLine(p, rec)
 }
 
 func truncateNote(s string) string {

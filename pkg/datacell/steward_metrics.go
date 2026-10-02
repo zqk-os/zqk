@@ -1,7 +1,6 @@
 package datacell
 
 import (
-	"encoding/json"
 	"path/filepath"
 	"time"
 
@@ -57,22 +56,8 @@ func appendStewardMetricsJSONL(projectRoot string, row any) error {
 	if projectRoot == "" || !metricsrecording.Enabled() {
 		return nil
 	}
-	dir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.MetricsDir)
-	if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
-		return err
-	}
-	p := filepath.Join(dir, stewardMetricsJSONLFile)
-	line, err := json.Marshal(row)
-	if err != nil {
-		return err
-	}
-	f, err := fileutil.OpenFile(p, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, paths.FilePerm644)
-	if err != nil {
-		return err
-	}
-	defer func() { _ = f.Close() }()
-	_, err = f.Write(append(line, '\n'))
-	return err
+	p := filepath.Join(projectRoot, paths.ProjectDataDir, paths.MetricsDir, stewardMetricsJSONLFile)
+	return fileutil.AppendJSONLine(p, row)
 }
 
 func recordStewardMetricsEnqueue(projectRoot string, rec StewardEnqueueRecord) {

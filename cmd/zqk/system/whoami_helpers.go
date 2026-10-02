@@ -26,12 +26,11 @@ type WhoamiAccountInfo struct {
 
 // getProjectRootForWhoami gets the project root for whoami command
 func getProjectRootForWhoami(ctx *cli.Context) (string, error) {
-	projectRoot := ctx.ProjectRoot
-	projectRoot = ProjectRootOrResolve(projectRoot)
-	if projectRoot == emptyValue {
+	root, err := resolveContextProjectRoot(ctx)
+	if err != nil {
 		return "", errfmt.Errorf("not a ZQK project (no project root found)")
 	}
-	return projectRoot, nil
+	return root, nil
 }
 
 // parseMCPRoles parses roles from MCP environment variable

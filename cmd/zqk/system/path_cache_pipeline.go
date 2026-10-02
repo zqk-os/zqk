@@ -93,7 +93,8 @@ func RunPathCacheViaPipeline(cmd *cobra.Command, _ []string) error {
 				return nil, err
 			}
 
-			logger, profile := resolveCommandLogger(cmd)
+			profile := resolveCommandProfile(cmd)
+			_, logger := resolveCommandLogger(cmd, profile)
 
 			wait, _ := cmd.Flags().GetBool("wait")
 			showPaths, _ := cmd.Flags().GetBool("show-paths")

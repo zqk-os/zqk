@@ -1,13 +1,10 @@
 package scheduler
 
 import (
-	"encoding/json"
 	"path/filepath"
 	"time"
 
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/datacell"
-	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -20,11 +17,7 @@ const dataCellEnvelopeTickJSONL = "data_cell_envelope_tick.jsonl"
 // resolvedJobTypesJoined must match the handler’s effective resolution (incl. token policy), not a second
 // call to [datacell.ResolvedSchedulerJobTypesFromDiscoveryTokens] — that would desync metrics from dispatch.
 func appendDataCellEnvelopeTickJSONL(projectRoot, jobID, kindAugJoined, kindOvJoined, resolvedJobTypesJoined string, summaries map[datacell.StorageProfile]string, dispatch EnvelopeTickDispatchOutcome) error {
-	dir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.MetricsDir)
-	if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
-		return err
-	}
-	p := filepath.Join(dir, dataCellEnvelopeTickJSONL)
+	p := filepath.Join(projectRoot, paths.ProjectDataDir, paths.MetricsDir, dataCellEnvelopeTickJSONL)
 	row := map[string]any{
 		"ts_rfc3339":                                        time.Now().UTC().Format(time.RFC3339Nano),
 		objects.FieldKeyJobType:                             JobTypeDataCellEnvelopeTick,
@@ -73,22 +66,5 @@ func appendDataCellEnvelopeTickJSONL(projectRoot, jobID, kindAugJoined, kindOvJo
 	} else {
 		row["envelope_tick_dispatch_evaluated"] = false
 	}
-	line, err := json.Marshal(row)
-	if err != nil {
-		return err
-	}
-	f, err := fileutil.OpenFile(p, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, paths.FilePerm644)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if err := f.Close(); err != nil {
-			logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-			SLog(logger).Debug("Failed to close datacell envelope tick metrics log").WithError(err).Log()
-		}
-	}()
-	if _, err := f.Write(append(line, '\n')); err != nil {
-		return err
-	}
-	return nil
+	return fileutil.AppendJSONLine(p, row)
 }

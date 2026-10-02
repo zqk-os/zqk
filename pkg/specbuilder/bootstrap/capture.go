@@ -192,8 +192,7 @@ func captureConfigFiles(sourceDir string, target map[string][]byte) error {
 
 // isYAMLFile checks if a file is a YAML file
 func isYAMLFile(path string) bool {
-	ext := filepath.Ext(path)
-	return ext == ".yaml" || ext == ".yml"
+	return fileutil.IsYAMLPath(path)
 }
 
 // getFileList returns a sorted list of file keys

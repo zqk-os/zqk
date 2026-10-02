@@ -46,11 +46,7 @@ func NewValidateAgentRulesCmd() *cobra.Command {
 
 	cli.RequireSession(cmd, false)
 	cli.BindAsyncProgress(cmd, func(cmd *cobra.Command, args []string) error {
-		ctx := cli.GetContext(cmd)
-		logger := logging.GetLoggerFromProfile(systemProfileHuman)
-		if ctx != nil && ctx.Profile != emptyValue {
-			logger = logging.GetLoggerFromProfile(ctx.Profile)
-		}
+		ctx, logger := resolveCommandLogger(cmd, systemProfileHuman)
 
 		root := projectRoot
 		if root == emptyValue && ctx != nil && ctx.ProjectRoot != emptyValue {

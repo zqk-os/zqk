@@ -29,13 +29,11 @@ legacy-named files. Run after migrate-audit-stream if you had legacy audit strea
 }
 
 func runMigrateStreamSegments(cmd *cobra.Command, _ []string) error {
-	projectRoot, err := resolveRequiredProjectRoot(cmd)
+	projectRoot, logger, err := resolveMigrationProjectAndLogger(cmd)
 	if err != nil {
 		return err
 	}
-	logger, _ := resolveCommandLogger(cmd)
 
-	storagepkg.BuildPathAliasCacheForProject(projectRoot)
 	moved, kindsUpdated, err := storagepkg.MigrateStreamSegmentFilenamesToCanonical(projectRoot)
 	if err != nil {
 		return errfmt.Newf("migrate stream segments").Wrap(err)

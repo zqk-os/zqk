@@ -1,16 +1,14 @@
 package system
 
 import (
-	"path/filepath"
+	"context"
 
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
-	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/storage/migration"
-	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // NewMigrateCasCmd creates the CAS migration command
@@ -42,23 +40,7 @@ func NewMigrateCasCmd() *cobra.Command {
 }
 
 func runMigrateCas(cmd *cobra.Command, removeOldFiles bool) error {
-	projectRoot := ProjectRootOrResolve("")
-	if projectRoot == emptyValue {
-		return errfmt.Errorf("project root not found")
-	}
-	if _, err := fileutil.Stat(filepath.Join(projectRoot, paths.ProjectDataDir)); err != nil {
-		return errfmt.Errorf("project root not found")
-	}
-
-	fileStorage, err := getFileObjectStorage(cmd.Context(), projectRoot)
-	if err != nil {
-		return err
-	}
-
-	ctx := pkgctx.NewSystemContext()
-	secCtx := pkgctx.NewSecurityContext("system", []string{"admin"}, []string{"read:*", "write:*", "execute:*"})
-
-	migratedByKind, errorsByKind := migration.NewCASMigrationUtility(fileStorage).MigrateAllToCAS(ctx, secCtx, removeOldFiles)
-	summary := formatMigrationSummary("CAS", "No legacy objects found to migrate.", migratedByKind, errorsByKind, ctx)
-	return cli.WriteOutput(cmd, []byte(summary))
+	return runStorageMigration(cmd, "CAS", "No legacy objects found to migrate.", removeOldFiles, func(fileStorage *storage.FileObjectStorage, ctx context.Context, secCtx *pkgctx.SecurityContext) (map[string]int, map[string][]error) {
+		return migration.NewCASMigrationUtility(fileStorage).MigrateAllToCAS(ctx, secCtx, removeOldFiles)
+	})
 }

@@ -185,3 +185,28 @@ func OpenAppend(path string) (*File, error) {
 	}
 	return file, nil
 }
+
+// IsYAMLPath returns true if the path ends with .yaml or .yml extension.
+func IsYAMLPath(path string) bool {
+	ext := filepath.Ext(path)
+	return ext == ".yaml" || ext == ".yml"
+}
+
+// AppendJSONLine marshals v as JSON and appends it followed by a newline to path.
+// It creates the parent directory if necessary.
+func AppendJSONLine(path string, v any) error {
+	line, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	if err := MkdirAll(filepath.Dir(path), standardDirPerm); err != nil {
+		return err
+	}
+	f, err := OpenAppend(path)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = f.Close() }()
+	_, err = f.Write(append(line, '\n'))
+	return err
+}
