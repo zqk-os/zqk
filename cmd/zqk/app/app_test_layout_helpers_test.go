@@ -206,6 +206,16 @@ func setupIntegrationTestWithSpecsApp(t *testing.T, scenarioName string) (testRo
 	if err := copyDirApp(srcInternal, dstInternal); err != nil {
 		t.Fatalf("copyDir _internal: %v", err)
 	}
+	srcSpecs := filepath.Join(projectRoot, paths.ProjectDataDir, "specs")
+	dstSpecs := filepath.Join(testRoot, paths.ProjectDataDir, "specs")
+	if info, err := fileutil.Stat(srcSpecs); err == nil && info.IsDir() {
+		_ = copyDirApp(srcSpecs, dstSpecs)
+	}
+	srcPacks := filepath.Join(projectRoot, "packs")
+	dstPacks := filepath.Join(testRoot, "packs")
+	if info, err := fileutil.Stat(srcPacks); err == nil && info.IsDir() {
+		_ = copyDirApp(srcPacks, dstPacks)
+	}
 	orig := zqkenv.TestRoot().Get()
 	if err := zqkenv.TestRoot().Set(testRoot); err != nil {
 		t.Fatalf("setenv %s: %v", zqkenv.TestRoot(), err)

@@ -88,12 +88,12 @@ func TestFields_AAAListKinds_Integration(t *testing.T) {
 	}
 	_, projectRoot := setupFieldsIntegrationWithSpecs(t, "fields-list-kinds-integration")
 	_ = projectRoot
+	objects.ResetGlobalFieldRegistryForTesting()
+	t.Cleanup(objects.ResetGlobalFieldRegistryForTesting)
 
 	// Ensure registry can load from test root (may have been created earlier with empty path)
 	reg := objects.GetGlobalFieldRegistry()
-	if reg.TryReloadFromFindSpecsDir() {
-		_ = reg.LoadFields()
-	}
+	_ = reg.LoadFields()
 	if err := reg.LoadFields(); err != nil {
 		t.Fatalf("registry LoadFields after setup: %v", err)
 	}
