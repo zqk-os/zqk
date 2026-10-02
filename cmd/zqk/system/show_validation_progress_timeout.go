@@ -101,31 +101,10 @@ func handleFallbackTimeout(vpc *ValidationProgressContext) (bool, error) {
 
 	emptyDuration := time.Since(*vpc.QueueEmptySince)
 	allStates := vpc.Validator.GetAllCachedStates()
-	cachedStateMap := make(map[string]bool, len(allStates))
-	for _, state := range allStates {
-		cachedStateMap[state.ObjectID] = true
-	}
+	progressReceivedCopy := vpc.copyCompletedObjectIDs()
+	cachedEnqueuedCount := countCachedObjects(vpc, allStates, progressReceivedCopy)
 
-	vpc.Mu.RLock()
-	progressReceivedCopy := make(map[string]bool, len(vpc.CompletedObjectIDs))
-	for id := range vpc.CompletedObjectIDs {
-		progressReceivedCopy[id] = true
-	}
-	vpc.Mu.RUnlock()
-
-	cachedEnqueuedCount := 0
-	for objectID := range vpc.EnqueuedObjectIDs {
-		hasProgress := progressReceivedCopy[objectID]
-		if !hasProgress && cachedStateMap[objectID] {
-			cachedEnqueuedCount++
-		}
-	}
-
-	vpc.Mu.RLock()
-	progressReceivedCount := len(vpc.CompletedObjectIDs)
-	currentCompleted := vpc.Completed
-	currentFailed := vpc.Failed
-	vpc.Mu.RUnlock()
+	progressReceivedCount, currentCompleted, currentFailed := vpc.snapshotProgressCounts()
 
 	allObjectsAccountedFor := (progressReceivedCount + cachedEnqueuedCount) >= len(vpc.EnqueuedObjectIDs)
 

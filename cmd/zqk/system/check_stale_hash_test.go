@@ -21,23 +21,19 @@ func TestStaleHashInValidationCache(t *testing.T) {
 	tmpDir := t.TempDir()
 	projectRoot := tmpDir
 
-	// Create metrics directory structure
-	metricsDir := datacell.CellCASPrimaryDir(projectRoot, "metrics")
-	if err := fileutil.MkdirAll(metricsDir, paths.DirPerm755); err != nil {
-		t.Fatalf("Failed to create metrics directory: %v", err)
+	// Create requirements directory structure
+	requirementsDir := datacell.CellCASPrimaryDir(projectRoot, "requirements")
+	if err := fileutil.MkdirAll(requirementsDir, paths.DirPerm755); err != nil {
+		t.Fatalf("Failed to create requirements directory: %v", err)
 	}
 
 	// Step 1: Create a test file with original content
-	testFile := filepath.Join(metricsDir, "SHM-TEST-001.yaml")
-	originalContent := `id: SHM-TEST-001
-kind: scheduler_health_metric
+	testFile := filepath.Join(requirementsDir, "REQ-TEST-001.yaml")
+	originalContent := `id: REQ-TEST-001
+kind: requirement
 schema_version: "` + objects.DefaultSchemaVersion + `"
 status: active
-health_check_duration_ms: 100.0
-health_checks: 0
-missed_triggers: 0
-recovered_jobs: 0
-cron_restarts: 0
+title: Test Requirement
 created_at: "2026-01-04T20:15:14Z"
 updated_at: "2026-01-04T20:15:14Z"
 created_by: ACC-SYSTEM
@@ -49,7 +45,7 @@ updated_by: ACC-SYSTEM
 	}
 
 	// Step 2: Register original hash
-	hashRegistry1 := storage.NewHashRegistry(pkgctx.NewSystemContext(), "scheduler_health_metric", metricsDir)
+	hashRegistry1 := storage.NewHashRegistry(pkgctx.NewSystemContext(), "requirement", requirementsDir)
 	hashRegistry1.SetSkipShutdownCoordinatorCheck(true)
 	hash1 := calculateFileHash(testFile)
 	filename := filepath.Base(testFile)
@@ -61,15 +57,11 @@ updated_by: ACC-SYSTEM
 	t.Logf("Step 2: Registered original hash: %s", hash1[:16])
 
 	// Step 3: Modify file (simulating a fix that changes the hash)
-	modifiedContent := `id: SHM-TEST-001
-kind: scheduler_health_metric
+	modifiedContent := `id: REQ-TEST-001
+kind: requirement
 schema_version: "` + objects.DefaultSchemaVersion + `"
 status: active
-health_check_duration_ms: 200.0
-health_checks: 0
-missed_triggers: 0
-recovered_jobs: 0
-cron_restarts: 0
+title: Test Requirement Modified
 created_at: "2026-01-04T20:15:14Z"
 updated_at: "2026-01-04T20:15:14Z"
 created_by: ACC-SYSTEM
@@ -88,7 +80,7 @@ updated_by: ACC-SYSTEM
 	t.Logf("Step 3: File modified, new hash: %s", hash2[:16])
 
 	// Step 4: Update hash registry (simulating fix-hashes command)
-	hashRegistry2 := storage.NewHashRegistry(pkgctx.NewSystemContext(), "scheduler_health_metric", metricsDir)
+	hashRegistry2 := storage.NewHashRegistry(pkgctx.NewSystemContext(), "requirement", requirementsDir)
 	hashRegistry2.SetSkipShutdownCoordinatorCheck(true)
 	if err := hashRegistry2.Load(); err != nil {
 		t.Fatalf("Failed to load registry for update: %v", err)
@@ -102,14 +94,14 @@ updated_by: ACC-SYSTEM
 	t.Logf("Step 4: Updated registry with new hash: %s", hash2[:16])
 
 	// Step 5: Verify registry has correct hash
-	hashRegistry3 := storage.NewHashRegistry(pkgctx.NewSystemContext(), "scheduler_health_metric", metricsDir)
+	hashRegistry3 := storage.NewHashRegistry(pkgctx.NewSystemContext(), "requirement", requirementsDir)
 	if err := hashRegistry3.Load(); err != nil {
 		t.Fatalf("Failed to reload registry: %v", err)
 	}
 
 	registryHash := hashRegistry3.GetHash(filename)
 	if registryHash != hash2 {
-		t.Fatalf("Registry should have updated hash: expected %s, got %s", hash2[:16], registryHash[:16])
+		t.Fatalf("Registry should have updated hash: expected %s, got %s", hash2, registryHash)
 	}
 
 	t.Logf("Step 5: Verified registry has correct hash: %s", registryHash[:16])
@@ -117,7 +109,7 @@ updated_by: ACC-SYSTEM
 	// Step 6: Simulate validation using directoryRegistryPool
 	// This is what system check actually does
 	pool := &directoryRegistryPool{}
-	registryForValidation := pool.GetOrCreate(pkgctx.NewSystemContext(), "scheduler_health_metric", metricsDir)
+	registryForValidation := pool.GetOrCreate(pkgctx.NewSystemContext(), "requirement", requirementsDir)
 
 	// Step 7: Check what hash validation would see
 	expectedHash := registryForValidation.GetHash(filename)

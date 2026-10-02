@@ -7,9 +7,7 @@ import (
 	"runtime/pprof"
 	"time"
 
-	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
-	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // dumpGoroutineStacksOnStuck dumps goroutine stacks when stuck condition is detected
@@ -66,20 +64,5 @@ func dumpGoroutineStacksOnStuck(vpc *ValidationProgressContext, stuckDuration ti
 
 // writeGoroutineProfileToFile writes a goroutine profile to file
 func writeGoroutineProfileToFile(filename string) error {
-	f, err := fileutil.Create(filename)
-	if err != nil {
-		return errfmt.Newf("failed to create goroutine profile").Wrap(err)
-	}
-	defer f.Close()
-
-	profile := pprof.Lookup("goroutine")
-	if profile == nil {
-		return errfmt.Errorf("goroutine profile not available")
-	}
-
-	if err := profile.WriteTo(f, 2); err != nil { // Debug level 2 for detailed stacks
-		return errfmt.Newf("failed to write goroutine profile").Wrap(err)
-	}
-
-	return nil
+	return writeGoroutineProfile(filename, 2)
 }

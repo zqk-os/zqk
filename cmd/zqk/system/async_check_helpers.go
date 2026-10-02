@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
-	"runtime/pprof"
 	"strings"
 	"time"
 
@@ -419,26 +418,6 @@ func setupGoroutineProfiling(checkCtx *AsyncCheckContext) (func(), error) {
 			logging.Fluent(checkCtx.Logger).Warn("Failed to write final goroutine profile").WithError(err).Log()
 		}
 	}, nil
-}
-
-// writeGoroutineProfile writes a goroutine profile to file
-func writeGoroutineProfile(filename string) error {
-	f, err := fileutil.Create(filename)
-	if err != nil {
-		return errfmt.Newf("failed to create goroutine profile").Wrap(err)
-	}
-	defer f.Close()
-
-	profile := pprof.Lookup("goroutine")
-	if profile == nil {
-		return errfmt.Errorf("goroutine profile not available")
-	}
-
-	if err := profile.WriteTo(f, 0); err != nil {
-		return errfmt.Newf("failed to write goroutine profile").Wrap(err)
-	}
-
-	return nil
 }
 
 // setupMetricsAndCleanup sets up metrics and cleanup handlers
