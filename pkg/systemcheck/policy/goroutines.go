@@ -25,13 +25,9 @@ var rawGoRegex = regexp.MustCompile(`^\s*go\s+(func\(|[A-Za-z_*(&])`)
 var errgroupGoRegex = regexp.MustCompile(`\b[a-zA-Z0-9_]+\.Go\(\s*func\(`)
 
 func (g *GoroutinesGate) Run(ctx context.Context, opts RunOptions) (*Result, error) {
-	root := opts.ProjectRoot
-	if root == "" {
-		var err error
-		root, err = os.Getwd()
-		if err != nil {
-			return nil, fmt.Errorf("failed to get current working directory: %w", err)
-		}
+	root, err := ResolveProjectRoot(opts)
+	if err != nil {
+		return nil, err
 	}
 
 	var violations []string
