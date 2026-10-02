@@ -22,10 +22,16 @@ type docmanEnv struct {
 	projectRoot     string
 	storageProvider storage.ObjectStorageProvider
 	logger          logging.Logger
+	subtrees        []string
+	shippedOnly     bool
 }
 
 func initDocmanEnv(cmd *cobra.Command) (*docmanEnv, error) {
 	cmdCtx, profile, projectRoot, storageProvider, err := resolveDocmanContext(cmd)
+	if err != nil {
+		return nil, err
+	}
+	subtrees, shippedOnly, err := resolveSubtreesAndShipped(cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +41,20 @@ func initDocmanEnv(cmd *cobra.Command) (*docmanEnv, error) {
 		projectRoot:     projectRoot,
 		storageProvider: storageProvider,
 		logger:          logging.GetLoggerFromProfile(profile),
+		subtrees:        subtrees,
+		shippedOnly:     shippedOnly,
 	}, nil
+}
+
+func withDocmanEnv(fn func(cmd *cobra.Command, env *docmanEnv) error) func(*cobra.Command, []string) error {
+	return func(cmd *cobra.Command, args []string) error {
+		_ = args
+		env, err := initDocmanEnv(cmd)
+		if err != nil {
+			return err
+		}
+		return fn(cmd, env)
+	}
 }
 
 func resolveSubtreesAndShipped(cmd *cobra.Command) ([]string, bool, error) {

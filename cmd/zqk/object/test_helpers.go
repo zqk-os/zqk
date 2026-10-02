@@ -376,14 +376,7 @@ func copySpecFiles(sourceDir, targetDir string) error {
 		if ext != ".yaml" && ext != ".yml" && ext != ".json" {
 			return nil
 		}
-		data, err := fileutil.ReadFile(path)
-		if err != nil {
-			return err
-		}
-		if err := fileutil.EnsureDir(filepath.Dir(out)); err != nil {
-			return err
-		}
-		return fileutil.WriteStandardFile(out, data)
+		return copyFileToTarget(path, out)
 	})
 }
 
@@ -393,6 +386,7 @@ func copyCliSpecsTree(srcRoot, dstRoot string) error {
 	if _, err := fileutil.Stat(srcRoot); fileutil.IsNotExist(err) {
 		return nil
 	}
+
 	return filepath.WalkDir(srcRoot, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -422,13 +416,17 @@ func copyCliSpecsTree(srcRoot, dstRoot string) error {
 				return fileutil.EnsureDir(out)
 			}
 		}
-		data, err := fileutil.ReadFile(path)
-		if err != nil {
-			return err
-		}
-		if err := fileutil.EnsureDir(filepath.Dir(out)); err != nil {
-			return err
-		}
-		return fileutil.WriteStandardFile(out, data)
+		return copyFileToTarget(path, out)
 	})
+}
+
+func copyFileToTarget(path, out string) error {
+	data, err := fileutil.ReadFile(path)
+	if err != nil {
+		return err
+	}
+	if err := fileutil.EnsureDir(filepath.Dir(out)); err != nil {
+		return err
+	}
+	return fileutil.WriteStandardFile(out, data)
 }

@@ -12,13 +12,11 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/pkg/cliapp"
-	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/interactive"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objectget"
-	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -87,77 +85,7 @@ func runCreate(cmd *cobra.Command, args []string) error {
 		// Drop get-time hydration keys so CAS stays sealed (hash = truth).
 		_ = objectget.StripReferenceResolverOverlayFields(objData)
 
-		handled, err := prepareCreateAndDryRun(cmd, proc, kind, objData)
-		if err != nil {
-			return err
-		}
-		if handled {
-			return nil
-		}
-
-		// Get object ID and kind for cache context
-		objID, _ := objData[objects.FieldKeyID].(string)
-		objKind, _ := objData[objects.FieldKeyKind].(string)
-
-		// Get force flag
-		force, err := cmd.Flags().GetBool("force")
-		if err != nil {
-			force = false
-		}
-
-		promote, err := cmd.Flags().GetBool("promote")
-		if err != nil {
-			promote = false
-		}
-
-		// Add cache context for update operation.
-		// Skip write-behind on interactive CLI create so CAS+index flush happen in-process
-		// (avoids EnsureCLIObjectMutationVisible waiting on WAL checkpoint stabilization).
-		// Revisit if bulk/API create needs shared write-behind.
-		opCtx := pkgctx.WithCacheUpdate(proc.OperationContext(), objID, objKind, "")
-		opCtx = storage.WithCLIOperation(storage.WithSkipWriteBehind(opCtx))
-		if promote {
-			opCtx = pkgctx.WithPromoteOnCreate(opCtx)
-		}
-
-		// Emit loud contextual broadcast if we are doing this across a boundary
-		clipkg.EmitContextHUD(proc.OperationContext(), proc.SecurityContext(), objData, "creating", objID)
-
-		// Create object
-		if err := proc.Storage().Create(opCtx, proc.SecurityContext(), objData); err != nil {
-			// If object already exists and --force is set, update it instead
-			if (err == storage.ErrObjectExists || strings.Contains(err.Error(), "already exists")) && force {
-				if objID == emptyValue {
-					return cli.Guard(cmd).Require(false, "cannot use --force without object ID").Return()
-				}
-				// Update existing object
-				updateCtx := pkgctx.WithCacheUpdate(proc.OperationContext(), objID, objKind, "")
-				if updateErr := proc.Storage().Update(updateCtx, proc.SecurityContext(), objID, objData); updateErr != nil {
-					logging.FluentEvent(proc.Logger()).Error("Failed to update existing object with --force", updateErr).
-						ObjectID(objID).
-						Log()
-					return cli.Guard(cmd).Err(updateErr).Wrapf("failed to update existing object with --force: %w").Return()
-				}
-				logging.FluentEvent(proc.Logger()).Info("Updated existing object with --force").
-					ObjectID(objID).
-					Log()
-			} else {
-				logging.FluentEvent(proc.Logger()).Error("Failed to create object", err).
-					Kind(kind).
-					Log()
-				return cli.Guard(cmd).Err(err).Wrapf("failed to create object: %w").Return()
-			}
-		}
-
-		// Update object ID and kind from data (in case they were generated/normalized by storage)
-		if id, ok := objData[objects.FieldKeyID].(string); ok && id != emptyValue {
-			objID = id
-		}
-		if k, ok := objData[objects.FieldKeyKind].(string); ok && k != emptyValue {
-		}
-
-		// Prove membrane visibility (or land repair draft).
-		return finalizeCLIObjectCreate(cmd, proc, objData, kind, objID, filePath)
+		return finalizeObjectCreation(cmd, proc, kind, objData, filePath)
 	})(cmd, args)
 }
 

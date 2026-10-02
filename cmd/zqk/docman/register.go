@@ -33,7 +33,7 @@ func NewRegisterCmd() *cobra.Command {
 	// Apply help builder to command
 	), &cobra.Command{
 		Use:  "register",
-		RunE: runRegister,
+		RunE: withDocmanEnv(runRegister),
 	})
 
 	helpBuilder.ApplyToCommand(registerCmd)
@@ -50,28 +50,13 @@ func NewRegisterCmd() *cobra.Command {
 	return registerCmd
 }
 
-func runRegister(cmd *cobra.Command, args []string) error {
-	env, err := initDocmanEnv(cmd)
-	if err != nil {
-		return err
-	}
+func runRegister(cmd *cobra.Command, env *docmanEnv) error {
 
-	logger := env.logger
+	dryRun, _ := cmd.Flags().GetBool("dry-run")
+	updateExisting, _ := cmd.Flags().GetBool("update-existing")
 
-	// Get flags
-	dryRun, err := cmd.Flags().GetBool("dry-run")
-	if err != nil {
-		return errfmt.Newf("failed to get dry-run flag").Wrap(err)
-	}
-	updateExisting, err := cmd.Flags().GetBool("update-existing")
-	if err != nil {
-		return errfmt.Newf("failed to get update-existing flag").Wrap(err)
-	}
-	subtrees, shippedOnly, err := resolveSubtreesAndShipped(cmd)
-	if err != nil {
-		return err
-	}
-	if shippedOnly && len(subtrees) == 0 {
+	subtrees := env.subtrees
+	if env.shippedOnly && len(subtrees) == 0 {
 		subtrees = docman.ShippedInitDocSubtrees
 	}
 
@@ -80,7 +65,7 @@ func runRegister(cmd *cobra.Command, args []string) error {
 
 	// Update existing entries if requested
 	if updateExisting {
-		logging.Fluent(logger).Info("Updating existing doc_entries to include missing reference fields").Log()
+		logging.Fluent(env.logger).Info("Updating existing doc_entries to include missing reference fields").Log()
 		updated, err := registry.UpdateExistingEntries(env.ctx, env.profile)
 		if err != nil {
 			return errfmt.Newf("failed to update existing entries").Wrap(err)
@@ -94,7 +79,7 @@ func runRegister(cmd *cobra.Command, args []string) error {
 	}
 
 	// Register documentation
-	logging.Fluent(logger).Info("Starting documentation registration").
+	logging.Fluent(env.logger).Info("Starting documentation registration").
 		String("dry_run", fmt.Sprintf("%v", dryRun)).
 		Log()
 

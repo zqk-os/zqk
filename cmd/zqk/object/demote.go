@@ -2,7 +2,6 @@ package object
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
@@ -23,108 +22,69 @@ func NewDemoteCmd() *cobra.Command {
 
 func runDemote(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-		tc, err := setupTransitionContext(cmd, proc, args)
-		if err != nil {
-			return err
-		}
-
-		ctx := tc.ctx
-		secCtx := tc.secCtx
-		lifecycleLoader := tc.env.lifecycleLoader
-		gv := tc.env.validator
-		flushTracker := tc.flushTracker
-
-		var errors []string
-		for _, idArg := range tc.args {
-			target, err := resolveAndLoadLifecycleTarget(ctx, secCtx, proc, lifecycleLoader, idArg)
-			if err != nil {
-				errors = append(errors, fmt.Sprintf("%s: %v", idArg, err))
-				continue
-			}
-
-			id := target.id
-			current := target.current
-			kind := target.kind
-			currentStatus := target.currentStatus
-			lifecycle := target.lifecycle
-			statuses := target.statuses
-			currentIdx := target.currentIdx
-
-			if currentIdx == -1 {
-				errors = append(errors, fmt.Sprintf("%s (%s): current status '%s' is not defined in the lifecycle", id, kind, currentStatus))
-				continue
-			}
-
-			// Find furthest valid status backwards. Keep rejection reasons.
-			bestStatus := currentStatus
-			rejectionByStatus := make(map[string]string)
-			var rejectedOrder []string // nearest-first (probe order)
-			for i := currentIdx - 1; i >= 0; i-- {
-				candidate := statuses[i]
-
-				if isNonProgressLifecycleProbeCandidate(candidate, lifecycleStatusByValue(lifecycle, candidate)) {
-					continue
-				}
-
-				// Create a copy of the object and set the candidate status
-				candidateObj := make(map[string]any)
-				for k, v := range current {
-					candidateObj[k] = v
-				}
-				candidateObj[objects.FieldKeyStatus] = candidate
-
-				// Set up validation options
-				valOptions := &validation.ValidationOptions{
-					CurrentState:          currentStatus,
-					ValidateLifecycle:     true,
-					ValidateSemanticTypes: true,
-				}
-				storage.BindValidationLookups(valOptions, ctx, proc.Storage(), secCtx)
-
-				// Validate in-memory
-				valResult, valErr := gv.Validate(ctx, candidateObj, kind, valOptions)
-				if valErr == nil && valResult != nil && valResult.IsValid {
-					// We must also check blocking errors per validation tier
-					blockingConfig := storage.GetGlobalBlockingCheckConfig()
-					blockingErrors := blockingConfig.GetBlockingValidationErrors(valResult.Errors, kind, "")
-					if len(blockingErrors) == 0 {
-						bestStatus = candidate
-						break
-					}
-					rejectionByStatus[candidate] = formatValidationErrorList(blockingErrors)
-					rejectedOrder = append(rejectedOrder, candidate)
-					continue
-				}
-				rejectionByStatus[candidate] = formatCandidateValidationFailure(valErr, valResult)
-				rejectedOrder = append(rejectedOrder, candidate)
-			}
-			if bestStatus == currentStatus {
-				msg := formatStuckLifecycleTransition(id, currentStatus, "lowest", "demote", rejectedOrder, rejectionByStatus, true)
-				fmt.Fprintln(cmd.OutOrStdout(), msg)
-				errors = append(errors, msg)
-				continue
-			}
-
-			// Persist the demotion
-			demoteCtx := pkgctx.WithCacheUpdate(ctx, id, kind, "")
-			err = proc.Storage().Update(demoteCtx, secCtx, id, map[string]any{
-				objects.FieldKeyStatus: bestStatus,
-			})
-			if err != nil {
-				errors = append(errors, fmt.Sprintf("%s: failed to apply demotion to '%s': %v", id, bestStatus, err))
-				continue
-			}
-
-			fmt.Fprintf(cmd.OutOrStdout(), "✓ Demoted %s from '%s' to '%s'\n", color.CyanString(id), color.YellowString(currentStatus), color.GreenString(bestStatus))
-			flushTracker.addWithBacklogCascade(kind)
-		}
-
-		flushObjectMutationVisibility(proc, "demote", flushTracker.kinds())
-
-		if len(errors) > 0 {
-			return fmt.Errorf("demotion completed with errors:\n%s", strings.Join(errors, "\n"))
-		}
-
-		return nil
+		return executeLifecycleTransitions(cmd, proc, args, "demote", "demotion", demoteTarget)
 	})(cmd, args)
+}
+
+func demoteTarget(cmd *cobra.Command, proc *cli.Processor, tc *transitionContext, target *loadedLifecycleTarget) error {
+	if target.currentIdx == -1 {
+		return fmt.Errorf("%s (%s): current status '%s' is not defined in the lifecycle", target.id, target.kind, target.currentStatus)
+	}
+
+	probe := newCandidateProbeState(target.currentStatus)
+	for i := target.currentIdx - 1; i >= 0; i-- {
+		candidate := target.statuses[i]
+
+		if isNonProgressLifecycleProbeCandidate(candidate, lifecycleStatusByValue(target.lifecycle, candidate)) {
+			continue
+		}
+
+		// Create a copy of the object and set the candidate status
+		candidateObj := make(map[string]any)
+		for k, v := range target.current {
+			candidateObj[k] = v
+		}
+		candidateObj[objects.FieldKeyStatus] = candidate
+
+		// Set up validation options
+		valOptions := &validation.ValidationOptions{
+			CurrentState:          target.currentStatus,
+			ValidateLifecycle:     true,
+			ValidateSemanticTypes: true,
+		}
+		storage.BindValidationLookups(valOptions, tc.ctx, proc.Storage(), tc.secCtx)
+
+		// Validate in-memory
+		valResult, valErr := tc.env.validator.Validate(tc.ctx, candidateObj, target.kind, valOptions)
+		if valErr == nil && valResult != nil && valResult.IsValid {
+			// We must also check blocking errors per validation tier
+			blockingConfig := storage.GetGlobalBlockingCheckConfig()
+			blockingErrors := blockingConfig.GetBlockingValidationErrors(valResult.Errors, target.kind, "")
+			if len(blockingErrors) == 0 {
+				probe.bestStatus = candidate
+				break
+			}
+			probe.recordRejection(candidate, formatValidationErrorList(blockingErrors))
+			continue
+		}
+		probe.recordRejection(candidate, formatCandidateValidationFailure(valErr, valResult))
+	}
+	if probe.bestStatus == target.currentStatus {
+		msg := formatStuckLifecycleTransition(target.id, target.currentStatus, "lowest", "demote", probe.rejectedOrder, probe.rejectionByStatus, true)
+		fmt.Fprintln(cmd.OutOrStdout(), msg)
+		return fmt.Errorf("%s", msg)
+	}
+
+	// Persist the demotion
+	demoteCtx := pkgctx.WithCacheUpdate(tc.ctx, target.id, target.kind, "")
+	err := proc.Storage().Update(demoteCtx, tc.secCtx, target.id, map[string]any{
+		objects.FieldKeyStatus: probe.bestStatus,
+	})
+	if err != nil {
+		return fmt.Errorf("%s: failed to apply demotion to '%s': %v", target.id, probe.bestStatus, err)
+	}
+
+	fmt.Fprintf(cmd.OutOrStdout(), "✓ Demoted %s from '%s' to '%s'\n", color.CyanString(target.id), color.YellowString(target.currentStatus), color.GreenString(probe.bestStatus))
+	tc.flushTracker.addWithBacklogCascade(target.kind)
+	return nil
 }

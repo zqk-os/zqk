@@ -16,50 +16,34 @@ import (
 // NewVerifyCmd creates a new verify command for docman
 func NewVerifyCmd() *cobra.Command {
 	verifyCmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewDocmanVerifyCommandBuilder(), &cobra.Command{
-		RunE: runVerify,
+		RunE: withDocmanEnv(runVerify),
 	})
 	return verifyCmd
 }
 
-func runVerify(cmd *cobra.Command, args []string) error {
-	env, err := initDocmanEnv(cmd)
-	if err != nil {
-		return err
-	}
-
-	logger := env.logger
+func runVerify(cmd *cobra.Command, env *docmanEnv) error {
 
 	ids, err := cmd.Flags().GetStringArray("ids")
 	if err != nil {
 		return errfmt.Newf("failed to get ids flag").Wrap(err)
 	}
-	subtrees, shippedOnly, err := resolveSubtreesAndShipped(cmd)
-	if err != nil {
-		return err
-	}
-	autoSeal, err := cmd.Flags().GetBool("auto-seal")
-	if err != nil {
-		return errfmt.Newf("failed to get auto-seal flag").Wrap(err)
-	}
-	strict, err := cmd.Flags().GetBool("strict")
-	if err != nil {
-		return errfmt.Newf("failed to get strict flag").Wrap(err)
-	}
+	autoSeal, _ := cmd.Flags().GetBool("auto-seal")
+	strict, _ := cmd.Flags().GetBool("strict")
 
 	verifier := docman.NewVerifier(env.storageProvider, env.projectRoot)
 
 	opts := docman.VerifyOptions{
 		IDs:         ids,
-		Subtrees:    subtrees,
-		ShippedOnly: shippedOnly,
+		Subtrees:    env.subtrees,
+		ShippedOnly: env.shippedOnly,
 		AutoSeal:    autoSeal,
 		Strict:      strict,
 	}
 
-	logging.Fluent(logger).Info("Running doc_entry cryptographic verification").
+	logging.Fluent(env.logger).Info("Running doc_entry cryptographic verification").
 		Int("ids_count", len(ids)).
-		Int("subtrees_count", len(subtrees)).
-		Bool("shipped_only", shippedOnly).
+		Int("subtrees_count", len(env.subtrees)).
+		Bool("shipped_only", env.shippedOnly).
 		Bool("auto_seal", autoSeal).
 		Log()
 

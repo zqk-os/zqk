@@ -16,6 +16,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/objects/koi"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/process"
 	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/validation"
@@ -223,5 +224,65 @@ func resolveAndLoadLifecycleTarget(ctx context.Context, secCtx *pkgctx.SecurityC
 		statuses:       statuses,
 		currentIdx:     currentIdx,
 	}, nil
+}
+
+type lifecycleTargetHandler func(cmd *cobra.Command, proc *cli.Processor, tc *transitionContext, target *loadedLifecycleTarget) error
+
+func executeLifecycleTransitions(
+	cmd *cobra.Command,
+	proc *cli.Processor,
+	rawArgs []string,
+	op string,
+	errLabel string,
+	handler lifecycleTargetHandler,
+) error {
+	tc, err := setupTransitionContext(cmd, proc, rawArgs)
+	if err != nil {
+		return err
+	}
+
+	var errors []string
+	for _, idArg := range tc.args {
+		process.TouchMeaningfulActivity()
+		if tc.ctx.Err() != nil {
+			errors = append(errors, fmt.Sprintf("%s: skipped due to context timeout: %v", idArg, tc.ctx.Err()))
+			break
+		}
+		target, err := resolveAndLoadLifecycleTarget(tc.ctx, tc.secCtx, proc, tc.env.lifecycleLoader, idArg)
+		if err != nil {
+			errors = append(errors, fmt.Sprintf("%s: %v", idArg, err))
+			continue
+		}
+
+		if err := handler(cmd, proc, tc, target); err != nil {
+			errors = append(errors, err.Error())
+		}
+	}
+
+	flushObjectMutationVisibility(proc, op, tc.flushTracker.kinds())
+
+	if len(errors) > 0 {
+		return fmt.Errorf("%s completed with errors:\n%s", errLabel, strings.Join(errors, "\n"))
+	}
+
+	return nil
+}
+
+type candidateProbeState struct {
+	bestStatus        string
+	rejectionByStatus map[string]string
+	rejectedOrder     []string
+}
+
+func newCandidateProbeState(initialStatus string) *candidateProbeState {
+	return &candidateProbeState{
+		bestStatus:        initialStatus,
+		rejectionByStatus: make(map[string]string),
+	}
+}
+
+func (s *candidateProbeState) recordRejection(candidate, reason string) {
+	s.rejectionByStatus[candidate] = reason
+	s.rejectedOrder = append(s.rejectedOrder, candidate)
 }
 

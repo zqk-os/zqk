@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/coordination"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/storage"
@@ -67,18 +67,7 @@ func emitLintBypassAuditEventViaCoordinator(
 		CreatedBy:  actor, // Git user info as actor
 	}
 
-	// Embed LoggingContext in context so coordinator logging respects --context profile
-	ctx = createContextWithLoggingProfile(ctx, profile)
-
-	coordinator := coordination.NewStorageCoordinator(projectRoot, storageProvider)
-
-	// Build audit metadata from options
-	auditMetadata := make(map[string]any)
-	if options.Metadata != nil {
-		for k, v := range options.Metadata {
-			auditMetadata[k] = v
-		}
-	}
+	ctx, coordinator, auditMetadata := cli.InitAuditCoordination(ctx, projectRoot, storageProvider, profile, options.Metadata)
 	auditMetadata[automationAuditKeyEventType] = options.EventType
 	auditMetadata[automationAuditKeyOperation] = options.Operation
 	auditMetadata[automationAuditKeySeverity] = options.Severity
@@ -119,36 +108,6 @@ func emitLintBypassAuditEventViaCoordinator(
 		})
 }
 
-// createContextWithLoggingProfile creates a context with LoggingContext embedded from profile string
-// This ensures coordinator logging events respect --context profile settings
-func createContextWithLoggingProfile(ctx context.Context, profile string) context.Context {
-	if ctx == nil {
-		ctx = pkgctx.NewSystemContext()
-	}
-
-	if profile == emptyValue {
-		profile = string(pkgctx.ProfileHuman) // Default
-	}
-
-	// Convert profile string to LoggingProfile enum
-	var loggingCtx *pkgctx.LoggingContext
-	switch profile {
-	case string(pkgctx.ProfileMCP):
-		loggingCtx = pkgctx.NewLoggingContext(pkgctx.ProfileMCP)
-	case string(pkgctx.ProfileSystem):
-		loggingCtx = pkgctx.NewSystemLoggingContext()
-	case string(pkgctx.ProfileAIAgent):
-		loggingCtx = pkgctx.NewLoggingContext(pkgctx.ProfileAIAgent)
-	case string(pkgctx.ProfileDebug):
-		loggingCtx = pkgctx.NewLoggingContext(pkgctx.ProfileDebug)
-	case string(pkgctx.ProfileHuman), "":
-		loggingCtx = pkgctx.NewHumanLoggingContext()
-	default:
-		loggingCtx = pkgctx.NewHumanLoggingContext()
-	}
-
-	return pkgctx.WithLoggingContext(ctx, loggingCtx)
-}
 
 // minInt returns the minimum of two integers
 func minInt(a, b int) int {
