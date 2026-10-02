@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -12,6 +13,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // ShouldProcessYAMLDirEntry checks standard exclusions (.git, node_modules, AppleDouble, non-yaml, placeholder, hashed).
@@ -66,4 +68,38 @@ func AddBuilderFlags(cmd *cobra.Command, sourceDir *string, sourceFlag, sourceDe
 	cmd.Flags().StringVar(outputDir, "output-dir", "", fmt.Sprintf("Output directory for generated builder files (default: %s)", defaultOutput))
 	cmd.Flags().BoolVar(overwrite, "overwrite", false, "Overwrite existing builder files")
 	cli.AddCommonFlags(cmd)
+}
+
+// CollectGenerateItems walks a directory of YAML files, filtering entries and skipping existing files when !overwrite.
+func CollectGenerateItems(
+	dir string,
+	logger logging.Logger,
+	overwrite bool,
+	resolveOutput func(baseName string, d os.DirEntry) (cleanBaseName, outputFile string),
+) (items []GenerateItem, skipped int, err error) {
+	err = filepath.WalkDir(dir, func(path string, d os.DirEntry, walkErr error) error {
+		skipDir, process := ShouldProcessYAMLDirEntry(d, walkErr)
+		if skipDir {
+			return filepath.SkipDir
+		}
+		if !process {
+			return nil
+		}
+
+		baseName := strings.TrimSuffix(d.Name(), ".yaml")
+		baseName = strings.TrimSuffix(baseName, ".yml")
+		cleanBaseName, outputFile := resolveOutput(baseName, d)
+
+		if !overwrite && outputFile != "" {
+			if _, statErr := fileutil.Stat(outputFile); statErr == nil {
+				logging.Fluent(logger).Debug(fmt.Sprintf("Skipping %s (builder already exists, use --overwrite to replace)", d.Name())).Log()
+				skipped++
+				return nil
+			}
+		}
+
+		items = append(items, GenerateItem{YAMLPath: path, BaseName: cleanBaseName})
+		return nil
+	})
+	return items, skipped, err
 }

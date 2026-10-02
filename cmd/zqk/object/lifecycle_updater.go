@@ -23,26 +23,32 @@ var priorityPlanTerminalStatuses = []any{objectStatusComplete, objectStatusArchi
 // Event type emitted when no next plan exists so workflows can establish the next block of work.
 const EventTypePlanningPrioritizationRequired = "planning_prioritization_required"
 
+func resolveCachedPriorityPlanStorage(projectRoot string) (storage.ObjectStorageProvider, *pkgctx.SecurityContext, *pkgctx.StorageContext, bool) {
+	if projectRoot == emptyValue {
+		return nil, nil, nil, false
+	}
+	raw, ok := cli.GetObjectStorageForProjectRoot(projectRoot)
+	if !ok {
+		return nil, nil, nil, false
+	}
+	provider, ok := nildecode.DecodeNonNilPayload[storage.ObjectStorageProvider](raw)
+	if !ok {
+		return nil, nil, nil, false
+	}
+	return provider, pkgctx.NewSystemSecurityContext(), pkgctx.NewStorageContext(), true
+}
+
 // RunPriorityPlanCompleteUpdater runs asynchronously when a priority plan transitions to complete.
 // It (1) finds the next plan by active_order/plan_date, (2) sets that plan to active_order=1 and
 // status=in_progress, or (3) if no next plan exists, emits a coordinator event so the planning
 // prioritization workflow can establish the next block of work.
 // Uses storage from process cache (GetObjectStorageForProjectRoot); no-op if storage not cached.
 func RunPriorityPlanCompleteUpdater(ctx context.Context, projectRoot string) {
-	if projectRoot == emptyValue {
-		return
-	}
-	provider, ok := cli.GetObjectStorageForProjectRoot(projectRoot)
-	if !ok {
-		return
-	}
-	provider, ok = nildecode.DecodeNonNilPayload[storage.ObjectStorageProvider](provider)
+	provider, secCtx, storageCtx, ok := resolveCachedPriorityPlanStorage(projectRoot)
 	if !ok {
 		return
 	}
 	eventLogger := logging.NewEventLogger(ctx)
-	secCtx := pkgctx.NewSystemSecurityContext()
-	storageCtx := pkgctx.NewStorageContext()
 
 	// List non-terminal priority plans (planning, grooming, prioritizing, active, in_progress, paused, blocked)
 	filter := storage.ListFilter{
@@ -148,19 +154,10 @@ func emitPlanningPrioritizationRequired(ctx context.Context, eventLogger *loggin
 }
 
 func RunPriorityPlanActivationUpdater(ctx context.Context, projectRoot string, planID string, toState string) {
-	if projectRoot == emptyValue {
-		return
-	}
-	provider, ok := cli.GetObjectStorageForProjectRoot(projectRoot)
+	provider, secCtx, storageCtx, ok := resolveCachedPriorityPlanStorage(projectRoot)
 	if !ok {
 		return
 	}
-	provider, ok = nildecode.DecodeNonNilPayload[storage.ObjectStorageProvider](provider)
-	if !ok {
-		return
-	}
-	secCtx := pkgctx.NewSystemSecurityContext()
-	storageCtx := pkgctx.NewStorageContext()
 
 	filter := storage.ListFilter{
 		Kind: objectKindPriorityPlan,

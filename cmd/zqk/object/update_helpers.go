@@ -12,9 +12,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/brand"
-	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
@@ -158,9 +157,7 @@ func loadUpdatesFromFile(cmd *cobra.Command, proc *cli.Processor) (map[string]an
 		return nil, errfmt.Newf("file hash validation failed").Wrap(err)
 	}
 
-	dl := cli.NewDataLoader(proc.Logger())
-	data, _, err := dl.LoadFromFile(filePath)
-	return data, err
+	return cli.NewDataLoader(proc.Logger()).LoadUpdatesFromFile(filePath)
 }
 
 // loadUpdatesFromData loads updates from inline data using internal/cli DataLoader.
@@ -169,9 +166,7 @@ func loadUpdatesFromData(cmd *cobra.Command, proc *cli.Processor) (map[string]an
 	if dataStr == emptyValue {
 		return nil, nil
 	}
-	dl := cli.NewDataLoader(proc.Logger())
-	data, _, err := dl.LoadFromString(dataStr)
-	return data, err
+	return cli.NewDataLoader(proc.Logger()).LoadUpdatesFromData(dataStr)
 }
 
 // loadUpdatesFromStdin loads updates from stdin using internal/cli DataLoader.
@@ -340,30 +335,7 @@ func applyUnsetFieldFlags(cmd *cobra.Command, updates map[string]any) {
 // applyAutoStatusFlag sets updates[status] to the next lifecycle-valid status when --auto-status is set.
 // It is a no-op when --auto-status is false or status is already explicitly provided.
 func applyAutoStatusFlag(cmd *cobra.Command, currentObj map[string]any, updates map[string]any) error {
-	autoStatus, _ := cmd.Flags().GetBool("auto-status")
-	if !autoStatus {
-		return nil
-	}
-	if currentObj == nil {
-		return errfmt.Errorf("--auto-status requires an existing object")
-	}
-	if _, hasStatus := updates[objects.FieldKeyStatus]; hasStatus {
-		return errfmt.Errorf("--auto-status cannot be combined with an explicit status update")
-	}
-	kind, _ := currentObj[objects.FieldKeyKind].(string)
-	hasTrait, err := objects.KindHasTrait(kind, "auto_status_transitionable")
-	if err != nil {
-		return errfmt.Errorf("failed to evaluate auto-status trait for kind %q: %w", kind, err)
-	}
-	if !hasTrait {
-		return errfmt.Errorf("--auto-status not supported for kind %q (missing auto_status_transitionable trait)", kind)
-	}
-	nextStatus, err := deriveNextLifecycleStatus(currentObj)
-	if err != nil {
-		return err
-	}
-	updates[objects.FieldKeyStatus] = nextStatus
-	return nil
+	return cli.ApplyAutoStatusFlag(cmd, currentObj, updates)
 }
 
 // deriveNextLifecycleStatus returns the next progress-only lifecycle status.
@@ -465,13 +437,7 @@ func addOptimisticLocking(cmd *cobra.Command, updates map[string]any) {
 func handleUpdateDryRun(cmd *cobra.Command, id string, current map[string]any, updates map[string]any, proc *cli.Processor) (bool, error) {
 	dr := cli.NewDryRunHandler(proc.Logger())
 	handled, result, err := dr.HandleUpdateDryRunResult(cmd, id, current, updates)
-	if err != nil {
-		return handled, err
-	}
-	if handled && result != nil {
-		return true, cli.FormatOutput(cmd, result)
-	}
-	return handled, nil
+	return processDryRunResult(cmd, handled, result, err)
 }
 
 // buildUpdateCacheContext builds the cache context for an update operation
@@ -653,17 +619,7 @@ func refuseManualStatusUnlessOverride(cmd *cobra.Command, proc *cli.Processor, i
 		exe := brand.ExecutableName()
 		return cli.Guard(cmd).Require(false, fmt.Sprintf("manual status updates are restricted to preserve lifecycle integrity. Use '%s object promote|demote|park <id>' to move through the lifecycle state machine. Human interactive TTY snap-remedy (--override) is blocked for non-TTY/agent shells", exe)).Return()
 	}
-	reasonCode := emptyValue
-	if cmd.Flags().Lookup("reason-code") != nil {
-		reasonCode, _ = cmd.Flags().GetString("reason-code")
-	}
-	if reasonCode == emptyValue {
-		return cli.Guard(cmd).Require(false, "--reason-code is required when using --override").Return()
-	}
-	if proc == nil {
-		return nil
-	}
-	return clipkg.EnforceOverrideFriction(cmd, proc.OperationContext(), proc.SecurityContext(), proc.Storage(), id, objKind, reasonCode)
+	return enforceOverrideFrictionFromFlags(cmd, proc, id, objKind, "")
 }
 
 // guardManualRefFieldUpdates refuses direct mutation of *_ref and *_refs fields via --field,
@@ -724,17 +680,7 @@ func guardManualRefFieldUpdates(cmd *cobra.Command, proc *cli.Processor, id, obj
 		exe := brand.ExecutableName()
 		return cli.Guard(cmd).Require(false, fmt.Sprintf("⚡️ AGENT POISON PILL: Direct mutation of reference field(s) %v is prohibited to preserve graph integrity. Use '%s object ref add <id> <target_id>' or '%s object ref remove <id> <target_id>' instead. Human override requires --override --reason-code=<reason>.", violatingFields, exe, exe)).Return()
 	}
-	reasonCode := emptyValue
-	if cmd != nil && cmd.Flags() != nil && cmd.Flags().Lookup("reason-code") != nil {
-		reasonCode, _ = cmd.Flags().GetString("reason-code")
-	}
-	if reasonCode == emptyValue {
-		return cli.Guard(cmd).Require(false, "--reason-code is required when using --override on reference fields").Return()
-	}
-	if proc == nil {
-		return nil
-	}
-	return clipkg.EnforceOverrideFriction(cmd, proc.OperationContext(), proc.SecurityContext(), proc.Storage(), id, objKind, reasonCode)
+	return enforceOverrideFrictionFromFlags(cmd, proc, id, objKind, "--reason-code is required when using --override on reference fields")
 }
 
 // guardManualSystemProvenanceFields refuses direct manual modification of system-managed provenance
@@ -755,17 +701,7 @@ func guardManualSystemProvenanceFields(cmd *cobra.Command, proc *cli.Processor, 
 		override, _ = cmd.Flags().GetBool("override")
 	}
 	if override {
-		reasonCode := emptyValue
-		if cmd.Flags().Lookup("reason-code") != nil {
-			reasonCode, _ = cmd.Flags().GetString("reason-code")
-		}
-		if reasonCode == emptyValue {
-			return cli.Guard(cmd).Require(false, "--reason-code is required when using --override to mutate system provenance fields").Return()
-		}
-		if proc != nil {
-			return clipkg.EnforceOverrideFriction(cmd, proc.OperationContext(), proc.SecurityContext(), proc.Storage(), id, objKind, reasonCode)
-		}
-		return nil
+		return enforceOverrideFrictionFromFlags(cmd, proc, id, objKind, "--reason-code is required when using --override to mutate system provenance fields")
 	}
 	if proc != nil && pkgctx.IsLifecycleBreakGlass(proc.OperationContext()) {
 		return nil

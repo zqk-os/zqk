@@ -9,8 +9,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/storage"
-
-	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // readCurrentObject reads the current object to check if it's built-in
@@ -52,9 +50,7 @@ func readFileUpdates(cmd *cobra.Command, proc *cli.Processor) (map[string]any, e
 	if flagsBag.Err() != nil || filePath == emptyValue {
 		return nil, flagsBag.Err()
 	}
-	dl := cli.NewDataLoader(proc.Logger())
-	data, _, err := dl.LoadFromFile(filePath)
-	return data, err
+	return cli.NewDataLoader(proc.Logger()).LoadUpdatesFromFile(filePath)
 }
 
 // readDataUpdates reads updates from --data flag using internal/cli DataLoader.
@@ -64,43 +60,11 @@ func readDataUpdates(cmd *cobra.Command, proc *cli.Processor) (map[string]any, e
 	if flagsBag.Err() != nil || dataStr == emptyValue {
 		return nil, flagsBag.Err()
 	}
-	dl := cli.NewDataLoader(proc.Logger())
-	data, _, err := dl.LoadFromString(dataStr)
-	return data, err
+	return cli.NewDataLoader(proc.Logger()).LoadUpdatesFromData(dataStr)
 }
 
 func applyInternalAutoStatusFlag(cmd *cobra.Command, currentObj map[string]any, updates map[string]any) error {
-	var flagsBag clipkg.FlagBag
-	autoStatus := flagsBag.Bool(cmd, "auto-status")
-	if flagsBag.Err() != nil || !autoStatus {
-		return flagsBag.Err()
-	}
-	if currentObj == nil {
-		return errfmt.Errorf("--auto-status requires an existing object")
-	}
-	if _, hasStatus := updates[objects.FieldKeyStatus]; hasStatus {
-		return errfmt.Errorf("--auto-status cannot be combined with an explicit status update")
-	}
-	kind, _ := currentObj[objects.FieldKeyKind].(string)
-	hasTrait, err := objects.KindHasTrait(kind, "auto_status_transitionable")
-	if err != nil {
-		return errfmt.Newf("failed to evaluate auto-status trait for kind %q", kind).Wrap(err)
-	}
-	if !hasTrait {
-		return errfmt.Errorf("--auto-status not supported for kind %q (missing auto_status_transitionable trait)", kind)
-	}
-	next, err := deriveInternalNextLifecycleStatus(currentObj)
-	if err != nil {
-		return err
-	}
-	updates[objects.FieldKeyStatus] = next
-	return nil
-}
-
-func deriveInternalNextLifecycleStatus(currentObj map[string]any) (string, error) {
-	kind, _ := currentObj[objects.FieldKeyKind].(string)
-	currentStatus, _ := currentObj[objects.FieldKeyStatus].(string)
-	return objects.NextProgressLifecycleStatus(kind, currentStatus)
+	return cli.ApplyAutoStatusFlag(cmd, currentObj, updates)
 }
 
 // buildAllUpdates builds all updates from field flags, file, data, or stdin using internal/cli.

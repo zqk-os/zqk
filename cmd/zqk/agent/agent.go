@@ -1,6 +1,8 @@
 package agent
 
 import (
+	stdcontext "context"
+
 	"github.com/spf13/cobra"
 
 	"github.com/zqk-os/zqk/cmd/zqk/feed"
@@ -10,6 +12,8 @@ import (
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // procSecurity extracts the security context from the processor or returns system context.
@@ -20,6 +24,26 @@ func procSecurity(proc *cli.Processor) *pkgctx.SecurityContext {
 		}
 	}
 	return pkgctx.NewSystemSecurityContext()
+}
+
+// procStorageTuple extracts standard context, security context, and storage provider from the processor.
+func procStorageTuple(proc *cli.Processor) (stdcontext.Context, *pkgctx.SecurityContext, storage.ObjectStorageProvider) {
+	if proc == nil {
+		return stdcontext.Background(), pkgctx.NewSystemSecurityContext(), nil
+	}
+	return proc.OperationContext(), procSecurity(proc), proc.Storage()
+}
+
+// newAgentProcessor initializes a new processor and verifies project root presence.
+func newAgentProcessor(cmd *cobra.Command) (*cli.Processor, error) {
+	proc, err := cli.NewProcessor(cmd)
+	if err != nil {
+		return nil, err
+	}
+	if proc.ProjectRoot() == "" {
+		return nil, errfmt.Errorf("project root is required")
+	}
+	return proc, nil
 }
 
 // NewAgentCmd creates the agent command group for multi-agent orchestration

@@ -237,20 +237,7 @@ func applySpecFix(fixCtx *AutoFixContext, originalObj map[string]any, updatedObj
 		options.CurrentState = status
 	}
 	if storageProvider != nil {
-		options.ObjectLookup = func(id string) (map[string]any, error) {
-			return storageProvider.Read(stdctx, secCtx, id)
-		}
-		options.ObjectStatusLookup = func(id string) (string, error) {
-			obj, err := options.ObjectLookup(id)
-			if err != nil {
-				return "", err
-			}
-			status, _ := obj[objects.FieldKeyStatus].(string)
-			return status, nil
-		}
-		options.DependentsLookup = func(id string) []string {
-			return storage.DependentsForID(stdctx, storageProvider, id)
-		}
+		storage.BindValidationLookups(options, stdctx, storageProvider, secCtx)
 	}
 
 	result, valErr := validator.Validate(stdctx, updatedObj, fixCtx.Kind, options)

@@ -280,13 +280,31 @@ func RenderScreenToSVG(filename, title string, screenText string, widthCols int)
 	return os.WriteFile(filename, []byte(svgContent), paths.FilePerm644)
 }
 
-func RenderWebStudioSVG(filename string) error {
-	width := 1100
-	height := 700
-
-	var sb strings.Builder
+func renderSVGHeader(sb *strings.Builder, width, height int) {
 	sb.WriteString(fmt.Sprintf(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" width="%d" height="%d">`+"\n",
 		width, height, width, height))
+}
+
+func renderBrowserWindowFrame(sb *strings.Builder, shadowFilterID, urlPath string) {
+	sb.WriteString(fmt.Sprintf(`  <!-- Browser Window Frame -->
+  <rect x="4" y="4" width="1092" height="692" class="browser-bg" filter="url(#%s)" stroke="#30363d" stroke-width="1"/>
+  <path d="M 4 16 A 12 12 0 0 1 16 4 L 1084 4 A 12 12 0 0 1 1096 16 L 1096 42 L 4 42 Z" class="browser-top"/>
+  <line x1="4" y1="42" x2="1096" y2="42" stroke="#30363d" stroke-width="1"/>
+
+  <!-- macOS Window Controls -->
+  <circle cx="22" cy="23" r="5.5" class="dot-red"/>
+  <circle cx="40" cy="23" r="5.5" class="dot-yellow"/>
+  <circle cx="58" cy="23" r="5.5" class="dot-green"/>
+
+  <!-- Browser URL Bar -->
+  <rect x="280" y="8" width="540" height="26" class="url-bar"/>
+  <text x="296" y="25" class="url-text"><tspan fill="#3fb950">🔒 </tspan><tspan class="url-host">http://127.0.0.1:8080%s</tspan></text>
+`, shadowFilterID, urlPath))
+}
+
+func RenderWebStudioSVG(filename string) error {
+	var sb strings.Builder
+	renderSVGHeader(&sb, 1100, 700)
 
 	sb.WriteString(`  <defs>
     <style>
@@ -357,21 +375,9 @@ func RenderWebStudioSVG(filename string) error {
       <path d="M 0 1 L 10 5 L 0 9 z" fill="#58a6ff"/>
     </marker>
   </defs>
-
-  <!-- Browser Window Frame -->
-  <rect x="4" y="4" width="1092" height="692" class="browser-bg" filter="url(#win-shadow)" stroke="#30363d" stroke-width="1"/>
-  <path d="M 4 16 A 12 12 0 0 1 16 4 L 1084 4 A 12 12 0 0 1 1096 16 L 1096 42 L 4 42 Z" class="browser-top"/>
-  <line x1="4" y1="42" x2="1096" y2="42" stroke="#30363d" stroke-width="1"/>
-
-  <!-- macOS Window Controls -->
-  <circle cx="22" cy="23" r="5.5" class="dot-red"/>
-  <circle cx="40" cy="23" r="5.5" class="dot-yellow"/>
-  <circle cx="58" cy="23" r="5.5" class="dot-green"/>
-
-  <!-- Browser URL Bar -->
-  <rect x="280" y="8" width="540" height="26" class="url-bar"/>
-  <text x="296" y="25" class="url-text"><tspan fill="#3fb950">🔒 </tspan><tspan class="url-host">http://127.0.0.1:8080/</tspan></text>
-
+`)
+	renderBrowserWindowFrame(&sb, "win-shadow", "/")
+	sb.WriteString(`
   <!-- App Header -->
   <rect x="4" y="43" width="1092" height="48" class="app-header"/>
   <line x1="4" y1="91" x2="1096" y2="91" stroke="#30363d" stroke-width="1"/>
@@ -617,12 +623,8 @@ func RenderWebStudioSVG(filename string) error {
 }
 
 func RenderWebStudioGanttSVG(filename string) error {
-	width := 1100
-	height := 700
-
 	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" width="%d" height="%d">`+"\n",
-		width, height, width, height))
+	renderSVGHeader(&sb, 1100, 700)
 
 	sb.WriteString(`  <defs>
     <style>
@@ -686,21 +688,9 @@ func RenderWebStudioGanttSVG(filename string) error {
       <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#000000" flood-opacity="0.55"/>
     </filter>
   </defs>
-
-  <!-- Browser Window Frame -->
-  <rect x="4" y="4" width="1092" height="692" class="browser-bg" filter="url(#win-shadow-gantt)" stroke="#30363d" stroke-width="1"/>
-  <path d="M 4 16 A 12 12 0 0 1 16 4 L 1084 4 A 12 12 0 0 1 1096 16 L 1096 42 L 4 42 Z" class="browser-top"/>
-  <line x1="4" y1="42" x2="1096" y2="42" stroke="#30363d" stroke-width="1"/>
-
-  <!-- macOS Window Controls -->
-  <circle cx="22" cy="23" r="5.5" class="dot-red"/>
-  <circle cx="40" cy="23" r="5.5" class="dot-yellow"/>
-  <circle cx="58" cy="23" r="5.5" class="dot-green"/>
-
-  <!-- Browser URL Bar -->
-  <rect x="280" y="8" width="540" height="26" class="url-bar"/>
-  <text x="296" y="25" class="url-text"><tspan fill="#3fb950">🔒 </tspan><tspan class="url-host">http://127.0.0.1:8080/studio/gantt</tspan></text>
-
+`)
+	renderBrowserWindowFrame(&sb, "win-shadow-gantt", "/studio/gantt")
+	sb.WriteString(`
   <!-- App Header -->
   <rect x="4" y="43" width="1092" height="48" class="app-header"/>
   <line x1="4" y1="91" x2="1096" y2="91" stroke="#30363d" stroke-width="1"/>

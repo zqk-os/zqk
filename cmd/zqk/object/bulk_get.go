@@ -6,7 +6,6 @@ import (
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/logging"
-	"github.com/zqk-os/zqk/pkg/objectget"
 )
 
 // NewBulkGetCmd creates a bulk get command
@@ -34,13 +33,7 @@ func executeBulkGet(cmd *cobra.Command, ids []string, proc *cli.Processor) error
 	var err error
 	_ = err
 
-	viewName, _ := cmd.Flags().GetString("view")
-	if viewName == emptyValue {
-		viewName = objectget.ViewDefault
-	}
-
-	linkHydrationRaw, _ := cmd.Flags().GetString("link-hydration")
-	hydration, parseErr := objectget.ParseLinkHydration(linkHydrationRaw)
+	viewName, hydration, parseErr := resolveGetViewAndHydration(cmd)
 	if parseErr != nil {
 		return cli.Guard(cmd).Err(parseErr).Return()
 	}

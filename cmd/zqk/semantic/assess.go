@@ -41,11 +41,7 @@ func NewAssessCmd() *cobra.Command {
 		RunE: runAssess,
 	})
 
-	// Apply help builder to command
-	helpBuilder.ApplyToCommand(cmd)
-
-	cli.AddCommonFlags(cmd)
-	return cmd
+	return cli.FinalizeCommand(cmd, helpBuilder)
 }
 
 func runAssess(cmd *cobra.Command, args []string) error {

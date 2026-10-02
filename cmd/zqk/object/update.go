@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
@@ -250,16 +249,7 @@ func runUpdate(cmd *cobra.Command, args []string) error {
 			return nil
 		}
 
-		// Get relaxed flag
-		relaxed, err := cmd.Flags().GetBool("relaxed")
-		if err != nil {
-			relaxed = false
-		}
-
-		// Set cache checker if relaxed mode (enables batch update with non-blocking reference validation)
-		if relaxed {
-			setCacheCheckerForBatchCreation(proc)
-		}
+		configureRelaxedMode(cmd, proc)
 
 		// If object doesn't exist and --force is set, create it from updates
 		if current == nil && force {
@@ -366,10 +356,8 @@ func runUpdate(cmd *cobra.Command, args []string) error {
 		}).Run()
 
 		// Write-behind: ensure next zqk process can read the object immediately after update/create-via-force.
-		flushCtx, cancelFlush := storage.DurabilityFlushContext()
-		defer cancelFlush()
-		t0 := time.Now()
-		if err := storage.EnsureCLIObjectMutationVisibleForProvider(flushCtx, proc.Storage(), proc.ProjectRoot(), []string{objKind}); err != nil {
+		dur, err := executeDurabilityFlush(proc, []string{objKind})
+		if err != nil {
 			logging.FluentEvent(proc.Logger()).Warn("Persist flush after object update timed out, but object is durable").
 				WithError(err).
 				ObjectID(id).
@@ -382,7 +370,7 @@ func runUpdate(cmd *cobra.Command, args []string) error {
 				fmt.Fprintln(cmd.ErrOrStderr(), color.YellowString("Warning: Object updated successfully, but index refresh is delayed."))
 			}
 		}
-		logSlowCLIObjectMutationFlush(proc.Logger(), "update", id, []string{objKind}, time.Since(t0), 0)
+		logSlowCLIObjectMutationFlush(proc.Logger(), "update", id, []string{objKind}, dur, 0)
 
 		// Trigger cache freshness check
 		proc.TriggerCacheFreshnessCheck("update", []string{objKind})

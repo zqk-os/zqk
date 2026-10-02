@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/coordination"
-	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
@@ -37,12 +36,7 @@ func emitHashRegistryEventViaCoordinator(
 	auditMetadata[eventKeyHashCount] = hashCount
 	auditMetadata[eventKeyDurationSeconds] = duration.Seconds()
 
-	// Determine severity
-	severity := severityLow
-	if status == eventStatusError || err != nil {
-		severity = severityHigh
-	}
-	auditMetadata[eventKeySeverity] = severity
+	auditMetadata[eventKeySeverity] = severityForStatusOrError(status, err)
 
 	// Build logging fields
 	loggingFields := []coordination.LoggingField{
@@ -78,28 +72,6 @@ func emitHashRegistryEventViaCoordinator(
 
 	// Create operation ID
 	operationID := fmt.Sprintf("hash_registry_batch_%s_%d", kind, time.Now().UnixNano())
-
-	// Create event context (enable audit and metrics, minimal logging)
-	eventCtx := coordination.NewEventContext(operationID, eventTypeHashRegistryBatch, status).
-		WithEventData(eventData).
-		WithContext(ctx).
-		WithChannels(false, true, true, false) // Audit and metrics, no logging/operational
-
-	if err != nil {
-		eventCtx = eventCtx.WithError(err)
-	}
-
-	if duration > 0 {
-		eventCtx = eventCtx.WithDuration(duration)
-	}
-
-	// Emit via coordinator (async, non-blocking)
-	bud := goroutinelabels.DefaultBudget()
-	builder := goroutinelabels.NewGoroutine("hash_registry_event_emit", fmt.Sprintf("emitting hash registry event for %s", kind))
-	if bud != nil {
-		builder = builder.WithBudget(bud)
-	}
-	builder.StartSimple(func() {
-		_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
-	})
+	eventCtx := buildEventContext(ctx, operationID, eventTypeHashRegistryBatch, status, eventData, duration, err, false, true, true, false)
+	emitAsyncCoordinationEvent(ctx, coordinator, "hash_registry_event_emit", fmt.Sprintf("emitting hash registry event for %s", kind), eventCtx)
 }

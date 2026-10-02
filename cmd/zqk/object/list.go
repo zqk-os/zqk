@@ -662,16 +662,9 @@ func findActivePriorityPlan(cmdCtx context.Context, storageProvider storage.Obje
 	return plans[0].ID, nil
 }
 
-// priorityPlanInfo represents a priority plan with sorting information
-type priorityPlanInfo struct {
-	ID          string
-	ActiveOrder *int
-	PlanDate    string
-}
-
 // buildPriorityPlanList builds a list of priority plan info from objects
-func buildPriorityPlanList(objectList []map[string]any) []priorityPlanInfo {
-	plans := make([]priorityPlanInfo, 0, len(objectList))
+func buildPriorityPlanList(objectList []map[string]any) []PriorityPlanInfo {
+	plans := make([]PriorityPlanInfo, 0, len(objectList))
 
 	for _, obj := range objectList {
 		planID, _ := obj[objects.FieldKeyID].(string)
@@ -681,9 +674,11 @@ func buildPriorityPlanList(objectList []map[string]any) []priorityPlanInfo {
 
 		activeOrder := extractActiveOrder(obj)
 		planDate, _ := obj[objects.FieldKeyPlanDate].(string)
+		status, _ := obj[objects.FieldKeyStatus].(string)
 
-		plans = append(plans, priorityPlanInfo{
+		plans = append(plans, PriorityPlanInfo{
 			ID:          planID,
+			Status:      status,
 			ActiveOrder: activeOrder,
 			PlanDate:    planDate,
 		})
@@ -705,18 +700,23 @@ func extractActiveOrder(obj map[string]any) *int {
 	}
 }
 
-// sortPriorityPlans sorts plans by active_order (lower first), then plan_date (desc)
-func sortPriorityPlans(plans []priorityPlanInfo) {
-	sort.Slice(plans, func(i, j int) bool {
-		if plans[i].ActiveOrder != nil && plans[j].ActiveOrder != nil {
-			if *plans[i].ActiveOrder != *plans[j].ActiveOrder {
-				return *plans[i].ActiveOrder < *plans[j].ActiveOrder
-			}
-		} else if plans[i].ActiveOrder != nil {
-			return true
-		} else if plans[j].ActiveOrder != nil {
-			return false
+// comparePriorityPlanOrder compares two PriorityPlanInfo items by active_order (lower first), then plan_date (desc).
+func comparePriorityPlanOrder(a, b PriorityPlanInfo) bool {
+	if a.ActiveOrder != nil && b.ActiveOrder != nil {
+		if *a.ActiveOrder != *b.ActiveOrder {
+			return *a.ActiveOrder < *b.ActiveOrder
 		}
-		return plans[i].PlanDate > plans[j].PlanDate
+	} else if a.ActiveOrder != nil {
+		return true
+	} else if b.ActiveOrder != nil {
+		return false
+	}
+	return a.PlanDate > b.PlanDate
+}
+
+// sortPriorityPlans sorts plans by active_order (lower first), then plan_date (desc)
+func sortPriorityPlans(plans []PriorityPlanInfo) {
+	sort.Slice(plans, func(i, j int) bool {
+		return comparePriorityPlanOrder(plans[i], plans[j])
 	})
 }

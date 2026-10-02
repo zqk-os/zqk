@@ -5,14 +5,12 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/spf13/cobra"
 
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
 	instancebuilders "github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -66,33 +64,10 @@ func NewGenerateInstanceBuildersCmd() *cobra.Command {
 			return errfmt.Newf("failed to create output directory").Wrap(err)
 		}
 
-		skipped := 0
-		var items []GenerateItem
-
-		err := filepath.WalkDir(specsDir, func(path string, d os.DirEntry, walkErr error) error {
-			skipDir, process := ShouldProcessYAMLDirEntry(d, walkErr)
-			if skipDir {
-				return filepath.SkipDir
-			}
-			if !process {
-				return nil
-			}
-
-			baseName := strings.TrimSuffix(d.Name(), ".yaml")
-			baseName = strings.TrimSuffix(baseName, ".yml")
-			destDir, _ := instancebuilders.InstanceBuilderOutput(outputDir)
+		destDir, _ := instancebuilders.InstanceBuilderOutput(outputDir)
+		items, skipped, err := CollectGenerateItems(specsDir, logger, overwrite, func(baseName string, d os.DirEntry) (string, string) {
 			outputFile := filepath.Join(destDir, fmt.Sprintf("%s_instance_builder.go", baseName))
-
-			if !overwrite {
-				if _, err := fileutil.Stat(outputFile); err == nil {
-					logging.Fluent(logger).Info(fmt.Sprintf("Skipping %s (instance builder already exists, use --overwrite to replace)", d.Name())).Log()
-					skipped++
-					return nil
-				}
-			}
-
-			items = append(items, GenerateItem{YAMLPath: path, BaseName: baseName})
-			return nil
+			return baseName, outputFile
 		})
 		if err != nil {
 			return errfmt.Newf("failed to read specs directory").Wrap(err)

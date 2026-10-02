@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/coordination"
-	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/storage"
 	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 )
@@ -113,22 +112,6 @@ func emitOrphanCleanupEventViaCoordinator(
 
 	// Create event context (enable audit, metrics, and logging; operational for lifecycle events)
 	emitOperational := operationType == "worker_started" || operationType == "worker_stopped"
-	eventCtx := coordination.NewEventContext(operationID, "orphan_cleanup", status).
-		WithEventData(eventData).
-		WithContext(ctx).
-		WithChannels(true, true, true, emitOperational) // Logging, audit, metrics; operational for lifecycle
-
-	if duration > 0 {
-		eventCtx = eventCtx.WithDuration(duration)
-	}
-
-	// Emit via coordinator (async, non-blocking)
-	bud := goroutinelabels.DefaultBudget()
-	builder := goroutinelabels.NewGoroutine("orphan_cleanup_event_emit", fmt.Sprintf("emitting orphan cleanup event: %s", operationType))
-	if bud != nil {
-		builder = builder.WithBudget(bud)
-	}
-	builder.StartSimple(func() {
-		_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
-	})
+	eventCtx := buildEventContext(ctx, operationID, "orphan_cleanup", status, eventData, duration, nil, true, true, true, emitOperational)
+	emitAsyncCoordinationEvent(ctx, coordinator, "orphan_cleanup_event_emit", fmt.Sprintf("emitting orphan cleanup event: %s", operationType), eventCtx)
 }

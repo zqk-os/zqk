@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/coordination"
-	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/validation"
 )
@@ -96,24 +95,8 @@ func emitValidationLifecycleEventViaCoordinator(
 
 	// Create event context (enable audit, metrics, and logging; operational for lifecycle events)
 	emitOperational := eventType == "worker_start" || eventType == "worker_shutdown" || eventType == "worker_idle_shutdown"
-	eventCtx := coordination.NewEventContext(workerID, eventTypeAsyncValidation, status).
-		WithEventData(eventData).
-		WithContext(ctx).
-		WithChannels(true, true, true, emitOperational) // Logging, audit, metrics; operational for lifecycle
-
-	if duration > 0 {
-		eventCtx = eventCtx.WithDuration(duration)
-	}
-
-	// Emit via coordinator (async, non-blocking)
-	bud := goroutinelabels.DefaultBudget()
-	builder := goroutinelabels.NewGoroutine("validation_lifecycle_event_emit", fmt.Sprintf("emitting validation lifecycle event: %s", eventType))
-	if bud != nil {
-		builder = builder.WithBudget(bud)
-	}
-	builder.StartSimple(func() {
-		_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
-	})
+	eventCtx := buildEventContext(ctx, workerID, eventTypeAsyncValidation, status, eventData, duration, nil, true, true, true, emitOperational)
+	emitAsyncCoordinationEvent(ctx, coordinator, "validation_lifecycle_event_emit", fmt.Sprintf("emitting validation lifecycle event: %s", eventType), eventCtx)
 }
 
 func init() {

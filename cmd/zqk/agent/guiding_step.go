@@ -39,9 +39,7 @@ func runAgentGuidingStep(cmd *cobra.Command, _ []string) error {
 		}
 		event = resolved
 
-		ctx := proc.OperationContext()
-		sec := procSecurity(proc)
-		sp := proc.Storage()
+		ctx, sec, sp := procStorageTuple(proc)
 
 		var persona map[string]any
 		if personaRef != "" {

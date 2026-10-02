@@ -34,8 +34,7 @@ func NewBulkCreateCmd() *cobra.Command {
 	//nolint:errcheck // Flag requirement check - error would be caught at runtime
 	_ = cmd.MarkFlagRequired("file")
 
-	ensureCmdAnnotations(cmd)
-	cmd.Annotations[AnnotationKindValidate] = KindValidatePositional0
+	configureKindPositionalValidation(cmd, false)
 
 	return cmd
 }
@@ -45,13 +44,9 @@ func runBulkCreate(cmd *cobra.Command, args []string) error {
 		var err error
 		_ = err
 
-		kind, ok := kindCanonicalFromPRERun(cmd)
-		if !ok {
-			var rerr error
-			kind, rerr = objkeys.ResolveAndValidateKindForProject(proc.ProjectRoot(), args[0])
-			if rerr != nil {
-				return cli.Guard(cmd).Err(rerr).Return()
-			}
+		kind, err := resolvePositional0Kind(cmd, proc, args, "")
+		if err != nil {
+			return cli.Guard(cmd).Err(err).Return()
 		}
 
 		//nolint:errcheck // Flag get - error indicates flag not set, default used

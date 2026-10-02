@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/coordination"
-	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/storage"
 
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -62,21 +61,8 @@ func emitValidationDebugEventViaCoordinator(
 		MetricsData:   nil,
 	}
 
-	// Create event context (debug status for verbose logging)
-	eventCtx := coordination.NewEventContext(operationID, "validation_debug", "debug").
-		WithEventData(eventData).
-		WithContext(ctx).
-		WithChannels(true, false, false, false) // Logging only
-
-	// Emit via coordinator (async, non-blocking)
-	bud := goroutinelabels.DefaultBudget()
-	builder := goroutinelabels.NewGoroutine("validation_debug_event_emit", "emitting validation debug event")
-	if bud != nil {
-		builder = builder.WithBudget(bud)
-	}
-	builder.StartSimple(func() {
-		_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
-	})
+	eventCtx := buildEventContext(ctx, operationID, "validation_debug", "debug", eventData, 0, nil, true, false, false, false)
+	emitAsyncCoordinationEvent(ctx, coordinator, "validation_debug_event_emit", "emitting validation debug event", eventCtx)
 }
 
 // emitValidationInputDebugViaCoordinator emits debug events for validation input

@@ -114,36 +114,12 @@ func checkInstanceValidationWithValidatorAndData(ctx *cli.Context, stdCtx stdcon
 	if validateCtx == nil {
 		validateCtx = pkgctx.NewSystemContext()
 	}
-	options.ObjectLookup = func(id string) (map[string]any, error) {
-		secCtx := pkgctx.NewSystemSecurityContext()
-		// Prefer hybrid/factory provider so file-CAS objects resolve during
-		// DependentsLookup status checks (graph-primary unwrap can miss them).
-		sp := storageProvider
-		if sp == nil {
-			sp = lookupProvider
-		}
-		return sp.Read(validateCtx, secCtx, id)
+	sp := storageProvider
+	if sp == nil {
+		sp = lookupProvider
 	}
-	options.ObjectStatusLookup = func(id string) (string, error) {
-		obj, err := options.ObjectLookup(id)
-		if err != nil {
-			return "", err
-		}
-		status, _ := obj[objects.FieldKeyStatus].(string)
-		return status, nil
-	}
-	// Wire reverse refs so status-hold preconditions that use DependentsLookup
-	// (e.g. priority_plan complete → all linked backlog_items terminal) are not
-	// fail-closed false positives during system check. Same helper as promote/demote/save.
-	// Use the hybrid/factory provider (not GetPrimary alone): graph-primary unwrap can
-	// miss file CAS BLIs or surface stale graph edges and falsely fail the hold check.
-	// keep check/promote/storage lookup wiring aligned.
-	depsProvider := storageProvider
-	if depsProvider == nil {
-		depsProvider = lookupProvider
-	}
-	options.DependentsLookup = func(id string) []string {
-		return storage.DependentsForID(validateCtx, depsProvider, id)
+	if sp != nil {
+		storage.BindValidationLookups(options, validateCtx, sp, pkgctx.NewSystemSecurityContext())
 	}
 	options.ProjectRoot = projectRoot
 	options.IsDraftPlaneOnly = func(id string) bool {

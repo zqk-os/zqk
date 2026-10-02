@@ -170,13 +170,9 @@ func buildContextBundle(task map[string]any, deps []map[string]any) ContextBundl
 
 //nolint:gocyclo
 func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
-	proc, err := cli.NewProcessor(cmd)
+	proc, err := newAgentProcessor(cmd)
 	if err != nil {
 		return err
-	}
-
-	if proc.ProjectRoot() == "" {
-		return errfmt.Errorf("project root is required")
 	}
 
 	// Create an execution context with an extended timeout to account for slow local CPU inference
