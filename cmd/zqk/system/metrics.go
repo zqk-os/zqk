@@ -42,6 +42,14 @@ func NewMetricsCmd() *cobra.Command {
 		RunE: runMetrics,
 	})
 
+	cmd.Flags().String("command", "", "Filter by specific command pattern")
+	cmd.Flags().String("filter", "", "Filter by type (failures, timeouts, slow)")
+	cmd.Flags().Int("limit", 0, "Limit number of results (0 = all)")
+	cmd.Flags().Bool("summary", false, "Generate detailed analysis summary report")
+	cmd.Flags().Bool("all-time", false, "Aggregate across current and all day-rolled historical chunks")
+	cmd.Flags().Duration("window", 0, "Window duration to look back across historical chunks (e.g. 24h, 72h, 168h)")
+	cmd.Flags().String("day", "", "View metrics for a specific date (YYYY-MM-DD or YYYYMMDD)")
+
 	// Apply help builder to command after flags are declared
 	helpBuilder.ApplyToCommand(cmd)
 
@@ -67,16 +75,9 @@ type metricsOptions struct {
 }
 
 func runMetrics(cmd *cobra.Command, args []string) error {
-	// Get context (already loaded in PersistentPreRunE)
-	ctx := cli.GetContext(cmd)
-	if ctx == nil {
-		return errfmt.Errorf("failed to get context")
-	}
-
-	projectRoot := ctx.ProjectRoot
-	projectRoot = ProjectRootOrResolve(projectRoot)
-	if projectRoot == emptyValue {
-		return errfmt.Errorf("project root not found")
+	projectRoot, err := resolveCommandProjectRoot(cmd)
+	if err != nil {
+		return err
 	}
 
 	// Extract command-specific flags (these aren't in context yet, but could be added)
@@ -97,7 +98,7 @@ func runMetrics(cmd *cobra.Command, args []string) error {
 
 	// Create options struct with context and command-specific flags
 	opts := &metricsOptions{
-		Context:       ctx,
+		Context:       cli.GetContext(cmd),
 		CommandFilter: commandFilter,
 		TypeFilter:    typeFilter,
 		Limit:         limit,

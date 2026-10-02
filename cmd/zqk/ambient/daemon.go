@@ -12,9 +12,8 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/ambient"
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/daemon/singleton"
 	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/logging"
@@ -108,33 +107,7 @@ func runAmbientDaemon(cmd *cobra.Command, args []string) error {
 
 	_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("Starting ZQK Ambient Daemon (PID: %d)...\nMonitoring: %s\n", currentPID, projectRoot)))
 
-	ctx := cmd.Context()
-	hub := ambient.NewEventHub()
-
-	// Initialize heuristic processors and writers
-	_ = ambient.NewArtifactWriter(hub)
-	_ = ambient.NewCoachHeuristicsWithRoot(hub, projectRoot)
-
-	// Initialize ambient ingest service
-	secCtx := pkgctx.NewSecurityContext(pkgctx.SystemAccountID, []string{"system"}, []string{"*"})
-	ingestService := ambient.NewAmbientIngestService(projectRoot, secCtx)
-	ingestService.BindToHub(hub)
-
-	// Create and start the FSWatcher
-	watcher, err := ambient.NewFSWatcher(projectRoot, hub)
-	if err != nil {
-		return fmt.Errorf("failed to create fswatcher: %w", err)
-	}
-
-	// Invalidate object cache on filesystem events
-	ambient.BindProcessYAMLInvalidator(hub, cli.TouchMeaningfulActivity)
-
-	if err := watcher.Start(ctx); err != nil {
-		return fmt.Errorf("failed to start fswatcher: %w", err)
-	}
-
-	<-ctx.Done()
-	return nil
+	return ambient.RunWatcherDaemon(cmd.Context(), projectRoot, cli.TouchMeaningfulActivity)
 }
 
 func newStartCmd() *cobra.Command {
