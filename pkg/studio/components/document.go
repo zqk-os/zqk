@@ -22,28 +22,30 @@ func NewDefaultDocument(title string) *DocumentComponent {
 	}
 }
 
-// RenderHTML generates the complete HTML document string.
-func (d *DocumentComponent) RenderHTML() string {
-	var sb strings.Builder
-
-	sb.WriteString("<!DOCTYPE html>\n")
-	sb.WriteString("<html lang=\"en\">\n")
-	sb.WriteString("<head>\n")
+// WriteHTMLHead writes standard metadata tags and title to the builder.
+func WriteHTMLHead(sb *strings.Builder, title, styleSheet string) {
+	sb.WriteString("<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n")
 	sb.WriteString("  <meta charset=\"UTF-8\">\n")
 	sb.WriteString("  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n")
 	sb.WriteString("  <meta http-equiv=\"Cache-Control\" content=\"no-cache, no-store, must-revalidate\">\n")
 	sb.WriteString("  <meta http-equiv=\"Pragma\" content=\"no-cache\">\n")
 	sb.WriteString("  <meta http-equiv=\"Expires\" content=\"0\">\n")
-	fmt.Fprintf(&sb, "  <title>%s</title>\n", d.Title)
+	fmt.Fprintf(sb, "  <title>%s</title>\n", title)
 
-	if d.StyleSheet != "" {
+	if styleSheet != "" {
 		sb.WriteString("  <style>\n")
-		sb.WriteString(d.StyleSheet)
-		if !strings.HasSuffix(d.StyleSheet, "\n") {
+		sb.WriteString(styleSheet)
+		if !strings.HasSuffix(styleSheet, "\n") {
 			sb.WriteString("\n")
 		}
 		sb.WriteString("  </style>\n")
 	}
+}
+
+// RenderHTML generates the complete HTML document string.
+func (d *DocumentComponent) RenderHTML() string {
+	var sb strings.Builder
+	WriteHTMLHead(&sb, d.Title, d.StyleSheet)
 	sb.WriteString("</head>\n")
 	sb.WriteString("<body>\n")
 

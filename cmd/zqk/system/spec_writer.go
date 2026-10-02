@@ -169,19 +169,9 @@ func (sw *SpecWriter) modifyField(spec *objects.Spec, op *FieldOperation) error 
 		}
 	}()
 
-	if spec.Fields == nil {
-		return errfmt.Errorf("spec has no fields")
-	}
-
-	// Get existing field
-	existingField, exists := spec.Fields[op.FieldName]
-	if !exists {
-		return errfmt.Errorf("field %s does not exist", op.FieldName)
-	}
-
-	existingFieldMap, ok := existingField.(map[string]any)
-	if !ok {
-		return errfmt.Errorf("field %s is not a map", op.FieldName)
+	existingFieldMap, err := sw.getFieldMap(spec, op.FieldName)
+	if err != nil {
+		return err
 	}
 
 	// Detect breaking changes
@@ -212,20 +202,29 @@ func (sw *SpecWriter) modifyField(spec *objects.Spec, op *FieldOperation) error 
 	return nil
 }
 
-// deprecateField deprecates a field
-func (sw *SpecWriter) deprecateField(spec *objects.Spec, op *FieldOperation) error {
+func (sw *SpecWriter) getFieldMap(spec *objects.Spec, fieldName string) (map[string]any, error) {
 	if spec.Fields == nil {
-		return errfmt.Errorf("spec has no fields")
+		return nil, errfmt.Errorf("spec has no fields")
 	}
 
-	field, exists := spec.Fields[op.FieldName]
+	field, exists := spec.Fields[fieldName]
 	if !exists {
-		return errfmt.Errorf("field %s does not exist", op.FieldName)
+		return nil, errfmt.Errorf("field %s does not exist", fieldName)
 	}
 
 	fieldMap, ok := field.(map[string]any)
 	if !ok {
-		return errfmt.Errorf("field %s is not a map", op.FieldName)
+		return nil, errfmt.Errorf("field %s is not a map", fieldName)
+	}
+
+	return fieldMap, nil
+}
+
+// deprecateField deprecates a field
+func (sw *SpecWriter) deprecateField(spec *objects.Spec, op *FieldOperation) error {
+	fieldMap, err := sw.getFieldMap(spec, op.FieldName)
+	if err != nil {
+		return err
 	}
 
 	// Mark field as deprecated
@@ -242,18 +241,9 @@ func (sw *SpecWriter) deprecateField(spec *objects.Spec, op *FieldOperation) err
 
 // archiveField archives a field
 func (sw *SpecWriter) archiveField(spec *objects.Spec, op *FieldOperation) error {
-	if spec.Fields == nil {
-		return errfmt.Errorf("spec has no fields")
-	}
-
-	field, exists := spec.Fields[op.FieldName]
-	if !exists {
-		return errfmt.Errorf("field %s does not exist", op.FieldName)
-	}
-
-	fieldMap, ok := field.(map[string]any)
-	if !ok {
-		return errfmt.Errorf("field %s is not a map", op.FieldName)
+	fieldMap, err := sw.getFieldMap(spec, op.FieldName)
+	if err != nil {
+		return err
 	}
 
 	// Mark field as archived
@@ -269,18 +259,9 @@ func (sw *SpecWriter) archiveField(spec *objects.Spec, op *FieldOperation) error
 
 // deleteField deletes a field (marks as deleted, keeps in spec for history)
 func (sw *SpecWriter) deleteField(spec *objects.Spec, op *FieldOperation) error {
-	if spec.Fields == nil {
-		return errfmt.Errorf("spec has no fields")
-	}
-
-	field, exists := spec.Fields[op.FieldName]
-	if !exists {
-		return errfmt.Errorf("field %s does not exist", op.FieldName)
-	}
-
-	fieldMap, ok := field.(map[string]any)
-	if !ok {
-		return errfmt.Errorf("field %s is not a map", op.FieldName)
+	fieldMap, err := sw.getFieldMap(spec, op.FieldName)
+	if err != nil {
+		return err
 	}
 
 	// Mark field as deleted (but keep in spec for history)

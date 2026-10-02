@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
+
+	"github.com/zqk-os/zqk/pkg/strutil"
 )
 
 // Standard error codes conforming to SPEC-ZPARQL-GRAPH-TRAVERSAL-GRAMMAR.
@@ -282,25 +284,6 @@ func (l *Lexer) NextToken() (Token, error) {
 	return Token{}, fmt.Errorf("%s: unexpected character %q at line %d, column %d", ErrCodeZPARQLSyntaxError, ch, startLine, startCol)
 }
 
-func decodeEscapeRune(escaped rune) rune {
-	switch escaped {
-	case 'n':
-		return '\n'
-	case 't':
-		return '\t'
-	case 'r':
-		return '\r'
-	case '\\':
-		return '\\'
-	case '"':
-		return '"'
-	case '\'':
-		return '\''
-	default:
-		return escaped
-	}
-}
-
 func (l *Lexer) scanString(quote rune) (Token, error) {
 	startLine, startCol := l.lineCol()
 	l.advance() // skip open quote
@@ -318,7 +301,7 @@ func (l *Lexer) scanString(quote rune) (Token, error) {
 				break
 			}
 			escaped := l.advance()
-			sb.WriteRune(decodeEscapeRune(escaped))
+			sb.WriteRune(strutil.DecodeEscapeRune(escaped))
 			continue
 		}
 		sb.WriteRune(ch)

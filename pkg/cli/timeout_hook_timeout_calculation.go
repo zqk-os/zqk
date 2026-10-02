@@ -315,22 +315,7 @@ func (h *TimeoutHook) getIdleShutdownDuration(normalizedCmd string, defaultDurat
 
 // findProjectRoot walks up from cwd until it finds a directory containing .zqk; returns "" if not found.
 func (h *TimeoutHook) findProjectRoot() string {
-	wd, err := fileutil.Getwd()
-	if err != nil {
-		return ""
-	}
-	dir := wd
-	for {
-		if _, err := fileutil.Stat(filepath.Join(dir, paths.ProjectDataDir)); err == nil {
-			return dir
-		}
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			break
-		}
-		dir = parent
-	}
-	return ""
+	return paths.ResolveProjectRoot(".")
 }
 
 // mcpIdleMemo is the stampmemo value for getMCPIdleTimeout.

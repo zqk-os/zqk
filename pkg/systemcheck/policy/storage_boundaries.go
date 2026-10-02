@@ -22,13 +22,9 @@ func (g *StorageBoundariesGate) Description() string {
 }
 
 func (g *StorageBoundariesGate) Run(ctx context.Context, opts RunOptions) (*Result, error) {
-	root := opts.ProjectRoot
-	if root == "" {
-		var err error
-		root, err = os.Getwd()
-		if err != nil {
-			return nil, fmt.Errorf("failed to get current working directory: %w", err)
-		}
+	root, err := ResolveProjectRoot(opts)
+	if err != nil {
+		return nil, err
 	}
 
 	storageDir := filepath.Join(root, "pkg", "storage")
@@ -58,7 +54,7 @@ func (g *StorageBoundariesGate) Run(ctx context.Context, opts RunOptions) (*Resu
 		return imports, nil
 	}
 
-	err := filepath.WalkDir(storageDir, func(path string, d os.DirEntry, walkErr error) error {
+	err = filepath.WalkDir(storageDir, func(path string, d os.DirEntry, walkErr error) error {
 		if walkErr != nil {
 			return nil
 		}

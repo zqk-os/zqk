@@ -158,26 +158,7 @@ func (b *DashboardBuilder) candidateAssetDirs() []string {
 
 func (b *DashboardBuilder) renderWithCustomBody(css, js, bodyHTML string) string {
 	var sb strings.Builder
-
-	sb.WriteString("<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n")
-	sb.WriteString("  <meta charset=\"UTF-8\">\n")
-	sb.WriteString("  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n")
-	sb.WriteString("  <meta http-equiv=\"Cache-Control\" content=\"no-cache, no-store, must-revalidate\">\n")
-	sb.WriteString("  <meta http-equiv=\"Pragma\" content=\"no-cache\">\n")
-	sb.WriteString("  <meta http-equiv=\"Expires\" content=\"0\">\n")
-	sb.WriteString("  <title>")
-	sb.WriteString(b.header.Title)
-	sb.WriteString("</title>\n")
-
-	if css != "" {
-		sb.WriteString("  <style>\n")
-		sb.WriteString(css)
-		if !strings.HasSuffix(css, "\n") {
-			sb.WriteString("\n")
-		}
-		sb.WriteString("  </style>\n")
-	}
-
+	components.WriteHTMLHead(&sb, b.header.Title, css)
 	sb.WriteString("</head>\n<body>\n")
 	sb.WriteString(bodyHTML)
 	if !strings.HasSuffix(bodyHTML, "\n") {

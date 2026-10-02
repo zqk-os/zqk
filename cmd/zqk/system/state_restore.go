@@ -66,27 +66,9 @@ func runStateRestore(cmd *cobra.Command, args []string) error {
 		ctx := context.WithoutCancel(proc.OperationContext())
 		projectRoot := proc.ProjectRoot()
 
-		inputPath, _ := cmd.Flags().GetString("input")
-		if !filepath.IsAbs(inputPath) {
-			inputPath = filepath.Join(projectRoot, inputPath)
-		}
-
-		if _, err := fileutil.Stat(inputPath); fileutil.IsNotExist(err) {
-			return errfmt.Errorf("state file %s does not exist", inputPath)
-		}
-
-		cmd.Printf("Reading compressed snapshot from %s...\n", inputPath)
-		cs, err := storage.ReadCompressedSnapshot(inputPath)
+		expanded, err := loadAndExpandSnapshot(cmd, projectRoot)
 		if err != nil {
-			return errfmt.Newf("failed to read compressed snapshot").Wrap(err)
-		}
-
-		cmd.Printf("Snapshot Checksum: %s\n", cs.Header.Checksum)
-		cmd.Printf("Expanding %d objects...\n", cs.Header.ObjectCount)
-
-		expanded, err := cs.Expand()
-		if err != nil {
-			return errfmt.Newf("failed to expand snapshot").Wrap(err)
+			return err
 		}
 
 		// Restore writes into the process tree; file modification updates CAS via discovery.

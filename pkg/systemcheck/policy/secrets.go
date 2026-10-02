@@ -55,12 +55,8 @@ var binaryExts = map[string]bool{
 }
 
 func (g *SecretsGate) Run(ctx context.Context, opts RunOptions) (*Result, error) {
-	root, err := ResolveProjectRoot(opts)
-	if err != nil {
-		return nil, err
-	}
-
-	var violations []string
+	return runWithResolvedRoot(opts, func(root string) (*Result, error) {
+		var violations []string
 
 	if len(opts.Files) > 0 {
 		for _, f := range opts.Files {
@@ -140,6 +136,7 @@ func (g *SecretsGate) Run(ctx context.Context, opts RunOptions) (*Result, error)
 		Passed:   true,
 		Message:  "Zero secrets or credential leaks detected",
 	}, nil
+	})
 }
 
 func scanFileForSecrets(filePath, root string) ([]string, error) {

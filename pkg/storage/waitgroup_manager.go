@@ -117,18 +117,22 @@ func (m *WaitGroupManager) GetGroup(id string) *sync.WaitGroup {
 	return wg
 }
 
-// Add increments the WaitGroup counter for the given ID
-// Panics if the group doesn't exist (to catch bugs early)
-func (m *WaitGroupManager) Add(id string, delta int) {
+func (m *WaitGroupManager) getGroupEntry(lockName, id string) (*waitGroupEntry, WaitGroupObserver, bool) {
 	var entry *waitGroupEntry
 	var exists bool
 	var observer WaitGroupObserver
-	_ = concurrency.RunInRLockOrLog(&m.mu, locknames.LockNameWaitgroupManagerAdd, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
+	_ = concurrency.RunInRLockOrLog(&m.mu, lockName, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
 		entry, exists = m.wgs[id]
 		observer = m.observer
 		return nil
 	})
+	return entry, observer, exists
+}
 
+// Add increments the WaitGroup counter for the given ID
+// Panics if the group doesn't exist (to catch bugs early)
+func (m *WaitGroupManager) Add(id string, delta int) {
+	entry, observer, exists := m.getGroupEntry(locknames.LockNameWaitgroupManagerAdd, id)
 	if !exists {
 		// Under extreme contention or ID collision, another caller may have already deleted this group.
 		// Log and no-op instead of panic so the scheduler does not crash (observe-hypothesize-test-verify).
@@ -151,15 +155,7 @@ func (m *WaitGroupManager) Add(id string, delta int) {
 // Done decrements the WaitGroup counter for the given ID.
 // If the group does not exist (e.g. already deleted by another caller under contention), logs and no-ops instead of panicking.
 func (m *WaitGroupManager) Done(id string) {
-	var entry *waitGroupEntry
-	var exists bool
-	var observer WaitGroupObserver
-	_ = concurrency.RunInRLockOrLog(&m.mu, locknames.LockNameWaitgroupManagerDone, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
-		entry, exists = m.wgs[id]
-		observer = m.observer
-		return nil
-	})
-
+	entry, observer, exists := m.getGroupEntry(locknames.LockNameWaitgroupManagerDone, id)
 	if !exists {
 		// Group may have been deleted already (e.g. list_cas/list_parse race under contention). Log and no-op to avoid panic.
 		StorageLog(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
@@ -181,15 +177,7 @@ func (m *WaitGroupManager) Done(id string) {
 // Wait waits for the WaitGroup with the given ID to complete
 // Returns immediately if the group doesn't exist
 func (m *WaitGroupManager) Wait(id string) {
-	var entry *waitGroupEntry
-	var exists bool
-	var observer WaitGroupObserver
-	_ = concurrency.RunInRLockOrLog(&m.mu, locknames.LockNameWaitgroupManagerWait, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
-		entry, exists = m.wgs[id]
-		observer = m.observer
-		return nil
-	})
-
+	entry, observer, exists := m.getGroupEntry(locknames.LockNameWaitgroupManagerWait, id)
 	if !exists {
 		return // Group doesn't exist, nothing to wait for
 	}

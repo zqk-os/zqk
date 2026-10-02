@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
+
+	"github.com/zqk-os/zqk/pkg/strutil"
 )
 
 // Standard error codes conforming to SPEC-ZQL-DECLARATIVE-MUTATION-GRAMMAR.
@@ -225,25 +227,6 @@ func (l *ZQLLexer) NextToken() (ZQLToken, error) {
 		ErrCodeZQLSyntaxError, startLine, startCol, ch)
 }
 
-func decodeZQLRune(escaped rune) rune {
-	switch escaped {
-	case 'n':
-		return '\n'
-	case 't':
-		return '\t'
-	case 'r':
-		return '\r'
-	case '\\':
-		return '\\'
-	case '"':
-		return '"'
-	case '\'':
-		return '\''
-	default:
-		return escaped
-	}
-}
-
 func (l *ZQLLexer) scanString(quote rune) (ZQLToken, error) {
 	startLine, startCol := l.lineCol()
 	l.advance() // skip open quote
@@ -261,7 +244,7 @@ func (l *ZQLLexer) scanString(quote rune) (ZQLToken, error) {
 				break
 			}
 			escaped := l.advance()
-			sb.WriteRune(decodeZQLRune(escaped))
+			sb.WriteRune(strutil.DecodeEscapeRune(escaped))
 			continue
 		}
 		sb.WriteRune(ch)

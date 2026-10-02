@@ -59,23 +59,7 @@ func (wcv *WorkflowConstraintValidator) ValidatePriorityPlanActivation(
 		return nil
 	}
 
-	// Read the workflow
-	workflow, err := wcv.storage.Read(ctx, secCtx, workflowRef)
-	if err != nil {
-		return errfmt.Errorf(ConstMiscFailedToReadWorkflowSW, workflowRef, err)
-	}
-
-	// Check if workflow is enabled
-	enabled, _ := workflow[objects.FieldKeyEnabled].(bool)
-	if !enabled {
-		return errfmt.Errorf(ConstMiscWorkflowSIsNotEnabled, workflowRef)
-	}
-
-	// Extract constraints
-	constraints := wcv.extractConstraints(workflow)
-
-	// Validate constraints for the current user's roles
-	return wcv.validateConstraintsForRoles(ctx, secCtx, constraints, objects.KindPriorityPlan, "activate")
+	return wcv.validateWorkflowConstraints(ctx, secCtx, workflowRef, objects.KindPriorityPlan, "activate")
 }
 
 // ValidateWorkstreamOperation validates workflow constraints for workstream operations
@@ -110,6 +94,16 @@ func (wcv *WorkflowConstraintValidator) ValidateWorkstreamOperation(
 		return nil
 	}
 
+	return wcv.validateWorkflowConstraints(ctx, secCtx, workflowRef, kind, operation)
+}
+
+func (wcv *WorkflowConstraintValidator) validateWorkflowConstraints(
+	ctx context.Context,
+	secCtx *pkgctx.SecurityContext,
+	workflowRef string,
+	kind string,
+	operation string,
+) error {
 	// Read the workflow
 	workflow, err := wcv.storage.Read(ctx, secCtx, workflowRef)
 	if err != nil {

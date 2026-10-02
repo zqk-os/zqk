@@ -87,9 +87,8 @@ func (av *AsyncValidator) worker(id int) {
 	goroutineID := getGoroutineID()
 	activeCount := incrementActiveGoroutines()
 	startTime := time.Now()
-	idleStartTime := time.Now()
-	processedCount := 0
-	failedCount := 0
+	idleStartTime := startTime
+	var processedCount, failedCount int
 
 	defer func() {
 		av.activeWorkers.Add(-1)

@@ -23,12 +23,8 @@ func (g *DocLinksGate) Description() string {
 var mdLinkRegex = regexp.MustCompile(`\[.*?\]\((.*?)\)`)
 
 func (g *DocLinksGate) Run(ctx context.Context, opts RunOptions) (*Result, error) {
-	root, err := ResolveProjectRoot(opts)
-	if err != nil {
-		return nil, err
-	}
-
-	var violations []string
+	return runWithResolvedRoot(opts, func(root string) (*Result, error) {
+		var violations []string
 
 	// 1. Verify docs/INDEX.md
 	indexPath := filepath.Join(root, "docs", "INDEX.md")
@@ -109,4 +105,5 @@ func (g *DocLinksGate) Run(ctx context.Context, opts RunOptions) (*Result, error
 		Passed:   true,
 		Message:  "All documentation links, Divio quadrants, and community files verified",
 	}, nil
+	})
 }

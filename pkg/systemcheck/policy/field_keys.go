@@ -25,16 +25,8 @@ func (g *FieldKeysGate) Description() string {
 var keyDefRegex = regexp.MustCompile(`FieldKey[a-zA-Z0-9_]+\s*=\s*"([^"]+)"`)
 
 func (g *FieldKeysGate) Run(ctx context.Context, opts RunOptions) (*Result, error) {
-	root := opts.ProjectRoot
-	if root == "" {
-		var err error
-		root, err = os.Getwd()
-		if err != nil {
-			return nil, fmt.Errorf("failed to get current working directory: %w", err)
-		}
-	}
-
-	fieldKeysFile := filepath.Join(root, "pkg", "objects", "field_keys.go")
+	return runWithResolvedRoot(opts, func(root string) (*Result, error) {
+		fieldKeysFile := filepath.Join(root, "pkg", "objects", "field_keys.go")
 	content, err := os.ReadFile(fieldKeysFile)
 	if err != nil {
 		return &Result{
@@ -142,4 +134,5 @@ func (g *FieldKeysGate) Run(ctx context.Context, opts RunOptions) (*Result, erro
 		Passed:   true,
 		Message:  "All Go files use typed objects.FieldKey constants",
 	}, nil
+	})
 }

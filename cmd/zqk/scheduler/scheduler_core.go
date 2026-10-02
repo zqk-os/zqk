@@ -168,7 +168,7 @@ func runSchedulerControlWithTimeoutDur(op string, timeout time.Duration, fn func
 		}).
 		Build()
 
-	_, runErr := pl.Run(&pipeline.Context{Ctx: runCtx, Outcome: make(map[string]any)}, st)
+	_, runErr := pl.RunWithContext(runCtx, st)
 	if runErr != nil {
 		return runErr
 	}

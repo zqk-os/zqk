@@ -240,25 +240,7 @@ func (r *ReceptorRegistry) Close(urn string, leaseID string, outcome string) err
 
 // Release cancels/aborts an active lease without recording a completed outcome, returning the receptor to idle/closed.
 func (r *ReceptorRegistry) Release(urn string, leaseID string) error {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
-	lineage, exists := r.lineages[urn]
-	if !exists || lineage.ActiveLeaseID != leaseID {
-		return ErrLeaseNotFound
-	}
-
-	lineage.State = StateClosed
-	lineage.ActiveLeaseID = ""
-	lineage.ActiveSession = ""
-
-	if len(lineage.History) > 0 {
-		lastIdx := len(lineage.History) - 1
-		lineage.History[lastIdx].CompletedAt = time.Now().UTC()
-		lineage.History[lastIdx].Outcome = "aborted"
-	}
-
-	return nil
+	return r.Close(urn, leaseID, "aborted")
 }
 
 // GetLineage retrieves a snapshot of the receptor lineage for a URN.

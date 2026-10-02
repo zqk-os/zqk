@@ -117,11 +117,6 @@ func (g *GanttViewComponent) RenderHTML() string {
 	sb.WriteString("            <!-- Dynamic date ticks -->\n")
 	sb.WriteString("          </div>\n")
 	sb.WriteString("        </div>\n")
-	sb.WriteString("        <div class=\"gantt-body\" id=\"gantt-body\">\n")
-	sb.WriteString("          <!-- Dynamic grouped rows -->\n")
-	sb.WriteString("        </div>\n")
-	sb.WriteString("      </div>\n")
-	sb.WriteString("    </div>\n")
-
+	sb.WriteString("        <div class=\"gantt-body\" id=\"gantt-body\">\n          <!-- Dynamic grouped rows -->\n        </div>\n      </div>\n    </div>\n")
 	return sb.String()
 }
