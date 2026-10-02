@@ -39,29 +39,15 @@ func initializeAggregateAuditContext(cmd *cobra.Command) (*AggregateAuditContext
 		return nil, errfmt.Errorf("failed to get context")
 	}
 
-	projectRoot := ctx.ProjectRoot
-	projectRoot = ProjectRootOrResolve(projectRoot)
-	if projectRoot == emptyValue {
-		return nil, errfmt.Errorf("project root not found")
-	}
-
-	storageProvider, err := getStorageProvider(cmd, projectRoot)
+	projectRoot, storageProvider, service, logger, err := initAuditAggregationSetup(cmd)
 	if err != nil {
-		return nil, errfmt.Newf("failed to initialize storage").Wrap(err)
+		return nil, err
 	}
-
-	service := storage.NewAuditAggregationService(storageProvider)
 
 	windowStart, windowEnd, err := parseTimeWindow(cmd)
 	if err != nil {
 		return nil, errfmt.Newf("failed to parse time window").Wrap(err)
 	}
-
-	profile := systemProfileSystem
-	if ctx.Profile != emptyValue {
-		profile = ctx.Profile
-	}
-	logger := logging.GetLoggerFromProfile(profile)
 
 	secCtx := pkgctx.NewSystemSecurityContext()
 	storageCtx := pkgctx.NewStorageContext()

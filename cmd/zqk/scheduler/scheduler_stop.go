@@ -2,14 +2,12 @@ package scheduler
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"syscall"
 	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cliapp"
-	clicontext "github.com/zqk-os/zqk/pkg/cliapp/context"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
@@ -79,13 +77,10 @@ func stopScheduler(ctx *cli.Context, cmd *cobra.Command) error {
 		}
 
 		projectRoot := resolveSchedulerCLIProjectRoot(ctx)
-		if projectRoot == emptyValue {
-			return errors.New(schedulerErrProjectRootNotFound)
+		profile, err := validateSchedulerProjectRootAndBrand(ctx, projectRoot)
+		if err != nil {
+			return err
 		}
-		if _, err := clicontext.LoadBrandSettings(projectRoot); err != nil {
-			return errfmt.Errorf(schedulerErrBrandSettingsRequired, err)
-		}
-		profile := strutil.OrDefault(ctx.Profile, schedulerProfileSystem)
 
 		if status.InProcess {
 			sched := schedulerpkg.GetGlobalScheduler()
