@@ -184,28 +184,49 @@ func (r RoleRecord) GrantsPlanner() bool {
 	return false
 }
 
+type stringCollector struct {
+	seen  map[string]struct{}
+	out   []string
+	lower bool
+}
+
+func newStringCollector(capacity int, lower bool) *stringCollector {
+	return &stringCollector{
+		seen:  make(map[string]struct{}, capacity),
+		out:   make([]string, 0, capacity),
+		lower: lower,
+	}
+}
+
+func (c *stringCollector) Add(s string) {
+	s = strings.TrimSpace(s)
+	if c.lower {
+		s = strings.ToLower(s)
+	}
+	if s == "" {
+		return
+	}
+	if _, ok := c.seen[s]; ok {
+		return
+	}
+	c.seen[s] = struct{}{}
+	c.out = append(c.out, s)
+}
+
+func (c *stringCollector) Result() []string {
+	return c.out
+}
+
 // Labels is role_id + object id + aliases from the role object (no code table).
 func (r RoleRecord) Labels() []string {
-	var out []string
-	seen := map[string]struct{}{}
-	add := func(s string) {
-		s = strings.ToLower(strings.TrimSpace(s))
-		if s == "" {
-			return
-		}
-		if _, ok := seen[s]; ok {
-			return
-		}
-		seen[s] = struct{}{}
-		out = append(out, s)
-	}
-	add(r.RoleID)
-	add(r.ID)
-	add(strings.TrimPrefix(r.ID, "ROL-"))
+	c := newStringCollector(len(r.Aliases)+3, true)
+	c.Add(r.RoleID)
+	c.Add(r.ID)
+	c.Add(strings.TrimPrefix(r.ID, "ROL-"))
 	for _, a := range r.Aliases {
-		add(a)
+		c.Add(a)
 	}
-	return out
+	return c.Result()
 }
 
 // Matches reports whether assigned is this role's id, role_id, or an alias on the object.

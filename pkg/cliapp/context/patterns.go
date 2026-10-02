@@ -126,57 +126,7 @@ func getDefaultSystemDefaults() map[string]any {
 }
 
 func applyDefaultsToContext(ctx *Context, config map[string]any) {
-	// Use the same logic as createContextFromMap in context.go
-	// Apply format
-	if format, ok := config[contextKeyFormat].(string); ok && format != emptyValue {
-		ctx.Format = format
-	}
-	// Apply verbose
-	if verbose, ok := config[contextKeyVerbose].(bool); ok {
-		ctx.Verbose = verbose
-	}
-	// Apply quiet
-	if quiet, ok := config[contextKeyQuiet].(bool); ok {
-		ctx.Quiet = quiet
-	}
-	// Apply profile
-	if profile, ok := config[contextKeyProfile].(string); ok && profile != emptyValue {
-		ctx.Profile = profile
-	}
-	// Apply project context
-	if priorityPlan, ok := config[contextKeyPriorityPlan].(string); ok && priorityPlan != emptyValue {
-		ctx.PriorityPlan = priorityPlan
-	}
-	if workstream, ok := config[contextKeyWorkstream].(string); ok && workstream != emptyValue {
-		ctx.Workstream = workstream
-	}
-	if milestone, ok := config[contextKeyMilestone].(string); ok && milestone != emptyValue {
-		ctx.Milestone = milestone
-	}
-	// Apply storage context
-	if storageCtx, ok := config[contextKeyStorage].(map[string]any); ok {
-		switch maxPageSize := storageCtx[contextKeyMaxPageSize].(type) {
-		case int:
-			ctx.StorageMaxPageSize = maxPageSize
-		case float64:
-			ctx.StorageMaxPageSize = int(maxPageSize)
-		}
-		switch defaultPageSize := storageCtx[contextKeyDefaultPageSize].(type) {
-		case int:
-			ctx.StorageDefaultPageSize = defaultPageSize
-		case float64:
-			ctx.StorageDefaultPageSize = int(defaultPageSize)
-		}
-		if enableGrouping, ok := storageCtx[contextKeyEnableGrouping].(bool); ok {
-			ctx.StorageEnableGrouping = enableGrouping
-		}
-		switch maxGroupSize := storageCtx[contextKeyMaxGroupSize].(type) {
-		case int:
-			ctx.StorageMaxGroupSize = maxGroupSize
-		case float64:
-			ctx.StorageMaxGroupSize = int(maxGroupSize)
-		}
-	}
+	applyConfigMapToContext(ctx, config)
 	if v := resolveErrorLogOutput(config); v != emptyValue {
 		ctx.ErrorLogOutput = v
 	}

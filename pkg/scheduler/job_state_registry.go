@@ -244,12 +244,8 @@ func (r *JobStateRegistry) Summarize(staleAfter time.Duration) (*JobStateSummary
 	}
 	now := time.Now().UTC()
 	_ = r.forEachStateYAML(func(path string) error {
-		b, readErr := fileutil.ReadFile(path)
-		if readErr != nil {
-			return nil
-		}
-		var st JobExecutionState
-		if err := yaml.Unmarshal(b, &st); err != nil {
+		st, ok := readJobExecutionStateFile(path)
+		if !ok {
 			return nil
 		}
 		out.TotalFiles++
@@ -259,7 +255,34 @@ func (r *JobStateRegistry) Summarize(staleAfter time.Duration) (*JobStateSummary
 		}
 		return nil
 	})
+
 	return out, nil
+}
+
+func readJobExecutionStateFile(path string) (*JobExecutionState, bool) {
+	b, err := fileutil.ReadFile(path)
+	if err != nil {
+		return nil, false
+	}
+	var st JobExecutionState
+	if err := yaml.Unmarshal(b, &st); err != nil {
+		return nil, false
+	}
+	return &st, true
+}
+
+func (r *JobStateRegistry) readStateDirEntries() ([]fileutil.DirEntry, error) {
+	if r == nil || r.stateDir == emptyValue {
+		return nil, nil
+	}
+	entries, err := fileutil.ReadDir(r.stateDir)
+	if err != nil {
+		if fileutil.IsNotExist(err) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return entries, nil
 }
 
 // MigrateLegacyFlatStateFilesBestEffort moves top-level *.yaml files (legacy flat layout) into
@@ -267,14 +290,8 @@ func (r *JobStateRegistry) Summarize(staleAfter time.Duration) (*JobStateSummary
 // and files that are not valid JobExecutionState YAML. If the nested target already exists with the
 // same job/execution, the flat duplicate is removed.
 func (r *JobStateRegistry) MigrateLegacyFlatStateFilesBestEffort() (moved int, err error) {
-	if r == nil || r.stateDir == emptyValue {
-		return 0, nil
-	}
-	entries, err := fileutil.ReadDir(r.stateDir)
-	if err != nil {
-		if fileutil.IsNotExist(err) {
-			return 0, nil
-		}
+	entries, err := r.readStateDirEntries()
+	if err != nil || len(entries) == 0 {
 		return 0, err
 	}
 	for _, e := range entries {
@@ -286,15 +303,8 @@ func (r *JobStateRegistry) MigrateLegacyFlatStateFilesBestEffort() (moved int, e
 			continue
 		}
 		flatPath := filepath.Join(r.stateDir, name)
-		b, readErr := fileutil.ReadFile(flatPath)
-		if readErr != nil {
-			continue
-		}
-		var st JobExecutionState
-		if err := yaml.Unmarshal(b, &st); err != nil {
-			continue
-		}
-		if strings.TrimSpace(st.JobID) == emptyValue || strings.TrimSpace(st.ExecutionID) == emptyValue {
+		st, ok := readJobExecutionStateFile(flatPath)
+		if !ok || strings.TrimSpace(st.JobID) == emptyValue || strings.TrimSpace(st.ExecutionID) == emptyValue {
 			continue
 		}
 		dest := r.stateFilePathForJobExecution(st.JobID, st.ExecutionID)
@@ -304,20 +314,18 @@ func (r *JobStateRegistry) MigrateLegacyFlatStateFilesBestEffort() (moved int, e
 		if err := fileutil.MkdirAll(filepath.Dir(dest), paths.DirPerm755); err != nil {
 			continue
 		}
-		if _, statErr := fileutil.Stat(dest); statErr == nil {
-			b2, _ := fileutil.ReadFile(dest)
-			var st2 JobExecutionState
-			if yaml.Unmarshal(b2, &st2) == nil && st2.JobID == st.JobID && st2.ExecutionID == st.ExecutionID {
-				_ = fileutil.Remove(flatPath)
-				moved++
-			}
+		if st2, ok2 := readJobExecutionStateFile(dest); ok2 && st2.JobID == st.JobID && st2.ExecutionID == st.ExecutionID {
+			_ = fileutil.Remove(flatPath)
+			moved++
 			continue
 		}
 		if err := fileutil.Rename(flatPath, dest); err != nil {
 			// Cross-volume or other rename failure: copy then remove source.
-			if err2 := fileutil.WriteFile(dest, b, paths.FilePerm600); err2 == nil {
-				_ = fileutil.Remove(flatPath)
-				moved++
+			if b, readErr := fileutil.ReadFile(flatPath); readErr == nil {
+				if err2 := fileutil.WriteFile(dest, b, paths.FilePerm600); err2 == nil {
+					_ = fileutil.Remove(flatPath)
+					moved++
+				}
 			}
 			continue
 		}
@@ -330,16 +338,11 @@ func (r *JobStateRegistry) MigrateLegacyFlatStateFilesBestEffort() (moved int, e
 // state/<job_id_segment>/ to state/<bucket>/<job_id_segment>/ so the top level is bucket folders
 // plus locks/. Safe to call repeatedly; skips bucket directories, locks, and paths already in place.
 func (r *JobStateRegistry) MigrateUnbucketedJobStateDirsBestEffort() (moved int, err error) {
-	if r == nil || r.stateDir == emptyValue {
-		return 0, nil
-	}
-	entries, err := fileutil.ReadDir(r.stateDir)
-	if err != nil {
-		if fileutil.IsNotExist(err) {
-			return 0, nil
-		}
+	entries, err := r.readStateDirEntries()
+	if err != nil || len(entries) == 0 {
 		return 0, err
 	}
+
 	for _, e := range entries {
 		if !e.IsDir() {
 			continue
@@ -437,18 +440,15 @@ func readJobIDFromJobStateDir(dir string) (string, error) {
 		if e.IsDir() || !strings.HasSuffix(e.Name(), ".yaml") {
 			continue
 		}
-		b, err := fileutil.ReadFile(filepath.Join(dir, e.Name()))
-		if err != nil {
-			continue
-		}
-		var st JobExecutionState
-		if err := yaml.Unmarshal(b, &st); err != nil {
+		st, ok := readJobExecutionStateFile(filepath.Join(dir, e.Name()))
+		if !ok {
 			continue
 		}
 		if strings.TrimSpace(st.JobID) != emptyValue {
 			return st.JobID, nil
 		}
 	}
+
 	return "", nil
 }
 
@@ -486,58 +486,37 @@ func (r *JobStateRegistry) GetExecutionState(jobID string) (*JobExecutionState, 
 				if e.IsDir() || !strings.HasSuffix(e.Name(), ".yaml") {
 					continue
 				}
-				b, readErr := fileutil.ReadFile(filepath.Join(jobDir, e.Name()))
-				if readErr != nil {
-					continue
-				}
-				var st JobExecutionState
-				if err := yaml.Unmarshal(b, &st); err != nil {
-					continue
-				}
-				if st.JobID != jobID {
+				st, ok := readJobExecutionStateFile(filepath.Join(jobDir, e.Name()))
+				if !ok || st.JobID != jobID {
 					continue
 				}
 				switch st.State {
 				case jobExecutionStateInProgress, jobExecutionStateDeferred:
-					s := st
-					return &s, nil
+					return st, nil
 				}
 			}
 		}
 	}
 
 	// Legacy flat layout
-	entries, err := fileutil.ReadDir(r.stateDir)
-	if err != nil {
-		if fileutil.IsNotExist(err) {
-			return nil, nil
-		}
+	entries, err := r.readStateDirEntries()
+	if err != nil || len(entries) == 0 {
 		return nil, err
 	}
 	for _, e := range entries {
-		if e.IsDir() {
+		if e.IsDir() || !strings.HasSuffix(e.Name(), ".yaml") || isReservedStateEntry(e.Name()) {
 			continue
 		}
-		if !strings.HasSuffix(e.Name(), ".yaml") || isReservedStateEntry(e.Name()) {
-			continue
-		}
-		b, readErr := fileutil.ReadFile(filepath.Join(r.stateDir, e.Name()))
-		if readErr != nil {
-			continue
-		}
-		var st JobExecutionState
-		if err := yaml.Unmarshal(b, &st); err != nil {
-			continue
-		}
-		if st.JobID != jobID {
+		st, ok := readJobExecutionStateFile(filepath.Join(r.stateDir, e.Name()))
+		if !ok || st.JobID != jobID {
 			continue
 		}
 		switch st.State {
 		case jobExecutionStateInProgress, jobExecutionStateDeferred:
-			s := st
-			return &s, nil
+			return st, nil
 		}
 	}
+
 
 	return nil, nil
 }
@@ -579,17 +558,12 @@ func (r *JobStateRegistry) ListInProgress() ([]*JobExecutionState, error) {
 
 	var out []*JobExecutionState
 	_ = r.forEachStateYAML(func(path string) error {
-		b, readErr := fileutil.ReadFile(path)
-		if readErr != nil {
-			return nil
-		}
-		var st JobExecutionState
-		if err := yaml.Unmarshal(b, &st); err != nil {
+		st, ok := readJobExecutionStateFile(path)
+		if !ok {
 			return nil
 		}
 		if st.State == jobExecutionStateInProgress || st.State == jobExecutionStateDeferred {
-			s := st
-			out = append(out, &s)
+			out = append(out, st)
 		}
 		return nil
 	})
@@ -611,15 +585,12 @@ func (r *JobStateRegistry) CompleteExecution(jobID, executionID, result string) 
 
 		if strings.TrimSpace(jobID) != emptyValue {
 			p := r.stateFilePathForJobExecution(jobID, executionID)
-			if b, err := fileutil.ReadFile(p); err == nil {
-				var st JobExecutionState
-				if err := yaml.Unmarshal(b, &st); err == nil && st.ExecutionID == executionID {
-					targetPath = p
-					s := st
-					target = &s
-				}
+			if st, ok := readJobExecutionStateFile(p); ok && st.ExecutionID == executionID {
+				targetPath = p
+				target = st
 			}
 		}
+
 		if target == nil {
 			var err error
 			targetPath, target, err = r.findExecutionStateByExecutionID(executionID)
@@ -676,21 +647,17 @@ func (r *JobStateRegistry) findExecutionStateByExecutionID(executionID string) (
 		if target != nil {
 			return nil
 		}
-		b, readErr := fileutil.ReadFile(path)
-		if readErr != nil {
-			return nil
-		}
-		var st JobExecutionState
-		if err := yaml.Unmarshal(b, &st); err != nil {
+		st, ok := readJobExecutionStateFile(path)
+		if !ok {
 			return nil
 		}
 		if st.ExecutionID == executionID {
 			targetPath = path
-			s := st
-			target = &s
+			target = st
 		}
 		return nil
 	})
+
 	if err != nil {
 		return "", nil, err
 	}
@@ -716,34 +683,20 @@ func (r *JobStateRegistry) DeferExecution(jobID, reason string, deferUntil *time
 						continue
 					}
 					path := filepath.Join(jobDir, e.Name())
-					b, readErr := fileutil.ReadFile(path)
-					if readErr != nil {
-						continue
-					}
-					var st JobExecutionState
-					if err := yaml.Unmarshal(b, &st); err != nil {
-						continue
-					}
-					if st.JobID != jobID {
-						continue
-					}
-					if st.State != jobExecutionStateInProgress {
+					st, ok := readJobExecutionStateFile(path)
+					if !ok || st.JobID != jobID || st.State != jobExecutionStateInProgress {
 						continue
 					}
 					targetPath = path
-					s := st
-					target = &s
+					target = st
 					break outerDeferSearch
 				}
 			}
 		}
 
 		if target == nil {
-			entries, err := fileutil.ReadDir(r.stateDir)
+			entries, err := r.readStateDirEntries()
 			if err != nil {
-				if fileutil.IsNotExist(err) {
-					return nil
-				}
 				return err
 			}
 			for _, e := range entries {
@@ -751,26 +704,16 @@ func (r *JobStateRegistry) DeferExecution(jobID, reason string, deferUntil *time
 					continue
 				}
 				path := filepath.Join(r.stateDir, e.Name())
-				b, readErr := fileutil.ReadFile(path)
-				if readErr != nil {
-					continue
-				}
-				var st JobExecutionState
-				if err := yaml.Unmarshal(b, &st); err != nil {
-					continue
-				}
-				if st.JobID != jobID {
-					continue
-				}
-				if st.State != jobExecutionStateInProgress {
+				st, ok := readJobExecutionStateFile(path)
+				if !ok || st.JobID != jobID || st.State != jobExecutionStateInProgress {
 					continue
 				}
 				targetPath = path
-				s := st
-				target = &s
+				target = st
 				break
 			}
 		}
+
 
 		if target == nil {
 			return nil
@@ -877,17 +820,14 @@ func (r *JobStateRegistry) cleanupCompletedInDirBestEffort(jobDir string) error 
 }
 
 func (r *JobStateRegistry) maybeRemoveExpiredStateFile(path string, cutoff time.Time, stats *stateRetentionCleanupStats) {
-	b, readErr := fileutil.ReadFile(path)
-	if readErr != nil {
-		return
-	}
-	var st JobExecutionState
-	if err := yaml.Unmarshal(b, &st); err != nil {
+	st, ok := readJobExecutionStateFile(path)
+	if !ok {
 		return
 	}
 	if st.State != jobExecutionStateCompleted && st.State != jobExecutionStateFailed && st.State != jobExecutionStateSkipped {
 		return
 	}
+
 	if st.CompletedAt == nil || !st.CompletedAt.Before(cutoff) {
 		return
 	}

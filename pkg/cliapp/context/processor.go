@@ -132,6 +132,25 @@ func (cp *ContextProcessor) ProcessSequential(contexts []*Context) (*Context, er
 	return nil, errfmt.Errorf("chain processing returned unexpected type: %T", chainResult)
 }
 
+func (cp *ContextProcessor) processBreadthFirstChain(root *ContextNode) (*Context, error) {
+	chainBuilder := pkgctx.NewChainBuilder()
+	chain := cp.buildChainFromNode(root, 0, chainBuilder)
+	if chain == nil {
+		return nil, errfmt.Errorf("failed to build chain from node tree")
+	}
+
+	chainResult, validationErrors := chain.ProcessBreadthFirst()
+	if len(validationErrors) > 0 {
+		// Log validation errors but continue (non-fatal)
+	}
+
+	if adapter, ok := chainResult.(*ContextNodeAdapter); ok {
+		return adapter.GetNode().Context, nil
+	}
+
+	return nil, errfmt.Errorf("chain processing returned unexpected type: %T", chainResult)
+}
+
 // ProcessHierarchical processes contexts in a hierarchical tree structure
 // Child contexts inherit from parent and override parent values
 // Now uses the chain-based system for consistent processing
@@ -139,28 +158,7 @@ func (cp *ContextProcessor) ProcessHierarchical(root *ContextNode) (*Context, er
 	if contextNodeMissing(root) {
 		return nil, errfmt.Errorf("root context node is required for hierarchical processing")
 	}
-
-	// Convert to chain-based system
-	chainBuilder := pkgctx.NewChainBuilder()
-
-	// Build chain from node tree
-	chain := cp.buildChainFromNode(root, 0, chainBuilder)
-	if chain == nil {
-		return nil, errfmt.Errorf("failed to build chain from node tree")
-	}
-
-	// Process using breadth-first traversal
-	chainResult, validationErrors := chain.ProcessBreadthFirst()
-	if len(validationErrors) > 0 {
-		// Log validation errors but continue (non-fatal)
-	}
-
-	// Extract Context from adapter
-	if adapter, ok := chainResult.(*ContextNodeAdapter); ok {
-		return adapter.GetNode().Context, nil
-	}
-
-	return nil, errfmt.Errorf("chain processing returned unexpected type: %T", chainResult)
+	return cp.processBreadthFirstChain(root)
 }
 
 // ProcessHybrid processes contexts with both sequential and hierarchical aspects
@@ -171,34 +169,7 @@ func (cp *ContextProcessor) ProcessHybrid(root *ContextNode) (*Context, error) {
 	if contextNodeMissing(root) {
 		return nil, errfmt.Errorf("root context node is required for hybrid processing")
 	}
-
-	// Hybrid mode: siblings processed sequentially (by precedence), children hierarchically (by depth)
-	// The chain system's breadth-first processing handles this automatically:
-	// - All contexts at depth 0 are processed by precedence (siblings)
-	// - Then all contexts at depth 1 are processed by precedence (children)
-	// - And so on...
-
-	// Convert to chain-based system
-	chainBuilder := pkgctx.NewChainBuilder()
-
-	// Build chain from node tree (siblings get same depth, children get depth+1)
-	chain := cp.buildChainFromNode(root, 0, chainBuilder)
-	if chain == nil {
-		return nil, errfmt.Errorf("failed to build chain from node tree")
-	}
-
-	// Process using breadth-first traversal (handles hybrid automatically)
-	chainResult, validationErrors := chain.ProcessBreadthFirst()
-	if len(validationErrors) > 0 {
-		// Log validation errors but continue (non-fatal)
-	}
-
-	// Extract Context from adapter
-	if adapter, ok := chainResult.(*ContextNodeAdapter); ok {
-		return adapter.GetNode().Context, nil
-	}
-
-	return nil, errfmt.Errorf("chain processing returned unexpected type: %T", chainResult)
+	return cp.processBreadthFirstChain(root)
 }
 
 // ProcessNode processes a context node according to its mode

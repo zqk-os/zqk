@@ -165,33 +165,31 @@ func (c *Coordinator) EmitOperationalSync(ctx context.Context, eventCtx *EventCo
 	return nil
 }
 
-// emitOperationalEventSync emits an operational event synchronously to subscribers
-// This bypasses the async router to ensure immediate delivery for CLI feedback
-func (c *Coordinator) emitOperationalEventSync(_ context.Context, eventCtx *EventContext) {
-	operationalEvent := NewOperationalEvent(eventCtx)
-
-	// Find relevant subscribers (same logic as async version)
+func (c *Coordinator) findRelevantSubscribers(eventType string) []OperationalEventSubscriber {
 	var subscribers []OperationalEventSubscriber
 	state := c.state.Load()
 
-	subscriberIDs, exists := state.typeIndex[operationalEvent.Type]
-	if !exists {
-		subscriberIDs = []string{}
-	}
-
-	for _, id := range subscriberIDs {
-		if sub, exists := state.subscribers[id]; exists && sub.IsActive() {
-			subscribers = append(subscribers, sub)
-		}
-	}
-
-	for _, sub := range state.subscribers {
-		if sub.IsActive() {
-			if len(sub.EventTypes()) == 0 {
+	if subscriberIDs, exists := state.typeIndex[eventType]; exists {
+		for _, id := range subscriberIDs {
+			if sub, exists := state.subscribers[id]; exists && sub.IsActive() {
 				subscribers = append(subscribers, sub)
 			}
 		}
 	}
+
+	for _, sub := range state.subscribers {
+		if sub.IsActive() && len(sub.EventTypes()) == 0 {
+			subscribers = append(subscribers, sub)
+		}
+	}
+	return subscribers
+}
+
+// emitOperationalEventSync emits an operational event synchronously to subscribers
+// This bypasses the async router to ensure immediate delivery for CLI feedback
+func (c *Coordinator) emitOperationalEventSync(_ context.Context, eventCtx *EventContext) {
+	operationalEvent := NewOperationalEvent(eventCtx)
+	subscribers := c.findRelevantSubscribers(operationalEvent.Type)
 
 	// Call subscribers synchronously (no goroutines, no router)
 	// This ensures immediate delivery for CLI feedback
@@ -203,29 +201,7 @@ func (c *Coordinator) emitOperationalEventSync(_ context.Context, eventCtx *Even
 // emitOperationalEvent emits an operational event to relevant subscribers
 func (c *Coordinator) emitOperationalEvent(ctx context.Context, eventCtx *EventContext) {
 	operationalEvent := NewOperationalEvent(eventCtx)
-
-	// Find relevant subscribers
-	var subscribers []OperationalEventSubscriber
-	state := c.state.Load()
-
-	subscriberIDs, exists := state.typeIndex[operationalEvent.Type]
-	if !exists {
-		subscriberIDs = []string{}
-	}
-
-	for _, id := range subscriberIDs {
-		if sub, exists := state.subscribers[id]; exists && sub.IsActive() {
-			subscribers = append(subscribers, sub)
-		}
-	}
-
-	for _, sub := range state.subscribers {
-		if sub.IsActive() {
-			if len(sub.EventTypes()) == 0 {
-				subscribers = append(subscribers, sub)
-			}
-		}
-	}
+	subscribers := c.findRelevantSubscribers(operationalEvent.Type)
 
 	// Route to operational router
 	_ = c.operationalRouter.Emit(ctx, operationalEvent, subscribers) //nolint:errcheck // Async, best-effort

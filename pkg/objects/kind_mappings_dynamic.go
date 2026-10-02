@@ -13,7 +13,9 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/loader"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage/locknames"
+
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
@@ -529,39 +531,6 @@ func findProcessDir() string {
 		}
 	}
 
-	// Try common locations
-	possiblePaths := []string{
-		datacell.ProcessPrimaryDir("."),
-		datacell.ProcessPrimaryDir(".."),
-		datacell.ProcessPrimaryDir(filepath.Join("..", "..")),
-	}
-
-	wd, err := fileutil.Getwd()
-	if err != nil {
-		return ""
-	}
-
-	for _, path := range possiblePaths {
-		absPath := filepath.Join(wd, path)
-		if info, err := fileutil.Stat(absPath); err == nil && info.IsDir() {
-			return absPath
-		}
-	}
-
-	// Walk up directory tree
-	dir := wd
-	for {
-		potentialPath := datacell.ProcessPrimaryDir(dir)
-		if _, err := fileutil.Stat(potentialPath); err == nil {
-			return potentialPath
-		}
-
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			break
-		}
-		dir = parent
-	}
-
-	return ""
+	return paths.FirstExistingFromCwd(paths.ProcessInternalDir)
 }
+

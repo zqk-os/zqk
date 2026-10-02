@@ -154,50 +154,9 @@ func (pl *ProfileLoader) resolveProfilePath(name string) string {
 
 // findCLIProfilesDir attempts to find the CLI profiles directory
 func findCLIProfilesDir() string {
-	// Try relative to current working directory
-	possiblePaths := []string{
-		paths.CLIProfilesDir,
-		filepath.Join("..", paths.CLIProfilesDir),
-		filepath.Join("..", "..", paths.CLIProfilesDir),
-	}
-
-	wd, err := fileutil.Getwd()
-	if err != nil {
-		return ""
-	}
-
-	for _, path := range possiblePaths {
-		absPath := filepath.Join(wd, path)
-		if info, err := fileutil.Stat(absPath); err == nil && info.IsDir() {
-			return absPath
-		}
-	}
-
-	// Walk up directory tree looking for project root
-	dir := wd
-	for {
-		profilesDir := filepath.Join(dir, paths.CLIProfilesDir)
-		if info, err := fileutil.Stat(profilesDir); err == nil && info.IsDir() {
-			return profilesDir
-		}
-
-		// Check if we're at project root
-		if _, err := fileutil.Stat(filepath.Join(dir, paths.ProjectDataDir)); err == nil {
-			if info, err := fileutil.Stat(profilesDir); err == nil && info.IsDir() {
-				return profilesDir
-			}
-		}
-
-		// Move up one directory
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			break // Reached filesystem root
-		}
-		dir = parent
-	}
-
-	return ""
+	return paths.FirstExistingFromCwd(paths.CLIProfilesDir)
 }
+
 
 // ClearCache clears the profile cache
 func (pl *ProfileLoader) ClearCache() {

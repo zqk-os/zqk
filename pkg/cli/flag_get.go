@@ -127,3 +127,11 @@ func (b *FlagBag) StringToString(cmd *cobra.Command, name string) map[string]str
 	b.fail(name, err)
 	return v
 }
+
+// ReadDataInputFlags extracts common file, data, and field flags.
+func (b *FlagBag) ReadDataInputFlags(cmd *cobra.Command) (filePath, dataStr string, fields []string) {
+	filePath = b.String(cmd, "file")
+	dataStr = b.String(cmd, "data")
+	fields = b.StringArray(cmd, "field")
+	return
+}

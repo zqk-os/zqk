@@ -554,16 +554,21 @@ func (s *Scheduler) hasCompletionEventForTime(jobID string, expectedTime time.Ti
 	return false
 }
 
-// parseCronSchedule parses a cron expression, handling both 5 and 6 field formats
-func (s *Scheduler) parseCronSchedule(expr string) (cron.Schedule, error) {
-	parts := len(strings.Fields(expr))
-	if parts == 5 {
+// ParseCronSchedule parses a cron expression, handling both 5 and 6 field formats.
+func ParseCronSchedule(expr string) (cron.Schedule, error) {
+	if len(strings.Fields(expr)) == 5 {
 		expr = "0 " + expr
 	}
 
 	specParser := cron.NewParser(cron.Second | cron.Minute | cron.Hour | cron.Dom | cron.Month | cron.Dow | cron.Descriptor)
 	return specParser.Parse(expr)
 }
+
+// parseCronSchedule parses a cron expression, handling both 5 and 6 field formats
+func (s *Scheduler) parseCronSchedule(expr string) (cron.Schedule, error) {
+	return ParseCronSchedule(expr)
+}
+
 
 // recoverMissedJob attempts to recover a missed job by submitting to the bounded pool (same as cron/event/lifecycle).
 func (s *Scheduler) recoverMissedJob(job *ScheduledJob) {

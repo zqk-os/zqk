@@ -194,6 +194,28 @@ func (h *ProgressHelper) EmitProgressSummary(
 	return h.EmitProgress(ctx, progress, total, fmt.Sprintf("Progress summary: %s - %s", threshold, message), fields, true)
 }
 
+func (h *ProgressHelper) buildStatusAuditMetadata(op, severity, oldStatus, newStatus string, fields map[string]any) map[string]any {
+	m := make(map[string]any, len(fields)+6)
+	m[keyEventType] = auditEventTypeSystemConfigChange
+	m[keyOperation] = op
+	m[keySeverity] = severity
+	m[keyTargetKind] = h.operationType
+	m[keyOldStatus] = oldStatus
+	m[keyNewStatus] = newStatus
+	maps.Copy(m, fields)
+	return m
+}
+
+func (h *ProgressHelper) buildStatusMetricsData(eventType, oldStatus, newStatus string, fields map[string]any) map[string]any {
+	m := make(map[string]any, len(fields)+4)
+	m[keyOperation] = h.operationType
+	m[keyEventType] = eventType
+	m[keyOldStatus] = oldStatus
+	m[keyNewStatus] = newStatus
+	maps.Copy(m, fields)
+	return m
+}
+
 // EmitStatusChange emits a status change event.
 // Deduplicates: only one event per (oldStatus, newStatus) transition per operation,
 // so heartbeat callers that repeatedly emit "started" -> "in_progress" do not inflate event counts.
@@ -229,24 +251,9 @@ func (h *ProgressHelper) EmitStatusChange(
 	}
 
 	loggingFields := h.buildStatusLoggingFields(oldStatus, newStatus, message, nil, fields)
-
-	// Build audit metadata
-	auditMetadata := make(map[string]any)
-	auditMetadata[keyEventType] = auditEventTypeSystemConfigChange
-	auditMetadata[keyOperation] = fmt.Sprintf("%s status change: %s -> %s", h.operationType, oldStatus, newStatus)
-	auditMetadata[keySeverity] = "low"
-	auditMetadata[keyTargetKind] = h.operationType
-	auditMetadata[keyOldStatus] = oldStatus
-	auditMetadata[keyNewStatus] = newStatus
-	maps.Copy(auditMetadata, fields)
-
-	// Build metrics data
-	metricsData := make(map[string]any)
-	metricsData[keyOperation] = h.operationType
-	metricsData[keyEventType] = "status_change"
-	metricsData[keyOldStatus] = oldStatus
-	metricsData[keyNewStatus] = newStatus
-	maps.Copy(metricsData, fields)
+	op := fmt.Sprintf("%s status change: %s -> %s", h.operationType, oldStatus, newStatus)
+	auditMetadata := h.buildStatusAuditMetadata(op, "low", oldStatus, newStatus, fields)
+	metricsData := h.buildStatusMetricsData("status_change", oldStatus, newStatus, fields)
 
 	// Create event data
 	eventData := &EventData{
@@ -293,33 +300,19 @@ func (h *ProgressHelper) EmitError(
 
 	loggingFields := h.buildStatusLoggingFields(objects.ObjectStatusInProgress, objects.ObjectStatusError, message, err, fields)
 
-	// Build audit metadata
-	auditMetadata := make(map[string]any)
-	auditMetadata[keyEventType] = auditEventTypeSystemConfigChange
+	op := fmt.Sprintf("%s error", h.operationType)
 	if message != emptyValue {
-		auditMetadata[keyOperation] = fmt.Sprintf("%s error: %s", h.operationType, message)
-	} else {
-		auditMetadata[keyOperation] = fmt.Sprintf("%s error", h.operationType)
+		op = fmt.Sprintf("%s error: %s", h.operationType, message)
 	}
-	auditMetadata[keySeverity] = "high"
-	auditMetadata[keyTargetKind] = h.operationType
-	auditMetadata[keyOldStatus] = "in_progress"
-	auditMetadata[keyNewStatus] = "error"
+	auditMetadata := h.buildStatusAuditMetadata(op, "high", "in_progress", "error", fields)
 	if err != nil {
 		auditMetadata[keyError] = err.Error()
 	}
-	maps.Copy(auditMetadata, fields)
 
-	// Build metrics data
-	metricsData := make(map[string]any)
-	metricsData[keyOperation] = h.operationType
-	metricsData[keyEventType] = "error"
-	metricsData[keyOldStatus] = "in_progress"
-	metricsData[keyNewStatus] = "error"
+	metricsData := h.buildStatusMetricsData("error", "in_progress", "error", fields)
 	if err != nil {
 		metricsData[keyError] = err.Error()
 	}
-	maps.Copy(metricsData, fields)
 
 	// Create event data
 	eventData := &EventData{
@@ -368,29 +361,15 @@ func (h *ProgressHelper) EmitCompletion(
 		loggingFields = append(loggingFields, LoggingField{Key: k, Value: v})
 	}
 
-	// Build audit metadata
-	auditMetadata := make(map[string]any)
-	auditMetadata[keyEventType] = auditEventTypeSystemConfigChange
+	op := fmt.Sprintf("%s completed", h.operationType)
 	if message != emptyValue {
-		auditMetadata[keyOperation] = fmt.Sprintf("%s completed: %s", h.operationType, message)
-	} else {
-		auditMetadata[keyOperation] = fmt.Sprintf("%s completed", h.operationType)
+		op = fmt.Sprintf("%s completed: %s", h.operationType, message)
 	}
-	auditMetadata[keySeverity] = "medium"
-	auditMetadata[keyTargetKind] = h.operationType
-	auditMetadata[keyOldStatus] = "in_progress"
-	auditMetadata[keyNewStatus] = "complete"
+	auditMetadata := h.buildStatusAuditMetadata(op, "medium", "in_progress", "complete", fields)
 	auditMetadata[keyDuration] = duration.String()
-	maps.Copy(auditMetadata, fields)
 
-	// Build metrics data
-	metricsData := make(map[string]any)
-	metricsData[keyOperation] = h.operationType
-	metricsData[keyEventType] = "completion"
-	metricsData[keyOldStatus] = "in_progress"
-	metricsData[keyNewStatus] = "complete"
+	metricsData := h.buildStatusMetricsData("completion", "in_progress", "complete", fields)
 	metricsData[keyDuration] = duration.Seconds()
-	maps.Copy(metricsData, fields)
 
 	// Create event data
 	eventData := &EventData{

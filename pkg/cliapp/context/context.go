@@ -540,88 +540,10 @@ func (cm *ContextManager) createContextFromMap(config map[string]any, layer Cont
 	}
 	ctx.layers[layer] = config
 
-	// Apply format
-	if format, ok := config[contextKeyFormat].(string); ok && format != emptyValue {
-		ctx.Format = format
-	}
-
-	// Apply verbose
-	if verbose, ok := config[contextKeyVerbose].(bool); ok {
-		ctx.Verbose = verbose
-	}
-
-	// Apply quiet
-	if quiet, ok := config[contextKeyQuiet].(bool); ok {
-		ctx.Quiet = quiet
-	}
-
-	// Apply profile (may override format)
+	applyConfigMapToContext(ctx, config)
 	if profile, ok := config[contextKeyProfile].(string); ok && profile != emptyValue {
-		ctx.Profile = profile
 		if err := cm.applyProfile(ctx, profile); err != nil {
 			return nil, err
-		}
-	}
-
-	// Apply project context
-	if priorityPlan, ok := config[contextKeyPriorityPlan].(string); ok && priorityPlan != emptyValue {
-		ctx.PriorityPlan = priorityPlan
-	}
-	if workstream, ok := config[contextKeyWorkstream].(string); ok && workstream != emptyValue {
-		ctx.Workstream = workstream
-	}
-	if milestone, ok := config[contextKeyMilestone].(string); ok && milestone != emptyValue {
-		ctx.Milestone = milestone
-	}
-
-	// Apply branding
-	if productName, ok := config[contextKeyProductName].(string); ok && productName != emptyValue {
-		ctx.ProductName = productName
-	}
-	if executableName, ok := config[contextKeyExecutableName].(string); ok && executableName != emptyValue {
-		ctx.ExecutableName = executableName
-	}
-	if namespacePrefix, ok := config[contextKeyNamespacePrefix].(string); ok && namespacePrefix != emptyValue {
-		ctx.NamespacePrefix = namespacePrefix
-	}
-	// Allow nested config: brand: { product_name, executable_name }
-	if brandCfg, ok := config[contextKeyBrand].(map[string]any); ok {
-		if productName, ok := brandCfg[contextKeyProductName].(string); ok && productName != emptyValue {
-			ctx.ProductName = productName
-		}
-		if executableName, ok := brandCfg[contextKeyExecutableName].(string); ok && executableName != emptyValue {
-			ctx.ExecutableName = executableName
-		}
-		if namespacePrefix, ok := brandCfg[contextKeyNamespacePrefix].(string); ok && namespacePrefix != emptyValue {
-			ctx.NamespacePrefix = namespacePrefix
-		}
-	}
-
-	// Apply storage context parameters
-	if storageCtx, ok := config[contextKeyStorage].(map[string]any); ok {
-		switch maxPageSize := storageCtx[contextKeyMaxPageSize].(type) {
-		case int:
-			ctx.StorageMaxPageSize = maxPageSize
-		case float64:
-			// YAML unmarshals integers as float64
-			ctx.StorageMaxPageSize = int(maxPageSize)
-		}
-		switch defaultPageSize := storageCtx[contextKeyDefaultPageSize].(type) {
-		case int:
-			ctx.StorageDefaultPageSize = defaultPageSize
-		case float64:
-			// YAML unmarshals integers as float64
-			ctx.StorageDefaultPageSize = int(defaultPageSize)
-		}
-		if enableGrouping, ok := storageCtx[contextKeyEnableGrouping].(bool); ok {
-			ctx.StorageEnableGrouping = enableGrouping
-		}
-		switch maxGroupSize := storageCtx[contextKeyMaxGroupSize].(type) {
-		case int:
-			ctx.StorageMaxGroupSize = maxGroupSize
-		case float64:
-			// YAML unmarshals integers as float64
-			ctx.StorageMaxGroupSize = int(maxGroupSize)
 		}
 	}
 
@@ -717,6 +639,73 @@ func GetContextFromCommand(cmd *cobra.Command, initCtx *pkgctx.CliInitialization
 
 	// Load and apply context
 	return manager.LoadContext(initCtx)
+}
+
+func applyConfigMapToContext(ctx *Context, config map[string]any) {
+	if format, ok := config[contextKeyFormat].(string); ok && format != emptyValue {
+		ctx.Format = format
+	}
+	if verbose, ok := config[contextKeyVerbose].(bool); ok {
+		ctx.Verbose = verbose
+	}
+	if quiet, ok := config[contextKeyQuiet].(bool); ok {
+		ctx.Quiet = quiet
+	}
+	if profile, ok := config[contextKeyProfile].(string); ok && profile != emptyValue {
+		ctx.Profile = profile
+	}
+	if priorityPlan, ok := config[contextKeyPriorityPlan].(string); ok && priorityPlan != emptyValue {
+		ctx.PriorityPlan = priorityPlan
+	}
+	if workstream, ok := config[contextKeyWorkstream].(string); ok && workstream != emptyValue {
+		ctx.Workstream = workstream
+	}
+	if milestone, ok := config[contextKeyMilestone].(string); ok && milestone != emptyValue {
+		ctx.Milestone = milestone
+	}
+	if productName, ok := config[contextKeyProductName].(string); ok && productName != emptyValue {
+		ctx.ProductName = productName
+	}
+	if executableName, ok := config[contextKeyExecutableName].(string); ok && executableName != emptyValue {
+		ctx.ExecutableName = executableName
+	}
+	if namespacePrefix, ok := config[contextKeyNamespacePrefix].(string); ok && namespacePrefix != emptyValue {
+		ctx.NamespacePrefix = namespacePrefix
+	}
+	if brandCfg, ok := config[contextKeyBrand].(map[string]any); ok {
+		if productName, ok := brandCfg[contextKeyProductName].(string); ok && productName != emptyValue {
+			ctx.ProductName = productName
+		}
+		if executableName, ok := brandCfg[contextKeyExecutableName].(string); ok && executableName != emptyValue {
+			ctx.ExecutableName = executableName
+		}
+		if namespacePrefix, ok := brandCfg[contextKeyNamespacePrefix].(string); ok && namespacePrefix != emptyValue {
+			ctx.NamespacePrefix = namespacePrefix
+		}
+	}
+	if storageCtx, ok := config[contextKeyStorage].(map[string]any); ok {
+		switch maxPageSize := storageCtx[contextKeyMaxPageSize].(type) {
+		case int:
+			ctx.StorageMaxPageSize = maxPageSize
+		case float64:
+			ctx.StorageMaxPageSize = int(maxPageSize)
+		}
+		switch defaultPageSize := storageCtx[contextKeyDefaultPageSize].(type) {
+		case int:
+			ctx.StorageDefaultPageSize = defaultPageSize
+		case float64:
+			ctx.StorageDefaultPageSize = int(defaultPageSize)
+		}
+		if enableGrouping, ok := storageCtx[contextKeyEnableGrouping].(bool); ok {
+			ctx.StorageEnableGrouping = enableGrouping
+		}
+		switch maxGroupSize := storageCtx[contextKeyMaxGroupSize].(type) {
+		case int:
+			ctx.StorageMaxGroupSize = maxGroupSize
+		case float64:
+			ctx.StorageMaxGroupSize = int(maxGroupSize)
+		}
+	}
 }
 
 // ResolveProjectRoot returns the project root using a single, explicit precedence so callers

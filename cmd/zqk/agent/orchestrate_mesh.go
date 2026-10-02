@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/agentclaim"
 	"github.com/zqk-os/zqk/pkg/federation/meshbroker"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
@@ -84,31 +85,19 @@ func stringIDsFromAny(raw any) []string {
 // orchestrationMeshSkillIDs collects skill object ids from the work item and
 // seated persona. Community kernels do not ship a studio AGE-* skill.
 func orchestrationMeshSkillIDs(item, persona map[string]any) []string {
-	seen := map[string]struct{}{}
-	var out []string
-	add := func(id string) {
-		id = strings.TrimSpace(id)
-		if id == "" {
-			return
-		}
-		if _, ok := seen[id]; ok {
-			return
-		}
-		seen[id] = struct{}{}
-		out = append(out, id)
-	}
+	acc := agentclaim.NewStringSetAccumulator()
 	if item != nil {
 		if ref, ok := item[objects.FieldKeySkillRef].(string); ok {
-			add(ref)
+			acc.Add(ref)
 		}
 		for _, id := range objects.CollectPersonaASKRefs(item) {
-			add(id)
+			acc.Add(id)
 		}
 	}
 	for _, id := range objects.CollectPersonaASKRefs(persona) {
-		add(id)
+		acc.Add(id)
 	}
-	return out
+	return acc.Result()
 }
 
 func leaseOrchestrationMeshSkill(

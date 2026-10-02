@@ -205,18 +205,23 @@ func SeatWorkerAlive(projectRoot, agentID string, maxAge time.Duration) (bool, t
 	return ok, ts, nil
 }
 
+func (opts SeatWorkerOptions) normalize() (root, agentID, persona string) {
+	root = strings.TrimSpace(opts.ProjectRoot)
+	agentID = strings.TrimSpace(opts.AgentID)
+	persona = strings.TrimSpace(opts.PersonaRef)
+	if persona == "" {
+		persona = objects.ConstPersonaDefaultOperator
+	}
+	return root, agentID, persona
+}
+
 // ProcessSeatInbox handles directed inbox items for a seat: deterministic COMMS
 // life∧work first; non-COMMS items are left unacked (AgentX / human).
 func ProcessSeatInbox(ctx context.Context, opts SeatWorkerOptions) (SeatWorkerResult, error) {
 	out := SeatWorkerResult{}
-	root := strings.TrimSpace(opts.ProjectRoot)
-	agentID := strings.TrimSpace(opts.AgentID)
-	persona := strings.TrimSpace(opts.PersonaRef)
+	root, agentID, persona := opts.normalize()
 	if root == "" || agentID == "" {
 		return out, errfmt.Errorf("project root and agent-id are required")
-	}
-	if persona == "" {
-		persona = objects.ConstPersonaDefaultOperator
 	}
 
 	alivePath, aerr := WriteSeatWorkerAlive(root, agentID, opts.SessionID, opts.Now)
@@ -409,12 +414,7 @@ func parseCommsFromStub(body string) (CommsCheckChallenge, bool) {
 }
 
 func handleCommsChallenge(ctx context.Context, opts SeatWorkerOptions, chal CommsCheckChallenge, inboxCount int) error {
-	root := strings.TrimSpace(opts.ProjectRoot)
-	agentID := strings.TrimSpace(opts.AgentID)
-	persona := strings.TrimSpace(opts.PersonaRef)
-	if persona == "" {
-		persona = objects.ConstPersonaDefaultOperator
-	}
+	root, agentID, persona := opts.normalize()
 	if chal.EventID == "" {
 		return errfmt.Errorf("COMMS challenge missing event_id")
 	}

@@ -357,13 +357,25 @@ func (b *CommandBuilder) WithEntitlementBundle(bundle string) *CommandBuilder {
 	return b
 }
 
-// WithQueryFlags adds standard query flags (filter, sort, pagination)
-func (b *CommandBuilder) WithQueryFlags() *CommandBuilder {
+type queryFlagAdder interface {
+	AddStringArrayFlag(name, shorthand, description string) *CommandBuilder
+	AddStringFlag(name, shorthand, defaultValue, description string) *CommandBuilder
+	AddBoolFlag(name, shorthand string, defaultValue bool, description string) *CommandBuilder
+	AddIntFlag(name, shorthand string, defaultValue int, description string) *CommandBuilder
+}
+
+
+func addStandardQueryFlags(b queryFlagAdder) {
 	b.AddStringArrayFlag(crudFlagFilter, "", crudHelpFilter)
 	b.AddStringFlag(crudFlagSortBy, "", "", crudHelpSortBy)
 	b.AddBoolFlag(crudFlagSortAsc, "", true, crudHelpSortAsc)
 	b.AddIntFlag(crudFlagOffset, "", 0, crudHelpOffset)
 	b.AddIntFlag(crudFlagLimit, "", 0, crudHelpLimit)
+}
+
+// WithQueryFlags adds standard query flags (filter, sort, pagination)
+func (b *CommandBuilder) WithQueryFlags() *CommandBuilder {
+	addStandardQueryFlags(b)
 	b.AddBoolFlag(crudFlagCount, "", false, crudHelpCount)
 	b.AddStringArrayFlag(crudFlagFields, "", crudHelpFields)
 	b.AddStringFlag(crudFlagGroupBy, "", "", crudHelpGroupBy)
@@ -632,11 +644,7 @@ func (b *CRUDCommandBuilder) WithUnlinkReferencesFlag() *CRUDCommandBuilder {
 
 // WithQueryFlags adds standard query flags (filter, sort, pagination)
 func (b *CRUDCommandBuilder) WithQueryFlags() *CRUDCommandBuilder {
-	b.AddStringArrayFlag(crudFlagFilter, "", crudHelpFilter)
-	b.AddStringFlag(crudFlagSortBy, "", "", crudHelpSortBy)
-	b.AddBoolFlag(crudFlagSortAsc, "", true, crudHelpSortAsc)
-	b.AddIntFlag(crudFlagOffset, "", 0, crudHelpOffset)
-	b.AddIntFlag(crudFlagLimit, "", 0, crudHelpLimit)
+	addStandardQueryFlags(b)
 	return b
 }
 

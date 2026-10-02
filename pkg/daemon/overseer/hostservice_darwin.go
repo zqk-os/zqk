@@ -92,6 +92,13 @@ func CleanLegacyLaunchAgents() ([]string, error) {
 }
 
 // InstallOverseerLaunchAgent cleans legacy units, generates the com.zqk.overseer.plist,
+func bootoutAndUnloadLaunchAgent(uid, plistPath string) {
+	_ = execwrap.Command("launchctl", "bootout", "gui/"+uid+"/"+OverseerLaunchAgentLabel).Run()
+	_ = execwrap.Command("launchctl", "bootout", "gui/"+uid, plistPath).Run()
+	_ = execwrap.Command("launchctl", "unload", "-w", plistPath).Run()
+}
+
+// InstallOverseerLaunchAgent writes the solitary LaunchAgent plist for zqk-overseer
 // and bootstraps it under macOS launchd.
 func InstallOverseerLaunchAgent(projectRoot, binaryPath string) (*LaunchAgentStatus, error) {
 	cleaned, err := CleanLegacyLaunchAgents()
@@ -184,9 +191,7 @@ func InstallOverseerLaunchAgent(projectRoot, binaryPath string) (*LaunchAgentSta
 	}
 
 	uid := currentUID()
-	_ = execwrap.Command("launchctl", "bootout", "gui/"+uid+"/"+OverseerLaunchAgentLabel).Run()
-	_ = execwrap.Command("launchctl", "bootout", "gui/"+uid, plistPath).Run()
-	_ = execwrap.Command("launchctl", "unload", "-w", plistPath).Run()
+	bootoutAndUnloadLaunchAgent(uid, plistPath)
 
 	if err := execwrap.Command("launchctl", "bootstrap", "gui/"+uid, plistPath).Run(); err != nil {
 		if err2 := execwrap.Command("launchctl", "load", "-w", plistPath).Run(); err2 != nil {
@@ -218,9 +223,7 @@ func UninstallOverseerLaunchAgent() error {
 	plistPath := filepath.Join(dir, OverseerLaunchAgentLabel+".plist")
 	uid := currentUID()
 
-	_ = execwrap.Command("launchctl", "bootout", "gui/"+uid+"/"+OverseerLaunchAgentLabel).Run()
-	_ = execwrap.Command("launchctl", "bootout", "gui/"+uid, plistPath).Run()
-	_ = execwrap.Command("launchctl", "unload", "-w", plistPath).Run()
+	bootoutAndUnloadLaunchAgent(uid, plistPath)
 	_ = fileutil.Remove(plistPath)
 	return nil
 }

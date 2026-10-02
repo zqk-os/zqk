@@ -182,51 +182,9 @@ func (rl *RoutingRuleLoader) convertConfigToRule(config RoutingRuleConfig) (*Rou
 
 // findRoutingRulesDir attempts to find the routing rules directory
 func findRoutingRulesDir() string {
-	rr := filepath.Join(paths.ProcessInternalDir, "routing_rules")
-	// Try common locations
-	possiblePaths := []string{
-		rr,
-		filepath.Join("..", rr),
-		filepath.Join("..", "..", rr),
-	}
-
-	wd, err := fileutil.Getwd()
-	if err != nil {
-		return ""
-	}
-
-	for _, path := range possiblePaths {
-		absPath := filepath.Join(wd, path)
-		if info, err := fileutil.Stat(absPath); err == nil && info.IsDir() {
-			return absPath
-		}
-	}
-
-	// Walk up directory tree looking for project root
-	dir := wd
-	for {
-		rulesDir := filepath.Join(dir, paths.ProcessInternalDir, "routing_rules")
-		if info, err := fileutil.Stat(rulesDir); err == nil && info.IsDir() {
-			return rulesDir
-		}
-
-		// Check if we're at project root
-		if _, err := fileutil.Stat(filepath.Join(dir, paths.ProjectDataDir)); err == nil {
-			if info, err := fileutil.Stat(rulesDir); err == nil && info.IsDir() {
-				return rulesDir
-			}
-		}
-
-		// Move up one directory
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			break // Reached filesystem root
-		}
-		dir = parent
-	}
-
-	return ""
+	return paths.FirstExistingFromCwd(filepath.Join(paths.ProcessInternalDir, "routing_rules"))
 }
+
 
 // LoadDefaultRules returns default routing rules (can be used as fallback)
 func LoadDefaultRules() []RoutingRule {

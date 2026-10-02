@@ -91,6 +91,27 @@ func (a *MCPPermissionCheckerAdapter) CheckPermission(ctx context.Context, opera
 	return false, fmt.Sprintf("missing permission: %s", requiredPerm)
 }
 
+func (a *MCPPermissionCheckerAdapter) checkBaseAccess(secCtx *pkgctx.SecurityContext) (bool, string, bool) {
+	if secCtx == nil {
+		return false, "no security context", true
+	}
+	if a.permissionCacheInterface != nil {
+		if pc, ok := a.permissionCacheInterface.(interface {
+			IsUserActive(accountID string) bool
+		}); ok {
+			if !pc.IsUserActive(secCtx.AccountID) {
+				return false, "user is inactive", true
+			}
+		}
+	}
+	for _, role := range secCtx.Roles {
+		if role == "admin" {
+			return true, "", true
+		}
+	}
+	return false, "", false
+}
+
 // CheckFormatPermission checks if format is allowed for the security context
 // Some formats (like json-rpc streaming) may require special permissions
 func (a *MCPPermissionCheckerAdapter) CheckFormatPermission(ctx context.Context, format OutputFormat) (bool, string) {
@@ -108,26 +129,8 @@ func (a *MCPPermissionCheckerAdapter) CheckFormatPermission(ctx context.Context,
 		},
 	)
 
-	if secCtx == nil {
-		return false, "no security context"
-	}
-
-	// Check if user is active
-	if a.permissionCacheInterface != nil {
-		if pc, ok := a.permissionCacheInterface.(interface {
-			IsUserActive(accountID string) bool
-		}); ok {
-			if !pc.IsUserActive(secCtx.AccountID) {
-				return false, "user is inactive"
-			}
-		}
-	}
-
-	// Admin can use any format
-	for _, role := range secCtx.Roles {
-		if role == "admin" {
-			return true, ""
-		}
+	if allowed, reason, handled := a.checkBaseAccess(secCtx); handled {
+		return allowed, reason
 	}
 
 	// Streaming formats (json-rpc, stream) may require special permissions
@@ -179,26 +182,8 @@ func (a *MCPPermissionCheckerAdapter) CheckDataAccess(ctx context.Context, data 
 		},
 	)
 
-	if secCtx == nil {
-		return false, "no security context"
-	}
-
-	// Check if user is active
-	if a.permissionCacheInterface != nil {
-		if pc, ok := a.permissionCacheInterface.(interface {
-			IsUserActive(accountID string) bool
-		}); ok {
-			if !pc.IsUserActive(secCtx.AccountID) {
-				return false, "user is inactive"
-			}
-		}
-	}
-
-	// Admin has access to all data
-	for _, role := range secCtx.Roles {
-		if role == "admin" {
-			return true, ""
-		}
+	if allowed, reason, handled := a.checkBaseAccess(secCtx); handled {
+		return allowed, reason
 	}
 
 	// If no spec access control, allow access (fallback)

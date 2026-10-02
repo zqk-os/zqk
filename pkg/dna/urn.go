@@ -65,11 +65,7 @@ func (u URN) MarshalJSON() ([]byte, error) {
 	return json.Marshal(s)
 }
 
-func (u *URN) UnmarshalJSON(b []byte) error {
-	var s string
-	if err := json.Unmarshal(b, &s); err != nil {
-		return err
-	}
+func (u *URN) parseAndSet(s string) error {
 	if strings.TrimSpace(s) == "" {
 		*u = URN{}
 		return nil
@@ -80,6 +76,14 @@ func (u *URN) UnmarshalJSON(b []byte) error {
 	}
 	*u = parsed
 	return nil
+}
+
+func (u *URN) UnmarshalJSON(b []byte) error {
+	var s string
+	if err := json.Unmarshal(b, &s); err != nil {
+		return err
+	}
+	return u.parseAndSet(s)
 }
 
 func (u URN) MarshalYAML() (interface{}, error) {
@@ -91,16 +95,7 @@ func (u *URN) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	if err := unmarshal(&s); err != nil {
 		return err
 	}
-	if strings.TrimSpace(s) == "" {
-		*u = URN{}
-		return nil
-	}
-	parsed, err := ParseURN(s)
-	if err != nil {
-		return err
-	}
-	*u = parsed
-	return nil
+	return u.parseAndSet(s)
 }
 
 // urnRegex matches canonical 4-segment URNs: urn:<brand>:<cell>:<kind>:<id>
