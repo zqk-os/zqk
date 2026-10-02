@@ -43,6 +43,7 @@ Available Commands:
   export-gate                    Audit candidate directory or open-core distribution against export gates
   federate                       Federate and synchronize kernel graph across distributed cluster nodes
   fswatcher-daemon               Start the FSWatcher daemon
+  generate-agent-configs         Write kernel boot directives into vendor agent config files
   git                            Git commit analysis and integration with work items
   health-data                    Output aggregated system-health data for dashboard
   improvement-report             Generate system improvement report with comparative analysis and prioritized work items

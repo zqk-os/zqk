@@ -23,3 +23,7 @@ Or prompt your paired AI assistant:
 - **Task Discovery**: Run `./bin/zqk workflow whats-next` to inspect shovel-ready items.
 - **Knowledge Kernel**: Kernel data stays under `.zqk/`. Process YAML goes through the CLI, not a text editor.
 - **Onboarding Guide**: Full documentation at [docs/onboarding/COMMUNITY_FIRST_RUN.md](docs/onboarding/COMMUNITY_FIRST_RUN.md).
+
+---
+
+> For the documentation quick-links index, see [docs/getting-started.md](docs/getting-started.md).

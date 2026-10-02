@@ -53,14 +53,14 @@ func NewInitCmd() *cobra.Command {
 		"  - "+paths.ProcessDir+"/ directory structure for object storage",
 		"  - Initial configuration files",
 	).
-		AddExample("Greenfield: Initialize in current directory", "%s system init").
-		AddExample("Declarative Seed: Initialize with answer file", "%s system init --answer-file seed.yaml").
-		AddExample("Legacy: Initialize existing project", "%s system init --legacy").
-		AddExample("Snapshot: Initialize from snapshot (test scenario)", zqkenv.TestRoot().Name()+"=test-scenarios/my-scenario %s system init --from-snapshot snapshot.csnap --wipe").
-		AddExample("Snapshot: Merge with existing data", "%s system init --from-snapshot snapshot.csnap --merge").
-		AddExample("Legacy + discover: Initialize and report existing objects", "%s system init --legacy --discover").
-		AddExample("Greenfield with maintenance jobs", "%s system init --with-maintenance-jobs").
-		AddExample("Greenfield with onboarding curriculum", "%s system init --with-onboarding-roadmap").
+		AddExample("Greenfield: Initialize in current directory (Note: 'system init' is an alias)", "%s init").
+		AddExample("Declarative Seed: Initialize with answer file", "%s init --answer-file seed.yaml").
+		AddExample("Legacy: Initialize existing project", "%s init --legacy").
+		AddExample("Snapshot: Initialize from snapshot (test scenario)", zqkenv.TestRoot().Name()+"=test-scenarios/my-scenario %s init --from-snapshot snapshot.csnap --wipe").
+		AddExample("Snapshot: Merge with existing data", "%s init --from-snapshot snapshot.csnap --merge").
+		AddExample("Legacy + discover: Initialize and report existing objects", "%s init --legacy --discover").
+		AddExample("Greenfield with maintenance jobs", "%s init --with-maintenance-jobs").
+		AddExample("Greenfield with onboarding curriculum", "%s init --with-onboarding-roadmap").
 		ExcludeCommonFlags()
 
 	initCmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewSystemInitCommandBuilder(), &cobra.Command{

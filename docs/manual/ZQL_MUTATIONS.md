@@ -31,10 +31,10 @@ To execute mutations safely, ZQL provides an `apply` execution pathway. The engi
 
 ```bash
 # Apply a declarative mutation payload from a file
-zqk object apply --file mutations/update_task.zql.yaml
+zqk mutate --file mutations/update_task.zql.yaml
 
 # Apply mutations with strict pre-condition enforcement
-zqk object apply --dry-run --file mutations/batch_realign.zql.yaml
+zqk mutate --dry-run --file mutations/batch_realign.zql.yaml
 ```
 
 ### Mutation Payload Example (`update_task.zql.yaml`)

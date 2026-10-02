@@ -1,0 +1,16 @@
+{
+  "subagent-context-enforcer": {
+    "PreToolUse": [
+      {
+        "matcher": "invoke_subagent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -x ./bin/zqk ]; then ./bin/zqk agent hook pre-subagent --vendor antigravity; elif [ -x /Users/lanceettl/zqk-public-candidate/bin/zqk ]; then /Users/lanceettl/zqk-public-candidate/bin/zqk agent hook pre-subagent --vendor antigravity; else zqk agent hook pre-subagent --vendor antigravity; fi",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}

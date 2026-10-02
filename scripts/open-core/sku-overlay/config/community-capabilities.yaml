@@ -1,0 +1,236 @@
+# Auto-generated from binary introspection. Do not edit manually.
+# Regenerate: ./scripts/open-core/generate-sku-manifest.sh
+sku: community
+generated_at: 2026-10-02T04:33:12Z
+top_level_commands:
+  - name: init
+    description: "Initialize a new ZQK project"
+  - name: quickstart
+    description: "Zero-friction project onboarding and quickstart guide"
+  - name: run
+    description: "Run a portable agent swarm package"
+  - name: auth
+    description: "Session and authentication"
+    subcommands:
+      - login
+      - logout
+  - name: do
+    description: "Execute autonomous single-command workflow loop for a backlog item or task"
+  - name: explain
+    description: "Explain kernel acronyms, ontology terms, and architectural concepts"
+  - name: grep
+    description: "In-process trigram and AST code search"
+  - name: inspect
+    description: "Interactive terminal object inspector and semantic projection viewer"
+  - name: mutate
+    description: "Execute declarative ZQL mutations and transactions"
+  - name: object
+    description: "Object operations (CRUD, query, and management)"
+  - name: pplan
+    description: "Priority plan operations (current)"
+  - name: query
+    description: "Execute declarative ZPARQL graph queries"
+  - name: state
+    description: "State — inspect live knowledge kernel state graph and audit journals"
+  - name: system
+    description: "System operations (health, validation, and maintenance)"
+    subcommands:
+      - agent-onboard
+      - align
+      - ambient-daemon
+      - audit-milestones
+      - audit-report
+      - audit-stream
+      - check
+      - check-policy
+      - clean-branches
+      - cleanup-duplicates
+      - cleanup-quarantine
+      - cli-hooks
+      - compact-journal
+      - compact-wal
+      - completion
+      - dashboard
+      - disk-usage
+      - emergency-manager
+      - ensure-retention-jobs
+      - evolve
+      - export-gate
+      - federate
+      - fswatcher-daemon
+      - generate-agent-configs
+      - git
+      - health-data
+      - improvement-report
+      - init
+      - kernel-integrity
+      - materialize-agent-chat-channel
+      - metrics
+      - migrate-cas
+      - object-count-report
+      - object-hygiene-scan
+      - orchestrate-batch
+      - policy-interrupts
+      - pre-commit
+      - prompt-builder
+      - quarantine-report
+      - quickstart
+      - rebuild-graph-projection
+      - recover-cas
+      - repair-cas-corruption
+      - reports
+      - resource-hygiene
+      - retention-tolerance
+      - seal-skill
+      - seed-default-agent-seating
+      - semantic-bridge-daemon
+      - shutdown
+      - snapshot
+      - snapshot-expand
+      - snapshot-scenario
+      - snapshot-verify
+      - spec-origination
+      - start
+      - start-here
+      - state-commit
+      - state-diff
+      - state-restore
+      - status
+      - stream-gc
+      - sync
+      - sync-cas-index
+      - sync-git-hooks
+      - telemetry
+      - truth-sentinel
+      - update-specs
+      - validate
+      - validate
+      - validate-agent-rules
+      - validate-command-specs
+      - validate-scenario
+      - verify-completion
+      - whoami
+  - name: test
+    description: "Execute verification tests linked to test cases and criteria"
+  - name: ui
+    description: "Interactive full-screen terminal mission control"
+  - name: validate
+    description: "Validation and verification commands"
+  - name: version
+    description: "Print version, commit, and build timestamp"
+  - name: workflow
+    description: "Manage and execute autonomous engineering workflows and lifecycle pipelines"
+  - name: automation
+    description: "Automation and integration operations (hooks, CI/CD, and scripts)"
+  - name: callback
+    description: "Handle scheduler job callbacks and notifications"
+  - name: ci
+    description: "Local CI (commit → checkout elsewhere → test run)"
+  - name: completion
+    description: "Generate shell completion script"
+  - name: daemon
+    description: "Manage background daemons under unified process group supervision"
+  - name: feed
+    description: "Agent correspondence feed (steer / status onto agent_feed JSONL)"
+  - name: inbox
+    description: "Inspect and manage the agent autonomy inbox"
+  - name: intake
+    description: "Semantic ingestion pipeline (Intent Capture)"
+  - name: kernel
+    description: "Knowledge Kernel governance, steward, and runtime lifecycle"
+  - name: keystore
+    description: "Keystore operations (create, issue, list, rotate keys)"
+  - name: learn
+    description: "Interactive curriculum mode"
+  - name: mcp
+    description: "MCP server operations"
+    subcommands:
+      - cursor-adapter
+      - daemon
+      - ensure
+      - ide-adapter
+      - install
+      - list-tools
+      - proxy
+      - serve
+      - supervise
+  - name: new
+    description: "Write draft YAML templates for object create and scenario bundles"
+  - name: pre-commit
+    description: "Pre-commit background results (aggregate and write category results)"
+  - name: reports
+    description: "Generate AI metrics reports (PCS, EDD, D&B)"
+  - name: scheduler
+    description: "Manage background scheduler daemon, jobs, and recurrent tasks"
+  - name: sync
+    description: "Synchronize Knowledge Kernel backlog items with external trackers"
+  - name: tray
+    description: "Tray — configurable named shortcuts to zqk subcommands"
+  - name: vendor
+    description: "Vendor-specific integrations and IDE adapters"
+  - name: agent
+    description: "Multi-agent orchestration and delegation"
+    subcommands:
+      - chat-responder
+      - claim
+      - claim-gate
+      - evaluate-run
+      - execute
+      - feed
+      - guiding-step
+      - hook
+      - learn
+      - new
+      - next
+      - orchestrate
+      - prepare-context
+      - recover
+      - release
+      - scoreboard
+      - seat-worker
+      - status
+      - swarm
+      - swarm-init
+      - sync-loop
+      - synthesize-skill
+      - validate
+  - name: ambient
+    description: "Manage ambient event processing"
+  - name: convergence
+    description: "Convergence measurement & nest management"
+  - name: docman
+    description: "Documentation management operations"
+  - name: domain
+    description: "Domain ontology discovery and registration"
+  - name: graph
+    description: "Graph-based operations and reasoning"
+  - name: job
+    description: "Background scheduler job triggers, queues, history, and status"
+  - name: join
+    description: "Join a node or agent into an existing federation or mesh network"
+  - name: kind-pack
+    description: "Record a verified spec pack as typed object kinds"
+  - name: matrix
+    description: "Traceability matrices (CSV registries, validation, reports)"
+  - name: mesh
+    description: "Manage peer-to-peer agent mesh networking, routing, and discovery"
+  - name: observer
+    description: "Observer agent operations"
+  - name: ontology
+    description: "Ontology import and translation"
+  - name: ops
+    description: "Operations and utility commands"
+  - name: organizational
+    description: "Organizational structure and change impact analysis"
+  - name: pack
+    description: "Holonic swarm package management (scaffold, seal, validate)"
+  - name: rollback
+    description: "List and apply rollback points (lifecycle/maintenance snapshots)"
+  - name: semantic
+    description: "Semantic operations and maturity assessment"
+  - name: service
+    description: "Manage per-root host OS scheduler units (launchd/systemd)"
+  - name: spec
+    description: "Spec operations (list and manage object specifications)"
+  - name: swarm
+    description: "Multi-agent swarm observability and throughput"

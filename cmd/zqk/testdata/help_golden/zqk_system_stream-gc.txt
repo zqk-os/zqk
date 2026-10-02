@@ -1,7 +1,25 @@
-Run garbage collector to prune orphaned JSONL stream segment files
+Scans .zqk/streams/ across all object kinds to identify and safely prune
+
+orphaned JSONL segment files that are no longer referenced by active indexes.
+
+Reclaims disk space and avoids file descriptor exhaustion in long-running
+
+agent hives without compromising historical durability.
+
+  Perform stream garbage collection across all object kinds
+  zqk system stream-gc
 
 Usage:
   zqk system stream-gc [flags]
+
+Flags:
+      --columns string          Override column widths for table output (format: field:width)
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+      --ignore-scheduler-down   Ignore scheduler down warning/lockdown
+  -o, --output string           Write output to file
+  -q, --quiet                   Suppress non-essential output
+      --timeout duration        Timeout for command execution (0 = auto-calculate)
+  -v, --verbose                 Verbose output
 
 Global Flags:
       --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

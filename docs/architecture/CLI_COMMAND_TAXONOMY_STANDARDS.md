@@ -94,6 +94,8 @@ All commands must implement the standard **Command DNA**:
 
 ## 3. Canonical Domain Taxonomy Matrix
 
+> **Implementation Note (Current State):** The canonical taxonomy below is an aspirational governance target. The current CLI surface (`cmd/zqk/`) includes additional root commands beyond the approved list. These grandfathered or legacy commands are actively under review for consolidation, retirement, or explicit approval.
+
 | Domain Namespace | Primary Responsibilities | Example Commands |
 | :--- | :--- | :--- |
 | **`zqk init`** | Zero-friction greenfield project knowledge kernel initialization | `init`, `init my-project` |

@@ -1,4 +1,5 @@
 Provides cluster federation controls, peer synchronization, and distributed
+
 event coordination.
 
 Usage:

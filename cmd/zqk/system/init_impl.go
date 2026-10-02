@@ -1222,7 +1222,7 @@ Your editor was automatically detected and configured during initialization. If 
 - **Cursor**: Pre-configured! Automatically detects '.agents/AGENTS.md' and '.cursor/mcp.json'. Prompt Cursor Composer: *"You are paired with the ZQK Knowledge Kernel. Run '%s do' to claim and execute work."*
 - **Claude Desktop**: Auto-install the MCP server:
   `+"```bash"+`
-  %s mcp install --client claude-desktop
+  %s mcp install
   `+"```"+`
   Restart Claude Desktop; the ZQK tools icon will appear.
 - **Claude Code (CLI)**: Register MCP in Claude Code:

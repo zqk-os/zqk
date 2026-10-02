@@ -9,3 +9,7 @@ Welcome to ZQK Core, the foundational Knowledge Kernel for sovereign human-agent
 - **[First-Run Object Tutorial](./onboarding/FIRST_RUN_OBJECT_TUTORIAL.md)**: Hands-on walk-through creating and updating your first kernel objects.
 - **[Architecture Overview](./architecture/README.md)**: High-level overview of the Knowledge Kernel, CAS, and daemon architecture.
 - **[Documentation Index](./INDEX.md)**: Full directory of all documentation guides and specifications.
+
+---
+
+> For the post-initialization welcome guide, see [ZQK_GETTING_STARTED.md](../ZQK_GETTING_STARTED.md).

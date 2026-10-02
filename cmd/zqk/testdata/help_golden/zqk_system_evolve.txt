@@ -1,4 +1,5 @@
 Executes automated schema updates, dialect migrations, and architectural
+
 ontology evolution cycles.
 
 Usage:

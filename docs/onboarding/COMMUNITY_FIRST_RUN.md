@@ -21,7 +21,7 @@ Use `zqk` (or `./bin/zqk` from this tree). **Do not** `export ZQK_PROJECT_ROOT` 
 
 **New Project (Greenfield):**
 ```bash
-zqk system init --with-onboarding-roadmap
+zqk system init --with-onboarding-roadmap # zqk init is a top-level alias for zqk system init
 zqk ui -w
 zqk do
 ```
@@ -47,7 +47,7 @@ See [Sovereign Air-Gapped AI Engineering Specification](../architecture/SOVEREIG
 ```bash
 zqk init                                          # Greenfield setup (skip if .zqk/ exists)
 zqk system agent-onboard                          # Detect IDE/Ollama, prime rules, & seat agent
-zqk quickstart                                    # Walkthrough
+zqk quickstart                                    # Walkthrough (alias: zqk system start-here)
 zqk workflow whats-next                           # Discover active plan and shovel-ready tasks
 zqk do                                            # Autonomously claim and execute work
 zqk ui -w                                         # Launch visual Web Studio (timeline & DAG)
@@ -109,7 +109,7 @@ zqk grep "error" --max-tokens 2000 -f json     # Token-budgeted JSON output for 
 5. `zqk state tree` — inspect the live knowledge graph hierarchy.
 6. `zqk object list` — first-run scoreboard.
 7. `zqk object inspect` — interactive object inspector, lineage radar, and live Policy Studio.
-8. `zqk system dashboard` (or `zqk ui`) — Mission Control Console with dedicated QA Tab (`--tab qa`).
+8. `zqk system dashboard` (or `zqk ui`) — Mission Control Console with dedicated Audit Tab (`--tab audit`).
 9. `zqk test dashboard --check-dod` — test_case ↔ criteria lineage and 100% Definition of Done verification.
 10. `zqk workflow whats-next --format json`.
 

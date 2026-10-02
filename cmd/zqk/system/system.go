@@ -46,7 +46,7 @@ func NewSystemCmd() *cobra.Command {
 	systemCmd.AddCommand(NewImprovementReportCmd())
 	systemCmd.AddCommand(NewEnsureRetentionJobsCmd())
 	systemCmd.AddCommand(NewRetentionToleranceCmd())
-	// Deprecated migration commands removed - use 'system migrate' with migration specs instead
+	// Legacy migration commands (retained for backward compatibility)
 	systemCmd.AddCommand(NewMigrateCasCmd())
 	systemCmd.AddCommand(NewCompactJournalCmd())
 	systemCmd.AddCommand(NewCompactWALCmd())
