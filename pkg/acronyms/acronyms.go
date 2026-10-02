@@ -487,10 +487,10 @@ func LoadFromKernel(ctx context.Context, secCtx *pkgctx.SecurityContext, store s
 	}
 
 	registryMu.Lock()
-	defer registryMu.Unlock()
 	for _, a := range items {
 		registry[a.Code] = a
 	}
+	registryMu.Unlock()
 	return nil
 }
 

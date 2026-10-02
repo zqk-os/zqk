@@ -90,11 +90,7 @@ func StartBoundCLIScheduler(t testing.TB, opts BoundCLISchedulerOpts) *BoundCLIS
 
 	t.Cleanup(func() {
 		cancelBound()
-		stopCmd := exec.Command(opts.CLIBinary, "scheduler", "stop", "--test-id="+testID, "--force") //nolint:gosec // test binary path from caller
-		WireCLISubprocessForIsolatedProject(stopCmd, opts.ProjectRoot)
-		if opts.Env != nil {
-			stopCmd.Env = opts.Env
-		}
+		stopCmd := buildSchedulerStopCmd(opts, testID)
 		if stopOut, stopErr := stopCmd.CombinedOutput(); stopErr != nil {
 			t.Logf("bound CLI scheduler cleanup: stop --force: %v\n%s", stopErr, stopOut)
 		}
@@ -108,16 +104,21 @@ func StartBoundCLIScheduler(t testing.TB, opts BoundCLISchedulerOpts) *BoundCLIS
 			if boundCtx.Err() != context.DeadlineExceeded {
 				return
 			}
-			stopCmd := exec.Command(opts.CLIBinary, "scheduler", "stop", "--test-id="+testID, "--force") //nolint:gosec // test binary path from caller
-			WireCLISubprocessForIsolatedProject(stopCmd, opts.ProjectRoot)
-			if opts.Env != nil {
-				stopCmd.Env = opts.Env
-			}
+			stopCmd := buildSchedulerStopCmd(opts, testID)
 			_ = stopCmd.Run() //nolint:errcheck // best-effort orphan prevention
 		}()
 	})
 
 	return h
+}
+
+func buildSchedulerStopCmd(opts BoundCLISchedulerOpts, testID string) *exec.Cmd {
+	stopCmd := exec.Command(opts.CLIBinary, "scheduler", "stop", "--test-id="+testID, "--force") //nolint:gosec // test binary path from caller
+	WireCLISubprocessForIsolatedProject(stopCmd, opts.ProjectRoot)
+	if opts.Env != nil {
+		stopCmd.Env = opts.Env
+	}
+	return stopCmd
 }
 
 // BoundSchedulerStartContext returns a child context canceled on test cleanup and after max

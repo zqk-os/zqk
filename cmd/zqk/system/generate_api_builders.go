@@ -100,9 +100,7 @@ func NewGenerateAPIBuildersCmd() *cobra.Command {
 		}
 
 		logging.Fluent(logger).Info("Starting api_spec builder generation").Log()
-		generated := 0
-		skipped := 0
-		errors := 0
+		var generated, skipped, errors int
 
 		for _, entry := range entries {
 			if entry.IsDir() {

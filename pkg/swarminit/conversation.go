@@ -29,8 +29,7 @@ func ProbeConversationViaAgentAPI(ctx context.Context, bin, lsAddr, conversation
 		cmd.Env = append(cmd.Env, "ANTIGRAVITY_LS_ADDRESS="+ls)
 	}
 	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
+	cmd.Stdout, cmd.Stderr = &stdout, &stderr
 	if err := cmd.Run(); err != nil {
 		blob := stdout.String() + stderr.String() + err.Error()
 		if strings.Contains(strings.ToLower(blob), "trajectory not found") {

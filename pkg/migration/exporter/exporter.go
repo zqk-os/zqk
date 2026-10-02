@@ -105,14 +105,7 @@ func (e *GraphExporter) ExportToYAML(properties map[string]any) ([]byte, error) 
 
 // toLabel converts a snake_case kind to PascalCase label
 func toLabel(kind string) string {
-	parts := strings.Split(kind, "_")
-	var labelParts []string
-	for _, part := range parts {
-		if part != emptyValue {
-			labelParts = append(labelParts, strings.ToUpper(part[:1])+strings.ToLower(part[1:]))
-		}
-	}
-	return strings.Join(labelParts, "")
+	return provider.ToLabel(kind)
 }
 
 // GetEntitySourcePath retrieves the original source path from Document node

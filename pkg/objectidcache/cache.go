@@ -441,26 +441,17 @@ func (c *ObjectIDCache) LoadCache(projectRoot string) (bool, error) {
 		}
 	}
 
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
-	defer cancel()
-	_ = concurrency.WithLockTimeout(
-		&c.mu,
-		ctx,
-		nil,
-		logging.NewLockLoggerAdapter(logger),
-		LockNameObjectIDCacheLoad,
-		func() error {
-			c.byKind = byKind
-			c.idToKind = idToKind
-			c.idToIndex = buildIDToIndex(byKind)
-			c.metadata = metadata
-			c.countByKind = countByKind
-			c.processDir = processDir
-			return nil
-		},
-	)
+	_ = c.withLockTimeout(LockNameObjectIDCacheLoad, func() error {
+		c.byKind = byKind
+		c.idToKind = idToKind
+		c.idToIndex = buildIDToIndex(byKind)
+		c.metadata = metadata
+		c.countByKind = countByKind
+		c.processDir = processDir
+		return nil
+	})
 
+	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	logging.Fluent(logger).Debug("Loaded object ID cache from disk").
 		EntryCount(entryCount).
 		String("build_time", metadata.BuildTime.Format(time.RFC3339)).
@@ -471,21 +462,40 @@ func (c *ObjectIDCache) LoadCache(projectRoot string) (bool, error) {
 	return true, nil
 }
 
+func (c *ObjectIDCache) withLockTimeout(lockName string, fn func() error) error {
+	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
+	defer cancel()
+	return concurrency.WithLockTimeout(
+		&c.mu,
+		ctx,
+		nil,
+		logging.NewLockLoggerAdapter(logger),
+		lockName,
+		fn,
+	)
+}
+
+func (c *ObjectIDCache) withRLockTimeout(lockName string, fn func() error) error {
+	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
+	defer cancel()
+	return concurrency.WithRLockTimeout(
+		&c.mu,
+		ctx,
+		nil,
+		logging.NewLockLoggerAdapter(logger),
+		lockName,
+		fn,
+	)
+}
+
 // kindNamesForReverseReferenceScan returns kind keys from the in-memory object ID cache (after LoadCache or BuildCache).
 // Used to build the reverse reference index in the same goroutine as cache load without a separate discovery pass.
 // Matches other ObjectIDCache readers (e.g. Get): [concurrency.WithRLockTimeout] + lock logger + bounded ctx.
 func (c *ObjectIDCache) kindNamesForReverseReferenceScan() []string {
 	var kinds []string
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
-	defer cancel()
-	_ = concurrency.WithRLockTimeout(
-		&c.mu,
-		ctx,
-		nil,
-		logging.NewLockLoggerAdapter(logger),
-		LockNameObjectIDCacheKindNamesForReverseRef,
-		func() error {
+	_ = c.withRLockTimeout(LockNameObjectIDCacheKindNamesForReverseRef, func() error {
 			if len(c.byKind) == 0 {
 				return nil
 			}
@@ -505,7 +515,6 @@ func (c *ObjectIDCache) kindNamesForReverseReferenceScan() []string {
 func (c *ObjectIDCache) SaveCache(projectRoot string) error {
 	saveStart := time.Now()
 	var entryCount int
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	cachePath := c.getCacheFilePath(projectRoot)
 	cacheDir := filepath.Dir(cachePath)
 	if err := fileutil.MkdirAll(cacheDir, paths.DirPerm755); err != nil {
@@ -519,13 +528,7 @@ func (c *ObjectIDCache) SaveCache(projectRoot string) error {
 	}
 
 	var v2 ObjectIDCacheFileV2
-	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
-	defer cancel()
-	_ = concurrency.WithLockTimeout(
-		&c.mu,
-		ctx,
-		nil,
-		logging.NewLockLoggerAdapter(logger),
+	_ = c.withLockTimeout(
 		LockNameObjectIDCacheSavePrepare,
 		func() error {
 			c.metadata = &ObjectIDCacheMetadata{
@@ -644,14 +647,7 @@ func (c *ObjectIDCache) Set(id string, entry *ObjectIDCacheEntry) {
 	}
 	pathToStore := kindBucketPathToStore(c.getProcessDir(), entry.Kind, entry.FilePath)
 	e := KindBucketEntry{ID: id, Path: pathToStore, MTime: entry.MTime}
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
-	defer cancel()
-	_ = concurrency.WithLockTimeout(
-		&c.mu,
-		ctx,
-		nil,
-		logging.NewLockLoggerAdapter(logger),
+	_ = c.withLockTimeout(
 		LockNameObjectIDCacheSet,
 		func() error {
 			if c.byKind == nil {
@@ -685,14 +681,7 @@ func (c *ObjectIDCache) Set(id string, entry *ObjectIDCacheEntry) {
 
 // Invalidate removes an entry from the cache (for deleted objects)
 func (c *ObjectIDCache) Invalidate(id string) {
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
-	defer cancel()
-	_ = concurrency.WithLockTimeout(
-		&c.mu,
-		ctx,
-		nil,
-		logging.NewLockLoggerAdapter(logger),
+	_ = c.withLockTimeout(
 		LockNameObjectIDCacheInvalidate,
 		func() error {
 			if c.idToKind == nil {
@@ -994,12 +983,7 @@ func (c *ObjectIDCache) BuildCache(buildCtx stdcontext.Context, projectRoot stri
 
 		// Emit cache load event
 		var entryCount int
-		logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-		_ = concurrency.WithRLockTimeout(
-			&c.mu,
-			pkgctx.NewSystemContext(),
-			nil,
-			logging.NewLockLoggerAdapter(logger),
+		_ = c.withRLockTimeout(
 			LockNameObjectIDCacheBuildGetCountLoaded,
 			func() error {
 				entryCount = len(c.idToKind)
@@ -1058,12 +1042,7 @@ func (c *ObjectIDCache) BuildCache(buildCtx stdcontext.Context, projectRoot stri
 
 	// Verify cache was populated after rebuild
 	var entryCount int
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	_ = concurrency.WithRLockTimeout(
-		&c.mu,
-		pkgctx.NewSystemContext(),
-		nil,
-		logging.NewLockLoggerAdapter(logger),
+	_ = c.withRLockTimeout(
 		LockNameObjectIDCacheBuildVerify,
 		func() error {
 			entryCount = len(c.idToKind)
@@ -1092,11 +1071,7 @@ func (c *ObjectIDCache) BuildCache(buildCtx stdcontext.Context, projectRoot stri
 			}
 		}
 		// Cache was built successfully - emit event
-		_ = concurrency.WithRLockTimeout(
-			&c.mu,
-			pkgctx.NewSystemContext(),
-			nil,
-			logging.NewLockLoggerAdapter(logger),
+		_ = c.withRLockTimeout(
 			LockNameObjectIDCacheBuildGetCountBuilt,
 			func() error {
 				entryCount = len(c.idToKind)

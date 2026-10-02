@@ -13,7 +13,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/nildecode"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/pipeline"
-	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/when"
 )
 
@@ -149,15 +148,7 @@ func (f *FileObjectStorage) Exists(ctx context.Context, secCtx *pkgctx.SecurityC
 	if err := ctx.Err(); err != nil {
 		return false, err
 	}
-	_, err = fileutil.Stat(filePath)
-	if err == nil {
-		return true, nil
-	}
-	if fileutil.IsNotExist(err) {
-		return false, nil
-	}
-	// Other error (permission, etc.)
-	return false, errfmt.Newf(ConstStreamFailedToCheckFileExistence).Wrap(err)
+	return fileExistsOnDisk(filePath, ConstStreamFailedToCheckFileExistence)
 }
 
 // Count counts objects matching the filter

@@ -32,6 +32,15 @@ func NewExternalTSDBProvider(config ExternalTSDBConfig) *ExternalTSDBProvider {
 	}
 }
 
+func (p *ExternalTSDBProvider) validateConfigType() error {
+	switch p.config.Type {
+	case "influxdb", "prometheus", "opentsdb":
+		return nil
+	default:
+		return errfmt.Errorf("unsupported external tsdb type: %s", p.config.Type)
+	}
+}
+
 // Initialize prepares the connection to the external TSDB.
 func (p *ExternalTSDBProvider) Initialize(ctx context.Context) error {
 	logging.Fluent(p.logger).Info("Initializing external TSDB provider").
@@ -39,17 +48,7 @@ func (p *ExternalTSDBProvider) Initialize(ctx context.Context) error {
 		String("endpoint", p.config.Endpoint).
 		Log()
 
-	switch p.config.Type {
-	case "influxdb":
-		// Initialize InfluxDB client
-	case "prometheus":
-		// Initialize Prometheus pushgateway client or similar
-	case "opentsdb":
-		// Initialize OpenTSDB client
-	default:
-		return errfmt.Errorf("unsupported external tsdb type: %s", p.config.Type)
-	}
-	return nil
+	return p.validateConfigType()
 }
 
 // WritePoint writes a single data point to the external TSDB.
@@ -63,19 +62,7 @@ func (p *ExternalTSDBProvider) WriteBatch(ctx context.Context, points []TSDBPoin
 		return nil
 	}
 
-	// Example adapter logic placeholder
-	switch p.config.Type {
-	case "influxdb":
-		// Convert points to Influx line protocol and send over HTTP
-	case "prometheus":
-		// Convert points to Prometheus format
-	case "opentsdb":
-		// Convert points to OpenTSDB put format
-	default:
-		return errfmt.Errorf("unsupported external tsdb type: %s", p.config.Type)
-	}
-
-	return nil
+	return p.validateConfigType()
 }
 
 // Query executes a query against the time-series data on the external TSDB.

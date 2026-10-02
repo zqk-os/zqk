@@ -1,31 +1,36 @@
-// Extracted from reverse_reference_index.go (BLI-CEF-STORAGE-DECOMPOSE-001).
 package storage
 
 import (
-	stdcontext "context"
 	"encoding/json"
 	"path/filepath"
 	"time"
 
-	"github.com/zqk-os/zqk/pkg/concurrency"
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/zqk-os/zqk/pkg/logging"
 	locknames "github.com/zqk-os/zqk/pkg/storage/locknames"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
+func readOptionalCacheFile(cachePath string) ([]byte, error) {
+	data, err := fileutil.ReadFile(cachePath)
+	if fileutil.IsNotExist(err) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, errfmt.Newf(ConstMiscFailedToReadCacheFile).Wrap(err)
+	}
+	return data, nil
+}
+
 func (r *ReverseReferenceIndex) LoadCache(projectRoot string) (bool, error) {
 	cachePath := r.getCacheFilePath(projectRoot)
 
-	data, err := fileutil.ReadFile(cachePath)
-	if fileutil.IsNotExist(err) {
-		// Cache doesn't exist - will be built fresh
-		return false, nil
-	}
+	data, err := readOptionalCacheFile(cachePath)
 	if err != nil {
-		return false, errfmt.Newf(ConstMiscFailedToReadCacheFile).Wrap(err)
+		return false, err
+	}
+	if data == nil {
+		return false, nil
 	}
 
 	// Parse cache file
@@ -57,15 +62,8 @@ func (r *ReverseReferenceIndex) LoadCache(projectRoot string) (bool, error) {
 	}
 
 	// Cache is valid - load it (after I/O operations)
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	var entryCount int
-	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
-	defer cancel()
-	var errLock = concurrency.WithLockTimeout(
-		&r.mu,
-		ctx,
-		nil,
-		logging.NewLockLoggerAdapter(logger),
+	var errLock = r.withWriteLock(
 		locknames.LockNameReverseReferenceIndexLoad,
 		func() error {
 			if r.index == nil {
@@ -91,7 +89,7 @@ func (r *ReverseReferenceIndex) LoadCache(projectRoot string) (bool, error) {
 		return false, errfmt.Errorf("reverse reference index lock timeout during load: %w", errLock)
 	}
 
-	StorageLog(logger).Debug(LogEventStorageReverseRefIndexLoadedDebug).
+	StorageLog(newReverseRefIndexLockLogger()).Debug(LogEventStorageReverseRefIndexLoadedDebug).
 		EntryCount(entryCount).
 		BuildTime(zqktime.FormatRFC3339UTC(cacheData.Metadata.BuildTime)).
 		Log()
@@ -103,14 +101,7 @@ func (r *ReverseReferenceIndex) LoadCache(projectRoot string) (bool, error) {
 func (r *ReverseReferenceIndex) SaveCache(projectRoot string) error {
 	saveStart := time.Now()
 	var entryCount int
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
-	defer cancel()
-	var errCount = concurrency.WithRLockTimeout(
-		&r.mu,
-		ctx,
-		nil,
-		logging.NewLockLoggerAdapter(logger),
+	var errCount = r.withReadLock(
 		locknames.LockNameReverseReferenceIndexSaveGetCount,
 		func() error {
 			entryCount = len(r.index)
@@ -133,13 +124,7 @@ func (r *ReverseReferenceIndex) SaveCache(projectRoot string) error {
 		Metadata *ReverseReferenceIndexMetadata `json:"metadata"`
 		Index    map[string][]string            `json:"index"`
 	}
-	ctx2, cancel2 := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
-	defer cancel2()
-	var errPrepare = concurrency.WithLockTimeout(
-		&r.mu,
-		ctx2,
-		nil,
-		logging.NewLockLoggerAdapter(logger),
+	var errPrepare = r.withWriteLock(
 		locknames.LockNameReverseReferenceIndexSavePrepare,
 		func() error {
 			r.metadata = &ReverseReferenceIndexMetadata{
@@ -151,7 +136,6 @@ func (r *ReverseReferenceIndex) SaveCache(projectRoot string) error {
 
 			cacheData.Index = make(map[string][]string, len(r.index))
 			for k, v := range r.index {
-
 				dependents := make([]string, len(v))
 				copy(dependents, v)
 				cacheData.Index[k] = dependents
@@ -177,7 +161,7 @@ func (r *ReverseReferenceIndex) SaveCache(projectRoot string) error {
 		return errfmt.Newf(ConstMiscFailedToWriteCacheFile).Wrap(err)
 	}
 
-	StorageLog(logger).Debug(LogEventStorageReverseRefIndexSavedDebug).
+	StorageLog(newReverseRefIndexLockLogger()).Debug(LogEventStorageReverseRefIndexSavedDebug).
 		EntryCount(entryCount).
 		ElapsedString(time.Since(saveStart).Round(time.Millisecond).String()).
 		Log()

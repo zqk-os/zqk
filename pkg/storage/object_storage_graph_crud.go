@@ -165,14 +165,9 @@ func (g *GraphObjectStorage) Update(ctx context.Context, secCtx *pkgctx.Security
 	}
 
 	// Read existing object
-	existing, err := g.Read(ctx, secCtx, id)
+	existing, kind, err := readExistingKind(g, ctx, secCtx, id)
 	if err != nil {
 		return err
-	}
-
-	kind, ok := existing[objects.FieldKeyKind].(string)
-	if !ok {
-		return errfmt.Errorf(ConstStreamObjectMissingKindField2)
 	}
 
 	// Check permission

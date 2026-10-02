@@ -77,14 +77,18 @@ func (f *FileObjectStorage) existsStreamBacked(ctx context.Context, id, kind str
 		_, err := fileutil.Stat(segmentPath)
 		return err == nil, nil
 	}
-	_, err = fileutil.Stat(filePath)
+	return fileExistsOnDisk(filePath, ConstStreamFailedToCheckStreamBackedObjectExistence)
+}
+
+func fileExistsOnDisk(filePath, errMsg string) (bool, error) {
+	_, err := fileutil.Stat(filePath)
 	if err == nil {
 		return true, nil
 	}
 	if fileutil.IsNotExist(err) {
 		return false, nil
 	}
-	return false, errfmt.Newf(ConstStreamFailedToCheckStreamBackedObjectExistence).Wrap(err)
+	return false, errfmt.Newf(errMsg).Wrap(err)
 }
 
 // updateStreamBacked writes stream_current + change journal and invalidates list cache; no CAS or hash registry.

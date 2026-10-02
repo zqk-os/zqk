@@ -79,14 +79,7 @@ func (w *GraphWriter) CreateHASSOURCEEdge(ctx context.Context, entityID, documen
 
 // toLabel converts a snake_case kind to PascalCase label
 func toLabel(kind string) string {
-	parts := strings.Split(kind, "_")
-	var labelParts []string
-	for _, part := range parts {
-		if part != emptyValue {
-			labelParts = append(labelParts, strings.ToUpper(part[:1])+strings.ToLower(part[1:]))
-		}
-	}
-	return strings.Join(labelParts, "")
+	return provider.ToLabel(kind)
 }
 
 // CreateBatch creates multiple nodes/edges in a batch

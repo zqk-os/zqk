@@ -91,16 +91,7 @@ func (f *FileObjectStorage) listStreamSegmentsWithLimit(ctx context.Context, _ *
 	defer ReleaseListCountSlot(ctx)
 	ctx = listCtx
 
-	maxWorkers := getListReadWorkers()
-	if len(segments) < maxWorkers {
-		maxWorkers = len(segments)
-	}
-
-	workCh := make(chan string, len(segments))
-	for _, s := range segments {
-		workCh <- s
-	}
-	close(workCh)
+	workCh, maxWorkers := createSegmentWorkChannel(segments, getListReadWorkers())
 
 	type workerResult struct {
 		objects []map[string]any
@@ -338,16 +329,7 @@ func (f *FileObjectStorage) countStreamSegmentsWithFilters(ctx context.Context, 
 	defer ReleaseListCountSlot(ctx)
 	ctx = listCtx
 
-	maxWorkers := getListReadWorkers()
-	if len(segments) < maxWorkers {
-		maxWorkers = len(segments)
-	}
-
-	workCh := make(chan string, len(segments))
-	for _, s := range segments {
-		workCh <- s
-	}
-	close(workCh)
+	workCh, maxWorkers := createSegmentWorkChannel(segments, getListReadWorkers())
 
 	results := make(chan int, maxWorkers)
 	var wg sync.WaitGroup

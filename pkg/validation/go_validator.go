@@ -1333,9 +1333,9 @@ func (gv *GoValidator) validateUnknownFields(kind string, obj map[string]any, sp
 }
 
 func validateDuplicateRefs(obj map[string]any) []ValidationError {
-	var errs []ValidationError
-	refOccurrences := make(map[string]string)
 	seenInField := make(map[string]map[string]bool)
+	refOccurrences := make(map[string]string)
+	var errs []ValidationError
 
 	var keys []string
 	for k := range obj {

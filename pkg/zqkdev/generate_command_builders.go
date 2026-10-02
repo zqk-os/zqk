@@ -93,9 +93,7 @@ func NewGenerateCommandBuildersCmd() *cobra.Command {
 			String("specs_dir", specsDir).
 			Bool("include_process_command_specs", includeProcessCommandSpecs).
 			Log()
-		generated := 0
-		skipped := 0
-		errors := 0
+		var generated, skipped, errors int
 
 		for _, yamlPath := range yamlFiles {
 			relPath, err := filepath.Rel(specsDir, yamlPath)

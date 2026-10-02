@@ -9,7 +9,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/graph/provider"
 	"github.com/zqk-os/zqk/pkg/logging"
-	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // BeginTransaction starts a transaction for atomic multi-object operations
@@ -58,14 +57,9 @@ func (tx *GraphObjectTransaction) Update(ctx context.Context, secCtx *pkgctx.Sec
 // Delete deletes an object within the transaction
 func (tx *GraphObjectTransaction) Delete(ctx context.Context, secCtx *pkgctx.SecurityContext, id string, cascade bool) error {
 	// Read existing object to get kind
-	existing, err := tx.storage.Read(ctx, secCtx, id)
+	_, kind, err := readExistingKind(tx.storage, ctx, secCtx, id)
 	if err != nil {
 		return err
-	}
-
-	kind, ok := existing[objects.FieldKeyKind].(string)
-	if !ok {
-		return errfmt.Errorf(ConstStreamObjectMissingKindField2)
 	}
 
 	label := toLabel(kind)

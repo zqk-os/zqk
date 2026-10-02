@@ -66,8 +66,7 @@ func RunRaceGate(ctx context.Context, cfg RaceGateConfig) (*RaceGateResult, erro
 	setupIsolatedCommandEnv(cmd, tmpDir, nil, cfg.Env)
 
 	var combinedBuf bytes.Buffer
-	cmd.Stdout = &combinedBuf
-	cmd.Stderr = &combinedBuf
+	cmd.Stdout, cmd.Stderr = &combinedBuf, &combinedBuf
 
 	runErr := cmd.Run()
 	res.Duration = time.Since(start)

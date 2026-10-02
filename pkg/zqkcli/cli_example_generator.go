@@ -446,16 +446,23 @@ func (g *CLIExampleGenerator) GenerateGraphCLICommandExamples(kind string) ([]st
 	})
 }
 
+func (g *CLIExampleGenerator) generateExampleID(kind string) (string, error) {
+	exampleObj, err := g.GenerateExampleObject(kind, "")
+	if err != nil {
+		return "", err
+	}
+	exampleID, _ := exampleObj[objects.FieldKeyID].(string)
+	return exampleID, nil
+}
+
 func (g *CLIExampleGenerator) generateCommandExamplesFromTemplates(kind string, templates []string) ([]string, error) {
 	var examples []string
 
-	// Generate example object
-	exampleObj, err := g.GenerateExampleObject(kind, "")
+	exampleID, err := g.generateExampleID(kind)
 	if err != nil {
 		return nil, err
 	}
 
-	exampleID, _ := exampleObj[objects.FieldKeyID].(string)
 	exampleYAML, err := g.GenerateYAMLExample(kind, exampleID)
 	if err != nil {
 		return nil, err
@@ -518,12 +525,10 @@ func (g *CLIExampleGenerator) generateBootstrapScriptFromTemplate(templateName, 
 	}
 
 	// Generate example objects
-	exampleObj, err := g.GenerateExampleObject(kind, "")
+	exampleID, err := g.generateExampleID(kind)
 	if err != nil {
 		return nil, err
 	}
-
-	exampleID, _ := exampleObj[objects.FieldKeyID].(string)
 
 	// Generate root YAML
 	rootID := strings.Replace(exampleID, "001", "ROOT-001", 1)

@@ -193,13 +193,12 @@ func (iv *InstanceValidator) validateInstanceLegacy(obj map[string]any, kind, cu
 //nolint:gocyclo // Function orchestrates multiple validation checks; complexity reduced via helper methods
 func (iv *InstanceValidator) validateField(fieldName string, fieldValue any, fieldDef map[string]any, exists bool, obj map[string]any, kind string) ([]ValidationError, []ValidationWarning) {
 	_ = obj // Reserved for future use (e.g., cross-field validation)
-	var errors []ValidationError
-	var warnings []ValidationWarning
-
 	validation, ok := ExtractValidationRules(fieldDef)
 	if !ok {
-		return errors, warnings
+		return nil, nil
 	}
+	var errors []ValidationError
+	var warnings []ValidationWarning
 
 	// Check required - early return if missing
 	if err := iv.validateRequired(fieldName, fieldValue, exists, validation); err != nil {

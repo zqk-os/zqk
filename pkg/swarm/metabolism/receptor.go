@@ -220,8 +220,8 @@ func (r *ReceptorRegistry) Close(urn string, leaseID string, outcome string) err
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	lineage, exists := r.lineages[urn]
-	if !exists || lineage.ActiveLeaseID != leaseID {
+	lineage := r.lineages[urn]
+	if lineage == nil || lineage.ActiveLeaseID != leaseID {
 		return ErrLeaseNotFound
 	}
 
