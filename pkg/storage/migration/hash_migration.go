@@ -197,12 +197,7 @@ func (hm *HashMigration) findHashFiles() ([]string, error) {
 			return err
 		}
 
-		// Skip directories
-		if info.IsDir() {
-			return nil
-		}
-
-		if appledouble.SkipPathInTreeWalk(path) {
+		if appledouble.SkipDirOrSidecar(info.IsDir(), path) {
 			return nil
 		}
 

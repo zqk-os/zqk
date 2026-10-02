@@ -107,12 +107,18 @@ func (a DarwinAdapter) Uninstall(e Entry) error {
 	return nil
 }
 
-func (a DarwinAdapter) Start(e Entry) error {
+func (a DarwinAdapter) prepareUnitControl(e Entry) (plist, domain string, err error) {
 	if err := refuseIfCallerDescendsFromUnit(e); err != nil {
+		return "", "", err
+	}
+	return a.plistPath(e), "gui/" + uid(), nil
+}
+
+func (a DarwinAdapter) Start(e Entry) error {
+	plist, domain, err := a.prepareUnitControl(e)
+	if err != nil {
 		return err
 	}
-	plist := a.plistPath(e)
-	domain := "gui/" + uid()
 	// Stop boots the job out of the domain; Start must bootstrap again.
 	if err := execwrap.Command("launchctl", "bootstrap", domain, plist).Run(); err != nil {
 		// Already loaded, or older macOS load path.
@@ -127,11 +133,10 @@ func (a DarwinAdapter) Start(e Entry) error {
 }
 
 func (a DarwinAdapter) Stop(e Entry) error {
-	if err := refuseIfCallerDescendsFromUnit(e); err != nil {
+	plist, domain, err := a.prepareUnitControl(e)
+	if err != nil {
 		return err
 	}
-	plist := a.plistPath(e)
-	domain := "gui/" + uid()
 	target := domain + "/" + e.UnitLabel
 	// Graceful signal first when the job is still in the domain.
 	_ = execwrap.Command("launchctl", "kill", "SIGTERM", target).Run()

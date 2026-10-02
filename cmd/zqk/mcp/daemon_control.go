@@ -114,15 +114,7 @@ func writePIDFile(path string, pid int) error {
 }
 
 func readPIDFile(path string) (int, bool) {
-	b, err := fileutil.ReadFile(path)
-	if err != nil {
-		return 0, false
-	}
-	pid, err := strconv.Atoi(strings.TrimSpace(string(b)))
-	if err != nil || pid <= 0 {
-		return 0, false
-	}
-	return pid, true
+	return fileutil.ReadPIDFile(path)
 }
 
 func processAlive(pid int) bool {

@@ -3,6 +3,7 @@ package agentfeed
 import (
 	"bufio"
 	"encoding/json"
+	"os"
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/datacell"
@@ -252,28 +253,26 @@ func expectsPeerAck(ev map[string]any, eventType, toAgentID string) bool {
 }
 
 func readJSONLEvents(path string) ([]map[string]any, error) {
-	f, err := fileutil.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close() //nolint:gosec
 	var events []map[string]any
-	sc := bufio.NewScanner(f)
-	// Large steer bodies; raise buffer.
-	buf := make([]byte, 0, 64*1024)
-	sc.Buffer(buf, 2*1024*1024)
-	for sc.Scan() {
-		line := strings.TrimSpace(sc.Text())
-		if line == "" {
-			continue
+	err := fileutil.WithOpenFile(path, func(f *os.File) error {
+		sc := bufio.NewScanner(f)
+		// Large steer bodies; raise buffer.
+		buf := make([]byte, 0, 64*1024)
+		sc.Buffer(buf, 2*1024*1024)
+		for sc.Scan() {
+			line := strings.TrimSpace(sc.Text())
+			if line == "" {
+				continue
+			}
+			var m map[string]any
+			if err := json.Unmarshal([]byte(line), &m); err != nil {
+				continue
+			}
+			events = append(events, m)
 		}
-		var m map[string]any
-		if err := json.Unmarshal([]byte(line), &m); err != nil {
-			continue
-		}
-		events = append(events, m)
-	}
-	return events, sc.Err()
+		return sc.Err()
+	})
+	return events, err
 }
 
 func eventTypeOf(ev map[string]any) string {

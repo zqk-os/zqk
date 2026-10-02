@@ -76,11 +76,20 @@ func GetCASPendingVisibilityCache(projectRoot string) *CASPendingVisibilityCache
 	return c
 }
 
-// loadFromDisk loads the pending visibility file from disk into inMemory.
-func (c *CASPendingVisibilityCache) loadFromDisk() {
+func (c *CASPendingVisibilityCache) reloadFromDiskAndLookup(objectID string) (PendingVisibilityEntry, bool) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.loadFromDiskLocked()
+	if objectID == "" {
+		return PendingVisibilityEntry{}, false
+	}
+	entry, found := c.inMemory[objectID]
+	return entry, found
+}
+
+// loadFromDisk loads the pending visibility file from disk into inMemory.
+func (c *CASPendingVisibilityCache) loadFromDisk() {
+	_, _ = c.reloadFromDiskAndLookup("")
 }
 
 func (c *CASPendingVisibilityCache) loadFromDiskLocked() {
@@ -263,13 +272,7 @@ func (c *CASPendingVisibilityCache) LookupPending(objectID string) (PendingVisib
 		return entry, true
 	}
 
-	// Cross-process re-read from disk (same TTL purge as loadFromDiskLocked).
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	c.loadFromDiskLocked()
-	entry, found = c.inMemory[objectID]
-	return entry, found
+	return c.reloadFromDiskAndLookup(objectID)
 }
 
 // ProjectRootFromCASIndexPath resolves project root from a kind index path

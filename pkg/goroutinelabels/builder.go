@@ -323,192 +323,7 @@ func (b *GoroutineBuilder) Start(fn func() error) {
 	onPanic := b.onPanic
 	onError := b.onError
 	shutdownCheck := b.shutdownCheck
-	ctx := b.ctx
-	name := b.name
-	purpose := b.purpose
-	budget := b.budget
-	onBudgetExceeded := b.onBudgetExceeded
-	isControlPlane := b.isControlPlane
-
-	var releaseBudget func()
-	if budget != nil && !isControlPlane {
-		release, err := budget.Reserve(1)
-		if err != nil {
-			if onBudgetExceeded != nil {
-				onBudgetExceeded()
-				return
-			}
-			notifyBudgetExceededFallback(name, purpose, err.Error())
-		} else {
-			releaseBudget = release
-		}
-	}
-
-	// Add to wait group before starting goroutine
-	if wg != nil {
-		wg.Add(1)
-	}
-
-	go func() {
-		if releaseBudget != nil {
-			defer releaseBudget()
-		}
-		defer deferDone(wg)()
-		defer recoverGoroutine(name, purpose, onPanic)
-
-		// Always set goroutine label first
-		SetGoroutineLabel(name, purpose)
-
-		// Pre-cleanup
-		if preCleanup != nil {
-			defer preCleanup()
-		}
-
-		// Check shutdown before executing - if shutdown, exit early (Done() called in defer)
-		if shutdownCheck != nil && shutdownCheck() {
-			return // Shutdown ordered, exit immediately
-		}
-
-		// Check context before executing - if cancelled, exit early (Done() called in defer)
-		if ctx != nil {
-			select {
-			case <-ctx.Done():
-				// Context cancelled before execution - exit early, Done() will be called in defer
-				return
-			default:
-			}
-		}
-
-		// Execute the function
-		var err error
-		func() {
-			defer func() {
-				if cleanupFunc != nil {
-					cleanupFunc()
-				}
-			}()
-			err = fn()
-		}()
-
-		// Handle error
-		if err != nil {
-			if onError != nil {
-				onError(err)
-			}
-		}
-
-		// Post-cleanup after everything
-		if postCleanup != nil {
-			postCleanup()
-		}
-	}()
-}
-
-// StartWithContext starts the goroutine with a function that takes a context.
-// The context is checked before execution and passed to the function.
-// This method accepts the context directly as a parameter for clarity.
-// WaitGroup Done() is called when the goroutine exits (completion or early exit).
-//
-// Example:
-//
-//	goroutinelabels.NewGoroutine("worker", "processing").
-//		StartWithContext(ctx, func(ctx context.Context) error {
-//			return doWork(ctx)
-//		})
-func (b *GoroutineBuilder) StartWithContext(ctx context.Context, fn func(ctx context.Context) error) {
-	// Capture builder state before starting goroutine to avoid race conditions if builder is reused
-	wg := b.waitGroup
-	preCleanup := b.preCleanup
-	cleanupFunc := b.cleanupFunc
-	postCleanup := b.postCleanup
-	onPanic := b.onPanic
-	onError := b.onError
-	name := b.name
-	purpose := b.purpose
-	budget := b.budget
-	onBudgetExceeded := b.onBudgetExceeded
-	isControlPlane := b.isControlPlane
-
-	var releaseBudget func()
-	if budget != nil && !isControlPlane {
-		release, err := budget.Reserve(1)
-		if err != nil {
-			if onBudgetExceeded != nil {
-				onBudgetExceeded()
-				return
-			}
-			notifyBudgetExceededFallback(name, purpose, err.Error())
-		} else {
-			releaseBudget = release
-		}
-	}
-
-	// Add to wait group before starting goroutine
-	if wg != nil {
-		wg.Add(1)
-	}
-
-	go func() {
-		if releaseBudget != nil {
-			defer releaseBudget()
-		}
-		defer deferDone(wg)()
-		defer recoverGoroutine(name, purpose, onPanic)
-
-		// Always set goroutine label first
-		SetGoroutineLabel(name, purpose)
-
-		// Pre-cleanup
-		if preCleanup != nil {
-			defer preCleanup()
-		}
-
-		// Check context before executing - if cancelled, exit early (Done() called in defer)
-		select {
-		case <-ctx.Done():
-			// Context cancelled before execution - exit early, Done() will be called in defer
-			return
-		default:
-		}
-
-		// Execute the function with context
-		var err error
-		func() {
-			defer func() {
-				if cleanupFunc != nil {
-					cleanupFunc()
-				}
-			}()
-			err = fn(ctx)
-		}()
-
-		// Handle error
-		if err != nil {
-			if onError != nil {
-				onError(err)
-			}
-		}
-
-		// Post-cleanup after everything
-		if postCleanup != nil {
-			postCleanup()
-		}
-	}()
-}
-
-// StartSimple starts the goroutine with a simple function (no return value)
-// Useful for fire-and-forget goroutines
-// WaitGroup Done() is called when the goroutine exits (completion or early exit)
-func (b *GoroutineBuilder) StartSimple(fn func()) {
-	// Capture waitGroup reference and other builder state before starting goroutine
-	// to avoid race conditions if builder is reused
-	wg := b.waitGroup
 	signalOnExit := b.signalOnExit
-	preCleanup := b.preCleanup
-	cleanupFunc := b.cleanupFunc
-	postCleanup := b.postCleanup
-	onPanic := b.onPanic
-	shutdownCheck := b.shutdownCheck
 	ctx := b.ctx
 	name := b.name
 	purpose := b.purpose
@@ -576,20 +391,57 @@ func (b *GoroutineBuilder) StartSimple(fn func()) {
 		}
 
 		// Execute the function
+		var err error
 		func() {
 			defer func() {
 				if cleanupFunc != nil {
 					cleanupFunc()
 				}
 			}()
-			fn()
+			err = fn()
 		}()
+
+		// Handle error
+		if err != nil {
+			if onError != nil {
+				onError(err)
+			}
+		}
 
 		// Post-cleanup after everything
 		if postCleanup != nil {
 			postCleanup()
 		}
 	}()
+}
+
+// StartWithContext starts the goroutine with a function that takes a context.
+// The context is checked before execution and passed to the function.
+// This method accepts the context directly as a parameter for clarity.
+// WaitGroup Done() is called when the goroutine exits (completion or early exit).
+//
+// Example:
+//
+//	goroutinelabels.NewGoroutine("worker", "processing").
+//		StartWithContext(ctx, func(ctx context.Context) error {
+//			return doWork(ctx)
+//		})
+func (b *GoroutineBuilder) StartWithContext(ctx context.Context, fn func(ctx context.Context) error) {
+	bClone := *b
+	bClone.ctx = ctx
+	bClone.Start(func() error {
+		return fn(ctx)
+	})
+}
+
+// StartSimple starts the goroutine with a simple function (no return value)
+// Useful for fire-and-forget goroutines
+// WaitGroup Done() is called when the goroutine exits (completion or early exit)
+func (b *GoroutineBuilder) StartSimple(fn func()) {
+	b.Start(func() error {
+		fn()
+		return nil
+	})
 }
 
 // StartWithResult starts the goroutine and sends the result to a channel

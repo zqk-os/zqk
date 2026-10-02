@@ -260,11 +260,15 @@ func (s *IndexedGraphStorage) AddEdge(sourceID, relation, targetID string) {
 	s.inEdges[targetID] = append(s.inEdges[targetID], edge)
 }
 
+func (s *IndexedGraphStorage) incrementInspected(counter *int) {
+	s.mu.Lock()
+	*counter++
+	s.mu.Unlock()
+}
+
 // GetNode retrieves a node by ID using the primary index.
 func (s *IndexedGraphStorage) GetNode(id string) (map[string]any, bool) {
-	s.mu.Lock()
-	s.nodesInspectedCount++
-	s.mu.Unlock()
+	s.incrementInspected(&s.nodesInspectedCount)
 
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -274,9 +278,7 @@ func (s *IndexedGraphStorage) GetNode(id string) (map[string]any, bool) {
 
 // GetOutboundEdges retrieves edges for a source node and relation via edge index.
 func (s *IndexedGraphStorage) GetOutboundEdges(sourceID, relation string) []Edge {
-	s.mu.Lock()
-	s.edgesInspectedCount++
-	s.mu.Unlock()
+	s.incrementInspected(&s.edgesInspectedCount)
 
 	s.mu.RLock()
 	defer s.mu.RUnlock()

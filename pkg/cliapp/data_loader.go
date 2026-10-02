@@ -64,14 +64,7 @@ func (dl *DataLoader) LoadData(cmd *cobra.Command, hint *LastDraftHint) (data ma
 		return nil, "", err
 	}
 
-	if loadedData == nil {
-		loadedData = make(map[string]any)
-	}
-
-	// Apply field updates
-	for k, v := range fieldUpdates {
-		loadedData[k] = v
-	}
+	loadedData = clipkg.ApplyFieldUpdates(loadedData, fieldUpdates)
 
 	if len(loadedData) == 0 {
 		return nil, "", errfmt.Errorf("no data provided (use --file, --data, --field, or pipe from stdin)")

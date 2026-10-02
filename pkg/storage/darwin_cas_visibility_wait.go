@@ -218,10 +218,7 @@ func darwinKindDirYAMLFingerprint(kindDir string) (string, error) {
 			}
 			return nil // skip deep files (beyond bucket/hash layout)
 		}
-		if d.IsDir() {
-			return nil
-		}
-		if appledouble.SkipPathInTreeWalk(path) {
+		if appledouble.SkipDirOrSidecar(d.IsDir(), path) {
 			return nil
 		}
 		name := d.Name()

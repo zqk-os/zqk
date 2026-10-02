@@ -21,6 +21,35 @@ type DataLoaderLogger interface {
 	LogWarning(msg string, fields ...logging.Field)
 }
 
+// ApplyFieldUpdates merges fieldUpdates into target, allocating target if nil.
+func ApplyFieldUpdates(target map[string]any, fieldUpdates map[string]any) map[string]any {
+	if len(fieldUpdates) == 0 {
+		return target
+	}
+	if target == nil {
+		target = make(map[string]any, len(fieldUpdates))
+	}
+	for k, v := range fieldUpdates {
+		target[k] = v
+	}
+	return target
+}
+
+// ParseFieldStrings parses slice of "key=value" strings into map.
+func ParseFieldStrings(fields []string) map[string]any {
+	if len(fields) == 0 {
+		return nil
+	}
+	fieldUpdates := make(map[string]any, len(fields))
+	for _, fieldStr := range fields {
+		parts := strings.SplitN(fieldStr, "=", 2)
+		if len(parts) == 2 {
+			fieldUpdates[parts[0]] = ParseFieldValue(parts[1])
+		}
+	}
+	return fieldUpdates
+}
+
 func LoadObjectData(cmd *cobra.Command, logger DataLoaderLogger) (objData map[string]any, filePath string, err error) {
 	var flagsBag FlagBag
 	filePath, dataStr, fields := flagsBag.ReadDataInputFlags(cmd)
@@ -28,16 +57,7 @@ func LoadObjectData(cmd *cobra.Command, logger DataLoaderLogger) (objData map[st
 		return nil, "", err
 	}
 
-	var fieldUpdates map[string]any
-	if len(fields) > 0 {
-		fieldUpdates = make(map[string]any)
-		for _, fieldStr := range fields {
-			parts := strings.SplitN(fieldStr, "=", 2)
-			if len(parts) == 2 {
-				fieldUpdates[parts[0]] = ParseFieldValue(parts[1])
-			}
-		}
-	}
+	fieldUpdates := ParseFieldStrings(fields)
 
 	if filePath != emptyValue {
 		objData, filePath, err = LoadObjectDataFromFile(filePath, logger)
@@ -49,13 +69,8 @@ func LoadObjectData(cmd *cobra.Command, logger DataLoaderLogger) (objData map[st
 		objData = make(map[string]any)
 	}
 
-	if err == nil && len(fieldUpdates) > 0 {
-		if objData == nil {
-			objData = make(map[string]any)
-		}
-		for k, v := range fieldUpdates {
-			objData[k] = v
-		}
+	if err == nil {
+		objData = ApplyFieldUpdates(objData, fieldUpdates)
 	}
 
 	if len(objData) == 0 && err == nil {

@@ -250,7 +250,7 @@ func linuxUnitPath(label string) (string, error) {
 	return filepath.Join(home, ".config", "systemd", "user", label+".service"), nil
 }
 
-func programArgsXML(bin, seat, persona string, poll int, execNC bool) string {
+func seatWorkerCommandArgs(bin, seat, persona string, poll int, execNC bool) []string {
 	args := []string{
 		bin, "agent", "seat-worker",
 		"--agent-id", seat,
@@ -260,7 +260,11 @@ func programArgsXML(bin, seat, persona string, poll int, execNC bool) string {
 	if execNC {
 		args = append(args, "--execute-non-comms")
 	}
-	args = append(args, "--timeout", "24h")
+	return append(args, "--timeout", "24h")
+}
+
+func programArgsXML(bin, seat, persona string, poll int, execNC bool) string {
+	args := seatWorkerCommandArgs(bin, seat, persona, poll, execNC)
 	var b strings.Builder
 	for _, a := range args {
 		fmt.Fprintf(&b, "    <string>%s</string>\n", xmlText(a))
@@ -316,13 +320,7 @@ func darwinPlist(root, bin, seat, persona string, poll int, execNC bool, logDir 
 }
 
 func linuxUnit(root, bin, seat, persona string, poll int, execNC bool) string {
-	args := []string{bin, "agent", "seat-worker",
-		"--agent-id", seat, "--persona-ref", persona,
-		"--poll-seconds", strconv.Itoa(poll)}
-	if execNC {
-		args = append(args, "--execute-non-comms")
-	}
-	args = append(args, "--timeout", "24h")
+	args := seatWorkerCommandArgs(bin, seat, persona, poll, execNC)
 	execStart := strings.Join(args, " ")
 	return fmt.Sprintf(`[Unit]
 Description=%s seat-worker %s

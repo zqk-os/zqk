@@ -71,41 +71,15 @@ func EnsureMCPRoleSymlink(projectRoot, role, targetBin string) (string, error) {
 	}
 
 	linkPath := MCPRoleBinPath(projectRoot, role)
-	if err := fileutil.EnsureDir(filepath.Dir(linkPath)); err != nil {
-		return "", errfmt.Newf("ensure bin dir for MCP role symlink").Wrap(err)
-	}
-	// Absolute target avoids macOS /var ↔ /private/var Rel/EvalSymlinks skew.
-	symlinkTarget := absTarget
-
 	if fi, err := fileutil.Lstat(linkPath); err == nil {
 		if fi.Mode()&fileutil.ModeSymlink == 0 {
 			return "", errfmt.Errorf("MCP role path exists and is not a symlink: %s", linkPath)
 		}
-		cur, readErr := fileutil.Readlink(linkPath)
-		if readErr == nil {
-			curAbs := cur
-			if !filepath.IsAbs(curAbs) {
-				curAbs = filepath.Join(filepath.Dir(linkPath), cur)
-			}
-			if resolved, evalErr := filepath.EvalSymlinks(curAbs); evalErr == nil {
-				curAbs = resolved
-			}
-			if curAbs == absTarget || cur == symlinkTarget {
-				absLink, _ := filepath.Abs(linkPath)
-				return absLink, nil
-			}
-		}
-		if err := fileutil.Remove(linkPath); err != nil {
-			return "", errfmt.Newf("replace MCP role symlink").Wrap(err)
-		}
 	}
 
-	if err := fileutil.Symlink(symlinkTarget, linkPath); err != nil {
-		return "", errfmt.Newf("create MCP role symlink %s -> %s", linkPath, symlinkTarget).Wrap(err)
-	}
-	absLink, err := filepath.Abs(linkPath)
+	absLink, err := fileutil.EnsureSymlink(linkPath, absTarget)
 	if err != nil {
-		return linkPath, nil //nolint:nilerr // fallback to linkPath if absolute path resolution fails
+		return "", errfmt.Newf("create MCP role symlink %s -> %s", linkPath, absTarget).Wrap(err)
 	}
 	return absLink, nil
 }

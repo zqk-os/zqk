@@ -52,136 +52,7 @@ func issuesFilePath(projectRoot string) string {
 	return filepath.Join(projectRoot, paths.ProjectDataDir, paths.SchedulerDir, issuesFileName)
 }
 
-// ReportIssue records a job failure or timeout so it is visible in .zqk/scheduler/issues.json.
-// Call this when a job fails or times out. Safe to call from any goroutine.
-func ReportIssue(projectRoot, jobID, jobType, errMsg string) {
-	if projectRoot == emptyValue || jobID == emptyValue {
-		return
-	}
-	issuesMu.Lock()
-	defer issuesMu.Unlock()
-
-	path := issuesFilePath(projectRoot)
-	dir := filepath.Dir(path)
-	if err := fileutil.EnsureDir(dir); err != nil {
-		return
-	}
-
-	now := time.Now().UTC()
-	entry := Issue{JobID: jobID, JobType: jobType, Error: errMsg, At: now.Format(time.RFC3339)}
-
-	var payload IssuesPayload
-	if data, err := fileutil.ReadFile(path); err == nil {
-		if errUnmarshal := json.Unmarshal(data, &payload); errUnmarshal != nil {
-			logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-			SLog(logger).Debug("Failed to unmarshal existing issues file").WithError(errUnmarshal).Log()
-		}
-	}
-	if payload.Issues == nil {
-		payload.Issues = []Issue{}
-	}
-	payload.Issues = append(payload.Issues, entry)
-	if len(payload.Issues) > issuesMaxEntries {
-		payload.Issues = payload.Issues[len(payload.Issues)-issuesMaxEntries:]
-	}
-	payload.Status = issuesStatusIssues
-	payload.UpdatedAt = now.Format(time.RFC3339)
-
-	data, err := json.MarshalIndent(payload, "", "  ")
-	if err != nil {
-		return
-	}
-	if errWrite := fileutil.WriteSecureFile(path, data); errWrite != nil {
-		logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-		SLog(logger).Debug("Failed to write issues file").WithError(errWrite).Log()
-	}
-}
-
-// ClearIssuesIfOk writes status "ok" to issues.json when all recorded issues are older than issuesClearAfter.
-// Call this from the health-monitoring path so that after a period with no new failures, the file shows ok again.
-func ClearIssuesIfOk(projectRoot string) {
-	if projectRoot == emptyValue {
-		return
-	}
-	issuesMu.Lock()
-	defer issuesMu.Unlock()
-
-	path := issuesFilePath(projectRoot)
-	data, err := fileutil.ReadFile(path)
-	if err != nil {
-		if fileutil.IsNotExist(err) {
-			return // already absent = ok
-		}
-		return
-	}
-	var payload IssuesPayload
-	if err := json.Unmarshal(data, &payload); err != nil {
-		return
-	}
-	if payload.Status != issuesStatusIssues || len(payload.Issues) == 0 {
-		return
-	}
-	now := time.Now().UTC()
-	cutoff := now.Add(-issuesClearAfter)
-
-	healthReport, _ := compareIssuesToBundleHealthUnsafe(projectRoot, 0, &payload)
-
-	var remaining []Issue
-	for _, i := range payload.Issues {
-		t, err := time.Parse(time.RFC3339, i.At)
-		isOld := err == nil && t.Before(cutoff)
-
-		isGreen := false
-		if healthReport != nil {
-			for _, row := range healthReport.Rows {
-				if row.JobID == i.JobID && row.IssueRecordedAt == i.At {
-					if strings.Contains(row.Interpretation, "latest bundle outcome for this fingerprint is green") {
-						isGreen = true
-					}
-					break
-				}
-			}
-		}
-
-		if !isOld && !isGreen {
-			remaining = append(remaining, i)
-		}
-	}
-
-	if len(remaining) == len(payload.Issues) {
-		return // nothing cleared
-	}
-
-	if len(remaining) == 0 {
-		payload.Status = issuesStatusOK
-		payload.UpdatedAt = now.Format(time.RFC3339)
-		payload.Issues = nil
-	} else {
-		payload.Status = issuesStatusIssues
-		payload.UpdatedAt = now.Format(time.RFC3339)
-		payload.Issues = remaining
-	}
-
-	out, err := json.MarshalIndent(payload, "", "  ")
-	if err != nil {
-		return
-	}
-	if errWrite := fileutil.WriteSecureFile(path, out); errWrite != nil {
-		logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-		SLog(logger).Debug("Failed to clear issues file").WithError(errWrite).Log()
-	}
-}
-
-// ReadIssues reads the current issues payload from .zqk/scheduler/issues.json.
-// Returns (nil, nil) if the file is missing or empty/ok. Safe to call from any goroutine.
-func ReadIssues(projectRoot string) (*IssuesPayload, error) {
-	if projectRoot == emptyValue {
-		return nil, nil
-	}
-	issuesMu.Lock()
-	defer issuesMu.Unlock()
-
-	path := issuesFilePath(projectRoot)
+func loadIssuesPayloadLocked(path string) (*IssuesPayload, error) {
 	data, err := fileutil.ReadFile(path)
 	if err != nil {
 		if fileutil.IsNotExist(err) {
@@ -194,6 +65,128 @@ func ReadIssues(projectRoot string) (*IssuesPayload, error) {
 		return nil, errfmt.Newf("parse issues file").Wrap(err)
 	}
 	return &payload, nil
+}
+
+func saveIssuesPayloadLocked(path string, payload IssuesPayload) error {
+	dir := filepath.Dir(path)
+	if err := fileutil.EnsureDir(dir); err != nil {
+		return err
+	}
+	data, err := json.MarshalIndent(payload, "", "  ")
+	if err != nil {
+		return err
+	}
+	return fileutil.WriteSecureFile(path, data)
+}
+
+func withIssuesContext(projectRoot string, fn func(path string, now time.Time)) {
+	issuesMu.Lock()
+	defer issuesMu.Unlock()
+	fn(issuesFilePath(projectRoot), time.Now().UTC())
+}
+
+// ReportIssue records a job failure or timeout so it is visible in .zqk/scheduler/issues.json.
+// Call this when a job fails or times out. Safe to call from any goroutine.
+func ReportIssue(projectRoot, jobID, jobType, errMsg string) {
+	if projectRoot == emptyValue || jobID == emptyValue {
+		return
+	}
+	withIssuesContext(projectRoot, func(path string, now time.Time) {
+		entry := Issue{JobID: jobID, JobType: jobType, Error: errMsg, At: now.Format(time.RFC3339)}
+
+		payload, _ := loadIssuesPayloadLocked(path)
+		if payload == nil {
+			payload = &IssuesPayload{}
+		}
+		if payload.Issues == nil {
+			payload.Issues = []Issue{}
+		}
+		payload.Issues = append(payload.Issues, entry)
+		if len(payload.Issues) > issuesMaxEntries {
+			payload.Issues = payload.Issues[len(payload.Issues)-issuesMaxEntries:]
+		}
+		payload.Status = issuesStatusIssues
+		payload.UpdatedAt = now.Format(time.RFC3339)
+
+		if errWrite := saveIssuesPayloadLocked(path, *payload); errWrite != nil {
+			logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+			SLog(logger).Debug("Failed to write issues file").WithError(errWrite).Log()
+		}
+	})
+}
+
+// ClearIssuesIfOk writes status "ok" to issues.json when all recorded issues are older than issuesClearAfter.
+// Call this from the health-monitoring path so that after a period with no new failures, the file shows ok again.
+func ClearIssuesIfOk(projectRoot string) {
+	if projectRoot == emptyValue {
+		return
+	}
+	withIssuesContext(projectRoot, func(path string, now time.Time) {
+		payload, err := loadIssuesPayloadLocked(path)
+		if err != nil || payload == nil || payload.Status != issuesStatusIssues || len(payload.Issues) == 0 {
+			return
+		}
+		cutoff := now.Add(-issuesClearAfter)
+
+		healthReport, _ := compareIssuesToBundleHealthUnsafe(projectRoot, 0, payload)
+
+		var remaining []Issue
+		for _, i := range payload.Issues {
+			t, err := time.Parse(time.RFC3339, i.At)
+			isOld := err == nil && t.Before(cutoff)
+
+			isGreen := false
+			if healthReport != nil {
+				for _, row := range healthReport.Rows {
+					if row.JobID == i.JobID && row.IssueRecordedAt == i.At {
+						if strings.Contains(row.Interpretation, "latest bundle outcome for this fingerprint is green") {
+							isGreen = true
+						}
+						break
+					}
+				}
+			}
+
+			if !isOld && !isGreen {
+				remaining = append(remaining, i)
+			}
+		}
+
+		if len(remaining) == len(payload.Issues) {
+			return // nothing cleared
+		}
+
+		if len(remaining) == 0 {
+			payload.Status = issuesStatusOK
+			payload.UpdatedAt = now.Format(time.RFC3339)
+			payload.Issues = nil
+		} else {
+			payload.Status = issuesStatusIssues
+			payload.UpdatedAt = now.Format(time.RFC3339)
+			payload.Issues = remaining
+		}
+
+		if errWrite := saveIssuesPayloadLocked(path, *payload); errWrite != nil {
+			logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+			SLog(logger).Debug("Failed to clear issues file").WithError(errWrite).Log()
+		}
+	})
+}
+
+// ReadIssues reads the current issues payload from .zqk/scheduler/issues.json.
+// Returns (nil, nil) if the file is missing or empty/ok. Safe to call from any goroutine.
+func ReadIssues(projectRoot string) (*IssuesPayload, error) {
+	if projectRoot == emptyValue {
+		return nil, nil
+	}
+	var (
+		payload *IssuesPayload
+		err     error
+	)
+	withIssuesContext(projectRoot, func(path string, _ time.Time) {
+		payload, err = loadIssuesPayloadLocked(path)
+	})
+	return payload, err
 }
 
 // ClearIssues writes status "ok" to issues.json, clearing all recorded issues.
@@ -209,28 +202,22 @@ func ClearIssues(projectRoot string) (writtenPath string, err error) {
 	}
 	projectRoot = absRoot
 
-	issuesMu.Lock()
-	defer issuesMu.Unlock()
+	var (
+		targetPath string
+		saveErr    error
+	)
+	withIssuesContext(projectRoot, func(path string, now time.Time) {
+		targetPath = path
+		payload := IssuesPayload{
+			Status:    issuesStatusOK,
+			UpdatedAt: now.Format(time.RFC3339),
+			Issues:    nil,
+		}
+		saveErr = saveIssuesPayloadLocked(targetPath, payload)
+	})
 
-	path := issuesFilePath(projectRoot)
-	dir := filepath.Dir(path)
-	if err := fileutil.EnsureDir(dir); err != nil {
-		return "", errfmt.Newf("failed to create scheduler directory").Wrap(err)
-	}
-
-	now := time.Now().UTC()
-	payload := IssuesPayload{
-		Status:    issuesStatusOK,
-		UpdatedAt: now.Format(time.RFC3339),
-		Issues:    nil,
-	}
-
-	data, err := json.MarshalIndent(payload, "", "  ")
-	if err != nil {
-		return "", errfmt.Newf("failed to marshal issues payload").Wrap(err)
-	}
-	if err := fileutil.WriteSecureFile(path, data); err != nil {
-		return "", errfmt.Newf("failed to write issues file").Wrap(err)
+	if saveErr != nil {
+		return "", errfmt.Newf("failed to write issues file").Wrap(saveErr)
 	}
 
 	// Also clear/rotate test bundle health and progress log files when manually clearing issues
@@ -245,5 +232,5 @@ func ClearIssues(projectRoot string) (writtenPath string, err error) {
 		SLog(logger).Debug("Failed to remove progress.jsonl file").WithError(errProgress).Log()
 	}
 
-	return path, nil
+	return targetPath, nil
 }

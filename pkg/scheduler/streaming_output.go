@@ -8,6 +8,7 @@ package scheduler
 import (
 	"errors"
 	"io"
+	"os"
 	"sync"
 
 	"github.com/zqk-os/zqk/pkg/concurrency"
@@ -113,30 +114,30 @@ const maxBytesToReadForTestParse = 2 * 1024 * 1024 // 2MB total (1MB per stream 
 // readLastBytesFromFile reads up to maxBytes from the end of the file (for test parsing without loading full output).
 // Returns nil if the file does not exist or cannot be read.
 func readLastBytesFromFile(path string, maxBytes int) ([]byte, error) {
-	f, err := fileutil.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	info, err := f.Stat()
-	if err != nil {
-		return nil, err
-	}
-	size := info.Size()
-	if size == 0 {
-		return nil, nil
-	}
-	if int(size) <= maxBytes {
-		maxBytes = int(size)
-	}
-	_, err = f.Seek(-int64(maxBytes), io.SeekEnd)
-	if err != nil {
-		return nil, err
-	}
-	buf := make([]byte, maxBytes)
-	n, err := io.ReadFull(f, buf)
-	if err != nil && !errors.Is(err, io.EOF) && !errors.Is(err, io.ErrUnexpectedEOF) {
-		return nil, err
-	}
-	return buf[:n], nil
+	var res []byte
+	err := fileutil.WithOpenFile(path, func(f *os.File) error {
+		info, err := f.Stat()
+		if err != nil {
+			return err
+		}
+		size := info.Size()
+		if size == 0 {
+			return nil
+		}
+		if int(size) <= maxBytes {
+			maxBytes = int(size)
+		}
+		_, err = f.Seek(-int64(maxBytes), io.SeekEnd)
+		if err != nil {
+			return err
+		}
+		buf := make([]byte, maxBytes)
+		n, err := io.ReadFull(f, buf)
+		if err != nil && !errors.Is(err, io.EOF) && !errors.Is(err, io.ErrUnexpectedEOF) {
+			return err
+		}
+		res = buf[:n]
+		return nil
+	})
+	return res, err
 }

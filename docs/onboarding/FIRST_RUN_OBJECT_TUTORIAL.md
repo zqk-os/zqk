@@ -173,6 +173,10 @@ zqk object delete <QUESTION_ID>
 | **Remove References** | `zqk object ref remove <src> <targ>` | `zqk object update <id> --field "*_refs=..."` | Safely prunes edges without slice parsing errors. |
 | **Scalar Field Edits** | `zqk object update <id> --field k=v` | Raw YAML file edits on disk | Best suited for titles, bodies, and descriptions. |
 
+> [!WARNING]
+> Do not treat `--allow-degraded` as the default fix — that flag means partial or degraded results are intentionally accepted.
+
+
 ---
 
 ## Related Guides & References

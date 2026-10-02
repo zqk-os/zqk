@@ -121,44 +121,51 @@ func TrackAndAppendTestBundleProgress(projectRoot, jobID string, eventType strin
 	}
 	states[jobID] = newState
 
-	// Compute tallies
-	totalCount := len(knownIDs)
-	completedCount := 0
-	passCount := 0
-	failCount := 0
-	runningCount := 0
-	pendingCount := 0
-
-	for _, s := range states {
-		switch s {
-		case "pass":
-			completedCount++
-			passCount++
-		case "fail":
-			completedCount++
-			failCount++
-		case "skipped":
-			completedCount++
-		case "running":
-			runningCount++
-		case "pending":
-			pendingCount++
-		}
-	}
+	tallies := computeStateTallies(states, len(knownIDs))
 
 	// Emit bundle_progress event
 	entry := map[string]any{
 		KeyTimestamp:      zqktime.NowRFC3339UTC(),
 		KeyEventType:      newState,
-		"completed_count": completedCount,
-		"total_count":     totalCount,
-		"pass_count":      passCount,
-		"fail_count":      failCount,
-		"running_count":   runningCount,
-		"pending_count":   pendingCount,
+		"completed_count": tallies.completedCount,
+		"total_count":     tallies.totalCount,
+		"pass_count":      tallies.passCount,
+		"fail_count":      tallies.failCount,
+		"running_count":   tallies.runningCount,
+		"pending_count":   tallies.pendingCount,
 	}
 
 	AppendTestBundleProgressEvent(projectRoot, jobID, entry)
+}
+
+type bundleProgressTallies struct {
+	totalCount     int
+	completedCount int
+	passCount      int
+	failCount      int
+	runningCount   int
+	pendingCount   int
+}
+
+func computeStateTallies(states map[string]string, totalCount int) bundleProgressTallies {
+	t := bundleProgressTallies{totalCount: totalCount}
+	for _, s := range states {
+		switch s {
+		case "pass":
+			t.completedCount++
+			t.passCount++
+		case "fail":
+			t.completedCount++
+			t.failCount++
+		case "skipped":
+			t.completedCount++
+		case "running":
+			t.runningCount++
+		case "pending":
+			t.pendingCount++
+		}
+	}
+	return t
 }
 
 // jobLogBufferSize is the size of the in-memory buffer per job (balance I/O efficiency vs memory).
