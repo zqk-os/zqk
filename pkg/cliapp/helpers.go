@@ -120,6 +120,14 @@ func FinalizeCommand(cmd *cobra.Command, help CommandHelpApplicator) *cobra.Comm
 	return cmd
 }
 
+// FinalizeBareCommand applies help without injecting default common flags.
+func FinalizeBareCommand(cmd *cobra.Command, help CommandHelpApplicator) *cobra.Command {
+	if help != nil {
+		help.ApplyToCommand(cmd)
+	}
+	return cmd
+}
+
 // Common flag names used for exclusion (must match AddCommonFlags).
 const (
 	FlagTimeout             = "timeout"

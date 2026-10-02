@@ -22,9 +22,6 @@ func runNeighbors(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 		id := args[0]
 
-		var err error
-		_ = err
-
 		// Get flags
 		direction, err := cmd.Flags().GetString("direction")
 		if err != nil {

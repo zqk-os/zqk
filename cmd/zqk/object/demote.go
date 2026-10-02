@@ -2,20 +2,15 @@ package object
 
 import (
 	"fmt"
-	"path/filepath"
 	"sort"
 	"strings"
-	"time"
 
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
-	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/paths"
-	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/validation"
 )
@@ -29,42 +24,23 @@ func NewDemoteCmd() *cobra.Command {
 
 func runDemote(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-		args = expandObjectIDArgs(cmd, args)
-		if len(args) == 0 {
-			return fmt.Errorf("at least one object ID is required (positional, comma-separated, and/or --ids)")
+		args, err := parseTargetObjectIDs(cmd, args)
+		if err != nil {
+			return err
 		}
 
 		ctx := proc.OperationContext()
 		secCtx := proc.SecurityContext()
 
-		// Initialize loaders and validator for dry-run checks
-		specsDir := filepath.Join(proc.ProjectRoot(), paths.ProcessInternalObjectSpecsDir)
-		specLoader := objects.NewSpecLoader(specsDir)
-
-		// Set builder registry on spec loader to enable version-aware loading
-		builderRegistry := builders.GetGlobalRegistry()
-		adapter := builders.NewSpecLoaderAdapter(builderRegistry)
-		specLoader.SetBuilderRegistry(adapter)
-
-		if err := specLoader.EnsureReady(ctx); err != nil {
-			return fmt.Errorf("failed to initialize spec loader: %w", err)
+		env, err := initObjectTransitionEnv(ctx, proc.ProjectRoot())
+		if err != nil {
+			return err
 		}
-
-		lifecyclesDir := filepath.Join(proc.ProjectRoot(), paths.ProcessInternalLifecyclesDir)
-		lifecycleLoader := objects.NewLifecycleLoader(lifecyclesDir)
-
-		gv := validation.NewGoValidatorWithLoaders(specLoader, lifecycleLoader)
+		lifecycleLoader := env.lifecycleLoader
+		gv := env.validator
 
 		var errors []string
-		affectedKinds := make([]string, 0, len(args))
-		kindSet := make(map[string]bool, len(args))
-		addFlushKind := func(k string) {
-			if k == "" || kindSet[k] {
-				return
-			}
-			kindSet[k] = true
-			affectedKinds = append(affectedKinds, k)
-		}
+		flushTracker := newFlushKindTracker(len(args))
 		for _, idArg := range args {
 			// Resolve natural language intents
 			id, err := proc.ResolveSemanticArgument(ctx, "", idArg)
@@ -195,25 +171,10 @@ func runDemote(cmd *cobra.Command, args []string) error {
 			}
 
 			fmt.Fprintf(cmd.OutOrStdout(), "✓ Demoted %s from '%s' to '%s'\n", color.CyanString(id), color.YellowString(currentStatus), color.GreenString(bestStatus))
-			addFlushKind(kind)
-			if kind == objects.KindBacklogItem {
-				addFlushKind(objects.KindPriorityPlan)
-			}
+			flushTracker.addWithBacklogCascade(kind)
 		}
 
-		if len(affectedKinds) > 0 {
-			flushCtx, cancelFlush := storage.DurabilityFlushContext()
-			defer cancelFlush()
-			t0 := time.Now()
-			if err := storage.EnsureCLIObjectMutationVisibleForProvider(flushCtx, proc.Storage(), proc.ProjectRoot(), affectedKinds); err != nil {
-				logging.FluentEvent(proc.Logger()).Warn("demote: durability flush after status write").
-					WithError(err).
-					String("kinds", strings.Join(affectedKinds, ",")).
-					Log()
-			}
-			logSlowCLIObjectMutationFlush(proc.Logger(), "demote", "", affectedKinds, time.Since(t0), 0)
-			proc.TriggerCacheFreshnessCheck("demote", affectedKinds)
-		}
+		flushObjectMutationVisibility(proc, "demote", flushTracker.kinds())
 
 		if len(errors) > 0 {
 			return fmt.Errorf("demotion completed with errors:\n%s", strings.Join(errors, "\n"))

@@ -3,10 +3,8 @@ package object
 import (
 	"context"
 	"fmt"
-	"path/filepath"
 	"sort"
 	"strings"
-	"time"
 
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
@@ -14,12 +12,10 @@ import (
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	zqklifecycle "github.com/zqk-os/zqk/pkg/lifecycle"
-	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/objects/koi"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/process"
-	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/validation"
 	"github.com/zqk-os/zqk/pkg/validation/qa"
@@ -43,44 +39,23 @@ func runPromote(cmd *cobra.Command, args []string) error {
 // promoteObjectIDs advances each id one lifecycle hop when preconditions pass.
 // Shared by `object promote` and `object draft promote`.
 func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) error {
-	args = expandObjectIDArgs(cmd, args)
-	if len(args) == 0 {
-		return fmt.Errorf("at least one object ID is required (positional, comma-separated, and/or --ids)")
+	args, err := parseTargetObjectIDs(cmd, args)
+	if err != nil {
+		return err
 	}
 
 	ctx := proc.OperationContext()
 	secCtx := proc.SecurityContext()
 
-	// Initialize loaders and validator for dry-run checks
-	specsDir := filepath.Join(proc.ProjectRoot(), paths.ProcessInternalObjectSpecsDir)
-	specLoader := objects.NewSpecLoader(specsDir)
-
-	// Set builder registry on spec loader to enable version-aware loading
-	builderRegistry := builders.GetGlobalRegistry()
-	adapter := builders.NewSpecLoaderAdapter(builderRegistry)
-	specLoader.SetBuilderRegistry(adapter)
-
-	if err := specLoader.EnsureReady(ctx); err != nil {
-		return fmt.Errorf("failed to initialize spec loader: %w", err)
+	env, err := initObjectTransitionEnv(ctx, proc.ProjectRoot())
+	if err != nil {
+		return err
 	}
-
-	lifecyclesDir := filepath.Join(proc.ProjectRoot(), paths.ProcessInternalLifecyclesDir)
-	lifecycleLoader := objects.NewLifecycleLoader(lifecyclesDir)
-
-	gv := validation.NewGoValidatorWithLoaders(specLoader, lifecycleLoader)
+	lifecycleLoader := env.lifecycleLoader
+	gv := env.validator
 
 	var errors []string
-	// flushKinds must be non-empty or CAS index
-	// queue is never flushed (nil skipped the listing-index write; next CLI process → object-not-found).
-	affectedKinds := make([]string, 0, len(args))
-	kindSet := make(map[string]bool, len(args))
-	addFlushKind := func(k string) {
-		if k == "" || kindSet[k] {
-			return
-		}
-		kindSet[k] = true
-		affectedKinds = append(affectedKinds, k)
-	}
+	flushTracker := newFlushKindTracker(len(args))
 	for _, idArg := range args {
 		process.TouchMeaningfulActivity()
 		if ctx.Err() != nil {
@@ -224,7 +199,7 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "✓ Recovered %s from undefined '%s' to initial '%s'\n",
 				color.CyanString(id), color.YellowString(currentStatus), color.GreenString(recovered))
-			addFlushKind(kind)
+			flushTracker.add(kind)
 			continue
 		}
 
@@ -405,7 +380,7 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 				continue
 			}
 			for _, m := range hop.Members {
-				addFlushKind(m.Kind)
+				flushTracker.add(m.Kind)
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "✓ Promoted %s from '%s' to '%s' (membrane %d members)\n",
 				color.CyanString(id), color.YellowString(currentStatus), color.GreenString(finalStatus), len(hop.AppliedMembers()))
@@ -448,29 +423,11 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 				fmt.Fprintln(cmd.OutOrStdout(), cue)
 			}
 		}
-		addFlushKind(kind)
-		// BLI status changes can shockwave priority_plan in-process; flush that kind too.
-		if kind == objects.KindBacklogItem {
-			addFlushKind(objects.KindPriorityPlan)
-		}
+		flushTracker.addWithBacklogCascade(kind)
 	}
 
 	// Write-behind drain + CAS listing-index flush for every kind we mutated.
-	if len(affectedKinds) > 0 {
-		flushCtx, cancelFlush := storage.DurabilityFlushContext()
-		defer cancelFlush()
-		t0 := time.Now()
-		if err := storage.EnsureCLIObjectMutationVisibleForProvider(flushCtx, proc.Storage(), proc.ProjectRoot(), affectedKinds); err != nil {
-			// Status write already succeeded; flush/visibility is best-effort across processes.
-			// Hard-failing here turned successful promotes into errors on Darwin CAS visibility waits.
-			logging.FluentEvent(proc.Logger()).Warn("promote: durability flush after status write").
-				WithError(err).
-				String("kinds", strings.Join(affectedKinds, ",")).
-				Log()
-		}
-		logSlowCLIObjectMutationFlush(proc.Logger(), "promote", "", affectedKinds, time.Since(t0), 0)
-		proc.TriggerCacheFreshnessCheck("promote", affectedKinds)
-	}
+	flushObjectMutationVisibility(proc, "promote", flushTracker.kinds())
 
 	if len(errors) > 0 {
 		return fmt.Errorf("promotion completed with errors:\n%s", strings.Join(errors, "\n"))

@@ -21,11 +21,17 @@ func NewClaimCmd() *cobra.Command {
 	return cmd
 }
 
+func parseClaimant(cmd *cobra.Command, proc *cli.Processor, flags *clipkg.FlagBag, fallbackIfEmpty bool) string {
+	claimant := strings.TrimSpace(flags.String(cmd, "by"))
+	if claimant == "" && fallbackIfEmpty {
+		return resolveClaimantIdentity(cmd, proc)
+	}
+	return claimant
+}
+
 func runClaim(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-	ctx := proc.OperationContext()
-	sec := procSecurity(proc)
 	var flags clipkg.FlagBag
-	claimant := flags.String(cmd, "by")
+	who := parseClaimant(cmd, proc, &flags, true)
 	forRef := flags.String(cmd, "for")
 	cvsRef := flags.String(cmd, "cvs")
 	exitWhenCVSCompleted := flags.Bool(cmd, "exit-when-cvs-completed")
@@ -33,10 +39,6 @@ func runClaim(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 	checkinCadence := flags.Duration(cmd, "checkin-cadence")
 	if err := flags.Err(); err != nil {
 		return err
-	}
-	who := strings.TrimSpace(claimant)
-	if who == "" {
-		who = resolveClaimantIdentity(cmd, proc)
 	}
 
 	opts := agentclaim.ClaimOptions{
@@ -48,6 +50,8 @@ func runClaim(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 		CheckinCadence:       checkinCadence,
 	}
 
+	ctx := proc.OperationContext()
+	sec := procSecurity(proc)
 	res, err := agentclaim.TryClaim(ctx, proc.Storage(), sec, args[0], who, opts)
 	if err != nil {
 		return err
@@ -80,18 +84,14 @@ func NewReleaseCmd() *cobra.Command {
 }
 
 func runRelease(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-	ctx := proc.OperationContext()
-	sec := procSecurity(proc)
 	var flags clipkg.FlagBag
-	claimant := flags.String(cmd, "by")
 	force := flags.Bool(cmd, "force")
+	who := parseClaimant(cmd, proc, &flags, !force)
 	if err := flags.Err(); err != nil {
 		return err
 	}
-	who := strings.TrimSpace(claimant)
-	if who == "" && !force {
-		who = resolveClaimantIdentity(cmd, proc)
-	}
+	ctx := proc.OperationContext()
+	sec := procSecurity(proc)
 	res, err := agentclaim.Release(ctx, proc.Storage(), sec, args[0], who, force, proc.ProjectRoot())
 	if err != nil {
 		return err

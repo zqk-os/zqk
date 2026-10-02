@@ -2,10 +2,8 @@ package object
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
-	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
@@ -168,23 +166,7 @@ func runDelete(cmd *cobra.Command, args []string) error {
 
 		// Write-behind: Delete returns after WAL+buffer enqueue; flush so the next
 		// zqk process (e.g. `object get`) sees the CAS changes immediately.
-		flushCtx, cancelFlush := storage.DurabilityFlushContext()
-		defer cancelFlush()
-		t0 := time.Now()
-		if err := storage.EnsureCLIObjectMutationVisibleForProvider(flushCtx, proc.Storage(), proc.ProjectRoot(), affectedKinds); err != nil {
-			logging.FluentEvent(proc.Logger()).Warn("Persist flush after delete timed out, but object is removed").
-				WithError(err).
-				ObjectID(id).
-				Bool("cascade", cascade).
-				Log()
-			// Emit warning but don't fail, the object is safely deleted.
-			if id != emptyValue {
-				fmt.Fprintln(cmd.ErrOrStderr(), color.YellowString(fmt.Sprintf("Warning: Object '%s' deleted successfully, but index refresh is delayed.", id)))
-			} else {
-				fmt.Fprintln(cmd.ErrOrStderr(), color.YellowString("Warning: Object deleted successfully, but index refresh is delayed."))
-			}
-		}
-		ensureDur := time.Since(t0)
+		ensureDur := flushDeleteVisibility(cmd, proc, id, cascade, affectedKinds)
 		t1 := time.Now()
 		// Best-effort extra safety: flush listing indexes so no stale mappings survive
 		// across write-behind content-addressed update batching.

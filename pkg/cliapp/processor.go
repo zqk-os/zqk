@@ -129,7 +129,7 @@ func NewProcessor(cmd *cobra.Command) (*Processor, error) {
 		storageProvider = p.(storage.ObjectStorageProvider)
 	} else {
 		var err error
-		storageProvider, err = storage.GetGlobalStorageProviderCache().GetOrCreate(cmd.Context(), projectRoot)
+		storageProvider, err = storage.GetGlobalStorageProviderCache().GetOrCreate(stdcontext.Background(), projectRoot)
 		if err != nil {
 			return nil, errfmt.Newf("failed to get storage").Wrap(err)
 		}

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
@@ -148,18 +147,7 @@ func executeBulkDelete(cmd *cobra.Command, ids []string, proc *cli.Processor) er
 
 	// Write-behind: BulkDelete returns after WAL+buffer enqueue; flush so the next
 	// zqk process sees the CAS changes immediately.
-	flushCtx, cancelFlush := storagepkg.DurabilityFlushContext()
-	defer cancelFlush()
-	t0 := time.Now()
-	if err := storagepkg.EnsureCLIObjectMutationVisibleForProvider(flushCtx, proc.Storage(), proc.ProjectRoot(), kindsList); err != nil {
-		logging.FluentEvent(proc.Logger()).Warn("Persist flush after bulk delete timed out, but objects are removed").
-			WithError(err).
-			Bool("cascade", cascade).
-			Log()
-		// Emit warning but don't fail, the objects are safely deleted.
-		fmt.Fprintln(cmd.ErrOrStderr(), color.YellowString("Warning: Bulk delete completed, but index refresh is delayed."))
-	}
-	ensureDur := time.Since(t0)
+	ensureDur := flushDeleteVisibility(cmd, proc, "", cascade, kindsList)
 	t1 := time.Now()
 	// Kind-scoped flush only — FlushAllListingIndexes walks every kind queue and is too
 	// expensive after large leaf litter deletes (scheduler_job).
