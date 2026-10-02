@@ -1167,12 +1167,11 @@ func isTestCaseReadyStatus(status string) bool {
 	return s == "active" || s == "draft" || s == "metrics_captured" || s == "complete"
 }
 
-func isBlockedByUnverifiedUpstream(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, item map[string]any) bool {
-	if sp == nil || item == nil {
-		return false
+func extractItemUpstreamIDs(item map[string]any) []string {
+	if item == nil {
+		return nil
 	}
 	kItem := koi.Wrap(item)
-
 	var upstreamIDs []string
 	if deps := kItem.GetStringSlice("depends_on"); len(deps) > 0 {
 		upstreamIDs = append(upstreamIDs, deps...)
@@ -1180,6 +1179,14 @@ func isBlockedByUnverifiedUpstream(ctx context.Context, sp storage.ObjectStorage
 	if upstreamTasks := kItem.GetStringSlice("upstream_task_refs"); len(upstreamTasks) > 0 {
 		upstreamIDs = append(upstreamIDs, upstreamTasks...)
 	}
+	return upstreamIDs
+}
+
+func isBlockedByUnverifiedUpstream(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, item map[string]any) bool {
+	if sp == nil || item == nil {
+		return false
+	}
+	upstreamIDs := extractItemUpstreamIDs(item)
 
 	for _, upID := range upstreamIDs {
 		upObj, err := sp.Read(ctx, secCtx, upID)
@@ -1205,15 +1212,7 @@ func resolveVerifiedUpstreamDeliverables(ctx context.Context, sp storage.ObjectS
 	if sp == nil || item == nil {
 		return ""
 	}
-	kItem := koi.Wrap(item)
-
-	var upstreamIDs []string
-	if deps := kItem.GetStringSlice("depends_on"); len(deps) > 0 {
-		upstreamIDs = append(upstreamIDs, deps...)
-	}
-	if upstreamTasks := kItem.GetStringSlice("upstream_task_refs"); len(upstreamTasks) > 0 {
-		upstreamIDs = append(upstreamIDs, upstreamTasks...)
-	}
+	upstreamIDs := extractItemUpstreamIDs(item)
 	if len(upstreamIDs) == 0 {
 		return ""
 	}

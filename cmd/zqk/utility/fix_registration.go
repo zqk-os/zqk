@@ -267,8 +267,12 @@ func findKindRegistrationIssues(projectRoot, kind string, validator *validation.
 		return issues
 	}
 
-	// Walk the kind directory
-	err := filepath.Walk(kindDir, func(path string, info fileutil.FileInfo, err error) error {
+	return collectRegistrationIssuesInDir(kindDir, projectRoot, validator, logger)
+}
+
+func collectRegistrationIssuesInDir(dir, projectRoot string, validator *validation.IDValidator, logger logging.Logger) []registrationIssue {
+	var issues []registrationIssue
+	err := filepath.Walk(dir, func(path string, info fileutil.FileInfo, err error) error {
 		if err != nil {
 			return nil //nolint:nilerr // continue walking on path error
 		}
@@ -300,7 +304,7 @@ func findKindRegistrationIssues(projectRoot, kind string, validator *validation.
 
 	if err != nil {
 		logging.Fluent(logger).Warn("Error walking directory").
-			String("dir", kindDir).
+			String("dir", dir).
 			WithError(err).
 			Log()
 	}
@@ -309,50 +313,10 @@ func findKindRegistrationIssues(projectRoot, kind string, validator *validation.
 }
 
 func findAllRegistrationIssues(projectRoot string, validator *validation.IDValidator, logger logging.Logger) []registrationIssue {
-	var issues []registrationIssue
-
 	// This would be expensive for large systems, so we'll limit to known problematic kinds
 	// or use system check to identify issues first
 	processDir := datacell.ProcessPrimaryDir(projectRoot)
-
-	// Walk all object directories
-	err := filepath.Walk(processDir, func(path string, info fileutil.FileInfo, err error) error {
-		if err != nil {
-			return nil //nolint:nilerr // continue walking on path error
-		}
-		if info.IsDir() {
-			return nil
-		}
-		if appledouble.SkipPathInTreeWalk(path) {
-			return nil
-		}
-		if filepath.Ext(path) != ".yaml" && filepath.Ext(path) != ".yml" {
-			return nil
-		}
-		// Skip hash registry files
-		if filepath.Base(path)[0] == '.' {
-			return nil
-		}
-
-		// Extract object ID from filename
-		filename := filepath.Base(path)
-		objectID := filename[:len(filename)-len(filepath.Ext(filename))]
-
-		issue := checkRegistrationIssue(projectRoot, objectID, validator, logger)
-		if issue != nil {
-			issues = append(issues, *issue)
-		}
-
-		return nil
-	})
-
-	if err != nil {
-		logging.Fluent(logger).Warn("Error walking process directory").
-			WithError(err).
-			Log()
-	}
-
-	return issues
+	return collectRegistrationIssuesInDir(processDir, projectRoot, validator, logger)
 }
 
 func getPrefixFromID(id string) string {

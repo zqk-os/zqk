@@ -86,28 +86,32 @@ func (t *flushKindTracker) kinds() []string {
 	return t.affected
 }
 
+func executeDurabilityFlush(proc *cli.Processor, kinds []string) (time.Duration, error) {
+	flushCtx, cancelFlush := storage.DurabilityFlushContext()
+	defer cancelFlush()
+	t0 := time.Now()
+	err := storage.EnsureCLIObjectMutationVisibleForProvider(flushCtx, proc.Storage(), proc.ProjectRoot(), kinds)
+	return time.Since(t0), err
+}
+
 func flushObjectMutationVisibility(proc *cli.Processor, op string, affectedKinds []string) {
 	if len(affectedKinds) == 0 {
 		return
 	}
-	flushCtx, cancelFlush := storage.DurabilityFlushContext()
-	defer cancelFlush()
-	t0 := time.Now()
-	if err := storage.EnsureCLIObjectMutationVisibleForProvider(flushCtx, proc.Storage(), proc.ProjectRoot(), affectedKinds); err != nil {
+	duration, err := executeDurabilityFlush(proc, affectedKinds)
+	if err != nil {
 		logging.FluentEvent(proc.Logger()).Warn(op + ": durability flush after status write").
 			WithError(err).
 			String("kinds", strings.Join(affectedKinds, ",")).
 			Log()
 	}
-	logSlowCLIObjectMutationFlush(proc.Logger(), op, "", affectedKinds, time.Since(t0), 0)
+	logSlowCLIObjectMutationFlush(proc.Logger(), op, "", affectedKinds, duration, 0)
 	proc.TriggerCacheFreshnessCheck(op, affectedKinds)
 }
 
 func flushDeleteVisibility(cmd *cobra.Command, proc *cli.Processor, id string, cascade bool, kinds []string) time.Duration {
-	flushCtx, cancelFlush := storage.DurabilityFlushContext()
-	defer cancelFlush()
-	t0 := time.Now()
-	if err := storage.EnsureCLIObjectMutationVisibleForProvider(flushCtx, proc.Storage(), proc.ProjectRoot(), kinds); err != nil {
+	duration, err := executeDurabilityFlush(proc, kinds)
+	if err != nil {
 		evt := logging.FluentEvent(proc.Logger()).Warn("Persist flush after delete timed out, but object is removed").
 			WithError(err).
 			Bool("cascade", cascade)
@@ -121,5 +125,5 @@ func flushDeleteVisibility(cmd *cobra.Command, proc *cli.Processor, id string, c
 			fmt.Fprintln(cmd.ErrOrStderr(), color.YellowString("Warning: Bulk delete completed, but index refresh is delayed."))
 		}
 	}
-	return time.Since(t0)
+	return duration
 }

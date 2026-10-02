@@ -578,8 +578,8 @@ func CreateContextWithLoggingProfile(ctx context.Context, profile string) contex
 // ReadRequiredFileFlag reads the content of a file specified by a flag.
 // It returns an error if the flag is missing, empty, or the file cannot be read.
 func ReadRequiredFileFlag(cmd *cobra.Command, flagName string) ([]byte, error) {
-	filePath, _ := cmd.Flags().GetString(flagName)
-	if filePath == "" {
+	filePath, err := cmd.Flags().GetString(flagName)
+	if err != nil || filePath == "" {
 		return nil, errfmt.Errorf("--%s is required", flagName)
 	}
 	data, err := fileutil.ReadFile(filePath)

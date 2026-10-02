@@ -552,21 +552,14 @@ func (p *ProxyDaemon) PublishDaemonEvent(ctx context.Context, message, agentID, 
 	return nil
 }
 
-// QueryEventsSubscriberCount calls events/list on the MCP daemon and returns subscriberCount.
-// Used by feed steer to fail-loud when notify mode has zero live IDE subscribers
-// (CRIT-COMMS-003 / core-backlog).
-//
-// New TCP sessions need an initialize handshake before request/response methods;
-// notifications/event alone does not. Auth elicitation on initialize is OK —
-// events/list still returns subscriberCount afterward.
-func (p *ProxyDaemon) QueryEventsSubscriberCount(ctx context.Context) (int, error) {
+func (p *ProxyDaemon) queryRPC(ctx context.Context, opName, method string, params map[string]any) (map[string]any, error) {
 	if p == nil {
-		return 0, errfmt.Errorf("nil proxy daemon")
+		return nil, errfmt.Errorf("nil proxy daemon")
 	}
 	dialer := net.Dialer{Timeout: 500 * time.Millisecond}
 	conn, err := dialer.DialContext(ctx, "tcp", p.tcpAddr)
 	if err != nil {
-		return 0, errfmt.Newf("events/list dial").Wrap(err)
+		return nil, errfmt.Newf("%s dial", opName).Wrap(err)
 	}
 	defer conn.Close()
 
@@ -579,20 +572,20 @@ func (p *ProxyDaemon) QueryEventsSubscriberCount(ctx context.Context) (int, erro
 	p.ensureTransports()
 	writer := bufio.NewWriter(conn)
 	br := bufio.NewReader(conn)
-	writeRPC := func(id int, method string, params map[string]any) error {
+	writeRPC := func(id int, m string, prms map[string]any) error {
 		payload := map[string]any{
 			"jsonrpc":              "2.0",
 			objects.FieldKeyID:     id,
-			objects.FieldKeyMethod: method,
-			"params":               params,
+			objects.FieldKeyMethod: m,
+			"params":               prms,
 		}
 		b, mErr := json.Marshal(payload)
 		if mErr != nil {
-			return errfmt.Newf("marshal %s", method).Wrap(mErr)
+			return errfmt.Newf("marshal %s", m).Wrap(mErr)
 		}
 		b = append(b, '\n')
 		if wErr := p.daemonTransport.WriteMessage(writer, b, &MessageFormat{IsRawJSON: true}); wErr != nil {
-			return errfmt.Newf("write %s", method).Wrap(wErr)
+			return errfmt.Newf("write %s", m).Wrap(wErr)
 		}
 		return writer.Flush()
 	}
@@ -604,18 +597,18 @@ func (p *ProxyDaemon) QueryEventsSubscriberCount(ctx context.Context) (int, erro
 		objects.FieldKeyCapabilities: map[string]any{},
 		"clientInfo":                 map[string]any{objects.FieldKeyName: feedSteerProbeClientID, objects.FieldKeyVersion: "dev"},
 	}); err != nil {
-		return 0, err
+		return nil, err
 	}
 	if _, rErr := br.ReadBytes('\n'); rErr != nil {
-		return 0, errfmt.Newf("read initialize response").Wrap(rErr)
+		return nil, errfmt.Newf("read initialize response").Wrap(rErr)
 	}
 
-	if err := writeRPC(2, "events/list", map[string]any{}); err != nil {
-		return 0, err
+	if err := writeRPC(2, method, params); err != nil {
+		return nil, err
 	}
 	line, rErr := br.ReadBytes('\n')
 	if rErr != nil {
-		return 0, errfmt.Newf("read events/list response").Wrap(rErr)
+		return nil, errfmt.Newf("read %s response", method).Wrap(rErr)
 	}
 	var resp struct {
 		Result map[string]any `json:"result"`
@@ -624,12 +617,22 @@ func (p *ProxyDaemon) QueryEventsSubscriberCount(ctx context.Context) (int, erro
 		} `json:"error"`
 	}
 	if uErr := json.Unmarshal(line, &resp); uErr != nil {
-		return 0, errfmt.Newf("decode events/list response").Wrap(uErr)
+		return nil, errfmt.Newf("decode %s response", method).Wrap(uErr)
 	}
 	if resp.Error != nil {
-		return 0, errfmt.Errorf("events/list error: %s", resp.Error.Message)
+		return nil, errfmt.Errorf("%s error: %s", method, resp.Error.Message)
 	}
-	raw, ok := resp.Result["subscriberCount"]
+	return resp.Result, nil
+}
+
+// QueryEventsSubscriberCount dials the daemon TCP port and invokes events/list to read subscriberCount.
+// Returns an error if the daemon is unreachable or returns an error.
+func (p *ProxyDaemon) QueryEventsSubscriberCount(ctx context.Context) (int, error) {
+	res, err := p.queryRPC(ctx, "events/list", "events/list", map[string]any{})
+	if err != nil {
+		return 0, err
+	}
+	raw, ok := res["subscriberCount"]
 	if !ok {
 		return 0, errfmt.Errorf("events/list missing subscriberCount")
 	}
@@ -653,72 +656,5 @@ func (p *ProxyDaemon) QueryEventsSubscriberCount(ctx context.Context) (int, erro
 // Used by supervise to extract telemetry and spec counts for operators without
 // coupling directly to kernel_storage objects.
 func (p *ProxyDaemon) QueryDiagnostics(ctx context.Context) (map[string]any, error) {
-	if p == nil {
-		return nil, errfmt.Errorf("nil proxy daemon")
-	}
-	dialer := net.Dialer{Timeout: 500 * time.Millisecond}
-	conn, err := dialer.DialContext(ctx, "tcp", p.tcpAddr)
-	if err != nil {
-		return nil, errfmt.Newf("diagnostics dial").Wrap(err)
-	}
-	defer conn.Close()
-
-	deadline := time.Now().Add(1500 * time.Millisecond)
-	if dl, ok := ctx.Deadline(); ok && dl.Before(deadline) {
-		deadline = dl
-	}
-	_ = conn.SetDeadline(deadline)
-
-	p.ensureTransports()
-	writer := bufio.NewWriter(conn)
-	br := bufio.NewReader(conn)
-	writeRPC := func(id int, method string, params map[string]any) error {
-		payload := map[string]any{
-			"jsonrpc":              "2.0",
-			objects.FieldKeyID:     id,
-			objects.FieldKeyMethod: method,
-			"params":               params,
-		}
-		b, mErr := json.Marshal(payload)
-		if mErr != nil {
-			return errfmt.Newf("marshal %s", method).Wrap(mErr)
-		}
-		b = append(b, '\n')
-		if wErr := p.daemonTransport.WriteMessage(writer, b, &MessageFormat{IsRawJSON: true}); wErr != nil {
-			return errfmt.Newf("write %s", method).Wrap(wErr)
-		}
-		return writer.Flush()
-	}
-
-	if err := writeRPC(1, "initialize", map[string]any{
-		"protocolVersion":            "2024-11-05",
-		objects.FieldKeyCapabilities: map[string]any{},
-		"clientInfo":                 map[string]any{objects.FieldKeyName: feedSteerProbeClientID, objects.FieldKeyVersion: "dev"},
-	}); err != nil {
-		return nil, err
-	}
-	if _, rErr := br.ReadBytes('\n'); rErr != nil {
-		return nil, errfmt.Newf("read initialize response").Wrap(rErr)
-	}
-
-	if err := writeRPC(2, "system/diagnostics", map[string]any{}); err != nil {
-		return nil, err
-	}
-	line, rErr := br.ReadBytes('\n')
-	if rErr != nil {
-		return nil, errfmt.Newf("read system/diagnostics response").Wrap(rErr)
-	}
-	var resp struct {
-		Result map[string]any `json:"result"`
-		Error  *struct {
-			Message string `json:"message"`
-		} `json:"error"`
-	}
-	if uErr := json.Unmarshal(line, &resp); uErr != nil {
-		return nil, errfmt.Newf("decode system/diagnostics response").Wrap(uErr)
-	}
-	if resp.Error != nil {
-		return nil, errfmt.Errorf("system/diagnostics error: %s", resp.Error.Message)
-	}
-	return resp.Result, nil
+	return p.queryRPC(ctx, "diagnostics", "system/diagnostics", map[string]any{})
 }
