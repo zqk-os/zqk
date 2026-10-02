@@ -5,6 +5,7 @@ package bldr_cli_cmd_v1
 import (
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 )
 
 // NewLearnCommandBuilder creates a new learn command
@@ -12,10 +13,16 @@ func NewLearnCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("learn")
 	builder.WithShort("Interactive curriculum mode to learn the zqk system and concepts")
 	help := clipkg.DynamicHelpBuilder("Interactive curriculum mode to learn the zqk system and concepts")
-	help.WithDescriptionLines("Provides an interactive curriculum mode to learn the zqk system, architecture,")
-	help.WithDescriptionLines("and core Knowledge Kernel concepts.")
+	help.WithDescriptionLines("Provides an interactive curriculum mode to learn the ZQK system, architecture,")
+	help.WithDescriptionLines("and core Knowledge Kernel concepts (Gantt matrix, CAS membrane, ontological")
+	help.WithDescriptionLines("traceability, and continuous autonomous loops).")
+	help.AddExample("Launch the interactive learning curriculum mode", "%s learn")
 	builder.WithHelpBuilder(help)
+	builder.WithArgs(cobra.NoArgs)
 	builder.WithCommonFlags(false, nil)
 	cmd := builder.Build()
+	cli.RequireStorage(cmd, false)
+	cli.RequireSession(cmd, false)
+	cli.RequireSchedulerCheck(cmd, false)
 	return cmd
 }

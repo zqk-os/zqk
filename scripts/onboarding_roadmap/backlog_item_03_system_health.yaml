@@ -5,7 +5,14 @@ description: |
   Run system health commands so you understand retention targets and
   system check reminders (e.g. retention_drift).
 priority_plan_ref: PRIO-onboarding
-workstream_refs: []
+workstream_refs:
+  - WS-onboarding
+milestone_refs:
+  - MIL-onboarding
+requirement_refs:
+  - REQ-onboarding-foundation
+criteria_refs:
+  - CRIT-onboarding-system-health
 priority_tier: P1
 status: planned
 category: Developer Experience

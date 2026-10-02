@@ -29,9 +29,7 @@
 #
 # Job sprawl / efficiency: prefer one parameterized scheduler_job (env vars) + shared scripts over
 # many persisted clones that differ only by CVS id or path. See EVENT_PIPELINE_AND_CONVERGENCE_INTEGRATION.md
-# (section "Scheduler automation discipline"). Not every convergence path is listed here: e.g.
-# SCH-convergence-orchestrate (full orchestrate) is a maintained optional job — create from
-# scripts/scheduler_jobs/convergence_orchestrate.yaml when needed; do not duplicate id per session.
+# (section "Scheduler automation discipline").
 #
 # Future (deferred): optional per-job validation profiles/refs — see EVENT_PIPELINE_AND_CONVERGENCE_INTEGRATION.md "Declarative validators (concept)"; design once DRY job patterns are stable.
 #

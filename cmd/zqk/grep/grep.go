@@ -17,24 +17,6 @@ import (
 
 // NewGrepCmd creates the 'zqk grep' command for native in-process code search.
 func NewGrepCmd() *cobra.Command {
-	var (
-		pathFlag      string
-		ignoreCase    bool
-		useRegex      bool
-		wordRegexp    bool
-		astMode       bool
-		astKind       string
-		astReceiver   string
-		contextLines  int
-		maxCount      int
-		maxTokens     int
-		fileExts      []string
-		useIndex      bool
-		includeHidden bool
-		reindex       bool
-		format        string
-	)
-
 	helpBuilder := clipkg.DynamicHelpBuilder(
 		"In-process trigram and AST code search",
 		"Fast in-process pure-Go code search engine with trigram indexing, Go AST structural queries, and token-budgeted JSON output.",
@@ -57,6 +39,31 @@ func NewGrepCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			query := ""
 			searchPath := "."
+			ignoreCase, _ := cmd.Flags().GetBool("ignore-case")
+			useRegex, _ := cmd.Flags().GetBool("regex")
+			wordRegexp, _ := cmd.Flags().GetBool("word-regexp")
+			astMode, _ := cmd.Flags().GetBool("ast")
+			astKind, _ := cmd.Flags().GetString("kind")
+			astReceiver, _ := cmd.Flags().GetString("recv")
+			contextLines, _ := cmd.Flags().GetInt("context")
+			maxCount, _ := cmd.Flags().GetInt("max-count")
+			maxTokens, _ := cmd.Flags().GetInt("max-tokens")
+			rawExts, _ := cmd.Flags().GetStringArray("ext")
+			var fileExts []string
+			for _, e := range rawExts {
+				for _, part := range strings.Split(e, ",") {
+					part = strings.TrimSpace(part)
+					if part != "" {
+						fileExts = append(fileExts, part)
+					}
+				}
+			}
+			useIndex, _ := cmd.Flags().GetBool("use-index")
+			reindex, _ := cmd.Flags().GetBool("reindex")
+			includeHidden, _ := cmd.Flags().GetBool("hidden")
+			pathFlag, _ := cmd.Flags().GetString("path")
+			format, _ := cmd.Flags().GetString("format")
+
 			if pathFlag != "" {
 				searchPath = pathFlag
 			}
@@ -172,22 +179,6 @@ func NewGrepCmd() *cobra.Command {
 			}
 		},
 	})
-
-	cmd.Flags().BoolVarP(&ignoreCase, "ignore-case", "i", false, "Case-insensitive search")
-	cmd.Flags().BoolVarP(&useRegex, "regex", "e", false, "Treat query as regular expression")
-	cmd.Flags().BoolVarP(&wordRegexp, "word-regexp", "w", false, "Match only whole words")
-	cmd.Flags().BoolVar(&astMode, "ast", false, "Enable Go AST structural query mode")
-	cmd.Flags().StringVar(&astKind, "kind", "", "Filter AST declarations by kind (func, method, struct, interface, type, var, const)")
-	cmd.Flags().StringVar(&astReceiver, "recv", "", "Filter AST methods by receiver type name")
-	cmd.Flags().IntVarP(&contextLines, "context", "C", 0, "Show NUM lines of surrounding context")
-	cmd.Flags().IntVarP(&maxCount, "max-count", "m", search.DefaultMaxMatches, "Stop after NUM matches (default 100)")
-	cmd.Flags().IntVar(&maxTokens, "max-tokens", search.DefaultMaxTokens, "Max estimated tokens in response payload (default 4000)")
-	cmd.Flags().StringSliceVar(&fileExts, "ext", nil, "Filter files by extension (e.g. --ext .go,.yaml)")
-	cmd.Flags().BoolVar(&useIndex, "use-index", true, "Use trigram index acceleration (default: true)")
-	cmd.Flags().BoolVar(&reindex, "reindex", false, "Rebuild and persist trigram index cache")
-	cmd.Flags().BoolVar(&includeHidden, "hidden", false, "Search hidden files and directories")
-	cmd.Flags().StringVarP(&pathFlag, "path", "p", "", "Target file or directory path")
-	cmd.Flags().StringVarP(&format, "format", "f", "lines", "Output format (lines, json, yaml)")
 
 	helpBuilder.ApplyToCommand(cmd)
 	cli.RequireSession(cmd, false)

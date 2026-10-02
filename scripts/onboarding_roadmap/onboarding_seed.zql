@@ -1,0 +1,111 @@
+// Declarative Onboarding Roadmap Seed (ZQL Transaction)
+// Complete Ontological Chain:
+// Goal -> Workstream -> Priority Plan -> Criteria (Static, Dynamic, Negative) -> Requirement -> Test Cases -> Milestone -> Backlog Items
+// Conforms to SPEC-ZQL-DECLARATIVE-MUTATION-GRAMMAR and the Three-Fold Proof Formula
+
+BEGIN TRANSACTION ISOLATION LEVEL STAGED_SNAPSHOT;
+
+LET $ws = UPSERT workstream {
+    title: "Agent & User Onboarding",
+    description: "Curriculum and verification flow for onboarding agents and users into the Knowledge Kernel.",
+    category: "system",
+    entry_point: "docs/onboarding/COMMUNITY_FIRST_RUN.md",
+    owner_ref: "ACC-SYSTEM",
+    status: "active"
+};
+
+LET $goal = UPSERT goal {
+    title: "Onboard agents and users to the project",
+    description: "Goal: every new agent or user completes the onboarding curriculum (priority plan PRIO-onboarding) and receives a certificate before engaging in project work. Tracked per account.",
+    ref_ids: [$ws.id],
+    status: "active"
+};
+
+LET $pri = UPSERT priority_plan {
+    title: "Agent & User Onboarding",
+    description: "Priority plan for onboarding new agents and users. All items in this plan form the onboarding curriculum. New agents should complete these items before engaging in project work.",
+    ref_ids: [$ws.id, $goal.id],
+    status: "in_progress"
+};
+
+LET $crit_phil = UPSERT criteria {
+    title: "Operating philosophy and architectural tenets verified",
+    description: "Operator or autonomous agent has verified comprehension of core tenets: event-driven architecture, declarative specifications, deterministic CAS content-addressing, acyclic graph edge ownership, and zero-drift discipline.",
+    category: "acceptance",
+    status: "awaiting_verification"
+};
+
+LET $crit_health = UPSERT criteria {
+    title: "Kernel subsystems pass comprehensive health checks",
+    description: "Execution of zqk system check exits 0 with zero errors across CAS storage, schema registry, WAL event streaming, git hooks configuration, and daemon connectivity.",
+    category: "functional",
+    status: "awaiting_verification"
+};
+
+LET $crit_bound = UPSERT criteria {
+    title: "Direct store mutations without membrane validation fail closed",
+    description: "Unauthenticated or malformed mutations, out-of-order lifecycle transitions, or raw writes bypassing the CAS membrane boundary are deterministically rejected with non-zero exit codes.",
+    category: "security",
+    status: "awaiting_verification"
+};
+
+LET $req = UPSERT requirement {
+    title: "Establish agent and operator onboarding baseline",
+    description: "New human operators and autonomous agents entering the system MUST establish deterministic identity, verify environment health across all kernel subsystems, internalize operating philosophy, and conform to fail-closed mutation boundaries.",
+    priority: "p0",
+    ref_ids: [$goal.id, $pri.id, $crit_phil.id, $crit_health.id, $crit_bound.id],
+    status: "active"
+};
+
+LET $tst_health = UPSERT test_case {
+    title: "Verify kernel system check operational health",
+    description: "Runs zqk system check and asserts exit code 0 and table status OK across all critical subsystems.",
+    category: "unit",
+    ref_ids: [$crit_health.id],
+    status: "active"
+};
+
+LET $tst_bound = UPSERT test_case {
+    title: "Verify fail-closed rejection on invalid object mutations",
+    description: "Asserts that creating or mutating objects with missing mandatory fields, invalid schemas, or unregistered kinds fails closed.",
+    category: "unit",
+    ref_ids: [$crit_bound.id],
+    status: "active"
+};
+
+LET $mil = UPSERT milestone {
+    title: "Complete onboarding curriculum",
+    description: "First milestone for Agent and User Onboarding: complete the three core backlog items (Read Operational Philosophy, Start Here, System health check) before participating in the project.",
+    stage_type: "stage",
+    ref_ids: [$ws.id, $crit_phil.id, $crit_health.id, $crit_bound.id],
+    status: "in_progress"
+};
+
+LET $bli1 = UPSERT backlog_item {
+    title: "Read Operational Philosophy policy",
+    description: "Get and read the policy 'Operational Philosophy - Object-First, Discoverable, Auditable' so you understand that everything substantive starts from a system object.",
+    priority_tier: "P0",
+    priority_plan_ref: $pri.id,
+    ref_ids: [$ws.id, $mil.id, $req.id, $crit_phil.id],
+    status: "planned"
+};
+
+LET $bli2 = UPSERT backlog_item {
+    title: "Complete Start Here tutorial",
+    description: "Follow the 'For New Agents and Users - Start Here (Tutorial)' policy: Steps 1–4 (philosophy, mission/vision/goals, policy index, current priority plan).",
+    priority_tier: "P0",
+    priority_plan_ref: $pri.id,
+    ref_ids: [$ws.id, $mil.id, $req.id, $crit_bound.id, $tst_bound.id],
+    status: "planned"
+};
+
+LET $bli3 = UPSERT backlog_item {
+    title: "Run retention-status and system check",
+    description: "Run system health commands so you understand retention targets and system check reminders (e.g. retention_drift).",
+    priority_tier: "P1",
+    priority_plan_ref: $pri.id,
+    ref_ids: [$ws.id, $mil.id, $req.id, $crit_health.id, $tst_health.id],
+    status: "planned"
+};
+
+COMMIT TRANSACTION;

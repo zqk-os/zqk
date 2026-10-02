@@ -5,6 +5,7 @@ package bldr_cli_cmd_v1
 import (
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 )
 
 // NewAuthLoginCommandBuilder creates a new auth_login command
@@ -13,10 +14,17 @@ func NewAuthLoginCommandBuilder() *cobra.Command {
 	builder.WithShort("Create or reuse a CLI session (persisted for multiple terminals)")
 	help := clipkg.DynamicHelpBuilder("Create or reuse a CLI session (persisted for multiple terminals)")
 	help.WithDescriptionLines("Creates a new session or reuses the current one if still active.")
-	help.WithDescriptionLines("Session is written to .zqk/state/session (under lock) so other terminals can reuse it.")
-	help.WithDescriptionLines("Optionally set ZQK_SESSION_ID in your shell to tie the session to this process tree.")
+	help.WithDescriptionLines("The active session is written to .zqk/state/session under lock so that")
+	help.WithDescriptionLines("other terminal windows and subagents can transparently reuse it without")
+	help.WithDescriptionLines("re-authenticating. Optionally set ZQK_SESSION_ID in your shell environment")
+	help.WithDescriptionLines("to pin the session to the current process tree.")
+	help.AddExample("Establish or reuse an active CLI operator session", "%s auth login")
 	builder.WithHelpBuilder(help)
-	builder.WithCommonFlags(false, nil)
+	builder.WithArgs(cobra.NoArgs)
+	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
 	cmd := builder.Build()
+	cli.RequireStorage(cmd, true)
+	cli.RequireSession(cmd, false)
+	cli.RequireSchedulerCheck(cmd, false)
 	return cmd
 }

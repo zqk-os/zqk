@@ -1,0 +1,10 @@
+kind: criteria
+schema_version: "2.0.0"
+id: CRIT-onboarding-philosophy-mastery
+title: Operating philosophy and architectural tenets verified
+description: |
+  Operator or autonomous agent has verified comprehension of core tenets: event-driven architecture,
+  declarative specifications, deterministic CAS content-addressing, acyclic graph edge ownership,
+  and zero-drift discipline.
+category: acceptance
+status: awaiting_verification

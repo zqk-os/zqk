@@ -5,17 +5,23 @@ package bldr_cli_cmd_v1
 import (
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 )
 
 // NewAuthLogoutCommandBuilder creates a new auth_logout command
 func NewAuthLogoutCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("logout")
-	builder.WithShort("End the current CLI session and clear persisted state")
-	help := clipkg.DynamicHelpBuilder("End the current CLI session and clear persisted state")
-	help.WithDescriptionLines("Ends the current session (status set to completed), removes .zqk/state/session,")
-	help.WithDescriptionLines("and optionally unset ZQK_SESSION_ID in your shell.")
+	builder.WithShort("End current CLI session and clear persisted state")
+	help := clipkg.DynamicHelpBuilder("End current CLI session and clear persisted state")
+	help.WithDescriptionLines("Ends the active session and clears .zqk/state/session so subsequent")
+	help.WithDescriptionLines("commands will require establishing a fresh session.")
+	help.AddExample("End current operator session and clear disk state", "%s auth logout")
 	builder.WithHelpBuilder(help)
-	builder.WithCommonFlags(false, nil)
+	builder.WithArgs(cobra.NoArgs)
+	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
 	cmd := builder.Build()
+	cli.RequireStorage(cmd, true)
+	cli.RequireSession(cmd, false)
+	cli.RequireSchedulerCheck(cmd, false)
 	return cmd
 }

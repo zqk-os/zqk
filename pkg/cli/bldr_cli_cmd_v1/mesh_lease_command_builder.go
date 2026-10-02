@@ -5,17 +5,27 @@ package bldr_cli_cmd_v1
 import (
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 )
 
 // NewMeshLeaseCommandBuilder creates a new mesh_lease command
 func NewMeshLeaseCommandBuilder() *cobra.Command {
-	builder := clipkg.NewCommandBuilder("lease")
-	builder.WithShort("Acquire or release execution leases on shared swarm workstreams")
-	help := clipkg.DynamicHelpBuilder("Acquire or release execution leases on shared swarm workstreams")
-	help.WithDescriptionLines("Coordinates mutual exclusion and resource reservation for distributed tasks")
-	help.WithDescriptionLines("across concurrent agent seats.")
+	builder := clipkg.NewCommandBuilder("lease <resource_id>")
+	builder.WithShort("Lease a capability, agent seat, or resource from a remote mesh peer")
+	help := clipkg.DynamicHelpBuilder("Lease a capability, agent seat, or resource from a remote mesh peer")
+	help.WithDescriptionLines("Establishes a cryptographically signed lease agreement with a remote peer node")
+	help.WithDescriptionLines("in the sovereign mesh, acquiring access to the specified capability or agent seat")
+	help.WithDescriptionLines("for a bounded operational duration.")
+	help.AddExample("Lease a Code Craftsman seat from remote peer for two hours", "%s mesh lease res-code-craftsman --from kernel-peer-eu --duration 2h")
+	help.AddExample("Lease an evaluation sandbox for 30 minutes", "%s mesh lease sandbox-go-124 --from kernel-peer-us --duration 30m")
 	builder.WithHelpBuilder(help)
-	builder.WithCommonFlags(false, nil)
+	builder.WithArgs(cobra.ExactArgs(1))
+	builder.AddStringFlag("from", "", "", "Kernel ID or peer URI of the capacity provider")
+	builder.AddDurationFlag("duration", "d", "1h", "Lease duration before automatic expiration (e.g. 30m, 2h)")
+	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
 	cmd := builder.Build()
+	cli.RequireStorage(cmd, true)
+	cli.RequireSession(cmd, false)
+	cli.RequireSchedulerCheck(cmd, false)
 	return cmd
 }

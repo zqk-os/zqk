@@ -1,6 +1,6 @@
 kind: workstream
 schema_version: "2.0.0"
-# id omitted - system assigns on create
+id: WS-onboarding
 title: Agent & User Onboarding
 description: |
   Workstream for onboarding new agents and users to the system. Contains the

@@ -18,14 +18,12 @@ import (
 
 // NewListCmd creates the 'inbox list' command that lists pending agent_instruction proposals.
 func NewListCmd() *cobra.Command {
-	var (
-		statusFilter  string
-		personaFilter string
-	)
-
 	cmd := bldr_cli_cmd_v1.NewInboxListCommandBuilder()
 	cli.RequireSession(cmd, true)
 	cli.BindAsyncProgress(cmd, func(cmd *cobra.Command, args []string) error {
+		statusFilter, _ := cmd.Flags().GetString("status")
+		personaFilter, _ := cmd.Flags().GetString("persona")
+
 		ctx := cli.GetContext(cmd)
 		if ctx == nil {
 			return errfmt.Errorf("failed to get context")
@@ -111,9 +109,6 @@ func NewListCmd() *cobra.Command {
 
 		return cli.WriteOutput(cmd, []byte(sb.String()))
 	})
-
-	cmd.Flags().StringVar(&statusFilter, "status", "", "Filter by status (e.g. pending, approved, rejected)")
-	cmd.Flags().StringVar(&personaFilter, "persona", "", "Filter by persona ID (e.g. tpm, neuron)")
 
 	cli.AddCommonFlags(cmd)
 	return cmd

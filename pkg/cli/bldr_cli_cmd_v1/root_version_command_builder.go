@@ -5,6 +5,7 @@ package bldr_cli_cmd_v1
 import (
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 )
 
 // NewRootVersionCommandBuilder creates a new root_version command
@@ -18,7 +19,10 @@ func NewRootVersionCommandBuilder() *cobra.Command {
 	help.AddExample("Print structured JSON version information", "%s version --format json")
 	builder.WithHelpBuilder(help)
 	builder.WithArgs(cobra.NoArgs)
-	builder.WithCommonFlags(false, nil)
+	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
 	cmd := builder.Build()
+	cli.RequireStorage(cmd, false)
+	cli.RequireSession(cmd, false)
+	cli.RequireSchedulerCheck(cmd, false)
 	return cmd
 }

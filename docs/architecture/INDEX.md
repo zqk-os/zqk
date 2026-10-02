@@ -13,7 +13,6 @@ Documents governing Content-Addressable Storage (CAS), append-only WAL streams, 
 - **[Cellular Specialization Tiers & Rubber Room](./CELLULAR_SPECIALIZATION_TIERS.md)**: Biological organ specialization tiers (`Neuron`, `Muscle`, `Heart`, `Lung`) and sandboxed side-effect execution in the Rubber Room (`ModeShielded` / `ShadowSpine`).
 - **[Tiered Storage and Archival Lifecycle](./TIERED_STORAGE_AND_ARCHIVAL_LIFECYCLE.md)**: Three-tier storage hierarchy: hot active CAS, warm index layers, and cold compressed stream archives.
 - **[Storage Write Queue & Observer Governance](./STORAGE_WRITE_QUEUE_OBSERVER_GOVERNANCE.md)**: Non-blocking asynchronous event queues, observer fan-out, and memory hygiene.
-- **[Project-Scoped Reverse Reference Index and Thread-Safe Caches](./PROJECT_SCOPED_REVERSE_REFERENCE_INDEX_AND_THREAD_SAFE_CACHES.md)**: Reverse-reference graph lookup performance, atomic index caches, and memory-safe cache invalidation.
 
 ---
 

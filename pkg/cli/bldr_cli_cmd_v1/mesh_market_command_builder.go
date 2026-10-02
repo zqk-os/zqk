@@ -5,17 +5,25 @@ package bldr_cli_cmd_v1
 import (
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 )
 
 // NewMeshMarketCommandBuilder creates a new mesh_market command
 func NewMeshMarketCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("market")
-	builder.WithShort("Discover and browse available agent swarm capabilities in the mesh market")
-	help := clipkg.DynamicHelpBuilder("Discover and browse available agent swarm capabilities in the mesh market")
-	help.WithDescriptionLines("Lists, searches, and inspects agent services, capability advertisements, and")
-	help.WithDescriptionLines("capability leases across the swarm mesh.")
+	builder.WithShort("Browse available capabilities, agent seats, and compute in the mesh marketplace")
+	help := clipkg.DynamicHelpBuilder("Browse available capabilities, agent seats, and compute in the mesh marketplace")
+	help.WithDescriptionLines("Queries active capacity advertisements across peer nodes in the sovereign mesh.")
+	help.WithDescriptionLines("Displays provider kernel references, resource identifiers, quantities, units,")
+	help.WithDescriptionLines("and pricing or allocation models.")
+	help.AddExample("List all active advertisements across the peer mesh", "%s mesh market")
+	help.AddExample("Filter marketplace listings by compute resources", "%s mesh market --type compute")
 	builder.WithHelpBuilder(help)
-	builder.WithCommonFlags(false, nil)
+	builder.AddStringFlag("type", "t", "", "Filter advertisements by resource type (e.g. agent_seat, compute, storage)")
+	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
 	cmd := builder.Build()
+	cli.RequireStorage(cmd, true)
+	cli.RequireSession(cmd, false)
+	cli.RequireSchedulerCheck(cmd, false)
 	return cmd
 }
