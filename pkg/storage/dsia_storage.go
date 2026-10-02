@@ -170,105 +170,107 @@ func (tx *DSIATransaction) ensureActive() error {
 	return nil
 }
 
-func (tx *DSIATransaction) Create(ctx context.Context, secCtx *SecurityContext, obj map[string]any) error {
+func (tx *DSIATransaction) withActiveLock(fn func() error) error {
 	tx.mu.Lock()
 	defer tx.mu.Unlock()
 	if err := tx.ensureActive(); err != nil {
 		return err
 	}
-	id, ok := obj[objects.FieldKeyID].(string)
-	if !ok {
-		return fmt.Errorf("id is required")
-	}
-	tx.staged[id] = obj
-	delete(tx.deleted, id)
-	return nil
+	return fn()
+}
+
+func (tx *DSIATransaction) Create(ctx context.Context, secCtx *SecurityContext, obj map[string]any) error {
+	return tx.withActiveLock(func() error {
+		id, ok := obj[objects.FieldKeyID].(string)
+		if !ok {
+			return fmt.Errorf("id is required")
+		}
+		tx.staged[id] = obj
+		delete(tx.deleted, id)
+		return nil
+	})
 }
 
 func (tx *DSIATransaction) Read(ctx context.Context, secCtx *SecurityContext, id string) (map[string]any, error) {
-	tx.mu.Lock()
-	defer tx.mu.Unlock()
-	if err := tx.ensureActive(); err != nil {
+	var obj map[string]any
+	var fromProvider bool
+	err := tx.withActiveLock(func() error {
+		if tx.deleted[id] {
+			return ErrObjectNotFound
+		}
+		if staged, exists := tx.staged[id]; exists {
+			obj = staged
+			return nil
+		}
+		fromProvider = true
+		return nil
+	})
+	if err != nil {
 		return nil, err
 	}
-	if tx.deleted[id] {
-		return nil, ErrObjectNotFound
+	if fromProvider {
+		return tx.provider.Read(ctx, secCtx, id)
 	}
-	if obj, exists := tx.staged[id]; exists {
-		return obj, nil
-	}
-	return tx.provider.Read(ctx, secCtx, id)
+	return obj, nil
 }
 
 func (tx *DSIATransaction) Update(ctx context.Context, secCtx *SecurityContext, id string, updates map[string]any) error {
-	tx.mu.Lock()
-	defer tx.mu.Unlock()
-	if err := tx.ensureActive(); err != nil {
-		return err
-	}
-	tx.staged[id] = updates
-	delete(tx.deleted, id)
-	return nil
+	return tx.withActiveLock(func() error {
+		tx.staged[id] = updates
+		delete(tx.deleted, id)
+		return nil
+	})
 }
 
 func (tx *DSIATransaction) Delete(ctx context.Context, secCtx *SecurityContext, id string, cascade bool) error {
-	tx.mu.Lock()
-	defer tx.mu.Unlock()
-	if err := tx.ensureActive(); err != nil {
-		return err
-	}
-	tx.deleted[id] = true
-	delete(tx.staged, id)
-	return nil
+	return tx.withActiveLock(func() error {
+		tx.deleted[id] = true
+		delete(tx.staged, id)
+		return nil
+	})
 }
 
 func (tx *DSIATransaction) Commit(ctx context.Context) error {
-	tx.mu.Lock()
-	defer tx.mu.Unlock()
-	if err := tx.ensureActive(); err != nil {
-		return err
-	}
-	// A failed commit may already have applied an earlier operation. Make the
-	// transaction terminal so callers cannot accidentally replay a partial
-	// commit and compound the inconsistency.
-	tx.active = false
-	for id := range tx.deleted {
-		if err := tx.provider.Delete(ctx, nil, id, false); err != nil {
-			return errfmt.Newf("commit delete %s", id).Wrap(err)
-		}
-	}
-	for _, obj := range tx.staged {
-		id, ok := obj[objects.FieldKeyID].(string)
-		if !ok || id == "" {
-			return fmt.Errorf("commit staged object: id is required")
-		}
-		exists, err := tx.provider.Exists(ctx, nil, id)
-		if err != nil {
-			return errfmt.Newf("commit check existence %s", id).Wrap(err)
-		}
-		if exists {
-			if err := tx.provider.Update(ctx, nil, id, obj); err != nil {
-				return errfmt.Newf("commit update %s", id).Wrap(err)
+	return tx.withActiveLock(func() error {
+		// A failed commit may already have applied an earlier operation. Make the
+		// transaction terminal so callers cannot accidentally replay a partial
+		// commit and compound the inconsistency.
+		tx.active = false
+		for id := range tx.deleted {
+			if err := tx.provider.Delete(ctx, nil, id, false); err != nil {
+				return errfmt.Newf("commit delete %s", id).Wrap(err)
 			}
-			continue
 		}
-		if err := tx.provider.Create(ctx, nil, obj); err != nil {
-			return errfmt.Newf("commit create %s", id).Wrap(err)
+		for _, obj := range tx.staged {
+			id, ok := obj[objects.FieldKeyID].(string)
+			if !ok || id == "" {
+				return fmt.Errorf("commit staged object: id is required")
+			}
+			exists, err := tx.provider.Exists(ctx, nil, id)
+			if err != nil {
+				return errfmt.Newf("commit check existence %s", id).Wrap(err)
+			}
+			if exists {
+				if err := tx.provider.Update(ctx, nil, id, obj); err != nil {
+					return errfmt.Newf("commit update %s", id).Wrap(err)
+				}
+				continue
+			}
+			if err := tx.provider.Create(ctx, nil, obj); err != nil {
+				return errfmt.Newf("commit create %s", id).Wrap(err)
+			}
 		}
-	}
-	return nil
+		return nil
+	})
 }
 
 func (tx *DSIATransaction) Rollback(ctx context.Context) error {
-	tx.mu.Lock()
-	defer tx.mu.Unlock()
-	if err := tx.ensureActive(); err != nil {
-		return err
-	}
-	tx.staged = nil
-	tx.deleted = nil
-	tx.active = false
-	return nil
+	return tx.withActiveLock(func() error {
+		tx.staged = nil
+		tx.deleted = nil
+		tx.active = false
+		return nil
+	})
 }
 
 func (p *DSIAStorageProvider) BeginTransaction(ctx context.Context) (ObjectTransaction, error) {

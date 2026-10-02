@@ -3,8 +3,21 @@ package policy
 import (
 	"context"
 	"fmt"
+	"os"
 	"strings"
 )
+
+// ResolveProjectRoot resolves the project root from RunOptions, falling back to os.Getwd().
+func ResolveProjectRoot(opts RunOptions) (string, error) {
+	if opts.ProjectRoot != "" {
+		return opts.ProjectRoot, nil
+	}
+	root, err := os.Getwd()
+	if err != nil {
+		return "", fmt.Errorf("failed to get current working directory: %w", err)
+	}
+	return root, nil
+}
 
 // Result represents the outcome of a policy gate execution.
 type Result struct {

@@ -23,13 +23,9 @@ func (g *DocLinksGate) Description() string {
 var mdLinkRegex = regexp.MustCompile(`\[.*?\]\((.*?)\)`)
 
 func (g *DocLinksGate) Run(ctx context.Context, opts RunOptions) (*Result, error) {
-	root := opts.ProjectRoot
-	if root == "" {
-		var err error
-		root, err = os.Getwd()
-		if err != nil {
-			return nil, fmt.Errorf("failed to get current working directory: %w", err)
-		}
+	root, err := ResolveProjectRoot(opts)
+	if err != nil {
+		return nil, err
 	}
 
 	var violations []string
