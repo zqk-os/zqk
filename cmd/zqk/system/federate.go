@@ -35,11 +35,7 @@ func NewFederateStatusCmd() *cobra.Command {
 
 func runFederateStatus(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-		var err error
-		_ = err
-		ctx := proc.OperationContext()
-		sp := proc.Storage()
-		secCtx := proc.SecurityContext()
+		ctx, sp, secCtx := proc.OperationContext(), proc.Storage(), proc.SecurityContext()
 
 		filter := storage.ListFilter{Kind: objects.KindRemoteKernel, Limit: 0}
 		result, err := sp.List(ctx, secCtx, proc.StorageContext(), filter)
@@ -84,8 +80,6 @@ func NewInitiateCmd() *cobra.Command {
 
 func runInitiate(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-		var err error
-		_ = err
 		ctx := proc.OperationContext()
 		remoteEndpoint := args[0]
 
@@ -157,8 +151,6 @@ func NewHandshakeCmd() *cobra.Command {
 
 func runHandshake(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-		var err error
-		_ = err
 		ctx := proc.OperationContext()
 
 		var req federation.HandshakeRequest

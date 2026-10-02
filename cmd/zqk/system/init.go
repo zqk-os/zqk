@@ -113,32 +113,29 @@ func createProjectDataDir(projectDataDir string, _ bool) error {
 		filepath.Join(projectDataDir, paths.WalDir),
 	}
 
+	return createDirectoryWithSubdirs(projectDataDir, subdirs)
+}
+
+func createDirectoryWithSubdirs(baseDir string, subdirs []string) error {
+	if err := fileutil.MkdirAll(baseDir, paths.DirPerm755); err != nil {
+		return err
+	}
 	for _, dir := range subdirs {
 		if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
 			return err
 		}
 	}
-
 	return nil
 }
 
 func createProcessDir(processDir string, _ bool) error {
-	if err := fileutil.MkdirAll(processDir, paths.DirPerm755); err != nil {
-		return err
-	}
 	// Seed essential directories for baseline workspace initialization
 	subdirs := []string{
 		filepath.Join(processDir, "backlog_items"),
 		filepath.Join(processDir, "policies"),
 	}
 
-	for _, dir := range subdirs {
-		if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return createDirectoryWithSubdirs(processDir, subdirs)
 }
 
 // writeProjectConfigFiles writes project YAML to config/zqk.yaml (SSOT).

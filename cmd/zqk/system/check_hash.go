@@ -114,18 +114,23 @@ type deferredHashCheck struct {
 	registry storage.HashRegistryProvider
 }
 
-func (c *HashRegistryCacheType) withLock(lockName string, fn func() error) {
+func (c *HashRegistryCacheType) withLockHelper(isWrite bool, lockName string, fn func() error) {
 	logger := logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem))
 	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
 	defer cancel()
-	_ = concurrency.WithLockTimeout(&c.mu, ctx, nil, logger, lockName, fn)
+	if isWrite {
+		_ = concurrency.WithLockTimeout(&c.mu, ctx, nil, logger, lockName, fn)
+	} else {
+		_ = concurrency.WithRLockTimeout(&c.mu, ctx, nil, logger, lockName, fn)
+	}
+}
+
+func (c *HashRegistryCacheType) withLock(lockName string, fn func() error) {
+	c.withLockHelper(true, lockName, fn)
 }
 
 func (c *HashRegistryCacheType) withRLock(lockName string, fn func() error) {
-	logger := logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem))
-	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
-	defer cancel()
-	_ = concurrency.WithRLockTimeout(&c.mu, ctx, nil, logger, lockName, fn)
+	c.withLockHelper(false, lockName, fn)
 }
 
 // Get retrieves a hash registry from cache

@@ -28,19 +28,11 @@ const defaultPoliciesRelDir = "scripts/default_policies"
 // an embedded minimal pack when the directory is absent.
 // Idempotent: skips when a policy with the same stable title already exists.
 func SeedDefaultPolicyPack(projectRoot string, logger logging.Logger) (created int, err error) {
-	if projectRoot == emptyValue {
-		return 0, errfmt.Errorf("project root is empty")
-	}
 	ctx := pkgctx.NewSystemContext()
-	factory, ferr := storage.NewStorageFactory(ctx, projectRoot)
-	if ferr != nil {
-		return 0, errfmt.Newf("storage factory for default policy pack").Wrap(ferr)
+	sp, secCtx, err := initSeedingStorage(ctx, projectRoot, "default policy pack")
+	if err != nil {
+		return 0, err
 	}
-	sp := factory.GetStorage()
-	if sp == nil {
-		return 0, errfmt.Errorf("storage provider is nil")
-	}
-	secCtx := pkgctx.NewSystemSecurityContext()
 
 	existingTitles, lerr := listExistingPolicyTitles(ctx, sp, secCtx)
 	if lerr != nil {

@@ -1,18 +1,13 @@
 package system
 
 import (
-	"context"
 	"fmt"
-	"path/filepath"
-	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/ambient"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
-	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // fswatcherDaemonCmd represents the fswatcher-daemon command
@@ -63,40 +58,7 @@ func runFSWatcherDaemon(cmd *cobra.Command, args []string) error {
 	}
 
 	// Bind cache invalidation to filesystem events
-	hub.Subscribe(ambient.EventTypeFilesystem, func(c context.Context, event ambient.Event) error {
-		payloadMap, ok := event.Payload.(map[string]any)
-		if !ok {
-			return nil
-		}
-		target, ok := payloadMap[objects.FieldKeyTargetID].(string)
-		if !ok {
-			return nil
-		}
-		op, _ := payloadMap[objects.FieldKeyOperation].(string)
-
-		// Only process yaml files in process directories
-		if !strings.Contains(target, paths.ProcessDir+"/") || !strings.HasSuffix(target, ".yaml") {
-			return nil
-		}
-
-		parts := strings.Split(target, string(filepath.Separator))
-		for i, part := range parts {
-			if part == "process" && i+2 < len(parts) {
-				kind := parts[i+1]
-				filename := parts[len(parts)-1]
-				id := strings.TrimSuffix(filename, ".yaml")
-
-				// High-volume kinds are ignored by UpdateObjectIDCache anyway
-				if op == "REMOVE" {
-					InvalidateObjectIDCache(id)
-				} else if op == "WRITE" || op == "CREATE" {
-					_ = UpdateObjectIDCache(id, kind, target)
-				}
-				break
-			}
-		}
-		return nil
-	})
+	ambient.BindProcessYAMLInvalidator(hub, nil)
 
 	if err := watcher.Start(ctx); err != nil {
 		return fmt.Errorf("failed to start fswatcher: %w", err)
