@@ -218,9 +218,7 @@ func resolvePriorityPlanForWhatsNext(ctx context.Context, sp storage.ObjectStora
 
 	// 5. If no plan has work, fall back to first candidate.
 	if bestPlan == nil || bestScore <= 0 {
-		// No plan has work; use first candidate as fallback
-		pID, pSumm := summarizePriorityPlan(candidates[0])
-		return pID, pSumm, activePlans
+		bestPlan = candidates[0]
 	}
 
 	pID, pSumm := summarizePriorityPlan(bestPlan)
@@ -425,9 +423,18 @@ func resolvePersonaIDs(ctx context.Context, sp storage.ObjectStorageProvider, pr
 	return getAgentPersonaIDs(ctx, sp, "")
 }
 
-func getAgentPersonaIDs(ctx context.Context, sp storage.ObjectStorageProvider, explicitPersonaID string) []string {
+// PersonaLister queries personas from storage.
+type PersonaLister interface {
+	List(ctx context.Context, secCtx *pkgctx.SecurityContext, storageCtx *pkgctx.StorageContext, filter storage.ListFilter) (*storage.QueryResult, error)
+}
+
+// GetAgentPersonaIDs resolves the list of persona IDs corresponding to the agent context.
+func GetAgentPersonaIDs(ctx context.Context, sp PersonaLister, explicitPersonaID string) []string {
 	if explicitPersonaID != "" {
 		return []string{explicitPersonaID}
+	}
+	if sp == nil {
+		return nil
 	}
 
 	secCtx := pkgctx.GetSecurityContext(ctx)
@@ -461,6 +468,10 @@ func getAgentPersonaIDs(ctx context.Context, sp storage.ObjectStorageProvider, e
 		}
 	}
 	return personaIDs
+}
+
+func getAgentPersonaIDs(ctx context.Context, sp storage.ObjectStorageProvider, explicitPersonaID string) []string {
+	return GetAgentPersonaIDs(ctx, sp, explicitPersonaID)
 }
 
 func hasPersonaMatch(obj map[string]any, personaIDs []string) bool {

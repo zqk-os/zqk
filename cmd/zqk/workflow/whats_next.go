@@ -676,8 +676,7 @@ func resolvePriorityPlanForWhatsNext(ctx context.Context, sp workflowStorage, ex
 
 	// 5. If no plan has work, fall back to first candidate.
 	if bestPlan == nil || bestScore <= 0 {
-		pID, pSumm := summarizePriorityPlan(candidates[0])
-		return pID, pSumm, activePlans
+		bestPlan = candidates[0]
 	}
 
 	pID, pSumm := summarizePriorityPlan(bestPlan)
@@ -839,43 +838,7 @@ func planPersonaFilter(ctx context.Context, sp workflowStorage, projectRoot, age
 }
 
 func getAgentPersonaIDs(ctx context.Context, sp workflowStorage, explicitPersonaID string) []string {
-	if explicitPersonaID != "" {
-		return []string{explicitPersonaID}
-	}
-	if sp == nil {
-		return nil
-	}
-
-	secCtx := pkgctx.GetSecurityContext(ctx)
-	if secCtx == nil || len(secCtx.Roles) == 0 {
-		return nil
-	}
-
-	sysSecCtx := pkgctx.NewSystemSecurityContext()
-	storageCtx := pkgctx.NewStorageContext()
-	res, err := sp.List(ctx, sysSecCtx, storageCtx, storage.DefaultQueryFactory.
-		NotArchived(objects.KindPersona).
-		IncludeFields(objects.FieldKeyID, objects.FieldKeyRole, objects.FieldKeyStatus).
-		Build())
-	if err != nil || len(res.Objects) == 0 {
-		return nil
-	}
-
-	var personaIDs []string
-	for _, obj := range res.Objects {
-		role := koi.GetString(obj, objects.FieldKeyRole)
-		if role == "" {
-			continue
-		}
-		for _, secRole := range secCtx.Roles {
-			if strings.EqualFold(role, secRole) {
-				id := koi.ID(obj)
-				personaIDs = append(personaIDs, id)
-				break
-			}
-		}
-	}
-	return personaIDs
+	return whatsnext.GetAgentPersonaIDs(ctx, sp, explicitPersonaID)
 }
 
 // leadColumnPersonaIDs drops plan/BLI persona filters for operator/TPM seats so

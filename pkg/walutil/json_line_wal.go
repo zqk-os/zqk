@@ -212,17 +212,17 @@ func (w *JSONLineWAL[T]) Close() error {
 func (w *JSONLineWAL[T]) Path() string           { return w.path }
 func (w *JSONLineWAL[T]) CheckpointPath() string { return w.ckPath }
 
-// ReadLastSeqFromJSONLines scans the file and returns the max "seq" value found, or 0 if missing/unreadable.
-func ReadLastSeqFromJSONLines(path string, maxLineSize int) (int64, error) {
+// ScanFileLines opens path and scans lines using a buffered scanner up to maxLineSize.
+// Calls fn for each scanned line. If path does not exist, returns nil without calling fn.
+func ScanFileLines(path string, maxLineSize int, fn func(line []byte)) error {
 	f, err := fileutil.Open(path)
 	if err != nil {
 		if fileutil.IsNotExist(err) {
-			return 0, nil
+			return nil
 		}
-		return 0, err
+		return err
 	}
 	defer f.Close()
-	var last int64
 	sc := bufio.NewScanner(f)
 	buf := make([]byte, 0, defaultScannerBufCap)
 	if maxLineSize <= 0 {
@@ -230,12 +230,21 @@ func ReadLastSeqFromJSONLines(path string, maxLineSize int) (int64, error) {
 	}
 	sc.Buffer(buf, maxLineSize)
 	for sc.Scan() {
-		seq := ExtractSeqFromJSON(sc.Bytes())
+		fn(sc.Bytes())
+	}
+	return sc.Err()
+}
+
+// ReadLastSeqFromJSONLines scans the file and returns the max "seq" value found, or 0 if missing/unreadable.
+func ReadLastSeqFromJSONLines(path string, maxLineSize int) (int64, error) {
+	var last int64
+	err := ScanFileLines(path, maxLineSize, func(line []byte) {
+		seq := ExtractSeqFromJSON(line)
 		if seq > last {
 			last = seq
 		}
-	}
-	return last, sc.Err()
+	})
+	return last, err
 }
 
 // ExtractSeqFromJSON best-effort extracts "seq" from a JSON object.

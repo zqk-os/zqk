@@ -508,36 +508,7 @@ func countInternalKinds(proc *cli.Processor, kinds []string) (count int, interna
 // isInternalKind checks if a kind has visibility: internal in its spec
 // Internal kinds should only be accessible via 'internal list' command
 func isInternalKind(kind string) bool {
-	// Check known internal kinds first (fast path)
-	knownInternalKinds := map[string]bool{
-		"audit_event":          true,
-		"change_journal_entry": true,
-		objectKindLifecycle:    true,
-		objectKindObjectSpec:   true,
-		"template":             true,
-		"integrity_manifest":   true,
-		"kind_synonym":         true,
-	}
-	if knownInternalKinds[kind] {
-		return true
-	}
-
-	// Load spec to check visibility
-	specLoader := objects.NewSpecLoader("")
-	specFile := kind + ".yaml"
-	spec, err := specLoader.LoadSpecWithInheritance(specFile)
-	if err != nil {
-		// If spec can't be loaded, assume it's not internal (safer default)
-		return false
-	}
-
-	// Check visibility from spec - only the spec's own visibility matters
-	// Visibility is NOT inherited from parent specs
-	if spec.Visibility == "internal" {
-		return true
-	}
-
-	return false
+	return objects.IsInternalKind(kind)
 }
 
 // groupObjectsByField groups objects by a specified field value or comma-separated fields

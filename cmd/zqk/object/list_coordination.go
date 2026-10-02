@@ -43,20 +43,10 @@ func emitObjectListEventViaCoordinator(
 	profile string,
 	fields map[string]any,
 ) {
-	if projectRoot == emptyValue || projectRoot == "." {
+	ctx, coordinator, ok := cli.InitListCoordination(ctx, projectRoot, profile)
+	if !ok {
 		return
 	}
-
-	// Embed LoggingContext in context so coordinator logging respects --context profile
-	ctx = cli.CreateContextWithLoggingProfile(ctx, profile)
-
-	// Create coordinator with routers
-	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
-		LoggingRouter:     &coordination.DefaultLoggingRouter{},
-		AuditRouter:       nil, // List operations don't create audit events
-		MetricsRouter:     nil,
-		OperationalRouter: &coordination.DefaultOperationalRouter{},
-	})
 
 	// Build logging fields
 	loggingFields := []coordination.LoggingField{

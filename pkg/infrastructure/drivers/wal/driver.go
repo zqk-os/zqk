@@ -12,6 +12,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/infrastructure"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/walutil"
 )
 
 // WALSpine implements infrastructure.SpinalSpine with a local write-ahead log.
@@ -66,26 +67,7 @@ func NewWALSpine(ctx context.Context, endpoint string, creds string) (infrastruc
 }
 
 func (s *WALSpine) readLastSeq() (int64, error) {
-	f, err := fileutil.Open(s.path)
-	if err != nil {
-		if fileutil.IsNotExist(err) {
-			return 0, nil
-		}
-		return 0, err
-	}
-	defer f.Close() //nolint:gosec
-
-	var last int64
-	sc := bufio.NewScanner(f)
-	for sc.Scan() {
-		var rec walRecord
-		if err := json.Unmarshal(sc.Bytes(), &rec); err == nil {
-			if rec.Seq > last {
-				last = rec.Seq
-			}
-		}
-	}
-	return last, sc.Err()
+	return walutil.ReadLastSeqFromJSONLines(s.path, 0)
 }
 
 // Publish persists the event to the WAL.

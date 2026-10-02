@@ -92,10 +92,9 @@ func backlogDependentStillReferencesPlan(planID, depID string, options *Validati
 	return strings.TrimSpace(ref) == planID
 }
 
-// LinkedBacklogItemsAllTerminal evaluates PrecondLinkedBacklogAllTerminal.
-// Fail-closed when DependentsLookup/ObjectStatusLookup are unavailable.
-// Vacuous true when no backlog_item dependents are found.
-func LinkedBacklogItemsAllTerminal(planID string, options *ValidationOptions, inferKind func(string) string) bool {
+// iterateLinkedBacklogItems walks all validated backlog items referencing planID and calls checkStatus.
+// Returns false immediately if planID is invalid, lookups are unavailable, or checkStatus returns false.
+func iterateLinkedBacklogItems(planID string, options *ValidationOptions, inferKind func(string) string, skipLookupErr bool, checkStatus func(status string) bool) bool {
 	planID = strings.TrimSpace(planID)
 	if planID == emptyValue {
 		return false
@@ -124,56 +123,35 @@ func LinkedBacklogItemsAllTerminal(planID string, options *ValidationOptions, in
 		}
 		st, err := options.ObjectStatusLookup(depID)
 		if err != nil {
-			// Ghost reverse-index entries (deleted BLIs) must not block plan-complete.
-			// Fail-closed remains when DependentsLookup/ObjectStatusLookup are nil.
-			// TRACK: follow-up in kernel backlog
-			continue
+			if skipLookupErr {
+				// Ghost reverse-index entries (deleted BLIs) must not block plan-complete/plan-promote.
+				continue
+			}
+			return false
 		}
-		if !BacklogItemStatusTerminalForPlanCompletion(st) {
+		if !checkStatus(st) {
 			return false
 		}
 	}
 	return true
 }
 
+// LinkedBacklogItemsAllTerminal evaluates PrecondLinkedBacklogAllTerminal.
+// Fail-closed when DependentsLookup/ObjectStatusLookup are unavailable.
+// Vacuous true when no backlog_item dependents are found.
+func LinkedBacklogItemsAllTerminal(planID string, options *ValidationOptions, inferKind func(string) string) bool {
+	return iterateLinkedBacklogItems(planID, options, inferKind, true, func(st string) bool {
+		return BacklogItemStatusTerminalForPlanCompletion(st)
+	})
+}
+
 // LinkedBacklogItemsAllReadyOrLater evaluates PrecondAllLinkedBacklogReadyOrLater.
 // Fail-closed when DependentsLookup/ObjectStatusLookup are unavailable or dependents are unverified (nil).
 // Vacuous true only when verified that zero backlog_item dependents exist (empty non-nil slice).
 func LinkedBacklogItemsAllReadyOrLater(planID string, options *ValidationOptions, inferKind func(string) string) bool {
-	planID = strings.TrimSpace(planID)
-	if planID == emptyValue {
-		return false
-	}
-	if options == nil || options.DependentsLookup == nil || options.ObjectStatusLookup == nil {
-		return false
-	}
-	if inferKind == nil {
-		inferKind = GetIDValidator().InferKindFromID
-	}
-	deps := options.DependentsLookup(planID)
-	if deps == nil {
-		return false
-	}
-	for _, depID := range deps {
-		if depID == emptyValue {
-			continue
-		}
-		kind := inferKind(depID)
-		if kind != emptyValue && kind != objects.KindBacklogItem {
-			continue
-		}
-		if !backlogDependentStillReferencesPlan(planID, depID, options) {
-			continue
-		}
-		st, err := options.ObjectStatusLookup(depID)
-		if err != nil {
-			return false
-		}
-		if !BacklogItemStatusReadyOrLater(st) {
-			return false
-		}
-	}
-	return true
+	return iterateLinkedBacklogItems(planID, options, inferKind, false, func(st string) bool {
+		return BacklogItemStatusReadyOrLater(st)
+	})
 }
 
 // BacklogItemStatusInProgressOrComplete checks if status represents active work or completion
@@ -193,41 +171,7 @@ func BacklogItemStatusInProgressOrComplete(status string) bool {
 // LinkedBacklogItemsNoneInProgressOrComplete evaluates PrecondNoLinkedBacklogInProgressOrComplete.
 // Fail-closed when DependentsLookup/ObjectStatusLookup are unavailable.
 func LinkedBacklogItemsNoneInProgressOrComplete(planID string, options *ValidationOptions, inferKind func(string) string) bool {
-	planID = strings.TrimSpace(planID)
-	if planID == emptyValue {
-		return false
-	}
-	if options == nil || options.DependentsLookup == nil || options.ObjectStatusLookup == nil {
-		return false
-	}
-	if inferKind == nil {
-		inferKind = GetIDValidator().InferKindFromID
-	}
-	deps := options.DependentsLookup(planID)
-	if deps == nil {
-		return false
-	}
-	for _, depID := range deps {
-		if depID == emptyValue {
-			continue
-		}
-		kind := inferKind(depID)
-		if kind != emptyValue && kind != objects.KindBacklogItem {
-			continue
-		}
-		if !backlogDependentStillReferencesPlan(planID, depID, options) {
-			// Stale reverse-index: BLI exists but no longer references this plan.
-			continue
-		}
-		st, err := options.ObjectStatusLookup(depID)
-		if err != nil {
-			// Ghost reverse-index entries (deleted BLIs) must not block plan/plan-promote.
-			// Fail-closed remains when DependentsLookup/ObjectStatusLookup are nil.
-			continue
-		}
-		if BacklogItemStatusInProgressOrComplete(st) {
-			return false
-		}
-	}
-	return true
+	return iterateLinkedBacklogItems(planID, options, inferKind, true, func(st string) bool {
+		return !BacklogItemStatusInProgressOrComplete(st)
+	})
 }

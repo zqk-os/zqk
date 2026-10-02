@@ -21,6 +21,10 @@ const (
 
 	// SessionIDPrefix is the primary zqk_session object id prefix (id_prefixes_config).
 	SessionIDPrefix = "ZS-"
+
+	// Visibility constants for object specifications
+	VisibilityInternal = "internal"
+	VisibilityPublic   = "public"
 )
 
 var schemaVersionRegex = regexp.MustCompile(SchemaVersionPattern)

@@ -24,3 +24,23 @@ func InitAuditCoordination(
 	}
 	return ctx, coordinator, auditMetadata
 }
+
+// InitListCoordination initializes context and a coordinator for list operations.
+// Returns ok=false if projectRoot is empty or ".".
+func InitListCoordination(
+	ctx context.Context,
+	projectRoot string,
+	profile string,
+) (context.Context, *coordination.Coordinator, bool) {
+	if projectRoot == "" || projectRoot == "." {
+		return ctx, nil, false
+	}
+	ctx = CreateContextWithLoggingProfile(ctx, profile)
+	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
+		LoggingRouter:     &coordination.DefaultLoggingRouter{},
+		AuditRouter:       nil,
+		MetricsRouter:     nil,
+		OperationalRouter: &coordination.DefaultOperationalRouter{},
+	})
+	return ctx, coordinator, true
+}
