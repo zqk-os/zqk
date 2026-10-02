@@ -5,10 +5,20 @@ import (
 	"os"
 	"strings"
 
+	"github.com/spf13/cobra"
+
 	"github.com/zqk-os/zqk/pkg/execwrap"
 
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
+
+// EvaluateCommandSchedulerState resolves the project root, checks scheduler running state, and queries the allow-degraded flag.
+func EvaluateCommandSchedulerState(cmd *cobra.Command, resolveRoot func(string) string, checkRunning func(string) bool) (projectRoot string, running bool, allowDegraded bool) {
+	root := resolveRoot(".")
+	running = checkRunning(root)
+	allowDegraded, _ = cmd.Flags().GetBool("allow-degraded")
+	return root, running, allowDegraded
+}
 
 // Confirm prompts the user for a yes/no confirmation.
 func Confirm(prompt string) bool {

@@ -9,16 +9,20 @@ import (
 	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
 )
 
-type schedulerCommandRequirement int
+type schedulerCommandRequirement = schedulerpkg.CommandRequirement
 
 const (
-	schedulerRequirementNone schedulerCommandRequirement = iota
-	schedulerRequirementOptional
-	schedulerRequirementRequired
+	schedulerRequirementNone     = schedulerpkg.RequirementNone
+	schedulerRequirementOptional = schedulerpkg.RequirementOptional
+	schedulerRequirementRequired = schedulerpkg.RequirementRequired
 )
 
-var schedulerRunningChecker = schedulerRunningForRoot
-var resolveProjectRootForSchedulerGuard = cli.ResolveProjectRoot
+var (
+	schedulerRunningForRoot            = schedulerpkg.IsSchedulerRunningForRoot
+	schedulerRunningChecker            = schedulerRunningForRoot
+	resolveProjectRootForSchedulerGuard = cli.ResolveProjectRoot
+	evaluateSchedulerGuard             = schedulerpkg.EvaluateSchedulerGuard
+)
 
 func requirementForInternalCommand(name string) schedulerCommandRequirement {
 	switch name {
@@ -31,28 +35,6 @@ func requirementForInternalCommand(name string) schedulerCommandRequirement {
 	}
 }
 
-func evaluateSchedulerGuard(requirement schedulerCommandRequirement, running, allowDegraded bool) (block bool, warn bool) {
-	if running || requirement == schedulerRequirementNone {
-		return false, false
-	}
-	if requirement == schedulerRequirementRequired && !allowDegraded {
-		return true, false
-	}
-	return false, true
-}
-
-func schedulerRunningForRoot(projectRoot string) bool {
-	if projectRoot == emptyValue {
-		return true
-	}
-	sched, ok := schedulerpkg.GetGlobalSchedulerIfAvailable()
-	if ok && sched != nil && sched.IsRunning() {
-		return true
-	}
-	running, _, err := schedulerpkg.IsSchedulerRunning(projectRoot)
-	return err == nil && running
-}
-
 func runInternalSchedulerGuard(cmd *cobra.Command, _ []string) error { // args reserved for parity with object guard
 	if cmd == nil || cmd.Name() == "internal" {
 		return nil
@@ -61,9 +43,7 @@ func runInternalSchedulerGuard(cmd *cobra.Command, _ []string) error { // args r
 	if req == schedulerRequirementNone {
 		return nil
 	}
-	projectRoot := resolveProjectRootForSchedulerGuard(".")
-	running := schedulerRunningChecker(projectRoot)
-	allowDegraded, _ := cmd.Flags().GetBool("allow-degraded")
+	_, running, allowDegraded := cli.EvaluateCommandSchedulerState(cmd, resolveProjectRootForSchedulerGuard, schedulerRunningChecker)
 	block, _ := evaluateSchedulerGuard(req, running, allowDegraded)
 	if block {
 		return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("scheduler daemon is not running; internal command %q requires scheduler-backed maintenance/caches. Start it with 'zqk scheduler start' or re-run with --allow-degraded", cmd.Name())))

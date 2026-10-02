@@ -15,7 +15,6 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/ambient"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	clicontext "github.com/zqk-os/zqk/pkg/cliapp/context"
-	"github.com/zqk-os/zqk/pkg/appledouble"
 	"github.com/zqk-os/zqk/pkg/brand"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/datacell"
@@ -1007,19 +1006,8 @@ func runLegacyDiscoverWizard(projectRoot string, logger logging.Logger) error {
 			continue
 		}
 		var n int
-		_ = filepath.Walk(kindDir, func(path string, info fileutil.FileInfo, err error) error {
-			if err != nil {
-				return nil //nolint:nilerr // skip errors, continue walking
-			}
-			if info.IsDir() {
-				return nil
-			}
-			if appledouble.SkipPathInTreeWalk(path) {
-				return nil
-			}
-			if strings.HasSuffix(strings.ToLower(info.Name()), ".yaml") {
-				n++
-			}
+		_ = walkYAMLFiles(kindDir, func(_ string, _ fileutil.FileInfo) error {
+			n++
 			return nil
 		})
 		if n > 0 {

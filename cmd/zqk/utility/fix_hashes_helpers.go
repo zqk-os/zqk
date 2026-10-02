@@ -8,9 +8,36 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/appledouble"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
+
+// initializeUtilityCommandContext initializes context, logger, and project root
+func initializeUtilityCommandContext(cmd *cobra.Command) (*cli.Context, logging.Logger, string, error) {
+	ctx := cli.GetContext(cmd)
+	if ctx == nil {
+		return nil, nil, "", errfmt.Errorf("failed to get context")
+	}
+
+	profile := ctx.Profile
+	if profile == emptyValue {
+		profile = string(pkgctx.ProfileHuman)
+	}
+	logger := logging.GetLoggerFromProfile(profile)
+
+	projectRoot := ctx.ProjectRoot
+	if projectRoot == emptyValue {
+		return nil, nil, "", errfmt.Errorf("not a ZQK project (no project root found)")
+	}
+
+	return ctx, logger, projectRoot, nil
+}
+
+func shouldSkipFileWalkCandidate(path string, info fileutil.FileInfo, err error) bool {
+	return err != nil || info.IsDir() || appledouble.SkipPathInTreeWalk(path)
+}
 
 // FixHashesFlags contains parsed fix-hashes command flags
 type FixHashesFlags struct {
@@ -105,12 +132,16 @@ func showProgress(cmd *cobra.Command, quiet bool, current, total int) {
 
 	if total > 10 && current == 0 {
 		progressMsg := fmt.Sprintf("Processing %d objects...\n", total)
-		_ = cli.WriteOutput(cmd, []byte(progressMsg)) //nolint:errcheck
+		if err := cli.WriteOutput(cmd, []byte(progressMsg)); err != nil {
+			return
+		}
 	}
 
 	if total > 100 && current > 0 && current%100 == 0 {
 		progressMsg := fmt.Sprintf("Processing %d/%d objects...\r", current, total)
-		_ = cli.WriteOutput(cmd, []byte(progressMsg)) //nolint:errcheck
+		if err := cli.WriteOutput(cmd, []byte(progressMsg)); err != nil {
+			return
+		}
 	}
 }
 
@@ -122,10 +153,14 @@ func outputSummary(cmd *cobra.Command, result *FixHashesResult) {
 	}
 	summary := fmt.Sprintf("\nHash fix summary: %d %s, %d skipped, %d errors (total: %d objects)\n",
 		result.FixedCount, fixedVerb, result.SkippedCount, result.ErrorCount, result.TotalFiles)
-	_ = cli.WriteOutput(cmd, []byte(summary)) //nolint:errcheck
+	if err := cli.WriteOutput(cmd, []byte(summary)); err != nil {
+		return
+	}
 
 	if result.DryRun && result.FixedCount+result.SkippedCount+result.ErrorCount > 0 {
-		_ = cli.WriteOutput(cmd, []byte("Dry run: no changes made.\n")) //nolint:errcheck
+		if err := cli.WriteOutput(cmd, []byte("Dry run: no changes made.\n")); err != nil {
+			return
+		}
 	}
 
 	// Print errors if any
@@ -134,11 +169,15 @@ func outputSummary(cmd *cobra.Command, result *FixHashesResult) {
 		for _, err := range result.Errors {
 			errorMsg += fmt.Sprintf("  %s\n", err)
 		}
-		_ = cli.WriteOutput(cmd, []byte(errorMsg)) //nolint:errcheck
+		if err := cli.WriteOutput(cmd, []byte(errorMsg)); err != nil {
+			return
+		}
 	}
 
 	if !result.Quiet && result.FixedCount > 0 && !result.DryRun {
 		successMsg := "All hashes fixed successfully\n"
-		_ = cli.WriteOutput(cmd, []byte(successMsg)) //nolint:errcheck
+		if err := cli.WriteOutput(cmd, []byte(successMsg)); err != nil {
+			return
+		}
 	}
 }

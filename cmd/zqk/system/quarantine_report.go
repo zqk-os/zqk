@@ -8,7 +8,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/zqk-os/zqk/pkg/cliapp"
-	"github.com/zqk-os/zqk/pkg/appledouble"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -168,19 +167,8 @@ func writeQuarantineReportTable(cmd *cobra.Command, data *QuarantineReportData, 
 
 func countYAMLFiles(dir string) (int, error) {
 	var n int
-	err := filepath.Walk(dir, func(path string, info fileutil.FileInfo, err error) error {
-		if err != nil {
-			return nil //nolint:nilerr // continue walking on path error
-		}
-		if info.IsDir() {
-			return nil
-		}
-		if appledouble.SkipPathInTreeWalk(path) {
-			return nil
-		}
-		if filepath.Ext(path) == ".yaml" || filepath.Ext(path) == ".yml" {
-			n++
-		}
+	err := walkYAMLFiles(dir, func(_ string, _ fileutil.FileInfo) error {
+		n++
 		return nil
 	})
 	return n, err

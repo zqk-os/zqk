@@ -135,23 +135,8 @@ func runFixHashes(cmd *cobra.Command, args []string, recursive, force, quiet boo
 
 // initializeFixHashesContext initializes context, logger, and project root
 func initializeFixHashesContext(cmd *cobra.Command) (logging.Logger, string, error) {
-	ctx := cli.GetContext(cmd)
-	if ctx == nil {
-		return nil, "", errfmt.Errorf("failed to get context")
-	}
-
-	profile := ctx.Profile
-	if profile == emptyValue {
-		profile = string(pkgctx.ProfileHuman)
-	}
-	logger := logging.GetLoggerFromProfile(profile)
-
-	projectRoot := ctx.ProjectRoot
-	if projectRoot == emptyValue {
-		return nil, "", errfmt.Errorf("not a ZQK project (no project root found)")
-	}
-
-	return logger, projectRoot, nil
+	_, logger, projectRoot, err := initializeUtilityCommandContext(cmd)
+	return logger, projectRoot, err
 }
 
 // collectFilesForHashFix collects files based on flags and arguments.
@@ -215,7 +200,9 @@ func processFileForHashFix(cmd *cobra.Command, stdCtx context.Context, file, pro
 			if flags.DryRun {
 				msg = "✓ Would fix hash for %s (%s)\n"
 			}
-			_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf(msg, relPath, objID))) //nolint:errcheck
+			if outErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf(msg, relPath, objID))); outErr != nil {
+				// best effort output
+			}
 		}
 	}
 }
@@ -333,7 +320,7 @@ func fixHashForFile(stdCtx context.Context, file string, data []byte, kind, objI
 
 	// Audit trail: log hash mismatch fix (CRIT-9048)
 	if isMismatch && projectRoot != emptyValue {
-		_ = storage.CreateAuditEventWithBuilder(stdCtx, projectRoot, nil, nil, &storage.AuditEventOptions{
+		if auditErr := storage.CreateAuditEventWithBuilder(stdCtx, projectRoot, nil, nil, &storage.AuditEventOptions{
 			EventType:      "hash_mismatch_fix",
 			Operation:      fmt.Sprintf("Regenerated integrity hash for %s (hash mismatch resolved)", objID),
 			Severity:       "high",
@@ -343,7 +330,9 @@ func fixHashForFile(stdCtx context.Context, file string, data []byte, kind, objI
 			OriginalValue:  existingHash,
 			NewValue:       hash,
 			RecoveryMethod: "force",
-		})
+		}); auditErr != nil {
+			// best effort audit logging
+		}
 	}
 
 	return true

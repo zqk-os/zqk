@@ -13,9 +13,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/pkg/cliapp"
-	"github.com/zqk-os/zqk/pkg/appledouble"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -78,20 +76,9 @@ func NewFixRegistrationCmd() *cobra.Command {
 }
 
 func runFixRegistration(cmd *cobra.Command, args []string, kind string, all bool, fix, dryRun, quiet bool) error {
-	ctx := cli.GetContext(cmd)
-	if ctx == nil {
-		return errfmt.Errorf("failed to get context")
-	}
-
-	profile := ctx.Profile
-	if profile == emptyValue {
-		profile = string(pkgctx.ProfileHuman)
-	}
-	logger := logging.GetLoggerFromProfile(profile)
-
-	projectRoot := ctx.ProjectRoot
-	if projectRoot == emptyValue {
-		return errfmt.Errorf("not a ZQK project (no project root found)")
+	_, logger, projectRoot, err := initializeUtilityCommandContext(cmd)
+	if err != nil {
+		return err
 	}
 
 	// Get ID validator
@@ -100,33 +87,9 @@ func runFixRegistration(cmd *cobra.Command, args []string, kind string, all bool
 		return errfmt.Newf("failed to load ID patterns").Wrap(err)
 	}
 
-	var issues []registrationIssue
-
-	if all {
-		if !quiet {
-			_ = cli.WriteOutput(cmd, []byte("Scanning objects for registration issues...\n")) //nolint:errcheck
-		}
-		issues = findAllRegistrationIssues(projectRoot, idValidator, logger)
-	} else if kind != emptyValue {
-		if !quiet {
-			_ = cli.WriteOutput(cmd, []byte("Scanning objects for registration issues...\n")) //nolint:errcheck
-		}
-		issues = findKindRegistrationIssues(projectRoot, kind, idValidator, logger)
-	} else {
-		// Check specific IDs
-		for _, id := range args {
-			issue := checkRegistrationIssue(projectRoot, id, idValidator, logger)
-			if issue != nil {
-				issues = append(issues, *issue)
-			}
-		}
-	}
-
+	issues := scanRegistrationIssues(cmd, projectRoot, kind, all, quiet, args, idValidator, logger)
 	if len(issues) == 0 {
-		msg := "No registration issues found\n"
-		//nolint:errcheck // Output errors are non-critical
-		_ = cli.WriteOutput(cmd, []byte(msg))
-		return nil
+		return cli.WriteOutput(cmd, []byte("No registration issues found\n"))
 	}
 
 	// Optionally apply fix: add missing prefixes to id_prefixes_config
@@ -137,12 +100,16 @@ func runFixRegistration(cmd *cobra.Command, args []string, kind string, all bool
 		}
 		if dryRun && len(added) > 0 {
 			msg := fmt.Sprintf("Dry run: would add %d prefix(es) to id_prefixes config. No changes made.\n", len(added))
-			_ = cli.WriteOutput(cmd, []byte(msg)) //nolint:errcheck
+			if outErr := cli.WriteOutput(cmd, []byte(msg)); outErr != nil {
+				return outErr
+			}
 		} else if len(added) > 0 {
 			validation.ResetGlobalIDPrefixesConfig()
 			if !quiet {
 				msg := fmt.Sprintf("Added %d prefix(es) to id_prefixes config. Run again to verify.\n", len(added))
-				_ = cli.WriteOutput(cmd, []byte(msg)) //nolint:errcheck
+				if outErr := cli.WriteOutput(cmd, []byte(msg)); outErr != nil {
+					return outErr
+				}
 			}
 		}
 		// When --fix we still report issues below unless quiet
@@ -161,10 +128,33 @@ func runFixRegistration(cmd *cobra.Command, args []string, kind string, all bool
 	}
 	msg += "Note: Use --fix to update id_prefixes config to accept these prefixes, or fix object IDs to match expected formats.\n"
 
-	//nolint:errcheck // Output errors are non-critical
-	_ = cli.WriteOutput(cmd, []byte(msg))
+	return cli.WriteOutput(cmd, []byte(msg))
+}
 
-	return nil
+func notifyScanning(cmd *cobra.Command, quiet bool) {
+	if !quiet {
+		if err := cli.WriteOutput(cmd, []byte("Scanning objects for registration issues...\n")); err != nil {
+			return
+		}
+	}
+}
+
+func scanRegistrationIssues(cmd *cobra.Command, projectRoot, kind string, all, quiet bool, args []string, idValidator *validation.IDValidator, logger logging.Logger) []registrationIssue {
+	if all {
+		notifyScanning(cmd, quiet)
+		return findAllRegistrationIssues(projectRoot, idValidator, logger)
+	}
+	if kind != emptyValue {
+		notifyScanning(cmd, quiet)
+		return findKindRegistrationIssues(projectRoot, kind, idValidator, logger)
+	}
+	var issues []registrationIssue
+	for _, id := range args {
+		if issue := checkRegistrationIssue(projectRoot, id, idValidator, logger); issue != nil {
+			issues = append(issues, *issue)
+		}
+	}
+	return issues
 }
 
 type registrationIssue struct {
@@ -180,13 +170,7 @@ func checkRegistrationIssue(projectRoot, objectID string, validator *validation.
 	var filePath string
 
 	err := filepath.Walk(processDir, func(path string, info fileutil.FileInfo, err error) error {
-		if err != nil {
-			return nil //nolint:nilerr // continue walking on path error
-		}
-		if info.IsDir() {
-			return nil
-		}
-		if appledouble.SkipPathInTreeWalk(path) {
+		if shouldSkipFileWalkCandidate(path, info, err) {
 			return nil
 		}
 		if filepath.Base(path) == objectID+".yaml" || filepath.Base(path) == objectID+".yml" {
@@ -273,13 +257,7 @@ func findKindRegistrationIssues(projectRoot, kind string, validator *validation.
 func collectRegistrationIssuesInDir(dir, projectRoot string, validator *validation.IDValidator, logger logging.Logger) []registrationIssue {
 	var issues []registrationIssue
 	err := filepath.Walk(dir, func(path string, info fileutil.FileInfo, err error) error {
-		if err != nil {
-			return nil //nolint:nilerr // continue walking on path error
-		}
-		if info.IsDir() {
-			return nil
-		}
-		if appledouble.SkipPathInTreeWalk(path) {
+		if shouldSkipFileWalkCandidate(path, info, err) {
 			return nil
 		}
 		if filepath.Ext(path) != ".yaml" && filepath.Ext(path) != ".yml" {
@@ -393,7 +371,9 @@ func applyRegistrationFix(cmd *cobra.Command, projectRoot string, issues []regis
 		return nil, errfmt.Newf("failed to write id_prefixes config").Wrap(writeErr)
 	}
 	if renameErr := fileutil.Rename(tmpPath, configPath); renameErr != nil {
-		_ = fileutil.Remove(tmpPath) //nolint:errcheck // best effort cleanup
+		if rmErr := fileutil.Remove(tmpPath); rmErr != nil {
+			// best effort cleanup
+		}
 		return nil, errfmt.Newf("failed to replace id_prefixes config").Wrap(renameErr)
 	}
 	return added, nil

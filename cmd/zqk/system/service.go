@@ -161,18 +161,20 @@ type ServiceManager struct {
 	hostManager *service.Manager
 }
 
+var newHostServiceManager = service.NewManager
+
 // NewServiceManager creates a new service manager with auto-detected or provided host service adapters
 func NewServiceManager(opts ...service.ManagerOption) *ServiceManager {
 	return &ServiceManager{
 		logger:      logging.GetLoggerFromProfile(systemProfileHuman),
-		hostManager: service.NewManager(opts...),
+		hostManager: newHostServiceManager(opts...),
 	}
 }
 
 // HostManager returns the underlying decoupled host service manager.
 func (sm *ServiceManager) HostManager() *service.Manager {
 	if sm.hostManager == nil {
-		sm.hostManager = service.NewManager()
+		sm.hostManager = newHostServiceManager()
 	}
 	return sm.hostManager
 }
@@ -448,197 +450,115 @@ func (sm *ServiceManager) getServiceAuth(serviceName string, config *ServiceConf
 	return nil
 }
 
-// runServiceStart handles the start command
-func runServiceStart(cmd *cobra.Command, args []string) error {
-	serviceName := args[0]
-	logger := logging.GetLoggerFromContext(cmd.Context())
+type serviceCoordinationContext struct {
+	projectRoot     string
+	storageProvider storage.ObjectStorageProvider
+	profile         string
+	cleanup         func()
+}
 
-	manager := getActiveServiceManager()
-	config, err := manager.getServiceConfig(serviceName)
-	if err != nil {
-		return err
-	}
-
-	// Get authentication from multiple sources (in order of precedence):
-	// 1. Command flags (if added in future)
-	// 2. Environment variables
-	// 3. Security context (if available)
-	// 4. Service defaults
-	auth := manager.getServiceAuth(serviceName, config)
-
-	startTime := time.Now()
-	err = manager.Start(cmd.Context(), serviceName, auth)
-	duration := time.Since(startTime)
-
-	// Get project root and storage for coordination events
-	ctx := cli.GetContext(cmd)
+func resolveServiceCoordinationContext(cmd *cobra.Command) *serviceCoordinationContext {
+	ctx, sp, _, _, cleanup, err := openSystemStorageWithContext(cmd)
 	projectRoot := ""
-	var storageProvider storage.ObjectStorageProvider
+	profile := systemProfileHuman
 	if ctx != nil {
-		projectRoot = ctx.ProjectRoot
-		projectRoot = ProjectRootOrResolve(projectRoot)
-		if projectRoot != emptyValue {
-			factory, storageErr := storage.NewStorageFactory(cmd.Context(), projectRoot)
-			if storageErr == nil {
-				storageProvider = factory.GetStorage()
-				defer func() { _ = storageProvider.Shutdown(context.Background()) }() // Background: request-or-shutdown derived
-			}
-			if storageErr != nil {
-				// Best effort - continue without coordinator if storage unavailable
-				storageProvider = nil
-			}
+		projectRoot = ProjectRootOrResolve(ctx.ProjectRoot)
+		if ctx.Profile != emptyValue {
+			profile = ctx.Profile
 		}
 	}
+	if err != nil {
+		return &serviceCoordinationContext{
+			projectRoot: projectRoot,
+			profile:     profile,
+			cleanup:     func() {},
+		}
+	}
+	return &serviceCoordinationContext{
+		projectRoot:     projectRoot,
+		storageProvider: sp,
+		profile:         profile,
+		cleanup:         cleanup,
+	}
+}
+
+func (s *serviceCoordinationContext) emitEvent(ctx context.Context, op, serviceName, status string, err error, duration time.Duration) {
+	if s.projectRoot == emptyValue {
+		return
+	}
+	emitServiceOperationEventViaCoordinator(
+		ctx,
+		s.projectRoot,
+		s.storageProvider,
+		op,
+		serviceName,
+		status,
+		err,
+		duration,
+		s.profile,
+	)
+}
+
+func resolveServiceInvocation(cmd *cobra.Command, args []string) (string, *logging.EventLogger, *ServiceManager) {
+	return args[0], logging.GetLoggerFromContext(cmd.Context()), getActiveServiceManager()
+}
+
+func executeServiceLifecycleAction(cmd *cobra.Command, args []string, op, status, verb string, action func(manager *ServiceManager, serviceName string) error) error {
+	serviceName, logger, manager := resolveServiceInvocation(cmd, args)
+
+	coord := resolveServiceCoordinationContext(cmd)
+	defer coord.cleanup()
+
+	startTime := time.Now()
+	err := action(manager, serviceName)
+	duration := time.Since(startTime)
 
 	if err != nil {
-		logging.FluentEvent(logger).Error("Failed to start service", err).
+		logging.FluentEvent(logger).Error(fmt.Sprintf("Failed to %s service", op), err).
 			String("service", serviceName).
 			Log()
 
-		// Emit coordination event for service start failure
-		if projectRoot != emptyValue {
-			profile := systemProfileHuman // Default
-			if ctx != nil && ctx.Profile != emptyValue {
-				profile = ctx.Profile
-			}
-			emitServiceOperationEventViaCoordinator(
-				cmd.Context(),
-				projectRoot,
-				storageProvider,
-				"start",
-				serviceName,
-				eventStatusError,
-				err,
-				duration,
-				profile,
-			)
-		}
-
+		coord.emitEvent(cmd.Context(), op, serviceName, eventStatusError, err, duration)
 		return err
 	}
 
-	// Emit coordination event for successful service start
-	if projectRoot != emptyValue {
-		profile := systemProfileHuman // Default
-		if ctx != nil && ctx.Profile != emptyValue {
-			profile = ctx.Profile
-		}
-		emitServiceOperationEventViaCoordinator(
-			cmd.Context(),
-			projectRoot,
-			storageProvider,
-			"start",
-			serviceName,
-			eventStatusComplete,
-			nil,
-			duration,
-			profile,
-		)
-	}
+	coord.emitEvent(cmd.Context(), op, serviceName, eventStatusComplete, nil, duration)
+	return formatServiceResult(cmd, serviceName, status, verb)
+}
 
+// runServiceStart handles the start command
+func runServiceStart(cmd *cobra.Command, args []string) error {
+	return executeServiceLifecycleAction(cmd, args, "start", objects.ObjectStatusStarted, "started", func(manager *ServiceManager, serviceName string) error {
+		config, err := manager.getServiceConfig(serviceName)
+		if err != nil {
+			return err
+		}
+		auth := manager.getServiceAuth(serviceName, config)
+		return manager.Start(cmd.Context(), serviceName, auth)
+	})
+}
+
+func formatServiceResult(cmd *cobra.Command, serviceName, status, actionVerb string) error {
 	switch cli.GetFormat(cmd) {
 	case cli.FormatJSON, cli.FormatJSONL, cli.FormatYAML:
-		data := map[string]string{"service": serviceName, objects.FieldKeyStatus: objects.ObjectStatusStarted}
+		data := map[string]string{"service": serviceName, objects.FieldKeyStatus: status}
 		return cli.FormatOutput(cmd, data)
 	default:
-		msg := fmt.Sprintf("Service %s started successfully\n", serviceName)
+		msg := fmt.Sprintf("Service %s %s successfully\n", serviceName, actionVerb)
 		return cli.WriteOutput(cmd, []byte(msg))
 	}
 }
 
 // runServiceStop handles the stop command
 func runServiceStop(cmd *cobra.Command, args []string) error {
-	serviceName := args[0]
-	logger := logging.GetLoggerFromContext(cmd.Context())
-
-	manager := getActiveServiceManager()
-
-	startTime := time.Now()
-	err := manager.Stop(cmd.Context(), serviceName)
-	duration := time.Since(startTime)
-
-	// Get project root and storage for coordination events
-	ctx := cli.GetContext(cmd)
-	projectRoot := ""
-	var storageProvider storage.ObjectStorageProvider
-	if ctx != nil {
-		projectRoot = ctx.ProjectRoot
-		projectRoot = ProjectRootOrResolve(projectRoot)
-		if projectRoot != emptyValue {
-			factory, storageErr := storage.NewStorageFactory(cmd.Context(), projectRoot)
-			if storageErr == nil {
-				storageProvider = factory.GetStorage()
-				defer func() { _ = storageProvider.Shutdown(context.Background()) }() // Background: request-or-shutdown derived
-			}
-			if storageErr != nil {
-				// Best effort - continue without coordinator if storage unavailable
-				storageProvider = nil
-			}
-		}
-	}
-
-	if err != nil {
-		logging.FluentEvent(logger).Error("Failed to stop service", err).
-			String("service", serviceName).
-			Log()
-
-		// Emit coordination event for service stop failure
-		if projectRoot != emptyValue {
-			profile := systemProfileHuman // Default
-			if ctx != nil && ctx.Profile != emptyValue {
-				profile = ctx.Profile
-			}
-			emitServiceOperationEventViaCoordinator(
-				cmd.Context(),
-				projectRoot,
-				storageProvider,
-				"stop",
-				serviceName,
-				eventStatusError,
-				err,
-				duration,
-				profile,
-			)
-		}
-
-		return err
-	}
-
-	// Emit coordination event for successful service stop
-	if projectRoot != emptyValue {
-		profile := systemProfileHuman // Default
-		if ctx != nil && ctx.Profile != emptyValue {
-			profile = ctx.Profile
-		}
-		emitServiceOperationEventViaCoordinator(
-			cmd.Context(),
-			projectRoot,
-			storageProvider,
-			"stop",
-			serviceName,
-			eventStatusComplete,
-			nil,
-			duration,
-			profile,
-		)
-	}
-
-	switch cli.GetFormat(cmd) {
-	case cli.FormatJSON, cli.FormatJSONL, cli.FormatYAML:
-		data := map[string]string{"service": serviceName, objects.FieldKeyStatus: objects.ObjectStatusStopped}
-		return cli.FormatOutput(cmd, data)
-	default:
-		msg := fmt.Sprintf("Service %s stopped successfully\n", serviceName)
-		return cli.WriteOutput(cmd, []byte(msg))
-	}
+	return executeServiceLifecycleAction(cmd, args, "stop", objects.ObjectStatusStopped, "stopped", func(manager *ServiceManager, serviceName string) error {
+		return manager.Stop(cmd.Context(), serviceName)
+	})
 }
 
 // runServiceStatus handles the status command
 func runServiceStatus(cmd *cobra.Command, args []string) error {
-	serviceName := args[0]
-	logger := logging.GetLoggerFromContext(cmd.Context())
-
-	manager := getActiveServiceManager()
+	serviceName, logger, manager := resolveServiceInvocation(cmd, args)
 	running, err := manager.Status(cmd.Context(), serviceName)
 	if err != nil {
 		logging.FluentEvent(logger).Error("Failed to check service status", err).

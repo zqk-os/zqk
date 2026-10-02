@@ -165,6 +165,16 @@ func setupCLITestEnvironmentForComprehensive(t *testing.T) (tmpDir, cliBinary st
 	if err := copySpecFilesForComprehensive(sourceLifecyclesDir, targetLifecyclesDir); err != nil {
 		t.Fatalf("failed to copy lifecycle files: %v", err)
 	}
+	// Copy pack specs and lifecycles so all pack schemas are available in test environments
+	packsDir := filepath.Join(projectRoot, "packs")
+	if entries, err := fileutil.ReadDir(packsDir); err == nil {
+		for _, e := range entries {
+			if e.IsDir() {
+				_ = copySpecFilesForComprehensive(filepath.Join(packsDir, e.Name(), "specs"), targetSpecsDir)
+				_ = copySpecFilesForComprehensive(filepath.Join(packsDir, e.Name(), "lifecycles"), targetLifecyclesDir)
+			}
+		}
+	}
 
 	// Copy spec_index.json
 	sourceSpecIndex := filepath.Join(projectRoot, paths.ProcessInternalDir, "spec_index.json")
