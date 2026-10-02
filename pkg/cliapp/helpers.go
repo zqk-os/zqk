@@ -106,6 +106,20 @@ func AddCommonFlags(cmd *cobra.Command) {
 	}
 }
 
+// CommandHelpApplicator defines types that can apply help documentation to a command.
+type CommandHelpApplicator interface {
+	ApplyToCommand(cmd *cobra.Command)
+}
+
+// FinalizeCommand applies help and adds standard common flags to the command.
+func FinalizeCommand(cmd *cobra.Command, help CommandHelpApplicator) *cobra.Command {
+	if help != nil {
+		help.ApplyToCommand(cmd)
+	}
+	AddCommonFlags(cmd)
+	return cmd
+}
+
 // Common flag names used for exclusion (must match AddCommonFlags).
 const (
 	FlagTimeout             = "timeout"

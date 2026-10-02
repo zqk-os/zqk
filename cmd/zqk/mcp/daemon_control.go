@@ -68,6 +68,7 @@ type mcpDaemonTarget struct {
 	port        string
 	projectRoot string
 	pidFile     string
+	supPidFile  string
 	logger      logging.Logger
 }
 
@@ -84,6 +85,7 @@ func resolveMCPDaemonTarget(proc *cli.Processor, rawTCP string) mcpDaemonTarget 
 		port:        port,
 		projectRoot: root,
 		pidFile:     mcpDaemonPIDPath(root, port),
+		supPidFile:  mcpSupervisePIDPath(root, port),
 		logger:      logging.GetLoggerFromProfile(profile),
 	}
 }

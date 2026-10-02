@@ -30,11 +30,7 @@ func NewLaunchAssessmentCmd() *cobra.Command {
 
 	cmd.Flags().String("phase", "3", "The project phase to assess")
 
-	// Apply help builder to command
-	helpBuilder.ApplyToCommand(cmd)
-
-	cli.AddCommonFlags(cmd)
-	return cmd
+	return cli.FinalizeCommand(cmd, helpBuilder)
 }
 
 func runLaunchAssessment(cmd *cobra.Command, args []string) error {

@@ -26,14 +26,16 @@ func NewEnsureCmd() *cobra.Command {
 func runEnsure(cmd *cobra.Command, _ []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, _ []string, proc *cli.Processor) error {
 		var flags clipkg.FlagBag
-		tcpAddr := resolveTCPFlag(flags.String(cmd, "tcp"))
+		rawTCP := flags.String(cmd, "tcp")
 		if err := flags.Err(); err != nil {
 			return err
 		}
-		port := tcpPort(tcpAddr)
-		projectRoot := projectRootOrResolve(proc.ProjectRoot())
-		pidFile := mcpDaemonPIDPath(projectRoot, port)
-		logger := logging.GetLoggerFromProfile(proc.Context().Profile)
+		target := resolveMCPDaemonTarget(proc, rawTCP)
+		tcpAddr := target.addr
+		port := target.port
+		projectRoot := target.projectRoot
+		pidFile := target.pidFile
+		logger := target.logger
 
 		binPath := resolveMCPDaemonBinPath(projectRoot)
 		// Always refresh IDE role symlinks (daemon + ide-adapter), even when

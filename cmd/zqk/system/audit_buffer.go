@@ -59,11 +59,7 @@ func NewAuditBufferStatsCmd() *cobra.Command {
 		RunE: runAuditBufferStats,
 	})
 
-	// Apply help builder to command
-	helpBuilder.ApplyToCommand(cmd)
-
-	cli.AddCommonFlags(cmd)
-	return cmd
+	return cli.FinalizeCommand(cmd, helpBuilder)
 }
 
 // NewAuditBufferFlushCmd creates a command to flush the buffer
@@ -80,11 +76,7 @@ func NewAuditBufferFlushCmd() *cobra.Command {
 		RunE: runAuditBufferFlush,
 	})
 
-	// Apply help builder to command
-	helpBuilder.ApplyToCommand(cmd)
-
-	cli.AddCommonFlags(cmd)
-	return cmd
+	return cli.FinalizeCommand(cmd, helpBuilder)
 }
 
 // NewAuditBufferEnableCmd creates a command to enable the buffer
@@ -101,11 +93,7 @@ func NewAuditBufferEnableCmd() *cobra.Command {
 		RunE: runAuditBufferEnable,
 	})
 
-	// Apply help builder to command
-	helpBuilder.ApplyToCommand(cmd)
-
-	cli.AddCommonFlags(cmd)
-	return cmd
+	return cli.FinalizeCommand(cmd, helpBuilder)
 }
 
 // NewAuditBufferDisableCmd creates a command to disable the buffer
@@ -122,11 +110,7 @@ func NewAuditBufferDisableCmd() *cobra.Command {
 		RunE: runAuditBufferDisable,
 	})
 
-	// Apply help builder to command
-	helpBuilder.ApplyToCommand(cmd)
-
-	cli.AddCommonFlags(cmd)
-	return cmd
+	return cli.FinalizeCommand(cmd, helpBuilder)
 }
 
 func runAuditBufferStats(cmd *cobra.Command, args []string) error {

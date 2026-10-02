@@ -41,11 +41,7 @@ func NewInternalGetCmd() *cobra.Command {
 	cmd.Args = cobra.ExactArgs(1)
 	cmd.RunE = runInternalGet
 
-	// Apply help builder to command
-	helpBuilder.ApplyToCommand(cmd)
-
-	cli.AddCommonFlags(cmd)
-	return cmd
+	return cli.FinalizeCommand(cmd, helpBuilder)
 }
 
 func runInternalGet(cmd *cobra.Command, args []string) error {

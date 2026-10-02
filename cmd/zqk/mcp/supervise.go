@@ -32,7 +32,7 @@ func runEnsureOnce(projectRoot, tcpAddr string) {
 func runSupervise(cmd *cobra.Command, _ []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, _ []string, proc *cli.Processor) error {
 		var flags clipkg.FlagBag
-		tcpAddr := resolveTCPFlag(flags.String(cmd, "tcp"))
+		rawTCP := flags.String(cmd, "tcp")
 		isStatus := flags.Bool(cmd, "status")
 		isStop := flags.Bool(cmd, "stop")
 		isLoop := flags.Bool(cmd, "loop")
@@ -40,11 +40,13 @@ func runSupervise(cmd *cobra.Command, _ []string) error {
 			return err
 		}
 
-		port := tcpPort(tcpAddr)
-		projectRoot := projectRootOrResolve(proc.ProjectRoot())
-		pidFile := mcpDaemonPIDPath(projectRoot, port)
-		supPidFile := mcpSupervisePIDPath(projectRoot, port)
-		logger := logging.GetLoggerFromProfile(proc.Context().Profile)
+		target := resolveMCPDaemonTarget(proc, rawTCP)
+		tcpAddr := target.addr
+		port := target.port
+		projectRoot := target.projectRoot
+		pidFile := target.pidFile
+		supPidFile := target.supPidFile
+		logger := target.logger
 
 		if isStatus {
 			return cli.FormatOutput(cmd, superviseStatusPayload(tcpAddr, port, supPidFile))

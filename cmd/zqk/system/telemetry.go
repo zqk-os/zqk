@@ -83,7 +83,5 @@ func NewTelemetryCmd() *cobra.Command {
 		},
 	})
 
-	helpBuilder.ApplyToCommand(cmd)
-	cli.AddCommonFlags(cmd)
-	return cmd
+	return cli.FinalizeCommand(cmd, helpBuilder)
 }

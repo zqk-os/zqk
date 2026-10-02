@@ -246,7 +246,5 @@ func NewCliHooksCmd() *cobra.Command {
 			return runCliHooks(cmd, cliCtx, args)
 		})
 	}
-	helpBuilder.ApplyToCommand(cmd)
-	cli.AddCommonFlags(cmd)
-	return cmd
+	return cli.FinalizeCommand(cmd, helpBuilder)
 }
