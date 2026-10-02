@@ -366,11 +366,7 @@ func buildResultsByKind(results []CheckResult, projectRoot string) map[string][]
 }
 
 func outputJSON(cmd *cobra.Command, results []CheckResult, bufferCount int, bufferSummary map[string]int) error {
-	projectRoot := ""
-	if ctx := cli.GetContext(cmd); ctx != nil && ctx.ProjectRoot != emptyValue {
-		projectRoot = ctx.ProjectRoot
-	}
-	projectRoot = ProjectRootOrResolve(projectRoot)
+	projectRoot := resolveProjectRootFromCommand(cmd)
 
 	// Summary (unchanged shape)
 	summary := struct {
@@ -521,11 +517,7 @@ func outputJSONL(cmd *cobra.Command, results []CheckResult, bufferCount int, buf
 	return nil
 }
 func outputYAML(cmd *cobra.Command, results []CheckResult, bufferCount int, bufferSummary map[string]int) error {
-	projectRoot := ""
-	if ctx := cli.GetContext(cmd); ctx != nil && ctx.ProjectRoot != emptyValue {
-		projectRoot = ctx.ProjectRoot
-	}
-	projectRoot = ProjectRootOrResolve(projectRoot)
+	projectRoot := resolveProjectRootFromCommand(cmd)
 
 	// Create a structured output object
 	output := struct {
@@ -593,11 +585,7 @@ func outputYAML(cmd *cobra.Command, results []CheckResult, bufferCount int, buff
 func outputTable(cmd *cobra.Command, ctx *cli.Context, results []CheckResult, bufferCount int, bufferSummary map[string]int, staleCASResult *StaleCASCleanupResult, runIssues *ValidationRunIssues) error {
 	var buf strings.Builder
 
-	projectRoot := ""
-	if ctx != nil && ctx.ProjectRoot != emptyValue {
-		projectRoot = ctx.ProjectRoot
-	}
-	projectRoot = ProjectRootOrResolve(projectRoot)
+	projectRoot := resolveProjectRootFromCommand(cmd)
 
 	tierFilter, _ := cmd.Flags().GetInt("tier")
 	tierFilterActive := tierFilter > 0

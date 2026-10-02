@@ -27,19 +27,19 @@ func runCriteriaEvidenceFromCmd(cmd *cobra.Command, _ []string) error {
 	return runCriteriaEvidence(cliCtx, cmd)
 }
 
-func runCriteriaEvidence(cliCtx *cli.Context, cmd *cobra.Command) error {
-	_ = cliCtx
-	projectRoot, err := resolveSchedulerProjectRoot(cmd)
+func runCriteriaEvidence(_ *cli.Context, cmd *cobra.Command) error {
+	projectRoot, limit, err := resolveSchedulerRootAndLimit(cmd, 800)
 	if err != nil {
 		return err
 	}
-
-	limit, _ := cmd.Flags().GetInt("limit") //nolint:errcheck // optional
-	if limit <= 0 {
-		limit = 800
+	apply, err := cmd.Flags().GetBool("apply")
+	if err != nil {
+		apply = false
 	}
-	apply, _ := cmd.Flags().GetBool("apply")    //nolint:errcheck
-	dryRun, _ := cmd.Flags().GetBool("dry-run") //nolint:errcheck // default true
+	dryRun, err := cmd.Flags().GetBool("dry-run")
+	if err != nil {
+		dryRun = true
+	}
 
 	path := schedpkg.TestBundlesEventsFilePath(projectRoot)
 	ctx := cmd.Context()

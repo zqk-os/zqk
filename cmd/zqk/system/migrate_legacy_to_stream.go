@@ -53,13 +53,9 @@ func runMigrateLegacyToStream(cmd *cobra.Command, _ []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		removeLegacy, _ := cmd.Flags().GetBool("remove-legacy")
 
-		projectRoot := ""
-		if cliCtx := cli.GetContext(cmd); cliCtx != nil {
-			projectRoot = cliCtx.ProjectRoot
-		}
-		projectRoot = ProjectRootOrResolve(projectRoot)
-		if projectRoot == emptyValue {
-			return errfmt.Errorf("project root not found; run from repo or set --project-root")
+		projectRoot, err := resolveRequiredProjectRoot(cmd)
+		if err != nil {
+			return err
 		}
 		if abs, err := filepath.Abs(projectRoot); err == nil {
 			projectRoot = abs
@@ -69,7 +65,6 @@ func runMigrateLegacyToStream(cmd *cobra.Command, _ []string) error {
 		if k, ok := cli.KindCanonicalFromPRERun(cli.KindAnnotKeysSystem, cmd); ok {
 			kind = k
 		} else {
-			var err error
 			kind, err = objects.ResolveAndValidateKindForProject(projectRoot, kind)
 			if err != nil {
 				return err
@@ -84,11 +79,7 @@ func runMigrateLegacyToStream(cmd *cobra.Command, _ []string) error {
 			return errfmt.Errorf("unknown kind: %s", kind)
 		}
 
-		profile := systemProfileHuman
-		if c := cli.GetContext(cmd); c != nil {
-			profile = c.Profile
-		}
-		logger := logging.GetLoggerFromProfile(profile)
+		logger, _ := resolveCommandLogger(cmd)
 
 		kindDir := datacell.CellCASPrimaryDir(projectRoot, dirName)
 		if _, err := fileutil.Stat(kindDir); err != nil {
@@ -103,8 +94,6 @@ func runMigrateLegacyToStream(cmd *cobra.Command, _ []string) error {
 		}
 
 		storage.BuildPathAliasCacheForProject(projectRoot)
-		var err error
-		_ = err
 		provider := proc.Storage()
 		if provider == nil {
 			return errfmt.Errorf("storage provider is nil")

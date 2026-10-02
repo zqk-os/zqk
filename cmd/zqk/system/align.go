@@ -61,46 +61,41 @@ func NewAlignCmd() *cobra.Command {
 }
 
 func runAlign(cmd *cobra.Command, gapsOnly bool, goalID string, scoreOnly bool, dashboard bool) error {
-	ctx, storageProvider, secCtx, storageCtx, cleanup, err := openSystemStorageWithContext(cmd)
-	if err != nil {
-		return err
-	}
-	defer cleanup()
-
-	// List backlog items (work items with goal_refs)
-	listResult, err := storageProvider.List(cmd.Context(), secCtx, storageCtx, storage.ListFilter{
-		Kind: objects.KindBacklogItem,
-		Filters: map[string]any{
-			objects.FieldKeyStatus: map[string]any{
-				"$ne": objects.ObjectStatusArchived,
-			},
-		},
-		Fields:  []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, "goal_ref", objects.FieldKeyGoalRefs},
-		Limit:   10000,
-		SortBy:  "id",
-		SortAsc: true,
-	})
-	if err != nil {
-		return errfmt.Newf("list backlog_item").Wrap(err)
-	}
-
-	// List goals if we need them for coverage (optional; align works without goals)
-	var goalIDs map[string]bool
-	if goalID != emptyValue {
-		goalIDs = map[string]bool{goalID: true}
-	} else {
-		goalList, _ := storageProvider.List(cmd.Context(), secCtx, storageCtx, storage.ListFilter{
-			Kind: objects.KindGoal,
+	return withSystemStorageContext(cmd, func(sess *SystemStorageSession) error {
+		// List backlog items (work items with goal_refs)
+		listResult, err := sess.List(cmd.Context(), storage.ListFilter{
+			Kind: objects.KindBacklogItem,
 			Filters: map[string]any{
 				objects.FieldKeyStatus: map[string]any{
 					"$ne": objects.ObjectStatusArchived,
 				},
 			},
-			Fields:  []string{objects.FieldKeyID, objects.FieldKeyStatus},
-			Limit:   5000,
+			Fields:  []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, "goal_ref", objects.FieldKeyGoalRefs},
+			Limit:   10000,
 			SortBy:  "id",
 			SortAsc: true,
 		})
+		if err != nil {
+			return errfmt.Newf("list backlog_item").Wrap(err)
+		}
+
+		// List goals if we need them for coverage (optional; align works without goals)
+		var goalIDs map[string]bool
+		if goalID != emptyValue {
+			goalIDs = map[string]bool{goalID: true}
+		} else {
+			goalList, _ := sess.List(cmd.Context(), storage.ListFilter{
+				Kind: objects.KindGoal,
+				Filters: map[string]any{
+					objects.FieldKeyStatus: map[string]any{
+						"$ne": objects.ObjectStatusArchived,
+					},
+				},
+				Fields:  []string{objects.FieldKeyID, objects.FieldKeyStatus},
+				Limit:   5000,
+				SortBy:  "id",
+				SortAsc: true,
+			})
 		goalIDs = make(map[string]bool)
 		for _, obj := range goalList.Objects {
 			if id, ok := obj[objects.FieldKeyID].(string); ok {
@@ -181,11 +176,12 @@ func runAlign(cmd *cobra.Command, gapsOnly bool, goalID string, scoreOnly bool, 
 	switch cli.GetFormat(cmd) {
 	case cli.FormatJSON, cli.FormatJSONL, cli.FormatYAML:
 		if err := cli.FormatOutput(cmd, result); err != nil {
-			logging.Fluent(logging.GetLoggerFromProfile(ctx.Profile)).Error("align format output", err).Log()
+			logging.Fluent(logging.GetLoggerFromProfile(sess.Ctx.Profile)).Error("align format output", err).Log()
 			return err
 		}
 		return nil
 	default:
 		return OutputAlignTable(cmd, result, gapsOnly, goalID)
 	}
+	})
 }

@@ -61,10 +61,14 @@ func (p *initProgress) reportValidationProgress(stage, message string) {
 	}
 }
 
-func (p *initProgress) Header(projectName string, mode InitMode) {
+func (p *initProgress) printInteractive(format string, a ...any) {
 	p.withInteractiveLock(func() {
-		fmt.Fprintf(p.out, "🚀 Initializing %s Kernel — Project: %s (Mode: %s)\n\n", brand.ProductName(), projectName, mode)
+		fmt.Fprintf(p.out, format, a...)
 	})
+}
+
+func (p *initProgress) Header(projectName string, mode InitMode) {
+	p.printInteractive("🚀 Initializing %s Kernel — Project: %s (Mode: %s)\n\n", brand.ProductName(), projectName, mode)
 }
 
 func (p *initProgress) Step(step, total int, stageName string) {
@@ -82,9 +86,7 @@ func (p *initProgress) SubStep(message string) {
 		stage = p.currentStage
 	}
 	p.reportValidationProgress(stage, message)
-	p.withInteractiveLock(func() {
-		fmt.Fprintf(p.out, "      ↳ %s\n", message)
-	})
+	p.printInteractive("      ↳ %s\n", message)
 }
 
 func (p *initProgress) runHeartbeat() {

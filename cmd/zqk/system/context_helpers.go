@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cliapp"
@@ -219,4 +220,119 @@ func formatMigrationSummary(title, emptyMsg string, migratedByKind map[string]in
 	return b.String()
 }
 
+// SystemStorageSession bundles CLI context, storage provider, and operational contexts.
+type SystemStorageSession struct {
+	Ctx             *cli.Context
+	StorageProvider storage.ObjectStorageProvider
+	SecCtx          *pkgctx.SecurityContext
+	StorageCtx      *pkgctx.StorageContext
+}
 
+// List executes a list query using the session's security and storage contexts.
+func (s *SystemStorageSession) List(ctx context.Context, filter storage.ListFilter) (*storage.QueryResult, error) {
+	return s.StorageProvider.List(ctx, s.SecCtx, s.StorageCtx, filter)
+}
+
+// Update executes an update using the session's security context.
+func (s *SystemStorageSession) Update(ctx context.Context, id string, updates map[string]any) error {
+	return s.StorageProvider.Update(ctx, s.SecCtx, id, updates)
+}
+
+// withSystemStorageContext executes a function with an active SystemStorageSession, handling cleanup.
+func withSystemStorageContext(cmd *cobra.Command, fn func(sess *SystemStorageSession) error) error {
+	ctx, storageProvider, secCtx, storageCtx, cleanup, err := openSystemStorageWithContext(cmd)
+	if err != nil {
+		return err
+	}
+	defer cleanup()
+	return fn(&SystemStorageSession{
+		Ctx:             ctx,
+		StorageProvider: storageProvider,
+		SecCtx:          secCtx,
+		StorageCtx:      storageCtx,
+	})
+}
+
+// resolveProjectRootFromCommand resolves project root from CLI context or fallback detection.
+func resolveProjectRootFromCommand(cmd *cobra.Command) string {
+	projectRoot := ""
+	if ctx := cli.GetContext(cmd); ctx != nil && ctx.ProjectRoot != emptyValue {
+		projectRoot = ctx.ProjectRoot
+	}
+	return ProjectRootOrResolve(projectRoot)
+}
+
+// resolveRequiredProjectRoot resolves project root or returns an error if not found.
+func resolveRequiredProjectRoot(cmd *cobra.Command) (string, error) {
+	projectRoot := resolveProjectRootFromCommand(cmd)
+	if projectRoot == emptyValue {
+		return "", errfmt.Errorf("project root not found; run from repo or set --project-root")
+	}
+	return projectRoot, nil
+}
+
+// resolveCommandProfile extracts command profile or defaults to systemProfileHuman.
+func resolveCommandProfile(cmd *cobra.Command) string {
+	if c := cli.GetContext(cmd); c != nil && c.Profile != "" {
+		return c.Profile
+	}
+	return systemProfileHuman
+}
+
+// resolveCommandLogger returns the logger and profile associated with the command.
+func resolveCommandLogger(cmd *cobra.Command) (logging.Logger, string) {
+	profile := resolveCommandProfile(cmd)
+	return logging.GetLoggerFromProfile(profile), profile
+}
+
+// analyzeCommandMetrics runs metric analysis using the provided metrics store.
+func analyzeCommandMetrics(store clipkg.MetricsStore) (*clipkg.MetricsAnalyzer, *clipkg.AnalysisResult, error) {
+	analyzer := clipkg.NewMetricsAnalyzer(store)
+	analysis, err := analyzer.Analyze()
+	if err != nil {
+		return nil, nil, errfmt.Newf("failed to analyze metrics").Wrap(err)
+	}
+	return analyzer, analysis, nil
+}
+
+// openAndAnalyzeCommandMetrics opens the metrics store for projectRoot and performs analysis.
+func openAndAnalyzeCommandMetrics(projectRoot string) (*clipkg.MetricsAnalyzer, *clipkg.AnalysisResult, error) {
+	store, err := openCommandMetricsStore(projectRoot)
+	if err != nil {
+		return nil, nil, err
+	}
+	return analyzeCommandMetrics(store)
+}
+
+// generateFormattedAnalysisReport formats an analysis result as JSON, YAML, or markdown table.
+func generateFormattedAnalysisReport(analyzer *clipkg.MetricsAnalyzer, analysis *clipkg.AnalysisResult, format string) ([]byte, error) {
+	switch format {
+	case "json":
+		return analyzer.GenerateReportJSON(analysis)
+	case "yaml":
+		return analyzer.GenerateReportYAML(analysis)
+	default:
+		return []byte(analyzer.GenerateReport(analysis)), nil
+	}
+}
+
+// ConsoleColors holds standardized color sprint functions for consistent CLI output formatting.
+type ConsoleColors struct {
+	Bold   func(a ...any) string
+	Cyan   func(a ...any) string
+	Green  func(a ...any) string
+	Yellow func(a ...any) string
+	Red    func(a ...any) string
+	Dim    func(a ...any) string
+}
+
+func newConsoleColors() ConsoleColors {
+	return ConsoleColors{
+		Bold:   color.New(color.Bold).SprintFunc(),
+		Cyan:   color.New(color.FgCyan).SprintFunc(),
+		Green:  color.New(color.FgGreen).SprintFunc(),
+		Yellow: color.New(color.FgYellow).SprintFunc(),
+		Red:    color.New(color.FgRed).SprintFunc(),
+		Dim:    color.New(color.Faint).SprintFunc(),
+	}
+}

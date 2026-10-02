@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/coordination"
-	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
@@ -39,57 +38,21 @@ func emitOperationExecutorEventViaCoordinator(
 	auditMetadata[eventKeyDurationSeconds] = duration.Seconds()
 	auditMetadata[eventKeyOperationType] = operationTypeOperationExecutor
 	auditMetadata[eventKeySource] = sourceBackgroundWorker
+	auditMetadata[eventKeySeverity] = determineFailureSeverity(status, failedCount, processedCount)
 
-	// Determine severity
-	severity := severityLow
-	if status == eventStatusError || failedCount > 0 {
-		if failedCount > processedCount/2 {
-			severity = severityHigh
-		} else {
-			severity = severityMedium
-		}
-	}
-	auditMetadata[eventKeySeverity] = severity
+	loggingFields, metricsData := buildWorkerLoggingAndMetrics(
+		operationType, status,
+		coordination.LoggingField{Key: eventKeyWorkerCount, Value: workerCount},
+		coordination.LoggingField{Key: eventKeyProcessedCount, Value: processedCount},
+		coordination.LoggingField{Key: eventKeyFailedCount, Value: failedCount},
+	)
 
-	// Build logging fields
-	loggingFields := []coordination.LoggingField{
-		{Key: eventKeyOperationType, Value: operationType},
-		{Key: eventKeyWorkerCount, Value: workerCount},
-		{Key: eventKeyProcessedCount, Value: processedCount},
-		{Key: eventKeyFailedCount, Value: failedCount},
-		{Key: eventKeyStatus, Value: status},
-	}
-	// Build metrics data
-	metricsData := map[string]any{
-		eventKeyOperationType:  operationType,
-		eventKeyWorkerCount:    workerCount,
-		eventKeyProcessedCount: processedCount,
-		eventKeyFailedCount:    failedCount,
-		eventKeyStatus:         status,
-	}
-
-	eventData := buildCoordinationEventData(loggingFields, auditMetadata, metricsData, duration, nil)
-
-	// Create event context (enable audit, metrics, and logging; operational for lifecycle events)
 	emitOperational := operationType == "worker_start" || operationType == "worker_shutdown" || operationType == "worker_idle_shutdown"
-	eventCtx := coordination.NewEventContext(operationID, eventTypeOperationExecutor, status).
-		WithEventData(eventData).
-		WithContext(ctx).
-		WithChannels(true, true, true, emitOperational) // Logging, audit, metrics; operational for lifecycle
-
-	if duration > 0 {
-		eventCtx = eventCtx.WithDuration(duration)
-	}
-
-	// Emit via coordinator (async, non-blocking)
-	bud := goroutinelabels.DefaultBudget()
-	builder := goroutinelabels.NewGoroutine("operation_executor_event_emit", fmt.Sprintf("emitting operation executor event: %s", operationType))
-	if bud != nil {
-		builder = builder.WithBudget(bud)
-	}
-	builder.StartSimple(func() {
-		_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
-	})
+	emitWorkerLifecycleCoordinationEvent(
+		ctx, coordinator, operationID, eventTypeOperationExecutor, operationType, status,
+		auditMetadata, loggingFields, metricsData, duration, emitOperational,
+		"operation_executor_event_emit", fmt.Sprintf("emitting operation executor event: %s", operationType),
+	)
 }
 
 func init() {

@@ -12,16 +12,10 @@ import (
 	schedpkg "github.com/zqk-os/zqk/pkg/scheduler"
 )
 
-func runTestFailuresHealth(cliCtx *cli.Context, cmd *cobra.Command) error {
-	_ = cliCtx
-	projectRoot, err := resolveSchedulerProjectRoot(cmd)
+func runTestFailuresHealth(_ *cli.Context, cmd *cobra.Command) error {
+	projectRoot, limit, err := resolveSchedulerRootAndLimit(cmd, 500)
 	if err != nil {
 		return err
-	}
-
-	limit, _ := cmd.Flags().GetInt("limit")
-	if limit <= 0 {
-		limit = 500
 	}
 
 	path := schedpkg.TestBundlesHealthFilePath(projectRoot)
@@ -40,11 +34,12 @@ func runTestFailuresHealth(cliCtx *cli.Context, cmd *cobra.Command) error {
 	fingerprintLastOutcome := make(map[string]string)
 
 	for _, m := range recent {
-		o, _ := m[schedpkg.KeyTestOutcome].(string)
+		o := extractTestHealthMapString(m, schedpkg.KeyTestOutcome)
 		if o != emptyValue {
 			outcomeCount[o]++
 		}
-		if fp, ok := m[schedpkg.KeyBundleCommandFingerprint].(string); ok && fp != emptyValue && o != emptyValue {
+		fp := extractTestHealthMapString(m, schedpkg.KeyBundleCommandFingerprint)
+		if fp != emptyValue && o != emptyValue {
 			fingerprintLastOutcome[fp] = o
 		}
 	}
@@ -66,15 +61,7 @@ func runTestFailuresHealth(cliCtx *cli.Context, cmd *cobra.Command) error {
 	good := outcomeCount["pass"] + outcomeCount["ok"]
 	bad := outcomeCount["test_fail"] + outcomeCount["fail"] + outcomeCount["timeout"]
 	b.WriteString("\nSignal: ")
-	if len(recent) == 0 {
-		b.WriteString("no data.\n")
-	} else if bad == 0 {
-		b.WriteString("all recorded outcomes in this window are green (pass/ok).\n")
-	} else if good >= bad {
-		b.WriteString("mixed or recovering (failures present but some passes in window).\n")
-	} else {
-		b.WriteString("needs attention (failures/timeouts dominate this window).\n")
-	}
+	b.WriteString(resolveHealthSignalMessage(len(recent), good, bad))
 
 	b.WriteString("\nPer-bundle fingerprint (latest outcome in window):\n")
 	fps := make([]string, 0, len(fingerprintLastOutcome))
@@ -94,3 +81,24 @@ func runTestFailuresHealth(cliCtx *cli.Context, cmd *cobra.Command) error {
 
 	return cli.WriteOutput(cmd, []byte(b.String()))
 }
+
+func extractTestHealthMapString(m map[string]any, key string) string {
+	if s, ok := m[key].(string); ok {
+		return s
+	}
+	return ""
+}
+
+func resolveHealthSignalMessage(recentCount, good, bad int) string {
+	switch {
+	case recentCount == 0:
+		return "no data.\n"
+	case bad == 0:
+		return "all recorded outcomes in this window are green (pass/ok).\n"
+	case good >= bad:
+		return "mixed or recovering (failures present but some passes in window).\n"
+	default:
+		return "needs attention (failures/timeouts dominate this window).\n"
+	}
+}
+

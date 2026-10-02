@@ -93,15 +93,20 @@ type testFailuresFilterConfig struct {
 	CutoffTime    time.Time
 }
 
-func parseTestFailuresFilterConfig(cliCtx *cli.Context, cmd *cobra.Command) (*testFailuresFilterConfig, error) {
-	_ = cliCtx
+func parseTestFailuresFilterConfig(_ *cli.Context, cmd *cobra.Command) (*testFailuresFilterConfig, error) {
 	projectRoot, err := resolveSchedulerProjectRoot(cmd)
 	if err != nil {
 		return nil, err
 	}
 
-	packageFilter, _ := cmd.Flags().GetString("package")
-	sinceStr, _ := cmd.Flags().GetString("since")
+	packageFilter, err := cmd.Flags().GetString("package")
+	if err != nil {
+		packageFilter = ""
+	}
+	sinceStr, err := cmd.Flags().GetString("since")
+	if err != nil {
+		sinceStr = ""
+	}
 
 	since, err := time.ParseDuration(sinceStr)
 	if err != nil {

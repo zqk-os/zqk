@@ -82,11 +82,7 @@ func runObjectCountReportImpl(cmd *cobra.Command, _ []string) error {
 			return err
 		}
 
-		projectRoot := ""
-		if cliCtx := cli.GetContext(cmd); cliCtx != nil {
-			projectRoot = cliCtx.ProjectRoot
-		}
-		projectRoot = ProjectRootOrResolve(projectRoot)
+		projectRoot := resolveProjectRootFromCommand(cmd)
 
 		reportFileFlag := cmd.Flags().Lookup("report-file")
 		userProvidedReportFile := reportFileFlag != nil && reportFileFlag.Changed

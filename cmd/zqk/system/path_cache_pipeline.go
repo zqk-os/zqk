@@ -88,16 +88,12 @@ func RunPathCacheViaPipeline(cmd *cobra.Command, _ []string) error {
 			if pctx.Outcome == nil {
 				pctx.Outcome = make(map[string]any)
 			}
-			projectRoot := ProjectRootOrResolve("")
-			if projectRoot == emptyValue {
-				return nil, errfmt.Errorf("project root not found; run from repo or pass --project-root")
+			projectRoot, err := resolveRequiredProjectRoot(cmd)
+			if err != nil {
+				return nil, err
 			}
 
-			profile := systemProfileHuman
-			if c := cli.GetContext(cmd); c != nil {
-				profile = c.Profile
-			}
-			logger := logging.GetLoggerFromProfile(profile)
+			logger, profile := resolveCommandLogger(cmd)
 
 			wait, _ := cmd.Flags().GetBool("wait")
 			showPaths, _ := cmd.Flags().GetBool("show-paths")

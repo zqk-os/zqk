@@ -59,22 +59,17 @@ func runAuditMilestones(cmd *cobra.Command, fix bool, defaultMilestoneID string)
 		return errfmt.Errorf("--default-milestone is required when --fix is specified")
 	}
 
-	_, storageProvider, secCtx, storageCtx, cleanup, err := openSystemStorageWithContext(cmd)
-	if err != nil {
-		return err
-	}
-	defer cleanup()
-
-	// List backlog items
-	listResult, err := storageProvider.List(cmd.Context(), secCtx, storageCtx, storage.DefaultQueryFactory.
-		NotArchived(objects.KindBacklogItem).
-		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyMilestoneRefs).
-		Limit(10000).
-		Sort("id", true).
-		Build())
-	if err != nil {
-		return errfmt.Newf("list backlog_item").Wrap(err)
-	}
+	return withSystemStorageContext(cmd, func(sess *SystemStorageSession) error {
+		// List backlog items
+		listResult, err := sess.List(cmd.Context(), storage.DefaultQueryFactory.
+			NotArchived(objects.KindBacklogItem).
+			IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyMilestoneRefs).
+			Limit(10000).
+			Sort("id", true).
+			Build())
+		if err != nil {
+			return errfmt.Newf("list backlog_item").Wrap(err)
+		}
 
 	var unlinked []map[string]any
 	var linked int
@@ -113,9 +108,9 @@ func runAuditMilestones(cmd *cobra.Command, fix bool, defaultMilestoneID string)
 				objects.FieldKeyMilestoneRefs: []string{defaultMilestoneID},
 			}
 
-			errUpdate := storageProvider.Update(cmd.Context(), secCtx, id, updates)
+			errUpdate := sess.Update(cmd.Context(), id, updates)
 			if errUpdate != nil {
-				logging.Fluent(logging.GetLoggerFromProfile(ctx.Profile)).Error("failed to fix milestone association", errUpdate).Log()
+				logging.Fluent(logging.GetLoggerFromProfile(sess.Ctx.Profile)).Error("failed to fix milestone association", errUpdate).Log()
 			} else {
 				fixedCount++
 			}
@@ -142,7 +137,7 @@ func runAuditMilestones(cmd *cobra.Command, fix bool, defaultMilestoneID string)
 	switch cli.GetFormat(cmd) {
 	case cli.FormatJSON, cli.FormatJSONL, cli.FormatYAML:
 		if err := cli.FormatOutput(cmd, result); err != nil {
-			logging.Fluent(logging.GetLoggerFromProfile(ctx.Profile)).Error("audit-milestones format output", err).Log()
+			logging.Fluent(logging.GetLoggerFromProfile(sess.Ctx.Profile)).Error("audit-milestones format output", err).Log()
 			return err
 		}
 		return nil
@@ -172,4 +167,5 @@ func runAuditMilestones(cmd *cobra.Command, fix bool, defaultMilestoneID string)
 		}
 		return nil
 	}
+	})
 }

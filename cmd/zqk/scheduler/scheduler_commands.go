@@ -103,8 +103,14 @@ func runStart(cmd *cobra.Command, args []string) error {
 	// Default: run in background when no flags are set. When user explicitly passes --foreground or
 	// --background=false, run in foreground. Using Changed() ensures "zqk scheduler start" with no
 	// flags always runs in background (PID created by detached child).
-	foreground, _ := cmd.Flags().GetBool("foreground") //nolint:errcheck
-	background, _ := cmd.Flags().GetBool("background") //nolint:errcheck
+	foreground, err := cmd.Flags().GetBool("foreground")
+	if err != nil {
+		foreground = false
+	}
+	background, err := cmd.Flags().GetBool("background")
+	if err != nil {
+		background = true
+	}
 	var runInForeground bool
 	if !cmd.Flags().Changed("foreground") && !cmd.Flags().Changed("background") {
 		runInForeground = false // default: background
@@ -169,6 +175,18 @@ func resolveSchedulerProjectRoot(cmd *cobra.Command) (string, error) {
 		return "", errfmt.Errorf("project root is required (run from project directory or set ZQK_PROJECT_ROOT)")
 	}
 	return projectRoot, nil
+}
+
+func resolveSchedulerRootAndLimit(cmd *cobra.Command, defaultLimit int) (string, int, error) {
+	projectRoot, err := resolveSchedulerProjectRoot(cmd)
+	if err != nil {
+		return "", 0, err
+	}
+	limit, err := cmd.Flags().GetInt("limit")
+	if err != nil || limit <= 0 {
+		limit = defaultLimit
+	}
+	return projectRoot, limit, nil
 }
 
 func runIssues(cmd *cobra.Command, args []string) error {
