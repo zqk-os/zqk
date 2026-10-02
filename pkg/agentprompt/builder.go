@@ -320,16 +320,17 @@ func BuildTaskPrompt(ctx context.Context, sp storage.ObjectStorageProvider, secC
 		Payload: footerSb.String(),
 	})
 
-	allocator := pipeline.NewAllocator(budget)
-	selected := allocator.Allocate(candidates)
+	return allocateAndConcatCandidates(candidates, budget), nil
+}
 
+func allocateAndConcatCandidates(candidates []pipeline.ContextNode, budget int) string {
+	selected := pipeline.NewAllocator(budget).Allocate(candidates)
 	var sb strings.Builder
 	for _, node := range selected {
 		content, _ := node.Payload.(string)
 		sb.WriteString(content)
 	}
-
-	return sb.String(), nil
+	return sb.String()
 }
 
 // SentinelPromptTemplateID is the canonical ID for the CAP Sentinel prompt template.
@@ -451,14 +452,7 @@ func BuildSentinelPrompt(ctx context.Context, sp storage.ObjectStorageProvider, 
 	}
 
 	// 3. Allocate within budget and assemble in topological order.
-	selected := pipeline.NewAllocator(budget).Allocate(candidates)
-
-	var sb strings.Builder
-	for _, node := range selected {
-		content, _ := node.Payload.(string)
-		sb.WriteString(content)
-	}
-	return sb.String(), nil
+	return allocateAndConcatCandidates(candidates, budget), nil
 }
 
 // compactStateJSON strips verbose, low-signal fields from the whats-next JSON before

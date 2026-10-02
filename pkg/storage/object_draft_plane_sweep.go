@@ -63,23 +63,11 @@ func SweepObjectDraftPlane(projectRoot string, opts ObjectDraftPlaneSweepOptions
 		}
 	}
 
-	matched, skipped, inv, err := MatchObjectDraftPlane(projectRoot, ObjectDraftPlaneMatchOptions{
-		Kind: opts.Kind, IDPrefix: opts.IDPrefix, Status: opts.Status,
-		OlderThan: opts.OlderThan, All: opts.All, Max: opts.Max, IncludeCASBacked: true,
-	})
+	matched, skipped, inv, err := MatchObjectDraftPlane(projectRoot, sweepMatchOptions(opts))
 	if err != nil {
 		return nil, err
 	}
-	out.Inventory = inv
-	out.Matched = len(matched)
-	out.Skipped = len(skipped)
-
-	for _, s := range skipped {
-		out.Items = append(out.Items, ObjectDraftPlaneSweepItem{
-			ID: s.ID, Kind: s.Kind, Status: s.Status, Path: s.Path,
-			Action: s.Action, Reason: s.Reason,
-		})
-	}
+	populateSweepMatches(out, inv, matched, skipped)
 	for _, m := range matched {
 		item := ObjectDraftPlaneSweepItem{
 			ID: m.ID, Kind: m.Kind, Status: m.Status, Path: m.Path,

@@ -146,26 +146,20 @@ func (m *CASMigrationUtility) MigrateKindToCAS(ctx context.Context, secCtx *pkgc
 //
 //nolint:gocritic // Multiple return values intentional for summary/error map
 func (m *CASMigrationUtility) MigrateAllToCAS(ctx context.Context, secCtx *pkgctx.SecurityContext, removeOldFiles bool) (map[string]int, map[string][]error) {
-	// Discover all object kinds
-	kinds := m.facade.DiscoverObjectKinds()
-
-	migratedByKind := make(map[string]int)
-	errorsByKind := make(map[string][]error)
-
-	// Migrate each kind that uses CAS
-	for _, kind := range kinds {
+	res := newMigrationResultMaps()
+	for _, kind := range m.facade.DiscoverObjectKinds() {
 		if !m.facade.UsesContentAddressableStorage(kind) {
 			continue
 		}
 
 		migrated, errors := m.MigrateKindToCAS(ctx, secCtx, kind, removeOldFiles)
-		migratedByKind[kind] = migrated
+		res.migratedByKind[kind] = migrated
 		if len(errors) > 0 {
-			errorsByKind[kind] = errors
+			res.errorsByKind[kind] = errors
 		}
 	}
 
-	return migratedByKind, errorsByKind
+	return res.migratedByKind, res.errorsByKind
 }
 
 // discoverObjectKinds discovers all object kinds by scanning the process directory

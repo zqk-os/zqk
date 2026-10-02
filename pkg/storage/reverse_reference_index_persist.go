@@ -11,26 +11,23 @@ import (
 	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
-func readOptionalCacheFile(cachePath string) ([]byte, error) {
+func readOptionalCacheData(cachePath string) ([]byte, bool, error) {
 	data, err := fileutil.ReadFile(cachePath)
 	if fileutil.IsNotExist(err) {
-		return nil, nil
+		return nil, false, nil
 	}
 	if err != nil {
-		return nil, errfmt.Newf(ConstMiscFailedToReadCacheFile).Wrap(err)
+		return nil, false, errfmt.Newf(ConstMiscFailedToReadCacheFile).Wrap(err)
 	}
-	return data, nil
+	return data, true, nil
 }
 
 func (r *ReverseReferenceIndex) LoadCache(projectRoot string) (bool, error) {
 	cachePath := r.getCacheFilePath(projectRoot)
 
-	data, err := readOptionalCacheFile(cachePath)
-	if err != nil {
+	data, ok, err := readOptionalCacheData(cachePath)
+	if err != nil || !ok {
 		return false, err
-	}
-	if data == nil {
-		return false, nil
 	}
 
 	// Parse cache file

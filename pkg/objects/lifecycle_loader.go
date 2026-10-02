@@ -37,6 +37,30 @@ type Lifecycle struct {
 	Location string `yaml:"-"`
 }
 
+// LoadLifecycleFile reads and parses a lifecycle YAML file from disk.
+func LoadLifecycleFile(path string) (*Lifecycle, error) {
+	data, err := fileutil.ReadFile(path)
+	if err != nil {
+		return nil, errfmt.Newf("failed to read lifecycle file").Wrap(err)
+	}
+	var lc Lifecycle
+	if err := yaml.Unmarshal(data, &lc); err != nil {
+		return nil, errfmt.Newf("failed to parse lifecycle file").Wrap(err)
+	}
+	return &lc, nil
+}
+
+// DeriveLifecycleTitle converts an objectType like "base_object" to "Base Object Lifecycle".
+func DeriveLifecycleTitle(objectType string) string {
+	titleParts := strings.Split(strings.ReplaceAll(objectType, "_", " "), " ")
+	for i, part := range titleParts {
+		if len(part) > 0 {
+			titleParts[i] = strings.ToUpper(part[:1]) + strings.ToLower(part[1:])
+		}
+	}
+	return strings.Join(titleParts, " ") + " Lifecycle"
+}
+
 // Status represents a lifecycle status
 type Status struct {
 	Value       string `yaml:"value"`

@@ -112,8 +112,7 @@ func RenderTable(columns []string, widths []int, rows [][]string) string {
 	return RenderTableWithTitle("", columns, widths, rows)
 }
 
-// RenderTableWithTitle formats a table using go-pretty/table with specified column widths and a centered title row.
-func RenderTableWithTitle(title string, columns []string, widths []int, rows [][]string) string {
+func createBaseTableWriter(title string, columns []string, rows [][]string) table.Writer {
 	t := table.NewWriter()
 	if title != "" {
 		t.SetTitle(title)
@@ -134,62 +133,43 @@ func RenderTableWithTitle(title string, columns []string, widths []int, rows [][
 		}
 		t.AppendRow(row)
 	}
+	return t
+}
 
-	// Prepare column configs
+func configureTableColumnWidths(t table.Writer, widths []int, enforcer func(string, int) string) {
 	var colConfigs []table.ColumnConfig
 	for i, w := range widths {
 		colConfigs = append(colConfigs, table.ColumnConfig{
 			Number:           i + 1,
 			WidthMin:         w,
 			WidthMax:         w,
-			WidthMaxEnforcer: TruncateString,
+			WidthMaxEnforcer: enforcer,
 		})
 	}
 	t.SetColumnConfigs(colConfigs)
+}
 
+func renderConfiguredTable(title string, columns []string, widths []int, rows [][]string, enforcer func(string, int) string, customize func(table.Writer)) string {
+	t := createBaseTableWriter(title, columns, rows)
+	configureTableColumnWidths(t, widths, enforcer)
 	t.SetStyle(table.StyleLight)
+	if customize != nil {
+		customize(t)
+	}
 	return adjustEmojiPadding(t.Render())
+}
+
+// RenderTableWithTitle formats a table using go-pretty/table with specified column widths and a centered title row.
+func RenderTableWithTitle(title string, columns []string, widths []int, rows [][]string) string {
+	return renderConfiguredTable(title, columns, widths, rows, TruncateString, nil)
 }
 
 // RenderTableWithTitleAndWrap formats a table using go-pretty/table with specified column widths, centered title, and text wrapping (instead of truncation).
 func RenderTableWithTitleAndWrap(title string, columns []string, widths []int, rows [][]string) string {
-	t := table.NewWriter()
-	if title != "" {
-		t.SetTitle(title)
-	}
-
-	// Prepare header
-	headerRow := make(table.Row, len(columns))
-	for i, h := range columns {
-		headerRow[i] = strings.ToUpper(h)
-	}
-	t.AppendHeader(headerRow)
-
-	// Prepare rows
-	for _, r := range rows {
-		row := make(table.Row, len(r))
-		for i, v := range r {
-			row[i] = v
-		}
-		t.AppendRow(row)
-	}
-
-	// Prepare column configs - set WidthMin and WidthMax to enforce exact widths and wrapping
-	var colConfigs []table.ColumnConfig
-	for i, w := range widths {
-		colConfigs = append(colConfigs, table.ColumnConfig{
-			Number:           i + 1,
-			WidthMin:         w,
-			WidthMax:         w,
-			WidthMaxEnforcer: text.WrapSoft,
-		})
-	}
-	t.SetColumnConfigs(colConfigs)
-
-	t.SetStyle(table.StyleLight)
-	t.Style().Title.Colors = text.Colors{text.Bold}
-	t.Style().Color.Header = text.Colors{text.Bold}
-	return adjustEmojiPadding(t.Render())
+	return renderConfiguredTable(title, columns, widths, rows, text.WrapSoft, func(t table.Writer) {
+		t.Style().Title.Colors = text.Colors{text.Bold}
+		t.Style().Color.Header = text.Colors{text.Bold}
+	})
 }
 
 // adjustEmojiPadding aligns table borders by trimming trailing spaces in cells where emojis

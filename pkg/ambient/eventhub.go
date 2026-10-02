@@ -33,6 +33,18 @@ type Event struct {
 	Timestamp time.Time
 }
 
+// ExtractFilesystemEventPayload extracts target, operation, and source fields from a filesystem event payload.
+func ExtractFilesystemEventPayload(event Event) (target string, op string, source string, ok bool) {
+	payload, ok := event.Payload.(map[string]any)
+	if !ok {
+		return "", "", "", false
+	}
+	target, _ = payload[objects.FieldKeyTargetID].(string)
+	op, _ = payload[objects.FieldKeyOperation].(string)
+	source, _ = payload[objects.FieldKeySource].(string)
+	return target, op, source, true
+}
+
 // EventHandler processes an event.
 type EventHandler func(ctx context.Context, event Event) error
 

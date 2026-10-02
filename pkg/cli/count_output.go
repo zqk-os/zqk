@@ -80,24 +80,30 @@ func buildCountOutputMap(result *CountResult, groupBy string) map[string]any {
 	return output
 }
 
-// OutputCountJSON formats count results in JSON format
-func OutputCountJSON(result *CountResult, groupBy string) ([]byte, error) {
-	output := buildCountOutputMap(result, groupBy)
-	data, err := json.MarshalIndent(output, "", "  ")
+func marshalIndentJSON(v any) ([]byte, error) {
+	data, err := json.MarshalIndent(v, "", "  ")
 	if err != nil {
 		return nil, errfmt.Newf("error marshaling JSON").Wrap(err)
 	}
 	return data, nil
 }
 
-// OutputCountYAML formats count results in YAML format
-func OutputCountYAML(result *CountResult, groupBy string) ([]byte, error) {
-	output := buildCountOutputMap(result, groupBy)
-	data, err := yaml.Marshal(output)
+func marshalYAML(v any) ([]byte, error) {
+	data, err := yaml.Marshal(v)
 	if err != nil {
 		return nil, errfmt.Newf("error marshaling YAML").Wrap(err)
 	}
 	return data, nil
+}
+
+// OutputCountJSON formats count results in JSON format
+func OutputCountJSON(result *CountResult, groupBy string) ([]byte, error) {
+	return marshalIndentJSON(buildCountOutputMap(result, groupBy))
+}
+
+// OutputCountYAML formats count results in YAML format
+func OutputCountYAML(result *CountResult, groupBy string) ([]byte, error) {
+	return marshalYAML(buildCountOutputMap(result, groupBy))
 }
 
 // OutputCountTable formats count results in table format
@@ -234,22 +240,12 @@ func buildAllKindsCountOutputMap(counts map[string]int, scopeNote string, meta m
 
 // OutputAllKindsCountJSON formats counts for all kinds in JSON format
 func OutputAllKindsCountJSON(counts map[string]int, scopeNote string, meta map[string]any) ([]byte, error) {
-	output := buildAllKindsCountOutputMap(counts, scopeNote, meta)
-	data, err := json.MarshalIndent(output, "", "  ")
-	if err != nil {
-		return nil, errfmt.Newf("error marshaling JSON").Wrap(err)
-	}
-	return data, nil
+	return marshalIndentJSON(buildAllKindsCountOutputMap(counts, scopeNote, meta))
 }
 
 // OutputAllKindsCountYAML formats counts for all kinds in YAML format
 func OutputAllKindsCountYAML(counts map[string]int, scopeNote string, meta map[string]any) ([]byte, error) {
-	output := buildAllKindsCountOutputMap(counts, scopeNote, meta)
-	data, err := yaml.Marshal(output)
-	if err != nil {
-		return nil, errfmt.Newf("error marshaling YAML").Wrap(err)
-	}
-	return data, nil
+	return marshalYAML(buildAllKindsCountOutputMap(counts, scopeNote, meta))
 }
 
 // OutputAllKindsCountTable formats counts for all kinds in table format.

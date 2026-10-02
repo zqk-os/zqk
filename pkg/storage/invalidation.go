@@ -78,14 +78,20 @@ func GetGlobalInvalidationBus() *InvalidationShockwaveBus {
 	return globalInvalidationBus
 }
 
-// Subscribe registers a subscriber on the bus.
-func (b *InvalidationShockwaveBus) Subscribe(sub InvalidationSubscriber) {
+func (b *InvalidationShockwaveBus) withSubscriberLock(sub InvalidationSubscriber, fn func()) {
 	if b == nil || sub == nil {
 		return
 	}
 	b.mu.Lock()
 	defer b.mu.Unlock()
-	b.subscribers = append(b.subscribers, sub)
+	fn()
+}
+
+// Subscribe registers a subscriber on the bus.
+func (b *InvalidationShockwaveBus) Subscribe(sub InvalidationSubscriber) {
+	b.withSubscriberLock(sub, func() {
+		b.subscribers = append(b.subscribers, sub)
+	})
 }
 
 // isSameSubscriber safely compares two subscribers, handling function types and pointers without panic.
@@ -111,18 +117,15 @@ func isSameSubscriber(a, b InvalidationSubscriber) bool {
 
 // Unsubscribe removes a subscriber from the bus.
 func (b *InvalidationShockwaveBus) Unsubscribe(sub InvalidationSubscriber) {
-	if b == nil || sub == nil {
-		return
-	}
-	b.mu.Lock()
-	defer b.mu.Unlock()
-	filtered := b.subscribers[:0]
-	for _, s := range b.subscribers {
-		if !isSameSubscriber(s, sub) {
-			filtered = append(filtered, s)
+	b.withSubscriberLock(sub, func() {
+		filtered := b.subscribers[:0]
+		for _, s := range b.subscribers {
+			if !isSameSubscriber(s, sub) {
+				filtered = append(filtered, s)
+			}
 		}
-	}
-	b.subscribers = filtered
+		b.subscribers = filtered
+	})
 }
 
 // SubscribersCount returns the current count of registered subscribers.

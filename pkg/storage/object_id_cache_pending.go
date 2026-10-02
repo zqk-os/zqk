@@ -193,19 +193,25 @@ func IsObjectIDCachePending(projectRoot, id string) bool {
 	return ok
 }
 
-// ListObjectIDCachePending returns a copy of outstanding pending entries.
-func ListObjectIDCachePending(projectRoot string) []ObjectIDCachePendingEntry {
+func withObjectIDCachePendingJournalLocked[T any](projectRoot string, defaultVal T, fn func(j *objectIDCachePendingJournal) T) T {
 	j := getObjectIDCachePendingJournal(projectRoot)
 	if j == nil {
-		return nil
+		return defaultVal
 	}
 	j.mu.Lock()
 	defer j.mu.Unlock()
-	out := make([]ObjectIDCachePendingEntry, 0, len(j.entries))
-	for _, e := range j.entries {
-		out = append(out, e)
-	}
-	return out
+	return fn(j)
+}
+
+// ListObjectIDCachePending returns a copy of outstanding pending entries.
+func ListObjectIDCachePending(projectRoot string) []ObjectIDCachePendingEntry {
+	return withObjectIDCachePendingJournalLocked(projectRoot, nil, func(j *objectIDCachePendingJournal) []ObjectIDCachePendingEntry {
+		out := make([]ObjectIDCachePendingEntry, 0, len(j.entries))
+		for _, e := range j.entries {
+			out = append(out, e)
+		}
+		return out
+	})
 }
 
 // ClearObjectIDCachePending removes a pending entry after successful cache true-up.
@@ -231,27 +237,19 @@ func ClearObjectIDCachePending(projectRoot, id string) {
 // ObjectIDCachePendingLastIOError returns the last load or persist I/O error for this root.
 // Used by tests and operators to detect a silent journal that failed closed.
 func ObjectIDCachePendingLastIOError(projectRoot string) error {
-	j := getObjectIDCachePendingJournal(projectRoot)
-	if j == nil {
-		return nil
-	}
-	j.mu.Lock()
-	defer j.mu.Unlock()
-	if j.persistErr != nil {
-		return j.persistErr
-	}
-	return j.loadErr
+	return withObjectIDCachePendingJournalLocked(projectRoot, nil, func(j *objectIDCachePendingJournal) error {
+		if j.persistErr != nil {
+			return j.persistErr
+		}
+		return j.loadErr
+	})
 }
 
 // ObjectIDCachePendingGeneration returns the monotonic generation for the journal.
 func ObjectIDCachePendingGeneration(projectRoot string) uint64 {
-	j := getObjectIDCachePendingJournal(projectRoot)
-	if j == nil {
-		return 0
-	}
-	j.mu.Lock()
-	defer j.mu.Unlock()
-	return j.gen
+	return withObjectIDCachePendingJournalLocked(projectRoot, uint64(0), func(j *objectIDCachePendingJournal) uint64 {
+		return j.gen
+	})
 }
 
 // warnOnceNilCacheHandler logs once per process when CAS post-sync notes pending without a CLI handler.

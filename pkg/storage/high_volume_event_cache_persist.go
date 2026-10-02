@@ -22,12 +22,9 @@ func (c *HighVolumeEventCache) LoadCache(projectRoot string) (bool, error) {
 	cachePath := c.getCacheFilePath(projectRoot)
 	c.cacheDir = filepath.Dir(cachePath)
 
-	data, err := readOptionalCacheFile(cachePath)
-	if err != nil {
+	data, ok, err := readOptionalCacheData(cachePath)
+	if err != nil || !ok {
 		return false, err
-	}
-	if data == nil {
-		return false, nil
 	}
 
 	// Parse cache file (v1: entries; v2: buckets)

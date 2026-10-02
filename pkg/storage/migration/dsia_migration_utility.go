@@ -87,18 +87,15 @@ func (m *DSIAMigrationUtility) scanHashBasedFilesRecursive(kindDir, kind string)
 }
 
 func (m *DSIAMigrationUtility) MigrateAllToDSIA(ctx context.Context, secCtx *pkgctx.SecurityContext, removeOldFiles bool) (map[string]int, map[string][]error) {
-	kinds := m.facade.DiscoverObjectKinds()
-	migratedByKind := make(map[string]int)
-	errorsByKind := make(map[string][]error)
-
-	for _, kind := range kinds {
+	res := newMigrationResultMaps()
+	for _, kind := range m.facade.DiscoverObjectKinds() {
 		migrated, errs := m.MigrateKindToDSIA(ctx, secCtx, kind, removeOldFiles)
 		if migrated > 0 {
-			migratedByKind[kind] = migrated
+			res.migratedByKind[kind] = migrated
 		}
 		if len(errs) > 0 {
-			errorsByKind[kind] = errs
+			res.errorsByKind[kind] = errs
 		}
 	}
-	return migratedByKind, errorsByKind
+	return res.migratedByKind, res.errorsByKind
 }

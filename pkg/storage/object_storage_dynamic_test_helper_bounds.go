@@ -8,11 +8,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
-func generateStringBoundaryValues(fieldName string, validation map[string]any, required bool) []any {
-	_ = fieldName // Reserved for future use
-	values := []any{}
-
-	// Get length constraints
+func extractMinMaxLengths(validation map[string]any) (int, int) {
 	var minLength, maxLength int
 	switch v := validation["min_length"].(type) {
 	case int:
@@ -26,6 +22,22 @@ func generateStringBoundaryValues(fieldName string, validation map[string]any, r
 	case float64:
 		maxLength = int(v)
 	}
+	return minLength, maxLength
+}
+
+func toAnySlice[T any](values []T) []any {
+	result := make([]any, len(values))
+	for i, v := range values {
+		result[i] = v
+	}
+	return result
+}
+
+func generateStringBoundaryValues(fieldName string, validation map[string]any, required bool) []any {
+	_ = fieldName // Reserved for future use
+	values := []any{}
+
+	minLength, maxLength := extractMinMaxLengths(validation)
 
 	// Check for enum first
 	if enum, ok := validation["enum"].([]any); ok && len(enum) > 0 {
@@ -153,12 +165,7 @@ func generateIntegerBoundaryValues(validation map[string]any, required bool) []a
 		}
 	}
 
-	// Convert to []any
-	result := make([]any, len(values))
-	for i, v := range values {
-		result[i] = v
-	}
-	return result
+	return toAnySlice(values)
 }
 
 // generateNumberBoundaryValues generates number/float values testing boundaries
@@ -203,31 +210,13 @@ func generateNumberBoundaryValues(validation map[string]any, required bool) []an
 		}
 	}
 
-	// Convert to []any
-	result := make([]any, len(values))
-	for i, v := range values {
-		result[i] = v
-	}
-	return result
+	return toAnySlice(values)
 }
 
 // generateListBoundaryValues generates list/array values testing boundaries
 func generateListBoundaryValues(validation map[string]any, required bool) []any {
 	values := []any{}
-
-	var minLength, maxLength int
-	switch v := validation["min_length"].(type) {
-	case int:
-		minLength = v
-	case float64:
-		minLength = int(v)
-	}
-	switch v := validation["max_length"].(type) {
-	case int:
-		maxLength = v
-	case float64:
-		maxLength = int(v)
-	}
+	minLength, maxLength := extractMinMaxLengths(validation)
 
 	// Generate lists with different lengths
 	if maxLength > 0 || minLength > 0 {

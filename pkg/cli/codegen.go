@@ -86,12 +86,16 @@ func writeCommandBuilderHeader(buf *strings.Builder, commandName, packageName st
 	fmt.Fprintf(buf, "// %s creates a new %s command\nfunc %s() *cobra.Command {\n", constructorName, commandName, constructorName)
 }
 
-func generateCommandBuilderCode(spec *CommandSpec, commandName, packageName string) string {
+func initCommandBuilderBuf(name, commandName, packageName string, commonFlags bool, reqStorage, reqSession, reqSched *bool) (strings.Builder, string) {
 	var buf strings.Builder
-	needsInternalCli := spec.CommonFlags || spec.RequiresStorage != nil || spec.RequiresSession != nil || spec.RequiresSchedulerCheck != nil
-	writeCommandBuilderHeader(&buf, commandName, packageName, needsInternalCli)
+	needsCli := commonFlags || reqStorage != nil || reqSession != nil || reqSched != nil
+	writeCommandBuilderHeader(&buf, commandName, packageName, needsCli)
+	useName := resolveCommandUseName(name, commandName)
+	return buf, useName
+}
 
-	useName := resolveCommandUseName(spec.Name, commandName)
+func generateCommandBuilderCode(spec *CommandSpec, commandName, packageName string) string {
+	buf, useName := initCommandBuilderBuf(spec.Name, commandName, packageName, spec.CommonFlags, spec.RequiresStorage, spec.RequiresSession, spec.RequiresSchedulerCheck)
 	fmt.Fprintf(&buf, "\tbuilder := clipkg.NewCommandBuilder(%q)\n", useName)
 
 	if spec.Short != "" {
@@ -194,11 +198,7 @@ func generateCommandBuilderCode(spec *CommandSpec, commandName, packageName stri
 }
 
 func generateCRUDCommandBuilderCode(spec *CRUDCommandSpec, commandName, packageName string) string {
-	var buf strings.Builder
-	needsInternalCli := spec.CommonFlags || spec.RequiresStorage != nil || spec.RequiresSession != nil || spec.RequiresSchedulerCheck != nil
-	writeCommandBuilderHeader(&buf, commandName, packageName, needsInternalCli)
-
-	useName := resolveCommandUseName(spec.Name, commandName)
+	buf, useName := initCommandBuilderBuf(spec.Name, commandName, packageName, spec.CommonFlags, spec.RequiresStorage, spec.RequiresSession, spec.RequiresSchedulerCheck)
 	fmt.Fprintf(&buf, "\tbuilder := clipkg.NewCRUDCommandBuilder(%q, %q)\n", spec.OperationType, useName)
 
 	if spec.DataInput {

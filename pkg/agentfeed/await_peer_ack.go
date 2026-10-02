@@ -163,58 +163,69 @@ func CompletePeerAckAwaits(projectRoot, eventID, ackingAgentID string) ([]PeerAc
 	return done, nil
 }
 
-// ListOpenPeerAckAwaits returns open awaits owned by fromAgentID (empty agent = all open).
-func ListOpenPeerAckAwaits(projectRoot, fromAgentID string) ([]PeerAckAwait, error) {
+func withLockedPeerAckAwaitFile(projectRoot string, fn func(f *peerAckAwaitFile) error) error {
 	f, unlock, err := loadLockedPeerAckAwaitFile(projectRoot)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer unlock()
+	return fn(&f)
+}
+
+// ListOpenPeerAckAwaits returns open awaits owned by fromAgentID (empty agent = all open).
+func ListOpenPeerAckAwaits(projectRoot, fromAgentID string) ([]PeerAckAwait, error) {
 	from := strings.TrimSpace(fromAgentID)
 	var out []PeerAckAwait
-	for _, a := range f.Awaits {
-		if a.Status != AwaitStatusOpen {
-			continue
+	err := withLockedPeerAckAwaitFile(projectRoot, func(f *peerAckAwaitFile) error {
+		for _, a := range f.Awaits {
+			if a.Status != AwaitStatusOpen {
+				continue
+			}
+			if from != "" && !strings.EqualFold(a.FromAgentID, from) {
+				continue
+			}
+			out = append(out, a)
 		}
-		if from != "" && !strings.EqualFold(a.FromAgentID, from) {
-			continue
-		}
-		out = append(out, a)
+		return nil
+	})
+	if err != nil {
+		return nil, err
 	}
 	return out, nil
 }
 
 // ExpirePeerAckAwaits marks open awaits expired if older than maxAge.
 func ExpirePeerAckAwaits(projectRoot string, maxAge time.Duration) ([]PeerAckAwait, error) {
-	f, unlock, err := loadLockedPeerAckAwaitFile(projectRoot)
-	if err != nil {
-		return nil, err
-	}
-	defer unlock()
 	now := time.Now().UTC()
 	var expired []PeerAckAwait
 	changed := false
-	for i := range f.Awaits {
-		a := &f.Awaits[i]
-		if a.Status != AwaitStatusOpen {
-			continue
+	err := withLockedPeerAckAwaitFile(projectRoot, func(f *peerAckAwaitFile) error {
+		for i := range f.Awaits {
+			a := &f.Awaits[i]
+			if a.Status != AwaitStatusOpen {
+				continue
+			}
+			t, err := time.Parse(time.RFC3339, a.CreatedAt)
+			if err != nil {
+				continue
+			}
+			if now.Sub(t) > maxAge {
+				a.Status = AwaitStatusExpired
+				a.CompletedAt = now.Format(time.RFC3339)
+				expired = append(expired, *a)
+				changed = true
+			}
 		}
-		t, err := time.Parse(time.RFC3339, a.CreatedAt)
-		if err != nil {
-			continue
+		if !changed {
+			return nil
 		}
-		if now.Sub(t) > maxAge {
-			a.Status = AwaitStatusExpired
-			a.CompletedAt = now.Format(time.RFC3339)
-			expired = append(expired, *a)
-			changed = true
-		}
+		return savePeerAckAwaitFile(projectRoot, *f)
+	})
+	if err != nil {
+		return nil, err
 	}
 	if !changed {
 		return nil, nil
-	}
-	if err := savePeerAckAwaitFile(projectRoot, f); err != nil {
-		return nil, err
 	}
 	return expired, nil
 }

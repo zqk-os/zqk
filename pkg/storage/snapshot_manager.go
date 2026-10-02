@@ -28,6 +28,21 @@ type SnapshotMetadata struct {
 	HashSources       map[string]string    // Object ID -> hash source ("registry" or "calculated")
 }
 
+// CountHashSources returns the number of hashes from the registry and calculated hashes.
+func (sm *SnapshotMetadata) CountHashSources() (registryCount int, calculatedCount int) {
+	if sm == nil {
+		return 0, 0
+	}
+	for _, source := range sm.HashSources {
+		if source == "registry" {
+			registryCount++
+		} else {
+			calculatedCount++
+		}
+	}
+	return registryCount, calculatedCount
+}
+
 // SnapshotManager coordinates snapshot lifecycle
 type SnapshotManager struct {
 	proxyStorage      *ProxyStorage

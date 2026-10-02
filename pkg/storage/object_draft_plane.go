@@ -13,6 +13,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage/cas"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -213,29 +214,10 @@ func IsObjectDraftPlanePath(projectRoot, path string) bool {
 // kinds whose origin is a terminal/active status (e.g. glossary_term origin=active) must use CAS.
 // TRACK: (draft-plane create path); VDS glossary materialization.
 func shouldUseObjectDraftPlane(kind, status string) bool {
-	if kind == emptyValue || status == emptyValue {
-		return false
-	}
 	if StreamStorageEnabledForKind(kind) {
 		return false
 	}
-	if objects.IsBypassKind(kind) {
-		return false
-	}
-	checker := objects.GetGlobalStatusChecker()
-	if checker.IsPreliminary(kind, status) {
-		return true
-	}
-	loader := objects.GetGlobalLifecycleLoader()
-	if loader == nil {
-		return false
-	}
-	origin, err := loader.GetOriginStatus(kind)
-	if err != nil || origin == emptyValue {
-		return false
-	}
-	// Park at origin only when that origin status is itself preliminary (draft/proposed/…).
-	return status == origin && checker.IsPreliminary(kind, origin)
+	return cas.ShouldUseObjectDraftPlane(kind, status)
 }
 
 // ObjectDraftPlaneExists reports whether the object exists on the draft plane.

@@ -17,16 +17,12 @@ func NewParagraphBuilder() *ParagraphBuilder {
 
 // AddLine appends a full line.
 func (p *ParagraphBuilder) AddLine(line string) *ParagraphBuilder {
-	p.b.WriteString(line)
-	p.b.WriteString("\n")
-	return p
+	return p.AddLineWithIndent(0, line)
 }
 
 // AddLinef appends a formatted line.
 func (p *ParagraphBuilder) AddLinef(format string, args ...any) *ParagraphBuilder {
-	p.b.WriteString(fmt.Sprintf(format, args...))
-	p.b.WriteString("\n")
-	return p
+	return p.AddLineWithIndentf(0, format, args...)
 }
 
 // AddLineWithIndent appends an indented line.
@@ -41,12 +37,7 @@ func (p *ParagraphBuilder) AddLineWithIndent(indent int, line string) *Paragraph
 
 // AddLineWithIndentf appends an indented, formatted line.
 func (p *ParagraphBuilder) AddLineWithIndentf(indent int, format string, args ...any) *ParagraphBuilder {
-	if indent > 0 {
-		p.b.WriteString(strings.Repeat(" ", indent))
-	}
-	p.b.WriteString(fmt.Sprintf(format, args...))
-	p.b.WriteString("\n")
-	return p
+	return p.AddLineWithIndent(indent, fmt.Sprintf(format, args...))
 }
 
 // Add appends raw content without adding a newline.

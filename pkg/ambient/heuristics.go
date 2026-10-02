@@ -31,14 +31,10 @@ func NewCoachHeuristicsWithRoot(hub EventHub, projectRoot string) *CoachHeuristi
 }
 
 func (h *CoachHeuristics) handleFilesystem(ctx context.Context, event Event) error {
-	payload, ok := event.Payload.(map[string]any)
+	target, op, source, ok := ExtractFilesystemEventPayload(event)
 	if !ok {
 		return nil
 	}
-
-	target, _ := payload[objects.FieldKeyTargetID].(string)
-	op, _ := payload[objects.FieldKeyOperation].(string)
-	source, _ := payload[objects.FieldKeySource].(string)
 
 	// Heuristic: Catch manual edits to process YAMLs
 	if source == "fswatcher" && strings.Contains(op, "WRITE") && strings.Contains(target, paths.ProcessDir+"/") && strings.HasSuffix(target, ".yaml") {

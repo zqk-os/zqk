@@ -24,14 +24,10 @@ func NewPredictiveTaskSpawner(hub EventHub) *PredictiveTaskSpawner {
 }
 
 func (s *PredictiveTaskSpawner) handleFilesystem(ctx context.Context, event Event) error {
-	payload, ok := event.Payload.(map[string]any)
+	target, op, source, ok := ExtractFilesystemEventPayload(event)
 	if !ok {
 		return nil
 	}
-
-	target, _ := payload[objects.FieldKeyTargetID].(string)
-	op, _ := payload[objects.FieldKeyOperation].(string)
-	source, _ := payload[objects.FieldKeySource].(string)
 
 	if source == "fswatcher" && strings.Contains(op, "CREATE") && strings.HasSuffix(target, ".go") && !strings.HasSuffix(target, "_test.go") {
 		testFile := strings.TrimSuffix(target, ".go") + "_test.go"
