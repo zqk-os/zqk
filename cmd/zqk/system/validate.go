@@ -42,7 +42,7 @@ func NewValidateCmd() *cobra.Command {
 		ExcludeCommonFlags()
 
 	validateCmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewSystemValidateCommandBuilder(), &cobra.Command{
-		Use:  "validate-schema [object-id]",
+		Use:  "validate [object-id]",
 		Args: cobra.MaximumNArgs(1),
 	})
 	cli.BindAsyncProgress(validateCmd, func(cmd *cobra.Command, args []string) error {

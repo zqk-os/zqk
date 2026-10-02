@@ -86,10 +86,10 @@ Available Commands:
   telemetry                      View telemetry from running agent tasks
   truth-sentinel                 Run the Truth Sentinel daemon or a one-shot audit
   update-specs                   Bulk update object specifications
+  validate                       Validate object(s) against schema
   validate-agent-rules           Validate IDE agent rules manifest vs rules directory
   validate-command-specs         Validate live CLI commands against canonical command specs
   validate-scenario              Execute a programmatic validation scenario
-  validate-schema                Validate object(s) against schema
   verify-completion              Verify completion of an object
   whoami                         Display the current user account information
 

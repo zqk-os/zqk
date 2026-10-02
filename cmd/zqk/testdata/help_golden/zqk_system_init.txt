@@ -51,7 +51,7 @@ Flags:
       scheduler to run it once and create the priority plan, workstream, and
       backlog items.
 
-  Greenfield: Initialize in current directory (Note: 'zqk system init' is an alias)
+  Greenfield: Initialize in current directory (Note: 'system init' is an alias)
   zqk init
   Declarative Seed: Initialize with answer file
   zqk init --answer-file seed.yaml

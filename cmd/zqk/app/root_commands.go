@@ -105,7 +105,6 @@ func registerCommands() {
 	// System operations group (health, validation, and maintenance)
 	systemCmdInst := system.NewSystemCmd()
 	systemCmdInst.GroupID = "everyday"
-	systemCmdInst.AddCommand(validate.NewValidateCmd())
 	systemCmdInst.AddCommand(precommit.NewPreCommitCmd())
 	systemCmdInst.AddCommand(reports.NewReportsCmd())
 	systemCmdInst.AddCommand(NewCompletionCmd(systemCmdInst))
