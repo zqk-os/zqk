@@ -39,28 +39,15 @@ func newGitHubSyncCmd() *cobra.Command {
 			token = os.Getenv(EnvGitHubToken)
 		}
 
-		secCtx := proc.SecurityContext()
-		if secCtx == nil {
-			secCtx = pkgctx.NewSystemSecurityContext()
-		}
-		store := syncpkg.NewKernelSyncStore(proc.Storage(), secCtx)
-		if store == nil {
-			return errors.New(ErrStorageUnavailable)
-		}
-
-		if dryRun {
-			fmt.Fprintf(cmd.OutOrStdout(), MsgDryRunGitHubFmt, repo)
-			fmt.Fprintf(cmd.OutOrStdout(), MsgDryRunDirectionFmt, direction)
-			fmt.Fprintf(cmd.OutOrStdout(), MsgDryRunVerified)
-			return nil
-		}
-
-		if token == "" {
-			return errors.New(MsgErrGitHubTokenRequired)
-		}
-
-		fmt.Fprintf(cmd.OutOrStdout(), MsgGitHubSyncCompletedFmt, repo, direction)
-		return nil
+		return executeSyncOperation(cmd, proc, syncExecutionParams{
+			target:      repo,
+			dryRun:      dryRun,
+			direction:   direction,
+			credential:  token,
+			dryRunFmt:   MsgDryRunGitHubFmt,
+			requiredErr: MsgErrGitHubTokenRequired,
+			completeFmt: MsgGitHubSyncCompletedFmt,
+		})
 	})
 	return cmd
 }
@@ -81,28 +68,15 @@ func newLinearSyncCmd() *cobra.Command {
 			apiKey = os.Getenv(EnvLinearAPIKey)
 		}
 
-		secCtx := proc.SecurityContext()
-		if secCtx == nil {
-			secCtx = pkgctx.NewSystemSecurityContext()
-		}
-		store := syncpkg.NewKernelSyncStore(proc.Storage(), secCtx)
-		if store == nil {
-			return errors.New(ErrStorageUnavailable)
-		}
-
-		if dryRun {
-			fmt.Fprintf(cmd.OutOrStdout(), MsgDryRunLinearFmt, team)
-			fmt.Fprintf(cmd.OutOrStdout(), MsgDryRunDirectionFmt, direction)
-			fmt.Fprintf(cmd.OutOrStdout(), MsgDryRunVerified)
-			return nil
-		}
-
-		if apiKey == "" {
-			return errors.New(MsgErrLinearAPIKeyRequired)
-		}
-
-		fmt.Fprintf(cmd.OutOrStdout(), MsgLinearSyncCompletedFmt, team, direction)
-		return nil
+		return executeSyncOperation(cmd, proc, syncExecutionParams{
+			target:      team,
+			dryRun:      dryRun,
+			direction:   direction,
+			credential:  apiKey,
+			dryRunFmt:   MsgDryRunLinearFmt,
+			requiredErr: MsgErrLinearAPIKeyRequired,
+			completeFmt: MsgLinearSyncCompletedFmt,
+		})
 	})
 	return cmd
 }
@@ -110,11 +84,10 @@ func newLinearSyncCmd() *cobra.Command {
 func newSyncStatusCmd() *cobra.Command {
 	cmd := bldr.NewSyncStatusCommandBuilder()
 	cmd.RunE = cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-		secCtx := proc.SecurityContext()
-		if secCtx == nil {
-			secCtx = pkgctx.NewSystemSecurityContext()
+		store, err := resolveKernelSyncStore(proc)
+		if err != nil {
+			return err
 		}
-		store := syncpkg.NewKernelSyncStore(proc.Storage(), secCtx)
 		items, err := store.ListBacklogItems(proc.OperationContext())
 		if err != nil {
 			return err
@@ -138,3 +111,47 @@ func newSyncStatusCmd() *cobra.Command {
 	})
 	return cmd
 }
+
+func resolveKernelSyncStore(proc *cli.Processor) (*syncpkg.KernelSyncStore, error) {
+	secCtx := proc.SecurityContext()
+	if secCtx == nil {
+		secCtx = pkgctx.NewSystemSecurityContext()
+	}
+	store := syncpkg.NewKernelSyncStore(proc.Storage(), secCtx)
+	if store == nil {
+		return nil, errors.New(ErrStorageUnavailable)
+	}
+	return store, nil
+}
+
+func printSyncDryRun(cmd *cobra.Command, targetFmt, target, direction string) {
+	fmt.Fprintf(cmd.OutOrStdout(), targetFmt, target)
+	fmt.Fprintf(cmd.OutOrStdout(), MsgDryRunDirectionFmt, direction)
+	fmt.Fprintf(cmd.OutOrStdout(), MsgDryRunVerified)
+}
+
+type syncExecutionParams struct {
+	target      string
+	dryRun      bool
+	direction   string
+	credential  string
+	dryRunFmt   string
+	requiredErr string
+	completeFmt string
+}
+
+func executeSyncOperation(cmd *cobra.Command, proc *cli.Processor, params syncExecutionParams) error {
+	if _, err := resolveKernelSyncStore(proc); err != nil {
+		return err
+	}
+	if params.dryRun {
+		printSyncDryRun(cmd, params.dryRunFmt, params.target, params.direction)
+		return nil
+	}
+	if params.credential == "" {
+		return errors.New(params.requiredErr)
+	}
+	fmt.Fprintf(cmd.OutOrStdout(), params.completeFmt, params.target, params.direction)
+	return nil
+}
+

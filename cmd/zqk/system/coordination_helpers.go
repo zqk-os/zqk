@@ -8,8 +8,62 @@ import (
 	"github.com/zqk-os/zqk/pkg/coordination"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/metrics"
+	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
+
+// buildAuditMetadataFromOptions extracts and merges metadata fields from storage.AuditEventOptions.
+func buildAuditMetadataFromOptions(options *storage.AuditEventOptions) map[string]any {
+	auditMetadata := make(map[string]any)
+	if options == nil {
+		return auditMetadata
+	}
+	mergeMetadata(auditMetadata, options.Metadata)
+	auditMetadata[eventKeyEventType] = options.EventType
+	auditMetadata[eventKeyOperation] = options.Operation
+	auditMetadata[eventKeySeverity] = options.Severity
+	auditMetadata[eventKeyTargetKind] = options.TargetKind
+	if options.TargetID != emptyValue {
+		auditMetadata[eventKeyTargetID] = options.TargetID
+	}
+	if options.TargetPath != emptyValue {
+		auditMetadata[objects.FieldKeyTargetPath] = options.TargetPath
+	}
+	return auditMetadata
+}
+
+// appendDurationLoggingField adds duration in seconds to logging fields if positive.
+func appendDurationLoggingField(fields []coordination.LoggingField, duration time.Duration) []coordination.LoggingField {
+	if duration > 0 {
+		return append(fields, coordination.LoggingField{Key: eventKeyDurationSeconds, Value: duration.Seconds()})
+	}
+	return fields
+}
+
+// buildCoordinationEventData constructs EventData with logging fields, audit metadata, and metrics populated with duration and error.
+func buildCoordinationEventData(
+	loggingFields []coordination.LoggingField,
+	auditMetadata map[string]any,
+	metricsData map[string]any,
+	duration time.Duration,
+	err error,
+) *coordination.EventData {
+	loggingFields = appendDurationLoggingField(loggingFields, duration)
+	if metricsData != nil {
+		if duration > 0 {
+			metricsData[eventKeyDurationSeconds] = duration.Seconds()
+			metricsData[eventKeyDurationNS] = duration.Nanoseconds()
+		}
+		if err != nil {
+			metricsData[eventKeyError] = err.Error()
+		}
+	}
+	return &coordination.EventData{
+		LoggingFields: loggingFields,
+		AuditMetadata: auditMetadata,
+		MetricsData:   metricsData,
+	}
+}
 
 // createContextWithLoggingProfile delegates to the canonical cli.CreateContextWithLoggingProfile.
 func createContextWithLoggingProfile(ctx context.Context, profile string) context.Context {
@@ -87,7 +141,7 @@ func buildEventContext(
 // emitAsyncCoordinationEvent dispatches an event via coordinator inside a budgeted goroutine.
 func emitAsyncCoordinationEvent(
 	ctx context.Context,
-	coordinator *coordination.Coordinator,
+	coordinator coordination.EventCoordinator,
 	goroutineName string,
 	goroutineDesc string,
 	eventCtx *coordination.EventContext,

@@ -95,14 +95,11 @@ func getCurrentPriorityPlan(cmd *cobra.Command, projectRoot string) map[string]a
 		func() {
 			defer close(resultChan)
 
-			factory, err := storage.NewStorageFactory(cmd.Context(), projectRoot)
+			storageProvider, cleanup, err := openStorageProvider(cmd.Context(), projectRoot)
 			if err != nil {
 				return
 			}
-			storageProvider := factory.GetStorage()
-			if storageProvider != nil {
-				defer func() { _ = storageProvider.Shutdown(stdctx.Background()) }()
-			}
+			defer cleanup()
 
 			secCtx := pkgctx.NewSystemSecurityContext()
 			storageCtx := pkgctx.NewStorageContext()

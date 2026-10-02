@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/coordination"
-	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
@@ -61,15 +60,7 @@ func emitSchedulerCommandEventViaCoordinator(
 		eventCtx = eventCtx.WithError(err)
 	}
 
-	// Emit via coordinator (async, non-blocking)
-	bud := goroutinelabels.DefaultBudget()
-	emitBuilder := goroutinelabels.NewGoroutine("scheduler_command_event_emitter", fmt.Sprintf("emitting scheduler %s event", operation))
-	if bud != nil {
-		emitBuilder = emitBuilder.WithBudget(bud)
-	}
-	emitBuilder.StartSimple(func() {
-		_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
-	})
+	emitCoordinatorEventAsync(ctx, coordinator, eventCtx)
 }
 
 // emitSchedulerStartEventViaCoordinator emits start command events

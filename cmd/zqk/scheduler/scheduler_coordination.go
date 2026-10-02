@@ -27,8 +27,34 @@ func emitCoordinatorEventAsync(ctx context.Context, coordinator *coordination.Co
 		activityBuilder = activityBuilder.WithBudget(bud)
 	}
 	activityBuilder.StartSimple(func() {
-		_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
+		if err := coordinator.Emit(ctx, eventCtx); err != nil {
+			return
+		}
 	})
+}
+
+func emitSchedulerLoggingEvent(
+	ctx context.Context,
+	projectRoot string,
+	operationID string,
+	eventType string,
+	status string,
+	loggingFields []coordination.LoggingField,
+) {
+	if projectRoot == emptyValue || projectRoot == "." {
+		return
+	}
+	coordinator := newSchedulerCoordinator()
+	eventData := &coordination.EventData{
+		LoggingFields: loggingFields,
+		AuditMetadata: nil,
+		MetricsData:   nil,
+	}
+	eventCtx := coordination.NewEventContext(operationID, eventType, status).
+		WithEventData(eventData).
+		WithContext(ctx).
+		WithChannels(true, false, false, false)
+	emitCoordinatorEventAsync(ctx, coordinator, eventCtx)
 }
 
 // emitSchedulerHistoryEventViaCoordinator emits scheduler history query events via coordinator
@@ -40,13 +66,6 @@ func emitSchedulerHistoryEventViaCoordinator(
 	statsCount int,
 	jobIDFilter string,
 ) {
-	if projectRoot == emptyValue || projectRoot == "." {
-		return
-	}
-
-	coordinator := newSchedulerCoordinator()
-
-	// Build logging fields
 	loggingFields := []coordination.LoggingField{
 		{Key: "operation", Value: "scheduler_history_query"},
 		{Key: "stats_count", Value: statsCount},
@@ -54,21 +73,7 @@ func emitSchedulerHistoryEventViaCoordinator(
 	if jobIDFilter != emptyValue {
 		loggingFields = append(loggingFields, coordination.LoggingField{Key: "job_id_filter", Value: jobIDFilter})
 	}
-
-	// Create event data
-	eventData := &coordination.EventData{
-		LoggingFields: loggingFields,
-		AuditMetadata: nil, // History queries don't create audit events
-		MetricsData:   nil,
-	}
-
-	// Create event context
-	eventCtx := coordination.NewEventContext(operationID, "scheduler_history_query", "complete").
-		WithEventData(eventData).
-		WithContext(ctx).
-		WithChannels(true, false, false, false) // Logging only
-
-	emitCoordinatorEventAsync(ctx, coordinator, eventCtx)
+	emitSchedulerLoggingEvent(ctx, projectRoot, operationID, "scheduler_history_query", "complete", loggingFields)
 }
 
 // createContextWithLoggingProfile creates a context with LoggingContext embedded from profile string
@@ -112,15 +117,9 @@ func emitSchedulerHistoryDebugEventViaCoordinator(
 	rawCount int,
 	profile string,
 ) {
-	if projectRoot == emptyValue || projectRoot == "." {
-		return
-	}
-
 	// Embed LoggingContext in context so coordinator logging respects --context profile
 	ctx = createContextWithLoggingProfile(ctx, profile)
-	coordinator := newSchedulerCoordinator()
 
-	// Build logging fields
 	loggingFields := []coordination.LoggingField{
 		{Key: "operation", Value: operation},
 		{Key: "event", Value: "Found audit events for scheduler jobs"},
@@ -128,23 +127,8 @@ func emitSchedulerHistoryDebugEventViaCoordinator(
 		{Key: "raw_count", Value: rawCount},
 	}
 
-	// Create event data
-	eventData := &coordination.EventData{
-		LoggingFields: loggingFields,
-		AuditMetadata: nil, // Debug events don't create audit events
-		MetricsData:   nil,
-	}
-
-	// Create operation ID
 	operationID := fmt.Sprintf("scheduler_history_%s_%d", operation, time.Now().UnixNano())
-
-	// Create event context (debug status for verbose logging)
-	eventCtx := coordination.NewEventContext(operationID, "scheduler_history", "debug").
-		WithEventData(eventData).
-		WithContext(ctx).
-		WithChannels(true, false, false, false) // Logging only
-
-	emitCoordinatorEventAsync(ctx, coordinator, eventCtx)
+	emitSchedulerLoggingEvent(ctx, projectRoot, operationID, "scheduler_history", "debug", loggingFields)
 }
 
 // emitSchedulerActivityEventViaCoordinator emits scheduler activity query events via coordinator
@@ -159,13 +143,6 @@ func emitSchedulerActivityEventViaCoordinator(
 	daemonDown bool,
 	jobIDFilter string,
 ) {
-	if projectRoot == emptyValue || projectRoot == "." {
-		return
-	}
-
-	coordinator := newSchedulerCoordinator()
-
-	// Build logging fields
 	loggingFields := []coordination.LoggingField{
 		{Key: "operation", Value: "scheduler_activity_query"},
 		{Key: "event_count", Value: eventCount},
@@ -177,24 +154,10 @@ func emitSchedulerActivityEventViaCoordinator(
 		loggingFields = append(loggingFields, coordination.LoggingField{Key: "job_id_filter", Value: jobIDFilter})
 	}
 
-	// Create event data
-	eventData := &coordination.EventData{
-		LoggingFields: loggingFields,
-		AuditMetadata: nil, // Activity queries don't create audit events
-		MetricsData:   nil,
-	}
-
-	// Determine status
 	status := "complete"
 	if daemonDown || stuckJobCount > 0 || missedTriggerCount > 0 {
 		status = "warning"
 	}
 
-	// Create event context
-	eventCtx := coordination.NewEventContext(operationID, "scheduler_activity_query", status).
-		WithEventData(eventData).
-		WithContext(ctx).
-		WithChannels(true, false, false, false) // Logging only
-
-	emitCoordinatorEventAsync(ctx, coordinator, eventCtx)
+	emitSchedulerLoggingEvent(ctx, projectRoot, operationID, "scheduler_activity_query", status, loggingFields)
 }

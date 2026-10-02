@@ -100,6 +100,14 @@ func getSchedulerJobEventTypesMap() (map[string]bool, error) {
 	return info.set, nil
 }
 
+func safeSchedulerJobEventTypesMap() map[string]bool {
+	set, err := getSchedulerJobEventTypesMap()
+	if err != nil {
+		return make(map[string]bool)
+	}
+	return set
+}
+
 func isSchedulerJobEventType(eventType string) bool {
 	eventTypesMap, err := getSchedulerJobEventTypesMap()
 	if err != nil {

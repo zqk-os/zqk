@@ -50,29 +50,15 @@ func emitListingIndexBatchEventViaCoordinator(
 		{Key: eventKeyBatchSize, Value: batchSize},
 		{Key: eventKeyStatus, Value: status},
 	}
-	if duration > 0 {
-		loggingFields = append(loggingFields, coordination.LoggingField{Key: eventKeyDurationSeconds, Value: duration.Seconds()})
-	}
 
 	// Build metrics data
-	metricsData := make(map[string]any)
-	metricsData[eventKeyKind] = kind
-	metricsData[eventKeyBatchSize] = batchSize
-	metricsData[eventKeyStatus] = status
-	if duration > 0 {
-		metricsData[eventKeyDurationSeconds] = duration.Seconds()
-		metricsData[eventKeyDurationNS] = duration.Nanoseconds()
-	}
-	if err != nil {
-		metricsData[eventKeyError] = err.Error()
+	metricsData := map[string]any{
+		eventKeyKind:      kind,
+		eventKeyBatchSize: batchSize,
+		eventKeyStatus:    status,
 	}
 
-	// Create event data
-	eventData := &coordination.EventData{
-		LoggingFields: loggingFields,
-		AuditMetadata: auditMetadata,
-		MetricsData:   metricsData,
-	}
+	eventData := buildCoordinationEventData(loggingFields, auditMetadata, metricsData, duration, err)
 
 	// Create operation ID
 	operationID := fmt.Sprintf("listing_index_batch_%s_%d", kind, time.Now().UnixNano())

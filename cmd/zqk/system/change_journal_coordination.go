@@ -50,29 +50,15 @@ func emitChangeJournalEventViaCoordinator(
 		{Key: eventKeyObjectID, Value: objectID},
 		{Key: eventKeyStatus, Value: status},
 	}
-	if duration > 0 {
-		loggingFields = append(loggingFields, coordination.LoggingField{Key: eventKeyDurationSeconds, Value: duration.Seconds()})
-	}
 
 	// Build metrics data
-	metricsData := make(map[string]any)
-	metricsData[eventKeyChangeType] = changeType
-	metricsData[eventKeyKind] = kind
-	metricsData[eventKeyStatus] = status
-	if duration > 0 {
-		metricsData[eventKeyDurationSeconds] = duration.Seconds()
-		metricsData[eventKeyDurationNS] = duration.Nanoseconds()
-	}
-	if err != nil {
-		metricsData[eventKeyError] = err.Error()
+	metricsData := map[string]any{
+		eventKeyChangeType: changeType,
+		eventKeyKind:       kind,
+		eventKeyStatus:     status,
 	}
 
-	// Create event data
-	eventData := &coordination.EventData{
-		LoggingFields: loggingFields,
-		AuditMetadata: auditMetadata,
-		MetricsData:   metricsData,
-	}
+	eventData := buildCoordinationEventData(loggingFields, auditMetadata, metricsData, duration, err)
 
 	eventCtx := buildEventContext(ctx, operationID, operationType, status, eventData, duration, err, false, true, true, true)
 	emitAsyncCoordinationEvent(ctx, coordinator, "change_journal_event_emit", fmt.Sprintf("emitting change journal event: %s %s", changeType, objectRef), eventCtx)

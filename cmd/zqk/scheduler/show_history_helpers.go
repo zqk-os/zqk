@@ -33,29 +33,10 @@ type JobHistoryContext struct {
 
 // initializeJobHistoryContext sets up the job history context
 func initializeJobHistoryContext(ctx *cli.Context, cmd *cobra.Command) (*JobHistoryContext, error) {
-	projectRoot := ""
-	if ctx != nil && ctx.ProjectRoot != emptyValue {
-		// Prefer explicit context (e.g. tests pass testRoot so they hit test storage, not real project)
-		projectRoot = ctx.ProjectRoot
-	}
-	if projectRoot == emptyValue {
-		projectRoot = cli.ResolveProjectRoot(".")
-	}
-	if projectRoot == emptyValue {
-		return nil, errfmt.Errorf("project root not found")
-	}
-
-	// Use global storage cache so we don't create a new storage instance (avoids blocking init and extra load)
-	cmdCtx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 60*time.Second)
-	defer cancel()
-
-	storageProvider, err := storagepkg.GetGlobalStorageProviderCache().GetOrCreate(cmdCtx, projectRoot)
+	base, err := initSchedulerQueryBaseContext(ctx, 60*time.Second)
 	if err != nil {
-		return nil, errfmt.Newf("failed to get storage").Wrap(err)
+		return nil, err
 	}
-
-	secCtx := pkgctx.NewSystemSecurityContext()
-	storageCtx := ctx.GetStorageContext()
 
 	jobIDFilter, _ := cmd.Flags().GetString("job-id") //nolint:errcheck
 	limit, _ := cmd.Flags().GetInt("limit")           //nolint:errcheck
@@ -88,11 +69,11 @@ func initializeJobHistoryContext(ctx *cli.Context, cmd *cobra.Command) (*JobHist
 	return &JobHistoryContext{
 		Ctx:             ctx,
 		Cmd:             cmd,
-		ProjectRoot:     projectRoot,
+		ProjectRoot:     base.ProjectRoot,
 		StorageFactory:  nil, // not used when using global cache
-		StorageProvider: storageProvider,
-		SecCtx:          secCtx,
-		StorageCtx:      storageCtx,
+		StorageProvider: base.StorageProvider,
+		SecCtx:          base.SecCtx,
+		StorageCtx:      base.StorageCtx,
 		JobIDFilter:     jobIDFilter,
 		Limit:           limit,
 		Since:           sinceTime,
@@ -105,34 +86,7 @@ func initializeJobHistoryContext(ctx *cli.Context, cmd *cobra.Command) (*JobHist
 // Filters by both target_kind and event_type to ensure we get scheduler job execution events
 // Uses high-volume event cache when available for faster queries
 func queryAuditEvents(jhc *JobHistoryContext) ([]map[string]any, error) {
-	// Try high-volume event cache first (fast path) if no complex filters
-	cache := storagepkg.GetGlobalHighVolumeEventCache()
-	useCache := false
-	var cacheEventIDs []string
-
-	if cache.IsPopulatedForProject(jhc.ProjectRoot) {
-		// Can use cache if:
-		// 1. Only time filters (or no filters)
-		// 2. No event_type or target_kind filters (cache doesn't filter by those)
-		// Note: We'll filter by target_kind/event_type after getting IDs from cache
-		if jhc.Since != nil || jhc.Until != nil {
-			startTime := time.Time{}
-			endTime := time.Now().UTC().Add(24 * time.Hour)
-			if jhc.Since != nil {
-				startTime = *jhc.Since
-			}
-			if jhc.Until != nil {
-				endTime = *jhc.Until
-			}
-			cacheEventIDs = cache.QueryByTimeWindow(startTime, endTime, jhc.Limit)
-			useCache = len(cacheEventIDs) > 0
-		} else if jhc.JobIDFilter == emptyValue {
-			// No filters - can use cache for recent events
-			weekAgo := time.Now().UTC().Add(-7 * 24 * time.Hour)
-			cacheEventIDs = cache.QueryByTimeWindow(weekAgo, time.Now().UTC().Add(24*time.Hour), jhc.Limit)
-			useCache = len(cacheEventIDs) > 0
-		}
-	}
+	useCache, cacheEventIDs := resolveHistoryCacheWindow(jhc)
 
 	// Filter by target_kind AND event_type to get scheduler job execution events
 	// Event types and target kind are dynamically loaded from specs and cached
@@ -219,11 +173,7 @@ func queryAuditEvents(jhc *JobHistoryContext) ([]map[string]any, error) {
 	// Filter results in code to ensure we only get scheduler job events
 	// This handles cases where $in might not be fully supported or events have different structures
 	filteredEvents := make([]map[string]any, 0, len(auditResult.Objects))
-	schedulerEventTypes, err := getSchedulerJobEventTypesMap()
-	if err != nil {
-		// Non-fatal - continue with empty map (will filter out all events)
-		schedulerEventTypes = make(map[string]bool)
-	}
+	schedulerEventTypes := safeSchedulerJobEventTypesMap()
 	for _, event := range auditResult.Objects {
 		fields := ExtractAuditEventFields(event)
 
@@ -531,4 +481,29 @@ func handleEmptyJobHistory(jhc *JobHistoryContext) error {
 	}
 	buf.WriteString("Jobs will appear here after they have been executed at least once.\n")
 	return cli.WriteOutput(jhc.Cmd, []byte(buf.String()))
+}
+
+func resolveHistoryCacheWindow(jhc *JobHistoryContext) (bool, []string) {
+	cache := storagepkg.GetGlobalHighVolumeEventCache()
+	if !cache.IsPopulatedForProject(jhc.ProjectRoot) {
+		return false, nil
+	}
+	if jhc.Since != nil || jhc.Until != nil {
+		startTime := time.Time{}
+		endTime := time.Now().UTC().Add(24 * time.Hour)
+		if jhc.Since != nil {
+			startTime = *jhc.Since
+		}
+		if jhc.Until != nil {
+			endTime = *jhc.Until
+		}
+		ids := cache.QueryByTimeWindow(startTime, endTime, jhc.Limit)
+		return len(ids) > 0, ids
+	}
+	if jhc.JobIDFilter == emptyValue {
+		weekAgo := time.Now().UTC().Add(-7 * 24 * time.Hour)
+		ids := cache.QueryByTimeWindow(weekAgo, time.Now().UTC().Add(24*time.Hour), jhc.Limit)
+		return len(ids) > 0, ids
+	}
+	return false, nil
 }

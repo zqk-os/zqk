@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -49,35 +48,10 @@ func initializeActivityContext(ctx *cli.Context, cmd *cobra.Command) (*ActivityC
 		return nil, errfmt.Errorf("cli context is required")
 	}
 
-	// Prefer explicit ProjectRoot from CLI context (tests inject an isolated temp dir). If we used
-	// ResolveProjectRoot(".") first, ZQK_TEST_ROOT could race under t.Parallel() and we would open
-	// storage for the repo instead of the test root (polluting activity with real audit events).
-	var projectRoot string
-	if strings.TrimSpace(ctx.ProjectRoot) != emptyValue {
-		if abs, err := filepath.Abs(ctx.ProjectRoot); err == nil {
-			projectRoot = abs
-		} else {
-			projectRoot = filepath.Clean(ctx.ProjectRoot)
-		}
-	}
-	if projectRoot == emptyValue {
-		projectRoot = cli.ResolveProjectRoot(".")
-	}
-	if projectRoot == emptyValue {
-		return nil, errfmt.Errorf("project root not found")
-	}
-
-	// Use global storage cache so we don't create a new storage instance (avoids blocking init and extra load)
-	cmdCtx, cancel := context.WithTimeout(pkgctx.NewSystemContext(), 30*time.Second)
-	defer cancel()
-
-	storageProvider, err := storagepkg.GetGlobalStorageProviderCache().GetOrCreate(cmdCtx, projectRoot)
+	base, err := initSchedulerQueryBaseContext(ctx, 30*time.Second)
 	if err != nil {
-		return nil, errfmt.Newf("failed to get storage").Wrap(err)
+		return nil, err
 	}
-
-	secCtx := pkgctx.NewSystemSecurityContext()
-	storageCtx := ctx.GetStorageContext()
 
 	limit, _ := cmd.Flags().GetInt("limit")               //nolint:errcheck
 	jobIDFilter, _ := cmd.Flags().GetString("job-id")     //nolint:errcheck
@@ -104,10 +78,10 @@ func initializeActivityContext(ctx *cli.Context, cmd *cobra.Command) (*ActivityC
 	}
 
 	return &ActivityContext{
-		ProjectRoot:          projectRoot,
-		StorageProvider:      storageProvider,
-		SecCtx:               secCtx,
-		StorageCtx:           storageCtx,
+		ProjectRoot:          base.ProjectRoot,
+		StorageProvider:      base.StorageProvider,
+		SecCtx:               base.SecCtx,
+		StorageCtx:           base.StorageCtx,
 		Limit:                limit,
 		JobIDFilter:          jobIDFilter,
 		BypassCache:          bypassCache,
@@ -229,15 +203,7 @@ func loadJobData(actCtx *ActivityContext) error {
 	filters[getAuditEventCreatedAtField()] = timeFilter
 
 	// Try high-volume event cache first (fast path)
-	cache := storagepkg.GetGlobalHighVolumeEventCache()
-	useCache := false
-	var cacheEventIDs []string
-
-	if cache.IsPopulatedForProject(actCtx.ProjectRoot) {
-		// Query recent events from cache
-		cacheEventIDs = cache.QueryByTimeWindow(weekAgo, now.Add(24*time.Hour), limit)
-		useCache = len(cacheEventIDs) > 0
-	}
+	useCache, cacheEventIDs := queryCachedEventIDs(actCtx.ProjectRoot, weekAgo, now.Add(24*time.Hour), limit)
 
 	var auditResult *storagepkg.QueryResult
 	if useCache {
@@ -272,12 +238,7 @@ func loadJobData(actCtx *ActivityContext) error {
 	// Filter results in code to ensure we only get scheduler job events
 	// This handles cases where $in might not be fully supported or events have different structures
 	filteredEvents := make([]map[string]any, 0, len(auditResult.Objects))
-	schedulerEventTypes, err := getSchedulerJobEventTypesMap()
-	if err != nil {
-		// Non-fatal - continue with empty map, but we'll still filter by target_kind
-		// This allows events to pass through if they match target_kind (for test environments)
-		schedulerEventTypes = make(map[string]bool)
-	}
+	schedulerEventTypes := safeSchedulerJobEventTypesMap()
 	schedulerJobKindForFilter := getSchedulerJobKind()
 	for _, event := range auditResult.Objects {
 		fields := ExtractAuditEventFields(event)
