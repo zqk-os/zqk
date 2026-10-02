@@ -2,7 +2,6 @@ package storage
 
 import (
 	"context"
-	"time"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -78,10 +77,8 @@ func (s *AuditAggregationService) findExistingMetricByOverlappingWindow(
 	secCtx *pkgctx.SecurityContext,
 	windowStart, windowEnd string,
 ) string {
-	// Parse time windows
-	startTime, err1 := time.Parse(time.RFC3339, windowStart)
-	endTime, err2 := time.Parse(time.RFC3339, windowEnd)
-	if err1 != nil || err2 != nil {
+	startTime, endTime, ok := ParseTimeWindowRFC3339(windowStart, windowEnd)
+	if !ok {
 		return "" // Can't parse times, skip this fallback
 	}
 

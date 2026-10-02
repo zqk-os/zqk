@@ -12,6 +12,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
+	"github.com/zqk-os/zqk/pkg/storage/audit"
 	"github.com/zqk-os/zqk/pkg/validation"
 )
 
@@ -315,12 +316,7 @@ func (s *ChangeJournalAggregationService) mergeAggregationMetrics(metric1, metri
 	if typeCounts2 == nil {
 		typeCounts2 = make(map[string]int)
 	}
-	mergedTypeCounts := make(map[string]int)
-	maps.Copy(mergedTypeCounts, typeCounts1)
-	for k, v := range typeCounts2 {
-		mergedTypeCounts[k] += v
-	}
-	merged[objects.FieldKeyEventTypeCounts] = mergedTypeCounts
+	merged[objects.FieldKeyEventTypeCounts] = audit.MergeIntMaps(typeCounts1, typeCounts2)
 
 	// Update collection_count (number of batches merged)
 	collectionCount1, _ := metric1[objects.FieldKeyCollectionCount].(int)
@@ -389,10 +385,8 @@ func (s *ChangeJournalAggregationService) findExistingMetricByOverlappingWindow(
 	secCtx *pkgctx.SecurityContext,
 	windowStart, windowEnd string,
 ) string {
-	// Parse time windows
-	startTime, err1 := time.Parse(time.RFC3339, windowStart)
-	endTime, err2 := time.Parse(time.RFC3339, windowEnd)
-	if err1 != nil || err2 != nil {
+	startTime, endTime, ok := ParseTimeWindowRFC3339(windowStart, windowEnd)
+	if !ok {
 		return "" // Can't parse times, skip this fallback
 	}
 
@@ -416,29 +410,7 @@ func (s *ChangeJournalAggregationService) findExistingMetricByOverlappingWindow(
 		return ""
 	}
 
-	// Check each metric for time window overlap
-	for _, obj := range result.Objects {
-		objStartStr, _ := obj[objects.FieldKeyAggregationWindowStart].(string)
-		objEndStr, _ := obj[objects.FieldKeyAggregationWindowEnd].(string)
-		if objStartStr == emptyValue || objEndStr == emptyValue {
-			continue
-		}
-
-		objStart, err1 := time.Parse(time.RFC3339, objStartStr)
-		objEnd, err2 := time.Parse(time.RFC3339, objEndStr)
-		if err1 != nil || err2 != nil {
-			continue
-		}
-
-		// Check if windows overlap: start1 < end2 && start2 < end1
-		if startTime.Before(objEnd) && objStart.Before(endTime) {
-			if id := objects.GetString(obj, objects.FieldKeyID); id != emptyValue {
-				return id
-			}
-		}
-	}
-
-	return ""
+	return audit.FirstOverlappingID(result.Objects, startTime, endTime)
 }
 
 // markEntriesAsAggregated marks change journal entries as aggregated

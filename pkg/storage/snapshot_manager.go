@@ -172,15 +172,7 @@ func (sm *SnapshotManager) CaptureMetadata(ctx context.Context, objectIDs []stri
 	}
 
 	// Count hash sources
-	registryCount := 0
-	calculatedCount := 0
-	for _, source := range metadata.HashSources {
-		if source == "registry" {
-			registryCount++
-		} else {
-			calculatedCount++
-		}
-	}
+	registryCount, calculatedCount := metadata.CountHashSources()
 
 	StorageLog(sm.logger).Info(LogEventStorageSnapshotMetadataCapturedInfo).
 		Int("objects", len(metadata.ObjectIDs)).

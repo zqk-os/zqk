@@ -89,11 +89,7 @@ func MergeMetrics(prefix, separator string, metric1, metric2 map[string]any) map
 	typeCounts2Any, _ := metric2[MergeKeyEventTypeCounts].(map[string]any)
 	typeCounts1 := MapFromAnyToInt(typeCounts1Any)
 	typeCounts2 := MapFromAnyToInt(typeCounts2Any)
-	mergedTypeCounts := make(map[string]int)
-	maps.Copy(mergedTypeCounts, typeCounts1)
-	for k, v := range typeCounts2 {
-		mergedTypeCounts[k] += v
-	}
+	mergedTypeCounts := MergeIntMaps(typeCounts1, typeCounts2)
 	if len(mergedTypeCounts) == 0 {
 		mergedTypeCounts[EventTypeCountKeyAggregated] = count1 + count2
 	}
@@ -104,11 +100,7 @@ func MergeMetrics(prefix, separator string, metric1, metric2 map[string]any) map
 	statusCounts1 := MapFromAnyToInt(statusCounts1Any)
 	statusCounts2 := MapFromAnyToInt(statusCounts2Any)
 	if statusCounts1 != nil || statusCounts2 != nil {
-		mergedStatusCounts := make(map[string]int)
-		maps.Copy(mergedStatusCounts, statusCounts1)
-		for k, v := range statusCounts2 {
-			mergedStatusCounts[k] += v
-		}
+		mergedStatusCounts := MergeIntMaps(statusCounts1, statusCounts2)
 		merged[MergeKeyStatusCounts] = MapIntToAny(mergedStatusCounts)
 	}
 
@@ -205,4 +197,14 @@ func MergeAnyMetrics(prefix, separator string, first, second any) (map[string]an
 		return nil, false
 	}
 	return MergeMetrics(prefix, separator, a, b), true
+}
+
+// MergeIntMaps adds counts from m2 into a copy of m1.
+func MergeIntMaps(m1, m2 map[string]int) map[string]int {
+	merged := make(map[string]int, len(m1)+len(m2))
+	maps.Copy(merged, m1)
+	for k, v := range m2 {
+		merged[k] += v
+	}
+	return merged
 }

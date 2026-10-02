@@ -282,44 +282,21 @@ func (tx *Transaction) Create(ctx context.Context, secCtx *pkgctx.SecurityContex
 
 // Update adds an update operation to the transaction
 func (tx *Transaction) Update(ctx context.Context, secCtx *pkgctx.SecurityContext, id string, updates map[string]any) error {
-	var err error
-	_ = concurrency.RunInLockOrLog(
-		&tx.mu, locknames.LockNameTransactionUpdate, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
-		func() error {
-			if tx.committed || tx.rolledBack {
-				err = errfmt.Errorf(ConstMiscTransactionAlreadyCommittedOrRolledBack)
-				return err
-			}
+	if err := tx.checkActive(locknames.LockNameTransactionUpdate); err != nil {
+		return err
+	}
 
-			// Read current object to get kind and determine file path (NO LOCK HELD)
-			// Release lock before I/O
-			return nil
-		},
-	)
+	kind, filePath, err := tx.resolveTargetKindAndPath(ctx, secCtx, id, ConstMiscFailedToReadObjectForUpdate)
 	if err != nil {
 		return err
 	}
 
-	// Read current object to get kind and determine file path (NO LOCK HELD)
-	obj, readErr := tx.adapter.storage.Read(ctx, secCtx, id)
-	if readErr != nil {
-		return errfmt.Newf(ConstMiscFailedToReadObjectForUpdate).Wrap(readErr)
-	}
-
-	kind, _ := obj[objects.FieldKeyKind].(string)
-	filePath, pathErr := tx.adapter.getObjectFilePathForTransaction(kind, id)
-	if pathErr != nil {
-		return errfmt.Newf(ConstMiscFailedToDetermineFilePath).Wrap(pathErr)
-	}
-
 	// Re-acquire lock to add file and operation
-	_ = concurrency.RunInLockOrLog(
+	return concurrency.RunInLockOrLog(
 		&tx.mu, locknames.LockNameTransactionUpdateAdd, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 		func() error {
-			// Check again after I/O
 			if tx.committed || tx.rolledBack {
-				err = errfmt.Errorf(ConstMiscTransactionAlreadyCommittedOrRolledBack)
-				return err
+				return errfmt.Errorf(ConstMiscTransactionAlreadyCommittedOrRolledBack)
 			}
 			tx.filePaths = append(tx.filePaths, filePath)
 			tx.operations = append(tx.operations, transactionOp{
@@ -331,46 +308,25 @@ func (tx *Transaction) Update(ctx context.Context, secCtx *pkgctx.SecurityContex
 			return nil
 		},
 	)
-	return err
 }
 
 // Delete adds a delete operation to the transaction
 func (tx *Transaction) Delete(ctx context.Context, secCtx *pkgctx.SecurityContext, id string) error {
-	var err error
-	_ = concurrency.RunInLockOrLog(
-		&tx.mu, locknames.LockNameTransactionDeleteCheck, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
-		func() error {
-			if tx.committed || tx.rolledBack {
-				err = errfmt.Errorf(ConstMiscTransactionAlreadyCommittedOrRolledBack)
-				return err
-			}
-			return nil
-		},
-	)
+	if err := tx.checkActive(locknames.LockNameTransactionDeleteCheck); err != nil {
+		return err
+	}
+
+	kind, filePath, err := tx.resolveTargetKindAndPath(ctx, secCtx, id, ConstMiscFailedToReadObjectForDelete)
 	if err != nil {
 		return err
 	}
 
-	// Read current object to get kind and determine file path (NO LOCK HELD)
-	obj, readErr := tx.adapter.storage.Read(ctx, secCtx, id)
-	if readErr != nil {
-		return errfmt.Newf(ConstMiscFailedToReadObjectForDelete).Wrap(readErr)
-	}
-
-	kind, _ := obj[objects.FieldKeyKind].(string)
-	filePath, pathErr := tx.adapter.getObjectFilePathForTransaction(kind, id)
-	if pathErr != nil {
-		return errfmt.Newf(ConstMiscFailedToDetermineFilePath).Wrap(pathErr)
-	}
-
 	// Re-acquire lock to add file and operation
-	_ = concurrency.RunInLockOrLog(
+	return concurrency.RunInLockOrLog(
 		&tx.mu, locknames.LockNameTransactionDeleteAdd, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 		func() error {
-			// Check again after I/O
 			if tx.committed || tx.rolledBack {
-				err = errfmt.Errorf(ConstMiscTransactionAlreadyCommittedOrRolledBack)
-				return err
+				return errfmt.Errorf(ConstMiscTransactionAlreadyCommittedOrRolledBack)
 			}
 			tx.filePaths = append(tx.filePaths, filePath)
 			tx.operations = append(tx.operations, transactionOp{
@@ -381,7 +337,35 @@ func (tx *Transaction) Delete(ctx context.Context, secCtx *pkgctx.SecurityContex
 			return nil
 		},
 	)
+}
+
+func (tx *Transaction) checkActive(lockName string) error {
+	var err error
+	_ = concurrency.RunInLockOrLog(
+		&tx.mu, lockName, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
+		func() error {
+			if tx.committed || tx.rolledBack {
+				err = errfmt.Errorf(ConstMiscTransactionAlreadyCommittedOrRolledBack)
+				return err
+			}
+			return nil
+		},
+	)
 	return err
+}
+
+func (tx *Transaction) resolveTargetKindAndPath(ctx context.Context, secCtx *pkgctx.SecurityContext, id, readErrMsg string) (string, string, error) {
+	obj, readErr := tx.adapter.storage.Read(ctx, secCtx, id)
+	if readErr != nil {
+		return "", "", errfmt.Newf(readErrMsg).Wrap(readErr)
+	}
+
+	kind, _ := obj[objects.FieldKeyKind].(string)
+	filePath, pathErr := tx.adapter.getObjectFilePathForTransaction(kind, id)
+	if pathErr != nil {
+		return "", "", errfmt.Newf(ConstMiscFailedToDetermineFilePath).Wrap(pathErr)
+	}
+	return kind, filePath, nil
 }
 
 // Commit commits the transaction atomically

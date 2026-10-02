@@ -10,6 +10,7 @@ import (
 	"context"
 	"fmt"
 	"slices"
+	"time"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -21,6 +22,17 @@ import (
 // ClampInt clamps val to the [minVal, maxVal] range.
 func ClampInt(val, minVal, maxVal int) int {
 	return min(max(val, minVal), maxVal)
+}
+
+// ParseTimeWindowRFC3339 parses windowStart and windowEnd as RFC3339 times.
+// Returns false if either string fails to parse.
+func ParseTimeWindowRFC3339(windowStart, windowEnd string) (time.Time, time.Time, bool) {
+	startTime, err1 := time.Parse(time.RFC3339, windowStart)
+	endTime, err2 := time.Parse(time.RFC3339, windowEnd)
+	if err1 != nil || err2 != nil {
+		return time.Time{}, time.Time{}, false
+	}
+	return startTime, endTime, true
 }
 
 // ============================================================================

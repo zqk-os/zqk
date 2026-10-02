@@ -195,15 +195,7 @@ func outputMetadataDetails(metadata *storage.SnapshotMetadata, verbose bool, out
 	}
 
 	// Summary
-	registryCount := 0
-	calculatedCount := 0
-	for _, source := range metadata.HashSources {
-		if source == "registry" {
-			registryCount++
-		} else {
-			calculatedCount++
-		}
-	}
+	registryCount, calculatedCount := metadata.CountHashSources()
 	if registryCount > 0 || calculatedCount > 0 {
 		_, _ = fmt.Fprintf(out, "\nHash sources:\n")
 		_, _ = fmt.Fprintf(out, "  - From registry: %d\n", registryCount)
