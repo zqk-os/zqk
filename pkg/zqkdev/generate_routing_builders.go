@@ -122,10 +122,6 @@ func NewGenerateRoutingBuildersCmd() *cobra.Command {
 	// Apply help builder to command
 	helpBuilder.ApplyToCommand(cmd)
 
-	cmd.Flags().StringVar(&rulesDir, "rules-dir", "", "Directory containing YAML routing rule files (default: "+filepath.Join(paths.ProcessInternalDir, "routing_rules")+")")
-	cmd.Flags().StringVar(&outputDir, "output-dir", "", "Output directory for generated builder files (default: pkg/specbuilder/routing_builders)")
-	cmd.Flags().BoolVar(&overwrite, "overwrite", false, "Overwrite existing builder files")
-
-	cli.AddCommonFlags(cmd)
+	AddBuilderFlags(cmd, &rulesDir, "rules-dir", filepath.Join(paths.ProcessInternalDir, "routing_rules"), "Directory containing YAML routing rule files", &outputDir, "pkg/specbuilder/routing_builders", &overwrite)
 	return cmd
 }

@@ -98,5 +98,20 @@ func requireAdminRole(cmd *cobra.Command, _ []string) error {
 	return nil
 }
 
-// getAdminSecurityContext returns a security context with admin privileges
-//
+// newInternalProcessor creates a processor with consistent error wrapping.
+func newInternalProcessor(cmd *cobra.Command) (*cli.Processor, error) {
+	proc, err := cli.NewProcessor(cmd)
+	if err != nil {
+		return nil, errfmt.Newf("failed to create processor").Wrap(err)
+	}
+	return proc, nil
+}
+
+// initInternalProcessorWithID extracts the object ID from args[0] and initializes a processor.
+func initInternalProcessorWithID(cmd *cobra.Command, args []string) (string, *cli.Processor, error) {
+	proc, err := newInternalProcessor(cmd)
+	if err != nil {
+		return "", nil, err
+	}
+	return args[0], proc, nil
+}

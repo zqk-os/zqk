@@ -131,10 +131,6 @@ func NewGenerateTraitBuildersCmd() *cobra.Command {
 	// Apply help builder to command
 	helpBuilder.ApplyToCommand(cmd)
 
-	cmd.Flags().StringVar(&traitsDir, "traits-dir", "", "Directory containing YAML trait files (default: "+paths.ProcessInternalTraitsDir+")")
-	cmd.Flags().StringVar(&outputDir, "output-dir", "", "Output directory for generated builder files (default: pkg/specbuilder/trait_builders)")
-	cmd.Flags().BoolVar(&overwrite, "overwrite", false, "Overwrite existing builder files")
-
-	cli.AddCommonFlags(cmd)
+	AddBuilderFlags(cmd, &traitsDir, "traits-dir", paths.ProcessInternalTraitsDir, "Directory containing YAML trait files", &outputDir, "pkg/specbuilder/trait_builders", &overwrite)
 	return cmd
 }

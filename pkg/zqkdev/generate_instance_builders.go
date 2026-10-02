@@ -10,11 +10,9 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/zqk-os/zqk/pkg/cliapp"
-	"github.com/zqk-os/zqk/pkg/appledouble"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
-	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	instancebuilders "github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -72,22 +70,11 @@ func NewGenerateInstanceBuildersCmd() *cobra.Command {
 		var items []GenerateItem
 
 		err := filepath.WalkDir(specsDir, func(path string, d os.DirEntry, walkErr error) error {
-			if walkErr != nil || d == nil {
-				return nil //nolint:nilerr // skip unreadable entries
+			skipDir, process := ShouldProcessYAMLDirEntry(d, walkErr)
+			if skipDir {
+				return filepath.SkipDir
 			}
-			if d.IsDir() {
-				if d.Name() == ".git" || d.Name() == "node_modules" {
-					return filepath.SkipDir
-				}
-				return nil
-			}
-			if appledouble.SkipNameInReadDir(d.Name()) {
-				return nil
-			}
-			if !strings.HasSuffix(d.Name(), ".yaml") && !strings.HasSuffix(d.Name(), ".yml") {
-				return nil
-			}
-			if d.Name() == "_placeholder.yaml" || objects.IsHashedFilename(d.Name()) {
+			if !process {
 				return nil
 			}
 
@@ -122,10 +109,6 @@ func NewGenerateInstanceBuildersCmd() *cobra.Command {
 	// Apply help builder to command
 	helpBuilder.ApplyToCommand(cmd)
 
-	cmd.Flags().StringVar(&specsDir, "specs-dir", "", "Directory containing YAML spec files (default: "+paths.ProcessInternalObjectSpecsDir+")")
-	cmd.Flags().StringVar(&outputDir, "output-dir", "", "Output directory for generated builder files (default: pkg/specbuilder/instance_builders)")
-	cmd.Flags().BoolVar(&overwrite, "overwrite", false, "Overwrite existing instance builder files")
-
-	cli.AddCommonFlags(cmd)
+	AddBuilderFlags(cmd, &specsDir, "specs-dir", paths.ProcessInternalObjectSpecsDir, "Directory containing YAML spec files", &outputDir, "pkg/specbuilder/instance_builders", &overwrite)
 	return cmd
 }

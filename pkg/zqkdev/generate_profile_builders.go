@@ -125,10 +125,6 @@ func NewGenerateProfileBuildersCmd() *cobra.Command {
 	// Apply help builder to command
 	helpBuilder.ApplyToCommand(cmd)
 
-	cmd.Flags().StringVar(&profilesDir, "profiles-dir", "", "Directory containing YAML profile files (default: "+paths.ProcessInternalProfileSpecsDir+")")
-	cmd.Flags().StringVar(&outputDir, "output-dir", "", "Output directory for generated builder files (default: pkg/specbuilder/profile_builders)")
-	cmd.Flags().BoolVar(&overwrite, "overwrite", false, "Overwrite existing builder files")
-
-	cli.AddCommonFlags(cmd)
+	AddBuilderFlags(cmd, &profilesDir, "profiles-dir", paths.ProcessInternalProfileSpecsDir, "Directory containing YAML profile files", &outputDir, "pkg/specbuilder/profile_builders", &overwrite)
 	return cmd
 }

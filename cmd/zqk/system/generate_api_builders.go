@@ -16,6 +16,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/specbuilder/api_builders"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkdev"
 )
 
 // NewGenerateAPIBuildersCmd creates the `system generate-api_spec-builders` command.
@@ -147,22 +148,12 @@ func NewGenerateAPIBuildersCmd() *cobra.Command {
 		}
 
 		// Summary (done)
-		logging.Fluent(logger).Info(fmt.Sprintf("Summary: Generated %d, Skipped %d, Errors %d", generated, skipped, errors)).Log()
-
-		if errors > 0 {
-			return errfmt.Errorf("generation completed with %d errors", errors)
-		}
-
-		return nil
+		return zqkdev.LogSummaryAndCheckErrors(logger, generated, skipped, errors)
 	})
 
 	// Apply help builder to command
 	helpBuilder.ApplyToCommand(cmd)
 
-	cmd.Flags().StringVar(&api_specsDir, "api-specs-dir", "", "Directory containing *_api.yaml files (default: "+paths.ProcessInternalAPISpecsDir+")")
-	cmd.Flags().StringVar(&outputDir, "output-dir", "", "Output directory for generated builder files (default: pkg/specbuilder/api_builders)")
-	cmd.Flags().BoolVar(&overwrite, "overwrite", false, "Overwrite existing builder files")
-
-	cli.AddCommonFlags(cmd)
+	zqkdev.AddBuilderFlags(cmd, &api_specsDir, "api-specs-dir", paths.ProcessInternalAPISpecsDir, "Directory containing *_api.yaml files", &outputDir, "pkg/specbuilder/api_builders", &overwrite)
 	return cmd
 }

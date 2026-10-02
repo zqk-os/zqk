@@ -91,10 +91,9 @@ func NewInternalBulkCreateCmd() *cobra.Command {
 }
 
 func runInternalBulkCreate(cmd *cobra.Command, args []string) error {
-	// Create processor (handles context, storage, security, logging)
-	proc, err := cli.NewProcessor(cmd)
+	proc, err := newInternalProcessor(cmd)
 	if err != nil {
-		return errfmt.Newf("failed to create processor").Wrap(err)
+		return err
 	}
 
 	kind, ok := kindCanonicalFromInternalPRERun(cmd)
@@ -223,10 +222,9 @@ func NewInternalBulkUpdateCmd() *cobra.Command {
 }
 
 func runInternalBulkUpdate(cmd *cobra.Command, args []string) error {
-	// Create processor (handles context, storage, security, logging)
-	proc, err := cli.NewProcessor(cmd)
+	proc, err := newInternalProcessor(cmd)
 	if err != nil {
-		return errfmt.Newf("failed to create processor").Wrap(err)
+		return err
 	}
 
 	filePath, err := cmd.Flags().GetString("file")
@@ -354,10 +352,9 @@ func NewInternalBulkGetCmd() *cobra.Command {
 }
 
 func runInternalBulkGet(cmd *cobra.Command, args []string) error {
-	// Create processor (handles context, storage, security, logging)
-	proc, err := cli.NewProcessor(cmd)
+	proc, err := newInternalProcessor(cmd)
 	if err != nil {
-		return errfmt.Newf("failed to create processor").Wrap(err)
+		return err
 	}
 
 	// Get IDs from --ids or --file using shared utility
@@ -422,10 +419,9 @@ func NewInternalBulkDeleteCmd() *cobra.Command {
 }
 
 func runInternalBulkDelete(cmd *cobra.Command, args []string) error {
-	// Create processor (handles context, storage, security, logging)
-	proc, err := cli.NewProcessor(cmd)
+	proc, err := newInternalProcessor(cmd)
 	if err != nil {
-		return errfmt.Newf("failed to create processor").Wrap(err)
+		return err
 	}
 
 	// Parse flags
