@@ -106,11 +106,7 @@ func NewFileObjectStorage(projectRoot string, opts ...*FileObjectStorageOptions)
 	}
 	lifecycleLoader := objects.NewLifecycleLoader(lifecyclesDir)
 
-	// Set builder registry on spec loader to enable version-aware loading
-	// This allows the validator to load specs by version when objects have schema_version
-	builderRegistry := builders.GetGlobalRegistry()
-	adapter := builders.NewSpecLoaderAdapter(builderRegistry)
-	specLoader.SetBuilderRegistry(adapter)
+	specLoader.SetBuilderRegistry(builders.NewSpecLoaderAdapter(builders.GetGlobalRegistry()))
 
 	// Load only base specs (EnsureReady). Do NOT pre-warm every kind: profile showed
 	// LoadSpecWithInheritance + loadSpecWithInheritanceRecursive at ~35% of CRUD CPU; doing

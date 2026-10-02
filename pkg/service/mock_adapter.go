@@ -139,10 +139,6 @@ func (m *MockAdapter) Restart(ctx context.Context, id string) error {
 		return nil
 	})
 }
-		Uptime: time.Millisecond * 5,
-	}
-	return nil
-}
 
 func (m *MockAdapter) Status(ctx context.Context, id string) (ServiceStatus, error) {
 	if m.StatusErr != nil {

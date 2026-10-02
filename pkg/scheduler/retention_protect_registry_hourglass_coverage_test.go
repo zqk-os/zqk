@@ -24,6 +24,7 @@ func TestExtended_RetentionCleanup_SlowPathAndProtectStatuses(t *testing.T) {
 	}
 	defer func() {
 		_ = sp.Shutdown(context.Background())
+		time.Sleep(100 * time.Millisecond)
 	}()
 
 	secCtx := pkgctx.NewSystemSecurityContext()

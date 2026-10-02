@@ -21,6 +21,7 @@ func TestExtended_RetentionMaxCount_Wave40(t *testing.T) {
 	}
 	defer func() {
 		_ = fs.Shutdown(context.Background())
+		time.Sleep(100 * time.Millisecond)
 	}()
 
 	rth := NewRetentionToleranceHandler(fs, tmpDir).(*RetentionToleranceHandler)

@@ -111,11 +111,8 @@ func WriteSystemObjectAndRegisterHash(filePath string, data []byte, kind, kindDi
 	if hashRegistry == nil {
 		return errfmt.Errorf(ErrMsgGetHashReg, kind)
 	}
-	if err := hashRegistry.Load(); err != nil {
-		// Hash registry doesn't exist yet - will be created on first save
-	}
 	filename := filepath.Base(filePath)
-	hashRegistry.SetHash(filename, hash)
+	hashRegistry.LoadAndSetHash(filename, hash)
 
 	// Use retry logic to ensure hash registry update succeeds
 	if err := saveHashRegistryWithRetryForSystemObject(hashRegistry, objectID, filename, hash); err != nil {

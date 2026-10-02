@@ -18,6 +18,11 @@ import (
 	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
+// ClampInt clamps val to the [minVal, maxVal] range.
+func ClampInt(val, minVal, maxVal int) int {
+	return min(max(val, minVal), maxVal)
+}
+
 // ============================================================================
 // Shared Permission Checking
 // ============================================================================

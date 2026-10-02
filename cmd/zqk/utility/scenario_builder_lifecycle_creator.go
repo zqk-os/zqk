@@ -6,8 +6,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"gopkg.in/yaml.v3"
-
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -100,15 +98,9 @@ func (sb *ScenarioBuilder) createLifecycleObjects(ctx context.Context) error {
 
 // createLifecycleObjectFromFile creates a lifecycle object from a YAML file
 func (sb *ScenarioBuilder) createLifecycleObjectFromFile(ctx context.Context, lifecyclePath, objectType, version string) error {
-	// Load lifecycle file
-	data, err := fileutil.ReadFile(lifecyclePath)
+	lifecycle, err := objects.LoadLifecycleFile(lifecyclePath)
 	if err != nil {
-		return errfmt.Newf("failed to read lifecycle file").Wrap(err)
-	}
-
-	var lifecycle objects.Lifecycle
-	if err := yaml.Unmarshal(data, &lifecycle); err != nil {
-		return errfmt.Newf("failed to parse lifecycle file").Wrap(err)
+		return err
 	}
 
 	// Use object_type from file if available
@@ -131,7 +123,7 @@ func (sb *ScenarioBuilder) createLifecycleObjectFromFile(ctx context.Context, li
 	}
 
 	// Convert lifecycle struct to object map using instance builder
-	lifecycleObj, err := lifecycleToObjectMap(&lifecycle, objectType, version)
+	lifecycleObj, err := lifecycleToObjectMap(lifecycle, objectType, version)
 	if err != nil {
 		return errfmt.Newf("failed to convert lifecycle to object").Wrap(err)
 	}
@@ -161,15 +153,7 @@ func lifecycleToObjectMap(lifecycle *objects.Lifecycle, objectType, version stri
 	builder.SetField(objects.FieldKeySourceType, scenarioBuilderSourceBuiltIn)
 
 	// Set title (required by base_object) - derive from object_type
-	// Convert object_type like "base_object" to "Base Object Lifecycle"
-	titleParts := strings.Split(strings.ReplaceAll(objectType, "_", " "), " ")
-	for i, part := range titleParts {
-		if len(part) > 0 {
-			titleParts[i] = strings.ToUpper(part[:1]) + strings.ToLower(part[1:])
-		}
-	}
-	title := strings.Join(titleParts, " ") + " Lifecycle"
-	builder.SetField(objects.FieldKeyTitle, title)
+	builder.SetField(objects.FieldKeyTitle, objects.DeriveLifecycleTitle(objectType))
 
 	// Set status (required by base_object) - lifecycle objects use base_object lifecycle
 	// Valid statuses: "proposed" (initial), "approved", "in_progress", "implemented", "archived", "error"

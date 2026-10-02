@@ -28,6 +28,16 @@ type pkgSem struct {
 	waiters []chan struct{}
 }
 
+func (sem *pkgSem) releaseAndWake() {
+	sem.inUse--
+	for sem.inUse < sem.limit && len(sem.waiters) > 0 {
+		ch := sem.waiters[0]
+		sem.waiters = sem.waiters[1:]
+		sem.inUse++
+		close(ch)
+	}
+}
+
 // MapConcurrencyLimiter limits concurrent execution of run_wrapper jobs by package path.
 // For example, pkg/storage defaults to 1 concurrent job unless ZQK_SCHEDULER_MAX_CONCURRENT_PKG_STORAGE overrides.
 type MapConcurrencyLimiter struct {
@@ -169,17 +179,17 @@ func (l *MapConcurrencyLimiter) Acquire(ctx context.Context, packagePath string)
 					}
 				}
 				// If not in waiters, it was already granted. We must release it.
-				sem.inUse--
-				for sem.inUse < sem.limit && len(sem.waiters) > 0 {
-					ch := sem.waiters[0]
-					sem.waiters = sem.waiters[1:]
-					sem.inUse++
-					close(ch)
-				}
+				sem.releaseAndWake()
 				return nil
 			},
 		)
 		return errfmt.Errorf("timed out waiting for package concurrency slot for %q (max wait %v): %w", packagePath, l.maxWait, acquireCtx.Err())
+	}
+}
+
+func (l *MapConcurrencyLimiter) releaseSemLocked(packagePath string) {
+	if sem := l.sems[packagePath]; sem != nil {
+		sem.releaseAndWake()
 	}
 }
 
@@ -192,17 +202,7 @@ func (l *MapConcurrencyLimiter) Release(packagePath string) {
 	_ = concurrency.RunInLockWithLogger(
 		&l.mu, "SchedulerPackageLimiterReleaseRead", logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 		func() error {
-			sem := l.sems[packagePath]
-			if sem == nil {
-				return nil
-			}
-			sem.inUse--
-			for sem.inUse < sem.limit && len(sem.waiters) > 0 {
-				ch := sem.waiters[0]
-				sem.waiters = sem.waiters[1:]
-				sem.inUse++
-				close(ch)
-			}
+			l.releaseSemLocked(packagePath)
 			return nil
 		},
 	)

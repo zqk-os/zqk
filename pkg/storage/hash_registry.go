@@ -249,6 +249,12 @@ func (hr *HashRegistry) SetHash(filename, hash string) {
 
 }
 
+// LoadAndSetHash loads existing registry entries if available and sets the given file hash.
+func (hr *HashRegistry) LoadAndSetHash(filename, hash string) {
+	_ = hr.Load()
+	hr.SetHash(filename, hash)
+}
+
 func (hr *HashRegistry) DeleteHash(filename string) {
 	if err := concurrency.RunInLockWithLogger(&hr.mu, locknames.LockNameHashRegistryDeleteHash, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
 		delete(hr.hashes, filename)

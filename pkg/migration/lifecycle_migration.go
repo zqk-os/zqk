@@ -7,8 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"gopkg.in/yaml.v3"
-
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
@@ -16,7 +14,6 @@ import (
 	lifecycleEnum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/lifecycle"
 	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	"github.com/zqk-os/zqk/pkg/storage"
-	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/validation"
 )
 
@@ -60,14 +57,9 @@ func (h *lifecycleMigrationHelper) migrateLifecycleFile(
 	secCtx := pkgctx.NewSystemSecurityContext()
 
 	// Load lifecycle file
-	data, err := fileutil.ReadFile(lifecyclePath)
+	lifecycle, err := objects.LoadLifecycleFile(lifecyclePath)
 	if err != nil {
-		return errfmt.Newf("failed to read lifecycle file").Wrap(err)
-	}
-
-	var lifecycle objects.Lifecycle
-	if err := yaml.Unmarshal(data, &lifecycle); err != nil {
-		return errfmt.Newf("failed to parse lifecycle file").Wrap(err)
+		return err
 	}
 
 	// Validate that object_type is set (either from file or parameter)
@@ -129,7 +121,7 @@ func (h *lifecycleMigrationHelper) migrateLifecycleFile(
 	}
 
 	// Convert lifecycle struct to object map using instance builder
-	lifecycleObj, err := h.lifecycleToObject(&lifecycle, objectType, version)
+	lifecycleObj, err := h.lifecycleToObject(lifecycle, objectType, version)
 	if err != nil {
 		return errfmt.Newf("failed to convert lifecycle to object").Wrap(err)
 	}
@@ -159,15 +151,9 @@ func (h *lifecycleMigrationHelper) migrateLifecycleFile(
 
 // lifecycleToObjectFromFile loads a lifecycle file and converts it to an object
 func (h *lifecycleMigrationHelper) lifecycleToObjectFromFile(filePath, objectType, version string) (map[string]any, error) {
-	// Load lifecycle file
-	data, err := fileutil.ReadFile(filePath)
+	lifecycle, err := objects.LoadLifecycleFile(filePath)
 	if err != nil {
-		return nil, errfmt.Newf("failed to read lifecycle file").Wrap(err)
-	}
-
-	var lifecycle objects.Lifecycle
-	if err := yaml.Unmarshal(data, &lifecycle); err != nil {
-		return nil, errfmt.Newf("failed to parse lifecycle file").Wrap(err)
+		return nil, err
 	}
 
 	// Use object_type from file if available, otherwise use parameter
@@ -175,7 +161,7 @@ func (h *lifecycleMigrationHelper) lifecycleToObjectFromFile(filePath, objectTyp
 		objectType = lifecycle.ObjectType
 	}
 
-	return h.lifecycleToObject(&lifecycle, objectType, version)
+	return h.lifecycleToObject(lifecycle, objectType, version)
 }
 
 // lifecycleToObject converts a Lifecycle struct to a lifecycle object map using the instance builder
@@ -245,15 +231,7 @@ func (h *lifecycleMigrationHelper) lifecycleToObject(lifecycle *objects.Lifecycl
 	builder.SetID(lifecycleID)
 
 	// Set title (required by base_object) - derive from object_type
-	// Convert object_type like "base_object" to "Base Object Lifecycle"
-	titleParts := strings.Split(strings.ReplaceAll(objectType, "_", " "), " ")
-	for i, part := range titleParts {
-		if len(part) > 0 {
-			titleParts[i] = strings.ToUpper(part[:1]) + strings.ToLower(part[1:])
-		}
-	}
-	title := strings.Join(titleParts, " ") + " Lifecycle"
-	builder.SetField(objects.FieldKeyTitle, title)
+	builder.SetField(objects.FieldKeyTitle, objects.DeriveLifecycleTitle(objectType))
 
 	// Set status (required by base_object) - lifecycle objects default to "approved"
 	// Find initial status from lifecycle statuses if available

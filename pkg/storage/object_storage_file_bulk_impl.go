@@ -12,6 +12,24 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
+func setupBulkCacheChecker() func() {
+	var original func(string) (string, bool)
+	if val := cacheChecker.Load(); val != nil {
+		original = val.(func(string) (string, bool))
+	}
+	cleanup := func() {
+		if original != nil {
+			cacheChecker.Store(original)
+		} else {
+			cacheChecker.Store((func(string) (string, bool))(nil))
+		}
+	}
+	if original == nil && cacheOperationHandler != nil {
+		cacheChecker.Store(func(objectID string) (string, bool) { return "", false })
+	}
+	return cleanup
+}
+
 // BulkCreate creates multiple objects atomically using a transaction
 func (f *FileObjectStorage) BulkCreate(ctx context.Context, secCtx *pkgctx.SecurityContext, objList []map[string]any) (*BulkResult, error) {
 	ctx = WithBulkCreateDeferFlush(ctx)
@@ -30,23 +48,8 @@ func (f *FileObjectStorage) BulkCreate(ctx context.Context, secCtx *pkgctx.Secur
 	}
 
 	// Auto-detect cascade mode
-	var originalCacheChecker func(string) (string, bool)
-	if val := cacheChecker.Load(); val != nil {
-		originalCacheChecker = val.(func(string) (string, bool))
-	}
-	defer func() {
-		// Ensure original cacheChecker is always restored on exit
-		if originalCacheChecker != nil {
-			cacheChecker.Store(originalCacheChecker)
-		} else {
-			cacheChecker.Store((func(string) (string, bool))(nil))
-		}
-	}()
-
-	if originalCacheChecker == nil && cacheOperationHandler != nil {
-		newChecker := func(objectID string) (string, bool) { return "", false }
-		cacheChecker.Store(newChecker)
-	}
+	cleanup := setupBulkCacheChecker()
+	defer cleanup()
 
 	// Process in chunks to cap peak memory usage (RECOMP-BULK-001)
 	const createChunkSize = 500
@@ -163,23 +166,8 @@ func (f *FileObjectStorage) BulkUpdate(ctx context.Context, secCtx *pkgctx.Secur
 	}
 
 	// Auto-detect cascade mode
-	var originalCacheChecker func(string) (string, bool)
-	if val := cacheChecker.Load(); val != nil {
-		originalCacheChecker = val.(func(string) (string, bool))
-	}
-	defer func() {
-		// Ensure original cacheChecker is always restored on exit
-		if originalCacheChecker != nil {
-			cacheChecker.Store(originalCacheChecker)
-		} else {
-			cacheChecker.Store((func(string) (string, bool))(nil))
-		}
-	}()
-
-	if originalCacheChecker == nil && cacheOperationHandler != nil {
-		newChecker := func(objectID string) (string, bool) { return "", false }
-		cacheChecker.Store(newChecker)
-	}
+	cleanup := setupBulkCacheChecker()
+	defer cleanup()
 
 	// Process in chunks to cap peak memory usage (RECOMP-BULK-001)
 	const updateChunkSize = 500

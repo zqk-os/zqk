@@ -145,6 +145,7 @@ func TestExtended_CapOrchestrator_FailureTrackerAndIndex(t *testing.T) {
 	}
 	defer func() {
 		_ = sp.Shutdown(context.Background())
+		time.Sleep(100 * time.Millisecond)
 	}()
 
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))

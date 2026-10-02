@@ -121,7 +121,8 @@ func RefuseCriteriaCASWithoutCategory(kind string, isDraft bool, data []byte) er
 	return RefuseCriteriaCASWithoutBaseInstance(kind, isDraft, data)
 }
 
-func shouldUseObjectDraftPlane(kind, status string) bool {
+// ShouldUseObjectDraftPlane is true for CAS kinds in a preliminary lifecycle status.
+func ShouldUseObjectDraftPlane(kind, status string) bool {
 	// Must match pkg/storage.shouldUseObjectDraftPlane for non-stream kinds:
 	// lifecycle preliminary (exploring/identified/draft/…) parks on the draft plane.
 	// The previous draft|draft_pending literal left backlog_item exploring on CAS.
@@ -145,4 +146,8 @@ func shouldUseObjectDraftPlane(kind, status string) bool {
 		return false
 	}
 	return status == origin && checker.IsPreliminary(kind, origin)
+}
+
+func shouldUseObjectDraftPlane(kind, status string) bool {
+	return ShouldUseObjectDraftPlane(kind, status)
 }

@@ -81,12 +81,16 @@ func SweepObjectDraftPlaneWithEntitlement(secCtx interface{}, ctx context.Contex
 	if err != nil {
 		return out, err
 	}
+	populateSweepMatches(out, inv, matched, skipped)
+
+	return applySweepToMatched(secCtx, out, matched, opts)
+}
+
+func populateSweepMatches(out *ObjectDraftPlaneSweepResult, inv ObjectDraftPlaneInventory, matched, skipped []ObjectDraftPlaneCandidate) {
 	out.Inventory = inv
 	out.Matched = len(matched)
 	out.Skipped = len(skipped)
 	appendSkippedSweepItems(out, skipped)
-
-	return applySweepToMatched(secCtx, out, matched, opts)
 }
 
 // sweepMatchOptions projects sweep options onto the draft-plane match filter.

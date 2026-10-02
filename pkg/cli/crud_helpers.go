@@ -82,109 +82,83 @@ func CleanupSourceFile(cmd *cobra.Command, filePath string, logger CRUDLogger) {
 	}
 }
 
-// FormatCreateSuccessMessage formats the success message for object creation
-func FormatCreateSuccessMessage(objData map[string]any, kind string, objectType string, logger CRUDLogger) string {
-	id, _ := objData[objects.FieldKeyID].(string)
-	objectTypeLabel := "Object"
+func resolveObjectTypeLabel(objectType, defaultLabel string) string {
 	if objectType != emptyValue {
-		objectTypeLabel = objectType
+		return objectType
+	}
+	return defaultLabel
+}
+
+func logAndFormatSuccess(id string, logger CRUDLogger, logMsg, cliMsg string, extraFields ...logging.Field) string {
+	if r, ok := logging.TryFluentEvent(logger); ok {
+		event := r.Info(logMsg)
+		if id != emptyValue {
+			event = event.ObjectID(id)
+		}
+		for _, f := range extraFields {
+			if f.Key == "kind" {
+				if k, ok := f.Value.(string); ok {
+					event = event.Kind(k)
+				}
+			}
+		}
+		event.Log()
+	} else if id != emptyValue {
+		fields := append([]logging.Field{logging.IDField(id)}, extraFields...)
+		logger.LogInfo(logMsg, fields...)
+	} else {
+		logger.LogInfo(logMsg, extraFields...)
 	}
 
 	successIcon := color.New(color.FgGreen).Sprint("✓")
+	return fmt.Sprintf("%s %s\n", successIcon, cliMsg)
+}
 
+// FormatCreateSuccessMessage formats the success message for object creation
+func FormatCreateSuccessMessage(objData map[string]any, kind string, objectType string, logger CRUDLogger) string {
+	id, _ := objData[objects.FieldKeyID].(string)
+	label := resolveObjectTypeLabel(objectType, "Object")
 	if id == emptyValue {
-		msg := fmt.Sprintf("%s created successfully", objectTypeLabel)
-		if r, ok := logging.TryFluentEvent(logger); ok {
-			r.Info(msg).Kind(kind).Log()
-		} else {
-			logger.LogInfo(msg, logging.KindField(kind))
-		}
-		return fmt.Sprintf("%s %s created successfully\n", successIcon, objectTypeLabel)
-	}
-	msg := fmt.Sprintf("%s created successfully", objectTypeLabel)
-	if r, ok := logging.TryFluentEvent(logger); ok {
-		r.Info(msg).ObjectID(id).Kind(kind).Log()
-	} else {
-		logger.LogInfo(msg,
-			logging.IDField(id),
-			logging.KindField(kind))
+		logMsg := fmt.Sprintf("%s created successfully", label)
+		cliMsg := fmt.Sprintf("%s created successfully", label)
+		return logAndFormatSuccess("", logger, logMsg, cliMsg, logging.KindField(kind))
 	}
 
 	highlightID := color.New(color.FgCyan).Sprint(id)
-	return fmt.Sprintf("%s %s %s created successfully\n", successIcon, objectTypeLabel, highlightID)
+	logMsg := fmt.Sprintf("%s created successfully", label)
+	cliMsg := fmt.Sprintf("%s %s created successfully", label, highlightID)
+	return logAndFormatSuccess(id, logger, logMsg, cliMsg, logging.KindField(kind))
+}
+
+func formatActionSuccessMessage(id string, isBuiltIn bool, objectType string, actionVerb string, logger CRUDLogger) string {
+	label := resolveObjectTypeLabel(objectType, "Object")
+	highlightID := color.New(color.FgCyan).Sprint(id)
+	prefix := ""
+	if isBuiltIn {
+		prefix = "Built-in "
+	}
+	logMsg := fmt.Sprintf("%s%s %s", prefix, label, actionVerb)
+	cliMsg := fmt.Sprintf("%s%s %s %s", prefix, label, highlightID, actionVerb)
+	return logAndFormatSuccess(id, logger, logMsg, cliMsg)
 }
 
 // FormatDeleteSuccessMessage formats the success message for object deletion
 func FormatDeleteSuccessMessage(id string, isBuiltIn bool, cascade bool, objectType string, logger CRUDLogger) string {
-	objectTypeLabel := "Object"
-	if objectType != emptyValue {
-		objectTypeLabel = objectType
-	}
-
-	successIcon := color.New(color.FgGreen).Sprint("✓")
-	highlightID := color.New(color.FgCyan).Sprint(id)
-
 	if cascade {
+		label := resolveObjectTypeLabel(objectType, "Object")
+		highlightID := color.New(color.FgCyan).Sprint(id)
+		prefix := ""
 		if isBuiltIn {
-			msg := fmt.Sprintf("Built-in %s and dependents deleted successfully", objectTypeLabel)
-			if r, ok := logging.TryFluentEvent(logger); ok {
-				r.Info(msg).ObjectID(id).Log()
-			} else {
-				logger.LogInfo(msg, logging.IDField(id))
-			}
-			return fmt.Sprintf("%s Built-in %s %s and its dependents deleted successfully\n", successIcon, objectTypeLabel, highlightID)
+			prefix = "Built-in "
 		}
-		msg := fmt.Sprintf("%s and dependents deleted successfully", objectTypeLabel)
-		if r, ok := logging.TryFluentEvent(logger); ok {
-			r.Info(msg).ObjectID(id).Log()
-		} else {
-			logger.LogInfo(msg, logging.IDField(id))
-		}
-		return fmt.Sprintf("%s %s %s and its dependents deleted successfully\n", successIcon, objectTypeLabel, highlightID)
+		logMsg := fmt.Sprintf("%s%s and dependents deleted successfully", prefix, label)
+		cliMsg := fmt.Sprintf("%s%s %s and its dependents deleted successfully", prefix, label, highlightID)
+		return logAndFormatSuccess(id, logger, logMsg, cliMsg)
 	}
-
-	if isBuiltIn {
-		msg := fmt.Sprintf("Built-in %s deleted successfully", objectTypeLabel)
-		if r, ok := logging.TryFluentEvent(logger); ok {
-			r.Info(msg).ObjectID(id).Log()
-		} else {
-			logger.LogInfo(msg, logging.IDField(id))
-		}
-		return fmt.Sprintf("%s Built-in %s %s deleted successfully\n", successIcon, objectTypeLabel, highlightID)
-	}
-	msg := fmt.Sprintf("%s deleted successfully", objectTypeLabel)
-	if r, ok := logging.TryFluentEvent(logger); ok {
-		r.Info(msg).ObjectID(id).Log()
-	} else {
-		logger.LogInfo(msg, logging.IDField(id))
-	}
-	return fmt.Sprintf("%s %s %s deleted successfully\n", successIcon, objectTypeLabel, highlightID)
+	return formatActionSuccessMessage(id, isBuiltIn, objectType, "deleted successfully", logger)
 }
 
 // FormatUpdateSuccessMessage formats the success message for object update
 func FormatUpdateSuccessMessage(id string, isBuiltIn bool, objectType string, logger CRUDLogger) string {
-	objectTypeLabel := "Object"
-	if objectType != emptyValue {
-		objectTypeLabel = objectType
-	}
-
-	successIcon := color.New(color.FgGreen).Sprint("✓")
-	highlightID := color.New(color.FgCyan).Sprint(id)
-
-	if isBuiltIn {
-		msg := fmt.Sprintf("Built-in %s updated successfully", objectTypeLabel)
-		if r, ok := logging.TryFluentEvent(logger); ok {
-			r.Info(msg).ObjectID(id).Log()
-		} else {
-			logger.LogInfo(msg, logging.IDField(id))
-		}
-		return fmt.Sprintf("%s Built-in %s %s updated successfully\n", successIcon, objectTypeLabel, highlightID)
-	}
-	msg := fmt.Sprintf("%s updated successfully", objectTypeLabel)
-	if r, ok := logging.TryFluentEvent(logger); ok {
-		r.Info(msg).ObjectID(id).Log()
-	} else {
-		logger.LogInfo(msg, logging.IDField(id))
-	}
-	return fmt.Sprintf("%s %s %s updated successfully\n", successIcon, objectTypeLabel, highlightID)
+	return formatActionSuccessMessage(id, isBuiltIn, objectType, "updated successfully", logger)
 }

@@ -251,13 +251,7 @@ func (f *FileObjectStorage) Create(ctx context.Context, secCtx *pkgctx.SecurityC
 
 	updateReverseReferenceIndexOnCreate(id, obj)
 
-	actualPath, err := f.getObjectFilePath(id, kind)
-	if err != nil && !IsExpectedMissingErr(err) {
-		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgSwallowedError, err).Log()
-	}
-	if actualPath == emptyValue {
-		actualPath = filePath
-	}
+	actualPath := f.resolveActualObjectFilePath(id, kind, filePath)
 	if useDraftPlane {
 		actualPath = f.objectDraftPlanePath(kind, id)
 	}

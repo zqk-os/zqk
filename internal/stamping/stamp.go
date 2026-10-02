@@ -5,13 +5,12 @@ package stamping
 
 import (
 	"crypto/ed25519"
-	"encoding/base64"
 	"errors"
 	"fmt"
 
 	"github.com/golang-jwt/jwt/v5"
 
-	"github.com/zqk-os/zqk/pkg/zqkenv"
+	"github.com/zqk-os/zqk/pkg/agent"
 )
 
 // ErrInvalidMethod is returned when a token uses an unexpected signing method.
@@ -51,16 +50,5 @@ func VerifyStamp(stamp string, publicKey ed25519.PublicKey) (jwt.MapClaims, erro
 
 // GetAuthorizedPublicKey returns the authorized public key for verifying stamps.
 func GetAuthorizedPublicKey() (ed25519.PublicKey, error) {
-	keyB64 := zqkenv.AgentPubKey().Get()
-	if keyB64 == "" {
-		return nil, fmt.Errorf("%s environment variable is not set; cryptographic verification must fail closed", zqkenv.AgentPubKey().Name())
-	}
-	keyBytes, err := base64.StdEncoding.DecodeString(keyB64)
-	if err != nil {
-		return nil, err
-	}
-	if len(keyBytes) != ed25519.PublicKeySize {
-		return nil, ErrInvalidPublicKeySize
-	}
-	return ed25519.PublicKey(keyBytes), nil
+	return agent.GetAuthorizedPublicKey()
 }

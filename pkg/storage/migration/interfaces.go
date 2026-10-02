@@ -43,3 +43,15 @@ type DSIAMigrationUtility struct{ facade StorageFacade }
 func NewDSIAMigrationUtility(f StorageFacade) *DSIAMigrationUtility {
 	return &DSIAMigrationUtility{facade: f}
 }
+
+type migrationResultMaps struct {
+	migratedByKind map[string]int
+	errorsByKind   map[string][]error
+}
+
+func newMigrationResultMaps() migrationResultMaps {
+	return migrationResultMaps{
+		migratedByKind: make(map[string]int),
+		errorsByKind:   make(map[string][]error),
+	}
+}

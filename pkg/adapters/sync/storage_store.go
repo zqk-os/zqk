@@ -27,23 +27,28 @@ func NewKernelSyncStore(sp storage.ObjectStorageProvider, secCtx *pkgctx.Securit
 	}
 }
 
-// GetBacklogItemByExternalID retrieves a backlog item matching source and external ID.
-func (s *KernelSyncStore) GetBacklogItemByExternalID(ctx context.Context, source ExternalSource, extID string) (*BacklogItemSyncData, error) {
+func (s *KernelSyncStore) listBacklogObjects(ctx context.Context) ([]map[string]any, error) {
 	if s.sp == nil {
 		return nil, nil
 	}
-
-	filter := storage.ListFilter{
+	res, err := s.sp.List(ctx, s.secCtx, nil, storage.ListFilter{
 		Kind: objects.KindBacklogItem,
-	}
-
-	res, err := s.sp.List(ctx, s.secCtx, nil, filter)
+	})
 	if err != nil {
+		return nil, err
+	}
+	return res.Objects, nil
+}
+
+// GetBacklogItemByExternalID retrieves a backlog item matching source and external ID.
+func (s *KernelSyncStore) GetBacklogItemByExternalID(ctx context.Context, source ExternalSource, extID string) (*BacklogItemSyncData, error) {
+	objs, err := s.listBacklogObjects(ctx)
+	if err != nil || len(objs) == 0 {
 		return nil, err
 	}
 
 	targetExtID := strings.TrimSpace(extID)
-	for _, obj := range res.Objects {
+	for _, obj := range objs {
 		origSys, _ := obj[objects.FieldKeyOriginSystem].(string)
 		id, _ := obj[objects.FieldKeyID].(string)
 
@@ -102,21 +107,13 @@ func (s *KernelSyncStore) UpsertBacklogItem(ctx context.Context, item *BacklogIt
 
 // ListBacklogItems lists all backlog items from kernel storage as BacklogItemSyncData.
 func (s *KernelSyncStore) ListBacklogItems(ctx context.Context) ([]*BacklogItemSyncData, error) {
-	if s.sp == nil {
-		return nil, nil
-	}
-
-	filter := storage.ListFilter{
-		Kind: objects.KindBacklogItem,
-	}
-
-	res, err := s.sp.List(ctx, s.secCtx, nil, filter)
+	objs, err := s.listBacklogObjects(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	var results []*BacklogItemSyncData
-	for _, obj := range res.Objects {
+	for _, obj := range objs {
 		source := ExternalSource(objects.GetString(obj, objects.FieldKeyOriginSystem))
 		results = append(results, mapObjectToSyncData(obj, source, ""))
 	}

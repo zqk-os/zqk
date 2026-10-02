@@ -335,11 +335,11 @@ func inferRoleHints(agentID string) []string {
 
 func truncateSummary(s string, max int) string {
 	s = strings.TrimSpace(strings.ReplaceAll(s, "\n", " "))
-	r := []rune(s)
-	if len(r) <= max {
-		return s
+	runes := []rune(s)
+	if len(runes) > max {
+		s = string(runes[:max]) + "…"
 	}
-	return string(r[:max]) + "…"
+	return s
 }
 
 func lastN(items []CorrespondenceItem, n int) []CorrespondenceItem {

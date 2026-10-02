@@ -85,10 +85,10 @@ func readValidationInput(path string) ([]byte, error) {
 //nolint:gocyclo // complexity from state machine and validation branches; refactor separately
 func (av *AsyncValidator) worker(id int) {
 	goroutineID := getGoroutineID()
-	activeCount := incrementActiveGoroutines()
-	var processedCount, failedCount int
+	incrementActiveGoroutines()
+	processedCount, failedCount := 0, 0
 	startTime := time.Now()
-	idleStartTime := startTime
+	idleStartTime := time.Now()
 
 	defer func() {
 		av.activeWorkers.Add(-1)

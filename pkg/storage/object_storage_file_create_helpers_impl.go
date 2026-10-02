@@ -291,14 +291,9 @@ func (f *FileObjectStorage) writeObjectToFile(ctx context.Context, id, kind, fil
 		return err
 	}
 
-	// Update hash registry (required for integrity checks)
-	hashRegistry := f.newHashRegistry(ctx, kind, filepath.Dir(filePath))
-	if err := hashRegistry.Load(); err != nil {
-		// Hash registry doesn't exist yet - will be created on first save
-	}
-
 	filename := filepath.Base(filePath)
-	hashRegistry.SetHash(filename, hash)
+	hashRegistry := f.newHashRegistry(ctx, kind, filepath.Dir(filePath))
+	hashRegistry.LoadAndSetHash(filename, hash)
 
 	// Save hash registry with retry (critical for integrity - must succeed)
 	if err := f.saveHashRegistryWithRetry(hashRegistry, id, filename, hash); err != nil {
@@ -373,13 +368,7 @@ func (f *FileObjectStorage) finalizeObjectCreation(ctx context.Context, id, kind
 	// Record state change in command execution tracker
 	RecordObjectStateChange(ctx, OpCreate, id)
 
-	actualPath, err := f.getObjectFilePath(id, kind)
-	if err != nil && !IsExpectedMissingErr(err) {
-		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgSwallowedError, err).Log()
-	}
-	if actualPath == emptyValue {
-		actualPath = filePath
-	}
+	actualPath := f.resolveActualObjectFilePath(id, kind, filePath)
 
 	// Create audit event for the creation (pass ctx so bulk-create can defer CAS flush)
 	//nolint:errcheck // Intentional error ignored - audit events are best effort
@@ -430,4 +419,15 @@ func (f *FileObjectStorage) applyCreateFromBuffer(ctx context.Context, id, kind 
 		updateReverseReferenceIndexOnCreate(id, obj)
 	}
 	return f.finalizeObjectCreation(ctx, id, kind, filePath, secCtx)
+}
+
+func (f *FileObjectStorage) resolveActualObjectFilePath(id, kind, fallbackPath string) string {
+	actualPath, err := f.getObjectFilePath(id, kind)
+	if err != nil && !IsExpectedMissingErr(err) {
+		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgSwallowedError, err).Log()
+	}
+	if actualPath == emptyValue {
+		return fallbackPath
+	}
+	return actualPath
 }

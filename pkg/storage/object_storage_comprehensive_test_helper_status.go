@@ -62,21 +62,28 @@ func initializeStatusCache() {
 }
 
 // getInitialStatusForKind returns a valid initial status for a given kind
+func getFromTestCacheLocked[T any](cache map[string]T, key string) (T, bool) {
+	comprehensiveTestCacheMu.RLock()
+	defer comprehensiveTestCacheMu.RUnlock()
+	val, ok := cache[key]
+	return val, ok
+}
+
+func loadTestLifecycle(kind string) (*objects.Lifecycle, error) {
+	return objects.NewLifecycleLoader("").LoadLifecycle(kind)
+}
+
 // Uses cached statuses from lifecycle definitions, with fallback for built-in objects
 func getInitialStatusForKind(kind string) string {
 	// Initialize cache if not already done (happens during lifecycle initialization)
 	initializeStatusCache()
 
-	comprehensiveTestCacheMu.RLock()
-	if status, ok := statusCache[kind]; ok {
-		comprehensiveTestCacheMu.RUnlock()
+	if status, ok := getFromTestCacheLocked(statusCache, kind); ok {
 		return status
 	}
-	comprehensiveTestCacheMu.RUnlock()
 
 	// If not in cache, try to load lifecycle dynamically (outside lock — I/O)
-	lifecycleLoader := objects.NewLifecycleLoader("")
-	lifecycle, err := lifecycleLoader.LoadLifecycle(kind)
+	lifecycle, err := loadTestLifecycle(kind)
 	var resolved string
 	if err == nil && lifecycle != nil {
 		for _, status := range lifecycle.Statuses {
@@ -165,15 +172,11 @@ func getValidStatusesForKind(kind string) []string {
 	// Initialize cache if not already done (happens during lifecycle initialization)
 	initializeValidStatusesCache()
 
-	comprehensiveTestCacheMu.RLock()
-	if statuses, ok := validStatusesCache[kind]; ok {
-		comprehensiveTestCacheMu.RUnlock()
+	if statuses, ok := getFromTestCacheLocked(validStatusesCache, kind); ok {
 		return statuses
 	}
-	comprehensiveTestCacheMu.RUnlock()
 
-	lifecycleLoader := objects.NewLifecycleLoader("")
-	lifecycle, err := lifecycleLoader.LoadLifecycle(kind)
+	lifecycle, err := loadTestLifecycle(kind)
 	var resolved []string
 	if err == nil && lifecycle != nil {
 		statuses := make([]string, 0, len(lifecycle.Statuses))

@@ -72,39 +72,43 @@ func casMappings(projectRoot, indexPath string) map[string]string {
 	return maps.Clone(s.mappings)
 }
 
-func casHash(projectRoot, objectID, indexPath string) (string, bool) {
+func lookupStateMapping(projectRoot, objectID, indexPath string) (*listingValue, string, bool) {
 	objectID = strings.TrimSpace(objectID)
 	if projectRoot == "" || objectID == "" || indexPath == "" {
-		return "", false
+		return nil, "", false
 	}
 	s := listingFor(projectRoot, indexPath)
 	if s == nil {
-		return "", false
+		return nil, "", false
 	}
 	s.mu.Lock()
-	defer s.mu.Unlock()
 	hash, ok := s.mappings[objectID]
 	if !ok || strings.TrimSpace(hash) == "" {
+		s.mu.Unlock()
+		return nil, "", false
+	}
+	return s, hash, true
+}
+
+func casHash(projectRoot, objectID, indexPath string) (string, bool) {
+	s, hash, ok := lookupStateMapping(projectRoot, objectID, indexPath)
+	if !ok {
 		return "", false
 	}
+	s.mu.Unlock()
 	return hash, true
 }
 
 func casYAML(projectRoot, objectID, indexPath, kindDir string) ([]byte, bool) {
-	objectID = strings.TrimSpace(objectID)
-	if projectRoot == "" || objectID == "" || indexPath == "" || kindDir == "" {
+	if kindDir == "" {
 		return nil, false
 	}
-	s := listingFor(projectRoot, indexPath)
-	if s == nil {
+	s, hash, ok := lookupStateMapping(projectRoot, objectID, indexPath)
+	if !ok {
 		return nil, false
 	}
-	s.mu.Lock()
 	defer s.mu.Unlock()
-	hash, ok := s.mappings[objectID]
-	if !ok || strings.TrimSpace(hash) == "" {
-		return nil, false
-	}
+
 	yamlPath := filepath.Join(kindDir, hash+paths.YAMLExtension)
 	yamlStamp := stampmemo.Of(yamlPath)
 	if yamlStamp == 0 {

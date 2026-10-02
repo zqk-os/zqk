@@ -67,9 +67,7 @@ func initObjectTransitionEnv(ctx context.Context, projectRoot string) (*objectTr
 	specsDir := filepath.Join(projectRoot, paths.ProcessInternalObjectSpecsDir)
 	specLoader := objects.NewSpecLoader(specsDir)
 
-	builderRegistry := builders.GetGlobalRegistry()
-	adapter := builders.NewSpecLoaderAdapter(builderRegistry)
-	specLoader.SetBuilderRegistry(adapter)
+	specLoader.SetBuilderRegistry(builders.NewSpecLoaderAdapter(builders.GetGlobalRegistry()))
 
 	if err := specLoader.EnsureReady(ctx); err != nil {
 		return nil, fmt.Errorf("failed to initialize spec loader: %w", err)

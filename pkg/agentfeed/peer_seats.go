@@ -172,19 +172,27 @@ func WorkerSeatID(projectRoot string) string {
 	return firstSeatIDByDutyThenWake(projectRoot, SeatKindWorker, WakeMembraneAgentAPI)
 }
 
+func loadSeatRecord(projectRoot, agentID string) (*PeerSeatRecord, bool) {
+	id := strings.TrimSpace(agentID)
+	if id == "" || strings.TrimSpace(projectRoot) == "" {
+		return nil, false
+	}
+	f, err := LoadPeerSeats(projectRoot)
+	if err != nil {
+		return nil, false
+	}
+	rec, ok := f.Seats[id]
+	if !ok {
+		return nil, false
+	}
+	return &rec, true
+}
+
 // SeatPersonaRef returns peer_seats[agentID].persona_ref. Empty if unset or unknown.
 // whats-next plan selection uses this so --agent-id is seat-scoped, not the
 // caller's security-context personas. TRACK
 func SeatPersonaRef(projectRoot, agentID string) string {
-	id := strings.TrimSpace(agentID)
-	if id == "" || strings.TrimSpace(projectRoot) == "" {
-		return ""
-	}
-	f, err := LoadPeerSeats(projectRoot)
-	if err != nil {
-		return ""
-	}
-	rec, ok := f.Seats[id]
+	rec, ok := loadSeatRecord(projectRoot, agentID)
 	if !ok {
 		return ""
 	}
@@ -193,15 +201,7 @@ func SeatPersonaRef(projectRoot, agentID string) string {
 
 // SeatLane returns peer_seats[agentID].lane (or worker_lane). Empty if unset or unknown.
 func SeatLane(projectRoot, agentID string) string {
-	id := strings.TrimSpace(agentID)
-	if id == "" || strings.TrimSpace(projectRoot) == "" {
-		return ""
-	}
-	f, err := LoadPeerSeats(projectRoot)
-	if err != nil {
-		return ""
-	}
-	rec, ok := f.Seats[id]
+	rec, ok := loadSeatRecord(projectRoot, agentID)
 	if !ok {
 		return ""
 	}

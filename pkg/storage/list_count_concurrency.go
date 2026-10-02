@@ -136,11 +136,5 @@ func getListReadWorkers() int {
 	if err != nil || n <= 0 {
 		return def
 	}
-	if n < minWorkers {
-		return minWorkers
-	}
-	if n > maxWorkers {
-		return maxWorkers
-	}
-	return n
+	return ClampInt(n, minWorkers, maxWorkers)
 }

@@ -97,13 +97,7 @@ func getHighVolumeCacheBuildWorkers() int {
 	if n <= 0 {
 		return defaultWorkers
 	}
-	if n < minWorkers {
-		return minWorkers
-	}
-	if n > maxWorkers {
-		return maxWorkers
-	}
-	return n
+	return ClampInt(n, minWorkers, maxWorkers)
 }
 
 // getHighVolumeCacheKindParallelism caps how many high-volume kinds build concurrently in buildCacheData.
@@ -119,13 +113,7 @@ func getHighVolumeCacheKindParallelism() int {
 	if n <= 0 {
 		return defaultParallelKinds
 	}
-	if n < minParallelKinds {
-		return minParallelKinds
-	}
-	if n > maxParallelKinds {
-		return maxParallelKinds
-	}
-	return n
+	return ClampInt(n, minParallelKinds, maxParallelKinds)
 }
 
 // newHighVolumeCacheGoroutine returns a builder with DefaultBudget when configured, matching

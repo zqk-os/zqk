@@ -91,8 +91,9 @@ func (r *KindProcessorRegistry) Get(kind string) KindProcessorAdapter {
 		return nil
 	}
 	r.mu.RLock()
-	defer r.mu.RUnlock()
-	return r.processors[kind]
+	proc := r.processors[kind]
+	r.mu.RUnlock()
+	return proc
 }
 
 // Process runs the registered adapter for the kind if present.
