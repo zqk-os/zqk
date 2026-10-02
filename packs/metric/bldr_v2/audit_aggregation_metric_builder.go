@@ -32,6 +32,11 @@ func NewAuditAggregationMetricBuilder() *AuditAggregationMetricBuilder {
 
 // addAuditAggregationMetricFields adds the audit_aggregation_metric fields
 func (b *AuditAggregationMetricBuilder) addAuditAggregationMetricFields() {
+	AddAuditAggregationMetricFields(b.BaseSpecBuilder)
+}
+
+// AddAuditAggregationMetricFields adds the audit_aggregation_metric fields to a BaseSpecBuilder.
+func AddAuditAggregationMetricFields(b *builders.BaseSpecBuilder) {
 	b.AddFieldBuilder(builders.NewFieldBuilder("aggregated_event_ids", "array").
 		WithChecklist(builders.NewChecklistBuilder().
 			Authority("automation (aggregation job)").

@@ -11,17 +11,33 @@ import (
 // WaitGroupManager manages WaitGroup lifecycle for concurrent operations.
 // Provides centralized tracking, timeout observation, and cleanup for all WaitGroups.
 type WaitGroupManager struct {
-	wgs      map[string]*waitGroupEntry
+	wgs      map[string]*WaitGroupEntry
 	mu       sync.RWMutex
 	observer WaitGroupObserver // Optional observer for tracking
 }
 
-// waitGroupEntry tracks a WaitGroup and its metadata.
-type waitGroupEntry struct {
-	wg         *sync.WaitGroup
-	createdAt  time.Time
-	lastAccess time.Time
-	operation  string // Operation type (e.g., "batch", "audit_event", "worker")
+// WaitGroupEntry tracks a WaitGroup and its metadata.
+type WaitGroupEntry struct {
+	WG         *sync.WaitGroup
+	CreatedAt  time.Time
+	LastAccess time.Time
+	Operation  string // Operation type (e.g., "batch", "audit_event", "worker")
+}
+
+// NewWaitGroupEntry creates a new WaitGroupEntry.
+func NewWaitGroupEntry(wg *sync.WaitGroup, operation string) *WaitGroupEntry {
+	now := time.Now()
+	return &WaitGroupEntry{
+		WG:         wg,
+		CreatedAt:  now,
+		LastAccess: now,
+		Operation:  operation,
+	}
+}
+
+// Touch updates the last access time.
+func (e *WaitGroupEntry) Touch() {
+	e.LastAccess = time.Now()
 }
 
 // WaitGroupObserver can be implemented to track WaitGroup lifecycle events.
@@ -36,7 +52,7 @@ type WaitGroupObserver interface {
 // NewWaitGroupManager creates a new WaitGroupManager.
 func NewWaitGroupManager() *WaitGroupManager {
 	return &WaitGroupManager{
-		wgs: make(map[string]*waitGroupEntry),
+		wgs: make(map[string]*WaitGroupEntry),
 	}
 }
 
@@ -53,17 +69,12 @@ func (m *WaitGroupManager) CreateGroup(id, operation string) *sync.WaitGroup {
 	m.mu.Lock()
 	var observer WaitGroupObserver
 	if entry, exists := m.wgs[id]; exists {
-		entry.lastAccess = time.Now()
+		entry.Touch()
 		m.mu.Unlock()
-		return entry.wg
+		return entry.WG
 	}
 	wg := &sync.WaitGroup{}
-	entry := &waitGroupEntry{
-		wg:         wg,
-		createdAt:  time.Now(),
-		lastAccess: time.Now(),
-		operation:  operation,
-	}
+	entry := NewWaitGroupEntry(wg, operation)
 	m.wgs[id] = entry
 	observer = m.observer
 	m.mu.Unlock()
@@ -86,11 +97,11 @@ func (m *WaitGroupManager) GetGroup(id string) *sync.WaitGroup {
 	if !exists {
 		return nil
 	}
-	entry.lastAccess = time.Now()
-	return entry.wg
+	entry.Touch()
+	return entry.WG
 }
 
-func (m *WaitGroupManager) getEntryAndObserver(id string) (*waitGroupEntry, WaitGroupObserver, bool) {
+func (m *WaitGroupManager) getEntryAndObserver(id string) (*WaitGroupEntry, WaitGroupObserver, bool) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 	entry, exists := m.wgs[id]
@@ -103,11 +114,11 @@ func (m *WaitGroupManager) recordCompleted(id string, observer WaitGroupObserver
 	}
 }
 
-func (m *WaitGroupManager) waitAsync(entry *waitGroupEntry, label, desc string) <-chan struct{} {
+func (m *WaitGroupManager) waitAsync(entry *WaitGroupEntry, label, desc string) <-chan struct{} {
 	done := make(chan struct{})
 	goroutinelabels.NewGoroutine(label, desc).
 		StartSimple(func() {
-			entry.wg.Wait()
+			entry.WG.Wait()
 			close(done)
 		})
 	return done
@@ -119,7 +130,7 @@ func (m *WaitGroupManager) Add(id string, delta int) {
 	if !exists {
 		return
 	}
-	entry.wg.Add(delta)
+	entry.WG.Add(delta)
 	if observer != nil {
 		observer.OnGroupAdd(id, delta)
 	}
@@ -131,7 +142,7 @@ func (m *WaitGroupManager) Done(id string) {
 	if !exists {
 		return
 	}
-	entry.wg.Done()
+	entry.WG.Done()
 	if observer != nil {
 		observer.OnGroupDone(id)
 	}
@@ -147,7 +158,7 @@ func (m *WaitGroupManager) Wait(id string) {
 	if observer != nil {
 		observer.OnGroupWait(id)
 	}
-	entry.wg.Wait()
+	entry.WG.Wait()
 	m.recordCompleted(id, observer, start)
 }
 
@@ -211,7 +222,7 @@ func (m *WaitGroupManager) CleanupStaleGroups(maxAge time.Duration) int {
 	cleaned := 0
 
 	for id, entry := range m.wgs {
-		if now.Sub(entry.lastAccess) > maxAge {
+		if now.Sub(entry.LastAccess) > maxAge {
 			delete(m.wgs, id)
 			cleaned++
 		}

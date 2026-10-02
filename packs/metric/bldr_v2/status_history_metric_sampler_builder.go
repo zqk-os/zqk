@@ -33,10 +33,7 @@ func NewStatusHistoryMetricSamplerBuilder() *StatusHistoryMetricSamplerBuilder {
 
 // addStatusHistoryMetricSamplerFields adds the status_history_metric_sampler fields
 func (b *StatusHistoryMetricSamplerBuilder) addStatusHistoryMetricSamplerFields() {
-	b.AddFieldBuilder(builders.NewFieldBuilder("batch_size", "string"))
-	b.AddFieldBuilder(builders.NewFieldBuilder("flush_interval", "string"))
-	b.AddFieldBuilder(builders.NewFieldBuilder("group_by_object_id", "string"))
-	b.AddFieldBuilder(builders.NewFieldBuilder("max_batch_size", "string"))
+	addSamplerBatchAndIntervalFields(b.BaseSpecBuilder)
 	b.AddFieldBuilder(builders.NewFieldBuilder("metric_type", "string").
 		WithValidation(builders.NewValidationBuilder().
 			Enum([]any{

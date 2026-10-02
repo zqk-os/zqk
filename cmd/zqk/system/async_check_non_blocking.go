@@ -11,7 +11,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/coordination"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // runCheckAsyncNonBlocking runs system check in the background and returns immediately
@@ -28,21 +27,9 @@ func runCheckAsyncNonBlocking(cmd *cobra.Command, args []string) error {
 	operationID := fmt.Sprintf("check_%d", time.Now().UnixNano())
 
 	// Get project root and storage provider for coordination
-	projectRoot := ctx.ProjectRoot
-	projectRoot = ProjectRootOrResolve(projectRoot)
-
-	var storageProvider storage.ObjectStorageProvider
-	if projectRoot != emptyValue {
-		factory, storageErr := storage.NewStorageFactory(pkgctx.NewSystemContext(), projectRoot)
-		if storageErr == nil {
-			storageProvider = factory.GetStorage()
-			defer func() { _ = storageProvider.Shutdown(context.Background()) }() // Background: request-or-shutdown derived
-		}
-		if storageErr != nil {
-			// Best effort - continue without coordinator if storage unavailable
-			storageProvider = nil
-		}
-	}
+	projectRoot := ProjectRootOrResolve(ctx.ProjectRoot)
+	storageProvider, cleanup := initCheckCoordinationStorage(projectRoot)
+	defer cleanup()
 
 	profile := profileOrDefault(ctx.Profile, systemProfileHuman)
 

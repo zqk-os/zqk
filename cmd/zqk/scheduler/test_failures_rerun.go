@@ -17,7 +17,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	schedpkg "github.com/zqk-os/zqk/pkg/scheduler"
-	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqktime"
 )
@@ -75,11 +74,10 @@ func rerunTestFailures(cliCtx *cli.Context, cmd *cobra.Command) error {
 
 	// Create storage and schedule test jobs
 	ctx := pkgctx.NewSystemContext()
-	storageFactory, err := storagepkg.NewStorageFactory(ctx, cfg.ProjectRoot)
+	storageProvider, err := cli.NewStorageProviderFromFactory(ctx, cfg.ProjectRoot)
 	if err != nil {
-		return errfmt.Newf("failed to create storage factory").Wrap(err)
+		return err
 	}
-	storageProvider := storageFactory.GetStorage()
 
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	secCtx := pkgctx.NewSystemSecurityContext()

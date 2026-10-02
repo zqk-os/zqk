@@ -101,39 +101,7 @@ func (sb *ScenarioBuilder) createObjectInLayer(
 	// Set cache context to ensure Object ID Cache is updated when object is created
 	createCtx := pkgctx.WithCacheUpdate(ctx, objID, objKind, "")
 
-	// Track that validation is starting
-	// Use defer to ensure Done() is always called, even on panic
-	// Track if we added to prevent double Done() calls
-	validationAdded := false
-	state.activeValidations.Add(1)
-	validationAdded = true
-	withLock(state.validationCounterMu, func() {
-		*state.validationCounter++
-	})
-	defer func() {
-		// Track that validation is complete (always called via defer)
-		// Only call Done() if we actually called Add()
-		// Recover from any WaitGroup panics to prevent cascading failures
-		defer func() {
-			if r := recover(); r != nil {
-				// Log but don't re-panic - WaitGroup errors shouldn't crash the goroutine
-				sb.emitCoordinatorEvent(ctx, ScenarioBuilderProfileName, scenarioBuilderStatusWarning,
-					fmt.Sprintf("Recovered from WaitGroup panic in defer: %v", r),
-					map[string]any{
-						objects.FieldKeyKind:  kind,
-						"object_id":           objID,
-						objects.FieldKeyLayer: layerIndex + 1,
-						"panic":               fmt.Sprintf("%v", r),
-					})
-			}
-		}()
-		if validationAdded {
-			state.activeValidations.Done()
-			withLock(state.validationCounterMu, func() {
-				*state.validationCounter--
-			})
-		}
-	}()
+	defer sb.trackValidationScope(ctx, state, kind, objID, layerIndex)()
 
 	// Create object - the cache callback will update the cache synchronously
 	// Wrap in recover to catch any panics from storage.Create() (e.g., WaitGroup panics from audit events)
@@ -397,38 +365,7 @@ func (sb *ScenarioBuilder) processObjectsSequentially(ctx context.Context, state
 			// Set cache context to ensure Object ID Cache is updated when object is created
 			createCtx := pkgctx.WithCacheUpdate(ctx, objID, objKind, "")
 
-			// Track that validation is starting (for sequential path)
-			// Use defer to ensure Done() is always called, even on panic
-			// Track if we added to prevent double Done() calls
-			validationAdded := false
-			state.activeValidations.Add(1)
-			validationAdded = true
-			withLock(state.validationCounterMu, func() {
-				*state.validationCounter++
-			})
-			defer func() {
-				// Track that validation is complete (always called via defer)
-				// Only call Done() if we actually called Add()
-				// Recover from any WaitGroup panics to prevent cascading failures
-				defer func() {
-					if r := recover(); r != nil {
-						// Log but don't re-panic - WaitGroup errors shouldn't crash the goroutine
-						sb.emitCoordinatorEvent(ctx, ScenarioBuilderProfileName, scenarioBuilderStatusWarning,
-							fmt.Sprintf("Recovered from WaitGroup panic in defer: %v", r),
-							map[string]any{
-								objects.FieldKeyKind: kind,
-								objects.FieldKeyID:   objID,
-								"panic":              fmt.Sprintf("%v", r),
-							})
-					}
-				}()
-				if validationAdded {
-					state.activeValidations.Done()
-					withLock(state.validationCounterMu, func() {
-						*state.validationCounter--
-					})
-				}
-			}()
+			defer sb.trackValidationScope(ctx, state, kind, objID, -1)()
 
 			// Create object - the cache callback will update the cache synchronously
 			// Wrap in recover to catch any panics from storage.Create() (e.g., WaitGroup panics from audit events)
@@ -605,4 +542,31 @@ func (sb *ScenarioBuilder) processObjectsSequentially(ctx context.Context, state
 		})
 	}
 	return created, skipped
+}
+
+func (sb *ScenarioBuilder) trackValidationScope(ctx context.Context, state *layerProcessingState, kind, objID string, layerIndex int) func() {
+	state.activeValidations.Add(1)
+	withLock(state.validationCounterMu, func() {
+		*state.validationCounter++
+	})
+	return func() {
+		defer func() {
+			if r := recover(); r != nil {
+				meta := map[string]any{
+					objects.FieldKeyKind: kind,
+					objects.FieldKeyID:   objID,
+					"panic":              fmt.Sprintf("%v", r),
+				}
+				if layerIndex >= 0 {
+					meta[objects.FieldKeyLayer] = layerIndex + 1
+				}
+				sb.emitCoordinatorEvent(ctx, ScenarioBuilderProfileName, scenarioBuilderStatusWarning,
+					fmt.Sprintf("Recovered from WaitGroup panic in defer: %v", r), meta)
+			}
+		}()
+		state.activeValidations.Done()
+		withLock(state.validationCounterMu, func() {
+			*state.validationCounter--
+		})
+	}
 }

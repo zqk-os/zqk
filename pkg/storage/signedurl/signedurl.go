@@ -34,16 +34,17 @@ func NewSigner(secret string) *Signer {
 	}
 }
 
+func (s *Signer) signPayload(path string, expires int64) string {
+	payload := fmt.Sprintf("%s:%d", path, expires)
+	mac := hmac.New(sha256.New, s.secret)
+	mac.Write([]byte(payload))
+	return hex.EncodeToString(mac.Sum(nil))
+}
+
 // Generate creates a cryptographically signed string including the path, expiration, and signature.
 func (s *Signer) Generate(path string, ttl time.Duration) (string, error) {
 	expires := s.now().Add(ttl).Unix()
-
-	// The payload contains the path and expiration time.
-	payload := fmt.Sprintf("%s:%d", path, expires)
-
-	mac := hmac.New(sha256.New, s.secret)
-	mac.Write([]byte(payload))
-	signature := hex.EncodeToString(mac.Sum(nil))
+	signature := s.signPayload(path, expires)
 
 	v := url.Values{}
 	v.Set("path", path)
@@ -75,10 +76,7 @@ func (s *Signer) Validate(signedString string) (string, error) {
 	}
 
 	// Verify the signature first to prevent timing-based analysis of expiration logic
-	payload := fmt.Sprintf("%s:%d", path, expires)
-	mac := hmac.New(sha256.New, s.secret)
-	mac.Write([]byte(payload))
-	expectedSig := hex.EncodeToString(mac.Sum(nil))
+	expectedSig := s.signPayload(path, expires)
 
 	if !hmac.Equal([]byte(sig), []byte(expectedSig)) {
 		return "", ErrInvalidSignature

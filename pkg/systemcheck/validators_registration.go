@@ -114,84 +114,84 @@ func hasNonEmptyStringProperty(obj *parser.ParsedObject, key string) bool {
 	return ok && value != emptyValue
 }
 
-// CheckLifecycle validates status presence and focused lifecycle rules via the global validator.
-func CheckLifecycle(obj *parser.ParsedObject, kind string) []Issue {
-	var issues []Issue
-
+func extractObjectStatus(obj *parser.ParsedObject) (string, []Issue) {
 	status, ok := obj.Properties[objects.FieldKeyStatus].(string)
 	if !ok || status == emptyValue {
-		issues = append(issues, Issue{
+		return "", []Issue{{
 			Tier:     2,
 			Category: objects.KindLifecycle,
 			Message:  "Missing or invalid status field",
-		})
-		return issues
+		}}
 	}
+	return status, nil
+}
 
-	validatorRegistry := validation.GetGlobalRegistry()
-	validator := validatorRegistry.Get("")
-	if validator != nil {
-		objMap := make(map[string]any)
-		if obj.Properties != nil {
-			objMap = obj.Properties
-		}
+func withExtractedStatus(obj *parser.ParsedObject, fn func(status string) []Issue) []Issue {
+	status, missing := extractObjectStatus(obj)
+	if missing != nil {
+		return missing
+	}
+	return fn(status)
+}
 
-		options := validation.DefaultValidationOptions()
-		options.ValidateLifecycle = true
-		options.CurrentState = status
+// CheckLifecycle validates status presence and focused lifecycle rules via the global validator.
+func CheckLifecycle(obj *parser.ParsedObject, kind string) []Issue {
+	return withExtractedStatus(obj, func(status string) []Issue {
+		var issues []Issue
+		validatorRegistry := validation.GetGlobalRegistry()
+		validator := validatorRegistry.Get("")
+		if validator != nil {
+			objMap := make(map[string]any)
+			if obj.Properties != nil {
+				objMap = obj.Properties
+			}
 
-		result, err := validator.Validate(pkgctx.NewSystemContext(), objMap, kind, options)
-		if err == nil {
-			for _, validationError := range result.Errors {
-				if validationError.Rule == objects.KindLifecycle {
-					issues = append(issues, Issue{
-						Tier:     1,
-						Category: objects.KindLifecycle,
-						Message:  fmt.Sprintf("%s: %s", validationError.Field, validationError.Message),
-					})
+			options := validation.DefaultValidationOptions()
+			options.ValidateLifecycle = true
+			options.CurrentState = status
+
+			result, err := validator.Validate(pkgctx.NewSystemContext(), objMap, kind, options)
+			if err == nil {
+				for _, validationError := range result.Errors {
+					if validationError.Rule == objects.KindLifecycle {
+						issues = append(issues, Issue{
+							Tier:     1,
+							Category: objects.KindLifecycle,
+							Message:  fmt.Sprintf("%s: %s", validationError.Field, validationError.Message),
+						})
+					}
 				}
 			}
 		}
-	}
-
-	return issues
+		return issues
+	})
 }
 
 // CheckLifecycleWithLoader validates status against a LifecycleLoader and suggests fixes.
 func CheckLifecycleWithLoader(obj *parser.ParsedObject, kind string, lifecycleLoader *objects.LifecycleLoader) []Issue {
-	var issues []Issue
-
-	status, ok := obj.Properties[objects.FieldKeyStatus].(string)
-	if !ok || status == emptyValue {
-		issues = append(issues, Issue{
-			Tier:     2,
-			Category: objects.KindLifecycle,
-			Message:  "Missing or invalid status field",
-		})
-		return issues
-	}
-
-	valid, err := lifecycleLoader.IsValidStatus(kind, status)
-	if err == nil && !valid {
-		issue := Issue{
-			Tier:     1,
-			Category: objects.KindLifecycle,
-			Message:  fmt.Sprintf("Invalid lifecycle status '%s' for kind '%s'", status, kind),
-		}
-		if obj.ID != emptyValue {
-			suggested, _ := lifecycleLoader.GetOriginStatus(kind)
-			if suggested == emptyValue {
-				if lc, loadErr := lifecycleLoader.LoadLifecycle(kind); loadErr == nil && len(lc.Statuses) > 0 {
-					suggested = lc.Statuses[0].Value
+	return withExtractedStatus(obj, func(status string) []Issue {
+		var issues []Issue
+		valid, err := lifecycleLoader.IsValidStatus(kind, status)
+		if err == nil && !valid {
+			issue := Issue{
+				Tier:     1,
+				Category: objects.KindLifecycle,
+				Message:  fmt.Sprintf("Invalid lifecycle status '%s' for kind '%s'", status, kind),
+			}
+			if obj.ID != emptyValue {
+				suggested, _ := lifecycleLoader.GetOriginStatus(kind)
+				if suggested == emptyValue {
+					if lc, loadErr := lifecycleLoader.LoadLifecycle(kind); loadErr == nil && len(lc.Statuses) > 0 {
+						suggested = lc.Statuses[0].Value
+					}
+				}
+				if suggested != emptyValue {
+					issue.FixCommand = fmt.Sprintf("%s object update %s --field status=%s", paths.CLICommandName, obj.ID, suggested)
+					issue.AutoFixable = true
 				}
 			}
-			if suggested != emptyValue {
-				issue.FixCommand = fmt.Sprintf("%s object update %s --field status=%s", paths.CLICommandName, obj.ID, suggested)
-				issue.AutoFixable = true
-			}
+			issues = append(issues, issue)
 		}
-		issues = append(issues, issue)
-	}
-
-	return issues
+		return issues
+	})
 }

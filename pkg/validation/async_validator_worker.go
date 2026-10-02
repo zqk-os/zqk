@@ -86,9 +86,9 @@ func readValidationInput(path string) ([]byte, error) {
 func (av *AsyncValidator) worker(id int) {
 	goroutineID := getGoroutineID()
 	activeCount := incrementActiveGoroutines()
+	var processedCount, failedCount int
 	startTime := time.Now()
 	idleStartTime := startTime
-	var processedCount, failedCount int
 
 	defer func() {
 		av.activeWorkers.Add(-1)

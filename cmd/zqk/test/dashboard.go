@@ -260,17 +260,7 @@ func (s *DashboardState) applyPayloadLocked(payload *DashboardLitePayload) {
 	if s.TestCaseOrder == nil {
 		s.TestCaseOrder = make([]string, 0)
 	}
-	// Guarantee every test case in s.TestCases is in s.TestCaseOrder
-	orderSet := make(map[string]bool, len(s.TestCaseOrder))
-	for _, id := range s.TestCaseOrder {
-		orderSet[id] = true
-	}
-	for id := range s.TestCases {
-		if !orderSet[id] {
-			s.TestCaseOrder = append(s.TestCaseOrder, id)
-			orderSet[id] = true
-		}
-	}
+	s.ensureTestCaseOrderIntegrityLocked()
 	s.UnboundTestCriteria = payload.UnboundTestCriteria
 	if s.UnboundTestCriteria == nil {
 		s.UnboundTestCriteria = make([]*UnboundCriterionModel, 0)
@@ -328,8 +318,7 @@ func (s *DashboardState) LoadFromLiteFile(projectRoot string) (bool, error) {
 	return true, nil
 }
 
-func (s *DashboardState) buildPayloadLocked() *DashboardLitePayload {
-	// Guarantee all test cases in s.TestCases are in s.TestCaseOrder
+func (s *DashboardState) ensureTestCaseOrderIntegrityLocked() {
 	orderSet := make(map[string]bool, len(s.TestCaseOrder))
 	for _, id := range s.TestCaseOrder {
 		orderSet[id] = true
@@ -340,6 +329,10 @@ func (s *DashboardState) buildPayloadLocked() *DashboardLitePayload {
 			orderSet[id] = true
 		}
 	}
+}
+
+func (s *DashboardState) buildPayloadLocked() *DashboardLitePayload {
+	s.ensureTestCaseOrderIntegrityLocked()
 
 	payload := &DashboardLitePayload{
 		SchemaVersion:       "1.0.0",

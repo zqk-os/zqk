@@ -313,3 +313,10 @@ func (b *BaseSamplerBuilder) GetOntology() string {
 func init() {
 	builders.RegisterBuilder(NewBaseSamplerBuilder())
 }
+
+func addSamplerBatchAndIntervalFields(b *builders.BaseSpecBuilder) {
+	b.AddFieldBuilder(builders.NewFieldBuilder("batch_size", "string"))
+	b.AddFieldBuilder(builders.NewFieldBuilder("flush_interval", "string"))
+	b.AddFieldBuilder(builders.NewFieldBuilder("group_by_object_id", "string"))
+	b.AddFieldBuilder(builders.NewFieldBuilder("max_batch_size", "string"))
+}

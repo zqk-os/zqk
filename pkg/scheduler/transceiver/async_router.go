@@ -482,9 +482,9 @@ func (ar *AsyncRouter) worker(workerID int) {
 		}
 	}()
 
+	var processedCount, failedCount int
 	startTime := time.Now()
 	idleStartTime := startTime
-	var processedCount, failedCount int
 
 	for {
 		select {

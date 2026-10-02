@@ -17,7 +17,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // CheckCompletionSubscriber subscribes to system_check completion events
@@ -385,41 +384,18 @@ func runCheckAsyncWithFollow(cmd *cobra.Command, args []string, timeout time.Dur
 	if cmd != nil {
 		fmt.Fprintf(cmd.ErrOrStderr(), "System check starting...\n")
 	}
-	// Prefer pre-set context (e.g. from tests or callers) so deprecated --sync is not required
-	var ctx *cli.Context
-	if cliCtx := cli.GetContext(cmd); cliCtx != nil && cliCtx.Context != nil {
-		ctx = cliCtx
-	}
-	if ctx == nil {
-		initCtx := &pkgctx.CliInitializationContext{
-			ProjectRoot: ProjectRootOrResolve(""),
-		}
-		var err error
-		ctx, err = cli.GetContextFromCommand(cmd, initCtx)
-		if err != nil {
-			return err
-		}
+	ctx, err := resolveSystemCliContextWithFallback(cmd)
+	if err != nil {
+		return err
 	}
 
 	// Generate operation ID before starting
 	operationID := fmt.Sprintf("check_%d", time.Now().UnixNano())
 
 	// Get project root and storage provider for coordination
-	projectRoot := ctx.ProjectRoot
-	projectRoot = ProjectRootOrResolve(projectRoot)
-
-	var storageProvider storage.ObjectStorageProvider
-	if projectRoot != emptyValue {
-		factory, storageErr := storage.NewStorageFactory(pkgctx.NewSystemContext(), projectRoot)
-		if storageErr == nil {
-			storageProvider = factory.GetStorage()
-			defer func() { _ = storageProvider.Shutdown(context.Background()) }() // Background: request-or-shutdown derived
-		}
-		if storageErr != nil {
-			// Best effort - continue without coordinator if storage unavailable
-			storageProvider = nil
-		}
-	}
+	projectRoot := ProjectRootOrResolve(ctx.ProjectRoot)
+	storageProvider, cleanup := initCheckCoordinationStorage(projectRoot)
+	defer cleanup()
 
 	profile := profileOrDefault(ctx.Profile, systemProfileHuman)
 

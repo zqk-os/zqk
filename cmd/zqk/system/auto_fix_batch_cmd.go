@@ -216,11 +216,7 @@ func runAutoFixProcessPending(cmd *cobra.Command, args []string) error {
 }
 
 func runGlossaryMaintenanceAfterAutofix(cmd *cobra.Command, projectRoot string, sharedProvider storage.ObjectStorageProvider, apply bool) error {
-	ctx := cli.GetContext(cmd)
-	if ctx == nil {
-		return errfmt.Errorf("failed to get context")
-	}
-	logger := logging.GetLoggerFromProfile(ctx.Profile)
+	_, logger := resolveCommandLogger(cmd, systemProfileHuman)
 
 	specsDir := filepath.Join(projectRoot, autoFixGlossarySpecsDir)
 	lifecyclesDir := filepath.Join(projectRoot, autoFixGlossaryLifeDir)

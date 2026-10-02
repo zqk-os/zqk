@@ -516,11 +516,10 @@ func (v *WhatsNextMaterializedView) ApplyLifecycleEvent(ev *lifecycle.LifecycleE
 	if ev == nil {
 		return
 	}
+	ts := ev.Timestamp()
 
 	v.mu.Lock()
 	defer v.mu.Unlock()
-
-	ts := ev.Timestamp()
 
 	switch ev.EventType {
 	case lifecycle.EventTypeStatusTransition:

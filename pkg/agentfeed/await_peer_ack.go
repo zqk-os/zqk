@@ -61,6 +61,16 @@ func peerAckAwaitStorePath(projectRoot string) string {
 	return paths.PeerAckAwaitsPath(projectRoot)
 }
 
+func loadLockedPeerAckAwaitFile(projectRoot string) (peerAckAwaitFile, func(), error) {
+	peerAckAwaitMu.Lock()
+	f, err := loadPeerAckAwaitFile(projectRoot)
+	if err != nil {
+		peerAckAwaitMu.Unlock()
+		return peerAckAwaitFile{}, nil, err
+	}
+	return f, peerAckAwaitMu.Unlock, nil
+}
+
 // RegisterPeerAckAwait records an open await for event_id (caller will be woken on peer_ack).
 func RegisterPeerAckAwait(projectRoot string, in PeerAckAwaitInput) (PeerAckAwait, error) {
 	eventID := strings.TrimSpace(in.EventID)
@@ -90,12 +100,11 @@ func RegisterPeerAckAwait(projectRoot string, in PeerAckAwaitInput) (PeerAckAwai
 		CreatedAt:   time.Now().UTC().Format(time.RFC3339),
 	}
 
-	peerAckAwaitMu.Lock()
-	defer peerAckAwaitMu.Unlock()
-	f, err := loadPeerAckAwaitFile(projectRoot)
+	f, unlock, err := loadLockedPeerAckAwaitFile(projectRoot)
 	if err != nil {
 		return PeerAckAwait{}, err
 	}
+	defer unlock()
 	f.Awaits = append(f.Awaits, a)
 	if err := savePeerAckAwaitFile(projectRoot, f); err != nil {
 		return PeerAckAwait{}, err
@@ -156,12 +165,11 @@ func CompletePeerAckAwaits(projectRoot, eventID, ackingAgentID string) ([]PeerAc
 
 // ListOpenPeerAckAwaits returns open awaits owned by fromAgentID (empty agent = all open).
 func ListOpenPeerAckAwaits(projectRoot, fromAgentID string) ([]PeerAckAwait, error) {
-	peerAckAwaitMu.Lock()
-	defer peerAckAwaitMu.Unlock()
-	f, err := loadPeerAckAwaitFile(projectRoot)
+	f, unlock, err := loadLockedPeerAckAwaitFile(projectRoot)
 	if err != nil {
 		return nil, err
 	}
+	defer unlock()
 	from := strings.TrimSpace(fromAgentID)
 	var out []PeerAckAwait
 	for _, a := range f.Awaits {
@@ -178,12 +186,11 @@ func ListOpenPeerAckAwaits(projectRoot, fromAgentID string) ([]PeerAckAwait, err
 
 // ExpirePeerAckAwaits marks open awaits expired if older than maxAge.
 func ExpirePeerAckAwaits(projectRoot string, maxAge time.Duration) ([]PeerAckAwait, error) {
-	peerAckAwaitMu.Lock()
-	defer peerAckAwaitMu.Unlock()
-	f, err := loadPeerAckAwaitFile(projectRoot)
+	f, unlock, err := loadLockedPeerAckAwaitFile(projectRoot)
 	if err != nil {
 		return nil, err
 	}
+	defer unlock()
 	now := time.Now().UTC()
 	var expired []PeerAckAwait
 	changed := false

@@ -242,10 +242,20 @@ func getStreamSegmentDir(projectRoot, kind string) (string, error) {
 	return GetStreamSegmentDir(projectRoot, kind)
 }
 
+func createSegmentWorkChannel(segments []string, requestedWorkers int) (chan string, int) {
+	workers := requestedWorkers
+	if len(segments) < workers {
+		workers = len(segments)
+	}
+	workCh := make(chan string, len(segments))
+	for _, s := range segments {
+		workCh <- s
+	}
+	close(workCh)
+	return workCh, workers
+}
+
 // CountStreamSegmentLines returns the total number of JSONL lines (records) in all segment files for the kind.
-// Does not parse JSON; counts newlines only. Used when high-volume cache is empty so Count() does not do unbounded full scans.
-// Returns 0, nil if the segment dir does not exist or has no .jsonl files. Returns error if path cache is not built.
-// CountStreamSegmentLines counts the total number of lines across all segment files for a kind.
 // Does not parse JSON; counts newlines only. Used when high-volume cache is empty so Count() does not do unbounded full scans.
 // Returns 0, nil if the segment dir does not exist or has no .jsonl files. Returns error if path cache is not built.
 func CountStreamSegmentLines(ctx context.Context, projectRoot, kind string) (int, error) {
@@ -281,16 +291,7 @@ func CountStreamSegmentLines(ctx context.Context, projectRoot, kind string) (int
 	}
 
 	// Use parallel scan for millions of events (RECOMP-STREAM-001)
-	maxWorkers := 16 // Sufficient parallelism for counting
-	if len(segments) < maxWorkers {
-		maxWorkers = len(segments)
-	}
-
-	workCh := make(chan string, len(segments))
-	for _, s := range segments {
-		workCh <- s
-	}
-	close(workCh)
+	workCh, maxWorkers := createSegmentWorkChannel(segments, 16)
 
 	results := make(chan int, maxWorkers)
 	var wg sync.WaitGroup

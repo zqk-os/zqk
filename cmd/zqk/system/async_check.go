@@ -62,20 +62,9 @@ func getActiveGoroutines() int64 {
 
 // runCheckAsync runs system check with async validation
 func runCheckAsync(cmd *cobra.Command, args []string) error {
-	// Prefer pre-set context (e.g. from tests or callers) so deprecated --sync is not required
-	var ctx *cli.Context
-	if cliCtx := cli.GetContext(cmd); cliCtx != nil && cliCtx.Context != nil {
-		ctx = cliCtx
-	}
-	if ctx == nil {
-		initCtx := &pkgctx.CliInitializationContext{
-			ProjectRoot: ProjectRootOrResolve(""),
-		}
-		var err error
-		ctx, err = cli.GetContextFromCommand(cmd, initCtx)
-		if err != nil {
-			return err
-		}
+	ctx, err := resolveSystemCliContextWithFallback(cmd)
+	if err != nil {
+		return err
 	}
 	return runCheckAsyncWithContext(cmd, ctx, args)
 }
