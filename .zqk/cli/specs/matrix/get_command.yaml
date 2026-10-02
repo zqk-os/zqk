@@ -26,3 +26,42 @@ description: |-
       zqk matrix get --field file_path --field fully_vetted
       Pipe-friendly CSV (header + data rows)
       zqk matrix get --format csv --filter fully_vetted=pending
+
+flags:
+  - name: "name"
+    type: "string"
+    description: "Matrix alias from matrix_registry.yaml (default: resolved from registry default)"
+  - name: "registry"
+    type: "string"
+    description: "Path to matrix_registry.yaml (repo-relative or absolute)"
+  - name: "matrix"
+    type: "string"
+    description: "Override CSV path (requires --profile)"
+  - name: "profile"
+    type: "string"
+    description: "Override profile YAML when using --matrix"
+  - name: "filter"
+    shorthand: "F"
+    type: "stringArray"
+    description: "column=value (repeatable); all must match (AND)"
+  - name: "glob"
+    type: "string"
+    description: "Glob pattern for file_path column (filepath.Match; e.g. pkg/*.go or */foo.go)"
+  - name: "go-only"
+    type: "bool"
+    default: false
+    description: "Only rows whose file_path ends with .go"
+  - name: "cvs-id"
+    type: "string"
+    description: "Only rows whose session ref column equals this id (uses registry session_ref_column)"
+  - name: "limit"
+    type: "int"
+    default: 0
+    description: "Max matching rows (0 = no limit)"
+  - name: "field"
+    shorthand: "C"
+    type: "stringArray"
+    description: "CSV column name to include in output (repeatable); order preserved; default is all columns"
+
+common_flags: true
+

@@ -22,6 +22,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objectidcache"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/scheduler/hostservice"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
@@ -216,10 +217,7 @@ func StartDaemon(projectRoot string, out interface{ Write([]byte) (int, error) }
 		return nil
 	}
 
-	exe, err := os.Executable()
-	if err != nil {
-		exe = "zqk"
-	}
+	exe := hostservice.ResolveServiceDaemonBinary(projectRoot, "amb")
 
 	// Setsid + --timeout 0 from *.test orphans grandchildren onto PID 1.
 	// Refuse here; tests that need a daemon must exec the product CLI and t.Cleanup(StopDaemon).

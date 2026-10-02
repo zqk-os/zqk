@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -104,28 +105,250 @@ func SaveRegistry(reg *Registry) error {
 	return fileutil.Rename(tmp, path)
 }
 
-// ResolveServiceDaemonBinary prefers workshop stable for LaunchAgent/systemd units so
-// host supervision matches MCP/scheduler daemon resolution (no tip rebuild split-brain).
-// CE may still fall back to tip bin/<exe> when stable is absent.
-// TRACK: one operational inode for long-lived procs.
-func ResolveServiceDaemonBinary(projectRoot string) string {
+// ResolveServiceDaemonBinary prefers role-differentiated binary names (e.g. <brand>-sched,
+// <brand>-amb, <brand>-pw, <brand>-overseer) over generic binary names so that host supervisor
+// units (LaunchAgent/systemd) and process tables (ps, top) display distinguishable process names.
+// When role is omitted or empty, it defaults to "sched" for scheduler host supervision.
+func ResolveServiceDaemonBinary(projectRoot string, role ...string) string {
+	roleName := "sched"
+	if len(role) > 0 && strings.TrimSpace(role[0]) != "" {
+		roleName = strings.TrimSpace(role[0])
+	}
+	return ResolveDaemonBinary(projectRoot, roleName)
+}
+
+// ResolveDaemonBinary resolves the executable for a specific daemon role (e.g. "sched", "amb", "pw", "overseer").
+func ResolveDaemonBinary(projectRoot string, role string) string {
 	if projectRoot == "" {
+		if role != "" {
+			names := brand.RoleDifferentiatorNames(role)
+			if len(names) > 0 {
+				return names[0]
+			}
+		}
 		return brand.ExecutableName()
 	}
-	candidates := append(
-		paths.StableBinaryCandidates(projectRoot),
-		filepath.Join(projectRoot, "bin", brand.ExecutableName()),
-		filepath.Join(projectRoot, brand.ExecutableName()),
-	)
+
+	var candidates []string
+	if role != "" {
+		for _, name := range brand.RoleDifferentiatorNames(role) {
+			candidates = append(candidates,
+				filepath.Join(projectRoot, "bin", name),
+				filepath.Join(paths.WorkshopBinDirPath(projectRoot), name),
+				filepath.Join(projectRoot, name),
+			)
+		}
+	}
+
 	for _, c := range candidates {
 		if info, err := fileutil.Stat(c); err == nil && !info.IsDir() {
 			return c
 		}
 	}
+
+	// Try auto-ensuring the role symlink if the base binary exists in bin/
+	if role != "" {
+		baseBin := filepath.Join(projectRoot, "bin", brand.ExecutableName())
+		if info, err := fileutil.Stat(baseBin); err == nil && !info.IsDir() {
+			if link, err := EnsureServiceRoleSymlink(projectRoot, role, baseBin); err == nil && link != "" {
+				return link
+			}
+		}
+	}
+
+	genericCandidates := append(
+		paths.StableBinaryCandidates(projectRoot),
+		filepath.Join(projectRoot, "bin", brand.ExecutableName()),
+		filepath.Join(projectRoot, brand.ExecutableName()),
+	)
+	for _, c := range genericCandidates {
+		if info, err := fileutil.Stat(c); err == nil && !info.IsDir() {
+			return c
+		}
+	}
+
 	if exe, err := fileutil.Executable(); err == nil && exe != "" {
+		if role != "" {
+			exeDir := filepath.Dir(exe)
+			for _, name := range brand.RoleDifferentiatorNames(role) {
+				roleCandidate := filepath.Join(exeDir, name)
+				if info, err := fileutil.Stat(roleCandidate); err == nil && !info.IsDir() {
+					return roleCandidate
+				}
+			}
+		}
 		return exe
 	}
+
+	if role != "" {
+		names := brand.RoleDifferentiatorNames(role)
+		if len(names) > 0 {
+			return names[0]
+		}
+	}
 	return brand.ExecutableName()
+}
+
+// EnsureServiceRoleSymlink creates or updates a role symlink (e.g. bin/<brand>-sched)
+// pointing to targetBin so that process tables (ps, top) display role-differentiated process names.
+func EnsureServiceRoleSymlink(projectRoot, role, targetBin string) (string, error) {
+	if projectRoot == "" {
+		return "", errfmt.Errorf("project root required for service role symlink")
+	}
+	names := brand.RoleDifferentiatorNames(role)
+	if len(names) == 0 {
+		return "", errfmt.Errorf("unknown role %q", role)
+	}
+	primaryName := names[0]
+	absTarget, err := filepath.Abs(targetBin)
+	if err != nil {
+		return "", errfmt.Newf("resolve service role target").Wrap(err)
+	}
+	if resolved, err := filepath.EvalSymlinks(absTarget); err == nil {
+		absTarget = resolved
+	}
+	if !fileutil.IsRegularFile(absTarget) {
+		return "", errfmt.Errorf("service role symlink target is not a regular file: %s", absTarget)
+	}
+
+	binDir := paths.ResolvePathFromCacheOrConstant(projectRoot, paths.PathAliasRepoBin, paths.RepoBinDir)
+	if !filepath.IsAbs(binDir) {
+		binDir = filepath.Join(projectRoot, binDir)
+	}
+	linkPath := filepath.Join(binDir, primaryName)
+	if err := fileutil.EnsureDir(filepath.Dir(linkPath)); err != nil {
+		return "", errfmt.Newf("ensure bin dir for service role symlink").Wrap(err)
+	}
+
+	if fi, err := fileutil.Lstat(linkPath); err == nil {
+		if fi.Mode()&fileutil.ModeSymlink == 0 {
+			return linkPath, nil
+		}
+		cur, readErr := fileutil.Readlink(linkPath)
+		if readErr == nil {
+			curAbs := cur
+			if !filepath.IsAbs(curAbs) {
+				curAbs = filepath.Join(filepath.Dir(linkPath), cur)
+			}
+			if resolved, evalErr := filepath.EvalSymlinks(curAbs); evalErr == nil {
+				curAbs = resolved
+			}
+			if curAbs == absTarget {
+				absLink, _ := filepath.Abs(linkPath)
+				return absLink, nil
+			}
+		}
+		if err := fileutil.Remove(linkPath); err != nil {
+			return "", errfmt.Newf("replace service role symlink").Wrap(err)
+		}
+	}
+
+	symlinkTarget := absTarget
+	if filepath.Dir(absTarget) == binDir {
+		symlinkTarget = filepath.Base(absTarget)
+	}
+
+	if err := fileutil.Symlink(symlinkTarget, linkPath); err != nil {
+		return "", errfmt.Newf("create service role symlink %s -> %s", linkPath, symlinkTarget).Wrap(err)
+	}
+	absLink, err := filepath.Abs(linkPath)
+	if err != nil {
+		return linkPath, nil
+	}
+	return absLink, nil
+}
+
+// DefaultServiceRoles lists the canonical daemon and adapter roles required for background processes.
+var DefaultServiceRoles = []string{
+	"sched",
+	"amb",
+	"pw",
+	"overseer",
+	"ide-adapter",
+}
+
+// EnsureAllServiceRoleSymlinks creates or updates the full suite of role differentiator symlinks
+// (bin/<brand>-sched, bin/<brand>-amb, bin/<brand>-pw, bin/<brand>-overseer, bin/<brand>-mcp-ide-adapter)
+// under projectRoot/bin so developers running standalone binaries get distinguishable process names
+// across host process tables (ps, top, Activity Monitor) and supervisors without needing 'make'.
+func EnsureAllServiceRoleSymlinks(projectRoot string, targetBin ...string) error {
+	if projectRoot == "" {
+		return errfmt.Errorf("project root required for service role symlinks")
+	}
+
+	var target string
+	if len(targetBin) > 0 && strings.TrimSpace(targetBin[0]) != "" {
+		target = strings.TrimSpace(targetBin[0])
+	} else {
+		// 1. Check if bin/<brand> exists in project
+		candidate := filepath.Join(projectRoot, "bin", brand.ExecutableName())
+		if info, err := fileutil.Stat(candidate); err == nil && !info.IsDir() {
+			target = candidate
+		} else {
+			// 2. Check running executable
+			if exe, err := fileutil.Executable(); err == nil && exe != "" {
+				target = exe
+			} else {
+				// 3. Check PATH
+				if p, err := exec.LookPath(brand.ExecutableName()); err == nil && p != "" {
+					target = p
+				}
+			}
+		}
+	}
+
+	if target == "" {
+		return errfmt.Errorf("could not determine target binary for service role symlinks")
+	}
+
+	absTarget, err := filepath.Abs(target)
+	if err != nil {
+		return errfmt.Newf("resolve target binary path").Wrap(err)
+	}
+	if resolved, err := filepath.EvalSymlinks(absTarget); err == nil {
+		absTarget = resolved
+	}
+
+	binDir := paths.ResolvePathFromCacheOrConstant(projectRoot, paths.PathAliasRepoBin, paths.RepoBinDir)
+	if !filepath.IsAbs(binDir) {
+		binDir = filepath.Join(projectRoot, binDir)
+	}
+	if err := fileutil.EnsureDir(binDir); err != nil {
+		return errfmt.Newf("ensure bin dir for service role symlinks").Wrap(err)
+	}
+
+	// If the target binary lives outside binDir, create projectRoot/bin/<brand> symlink
+	baseInBin := filepath.Join(binDir, brand.ExecutableName())
+	if absTarget != baseInBin {
+		if fi, err := fileutil.Lstat(baseInBin); err != nil {
+			_ = fileutil.Symlink(absTarget, baseInBin)
+		} else if fi.Mode()&fileutil.ModeSymlink != 0 {
+			cur, readErr := fileutil.Readlink(baseInBin)
+			if readErr == nil {
+				curAbs := cur
+				if !filepath.IsAbs(curAbs) {
+					curAbs = filepath.Join(binDir, cur)
+				}
+				if resolved, evalErr := filepath.EvalSymlinks(curAbs); evalErr == nil && resolved != absTarget {
+					_ = fileutil.Remove(baseInBin)
+					_ = fileutil.Symlink(absTarget, baseInBin)
+				}
+			}
+		}
+	}
+
+	effectiveTarget := absTarget
+	if fileutil.Exists(baseInBin) {
+		effectiveTarget = baseInBin
+	}
+
+	var firstErr error
+	for _, role := range DefaultServiceRoles {
+		if _, err := EnsureServiceRoleSymlink(projectRoot, role, effectiveTarget); err != nil && firstErr == nil {
+			firstErr = err
+		}
+	}
+	return firstErr
 }
 
 // UpsertEntry inserts or replaces an entry by RootID.

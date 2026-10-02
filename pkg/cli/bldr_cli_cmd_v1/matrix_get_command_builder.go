@@ -5,6 +5,7 @@ package bldr_cli_cmd_v1
 import (
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 )
 
 // NewMatrixGetCommandBuilder creates a new matrix_get command
@@ -37,7 +38,17 @@ func NewMatrixGetCommandBuilder() *cobra.Command {
 	help.WithDescriptionLines("  Pipe-friendly CSV (header + data rows)")
 	help.WithDescriptionLines("  zqk matrix get --format csv --filter fully_vetted=pending")
 	builder.WithHelpBuilder(help)
-	builder.WithCommonFlags(false, nil)
+	builder.AddStringFlag("name", "", "", "Matrix alias from matrix_registry.yaml (default: resolved from registry default)")
+	builder.AddStringFlag("registry", "", "", "Path to matrix_registry.yaml (repo-relative or absolute)")
+	builder.AddStringFlag("matrix", "", "", "Override CSV path (requires --profile)")
+	builder.AddStringFlag("profile", "", "", "Override profile YAML when using --matrix")
+	builder.AddStringArrayFlag("filter", "F", "column=value (repeatable); all must match (AND)")
+	builder.AddStringFlag("glob", "", "", "Glob pattern for file_path column (filepath.Match; e.g. pkg/*.go or */foo.go)")
+	builder.AddBoolFlag("go-only", "", false, "Only rows whose file_path ends with .go")
+	builder.AddStringFlag("cvs-id", "", "", "Only rows whose session ref column equals this id (uses registry session_ref_column)")
+	builder.AddIntFlag("limit", "", 0, "Max matching rows (0 = no limit)")
+	builder.AddStringArrayFlag("field", "C", "CSV column name to include in output (repeatable); order preserved; default is all columns")
+	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
 	cmd := builder.Build()
 	return cmd
 }

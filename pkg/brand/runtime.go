@@ -42,6 +42,9 @@ func init() {
 func defaultExecutableName() string {
 	if len(os.Args) > 0 && os.Args[0] != emptyBrandValue {
 		base := filepath.Base(os.Args[0])
+		if len(base) > 4 && strings.EqualFold(base[len(base)-4:], ".exe") {
+			base = base[:len(base)-4]
+		}
 		if base == ZqkStableName || strings.HasPrefix(base, ZqkStablePrefix) ||
 			base == "zqk-pw" || base == "zqk-amb" || base == "zqk-sched" || base == "zqk-overseer" {
 			return defaultExecutableNameValue
@@ -52,6 +55,12 @@ func defaultExecutableName() string {
 		// Similarly, "go run" produces a binary named "main" (or "main.exe").
 		if isGoTestExecutableBase(base) || isGoRunExecutableBase(base) || strings.Contains(os.Args[0], "go-build") || strings.Contains(os.Args[0], "___go_build") {
 			return defaultExecutableNameValue
+		}
+		// If base has a role/channel suffix (e.g. foo-sched, foo-amb, foo-pw, foo-overseer),
+		// strip it to get the core brand executable name.
+		stripped := stripEnvChannelSuffix(base)
+		if stripped != base && stripped != emptyBrandValue {
+			return stripped
 		}
 		return base
 	}
@@ -131,6 +140,96 @@ func MCPIdeAdapterExecutableName() string {
 	return exe + "-mcp-ide-adapter"
 }
 
+// SchedExecutableName returns the binary name for the scheduler daemon (e.g. "zqk-sched" or "<brand>-sched").
+func SchedExecutableName() string {
+	exe := ExecutableName()
+	if exe == emptyBrandValue || exe == defaultExecutableNameValue {
+		return "zqk-sched"
+	}
+	return exe + "-sched"
+}
+
+// AmbExecutableName returns the binary name for the ambient daemon (e.g. "zqk-amb" or "<brand>-amb").
+func AmbExecutableName() string {
+	exe := ExecutableName()
+	if exe == emptyBrandValue || exe == defaultExecutableNameValue {
+		return "zqk-amb"
+	}
+	return exe + "-amb"
+}
+
+// PWExecutableName returns the binary name for the privileged writer daemon (e.g. "zqk-pw" or "<brand>-pw").
+func PWExecutableName() string {
+	exe := ExecutableName()
+	if exe == emptyBrandValue || exe == defaultExecutableNameValue {
+		return "zqk-pw"
+	}
+	return exe + "-pw"
+}
+
+// OverseerExecutableName returns the binary name for the process group overseer daemon (e.g. "zqk-overseer" or "<brand>-overseer").
+func OverseerExecutableName() string {
+	exe := ExecutableName()
+	if exe == emptyBrandValue || exe == defaultExecutableNameValue {
+		return "zqk-overseer"
+	}
+	return exe + "-overseer"
+}
+
+// RoleDifferentiatorNames returns the candidate binary basenames for a daemon role under the current brand.
+// For example, role "sched" -> ["foo-sched", "foo-scheduler", "zqk-sched", "zqk-scheduler"].
+func RoleDifferentiatorNames(role string) []string {
+	exe := ExecutableName()
+	switch strings.ToLower(strings.TrimSpace(role)) {
+	case "sched", "scheduler", "scheduler-daemon":
+		names := []string{exe + "-sched", exe + "-scheduler"}
+		if exe != defaultExecutableNameValue {
+			names = append(names, "zqk-sched", "zqk-scheduler")
+		}
+		return names
+	case "amb", "ambient", "ambient-daemon":
+		names := []string{exe + "-amb", exe + "-ambient"}
+		if exe != defaultExecutableNameValue {
+			names = append(names, "zqk-amb", "zqk-ambient")
+		}
+		return names
+	case "pw", "privileged-writer", "writer":
+		names := []string{exe + "-pw", exe + "-privileged-writer"}
+		if exe != defaultExecutableNameValue {
+			names = append(names, "zqk-pw", "zqk-privileged-writer")
+		}
+		return names
+	case "overseer":
+		names := []string{exe + "-overseer"}
+		if exe != defaultExecutableNameValue {
+			names = append(names, "zqk-overseer")
+		}
+		return names
+	case "mcp", "mcp-daemon":
+		names := []string{exe + "-mcp-daemon", exe + "-mcp"}
+		if exe != defaultExecutableNameValue {
+			names = append(names, "zqk-mcp-daemon", "zqk-mcp")
+		}
+		return names
+	case "ide-adapter", "mcp-ide-adapter":
+		names := []string{exe + "-mcp-ide-adapter"}
+		if exe != defaultExecutableNameValue {
+			names = append(names, "zqk-mcp-ide-adapter")
+		}
+		return names
+	default:
+		r := strings.ToLower(strings.TrimSpace(role))
+		if r == "" {
+			return nil
+		}
+		names := []string{exe + "-" + r}
+		if exe != defaultExecutableNameValue {
+			names = append(names, "zqk-"+r)
+		}
+		return names
+	}
+}
+
 // IsProductExecutable returns true if base matches any executable name belonging to the branded ecosystem.
 func IsProductExecutable(name string) bool {
 	base := filepath.Base(name)
@@ -142,15 +241,27 @@ func IsProductExecutable(name string) bool {
 	curMCP := MCPExecutableName()
 	curDaemon := MCPDaemonExecutableName()
 	curAdapter := MCPIdeAdapterExecutableName()
+	curSched := SchedExecutableName()
+	curAmb := AmbExecutableName()
+	curPW := PWExecutableName()
+	curOverseer := OverseerExecutableName()
 
-	if base == curExe || base == curStable || base == curMCP || base == curDaemon || base == curAdapter {
+	if base == curExe || base == curStable || base == curMCP || base == curDaemon || base == curAdapter ||
+		base == curSched || base == curAmb || base == curPW || base == curOverseer {
 		return true
 	}
-	// Always recognize canonical upstream names
-	if base == "zqk" || base == "zqk-stable" || base == "zqk-mcp" || base == "zqk-mcp-daemon" || base == "zqk-mcp-ide-adapter" || base == "zcom" {
+	// Always recognize canonical upstream names and role aliases
+	switch base {
+	case "zqk", "zqk-stable", "zqk-mcp", "zqk-mcp-daemon", "zqk-mcp-ide-adapter", "zcom",
+		"zqk-sched", "zqk-scheduler", "zqk-amb", "zqk-ambient", "zqk-pw", "zqk-privileged-writer", "zqk-overseer":
 		return true
 	}
 	if strings.HasPrefix(base, curStable+"-") || strings.HasPrefix(base, ZqkStablePrefix) {
+		return true
+	}
+	// Dynamic brand with role suffixes: e.g. foo-sched, foo-amb, foo-pw, foo-overseer
+	trimmed := stripEnvChannelSuffix(base)
+	if trimmed == curExe || trimmed == defaultExecutableNameValue || trimmed == "zcom" {
 		return true
 	}
 	return false
