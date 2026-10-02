@@ -125,35 +125,9 @@ func (hr *HashRegistry) Save() error {
 	if StreamStorageEnabledForKind(hr.kind) {
 		return nil
 	}
-	if hr.ctx.Err() != nil {
-		return errfmt.Errorf(DescHashRegCtxCancelNoSave)
-	}
-
-	if !hr.skipShutdownCoordinatorCheck.Load() {
-		coordinator := GetGlobalShutdownCoordinator()
-		if coordinator != nil && coordinator.IsShutdownInitiated() {
-			return errfmt.Errorf(DescShutdownInProgressNoSave)
-		}
-	}
-
-	if hr.ctx.Err() != nil {
-		return errfmt.Errorf(DescHashRegCtxCancelNoSave)
-	}
-
-	// Acquire read lock, copy data, release lock BEFORE enqueuing
-	var dataCopy map[string]string
-	err := concurrency.RunInRLockWithLogger(&hr.mu, locknames.LockNameHashRegistrySaveCopy, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
-		dataCopy = make(map[string]string, len(hr.hashes))
-		maps.Copy(dataCopy, hr.hashes)
-		return nil
-	})
+	req, err := hr.prepareSaveRequest()
 	if err != nil {
-		return errfmt.Newf(DescCopyingHashRegData).Wrap(err)
-	}
-
-	req := &saveRequest{
-		data: dataCopy,
-		done: make(chan error, 1),
+		return err
 	}
 
 	select {
@@ -187,7 +161,7 @@ func (hr *HashRegistry) Save() error {
 	case <-saveTimer.C:
 
 		queueLen := len(hr.saveQueue)
-		hashCount := len(dataCopy)
+		hashCount := len(req.data)
 		workerRunning := hr.workerRunning.Load() != 0
 		var fileSize int64
 		if fi, err := fileutil.Stat(hr.filePath); err == nil {
@@ -225,28 +199,10 @@ func (hr *HashRegistry) SaveWithContext(ctx context.Context) error {
 	if hr.ctx.Err() != nil {
 		return errfmt.Errorf(DescHashRegCtxCancelNoSave)
 	}
-	if !hr.skipShutdownCoordinatorCheck.Load() {
-		coordinator := GetGlobalShutdownCoordinator()
-		if coordinator != nil && coordinator.IsShutdownInitiated() {
-			return errfmt.Errorf(DescShutdownInProgressNoSave)
-		}
-	}
-	if hr.ctx.Err() != nil {
-		return errfmt.Errorf(DescHashRegCtxCancelNoSave)
-	}
-	var dataCopy map[string]string
-	err := concurrency.RunInRLockWithLogger(&hr.mu, locknames.LockNameHashRegistrySaveCopy, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
-		dataCopy = make(map[string]string, len(hr.hashes))
-		maps.Copy(dataCopy, hr.hashes)
-		return nil
-	})
-	if err != nil {
-		return errfmt.Newf(DescCopyingHashRegData).Wrap(err)
-	}
 
-	req := &saveRequest{
-		data: dataCopy,
-		done: make(chan error, 1),
+	req, err := hr.prepareSaveRequest()
+	if err != nil {
+		return err
 	}
 
 	select {
@@ -282,4 +238,34 @@ func (hr *HashRegistry) SaveWithContext(ctx context.Context) error {
 	case <-ctx.Done():
 		return ctx.Err()
 	}
+}
+
+func (hr *HashRegistry) prepareSaveRequest() (*saveRequest, error) {
+	if hr.ctx.Err() != nil {
+		return nil, errfmt.Errorf(DescHashRegCtxCancelNoSave)
+	}
+	if !hr.skipShutdownCoordinatorCheck.Load() {
+		coordinator := GetGlobalShutdownCoordinator()
+		if coordinator != nil && coordinator.IsShutdownInitiated() {
+			return nil, errfmt.Errorf(DescShutdownInProgressNoSave)
+		}
+	}
+	if hr.ctx.Err() != nil {
+		return nil, errfmt.Errorf(DescHashRegCtxCancelNoSave)
+	}
+
+	var dataCopy map[string]string
+	err := concurrency.RunInRLockWithLogger(&hr.mu, locknames.LockNameHashRegistrySaveCopy, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
+		dataCopy = make(map[string]string, len(hr.hashes))
+		maps.Copy(dataCopy, hr.hashes)
+		return nil
+	})
+	if err != nil {
+		return nil, errfmt.Newf(DescCopyingHashRegData).Wrap(err)
+	}
+
+	return &saveRequest{
+		data: dataCopy,
+		done: make(chan error, 1),
+	}, nil
 }

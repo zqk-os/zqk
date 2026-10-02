@@ -151,13 +151,34 @@ func (h *ProgressHelper) EmitProgress(
 	// Enable channels: logging + metrics + operational always, audit only if emitAudit
 	eventCtx = eventCtx.WithChannels(true, emitAudit, true, true)
 
-	// Emit via coordinator (async, non-blocking)
+	h.emitAsync(ctx, eventCtx)
+	return nil
+}
+
+func (h *ProgressHelper) emitAsync(ctx context.Context, eventCtx *EventContext) {
 	goroutinelabels.NewGoroutine("progress_helper_emitter", "emitting progress event").
 		StartSimple(func() {
 			_ = h.coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
 		})
+}
 
-	return nil
+func (h *ProgressHelper) buildStatusLoggingFields(oldStatus, newStatus, message string, err error, fields map[string]any) []LoggingField {
+	loggingFields := []LoggingField{
+		{Key: keyOperationID, Value: h.operationID},
+		{Key: keyOperationType, Value: h.operationType},
+		{Key: keyOldStatus, Value: oldStatus},
+		{Key: keyNewStatus, Value: newStatus},
+	}
+	if message != emptyValue {
+		loggingFields = append(loggingFields, LoggingField{Key: keyMessage, Value: message})
+	}
+	if err != nil {
+		loggingFields = append(loggingFields, LoggingField{Key: keyError, Value: err.Error()})
+	}
+	for k, v := range fields {
+		loggingFields = append(loggingFields, LoggingField{Key: k, Value: v})
+	}
+	return loggingFields
 }
 
 // EmitProgressSummary emits a sparse progress-summary checkpoint (e.g. 25%, 50%).
@@ -207,20 +228,7 @@ func (h *ProgressHelper) EmitStatusChange(
 		return nil
 	}
 
-	// Build logging fields
-	loggingFields := []LoggingField{
-		{Key: keyOperationID, Value: h.operationID},
-		{Key: keyOperationType, Value: h.operationType},
-		{Key: keyOldStatus, Value: oldStatus},
-		{Key: keyNewStatus, Value: newStatus},
-	}
-	if message != emptyValue {
-		loggingFields = append(loggingFields, LoggingField{Key: keyMessage, Value: message})
-	}
-	// Add custom fields
-	for k, v := range fields {
-		loggingFields = append(loggingFields, LoggingField{Key: k, Value: v})
-	}
+	loggingFields := h.buildStatusLoggingFields(oldStatus, newStatus, message, nil, fields)
 
 	// Build audit metadata
 	auditMetadata := make(map[string]any)
@@ -268,12 +276,7 @@ func (h *ProgressHelper) EmitStatusChange(
 		eventCtx.WithLevel(lvl)
 	}
 
-	// Emit via coordinator (async, non-blocking)
-	goroutinelabels.NewGoroutine("progress_helper_emitter", "emitting progress event").
-		StartSimple(func() {
-			_ = h.coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
-		})
-
+	h.emitAsync(ctx, eventCtx)
 	return nil
 }
 
@@ -288,23 +291,7 @@ func (h *ProgressHelper) EmitError(
 		return nil // Best effort
 	}
 
-	// Build logging fields (include old_status/new_status for consistent diagnostics.jsonl)
-	loggingFields := []LoggingField{
-		{Key: keyOperationID, Value: h.operationID},
-		{Key: keyOperationType, Value: h.operationType},
-		{Key: keyOldStatus, Value: objects.ObjectStatusInProgress},
-		{Key: keyNewStatus, Value: objects.ObjectStatusError},
-	}
-	if message != emptyValue {
-		loggingFields = append(loggingFields, LoggingField{Key: keyMessage, Value: message})
-	}
-	if err != nil {
-		loggingFields = append(loggingFields, LoggingField{Key: keyError, Value: err.Error()})
-	}
-	// Add custom fields
-	for k, v := range fields {
-		loggingFields = append(loggingFields, LoggingField{Key: k, Value: v})
-	}
+	loggingFields := h.buildStatusLoggingFields(objects.ObjectStatusInProgress, objects.ObjectStatusError, message, err, fields)
 
 	// Build audit metadata
 	auditMetadata := make(map[string]any)

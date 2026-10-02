@@ -101,49 +101,52 @@ func lookupCASBlob(hash string) ([]byte, bool) { return LookupCASBlob(hash) }
 
 func storeCASBlob(hash string, data []byte) { StoreCASBlob(hash, data) }
 
-// Peek copies the value for key without changing eviction order.
-func (c *BlobCache) Peek(key string) ([]byte, bool) {
+func (c *BlobCache) accessEntry(key string, fn func() ([]byte, bool)) ([]byte, bool) {
 	if c == nil || key == "" {
 		return nil, false
 	}
-	var src []byte
-	ok := false
-	_ = concurrency.RunInRLock(&c.mu, func() error {
-		el, hit := c.entries[key]
-		if e := entryOf(el); hit && e != nil {
-			src = e.data
-			ok = true
-		}
-		return nil
-	})
+	src, ok := fn()
 	if !ok {
 		return nil, false
 	}
 	return copyBlob(src), true
 }
 
+// Peek copies the value for key without changing eviction order.
+func (c *BlobCache) Peek(key string) ([]byte, bool) {
+	return c.accessEntry(key, func() ([]byte, bool) {
+		var src []byte
+		ok := false
+		_ = concurrency.RunInRLock(&c.mu, func() error {
+			el, hit := c.entries[key]
+			if e := entryOf(el); hit && e != nil {
+				src = e.data
+				ok = true
+			}
+			return nil
+		})
+		return src, ok
+	})
+}
+
 // Get copies the value and marks the key most-recently used.
 func (c *BlobCache) Get(key string) ([]byte, bool) {
-	if c == nil || key == "" {
-		return nil, false
-	}
-	var src []byte
-	ok := false
-	_ = concurrency.RunInLock(&c.mu, func() error {
-		el, hit := c.entries[key]
-		e := entryOf(el)
-		if !hit || e == nil {
+	return c.accessEntry(key, func() ([]byte, bool) {
+		var src []byte
+		ok := false
+		_ = concurrency.RunInLock(&c.mu, func() error {
+			el, hit := c.entries[key]
+			e := entryOf(el)
+			if !hit || e == nil {
+				return nil
+			}
+			c.ll.MoveToFront(el)
+			src = e.data
+			ok = true
 			return nil
-		}
-		c.ll.MoveToFront(el)
-		src = e.data
-		ok = true
-		return nil
+		})
+		return src, ok
 	})
-	if !ok {
-		return nil, false
-	}
-	return copyBlob(src), true
 }
 
 // Put stores a copy of data. A new key at capacity evicts the LRU entry first.

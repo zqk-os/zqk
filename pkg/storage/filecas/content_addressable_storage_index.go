@@ -72,6 +72,24 @@ func (idx *IDIndex) Save() error {
 	}
 
 	metrics := getSafeMetrics()
+	return idx.withIndexFileLock(metrics, func() error {
+		var mappingsCopy, bucketKeysCopy, createdAtsCopy map[string]string
+		err := concurrency.RunInLockWithLogger(&idx.Mu, locknames.LockNameListingIndexSave, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
+			preserved := idx.copyPreservedMappingsLocked()
+			_ = idx.LoadLocked() //nolint:errcheck // empty/missing index is fine
+			kindDir := filepath.Dir(idx.FilePath)
+			idx.Mappings = MergeCASIndexMaps(kindDir, idx.Mappings, preserved)
+			mappingsCopy, bucketKeysCopy, createdAtsCopy = idx.snapshotMapsLocked()
+			return nil
+		})
+		if err != nil {
+			return errfmt.Newf(ConstMiscFailedToAcquireLockForIndexSave).Wrap(err)
+		}
+		return idx.SaveMappingsLocked(mappingsCopy, bucketKeysCopy, createdAtsCopy)
+	})
+}
+
+func (idx *IDIndex) withIndexFileLock(metrics StorageMetrics, fn func() error) error {
 	lockHandle, lockErr := idx.acquireIndexFileLock(metrics)
 	if lockErr != nil {
 		return lockErr
@@ -79,20 +97,7 @@ func (idx *IDIndex) Save() error {
 	defer func() {
 		logging.LogSwallowedError(lockHandle.Release())
 	}()
-
-	var mappingsCopy, bucketKeysCopy, createdAtsCopy map[string]string
-	err := concurrency.RunInLockWithLogger(&idx.Mu, locknames.LockNameListingIndexSave, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
-		preserved := idx.copyPreservedMappingsLocked()
-		_ = idx.LoadLocked() //nolint:errcheck // empty/missing index is fine
-		kindDir := filepath.Dir(idx.FilePath)
-		idx.Mappings = MergeCASIndexMaps(kindDir, idx.Mappings, preserved)
-		mappingsCopy, bucketKeysCopy, createdAtsCopy = idx.snapshotMapsLocked()
-		return nil
-	})
-	if err != nil {
-		return errfmt.Newf(ConstMiscFailedToAcquireLockForIndexSave).Wrap(err)
-	}
-	return idx.SaveMappingsLocked(mappingsCopy, bucketKeysCopy, createdAtsCopy)
+	return fn()
 }
 
 // saveMappingsLocked saves the provided mappings, optional bucket keys, and optional created_at to disk (must be called with lock held).
@@ -248,67 +253,19 @@ func (idx *IDIndex) GetBucketKey(objectID string) string {
 }
 
 func (idx *IDIndex) SetMapping(objectID, hash string, bucketKey ...string) error {
-	start := time.Now()
-	metrics := getSafeMetrics()
-	reloaded := false
-
-	lockHandle, lockErr := idx.acquireIndexFileLock(metrics)
-	if lockErr != nil {
-		metrics.RecordSetMapping(time.Since(start), lockErr, false)
-		return lockErr
+	mappings := map[string]string{objectID: hash}
+	var bKeys map[string]string
+	if len(bucketKey) > 0 && bucketKey[0] != emptyValue {
+		bKeys = map[string]string{objectID: bucketKey[0]}
 	}
-	defer func() {
-		logging.LogSwallowedError(lockHandle.Release())
-	}()
-
-	var mappingsCopy, bucketKeysCopy, createdAtsCopy map[string]string
-	err := concurrency.RunInLockWithLogger(&idx.Mu, locknames.LockNameListingIndexSetMapping, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
-		// Snapshot pre-load memory, then reload disk. Do NOT blanket-overlay memory onto
-		// disk — that reverted sync-cas-index / heal when system check held a stale CAS.
-		// TRACK: follow-up in kernel backlog
-		preservedMappings := idx.copyPreservedMappingsLocked()
-
-		if loadErr := idx.LoadLocked(); loadErr == nil {
-			reloaded = true
-			metrics.RecordIndexReload()
-		}
-
-		kindDir := filepath.Dir(idx.FilePath)
-		idx.Mappings = MergeCASIndexMaps(kindDir, idx.Mappings, preservedMappings)
-		idx.Mappings[objectID] = hash
-
-		if len(bucketKey) > 0 && bucketKey[0] != emptyValue {
-			if idx.BucketKeys == nil {
-				idx.BucketKeys = make(map[string]string)
-			}
-			idx.BucketKeys[objectID] = bucketKey[0]
-		}
-		// Optional created_at: variadic [bucketKey, createdAt]; if len==2 and second non-empty, set CreatedAt
-		if len(bucketKey) >= 2 && bucketKey[1] != emptyValue {
-			if idx.CreatedAt == nil {
-				idx.CreatedAt = make(map[string]string)
-			}
-			idx.CreatedAt[objectID] = bucketKey[1]
-		} else if len(bucketKey) == 1 && bucketKey[0] != emptyValue {
-			// Only bucket key passed
-		}
-
-		mappingsCopy, bucketKeysCopy, createdAtsCopy = idx.snapshotMapsLocked()
-		return nil
-	})
-	if err != nil {
-		return errfmt.Newf(ConstMiscSettingMapping).Wrap(err)
+	var cAts map[string]string
+	if len(bucketKey) >= 2 && bucketKey[1] != emptyValue {
+		cAts = map[string]string{objectID: bucketKey[1]}
 	}
-
-	// Save snapshot while still holding the file lock (cross-process atomicity).
-	saveErr := idx.SaveMappingsLocked(mappingsCopy, bucketKeysCopy, createdAtsCopy)
-	metrics.RecordSetMapping(time.Since(start), saveErr, reloaded)
-	if saveErr == nil {
-		if ConfirmPendingAfterDurableMapping != nil {
-			ConfirmPendingAfterDurableMapping(idx.FilePath, objectID, hash)
-		}
+	if cAts != nil {
+		return idx.SetMappings(mappings, bKeys, cAts)
 	}
-	return saveErr
+	return idx.SetMappings(mappings, bKeys)
 }
 
 // SetMappings sets multiple ID->hash mappings (and optional bucket keys and optional created_at) in one load/merge/save.
@@ -454,33 +411,31 @@ func (idx *IDIndex) RemoveMapping(objectID string) error {
 	start := time.Now()
 	metrics := getSafeMetrics()
 
-	lockHandle, lockErr := idx.acquireIndexFileLock(metrics)
-	if lockErr != nil {
-		return lockErr
-	}
-	defer func() {
-		logging.LogSwallowedError(lockHandle.Release())
-	}()
+	var saveErr error
+	lockErr := idx.withIndexFileLock(metrics, func() error {
+		var mappingsCopy, bucketKeysCopy, createdAtsCopy map[string]string
+		err := concurrency.RunInLockWithLogger(&idx.Mu, locknames.LockNameListingIndexRemoveMapping, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
+			logging.LogSwallowedError(idx.LoadLocked())
+			delete(idx.Mappings, objectID)
+			if idx.BucketKeys != nil {
+				delete(idx.BucketKeys, objectID)
+			}
+			if idx.CreatedAt != nil {
+				delete(idx.CreatedAt, objectID)
+			}
+			mappingsCopy, bucketKeysCopy, createdAtsCopy = idx.snapshotMapsLocked()
+			return nil
+		})
+		if err != nil {
+			return errfmt.Newf(ConstMiscTimeoutRemovingMapping).Wrap(err)
+		}
 
-	var mappingsCopy, bucketKeysCopy, createdAtsCopy map[string]string
-	err := concurrency.RunInLockWithLogger(&idx.Mu, locknames.LockNameListingIndexRemoveMapping, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
-		logging.LogSwallowedError(idx.LoadLocked())
-		delete(idx.Mappings, objectID)
-		if idx.BucketKeys != nil {
-			delete(idx.BucketKeys, objectID)
-		}
-		if idx.CreatedAt != nil {
-			delete(idx.CreatedAt, objectID)
-		}
-		mappingsCopy, bucketKeysCopy, createdAtsCopy = idx.snapshotMapsLocked()
-		return nil
+		saveErr = idx.SaveMappingsLocked(mappingsCopy, bucketKeysCopy, createdAtsCopy)
+		return saveErr
 	})
-	if err != nil {
-		return errfmt.Newf(ConstMiscTimeoutRemovingMapping).Wrap(err)
+	if lockErr != nil && saveErr == nil {
+		saveErr = lockErr
 	}
-
-	// Save snapshot while still holding the file lock (cross-process atomicity).
-	saveErr := idx.SaveMappingsLocked(mappingsCopy, bucketKeysCopy, createdAtsCopy)
 	metrics.RecordRemoveMapping(time.Since(start), saveErr)
-	return saveErr
+	return lockErr
 }

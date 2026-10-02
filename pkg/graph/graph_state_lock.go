@@ -2,7 +2,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/graph/provider"
@@ -92,16 +91,7 @@ func (l *graphStateLocker) tryAcquire(ctx context.Context, resourceID string, lo
 		return false, err
 	}
 
-	if len(result.Rows) == 0 {
-		return false, fmt.Errorf("unexpected query result: no rows returned")
-	}
-
-	acquired, ok := result.Rows[0]["acquired"].(bool)
-	if !ok {
-		return false, fmt.Errorf("unexpected query result: acquired field is not a boolean")
-	}
-
-	return acquired, nil
+	return result.ExtractBooleanField("acquired")
 }
 
 func (l *graphStateLocker) release(ctx context.Context, resourceID string) error {

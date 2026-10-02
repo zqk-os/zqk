@@ -34,15 +34,7 @@ func BuildContextChain(contexts ...ChainableContext) (*ContextChain, []Validatio
 		}
 	}
 
-	// Build and return chain head
-	result, errors := builder.Build()
-	if result == nil {
-		return nil, errors
-	}
-
-	// Find the chain head
-	chain := builder.GetChain()
-	return chain, errors
+	return buildAndGetChain(builder)
 }
 
 // BuildNestedContextChain builds a context chain with nested contexts
@@ -70,13 +62,15 @@ func BuildNestedContextChain(parent ChainableContext, children ...ChainableConte
 		}
 	}
 
+	return buildAndGetChain(builder)
+}
+
+func buildAndGetChain(builder *ChainBuilder) (*ContextChain, []ValidationError) {
 	result, errors := builder.Build()
 	if result == nil {
 		return nil, errors
 	}
-
-	chain := builder.GetChain()
-	return chain, errors
+	return builder.GetChain(), errors
 }
 
 // MergeContexts merges multiple contexts using chain-based processing

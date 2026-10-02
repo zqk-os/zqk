@@ -110,13 +110,7 @@ func (cas *ContentAddressableStorage) Update(objectID string, data []byte, targe
 		return cas.ensureExactlyOneLiveBlob(objectID, newHash)
 	}
 
-	bucketKey := cas.index.GetBucketKey(objectID)
-	oldHashFile, oldBucketDir := cas.findHashFile(oldHash, bucketKey)
-	if oldHashFile == emptyValue {
-
-		oldHashFile = filepath.Join(cas.kindDir, oldHash+".yaml")
-		oldBucketDir = cas.kindDir
-	}
+	oldHashFile, oldBucketDir := cas.resolveOldHashFileAndBucket(oldHash, objectID)
 
 	storageDir := oldBucketDir
 	indexBucketKey := ""
@@ -145,14 +139,8 @@ func (cas *ContentAddressableStorage) Update(objectID string, data []byte, targe
 			_ = pendingCache.PublishPending(objectID, cas.kind, newHash, indexBucketKey)
 		}
 
-		writeQueue := cas.getWriteQueue()
-		opCallback := cas.getOperationCallback()
 		var done <-chan error
-		if GetSkipIndexUpdateWait() {
-			_, err = writeQueue.EnqueueInternal(cas.kind, objectID, newHash, indexBucketKey, "", cas, opCallback, false, false)
-		} else {
-			done, err = writeQueue.EnqueueUpdateWithOperationCallback(cas.kind, objectID, newHash, indexBucketKey, cas, opCallback)
-		}
+		done, err = cas.enqueueIndexWrite(objectID, newHash, indexBucketKey, "")
 
 		rollbackMutation := func() {
 			if err := fileutil.RemoveFile(newHashFile); err != nil {
@@ -162,7 +150,7 @@ func (cas *ContentAddressableStorage) Update(objectID string, data []byte, targe
 			if cas.index != nil {
 				RestorePendingAfterFailedMutation(
 					projectRootFromCASIndexPath(cas.index.FilePath),
-					objectID, cas.kind, oldHash, bucketKey,
+					objectID, cas.kind, oldHash, indexBucketKey,
 				)
 			}
 		}
@@ -256,13 +244,7 @@ func (cas *ContentAddressableStorage) UpdateWithIDChange(oldID, newID string, da
 
 	newHash := CalculateSHA256Hash(data)
 
-	bucketKey := cas.index.GetBucketKey(oldID)
-	oldHashFile, oldBucketDir := cas.findHashFile(oldHash, bucketKey)
-	if oldHashFile == emptyValue {
-
-		oldHashFile = filepath.Join(cas.kindDir, oldHash+".yaml")
-		oldBucketDir = cas.kindDir
-	}
+	oldHashFile, oldBucketDir := cas.resolveOldHashFileAndBucket(oldHash, oldID)
 
 	storageDir := oldBucketDir
 	newHashFile := filepath.Join(storageDir, newHash+".yaml")
@@ -313,4 +295,14 @@ func (cas *ContentAddressableStorage) UpdateWithIDChange(oldID, newID string, da
 		}
 		return cas.ensureExactlyOneLiveBlob(newID, newHash)
 	})
+}
+
+func (cas *ContentAddressableStorage) resolveOldHashFileAndBucket(oldHash, objectID string) (string, string) {
+	bucketKey := cas.index.GetBucketKey(objectID)
+	oldHashFile, oldBucketDir := cas.findHashFile(oldHash, bucketKey)
+	if oldHashFile == emptyValue {
+		oldHashFile = filepath.Join(cas.kindDir, oldHash+".yaml")
+		oldBucketDir = cas.kindDir
+	}
+	return oldHashFile, oldBucketDir
 }

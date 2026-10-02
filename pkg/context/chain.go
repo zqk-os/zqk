@@ -68,11 +68,16 @@ func NewContextChain(ctx ChainableContext) *ContextChain {
 	}
 }
 
+func (cc *ContextChain) newSiblingChain(ctx ChainableContext) *ContextChain {
+	newChain := NewContextChain(ctx)
+	newChain.Parent = cc.Parent
+	newChain.Depth = cc.Depth
+	return newChain
+}
+
 // Append adds a context to the end of the chain (lowest precedence)
 func (cc *ContextChain) Append(ctx ChainableContext) *ContextChain {
-	newChain := NewContextChain(ctx)
-	newChain.Parent = cc.Parent // Inherit parent from chain
-	newChain.Depth = cc.Depth   // Same depth level
+	newChain := cc.newSiblingChain(ctx)
 
 	// Find the end of the chain
 	current := cc
@@ -86,9 +91,7 @@ func (cc *ContextChain) Append(ctx ChainableContext) *ContextChain {
 
 // Prepend adds a context to the beginning of the chain (highest precedence)
 func (cc *ContextChain) Prepend(ctx ChainableContext) *ContextChain {
-	newChain := NewContextChain(ctx)
-	newChain.Parent = cc.Parent
-	newChain.Depth = cc.Depth
+	newChain := cc.newSiblingChain(ctx)
 	newChain.Next = cc
 
 	// If this chain has a parent, update parent's reference

@@ -138,20 +138,7 @@ func (cas *ContentAddressableStorage) Create(objectID string, data []byte, bucke
 		createdAt = parseCreatedAtFromObjectData(data)
 	}
 
-	// Queue index update for batched processing (async, prevents race conditions)
-	writeQueue := cas.getWriteQueue()
-	opCallback := cas.getOperationCallback()
-	var done <-chan error
-	var enqueueErr error
-	if GetSkipIndexUpdateWait() {
-		_, enqueueErr = writeQueue.EnqueueInternal(cas.kind, objectID, hash, bucketKey, createdAt, cas, opCallback, false, false)
-	} else {
-		if createdAt != emptyValue {
-			done, enqueueErr = writeQueue.EnqueueUpdateWithOperationCallbackAndCreatedAt(cas.kind, objectID, hash, bucketKey, createdAt, cas, opCallback)
-		} else {
-			done, enqueueErr = writeQueue.EnqueueUpdateWithOperationCallback(cas.kind, objectID, hash, bucketKey, cas, opCallback)
-		}
-	}
+	done, enqueueErr := cas.enqueueIndexWrite(objectID, hash, bucketKey, createdAt)
 	if enqueueErr != nil {
 		// If queueing fails, fall back to a synchronous index write so the object is indexed.
 		// CRITICAL: SetMapping reloads from disk which clears in-memory mappings.
@@ -608,4 +595,17 @@ func (cas *ContentAddressableStorage) BatchDelete(objectIDs []string) error {
 		}
 	}
 	return nil
+}
+
+func (cas *ContentAddressableStorage) enqueueIndexWrite(objectID, hash, bucketKey, createdAt string) (<-chan error, error) {
+	writeQueue := cas.getWriteQueue()
+	opCallback := cas.getOperationCallback()
+	if GetSkipIndexUpdateWait() {
+		_, err := writeQueue.EnqueueInternal(cas.kind, objectID, hash, bucketKey, createdAt, cas, opCallback, false, false)
+		return nil, err
+	}
+	if createdAt != emptyValue {
+		return writeQueue.EnqueueUpdateWithOperationCallbackAndCreatedAt(cas.kind, objectID, hash, bucketKey, createdAt, cas, opCallback)
+	}
+	return writeQueue.EnqueueUpdateWithOperationCallback(cas.kind, objectID, hash, bucketKey, cas, opCallback)
 }

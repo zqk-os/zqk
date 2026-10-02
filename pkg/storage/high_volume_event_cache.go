@@ -272,32 +272,23 @@ func (c *HighVolumeEventCache) removeEntryFromByTime(id string) {
 
 // Step 4: I/O operations WITHOUT lock (JSON marshaling and file write)
 
-func (c *HighVolumeEventCache) withReadLock(lockName string, op func() error) error {
+func (c *HighVolumeEventCache) withLockInternal(lockName string, isWrite bool, op func() error) error {
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
 	defer cancel()
-	return concurrency.WithRLockTimeout(
-		&c.mu,
-		ctx,
-		nil,
-		logging.NewLockLoggerAdapter(logger),
-		lockName,
-		op,
-	)
+	adapter := logging.NewLockLoggerAdapter(logger)
+	if isWrite {
+		return concurrency.WithLockTimeout(&c.mu, ctx, nil, adapter, lockName, op)
+	}
+	return concurrency.WithRLockTimeout(&c.mu, ctx, nil, adapter, lockName, op)
+}
+
+func (c *HighVolumeEventCache) withReadLock(lockName string, op func() error) error {
+	return c.withLockInternal(lockName, false, op)
 }
 
 func (c *HighVolumeEventCache) withWriteLock(lockName string, op func() error) error {
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
-	defer cancel()
-	return concurrency.WithLockTimeout(
-		&c.mu,
-		ctx,
-		nil,
-		logging.NewLockLoggerAdapter(logger),
-		lockName,
-		op,
-	)
+	return c.withLockInternal(lockName, true, op)
 }
 
 // Get retrieves a cache entry by ID
