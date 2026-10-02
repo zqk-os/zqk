@@ -225,11 +225,7 @@ func (g *GraphObjectStorage) Update(ctx context.Context, secCtx *pkgctx.Security
 		return errfmt.Errorf("validation failed: %w", err)
 	}
 
-	// Check if this is a built-in object and user has admin role
-	isBuiltIn := IsBuiltIn(existing)
-	hasAdminRole := slices.Contains(secCtx.Roles, "admin")
-
-	// Get old status before merge for lifecycle transition validation
+	canModifyBuiltIn := IsBuiltIn(existing) && slices.Contains(secCtx.Roles, "admin")
 	oldState, _ := existing[objects.FieldKeyStatus].(string)
 	removeProperties := UnsetFieldKeys(updates)
 
@@ -249,7 +245,7 @@ func (g *GraphObjectStorage) Update(ctx context.Context, secCtx *pkgctx.Security
 		}
 		if k == objects.FieldKeyCreatedAt || k == objects.FieldKeyCreatedBy {
 			// Allow updating created_at/created_by for built-in objects with admin role, or when break_glass is active
-			if (isBuiltIn && hasAdminRole) || pkgctx.HasLifecycleBreakGlass(ctx) {
+			if canModifyBuiltIn || pkgctx.HasLifecycleBreakGlass(ctx) {
 				existing[k] = v
 			}
 			// Otherwise, skip (immutable)
@@ -310,35 +306,9 @@ func (g *GraphObjectStorage) Move(ctx context.Context, secCtx *pkgctx.SecurityCo
 	ctx, cancel := pkgctx.EnforceTimeout(ctx, 30*time.Second)
 	defer cancel()
 
-	// Require CLI authorization for moves
-	if !IsCLIOperation(ctx, secCtx) {
-		return errfmt.Errorf(ConstStreamMoveOperationsMustBePerformedThroughCli)
-	}
-
-	// Read existing object
-	existing, err := g.Read(ctx, secCtx, id)
+	existing, oldKind, _, err := ValidateMovePreconditions(ctx, secCtx, g, id, newKind)
 	if err != nil {
 		return err
-	}
-
-	oldKind, ok := existing[objects.FieldKeyKind].(string)
-	if !ok {
-		return errfmt.Errorf(ConstStreamObjectMissingKindField2)
-	}
-
-	// Validate new kind
-	if newKind == emptyValue {
-		return errfmt.Errorf(ConstStreamNewKindCannotBeEmpty)
-	}
-
-	if oldKind == newKind {
-		return errfmt.Errorf(ConstStreamObjectIsAlreadyOfKindStrNoMoveNeeded, newKind)
-	}
-
-	// Validate new kind exists
-	newDir := objects.GetDirectoryFromKind(newKind)
-	if newDir == emptyValue {
-		return errfmt.Errorf(ConstStreamInvalidKindStrNoDirectoryMappingFound, newKind)
 	}
 
 	// Check permissions

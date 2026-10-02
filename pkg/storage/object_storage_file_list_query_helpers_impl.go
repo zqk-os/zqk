@@ -123,22 +123,16 @@ func (f *FileObjectStorage) countFromCASIndex(ctx context.Context, kind string, 
 // countFiles counts files in a directory without parsing
 // Uses the same unified traversal logic as collectFilePaths
 func (f *FileObjectStorage) countFiles(ctx context.Context, kindDir string, _ bool) (int, error) {
-	EmitListCountWaitProgress(ctx)
-	listCtx, err := AcquireListCountSlot(ctx)
-	if err != nil {
-		return 0, err
-	}
-	defer ReleaseListCountSlot(ctx)
-
-	// Use unified file collection logic
-	filePaths, err := f.collectFilePaths(listCtx, kindDir, nil, nil)
-	if err != nil {
-		if fileutil.IsNotExist(err) {
-			return 0, nil
+	return WithListCountSlotInt(ctx, func(listCtx context.Context) (int, error) {
+		filePaths, err := f.collectFilePaths(listCtx, kindDir, nil, nil)
+		if err != nil {
+			if fileutil.IsNotExist(err) {
+				return 0, nil
+			}
+			return 0, err
 		}
-		return 0, err
-	}
-	return len(filePaths), nil
+		return len(filePaths), nil
+	})
 }
 
 // countWithFilters counts objects matching filters
@@ -146,30 +140,18 @@ func (f *FileObjectStorage) countFiles(ctx context.Context, kindDir string, _ bo
 //
 //nolint:gocritic // Internal helper; filter passed by value for consistency with interface
 func (f *FileObjectStorage) countWithFilters(ctx context.Context, kindDir string, filter ListFilter, _ bool) (int, error) {
-	EmitListCountWaitProgress(ctx)
-	listCtx, err := AcquireListCountSlot(ctx)
-	if err != nil {
-		return 0, err
-	}
-	defer ReleaseListCountSlot(ctx)
-
-	// Collect file paths using unified traversal logic
-	timeRange := f.extractTimeRangeFromFilters(filter.Filters)
-	filePaths, err := f.collectFilePaths(listCtx, kindDir, timeRange, nil)
-	if err != nil {
-		if fileutil.IsNotExist(err) {
-			return 0, nil
+	return WithListCountSlotInt(ctx, func(listCtx context.Context) (int, error) {
+		// Collect file paths using unified traversal logic
+		timeRange := f.extractTimeRangeFromFilters(filter.Filters)
+		filePaths, err := f.collectFilePaths(listCtx, kindDir, timeRange, nil)
+		if err != nil {
+			if fileutil.IsNotExist(err) {
+				return 0, nil
+			}
+			return 0, errfmt.Newf(ConstStreamFailedToCollectFilePaths).Wrap(err)
 		}
-		return 0, errfmt.Newf(ConstStreamFailedToCollectFilePaths).Wrap(err)
-	}
-
-	// Bounded worker pool: fixed number of goroutines (not one per file) to avoid thread exhaustion.
-	// workCh must be buffered to len(filePaths): we enqueue before workers start (same pattern as
-	// CAS list). A small buffer (maxWorkers*2) deadlocks when file count exceeds the buffer —
-	// default namespace-scoped object count hit this for kinds with >128 YAML files.
-	// TRACK: follow-up in kernel backlog
-	count := 0
-	maxWorkers := getListReadWorkers()
+		count := 0
+		maxWorkers := getListReadWorkers()
 	results := make(chan bool, maxWorkers*2)
 	workCh := make(chan string, len(filePaths))
 	numWorkers := maxWorkers
@@ -290,6 +272,7 @@ func (f *FileObjectStorage) countWithFilters(ctx context.Context, kindDir string
 		return 0, err
 	}
 	return count, nil
+	})
 }
 
 // extractTimeRangeFromFilters extracts time range from created_at filters

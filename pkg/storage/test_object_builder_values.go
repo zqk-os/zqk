@@ -116,8 +116,7 @@ func generateLowercaseIdentifier(fieldName string) string {
 	return result.String()
 }
 
-// generateReferenceFromString generates a reference value for string fields with reference semantic type
-func generateReferenceFromString(fieldName string, fieldValidation map[string]any) string {
+func resolveFieldRefKind(fieldName string, fieldValidation map[string]any) string {
 	refKind := ""
 	if fieldValidation != nil {
 		if rk := objects.GetString(fieldValidation, ConstMiscReferenceKind); rk != "" {
@@ -127,7 +126,12 @@ func generateReferenceFromString(fieldName string, fieldValidation map[string]an
 	if refKind == emptyValue {
 		refKind = inferReferenceKind(fieldName)
 	}
-	return generateReferenceID(refKind)
+	return refKind
+}
+
+// generateReferenceFromString generates a reference value for string fields with reference semantic type
+func generateReferenceFromString(fieldName string, fieldValidation map[string]any) string {
+	return generateReferenceID(resolveFieldRefKind(fieldName, fieldValidation))
 }
 
 // generateReferenceID generates a reference ID for a given kind
@@ -154,19 +158,10 @@ func generateReferenceID(refKind string) string {
 
 // generateReferenceTestValue generates a test value for reference type fields
 func generateReferenceTestValue(fieldName string, fieldValidation map[string]any) string {
-	refKind := ""
-	if fieldValidation != nil {
-		if rk := objects.GetString(fieldValidation, ConstMiscReferenceKind); rk != "" {
-			refKind = rk
-		}
-	}
 	if fieldName == ConstMiscToWorkstreamRef {
 		return "WS-998"
 	}
-	if refKind == emptyValue {
-		refKind = inferReferenceKind(fieldName)
-	}
-	return generateReferenceID(refKind)
+	return generateReferenceID(resolveFieldRefKind(fieldName, fieldValidation))
 }
 
 // generateDateTimeTestValue generates a test datetime value
@@ -222,15 +217,7 @@ func generateListTestValue(fieldName string, fieldMap, fieldValidation map[strin
 
 // generateReferenceList generates a list of reference IDs
 func generateReferenceList(fieldName string, fieldValidation map[string]any, minCount int) []any {
-	refKind := ""
-	if fieldValidation != nil {
-		if rk := objects.GetString(fieldValidation, ConstMiscReferenceKind); rk != "" {
-			refKind = rk
-		}
-	}
-	if refKind == emptyValue {
-		refKind = inferReferenceKind(fieldName)
-	}
+	refKind := resolveFieldRefKind(fieldName, fieldValidation)
 
 	list := make([]any, minCount)
 	for i := range list {

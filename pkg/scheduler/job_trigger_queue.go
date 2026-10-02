@@ -152,8 +152,7 @@ func NewJobTriggerQueue(projectRoot string) JobTriggerQueueInterface {
 	}
 }
 
-// EnqueueLifecycleTrigger adds a lifecycle trigger request to the queue.
-func (q *JobTriggerQueue) EnqueueLifecycleTrigger(kind, fromState, toState string, objectData map[string]any) error {
+func (q *JobTriggerQueue) withLockedQueue(fn func(requests []JobTriggerRequest) ([]JobTriggerRequest, error)) error {
 	inMemMu := getTriggerQueueMutex(q.lockFile)
 	inMemMu.Lock()
 	defer inMemMu.Unlock()
@@ -179,19 +178,34 @@ func (q *JobTriggerQueue) EnqueueLifecycleTrigger(kind, fromState, toState strin
 		requests = []JobTriggerRequest{}
 	}
 
-	request := JobTriggerRequest{
-		RequestedAt:        time.Now(),
-		RequestedBy:        fmt.Sprintf(triggerQueueRequestedByFmt, os.Getpid()),
-		IsLifecycleTrigger: true,
-		LifecycleKind:      kind,
-		LifecycleFrom:      fromState,
-		LifecycleTo:        toState,
-		LifecycleData:      objectData,
+	updated, err := fn(requests)
+	if err != nil {
+		return err
 	}
-	requests = append(requests, request)
+	if updated != nil {
+		if err := q.writeQueue(updated); err != nil {
+			return errfmt.Errorf(triggerQueueErrWriteQueueFmt, err)
+		}
+	}
+	return nil
+}
 
-	if err := q.writeQueue(requests); err != nil {
-		return errfmt.Errorf(triggerQueueErrWriteQueueFmt, err)
+// EnqueueLifecycleTrigger adds a lifecycle trigger request to the queue.
+func (q *JobTriggerQueue) EnqueueLifecycleTrigger(kind, fromState, toState string, objectData map[string]any) error {
+	err := q.withLockedQueue(func(requests []JobTriggerRequest) ([]JobTriggerRequest, error) {
+		requests = append(requests, JobTriggerRequest{
+			RequestedAt:        time.Now(),
+			RequestedBy:        fmt.Sprintf(triggerQueueRequestedByFmt, os.Getpid()),
+			IsLifecycleTrigger: true,
+			LifecycleKind:      kind,
+			LifecycleFrom:      fromState,
+			LifecycleTo:        toState,
+			LifecycleData:      objectData,
+		})
+		return requests, nil
+	})
+	if err != nil {
+		return err
 	}
 
 	SchedulerTriggerQueueLog(q.logger).Info("lifecycle_trigger_enqueued").
@@ -213,68 +227,40 @@ func (q *JobTriggerQueue) EnqueueTriggerRequest(jobID string) error {
 // When origin is TriggerOriginPreCommit ("pre_commit"), the scheduler will run the job's callback_on_completion
 // (and callback_on_error) only for this run. Use for pre-commit triggered runs so timer runs do not write pre-commit results.
 func (q *JobTriggerQueue) EnqueueTriggerRequestWithOrigin(jobID, triggerOrigin string) error {
-	inMemMu := getTriggerQueueMutex(q.lockFile)
-	inMemMu.Lock()
-	defer inMemMu.Unlock()
-
-	// Create file lock for cross-process coordination
-	fileLock, err := storagepkg.NewFileLock(q.lockFile)
-	if err != nil {
-		return errfmt.Errorf(triggerQueueErrCreateLockFmt, err)
-	}
-	defer fileLock.Close()
-
-	// Acquire lock with timeout (5 seconds)
-	// This prevents indefinite blocking if another process is stuck
-	if err := fileLock.LockWithTimeout(triggerQueueLockTimeout); err != nil {
-		return errfmt.Errorf(triggerQueueErrAcquireLockFmt, err)
-	}
-	defer func() { _ = fileLock.Unlock() }() //nolint:errcheck // Lock cleanup errors are non-critical
-
-	// Create queue directory if it doesn't exist
-	queueDir := filepath.Dir(q.queueFile)
-	if err := fileutil.MkdirAll(queueDir, paths.DirPerm755); err != nil {
-		return errfmt.Errorf(triggerQueueErrCreateDirFmt, err)
-	}
-
-	// Read existing queue (while holding lock)
-	requests, err := q.readQueue()
-	if err != nil {
-		// If file doesn't exist, start with empty queue
-		requests = []JobTriggerRequest{}
-	}
-
-	// Deduplicate: skip if the same job ID (with the same origin) is already pending.
-	// Prevents spurious "job not found" events when multiple sources enqueue the same
-	// persistent job (e.g. daemon startup + system check both enqueue SCH-cache-prewarm).
-	for _, existing := range requests {
-		if existing.JobID == jobID && existing.TriggerOrigin == triggerOrigin {
-			SchedulerTriggerQueueLog(q.logger).Debug(LogEventSchedulerTriggerQueueSkippedDuplicateEnqueue).
-				JobID(jobID).
-				String("trigger_origin", triggerOrigin).
-				Log()
-			return nil
+	var finalLen int
+	skipped := false
+	err := q.withLockedQueue(func(requests []JobTriggerRequest) ([]JobTriggerRequest, error) {
+		for _, existing := range requests {
+			if existing.JobID == jobID && existing.TriggerOrigin == triggerOrigin {
+				skipped = true
+				return nil, nil
+			}
 		}
-	}
 
-	// Add new request
-	request := JobTriggerRequest{
-		JobID:         jobID,
-		RequestedAt:   time.Now(),
-		RequestedBy:   fmt.Sprintf(triggerQueueRequestedByFmt, os.Getpid()),
-		TriggerOrigin: triggerOrigin,
+		requests = append(requests, JobTriggerRequest{
+			JobID:         jobID,
+			RequestedAt:   time.Now(),
+			RequestedBy:   fmt.Sprintf(triggerQueueRequestedByFmt, os.Getpid()),
+			TriggerOrigin: triggerOrigin,
+		})
+		finalLen = len(requests)
+		return requests, nil
+	})
+	if err != nil {
+		return err
 	}
-	requests = append(requests, request)
-
-	// Write queue back (while holding lock)
-	if err := q.writeQueue(requests); err != nil {
-		return errfmt.Errorf(triggerQueueErrWriteQueueFmt, err)
+	if skipped {
+		SchedulerTriggerQueueLog(q.logger).Debug(LogEventSchedulerTriggerQueueSkippedDuplicateEnqueue).
+			JobID(jobID).
+			String("trigger_origin", triggerOrigin).
+			Log()
+		return nil
 	}
 
 	SchedulerTriggerQueueLog(q.logger).Info(LogEventSchedulerTriggerQueueRequestEnqueued).
 		JobID(jobID).
 		String("queue_file", q.queueFile).
-		Int("queue_length", len(requests)).
+		Int("queue_length", finalLen).
 		Log()
 
 	return nil
@@ -287,50 +273,30 @@ func (q *JobTriggerQueue) EnqueueTriggerRequests(jobIDs []string, triggerOrigin 
 	if len(jobIDs) == 0 {
 		return nil
 	}
-	inMemMu := getTriggerQueueMutex(q.lockFile)
-	inMemMu.Lock()
-	defer inMemMu.Unlock()
 
-	fileLock, err := storagepkg.NewFileLock(q.lockFile)
+	var finalLen int
+	err := q.withLockedQueue(func(requests []JobTriggerRequest) ([]JobTriggerRequest, error) {
+		now := time.Now()
+		requestedBy := fmt.Sprintf(triggerQueueRequestedByFmt, os.Getpid())
+		for _, jobID := range jobIDs {
+			requests = append(requests, JobTriggerRequest{
+				JobID:         jobID,
+				RequestedAt:   now,
+				RequestedBy:   requestedBy,
+				TriggerOrigin: triggerOrigin,
+			})
+		}
+		finalLen = len(requests)
+		return requests, nil
+	})
 	if err != nil {
-		return errfmt.Errorf(triggerQueueErrCreateLockFmt, err)
-	}
-	defer fileLock.Close()
-
-	if err := fileLock.LockWithTimeout(triggerQueueLockTimeout); err != nil {
-		return errfmt.Errorf(triggerQueueErrAcquireLockFmt, err)
-	}
-	defer func() { _ = fileLock.Unlock() }() //nolint:errcheck
-
-	queueDir := filepath.Dir(q.queueFile)
-	if err := fileutil.MkdirAll(queueDir, paths.DirPerm755); err != nil {
-		return errfmt.Errorf(triggerQueueErrCreateDirFmt, err)
-	}
-
-	requests, err := q.readQueue()
-	if err != nil {
-		requests = []JobTriggerRequest{}
-	}
-
-	now := time.Now()
-	requestedBy := fmt.Sprintf(triggerQueueRequestedByFmt, os.Getpid())
-	for _, jobID := range jobIDs {
-		requests = append(requests, JobTriggerRequest{
-			JobID:         jobID,
-			RequestedAt:   now,
-			RequestedBy:   requestedBy,
-			TriggerOrigin: triggerOrigin,
-		})
-	}
-
-	if err := q.writeQueue(requests); err != nil {
-		return errfmt.Errorf(triggerQueueErrWriteQueueFmt, err)
+		return err
 	}
 
 	SchedulerTriggerQueueLog(q.logger).Info(LogEventSchedulerTriggerQueueRequestsEnqueuedBatch).
 		Int(triggerQueueKeyCount, len(jobIDs)).
 		String("queue_file", q.queueFile).
-		Int("queue_length", len(requests)).
+		Int("queue_length", finalLen).
 		Log()
 
 	return nil
@@ -342,36 +308,9 @@ func (q *JobTriggerQueue) EnqueueTriggerRequestStructs(toAppend []JobTriggerRequ
 	if len(toAppend) == 0 {
 		return nil
 	}
-	inMemMu := getTriggerQueueMutex(q.lockFile)
-	inMemMu.Lock()
-	defer inMemMu.Unlock()
-
-	fileLock, err := storagepkg.NewFileLock(q.lockFile)
-	if err != nil {
-		return errfmt.Errorf(triggerQueueErrCreateLockFmt, err)
-	}
-	defer fileLock.Close()
-
-	if err := fileLock.LockWithTimeout(triggerQueueLockTimeout); err != nil {
-		return errfmt.Errorf(triggerQueueErrAcquireLockFmt, err)
-	}
-	defer func() { _ = fileLock.Unlock() }() //nolint:errcheck
-
-	queueDir := filepath.Dir(q.queueFile)
-	if err := fileutil.MkdirAll(queueDir, paths.DirPerm755); err != nil {
-		return errfmt.Errorf(triggerQueueErrCreateDirFmt, err)
-	}
-
-	requests, err := q.readQueue()
-	if err != nil {
-		requests = []JobTriggerRequest{}
-	}
-
-	requests = append(requests, toAppend...)
-	if err := q.writeQueue(requests); err != nil {
-		return errfmt.Errorf(triggerQueueErrWriteQueueFmt, err)
-	}
-	return nil
+	return q.withLockedQueue(func(requests []JobTriggerRequest) ([]JobTriggerRequest, error) {
+		return append(requests, toAppend...), nil
+	})
 }
 
 // PeekTriggerRequests reads pending trigger requests without removing them.

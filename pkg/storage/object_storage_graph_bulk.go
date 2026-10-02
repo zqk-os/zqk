@@ -299,8 +299,7 @@ func (g *GraphObjectStorage) prepareBulkUpdatePayload(ctx context.Context, secCt
 		}
 		delete(patched, ConstStreamExpectedUpdatedAt)
 	}
-	isBuiltIn := IsBuiltIn(existing)
-	hasAdminRole := slices.Contains(secCtx.Roles, "admin")
+	canModifyBuiltIn := IsBuiltIn(existing) && slices.Contains(secCtx.Roles, "admin")
 	oldState, _ := existing[objects.FieldKeyStatus].(string)
 	for k, v := range patched {
 		if IsFieldUnset(v) {
@@ -311,7 +310,7 @@ func (g *GraphObjectStorage) prepareBulkUpdatePayload(ctx context.Context, secCt
 			continue
 		}
 		if k == objects.FieldKeyCreatedAt || k == objects.FieldKeyCreatedBy {
-			if isBuiltIn && hasAdminRole {
+			if canModifyBuiltIn {
 				existing[k] = v
 			}
 			continue

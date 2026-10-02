@@ -63,10 +63,35 @@ func allTransactionOpsAreDeletes(ops []fileTransactionOp) bool {
 	return len(ops) > 0
 }
 
-// Create creates a new object within the transaction
-func (tx *FileObjectTransaction) Create(ctx context.Context, secCtx *pkgctx.SecurityContext, obj map[string]any) error {
+func (tx *FileObjectTransaction) ensureActive() error {
 	if tx.committed || tx.rolledBack {
 		return errfmt.Errorf(ConstStreamTransactionAlreadyCommittedOrRolledBack)
+	}
+	return nil
+}
+
+func (tx *FileObjectTransaction) appendOp(op fileTransactionOp) {
+	tx.mu.Lock()
+	tx.ops = append(tx.ops, op)
+	tx.mu.Unlock()
+}
+
+func (tx *FileObjectTransaction) readKind(ctx context.Context, secCtx *pkgctx.SecurityContext, id string) (string, error) {
+	if err := tx.ensureActive(); err != nil {
+		return "", err
+	}
+	obj, err := tx.storage.Read(ctx, secCtx, id)
+	if err != nil {
+		return "", err
+	}
+	kind, _ := obj[objects.FieldKeyKind].(string)
+	return kind, nil
+}
+
+// Create creates a new object within the transaction
+func (tx *FileObjectTransaction) Create(ctx context.Context, secCtx *pkgctx.SecurityContext, obj map[string]any) error {
+	if err := tx.ensureActive(); err != nil {
+		return err
 	}
 
 	kind, _ := obj[objects.FieldKeyKind].(string)
@@ -75,14 +100,12 @@ func (tx *FileObjectTransaction) Create(ctx context.Context, secCtx *pkgctx.Secu
 		return errfmt.Errorf(ConstStreamObjectMustHaveKindAndId)
 	}
 
-	tx.mu.Lock()
-	tx.ops = append(tx.ops, fileTransactionOp{
+	tx.appendOp(fileTransactionOp{
 		opType: OpCreate,
 		id:     id,
 		kind:   kind,
 		obj:    obj,
 	})
-	tx.mu.Unlock()
 	return nil
 }
 
@@ -95,53 +118,41 @@ func (tx *FileObjectTransaction) Read(ctx context.Context, secCtx *pkgctx.Securi
 
 // Update updates an object within the transaction
 func (tx *FileObjectTransaction) Update(ctx context.Context, secCtx *pkgctx.SecurityContext, id string, updates map[string]any) error {
-	if tx.committed || tx.rolledBack {
-		return errfmt.Errorf(ConstStreamTransactionAlreadyCommittedOrRolledBack)
-	}
-
-	// Read current object to get kind
-	obj, err := tx.storage.Read(ctx, secCtx, id)
+	kind, err := tx.readKind(ctx, secCtx, id)
 	if err != nil {
 		return err
 	}
-	kind, _ := obj[objects.FieldKeyKind].(string)
 
-	tx.mu.Lock()
-	tx.ops = append(tx.ops, fileTransactionOp{
+	tx.appendOp(fileTransactionOp{
 		opType:  OpUpdate,
 		id:      id,
 		kind:    kind,
 		updates: updates,
 	})
-	tx.mu.Unlock()
 	return nil
 }
 
 // Delete deletes an object within the transaction
 func (tx *FileObjectTransaction) Delete(ctx context.Context, secCtx *pkgctx.SecurityContext, id string, cascade bool) error {
-	if tx.committed || tx.rolledBack {
-		return errfmt.Errorf(ConstStreamTransactionAlreadyCommittedOrRolledBack)
-	}
-
-	// Read current object to get kind
-	obj, err := tx.storage.Read(ctx, secCtx, id)
+	kind, err := tx.readKind(ctx, secCtx, id)
 	if err != nil {
 		return err
 	}
-	kind, _ := obj[objects.FieldKeyKind].(string)
 
 	if err := denyCoreKernelHardDelete(ctx, secCtx, kind, id); err != nil {
 		return err
 	}
 
-	tx.mu.Lock()
-	tx.ops = append(tx.ops, fileTransactionOp{
+	tx.appendDeleteOp(id, kind)
+	return nil
+}
+
+func (tx *FileObjectTransaction) appendDeleteOp(id, kind string) {
+	tx.appendOp(fileTransactionOp{
 		opType: OpDelete,
 		id:     id,
 		kind:   kind,
 	})
-	tx.mu.Unlock()
-	return nil
 }
 
 // DeleteByIDAndKind appends a delete op without reading the object.
@@ -149,8 +160,8 @@ func (tx *FileObjectTransaction) Delete(ctx context.Context, secCtx *pkgctx.Secu
 // Critical kinds are refused here — callers must use Delete → kernel.cas_object_erase.
 // TRACK: follow-up in kernel backlog
 func (tx *FileObjectTransaction) DeleteByIDAndKind(ctx context.Context, id, kind string) error {
-	if tx.committed || tx.rolledBack {
-		return errfmt.Errorf(ConstStreamTransactionAlreadyCommittedOrRolledBack)
+	if err := tx.ensureActive(); err != nil {
+		return err
 	}
 	if id == emptyValue || kind == emptyValue {
 		return errfmt.Errorf(ConstStreamIdAndKindRequiredForDeletebyidandkind)
@@ -158,13 +169,7 @@ func (tx *FileObjectTransaction) DeleteByIDAndKind(ctx context.Context, id, kind
 	if err := denyCoreKernelHardDelete(ctx, pkgctx.GetSecurityContext(ctx), kind, id); err != nil {
 		return err
 	}
-	tx.mu.Lock()
-	tx.ops = append(tx.ops, fileTransactionOp{
-		opType: OpDelete,
-		id:     id,
-		kind:   kind,
-	})
-	tx.mu.Unlock()
+	tx.appendDeleteOp(id, kind)
 	return nil
 }
 

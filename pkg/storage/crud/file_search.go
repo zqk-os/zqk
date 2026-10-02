@@ -15,37 +15,15 @@ import (
 
 // Search performs full-text search across objects (file backend)
 //
-//nolint:gocritic // Interface requires value semantics for SearchQuery
 func SearchObjects(ctx context.Context, secCtx *pkgctx.SecurityContext, storageCtx *pkgctx.StorageContext, query SearchQuery, listFn func(context.Context, *pkgctx.SecurityContext, *pkgctx.StorageContext, ListFilter) (*QueryResult, error), permFn func(*pkgctx.SecurityContext, string, string) error) (*SearchResult, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
+	kindsToSearch, err := PrepareSearchKinds(ctx, secCtx, query.Kinds, permFn)
+	if err != nil {
+		return nil, err
+	}
 	startTime := time.Now()
-
-	// Check permissions for requested kinds (or all kinds if empty)
-	kindsToSearch := query.Kinds
-	if len(kindsToSearch) == 0 {
-		// Get all discoverable kinds
-		fieldRegistry := objects.GetGlobalFieldRegistry()
-		if err := fieldRegistry.LoadFields(); err != nil {
-			return nil, errfmt.Newf("failed to load field registry").Wrap(err)
-		}
-		allKinds, err := fieldRegistry.GetAllKinds()
-		if err != nil {
-			return nil, errfmt.Newf("failed to get all kinds").Wrap(err)
-		}
-		kindsToSearch = allKinds
-	}
-
-	// Check permissions for each kind
-	for _, kind := range kindsToSearch {
-		if err := ctx.Err(); err != nil {
-			return nil, err
-		}
-		if err := permFn(secCtx, "read", kind); err != nil {
-			return nil, err
-		}
-	}
 
 	// Perform search across all requested kinds
 	var allMatches []SearchMatch
@@ -66,24 +44,8 @@ func SearchObjects(ctx context.Context, secCtx *pkgctx.SecurityContext, storageC
 	// Sort by score (descending)
 	SortSearchMatches(allMatches)
 
-	// Apply pagination
 	totalCount := len(allMatches)
-	start := query.Offset
-	if start < 0 {
-		start = 0
-	}
-	end := start + query.Limit
-	if query.Limit <= 0 {
-		end = len(allMatches)
-	}
-	if end > len(allMatches) {
-		end = len(allMatches)
-	}
-
-	var paginatedMatches []SearchMatch
-	if start < len(allMatches) {
-		paginatedMatches = allMatches[start:end]
-	}
+	paginatedMatches := PaginateSearchMatches(allMatches, query.Offset, query.Limit)
 
 	queryTime := time.Since(startTime)
 
@@ -318,4 +280,61 @@ func levenshteinDistance(s1, s2 string) int {
 
 func minInt(a, b, c int) int {
 	return min(a, min(b, c))
+}
+
+// ResolveKindsToSearch returns queryKinds or all discoverable kinds if empty.
+func ResolveKindsToSearch(queryKinds []string) ([]string, error) {
+	if len(queryKinds) > 0 {
+		return queryKinds, nil
+	}
+	fieldRegistry := objects.GetGlobalFieldRegistry()
+	if err := fieldRegistry.LoadFields(); err != nil {
+		return nil, errfmt.Newf("failed to load field registry").Wrap(err)
+	}
+	allKinds, err := fieldRegistry.GetAllKinds()
+	if err != nil {
+		return nil, errfmt.Newf("failed to get all kinds").Wrap(err)
+	}
+	return allKinds, nil
+}
+
+// CheckReadPermissions checks read permission for each kind in the slice.
+func CheckReadPermissions(ctx context.Context, secCtx *pkgctx.SecurityContext, kinds []string, permFn func(*pkgctx.SecurityContext, string, string) error) error {
+	for _, kind := range kinds {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
+		if err := permFn(secCtx, "read", kind); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// PrepareSearchKinds resolves kinds and checks read permissions for search.
+func PrepareSearchKinds(ctx context.Context, secCtx *pkgctx.SecurityContext, kinds []string, permFn func(*pkgctx.SecurityContext, string, string) error) ([]string, error) {
+	kindsToSearch, err := ResolveKindsToSearch(kinds)
+	if err != nil {
+		return nil, err
+	}
+	if err := CheckReadPermissions(ctx, secCtx, kindsToSearch, permFn); err != nil {
+		return nil, err
+	}
+	return kindsToSearch, nil
+}
+
+// PaginateSearchMatches applies pagination offsets and limits to matches.
+func PaginateSearchMatches(matches []SearchMatch, offset, limit int) []SearchMatch {
+	start := offset
+	if start < 0 {
+		start = 0
+	}
+	end := start + limit
+	if limit <= 0 || end > len(matches) {
+		end = len(matches)
+	}
+	if start >= len(matches) {
+		return nil
+	}
+	return matches[start:end]
 }

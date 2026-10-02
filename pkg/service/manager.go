@@ -71,44 +71,41 @@ func (m *Manager) Install(ctx context.Context, spec ServiceSpec) error {
 	return m.adapter.Install(ctx, spec)
 }
 
-// Uninstall unregisters a service specification.
-func (m *Manager) Uninstall(ctx context.Context, id string) error {
+func (m *Manager) withServiceOp(id string, op func(id string) error) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	if id == "" {
 		return fmt.Errorf("%w: missing service id", ErrInvalidSpec)
 	}
-	return m.adapter.Uninstall(ctx, id)
+	return op(id)
+}
+
+// Uninstall unregisters a service specification.
+func (m *Manager) Uninstall(ctx context.Context, id string) error {
+	return m.withServiceOp(id, func(id string) error {
+		return m.adapter.Uninstall(ctx, id)
+	})
 }
 
 // Start instructs the underlying supervisor to start the service.
 func (m *Manager) Start(ctx context.Context, id string) error {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if id == "" {
-		return fmt.Errorf("%w: missing service id", ErrInvalidSpec)
-	}
-	return m.adapter.Start(ctx, id)
+	return m.withServiceOp(id, func(id string) error {
+		return m.adapter.Start(ctx, id)
+	})
 }
 
 // Stop instructs the underlying supervisor to stop the service.
 func (m *Manager) Stop(ctx context.Context, id string) error {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if id == "" {
-		return fmt.Errorf("%w: missing service id", ErrInvalidSpec)
-	}
-	return m.adapter.Stop(ctx, id)
+	return m.withServiceOp(id, func(id string) error {
+		return m.adapter.Stop(ctx, id)
+	})
 }
 
 // Restart restarts the specified service.
 func (m *Manager) Restart(ctx context.Context, id string) error {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if id == "" {
-		return fmt.Errorf("%w: missing service id", ErrInvalidSpec)
-	}
-	return m.adapter.Restart(ctx, id)
+	return m.withServiceOp(id, func(id string) error {
+		return m.adapter.Restart(ctx, id)
+	})
 }
 
 // Status queries the live status of the service.

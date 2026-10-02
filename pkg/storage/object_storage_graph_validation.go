@@ -38,21 +38,7 @@ func (g *GraphObjectStorage) validateObject(ctx context.Context, obj map[string]
 		// TRACK: follow-up in kernel backlog
 		ProjectRoot: g.projectRoot,
 	}
-	options.ObjectLookup = func(id string) (map[string]any, error) {
-		secCtx := pkgctx.NewSystemSecurityContext()
-		return g.Read(ctx, secCtx, id)
-	}
-	options.ObjectStatusLookup = func(id string) (string, error) {
-		obj, err := options.ObjectLookup(id)
-		if err != nil {
-			return "", err
-		}
-		status, _ := obj[objects.FieldKeyStatus].(string)
-		return status, nil
-	}
-	options.DependentsLookup = func(id string) []string {
-		return DependentsForID(ctx, g, id)
-	}
+	BindValidationLookups(options, ctx, g, pkgctx.NewSystemSecurityContext())
 
 	result, err := g.validator.Validate(ctx, obj, kind, options)
 	if err != nil {
@@ -113,11 +99,7 @@ func (g *GraphObjectStorage) validateObject(ctx context.Context, obj map[string]
 //
 //nolint:gocyclo // Function orchestrates reference validation; complexity reduced via helper methods
 func (g *GraphObjectStorage) validateReferences(ctx context.Context, obj map[string]any, kind string) error {
-	// Extract reference fields
-	yamlParser := parser.NewYAMLParser()
-	refFields := yamlParser.ExtractReferenceFields(obj)
-
-	// Track which objects we've already checked
+	refFields := parser.NewYAMLParser().ExtractReferenceFields(obj)
 	checkedRefs := make(map[string]bool)
 
 	// Validate each reference field
@@ -137,24 +119,7 @@ func (g *GraphObjectStorage) validateReferences(ctx context.Context, obj map[str
 
 // extractReferenceIDs extracts reference IDs from various formats
 func (g *GraphObjectStorage) extractReferenceIDs(refValue any) []string {
-	var refIDs []string
-
-	switch v := refValue.(type) {
-	case string:
-		if v != emptyValue {
-			refIDs = []string{v}
-		}
-	case []any:
-		for _, item := range v {
-			if str, ok := item.(string); ok && str != emptyValue {
-				refIDs = append(refIDs, str)
-			}
-		}
-	case []string:
-		refIDs = v
-	}
-
-	return refIDs
+	return ExtractReferenceIDs(refValue)
 }
 
 // validateReferenceIDs validates a list of reference IDs

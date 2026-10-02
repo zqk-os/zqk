@@ -196,15 +196,8 @@ func (f *FileObjectStorage) ensureObjectID(ctx context.Context, obj map[string]a
 	}
 
 	// Validate ID format (strict - must pass validation); LoadPatterns waits if another goroutine is loading
-	if err := f.idValidator.LoadPatterns(); err != nil {
-		return "", errfmt.Newf(ErrMsgLoadIDPatternsValidation).Wrap(err)
-	}
-	valid, err := f.idValidator.ValidateID(id, kind)
-	if err != nil {
-		return "", errfmt.Newf(ErrMsgValidateID).Wrap(err)
-	}
-	if !valid {
-		return "", errfmt.Errorf(ErrMsgInvalidIDFormat, kind, id)
+	if err := ValidateIDFormatStrict(f.idValidator, id, kind); err != nil {
+		return "", err
 	}
 
 	return id, nil

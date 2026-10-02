@@ -110,6 +110,29 @@ func (f *FileObjectStorage) walkBucketedStorageByDateRange(ctx context.Context, 
 	return filePaths
 }
 
+func shouldSkipStorageWalkEntry(ctx context.Context, path string, info fileutil.FileInfo, err error, eventLogger *logging.EventLogger) (bool, error) {
+	select {
+	case <-ctx.Done():
+		return false, ctx.Err()
+	default:
+	}
+
+	if err != nil {
+		if eventLogger != nil {
+			StorageLog(eventLogger.Logger()).Debug(LogEventStorageListCollectionWalkErrorSkippingDebug).
+				String("path", path).
+				WithError(err).
+				Log()
+		}
+		return true, nil
+	}
+
+	if info == nil || info.IsDir() || appledouble.SkipPathInTreeWalk(path) {
+		return true, nil
+	}
+	return false, nil
+}
+
 // collectFilePathsWithStrategy collects all YAML file paths from a kind directory
 // Uses the bucketing strategy to understand where files are stored
 // If timeRange is provided, only walks date subdirectories within that range
@@ -165,26 +188,11 @@ func (f *FileObjectStorage) collectFilePathsWithStrategy(ctx context.Context, ki
 				String("kind_dir", kindDir).
 				Log()
 			err := filepath.Walk(kindDir, func(path string, info fileutil.FileInfo, err error) error {
-				// Check context cancellation
-				select {
-				case <-ctx.Done():
-					return ctx.Err()
-				default:
+				skip, skipErr := shouldSkipStorageWalkEntry(ctx, path, info, err, eventLogger)
+				if skipErr != nil {
+					return skipErr
 				}
-
-				if err != nil {
-					if eventLogger != nil {
-						StorageLog(eventLogger.Logger()).Debug(LogEventStorageListCollectionWalkErrorSkippingDebug).
-							String("path", path).
-							WithError(err).
-							Log()
-					}
-					return nil // Skip errors, continue walking
-				}
-				if info == nil || info.IsDir() {
-					return nil
-				}
-				if appledouble.SkipPathInTreeWalk(path) {
+				if skip {
 					return nil
 				}
 				config := GetStorageConfig()
@@ -286,28 +294,11 @@ func (f *FileObjectStorage) collectFilePathsUsingStrategy(ctx context.Context, _
 	// For path-based strategies, files are in subdirectories
 	// For chrono strategies, files are in date-based subdirectories
 	err := filepath.Walk(kindDir, func(path string, info fileutil.FileInfo, err error) error {
-		// Check context cancellation
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		default:
+		skip, skipErr := shouldSkipStorageWalkEntry(ctx, path, info, err, eventLogger)
+		if skipErr != nil {
+			return skipErr
 		}
-
-		if err != nil {
-			if eventLogger != nil {
-				StorageLog(eventLogger.Logger()).Debug(LogEventStorageListCollectionWalkErrorSkippingDebug).
-					String("path", path).
-					WithError(err).
-					Log()
-			}
-			return nil // Skip errors, continue walking
-		}
-
-		if info == nil || info.IsDir() {
-			return nil
-		}
-
-		if appledouble.SkipPathInTreeWalk(path) {
+		if skip {
 			return nil
 		}
 

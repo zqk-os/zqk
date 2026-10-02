@@ -157,9 +157,7 @@ func NewMemoryExecutor(responses map[string]*MockCmd) CommandExecutor {
 	}
 }
 
-// Execute is a helper wrapper for convenience (used in some tests).
-func (n *NativeExecutor) Execute(ctx context.Context, dir string, env []string, name string, args ...string) ([]byte, error) {
-	cmd := n.CommandContext(ctx, name, args...)
+func executeCmdWithOutput(cmd Cmd, dir string, env []string) ([]byte, error) {
 	cmd.SetDir(dir)
 	cmd.SetEnv(env)
 	var buf bytes.Buffer
@@ -169,15 +167,13 @@ func (n *NativeExecutor) Execute(ctx context.Context, dir string, env []string, 
 	return buf.Bytes(), err
 }
 
+// Execute is a helper wrapper for convenience (used in some tests).
+func (n *NativeExecutor) Execute(ctx context.Context, dir string, env []string, name string, args ...string) ([]byte, error) {
+	return executeCmdWithOutput(n.CommandContext(ctx, name, args...), dir, env)
+}
+
 func (m *MockExecutor) Execute(ctx context.Context, dir string, env []string, name string, args ...string) ([]byte, error) {
-	cmd := m.CommandContext(ctx, name, args...)
-	cmd.SetDir(dir)
-	cmd.SetEnv(env)
-	var buf bytes.Buffer
-	cmd.SetStdout(&buf)
-	cmd.SetStderr(&buf)
-	err := cmd.Run()
-	return buf.Bytes(), err
+	return executeCmdWithOutput(m.CommandContext(ctx, name, args...), dir, env)
 }
 
 // InProcessHandler defines an in-process command execution handler.

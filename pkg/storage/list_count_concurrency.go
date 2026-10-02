@@ -78,6 +78,26 @@ func ReleaseListCountSlot(parentCtx context.Context) {
 	<-listCountSem
 }
 
+// AcquireListCountContext wraps slot acquisition with wait progress and returns a cleanup func.
+func AcquireListCountContext(ctx context.Context) (context.Context, func(), error) {
+	EmitListCountWaitProgress(ctx)
+	listCtx, err := AcquireListCountSlot(ctx)
+	if err != nil {
+		return ctx, func() {}, err
+	}
+	return listCtx, func() { ReleaseListCountSlot(ctx) }, nil
+}
+
+// WithListCountSlotInt executes fn within an acquired list/count slot, returning an int and error.
+func WithListCountSlotInt(ctx context.Context, fn func(listCtx context.Context) (int, error)) (int, error) {
+	listCtx, release, err := AcquireListCountContext(ctx)
+	if err != nil {
+		return 0, err
+	}
+	defer release()
+	return fn(listCtx)
+}
+
 // AcquireListCountSlot blocks until a slot is available or ctx is cancelled.
 // Call before starting a file-heavy List or Count (collectFilePaths + worker pool).
 // Must be paired with ReleaseListCountSlot (typically defer).

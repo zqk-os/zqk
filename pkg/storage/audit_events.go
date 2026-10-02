@@ -4,7 +4,6 @@ import (
 	"context"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"gopkg.in/yaml.v3"
 
@@ -138,40 +137,12 @@ func WriteSystemObjectAndRegisterHash(filePath string, data []byte, kind, kindDi
 //
 //nolint:unparam // expectedHash kept for API consistency with saveHashRegistryWithRetry
 func saveHashRegistryWithRetryForSystemObject(registry *HashRegistry, _, _, _ string) error {
-	const maxAttempts = 3
-	const initialDelay = 50 * time.Millisecond
-	const maxDelay = 500 * time.Millisecond
-	const backoffFactor = 2.0
-
-	var lastErr error
-	delay := initialDelay
-
-	for attempt := 0; attempt < maxAttempts; attempt++ {
-		err := registry.Save()
-		if err == nil {
-			// Success - Save() already does file.Sync(), so we trust it succeeded
-			// Git doesn't verify by reading back - it trusts the write succeeded
-			// Reading back immediately can hit file system caching issues (especially on macOS)
-			// The file.Sync() in Save() is the real guarantee, not a read-back verification
-			return nil
-		}
-		lastErr = err
-
-		// Last attempt, don't wait
-		if attempt == maxAttempts-1 {
-			break
-		}
-
-		// Wait before retry with exponential backoff
-		time.Sleep(delay)
-		delay = time.Duration(float64(delay) * backoffFactor)
-		if delay > maxDelay {
-			delay = maxDelay
-		}
+	if registry == nil {
+		return nil
 	}
-
-	// All retries exhausted
-	return errfmt.Errorf(ErrMsgSaveHashReg, maxAttempts, lastErr)
+	return saveHashRegistryWithExponentialBackoff(func() error {
+		return registry.Save()
+	})
 }
 
 // IsCLIOperation checks if the context indicates this is a CLI operation.

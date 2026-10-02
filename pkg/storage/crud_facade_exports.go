@@ -153,6 +153,10 @@ type SearchResult = crud.SearchResult
 var SortSearchMatches = crud.SortSearchMatches
 var ParseSearchQuery = crud.ParseSearchQuery
 var HighlightMatch = crud.HighlightMatch
+var ResolveKindsToSearch = crud.ResolveKindsToSearch
+var CheckReadPermissions = crud.CheckReadPermissions
+var PrepareSearchKinds = crud.PrepareSearchKinds
+var PaginateSearchMatches = crud.PaginateSearchMatches
 
 var NormalizeCASIDPrefix = crud.NormalizeCASIDPrefix
 var IsTestOrTempProjectRoot = crud.IsTestOrTempProjectRoot

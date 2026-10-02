@@ -19,6 +19,30 @@ import (
 	"github.com/zqk-os/zqk/pkg/when"
 )
 
+func deduplicateObjectListByID(objectList []map[string]any) []map[string]any {
+	finalSeenIDs := make(map[string]bool, len(objectList))
+	deduplicatedList := make([]map[string]any, 0, len(objectList))
+	for _, obj := range objectList {
+		objID, ok := obj[objects.FieldKeyID].(string)
+		if ok && objID != emptyValue {
+			if !finalSeenIDs[objID] {
+				finalSeenIDs[objID] = true
+				deduplicatedList = append(deduplicatedList, obj)
+			}
+		} else {
+			deduplicatedList = append(deduplicatedList, obj)
+		}
+	}
+	return deduplicatedList
+}
+
+func projectAndSetResultObjects(kind string, filter ListFilter, result *QueryResult, objectList []map[string]any) {
+	objectList = applyListFieldProjection(kind, filter, objectList)
+	result.Objects = objectList
+	projectQueryResultGroups(kind, filter, result)
+	result.Meta[ConstStreamReturnedCount] = len(objectList)
+}
+
 func (f *FileObjectStorage) ListImpl(ctx context.Context, secCtx *pkgctx.SecurityContext, storageCtx *pkgctx.StorageContext, filter ListFilter) (*QueryResult, error) {
 	// Check permission
 	if err := f.checkPermission(secCtx, "read", filter.Kind); err != nil {
@@ -52,17 +76,14 @@ func (f *FileObjectStorage) ListImpl(ctx context.Context, secCtx *pkgctx.Securit
 		return f.listCASPath(ctx, secCtx, storageCtx, filter, effectiveLimit, cacheable, eventLogger)
 	}
 
-	// Get directory for this kind
-	dirName := objects.GetDirectoryFromKind(filter.Kind)
-	if dirName == emptyValue {
-		return nil, errfmt.Errorf(ConstStreamUnknownObjectKindStr, filter.Kind)
+	kindDir, err := f.resolveKindDir(filter.Kind)
+	if err != nil {
+		return nil, err
 	}
-
-	kindDir := filepath.Join(f.processDir, dirName)
 	StorageLog(eventLogger.Logger()).Debug(LogEventStorageListMainOperationDebug).
 		String("kind_dir", kindDir).
 		String("process_dir", f.processDir).
-		String("dir_name", dirName).
+		String("dir_name", filepath.Base(kindDir)).
 		Log()
 
 	// Check if directory exists
@@ -98,12 +119,11 @@ func (f *FileObjectStorage) ListImpl(ctx context.Context, secCtx *pkgctx.Securit
 	}
 
 	// Limit concurrent file-heavy list operations so N jobs don't create N*64 workers (see list_count_concurrency.go)
-	EmitListCountWaitProgress(ctx)
-	listCtx, err := AcquireListCountSlot(ctx)
+	listCtx, releaseSlot, err := AcquireListCountContext(ctx)
 	if err != nil {
 		return nil, err
 	}
-	defer ReleaseListCountSlot(ctx)
+	defer releaseSlot()
 
 	// Collect file paths using bucketing strategy to understand storage structure
 	StorageLog(eventLogger.Logger()).Debug(LogEventStorageListMainCollectingFilePathsDebug).
@@ -394,20 +414,7 @@ done:
 	}
 
 	// Final deduplication by ID (safety check - should already be deduplicated above)
-	finalSeenIDs := make(map[string]bool)
-	deduplicatedList := make([]map[string]any, 0, len(objectList))
-	for _, obj := range objectList {
-		objID, ok := obj[objects.FieldKeyID].(string)
-		when.When(func() bool { return ok && objID != emptyValue }).Then(func() {
-			if !finalSeenIDs[objID] {
-				finalSeenIDs[objID] = true
-				deduplicatedList = append(deduplicatedList, obj)
-			}
-		}).OrElse(func() {
-			deduplicatedList = append(deduplicatedList, obj)
-		}).Run()
-	}
-	objectList = deduplicatedList
+	objectList = deduplicateObjectListByID(objectList)
 
 	// Build result (effectiveLimit computed at start of List)
 	result := &QueryResult{
@@ -468,10 +475,7 @@ done:
 		objectList = filteredObjects
 	}
 
-	objectList = applyListFieldProjection(filter.Kind, filter, objectList)
-	result.Objects = objectList
-	projectQueryResultGroups(filter.Kind, filter, result)
-	result.Meta[ConstStreamReturnedCount] = len(objectList)
+	projectAndSetResultObjects(filter.Kind, filter, result, objectList)
 	if cacheable && effectiveLimit > 0 {
 		SetListCache(f.projectRoot, &filter, effectiveLimit, result)
 	}

@@ -518,22 +518,7 @@ func formatAgentMarkdown(sessionID string, cvs map[string]any, sug map[string]an
 }
 
 func sessionPredictionsFromCVS(cvs map[string]any) map[string]any {
-	if cvs == nil {
-		return nil
-	}
-	raw, ok := cvs[objects.FieldKeyPredictions]
-	if !ok {
-		return nil
-	}
-	raw, ok = nildecode.DecodeNonNilPayload[any](raw)
-	if !ok {
-		return nil
-	}
-	m, ok := raw.(map[string]any)
-	if !ok {
-		return nil
-	}
-	return m
+	return schedpkg.ExtractNonEmptySubMap(cvs, objects.FieldKeyPredictions)
 }
 
 func convergenceFieldString(obj map[string]any, key string) string {

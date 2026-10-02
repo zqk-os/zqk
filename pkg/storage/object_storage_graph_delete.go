@@ -14,16 +14,24 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
+func (g *GraphObjectStorage) authorizeDeleteAndGetKind(ctx context.Context, secCtx *pkgctx.SecurityContext, id string) (string, error) {
+	if !IsCLIOperation(ctx, secCtx) {
+		return "", errfmt.Errorf(ConstStreamDeleteOperationsMustBePerformedThroughCli)
+	}
+	_, kind, err := readExistingKind(g, ctx, secCtx, id)
+	if err != nil {
+		return "", err
+	}
+	return kind, nil
+}
+
 func (g *GraphObjectStorage) Delete(ctx context.Context, secCtx *pkgctx.SecurityContext, id string, cascade bool) error {
 	ctx, cancel := pkgctx.EnforceTimeout(ctx, 30*time.Second)
 	defer cancel()
 	if kernelcas.IsCommit(ctx) {
 		return g.deleteImpl(ctx, secCtx, id, cascade)
 	}
-	if !IsCLIOperation(ctx, secCtx) {
-		return errfmt.Errorf(ConstStreamDeleteOperationsMustBePerformedThroughCli)
-	}
-	_, kind, err := readExistingKind(g, ctx, secCtx, id)
+	kind, err := g.authorizeDeleteAndGetKind(ctx, secCtx, id)
 	if err != nil {
 		return err
 	}
@@ -43,14 +51,7 @@ func (g *GraphObjectStorage) deleteImpl(ctx context.Context, secCtx *pkgctx.Secu
 	ctx, cancel := pkgctx.EnforceTimeout(ctx, 30*time.Second)
 	defer cancel()
 
-	// Require CLI authorization for deletions
-	// This prevents direct API calls from deleting objects without going through CLI
-	if !IsCLIOperation(ctx, secCtx) {
-		return errfmt.Errorf(ConstStreamDeleteOperationsMustBePerformedThroughCli)
-	}
-
-	// Read existing object to get kind
-	_, kind, err := readExistingKind(g, ctx, secCtx, id)
+	kind, err := g.authorizeDeleteAndGetKind(ctx, secCtx, id)
 	if err != nil {
 		return err
 	}

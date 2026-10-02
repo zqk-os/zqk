@@ -415,6 +415,14 @@ func (f *FileObjectStorage) GetKindDir(kind string) string {
 	return filepath.Join(f.processDir, dirName)
 }
 
+func (f *FileObjectStorage) resolveKindDir(kind string) (string, error) {
+	dirName := objects.GetDirectoryFromKind(kind)
+	if dirName == emptyValue {
+		return "", errfmt.Errorf(ConstStreamUnknownObjectKindStr, kind)
+	}
+	return filepath.Join(f.processDir, dirName), nil
+}
+
 const maxStreamEntriesForCacheBuild = 100000
 
 // getObjectFilePath returns the live file path for an object given its ID and kind.

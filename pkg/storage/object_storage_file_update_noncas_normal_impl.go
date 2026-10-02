@@ -85,9 +85,7 @@ func (f *FileObjectStorage) updateNonCASPathNormal(ctx context.Context, secCtx *
 					_ = dirFile.Close()
 				}
 				// Part of the transaction: list cache must reflect the write
-				f.InvalidateCachesForKind(kind)
-				f.InvalidateCASCacheForKind(kind)
-				_ = RemoveRuntimeDeltaCurrentState(f.projectRoot, kind, id)
+				f.invalidateNonCASUpdateCaches(kind, id)
 				// BLI-643: Notify subscribers of object update (test mode path)
 				executeChangeNotification(ctx, OpUpdate, kind, id, existing)
 				return nil
@@ -378,9 +376,7 @@ func (f *FileObjectStorage) updateNonCASPathNormal(ctx context.Context, secCtx *
 			Log()
 	}
 	// Part of the transaction: list cache must reflect the write
-	f.InvalidateCachesForKind(kind)
-	f.InvalidateCASCacheForKind(kind)
-	_ = RemoveRuntimeDeltaCurrentState(f.projectRoot, kind, id)
+	f.invalidateNonCASUpdateCaches(kind, id)
 
 	// Update reverse reference index (best effort - don't fail update if this fails)
 	// existing contains the old object state, and after applying updates it contains the new state
@@ -426,5 +422,10 @@ func (f *FileObjectStorage) updateNonCASPathNormal(ctx context.Context, secCtx *
 	}
 
 	return nil
+}
 
+func (f *FileObjectStorage) invalidateNonCASUpdateCaches(kind, id string) {
+	f.InvalidateCachesForKind(kind)
+	f.InvalidateCASCacheForKind(kind)
+	_ = RemoveRuntimeDeltaCurrentState(f.projectRoot, kind, id)
 }

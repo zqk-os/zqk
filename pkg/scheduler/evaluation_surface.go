@@ -5,7 +5,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/zqk-os/zqk/pkg/nildecode"
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
@@ -97,20 +96,5 @@ func evaluationSurfaceIDFromMap(m map[string]any) string {
 }
 
 func extractAfterStateSnapshot(obj map[string]any) map[string]any {
-	if obj == nil {
-		return nil
-	}
-	raw, ok := obj[objects.FieldKeyAfterStateSnapshot]
-	if !ok {
-		return nil
-	}
-	raw, ok = nildecode.DecodeNonNilPayload[any](raw)
-	if !ok {
-		return nil
-	}
-	m, ok := raw.(map[string]any)
-	if !ok || len(m) == 0 {
-		return nil
-	}
-	return m
+	return ExtractNonEmptySubMap(obj, objects.FieldKeyAfterStateSnapshot)
 }

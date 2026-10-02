@@ -12,6 +12,22 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
+func checkRateLimitTicksPerHour(h *ConvergenceSessionTickHandler, job *ScheduledJob, sessionID string, obj map[string]any, thresholds map[string]any) bool {
+	maxPerHour := thresholdMaxTicksPerHour(thresholds)
+	if activityLog, ok := obj[objects.FieldKeyActivityLog].([]any); ok && maxPerHour > 0 {
+		if n := countMeasureTicksInLastHour(activityLog, time.Now().UTC()); n >= maxPerHour {
+			ConvergenceSessionTickLog(h.logger).Info(LogEventConvergenceSessionTickSkippedMaxTicksPerHour).
+				JobID(job.ID).
+				SessionID(sessionID).
+				Int("ticks_last_hour", n).
+				Int("max_ticks_per_hour", maxPerHour).
+				Log()
+			return true
+		}
+	}
+	return false
+}
+
 type testBundleEvaluationAdapter struct{}
 
 func (testBundleEvaluationAdapter) Measure(ctx context.Context, job *ScheduledJob, sessionID string, obj map[string]any, h *ConvergenceSessionTickHandler) (*ConvergenceMeasureResult, error) {
@@ -49,17 +65,8 @@ func (testBundleEvaluationAdapter) Measure(ctx context.Context, job *ScheduledJo
 	}
 
 	thresholds, _ := obj[objects.FieldKeyThresholds].(map[string]any)
-	maxPerHour := thresholdMaxTicksPerHour(thresholds)
-	if activityLog, ok := obj[objects.FieldKeyActivityLog].([]any); ok && maxPerHour > 0 {
-		if n := countMeasureTicksInLastHour(activityLog, time.Now().UTC()); n >= maxPerHour {
-			ConvergenceSessionTickLog(h.logger).Info(LogEventConvergenceSessionTickSkippedMaxTicksPerHour).
-				JobID(job.ID).
-				SessionID(sessionID).
-				Int("ticks_last_hour", n).
-				Int("max_ticks_per_hour", maxPerHour).
-				Log()
-			return &ConvergenceMeasureResult{Skip: true}, nil
-		}
+	if checkRateLimitTicksPerHour(h, job, sessionID, obj, thresholds) {
+		return &ConvergenceMeasureResult{Skip: true}, nil
 	}
 
 	if ShouldSkipConvergencePersistForDuplicateWatermark(obj, snap) {
@@ -109,17 +116,8 @@ func (cefDiamondEvaluationAdapter) Measure(ctx context.Context, job *ScheduledJo
 	}
 
 	thresholds, _ := obj[objects.FieldKeyThresholds].(map[string]any)
-	maxPerHour := thresholdMaxTicksPerHour(thresholds)
-	if activityLog, ok := obj[objects.FieldKeyActivityLog].([]any); ok && maxPerHour > 0 {
-		if n := countMeasureTicksInLastHour(activityLog, time.Now().UTC()); n >= maxPerHour {
-			ConvergenceSessionTickLog(h.logger).Info(LogEventConvergenceSessionTickSkippedMaxTicksPerHour).
-				JobID(job.ID).
-				SessionID(sessionID).
-				Int("ticks_last_hour", n).
-				Int("max_ticks_per_hour", maxPerHour).
-				Log()
-			return &ConvergenceMeasureResult{Skip: true}, nil
-		}
+	if checkRateLimitTicksPerHour(h, job, sessionID, obj, thresholds) {
+		return &ConvergenceMeasureResult{Skip: true}, nil
 	}
 
 	res, err := BuildCEFDiamondMeasureResult(h.projectRoot, sessionID, thresholds)
