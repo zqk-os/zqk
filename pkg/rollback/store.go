@@ -14,6 +14,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/walutil"
 )
 
 const (
@@ -78,21 +79,10 @@ func (s *Store) Append(p *RollbackPoint) error {
 func (s *Store) List() ([]Meta, error) {
 	var metas []Meta
 	err := concurrency.RunInRLockWithLogger(&s.mu, LockNameRollbackStoreList, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
-		f, err := fileutil.Open(s.path)
-		if err != nil {
-			if fileutil.IsNotExist(err) {
-				return nil
-			}
-			return err
-		}
-		defer f.Close() //nolint:gosec
-		sc := bufio.NewScanner(f)
-		buf := make([]byte, 0, scannerInitialBufSize)
-		sc.Buffer(buf, maxRollbackLineSize)
-		for sc.Scan() {
+		return walutil.ScanFileLines(s.path, maxRollbackLineSize, func(line []byte) {
 			var p RollbackPoint
-			if err := json.Unmarshal(sc.Bytes(), &p); err != nil {
-				continue
+			if err := json.Unmarshal(line, &p); err != nil {
+				return
 			}
 			metas = append(metas, Meta{
 				ID:          p.ID,
@@ -101,8 +91,7 @@ func (s *Store) List() ([]Meta, error) {
 				ScopeID:     p.ScopeID,
 				ObjectCount: len(p.ObjectStates),
 			})
-		}
-		return sc.Err()
+		})
 	})
 	if err != nil {
 		return nil, err
@@ -114,28 +103,18 @@ func (s *Store) List() ([]Meta, error) {
 func (s *Store) Get(id string) (*RollbackPoint, error) {
 	var out *RollbackPoint
 	err := concurrency.RunInRLockWithLogger(&s.mu, LockNameRollbackStoreGet, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
-		f, err := fileutil.Open(s.path)
-		if err != nil {
-			if fileutil.IsNotExist(err) {
-				return nil
+		return walutil.ScanFileLines(s.path, maxRollbackLineSize, func(line []byte) {
+			if out != nil {
+				return
 			}
-			return err
-		}
-		defer f.Close() //nolint:gosec
-		sc := bufio.NewScanner(f)
-		buf := make([]byte, 0, scannerInitialBufSize)
-		sc.Buffer(buf, maxRollbackLineSize)
-		for sc.Scan() {
 			var p RollbackPoint
-			if err := json.Unmarshal(sc.Bytes(), &p); err != nil {
-				continue
+			if err := json.Unmarshal(line, &p); err != nil {
+				return
 			}
 			if p.ID == id {
 				out = &p
-				return nil
 			}
-		}
-		return sc.Err()
+		})
 	})
 	if err != nil {
 		return nil, err

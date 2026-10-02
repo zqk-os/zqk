@@ -521,10 +521,7 @@ func (v *WhatsNextMaterializedView) ApplyLifecycleEvent(ev *lifecycle.LifecycleE
 	v.mu.Lock()
 	defer v.mu.Unlock()
 
-	ts := ev.Ts
-	if ts.IsZero() {
-		ts = time.Now()
-	}
+	ts := ev.Timestamp()
 
 	switch ev.EventType {
 	case lifecycle.EventTypeStatusTransition:
@@ -721,61 +718,24 @@ func (v *WhatsNextMaterializedView) SaveToLiteFile() error {
 
 // LoadFromLiteFile reads the materialized payload directly from disk via the accumulator Engine.
 func (v *WhatsNextMaterializedView) LoadFromLiteFile() (*WhatsNextLitePayload, error) {
+	var env *accumulator.Envelope[*WhatsNextLitePayload]
+	var err error
 	if v.engine != nil {
-		env, err := v.engine.LoadFromLiteFile()
-		if err != nil {
-			return nil, err
-		}
-		if env == nil || env.Payload == nil {
-			return nil, fmt.Errorf("empty payload in envelope")
-		}
-		v.mu.Lock()
-		v.lastUpdated = env.MaterializedAt
-		v.mu.Unlock()
-		return env.Payload, nil
+		env, err = v.engine.LoadFromLiteFile()
+	} else {
+		targetPath := WhatsNextLiteFilePath(v.projectRoot)
+		env, err = accumulator.LoadEnvelopeFromLiteFile[*WhatsNextLitePayload](targetPath, MaterializedViewSchemaVersion)
 	}
-
-	targetPath := WhatsNextLiteFilePath(v.projectRoot)
-	data, err := fileutil.ReadFile(targetPath)
 	if err != nil {
 		return nil, err
 	}
-
-	var rawMap map[string]json.RawMessage
-	if err := json.Unmarshal(data, &rawMap); err != nil {
-		return nil, fmt.Errorf("unmarshal whats_next_lite: %w", err)
+	if env == nil || env.Payload == nil {
+		return nil, fmt.Errorf("empty payload in envelope")
 	}
-
-	var payload *WhatsNextLitePayload
-	var matAt time.Time
-
-	if rawPayload, ok := rawMap[objects.FieldKeyPayload]; ok && len(rawPayload) > 0 && string(rawPayload) != "null" {
-		var env accumulator.Envelope[*WhatsNextLitePayload]
-		if err := json.Unmarshal(data, &env); err == nil && env.Payload != nil {
-			payload = env.Payload
-			matAt = env.MaterializedAt
-		}
-	}
-
-	if payload == nil {
-		var flat WhatsNextLitePayload
-		if err := json.Unmarshal(data, &flat); err != nil {
-			return nil, fmt.Errorf("unmarshal whats_next_lite: %w", err)
-		}
-		payload = &flat
-		matAt = flat.MaterializedAt
-		if matAt.IsZero() {
-			if fi, err := fileutil.Stat(targetPath); err == nil {
-				matAt = fi.ModTime().UTC()
-			}
-		}
-	}
-
 	v.mu.Lock()
-	v.lastUpdated = matAt
+	v.lastUpdated = env.MaterializedAt
 	v.mu.Unlock()
-
-	return payload, nil
+	return env.Payload, nil
 }
 
 // ---------------------------------------------------------------------------

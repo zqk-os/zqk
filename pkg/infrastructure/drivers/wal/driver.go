@@ -112,29 +112,26 @@ func (s *WALSpine) Subscribe(ctx context.Context, kind string, handler infrastru
 
 // Replay reads the WAL and calls the handler for each event with seq > appliedSeq.
 func (s *WALSpine) Replay(ctx context.Context, appliedSeq int64, handler infrastructure.Handler) error {
-	f, err := fileutil.Open(s.path)
-	if err != nil {
-		if fileutil.IsNotExist(err) {
-			return nil
+	var handlerErr error
+	err := walutil.ScanFileLines(s.path, 0, func(line []byte) {
+		if handlerErr != nil {
+			return
 		}
-		return err
-	}
-	defer f.Close() //nolint:gosec
-
-	sc := bufio.NewScanner(f)
-	for sc.Scan() {
 		var rec walRecord
-		if err := json.Unmarshal(sc.Bytes(), &rec); err != nil {
-			continue
+		if err := json.Unmarshal(line, &rec); err != nil {
+			return
 		}
 		if rec.Seq <= appliedSeq {
-			continue
+			return
 		}
 		if err := handler(ctx, rec.Event); err != nil {
-			return err
+			handlerErr = err
 		}
+	})
+	if handlerErr != nil {
+		return handlerErr
 	}
-	return sc.Err()
+	return err
 }
 
 func (s *WALSpine) Close() error {
