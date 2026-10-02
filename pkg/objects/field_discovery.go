@@ -574,6 +574,7 @@ func GetGlobalFieldRegistry() *FieldRegistry {
 func ResetGlobalFieldRegistryForTesting() {
 	globalFieldRegistryMu.Lock()
 	defer globalFieldRegistryMu.Unlock()
+	discoveredSpecsDirs.Reset()
 	fieldRegistryMemos.Reset()
 	globalFieldRegistry = nil
 }

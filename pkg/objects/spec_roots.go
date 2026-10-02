@@ -9,6 +9,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // extraSpecRoots are spec directories a linked pack registered.
@@ -208,15 +209,23 @@ func pathInExtraSpecRoot(absPath string) bool {
 		return false
 	}
 	target = filepath.Clean(target)
+	repoRoot, _ := moduleRootForSpecs()
+	testRoot := zqkenv.TestRoot().Get()
 	for _, root := range ExtraSpecRoots() {
-		rel, err := filepath.Rel(filepath.Clean(root), target)
-		if err != nil {
-			continue
+		cleanRoot := filepath.Clean(root)
+		rel, err := filepath.Rel(cleanRoot, target)
+		if err == nil && rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+			return true
 		}
-		if rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
-			continue
+		if repoRoot != "" && testRoot != "" {
+			if relToRepo, err := filepath.Rel(repoRoot, cleanRoot); err == nil && !strings.HasPrefix(relToRepo, "..") {
+				testEquiv := filepath.Join(testRoot, relToRepo)
+				rel, err := filepath.Rel(testEquiv, target)
+				if err == nil && rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+					return true
+				}
+			}
 		}
-		return true
 	}
 	return false
 }
