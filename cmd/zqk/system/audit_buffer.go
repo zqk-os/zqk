@@ -28,21 +28,16 @@ func NewAuditBufferCmd() *cobra.Command {
 		AddExample("Disable buffer", "%s system audit-buffer disable").
 		ExcludeCommonFlags()
 
-	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewSystemAuditBufferCommandBuilder(
-
-	// Apply help builder to command
-	), &cobra.Command{
+	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewSystemAuditBufferCommandBuilder(), &cobra.Command{
 		Use: "audit-buffer",
 	})
-
-	helpBuilder.ApplyToCommand(cmd)
 
 	cmd.AddCommand(NewAuditBufferStatsCmd())
 	cmd.AddCommand(NewAuditBufferFlushCmd())
 	cmd.AddCommand(NewAuditBufferEnableCmd())
 	cmd.AddCommand(NewAuditBufferDisableCmd())
 
-	return cmd
+	return cli.FinalizeBareCommand(cmd, helpBuilder)
 }
 
 // NewAuditBufferStatsCmd creates a command to view buffer statistics

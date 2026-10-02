@@ -35,18 +35,13 @@ func NewSchedulerHealthMetricsCmd() *cobra.Command {
 		AddExample("View existing health metrics", "%s internal list scheduler_health_metric").
 		ExcludeCommonFlags()
 
-	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewSystemSchedulerHealthCommandBuilder(
-
-	// Apply help builder to command
-	), &cobra.Command{
+	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewSystemSchedulerHealthCommandBuilder(), &cobra.Command{
 		Use: "scheduler-health",
 	})
 
-	helpBuilder.ApplyToCommand(cmd)
-
 	cmd.AddCommand(NewSchedulerHealthMetricsTestCmd())
 
-	return cmd
+	return cli.FinalizeBareCommand(cmd, helpBuilder)
 }
 
 // NewSchedulerHealthMetricsTestCmd creates a command to generate a test health metric
@@ -71,13 +66,7 @@ func NewSchedulerHealthMetricsTestCmd() *cobra.Command {
 		return createTestSchedulerHealthMetric(ctx, cmd)
 	})
 
-	// Apply help builder to command
-	helpBuilder.ApplyToCommand(testCmd)
-
-	// Add common flags
-	cli.AddCommonFlags(testCmd)
-
-	return testCmd
+	return cli.FinalizeCommand(testCmd, helpBuilder)
 }
 
 // createTestSchedulerHealthMetric creates a dummy health metric for inspection

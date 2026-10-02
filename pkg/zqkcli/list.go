@@ -39,12 +39,8 @@ func NewInternalListCmd() *cobra.Command {
 		RunE: runInternalList,
 	}
 
-	// Apply help builder to command
-	helpBuilder.ApplyToCommand(cmd)
-
 	// Trait harness list flags first (so AddCommonFlags skips format if already added)
 	clipkg.AddListFlags(cmd)
-	cli.AddCommonFlags(cmd)
 
 	// Internal-specific flags
 	cmd.Flags().Bool("built-in", false, "Filter for built-in instances only")
@@ -59,7 +55,7 @@ func NewInternalListCmd() *cobra.Command {
 	ensureCmdAnnotations(cmd)
 	cmd.Annotations[AnnotationKindValidate] = KindValidateInternalListOptional
 
-	return cmd
+	return cli.FinalizeCommand(cmd, helpBuilder)
 }
 
 func runInternalList(cmd *cobra.Command, args []string) error {

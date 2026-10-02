@@ -36,16 +36,12 @@ func NewInternalDeleteCmd() *cobra.Command {
 		Args: cobra.ExactArgs(1),
 	}
 
-	// Apply help builder to command
-	helpBuilder.ApplyToCommand(cmd)
-
 	cli.BindAsyncProgress(cmd, runInternalDelete)
-	cli.AddCommonFlags(cmd)
 	cmd.Flags().Bool("cascade", false, "Delete object and all objects that reference it")
 	cmd.Flags().Bool("unlink-references", false, "Strip this ID from dependents' reference fields, then delete (does not delete dependent objects)")
 	cmd.Flags().Bool("dry-run", false, "Show what would be deleted without actually deleting it")
 
-	return cmd
+	return cli.FinalizeCommand(cmd, helpBuilder)
 }
 
 func runInternalDelete(cmd *cobra.Command, args []string) error {
