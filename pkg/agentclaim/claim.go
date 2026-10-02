@@ -37,6 +37,25 @@ type ClaimOptions struct {
 	CheckinCadence time.Duration
 }
 
+func readOccupiableTask(ctx context.Context, sp storage.ObjectStorageProvider, sec *pkgctx.SecurityContext, taskID string) (map[string]any, string, Result, error) {
+	if sp == nil {
+		return nil, "", Result{}, errfmt.Errorf("storage unavailable")
+	}
+	task, err := sp.Read(ctx, sec, taskID)
+	if err != nil {
+		return nil, "", Result{}, errfmt.Newf("read task %s", taskID).Wrap(err)
+	}
+	kind, _ := task[objects.FieldKeyKind].(string)
+	if kind == "" {
+		kind = validation.GetIDValidator().InferKindFromID(taskID)
+	}
+	hasTrait, _ := objects.KindHasTrait(kind, objects.TraitOccupiable)
+	if !hasTrait {
+		return nil, "", Result{Reason: "not_occupiable"}, errfmt.Errorf("%s (kind %s) is not occupiable", taskID, kind)
+	}
+	return task, kind, Result{}, nil
+}
+
 // TryClaim sets claimed_by/claimed_at when the task is free or already held by claimant.
 // Contended claims (different claimed_by) fail closed.
 //
@@ -49,20 +68,9 @@ func TryClaim(ctx context.Context, sp storage.ObjectStorageProvider, sec *pkgctx
 	if claimant == "" {
 		return Result{Reason: "empty_claimant"}, errfmt.Errorf("claimed_by claimant is required")
 	}
-	if sp == nil {
-		return Result{}, errfmt.Errorf("storage unavailable")
-	}
-	task, err := sp.Read(ctx, sec, taskID)
+	task, kind, res, err := readOccupiableTask(ctx, sp, sec, taskID)
 	if err != nil {
-		return Result{}, errfmt.Newf("read task %s", taskID).Wrap(err)
-	}
-	kind, _ := task[objects.FieldKeyKind].(string)
-	if kind == "" {
-		kind = validation.GetIDValidator().InferKindFromID(taskID)
-	}
-	hasTrait, _ := objects.KindHasTrait(kind, objects.TraitOccupiable)
-	if !hasTrait {
-		return Result{Reason: "not_occupiable"}, errfmt.Errorf("%s (kind %s) is not occupiable", taskID, kind)
+		return res, err
 	}
 
 	status := strings.TrimSpace(objects.StringField(task, objects.FieldKeyStatus))
@@ -217,20 +225,9 @@ func Release(ctx context.Context, sp storage.ObjectStorageProvider, sec *pkgctx.
 			_ = ClearCheckin(projectRoot[0], taskID)
 		}
 	}()
-	if sp == nil {
-		return Result{}, errfmt.Errorf("storage unavailable")
-	}
-	task, err := sp.Read(ctx, sec, taskID)
+	task, _, res, err := readOccupiableTask(ctx, sp, sec, taskID)
 	if err != nil {
-		return Result{}, errfmt.Newf("read task %s", taskID).Wrap(err)
-	}
-	kind, _ := task[objects.FieldKeyKind].(string)
-	if kind == "" {
-		kind = validation.GetIDValidator().InferKindFromID(taskID)
-	}
-	hasTrait, _ := objects.KindHasTrait(kind, objects.TraitOccupiable)
-	if !hasTrait {
-		return Result{Reason: "not_occupiable"}, errfmt.Errorf("%s (kind %s) is not occupiable", taskID, kind)
+		return res, err
 	}
 	holder := strings.TrimSpace(objects.StringField(task, objects.FieldKeyClaimedBy))
 	if holder == "" {

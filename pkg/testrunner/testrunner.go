@@ -211,8 +211,7 @@ func ExecuteSubprocess(ctx context.Context, inv CriterionInvocation) CriterionRu
 	}, inv.Env)
 
 	var stdoutBuf, stderrBuf bytes.Buffer
-	cmd.Stdout = &stdoutBuf
-	cmd.Stderr = &stderrBuf
+	cmd.Stdout, cmd.Stderr = &stdoutBuf, &stderrBuf
 
 	if err := cmd.Start(); err != nil {
 		res.Duration = time.Since(start)

@@ -38,6 +38,31 @@ func getSystemCliContext(cmd *cobra.Command) (*cli.Context, error) {
 	return cli.GetContextFromCommand(cmd, initCtx)
 }
 
+// resolveSystemCliContextWithFallback gets the CLI context from cmd or initializes a new one.
+func resolveSystemCliContextWithFallback(cmd *cobra.Command) (*cli.Context, error) {
+	if cliCtx := cli.GetContext(cmd); cliCtx != nil && cliCtx.Context != nil {
+		return cliCtx, nil
+	}
+	return getSystemCliContext(cmd)
+}
+
+// initCheckCoordinationStorage creates a storage provider and cleanup closure for async check coordination.
+func initCheckCoordinationStorage(projectRoot string) (storage.ObjectStorageProvider, func()) {
+	if projectRoot == emptyValue {
+		return nil, func() {}
+	}
+	factory, err := storage.NewStorageFactory(pkgctx.NewSystemContext(), projectRoot)
+	if err != nil {
+		return nil, func() {}
+	}
+	sp := factory.GetStorage()
+	return sp, func() {
+		if sp != nil {
+			_ = sp.Shutdown(context.Background())
+		}
+	}
+}
+
 // bindSystemCliContextRunner binds an async progress handler that resolves a system CLI context.
 func bindSystemCliContextRunner(cmd *cobra.Command, fn func(cmd *cobra.Command, ctx *cli.Context, args []string) error) {
 	cli.BindAsyncProgress(cmd, func(cmd *cobra.Command, args []string) error {

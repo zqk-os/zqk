@@ -44,13 +44,11 @@ func runObjectHygieneScan(cmd *cobra.Command, _ []string) error {
 		rulesFile, _ := cmd.Flags().GetString("rules-file")
 		emitEvents, _ := cmd.Flags().GetBool("emit-events")
 
-		var err error
-		_ = err
-		logger := proc.Logger()
-		projectRoot := proc.ProjectRoot()
-		if projectRoot == emptyValue {
-			return errfmt.Errorf("project root not found")
+		projectRoot, err := requireProjectRoot(proc)
+		if err != nil {
+			return err
 		}
+		logger := proc.Logger()
 
 		storageProvider := proc.Storage()
 		if storageProvider == nil {

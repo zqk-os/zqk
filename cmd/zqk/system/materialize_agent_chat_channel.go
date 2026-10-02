@@ -36,10 +36,7 @@ func runMaterializeAgentChatChannel(cmd *cobra.Command, _ []string) error {
 		if err != nil {
 			return err
 		}
-		dryRun, err := cmd.Flags().GetBool("dry-run")
-		if err != nil {
-			return err
-		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
 
 		ctx := proc.OperationContext()
 		obj, readErr := proc.Storage().Read(ctx, proc.SecurityContext(), feedID)

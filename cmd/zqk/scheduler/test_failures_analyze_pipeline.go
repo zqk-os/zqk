@@ -278,11 +278,10 @@ func stageCreateBacklogItems(stageCtx *pipeline.Context, p any) (any, error) {
 	fmt.Fprintf(&payload.outputBuf, "   Criteria: ≥%d failures, ≥%.0f%% failure rate\n\n", payload.minFailures, payload.failureRateThreshold*100)
 
 	ctx := pkgctx.NewSystemContext()
-	storageFactory, err := storagepkg.NewStorageFactory(ctx, payload.projectRoot)
+	storageProvider, err := cli.NewStorageProviderFromFactory(ctx, payload.projectRoot)
 	if err != nil {
-		return nil, errfmt.Newf("failed to create storage factory").Wrap(err)
+		return nil, err
 	}
-	storageProvider := storageFactory.GetStorage()
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	secCtx := pkgctx.NewSystemSecurityContext()
 

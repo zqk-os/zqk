@@ -16,32 +16,21 @@ import (
 // WaitGroupManager manages WaitGroup lifecycle for async operations
 // Provides centralized tracking and observability for all WaitGroups
 type WaitGroupManager struct {
-	wgs      map[string]*waitGroupEntry
+	wgs      map[string]*concurrency.WaitGroupEntry
 	mu       sync.RWMutex
 	observer WaitGroupObserver // Optional observer for tracking
 }
 
 // waitGroupEntry tracks a WaitGroup and its metadata
-type waitGroupEntry struct {
-	wg         *sync.WaitGroup
-	createdAt  time.Time
-	lastAccess time.Time
-	operation  string // Operation type (e.g., "create", "audit_event")
-}
+type waitGroupEntry = concurrency.WaitGroupEntry
 
 // WaitGroupObserver can be implemented to track WaitGroup lifecycle events
-type WaitGroupObserver interface {
-	OnGroupCreated(id, operation string)
-	OnGroupAdd(id string, delta int)
-	OnGroupDone(id string)
-	OnGroupWait(id string)
-	OnGroupCompleted(id string, duration time.Duration)
-}
+type WaitGroupObserver = concurrency.WaitGroupObserver
 
 // NewWaitGroupManager creates a new WaitGroupManager
 func NewWaitGroupManager() *WaitGroupManager {
 	return &WaitGroupManager{
-		wgs: make(map[string]*waitGroupEntry),
+		wgs: make(map[string]*concurrency.WaitGroupEntry),
 	}
 }
 
@@ -60,18 +49,12 @@ func (m *WaitGroupManager) CreateGroup(id, operation string) *sync.WaitGroup {
 	var observer WaitGroupObserver
 	err := concurrency.RunInLockWithLogger(&m.mu, locknames.LockNameWaitgroupManagerCreateGroup, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
 		if entry, exists := m.wgs[id]; exists {
-			entry.lastAccess = time.Now()
-			wg = entry.wg
+			entry.Touch()
+			wg = entry.WG
 			return nil
 		}
 		wg = &sync.WaitGroup{}
-		entry := &waitGroupEntry{
-			wg:         wg,
-			createdAt:  time.Now(),
-			lastAccess: time.Now(),
-			operation:  operation,
-		}
-		m.wgs[id] = entry
+		m.wgs[id] = concurrency.NewWaitGroupEntry(wg, operation)
 		observer = m.observer
 		return nil
 	})
@@ -110,15 +93,15 @@ func (m *WaitGroupManager) GetGroup(id string) *sync.WaitGroup {
 		if !exists {
 			return nil
 		}
-		entry.lastAccess = time.Now()
-		wg = entry.wg
+		entry.Touch()
+		wg = entry.WG
 		return nil
 	})
 	return wg
 }
 
-func (m *WaitGroupManager) getGroupEntry(lockName, id string) (*waitGroupEntry, WaitGroupObserver, bool) {
-	var entry *waitGroupEntry
+func (m *WaitGroupManager) getGroupEntry(lockName, id string) (*concurrency.WaitGroupEntry, WaitGroupObserver, bool) {
+	var entry *concurrency.WaitGroupEntry
 	var exists bool
 	var observer WaitGroupObserver
 	_ = concurrency.RunInRLockOrLog(&m.mu, lockName, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
@@ -143,8 +126,8 @@ func (m *WaitGroupManager) Add(id string, delta int) {
 		return
 	}
 
-	entry.wg.Add(delta)
-	entry.lastAccess = time.Now()
+	entry.WG.Add(delta)
+	entry.Touch()
 
 	// Notify observer outside lock
 	if observer != nil {
@@ -165,8 +148,8 @@ func (m *WaitGroupManager) Done(id string) {
 		return
 	}
 
-	entry.wg.Done()
-	entry.lastAccess = time.Now()
+	entry.WG.Done()
+	entry.Touch()
 
 	// Notify observer outside lock
 	if observer != nil {
@@ -203,7 +186,7 @@ func (m *WaitGroupManager) Wait(id string) {
 	}
 	wgWaitBuilder.StartWithContext(waitCtx, func(ctx context.Context) error {
 		// WaitGroup.Wait() can't be cancelled, but we check context in the select below
-		entry.wg.Wait()
+		entry.WG.Wait()
 		return nil
 	})
 
@@ -246,9 +229,9 @@ func (m *WaitGroupManager) GetGroupInfo(id string) (operation string, createdAt,
 		if !found {
 			return nil
 		}
-		op = entry.operation
-		created = entry.createdAt
-		accessed = entry.lastAccess
+		op = entry.Operation
+		created = entry.CreatedAt
+		accessed = entry.LastAccess
 		return nil
 	})
 	if err != nil {

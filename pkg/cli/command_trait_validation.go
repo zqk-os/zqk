@@ -5,6 +5,34 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
+func resolveKindTraitMap(kind string) (map[string]bool, *objects.TraitRegistry, error) {
+	registry := objects.NewTraitRegistry()
+	if registry == nil {
+		return nil, nil, nil
+	}
+
+	specLoader := objects.GetGlobalSpecLoader()
+	if specLoader == nil {
+		return nil, nil, nil
+	}
+
+	objSpec, err := specLoader.LoadSpecWithInheritance(kind + ".yaml")
+	if err != nil {
+		return nil, nil, nil
+	}
+
+	expandedTraits, err := registry.ExpandTraits(objSpec.ResolvedTraits)
+	if err != nil {
+		return nil, nil, errfmt.Errorf("failed to expand traits for kind %s: %w", kind, err)
+	}
+
+	traitMap := make(map[string]bool, len(expandedTraits))
+	for _, trait := range expandedTraits {
+		traitMap[trait] = true
+	}
+	return traitMap, registry, nil
+}
+
 // ValidateCommandTraits validates that an object kind has the required traits for a command
 // This enables early validation before attempting operations
 func ValidateCommandTraits(spec *CommandSpec, kind string) error {
@@ -12,35 +40,9 @@ func ValidateCommandTraits(spec *CommandSpec, kind string) error {
 		return nil // No spec, no validation needed
 	}
 
-	// Get trait registry (create new instance)
-	registry := objects.NewTraitRegistry()
-	if registry == nil {
-		return nil // No registry available, skip validation
-	}
-
-	// Get object spec to check traits
-	specLoader := objects.GetGlobalSpecLoader()
-	if specLoader == nil {
-		return nil // No spec loader, skip validation
-	}
-
-	// Load object spec (use LoadSpecWithInheritance to get resolved traits)
-	objSpec, err := specLoader.LoadSpecWithInheritance(kind + ".yaml")
-	if err != nil {
-		// Object spec not found - this is handled elsewhere, just skip trait validation
-		return nil
-	}
-
-	// Expand object traits (handles trait groups)
-	expandedTraits, err := registry.ExpandTraits(objSpec.ResolvedTraits)
-	if err != nil {
-		return errfmt.Errorf("failed to expand traits for kind %s: %w", kind, err)
-	}
-
-	// Build trait map for quick lookup
-	traitMap := make(map[string]bool)
-	for _, trait := range expandedTraits {
-		traitMap[trait] = true
+	traitMap, registry, err := resolveKindTraitMap(kind)
+	if err != nil || traitMap == nil {
+		return err
 	}
 
 	// Check required traits
@@ -80,35 +82,9 @@ func ValidateCommandTraitsWithFlags(spec *CommandSpec, kind string, flags map[st
 		return nil // No conditional traits to check
 	}
 
-	// Get trait registry (create new instance)
-	registry := objects.NewTraitRegistry()
-	if registry == nil {
-		return nil // No registry available, skip validation
-	}
-
-	// Get object spec to check traits
-	specLoader := objects.GetGlobalSpecLoader()
-	if specLoader == nil {
-		return nil // No spec loader, skip validation
-	}
-
-	// Load object spec (use LoadSpecWithInheritance to get resolved traits)
-	objSpec, err := specLoader.LoadSpecWithInheritance(kind + ".yaml")
-	if err != nil {
-		// Object spec not found - this is handled elsewhere, just skip trait validation
-		return nil
-	}
-
-	// Expand object traits
-	expandedTraits, err := registry.ExpandTraits(objSpec.ResolvedTraits)
-	if err != nil {
-		return errfmt.Errorf("failed to expand traits for kind %s: %w", kind, err)
-	}
-
-	// Build trait map for quick lookup
-	traitMap := make(map[string]bool)
-	for _, trait := range expandedTraits {
-		traitMap[trait] = true
+	traitMap, _, err := resolveKindTraitMap(kind)
+	if err != nil || traitMap == nil {
+		return err
 	}
 
 	// Check conditional traits

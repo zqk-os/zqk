@@ -156,8 +156,6 @@ func executeBulkDelete(cmd *cobra.Command, ids []string, proc *cli.Processor) er
 	}
 
 	// Output results (format respects context precedence: system -> user -> project -> command)
-	format := string(proc.Format())
-	outputBulkResult(cmd, result, format, "delete")
-
+	outputBulkResult(cmd, result, string(proc.Format()), "delete")
 	return nil
 }

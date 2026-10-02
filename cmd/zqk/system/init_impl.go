@@ -890,11 +890,10 @@ func runInteractiveWizard(projectRoot string, logger logging.Logger) error {
 
 	// Save the objects (core-backlog: create first-class mission/vision).
 	ctx := pkgctx.NewSystemContext()
-	factory, err := storage.NewStorageFactory(ctx, projectRoot)
+	sp, err := createSystemStorageProvider(ctx, projectRoot)
 	if err != nil {
-		return errfmt.Newf("failed to create storage factory").Wrap(err)
+		return err
 	}
-	sp := factory.GetStorage()
 	secCtx := pkgctx.NewSystemSecurityContext()
 	var createErrs []string
 	var missionID, visionID string

@@ -20,7 +20,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
-	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // BaselineMetrics contains baseline performance and result metrics

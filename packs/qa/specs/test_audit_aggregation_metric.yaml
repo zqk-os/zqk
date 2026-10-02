@@ -196,6 +196,7 @@ fields:
       default: auto-calculated during aggregation
       dependencies: aggregation system.
       observability: "yes"
+      origin_lifecycle: immutable
       purpose: Total number of audit events aggregated into this metric.
       security: non-sensitive
       system_usage:

@@ -72,94 +72,91 @@ func NoteSignificantCacheChange(projectRoot, reason string) {
 	NoteSignificantCacheChangeDetail(projectRoot, reason, 0, 0)
 }
 
-// NoteSignificantCacheChangeDetail is NoteSignificantCacheChange with optional counts.
-func NoteSignificantCacheChangeDetail(projectRoot, reason string, pendingCount, mutationCount int) {
-	if projectRoot == emptyValue || reason == emptyValue {
-		return
+func resolveSignificantCacheChangePath(projectRoot string) (string, bool) {
+	if projectRoot == emptyValue {
+		return "", false
 	}
 	if abs, err := filepath.Abs(projectRoot); err == nil {
 		projectRoot = abs
 	}
-	significantCacheChangeMu.Lock()
-	defer significantCacheChangeMu.Unlock()
-
-	path := significantCacheChangePath(projectRoot)
-	if err := fileutil.MkdirAll(filepath.Dir(path), paths.DirPerm755); err != nil {
-		return
-	}
-	marker := SignificantCacheChange{
-		Version:   "1.0.0",
-		Reason:    reason,
-		NotedAt:   time.Now().UTC().Format(time.RFC3339Nano),
-		Project:   projectRoot,
-		PendingN:  pendingCount,
-		Mutations: mutationCount,
-	}
-	data, err := json.MarshalIndent(marker, "", "  ")
-	if err != nil {
-		return
-	}
-	data = append(data, '\n')
-	_ = fileutil.WriteFile(path, data, paths.FilePerm644)
+	return significantCacheChangePath(projectRoot), true
 }
 
-// PeekSignificantCacheChange returns the marker without consuming it.
-func PeekSignificantCacheChange(projectRoot string) (SignificantCacheChange, bool) {
-	if projectRoot == emptyValue {
-		return SignificantCacheChange{}, false
-	}
-	if abs, err := filepath.Abs(projectRoot); err == nil {
-		projectRoot = abs
+func withSignificantCacheChangeLocked(projectRoot string, fn func(path string)) {
+	path, ok := resolveSignificantCacheChangePath(projectRoot)
+	if !ok {
+		return
 	}
 	significantCacheChangeMu.Lock()
 	defer significantCacheChangeMu.Unlock()
-
-	data, err := fileutil.ReadFile(significantCacheChangePath(projectRoot))
-	if err != nil {
-		return SignificantCacheChange{}, false
-	}
-	var marker SignificantCacheChange
-	if err := json.Unmarshal(data, &marker); err != nil || marker.Reason == emptyValue {
-		return SignificantCacheChange{}, false
-	}
-	return marker, true
+	fn(path)
 }
 
-// ConsumeSignificantCacheChange returns and removes the marker so a subsequent
-// check does not keep forcing full clear+rebuild.
-func ConsumeSignificantCacheChange(projectRoot string) (SignificantCacheChange, bool) {
-	if projectRoot == emptyValue {
+func readSignificantCacheChangeLocked(projectRoot string, removeAfterRead bool) (SignificantCacheChange, bool) {
+	path, ok := resolveSignificantCacheChangePath(projectRoot)
+	if !ok {
 		return SignificantCacheChange{}, false
-	}
-	if abs, err := filepath.Abs(projectRoot); err == nil {
-		projectRoot = abs
 	}
 	significantCacheChangeMu.Lock()
 	defer significantCacheChangeMu.Unlock()
 
-	path := significantCacheChangePath(projectRoot)
 	data, err := fileutil.ReadFile(path)
 	if err != nil {
 		return SignificantCacheChange{}, false
 	}
 	var marker SignificantCacheChange
 	if err := json.Unmarshal(data, &marker); err != nil || marker.Reason == emptyValue {
-		_ = fileutil.Remove(path)
+		if removeAfterRead {
+			_ = fileutil.Remove(path)
+		}
 		return SignificantCacheChange{}, false
 	}
-	_ = fileutil.Remove(path)
+	if removeAfterRead {
+		_ = fileutil.Remove(path)
+	}
 	return marker, true
+}
+
+// NoteSignificantCacheChangeDetail is NoteSignificantCacheChange with optional counts.
+func NoteSignificantCacheChangeDetail(projectRoot, reason string, pendingCount, mutationCount int) {
+	if reason == emptyValue {
+		return
+	}
+	withSignificantCacheChangeLocked(projectRoot, func(path string) {
+		if err := fileutil.MkdirAll(filepath.Dir(path), paths.DirPerm755); err != nil {
+			return
+		}
+		marker := SignificantCacheChange{
+			Version:   "1.0.0",
+			Reason:    reason,
+			NotedAt:   time.Now().UTC().Format(time.RFC3339Nano),
+			Project:   projectRoot,
+			PendingN:  pendingCount,
+			Mutations: mutationCount,
+		}
+		data, err := json.MarshalIndent(marker, "", "  ")
+		if err != nil {
+			return
+		}
+		data = append(data, '\n')
+		_ = fileutil.WriteFile(path, data, paths.FilePerm644)
+	})
+}
+
+// PeekSignificantCacheChange returns the marker without consuming it.
+func PeekSignificantCacheChange(projectRoot string) (SignificantCacheChange, bool) {
+	return readSignificantCacheChangeLocked(projectRoot, false)
+}
+
+// ConsumeSignificantCacheChange returns and removes the marker so a subsequent
+// check does not keep forcing full clear+rebuild.
+func ConsumeSignificantCacheChange(projectRoot string) (SignificantCacheChange, bool) {
+	return readSignificantCacheChangeLocked(projectRoot, true)
 }
 
 // ResetSignificantCacheChangeForTest clears the marker file (tests only).
 func ResetSignificantCacheChangeForTest(projectRoot string) {
-	if projectRoot == emptyValue {
-		return
-	}
-	if abs, err := filepath.Abs(projectRoot); err == nil {
-		projectRoot = abs
-	}
-	significantCacheChangeMu.Lock()
-	defer significantCacheChangeMu.Unlock()
-	_ = fileutil.Remove(significantCacheChangePath(projectRoot))
+	withSignificantCacheChangeLocked(projectRoot, func(path string) {
+		_ = fileutil.Remove(path)
+	})
 }

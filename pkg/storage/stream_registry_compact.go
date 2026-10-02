@@ -17,28 +17,10 @@ import (
 )
 
 func CompactStreamRegistryForKind(projectRoot, kind string) error {
-	if projectRoot == emptyValue || kind == emptyValue {
+	snap := loadStreamRegistrySnapshot(projectRoot, kind)
+	if snap == nil {
 		return nil
 	}
-	key := streamRegistryCacheKey(projectRoot, kind)
-
-	// Step 1: Pre-refresh the snapshot outside the global lock.
-	// For massive kinds (e.g. change_journal_entry), parsing 400MB of JSON lines can take 30s.
-	// We MUST NOT hold the global streamRegistryMu during this time, or the whole system freezes.
-	// snap is thread-safe internally (uses snap.mu).
-	streamRegistryMu.Lock()
-	snap, ok := streamRegistryCache[key]
-	if !ok {
-		snap = &streamRegistrySnapshot{
-			locations: make(map[string]string),
-			deleted:   make(map[string]bool),
-		}
-		streamRegistryCache[key] = snap
-	}
-	streamRegistryMu.Unlock()
-
-	// Parse the massive file while the rest of the system runs normally.
-	snap.refresh(projectRoot, kind)
 
 	// Step 1.5: Merge older daily segment files and get new locations
 	relocations, err := MergeDailySegmentsForKind(projectRoot, kind, snap)
