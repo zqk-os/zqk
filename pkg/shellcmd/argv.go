@@ -5,6 +5,10 @@
 // such a string on whitespace passes those tokens to the program as literal
 // arguments, so `tee -a log.jsonl >/dev/null && zqk feed steer -m "a b c"`
 // makes tee create one file per word in the working directory.
+//
+// On Windows (runtime.GOOS == "windows"), ResolveShell detects COMSPEC (falling
+// back to cmd.exe) and uses the /c flag. See README.md for full platform
+// considerations and limitations.
 package shellcmd
 
 import (
