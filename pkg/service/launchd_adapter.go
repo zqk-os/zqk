@@ -157,6 +157,18 @@ func (a *LaunchdAdapter) Install(ctx context.Context, spec ServiceSpec) error {
 	return nil
 }
 
+func (a *LaunchdAdapter) servicePlistPath(id string) (string, error) {
+	dir, err := a.getDir()
+	if err != nil {
+		return "", err
+	}
+	plistPath := filepath.Join(dir, id+".plist")
+	if _, err := os.Stat(plistPath); os.IsNotExist(err) {
+		return "", fmt.Errorf("%w: %s", ErrServiceNotFound, id)
+	}
+	return plistPath, nil
+}
+
 func (a *LaunchdAdapter) Uninstall(ctx context.Context, id string) error {
 	dir, err := a.getDir()
 	if err != nil {
@@ -181,21 +193,22 @@ func (a *LaunchdAdapter) Uninstall(ctx context.Context, id string) error {
 	return nil
 }
 
+func (a *LaunchdAdapter) launchctlTarget(id string) (string, bool, error) {
+	if _, err := a.servicePlistPath(id); err != nil {
+		return "", false, err
+	}
+	if !a.IsAvailable() {
+		return "", false, nil
+	}
+	return strconv.Itoa(os.Getuid()), true, nil
+}
+
 func (a *LaunchdAdapter) Start(ctx context.Context, id string) error {
-	dir, err := a.getDir()
-	if err != nil {
+	uid, available, err := a.launchctlTarget(id)
+	if err != nil || !available {
 		return err
 	}
-	plistPath := filepath.Join(dir, id+".plist")
-	if _, err := os.Stat(plistPath); os.IsNotExist(err) {
-		return fmt.Errorf("%w: %s", ErrServiceNotFound, id)
-	}
 
-	if !a.IsAvailable() {
-		return nil
-	}
-
-	uid := strconv.Itoa(os.Getuid())
 	if _, err := a.runCmd(ctx, "launchctl", "kickstart", "-k", "gui/"+uid+"/"+id); err != nil {
 		if _, err2 := a.runCmd(ctx, "launchctl", "start", id); err2 != nil {
 			return fmt.Errorf("start service %s: %w", id, err)
@@ -205,20 +218,11 @@ func (a *LaunchdAdapter) Start(ctx context.Context, id string) error {
 }
 
 func (a *LaunchdAdapter) Stop(ctx context.Context, id string) error {
-	dir, err := a.getDir()
-	if err != nil {
+	uid, available, err := a.launchctlTarget(id)
+	if err != nil || !available {
 		return err
 	}
-	plistPath := filepath.Join(dir, id+".plist")
-	if _, err := os.Stat(plistPath); os.IsNotExist(err) {
-		return fmt.Errorf("%w: %s", ErrServiceNotFound, id)
-	}
 
-	if !a.IsAvailable() {
-		return nil
-	}
-
-	uid := strconv.Itoa(os.Getuid())
 	if _, err := a.runCmd(ctx, "launchctl", "kill", "SIGTERM", "gui/"+uid+"/"+id); err != nil {
 		if _, err2 := a.runCmd(ctx, "launchctl", "stop", id); err2 != nil {
 			return fmt.Errorf("stop service %s: %w", id, err)
@@ -277,19 +281,14 @@ func (a *LaunchdAdapter) CleanupLegacy(ctx context.Context, legacyIDs []string) 
 	if err != nil {
 		return nil, err
 	}
-
-	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		return nil, nil
+	entries, err := readServiceDirEntries(dir)
+	if err != nil || len(entries) == 0 {
+		return nil, err
 	}
 
 	targetSet := make(map[string]struct{}, len(legacyIDs))
 	for _, id := range legacyIDs {
 		targetSet[id] = struct{}{}
-	}
-
-	entries, err := os.ReadDir(dir)
-	if err != nil {
-		return nil, fmt.Errorf("read dir %s: %w", dir, err)
 	}
 
 	var cleaned []string

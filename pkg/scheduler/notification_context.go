@@ -188,39 +188,13 @@ func (nc *NotificationContext) Notify(notif *JobNotification) {
 				nc.history = nc.history[1:]
 			}
 
-			// Add to unacknowledged if high priority (use priority order for comparison)
-			priorityOrder := map[NotificationPriority]int{
-				PriorityCritical: 4,
-				PriorityHigh:     3,
-				PriorityMedium:   2,
-				PriorityLow:      1,
-			}
-			notifPriority := priorityOrder[notif.Priority]
-			highPriority := priorityOrder[PriorityHigh]
-			if notifPriority == 0 {
-				// Unknown priority - default to low
-				notifPriority = 1
-			}
-			if notifPriority >= highPriority {
+			// Add to unacknowledged if high priority
+			if notif.Priority.IsAtLeast(PriorityHigh) {
 				nc.unacknowledged[notif.JobID] = notif
 			}
 			return nil
 		},
 	)
-
-	// Calculate priority for channel routing (outside lock)
-	priorityOrder := map[NotificationPriority]int{
-		PriorityCritical: 4,
-		PriorityHigh:     3,
-		PriorityMedium:   2,
-		PriorityLow:      1,
-	}
-	notifPriority := priorityOrder[notif.Priority]
-	highPriority := priorityOrder[PriorityHigh]
-	if notifPriority == 0 {
-		// Unknown priority - default to low
-		notifPriority = 1
-	}
 
 	// Call custom handler if set
 	if nc.onNotification != nil {
@@ -247,7 +221,7 @@ func (nc *NotificationContext) Notify(notif *JobNotification) {
 	}
 
 	// Check if desktop notification should be shown (high+ priority)
-	if showDesktop && notifPriority >= highPriority {
+	if showDesktop && notif.Priority.IsAtLeast(PriorityHigh) {
 		select {
 		case nc.desktopChannel <- notif:
 		default:

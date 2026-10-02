@@ -3,7 +3,6 @@ package exporter
 import (
 	"context"
 	"path/filepath"
-	"strings"
 
 	"gopkg.in/yaml.v3"
 

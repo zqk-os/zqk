@@ -2,7 +2,6 @@ package storage
 
 import (
 	"sync"
-	"time"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
@@ -37,18 +36,7 @@ func (r *AuditEventBufferRegistry) GetOrCreate(projectRoot string, secCtx *pkgct
 		return buf
 	}
 
-	// Load configuration
-	config, err := LoadAggregationConfig(projectRoot)
-	if err != nil {
-		config = DefaultAggregationConfig()
-	}
-
-	windowSize := time.Hour
-	if config.WindowSize != emptyValue {
-		if parsed, err := ParseWindowSize(config.WindowSize); err == nil {
-			windowSize = parsed
-		}
-	}
+	config, windowSize := loadBufferConfigAndWindow(projectRoot)
 
 	newBuffer := NewAuditEventBufferWithConfig(projectRoot, secCtx, config.Rules, windowSize, config.Threshold, config.Enabled)
 	r.buffers[projectRoot] = newBuffer

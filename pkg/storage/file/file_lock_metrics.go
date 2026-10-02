@@ -158,6 +158,12 @@ func (m *FileLockMetrics) GetSnapshot() FileLockMetricsSnapshot {
 	}
 }
 
+// SnapshotAndDerived returns both the raw snapshot and its derived rates.
+func (m *FileLockMetrics) SnapshotAndDerived() (FileLockMetricsSnapshot, FileLockDerivedMetrics) {
+	s := m.GetSnapshot()
+	return s, s.Derived()
+}
+
 // FileLockMetricsSnapshot is a thread-safe snapshot of metrics
 type FileLockMetricsSnapshot struct {
 	TotalAcquisitions    int64
@@ -219,4 +225,24 @@ func (s FileLockMetricsSnapshot) SuccessRate() float64 {
 		return 0
 	}
 	return float64(s.TotalAcquisitions) / float64(totalAttempts)
+}
+
+// FileLockDerivedMetrics holds computed derived metrics from a snapshot.
+type FileLockDerivedMetrics struct {
+	AvgAcquisitionTime time.Duration
+	AvgWaitTime        time.Duration
+	ContentionRate     float64
+	SuccessRate        float64
+}
+
+// Derived returns the computed derived metrics from the snapshot.
+//
+//nolint:gocritic // Value receiver snapshot; copying acceptable
+func (s FileLockMetricsSnapshot) Derived() FileLockDerivedMetrics {
+	return FileLockDerivedMetrics{
+		AvgAcquisitionTime: s.AverageAcquisitionTime(),
+		AvgWaitTime:        s.AverageWaitTime(),
+		ContentionRate:     s.ContentionRate(),
+		SuccessRate:        s.SuccessRate(),
+	}
 }

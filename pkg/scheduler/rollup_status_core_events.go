@@ -1,15 +1,14 @@
 package scheduler
 
 import (
-	"encoding/json"
 	"path/filepath"
 	"sync"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
+
 
 // rollupStatusCoreEventsMu serializes appends to rollup_status_core.jsonl (convergence CLI rollup runs).
 var rollupStatusCoreEventsMu sync.Mutex
@@ -34,21 +33,9 @@ func AppendRollupStatusCoreEvent(projectRoot, convergenceSessionID string, rollu
 	if convergenceSessionID != emptyValue {
 		entry["convergence_session_id"] = convergenceSessionID
 	}
-	data, err := json.Marshal(entry)
-	if err != nil {
-		return
-	}
 	path := RollupStatusCoreEventsFilePath(projectRoot)
 	rollupStatusCoreEventsMu.Lock()
 	defer rollupStatusCoreEventsMu.Unlock()
-	if err := fileutil.EnsureDir(filepath.Dir(path)); err != nil {
-		return
-	}
-	f, err := fileutil.OpenFile(path, fileutil.O_WRONLY|fileutil.O_CREATE|fileutil.O_APPEND, paths.FilePerm600)
-	if err != nil {
-		return
-	}
-	_, _ = f.Write(data)
-	_, _ = f.WriteString("\n")
-	_ = f.Close()
+	_ = fileutil.AppendJSONLine(path, entry)
 }
+

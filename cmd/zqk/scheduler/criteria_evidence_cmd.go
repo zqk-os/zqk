@@ -3,6 +3,7 @@ package scheduler
 import (
 	"context"
 	"fmt"
+	"maps"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -169,11 +170,7 @@ func gatherLatestCriteriaEvidence(rows []map[string]any) map[string]map[string]a
 }
 
 func cloneMapShallow(m map[string]any) map[string]any {
-	out := make(map[string]any, len(m))
-	for k, v := range m {
-		out[k] = v
-	}
-	return out
+	return maps.Clone(m)
 }
 
 func applyCriteriaValidated(proc *cli.Processor, critID string) error {

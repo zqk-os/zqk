@@ -142,24 +142,27 @@ func setDispatchResourceWaitMaxForTest(d time.Duration) {
 // goroutine-ceiling gates and blocked pool submit before this attempt is abandoned (default 2h).
 // Execution max_runtime_seconds is separate and starts when the handler runs. Invalid or tiny
 // values fall back to the default; values above the cap are clamped.
+func parseDurationInRange(v string, defaultVal, minVal, maxVal time.Duration) time.Duration {
+	d, err := time.ParseDuration(v)
+	if err != nil || d < minVal {
+		return defaultVal
+	}
+	if d > maxVal {
+		return maxVal
+	}
+	return d
+}
+
 func getSchedulerDispatchResourceWaitMax() time.Duration {
 	if ns := testDispatchResourceWaitMaxNS.Load(); ns > 0 {
 		return time.Duration(ns)
 	}
-	const (
-		defaultMax = 2 * time.Hour
-		minMax     = 5 * time.Minute
-		maxMax     = 48 * time.Hour
+	return parseDurationInRange(
+		config.SchedulerDispatchResourceWaitMax().OrDefault("2h"),
+		2*time.Hour,
+		5*time.Minute,
+		48*time.Hour,
 	)
-	v := config.SchedulerDispatchResourceWaitMax().OrDefault("2h")
-	d, err := time.ParseDuration(v)
-	if err != nil || d < minMax {
-		return defaultMax
-	}
-	if d > maxMax {
-		return maxMax
-	}
-	return d
 }
 
 // getSchedulerAdmissionTimeout is how long a callback-bearing one_time immediate job may wait
@@ -170,20 +173,12 @@ func getSchedulerAdmissionTimeout() time.Duration {
 	if ns := testAdmissionTimeoutNS.Load(); ns > 0 {
 		return time.Duration(ns)
 	}
-	const (
-		defaultMax = 3 * time.Minute
-		minMax     = 10 * time.Second
-		maxMax     = 10 * time.Minute
+	return parseDurationInRange(
+		config.SchedulerAdmissionTimeout().OrDefault("3m"),
+		3*time.Minute,
+		10*time.Second,
+		10*time.Minute,
 	)
-	v := config.SchedulerAdmissionTimeout().OrDefault("3m")
-	d, err := time.ParseDuration(v)
-	if err != nil || d < minMax {
-		return defaultMax
-	}
-	if d > maxMax {
-		return maxMax
-	}
-	return d
 }
 
 // getSchedulerDefaultPackageConcurrency returns the fallback max concurrent run_wrapper jobs per

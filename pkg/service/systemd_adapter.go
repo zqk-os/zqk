@@ -173,86 +173,56 @@ func (a *SystemdAdapter) Install(ctx context.Context, spec ServiceSpec) error {
 	return nil
 }
 
-func (a *SystemdAdapter) Uninstall(ctx context.Context, id string) error {
+func (a *SystemdAdapter) serviceUnitFile(id string) (string, error) {
 	dir, err := a.getDir()
 	if err != nil {
-		return err
+		return "", err
 	}
 	unitFile := filepath.Join(dir, a.unitName(id))
+	if _, err := os.Stat(unitFile); os.IsNotExist(err) {
+		return "", fmt.Errorf("%w: %s", ErrServiceNotFound, id)
+	}
+	return unitFile, nil
+}
 
+func (a *SystemdAdapter) systemctlAction(ctx context.Context, action, id string) error {
+	if _, err := a.serviceUnitFile(id); err != nil {
+		return err
+	}
+	if !a.IsAvailable() {
+		return nil
+	}
+	if _, err := a.runCmd(ctx, "systemctl", a.systemctlArgs(action, a.unitName(id))...); err != nil {
+		return fmt.Errorf("%s unit %s: %w", action, id, err)
+	}
+	return nil
+}
+
+func (a *SystemdAdapter) Uninstall(ctx context.Context, id string) error {
+	unitFile, err := a.serviceUnitFile(id)
 	if a.IsAvailable() {
 		_, _ = a.runCmd(ctx, "systemctl", a.systemctlArgs("disable", "--now", a.unitName(id))...)
 		_, _ = a.runCmd(ctx, "systemctl", a.systemctlArgs("daemon-reload")...)
 	}
-
-	if _, err := os.Stat(unitFile); os.IsNotExist(err) {
-		return fmt.Errorf("%w: %s", ErrServiceNotFound, id)
+	if err != nil {
+		return err
 	}
-
-	if err := os.Remove(unitFile); err != nil && !os.IsNotExist(err) {
-		return fmt.Errorf("remove unit file %s: %w", unitFile, err)
+	if removeErr := os.Remove(unitFile); removeErr != nil && !os.IsNotExist(removeErr) {
+		return fmt.Errorf("remove unit file %s: %w", unitFile, removeErr)
 	}
 	return nil
 }
 
 func (a *SystemdAdapter) Start(ctx context.Context, id string) error {
-	dir, err := a.getDir()
-	if err != nil {
-		return err
-	}
-	unitFile := filepath.Join(dir, a.unitName(id))
-	if _, err := os.Stat(unitFile); os.IsNotExist(err) {
-		return fmt.Errorf("%w: %s", ErrServiceNotFound, id)
-	}
-
-	if !a.IsAvailable() {
-		return nil
-	}
-
-	if _, err := a.runCmd(ctx, "systemctl", a.systemctlArgs("start", a.unitName(id))...); err != nil {
-		return fmt.Errorf("start unit %s: %w", id, err)
-	}
-	return nil
+	return a.systemctlAction(ctx, "start", id)
 }
 
 func (a *SystemdAdapter) Stop(ctx context.Context, id string) error {
-	dir, err := a.getDir()
-	if err != nil {
-		return err
-	}
-	unitFile := filepath.Join(dir, a.unitName(id))
-	if _, err := os.Stat(unitFile); os.IsNotExist(err) {
-		return fmt.Errorf("%w: %s", ErrServiceNotFound, id)
-	}
-
-	if !a.IsAvailable() {
-		return nil
-	}
-
-	if _, err := a.runCmd(ctx, "systemctl", a.systemctlArgs("stop", a.unitName(id))...); err != nil {
-		return fmt.Errorf("stop unit %s: %w", id, err)
-	}
-	return nil
+	return a.systemctlAction(ctx, "stop", id)
 }
 
 func (a *SystemdAdapter) Restart(ctx context.Context, id string) error {
-	dir, err := a.getDir()
-	if err != nil {
-		return err
-	}
-	unitFile := filepath.Join(dir, a.unitName(id))
-	if _, err := os.Stat(unitFile); os.IsNotExist(err) {
-		return fmt.Errorf("%w: %s", ErrServiceNotFound, id)
-	}
-
-	if !a.IsAvailable() {
-		return nil
-	}
-
-	if _, err := a.runCmd(ctx, "systemctl", a.systemctlArgs("restart", a.unitName(id))...); err != nil {
-		return fmt.Errorf("restart unit %s: %w", id, err)
-	}
-	return nil
+	return a.systemctlAction(ctx, "restart", id)
 }
 
 func (a *SystemdAdapter) Status(ctx context.Context, id string) (ServiceStatus, error) {
@@ -307,19 +277,15 @@ func (a *SystemdAdapter) CleanupLegacy(ctx context.Context, legacyIDs []string) 
 	if err != nil {
 		return nil, err
 	}
-	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		return nil, nil
+	entries, err := readServiceDirEntries(dir)
+	if err != nil || len(entries) == 0 {
+		return nil, err
 	}
 
 	targetSet := make(map[string]struct{}, len(legacyIDs))
 	for _, id := range legacyIDs {
 		targetSet[a.unitName(id)] = struct{}{}
 		targetSet[id] = struct{}{}
-	}
-
-	entries, err := os.ReadDir(dir)
-	if err != nil {
-		return nil, fmt.Errorf("read dir %s: %w", dir, err)
 	}
 
 	var cleaned []string

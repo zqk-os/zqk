@@ -219,34 +219,23 @@ func (q *CASOrphanCleanupQueue) processBatch(batch []*orphanCleanupRequest) {
 	}
 }
 
-// emitBatchProcessingEvent emits a batch processing event via coordinator
-// This provides unified observability through coordinator (logging, audit, metrics, operational)
-// Skips emission for successful single-file cleanups to avoid log spam when orphans are produced one-at-a-time (e.g. trickle of CAS updates).
-func (q *CASOrphanCleanupQueue) emitBatchProcessingEvent(
+func (q *CASOrphanCleanupQueue) emitCleanupCoordinatorEvent(
+	operationIDFormat, operationType, status, eventLabel string,
 	batchSize, successCount, failureCount int,
 	duration time.Duration,
 	failedFiles []string,
 ) {
-	if batchSize == 1 && failureCount == 0 {
-		return
-	}
 	callback := getOrphanCleanupEventCallback()
 	projectRoot := q.GetProjectRoot()
 	storage := q.GetStorage()
 	if callback == nil || projectRoot == emptyValue || storage == nil {
-
 		return
 	}
 
 	ctx := pkgctx.NewSystemContext()
-	operationID := fmt.Sprintf(ConstStreamOrphanCleanupBatchInt, time.Now().Unix())
-	operationType := ConstStreamOrphanCleanupBatch
-	status := "complete"
-	if failureCount > 0 {
-		status = ConstStreamPartialFailure
-	}
+	operationID := fmt.Sprintf(operationIDFormat, time.Now().Unix())
 
-	goroutinelabels.NewGoroutine(ConstStreamOrphanCleanupCoordinatorEvent, ConstStreamEmittingBatchProcessingEventViaCoordinator).
+	goroutinelabels.NewGoroutine(ConstStreamOrphanCleanupCoordinatorEvent, eventLabel).
 		StartSimple(func() {
 			callback(
 				ctx,
@@ -264,6 +253,34 @@ func (q *CASOrphanCleanupQueue) emitBatchProcessingEvent(
 		})
 }
 
+// emitBatchProcessingEvent emits a batch processing event via coordinator
+// This provides unified observability through coordinator (logging, audit, metrics, operational)
+// Skips emission for successful single-file cleanups to avoid log spam when orphans are produced one-at-a-time (e.g. trickle of CAS updates).
+func (q *CASOrphanCleanupQueue) emitBatchProcessingEvent(
+	batchSize, successCount, failureCount int,
+	duration time.Duration,
+	failedFiles []string,
+) {
+	if batchSize == 1 && failureCount == 0 {
+		return
+	}
+	status := "complete"
+	if failureCount > 0 {
+		status = ConstStreamPartialFailure
+	}
+	q.emitCleanupCoordinatorEvent(
+		ConstStreamOrphanCleanupBatchInt,
+		ConstStreamOrphanCleanupBatch,
+		status,
+		ConstStreamEmittingBatchProcessingEventViaCoordinator,
+		batchSize,
+		successCount,
+		failureCount,
+		duration,
+		failedFiles,
+	)
+}
+
 // emitWorkerLifecycleEvent emits a worker lifecycle event via coordinator
 func (q *CASOrphanCleanupQueue) emitWorkerLifecycleEvent(
 	status, operationType string,
@@ -271,33 +288,17 @@ func (q *CASOrphanCleanupQueue) emitWorkerLifecycleEvent(
 	duration time.Duration,
 	failedFiles []string,
 ) {
-	callback := getOrphanCleanupEventCallback()
-	projectRoot := q.GetProjectRoot()
-	storage := q.GetStorage()
-	if callback == nil || projectRoot == emptyValue || storage == nil {
-
-		return
-	}
-
-	ctx := pkgctx.NewSystemContext()
-	operationID := fmt.Sprintf(ConstStreamOrphanCleanupWorkerInt, time.Now().Unix())
-
-	goroutinelabels.NewGoroutine(ConstStreamOrphanCleanupCoordinatorEvent, ConstStreamEmittingWorkerLifecycleEventViaCoordinator).
-		StartSimple(func() {
-			callback(
-				ctx,
-				projectRoot,
-				storage,
-				operationID,
-				operationType,
-				status,
-				batchSize,
-				successCount,
-				failureCount,
-				duration,
-				failedFiles,
-			)
-		})
+	q.emitCleanupCoordinatorEvent(
+		ConstStreamOrphanCleanupWorkerInt,
+		operationType,
+		status,
+		ConstStreamEmittingWorkerLifecycleEventViaCoordinator,
+		batchSize,
+		successCount,
+		failureCount,
+		duration,
+		failedFiles,
+	)
 }
 
 // createCleanupBatchAuditEvent creates an audit event for a cleanup batch

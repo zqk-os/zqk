@@ -62,7 +62,7 @@ func (idx *IDIndex) snapshotMapsLocked() (map[string]string, map[string]string, 
 // clobber a fresher index written by another process (sync-cas-index / heal).
 // TRACK: follow-up in kernel backlog
 func (idx *IDIndex) Save() error {
-	if isStreamKind(idx.Kind) {
+	if isStreamKind(idx.Kind) && len(idx.Mappings) == 0 {
 		return nil
 	}
 	if len(idx.Mappings) == 0 {
@@ -70,7 +70,6 @@ func (idx *IDIndex) Save() error {
 			return nil
 		}
 	}
-
 	metrics := getSafeMetrics()
 	return idx.withIndexFileLock(metrics, func() error {
 		var mappingsCopy, bucketKeysCopy, createdAtsCopy map[string]string
@@ -108,7 +107,7 @@ func (idx *IDIndex) withIndexFileLock(metrics StorageMetrics, fn func() error) e
 // Internal helper for use by the CAS index write queue worker.
 // bucketKeys and createdAts may be nil; when non-nil they are written (created_at for OldestIDs).
 func (idx *IDIndex) SaveMappingsLocked(mappings, bucketKeys, createdAts map[string]string) error {
-	if isStreamKind(idx.Kind) {
+	if isStreamKind(idx.Kind) && len(mappings) == 0 {
 		return nil
 	}
 	if len(mappings) == 0 {
@@ -122,7 +121,7 @@ func (idx *IDIndex) SaveMappingsLocked(mappings, bucketKeys, createdAts map[stri
 // saveMappingsNoLock saves the provided mappings, optional bucket keys, and optional created_at to disk (internal helper, no file locking).
 // Caller MUST hold the CAS index file lock.
 func (idx *IDIndex) saveMappingsNoLock(mappings, bucketKeys, createdAts map[string]string) error {
-	if isStreamKind(idx.Kind) {
+	if isStreamKind(idx.Kind) && len(mappings) == 0 {
 		return nil
 	}
 	if len(mappings) == 0 {
@@ -309,23 +308,27 @@ func (idx *IDIndex) SetMappings(mappings, bucketKeys map[string]string, createdA
 		}
 
 		var diskMappings, diskBucketKeys, diskCreatedAt map[string]string
-		if loadErr := idx.LoadLocked(); loadErr == nil {
-			reloaded = true
-			metrics.RecordIndexReload()
+		if stat, statErr := fileutil.Stat(idx.FilePath); statErr == nil && !stat.IsDir() {
+			if loadErr := idx.LoadLocked(); loadErr == nil {
+				reloaded = true
+				metrics.RecordIndexReload()
 
-			// Snapshot post-load disk state before merge so we can skip no-op saves.
-			diskMappings = make(map[string]string, len(idx.Mappings))
-			if idx.Mappings != nil {
-				maps.Copy(diskMappings, idx.Mappings)
+				// Snapshot post-load disk state before merge so we can skip no-op saves.
+				diskMappings = make(map[string]string, len(idx.Mappings))
+				if idx.Mappings != nil {
+					maps.Copy(diskMappings, idx.Mappings)
+				}
+				if len(idx.BucketKeys) > 0 {
+					diskBucketKeys = make(map[string]string, len(idx.BucketKeys))
+					maps.Copy(diskBucketKeys, idx.BucketKeys)
+				}
+				if len(idx.CreatedAt) > 0 {
+					diskCreatedAt = make(map[string]string, len(idx.CreatedAt))
+					maps.Copy(diskCreatedAt, idx.CreatedAt)
+				}
 			}
-			if len(idx.BucketKeys) > 0 {
-				diskBucketKeys = make(map[string]string, len(idx.BucketKeys))
-				maps.Copy(diskBucketKeys, idx.BucketKeys)
-			}
-			if len(idx.CreatedAt) > 0 {
-				diskCreatedAt = make(map[string]string, len(idx.CreatedAt))
-				maps.Copy(diskCreatedAt, idx.CreatedAt)
-			}
+		} else {
+			_ = idx.LoadLocked()
 		}
 
 		kindDir := filepath.Dir(idx.FilePath)
@@ -379,6 +382,11 @@ func (idx *IDIndex) SetMappings(mappings, bucketKeys map[string]string, createdA
 	}
 	if unchanged {
 		metrics.RecordSetMapping(time.Since(start), nil, reloaded)
+		if ConfirmPendingAfterDurableMapping != nil {
+			for id, hash := range mappings {
+				ConfirmPendingAfterDurableMapping(idx.FilePath, id, hash)
+			}
+		}
 		return nil
 	}
 

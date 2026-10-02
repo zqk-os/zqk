@@ -16,22 +16,9 @@ import (
 )
 
 func createDeleteAuditEvent(ctx context.Context, projectRoot, id, kind, filePath string, cascade bool, secCtx *pkgctx.SecurityContext, dependents []string, fileStorage *FileObjectStorage) error {
-	// CRITICAL: Use fileStorage's project root if provided and projectRoot is empty
-	// This ensures deterministic project root resolution - no auto-discovery fallback
-	if projectRoot == emptyValue && fileStorage != nil {
-		projectRoot = fileStorage.GetProjectRoot()
-	}
-
+	projectRoot, relPath := initAuditContext(projectRoot, fileStorage, filePath)
 	if projectRoot == emptyValue {
-		// Can't create audit event without project root
-		// Don't fall back to auto-discovery - this causes non-deterministic behavior
-		return nil // Best effort - don't fail deletion
-	}
-
-	// Get relative file path
-	relPath, err := filepath.Rel(projectRoot, filePath)
-	if err != nil {
-		relPath = filePath
+		return nil
 	}
 
 	// Build operation description
@@ -56,13 +43,7 @@ func createDeleteAuditEvent(ctx context.Context, projectRoot, id, kind, filePath
 		"project_root":         projectRoot,
 	}
 
-	if secCtx == nil {
-		secCtx = pkgctx.NewSystemSecurityContext()
-	}
-	createdBy := pkgctx.SystemAccountID
-	if secCtx != nil {
-		createdBy = secCtx.AccountID
-	}
+	secCtx, createdBy := resolveAuditSecurity(secCtx)
 	options := &AuditEventOptions{
 		EventType:  EventTypeObjectDeletion,
 		Operation:  operation,
@@ -75,21 +56,7 @@ func createDeleteAuditEvent(ctx context.Context, projectRoot, id, kind, filePath
 		SessionID:  zqkenv.SessionID().Get(),
 	}
 
-	if fileStorage != nil {
-		ctx = fileStorage.augmentCtxForAuditDuringWriteBehindApply(ctx)
-	}
-
-	if IsDeferAuditEvents(ctx) {
-		EnqueuePendingAuditEvent(PendingAuditItem{ProjectRoot: projectRoot, SecCtx: secCtx, FileStorage: fileStorage, Options: options})
-		return nil
-	}
-
-	runCtx := ctx
-	if runCtx == nil {
-		runCtx = pkgctx.NewSystemContext()
-	}
-	var storageProvider ObjectStorageProvider = fileStorage
-	return CreateAuditEventWithBuilder(runCtx, projectRoot, secCtx, storageProvider, options)
+	return dispatchAuditEvent(ctx, projectRoot, secCtx, fileStorage, options)
 }
 
 // CreateCacheRefreshAuditEvent creates an audit event for cache refresh operations
@@ -312,18 +279,9 @@ func createCreateAuditEvent(ctx context.Context, projectRoot, id, kind, filePath
 //
 //nolint:unparam // Always returns nil error - audit events are best-effort
 func createUpdateAuditEvent(ctx context.Context, projectRoot, id, kind, filePath string, secCtx *pkgctx.SecurityContext, changedFields []string, fileStorage *FileObjectStorage) error {
-	// CRITICAL: Use fileStorage's project root if provided and projectRoot is empty
-	if projectRoot == emptyValue && fileStorage != nil {
-		projectRoot = fileStorage.GetProjectRoot()
-	}
-
+	projectRoot, relPath := initAuditContext(projectRoot, fileStorage, filePath)
 	if projectRoot == emptyValue {
-		return nil // Best effort - don't fail update
-	}
-
-	relPath, err := filepath.Rel(projectRoot, filePath)
-	if err != nil {
-		relPath = filePath
+		return nil
 	}
 
 	operation := fmt.Sprintf(LogFmtUpdatedObject, id)
@@ -339,13 +297,7 @@ func createUpdateAuditEvent(ctx context.Context, projectRoot, id, kind, filePath
 		AuditMetadataKeyChangedFields: changedFields,
 	}
 
-	if secCtx == nil {
-		secCtx = pkgctx.NewSystemSecurityContext()
-	}
-	createdBy := pkgctx.SystemAccountID
-	if secCtx != nil {
-		createdBy = secCtx.AccountID
-	}
+	secCtx, createdBy := resolveAuditSecurity(secCtx)
 	options := &AuditEventOptions{
 		EventType:  EventTypeObjectUpdate,
 		Operation:  operation,
@@ -358,6 +310,44 @@ func createUpdateAuditEvent(ctx context.Context, projectRoot, id, kind, filePath
 		SessionID:  zqkenv.SessionID().Get(),
 	}
 
+	return dispatchAuditEvent(ctx, projectRoot, secCtx, fileStorage, options)
+}
+
+func initAuditContext(projectRoot string, fileStorage *FileObjectStorage, filePath string) (root, relPath string) {
+	root = resolveProjectRoot(projectRoot, fileStorage)
+	if root == emptyValue {
+		return "", ""
+	}
+	return root, resolveAuditRelPath(root, filePath)
+}
+
+func resolveProjectRoot(projectRoot string, fileStorage *FileObjectStorage) string {
+	if projectRoot == emptyValue && fileStorage != nil {
+		return fileStorage.GetProjectRoot()
+	}
+	return projectRoot
+}
+
+func resolveAuditRelPath(projectRoot, filePath string) string {
+	relPath, err := filepath.Rel(projectRoot, filePath)
+	if err != nil {
+		return filePath
+	}
+	return relPath
+}
+
+func resolveAuditSecurity(secCtx *pkgctx.SecurityContext) (*pkgctx.SecurityContext, string) {
+	if secCtx == nil {
+		secCtx = pkgctx.NewSystemSecurityContext()
+	}
+	createdBy := pkgctx.SystemAccountID
+	if secCtx != nil {
+		createdBy = secCtx.AccountID
+	}
+	return secCtx, createdBy
+}
+
+func dispatchAuditEvent(ctx context.Context, projectRoot string, secCtx *pkgctx.SecurityContext, fileStorage *FileObjectStorage, options *AuditEventOptions) error {
 	if fileStorage != nil {
 		ctx = fileStorage.augmentCtxForAuditDuringWriteBehindApply(ctx)
 	}

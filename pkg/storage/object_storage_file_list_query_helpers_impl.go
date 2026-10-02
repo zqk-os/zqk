@@ -275,4 +275,22 @@ func (f *FileObjectStorage) countWithFilters(ctx context.Context, kindDir string
 	})
 }
 
+// createClosedWorkChannel creates a closed channel containing all items.
+func createClosedWorkChannel(items []string) <-chan string {
+	ch := make(chan string, len(items))
+	for _, item := range items {
+		ch <- item
+	}
+	close(ch)
+	return ch
+}
+
+// calcBoundedWorkerCount determines actual worker count bounded by item count and maximum allowed workers.
+func calcBoundedWorkerCount(itemCount, maxWorkers int) int {
+	if itemCount < maxWorkers {
+		return itemCount
+	}
+	return maxWorkers
+}
+
 // extractTimeRangeFromFilters extracts time range from created_at filters

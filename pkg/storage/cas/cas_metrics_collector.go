@@ -62,9 +62,7 @@ func (c *CASMetricsCollector) CollectMetrics(
 		zqktime.FormatLayoutUTC(windowStart, zqktime.LayoutDateTimeSpace),
 		zqktime.FormatLayoutUTC(windowEnd, zqktime.LayoutDateTimeSpace))
 
-	now := time.Now().UTC()
-	windowStartStr := zqktime.FormatRFC3339UTC(windowStart)
-	windowEndStr := zqktime.FormatRFC3339UTC(windowEnd)
+	now, windowStartStr, windowEndStr := zqktime.WindowStrings(windowStart, windowEnd)
 
 	// TODO: Create cas_metric builder when schema is defined.
 	// For now, use command_metric as a temporary solution (similar to audit_metrics).
@@ -249,18 +247,12 @@ func (c *CASMetricsCollector) CollectAndReset(
 	secCtx *pkgctx.SecurityContext,
 	windowStart, windowEnd time.Time,
 ) (string, error) {
-	if !metricsrecording.Enabled() {
-		return "", nil
-	}
-	metricID, err := c.CollectMetrics(ctx, secCtx, windowStart, windowEnd)
-	if err != nil {
-		return "", err
-	}
-
-	// Reset metrics for next collection period
-	ResetObjectStorageMetrics()
-
-	return metricID, nil
+	return metricsrecording.CollectAndReset(
+		func() (string, error) {
+			return c.CollectMetrics(ctx, secCtx, windowStart, windowEnd)
+		},
+		ResetObjectStorageMetrics,
+	)
 }
 
 type idGenerator interface {

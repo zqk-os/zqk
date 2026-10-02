@@ -26,8 +26,8 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/nildecode"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/pipeline"
+
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/when"
 	"github.com/zqk-os/zqk/pkg/zqktime"
@@ -1119,19 +1119,10 @@ func writeJobLogEntry(projectRoot, jobID string, entry map[string]any) {
 		}
 	}
 	// Fallback / maintenance: direct write so each line is visible on disk
-	logDir := JobLogDir(projectRoot, jobID)
 	eventsFilePath := JobEventsFilePath(projectRoot, jobID)
-	if mkErr := fileutil.MkdirAll(logDir, paths.DirPerm755); mkErr != nil {
-		return
-	}
-	f, openErr := fileutil.OpenFile(eventsFilePath, fileutil.O_WRONLY|fileutil.O_CREATE|fileutil.O_APPEND, paths.FilePerm644)
-	if openErr != nil {
-		return
-	}
-	_, _ = f.Write(data)
-	_, _ = f.WriteString("\n")
-	_ = f.Close()
+	_ = fileutil.AppendJSONLine(eventsFilePath, entry)
 	maxLines := config.GetMaxJobLogLines(projectRoot)
+
 	trimJobLogFileIfNeeded(eventsFilePath, maxLines)
 }
 

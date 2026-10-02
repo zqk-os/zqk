@@ -92,18 +92,7 @@ func InitializeGlobalBufferWithConfig(projectRoot string, secCtx *pkgctx.Securit
 			return nil
 		}
 
-		config, err := LoadAggregationConfig(projectRoot)
-		if err != nil {
-			config = DefaultAggregationConfig()
-		}
-
-		windowSize := time.Hour
-		if config.WindowSize != emptyValue {
-			parsed, err := ParseWindowSize(config.WindowSize)
-			if err == nil {
-				windowSize = parsed
-			}
-		}
+		config, windowSize := loadBufferConfigAndWindow(projectRoot)
 
 		// Preserve disabled state when replacing (e.g. tests call SetEnabled(false))
 		enabled := config.Enabled

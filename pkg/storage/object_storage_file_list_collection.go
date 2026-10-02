@@ -133,6 +133,18 @@ func shouldSkipStorageWalkEntry(ctx context.Context, path string, info fileutil.
 	return false, nil
 }
 
+func isYAMLStorageFile(ctx context.Context, path string, info fileutil.FileInfo, err error, eventLogger *logging.EventLogger) (bool, error) {
+	skip, skipErr := shouldSkipStorageWalkEntry(ctx, path, info, err, eventLogger)
+	if skipErr != nil {
+		return false, skipErr
+	}
+	if skip {
+		return false, nil
+	}
+	config := GetStorageConfig()
+	return strings.HasSuffix(info.Name(), config.YAMLExtension) || strings.HasSuffix(info.Name(), config.YAMLAltExtension), nil
+}
+
 // collectFilePathsWithStrategy collects all YAML file paths from a kind directory
 // Uses the bucketing strategy to understand where files are stored
 // If timeRange is provided, only walks date subdirectories within that range
@@ -188,15 +200,11 @@ func (f *FileObjectStorage) collectFilePathsWithStrategy(ctx context.Context, ki
 				String("kind_dir", kindDir).
 				Log()
 			err := filepath.Walk(kindDir, func(path string, info fileutil.FileInfo, err error) error {
-				skip, skipErr := shouldSkipStorageWalkEntry(ctx, path, info, err, eventLogger)
-				if skipErr != nil {
-					return skipErr
+				isYAML, walkErr := isYAMLStorageFile(ctx, path, info, err, eventLogger)
+				if walkErr != nil {
+					return walkErr
 				}
-				if skip {
-					return nil
-				}
-				config := GetStorageConfig()
-				if strings.HasSuffix(info.Name(), config.YAMLExtension) || strings.HasSuffix(info.Name(), config.YAMLAltExtension) {
+				if isYAML {
 					filePaths = append(filePaths, path)
 					if eventLogger != nil && len(filePaths) <= 5 {
 						StorageLog(eventLogger.Logger()).Debug(LogEventStorageListCollectionFoundYAMLFileDebug).
@@ -294,19 +302,16 @@ func (f *FileObjectStorage) collectFilePathsUsingStrategy(ctx context.Context, _
 	// For path-based strategies, files are in subdirectories
 	// For chrono strategies, files are in date-based subdirectories
 	err := filepath.Walk(kindDir, func(path string, info fileutil.FileInfo, err error) error {
-		skip, skipErr := shouldSkipStorageWalkEntry(ctx, path, info, err, eventLogger)
-		if skipErr != nil {
-			return skipErr
+		isYAML, walkErr := isYAMLStorageFile(ctx, path, info, err, eventLogger)
+		if walkErr != nil {
+			return walkErr
 		}
-		if skip {
+		if !isYAML {
 			return nil
 		}
 
-		// Only collect YAML files
-		config := GetStorageConfig()
-		if strings.HasSuffix(info.Name(), config.YAMLExtension) || strings.HasSuffix(info.Name(), config.YAMLAltExtension) {
-			// For time-based strategies with timeRange, filter by bucket
-			if timeRange != nil {
+		// For time-based strategies with timeRange, filter by bucket
+		if timeRange != nil {
 				// Extract bucket key from path to check if it's in range
 				// The path structure is: kindDir/bucketKey/file.yaml
 				relPath, err := filepath.Rel(kindDir, filepath.Dir(path))
@@ -316,12 +321,10 @@ func (f *FileObjectStorage) collectFilePathsUsingStrategy(ctx context.Context, _
 					if !f.isBucketInTimeRange(relPath, timeRange) {
 						return nil // Skip files outside time range
 					}
-				}
 			}
-
-			filePaths = append(filePaths, path)
 		}
 
+		filePaths = append(filePaths, path)
 		return nil
 	})
 

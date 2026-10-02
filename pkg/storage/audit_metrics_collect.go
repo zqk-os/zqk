@@ -34,9 +34,7 @@ func (c *AuditMetricsCollector) CollectMetrics(
 		zqktime.FormatLayoutUTC(windowStart, zqktime.LayoutDateTimeSpace),
 		zqktime.FormatLayoutUTC(windowEnd, zqktime.LayoutDateTimeSpace))
 
-	now := time.Now().UTC()
-	windowStartStr := zqktime.FormatRFC3339UTC(windowStart)
-	windowEndStr := zqktime.FormatRFC3339UTC(windowEnd)
+	now, windowStartStr, windowEndStr := zqktime.WindowStrings(windowStart, windowEnd)
 
 	// Get instance builder schema version from registry
 	// NOTE: We create a fresh builder instance for each use to avoid concurrent map writes.
@@ -144,31 +142,27 @@ func (c *AuditMetricsCollector) CollectAndReset(
 	secCtx *pkgctx.SecurityContext,
 	windowStart, windowEnd time.Time,
 ) (string, error) {
-	if !metricsrecording.Enabled() {
-		return "", nil
-	}
-	metricID, err := c.CollectMetrics(ctx, secCtx, windowStart, windowEnd)
-	if err != nil {
-		return "", err
-	}
-
-	// Reset metrics for next collection period
-	c.eventsCreated.Store(0)
-	c.eventsCreatedCAS.Store(0)
-	c.eventsCreatedID.Store(0)
-	c.eventsFailed.Store(0)
-	c.eventsValidated.Store(0)
-	c.eventsSkipped.Store(0)
-	c.eventsDuplicated.Store(0)
-	c.eventsMerged.Store(0)
-	c.totalCreationTime.Store(0)
-	c.maxCreationTime.Store(0)
-	c.creationEvents.Store(0)
-	c.updateEvents.Store(0)
-	c.deleteEvents.Store(0)
-	c.bulkEvents.Store(0)
-	c.systemEvents.Store(0)
-	c.otherEvents.Store(0)
-
-	return metricID, nil
+	return metricsrecording.CollectAndReset(
+		func() (string, error) {
+			return c.CollectMetrics(ctx, secCtx, windowStart, windowEnd)
+		},
+		func() {
+			c.eventsCreated.Store(0)
+			c.eventsCreatedCAS.Store(0)
+			c.eventsCreatedID.Store(0)
+			c.eventsFailed.Store(0)
+			c.eventsValidated.Store(0)
+			c.eventsSkipped.Store(0)
+			c.eventsDuplicated.Store(0)
+			c.eventsMerged.Store(0)
+			c.totalCreationTime.Store(0)
+			c.maxCreationTime.Store(0)
+			c.creationEvents.Store(0)
+			c.updateEvents.Store(0)
+			c.deleteEvents.Store(0)
+			c.bulkEvents.Store(0)
+			c.systemEvents.Store(0)
+			c.otherEvents.Store(0)
+		},
+	)
 }

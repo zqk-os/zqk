@@ -328,11 +328,7 @@ func (c *HighVolumeEventCache) buildCacheFromIndex(ctx stdcontext.Context, f *Fi
 	type result struct {
 		entry *HighVolumeEventCacheEntry
 	}
-	workCh := make(chan string, len(ids))
-	for _, id := range ids {
-		workCh <- id
-	}
-	close(workCh)
+	workCh := createClosedWorkChannel(ids)
 	resultCh := make(chan result, workers*2)
 	for w := 0; w < workers && w < len(ids); w++ {
 		newHighVolumeCacheGoroutine(ConstMiscHighVolumeCacheBuildWorker, ConstMiscBuildCacheFromIndex).

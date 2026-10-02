@@ -2,7 +2,6 @@ package writer
 
 import (
 	"context"
-	"strings"
 
 	"github.com/zqk-os/zqk/pkg/graph/provider"
 	"github.com/zqk-os/zqk/pkg/objects"

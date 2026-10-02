@@ -46,14 +46,7 @@ func (c *FileLockMetricsCollector) CollectMetrics(
 	if !metricsrecording.Enabled() {
 		return "", nil
 	}
-	metrics := GetFileLockMetrics()
-	snapshot := metrics.GetSnapshot()
-
-	// Calculate derived metrics
-	avgAcquisitionTime := snapshot.AverageAcquisitionTime()
-	avgWaitTime := snapshot.AverageWaitTime()
-	contentionRate := snapshot.ContentionRate()
-	successRate := snapshot.SuccessRate()
+	snapshot, derived := GetFileLockSnapshotAndDerived()
 
 	// Generate a descriptive title (required by base_object)
 	title := fmt.Sprintf(ConstMiscFileLockMetricsDAcquisitionsFromSToS,
@@ -61,9 +54,7 @@ func (c *FileLockMetricsCollector) CollectMetrics(
 		zqktime.FormatLayoutUTC(windowStart, zqktime.LayoutDateTimeSpace),
 		zqktime.FormatLayoutUTC(windowEnd, zqktime.LayoutDateTimeSpace))
 
-	now := time.Now().UTC()
-	windowStartStr := zqktime.FormatRFC3339UTC(windowStart)
-	windowEndStr := zqktime.FormatRFC3339UTC(windowEnd)
+	now, windowStartStr, windowEndStr := zqktime.WindowStrings(windowStart, windowEnd)
 
 	// Get instance builder from registry (factory pattern)
 	// Get instance builder schema version from registry
@@ -123,12 +114,12 @@ func (c *FileLockMetricsCollector) CollectMetrics(
 		SetField(objects.FieldKeyTotalFailures, int(snapshot.TotalFailures)).
 		SetField(objects.FieldKeyTotalTimeouts, int(snapshot.TotalTimeouts)).
 		SetField(objects.FieldKeyTotalContention, int(snapshot.TotalContention)).
-		SetField(objects.FieldKeyAvgAcquisitionTimeMs, float64(avgAcquisitionTime.Nanoseconds())/1e6).
-		SetField(objects.FieldKeyAvgWaitTimeMs, float64(avgWaitTime.Nanoseconds())/1e6).
+		SetField(objects.FieldKeyAvgAcquisitionTimeMs, float64(derived.AvgAcquisitionTime.Nanoseconds())/1e6).
+		SetField(objects.FieldKeyAvgWaitTimeMs, float64(derived.AvgWaitTime.Nanoseconds())/1e6).
 		SetField(objects.FieldKeyMaxAcquisitionTimeMs, float64(snapshot.MaxAcquisitionTime.Nanoseconds())/1e6).
 		SetField(objects.FieldKeyMaxWaitTimeMs, float64(snapshot.MaxWaitTime.Nanoseconds())/1e6).
-		SetField(objects.FieldKeyContentionRate, contentionRate*100).
-		SetField(objects.FieldKeySuccessRate, successRate*100).
+		SetField(objects.FieldKeyContentionRate, derived.ContentionRate*100).
+		SetField(objects.FieldKeySuccessRate, derived.SuccessRate*100).
 		SetField(objects.FieldKeyPeakContention, int(snapshot.PeakContention)).
 		SetField(objects.FieldKeyMeasurementWindowStart, windowStartStr).
 		SetField(objects.FieldKeyMeasurementWindowEnd, windowEndStr)
@@ -161,16 +152,10 @@ func (c *FileLockMetricsCollector) CollectAndReset(
 	secCtx *pkgctx.SecurityContext,
 	windowStart, windowEnd time.Time,
 ) (string, error) {
-	if !metricsrecording.Enabled() {
-		return "", nil
-	}
-	metricID, err := c.CollectMetrics(ctx, secCtx, windowStart, windowEnd)
-	if err != nil {
-		return "", err
-	}
-
-	// Reset metrics for next collection period
-	ResetFileLockMetrics()
-
-	return metricID, nil
+	return metricsrecording.CollectAndReset(
+		func() (string, error) {
+			return c.CollectMetrics(ctx, secCtx, windowStart, windowEnd)
+		},
+		ResetFileLockMetrics,
+	)
 }

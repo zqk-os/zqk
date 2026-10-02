@@ -23,23 +23,11 @@ func appendTestBundleJSONL(path, jobID string, entry map[string]any) {
 	if entry[KeyJobID] == nil && entry["job_id"] == nil {
 		entry[KeyJobID] = jobID
 	}
-	data, err := json.Marshal(entry)
-	if err != nil {
-		return
-	}
 	testBundlesEventsMu.Lock()
 	defer testBundlesEventsMu.Unlock()
-	if err := fileutil.MkdirAll(filepath.Dir(path), paths.DirPerm755); err != nil {
-		return
-	}
-	f, err := fileutil.OpenFile(path, fileutil.O_WRONLY|fileutil.O_CREATE|fileutil.O_APPEND, paths.FilePerm644)
-	if err != nil {
-		return
-	}
-	_, _ = f.Write(data)
-	_, _ = f.WriteString("\n")
-	_ = f.Close()
+	_ = fileutil.AppendJSONLine(path, entry)
 }
+
 
 // AppendTestBundleEvent appends one JSONL event to the shared test-bundles/events.jsonl.
 // Caller must ensure entry contains "job_id" so consumers can attribute events. Best-effort; errors are ignored.
