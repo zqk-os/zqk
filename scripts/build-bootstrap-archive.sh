@@ -9,10 +9,8 @@ REPO_ROOT="${1:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 REPO_ROOT="$(cd "$REPO_ROOT" && pwd)"
 if [ -d "${REPO_ROOT}/.zqk/specs" ]; then
 	INTERNAL_DIR="${REPO_ROOT}/.zqk/specs"
-elif [ -d "${REPO_ROOT}/.zqk/specs" ]; then
-	INTERNAL_DIR="${REPO_ROOT}/.zqk/specs"
 else
-	echo "Error: specs source directory not found (.zqk/specs or .zqk/specs)" >&2
+	echo "Error: specs source directory not found (.zqk/specs)" >&2
 	exit 1
 fi
 CLI_SPECS_DIR="${REPO_ROOT}/.zqk/cli/specs"
@@ -117,7 +115,7 @@ find "$STAGING" \( \
 # A commit-derived default makes committing the archive invalidate it immediately
 # when HEAD advances. Release builders may override this standard fixed epoch.
 SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-946684800}"
-TOUCH_TS="$(date -u -r "$SOURCE_DATE_EPOCH" '+%Y%m%d%H%M.%S' 2>/dev/null || date -u '+%Y%m%d%H%M.%S')"
+TOUCH_TS="$(date -u -r "$SOURCE_DATE_EPOCH" '+%Y%m%d%H%M.%S' 2>/dev/null || date -u -d "@$SOURCE_DATE_EPOCH" '+%Y%m%d%H%M.%S' 2>/dev/null || date -u '+%Y%m%d%H%M.%S')"
 find "$STAGING" -exec touch -h -t "$TOUCH_TS" {} + 2>/dev/null || true
 
 unset GZIP 2>/dev/null || true
@@ -126,4 +124,5 @@ unset GZIP 2>/dev/null || true
 tar tzf "$ARCHIVE_TMP" | sort > "$MANIFEST_TMP"
 mv "$ARCHIVE_TMP" "$ARCHIVE"
 mv "$MANIFEST_TMP" "$MANIFEST"
-echo "Created $ARCHIVE ($(wc -l < "$MANIFEST") entries) and $MANIFEST"
+ENTRY_COUNT="$(wc -l < "$MANIFEST" | tr -d ' ')"
+echo "Created $ARCHIVE (${ENTRY_COUNT} entries) and $MANIFEST"

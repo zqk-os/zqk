@@ -1,4 +1,18 @@
 $schema: ../_schemas/command_spec.schema.json
 name: emergency-manager
-short: Monitors the health of the CAP orchestrator and Kernel Steward. Executes safe rollbacks or stashes untracked files if the main managers fail continuously.
-description: Monitors the health of the CAP orchestrator and Kernel Steward. Executes safe rollbacks or stashes untracked files if the main managers fail continuously.
+short: Monitors scheduler daemon and orchestrator health, initiating automated recovery
+description: |
+  Supervisor watchdog that monitors the operational health of the scheduler daemon,
+  the CAP loop orchestrator, and Kernel Steward. Evaluates process liveness and
+  heartbeat freshness; if the scheduler process dies or keep-alives become stale,
+  executes an automated safe recovery cycle (forceful stop and clean restart).
+args:
+  type: no_args
+help:
+  examples:
+    - comment: "Evaluate scheduler health and trigger automated recovery if stale"
+      command: "%s system emergency-manager"
+common_flags: true
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false

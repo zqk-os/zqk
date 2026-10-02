@@ -121,7 +121,7 @@ func NewSchedulerMaintenanceConfigBuilder() *SchedulerMaintenanceConfigBuilder {
 				map[string]any{
 					objects.FieldKeyID:      "SCH-scheduler-job-retention",
 					objects.FieldKeyJobType: "scheduler_job_retention",
-					"template_file":         "scripts/scheduler_jobs/scheduler_job_retention_daily.yaml",
+					"template_file":         "scripts/scheduler_jobs/retention_scheduler_job_daily.yaml",
 				},
 			},
 			"updated_at": "2026-07-03 18:00:00 +0000 UTC",

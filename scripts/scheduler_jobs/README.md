@@ -74,7 +74,7 @@ zqk system ensure-retention-jobs
 **Create manually (if needed):**
 
 ```bash
-zqk internal create scheduler_job --file scripts/scheduler_jobs/retention_tolerance_catchall.yaml
+zqk object create scheduler_job --file scripts/scheduler_jobs/retention_tolerance_catchall.yaml
 ```
 
 ## SCH-016: Cleanup Old Command Metrics (bulk delete)
@@ -102,7 +102,7 @@ zqk system ensure-retention-jobs
 **Create manually:**
 
 ```bash
-zqk internal create scheduler_job --file scripts/scheduler_jobs/audit_event_aggregation_default.yaml
+zqk object create scheduler_job --file scripts/scheduler_jobs/audit_event_aggregation_default.yaml
 ```
 
 
@@ -127,3 +127,20 @@ zqk scheduler trigger SCH-convergence-orchestrate
 Update **`CONVERGENCE_SESSION_ID`** in **`environment_variables`** when your active **`CVS-*`** changes. Tests: **`go test ./cmd/zqk/scheduler -run ConvergenceOrchestrate -timeout 60s`**.
 
 See **`docs/architecture/CONVERGENCE_ORCHESTRATION_AND_NESTED_CVS.md`** (Appendix E).
+
+## Persistent Daemons vs. Scheduled Jobs
+
+### semantic_bridge.yaml & truth_sentinel.yaml
+
+`scripts/scheduler_jobs/semantic_bridge.yaml` and `scripts/scheduler_jobs/truth_sentinel.yaml` describe **continuous background daemons** rather than recurring timer jobs:
+
+- **Semantic Bridge (`SCH-semantic-bridge`)**: Continuously monitors the lifecycle WAL for completed requirements and specifications, updating vector index embeddings.
+- **QA Truth Sentinel (`SCH-truth-sentinel`)**: Continuously monitors the lifecycle WAL for `in_progress` and `complete` transitions to run the AST structural auditor and QA gates.
+
+> [!WARNING]
+> **Anti-Orphan Discipline**: Running continuous daemons (`max_runtime_seconds: 0`) under timer scheduler loops without supervisor process management causes them to detach under PID 1 when parent tasks terminate, causing hidden resource leaks.
+>
+> **Recommended Lifecycle**:
+> - **Supervised Daemons**: Manage via hostservice / OS supervision (`zqk system start`, LaunchAgent on macOS, systemd user service on Linux).
+> - **One-Shot Evaluation**: For QA audits without long-running daemons, run `zqk system truth-sentinel --once --id <ID>`.
+> - Both templates ship **disabled by default** (`enabled: false`) to prevent accidental orphaned detachments.

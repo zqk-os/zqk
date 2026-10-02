@@ -124,7 +124,6 @@ tree_police:
     - "install.sh"
     - "generate-openvex.sh"
     - "check-hardcoded-paths-and-perms-repo.sh"
-    - "check-cli-name-literals-repo.sh"
     - "build-bootstrap-archive.sh"
     - "scan-secrets.sh"
   allowed_script_prefixes:

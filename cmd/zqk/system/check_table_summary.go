@@ -2,14 +2,18 @@ package system
 
 import (
 	"fmt"
+	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
 
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	pkgcli "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // Objects that have not crossed the membrane are not layered — see writeObjectDraftPlaneSummary.
@@ -254,6 +258,36 @@ func writeLayeredSummary(buf *strings.Builder, results []CheckResult, cmd *cobra
 		}
 		buf.WriteString(renderTableWithTitle("Static configurations and specifications", headers, rows))
 		buf.WriteString("\n")
+	}
+
+	// Git Hooks Guard & Attention Hailing
+	projectRoot := cli.ResolveProjectRoot(".")
+	if projectRoot != "" {
+		gitDir := filepath.Join(projectRoot, ".git")
+		if _, err := fileutil.Stat(gitDir); err == nil {
+			prePush := filepath.Join(gitDir, "hooks", "pre-push")
+			preCommit := filepath.Join(gitDir, "hooks", "pre-commit")
+			hasPush := false
+			hasCommit := false
+			if info, err := fileutil.Stat(prePush); err == nil && info.Mode()&0111 != 0 {
+				hasPush = true
+			}
+			if info, err := fileutil.Stat(preCommit); err == nil && info.Mode()&0111 != 0 {
+				hasCommit = true
+			}
+			if !hasPush || !hasCommit {
+				buf.WriteString(fmt.Sprintf("%s %s\n",
+					yellow("⚠️  [Git Hooks Attention]"),
+					"Repository git hooks are not configured or executable in .git/hooks/:"))
+				if !hasCommit {
+					buf.WriteString(fmt.Sprintf("   • %s missing or not executable\n", filepath.Join(".git", "hooks", "pre-commit")))
+				}
+				if !hasPush {
+					buf.WriteString(fmt.Sprintf("   • %s missing or not executable\n", filepath.Join(".git", "hooks", "pre-push")))
+				}
+				buf.WriteString(fmt.Sprintf("   👉 Run '%s' to install and activate git hooks.\n\n", paths.CLIInvocation("system sync-git-hooks")))
+			}
+		}
 	}
 }
 

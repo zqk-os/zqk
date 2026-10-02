@@ -3,5 +3,17 @@ name: login
 short: Create or reuse a CLI session (persisted for multiple terminals)
 description: |
   Creates a new session or reuses the current one if still active.
-  Session is written to .zqk/state/session (under lock) so other terminals can reuse it.
-  Optionally set ZQK_SESSION_ID in your shell to tie the session to this process tree.
+  The active session is written to .zqk/state/session under lock so that
+  other terminal windows and subagents can transparently reuse it without
+  re-authenticating. Optionally set ZQK_SESSION_ID in your shell environment
+  to pin the session to the current process tree.
+args:
+  type: no_args
+help:
+  examples:
+    - comment: "Establish or reuse an active CLI operator session"
+      command: "%s auth login"
+common_flags: true
+requires_storage: true
+requires_session: false
+requires_scheduler_check: false

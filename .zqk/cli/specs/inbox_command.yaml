@@ -1,7 +1,20 @@
 $schema: _schemas/command_spec.schema.json
 name: inbox
-short: Manage the Autonomy Inbox for agent proposals and instructions
-description: |-
-    The inbox command group provides access to the Autonomy Inbox Protocol. Agents
-    and workflows submit proposals (agent_instruction objects) into the inbox. Human
-    operators review, approve, or reject these proposals before execution.
+short: Inspect and manage the agent autonomy inbox
+description: |
+  Inspects and manages proposals, instructions, and coordination directives
+  submitted to the Agent Autonomy Inbox. Enables operators to review, filter,
+  and steer autonomous agent activity across the swarm.
+help:
+  examples:
+    - comment: "List all pending agent instruction proposals in the inbox"
+      command: "%s inbox list"
+    - comment: "Filter inbox proposals for a specific persona"
+      command: "%s inbox list --persona PER-COMMUNITY-SOFTWARE-ENGINEER"
+common_flags: true
+requires_storage: true
+requires_session: true
+requires_scheduler_check: false
+subcommands:
+  - name: list
+    spec_ref: inbox/list_command.yaml

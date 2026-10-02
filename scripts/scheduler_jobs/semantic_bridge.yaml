@@ -1,17 +1,28 @@
+# Semantic Bridge Daemon Configuration Template
+# NOTE: This defines a continuous WAL listener daemon, NOT a recurring timer job.
+# Running long-running daemons via raw timer scheduler triggers risks process detachment
+# and PID 1 orphan leakage upon scheduler restart.
+#
+# Recommended Operations:
+# 1. Host Service / System Supervisor: Manage via `zqk system start` or OS service units
+#    (Darwin LaunchAgent / Linux systemd --user) with supervisor PID tracking.
+# 2. Foreground Verification: Run directly with `zqk system semantic-bridge-daemon`.
 id: SCH-semantic-bridge
 kind: scheduler_job
 title: Semantic Bridge Daemon
-description: Continuously monitors the lifecycle WAL for completed requirements and specifications, maintaining the Vector Index via LLM embeddings.
+description: |
+  Continuously monitors the lifecycle WAL for completed requirements and specifications,
+  maintaining the Vector Index via LLM embeddings. Must be supervised as a hostservice.
 job_type: daemon_exec
 trigger_type: daemon
 execution_mode: reusable
 status: active
-enabled: true
-command: ./bin/zqk
+enabled: false
+command: zqk
 command_args:
   - system
   - semantic-bridge-daemon
 max_runtime_seconds: 0
 category: system
 namespace_id: zqk:kernel
-schema_version: 2.0.0
+schema_version: "2.0.0"

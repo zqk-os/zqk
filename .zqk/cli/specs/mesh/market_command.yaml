@@ -1,6 +1,22 @@
 $schema: ../_schemas/command_spec.schema.json
 name: market
-short: Discover and browse available agent swarm capabilities in the mesh market
-description: |-
-    Lists, searches, and inspects agent services, capability advertisements, and
-    capability leases across the swarm mesh.
+short: Browse available capabilities, agent seats, and compute in the mesh marketplace
+description: |
+  Queries active capacity advertisements across peer nodes in the sovereign mesh.
+  Displays provider kernel references, resource identifiers, quantities, units,
+  and pricing or allocation models.
+flags:
+  - name: type
+    shorthand: t
+    type: string
+    description: "Filter advertisements by resource type (e.g. agent_seat, compute, storage)"
+help:
+  examples:
+    - comment: "List all active advertisements across the peer mesh"
+      command: "%s mesh market"
+    - comment: "Filter marketplace listings by compute resources"
+      command: "%s mesh market --type compute"
+common_flags: true
+requires_storage: true
+requires_session: false
+requires_scheduler_check: false

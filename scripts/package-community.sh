@@ -182,10 +182,10 @@ fi
 # Generate Homebrew tap formula
 echo ""
 echo "  🍺 Generating Homebrew formula"
-DARWIN_ARM64_SHA="$(grep -F "zqk-community_${VER_NUM}_darwin_arm64.tar.gz" "${DIST_DIR}/checksums.txt" | awk '{print $1}' | head -n 1)"
-DARWIN_AMD64_SHA="$(grep -F "zqk-community_${VER_NUM}_darwin_amd64.tar.gz" "${DIST_DIR}/checksums.txt" | awk '{print $1}' | head -n 1)"
-LINUX_ARM64_SHA="$(grep -F "zqk-community_${VER_NUM}_linux_arm64.tar.gz" "${DIST_DIR}/checksums.txt" | awk '{print $1}' | head -n 1)"
-LINUX_AMD64_SHA="$(grep -F "zqk-community_${VER_NUM}_linux_amd64.tar.gz" "${DIST_DIR}/checksums.txt" | awk '{print $1}' | head -n 1)"
+DARWIN_ARM64_SHA="$(grep -E "zqk(_|-community_)${VER_NUM}_darwin_arm64.tar.gz" "${DIST_DIR}/checksums.txt" | awk '{print $1}' | head -n 1)"
+DARWIN_AMD64_SHA="$(grep -E "zqk(_|-community_)${VER_NUM}_darwin_amd64.tar.gz" "${DIST_DIR}/checksums.txt" | awk '{print $1}' | head -n 1)"
+LINUX_ARM64_SHA="$(grep -E "zqk(_|-community_)${VER_NUM}_linux_arm64.tar.gz" "${DIST_DIR}/checksums.txt" | awk '{print $1}' | head -n 1)"
+LINUX_AMD64_SHA="$(grep -E "zqk(_|-community_)${VER_NUM}_linux_amd64.tar.gz" "${DIST_DIR}/checksums.txt" | awk '{print $1}' | head -n 1)"
 
 mkdir -p "${DIST_DIR}/Formula"
 cat <<EOF > "${DIST_DIR}/Formula/zqk.rb"
@@ -197,20 +197,20 @@ class Zqk < Formula
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk-community_#{version}_darwin_arm64.tar.gz"
+      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk_#{version}_darwin_arm64.tar.gz"
       sha256 "${DARWIN_ARM64_SHA}"
     else
-      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk-community_#{version}_darwin_amd64.tar.gz"
+      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk_#{version}_darwin_amd64.tar.gz"
       sha256 "${DARWIN_AMD64_SHA}"
     end
   end
 
   on_linux do
     if Hardware::CPU.arm?
-      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk-community_#{version}_linux_arm64.tar.gz"
+      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk_#{version}_linux_arm64.tar.gz"
       sha256 "${LINUX_ARM64_SHA}"
     else
-      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk-community_#{version}_linux_amd64.tar.gz"
+      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk_#{version}_linux_amd64.tar.gz"
       sha256 "${LINUX_AMD64_SHA}"
     end
   end

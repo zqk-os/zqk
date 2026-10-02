@@ -1,5 +1,5 @@
 # One-time scheduler_job churn cleanup. Used by: zqk system ensure-retention-jobs
-# Create: zqk object create scheduler_job --file scripts/scheduler_jobs/scheduler_job_retention_daily.yaml
+# Create: zqk object create scheduler_job --file scripts/scheduler_jobs/retention_scheduler_job_daily.yaml
 id: SCH-scheduler-job-retention
 title: Scheduler job store retention (one_time)
 description: |

@@ -999,10 +999,10 @@
 ./scripts/scheduler_jobs/pre_commit_integrity.yaml
 ./scripts/scheduler_jobs/pre_commit_lint.yaml
 ./scripts/scheduler_jobs/pre_commit_policy.yaml
+./scripts/scheduler_jobs/retention_scheduler_job_daily.yaml
 ./scripts/scheduler_jobs/retention_tolerance_agent_instruction.yaml
 ./scripts/scheduler_jobs/retention_tolerance_catchall.yaml
 ./scripts/scheduler_jobs/scheduler_events_aggregation_schevag.yaml
-./scripts/scheduler_jobs/scheduler_job_retention_daily.yaml
 ./scripts/scheduler_jobs/semantic_bridge.yaml
 ./scripts/scheduler_jobs/stream_gc_hourly.yaml
 ./scripts/scheduler_jobs/sync_external_agents.yaml

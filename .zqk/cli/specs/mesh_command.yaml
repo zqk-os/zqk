@@ -1,6 +1,25 @@
 $schema: _schemas/command_spec.schema.json
 name: mesh
 short: Manage peer-to-peer agent mesh networking, routing, and discovery
-description: |-
-    Controls the agent mesh overlay network, peer discovery, route propagation, and
-    swarm communication.
+description: |
+  Controls the agent mesh overlay network, peer discovery, capacity marketplace,
+  and capability leasing across sovereign kernel nodes.
+help:
+  examples:
+    - comment: "Inspect available capacity and resources in the mesh marketplace"
+      command: "%s mesh market"
+    - comment: "Advertise local agent seat or compute capacity to peer nodes"
+      command: "%s mesh advertise compute --amount 4.0 --units cores"
+    - comment: "Lease a capability or agent seat from a remote provider"
+      command: "%s mesh lease res-agent-qa --from kernel-peer-alpha --duration 1h"
+common_flags: true
+requires_storage: true
+requires_session: false
+requires_scheduler_check: false
+subcommands:
+  - name: market
+    spec_ref: mesh/market_command.yaml
+  - name: advertise
+    spec_ref: mesh/advertise_command.yaml
+  - name: lease
+    spec_ref: mesh/lease_command.yaml

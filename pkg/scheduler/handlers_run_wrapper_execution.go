@@ -47,7 +47,7 @@ func (h *RunWrapperHandler) prepareRunWrapperExecution(job *ScheduledJob) runWra
 	if exeName == emptyValue {
 		exeName = "zqk"
 	}
-	if command == exeName || command == "zqk" {
+	if command == exeName || command == "zqk" || command == "zcom" || command == "./bin/zqk" || command == "./bin/zcom" || filepath.Base(command) == "zqk" || filepath.Base(command) == "zcom" {
 		command = resolveSchedulerCLIBinary(h.projectRoot)
 	}
 
@@ -70,7 +70,7 @@ func (h *RunWrapperHandler) prepareRunWrapperExecution(job *ScheduledJob) runWra
 		}
 	}
 
-	if command == "zqk" {
+	if command == "zqk" || command == "zcom" || command == "./bin/zqk" || command == "./bin/zcom" || filepath.Base(command) == "zqk" || filepath.Base(command) == "zcom" {
 		projectRoot := h.projectRoot
 		if projectRoot == emptyValue {
 			if fileStorage, ok := h.storage.(*storagepkg.FileObjectStorage); ok {
