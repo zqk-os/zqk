@@ -126,6 +126,8 @@ tree_police:
     - "check-hardcoded-paths-and-perms-repo.sh"
     - "build-bootstrap-archive.sh"
     - "scan-secrets.sh"
+    - "check-doc-cli-coherency.sh"
+    - "check-doc-links.sh"
   allowed_script_prefixes:
     - "scripts/open-core/"
     - "scripts/starter_kernel_graph/"
