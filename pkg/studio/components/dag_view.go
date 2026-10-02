@@ -87,9 +87,6 @@ func (d *DAGViewComponent) RenderHTML() string {
 	sb.WriteString("            <g id=\"edges-layer\"></g>\n")
 	sb.WriteString("            <g id=\"nodes-layer\"></g>\n")
 	sb.WriteString("          </g>\n")
-	sb.WriteString("        </svg>\n")
-	sb.WriteString("      </div>\n")
-	sb.WriteString("    </div>\n")
-
+	sb.WriteString("        </svg>\n      </div>\n    </div>\n")
 	return sb.String()
 }

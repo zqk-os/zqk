@@ -8,9 +8,9 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-// waitForWALProcessingCheckpoint is a tuned checkpoint stabilization wait used by the
+// WaitForWALProcessingCheckpoint is a tuned checkpoint stabilization wait used by the
 // cross-process durability barrier. Callers choose stableThreshold and ticker interval.
-func waitForWALProcessingCheckpoint(projectRoot string, timeout time.Duration, stableThreshold int, tickerInterval time.Duration) error {
+func WaitForWALProcessingCheckpoint(projectRoot string, timeout time.Duration, stableThreshold int, tickerInterval time.Duration) error {
 	if projectRoot == emptyValue {
 		return nil
 	}

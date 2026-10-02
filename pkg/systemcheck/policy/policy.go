@@ -19,6 +19,15 @@ func ResolveProjectRoot(opts RunOptions) (string, error) {
 	return root, nil
 }
 
+// runWithResolvedRoot resolves the project root from opts and executes fn with it.
+func runWithResolvedRoot(opts RunOptions, fn func(root string) (*Result, error)) (*Result, error) {
+	root, err := ResolveProjectRoot(opts)
+	if err != nil {
+		return nil, err
+	}
+	return fn(root)
+}
+
 // Result represents the outcome of a policy gate execution.
 type Result struct {
 	GateName   string   `json:"gate_name"`

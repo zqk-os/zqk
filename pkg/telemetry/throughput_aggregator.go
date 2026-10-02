@@ -117,105 +117,112 @@ func (a *ThroughputAggregator) RecordWorkerSample(ctx context.Context, workerID 
 	return nil
 }
 
-// Workers returns all known worker IDs in deterministic sorted order.
-func (a *ThroughputAggregator) Workers() []string {
+func (a *ThroughputAggregator) withRLock(fn func()) {
 	a.mu.RLock()
 	defer a.mu.RUnlock()
+	fn()
+}
 
-	workers := make([]string, 0, len(a.workerTokens))
-	for w := range a.workerTokens {
-		workers = append(workers, w)
-	}
+// Workers returns all known worker IDs in deterministic sorted order.
+func (a *ThroughputAggregator) Workers() []string {
+	var workers []string
+	a.withRLock(func() {
+		workers = make([]string, 0, len(a.workerTokens))
+		for w := range a.workerTokens {
+			workers = append(workers, w)
+		}
+	})
 	sort.Strings(workers)
 	return workers
 }
 
 // Snapshot calculates windowed metrics across the aggregator.
 func (a *ThroughputAggregator) Snapshot() ThroughputSnapshot {
-	a.mu.RLock()
-	defer a.mu.RUnlock()
+	var snap ThroughputSnapshot
+	a.withRLock(func() {
+		now := a.clock()
+		cutoff := now.Add(-a.window)
 
-	now := a.clock()
-	cutoff := now.Add(-a.window)
+		windowTokens := 0
+		activeSet := make(map[string]bool)
+		var latestActivity time.Time
 
-	windowTokens := 0
-	activeSet := make(map[string]bool)
-	var latestActivity time.Time
-
-	for _, s := range a.samples {
-		if s.timestamp.After(cutoff) || s.timestamp.Equal(cutoff) {
-			windowTokens += s.tokens
+		for _, s := range a.samples {
+			if s.timestamp.After(cutoff) || s.timestamp.Equal(cutoff) {
+				windowTokens += s.tokens
+			}
 		}
-	}
 
-	for w, t := range a.lastActivity {
-		if t.After(cutoff) || t.Equal(cutoff) {
-			activeSet[w] = true
+		for w, t := range a.lastActivity {
+			if t.After(cutoff) || t.Equal(cutoff) {
+				activeSet[w] = true
+			}
+			if t.After(latestActivity) {
+				latestActivity = t
+			}
 		}
-		if t.After(latestActivity) {
-			latestActivity = t
+
+		seconds := a.window.Seconds()
+		rate := 0.0
+		if seconds > 0 {
+			rate = float64(windowTokens) / seconds
 		}
-	}
 
-	seconds := a.window.Seconds()
-	rate := 0.0
-	if seconds > 0 {
-		rate = float64(windowTokens) / seconds
-	}
-
-	idle := false
-	var lastAgo time.Duration
-	if !latestActivity.IsZero() {
-		lastAgo = now.Sub(latestActivity)
-		if a.idleThreshold > 0 && lastAgo >= a.idleThreshold {
+		idle := false
+		var lastAgo time.Duration
+		if !latestActivity.IsZero() {
+			lastAgo = now.Sub(latestActivity)
+			if a.idleThreshold > 0 && lastAgo >= a.idleThreshold {
+				idle = true
+			}
+		} else {
 			idle = true
 		}
-	} else {
-		idle = true
-	}
 
-	return ThroughputSnapshot{
-		SampleCount:               len(a.samples),
-		ActiveWorkers:             len(activeSet),
-		WindowTokens:              windowTokens,
-		ThroughputTokensPerSecond: rate,
-		Idle:                      idle,
-		LastActivityAgo:           lastAgo,
-	}
+		snap = ThroughputSnapshot{
+			SampleCount:               len(a.samples),
+			ActiveWorkers:             len(activeSet),
+			WindowTokens:              windowTokens,
+			ThroughputTokensPerSecond: rate,
+			Idle:                      idle,
+			LastActivityAgo:           lastAgo,
+		}
+	})
+	return snap
 }
 
 // WorkerDetails returns individual worker stats sorted by total tokens descending.
 func (a *ThroughputAggregator) WorkerDetails() []WorkerThroughput {
-	a.mu.RLock()
-	defer a.mu.RUnlock()
+	var details []WorkerThroughput
+	a.withRLock(func() {
+		now := a.clock()
+		details = make([]WorkerThroughput, 0, len(a.workerTokens))
 
-	now := a.clock()
-	details := make([]WorkerThroughput, 0, len(a.workerTokens))
+		for w, total := range a.workerTokens {
+			last := a.lastActivity[w]
+			isIdle := false
+			var idleSince *time.Time
+			if a.idleThreshold > 0 && now.Sub(last) >= a.idleThreshold {
+				isIdle = true
+				t := last.Add(a.idleThreshold)
+				idleSince = &t
+			}
 
-	for w, total := range a.workerTokens {
-		last := a.lastActivity[w]
-		isIdle := false
-		var idleSince *time.Time
-		if a.idleThreshold > 0 && now.Sub(last) >= a.idleThreshold {
-			isIdle = true
-			t := last.Add(a.idleThreshold)
-			idleSince = &t
+			details = append(details, WorkerThroughput{
+				WorkerID:    w,
+				TotalTokens: total,
+				SampleCount: a.workerSamples[w],
+				Idle:        isIdle,
+				IdleSince:   idleSince,
+			})
 		}
 
-		details = append(details, WorkerThroughput{
-			WorkerID:    w,
-			TotalTokens: total,
-			SampleCount: a.workerSamples[w],
-			Idle:        isIdle,
-			IdleSince:   idleSince,
+		sort.Slice(details, func(i, j int) bool {
+			if details[i].TotalTokens == details[j].TotalTokens {
+				return details[i].WorkerID < details[j].WorkerID
+			}
+			return details[i].TotalTokens > details[j].TotalTokens
 		})
-	}
-
-	sort.Slice(details, func(i, j int) bool {
-		if details[i].TotalTokens == details[j].TotalTokens {
-			return details[i].WorkerID < details[j].WorkerID
-		}
-		return details[i].TotalTokens > details[j].TotalTokens
 	})
 
 	return details

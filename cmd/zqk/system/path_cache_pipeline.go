@@ -222,8 +222,7 @@ func RunPathCacheViaPipeline(cmd *cobra.Command, _ []string) error {
 		}).
 		Build()
 
-	pctx := &pipeline.Context{Ctx: baseCtx, Outcome: make(map[string]any)}
-	_, err := pl.Run(pctx, struct{}{})
+	_, err := pl.RunWithContext(baseCtx, struct{}{})
 	return err
 }
 

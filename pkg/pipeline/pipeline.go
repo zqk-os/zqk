@@ -24,6 +24,18 @@ type Context struct {
 	Outcome map[string]any
 }
 
+// NewContext creates a new pipeline Context with an initialized outcome map.
+// If ctx is nil, it defaults to pkgctx.NewSystemContext().
+func NewContext(ctx context.Context) *Context {
+	if ctx == nil {
+		ctx = pkgctx.NewSystemContext()
+	}
+	return &Context{
+		Ctx:     ctx,
+		Outcome: make(map[string]any),
+	}
+}
+
 // StageFunc is the shape for each pipeline stage.
 // The input/output contracts are intentionally generic (any) so flows can adapt without
 // re-generating types; concrete pilots should wrap these with typed helpers.
@@ -280,6 +292,11 @@ func (p *Pipeline) Run(ctx *Context, payload any) (any, error) {
 		current = next
 	}
 	return current, nil
+}
+
+// RunWithContext runs the pipeline using a new Context initialized from ctx.
+func (p *Pipeline) RunWithContext(ctx context.Context, payload any) (any, error) {
+	return p.Run(NewContext(ctx), payload)
 }
 
 func recordPipelineStageMetrics(cfg *MetricsConfig, pctx *Context, pipelineKind, stageName string, duration time.Duration, err error) {

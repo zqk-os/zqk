@@ -79,25 +79,7 @@ func readFileWithTimeout(path string, timeout time.Duration) ([]byte, error) {
 // a directory containing ProjectDataDir (.zqk). Used when the scheduler is started
 // without a project root (e.g. by launchd) so the PID file and keep-alive are still written.
 func ResolveProjectRootFromCWD() string {
-	dir, err := fileutil.Getwd()
-	if err != nil {
-		return ""
-	}
-	dir, err = filepath.Abs(dir)
-	if err != nil {
-		return ""
-	}
-	for {
-		if _, err := fileutil.Stat(filepath.Join(dir, paths.ProjectDataDir)); err == nil {
-			return dir
-		}
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			break
-		}
-		dir = parent
-	}
-	return ""
+	return paths.ResolveProjectRoot(".")
 }
 
 // getPIDFilePath returns the path to the PID file

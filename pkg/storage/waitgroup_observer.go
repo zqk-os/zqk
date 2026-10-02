@@ -76,9 +76,8 @@ func (o *LoggingWaitGroupObserver) OnGroupCreated(id, operation string) {
 	})
 }
 
-// OnGroupAdd is called when Add() is called on a WaitGroup
-func (o *LoggingWaitGroupObserver) OnGroupAdd(id string, delta int) {
-	_ = concurrency.RunInLockOrLog(&o.mu, locknames.LockNameWaitgroupObserverOnAdd, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
+func (o *LoggingWaitGroupObserver) withActiveGroup(lockName string, id string, fn func(stats *groupStats)) {
+	_ = concurrency.RunInLockOrLog(&o.mu, lockName, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
 		if !o.enabled {
 			return nil
 		}
@@ -86,6 +85,14 @@ func (o *LoggingWaitGroupObserver) OnGroupAdd(id string, delta int) {
 		if !exists {
 			return nil
 		}
+		fn(stats)
+		return nil
+	})
+}
+
+// OnGroupAdd is called when Add() is called on a WaitGroup
+func (o *LoggingWaitGroupObserver) OnGroupAdd(id string, delta int) {
+	o.withActiveGroup(locknames.LockNameWaitgroupObserverOnAdd, id, func(stats *groupStats) {
 		stats.addCount += delta
 		stats.lastAdd = time.Now()
 		StorageLog(o.logger.Logger()).Debug(LogEventStorageWaitGroupObserverAddDebug).
@@ -94,20 +101,12 @@ func (o *LoggingWaitGroupObserver) OnGroupAdd(id string, delta int) {
 			Int("delta", delta).
 			Int("total_adds", stats.addCount).
 			Log()
-		return nil
 	})
 }
 
 // OnGroupDone is called when Done() is called on a WaitGroup
 func (o *LoggingWaitGroupObserver) OnGroupDone(id string) {
-	_ = concurrency.RunInLockOrLog(&o.mu, locknames.LockNameWaitgroupObserverOnDone, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
-		if !o.enabled {
-			return nil
-		}
-		stats, exists := o.groups[id]
-		if !exists {
-			return nil
-		}
+	o.withActiveGroup(locknames.LockNameWaitgroupObserverOnDone, id, func(stats *groupStats) {
 		stats.doneCount++
 		stats.lastDone = time.Now()
 		if stats.doneCount > stats.addCount {
@@ -124,20 +123,12 @@ func (o *LoggingWaitGroupObserver) OnGroupDone(id string) {
 			Int("done_count", stats.doneCount).
 			Int("add_count", stats.addCount).
 			Log()
-		return nil
 	})
 }
 
 // OnGroupWait is called when Wait() is called on a WaitGroup
 func (o *LoggingWaitGroupObserver) OnGroupWait(id string) {
-	_ = concurrency.RunInLockOrLog(&o.mu, locknames.LockNameWaitgroupObserverOnWait, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
-		if !o.enabled {
-			return nil
-		}
-		stats, exists := o.groups[id]
-		if !exists {
-			return nil
-		}
+	o.withActiveGroup(locknames.LockNameWaitgroupObserverOnWait, id, func(stats *groupStats) {
 		stats.waitCount++
 		stats.lastWait = time.Now()
 		if stats.addCount != stats.doneCount {
@@ -155,20 +146,12 @@ func (o *LoggingWaitGroupObserver) OnGroupWait(id string) {
 			Int("add_count", stats.addCount).
 			Int("done_count", stats.doneCount).
 			Log()
-		return nil
 	})
 }
 
 // OnGroupCompleted is called when Wait() completes
 func (o *LoggingWaitGroupObserver) OnGroupCompleted(id string, duration time.Duration) {
-	_ = concurrency.RunInLockOrLog(&o.mu, locknames.LockNameWaitgroupObserverOnCompleted, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
-		if !o.enabled {
-			return nil
-		}
-		stats, exists := o.groups[id]
-		if !exists {
-			return nil
-		}
+	o.withActiveGroup(locknames.LockNameWaitgroupObserverOnCompleted, id, func(stats *groupStats) {
 		StorageLog(o.logger.Logger()).Info(LogEventStorageWaitGroupObserverCompletedInfo).
 			String("group_id", id).
 			String("operation", stats.operation).
@@ -192,7 +175,6 @@ func (o *LoggingWaitGroupObserver) OnGroupCompleted(id string, duration time.Dur
 				String("duration", duration.String()).
 				Log()
 		}
-		return nil
 	})
 }
 

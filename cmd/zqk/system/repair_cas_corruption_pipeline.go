@@ -317,7 +317,6 @@ func RunRepairCASCorruptionViaPipeline(
 		}).
 		Build()
 
-	pctx := &pipeline.Context{Ctx: baseCtx, Outcome: make(map[string]any)}
-	_, err := pl.Run(pctx, payload)
+	_, err := pl.RunWithContext(baseCtx, payload)
 	return err
 }

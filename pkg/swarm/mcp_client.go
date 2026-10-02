@@ -448,31 +448,7 @@ func (e *MCPExecutor) ExecuteToolCall(ctx context.Context, call llm.ToolCall) (s
 }
 
 func getProjectRoot() string {
-	if pr := zqkenv.ProjectRoot().Get(); pr != "" {
-		return pr
-	}
-	if tr := zqkenv.TestRoot().Get(); tr != "" {
-		return tr
-	}
-	dir, err := fileutil.Getwd()
-	if err != nil {
-		return ""
-	}
-	dir, err = filepath.Abs(dir)
-	if err != nil {
-		return ""
-	}
-	for {
-		if _, err := fileutil.Stat(filepath.Join(dir, paths.ProjectDataDir)); err == nil {
-			return dir
-		}
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			break
-		}
-		dir = parent
-	}
-	return ""
+	return paths.ResolveProjectRoot(".")
 }
 
 // levenshteinDistance calculates the Levenshtein distance between two strings

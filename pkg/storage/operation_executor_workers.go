@@ -97,10 +97,9 @@ func (e *OperationExecutor) worker(workerID int) {
 		}
 	}()
 
-	idleStartTime := time.Now()
-	processedCount := 0
-	failedCount := 0
 	startTime := time.Now()
+	idleStartTime := startTime
+	var processedCount, failedCount int
 
 	for {
 		select {

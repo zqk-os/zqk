@@ -88,12 +88,6 @@ func (s *SidebarComponent) RenderHTML() string {
 	sb.WriteString("          <span style=\"font-weight: 600; font-size: 13px;\">Agent & Operator Inbox</span>\n")
 	sb.WriteString("          <button class=\"btn btn-sm\" onclick=\"fetchInbox()\">↻ Refresh</button>\n")
 	sb.WriteString("        </div>\n")
-	sb.WriteString("        <div id=\"inbox-list-container\" style=\"overflow-y: auto; max-height: calc(100vh - 180px); padding: 8px;\">\n")
-	sb.WriteString("          <div style=\"padding: 16px; color: var(--text-muted);\">Loading inbox...</div>\n")
-	sb.WriteString("        </div>\n")
-	sb.WriteString("      </div>\n")
-
-	sb.WriteString("    </div>\n")
-
+	sb.WriteString("        <div id=\"inbox-list-container\" style=\"overflow-y: auto; max-height: calc(100vh - 180px); padding: 8px;\">\n          <div style=\"padding: 16px; color: var(--text-muted);\">Loading inbox...</div>\n        </div>\n      </div>\n    </div>\n")
 	return sb.String()
 }

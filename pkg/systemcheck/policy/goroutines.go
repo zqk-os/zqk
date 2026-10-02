@@ -25,12 +25,8 @@ var rawGoRegex = regexp.MustCompile(`^\s*go\s+(func\(|[A-Za-z_*(&])`)
 var errgroupGoRegex = regexp.MustCompile(`\b[a-zA-Z0-9_]+\.Go\(\s*func\(`)
 
 func (g *GoroutinesGate) Run(ctx context.Context, opts RunOptions) (*Result, error) {
-	root, err := ResolveProjectRoot(opts)
-	if err != nil {
-		return nil, err
-	}
-
-	var violations []string
+	return runWithResolvedRoot(opts, func(root string) (*Result, error) {
+		var violations []string
 	var warnings []string
 	var filesToScan []string
 
@@ -162,6 +158,7 @@ func (g *GoroutinesGate) Run(ctx context.Context, opts RunOptions) (*Result, err
 		Message:  fmt.Sprintf("All scoped goroutines comply with policies (%d pre-existing debt warning(s))", len(warnings)),
 		Warnings: warnings,
 	}, nil
+	})
 }
 
 func getStagedGoFiles(root string) []string {

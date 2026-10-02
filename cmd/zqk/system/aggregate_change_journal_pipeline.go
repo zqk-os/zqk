@@ -181,7 +181,6 @@ func RunAggregateChangeJournalViaPipeline(cmd *cobra.Command, _ []string) error 
 		Build()
 
 	initial := &aggregateChangeJournalPipelinePayload{cmd: cmd}
-	pctx := &pipeline.Context{Ctx: baseCtx, Outcome: make(map[string]any)}
-	_, err := pl.Run(pctx, initial)
+	_, err := pl.RunWithContext(baseCtx, initial)
 	return err
 }

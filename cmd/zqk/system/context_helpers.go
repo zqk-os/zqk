@@ -90,15 +90,7 @@ func resolveContextProjectRoot(ctx *cli.Context) (string, error) {
 }
 
 func resolveCommandProjectRoot(cmd *cobra.Command) (string, error) {
-	ctx := cli.GetContext(cmd)
-	if ctx == nil {
-		return "", errfmt.Errorf("failed to get context")
-	}
-	projectRoot := ProjectRootOrResolve(ctx.ProjectRoot)
-	if projectRoot == emptyValue {
-		return "", errfmt.Errorf("project root not found")
-	}
-	return projectRoot, nil
+	return resolveContextProjectRoot(cli.GetContext(cmd))
 }
 
 // openStorageProvider creates a StorageFactory for projectRoot and returns its ObjectStorageProvider along with a deferrable cleanup function.
@@ -432,6 +424,33 @@ func writeGoroutineProfile(filename string, debugLevel ...int) error {
 	}
 
 	return nil
+}
+
+// loadAndExpandSnapshot loads and expands a compressed snapshot from the specified input path flag.
+func loadAndExpandSnapshot(cmd *cobra.Command, projectRoot string) ([]map[string]any, error) {
+	inputPath, _ := cmd.Flags().GetString("input")
+	if !filepath.IsAbs(inputPath) {
+		inputPath = filepath.Join(projectRoot, inputPath)
+	}
+
+	if _, err := fileutil.Stat(inputPath); fileutil.IsNotExist(err) {
+		return nil, errfmt.Errorf("state file %s does not exist", inputPath)
+	}
+
+	cmd.Printf("Reading compressed snapshot from %s...\n", inputPath)
+	cs, err := storage.ReadCompressedSnapshot(inputPath)
+	if err != nil {
+		return nil, errfmt.Newf("failed to read compressed snapshot").Wrap(err)
+	}
+
+	cmd.Printf("Snapshot Checksum: %s\n", cs.Header.Checksum)
+	cmd.Printf("Expanding %d objects...\n", cs.Header.ObjectCount)
+
+	expanded, err := cs.Expand()
+	if err != nil {
+		return nil, errfmt.Newf("failed to expand snapshot").Wrap(err)
+	}
+	return expanded, nil
 }
 
 

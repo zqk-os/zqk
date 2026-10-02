@@ -470,19 +470,7 @@ func RenderSystemPromptWithStorage(ctx context.Context, sp storage.ObjectStorage
 		fallback = DefaultSwarmWorkerCodingSystemPromptTemplate
 	}
 	tmplSrc := ResolvePromptTemplate(ctx, sp, secCtx, templateID, fallback)
-	tmpl, err := template.New("swarm_worker_system").Parse(tmplSrc)
-	if err != nil && tmplSrc != fallback {
-		// Fallback to built-in template if custom template has syntax error
-		tmpl, err = template.New("swarm_worker_system").Parse(fallback)
-	}
-	if err != nil {
-		return "", err
-	}
-	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, data); err != nil {
-		return "", err
-	}
-	return buf.String(), nil
+	return renderPromptTemplate("swarm_worker_system", tmplSrc, fallback, data)
 }
 
 // RenderTaskPromptWithStorage renders the swarm worker task prompt, resolving the template
@@ -492,10 +480,14 @@ func RenderTaskPromptWithStorage(ctx context.Context, sp storage.ObjectStoragePr
 		data.ToolPrefix = DefaultToolPrefix()
 	}
 	tmplSrc := ResolvePromptTemplate(ctx, sp, secCtx, PromptTemplateSwarmWorkerTask, DefaultSwarmWorkerTaskPromptTemplate)
-	tmpl, err := template.New("swarm_worker_task").Parse(tmplSrc)
-	if err != nil && tmplSrc != DefaultSwarmWorkerTaskPromptTemplate {
+	return renderPromptTemplate("swarm_worker_task", tmplSrc, DefaultSwarmWorkerTaskPromptTemplate, data)
+}
+
+func renderPromptTemplate(name, tmplSrc, fallback string, data any) (string, error) {
+	tmpl, err := template.New(name).Parse(tmplSrc)
+	if err != nil && tmplSrc != fallback {
 		// Fallback to built-in template if custom template has syntax error
-		tmpl, err = template.New("swarm_worker_task").Parse(DefaultSwarmWorkerTaskPromptTemplate)
+		tmpl, err = template.New(name).Parse(fallback)
 	}
 	if err != nil {
 		return "", err
