@@ -28,12 +28,10 @@ func runCriteriaEvidenceFromCmd(cmd *cobra.Command, _ []string) error {
 }
 
 func runCriteriaEvidence(cliCtx *cli.Context, cmd *cobra.Command) error {
-	projectRoot := cliCtx.ProjectRoot
-	if projectRoot == emptyValue {
-		projectRoot = cli.ResolveProjectRoot(".")
-		if projectRoot == emptyValue {
-			return errfmt.Errorf("project root not found")
-		}
+	_ = cliCtx
+	projectRoot, err := resolveSchedulerProjectRoot(cmd)
+	if err != nil {
+		return err
 	}
 
 	limit, _ := cmd.Flags().GetInt("limit") //nolint:errcheck // optional

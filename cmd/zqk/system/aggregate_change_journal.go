@@ -38,9 +38,7 @@ func NewAggregateChangeJournalCmd() *cobra.Command {
 	// Apply help builder to command
 	helpBuilder.ApplyToCommand(cmd)
 
-	cmd.Flags().String("window", "24h", "Time window for aggregation (e.g., 24h, 7d, 1w)")
-	cmd.Flags().String("start", "", "Start time for aggregation window (ISO 8601 format)")
-	cmd.Flags().String("end", "", "End time for aggregation window (ISO 8601 format, defaults to now)")
+	addAggregationWindowFlags(cmd)
 	cmd.Flags().Bool("delete", false, "Delete processed entries after aggregation (use with caution)")
 
 	cli.AddCommonFlags(cmd)

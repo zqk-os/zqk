@@ -51,16 +51,8 @@ func RunAggregateChangeJournalViaPipeline(cmd *cobra.Command, _ []string) error 
 		return errfmt.Errorf("aggregate-change-journal: cmd required")
 	}
 
-	baseCtx := cmd.Context()
-	if baseCtx == nil {
-		baseCtx = pkgctx.NewSystemContext()
-	}
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-
-	pl := pipeline.NewBuilder(pipelineKindAggregateChangeJournal, logger).
-		WithProfile(string(pkgctx.ProfileSystem)).
-		WithMetricsConfig(&pipeline.MetricsConfig{Sink: noopMetricsSink{}, Strategy: pipeline.NoopBucketing{}}).
-		AddStage("INGEST", func(pctx *pipeline.Context, _ any) (any, error) {
+	baseCtx, bldr := initAggregationPipelineBuilder(cmd, pipelineKindAggregateChangeJournal)
+	pl := bldr.AddStage("INGEST", func(pctx *pipeline.Context, _ any) (any, error) {
 			out := &aggregateChangeJournalPipelinePayload{cmd: cmd}
 
 			ctx := cli.GetContext(cmd)

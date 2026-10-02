@@ -1,0 +1,44 @@
+## Summary
+
+This PR executes **Wave 7** of the systematic, kernel-wide DRY refactoring campaign (`PRI-DRY-REMEDIATION-007`), reducing duplicative AST sequences identified by `zqk-vet --suite hygiene`.
+
+### Warning Reduction Progress
+- Baseline: 1,797 warnings
+- PR #441 (Wave 1): 1,488 warnings (-309)
+- PR #442 (Wave 2): 1,394 warnings (-94)
+- PR #443 (Wave 3): 1,291 warnings (-103)
+- PR #444 (Wave 4): 1,201 warnings (-90)
+- PR #445 (Wave 5): 1,148 warnings (-53)
+- PR #446 (Wave 6): 1,122 warnings (-26)
+- **PR #447 (Wave 7): 1,105 warnings (-17 warnings eliminated, cumulative 692 warnings eliminated, >38.5% total reduction)**
+
+---
+
+### Key Refactorings in Wave 7
+
+1. **`cmd/zqk/semantic/`**:
+   - Extracted `assessSemanticMaturity(cmd *cobra.Command, errPrefix string)` in `cmd/zqk/semantic/helpers.go`.
+   - Unified command execution and validation in `cmd/zqk/semantic/assess.go` and `cmd/zqk/semantic/recommend.go`.
+
+2. **`cmd/zqk/scheduler/`**:
+   - Extracted `initCommandProcContext(cmd *cobra.Command)` and `cvsNestNodeLoader` in `convergence_nest.go`.
+   - Reused across `test_failures_convergence_cef.go`, `test_failures_convergence.go`, and `test_failures_convergence_rollup.go`.
+   - Extracted `addTestFailuresPackageAndSinceFlags(cmd *cobra.Command)` in `test_failures_commands.go`.
+   - Extracted `walkLogFileLines(dir, cutoff, exts, fn)`, `parseTestFailuresFilterConfig(cliCtx, cmd)`, and `parseCallbackTestFailures(entry, filter, fn)` in `test_failures.go`.
+   - Refactored `test_failures_list.go`, `test_failures_rerun.go`, and `test_failures_analyze_pipeline.go` to collapse repetitive log file walks, cutoff calculations, json unmarshalling, and package filtering.
+   - Refactored project root resolution across `criteria_evidence_cmd.go` and `test_failures_health.go`.
+
+3. **`cmd/zqk/system/`**:
+   - Extracted `addAggregationWindowFlags(cmd *cobra.Command)` and unified `cmd/zqk/system/aggregate_audit.go` and `cmd/zqk/system/aggregate_change_journal.go`.
+   - Extracted `initAggregationPipelineBuilder(cmd, pipelineKind)` and unified `aggregate_audit_pipeline.go` and `aggregate_change_journal_pipeline.go`.
+   - Extracted `invalidateBulkEventsCache` in `aggregate_audit_helpers.go` and refactored `cleanup_events_helpers.go`.
+   - Delegated `parseDuration` in `aggregate_audit.go` to `storage.ParseWindowSize`.
+
+---
+
+### Verification
+- `go test ./cmd/zqk/semantic/...`: PASS
+- `go test ./cmd/zqk/scheduler/...`: PASS
+- `go test ./cmd/zqk/system -run "Test.*Cleanup|Test.*Aggregate"`: PASS
+- `go build -o ./bin/zqk ./cmd/zqk && go build -o ./bin/zqk-vet ./cmd/zqk-vet`: PASS
+- `./bin/zqk system check`: PASS (3,968 objects validated, 0 errors, 0 warnings, CAS clean)

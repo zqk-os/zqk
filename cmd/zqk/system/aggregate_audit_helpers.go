@@ -277,18 +277,16 @@ func handleArchiveCleanup(aggCtx *AggregateAuditContext, result *storage.AuditAg
 	return cli.WriteOutput(aggCtx.Cmd, buf.Bytes())
 }
 
-// handleCacheInvalidation handles cache invalidation after deletion
-func handleCacheInvalidation(aggCtx *AggregateAuditContext, result *storage.AuditAggregationResult, buf *bytes.Buffer) {
-	proc, procErr := cli.NewProcessor(aggCtx.Cmd)
+func invalidateBulkEventsCache(cmd *cobra.Command, projectRoot, reason string, eventIDs []string, buf *bytes.Buffer) {
+	proc, procErr := cli.NewProcessor(cmd)
 	if procErr != nil {
 		return
 	}
 
-	expandedIDs := storage.ExpandIDRanges(result.EventsProcessed)
 	cacheCtx := pkgctx.NewCacheInvalidationContext(
-		expandedIDs,
-		aggCtx.ProjectRoot,
-		"Bulk deletion of aggregated audit events",
+		eventIDs,
+		projectRoot,
+		reason,
 	)
 	cacheInvalidated, cacheErr := proc.InvalidateCache(cacheCtx)
 	if cacheErr != nil {
@@ -298,6 +296,12 @@ func handleCacheInvalidation(aggCtx *AggregateAuditContext, result *storage.Audi
 		//nolint:gocritic // preferFprint: POL-CODE-007 buffer via WriteString(Sprintf)
 		fmt.Fprintf(buf, "  ✅ Cache entries invalidated: %d\n", cacheInvalidated)
 	}
+}
+
+// handleCacheInvalidation handles cache invalidation after deletion
+func handleCacheInvalidation(aggCtx *AggregateAuditContext, result *storage.AuditAggregationResult, buf *bytes.Buffer) {
+	expandedIDs := storage.ExpandIDRanges(result.EventsProcessed)
+	invalidateBulkEventsCache(aggCtx.Cmd, aggCtx.ProjectRoot, "Bulk deletion of aggregated audit events", expandedIDs, buf)
 }
 
 // outputNoCleanupMessage outputs message when no cleanup is performed

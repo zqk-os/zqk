@@ -277,13 +277,13 @@ func runConvergenceSessionPersist(
 	sessionThresholds map[string]any,
 ) (*persistSessionOutcome, error) {
 	_ = cliCtx
-	proc, err := cli.NewProcessor(cmd)
+	cpc, err := initCommandProcContext(cmd)
 	if err != nil {
 		return nil, err
 	}
-	ctx := proc.OperationContext()
-	sec := proc.SecurityContext()
-	obj, err := proc.Storage().Read(ctx, sec, sessionID)
+	ctx := cpc.Ctx
+	sec := cpc.Sec
+	obj, err := cpc.Proc.Storage().Read(ctx, sec, sessionID)
 	if err != nil {
 		return nil, errfmt.Newf("persist-session: read convergence_session").Wrap(err)
 	}
@@ -291,7 +291,7 @@ func runConvergenceSessionPersist(
 	if schedpkg.ShouldSkipConvergencePersistForDuplicateWatermark(obj, snap) {
 		out.SkippedNoNewWatermark = true
 		audit := schedpkg.ConvergenceDuplicateWatermarkAuditUpdate(obj, snap, time.Now())
-		if err := proc.Storage().Update(ctx, sec, sessionID, audit); err != nil {
+		if err := cpc.Proc.Storage().Update(ctx, sec, sessionID, audit); err != nil {
 			return nil, errfmt.Newf("persist-session: duplicate-watermark audit append").Wrap(err)
 		}
 		out.AuditAppended = true
@@ -309,7 +309,7 @@ func runConvergenceSessionPersist(
 		return nil, errfmt.Errorf("persist-session: empty object_update_body")
 	}
 	schedpkg.MergeConvergencePersistObjectUpdateBody(obj, body, snap)
-	if err := proc.Storage().Update(ctx, sec, sessionID, body); err != nil {
+	if err := cpc.Proc.Storage().Update(ctx, sec, sessionID, body); err != nil {
 		return nil, errfmt.Newf("persist-session").Wrap(err)
 	}
 	out.Applied = true

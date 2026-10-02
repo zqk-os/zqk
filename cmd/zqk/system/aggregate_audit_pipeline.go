@@ -1,6 +1,7 @@
 package system
 
 import (
+	stdcontext "context"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -46,6 +47,19 @@ func aggregateAuditPayloadFrom(payload any, requireAggCtx bool) (*aggregateAudit
 	return in, true
 }
 
+func initAggregationPipelineBuilder(cmd *cobra.Command, pipelineKind string) (stdcontext.Context, *pipeline.Builder) {
+	baseCtx := cmd.Context()
+	if baseCtx == nil {
+		baseCtx = pkgctx.NewSystemContext()
+	}
+	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+
+	pl := pipeline.NewBuilder(pipelineKind, logger).
+		WithProfile(string(pkgctx.ProfileSystem)).
+		WithMetricsConfig(&pipeline.MetricsConfig{Sink: noopMetricsSink{}, Strategy: pipeline.NoopBucketing{}})
+	return baseCtx, pl
+}
+
 // RunAggregateAuditViaPipeline wraps `aggregate-audit` in the canonical pipeline lifecycle.
 func RunAggregateAuditViaPipeline(cmd *cobra.Command, _ []string) error {
 	if cmd == nil {
@@ -58,16 +72,8 @@ func RunAggregateAuditViaPipeline(cmd *cobra.Command, _ []string) error {
 	}
 	defer stopCPUProfile()
 
-	baseCtx := cmd.Context()
-	if baseCtx == nil {
-		baseCtx = pkgctx.NewSystemContext()
-	}
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-
-	pl := pipeline.NewBuilder(pipelineKindAggregateAudit, logger).
-		WithProfile(string(pkgctx.ProfileSystem)).
-		WithMetricsConfig(&pipeline.MetricsConfig{Sink: noopMetricsSink{}, Strategy: pipeline.NoopBucketing{}}).
-		AddStage("INGEST", func(pctx *pipeline.Context, _ any) (any, error) {
+	baseCtx, bldr := initAggregationPipelineBuilder(cmd, pipelineKindAggregateAudit)
+	pl := bldr.AddStage("INGEST", func(pctx *pipeline.Context, _ any) (any, error) {
 			if pctx.Outcome == nil {
 				pctx.Outcome = make(map[string]any)
 			}

@@ -102,14 +102,12 @@ func persistCEFDiamondSession(cliCtx *cli.Context, cmd *cobra.Command, sessionID
 		return nil, errfmt.Errorf("persist-session: empty CEF object_update_body")
 	}
 	_ = cliCtx
-	proc, err := cli.NewProcessor(cmd)
+	cpc, err := initCommandProcContext(cmd)
 	if err != nil {
 		return nil, err
 	}
-	ctx := proc.OperationContext()
-	sec := proc.SecurityContext()
 	body := res.ObjectUpdateBody
-	if err := proc.Storage().Update(ctx, sec, sessionID, body); err != nil {
+	if err := cpc.Proc.Storage().Update(cpc.Ctx, cpc.Sec, sessionID, body); err != nil {
 		return nil, errfmt.Newf("persist-session CEF").Wrap(err)
 	}
 	return &persistSessionOutcome{Requested: true, Applied: true}, nil

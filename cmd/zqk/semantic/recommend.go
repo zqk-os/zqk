@@ -8,7 +8,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
-	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/semantic"
 )
@@ -41,14 +40,9 @@ func NewRecommendCmd() *cobra.Command {
 }
 
 func runRecommend(cmd *cobra.Command, args []string) error {
-	projectRoot, err := resolveSemanticProjectRoot(cmd)
+	assessment, err := assessSemanticMaturity(cmd, "recommendation failed")
 	if err != nil {
 		return err
-	}
-
-	assessment, err := runMaturityAssessment(projectRoot)
-	if err != nil {
-		return errfmt.Newf("recommendation failed").Wrap(err)
 	}
 
 	return outputRecommendations(cmd, assessment)

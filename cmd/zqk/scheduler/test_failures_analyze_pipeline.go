@@ -22,7 +22,6 @@ import (
 	schedpkg "github.com/zqk-os/zqk/pkg/scheduler"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/storage/id_generation"
-	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/validation"
 	"github.com/zqk-os/zqk/pkg/zqktime"
 )
@@ -82,12 +81,9 @@ func stageIngestTestFailures(stageCtx *pipeline.Context, p any) (any, error) {
 		return nil, errfmt.Errorf("expected *testFailureAnalysisPayload")
 	}
 
-	projectRoot := payload.cliCtx.ProjectRoot
-	if projectRoot == emptyValue {
-		projectRoot = cli.ResolveProjectRoot(".")
-		if projectRoot == emptyValue {
-			return nil, errfmt.Errorf("project root not found")
-		}
+	projectRoot, err := resolveSchedulerProjectRoot(payload.cmd)
+	if err != nil {
+		return nil, err
 	}
 	payload.projectRoot = projectRoot
 
@@ -122,56 +118,14 @@ func stageCollectLogs(stageCtx *pipeline.Context, p any) (any, error) {
 
 	// We collect raw file content into logLines for parsing
 	callbackLogsDir := filepath.Join(payload.projectRoot, paths.ProjectDataDir, "callbacks")
-	if _, err := fileutil.Stat(callbackLogsDir); err == nil {
-		err = filepath.Walk(callbackLogsDir, func(path string, info fileutil.FileInfo, err error) error {
-			if err != nil || info.ModTime().Before(payload.cutoffTime) {
-				return nil //nolint:nilerr // skip unreadable or outdated callback logs
-			}
-			if !strings.HasSuffix(path, ".log") && !strings.HasSuffix(path, ".jsonl") {
-				return nil
-			}
-			data, err := fileutil.ReadFile(path)
-			if err != nil {
-				return nil //nolint:nilerr // best-effort log parsing
-			}
-			for line := range strings.SplitSeq(string(data), "\n") {
-				line = strings.TrimSpace(line)
-				if line != emptyValue {
-					payload.logLines = append(payload.logLines, line)
-				}
-			}
-			return nil
-		})
-		if err != nil {
-			return nil, errfmt.Newf("failed to scan callback logs").Wrap(err)
-		}
-	}
+	_ = walkLogFileLines(callbackLogsDir, payload.cutoffTime, []string{".log", ".jsonl"}, func(line string) {
+		payload.logLines = append(payload.logLines, line)
+	})
 
 	schedulerLogsDir := filepath.Join(payload.projectRoot, paths.ProjectDataDir, paths.LogsDir, paths.SchedulerJobLogsSubdir)
-	if _, err := fileutil.Stat(schedulerLogsDir); err == nil {
-		err = filepath.Walk(schedulerLogsDir, func(path string, info fileutil.FileInfo, err error) error {
-			if err != nil || info.ModTime().Before(payload.cutoffTime) {
-				return nil //nolint:nilerr // skip unreadable or outdated scheduler logs
-			}
-			if !strings.HasSuffix(path, ".log") {
-				return nil
-			}
-			data, err := fileutil.ReadFile(path)
-			if err != nil {
-				return nil //nolint:nilerr // best-effort log parsing
-			}
-			for line := range strings.SplitSeq(string(data), "\n") {
-				line = strings.TrimSpace(line)
-				if line != emptyValue {
-					payload.logLines = append(payload.logLines, line)
-				}
-			}
-			return nil
-		})
-		if err != nil {
-			return nil, errfmt.Newf("failed to scan scheduler logs").Wrap(err)
-		}
-	}
+	_ = walkLogFileLines(schedulerLogsDir, payload.cutoffTime, []string{".log"}, func(line string) {
+		payload.logLines = append(payload.logLines, line)
+	})
 
 	stageCtx.Outcome["lines_collected"] = len(payload.logLines)
 	return payload, nil

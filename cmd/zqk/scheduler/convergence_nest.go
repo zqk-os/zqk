@@ -1,24 +1,42 @@
 package scheduler
 
 import (
+	"context"
 	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cliapp"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/convergerollup"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
-func cvsNestNodeLoader(cmd *cobra.Command) (convergerollup.CVSNodeLoader, *cli.Processor, error) {
+type commandProcContext struct {
+	Proc *cli.Processor
+	Ctx  context.Context
+	Sec  *pkgctx.SecurityContext
+}
+
+func initCommandProcContext(cmd *cobra.Command) (*commandProcContext, error) {
 	proc, err := cli.NewProcessor(cmd)
+	if err != nil {
+		return nil, err
+	}
+	return &commandProcContext{
+		Proc: proc,
+		Ctx:  proc.OperationContext(),
+		Sec:  proc.SecurityContext(),
+	}, nil
+}
+
+func cvsNestNodeLoader(cmd *cobra.Command) (convergerollup.CVSNodeLoader, *cli.Processor, error) {
+	cpc, err := initCommandProcContext(cmd)
 	if err != nil {
 		return nil, nil, err
 	}
-	ctx := proc.OperationContext()
-	sec := proc.SecurityContext()
 	nodeFor := func(id string) ([]string, string, string, error) {
-		obj, rerr := proc.Storage().Read(ctx, sec, id)
+		obj, rerr := cpc.Proc.Storage().Read(cpc.Ctx, cpc.Sec, id)
 		if rerr != nil {
 			return nil, "", "", rerr
 		}
@@ -26,7 +44,7 @@ func cvsNestNodeLoader(cmd *cobra.Command) (convergerollup.CVSNodeLoader, *cli.P
 		phase, _ := obj[objects.FieldKeyCurrentPhase].(string)
 		return cvsIDsFromRelatedObjectRefs(obj[objects.FieldKeyRelatedObjectRefs]), st, phase, nil
 	}
-	return nodeFor, proc, nil
+	return nodeFor, cpc.Proc, nil
 }
 
 // RunConvergenceNestStatus executes nest-status
