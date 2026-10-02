@@ -17,6 +17,21 @@ import (
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
+// SetupRawTerminal puts the terminal into raw mode, enters alternate buffer, and hides cursor.
+// It returns a restore function that reverts all changes.
+func SetupRawTerminal(stdinFd int) (func(), error) {
+	oldState, err := term.MakeRaw(stdinFd)
+	if err != nil {
+		return nil, err
+	}
+	_, _ = os.Stdout.WriteString(AnsiAltBufferEnter + AnsiClearScreen + AnsiHomeCursor + AnsiHideCursor)
+	restore := func() {
+		_, _ = os.Stdout.WriteString(AnsiShowCursor + AnsiAltBufferExit + CRLF)
+		_ = term.Restore(stdinFd, oldState)
+	}
+	return restore, nil
+}
+
 // RunTUI starts the interactive full-screen mission control session.
 func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp storage.ObjectStorageProvider, sec *pkgctx.SecurityContext) error {
 	stdinFd := int(os.Stdin.Fd())
@@ -42,21 +57,11 @@ func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp stora
 		return nil
 	}
 
-	// Put terminal into raw mode to capture individual keypresses
-	oldState, err := term.MakeRaw(stdinFd)
+	restore, err := SetupRawTerminal(stdinFd)
 	if err != nil {
 		return err
 	}
-	defer func() {
-		_ = term.Restore(stdinFd, oldState)
-	}()
-
-	// Switch to alternate screen buffer, clear screen, and hide cursor
-	_, _ = os.Stdout.WriteString(AnsiAltBufferEnter + AnsiClearScreen + AnsiHomeCursor + AnsiHideCursor)
-	defer func() {
-		// Restore cursor visibility, exit alternate buffer, and return cursor
-		_, _ = os.Stdout.WriteString(AnsiShowCursor + AnsiAltBufferExit + CRLF)
-	}()
+	defer restore()
 
 	m := NewUIModel(projectRoot, initialTab)
 	m.Storage = sp

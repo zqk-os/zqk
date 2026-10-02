@@ -21,6 +21,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/tui"
 	"github.com/zqk-os/zqk/pkg/tui/tds"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
@@ -1635,19 +1636,11 @@ func RunInspectTUI(cmd *cobra.Command, initialKind string, fields, filters []str
 		return nil
 	}
 
-	oldState, err := term.MakeRaw(stdinFd)
+	restore, err := tui.SetupRawTerminal(stdinFd)
 	if err != nil {
 		return err
 	}
-	defer func() {
-		_ = term.Restore(stdinFd, oldState)
-	}()
-
-	// Switch to alternate screen buffer, clear screen, and hide cursor
-	_, _ = os.Stdout.WriteString(ansiAltBufferEnter + ansiClearScreen + ansiHomeCursor + ansiHideCursor)
-	defer func() {
-		_, _ = os.Stdout.WriteString(ansiShowCursor + ansiAltBufferExit + crlf)
-	}()
+	defer restore()
 
 	w, h, err := term.GetSize(stdoutFd)
 	if err == nil {

@@ -18,6 +18,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/walutil"
 )
 
 const (
@@ -110,20 +111,7 @@ func EmitForKind(projectRoot, kind, reason string) error {
 
 func appendEvent(projectRoot string, ev Event) error {
 	path := outboxPath(projectRoot)
-	if err := fileutil.MkdirAll(filepath.Dir(path), paths.DirPerm755); err != nil {
-		return err
-	}
-	b, err := json.Marshal(ev)
-	if err != nil {
-		return err
-	}
-	f, err := fileutil.OpenFile(path, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, paths.FilePerm644) //nolint:gosec
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	_, err = f.Write(append(b, '\n'))
-	return err
+	return walutil.AppendJSONLine(path, ev)
 }
 
 // ListPending returns unconsumed outbox events (order preserved).

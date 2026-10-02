@@ -19,7 +19,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
-	"github.com/zqk-os/zqk/pkg/walutil"
 )
 
 // StrategicReadinessLiteFilePath returns the canonical path for the materialized strategic readiness view.
@@ -698,51 +697,15 @@ func (v *StrategicReadinessView) GetSnapshot() *StrategicReadinessLitePayload {
 
 // SubscribeWAL starts a background listener on the lifecycle WAL for continuous incremental updates.
 func (v *StrategicReadinessView) SubscribeWAL(ctx context.Context, updateCh chan<- struct{}) {
-	wal, err := lifecycle.GetOrCreateLifecycleWAL(v.projectRoot)
-	if err != nil {
-		return
-	}
-
-	var cursor walutil.ReplayCursor
-	pollInterval := 200 * time.Millisecond
-
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		default:
-		}
-
-		newEvents := 0
-		newCursor, err := wal.ReplayFromCursor(cursor, func(ev *lifecycle.LifecycleEvent) error {
-			if ev == nil {
-				return nil
-			}
-			newEvents++
-			v.ApplyLifecycleEvent(ev)
-			return nil
-		})
-
-		if err == nil {
-			cursor = newCursor
-		}
-
-		if newEvents > 0 {
-			_ = v.SaveToLiteFile()
-			if updateCh != nil {
-				select {
-				case updateCh <- struct{}{}:
-				default:
-				}
+	lifecycle.PollLifecycleWAL(ctx, v.projectRoot, 200*time.Millisecond, v.ApplyLifecycleEvent, func() {
+		_ = v.SaveToLiteFile()
+		if updateCh != nil {
+			select {
+			case updateCh <- struct{}{}:
+			default:
 			}
 		}
-
-		select {
-		case <-ctx.Done():
-			return
-		case <-time.After(pollInterval):
-		}
-	}
+	})
 }
 
 // StartBackgroundWALSubscriber helper to launch SubscribeWAL with proper goroutine tracking.

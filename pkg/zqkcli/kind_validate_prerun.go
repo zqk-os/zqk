@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cliapp"
+	objkeys "github.com/zqk-os/zqk/pkg/objects"
 )
 
 const (
@@ -43,4 +44,28 @@ func kindCanonicalFromInternalPRERun(cmd *cobra.Command) (string, bool) {
 
 func kindsListFromInternalPRERun(cmd *cobra.Command) ([]string, bool) {
 	return cli.KindsListFromPRERun(cli.KindAnnotKeysInternal, cmd)
+}
+
+func newInternalProcessorWithRoot(cmd *cobra.Command) (*cli.Processor, string, error) {
+	proc, err := newInternalProcessor(cmd)
+	if err != nil {
+		return nil, "", err
+	}
+	return proc, proc.ProjectRoot(), nil
+}
+
+func resolveInternalKindAndProcessor(cmd *cobra.Command, args []string) (*cli.Processor, string, error) {
+	proc, root, err := newInternalProcessorWithRoot(cmd)
+	if err != nil {
+		return nil, "", err
+	}
+	kind, ok := kindCanonicalFromInternalPRERun(cmd)
+	if !ok {
+		var rerr error
+		kind, rerr = objkeys.ResolveAndValidateKindForProject(root, args[0])
+		if rerr != nil {
+			return nil, "", rerr
+		}
+	}
+	return proc, kind, nil
 }

@@ -367,15 +367,18 @@ func (c *IDPrefixesConfig) inferPrefixFromKind(kind string) []string {
 	}
 
 	// Default strategy: use first 3 letters of first part
+	return inferPrefixFromFirstPart(kind)
+}
+
+// inferPrefixFromFirstPart extracts prefix from first underscore-delimited segment.
+func inferPrefixFromFirstPart(kind string) []string {
 	parts := strings.Split(kind, "_")
 	if len(parts) > 0 {
 		firstPart := strings.ToUpper(parts[0])
 		if len(firstPart) >= 3 {
-			prefix := firstPart[:3] + "-"
-			return []string{prefix}
+			return []string{firstPart[:3] + "-"}
 		}
 	}
-
 	return []string{}
 }
 

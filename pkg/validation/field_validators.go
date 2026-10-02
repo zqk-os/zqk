@@ -330,3 +330,22 @@ func IsEmptyValue(value any) bool {
 
 	return false
 }
+
+// ExtractValidationRules extracts the "validation" map from a field definition.
+func ExtractValidationRules(fieldDef map[string]any) (map[string]any, bool) {
+	validation, ok := fieldDef["validation"].(map[string]any)
+	return validation, ok
+}
+
+// ExtractPatternAndString resolves the pattern string and normalized field value.
+func ExtractPatternAndString(fieldName string, fieldValue any, validation map[string]any) (string, string, bool) {
+	pattern, ok := validation["pattern"].(string)
+	if !ok {
+		return "", "", false
+	}
+	strValue, ok := ResolveStringForPatternValidationWithField(fieldName, fieldValue)
+	if !ok {
+		return "", "", false
+	}
+	return pattern, strValue, true
+}

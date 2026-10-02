@@ -64,15 +64,5 @@ func (v *IDValidator) inferPrefixesFromKind(kind string) []string {
 	}
 
 	// Fallback: try to infer from kind name (backward compatibility)
-	parts := strings.Split(kind, "_")
-	if len(parts) > 0 {
-		// Take first 3-4 letters of first part, uppercase
-		firstPart := strings.ToUpper(parts[0])
-		if len(firstPart) >= 3 {
-			prefix := firstPart[:3] + "-"
-			return []string{prefix}
-		}
-	}
-
-	return []string{}
+	return inferPrefixFromFirstPart(kind)
 }

@@ -1188,20 +1188,7 @@ func renderSchedulerTab(b *strings.Builder, m *UIModel) {
 	}
 
 	total := len(jobs)
-	start := 0
-	if m.SelectedIndex >= availRows {
-		start = m.SelectedIndex - availRows + 1
-	}
-	if start+availRows > total {
-		start = total - availRows
-	}
-	if start < 0 {
-		start = 0
-	}
-	end := start + availRows
-	if end > total {
-		end = total
-	}
+	start, end := computeVisibleWindow(m.SelectedIndex, availRows, total)
 	visible := jobs[start:end]
 
 	for i, job := range visible {
@@ -1488,20 +1475,7 @@ func renderQATab(b *strings.Builder, m *UIModel) {
 	}
 
 	total := len(testCases)
-	start := 0
-	if m.SelectedIndex >= availRows {
-		start = m.SelectedIndex - availRows + 1
-	}
-	if start+availRows > total {
-		start = total - availRows
-	}
-	if start < 0 {
-		start = 0
-	}
-	end := start + availRows
-	if end > total {
-		end = total
-	}
+	start, end := computeVisibleWindow(m.SelectedIndex, availRows, total)
 	visible := testCases[start:end]
 
 	for i, tc := range visible {
@@ -1845,20 +1819,7 @@ func renderHealthTab(b *strings.Builder, m *UIModel) {
 	}
 
 	total := len(violations)
-	start := 0
-	if m.SelectedIndex >= availRows {
-		start = m.SelectedIndex - availRows + 1
-	}
-	if start+availRows > total {
-		start = total - availRows
-	}
-	if start < 0 {
-		start = 0
-	}
-	end := start + availRows
-	if end > total {
-		end = total
-	}
+	start, end := computeVisibleWindow(m.SelectedIndex, availRows, total)
 	visible := violations[start:end]
 
 	for i, v := range visible {
@@ -1890,4 +1851,23 @@ func renderHealthTab(b *strings.Builder, m *UIModel) {
 
 	b.WriteString(vTable.Render())
 	b.WriteString("\n")
+}
+
+// computeVisibleWindow calculates [start, end) indices for scrolling lists.
+func computeVisibleWindow(selectedIndex, availRows, total int) (int, int) {
+	start := 0
+	if selectedIndex >= availRows {
+		start = selectedIndex - availRows + 1
+	}
+	if start+availRows > total {
+		start = total - availRows
+	}
+	if start < 0 {
+		start = 0
+	}
+	end := start + availRows
+	if end > total {
+		end = total
+	}
+	return start, end
 }

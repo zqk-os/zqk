@@ -196,8 +196,7 @@ func (iv *InstanceValidator) validateField(fieldName string, fieldValue any, fie
 	var errors []ValidationError
 	var warnings []ValidationWarning
 
-	// Get validation rules from field definition
-	validation, ok := fieldDef["validation"].(map[string]any)
+	validation, ok := ExtractValidationRules(fieldDef)
 	if !ok {
 		return errors, warnings
 	}
@@ -272,12 +271,7 @@ func (iv *InstanceValidator) validateFieldType(fieldName string, fieldValue any,
 // For the 'id' field, uses IDValidator which leverages IDPrefixesConfig
 // This allows configurable ID validation strategies per kind (e.g., account:username format)
 func (iv *InstanceValidator) validateFieldPattern(fieldName string, fieldValue any, validation map[string]any, kind string) (*ValidationError, *ValidationWarning) {
-	pattern, ok := validation["pattern"].(string)
-	if !ok {
-		return nil, nil
-	}
-
-	strValue, ok := ResolveStringForPatternValidationWithField(fieldName, fieldValue)
+	pattern, strValue, ok := ExtractPatternAndString(fieldName, fieldValue, validation)
 	if !ok {
 		return nil, nil
 	}

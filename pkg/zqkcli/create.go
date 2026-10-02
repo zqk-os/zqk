@@ -4,7 +4,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
-	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // NewInternalCreateCmd creates a create command for internal objects
@@ -38,18 +37,9 @@ func NewInternalCreateCmd() *cobra.Command {
 }
 
 func runInternalCreate(cmd *cobra.Command, args []string) error {
-	proc, err := newInternalProcessor(cmd)
+	proc, kind, err := resolveInternalKindAndProcessor(cmd, args)
 	if err != nil {
 		return err
-	}
-
-	kind, ok := kindCanonicalFromInternalPRERun(cmd)
-	if !ok {
-		var rerr error
-		kind, rerr = objects.ResolveAndValidateKindForProject(proc.ProjectRoot(), args[0])
-		if rerr != nil {
-			return rerr
-		}
 	}
 
 	// Read object data

@@ -26,7 +26,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
-	"github.com/zqk-os/zqk/pkg/walutil"
 )
 
 // LineageNode represents a node in the upward/downward traceability chain.
@@ -882,48 +881,14 @@ func (s *DashboardState) SubscribeWAL(ctx context.Context, projectRoot string, u
 		return
 	}
 
-	wal, err := lifecycle.GetOrCreateLifecycleWAL(projectRoot)
-	if err != nil {
-		return
-	}
-
-	var cursor walutil.ReplayCursor
-	pollInterval := 200 * time.Millisecond
-
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		default:
-		}
-
-		newEvents := 0
-		newCursor, err := wal.ReplayFromCursor(cursor, func(ev *lifecycle.LifecycleEvent) error {
-			if ev == nil {
-				return nil
-			}
-			newEvents++
-			s.HandleLifecycleEvent(ev)
-			return nil
-		})
-
-		if err == nil {
-			cursor = newCursor
-		}
-
-		if newEvents > 0 {
+	lifecycle.PollLifecycleWAL(ctx, projectRoot, 200*time.Millisecond, s.HandleLifecycleEvent, func() {
+		if updateCh != nil {
 			select {
 			case updateCh <- struct{}{}:
 			default:
 			}
 		}
-
-		select {
-		case <-ctx.Done():
-			return
-		case <-time.After(pollInterval):
-		}
-	}
+	})
 }
 
 // HandleLifecycleEvent updates internal state based on WAL events.

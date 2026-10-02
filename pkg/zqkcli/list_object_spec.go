@@ -20,17 +20,7 @@ import (
 // listObjectSpecsForAll returns object specifications as QueryResult (for use in listAllInternalObjects)
 func listObjectSpecsForAll(cmd *cobra.Command, proc *cli.Processor, storageProvider storage.ObjectStorageProvider, projectRoot string, builtInOnly, internalOnly, allObjects bool) (*storage.QueryResult, error) {
 	_ = cmd // Reserved for future use (e.g., flag parsing)
-	// Check if this is a graph backend by trying to query for object_spec objects
-	secCtx := proc.SecurityContext()
-	storageCtx := proc.StorageContext()
-
-	// Try to query object_spec objects from storage
-	filter := storage.ListFilter{
-		Kind:    internalKindObjectSpec,
-		Filters: make(map[string]any),
-	}
-
-	result, err := storageProvider.List(proc.OperationContext(), secCtx, storageCtx, filter)
+	result, err := queryStorageInternalKind(proc, storageProvider, internalKindObjectSpec)
 	if err == nil && len(result.Objects) > 0 {
 		// Graph backend has object_spec objects stored as nodes
 		// Apply filters

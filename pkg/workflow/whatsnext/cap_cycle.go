@@ -8,6 +8,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/walutil"
 )
 
 // CapStages is the ordered CAP loop. Selection peeks; advance is explicit after
@@ -132,18 +133,7 @@ func AppendCapAdvanceJournal(projectRoot string, e CapAdvanceJournalEntry) error
 		e.Source = "cap_orchestrator"
 	}
 	path := capAdvanceJournalPath(projectRoot)
-	fileutil.EnsureDir(filepath.Dir(path)) //nolint:gosec
-	b, err := json.Marshal(e)
-	if err != nil {
-		return err
-	}
-	f, err := fileutil.OpenFile(path, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, paths.FilePerm644)
-	if err != nil {
-		return err
-	}
-	defer f.Close() //nolint:gosec
-	_, err = f.Write(append(b, '\n'))
-	return err
+	return walutil.AppendJSONLine(path, e)
 }
 
 // AdvanceCAPStage moves cap_cycle from completedStage to the next stage.

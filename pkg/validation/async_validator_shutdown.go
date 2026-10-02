@@ -84,14 +84,21 @@ func (av *AsyncValidator) Drain(ctx context.Context) error {
 	}
 }
 
-// isHexString checks if a string contains only hexadecimal characters
-func isHexString(s string) bool {
+// IsHexString reports whether s consists entirely of hexadecimal characters.
+func IsHexString(s string) bool {
+	if len(s) == 0 {
+		return false
+	}
 	for _, c := range s {
 		if (c < '0' || c > '9') && (c < 'a' || c > 'f') && (c < 'A' || c > 'F') {
 			return false
 		}
 	}
 	return true
+}
+
+func isHexString(s string) bool {
+	return IsHexString(s)
 }
 
 // IsDrained implements QueueShutdownHandler

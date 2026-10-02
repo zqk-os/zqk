@@ -295,8 +295,7 @@ func (gv *GoValidator) validatePropertyShape(
 	var errors []ValidationError
 	var warnings []ValidationWarning
 
-	// Get validation rules (SHACL constraints)
-	validation, ok := fieldDef["validation"].(map[string]any)
+	validation, ok := ExtractValidationRules(fieldDef)
 	if !ok {
 		return errors, warnings
 	}
@@ -407,12 +406,7 @@ func (gv *GoValidator) validateDatatypeConstraint(fieldName string, fieldValue a
 // For the 'id' field, uses IDValidator which leverages IDPrefixesConfig
 // This allows configurable ID validation strategies per kind (e.g., account:username format)
 func (gv *GoValidator) validatePatternConstraint(fieldName string, fieldValue any, validation map[string]any, kind string) (*ValidationError, *ValidationWarning) {
-	pattern, ok := validation["pattern"].(string)
-	if !ok {
-		return nil, nil
-	}
-
-	strValue, ok := ResolveStringForPatternValidationWithField(fieldName, fieldValue)
+	pattern, strValue, ok := ExtractPatternAndString(fieldName, fieldValue, validation)
 	if !ok {
 		return nil, nil
 	}

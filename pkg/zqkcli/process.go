@@ -54,9 +54,9 @@ func runInternalProcess(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	filePath, err := cmd.Flags().GetString("file")
-	if err != nil || filePath == emptyValue {
-		return errfmt.Errorf("--file is required")
+	filePath, err := requireFileFlag(cmd)
+	if err != nil {
+		return err
 	}
 
 	dryRun, err := cmd.Flags().GetBool("dry-run")
