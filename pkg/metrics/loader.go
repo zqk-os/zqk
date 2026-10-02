@@ -136,50 +136,9 @@ func (pl *ProfileLoader) resolveProfilePath(name string) string {
 
 // findMetricsProfilesDir attempts to find the metrics profiles directory
 func findMetricsProfilesDir() string {
-	// Try relative to current working directory
-	possiblePaths := []string{
-		paths.MetricsProfilesDir,
-		filepath.Join("..", paths.MetricsProfilesDir),
-		filepath.Join("..", "..", paths.MetricsProfilesDir),
-	}
-
-	wd, err := fileutil.Getwd()
-	if err != nil {
-		return ""
-	}
-
-	for _, path := range possiblePaths {
-		absPath := filepath.Join(wd, path)
-		if info, err := fileutil.Stat(absPath); err == nil && info.IsDir() {
-			return absPath
-		}
-	}
-
-	// Walk up directory tree looking for project root
-	dir := wd
-	for {
-		profilesDir := filepath.Join(dir, paths.MetricsProfilesDir)
-		if info, err := fileutil.Stat(profilesDir); err == nil && info.IsDir() {
-			return profilesDir
-		}
-
-		// Check if we're at project root
-		if _, err := fileutil.Stat(filepath.Join(dir, paths.ProjectDataDir)); err == nil {
-			if info, err := fileutil.Stat(profilesDir); err == nil && info.IsDir() {
-				return profilesDir
-			}
-		}
-
-		// Move up one directory
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			break // Reached filesystem root
-		}
-		dir = parent
-	}
-
-	return ""
+	return paths.FirstExistingFromCwd(paths.MetricsProfilesDir)
 }
+
 
 // ClearCache clears the profile cache
 func (pl *ProfileLoader) ClearCache() {

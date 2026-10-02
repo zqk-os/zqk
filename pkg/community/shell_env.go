@@ -111,14 +111,7 @@ func InjectPath(profile ShellProfile) (*InjectionResult, error) {
 	snippet := FormatShellSnippet(profile.Shell, profile.BinDir)
 
 	// Check if already injected and unchanged
-	startIdx := strings.Index(existingContent, markerStart)
-	endIdx := strings.Index(existingContent, markerEnd)
-
-	if startIdx != -1 && endIdx != -1 && endIdx > startIdx {
-		blockEnd := endIdx + len(markerEnd)
-		if blockEnd < len(existingContent) && existingContent[blockEnd] == '\n' {
-			blockEnd++
-		}
+	if startIdx, _, blockEnd, ok := findInjectionBlock(existingContent); ok {
 		currentBlock := existingContent[startIdx:blockEnd]
 		if strings.TrimSpace(currentBlock) == strings.TrimSpace(snippet) {
 			result.AlreadyConfigured = true
@@ -165,17 +158,10 @@ func RemovePathInjection(profile ShellProfile) (*InjectionResult, error) {
 	}
 
 	content := string(data)
-	startIdx := strings.Index(content, markerStart)
-	endIdx := strings.Index(content, markerEnd)
-
-	if startIdx == -1 || endIdx == -1 || endIdx <= startIdx {
+	startIdx, _, blockEnd, ok := findInjectionBlock(content)
+	if !ok {
 		result.Modified = false
 		return result, nil
-	}
-
-	blockEnd := endIdx + len(markerEnd)
-	if blockEnd < len(content) && content[blockEnd] == '\n' {
-		blockEnd++
 	}
 
 	newContent := strings.TrimRight(content[:startIdx], "\n")
@@ -205,10 +191,7 @@ func VerifyPathInjected(profile ShellProfile) (bool, error) {
 	}
 
 	content := string(data)
-	startIdx := strings.Index(content, markerStart)
-	endIdx := strings.Index(content, markerEnd)
-
-	if startIdx != -1 && endIdx != -1 && endIdx > startIdx {
+	if startIdx, endIdx, _, ok := findInjectionBlock(content); ok {
 		cleanedBin := filepath.Clean(profile.BinDir)
 		block := content[startIdx:endIdx]
 		if strings.Contains(block, cleanedBin) {
@@ -217,6 +200,19 @@ func VerifyPathInjected(profile ShellProfile) (bool, error) {
 	}
 
 	return false, nil
+}
+
+func findInjectionBlock(content string) (startIdx, endIdx, blockEnd int, found bool) {
+	startIdx = strings.Index(content, markerStart)
+	endIdx = strings.Index(content, markerEnd)
+	if startIdx != -1 && endIdx != -1 && endIdx > startIdx {
+		blockEnd = endIdx + len(markerEnd)
+		if blockEnd < len(content) && content[blockEnd] == '\n' {
+			blockEnd++
+		}
+		return startIdx, endIdx, blockEnd, true
+	}
+	return -1, -1, -1, false
 }
 
 func writeWithBackup(targetPath, oldContent, newContent string, result *InjectionResult) (*InjectionResult, error) {

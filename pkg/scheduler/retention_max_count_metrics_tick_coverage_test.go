@@ -19,10 +19,8 @@ func TestExtended_RetentionMaxCount_Wave40(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create storage: %v", err)
 	}
-	defer func() {
-		_ = fs.Shutdown(context.Background())
-		time.Sleep(100 * time.Millisecond)
-	}()
+	registerFileStorageTestTeardown(t, tmpDir, fs)
+
 
 	rth := NewRetentionToleranceHandler(fs, tmpDir).(*RetentionToleranceHandler)
 
@@ -82,9 +80,8 @@ func TestExtended_MetricsCleanupAndConvergenceTick_Wave40(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create storage: %v", err)
 	}
-	defer func() {
-		_ = fs.Shutdown(context.Background())
-	}()
+	registerFileStorageTestTeardown(t, tmpDir, fs)
+
 
 	ctx := context.Background()
 	bgCtx := pkgctx.WithLifecycleBreakGlass(pkgctx.WithAllowCoreObjectDelete(ctx), "test-reason")

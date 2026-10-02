@@ -179,31 +179,53 @@ func removeTaskFromAllSeatIndexes(projectRoot, taskID string) error {
 	return nil
 }
 
+// StringSetAccumulator collects unique, non-empty, trimmed strings preserving insertion order.
+type StringSetAccumulator struct {
+	seen map[string]struct{}
+	out  []string
+}
+
+// NewStringSetAccumulator creates a new StringSetAccumulator with optional initial capacity.
+func NewStringSetAccumulator(capacity ...int) *StringSetAccumulator {
+	cap := 0
+	if len(capacity) > 0 {
+		cap = capacity[0]
+	}
+	return &StringSetAccumulator{
+		seen: make(map[string]struct{}, cap),
+		out:  make([]string, 0, cap),
+	}
+}
+
+func (a *StringSetAccumulator) Add(s string) {
+	s = strings.TrimSpace(s)
+	if s == "" {
+		return
+	}
+	if _, ok := a.seen[s]; ok {
+		return
+	}
+	a.seen[s] = struct{}{}
+	a.out = append(a.out, s)
+}
+
+func (a *StringSetAccumulator) Result() []string {
+	return a.out
+}
+
 // LiveClaimIDs returns occupiable ids this claimant currently holds.
 func LiveClaimIDs(projectRoot, claimant string) ([]string, error) {
 	claimant = strings.TrimSpace(claimant)
 	if projectRoot == "" || claimant == "" {
 		return nil, nil
 	}
-	seen := map[string]struct{}{}
-	var ids []string
-	add := func(id string) {
-		id = strings.TrimSpace(id)
-		if id == "" {
-			return
-		}
-		if _, ok := seen[id]; ok {
-			return
-		}
-		seen[id] = struct{}{}
-		ids = append(ids, id)
-	}
+	acc := NewStringSetAccumulator()
 
 	if data, err := fileutil.ReadFile(SeatClaimIndexPath(projectRoot, claimant)); err == nil {
 		var idx SeatClaimIndex
 		if json.Unmarshal(data, &idx) == nil && strings.EqualFold(idx.Claimant, claimant) {
 			for _, id := range idx.TaskIDs {
-				add(id)
+				acc.Add(id)
 			}
 		}
 	}
@@ -212,12 +234,12 @@ func LiveClaimIDs(projectRoot, claimant string) ([]string, error) {
 		q.mu.Lock()
 		for _, req := range q.items {
 			if filepath.Clean(req.projectRoot) == filepath.Clean(projectRoot) && req.timer != nil && strings.EqualFold(req.timer.ClaimedBy, claimant) && req.timer.EvictedAt == "" {
-				add(req.timer.TaskID)
+				acc.Add(req.timer.TaskID)
 			}
 		}
 		for _, req := range q.flushing {
 			if filepath.Clean(req.projectRoot) == filepath.Clean(projectRoot) && req.timer != nil && strings.EqualFold(req.timer.ClaimedBy, claimant) && req.timer.EvictedAt == "" {
-				add(req.timer.TaskID)
+				acc.Add(req.timer.TaskID)
 			}
 		}
 		q.mu.Unlock()
@@ -226,7 +248,7 @@ func LiveClaimIDs(projectRoot, claimant string) ([]string, error) {
 	dir := filepath.Dir(CheckinTimerPath(projectRoot, "_"))
 	entries, err := os.ReadDir(dir)
 	if err != nil && !os.IsNotExist(err) {
-		return ids, err
+		return acc.Result(), err
 	}
 	for _, ent := range entries {
 		if ent.IsDir() || !strings.HasSuffix(ent.Name(), checkinFileSuffix) {
@@ -237,10 +259,10 @@ func LiveClaimIDs(projectRoot, claimant string) ([]string, error) {
 			continue
 		}
 		if strings.EqualFold(timer.ClaimedBy, claimant) {
-			add(timer.TaskID)
+			acc.Add(timer.TaskID)
 		}
 	}
-	return ids, nil
+	return acc.Result(), nil
 }
 
 // GateWrite fails closed unless this seat holds a live occupiable claim.

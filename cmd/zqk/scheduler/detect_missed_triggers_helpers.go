@@ -2,11 +2,13 @@ package scheduler
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/robfig/cron/v3"
+	schedpkg "github.com/zqk-os/zqk/pkg/scheduler"
 )
+
+
 
 // buildLastCompletionsMap builds a map of last completion times by job ID
 func buildLastCompletionsMap(activityEvents []jobActivityEvent) map[string]time.Time {
@@ -99,15 +101,9 @@ func formatDurationShort(d time.Duration) string {
 
 // parseCronSchedule parses a cron expression and returns a schedule
 func parseCronSchedule(scheduleExpr string) (cron.Schedule, error) {
-	expr := scheduleExpr
-	parts := len(strings.Fields(expr))
-	if parts == 5 {
-		expr = "0 " + expr
-	}
-
-	specParser := cron.NewParser(cron.Second | cron.Minute | cron.Hour | cron.Dom | cron.Month | cron.Dow | cron.Descriptor)
-	return specParser.Parse(expr)
+	return schedpkg.ParseCronSchedule(scheduleExpr)
 }
+
 
 // maxCronSlotsPerJob caps how many expected fire times we enumerate (safety bound for tight schedules).
 const maxCronSlotsPerJob = 4096

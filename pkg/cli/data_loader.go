@@ -23,9 +23,7 @@ type DataLoaderLogger interface {
 
 func LoadObjectData(cmd *cobra.Command, logger DataLoaderLogger) (objData map[string]any, filePath string, err error) {
 	var flagsBag FlagBag
-	filePath = flagsBag.String(cmd, "file")
-	dataStr := flagsBag.String(cmd, "data")
-	fields := flagsBag.StringArray(cmd, "field")
+	filePath, dataStr, fields := flagsBag.ReadDataInputFlags(cmd)
 	if err := flagsBag.Err(); err != nil {
 		return nil, "", err
 	}

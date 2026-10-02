@@ -29,15 +29,39 @@ func NewAmbientIngestService(projectRoot string, secCtx *pkgctx.SecurityContext)
 	}
 }
 
+func mapFileSuffixToKind(filePath string) string {
+	if strings.HasSuffix(filePath, ".md") {
+		return objects.KindDocEntry
+	}
+	if strings.HasSuffix(filePath, ".yaml") || strings.HasSuffix(filePath, ".json") {
+		return objects.KindTechnicalSpec
+	}
+	return objects.KindAuditEvent
+}
+
+func makeAmbientAuditOpts(eventType, createdAt, targetKind, targetURI string, metadata map[string]any) *storage.AuditEventOptions {
+	metadata["timestamp"] = createdAt
+	metadata[objects.FieldKeyTargetKind] = targetKind
+	if targetURI != "" {
+		metadata["target_uri"] = targetURI
+	}
+	return &storage.AuditEventOptions{
+		EventType:  eventType,
+		Operation:  fmt.Sprintf("Ambient event: %s", eventType),
+		Severity:   "low",
+		TargetKind: targetKind,
+		Metadata:   metadata,
+		CreatedAt:  createdAt,
+	}
+}
+
 // MapToSystemObject maps an ambient event payload to a discrete system object kind and target URI.
 func (s *AmbientIngestService) MapToSystemObject(event Event) (string, string) {
 	if payloadMap, ok := event.Payload.(map[string]any); ok {
 		if filePath, ok := payloadMap["file"].(string); ok && filePath != "" {
-			if strings.HasSuffix(filePath, ".md") {
-				return objects.KindDocEntry, filePath
-			}
-			if strings.HasSuffix(filePath, ".yaml") || strings.HasSuffix(filePath, ".json") {
-				return objects.KindTechnicalSpec, filePath
+			kind := mapFileSuffixToKind(filePath)
+			if kind != objects.KindAuditEvent {
+				return kind, filePath
 			}
 		}
 	}
@@ -57,23 +81,10 @@ func (s *AmbientIngestService) Ingest(ctx context.Context, event Event) error {
 	}
 
 	targetKind, targetURI := s.MapToSystemObject(event)
-
 	metadata := map[string]any{
-		"timestamp":                event.Timestamp.Format(time.RFC3339),
-		objects.FieldKeyPayload:    event.Payload,
-		objects.FieldKeyTargetKind: targetKind,
+		objects.FieldKeyPayload: event.Payload,
 	}
-	if targetURI != "" {
-		metadata["target_uri"] = targetURI
-	}
-
-	opts := &storage.AuditEventOptions{
-		EventType: string(event.Type),
-		Operation: fmt.Sprintf("Ambient event: %s", event.Type),
-		Severity:  "low",
-		Metadata:  metadata,
-		CreatedAt: event.Timestamp.Format(time.RFC3339),
-	}
+	opts := makeAmbientAuditOpts(string(event.Type), event.Timestamp.Format(time.RFC3339), targetKind, targetURI, metadata)
 
 	if err := storage.CreateAuditEventWithBuilder(ctx, s.projectRoot, s.secCtx, nil, opts); err != nil {
 		return fmt.Errorf("failed to emit audit event for ambient event: %w", err)
@@ -100,10 +111,8 @@ func (s *AmbientIngestService) IngestAmbientEvent(ctx context.Context, event amb
 	targetURI := event.URI
 
 	if event.URI != "" {
-		if strings.HasSuffix(event.URI, ".md") {
-			targetKind = objects.KindDocEntry
-		} else if strings.HasSuffix(event.URI, ".yaml") || strings.HasSuffix(event.URI, ".json") {
-			targetKind = objects.KindTechnicalSpec
+		if kind := mapFileSuffixToKind(event.URI); kind != objects.KindAuditEvent {
+			targetKind = kind
 		}
 	}
 
@@ -113,23 +122,10 @@ func (s *AmbientIngestService) IngestAmbientEvent(ctx context.Context, event amb
 	}
 
 	metadata := map[string]any{
-		"ambient_id":               event.ID,
-		"timestamp":                time.Unix(event.Timestamp, 0).Format(time.RFC3339),
-		objects.FieldKeyPayload:    payloadMap,
-		objects.FieldKeyTargetKind: targetKind,
+		"ambient_id":            event.ID,
+		objects.FieldKeyPayload: payloadMap,
 	}
-	if targetURI != "" {
-		metadata["target_uri"] = targetURI
-	}
-
-	opts := &storage.AuditEventOptions{
-		EventType:  string(event.Type),
-		Operation:  fmt.Sprintf("Ambient event: %s", event.Type),
-		Severity:   "low",
-		TargetKind: targetKind,
-		Metadata:   metadata,
-		CreatedAt:  time.Unix(event.Timestamp, 0).Format(time.RFC3339),
-	}
+	opts := makeAmbientAuditOpts(string(event.Type), time.Unix(event.Timestamp, 0).Format(time.RFC3339), targetKind, targetURI, metadata)
 
 	if err := storage.CreateAuditEventWithBuilder(ctx, s.projectRoot, s.secCtx, nil, opts); err != nil {
 		return fmt.Errorf("failed to emit audit event for ambient event: %w", err)

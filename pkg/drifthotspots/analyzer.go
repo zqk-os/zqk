@@ -615,43 +615,22 @@ func isMapIndexKey(path []ast.Node, lit *ast.BasicLit) bool {
 	return ix.Index == lit
 }
 
-func isRegistryRunMonitorIDLiteral(path []ast.Node, lit *ast.BasicLit) bool {
+func callSelectorForLiteral(path []ast.Node, lit *ast.BasicLit) (*ast.CallExpr, *ast.SelectorExpr, bool) {
 	if len(path) < 2 || path[0] != lit {
-		return false
+		return nil, nil, false
 	}
 	call, ok := path[1].(*ast.CallExpr)
 	if !ok {
-		return false
-	}
-	sel, ok := call.Fun.(*ast.SelectorExpr)
-	if !ok || sel.Sel == nil || sel.Sel.Name != "Run" {
-		return false
-	}
-	if len(call.Args) < 3 || call.Args[2] != lit {
-		return false
-	}
-	return true
-}
-
-func isExecCommandLiteral(path []ast.Node, lit *ast.BasicLit) bool {
-	if len(path) < 2 || path[0] != lit {
-		return false
-	}
-	call, ok := path[1].(*ast.CallExpr)
-	if !ok {
-		return false
+		return nil, nil, false
 	}
 	sel, ok := call.Fun.(*ast.SelectorExpr)
 	if !ok || sel.Sel == nil {
-		return false
+		return nil, nil, false
 	}
-	if sel.Sel.Name != "Command" && sel.Sel.Name != "CommandContext" {
-		return false
-	}
-	xid, ok := sel.X.(*ast.Ident)
-	if !ok || xid.Name != "exec" {
-		return false
-	}
+	return call, sel, true
+}
+
+func callHasArg(call *ast.CallExpr, lit *ast.BasicLit) bool {
 	for _, a := range call.Args {
 		if a == lit {
 			return true
@@ -660,27 +639,34 @@ func isExecCommandLiteral(path []ast.Node, lit *ast.BasicLit) bool {
 	return false
 }
 
+func isRegistryRunMonitorIDLiteral(path []ast.Node, lit *ast.BasicLit) bool {
+	call, sel, ok := callSelectorForLiteral(path, lit)
+	if !ok || sel.Sel.Name != "Run" {
+		return false
+	}
+	return len(call.Args) >= 3 && call.Args[2] == lit
+}
+
+func isExecCommandLiteral(path []ast.Node, lit *ast.BasicLit) bool {
+	call, sel, ok := callSelectorForLiteral(path, lit)
+	if !ok || (sel.Sel.Name != "Command" && sel.Sel.Name != "CommandContext") {
+		return false
+	}
+	xid, ok := sel.X.(*ast.Ident)
+	return ok && xid.Name == "exec" && callHasArg(call, lit)
+}
+
 func isCobraFlagLiteral(path []ast.Node, lit *ast.BasicLit) bool {
-	if len(path) < 2 || path[0] != lit {
-		return false
-	}
-	call, ok := path[1].(*ast.CallExpr)
+	call, sel, ok := callSelectorForLiteral(path, lit)
 	if !ok {
-		return false
-	}
-	sel, ok := call.Fun.(*ast.SelectorExpr)
-	if !ok || sel.Sel == nil {
 		return false
 	}
 	switch sel.Sel.Name {
 	case "BoolVar", "BoolVarP", "StringVar", "StringVarP", "IntVar", "IntVarP":
-		for _, a := range call.Args {
-			if a == lit {
-				return true
-			}
-		}
+		return callHasArg(call, lit)
+	default:
+		return false
 	}
-	return false
 }
 
 func isListFilterStatusLiteral(path []ast.Node, lit *ast.BasicLit) bool {

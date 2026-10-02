@@ -35,7 +35,7 @@ internal/
 Import packages using their canonical import path:
 
 ```go
-import "github.com/zqk-os/zqk/internal/codegen"
+import "github.com/zqk-os/zqk/internal/cli"
 ```
 
 ## Related Documentation

@@ -85,13 +85,17 @@ func loadSpecIndexForDataCell(projectRoot string) (*objects.SpecIndex, error) {
 	return idx, nil
 }
 
-// LoadDataCellDescriptors loads .zqk/specs/spec_index.json when present; otherwise
-// builds from .zqk/specs/objects (same fallback pattern as tooling that needs an index).
-func LoadDataCellDescriptors(projectRoot string) ([]datacell.CellKindDescriptor, error) {
+func loadSpecIndexWithValidation(projectRoot string) (*objects.SpecIndex, error) {
 	if projectRoot == "" {
 		return nil, errfmt.Errorf("project root is required")
 	}
-	idx, err := loadSpecIndexForDataCell(projectRoot)
+	return loadSpecIndexForDataCell(projectRoot)
+}
+
+// LoadDataCellDescriptors loads .zqk/specs/spec_index.json when present; otherwise
+// builds from .zqk/specs/objects (same fallback pattern as tooling that needs an index).
+func LoadDataCellDescriptors(projectRoot string) ([]datacell.CellKindDescriptor, error) {
+	idx, err := loadSpecIndexWithValidation(projectRoot)
 	if err != nil {
 		return nil, err
 	}
@@ -103,10 +107,7 @@ func LoadDataCellDescriptors(projectRoot string) ([]datacell.CellKindDescriptor,
 // [datacell.DescriptorReadModel.BuiltAtSpecCacheRevision] to [objects.SpecLoader.SpecCacheRevision]
 // for staleness (see [datacell.ReadModelIsStale]).
 func LoadDescriptorReadModel(projectRoot string) (*datacell.DescriptorReadModel, error) {
-	if projectRoot == "" {
-		return nil, errfmt.Errorf("project root is required")
-	}
-	idx, err := loadSpecIndexForDataCell(projectRoot)
+	idx, err := loadSpecIndexWithValidation(projectRoot)
 	if err != nil {
 		return nil, err
 	}
@@ -149,10 +150,7 @@ func HighVolumeStreamSpecProfileMismatchesFromIndex(idx *objects.SpecIndex, stre
 // HighVolumeStreamSpecProfileMismatches loads the spec index from projectRoot and runs
 // HighVolumeStreamSpecProfileMismatchesFromIndex. Used by stream stewardship and operational checks.
 func HighVolumeStreamSpecProfileMismatches(projectRoot string, streamEnabledKinds []string) ([]string, error) {
-	if projectRoot == "" {
-		return nil, errfmt.Errorf("project root is required")
-	}
-	idx, err := loadSpecIndexForDataCell(projectRoot)
+	idx, err := loadSpecIndexWithValidation(projectRoot)
 	if err != nil {
 		return nil, err
 	}

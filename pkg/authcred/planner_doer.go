@@ -39,32 +39,20 @@ func RoleMatches(assigned, roleObjID, roleID string) bool {
 
 // ExpandAssignedRoles returns assigned labels plus matching role_id values from dir.
 func ExpandAssignedRoles(assigned []string, dir SeatDirectory) []string {
-	out := make([]string, 0, len(assigned)*2)
-	seen := map[string]struct{}{}
-	add := func(s string) {
-		s = strings.TrimSpace(s)
-		if s == "" {
-			return
-		}
-		if _, ok := seen[s]; ok {
-			return
-		}
-		seen[s] = struct{}{}
-		out = append(out, s)
-	}
+	c := newStringCollector(len(assigned)*2, false)
 	for _, a := range assigned {
-		add(a)
+		c.Add(a)
 	}
 	if dir == nil {
-		return out
+		return c.Result()
 	}
 	for _, role := range dir.Roles() {
 		if role.MatchesAny(assigned) {
-			add(role.RoleID)
-			add(role.ID)
+			c.Add(role.RoleID)
+			c.Add(role.ID)
 		}
 	}
-	return out
+	return c.Result()
 }
 
 // HasExactPermission reports whether secCtx lists the permission (no wildcards).

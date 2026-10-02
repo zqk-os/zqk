@@ -44,9 +44,7 @@ func NewDataLoader(logger *logging.EventLogger) *DataLoader {
 // when --file and --data are empty and stdin is empty (TTY) or an empty pipe.
 func (dl *DataLoader) LoadData(cmd *cobra.Command, hint *LastDraftHint) (data map[string]any, filePath string, err error) {
 	var flagsBag clipkg.FlagBag
-	filePath = flagsBag.String(cmd, dataLoaderFlagFile)
-	dataStr := flagsBag.String(cmd, dataLoaderFlagData)
-	fields := flagsBag.StringArray(cmd, "field")
+	filePath, dataStr, fields := flagsBag.ReadDataInputFlags(cmd)
 	if err := flagsBag.Err(); err != nil {
 		return nil, "", err
 	}

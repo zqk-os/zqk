@@ -81,18 +81,7 @@ func (d *SemanticStorageDecorator) List(ctx context.Context, secCtx *pkgctx.Secu
 		return nil, err
 	}
 
-	// Filter out objects that violate the semantic scope
-	if secCtx != nil && len(secCtx.ActiveVocabularySchemes) > 0 {
-		var filtered []map[string]any
-		for _, obj := range res.Objects {
-			kind, _ := obj[objects.FieldKeyKind].(string)
-			if d.isKindAllowed(ctx, secCtx, kind) {
-				filtered = append(filtered, obj)
-			}
-		}
-		res.Objects = filtered
-	}
-
+	d.filterSemanticObjects(ctx, secCtx, res)
 	return res, nil
 }
 
@@ -102,16 +91,20 @@ func (d *SemanticStorageDecorator) Query(ctx context.Context, secCtx *pkgctx.Sec
 		return nil, err
 	}
 
-	if secCtx != nil && len(secCtx.ActiveVocabularySchemes) > 0 {
-		var filtered []map[string]any
-		for _, obj := range res.Objects {
-			kind, _ := obj[objects.FieldKeyKind].(string)
-			if d.isKindAllowed(ctx, secCtx, kind) {
-				filtered = append(filtered, obj)
-			}
-		}
-		res.Objects = filtered
-	}
-
+	d.filterSemanticObjects(ctx, secCtx, res)
 	return res, nil
+}
+
+func (d *SemanticStorageDecorator) filterSemanticObjects(ctx context.Context, secCtx *pkgctx.SecurityContext, res *storage.QueryResult) {
+	if res == nil || secCtx == nil || len(secCtx.ActiveVocabularySchemes) == 0 {
+		return
+	}
+	var filtered []map[string]any
+	for _, obj := range res.Objects {
+		kind, _ := obj[objects.FieldKeyKind].(string)
+		if d.isKindAllowed(ctx, secCtx, kind) {
+			filtered = append(filtered, obj)
+		}
+	}
+	res.Objects = filtered
 }
