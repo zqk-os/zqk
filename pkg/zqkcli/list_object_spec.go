@@ -56,6 +56,28 @@ func listObjectSpecsForAll(cmd *cobra.Command, proc *cli.Processor, storageProvi
 	}
 
 	// Fall back to file-based scanning
+	result, err = ScanObjectSpecsFromFiles(projectRoot)
+	if err != nil {
+		return nil, err
+	}
+	if allObjects || (!builtInOnly && !internalOnly) {
+		return result, nil
+	}
+	filtered := make([]map[string]any, 0, len(result.Objects))
+	for _, obj := range result.Objects {
+		isBuiltIn := obj[internalSourceType] == internalSourceBuiltIn
+		isInternal := obj[internalSourceType] == internalSourceInternal
+		if (builtInOnly && isBuiltIn) || (internalOnly && isInternal) {
+			filtered = append(filtered, obj)
+		}
+	}
+	result.Objects = filtered
+	result.Meta["total_count"] = len(filtered)
+	return result, nil
+}
+
+// ScanObjectSpecsFromFiles scans .zqk/specs/objects for YAML spec files.
+func ScanObjectSpecsFromFiles(projectRoot string) (*storage.QueryResult, error) {
 	specsDir := filepath.Join(projectRoot, paths.ProcessInternalObjectSpecsDir)
 	if _, err := fileutil.Stat(specsDir); err != nil {
 		if fileutil.IsNotExist(err) {
@@ -68,11 +90,8 @@ func listObjectSpecsForAll(cmd *cobra.Command, proc *cli.Processor, storageProvi
 	}
 
 	var specObjects []map[string]any
-	err = filepath.Walk(specsDir, func(path string, info fileutil.FileInfo, walkErr error) error {
-		if walkErr != nil {
-			return nil
-		}
-		if info.IsDir() {
+	err := filepath.Walk(specsDir, func(path string, info fileutil.FileInfo, walkErr error) error {
+		if walkErr != nil || info.IsDir() {
 			return nil
 		}
 		if appledouble.SkipPathInTreeWalk(path) {
@@ -81,8 +100,6 @@ func listObjectSpecsForAll(cmd *cobra.Command, proc *cli.Processor, storageProvi
 		if !strings.HasSuffix(info.Name(), ".yaml") && !strings.HasSuffix(info.Name(), ".yml") {
 			return nil
 		}
-
-		// Skip placeholder files
 		if strings.HasPrefix(info.Name(), "_") {
 			return nil
 		}
@@ -92,16 +109,12 @@ func listObjectSpecsForAll(cmd *cobra.Command, proc *cli.Processor, storageProvi
 			return nil
 		}
 
-		// Extract ontology (which is the kind this spec defines)
 		ontology, _ := specDef[objects.FieldKeyOntology].(string)
 		if ontology == emptyValue {
 			return nil
 		}
 
-		// Create an object-like structure for display
 		id := strings.TrimSuffix(info.Name(), filepath.Ext(info.Name()))
-
-		// Extract title from description or use ontology
 		title := fmt.Sprintf("%s Specification", ontology)
 		if desc, ok := specDef[objects.FieldKeyDescription].(string); ok && desc != emptyValue {
 			lines := strings.Split(desc, "\n")
@@ -115,7 +128,6 @@ func listObjectSpecsForAll(cmd *cobra.Command, proc *cli.Processor, storageProvi
 			}
 		}
 
-		// Build object representation
 		obj := map[string]any{
 			objects.FieldKeyID:       id,
 			objects.FieldKeyKind:     internalKindObjectSpec,
@@ -132,7 +144,6 @@ func listObjectSpecsForAll(cmd *cobra.Command, proc *cli.Processor, storageProvi
 			obj[objects.FieldKeyVisibility] = visibility
 		}
 
-		// Check if this is a built-in spec or internal
 		isBuiltIn := strings.Contains(path, "/built-in/")
 		visibility, _ := specDef[objects.FieldKeyVisibility].(string)
 		isInternal := visibility == internalSourceInternal
@@ -145,22 +156,7 @@ func listObjectSpecsForAll(cmd *cobra.Command, proc *cli.Processor, storageProvi
 			obj[internalSourceType] = internalSourcePublic
 		}
 
-		// Apply filters
-		shouldInclude := false
-		if allObjects {
-			shouldInclude = true
-		} else if builtInOnly {
-			shouldInclude = isBuiltIn
-		} else if internalOnly {
-			shouldInclude = isInternal
-		} else {
-			shouldInclude = true
-		}
-
-		if shouldInclude {
-			specObjects = append(specObjects, obj)
-		}
-
+		specObjects = append(specObjects, obj)
 		return nil
 	})
 

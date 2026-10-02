@@ -1,22 +1,14 @@
 package spec
 
 import (
-	"fmt"
-	"path/filepath"
-	"strings"
-
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/pkg/cliapp"
-	"github.com/zqk-os/zqk/pkg/appledouble"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
-	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
-	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	internal "github.com/zqk-os/zqk/pkg/zqkcli"
 )
 
 const emptyValue = ""
@@ -68,80 +60,5 @@ func runSpecList(cmd *cobra.Command, _ []string) error {
 
 // listSpecsFromFiles scans .zqk/specs/objects for YAML spec files (file-backend fallback).
 func listSpecsFromFiles(projectRoot string) (*storage.QueryResult, error) {
-	specsDir := filepath.Join(projectRoot, paths.ProcessInternalObjectSpecsDir)
-	if _, err := fileutil.Stat(specsDir); err != nil {
-		if fileutil.IsNotExist(err) {
-			return &storage.QueryResult{
-				Objects: []map[string]any{},
-				Meta:    map[string]any{"total_count": 0},
-			}, nil
-		}
-		return nil, errfmt.Newf("failed to access object_specs directory").Wrap(err)
-	}
-
-	var specObjects []map[string]any
-	err := filepath.Walk(specsDir, func(path string, info fileutil.FileInfo, walkErr error) error {
-		if walkErr != nil || info.IsDir() {
-			return nil //nolint:nilerr // skip unreadable files
-		}
-		if appledouble.SkipPathInTreeWalk(path) {
-			return nil
-		}
-		if !strings.HasSuffix(info.Name(), ".yaml") && !strings.HasSuffix(info.Name(), ".yml") {
-			return nil
-		}
-		if strings.HasPrefix(info.Name(), "_") {
-			return nil
-		}
-
-		data, readErr := fileutil.ReadFile(path)
-		if readErr != nil {
-			return nil //nolint:nilerr // skip files that cannot be read
-		}
-		var specDef map[string]any
-		if parseErr := yaml.Unmarshal(data, &specDef); parseErr != nil {
-			return nil //nolint:nilerr // skip unparseable YAML
-		}
-		ontology, _ := specDef[objects.FieldKeyOntology].(string)
-		if ontology == emptyValue {
-			return nil
-		}
-
-		id := strings.TrimSuffix(info.Name(), filepath.Ext(info.Name()))
-		title := fmt.Sprintf("%s Specification", ontology)
-		if desc, ok := specDef[objects.FieldKeyDescription].(string); ok && desc != emptyValue {
-			first := strings.TrimSpace(strings.Split(desc, "\n")[0])
-			if first != emptyValue {
-				if len(first) > 80 {
-					title = first[:77] + "..."
-				} else {
-					title = first
-				}
-			}
-		}
-
-		obj := map[string]any{
-			objects.FieldKeyID:       id,
-			objects.FieldKeyKind:     objects.KindObjectSpec,
-			objects.FieldKeyTitle:    title,
-			objects.FieldKeyOntology: ontology,
-			objects.FieldKeyFilePath: path,
-		}
-		if v, ok := specDef[objects.FieldKeySchemaVersion].(string); ok {
-			obj[objects.FieldKeySchemaVersion] = v
-		}
-		if v, ok := specDef[objects.FieldKeyVisibility].(string); ok {
-			obj[objects.FieldKeyVisibility] = v
-		}
-		specObjects = append(specObjects, obj)
-		return nil
-	})
-	if err != nil {
-		return nil, errfmt.Newf("failed to scan object_specs directory").Wrap(err)
-	}
-
-	return &storage.QueryResult{
-		Objects: specObjects,
-		Meta:    map[string]any{"total_count": len(specObjects)},
-	}, nil
+	return internal.ScanObjectSpecsFromFiles(projectRoot)
 }

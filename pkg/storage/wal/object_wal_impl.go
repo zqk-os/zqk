@@ -248,26 +248,14 @@ func NewObjectWAL(projectRoot string) (*ObjectWAL, error) {
 }
 
 func (w *ObjectWAL) readLastSeqFromFile() (int64, error) {
-	f, err := fileutil.Open(w.path)
-	if err != nil {
-		if fileutil.IsNotExist(err) {
-			return 0, nil
-		}
-		return 0, err
-	}
-	defer f.Close()
 	var last int64
-	sc := bufio.NewScanner(f)
-	buf := make([]byte, 0, 64*1024)
-	sc.Buffer(buf, maxWALLineSize)
-	for sc.Scan() {
-		line := sc.Bytes()
+	err := walutil.ScanFileLines(w.path, maxWALLineSize, func(line []byte) {
 		seq := getMaxSeqFromLine(line)
 		if seq > last {
 			last = seq
 		}
-	}
-	return last, sc.Err()
+	})
+	return last, err
 }
 
 // Append appends a record to the WAL and assigns Seq. Uses compact v2 format (short keys, positional payload for known kinds). Does not sync; call Sync for durability.

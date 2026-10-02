@@ -1026,3 +1026,20 @@ func locateSpecsDir(wd, testRoot string) string {
 	}
 	return ""
 }
+
+// IsInternalKind checks if a kind has visibility: internal in its spec or is a well-known internal kind.
+func IsInternalKind(kind string) bool {
+	switch kind {
+	case KindAuditEvent, KindChangeJournalEntry, KindLifecycle, KindObjectSpec,
+		KindTemplate, KindIntegrityManifest, KindSynonym:
+		return true
+	}
+
+	specLoader := NewSpecLoader("")
+	specFile := kind + ".yaml"
+	spec, err := specLoader.LoadSpecWithInheritance(specFile)
+	if err != nil {
+		return false
+	}
+	return spec.Visibility == VisibilityInternal
+}

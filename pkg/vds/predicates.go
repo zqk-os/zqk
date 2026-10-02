@@ -134,6 +134,19 @@ func predObjectExists(ctx context.Context, pred, id string, opt EvalOptions) Pre
 	return PredicateResult{Predicate: pred, OK: true, Detail: "object found"}
 }
 
+func lookupObjectForPredicate(ctx context.Context, pred, id string, opt EvalOptions) (map[string]any, *PredicateResult) {
+	if opt.Lookup == nil {
+		res := PredicateResult{Predicate: pred, OK: false, Skipped: true, Detail: "no object lookup wired"}
+		return nil, &res
+	}
+	obj, err := opt.Lookup(ctx, id)
+	if err != nil {
+		res := PredicateResult{Predicate: pred, OK: false, Detail: err.Error()}
+		return nil, &res
+	}
+	return obj, nil
+}
+
 func predFieldNonempty(ctx context.Context, pred, arg string, opt EvalOptions) PredicateResult {
 	// arg: id:field
 	id, field, ok := strings.Cut(arg, ":")
@@ -142,12 +155,9 @@ func predFieldNonempty(ctx context.Context, pred, arg string, opt EvalOptions) P
 	if !ok || id == "" || field == "" {
 		return PredicateResult{Predicate: pred, OK: false, Detail: "want field_nonempty:{id}:{field}"}
 	}
-	if opt.Lookup == nil {
-		return PredicateResult{Predicate: pred, OK: false, Skipped: true, Detail: "no object lookup wired"}
-	}
-	obj, err := opt.Lookup(ctx, id)
-	if err != nil {
-		return PredicateResult{Predicate: pred, OK: false, Detail: err.Error()}
+	obj, early := lookupObjectForPredicate(ctx, pred, id, opt)
+	if early != nil {
+		return *early
 	}
 	v, exists := obj[field]
 	if !exists || v == nil {
@@ -170,12 +180,9 @@ func predCriteriaOrAcceptance(ctx context.Context, pred, id string, opt EvalOpti
 	if id == "" {
 		return PredicateResult{Predicate: pred, OK: false, Detail: "missing object id"}
 	}
-	if opt.Lookup == nil {
-		return PredicateResult{Predicate: pred, OK: false, Skipped: true, Detail: "no object lookup wired"}
-	}
-	obj, err := opt.Lookup(ctx, id)
-	if err != nil {
-		return PredicateResult{Predicate: pred, OK: false, Detail: err.Error()}
+	obj, early := lookupObjectForPredicate(ctx, pred, id, opt)
+	if early != nil {
+		return *early
 	}
 	if nonemptyListOrString(obj[objects.FieldKeyCriteriaRefs]) {
 		return PredicateResult{Predicate: pred, OK: true, Detail: "criteria_refs present"}

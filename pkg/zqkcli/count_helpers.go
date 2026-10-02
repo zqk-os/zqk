@@ -149,36 +149,6 @@ func filterInternalKinds(allKinds []string) []string {
 }
 
 // isInternalKind checks if a kind has visibility: internal in its spec
-// This is a copy of the function from cmd/zqk/object/list.go to avoid cross-package dependency
 func isInternalKind(kind string) bool {
-	// Check known internal kinds first (fast path)
-	knownInternalKinds := map[string]bool{
-		objects.KindAuditEvent:         true,
-		objects.KindChangeJournalEntry: true,
-		internalKindLifecycle:          true,
-		internalKindObjectSpec:         true,
-		objects.KindTemplate:           true,
-		objects.KindIntegrityManifest:  true,
-		objects.KindSynonym:            true,
-	}
-	if knownInternalKinds[kind] {
-		return true
-	}
-
-	// Load spec to check visibility
-	specLoader := objects.NewSpecLoader("")
-	specFile := kind + ".yaml"
-	spec, err := specLoader.LoadSpecWithInheritance(specFile)
-	if err != nil {
-		// If spec can't be loaded, assume it's not internal (safer default)
-		return false
-	}
-
-	// Check visibility from spec - only the spec's own visibility matters
-	// Visibility is NOT inherited from parent specs
-	if spec.Visibility == internalSourceInternal {
-		return true
-	}
-
-	return false
+	return objects.IsInternalKind(kind)
 }
