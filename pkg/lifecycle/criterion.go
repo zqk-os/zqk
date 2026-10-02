@@ -110,19 +110,43 @@ func forEachObjectContainingCriterion(ctx context.Context, projectRoot, criterio
 	}
 }
 
-// TryEmitRemainingOpenDrained emits criterion_satisfied when remaining_open_count is 0.
-// Unset field fail-closes (no member List).
-func TryEmitRemainingOpenDrained(ctx context.Context, projectRoot, containerID string, getStorage StorageProviderForCriterion) {
-	if containerID == emptyValue {
-		return
+func readObjectForCriterion(
+	ctx context.Context,
+	projectRoot, objectID string,
+	getStorage StorageProviderForCriterion,
+) (storage.ObjectStorageProvider, map[string]any, bool) {
+	if objectID == emptyValue {
+		return nil, nil, false
 	}
 	provider, ok := resolveStorageProvider(projectRoot, getStorage)
 	if !ok {
-		return
+		return nil, nil, false
 	}
 	secCtx := pkgctx.NewSystemSecurityContext()
-	container, err := provider.Read(ctx, secCtx, containerID)
-	if err != nil || container == nil {
+	obj, err := provider.Read(ctx, secCtx, objectID)
+	if err != nil || obj == nil {
+		return nil, nil, false
+	}
+	return provider, obj, true
+}
+
+func criteriaRefsFromObject(obj map[string]any) ([]string, bool) {
+	critAny, ok := obj[objects.FieldKeyCriteriaRefs]
+	if !ok {
+		return nil, false
+	}
+	critAny, ok = nildecode.DecodeNonNilPayload[any](critAny)
+	if !ok {
+		return nil, false
+	}
+	return StringRefsFromAny(critAny), true
+}
+
+// TryEmitRemainingOpenDrained emits criterion_satisfied when remaining_open_count is 0.
+// Unset field fail-closes (no member List).
+func TryEmitRemainingOpenDrained(ctx context.Context, projectRoot, containerID string, getStorage StorageProviderForCriterion) {
+	_, container, ok := readObjectForCriterion(ctx, projectRoot, containerID, getStorage)
+	if !ok {
 		return
 	}
 	n, counted := remainingOpenCountFrom(container)
@@ -137,16 +161,8 @@ func TryEmitRemainingOpenDrained(ctx context.Context, projectRoot, containerID s
 // CriterionSatisfied(all_criteria_complete_for_milestone, milestone_id=milestoneID) to the lifecycle WAL.
 // No-op if milestone is already terminal, has no criteria_refs, or any linked criterion is not satisfied.
 func TryEmitAllCriteriaCompleteForMilestone(ctx context.Context, projectRoot, milestoneID string, getStorage StorageProviderForCriterion) {
-	if milestoneID == emptyValue {
-		return
-	}
-	provider, ok := resolveStorageProvider(projectRoot, getStorage)
+	provider, milObj, ok := readObjectForCriterion(ctx, projectRoot, milestoneID, getStorage)
 	if !ok {
-		return
-	}
-	secCtx := pkgctx.NewSystemSecurityContext()
-	milObj, err := provider.Read(ctx, secCtx, milestoneID)
-	if err != nil || milObj == nil {
 		return
 	}
 	kind, _ := milObj[objects.FieldKeyKind].(string)
@@ -158,16 +174,8 @@ func TryEmitAllCriteriaCompleteForMilestone(ctx context.Context, projectRoot, mi
 	case statusComplete, statusDeferred, statusArchived:
 		return
 	}
-	critAny, ok := milObj[objects.FieldKeyCriteriaRefs]
-	if !ok {
-		return
-	}
-	critAny, ok = nildecode.DecodeNonNilPayload[any](critAny)
-	if !ok {
-		return
-	}
-	critIDs := StringRefsFromAny(critAny)
-	if !areAllLinkedCriteriaSatisfied(ctx, provider, critIDs) {
+	critIDs, ok := criteriaRefsFromObject(milObj)
+	if !ok || !areAllLinkedCriteriaSatisfied(ctx, provider, critIDs) {
 		return
 	}
 
@@ -197,16 +205,8 @@ func TryEmitForBacklogItemsContainingCriterion(ctx context.Context, projectRoot,
 // TryEmitAllAcceptanceCriteriaMetForBacklogItem appends all_acceptance_criteria_met_for_backlog_item when every
 // CRIT-* listed in the backlog item's criteria_refs is validated/complete and the item is in_progress.
 func TryEmitAllAcceptanceCriteriaMetForBacklogItem(ctx context.Context, projectRoot, backlogItemID string, getStorage StorageProviderForCriterion) {
-	if backlogItemID == emptyValue {
-		return
-	}
-	provider, ok := resolveStorageProvider(projectRoot, getStorage)
+	provider, bli, ok := readObjectForCriterion(ctx, projectRoot, backlogItemID, getStorage)
 	if !ok {
-		return
-	}
-	secCtx := pkgctx.NewSystemSecurityContext()
-	bli, err := provider.Read(ctx, secCtx, backlogItemID)
-	if err != nil || bli == nil {
 		return
 	}
 	if k, _ := bli[objects.FieldKeyKind].(string); k != objects.KindBacklogItem {
@@ -283,16 +283,8 @@ func collectBacklogItemsForMilestone(ctx context.Context, provider storage.Objec
 // are in a terminal status. If so, appends CriterionSatisfied(all_backlog_items_complete_for_milestone, milestone_id=milestoneID)
 // to the lifecycle WAL.
 func TryEmitAllBacklogItemsCompleteForMilestone(ctx context.Context, projectRoot, milestoneID string, getStorage StorageProviderForCriterion) {
-	if milestoneID == emptyValue {
-		return
-	}
-	provider, ok := resolveStorageProvider(projectRoot, getStorage)
+	provider, milObj, ok := readObjectForCriterion(ctx, projectRoot, milestoneID, getStorage)
 	if !ok {
-		return
-	}
-	secCtx := pkgctx.NewSystemSecurityContext()
-	milObj, err := provider.Read(ctx, secCtx, milestoneID)
-	if err != nil || milObj == nil {
 		return
 	}
 	st, _ := milObj[objects.FieldKeyStatus].(string)
@@ -377,16 +369,8 @@ func TryEmitForRequirementsContainingCriterion(ctx context.Context, projectRoot,
 // CriterionSatisfied(all_criteria_complete_for_requirement, requirement_id=requirementID) to the lifecycle WAL,
 // transitions the requirement to complete, and propagates shockwaves.
 func TryEmitAllCriteriaCompleteForRequirement(ctx context.Context, projectRoot, requirementID string, getStorage StorageProviderForCriterion) {
-	if requirementID == emptyValue {
-		return
-	}
-	provider, ok := resolveStorageProvider(projectRoot, getStorage)
+	provider, reqObj, ok := readObjectForCriterion(ctx, projectRoot, requirementID, getStorage)
 	if !ok {
-		return
-	}
-	secCtx := pkgctx.NewSystemSecurityContext()
-	reqObj, err := provider.Read(ctx, secCtx, requirementID)
-	if err != nil || reqObj == nil {
 		return
 	}
 	kind, _ := reqObj[objects.FieldKeyKind].(string)
@@ -397,20 +381,13 @@ func TryEmitAllCriteriaCompleteForRequirement(ctx context.Context, projectRoot, 
 	if isTerminalStatus(st) {
 		return
 	}
-	critAny, ok := reqObj[objects.FieldKeyCriteriaRefs]
-	if !ok {
-		return
-	}
-	critAny, ok = nildecode.DecodeNonNilPayload[any](critAny)
-	if !ok {
-		return
-	}
-	critIDs := StringRefsFromAny(critAny)
-	if !areAllLinkedCriteriaSatisfied(ctx, provider, critIDs) {
+	critIDs, ok := criteriaRefsFromObject(reqObj)
+	if !ok || !areAllLinkedCriteriaSatisfied(ctx, provider, critIDs) {
 		return
 	}
 
 	// Verify all test cases pointing to this requirement are complete
+	secCtx := pkgctx.NewSystemSecurityContext()
 	storageCtx := pkgctx.NewStorageContext()
 	tcFilter := storage.ListFilter{
 		Kind: objects.KindTestCase,

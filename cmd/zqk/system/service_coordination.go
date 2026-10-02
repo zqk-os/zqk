@@ -23,25 +23,11 @@ func emitServiceOperationEventViaCoordinator(
 	duration time.Duration,
 	profile string, // CLI context profile for logging format
 ) {
-	projectRoot = ProjectRootOrResolveDot(projectRoot)
-	if projectRoot == emptyValue {
-		// Best effort - skip if no project root
+	var ok bool
+	ctx, coordinator, ok := setupSystemCoordinator(ctx, projectRoot, storageProvider, profile, false)
+	if !ok {
 		return
 	}
-
-	// Embed LoggingContext in context so coordinator logging respects --context profile
-	ctx = createContextWithLoggingProfile(ctx, profile)
-
-	// Create routers for coordinator
-	auditRouter := coordination.NewStorageAuditRouter(projectRoot, storageProvider)
-
-	// Create coordinator with routers (audit and logging for service operations)
-	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
-		LoggingRouter:     &coordination.DefaultLoggingRouter{},
-		AuditRouter:       auditRouter,
-		MetricsRouter:     nil, // Service operations don't create metrics
-		OperationalRouter: &coordination.DefaultOperationalRouter{},
-	})
 
 	// Build audit metadata
 	auditMetadata := make(map[string]any)

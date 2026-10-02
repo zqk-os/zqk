@@ -826,25 +826,29 @@ func safePlanFileName(planID string) string {
 	}, planID)
 }
 
-func recentPlanOrchSubmit(root, planID string) (bool, string) {
-	raw, err := fileutil.ReadFile(planOrchSubmitMarkPath(root, planID))
+func isMarkDispatchedRecently(markPath string, cooldown time.Duration) bool {
+	raw, err := fileutil.ReadFile(markPath)
 	if err != nil {
-		return false, ""
+		return false
 	}
 	var mark struct {
 		DispatchedAt string `json:"dispatched_at"`
 	}
 	if json.Unmarshal(raw, &mark) != nil {
-		return false, ""
+		return false
 	}
 	ts, err := time.Parse(time.RFC3339, strings.TrimSpace(mark.DispatchedAt))
 	if err != nil {
-		return false, ""
+		return false
 	}
-	if time.Since(ts) >= planOrchSubmitCooldown {
-		return false, ""
+	return time.Since(ts) < cooldown
+}
+
+func recentPlanOrchSubmit(root, planID string) (bool, string) {
+	if isMarkDispatchedRecently(planOrchSubmitMarkPath(root, planID), planOrchSubmitCooldown) {
+		return true, "already_submitted " + planID
 	}
-	return true, "already_submitted " + planID
+	return false, ""
 }
 
 func writePlanOrchSubmitMark(root, planID, detail string) error {

@@ -132,44 +132,36 @@ func CompareEqual(a, b any) bool {
 	return a == b
 }
 
-// StringContains checks if a string value contains a substring.
-// This is a shared utility for string filtering operations.
-func StringContains(actualValue, filterValue any) bool {
+func toStrings(actualValue, filterValue any) (string, string, bool) {
 	actualStr, ok := actualValue.(string)
 	if !ok {
-		return false
+		return "", "", false
 	}
 	filterStr, ok := filterValue.(string)
 	if !ok {
-		return false
+		return "", "", false
 	}
-	return strings.Contains(actualStr, filterStr)
+	return actualStr, filterStr, true
+}
+
+// StringContains checks if a string value contains a substring.
+// This is a shared utility for string filtering operations.
+func StringContains(actualValue, filterValue any) bool {
+	a, b, ok := toStrings(actualValue, filterValue)
+	return ok && strings.Contains(a, b)
 }
 
 // StringStartsWith checks if a string value starts with a prefix.
 // This is a shared utility for string filtering operations.
 func StringStartsWith(actualValue, filterValue any) bool {
-	actualStr, ok := actualValue.(string)
-	if !ok {
-		return false
-	}
-	filterStr, ok := filterValue.(string)
-	if !ok {
-		return false
-	}
-	return strings.HasPrefix(actualStr, filterStr)
+	a, b, ok := toStrings(actualValue, filterValue)
+	return ok && strings.HasPrefix(a, b)
 }
 
 // StringEndsWith checks if a string value ends with a suffix.
 // This is a shared utility for string filtering operations.
 func StringEndsWith(actualValue, filterValue any) bool {
-	actualStr, ok := actualValue.(string)
-	if !ok {
-		return false
-	}
-	filterStr, ok := filterValue.(string)
-	if !ok {
-		return false
-	}
-	return strings.HasSuffix(actualStr, filterStr)
+	a, b, ok := toStrings(actualValue, filterValue)
+	return ok && strings.HasSuffix(a, b)
 }
+

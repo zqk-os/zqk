@@ -8,11 +8,9 @@ import (
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/docman"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
-	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // NewVerifyCmd creates a new verify command for docman
@@ -24,24 +22,12 @@ func NewVerifyCmd() *cobra.Command {
 }
 
 func runVerify(cmd *cobra.Command, args []string) error {
-	cmdCtx := cmd.Context()
-	if cmdCtx == nil {
-		cmdCtx = pkgctx.NewSystemContext()
-	}
-
-	profile := string(pkgctx.ProfileHuman)
-	if f := cmd.Flags().Lookup("context"); f != nil {
-		if val, err := cmd.Flags().GetString("context"); err == nil && val != emptyValue {
-			profile = val
-		}
+	cmdCtx, profile, projectRoot, storageProvider, err := resolveDocmanContext(cmd)
+	if err != nil {
+		return err
 	}
 
 	logger := logging.GetLoggerFromProfile(profile)
-
-	projectRoot := cli.ResolveProjectRoot(".")
-	if projectRoot == emptyValue {
-		return errfmt.Errorf("project root not found")
-	}
 
 	ids, err := cmd.Flags().GetStringArray("ids")
 	if err != nil {
@@ -63,12 +49,6 @@ func runVerify(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return errfmt.Newf("failed to get strict flag").Wrap(err)
 	}
-
-	factory, err := storage.NewStorageFactory(cmdCtx, projectRoot)
-	if err != nil {
-		return errfmt.Newf("failed to initialize storage factory").Wrap(err)
-	}
-	storageProvider := factory.GetStorageForKind("doc_entry")
 
 	verifier := docman.NewVerifier(storageProvider, projectRoot)
 

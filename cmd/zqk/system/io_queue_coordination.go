@@ -7,7 +7,6 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/coordination"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
-	"github.com/zqk-os/zqk/pkg/metrics"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
@@ -18,27 +17,10 @@ func emitIOQueueStateChangeEventViaCoordinator(
 	storageProvider storage.ObjectStorageProvider,
 	changeType string,
 ) {
-	projectRoot = ProjectRootOrResolveDot(projectRoot)
-	if projectRoot == emptyValue {
+	ctx, coordinator, ok := setupSystemCoordinator(ctx, projectRoot, storageProvider, systemProfileSystem, true)
+	if !ok {
 		return
 	}
-
-	ctx = createContextWithLoggingProfile(ctx, systemProfileSystem)
-
-	auditRouter := coordination.NewStorageAuditRouter(projectRoot, storageProvider)
-
-	var metricsRouter coordination.MetricsRouter
-	if storageProvider != nil {
-		metricsPipeline := metrics.MetricPipelineForProject(storageProvider, projectRoot)
-		metricsRouter = coordination.NewMetricPipelineRouter(metricsPipeline)
-	}
-
-	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
-		LoggingRouter:     &coordination.DefaultLoggingRouter{},
-		AuditRouter:       auditRouter,
-		MetricsRouter:     metricsRouter,
-		OperationalRouter: &coordination.DefaultOperationalRouter{},
-	})
 
 	auditMetadata := make(map[string]any)
 	auditMetadata[eventKeyEventType] = fmt.Sprintf("io_queue_state_%s", changeType)

@@ -39,59 +39,43 @@ func NotInProgress(m map[string]any) bool {
 	return !InProgress(m)
 }
 
-// IsTerminal reports whether the object has reached a terminal lifecycle state,
-// using the standard project-provided StatusChecker.
-func IsTerminal(m map[string]any) bool {
+func checkStatus(m map[string]any, fn func(sc objects.IStatusChecker, kind, status string) bool) bool {
 	kind := Kind(m)
 	st := Status(m)
 	if kind == "" || st == "" {
 		return false
 	}
-	return objects.GetGlobalStatusChecker().IsTerminal(kind, st)
+	return fn(objects.GetGlobalStatusChecker(), kind, st)
+}
+
+// IsTerminal reports whether the object has reached a terminal lifecycle state,
+// using the standard project-provided StatusChecker.
+func IsTerminal(m map[string]any) bool {
+	return checkStatus(m, func(sc objects.IStatusChecker, k, s string) bool { return sc.IsTerminal(k, s) })
 }
 
 // IsWorkDone reports whether the status is a work-interval finish (not archive),
 // using the standard project-provided StatusChecker.
 func IsWorkDone(m map[string]any) bool {
-	kind := Kind(m)
-	st := Status(m)
-	if kind == "" || st == "" {
-		return false
-	}
-	return objects.GetGlobalStatusChecker().IsWorkDone(kind, st)
+	return checkStatus(m, func(sc objects.IStatusChecker, k, s string) bool { return sc.IsWorkDone(k, s) })
 }
 
 // IsPreliminary reports whether the status is preliminary/draft/origin,
 // using the standard project-provided StatusChecker.
 func IsPreliminary(m map[string]any) bool {
-	kind := Kind(m)
-	st := Status(m)
-	if kind == "" || st == "" {
-		return false
-	}
-	return objects.GetGlobalStatusChecker().IsPreliminary(kind, st)
+	return checkStatus(m, func(sc objects.IStatusChecker, k, s string) bool { return sc.IsPreliminary(k, s) })
 }
 
 // IsArchive reports whether the status represents an archived/inactive state,
 // using the standard project-provided StatusChecker.
 func IsArchive(m map[string]any) bool {
-	kind := Kind(m)
-	st := Status(m)
-	if kind == "" || st == "" {
-		return false
-	}
-	return objects.GetGlobalStatusChecker().IsArchive(kind, st)
+	return checkStatus(m, func(sc objects.IStatusChecker, k, s string) bool { return sc.IsArchive(k, s) })
 }
 
 // IsSatisfied reports whether a satisfiable kind's predicate holds at this status,
 // using the standard project-provided StatusChecker.
 func IsSatisfied(m map[string]any) bool {
-	kind := Kind(m)
-	st := Status(m)
-	if kind == "" || st == "" {
-		return false
-	}
-	return objects.GetGlobalStatusChecker().IsSatisfied(kind, st)
+	return checkStatus(m, func(sc objects.IStatusChecker, k, s string) bool { return sc.IsSatisfied(k, s) })
 }
 
 // ID returns the object id from m, or empty string if absent or nil.
@@ -124,13 +108,45 @@ func GetString(m map[string]any, key string) string {
 	return GetStringOr(m, key, "")
 }
 
-// GetStringOr returns the string value for key, or fallback if missing or non-string.
-func GetStringOr(m map[string]any, key string, fallback string) string {
+func getValue(m map[string]any, key string) (any, bool) {
 	if m == nil {
-		return fallback
+		return nil, false
 	}
 	v, ok := m[key]
 	if !ok || v == nil {
+		return nil, false
+	}
+	return v, true
+}
+
+func getInt64(v any) (int64, bool) {
+	switch val := v.(type) {
+	case int64:
+		return val, true
+	case int:
+		return int64(val), true
+	case int32:
+		return int64(val), true
+	case float64:
+		return int64(val), true
+	case float32:
+		return int64(val), true
+	case json.Number:
+		if i, err := val.Int64(); err == nil {
+			return i, true
+		}
+	case string:
+		if i, err := strconv.ParseInt(strings.TrimSpace(val), 10, 64); err == nil {
+			return i, true
+		}
+	}
+	return 0, false
+}
+
+// GetStringOr returns the string value for key, or fallback if missing or non-string.
+func GetStringOr(m map[string]any, key string, fallback string) string {
+	v, ok := getValue(m, key)
+	if !ok {
 		return fallback
 	}
 	if s, ok := v.(string); ok {
@@ -144,11 +160,8 @@ func GetStringOr(m map[string]any, key string, fallback string) string {
 
 // GetStringSlice extracts a slice of strings from key, converting []any or []string elements.
 func GetStringSlice(m map[string]any, key string) []string {
-	if m == nil {
-		return nil
-	}
-	v, ok := m[key]
-	if !ok || v == nil {
+	v, ok := getValue(m, key)
+	if !ok {
 		return nil
 	}
 	switch s := v.(type) {
@@ -181,11 +194,8 @@ func GetStringSlice(m map[string]any, key string) []string {
 
 // GetSlice returns a []any slice from m at key, or nil if absent or non-slice.
 func GetSlice(m map[string]any, key string) []any {
-	if m == nil {
-		return nil
-	}
-	v, ok := m[key]
-	if !ok || v == nil {
+	v, ok := getValue(m, key)
+	if !ok {
 		return nil
 	}
 	if s, ok := v.([]any); ok {
@@ -196,11 +206,8 @@ func GetSlice(m map[string]any, key string) []any {
 
 // GetMap returns a map[string]any for key, or nil if missing or non-map.
 func GetMap(m map[string]any, key string) map[string]any {
-	if m == nil {
-		return nil
-	}
-	v, ok := m[key]
-	if !ok || v == nil {
+	v, ok := getValue(m, key)
+	if !ok {
 		return nil
 	}
 	if subMap, ok := v.(map[string]any); ok {
@@ -211,75 +218,32 @@ func GetMap(m map[string]any, key string) map[string]any {
 
 // GetIntOr returns an int value for key, coercing numeric types and strings, or fallback on failure.
 func GetIntOr(m map[string]any, key string, fallback int) int {
-	if m == nil {
+	v, ok := getValue(m, key)
+	if !ok {
 		return fallback
 	}
-	v, ok := m[key]
-	if !ok || v == nil {
-		return fallback
-	}
-	switch val := v.(type) {
-	case int:
-		return val
-	case int64:
-		return int(val)
-	case int32:
-		return int(val)
-	case float64:
-		return int(val)
-	case float32:
-		return int(val)
-	case json.Number:
-		if i, err := val.Int64(); err == nil {
-			return int(i)
-		}
-	case string:
-		if i, err := strconv.Atoi(strings.TrimSpace(val)); err == nil {
-			return i
-		}
+	if i, ok := getInt64(v); ok {
+		return int(i)
 	}
 	return fallback
 }
 
 // GetInt64Or returns an int64 value for key, coercing numeric types and strings, or fallback on failure.
 func GetInt64Or(m map[string]any, key string, fallback int64) int64 {
-	if m == nil {
+	v, ok := getValue(m, key)
+	if !ok {
 		return fallback
 	}
-	v, ok := m[key]
-	if !ok || v == nil {
-		return fallback
-	}
-	switch val := v.(type) {
-	case int64:
-		return val
-	case int:
-		return int64(val)
-	case int32:
-		return int64(val)
-	case float64:
-		return int64(val)
-	case float32:
-		return int64(val)
-	case json.Number:
-		if i, err := val.Int64(); err == nil {
-			return i
-		}
-	case string:
-		if i, err := strconv.ParseInt(strings.TrimSpace(val), 10, 64); err == nil {
-			return i
-		}
+	if i, ok := getInt64(v); ok {
+		return i
 	}
 	return fallback
 }
 
 // GetBoolOr returns a bool value for key, coercing strings ("true", "1") or fallback on failure.
 func GetBoolOr(m map[string]any, key string, fallback bool) bool {
-	if m == nil {
-		return fallback
-	}
-	v, ok := m[key]
-	if !ok || v == nil {
+	v, ok := getValue(m, key)
+	if !ok {
 		return fallback
 	}
 	switch val := v.(type) {
@@ -299,11 +263,8 @@ func GetBoolOr(m map[string]any, key string, fallback bool) bool {
 
 // GetTime parses a time.Time value from key (supporting time.Time or RFC3339 strings).
 func GetTime(m map[string]any, key string) (time.Time, bool) {
-	if m == nil {
-		return time.Time{}, false
-	}
-	v, ok := m[key]
-	if !ok || v == nil {
+	v, ok := getValue(m, key)
+	if !ok {
 		return time.Time{}, false
 	}
 	switch val := v.(type) {

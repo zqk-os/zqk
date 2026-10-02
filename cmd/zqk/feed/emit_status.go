@@ -21,53 +21,23 @@ func NewEmitStatusCmd() *cobra.Command {
 	return cmd
 }
 
-func runFeedEmitStatus(cmd *cobra.Command, _ []string) error {
-	return cli.WithProcessor(func(cmd *cobra.Command, _ []string, proc *cli.Processor) error {
-		root := proc.ProjectRoot()
-		if root == "" {
-			return errfmt.Errorf("project root not found")
+func runFeedEmitStatus(cmd *cobra.Command, args []string) error {
+	return withFeedRoot(func(cmd *cobra.Command, proc *cli.Processor, root string, flags *clipkg.FlagBag) error {
+		p, err := parsePersonaEventFlags(cmd, flags)
+		if err != nil {
+			return err
 		}
-		var flags clipkg.FlagBag
-		personaRef := flags.String(cmd, "persona-ref")
-		agentID := flags.String(cmd, "agent-id")
-		summary := flags.String(cmd, "summary")
-		noAck := flags.Bool(cmd, "no-ack")
 		pulseHuman := flags.Bool(cmd, "pulse-human")
 		if err := flags.Err(); err != nil {
 			return err
 		}
 
-		personaRef = strings.TrimSpace(personaRef)
-		if personaRef == "" {
-			return errfmt.Errorf("--persona-ref is required (kernel persona PER-*)")
-		}
-		agentID = strings.TrimSpace(agentID)
-		if agentID == "" {
-			return errfmt.Errorf("--agent-id is required (unique swarm seat; not the persona id)")
-		}
-		if strings.EqualFold(agentID, personaRef) {
-			return errfmt.Errorf("--agent-id must differ from --persona-ref (seat vs kernel persona)")
-		}
-
-		persona, err := proc.Storage().Read(proc.OperationContext(), proc.SecurityContext(), personaRef)
+		persona, err := resolveAndValidatePersona(proc, p.personaRef, "emit-status")
 		if err != nil {
-			return errfmt.Newf("feed emit-status: resolve persona %s", personaRef).Wrap(err)
+			return err
 		}
-		kind, _ := persona[objects.FieldKeyKind].(string)
-		if !strings.EqualFold(strings.TrimSpace(kind), "persona") {
-			return errfmt.Errorf("--persona-ref %q is kind %q (want persona)", personaRef, kind)
-		}
-		status, _ := persona[objects.FieldKeyStatus].(string)
-		switch strings.ToLower(strings.TrimSpace(status)) {
-		case "approved", "implemented", "active":
-			// usable seating
-		case "archived", "error", "rejected", "deprecated":
-			return errfmt.Errorf("persona %s has status %q (not usable for mesh stamp)", personaRef, status)
-		default:
-			if strings.TrimSpace(status) == "" {
-				return errfmt.Errorf("persona %s has empty status", personaRef)
-			}
-			// Allow other non-terminal statuses; log via fluent below.
+		if err := validateUsablePersonaStatus(persona, p.personaRef); err != nil {
+			return err
 		}
 		roleFromPersona, _ := persona[objects.FieldKeyRole].(string)
 		roleFromPersona = strings.TrimSpace(roleFromPersona)
@@ -75,13 +45,13 @@ func runFeedEmitStatus(cmd *cobra.Command, _ []string) error {
 
 		res, err := agentfeed.AppendEvent(agentfeed.AppendEventInput{
 			ProjectRoot: root,
-			Message:     summary,
-			AgentID:     agentID,
-			PersonaRef:  personaRef,
+			Message:     p.summary,
+			AgentID:     p.agentID,
+			PersonaRef:  p.personaRef,
 			Role:        roleFromPersona,
 			Sender:      agentfeed.FeedSenderMeshStatus,
 			EventType:   agentfeed.FeedEventTypeMeshStatus,
-			SelfACK:     !noAck,
+			SelfACK:     !p.noAck,
 		})
 		if err != nil {
 			return errfmt.Newf("feed emit-status").Wrap(err)
@@ -90,25 +60,23 @@ func runFeedEmitStatus(cmd *cobra.Command, _ []string) error {
 		logger := logging.GetLoggerFromProfile(proc.Context().Profile)
 		logging.Fluent(logger).Info("feed emit-status appended").
 			Path(res.EventPath).
-			PersonaRef(personaRef).
+			PersonaRef(p.personaRef).
 			PersonaTitle(strings.TrimSpace(title)).
 			Role(roleFromPersona).
-			AgentID(agentID).
+			AgentID(p.agentID).
 			FeedID(res.FeedID).
 			Log()
 
-		out := feedResult(cmd, res, nil)
-		out[objects.FieldKeyPersonaRef] = personaRef
-		out[objects.FieldKeyAgentID] = agentID
+		out := newPersonaFeedResult(cmd, res, p.personaRef, p.agentID)
 		if roleFromPersona != "" {
 			out[objects.FieldKeyRole] = roleFromPersona
 		}
 		if t := strings.TrimSpace(title); t != "" {
 			out["persona_title"] = t
 		}
-		if pulseHuman && idebridge.QueueProofOfLife(root, summary) {
+		if pulseHuman && idebridge.QueueProofOfLife(root, p.summary) {
 			out["ide_bridge_queued"] = true
 		}
 		return cli.FormatOutput(cmd, out)
-	})(cmd, nil)
+	})(cmd, args)
 }

@@ -70,11 +70,50 @@ func sendOverseerAction(ctx context.Context, client *overseer.IPCClient, action,
 	})
 }
 
-func setDesiredStateOffline(projectRoot, name string, state overseer.DesiredState) error {
+func loadDaemonRegistry(projectRoot string) (*overseer.Registry, error) {
 	regPath := overseer.DefaultRegistryPath(projectRoot)
 	reg := overseer.NewRegistry(regPath)
 	if err := reg.Load(); err != nil {
-		return errfmt.Newf("load registry").Wrap(err)
+		return nil, errfmt.Newf("load daemon registry").Wrap(err)
+	}
+	return reg, nil
+}
+
+func formatDaemonSuccessOutput(cmd *cobra.Command, name string, daemons any) error {
+	return cli.FormatOutput(cmd, map[string]any{
+		objects.FieldKeyStatus: objects.ObjectStatusSuccess,
+		"daemon":               name,
+		"daemons":              daemons,
+	})
+}
+
+func handleDaemonStateToggle(cmd *cobra.Command, name string, desired overseer.DesiredState) error {
+	projectRoot, client := getDaemonClient(cmd)
+	stateStr := string(desired)
+	if client.IsRunning() {
+		if _, err := sendOverseerAction(cmd.Context(), client, stateStr, name); err != nil {
+			return err
+		}
+		return cli.FormatOutput(cmd, map[string]any{
+			objects.FieldKeyStatus: objects.ObjectStatusSuccess,
+			"daemon":               name,
+			"desired":              stateStr,
+		})
+	}
+
+	if err := setDesiredStateOffline(projectRoot, name, desired); err != nil {
+		return err
+	}
+	return cli.FormatOutput(cmd, map[string]any{
+		"daemon":  name,
+		"desired": stateStr,
+	})
+}
+
+func setDesiredStateOffline(projectRoot, name string, state overseer.DesiredState) error {
+	reg, err := loadDaemonRegistry(projectRoot)
+	if err != nil {
+		return err
 	}
 	return reg.SetDesiredState(name, state)
 }
@@ -101,10 +140,9 @@ func newStatusCmd() *cobra.Command {
 		}
 
 		// Overseer not running; fallback to reading persistent registry
-		regPath := overseer.DefaultRegistryPath(projectRoot)
-		reg := overseer.NewRegistry(regPath)
-		if err := reg.Load(); err != nil {
-			return errfmt.Newf("load daemon registry").Wrap(err)
+		reg, err := loadDaemonRegistry(projectRoot)
+		if err != nil {
+			return err
 		}
 
 		specs := reg.List()
@@ -154,11 +192,7 @@ func newStartCmd() *cobra.Command {
 		if err != nil {
 			return err
 		}
-		return cli.FormatOutput(cmd, map[string]any{
-			objects.FieldKeyStatus: objects.ObjectStatusSuccess,
-			"daemon":               name,
-			"daemons":              resp.Daemons,
-		})
+		return formatDaemonSuccessOutput(cmd, name, resp.Daemons)
 	}
 	return cmd
 }
@@ -183,11 +217,7 @@ func newStopCmd() *cobra.Command {
 		if err != nil {
 			return err
 		}
-		return cli.FormatOutput(cmd, map[string]any{
-			objects.FieldKeyStatus: objects.ObjectStatusSuccess,
-			"daemon":               name,
-			"daemons":              resp.Daemons,
-		})
+		return formatDaemonSuccessOutput(cmd, name, resp.Daemons)
 	}
 	return cmd
 }
@@ -206,11 +236,7 @@ func newRestartCmd() *cobra.Command {
 		if err != nil {
 			return err
 		}
-		return cli.FormatOutput(cmd, map[string]any{
-			objects.FieldKeyStatus: objects.ObjectStatusSuccess,
-			"daemon":               name,
-			"daemons":              resp.Daemons,
-		})
+		return formatDaemonSuccessOutput(cmd, name, resp.Daemons)
 	}
 	return cmd
 }
@@ -218,56 +244,18 @@ func newRestartCmd() *cobra.Command {
 func newEnableCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewDaemonEnableCommandBuilder()
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		name := args[0]
-		projectRoot, client := getDaemonClient(cmd)
-
-		if client.IsRunning() {
-			if _, err := sendOverseerAction(cmd.Context(), client, "enable", name); err != nil {
-				return err
-			}
-			return cli.FormatOutput(cmd, map[string]any{
-				objects.FieldKeyStatus: objects.ObjectStatusSuccess,
-				"daemon":               name,
-				"desired":              "enabled",
-			})
-		}
-
-		if err := setDesiredStateOffline(projectRoot, name, overseer.DesiredStateEnabled); err != nil {
-			return err
-		}
-		return cli.FormatOutput(cmd, map[string]any{
-			"daemon":  name,
-			"desired": "enabled",
-		})
+		return handleDaemonStateToggle(cmd, args[0], overseer.DesiredStateEnabled)
 	}
+	cli.AddCommonFlags(cmd)
 	return cmd
 }
 
 func newDisableCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewDaemonDisableCommandBuilder()
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		name := args[0]
-		projectRoot, client := getDaemonClient(cmd)
-
-		if client.IsRunning() {
-			if _, err := sendOverseerAction(cmd.Context(), client, "disable", name); err != nil {
-				return err
-			}
-			return cli.FormatOutput(cmd, map[string]any{
-				objects.FieldKeyStatus: objects.ObjectStatusSuccess,
-				"daemon":               name,
-				"desired":              "disabled",
-			})
-		}
-
-		if err := setDesiredStateOffline(projectRoot, name, overseer.DesiredStateDisabled); err != nil {
-			return err
-		}
-		return cli.FormatOutput(cmd, map[string]any{
-			"daemon":  name,
-			"desired": "disabled",
-		})
+		return handleDaemonStateToggle(cmd, args[0], overseer.DesiredStateDisabled)
 	}
+	cli.AddCommonFlags(cmd)
 	return cmd
 }
 
@@ -333,11 +321,7 @@ func newAddCmd() *cobra.Command {
 		if err != nil {
 			return err
 		}
-		return cli.FormatOutput(cmd, map[string]any{
-			objects.FieldKeyStatus: objects.ObjectStatusSuccess,
-			"daemon":               name,
-			"daemons":              resp.Daemons,
-		})
+		return formatDaemonSuccessOutput(cmd, name, resp.Daemons)
 	}
 	return cmd
 }
@@ -349,10 +333,9 @@ func newRemoveCmd() *cobra.Command {
 		projectRoot, client := getDaemonClient(cmd)
 
 		if !client.IsRunning() {
-			regPath := overseer.DefaultRegistryPath(projectRoot)
-			reg := overseer.NewRegistry(regPath)
-			if err := reg.Load(); err != nil {
-				return errfmt.Newf("load registry").Wrap(err)
+			reg, err := loadDaemonRegistry(projectRoot)
+			if err != nil {
+				return err
 			}
 			if err := reg.Delete(name); err != nil {
 				return err
@@ -400,10 +383,9 @@ func newRunCmd() *cobra.Command {
 			logger.Warn(fmt.Sprintf("child subreaper not supported on this host: %v", err))
 		}
 
-		regPath := overseer.DefaultRegistryPath(projectRoot)
-		reg := overseer.NewRegistry(regPath)
-		if err := reg.Load(); err != nil {
-			return errfmt.Newf("load daemon registry").Wrap(err)
+		reg, err := loadDaemonRegistry(projectRoot)
+		if err != nil {
+			return err
 		}
 
 		sup := overseer.NewSupervisor(projectRoot, reg, pgMgr)

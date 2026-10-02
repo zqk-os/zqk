@@ -7,8 +7,41 @@ import (
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	bldr_cli_cmd_v1 "github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/quality"
 )
+
+func resolveProjectRoot(cmd *cobra.Command) (string, error) {
+	ctx := cli.GetContext(cmd)
+	projectRoot := ""
+	if ctx != nil {
+		projectRoot = ctx.ProjectRoot
+	}
+	if projectRoot == "" {
+		projectRoot = cli.ResolveProjectRoot(".")
+	}
+	if projectRoot == "" {
+		return "", errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations("project root not found; run from repo root or zqk use"))
+	}
+	return projectRoot, nil
+}
+
+func resolveMatrixFromCmd(cmd *cobra.Command) (string, quality.MatrixResolution, error) {
+	projectRoot, err := resolveProjectRoot(cmd)
+	if err != nil {
+		return "", quality.MatrixResolution{}, err
+	}
+	name, _ := cmd.Flags().GetString("name")
+	registryFlag, _ := cmd.Flags().GetString("registry")
+	matrixPath, _ := cmd.Flags().GetString("matrix")
+	profilePath, _ := cmd.Flags().GetString("profile")
+	resolved, err := quality.ResolveMatrixForCLI(projectRoot, name, registryFlag, matrixPath, profilePath)
+	if err != nil {
+		return projectRoot, quality.MatrixResolution{}, err
+	}
+	return projectRoot, resolved, nil
+}
 
 // NewMatrixCmd is the top-level matrix command group (traceability / vetting CSVs).
 // See docs/architecture/MATRIX_CLI_STRATEGY.md

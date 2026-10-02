@@ -60,9 +60,7 @@ func TestDomainRegister_Integration(t *testing.T) {
 	})
 
 	cmd := NewRegisterCmd()
-	cmd.SetArgs([]string{})
-	_ = cmd.Flags().Set("domain-id", "integration-test-domain")
-	_ = cmd.Flags().Set("namespace", "domain:integration:*")
+	cmd.SetArgs([]string{"--domain-id", "integration-test-domain", "--namespace", "domain:integration:*"})
 	cli.SetContext(cmd, cli.ContextForProjectRoot(testRoot))
 	// Inject storage so the command uses our instance and we can shut it down (avoids "directory not empty" on temp cleanup).
 	reqCtx := cmd.Context()

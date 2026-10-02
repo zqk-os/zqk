@@ -19,13 +19,8 @@ func NewPendingCmd() *cobra.Command {
 	return cmd
 }
 
-func runFeedPending(cmd *cobra.Command, _ []string) error {
-	return cli.WithProcessor(func(cmd *cobra.Command, _ []string, proc *cli.Processor) error {
-		root := proc.ProjectRoot()
-		if root == "" {
-			return errfmt.Errorf("project root not found")
-		}
-		var flags clipkg.FlagBag
+func runFeedPending(cmd *cobra.Command, args []string) error {
+	return withFeedRoot(func(cmd *cobra.Command, proc *cli.Processor, root string, flags *clipkg.FlagBag) error {
 		agentID := strings.TrimSpace(flags.String(cmd, "agent-id"))
 		personaRef := flags.String(cmd, "persona-ref")
 		limit := flags.Int(cmd, "limit")
@@ -53,5 +48,5 @@ func runFeedPending(cmd *cobra.Command, _ []string) error {
 			agentfeed.JSONFieldSkipReason:   snap.SkipReason,
 		}
 		return cli.FormatOutput(cmd, out)
-	})(cmd, nil)
+	})(cmd, args)
 }

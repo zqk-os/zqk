@@ -22,12 +22,7 @@ func NewServeCmd() *cobra.Command {
 }
 
 func runFeedServe(cmd *cobra.Command, _ []string) error {
-	return cli.WithProcessor(func(cmd *cobra.Command, _ []string, proc *cli.Processor) error {
-		root := proc.ProjectRoot()
-		if root == "" {
-			return errfmt.Errorf("project root not found")
-		}
-		var flags clipkg.FlagBag
+	return withFeedRoot(func(cmd *cobra.Command, proc *cli.Processor, root string, flags *clipkg.FlagBag) error {
 		listen := flags.String(cmd, "listen")
 		token := flags.String(cmd, "token")
 		if err := flags.Err(); err != nil {

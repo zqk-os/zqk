@@ -20,13 +20,8 @@ func NewAckCmd() *cobra.Command {
 	return cmd
 }
 
-func runFeedAck(cmd *cobra.Command, _ []string) error {
-	return cli.WithProcessor(func(cmd *cobra.Command, _ []string, proc *cli.Processor) error {
-		root := proc.ProjectRoot()
-		if root == "" {
-			return errfmt.Errorf("project root not found")
-		}
-		var flags clipkg.FlagBag
+func runFeedAck(cmd *cobra.Command, args []string) error {
+	return withFeedRoot(func(cmd *cobra.Command, proc *cli.Processor, root string, flags *clipkg.FlagBag) error {
 		inReplyTo := strings.TrimSpace(flags.String(cmd, "in-reply-to"))
 		agentID := strings.TrimSpace(flags.String(cmd, "agent-id"))
 		personaRef := strings.TrimSpace(flags.String(cmd, "persona-ref"))
@@ -44,13 +39,8 @@ func runFeedAck(cmd *cobra.Command, _ []string) error {
 			return errfmt.Errorf("--persona-ref is required")
 		}
 
-		persona, err := proc.Storage().Read(proc.OperationContext(), proc.SecurityContext(), personaRef)
-		if err != nil {
-			return errfmt.Newf("feed ack: resolve persona %s", personaRef).Wrap(err)
-		}
-		kind, _ := persona[objects.FieldKeyKind].(string)
-		if !strings.EqualFold(strings.TrimSpace(kind), "persona") {
-			return errfmt.Errorf("--persona-ref %q is kind %q (want persona)", personaRef, kind)
+		if _, err := resolveAndValidatePersona(proc, personaRef, "ack"); err != nil {
+			return err
 		}
 
 		if err := agentfeed.AuthorizePeerAck(root, agentID, inReplyTo); err != nil {
@@ -80,10 +70,8 @@ func runFeedAck(cmd *cobra.Command, _ []string) error {
 			Int("awaits_completed", len(completed)).
 			Log()
 
-		out := feedResult(cmd, res, nil)
+		out := newPersonaFeedResult(cmd, res, personaRef, agentID)
 		out["in_reply_to"] = inReplyTo
-		out[objects.FieldKeyPersonaRef] = personaRef
-		out[objects.FieldKeyAgentID] = agentID
 		out[objects.FieldKeyEventType] = agentfeed.FeedEventTypePeerAck
 		if len(completed) > 0 {
 			ids := make([]string, 0, len(completed))
@@ -93,5 +81,5 @@ func runFeedAck(cmd *cobra.Command, _ []string) error {
 			out["awaits_completed"] = ids
 		}
 		return cli.FormatOutput(cmd, out)
-	})(cmd, nil)
+	})(cmd, args)
 }

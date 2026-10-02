@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/zqk-os/zqk/pkg/agentfeed"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -35,24 +34,10 @@ func fillSubmitMarkPath(root, kind string) string {
 }
 
 func recentFillSubmit(root, kind string) (bool, string) {
-	raw, err := fileutil.ReadFile(fillSubmitMarkPath(root, kind))
-	if err != nil {
-		return false, ""
+	if isMarkDispatchedRecently(fillSubmitMarkPath(root, kind), planOrchSubmitCooldown) {
+		return true, "already_submitted " + kind
 	}
-	var mark struct {
-		DispatchedAt string `json:"dispatched_at"`
-	}
-	if json.Unmarshal(raw, &mark) != nil {
-		return false, ""
-	}
-	ts, err := time.Parse(time.RFC3339, strings.TrimSpace(mark.DispatchedAt))
-	if err != nil {
-		return false, ""
-	}
-	if time.Since(ts) >= planOrchSubmitCooldown {
-		return false, ""
-	}
-	return true, "already_submitted " + kind
+	return false, ""
 }
 
 func writeFillSubmitMark(root, kind, detail string) error {

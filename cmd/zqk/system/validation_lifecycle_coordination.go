@@ -7,7 +7,6 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/coordination"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
-	"github.com/zqk-os/zqk/pkg/metrics"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/validation"
 )
@@ -26,15 +25,6 @@ func emitValidationLifecycleEventViaCoordinator(
 	failedCount int,
 	duration time.Duration,
 ) {
-	projectRoot = ProjectRootOrResolveDot(projectRoot)
-	if projectRoot == emptyValue {
-		// Best effort - skip if no project root
-		return
-	}
-
-	// Embed LoggingContext in context so coordinator logging respects --context profile
-	ctx = createContextWithLoggingProfile(ctx, systemProfileSystem)
-
 	// Type assert storage provider
 	var storageProviderTyped storage.ObjectStorageProvider
 	if storageProvider != nil {
@@ -43,23 +33,10 @@ func emitValidationLifecycleEventViaCoordinator(
 		}
 	}
 
-	// Create routers for coordinator
-	auditRouter := coordination.NewStorageAuditRouter(projectRoot, storageProviderTyped)
-
-	// Create metrics pipeline for metrics router (if storage provider available)
-	var metricsRouter coordination.MetricsRouter
-	if storageProviderTyped != nil {
-		metricsPipeline := metrics.MetricPipelineForProject(storageProviderTyped, projectRoot)
-		metricsRouter = coordination.NewMetricPipelineRouter(metricsPipeline)
+	ctx, coordinator, ok := setupSystemCoordinator(ctx, projectRoot, storageProviderTyped, systemProfileSystem, true)
+	if !ok {
+		return
 	}
-
-	// Create coordinator with routers
-	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
-		LoggingRouter:     &coordination.DefaultLoggingRouter{},
-		AuditRouter:       auditRouter,
-		MetricsRouter:     metricsRouter,
-		OperationalRouter: &coordination.DefaultOperationalRouter{},
-	})
 
 	// Build audit metadata
 	auditMetadata := make(map[string]any)
