@@ -52,11 +52,7 @@ func NewGenerateCommandBuildersCmd() *cobra.Command {
 	}
 	cli.RequireSession(cmd, false) // no storage/session; codegen only
 	cli.BindAsyncProgress(cmd, func(cmd *cobra.Command, args []string) error {
-		ctx := cli.GetContext(cmd)
-		logger := logging.GetLoggerFromProfile(SystemProfileHuman)
-		if ctx != nil && ctx.Profile != EmptyValue {
-			logger = logging.GetLoggerFromProfile(ctx.Profile)
-		}
+		logger := cmdLogger(cmd)
 
 		projectRoot := cli.ResolveProjectRoot(".")
 		if specsDir == EmptyValue {
@@ -156,13 +152,7 @@ func NewGenerateCommandBuildersCmd() *cobra.Command {
 			generated++
 		}
 
-		logging.Fluent(logger).Info(fmt.Sprintf("Summary: Generated %d, Skipped %d, Errors %d", generated, skipped, errors)).Log()
-
-		if errors > 0 {
-			return errfmt.Errorf("generation completed with %d errors", errors)
-		}
-
-		return nil
+		return logSummaryAndCheckErrors(logger, generated, skipped, errors)
 	})
 
 	helpBuilder.ApplyToCommand(cmd)

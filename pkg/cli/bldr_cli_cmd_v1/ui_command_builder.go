@@ -25,7 +25,7 @@ func NewUiCommandBuilder() *cobra.Command {
 	help.AddExample("Launch mission control", "%s ui")
 	help.AddExample("Launch focused on swarm tab", "%s ui --tab swarm")
 	builder.WithHelpBuilder(help)
-	builder.WithArgs(cobra.NoArgs)
+	builder.WithArgs(cobra.ArbitraryArgs)
 	builder.AddStringFlag("tab", "t", "seismograph", "Initial tab to display (state, audit, swarm, pm, metrics, scheduler)")
 	builder.AddBoolFlag("web", "w", false, "Start local web studio HTTP server with interactive DAG visualizer")
 	builder.AddIntFlag("port", "p", 8080, "Port to listen on for local web studio (default 8080)")

@@ -70,17 +70,7 @@ func emitLintBypassAuditEventViaCoordinator(
 	// Embed LoggingContext in context so coordinator logging respects --context profile
 	ctx = createContextWithLoggingProfile(ctx, profile)
 
-	// Create routers for coordinator (with security context)
-	auditRouter := coordination.NewStorageAuditRouter(projectRoot, storageProvider)
-	// Note: StorageAuditRouter uses secCtx from context or defaults to system account
-
-	// Create coordinator with routers (only audit for lint bypass events)
-	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
-		LoggingRouter:     &coordination.DefaultLoggingRouter{},
-		AuditRouter:       auditRouter,
-		MetricsRouter:     nil, // Lint bypass events don't need metrics router
-		OperationalRouter: &coordination.DefaultOperationalRouter{},
-	})
+	coordinator := coordination.NewStorageCoordinator(projectRoot, storageProvider)
 
 	// Build audit metadata from options
 	auditMetadata := make(map[string]any)

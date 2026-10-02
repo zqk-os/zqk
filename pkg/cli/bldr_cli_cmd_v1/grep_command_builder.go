@@ -25,7 +25,7 @@ func NewGrepCommandBuilder() *cobra.Command {
 	help.AddExample("Token-budgeted JSON output for AI agent context consumption", "%s grep 'error' --max-tokens 2000 -f json")
 	help.AddExample("Rebuild and refresh persistent trigram index", "%s grep --reindex")
 	builder.WithHelpBuilder(help)
-	builder.WithArgs(cobra.NoArgs)
+	builder.WithArgs(cobra.RangeArgs(0, 2))
 	builder.AddBoolFlag("ignore-case", "i", false, "Case-insensitive search")
 	builder.AddBoolFlag("regex", "e", false, "Treat query as regular expression")
 	builder.AddBoolFlag("word-regexp", "w", false, "Match only whole words")

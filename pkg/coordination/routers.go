@@ -38,6 +38,13 @@ func StorageAuditRouterForProject(projectRoot string, storageProvider storage.Ob
 	return NewStorageAuditRouter(projectRoot, storageProvider)
 }
 
+// NewStorageCoordinator creates a new coordinator wired with a storage-backed audit router.
+func NewStorageCoordinator(projectRoot string, storageProvider storage.ObjectStorageProvider) *Coordinator {
+	return NewCoordinator(CoordinatorConfig{
+		AuditRouter: NewStorageAuditRouter(projectRoot, storageProvider),
+	})
+}
+
 // SetCallback sets an optional callback function to be called when audit events are created
 // This is useful for test verification and monitoring async operations
 func (r *StorageAuditRouter) SetCallback(callback AuditEventCallback) {

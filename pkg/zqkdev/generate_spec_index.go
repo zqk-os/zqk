@@ -41,11 +41,7 @@ func NewGenerateSpecIndexCmd() *cobra.Command {
 
 	cli.RequireSession(cmd, false) // no storage/session; codegen only
 	cli.BindAsyncProgress(cmd, func(cmd *cobra.Command, args []string) error {
-		ctx := cli.GetContext(cmd)
-		logger := logging.GetLoggerFromProfile(SystemProfileHuman)
-		if ctx != nil && ctx.Profile != EmptyValue {
-			logger = logging.GetLoggerFromProfile(ctx.Profile)
-		}
+		logger := cmdLogger(cmd)
 
 		if specsDir == EmptyValue {
 			// Use the standard paths resolver so generation works from any cwd and
@@ -71,9 +67,10 @@ func NewGenerateSpecIndexCmd() *cobra.Command {
 			return errfmt.Newf("failed to build spec index").Wrap(err)
 		}
 
+		cmdCtx := cli.GetContext(cmd)
 		root := ProjectRootOrResolve("")
-		if ctx != nil && ctx.ProjectRoot != "" {
-			root = ProjectRootOrResolve(ctx.ProjectRoot)
+		if cmdCtx != nil && cmdCtx.ProjectRoot != "" {
+			root = ProjectRootOrResolve(cmdCtx.ProjectRoot)
 		}
 		if err := objects.ValidateHighVolumeStreamKindsMatchSpecIndex(idx, root); err != nil {
 			return errfmt.Newf("spec index vs high_volume_kinds (data-cell stream contract)").Wrap(err)

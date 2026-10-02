@@ -341,6 +341,20 @@ func generateArgsCode(args *ArgsSpec) string {
 			max = *args.Count
 		}
 		return fmt.Sprintf("cobra.MaximumNArgs(%d)", max)
+	case "range":
+		min := 0
+		if args.Min != nil {
+			min = *args.Min
+		}
+		max := 0
+		if args.Max != nil {
+			max = *args.Max
+		}
+		return fmt.Sprintf("cobra.RangeArgs(%d, %d)", min, max)
+	case "arbitrary", "arbitrary_args", "any":
+		return "cobra.ArbitraryArgs"
+	case "none", "no_args":
+		return "cobra.NoArgs"
 	default:
 		return "cobra.NoArgs"
 	}
