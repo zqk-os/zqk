@@ -169,9 +169,11 @@ func NewSpecLoader(specsDir string) *SpecLoader {
 
 // readSpecFile loads raw bytes and modification time for an absolute spec path.
 func (sl *SpecLoader) readSpecFile(ctx context.Context, absPath string) ([]byte, time.Time, error) {
-	if sl != nil && sl.specStorage != nil && !pathInExtraSpecRoot(absPath) {
+	if sl != nil && sl.specStorage != nil && !sl.isExtraSpecPath(absPath) {
 		data, meta, err := sl.specStorage.ReadSpecBytes(ctx, absPath)
-		return data, meta.ModTime, err
+		if err == nil {
+			return data, meta.ModTime, nil
+		}
 	}
 	data, err := fileutil.ReadFile(absPath)
 	if err != nil {
@@ -182,6 +184,27 @@ func (sl *SpecLoader) readSpecFile(ctx context.Context, absPath string) ([]byte,
 		mt = st.ModTime()
 	}
 	return data, mt, nil
+}
+
+func (sl *SpecLoader) isExtraSpecPath(absPath string) bool {
+	if pathInExtraSpecRoot(absPath) {
+		return true
+	}
+	if sl == nil {
+		return false
+	}
+	target, err := filepath.Abs(absPath)
+	if err != nil {
+		return false
+	}
+	target = filepath.Clean(target)
+	for _, root := range sl.applicableExtraSpecRoots() {
+		rel, err := filepath.Rel(filepath.Clean(root), target)
+		if err == nil && rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+			return true
+		}
+	}
+	return false
 }
 
 // specLoaderLockLogger adapts logging.Logger to concurrency.LockLogger
@@ -385,7 +408,9 @@ func (sl *SpecLoader) applicableExtraSpecRoots() []string {
 	}
 	mod, err := paths.ModuleRootFromPath(sl.specsDir)
 	if err != nil || mod == "" {
-		if fallback, ok := moduleRootForSpecs(); ok && fallback != "" && strings.HasPrefix(sl.specsDir, fallback) {
+		if testRoot := zqkenv.TestRoot().Get(); testRoot != "" && strings.HasPrefix(sl.specsDir, testRoot) {
+			mod = testRoot
+		} else if fallback, ok := moduleRootForSpecs(); ok && fallback != "" && strings.HasPrefix(sl.specsDir, fallback) {
 			mod = fallback
 		} else {
 			return nil
@@ -406,7 +431,6 @@ func (sl *SpecLoader) applicableExtraSpecRoots() []string {
 					continue
 				}
 			}
-			out = append(out, root)
 		}
 	}
 	return out
