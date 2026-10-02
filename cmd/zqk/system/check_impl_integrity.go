@@ -23,11 +23,7 @@ import (
 func checkIntegrity(ctx *cli.Context, cmd *cobra.Command, _ *parser.ParsedObject, filePath, kind string) (issues []Issue, autoFixed []string) {
 	autoFixed = []string{} // Initialize to empty slice (reserved for future use)
 
-	projectRoot := ctx.ProjectRoot
-	projectRoot = ProjectRootOrResolve(projectRoot)
-
-	// Get the directory for this kind
-	kindDir := getKindDirectory(projectRoot, kind)
+	_, kindDir := resolveKindDirectoryFromContext(ctx, kind)
 	if kindDir == emptyValue {
 		return issues, autoFixed
 	}
@@ -158,11 +154,7 @@ func checkIntegrityWithRegistryAndContent(ctx *cli.Context, obj *parser.ParsedOb
 	}
 
 	// CRITICAL: All kinds use CAS now - check CAS index instead of HashRegistry
-	projectRoot := ctx.ProjectRoot
-	projectRoot = ProjectRootOrResolve(projectRoot)
-
-	// Get kind directory
-	kindDir := getKindDirectory(projectRoot, kind)
+	_, kindDir := resolveKindDirectoryFromContext(ctx, kind)
 	if kindDir == emptyValue {
 		// Unknown kind - return error to stop masking issues
 		issues = append(issues, Issue{

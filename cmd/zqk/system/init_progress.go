@@ -44,49 +44,47 @@ func newInitProgress(ctx context.Context, out io.Writer, interactive bool) *init
 	return p
 }
 
-func (p *initProgress) Header(projectName string, mode InitMode) {
+func (p *initProgress) withInteractiveLock(fn func()) {
 	if p == nil || !p.interactive {
 		return
 	}
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	fmt.Fprintf(p.out, "🚀 Initializing %s Kernel — Project: %s (Mode: %s)\n\n", brand.ProductName(), projectName, mode)
+	fn()
+}
+
+func (p *initProgress) reportValidationProgress(stage, message string) {
+	if p != nil && p.ctx != nil {
+		if fn := pkgctx.GetValidationProgress(p.ctx); fn != nil {
+			fn(stage, message)
+		}
+	}
+}
+
+func (p *initProgress) Header(projectName string, mode InitMode) {
+	p.withInteractiveLock(func() {
+		fmt.Fprintf(p.out, "🚀 Initializing %s Kernel — Project: %s (Mode: %s)\n\n", brand.ProductName(), projectName, mode)
+	})
 }
 
 func (p *initProgress) Step(step, total int, stageName string) {
-	if p == nil {
-		return
-	}
-	if p.ctx != nil {
-		if fn := pkgctx.GetValidationProgress(p.ctx); fn != nil {
-			fn(stageName, fmt.Sprintf("[%d/%d] %s", step, total, stageName))
-		}
-	}
-	if !p.interactive {
-		return
-	}
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	p.currentStage = stageName
-	p.stageStart = time.Now()
-	fmt.Fprintf(p.out, "  [%d/%d] %s\n", step, total, stageName)
+	p.reportValidationProgress(stageName, fmt.Sprintf("[%d/%d] %s", step, total, stageName))
+	p.withInteractiveLock(func() {
+		p.currentStage = stageName
+		p.stageStart = time.Now()
+		fmt.Fprintf(p.out, "  [%d/%d] %s\n", step, total, stageName)
+	})
 }
 
 func (p *initProgress) SubStep(message string) {
-	if p == nil {
-		return
+	stage := ""
+	if p != nil {
+		stage = p.currentStage
 	}
-	if p.ctx != nil {
-		if fn := pkgctx.GetValidationProgress(p.ctx); fn != nil {
-			fn(p.currentStage, message)
-		}
-	}
-	if !p.interactive {
-		return
-	}
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	fmt.Fprintf(p.out, "      ↳ %s\n", message)
+	p.reportValidationProgress(stage, message)
+	p.withInteractiveLock(func() {
+		fmt.Fprintf(p.out, "      ↳ %s\n", message)
+	})
 }
 
 func (p *initProgress) runHeartbeat() {
@@ -122,14 +120,11 @@ func (p *initProgress) Done() {
 }
 
 func (p *initProgress) Summary(projectRoot string) {
-	if p == nil || !p.interactive {
-		return
-	}
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	fmt.Fprintf(p.out, "\n✅ %s Kernel initialized successfully in %s\n\n", brand.ProductName(), projectRoot)
-	fmt.Fprintln(p.out, "Get started in 2 commands:")
-	fmt.Fprintf(p.out, "  1. Launch Visual Web Studio (timeline & DAG):\n     $ %s ui -w  (http://127.0.0.1:8080)\n\n", brand.ExecutableName())
-	fmt.Fprintf(p.out, "  2. Execute shovel-ready work:\n     $ %s do\n\n", brand.ExecutableName())
-	fmt.Fprintln(p.out, "Docs & Architecture: docs/INDEX.md")
+	p.withInteractiveLock(func() {
+		fmt.Fprintf(p.out, "\n✅ %s Kernel initialized successfully in %s\n\n", brand.ProductName(), projectRoot)
+		fmt.Fprintln(p.out, "Get started in 2 commands:")
+		fmt.Fprintf(p.out, "  1. Launch Visual Web Studio (timeline & DAG):\n     $ %s ui -w  (http://127.0.0.1:8080)\n\n", brand.ExecutableName())
+		fmt.Fprintf(p.out, "  2. Execute shovel-ready work:\n     $ %s do\n\n", brand.ExecutableName())
+		fmt.Fprintln(p.out, "Docs & Architecture: docs/INDEX.md")
+	})
 }

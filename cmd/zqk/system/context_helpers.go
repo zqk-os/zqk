@@ -2,14 +2,18 @@ package system
 
 import (
 	"context"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/strutil"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // getSystemCliContext returns a CLI context initialized for system commands.
@@ -137,3 +141,18 @@ func initAuditAggregationSetup(cmd *cobra.Command) (string, storage.ObjectStorag
 
 	return projectRoot, storageProvider, service, logger, nil
 }
+
+// openCommandMetricsStore ensures the metrics directory exists and returns a FileMetricsStore for the project root.
+func openCommandMetricsStore(projectRoot string) (*clipkg.FileMetricsStore, error) {
+	metricsPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.MetricsDir, paths.CommandMetricsFile)
+	dir := filepath.Dir(metricsPath)
+	if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
+		return nil, errfmt.Newf("failed to create metrics directory").Wrap(err)
+	}
+	store, err := clipkg.NewFileMetricsStore(metricsPath)
+	if err != nil {
+		return nil, errfmt.Newf("failed to load metrics store").Wrap(err)
+	}
+	return store, nil
+}
+

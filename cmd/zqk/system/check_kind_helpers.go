@@ -40,10 +40,7 @@ type CheckKindContext struct {
 
 // initializeCheckKindContext sets up the check kind context
 func initializeCheckKindContext(ctx *cli.Context, stdCtx stdcontext.Context, cmd *cobra.Command, kind string, ids []string, specLoader *objects.SpecLoader, lifecycleLoader *objects.LifecycleLoader, validator validation.Validator, hashRegistryCache *HashRegistryCacheType, objectIDCache *ObjectIDCache) (*CheckKindContext, error) {
-	projectRoot := ctx.ProjectRoot
-	projectRoot = ProjectRootOrResolve(projectRoot)
-
-	kindDir := getKindDirectory(projectRoot, kind)
+	projectRoot, kindDir := resolveKindDirectoryFromContext(ctx, kind)
 	if kindDir == emptyValue {
 		return nil, errfmt.Errorf("unknown object kind: %s", kind)
 	}

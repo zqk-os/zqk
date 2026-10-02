@@ -27,11 +27,7 @@ func checkIntegrityCAS(ctx *cli.Context, obj *parser.ParsedObject, filePath, kin
 	// autoFixed is always empty - reserved for future use
 	autoFixed = []string{}
 
-	projectRoot := ctx.ProjectRoot
-	projectRoot = ProjectRootOrResolve(projectRoot)
-
-	// Get the directory for this kind
-	kindDir := getKindDirectory(projectRoot, kind)
+	projectRoot, kindDir := resolveKindDirectoryFromContext(ctx, kind)
 	if kindDir == emptyValue {
 		return issues, autoFixed
 	}

@@ -522,23 +522,9 @@ func formatAgentFeedBindingsFooter(sum *agentFeedBindingsSummary) string {
 }
 
 func stringFromObjectMap(m map[string]any, key string) string {
-	v, ok := m[key]
-	if !ok || v == nil {
-		return ""
-	}
-	if s, ok := v.(string); ok {
-		return s
-	}
-	return fmt.Sprint(v)
+	return objectMapString(m, key)
 }
 
 func boolFromObjectMap(m map[string]any, key string) bool {
-	v, ok := m[key]
-	if !ok || v == nil {
-		return false
-	}
-	if b, ok := v.(bool); ok {
-		return b
-	}
-	return false
+	return objectMapBool(m, key)
 }
