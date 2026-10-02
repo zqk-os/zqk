@@ -392,8 +392,20 @@ func (sl *SpecLoader) applicableExtraSpecRoots() []string {
 		}
 	}
 	var out []string
+	repoRoot, _ := moduleRootForSpecs()
 	for _, root := range all {
 		if strings.HasPrefix(root, mod) {
+			out = append(out, root)
+			continue
+		}
+		if repoRoot != "" && mod != repoRoot {
+			if rel, err := filepath.Rel(repoRoot, root); err == nil && !strings.HasPrefix(rel, "..") {
+				cand := filepath.Join(mod, rel)
+				if info, err := fileutil.Stat(cand); err == nil && info.IsDir() {
+					out = append(out, cand)
+					continue
+				}
+			}
 			out = append(out, root)
 		}
 	}
