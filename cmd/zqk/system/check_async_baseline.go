@@ -609,20 +609,7 @@ func saveComparisonResult(outputFile string, comparison *ComparisonResult) error
 	comparisonJSON.Async.IssuesByTier = comparison.Async.IssuesByTier
 	comparisonJSON.Async.Workers = comparison.Async.Workers
 
-	data, err := json.MarshalIndent(comparisonJSON, "", "  ")
-	if err != nil {
-		return errfmt.Newf("failed to marshal comparison").Wrap(err)
-	}
-
-	if err := fileutil.MkdirAll(filepath.Dir(outputFile), paths.DirPerm755); err != nil {
-		return errfmt.Newf("failed to create output directory").Wrap(err)
-	}
-
-	if err := fileutil.WriteFile(outputFile, data, paths.FilePerm644); err != nil { //nolint:gosec // Baseline files - 0600 is acceptable
-		return errfmt.Newf("failed to write output file").Wrap(err)
-	}
-
-	return nil
+	return writeJSONFile(outputFile, comparisonJSON)
 }
 
 // NewCheckAsyncBaselineCmd creates a command to compare async validator with baseline
@@ -648,10 +635,7 @@ func NewCheckAsyncBaselineCmd() *cobra.Command {
 		Use: "check-async-baseline",
 	})
 	cli.BindAsyncProgress(cmd, func(cmd *cobra.Command, args []string) error {
-		initCtx := &pkgctx.CliInitializationContext{
-			ProjectRoot: ProjectRootOrResolve(""),
-		}
-		ctx, err := cli.GetContextFromCommand(cmd, initCtx)
+		ctx, err := getSystemCliContext(cmd)
 		if err != nil {
 			return err
 		}

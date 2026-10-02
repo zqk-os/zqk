@@ -281,10 +281,7 @@ func NewFeatureFlagsCmd() *cobra.Command {
 		Args: cobra.MinimumNArgs(0),
 	})
 	cli.BindAsyncProgress(cmd, func(cmd *cobra.Command, args []string) error {
-		initCtx := &pkgctx.CliInitializationContext{
-			ProjectRoot: ProjectRootOrResolve(""),
-		}
-		ctx, err := cli.GetContextFromCommand(cmd, initCtx)
+		ctx, err := getSystemCliContext(cmd)
 		if err != nil {
 			return err
 		}

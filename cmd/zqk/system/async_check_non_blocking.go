@@ -19,10 +19,7 @@ import (
 // events via the coordinator that clients can subscribe to.
 func runCheckAsyncNonBlocking(cmd *cobra.Command, args []string) error {
 	// Get context
-	initCtx := &pkgctx.CliInitializationContext{
-		ProjectRoot: ProjectRootOrResolve(""),
-	}
-	ctx, err := cli.GetContextFromCommand(cmd, initCtx)
+	ctx, err := getSystemCliContext(cmd)
 	if err != nil {
 		return err
 	}

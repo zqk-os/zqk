@@ -12,49 +12,25 @@ import (
 	"github.com/zqk-os/zqk/pkg/tde"
 )
 
+func registerScriptAction(actionName string) {
+	tde.RegisterAction(actionName, func(ctx context.Context, env tde.Envelope) error {
+		scriptBytes, err := base64.StdEncoding.DecodeString(env.PayloadB64)
+		if err != nil {
+			return fmt.Errorf("failed to decode %s payload: %w", actionName, err)
+		}
+		script := string(scriptBytes)
+		logger := logging.GetLoggerFromContext(ctx)
+		logging.FluentEvent(logger).Info(fmt.Sprintf("TDE %s Executing", actionName)).Script(script).Log()
+
+		cmd := execwrap.CommandContext(ctx, "bash", "-c", script)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		return cmd.Run()
+	})
+}
+
 func init() {
-	tde.RegisterAction("mubert-generate", func(ctx context.Context, env tde.Envelope) error {
-		scriptBytes, err := base64.StdEncoding.DecodeString(env.PayloadB64)
-		if err != nil {
-			return fmt.Errorf("failed to decode mubert-generate payload: %w", err)
-		}
-		script := string(scriptBytes)
-		logger := logging.GetLoggerFromContext(ctx)
-		logging.FluentEvent(logger).Info("TDE mubert-generate Executing").Script(script).Log()
-
-		cmd := execwrap.CommandContext(ctx, "bash", "-c", script)
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		return cmd.Run()
-	})
-
-	tde.RegisterAction("mubert-streaming", func(ctx context.Context, env tde.Envelope) error {
-		scriptBytes, err := base64.StdEncoding.DecodeString(env.PayloadB64)
-		if err != nil {
-			return fmt.Errorf("failed to decode mubert-streaming payload: %w", err)
-		}
-		script := string(scriptBytes)
-		logger := logging.GetLoggerFromContext(ctx)
-		logging.FluentEvent(logger).Info("TDE mubert-streaming Executing").Script(script).Log()
-
-		cmd := execwrap.CommandContext(ctx, "bash", "-c", script)
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		return cmd.Run()
-	})
-
-	tde.RegisterAction("ffmpeg", func(ctx context.Context, env tde.Envelope) error {
-		scriptBytes, err := base64.StdEncoding.DecodeString(env.PayloadB64)
-		if err != nil {
-			return fmt.Errorf("failed to decode ffmpeg payload: %w", err)
-		}
-		script := string(scriptBytes)
-		logger := logging.GetLoggerFromContext(ctx)
-		logging.FluentEvent(logger).Info("TDE ffmpeg Executing").Script(script).Log()
-
-		cmd := execwrap.CommandContext(ctx, "bash", "-c", script)
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		return cmd.Run()
-	})
+	for _, action := range []string{"mubert-generate", "mubert-streaming", "ffmpeg"} {
+		registerScriptAction(action)
+	}
 }

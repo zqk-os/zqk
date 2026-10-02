@@ -5,10 +5,19 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cliapp"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/strutil"
 )
+
+// getSystemCliContext returns a CLI context initialized for system commands.
+func getSystemCliContext(cmd *cobra.Command) (*cli.Context, error) {
+	initCtx := &pkgctx.CliInitializationContext{
+		ProjectRoot: ProjectRootOrResolve(""),
+	}
+	return cli.GetContextFromCommand(cmd, initCtx)
+}
 
 func profileOrDefault(profile, fallback string) string {
 	return strutil.OrDefault(profile, fallback)
