@@ -46,12 +46,7 @@ func NewEDDCmd() *cobra.Command {
 		},
 	})
 
-	helpBuilder.ApplyToCommand(cmd)
-	cli.BindAsyncProgress(cmd, runEDD)
-	cmd.Flags().Bool("include-commit-data", false, "Explicitly include Git commit data (auto-detected by default)")
-	cli.AddCommonFlags(cmd)
-
-	return cmd
+	return bindReportCommand(cmd, helpBuilder, runEDD)
 }
 
 func runEDD(cmd *cobra.Command, args []string) error {

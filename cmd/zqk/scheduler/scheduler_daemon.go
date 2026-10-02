@@ -258,6 +258,22 @@ func StartSchedulerDaemonForRoot(projectRoot string) error {
 
 	// NOTE: Do NOT override Args[0] or use WireExecForIsolatedProject —
 	// see startSchedulerInBackground comment about brand prefix and test settings.
+	cleanup, err := configureSchedulerDaemonExec(execCmd, projectRoot, "during root transition")
+	if err != nil {
+		return err
+	}
+	defer cleanup()
+
+	if runtime.GOOS != schedulerGOOSWindows {
+		execCmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true}
+	}
+	if err := startDetachedSchedulerDaemonProcess(execCmd); err != nil {
+		return errfmt.Newf("failed to start scheduler for new root").Wrap(err)
+	}
+	return nil
+}
+
+func configureSchedulerDaemonExec(execCmd *exec.Cmd, projectRoot, contextLabel string) (func(), error) {
 	execCmd.Dir = projectRoot
 	execCmd.Env = scrubDaemonInheritEnv(append(os.Environ(),
 		zqkenv.ProjectRoot().Name()+"="+projectRoot,
@@ -266,27 +282,20 @@ func StartSchedulerDaemonForRoot(projectRoot string) error {
 
 	devNull, err := fileutil.Open(fileutil.DevNull)
 	if err != nil {
-		return errfmt.Errorf(schedulerErrOpenFmt, fileutil.DevNull, err)
+		return nil, errfmt.Errorf(schedulerErrOpenFmt, fileutil.DevNull, err)
 	}
 	execCmd.Stdin = devNull
 	closeDup, err := attachSchedulerDaemonStdioToDevNull(execCmd)
 	if err != nil {
 		_ = devNull.Close() //nolint:errcheck // best-effort cleanup on error path
-		return err
+		return nil, err
 	}
-	// Defer fd cleanup until after child process has started and detached its own stdio.
-	defer func() {
+	cleanup := func() {
 		closeDup()
 		if err := devNull.Close(); err != nil {
 			logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-			schedulerpkg.SLog(logger).Debug("Failed to close devNull during root transition").WithError(err).Log()
+			schedulerpkg.SLog(logger).Debug(fmt.Sprintf("Failed to close devNull %s", contextLabel)).WithError(err).Log()
 		}
-	}()
-	if runtime.GOOS != schedulerGOOSWindows {
-		execCmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true}
 	}
-	if err := startDetachedSchedulerDaemonProcess(execCmd); err != nil {
-		return errfmt.Newf("failed to start scheduler for new root").Wrap(err)
-	}
-	return nil
+	return cleanup, nil
 }

@@ -46,12 +46,7 @@ func NewBlockersCmd() *cobra.Command {
 		},
 	})
 
-	helpBuilder.ApplyToCommand(cmd)
-	cli.BindAsyncProgress(cmd, runBlockers)
-	cmd.Flags().Bool("include-commit-data", false, "Explicitly include Git commit data (auto-detected by default)")
-	cli.AddCommonFlags(cmd)
-
-	return cmd
+	return bindReportCommand(cmd, helpBuilder, runBlockers)
 }
 
 func runBlockers(cmd *cobra.Command, args []string) error {

@@ -46,12 +46,7 @@ func NewPCSCmd() *cobra.Command {
 		},
 	})
 
-	helpBuilder.ApplyToCommand(cmd)
-	cli.BindAsyncProgress(cmd, runPCS)
-	cmd.Flags().Bool("include-commit-data", false, "Explicitly include Git commit data (auto-detected by default)")
-	cli.AddCommonFlags(cmd)
-
-	return cmd
+	return bindReportCommand(cmd, helpBuilder, runPCS)
 }
 
 func runPCS(cmd *cobra.Command, args []string) error {

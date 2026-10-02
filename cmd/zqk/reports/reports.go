@@ -45,6 +45,14 @@ func NewReportsCmd() *cobra.Command {
 	return reportsCmd
 }
 
+func bindReportCommand(cmd *cobra.Command, helpBuilder *clipkg.HelpBuilder, runFn func(cmd *cobra.Command, args []string) error) *cobra.Command {
+	helpBuilder.ApplyToCommand(cmd)
+	cli.BindAsyncProgress(cmd, runFn)
+	cmd.Flags().Bool("include-commit-data", false, "Explicitly include Git commit data (auto-detected by default)")
+	cli.AddCommonFlags(cmd)
+	return cmd
+}
+
 func calculateReportMetrics(cmd *cobra.Command, metricLabel string) (*metrics.ProjectMetrics, error) {
 	ctx := cli.GetContext(cmd)
 	if ctx == nil {

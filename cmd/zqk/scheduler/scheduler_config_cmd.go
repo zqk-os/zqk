@@ -24,14 +24,9 @@ func NewConfigCmd() *cobra.Command {
 }
 
 func runConfig(cmd *cobra.Command, args []string) error {
-	projectRoot := cli.ResolveProjectRoot(".")
-	if projectRoot == emptyValue {
-		if ctx := cli.GetContext(cmd); ctx != nil && ctx.ProjectRoot != emptyValue {
-			projectRoot = ctx.ProjectRoot
-		}
-	}
-	if projectRoot == emptyValue {
-		return errfmt.Errorf("project root is required (run from project directory or set ZQK_PROJECT_ROOT)")
+	projectRoot, err := resolveSchedulerProjectRoot(cmd)
+	if err != nil {
+		return err
 	}
 
 	config, err := loadSchedulerConfig(projectRoot)
