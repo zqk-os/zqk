@@ -13,7 +13,12 @@ enabled: true
 status: active
 namespace_id: zqk:kernel
 schema_version: "2.0.0"
-command: zqk
+command: /bin/sh
 command_args:
-  - system
-  - stream-gc
+  - "-c"
+  - |
+    set -euo pipefail
+    ROOT="${ZQK_PROJECT_ROOT:-.}"
+    cd "$ROOT"
+    BIN="${ZQK_BIN:-zqk}"
+    exec "$BIN" system stream-gc

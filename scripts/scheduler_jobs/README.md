@@ -58,9 +58,8 @@ Default cap in YAML: `AUTOFIX_GLOSSARY_MAX_CREATE=25`.
 **Create/update from YAML (high-level new object flow):**
 
 ```bash
-zqk new object scheduler_job --file scripts/scheduler_jobs/autofix_process_pending.yaml --promote
+zqk object create scheduler_job --file scripts/scheduler_jobs/autofix_process_pending.yaml --promote
 ```
-*(Low-level CAS import alternative: `zqk object create scheduler_job --file scripts/scheduler_jobs/autofix_process_pending.yaml --keep-file --force`)*
 
 ## retention_tolerance_catchall.yaml
 
@@ -72,12 +71,11 @@ Catch-all retention job: runs retention tolerance for all kinds in `retention_to
 zqk system ensure-retention-jobs
 ```
 
-**Manual creation flow (high-level draft-and-promote):**
+**Manual creation flow:**
 
 ```bash
-zqk new object scheduler_job --file scripts/scheduler_jobs/retention_tolerance_catchall.yaml --promote
+zqk object create scheduler_job --file scripts/scheduler_jobs/retention_tolerance_catchall.yaml --promote
 ```
-*(Low-level CAS import alternative: `zqk object create scheduler_job --file scripts/scheduler_jobs/retention_tolerance_catchall.yaml`)*
 
 ## SCH-016: Cleanup Old Command Metrics (bulk delete)
 
@@ -101,12 +99,11 @@ Default audit event aggregation job (e.g. SCH-002). Used by `zqk system ensure-r
 zqk system ensure-retention-jobs
 ```
 
-**Manual creation flow (high-level draft-and-promote):**
+**Manual creation flow:**
 
 ```bash
-zqk new object scheduler_job --file scripts/scheduler_jobs/audit_event_aggregation_default.yaml --promote
+zqk object create scheduler_job --file scripts/scheduler_jobs/audit_event_aggregation_default.yaml --promote
 ```
-*(Low-level CAS import alternative: `zqk object create scheduler_job --file scripts/scheduler_jobs/audit_event_aggregation_default.yaml`)*
 
 ## Persistent Daemons vs. Scheduled Jobs
 

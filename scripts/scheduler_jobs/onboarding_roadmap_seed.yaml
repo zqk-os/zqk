@@ -1,5 +1,5 @@
 # One-time job: creates onboarding curriculum via declarative ZQL transaction in scripts/onboarding_roadmap/onboarding_seed.zql.
-# Create: zqk new object scheduler_job --file scripts/scheduler_jobs/onboarding_roadmap_seed.yaml --promote
+# Create: zqk object create scheduler_job --file scripts/scheduler_jobs/onboarding_roadmap_seed.yaml --promote
 # Then start the scheduler; the job runs immediately (trigger_type: immediate, execution_mode: one_time).
 # Alternatively: zqk scheduler trigger <job-id> after creating the job.
 title: Onboarding Roadmap Seed
