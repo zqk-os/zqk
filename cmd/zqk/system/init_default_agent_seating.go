@@ -29,21 +29,13 @@ const (
 // after greenfield init so feed/chat works without Studio-only PER-* IDs.
 // Idempotent: skips when the stable object id already exists.
 func SeedDefaultAgentSeatingPack(projectRoot string, logger logging.Logger) (created int, err error) {
-	if projectRoot == emptyValue {
-		return 0, errfmt.Errorf("project root is empty")
-	}
 	// Promote-ready status (approved) must land on CAS — not draft plane.
 	// Draft-only seating made feed ack/steer resolve "object not found" for PER-DEFAULT-*.
 	ctx := pkgctx.WithPromoteOnCreate(pkgctx.NewSystemContext())
-	factory, ferr := storage.NewStorageFactory(ctx, projectRoot)
-	if ferr != nil {
-		return 0, errfmt.Newf("storage factory for default agent seating").Wrap(ferr)
+	sp, secCtx, err := initSeedingStorage(ctx, projectRoot, "default agent seating")
+	if err != nil {
+		return 0, err
 	}
-	sp := factory.GetStorage()
-	if sp == nil {
-		return 0, errfmt.Errorf("storage provider is nil")
-	}
-	secCtx := pkgctx.NewSystemSecurityContext()
 	if storage.GetCacheOperationHandler() == nil {
 		storage.SetCacheOperationHandler(func(cacheCtx *pkgctx.CacheContext) error {
 			if cacheCtx.Operation == pkgctx.CacheOperationUpdate || cacheCtx.Operation == pkgctx.CacheOperationInvalidateAndUpdate {
@@ -294,15 +286,10 @@ func SeedKernelFromAnswerFile(projectRoot, answerFilePath string, logger logging
 	}
 
 	ctx := pkgctx.NewSystemContext()
-	factory, ferr := storage.NewStorageFactory(ctx, projectRoot)
-	if ferr != nil {
-		return 0, errfmt.Newf("storage factory for answer file seed").Wrap(ferr)
+	sp, secCtx, err := initSeedingStorage(ctx, projectRoot, "answer file seed")
+	if err != nil {
+		return 0, err
 	}
-	sp := factory.GetStorage()
-	if sp == nil {
-		return 0, errfmt.Errorf("storage provider is nil")
-	}
-	secCtx := pkgctx.NewSystemSecurityContext()
 
 	created := 0
 	var lastCreateErr error

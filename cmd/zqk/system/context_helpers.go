@@ -62,3 +62,19 @@ func openStorageProvider(ctx context.Context, projectRoot string) (storage.Objec
 	}
 	return storageProvider, cleanup, nil
 }
+
+// initSeedingStorage initializes storage provider and security context for pack seeding operations.
+func initSeedingStorage(ctx context.Context, projectRoot, purpose string) (storage.ObjectStorageProvider, *pkgctx.SecurityContext, error) {
+	if projectRoot == emptyValue {
+		return nil, nil, errfmt.Errorf("project root is empty")
+	}
+	factory, ferr := storage.NewStorageFactory(ctx, projectRoot)
+	if ferr != nil {
+		return nil, nil, errfmt.Newf("storage factory for %s", purpose).Wrap(ferr)
+	}
+	sp := factory.GetStorage()
+	if sp == nil {
+		return nil, nil, errfmt.Errorf("storage provider is nil")
+	}
+	return sp, pkgctx.NewSystemSecurityContext(), nil
+}

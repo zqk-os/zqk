@@ -10,6 +10,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/objectidcache"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -374,4 +375,44 @@ func (fw *FSWatcher) Start(ctx context.Context) error {
 func (fw *FSWatcher) Stop() error {
 	close(fw.done)
 	return fw.watcher.Close()
+}
+
+// BindProcessYAMLInvalidator subscribes to filesystem events on hub and invalidates/updates the object ID cache for process YAML files.
+func BindProcessYAMLInvalidator(hub EventHub, onActivity func()) {
+	hub.Subscribe(EventTypeFilesystem, func(c context.Context, event Event) error {
+		if onActivity != nil {
+			onActivity()
+		}
+		payloadMap, ok := event.Payload.(map[string]any)
+		if !ok {
+			return nil
+		}
+		target, ok := payloadMap[objects.FieldKeyTargetID].(string)
+		if !ok {
+			return nil
+		}
+		op, _ := payloadMap[objects.FieldKeyOperation].(string)
+
+		// Only process yaml files in process directories
+		if !strings.Contains(target, paths.ProcessDir+"/") || !strings.HasSuffix(target, ".yaml") {
+			return nil
+		}
+
+		parts := strings.Split(target, string(filepath.Separator))
+		for i, part := range parts {
+			if part == "process" && i+2 < len(parts) {
+				kind := parts[i+1]
+				filename := parts[len(parts)-1]
+				id := strings.TrimSuffix(filename, ".yaml")
+
+				if op == "REMOVE" {
+					objectidcache.InvalidateObjectIDCache(id)
+				} else if op == "WRITE" || op == "CREATE" {
+					_ = objectidcache.UpdateObjectIDCache(id, kind, target)
+				}
+				break
+			}
+		}
+		return nil
+	})
 }

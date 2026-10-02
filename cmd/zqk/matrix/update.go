@@ -100,8 +100,6 @@ func validateCvsIDsReadable(cmd *cobra.Command, ids []string) error {
 		if len(ids) == 0 {
 			return nil
 		}
-		var err error
-		_ = err
 		ctx := proc.OperationContext()
 		sec := proc.SecurityContext()
 		for _, id := range ids {

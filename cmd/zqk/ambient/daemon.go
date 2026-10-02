@@ -1,7 +1,6 @@
 package ambient
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -19,8 +18,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/daemon/singleton"
 	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/logging"
-	"github.com/zqk-os/zqk/pkg/objectidcache"
-	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/scheduler/hostservice"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -130,39 +127,7 @@ func runAmbientDaemon(cmd *cobra.Command, args []string) error {
 	}
 
 	// Invalidate object cache on filesystem events
-	hub.Subscribe(ambient.EventTypeFilesystem, func(c context.Context, event ambient.Event) error {
-		cli.TouchMeaningfulActivity()
-		payloadMap, ok := event.Payload.(map[string]any)
-		if !ok {
-			return nil
-		}
-		target, ok := payloadMap[objects.FieldKeyTargetID].(string)
-		if !ok {
-			return nil
-		}
-		op, _ := payloadMap[objects.FieldKeyOperation].(string)
-
-		if !strings.Contains(target, paths.ProcessDir+"/") || !strings.HasSuffix(target, ".yaml") {
-			return nil
-		}
-
-		parts := strings.Split(target, string(filepath.Separator))
-		for i, part := range parts {
-			if part == "process" && i+2 < len(parts) {
-				kind := parts[i+1]
-				filename := parts[len(parts)-1]
-				id := strings.TrimSuffix(filename, ".yaml")
-
-				if op == "REMOVE" {
-					objectidcache.InvalidateObjectIDCache(id)
-				} else if op == "WRITE" || op == "CREATE" {
-					_ = objectidcache.UpdateObjectIDCache(id, kind, target)
-				}
-				break
-			}
-		}
-		return nil
-	})
+	ambient.BindProcessYAMLInvalidator(hub, cli.TouchMeaningfulActivity)
 
 	if err := watcher.Start(ctx); err != nil {
 		return fmt.Errorf("failed to start fswatcher: %w", err)
