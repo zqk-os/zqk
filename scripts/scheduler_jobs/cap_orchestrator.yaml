@@ -3,22 +3,25 @@
 # (local LLM perpetual monitoring) and routes to review/grooming/planning/metrics stages.
 # Create manually: zqk internal create scheduler_job --file scripts/scheduler_jobs/cap_orchestrator.yaml
 id: SCH-cap-orchestrator
+kind: scheduler_job
 title: CAP Orchestrator
 description: |
-  Convergence-Analyze-Plan orchestrator. Reads kernel state via 'workflow whats-next'
-  and routes to the appropriate stage handler:
+  Convergence-Analyze-Plan native in-process engine (JobTypeCapOrchestrator).
+  Reads kernel state via 'workflow whats-next' and executes the multi-stage CAP loop:
     - cap_stage_sentinel: local LLM kernel steward (drift monitoring, anomaly detection)
     - cap_stage_review: convergence review
     - cap_stage_grooming: backlog grooming
     - cap_stage_planning: priority plan execution
     - cap_stage_metrics: metrics aggregation
-  Requires ZQK_LLM_BASE_URL, ZQK_LLM_CHAT_MODEL, ZQK_LLM_PROVIDER in the daemon environment
-  for the sentinel stage to call the local LLM.
+  This is an active in-process Go handler that requires no shell wrapper.
+  Requires ZQK_LLM_BASE_URL, ZQK_LLM_CHAT_MODEL, ZQK_LLM_PROVIDER in daemon environment.
 job_type: cap_orchestrator
 trigger_type: timer
-schedule_expression: "0 */10 * * * *"
+schedule_expression: "*/10 * * * *"
 category: maintenance
 execution_mode: reusable
+priority: normal
+log_level: default
 max_runtime_seconds: 300
 enabled: true
 status: active

@@ -37,7 +37,10 @@ func BootPayload() string {
   3. Immediately create/checkout the next integration branch (`+"`"+`git checkout -b integration/<pri-id> origin/main`+"`"+`).
   4. Claim or shape the first BLI (`+"`"+paths.RewriteCanonicalCLIInvocations(`zqk agent claim-work ...`)+"`"+` or kernel object creation).
   5. Continue the execution chain without yielding control to an idle wait state.
-`, brand.ProductName(), brand.ProductName(), exe, exe, exe, exe, exe, exe, exe)
+
+## Code Search & Token Conservation (`+"`"+`%s grep`+"`"+`)
+- **Prefer `+"`"+`%s grep`+"`"+` (alias `+"`zgrep`"+`) over raw shell `+"`grep`"+` or `+"`find`"+`:** `+"`"+`%s grep`+"`"+` provides sub-15ms trigram indexing, Go AST structural queries (`+"`--ast --kind struct|func`"+`, `+"`--ast --recv <Type>`"+`), and strict token budgeting (`+"`--max-tokens 2000 -f json`"+`). Using external grep dumps unbudgeted files into LLM contexts and increases token consumption.
+`, brand.ProductName(), brand.ProductName(), exe, exe, exe, exe, exe, exe, exe, exe, exe, exe)
 }
 
 // SyncReportRelPath is the workspace→kernel sync artifact (lite file under .zqk/agent-runtime).

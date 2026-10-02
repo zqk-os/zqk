@@ -1,7 +1,9 @@
 package system
 
 import (
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cliapp"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/strutil"
 )
 
@@ -20,4 +22,16 @@ func ProjectRootOrResolveDot(projectRoot string) string {
 		return cli.ResolveProjectRoot(".")
 	}
 	return projectRoot
+}
+
+func resolveCommandProjectRoot(cmd *cobra.Command) (string, error) {
+	ctx := cli.GetContext(cmd)
+	if ctx == nil {
+		return "", errfmt.Errorf("failed to get context")
+	}
+	root := ProjectRootOrResolve(ctx.ProjectRoot)
+	if root == emptyValue {
+		return "", errfmt.Errorf("project root not found")
+	}
+	return root, nil
 }

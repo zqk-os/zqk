@@ -17,9 +17,15 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/workpack"
 )
 
 func init() {
+	workpack.Enable()
+	objects.AddPackOwnedKinds(workpack.Kinds())
+	objects.AddModuleSpecRoot(workpack.SpecDir)
+	objects.AddModuleLifecycleRoot(workpack.LifecycleDir)
+
 	// So the first GetGlobalFieldRegistry() (e.g. when ensureCommandsRegistered runs) finds specs
 	// and adds dynamic kind subcommands, set ZQK_TEST_ROOT to project root when unset.
 	if zqkenv.TestRoot().Get() != app.EmptyValue {

@@ -1,38 +1,89 @@
-# Seat Worker Supervisor Subsystem (`pkg/seatworker`)
+# Mesh Seat Worker & Supervisor Daemon (`pkg/seatworker`)
 
-`pkg/seatworker` provides OS-level service supervision (via `launchd` on macOS and `systemd` on Linux) to run autonomous agent seats as persistent background daemons.
+`pkg/seatworker` provides OS supervisor installation and lifecycle management for persistent autonomous agent worker processes (`zqk agent seat-worker`).
 
 ---
 
 ## 1. What is a Seat Worker?
 
-In the ZQK swarm mesh, a **seat** represents an assigned role or slot (e.g. `architect`, `tpm`, `qa-lead`, `worker-1`).
+A **Seat Worker** is a dedicated, headless autonomous process bound to a specific seated persona defined in `.zqk/agent-runtime/peer_seats.json` (or `peer_seats.json`).
 
-While developer agents often run interactively inside IDE windows, a **Seat Worker** is an autonomous background process that runs continuously on the host operating system. It executes `zqk agent seat-worker` on a continuous polling loop, claiming eligible backlog items (`agent_task`), processing event mesh notifications, and emitting status updates to the shared feed.
+While interactive agents operate within an IDE or single CLI session, a Seat Worker runs continuously in the background under the host OS supervisor:
+- **macOS**: `launchd` User Agent (`~/Library/LaunchAgents/com.zqk.mesh.seat-worker.<seat>.plist`)
+- **Linux**: `systemd` User Service (`~/.config/systemd/user/com.zqk.mesh.seat-worker.<seat>.service`)
 
----
-
-## 2. When to Use Seat Workers
-
-- **Continuous 24/7 Autonomy**: When you want swarm seats to monitor repos, run verification loops, or handle incoming issues without requiring an open IDE or terminal window.
-- **Dedicated Worker Workstations / Servers**: On CI/CD runner nodes or dedicated swarm servers that host multiple background agent seats.
-- **Resilience Against Terminal Drops**: Seat workers survive shell disconnections and reboots via native OS init supervisors (`launchd` / `systemd`).
+The worker daemon periodically polls its seat's inbox (`poll_seconds`, default 30s), dequeues steers and task assignments (`ATK-*`), prepares kernel context, executes the cognitive reasoning and action loop, and returns status updates to the Knowledge Kernel.
 
 ---
 
-## 3. Platform Supervisors
+## 2. When Should You Use Them?
 
-- **macOS (`launchd`)**:
-  - Writes property lists to `~/Library/LaunchAgents/com.zqk.mesh.seat-worker.<seat>.plist`.
-  - Manages lifecycles via `launchctl bootstrap gui/$UID` and `launchctl bootout gui/$UID`.
-- **Linux (`systemd`)**:
-  - Writes unit files to `~/.config/systemd/user/zqk-mesh-seat-worker@<seat>.service`.
-  - Manages lifecycles via `systemctl --user enable --now` and `systemctl --user daemon-reload`.
+1. **Continuous 24/7 Autonomous Loops**: When you want agents to autonomously make progress on backlog items, perform continuous verification, or monitor repository health without requiring an open IDE terminal.
+2. **Specialized Agent Swarms**: When dedicating specific hardware or processes to specialized roles (e.g., dedicated TPM orchestrator, Code Craftsman, QA Verification, or Security Auditor).
+3. **Sovereign Mesh Compute Clusters**: In multi-node federated mesh environments where remote machines advertise compute capacity and execute delegated workloads.
 
 ---
 
-## 4. Key Limitations & Considerations
+## 3. Installation & CLI Usage
 
-1. **Worktree Isolation**: Seat workers cannot be installed on an ephemeral or secondary git worktree; they must be bound directly to the seated repository root (`.zqk/`).
-2. **Resource Throttling**: Each active seat worker polls at the configured interval (`--poll-seconds`, default 30s). When deploying dozens of concurrent seats on a single machine, configure staggered polling intervals to avoid I/O lock contention.
-3. **Credentials & API Quotas**: Background seat workers invoke LLM providers. Ensure environment variables (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`, or local Ollama endpoints) are populated in the user environment or supervisor configuration.
+Install seat worker daemons natively using the CLI:
+
+```bash
+# Install supervisor units for all agentapi/mcp seats in peer_seats.json
+zqk agent install-seat-workers
+
+# Install a specific seat worker with a 15-second polling interval
+zqk agent install-seat-workers --seat craftsman --poll-seconds 15
+
+# Enable autonomous execution of code/shell mutations
+zqk agent install-seat-workers --seat craftsman --execute-non-comms
+
+# Dry-run / test without registering with launchctl/systemctl
+zqk agent install-seat-workers --write-only
+```
+
+To run a seat worker directly in the foreground for debugging:
+```bash
+zqk agent seat-worker --agent-id craftsman --persona-ref community-code-craftsman --poll-seconds 10
+```
+
+---
+
+## 4. Architecture & Supervision Flow
+
+```
+  ┌─────────────────────────────────────────────────────────────┐
+  │ Host Supervisor (launchd / systemd)                         │
+  │ com.zqk.mesh.seat-worker.<seat_id>                          │
+  └───────────────┬─────────────────────────────────────────────┘
+                  │ Spawns & Keeps Alive
+                  ▼
+  ┌─────────────────────────────────────────────────────────────┐
+  │ zqk agent seat-worker                                       │
+  │   - Agent ID: <seat_id>                                     │
+  │   - Persona:  <persona_ref>                                 │
+  │   - Interval: <poll_seconds>                                │
+  └───────┬───────────────────────────────▲─────────────────────┘
+          │ Polls Inbox / Steer           │ Emits Status / ACKs
+          ▼                               │
+  ┌────────────────────────┐    ┌─────────┴─────────────┐
+  │ Agent Feed (Inbox)     │    │ Knowledge Kernel      │
+  │ .zqk/agent-runtime/    │    │ (Tasks, Criteria, CAS)│
+  └────────────────────────┘    └───────────────────────┘
+```
+
+---
+
+## 5. Limitations & Operational Considerations
+
+1. **Root Kernel Binding**: Seat workers must be installed on the canonical project root containing the `.zqk/` kernel directory. Installing on isolated git worktrees is explicitly rejected (`cannot install seat workers on worktree root`).
+2. **Execution Permissions (`--execute-non-comms`)**:
+   - By default, seat workers only ingest correspondence and claim work.
+   - When `--execute-non-comms` is enabled, the worker executes live bash commands, file modifications, and git operations. Ensure proper git credentials and branch protections are configured.
+3. **Cognitive Timeout & Retries**:
+   - `seatWorkerAgentXRunTimeout` (10 minutes): Bounds individual cognitive task runs so a stalled prompt or slow LLM response does not hang the daemon.
+   - `seatWorkerMaxEventAttempts` (3 attempts): Caps retries per task to prevent infinite loops on failing tasks.
+4. **Log Inspection**:
+   Supervisor stdout and stderr streams are isolated per seat under:
+   `.zqk/logs/mesh/seat-worker-<seat_id>.stdout.log`
+   `.zqk/logs/mesh/seat-worker-<seat_id>.stderr.log`

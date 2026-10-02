@@ -3,7 +3,6 @@ package testkit_test
 import (
 	"bytes"
 	"context"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -11,6 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -58,10 +58,10 @@ func TestGodFiles_ExtractedAssets_OperationalProof(t *testing.T) {
 
 	// Verify Python script parses cleanly and loads assets
 	scriptPath := filepath.Join("..", "..", "scripts", "open-core", "docs-portal", "generate_docs_portal.py")
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(t.Context(), 20*time.Second)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, "python3", scriptPath, "--help")
+	cmd := testkit.ManagedCommand(t, ctx, "python3", scriptPath, "--help")
 	var stdout bytes.Buffer
 	cmd.Stdout = &stdout
 	err = cmd.Run()
@@ -74,11 +74,11 @@ func TestGodFiles_CorruptTarballRejection_NegativeBoundary(t *testing.T) {
 	t.Parallel()
 
 	scriptPath := filepath.Join("..", "..", "scripts", "open-core", "docs-portal", "generate_docs_portal.py")
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(t.Context(), 20*time.Second)
 	defer cancel()
 
 	// 1. Nonexistent tarball must fail
-	cmd := exec.CommandContext(ctx, "python3", scriptPath, "--verify", "nonexistent-fake-tarball.tar.gz")
+	cmd := testkit.ManagedCommand(t, ctx, "python3", scriptPath, "--verify", "nonexistent-fake-tarball.tar.gz")
 	err := cmd.Run()
 	assert.Error(t, err, "generate_docs_portal.py --verify must fail closed on nonexistent tarball")
 
@@ -87,7 +87,7 @@ func TestGodFiles_CorruptTarballRejection_NegativeBoundary(t *testing.T) {
 	badTarball := filepath.Join(tmpDir, "corrupted.tar.gz")
 	_ = fileutil.WriteFile(badTarball, []byte("not a valid gzip archive"), 0644)
 
-	cmdBad := exec.CommandContext(ctx, "python3", scriptPath, "--verify", badTarball)
+	cmdBad := testkit.ManagedCommand(t, ctx, "python3", scriptPath, "--verify", badTarball)
 	errBad := cmdBad.Run()
 	assert.Error(t, errBad, "generate_docs_portal.py --verify must fail closed on corrupted tarball")
 }

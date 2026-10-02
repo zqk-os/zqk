@@ -58,6 +58,8 @@ fi
 if [ -d "$SCRIPTS_SCHEDULER_JOBS_DIR" ]; then
 	mkdir -p "$STAGING/scripts/scheduler_jobs"
 	cp -r "$SCRIPTS_SCHEDULER_JOBS_DIR"/*.yaml "$STAGING/scripts/scheduler_jobs/" 2>/dev/null || true
+	# Exclude project-specific jobs from embedded binary bootstrap archive (ships with core repo, not binary)
+	rm -f "$STAGING/scripts/scheduler_jobs/pre_commit_lint.yaml"
 fi
 # Default policy pack templates (seeded by system init)
 DEFAULT_POLICIES_DIR="${REPO_ROOT}/scripts/default_policies"

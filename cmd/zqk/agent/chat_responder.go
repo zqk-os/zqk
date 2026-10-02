@@ -21,7 +21,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
-	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // NewChatResponderCmd creates the command for the native Chat Responder subagent
@@ -33,11 +32,12 @@ func NewChatResponderCmd() *cobra.Command {
 
 func runChatResponder(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 	ctx := proc.OperationContext()
-	transcriptPath := zqkenv.AGTranscriptPath().Get()
+	transcriptPath := antigravity.ResolveActiveTranscript()
 	if transcriptPath == "" {
-		_ = cli.WriteOutput(cmd, []byte("AG_TRANSCRIPT_PATH not set; skipping chat responder.\n"))
+		_ = cli.WriteOutput(cmd, []byte("No active Antigravity transcript found; skipping chat responder.\n"))
 		return nil
 	}
+
 
 	convID := "DEFAULT"
 	if root, err := antigravity.ConversationRootFromTranscript(transcriptPath); err == nil {

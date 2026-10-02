@@ -76,6 +76,10 @@ bootstrap-archive:
 compile-bin: bootstrap-archive
 	go build -trimpath -ldflags '$(LDFLAGS)' -o $(BIN) ./cmd/zqk
 	ln -sf $(BRAND_EXE) bin/$(BRAND_EXE)-mcp-ide-adapter
+	ln -sf $(BRAND_EXE) bin/$(BRAND_EXE)-pw
+	ln -sf $(BRAND_EXE) bin/$(BRAND_EXE)-amb
+	ln -sf $(BRAND_EXE) bin/$(BRAND_EXE)-sched
+	ln -sf $(BRAND_EXE) bin/$(BRAND_EXE)-overseer
 
 codegen: compile-bin
 	@echo "Generating builders from specs..."

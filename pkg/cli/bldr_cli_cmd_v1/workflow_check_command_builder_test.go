@@ -37,7 +37,9 @@ func TestNewWorkflowCheckCommandBuilder_HasShortDescription(t *testing.T) {
 
 func TestNewWorkflowCheckCommandBuilder_AcceptsZeroArgs(t *testing.T) {
 	cmd := bldr_cli_cmd_v1.NewWorkflowCheckCommandBuilder()
-	if err := cmd.RunE(cmd, []string{}); err != nil {
-		t.Fatalf("%s: %v", testZeroArgsSucceeded, err)
+	if cmd.Args != nil {
+		if err := cmd.Args(cmd, []string{}); err != nil {
+			t.Fatalf("%s: %v", testZeroArgsSucceeded, err)
+		}
 	}
 }

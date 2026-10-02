@@ -20,18 +20,92 @@ import (
 // StorageProvider is the same as in updater: returns storage for a project root.
 type StorageProviderForCriterion func(projectRoot string) (storage.ObjectStorageProvider, bool)
 
-// TryEmitRemainingOpenDrained emits criterion_satisfied when remaining_open_count is 0.
-// Unset field fail-closes (no member List).
-func TryEmitRemainingOpenDrained(ctx context.Context, projectRoot, containerID string, getStorage StorageProviderForCriterion) {
-	if projectRoot == emptyValue || containerID == emptyValue || getStorage == nil {
-		return
+func resolveStorageProvider(projectRoot string, getStorage StorageProviderForCriterion) (storage.ObjectStorageProvider, bool) {
+	if projectRoot == emptyValue || getStorage == nil {
+		return nil, false
 	}
 	provider, ok := getStorage(projectRoot)
 	if !ok {
+		return nil, false
+	}
+	return nildecode.DecodeNonNilPayload[storage.ObjectStorageProvider](provider)
+}
+
+func appendAndSyncCriterionSatisfied(projectRoot, criterion string, scope map[string]string) {
+	wal, err := GetOrCreateLifecycleWAL(projectRoot)
+	if err != nil {
 		return
 	}
-	provider, ok = nildecode.DecodeNonNilPayload[storage.ObjectStorageProvider](provider)
-	if !ok {
+	_ = AppendCriterionSatisfied(wal, criterion, scope)
+	if syncErr := wal.Sync(); syncErr != nil {
+		logging.LogSwallowedError(syncErr)
+	}
+}
+
+func completeObjectAndEmitShockwaves(ctx context.Context, provider storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, projectRoot, kind, id, oldStatus, reason string, extraUpdates map[string]any) map[string]any {
+	trustedCtx := pkgctx.WithLifecycleBreakGlass(pkgctx.WithAllowCoreObjectDelete(ctx), reason)
+	updates := map[string]any{objects.FieldKeyStatus: objects.ObjectStatusComplete}
+	for k, v := range extraUpdates {
+		updates[k] = v
+	}
+	if updateErr := provider.Update(trustedCtx, secCtx, id, updates); updateErr == nil {
+		if flushErr := storage.FlushListingIndexForProjectRoot(projectRoot, kind); flushErr != nil {
+			logging.LogSwallowedError(flushErr)
+		}
+		if updated, readErr := provider.Read(ctx, secCtx, id); readErr == nil && updated != nil {
+			ApplyDependencyRefEvents(ctx, logging.NewEventLogger(ctx), provider, projectRoot, kind, id, oldStatus, objects.ObjectStatusComplete, updated)
+			return updated
+		}
+	}
+	return nil
+}
+
+func areAllLinkedCriteriaSatisfied(ctx context.Context, provider storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, critIDs []string) bool {
+	if len(critIDs) == 0 {
+		return false
+	}
+	for _, cid := range critIDs {
+		co, err := provider.Read(ctx, secCtx, cid)
+		if err != nil || co == nil {
+			return false
+		}
+		cst, _ := co[objects.FieldKeyStatus].(string)
+		if !CriterionStatusMeetsMilestoneGateForMilestone(cst) {
+			return false
+		}
+	}
+	return true
+}
+
+func forEachObjectContainingCriterion(ctx context.Context, projectRoot, criterionID, kind string, getStorage StorageProviderForCriterion, fn func(id string)) {
+	provider, ok := resolveStorageProvider(projectRoot, getStorage)
+	if !ok || criterionID == emptyValue {
+		return
+	}
+	secCtx := pkgctx.NewSystemSecurityContext()
+	storageCtx := pkgctx.NewStorageContext()
+	filter := storage.ListFilter{
+		Kind: kind,
+		Filters: map[string]any{
+			objects.FieldKeyCriteriaRefs: map[string]any{"$has": criterionID},
+		},
+	}
+	result, err := provider.List(ctx, secCtx, storageCtx, filter)
+	if err != nil || len(result.Objects) == 0 {
+		return
+	}
+	for _, obj := range result.Objects {
+		if id, _ := obj[objects.FieldKeyID].(string); id != emptyValue {
+			fn(id)
+		}
+	}
+}
+
+// TryEmitRemainingOpenDrained emits criterion_satisfied when remaining_open_count is 0.
+// Unset field fail-closes (no member List).
+func TryEmitRemainingOpenDrained(ctx context.Context, projectRoot, containerID string, getStorage StorageProviderForCriterion) {
+	provider, ok := resolveStorageProvider(projectRoot, getStorage)
+	if !ok || containerID == emptyValue {
 		return
 	}
 	secCtx := pkgctx.NewSystemSecurityContext()
@@ -51,19 +125,8 @@ func TryEmitRemainingOpenDrained(ctx context.Context, projectRoot, containerID s
 // CriterionSatisfied(all_criteria_complete_for_milestone, milestone_id=milestoneID) to the lifecycle WAL.
 // No-op if milestone is already terminal, has no criteria_refs, or any linked criterion is not satisfied.
 func TryEmitAllCriteriaCompleteForMilestone(ctx context.Context, projectRoot, milestoneID string, getStorage StorageProviderForCriterion) {
-	if projectRoot == emptyValue || milestoneID == emptyValue {
-		return
-	}
-	provider, ok := getStorage(projectRoot)
-	if !ok {
-		return
-	}
-	provider, ok = nildecode.DecodeNonNilPayload[storage.ObjectStorageProvider](provider)
-	if !ok {
-		return
-	}
-	wal, err := GetOrCreateLifecycleWAL(projectRoot)
-	if err != nil {
+	provider, ok := resolveStorageProvider(projectRoot, getStorage)
+	if !ok || milestoneID == emptyValue {
 		return
 	}
 	secCtx := pkgctx.NewSystemSecurityContext()
@@ -89,123 +152,36 @@ func TryEmitAllCriteriaCompleteForMilestone(ctx context.Context, projectRoot, mi
 		return
 	}
 	critIDs := StringRefsFromAny(critAny)
-	if len(critIDs) == 0 {
+	if !areAllLinkedCriteriaSatisfied(ctx, provider, secCtx, critIDs) {
 		return
 	}
-	for _, cid := range critIDs {
-		co, err := provider.Read(ctx, secCtx, cid)
-		if err != nil || co == nil {
-			return
-		}
-		cst, _ := co[objects.FieldKeyStatus].(string)
-		if !CriterionStatusMeetsMilestoneGateForMilestone(cst) {
-			return
-		}
-	}
-	scope := map[string]string{scopeMilestoneID: milestoneID}
-	_ = AppendCriterionSatisfied(wal, criterionAllCriteriaCompleteForMilestone, scope)
-	if syncErr := wal.Sync(); syncErr != nil {
-		logging.LogSwallowedError(syncErr)
-	}
-
-	trustedCtx := pkgctx.WithLifecycleBreakGlass(pkgctx.WithAllowCoreObjectDelete(ctx), "milestone all criteria complete")
-	updates := map[string]any{objects.FieldKeyStatus: objects.ObjectStatusComplete}
-	if updateErr := provider.Update(trustedCtx, secCtx, milestoneID, updates); updateErr == nil {
-		if flushErr := storage.FlushListingIndexForProjectRoot(projectRoot, objects.KindMilestone); flushErr != nil {
-			logging.LogSwallowedError(flushErr)
-		}
-		if updatedMil, readErr := provider.Read(ctx, secCtx, milestoneID); readErr == nil && updatedMil != nil {
-			ApplyDependencyRefEvents(ctx, logging.NewEventLogger(ctx), provider, projectRoot, objects.KindMilestone, milestoneID, st, objects.ObjectStatusComplete, updatedMil)
-		}
-	}
+	appendAndSyncCriterionSatisfied(projectRoot, criterionAllCriteriaCompleteForMilestone, map[string]string{scopeMilestoneID: milestoneID})
+	completeObjectAndEmitShockwaves(ctx, provider, secCtx, projectRoot, objects.KindMilestone, milestoneID, st, "milestone all criteria complete", nil)
 }
 
 // TryEmitForMilestonesContainingCriterion lists milestones whose criteria_refs include criterionID,
 // then evaluates TryEmitAllCriteriaCompleteForMilestone for each. Call when a criterion transitions
 // toward a satisfied state so milestones can auto-complete when their linked criteria are all met.
 func TryEmitForMilestonesContainingCriterion(ctx context.Context, projectRoot, criterionID string, getStorage StorageProviderForCriterion) {
-	if projectRoot == emptyValue || criterionID == emptyValue {
-		return
-	}
-	provider, ok := getStorage(projectRoot)
-	if !ok {
-		return
-	}
-	provider, ok = nildecode.DecodeNonNilPayload[storage.ObjectStorageProvider](provider)
-	if !ok {
-		return
-	}
-	secCtx := pkgctx.NewSystemSecurityContext()
-	storageCtx := pkgctx.NewStorageContext()
-	filter := storage.ListFilter{
-		Kind: objects.KindMilestone,
-		Filters: map[string]any{
-			objects.FieldKeyCriteriaRefs: map[string]any{"$has": criterionID},
-		},
-	}
-	result, err := provider.List(ctx, secCtx, storageCtx, filter)
-	if err != nil {
-		return
-	}
-	for _, mil := range result.Objects {
-		mid, _ := mil[objects.FieldKeyID].(string)
-		if mid != emptyValue {
-			TryEmitAllCriteriaCompleteForMilestone(ctx, projectRoot, mid, getStorage)
-		}
-	}
+	forEachObjectContainingCriterion(ctx, projectRoot, criterionID, objects.KindMilestone, getStorage, func(mid string) {
+		TryEmitAllCriteriaCompleteForMilestone(ctx, projectRoot, mid, getStorage)
+	})
 }
 
 // TryEmitForBacklogItemsContainingCriterion lists backlog items whose criteria_refs include criterionID,
 // then evaluates TryEmitAllAcceptanceCriteriaMetForBacklogItem for each. Call when a criterion transitions
 // toward a satisfied state so backlog items can auto-complete when their linked criteria are all met.
 func TryEmitForBacklogItemsContainingCriterion(ctx context.Context, projectRoot, criterionID string, getStorage StorageProviderForCriterion) {
-	if projectRoot == emptyValue || criterionID == emptyValue {
-		return
-	}
-	provider, ok := getStorage(projectRoot)
-	if !ok {
-		return
-	}
-	provider, ok = nildecode.DecodeNonNilPayload[storage.ObjectStorageProvider](provider)
-	if !ok {
-		return
-	}
-	secCtx := pkgctx.NewSystemSecurityContext()
-	storageCtx := pkgctx.NewStorageContext()
-	filter := storage.ListFilter{
-		Kind: objects.KindBacklogItem,
-		Filters: map[string]any{
-			objects.FieldKeyCriteriaRefs: map[string]any{"$has": criterionID},
-		},
-	}
-	result, err := provider.List(ctx, secCtx, storageCtx, filter)
-	if err != nil {
-		return
-	}
-	for _, bli := range result.Objects {
-		bliID, _ := bli[objects.FieldKeyID].(string)
-		if bliID != emptyValue {
-			TryEmitAllAcceptanceCriteriaMetForBacklogItem(ctx, projectRoot, bliID, getStorage)
-		}
-	}
+	forEachObjectContainingCriterion(ctx, projectRoot, criterionID, objects.KindBacklogItem, getStorage, func(bliID string) {
+		TryEmitAllAcceptanceCriteriaMetForBacklogItem(ctx, projectRoot, bliID, getStorage)
+	})
 }
 
 // TryEmitAllAcceptanceCriteriaMetForBacklogItem appends all_acceptance_criteria_met_for_backlog_item when every
 // CRIT-* listed in the backlog item's criteria_refs is validated/complete and the item is in_progress.
 func TryEmitAllAcceptanceCriteriaMetForBacklogItem(ctx context.Context, projectRoot, backlogItemID string, getStorage StorageProviderForCriterion) {
-	if projectRoot == emptyValue || backlogItemID == emptyValue {
-		return
-	}
-	provider, ok := getStorage(projectRoot)
-	if !ok {
-		return
-	}
-	provider, ok = nildecode.DecodeNonNilPayload[storage.ObjectStorageProvider](provider)
-	if !ok {
-		return
-	}
-	wal, err := GetOrCreateLifecycleWAL(projectRoot)
-	if err != nil {
+	provider, ok := resolveStorageProvider(projectRoot, getStorage)
+	if !ok || backlogItemID == emptyValue {
 		return
 	}
 	secCtx := pkgctx.NewSystemSecurityContext()
@@ -221,24 +197,10 @@ func TryEmitAllAcceptanceCriteriaMetForBacklogItem(ctx context.Context, projectR
 		return
 	}
 	critIDs := StringRefsFromAny(bli[objects.FieldKeyCriteriaRefs])
-	if len(critIDs) == 0 {
+	if !areAllLinkedCriteriaSatisfied(ctx, provider, secCtx, critIDs) {
 		return
 	}
-	for _, cid := range critIDs {
-		co, err := provider.Read(ctx, secCtx, cid)
-		if err != nil || co == nil {
-			return
-		}
-		cst, _ := co[objects.FieldKeyStatus].(string)
-		if !CriterionStatusMeetsMilestoneGateForMilestone(cst) {
-			return
-		}
-	}
-	scope := map[string]string{scopeBacklogItemID: backlogItemID}
-	_ = AppendCriterionSatisfied(wal, criterionAllAcceptanceCriteriaMetForBacklogItem, scope)
-	if syncErr := wal.Sync(); syncErr != nil {
-		logging.LogSwallowedError(syncErr)
-	}
+	appendAndSyncCriterionSatisfied(projectRoot, criterionAllAcceptanceCriteriaMetForBacklogItem, map[string]string{scopeBacklogItemID: backlogItemID})
 }
 
 // CriterionStatusMeetsMilestoneGateForMilestone returns true if criteria.status counts as satisfied
@@ -273,15 +235,8 @@ func StringRefsFromAny(v any) []string {
 // are in a terminal status. If so, appends CriterionSatisfied(all_backlog_items_complete_for_milestone, milestone_id=milestoneID)
 // to the lifecycle WAL.
 func TryEmitAllBacklogItemsCompleteForMilestone(ctx context.Context, projectRoot, milestoneID string, getStorage StorageProviderForCriterion) {
-	if projectRoot == emptyValue || milestoneID == emptyValue {
-		return
-	}
-	provider, ok := getStorage(projectRoot)
-	if !ok {
-		return
-	}
-	provider, ok = nildecode.DecodeNonNilPayload[storage.ObjectStorageProvider](provider)
-	if !ok {
+	provider, ok := resolveStorageProvider(projectRoot, getStorage)
+	if !ok || milestoneID == emptyValue {
 		return
 	}
 	secCtx := pkgctx.NewSystemSecurityContext()
@@ -294,10 +249,6 @@ func TryEmitAllBacklogItemsCompleteForMilestone(ctx context.Context, projectRoot
 		return
 	}
 
-	wal, err := GetOrCreateLifecycleWAL(projectRoot)
-	if err != nil {
-		return
-	}
 	storageCtx := pkgctx.NewStorageContext()
 	seen := make(map[string]map[string]any)
 	filter1 := storage.ListFilter{
@@ -308,8 +259,7 @@ func TryEmitAllBacklogItemsCompleteForMilestone(ctx context.Context, projectRoot
 	}
 	if res1, err := provider.List(ctx, secCtx, storageCtx, filter1); err == nil && res1 != nil {
 		for _, obj := range res1.Objects {
-			id, _ := obj[objects.FieldKeyID].(string)
-			if id != "" {
+			if id, _ := obj[objects.FieldKeyID].(string); id != "" {
 				seen[id] = obj
 			}
 		}
@@ -322,8 +272,7 @@ func TryEmitAllBacklogItemsCompleteForMilestone(ctx context.Context, projectRoot
 	}
 	if res2, err := provider.List(ctx, secCtx, storageCtx, filter2); err == nil && res2 != nil {
 		for _, obj := range res2.Objects {
-			id, _ := obj[objects.FieldKeyID].(string)
-			if id != "" {
+			if id, _ := obj[objects.FieldKeyID].(string); id != "" {
 				seen[id] = obj
 			}
 		}
@@ -337,36 +286,15 @@ func TryEmitAllBacklogItemsCompleteForMilestone(ctx context.Context, projectRoot
 			return
 		}
 	}
-	scope := map[string]string{scopeMilestoneID: milestoneID}
-	_ = AppendCriterionSatisfied(wal, criterionAllBacklogCompleteForMilestone, scope)
-	if syncErr := wal.Sync(); syncErr != nil {
-		logging.LogSwallowedError(syncErr)
-	}
-
-	trustedCtx := pkgctx.WithLifecycleBreakGlass(pkgctx.WithAllowCoreObjectDelete(ctx), "milestone all backlog complete")
-	updates := map[string]any{objects.FieldKeyStatus: objects.ObjectStatusComplete}
-	if updateErr := provider.Update(trustedCtx, secCtx, milestoneID, updates); updateErr == nil {
-		if flushErr := storage.FlushListingIndexForProjectRoot(projectRoot, objects.KindMilestone); flushErr != nil {
-			logging.LogSwallowedError(flushErr)
-		}
-		if updatedMil, readErr := provider.Read(ctx, secCtx, milestoneID); readErr == nil && updatedMil != nil {
-			ApplyDependencyRefEvents(ctx, logging.NewEventLogger(ctx), provider, projectRoot, objects.KindMilestone, milestoneID, st, objects.ObjectStatusComplete, updatedMil)
-		}
-	}
+	appendAndSyncCriterionSatisfied(projectRoot, criterionAllBacklogCompleteForMilestone, map[string]string{scopeMilestoneID: milestoneID})
+	completeObjectAndEmitShockwaves(ctx, provider, secCtx, projectRoot, objects.KindMilestone, milestoneID, st, "milestone all backlog complete", nil)
 }
 
 // TryEmitForTestCasesContainingCriterion lists test cases whose criteria_refs include criterionID,
 // decrements their remaining_open_count, and auto-transitions the test_case to complete when 0.
 func TryEmitForTestCasesContainingCriterion(ctx context.Context, projectRoot, criterionID string, getStorage StorageProviderForCriterion) {
-	if projectRoot == emptyValue || criterionID == emptyValue || getStorage == nil {
-		return
-	}
-	provider, ok := getStorage(projectRoot)
-	if !ok {
-		return
-	}
-	provider, ok = nildecode.DecodeNonNilPayload[storage.ObjectStorageProvider](provider)
-	if !ok {
+	provider, ok := resolveStorageProvider(projectRoot, getStorage)
+	if !ok || criterionID == emptyValue {
 		return
 	}
 	secCtx := pkgctx.NewSystemSecurityContext()
@@ -395,20 +323,10 @@ func TryEmitForTestCasesContainingCriterion(ctx context.Context, projectRoot, cr
 			continue
 		}
 		if rem <= 0 {
-			trustedCtx := pkgctx.WithLifecycleBreakGlass(pkgctx.WithAllowCoreObjectDelete(ctx), "test_case criteria drained")
-			updates := map[string]any{
-				objects.FieldKeyStatus:             objects.ObjectStatusComplete,
-				objects.FieldKeyRemainingOpenCount: 0,
-			}
-			if updateErr := provider.Update(trustedCtx, secCtx, tcID, updates); updateErr == nil {
-				if flushErr := storage.FlushListingIndexForProjectRoot(projectRoot, objects.KindTestCase); flushErr != nil {
-					logging.LogSwallowedError(flushErr)
-				}
-				if updatedTc, readErr := provider.Read(ctx, secCtx, tcID); readErr == nil && updatedTc != nil {
-					ApplyDependencyRefEvents(ctx, logging.NewEventLogger(ctx), provider, projectRoot, objects.KindTestCase, tcID, tcStatus, objects.ObjectStatusComplete, updatedTc)
-					for _, reqID := range StringRefsFromAny(updatedTc[objects.FieldKeyRequirementRefs]) {
-						TryEmitAllCriteriaCompleteForRequirement(ctx, projectRoot, reqID, getStorage)
-					}
+			extra := map[string]any{objects.FieldKeyRemainingOpenCount: 0}
+			if updatedTc := completeObjectAndEmitShockwaves(ctx, provider, secCtx, projectRoot, objects.KindTestCase, tcID, tcStatus, "test_case criteria drained", extra); updatedTc != nil {
+				for _, reqID := range StringRefsFromAny(updatedTc[objects.FieldKeyRequirementRefs]) {
+					TryEmitAllCriteriaCompleteForRequirement(ctx, projectRoot, reqID, getStorage)
 				}
 			}
 		}
@@ -419,35 +337,9 @@ func TryEmitForTestCasesContainingCriterion(ctx context.Context, projectRoot, cr
 // then evaluates TryEmitAllCriteriaCompleteForRequirement for each. Call when a criterion transitions
 // toward a satisfied state so requirements can auto-complete when their linked criteria are all met.
 func TryEmitForRequirementsContainingCriterion(ctx context.Context, projectRoot, criterionID string, getStorage StorageProviderForCriterion) {
-	if projectRoot == emptyValue || criterionID == emptyValue || getStorage == nil {
-		return
-	}
-	provider, ok := getStorage(projectRoot)
-	if !ok {
-		return
-	}
-	provider, ok = nildecode.DecodeNonNilPayload[storage.ObjectStorageProvider](provider)
-	if !ok {
-		return
-	}
-	secCtx := pkgctx.NewSystemSecurityContext()
-	storageCtx := pkgctx.NewStorageContext()
-	filter := storage.ListFilter{
-		Kind: objects.KindRequirement,
-		Filters: map[string]any{
-			objects.FieldKeyCriteriaRefs: map[string]any{"$has": criterionID},
-		},
-	}
-	result, err := provider.List(ctx, secCtx, storageCtx, filter)
-	if err != nil {
-		return
-	}
-	for _, req := range result.Objects {
-		reqID, _ := req[objects.FieldKeyID].(string)
-		if reqID != emptyValue {
-			TryEmitAllCriteriaCompleteForRequirement(ctx, projectRoot, reqID, getStorage)
-		}
-	}
+	forEachObjectContainingCriterion(ctx, projectRoot, criterionID, objects.KindRequirement, getStorage, func(reqID string) {
+		TryEmitAllCriteriaCompleteForRequirement(ctx, projectRoot, reqID, getStorage)
+	})
 }
 
 // TryEmitAllCriteriaCompleteForRequirement checks whether every criterion in the requirement's criteria_refs
@@ -455,15 +347,8 @@ func TryEmitForRequirementsContainingCriterion(ctx context.Context, projectRoot,
 // CriterionSatisfied(all_criteria_complete_for_requirement, requirement_id=requirementID) to the lifecycle WAL,
 // transitions the requirement to complete, and propagates shockwaves.
 func TryEmitAllCriteriaCompleteForRequirement(ctx context.Context, projectRoot, requirementID string, getStorage StorageProviderForCriterion) {
-	if projectRoot == emptyValue || requirementID == emptyValue || getStorage == nil {
-		return
-	}
-	provider, ok := getStorage(projectRoot)
-	if !ok {
-		return
-	}
-	provider, ok = nildecode.DecodeNonNilPayload[storage.ObjectStorageProvider](provider)
-	if !ok {
+	provider, ok := resolveStorageProvider(projectRoot, getStorage)
+	if !ok || requirementID == emptyValue {
 		return
 	}
 	secCtx := pkgctx.NewSystemSecurityContext()
@@ -488,18 +373,8 @@ func TryEmitAllCriteriaCompleteForRequirement(ctx context.Context, projectRoot, 
 		return
 	}
 	critIDs := StringRefsFromAny(critAny)
-	if len(critIDs) == 0 {
+	if !areAllLinkedCriteriaSatisfied(ctx, provider, secCtx, critIDs) {
 		return
-	}
-	for _, cid := range critIDs {
-		co, err := provider.Read(ctx, secCtx, cid)
-		if err != nil || co == nil {
-			return
-		}
-		cst, _ := co[objects.FieldKeyStatus].(string)
-		if !CriterionStatusMeetsMilestoneGateForMilestone(cst) {
-			return
-		}
 	}
 
 	// Verify all test cases pointing to this requirement are complete
@@ -519,23 +394,6 @@ func TryEmitAllCriteriaCompleteForRequirement(ctx context.Context, projectRoot, 
 		}
 	}
 
-	wal, err := GetOrCreateLifecycleWAL(projectRoot)
-	if err == nil {
-		scope := map[string]string{scopeRequirementID: requirementID}
-		_ = AppendCriterionSatisfied(wal, criterionAllCriteriaCompleteForRequirement, scope)
-		if syncErr := wal.Sync(); syncErr != nil {
-			logging.LogSwallowedError(syncErr)
-		}
-	}
-
-	trustedCtx := pkgctx.WithLifecycleBreakGlass(pkgctx.WithAllowCoreObjectDelete(ctx), "requirement all criteria complete")
-	updates := map[string]any{objects.FieldKeyStatus: objects.ObjectStatusComplete}
-	if updateErr := provider.Update(trustedCtx, secCtx, requirementID, updates); updateErr == nil {
-		if flushErr := storage.FlushListingIndexForProjectRoot(projectRoot, objects.KindRequirement); flushErr != nil {
-			logging.LogSwallowedError(flushErr)
-		}
-		if updatedReq, readErr := provider.Read(ctx, secCtx, requirementID); readErr == nil && updatedReq != nil {
-			ApplyDependencyRefEvents(ctx, logging.NewEventLogger(ctx), provider, projectRoot, objects.KindRequirement, requirementID, st, objects.ObjectStatusComplete, updatedReq)
-		}
-	}
+	appendAndSyncCriterionSatisfied(projectRoot, criterionAllCriteriaCompleteForRequirement, map[string]string{scopeRequirementID: requirementID})
+	completeObjectAndEmitShockwaves(ctx, provider, secCtx, projectRoot, objects.KindRequirement, requirementID, st, "requirement all criteria complete", nil)
 }

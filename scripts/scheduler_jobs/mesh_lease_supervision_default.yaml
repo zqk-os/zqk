@@ -2,14 +2,21 @@ schema_version: 2.0.0
 id: SCH-LEASE-SUPERVISION
 kind: scheduler_job
 title: Default Mesh Lease Supervision
-status: enabled
-job_type: mesh_lease_supervision
-trigger_type: schedule
-schedule: "@every 1m"
-execution_mode: exclusive
-category: system_maintenance
-priority: medium
-log_level: info
 description: |
   Automatically monitors capacity_advertisement and zqk_session (federated_lease) objects to
   spawn and manage ambient compute processes (zqk-scheduler subprocesses) for the Sovereign Mesh.
+job_type: mesh_lease_supervision
+trigger_type: timer
+schedule_expression: "*/1 * * * *"
+execution_mode: reusable
+category: maintenance
+priority: normal
+log_level: default
+max_runtime_seconds: 60
+enabled: true
+status: active
+created_by: ACC-SYSTEM
+updated_by: ACC-SYSTEM
+created_at: "2026-01-01T00:00:00Z"
+updated_at: "2026-01-01T00:00:00Z"
+namespace_id: zqk:kernel

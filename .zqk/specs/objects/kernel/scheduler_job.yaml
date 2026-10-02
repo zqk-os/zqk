@@ -518,6 +518,15 @@ fields:
         - cap_orchestrator
         - emergency_manager
         - idle_cleanup
+        - log_rotation
+        - peer_ack_timeout_audit
+        - mesh_lease_supervision
+        - agent_sync
+        - watchdog_evaluation
+        - passive_test_sweeper
+        - capacity_scaling
+        - strategic_pulse
+        - test_io
       required: true
   last_run_at:
     access:

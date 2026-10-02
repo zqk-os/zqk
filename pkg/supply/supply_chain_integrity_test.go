@@ -3,7 +3,6 @@ package supply_test
 import (
 	"context"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -51,7 +50,7 @@ set -e
 export ZQK_REQUIRE_COSIGN=1
 _verify_checksums_signature "` + checksumsFile + `"
 `
-	cmd := exec.Command("bash", "-c", testScript)
+	cmd := testkit.ManagedCommand(t, t.Context(), "bash", "-c", testScript)
 	out, err := cmd.CombinedOutput()
 	assert.Error(t, err, "installer must fail closed when signature is missing and ZQK_REQUIRE_COSIGN=1")
 	assert.Contains(t, string(out), "Error: signature file", "installer must output clear error on missing signature")

@@ -2,8 +2,12 @@ package antigravity
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
+	"time"
+
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 const (
@@ -55,3 +59,40 @@ func ConversationID(conversationRoot string) string {
 func undeliveredInboxDir(conversationRoot string) string {
 	return filepath.Join(conversationRoot, systemGeneratedDir, messagesDir, undeliveredDir)
 }
+
+// ResolveActiveTranscript returns the path to the active Antigravity transcript.
+// It checks the AG_TRANSCRIPT_PATH environment variable first, and if unset,
+// searches the default Antigravity brain directory for the most recently modified transcript.
+func ResolveActiveTranscript() string {
+	if p := zqkenv.AGTranscriptPath().Get(); p != "" {
+		if _, err := os.Stat(p); err == nil {
+			return p
+		}
+	}
+
+	home, err := os.UserHomeDir()
+	if err != nil || home == "" {
+		return ""
+	}
+
+	pattern := filepath.Join(home, ".gemini", "antigravity-cli", "brain", "*", systemGeneratedDir, "logs", "transcript.jsonl")
+	matches, err := filepath.Glob(pattern)
+	if err != nil || len(matches) == 0 {
+		return ""
+	}
+
+	var newestPath string
+	var newestTime time.Time
+	for _, m := range matches {
+		info, err := os.Stat(m)
+		if err != nil {
+			continue
+		}
+		if newestPath == "" || info.ModTime().After(newestTime) {
+			newestPath = m
+			newestTime = info.ModTime()
+		}
+	}
+	return newestPath
+}
+

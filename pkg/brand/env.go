@@ -74,6 +74,10 @@ func stripEnvChannelSuffix(name string) string {
 	for _, suffix := range []string{
 		".test",
 		"-mcp-ide-adapter", "-mcp-proxy", "-mcp-daemon", "-mcp",
+		"-privileged-writer", "-pw",
+		"-ambient-daemon", "-ambient", "-amb",
+		"-scheduler-daemon", "-scheduler", "-sched",
+		"-overseer",
 		"-community", "-stable", "-dev", "-beta", "-alpha", "-rc",
 	} {
 		if strings.HasSuffix(lower, suffix) {
