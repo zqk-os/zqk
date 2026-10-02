@@ -250,17 +250,21 @@ func saveBaselineMetrics(outputFile string, metrics *BaselineMetrics) error {
 		Results:         metrics.Results,
 	}
 
-	data, err := json.MarshalIndent(metricsJSON, "", "  ")
+	return writeJSONFile(outputFile, metricsJSON)
+}
+
+// writeJSONFile writes indented JSON data to targetPath, ensuring parent directory exists.
+func writeJSONFile(targetPath string, v any) error {
+	data, err := json.MarshalIndent(v, "", "  ")
 	if err != nil {
-		return errfmt.Newf("failed to marshal metrics").Wrap(err)
+		return errfmt.Newf("failed to marshal JSON").Wrap(err)
 	}
 
-	// Ensure directory exists
-	if err := fileutil.MkdirAll(filepath.Dir(outputFile), paths.DirPerm755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(targetPath), paths.DirPerm755); err != nil {
 		return errfmt.Newf("failed to create output directory").Wrap(err)
 	}
 
-	if err := fileutil.WriteFile(outputFile, data, paths.FilePerm644); err != nil { //nolint:gosec // Baseline files - 0600 is acceptable
+	if err := fileutil.WriteFile(targetPath, data, paths.FilePerm644); err != nil { //nolint:gosec // Output files - 0644 is standard
 		return errfmt.Newf("failed to write output file").Wrap(err)
 	}
 
@@ -282,10 +286,7 @@ func NewCheckBaselineCmd() *cobra.Command {
 		Use: "check-baseline",
 	})
 	cli.BindAsyncProgress(cmd, func(cmd *cobra.Command, args []string) error {
-		initCtx := &pkgctx.CliInitializationContext{
-			ProjectRoot: ProjectRootOrResolve(""),
-		}
-		ctx, err := cli.GetContextFromCommand(cmd, initCtx)
+		ctx, err := getSystemCliContext(cmd)
 		if err != nil {
 			return err
 		}

@@ -114,84 +114,51 @@ type deferredHashCheck struct {
 	registry storage.HashRegistryProvider
 }
 
+func (c *HashRegistryCacheType) withLock(lockName string, fn func() error) {
+	logger := logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem))
+	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
+	defer cancel()
+	_ = concurrency.WithLockTimeout(&c.mu, ctx, nil, logger, lockName, fn)
+}
+
+func (c *HashRegistryCacheType) withRLock(lockName string, fn func() error) {
+	logger := logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem))
+	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
+	defer cancel()
+	_ = concurrency.WithRLockTimeout(&c.mu, ctx, nil, logger, lockName, fn)
+}
+
 // Get retrieves a hash registry from cache
 func (c *HashRegistryCacheType) Get(kind string) (storage.HashRegistryProvider, bool) {
 	var reg storage.HashRegistryProvider
 	var ok bool
-	logger := logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem))
-	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
-	defer cancel()
-	_ = concurrency.WithRLockTimeout(
-		&c.mu,
-		ctx,
-		nil,
-		logger,
-		LockNameHashRegistryCacheGet,
-		func() error {
-			reg, ok = c.cache[kind]
-			return nil
-		},
-	)
+	c.withRLock(LockNameHashRegistryCacheGet, func() error {
+		reg, ok = c.cache[kind]
+		return nil
+	})
 	return reg, ok
 }
 
 // Set stores a hash registry in cache
 func (c *HashRegistryCacheType) Set(kind string, reg storage.HashRegistryProvider) {
-	logger := logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem))
-	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
-	defer cancel()
-	_ = concurrency.WithLockTimeout(
-		&c.mu,
-		ctx,
-		nil,
-		logger,
-		LockNameHashRegistryCacheSet,
-		func() error {
-			c.cache[kind] = reg
-			return nil
-		},
-	)
+	c.withLock(LockNameHashRegistryCacheSet, func() error {
+		c.cache[kind] = reg
+		return nil
+	})
 }
 
 // Delete removes a hash registry from cache
 func (c *HashRegistryCacheType) Delete(kind string) {
-	logger := logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem))
-	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
-	defer cancel()
-	_ = concurrency.WithLockTimeout(
-		&c.mu,
-		ctx,
-		nil,
-		logger,
-		LockNameHashRegistryCacheDelete,
-		func() error {
-			delete(c.cache, kind)
-			return nil
-		},
-	)
+	c.withLock(LockNameHashRegistryCacheDelete, func() error {
+		delete(c.cache, kind)
+		return nil
+	})
 }
 
 // Reload reloads a hash registry from disk into the cache
 // OPTIMIZATION: Release lock before file I/O to prevent blocking other workers
 func (c *HashRegistryCacheType) Reload(kind string) {
-	var reg storage.HashRegistryProvider
-	var ok bool
-	logger := logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem))
-	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
-	defer cancel()
-	_ = concurrency.WithRLockTimeout(
-		&c.mu,
-		ctx,
-		nil,
-		logger,
-		LockNameHashRegistryCacheReloadCheck,
-		func() error {
-			reg, ok = c.cache[kind]
-			return nil
-		},
-	)
-
-	if ok && reg != nil {
+	if reg, ok := c.Get(kind); ok && reg != nil {
 		// Reload the registry from disk to get latest hashes (NO LOCK HELD)
 		//nolint:errcheck // Best-effort operation
 		_ = reg.Load() // Ignore errors - best effort
@@ -202,26 +169,16 @@ func (c *HashRegistryCacheType) Reload(kind string) {
 // OPTIMIZATION: Release lock before file I/O to prevent blocking other workers
 func (c *HashRegistryCacheType) ReloadAll() {
 	var registries []storage.HashRegistryProvider
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
-	defer cancel()
-	_ = concurrency.WithRLockTimeout(
-		&c.mu,
-		ctx,
-		nil,
-		logging.NewLockLoggerAdapter(logger),
-		LockNameHashRegistryCacheReloadAll,
-		func() error {
-			// Copy registry references to avoid holding lock during I/O
-			registries = make([]storage.HashRegistryProvider, 0, len(c.cache))
-			for _, reg := range c.cache {
-				if reg != nil {
-					registries = append(registries, reg)
-				}
+	c.withRLock(LockNameHashRegistryCacheReloadAll, func() error {
+		// Copy registry references to avoid holding lock during I/O
+		registries = make([]storage.HashRegistryProvider, 0, len(c.cache))
+		for _, reg := range c.cache {
+			if reg != nil {
+				registries = append(registries, reg)
 			}
-			return nil
-		},
-	)
+		}
+		return nil
+	})
 
 	// Reload all registries (NO LOCK HELD during file I/O)
 	for _, reg := range registries {

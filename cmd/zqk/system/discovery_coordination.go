@@ -11,6 +11,57 @@ import (
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
+func initDiscoveryContext(ctx context.Context, projectRoot, profile string) (context.Context, string, bool) {
+	projectRoot = ProjectRootOrResolveDot(projectRoot)
+	if projectRoot == emptyValue {
+		return ctx, emptyValue, false
+	}
+	return createContextWithLoggingProfile(ctx, profile), projectRoot, true
+}
+
+func emitStorageEventAsync(ctx context.Context, projectRoot string, storageProvider storage.ObjectStorageProvider, taskName, taskDesc string, eventCtx *coordination.EventContext) {
+	if storageProvider == nil {
+		return
+	}
+	coordinator := coordination.NewStorageCoordinator(projectRoot, storageProvider)
+	goroutinelabels.NewGoroutine(taskName, taskDesc).
+		StartSimple(func() {
+			_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
+		})
+}
+
+func emitOperationalSyncGlobal(ctx context.Context, operationID, status string, eventData *coordination.EventData) {
+	globalCoordinator := coordination.GetCoordinator()
+	if globalCoordinator == nil {
+		return
+	}
+	opEventCtx := coordination.NewEventContext(operationID, eventTypeSystemCheck, status).
+		WithEventData(eventData).
+		WithContext(ctx).
+		WithChannels(false, false, false, true)
+	if syncCoordinator, ok := globalCoordinator.(*coordination.Coordinator); ok {
+		_ = syncCoordinator.EmitOperationalSync(ctx, opEventCtx) //nolint:errcheck // Best-effort, synchronous
+	} else {
+		_ = globalCoordinator.Emit(ctx, opEventCtx) //nolint:errcheck // Best-effort
+	}
+}
+
+func appendDiscoveryScope(targetKind string, kinds []string, auditMetadata map[string]any, loggingFields []coordination.LoggingField) []coordination.LoggingField {
+	if targetKind != emptyValue {
+		auditMetadata["target_kind_specific"] = targetKind
+		return append(loggingFields, coordination.LoggingField{Key: eventKeyTargetKind, Value: targetKind})
+	}
+	auditMetadata["kinds"] = kinds
+	return append(loggingFields, coordination.LoggingField{Key: "kinds", Value: kinds})
+}
+
+func formatDiscoveryOpDesc(action string, targetKind string, kinds []string) string {
+	if targetKind != emptyValue {
+		return fmt.Sprintf("Object discovery %s for kind: %s", action, targetKind)
+	}
+	return fmt.Sprintf("Object discovery %s for %d kinds", action, len(kinds))
+}
+
 // emitDiscoveryCancellationEventViaCoordinator emits discovery cancellation events via the coordination system
 // This tracks when object discovery operations are cancelled due to context cancellation
 func emitDiscoveryCancellationEventViaCoordinator(
@@ -23,16 +74,10 @@ func emitDiscoveryCancellationEventViaCoordinator(
 	err error,
 	profile string, // CLI context profile for logging format
 ) {
-	projectRoot = ProjectRootOrResolveDot(projectRoot)
-	if projectRoot == emptyValue {
-		// Best effort - skip if no project root
+	ctx, projectRoot, ok := initDiscoveryContext(ctx, projectRoot, profile)
+	if !ok {
 		return
 	}
-
-	// Embed LoggingContext in context so coordinator logging respects --context profile
-	ctx = createContextWithLoggingProfile(ctx, profile)
-
-	coordinator := coordination.NewStorageCoordinator(projectRoot, storageProvider)
 
 	// Build audit metadata
 	auditMetadata := make(map[string]any)
@@ -75,11 +120,7 @@ func emitDiscoveryCancellationEventViaCoordinator(
 		eventCtx = eventCtx.WithError(err)
 	}
 
-	// Emit via coordinator (async, non-blocking)
-	goroutinelabels.NewGoroutine("discovery_cancellation_event_emit", fmt.Sprintf("emitting discovery cancellation event for kind %s", kind)).
-		StartSimple(func() {
-			_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
-		})
+	emitStorageEventAsync(ctx, projectRoot, storageProvider, "discovery_cancellation_event_emit", fmt.Sprintf("emitting discovery cancellation event for kind %s", kind), eventCtx)
 }
 
 // emitDiscoveryStartEventViaCoordinator emits discovery start events via the coordination system
@@ -94,36 +135,19 @@ func emitDiscoveryStartEventViaCoordinator(
 	processDir string,
 	profile string, // CLI context profile for logging format
 ) {
-	projectRoot = ProjectRootOrResolveDot(projectRoot)
-	if projectRoot == emptyValue {
-		// Best effort - skip if no project root
+	ctx, projectRoot, ok := initDiscoveryContext(ctx, projectRoot, profile)
+	if !ok {
 		return
-	}
-
-	// Embed LoggingContext in context so coordinator logging respects --context profile
-	ctx = createContextWithLoggingProfile(ctx, profile)
-
-	// Build operation description
-	var operation string
-	if targetKind != emptyValue {
-		operation = fmt.Sprintf("Object discovery started for kind: %s", targetKind)
-	} else {
-		operation = fmt.Sprintf("Object discovery started for %d kinds", len(kinds))
 	}
 
 	// Build audit metadata
 	auditMetadata := make(map[string]any)
 	auditMetadata[eventKeyEventType] = eventTypeSystemConfigChange
-	auditMetadata[eventKeyOperation] = operation
+	auditMetadata[eventKeyOperation] = formatDiscoveryOpDesc("started", targetKind, kinds)
 	auditMetadata[eventKeyTargetKind] = "discovery"
 	auditMetadata["kinds_count"] = len(kinds)
 	auditMetadata["process_dir"] = processDir
 	auditMetadata[eventKeySeverity] = severityLow // Discovery start is routine
-	if targetKind != emptyValue {
-		auditMetadata["target_kind_specific"] = targetKind
-	} else {
-		auditMetadata["kinds"] = kinds
-	}
 
 	// Build logging fields
 	loggingFields := []coordination.LoggingField{
@@ -132,11 +156,7 @@ func emitDiscoveryStartEventViaCoordinator(
 		{Key: eventKeyStatus, Value: "started"},
 		{Key: "phase", Value: "discovery"},
 	}
-	if targetKind != emptyValue {
-		loggingFields = append(loggingFields, coordination.LoggingField{Key: eventKeyTargetKind, Value: targetKind})
-	} else {
-		loggingFields = append(loggingFields, coordination.LoggingField{Key: "kinds", Value: kinds})
-	}
+	loggingFields = appendDiscoveryScope(targetKind, kinds, auditMetadata, loggingFields)
 
 	// Create event data
 	eventData := &coordination.EventData{
@@ -153,33 +173,10 @@ func emitDiscoveryStartEventViaCoordinator(
 		WithChannels(true, true, false, true) // Audit, logging, no metrics, operational (for CLI subscribers)
 
 	// Emit via storage-backed coordinator (for audit/persistence)
-	if storageProvider != nil {
-		coordinator := coordination.NewStorageCoordinator(projectRoot, storageProvider)
-		goroutinelabels.NewGoroutine("discovery_start_event_emit_storage", "emitting discovery start event to storage").
-			StartSimple(func() {
-				_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
-			})
-	}
+	emitStorageEventAsync(ctx, projectRoot, storageProvider, "discovery_start_event_emit_storage", "emitting discovery start event to storage", eventCtx)
 
 	// Also emit via global coordinator so in-process subscribers (e.g., TerminalProgressSubscriber) can see it
-	globalCoordinator := coordination.GetCoordinator()
-	if globalCoordinator != nil {
-		// Only operational channel for global coordinator (storage coordinator handles audit/logging)
-		// Use "start" status so it maps to "operation.start" for subscribers
-		opEventCtx := coordination.NewEventContext(operationID, eventTypeSystemCheck, eventStatusStart).
-			WithEventData(eventData).
-			WithContext(ctx).
-			WithChannels(false, false, false, true) // Operational only
-
-		// Emit synchronously to global coordinator to ensure subscriber catches it
-		// before discovery work begins (subscribers are already subscribed at this point)
-		if syncCoordinator, ok := globalCoordinator.(*coordination.Coordinator); ok {
-			_ = syncCoordinator.EmitOperationalSync(ctx, opEventCtx) //nolint:errcheck // Best-effort, synchronous
-		} else {
-			// Fallback to regular Emit if not a Coordinator instance
-			_ = globalCoordinator.Emit(ctx, opEventCtx) //nolint:errcheck // Best-effort
-		}
-	}
+	emitOperationalSyncGlobal(ctx, operationID, eventStatusStart, eventData)
 }
 
 // emitDiscoveryCompletionEventViaCoordinator emits discovery completion events via the coordination system
@@ -194,40 +191,20 @@ func emitDiscoveryCompletionEventViaCoordinator(
 	duration time.Duration,
 	profile string, // CLI context profile for logging format
 ) {
-	projectRoot = ProjectRootOrResolveDot(projectRoot)
-	if projectRoot == emptyValue {
-		// Best effort - skip if no project root
+	ctx, projectRoot, ok := initDiscoveryContext(ctx, projectRoot, profile)
+	if !ok {
 		return
-	}
-
-	// Embed LoggingContext in context so coordinator logging respects --context profile
-	ctx = createContextWithLoggingProfile(ctx, profile)
-
-	// Create coordinator with storage-backed audit router
-	coordinator := coordination.NewStorageCoordinator(projectRoot, storageProvider)
-
-	// Build operation description
-	var operation string
-	if targetKind != emptyValue {
-		operation = fmt.Sprintf("Object discovery completed for kind: %s", targetKind)
-	} else {
-		operation = fmt.Sprintf("Object discovery completed for %d kinds", len(kinds))
 	}
 
 	// Build audit metadata
 	auditMetadata := make(map[string]any)
 	auditMetadata[eventKeyEventType] = eventTypeSystemConfigChange
-	auditMetadata[eventKeyOperation] = operation
+	auditMetadata[eventKeyOperation] = formatDiscoveryOpDesc("completed", targetKind, kinds)
 	auditMetadata[eventKeyTargetKind] = "discovery"
 	auditMetadata["kinds_count"] = len(kinds)
 	auditMetadata["files_found"] = filesFound
 	auditMetadata[eventKeyDurationSeconds] = duration.Seconds()
 	auditMetadata[eventKeySeverity] = severityLow // Discovery completion is routine
-	if targetKind != emptyValue {
-		auditMetadata["target_kind_specific"] = targetKind
-	} else {
-		auditMetadata["kinds"] = kinds
-	}
 
 	// Build logging fields
 	loggingFields := []coordination.LoggingField{
@@ -236,11 +213,7 @@ func emitDiscoveryCompletionEventViaCoordinator(
 		{Key: eventKeyDurationSeconds, Value: duration.Seconds()},
 		{Key: eventKeyStatus, Value: "completed"},
 	}
-	if targetKind != emptyValue {
-		loggingFields = append(loggingFields, coordination.LoggingField{Key: eventKeyTargetKind, Value: targetKind})
-	} else {
-		loggingFields = append(loggingFields, coordination.LoggingField{Key: "kinds", Value: kinds})
-	}
+	loggingFields = appendDiscoveryScope(targetKind, kinds, auditMetadata, loggingFields)
 
 	// Create event data
 	eventData := &coordination.EventData{
@@ -259,11 +232,7 @@ func emitDiscoveryCompletionEventViaCoordinator(
 		WithDuration(duration).
 		WithChannels(true, true, false, false) // Audit and logging, no metrics/operational
 
-	// Emit via coordinator (async, non-blocking)
-	goroutinelabels.NewGoroutine("discovery_completion_event_emit", "emitting discovery completion event").
-		StartSimple(func() {
-			_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
-		})
+	emitStorageEventAsync(ctx, projectRoot, storageProvider, "discovery_completion_event_emit", "emitting discovery completion event", eventCtx)
 }
 
 // emitDiscoveryProgressEventViaCoordinator emits discovery progress events via the coordination system.
@@ -279,12 +248,10 @@ func emitDiscoveryProgressEventViaCoordinator(
 	elapsed time.Duration,
 	profile string,
 ) {
-	projectRoot = ProjectRootOrResolveDot(projectRoot)
-	if projectRoot == emptyValue {
+	ctx, projectRoot, ok := initDiscoveryContext(ctx, projectRoot, profile)
+	if !ok {
 		return
 	}
-
-	ctx = createContextWithLoggingProfile(ctx, profile)
 
 	// Ensure elapsed time is always included (even if 0) for reliable heartbeat
 	elapsedSeconds := elapsed.Seconds()
@@ -325,31 +292,8 @@ func emitDiscoveryProgressEventViaCoordinator(
 		WithContext(ctx).
 		WithChannels(true, false, false, true) // Audit, no logging (high frequency), no metrics, operational
 
-	// Emit via storage-backed coordinator (for audit/persistence)
-	if storageProvider != nil {
-		coordinator := coordination.NewStorageCoordinator(projectRoot, storageProvider)
-		goroutinelabels.NewGoroutine("discovery_progress_event_emit_storage", "emitting discovery progress event to storage").
-			StartSimple(func() {
-				_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // best-effort
-			})
-	}
+	emitStorageEventAsync(ctx, projectRoot, storageProvider, "discovery_progress_event_emit_storage", "emitting discovery progress event to storage", eventCtx)
 
 	// Also emit via global coordinator so in-process subscribers can see it
-	// Emit synchronously to ensure subscriber receives it promptly
-	globalCoordinator := coordination.GetCoordinator()
-	if globalCoordinator != nil {
-		// Only operational channel for global coordinator
-		opEventCtx := coordination.NewEventContext(operationID, eventTypeSystemCheck, eventStatusProgress).
-			WithEventData(eventData).
-			WithContext(ctx).
-			WithChannels(false, false, false, true) // Operational only
-
-		// Emit synchronously so subscriber receives it before next progress update
-		if syncCoordinator, ok := globalCoordinator.(*coordination.Coordinator); ok {
-			_ = syncCoordinator.EmitOperationalSync(ctx, opEventCtx) //nolint:errcheck // Best-effort, synchronous
-		} else {
-			// Fallback to regular Emit if not a Coordinator instance
-			_ = globalCoordinator.Emit(ctx, opEventCtx) //nolint:errcheck // Best-effort
-		}
-	}
+	emitOperationalSyncGlobal(ctx, operationID, eventStatusProgress, eventData)
 }

@@ -530,17 +530,9 @@ func createHashMismatchFixAuditEvent(ctx *cli.Context, obj *parser.ParsedObject,
 	}
 
 	// Get storage provider - create via StorageFactory
-	factory, err := storage.NewStorageFactory(pkgctx.NewSystemContext(), projectRoot)
-	var fileStorage storage.ObjectStorageProvider
-	if factory != nil {
-		fileStorage = factory.GetStorage()
-		defer func() { _ = fileStorage.Shutdown(context.Background()) }() // Background: request-or-shutdown derived
-	}
+	fileStorage, cleanup, err := acquireAuditStorage(projectRoot, "hash mismatch fix audit event")
+	defer cleanup()
 	if err != nil {
-		logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-		logging.Fluent(logger).Warn("Failed to create StorageFactory for hash mismatch fix audit event, skipping creation").
-			WithError(err).
-			Log()
 		return nil // Best effort - skip rather than create non-CAS audit event
 	}
 
@@ -560,6 +552,28 @@ func createHashMismatchFixAuditEvent(ctx *cli.Context, obj *parser.ParsedObject,
 	) //nolint:errcheck // Best-effort audit fan-out
 
 	return nil
+}
+
+// acquireAuditStorage acquires storage.ObjectStorageProvider via StorageFactory with safe cleanup.
+func acquireAuditStorage(projectRoot, eventDesc string) (storage.ObjectStorageProvider, func(), error) {
+	factory, err := storage.NewStorageFactory(pkgctx.NewSystemContext(), projectRoot)
+	var fileStorage storage.ObjectStorageProvider
+	if factory != nil {
+		fileStorage = factory.GetStorage()
+	}
+	cleanup := func() {
+		if fileStorage != nil {
+			_ = fileStorage.Shutdown(context.Background())
+		}
+	}
+	if err != nil {
+		logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+		logging.Fluent(logger).Warn(fmt.Sprintf("Failed to create StorageFactory for %s, skipping creation", eventDesc)).
+			WithError(err).
+			Log()
+		return nil, cleanup, err
+	}
+	return fileStorage, cleanup, nil
 }
 
 // createCacheAuditEvent creates an audit event for cache operations
@@ -629,19 +643,9 @@ func createCacheAuditEvent(eventType, targetID, targetKind, targetPath, operatio
 // createCacheAuditEventWithBuilder creates a cache audit event using the coordination system
 // This routes cache audit events through the central event coordinator
 func createCacheAuditEventWithBuilder(projectRoot string, secCtx *pkgctx.SecurityContext, options *storage.AuditEventOptions, profile string) {
-	// Get storage provider - create via StorageFactory
-	factory, err := storage.NewStorageFactory(pkgctx.NewSystemContext(), projectRoot)
-	var fileStorage storage.ObjectStorageProvider
-	if factory != nil {
-		fileStorage = factory.GetStorage()
-		defer func() { _ = fileStorage.Shutdown(context.Background()) }() // Background: request-or-shutdown derived
-	}
+	fileStorage, cleanup, err := acquireAuditStorage(projectRoot, "cache audit event")
+	defer cleanup()
 	if err != nil {
-		// If we can't get storage, we can't route through CAS
-		logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-		logging.Fluent(logger).Warn("Failed to create StorageFactory for cache audit event, skipping creation").
-			WithError(err).
-			Log()
 		return // Best effort - skip rather than create non-CAS audit event
 	}
 
@@ -655,18 +659,9 @@ func createCacheAuditEventWithBuilder(projectRoot string, secCtx *pkgctx.Securit
 // uses storage.Create so the event goes to the stream (no YAML under .zqk/process). Otherwise
 // uses WriteSystemObjectAndRegisterHash for CAS.
 func writeAuditEventWithCAS(projectRoot, auditDir, auditID string, auditEvent map[string]any) error {
-	factory, err := storage.NewStorageFactory(pkgctx.NewSystemContext(), projectRoot)
-	var fileStorage storage.ObjectStorageProvider
-	if factory != nil {
-		fileStorage = factory.GetStorage()
-		defer func() { _ = fileStorage.Shutdown(context.Background()) }() // Background: request-or-shutdown derived
-	}
+	fileStorage, cleanup, err := acquireAuditStorage(projectRoot, "audit event")
+	defer cleanup()
 	if err != nil {
-		logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-		logging.Fluent(logger).Warn("Failed to create StorageFactory for audit event, skipping creation").
-			String("audit_id", auditID).
-			WithError(err).
-			Log()
 		return errfmt.Newf("cannot create audit event without storage").Wrap(err)
 	}
 
