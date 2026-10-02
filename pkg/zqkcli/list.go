@@ -63,10 +63,9 @@ func NewInternalListCmd() *cobra.Command {
 }
 
 func runInternalList(cmd *cobra.Command, args []string) error {
-	// Create processor (handles context, storage, security, logging)
-	proc, err := cli.NewProcessor(cmd)
+	proc, err := newInternalProcessor(cmd)
 	if err != nil {
-		return errfmt.Newf("failed to create processor").Wrap(err)
+		return err
 	}
 
 	projectRoot := proc.ProjectRoot()

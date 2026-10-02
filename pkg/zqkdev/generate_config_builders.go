@@ -139,10 +139,6 @@ func NewGenerateConfigBuildersCmd() *cobra.Command {
 	// Apply help builder to command
 	helpBuilder.ApplyToCommand(cmd)
 
-	cmd.Flags().StringVar(&configsDir, "configs-dir", "", "Directory containing *_config.yaml files (default: "+paths.ProcessInternalConfigsDir+")")
-	cmd.Flags().StringVar(&outputDir, "output-dir", "", "Output directory for generated builder files (default: pkg/specbuilder/config_builders)")
-	cmd.Flags().BoolVar(&overwrite, "overwrite", false, "Overwrite existing builder files")
-
-	cli.AddCommonFlags(cmd)
+	AddBuilderFlags(cmd, &configsDir, "configs-dir", paths.ProcessInternalConfigsDir, "Directory containing *_config.yaml files", &outputDir, "pkg/specbuilder/config_builders", &overwrite)
 	return cmd
 }

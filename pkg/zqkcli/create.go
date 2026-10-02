@@ -4,7 +4,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
-	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
@@ -43,10 +42,9 @@ func NewInternalCreateCmd() *cobra.Command {
 }
 
 func runInternalCreate(cmd *cobra.Command, args []string) error {
-	// Create processor (handles context, storage, security, logging)
-	proc, err := cli.NewProcessor(cmd)
+	proc, err := newInternalProcessor(cmd)
 	if err != nil {
-		return errfmt.Newf("failed to create processor").Wrap(err)
+		return err
 	}
 
 	kind, ok := kindCanonicalFromInternalPRERun(cmd)

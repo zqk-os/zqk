@@ -10,11 +10,9 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/zqk-os/zqk/pkg/cliapp"
-	"github.com/zqk-os/zqk/pkg/appledouble"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
-	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/specbuilder/lifecycle_builders"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -75,22 +73,11 @@ func NewGenerateLifecycleBuildersCmd() *cobra.Command {
 		var items []GenerateItem
 
 		err := filepath.WalkDir(lifecyclesDir, func(path string, d os.DirEntry, walkErr error) error {
-			if walkErr != nil || d == nil {
-				return nil
+			skipDir, process := ShouldProcessYAMLDirEntry(d, walkErr)
+			if skipDir {
+				return filepath.SkipDir
 			}
-			if d.IsDir() {
-				if d.Name() == ".git" || d.Name() == "node_modules" {
-					return filepath.SkipDir
-				}
-				return nil
-			}
-			if appledouble.SkipNameInReadDir(d.Name()) {
-				return nil
-			}
-			if !strings.HasSuffix(d.Name(), ".yaml") && !strings.HasSuffix(d.Name(), ".yml") {
-				return nil
-			}
-			if d.Name() == "_placeholder.yaml" || objects.IsHashedFilename(d.Name()) {
+			if !process {
 				return nil
 			}
 
@@ -124,10 +111,6 @@ func NewGenerateLifecycleBuildersCmd() *cobra.Command {
 	// Apply help builder to command
 	helpBuilder.ApplyToCommand(cmd)
 
-	cmd.Flags().StringVar(&lifecyclesDir, "lifecycles-dir", "", "Directory containing lifecycle YAML files (default: "+paths.ProcessInternalLifecyclesDir+")")
-	cmd.Flags().StringVar(&outputDir, "output-dir", "", "Output directory for generated Go files (default: pkg/specbuilder/lifecycle_builders)")
-	cmd.Flags().BoolVar(&overwrite, "overwrite", false, "Overwrite existing lifecycle builder files")
-
-	cli.AddCommonFlags(cmd)
+	AddBuilderFlags(cmd, &lifecyclesDir, "lifecycles-dir", paths.ProcessInternalLifecyclesDir, "Directory containing lifecycle YAML files", &outputDir, "pkg/specbuilder/lifecycle_builders", &overwrite)
 	return cmd
 }

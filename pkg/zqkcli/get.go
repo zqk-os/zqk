@@ -49,12 +49,9 @@ func NewInternalGetCmd() *cobra.Command {
 }
 
 func runInternalGet(cmd *cobra.Command, args []string) error {
-	id := args[0]
-
-	// Create processor (handles context, storage, security, logging)
-	proc, err := cli.NewProcessor(cmd)
+	id, proc, err := initInternalProcessorWithID(cmd, args)
 	if err != nil {
-		return errfmt.Newf("failed to create processor").Wrap(err)
+		return err
 	}
 
 	projectRoot := proc.ProjectRoot()

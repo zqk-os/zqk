@@ -174,9 +174,9 @@ func runInternalKindFields(cmd *cobra.Command, args []string) error {
 	}
 
 	// Create processor
-	proc, err := cli.NewProcessor(cmd)
+	proc, err := newInternalProcessor(cmd)
 	if err != nil {
-		return errfmt.Newf("failed to create processor").Wrap(err)
+		return err
 	}
 
 	kind, ok := kindCanonicalFromInternalPRERun(cmd)

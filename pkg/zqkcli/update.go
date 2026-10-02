@@ -4,7 +4,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
-	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // NewInternalUpdateCmd creates an update command for internal/built-in objects
@@ -49,13 +48,9 @@ func NewInternalUpdateCmd() *cobra.Command {
 }
 
 func runInternalUpdate(cmd *cobra.Command, args []string) error {
-	id := args[0]
-
-	// Create processor (handles context, storage, security, logging)
-	proc, err := cli.NewProcessor(cmd)
+	id, proc, err := initInternalProcessorWithID(cmd, args)
 	if err != nil {
-		// No logger available yet, but root.go will log this
-		return errfmt.Newf("failed to create processor").Wrap(err)
+		return err
 	}
 
 	// Read current object to check if it's built-in
