@@ -207,6 +207,7 @@ docs/archive/snapshots/*.zip
 # Kernel state instances: all instance kernel objects are runtime data and must NEVER be tracked in git
 .zqk/process/
 docs/process/
+.zqk-state/
 # Prior csnap archives (state-commit copies before overwrite) — keep in git for rollback
 !.zqk-state/snapshots/
 !.zqk-state/snapshots/**/*.csnap
