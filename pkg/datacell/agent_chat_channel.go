@@ -101,15 +101,7 @@ func cloneAgentChatChannelConfig(c AgentChatChannelConfig) AgentChatChannelConfi
 // WriteAgentChatChannelConfig writes the lite file to [AgentChatChannelConfigPath] with 0600.
 func WriteAgentChatChannelConfig(projectRoot string, c AgentChatChannelConfig) error {
 	p := AgentChatChannelConfigPath(projectRoot)
-	if err := fileutil.MkdirAll(filepath.Dir(p), paths.DirPerm755); err != nil {
-		return err
-	}
-	b, err := json.MarshalIndent(c, "", "  ")
-	if err != nil {
-		return err
-	}
-	b = append(b, '\n')
-	if err := fileutil.WriteSecureFile(p, b); err != nil {
+	if err := fileutil.WriteSecureJSONIndent(p, c); err != nil {
 		return err
 	}
 	agentChatChannelConfigs.Delete(projectRoot)

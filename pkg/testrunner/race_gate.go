@@ -3,14 +3,11 @@ package testrunner
 import (
 	"bytes"
 	"context"
-	"os"
-	"syscall"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/gotestparse"
-	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // RaceGateConfig configures an isolated race gate execution.
@@ -62,35 +59,11 @@ func RunRaceGate(ctx context.Context, cfg RaceGateConfig) (*RaceGateResult, erro
 		cmd.Dir = cfg.ProjectRoot
 	}
 
-	// Ephemeral TMPDIR provisioning
-	tmpDir, err := fileutil.MkdirTemp("", "zqk-racegate-")
-	if err == nil {
-		defer func() {
-			_ = fileutil.RemoveAll(tmpDir)
-		}()
-	}
+	// Provision ephemeral TMPDIR and configure PGID isolation and sandbox environment
+	tmpDir, cleanup := createEphemeralTmpDir("zqk-racegate-")
+	defer cleanup()
 
-	// PGID Isolation
-	cmd.SysProcAttr = &syscall.SysProcAttr{
-		Setpgid: true,
-	}
-
-	cmd.Env = os.Environ()
-	if os.Getenv("DEVELOPER_DIR") == "" {
-		if _, err := os.Stat("/Library/Developer/CommandLineTools"); err == nil {
-			cmd.Env = append(cmd.Env, "DEVELOPER_DIR=/Library/Developer/CommandLineTools")
-		}
-	}
-	if tmpDir != "" {
-		cmd.Env = append(cmd.Env,
-			"TMPDIR="+tmpDir,
-			"TEMP="+tmpDir,
-			"TMP="+tmpDir,
-		)
-	}
-	if len(cfg.Env) > 0 {
-		cmd.Env = append(cmd.Env, cfg.Env...)
-	}
+	setupIsolatedCommandEnv(cmd, tmpDir, nil, cfg.Env)
 
 	var combinedBuf bytes.Buffer
 	cmd.Stdout = &combinedBuf

@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"syscall"
@@ -197,43 +198,17 @@ func ExecuteSubprocess(ctx context.Context, inv CriterionInvocation) CriterionRu
 		cmd.Dir = inv.Dir
 	}
 
-	// BLI-TESTCASE-SANDBOX-TMPDIR-002: Deterministic ephemeral TMPDIR provisioning & auto-cleanup
-	tmpDir, err := fileutil.MkdirTemp("", "zqk-testcase-")
-	if err == nil {
-		defer func() {
-			_ = fileutil.RemoveAll(tmpDir)
-		}()
-	}
+	// Provision ephemeral TMPDIR and configure PGID isolation and sandbox environment
+	tmpDir, cleanup := createEphemeralTmpDir("zqk-testcase-")
+	defer cleanup()
 
-	// BLI-TESTCASE-SANDBOX-PGID-001: Process Group (PGID) Isolation
-	cmd.SysProcAttr = &syscall.SysProcAttr{
-		Setpgid: true,
-	}
-
-	// Pass parent env plus test-friendly flags and isolated ephemeral TMPDIR
-	cmd.Env = os.Environ()
-	cmd.Env = append(cmd.Env,
+	setupIsolatedCommandEnv(cmd, tmpDir, []string{
 		"ZQK_JOB_ID=kernel-testrunner",
 		"ZQK_ALLOW_FOREGROUND_GO_TEST=1",
 		"ZQK_TEST_ALLOW_FOREGROUND_GO_TEST=1",
-		zqkenv.AllowForegroundGoTest().Name()+"=1",
-		zqkenv.InTest().Name()+"=1",
-	)
-	if os.Getenv("DEVELOPER_DIR") == "" {
-		if _, err := os.Stat("/Library/Developer/CommandLineTools"); err == nil {
-			cmd.Env = append(cmd.Env, "DEVELOPER_DIR=/Library/Developer/CommandLineTools")
-		}
-	}
-	if tmpDir != "" {
-		cmd.Env = append(cmd.Env,
-			"TMPDIR="+tmpDir,
-			"TEMP="+tmpDir,
-			"TMP="+tmpDir,
-		)
-	}
-	if len(inv.Env) > 0 {
-		cmd.Env = append(cmd.Env, inv.Env...)
-	}
+		zqkenv.AllowForegroundGoTest().Name() + "=1",
+		zqkenv.InTest().Name() + "=1",
+	}, inv.Env)
 
 	var stdoutBuf, stderrBuf bytes.Buffer
 	cmd.Stdout = &stdoutBuf
@@ -277,15 +252,15 @@ func ExecuteSubprocess(ctx context.Context, inv CriterionInvocation) CriterionRu
 		}
 	})
 
-	err = cmd.Wait()
+	waitErr := cmd.Wait()
 	res.Duration = time.Since(start)
 	res.Stdout = stdoutBuf.String()
 	res.Stderr = stderrBuf.String()
 
-	if err != nil {
+	if waitErr != nil {
 		res.ExitCode = 1
-		res.Error = err.Error()
-		if exitErr, ok := err.(interface{ ExitCode() int }); ok {
+		res.Error = waitErr.Error()
+		if exitErr, ok := waitErr.(interface{ ExitCode() int }); ok {
 			res.ExitCode = exitErr.ExitCode()
 		}
 		res.Passed = false
@@ -470,3 +445,41 @@ func RunTestCase(
 
 	return result, nil
 }
+
+// createEphemeralTmpDir creates a temporary directory with the given prefix and returns its path and a cleanup function.
+func createEphemeralTmpDir(prefix string) (string, func()) {
+	tmpDir, err := fileutil.MkdirTemp("", prefix)
+	if err != nil {
+		return "", func() {}
+	}
+	return tmpDir, func() {
+		_ = fileutil.RemoveAll(tmpDir)
+	}
+}
+
+// setupIsolatedCommandEnv configures PGID isolation and standard sandbox environment on cmd.
+func setupIsolatedCommandEnv(cmd *exec.Cmd, tmpDir string, baseEnv []string, extraEnv []string) {
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		Setpgid: true,
+	}
+	cmd.Env = os.Environ()
+	if len(baseEnv) > 0 {
+		cmd.Env = append(cmd.Env, baseEnv...)
+	}
+	if os.Getenv("DEVELOPER_DIR") == "" {
+		if _, err := os.Stat("/Library/Developer/CommandLineTools"); err == nil {
+			cmd.Env = append(cmd.Env, "DEVELOPER_DIR=/Library/Developer/CommandLineTools")
+		}
+	}
+	if tmpDir != "" {
+		cmd.Env = append(cmd.Env,
+			"TMPDIR="+tmpDir,
+			"TEMP="+tmpDir,
+			"TMP="+tmpDir,
+		)
+	}
+	if len(extraEnv) > 0 {
+		cmd.Env = append(cmd.Env, extraEnv...)
+	}
+}
+

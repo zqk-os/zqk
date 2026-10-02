@@ -54,22 +54,72 @@ func NewCoordinatorOperationCallback(
 	}
 }
 
-// OnStart emits start event via coordinator
-func (c *CoordinatorOperationCallback) OnStart(operationID string, metadata map[string]any) {
+func (c *CoordinatorOperationCallback) getStorageCoordinator() *Coordinator {
 	if c.projectRoot == emptyValue || c.storageProvider == nil {
-		return // Best effort - skip if not available
+		return nil
 	}
-
-	// Create coordinator
 	auditRouter := NewStorageAuditRouter(c.projectRoot, c.storageProvider)
-	coordinator := NewCoordinator(CoordinatorConfig{
+	return NewCoordinator(CoordinatorConfig{
 		LoggingRouter:     &DefaultLoggingRouter{},
 		AuditRouter:       auditRouter,
-		MetricsRouter:     nil, // Start events don't create metrics
+		MetricsRouter:     nil,
 		OperationalRouter: &DefaultOperationalRouter{},
 	})
+}
 
-	// Build event data
+type callbackEmitSpec struct {
+	label       string
+	operationID string
+	eventType   string
+	eventCtx    *EventContext
+	emitGlobal  bool
+	duration    time.Duration
+}
+
+func (c *CoordinatorOperationCallback) dispatchEvent(spec callbackEmitSpec) {
+	coordinator := c.getStorageCoordinator()
+	if coordinator == nil {
+		return
+	}
+
+	goroutinelabels.NewGoroutine(spec.label, fmt.Sprintf("emitting %s event for %s", spec.eventType, spec.operationID)).
+		StartSimple(func() {
+			if emitErr := coordinator.Emit(c.ctx, spec.eventCtx); emitErr != nil {
+				// best effort async emission
+			}
+		})
+
+	if !spec.emitGlobal {
+		return
+	}
+
+	globalCoordinator := GetCoordinator()
+	if globalCoordinator == nil {
+		return
+	}
+
+	opEventCtx := NewEventContext(spec.operationID, c.operationType, spec.eventType).
+		WithEventData(spec.eventCtx.EventData).
+		WithContext(c.ctx).
+		WithChannels(false, false, false, true)
+
+	if spec.duration > 0 {
+		opEventCtx = opEventCtx.WithDuration(spec.duration)
+	}
+
+	if syncCoordinator, ok := globalCoordinator.(*Coordinator); ok {
+		if syncErr := syncCoordinator.EmitOperationalSync(c.ctx, opEventCtx); syncErr != nil {
+			// best effort sync emission
+		}
+	} else {
+		if globalErr := globalCoordinator.Emit(c.ctx, opEventCtx); globalErr != nil {
+			// best effort global emission
+		}
+	}
+}
+
+// OnStart emits start event via coordinator
+func (c *CoordinatorOperationCallback) OnStart(operationID string, metadata map[string]any) {
 	eventData := &EventData{
 		LoggingFields: []LoggingField{
 			{Key: logFieldOperationID, Value: operationID},
@@ -86,7 +136,6 @@ func (c *CoordinatorOperationCallback) OnStart(operationID string, metadata map[
 		MetricsData: nil,
 	}
 
-	// Add metadata fields (audit map merge + structured logging keys)
 	maps.Copy(eventData.AuditMetadata, metadata)
 	for k, v := range metadata {
 		eventData.LoggingFields = append(eventData.LoggingFields, LoggingField{Key: k, Value: v})
@@ -95,48 +144,19 @@ func (c *CoordinatorOperationCallback) OnStart(operationID string, metadata map[
 	eventCtx := NewEventContext(operationID, c.operationType, "start").
 		WithEventData(eventData).
 		WithContext(c.ctx).
-		WithChannels(true, true, false, true) // Audit, logging, no metrics, operational
+		WithChannels(true, true, false, true)
 
-	// Emit via storage-backed coordinator (async, non-blocking)
-	goroutinelabels.NewGoroutine("operation_callback_start", fmt.Sprintf("emitting start event for %s", operationID)).
-		StartSimple(func() {
-			_ = coordinator.Emit(c.ctx, eventCtx) //nolint:errcheck // Async, best-effort
-		})
-
-	// Also emit to global coordinator so CLI subscribers can see it
-	// Emit synchronously to ensure CLI subscribers receive it immediately
-	globalCoordinator := GetCoordinator()
-	if globalCoordinator != nil {
-		// Only operational channel for global coordinator
-		opEventCtx := NewEventContext(operationID, c.operationType, "start").
-			WithEventData(eventData).
-			WithContext(c.ctx).
-			WithChannels(false, false, false, true) // Operational only
-
-		// Emit synchronously for CLI subscribers
-		if syncCoordinator, ok := globalCoordinator.(*Coordinator); ok {
-			_ = syncCoordinator.EmitOperationalSync(c.ctx, opEventCtx) //nolint:errcheck // Synchronous for CLI
-		} else {
-			// Fallback to regular Emit if not a Coordinator instance
-			_ = globalCoordinator.Emit(c.ctx, opEventCtx) //nolint:errcheck // Best-effort
-		}
-	}
+	c.dispatchEvent(callbackEmitSpec{
+		label:       "operation_callback_start",
+		operationID: operationID,
+		eventType:   "start",
+		eventCtx:    eventCtx,
+		emitGlobal:  true,
+	})
 }
 
 // OnProgress emits progress event via coordinator
 func (c *CoordinatorOperationCallback) OnProgress(operationID string, progress int, total int, message string) {
-	if c.projectRoot == emptyValue || c.storageProvider == nil {
-		return
-	}
-
-	auditRouter := NewStorageAuditRouter(c.projectRoot, c.storageProvider)
-	coordinator := NewCoordinator(CoordinatorConfig{
-		LoggingRouter:     &DefaultLoggingRouter{},
-		AuditRouter:       auditRouter,
-		MetricsRouter:     nil,
-		OperationalRouter: &DefaultOperationalRouter{},
-	})
-
 	percent := 0.0
 	if total > 0 {
 		percent = float64(progress) / float64(total) * 100.0
@@ -165,46 +185,19 @@ func (c *CoordinatorOperationCallback) OnProgress(operationID string, progress i
 	eventCtx := NewEventContext(operationID, c.operationType, "progress").
 		WithEventData(eventData).
 		WithContext(c.ctx).
-		WithChannels(true, true, false, true) // Audit, logging, no metrics, operational
+		WithChannels(true, true, false, true)
 
-	goroutinelabels.NewGoroutine("operation_callback_progress", fmt.Sprintf("emitting progress event for %s", operationID)).
-		StartSimple(func() {
-			_ = coordinator.Emit(c.ctx, eventCtx) //nolint:errcheck
-		})
-
-	// Also emit to global coordinator so CLI subscribers can see it
-	// Emit synchronously to ensure CLI subscribers receive it immediately
-	globalCoordinator := GetCoordinator()
-	if globalCoordinator != nil {
-		opEventCtx := NewEventContext(operationID, c.operationType, "progress").
-			WithEventData(eventData).
-			WithContext(c.ctx).
-			WithChannels(false, false, false, true) // Operational only
-
-		// Emit synchronously for CLI subscribers
-		if syncCoordinator, ok := globalCoordinator.(*Coordinator); ok {
-			_ = syncCoordinator.EmitOperationalSync(c.ctx, opEventCtx) //nolint:errcheck // Synchronous for CLI
-		} else {
-			// Fallback to regular Emit if not a Coordinator instance
-			_ = globalCoordinator.Emit(c.ctx, opEventCtx) //nolint:errcheck // Best-effort
-		}
-	}
+	c.dispatchEvent(callbackEmitSpec{
+		label:       "operation_callback_progress",
+		operationID: operationID,
+		eventType:   "progress",
+		eventCtx:    eventCtx,
+		emitGlobal:  true,
+	})
 }
 
 // OnComplete emits completion event via coordinator
 func (c *CoordinatorOperationCallback) OnComplete(operationID string, result any, duration time.Duration) {
-	if c.projectRoot == emptyValue || c.storageProvider == nil {
-		return
-	}
-
-	auditRouter := NewStorageAuditRouter(c.projectRoot, c.storageProvider)
-	coordinator := NewCoordinator(CoordinatorConfig{
-		LoggingRouter:     &DefaultLoggingRouter{},
-		AuditRouter:       auditRouter,
-		MetricsRouter:     nil,
-		OperationalRouter: &DefaultOperationalRouter{},
-	})
-
 	eventData := &EventData{
 		LoggingFields: []LoggingField{
 			{Key: logFieldOperationID, Value: operationID},
@@ -225,47 +218,20 @@ func (c *CoordinatorOperationCallback) OnComplete(operationID string, result any
 		WithEventData(eventData).
 		WithContext(c.ctx).
 		WithDuration(duration).
-		WithChannels(true, true, false, true) // Audit, logging, no metrics, operational
+		WithChannels(true, true, false, true)
 
-	goroutinelabels.NewGoroutine("operation_callback_complete", fmt.Sprintf("emitting completion event for %s", operationID)).
-		StartSimple(func() {
-			_ = coordinator.Emit(c.ctx, eventCtx) //nolint:errcheck
-		})
-
-	// Also emit to global coordinator so CLI subscribers can see it
-	// Emit synchronously to ensure CLI subscribers receive it immediately
-	globalCoordinator := GetCoordinator()
-	if globalCoordinator != nil {
-		opEventCtx := NewEventContext(operationID, c.operationType, "complete").
-			WithEventData(eventData).
-			WithContext(c.ctx).
-			WithDuration(duration).
-			WithChannels(false, false, false, true) // Operational only
-
-		// Emit synchronously for CLI subscribers
-		if syncCoordinator, ok := globalCoordinator.(*Coordinator); ok {
-			_ = syncCoordinator.EmitOperationalSync(c.ctx, opEventCtx) //nolint:errcheck // Synchronous for CLI
-		} else {
-			// Fallback to regular Emit if not a Coordinator instance
-			_ = globalCoordinator.Emit(c.ctx, opEventCtx) //nolint:errcheck // Best-effort
-		}
-	}
+	c.dispatchEvent(callbackEmitSpec{
+		label:       "operation_callback_complete",
+		operationID: operationID,
+		eventType:   "complete",
+		eventCtx:    eventCtx,
+		emitGlobal:  true,
+		duration:    duration,
+	})
 }
 
 // OnError emits error event via coordinator
 func (c *CoordinatorOperationCallback) OnError(operationID string, err error) {
-	if c.projectRoot == emptyValue || c.storageProvider == nil {
-		return
-	}
-
-	auditRouter := NewStorageAuditRouter(c.projectRoot, c.storageProvider)
-	coordinator := NewCoordinator(CoordinatorConfig{
-		LoggingRouter:     &DefaultLoggingRouter{},
-		AuditRouter:       auditRouter,
-		MetricsRouter:     nil,
-		OperationalRouter: &DefaultOperationalRouter{},
-	})
-
 	eventData := &EventData{
 		LoggingFields: []LoggingField{
 			{Key: logFieldOperationID, Value: operationID},
@@ -288,26 +254,17 @@ func (c *CoordinatorOperationCallback) OnError(operationID string, err error) {
 		WithError(err).
 		WithChannels(true, true, false, false)
 
-	goroutinelabels.NewGoroutine("operation_callback_error", fmt.Sprintf("emitting error event for %s", operationID)).
-		StartSimple(func() {
-			_ = coordinator.Emit(c.ctx, eventCtx) //nolint:errcheck
-		})
+	c.dispatchEvent(callbackEmitSpec{
+		label:       "operation_callback_error",
+		operationID: operationID,
+		eventType:   "error",
+		eventCtx:    eventCtx,
+		emitGlobal:  false,
+	})
 }
 
 // OnCancel emits cancellation event via coordinator
 func (c *CoordinatorOperationCallback) OnCancel(operationID string, reason string) {
-	if c.projectRoot == emptyValue || c.storageProvider == nil {
-		return
-	}
-
-	auditRouter := NewStorageAuditRouter(c.projectRoot, c.storageProvider)
-	coordinator := NewCoordinator(CoordinatorConfig{
-		LoggingRouter:     &DefaultLoggingRouter{},
-		AuditRouter:       auditRouter,
-		MetricsRouter:     nil,
-		OperationalRouter: &DefaultOperationalRouter{},
-	})
-
 	eventData := &EventData{
 		LoggingFields: []LoggingField{
 			{Key: logFieldOperationID, Value: operationID},
@@ -329,8 +286,11 @@ func (c *CoordinatorOperationCallback) OnCancel(operationID string, reason strin
 		WithContext(c.ctx).
 		WithChannels(true, true, false, false)
 
-	goroutinelabels.NewGoroutine("operation_callback_cancel", fmt.Sprintf("emitting cancellation event for %s", operationID)).
-		StartSimple(func() {
-			_ = coordinator.Emit(c.ctx, eventCtx) //nolint:errcheck
-		})
+	c.dispatchEvent(callbackEmitSpec{
+		label:       "operation_callback_cancel",
+		operationID: operationID,
+		eventType:   "cancelled",
+		eventCtx:    eventCtx,
+		emitGlobal:  false,
+	})
 }

@@ -173,12 +173,12 @@ func validateCountArg0(keys KindAnnotKeys, cmd *cobra.Command, projectRoot strin
 	return nil
 }
 
-func validateFlagKind(keys KindAnnotKeys, cmd *cobra.Command, projectRoot string) error {
-	kind, err := cmd.Flags().GetString("kind")
-	if err != nil || strings.TrimSpace(kind) == "" {
+func resolveAndAnnotateCanonicalKind(keys KindAnnotKeys, cmd *cobra.Command, projectRoot, rawKind string) error {
+	raw := strings.TrimSpace(rawKind)
+	if raw == "" {
 		return nil
 	}
-	k, err := objects.ResolveAndValidateKindForProject(projectRoot, kind)
+	k, err := objects.ResolveAndValidateKindForProject(projectRoot, raw)
 	if err != nil {
 		return err
 	}
@@ -187,22 +187,24 @@ func validateFlagKind(keys KindAnnotKeys, cmd *cobra.Command, projectRoot string
 	return nil
 }
 
+func getTrimmedKindFlag(cmd *cobra.Command) string {
+	kind, err := cmd.Flags().GetString("kind")
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(kind)
+}
+
+func validateFlagKind(keys KindAnnotKeys, cmd *cobra.Command, projectRoot string) error {
+	return resolveAndAnnotateCanonicalKind(keys, cmd, projectRoot, getTrimmedKindFlag(cmd))
+}
+
 func validateUpdateAllKindFlag(keys KindAnnotKeys, cmd *cobra.Command, projectRoot string) error {
 	all, err := cmd.Flags().GetBool("all")
 	if err != nil || !all {
 		return nil
 	}
-	kind, err := cmd.Flags().GetString("kind")
-	if err != nil || strings.TrimSpace(kind) == "" {
-		return nil
-	}
-	k, err := objects.ResolveAndValidateKindForProject(projectRoot, kind)
-	if err != nil {
-		return err
-	}
-	EnsureCmdAnnotations(cmd)
-	cmd.Annotations[keys.Canonical] = k
-	return nil
+	return resolveAndAnnotateCanonicalKind(keys, cmd, projectRoot, getTrimmedKindFlag(cmd))
 }
 
 func validateInternalListOptional(keys KindAnnotKeys, cmd *cobra.Command, projectRoot string, args []string, hook InternalListOptionalHook) error {
@@ -217,30 +219,15 @@ func validateInternalListOptional(keys KindAnnotKeys, cmd *cobra.Command, projec
 			return nil
 		}
 	}
-	k, err := objects.ResolveAndValidateKindForProject(projectRoot, raw)
-	if err != nil {
-		return err
-	}
-	EnsureCmdAnnotations(cmd)
-	cmd.Annotations[keys.Canonical] = k
-	return nil
+	return resolveAndAnnotateCanonicalKind(keys, cmd, projectRoot, raw)
 }
 
 func validateFieldsParentKind(keys KindAnnotKeys, cmd *cobra.Command, projectRoot string) error {
 	kindArg := ""
 	if cmd.Annotations != nil {
-		kindArg = strings.TrimSpace(cmd.Annotations[objects.FieldKeyKind])
+		kindArg = cmd.Annotations[objects.FieldKeyKind]
 	}
-	if kindArg == "" {
-		return nil
-	}
-	k, err := objects.ResolveAndValidateKindForProject(projectRoot, kindArg)
-	if err != nil {
-		return err
-	}
-	EnsureCmdAnnotations(cmd)
-	cmd.Annotations[keys.Canonical] = k
-	return nil
+	return resolveAndAnnotateCanonicalKind(keys, cmd, projectRoot, kindArg)
 }
 
 func validateSystemCompactStream(keys KindAnnotKeys, cmd *cobra.Command, projectRoot string) error {
@@ -248,17 +235,7 @@ func validateSystemCompactStream(keys KindAnnotKeys, cmd *cobra.Command, project
 	if err != nil || all {
 		return nil
 	}
-	kind, err := cmd.Flags().GetString("kind")
-	if err != nil || strings.TrimSpace(kind) == "" {
-		return nil
-	}
-	k, err := objects.ResolveAndValidateKindForProject(projectRoot, kind)
-	if err != nil {
-		return err
-	}
-	EnsureCmdAnnotations(cmd)
-	cmd.Annotations[keys.Canonical] = k
-	return nil
+	return resolveAndAnnotateCanonicalKind(keys, cmd, projectRoot, getTrimmedKindFlag(cmd))
 }
 
 func validateBulkUpdateFileKind(keys KindAnnotKeys, cmd *cobra.Command, projectRoot string, args []string) error {
@@ -266,16 +243,10 @@ func validateBulkUpdateFileKind(keys KindAnnotKeys, cmd *cobra.Command, projectR
 	if err != nil || strings.TrimSpace(filePath) == "" {
 		return nil
 	}
-	if len(args) < 1 || strings.TrimSpace(args[0]) == "" {
+	if len(args) < 1 {
 		return nil
 	}
-	k, err := objects.ResolveAndValidateKindForProject(projectRoot, args[0])
-	if err != nil {
-		return err
-	}
-	EnsureCmdAnnotations(cmd)
-	cmd.Annotations[keys.Canonical] = k
-	return nil
+	return resolveAndAnnotateCanonicalKind(keys, cmd, projectRoot, args[0])
 }
 
 // KindCanonicalFromPRERun reads the validated single-kind annotation set by ValidateAnnotatedKind.

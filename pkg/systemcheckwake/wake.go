@@ -8,7 +8,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"path/filepath"
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/agentfeed"
@@ -357,16 +356,8 @@ func formatWakeMessage(sum Summary, reasons []TripReason) string {
 // WriteExampleConfig writes the example file next to config (for docs/bootstrap).
 func WriteExampleConfig(projectRoot string, c Config) error {
 	p := ConfigPath(projectRoot) + ".example"
-	if err := fileutil.MkdirAll(filepath.Dir(p), paths.DirPerm755); err != nil {
-		return err
-	}
 	if c.SchemaVersion == "" {
 		c = DefaultConfig()
 	}
-	b, err := json.MarshalIndent(c, "", "  ")
-	if err != nil {
-		return err
-	}
-	b = append(b, '\n')
-	return fileutil.WriteSecureFile(p, b)
+	return fileutil.WriteSecureJSONIndent(p, c)
 }

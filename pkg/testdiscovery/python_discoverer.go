@@ -1,8 +1,6 @@
 package testdiscovery
 
 import (
-	"bufio"
-	"bytes"
 	"context"
 	"fmt"
 	"path/filepath"
@@ -34,58 +32,35 @@ var (
 )
 
 func (d *PythonDiscoverer) Discover(ctx context.Context, projectRoot, relPath string, content []byte) ([]DiscoveredTarget, error) {
-	scanner := bufio.NewScanner(bytes.NewReader(content))
-	var targets []DiscoveredTarget
-	var currentSuite string
-	var pendingTags []string
-	var pendingCrit []string
-	var pendingReq []string
+	state := newLineDiscoveryState(content)
 
-	lineNum := 0
-	for scanner.Scan() {
-		lineNum++
-		line := scanner.Text()
+	for state.scanner.Scan() {
+		state.lineNum++
+		line := state.scanner.Text()
 		trimmed := strings.TrimSpace(line)
 
 		// Extract comments & annotations
 		if strings.HasPrefix(trimmed, "#") {
-			if m := critRegex.FindStringSubmatch(trimmed); len(m) > 1 {
-				for _, p := range strings.Split(m[1], ",") {
-					p = strings.TrimSpace(p)
-					if p != "" {
-						pendingCrit = append(pendingCrit, p)
-					}
-				}
-			}
-			if m := reqRegex.FindStringSubmatch(trimmed); len(m) > 1 {
-				for _, p := range strings.Split(m[1], ",") {
-					p = strings.TrimSpace(p)
-					if p != "" {
-						pendingReq = append(pendingReq, p)
-					}
-				}
-			}
-			if m := tagRegex.FindStringSubmatch(trimmed); len(m) > 1 {
-				pendingTags = append(pendingTags, strings.TrimSpace(m[1]))
-			}
+			crit, req, tags := extractCommentMetadata(trimmed)
+			state.appendMetadata(crit, req, tags)
 			continue
 		}
 
 		if m := pyMarkRegex.FindStringSubmatch(trimmed); len(m) > 1 {
-			pendingTags = append(pendingTags, m[1])
+			state.pendingTags = append(state.pendingTags, m[1])
 			continue
 		}
 
 		if m := pyClassRegex.FindStringSubmatch(line); len(m) > 1 {
-			currentSuite = m[1]
+			state.currentSuite = m[1]
 			continue
 		}
 
 		if m := pyFuncRegex.FindStringSubmatch(line); len(m) > 1 {
 			funcName := m[1]
 			fullTarget := funcName
-			if currentSuite != "" && !strings.HasPrefix(line, "def ") {
-				fullTarget = currentSuite + "::" + funcName
+			if state.currentSuite != "" && !strings.HasPrefix(line, "def ") {
+				fullTarget = state.currentSuite + "::" + funcName
 			}
 
 			execCmd := fmt.Sprintf("pytest %s::%s", relPath, fullTarget)
@@ -93,21 +68,19 @@ func (d *PythonDiscoverer) Discover(ctx context.Context, projectRoot, relPath st
 			target := DiscoveredTarget{
 				Path:             relPath,
 				Language:         "python",
-				Suite:            currentSuite,
+				Suite:            state.currentSuite,
 				Function:         funcName,
-				Line:             lineNum,
-				Tags:             append([]string{}, pendingTags...),
-				CriteriaRefs:     append([]string{}, pendingCrit...),
-				RequirementRefs:  append([]string{}, pendingReq...),
+				Line:             state.lineNum,
+				Tags:             append([]string{}, state.pendingTags...),
+				CriteriaRefs:     append([]string{}, state.pendingCrit...),
+				RequirementRefs:  append([]string{}, state.pendingReq...),
 				ExecutionCommand: execCmd,
 			}
 
-			targets = append(targets, target)
-			pendingTags = nil
-			pendingCrit = nil
-			pendingReq = nil
+			state.targets = append(state.targets, target)
+			state.resetPending()
 		}
 	}
 
-	return targets, scanner.Err()
+	return state.targets, state.scanner.Err()
 }

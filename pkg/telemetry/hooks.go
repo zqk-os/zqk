@@ -185,10 +185,7 @@ func (m *Manager) RegisterHook(hook Hook) {
 // StartSpan starts a span across all registered hooks and returns a decorated context
 // and a completion function to be deferred.
 func (m *Manager) StartSpan(ctx context.Context, operation string, tags map[string]string) (context.Context, func(error)) {
-	m.mu.RLock()
-	hooks := make([]Hook, len(m.hooks))
-	copy(hooks, m.hooks)
-	m.mu.RUnlock()
+	hooks := m.GetHooks()
 
 	currentCtx := ctx
 	if currentCtx == nil {
@@ -214,10 +211,7 @@ func (m *Manager) StartSpan(ctx context.Context, operation string, tags map[stri
 
 // RecordMetric records a metric across all registered hooks.
 func (m *Manager) RecordMetric(ctx context.Context, name string, value float64, tags map[string]string) {
-	m.mu.RLock()
-	hooks := make([]Hook, len(m.hooks))
-	copy(hooks, m.hooks)
-	m.mu.RUnlock()
+	hooks := m.GetHooks()
 
 	for _, hook := range hooks {
 		hook.RecordMetric(ctx, name, value, tags)

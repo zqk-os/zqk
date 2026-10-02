@@ -1,8 +1,6 @@
 package testdiscovery
 
 import (
-	"bufio"
-	"bytes"
 	"context"
 	"fmt"
 	"regexp"
@@ -35,54 +33,31 @@ var (
 )
 
 func (d *TypeScriptDiscoverer) Discover(ctx context.Context, projectRoot, relPath string, content []byte) ([]DiscoveredTarget, error) {
-	scanner := bufio.NewScanner(bytes.NewReader(content))
-	var targets []DiscoveredTarget
-	var currentSuite string
-	var pendingTags []string
-	var pendingCrit []string
-	var pendingReq []string
+	state := newLineDiscoveryState(content)
 
-	lineNum := 0
-	for scanner.Scan() {
-		lineNum++
-		line := scanner.Text()
+	for state.scanner.Scan() {
+		state.lineNum++
+		line := state.scanner.Text()
 		trimmed := strings.TrimSpace(line)
 
 		// Extract comments & annotations
 		if strings.HasPrefix(trimmed, "//") || strings.HasPrefix(trimmed, "/*") || strings.HasPrefix(trimmed, "*") {
 			cleanComment := strings.TrimLeft(trimmed, "/* \t")
-			if m := critRegex.FindStringSubmatch(cleanComment); len(m) > 1 {
-				for _, p := range strings.Split(m[1], ",") {
-					p = strings.TrimSpace(p)
-					if p != "" {
-						pendingCrit = append(pendingCrit, p)
-					}
-				}
-			}
-			if m := reqRegex.FindStringSubmatch(cleanComment); len(m) > 1 {
-				for _, p := range strings.Split(m[1], ",") {
-					p = strings.TrimSpace(p)
-					if p != "" {
-						pendingReq = append(pendingReq, p)
-					}
-				}
-			}
-			if m := tagRegex.FindStringSubmatch(cleanComment); len(m) > 1 {
-				pendingTags = append(pendingTags, strings.TrimSpace(m[1]))
-			}
+			crit, req, tags := extractCommentMetadata(cleanComment)
+			state.appendMetadata(crit, req, tags)
 			continue
 		}
 
 		if m := tsDescribeRegex.FindStringSubmatch(line); len(m) > 1 {
-			currentSuite = m[1]
+			state.currentSuite = m[1]
 			continue
 		}
 
 		if m := tsTestRegex.FindStringSubmatch(line); len(m) > 1 {
 			testName := m[1]
 			fullTarget := testName
-			if currentSuite != "" {
-				fullTarget = currentSuite + " > " + testName
+			if state.currentSuite != "" {
+				fullTarget = state.currentSuite + " > " + testName
 			}
 
 			execCmd := fmt.Sprintf("npm test -- -t '%s'", testName)
@@ -90,21 +65,19 @@ func (d *TypeScriptDiscoverer) Discover(ctx context.Context, projectRoot, relPat
 			target := DiscoveredTarget{
 				Path:             relPath,
 				Language:         "typescript",
-				Suite:            currentSuite,
+				Suite:            state.currentSuite,
 				Function:         fullTarget,
-				Line:             lineNum,
-				Tags:             append([]string{}, pendingTags...),
-				CriteriaRefs:     append([]string{}, pendingCrit...),
-				RequirementRefs:  append([]string{}, pendingReq...),
+				Line:             state.lineNum,
+				Tags:             append([]string{}, state.pendingTags...),
+				CriteriaRefs:     append([]string{}, state.pendingCrit...),
+				RequirementRefs:  append([]string{}, state.pendingReq...),
 				ExecutionCommand: execCmd,
 			}
 
-			targets = append(targets, target)
-			pendingTags = nil
-			pendingCrit = nil
-			pendingReq = nil
+			state.targets = append(state.targets, target)
+			state.resetPending()
 		}
 	}
 
-	return targets, scanner.Err()
+	return state.targets, state.scanner.Err()
 }

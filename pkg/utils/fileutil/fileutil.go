@@ -1,6 +1,7 @@
 package fileutil
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 )
@@ -76,6 +77,20 @@ func WriteDurableSecureFile(path string, data []byte) error {
 // WriteSecureFile writes data to a file with secure permissions (0600).
 func WriteSecureFile(path string, data []byte) error {
 	return writeFileWithMode(path, data, secureFilePerm)
+}
+
+// WriteSecureJSONIndent marshals v as indented JSON, ensures the parent directory exists, and writes it with secure permissions (0600) with a trailing newline.
+func WriteSecureJSONIndent(path string, v any) error {
+	dir := filepath.Dir(path)
+	if err := MkdirAll(dir, standardDirPerm); err != nil {
+		return err
+	}
+	b, err := json.MarshalIndent(v, "", "  ")
+	if err != nil {
+		return err
+	}
+	b = append(b, '\n')
+	return WriteSecureFile(path, b)
 }
 
 // WriteStandardFile writes data to a file with standard permissions (0644).
