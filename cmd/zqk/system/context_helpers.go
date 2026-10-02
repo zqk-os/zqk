@@ -7,19 +7,27 @@ import (
 	"runtime/pprof"
 	"strings"
 
+	"sync"
+	"time"
+
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/appledouble"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cliapp"
+	"github.com/zqk-os/zqk/pkg/concurrency"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 	"github.com/zqk-os/zqk/pkg/strutil"
+	"github.com/zqk-os/zqk/pkg/systemcheck/snapshot"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // getSystemCliContext returns a CLI context initialized for system commands.
@@ -62,6 +70,11 @@ func resolveContextAndLogger(cmd *cobra.Command, fallbackProfile string) (*cli.C
 		return nil, nil, errfmt.Errorf("failed to get context")
 	}
 	return ctx, logger, nil
+}
+
+// processorContexts extracts the standard context tuple from a CLI Processor.
+func processorContexts(proc *cli.Processor) (context.Context, *pkgctx.SecurityContext, string) {
+	return proc.OperationContext(), proc.SecurityContext(), proc.ProjectRoot()
 }
 
 func ProjectRootOrResolve(projectRoot string) string {
@@ -438,19 +451,113 @@ func loadAndExpandSnapshot(cmd *cobra.Command, projectRoot string) ([]map[string
 	}
 
 	cmd.Printf("Reading compressed snapshot from %s...\n", inputPath)
-	cs, err := storage.ReadCompressedSnapshot(inputPath)
+	cs, expanded, err := snapshot.ReadAndExpandSnapshotWithHeader(inputPath)
 	if err != nil {
-		return nil, errfmt.Newf("failed to read compressed snapshot").Wrap(err)
+		return nil, err
 	}
 
 	cmd.Printf("Snapshot Checksum: %s\n", cs.Header.Checksum)
 	cmd.Printf("Expanding %d objects...\n", cs.Header.ObjectCount)
-
-	expanded, err := cs.Expand()
-	if err != nil {
-		return nil, errfmt.Newf("failed to expand snapshot").Wrap(err)
-	}
 	return expanded, nil
+}
+
+// expandedObjectProcessorConfig configures parallel processing of expanded snapshot objects.
+type expandedObjectProcessorConfig struct {
+	NumWorkers   int
+	RoutineLabel string
+	Timeout      time.Duration
+}
+
+// expandedObjectProcessStats records written and skipped count for expanded snapshot processing.
+type expandedObjectProcessStats struct {
+	Written int
+	Skipped int
+}
+
+// processExpandedSnapshotParallel processes an expanded snapshot slice with bounded concurrency.
+func processExpandedSnapshotParallel(
+	ctx context.Context,
+	expanded []map[string]any,
+	cfg expandedObjectProcessorConfig,
+	processFn func(kind, id string, obj map[string]any) error,
+) (expandedObjectProcessStats, error) {
+	var wg sync.WaitGroup
+	var mu sync.Mutex
+	var stats expandedObjectProcessStats
+	var firstError error
+
+	jobs := make(chan map[string]any, len(expanded))
+	for _, obj := range expanded {
+		jobs <- obj
+	}
+	close(jobs)
+
+	numWorkers := cfg.NumWorkers
+	if numWorkers <= 0 {
+		numWorkers = 10
+	}
+
+	for i := 0; i < numWorkers; i++ {
+		wg.Add(1)
+		goroutinelabels.NewGoroutine(cfg.RoutineLabel, "processing expanded objects").StartSimple(func() {
+			defer wg.Done()
+			for obj := range jobs {
+				if ctx.Err() != nil {
+					return
+				}
+				kind, ok := obj[objects.FieldKeyKind].(string)
+				if !ok || kind == "" {
+					_ = concurrency.RunInLock(&mu, func() error { stats.Skipped++; return nil })
+					continue
+				}
+				id, ok := obj[objects.FieldKeyID].(string)
+				if !ok || id == "" {
+					_ = concurrency.RunInLock(&mu, func() error { stats.Skipped++; return nil })
+					continue
+				}
+				if err := processFn(kind, id, obj); err != nil {
+					_ = concurrency.RunInLock(&mu, func() error {
+						if firstError == nil {
+							firstError = err
+						}
+						return nil
+					})
+				} else {
+					_ = concurrency.RunInLock(&mu, func() error {
+						stats.Written++
+						if stats.Written%100 == 0 {
+							cli.TouchMeaningfulActivity()
+						}
+						return nil
+					})
+				}
+			}
+		})
+	}
+
+	timeout := cfg.Timeout
+	if timeout <= 0 {
+		timeout = 30 * time.Minute
+	}
+	waitGroupWithTimeout(&wg, timeout, cfg.RoutineLabel)
+
+	return stats, firstError
+}
+
+// GlobalValidationLoaders bundles global spec, lifecycle, and validation singletons.
+type GlobalValidationLoaders struct {
+	SpecLoader      *objects.SpecLoader
+	LifecycleLoader *objects.LifecycleLoader
+	Validator       validation.Validator
+}
+
+// getGlobalValidationLoaders returns the cached global spec, lifecycle, and validation loaders.
+func getGlobalValidationLoaders() GlobalValidationLoaders {
+	return GlobalValidationLoaders{
+		SpecLoader:      objects.GetGlobalSpecLoader(),
+		LifecycleLoader: objects.GetGlobalLifecycleLoader(),
+		Validator:       validation.GetGlobalRegistry().Get(""),
+	}
 }
 
 

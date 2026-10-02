@@ -64,9 +64,7 @@ func NewStateCommitCmd() *cobra.Command {
 
 func runStateCommit(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-		ctx := proc.OperationContext()
-		secCtx := proc.SecurityContext()
-		projectRoot := proc.ProjectRoot()
+		ctx, secCtx, projectRoot := processorContexts(proc)
 		logger := proc.Logger()
 
 		outputPath, _ := cmd.Flags().GetString("snapshot-file")

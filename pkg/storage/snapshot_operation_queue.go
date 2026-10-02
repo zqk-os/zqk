@@ -237,15 +237,19 @@ func (q *SnapshotOperationQueue) Replay(ctx context.Context, storage ObjectStora
 		Log()
 
 	// Clear queue
-	q.operations = nil
-	q.pendingWrites = make(map[string]bool)
-	q.sequence = 0
+	q.clearLocked()
 
 	if failed > 0 {
 		return errfmt.Errorf(ConstMiscFailedToReplayDOperations, failed)
 	}
 
 	return nil
+}
+
+func (q *SnapshotOperationQueue) clearLocked() {
+	q.operations = nil
+	q.pendingWrites = make(map[string]bool)
+	q.sequence = 0
 }
 
 // Size returns the current queue size
@@ -266,9 +270,7 @@ func (q *SnapshotOperationQueue) Clear() {
 	_ = concurrency.RunInLockOrLog(
 		&q.mu, locknames.LockNameSnapshotQueueClear, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 		func() error {
-			q.operations = nil
-			q.pendingWrites = make(map[string]bool)
-			q.sequence = 0
+			q.clearLocked()
 			return nil
 		},
 	)

@@ -96,16 +96,9 @@ func runInternalBulkCreate(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	_, data, err := readRequiredFileFlag(cmd, proc)
+	objects, err := readRequiredYAMLObjectArray(cmd, proc)
 	if err != nil {
 		return err
-	}
-
-	// Parse YAML array
-	var objects []map[string]any
-	if err := yaml.Unmarshal(data, &objects); err != nil {
-		logging.FluentEvent(proc.Logger()).Error("Failed to parse YAML", err).Log()
-		return errfmt.Newf("failed to parse YAML").Wrap(err)
 	}
 
 	// Ensure all objects have the correct kind and source_type
@@ -209,16 +202,9 @@ func runInternalBulkUpdate(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	_, data, err := readRequiredFileFlag(cmd, proc)
+	updateItems, err := readRequiredYAMLObjectArray(cmd, proc)
 	if err != nil {
 		return err
-	}
-
-	// Parse YAML array
-	var updateItems []map[string]any
-	if err := yaml.Unmarshal(data, &updateItems); err != nil {
-		logging.FluentEvent(proc.Logger()).Error("Failed to parse YAML", err).Log()
-		return errfmt.Newf("failed to parse YAML").Wrap(err)
 	}
 
 	// Convert to BulkUpdateItem format
@@ -467,4 +453,18 @@ func readRequiredFileFlag(cmd *cobra.Command, proc *cli.Processor) (string, []by
 		return "", nil, errfmt.Newf("failed to read file").Wrap(err)
 	}
 	return filePath, data, nil
+}
+
+func readRequiredYAMLObjectArray(cmd *cobra.Command, proc *cli.Processor) ([]map[string]any, error) {
+	_, data, err := readRequiredFileFlag(cmd, proc)
+	if err != nil {
+		return nil, err
+	}
+
+	var items []map[string]any
+	if err := yaml.Unmarshal(data, &items); err != nil {
+		logging.FluentEvent(proc.Logger()).Error("Failed to parse YAML", err).Log()
+		return nil, errfmt.Newf("failed to parse YAML").Wrap(err)
+	}
+	return items, nil
 }

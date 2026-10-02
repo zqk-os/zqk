@@ -19,10 +19,8 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
-	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
-	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // BaselineMetrics contains baseline performance and result metrics
@@ -128,10 +126,10 @@ func runCheckAllSynchronous(projectRoot string, cmd *cobra.Command, ctx *cli.Con
 
 	// Create shared loaders
 	// Use global loaders to share caches across sync and async validation
-	specLoader := objects.GetGlobalSpecLoader()
-	lifecycleLoader := objects.GetGlobalLifecycleLoader()
-	validatorRegistry := validation.GetGlobalRegistry()
-	validator := validatorRegistry.Get("")
+	loaders := getGlobalValidationLoaders()
+	specLoader := loaders.SpecLoader
+	lifecycleLoader := loaders.LifecycleLoader
+	validator := loaders.Validator
 
 	// Cache hash registries per kind
 	hashRegistryCache := &HashRegistryCacheType{

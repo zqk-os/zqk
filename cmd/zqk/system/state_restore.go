@@ -19,7 +19,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/concurrency"
 	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/kernelcas"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
@@ -87,106 +86,50 @@ func runStateRestore(cmd *cobra.Command, args []string) error {
 			return errfmt.Errorf("failed to obtain FileObjectStorage from StorageFactory (proc.Storage returned nil or non-file provider)")
 		}
 
-		var wg sync.WaitGroup
-		var mu sync.Mutex
-		written := 0
-		skipped := 0
-		var firstError error
-
 		var expectedPathsMutex sync.Mutex
 		expectedPaths := make(map[string]bool)
 
-		type writeJob struct {
-			obj map[string]any
-		}
-
-		writeOneJob := func(job writeJob) {
-			obj := job.obj
-			kind, ok := obj[objects.FieldKeyKind].(string)
-			if !ok || kind == "" {
-				_ = concurrency.RunInLock(&mu, func() error { skipped++; return nil })
-				return
-			}
-			id, ok := obj[objects.FieldKeyID].(string)
-			if !ok || id == "" {
-				_ = concurrency.RunInLock(&mu, func() error { skipped++; return nil })
-				return
-			}
-			data, err := yaml.Marshal(obj)
-			if err != nil {
-				_ = concurrency.RunInLock(&mu, func() error {
-					if firstError == nil {
-						firstError = err
-					}
-					return nil
-				})
-				return
-			}
-
-			if err := kernelcas.RunRestoreMerge(ctx, nil, &kernelcas.Mutation{
-				Kind:   kind,
-				ID:     id,
-				Intent: kernelcas.IntentRestoreMerge,
-				Reason: "system state-restore merge",
-				CommitFn: func(c context.Context) error {
-					return storageProvider.WriteObjectRaw(c, kind, id, data)
-				},
-			}); err != nil {
-				_ = concurrency.RunInLock(&mu, func() error {
-					if firstError == nil {
-						firstError = err
-					}
-					return nil
-				})
-				return
-			}
-
-			cas, casErr := storageProvider.GetContentAddressableStorage(kind)
-			if casErr == nil && cas != nil {
-				if filePath, fpErr := cas.GetFilePathForID(id); fpErr == nil && filePath != "" {
-					_ = concurrency.RunInLock(&expectedPathsMutex, func() error {
-						expectedPaths[filePath] = true
-						return nil
-					})
+		stats, err := processExpandedSnapshotParallel(
+			ctx,
+			expanded,
+			expandedObjectProcessorConfig{
+				NumWorkers:   16,
+				RoutineLabel: "state_restore",
+				Timeout:      30 * time.Minute,
+			},
+			func(kind, id string, obj map[string]any) error {
+				data, err := yaml.Marshal(obj)
+				if err != nil {
+					return err
 				}
-			}
 
-			_ = concurrency.RunInLock(&mu, func() error {
-				written++
-				if written%100 == 0 {
-					cli.TouchMeaningfulActivity()
+				if err := kernelcas.RunRestoreMerge(ctx, nil, &kernelcas.Mutation{
+					Kind:   kind,
+					ID:     id,
+					Intent: kernelcas.IntentRestoreMerge,
+					Reason: "system state-restore merge",
+					CommitFn: func(c context.Context) error {
+						return storageProvider.WriteObjectRaw(c, kind, id, data)
+					},
+				}); err != nil {
+					return err
+				}
+
+				cas, casErr := storageProvider.GetContentAddressableStorage(kind)
+				if casErr == nil && cas != nil {
+					if filePath, fpErr := cas.GetFilePathForID(id); fpErr == nil && filePath != "" {
+						_ = concurrency.RunInLock(&expectedPathsMutex, func() error {
+							expectedPaths[filePath] = true
+							return nil
+						})
+					}
 				}
 				return nil
-			})
-		}
-
-		// Serialize writes: parallel WriteObjectRaw races CAS IDIndex JSON encode
-		// (concurrent map iteration and map write under bulk restore).
-		// restore throughput vs index race
-		const numWorkers = 16
-		jobs := make(chan writeJob, len(expanded))
-		for _, obj := range expanded {
-			jobs <- writeJob{obj: obj}
-		}
-		close(jobs)
-
-		for i := 0; i < numWorkers; i++ {
-			wg.Add(1)
-			goroutinelabels.NewGoroutine("state_restore", "writing expanded objects").StartSimple(func() {
-				defer wg.Done()
-				for job := range jobs {
-					if ctx.Err() != nil {
-						return
-					}
-					writeOneJob(job)
-				}
-			})
-		}
-		wg.Wait()
-
-		if firstError != nil {
-			cmd.Printf("STATE RESTORE ERROR: %+v\n", firstError)
-			return errfmt.Newf("failed to write some objects").Wrap(firstError)
+			},
+		)
+		if err != nil {
+			cmd.Printf("STATE RESTORE ERROR: %+v\n", err)
+			return errfmt.Newf("failed to write some objects").Wrap(err)
 		}
 
 		cmd.Println("Flushing index write queues...")
@@ -204,11 +147,11 @@ func runStateRestore(cmd *cobra.Command, args []string) error {
 			}
 		}
 
-		cmd.Printf("✅ Restore complete. %d objects written, %d skipped.\n", written, skipped)
+		cmd.Printf("✅ Restore complete. %d objects written, %d skipped.\n", stats.Written, stats.Skipped)
 		// Bulk CAS rewrite: next system check must not trust stale validation /
 		// object-id caches (Layer-1 false missing-ref).
-		if written > 0 {
-			storage.NoteSignificantCacheChangeDetail(projectRoot, "system_state_restore", 0, written)
+		if stats.Written > 0 {
+			storage.NoteSignificantCacheChangeDetail(projectRoot, "system_state_restore", 0, stats.Written)
 		}
 		return nil
 	})(cmd, args)

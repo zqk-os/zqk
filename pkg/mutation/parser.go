@@ -228,10 +228,10 @@ func (l *ZQLLexer) NextToken() (ZQLToken, error) {
 }
 
 func (l *ZQLLexer) scanString(quote rune) (ZQLToken, error) {
-	startLine, startCol := l.lineCol()
-	l.advance() // skip open quote
-
 	var sb strings.Builder
+	l.advance() // skip open quote
+	startLine, startCol := l.lineCol()
+
 	for l.pos < len(l.input) {
 		ch := l.current()
 		if ch == quote {
@@ -256,12 +256,11 @@ func (l *ZQLLexer) scanString(quote rune) (ZQLToken, error) {
 }
 
 func (l *ZQLLexer) scanNumber() (ZQLToken, error) {
-	startLine, startCol := l.lineCol()
 	var sb strings.Builder
-
 	if l.current() == '-' {
 		sb.WriteRune(l.advance())
 	}
+	startLine, startCol := l.lineCol()
 
 	for l.pos < len(l.input) && (unicode.IsDigit(l.current()) || l.current() == '.') {
 		sb.WriteRune(l.advance())

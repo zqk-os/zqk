@@ -1303,9 +1303,7 @@ func (s *DashboardState) Render(w ioWriter, isWatch bool, viewMode string) error
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	cyan := color.New(color.FgCyan).SprintFunc()
-	green := color.New(color.FgGreen).SprintFunc()
-	yellow := color.New(color.FgYellow).SprintFunc()
+	cyan, green, yellow := cli.StandardColorPrinters()
 	red := color.New(color.FgRed).SprintFunc()
 	white := color.New(color.FgWhite).SprintFunc()
 	bold := color.New(color.Bold).SprintFunc()

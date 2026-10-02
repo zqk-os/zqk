@@ -2,21 +2,16 @@ package system
 
 import (
 	"path/filepath"
-	"sync"
-	"time"
-
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	bldr_cli_cmd_v1 "github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
-	"github.com/zqk-os/zqk/pkg/concurrency"
 	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/graph/memgraph"
 	"github.com/zqk-os/zqk/pkg/graph/provider"
-	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 )
 
@@ -61,152 +56,92 @@ func runHydrateGraph(cmd *cobra.Command, args []string) error {
 		}
 		defer pool.Close()
 
-		var wg sync.WaitGroup
-		var mu sync.Mutex
-		written := 0
-		skipped := 0
-		var firstError error
+		stats, err := processExpandedSnapshotParallel(
+			ctx,
+			expanded,
+			expandedObjectProcessorConfig{
+				NumWorkers:   10,
+				RoutineLabel: "hydrate_graph",
+				Timeout:      30 * time.Minute,
+			},
+			func(kind, id string, obj map[string]any) error {
+				conn, err := pool.GetConnection(ctx)
+				if err != nil {
+					return err
+				}
+				defer func() { _ = pool.ReturnConnection(conn) }()
 
-		type writeJob struct {
-			obj map[string]any
-		}
-
-		writeOneJob := func(job writeJob) {
-			obj := job.obj
-			kind, ok := obj[objects.FieldKeyKind].(string)
-			if !ok || kind == "" {
-				_ = concurrency.RunInLock(&mu, func() error { skipped++; return nil })
-				return
-			}
-			id, ok := obj[objects.FieldKeyID].(string)
-			if !ok || id == "" {
-				_ = concurrency.RunInLock(&mu, func() error { skipped++; return nil })
-				return
-			}
-
-			conn, err := pool.GetConnection(ctx)
-			if err != nil {
-				_ = concurrency.RunInLock(&mu, func() error {
-					if firstError == nil {
-						firstError = err
+				toLabel := func(k string) string {
+					parts := strings.Split(k, "_")
+					var labelParts []string
+					for _, part := range parts {
+						if part != "" {
+							labelParts = append(labelParts, strings.ToUpper(part[:1])+strings.ToLower(part[1:]))
+						}
 					}
-					return nil
-				})
-				return
-			}
-			defer func() { _ = pool.ReturnConnection(conn) }()
-
-			toLabel := func(k string) string {
-				parts := strings.Split(k, "_")
-				var labelParts []string
-				for _, part := range parts {
-					if part != "" {
-						labelParts = append(labelParts, strings.ToUpper(part[:1])+strings.ToLower(part[1:]))
-					}
-				}
-				return strings.Join(labelParts, "")
-			}
-
-			node := provider.Node{
-				ID:         id,
-				Labels:     []string{toLabel(kind), "Entity"},
-				Properties: obj,
-			}
-
-			var writeErr error
-			for attempt := 0; attempt < 5; attempt++ {
-				exists := false
-				nodeVal, getErr := conn.GetNode(ctx, id, []string{toLabel(kind), "Entity"})
-				if getErr == nil && nodeVal != nil {
-					exists = true
+					return strings.Join(labelParts, "")
 				}
 
-				if written < 5 {
-					cmd.Printf("DEBUG [Attempt %d] ID=%s Kind=%s exists=%v\n", attempt, id, kind, exists)
+				node := provider.Node{
+					ID:         id,
+					Labels:     []string{toLabel(kind), "Entity"},
+					Properties: obj,
 				}
 
-				if !exists {
-					writeErr = conn.CreateNode(ctx, node)
-					if writeErr != nil {
-						cmd.PrintErrf("⚠️  CreateNode failed for ID=%s Kind=%s: %v\n", id, kind, writeErr)
-						// Fallback to update just in case of race
+				var writeErr error
+				for attempt := 0; attempt < 5; attempt++ {
+					exists := false
+					nodeVal, getErr := conn.GetNode(ctx, id, []string{toLabel(kind), "Entity"})
+					if getErr == nil && nodeVal != nil {
 						exists = true
-					} else {
-						if written < 5 {
-							cmd.Printf("DEBUG CreateNode succeeded for ID=%s\n", id)
+					}
+
+					if !exists {
+						writeErr = conn.CreateNode(ctx, node)
+						if writeErr != nil {
+							cmd.PrintErrf("⚠️  CreateNode failed for ID=%s Kind=%s: %v\n", id, kind, writeErr)
+							// Fallback to update just in case of race
+							exists = true
 						}
 					}
-				}
 
-				if exists {
-					writeErr = conn.UpdateNode(ctx, id, provider.NodeUpdates{
-						Properties: obj,
-					})
+					if exists {
+						writeErr = conn.UpdateNode(ctx, id, provider.NodeUpdates{
+							Properties: obj,
+						})
+					}
+
 					if writeErr == nil {
-						if written < 5 {
-							cmd.Printf("DEBUG UpdateNode succeeded for ID=%s\n", id)
-						}
+						break
 					}
-				}
 
-				if writeErr == nil {
+					// If it's a transient memgraph conflict or connectivity timeout, retry after sleep
+					errMsg := writeErr.Error()
+					if strings.Contains(errMsg, "conflicting transactions") ||
+						strings.Contains(errMsg, "TransientError") ||
+						strings.Contains(errMsg, "ConnectivityError") {
+						time.Sleep(50 * time.Millisecond)
+						continue
+					}
 					break
 				}
 
-				// If it's a transient memgraph conflict or connectivity timeout, retry after sleep
-				errMsg := writeErr.Error()
-				if strings.Contains(errMsg, "conflicting transactions") ||
-					strings.Contains(errMsg, "TransientError") ||
-					strings.Contains(errMsg, "ConnectivityError") {
-					time.Sleep(50 * time.Millisecond)
-					continue
-				}
-				break
-			}
-
-			if writeErr != nil {
-				cmd.PrintErrf("❌ Failed to update node ID=%s Kind=%s: %v\n", id, kind, writeErr)
-				for k := range obj {
-					cmd.PrintErrf("   key: %s\n", k)
-				}
-				_ = concurrency.RunInLock(&mu, func() error {
-					if firstError == nil {
-						firstError = writeErr
+				if writeErr != nil {
+					cmd.PrintErrf("❌ Failed to update node ID=%s Kind=%s: %v\n", id, kind, writeErr)
+					for k := range obj {
+						cmd.PrintErrf("   key: %s\n", k)
 					}
-					return nil
-				})
-				return
-			}
-
-			_ = concurrency.RunInLock(&mu, func() error { written++; return nil })
-		}
-
-		const numWorkers = 10
-		jobs := make(chan writeJob, len(expanded))
-		for _, obj := range expanded {
-			jobs <- writeJob{obj: obj}
-		}
-		close(jobs)
-
-		for i := 0; i < numWorkers; i++ {
-			wg.Add(1)
-			goroutinelabels.NewGoroutine("hydrate_graph", "writing expanded objects to graph").StartSimple(func() {
-				defer wg.Done()
-				for job := range jobs {
-					if ctx.Err() != nil {
-						return
-					}
-					writeOneJob(job)
+					return writeErr
 				}
-			})
-		}
-		waitGroupWithTimeout(&wg, 30*time.Minute, "hydrate_graph")
 
-		if firstError != nil {
-			return errfmt.Newf("failed to write some objects").Wrap(firstError)
+				return nil
+			},
+		)
+		if err != nil {
+			return errfmt.Newf("failed to write some objects").Wrap(err)
 		}
 
-		cmd.Printf("✅ Graph Hydration complete. %d objects written, %d skipped.\n", written, skipped)
+		cmd.Printf("✅ Graph Hydration complete. %d objects written, %d skipped.\n", stats.Written, stats.Skipped)
 		return nil
 	})(cmd, args)
 }
