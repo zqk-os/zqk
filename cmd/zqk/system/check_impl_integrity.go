@@ -1,8 +1,6 @@
 package system
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -51,8 +49,7 @@ func checkIntegrity(ctx *cli.Context, cmd *cobra.Command, _ *parser.ParsedObject
 	}
 
 	// Calculate hash
-	hash := sha256.Sum256(content)
-	hashStr := hex.EncodeToString(hash[:])
+	hashStr := storage.CalculateSHA256Hash(content)
 
 	// Get filename relative to kind directory
 	filename := filepath.Base(filePath)
@@ -125,8 +122,7 @@ func checkIntegrityWithRegistryAndContent(ctx *cli.Context, obj *parser.ParsedOb
 		}
 	}
 	// Calculate hash from pre-read content
-	hash := sha256.Sum256(content)
-	hashStr := hex.EncodeToString(hash[:])
+	hashStr := storage.CalculateSHA256Hash(content)
 
 	// Detect hash-based CAS filenames: <64-hex>.yaml (or .yml)
 	// This lets us distinguish:

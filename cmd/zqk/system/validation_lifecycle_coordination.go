@@ -42,23 +42,8 @@ func emitValidationLifecycleEventViaCoordinator(
 	auditMetadata[eventKeyEventType] = fmt.Sprintf("validation_%s", eventType)
 	auditMetadata[eventKeyOperation] = fmt.Sprintf("Validation worker %s: %d workers, %d processed, %d failed", eventType, workerCount, processedCount, failedCount)
 	auditMetadata[eventKeyWorkerID] = workerID
-	auditMetadata[eventKeyWorkerCount] = workerCount
-	auditMetadata[eventKeyProcessedCount] = processedCount
-	auditMetadata[eventKeyFailedCount] = failedCount
-	auditMetadata[eventKeyDurationSeconds] = duration.Seconds()
-	auditMetadata[eventKeyOperationType] = eventTypeAsyncValidation
-	auditMetadata[eventKeySource] = sourceBackgroundWorker
-
-	// Determine severity
-	severity := severityLow
-	if status == eventStatusError || failedCount > 0 {
-		if failedCount > processedCount/2 {
-			severity = severityHigh
-		} else {
-			severity = severityMedium
-		}
-	}
-	auditMetadata[eventKeySeverity] = severity
+	severity := determineFailureSeverity(status, failedCount, processedCount)
+	populateWorkerAuditMetadata(auditMetadata, eventTypeAsyncValidation, workerCount, processedCount, failedCount, duration, severity)
 
 	// Build logging fields
 	loggingFields := []coordination.LoggingField{

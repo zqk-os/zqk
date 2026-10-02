@@ -59,13 +59,9 @@ Examples:
 		if projectRoot == emptyValue {
 			return errfmt.Errorf("project root not found")
 		}
-		storageFactory, err := storage.NewStorageFactory(stdctx, projectRoot)
+		storageProvider, err := createSystemStorageProvider(stdctx, projectRoot)
 		if err != nil {
-			return errfmt.Newf("failed to create storage factory").Wrap(err)
-		}
-		storageProvider := storageFactory.GetStorage()
-		if storageProvider == nil {
-			return errfmt.Errorf("storage provider is nil")
+			return err
 		}
 		options := &caspkg.CASRecoveryOptions{
 			RemoveFromIndexIfMissing: removeFromIndexIfMissing,

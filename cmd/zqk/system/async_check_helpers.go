@@ -665,8 +665,7 @@ func discoverAndEnqueueObjects(checkCtx *AsyncCheckContext) error {
 		}).
 		Build()
 
-	_, runErr := pl.RunWithContext(runCtx, st)
-	if runErr != nil {
+	if _, runErr := pl.RunWithContext(runCtx, st); runErr != nil {
 		return runErr
 	}
 	return st.err

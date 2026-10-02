@@ -111,11 +111,8 @@ func NewInspectCmd() *cobra.Command {
 func runInspect(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 		ctx := proc.OperationContext()
-		secCtx := proc.SecurityContext()
-		if secCtx == nil {
-			secCtx = pkgctx.NewSystemSecurityContext()
-		}
-		storageCtx := proc.StorageContext()
+		secCtx := proc.ResolvedSecurityContext()
+		storageCtx := proc.ResolvedStorageContext()
 		sp := proc.Storage()
 
 		// Read flags

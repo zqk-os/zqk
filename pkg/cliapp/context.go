@@ -5,6 +5,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/cliapp/context"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
 )
 
@@ -129,6 +130,22 @@ func GetContextFromCommand(cmd *cobra.Command, initCtx *pkgctx.CliInitialization
 // ZQK_TEST_ROOT, then CWD-based discovery). Use this so the process is always sure which root is in use.
 func ResolveProjectRoot(startPath string) string {
 	return context.ResolveProjectRoot(startPath)
+}
+
+// ResolveCommandProjectRoot resolves and validates the project root from a cobra.Command's CLI context.
+func ResolveCommandProjectRoot(cmd *cobra.Command) (string, error) {
+	ctx := GetContext(cmd)
+	if ctx == nil {
+		return "", errfmt.Errorf("failed to get context")
+	}
+	projectRoot := ResolveProjectRoot(".")
+	if projectRoot == emptyValue {
+		projectRoot = ctx.ProjectRoot
+	}
+	if projectRoot == emptyValue {
+		return "", errfmt.Errorf("project root not found")
+	}
+	return projectRoot, nil
 }
 
 // NewContextManager creates a new context manager

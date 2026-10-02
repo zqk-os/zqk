@@ -225,27 +225,25 @@ func findCurrentPriorityPlan(cmdCtx context.Context, storageProvider storage.Obj
 	}
 
 	// If no in_progress, find active plans
-	filter = storage.ListFilter{
+	activeResult, activeErr := storageProvider.List(cmdCtx, secCtx, storageCtx, storage.ListFilter{
 		Kind:    objects.KindPriorityPlan,
 		Filters: map[string]any{objects.FieldKeyStatus: statusActive},
 		SortBy:  sortByActiveOrder,
 		SortAsc: true,
+	})
+	if activeErr != nil {
+		return nil, errfmt.Newf("failed to query active priority plans").Wrap(activeErr)
 	}
-
-	result, err = storageProvider.List(cmdCtx, secCtx, storageCtx, filter)
-	if err != nil {
-		return nil, errfmt.Newf("failed to query active priority plans").Wrap(err)
-	}
-
-	if len(result.Objects) == 0 {
+	if len(activeResult.Objects) == 0 {
 		return nil, errfmt.Errorf("no active or in_progress priority plans found")
 	}
 
+	activePlan := activeResult.Objects[0]
 	if logger != nil {
-		planID, _ := result.Objects[0][objects.FieldKeyID].(string)
+		planID, _ := activePlan[objects.FieldKeyID].(string)
 		logging.FluentEvent(logger).Debug(fmt.Sprintf("Found active plan: %s", planID)).Log()
 	}
-	return result.Objects[0], nil
+	return activePlan, nil
 }
 
 // generateBranchName generates a branch name from priority plan ID
@@ -712,26 +710,19 @@ func generatePRDetails(storageProvider storage.ObjectStorageProvider, cmdCtx con
 	}
 
 	// Add backlog items summary
-	secCtx := pkgctx.NewSystemSecurityContext()
-	storageCtx := pkgctx.NewStorageContext()
-	filter := storage.ListFilter{
-		Kind:    objects.KindBacklogItem,
-		Filters: map[string]any{objects.FieldKeyPriorityPlanRef: planID},
-	}
-
-	result, err := storageProvider.List(cmdCtx, secCtx, storageCtx, filter)
-	if err == nil && len(result.Objects) > 0 {
+	items, err := listBacklogItemsForPlan(cmdCtx, storageProvider, planID)
+	if err == nil && len(items) > 0 {
 		bodyBuilder.WriteString("## Backlog Items\n\n")
 		completeCount := 0
-		for _, item := range result.Objects {
+		for _, item := range items {
 			status, _ := item[objects.FieldKeyStatus].(string)
 			if status == backlogStatusComplete {
 				completeCount++
 			}
 		}
-		fmt.Fprintf(&bodyBuilder, "- Total items: %d\n", len(result.Objects))
+		fmt.Fprintf(&bodyBuilder, "- Total items: %d\n", len(items))
 		fmt.Fprintf(&bodyBuilder, "- Completed: %d\n", completeCount)
-		fmt.Fprintf(&bodyBuilder, "- Remaining: %d\n\n", len(result.Objects)-completeCount)
+		fmt.Fprintf(&bodyBuilder, "- Remaining: %d\n\n", len(items)-completeCount)
 	}
 
 	bodyBuilder.WriteString("---\n\n")
@@ -741,25 +732,32 @@ func generatePRDetails(storageProvider storage.ObjectStorageProvider, cmdCtx con
 	return title, body, nil
 }
 
-// checkAllBacklogItemsComplete verifies all backlog items for a priority plan are complete
-func checkAllBacklogItemsComplete(storageProvider storage.ObjectStorageProvider, cmdCtx context.Context, planID string, _ *logging.EventLogger) (bool, error) {
+func listBacklogItemsForPlan(ctx context.Context, sp storage.ObjectStorageProvider, planID string) ([]map[string]any, error) {
 	secCtx := pkgctx.NewSystemSecurityContext()
 	storageCtx := pkgctx.NewStorageContext()
 	filter := storage.ListFilter{
 		Kind:    objects.KindBacklogItem,
 		Filters: map[string]any{objects.FieldKeyPriorityPlanRef: planID},
 	}
+	result, err := sp.List(ctx, secCtx, storageCtx, filter)
+	if err != nil {
+		return nil, err
+	}
+	return result.Objects, nil
+}
 
-	result, err := storageProvider.List(cmdCtx, secCtx, storageCtx, filter)
+// checkAllBacklogItemsComplete verifies all backlog items for a priority plan are complete
+func checkAllBacklogItemsComplete(storageProvider storage.ObjectStorageProvider, cmdCtx context.Context, planID string, _ *logging.EventLogger) (bool, error) {
+	items, err := listBacklogItemsForPlan(cmdCtx, storageProvider, planID)
 	if err != nil {
 		return false, err
 	}
 
-	if len(result.Objects) == 0 {
+	if len(items) == 0 {
 		return true, nil // No items means "all complete" (trivially)
 	}
 
-	for _, item := range result.Objects {
+	for _, item := range items {
 		status, _ := item[objects.FieldKeyStatus].(string)
 		if status != backlogStatusComplete && status != objects.ObjectStatusArchived {
 			return false, nil

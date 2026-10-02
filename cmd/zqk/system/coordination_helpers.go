@@ -77,6 +77,17 @@ func determineFailureSeverity(status string, failedCount, totalCount int) string
 	return severityLow
 }
 
+// populateWorkerAuditMetadata populates worker count, processed count, failed count, duration, operation type, and severity.
+func populateWorkerAuditMetadata(m map[string]any, opType string, workerCount, processedCount, failedCount int, duration time.Duration, severity string) {
+	m[eventKeyWorkerCount] = workerCount
+	m[eventKeyProcessedCount] = processedCount
+	m[eventKeyFailedCount] = failedCount
+	m[eventKeyDurationSeconds] = duration.Seconds()
+	m[eventKeyOperationType] = opType
+	m[eventKeySource] = sourceBackgroundWorker
+	m[eventKeySeverity] = severity
+}
+
 // createContextWithLoggingProfile delegates to the canonical cli.CreateContextWithLoggingProfile.
 func createContextWithLoggingProfile(ctx context.Context, profile string) context.Context {
 	return cli.CreateContextWithLoggingProfile(ctx, profile)

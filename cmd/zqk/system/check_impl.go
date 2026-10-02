@@ -218,20 +218,7 @@ func performBlockingCheck(blockingCtx *pkgctx.BlockingCheckContext) *pkgctx.Bloc
 		processDir = datacell.ProcessPrimaryDir(projectRoot)
 	}
 	kinds := discoverObjectKinds(processDir)
-
-	// Use global loaders to share caches across sync and async validation
-	loaders := getGlobalValidationLoaders()
-	specLoader := loaders.SpecLoader
-	lifecycleLoader := loaders.LifecycleLoader
-	validator := loaders.Validator
-
-	// Cache hash registries per kind
-	hashRegistryCache := &HashRegistryCacheType{
-		cache: make(map[string]storage.HashRegistryProvider),
-	}
-
-	// Use object ID cache when available; trigger background build if not (keeps command snappy).
-	objectIDCache := GetGlobalObjectIDCache()
+	res := initCheckSharedResources()
 	if !TryLoadObjectIDCacheOnly(projectRoot) {
 		TriggerBackgroundObjectIDCacheBuild(projectRoot)
 	}
@@ -271,7 +258,7 @@ func performBlockingCheck(blockingCtx *pkgctx.BlockingCheckContext) *pkgctx.Bloc
 					kindResults <- kindBlockingResult{hasBlocking: false, issues: nil}
 				}
 			}()
-			checkResults, _, err := CheckKindObjectsWithCache(checkCtx, pkgctx.NewSystemContext(), dummyCmd, k, nil, specLoader, lifecycleLoader, validator, hashRegistryCache, objectIDCache)
+			checkResults, _, err := CheckKindObjectsWithCache(checkCtx, pkgctx.NewSystemContext(), dummyCmd, k, nil, res.SpecLoader, res.LifecycleLoader, res.Validator, res.HashRegistryCache, res.ObjectIDCache)
 			var issues []pkgctx.BlockingIssue
 			hasBlocking := false
 			if err == nil {
@@ -479,15 +466,7 @@ func CheckKindObjectsWithCache(ctx *cli.Context, stdCtx stdcontext.Context, cmd 
 // It builds loaders/cache and delegates to CheckKindObjectsWithCache.
 func checkKindObjects(ctx *cli.Context, cmd *cobra.Command, kind string, ids []string) ([]CheckResult, error) {
 	// Spec/lifecycle loaders resolve under .zqk/specs — never pass project
-	// root as the loader directory (that looks for <root>/criteria_lifecycle.yaml).
-	loaders := getGlobalValidationLoaders()
-	specLoader := loaders.SpecLoader
-	lifecycleLoader := loaders.LifecycleLoader
-	validator := loaders.Validator
-	hashRegistryCache := &HashRegistryCacheType{
-		cache: make(map[string]storage.HashRegistryProvider),
-	}
-	objectIDCache := GetGlobalObjectIDCache()
+	res := initCheckSharedResources()
 
 	projectRoot := ProjectRootOrResolve(ctx.ProjectRoot)
 	refreshCache := false
@@ -511,7 +490,7 @@ func checkKindObjects(ctx *cli.Context, cmd *cobra.Command, kind string, ids []s
 		}
 	}
 
-	results, _, err := CheckKindObjectsWithCache(ctx, pkgctx.NewSystemContext(), cmd, kind, ids, specLoader, lifecycleLoader, validator, hashRegistryCache, objectIDCache)
+	results, _, err := CheckKindObjectsWithCache(ctx, pkgctx.NewSystemContext(), cmd, kind, ids, res.SpecLoader, res.LifecycleLoader, res.Validator, res.HashRegistryCache, res.ObjectIDCache)
 	return results, err
 }
 

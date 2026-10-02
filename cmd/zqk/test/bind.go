@@ -81,15 +81,15 @@ func executeExplicitBinding(
 ) error {
 	sp := proc.Storage()
 	secCtx := proc.SecurityContext()
-	projectRoot := proc.ProjectRoot()
 	tcObj, err := sp.Read(ctx, secCtx, tcID)
 	if err != nil || tcObj == nil {
 		return fmt.Errorf("test case %s not found: %w", tcID, err)
 	}
 
-	green := color.New(color.FgGreen).SprintFunc()
-	cyan := color.New(color.FgCyan).SprintFunc()
-	bold := color.New(color.Bold).SprintFunc()
+	ui := cli.StandardUIPalette()
+	green := ui.Green
+	cyan := ui.Cyan
+	bold := ui.Bold
 
 	// 1. Bind requirement or backlog item to test case
 	if reqID != "" {
@@ -149,7 +149,7 @@ func executeExplicitBinding(
 	// Refresh dashboard state and save lite-file
 	state := NewDashboardState()
 	_ = state.LoadFromStorage(ctx, proc, false, "", "")
-	_ = state.SaveToLiteFile(projectRoot)
+	_ = state.SaveToLiteFile(proc.ProjectRoot())
 
 	fmt.Fprintf(cmd.OutOrStdout(), "%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("\n%s Lineage updated successfully! Run 'zqk test dashboard' to inspect.\n", green("✓"))))
 	return nil
@@ -274,9 +274,10 @@ func executeAutoBinding(
 	dryRun bool,
 	cmd *cobra.Command,
 ) error {
-	green := color.New(color.FgGreen).SprintFunc()
-	cyan := color.New(color.FgCyan).SprintFunc()
-	bold := color.New(color.Bold).SprintFunc()
+	ui := cli.StandardUIPalette()
+	green := ui.Green
+	cyan := ui.Cyan
+	bold := ui.Bold
 
 	sp := proc.Storage()
 	secCtx := proc.SecurityContext()

@@ -6,3 +6,8 @@ import clipkg "github.com/zqk-os/zqk/pkg/cli"
 func StandardColorPrinters() (cyan, green, yellow func(a ...any) string) {
 	return clipkg.StandardColorPrinters()
 }
+
+// StandardUIPalette returns commonly used terminal text formatters.
+func StandardUIPalette() clipkg.UIPalette {
+	return clipkg.StandardUIPalette()
+}

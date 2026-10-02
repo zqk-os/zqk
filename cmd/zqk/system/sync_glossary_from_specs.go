@@ -71,11 +71,9 @@ func NewSyncGlossaryFromSpecsCmd() *cobra.Command {
 
 func runSyncGlossaryFromSpecs(cmd *cobra.Command, _ []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, _ []string, proc *cli.Processor) error {
-		var err error
-		_ = err
-		root := proc.ProjectRoot()
-		if root == emptyValue {
-			return errfmt.Errorf("project root not found")
+		root, err := requireProjectRoot(proc)
+		if err != nil {
+			return err
 		}
 		specsDir, _ := cmd.Flags().GetString("specs-dir")
 		commandSpecsDir, _ := cmd.Flags().GetString("command-specs-dir")
@@ -501,7 +499,7 @@ func scanCommandSpecCandidates(root, dir string) ([]glossaryCandidate, error) {
 	return out, err
 }
 
-func scanSpecCandidates(root, dir string) ([]glossaryCandidate, error) {
+func collectYAMLFiles(dir string) []string {
 	var files []string
 	_ = filepath.Walk(dir, func(path string, info fileutil.FileInfo, err error) error {
 		if err != nil || info.IsDir() || !strings.HasSuffix(path, ".yaml") {
@@ -510,6 +508,11 @@ func scanSpecCandidates(root, dir string) ([]glossaryCandidate, error) {
 		files = append(files, path)
 		return nil
 	})
+	return files
+}
+
+func scanSpecCandidates(root, dir string) ([]glossaryCandidate, error) {
+	files := collectYAMLFiles(dir)
 	out := make([]glossaryCandidate, 0, len(files))
 	for _, path := range files {
 		m, err := readYAMLMap(path)
@@ -559,14 +562,7 @@ func objectSpecOntologyName(m map[string]any) string {
 }
 
 func scanLifecycleCandidates(root, dir string) ([]glossaryCandidate, error) {
-	var files []string
-	_ = filepath.Walk(dir, func(path string, info fileutil.FileInfo, err error) error {
-		if err != nil || info.IsDir() || !strings.HasSuffix(path, ".yaml") {
-			return nil //nolint:nilerr // continue walking on path error or non-matching file
-		}
-		files = append(files, path)
-		return nil
-	})
+	files := collectYAMLFiles(dir)
 	out := make([]glossaryCandidate, 0, len(files))
 	for _, path := range files {
 		m, err := readYAMLMap(path)

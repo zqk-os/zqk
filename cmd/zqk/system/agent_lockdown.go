@@ -26,12 +26,10 @@ func NewAgentLockdownCmd() *cobra.Command {
 }
 
 func runAgentLockdown(cmd *cobra.Command, unlock bool) error {
-	proc, err := cli.NewProcessor(cmd)
+	_, ctx, err := getGuardedProcessorContext(cmd)
 	if err != nil {
-		return cli.Guard(cmd).Err(err).Wrapf("processor: %w").Return()
+		return err
 	}
-
-	ctx := proc.OperationContext()
 	projectRoot := ProjectRootOrResolve("")
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 

@@ -1,8 +1,6 @@
 package system
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"path/filepath"
 	"strings"
 	"time"
@@ -124,14 +122,9 @@ func checkCASHashMismatch(filePath string) (bool, string, error) {
 // This will recalculate the hash, rename the file, and update the CAS index
 func fixCASHashMismatch(projectRoot, filePath, objectID, kind string) error {
 	systemCtx := pkgctx.NewSystemContext()
-	storageFactory, err := storage.NewStorageFactory(systemCtx, projectRoot)
+	storageProvider, err := createSystemStorageProvider(systemCtx, projectRoot)
 	if err != nil {
-		return errfmt.Newf("failed to create storage factory").Wrap(err)
-	}
-
-	storageProvider := storageFactory.GetStorage()
-	if storageProvider == nil {
-		return errfmt.Errorf("storage provider is nil")
+		return err
 	}
 
 	secCtx := pkgctx.NewSystemSecurityContext()
@@ -241,10 +234,6 @@ func updateFileHash(registry storage.HashRegistryProvider, filePath string) bool
 		return false // Skip if can't read
 	}
 
-	hash := sha256.Sum256(content)
-	hashStr := hex.EncodeToString(hash[:])
-
-	filename := filepath.Base(filePath)
-	registry.SetHash(filename, hashStr)
+	registry.SetHash(filepath.Base(filePath), storage.CalculateSHA256Hash(content))
 	return true
 }

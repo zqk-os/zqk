@@ -17,7 +17,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
-	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/when"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
@@ -205,12 +204,10 @@ func createFeatureFlagAuditEventAsync(
 	flagName string,
 	previousValue, newValue bool,
 ) error {
-	// Create storage factory with timeout context
-	storageFactory, err := storage.NewStorageFactory(ctx, projectRoot)
+	storageProvider, err := createSystemStorageProvider(ctx, projectRoot)
 	if err != nil {
-		return errfmt.Newf("failed to create storage factory").Wrap(err)
+		return err
 	}
-	storageProvider := storageFactory.GetStorage()
 
 	now := time.Now().UTC()
 	// Create audit event object

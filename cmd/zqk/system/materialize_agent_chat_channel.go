@@ -25,18 +25,16 @@ func NewMaterializeAgentChatChannelCmd() *cobra.Command {
 
 func runMaterializeAgentChatChannel(cmd *cobra.Command, _ []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, _ []string, proc *cli.Processor) error {
-		var err error
-		_ = err
-		root := proc.ProjectRoot()
-		if root == emptyValue {
-			return errfmt.Errorf("project root not found")
-		}
 		feedID, err := cmd.Flags().GetString("feed-id")
 		if err != nil {
 			return err
 		}
 		if feedID == "" {
 			return errfmt.Errorf("--feed-id is required (AGF-*)")
+		}
+		root, err := requireProjectRoot(proc)
+		if err != nil {
+			return err
 		}
 		dryRun, err := cmd.Flags().GetBool("dry-run")
 		if err != nil {
