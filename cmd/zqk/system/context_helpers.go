@@ -20,6 +20,17 @@ func getSystemCliContext(cmd *cobra.Command) (*cli.Context, error) {
 	return cli.GetContextFromCommand(cmd, initCtx)
 }
 
+// bindSystemCliContextRunner binds an async progress handler that resolves a system CLI context.
+func bindSystemCliContextRunner(cmd *cobra.Command, fn func(cmd *cobra.Command, ctx *cli.Context, args []string) error) {
+	cli.BindAsyncProgress(cmd, func(cmd *cobra.Command, args []string) error {
+		ctx, err := getSystemCliContext(cmd)
+		if err != nil {
+			return err
+		}
+		return fn(cmd, ctx, args)
+	})
+}
+
 func profileOrDefault(profile, fallback string) string {
 	return strutil.OrDefault(profile, fallback)
 }
