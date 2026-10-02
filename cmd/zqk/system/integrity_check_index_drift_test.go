@@ -20,7 +20,7 @@ func TestIntegrityCheck_CASIndexOutOfSyncIsNotTampering(t *testing.T) {
 	t.Parallel()
 	projectRoot := t.TempDir()
 
-	kind := "audit_event"
+	kind := "backlog_item"
 	kindDir := getKindDirectory(projectRoot, kind)
 	if kindDir == emptyValue {
 		t.Fatalf("kind directory not found for kind %q", kind)
@@ -29,7 +29,7 @@ func TestIntegrityCheck_CASIndexOutOfSyncIsNotTampering(t *testing.T) {
 		t.Fatalf("failed to create kind directory: %v", err)
 	}
 
-	objectID := "AUD-0001"
+	objectID := "BLI-0001"
 	content := []byte("id: " + objectID + "\nkind: " + kind + "\nschema_version: \"" + objects.DefaultSchemaVersion + "\"\n")
 	fileHash := storage.CalculateSHA256Hash(content)
 	filePath := filepath.Join(kindDir, fileHash+".yaml")

@@ -3,7 +3,6 @@ package system
 import (
 	"bytes"
 	"fmt"
-	"path/filepath"
 	"sort"
 	"time"
 
@@ -13,8 +12,6 @@ import (
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/zqk-os/zqk/pkg/paths"
-	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // NewMetricsCmd creates a command to view command metrics
@@ -108,17 +105,9 @@ func runMetrics(cmd *cobra.Command, args []string) error {
 		Day:           day,
 	}
 
-	metricsPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.MetricsDir, paths.CommandMetricsFile)
-
-	// Create directory if it doesn't exist (prevents errors)
-	dir := filepath.Dir(metricsPath)
-	if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
-		return errfmt.Newf("failed to create metrics directory").Wrap(err)
-	}
-
-	store, err := clipkg.NewFileMetricsStore(metricsPath)
+	store, err := openCommandMetricsStore(projectRoot)
 	if err != nil {
-		return errfmt.Newf("failed to load metrics store").Wrap(err)
+		return err
 	}
 
 	var allMetrics map[string]*clipkg.CommandMetrics

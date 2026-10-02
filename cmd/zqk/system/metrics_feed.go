@@ -50,16 +50,9 @@ func runMetricsFeed(cmd *cobra.Command, args []string) error {
 	agentID, _ := cmd.Flags().GetString("agent-id")
 	notify, _ := cmd.Flags().GetBool("notify")
 
-	metricsPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.MetricsDir, paths.CommandMetricsFile)
-
-	dir := filepath.Dir(metricsPath)
-	if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
-		return errfmt.Newf("failed to create metrics directory").Wrap(err)
-	}
-
-	store, err := clipkg.NewFileMetricsStore(metricsPath)
+	store, err := openCommandMetricsStore(projectRoot)
 	if err != nil {
-		return errfmt.Newf("failed to load metrics store").Wrap(err)
+		return err
 	}
 
 	analyzer := clipkg.NewMetricsAnalyzer(store)

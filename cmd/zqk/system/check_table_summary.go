@@ -291,119 +291,40 @@ func writeLayeredSummary(buf *strings.Builder, results []CheckResult, cmd *cobra
 	}
 }
 
-func getGroupedLayer0Rows(results []CheckResult, details bool) [][]string {
-	type groupKey struct {
-		Kind    string
-		Message string
-	}
-	type groupInfo struct {
-		Tier        int
-		AutoFixable bool
-		IDs         []string
-	}
-
-	groups := make(map[groupKey]*groupInfo)
-	var keys []groupKey
-
-	for _, r := range results {
-		for _, issue := range r.Issues {
-			if issue.Category == categoryIntegrity || issue.Category == categoryRegistration {
-				normMsg := normalizeErrorMessage(issue.Message)
-				key := groupKey{
-					Kind:    r.ObjectKind,
-					Message: normMsg,
-				}
-				info, exists := groups[key]
-				if !exists {
-					info = &groupInfo{
-						Tier:        issue.Tier,
-						AutoFixable: issue.AutoFixable,
-					}
-					groups[key] = info
-					keys = append(keys, key)
-				}
-				info.IDs = append(info.IDs, r.ObjectID)
-				if issue.AutoFixable {
-					info.AutoFixable = true
-				}
-			}
-		}
-	}
-
-	sort.Slice(keys, func(i, j int) bool {
-		if keys[i].Message != keys[j].Message {
-			return keys[i].Message < keys[j].Message
-		}
-		return keys[i].Kind < keys[j].Kind
-	})
-
-	var rows [][]string
-	var lastMessage string
-	for _, key := range keys {
-		info := groups[key]
-		severitySymbol := "🟡"
-		if info.Tier == 1 {
-			severitySymbol = "❌"
-		} else if info.Tier == 3 {
-			severitySymbol = "🔹"
-		} else if info.Tier == 4 {
-			severitySymbol = "💡"
-		}
-
-		fixableStr := ""
-		if info.AutoFixable {
-			fixableStr = "  🔧 [Auto-fix]"
-		}
-
-		var suffix string
-		if details {
-			suffix = fixableStr + fmt.Sprintf(" (IDs: %s)", strings.Join(info.IDs, ", "))
-		} else {
-			suffix = fixableStr
-		}
-
-		msgText := key.Message + suffix
-		displayMsg := msgText
-		displaySeverity := severitySymbol
-		if displayMsg == lastMessage {
-			displayMsg = ""
-			displaySeverity = ""
-		} else {
-			lastMessage = displayMsg
-		}
-
-		kindVal := fmt.Sprintf("%s (%d)", formatColumnHeader(key.Kind), len(info.IDs))
-		rows = append(rows, []string{displayMsg, displaySeverity, kindVal})
-	}
-	return rows
+type groupedIssueKey struct {
+	Kind    string
+	Status  string
+	Message string
 }
 
-func getGroupedIssueRows(results []CheckResult, details bool) [][]string {
-	type groupKey struct {
-		Kind    string
-		Status  string
-		Message string
-	}
-	type groupInfo struct {
-		Tier        int
-		AutoFixable bool
-		IDs         []string
-	}
+type groupedIssueInfo struct {
+	Tier        int
+	AutoFixable bool
+	IDs         []string
+}
 
-	groups := make(map[groupKey]*groupInfo)
-	var keys []groupKey
+func groupAndFormatIssueRows(results []CheckResult, details bool, filter func(issue Issue) bool, includeStatus bool) [][]string {
+	groups := make(map[groupedIssueKey]*groupedIssueInfo)
+	var keys []groupedIssueKey
 
 	for _, r := range results {
 		for _, issue := range r.Issues {
+			if filter != nil && !filter(issue) {
+				continue
+			}
 			normMsg := normalizeErrorMessage(issue.Message)
-			key := groupKey{
+			status := ""
+			if includeStatus {
+				status = r.Status
+			}
+			key := groupedIssueKey{
 				Kind:    r.ObjectKind,
-				Status:  r.Status,
+				Status:  status,
 				Message: normMsg,
 			}
 			info, exists := groups[key]
 			if !exists {
-				info = &groupInfo{
+				info = &groupedIssueInfo{
 					Tier:        issue.Tier,
 					AutoFixable: issue.AutoFixable,
 				}
@@ -469,6 +390,16 @@ func getGroupedIssueRows(results []CheckResult, details bool) [][]string {
 		rows = append(rows, []string{displayMsg, displaySeverity, kindVal})
 	}
 	return rows
+}
+
+func getGroupedLayer0Rows(results []CheckResult, details bool) [][]string {
+	return groupAndFormatIssueRows(results, details, func(issue Issue) bool {
+		return issue.Category == categoryIntegrity || issue.Category == categoryRegistration
+	}, false)
+}
+
+func getGroupedIssueRows(results []CheckResult, details bool) [][]string {
+	return groupAndFormatIssueRows(results, details, nil, true)
 }
 
 func renderTableWithTitle(title string, headers []string, rows [][]string) string {

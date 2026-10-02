@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -175,6 +176,11 @@ func getKindDirectory(projectRoot, kind string) string {
 	}
 
 	return datacell.CellCASPrimaryDir(projectRoot, dirName)
+}
+
+func resolveKindDirectoryFromContext(ctx *cli.Context, kind string) (string, string) {
+	projectRoot := ProjectRootOrResolve(ctx.ProjectRoot)
+	return projectRoot, getKindDirectory(projectRoot, kind)
 }
 func inferKindFromID(id string) string {
 	// Use configurable validator
