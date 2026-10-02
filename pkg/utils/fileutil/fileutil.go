@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 )
 
 const (
@@ -209,4 +211,85 @@ func AppendJSONLine(path string, v any) error {
 	defer func() { _ = f.Close() }()
 	_, err = f.Write(append(line, '\n'))
 	return err
+}
+
+// WithOpenFile opens a file at path, calls fn with the open *os.File, and guarantees the file is closed on return.
+func WithOpenFile(path string, fn func(f *os.File) error) error {
+	f, err := Open(path)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = f.Close() }()
+	return fn(f)
+}
+
+// ReadPIDFile reads a numeric process ID from path. Returns (0, false) if unreadable or non-positive.
+func ReadPIDFile(path string) (int, bool) {
+	b, err := ReadFile(path)
+	if err != nil {
+		return 0, false
+	}
+	pid, err := strconv.Atoi(strings.TrimSpace(string(b)))
+	if err != nil || pid <= 0 {
+		return 0, false
+	}
+	return pid, true
+}
+
+// EnsureSymlink creates or updates a symlink at linkPath targeting targetPath.
+// If linkPath already points to targetPath, it returns the resolved path.
+// If linkPath is an existing non-symlink, it returns linkPath unmodified.
+func EnsureSymlink(linkPath, targetPath string) (string, error) {
+	absTarget, err := filepath.Abs(targetPath)
+	if err != nil {
+		absTarget = targetPath
+	}
+	binDir := filepath.Dir(linkPath)
+	if err := EnsureDir(binDir); err != nil {
+		return "", err
+	}
+
+	if fi, err := Lstat(linkPath); err == nil {
+		if fi.Mode()&ModeSymlink == 0 {
+			return linkPath, nil
+		}
+		cur, readErr := Readlink(linkPath)
+		if readErr == nil {
+			curAbs := cur
+			if !filepath.IsAbs(curAbs) {
+				curAbs = filepath.Join(binDir, cur)
+			}
+			if resolved, evalErr := filepath.EvalSymlinks(curAbs); evalErr == nil {
+				curAbs = resolved
+			}
+			symTarget := absTarget
+			if filepath.Dir(absTarget) == binDir {
+				symTarget = filepath.Base(absTarget)
+			}
+			if curAbs == absTarget || cur == symTarget {
+				absLink, err := filepath.Abs(linkPath)
+				if err != nil {
+					return linkPath, nil
+				}
+				return absLink, nil
+			}
+		}
+		if err := Remove(linkPath); err != nil {
+			return "", err
+		}
+	}
+
+	symlinkTarget := absTarget
+	if filepath.Dir(absTarget) == binDir {
+		symlinkTarget = filepath.Base(absTarget)
+	}
+
+	if err := Symlink(symlinkTarget, linkPath); err != nil {
+		return "", err
+	}
+	absLink, err := filepath.Abs(linkPath)
+	if err != nil {
+		return linkPath, nil
+	}
+	return absLink, nil
 }

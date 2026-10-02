@@ -6,7 +6,6 @@ import (
 	"slices"
 	"sort"
 	"strings"
-	"sync"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -148,21 +147,15 @@ func (f *FileObjectStorage) listCASPathGeneral(ctx context.Context, secCtx *pkgc
 	}
 	defer releaseSlot()
 
-	// Bounded parallel read+parse: fixed worker count to avoid thread exhaustion when listing
-	// many objects (one goroutine per ID was causing 10k+ goroutines and fatal thread exhaustion).
-	listMaxConcurrentReads := getListReadWorkers()
+	pool := newListIDWorkerPool(ids)
+	results := pool.results
+	workCh := pool.workCh
+	numWorkers := pool.numWorkers
+	listWg := &pool.wg
+	listBud := pool.budget
 	var parsedObjects []*objects.ParsedObject
-	type casParseResult struct {
-		parsed *objects.ParsedObject
-	}
-	results := make(chan casParseResult, listMaxConcurrentReads*2)
-	workCh := createClosedWorkChannel(ids)
-	numWorkers := calcBoundedWorkerCount(len(ids), listMaxConcurrentReads)
-	var listWg sync.WaitGroup
-
-	listBud := goroutinelabels.DefaultBudget()
 	for w := 0; w < numWorkers; w++ {
-		casBuilder := goroutinelabels.NewGoroutine(ConstStreamFileStorageListCasRead, ConstStreamListCasWorker).WithWaitGroup(&listWg)
+		casBuilder := goroutinelabels.NewGoroutine(ConstStreamFileStorageListCasRead, ConstStreamListCasWorker).WithWaitGroup(listWg)
 		// The first reader is an essential fallback. Optional parallel readers use the
 		// global budget, but exhausting it must not leave List without a worker.
 		if w > 0 && listBud != nil {

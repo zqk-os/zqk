@@ -103,79 +103,47 @@ func parseNotEqualFilter(filterStr string) (field string, value any, err error) 
 	return fieldName, map[string]any{filterMongoOpNotEq: parsedValue}, nil
 }
 
-// parseDoubleEqualFilter parses a filter with == operator
-func parseDoubleEqualFilter(filterStr string) (field string, value any, err error) {
-	fieldPart, valuePart, ok := strings.Cut(filterStr, "==")
+func parseDelimitedFilter(filterStr, op string, supportPipeSeparated bool) (field string, value any, err error) {
+	fieldPart, valuePart, ok := strings.Cut(filterStr, op)
 	if !ok {
-		return "", nil, errfmt.Errorf("invalid == filter format: %s", filterStr)
+		return "", nil, errfmt.Errorf("invalid %s filter format: %s", op, filterStr)
 	}
 
 	fieldName := normalizeFieldName(fieldPart)
 	if fieldName == "" {
-		return "", nil, errfmt.Errorf("invalid filter syntax %q: missing field name before == operator", filterStr)
+		return "", nil, errfmt.Errorf("invalid filter syntax %q: missing field name before %s operator", filterStr, op)
 	}
 	fieldValue := strings.TrimSpace(valuePart)
-	fieldValue = strings.Trim(fieldValue, `"'`)
-
-	if strings.Contains(fieldValue, filterValueSeparator) {
-		valueList := parsePipeSeparatedValues(fieldValue)
-		return fieldName, map[string]any{filterMongoOpIn: valueList}, nil
+	if supportPipeSeparated {
+		fieldValue = strings.Trim(fieldValue, `"'`)
+		if strings.Contains(fieldValue, filterValueSeparator) {
+			valueList := parsePipeSeparatedValues(fieldValue)
+			return fieldName, map[string]any{filterMongoOpIn: valueList}, nil
+		}
 	}
 
 	parsedValue := parseYAMLValue(fieldValue)
-	if filterMap, ok := parsedValue.(map[string]any); ok {
-		return fieldName, filterMap, nil
+	if supportPipeSeparated {
+		if filterMap, ok := parsedValue.(map[string]any); ok {
+			return fieldName, filterMap, nil
+		}
 	}
-
 	return fieldName, parsedValue, nil
+}
+
+// parseDoubleEqualFilter parses a filter with == operator
+func parseDoubleEqualFilter(filterStr string) (field string, value any, err error) {
+	return parseDelimitedFilter(filterStr, "==", true)
 }
 
 // parseEqualFilter parses a filter with = operator
 func parseEqualFilter(filterStr string) (field string, value any, err error) {
-	fieldPart, valuePart, ok := strings.Cut(filterStr, filterOpEqual)
-	if !ok {
-		return "", nil, errfmt.Errorf("invalid = filter format: %s", filterStr)
-	}
-
-	fieldName := normalizeFieldName(fieldPart)
-	if fieldName == "" {
-		return "", nil, errfmt.Errorf("invalid filter syntax %q: missing field name before = operator", filterStr)
-	}
-	fieldValue := strings.TrimSpace(valuePart)
-	fieldValue = strings.Trim(fieldValue, `"'`)
-
-	// Check for pipe-separated values (OR condition)
-	if strings.Contains(fieldValue, filterValueSeparator) {
-		valueList := parsePipeSeparatedValues(fieldValue)
-		return fieldName, map[string]any{filterMongoOpIn: valueList}, nil
-	}
-
-	// Try to parse as YAML value (supports JSON-like maps for operators)
-	parsedValue := parseYAMLValue(fieldValue)
-
-	// If parsed value is a map, it might be an explicit operator (e.g., {"$gt": 10})
-	if filterMap, ok := parsedValue.(map[string]any); ok {
-		return fieldName, filterMap, nil
-	}
-
-	return fieldName, parsedValue, nil
+	return parseDelimitedFilter(filterStr, filterOpEqual, true)
 }
 
 // parseColonFilter parses a filter with : separator
 func parseColonFilter(filterStr string) (field string, value any, err error) {
-	fieldPart, valuePart, ok := strings.Cut(filterStr, filterOpColon)
-	if !ok {
-		return "", nil, errfmt.Errorf("invalid : filter format: %s", filterStr)
-	}
-
-	fieldName := normalizeFieldName(fieldPart)
-	if fieldName == "" {
-		return "", nil, errfmt.Errorf("invalid filter syntax %q: missing field name before : operator", filterStr)
-	}
-	fieldValue := strings.TrimSpace(valuePart)
-
-	parsedValue := parseYAMLValue(fieldValue)
-	return fieldName, parsedValue, nil
+	return parseDelimitedFilter(filterStr, filterOpColon, false)
 }
 
 // parsePipeSeparatedValues parses pipe-separated values into a list

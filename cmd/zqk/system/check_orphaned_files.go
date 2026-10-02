@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/kernelcas"
@@ -347,12 +346,8 @@ func reindexOrphanCASHashFile(kind, kindDir, filePath, hash string, cas *storage
 		ID:     hash,
 		Intent: kernelcas.IntentReconcileIndex,
 		CommitFn: func(_ context.Context) error {
-			data, err := fileutil.ReadFile(filePath)
+			obj, err := storage.ReadYAMLMapFile(filePath)
 			if err != nil {
-				return err
-			}
-			var obj map[string]any
-			if err := yaml.Unmarshal(data, &obj); err != nil {
 				return err
 			}
 			oid, _ := obj[objects.FieldKeyID].(string)

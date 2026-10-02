@@ -5,7 +5,6 @@
 package gitevidence
 
 import (
-	"bytes"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -160,17 +159,15 @@ func short(full string) string {
 func gitOutput(repoRoot string, args ...string) (string, error) {
 	cmd := execwrap.Command("git", args...)
 	cmd.Dir = repoRoot
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-	if err := cmd.Run(); err != nil {
-		msg := strings.TrimSpace(stderr.String())
+	stdout, stderr, err := execwrap.RunWithBuffers(cmd)
+	if err != nil {
+		msg := strings.TrimSpace(stderr)
 		if msg == "" {
 			msg = err.Error()
 		}
 		return "", fmt.Errorf("%s", msg)
 	}
-	return stdout.String(), nil
+	return stdout, nil
 }
 
 // ValidateBranchAncestorOfTrunk ensures the branch_name is an ancestor of the trunk branch (main).

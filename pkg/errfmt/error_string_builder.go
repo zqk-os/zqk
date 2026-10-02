@@ -67,12 +67,7 @@ func (b *ErrorStringBuilder) AndIfTrue(cond bool, template string, args ...any) 
 	if !cond {
 		return b
 	}
-	if strings.Contains(template, "%w") {
-		b.parts = append(b.parts, fmt.Errorf(template, args...).Error())
-		return b
-	}
-	b.parts = append(b.parts, fmt.Sprintf(template, args...))
-	return b
+	return b.With(template, args...)
 }
 
 // Build returns the composed message.

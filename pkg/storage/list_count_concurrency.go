@@ -7,6 +7,8 @@ import (
 	"sync"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
@@ -90,9 +92,15 @@ func AcquireListCountContext(ctx context.Context) (context.Context, func(), erro
 
 // WithListCountSlotInt executes fn within an acquired list/count slot, returning an int and error.
 func WithListCountSlotInt(ctx context.Context, fn func(listCtx context.Context) (int, error)) (int, error) {
+	return WithListCountSlot(ctx, fn)
+}
+
+// WithListCountSlot executes fn within an acquired list/count slot, returning T and error.
+func WithListCountSlot[T any](ctx context.Context, fn func(listCtx context.Context) (T, error)) (T, error) {
 	listCtx, release, err := AcquireListCountContext(ctx)
 	if err != nil {
-		return 0, err
+		var zero T
+		return zero, err
 	}
 	defer release()
 	return fn(listCtx)
@@ -137,4 +145,26 @@ func getListReadWorkers() int {
 		return def
 	}
 	return ClampInt(n, minWorkers, maxWorkers)
+}
+
+type casParseResult struct {
+	parsed *objects.ParsedObject
+}
+
+type listIDWorkerPool struct {
+	results    chan casParseResult
+	workCh     <-chan string
+	numWorkers int
+	wg         sync.WaitGroup
+	budget     *goroutinelabels.Budget
+}
+
+func newListIDWorkerPool(ids []string) listIDWorkerPool {
+	limit := getListReadWorkers()
+	return listIDWorkerPool{
+		results:    make(chan casParseResult, limit*2),
+		workCh:     createClosedWorkChannel(ids),
+		numWorkers: calcBoundedWorkerCount(len(ids), limit),
+		budget:     goroutinelabels.DefaultBudget(),
+	}
 }

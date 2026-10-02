@@ -75,18 +75,13 @@ func (a *CommandAdapter) Send(ctx context.Context, message types.Message, action
 	cmd := execwrap.CommandContext(cmdCtx, argv[0], argv[1:]...)
 	cmd.Stdin = bytes.NewReader(jsonData)
 
-	// Capture stdout/stderr
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-
-	// Execute command
-	err = cmd.Run()
+	// Execute command with captured buffers
+	stdout, stderr, err := execwrap.RunWithBuffers(cmd)
 	if err != nil {
 		// Command failed
-		errMsg := stderr.String()
+		errMsg := stderr
 		if errMsg == emptyValue {
-			errMsg = stdout.String()
+			errMsg = stdout
 		}
 		if errMsg == emptyValue {
 			errMsg = err.Error()
@@ -95,10 +90,10 @@ func (a *CommandAdapter) Send(ctx context.Context, message types.Message, action
 	}
 
 	// Log successful execution
-	if stdout.Len() > 0 {
+	if len(stdout) > 0 {
 		logging.Fluent(a.logger).Debug(LogEventSchedulerTransceiverCommandExecuted).
 			Command(action.Endpoint).
-			StdoutSnippet(stdout.String()).
+			StdoutSnippet(stdout).
 			Log()
 	}
 

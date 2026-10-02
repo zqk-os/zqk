@@ -125,18 +125,14 @@ func (f *FileObjectStorage) listAuditEventsByIDs(ctx context.Context, cas *filec
 	if len(ids) == 0 {
 		return nil, nil
 	}
-	listMaxConcurrentReads := getListReadWorkers()
-	type casParseResult struct {
-		parsed *objects.ParsedObject
-	}
-	results := make(chan casParseResult, listMaxConcurrentReads*2)
-	workCh := createClosedWorkChannel(ids)
-	numWorkers := calcBoundedWorkerCount(len(ids), listMaxConcurrentReads)
-	var listWg sync.WaitGroup
-
-	listBud := goroutinelabels.DefaultBudget()
+	pool := newListIDWorkerPool(ids)
+	results := pool.results
+	workCh := pool.workCh
+	numWorkers := pool.numWorkers
+	listWg := &pool.wg
+	listBud := pool.budget
 	for w := 0; w < numWorkers; w++ {
-		casBuilder := goroutinelabels.NewGoroutine(ConstStreamFileStorageListAuditByIds, ConstStreamListAuditByIdsWorker).WithWaitGroup(&listWg)
+		casBuilder := goroutinelabels.NewGoroutine(ConstStreamFileStorageListAuditByIds, ConstStreamListAuditByIdsWorker).WithWaitGroup(listWg)
 		if w > 0 && listBud != nil {
 			casBuilder = casBuilder.WithBudget(listBud)
 		}

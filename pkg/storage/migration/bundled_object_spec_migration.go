@@ -65,10 +65,7 @@ func EnsureBundledObjectSpecsMigrated(ctx context.Context, projectRoot string, l
 		if walkErr != nil {
 			return walkErr
 		}
-		if d.IsDir() {
-			return nil
-		}
-		if appledouble.SkipPathInTreeWalk(path) {
+		if appledouble.SkipDirOrSidecar(d.IsDir(), path) {
 			return nil
 		}
 		name := d.Name()

@@ -3,8 +3,22 @@ package storage
 import (
 	"fmt"
 
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"gopkg.in/yaml.v3"
 )
+
+// ReadYAMLMapFile reads a YAML file and unmarshals it into a map[string]any.
+func ReadYAMLMapFile(filePath string) (map[string]any, error) {
+	data, err := fileutil.ReadFile(filePath)
+	if err != nil {
+		return nil, err
+	}
+	var obj map[string]any
+	if err := yaml.Unmarshal(data, &obj); err != nil {
+		return nil, err
+	}
+	return obj, nil
+}
 
 // FormatMultiLineYAML ensures multi-line strings are properly formatted in YAML
 // It uses yaml.Node to set the literal block scalar style (|) for strings containing newlines

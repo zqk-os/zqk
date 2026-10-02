@@ -533,3 +533,11 @@ func WithLockCtxLogger(mu sync.Locker, ctx context.Context, operation string, lo
 func WithRLockCtxLogger(mu *sync.RWMutex, ctx context.Context, operation string, logger LockLogger, fn func() error) error {
 	return WithRLockTimeout(mu, ctx, nil, logger, operation, fn)
 }
+
+// WithRWMutexCtxLogger executes fn under write or read lock of mu using ctx, logger, and operation.
+func WithRWMutexCtxLogger(mu *sync.RWMutex, ctx context.Context, operation string, logger LockLogger, isWrite bool, fn func() error) error {
+	if isWrite {
+		return WithLockTimeout(mu, ctx, nil, logger, operation, fn)
+	}
+	return WithRLockTimeout(mu, ctx, nil, logger, operation, fn)
+}

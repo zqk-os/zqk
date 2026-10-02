@@ -363,10 +363,7 @@ func collectFilesByKind(projectRoot, kind string, logger logging.Logger, quiet b
 		if err != nil {
 			return err
 		}
-		if info.IsDir() {
-			return nil
-		}
-		if appledouble.SkipPathInTreeWalk(path) {
+		if appledouble.SkipDirOrSidecar(info.IsDir(), path) {
 			return nil
 		}
 		if strings.HasSuffix(path, ".yaml") || strings.HasSuffix(path, ".yml") {

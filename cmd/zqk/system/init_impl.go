@@ -337,6 +337,29 @@ func determineProjectRoot() string {
 	return ""
 }
 
+func registerShippedDocsHelper(projectRoot string, logger logging.Logger) error {
+	reg, skip, err := docman.RegisterShippedDocs(context.Background(), projectRoot, logger)
+	if err != nil {
+		return errfmt.Newf("failed to register shipped documentation in kernel graph").Wrap(err)
+	}
+	if reg > 0 || skip > 0 {
+		logging.Fluent(logger).Info("Shipped documentation registered in graph").
+			Int("registered", reg).
+			Int("skipped", skip).
+			Log()
+	}
+	return nil
+}
+
+func seedInitialSystemAndKernelGraph(projectRoot string, logger logging.Logger) {
+	if err := writeSystemAccount(projectRoot); err != nil {
+		logging.Fluent(logger).Warn("Failed to create system account").WithError(err).Log()
+	}
+	if err := seedStarterKernelGraph(projectRoot, logger); err != nil {
+		logging.Fluent(logger).Warn("Failed to seed starter kernel graph").WithError(err).Log()
+	}
+}
+
 // runGreenfieldInit handles greenfield project initialization
 func runGreenfieldInit(projectRoot, projectName, template string, force bool, logger logging.Logger, progress *initProgress) error {
 	projectDataDir := filepath.Join(projectRoot, paths.ProjectDataDir)
@@ -387,23 +410,12 @@ func runGreenfieldInit(projectRoot, projectName, template string, force bool, lo
 
 	// Register shipped documentation in doc_entry graph (architecture, best-practices, onboarding).
 	// Skips archive trees and docs/launch.
-	if reg, skip, err := docman.RegisterShippedDocs(context.Background(), projectRoot, logger); err != nil {
-		return errfmt.Newf("failed to register shipped documentation in kernel graph").Wrap(err)
-	} else if reg > 0 || skip > 0 {
-		logging.Fluent(logger).Info("Shipped documentation registered in graph").
-			Int("registered", reg).
-			Int("skipped", skip).
-			Log()
+	if err := registerShippedDocsHelper(projectRoot, logger); err != nil {
+		return err
 	}
 
 	progress.Step(3, 7, "Seeding starter kernel graph (goals, plans, milestones)...")
-	if err := writeSystemAccount(projectRoot); err != nil {
-		logging.Fluent(logger).Warn("Failed to create system account").WithError(err).Log()
-	}
-
-	if err := seedStarterKernelGraph(projectRoot, logger); err != nil {
-		logging.Fluent(logger).Warn("Failed to seed starter kernel graph").WithError(err).Log()
-	}
+	seedInitialSystemAndKernelGraph(projectRoot, logger)
 
 	// Create project YAML SSOT at config/zqk.yaml
 	if err := writeProjectConfigFiles(projectDataDir, projectName, template, force); err != nil {
@@ -530,25 +542,12 @@ func runLegacyInit(projectRoot, projectName, template string, force bool, logger
 	}
 
 	// Register shipped documentation in doc_entry graph (architecture, best-practices, onboarding).
-	if reg, skip, err := docman.RegisterShippedDocs(context.Background(), projectRoot, logger); err != nil {
-		return errfmt.Newf("failed to register shipped documentation").Wrap(err)
-	} else if reg > 0 || skip > 0 {
-		logging.Fluent(logger).Info("Shipped documentation registered in graph").
-			Int("registered", reg).
-			Int("skipped", skip).
-			Log()
+	if err := registerShippedDocsHelper(projectRoot, logger); err != nil {
+		return err
 	}
 
 	progress.Step(3, 7, "Seeding starter kernel graph (goals, plans, milestones)...")
-
-	// Create system account if missing
-	if err := writeSystemAccount(projectRoot); err != nil {
-		logging.Fluent(logger).Warn("Failed to create system account").WithError(err).Log()
-	}
-
-	if err := seedStarterKernelGraph(projectRoot, logger); err != nil {
-		logging.Fluent(logger).Warn("Failed to seed starter kernel graph").WithError(err).Log()
-	}
+	seedInitialSystemAndKernelGraph(projectRoot, logger)
 
 	// Write root isolation and kernel config files
 	if err := writeRootIsolationFiles(projectRoot, force, logger); err != nil {

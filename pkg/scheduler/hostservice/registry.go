@@ -216,44 +216,9 @@ func EnsureServiceRoleSymlink(projectRoot, role, targetBin string) (string, erro
 		binDir = filepath.Join(projectRoot, binDir)
 	}
 	linkPath := filepath.Join(binDir, primaryName)
-	if err := fileutil.EnsureDir(filepath.Dir(linkPath)); err != nil {
-		return "", errfmt.Newf("ensure bin dir for service role symlink").Wrap(err)
-	}
-
-	if fi, err := fileutil.Lstat(linkPath); err == nil {
-		if fi.Mode()&fileutil.ModeSymlink == 0 {
-			return linkPath, nil
-		}
-		cur, readErr := fileutil.Readlink(linkPath)
-		if readErr == nil {
-			curAbs := cur
-			if !filepath.IsAbs(curAbs) {
-				curAbs = filepath.Join(filepath.Dir(linkPath), cur)
-			}
-			if resolved, evalErr := filepath.EvalSymlinks(curAbs); evalErr == nil {
-				curAbs = resolved
-			}
-			if curAbs == absTarget {
-				absLink, _ := filepath.Abs(linkPath)
-				return absLink, nil
-			}
-		}
-		if err := fileutil.Remove(linkPath); err != nil {
-			return "", errfmt.Newf("replace service role symlink").Wrap(err)
-		}
-	}
-
-	symlinkTarget := absTarget
-	if filepath.Dir(absTarget) == binDir {
-		symlinkTarget = filepath.Base(absTarget)
-	}
-
-	if err := fileutil.Symlink(symlinkTarget, linkPath); err != nil {
-		return "", errfmt.Newf("create service role symlink %s -> %s", linkPath, symlinkTarget).Wrap(err)
-	}
-	absLink, err := filepath.Abs(linkPath)
+	absLink, err := fileutil.EnsureSymlink(linkPath, absTarget)
 	if err != nil {
-		return linkPath, nil
+		return "", errfmt.Newf("create service role symlink %s -> %s", linkPath, absTarget).Wrap(err)
 	}
 	return absLink, nil
 }
@@ -443,6 +408,34 @@ func (a WindowsStubAdapter) Status(Entry) (string, error) {
 	return "unsupported", a.Install(Entry{})
 }
 
+func saveEntryInRegistry(e Entry) error {
+	reg, err := LoadRegistry()
+	if err != nil {
+		return err
+	}
+	reg.UpsertEntry(e)
+	return SaveRegistry(reg)
+}
+
+func mutateRegistryEntry(rootID string, mutate func(e *Entry) error) (Entry, error) {
+	reg, err := LoadRegistry()
+	if err != nil {
+		return Entry{}, err
+	}
+	e, ok := reg.FindByRootID(rootID)
+	if !ok {
+		return Entry{}, errfmt.Errorf("root_id %s not in host service registry", rootID)
+	}
+	if err := mutate(&e); err != nil {
+		return Entry{}, err
+	}
+	reg.UpsertEntry(e)
+	if err := SaveRegistry(reg); err != nil {
+		return Entry{}, err
+	}
+	return e, nil
+}
+
 // InstallRoot registers and installs a unit for absRoot.
 func InstallRoot(absRoot string) (Entry, error) {
 	abs, err := filepath.Abs(absRoot)
@@ -467,12 +460,7 @@ func InstallRoot(absRoot string) (Entry, error) {
 	if err := NewAdapter().Install(e); err != nil {
 		return Entry{}, err
 	}
-	reg, err := LoadRegistry()
-	if err != nil {
-		return Entry{}, err
-	}
-	reg.UpsertEntry(e)
-	if err := SaveRegistry(reg); err != nil {
+	if err := saveEntryInRegistry(e); err != nil {
 		return Entry{}, err
 	}
 	return e, nil
@@ -485,30 +473,20 @@ func Rebind(rootID, newAbs string) (Entry, error) {
 		return Entry{}, errfmt.Newf("abs new path").Wrap(err)
 	}
 	abs = filepath.Clean(abs)
-	reg, err := LoadRegistry()
-	if err != nil {
-		return Entry{}, err
-	}
-	e, ok := reg.FindByRootID(rootID)
-	if !ok {
-		return Entry{}, errfmt.Errorf("root_id %s not in host service registry", rootID)
-	}
-	adapter := NewAdapter()
-	_ = adapter.Stop(e)
-	_ = adapter.Uninstall(e)
-	e.AbsRoot = abs
-	e.BinaryRef = ResolveServiceDaemonBinary(abs)
-	if err := adapter.Install(e); err != nil {
-		return Entry{}, err
-	}
-	if e.DesiredState == DesiredStateEnabled {
-		_ = adapter.Start(e)
-	}
-	reg.UpsertEntry(e)
-	if err := SaveRegistry(reg); err != nil {
-		return Entry{}, err
-	}
-	return e, nil
+	return mutateRegistryEntry(rootID, func(e *Entry) error {
+		adapter := NewAdapter()
+		_ = adapter.Stop(*e)
+		_ = adapter.Uninstall(*e)
+		e.AbsRoot = abs
+		e.BinaryRef = ResolveServiceDaemonBinary(abs)
+		if err := adapter.Install(*e); err != nil {
+			return err
+		}
+		if e.DesiredState == DesiredStateEnabled {
+			_ = adapter.Start(*e)
+		}
+		return nil
+	})
 }
 
 // GC removes units whose abs_root is missing or desired_state=absent.
@@ -622,18 +600,8 @@ func SetEntryDesiredState(rootID, state string) (Entry, error) {
 	if state == "" {
 		return Entry{}, errfmt.Errorf("invalid desired_state %q", state)
 	}
-	reg, err := LoadRegistry()
-	if err != nil {
-		return Entry{}, err
-	}
-	e, ok := reg.FindByRootID(rootID)
-	if !ok {
-		return Entry{}, errfmt.Errorf("root_id %s not in host service registry", rootID)
-	}
-	e.DesiredState = state
-	reg.UpsertEntry(e)
-	if err := SaveRegistry(reg); err != nil {
-		return Entry{}, err
-	}
-	return e, nil
+	return mutateRegistryEntry(rootID, func(e *Entry) error {
+		e.DesiredState = state
+		return nil
+	})
 }

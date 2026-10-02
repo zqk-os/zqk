@@ -9,20 +9,14 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/storage"
 
-	"gopkg.in/yaml.v3"
-
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func (m *DSIAMigrationUtility) MigrateObjectToDSIA(ctx context.Context, secCtx *pkgctx.SecurityContext, kind, hash, filePath string, removeOldFile bool) error {
-	data, err := fileutil.ReadFile(filePath)
+	obj, err := storage.ReadYAMLMapFile(filePath)
 	if err != nil {
-		return err
-	}
-	var obj map[string]any
-	if err := yaml.Unmarshal(data, &obj); err != nil {
 		return err
 	}
 	dsia := storage.NewDSIAStorageProvider(m.facade.GetProcessDir())

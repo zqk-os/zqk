@@ -211,16 +211,12 @@ func (w *RuntimeWrangler) Start() error {
 }
 
 func readPidFile(path string) (int, bool) {
-	b, err := fileutil.ReadFile(path)
-	if err != nil {
-		return 0, false
-	}
-	pid, err := strconv.Atoi(strings.TrimSpace(string(b)))
-	if err != nil || pid <= 0 {
+	pid, ok := fileutil.ReadPIDFile(path)
+	if !ok {
 		return 0, false
 	}
 	// Check alive
-	err = syscall.Kill(pid, 0)
+	err := syscall.Kill(pid, 0)
 	return pid, err == nil
 }
 
