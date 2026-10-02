@@ -1,7 +1,6 @@
 package system
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/zqk-os/zqk/pkg/cliapp"
@@ -73,14 +72,11 @@ func runAlign(cmd *cobra.Command, gapsOnly bool, goalID string, scoreOnly bool, 
 		return errfmt.Errorf("not a ZQK project (no project root found)")
 	}
 
-	factory, err := storage.NewStorageFactory(cmd.Context(), projectRoot)
+	storageProvider, cleanup, err := openStorageProvider(cmd.Context(), projectRoot)
 	if err != nil {
-		return errfmt.Newf("storage factory").Wrap(err)
+		return err
 	}
-	storageProvider := factory.GetStorage()
-	if storageProvider != nil {
-		defer func() { _ = storageProvider.Shutdown(context.Background()) }() // Background: request-or-shutdown derived
-	}
+	defer cleanup()
 
 	secCtx := pkgctx.NewSystemSecurityContext()
 	storageCtx := pkgctx.NewStorageContext()

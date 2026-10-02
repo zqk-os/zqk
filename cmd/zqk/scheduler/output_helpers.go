@@ -3,14 +3,68 @@ package scheduler
 import (
 	"context"
 	"fmt"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cliapp"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/coordination"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
+
+type schedulerQueryBaseContext struct {
+	ProjectRoot     string
+	StorageProvider storagepkg.ObjectStorageProvider
+	SecCtx          *pkgctx.SecurityContext
+	StorageCtx      *pkgctx.StorageContext
+}
+
+func initSchedulerQueryBaseContext(ctx *cli.Context, timeout time.Duration) (*schedulerQueryBaseContext, error) {
+	if ctx == nil {
+		return nil, errfmt.Errorf("failed to get CLI context")
+	}
+	var projectRoot string
+	if strings.TrimSpace(ctx.ProjectRoot) != emptyValue {
+		if abs, err := filepath.Abs(ctx.ProjectRoot); err == nil {
+			projectRoot = abs
+		} else {
+			projectRoot = filepath.Clean(ctx.ProjectRoot)
+		}
+	}
+	if projectRoot == emptyValue {
+		projectRoot = cli.ResolveProjectRoot(".")
+	}
+	if projectRoot == emptyValue {
+		return nil, errfmt.Errorf("project root not found")
+	}
+
+	cmdCtx, cancel := context.WithTimeout(pkgctx.NewSystemContext(), timeout)
+	defer cancel()
+
+	storageProvider, err := storagepkg.GetGlobalStorageProviderCache().GetOrCreate(cmdCtx, projectRoot)
+	if err != nil {
+		return nil, errfmt.Newf("failed to get storage").Wrap(err)
+	}
+
+	return &schedulerQueryBaseContext{
+		ProjectRoot:     projectRoot,
+		StorageProvider: storageProvider,
+		SecCtx:          pkgctx.NewSystemSecurityContext(),
+		StorageCtx:      ctx.GetStorageContext(),
+	}, nil
+}
+
+func queryCachedEventIDs(projectRoot string, start, end time.Time, limit int) (bool, []string) {
+	cache := storagepkg.GetGlobalHighVolumeEventCache()
+	if !cache.IsPopulatedForProject(projectRoot) {
+		return false, nil
+	}
+	ids := cache.QueryByTimeWindow(start, end, limit)
+	return len(ids) > 0, ids
+}
 
 // OutputJobHistoryData handles output of job history data using coordinator
 // This is a shared component that centralizes format handling and coordinator integration

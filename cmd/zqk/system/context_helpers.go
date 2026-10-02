@@ -1,9 +1,12 @@
 package system
 
 import (
+	"context"
+
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/strutil"
 )
 
@@ -34,4 +37,19 @@ func resolveCommandProjectRoot(cmd *cobra.Command) (string, error) {
 		return "", errfmt.Errorf("project root not found")
 	}
 	return projectRoot, nil
+}
+
+// openStorageProvider creates a StorageFactory for projectRoot and returns its ObjectStorageProvider along with a deferrable cleanup function.
+func openStorageProvider(ctx context.Context, projectRoot string) (storage.ObjectStorageProvider, func(), error) {
+	factory, err := storage.NewStorageFactory(ctx, projectRoot)
+	if err != nil {
+		return nil, nil, errfmt.Newf("storage factory").Wrap(err)
+	}
+	storageProvider := factory.GetStorage()
+	cleanup := func() {
+		if storageProvider != nil {
+			_ = storageProvider.Shutdown(context.Background())
+		}
+	}
+	return storageProvider, cleanup, nil
 }

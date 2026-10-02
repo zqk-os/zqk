@@ -2,7 +2,6 @@ package object
 
 import (
 	"fmt"
-	"sort"
 	"strings"
 
 	"github.com/fatih/color"
@@ -37,55 +36,19 @@ func runDemote(cmd *cobra.Command, args []string) error {
 
 		var errors []string
 		for _, idArg := range tc.args {
-			// Resolve natural language intents
-			id, err := proc.ResolveSemanticArgument(ctx, "", idArg)
+			target, err := resolveAndLoadLifecycleTarget(ctx, secCtx, proc, lifecycleLoader, idArg)
 			if err != nil {
-				errors = append(errors, fmt.Sprintf("%s: failed to resolve ID: %v", idArg, err))
+				errors = append(errors, fmt.Sprintf("%s: %v", idArg, err))
 				continue
 			}
 
-			// Read current object
-			current, err := proc.Storage().Read(ctx, secCtx, id)
-			if err != nil {
-				errors = append(errors, fmt.Sprintf("%s: failed to read object: %v", id, err))
-				continue
-			}
-
-			kind, _ := current[objects.FieldKeyKind].(string)
-			currentStatus, _ := current[objects.FieldKeyStatus].(string)
-
-			// Load lifecycle
-			lifecycle, err := lifecycleLoader.LoadLifecycle(kind)
-			if err != nil {
-				errors = append(errors, fmt.Sprintf("%s (%s): no lifecycle defined: %v", id, kind, err))
-				continue
-			}
-
-			// Sort statuses by percent complete default values to establish progression order
-			type statusWithPercent struct {
-				value   string
-				percent float64
-			}
-			var sortedStatuses []statusWithPercent
-			for _, st := range lifecycle.Statuses {
-				sortedStatuses = append(sortedStatuses, statusWithPercent{
-					value:   st.Value,
-					percent: getPercentComplete(st.Value, lifecycle.PercentComplete),
-				})
-			}
-			sort.Slice(sortedStatuses, func(i, j int) bool {
-				return sortedStatuses[i].percent < sortedStatuses[j].percent
-			})
-
-			// Populate statuses slice in sorted order
-			var statuses []string
-			currentIdx := -1
-			for i, swp := range sortedStatuses {
-				statuses = append(statuses, swp.value)
-				if swp.value == currentStatus {
-					currentIdx = i
-				}
-			}
+			id := target.id
+			current := target.current
+			kind := target.kind
+			currentStatus := target.currentStatus
+			lifecycle := target.lifecycle
+			statuses := target.statuses
+			currentIdx := target.currentIdx
 
 			if currentIdx == -1 {
 				errors = append(errors, fmt.Sprintf("%s (%s): current status '%s' is not defined in the lifecycle", id, kind, currentStatus))

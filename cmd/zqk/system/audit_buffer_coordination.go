@@ -53,31 +53,17 @@ func emitAuditBufferFlushEventViaCoordinator(
 		{Key: "event_count", Value: eventCount},
 		{Key: eventKeyStatus, Value: status},
 	}
-	if duration > 0 {
-		loggingFields = append(loggingFields, coordination.LoggingField{Key: eventKeyDurationSeconds, Value: duration.Seconds()})
-	}
 
 	// Build metrics data
-	metricsData := make(map[string]any)
-	metricsData["group_key"] = groupKey
-	metricsData[eventKeyEventType] = eventType
-	metricsData[eventKeyTargetKind] = targetKind
-	metricsData[objects.FieldKeyEventCount] = eventCount
-	metricsData[eventKeyStatus] = status
-	if duration > 0 {
-		metricsData[eventKeyDurationSeconds] = duration.Seconds()
-		metricsData[eventKeyDurationNS] = duration.Nanoseconds()
-	}
-	if err != nil {
-		metricsData[eventKeyError] = err.Error()
+	metricsData := map[string]any{
+		"group_key":                groupKey,
+		eventKeyEventType:          eventType,
+		eventKeyTargetKind:         targetKind,
+		objects.FieldKeyEventCount: eventCount,
+		eventKeyStatus:             status,
 	}
 
-	// Create event data
-	eventData := &coordination.EventData{
-		LoggingFields: loggingFields,
-		AuditMetadata: auditMetadata,
-		MetricsData:   metricsData,
-	}
+	eventData := buildCoordinationEventData(loggingFields, auditMetadata, metricsData, duration, err)
 
 	eventCtx := buildEventContext(ctx, operationID, operationType, status, eventData, duration, err, false, true, true, false)
 	emitAsyncCoordinationEvent(ctx, coordinator, "audit_buffer_event_emit", fmt.Sprintf("emitting audit buffer flush event: %s", groupKey), eventCtx)

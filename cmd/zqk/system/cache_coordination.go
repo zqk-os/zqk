@@ -58,9 +58,13 @@ func emitObjectIDCacheProgressViaCoordinator(ctx context.Context, operationID st
 	}
 	progressBuilder.StartSimple(func() {
 		if syncCoordinator, ok := coord.(*coordination.Coordinator); ok {
-			_ = syncCoordinator.EmitOperationalSync(ctx, eventCtx) //nolint:errcheck // Best-effort for CLI
+			if err := syncCoordinator.EmitOperationalSync(ctx, eventCtx); err != nil {
+				return
+			}
 		} else {
-			_ = coord.Emit(ctx, eventCtx) //nolint:errcheck // Best-effort
+			if err := coord.Emit(ctx, eventCtx); err != nil {
+				return
+			}
 		}
 	})
 }
@@ -77,93 +81,27 @@ func emitCacheBuildEventViaCoordinator(
 	buildDuration time.Duration,
 	profile string,
 ) {
-	projectRoot = ProjectRootOrResolveDot(projectRoot)
-	if projectRoot == emptyValue {
-		// Best effort - skip if no project root
-		return
-	}
-
-	// Build operation description
-	opDescription := fmt.Sprintf("Object ID cache %s", operation)
+	opDesc := fmt.Sprintf("Object ID cache %s", operation)
 	if forceRebuild {
-		opDescription = fmt.Sprintf("Object ID cache force %s", operation)
+		opDesc = fmt.Sprintf("Object ID cache force %s", operation)
 	}
-
-	// Build metadata
-	metadata := map[string]any{
-		eventKeySource:        sourceCacheBuild,
-		eventKeyProjectRoot:   projectRoot,
-		eventKeyOperation:     operation,
-		eventKeyEntryCount:    entryCount,
-		eventKeyForceRebuild:  forceRebuild,
-		eventKeyBuildDuration: buildDuration.String(),
-		eventKeyCacheType:     cacheTypeObjectID,
-	}
-
-	// Build audit event options
-	options := &storage.AuditEventOptions{
-		EventType:  eventTypeCacheOperation,
-		Operation:  opDescription,
-		TargetKind: targetKindCache,
-		Severity:   severityLow, // Low severity - routine operation
-		Metadata:   metadata,
-		CreatedBy:  pkgctx.SystemAccountID,
-	}
-
-	// Embed LoggingContext in context so coordinator logging respects --context profile
-	ctx = createContextWithLoggingProfile(ctx, profile)
-
-	// Use global coordinator to ensure subscribers receive events
-	// The global coordinator will route to appropriate channels based on event context
-	coordinator := coordination.GetCoordinator()
-
-	// Ensure audit router is available for this coordinator
-	// Note: If global coordinator doesn't have audit router, events will still be emitted
-	// but audit channel won't work. This is acceptable for cache events (best effort).
-
-	// Build audit metadata from options
-	auditMetadata := make(map[string]any)
-	mergeMetadata(auditMetadata, options.Metadata)
-	auditMetadata[eventKeyEventType] = options.EventType
-	auditMetadata[eventKeyOperation] = options.Operation
-	auditMetadata[eventKeySeverity] = options.Severity
-	auditMetadata[eventKeyTargetKind] = options.TargetKind
-
-	// Create event data
-	eventData := &coordination.EventData{
-		LoggingFields: []coordination.LoggingField{
-			{Key: eventKeyCacheOperation, Value: operation},
-			{Key: eventKeyEntryCount, Value: entryCount},
-			{Key: eventKeyForceRebuild, Value: forceRebuild},
-		},
-		AuditMetadata: auditMetadata,
-		MetricsData:   nil, // Cache build events don't create metrics
-	}
-
-	// Determine status
 	status := eventStatusComplete
 	if entryCount == 0 {
-		status = eventStatusWarning // Empty cache is a warning
+		status = eventStatusWarning
 	}
-
-	// Create operation ID
-	operationID := fmt.Sprintf("cache_%s_%d", operation, time.Now().Unix())
-
-	// Create event context (audit + operational for cache availability tracking)
-	eventCtx := coordination.NewEventContext(operationID, eventTypeCacheOperation, status).
-		WithEventData(eventData).
-		WithContext(ctx).
-		WithChannels(false, true, false, true) // Audit + operational (for cache availability tracking)
-
-	// Emit via coordinator (async, non-blocking)
-	bud := goroutinelabels.DefaultBudget()
-	emitBuilder := goroutinelabels.NewGoroutine("cache_event_emit", fmt.Sprintf("emitting cache %s event", operation))
-	if bud != nil {
-		emitBuilder = emitBuilder.WithBudget(bud)
-	}
-	emitBuilder.StartSimple(func() {
-		_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
-	})
+	emitCacheAuditEvent(
+		ctx, projectRoot, profile,
+		operation, opDesc,
+		sourceCacheBuild, severityLow, status,
+		eventTypeCacheOperation, false, entryCount,
+		map[string]any{
+			eventKeyForceRebuild:  forceRebuild,
+			eventKeyBuildDuration: buildDuration.String(),
+		},
+		[]coordination.LoggingField{
+			{Key: eventKeyForceRebuild, Value: forceRebuild},
+		},
+	)
 }
 
 // emitCacheSaveEventViaCoordinator emits cache save events via the coordination system
@@ -176,74 +114,16 @@ func emitCacheSaveEventViaCoordinator(
 	saveDuration time.Duration,
 	profile string,
 ) {
-	projectRoot = ProjectRootOrResolveDot(projectRoot)
-	if projectRoot == emptyValue {
-		// Best effort - skip if no project root
-		return
-	}
-
-	// Build metadata
-	metadata := map[string]any{
-		eventKeySource:       sourceCacheSave,
-		eventKeyProjectRoot:  projectRoot,
-		eventKeyOperation:    "save",
-		eventKeyEntryCount:   entryCount,
-		eventKeySaveDuration: saveDuration.String(),
-		eventKeyCacheType:    cacheTypeObjectID,
-	}
-
-	// Build audit event options
-	options := &storage.AuditEventOptions{
-		EventType:  eventTypeCacheOperation,
-		Operation:  "Object ID cache saved to disk",
-		TargetKind: targetKindCache,
-		Severity:   severityLow, // Low severity - routine operation
-		Metadata:   metadata,
-		CreatedBy:  pkgctx.SystemAccountID,
-	}
-
-	// Embed LoggingContext in context so coordinator logging respects --context profile
-	ctx = createContextWithLoggingProfile(ctx, profile)
-
-	// Use global coordinator to ensure subscribers receive events
-	coordinator := coordination.GetCoordinator()
-
-	// Build audit metadata from options
-	auditMetadata := make(map[string]any)
-	mergeMetadata(auditMetadata, options.Metadata)
-	auditMetadata[eventKeyEventType] = options.EventType
-	auditMetadata[eventKeyOperation] = options.Operation
-	auditMetadata[eventKeySeverity] = options.Severity
-	auditMetadata[eventKeyTargetKind] = options.TargetKind
-
-	// Create event data
-	eventData := &coordination.EventData{
-		LoggingFields: []coordination.LoggingField{
-			{Key: eventKeyCacheOperation, Value: "save"},
-			{Key: eventKeyEntryCount, Value: entryCount},
+	emitCacheAuditEvent(
+		ctx, projectRoot, profile,
+		"save", "Object ID cache saved to disk",
+		sourceCacheSave, severityLow, eventStatusComplete,
+		eventTypeCacheOperation, false, entryCount,
+		map[string]any{
+			eventKeySaveDuration: saveDuration.String(),
 		},
-		AuditMetadata: auditMetadata,
-		MetricsData:   nil,
-	}
-
-	// Create operation ID
-	operationID := fmt.Sprintf("cache_save_%d", time.Now().Unix())
-
-	// Create event context (audit + operational for cache availability tracking)
-	eventCtx := coordination.NewEventContext(operationID, eventTypeCacheOperation, eventStatusComplete).
-		WithEventData(eventData).
-		WithContext(ctx).
-		WithChannels(false, true, false, true) // Audit + operational
-
-	// Emit via coordinator (async, non-blocking)
-	saveBud := goroutinelabels.DefaultBudget()
-	saveBuilder := goroutinelabels.NewGoroutine("cache_save_event_emit", "emitting cache save event")
-	if saveBud != nil {
-		saveBuilder = saveBuilder.WithBudget(saveBud)
-	}
-	saveBuilder.StartSimple(func() {
-		_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
-	})
+		nil,
+	)
 }
 
 // emitCacheAvailabilityEventViaCoordinator emits cache availability events via the coordination system
@@ -257,92 +137,84 @@ func emitCacheAvailabilityEventViaCoordinator(
 	operation string, // "validation_start", "reference_check", etc.
 	profile string,
 ) {
-	projectRoot = ProjectRootOrResolveDot(projectRoot)
-	if projectRoot == emptyValue {
-		// Best effort - skip if no project root
+	opDesc := fmt.Sprintf("Cache availability check for %s", operation)
+	severity := severityLow
+	status := eventStatusComplete
+	if !available {
+		opDesc = fmt.Sprintf("Cache unavailable for %s", operation)
+		severity = severityHigh
+		status = eventStatusError
+	}
+	emitCacheAuditEvent(
+		ctx, projectRoot, profile,
+		operation, opDesc,
+		sourceCacheAvailability, severity, status,
+		eventTypeCacheAvailability, true, entryCount,
+		map[string]any{
+			eventKeyAvailable: available,
+		},
+		[]coordination.LoggingField{
+			{Key: eventKeyCacheAvailable, Value: available},
+		},
+	)
+}
+
+func emitCacheAuditEvent(
+	ctx context.Context,
+	projectRoot string,
+	profile string,
+	operation string,
+	opDescription string,
+	source string,
+	severity string,
+	status string,
+	eventType string,
+	loggingChannel bool,
+	entryCount int,
+	extraMetadata map[string]any,
+	extraLoggingFields []coordination.LoggingField,
+) {
+	root := ProjectRootOrResolveDot(projectRoot)
+	if root == emptyValue {
 		return
 	}
-
-	// Build operation description
-	opDescription := fmt.Sprintf("Cache availability check for %s", operation)
-	if !available {
-		opDescription = fmt.Sprintf("Cache unavailable for %s", operation)
-	}
-
-	// Build metadata
+	ctx = createContextWithLoggingProfile(ctx, profile)
+	coordinator := coordination.GetCoordinator()
 	metadata := map[string]any{
-		eventKeySource:      sourceCacheAvailability,
-		eventKeyProjectRoot: projectRoot,
+		eventKeySource:      source,
+		eventKeyProjectRoot: root,
 		eventKeyOperation:   operation,
-		eventKeyAvailable:   available,
 		eventKeyEntryCount:  entryCount,
 		eventKeyCacheType:   cacheTypeObjectID,
 	}
-
-	// Build audit event options
-	severity := severityLow
-	if !available {
-		severity = severityHigh // High severity if cache is unavailable
+	for k, v := range extraMetadata {
+		metadata[k] = v
 	}
-
 	options := &storage.AuditEventOptions{
-		EventType:  eventTypeCacheAvailability,
+		EventType:  eventType,
 		Operation:  opDescription,
 		TargetKind: targetKindCache,
 		Severity:   severity,
 		Metadata:   metadata,
 		CreatedBy:  pkgctx.SystemAccountID,
 	}
+	auditMetadata := buildAuditMetadataFromOptions(options)
+	loggingFields := append([]coordination.LoggingField{
+		{Key: eventKeyCacheOperation, Value: operation},
+		{Key: eventKeyEntryCount, Value: entryCount},
+	}, extraLoggingFields...)
 
-	// Embed LoggingContext in context so coordinator logging respects --context profile
-	ctx = createContextWithLoggingProfile(ctx, profile)
-
-	// Use global coordinator to ensure subscribers receive events
-	coordinator := coordination.GetCoordinator()
-
-	// Build audit metadata from options
-	auditMetadata := make(map[string]any)
-	mergeMetadata(auditMetadata, options.Metadata)
-	auditMetadata[eventKeyEventType] = options.EventType
-	auditMetadata[eventKeyOperation] = options.Operation
-	auditMetadata[eventKeySeverity] = options.Severity
-	auditMetadata[eventKeyTargetKind] = options.TargetKind
-
-	// Create event data
 	eventData := &coordination.EventData{
-		LoggingFields: []coordination.LoggingField{
-			{Key: eventKeyCacheAvailable, Value: available},
-			{Key: eventKeyEntryCount, Value: entryCount},
-			{Key: eventKeyOperation, Value: operation},
-		},
+		LoggingFields: loggingFields,
 		AuditMetadata: auditMetadata,
 		MetricsData:   nil,
 	}
-
-	// Determine status
-	status := eventStatusComplete
-	if !available {
-		status = eventStatusError // Cache unavailable is an error
-	}
-
-	// Create operation ID
-	operationID := fmt.Sprintf("cache_availability_%s_%d", operation, time.Now().Unix())
-
-	// Create event context (all channels for availability tracking)
-	eventCtx := coordination.NewEventContext(operationID, eventTypeCacheAvailability, status).
+	opID := fmt.Sprintf("%s_%d", source, time.Now().Unix())
+	eventCtx := coordination.NewEventContext(opID, eventType, status).
 		WithEventData(eventData).
 		WithContext(ctx).
-		WithChannels(true, true, false, true) // Logging, audit, operational (no metrics)
-
-	// Emit via coordinator (async, non-blocking)
-	availBud := goroutinelabels.DefaultBudget()
-	availBuilder := goroutinelabels.NewGoroutine("cache_event_emit", fmt.Sprintf("emitting cache %s event", operation))
-	if availBud != nil {
-		availBuilder = availBuilder.WithBudget(availBud)
-	}
-	availBuilder.StartSimple(func() {
-		_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
-	})
+		WithChannels(loggingChannel, true, false, true)
+	emitAsyncCoordinationEvent(ctx, coordinator, "cache_event_emit", "emitting cache coordination event", eventCtx)
 }
 
 // emitCacheSidecarsIdleViaCoordinator emits when background object-id cache and async reverse-reference
@@ -353,8 +225,8 @@ func emitCacheAvailabilityEventViaCoordinator(
 // idle → same subscriber) for the same root without an async boundary; see
 // docs/architecture/concurrency-patterns-v1.0.md § Cache sidecar idle coordination.
 func emitCacheSidecarsIdleViaCoordinator(ctx context.Context, projectRoot string) {
-	projectRoot = ProjectRootOrResolveDot(projectRoot)
-	if projectRoot == emptyValue {
+	root := ProjectRootOrResolveDot(projectRoot)
+	if root == emptyValue {
 		return
 	}
 	coordinator := coordination.GetCoordinator()
@@ -365,12 +237,12 @@ func emitCacheSidecarsIdleViaCoordinator(ctx context.Context, projectRoot string
 	eventData := &coordination.EventData{
 		LoggingFields: []coordination.LoggingField{
 			{Key: eventKeyCacheEvent, Value: "cache_sidecars_idle"},
-			{Key: eventKeyProjectRoot, Value: projectRoot},
+			{Key: eventKeyProjectRoot, Value: root},
 		},
 		AuditMetadata: nil,
 		MetricsData: map[string]any{
 			"cache_sidecars_idle": 1,
-			eventKeyProjectRoot:   projectRoot,
+			eventKeyProjectRoot:   root,
 		},
 	}
 
@@ -381,19 +253,5 @@ func emitCacheSidecarsIdleViaCoordinator(ctx context.Context, projectRoot string
 		WithChannels(true, false, true, true) // logging + metrics + operational (no audit noise)
 
 	ctx = createContextWithLoggingProfile(ctx, systemProfileSystem)
-
-	bud := goroutinelabels.DefaultBudget()
-	emitBuilder := goroutinelabels.NewGoroutine("cache_sidecars_idle_emit", "emitting cache_sidecars_idle for project root").
-		WithPanicHandler(func(r any) {
-			logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Warn("cache_sidecars_idle emit panic (best-effort)").
-				String("panic", fmt.Sprint(r)).
-				ProjectRoot(projectRoot).
-				Log()
-		})
-	if bud != nil {
-		emitBuilder = emitBuilder.WithBudget(bud)
-	}
-	emitBuilder.StartSimple(func() {
-		_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
-	})
+	emitAsyncCoordinationEvent(ctx, coordinator, "cache_sidecars_idle_emit", "emitting cache_sidecars_idle for project root", eventCtx)
 }

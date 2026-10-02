@@ -7,7 +7,6 @@ import (
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/coordination"
-	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
@@ -79,18 +78,7 @@ func emitCacheAuditEventViaCoordinator(
 	}
 
 	// Build audit metadata from options
-	auditMetadata := make(map[string]any)
-	mergeMetadata(auditMetadata, options.Metadata)
-	auditMetadata[eventKeyEventType] = options.EventType
-	auditMetadata[eventKeyOperation] = options.Operation
-	auditMetadata[eventKeySeverity] = options.Severity
-	auditMetadata[eventKeyTargetKind] = options.TargetKind
-	if options.TargetID != emptyValue {
-		auditMetadata[eventKeyTargetID] = options.TargetID
-	}
-	if options.TargetPath != emptyValue {
-		auditMetadata[objects.FieldKeyTargetPath] = options.TargetPath
-	}
+	auditMetadata := buildAuditMetadataFromOptions(options)
 
 	// Create event data
 	eventData := &coordination.EventData{
@@ -117,9 +105,5 @@ func emitCacheAuditEventViaCoordinator(
 		WithContext(ctx).
 		WithChannels(false, true, false, false) // Only audit, no logging/metrics/operational
 
-	// Emit via coordinator (async, non-blocking)
-	goroutinelabels.NewGoroutine("check_cache_audit_emitter", "emitting check cache audit event").
-		StartSimple(func() {
-			_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
-		})
+	emitAsyncCoordinationEvent(ctx, coordinator, "check_cache_audit_emitter", "emitting check cache audit event", eventCtx)
 }

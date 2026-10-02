@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -13,6 +14,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects/koi"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/specbuilder/builders"
 	"github.com/zqk-os/zqk/pkg/storage"
@@ -155,3 +157,71 @@ func flushDeleteVisibility(cmd *cobra.Command, proc *cli.Processor, id string, c
 	}
 	return duration
 }
+
+type statusWithPercent struct {
+	value   string
+	percent float64
+}
+
+type loadedLifecycleTarget struct {
+	id             string
+	current        map[string]any
+	kind           string
+	currentStatus  string
+	lifecycle      *objects.Lifecycle
+	sortedStatuses []statusWithPercent
+	statuses       []string
+	currentIdx     int
+}
+
+func resolveAndLoadLifecycleTarget(ctx context.Context, secCtx *pkgctx.SecurityContext, proc *cli.Processor, lifecycleLoader *objects.LifecycleLoader, idArg string) (*loadedLifecycleTarget, error) {
+	id, err := proc.ResolveSemanticArgument(ctx, "", idArg)
+	if err != nil {
+		return nil, fmt.Errorf("failed to resolve ID: %w", err)
+	}
+
+	current, err := proc.Storage().Read(ctx, secCtx, id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read object: %w", err)
+	}
+
+	kind := koi.Kind(current)
+	currentStatus := koi.Status(current)
+
+	lifecycle, err := lifecycleLoader.LoadLifecycle(kind)
+	if err != nil {
+		return nil, fmt.Errorf("%s (%s): no lifecycle defined: %w", id, kind, err)
+	}
+
+	var sortedStatuses []statusWithPercent
+	for _, st := range lifecycle.Statuses {
+		sortedStatuses = append(sortedStatuses, statusWithPercent{
+			value:   st.Value,
+			percent: objects.LifecycleProgressPercent(st.Value, lifecycle.PercentComplete),
+		})
+	}
+	sort.Slice(sortedStatuses, func(i, j int) bool {
+		return sortedStatuses[i].percent < sortedStatuses[j].percent
+	})
+
+	var statuses []string
+	currentIdx := -1
+	for i, swp := range sortedStatuses {
+		statuses = append(statuses, swp.value)
+		if swp.value == currentStatus {
+			currentIdx = i
+		}
+	}
+
+	return &loadedLifecycleTarget{
+		id:             id,
+		current:        current,
+		kind:           kind,
+		currentStatus:  currentStatus,
+		lifecycle:      lifecycle,
+		sortedStatuses: sortedStatuses,
+		statuses:       statuses,
+		currentIdx:     currentIdx,
+	}, nil
+}
+

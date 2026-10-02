@@ -3,7 +3,6 @@ package object
 import (
 	"context"
 	"fmt"
-	"sort"
 	"strings"
 
 	"github.com/fatih/color"
@@ -58,55 +57,20 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 			errors = append(errors, fmt.Sprintf("%s: skipped due to context timeout: %v", idArg, ctx.Err()))
 			break
 		}
-		// Resolve natural language intents
-		id, err := proc.ResolveSemanticArgument(ctx, "", idArg)
+		target, err := resolveAndLoadLifecycleTarget(ctx, secCtx, proc, lifecycleLoader, idArg)
 		if err != nil {
-			errors = append(errors, fmt.Sprintf("%s: failed to resolve ID: %v", idArg, err))
+			errors = append(errors, fmt.Sprintf("%s: %v", idArg, err))
 			continue
 		}
 
-		// Read current object
-		current, err := proc.Storage().Read(ctx, secCtx, id)
-		if err != nil {
-			errors = append(errors, fmt.Sprintf("%s: failed to read object: %v", id, err))
-			continue
-		}
-
-		kind := koi.Kind(current)
-		currentStatus := koi.Status(current)
-
-		// Load lifecycle
-		lifecycle, err := lifecycleLoader.LoadLifecycle(kind)
-		if err != nil {
-			errors = append(errors, fmt.Sprintf("%s (%s): no lifecycle defined: %v", id, kind, err))
-			continue
-		}
-
-		// Sort statuses by percent complete default values to establish progression order
-		type statusWithPercent struct {
-			value   string
-			percent float64
-		}
-		var sortedStatuses []statusWithPercent
-		for _, st := range lifecycle.Statuses {
-			sortedStatuses = append(sortedStatuses, statusWithPercent{
-				value:   st.Value,
-				percent: objects.LifecycleProgressPercent(st.Value, lifecycle.PercentComplete),
-			})
-		}
-		sort.Slice(sortedStatuses, func(i, j int) bool {
-			return sortedStatuses[i].percent < sortedStatuses[j].percent
-		})
-
-		// Populate statuses slice in sorted order
-		var statuses []string
-		currentIdx := -1
-		for i, swp := range sortedStatuses {
-			statuses = append(statuses, swp.value)
-			if swp.value == currentStatus {
-				currentIdx = i
-			}
-		}
+		id := target.id
+		current := target.current
+		kind := target.kind
+		currentStatus := target.currentStatus
+		lifecycle := target.lifecycle
+		statuses := target.statuses
+		sortedStatuses := target.sortedStatuses
+		currentIdx := target.currentIdx
 
 		if currentIdx == -1 {
 			// Kernel repair: illegal/undefined status (e.g. legacy "proposed") cannot walk

@@ -1,7 +1,6 @@
 package system
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
@@ -10,7 +9,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/authcred"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -62,14 +60,11 @@ func parseMCPPermissions(permsStr string) []string {
 
 // loadAccountDetailsFromStorage loads account details from storage
 func loadAccountDetailsFromStorage(cmd *cobra.Command, projectRoot string, accountID string) map[string]any {
-	factory, err := storage.NewStorageFactory(cmd.Context(), projectRoot)
+	storageProvider, cleanup, err := openStorageProvider(cmd.Context(), projectRoot)
 	if err != nil {
 		return nil
 	}
-	storageProvider := factory.GetStorage()
-	if storageProvider != nil {
-		defer func() { _ = storageProvider.Shutdown(context.Background()) }() // Background: request-or-shutdown derived
-	}
+	defer cleanup()
 
 	secCtx := pkgctx.NewSystemSecurityContext()
 	accountObj, err := storageProvider.Read(cmd.Context(), secCtx, accountID)

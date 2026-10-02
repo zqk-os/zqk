@@ -6,10 +6,8 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/coordination"
-	"github.com/zqk-os/zqk/pkg/goroutinelabels"
-	"github.com/zqk-os/zqk/pkg/storage"
-
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // emitBufferedAuditEventViaCoordinator emits buffered audit events via the coordination system
@@ -76,9 +74,5 @@ func emitBufferedAuditEventViaCoordinator(
 		WithContext(ctx).
 		WithChannels(false, true, false, false) // Only audit, no logging/metrics/operational
 
-	// Emit via coordinator (async, non-blocking)
-	goroutinelabels.NewGoroutine("buffer_audit_event_emitter", "emitting buffer audit event").
-		StartSimple(func() {
-			_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
-		})
+	emitAsyncCoordinationEvent(ctx, coordinator, "buffer_audit_event_emitter", "emitting buffer audit event", eventCtx)
 }
