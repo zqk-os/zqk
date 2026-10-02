@@ -59,28 +59,16 @@ func emitOperationExecutorEventViaCoordinator(
 		{Key: eventKeyFailedCount, Value: failedCount},
 		{Key: eventKeyStatus, Value: status},
 	}
-	if duration > 0 {
-		loggingFields = append(loggingFields, coordination.LoggingField{Key: eventKeyDurationSeconds, Value: duration.Seconds()})
-	}
-
 	// Build metrics data
-	metricsData := make(map[string]any)
-	metricsData[eventKeyOperationType] = operationType
-	metricsData[eventKeyWorkerCount] = workerCount
-	metricsData[eventKeyProcessedCount] = processedCount
-	metricsData[eventKeyFailedCount] = failedCount
-	metricsData[eventKeyStatus] = status
-	if duration > 0 {
-		metricsData[eventKeyDurationSeconds] = duration.Seconds()
-		metricsData[eventKeyDurationNS] = duration.Nanoseconds()
+	metricsData := map[string]any{
+		eventKeyOperationType:  operationType,
+		eventKeyWorkerCount:    workerCount,
+		eventKeyProcessedCount: processedCount,
+		eventKeyFailedCount:    failedCount,
+		eventKeyStatus:         status,
 	}
 
-	// Create event data
-	eventData := &coordination.EventData{
-		LoggingFields: loggingFields,
-		AuditMetadata: auditMetadata,
-		MetricsData:   metricsData,
-	}
+	eventData := buildCoordinationEventData(loggingFields, auditMetadata, metricsData, duration, nil)
 
 	// Create event context (enable audit, metrics, and logging; operational for lifecycle events)
 	emitOperational := operationType == "worker_start" || operationType == "worker_shutdown" || operationType == "worker_idle_shutdown"

@@ -55,10 +55,9 @@ func runAuditReport(cmd *cobra.Command, args []string) error {
 		return errfmt.Errorf("project root not found")
 	}
 
-	metricsPath := filepath.Join(projectRoot, paths.ProjectDataDir, paths.MetricsDir, paths.CommandMetricsFile)
-	store, err := clipkg.NewFileMetricsStore(metricsPath)
+	store, err := openCommandMetricsStore(projectRoot)
 	if err != nil {
-		return errfmt.Newf("failed to load metrics store").Wrap(err)
+		return err
 	}
 
 	// Create analyzer

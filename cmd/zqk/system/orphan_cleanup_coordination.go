@@ -84,31 +84,19 @@ func emitOrphanCleanupEventViaCoordinator(
 		{Key: eventKeyFailureCount, Value: failureCount},
 		{Key: eventKeyStatus, Value: status},
 	}
-	if duration > 0 {
-		loggingFields = append(loggingFields, coordination.LoggingField{Key: eventKeyDurationSeconds, Value: duration.Seconds()})
-	}
-
 	// Build metrics data
-	metricsData := make(map[string]any)
-	metricsData[eventKeyOperationType] = operationType
-	metricsData[eventKeyBatchSize] = batchSize
-	metricsData[eventKeySuccessCount] = successCount
-	metricsData[eventKeyFailureCount] = failureCount
-	metricsData[eventKeyStatus] = status
-	if duration > 0 {
-		metricsData[eventKeyDurationSeconds] = duration.Seconds()
-		metricsData[eventKeyDurationNS] = duration.Nanoseconds()
+	metricsData := map[string]any{
+		eventKeyOperationType: operationType,
+		eventKeyBatchSize:     batchSize,
+		eventKeySuccessCount:  successCount,
+		eventKeyFailureCount:  failureCount,
+		eventKeyStatus:        status,
 	}
 	if len(failedFiles) > 0 {
 		metricsData[eventKeyFailedFileCount] = len(failedFiles)
 	}
 
-	// Create event data
-	eventData := &coordination.EventData{
-		LoggingFields: loggingFields,
-		AuditMetadata: auditMetadata,
-		MetricsData:   metricsData,
-	}
+	eventData := buildCoordinationEventData(loggingFields, auditMetadata, metricsData, duration, nil)
 
 	// Create event context (enable audit, metrics, and logging; operational for lifecycle events)
 	emitOperational := operationType == "worker_started" || operationType == "worker_stopped"

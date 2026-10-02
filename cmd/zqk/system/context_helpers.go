@@ -2,7 +2,9 @@ package system
 
 import (
 	"context"
+	"fmt"
 	"path/filepath"
+	"strings"
 
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
@@ -12,6 +14,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 	"github.com/zqk-os/zqk/pkg/strutil"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -155,4 +158,65 @@ func openCommandMetricsStore(projectRoot string) (*clipkg.FileMetricsStore, erro
 	}
 	return store, nil
 }
+
+// getFileObjectStorage initializes a storage factory for projectRoot and unwraps its FileObjectStorage.
+func getFileObjectStorage(ctx context.Context, projectRoot string) (*storage.FileObjectStorage, error) {
+	factory, err := storage.NewStorageFactory(ctx, projectRoot)
+	if err != nil {
+		return nil, errfmt.Newf("failed to create storage factory").Wrap(err)
+	}
+
+	mainStorage := factory.GetStorage()
+	if fileStorage, ok := mainStorage.(*storage.FileObjectStorage); ok {
+		return fileStorage, nil
+	}
+	if hybrid, isHybrid := mainStorage.(*storage.HybridObjectStorage); isHybrid {
+		if fileStorage, ok := hybrid.GetPrimary().(*storage.FileObjectStorage); ok {
+			return fileStorage, nil
+		}
+		return nil, errfmt.Errorf("primary storage in HybridObjectStorage is not FileObjectStorage")
+	}
+	return nil, errfmt.Errorf("storage provider is not a FileObjectStorage")
+}
+
+// formatMigrationSummary formats the report for CAS and DSIA migration operations.
+func formatMigrationSummary(title, emptyMsg string, migratedByKind map[string]int, errorsByKind map[string][]error, ctx context.Context) string {
+	var b strings.Builder
+	fmt.Fprintf(&b, "%s Migration completed.\n", title)
+
+	totalMigrated := 0
+	for kind, count := range migratedByKind {
+		fmt.Fprintf(&b, "  %s: %d objects migrated\n", kind, count)
+		totalMigrated += count
+	}
+
+	if totalMigrated == 0 {
+		fmt.Fprintf(&b, "  %s\n", emptyMsg)
+	}
+
+	for kind, errs := range errorsByKind {
+		if len(errs) > 0 {
+			fmt.Fprintf(&b, "  %s: %d errors\n", kind, len(errs))
+			for _, err := range errs {
+				fmt.Fprintf(&b, "    - %v\n", err)
+			}
+		}
+	}
+
+	q := caspkg.GetGlobalCASOrphanCleanupQueue()
+	if q != nil {
+		fmt.Fprintf(&b, "\nRunning Zero-Orphan Cleanup Pipeline...\n")
+		processed, err := q.ProcessQueueIfIdle(ctx)
+		if err != nil {
+			fmt.Fprintf(&b, "  Warning: failed to process orphan cleanup queue: %v\n", err)
+		} else {
+			fmt.Fprintf(&b, "  %d orphan files processed and safely cleaned up.\n", processed)
+		}
+	} else {
+		fmt.Fprintf(&b, "\nWarning: Zero-Orphan Cleanup Queue is not initialized.\n")
+	}
+
+	return b.String()
+}
+
 
