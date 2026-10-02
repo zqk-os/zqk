@@ -12,3 +12,7 @@ help:
       command: '%s version'
     - comment: Print structured JSON version information
       command: '%s version --format json'
+common_flags: true
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false

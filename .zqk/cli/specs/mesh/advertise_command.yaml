@@ -1,6 +1,34 @@
 $schema: ../_schemas/command_spec.schema.json
-name: advertise
+name: advertise <resource_type>
 short: Advertise local agent seat capabilities and availability to the swarm mesh
-description: |-
-    Publishes agent seat specifications, supported roles, and availability status to
-    the peer-to-peer swarm mesh.
+description: |
+  Publishes a capacity advertisement object into the kernel graph, broadcasting
+  local agent seat capabilities, compute capacity, or specialized skills to
+  federated peer nodes in the sovereign swarm mesh.
+args:
+  type: exact
+  count: 1
+flags:
+  - name: amount
+    shorthand: a
+    type: string
+    required: true
+    description: "Quantity of capacity or resources being advertised (e.g. 4.0)"
+  - name: units
+    shorthand: u
+    type: string
+    default: "instances"
+    description: "Measurement unit for the advertised capacity (e.g. seats, cores, instances)"
+  - name: resource-id
+    type: string
+    description: "Unique local identifier for the advertised resource"
+help:
+  examples:
+    - comment: "Advertise 2 QA Verification agent seats to the mesh"
+      command: "%s mesh advertise agent_seat --amount 2 --units seats --resource-id qa-verifier"
+    - comment: "Advertise compute capacity for distributed model evaluation"
+      command: "%s mesh advertise compute --amount 8.0 --units cores"
+common_flags: true
+requires_storage: true
+requires_session: false
+requires_scheduler_check: false

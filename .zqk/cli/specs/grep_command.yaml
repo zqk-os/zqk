@@ -1,4 +1,90 @@
 $schema: schemas/command_spec.schema.json
-name: grep
+name: grep [query] [path]
 short: In-process trigram and AST code search
-description: Fast in-process pure-Go code search engine with trigram indexing, Go AST structural queries, and token-budgeted JSON output.
+description: |
+  Fast in-process pure-Go code search engine with sub-15ms trigram indexing,
+  Go AST structural queries (functions, methods, structs, interfaces), and strict
+  token-budgeted JSON output for AI agent contexts. Eliminates external ripgrep/tgrep
+  binary dependencies and avoids blowing agent token budgets.
+args:
+  type: range
+  min: 0
+  max: 2
+flags:
+  - name: ignore-case
+    shorthand: i
+    type: bool
+    description: "Case-insensitive search"
+  - name: regex
+    shorthand: e
+    type: bool
+    description: "Treat query as regular expression"
+  - name: word-regexp
+    shorthand: w
+    type: bool
+    description: "Match only whole words"
+  - name: ast
+    type: bool
+    description: "Enable Go AST structural query mode"
+  - name: kind
+    type: string
+    description: "Filter AST declarations by kind (func, method, struct, interface, type, var, const)"
+  - name: recv
+    type: string
+    description: "Filter AST methods by receiver type name"
+  - name: context
+    shorthand: C
+    type: int
+    default: 0
+    description: "Show NUM lines of surrounding context"
+  - name: max-count
+    shorthand: m
+    type: int
+    default: 100
+    description: "Stop searching after NUM matches"
+  - name: max-tokens
+    type: int
+    default: 4000
+    description: "Maximum estimated tokens in response payload before truncation"
+  - name: ext
+    type: stringSlice
+    description: "Filter files by extension (e.g. --ext .go,.yaml)"
+  - name: use-index
+    type: bool
+    default: true
+    description: "Use trigram index acceleration"
+  - name: reindex
+    type: bool
+    description: "Rebuild and persist trigram index cache"
+  - name: hidden
+    type: bool
+    description: "Search hidden files and directories"
+  - name: path
+    shorthand: p
+    type: string
+    description: "Target file or directory path"
+  - name: format
+    shorthand: f
+    type: string
+    default: "lines"
+    description: "Output format: lines, json, yaml"
+help:
+  examples:
+    - comment: "Literal string search across repository"
+      command: "%s grep 'MaterializedView'"
+    - comment: "Case-insensitive search"
+      command: "%s grep -i 'wal_subscriber'"
+    - comment: "Regular expression search"
+      command: "%s grep -e 'func.*Start\\('"
+    - comment: "AST search for all struct declarations"
+      command: "%s grep --ast --kind struct"
+    - comment: "AST search for methods on a specific receiver"
+      command: "%s grep --ast --recv Engine"
+    - comment: "Token-budgeted JSON output for AI agent context consumption"
+      command: "%s grep 'error' --max-tokens 2000 -f json"
+    - comment: "Rebuild and refresh persistent trigram index"
+      command: "%s grep --reindex"
+common_flags: false
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false

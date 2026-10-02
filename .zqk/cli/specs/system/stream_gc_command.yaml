@@ -1,4 +1,18 @@
 $schema: ../_schemas/command_spec.schema.json
 name: stream-gc
 short: Run garbage collector to prune orphaned JSONL stream segment files
-description: Run garbage collector to prune orphaned JSONL stream segment files
+description: |
+  Scans .zqk/streams/ across all object kinds to identify and safely prune
+  orphaned JSONL segment files that are no longer referenced by active indexes.
+  Reclaims disk space and avoids file descriptor exhaustion in long-running
+  agent hives without compromising historical durability.
+args:
+  type: no_args
+help:
+  examples:
+    - comment: "Perform stream garbage collection across all object kinds"
+      command: "%s system stream-gc"
+common_flags: true
+requires_storage: true
+requires_session: false
+requires_scheduler_check: false

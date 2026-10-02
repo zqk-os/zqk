@@ -2,5 +2,16 @@ $schema: _schemas/command_spec.schema.json
 name: learn
 short: Interactive curriculum mode to learn the zqk system and concepts
 description: |
-  Provides an interactive curriculum mode to learn the zqk system, architecture,
-  and core Knowledge Kernel concepts.
+  Provides an interactive curriculum mode to learn the ZQK system, architecture,
+  and core Knowledge Kernel concepts (Gantt matrix, CAS membrane, ontological
+  traceability, and continuous autonomous loops).
+args:
+  type: no_args
+help:
+  examples:
+    - comment: "Launch the interactive learning curriculum mode"
+      command: "%s learn"
+common_flags: false
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false

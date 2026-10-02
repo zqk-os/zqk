@@ -1,0 +1,64 @@
+// Declarative Starter Kernel Graph (ZQL Transaction)
+// Seeds the ontological spine: organization -> mission -> vision -> goal -> workstream -> priority_plan -> requirement
+// Conforms to SPEC-ZQL-DECLARATIVE-MUTATION-GRAMMAR
+
+BEGIN TRANSACTION ISOLATION LEVEL STAGED_SNAPSHOT;
+
+LET $org = UPSERT organization {
+    organization_name: "ZQK Open-Core Community",
+    title: "ZQK Open-Core Community",
+    domain: "custom",
+    spec_context_broker: "org_broker",
+    spec_interpreter: "org_interpreter",
+    description: "Public open-core kernel for strangers and agents. This organization owns the starter graph that init must materialize so first-run is not an empty Gantt.",
+    status: "active"
+};
+
+LET $mis = UPSERT mission {
+    title: "Ship a kernel strangers can init and operate",
+    mission_statement: "Give every operator a local, content-addressed knowledge kernel they can initialize, query, and extend without reconstructing the Gantt matrix from tribal knowledge.",
+    problem_statement: "Init currently leaves organization, mission, vision, goal, and workstream empty. start-here then tells agents to list goals and create one with a title field. New users and agents cannot assemble the pipeline.",
+    description: "Community launch mission: a first-run kernel that already has the strategic spine and one traced requirement.",
+    status: "active"
+};
+
+LET $vis = UPSERT vision {
+    title: "First-run produces a complete executable graph",
+    narrative: "A stranger runs system init and immediately has organization, mission, vision, goal, workstream, priority_plan, and a requirement with criteria/tests/backlog — seated as the system account, not a test harness.",
+    description: "Desired end state for community first-run: whats-next has a real plan because the starter graph exists.",
+    ref_ids: [$mis.id],
+    status: "active"
+};
+
+LET $ws = UPSERT workstream {
+    title: "Community launch and first-run kernel",
+    description: "Execution lane for community launch vetting: isolation, documentation graph, starter kernel objects, and installer/quickstart.",
+    category: "feature",
+    entry_point: "scripts/starter_kernel_graph/seed.sh",
+    owner_ref: "ACC-SYSTEM",
+    status: "active"
+};
+
+LET $goal = UPSERT goal {
+    title: "Community kernel is launch-ready for strangers and agents",
+    description: "Measurable outcome: zcom in this checkout lists a linked org/mission/vision/goal/workstream/priority_plan, live docs have doc_entry rows, archive copies are gone, and identity is the system account.",
+    ref_ids: [$org.id, $mis.id, $vis.id, $ws.id],
+    status: "active"
+};
+
+LET $pri = UPSERT priority_plan {
+    title: "Community launch testing and vetting",
+    description: "Execution column for proving the community kernel is launch-ready: isolation, starter graph, documentation vetting, and first-run smoke.",
+    ref_ids: [$ws.id],
+    status: "active"
+};
+
+LET $req = UPSERT requirement {
+    title: "Community kernel must prove launch-ready testing and documentation vetting",
+    description: "The community checkout must be operable as its own kernel: objects resolve here, the starter graph is present, live architecture/best-practices/onboarding have doc_entry rows, and archive markdown is not shipped.",
+    priority: "p0",
+    ref_ids: [$goal.id, $pri.id],
+    status: "active"
+};
+
+COMMIT TRANSACTION;

@@ -13,7 +13,7 @@ enabled: true
 status: active
 namespace_id: zqk:kernel
 schema_version: "2.0.0"
-command: ./bin/zqk
+command: zqk
 command_args:
   - system
   - stream-gc

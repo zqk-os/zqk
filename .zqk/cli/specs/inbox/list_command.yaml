@@ -1,6 +1,26 @@
 $schema: ../_schemas/command_spec.schema.json
 name: list
-short: List items in the Autonomy Inbox
-description: |-
-    List agent_instruction proposals currently pending in the inbox. Supports
-    filtering by status and persona.
+short: List pending agent instruction proposals in the autonomy inbox
+description: |
+  Retrieves and displays agent instruction proposals currently queued in the
+  Autonomy Inbox. Supports filtering by execution status and target persona ref,
+  sorting by reverse chronological order (newest first).
+flags:
+  - name: status
+    shorthand: s
+    type: string
+    description: "Filter instruction proposals by status (e.g. pending, approved, rejected)"
+  - name: persona
+    shorthand: p
+    type: string
+    description: "Filter instruction proposals directed to a specific persona ID"
+help:
+  examples:
+    - comment: "List all active proposals in the autonomy inbox"
+      command: "%s inbox list"
+    - comment: "Filter pending proposals for the code craftsman persona"
+      command: "%s inbox list --status pending --persona PER-COMMUNITY-CODE-CRAFTSMAN"
+common_flags: true
+requires_storage: true
+requires_session: true
+requires_scheduler_check: false

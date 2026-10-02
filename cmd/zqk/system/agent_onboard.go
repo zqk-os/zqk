@@ -3,6 +3,7 @@ package system
 import (
 	"context"
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -13,6 +14,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // NewAgentOnboardCmd wires system agent-onboard (Vector A/B first-contact sync).
@@ -134,7 +136,35 @@ func renderAgentOnboardSummary(cmd *cobra.Command, res *agentonboard.Result) {
 
 	// 4. Daemons & Hooks
 	buf.WriteString("\n✓ System Daemons & Hooks:\n")
-	buf.WriteString("  • Git pre-commit verification hook: active\n")
+	gitDir := filepath.Join(cli.ResolveProjectRoot("."), ".git")
+	if _, err := fileutil.Stat(gitDir); err == nil {
+		prePush := filepath.Join(gitDir, "hooks", "pre-push")
+		preCommit := filepath.Join(gitDir, "hooks", "pre-commit")
+		hasPush := false
+		hasCommit := false
+		if info, err := fileutil.Stat(prePush); err == nil && info.Mode()&0111 != 0 {
+			hasPush = true
+		}
+		if info, err := fileutil.Stat(preCommit); err == nil && info.Mode()&0111 != 0 {
+			hasCommit = true
+		}
+		if hasCommit && hasPush {
+			buf.WriteString("  • Git verification hooks (pre-commit, pre-push): active\n")
+		} else {
+			if hasCommit {
+				buf.WriteString("  • Git pre-commit hook: active\n")
+			} else {
+				buf.WriteString("  ⚠️  Git pre-commit hook: NOT configured in .git/hooks/pre-commit\n")
+			}
+			if hasPush {
+				buf.WriteString("  • Git pre-push hook: active\n")
+			} else {
+				buf.WriteString(fmt.Sprintf("  ⚠️  Git pre-push hook: NOT configured in .git/hooks/pre-push (run '%s')\n", paths.CLIInvocation("system sync-git-hooks")))
+			}
+		}
+	} else {
+		buf.WriteString("  • Git hooks: repository not detected (.git missing)\n")
+	}
 	buf.WriteString("  • Ambient event-driven daemon: running\n")
 
 	// 5. Connect Your AI Agent

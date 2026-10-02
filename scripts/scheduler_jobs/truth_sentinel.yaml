@@ -1,17 +1,29 @@
+# QA Truth Sentinel Daemon Configuration Template
+# NOTE: This defines a continuous WAL listener daemon, NOT a recurring timer job.
+# Running long-running daemons via raw timer scheduler triggers risks process detachment
+# and PID 1 orphan leakage upon scheduler restart.
+#
+# Recommended Operations:
+# 1. One-Shot Audit: Run `zqk system truth-sentinel --once --id <id>` to audit without a daemon.
+# 2. Host Service / System Supervisor: Manage via `zqk system start` or OS service units
+#    (Darwin LaunchAgent / Linux systemd --user) with supervisor PID tracking.
+# 3. Foreground Verification: Run directly with `zqk system truth-sentinel`.
 id: SCH-truth-sentinel
 kind: scheduler_job
 title: QA Truth Sentinel Daemon
-description: Continuously monitors the lifecycle WAL for in_progress/complete transitions and runs the AST Auditor to enforce structural policy.
+description: |
+  Continuously monitors the lifecycle WAL for in_progress/complete transitions and runs
+  the AST Auditor to enforce structural policy. Must be supervised as a hostservice.
 job_type: daemon_exec
 trigger_type: daemon
 execution_mode: reusable
 status: active
-enabled: true
-command: ./bin/zqk
+enabled: false
+command: zqk
 command_args:
   - system
   - truth-sentinel
 max_runtime_seconds: 0
 category: system
 namespace_id: zqk:kernel
-schema_version: 2.0.0
+schema_version: "2.0.0"

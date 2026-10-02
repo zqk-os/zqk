@@ -111,14 +111,35 @@ _verify_archive_sha256() {
 _verify_checksums_signature() {
   local checksums_path="$1"
   local sig_path="${checksums_path}.sig" # verifies checksums.txt.sig
+  local cert_path="${checksums_path}.pem"
   if [ ! -f "$sig_path" ]; then
+    if [ "${ZQK_REQUIRE_COSIGN:-0}" = "1" ]; then
+      echo "Error: signature file ${sig_path} not found and ZQK_REQUIRE_COSIGN=1" >&2
+      exit 1
+    fi
+    if command -v cosign >/dev/null 2>&1; then
+      echo "⚠️ Warning: signature file ${sig_path} not found; cosign verification cannot be performed." >&2
+    fi
     return 0
   fi
   if command -v cosign >/dev/null 2>&1; then
     echo "🔒 Verifying checksums signature with cosign..."
-    if ! cosign verify-blob --signature "$sig_path" "$checksums_path" >/dev/null 2>&1; then
-      echo "Warning: cosign signature verification failed for checksums.txt (checksums.txt.sig)" >&2
+    local verify_failed=0
+    if [ -n "${ZQK_COSIGN_KEY:-}" ]; then
+      cosign verify-blob --key "${ZQK_COSIGN_KEY}" --signature "$sig_path" "$checksums_path" >/dev/null 2>&1 || verify_failed=1
+    elif [ -f "$cert_path" ]; then
+      cosign verify-blob --certificate "$cert_path" --signature "$sig_path" "$checksums_path" >/dev/null 2>&1 || verify_failed=1
+    else
+      cosign verify-blob --signature "$sig_path" "$checksums_path" >/dev/null 2>&1 || verify_failed=1
     fi
+    if [ "$verify_failed" -ne 0 ]; then
+      echo "Error: cosign signature verification failed for checksums.txt (checksums.txt.sig). Aborting install for safety." >&2
+      exit 1
+    fi
+    echo "✓ Cosign signature verified successfully."
+  elif [ "${ZQK_REQUIRE_COSIGN:-0}" = "1" ]; then
+    echo "Error: cosign command not found but ZQK_REQUIRE_COSIGN=1" >&2
+    exit 1
   fi
 }
 
@@ -142,9 +163,13 @@ install_binary() {
   local base_url="https://github.com/${REPO}/releases/download/${ver}"
   if curl -sSLf "${base_url}/${archive}" -o "${archive_path}" 2>/dev/null && \
      curl -sSLf "${base_url}/checksums.txt" -o "${checksums_path}" 2>/dev/null; then
+    curl -sSLf "${base_url}/checksums.txt.sig" -o "${checksums_path}.sig" 2>/dev/null || true
+    curl -sSLf "${base_url}/checksums.txt.pem" -o "${checksums_path}.pem" 2>/dev/null || true
     : # downloaded from public release URL
   elif curl -sSLf "${base_url}/${comm_archive}" -o "${archive_path}" 2>/dev/null && \
      curl -sSLf "${base_url}/checksums.txt" -o "${checksums_path}" 2>/dev/null; then
+    curl -sSLf "${base_url}/checksums.txt.sig" -o "${checksums_path}.sig" 2>/dev/null || true
+    curl -sSLf "${base_url}/checksums.txt.pem" -o "${checksums_path}.pem" 2>/dev/null || true
     : # downloaded community-prefixed archive from public release URL
   elif [ -n "$GITHUB_TOKEN" ] || command -v gh >/dev/null 2>&1; then
     if ! _download_private "$ver" "$archive" "${archive_path}"; then
@@ -157,8 +182,15 @@ install_binary() {
       echo "Checksums file not found in release ${ver}" >&2
       exit 1
     }
+    _download_private "$ver" "checksums.txt.sig" "${checksums_path}.sig" || true
+    _download_private "$ver" "checksums.txt.pem" "${checksums_path}.pem" || true
   else
     echo "Binary release not found for ${ver}. Try ZQK_INSTALL_METHOD=source or set GITHUB_TOKEN." >&2
+    exit 1
+  fi
+
+  if [ "${ZQK_REQUIRE_COSIGN:-0}" = "1" ] && [ ! -f "${checksums_path}.sig" ]; then
+    echo "Error: checksums.txt.sig could not be downloaded and ZQK_REQUIRE_COSIGN=1" >&2
     exit 1
   fi
 
@@ -286,9 +318,6 @@ install_source() {
 # ---------------------------------------------------------------------------
 _place_binary() {
   local bin="$1" mcp_bin="$2"
-  if [ ! -d "$INSTALL_DIR" ]; then
-    mkdir -p "$INSTALL_DIR" 2>/dev/null || sudo mkdir -p "$INSTALL_DIR"
-  fi
   if [ ! -w "$INSTALL_DIR" ]; then
     echo "🔑 Installing to ${INSTALL_DIR} (requires sudo)..."
     sudo install -m 755 "$bin" "${INSTALL_DIR}/zqk"
@@ -298,21 +327,12 @@ _place_binary() {
     install -m 755 "$bin" "${INSTALL_DIR}/zqk"
     [ -f "$mcp_bin" ] && install -m 755 "$mcp_bin" "${INSTALL_DIR}/zqk-mcp"
   fi
-  # Remove macOS quarantine flag and ensure valid ad-hoc signature on Darwin
-  if [ "$OS" = "darwin" ]; then
-    if command -v xattr >/dev/null 2>&1; then
-      if [ ! -w "$INSTALL_DIR" ]; then
-        sudo xattr -d com.apple.quarantine "${INSTALL_DIR}/zqk" 2>/dev/null || true
-      else
-        xattr -d com.apple.quarantine "${INSTALL_DIR}/zqk" 2>/dev/null || true
-      fi
-    fi
-    if command -v codesign >/dev/null 2>&1; then
-      if [ ! -w "$INSTALL_DIR" ]; then
-        sudo codesign --force --sign - "${INSTALL_DIR}/zqk" 2>/dev/null || true
-      else
-        codesign --force --sign - "${INSTALL_DIR}/zqk" 2>/dev/null || true
-      fi
+  # Remove macOS quarantine flag
+  if [ "$OS" = "darwin" ] && command -v xattr >/dev/null 2>&1; then
+    if [ ! -w "$INSTALL_DIR" ]; then
+      sudo xattr -d com.apple.quarantine "${INSTALL_DIR}/zqk" 2>/dev/null || true
+    else
+      xattr -d com.apple.quarantine "${INSTALL_DIR}/zqk" 2>/dev/null || true
     fi
   fi
 }
@@ -359,7 +379,7 @@ esac
 # ---------------------------------------------------------------------------
 # 4. Post-install verification and quick-start hint
 # ---------------------------------------------------------------------------
-if [ -f "${INSTALL_DIR}/zqk" ]; then
+if command -v zqk >/dev/null 2>&1 || [ -f "${INSTALL_DIR}/zqk" ]; then
   ZQK_BIN="${INSTALL_DIR}/zqk"
   ZQK_VER="$("$ZQK_BIN" version 2>/dev/null || echo 'installed')"
   echo ""
@@ -367,12 +387,9 @@ if [ -f "${INSTALL_DIR}/zqk" ]; then
   echo ""
   echo "Quick start (< 2 min):"
   echo "  mkdir my-project && cd my-project"
-  echo "  zqk init"
+  echo "  zqk system init --project-name my-project"
   echo "  zqk workflow whats-next          # discover mission + next tasks"
   echo "  zqk mcp proxy --tcp 127.0.0.1:7777 # expose MCP securely on loopback"
   echo ""
   echo "Docs: https://github.com/${REPO}#readme"
-else
-  echo "❌ Error: zqk binary not found in ${INSTALL_DIR}/zqk" >&2
-  exit 1
 fi
