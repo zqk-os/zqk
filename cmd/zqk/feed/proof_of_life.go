@@ -22,14 +22,9 @@ func NewProofOfLifeCmd() *cobra.Command {
 }
 
 func runFeedProofOfLife(cmd *cobra.Command, _ []string) error {
-	return cli.WithProcessor(func(cmd *cobra.Command, _ []string, proc *cli.Processor) error {
-		root := proc.ProjectRoot()
-		if root == "" {
-			return errfmt.Errorf("project root not found")
-		}
-		var flags clipkg.FlagBag
-		personaRef := flags.String(cmd, "persona-ref")
-		agentID := flags.String(cmd, "agent-id")
+	return withFeedRoot(func(cmd *cobra.Command, proc *cli.Processor, root string, flags *clipkg.FlagBag) error {
+		personaRef := strings.TrimSpace(flags.String(cmd, "persona-ref"))
+		agentID := strings.TrimSpace(flags.String(cmd, "agent-id"))
 		summary := flags.String(cmd, "summary")
 		noAck := flags.Bool(cmd, "no-ack")
 		noPulse := flags.Bool(cmd, "no-pulse")
@@ -37,25 +32,13 @@ func runFeedProofOfLife(cmd *cobra.Command, _ []string) error {
 			return err
 		}
 
-		personaRef = strings.TrimSpace(personaRef)
-		agentID = strings.TrimSpace(agentID)
-		if personaRef == "" {
-			return errfmt.Errorf("--persona-ref is required (kernel persona PER-*)")
-		}
-		if agentID == "" {
-			return errfmt.Errorf("--agent-id is required (unique swarm seat; not the persona id)")
-		}
-		if strings.EqualFold(agentID, personaRef) {
-			return errfmt.Errorf("--agent-id must differ from --persona-ref (seat vs kernel persona)")
+		if err := validateSeatAndPersona(agentID, personaRef); err != nil {
+			return err
 		}
 
-		persona, err := proc.Storage().Read(proc.OperationContext(), proc.SecurityContext(), personaRef)
+		persona, err := resolveAndValidatePersona(proc, personaRef, "proof-of-life")
 		if err != nil {
-			return errfmt.Newf("feed proof-of-life: resolve persona %s", personaRef).Wrap(err)
-		}
-		kind, _ := persona[objects.FieldKeyKind].(string)
-		if !strings.EqualFold(strings.TrimSpace(kind), "persona") {
-			return errfmt.Errorf("--persona-ref %q is kind %q (want persona)", personaRef, kind)
+			return err
 		}
 
 		msg := idebridge.FormatProofOfLifeMessage(summary)
@@ -91,9 +74,7 @@ func runFeedProofOfLife(cmd *cobra.Command, _ []string) error {
 			Bool("ide_bridge_queued", pulsed).
 			Log()
 
-		out := feedResult(cmd, res, nil)
-		out[objects.FieldKeyPersonaRef] = personaRef
-		out[objects.FieldKeyAgentID] = agentID
+		out := newPersonaFeedResult(cmd, res, personaRef, agentID)
 		if pulsed {
 			out["ide_bridge_queued"] = true
 		}

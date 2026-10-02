@@ -180,13 +180,21 @@ type convergenceInfo struct {
 	UpdatedAt string
 }
 
-func selectActiveConvergence(ctx context.Context, sp workflowStorage) *convergenceInfo {
+func resolveWorkflowContexts(ctx context.Context) (*pkgctx.SecurityContext, *pkgctx.StorageContext) {
 	secCtx := pkgctx.GetSecurityContext(ctx)
 	if secCtx == nil {
 		secCtx = pkgctx.NewSystemSecurityContext()
 	}
-	storageCtx := pkgctx.NewStorageContext()
-	result, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
+	return secCtx, pkgctx.NewStorageContext()
+}
+
+func listWorkflowObjects(ctx context.Context, sp workflowStorage, filter storage.ListFilter) (*storage.QueryResult, error) {
+	secCtx, storageCtx := resolveWorkflowContexts(ctx)
+	return sp.List(ctx, secCtx, storageCtx, filter)
+}
+
+func selectActiveConvergence(ctx context.Context, sp workflowStorage) *convergenceInfo {
+	result, err := listWorkflowObjects(ctx, sp, storage.ListFilter{
 		Kind: objects.KindConvergenceSession,
 		Filters: map[string]any{
 			objects.FieldKeyStatus: statusInProcess,
@@ -230,12 +238,7 @@ func selectBacklogNext(ctx context.Context, sp workflowStorage) (string, *backlo
 	if planID == emptyValue {
 		return "", nil
 	}
-	secCtx := pkgctx.GetSecurityContext(ctx)
-	if secCtx == nil {
-		secCtx = pkgctx.NewSystemSecurityContext()
-	}
-	storageCtx := pkgctx.NewStorageContext()
-	result, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
+	result, err := listWorkflowObjects(ctx, sp, storage.ListFilter{
 		Kind: objects.KindBacklogItem,
 		Filters: map[string]any{
 			objects.FieldKeyPriorityPlanRef: planID,
@@ -277,12 +280,7 @@ func selectBacklogNext(ctx context.Context, sp workflowStorage) (string, *backlo
 }
 
 func resolveCurrentPlanID(ctx context.Context, sp workflowStorage) string {
-	secCtx := pkgctx.GetSecurityContext(ctx)
-	if secCtx == nil {
-		secCtx = pkgctx.NewSystemSecurityContext()
-	}
-	storageCtx := pkgctx.NewStorageContext()
-	result, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
+	result, err := listWorkflowObjects(ctx, sp, storage.ListFilter{
 		Kind: objects.KindPriorityPlan,
 		Filters: map[string]any{
 			objects.FieldKeyStatus: map[string]any{

@@ -21,15 +21,10 @@ func NewEmitStatusCmd() *cobra.Command {
 	return cmd
 }
 
-func runFeedEmitStatus(cmd *cobra.Command, _ []string) error {
-	return cli.WithProcessor(func(cmd *cobra.Command, _ []string, proc *cli.Processor) error {
-		root := proc.ProjectRoot()
-		if root == "" {
-			return errfmt.Errorf("project root not found")
-		}
-		var flags clipkg.FlagBag
-		personaRef := flags.String(cmd, "persona-ref")
-		agentID := flags.String(cmd, "agent-id")
+func runFeedEmitStatus(cmd *cobra.Command, args []string) error {
+	return withFeedRoot(func(cmd *cobra.Command, proc *cli.Processor, root string, flags *clipkg.FlagBag) error {
+		personaRef := strings.TrimSpace(flags.String(cmd, "persona-ref"))
+		agentID := strings.TrimSpace(flags.String(cmd, "agent-id"))
 		summary := flags.String(cmd, "summary")
 		noAck := flags.Bool(cmd, "no-ack")
 		pulseHuman := flags.Bool(cmd, "pulse-human")
@@ -37,37 +32,16 @@ func runFeedEmitStatus(cmd *cobra.Command, _ []string) error {
 			return err
 		}
 
-		personaRef = strings.TrimSpace(personaRef)
-		if personaRef == "" {
-			return errfmt.Errorf("--persona-ref is required (kernel persona PER-*)")
-		}
-		agentID = strings.TrimSpace(agentID)
-		if agentID == "" {
-			return errfmt.Errorf("--agent-id is required (unique swarm seat; not the persona id)")
-		}
-		if strings.EqualFold(agentID, personaRef) {
-			return errfmt.Errorf("--agent-id must differ from --persona-ref (seat vs kernel persona)")
+		if err := validateSeatAndPersona(agentID, personaRef); err != nil {
+			return err
 		}
 
-		persona, err := proc.Storage().Read(proc.OperationContext(), proc.SecurityContext(), personaRef)
+		persona, err := resolveAndValidatePersona(proc, personaRef, "emit-status")
 		if err != nil {
-			return errfmt.Newf("feed emit-status: resolve persona %s", personaRef).Wrap(err)
+			return err
 		}
-		kind, _ := persona[objects.FieldKeyKind].(string)
-		if !strings.EqualFold(strings.TrimSpace(kind), "persona") {
-			return errfmt.Errorf("--persona-ref %q is kind %q (want persona)", personaRef, kind)
-		}
-		status, _ := persona[objects.FieldKeyStatus].(string)
-		switch strings.ToLower(strings.TrimSpace(status)) {
-		case "approved", "implemented", "active":
-			// usable seating
-		case "archived", "error", "rejected", "deprecated":
-			return errfmt.Errorf("persona %s has status %q (not usable for mesh stamp)", personaRef, status)
-		default:
-			if strings.TrimSpace(status) == "" {
-				return errfmt.Errorf("persona %s has empty status", personaRef)
-			}
-			// Allow other non-terminal statuses; log via fluent below.
+		if err := validateUsablePersonaStatus(persona, personaRef); err != nil {
+			return err
 		}
 		roleFromPersona, _ := persona[objects.FieldKeyRole].(string)
 		roleFromPersona = strings.TrimSpace(roleFromPersona)
@@ -97,9 +71,7 @@ func runFeedEmitStatus(cmd *cobra.Command, _ []string) error {
 			FeedID(res.FeedID).
 			Log()
 
-		out := feedResult(cmd, res, nil)
-		out[objects.FieldKeyPersonaRef] = personaRef
-		out[objects.FieldKeyAgentID] = agentID
+		out := newPersonaFeedResult(cmd, res, personaRef, agentID)
 		if roleFromPersona != "" {
 			out[objects.FieldKeyRole] = roleFromPersona
 		}
@@ -110,5 +82,5 @@ func runFeedEmitStatus(cmd *cobra.Command, _ []string) error {
 			out["ide_bridge_queued"] = true
 		}
 		return cli.FormatOutput(cmd, out)
-	})(cmd, nil)
+	})(cmd, args)
 }

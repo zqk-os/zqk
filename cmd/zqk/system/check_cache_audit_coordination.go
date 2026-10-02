@@ -73,25 +73,10 @@ func emitCacheAuditEventViaCoordinator(
 	options *storage.AuditEventOptions,
 	profile string, // CLI context profile for logging format
 ) {
-	projectRoot = ProjectRootOrResolveDot(projectRoot)
-	if projectRoot == emptyValue {
-		// Best effort - skip if no project root
+	ctx, coordinator, ok := setupSystemCoordinator(ctx, projectRoot, storageProvider, profile, false)
+	if !ok {
 		return
 	}
-
-	// Embed LoggingContext in context so coordinator logging respects --context profile
-	ctx = createContextWithLoggingProfile(ctx, profile)
-
-	// Create routers for coordinator
-	auditRouter := coordination.NewStorageAuditRouter(projectRoot, storageProvider)
-
-	// Create coordinator with routers (only audit for cache events)
-	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
-		LoggingRouter:     &coordination.DefaultLoggingRouter{},
-		AuditRouter:       auditRouter,
-		MetricsRouter:     nil, // Cache audit events don't need metrics router
-		OperationalRouter: &coordination.DefaultOperationalRouter{},
-	})
 
 	// Build audit metadata from options
 	auditMetadata := make(map[string]any)

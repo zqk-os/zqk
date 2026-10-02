@@ -97,34 +97,32 @@ func ArrayContains(actualValue, filterValue any) bool {
 }
 
 // arrayContainsAll checks if an array contains all values
+func toAnySlice(val any) ([]any, bool) {
+	switch v := val.(type) {
+	case []any:
+		return v, true
+	case []string:
+		res := make([]any, len(v))
+		for i, s := range v {
+			res[i] = s
+		}
+		return res, true
+	default:
+		return nil, false
+	}
+}
+
+// ArrayContainsAll checks if an array contains all specified values.
 func ArrayContainsAll(actualValue, filterValue any) bool {
-	// Get list of values to check
-	var valuesToCheck []any
-	switch v := filterValue.(type) {
-	case []any:
-		valuesToCheck = v
-	case []string:
-		for _, s := range v {
-			valuesToCheck = append(valuesToCheck, s)
-		}
-	default:
+	valuesToCheck, ok := toAnySlice(filterValue)
+	if !ok {
+		return false
+	}
+	actualArray, ok := toAnySlice(actualValue)
+	if !ok {
 		return false
 	}
 
-	// Check if actualValue is an array
-	var actualArray []any
-	switch v := actualValue.(type) {
-	case []any:
-		actualArray = v
-	case []string:
-		for _, s := range v {
-			actualArray = append(actualArray, s)
-		}
-	default:
-		return false
-	}
-
-	// Check if all values are in the array
 	for _, checkValue := range valuesToCheck {
 		found := false
 		for _, arrayValue := range actualArray {
@@ -140,35 +138,17 @@ func ArrayContainsAll(actualValue, filterValue any) bool {
 	return true
 }
 
-// arrayContainsAny checks if an array contains any value
+// ArrayContainsAny checks if an array contains any of the specified values.
 func ArrayContainsAny(actualValue, filterValue any) bool {
-	// Get list of values to check
-	var valuesToCheck []any
-	switch v := filterValue.(type) {
-	case []any:
-		valuesToCheck = v
-	case []string:
-		for _, s := range v {
-			valuesToCheck = append(valuesToCheck, s)
-		}
-	default:
+	valuesToCheck, ok := toAnySlice(filterValue)
+	if !ok {
+		return false
+	}
+	actualArray, ok := toAnySlice(actualValue)
+	if !ok {
 		return false
 	}
 
-	// Check if actualValue is an array
-	var actualArray []any
-	switch v := actualValue.(type) {
-	case []any:
-		actualArray = v
-	case []string:
-		for _, s := range v {
-			actualArray = append(actualArray, s)
-		}
-	default:
-		return false
-	}
-
-	// Check if any value is in the array
 	for _, checkValue := range valuesToCheck {
 		for _, arrayValue := range actualArray {
 			if CompareEqual(arrayValue, checkValue) {

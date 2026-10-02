@@ -1,7 +1,6 @@
 package feed
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -10,11 +9,8 @@ import (
 	"github.com/zqk-os/zqk/pkg/authcred"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
-	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
-	"github.com/zqk-os/zqk/pkg/mcp"
-	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // NewSteerCmd creates zqk feed steer.
@@ -25,12 +21,7 @@ func NewSteerCmd() *cobra.Command {
 }
 
 func runFeedSteer(cmd *cobra.Command, _ []string) error {
-	return cli.WithProcessor(func(cmd *cobra.Command, _ []string, proc *cli.Processor) error {
-		root := proc.ProjectRoot()
-		if root == "" {
-			return errfmt.Errorf("project root not found")
-		}
-		var flags clipkg.FlagBag
+	return withFeedRoot(func(cmd *cobra.Command, proc *cli.Processor, root string, flags *clipkg.FlagBag) error {
 		message := flags.String(cmd, "message")
 		agentID := flags.String(cmd, "agent-id")
 		feedID := flags.String(cmd, "feed-id")
@@ -94,89 +85,17 @@ func runFeedSteer(cmd *cobra.Command, _ []string) error {
 				Log()
 		}
 
-		var wake agentfeed.PeerWakeResult
-		var wakePtr *agentfeed.PeerWakeResult
-		mcpSubscribers := -1
-		mcpSubscribersProbed := false
-		mcpIPCDelivered := false
-		// Studio mesh wake (local MCP proxy IPC + peer wake script) is not part of
-		// the community edition surface — community delivery is feed JSONL only.
-		if !zqkenv.IsCommunityEdition && !noWake && agentfeed.ShouldWakePeer(res.DeliveryMode) {
-			// MCP ActionRequired is the
-			// live coordinator interrupt; shell stamp alone is not Live.
-			// MCP IPC + peer wake script are complementary: IPC targets IDE MCP
-			// subscribers; wake-agy targets Terminal AGY seats. Do not skip WakePeer
-			// when IPC succeeds — that left AGY unwoken.
-			if res.DeliveryMode == datacell.DeliveryModeNotify {
-				probe := mcp.ProbeFeedSteerMCPWake(cmd.Context(), "", message, agentID, res.EventID, logger)
-				mcpIPCDelivered = probe.IPCDelivered
-				mcpSubscribersProbed = probe.SubscribersProbed
-				mcpSubscribers = probe.SubscriberCount
-				if probe.PublishErr == nil {
-					logging.Fluent(logger).Info("feed steer MCP daemon IPC wake delivered").
-						String("event_id", res.EventID).
-						Log()
-				} else {
-					logging.Fluent(logger).Warn("feed steer MCP daemon IPC publish failed; continuing with wake script").
-						String("error", probe.PublishErr.Error()).
-						Log()
-				}
-				if probe.QueryErr != nil {
-					logging.Fluent(logger).Warn("feed steer MCP subscriber count query failed").
-						String("error", probe.QueryErr.Error()).
-						Log()
-				} else if probe.SubscribersProbed {
-					logging.Fluent(logger).Info("feed steer MCP subscriber count").
-						Int("subscriber_count", probe.SubscriberCount).
-						Log()
-				}
-			}
-
-			wake = agentfeed.WakePeerOpts(cmd.Context(), agentfeed.WakePeerOptions{
-				ProjectRoot:          root,
-				Message:              message,
-				InReplyTo:            res.EventID,
-				FromAgentID:          agentID,
-				DeliveryMode:         res.DeliveryMode,
-				ToAgentID:            toAgentID,
-				MCPIPCDelivered:      mcpIPCDelivered,
-				MCPSubscribersProbed: mcpSubscribersProbed,
-				MCPSubscriberCount:   mcpSubscribers,
-			})
-			wakePtr = &wake
-			if unrepaired, reason, detail := agentfeed.IsUnrepairedWake(wake); unrepaired {
-				_ = agentfeed.AlertUnrepairedWake(res.EventID, detail, reason)
-				logging.Fluent(logger).Warn("feed steer peer wake unrepaired (event still appended; human alerted)").
-					String("reason", string(reason)).
-					String("detail", detail).
-					String("transport", wake.Transport).
-					Path(wake.Script).
-					Log()
-			} else if wake.Attempted {
-				logging.Fluent(logger).Info("feed steer peer wake attempted").
-					Path(wake.Script).
-					String("transport", wake.Transport).
-					String("delivery_receipt", fmt.Sprintf("%v", wake.DeliveryReceipt)).
-					Bool("live", wake.Live).
-					Log()
-			}
-		} else if zqkenv.IsCommunityEdition && !noWake && agentfeed.ShouldWakePeer(res.DeliveryMode) {
-			logging.Fluent(logger).Info("feed steer: community edition skips Studio mesh wake membrane").
-				String("delivery_mode", res.DeliveryMode).
-				Log()
-		}
-
-		out := feedResult(cmd, res, wakePtr)
-		if awaitID != "" {
-			out["peer_ack_await_id"] = awaitID
-			out["await_peer_ack"] = true
-		}
-		if mcpSubscribers >= 0 {
-			out["mcp_subscribers"] = mcpSubscribers
-		}
-		if wakePtr != nil && wakePtr.Transport != "" {
-			out["peer_wake_transport"] = wakePtr.Transport
-		}
-		return cli.FormatOutput(cmd, out)
+		wakePtr, mcpSubscribers := dispatchPeerWake(
+			cmd.Context(),
+			logger,
+			root,
+			message,
+			res,
+			agentID,
+			toAgentID,
+			noWake,
+			"steer",
+		)
+		return formatPeerWakeOutput(cmd, res, wakePtr, awaitID, mcpSubscribers)
 	})(cmd, nil)
 }

@@ -24,33 +24,10 @@ func emitAutoFixEventViaCoordinator(
 	message string,
 	profile string,
 ) {
-	projectRoot = ProjectRootOrResolveDot(projectRoot)
-	if projectRoot == emptyValue {
-		// Best effort - skip if no project root
+	ctx, coordinator, ok := setupSystemCoordinator(ctx, projectRoot, storageProvider, profile, false)
+	if !ok {
 		return
 	}
-
-	// Embed LoggingContext in context so coordinator logging respects --context profile
-	ctx = createContextWithLoggingProfile(ctx, profile)
-
-	// Create routers for coordinator
-	auditRouter := coordination.NewStorageAuditRouter(projectRoot, storageProvider)
-
-	// Create metrics pipeline for metrics router (if storage provider available)
-	var metricsRouter coordination.MetricsRouter
-	if storageProvider != nil {
-		// Note: We don't create metrics for individual auto-fix events to avoid bloat
-		// Batch auto-fix operations have their own metrics
-		metricsRouter = nil
-	}
-
-	// Create coordinator with routers
-	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
-		LoggingRouter:     &coordination.DefaultLoggingRouter{},
-		AuditRouter:       auditRouter,
-		MetricsRouter:     metricsRouter,
-		OperationalRouter: &coordination.DefaultOperationalRouter{},
-	})
 
 	// Build logging fields
 	loggingFields := []coordination.LoggingField{

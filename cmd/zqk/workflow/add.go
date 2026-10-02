@@ -20,6 +20,10 @@ import (
 // NewAddCmd creates the workflow add subcommand
 func NewAddCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewWorkflowAddCommandBuilder()
+	cmd.Flags().String("milestone", "", "Target milestone ID (e.g. MIL-001)")
+	cmd.Flags().String("priority", "", "Backlog item priority (e.g. high, medium, low)")
+	cmd.Flags().Bool("override", false, "Force transition via lifecycle break-glass")
+	cmd.Flags().String("reason-code", "", "Reason code for audit compliance")
 	cli.BindAsyncProgress(cmd, runAdd)
 	cli.RequireStorage(cmd, true)
 	return cmd

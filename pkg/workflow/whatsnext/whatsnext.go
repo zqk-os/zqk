@@ -540,7 +540,8 @@ func pickDefaultMeasureSessionID(rows []WhatsNextCVSRow) string {
 	return ""
 }
 
-func runSchedulerConvergenceMeasureJSON(projectRoot, sessionID string) (map[string]any, error) {
+// RunSchedulerConvergenceMeasureJSON executes scheduler convergence measure as a JSON subprocess.
+func RunSchedulerConvergenceMeasureJSON(projectRoot, sessionID string) (map[string]any, error) {
 	exe, err := resolveZQKCLIExecutable()
 	if err != nil {
 		return nil, err
@@ -563,6 +564,10 @@ func runSchedulerConvergenceMeasureJSON(projectRoot, sessionID string) (map[stri
 	return m, nil
 }
 
+func runSchedulerConvergenceMeasureJSON(projectRoot, sessionID string) (map[string]any, error) {
+	return RunSchedulerConvergenceMeasureJSON(projectRoot, sessionID)
+}
+
 // resolveZQKCLIExecutable returns the path to the running zqk binary (for subprocess measure).
 var resolveZQKCLIExecutable = func() (string, error) {
 	if p, err := fileutil.Executable(); err == nil && strings.TrimSpace(p) != "" {
@@ -572,6 +577,11 @@ var resolveZQKCLIExecutable = func() (string, error) {
 		return exec.LookPath(os.Args[0])
 	}
 	return "", fmt.Errorf("cannot resolve CLI executable")
+}
+
+// CompressWhatsNextMeasure reduces scheduler convergence measure JSON to a small agent-facing map.
+func CompressWhatsNextMeasure(m map[string]any) map[string]any {
+	return compressWhatsNextMeasure(m)
 }
 
 // compressWhatsNextMeasure reduces scheduler convergence measure JSON to a small agent-facing map.

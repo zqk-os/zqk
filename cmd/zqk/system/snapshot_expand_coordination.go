@@ -8,7 +8,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/coordination"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
-	"github.com/zqk-os/zqk/pkg/metrics"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
@@ -26,32 +25,10 @@ func emitSnapshotExpandEventViaCoordinator(
 	duration time.Duration,
 	profile string, // CLI context profile for logging format
 ) {
-	projectRoot = ProjectRootOrResolveDot(projectRoot)
-	if projectRoot == emptyValue {
-		// Best effort - skip if no project root
+	ctx, coordinator, ok := setupSystemCoordinator(ctx, projectRoot, storageProvider, profile, true)
+	if !ok {
 		return
 	}
-
-	// Embed LoggingContext in context so coordinator logging respects --context profile
-	ctx = createContextWithLoggingProfile(ctx, profile)
-
-	// Create routers for coordinator
-	auditRouter := coordination.NewStorageAuditRouter(projectRoot, storageProvider)
-
-	// Create metrics pipeline for metrics router (if storage provider available)
-	var metricsRouter coordination.MetricsRouter
-	if storageProvider != nil {
-		metricsPipeline := metrics.MetricPipelineForProject(storageProvider, projectRoot)
-		metricsRouter = coordination.NewMetricPipelineRouter(metricsPipeline)
-	}
-
-	// Create coordinator with routers
-	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
-		LoggingRouter:     &coordination.DefaultLoggingRouter{},
-		AuditRouter:       auditRouter,
-		MetricsRouter:     metricsRouter,
-		OperationalRouter: &coordination.DefaultOperationalRouter{},
-	})
 
 	// Convert snapshotExpandEventData to coordination.EventData
 	coordEventData := &coordination.EventData{

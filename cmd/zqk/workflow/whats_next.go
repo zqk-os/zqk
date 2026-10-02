@@ -2,17 +2,11 @@ package workflow
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"os"
-	"os/exec"
 	"strings"
 	"time"
 
-	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
-
-	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"github.com/spf13/cobra"
 
@@ -22,7 +16,6 @@ import (
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
-	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/interactionpolicy"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -579,11 +572,7 @@ func getObserverTips() []string {
 }
 
 func resolvePriorityPlanForWhatsNext(ctx context.Context, sp workflowStorage, explicit string, personaIDs []string) (planID string, summ *whatsNextPriorityPlan, activePlans []whatsNextPriorityPlan) {
-	secCtx := pkgctx.GetSecurityContext(ctx)
-	if secCtx == nil {
-		secCtx = pkgctx.NewSystemSecurityContext()
-	}
-	storageCtx := pkgctx.NewStorageContext()
+	secCtx, storageCtx := resolveWorkflowContexts(ctx)
 
 	// 1. Explicit plan request always wins — no work check needed.
 	if explicit != emptyValue {
@@ -703,13 +692,7 @@ func planHasWork(ctx context.Context, sp workflowStorage, planID string) bool {
 // countLinkedBLIs returns the number of BLIs linked to a plan.
 // Falls back to client-side filtering if the storage filter returns empty.
 func countLinkedBLIs(ctx context.Context, sp workflowStorage, planID string) int {
-	secCtx := pkgctx.GetSecurityContext(ctx)
-	if secCtx == nil {
-		secCtx = pkgctx.NewSystemSecurityContext()
-	}
-	storageCtx := pkgctx.NewStorageContext()
-
-	res, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+	res, err := listWorkflowObjects(ctx, sp, storage.DefaultQueryFactory.
 		ForPlan(objects.KindBacklogItem, planID).
 		StatusNot(objects.ObjectStatusArchived).
 		IncludeFields(objects.FieldKeyID, objects.FieldKeyPriorityPlanRef, objects.FieldKeyStatus).
@@ -743,11 +726,6 @@ func preferSeatedPlansWithOpenWork(ctx context.Context, sp workflowStorage, cand
 // countOpenLinkedBLIs counts non-terminal BLIs linked to a plan (child-owned membership).
 // personaIDs filters BLIs the same way plan selection does (unassigned stays eligible).
 func countOpenLinkedBLIs(ctx context.Context, sp workflowStorage, planID string, personaIDs []string) int {
-	secCtx := pkgctx.GetSecurityContext(ctx)
-	if secCtx == nil {
-		secCtx = pkgctx.NewSystemSecurityContext()
-	}
-	storageCtx := pkgctx.NewStorageContext()
 	countOpen := func(objs []map[string]any) int {
 		n := 0
 		for _, o := range objs {
@@ -773,7 +751,7 @@ func countOpenLinkedBLIs(ctx context.Context, sp workflowStorage, planID string,
 		}
 		return n
 	}
-	res, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+	res, err := listWorkflowObjects(ctx, sp, storage.DefaultQueryFactory.
 		ForPlan(objects.KindBacklogItem, planID).
 		StatusNotIn(objects.ObjectStatusComplete, objects.ObjectStatusArchived).
 		IncludeFields(objects.FieldKeyID, objects.FieldKeyStatus, objects.FieldKeyPriorityPlanRef, objects.FieldKeyPersonaRefs).
@@ -815,14 +793,8 @@ func priorityPlanLooksShaped(obj map[string]any) bool {
 }
 
 func countBacklogByStatus(ctx context.Context, sp workflowStorage, planID string, personaIDs []string) map[string]int {
-	secCtx := pkgctx.GetSecurityContext(ctx)
-	if secCtx == nil {
-		secCtx = pkgctx.NewSystemSecurityContext()
-	}
-	storageCtx := pkgctx.NewStorageContext()
-
 	out := map[string]int{}
-	res, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+	res, err := listWorkflowObjects(ctx, sp, storage.DefaultQueryFactory.
 		ForPlan(objects.KindBacklogItem, planID).
 		StatusNot(objects.ObjectStatusArchived).
 		IncludeFields(objects.FieldKeyID, objects.FieldKeyStatus, objects.FieldKeyPriorityPlanRef, objects.FieldKeyPersonaRefs).
@@ -952,12 +924,7 @@ func hasPersonaMatch(obj map[string]any, personaIDs []string) bool {
 }
 
 func listActiveOrPausedConvergenceSessions(ctx context.Context, sp workflowStorage) []whatsNextCVSRow {
-	secCtx := pkgctx.GetSecurityContext(ctx)
-	if secCtx == nil {
-		secCtx = pkgctx.NewSystemSecurityContext()
-	}
-	storageCtx := pkgctx.NewStorageContext()
-	res, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+	res, err := listWorkflowObjects(ctx, sp, storage.DefaultQueryFactory.
 		Builder(objects.KindConvergenceSession).
 		StatusIn("active", "paused").
 		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyCurrentPhase, objects.FieldKeyStatus).
@@ -995,81 +962,12 @@ func pickDefaultMeasureSessionID(rows []whatsNextCVSRow) string {
 }
 
 func runSchedulerConvergenceMeasureJSON(projectRoot, sessionID string) (map[string]any, error) {
-	exe, err := resolveZQKCLIExecutable()
-	if err != nil {
-		return nil, err
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), measureSubprocessTimeout) // Background: request-or-shutdown derived
-	defer cancel()
-	c := execwrap.CommandContext(ctx, exe, "scheduler", "convergence", "measure", "--format", "json", "--session-id", sessionID)
-	c.Dir = projectRoot
-	out, err := c.Output()
-	if err != nil {
-		if ee, ok := err.(*exec.ExitError); ok {
-			return nil, errfmt.Errorf("%w: %s", err, string(ee.Stderr))
-		}
-		return nil, err
-	}
-	var m map[string]any
-	if jerr := json.Unmarshal(out, &m); jerr != nil {
-		return nil, jerr
-	}
-	return m, nil
-}
-
-// resolveZQKCLIExecutable returns the path to the running zqk binary (for subprocess measure).
-var resolveZQKCLIExecutable = func() (string, error) {
-	if p, err := fileutil.Executable(); err == nil && strings.TrimSpace(p) != "" {
-		return p, nil
-	}
-	if len(os.Args) > 0 {
-		return exec.LookPath(os.Args[0])
-	}
-	return "", errfmt.Errorf("cannot resolve CLI executable")
+	return whatsnext.RunSchedulerConvergenceMeasureJSON(projectRoot, sessionID)
 }
 
 // compressWhatsNextMeasure reduces scheduler convergence measure JSON to a small agent-facing map.
 func compressWhatsNextMeasure(m map[string]any) map[string]any {
-	if m == nil {
-		return nil
-	}
-	rsc, _ := m["rollup_status_core"].(map[string]any)
-	if rsc == nil {
-		rsc = map[string]any{}
-	}
-	sug, _ := m["suggested_convergence_session_fields"].(map[string]any)
-	if sug == nil {
-		sug = map[string]any{}
-	}
-	pr, _ := sug["phase_router"].(map[string]any)
-	if pr == nil {
-		pr = map[string]any{}
-	}
-	out := map[string]any{
-		"convergence_session_id":                        m["convergence_session_id"],
-		objects.FieldKeyPrimaryMeasurementOutcome:       m[objects.FieldKeyPrimaryMeasurementOutcome],
-		objects.FieldKeyPrimaryMeasurementOutcomeDetail: m[objects.FieldKeyPrimaryMeasurementOutcomeDetail],
-		objects.FieldKeyDeltaAssessment:                 m[objects.FieldKeyDeltaAssessment],
-		"health_watermark_rfc3339":                      m["health_watermark_rfc3339"],
-		"had_failure_in_window":                         m["had_failure_in_window"],
-		"failing_fingerprints_now":                      m["failing_fingerprints_now"],
-		objects.FieldKeyNextActionHint:                  m[objects.FieldKeyNextActionHint],
-		objects.FieldKeyReadyForSessionCompletion:       m[objects.FieldKeyReadyForSessionCompletion],
-		"phase_router": map[string]any{
-			"phase_alignment":           pr["phase_alignment"],
-			"suggested_current_phase":   pr["suggested_current_phase"],
-			"routing_profile":           pr["routing_profile"],
-			"measurement_implied_phase": pr["measurement_implied_phase"],
-		},
-		"rollup_status":           rsc["rollup_status"],
-		"recommended_next_action": rsc["recommended_next_action"],
-	}
-	if na := koi.GetString(sug, objects.FieldKeyNextAction); na != "" {
-		out["next_action_suggested"] = na
-	} else {
-		out["next_action_suggested"] = nil
-	}
-	return out
+	return whatsnext.CompressWhatsNextMeasure(m)
 }
 
 func enrichWhatsNextRemedies(cmd *cobra.Command, projectRoot string, out *whatsNextOut) {

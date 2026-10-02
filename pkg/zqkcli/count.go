@@ -188,106 +188,14 @@ func countAllKinds(cmd *cobra.Command, proc *cli.Processor, storageProvider stor
 		scopeNote = paths.RewriteCanonicalCLIInvocations("internal/built-in only; run 'zqk object count' for total system object count")
 	}
 
-	// Optimize: when !AllObjects, we've already filtered to internal kinds
-	// All objects in internal kinds are internal, so we can use Count() directly
 	useList := shouldUseListForCount(flags)
 	if !flags.AllObjects {
-		// For internal kinds, all objects are internal, so we can use Count() with filters
-		// Only need List() if there are custom filters that require object inspection
 		useList = len(flags.Filters) > 0 && !flags.BuiltInOnly && !flags.InternalOnly
 	}
 
-	// Use worker pool pattern for parallel counting (bounded goroutines, not one per kind)
-	ctx := proc.OperationContext()
-	const maxWorkers = 10 // Limit concurrent counts to avoid overwhelming I/O
-	numWorkers := maxWorkers
-	if len(kinds) < numWorkers {
-		numWorkers = len(kinds)
-	}
-	if numWorkers == 0 {
-		// No kinds to count
-		return outputAllKindsCount(cmd, counts, string(format), scopeNote)
-	}
-
-	// Work channel: send kinds to workers
-	workCh := make(chan string, len(kinds))
-	for _, kind := range kinds {
-		select {
-		case <-ctx.Done():
-			return errfmt.Newf("context cancelled").Wrap(ctx.Err())
-		case workCh <- kind:
-		}
-	}
-	close(workCh)
-
-	// Results channel: workers send (kind, count, error) tuples
-	type countResult struct {
-		kind  string
-		count int
-		err   error
-	}
-	results := make(chan countResult, len(kinds))
-
-	// Start worker pool (each StartWithContext does wg.Add(1); do not add numWorkers here)
-	var wg sync.WaitGroup
-	bud := goroutinelabels.DefaultBudget()
-	for w := 0; w < numWorkers; w++ {
-		workerID := w
-		workerBuilder := goroutinelabels.NewGoroutine("internal_count_worker", fmt.Sprintf("counting objects (worker %d of %d)", workerID, numWorkers))
-		if bud != nil {
-			workerBuilder = workerBuilder.WithBudget(bud)
-		}
-		workerBuilder.WithWaitGroup(&wg).StartWithContext(ctx, func(workerCtx context.Context) error {
-			for {
-				select {
-				case <-workerCtx.Done():
-					return workerCtx.Err()
-				case kind, ok := <-workCh:
-					if !ok {
-						return nil // Channel closed, no more work
-					}
-					count, err := countKind(proc, storageProvider, secCtx, storageCtx, kind, flags, useList)
-					select {
-					case <-workerCtx.Done():
-						return workerCtx.Err()
-					case results <- countResult{kind: kind, count: count, err: err}:
-					}
-				}
-			}
-		})
-	}
-
-	// Close results channel after all workers finish
-	closerBuilder := goroutinelabels.NewGoroutine("internal_count_results_closer", "waiting for count workers and closing results channel").
-		WithCleanup(func() {
-			close(results)
-		})
-	if bud != nil {
-		closerBuilder = closerBuilder.WithBudget(bud)
-	}
-	closerBuilder.StartSimple(func() {
-		wg.Wait()
-	})
-
-	// Collect results
-	for res := range results {
-		if res.err != nil {
-			logging.FluentEvent(proc.Logger()).Debug("Skipping kind due to error").
-				String("kind", res.kind).
-				WithError(res.err).
-				Log()
-			continue
-		}
-		counts[res.kind] = res.count
-	}
-
-	// Default: omit zero-count kinds to reduce noise; use --include-zero-count to show them
-	if !flags.IncludeZeroCount {
-		for kind, n := range counts {
-			if n == 0 {
-				delete(counts, kind)
-			}
-		}
+	counts, err = executeParallelKindCounts(proc.OperationContext(), proc, storageProvider, secCtx, storageCtx, kinds, flags, useList, false)
+	if err != nil {
+		return err
 	}
 
 	return outputAllKindsCount(cmd, counts, string(format), scopeNote)
@@ -295,7 +203,6 @@ func countAllKinds(cmd *cobra.Command, proc *cli.Processor, storageProvider stor
 
 // countMultipleKinds counts objects for multiple specified kinds
 func countMultipleKinds(cmd *cobra.Command, proc *cli.Processor, storageProvider storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, storageCtx *pkgctx.StorageContext, kinds []string, flags *CountFlags) error {
-	counts := make(map[string]int)
 	format := proc.Format()
 	logging.FluentEvent(proc.Logger()).Debug("Counting objects for multiple kinds").
 		Int("kind_count", len(kinds)).
@@ -307,31 +214,45 @@ func countMultipleKinds(cmd *cobra.Command, proc *cli.Processor, storageProvider
 	}
 
 	useList := shouldUseListForCount(flags)
+	counts, err := executeParallelKindCounts(proc.OperationContext(), proc, storageProvider, secCtx, storageCtx, kinds, flags, useList, true)
+	if err != nil {
+		return err
+	}
 
-	// Use worker pool pattern for parallel counting (bounded goroutines, not one per kind)
-	ctx := proc.OperationContext()
+	return outputAllKindsCount(cmd, counts, string(format), scopeNote)
+}
+
+func executeParallelKindCounts(
+	ctx context.Context,
+	proc *cli.Processor,
+	storageProvider storage.ObjectStorageProvider,
+	secCtx *pkgctx.SecurityContext,
+	storageCtx *pkgctx.StorageContext,
+	kinds []string,
+	flags *CountFlags,
+	useList bool,
+	warnOnError bool,
+) (map[string]int, error) {
+	counts := make(map[string]int)
 	const maxWorkers = 10 // Limit concurrent counts to avoid overwhelming I/O
 	numWorkers := maxWorkers
 	if len(kinds) < numWorkers {
 		numWorkers = len(kinds)
 	}
 	if numWorkers == 0 {
-		// No kinds to count
-		return outputAllKindsCount(cmd, counts, string(format), scopeNote)
+		return counts, nil
 	}
 
-	// Work channel: send kinds to workers
 	workCh := make(chan string, len(kinds))
 	for _, kind := range kinds {
 		select {
 		case <-ctx.Done():
-			return errfmt.Newf("context cancelled").Wrap(ctx.Err())
+			return nil, errfmt.Newf("context cancelled").Wrap(ctx.Err())
 		case workCh <- kind:
 		}
 	}
 	close(workCh)
 
-	// Results channel: workers send (kind, count, error) tuples
 	type countResult struct {
 		kind  string
 		count int
@@ -339,7 +260,6 @@ func countMultipleKinds(cmd *cobra.Command, proc *cli.Processor, storageProvider
 	}
 	results := make(chan countResult, len(kinds))
 
-	// Start worker pool (each StartWithContext does wg.Add(1); do not add numWorkers here)
 	var wg sync.WaitGroup
 	bud := goroutinelabels.DefaultBudget()
 	for w := 0; w < numWorkers; w++ {
@@ -355,10 +275,10 @@ func countMultipleKinds(cmd *cobra.Command, proc *cli.Processor, storageProvider
 					return workerCtx.Err()
 				case kind, ok := <-workCh:
 					if !ok {
-						return nil // Channel closed, no more work
+						return nil
 					}
 					count, err := countKind(proc, storageProvider, secCtx, storageCtx, kind, flags, useList)
-					if err != nil {
+					if err != nil && warnOnError {
 						logging.FluentEvent(proc.Logger()).Warn("Failed to count objects for kind").
 							String("kind", kind).
 							WithError(err).
@@ -375,7 +295,6 @@ func countMultipleKinds(cmd *cobra.Command, proc *cli.Processor, storageProvider
 		})
 	}
 
-	// Close results channel after all workers finish
 	closerBuilder := goroutinelabels.NewGoroutine("internal_count_results_closer", "waiting for count workers and closing results channel").
 		WithCleanup(func() {
 			close(results)
@@ -387,12 +306,19 @@ func countMultipleKinds(cmd *cobra.Command, proc *cli.Processor, storageProvider
 		wg.Wait()
 	})
 
-	// Collect results
 	for res := range results {
+		if res.err != nil {
+			if !warnOnError {
+				logging.FluentEvent(proc.Logger()).Debug("Skipping kind due to error").
+					String("kind", res.kind).
+					WithError(res.err).
+					Log()
+				continue
+			}
+		}
 		counts[res.kind] = res.count
 	}
 
-	// Default: omit zero-count kinds to reduce noise; use --include-zero-count to show them
 	if !flags.IncludeZeroCount {
 		for kind, n := range counts {
 			if n == 0 {
@@ -401,7 +327,7 @@ func countMultipleKinds(cmd *cobra.Command, proc *cli.Processor, storageProvider
 		}
 	}
 
-	return outputAllKindsCount(cmd, counts, string(format), scopeNote)
+	return counts, nil
 }
 
 // countSingleKind counts objects for a single kind

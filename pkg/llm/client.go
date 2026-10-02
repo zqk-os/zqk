@@ -268,13 +268,126 @@ func NewOpenAIClient(ctx context.Context, config *Config) *OpenAIClient {
 	}
 }
 
+type openAIChatResponse struct {
+	Choices []struct {
+		Message struct {
+			Content string `json:"content"`
+		} `json:"message"`
+	} `json:"choices"`
+}
+
+func executeJSONHTTPRequest(ctx context.Context, client specbuilder.APIClient, method, url string, headers map[string]string, payload any, responseTarget any) error {
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return errfmt.Newf("failed to marshal payload").Wrap(err)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, method, url, bytes.NewReader(body))
+	if err != nil {
+		return errfmt.Newf("failed to create request").Wrap(err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+	for k, v := range headers {
+		if v != "" {
+			req.Header.Set(k, v)
+		}
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return errfmt.Newf("request failed").Wrap(err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		respBody, _ := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
+		return errfmt.Errorf("API error: status=%d body=%s", resp.StatusCode, string(respBody))
+	}
+
+	if responseTarget != nil {
+		if err := json.NewDecoder(resp.Body).Decode(responseTarget); err != nil {
+			return errfmt.Newf("failed to decode response").Wrap(err)
+		}
+	}
+
+	return nil
+}
+
+func (c *OpenAIClient) executeJSONRequest(ctx context.Context, endpoint string, payload any, responseTarget any) error {
+	url := fmt.Sprintf("%s%s", strings.TrimSuffix(c.config.BaseURL, "/"), endpoint)
+	var headers map[string]string
+	if c.config.APIKey != "" {
+		headers = map[string]string{"Authorization": "Bearer " + c.config.APIKey}
+	}
+	return executeJSONHTTPRequest(ctx, c.httpClient, http.MethodPost, url, headers, payload, responseTarget)
+}
+
+func (c *OpenAIClient) doChatCompletionRequest(ctx context.Context, payload map[string]any) (string, error) {
+	if c.config.ContextWindowSize > 0 {
+		if _, exists := payload["options"]; !exists {
+			payload["options"] = map[string]any{
+				"num_ctx": c.config.ContextWindowSize,
+			}
+		}
+	}
+
+	var result openAIChatResponse
+	if err := c.executeJSONRequest(ctx, "/chat/completions", payload, &result); err != nil {
+		return "", err
+	}
+
+	if len(result.Choices) == 0 {
+		return "", errfmt.Errorf("no response choices returned")
+	}
+
+	return result.Choices[0].Message.Content, nil
+}
+
+func (c *OpenAIClient) doUserChatCompletion(ctx context.Context, content any, maxTokens int) (string, error) {
+	payload := map[string]any{
+		"model": c.config.ChatModel,
+		"messages": []map[string]any{
+			{
+				objects.FieldKeyRole:    "user",
+				objects.FieldKeyContent: content,
+			},
+		},
+		"max_tokens": maxTokens,
+	}
+	return c.doChatCompletionRequest(ctx, payload)
+}
+
+func (c *OpenAIClient) doAnalysisRequest(ctx context.Context, content []map[string]any) (AnalysisResult, error) {
+	payload := map[string]any{
+		"model":           c.config.ChatModel,
+		"response_format": map[string]string{objects.FieldKeyType: "json_object"},
+		"messages": []map[string]any{
+			{
+				objects.FieldKeyRole:    "user",
+				objects.FieldKeyContent: content,
+			},
+		},
+		"max_tokens": 500,
+	}
+
+	respStr, err := c.doChatCompletionRequest(ctx, payload)
+	if err != nil {
+		return AnalysisResult{}, err
+	}
+
+	var analysis AnalysisResult
+	if err := json.Unmarshal([]byte(respStr), &analysis); err != nil {
+		return AnalysisResult{}, errfmt.Newf("failed to unmarshal analysis json").Wrap(err)
+	}
+
+	return analysis, nil
+}
+
 func (c *OpenAIClient) GenerateIntent(ctx context.Context, code string) (string, error) {
 	if c.shouldMock() {
 		// Mock implementation for when no API key is provided
 		return fmt.Sprintf("Semantic intent for: %s", truncate(code, 50)), nil
 	}
-
-	url := fmt.Sprintf("%s/chat/completions", strings.TrimSuffix(c.config.BaseURL, "/"))
 
 	payload := map[string]any{
 		"model": c.config.ChatModel,
@@ -291,54 +404,7 @@ func (c *OpenAIClient) GenerateIntent(ctx context.Context, code string) (string,
 		"max_tokens": 100,
 	}
 
-	if c.config.ContextWindowSize > 0 {
-		payload["options"] = map[string]any{
-			"num_ctx": c.config.ContextWindowSize,
-		}
-	}
-
-	body, err := json.Marshal(payload)
-	if err != nil {
-		return "", errfmt.Newf("failed to marshal payload").Wrap(err)
-	}
-
-	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(body))
-	if err != nil {
-		return "", errfmt.Newf("failed to create request").Wrap(err)
-	}
-	req.Header.Set("Content-Type", "application/json")
-	if c.config.APIKey != "" {
-		req.Header.Set("Authorization", "Bearer "+c.config.APIKey)
-	}
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return "", errfmt.Newf("request failed").Wrap(err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		respBody, _ := io.ReadAll(resp.Body)
-		return "", errfmt.Errorf("API error: status=%d body=%s", resp.StatusCode, string(respBody))
-	}
-
-	var result struct {
-		Choices []struct {
-			Message struct {
-				Content string `json:"content"`
-			} `json:"message"`
-		} `json:"choices"`
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return "", errfmt.Newf("failed to decode response").Wrap(err)
-	}
-
-	if len(result.Choices) == 0 {
-		return "", errfmt.Errorf("no response choices returned")
-	}
-
-	return result.Choices[0].Message.Content, nil
+	return c.doChatCompletionRequest(ctx, payload)
 }
 
 func (c *OpenAIClient) GenerateCompletion(ctx context.Context, prompt string, system string) (string, error) {
@@ -350,8 +416,6 @@ func (c *OpenAIClient) GenerateCompletion(ctx context.Context, prompt string, sy
 	if err != nil {
 		return "", errfmt.Newf("sanitizing prompt").Wrap(err)
 	}
-
-	url := fmt.Sprintf("%s/chat/completions", strings.TrimSuffix(c.config.BaseURL, "/"))
 
 	messages := []map[string]string{}
 	if system != "" {
@@ -371,54 +435,7 @@ func (c *OpenAIClient) GenerateCompletion(ctx context.Context, prompt string, sy
 		"max_tokens": 4096,
 	}
 
-	if c.config.ContextWindowSize > 0 {
-		payload["options"] = map[string]any{
-			"num_ctx": c.config.ContextWindowSize,
-		}
-	}
-
-	body, err := json.Marshal(payload)
-	if err != nil {
-		return "", errfmt.Newf("failed to marshal payload").Wrap(err)
-	}
-
-	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(body))
-	if err != nil {
-		return "", errfmt.Newf("failed to create request").Wrap(err)
-	}
-	req.Header.Set("Content-Type", "application/json")
-	if c.config.APIKey != "" {
-		req.Header.Set("Authorization", "Bearer "+c.config.APIKey)
-	}
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return "", errfmt.Newf("request failed").Wrap(err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		respBody, _ := io.ReadAll(resp.Body)
-		return "", errfmt.Errorf("API error: status=%d body=%s", resp.StatusCode, string(respBody))
-	}
-
-	var result struct {
-		Choices []struct {
-			Message struct {
-				Content string `json:"content"`
-			} `json:"message"`
-		} `json:"choices"`
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return "", errfmt.Newf("failed to decode response").Wrap(err)
-	}
-
-	if len(result.Choices) == 0 {
-		return "", errfmt.Errorf("no response choices returned")
-	}
-
-	return result.Choices[0].Message.Content, nil
+	return c.doChatCompletionRequest(ctx, payload)
 }
 
 func (c *OpenAIClient) GenerateEmbedding(ctx context.Context, text string) ([]float32, error) {
@@ -428,8 +445,6 @@ func (c *OpenAIClient) GenerateEmbedding(ctx context.Context, text string) ([]fl
 		emb[0] = 1.0
 		return emb, nil
 	}
-
-	url := fmt.Sprintf("%s/embeddings", strings.TrimSuffix(c.config.BaseURL, "/"))
 
 	payload := map[string]any{
 		"model": c.config.EmbedModel,
@@ -442,45 +457,21 @@ func (c *OpenAIClient) GenerateEmbedding(ctx context.Context, text string) ([]fl
 		}
 	}
 
-	body, err := json.Marshal(payload)
-	if err != nil {
-		return nil, errfmt.Newf("failed to marshal payload").Wrap(err)
-	}
-
-	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(body))
-	if err != nil {
-		return nil, errfmt.Newf("failed to create request").Wrap(err)
-	}
-	req.Header.Set("Content-Type", "application/json")
-	if c.config.APIKey != "" {
-		req.Header.Set("Authorization", "Bearer "+c.config.APIKey)
-	}
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return nil, errfmt.Newf("request failed").Wrap(err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		respBody, _ := io.ReadAll(resp.Body)
-		bodyStr := string(respBody)
-		if strings.Contains(bodyStr, "does not support embeddings") || strings.Contains(bodyStr, "not_found_error") {
-			emb := make([]float32, 1536)
-			emb[0] = 1.0
-			return emb, nil
-		}
-		return nil, errfmt.Errorf("API error: status=%d body=%s", resp.StatusCode, bodyStr)
-	}
-
 	var result struct {
 		Data []struct {
 			Embedding []float32 `json:"embedding"`
 		} `json:"data"`
 	}
 
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, errfmt.Newf("failed to decode response").Wrap(err)
+	err := c.executeJSONRequest(ctx, "/embeddings", payload, &result)
+	if err != nil {
+		errStr := err.Error()
+		if strings.Contains(errStr, "does not support embeddings") || strings.Contains(errStr, "not_found_error") {
+			emb := make([]float32, 1536)
+			emb[0] = 1.0
+			return emb, nil
+		}
+		return nil, err
 	}
 
 	if len(result.Data) == 0 {
@@ -499,8 +490,6 @@ func (c *OpenAIClient) AnalyzeVideoFrames(ctx context.Context, frames [][]byte, 
 		}, nil
 	}
 
-	url := fmt.Sprintf("%s/chat/completions", strings.TrimSuffix(c.config.BaseURL, "/"))
-
 	content := []map[string]any{
 		{
 			objects.FieldKeyType: "text",
@@ -518,71 +507,7 @@ func (c *OpenAIClient) AnalyzeVideoFrames(ctx context.Context, frames [][]byte, 
 		})
 	}
 
-	payload := map[string]any{
-		"model":           c.config.ChatModel,
-		"response_format": map[string]string{objects.FieldKeyType: "json_object"},
-		"messages": []map[string]any{
-			{
-				objects.FieldKeyRole:    "user",
-				objects.FieldKeyContent: content,
-			},
-		},
-		"max_tokens": 500,
-	}
-
-	if c.config.ContextWindowSize > 0 {
-		payload["options"] = map[string]any{
-			"num_ctx": c.config.ContextWindowSize,
-		}
-	}
-
-	body, err := json.Marshal(payload)
-	if err != nil {
-		return AnalysisResult{}, errfmt.Newf("failed to marshal payload").Wrap(err)
-	}
-
-	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(body))
-	if err != nil {
-		return AnalysisResult{}, errfmt.Newf("failed to create request").Wrap(err)
-	}
-	req.Header.Set("Content-Type", "application/json")
-	if c.config.APIKey != "" {
-		req.Header.Set("Authorization", "Bearer "+c.config.APIKey)
-	}
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return AnalysisResult{}, errfmt.Newf("request failed").Wrap(err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		respBody, _ := io.ReadAll(resp.Body)
-		return AnalysisResult{}, errfmt.Errorf("API error: status=%d body=%s", resp.StatusCode, string(respBody))
-	}
-
-	var result struct {
-		Choices []struct {
-			Message struct {
-				Content string `json:"content"`
-			} `json:"message"`
-		} `json:"choices"`
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return AnalysisResult{}, errfmt.Newf("failed to decode response").Wrap(err)
-	}
-
-	if len(result.Choices) == 0 {
-		return AnalysisResult{}, errfmt.Errorf("no response choices returned")
-	}
-
-	var analysis AnalysisResult
-	if err := json.Unmarshal([]byte(result.Choices[0].Message.Content), &analysis); err != nil {
-		return AnalysisResult{}, errfmt.Newf("failed to unmarshal analysis json").Wrap(err)
-	}
-
-	return analysis, nil
+	return c.doAnalysisRequest(ctx, content)
 }
 
 func (c *OpenAIClient) VerifyImage(ctx context.Context, image []byte, referenceImage []byte, textPrompt string) (AnalysisResult, error) {
@@ -593,8 +518,6 @@ func (c *OpenAIClient) VerifyImage(ctx context.Context, image []byte, referenceI
 			Summary:    fmt.Sprintf("Mock analysis: image verified against prompt '%s'", truncate(textPrompt, 50)),
 		}, nil
 	}
-
-	url := fmt.Sprintf("%s/chat/completions", strings.TrimSuffix(c.config.BaseURL, "/"))
 
 	prompt := fmt.Sprintf("Analyze this image against the following text prompt: '%s'. Provide a truth score (0.0 to 1.0) and a summary of the match.", textPrompt)
 	if len(referenceImage) > 0 {
@@ -625,79 +548,13 @@ func (c *OpenAIClient) VerifyImage(ctx context.Context, image []byte, referenceI
 		})
 	}
 
-	payload := map[string]any{
-		"model":           c.config.ChatModel,
-		"response_format": map[string]string{objects.FieldKeyType: "json_object"},
-		"messages": []map[string]any{
-			{
-				objects.FieldKeyRole:    "user",
-				objects.FieldKeyContent: content,
-			},
-		},
-		"max_tokens": 500,
-	}
-
-	if c.config.ContextWindowSize > 0 {
-		payload["options"] = map[string]any{
-			"num_ctx": c.config.ContextWindowSize,
-		}
-	}
-
-	body, err := json.Marshal(payload)
-	if err != nil {
-		return AnalysisResult{}, errfmt.Newf("failed to marshal payload").Wrap(err)
-	}
-
-	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(body))
-	if err != nil {
-		return AnalysisResult{}, errfmt.Newf("failed to create request").Wrap(err)
-	}
-	req.Header.Set("Content-Type", "application/json")
-	if c.config.APIKey != "" {
-		req.Header.Set("Authorization", "Bearer "+c.config.APIKey)
-	}
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return AnalysisResult{}, errfmt.Newf("request failed").Wrap(err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		respBody, _ := io.ReadAll(resp.Body)
-		return AnalysisResult{}, errfmt.Errorf("API error: status=%d body=%s", resp.StatusCode, string(respBody))
-	}
-
-	var result struct {
-		Choices []struct {
-			Message struct {
-				Content string `json:"content"`
-			} `json:"message"`
-		} `json:"choices"`
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return AnalysisResult{}, errfmt.Newf("failed to decode response").Wrap(err)
-	}
-
-	if len(result.Choices) == 0 {
-		return AnalysisResult{}, errfmt.Errorf("no response choices returned")
-	}
-
-	var analysis AnalysisResult
-	if err := json.Unmarshal([]byte(result.Choices[0].Message.Content), &analysis); err != nil {
-		return AnalysisResult{}, errfmt.Newf("failed to unmarshal analysis json").Wrap(err)
-	}
-
-	return analysis, nil
+	return c.doAnalysisRequest(ctx, content)
 }
 
 func (c *OpenAIClient) DescribeImage(ctx context.Context, image []byte) (string, error) {
 	if c.shouldMock() {
 		return "Mock description: two individuals in a cave holding rocks.", nil
 	}
-
-	url := fmt.Sprintf("%s/chat/completions", strings.TrimSuffix(c.config.BaseURL, "/"))
 
 	content := []map[string]any{
 		{
@@ -713,73 +570,13 @@ func (c *OpenAIClient) DescribeImage(ctx context.Context, image []byte) (string,
 		},
 	}
 
-	payload := map[string]any{
-		"model": c.config.ChatModel,
-		"messages": []map[string]any{
-			{
-				objects.FieldKeyRole:    "user",
-				objects.FieldKeyContent: content,
-			},
-		},
-		"max_tokens": 500,
-	}
-
-	if c.config.ContextWindowSize > 0 {
-		payload["options"] = map[string]any{
-			"num_ctx": c.config.ContextWindowSize,
-		}
-	}
-
-	body, err := json.Marshal(payload)
-	if err != nil {
-		return "", errfmt.Newf("failed to marshal payload").Wrap(err)
-	}
-
-	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(body))
-	if err != nil {
-		return "", errfmt.Newf("failed to create request").Wrap(err)
-	}
-	req.Header.Set("Content-Type", "application/json")
-	if c.config.APIKey != "" {
-		req.Header.Set("Authorization", "Bearer "+c.config.APIKey)
-	}
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return "", errfmt.Newf("request failed").Wrap(err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		respBody, _ := io.ReadAll(resp.Body)
-		return "", errfmt.Errorf("API error: status=%d body=%s", resp.StatusCode, string(respBody))
-	}
-
-	var result struct {
-		Choices []struct {
-			Message struct {
-				Content string `json:"content"`
-			} `json:"message"`
-		} `json:"choices"`
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return "", errfmt.Newf("failed to decode response").Wrap(err)
-	}
-
-	if len(result.Choices) == 0 {
-		return "", errfmt.Errorf("no response choices returned")
-	}
-
-	return result.Choices[0].Message.Content, nil
+	return c.doUserChatCompletion(ctx, content, 500)
 }
 
 func (c *OpenAIClient) DescribeScene(ctx context.Context, frames [][]byte) (string, error) {
 	if c.shouldMock() {
 		return "Mock scene description: The scene progresses from static setup to dynamic action, showing two individuals attempting to create fire in a dimly lit cave setting.", nil
 	}
-
-	url := fmt.Sprintf("%s/chat/completions", strings.TrimSuffix(c.config.BaseURL, "/"))
 
 	content := []map[string]any{
 		{
@@ -798,65 +595,7 @@ func (c *OpenAIClient) DescribeScene(ctx context.Context, frames [][]byte) (stri
 		})
 	}
 
-	payload := map[string]any{
-		"model": c.config.ChatModel,
-		"messages": []map[string]any{
-			{
-				objects.FieldKeyRole:    "user",
-				objects.FieldKeyContent: content,
-			},
-		},
-		"max_tokens": 500,
-	}
-
-	if c.config.ContextWindowSize > 0 {
-		payload["options"] = map[string]any{
-			"num_ctx": c.config.ContextWindowSize,
-		}
-	}
-
-	body, err := json.Marshal(payload)
-	if err != nil {
-		return "", errfmt.Newf("failed to marshal payload").Wrap(err)
-	}
-
-	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(body))
-	if err != nil {
-		return "", errfmt.Newf("failed to create request").Wrap(err)
-	}
-	req.Header.Set("Content-Type", "application/json")
-	if c.config.APIKey != "" {
-		req.Header.Set("Authorization", "Bearer "+c.config.APIKey)
-	}
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return "", errfmt.Newf("request failed").Wrap(err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		respBody, _ := io.ReadAll(resp.Body)
-		return "", errfmt.Errorf("API error: status=%d body=%s", resp.StatusCode, string(respBody))
-	}
-
-	var result struct {
-		Choices []struct {
-			Message struct {
-				Content string `json:"content"`
-			} `json:"message"`
-		} `json:"choices"`
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return "", errfmt.Newf("failed to decode response").Wrap(err)
-	}
-
-	if len(result.Choices) == 0 {
-		return "", errfmt.Errorf("no response choices returned")
-	}
-
-	return result.Choices[0].Message.Content, nil
+	return c.doUserChatCompletion(ctx, content, 500)
 }
 
 func (c *OpenAIClient) SemanticCompare(ctx context.Context, observedDescription string, expectedNarrative string) (float64, error) {

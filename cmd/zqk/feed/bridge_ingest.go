@@ -23,13 +23,8 @@ func NewBridgeIngestCmd() *cobra.Command {
 	return cmd
 }
 
-func runFeedBridgeIngest(cmd *cobra.Command, _ []string) error {
-	return cli.WithProcessor(func(cmd *cobra.Command, _ []string, proc *cli.Processor) error {
-		root := proc.ProjectRoot()
-		if root == "" {
-			return errfmt.Errorf("project root not found")
-		}
-		var flags clipkg.FlagBag
+func runFeedBridgeIngest(cmd *cobra.Command, args []string) error {
+	return withFeedRoot(func(cmd *cobra.Command, proc *cli.Processor, root string, flags *clipkg.FlagBag) error {
 		channel := flags.String(cmd, "channel")
 		payloadFile := flags.String(cmd, "payload-file")
 		payloadInline := flags.String(cmd, "payload")
@@ -107,7 +102,7 @@ func runFeedBridgeIngest(cmd *cobra.Command, _ []string) error {
 			out["external_id"] = msg.ExternalID
 		}
 		return cli.FormatOutput(cmd, out)
-	})(cmd, nil)
+	})(cmd, args)
 }
 
 func readBridgePayload(payloadFile, payloadInline string) ([]byte, error) {

@@ -1,12 +1,10 @@
 package llm
 
 import (
-	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"strings"
 
@@ -55,12 +53,43 @@ func (c *GeminiClient) shouldMock() bool {
 	return false
 }
 
+type geminiGenerateContentResponse struct {
+	Candidates []struct {
+		Content struct {
+			Parts []struct {
+				Text string `json:"text"`
+			} `json:"parts"`
+		} `json:"content"`
+	} `json:"candidates"`
+}
+
+func (c *GeminiClient) executeJSONRequest(ctx context.Context, endpoint string, payload any, responseTarget any) error {
+	url := fmt.Sprintf("%s%s", strings.TrimSuffix(c.config.BaseURL, "/"), endpoint)
+	var headers map[string]string
+	if c.config.APIKey != "" {
+		headers = map[string]string{"x-goog-api-key": c.config.APIKey}
+	}
+	return executeJSONHTTPRequest(ctx, c.httpClient, http.MethodPost, url, headers, payload, responseTarget)
+}
+
+func (c *GeminiClient) doGenerateContent(ctx context.Context, payload any) (string, error) {
+	endpoint := fmt.Sprintf("/models/%s:generateContent", c.config.ChatModel)
+	var result geminiGenerateContentResponse
+	if err := c.executeJSONRequest(ctx, endpoint, payload, &result); err != nil {
+		return "", err
+	}
+
+	if len(result.Candidates) == 0 || len(result.Candidates[0].Content.Parts) == 0 {
+		return "", errfmt.Errorf("no response candidates returned")
+	}
+
+	return result.Candidates[0].Content.Parts[0].Text, nil
+}
+
 func (c *GeminiClient) GenerateIntent(ctx context.Context, code string) (string, error) {
 	if c.shouldMock() {
 		return fmt.Sprintf("Semantic intent for: %s", truncate(code, 50)), nil
 	}
-
-	url := fmt.Sprintf("%s/models/%s:generateContent", strings.TrimSuffix(c.config.BaseURL, "/"), c.config.ChatModel)
 
 	payload := map[string]any{
 		"systemInstruction": map[string]any{
@@ -80,50 +109,7 @@ func (c *GeminiClient) GenerateIntent(ctx context.Context, code string) (string,
 		},
 	}
 
-	body, err := json.Marshal(payload)
-	if err != nil {
-		return "", errfmt.Newf("failed to marshal payload").Wrap(err)
-	}
-
-	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(body))
-	if err != nil {
-		return "", errfmt.Newf("failed to create request").Wrap(err)
-	}
-	req.Header.Set("Content-Type", "application/json")
-	if c.config.APIKey != "" {
-		req.Header.Set("x-goog-api-key", c.config.APIKey)
-	}
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return "", errfmt.Newf("request failed").Wrap(err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		respBody, _ := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
-		return "", errfmt.Errorf("API error: status=%d body=%s", resp.StatusCode, string(respBody))
-	}
-
-	var result struct {
-		Candidates []struct {
-			Content struct {
-				Parts []struct {
-					Text string `json:"text"`
-				} `json:"parts"`
-			} `json:"content"`
-		} `json:"candidates"`
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return "", errfmt.Newf("failed to decode response").Wrap(err)
-	}
-
-	if len(result.Candidates) == 0 || len(result.Candidates[0].Content.Parts) == 0 {
-		return "", errfmt.Errorf("no response candidates returned")
-	}
-
-	return result.Candidates[0].Content.Parts[0].Text, nil
+	return c.doGenerateContent(ctx, payload)
 }
 
 func (c *GeminiClient) GenerateCompletion(ctx context.Context, prompt string, system string) (string, error) {
@@ -135,8 +121,6 @@ func (c *GeminiClient) GenerateCompletion(ctx context.Context, prompt string, sy
 	if err != nil {
 		return "", errfmt.Newf("sanitizing prompt").Wrap(err)
 	}
-
-	url := fmt.Sprintf("%s/models/%s:generateContent", strings.TrimSuffix(c.config.BaseURL, "/"), c.config.ChatModel)
 
 	payload := map[string]any{
 		"contents": []map[string]any{
@@ -159,50 +143,7 @@ func (c *GeminiClient) GenerateCompletion(ctx context.Context, prompt string, sy
 		}
 	}
 
-	body, err := json.Marshal(payload)
-	if err != nil {
-		return "", errfmt.Newf("failed to marshal payload").Wrap(err)
-	}
-
-	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(body))
-	if err != nil {
-		return "", errfmt.Newf("failed to create request").Wrap(err)
-	}
-	req.Header.Set("Content-Type", "application/json")
-	if c.config.APIKey != "" {
-		req.Header.Set("x-goog-api-key", c.config.APIKey)
-	}
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return "", errfmt.Newf("request failed").Wrap(err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		respBody, _ := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
-		return "", errfmt.Errorf("API error: status=%d body=%s", resp.StatusCode, string(respBody))
-	}
-
-	var result struct {
-		Candidates []struct {
-			Content struct {
-				Parts []struct {
-					Text string `json:"text"`
-				} `json:"parts"`
-			} `json:"content"`
-		} `json:"candidates"`
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return "", errfmt.Newf("failed to decode response").Wrap(err)
-	}
-
-	if len(result.Candidates) == 0 || len(result.Candidates[0].Content.Parts) == 0 {
-		return "", errfmt.Errorf("no response candidates returned")
-	}
-
-	return result.Candidates[0].Content.Parts[0].Text, nil
+	return c.doGenerateContent(ctx, payload)
 }
 
 func (c *GeminiClient) GenerateEmbedding(ctx context.Context, text string) ([]float32, error) {
@@ -212,8 +153,7 @@ func (c *GeminiClient) GenerateEmbedding(ctx context.Context, text string) ([]fl
 		return emb, nil
 	}
 
-	url := fmt.Sprintf("%s/models/%s:embedContent", strings.TrimSuffix(c.config.BaseURL, "/"), c.config.EmbedModel)
-
+	endpoint := fmt.Sprintf("/models/%s:embedContent", c.config.EmbedModel)
 	payload := map[string]any{
 		"model": "models/" + c.config.EmbedModel,
 		objects.FieldKeyContent: map[string]any{
@@ -223,39 +163,14 @@ func (c *GeminiClient) GenerateEmbedding(ctx context.Context, text string) ([]fl
 		},
 	}
 
-	body, err := json.Marshal(payload)
-	if err != nil {
-		return nil, errfmt.Newf("failed to marshal payload").Wrap(err)
-	}
-
-	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(body))
-	if err != nil {
-		return nil, errfmt.Newf("failed to create request").Wrap(err)
-	}
-	req.Header.Set("Content-Type", "application/json")
-	if c.config.APIKey != "" {
-		req.Header.Set("x-goog-api-key", c.config.APIKey)
-	}
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return nil, errfmt.Newf("request failed").Wrap(err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		respBody, _ := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
-		return nil, errfmt.Errorf("API error: status=%d body=%s", resp.StatusCode, string(respBody))
-	}
-
 	var result struct {
 		Embedding struct {
 			Values []float32 `json:"values"`
 		} `json:"embedding"`
 	}
 
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, errfmt.Newf("failed to decode response").Wrap(err)
+	if err := c.executeJSONRequest(ctx, endpoint, payload, &result); err != nil {
+		return nil, err
 	}
 
 	if len(result.Embedding.Values) == 0 {
@@ -272,8 +187,6 @@ func (c *GeminiClient) AnalyzeVideoFrames(ctx context.Context, frames [][]byte, 
 			Summary:    fmt.Sprintf("Mock analysis: script '%s' matches %d frames", truncate(script, 50), len(frames)),
 		}, nil
 	}
-
-	url := fmt.Sprintf("%s/models/%s:generateContent", strings.TrimSuffix(c.config.BaseURL, "/"), c.config.ChatModel)
 
 	parts := []map[string]any{
 		{
@@ -301,51 +214,13 @@ func (c *GeminiClient) AnalyzeVideoFrames(ctx context.Context, frames [][]byte, 
 		},
 	}
 
-	body, err := json.Marshal(payload)
+	text, err := c.doGenerateContent(ctx, payload)
 	if err != nil {
-		return AnalysisResult{}, errfmt.Newf("failed to marshal payload").Wrap(err)
-	}
-
-	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(body))
-	if err != nil {
-		return AnalysisResult{}, errfmt.Newf("failed to create request").Wrap(err)
-	}
-	req.Header.Set("Content-Type", "application/json")
-	if c.config.APIKey != "" {
-		req.Header.Set("x-goog-api-key", c.config.APIKey)
-	}
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return AnalysisResult{}, errfmt.Newf("request failed").Wrap(err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		respBody, _ := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
-		return AnalysisResult{}, errfmt.Errorf("API error: status=%d body=%s", resp.StatusCode, string(respBody))
-	}
-
-	var result struct {
-		Candidates []struct {
-			Content struct {
-				Parts []struct {
-					Text string `json:"text"`
-				} `json:"parts"`
-			} `json:"content"`
-		} `json:"candidates"`
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return AnalysisResult{}, errfmt.Newf("failed to decode response").Wrap(err)
-	}
-
-	if len(result.Candidates) == 0 || len(result.Candidates[0].Content.Parts) == 0 {
-		return AnalysisResult{}, errfmt.Errorf("no response candidates returned")
+		return AnalysisResult{}, err
 	}
 
 	var analysis AnalysisResult
-	if err := json.Unmarshal([]byte(result.Candidates[0].Content.Parts[0].Text), &analysis); err != nil {
+	if err := json.Unmarshal([]byte(text), &analysis); err != nil {
 		return AnalysisResult{}, errfmt.Newf("failed to parse JSON response from model").Wrap(err)
 	}
 

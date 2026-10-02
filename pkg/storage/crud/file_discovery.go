@@ -13,32 +13,20 @@ type PathWithID struct {
 	ID   string
 }
 
-// GetObjectIDAndKindFromPath extracts object ID and (for hash-based files) kind from a file.
-// For hash-based files returns (id, fileKind); for others returns (id, "") so callers can skip kind filtering.
-func GetObjectIDAndKindFromPath(path, kind string) (id, fileKind string) {
+func cleanBaseName(path string) string {
 	base := filepath.Base(path)
 	ext := filepath.Ext(base)
 	if ext != "" {
-		base = strings.TrimSuffix(base, ext)
+		return strings.TrimSuffix(base, ext)
 	}
-	if len(base) == 64 && IsHex(base) {
-		return objects.ReadIDAndKindFromYAMLFile(path)
-	}
-	id = GetObjectIDFromPath(path, kind)
-	return id, ""
+	return base
 }
 
-// GetObjectIDFromPath extracts object ID from a file path (filename or file content for hash-based files).
-func GetObjectIDFromPath(path, kind string) string {
-	base := filepath.Base(path)
-	ext := filepath.Ext(base)
-	if ext != "" {
-		base = strings.TrimSuffix(base, ext)
-	}
-	// Hash-based (CAS) filename: 64 hex chars — read only id field (fast path, no full YAML parse)
-	if len(base) == 64 && IsHex(base) {
-		return objects.ReadIDFromYAMLFile(path)
-	}
+func isCASBase(base string) bool {
+	return len(base) == 64 && IsHex(base)
+}
+
+func resolveNonCASID(base, kind string) string {
 	// Account: account-username -> account:username
 	accountDir := objects.GetDirectoryFromKind(objects.KindAccount)
 	if accountDir != "" && objects.GetDirectoryFromKind(kind) == accountDir && strings.HasPrefix(base, "account-") {
@@ -48,6 +36,25 @@ func GetObjectIDFromPath(path, kind string) string {
 		return base
 	}
 	return ""
+}
+
+// GetObjectIDAndKindFromPath extracts object ID and (for hash-based files) kind from a file.
+// For hash-based files returns (id, fileKind); for others returns (id, "") so callers can skip kind filtering.
+func GetObjectIDAndKindFromPath(path, kind string) (id, fileKind string) {
+	base := cleanBaseName(path)
+	if isCASBase(base) {
+		return objects.ReadIDAndKindFromYAMLFile(path)
+	}
+	return resolveNonCASID(base, kind), ""
+}
+
+// GetObjectIDFromPath extracts object ID from a file path (filename or file content for hash-based files).
+func GetObjectIDFromPath(path, kind string) string {
+	base := cleanBaseName(path)
+	if isCASBase(base) {
+		return objects.ReadIDFromYAMLFile(path)
+	}
+	return resolveNonCASID(base, kind)
 }
 
 func IsHex(s string) bool {
