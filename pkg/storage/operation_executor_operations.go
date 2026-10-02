@@ -114,17 +114,19 @@ func (e *OperationExecutor) executeOperationOnce(ctx context.Context, op *Operat
 	return err
 }
 
+func (e *OperationExecutor) readObjectForOp(ctx context.Context, op *Operation) (map[string]any, error) {
+	readCtx, cancel := context.WithTimeout(ctx, e.ioTimeout)
+	defer cancel()
+	return e.storage.Read(readCtx, op.SecCtx, op.ObjectID)
+}
+
 // executeCreateWithCache executes create with cache awareness
 func (e *OperationExecutor) executeCreateWithCache(ctx context.Context, op *Operation) error {
 	if e.queue.notifier != nil {
 		logging.LogSwallowedError(e.queue.notifier.NotifyProgress(op, opProgressCreate, fmt.Sprintf(opMsgCreatingFmt, op.ObjectKind, op.ObjectID)))
 	}
 
-	// Check for conflicts (with timeout)
-	ctx, cancel := context.WithTimeout(ctx, e.ioTimeout)
-	defer cancel()
-
-	_, err := e.storage.Read(ctx, op.SecCtx, op.ObjectID)
+	_, err := e.readObjectForOp(ctx, op)
 	if err == nil || !errors.Is(err, ErrObjectNotFound) {
 		// Object exists or other error
 		if err == nil {
@@ -134,44 +136,21 @@ func (e *OperationExecutor) executeCreateWithCache(ctx context.Context, op *Oper
 	}
 
 	// Create object (with timeout)
-	ctx, cancel = context.WithTimeout(ctx, e.ioTimeout)
+	ctx, cancel := context.WithTimeout(ctx, e.ioTimeout)
 	defer cancel()
 
 	if e.queue.notifier != nil {
 		logging.LogSwallowedError(e.queue.notifier.NotifyProgress(op, opProgressWrite, fmt.Sprintf(opMsgWritingFmt, op.ObjectKind, op.ObjectID)))
 	}
 
-	// Register operation with deferred hash manager
-	hashManager := GetDeferredHashManager(e.storage)
-	operationID := fmt.Sprintf("create-%s-%d", op.ObjectID, time.Now().UnixNano())
-	// Get file path from storage (if file storage)
-	var filePath string
-	if fileStorage, ok := e.storage.(*FileObjectStorage); ok {
-		var err error
-		filePath, err = fileStorage.getObjectFilePath(op.ObjectID, op.ObjectKind)
-		if err != nil {
-			// Log warning but continue - file path will be inferred later
-			StorageLog(e.logger.Logger()).Warn(LogEventStorageOperationExecutorDeferredHashFilePathWarn).
-				ObjectID(op.ObjectID).
-				WithError(err).
-				Log()
-		}
-	}
-	hashManager.RegisterOperation(op.ObjectID, op.ObjectKind, filePath, operationID)
+	hashManager, operationID := e.registerDeferredOperation(op, "create")
 
 	if err := e.storage.Create(ctx, op.SecCtx, op.Data); err != nil {
 		logging.LogSwallowedError(hashManager.CompleteOperation(op.ObjectID, operationID))
 		return errfmt.Newf(ConstMiscFailedToCreateObject).Wrap(err)
 	}
 
-	// Mark operation as complete (will trigger hash update if no other pending ops)
-	if err := hashManager.CompleteOperation(op.ObjectID, operationID); err != nil {
-		// Log warning but don't fail - hash update is best effort
-		StorageLog(e.logger.Logger()).Warn(LogEventStorageOperationExecutorDeferredHashCompleteWarn).
-			ObjectID(op.ObjectID).
-			WithError(err).
-			Log()
-	}
+	e.completeDeferredOperation(hashManager, op.ObjectID, operationID)
 
 	// Invalidate cache in background
 	e.cacheManager.InvalidateAsync(ctx, []string{op.ObjectID}, fmt.Sprintf("Created %s", op.ObjectID))
@@ -368,4 +347,31 @@ func (e *OperationExecutor) executeCascadeSetNull(_ *Operation) error {
 // GetConsistencyStatus returns current cache consistency status
 func (e *OperationExecutor) GetConsistencyStatus() *ConsistencyStatus {
 	return e.cacheManager.GetConsistencyStatus()
+}
+
+func (e *OperationExecutor) registerDeferredOperation(op *Operation, opType string) (*DeferredHashManager, string) {
+	hashManager := GetDeferredHashManager(e.storage)
+	operationID := fmt.Sprintf("%s-%s-%d", opType, op.ObjectID, time.Now().UnixNano())
+	var filePath string
+	if fileStorage, ok := e.storage.(*FileObjectStorage); ok {
+		var err error
+		filePath, err = fileStorage.getObjectFilePath(op.ObjectID, op.ObjectKind)
+		if err != nil {
+			StorageLog(e.logger.Logger()).Warn(LogEventStorageOperationExecutorDeferredHashFilePathWarn).
+				ObjectID(op.ObjectID).
+				WithError(err).
+				Log()
+		}
+	}
+	hashManager.RegisterOperation(op.ObjectID, op.ObjectKind, filePath, operationID)
+	return hashManager, operationID
+}
+
+func (e *OperationExecutor) completeDeferredOperation(hashManager *DeferredHashManager, objectID, operationID string) {
+	if err := hashManager.CompleteOperation(objectID, operationID); err != nil {
+		StorageLog(e.logger.Logger()).Warn(LogEventStorageOperationExecutorDeferredHashCompleteWarn).
+			ObjectID(objectID).
+			WithError(err).
+			Log()
+	}
 }

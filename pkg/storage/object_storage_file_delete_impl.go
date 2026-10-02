@@ -12,6 +12,21 @@ import (
 // Delete deletes an object
 //
 //nolint:gocyclo
+func (f *FileObjectStorage) authorizeDeleteAndGetKind(ctx context.Context, secCtx *pkgctx.SecurityContext, id string) (string, error) {
+	if !IsCLIOperation(ctx, secCtx) {
+		return "", errfmt.Errorf(ErrMsgDeleteRequiresCLI)
+	}
+	existing, err := f.Read(ctx, secCtx, id)
+	if err != nil {
+		return "", err
+	}
+	kind, ok := existing[objects.FieldKeyKind].(string)
+	if !ok {
+		return "", errfmt.Errorf(ErrMsgObjectNeedsKind)
+	}
+	return kind, nil
+}
+
 func (f *FileObjectStorage) Delete(ctx context.Context, secCtx *pkgctx.SecurityContext, id string, cascade bool) error {
 	if err := f.CheckTestRepoWriteGuard(); err != nil {
 		return err
@@ -21,18 +36,9 @@ func (f *FileObjectStorage) Delete(ctx context.Context, secCtx *pkgctx.SecurityC
 		return f.deleteImpl(ctx, secCtx, id, cascade)
 	}
 
-	// Require CLI authorization for deletions
-	if !IsCLIOperation(ctx, secCtx) {
-		return errfmt.Errorf(ErrMsgDeleteRequiresCLI)
-	}
-
-	existing, err := f.Read(ctx, secCtx, id)
+	kind, err := f.authorizeDeleteAndGetKind(ctx, secCtx, id)
 	if err != nil {
 		return err
-	}
-	kind, ok := existing[objects.FieldKeyKind].(string)
-	if !ok {
-		return errfmt.Errorf(ErrMsgObjectNeedsKind)
 	}
 
 	// Intent must arrive from the caller. Minting it here from the actor's privilege is what made

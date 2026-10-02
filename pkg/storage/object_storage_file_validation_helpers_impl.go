@@ -117,11 +117,7 @@ func (f *FileObjectStorage) registerValidationError(_ context.Context, obj map[s
 
 // validateReferences validates that all referenced objects exist
 func (f *FileObjectStorage) validateReferences(obj map[string]any, kind string) error {
-	// Extract reference fields
-	yamlParser := parser.NewYAMLParser()
-	refFields := yamlParser.ExtractReferenceFields(obj)
-
-	// Track which objects we've already checked
+	refFields := parser.NewYAMLParser().ExtractReferenceFields(obj)
 	checkedRefs := make(map[string]bool)
 
 	// Validate each reference field
@@ -130,22 +126,7 @@ func (f *FileObjectStorage) validateReferences(obj map[string]any, kind string) 
 			continue
 		}
 
-		// Handle both single references (_ref) and lists (_refs)
-		var refIDs []string
-		switch v := refValue.(type) {
-		case string:
-			if v != emptyValue {
-				refIDs = []string{v}
-			}
-		case []any:
-			for _, item := range v {
-				if str, ok := item.(string); ok && str != emptyValue {
-					refIDs = append(refIDs, str)
-				}
-			}
-		case []string:
-			refIDs = v
-		}
+		refIDs := ExtractReferenceIDs(refValue)
 
 		// Validate each referenced ID
 		for _, refID := range refIDs {

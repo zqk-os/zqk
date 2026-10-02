@@ -26,10 +26,7 @@ import (
 // and truncates the stream-deleted file. Run periodically so state files do not grow indefinitely.
 // Caller should hold no other locks; this function takes streamRegistryMu for the duration.
 
-func parseSegmentLineIDFast(line []byte) string {
-	// Dynamically build the search key to avoid hardcoding "id" as a raw string literal,
-	// keeping check-field-key-literals.sh happy.
-	key := []byte(fmt.Sprintf(`"%s":"`, objects.FieldKeyID))
+func extractJSONStringFieldFast(line, key []byte) string {
 	start := bytes.Index(line, key)
 	if start == -1 {
 		return ""
@@ -40,6 +37,13 @@ func parseSegmentLineIDFast(line []byte) string {
 		return ""
 	}
 	return string(line[start : start+end])
+}
+
+func parseSegmentLineIDFast(line []byte) string {
+	// Dynamically build the search key to avoid hardcoding "id" as a raw string literal,
+	// keeping check-field-key-literals.sh happy.
+	key := []byte(fmt.Sprintf(`"%s":"`, objects.FieldKeyID))
+	return extractJSONStringFieldFast(line, key)
 }
 
 const (
@@ -336,19 +340,7 @@ func loadStreamRegistrySnapshot(projectRoot, kind string) *streamRegistrySnapsho
 }
 
 func parseStreamRegistryLineFast(line []byte) (id string, loc string) {
-	extractValue := func(key []byte) string {
-		start := bytes.Index(line, key)
-		if start == -1 {
-			return ""
-		}
-		start += len(key)
-		end := bytes.IndexByte(line[start:], '"')
-		if end == -1 {
-			return ""
-		}
-		return string(line[start : start+end])
-	}
-	id = extractValue([]byte(`"id":"`))
-	loc = extractValue([]byte(`"loc":"`))
+	id = extractJSONStringFieldFast(line, []byte(`"id":"`))
+	loc = extractJSONStringFieldFast(line, []byte(`"loc":"`))
 	return
 }

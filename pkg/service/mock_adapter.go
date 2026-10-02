@@ -71,83 +71,74 @@ func (m *MockAdapter) Install(ctx context.Context, spec ServiceSpec) error {
 	return nil
 }
 
-func (m *MockAdapter) Uninstall(ctx context.Context, id string) error {
-	if m.UninstallErr != nil {
-		return m.UninstallErr
-	}
-
+func (m *MockAdapter) withInstalledServiceLocked(id string, fn func() error) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
 	if _, exists := m.installed[id]; !exists {
 		return fmt.Errorf("%w: %s", ErrServiceNotFound, id)
 	}
+	return fn()
+}
 
-	delete(m.running, id)
-	delete(m.installed, id)
-	return nil
+func (m *MockAdapter) Uninstall(ctx context.Context, id string) error {
+	if m.UninstallErr != nil {
+		return m.UninstallErr
+	}
+	return m.withInstalledServiceLocked(id, func() error {
+		delete(m.running, id)
+		delete(m.installed, id)
+		return nil
+	})
 }
 
 func (m *MockAdapter) Start(ctx context.Context, id string) error {
 	if m.StartErr != nil {
 		return m.StartErr
 	}
+	return m.withInstalledServiceLocked(id, func() error {
+		if st, ok := m.running[id]; ok && st.State == StateRunning {
+			return fmt.Errorf("%w: %s", ErrServiceAlreadyActive, id)
+		}
 
-	m.mu.Lock()
-	defer m.mu.Unlock()
-
-	if _, exists := m.installed[id]; !exists {
-		return fmt.Errorf("%w: %s", ErrServiceNotFound, id)
-	}
-	if st, ok := m.running[id]; ok && st.State == StateRunning {
-		return fmt.Errorf("%w: %s", ErrServiceAlreadyActive, id)
-	}
-
-	m.running[id] = ServiceStatus{
-		ID:     id,
-		PID:    20000 + len(m.running),
-		State:  StateRunning,
-		Uptime: time.Millisecond * 10,
-	}
-	return nil
+		m.running[id] = ServiceStatus{
+			ID:     id,
+			PID:    20000 + len(m.running),
+			State:  StateRunning,
+			Uptime: time.Millisecond * 10,
+		}
+		return nil
+	})
 }
 
 func (m *MockAdapter) Stop(ctx context.Context, id string) error {
 	if m.StopErr != nil {
 		return m.StopErr
 	}
-
-	m.mu.Lock()
-	defer m.mu.Unlock()
-
-	if _, exists := m.installed[id]; !exists {
-		return fmt.Errorf("%w: %s", ErrServiceNotFound, id)
-	}
-
-	if st, ok := m.running[id]; ok && st.State == StateRunning {
-		delete(m.running, id)
-		return nil
-	}
-	return fmt.Errorf("%w: %s", ErrServiceNotRunning, id)
+	return m.withInstalledServiceLocked(id, func() error {
+		if st, ok := m.running[id]; ok && st.State == StateRunning {
+			delete(m.running, id)
+			return nil
+		}
+		return fmt.Errorf("%w: %s", ErrServiceNotRunning, id)
+	})
 }
 
 func (m *MockAdapter) Restart(ctx context.Context, id string) error {
 	if m.RestartErr != nil {
 		return m.RestartErr
 	}
-
-	m.mu.Lock()
-	defer m.mu.Unlock()
-
-	if _, exists := m.installed[id]; !exists {
-		return fmt.Errorf("%w: %s", ErrServiceNotFound, id)
-	}
-
-	delete(m.running, id)
-	m.running[id] = ServiceStatus{
-		ID:     id,
-		PID:    30000 + len(m.running),
-		State:  StateRunning,
+	return m.withInstalledServiceLocked(id, func() error {
+		delete(m.running, id)
+		m.running[id] = ServiceStatus{
+			ID:     id,
+			PID:    30000 + len(m.running),
+			State:  StateRunning,
+			Uptime: time.Millisecond * 10,
+		}
+		return nil
+	})
+}
 		Uptime: time.Millisecond * 5,
 	}
 	return nil

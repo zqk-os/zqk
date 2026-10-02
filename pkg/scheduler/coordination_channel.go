@@ -163,9 +163,6 @@ func (cc *CoordinationChannel) buildWatchEventsPipeline(logger logging.Logger) *
 			return ev, nil
 		}).
 		AddStage(pipeline.StageNormalize, func(pctx *pipeline.Context, payload any) (any, error) {
-			if payload == nil {
-				return nil, nil
-			}
 			ev, ok := payload.(Event)
 			if !ok {
 				return nil, nil
@@ -176,9 +173,6 @@ func (cc *CoordinationChannel) buildWatchEventsPipeline(logger logging.Logger) *
 			return ev, nil
 		}).
 		AddStage(pipeline.StageCommit, func(pctx *pipeline.Context, payload any) (any, error) {
-			if payload == nil {
-				return nil, nil
-			}
 			ev, ok := payload.(Event)
 			if !ok {
 				return nil, nil

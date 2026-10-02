@@ -51,13 +51,11 @@ func OutputCount(result *CountResult, format, kind, groupBy string) ([]byte, err
 	}
 }
 
-// OutputCountJSON formats count results in JSON format
-func OutputCountJSON(result *CountResult, groupBy string) ([]byte, error) {
+func buildCountOutputMap(result *CountResult, groupBy string) map[string]any {
 	output := make(map[string]any)
 
 	if groupBy != emptyValue && len(result.Groups) > 0 {
-		// Grouped counts
-		counts := make(map[string]int)
+		counts := make(map[string]int, len(result.Groups))
 		for groupKey, objects := range result.Groups {
 			counts[groupKey] = len(objects)
 		}
@@ -66,7 +64,6 @@ func OutputCountJSON(result *CountResult, groupBy string) ([]byte, error) {
 			output[countOutKeyTotalGroups] = totalGroups
 		}
 	} else {
-		// Total count
 		if total, ok := result.Meta[countOutKeyTotalCount].(int); ok {
 			output[countOutKeyCount] = total
 		} else {
@@ -80,7 +77,12 @@ func OutputCountJSON(result *CountResult, groupBy string) ([]byte, error) {
 	if result.Meta != nil {
 		output[countOutKeyMeta] = result.Meta
 	}
+	return output
+}
 
+// OutputCountJSON formats count results in JSON format
+func OutputCountJSON(result *CountResult, groupBy string) ([]byte, error) {
+	output := buildCountOutputMap(result, groupBy)
 	data, err := json.MarshalIndent(output, "", "  ")
 	if err != nil {
 		return nil, errfmt.Newf("error marshaling JSON").Wrap(err)
@@ -90,34 +92,7 @@ func OutputCountJSON(result *CountResult, groupBy string) ([]byte, error) {
 
 // OutputCountYAML formats count results in YAML format
 func OutputCountYAML(result *CountResult, groupBy string) ([]byte, error) {
-	output := make(map[string]any)
-
-	if groupBy != emptyValue && len(result.Groups) > 0 {
-		// Grouped counts
-		counts := make(map[string]int)
-		for groupKey, objects := range result.Groups {
-			counts[groupKey] = len(objects)
-		}
-		output[countOutKeyCountsByGroup] = counts
-		if totalGroups, ok := result.Meta[countOutKeyTotalGroups].(int); ok {
-			output[countOutKeyTotalGroups] = totalGroups
-		}
-	} else {
-		// Total count
-		if total, ok := result.Meta[countOutKeyTotalCount].(int); ok {
-			output[countOutKeyCount] = total
-		} else {
-			output[countOutKeyCount] = len(result.Objects)
-		}
-		if returned, ok := result.Meta[countOutKeyReturnedCount].(int); ok {
-			output[countOutKeyReturned] = returned
-		}
-	}
-
-	if result.Meta != nil {
-		output[countOutKeyMeta] = result.Meta
-	}
-
+	output := buildCountOutputMap(result, groupBy)
 	data, err := yaml.Marshal(output)
 	if err != nil {
 		return nil, errfmt.Newf("error marshaling YAML").Wrap(err)
@@ -237,8 +212,7 @@ func OutputAllKindsCount(counts map[string]int, format string, scopeNote string,
 	}
 }
 
-// OutputAllKindsCountJSON formats counts for all kinds in JSON format
-func OutputAllKindsCountJSON(counts map[string]int, scopeNote string, meta map[string]any) ([]byte, error) {
+func buildAllKindsCountOutputMap(counts map[string]int, scopeNote string, meta map[string]any) map[string]any {
 	output := map[string]any{
 		countOutKeyCountsByKind: counts,
 		countOutKeyTotalKinds:   len(counts),
@@ -255,7 +229,12 @@ func OutputAllKindsCountJSON(counts map[string]int, scopeNote string, meta map[s
 	if len(meta) > 0 {
 		output[countOutKeyMeta] = meta
 	}
+	return output
+}
 
+// OutputAllKindsCountJSON formats counts for all kinds in JSON format
+func OutputAllKindsCountJSON(counts map[string]int, scopeNote string, meta map[string]any) ([]byte, error) {
+	output := buildAllKindsCountOutputMap(counts, scopeNote, meta)
 	data, err := json.MarshalIndent(output, "", "  ")
 	if err != nil {
 		return nil, errfmt.Newf("error marshaling JSON").Wrap(err)
@@ -265,23 +244,7 @@ func OutputAllKindsCountJSON(counts map[string]int, scopeNote string, meta map[s
 
 // OutputAllKindsCountYAML formats counts for all kinds in YAML format
 func OutputAllKindsCountYAML(counts map[string]int, scopeNote string, meta map[string]any) ([]byte, error) {
-	output := map[string]any{
-		countOutKeyCountsByKind: counts,
-		countOutKeyTotalKinds:   len(counts),
-	}
-
-	totalCount := 0
-	for _, count := range counts {
-		totalCount += count
-	}
-	output[countOutKeyTotalObjects] = totalCount
-	if scopeNote != emptyValue {
-		output[countOutKeyCountScope] = scopeNote
-	}
-	if len(meta) > 0 {
-		output[countOutKeyMeta] = meta
-	}
-
+	output := buildAllKindsCountOutputMap(counts, scopeNote, meta)
 	data, err := yaml.Marshal(output)
 	if err != nil {
 		return nil, errfmt.Newf("error marshaling YAML").Wrap(err)

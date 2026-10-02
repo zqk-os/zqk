@@ -619,9 +619,7 @@ func (h *CapOrchestratorHandler) buildOpenAgentInstructionIndex(ctx context.Cont
 	if h == nil || h.storage == nil {
 		return idx
 	}
-	secCtx := pkgctx.NewSystemSecurityContext()
-	storageCtx := pkgctx.NewStorageContext()
-	res, err := h.storage.List(ctx, secCtx, storageCtx, storagepkg.ListFilter{
+	res, err := h.storage.List(ctx, pkgctx.NewSystemSecurityContext(), pkgctx.NewStorageContext(), storagepkg.ListFilter{
 		Kind: objects.KindAgentInstruction,
 		Filters: map[string]any{
 			objects.FieldKeyStatus: map[string]any{
@@ -729,8 +727,7 @@ func (h *CapOrchestratorHandler) buildOpenAgentTaskIndex(ctx context.Context) *o
 		return idx
 	}
 	secCtx := pkgctx.NewSystemSecurityContext()
-	storageCtx := pkgctx.NewStorageContext()
-	if res, err := h.storage.List(ctx, secCtx, storageCtx, storagepkg.ListFilter{
+	if res, err := h.storage.List(ctx, secCtx, pkgctx.NewStorageContext(), storagepkg.ListFilter{
 		Kind: objects.KindAgentTask,
 		Filters: map[string]any{
 			objects.FieldKeyStatus: map[string]any{

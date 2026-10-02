@@ -16,36 +16,9 @@ import (
 
 // Move moves an object to a different directory/kind while preserving history
 func (f *FileObjectStorage) Move(ctx context.Context, secCtx *pkgctx.SecurityContext, id string, newKind string, updateReferences bool) error {
-	// Require CLI authorization for moves
-	if !IsCLIOperation(ctx, secCtx) {
-		return errfmt.Errorf(ConstStreamMoveOperationsMustBePerformedThroughCli)
-	}
-
-	// Read existing object
-	existing, err := f.Read(ctx, secCtx, id)
+	existing, oldKind, newDir, err := ValidateMovePreconditions(ctx, secCtx, f, id, newKind)
 	if err != nil {
 		return err
-	}
-
-	oldKind, ok := existing[objects.FieldKeyKind].(string)
-	if !ok {
-		return errfmt.Errorf(ConstStreamObjectMissingKindField2)
-	}
-
-	// Validate new kind
-	if newKind == emptyValue {
-		return errfmt.Errorf(ConstStreamNewKindCannotBeEmpty)
-	}
-
-	// Check if kind is actually changing
-	if oldKind == newKind {
-		return errfmt.Errorf(ConstStreamObjectIsAlreadyOfKindStrNoMoveNeeded, newKind)
-	}
-
-	// Validate new kind exists (check if directory mapping exists)
-	newDir := objects.GetDirectoryFromKind(newKind)
-	if newDir == emptyValue {
-		return errfmt.Errorf(ConstStreamInvalidKindStrNoDirectoryMappingFound, newKind)
 	}
 
 	// Check for blocking issues before write operations

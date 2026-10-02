@@ -3,7 +3,6 @@ package storage
 import (
 	"context"
 	"errors"
-	"path/filepath"
 	"slices"
 	"sort"
 	"strings"
@@ -47,11 +46,10 @@ func (f *FileObjectStorage) listCASPathGeneral(ctx context.Context, secCtx *pkgc
 
 	// Also scan for legacy ID-named files (migration); all new objects are CAS (hash-named). Keep idToPath when bucketed.
 	// Stream-backed kinds: do not read YAML dir; IDs come from listStreamIDsForKind below.
-	dirName := objects.GetDirectoryFromKind(filter.Kind)
-	if dirName == emptyValue {
-		return nil, errfmt.Errorf(ConstStreamUnknownObjectKindStr, filter.Kind)
+	kindDir, err := f.resolveKindDir(filter.Kind)
+	if err != nil {
+		return nil, err
 	}
-	kindDir := filepath.Join(f.processDir, dirName)
 	var idToPath map[string]string // only set for bucketed; used to avoid repeated getObjectFilePath
 	idSet := make(map[string]bool)
 
@@ -144,12 +142,11 @@ func (f *FileObjectStorage) listCASPathGeneral(ctx context.Context, secCtx *pkgc
 	sort.Strings(ids)
 
 	// Limit concurrent CAS list operations so N jobs don't create N*64 workers (see list_count_concurrency.go)
-	EmitListCountWaitProgress(ctx)
-	listCtx, err := AcquireListCountSlot(ctx)
+	listCtx, releaseSlot, err := AcquireListCountContext(ctx)
 	if err != nil {
 		return nil, err
 	}
-	defer ReleaseListCountSlot(ctx)
+	defer releaseSlot()
 
 	// Bounded parallel read+parse: fixed worker count to avoid thread exhaustion when listing
 	// many objects (one goroutine per ID was causing 10k+ goroutines and fatal thread exhaustion).
@@ -301,20 +298,7 @@ func (f *FileObjectStorage) listCASPathGeneral(ctx context.Context, secCtx *pkgc
 	}
 
 	// Final deduplication by ID (safety check - should already be deduplicated above)
-	finalSeenIDs := make(map[string]bool)
-	deduplicatedList := make([]map[string]any, 0, len(objectList))
-	for _, obj := range objectList {
-		objID, ok := obj[objects.FieldKeyID].(string)
-		when.When(func() bool { return ok && objID != emptyValue }).Then(func() {
-			if !finalSeenIDs[objID] {
-				finalSeenIDs[objID] = true
-				deduplicatedList = append(deduplicatedList, obj)
-			}
-		}).OrElse(func() {
-			deduplicatedList = append(deduplicatedList, obj)
-		}).Run()
-	}
-	objectList = deduplicatedList
+	objectList = deduplicateObjectListByID(objectList)
 
 	// Build result (same as regular List; effectiveLimit computed at start of List)
 	result := &QueryResult{
@@ -367,10 +351,7 @@ func (f *FileObjectStorage) listCASPathGeneral(ctx context.Context, secCtx *pkgc
 		objectList = filteredObjects
 	}
 
-	objectList = applyListFieldProjection(filter.Kind, filter, objectList)
-	result.Objects = objectList
-	projectQueryResultGroups(filter.Kind, filter, result)
-	result.Meta[ConstStreamReturnedCount] = len(objectList)
+	projectAndSetResultObjects(filter.Kind, filter, result, objectList)
 
 	// Do not cache empty list for audit_event created_at range so a timeout or transient 0 doesn't poison future runs
 	skipCacheEmpty := filter.Kind == objects.KindAuditEvent && crud.ListFilterIsOnlyCreatedAtRange(filter.Filters) && len(objectList) == 0

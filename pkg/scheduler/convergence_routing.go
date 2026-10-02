@@ -6,7 +6,6 @@ import (
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"
-	"github.com/zqk-os/zqk/pkg/nildecode"
 	"github.com/zqk-os/zqk/pkg/objects"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/when"
@@ -85,41 +84,11 @@ func ResolveConvergenceRoutingSession(
 }
 
 func extractPredictions(obj map[string]any) map[string]any {
-	if obj == nil {
-		return nil
-	}
-	raw, ok := obj[objects.FieldKeyPredictions]
-	if !ok {
-		return nil
-	}
-	raw, ok = nildecode.DecodeNonNilPayload[any](raw)
-	if !ok {
-		return nil
-	}
-	m, ok := raw.(map[string]any)
-	if !ok || len(m) == 0 {
-		return nil
-	}
-	return m
+	return ExtractNonEmptySubMap(obj, objects.FieldKeyPredictions)
 }
 
 func extractBeforeStateSnapshot(obj map[string]any) map[string]any {
-	if obj == nil {
-		return nil
-	}
-	raw, ok := obj[objects.FieldKeyBeforeStateSnapshot]
-	if !ok {
-		return nil
-	}
-	raw, ok = nildecode.DecodeNonNilPayload[any](raw)
-	if !ok {
-		return nil
-	}
-	m, ok := raw.(map[string]any)
-	if !ok || len(m) == 0 {
-		return nil
-	}
-	return m
+	return ExtractNonEmptySubMap(obj, objects.FieldKeyBeforeStateSnapshot)
 }
 
 func mergeObjectFieldsIntoRoutingMeta(obj map[string]any, flagCP, flagFV string, meta map[string]any) {

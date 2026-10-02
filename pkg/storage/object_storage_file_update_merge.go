@@ -12,17 +12,12 @@ import (
 )
 
 func (f *FileObjectStorage) mergeFileObjectUpdate(p *fileObjectUpdatePrep) error {
-	ctx := p.ctx
-	secCtx := p.secCtx
-	id := p.id
-	updates := p.updates
-	kind := p.kind
-	existing := p.existing
-	spec := p.spec
-	idUpdated := p.idUpdated
+	existing, updates := p.existing, p.updates
+	kind, id := p.kind, p.id
+	spec, idUpdated := p.spec, p.idUpdated
+	ctx, secCtx := p.ctx, p.secCtx
 	previousStateForJournal := p.previousStateForJournal
-	isBuiltIn := p.isBuiltIn
-	hasAdminRole := p.hasAdminRole
+	isBuiltIn, hasAdminRole := p.isBuiltIn, p.hasAdminRole
 	// Merge updates into existing object
 	for k, v := range updates {
 		// CLI --unset-field: remove key from persisted object (not a value write)

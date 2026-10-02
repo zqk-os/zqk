@@ -85,14 +85,7 @@ func (h *CapOrchestratorHandler) executeReviewStage(ctx context.Context, exe str
 
 	// Write review results to state file for metrics stage / gate freshness checks.
 	now := time.Now().UTC()
-	pending, _ := h.readPendingStage()
-	if h.refreshPendingBoundCVS(ctx, &pending) {
-		h.writeStateFile(capStagePendingFile, pending)
-	}
-	cvsID := pending.CvsID
-	if cvsID == "" {
-		cvsID, _ = h.resolveBoundCVS(ctx, pending.PlanID)
-	}
+	pending, cvsID, _ := h.readPendingAndResolveBoundCVS(ctx)
 	reviewResult := map[string]any{
 		"timestamp":          now.Format(time.RFC3339),
 		"system_check":       systemCheckOK,
@@ -196,14 +189,7 @@ func (h *CapOrchestratorHandler) executeMetricsStage(ctx context.Context, exe st
 	reviewResult, _ := h.readStateFile(capReviewResultFile)
 
 	// 6. Write metrics snapshot
-	pending, _ := h.readPendingStage()
-	if h.refreshPendingBoundCVS(ctx, &pending) {
-		h.writeStateFile(capStagePendingFile, pending)
-	}
-	cvsID := pending.CvsID
-	if cvsID == "" {
-		cvsID, _ = h.resolveBoundCVS(ctx, pending.PlanID)
-	}
+	pending, cvsID, _ := h.readPendingAndResolveBoundCVS(ctx)
 	var alignPointer any
 	var wnObj map[string]any
 	if err := json.Unmarshal(whatsNextOut, &wnObj); err == nil {

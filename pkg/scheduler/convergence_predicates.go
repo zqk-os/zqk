@@ -104,43 +104,29 @@ func completionGateRequiresReadyForSessionCompletion(cg map[string]any) bool {
 	}
 }
 
+// ExtractNonEmptySubMap returns the non-empty map[string]any subfield for key from m, or nil.
+func ExtractNonEmptySubMap(m map[string]any, key string) map[string]any {
+	if m == nil {
+		return nil
+	}
+	raw, ok := nildecode.DecodeNonNilPayload[any](m[key])
+	if !ok {
+		return nil
+	}
+	sub, ok := raw.(map[string]any)
+	if !ok || len(sub) == 0 {
+		return nil
+	}
+	return sub
+}
+
 func mapFromThresholds(thresholds map[string]any, key string) map[string]any {
-	if thresholds == nil {
-		return nil
-	}
-	raw, ok := thresholds[key]
-	if !ok {
-		return nil
-	}
-	raw, ok = nildecode.DecodeNonNilPayload[any](raw)
-	if !ok {
-		return nil
-	}
-	m, ok := raw.(map[string]any)
-	if !ok || len(m) == 0 {
-		return nil
-	}
-	return m
+	return ExtractNonEmptySubMap(thresholds, key)
 }
 
 // ThresholdsMapFromObject returns the session thresholds map from a convergence_session object map, or nil.
 func ThresholdsMapFromObject(obj map[string]any) map[string]any {
-	if obj == nil {
-		return nil
-	}
-	raw, ok := obj[objects.FieldKeyThresholds]
-	if !ok {
-		return nil
-	}
-	raw, ok = nildecode.DecodeNonNilPayload[any](raw)
-	if !ok {
-		return nil
-	}
-	m, ok := raw.(map[string]any)
-	if !ok || len(m) == 0 {
-		return nil
-	}
-	return m
+	return ExtractNonEmptySubMap(obj, objects.FieldKeyThresholds)
 }
 
 // ThresholdsCompletionGateRequiresReadyForSessionCompletion reports whether thresholds.completion_gate

@@ -315,16 +315,43 @@ func (g *GraphObjectStorage) ensureObjectID(_ context.Context, obj map[string]an
 	}
 
 	// Validate ID format (strict)
-	if err := g.idValidator.LoadPatterns(); err != nil {
-		return "", errfmt.Newf(ErrMsgLoadIDPatternsValidation).Wrap(err)
-	}
-	valid, err := g.idValidator.ValidateID(id, kind)
-	if err != nil {
-		return "", errfmt.Newf(ErrMsgValidateID).Wrap(err)
-	}
-	if !valid {
-		return "", errfmt.Errorf(ErrMsgInvalidIDFormat, kind, id)
+	if err := ValidateIDFormatStrict(g.idValidator, id, kind); err != nil {
+		return "", err
 	}
 
 	return id, nil
+}
+
+// ValidateMovePreconditions validates authorization, reads the existing object, and validates kind transitions.
+func ValidateMovePreconditions(ctx context.Context, secCtx *pkgctx.SecurityContext, reader interface {
+	Read(context.Context, *pkgctx.SecurityContext, string) (map[string]any, error)
+}, id, newKind string) (map[string]any, string, string, error) {
+	if !IsCLIOperation(ctx, secCtx) {
+		return nil, "", "", errfmt.Errorf(ConstStreamMoveOperationsMustBePerformedThroughCli)
+	}
+
+	existing, err := reader.Read(ctx, secCtx, id)
+	if err != nil {
+		return nil, "", "", err
+	}
+
+	oldKind, ok := existing[objects.FieldKeyKind].(string)
+	if !ok {
+		return nil, "", "", errfmt.Errorf(ConstStreamObjectMissingKindField2)
+	}
+
+	if newKind == emptyValue {
+		return nil, "", "", errfmt.Errorf(ConstStreamNewKindCannotBeEmpty)
+	}
+
+	if oldKind == newKind {
+		return nil, "", "", errfmt.Errorf(ConstStreamObjectIsAlreadyOfKindStrNoMoveNeeded, newKind)
+	}
+
+	newDir := objects.GetDirectoryFromKind(newKind)
+	if newDir == emptyValue {
+		return nil, "", "", errfmt.Errorf(ConstStreamInvalidKindStrNoDirectoryMappingFound, newKind)
+	}
+
+	return existing, oldKind, newDir, nil
 }

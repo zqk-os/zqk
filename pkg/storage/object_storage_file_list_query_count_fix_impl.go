@@ -83,12 +83,11 @@ func (f *FileObjectStorage) listStreamSegmentsWithLimit(ctx context.Context, _ *
 		return filepath.Base(segments[i]) > filepath.Base(segments[j])
 	})
 
-	EmitListCountWaitProgress(ctx)
-	listCtx, slotErr := AcquireListCountSlot(ctx)
+	listCtx, releaseSlot, slotErr := AcquireListCountContext(ctx)
 	if slotErr != nil {
 		return nil, 0, slotErr
 	}
-	defer ReleaseListCountSlot(ctx)
+	defer releaseSlot()
 	ctx = listCtx
 
 	workCh, maxWorkers := createSegmentWorkChannel(segments, getListReadWorkers())
@@ -99,12 +98,7 @@ func (f *FileObjectStorage) listStreamSegmentsWithLimit(ctx context.Context, _ *
 	}
 	results := make(chan workerResult, maxWorkers)
 	var wg sync.WaitGroup
-	actualWorkers := 0
-	if len(segments) < maxWorkers {
-		actualWorkers = len(segments)
-	} else {
-		actualWorkers = maxWorkers
-	}
+	actualWorkers := min(len(segments), maxWorkers)
 	wg.Add(actualWorkers)
 	// Pre-build fast byte-slice filters for all string values to aggressively drop non-matching lines before unmarshaling
 	var requiredSubstrings [][]byte
@@ -321,24 +315,18 @@ func (f *FileObjectStorage) countStreamSegmentsWithFilters(ctx context.Context, 
 		return 0, nil
 	}
 
-	EmitListCountWaitProgress(ctx)
-	listCtx, slotErr := AcquireListCountSlot(ctx)
+	listCtx, releaseSlot, slotErr := AcquireListCountContext(ctx)
 	if slotErr != nil {
 		return 0, slotErr
 	}
-	defer ReleaseListCountSlot(ctx)
+	defer releaseSlot()
 	ctx = listCtx
 
 	workCh, maxWorkers := createSegmentWorkChannel(segments, getListReadWorkers())
 
 	results := make(chan int, maxWorkers)
 	var wg sync.WaitGroup
-	actualWorkers := 0
-	if len(segments) < maxWorkers {
-		actualWorkers = len(segments)
-	} else {
-		actualWorkers = maxWorkers
-	}
+	actualWorkers := min(len(segments), maxWorkers)
 	wg.Add(actualWorkers)
 	// Pre-build regex pre-filter
 	var preFilterRegex *regexp.Regexp

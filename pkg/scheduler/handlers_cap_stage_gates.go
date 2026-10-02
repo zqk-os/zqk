@@ -150,23 +150,31 @@ func (h *CapOrchestratorHandler) quarantineCAPStage(pending capStagePending) {
 	})
 }
 
+func (h *CapOrchestratorHandler) readQuarantineMatch(pending capStagePending) (quarantine map[string]any, fileFound bool, matches bool) {
+	raw, err := h.readStateFile(capQuarantineFile)
+	if err != nil {
+		return nil, false, false
+	}
+	q, ok := raw.(map[string]any)
+	if !ok {
+		return nil, true, false
+	}
+	stage, _ := q["stage"].(string)
+	planID, _ := q[capFieldPlanID].(string)
+	cvsID, _ := q["cvs_id"].(string)
+	return q, true, stage == pending.Stage && planID == pending.PlanID && cvsID == pending.CvsID
+}
+
 // capStageQuarantineRetryReady reports whether a quarantined stage may begin a
 // fresh bounded attempt window. Scope changes reset immediately; otherwise the
 // retry window opens after capStageQuarantineRetryAfter. Malformed legacy state
 // is reset rather than wedging CAP forever.
 func (h *CapOrchestratorHandler) capStageQuarantineRetryReady(pending capStagePending, now time.Time) bool {
-	raw, err := h.readStateFile(capQuarantineFile)
-	if err != nil {
+	quarantine, fileFound, matches := h.readQuarantineMatch(pending)
+	if !fileFound {
 		return false
 	}
-	quarantine, ok := raw.(map[string]any)
-	if !ok {
-		return true
-	}
-	stage, _ := quarantine["stage"].(string)
-	planID, _ := quarantine[capFieldPlanID].(string)
-	cvsID, _ := quarantine["cvs_id"].(string)
-	if stage != pending.Stage || planID != pending.PlanID || cvsID != pending.CvsID {
+	if !matches {
 		return true
 	}
 	createdAt, _ := quarantine[objects.FieldKeyCreatedAt].(string)
@@ -183,18 +191,8 @@ func (h *CapOrchestratorHandler) clearCAPStageQuarantine() {
 }
 
 func (h *CapOrchestratorHandler) capStageQuarantineActive(pending capStagePending) bool {
-	raw, err := h.readStateFile(capQuarantineFile)
-	if err != nil {
-		return false
-	}
-	quarantine, ok := raw.(map[string]any)
-	if !ok {
-		return false
-	}
-	stage, _ := quarantine["stage"].(string)
-	planID, _ := quarantine[capFieldPlanID].(string)
-	cvsID, _ := quarantine["cvs_id"].(string)
-	return stage == pending.Stage && planID == pending.PlanID && cvsID == pending.CvsID
+	_, fileFound, matches := h.readQuarantineMatch(pending)
+	return fileFound && matches
 }
 
 // clearCAPStageFailureAttempts keeps the stage entry watermark but resets the
@@ -668,6 +666,19 @@ func (h *CapOrchestratorHandler) stateFileFresh(name, maxAgeHint string) bool {
 	return time.Since(fi.ModTime()) <= maxAge
 }
 
+func (h *CapOrchestratorHandler) readPendingAndResolveBoundCVS(ctx context.Context) (capStagePending, string, string) {
+	pending, _ := h.readPendingStage()
+	if h.refreshPendingBoundCVS(ctx, &pending) {
+		h.writeStateFile(capStagePendingFile, pending)
+	}
+	cvsID := pending.CvsID
+	focus := pending.FocusChildCvsID
+	if cvsID == "" {
+		cvsID, focus = h.resolveBoundCVS(ctx, pending.PlanID)
+	}
+	return pending, cvsID, focus
+}
+
 // maybeAdvanceCAPStage advances only when bound CVS + delivery evidence exist.
 func (h *CapOrchestratorHandler) maybeAdvanceCAPStage(ctx context.Context, stage string) error {
 	if !strings.HasPrefix(stage, "cap_stage_") {
@@ -680,15 +691,7 @@ func (h *CapOrchestratorHandler) maybeAdvanceCAPStage(ctx context.Context, stage
 			logging.Bool("ok", ok))
 		return fmt.Errorf("stage held: cap_cycle tamper detected (restored=%v)", restored)
 	}
-	pending, _ := h.readPendingStage()
-	if h.refreshPendingBoundCVS(ctx, &pending) {
-		h.writeStateFile(capStagePendingFile, pending)
-	}
-	cvsID := pending.CvsID
-	focus := pending.FocusChildCvsID
-	if cvsID == "" {
-		cvsID, focus = h.resolveBoundCVS(ctx, pending.PlanID)
-	}
+	_, cvsID, focus := h.readPendingAndResolveBoundCVS(ctx)
 	if cvsID == "" {
 		h.logger.Info("cap_stage_held_unbound_cvs", logging.StageField(stage))
 		h.maybeWakeOnStageHold(stage, "unbound parent convergence_session")

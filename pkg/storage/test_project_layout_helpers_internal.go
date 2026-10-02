@@ -56,10 +56,7 @@ func CopyObjectSpecsFromModuleOrSkip(t *testing.T, tmpDir string) {
 // copying specs/lifecycles. Skips when specs cannot be copied (e.g. not running from a module checkout).
 func setupTestRootLikeSetupTestEnvironmentWithSpecsOrSkip(t *testing.T, tmpDir string) {
 	t.Helper()
-	modRoot := moduleRootFromGoEnv(t)
-	if err := testenvroot.BootstrapRoot(tmpDir, modRoot); err != nil {
-		t.Skipf("bootstrap root (run from module checkout): %v", err)
-	}
+	CopyObjectSpecsFromModuleOrSkip(t, tmpDir)
 	objects.ResetGlobalFieldRegistryForTesting()
 	objects.ResetGlobalKindMapperForTesting()
 	ensureTestIdentityCacheHandler()

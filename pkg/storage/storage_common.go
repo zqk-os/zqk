@@ -12,6 +12,7 @@ import (
 	"slices"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/validation"
 	"github.com/zqk-os/zqk/pkg/zqktime"
@@ -222,4 +223,22 @@ func (a *IDValidatorAdapter) InferKindFromID(id string) string {
 		return ""
 	}
 	return a.IDValidator.InferKindFromID(id)
+}
+
+// ValidateIDFormatStrict loads patterns and strictly validates id against kind format rules.
+func ValidateIDFormatStrict(v *validation.IDValidator, id, kind string) error {
+	if v == nil {
+		return nil
+	}
+	if err := v.LoadPatterns(); err != nil {
+		return errfmt.Newf(ErrMsgLoadIDPatternsValidation).Wrap(err)
+	}
+	valid, err := v.ValidateID(id, kind)
+	if err != nil {
+		return errfmt.Newf(ErrMsgValidateID).Wrap(err)
+	}
+	if !valid {
+		return errfmt.Errorf(ErrMsgInvalidIDFormat, kind, id)
+	}
+	return nil
 }

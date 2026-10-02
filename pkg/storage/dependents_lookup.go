@@ -254,3 +254,23 @@ func BindValidationLookups(opts *validation.ValidationOptions, ctx context.Conte
 		return DependentsForID(ctx, store, targetID)
 	}
 }
+
+// ExtractReferenceIDs extracts reference IDs from string, []any, or []string.
+func ExtractReferenceIDs(refValue any) []string {
+	var refIDs []string
+	switch v := refValue.(type) {
+	case string:
+		if v != emptyValue {
+			refIDs = []string{v}
+		}
+	case []any:
+		for _, item := range v {
+			if str, ok := item.(string); ok && str != emptyValue {
+				refIDs = append(refIDs, str)
+			}
+		}
+	case []string:
+		refIDs = v
+	}
+	return refIDs
+}

@@ -22,32 +22,11 @@ func (g *GraphObjectStorage) Search(ctx context.Context, secCtx *pkgctx.Security
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
+	kindsToSearch, err := PrepareSearchKinds(ctx, secCtx, query.Kinds, g.checkPermission)
+	if err != nil {
+		return nil, err
+	}
 	startTime := time.Now()
-
-	// Check permissions for requested kinds (or all kinds if empty)
-	kindsToSearch := query.Kinds
-	if len(kindsToSearch) == 0 {
-		// Get all discoverable kinds
-		fieldRegistry := objects.GetGlobalFieldRegistry()
-		if err := fieldRegistry.LoadFields(); err != nil {
-			return nil, errfmt.Newf(ConstStreamFailedToLoadFieldRegistry).Wrap(err)
-		}
-		allKinds, err := fieldRegistry.GetAllKinds()
-		if err != nil {
-			return nil, errfmt.Newf(ConstStreamFailedToGetAllKinds).Wrap(err)
-		}
-		kindsToSearch = allKinds
-	}
-
-	// Check permissions for each kind
-	for _, kind := range kindsToSearch {
-		if err := ctx.Err(); err != nil {
-			return nil, err
-		}
-		if err := g.checkPermission(secCtx, "read", kind); err != nil {
-			return nil, err
-		}
-	}
 
 	if err := ctx.Err(); err != nil {
 		return nil, err
@@ -80,24 +59,8 @@ func (g *GraphObjectStorage) Search(ctx context.Context, secCtx *pkgctx.Security
 	// Sort by score (descending)
 	SortSearchMatches(matches)
 
-	// Apply pagination
 	totalCount := len(matches)
-	start := query.Offset
-	if start < 0 {
-		start = 0
-	}
-	end := start + query.Limit
-	if query.Limit <= 0 {
-		end = len(matches)
-	}
-	if end > len(matches) {
-		end = len(matches)
-	}
-
-	var paginatedMatches []SearchMatch
-	if start < len(matches) {
-		paginatedMatches = matches[start:end]
-	}
+	paginatedMatches := PaginateSearchMatches(matches, query.Offset, query.Limit)
 
 	queryTime := time.Since(startTime)
 

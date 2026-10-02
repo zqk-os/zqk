@@ -35,7 +35,6 @@ func (f *FileObjectStorage) appendDeleteToWAL(kind, id string) error {
 
 func (f *FileObjectStorage) deleteImpl(ctx context.Context, secCtx *pkgctx.SecurityContext, id string, cascade bool) error {
 	// Require CLI authorization for deletions
-	// This prevents direct API calls from deleting objects without going through CLI
 	if !IsCLIOperation(ctx, secCtx) {
 		return errfmt.Errorf(ErrMsgDeleteRequiresCLI)
 	}

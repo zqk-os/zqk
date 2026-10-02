@@ -29,6 +29,17 @@ func (f *FileObjectStorage) readObjectFile(ctx context.Context, filePath string)
 	return f.readObjectFileViaQueue(ctx, filePath)
 }
 
+func unmarshalAndVerifyYAMLObject(data []byte) (map[string]any, error) {
+	var obj map[string]any
+	if err := yaml.Unmarshal(data, &obj); err != nil {
+		return nil, errfmt.Newf(ErrMsgParseYAML).Wrap(err)
+	}
+	if err := crud.VerifyEmbeddedChecksum(data, obj); err != nil {
+		return nil, err
+	}
+	return obj, nil
+}
+
 // readObjectFileFast reads an object from a YAML file or from a stream segment (path with "::offset").
 // Use from List bulk reads to meet sub-second target for 5k items; avoids per-file Sync and queue overhead.
 func (f *FileObjectStorage) readObjectFileFast(filePath string) (map[string]any, error) {
@@ -63,11 +74,9 @@ func (f *FileObjectStorage) readObjectFileFast(filePath string) (map[string]any,
 		}
 		filecas.StoreCASBlob(hash, data)
 	}
-	var obj map[string]any
-	if err := yaml.Unmarshal(data, &obj); err != nil {
-		return nil, errfmt.Newf(ErrMsgParseYAML).Wrap(err)
-	}
-	if err := crud.VerifyEmbeddedChecksum(data, obj); err != nil {
+
+	obj, err := unmarshalAndVerifyYAMLObject(data)
+	if err != nil {
 		return nil, err
 	}
 	if isHashFile {
@@ -157,15 +166,7 @@ func (f *FileObjectStorage) readObjectFileNoCache(filePath string) (map[string]a
 		}
 	}
 
-	var obj map[string]any
-	if err := yaml.Unmarshal(data, &obj); err != nil {
-		return nil, errfmt.Newf(ErrMsgParseYAML).Wrap(err)
-	}
-	if err := crud.VerifyEmbeddedChecksum(data, obj); err != nil {
-		return nil, err
-	}
-
-	return obj, nil
+	return unmarshalAndVerifyYAMLObject(data)
 }
 
 // prepareKeystoreEntry prepares a keystore entry with proper account_id and permission checks

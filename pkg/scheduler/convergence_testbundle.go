@@ -12,7 +12,6 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/convergerollup"
 	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/zqk-os/zqk/pkg/nildecode"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -214,19 +213,14 @@ func readTestBundleHealthJSONLFullScan(projectRoot string, maxParsedRows int) ([
 }
 
 func parseSuggestedRerunCommands(m map[string]any) []string {
-	raw, ok := m[KeySuggestedRerunCommands]
-	if !ok {
+	if m == nil {
 		return nil
 	}
-	raw, ok = nildecode.DecodeNonNilPayload[any](raw)
-	if !ok {
+	arr, ok := m[KeySuggestedRerunCommands].([]any)
+	if !ok || len(arr) == 0 {
 		return nil
 	}
-	arr, ok := raw.([]any)
-	if !ok {
-		return nil
-	}
-	out := make([]string, 0, len(arr))
+	var out []string
 	for _, x := range arr {
 		if s, ok := x.(string); ok && strings.TrimSpace(s) != emptyValue {
 			out = append(out, s)

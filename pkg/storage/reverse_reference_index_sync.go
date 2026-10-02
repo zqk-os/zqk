@@ -30,13 +30,20 @@ func BindReverseReferenceIndexProjectRoot(projectRoot string) {
 	ensureReverseReferenceIndexLoaded(projectRoot)
 }
 
-// WarmReverseReferenceIndex asynchronously warms the reverse reference index in the background if not ready.
-func WarmReverseReferenceIndex(projectRoot string) {
+func getUnreadyReverseReferenceIndex(projectRoot string) *ReverseReferenceIndex {
 	if projectRoot == emptyValue {
-		return
+		return nil
 	}
 	index := GetGlobalReverseReferenceIndex()
 	if index.IsReady() {
+		return nil
+	}
+	return index
+}
+
+// WarmReverseReferenceIndex asynchronously warms the reverse reference index in the background if not ready.
+func WarmReverseReferenceIndex(projectRoot string) {
+	if getUnreadyReverseReferenceIndex(projectRoot) == nil {
 		return
 	}
 	goroutinelabels.NewGoroutine("storage.reverse_ref_index_warm", "warming reverse reference index in background").
@@ -55,11 +62,8 @@ func reverseReferenceBoundProjectRoot() string {
 }
 
 func ensureReverseReferenceIndexLoaded(projectRoot string) {
-	if projectRoot == emptyValue {
-		return
-	}
-	index := GetGlobalReverseReferenceIndex()
-	if index.IsReady() {
+	index := getUnreadyReverseReferenceIndex(projectRoot)
+	if index == nil {
 		return
 	}
 	ok, err := index.LoadCache(projectRoot)
@@ -81,16 +85,20 @@ func ensureReverseReferenceIndexLoaded(projectRoot string) {
 	}
 }
 
+func resolveReverseReferenceProjectRoot(projectRoot string) string {
+	if projectRoot == emptyValue {
+		return reverseReferenceBoundProjectRoot()
+	}
+	return projectRoot
+}
+
 // scheduleReverseReferenceIndexPersist debounces SaveCache so burst CUD does not rewrite
 // the JSON file on every single object write.
 func scheduleReverseReferenceIndexPersist(projectRoot string) {
-	if projectRoot == emptyValue {
-		projectRoot = reverseReferenceBoundProjectRoot()
-	}
-	if projectRoot == emptyValue {
+	root := resolveReverseReferenceProjectRoot(projectRoot)
+	if root == emptyValue {
 		return
 	}
-	root := projectRoot
 	timerReady := make(chan *time.Timer, 1)
 	t := time.AfterFunc(reverseReferencePersistDebounce, func() {
 		readyT := <-timerReady

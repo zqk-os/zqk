@@ -64,10 +64,7 @@ func (f *FileObjectStorage) calculateHash(content []byte) string {
 // filename and expectedHash are used to verify the hash was actually persisted
 //
 //nolint:unparam // expectedHash kept for API consistency and potential future verification
-func (f *FileObjectStorage) saveHashRegistryWithRetry(registry *HashRegistry, _, _, _ string) error {
-	if registry == nil || StreamStorageEnabledForKind(registry.kind) {
-		return nil
-	}
+func saveHashRegistryWithExponentialBackoff(saveFn func() error) error {
 	const maxAttempts = 3
 	const initialDelay = 50 * time.Millisecond
 	const maxDelay = 500 * time.Millisecond
@@ -77,22 +74,16 @@ func (f *FileObjectStorage) saveHashRegistryWithRetry(registry *HashRegistry, _,
 	delay := initialDelay
 
 	for attempt := 0; attempt < maxAttempts; attempt++ {
-		err := f.saveHashRegistry(registry)
+		err := saveFn()
 		if err == nil {
-			// Success - Save() already does file.Sync(), so we trust it succeeded
-			// Git doesn't verify by reading back - it trusts the write succeeded
-			// Reading back immediately can hit file system caching issues (especially on macOS)
-			// The file.Sync() in Save() is the real guarantee, not a read-back verification
 			return nil
 		}
 		lastErr = err
 
-		// Last attempt, don't wait
 		if attempt == maxAttempts-1 {
 			break
 		}
 
-		// Wait before retry with exponential backoff
 		time.Sleep(delay)
 		delay = time.Duration(float64(delay) * backoffFactor)
 		if delay > maxDelay {
@@ -100,8 +91,16 @@ func (f *FileObjectStorage) saveHashRegistryWithRetry(registry *HashRegistry, _,
 		}
 	}
 
-	// All retries exhausted
 	return errfmt.Errorf(ErrMsgSaveHashReg, maxAttempts, lastErr)
+}
+
+func (f *FileObjectStorage) saveHashRegistryWithRetry(registry *HashRegistry, _, _, _ string) error {
+	if registry == nil || StreamStorageEnabledForKind(registry.kind) {
+		return nil
+	}
+	return saveHashRegistryWithExponentialBackoff(func() error {
+		return f.saveHashRegistry(registry)
+	})
 }
 
 // writeObjectFile writes an object to a YAML file

@@ -206,21 +206,7 @@ func (f *FileObjectStorage) validateObject(ctx context.Context, obj map[string]a
 			return f.IsDraftPlaneOnly(id)
 		},
 	}
-	options.ObjectLookup = func(id string) (map[string]any, error) {
-		secCtx := pkgctx.NewSystemSecurityContext()
-		return f.Read(ctx, secCtx, id)
-	}
-	options.ObjectStatusLookup = func(id string) (string, error) {
-		obj, err := options.ObjectLookup(id)
-		if err != nil {
-			return "", err
-		}
-		status, _ := obj[objects.FieldKeyStatus].(string)
-		return status, nil
-	}
-	options.DependentsLookup = func(id string) []string {
-		return DependentsForID(ctx, f, id)
-	}
+	BindValidationLookups(options, ctx, f, pkgctx.NewSystemSecurityContext())
 	if fn := pkgctx.GetValidationProgress(ctx); fn != nil {
 		options.ProgressCallback = func(stage, message string) { fn(stage, message) }
 	}
