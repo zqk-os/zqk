@@ -51,9 +51,7 @@ events, use a longer window (e.g. --window 30d or --window 90d) or explicit --st
 		RunE:  runAggregateAudit,
 	})
 
-	cmd.Flags().String("window", "24h", "Time window for aggregation (e.g., 24h, 7d, 1w)")
-	cmd.Flags().String("start", "", "Start time for aggregation window (ISO 8601 format)")
-	cmd.Flags().String("end", "", "End time for aggregation window (ISO 8601 format, defaults to now)")
+	addAggregationWindowFlags(cmd)
 	cmd.Flags().Bool("archive", false, "Archive processed events after aggregation")
 	cmd.Flags().Bool("delete", false, "Delete processed events after aggregation (use with caution)")
 	cmd.Flags().String("cleanup-metric", "", "Clean up events from a specific aggregation metric ID (e.g., AAM-001)")
@@ -61,6 +59,12 @@ events, use a longer window (e.g. --window 30d or --window 90d) or explicit --st
 
 	cli.AddCommonFlags(cmd)
 	return cmd
+}
+
+func addAggregationWindowFlags(cmd *cobra.Command) {
+	cmd.Flags().String("window", "24h", "Time window for aggregation (e.g., 24h, 7d, 1w)")
+	cmd.Flags().String("start", "", "Start time for aggregation window (ISO 8601 format)")
+	cmd.Flags().String("end", "", "End time for aggregation window (ISO 8601 format, defaults to now)")
 }
 
 func runAggregateAudit(cmd *cobra.Command, args []string) error {
@@ -114,35 +118,7 @@ func parseTimeWindowWithNow(cmd *cobra.Command, nowUTC time.Time) (start, end ti
 }
 
 func parseDuration(s string) (time.Duration, error) {
-	// Support common formats: 24h, 7d, 1w, etc.
-	if len(s) < 2 {
-		return 0, errfmt.Errorf("invalid duration format: %s", s)
-	}
-
-	unit := s[len(s)-1:]
-	value := s[:len(s)-1]
-
-	var multiplier time.Duration
-	switch unit {
-	case "h":
-		multiplier = time.Hour
-	case "d":
-		multiplier = 24 * time.Hour
-	case "w":
-		multiplier = 7 * 24 * time.Hour
-	case "m":
-		multiplier = 30 * 24 * time.Hour // Approximate month
-	default:
-		// Try standard Go duration parsing
-		return time.ParseDuration(s)
-	}
-
-	var num int
-	if _, err := fmt.Sscanf(value, "%d", &num); err != nil {
-		return 0, errfmt.Errorf("invalid duration value: %s", value)
-	}
-
-	return time.Duration(num) * multiplier, nil
+	return storage.ParseWindowSize(s)
 }
 
 // cleanupEventsFromMetric cleans up events from a specific aggregation metric

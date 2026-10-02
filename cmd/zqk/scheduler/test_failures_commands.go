@@ -93,12 +93,16 @@ func NewTestFailuresListCmd() *cobra.Command {
 	// Apply help builder to command
 	helpBuilder.ApplyToCommand(cmd)
 
-	cmd.Flags().String("package", "", "Filter by package path (e.g., ./pkg/storage)")
+	addTestFailuresPackageAndSinceFlags(cmd)
 	cmd.Flags().Int("limit", 50, "Maximum number of failures to show")
-	cmd.Flags().String("since", "24h", "Time range to analyze (e.g., 24h, 7d, 1h)")
 
 	cli.AddCommonFlags(cmd)
 	return cmd
+}
+
+func addTestFailuresPackageAndSinceFlags(cmd *cobra.Command) {
+	cmd.Flags().String("package", "", "Filter by package path (e.g., ./pkg/storage)")
+	cmd.Flags().String("since", "24h", "Time range to analyze (e.g., 24h, 7d, 1h)")
 }
 
 // NewTestFailuresRerunCmd creates the rerun command for failing tests
@@ -124,8 +128,7 @@ func NewTestFailuresRerunCmd() *cobra.Command {
 	// Apply help builder to command
 	helpBuilder.ApplyToCommand(cmd)
 
-	cmd.Flags().String("package", "", "Filter by package path (e.g., ./pkg/storage)")
-	cmd.Flags().String("since", "24h", "Time range to analyze (e.g., 24h, 7d, 1h)")
+	addTestFailuresPackageAndSinceFlags(cmd)
 
 	cli.AddCommonFlags(cmd)
 	return cmd

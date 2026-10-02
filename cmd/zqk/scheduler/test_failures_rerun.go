@@ -26,110 +26,41 @@ func rerunTestFailures(cliCtx *cli.Context, cmd *cobra.Command) error {
 	// First, list failures to get the set of failing tests
 	// Then schedule new test jobs for only those tests
 
-	projectRoot := cliCtx.ProjectRoot
-	if projectRoot == emptyValue {
-		projectRoot = cli.ResolveProjectRoot(".")
-		if projectRoot == emptyValue {
-			return errfmt.Errorf("project root not found")
-		}
-	}
-
-	packageFilter, _ := cmd.Flags().GetString("package")
-	sinceStr, _ := cmd.Flags().GetString("since")
-
-	since, err := time.ParseDuration(sinceStr)
+	cfg, err := parseTestFailuresFilterConfig(cliCtx, cmd)
 	if err != nil {
-		return errfmt.Errorf("invalid duration %q: %w", sinceStr, err)
+		return err
 	}
-
-	cutoffTime := time.Now().Add(-since)
 
 	// Find callback log files and collect failures
 	failuresByPackage := make(map[string][]string)
 
-	callbackLogsDir := filepath.Join(projectRoot, paths.ProjectDataDir, "callbacks")
-	testBundlesEventsPath := filepath.Join(schedpkg.JobLogsTestBundlesDir(projectRoot), "events.jsonl")
+	callbackLogsDir := filepath.Join(cfg.ProjectRoot, paths.ProjectDataDir, "callbacks")
+	testBundlesEventsPath := filepath.Join(schedpkg.JobLogsTestBundlesDir(cfg.ProjectRoot), "events.jsonl")
 	_, errCallbacks := fileutil.Stat(callbackLogsDir)
 	_, errBundles := fileutil.Stat(testBundlesEventsPath)
 	if errCallbacks != nil && errBundles != nil {
 		return errfmt.Errorf("no callback logs or test-bundle events found. Run some tests first")
 	}
 
-	var walkErr error
 	if errCallbacks == nil {
-		walkErr = filepath.Walk(callbackLogsDir, func(path string, info fileutil.FileInfo, walkPathErr error) error {
-			if walkPathErr != nil || info.ModTime().Before(cutoffTime) {
-				return nil //nolint:nilerr // skip unreadable or outdated files
+		walkErr := walkLogFileLines(callbackLogsDir, cfg.CutoffTime, []string{".log", ".jsonl"}, func(line string) {
+			var entry map[string]any
+			if err := json.Unmarshal([]byte(line), &entry); err != nil {
+				return
 			}
 
-			if !strings.HasSuffix(path, ".log") && !strings.HasSuffix(path, ".jsonl") {
-				return nil
-			}
-
-			data, readErr := fileutil.ReadFile(path)
-			if readErr != nil {
-				return nil //nolint:nilerr // skip files that cannot be read
-			}
-
-			for line := range strings.SplitSeq(string(data), "\n") {
-				line = strings.TrimSpace(line)
-				if line == emptyValue {
-					continue
-				}
-
-				var entry map[string]any
-				if err := json.Unmarshal([]byte(line), &entry); err != nil {
-					continue
-				}
-
-				eventType, _ := entry[objects.FieldKeyEventType].(string)
-				if eventType != schedulerStateFailed && eventType != schedulerStateError {
-					continue
-				}
-
-				testFailures, ok := entry["test_failures"].([]any)
-				if !ok {
-					continue
-				}
-
-				for _, failure := range testFailures {
-					failureStr, ok := failure.(string)
-					if !ok {
-						continue
-					}
-
-					parts := strings.Split(failureStr, ".")
-					if len(parts) < 2 {
-						continue
-					}
-
-					pkg := strings.Join(parts[:len(parts)-1], ".")
-					testName := parts[len(parts)-1]
-
-					if packageFilter != emptyValue && !strings.Contains(pkg, packageFilter) {
-						continue
-					}
-
-					pkg = strings.TrimPrefix(pkg, "github.com/zqk-os/zqk/")
-					if !strings.HasPrefix(pkg, "./") {
-						pkg = "./" + pkg
-					}
-
-					failuresByPackage[pkg] = append(failuresByPackage[pkg], testName)
-				}
-			}
-
-			return nil
+			parseCallbackTestFailures(entry, cfg.PackageFilter, func(pkg, testName string) {
+				failuresByPackage[pkg] = append(failuresByPackage[pkg], testName)
+			})
 		})
-	}
-
-	if walkErr != nil {
-		return errfmt.Newf("failed to scan callback logs").Wrap(walkErr)
+		if walkErr != nil {
+			return errfmt.Newf("failed to scan callback logs").Wrap(walkErr)
+		}
 	}
 
 	var extraTotal int
 	if errBundles == nil {
-		if err := mergeTestBundleEventFailures(projectRoot, cutoffTime, packageFilter, failuresByPackage, &extraTotal); err != nil {
+		if err := mergeTestBundleEventFailures(cfg.ProjectRoot, cfg.CutoffTime, cfg.PackageFilter, failuresByPackage, &extraTotal); err != nil {
 			return err
 		}
 	}
@@ -144,7 +75,7 @@ func rerunTestFailures(cliCtx *cli.Context, cmd *cobra.Command) error {
 
 	// Create storage and schedule test jobs
 	ctx := pkgctx.NewSystemContext()
-	storageFactory, err := storagepkg.NewStorageFactory(ctx, projectRoot)
+	storageFactory, err := storagepkg.NewStorageFactory(ctx, cfg.ProjectRoot)
 	if err != nil {
 		return errfmt.Newf("failed to create storage factory").Wrap(err)
 	}
@@ -230,8 +161,8 @@ func rerunTestFailures(cliCtx *cli.Context, cmd *cobra.Command) error {
 	}
 
 	// Enqueue trigger requests so the daemon actually runs the jobs (same as zqk test run enqueue).
-	if len(jobIDs) > 0 && projectRoot != emptyValue {
-		triggerQueue := schedpkg.NewJobTriggerQueue(projectRoot)
+	if len(jobIDs) > 0 && cfg.ProjectRoot != emptyValue {
+		triggerQueue := schedpkg.NewJobTriggerQueue(cfg.ProjectRoot)
 		if enqErr := triggerQueue.EnqueueTriggerRequests(jobIDs, ""); enqErr != nil {
 			schedpkg.SLog(logger).Warn(paths.RewriteCanonicalCLIInvocations("Failed to enqueue trigger requests for rerun jobs; trigger them manually with 'zqk scheduler trigger <job-id>'")).
 				WithError(enqErr).

@@ -34,3 +34,15 @@ func resolveSemanticProjectRoot(cmd *cobra.Command) (string, error) {
 	}
 	return projectRoot, nil
 }
+
+func assessSemanticMaturity(cmd *cobra.Command, errPrefix string) (*semantic.MaturityAssessment, error) {
+	projectRoot, err := resolveSemanticProjectRoot(cmd)
+	if err != nil {
+		return nil, err
+	}
+	assessment, err := runMaturityAssessment(projectRoot)
+	if err != nil {
+		return nil, errfmt.Newf("%s", errPrefix).Wrap(err)
+	}
+	return assessment, nil
+}

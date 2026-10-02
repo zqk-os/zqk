@@ -122,15 +122,13 @@ func runLiteralRepoGates(projectRoot string) (fkExit, zeExit int) {
 }
 
 func loadRollupChildSessions(cmd *cobra.Command, parentID string, maxChildren int) ([]convergerollup.ChildSessionInput, error) {
-	proc, err := cli.NewProcessor(cmd)
+	cpc, err := initCommandProcContext(cmd)
 	if err != nil {
 		return nil, err
 	}
-	ctx := proc.OperationContext()
-	sec := proc.SecurityContext()
 
 	refsFor := func(id string) ([]string, error) {
-		obj, rerr := proc.Storage().Read(ctx, sec, id)
+		obj, rerr := cpc.Proc.Storage().Read(cpc.Ctx, cpc.Sec, id)
 		if rerr != nil {
 			return nil, rerr
 		}
@@ -144,7 +142,7 @@ func loadRollupChildSessions(cmd *cobra.Command, parentID string, maxChildren in
 		}}, nil
 	}
 
-	parent, err := proc.Storage().Read(ctx, sec, parentID)
+	parent, err := cpc.Proc.Storage().Read(cpc.Ctx, cpc.Sec, parentID)
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +161,7 @@ func loadRollupChildSessions(cmd *cobra.Command, parentID string, maxChildren in
 			})
 			break
 		}
-		ch, err := proc.Storage().Read(ctx, sec, id)
+		ch, err := cpc.Proc.Storage().Read(cpc.Ctx, cpc.Sec, id)
 		if err != nil {
 			out = append(out, convergerollup.ChildSessionInput{
 				ID:       id,
@@ -210,21 +208,9 @@ func cvsIDsFromRelatedObjectRefs(raw any) []string {
 
 // collectCVSTreeForOverseer returns coordinator + descendants reachable via related_object_refs (CVS-* only), BFS, depth-limited.
 func collectCVSTreeForOverseer(cmd *cobra.Command, rootID string, maxDepth int) ([]convergerollup.CVSTreeNode, error) {
-	proc, err := cli.NewProcessor(cmd)
+	nodeFor, _, err := cvsNestNodeLoader(cmd)
 	if err != nil {
 		return nil, err
-	}
-	ctx := proc.OperationContext()
-	sec := proc.SecurityContext()
-
-	nodeFor := func(id string) ([]string, string, string, error) {
-		obj, rerr := proc.Storage().Read(ctx, sec, id)
-		if rerr != nil {
-			return nil, "", "", rerr
-		}
-		st, _ := obj[objects.FieldKeyStatus].(string)
-		phase, _ := obj[objects.FieldKeyCurrentPhase].(string)
-		return cvsIDsFromRelatedObjectRefs(obj[objects.FieldKeyRelatedObjectRefs]), st, phase, nil
 	}
 	return convergerollup.CollectCVSTreeBFS(rootID, maxDepth, nodeFor)
 }

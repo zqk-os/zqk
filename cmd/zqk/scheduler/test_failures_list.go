@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
-	"time"
 
 	"github.com/spf13/cobra"
 
@@ -20,29 +19,17 @@ import (
 )
 
 func listTestFailures(cliCtx *cli.Context, cmd *cobra.Command) error {
-	projectRoot := cliCtx.ProjectRoot
-	if projectRoot == emptyValue {
-		projectRoot = cli.ResolveProjectRoot(".")
-		if projectRoot == emptyValue {
-			return errfmt.Errorf("project root not found")
-		}
-	}
-
-	packageFilter, _ := cmd.Flags().GetString("package")
-	limit, _ := cmd.Flags().GetInt("limit")
-	sinceStr, _ := cmd.Flags().GetString("since")
-
-	since, err := time.ParseDuration(sinceStr)
+	cfg, err := parseTestFailuresFilterConfig(cliCtx, cmd)
 	if err != nil {
-		return errfmt.Errorf("invalid duration %q: %w", sinceStr, err)
+		return err
 	}
 
-	cutoffTime := time.Now().Add(-since)
+	limit, _ := cmd.Flags().GetInt("limit")
 
 	// Find callback log files AND scheduler execution logs
-	callbackLogsDir := filepath.Join(projectRoot, paths.ProjectDataDir, "callbacks")
-	schedulerLogsDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.LogsDir, paths.SchedulerJobLogsSubdir)
-	testBundlesEventsPath := filepath.Join(schedpkg.JobLogsTestBundlesDir(projectRoot), "health.jsonl")
+	callbackLogsDir := filepath.Join(cfg.ProjectRoot, paths.ProjectDataDir, "callbacks")
+	schedulerLogsDir := filepath.Join(cfg.ProjectRoot, paths.ProjectDataDir, paths.LogsDir, paths.SchedulerJobLogsSubdir)
+	testBundlesEventsPath := filepath.Join(schedpkg.JobLogsTestBundlesDir(cfg.ProjectRoot), "health.jsonl")
 
 	hasCallbackLogs := false
 	hasSchedulerLogs := false
@@ -72,83 +59,17 @@ func listTestFailures(cliCtx *cli.Context, cmd *cobra.Command) error {
 
 	// Process callback logs (contains parsed test_failures from callbacks)
 	if hasCallbackLogs {
-		err = filepath.Walk(callbackLogsDir, func(path string, info fileutil.FileInfo, err error) error {
-			if err != nil {
-				return nil //nolint:nilerr // skip files we can't read
+		err = walkLogFileLines(callbackLogsDir, cfg.CutoffTime, []string{".log", ".jsonl"}, func(line string) {
+			var entry map[string]any
+			if err := json.Unmarshal([]byte(line), &entry); err != nil {
+				return
 			}
 
-			// Only process log files modified since cutoff
-			if info.ModTime().Before(cutoffTime) {
-				return nil
-			}
-
-			if !strings.HasSuffix(path, ".log") && !strings.HasSuffix(path, ".jsonl") {
-				return nil
-			}
-
-			// Read and parse log file
-			data, err := fileutil.ReadFile(path)
-			if err != nil {
-				return nil //nolint:nilerr // skip files we can't read
-			}
-
-			// Parse JSONL format (one JSON object per line)
-			for line := range strings.SplitSeq(string(data), "\n") {
-				line = strings.TrimSpace(line)
-				if line == emptyValue {
-					continue
-				}
-
-				var entry map[string]any
-				if err := json.Unmarshal([]byte(line), &entry); err != nil {
-					continue // Skip invalid JSON
-				}
-
-				// Check if this is an error callback with test failures
-				eventType, _ := entry[objects.FieldKeyEventType].(string)
-				if eventType != schedulerStateFailed && eventType != schedulerStateError {
-					continue
-				}
-
-				// Extract test failures if present
-				testFailures, ok := entry["test_failures"].([]any)
-				if !ok {
-					continue
-				}
-
-				for _, failure := range testFailures {
-					failureStr, ok := failure.(string)
-					if !ok {
-						continue
-					}
-
-					// Parse "package.TestName" format
-					parts := strings.Split(failureStr, ".")
-					if len(parts) < 2 {
-						continue
-					}
-
-					pkg := strings.Join(parts[:len(parts)-1], ".")
-					testName := parts[len(parts)-1]
-
-					// Apply package filter if specified
-					if packageFilter != emptyValue && !strings.Contains(pkg, packageFilter) {
-						continue
-					}
-
-					// Normalize package path
-					pkg = strings.TrimPrefix(pkg, "github.com/zqk-os/zqk/")
-					if !strings.HasPrefix(pkg, "./") {
-						pkg = "./" + pkg
-					}
-
-					fullTestName := fmt.Sprintf("%s.%s", pkg, testName)
-					failuresByPackage[pkg] = append(failuresByPackage[pkg], fullTestName)
-					totalFailures++
-				}
-			}
-
-			return nil
+			parseCallbackTestFailures(entry, cfg.PackageFilter, func(pkg, testName string) {
+				fullTestName := fmt.Sprintf("%s.%s", pkg, testName)
+				failuresByPackage[pkg] = append(failuresByPackage[pkg], fullTestName)
+				totalFailures++
+			})
 		})
 		if err != nil {
 			return errfmt.Newf("failed to scan callback logs").Wrap(err)
@@ -158,79 +79,50 @@ func listTestFailures(cliCtx *cli.Context, cmd *cobra.Command) error {
 	// Process scheduler execution logs (.zqk/logs/scheduler/SCH-XXX/SCH-XXX.log)
 	// These contain execution history with stdout/stderr that may have test failure info
 	if hasSchedulerLogs {
-		err = filepath.Walk(schedulerLogsDir, func(path string, info fileutil.FileInfo, err error) error {
-			if err != nil {
-				return nil //nolint:nilerr // skip files we can't read
+		err = walkLogFileLines(schedulerLogsDir, cfg.CutoffTime, []string{".log"}, func(line string) {
+			var entry map[string]any
+			if err := json.Unmarshal([]byte(line), &entry); err != nil {
+				return
 			}
 
-			// Only process log files modified since cutoff
-			if info.ModTime().Before(cutoffTime) {
-				return nil
+			// Check if this is a failed test execution
+			eventType, _ := entry[objects.FieldKeyEventType].(string)
+			if eventType != schedulerStateFailed {
+				return
 			}
 
-			if !strings.HasSuffix(path, ".log") {
-				return nil
+			// Extract command to check if it's a test command
+			command, _ := entry[objects.FieldKeyCommand].(string)
+			if !strings.Contains(command, "go test") {
+				return
 			}
 
-			// Read and parse log file
-			data, err := fileutil.ReadFile(path)
-			if err != nil {
-				return nil //nolint:nilerr // skip files we can't read
-			}
+			// Extract stderr which may contain test failure details
+			stderr, _ := entry["stderr"].(string)
+			if stderr != emptyValue {
+				// Try to parse test failures from stderr using test parser
+				if summary, err := gotestparse.ParseGoTestOutput(stderr); err == nil && summary.FailedCount > 0 {
+					for _, test := range summary.FailedTestList {
+						pkg := test.PackagePath
+						testName := test.TestName
 
-			// Parse JSONL format
-			for line := range strings.SplitSeq(string(data), "\n") {
-				line = strings.TrimSpace(line)
-				if line == emptyValue {
-					continue
-				}
-
-				var entry map[string]any
-				if err := json.Unmarshal([]byte(line), &entry); err != nil {
-					continue
-				}
-
-				// Check if this is a failed test execution
-				eventType, _ := entry[objects.FieldKeyEventType].(string)
-				if eventType != schedulerStateFailed {
-					continue
-				}
-
-				// Extract command to check if it's a test command
-				command, _ := entry[objects.FieldKeyCommand].(string)
-				if !strings.Contains(command, "go test") {
-					continue
-				}
-
-				// Extract stderr which may contain test failure details
-				stderr, _ := entry["stderr"].(string)
-				if stderr != emptyValue {
-					// Try to parse test failures from stderr using test parser
-					if summary, err := gotestparse.ParseGoTestOutput(stderr); err == nil && summary.FailedCount > 0 {
-						for _, test := range summary.FailedTestList {
-							pkg := test.PackagePath
-							testName := test.TestName
-
-							// Apply package filter if specified
-							if packageFilter != emptyValue && !strings.Contains(pkg, packageFilter) {
-								continue
-							}
-
-							// Normalize package path
-							pkg = strings.TrimPrefix(pkg, "github.com/zqk-os/zqk/")
-							if !strings.HasPrefix(pkg, "./") {
-								pkg = "./" + pkg
-							}
-
-							fullTestName := fmt.Sprintf("%s.%s", pkg, testName)
-							failuresByPackage[pkg] = append(failuresByPackage[pkg], fullTestName)
-							totalFailures++
+						// Apply package filter if specified
+						if cfg.PackageFilter != emptyValue && !strings.Contains(pkg, cfg.PackageFilter) {
+							continue
 						}
+
+						// Normalize package path
+						pkg = strings.TrimPrefix(pkg, "github.com/zqk-os/zqk/")
+						if !strings.HasPrefix(pkg, "./") {
+							pkg = "./" + pkg
+						}
+
+						fullTestName := fmt.Sprintf("%s.%s", pkg, testName)
+						failuresByPackage[pkg] = append(failuresByPackage[pkg], fullTestName)
+						totalFailures++
 					}
 				}
 			}
-
-			return nil
 		})
 		if err != nil {
 			return errfmt.Newf("failed to scan scheduler logs").Wrap(err)
@@ -238,7 +130,7 @@ func listTestFailures(cliCtx *cli.Context, cmd *cobra.Command) error {
 	}
 
 	if hasTestBundlesEvents {
-		if err := mergeTestBundleEventFailures(projectRoot, cutoffTime, packageFilter, failuresByPackage, &totalFailures); err != nil {
+		if err := mergeTestBundleEventFailures(cfg.ProjectRoot, cfg.CutoffTime, cfg.PackageFilter, failuresByPackage, &totalFailures); err != nil {
 			return err
 		}
 	}

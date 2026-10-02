@@ -149,22 +149,11 @@ func handleArchiveCleanupFromMetric(cleanupCtx *CleanupEventsContext, eventIDs [
 
 // handleCacheInvalidationForDelete handles cache invalidation after deletion
 func handleCacheInvalidationForDelete(cleanupCtx *CleanupEventsContext, eventIDs []string, buf *bytes.Buffer) {
-	proc, procErr := cli.NewProcessor(cleanupCtx.Cmd)
-	if procErr != nil {
-		return
-	}
-
-	cacheCtx := pkgctx.NewCacheInvalidationContext(
-		eventIDs,
+	invalidateBulkEventsCache(
+		cleanupCtx.Cmd,
 		cleanupCtx.ProjectRoot,
 		fmt.Sprintf("Bulk deletion of events from metric %s", cleanupCtx.MetricID),
+		eventIDs,
+		buf,
 	)
-	cacheInvalidated, cacheErr := proc.InvalidateCache(cacheCtx)
-	if cacheErr != nil {
-		//nolint:gocritic // preferFprint: POL-CODE-007 buffer via WriteString(Sprintf)
-		fmt.Fprintf(buf, "  ⚠️  Warning: Failed to invalidate cache: %v\n", cacheErr)
-	} else if cacheInvalidated > 0 {
-		//nolint:gocritic // preferFprint: POL-CODE-007 buffer via WriteString(Sprintf)
-		fmt.Fprintf(buf, "  ✅ Cache entries invalidated: %d\n", cacheInvalidated)
-	}
 }
