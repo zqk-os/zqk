@@ -23,24 +23,20 @@ func NewEmitStatusCmd() *cobra.Command {
 
 func runFeedEmitStatus(cmd *cobra.Command, args []string) error {
 	return withFeedRoot(func(cmd *cobra.Command, proc *cli.Processor, root string, flags *clipkg.FlagBag) error {
-		personaRef := strings.TrimSpace(flags.String(cmd, "persona-ref"))
-		agentID := strings.TrimSpace(flags.String(cmd, "agent-id"))
-		summary := flags.String(cmd, "summary")
-		noAck := flags.Bool(cmd, "no-ack")
+		p, err := parsePersonaEventFlags(cmd, flags)
+		if err != nil {
+			return err
+		}
 		pulseHuman := flags.Bool(cmd, "pulse-human")
 		if err := flags.Err(); err != nil {
 			return err
 		}
 
-		if err := validateSeatAndPersona(agentID, personaRef); err != nil {
-			return err
-		}
-
-		persona, err := resolveAndValidatePersona(proc, personaRef, "emit-status")
+		persona, err := resolveAndValidatePersona(proc, p.personaRef, "emit-status")
 		if err != nil {
 			return err
 		}
-		if err := validateUsablePersonaStatus(persona, personaRef); err != nil {
+		if err := validateUsablePersonaStatus(persona, p.personaRef); err != nil {
 			return err
 		}
 		roleFromPersona, _ := persona[objects.FieldKeyRole].(string)
@@ -49,13 +45,13 @@ func runFeedEmitStatus(cmd *cobra.Command, args []string) error {
 
 		res, err := agentfeed.AppendEvent(agentfeed.AppendEventInput{
 			ProjectRoot: root,
-			Message:     summary,
-			AgentID:     agentID,
-			PersonaRef:  personaRef,
+			Message:     p.summary,
+			AgentID:     p.agentID,
+			PersonaRef:  p.personaRef,
 			Role:        roleFromPersona,
 			Sender:      agentfeed.FeedSenderMeshStatus,
 			EventType:   agentfeed.FeedEventTypeMeshStatus,
-			SelfACK:     !noAck,
+			SelfACK:     !p.noAck,
 		})
 		if err != nil {
 			return errfmt.Newf("feed emit-status").Wrap(err)
@@ -64,21 +60,21 @@ func runFeedEmitStatus(cmd *cobra.Command, args []string) error {
 		logger := logging.GetLoggerFromProfile(proc.Context().Profile)
 		logging.Fluent(logger).Info("feed emit-status appended").
 			Path(res.EventPath).
-			PersonaRef(personaRef).
+			PersonaRef(p.personaRef).
 			PersonaTitle(strings.TrimSpace(title)).
 			Role(roleFromPersona).
-			AgentID(agentID).
+			AgentID(p.agentID).
 			FeedID(res.FeedID).
 			Log()
 
-		out := newPersonaFeedResult(cmd, res, personaRef, agentID)
+		out := newPersonaFeedResult(cmd, res, p.personaRef, p.agentID)
 		if roleFromPersona != "" {
 			out[objects.FieldKeyRole] = roleFromPersona
 		}
 		if t := strings.TrimSpace(title); t != "" {
 			out["persona_title"] = t
 		}
-		if pulseHuman && idebridge.QueueProofOfLife(root, summary) {
+		if pulseHuman && idebridge.QueueProofOfLife(root, p.summary) {
 			out["ide_bridge_queued"] = true
 		}
 		return cli.FormatOutput(cmd, out)

@@ -7,11 +7,9 @@ import (
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/docman"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
-	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // NewRegisterCmd creates a new register command
@@ -53,27 +51,12 @@ func NewRegisterCmd() *cobra.Command {
 }
 
 func runRegister(cmd *cobra.Command, args []string) error {
-	// Get context from command
-	cmdCtx := cmd.Context()
-	if cmdCtx == nil {
-		cmdCtx = pkgctx.NewSystemContext()
-	}
-
-	// Get profile from command flags or default
-	profile := string(pkgctx.ProfileHuman)
-	if f := cmd.Flags().Lookup("context"); f != nil {
-		if val, err := cmd.Flags().GetString("context"); err == nil && val != emptyValue {
-			profile = val
-		}
+	cmdCtx, profile, projectRoot, storageProvider, err := resolveDocmanContext(cmd)
+	if err != nil {
+		return err
 	}
 
 	logger := logging.GetLoggerFromProfile(profile)
-
-	// Get project root
-	projectRoot := cli.ResolveProjectRoot(".")
-	if projectRoot == emptyValue {
-		return errfmt.Errorf("project root not found")
-	}
 
 	// Get flags
 	dryRun, err := cmd.Flags().GetBool("dry-run")
@@ -95,13 +78,6 @@ func runRegister(cmd *cobra.Command, args []string) error {
 	if shippedOnly && len(subtrees) == 0 {
 		subtrees = docman.ShippedInitDocSubtrees
 	}
-
-	// Initialize storage provider via StorageFactory for unified storage routing
-	factory, err := storage.NewStorageFactory(cmdCtx, projectRoot)
-	if err != nil {
-		return errfmt.Newf("failed to initialize storage factory").Wrap(err)
-	}
-	storageProvider := factory.GetStorageForKind("doc_entry")
 
 	// Create registry
 	registry := docman.NewRegistry(storageProvider, projectRoot)

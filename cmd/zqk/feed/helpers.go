@@ -208,3 +208,81 @@ func formatPeerWakeOutput(
 	}
 	return cli.FormatOutput(cmd, out)
 }
+
+type peerEventFlags struct {
+	message      string
+	agentID      string
+	feedID       string
+	noAck        bool
+	noWake       bool
+	toAgentID    string
+	awaitPeerAck bool
+}
+
+func parsePeerEventFlags(cmd *cobra.Command, flags *clipkg.FlagBag) (peerEventFlags, error) {
+	p := peerEventFlags{
+		message:      flags.String(cmd, "message"),
+		agentID:      flags.String(cmd, "agent-id"),
+		feedID:       flags.String(cmd, "feed-id"),
+		noAck:        flags.Bool(cmd, "no-ack"),
+		noWake:       flags.Bool(cmd, "no-wake"),
+		toAgentID:    flags.String(cmd, "to-agent-id"),
+		awaitPeerAck: flags.Bool(cmd, "await-peer-ack"),
+	}
+	if err := flags.Err(); err != nil {
+		return p, err
+	}
+	if err := agentfeed.EnforceDirectedHourglass(p.toAgentID, p.awaitPeerAck); err != nil {
+		return p, err
+	}
+	return p, nil
+}
+
+func validateLiteFeedID(resFeedID, feedID string) error {
+	if want := strings.TrimSpace(feedID); want != "" && resFeedID != "" && want != resFeedID {
+		return errfmt.Errorf("lite feed_id %q does not match --feed-id %q (rematerialize agent_chat_channel)", resFeedID, want)
+	}
+	return nil
+}
+
+func registerPeerAckAwaitHelper(logger logging.Logger, root string, res agentfeed.AppendEventResult, agentID, toAgentID, action, opName string) (string, error) {
+	aw, aerr := agentfeed.RegisterPeerAckAwait(root, agentfeed.PeerAckAwaitInput{
+		EventID:     res.EventID,
+		FromAgentID: agentID,
+		ToAgentID:   toAgentID,
+		Action:      action,
+		WakeMessage: agentfeed.PeerAckPasteStub(res.EventID),
+	})
+	if aerr != nil {
+		return "", errfmt.Newf("feed %s: register peer-ack await", opName).Wrap(aerr)
+	}
+	logging.Fluent(logger).Info("peer-ack await registered").
+		String("await_id", aw.ID).
+		String("event_id", res.EventID).
+		Log()
+	return aw.ID, nil
+}
+
+type personaEventFlags struct {
+	personaRef string
+	agentID    string
+	summary    string
+	noAck      bool
+}
+
+func parsePersonaEventFlags(cmd *cobra.Command, flags *clipkg.FlagBag) (personaEventFlags, error) {
+	p := personaEventFlags{
+		personaRef: strings.TrimSpace(flags.String(cmd, "persona-ref")),
+		agentID:    strings.TrimSpace(flags.String(cmd, "agent-id")),
+		summary:    flags.String(cmd, "summary"),
+		noAck:      flags.Bool(cmd, "no-ack"),
+	}
+	if err := flags.Err(); err != nil {
+		return p, err
+	}
+	if err := validateSeatAndPersona(p.agentID, p.personaRef); err != nil {
+		return p, err
+	}
+	return p, nil
+}
+

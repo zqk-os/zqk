@@ -300,7 +300,10 @@ func executeJSONHTTPRequest(ctx context.Context, client specbuilder.APIClient, m
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		respBody, _ := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
+		respBody, readErr := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
+		if readErr != nil {
+			return errfmt.Errorf("API error: status=%d (failed to read body: %v)", resp.StatusCode, readErr)
+		}
 		return errfmt.Errorf("API error: status=%d body=%s", resp.StatusCode, string(respBody))
 	}
 

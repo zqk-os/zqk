@@ -10,7 +10,6 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/storage"
 	internal "github.com/zqk-os/zqk/pkg/zqkcli"
 )
 
@@ -19,6 +18,10 @@ var domainRegistryIDRe = regexp.MustCompile(`^DOMAIN-REG-(\d+)$`)
 // NewRegisterCmd creates the register command from the generated builder
 func NewRegisterCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewDomainRegisterCommandBuilder()
+	cmd.Flags().String("domain-id", "", "Domain ID to register")
+	cmd.Flags().String(objects.KindNamespace, "", "Namespace for domain objects")
+	cmd.Flags().String("spec-file", "", "Path to YAML spec file describing domain ontology")
+	cmd.Flags().Bool("dry-run", false, "Preview changes without creating or updating registry")
 	cli.BindAsyncProgress(cmd, runRegister)
 	return cmd
 }
@@ -42,11 +45,6 @@ func runRegister(cmd *cobra.Command, args []string) error {
 			return cli.WriteOutput(cmd, []byte(msg))
 		}
 
-		ctx := proc.OperationContext()
-		secCtx := proc.SecurityContext()
-		store := proc.Storage()
-		storageCtx := pkgctx.NewStorageContext()
-
 		entry := map[string]any{
 			objects.FieldKeyID: domainID,
 		}
@@ -57,13 +55,14 @@ func runRegister(cmd *cobra.Command, args []string) error {
 			entry["spec_file"] = specFile
 		}
 
-		listResult, err := store.List(ctx, secCtx, storageCtx, storage.ListFilter{
-			Kind:  objects.KindDomainRegistry,
-			Limit: 1000,
-		})
+		listResult, err := listDomainRegistries(proc, 1000)
 		if err != nil {
 			return errfmt.Newf("failed to list domain_registry").Wrap(err)
 		}
+
+		ctx := proc.OperationContext()
+		secCtx := proc.SecurityContext()
+		store := proc.Storage()
 
 		if len(listResult.Objects) == 0 {
 			regID := internal.NextSequentialID(listResult.Objects, domainRegistryIDRe, "DOMAIN-REG-%03d")

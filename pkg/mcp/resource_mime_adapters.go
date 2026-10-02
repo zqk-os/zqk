@@ -209,16 +209,16 @@ func extractStructuredDescription(data map[string]any) string {
 	if len(data) == 0 {
 		return emptyValue
 	}
-	if desc, ok := data[objects.FieldKeyDescription].(string); ok && desc != emptyValue {
+	if desc := objects.GetString(data, objects.FieldKeyDescription); desc != emptyValue {
 		return desc
 	}
-	if desc, ok := data["Description"].(string); ok && desc != emptyValue {
+	if desc := objects.GetString(data, "Description"); desc != emptyValue {
 		return desc
 	}
-	if title, ok := data[objects.FieldKeyTitle].(string); ok && title != emptyValue {
+	if title := objects.GetString(data, objects.FieldKeyTitle); title != emptyValue {
 		return fmt.Sprintf("Documentation: %s", title)
 	}
-	if title, ok := data["Title"].(string); ok && title != emptyValue {
+	if title := objects.GetString(data, "Title"); title != emptyValue {
 		return fmt.Sprintf("Documentation: %s", title)
 	}
 	return emptyValue
@@ -228,16 +228,16 @@ func extractStructuredTitle(data map[string]any) string {
 	if len(data) == 0 {
 		return emptyValue
 	}
-	if title, ok := data[objects.FieldKeyTitle].(string); ok && title != emptyValue {
+	if title := objects.GetString(data, objects.FieldKeyTitle); title != emptyValue {
 		return title
 	}
-	if title, ok := data["Title"].(string); ok && title != emptyValue {
+	if title := objects.GetString(data, "Title"); title != emptyValue {
 		return title
 	}
-	if name, ok := data[objects.FieldKeyName].(string); ok && name != emptyValue {
+	if name := objects.GetString(data, objects.FieldKeyName); name != emptyValue {
 		return name
 	}
-	if name, ok := data["Name"].(string); ok && name != emptyValue {
+	if name := objects.GetString(data, "Name"); name != emptyValue {
 		return name
 	}
 	return emptyValue

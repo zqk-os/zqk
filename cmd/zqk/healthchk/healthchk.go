@@ -69,15 +69,38 @@ func (s healthchkListSource) List(ctx context.Context, opts clipkg.ListOptions) 
 	return items, len(items), nil
 }
 
-func runList(cmd *cobra.Command, args []string) error {
+func resolveHealthcheckProjectRoot(cmd *cobra.Command) (string, error) {
 	ctx := cli.GetContext(cmd)
 	if ctx == nil {
-		return errfmt.Errorf("failed to get context")
+		return emptyValue, errfmt.Errorf("failed to get context")
 	}
 	projectRoot := cli.ResolveProjectRoot(".")
 	if projectRoot == emptyValue {
 		projectRoot = ctx.ProjectRoot
 	}
+	if projectRoot == emptyValue {
+		return emptyValue, errfmt.Errorf("project root not found")
+	}
+	return projectRoot, nil
+}
+
+func resolveBoundRegistry(cmd *cobra.Command) (string, *healthcheck.DefaultRegistryImpl, error) {
+	projectRoot, err := resolveHealthcheckProjectRoot(cmd)
+	if err != nil {
+		return emptyValue, nil, err
+	}
+	reg, ok := healthcheck.DefaultRegistry.(*healthcheck.DefaultRegistryImpl)
+	if !ok {
+		return emptyValue, nil, errfmt.Errorf("registry does not support config persistence")
+	}
+	if err := reg.BindProjectRoot(projectRoot); err != nil {
+		return emptyValue, nil, err
+	}
+	return projectRoot, reg, nil
+}
+
+func runList(cmd *cobra.Command, args []string) error {
+	projectRoot, _ := resolveHealthcheckProjectRoot(cmd)
 	reg, ok := healthcheck.DefaultRegistry.(*healthcheck.DefaultRegistryImpl)
 	if ok && projectRoot != emptyValue {
 		_ = reg.BindProjectRoot(projectRoot)
@@ -105,22 +128,8 @@ func newUpdateCmd() *cobra.Command {
 }
 
 func runUpdate(cmd *cobra.Command, args []string) error {
-	ctx := cli.GetContext(cmd)
-	if ctx == nil {
-		return errfmt.Errorf("failed to get context")
-	}
-	projectRoot := cli.ResolveProjectRoot(".")
-	if projectRoot == emptyValue {
-		projectRoot = ctx.ProjectRoot
-	}
-	if projectRoot == emptyValue {
-		return errfmt.Errorf("project root not found")
-	}
-	reg, ok := healthcheck.DefaultRegistry.(*healthcheck.DefaultRegistryImpl)
-	if !ok {
-		return errfmt.Errorf("registry does not support config persistence")
-	}
-	if err := reg.BindProjectRoot(projectRoot); err != nil {
+	_, reg, err := resolveBoundRegistry(cmd)
+	if err != nil {
 		return err
 	}
 	id := args[0]
@@ -146,16 +155,9 @@ func newRunCmd() *cobra.Command {
 }
 
 func runRun(cmd *cobra.Command, args []string) error {
-	ctx := cli.GetContext(cmd)
-	if ctx == nil {
-		return errfmt.Errorf("failed to get context")
-	}
-	projectRoot := cli.ResolveProjectRoot(".")
-	if projectRoot == emptyValue {
-		projectRoot = ctx.ProjectRoot
-	}
-	if projectRoot == emptyValue {
-		return errfmt.Errorf("project root not found")
+	projectRoot, err := resolveHealthcheckProjectRoot(cmd)
+	if err != nil {
+		return err
 	}
 	reg, ok := healthcheck.DefaultRegistry.(*healthcheck.DefaultRegistryImpl)
 	if ok {
@@ -210,22 +212,8 @@ func newBulkDisableCmd() *cobra.Command {
 }
 
 func runBulkDisable(cmd *cobra.Command, args []string) error {
-	ctx := cli.GetContext(cmd)
-	if ctx == nil {
-		return errfmt.Errorf("failed to get context")
-	}
-	projectRoot := cli.ResolveProjectRoot(".")
-	if projectRoot == emptyValue {
-		projectRoot = ctx.ProjectRoot
-	}
-	if projectRoot == emptyValue {
-		return errfmt.Errorf("project root not found")
-	}
-	reg, ok := healthcheck.DefaultRegistry.(*healthcheck.DefaultRegistryImpl)
-	if !ok {
-		return errfmt.Errorf("registry does not support config persistence")
-	}
-	if err := reg.BindProjectRoot(projectRoot); err != nil {
+	_, reg, err := resolveBoundRegistry(cmd)
+	if err != nil {
 		return err
 	}
 	idsStr, _ := cmd.Flags().GetString("ids")

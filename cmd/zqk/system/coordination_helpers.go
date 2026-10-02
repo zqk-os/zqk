@@ -55,7 +55,7 @@ func setupSystemCoordinator(
 	}
 
 	ctx = createContextWithLoggingProfile(ctx, profile)
-	auditRouter := coordination.NewStorageAuditRouter(projectRoot, storageProvider)
+	auditRouter := coordination.NewAuditRouter(projectRoot, storageProvider)
 
 	var metricsRouter coordination.MetricsRouter
 	if withMetrics && storageProvider != nil {
