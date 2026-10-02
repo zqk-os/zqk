@@ -5,6 +5,7 @@ package bldr_cli_cmd_v1
 import (
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 )
 
 // NewAuthCommandBuilder creates a new auth command
@@ -12,12 +13,17 @@ func NewAuthCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("auth")
 	builder.WithShort("Login and logout for CLI session lifecycle")
 	help := clipkg.DynamicHelpBuilder("Login and logout for CLI session lifecycle")
-	help.WithDescriptionLines("Login and logout for CLI session lifecycle.")
-	help.WithDescriptionLines("Session ID can be stored in ZQK_SESSION_ID (env) or in .zqk/state/session (file).")
-	help.WithDescriptionLines("Multiple terminals share the same session via the file; a file lock ensures consistency.")
-	help.WithDescriptionLines("Use 'auth login' to create or reuse a session; use 'auth logout' to end it.")
+	help.WithDescriptionLines("Session and authentication commands for managing the CLI operator identity lifecycle.")
+	help.WithDescriptionLines("Session IDs can be stored in the ZQK_SESSION_ID environment variable or persisted")
+	help.WithDescriptionLines("in .zqk/state/session under process-level file lock so multiple terminal panes")
+	help.WithDescriptionLines("transparently share a unified agent session without authentication drift.")
+	help.AddExample("Create or reuse an active CLI operator session", "%s auth login")
+	help.AddExample("End active session and clear persisted state", "%s auth logout")
 	builder.WithHelpBuilder(help)
-	builder.WithCommonFlags(false, nil)
+	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
 	cmd := builder.Build()
+	cli.RequireStorage(cmd, false)
+	cli.RequireSession(cmd, false)
+	cli.RequireSchedulerCheck(cmd, false)
 	return cmd
 }

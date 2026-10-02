@@ -1,0 +1,9 @@
+kind: criteria
+schema_version: "2.0.0"
+id: CRIT-onboarding-system-health
+title: Kernel subsystems pass comprehensive health checks
+description: |
+  Execution of `zqk system check` exits 0 with zero errors across CAS storage, schema registry,
+  WAL event streaming, git hooks configuration, and daemon connectivity.
+category: functional
+status: awaiting_verification

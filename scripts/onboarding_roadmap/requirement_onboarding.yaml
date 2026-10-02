@@ -1,0 +1,29 @@
+kind: requirement
+schema_version: "2.0.0"
+id: REQ-onboarding-foundation
+title: Establish agent and operator onboarding baseline
+description: |
+  New human operators and autonomous agents entering the system MUST establish deterministic
+  identity, verify environment health across all kernel subsystems, internalize operating philosophy,
+  and conform to fail-closed mutation boundaries.
+priority: p0
+status: active
+problem_statement: |
+  Without a structured, verified onboarding baseline, newly initialized agents and operators risk
+  violating graph invariants, issuing unbudgeted external searches, mutating process state out-of-band,
+  and causing system degradation.
+operational_scope: |
+  Covers identity establishment, environment verification via system check, core philosophy ingestion,
+  and schema validation across CAS storage, scheduler, and git hooks.
+goal_refs:
+  - GOAL-onboarding
+priority_plan_refs:
+  - PRIO-onboarding
+workstream_refs:
+  - WS-onboarding
+criteria_refs:
+  - CRIT-onboarding-philosophy-mastery
+  - CRIT-onboarding-system-health
+  - CRIT-onboarding-failclosed-boundary
+milestone_refs:
+  - MIL-onboarding

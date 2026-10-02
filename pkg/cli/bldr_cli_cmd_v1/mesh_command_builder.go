@@ -5,6 +5,7 @@ package bldr_cli_cmd_v1
 import (
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 )
 
 // NewMeshCommandBuilder creates a new mesh command
@@ -12,10 +13,16 @@ func NewMeshCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("mesh")
 	builder.WithShort("Manage peer-to-peer agent mesh networking, routing, and discovery")
 	help := clipkg.DynamicHelpBuilder("Manage peer-to-peer agent mesh networking, routing, and discovery")
-	help.WithDescriptionLines("Controls the agent mesh overlay network, peer discovery, route propagation, and")
-	help.WithDescriptionLines("swarm communication.")
+	help.WithDescriptionLines("Controls the agent mesh overlay network, peer discovery, capacity marketplace,")
+	help.WithDescriptionLines("and capability leasing across sovereign kernel nodes.")
+	help.AddExample("Inspect available capacity and resources in the mesh marketplace", "%s mesh market")
+	help.AddExample("Advertise local agent seat or compute capacity to peer nodes", "%s mesh advertise compute --amount 4.0 --units cores")
+	help.AddExample("Lease a capability or agent seat from a remote provider", "%s mesh lease res-agent-qa --from kernel-peer-alpha --duration 1h")
 	builder.WithHelpBuilder(help)
-	builder.WithCommonFlags(false, nil)
+	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
 	cmd := builder.Build()
+	cli.RequireStorage(cmd, true)
+	cli.RequireSession(cmd, false)
+	cli.RequireSchedulerCheck(cmd, false)
 	return cmd
 }

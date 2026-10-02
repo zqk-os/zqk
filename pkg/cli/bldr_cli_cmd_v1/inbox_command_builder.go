@@ -5,18 +5,24 @@ package bldr_cli_cmd_v1
 import (
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 )
 
 // NewInboxCommandBuilder creates a new inbox command
 func NewInboxCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("inbox")
-	builder.WithShort("Manage the Autonomy Inbox for agent proposals and instructions")
-	help := clipkg.DynamicHelpBuilder("Manage the Autonomy Inbox for agent proposals and instructions")
-	help.WithDescriptionLines("The inbox command group provides access to the Autonomy Inbox Protocol. Agents")
-	help.WithDescriptionLines("and workflows submit proposals (agent_instruction objects) into the inbox. Human")
-	help.WithDescriptionLines("operators review, approve, or reject these proposals before execution.")
+	builder.WithShort("Inspect and manage the agent autonomy inbox")
+	help := clipkg.DynamicHelpBuilder("Inspect and manage the agent autonomy inbox")
+	help.WithDescriptionLines("Inspects and manages proposals, instructions, and coordination directives")
+	help.WithDescriptionLines("submitted to the Agent Autonomy Inbox. Enables operators to review, filter,")
+	help.WithDescriptionLines("and steer autonomous agent activity across the swarm.")
+	help.AddExample("List all pending agent instruction proposals in the inbox", "%s inbox list")
+	help.AddExample("Filter inbox proposals for a specific persona", "%s inbox list --persona PER-COMMUNITY-SOFTWARE-ENGINEER")
 	builder.WithHelpBuilder(help)
-	builder.WithCommonFlags(false, nil)
+	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
 	cmd := builder.Build()
+	cli.RequireStorage(cmd, true)
+	cli.RequireSession(cmd, true)
+	cli.RequireSchedulerCheck(cmd, false)
 	return cmd
 }

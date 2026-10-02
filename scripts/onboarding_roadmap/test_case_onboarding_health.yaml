@@ -1,0 +1,13 @@
+kind: test_case
+schema_version: "2.0.0"
+id: TST-onboarding-health-check
+title: Verify kernel system check operational health
+description: |
+  Runs `zqk system check` and asserts exit code 0 and table status OK across all critical subsystems.
+category: unit
+status: active
+criteria_refs:
+  - CRIT-onboarding-system-health
+backlog_item_refs:
+  - BLI-onboarding-system-health
+execution_command: zqk system check

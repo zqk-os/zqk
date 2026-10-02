@@ -8,6 +8,10 @@ description: |
   (tracked per account via certification) before engaging in project work.
 status: in_progress
 plan_date: "2026-02-23"
+workstream_refs:
+  - WS-onboarding
+goal_refs:
+  - GOAL-onboarding
 note: |
   Curriculum is discoverable via zqk object list backlog_item --filter priority_plan_ref=PRIO-onboarding.
   Completion is tracked per account; see ONBOARDING_ROADMAP_AND_CERTIFICATION.md.

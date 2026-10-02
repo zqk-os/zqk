@@ -5,17 +5,26 @@ package bldr_cli_cmd_v1
 import (
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 )
 
 // NewInboxListCommandBuilder creates a new inbox_list command
 func NewInboxListCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("list")
-	builder.WithShort("List items in the Autonomy Inbox")
-	help := clipkg.DynamicHelpBuilder("List items in the Autonomy Inbox")
-	help.WithDescriptionLines("List agent_instruction proposals currently pending in the inbox. Supports")
-	help.WithDescriptionLines("filtering by status and persona.")
+	builder.WithShort("List pending agent instruction proposals in the autonomy inbox")
+	help := clipkg.DynamicHelpBuilder("List pending agent instruction proposals in the autonomy inbox")
+	help.WithDescriptionLines("Retrieves and displays agent instruction proposals currently queued in the")
+	help.WithDescriptionLines("Autonomy Inbox. Supports filtering by execution status and target persona ref,")
+	help.WithDescriptionLines("sorting by reverse chronological order (newest first).")
+	help.AddExample("List all active proposals in the autonomy inbox", "%s inbox list")
+	help.AddExample("Filter pending proposals for the code craftsman persona", "%s inbox list --status pending --persona PER-COMMUNITY-CODE-CRAFTSMAN")
 	builder.WithHelpBuilder(help)
-	builder.WithCommonFlags(false, nil)
+	builder.AddStringFlag("status", "s", "", "Filter instruction proposals by status (e.g. pending, approved, rejected)")
+	builder.AddStringFlag("persona", "p", "", "Filter instruction proposals directed to a specific persona ID")
+	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
 	cmd := builder.Build()
+	cli.RequireStorage(cmd, true)
+	cli.RequireSession(cmd, true)
+	cli.RequireSchedulerCheck(cmd, false)
 	return cmd
 }

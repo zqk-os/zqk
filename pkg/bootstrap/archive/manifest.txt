@@ -980,7 +980,6 @@
 ./scripts/scheduler_jobs/cap_orchestrator.yaml
 ./scripts/scheduler_jobs/chat_responder.yaml
 ./scripts/scheduler_jobs/cleanup_on_demand.yaml
-./scripts/scheduler_jobs/convergence_orchestrate.yaml
 ./scripts/scheduler_jobs/convergence_overseer_record_daily.yaml
 ./scripts/scheduler_jobs/data_cell_envelope_tick_six_hourly.yaml
 ./scripts/scheduler_jobs/emergency_manager.yaml

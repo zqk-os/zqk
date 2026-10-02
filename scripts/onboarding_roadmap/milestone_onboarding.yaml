@@ -1,11 +1,15 @@
 kind: milestone
 schema_version: "2.0.0"
-# id omitted - system assigns. After creating workstream and backlog items, set workstream_refs and backlog_item_refs.
+id: MIL-onboarding
 title: Complete onboarding curriculum
 description: |
   First milestone for Agent and User Onboarding: complete the three core backlog items
   (Read Operational Philosophy, Start Here, System health check) before participating in the project.
 stage_type: stage
 status: in_progress
-workstream_refs: []
-backlog_item_refs: []
+workstream_refs:
+  - WS-onboarding
+criteria_refs:
+  - CRIT-onboarding-philosophy-mastery
+  - CRIT-onboarding-system-health
+  - CRIT-onboarding-failclosed-boundary

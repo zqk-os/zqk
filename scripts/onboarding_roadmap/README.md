@@ -1,85 +1,113 @@
-# Onboarding Roadmap
+# Onboarding Roadmap & Complete Ontological Cascade
 
-This directory contains YAML templates for the **Agent & User Onboarding** workstream, priority plan, and backlog items. The onboarding curriculum is first-class system data (workstream, priority plan, backlog items) so it is indexed, discoverable, and auditable.
+This directory defines the canonical, end-to-end ontological onboarding chain for the **Agent & User Onboarding** domain. In ZQK, onboarding curriculum is first-class, content-addressed system data rather than transient documentation or tribal knowledge.
 
-**Design**: Architecture overview and onboarding curriculum (see [docs/onboarding/COMMUNITY_FIRST_RUN.md](../../docs/onboarding/COMMUNITY_FIRST_RUN.md))
+## Ontological Architecture: The Five-Layer Cascade
 
-**Automated seed**: [scripts/scheduler_jobs/onboarding_roadmap_seed.yaml](../scheduler_jobs/onboarding_roadmap_seed.yaml) runs the same steps as below (milestone before backlog items with `milestone_refs`). After `zqk system init --with-onboarding-roadmap`, start the scheduler once to execute the job.
+This curriculum exemplifies the complete five-layer cascade defined in `community-ontological-architecture`:
 
-## Reference pattern for advanced tutorials
-
-This roadmap is a **template for curriculum-as-data**: a `priority_plan`, `workstream`, `milestone`, `goal`, and linked `backlog_item` rows, all discoverable via `object list` / filters. Advanced tutorials can reuse the same shape with different YAML under `scripts/` (or another path) and a dedicated `scheduler_job` (`run_wrapper`) or manual CLI steps. That showcases **customizability** without forking the CLI: swap templates, add backlog items, tie items to additional milestones or policies, and keep everything auditable in `.zqk/process/`. Point authors at this directory and the seed job as the **minimal working example**; link longer narrative docs from `doc_entries` or policy bodies as needed.
-
-## Creation order (CLI only)
-
-All objects must be created via the zqk CLI. Do not edit instance YAML under `.zqk/process/` directly.
-
-Backlog items in these templates use **`status: planned`**, which requires **at least one `milestone_ref`** (see `backlog_item` lifecycle). Create the **milestone** before the backlog items, then pass `milestone_refs` on create (and link `workstream_refs` afterward).
-
-### 1. Create the priority plan
-
-```bash
-zqk object create priority_plan --file scripts/onboarding_roadmap/priority_plan_onboarding.yaml
+```
+Layer 1: Strategic Intent     [goal: GOAL-onboarding]
+                                   │
+Layer 2: Execution Spine       [workstream: WS-onboarding] ── [priority_plan: PRIO-onboarding]
+                                   │
+Layer 3: System Capability     [requirement: REQ-onboarding-foundation]
+                                   │
+Layer 3: Three-Fold Proof      ├── [criteria: CRIT-onboarding-philosophy-mastery] (Static Invariant)
+                               ├── [criteria: CRIT-onboarding-system-health]      (Dynamic Behavior)
+                               └── [criteria: CRIT-onboarding-failclosed-boundary] (Negative Invariant)
+                                   │
+Layer 4: Verification          ├── [test_case: TST-onboarding-health-check]
+                               └── [test_case: TST-onboarding-mutation-boundary]
+                                   │
+Layer 5: Phased Actions        [milestone: MIL-onboarding]
+                                   ├── [backlog_item: BLI-onboarding-read-philosophy]
+                                   ├── [backlog_item: BLI-onboarding-start-here]
+                                   └── [backlog_item: BLI-onboarding-system-health]
 ```
 
-Result: Plan with id `PRIO-onboarding` (fixed in template). Note the plan ID for filters.
+### The Three-Fold Proof Formula
 
-### 2. Create the workstream
+To set a rigorous example, requirement satisfaction is not 1:1 with a single criteria node. Every requirement defines at least 3 orthogonal criteria:
 
-```bash
-zqk object create workstream --file scripts/onboarding_roadmap/workstream_onboarding.yaml --relaxed
-```
+1. **State Invariant (Static Floor)**: `CRIT-onboarding-philosophy-mastery` — verifies comprehension of core architectural tenets (event-driven architecture, declarative specifications, deterministic CAS content-addressing, acyclic graph edge ownership).
+2. **Dynamic Behavior (Operational Proof)**: `CRIT-onboarding-system-health` — programmatic execution where `zqk system check` exits 0 with zero errors across CAS storage, schema registry, WAL streaming, and git hooks.
+3. **Negative Invariant (Adversarial Boundary)**: `CRIT-onboarding-failclosed-boundary` — confirms unauthenticated mutations, missing mandatory fields, or writes bypassing the CAS membrane fail closed deterministically.
 
-Result: Workstream created with system-assigned ID (e.g. `WS-XXX`). **Capture this ID** for later steps.
+---
 
-### 3. Create the milestone and link the workstream
+## 1. Primary Seed Flow: Declarative ZQL Transaction
 
-```bash
-zqk object create milestone --file scripts/onboarding_roadmap/milestone_onboarding.yaml
-# Capture MIL-ID from output, then link workstream:
-zqk object ref add <MIL-ID> <WS-ID>
-```
-*(Legacy alternative: `zqk object update <MIL-ID> --field "workstream_refs=[<WS-ID>]"`)*
-
-### 4. Create backlog items (with `milestone_refs`) and link the workstream
+The entire multi-object constellation is seeded in a single atomic ACID transaction via Kahn topological ordering:
 
 ```bash
-zqk object create backlog_item --file scripts/onboarding_roadmap/backlog_item_01_read_philosophy.yaml --field "milestone_refs=[<MIL-ID>]"
-zqk object create backlog_item --file scripts/onboarding_roadmap/backlog_item_02_start_here.yaml --field "milestone_refs=[<MIL-ID>]"
-zqk object create backlog_item --file scripts/onboarding_roadmap/backlog_item_03_system_health.yaml --field "milestone_refs=[<MIL-ID>]"
+zqk object mutate --file scripts/onboarding_roadmap/onboarding_seed.zql
 ```
 
-Then link the workstream to each item using the schema-aware reference command:
+*(Automated execution is handled by `scripts/scheduler_jobs/onboarding_roadmap_seed.yaml`)*.
+
+---
+
+## 2. High-Level Creation Flow (`new object`)
+
+When creating individual onboarding nodes manually, use the high-level draft plane and promote workflow rather than raw low-level file imports:
+
+### Minting onto the Draft Plane
 
 ```bash
-zqk object ref add <BLI-ID-1> <WS-ID>
-zqk object ref add <BLI-ID-2> <WS-ID>
-zqk object ref add <BLI-ID-3> <WS-ID>
+# 1. Mint requirement (scaffolds trace pipeline)
+zqk new object requirement --title "Establish agent and operator onboarding baseline"
+
+# 2. Mint criteria
+zqk new object criteria --title "Kernel subsystems pass comprehensive health checks"
+
+# 3. Mint backlog items
+zqk new object backlog_item --title "Read Operational Philosophy policy"
 ```
 
-### 5. Create the goal and link milestone + backlog
+### Promoting Along the Lifecycle
+
+Once fields and references are populated on `.zqk/object_drafts/<ID>.yaml`:
 
 ```bash
-zqk object create goal --file scripts/onboarding_roadmap/goal_onboarding.yaml
-# Capture GOAL-ID, then link relationships cleanly via object ref add:
-zqk object ref add <GOAL-ID> <WS-ID>
-zqk object ref add <GOAL-ID> <BLI-1> <BLI-2> <BLI-3>
-zqk object ref add <MIL-ID> <BLI-1> <BLI-2> <BLI-3>
+zqk object promote <OBJECT-ID>
 ```
-*(Legacy alternative: `zqk object update <GOAL-ID> --field "workstream_refs=[<WS-ID>]" --field "backlog_item_refs=[<BLI-1>,<BLI-2>,<BLI-3>]"`)*
 
-### 6. Optional: agent_onboarding_preparation
+---
 
-Link an `agent_onboarding_preparation` to this workstream and set `preparation_tasks` to the list of onboarding backlog item IDs for discoverability. See object spec `agent_onboarding_preparation.yaml`.
+## 3. Direct Template Scaffolds (Declarative YAML)
 
-## Discovery
+The YAML templates in this directory provide pre-populated schemas for reference or direct CAS staging:
 
-- List onboarding backlog items:  
-  `zqk object list backlog_item --filter priority_plan_ref=PRIO-onboarding`
-- Get the workstream:  
-  `zqk object list workstream --filter "title=Agent & User Onboarding"`
-- Start Here and Operational Philosophy policies point users/agents to this curriculum.
+- `goal_onboarding.yaml` (`GOAL-onboarding`)
+- `workstream_onboarding.yaml` (`WS-onboarding`)
+- `priority_plan_onboarding.yaml` (`PRIO-onboarding`)
+- `requirement_onboarding.yaml` (`REQ-onboarding-foundation`)
+- `criteria_onboarding_philosophy.yaml` (`CRIT-onboarding-philosophy-mastery`)
+- `criteria_onboarding_system_health.yaml` (`CRIT-onboarding-system-health`)
+- `criteria_onboarding_failclosed_boundary.yaml` (`CRIT-onboarding-failclosed-boundary`)
+- `test_case_onboarding_health.yaml` (`TST-onboarding-health-check`)
+- `test_case_onboarding_boundary.yaml` (`TST-onboarding-mutation-boundary`)
+- `milestone_onboarding.yaml` (`MIL-onboarding`)
+- `backlog_item_01_read_philosophy.yaml` (`BLI-onboarding-read-philosophy`)
+- `backlog_item_02_start_here.yaml` (`BLI-onboarding-start-here`)
+- `backlog_item_03_system_health.yaml` (`BLI-onboarding-system-health`)
 
-## Per-account completion and certification
+*(Low-level CLI primitive: `zqk object create <kind> --file <path>`)*
 
-Completion of these items is tracked **per account** (not by marking backlog items "complete" once). See the design doc for the proposed **certification** object and optional X.509 credential. Until certification is implemented, completion can be tracked manually or via audit/attestation.
+---
+
+## Discovery & Querying
+
+- **List onboarding backlog items**:
+  ```bash
+  zqk object list backlog_item --filter priority_plan_ref=PRIO-onboarding
+  ```
+- **Inspect complete requirement lineage**:
+  ```bash
+  zqk object get REQ-onboarding-foundation
+  ```
+- **Traverse graph relationships**:
+  ```bash
+  zqk object related REQ-onboarding-foundation
+  ```

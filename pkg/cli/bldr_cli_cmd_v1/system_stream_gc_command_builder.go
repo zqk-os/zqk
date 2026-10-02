@@ -5,6 +5,7 @@ package bldr_cli_cmd_v1
 import (
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 )
 
 // NewSystemStreamGcCommandBuilder creates a new system_stream_gc command
@@ -12,9 +13,17 @@ func NewSystemStreamGcCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("stream-gc")
 	builder.WithShort("Run garbage collector to prune orphaned JSONL stream segment files")
 	help := clipkg.DynamicHelpBuilder("Run garbage collector to prune orphaned JSONL stream segment files")
-	help.WithDescriptionLines("Run garbage collector to prune orphaned JSONL stream segment files")
+	help.WithDescriptionLines("Scans .zqk/streams/ across all object kinds to identify and safely prune")
+	help.WithDescriptionLines("orphaned JSONL segment files that are no longer referenced by active indexes.")
+	help.WithDescriptionLines("Reclaims disk space and avoids file descriptor exhaustion in long-running")
+	help.WithDescriptionLines("agent hives without compromising historical durability.")
+	help.AddExample("Perform stream garbage collection across all object kinds", "%s system stream-gc")
 	builder.WithHelpBuilder(help)
-	builder.WithCommonFlags(false, nil)
+	builder.WithArgs(cobra.NoArgs)
+	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
 	cmd := builder.Build()
+	cli.RequireStorage(cmd, true)
+	cli.RequireSession(cmd, false)
+	cli.RequireSchedulerCheck(cmd, false)
 	return cmd
 }

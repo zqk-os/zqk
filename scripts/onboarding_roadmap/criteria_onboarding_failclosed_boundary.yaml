@@ -1,0 +1,9 @@
+kind: criteria
+schema_version: "2.0.0"
+id: CRIT-onboarding-failclosed-boundary
+title: Direct store mutations without membrane validation fail closed
+description: |
+  Unauthenticated or malformed mutations, out-of-order lifecycle transitions, or raw writes
+  bypassing the CAS membrane boundary are deterministically rejected with non-zero exit codes.
+category: security
+status: awaiting_verification

@@ -5,16 +5,46 @@ package bldr_cli_cmd_v1
 import (
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 )
 
 // NewGrepCommandBuilder creates a new grep command
 func NewGrepCommandBuilder() *cobra.Command {
-	builder := clipkg.NewCommandBuilder("grep")
+	builder := clipkg.NewCommandBuilder("grep [query] [path]")
 	builder.WithShort("In-process trigram and AST code search")
 	help := clipkg.DynamicHelpBuilder("In-process trigram and AST code search")
-	help.WithDescriptionLines("Fast in-process pure-Go code search engine with trigram indexing, Go AST structural queries, and token-budgeted JSON output.")
+	help.WithDescriptionLines("Fast in-process pure-Go code search engine with sub-15ms trigram indexing,")
+	help.WithDescriptionLines("Go AST structural queries (functions, methods, structs, interfaces), and strict")
+	help.WithDescriptionLines("token-budgeted JSON output for AI agent contexts. Eliminates external ripgrep/tgrep")
+	help.WithDescriptionLines("binary dependencies and avoids blowing agent token budgets.")
+	help.AddExample("Literal string search across repository", "%s grep 'MaterializedView'")
+	help.AddExample("Case-insensitive search", "%s grep -i 'wal_subscriber'")
+	help.AddExample("Regular expression search", "%s grep -e 'func.*Start\\('")
+	help.AddExample("AST search for all struct declarations", "%s grep --ast --kind struct")
+	help.AddExample("AST search for methods on a specific receiver", "%s grep --ast --recv Engine")
+	help.AddExample("Token-budgeted JSON output for AI agent context consumption", "%s grep 'error' --max-tokens 2000 -f json")
+	help.AddExample("Rebuild and refresh persistent trigram index", "%s grep --reindex")
 	builder.WithHelpBuilder(help)
+	builder.WithArgs(cobra.NoArgs)
+	builder.AddBoolFlag("ignore-case", "i", false, "Case-insensitive search")
+	builder.AddBoolFlag("regex", "e", false, "Treat query as regular expression")
+	builder.AddBoolFlag("word-regexp", "w", false, "Match only whole words")
+	builder.AddBoolFlag("ast", "", false, "Enable Go AST structural query mode")
+	builder.AddStringFlag("kind", "", "", "Filter AST declarations by kind (func, method, struct, interface, type, var, const)")
+	builder.AddStringFlag("recv", "", "", "Filter AST methods by receiver type name")
+	builder.AddIntFlag("context", "C", 0, "Show NUM lines of surrounding context")
+	builder.AddIntFlag("max-count", "m", 100, "Stop searching after NUM matches")
+	builder.AddIntFlag("max-tokens", "", 4000, "Maximum estimated tokens in response payload before truncation")
+	builder.AddStringArrayFlag("ext", "", "Filter files by extension (e.g. --ext .go,.yaml)")
+	builder.AddBoolFlag("use-index", "", true, "Use trigram index acceleration")
+	builder.AddBoolFlag("reindex", "", false, "Rebuild and persist trigram index cache")
+	builder.AddBoolFlag("hidden", "", false, "Search hidden files and directories")
+	builder.AddStringFlag("path", "p", "", "Target file or directory path")
+	builder.AddStringFlag("format", "f", "lines", "Output format: lines, json, yaml")
 	builder.WithCommonFlags(false, nil)
 	cmd := builder.Build()
+	cli.RequireStorage(cmd, false)
+	cli.RequireSession(cmd, false)
+	cli.RequireSchedulerCheck(cmd, false)
 	return cmd
 }

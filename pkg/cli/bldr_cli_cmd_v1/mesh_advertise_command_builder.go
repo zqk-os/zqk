@@ -5,17 +5,28 @@ package bldr_cli_cmd_v1
 import (
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 )
 
 // NewMeshAdvertiseCommandBuilder creates a new mesh_advertise command
 func NewMeshAdvertiseCommandBuilder() *cobra.Command {
-	builder := clipkg.NewCommandBuilder("advertise")
+	builder := clipkg.NewCommandBuilder("advertise <resource_type>")
 	builder.WithShort("Advertise local agent seat capabilities and availability to the swarm mesh")
 	help := clipkg.DynamicHelpBuilder("Advertise local agent seat capabilities and availability to the swarm mesh")
-	help.WithDescriptionLines("Publishes agent seat specifications, supported roles, and availability status to")
-	help.WithDescriptionLines("the peer-to-peer swarm mesh.")
+	help.WithDescriptionLines("Publishes a capacity advertisement object into the kernel graph, broadcasting")
+	help.WithDescriptionLines("local agent seat capabilities, compute capacity, or specialized skills to")
+	help.WithDescriptionLines("federated peer nodes in the sovereign swarm mesh.")
+	help.AddExample("Advertise 2 QA Verification agent seats to the mesh", "%s mesh advertise agent_seat --amount 2 --units seats --resource-id qa-verifier")
+	help.AddExample("Advertise compute capacity for distributed model evaluation", "%s mesh advertise compute --amount 8.0 --units cores")
 	builder.WithHelpBuilder(help)
-	builder.WithCommonFlags(false, nil)
+	builder.WithArgs(cobra.ExactArgs(1))
+	builder.AddStringFlag("amount", "a", "", "Quantity of capacity or resources being advertised (e.g. 4.0)")
+	builder.AddStringFlag("units", "u", "instances", "Measurement unit for the advertised capacity (e.g. seats, cores, instances)")
+	builder.AddStringFlag("resource-id", "", "", "Unique local identifier for the advertised resource")
+	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
 	cmd := builder.Build()
+	cli.RequireStorage(cmd, true)
+	cli.RequireSession(cmd, false)
+	cli.RequireSchedulerCheck(cmd, false)
 	return cmd
 }

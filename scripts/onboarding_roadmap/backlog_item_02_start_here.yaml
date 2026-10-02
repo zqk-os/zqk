@@ -5,7 +5,14 @@ description: |
   Follow the "For New Agents and Users - Start Here (Tutorial)" policy:
   Steps 1–4 (philosophy, mission/vision/goals, policy index, current priority plan).
 priority_plan_ref: PRIO-onboarding
-workstream_refs: []   # Replace with [<WS-ID>] after creating workstream
+workstream_refs:
+  - WS-onboarding
+milestone_refs:
+  - MIL-onboarding
+requirement_refs:
+  - REQ-onboarding-foundation
+criteria_refs:
+  - CRIT-onboarding-failclosed-boundary
 priority_tier: P0
 status: planned
 category: Developer Experience

@@ -5,16 +5,25 @@ package bldr_cli_cmd_v1
 import (
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 )
 
 // NewSystemEmergencyManagerCommandBuilder creates a new system_emergency_manager command
 func NewSystemEmergencyManagerCommandBuilder() *cobra.Command {
 	builder := clipkg.NewCommandBuilder("emergency-manager")
-	builder.WithShort("Monitors the health of the CAP orchestrator and Kernel Steward. Executes safe rollbacks or stashes untracked files if the main managers fail continuously.")
-	help := clipkg.DynamicHelpBuilder("Monitors the health of the CAP orchestrator and Kernel Steward. Executes safe rollbacks or stashes untracked files if the main managers fail continuously.")
-	help.WithDescriptionLines("Monitors the health of the CAP orchestrator and Kernel Steward. Executes safe rollbacks or stashes untracked files if the main managers fail continuously.")
+	builder.WithShort("Monitors scheduler daemon and orchestrator health, initiating automated recovery")
+	help := clipkg.DynamicHelpBuilder("Monitors scheduler daemon and orchestrator health, initiating automated recovery")
+	help.WithDescriptionLines("Supervisor watchdog that monitors the operational health of the scheduler daemon,")
+	help.WithDescriptionLines("the CAP loop orchestrator, and Kernel Steward. Evaluates process liveness and")
+	help.WithDescriptionLines("heartbeat freshness; if the scheduler process dies or keep-alives become stale,")
+	help.WithDescriptionLines("executes an automated safe recovery cycle (forceful stop and clean restart).")
+	help.AddExample("Evaluate scheduler health and trigger automated recovery if stale", "%s system emergency-manager")
 	builder.WithHelpBuilder(help)
-	builder.WithCommonFlags(false, nil)
+	builder.WithArgs(cobra.NoArgs)
+	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
 	cmd := builder.Build()
+	cli.RequireStorage(cmd, false)
+	cli.RequireSession(cmd, false)
+	cli.RequireSchedulerCheck(cmd, false)
 	return cmd
 }

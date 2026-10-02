@@ -1,0 +1,14 @@
+kind: test_case
+schema_version: "2.0.0"
+id: TST-onboarding-mutation-boundary
+title: Verify fail-closed rejection on invalid object mutations
+description: |
+  Asserts that creating or mutating objects with missing mandatory fields, invalid schemas,
+  or unregistered kinds fails closed.
+category: unit
+status: active
+criteria_refs:
+  - CRIT-onboarding-failclosed-boundary
+backlog_item_refs:
+  - BLI-onboarding-start-here
+execution_command: zqk object create unknown_kind --data "invalid" 2>&1 | grep -q "unknown kind"

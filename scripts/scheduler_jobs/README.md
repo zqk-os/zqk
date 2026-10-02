@@ -55,11 +55,12 @@ Now includes glossary maintenance flags:
 
 Default cap in YAML: `AUTOFIX_GLOSSARY_MAX_CREATE=25`.
 
-**Create/update from YAML:**
+**Create/update from YAML (high-level new object flow):**
 
 ```bash
-zqk object create scheduler_job --file scripts/scheduler_jobs/autofix_process_pending.yaml --keep-file --force
+zqk new object scheduler_job --file scripts/scheduler_jobs/autofix_process_pending.yaml --promote
 ```
+*(Low-level CAS import alternative: `zqk object create scheduler_job --file scripts/scheduler_jobs/autofix_process_pending.yaml --keep-file --force`)*
 
 ## retention_tolerance_catchall.yaml
 
@@ -71,11 +72,12 @@ Catch-all retention job: runs retention tolerance for all kinds in `retention_to
 zqk system ensure-retention-jobs
 ```
 
-**Create manually (if needed):**
+**Manual creation flow (high-level draft-and-promote):**
 
 ```bash
-zqk object create scheduler_job --file scripts/scheduler_jobs/retention_tolerance_catchall.yaml
+zqk new object scheduler_job --file scripts/scheduler_jobs/retention_tolerance_catchall.yaml --promote
 ```
+*(Low-level CAS import alternative: `zqk object create scheduler_job --file scripts/scheduler_jobs/retention_tolerance_catchall.yaml`)*
 
 ## SCH-016: Cleanup Old Command Metrics (bulk delete)
 
@@ -99,34 +101,12 @@ Default audit event aggregation job (e.g. SCH-002). Used by `zqk system ensure-r
 zqk system ensure-retention-jobs
 ```
 
-**Create manually:**
+**Manual creation flow (high-level draft-and-promote):**
 
 ```bash
-zqk object create scheduler_job --file scripts/scheduler_jobs/audit_event_aggregation_default.yaml
+zqk new object scheduler_job --file scripts/scheduler_jobs/audit_event_aggregation_default.yaml --promote
 ```
-
-
-## convergence_orchestrate.yaml
-
-Timer **`run_wrapper`** for **`./scripts/cvs_convergence_orchestrate.sh`** (persist session + Python rollup **`--apply`**, with **`--no-fail-on-gates`** for scheduled runs). **`schedule_expression`** on the job object is the source of truth for cadence (the committed YAML may ship an example such as **`*/15 * * * *`**). Set **`CONVERGENCE_SESSION_ID`** before enabling. **Disabled by default** (`enabled: false`). Id **`SCH-convergence-orchestrate`**.
-
-**Create:**
-
-```bash
-zqk object create scheduler_job --file scripts/scheduler_jobs/convergence_orchestrate.yaml --keep-file
-```
-
-**If the job id already exists:** `zqk object create scheduler_job --file scripts/scheduler_jobs/convergence_orchestrate.yaml --keep-file --force`
-
-**Manual trigger (after enabling):**
-
-```bash
-zqk scheduler trigger SCH-convergence-orchestrate
-```
-
-Update **`CONVERGENCE_SESSION_ID`** in **`environment_variables`** when your active **`CVS-*`** changes. Tests: **`go test ./cmd/zqk/scheduler -run ConvergenceOrchestrate -timeout 60s`**.
-
-See **`docs/architecture/CONVERGENCE_ORCHESTRATION_AND_NESTED_CVS.md`** (Appendix E).
+*(Low-level CAS import alternative: `zqk object create scheduler_job --file scripts/scheduler_jobs/audit_event_aggregation_default.yaml`)*
 
 ## Persistent Daemons vs. Scheduled Jobs
 
