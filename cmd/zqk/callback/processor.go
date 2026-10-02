@@ -254,49 +254,31 @@ func (p *Processor) formatLogEntry(entry *CallbackEntry) ([]byte, error) {
 	}
 }
 
-// formatJSONL formats entry as JSONL (one JSON object per line, no trailing newline in object)
-func (p *Processor) formatJSONL(entry *CallbackEntry) ([]byte, error) {
-	// Create event object with timestamp
-	event := map[string]any{
-		"timestamp": entry.Timestamp.Format(time.RFC3339),
-	}
-
-	// Copy payload fields
+func (p *Processor) callbackEventMap(entry *CallbackEntry) map[string]any {
+	event := make(map[string]any, len(entry.Payload)+1)
+	event["timestamp"] = entry.Timestamp.Format(time.RFC3339)
 	for k, v := range entry.Payload {
 		event[k] = v
 	}
+	return event
+}
 
-	// Marshal as compact JSON (no indentation) and add newline
-	jsonData, err := json.Marshal(event)
+// formatJSONL formats entry as JSONL (one JSON object per line, no trailing newline in object)
+func (p *Processor) formatJSONL(entry *CallbackEntry) ([]byte, error) {
+	jsonData, err := json.Marshal(p.callbackEventMap(entry))
 	if err != nil {
 		return nil, errfmt.Newf("failed to marshal JSON").Wrap(err)
 	}
-
-	// JSONL: one JSON object per line
-	jsonData = append(jsonData, '\n')
-	return jsonData, nil
+	return append(jsonData, '\n'), nil
 }
 
 // formatJSON formats entry as pretty-printed JSON
 func (p *Processor) formatJSON(entry *CallbackEntry) ([]byte, error) {
-	// Create event object with timestamp
-	event := map[string]any{
-		"timestamp": entry.Timestamp.Format(time.RFC3339),
-	}
-
-	// Copy payload fields
-	for k, v := range entry.Payload {
-		event[k] = v
-	}
-
-	// Marshal as indented JSON
-	jsonData, err := json.MarshalIndent(event, "", "  ")
+	jsonData, err := json.MarshalIndent(p.callbackEventMap(entry), "", "  ")
 	if err != nil {
 		return nil, errfmt.Newf("failed to marshal JSON").Wrap(err)
 	}
-
-	jsonData = append(jsonData, '\n')
-	return jsonData, nil
+	return append(jsonData, '\n'), nil
 }
 
 // formatText formats entry as human-readable text (original format)

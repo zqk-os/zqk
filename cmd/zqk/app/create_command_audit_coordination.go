@@ -82,16 +82,7 @@ func emitCommandExecutionEventViaCoordinator(
 	// Embed LoggingContext in context so coordinator logging respects --context profile
 	ctx = createContextWithLoggingProfile(ctx, profile)
 
-	// Create routers for coordinator
-	auditRouter := coordination.NewStorageAuditRouter(projectRoot, storageProvider)
-
-	// Create coordinator with routers (only audit for command execution events)
-	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
-		LoggingRouter:     &coordination.DefaultLoggingRouter{},
-		AuditRouter:       auditRouter,
-		MetricsRouter:     nil, // Command execution events don't need metrics router
-		OperationalRouter: &coordination.DefaultOperationalRouter{},
-	})
+	coordinator := coordination.NewStorageCoordinator(projectRoot, storageProvider)
 
 	// Build audit metadata
 	auditMetadata := make(map[string]any)

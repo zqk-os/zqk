@@ -32,16 +32,7 @@ func emitDiscoveryCancellationEventViaCoordinator(
 	// Embed LoggingContext in context so coordinator logging respects --context profile
 	ctx = createContextWithLoggingProfile(ctx, profile)
 
-	// Create routers for coordinator
-	auditRouter := coordination.NewStorageAuditRouter(projectRoot, storageProvider)
-
-	// Create coordinator with routers (audit and logging for discovery operations)
-	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
-		LoggingRouter:     &coordination.DefaultLoggingRouter{},
-		AuditRouter:       auditRouter,
-		MetricsRouter:     nil, // Discovery cancellation events don't create metrics
-		OperationalRouter: &coordination.DefaultOperationalRouter{},
-	})
+	coordinator := coordination.NewStorageCoordinator(projectRoot, storageProvider)
 
 	// Build audit metadata
 	auditMetadata := make(map[string]any)
@@ -163,13 +154,7 @@ func emitDiscoveryStartEventViaCoordinator(
 
 	// Emit via storage-backed coordinator (for audit/persistence)
 	if storageProvider != nil {
-		auditRouter := coordination.NewStorageAuditRouter(projectRoot, storageProvider)
-		coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
-			LoggingRouter:     &coordination.DefaultLoggingRouter{},
-			AuditRouter:       auditRouter,
-			MetricsRouter:     nil,
-			OperationalRouter: &coordination.DefaultOperationalRouter{},
-		})
+		coordinator := coordination.NewStorageCoordinator(projectRoot, storageProvider)
 		goroutinelabels.NewGoroutine("discovery_start_event_emit_storage", "emitting discovery start event to storage").
 			StartSimple(func() {
 				_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
@@ -218,16 +203,8 @@ func emitDiscoveryCompletionEventViaCoordinator(
 	// Embed LoggingContext in context so coordinator logging respects --context profile
 	ctx = createContextWithLoggingProfile(ctx, profile)
 
-	// Create routers for coordinator
-	auditRouter := coordination.NewStorageAuditRouter(projectRoot, storageProvider)
-
-	// Create coordinator with routers (audit and logging for discovery operations)
-	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
-		LoggingRouter:     &coordination.DefaultLoggingRouter{},
-		AuditRouter:       auditRouter,
-		MetricsRouter:     nil, // Discovery completion events don't create metrics
-		OperationalRouter: &coordination.DefaultOperationalRouter{},
-	})
+	// Create coordinator with storage-backed audit router
+	coordinator := coordination.NewStorageCoordinator(projectRoot, storageProvider)
 
 	// Build operation description
 	var operation string
@@ -350,13 +327,7 @@ func emitDiscoveryProgressEventViaCoordinator(
 
 	// Emit via storage-backed coordinator (for audit/persistence)
 	if storageProvider != nil {
-		auditRouter := coordination.NewStorageAuditRouter(projectRoot, storageProvider)
-		coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
-			LoggingRouter:     &coordination.DefaultLoggingRouter{},
-			AuditRouter:       auditRouter,
-			MetricsRouter:     nil,
-			OperationalRouter: &coordination.DefaultOperationalRouter{},
-		})
+		coordinator := coordination.NewStorageCoordinator(projectRoot, storageProvider)
 		goroutinelabels.NewGoroutine("discovery_progress_event_emit_storage", "emitting discovery progress event to storage").
 			StartSimple(func() {
 				_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // best-effort

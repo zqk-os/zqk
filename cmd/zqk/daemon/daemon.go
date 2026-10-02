@@ -44,31 +44,55 @@ func resolveProjectRoot(cmd *cobra.Command) string {
 	return cli.ResolveProjectRoot(".")
 }
 
+func getDaemonClient(cmd *cobra.Command) (string, *overseer.IPCClient) {
+	projectRoot := resolveProjectRoot(cmd)
+	sockPath := overseer.SocketPath(projectRoot)
+	return projectRoot, overseer.NewIPCClient(sockPath)
+}
+
+func sendOverseerRequest(ctx context.Context, client *overseer.IPCClient, req overseer.IPCRequest) (*overseer.IPCResponse, error) {
+	reqCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	resp, err := client.Send(reqCtx, req)
+	if err != nil {
+		return nil, errfmt.Newf("send %s command", req.Action).Wrap(err)
+	}
+	if !resp.Success {
+		return nil, errfmt.Errorf("%s", resp.Error)
+	}
+	return resp, nil
+}
+
+func sendOverseerAction(ctx context.Context, client *overseer.IPCClient, action, target string) (*overseer.IPCResponse, error) {
+	return sendOverseerRequest(ctx, client, overseer.IPCRequest{
+		Action: action,
+		Target: target,
+	})
+}
+
+func setDesiredStateOffline(projectRoot, name string, state overseer.DesiredState) error {
+	regPath := overseer.DefaultRegistryPath(projectRoot)
+	reg := overseer.NewRegistry(regPath)
+	if err := reg.Load(); err != nil {
+		return errfmt.Newf("load registry").Wrap(err)
+	}
+	return reg.SetDesiredState(name, state)
+}
+
 func newStatusCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewDaemonStatusCommandBuilder()
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		projectRoot := resolveProjectRoot(cmd)
-		sockPath := overseer.SocketPath(projectRoot)
-		client := overseer.NewIPCClient(sockPath)
+		projectRoot, client := getDaemonClient(cmd)
 
 		var target string
 		if len(args) > 0 {
 			target = args[0]
 		}
 
-		ctx, cancel := context.WithTimeout(cmd.Context(), 3*time.Second)
-		defer cancel()
-
 		if client.IsRunning() {
-			resp, err := client.Send(ctx, overseer.IPCRequest{
-				Action: "status",
-				Target: target,
-			})
+			resp, err := sendOverseerAction(cmd.Context(), client, "status", target)
 			if err != nil {
-				return errfmt.Newf("query overseer status").Wrap(err)
-			}
-			if !resp.Success {
-				return errfmt.Errorf("%s", resp.Error)
+				return err
 			}
 			return cli.FormatOutput(cmd, map[string]any{
 				"overseer_running": true,
@@ -113,18 +137,10 @@ func newStartCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewDaemonStartCommandBuilder()
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		name := args[0]
-		projectRoot := resolveProjectRoot(cmd)
-		sockPath := overseer.SocketPath(projectRoot)
-		client := overseer.NewIPCClient(sockPath)
+		projectRoot, client := getDaemonClient(cmd)
 
 		if !client.IsRunning() {
-			// Update registry directly
-			regPath := overseer.DefaultRegistryPath(projectRoot)
-			reg := overseer.NewRegistry(regPath)
-			if err := reg.Load(); err != nil {
-				return errfmt.Newf("load registry").Wrap(err)
-			}
-			if err := reg.SetDesiredState(name, overseer.DesiredStateEnabled); err != nil {
+			if err := setDesiredStateOffline(projectRoot, name, overseer.DesiredStateEnabled); err != nil {
 				return err
 			}
 			return cli.FormatOutput(cmd, map[string]any{
@@ -134,18 +150,9 @@ func newStartCmd() *cobra.Command {
 			})
 		}
 
-		ctx, cancel := context.WithTimeout(cmd.Context(), 5*time.Second)
-		defer cancel()
-
-		resp, err := client.Send(ctx, overseer.IPCRequest{
-			Action: "start",
-			Target: name,
-		})
+		resp, err := sendOverseerAction(cmd.Context(), client, "start", name)
 		if err != nil {
-			return errfmt.Newf("send start command").Wrap(err)
-		}
-		if !resp.Success {
-			return errfmt.Errorf("%s", resp.Error)
+			return err
 		}
 		return cli.FormatOutput(cmd, map[string]any{
 			objects.FieldKeyStatus: objects.ObjectStatusSuccess,
@@ -160,17 +167,10 @@ func newStopCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewDaemonStopCommandBuilder()
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		name := args[0]
-		projectRoot := resolveProjectRoot(cmd)
-		sockPath := overseer.SocketPath(projectRoot)
-		client := overseer.NewIPCClient(sockPath)
+		projectRoot, client := getDaemonClient(cmd)
 
 		if !client.IsRunning() {
-			regPath := overseer.DefaultRegistryPath(projectRoot)
-			reg := overseer.NewRegistry(regPath)
-			if err := reg.Load(); err != nil {
-				return errfmt.Newf("load registry").Wrap(err)
-			}
-			if err := reg.SetDesiredState(name, overseer.DesiredStateDisabled); err != nil {
+			if err := setDesiredStateOffline(projectRoot, name, overseer.DesiredStateDisabled); err != nil {
 				return err
 			}
 			return cli.FormatOutput(cmd, map[string]any{
@@ -179,18 +179,9 @@ func newStopCmd() *cobra.Command {
 			})
 		}
 
-		ctx, cancel := context.WithTimeout(cmd.Context(), 5*time.Second)
-		defer cancel()
-
-		resp, err := client.Send(ctx, overseer.IPCRequest{
-			Action: "stop",
-			Target: name,
-		})
+		resp, err := sendOverseerAction(cmd.Context(), client, "stop", name)
 		if err != nil {
-			return errfmt.Newf("send stop command").Wrap(err)
-		}
-		if !resp.Success {
-			return errfmt.Errorf("%s", resp.Error)
+			return err
 		}
 		return cli.FormatOutput(cmd, map[string]any{
 			objects.FieldKeyStatus: objects.ObjectStatusSuccess,
@@ -205,26 +196,15 @@ func newRestartCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewDaemonRestartCommandBuilder()
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		name := args[0]
-		projectRoot := resolveProjectRoot(cmd)
-		sockPath := overseer.SocketPath(projectRoot)
-		client := overseer.NewIPCClient(sockPath)
+		_, client := getDaemonClient(cmd)
 
 		if !client.IsRunning() {
 			return errfmt.Errorf("cannot restart %q: overseer is not running", name)
 		}
 
-		ctx, cancel := context.WithTimeout(cmd.Context(), 5*time.Second)
-		defer cancel()
-
-		resp, err := client.Send(ctx, overseer.IPCRequest{
-			Action: "restart",
-			Target: name,
-		})
+		resp, err := sendOverseerAction(cmd.Context(), client, "restart", name)
 		if err != nil {
-			return errfmt.Newf("send restart command").Wrap(err)
-		}
-		if !resp.Success {
-			return errfmt.Errorf("%s", resp.Error)
+			return err
 		}
 		return cli.FormatOutput(cmd, map[string]any{
 			objects.FieldKeyStatus: objects.ObjectStatusSuccess,
@@ -239,19 +219,11 @@ func newEnableCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewDaemonEnableCommandBuilder()
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		name := args[0]
-		projectRoot := resolveProjectRoot(cmd)
-		sockPath := overseer.SocketPath(projectRoot)
-		client := overseer.NewIPCClient(sockPath)
+		projectRoot, client := getDaemonClient(cmd)
 
 		if client.IsRunning() {
-			ctx, cancel := context.WithTimeout(cmd.Context(), 5*time.Second)
-			defer cancel()
-			resp, err := client.Send(ctx, overseer.IPCRequest{Action: "enable", Target: name})
-			if err != nil {
-				return errfmt.Newf("send enable command").Wrap(err)
-			}
-			if !resp.Success {
-				return errfmt.Errorf("%s", resp.Error)
+			if _, err := sendOverseerAction(cmd.Context(), client, "enable", name); err != nil {
+				return err
 			}
 			return cli.FormatOutput(cmd, map[string]any{
 				objects.FieldKeyStatus: objects.ObjectStatusSuccess,
@@ -260,12 +232,7 @@ func newEnableCmd() *cobra.Command {
 			})
 		}
 
-		regPath := overseer.DefaultRegistryPath(projectRoot)
-		reg := overseer.NewRegistry(regPath)
-		if err := reg.Load(); err != nil {
-			return errfmt.Newf("load registry").Wrap(err)
-		}
-		if err := reg.SetDesiredState(name, overseer.DesiredStateEnabled); err != nil {
+		if err := setDesiredStateOffline(projectRoot, name, overseer.DesiredStateEnabled); err != nil {
 			return err
 		}
 		return cli.FormatOutput(cmd, map[string]any{
@@ -280,19 +247,11 @@ func newDisableCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewDaemonDisableCommandBuilder()
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		name := args[0]
-		projectRoot := resolveProjectRoot(cmd)
-		sockPath := overseer.SocketPath(projectRoot)
-		client := overseer.NewIPCClient(sockPath)
+		projectRoot, client := getDaemonClient(cmd)
 
 		if client.IsRunning() {
-			ctx, cancel := context.WithTimeout(cmd.Context(), 5*time.Second)
-			defer cancel()
-			resp, err := client.Send(ctx, overseer.IPCRequest{Action: "disable", Target: name})
-			if err != nil {
-				return errfmt.Newf("send disable command").Wrap(err)
-			}
-			if !resp.Success {
-				return errfmt.Errorf("%s", resp.Error)
+			if _, err := sendOverseerAction(cmd.Context(), client, "disable", name); err != nil {
+				return err
 			}
 			return cli.FormatOutput(cmd, map[string]any{
 				objects.FieldKeyStatus: objects.ObjectStatusSuccess,
@@ -301,12 +260,7 @@ func newDisableCmd() *cobra.Command {
 			})
 		}
 
-		regPath := overseer.DefaultRegistryPath(projectRoot)
-		reg := overseer.NewRegistry(regPath)
-		if err := reg.Load(); err != nil {
-			return errfmt.Newf("load registry").Wrap(err)
-		}
-		if err := reg.SetDesiredState(name, overseer.DesiredStateDisabled); err != nil {
+		if err := setDesiredStateOffline(projectRoot, name, overseer.DesiredStateDisabled); err != nil {
 			return err
 		}
 		return cli.FormatOutput(cmd, map[string]any{
@@ -353,9 +307,7 @@ func newAddCmd() *cobra.Command {
 			WorkingDir:    workingDir,
 		}
 
-		projectRoot := resolveProjectRoot(cmd)
-		sockPath := overseer.SocketPath(projectRoot)
-		client := overseer.NewIPCClient(sockPath)
+		projectRoot, client := getDaemonClient(cmd)
 
 		if !client.IsRunning() {
 			regPath := overseer.DefaultRegistryPath(projectRoot)
@@ -374,18 +326,12 @@ func newAddCmd() *cobra.Command {
 			})
 		}
 
-		ctx, cancel := context.WithTimeout(cmd.Context(), 5*time.Second)
-		defer cancel()
-
-		resp, err := client.Send(ctx, overseer.IPCRequest{
+		resp, err := sendOverseerRequest(cmd.Context(), client, overseer.IPCRequest{
 			Action: "add",
 			Spec:   spec,
 		})
 		if err != nil {
-			return errfmt.Newf("send add command").Wrap(err)
-		}
-		if !resp.Success {
-			return errfmt.Errorf("%s", resp.Error)
+			return err
 		}
 		return cli.FormatOutput(cmd, map[string]any{
 			objects.FieldKeyStatus: objects.ObjectStatusSuccess,
@@ -400,9 +346,7 @@ func newRemoveCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewDaemonRemoveCommandBuilder()
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		name := args[0]
-		projectRoot := resolveProjectRoot(cmd)
-		sockPath := overseer.SocketPath(projectRoot)
-		client := overseer.NewIPCClient(sockPath)
+		projectRoot, client := getDaemonClient(cmd)
 
 		if !client.IsRunning() {
 			regPath := overseer.DefaultRegistryPath(projectRoot)
@@ -419,18 +363,8 @@ func newRemoveCmd() *cobra.Command {
 			})
 		}
 
-		ctx, cancel := context.WithTimeout(cmd.Context(), 5*time.Second)
-		defer cancel()
-
-		resp, err := client.Send(ctx, overseer.IPCRequest{
-			Action: "remove",
-			Target: name,
-		})
-		if err != nil {
-			return errfmt.Newf("send remove command").Wrap(err)
-		}
-		if !resp.Success {
-			return errfmt.Errorf("%s", resp.Error)
+		if _, err := sendOverseerAction(cmd.Context(), client, "remove", name); err != nil {
+			return err
 		}
 		return cli.FormatOutput(cmd, map[string]any{
 			objects.FieldKeyStatus: objects.ObjectStatusSuccess,
