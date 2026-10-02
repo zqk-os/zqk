@@ -32,9 +32,7 @@ func NewCreateCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewObjectCreateCommandBuilder()
 	cli.BindAsyncProgress(cmd, runCreate)
 	cmd.Aliases = []string{"add", "new"}
-	cmd.ValidArgsFunction = kindCompletion
-	ensureCmdAnnotations(cmd)
-	cmd.Annotations[AnnotationKindValidate] = KindValidatePositional0
+	configureKindPositionalValidation(cmd, true)
 
 	return cmd
 }
@@ -45,16 +43,9 @@ func runCreate(cmd *cobra.Command, args []string) error {
 			return cli.Guard(cmd).Err(err).Return()
 		}
 
-		kind, ok := kindCanonicalFromPRERun(cmd)
-		if !ok {
-			if len(args) == 0 {
-				return cli.Guard(cmd).Err(fmt.Errorf("object kind argument required (e.g. %s)", paths.CLIInvocation("object create <kind>"))).Return()
-			}
-			var err error
-			kind, err = objects.ResolveAndValidateKindForProject(proc.ProjectRoot(), args[0])
-			if err != nil {
-				return cli.Guard(cmd).Err(err).Return()
-			}
+		kind, err := resolvePositional0Kind(cmd, proc, args, fmt.Sprintf("object kind argument required (e.g. %s)", paths.CLIInvocation("object create <kind>")))
+		if err != nil {
+			return cli.Guard(cmd).Err(err).Return()
 		}
 
 		// Do not clear spec loader cache on every create (PRE_CHANGE_CHECKLIST §2–3, CLI_PERFORMANCE_AND_CONSISTENCY).
@@ -110,16 +101,7 @@ func runCreate(cmd *cobra.Command, args []string) error {
 			return nil
 		}
 
-		// Get relaxed flag
-		relaxed, err := cmd.Flags().GetBool("relaxed")
-		if err != nil {
-			relaxed = false
-		}
-
-		// Set cache checker if relaxed mode (enables batch creation with non-blocking reference validation)
-		if relaxed {
-			setCacheCheckerForBatchCreation(proc)
-		}
+		configureRelaxedMode(cmd, proc)
 
 		// Get object ID and kind for cache context
 		objID, _ := objData[objects.FieldKeyID].(string)

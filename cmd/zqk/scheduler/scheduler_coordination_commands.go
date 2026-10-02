@@ -29,14 +29,7 @@ func emitSchedulerCommandEventViaCoordinator(
 
 	// Embed LoggingContext in context so coordinator logging respects --context profile
 	ctx = createContextWithLoggingProfile(ctx, profile)
-
-	// Create coordinator with routers
-	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
-		LoggingRouter:     &coordination.DefaultLoggingRouter{},
-		AuditRouter:       nil, // Command operations don't create audit events
-		MetricsRouter:     nil,
-		OperationalRouter: &coordination.DefaultOperationalRouter{},
-	})
+	coordinator := newSchedulerCoordinator()
 
 	// Build logging fields
 	loggingFields := []coordination.LoggingField{

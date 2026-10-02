@@ -11,6 +11,26 @@ import (
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
+func newSchedulerCoordinator() *coordination.Coordinator {
+	return coordination.NewCoordinator(coordination.CoordinatorConfig{
+		LoggingRouter:     &coordination.DefaultLoggingRouter{},
+		AuditRouter:       nil,
+		MetricsRouter:     nil,
+		OperationalRouter: &coordination.DefaultOperationalRouter{},
+	})
+}
+
+func emitCoordinatorEventAsync(ctx context.Context, coordinator *coordination.Coordinator, eventCtx *coordination.EventContext) {
+	bud := goroutinelabels.DefaultBudget()
+	activityBuilder := goroutinelabels.NewGoroutine("scheduler_event_emitter", "emitting scheduler activity query event")
+	if bud != nil {
+		activityBuilder = activityBuilder.WithBudget(bud)
+	}
+	activityBuilder.StartSimple(func() {
+		_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
+	})
+}
+
 // emitSchedulerHistoryEventViaCoordinator emits scheduler history query events via coordinator
 func emitSchedulerHistoryEventViaCoordinator(
 	ctx context.Context,
@@ -24,13 +44,7 @@ func emitSchedulerHistoryEventViaCoordinator(
 		return
 	}
 
-	// Create coordinator with routers
-	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
-		LoggingRouter:     &coordination.DefaultLoggingRouter{},
-		AuditRouter:       nil, // History queries don't create audit events
-		MetricsRouter:     nil,
-		OperationalRouter: &coordination.DefaultOperationalRouter{},
-	})
+	coordinator := newSchedulerCoordinator()
 
 	// Build logging fields
 	loggingFields := []coordination.LoggingField{
@@ -54,15 +68,7 @@ func emitSchedulerHistoryEventViaCoordinator(
 		WithContext(ctx).
 		WithChannels(true, false, false, false) // Logging only
 
-	// Emit via coordinator (async, non-blocking)
-	bud := goroutinelabels.DefaultBudget()
-	historyBuilder := goroutinelabels.NewGoroutine("scheduler_event_emitter", "emitting scheduler history query event")
-	if bud != nil {
-		historyBuilder = historyBuilder.WithBudget(bud)
-	}
-	historyBuilder.StartSimple(func() {
-		_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
-	})
+	emitCoordinatorEventAsync(ctx, coordinator, eventCtx)
 }
 
 // createContextWithLoggingProfile creates a context with LoggingContext embedded from profile string
@@ -112,14 +118,7 @@ func emitSchedulerHistoryDebugEventViaCoordinator(
 
 	// Embed LoggingContext in context so coordinator logging respects --context profile
 	ctx = createContextWithLoggingProfile(ctx, profile)
-
-	// Create coordinator with routers
-	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
-		LoggingRouter:     &coordination.DefaultLoggingRouter{},
-		AuditRouter:       nil, // Debug events don't create audit events
-		MetricsRouter:     nil,
-		OperationalRouter: &coordination.DefaultOperationalRouter{},
-	})
+	coordinator := newSchedulerCoordinator()
 
 	// Build logging fields
 	loggingFields := []coordination.LoggingField{
@@ -145,15 +144,7 @@ func emitSchedulerHistoryDebugEventViaCoordinator(
 		WithContext(ctx).
 		WithChannels(true, false, false, false) // Logging only
 
-	// Emit via coordinator (async, non-blocking)
-	bud := goroutinelabels.DefaultBudget()
-	activityBuilder := goroutinelabels.NewGoroutine("scheduler_event_emitter", "emitting scheduler activity query event")
-	if bud != nil {
-		activityBuilder = activityBuilder.WithBudget(bud)
-	}
-	activityBuilder.StartSimple(func() {
-		_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
-	})
+	emitCoordinatorEventAsync(ctx, coordinator, eventCtx)
 }
 
 // emitSchedulerActivityEventViaCoordinator emits scheduler activity query events via coordinator
@@ -172,13 +163,7 @@ func emitSchedulerActivityEventViaCoordinator(
 		return
 	}
 
-	// Create coordinator with routers
-	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
-		LoggingRouter:     &coordination.DefaultLoggingRouter{},
-		AuditRouter:       nil, // Activity queries don't create audit events
-		MetricsRouter:     nil,
-		OperationalRouter: &coordination.DefaultOperationalRouter{},
-	})
+	coordinator := newSchedulerCoordinator()
 
 	// Build logging fields
 	loggingFields := []coordination.LoggingField{
@@ -211,13 +196,5 @@ func emitSchedulerActivityEventViaCoordinator(
 		WithContext(ctx).
 		WithChannels(true, false, false, false) // Logging only
 
-	// Emit via coordinator (async, non-blocking)
-	bud := goroutinelabels.DefaultBudget()
-	activityBuilder := goroutinelabels.NewGoroutine("scheduler_event_emitter", "emitting scheduler activity query event")
-	if bud != nil {
-		activityBuilder = activityBuilder.WithBudget(bud)
-	}
-	activityBuilder.StartSimple(func() {
-		_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
-	})
+	emitCoordinatorEventAsync(ctx, coordinator, eventCtx)
 }

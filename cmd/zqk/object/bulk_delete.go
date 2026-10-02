@@ -2,7 +2,6 @@ package object
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"time"
 
@@ -44,27 +43,12 @@ func executeBulkDelete(cmd *cobra.Command, ids []string, proc *cli.Processor) er
 	var err error
 	_ = err
 
-	cascade, err := cmd.Flags().GetBool("cascade")
+	delFlags, err := parseDeleteFlags(cmd, "bulk delete refused: pass --unlink-references or --cascade; refusing to leave GhostRefs")
 	if err != nil {
-		cascade = false
-	}
-	unlinkRefs, err := cmd.Flags().GetBool("unlink-references")
-	if err != nil {
-		unlinkRefs = false
-	}
-	dryRun, err := cmd.Flags().GetBool("dry-run")
-	if err != nil {
-		dryRun = false
-	}
-	if unlinkRefs && cascade {
-		return cli.Guard(cmd).Err(errors.New("--unlink-references cannot be combined with --cascade")).Return()
-	}
-	// fail-closed bulk delete (no silent GhostRef fan-in).
-	if !unlinkRefs && !cascade {
-		return cli.Guard(cmd).Err(errors.New("bulk delete refused: pass --unlink-references or --cascade; refusing to leave GhostRefs")).Return()
+		return err
 	}
 
-	if dryRun {
+	if delFlags.DryRun {
 		logging.FluentEvent(proc.Logger()).Info("Dry-run mode: showing what would be deleted").
 			Int("count", len(ids)).
 			Log()
@@ -85,22 +69,16 @@ func executeBulkDelete(cmd *cobra.Command, ids []string, proc *cli.Processor) er
 				fmt.Fprintf(&buf, "  - %s (not found)\n", id)
 			}).Run()
 		}
-		if unlinkRefs {
+		if delFlags.UnlinkRefs {
 			buf.WriteString("  Unlink references from dependents before delete: true\n")
 		}
-		if cascade {
+		if delFlags.Cascade {
 			buf.WriteString("  Cascade: true (would also delete dependents)\n")
 		}
 		return cli.WriteOutput(cmd, buf.Bytes())
 	}
 
-	// Mark context as CLI operation for authorization (required for delete)
-	cliCtx := proc.WithCLIOperation()
-	if unlinkRefs {
-		cliCtx = storagepkg.WithUnlinkReferencesBeforeDelete(cliCtx)
-	}
-	var reasonErr error
-	cliCtx, reasonErr = withCoreDeleteReasonFromFlags(cmd, cliCtx)
+	cliCtx, reasonErr := prepareDeleteContext(cmd, proc, delFlags.UnlinkRefs, false)
 	if reasonErr != nil {
 		return reasonErr
 	}
@@ -110,7 +88,7 @@ func executeBulkDelete(cmd *cobra.Command, ids []string, proc *cli.Processor) er
 		fn("bulk_delete", fmt.Sprintf("Deleting %d objects...", len(ids)))
 	}
 
-	result, err := proc.Storage().BulkDelete(cliCtx, proc.SecurityContext(), ids, cascade)
+	result, err := proc.Storage().BulkDelete(cliCtx, proc.SecurityContext(), ids, delFlags.Cascade)
 	if err != nil {
 		logging.FluentEvent(proc.Logger()).Error("Bulk delete failed", err).Log()
 		return cli.Guard(cmd).Err(err).Wrapf("bulk delete failed: %w").Return()
@@ -147,7 +125,7 @@ func executeBulkDelete(cmd *cobra.Command, ids []string, proc *cli.Processor) er
 
 	// Write-behind: BulkDelete returns after WAL+buffer enqueue; flush so the next
 	// zqk process sees the CAS changes immediately.
-	ensureDur := flushDeleteVisibility(cmd, proc, "", cascade, kindsList)
+	ensureDur := flushDeleteVisibility(cmd, proc, "", delFlags.Cascade, kindsList)
 	t1 := time.Now()
 	// Kind-scoped flush only — FlushAllListingIndexes walks every kind queue and is too
 	// expensive after large leaf litter deletes (scheduler_job).
@@ -157,7 +135,7 @@ func executeBulkDelete(cmd *cobra.Command, ids []string, proc *cli.Processor) er
 		}
 		if err := storagepkg.FlushListingIndexForProjectRoot(proc.ProjectRoot(), kind); err != nil {
 			logging.FluentEvent(proc.Logger()).Error("FlushListingIndexForProjectRoot after bulk delete failed", err).
-				Bool("cascade", cascade).
+				Bool("cascade", delFlags.Cascade).
 				String("kind", kind).
 				Log()
 			return cli.Guard(cmd).Err(err).Wrapf("failed to flush listing index after bulk delete: %w").Return()

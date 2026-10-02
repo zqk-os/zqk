@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/coordination"
-	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/storage"
 	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 )
@@ -77,26 +76,8 @@ func emitListingIndexBatchEventViaCoordinator(
 
 	// Create operation ID
 	operationID := fmt.Sprintf("listing_index_batch_%s_%d", kind, time.Now().UnixNano())
-
-	// Create event context (enable audit and metrics, minimal logging)
-	eventCtx := coordination.NewEventContext(operationID, "listing_index_batch", status).
-		WithEventData(eventData).
-		WithContext(ctx).
-		WithChannels(false, true, true, false) // Audit and metrics, no logging/operational
-
-	if err != nil {
-		eventCtx = eventCtx.WithError(err)
-	}
-
-	if duration > 0 {
-		eventCtx = eventCtx.WithDuration(duration)
-	}
-
-	// Emit via coordinator (async, non-blocking)
-	builder := goroutinelabels.NewGoroutine("listing_index_event_emit", fmt.Sprintf("emitting listing index event for %s", kind))
-	builder.StartSimple(func() {
-		_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
-	})
+	eventCtx := buildEventContext(ctx, operationID, "listing_index_batch", status, eventData, duration, err, false, true, true, false)
+	emitAsyncCoordinationEvent(ctx, coordinator, "listing_index_event_emit", fmt.Sprintf("emitting listing index event for %s", kind), eventCtx)
 }
 
 // emitListingIndexStateChangeEventViaCoordinator emits listing-index queue state change events via the coordination system.
@@ -132,14 +113,6 @@ func emitListingIndexStateChangeEventViaCoordinator(
 	}
 
 	operationID := fmt.Sprintf("listing_index_state_%s_%d", changeType, time.Now().UnixNano())
-
-	eventCtx := coordination.NewEventContext(operationID, "listing_index_state_change", changeType).
-		WithEventData(eventData).
-		WithContext(ctx).
-		WithChannels(false, true, true, false)
-
-	stateBuilder := goroutinelabels.NewGoroutine("listing_index_state_change_emit", fmt.Sprintf("emitting listing index state change %s", changeType))
-	stateBuilder.StartSimple(func() {
-		_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
-	})
+	eventCtx := buildEventContext(ctx, operationID, "listing_index_state_change", changeType, eventData, 0, nil, false, true, true, false)
+	emitAsyncCoordinationEvent(ctx, coordinator, "listing_index_state_change_emit", fmt.Sprintf("emitting listing index state change %s", changeType), eventCtx)
 }

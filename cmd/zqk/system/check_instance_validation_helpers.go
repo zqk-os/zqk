@@ -150,22 +150,7 @@ func performValidation(valCtx *InstanceValidationContext) (*validation.Validatio
 	}
 
 	if valCtx.StorageProvider != nil {
-		sp := valCtx.StorageProvider
-		secCtx := pkgctx.NewSystemSecurityContext()
-		options.ObjectLookup = func(id string) (map[string]any, error) {
-			return sp.Read(ctx, secCtx, id)
-		}
-		options.ObjectStatusLookup = func(id string) (string, error) {
-			obj, err := options.ObjectLookup(id)
-			if err != nil {
-				return "", err
-			}
-			status, _ := obj[objects.FieldKeyStatus].(string)
-			return status, nil
-		}
-		options.DependentsLookup = func(id string) []string {
-			return storage.DependentsForID(ctx, sp, id)
-		}
+		storage.BindValidationLookups(options, ctx, valCtx.StorageProvider, pkgctx.NewSystemSecurityContext())
 	}
 
 	result, err := valCtx.Validator.Validate(ctx, valCtx.ObjMap, valCtx.Kind, options)

@@ -233,3 +233,24 @@ func candidateKindReferenceFields(kind string) []string {
 	sort.Strings(out)
 	return out
 }
+
+// BindValidationLookups attaches storage-backed ObjectLookup, ObjectStatusLookup, and DependentsLookup to opts.
+func BindValidationLookups(opts *validation.ValidationOptions, ctx context.Context, store ObjectStorageProvider, secCtx *pkgctx.SecurityContext) {
+	if opts == nil || store == nil {
+		return
+	}
+	opts.ObjectLookup = func(targetID string) (map[string]any, error) {
+		return store.Read(ctx, secCtx, targetID)
+	}
+	opts.ObjectStatusLookup = func(targetID string) (string, error) {
+		obj, err := opts.ObjectLookup(targetID)
+		if err != nil {
+			return "", err
+		}
+		status, _ := obj[objects.FieldKeyStatus].(string)
+		return status, nil
+	}
+	opts.DependentsLookup = func(targetID string) []string {
+		return DependentsForID(ctx, store, targetID)
+	}
+}

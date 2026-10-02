@@ -61,7 +61,6 @@
       <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#000000" flood-opacity="0.55"/>
     </filter>
   </defs>
-
   <!-- Browser Window Frame -->
   <rect x="4" y="4" width="1092" height="692" class="browser-bg" filter="url(#win-shadow-gantt)" stroke="#30363d" stroke-width="1"/>
   <path d="M 4 16 A 12 12 0 0 1 16 4 L 1084 4 A 12 12 0 0 1 1096 16 L 1096 42 L 4 42 Z" class="browser-top"/>

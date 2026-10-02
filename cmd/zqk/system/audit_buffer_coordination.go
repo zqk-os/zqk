@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/coordination"
-	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
@@ -44,12 +43,7 @@ func emitAuditBufferFlushEventViaCoordinator(
 	auditMetadata[objects.FieldKeyAggregationWindow] = aggregationWindow
 	auditMetadata[eventKeyDurationSeconds] = duration.Seconds()
 
-	// Determine severity
-	severity := severityLow
-	if status == eventStatusError || err != nil {
-		severity = severityHigh
-	}
-	auditMetadata[eventKeySeverity] = severity
+	auditMetadata[eventKeySeverity] = severityForStatusOrError(status, err)
 
 	// Build logging fields
 	loggingFields := []coordination.LoggingField{
@@ -85,27 +79,6 @@ func emitAuditBufferFlushEventViaCoordinator(
 		MetricsData:   metricsData,
 	}
 
-	// Create event context (enable audit and metrics, minimal logging)
-	eventCtx := coordination.NewEventContext(operationID, operationType, status).
-		WithEventData(eventData).
-		WithContext(ctx).
-		WithChannels(false, true, true, false) // Audit and metrics, no logging/operational
-
-	if err != nil {
-		eventCtx = eventCtx.WithError(err)
-	}
-
-	if duration > 0 {
-		eventCtx = eventCtx.WithDuration(duration)
-	}
-
-	// Emit via coordinator (async, non-blocking)
-	bud := goroutinelabels.DefaultBudget()
-	builder := goroutinelabels.NewGoroutine("audit_buffer_event_emit", fmt.Sprintf("emitting audit buffer flush event: %s", groupKey))
-	if bud != nil {
-		builder = builder.WithBudget(bud)
-	}
-	builder.StartSimple(func() {
-		_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
-	})
+	eventCtx := buildEventContext(ctx, operationID, operationType, status, eventData, duration, err, false, true, true, false)
+	emitAsyncCoordinationEvent(ctx, coordinator, "audit_buffer_event_emit", fmt.Sprintf("emitting audit buffer flush event: %s", groupKey), eventCtx)
 }

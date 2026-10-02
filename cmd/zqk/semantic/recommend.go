@@ -37,11 +37,7 @@ func NewRecommendCmd() *cobra.Command {
 		RunE:  runRecommend,
 	})
 
-	// Apply help builder to command and add common flags (includes --format; default table).
-	helpBuilder.ApplyToCommand(cmd)
-	cli.AddCommonFlags(cmd)
-
-	return cmd
+	return cli.FinalizeCommand(cmd, helpBuilder)
 }
 
 func runRecommend(cmd *cobra.Command, args []string) error {

@@ -9,7 +9,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/coordination"
 	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
@@ -86,14 +85,7 @@ func emitSchedulerOutputErrorViaCoordinator(
 
 	// Embed LoggingContext in context so coordinator logging respects --context profile
 	ctx = createContextWithLoggingProfile(ctx, profile)
-
-	// Create coordinator with routers
-	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
-		LoggingRouter:     &coordination.DefaultLoggingRouter{},
-		AuditRouter:       nil, // Output errors don't create audit events
-		MetricsRouter:     nil,
-		OperationalRouter: &coordination.DefaultOperationalRouter{},
-	})
+	coordinator := newSchedulerCoordinator()
 
 	// Build logging fields
 	loggingFields := []coordination.LoggingField{
@@ -119,13 +111,5 @@ func emitSchedulerOutputErrorViaCoordinator(
 		WithChannels(true, false, false, false). // Logging only
 		WithError(err)
 
-	// Emit via coordinator (async, non-blocking)
-	bud := goroutinelabels.DefaultBudget()
-	outputBuilder := goroutinelabels.NewGoroutine("scheduler_output_event_emitter", "emitting scheduler output event")
-	if bud != nil {
-		outputBuilder = outputBuilder.WithBudget(bud)
-	}
-	outputBuilder.StartSimple(func() {
-		_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
-	})
+	emitCoordinatorEventAsync(ctx, coordinator, eventCtx)
 }

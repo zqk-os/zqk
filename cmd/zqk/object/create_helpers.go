@@ -321,13 +321,7 @@ func ensureKindMatches(objData map[string]any, kind string, proc *cli.Processor)
 func handleDryRun(cmd *cobra.Command, objData map[string]any, kind string, proc *cli.Processor) (bool, error) {
 	dr := cli.NewDryRunHandler(proc.Logger())
 	handled, result, err := dr.HandleCreateDryRunResult(cmd, objData, kind, "object")
-	if err != nil {
-		return handled, err
-	}
-	if handled && result != nil {
-		return true, cli.FormatOutput(cmd, result)
-	}
-	return handled, nil
+	return processDryRunResult(cmd, handled, result, err)
 }
 
 // cleanupSourceFile removes the source file after successful creation.
@@ -373,19 +367,9 @@ func guardManualStatusOnCreate(cmd *cobra.Command, proc *cli.Processor, kind str
 		exe := brand.ExecutableName()
 		return cli.Guard(cmd).Require(false, fmt.Sprintf("manual status assignment on create is prohibited to preserve lifecycle integrity. Objects start at lifecycle origin on the draft plane, or use '%s object create <kind> --promote' to advance to the initial shovel-ready status. Human interactive TTY snap-remedy (--override) is blocked for non-TTY/agent shells", exe)).Return()
 	}
-	reasonCode := emptyValue
-	if cmd.Flags().Lookup("reason-code") != nil {
-		reasonCode, _ = cmd.Flags().GetString("reason-code")
-	}
-	if reasonCode == emptyValue {
-		return cli.Guard(cmd).Require(false, "--reason-code is required when using --override").Return()
-	}
-	if proc == nil {
-		return nil
-	}
 	objID, _ := objData[objects.FieldKeyID].(string)
 	if objID == "" {
 		objID = "create-" + kind
 	}
-	return clipkg.EnforceOverrideFriction(cmd, proc.OperationContext(), proc.SecurityContext(), proc.Storage(), objID, kind, reasonCode)
+	return enforceOverrideFrictionFromFlags(cmd, proc, objID, kind, "")
 }

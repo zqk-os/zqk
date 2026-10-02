@@ -1,10 +1,26 @@
 package object
 
 import (
+	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/objectget"
 	"github.com/zqk-os/zqk/pkg/objects"
 )
+
+// resolveGetViewAndHydration extracts view and link-hydration flags from the command.
+func resolveGetViewAndHydration(cmd *cobra.Command) (string, objectget.LinkHydration, error) {
+	viewName, _ := cmd.Flags().GetString("view")
+	if viewName == emptyValue {
+		viewName = objectget.ViewDefault
+	}
+
+	linkHydrationRaw, _ := cmd.Flags().GetString("link-hydration")
+	hydration, parseErr := objectget.ParseLinkHydration(linkHydrationRaw)
+	if parseErr != nil {
+		return "", objectget.HydrationUnspecified, parseErr
+	}
+	return viewName, hydration, nil
+}
 
 // applyObjectGetOverlays applies the shared "reference resolver overlay" and any
 // higher-level view overlays (e.g. milestone completion/progress).

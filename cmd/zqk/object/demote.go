@@ -24,24 +24,19 @@ func NewDemoteCmd() *cobra.Command {
 
 func runDemote(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-		args, err := parseTargetObjectIDs(cmd, args)
+		tc, err := setupTransitionContext(cmd, proc, args)
 		if err != nil {
 			return err
 		}
 
-		ctx := proc.OperationContext()
-		secCtx := proc.SecurityContext()
-
-		env, err := initObjectTransitionEnv(ctx, proc.ProjectRoot())
-		if err != nil {
-			return err
-		}
-		lifecycleLoader := env.lifecycleLoader
-		gv := env.validator
+		ctx := tc.ctx
+		secCtx := tc.secCtx
+		lifecycleLoader := tc.env.lifecycleLoader
+		gv := tc.env.validator
+		flushTracker := tc.flushTracker
 
 		var errors []string
-		flushTracker := newFlushKindTracker(len(args))
-		for _, idArg := range args {
+		for _, idArg := range tc.args {
 			// Resolve natural language intents
 			id, err := proc.ResolveSemanticArgument(ctx, "", idArg)
 			if err != nil {
@@ -121,20 +116,7 @@ func runDemote(cmd *cobra.Command, args []string) error {
 					ValidateLifecycle:     true,
 					ValidateSemanticTypes: true,
 				}
-				valOptions.ObjectLookup = func(targetID string) (map[string]any, error) {
-					return proc.Storage().Read(ctx, secCtx, targetID)
-				}
-				valOptions.ObjectStatusLookup = func(targetID string) (string, error) {
-					obj, err := valOptions.ObjectLookup(targetID)
-					if err != nil {
-						return "", err
-					}
-					status, _ := obj[objects.FieldKeyStatus].(string)
-					return status, nil
-				}
-				valOptions.DependentsLookup = func(targetID string) []string {
-					return storage.DependentsForID(ctx, proc.Storage(), targetID)
-				}
+				storage.BindValidationLookups(valOptions, ctx, proc.Storage(), secCtx)
 
 				// Validate in-memory
 				valResult, valErr := gv.Validate(ctx, candidateObj, kind, valOptions)

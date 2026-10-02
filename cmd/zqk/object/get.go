@@ -84,13 +84,7 @@ func runGet(cmd *cobra.Command, args []string) error {
 		}
 
 		id := rawIDs[0]
-		viewName, _ := cmd.Flags().GetString("view")
-		if viewName == emptyValue {
-			viewName = objectget.ViewDefault
-		}
-
-		linkHydrationRaw, _ := cmd.Flags().GetString("link-hydration")
-		hydration, parseErr := objectget.ParseLinkHydration(linkHydrationRaw)
+		viewName, hydration, parseErr := resolveGetViewAndHydration(cmd)
 		if parseErr != nil {
 			return cli.Guard(cmd).Err(parseErr).Return()
 		}

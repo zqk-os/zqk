@@ -69,33 +69,10 @@ func NewGenerateLifecycleBuildersCmd() *cobra.Command {
 		}
 
 		logging.Fluent(logger).Info("Starting lifecycle builder generation").Log()
-		skipped := 0
-		var items []GenerateItem
-
-		err := filepath.WalkDir(lifecyclesDir, func(path string, d os.DirEntry, walkErr error) error {
-			skipDir, process := ShouldProcessYAMLDirEntry(d, walkErr)
-			if skipDir {
-				return filepath.SkipDir
-			}
-			if !process {
-				return nil
-			}
-
-			baseName := strings.TrimSuffix(d.Name(), ".yaml")
-			baseName = strings.TrimSuffix(baseName, ".yml")
-			baseName = strings.TrimSuffix(baseName, "_lifecycle")
-			outputFile := filepath.Join(parentDir, "bldr_lifecycle_v1", fmt.Sprintf("%s_builder.go", baseName))
-
-			if !overwrite {
-				if _, err := fileutil.Stat(outputFile); err == nil {
-					logging.Fluent(logger).Debug(fmt.Sprintf("Skipping %s (builder already exists, use --overwrite to replace)", d.Name())).Log()
-					skipped++
-					return nil
-				}
-			}
-
-			items = append(items, GenerateItem{YAMLPath: path, BaseName: baseName})
-			return nil
+		items, skipped, err := CollectGenerateItems(lifecyclesDir, logger, overwrite, func(baseName string, d os.DirEntry) (string, string) {
+			cleanBaseName := strings.TrimSuffix(baseName, "_lifecycle")
+			outputFile := filepath.Join(parentDir, "bldr_lifecycle_v1", fmt.Sprintf("%s_builder.go", cleanBaseName))
+			return cleanBaseName, outputFile
 		})
 		if err != nil {
 			return errfmt.Newf("failed to read lifecycles directory").Wrap(err)

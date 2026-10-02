@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/coordination"
-	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
@@ -41,12 +40,7 @@ func emitChangeJournalEventViaCoordinator(
 	auditMetadata[eventKeyObjectRef] = objectRef
 	auditMetadata[eventKeyDurationSeconds] = duration.Seconds()
 
-	// Determine severity
-	severity := severityLow
-	if status == eventStatusError || err != nil {
-		severity = severityHigh
-	}
-	auditMetadata[eventKeySeverity] = severity
+	auditMetadata[eventKeySeverity] = severityForStatusOrError(status, err)
 
 	// Build logging fields
 	loggingFields := []coordination.LoggingField{
@@ -80,27 +74,6 @@ func emitChangeJournalEventViaCoordinator(
 		MetricsData:   metricsData,
 	}
 
-	// Create event context (enable audit, metrics, and operational for rollback coordination)
-	eventCtx := coordination.NewEventContext(operationID, operationType, status).
-		WithEventData(eventData).
-		WithContext(ctx).
-		WithChannels(false, true, true, true) // Audit, metrics, and operational (for rollback coordination)
-
-	if err != nil {
-		eventCtx = eventCtx.WithError(err)
-	}
-
-	if duration > 0 {
-		eventCtx = eventCtx.WithDuration(duration)
-	}
-
-	// Emit via coordinator (async, non-blocking)
-	bud := goroutinelabels.DefaultBudget()
-	builder := goroutinelabels.NewGoroutine("change_journal_event_emit", fmt.Sprintf("emitting change journal event: %s %s", changeType, objectRef))
-	if bud != nil {
-		builder = builder.WithBudget(bud)
-	}
-	builder.StartSimple(func() {
-		_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
-	})
+	eventCtx := buildEventContext(ctx, operationID, operationType, status, eventData, duration, err, false, true, true, true)
+	emitAsyncCoordinationEvent(ctx, coordinator, "change_journal_event_emit", fmt.Sprintf("emitting change journal event: %s %s", changeType, objectRef), eventCtx)
 }

@@ -50,9 +50,8 @@ func runClaim(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 		CheckinCadence:       checkinCadence,
 	}
 
-	ctx := proc.OperationContext()
-	sec := procSecurity(proc)
-	res, err := agentclaim.TryClaim(ctx, proc.Storage(), sec, args[0], who, opts)
+	ctx, sec, sp := procStorageTuple(proc)
+	res, err := agentclaim.TryClaim(ctx, sp, sec, args[0], who, opts)
 	if err != nil {
 		return err
 	}
@@ -90,9 +89,8 @@ func runRelease(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 	if err := flags.Err(); err != nil {
 		return err
 	}
-	ctx := proc.OperationContext()
-	sec := procSecurity(proc)
-	res, err := agentclaim.Release(ctx, proc.Storage(), sec, args[0], who, force, proc.ProjectRoot())
+	ctx, sec, sp := procStorageTuple(proc)
+	res, err := agentclaim.Release(ctx, sp, sec, args[0], who, force, proc.ProjectRoot())
 	if err != nil {
 		return err
 	}
@@ -130,8 +128,8 @@ func claimTaskForExecute(cmd *cobra.Command, proc *cli.Processor, taskID string,
 		return nil
 	}
 	who := resolveClaimantIdentity(cmd, proc)
-	sec := procSecurity(proc)
-	_, err := agentclaim.TryClaim(proc.OperationContext(), proc.Storage(), sec, taskID, who)
+	ctx, sec, sp := procStorageTuple(proc)
+	_, err := agentclaim.TryClaim(ctx, sp, sec, taskID, who)
 	if err != nil {
 		return errfmt.Newf("work claim failed for %s", taskID).Wrap(err)
 	}
@@ -140,11 +138,11 @@ func claimTaskForExecute(cmd *cobra.Command, proc *cli.Processor, taskID string,
 
 // releaseTaskAfterNext clears claim when worker advances via agent next.
 func releaseTaskAfterNext(proc *cli.Processor, taskID, claimant string) error {
-	sec := procSecurity(proc)
+	ctx, sec, sp := procStorageTuple(proc)
 	who := strings.TrimSpace(claimant)
 	if who == "" {
 		who = resolveClaimantIdentity(nil, proc)
 	}
-	_, err := agentclaim.Release(proc.OperationContext(), proc.Storage(), sec, taskID, who, true, proc.ProjectRoot())
+	_, err := agentclaim.Release(ctx, sp, sec, taskID, who, true, proc.ProjectRoot())
 	return err
 }

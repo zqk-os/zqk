@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/coordination"
-	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
@@ -77,27 +76,8 @@ func emitSnapshotExpandEventViaCoordinator(
 	}
 
 	// Create event context
-	eventCtx := coordination.NewEventContext(operationID, operationType, status).
-		WithEventData(coordEventData).
-		WithContext(ctx)
-
-	if err != nil {
-		eventCtx = eventCtx.WithError(err)
-	}
-
-	if duration > 0 {
-		eventCtx = eventCtx.WithDuration(duration)
-	}
-
-	// Emit via coordinator (async, non-blocking)
-	bud := goroutinelabels.DefaultBudget()
-	builder := goroutinelabels.NewGoroutine("snapshot_expand_event_emit", fmt.Sprintf("emitting snapshot expand event: %s", operationID))
-	if bud != nil {
-		builder = builder.WithBudget(bud)
-	}
-	builder.StartSimple(func() {
-		_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
-	})
+	eventCtx := buildEventContext(ctx, operationID, operationType, status, coordEventData, duration, err, true, true, true, false)
+	emitAsyncCoordinationEvent(ctx, coordinator, "snapshot_expand_event_emit", fmt.Sprintf("emitting snapshot expand event: %s", operationID), eventCtx)
 }
 
 // convertLoggingFields converts logging.Field to coordination.LoggingField

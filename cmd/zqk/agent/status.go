@@ -30,10 +30,7 @@ func NewStatusCmd() *cobra.Command {
 		RunE: runStatus,
 	})
 
-	helpBuilder.ApplyToCommand(cmd)
-	cli.AddCommonFlags(cmd)
-
-	return cmd
+	return cli.FinalizeCommand(cmd, helpBuilder)
 }
 
 func runStatus(cmd *cobra.Command, args []string) error {

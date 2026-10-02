@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/coordination"
-	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
@@ -62,28 +61,6 @@ func emitServiceOperationEventViaCoordinator(
 
 	// Create operation ID
 	operationID := fmt.Sprintf("service_%s_%s_%d", operation, serviceName, time.Now().Unix())
-
-	// Create event context (enable audit and logging channels)
-	eventCtx := coordination.NewEventContext(operationID, fmt.Sprintf("service_%s", operation), status).
-		WithEventData(eventData).
-		WithContext(ctx).
-		WithChannels(true, true, false, false) // Audit and logging, no metrics/operational
-
-	if err != nil {
-		eventCtx = eventCtx.WithError(err)
-	}
-
-	if duration > 0 {
-		eventCtx = eventCtx.WithDuration(duration)
-	}
-
-	// Emit via coordinator (async, non-blocking)
-	bud := goroutinelabels.DefaultBudget()
-	builder := goroutinelabels.NewGoroutine("service_event_emitter", "emitting service event")
-	if bud != nil {
-		builder = builder.WithBudget(bud)
-	}
-	builder.StartSimple(func() {
-		_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
-	})
+	eventCtx := buildEventContext(ctx, operationID, fmt.Sprintf("service_%s", operation), status, eventData, duration, err, true, true, false, false)
+	emitAsyncCoordinationEvent(ctx, coordinator, "service_event_emitter", "emitting service event", eventCtx)
 }

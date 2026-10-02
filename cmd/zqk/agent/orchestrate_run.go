@@ -52,13 +52,9 @@ var (
 // OrchestrateOptions holds the execution options for orchestrate
 
 func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions) error {
-	proc, err := cli.NewProcessor(cmd)
+	proc, err := newAgentProcessor(cmd)
 	if err != nil {
 		return err
-	}
-
-	if proc.ProjectRoot() == "" {
-		return errfmt.Errorf("project root is required")
 	}
 
 	// Doers cannot orchestrate peers.

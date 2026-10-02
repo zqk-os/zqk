@@ -37,26 +37,22 @@ func runPromote(cmd *cobra.Command, args []string) error {
 }
 
 // promoteObjectIDs advances each id one lifecycle hop when preconditions pass.
+// promoteObjectIDs advances each id one lifecycle hop when preconditions pass.
 // Shared by `object promote` and `object draft promote`.
 func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) error {
-	args, err := parseTargetObjectIDs(cmd, args)
+	tc, err := setupTransitionContext(cmd, proc, args)
 	if err != nil {
 		return err
 	}
 
-	ctx := proc.OperationContext()
-	secCtx := proc.SecurityContext()
-
-	env, err := initObjectTransitionEnv(ctx, proc.ProjectRoot())
-	if err != nil {
-		return err
-	}
-	lifecycleLoader := env.lifecycleLoader
-	gv := env.validator
+	ctx := tc.ctx
+	secCtx := tc.secCtx
+	lifecycleLoader := tc.env.lifecycleLoader
+	gv := tc.env.validator
+	flushTracker := tc.flushTracker
 
 	var errors []string
-	flushTracker := newFlushKindTracker(len(args))
-	for _, idArg := range args {
+	for _, idArg := range tc.args {
 		process.TouchMeaningfulActivity()
 		if ctx.Err() != nil {
 			errors = append(errors, fmt.Sprintf("%s: skipped due to context timeout: %v", idArg, ctx.Err()))

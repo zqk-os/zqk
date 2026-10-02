@@ -1,7 +1,6 @@
 package object
 
 import (
-	"errors"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -65,35 +64,20 @@ func runDelete(cmd *cobra.Command, args []string) error {
 			return cli.Guard(cmd).Err(err).Wrapf("semantic routing failed").Return()
 		}
 
-		cascade, err := cmd.Flags().GetBool("cascade")
+		delFlags, err := parseDeleteFlags(cmd, "delete refused: pass --unlink-references (strip inbound refs) or --cascade; refusing to leave GhostRefs")
 		if err != nil {
-			cascade = false
-		}
-		unlinkRefs, err := cmd.Flags().GetBool("unlink-references")
-		if err != nil {
-			unlinkRefs = false
-		}
-		dryRun, err := cmd.Flags().GetBool("dry-run")
-		if err != nil {
-			dryRun = false
-		}
-		if unlinkRefs && cascade {
-			return cli.Guard(cmd).Err(errors.New("--unlink-references cannot be combined with --cascade")).Return()
-		}
-		// Fail-closed delete (no silent GhostRef fan-in).
-		if !unlinkRefs && !cascade {
-			return cli.Guard(cmd).Err(errors.New("delete refused: pass --unlink-references (strip inbound refs) or --cascade; refusing to leave GhostRefs")).Return()
+			return err
 		}
 
 		logging.FluentEvent(proc.Logger()).Debug("Deleting object").
 			ObjectID(id).
-			Bool("cascade", cascade).
-			Bool("unlink_references", unlinkRefs).
-			Bool("dry_run", dryRun).
+			Bool("cascade", delFlags.Cascade).
+			Bool("unlink_references", delFlags.UnlinkRefs).
+			Bool("dry_run", delFlags.DryRun).
 			Log()
 
 		// Check for dry-run using shared utility
-		if dryRun {
+		if delFlags.DryRun {
 			// Read object to show what would be deleted
 			obj, err := proc.Storage().Read(proc.OperationContext(), proc.SecurityContext(), id)
 			if err != nil {
@@ -103,7 +87,7 @@ func runDelete(cmd *cobra.Command, args []string) error {
 				return cli.Guard(cmd).Err(err).Wrapf("failed to read object: %w").Return()
 			}
 
-			handled, result, err := clipkg.HandleDeleteDryRun(cmd, id, obj, cascade, proc.Logger(), "object")
+			handled, result, err := clipkg.HandleDeleteDryRun(cmd, id, obj, delFlags.Cascade, proc.Logger(), "object")
 			if err != nil {
 				return cli.Guard(cmd).Err(err).Return()
 			}
@@ -113,14 +97,7 @@ func runDelete(cmd *cobra.Command, args []string) error {
 			}
 		}
 
-		// Mark context as CLI operation for authorization (required for delete).
-		// Skip write-behind so delete is durable before return (avoids WAL races with create hammers).
-		cliCtx := storage.WithSkipWriteBehind(proc.WithCLIOperation())
-		if unlinkRefs {
-			cliCtx = storage.WithUnlinkReferencesBeforeDelete(cliCtx)
-		}
-		var reasonErr error
-		cliCtx, reasonErr = withCoreDeleteReasonFromFlags(cmd, cliCtx)
+		cliCtx, reasonErr := prepareDeleteContext(cmd, proc, delFlags.UnlinkRefs, true)
 		if reasonErr != nil {
 			return reasonErr
 		}
@@ -141,7 +118,7 @@ func runDelete(cmd *cobra.Command, args []string) error {
 				affectedKinds = []string{inferred}
 			}
 		}
-		if unlinkRefs || cascade {
+		if delFlags.UnlinkRefs || delFlags.Cascade {
 			if idx := objects.TryLoadSpecIndexForProjectRoot(proc.ProjectRoot()); idx != nil {
 				affectedKinds = nil
 				for k := range idx.Kinds {
@@ -156,24 +133,24 @@ func runDelete(cmd *cobra.Command, args []string) error {
 		}
 
 		// Delete object
-		if err := proc.Storage().Delete(cliCtx, proc.SecurityContext(), id, cascade); err != nil {
+		if err := proc.Storage().Delete(cliCtx, proc.SecurityContext(), id, delFlags.Cascade); err != nil {
 			logging.FluentEvent(proc.Logger()).Error("Failed to delete object", err).
 				ObjectID(id).
-				Bool("cascade", cascade).
+				Bool("cascade", delFlags.Cascade).
 				Log()
 			return cli.Guard(cmd).Err(err).Wrapf("failed to delete object: %w").Return()
 		}
 
 		// Write-behind: Delete returns after WAL+buffer enqueue; flush so the next
 		// zqk process (e.g. `object get`) sees the CAS changes immediately.
-		ensureDur := flushDeleteVisibility(cmd, proc, id, cascade, affectedKinds)
+		ensureDur := flushDeleteVisibility(cmd, proc, id, delFlags.Cascade, affectedKinds)
 		t1 := time.Now()
 		// Best-effort extra safety: flush listing indexes so no stale mappings survive
 		// across write-behind content-addressed update batching.
 		if err := storage.FlushAllListingIndexesForProjectRoot(proc.ProjectRoot()); err != nil {
 			logging.FluentEvent(proc.Logger()).Error("FlushAllListingIndexesForProjectRoot after delete failed", err).
 				ObjectID(id).
-				Bool("cascade", cascade).
+				Bool("cascade", delFlags.Cascade).
 				Log()
 			return cli.Guard(cmd).Err(err).Wrapf("failed to flush listing indexes after delete: %w").Return()
 		}
@@ -183,7 +160,7 @@ func runDelete(cmd *cobra.Command, args []string) error {
 		proc.TriggerCacheFreshnessCheck("delete", affectedKinds)
 
 		// Format success message using shared utility
-		msg := clipkg.FormatDeleteSuccessMessage(id, false, cascade, "object", proc.Logger())
+		msg := clipkg.FormatDeleteSuccessMessage(id, false, delFlags.Cascade, "object", proc.Logger())
 		return cli.WriteOutput(cmd, []byte(msg))
 	})(cmd, args)
 }

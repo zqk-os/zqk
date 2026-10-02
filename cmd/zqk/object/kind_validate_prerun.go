@@ -1,8 +1,11 @@
 package object
 
 import (
+	"errors"
+
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cliapp"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // Annotation keys — aliases for declarative kind validation on the object command subtree.
@@ -26,6 +29,28 @@ const (
 
 func ensureCmdAnnotations(cmd *cobra.Command) {
 	cli.EnsureCmdAnnotations(cmd)
+}
+
+func configureKindPositionalValidation(cmd *cobra.Command, withCompletion bool) {
+	if withCompletion {
+		cmd.ValidArgsFunction = kindCompletion
+	}
+	ensureCmdAnnotations(cmd)
+	cmd.Annotations[AnnotationKindValidate] = KindValidatePositional0
+}
+
+func resolvePositional0Kind(cmd *cobra.Command, proc *cli.Processor, args []string, requiredErr string) (string, error) {
+	kind, ok := kindCanonicalFromPRERun(cmd)
+	if ok {
+		return kind, nil
+	}
+	if len(args) == 0 {
+		if requiredErr != "" {
+			return "", errors.New(requiredErr)
+		}
+		return "", nil
+	}
+	return objects.ResolveAndValidateKindForProject(proc.ProjectRoot(), args[0])
 }
 
 func validateAnnotatedObjectKind(cmd *cobra.Command, args []string) error {

@@ -104,45 +104,12 @@ func findCurrentPriorityPlan(cmdCtx context.Context, storageProvider storage.Obj
 		return nil, errfmt.Errorf("no active or in_progress priority plans found")
 	}
 
-	// Sort active plans: lowest active_order first, then by plan_date desc
-	plans := make([]PriorityPlanInfo, 0, len(result.Objects))
-	for _, obj := range result.Objects {
-		planID, _ := obj[objects.FieldKeyID].(string)
-		status, _ := obj[pplanFieldStatus].(string)
-		planDate, _ := obj[pplanFieldPlanDate].(string)
-		var activeOrder *int
-		switch ao := obj[pplanFieldActiveOrder].(type) {
-		case int:
-			activeOrder = &ao
-		case float64:
-			aoInt := int(ao)
-			activeOrder = &aoInt
-		}
-
-		plans = append(plans, PriorityPlanInfo{
-			ID:          planID,
-			Status:      status,
-			ActiveOrder: activeOrder,
-			PlanDate:    planDate,
-		})
+	// Build and sort active plans: lowest active_order first, then by plan_date desc
+	plans := buildPriorityPlanList(result.Objects)
+	if len(plans) == 0 {
+		return nil, errfmt.Errorf("no valid priority plan found")
 	}
-
-	// Sort: active_order (lower first), then plan_date (desc)
-	sort.Slice(plans, func(i, j int) bool {
-		// Plans with active_order come first
-		if plans[i].ActiveOrder != nil && plans[j].ActiveOrder != nil {
-			if *plans[i].ActiveOrder != *plans[j].ActiveOrder {
-				return *plans[i].ActiveOrder < *plans[j].ActiveOrder
-			}
-		} else if plans[i].ActiveOrder != nil {
-			return true // i has order, j doesn't - i comes first
-		} else if plans[j].ActiveOrder != nil {
-			return false // j has order, i doesn't - j comes first
-		}
-
-		// Both have no active_order or same active_order, sort by plan_date desc
-		return plans[i].PlanDate > plans[j].PlanDate
-	})
+	sortPriorityPlans(plans)
 
 	logging.FluentEvent(logger).Debug(fmt.Sprintf("Found active plan: %s (active_order: %v)", plans[0].ID, plans[0].ActiveOrder)).Log()
 	return &plans[0], nil
@@ -180,27 +147,7 @@ func getAllActivePriorityPlans(cmdCtx context.Context, storageProvider storage.O
 	allObjects = append(allObjects, resultInProgress.Objects...)
 	allObjects = append(allObjects, resultActive.Objects...)
 
-	plans := make([]PriorityPlanInfo, 0, len(allObjects))
-	for _, obj := range allObjects {
-		planID, _ := obj[objects.FieldKeyID].(string)
-		status, _ := obj[pplanFieldStatus].(string)
-		planDate, _ := obj[pplanFieldPlanDate].(string)
-		var activeOrder *int
-		switch ao := obj[pplanFieldActiveOrder].(type) {
-		case int:
-			activeOrder = &ao
-		case float64:
-			aoInt := int(ao)
-			activeOrder = &aoInt
-		}
-
-		plans = append(plans, PriorityPlanInfo{
-			ID:          planID,
-			Status:      status,
-			ActiveOrder: activeOrder,
-			PlanDate:    planDate,
-		})
-	}
+	plans := buildPriorityPlanList(allObjects)
 
 	// Sort: in_progress first, then active by active_order (lower first), then by plan_date desc
 	sort.Slice(plans, func(i, j int) bool {
@@ -211,20 +158,7 @@ func getAllActivePriorityPlans(cmdCtx context.Context, storageProvider storage.O
 		if plans[i].Status != pplanStatusInProgress && plans[j].Status == pplanStatusInProgress {
 			return false
 		}
-
-		// Both same status, sort by active_order
-		if plans[i].ActiveOrder != nil && plans[j].ActiveOrder != nil {
-			if *plans[i].ActiveOrder != *plans[j].ActiveOrder {
-				return *plans[i].ActiveOrder < *plans[j].ActiveOrder
-			}
-		} else if plans[i].ActiveOrder != nil {
-			return true
-		} else if plans[j].ActiveOrder != nil {
-			return false
-		}
-
-		// Both have no active_order or same active_order, sort by plan_date desc
-		return plans[i].PlanDate > plans[j].PlanDate
+		return comparePriorityPlanOrder(plans[i], plans[j])
 	})
 
 	return plans, nil

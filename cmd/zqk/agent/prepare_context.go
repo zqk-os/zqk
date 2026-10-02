@@ -19,9 +19,7 @@ func NewPrepareContextCmd() *cobra.Command {
 }
 
 func runPrepareContext(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-	ctx := proc.OperationContext()
-	sec := procSecurity(proc)
-	sp := proc.Storage()
+	ctx, sec, sp := procStorageTuple(proc)
 	if sp == nil {
 		return errfmt.Errorf("storage unavailable")
 	}

@@ -37,9 +37,7 @@ func NewTemplateCmd() *cobra.Command {
 	}
 	// Add RunE implementation
 	cli.BindAsyncProgress(cmd, runTemplate)
-	cmd.ValidArgsFunction = kindCompletion
-	ensureCmdAnnotations(cmd)
-	cmd.Annotations[AnnotationKindValidate] = KindValidatePositional0
+	configureKindPositionalValidation(cmd, true)
 	return cmd
 }
 
@@ -48,13 +46,9 @@ func runTemplate(cmd *cobra.Command, args []string) error {
 		var err error
 		_ = err
 
-		kind, ok := kindCanonicalFromPRERun(cmd)
-		if !ok {
-			var rerr error
-			kind, rerr = objects.ResolveAndValidateKindForProject(proc.ProjectRoot(), args[0])
-			if rerr != nil {
-				return cli.Guard(cmd).Err(rerr).Return()
-			}
+		kind, err := resolvePositional0Kind(cmd, proc, args, "")
+		if err != nil {
+			return cli.Guard(cmd).Err(err).Return()
 		}
 
 		logging.FluentEvent(proc.Logger()).Debug("Generating template").

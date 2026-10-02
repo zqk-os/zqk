@@ -10,6 +10,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cliapp"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -24,6 +25,33 @@ func parseTargetObjectIDs(cmd *cobra.Command, args []string) ([]string, error) {
 		return nil, fmt.Errorf("at least one object ID is required (positional, comma-separated, and/or --ids)")
 	}
 	return args, nil
+}
+
+type transitionContext struct {
+	args         []string
+	ctx          context.Context
+	secCtx       *pkgctx.SecurityContext
+	env          *objectTransitionEnv
+	flushTracker *flushKindTracker
+}
+
+func setupTransitionContext(cmd *cobra.Command, proc *cli.Processor, rawArgs []string) (*transitionContext, error) {
+	args, err := parseTargetObjectIDs(cmd, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	ctx := proc.OperationContext()
+	env, err := initObjectTransitionEnv(ctx, proc.ProjectRoot())
+	if err != nil {
+		return nil, err
+	}
+	return &transitionContext{
+		args:         args,
+		ctx:          ctx,
+		secCtx:       proc.SecurityContext(),
+		env:          env,
+		flushTracker: newFlushKindTracker(len(args)),
+	}, nil
 }
 
 type objectTransitionEnv struct {
