@@ -986,7 +986,6 @@
 ./scripts/scheduler_jobs/idle_worktree_cleanup.yaml
 ./scripts/scheduler_jobs/improvement_report_hourly.yaml
 ./scripts/scheduler_jobs/log_rotation_periodic.yaml
-./scripts/scheduler_jobs/maintenance_aggregate_then_retention.yaml
 ./scripts/scheduler_jobs/maintenance_wal_trigger.yaml
 ./scripts/scheduler_jobs/mesh_lease_supervision_default.yaml
 ./scripts/scheduler_jobs/object_count_report_hourly.yaml
@@ -996,7 +995,6 @@
 ./scripts/scheduler_jobs/passive_test_sweeper.yaml
 ./scripts/scheduler_jobs/peer_ack_timeout_audit.yaml
 ./scripts/scheduler_jobs/pre_commit_integrity.yaml
-./scripts/scheduler_jobs/pre_commit_lint.yaml
 ./scripts/scheduler_jobs/pre_commit_policy.yaml
 ./scripts/scheduler_jobs/retention_scheduler_job_daily.yaml
 ./scripts/scheduler_jobs/retention_tolerance_agent_instruction.yaml

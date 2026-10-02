@@ -36,6 +36,7 @@ const (
 type JobType string
 
 const (
+	JobTypeAgentSync                  JobType = "agent_sync"
 	JobTypeAggregation                JobType = "aggregation"
 	JobTypeAggregationMetricsCleanup  JobType = "aggregation_metrics_cleanup"
 	JobTypeAuditEventAggregation      JobType = "audit_event_aggregation"
@@ -45,6 +46,7 @@ const (
 	JobTypeCachePrewarm               JobType = "cache_prewarm"
 	JobTypeCallbackListener           JobType = "callback_listener"
 	JobTypeCapOrchestrator            JobType = "cap_orchestrator"
+	JobTypeCapacityScaling            JobType = "capacity_scaling"
 	JobTypeCascadeUpdate              JobType = "cascade_update"
 	JobTypeChangeJournalAggregation   JobType = "change_journal_aggregation"
 	JobTypeCleanup                    JobType = "cleanup"
@@ -56,16 +58,23 @@ const (
 	JobTypeIdleCleanup                JobType = "idle_cleanup"
 	JobTypeIntegrityCheck             JobType = "integrity_check"
 	JobTypeLifecycleCheck             JobType = "lifecycle_check"
+	JobTypeLogRotation                JobType = "log_rotation"
 	JobTypeMaintenance                JobType = "maintenance"
 	JobTypeManifestSnapshot           JobType = "manifest_snapshot"
+	JobTypeMeshLeaseSupervision       JobType = "mesh_lease_supervision"
 	JobTypeMetricsCollection          JobType = "metrics_collection"
 	JobTypeObjectValidation           JobType = "object_validation"
 	JobTypeOperationExecution         JobType = "operation_execution"
+	JobTypePassiveTestSweeper         JobType = "passive_test_sweeper"
+	JobTypePeerAckTimeoutAudit        JobType = "peer_ack_timeout_audit"
 	JobTypeRetentionTolerance         JobType = "retention_tolerance"
 	JobTypeRunWrapper                 JobType = "run_wrapper"
 	JobTypeSchedulerEventsAggregation JobType = "scheduler_events_aggregation"
 	JobTypeSchedulerJobRetention      JobType = "scheduler_job_retention"
+	JobTypeStrategicPulse             JobType = "strategic_pulse"
+	JobTypeTestIo                     JobType = "test_io"
 	JobTypeTestRunner                 JobType = "test_runner"
+	JobTypeWatchdogEvaluation         JobType = "watchdog_evaluation"
 )
 
 type LogLevel string
