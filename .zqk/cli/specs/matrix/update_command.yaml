@@ -26,3 +26,56 @@ description: |-
       zqk matrix update --file-path pkg/x.go --set fully_vetted=yes --backup
       Append matrix update note to a CVS activity_log after write
       zqk matrix update --file-path pkg/x.go --set fully_vetted=yes --append-cvs-activity --cvs-id CVS-abc123
+
+flags:
+  - name: "name"
+    type: "string"
+    description: "Matrix alias from matrix_registry.yaml (default: resolved from registry default)"
+  - name: "registry"
+    type: "string"
+    description: "Path to matrix_registry.yaml (repo-relative or absolute)"
+  - name: "matrix"
+    type: "string"
+    description: "Override CSV path (requires --profile)"
+  - name: "profile"
+    type: "string"
+    description: "Override profile YAML when using --matrix"
+  - name: "file-path"
+    type: "string"
+    description: "Match one row where file_path equals this value (normalized); mutually exclusive with --bundle-label and --filter"
+  - name: "bundle-label"
+    type: "string"
+    description: "Match one row where bundle_label equals this value; mutually exclusive with --file-path and --filter"
+  - name: "filter"
+    shorthand: "F"
+    type: "stringArray"
+    description: "column=value (repeatable, AND) to select rows for bulk update; mutually exclusive with --file-path and --bundle-label"
+  - name: "limit"
+    type: "int"
+    default: 0
+    description: "With --filter, max rows to update in match order (0 = no limit)"
+  - name: "set"
+    shorthand: "s"
+    type: "stringArray"
+    description: "column=value (repeatable). Gate columns must be allowed done_values in the profile."
+  - name: "dry-run"
+    type: "bool"
+    default: false
+    description: "Validate and print result without writing the CSV"
+  - name: "backup"
+    type: "bool"
+    default: false
+    description: "Before replace, copy the current CSV to <csv>.bak (same directory)"
+  - name: "backup-to"
+    type: "string"
+    description: "Before replace, copy the current CSV to this path (overrides --backup default)"
+  - name: "append-cvs-activity"
+    type: "bool"
+    default: false
+    description: "After a successful CSV write, append one activity_log entry to each target convergence_session (use --cvs-id and/or registry session_ref_column on updated rows)"
+  - name: "cvs-id"
+    type: "stringArray"
+    description: "Convergence session id(s) to append to (repeatable); when omitted, uses session_ref_column values from updated row(s)"
+
+common_flags: true
+

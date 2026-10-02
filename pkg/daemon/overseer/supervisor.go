@@ -13,6 +13,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/scheduler/hostservice"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -236,6 +237,30 @@ func (s *Supervisor) launchDaemonLocked(ctx context.Context, spec *DaemonSpec, s
 	selfExe, err := fileutil.Executable()
 	if err != nil || selfExe == "" {
 		selfExe = filepath.Join(s.projectRoot, "bin", brand.ExecutableName())
+	}
+
+	daemonRole := ""
+	switch spec.Name {
+	case "scheduler":
+		daemonRole = "sched"
+	case "ambient", "fswatcher":
+		daemonRole = "amb"
+	case "privileged-writer":
+		daemonRole = "pw"
+	default:
+		if len(spec.Command) > 0 {
+			switch spec.Command[0] {
+			case "scheduler":
+				daemonRole = "sched"
+			case "ambient":
+				daemonRole = "amb"
+			}
+		}
+	}
+	if daemonRole != "" {
+		if roleBin := hostservice.ResolveServiceDaemonBinary(s.projectRoot, daemonRole); roleBin != "" && fileutil.Exists(roleBin) {
+			selfExe = roleBin
+		}
 	}
 
 	if brand.IsProductExecutable(exe) {

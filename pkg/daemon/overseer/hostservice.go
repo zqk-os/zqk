@@ -8,6 +8,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/scheduler/hostservice"
 	"github.com/zqk-os/zqk/pkg/service"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
@@ -17,12 +18,7 @@ import (
 func OverseerServiceSpec(absRoot, binaryPath string) service.ServiceSpec {
 	bin := binaryPath
 	if bin == "" {
-		candidate := filepath.Join(absRoot, "bin", "zqk")
-		if fileutil.Exists(candidate) {
-			bin = candidate
-		} else {
-			bin = "zqk"
-		}
+		bin = hostservice.ResolveServiceDaemonBinary(absRoot, "overseer")
 	}
 
 	envPath := zqkenv.OSPath().Get()

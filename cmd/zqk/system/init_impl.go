@@ -25,6 +25,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/mcp"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/scheduler/hostservice"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/storage/migration"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -273,6 +274,12 @@ func runInit(cmd *cobra.Command, projectName, template string, force bool, snaps
 	// Ensure Git pre-commit hooks are installed
 	if err := EnsureGitHooks(projectRoot, logger); err != nil {
 		logging.Fluent(logger).Warn("Failed to ensure git pre-commit hook on init").WithError(err).Log()
+	}
+
+	// Ensure daemon role differentiator symlinks (bin/<brand>-sched, bin/<brand>-amb, bin/<brand>-pw, bin/<brand>-overseer, bin/<brand>-mcp-ide-adapter)
+	// so developers running standalone binaries get distinguishable process names across process tables and supervisors automatically.
+	if err := hostservice.EnsureAllServiceRoleSymlinks(projectRoot); err != nil {
+		logging.Fluent(logger).Warn("Failed to ensure service role symlinks on init").WithError(err).Log()
 	}
 
 	progress.Step(7, 7, "Starting ambient filesystem and heuristics daemon...")
