@@ -31,12 +31,8 @@ func NewCoachCmd() *cobra.Command {
 	cli.RequireStorage(cmd, true)
 	cli.BindAsyncProgress(cmd, cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 		logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-		ctx := proc.OperationContext()
-		sp := proc.Storage()
-		projectRoot := proc.ProjectRoot()
-		if projectRoot == "" {
-			projectRoot = cli.ResolveProjectRoot(".")
-		}
+		ctx, sp, _ := processorContexts(proc)
+		projectRoot := proc.ResolvedProjectRoot()
 
 		if updateTips {
 			logging.Fluent(logger).Info("Generating dynamic observer tips").Log()

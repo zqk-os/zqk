@@ -36,9 +36,7 @@ func extractTargetCriteria(pipelineRefID string, pipelineObj map[string]any) (st
 
 func runLinkCommand(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-		ctx := proc.OperationContext()
-		storageProvider := proc.Storage()
-		secCtx := proc.SecurityContext()
+		ctx, storageProvider, secCtx := processorContexts(proc)
 
 		if len(args) < 2 {
 			return fmt.Errorf("missing arguments. Usage: workflow link <object-id> <pipeline-ref>")

@@ -9,6 +9,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/strutil"
 )
 
 const (
@@ -202,40 +203,7 @@ func SuggestSimilarKinds(input string, allKinds []string) []string {
 }
 
 func computeLevenshtein(a, b string) int {
-	la, lb := len(a), len(b)
-	if la == 0 {
-		return lb
-	}
-	if lb == 0 {
-		return la
-	}
-
-	dp := make([][]int, la+1)
-	for i := range dp {
-		dp[i] = make([]int, lb+1)
-		dp[i][0] = i
-	}
-	for j := 0; j <= lb; j++ {
-		dp[0][j] = j
-	}
-
-	for i := 1; i <= la; i++ {
-		for j := 1; j <= lb; j++ {
-			cost := 1
-			if a[i-1] == b[j-1] {
-				cost = 0
-			}
-			minVal := dp[i-1][j] + 1
-			if dp[i][j-1]+1 < minVal {
-				minVal = dp[i][j-1] + 1
-			}
-			if dp[i-1][j-1]+cost < minVal {
-				minVal = dp[i-1][j-1] + cost
-			}
-			dp[i][j] = minVal
-		}
-	}
-	return dp[la][lb]
+	return strutil.LevenshteinDistance(a, b)
 }
 
 func sliceContainsString(slice []string, s string) bool {

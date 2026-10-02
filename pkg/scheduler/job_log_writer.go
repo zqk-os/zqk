@@ -16,20 +16,17 @@ import (
 // testBundlesEventsMu serializes appends to the single test-bundles events.jsonl so multiple jobs don't interleave.
 var testBundlesEventsMu sync.Mutex
 
-// AppendTestBundleEvent appends one JSONL event to the shared test-bundles/events.jsonl.
-// Caller must ensure entry contains "job_id" so consumers can attribute events. Best-effort; errors are ignored.
-func AppendTestBundleEvent(projectRoot, jobID string, entry map[string]any) {
-	if projectRoot == emptyValue || jobID == emptyValue || entry == nil {
+func appendTestBundleJSONL(path, jobID string, entry map[string]any) {
+	if jobID == emptyValue || entry == nil {
 		return
 	}
-	if entry["job_id"] == nil {
-		entry["job_id"] = jobID
+	if entry[KeyJobID] == nil && entry["job_id"] == nil {
+		entry[KeyJobID] = jobID
 	}
 	data, err := json.Marshal(entry)
 	if err != nil {
 		return
 	}
-	path := TestBundlesEventsFilePath(projectRoot)
 	testBundlesEventsMu.Lock()
 	defer testBundlesEventsMu.Unlock()
 	if err := fileutil.MkdirAll(filepath.Dir(path), paths.DirPerm755); err != nil {
@@ -42,62 +39,33 @@ func AppendTestBundleEvent(projectRoot, jobID string, entry map[string]any) {
 	_, _ = f.Write(data)
 	_, _ = f.WriteString("\n")
 	_ = f.Close()
+}
+
+// AppendTestBundleEvent appends one JSONL event to the shared test-bundles/events.jsonl.
+// Caller must ensure entry contains "job_id" so consumers can attribute events. Best-effort; errors are ignored.
+func AppendTestBundleEvent(projectRoot, jobID string, entry map[string]any) {
+	if projectRoot == emptyValue {
+		return
+	}
+	appendTestBundleJSONL(TestBundlesEventsFilePath(projectRoot), jobID, entry)
 }
 
 // AppendTestBundleHealthEvent appends one line to test-bundles/health.jsonl (outcome, fingerprint, suggested reruns).
 // Best-effort; errors ignored. Serialized with the same mutex as events.jsonl to avoid interleaving.
 func AppendTestBundleHealthEvent(projectRoot, jobID string, entry map[string]any) {
-	if projectRoot == emptyValue || jobID == emptyValue || entry == nil {
+	if projectRoot == emptyValue {
 		return
 	}
-	if entry[KeyJobID] == nil {
-		entry[KeyJobID] = jobID
-	}
-	data, err := json.Marshal(entry)
-	if err != nil {
-		return
-	}
-	path := TestBundlesHealthFilePath(projectRoot)
-	testBundlesEventsMu.Lock()
-	defer testBundlesEventsMu.Unlock()
-	if err := fileutil.MkdirAll(filepath.Dir(path), paths.DirPerm755); err != nil {
-		return
-	}
-	f, err := fileutil.OpenFile(path, fileutil.O_WRONLY|fileutil.O_CREATE|fileutil.O_APPEND, paths.FilePerm644)
-	if err != nil {
-		return
-	}
-	_, _ = f.Write(data)
-	_, _ = f.WriteString("\n")
-	_ = f.Close()
+	appendTestBundleJSONL(TestBundlesHealthFilePath(projectRoot), jobID, entry)
 }
 
 // AppendTestBundleProgressEvent appends one line to test-bundles/progress.jsonl.
 // Best-effort; errors ignored. Serialized with the same mutex as events.jsonl.
 func AppendTestBundleProgressEvent(projectRoot, jobID string, entry map[string]any) {
-	if projectRoot == emptyValue || jobID == emptyValue || entry == nil {
+	if projectRoot == emptyValue {
 		return
 	}
-	if entry[KeyJobID] == nil {
-		entry[KeyJobID] = jobID
-	}
-	data, err := json.Marshal(entry)
-	if err != nil {
-		return
-	}
-	path := TestBundlesProgressFilePath(projectRoot)
-	testBundlesEventsMu.Lock()
-	defer testBundlesEventsMu.Unlock()
-	if err := fileutil.MkdirAll(filepath.Dir(path), paths.DirPerm755); err != nil {
-		return
-	}
-	f, err := fileutil.OpenFile(path, fileutil.O_WRONLY|fileutil.O_CREATE|fileutil.O_APPEND, paths.FilePerm644)
-	if err != nil {
-		return
-	}
-	_, _ = f.Write(data)
-	_, _ = f.WriteString("\n")
-	_ = f.Close()
+	appendTestBundleJSONL(TestBundlesProgressFilePath(projectRoot), jobID, entry)
 }
 
 // TrackAndAppendTestBundleProgress tracks the progress of the test bundles and writes tallies to progress.jsonl.

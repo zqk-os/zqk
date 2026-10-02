@@ -267,42 +267,21 @@ func generateTracePipelineBundle(targetID string, obj map[string]any, criteriaNe
 	return bundle, allCriteria, needCriteria
 }
 
+func validateTraceTargetKind(targetID string) error {
+	if strings.HasPrefix(targetID, "REQ-") || strings.HasPrefix(targetID, "GOAL-") || strings.HasPrefix(targetID, "MIL-") {
+		return nil
+	}
+	return fmt.Errorf("trace pipeline generation is only supported for requirements, goals, and milestones")
+}
+
 func runGenTracePipeline(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-		ctx := proc.OperationContext()
-		storageProvider := proc.Storage()
-		secCtx := proc.SecurityContext()
-
 		if len(args) == 0 {
 			return fmt.Errorf("missing object ID")
 		}
 		targetID := args[0]
-
-		obj, err := storageProvider.Read(ctx, secCtx, targetID)
-		if err != nil {
-			return fmt.Errorf("failed to load target object %s: %w", targetID, err)
-		}
-
-		var kind string
-		if strings.HasPrefix(targetID, "REQ-") {
-			kind = objects.KindRequirement
-		} else if strings.HasPrefix(targetID, "GOAL-") {
-			kind = objects.KindGoal
-		} else if strings.HasPrefix(targetID, "MIL-") {
-			kind = objects.KindMilestone
-		} else {
-			return fmt.Errorf("trace pipeline generation is only supported for requirements, goals, and milestones")
-		}
-
-		var criteriaNeighbors []map[string]any
-		if refs, ok := obj[objects.FieldKeyCriteriaRefs].([]any); ok && len(refs) > 0 {
-			for _, r := range refs {
-				critID := fmt.Sprint(r)
-				neighbors, err := storageProvider.GetNeighbors(ctx, secCtx, critID, "incoming")
-				if err == nil {
-					criteriaNeighbors = append(criteriaNeighbors, neighbors...)
-				}
-			}
+		if err := validateTraceTargetKind(targetID); err != nil {
+			return err
 		}
 
 		criteriaCount := 3
@@ -310,8 +289,7 @@ func runGenTracePipeline(cmd *cobra.Command, args []string) error {
 			criteriaCount = flagCount
 		}
 
-		_ = kind
-		return applyGeneratedTracePipeline(cmd, proc, targetID, obj, criteriaNeighbors, criteriaCount)
+		return applyGeneratedTracePipelineForID(cmd, proc, targetID, criteriaCount)
 	})(cmd, args)
 }
 
@@ -326,9 +304,7 @@ func ApplyGeneratedTracePipelineFromCmd(cmd *cobra.Command, targetID string) err
 }
 
 func applyGeneratedTracePipelineForID(cmd *cobra.Command, proc *cli.Processor, targetID string, criteriaCount int) error {
-	ctx := proc.OperationContext()
-	storageProvider := proc.Storage()
-	secCtx := proc.SecurityContext()
+	ctx, storageProvider, secCtx := processorContexts(proc)
 
 	obj, err := storageProvider.Read(ctx, secCtx, targetID)
 	if err != nil {
@@ -350,9 +326,7 @@ func applyGeneratedTracePipelineForID(cmd *cobra.Command, proc *cli.Processor, t
 }
 
 func applyGeneratedTracePipeline(cmd *cobra.Command, proc *cli.Processor, targetID string, obj map[string]any, criteriaNeighbors []map[string]any, criteriaCount int) error {
-	ctx := proc.OperationContext()
-	storageProvider := proc.Storage()
-	secCtx := proc.SecurityContext()
+	ctx, storageProvider, secCtx := processorContexts(proc)
 
 	bundle, allCriteria, needCriteria := generateTracePipelineBundle(targetID, obj, criteriaNeighbors, criteriaCount)
 	if bundle == nil {

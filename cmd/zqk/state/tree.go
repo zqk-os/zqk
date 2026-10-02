@@ -91,10 +91,7 @@ func newTreeCmd() *cobra.Command {
 func runStateTree(cmd *cobra.Command, proc *cli.Processor) error {
 	ctx := proc.OperationContext()
 	sp := proc.Storage()
-	projectRoot := proc.ProjectRoot()
-	if projectRoot == "" {
-		projectRoot = cli.ResolveProjectRoot(".")
-	}
+	projectRoot := proc.ResolvedProjectRoot()
 
 	payload := buildStateTreePayload(ctx, sp, projectRoot)
 

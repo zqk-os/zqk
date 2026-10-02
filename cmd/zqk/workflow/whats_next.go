@@ -137,10 +137,7 @@ func runWhatsNext(cmd *cobra.Command, args []string) error {
 }
 
 func runWhatsNextLite(cmd *cobra.Command, args []string, proc *cli.Processor, projectRoot, priFlag, cvsFlag, personaFlag, agentIDFlag string, skipMeasure bool) error {
-	ctx := proc.OperationContext()
-	sp := proc.Storage()
-
-	out := whatsNextOut{Schema: whatsNextSchema, BacklogCountsByStatus: map[string]int{}}
+	ctx, sp, out := initWhatsNextContext(proc)
 
 	// Strict default hot path: read pre-computed zero-cost projection (<5ms SLA)
 	lite, _ := whatsnext.GetOrRecoverPayload(ctx, sp, projectRoot, whatsnext.DefaultStalenessTolerance)
@@ -284,13 +281,7 @@ func runWhatsNextLite(cmd *cobra.Command, args []string, proc *cli.Processor, pr
 	out.Correspondence = buildWhatsNextCorrespondence(projectRoot, strings.TrimSpace(agentIDFlag), strings.TrimSpace(personaFlag), personaIDs, activeTask)
 
 	amb := whatsnext.LoadKernelAmbience(projectRoot)
-	hint := ""
-	if out.Correspondence != nil {
-		hint = out.Correspondence.NextActionHint
-	}
-	whatsnext.ApplySeatOperatingModeIn(&amb, projectRoot, strings.TrimSpace(agentIDFlag), hint)
-	out.KernelAmbience = &amb
-	out.AgentInstruction = whatsnext.PrependStewardProjectionForSeat(out.AgentInstruction, amb.StewardFocus, amb.SeatMode)
+	applyWhatsNextAmbienceAndSeat(&out, &amb, projectRoot, agentIDFlag)
 
 	compileWhatsNextDrive(&out, ctx, nil, strings.TrimSpace(personaFlag), personaIDs)
 	out.AgentInstruction = whatsnext.ApplyFillToInstruction(out.AgentInstruction, out.FillItem)
@@ -313,23 +304,11 @@ func runWhatsNextLite(cmd *cobra.Command, args []string, proc *cli.Processor, pr
 		out.MeasureSkipReason = "zero-cost hot path (use --session-id or --sync-sweep to measure)"
 	}
 
-	enrichWhatsNextRemedies(cmd, projectRoot, &out)
-
-	switch cli.GetFormat(cmd) {
-	case cli.FormatJSON, cli.FormatJSONL:
-		return cli.FormatOutput(cmd, out)
-	case cli.FormatYAML:
-		return cli.FormatOutput(cmd, out)
-	default:
-		return writeWhatsNextTable(cmd, out)
-	}
+	return renderWhatsNextOutput(cmd, projectRoot, out)
 }
 
 func runWhatsNextSyncSweep(cmd *cobra.Command, args []string, proc *cli.Processor, projectRoot, priFlag, cvsFlag, personaFlag, agentIDFlag string, skipMeasure bool) error {
-	ctx := proc.OperationContext()
-	sp := proc.Storage()
-
-	out := whatsNextOut{Schema: whatsNextSchema, BacklogCountsByStatus: map[string]int{}}
+	ctx, sp, out := initWhatsNextContext(proc)
 
 	personaIDs := resolveWhatsNextPersonaIDs(ctx, sp, projectRoot, personaFlag, agentIDFlag)
 	columnIDs := planPersonaFilter(ctx, sp, projectRoot, agentIDFlag, personaIDs)
@@ -522,13 +501,7 @@ func runWhatsNextSyncSweep(cmd *cobra.Command, args []string, proc *cli.Processo
 	}
 	whatsnext.EnrichKernelAmbienceWithWorkflows(ctx, sp, &amb, planID, ambientPlanIDs)
 	whatsnext.EnrichKernelAmbienceWithStaleTasks(ctx, sp, &amb, time.Now().UTC())
-	hint := ""
-	if out.Correspondence != nil {
-		hint = out.Correspondence.NextActionHint
-	}
-	whatsnext.ApplySeatOperatingModeIn(&amb, projectRoot, strings.TrimSpace(agentIDFlag), hint)
-	out.KernelAmbience = &amb
-	out.AgentInstruction = whatsnext.PrependStewardProjectionForSeat(out.AgentInstruction, amb.StewardFocus, amb.SeatMode)
+	applyWhatsNextAmbienceAndSeat(&out, &amb, projectRoot, agentIDFlag)
 
 	compileWhatsNextDrive(&out, ctx, sp, strings.TrimSpace(personaFlag), personaIDs)
 	out.AgentInstruction = whatsnext.ApplyFillToInstruction(out.AgentInstruction, out.FillItem)
@@ -555,6 +528,10 @@ func runWhatsNextSyncSweep(cmd *cobra.Command, args []string, proc *cli.Processo
 		out.MaterializedViewDegradedReason = lite.DegradedReason
 	}
 
+	return renderWhatsNextOutput(cmd, projectRoot, out)
+}
+
+func renderWhatsNextOutput(cmd *cobra.Command, projectRoot string, out whatsNextOut) error {
 	enrichWhatsNextRemedies(cmd, projectRoot, &out)
 
 	switch cli.GetFormat(cmd) {
@@ -564,6 +541,23 @@ func runWhatsNextSyncSweep(cmd *cobra.Command, args []string, proc *cli.Processo
 		return cli.FormatOutput(cmd, out)
 	default:
 		return writeWhatsNextTable(cmd, out)
+	}
+}
+
+func applyWhatsNextAmbienceAndSeat(out *whatsNextOut, amb *whatsnext.KernelAmbience, projectRoot, agentIDFlag string) {
+	hint := ""
+	if out.Correspondence != nil {
+		hint = out.Correspondence.NextActionHint
+	}
+	whatsnext.ApplySeatOperatingModeIn(amb, projectRoot, strings.TrimSpace(agentIDFlag), hint)
+	out.KernelAmbience = amb
+	out.AgentInstruction = whatsnext.PrependStewardProjectionForSeat(out.AgentInstruction, amb.StewardFocus, amb.SeatMode)
+}
+
+func initWhatsNextContext(proc *cli.Processor) (context.Context, storage.ObjectStorageProvider, whatsNextOut) {
+	return proc.OperationContext(), proc.Storage(), whatsNextOut{
+		Schema:                 whatsNextSchema,
+		BacklogCountsByStatus: map[string]int{},
 	}
 }
 

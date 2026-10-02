@@ -21,6 +21,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/mcp"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/strutil"
 	"github.com/zqk-os/zqk/pkg/telemetry"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -476,37 +477,7 @@ func getProjectRoot() string {
 
 // levenshteinDistance calculates the Levenshtein distance between two strings
 func levenshteinDistance(s1, s2 string) int {
-	if len(s1) == 0 {
-		return len(s2)
-	}
-	if len(s2) == 0 {
-		return len(s1)
-	}
-	d := make([][]int, len(s1)+1)
-	for i := range d {
-		d[i] = make([]int, len(s2)+1)
-		d[i][0] = i
-	}
-	for j := 0; j <= len(s2); j++ {
-		d[0][j] = j
-	}
-	for i := 1; i <= len(s1); i++ {
-		for j := 1; j <= len(s2); j++ {
-			cost := 0
-			if s1[i-1] != s2[j-1] {
-				cost = 1
-			}
-			min := d[i-1][j] + 1
-			if d[i][j-1]+1 < min {
-				min = d[i][j-1] + 1
-			}
-			if d[i-1][j-1]+cost < min {
-				min = d[i-1][j-1] + cost
-			}
-			d[i][j] = min
-		}
-	}
-	return d[len(s1)][len(s2)]
+	return strutil.LevenshteinDistance(s1, s2)
 }
 
 // normalizeToolName attempts to find the correct tool name, using exact match,

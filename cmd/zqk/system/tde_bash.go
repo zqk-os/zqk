@@ -1,41 +1,21 @@
 package system
 
 import (
-	"context"
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
-	"os"
 	"time"
 
-	"github.com/zqk-os/zqk/pkg/execwrap"
-
 	"github.com/spf13/cobra"
-	"github.com/zqk-os/zqk/pkg/cliapp"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
-	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/tde"
 )
 
 func init() {
-	tde.RegisterAction("bash_command", func(ctx context.Context, env tde.Envelope) error {
-		scriptBytes, err := base64.StdEncoding.DecodeString(env.PayloadB64)
-		if err != nil {
-			return fmt.Errorf("failed to decode bash payload: %w", err)
-		}
-
-		script := string(scriptBytes)
-		logger := logging.GetLoggerFromContext(ctx)
-		logging.FluentEvent(logger).Info("TDE-Bash Executing").Script(script).Log()
-
-		cmd := execwrap.CommandContext(ctx, "bash", "-c", script)
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-
-		return cmd.Run()
-	})
+	registerTDEScriptAction("bash_command", "TDE-Bash Executing")
 }
 
 func generateID() string {

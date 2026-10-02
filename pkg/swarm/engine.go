@@ -17,6 +17,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/llm"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/process"
+	"github.com/zqk-os/zqk/pkg/strutil"
 )
 
 var globalActiveMCPToolCalls atomic.Int32
@@ -850,32 +851,7 @@ func min(a, b int) int {
 }
 
 func levenshtein(s, t string) int {
-	if len(s) == 0 {
-		return len(t)
-	}
-	if len(t) == 0 {
-		return len(s)
-	}
-
-	d := make([][]int, len(s)+1)
-	for i := range d {
-		d[i] = make([]int, len(t)+1)
-		d[i][0] = i
-	}
-	for j := 0; j <= len(t); j++ {
-		d[0][j] = j
-	}
-
-	for i := 1; i <= len(s); i++ {
-		for j := 1; j <= len(t); j++ {
-			cost := 1
-			if s[i-1] == t[j-1] {
-				cost = 0
-			}
-			d[i][j] = min(min(d[i-1][j]+1, d[i][j-1]+1), d[i-1][j-1]+cost)
-		}
-	}
-	return d[len(s)][len(t)]
+	return strutil.LevenshteinDistance(s, t)
 }
 
 func detectRepeatingPattern(history []ToolCallRecord) (bool, string) {

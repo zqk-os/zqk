@@ -295,6 +295,14 @@ func (p *Processor) ProjectRoot() string {
 	return p.projectRoot
 }
 
+// ResolvedProjectRoot returns the project root or resolves it from "." if empty.
+func (p *Processor) ResolvedProjectRoot() string {
+	if p.projectRoot == "" {
+		return ResolveProjectRoot(".")
+	}
+	return p.projectRoot
+}
+
 // StorageContext returns the storage context
 func (p *Processor) StorageContext() *pkgctx.StorageContext {
 	return p.storageCtx
