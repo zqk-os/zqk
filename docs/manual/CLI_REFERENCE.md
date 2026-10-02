@@ -44,8 +44,9 @@ All `zqk` commands accept standard global flags governing execution context, ser
 
 ### Initializing and Seating Workspaces
 
-- `zqk init`: Project initialization.
-- `zqk quickstart`: Interactive or automated onboarding wizard. Detects host environment, seats the default workspace, verifies prerequisites, and launches background daemons.
+- `zqk init`: Initialize a new ZQK project
+- `zqk quickstart`: Zero-friction project onboarding and quickstart guide
+- `zqk run`: Run a portable agent swarm package
 
 ---
 
@@ -53,68 +54,78 @@ All `zqk` commands accept standard global flags governing execution context, ser
 
 The everyday command family covers core day-to-day interactions with the Knowledge Kernel:
 
-- `zqk do`: Autonomous execution loop.
-- `zqk query`: ZPARQL graph queries.
-- `zqk mutate`: ZQL atomic mutations.
-- `zqk run`: Swarm package execution.
-- `zqk ui`: Visual web studio.
-- `zqk workflow`: Manages workflow execution states, next actions (`whats-next`), and Verifiable Decomposition Spine (VDS) done-gates.
-- `zqk object`: Comprehensive CRUD, inspect, promote, and query operations for all kernel ontological objects.
-- `zqk system`: Inspects platform health (`system check`), performs secret scans, validates command specifications, and diagnoses daemons.
-- `zqk pplan`: Manages priority plans, Gantt matrices, child backlog item allocations, and execution order locks.
-- `zqk grep`: Ultra-fast native code search utilizing Go AST parsing, trigram indexing, and token-budgeted AI payloads.
-- `zqk test`: Test execution suite, runner harnesses, and verification matrix DoD checks.
-- `zqk auth`: Authentication, session token validation, credential stores, and agent capability bindings.
-- `zqk validate`: Validates instance YAML files, schemas, and ontological invariants against specifications.
-- `zqk version`: Displays binary build commit, release version, and compiler toolchain information.
+- `zqk auth`: Session and authentication
+- `zqk do`: Execute autonomous single-command workflow loop for a backlog item or task
+- `zqk explain`: Explain kernel acronyms, ontology terms, and architectural concepts
+- `zqk grep`: In-process trigram and AST code search
+- `zqk inspect`: Interactive terminal object inspector and semantic projection viewer
+- `zqk mutate`: Execute declarative ZQL mutations and transactions
+- `zqk object`: Object operations (CRUD, query, and management)
+- `zqk pplan`: Priority plan operations (current)
+- `zqk query`: Execute declarative ZPARQL graph queries
+- `zqk state`: State — inspect live knowledge kernel state graph and audit journals
+- `zqk system`: System operations (health, validation, and maintenance)
+- `zqk test`: Execute verification tests linked to test cases and criteria
+- `zqk ui`: Interactive full-screen terminal mission control
+- `zqk validate`: Validation and verification commands
+- `zqk version`: Print version, commit, and build timestamp
+- `zqk workflow`: Manage and execute autonomous engineering workflows and lifecycle pipelines
 
 ---
 
 ## Integrations & Daemon Operations
 
-- `zqk scheduler`: Coordinates background cron jobs, task timers, test execution bundles, and lock cleanup.
-- `zqk mcp`: Model Context Protocol (MCP) server daemon, tool registration, and tool evaluation interfaces.
-- `zqk feed`: Manages agent correspondence channels, activity feed streaming, and message acknowledgements.
-- `zqk inbox`: Manages incoming agent tasks, human-in-the-loop review requests, and notifications.
-- `zqk intake`: Ingests external requirements, issues, and work streams into the draft plane.
-- `zqk keystore`: Secure storage for cryptographic keys, tokens, and verification signatures.
-- `zqk learn`: Records institutional knowledge, architectural decisions, and agent operational lessons into the kernel.
-- `zqk new`: Scaffolds new repositories, plugins, adapters, and custom ontological packs.
-- `zqk pre-commit`: Runs local pre-commit release gates, secret scans, tree police, and invariant checks.
-- `zqk reports`: Generates engineering metrics, burndown charts, and quality evaluation summaries.
-- `zqk tray`: macOS menu bar companion for live daemon telemetry and agent status.
-- `zqk automation`: Orchestrates scheduled batch workflows, unattended maintenance, and event triggers.
-- `zqk callback`: Handles asynchronous webhooks and IPC callback responses from background workers.
-- `zqk ci`: Continuous integration pipeline runners, matrix test execution, and CI status reporters.
-- `zqk completion`: Generates shell completion scripts for `bash`, `zsh`, and `fish`.
+- `zqk automation`: Automation and integration operations (hooks, CI/CD, and scripts)
+- `zqk callback`: Handle scheduler job callbacks and notifications
+- `zqk ci`: Local CI (commit → checkout elsewhere → test run)
+- `zqk completion`: Generate shell completion script
+- `zqk daemon`: Manage background daemons under unified process group supervision
+- `zqk feed`: Agent correspondence feed (steer / status onto agent_feed JSONL)
+- `zqk inbox`: Inspect and manage the agent autonomy inbox
+- `zqk intake`: Semantic ingestion pipeline (Intent Capture)
+- `zqk kernel`: Knowledge Kernel governance, steward, and runtime lifecycle
+- `zqk keystore`: Keystore operations (create, issue, list, rotate keys)
+- `zqk learn`: Interactive curriculum mode
+- `zqk mcp`: MCP server operations
+- `zqk new`: Write draft YAML templates for object create and scenario bundles
+- `zqk pre-commit`: Pre-commit background results (aggregate and write category results)
+- `zqk reports`: Generate AI metrics reports (PCS, EDD, D&B)
+- `zqk scheduler`: Manage background scheduler daemon, jobs, and recurrent tasks
+- `zqk sync`: Synchronize Knowledge Kernel backlog items with external trackers
+- `zqk tray`: Tray — configurable named shortcuts to zqk subcommands
+- `zqk vendor`: Vendor-specific integrations and IDE adapters
 
 ---
 
 ## Advanced Knowledge Kernel Commands
 
-- `zqk agent`: Multi-agent orchestration, seat assignment, capability claims, and lock management.
-- `zqk swarm`: Swarm topology management, parallel execution rings, and swarm pool health.
-- `zqk ambient`: Background ambient intelligence daemon, telemetry monitoring, and signal accumulation.
-- `zqk convergence`: Convergence session contracts (`CVS-*`), divergence checks, and alignment scoring.
-- `zqk docman`: Document manager, Content-Addressable Storage (CAS) file qualification, and checksum verification.
-- `zqk domain`: Domain taxonomy definitions, ontological boundaries, and pack configurations.
-- `zqk graph`: Graph engine inspection, lineage visualization, dependency traversal, and topological sorting.
-- `zqk join`: Executes relational joins and multi-domain projections across kernel objects.
-- `zqk matrix`: Test verification matrix operations, DoD validation, and test case binding.
-- `zqk mesh`: P2P mesh synchronization across distributed agent pods and storage membranes.
-- `zqk observer`: Codebase AST observer, symbol resolution, and structure queries.
-- `zqk ontology`: Ontological metamodel operations, kind definitions, and schema transformations.
-- `zqk ops`: Low-level operational maintenance, storage compaction, and index rebuilds.
-- `zqk organizational`: Team configurations, persona assignments, and governance policies.
-- `zqk rollback`: Rollback journal execution, state restoration, and transaction recovery.
-- `zqk semantic`: Semantic recall, embeddings generation, vector search, and glossary lookups.
-- `zqk inspect`: Object inspection.
-- `zqk explain`: Glossary/concept explanation.
-- `zqk healthchk`: System health check.
-- `zqk state`: State management & streaming.
-- `zqk sync`: Synchronization.
-- `zqk pack`: Pack management.
-- `zqk spec`: Command specification generator, spec validation, and schema builders.
+- `zqk agent`: Multi-agent orchestration and delegation
+- `zqk ambient`: Manage ambient event processing
+- `zqk convergence`: Convergence measurement & nest management
+- `zqk docman`: Documentation management operations
+- `zqk domain`: Domain ontology discovery and registration
+- `zqk graph`: Graph-based operations and reasoning
+- `zqk job`: Background scheduler job triggers, queues, history, and status
+- `zqk join`: Join a node or agent into an existing federation or mesh network
+- `zqk kind-pack`: Record a verified spec pack as typed object kinds
+- `zqk matrix`: Traceability matrices (CSV registries, validation, reports)
+- `zqk mesh`: Manage peer-to-peer agent mesh networking, routing, and discovery
+- `zqk observer`: Observer agent operations
+- `zqk ontology`: Ontology import and translation
+- `zqk ops`: Operations and utility commands
+- `zqk organizational`: Organizational structure and change impact analysis
+- `zqk pack`: Holonic swarm package management (scaffold, seal, validate)
+- `zqk rollback`: List and apply rollback points (lifecycle/maintenance snapshots)
+- `zqk semantic`: Semantic operations and maturity assessment
+- `zqk service`: Manage per-root host OS scheduler units (launchd/systemd)
+- `zqk spec`: Spec operations (list and manage object specifications)
+- `zqk swarm`: Multi-agent swarm observability and throughput
+
+---
+
+## Additional Commands
+
+- `zqk help`: Help about any command
 
 ---
 

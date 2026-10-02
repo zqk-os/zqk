@@ -1,3 +1,5 @@
+<!-- SKU capabilities sourced from config/community-capabilities.yaml -->
+<!-- Regenerate manifest: ./scripts/open-core/generate-sku-manifest.sh -->
 # Community first-run (agent + human)
 
 **Audience:** People installing ZQK Community.  
