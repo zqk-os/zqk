@@ -36,17 +36,9 @@ type bundleProgressRow struct {
 }
 
 func runBundleProgress(cmd *cobra.Command, args []string) error {
-	ctx := cli.GetContext(cmd)
-	if ctx == nil {
-		return errfmt.Errorf("failed to get context")
-	}
-
-	projectRoot := ctx.ProjectRoot
-	if projectRoot == "" {
-		projectRoot = cli.ResolveProjectRoot(".")
-		if projectRoot == "" {
-			return errfmt.Errorf("project root not found")
-		}
+	projectRoot, err := resolveSchedulerProjectRoot(cmd)
+	if err != nil {
+		return err
 	}
 
 	rows, err := readBundleProgress(projectRoot)
@@ -130,16 +122,7 @@ func readBundleProgress(projectRoot string) ([]bundleProgressRow, error) {
 		}
 	}
 
-	knownIDs := []string{}
-	bundleStorageDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.TestBundlesDir)
-	if entries, err := fileutil.ReadDir(bundleStorageDir); err == nil {
-		for _, entry := range entries {
-			if !entry.IsDir() && filepath.Ext(entry.Name()) == ".json" {
-				name := entry.Name()[:len(entry.Name())-5] // Remove .json extension
-				knownIDs = append(knownIDs, "SCH-run-bundle-"+name)
-			}
-		}
-	}
+	knownIDs := readKnownBundleJobIDs(projectRoot)
 
 	for jID := range eventsByJob {
 		found := false
@@ -203,8 +186,8 @@ func readBundleProgress(projectRoot string) ([]bundleProgressRow, error) {
 	return rows, nil
 }
 
-func buildDefaultPendingRows(projectRoot string) []bundleProgressRow {
-	knownIDs := []string{}
+func readKnownBundleJobIDs(projectRoot string) []string {
+	var knownIDs []string
 	bundleStorageDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.TestBundlesDir)
 	if entries, err := fileutil.ReadDir(bundleStorageDir); err == nil {
 		for _, entry := range entries {
@@ -214,6 +197,11 @@ func buildDefaultPendingRows(projectRoot string) []bundleProgressRow {
 			}
 		}
 	}
+	return knownIDs
+}
+
+func buildDefaultPendingRows(projectRoot string) []bundleProgressRow {
+	knownIDs := readKnownBundleJobIDs(projectRoot)
 	sort.Strings(knownIDs)
 
 	var rows []bundleProgressRow

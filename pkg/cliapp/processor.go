@@ -846,6 +846,11 @@ func (p *Processor) Close() error {
 	return filecas.DrainDarwinSyncQueueContext(ctx)
 }
 
+// StorageTuple returns the operation context, security context, and storage provider.
+func (p *Processor) StorageTuple() (stdcontext.Context, *pkgctx.SecurityContext, storage.ObjectStorageProvider) {
+	return p.OperationContext(), p.SecurityContext(), p.Storage()
+}
+
 // WithProcessor wraps a cobra RunE function to automatically initialize and inject a Processor.
 func WithProcessor(handler func(cmd *cobra.Command, args []string, proc *Processor) error) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {

@@ -32,9 +32,7 @@ func runPropagate(cmd *cobra.Command, args []string) error {
 			return errfmt.Errorf("--change is required")
 		}
 
-		ctx := proc.OperationContext()
-		secCtx := proc.SecurityContext()
-		store := proc.Storage()
+		ctx, secCtx, store := proc.StorageTuple()
 		domainLogger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 
 		changeObj, err := store.Read(ctx, secCtx, changeID)

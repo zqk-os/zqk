@@ -11,9 +11,7 @@ import (
 )
 
 func listDomainRegistries(proc *cli.Processor, limit int) (*storage.QueryResult, error) {
-	ctx := proc.OperationContext()
-	secCtx := proc.SecurityContext()
-	store := proc.Storage()
+	ctx, secCtx, store := proc.StorageTuple()
 	storageCtx := pkgctx.NewStorageContext()
 
 	return store.List(ctx, secCtx, storageCtx, storage.ListFilter{

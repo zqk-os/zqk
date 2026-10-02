@@ -57,9 +57,7 @@ func runOntologyImport(cmd *cobra.Command, args []string) error {
 		}
 
 		// Create import_tracking record
-		ctx := proc.OperationContext()
-		secCtx := proc.SecurityContext()
-		store := proc.Storage()
+		ctx, secCtx, store := proc.StorageTuple()
 		storageCtx := pkgctx.NewStorageContext()
 		var nextID string
 		listResult, err := store.List(ctx, secCtx, storageCtx, storage.ListFilter{Kind: objects.KindImportTracking, Limit: 1000})

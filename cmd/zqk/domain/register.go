@@ -60,9 +60,7 @@ func runRegister(cmd *cobra.Command, args []string) error {
 			return errfmt.Newf("failed to list domain_registry").Wrap(err)
 		}
 
-		ctx := proc.OperationContext()
-		secCtx := proc.SecurityContext()
-		store := proc.Storage()
+		ctx, secCtx, store := proc.StorageTuple()
 
 		if len(listResult.Objects) == 0 {
 			regID := internal.NextSequentialID(listResult.Objects, domainRegistryIDRe, "DOMAIN-REG-%03d")
