@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 )
@@ -132,4 +133,15 @@ type ServiceAdapter interface {
 
 	// CleanupLegacy detects and removes superseded service units matching legacy prefixes.
 	CleanupLegacy(ctx context.Context, legacyIDs []string) ([]string, error)
+}
+
+func readServiceDirEntries(dir string) ([]os.DirEntry, error) {
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		return nil, nil
+	}
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return nil, fmt.Errorf("read dir %s: %w", dir, err)
+	}
+	return entries, nil
 }

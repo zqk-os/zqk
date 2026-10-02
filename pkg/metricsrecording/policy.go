@@ -82,3 +82,18 @@ func Enabled() bool {
 func isTruthy(value string) bool {
 	return value == envEnabledNumeric || strings.EqualFold(value, envEnabledLiteral)
 }
+
+// CollectAndReset executes collection if metrics recording is enabled, then executes reset.
+func CollectAndReset(collect func() (string, error), reset func()) (string, error) {
+	if !Enabled() {
+		return "", nil
+	}
+	metricID, err := collect()
+	if err != nil {
+		return "", err
+	}
+	if reset != nil {
+		reset()
+	}
+	return metricID, nil
+}

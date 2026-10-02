@@ -70,3 +70,8 @@ func FormatLayoutUTC(t time.Time, layout string) string {
 func NowLayoutUTC(layout string) string {
 	return FormatLayoutUTC(time.Now(), layout)
 }
+
+// WindowStrings returns the current UTC time along with the window start and end formatted in RFC3339 UTC.
+func WindowStrings(start, end time.Time) (time.Time, string, string) {
+	return time.Now().UTC(), FormatRFC3339UTC(start), FormatRFC3339UTC(end)
+}

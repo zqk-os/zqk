@@ -70,6 +70,29 @@ func (s *AuditAggregationService) findExistingMetricByWindow(
 	return nil, errfmt.Errorf(NoteNoExistingMetric)
 }
 
+func findOverlappingMetric(
+	ctx context.Context,
+	secCtx *pkgctx.SecurityContext,
+	q audit.ObjectQuery,
+	source string,
+	windowStart, windowEnd string,
+) string {
+	startTime, endTime, ok := ParseTimeWindowRFC3339(windowStart, windowEnd)
+	if !ok {
+		return ""
+	}
+	storageCtx := pkgctx.GetStorageContext()
+	objs, err := q.List(ctx, secCtx, storageCtx, audit.EventsNewestFirst(
+		MetricKindAuditAggregation,
+		audit.SourceEq(source),
+		10,
+	))
+	if err != nil || len(objs) == 0 {
+		return ""
+	}
+	return audit.FirstOverlappingID(objs, startTime, endTime)
+}
+
 // findExistingMetricByOverlappingWindow finds an existing aggregation metric with overlapping time window
 // This is a fallback when exact time window match fails
 func (s *AuditAggregationService) findExistingMetricByOverlappingWindow(
@@ -77,24 +100,7 @@ func (s *AuditAggregationService) findExistingMetricByOverlappingWindow(
 	secCtx *pkgctx.SecurityContext,
 	windowStart, windowEnd string,
 ) string {
-	startTime, endTime, ok := ParseTimeWindowRFC3339(windowStart, windowEnd)
-	if !ok {
-		return "" // Can't parse times, skip this fallback
-	}
-
-	// Query for metrics that overlap with this window
-	// A window overlaps if: start1 < end2 && start2 < end1
-	storageCtx := pkgctx.GetStorageContext()
-	objs, err := s.query().List(ctx, secCtx, storageCtx, audit.EventsNewestFirst(
-		MetricKindAuditAggregation,
-		audit.SourceEq(ValueAuditAggregationJob),
-		10,
-	))
-	if err != nil || len(objs) == 0 {
-		return ""
-	}
-
-	return audit.FirstOverlappingID(objs, startTime, endTime)
+	return findOverlappingMetric(ctx, secCtx, s.query(), ValueAuditAggregationJob, windowStart, windowEnd)
 }
 
 // markEventsAsAggregated marks audit events as aggregated by updating their status

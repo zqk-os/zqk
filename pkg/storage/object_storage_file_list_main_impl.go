@@ -130,15 +130,8 @@ func (f *FileObjectStorage) listAuditEventsByIDs(ctx context.Context, cas *filec
 		parsed *objects.ParsedObject
 	}
 	results := make(chan casParseResult, listMaxConcurrentReads*2)
-	workCh := make(chan string, len(ids))
-	for _, id := range ids {
-		workCh <- id
-	}
-	close(workCh)
-	numWorkers := listMaxConcurrentReads
-	if len(ids) < numWorkers {
-		numWorkers = len(ids)
-	}
+	workCh := createClosedWorkChannel(ids)
+	numWorkers := calcBoundedWorkerCount(len(ids), listMaxConcurrentReads)
 	var listWg sync.WaitGroup
 
 	listBud := goroutinelabels.DefaultBudget()

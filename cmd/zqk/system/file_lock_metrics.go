@@ -85,14 +85,7 @@ func runFileLockMetricsView(cmd *cobra.Command, args []string) error {
 	}
 
 	// Get current metrics snapshot
-	metrics := storagepkg.GetFileLockMetrics()
-	snapshot := metrics.GetSnapshot()
-
-	// Calculate derived metrics
-	avgAcquisitionTime := snapshot.AverageAcquisitionTime()
-	avgWaitTime := snapshot.AverageWaitTime()
-	contentionRate := snapshot.ContentionRate()
-	successRate := snapshot.SuccessRate()
+	snapshot, derived := storagepkg.GetFileLockSnapshotAndDerived()
 
 	// Build output data
 	outputData := map[string]any{
@@ -102,12 +95,12 @@ func runFileLockMetricsView(cmd *cobra.Command, args []string) error {
 		objects.FieldKeyTotalContention:      snapshot.TotalContention,
 		"current_holders":                    snapshot.CurrentHolders,
 		objects.FieldKeyPeakContention:       snapshot.PeakContention,
-		objects.FieldKeyAvgAcquisitionTimeMs: float64(avgAcquisitionTime.Nanoseconds()) / 1e6,
-		objects.FieldKeyAvgWaitTimeMs:        float64(avgWaitTime.Nanoseconds()) / 1e6,
+		objects.FieldKeyAvgAcquisitionTimeMs: float64(derived.AvgAcquisitionTime.Nanoseconds()) / 1e6,
+		objects.FieldKeyAvgWaitTimeMs:        float64(derived.AvgWaitTime.Nanoseconds()) / 1e6,
 		objects.FieldKeyMaxAcquisitionTimeMs: float64(snapshot.MaxAcquisitionTime.Nanoseconds()) / 1e6,
 		objects.FieldKeyMaxWaitTimeMs:        float64(snapshot.MaxWaitTime.Nanoseconds()) / 1e6,
-		objects.FieldKeyContentionRate:       contentionRate * 100,
-		objects.FieldKeySuccessRate:          successRate * 100,
+		objects.FieldKeyContentionRate:       derived.ContentionRate * 100,
+		objects.FieldKeySuccessRate:          derived.SuccessRate * 100,
 	}
 
 	switch cli.GetFormat(cmd) {
@@ -124,13 +117,13 @@ func runFileLockMetricsView(cmd *cobra.Command, args []string) error {
 		fmt.Fprintf(&buf, "Current Holders:        %d\n", snapshot.CurrentHolders)
 		fmt.Fprintf(&buf, "Peak Contention:        %d\n", snapshot.PeakContention)
 		fmt.Fprintf(&buf, "\nPerformance:\n")
-		fmt.Fprintf(&buf, "  Avg Acquisition Time: %.2f ms\n", float64(avgAcquisitionTime.Nanoseconds())/1e6)
-		fmt.Fprintf(&buf, "  Avg Wait Time:        %.2f ms\n", float64(avgWaitTime.Nanoseconds())/1e6)
+		fmt.Fprintf(&buf, "  Avg Acquisition Time: %.2f ms\n", float64(derived.AvgAcquisitionTime.Nanoseconds())/1e6)
+		fmt.Fprintf(&buf, "  Avg Wait Time:        %.2f ms\n", float64(derived.AvgWaitTime.Nanoseconds())/1e6)
 		fmt.Fprintf(&buf, "  Max Acquisition Time: %.2f ms\n", float64(snapshot.MaxAcquisitionTime.Nanoseconds())/1e6)
 		fmt.Fprintf(&buf, "  Max Wait Time:        %.2f ms\n", float64(snapshot.MaxWaitTime.Nanoseconds())/1e6)
 		fmt.Fprintf(&buf, "\nRates:\n")
-		fmt.Fprintf(&buf, "  Contention Rate:      %.2f%%\n", contentionRate*100)
-		fmt.Fprintf(&buf, "  Success Rate:         %.2f%%\n", successRate*100)
+		fmt.Fprintf(&buf, "  Contention Rate:      %.2f%%\n", derived.ContentionRate*100)
+		fmt.Fprintf(&buf, "  Success Rate:         %.2f%%\n", derived.SuccessRate*100)
 		return cli.WriteOutput(cmd, []byte(buf.String()))
 	}
 }

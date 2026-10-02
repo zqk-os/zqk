@@ -49,6 +49,17 @@ func DefaultCASRecoveryOptions(logger logging.Logger) *CASRecoveryOptions {
 	}
 }
 
+func resolveKindDir(projectRoot, kind string) (string, error) {
+	dirName := objects.GetDirectoryFromKind(kind)
+	if dirName == "" {
+		return "", errfmt.Errorf(ConstStreamUnknownObjectKindStr, kind)
+	}
+	if rel := paths.GetPathAlias(projectRoot, dirName); rel != "" {
+		return filepath.Join(projectRoot, rel), nil
+	}
+	return filepath.Join(datacell.ProcessPrimaryDir(projectRoot), dirName), nil
+}
+
 // RecoverCASObject attempts to recover a CAS object that has index entry but missing file
 // Returns recovery result indicating what action was taken.
 // sharedCAS is optional (INDEX_FIRST_LOW_CPU_SCAN_DESIGN): when non-nil, reuse it to avoid repeated index load.
@@ -75,18 +86,10 @@ func RecoverCASObject(
 		Success:  false,
 	}
 
-	dirName := objects.GetDirectoryFromKind(kind)
-	if dirName == "" {
-		result.Error = errfmt.Errorf(ConstStreamUnknownObjectKindStr, kind)
+	kindDir, err := resolveKindDir(projectRoot, kind)
+	if err != nil {
+		result.Error = err
 		return result, result.Error
-	}
-
-	var kindDir string
-	if rel := paths.GetPathAlias(projectRoot, dirName); rel != "" {
-		kindDir = filepath.Join(projectRoot, rel)
-	} else {
-		processDir := datacell.ProcessPrimaryDir(projectRoot)
-		kindDir = filepath.Join(processDir, dirName)
 	}
 	var cas *filecas.ContentAddressableStorage
 	if sharedCAS != nil {
@@ -226,22 +229,13 @@ func RecoverCASKind(
 		}
 	}
 
-	dirName := objects.GetDirectoryFromKind(kind)
-	if dirName == "" {
-		return nil, errfmt.Errorf(ConstStreamUnknownObjectKindStr, kind)
-	}
-
-	var kindDir string
-	if rel := paths.GetPathAlias(projectRoot, dirName); rel != "" {
-		kindDir = filepath.Join(projectRoot, rel)
-	} else {
-		processDir := datacell.ProcessPrimaryDir(projectRoot)
-		kindDir = filepath.Join(processDir, dirName)
+	kindDir, err := resolveKindDir(projectRoot, kind)
+	if err != nil {
+		return nil, err
 	}
 
 	var cas *filecas.ContentAddressableStorage
 	var allMappings map[string]string
-	var err error
 	if fileStorage, ok := storageForKind.(StorageFacade); ok && fileStorage != nil {
 		cas, err = fileStorage.GetContentAddressableStorage(kind)
 		if err == nil && cas != nil {
@@ -284,17 +278,9 @@ func RecoverCASKind(
 // ValidateCASIndex validates CAS index entries and returns objects with issues
 func ValidateCASIndex(projectRoot string, kind string) ([]*CASRecoveryResult, error) {
 	// Get CAS instance
-	dirName := objects.GetDirectoryFromKind(kind)
-	if dirName == "" {
-		return nil, errfmt.Errorf(ConstStreamUnknownObjectKindStr, kind)
-	}
-
-	var kindDir string
-	if rel := paths.GetPathAlias(projectRoot, dirName); rel != "" {
-		kindDir = filepath.Join(projectRoot, rel)
-	} else {
-		processDir := datacell.ProcessPrimaryDir(projectRoot)
-		kindDir = filepath.Join(processDir, dirName)
+	kindDir, err := resolveKindDir(projectRoot, kind)
+	if err != nil {
+		return nil, err
 	}
 	cas := filecas.NewContentAddressableStorage(kindDir, kind)
 

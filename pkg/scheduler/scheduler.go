@@ -65,40 +65,44 @@ func (s *Scheduler) clearLockFailureCount(jobID string) {
 	delete(s.lockFailureCountByJobID, jobID)
 }
 
-// getDispatchDropRetryCount returns the current dispatch drop retry count for the job.
-func (s *Scheduler) getDispatchDropRetryCount(jobID string) int {
-	if s == nil {
-		return 0
-	}
-	s.dispatchDropRetriesMu.Lock()
-	defer s.dispatchDropRetriesMu.Unlock()
-	return s.dispatchDropRetriesByJobID[jobID]
-}
-
-// incrementDispatchDropRetryCount increments and returns the dispatch drop retry count for the job.
-func (s *Scheduler) incrementDispatchDropRetryCount(jobID string) int {
-	if s == nil {
-		return 0
-	}
-	s.dispatchDropRetriesMu.Lock()
-	defer s.dispatchDropRetriesMu.Unlock()
-	if s.dispatchDropRetriesByJobID == nil {
-		s.dispatchDropRetriesByJobID = make(map[string]int)
-	}
-	s.dispatchDropRetriesByJobID[jobID]++
-	return s.dispatchDropRetriesByJobID[jobID]
-}
-
-// clearDispatchDropRetryCount resets the dispatch drop retry count for the job.
-func (s *Scheduler) clearDispatchDropRetryCount(jobID string) {
+func (s *Scheduler) withDispatchDropRetries(fn func()) {
 	if s == nil {
 		return
 	}
 	s.dispatchDropRetriesMu.Lock()
 	defer s.dispatchDropRetriesMu.Unlock()
-	if s.dispatchDropRetriesByJobID != nil {
-		delete(s.dispatchDropRetriesByJobID, jobID)
-	}
+	fn()
+}
+
+// getDispatchDropRetryCount returns the current dispatch drop retry count for the job.
+func (s *Scheduler) getDispatchDropRetryCount(jobID string) int {
+	var count int
+	s.withDispatchDropRetries(func() {
+		count = s.dispatchDropRetriesByJobID[jobID]
+	})
+	return count
+}
+
+// incrementDispatchDropRetryCount increments and returns the dispatch drop retry count for the job.
+func (s *Scheduler) incrementDispatchDropRetryCount(jobID string) int {
+	var count int
+	s.withDispatchDropRetries(func() {
+		if s.dispatchDropRetriesByJobID == nil {
+			s.dispatchDropRetriesByJobID = make(map[string]int)
+		}
+		s.dispatchDropRetriesByJobID[jobID]++
+		count = s.dispatchDropRetriesByJobID[jobID]
+	})
+	return count
+}
+
+// clearDispatchDropRetryCount resets the dispatch drop retry count for the job.
+func (s *Scheduler) clearDispatchDropRetryCount(jobID string) {
+	s.withDispatchDropRetries(func() {
+		if s.dispatchDropRetriesByJobID != nil {
+			delete(s.dispatchDropRetriesByJobID, jobID)
+		}
+	})
 }
 
 // startCronOnce starts the robfig cron scheduler exactly once per Scheduler instance.

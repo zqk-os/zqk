@@ -205,3 +205,18 @@ func parseDuration(s string) (time.Duration, error) {
 func ParseWindowSize(windowSize string) (time.Duration, error) {
 	return parseDuration(windowSize)
 }
+
+// loadBufferConfigAndWindow loads aggregation config and resolves window size for buffer initialization.
+func loadBufferConfigAndWindow(projectRoot string) (*AuditAggregationConfig, time.Duration) {
+	config, err := LoadAggregationConfig(projectRoot)
+	if err != nil {
+		config = DefaultAggregationConfig()
+	}
+	windowSize := time.Hour
+	if config.WindowSize != emptyValue {
+		if parsed, err := ParseWindowSize(config.WindowSize); err == nil {
+			windowSize = parsed
+		}
+	}
+	return config, windowSize
+}

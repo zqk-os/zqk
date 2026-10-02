@@ -251,16 +251,10 @@ func (e *Engine) searchText(ctx context.Context, targetRoot string, opts SearchO
 	var accumulatedTokens int32
 	var stopped int32
 
-	numWorkers := runtime.GOMAXPROCS(0) * 2
-	if numWorkers > 32 {
-		numWorkers = 32
-	}
-	if numWorkers < 2 {
-		numWorkers = 2
-	}
-
+	numWorkers := searchWorkerCount()
 	fileCh := make(chan string, 128)
 	var wg sync.WaitGroup
+
 
 	for w := 0; w < numWorkers; w++ {
 		wg.Add(1)
@@ -328,40 +322,11 @@ func (e *Engine) searchText(ctx context.Context, targetRoot string, opts SearchO
 		})
 	}
 
-	for _, f := range files {
-		if atomic.LoadInt32(&stopped) != 0 {
-			break
-		}
-		select {
-		case <-ctx.Done():
-			break
-		case fileCh <- f:
-		}
-	}
-	close(fileCh)
-
-	waitDone := make(chan struct{})
-	goroutinelabels.NewGoroutine("search.wait", "wait for text search workers").StartSimple(func() {
-		wg.Wait()
-		close(waitDone)
-	})
-	select {
-	case <-waitDone:
-	case <-ctx.Done():
-		atomic.StoreInt32(&stopped, 1)
-		<-waitDone
-	case <-time.After(30 * time.Second):
-		atomic.StoreInt32(&stopped, 1)
-		<-waitDone
-	}
-
-	result.TotalMatches = len(result.Matches)
-	result.EstimatedTokens = int(atomic.LoadInt32(&accumulatedTokens))
-	result.Duration = time.Since(start)
-	result.DurationMs = float64(result.Duration.Microseconds()) / 1000.0
-
+	dispatchFilesAndWait(ctx, files, fileCh, &wg, &stopped, "search.wait")
+	finalizeSearchResult(result, atomic.LoadInt32(&accumulatedTokens), start)
 	return result, nil
 }
+
 
 func (e *Engine) searchAST(ctx context.Context, targetRoot string, opts SearchOptions, start time.Time) (*SearchResult, error) {
 	files, err := CollectFiles(targetRoot, opts)
@@ -378,16 +343,10 @@ func (e *Engine) searchAST(ctx context.Context, targetRoot string, opts SearchOp
 	var accumulatedTokens int32
 	var stopped int32
 
-	numWorkers := runtime.GOMAXPROCS(0) * 2
-	if numWorkers > 32 {
-		numWorkers = 32
-	}
-	if numWorkers < 2 {
-		numWorkers = 2
-	}
-
+	numWorkers := searchWorkerCount()
 	fileCh := make(chan string, 64)
 	var wg sync.WaitGroup
+
 
 	for w := 0; w < numWorkers; w++ {
 		wg.Add(1)
@@ -459,8 +418,25 @@ func (e *Engine) searchAST(ctx context.Context, targetRoot string, opts SearchOp
 		})
 	}
 
+	dispatchFilesAndWait(ctx, files, fileCh, &wg, &stopped, "search_ast.wait")
+	finalizeSearchResult(result, atomic.LoadInt32(&accumulatedTokens), start)
+	return result, nil
+}
+
+func searchWorkerCount() int {
+	numWorkers := runtime.GOMAXPROCS(0) * 2
+	if numWorkers > 32 {
+		return 32
+	}
+	if numWorkers < 2 {
+		return 2
+	}
+	return numWorkers
+}
+
+func dispatchFilesAndWait(ctx context.Context, files []string, fileCh chan string, wg *sync.WaitGroup, stopped *int32, waitLabel string) {
 	for _, f := range files {
-		if atomic.LoadInt32(&stopped) != 0 {
+		if atomic.LoadInt32(stopped) != 0 {
 			break
 		}
 		select {
@@ -472,24 +448,25 @@ func (e *Engine) searchAST(ctx context.Context, targetRoot string, opts SearchOp
 	close(fileCh)
 
 	waitDone := make(chan struct{})
-	goroutinelabels.NewGoroutine("search_ast.wait", "wait for AST search workers").StartSimple(func() {
+	goroutinelabels.NewGoroutine(waitLabel, "wait for search workers").StartSimple(func() {
 		wg.Wait()
 		close(waitDone)
 	})
 	select {
 	case <-waitDone:
 	case <-ctx.Done():
-		atomic.StoreInt32(&stopped, 1)
+		atomic.StoreInt32(stopped, 1)
 		<-waitDone
 	case <-time.After(30 * time.Second):
-		atomic.StoreInt32(&stopped, 1)
+		atomic.StoreInt32(stopped, 1)
 		<-waitDone
 	}
+}
 
+func finalizeSearchResult(result *SearchResult, accumulatedTokens int32, start time.Time) {
 	result.TotalMatches = len(result.Matches)
-	result.EstimatedTokens = int(atomic.LoadInt32(&accumulatedTokens))
+	result.EstimatedTokens = int(accumulatedTokens)
 	result.Duration = time.Since(start)
 	result.DurationMs = float64(result.Duration.Microseconds()) / 1000.0
-
-	return result, nil
 }
+

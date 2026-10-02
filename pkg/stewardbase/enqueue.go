@@ -2,7 +2,6 @@ package stewardbase
 
 import (
 	"context"
-	"encoding/json"
 	"path/filepath"
 	"time"
 
@@ -63,21 +62,8 @@ func AppendStewardEnqueueRecord(projectRoot string, rec map[string]any) error {
 	// Fallback path calculation to avoid datacell dependency
 	path := filepath.Join(root, paths.ProjectDataDir, paths.LogsDir, "datacell", "steward_enqueue.jsonl")
 
-	line, err := json.Marshal(rec)
-	if err != nil {
-		return errfmt.Newf("append steward enqueue: marshal").Wrap(err)
+	if err := fileutil.AppendJSONLine(path, rec); err != nil {
+		return errfmt.Errorf("append steward enqueue: %w", err)
 	}
-	if err := fileutil.MkdirAll(filepath.Dir(path), paths.DirPerm755); err != nil {
-		return errfmt.Newf("append steward enqueue: mkdir").Wrap(err)
-	}
-	f, err := fileutil.OpenFile(path, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, paths.FilePerm644)
-	if err != nil {
-		return errfmt.Newf("append steward enqueue: open").Wrap(err)
-	}
-	_, wErr := f.Write(append(line, '\n'))
-	cErr := f.Close()
-	if wErr != nil {
-		return errfmt.Newf("append steward enqueue: write").Wrap(wErr)
-	}
-	return cErr
+	return nil
 }

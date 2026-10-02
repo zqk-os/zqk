@@ -50,15 +50,20 @@ func (f *FileBucketStrategyStorage) GetBackendType() string {
 	return "file"
 }
 
-func (f *FileBucketStrategyStorage) LoadStrategy(ctx context.Context, strategyID string) (map[string]any, error) {
-	// Load from YAML file using ObjectStorageProvider
-	// This reuses the existing file storage infrastructure
+func (f *FileBucketStrategyStorage) getStorage(ctx context.Context) (ObjectStorageProvider, error) {
 	storageFactory, err := NewStorageFactory(ctx, f.projectRoot)
 	if err != nil {
 		return nil, errfmt.Newf(ErrMsgCreateStorageFactory).Wrap(err)
 	}
+	return storageFactory.GetStorage(), nil
+}
 
-	storage := storageFactory.GetStorage()
+func (f *FileBucketStrategyStorage) LoadStrategy(ctx context.Context, strategyID string) (map[string]any, error) {
+	storage, err := f.getStorage(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	obj, err := storage.Read(ctx, nil, strategyID)
 	if err != nil {
 		return nil, errfmt.Errorf(ErrMsgLoadStrategyFmt, strategyID, err)
@@ -69,36 +74,14 @@ func (f *FileBucketStrategyStorage) LoadStrategy(ctx context.Context, strategyID
 
 func (f *FileBucketStrategyStorage) LoadAllStrategies(ctx context.Context) ([]map[string]any, error) {
 	loadStart := time.Now()
-	// List all bucketing_strategy objects
-	storageFactory, err := NewStorageFactory(ctx, f.projectRoot)
+	storage, err := f.getStorage(ctx)
 	if err != nil {
-		return nil, errfmt.Newf(ErrMsgCreateStorageFactory).Wrap(err)
+		return nil, err
 	}
-
-	storage := storageFactory.GetStorage()
-	filter := ListFilter{
-		Kind: objects.KindBucketingStrategy,
-	}
-	secCtx := pkgctx.NewSystemSecurityContext()
-	storageCtx := pkgctx.GetStorageContext()
-
-	listStart := time.Now()
-	results, err := storage.List(ctx, secCtx, storageCtx, filter)
-	listDuration := time.Since(listStart)
-	if listDuration > 100*time.Millisecond {
-		logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-		StorageLog(logger).Debug(LogEventStorageBucketingStorageListSlowDebug).
-			String("operation", OpNameLoadAllStrategies).
-			String("step", "storage_list").
-			String("duration", listDuration.String()).
-			WithFields(logging.Field{Key: "metadata", Value: map[string]any{"duration_ms": float64(listDuration.Nanoseconds()) / 1e6, "result_count": len(results.Objects)}}).
-			Log()
-	}
+	strategies, err := listBucketingStrategies(ctx, storage)
 	if err != nil {
-		return nil, errfmt.Newf(ErrMsgListStrategies).Wrap(err)
+		return nil, err
 	}
-
-	strategies := append(make([]map[string]any, 0, len(results.Objects)), results.Objects...)
 
 	totalDuration := time.Since(loadStart)
 	if totalDuration > 100*time.Millisecond {
@@ -114,21 +97,14 @@ func (f *FileBucketStrategyStorage) LoadAllStrategies(ctx context.Context) ([]ma
 	return strategies, nil
 }
 
-func (f *FileBucketStrategyStorage) LoadStrategiesForKind(ctx context.Context, kind string) ([]map[string]any, error) {
-	// Load all strategies and filter by applies_to
-	allStrategies, err := f.LoadAllStrategies(ctx)
-	if err != nil {
-		return nil, err
-	}
-
+func filterStrategiesForKind(strategies []map[string]any, kind string) []map[string]any {
 	var matchingStrategies []map[string]any
-	for _, strategy := range allStrategies {
+	for _, strategy := range strategies {
 		appliesTo, ok := strategy[objects.FieldKeyAppliesTo].([]any)
 		if !ok {
 			continue
 		}
 
-		// Check if kind is in applies_to
 		for _, appliedKind := range appliesTo {
 			if appliedKindStr, ok := appliedKind.(string); ok && appliedKindStr == kind {
 				enabled, _ := strategy[objects.FieldKeyEnabled].(bool)
@@ -139,18 +115,34 @@ func (f *FileBucketStrategyStorage) LoadStrategiesForKind(ctx context.Context, k
 			}
 		}
 	}
+	return matchingStrategies
+}
 
-	return matchingStrategies, nil
+func listBucketingStrategies(ctx context.Context, storage ObjectStorageProvider) ([]map[string]any, error) {
+	filter := ListFilter{Kind: objects.KindBucketingStrategy}
+	secCtx := pkgctx.NewSystemSecurityContext()
+	storageCtx := pkgctx.GetStorageContext()
+	results, err := storage.List(ctx, secCtx, storageCtx, filter)
+	if err != nil {
+		return nil, errfmt.Newf(ErrMsgListStrategies).Wrap(err)
+	}
+	return append(make([]map[string]any, 0, len(results.Objects)), results.Objects...), nil
+}
+
+func (f *FileBucketStrategyStorage) LoadStrategiesForKind(ctx context.Context, kind string) ([]map[string]any, error) {
+	allStrategies, err := f.LoadAllStrategies(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return filterStrategiesForKind(allStrategies, kind), nil
 }
 
 func (f *FileBucketStrategyStorage) SaveStrategy(ctx context.Context, strategy map[string]any) error {
-	// Save using ObjectStorageProvider
-	storageFactory, err := NewStorageFactory(ctx, f.projectRoot)
+	storage, err := f.getStorage(ctx)
 	if err != nil {
-		return errfmt.Newf(ErrMsgCreateStorageFactory).Wrap(err)
+		return err
 	}
 
-	storage := storageFactory.GetStorage()
 	strategyID, ok := strategy[objects.FieldKeyID].(string)
 	if !ok {
 		return errfmt.Errorf(ErrMsgStrategyNoID)
@@ -172,12 +164,11 @@ func (f *FileBucketStrategyStorage) SaveStrategy(ctx context.Context, strategy m
 }
 
 func (f *FileBucketStrategyStorage) DeleteStrategy(ctx context.Context, strategyID string) error {
-	storageFactory, err := NewStorageFactory(ctx, f.projectRoot)
+	storage, err := f.getStorage(ctx)
 	if err != nil {
-		return errfmt.Newf(ErrMsgCreateStorageFactory).Wrap(err)
+		return err
 	}
 
-	storage := storageFactory.GetStorage()
 	err = storage.Delete(ctx, nil, strategyID, false)
 	if err != nil {
 		return errfmt.Newf(ErrMsgDeleteStrategy).Wrap(err)
@@ -226,32 +217,11 @@ func (g *GraphBucketStrategyStorage) LoadAllStrategies(ctx context.Context) ([]m
 }
 
 func (g *GraphBucketStrategyStorage) LoadStrategiesForKind(ctx context.Context, kind string) ([]map[string]any, error) {
-	// Use graph query to find strategies that apply to this kind
-	// This is more efficient than loading all and filtering
 	allStrategies, err := g.LoadAllStrategies(ctx)
 	if err != nil {
 		return nil, err
 	}
-
-	var matchingStrategies []map[string]any
-	for _, strategy := range allStrategies {
-		appliesTo, ok := strategy[objects.FieldKeyAppliesTo].([]any)
-		if !ok {
-			continue
-		}
-
-		for _, appliedKind := range appliesTo {
-			if appliedKindStr, ok := appliedKind.(string); ok && appliedKindStr == kind {
-				enabled, _ := strategy[objects.FieldKeyEnabled].(bool)
-				if enabled {
-					matchingStrategies = append(matchingStrategies, strategy)
-				}
-				break
-			}
-		}
-	}
-
-	return matchingStrategies, nil
+	return filterStrategiesForKind(allStrategies, kind), nil
 }
 
 func (g *GraphBucketStrategyStorage) SaveStrategy(ctx context.Context, strategy map[string]any) error {
@@ -309,14 +279,7 @@ func (e *existingStorageBucketStrategyProvider) LoadStrategy(ctx context.Context
 }
 
 func (e *existingStorageBucketStrategyProvider) LoadAllStrategies(ctx context.Context) ([]map[string]any, error) {
-	filter := ListFilter{Kind: objects.KindBucketingStrategy}
-	secCtx := pkgctx.NewSystemSecurityContext()
-	storageCtx := pkgctx.GetStorageContext()
-	results, err := e.storage.List(ctx, secCtx, storageCtx, filter)
-	if err != nil {
-		return nil, errfmt.Newf(ErrMsgListStrategies).Wrap(err)
-	}
-	return append(make([]map[string]any, 0, len(results.Objects)), results.Objects...), nil
+	return listBucketingStrategies(ctx, e.storage)
 }
 
 func (e *existingStorageBucketStrategyProvider) LoadStrategiesForKind(ctx context.Context, kind string) ([]map[string]any, error) {
@@ -324,22 +287,7 @@ func (e *existingStorageBucketStrategyProvider) LoadStrategiesForKind(ctx contex
 	if err != nil {
 		return nil, err
 	}
-	var matching []map[string]any
-	for _, strategy := range all {
-		appliesTo, ok := strategy[objects.FieldKeyAppliesTo].([]any)
-		if !ok {
-			continue
-		}
-		for _, appliedKind := range appliesTo {
-			if s, ok := appliedKind.(string); ok && s == kind {
-				if enabled, _ := strategy[objects.FieldKeyEnabled].(bool); enabled {
-					matching = append(matching, strategy)
-				}
-				break
-			}
-		}
-	}
-	return matching, nil
+	return filterStrategiesForKind(all, kind), nil
 }
 
 func (e *existingStorageBucketStrategyProvider) SaveStrategy(ctx context.Context, strategy map[string]any) error {

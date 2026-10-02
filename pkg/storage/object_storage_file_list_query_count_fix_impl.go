@@ -32,6 +32,13 @@ var streamMapPool = sync.Pool{
 // DefaultMaxStreamListLimit is the upper bound on segment objects returned when limit <= 0 to prevent unbounded memory exhaustion.
 const DefaultMaxStreamListLimit = 10000
 
+func initWorkerPool(itemCount, maxWorkers int) (int, *sync.WaitGroup) {
+	actualWorkers := min(itemCount, maxWorkers)
+	var wg sync.WaitGroup
+	wg.Add(actualWorkers)
+	return actualWorkers, &wg
+}
+
 // listStreamSegmentsWithLimit lists matching objects in stream segments using a parallel worker pool, up to a limit.
 func (f *FileObjectStorage) listStreamSegmentsWithLimit(ctx context.Context, _ *pkgctx.SecurityContext, filter ListFilter, limit int) ([]map[string]any, int, error) {
 	effectiveLimit := limit
@@ -74,9 +81,7 @@ func (f *FileObjectStorage) listStreamSegmentsWithLimit(ctx context.Context, _ *
 		total   int
 	}
 	results := make(chan workerResult, maxWorkers)
-	var wg sync.WaitGroup
-	actualWorkers := min(len(segments), maxWorkers)
-	wg.Add(actualWorkers)
+	actualWorkers, wg := initWorkerPool(len(segments), maxWorkers)
 	// Pre-build fast byte-slice filters for all string values to aggressively drop non-matching lines before unmarshaling
 	var requiredSubstrings [][]byte
 	for _, val := range filter.Filters {
@@ -97,7 +102,7 @@ func (f *FileObjectStorage) listStreamSegmentsWithLimit(ctx context.Context, _ *
 		workerName := ConstStreamStreamListWorker
 		builder := goroutinelabels.NewGoroutine(workerName, ConstStreamScanningSegmentForList).
 			WithContext(ctx).
-			WithWaitGroup(&wg)
+			WithWaitGroup(wg)
 		if bud != nil {
 			builder = builder.WithBudget(bud)
 		}
@@ -274,9 +279,7 @@ func (f *FileObjectStorage) countStreamSegmentsWithFilters(ctx context.Context, 
 	ctx = listCtx
 
 	results := make(chan int, maxWorkers)
-	var wg sync.WaitGroup
-	actualWorkers := min(len(segments), maxWorkers)
-	wg.Add(actualWorkers)
+	actualWorkers, wg := initWorkerPool(len(segments), maxWorkers)
 	// Pre-build regex pre-filter
 	var preFilterRegex *regexp.Regexp
 	status, hasStatus := filter.Filters[objects.FieldKeyStatus].(string)
@@ -298,7 +301,7 @@ func (f *FileObjectStorage) countStreamSegmentsWithFilters(ctx context.Context, 
 		workerName := ConstStreamStreamCountWorker
 		builder := goroutinelabels.NewGoroutine(workerName, ConstStreamScanningSegmentForCount).
 			WithContext(ctx).
-			WithWaitGroup(&wg)
+			WithWaitGroup(wg)
 		if bud != nil {
 			builder = builder.WithBudget(bud)
 		}

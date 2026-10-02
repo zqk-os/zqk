@@ -29,6 +29,28 @@ const (
 	PriorityCritical NotificationPriority = "critical"
 )
 
+// Level returns numeric priority ranking (1=low, 2=medium, 3=high, 4=critical).
+func (p NotificationPriority) Level() int {
+	switch p {
+	case PriorityCritical:
+		return 4
+	case PriorityHigh:
+		return 3
+	case PriorityMedium:
+		return 2
+	case PriorityLow:
+		return 1
+	default:
+		return 1
+	}
+}
+
+// IsAtLeast returns true if p has equal or higher priority than min.
+func (p NotificationPriority) IsAtLeast(min NotificationPriority) bool {
+	return p.Level() >= min.Level()
+}
+
+
 const (
 	notificationEventCompleted    = "completed"
 	notificationEventFailed       = "failed"
@@ -72,23 +94,11 @@ func (nd *NotificationDisplay) Display(notif *JobNotification) {
 	nd.displayTerminalNotification(notif)
 
 	// Try desktop notification (if available and appropriate)
-	// Use priority order map for correct comparison (string comparison is incorrect: "medium" > "high" lexicographically)
-	priorityOrder := map[NotificationPriority]int{
-		PriorityCritical: 4,
-		PriorityHigh:     3,
-		PriorityMedium:   2,
-		PriorityLow:      1,
-	}
-	notifPriority := priorityOrder[notif.Priority]
-	highPriority := priorityOrder[PriorityHigh]
-	if notifPriority == 0 {
-		// Unknown priority - default to low
-		notifPriority = 1
-	}
-	if notifPriority >= highPriority {
+	if notif.Priority.IsAtLeast(PriorityHigh) {
 		nd.displayDesktopNotification(notif)
 	}
 }
+
 
 // logNotification logs the notification to the structured logger
 // DisplayTerminalNotification displays a notification in the terminal
@@ -207,22 +217,10 @@ func (nd *NotificationDisplay) displayTerminalNotification(notif *JobNotificatio
 // displayDesktopNotification displays a desktop notification (if available)
 func (nd *NotificationDisplay) displayDesktopNotification(notif *JobNotification) {
 	// Only show desktop notifications for high-priority events
-	// Use priority order map for correct comparison (string comparison is incorrect: "medium" > "high" lexicographically)
-	priorityOrder := map[NotificationPriority]int{
-		PriorityCritical: 4,
-		PriorityHigh:     3,
-		PriorityMedium:   2,
-		PriorityLow:      1,
-	}
-	notifPriority := priorityOrder[notif.Priority]
-	highPriority := priorityOrder[PriorityHigh]
-	if notifPriority == 0 {
-		// Unknown priority - default to low
-		notifPriority = 1
-	}
-	if notifPriority < highPriority {
+	if !notif.Priority.IsAtLeast(PriorityHigh) {
 		return
 	}
+
 
 	var cmd *exec.Cmd
 	title := notif.Title

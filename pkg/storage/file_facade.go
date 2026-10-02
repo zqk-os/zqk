@@ -9,6 +9,8 @@ import (
 type FileLockConfig = file.FileLockConfig
 type FileLock = file.FileLock
 type FileLockMetrics = file.FileLockMetrics
+type FileLockMetricsSnapshot = file.FileLockMetricsSnapshot
+type FileLockDerivedMetrics = file.FileLockDerivedMetrics
 type FileLockStrategy = file.FileLockStrategy
 type FileLockStrategyMetrics = file.FileLockStrategyMetrics
 type LockHandle = file.LockHandle
@@ -32,6 +34,10 @@ func GetFileLockStrategyMetrics() *FileLockStrategyMetrics {
 
 func GetFileLockMetrics() *FileLockMetrics {
 	return file.GetFileLockMetrics()
+}
+
+func GetFileLockSnapshotAndDerived() (file.FileLockMetricsSnapshot, file.FileLockDerivedMetrics) {
+	return file.GetFileLockMetrics().SnapshotAndDerived()
 }
 
 func ResetFileLockMetrics() {

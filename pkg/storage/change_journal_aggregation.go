@@ -385,32 +385,7 @@ func (s *ChangeJournalAggregationService) findExistingMetricByOverlappingWindow(
 	secCtx *pkgctx.SecurityContext,
 	windowStart, windowEnd string,
 ) string {
-	startTime, endTime, ok := ParseTimeWindowRFC3339(windowStart, windowEnd)
-	if !ok {
-		return "" // Can't parse times, skip this fallback
-	}
-
-	// Query for metrics that overlap with this window
-	// A window overlaps if: start1 < end2 && start2 < end1
-	storageCtx := pkgctx.GetStorageContext()
-	filter := ListFilter{
-		Kind: objects.KindAuditAggregationMetric,
-		Filters: map[string]any{
-			objects.FieldKeySource: map[string]any{
-				"$eq": ConstAuditChangeJournalAggregationJob,
-			},
-		},
-		Limit:   10, // Check a few recent metrics
-		SortBy:  objects.FieldKeyCreatedAt,
-		SortAsc: false, // Most recent first
-	}
-
-	result, err := s.storage.List(ctx, secCtx, storageCtx, filter)
-	if err != nil || len(result.Objects) == 0 {
-		return ""
-	}
-
-	return audit.FirstOverlappingID(result.Objects, startTime, endTime)
+	return findOverlappingMetric(ctx, secCtx, auditStore{s.storage}, ConstAuditChangeJournalAggregationJob, windowStart, windowEnd)
 }
 
 // markEntriesAsAggregated marks change journal entries as aggregated
