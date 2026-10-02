@@ -104,6 +104,21 @@ func resolveSchedulerCLIProjectRoot(ctx *cli.Context) string {
 	return projectRoot
 }
 
+// validateSchedulerProjectRootAndBrand verifies projectRoot is not empty, loads brand settings, and returns profile.
+func validateSchedulerProjectRootAndBrand(ctx *cli.Context, projectRoot string) (string, error) {
+	if projectRoot == emptyValue {
+		return "", errors.New(schedulerErrProjectRootNotFound)
+	}
+	if _, err := clicontext.LoadBrandSettings(projectRoot); err != nil {
+		return "", errfmt.Errorf(schedulerErrBrandSettingsRequired, err)
+	}
+	profile := schedulerProfileSystem
+	if ctx != nil && ctx.Profile != emptyValue {
+		profile = ctx.Profile
+	}
+	return profile, nil
+}
+
 // runSchedulerControlWithTimeout runs fn in a labeled goroutine and waits up to schedulerControlTimeout.
 func runSchedulerControlWithTimeout(op string, fn func() error) error {
 	return runSchedulerControlWithTimeoutDur(op, schedulerControlTimeout, fn)
@@ -204,16 +219,11 @@ func startScheduler(ctx *cli.Context, cmd *cobra.Command) error {
 
 	// Project root: explicit ctx (tests) first, then settings / persisted use / cwd — see resolveSchedulerCLIProjectRoot.
 	projectRoot := resolveSchedulerCLIProjectRoot(ctx)
-	if projectRoot == emptyValue {
-		return errors.New(schedulerErrProjectRootNotFound)
-	}
-	if abs, err := filepath.Abs(projectRoot); err != nil {
-		return errfmt.Newf("failed to resolve absolute project root").Wrap(err)
-	} else {
+	if abs, err := filepath.Abs(projectRoot); err == nil && projectRoot != emptyValue {
 		projectRoot = abs
 	}
-	if _, err := clicontext.LoadBrandSettings(projectRoot); err != nil {
-		return errfmt.Errorf(schedulerErrBrandSettingsRequired, err)
+	if _, err := validateSchedulerProjectRootAndBrand(ctx, projectRoot); err != nil {
+		return err
 	}
 
 	releaseLock, err := singleton.Guard(projectRoot, "scheduler")

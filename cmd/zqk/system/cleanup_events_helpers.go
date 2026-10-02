@@ -28,24 +28,10 @@ type CleanupEventsContext struct {
 
 // initializeCleanupEventsContext sets up the cleanup events context
 func initializeCleanupEventsContext(cmd *cobra.Command, metricID string, archive, shouldDelete bool) (*CleanupEventsContext, error) {
-	projectRoot := ProjectRootOrResolve("")
-	if projectRoot == emptyValue {
-		return nil, errfmt.Errorf("project root not found")
-	}
-
-	storageProvider, err := getStorageProvider(cmd, projectRoot)
+	projectRoot, storageProvider, service, logger, err := initAuditAggregationSetup(cmd)
 	if err != nil {
-		return nil, errfmt.Newf("failed to initialize storage").Wrap(err)
+		return nil, err
 	}
-
-	service := storage.NewAuditAggregationService(storageProvider)
-
-	cliCtx := cli.GetContext(cmd)
-	profile := systemProfileSystem
-	if cliCtx != nil && cliCtx.Profile != emptyValue {
-		profile = cliCtx.Profile
-	}
-	logger := logging.GetLoggerFromProfile(profile)
 
 	secCtx := pkgctx.NewSystemSecurityContext()
 

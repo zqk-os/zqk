@@ -7,6 +7,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/strutil"
 )
@@ -77,4 +78,51 @@ func initSeedingStorage(ctx context.Context, projectRoot, purpose string) (stora
 		return nil, nil, errfmt.Errorf("storage provider is nil")
 	}
 	return sp, pkgctx.NewSystemSecurityContext(), nil
+}
+
+// openSystemStorageWithContext resolves CLI context and project root from cmd and opens storage provider with security & storage contexts.
+func openSystemStorageWithContext(cmd *cobra.Command) (*cli.Context, storage.ObjectStorageProvider, *pkgctx.SecurityContext, *pkgctx.StorageContext, func(), error) {
+	ctx := cli.GetContext(cmd)
+	if ctx == nil {
+		return nil, nil, nil, nil, nil, errfmt.Errorf("failed to get context")
+	}
+
+	projectRoot := ProjectRootOrResolveDot(ctx.ProjectRoot)
+	if projectRoot == emptyValue {
+		return nil, nil, nil, nil, nil, errfmt.Errorf("not a ZQK project (no project root found)")
+	}
+
+	storageProvider, cleanup, err := openStorageProvider(cmd.Context(), projectRoot)
+	if err != nil {
+		return nil, nil, nil, nil, nil, err
+	}
+
+	return ctx, storageProvider, pkgctx.NewSystemSecurityContext(), pkgctx.NewStorageContext(), cleanup, nil
+}
+
+// initAuditAggregationSetup initializes project root, storage provider, audit aggregation service, and logger from command.
+func initAuditAggregationSetup(cmd *cobra.Command) (string, storage.ObjectStorageProvider, *storage.AuditAggregationService, logging.Logger, error) {
+	cliCtx := cli.GetContext(cmd)
+	projectRoot := ProjectRootOrResolve("")
+	if cliCtx != nil && cliCtx.ProjectRoot != "" {
+		projectRoot = ProjectRootOrResolve(cliCtx.ProjectRoot)
+	}
+	if projectRoot == emptyValue {
+		return "", nil, nil, nil, errfmt.Errorf("project root not found")
+	}
+
+	storageProvider, err := getStorageProvider(cmd, projectRoot)
+	if err != nil {
+		return "", nil, nil, nil, errfmt.Newf("failed to initialize storage").Wrap(err)
+	}
+
+	service := storage.NewAuditAggregationService(storageProvider)
+
+	profile := systemProfileSystem
+	if cliCtx != nil && cliCtx.Profile != emptyValue {
+		profile = cliCtx.Profile
+	}
+	logger := logging.GetLoggerFromProfile(profile)
+
+	return projectRoot, storageProvider, service, logger, nil
 }

@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/sha1" //nolint:gosec
 	"encoding/base64"
-	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -22,7 +21,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
-	"github.com/zqk-os/zqk/pkg/strutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
@@ -128,13 +126,10 @@ func triggerJob(ctx *cli.Context, cmd *cobra.Command, jobID string) error {
 			projectRoot = ctx.ProjectRoot
 		}
 	}
-	if projectRoot == emptyValue {
-		return errors.New(schedulerErrProjectRootNotFound)
+	profile, err := validateSchedulerProjectRootAndBrand(ctx, projectRoot)
+	if err != nil {
+		return err
 	}
-	if _, err := clicontext.LoadBrandSettings(projectRoot); err != nil {
-		return errfmt.Errorf(schedulerErrBrandSettingsRequired, err)
-	}
-	profile := strutil.OrDefault(ctx.Profile, schedulerProfileSystem)
 
 	// Create storage provider for coordinator (best effort); use cache to avoid extra instances
 	var storageProvider storagepkg.ObjectStorageProvider
