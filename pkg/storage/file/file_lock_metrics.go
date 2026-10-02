@@ -75,18 +75,7 @@ func (m *FileLockMetrics) RecordTimeout(waitTime time.Duration) {
 		return
 	}
 	m.TotalTimeouts.Add(1)
-	m.TotalWaitTime.Add(int64(waitTime))
-
-	// Update max wait time
-	for {
-		current := m.MaxWaitTime.Load()
-		if int64(waitTime) <= current {
-			break
-		}
-		if m.MaxWaitTime.CompareAndSwap(current, int64(waitTime)) {
-			break
-		}
-	}
+	m.RecordWaitTime(waitTime)
 }
 
 // RecordContention records that a lock was already held (TryLock returned false)

@@ -165,11 +165,14 @@ func (c *BaseMetricsCollector) CollectMetrics(
 		return "", errfmt.Newf(ConstMiscFailedToCreateMetric).Wrap(err)
 	}
 
+	return extractMetricInstanceID(instance)
+}
+
+func extractMetricInstanceID(instance map[string]any) (string, error) {
 	id, ok := instance[objects.FieldKeyID].(string)
-	if !ok {
+	if !ok || id == "" {
 		return "", errfmt.Errorf(ConstMiscMetricIdNotSetAfterCreation)
 	}
-
 	return id, nil
 }
 

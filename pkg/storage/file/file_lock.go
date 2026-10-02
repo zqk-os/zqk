@@ -71,14 +71,19 @@ func NewFileLockWithConfig(filePath string, config FileLockConfig) (*FileLock, e
 	}, nil
 }
 
-// Lock acquires an exclusive lock on the file (blocking)
-// Returns an error if the lock cannot be acquired
-func (fl *FileLock) Lock() error {
+func (fl *FileLock) initLockMetrics() (time.Time, *FileLockMetrics) {
 	start := time.Now()
 	metrics := GetFileLockMetrics()
 	if fl.config.EnableMetrics {
 		metrics.RecordContentionAttempt()
 	}
+	return start, metrics
+}
+
+// Lock acquires an exclusive lock on the file (blocking)
+// Returns an error if the lock cannot be acquired
+func (fl *FileLock) Lock() error {
+	start, metrics := fl.initLockMetrics()
 
 	return concurrency.RunInLockWithLogger(
 		&fl.mu,
@@ -101,26 +106,24 @@ func (fl *FileLock) Lock() error {
 				return errfmt.Newf(ConstMiscFailedToAcquireFileLock).Wrap(err)
 			}
 
-			acquisitionTime := time.Since(start)
-			if fl.config.EnableMetrics {
-				metrics.RecordAcquisition(acquisitionTime)
-				metrics.IncrementHolders()
-			}
-
-			fl.locked = true
+			fl.recordLockAcquired(start, metrics)
 			return nil
 		},
 	)
 }
 
+func (fl *FileLock) recordLockAcquired(start time.Time, metrics *FileLockMetrics) {
+	if fl.config.EnableMetrics {
+		metrics.RecordAcquisition(time.Since(start))
+		metrics.IncrementHolders()
+	}
+	fl.locked = true
+}
+
 // TryLock attempts to acquire an exclusive lock (non-blocking)
 // Returns true if the lock was acquired, false if it's already held
 func (fl *FileLock) TryLock() (bool, error) {
-	start := time.Now()
-	metrics := GetFileLockMetrics()
-	if fl.config.EnableMetrics {
-		metrics.RecordContentionAttempt()
-	}
+	start, metrics := fl.initLockMetrics()
 
 	var acquired bool
 	var lockErr error
@@ -151,13 +154,7 @@ func (fl *FileLock) TryLock() (bool, error) {
 				return nil
 			}
 
-			acquisitionTime := time.Since(start)
-			if fl.config.EnableMetrics {
-				metrics.RecordAcquisition(acquisitionTime)
-				metrics.IncrementHolders()
-			}
-
-			fl.locked = true
+			fl.recordLockAcquired(start, metrics)
 			acquired = true
 			return nil
 		},
@@ -175,11 +172,7 @@ func (fl *FileLock) TryLock() (bool, error) {
 // Returns an error if the lock cannot be acquired within the timeout
 // If EarlyBailoutThreshold is configured and exceeded, returns an error suggesting early bailout
 func (fl *FileLock) LockWithTimeout(timeout time.Duration) error {
-	start := time.Now()
-	metrics := GetFileLockMetrics()
-	if fl.config.EnableMetrics {
-		metrics.RecordContentionAttempt()
-	}
+	start, metrics := fl.initLockMetrics()
 
 	deadline := time.Now().Add(timeout)
 	backoff := 5 * time.Millisecond

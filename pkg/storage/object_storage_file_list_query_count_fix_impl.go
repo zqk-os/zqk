@@ -50,28 +50,7 @@ func (f *FileObjectStorage) listStreamSegmentsWithLimit(ctx context.Context, _ *
 		return nil, 0, err
 	}
 
-	timeRange := f.extractTimeRangeFromFilters(filter.Filters)
-
-	var segments []string
-	for _, entry := range entries {
-		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".json") {
-			continue
-		}
-		if timeRange != nil && (!timeRange.start.IsZero() || !timeRange.end.IsZero()) {
-			parts := strings.Split(entry.Name(), "_")
-			if len(parts) > 0 {
-				if t, err := time.Parse("2006-01-02", parts[0]); err == nil {
-					if !timeRange.end.IsZero() && t.After(timeRange.end) {
-						continue
-					}
-					if !timeRange.start.IsZero() && t.Add(24*time.Hour).Before(timeRange.start) {
-						continue
-					}
-				}
-			}
-		}
-		segments = append(segments, filepath.Join(segDir, entry.Name()))
-	}
+	segments := f.filterStreamSegmentFiles(entries, segDir, filter.Filters)
 
 	if len(segments) == 0 {
 		return nil, 0, nil
@@ -83,14 +62,12 @@ func (f *FileObjectStorage) listStreamSegmentsWithLimit(ctx context.Context, _ *
 		return filepath.Base(segments[i]) > filepath.Base(segments[j])
 	})
 
-	listCtx, releaseSlot, slotErr := AcquireListCountContext(ctx)
+	listCtx, releaseSlot, workCh, maxWorkers, slotErr := prepareStreamSegmentWorkerPool(ctx, segments)
 	if slotErr != nil {
 		return nil, 0, slotErr
 	}
 	defer releaseSlot()
 	ctx = listCtx
-
-	workCh, maxWorkers := createSegmentWorkChannel(segments, getListReadWorkers())
 
 	type workerResult struct {
 		objects []map[string]any
@@ -112,11 +89,7 @@ func (f *FileObjectStorage) listStreamSegmentsWithLimit(ctx context.Context, _ *
 	// Use goroutine budget if available
 	bud := goroutinelabels.DefaultBudget()
 
-	// Load deleted set directly to bypass massive streamRegistrySnapshot allocations
-	deletedMap := crud.LoadStreamDeletedSetFast(f.projectRoot, filter.Kind)
-	// Live registry is authoritative after compact truncates stream_deleted (ghost segment lines).
-	// TRACK: follow-up in kernel backlog
-	liveSet := LiveStreamIDSet(f.projectRoot, filter.Kind)
+	deletedMap, liveSet := f.loadStreamDeletedAndLiveSets(filter.Kind)
 	var collected atomic.Int32
 
 	for i := 0; i < actualWorkers; i++ {
@@ -287,42 +260,18 @@ func (f *FileObjectStorage) countStreamSegmentsWithFilters(ctx context.Context, 
 		return 0, err
 	}
 
-	timeRange := f.extractTimeRangeFromFilters(filter.Filters)
-
-	var segments []string
-	for _, entry := range entries {
-		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".json") {
-			continue
-		}
-
-		if timeRange != nil && (!timeRange.start.IsZero() || !timeRange.end.IsZero()) {
-			parts := strings.Split(entry.Name(), "_")
-			if len(parts) > 0 {
-				if t, err := time.Parse("2006-01-02", parts[0]); err == nil {
-					if !timeRange.end.IsZero() && t.After(timeRange.end) {
-						continue
-					}
-					if !timeRange.start.IsZero() && t.Add(24*time.Hour).Before(timeRange.start) {
-						continue
-					}
-				}
-			}
-		}
-		segments = append(segments, filepath.Join(segDir, entry.Name()))
-	}
+	segments := f.filterStreamSegmentFiles(entries, segDir, filter.Filters)
 
 	if len(segments) == 0 {
 		return 0, nil
 	}
 
-	listCtx, releaseSlot, slotErr := AcquireListCountContext(ctx)
+	listCtx, releaseSlot, workCh, maxWorkers, slotErr := prepareStreamSegmentWorkerPool(ctx, segments)
 	if slotErr != nil {
 		return 0, slotErr
 	}
 	defer releaseSlot()
 	ctx = listCtx
-
-	workCh, maxWorkers := createSegmentWorkChannel(segments, getListReadWorkers())
 
 	results := make(chan int, maxWorkers)
 	var wg sync.WaitGroup
@@ -342,10 +291,7 @@ func (f *FileObjectStorage) countStreamSegmentsWithFilters(ctx context.Context, 
 	// Use goroutine budget if available
 	bud := goroutinelabels.DefaultBudget()
 
-	// Load deleted set directly to bypass massive streamRegistrySnapshot allocations
-	deletedMap := crud.LoadStreamDeletedSetFast(f.projectRoot, filter.Kind)
-	// TRACK: same live-set gate as listStreamSegmentsWithLimit
-	liveSet := LiveStreamIDSet(f.projectRoot, filter.Kind)
+	deletedMap, liveSet := f.loadStreamDeletedAndLiveSets(filter.Kind)
 
 	for i := 0; i < actualWorkers; i++ {
 
@@ -451,4 +397,46 @@ func (f *FileObjectStorage) countStreamSegmentsWithFilters(ctx context.Context, 
 	}
 
 	return totalCount, nil
+}
+
+func (f *FileObjectStorage) filterStreamSegmentFiles(entries []fileutil.DirEntry, segDir string, filters map[string]any) []string {
+	timeRange := f.extractTimeRangeFromFilters(filters)
+
+	var segments []string
+	for _, entry := range entries {
+		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".json") {
+			continue
+		}
+
+		if timeRange != nil && (!timeRange.start.IsZero() || !timeRange.end.IsZero()) {
+			parts := strings.Split(entry.Name(), "_")
+			if len(parts) > 0 {
+				if t, err := time.Parse("2006-01-02", parts[0]); err == nil {
+					if !timeRange.end.IsZero() && t.After(timeRange.end) {
+						continue
+					}
+					if !timeRange.start.IsZero() && t.Add(24*time.Hour).Before(timeRange.start) {
+						continue
+					}
+				}
+			}
+		}
+		segments = append(segments, filepath.Join(segDir, entry.Name()))
+	}
+	return segments
+}
+
+func prepareStreamSegmentWorkerPool(ctx context.Context, segments []string) (context.Context, func(), <-chan string, int, error) {
+	listCtx, releaseSlot, slotErr := AcquireListCountContext(ctx)
+	if slotErr != nil {
+		return nil, nil, nil, 0, slotErr
+	}
+	workCh, maxWorkers := createSegmentWorkChannel(segments, getListReadWorkers())
+	return listCtx, releaseSlot, workCh, maxWorkers, nil
+}
+
+func (f *FileObjectStorage) loadStreamDeletedAndLiveSets(kind string) (map[string]bool, map[string]bool) {
+	deletedMap := crud.LoadStreamDeletedSetFast(f.projectRoot, kind)
+	liveSet := LiveStreamIDSet(f.projectRoot, kind)
+	return deletedMap, liveSet
 }

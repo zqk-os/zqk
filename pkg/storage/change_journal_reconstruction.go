@@ -88,11 +88,8 @@ func ReconstructStateAtTimestampWithCount(
 	snapshotTimestamp time.Time,
 	logger logging.Logger,
 ) (map[string]any, int64, error) {
-	secCtx := pkgctx.NewSystemSecurityContext()
-	storageCtx := pkgctx.GetStorageContext()
-
-	// Build object reference (format: "kind:id")
-	objectRef := fmt.Sprintf("%s:%s", kind, objectID)
+	secCtx, storageCtx := systemStorageContexts()
+	objectRef := formatObjectRef(kind, objectID)
 
 	// Query change journal entries for this object
 	// Filter: object_ref = "kind:id" AND created_at > snapshotTimestamp
@@ -325,11 +322,8 @@ func QueryChangeJournalEntries(
 	kind string,
 	startTime, endTime time.Time,
 ) ([]map[string]any, error) {
-	secCtx := pkgctx.NewSystemSecurityContext()
-	storageCtx := pkgctx.GetStorageContext()
-
-	// Build object reference (format: "kind:id")
-	objectRef := fmt.Sprintf("%s:%s", kind, objectID)
+	secCtx, storageCtx := systemStorageContexts()
+	objectRef := formatObjectRef(kind, objectID)
 
 	// Build filter
 	filters := map[string]any{
@@ -373,4 +367,12 @@ func ExtractObjectRef(objectRef string) (kind, objectID string, err error) {
 		return "", "", errfmt.Errorf(ConstAuditInvalidObjectRefFormatExpectedKindId, objectRef)
 	}
 	return parts[0], parts[1], nil
+}
+
+func systemStorageContexts() (*pkgctx.SecurityContext, *pkgctx.StorageContext) {
+	return pkgctx.NewSystemSecurityContext(), pkgctx.GetStorageContext()
+}
+
+func formatObjectRef(kind, objectID string) string {
+	return fmt.Sprintf("%s:%s", kind, objectID)
 }

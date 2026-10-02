@@ -151,12 +151,7 @@ func (c *FileLockMetricsCollector) CollectMetrics(
 	c.metricsCollectedTotal.Add(1)
 
 	// Return the generated ID
-	id, ok := instance[objects.FieldKeyID].(string)
-	if !ok {
-		return "", errfmt.Errorf(ConstMiscMetricIdNotSetAfterCreation)
-	}
-
-	return id, nil
+	return extractMetricInstanceID(instance)
 }
 
 // CollectAndReset collects metrics and resets the metrics counter

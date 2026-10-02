@@ -112,13 +112,18 @@ func toAnySlice(val any) ([]any, bool) {
 	}
 }
 
-// ArrayContainsAll checks if an array contains all specified values.
-func ArrayContainsAll(actualValue, filterValue any) bool {
+func toAnySlices(actualValue, filterValue any) ([]any, []any, bool) {
 	valuesToCheck, ok := toAnySlice(filterValue)
 	if !ok {
-		return false
+		return nil, nil, false
 	}
 	actualArray, ok := toAnySlice(actualValue)
+	return valuesToCheck, actualArray, ok
+}
+
+// ArrayContainsAll checks if an array contains all specified values.
+func ArrayContainsAll(actualValue, filterValue any) bool {
+	valuesToCheck, actualArray, ok := toAnySlices(actualValue, filterValue)
 	if !ok {
 		return false
 	}
@@ -140,11 +145,7 @@ func ArrayContainsAll(actualValue, filterValue any) bool {
 
 // ArrayContainsAny checks if an array contains any of the specified values.
 func ArrayContainsAny(actualValue, filterValue any) bool {
-	valuesToCheck, ok := toAnySlice(filterValue)
-	if !ok {
-		return false
-	}
-	actualArray, ok := toAnySlice(actualValue)
+	valuesToCheck, actualArray, ok := toAnySlices(actualValue, filterValue)
 	if !ok {
 		return false
 	}

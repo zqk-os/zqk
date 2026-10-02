@@ -36,14 +36,7 @@ func (s *ChangeJournalAggregationService) QueryOldAggregatedEntries(
 		return nil, errfmt.Newf(ConstAuditFailedToQueryOldAggregatedEntries).Wrap(err)
 	}
 
-	entryIDs := make([]string, 0, len(result.Objects))
-	for _, obj := range result.Objects {
-		if id := objects.GetString(obj, objects.FieldKeyID); id != emptyValue {
-			entryIDs = append(entryIDs, id)
-		}
-	}
-
-	return entryIDs, nil
+	return extractEntryIDs(result.Objects), nil
 }
 
 // QueryOldEntriesByAge returns change_journal_entry IDs with created_at older than cutoff (any status).
@@ -71,13 +64,17 @@ func (s *ChangeJournalAggregationService) QueryOldEntriesByAge(
 	if err != nil {
 		return nil, errfmt.Newf(ConstAuditFailedToQueryOldEntriesByAge).Wrap(err)
 	}
-	entryIDs := make([]string, 0, len(result.Objects))
-	for _, obj := range result.Objects {
+	return extractEntryIDs(result.Objects), nil
+}
+
+func extractEntryIDs(objs []map[string]any) []string {
+	entryIDs := make([]string, 0, len(objs))
+	for _, obj := range objs {
 		if id := objects.GetString(obj, objects.FieldKeyID); id != emptyValue {
 			entryIDs = append(entryIDs, id)
 		}
 	}
-	return entryIDs, nil
+	return entryIDs
 }
 
 // CleanupAggregatedEntries deletes or archives change journal entries that have been aggregated
