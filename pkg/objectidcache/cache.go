@@ -462,32 +462,23 @@ func (c *ObjectIDCache) LoadCache(projectRoot string) (bool, error) {
 	return true, nil
 }
 
-func (c *ObjectIDCache) withLockTimeout(lockName string, fn func() error) error {
+func (c *ObjectIDCache) withLockInternal(lockName string, isWrite bool, fn func() error) error {
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
 	defer cancel()
-	return concurrency.WithLockTimeout(
-		&c.mu,
-		ctx,
-		nil,
-		logging.NewLockLoggerAdapter(logger),
-		lockName,
-		fn,
-	)
+	adapter := logging.NewLockLoggerAdapter(logger)
+	if isWrite {
+		return concurrency.WithLockTimeout(&c.mu, ctx, nil, adapter, lockName, fn)
+	}
+	return concurrency.WithRLockTimeout(&c.mu, ctx, nil, adapter, lockName, fn)
+}
+
+func (c *ObjectIDCache) withLockTimeout(lockName string, fn func() error) error {
+	return c.withLockInternal(lockName, true, fn)
 }
 
 func (c *ObjectIDCache) withRLockTimeout(lockName string, fn func() error) error {
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
-	defer cancel()
-	return concurrency.WithRLockTimeout(
-		&c.mu,
-		ctx,
-		nil,
-		logging.NewLockLoggerAdapter(logger),
-		lockName,
-		fn,
-	)
+	return c.withLockInternal(lockName, false, fn)
 }
 
 // kindNamesForReverseReferenceScan returns kind keys from the in-memory object ID cache (after LoadCache or BuildCache).

@@ -53,13 +53,9 @@ func (gl *GraphLock) TryLock(ctx context.Context) (bool, error) {
 		return false, err
 	}
 
-	if len(result.Rows) == 0 {
-		return false, fmt.Errorf("unexpected query result: no rows returned")
-	}
-
-	acquired, ok := result.Rows[0]["acquired"].(bool)
-	if !ok {
-		return false, fmt.Errorf("unexpected query result: acquired field is not a boolean")
+	acquired, err := result.ExtractBooleanField("acquired")
+	if err != nil {
+		return false, err
 	}
 
 	if acquired {

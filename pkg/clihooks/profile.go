@@ -108,13 +108,8 @@ func (p *Profile) Save() error {
 
 // IsEnabled reports whether hook id is enabled (default false if unknown).
 func (p *Profile) IsEnabled(id string) bool {
-	p.mu.RLock()
-	defer p.mu.RUnlock()
-	h, ok := nildecode.DecodeNonNilPayload[*Hook](p.hooks[id])
-	if !ok {
-		return false
-	}
-	return h.Enabled
+	h := p.Get(id)
+	return h != nil && h.Enabled
 }
 
 // Has reports whether id is a known built-in hook.
@@ -153,28 +148,29 @@ func (p *Profile) List() []*Hook {
 	return out
 }
 
-// SetEnabled sets enabled for a known hook id.
-func (p *Profile) SetEnabled(id string, enabled bool) error {
+func (p *Profile) updateHook(id string, fn func(h *Hook)) error {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	h, ok := nildecode.DecodeNonNilPayload[*Hook](p.hooks[id])
 	if !ok {
 		return errfmt.Errorf("unknown cli hook %q", id)
 	}
-	h.Enabled = enabled
+	fn(h)
 	return p.saveUnlocked()
+}
+
+// SetEnabled sets enabled for a known hook id.
+func (p *Profile) SetEnabled(id string, enabled bool) error {
+	return p.updateHook(id, func(h *Hook) {
+		h.Enabled = enabled
+	})
 }
 
 // SetTrayEntry sets optional tray entry name (empty clears).
 func (p *Profile) SetTrayEntry(id string, trayEntry string) error {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	h, ok := nildecode.DecodeNonNilPayload[*Hook](p.hooks[id])
-	if !ok {
-		return errfmt.Errorf("unknown cli hook %q", id)
-	}
-	h.TrayEntry = trayEntry
-	return p.saveUnlocked()
+	return p.updateHook(id, func(h *Hook) {
+		h.TrayEntry = trayEntry
+	})
 }
 
 func (p *Profile) saveUnlocked() error {

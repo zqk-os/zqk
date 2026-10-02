@@ -137,7 +137,7 @@ func (av *AsyncValidator) worker(id int) {
 	logging.Fluent(av.logger).Debug("Worker started").
 		WorkerID(id).
 		GoroutineID(int(goroutineID)).
-		ActiveGoroutines(int(activeCount)).
+		ActiveGoroutines(int(getActiveGoroutines())).
 		Log()
 
 	// Emit worker start event

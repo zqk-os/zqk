@@ -274,6 +274,18 @@ type QueryResult struct {
 	Meta  map[string]any
 }
 
+// ExtractBooleanField extracts a named boolean field from the first row of QueryResult.
+func (qr *QueryResult) ExtractBooleanField(field string) (bool, error) {
+	if qr == nil || len(qr.Rows) == 0 {
+		return false, fmt.Errorf("unexpected query result: no rows returned")
+	}
+	val, ok := qr.Rows[0][field].(bool)
+	if !ok {
+		return false, fmt.Errorf("unexpected query result: %s field is not a boolean", field)
+	}
+	return val, nil
+}
+
 // GraphTransaction provides transaction support.
 // Transactions must be explicitly committed or rolled back.
 // If a connection is returned to the pool with an open transaction, it will be automatically rolled back.

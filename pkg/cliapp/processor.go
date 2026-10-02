@@ -528,16 +528,7 @@ func (p *Processor) BuildContextSequential(contexts []*Context) (*Context, error
 	}
 
 	processor := clictx.NewContextProcessor(clictx.ModeSequential)
-	result, err := processor.ProcessSequential(ctxContexts)
-	if err != nil {
-		return nil, err
-	}
-
-	// Convert back to cli.Context
-	return &Context{
-		Context: result,
-		Format:  OutputFormat(result.Format),
-	}, nil
+	return wrapContextResult(processor.ProcessSequential(ctxContexts))
 }
 
 // BuildContextHierarchical builds a context from a hierarchical tree structure
@@ -545,16 +536,7 @@ func (p *Processor) BuildContextSequential(contexts []*Context) (*Context, error
 // Child contexts inherit from parent and override parent values
 func (p *Processor) BuildContextHierarchical(root *clictx.ContextNode) (*Context, error) {
 	processor := clictx.NewContextProcessor(clictx.ModeHierarchical)
-	result, err := processor.ProcessHierarchical(root)
-	if err != nil {
-		return nil, err
-	}
-
-	// Convert back to cli.Context
-	return &Context{
-		Context: result,
-		Format:  OutputFormat(result.Format),
-	}, nil
+	return wrapContextResult(processor.ProcessHierarchical(root))
 }
 
 // BuildContextHybrid builds a context with both sequential and hierarchical aspects
@@ -562,12 +544,13 @@ func (p *Processor) BuildContextHierarchical(root *clictx.ContextNode) (*Context
 // Siblings are processed sequentially, children inherit hierarchically
 func (p *Processor) BuildContextHybrid(root *clictx.ContextNode) (*Context, error) {
 	processor := clictx.NewContextProcessor(clictx.ModeHybrid)
-	result, err := processor.ProcessHybrid(root)
+	return wrapContextResult(processor.ProcessHybrid(root))
+}
+
+func wrapContextResult(result *clictx.Context, err error) (*Context, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	// Convert back to cli.Context
 	return &Context{
 		Context: result,
 		Format:  OutputFormat(result.Format),
@@ -647,18 +630,9 @@ func (p *Processor) InvalidateCache(ctx *pkgctx.CacheInvalidationContext) (int, 
 	// Set the operation context for cancellation
 	ctx.WithContext(p.operationCtx)
 
-	// Process through the listener pipeline (triggers async listeners if registered)
-	resultChan := pkgctx.ProcessContext(ctx)
-
-	// Wait for result (with timeout if needed)
-	result, err := pkgctx.WaitForResult(resultChan, 0) // 0 = no timeout, wait indefinitely
+	result, err := p.executeContextPipeline(ctx, "cache invalidation")
 	if err != nil {
-		return 0, errfmt.Newf("failed to process cache invalidation").Wrap(err)
-	}
-
-	// Check for errors
-	if result.FinalError != nil {
-		return 0, result.FinalError
+		return 0, err
 	}
 
 	// Extract count from results
@@ -738,18 +712,9 @@ func (p *Processor) CheckCacheFreshness(ctx *pkgctx.CacheFreshnessContext) (int,
 	// Set the operation context for cancellation
 	ctx.WithContext(p.operationCtx)
 
-	// Process through the listener pipeline (triggers async listeners if registered)
-	resultChan := pkgctx.ProcessContext(ctx)
-
-	// Wait for result (with timeout if needed)
-	result, err := pkgctx.WaitForResult(resultChan, 0) // 0 = no timeout, wait indefinitely
+	result, err := p.executeContextPipeline(ctx, "cache freshness check")
 	if err != nil {
-		return 0, errfmt.Newf("failed to process cache freshness check").Wrap(err)
-	}
-
-	// Check for errors
-	if result.FinalError != nil {
-		return 0, result.FinalError
+		return 0, err
 	}
 
 	// Extract count from results
@@ -774,6 +739,18 @@ func (p *Processor) CheckCacheFreshness(ctx *pkgctx.CacheFreshnessContext) (int,
 	}
 
 	return count, nil
+}
+
+func (p *Processor) executeContextPipeline(ctx pkgctx.ProcessableContext, opName string) (*pkgctx.ProcessingResult, error) {
+	resultChan := pkgctx.ProcessContext(ctx)
+	result, err := pkgctx.WaitForResult(resultChan, 0)
+	if err != nil {
+		return nil, errfmt.Newf("failed to process %s", opName).Wrap(err)
+	}
+	if result.FinalError != nil {
+		return nil, result.FinalError
+	}
+	return result, nil
 }
 
 // CheckCacheFreshnessAsync processes cache freshness check asynchronously and returns immediately
