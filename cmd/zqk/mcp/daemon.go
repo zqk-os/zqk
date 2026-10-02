@@ -52,9 +52,7 @@ func runDaemon(cmd *cobra.Command, args []string) error {
 	// ZQK_PARENT_PID would start a parent-death watcher that os.Exit(0)s the daemon;
 	// ZQK_MCP_ACCOUNT_ID on the server process pollutes in-process CLI. Mark ourselves
 	// as parent-zqk so nested ExecuteContext skips the child idle watchdog.
-	_ = zqkenv.ParentPID().Unset()
-	_ = zqkenv.MCPAccountID().Unset()
-	_ = zqkenv.IsParentZqk().Set("1")
+	zqkenv.ScrubDaemonProcessEnv()
 
 	return runServe(cmd, args)
 }

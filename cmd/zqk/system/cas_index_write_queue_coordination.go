@@ -22,19 +22,6 @@ func emitListingIndexBatchEventViaCoordinator(
 	err error,
 ) {
 	storageProvider := storageProviderCas.(storage.ObjectStorageProvider)
-	ctx, coordinator, ok := setupSystemCoordinator(ctx, projectRoot, storageProvider, systemProfileSystem, true)
-	if !ok {
-		return
-	}
-
-	// Build audit metadata
-	auditMetadata := make(map[string]any)
-	auditMetadata[eventKeyEventType] = fmt.Sprintf("listing_index_batch_%s", status)
-	auditMetadata[eventKeyOperation] = fmt.Sprintf("Listing index batch processing: %d updates for %s", batchSize, kind)
-	auditMetadata[eventKeyTargetKind] = kind
-	auditMetadata[eventKeyBatchSize] = batchSize
-	auditMetadata[eventKeyDurationSeconds] = duration.Seconds()
-
 	// Determine severity
 	severity := severityLow
 	if status == eventStatusError || err != nil {
@@ -42,7 +29,15 @@ func emitListingIndexBatchEventViaCoordinator(
 	} else if status == eventStatusComplete {
 		severity = severityMedium
 	}
-	auditMetadata[eventKeySeverity] = severity
+
+	auditMetadata := map[string]any{
+		eventKeyEventType:       fmt.Sprintf("listing_index_batch_%s", status),
+		eventKeyOperation:       fmt.Sprintf("Listing index batch processing: %d updates for %s", batchSize, kind),
+		eventKeyTargetKind:      kind,
+		eventKeyBatchSize:       batchSize,
+		eventKeyDurationSeconds: duration.Seconds(),
+		eventKeySeverity:        severity,
+	}
 
 	// Build logging fields
 	loggingFields := []coordination.LoggingField{
@@ -58,12 +53,24 @@ func emitListingIndexBatchEventViaCoordinator(
 		eventKeyStatus:    status,
 	}
 
-	eventData := buildCoordinationEventData(loggingFields, auditMetadata, metricsData, duration, err)
-
 	// Create operation ID
 	operationID := fmt.Sprintf("listing_index_batch_%s_%d", kind, time.Now().UnixNano())
-	eventCtx := buildEventContext(ctx, operationID, "listing_index_batch", status, eventData, duration, err, false, true, true, false)
-	emitAsyncCoordinationEvent(ctx, coordinator, "listing_index_event_emit", fmt.Sprintf("emitting listing index event for %s", kind), eventCtx)
+	emitSystemEventViaCoordinator(
+		ctx,
+		projectRoot,
+		storageProvider,
+		operationID,
+		"listing_index_batch",
+		status,
+		duration,
+		err,
+		loggingFields,
+		auditMetadata,
+		metricsData,
+		false,
+		"listing_index_event_emit",
+		fmt.Sprintf("emitting listing index event for %s", kind),
+	)
 }
 
 // emitListingIndexStateChangeEventViaCoordinator emits listing-index queue state change events via the coordination system.
@@ -77,28 +84,16 @@ func emitListingIndexStateChangeEventViaCoordinator(
 	if sp, ok := storageProviderCas.(storage.ObjectStorageProvider); ok {
 		storageProvider = sp
 	}
-	ctx, coordinator, ok := setupSystemCoordinator(ctx, projectRoot, storageProvider, systemProfileSystem, true)
-	if !ok {
-		return
-	}
-
-	auditMetadata := make(map[string]any)
-	auditMetadata[eventKeyEventType] = fmt.Sprintf("cas_index_state_%s", changeType)
-	auditMetadata[eventKeyOperation] = fmt.Sprintf("CAS index queue state change: %s", changeType)
-	auditMetadata[eventKeyChangeType] = changeType
-	auditMetadata[eventKeySeverity] = severityLow
-
-	loggingFields := []coordination.LoggingField{
-		{Key: eventKeyChangeType, Value: changeType},
-	}
-
-	eventData := &coordination.EventData{
-		LoggingFields: loggingFields,
-		AuditMetadata: auditMetadata,
-		MetricsData:   map[string]any{eventKeyChangeType: changeType},
-	}
-
-	operationID := fmt.Sprintf("listing_index_state_%s_%d", changeType, time.Now().UnixNano())
-	eventCtx := buildEventContext(ctx, operationID, "listing_index_state_change", changeType, eventData, 0, nil, false, true, true, false)
-	emitAsyncCoordinationEvent(ctx, coordinator, "listing_index_state_change_emit", fmt.Sprintf("emitting listing index state change %s", changeType), eventCtx)
+	emitStateChangeEventViaCoordinator(
+		ctx,
+		projectRoot,
+		storageProvider,
+		fmt.Sprintf("cas_index_state_%s", changeType),
+		fmt.Sprintf("CAS index queue state change: %s", changeType),
+		changeType,
+		"listing_index_state",
+		"listing_index_state_change",
+		"listing_index_state_change_emit",
+		fmt.Sprintf("emitting listing index state change %s", changeType),
+	)
 }

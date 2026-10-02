@@ -22,21 +22,15 @@ func emitHashRegistryEventViaCoordinator(
 	status string,
 	err error,
 ) {
-	ctx, coordinator, ok := setupSystemCoordinator(ctx, projectRoot, storageProvider, systemProfileSystem, true)
-	if !ok {
-		return
+	auditMetadata := map[string]any{
+		eventKeyEventType:       fmt.Sprintf("hash_registry_batch_%s", status),
+		eventKeyOperation:       fmt.Sprintf("Hash registry batch processing: %d requests, %d hashes for %s", batchSize, hashCount, kind),
+		eventKeyTargetKind:      kind,
+		eventKeyBatchSize:       batchSize,
+		eventKeyHashCount:       hashCount,
+		eventKeyDurationSeconds: duration.Seconds(),
+		eventKeySeverity:        severityForStatusOrError(status, err),
 	}
-
-	// Build audit metadata
-	auditMetadata := make(map[string]any)
-	auditMetadata[eventKeyEventType] = fmt.Sprintf("hash_registry_batch_%s", status)
-	auditMetadata[eventKeyOperation] = fmt.Sprintf("Hash registry batch processing: %d requests, %d hashes for %s", batchSize, hashCount, kind)
-	auditMetadata[eventKeyTargetKind] = kind
-	auditMetadata[eventKeyBatchSize] = batchSize
-	auditMetadata[eventKeyHashCount] = hashCount
-	auditMetadata[eventKeyDurationSeconds] = duration.Seconds()
-
-	auditMetadata[eventKeySeverity] = severityForStatusOrError(status, err)
 
 	// Build logging fields
 	loggingFields := []coordination.LoggingField{
@@ -45,33 +39,30 @@ func emitHashRegistryEventViaCoordinator(
 		{Key: eventKeyHashCount, Value: hashCount},
 		{Key: eventKeyStatus, Value: status},
 	}
-	if duration > 0 {
-		loggingFields = append(loggingFields, coordination.LoggingField{Key: eventKeyDurationSeconds, Value: duration.Seconds()})
-	}
 
 	// Build metrics data
-	metricsData := make(map[string]any)
-	metricsData[eventKeyKind] = kind
-	metricsData[eventKeyBatchSize] = batchSize
-	metricsData[eventKeyHashCount] = hashCount
-	metricsData[eventKeyStatus] = status
-	if duration > 0 {
-		metricsData[eventKeyDurationSeconds] = duration.Seconds()
-		metricsData[eventKeyDurationNS] = duration.Nanoseconds()
-	}
-	if err != nil {
-		metricsData[eventKeyError] = err.Error()
+	metricsData := map[string]any{
+		eventKeyKind:      kind,
+		eventKeyBatchSize: batchSize,
+		eventKeyHashCount: hashCount,
+		eventKeyStatus:    status,
 	}
 
-	// Create event data
-	eventData := &coordination.EventData{
-		LoggingFields: loggingFields,
-		AuditMetadata: auditMetadata,
-		MetricsData:   metricsData,
-	}
-
-	// Create operation ID
 	operationID := fmt.Sprintf("hash_registry_batch_%s_%d", kind, time.Now().UnixNano())
-	eventCtx := buildEventContext(ctx, operationID, eventTypeHashRegistryBatch, status, eventData, duration, err, false, true, true, false)
-	emitAsyncCoordinationEvent(ctx, coordinator, "hash_registry_event_emit", fmt.Sprintf("emitting hash registry event for %s", kind), eventCtx)
+	emitSystemEventViaCoordinator(
+		ctx,
+		projectRoot,
+		storageProvider,
+		operationID,
+		eventTypeHashRegistryBatch,
+		status,
+		duration,
+		err,
+		loggingFields,
+		auditMetadata,
+		metricsData,
+		false,
+		"hash_registry_event_emit",
+		fmt.Sprintf("emitting hash registry event for %s", kind),
+	)
 }

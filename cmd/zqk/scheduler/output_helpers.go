@@ -133,13 +133,10 @@ func emitSchedulerOutputErrorViaCoordinator(
 	err error,
 	profile string,
 ) {
-	if projectRoot == emptyValue || projectRoot == "." {
+	ctx, coordinator, ok := initSchedulerCoordination(ctx, projectRoot, profile)
+	if !ok {
 		return
 	}
-
-	// Embed LoggingContext in context so coordinator logging respects --context profile
-	ctx = createContextWithLoggingProfile(ctx, profile)
-	coordinator := newSchedulerCoordinator()
 
 	// Build logging fields
 	loggingFields := []coordination.LoggingField{

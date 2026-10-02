@@ -34,7 +34,5 @@ func scrubDaemonInheritEnv(env []string) []string {
 // scrubSchedulerDaemonProcessEnv applies scrubDaemonInheritEnv to this process
 // before the foreground daemon loop (agent shells often leak MCP child env).
 func scrubSchedulerDaemonProcessEnv() {
-	_ = zqkenv.ParentPID().Unset()
-	_ = zqkenv.MCPAccountID().Unset()
-	_ = zqkenv.IsParentZqk().Set("1")
+	zqkenv.ScrubDaemonProcessEnv()
 }

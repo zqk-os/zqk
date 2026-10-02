@@ -148,20 +148,11 @@ func startSchedulerInBackground(ctx *cli.Context, cmd *cobra.Command) error {
 	//
 	// NOTE: Do NOT use WireExecForIsolatedProject — it sets ZQK_TEST_ROOT / ZQK_TEST_BYPASS_AUTH
 	// which makes the child resolve test configuration instead of project configuration.
-	// The daemon is a production process that should inherit the parent's full environment.
-	cleanup, err := configureSchedulerDaemonExec(execCmd, projectRoot, "detached daemon")
+	cleanup, err := spawnConfiguredSchedulerDaemon(execCmd, projectRoot, "detached daemon", "failed to start scheduler in background")
 	if err != nil {
 		return err
 	}
 	defer cleanup()
-
-	if runtime.GOOS != schedulerGOOSWindows {
-		execCmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true}
-	}
-
-	if err := startDetachedSchedulerDaemonProcess(execCmd); err != nil {
-		return errfmt.Newf("failed to start scheduler in background").Wrap(err)
-	}
 
 	// Give child time to start and write PID file.
 	// 2 seconds allows for slow initialization under memory pressure or heavy CPU load.
@@ -258,19 +249,28 @@ func StartSchedulerDaemonForRoot(projectRoot string) error {
 
 	// NOTE: Do NOT override Args[0] or use WireExecForIsolatedProject —
 	// see startSchedulerInBackground comment about brand prefix and test settings.
-	cleanup, err := configureSchedulerDaemonExec(execCmd, projectRoot, "during root transition")
+	cleanup, err := spawnConfiguredSchedulerDaemon(execCmd, projectRoot, "during root transition", "failed to start scheduler for new root")
 	if err != nil {
 		return err
 	}
 	defer cleanup()
+	return nil
+}
+
+func spawnConfiguredSchedulerDaemon(execCmd *exec.Cmd, projectRoot, contextLabel, errDesc string) (func(), error) {
+	cleanup, err := configureSchedulerDaemonExec(execCmd, projectRoot, contextLabel)
+	if err != nil {
+		return nil, err
+	}
 
 	if runtime.GOOS != schedulerGOOSWindows {
 		execCmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true}
 	}
 	if err := startDetachedSchedulerDaemonProcess(execCmd); err != nil {
-		return errfmt.Newf("failed to start scheduler for new root").Wrap(err)
+		cleanup()
+		return nil, errfmt.Newf(errDesc).Wrap(err)
 	}
-	return nil
+	return cleanup, nil
 }
 
 func configureSchedulerDaemonExec(execCmd *exec.Cmd, projectRoot, contextLabel string) (func(), error) {

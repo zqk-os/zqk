@@ -25,22 +25,17 @@ func emitChangeJournalEventViaCoordinator(
 	duration time.Duration,
 	err error,
 ) {
-	ctx, coordinator, ok := setupSystemCoordinator(ctx, projectRoot, storageProvider, systemProfileSystem, true)
-	if !ok {
-		return
-	}
-
 	// Build audit metadata
-	auditMetadata := make(map[string]any)
-	auditMetadata[eventKeyEventType] = fmt.Sprintf("change_journal_%s", status)
-	auditMetadata[eventKeyOperation] = fmt.Sprintf("Change journal entry created: %s %s", changeType, objectRef)
-	auditMetadata[eventKeyTargetKind] = kind
-	auditMetadata[eventKeyTargetID] = objectID
-	auditMetadata[eventKeyChangeType] = changeType
-	auditMetadata[eventKeyObjectRef] = objectRef
-	auditMetadata[eventKeyDurationSeconds] = duration.Seconds()
-
-	auditMetadata[eventKeySeverity] = severityForStatusOrError(status, err)
+	auditMetadata := map[string]any{
+		eventKeyEventType:       fmt.Sprintf("change_journal_%s", status),
+		eventKeyOperation:       fmt.Sprintf("Change journal entry created: %s %s", changeType, objectRef),
+		eventKeyTargetKind:      kind,
+		eventKeyTargetID:        objectID,
+		eventKeyChangeType:      changeType,
+		eventKeyObjectRef:       objectRef,
+		eventKeyDurationSeconds: duration.Seconds(),
+		eventKeySeverity:        severityForStatusOrError(status, err),
+	}
 
 	// Build logging fields
 	loggingFields := []coordination.LoggingField{
@@ -58,8 +53,20 @@ func emitChangeJournalEventViaCoordinator(
 		eventKeyStatus:     status,
 	}
 
-	eventData := buildCoordinationEventData(loggingFields, auditMetadata, metricsData, duration, err)
-
-	eventCtx := buildEventContext(ctx, operationID, operationType, status, eventData, duration, err, false, true, true, true)
-	emitAsyncCoordinationEvent(ctx, coordinator, "change_journal_event_emit", fmt.Sprintf("emitting change journal event: %s %s", changeType, objectRef), eventCtx)
+	emitSystemEventViaCoordinator(
+		ctx,
+		projectRoot,
+		storageProvider,
+		operationID,
+		operationType,
+		status,
+		duration,
+		err,
+		loggingFields,
+		auditMetadata,
+		metricsData,
+		true,
+		"change_journal_event_emit",
+		fmt.Sprintf("emitting change journal event: %s %s", changeType, objectRef),
+	)
 }

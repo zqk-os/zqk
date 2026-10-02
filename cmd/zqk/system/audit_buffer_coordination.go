@@ -27,23 +27,18 @@ func emitAuditBufferFlushEventViaCoordinator(
 	duration time.Duration,
 	err error,
 ) {
-	ctx, coordinator, ok := setupSystemCoordinator(ctx, projectRoot, storageProvider, systemProfileSystem, true)
-	if !ok {
-		return
-	}
-
 	// Build audit metadata
-	auditMetadata := make(map[string]any)
-	auditMetadata[eventKeyEventType] = fmt.Sprintf("audit_buffer_flush_%s", status)
-	auditMetadata[eventKeyOperation] = fmt.Sprintf("Audit buffer flush: %d %s events for %s", eventCount, eventType, targetKind)
-	auditMetadata[eventKeyTargetKind] = targetKind
-	auditMetadata["group_key"] = groupKey
-	auditMetadata["event_type_aggregated"] = eventType
-	auditMetadata[objects.FieldKeyEventCount] = eventCount
-	auditMetadata[objects.FieldKeyAggregationWindow] = aggregationWindow
-	auditMetadata[eventKeyDurationSeconds] = duration.Seconds()
-
-	auditMetadata[eventKeySeverity] = severityForStatusOrError(status, err)
+	auditMetadata := map[string]any{
+		eventKeyEventType:                 fmt.Sprintf("audit_buffer_flush_%s", status),
+		eventKeyOperation:                 fmt.Sprintf("Audit buffer flush: %d %s events for %s", eventCount, eventType, targetKind),
+		eventKeyTargetKind:                targetKind,
+		"group_key":                       groupKey,
+		"event_type_aggregated":           eventType,
+		objects.FieldKeyEventCount:        eventCount,
+		objects.FieldKeyAggregationWindow: aggregationWindow,
+		eventKeyDurationSeconds:           duration.Seconds(),
+		eventKeySeverity:                  severityForStatusOrError(status, err),
+	}
 
 	// Build logging fields
 	loggingFields := []coordination.LoggingField{
@@ -63,8 +58,20 @@ func emitAuditBufferFlushEventViaCoordinator(
 		eventKeyStatus:             status,
 	}
 
-	eventData := buildCoordinationEventData(loggingFields, auditMetadata, metricsData, duration, err)
-
-	eventCtx := buildEventContext(ctx, operationID, operationType, status, eventData, duration, err, false, true, true, false)
-	emitAsyncCoordinationEvent(ctx, coordinator, "audit_buffer_event_emit", fmt.Sprintf("emitting audit buffer flush event: %s", groupKey), eventCtx)
+	emitSystemEventViaCoordinator(
+		ctx,
+		projectRoot,
+		storageProvider,
+		operationID,
+		operationType,
+		status,
+		duration,
+		err,
+		loggingFields,
+		auditMetadata,
+		metricsData,
+		false,
+		"audit_buffer_event_emit",
+		fmt.Sprintf("emitting audit buffer flush event: %s", groupKey),
+	)
 }
