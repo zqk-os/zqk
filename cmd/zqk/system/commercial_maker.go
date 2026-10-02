@@ -12,7 +12,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/tde"
 )
 
-func registerScriptAction(actionName string) {
+func registerTDEScriptAction(actionName, logPrefix string) {
 	tde.RegisterAction(actionName, func(ctx context.Context, env tde.Envelope) error {
 		scriptBytes, err := base64.StdEncoding.DecodeString(env.PayloadB64)
 		if err != nil {
@@ -20,7 +20,7 @@ func registerScriptAction(actionName string) {
 		}
 		script := string(scriptBytes)
 		logger := logging.GetLoggerFromContext(ctx)
-		logging.FluentEvent(logger).Info(fmt.Sprintf("TDE %s Executing", actionName)).Script(script).Log()
+		logging.FluentEvent(logger).Info(logPrefix).Script(script).Log()
 
 		cmd := execwrap.CommandContext(ctx, "bash", "-c", script)
 		cmd.Stdout = os.Stdout
@@ -31,6 +31,6 @@ func registerScriptAction(actionName string) {
 
 func init() {
 	for _, action := range []string{"mubert-generate", "mubert-streaming", "ffmpeg"} {
-		registerScriptAction(action)
+		registerTDEScriptAction(action, fmt.Sprintf("TDE %s Executing", action))
 	}
 }

@@ -13,6 +13,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/mutation"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/strutil"
 )
 
 // KernelAcronymsSchemeID is the canonical ID of the acronym vocabulary scheme.
@@ -542,32 +543,7 @@ func FindClosest(query string) []string {
 }
 
 func levenshtein(a, b string) int {
-	la, lb := len(a), len(b)
-	d := make([][]int, la+1)
-	for i := range d {
-		d[i] = make([]int, lb+1)
-		d[i][0] = i
-	}
-	for j := 0; j <= lb; j++ {
-		d[0][j] = j
-	}
-	for i := 1; i <= la; i++ {
-		for j := 1; j <= lb; j++ {
-			cost := 1
-			if a[i-1] == b[j-1] {
-				cost = 0
-			}
-			d[i][j] = min(d[i-1][j]+1, min(d[i-1][j-1]+1, d[i-1][j-1]+cost))
-		}
-	}
-	return d[la][lb]
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
+	return strutil.LevenshteinDistance(a, b)
 }
 
 // FormatTable formats a slice of acronyms into a clean ASCII table.

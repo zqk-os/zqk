@@ -151,6 +151,18 @@ func writeObjectViaPrivilegedWriter(ctx context.Context, id, kind string, data [
 	return w.WriteObject(ctx, id, kind, data, false)
 }
 
+func executeThroughMembrane(localFn func() error, daemonFn func(w *IPCWriter) error, projectRoots ...string) error {
+	if privilegedWriterLocalWriteAllowed(projectRoots...) {
+		return localFn()
+	}
+	w, err := dialPrivilegedWriter(projectRoots...)
+	if err != nil {
+		return errPrivilegedWriterUnavailable(err)
+	}
+	defer w.Close()
+	return daemonFn(w)
+}
+
 // writeCASThroughMembrane routes CAS/draft writes through PrivilegedWriter in production.
 // When test local-write is allowed (ZQK_TEST_ROOT or ZQK_TEST_ALLOW_CAS_FALLTHROUGH=1 or IsTestOrTempProjectRoot),
 // always use localFn and skip the daemon — a live LaunchAgent would otherwise write into
@@ -167,15 +179,9 @@ func (f *FileObjectStorage) writeCASThroughMembrane(ctx context.Context, id, kin
 	if f != nil {
 		root = f.projectRoot
 	}
-	if privilegedWriterLocalWriteAllowed(root) {
-		return localFn()
-	}
-	w, err := dialPrivilegedWriter(root)
-	if err != nil {
-		return errPrivilegedWriterUnavailable(err)
-	}
-	defer w.Close()
-	return w.WriteObject(ctx, id, kind, data, isDraft)
+	return executeThroughMembrane(localFn, func(w *IPCWriter) error {
+		return w.WriteObject(ctx, id, kind, data, isDraft)
+	}, root)
 }
 
 func writeCASThroughMembrane(ctx context.Context, id, kind string, data []byte, isDraft bool, localFn func() error) error {
@@ -185,15 +191,9 @@ func writeCASThroughMembrane(ctx context.Context, id, kind string, data []byte, 
 	if err := caspkg.RefuseCASWithoutDescription(kind, isDraft, data); err != nil {
 		return err
 	}
-	if privilegedWriterLocalWriteAllowed() {
-		return localFn()
-	}
-	w, err := dialPrivilegedWriter()
-	if err != nil {
-		return errPrivilegedWriterUnavailable(err)
-	}
-	defer w.Close()
-	return w.WriteObject(ctx, id, kind, data, isDraft)
+	return executeThroughMembrane(localFn, func(w *IPCWriter) error {
+		return w.WriteObject(ctx, id, kind, data, isDraft)
+	})
 }
 
 // renameCASThroughMembrane is the ID-change counterpart of writeCASThroughMembrane.
@@ -202,27 +202,15 @@ func (f *FileObjectStorage) renameCASThroughMembrane(ctx context.Context, id, ne
 	if f != nil {
 		root = f.projectRoot
 	}
-	if privilegedWriterLocalWriteAllowed(root) {
-		return localFn()
-	}
-	w, err := dialPrivilegedWriter(root)
-	if err != nil {
-		return errPrivilegedWriterUnavailable(err)
-	}
-	defer w.Close()
-	return w.RenameObject(ctx, id, newID, kind)
+	return executeThroughMembrane(localFn, func(w *IPCWriter) error {
+		return w.RenameObject(ctx, id, newID, kind)
+	}, root)
 }
 
 func renameCASThroughMembrane(ctx context.Context, id, newID, kind string, localFn func() error) error {
-	if privilegedWriterLocalWriteAllowed() {
-		return localFn()
-	}
-	w, err := dialPrivilegedWriter()
-	if err != nil {
-		return errPrivilegedWriterUnavailable(err)
-	}
-	defer w.Close()
-	return w.RenameObject(ctx, id, newID, kind)
+	return executeThroughMembrane(localFn, func(w *IPCWriter) error {
+		return w.RenameObject(ctx, id, newID, kind)
+	})
 }
 
 // deleteCASThroughMembrane is the delete counterpart of writeCASThroughMembrane.
@@ -231,25 +219,13 @@ func (f *FileObjectStorage) deleteCASThroughMembrane(ctx context.Context, id, ki
 	if f != nil {
 		root = f.projectRoot
 	}
-	if privilegedWriterLocalWriteAllowed(root) {
-		return localFn()
-	}
-	w, err := dialPrivilegedWriter(root)
-	if err != nil {
-		return errPrivilegedWriterUnavailable(err)
-	}
-	defer w.Close()
-	return w.DeleteObject(ctx, id, kind)
+	return executeThroughMembrane(localFn, func(w *IPCWriter) error {
+		return w.DeleteObject(ctx, id, kind)
+	}, root)
 }
 
 func deleteCASThroughMembrane(ctx context.Context, id, kind string, localFn func() error) error {
-	if privilegedWriterLocalWriteAllowed() {
-		return localFn()
-	}
-	w, err := dialPrivilegedWriter()
-	if err != nil {
-		return errPrivilegedWriterUnavailable(err)
-	}
-	defer w.Close()
-	return w.DeleteObject(ctx, id, kind)
+	return executeThroughMembrane(localFn, func(w *IPCWriter) error {
+		return w.DeleteObject(ctx, id, kind)
+	})
 }
