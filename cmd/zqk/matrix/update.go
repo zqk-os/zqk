@@ -9,27 +9,10 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/quality"
 )
 
 func runMatrixUpdate(cmd *cobra.Command, _ []string) error {
-	ctx := cli.GetContext(cmd)
-	projectRoot := ""
-	if ctx != nil {
-		projectRoot = ctx.ProjectRoot
-	}
-	if projectRoot == "" {
-		projectRoot = cli.ResolveProjectRoot(".")
-	}
-	if projectRoot == "" {
-		return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations("project root not found; run from repo root or zqk use"))
-	}
-
-	name, _ := cmd.Flags().GetString("name")
-	registryFlag, _ := cmd.Flags().GetString("registry")
-	matrixPath, _ := cmd.Flags().GetString("matrix")
-	profilePath, _ := cmd.Flags().GetString("profile")
 	filePath, _ := cmd.Flags().GetString("file-path")
 	bundleLabel, _ := cmd.Flags().GetString("bundle-label")
 	filterPairs, _ := cmd.Flags().GetStringArray("filter")
@@ -67,7 +50,7 @@ func runMatrixUpdate(cmd *cobra.Command, _ []string) error {
 		return errfmt.Errorf("do not combine --filter with --file-path or --bundle-label")
 	}
 
-	resolved, err := quality.ResolveMatrixForCLI(projectRoot, name, registryFlag, matrixPath, profilePath)
+	_, resolved, err := resolveMatrixFromCmd(cmd)
 	if err != nil {
 		return err
 	}
