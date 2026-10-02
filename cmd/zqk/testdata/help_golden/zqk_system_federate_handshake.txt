@@ -1,4 +1,5 @@
 Performs cryptographic verification and reciprocal credential attestation
+
 between federated knowledge kernel nodes.
 
 Usage:

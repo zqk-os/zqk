@@ -43,6 +43,7 @@ Available Commands:
   export-gate                    Audit candidate directory or open-core distribution against export gates
   federate                       Federate and synchronize kernel graph across distributed cluster nodes
   fswatcher-daemon               Start the FSWatcher daemon
+  generate-agent-configs         Write kernel boot directives into vendor agent config files
   git                            Git commit analysis and integration with work items
   health-data                    Output aggregated system-health data for dashboard
   improvement-report             Generate system improvement report with comparative analysis and prioritized work items
@@ -85,10 +86,10 @@ Available Commands:
   telemetry                      View telemetry from running agent tasks
   truth-sentinel                 Run the Truth Sentinel daemon or a one-shot audit
   update-specs                   Bulk update object specifications
-  validate                       Validate object(s) against schema
   validate-agent-rules           Validate IDE agent rules manifest vs rules directory
   validate-command-specs         Validate live CLI commands against canonical command specs
   validate-scenario              Execute a programmatic validation scenario
+  validate-schema                Validate object(s) against schema
   verify-completion              Verify completion of an object
   whoami                         Display the current user account information
 

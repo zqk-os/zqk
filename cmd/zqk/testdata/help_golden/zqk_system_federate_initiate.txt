@@ -1,4 +1,5 @@
 Start the outbound federation protocol sequence to discover, establish,
+
 and verify mutual trust and synchronization with a remote peer.
 
 Usage:

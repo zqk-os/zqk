@@ -68,7 +68,7 @@ Instead, ZQK treats multi-agent systems as a biological computing substrate buil
 Rather than treating multi-agent work as loose prompt scripts or terminal splits, ZQK introduces four foundational biological primitives:
 
 1. **The Cell / Holon (Sovereign Node):** Each ZQK kernel is an autonomous holon—simultaneously a complete, self-governing whole and an organic participant in the wider mesh. It maintains authoritative stewardship over its local codebase, tests, and private knowledge graph without relying on bloated global vector lakes.
-2. **The Membrane (Deterministic Boundaries):** A strict multi-plane state machine (`PlaneDraft` → `PlaneStaged` → `PlanePromoted`) ensuring that zero unverified agent mutations ever pollute working code or canonical state.
+2. **The Membrane (Deterministic Boundaries):** A strict multi-plane state machine (`Draft` → `Promoted` (via CAS membrane qualification)) ensuring that zero unverified agent mutations ever pollute working code or canonical state.
 3. **The Nervous System (Active Operational Graph):** An active, real-time synaptic state bus driving task execution, causal provenance lineage, and dependency trees—not a passive secondary data lake.
 4. **The Organism (Inter-Cellular Mesh):** Domain-expert kernels communicating over a typed P2P wire protocol to achieve compound objectives without central micromanagement.
 
@@ -76,17 +76,17 @@ Rather than treating multi-agent work as loose prompt scripts or terminal splits
 
 Knowledge in ZQK is never static documentation. It is an active, sensing memory layer:
 
-- **Programmed Human Intent:** Human goals, non-negotiable rules, architectural invariants, mission, and vision are encoded directly into kernel schema objects (`Intent`, `Policy`, `InvariantGate`). Agents never invent objectives in isolation; their actions are strictly bounded by human-imparted intent.
+- **Programmed Human Intent:** Human goals, non-negotiable rules, architectural invariants, mission, and vision are encoded directly into kernel schema objects (`Goal`, `Policy`, `InvariantGate`). Agents never invent objectives in isolation; their actions are strictly bounded by human-imparted intent.
 - **Ambient Feedback Sensing:** Integrated background daemons monitor filesystem changes, test execution suites, and process drift. The kernel senses when reality diverges from intent and dynamically triggers corrective cycles.
 - **Temporal Agility (Snapshot, Rollback & Cherry-Pick):** Treat knowledge like Git commits. Create atomic cryptographic snapshots, fork or branch memory planes for parallel experimentation, rollback failed excursions, and cherry-pick verified knowledge across cells.
-- **Laser Context Curation & Token Efficiency:** Rather than exhausting LLM context windows on uncurated chat history, ZQK slices precise graph subtrees based on the specific WorkUnit an agent claims—**reducing token bloat by up to 80%** while maximizing reasoning accuracy.
+- **Laser Context Curation & Token Efficiency:** Rather than exhausting LLM context windows on uncurated chat history, ZQK slices precise graph subtrees based on the specific WorkUnit an agent claims—**significantly reducing token consumption** while maximizing reasoning accuracy.
 
 ## The 3-Tier Layering Model
 
 | Layer | System Tier | Responsibilities |
 | :--- | :--- | :--- |
 | **Layer 3** | **Domain Workflows & Applications** | Software Engineering Profile, Security Ops Enclaves, Custom Enterprise Swarms |
-| **Layer 2** | **The Kernel Standard Library (Core DNA)** | `Intent` (Objective), `WorkUnit` (BLI), `InvariantGate` (Verification), `LineageNode` (ADR) |
+| **Layer 2** | **The Kernel Standard Library (Core DNA)** | `Goal` (Objective), `BacklogItem` (BLI / WorkUnit), `InvariantGate` (Verification), `Decision` (ADR) |
 | **Layer 1** | **Microkernel Runtime Engine** | Graph State Bus, Multi-Plane Isolation (`Draft` vs `Promoted`), Deterministic Scheduler, IPC Protocol |
 
 ## Open-Core Boundary: Single Cell vs. Organism Mesh

@@ -13,6 +13,7 @@ Documents governing Content-Addressable Storage (CAS), append-only WAL streams, 
 - **[Cellular Specialization Tiers & Rubber Room](./CELLULAR_SPECIALIZATION_TIERS.md)**: Biological organ specialization tiers (`Neuron`, `Muscle`, `Heart`, `Lung`) and sandboxed side-effect execution in the Rubber Room (`ModeShielded` / `ShadowSpine`).
 - **[Tiered Storage and Archival Lifecycle](./TIERED_STORAGE_AND_ARCHIVAL_LIFECYCLE.md)**: Three-tier storage hierarchy: hot active CAS, warm index layers, and cold compressed stream archives.
 - **[Storage Write Queue & Observer Governance](./STORAGE_WRITE_QUEUE_OBSERVER_GOVERNANCE.md)**: Non-blocking asynchronous event queues, observer fan-out, and memory hygiene.
+- **[Project-Scoped Reverse Reference Index](./PROJECT_SCOPED_REVERSE_REFERENCE_INDEX_AND_THREAD_SAFE_CACHES.md)**: Caching and reverse referencing mechanisms.
 
 ---
 
@@ -21,6 +22,7 @@ Documents governing state transitions, provenance enforcement, and fail-closed v
 
 - **[Membrane Mutation Governance & Integrity Specification](./MUTATION_GOVERNANCE.md)**: System provenance fields (`created_at`, `cas_address`, `hash`), directed state graph transitions, audited `--override` elevation, and interactive TTY friction controls.
 - **[Lifecycle State Machine Architecture](./LIFECYCLE_STATE_MACHINE.md)**: Formal lifecycle definitions, state transitions, and precondition verification engines.
+- **[Fail-Closed Error Propagation](./FAIL_CLOSED_ERROR_PROPAGATION.md)**: Core error handling and propagation strategy.
 - **[Fail-Closed Error Propagation & Transaction Resilience](./FAIL_CLOSED_ERROR_PROPAGATION_AND_TRANSACTION_RESILIENCE.md)**: Fail-closed boundary guarantees across storage, networking, and validation boundaries.
 - **[Fail-Closed Panic Resilience](./FAIL_CLOSED_PANIC_RESILIENCE.md)**: Subprocess and thread isolation preventing daemon crashes and unhandled panic propagation.
 
@@ -32,6 +34,9 @@ Documents governing the Cobra CLI command surface, taxonomy standards, builders,
 - **[CLI Command Taxonomy Standards](./CLI_COMMAND_TAXONOMY_STANDARDS.md)**: Canonical noun-verb command standards, grammar rules, YAML specification inventory, and regression guardrails.
 - **[Orphan Verbs Retirement & Canonical Domain Mapping](./ORPHAN_VERBS_RETIREMENT_AND_CANONICAL_DOMAIN_MAPPING.md)**: Ergonomic root shortcuts (`zqk do`, `zqk inspect`, `zqk mutate`) mapped to canonical domain commands (`zqk workflow do`, `zqk object inspect`, etc.).
 - **[Acronym Vocabulary Scheme & Progressive Disclosure](./ACRONYM_VOCABULARY_SCHEME_AND_PROGRESSIVE_DISCLOSURE.md)**: Glossary scheme for technical acronyms (CAS, VDS, DoD, BLI, REQ, CRIT) and cognitive load management.
+- **[Diagnostics Auto Remedy](./ergonomics/DIAGNOSTICS_AUTO_REMEDY.md)**: Ergonomic flows for diagnosing and fixing issues.
+- **[Worktree Kernel Resolution](./ergonomics/WORKTREE_KERNEL_RESOLUTION.md)**: Resolving kernel locations within git worktrees.
+- **[ZQK Do Autonomous Execution](./ergonomics/ZQK_DO_AUTONOMOUS_EXECUTION.md)**: Guidelines for the `zqk do` capability.
 
 ---
 

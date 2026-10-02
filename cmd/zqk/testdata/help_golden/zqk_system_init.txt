@@ -51,22 +51,22 @@ Flags:
       scheduler to run it once and create the priority plan, workstream, and
       backlog items.
 
-  Greenfield: Initialize in current directory
-  zqk system init
+  Greenfield: Initialize in current directory (Note: 'zqk system init' is an alias)
+  zqk init
   Declarative Seed: Initialize with answer file
-  zqk system init --answer-file seed.yaml
+  zqk init --answer-file seed.yaml
   Legacy: Initialize existing project
-  zqk system init --legacy
+  zqk init --legacy
   Snapshot: Initialize from snapshot (test scenario)
-  ZQK_TEST_ROOT=test-scenarios/my-scenario zqk system init --from-snapshot snapshot.csnap --wipe
+  ZQK_TEST_ROOT=test-scenarios/my-scenario zqk init --from-snapshot snapshot.csnap --wipe
   Snapshot: Merge with existing data
-  zqk system init --from-snapshot snapshot.csnap --merge
+  zqk init --from-snapshot snapshot.csnap --merge
   Legacy + discover: Initialize and report existing objects
-  zqk system init --legacy --discover
+  zqk init --legacy --discover
   Greenfield with maintenance jobs
-  zqk system init --with-maintenance-jobs
+  zqk init --with-maintenance-jobs
   Greenfield with onboarding curriculum
-  zqk system init --with-onboarding-roadmap
+  zqk init --with-onboarding-roadmap
 
 Usage:
   zqk system init [flags]

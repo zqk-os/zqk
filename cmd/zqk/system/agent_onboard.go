@@ -171,7 +171,7 @@ func renderAgentOnboardSummary(cmd *cobra.Command, res *agentonboard.Result) {
 	cmdName := paths.CLICommandName
 	buf.WriteString("\n🔌 Connect Your AI Agent (Seating Guide):\n")
 	buf.WriteString("  • Cursor:             Pre-configured! Reads .agents/AGENTS.md and .cursor/mcp.json.\n")
-	buf.WriteString(fmt.Sprintf("  • Claude Desktop:     Run '%s mcp install --client claude-desktop' then restart Claude.\n", cmdName))
+	buf.WriteString(fmt.Sprintf("  • Claude Desktop:     Run '%s mcp install' then restart Claude.\n", cmdName))
 	buf.WriteString(fmt.Sprintf("  • Claude Code (CLI):  Run 'claude mcp add %s -- %s mcp serve'.\n", cmdName, cmdName))
 	buf.WriteString("  • Windsurf (Cascade): Pre-configured! Reads .windsurfrules and mcp_config.json.\n")
 	buf.WriteString("  • Cline / Roo Code:   Pre-configured! Reads .clinerules and cline_mcp_settings.json.\n")
