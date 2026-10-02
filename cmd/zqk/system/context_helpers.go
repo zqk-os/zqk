@@ -45,6 +45,25 @@ func profileOrDefault(profile, fallback string) string {
 	return strutil.OrDefault(profile, fallback)
 }
 
+// resolveCommandLogger returns the CLI context (which may be nil) and a logger resolved from its profile or fallbackProfile.
+func resolveCommandLogger(cmd *cobra.Command, fallbackProfile string) (*cli.Context, logging.Logger) {
+	ctx := cli.GetContext(cmd)
+	profile := fallbackProfile
+	if ctx != nil && ctx.Profile != emptyValue {
+		profile = ctx.Profile
+	}
+	return ctx, logging.GetLoggerFromProfile(profile)
+}
+
+// resolveContextAndLogger resolves the CLI context and creates a logger using the specified fallback profile.
+func resolveContextAndLogger(cmd *cobra.Command, fallbackProfile string) (*cli.Context, logging.Logger, error) {
+	ctx, logger := resolveCommandLogger(cmd, fallbackProfile)
+	if ctx == nil {
+		return nil, nil, errfmt.Errorf("failed to get context")
+	}
+	return ctx, logger, nil
+}
+
 func ProjectRootOrResolve(projectRoot string) string {
 	return strutil.OrDefault(projectRoot, cli.ResolveProjectRoot("."))
 }
@@ -56,6 +75,18 @@ func ProjectRootOrResolveDot(projectRoot string) string {
 		return cli.ResolveProjectRoot(".")
 	}
 	return projectRoot
+}
+
+// resolveContextProjectRoot resolves and validates the project root from a CLI context.
+func resolveContextProjectRoot(ctx *cli.Context) (string, error) {
+	if ctx == nil {
+		return "", errfmt.Errorf("failed to get context")
+	}
+	projectRoot := ProjectRootOrResolve(ctx.ProjectRoot)
+	if projectRoot == emptyValue {
+		return "", errfmt.Errorf("project root not found")
+	}
+	return projectRoot, nil
 }
 
 func resolveCommandProjectRoot(cmd *cobra.Command) (string, error) {
@@ -222,6 +253,28 @@ func formatMigrationSummary(title, emptyMsg string, migratedByKind map[string]in
 	return b.String()
 }
 
+func runStorageMigration(cmd *cobra.Command, mode, emptyMsg string, removeOldFiles bool, migrateFn func(fileStorage *storage.FileObjectStorage, ctx context.Context, secCtx *pkgctx.SecurityContext) (map[string]int, map[string][]error)) error {
+	projectRoot := ProjectRootOrResolve("")
+	if projectRoot == emptyValue {
+		return errfmt.Errorf("project root not found")
+	}
+	if _, err := fileutil.Stat(filepath.Join(projectRoot, paths.ProjectDataDir)); err != nil {
+		return errfmt.Errorf("project root not found")
+	}
+
+	fileStorage, err := getFileObjectStorage(cmd.Context(), projectRoot)
+	if err != nil {
+		return err
+	}
+
+	ctx := pkgctx.NewSystemContext()
+	secCtx := pkgctx.NewSecurityContext("system", []string{"admin"}, []string{"read:*", "write:*", "execute:*"})
+
+	migratedByKind, errorsByKind := migrateFn(fileStorage, ctx, secCtx)
+	summary := formatMigrationSummary(mode, emptyMsg, migratedByKind, errorsByKind, ctx)
+	return cli.WriteOutput(cmd, []byte(summary))
+}
+
 // SystemStorageSession bundles CLI context, storage provider, and operational contexts.
 type SystemStorageSession struct {
 	Ctx             *cli.Context
@@ -281,10 +334,15 @@ func resolveCommandProfile(cmd *cobra.Command) string {
 	return systemProfileHuman
 }
 
-// resolveCommandLogger returns the logger and profile associated with the command.
-func resolveCommandLogger(cmd *cobra.Command) (logging.Logger, string) {
-	profile := resolveCommandProfile(cmd)
-	return logging.GetLoggerFromProfile(profile), profile
+// resolveMigrationProjectAndLogger resolves projectRoot and logger, and primes the path alias cache.
+func resolveMigrationProjectAndLogger(cmd *cobra.Command) (string, logging.Logger, error) {
+	projectRoot, err := resolveRequiredProjectRoot(cmd)
+	if err != nil {
+		return "", nil, err
+	}
+	_, logger := resolveCommandLogger(cmd, systemProfileHuman)
+	storage.BuildPathAliasCacheForProject(projectRoot)
+	return projectRoot, logger, nil
 }
 
 // analyzeCommandMetrics runs metric analysis using the provided metrics store.
@@ -345,8 +403,7 @@ func walkYAMLFiles(dir string, fn func(path string, info fileutil.FileInfo) erro
 		if err != nil || info == nil || info.IsDir() || appledouble.SkipPathInTreeWalk(path) {
 			return nil
 		}
-		ext := strings.ToLower(filepath.Ext(path))
-		if ext == ".yaml" || ext == ".yml" {
+		if fileutil.IsYAMLPath(strings.ToLower(path)) {
 			return fn(path, info)
 		}
 		return nil

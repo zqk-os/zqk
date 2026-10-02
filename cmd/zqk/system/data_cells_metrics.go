@@ -2,7 +2,6 @@
 package system
 
 import (
-	"encoding/json"
 	"path/filepath"
 	"time"
 
@@ -47,12 +46,8 @@ func emitDataCellsStageMetrics(projectRoot string, specLoad, buildOutput, stream
 }
 
 func appendDataCellsStagesJSONL(projectRoot string, specLoad, buildOutput, streamSummaryRead time.Duration, kindFilter string) error {
-	dir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.MetricsDir)
-	if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
-		return err
-	}
-	p := filepath.Join(dir, dataCellsStagesJSONL)
-	line, err := json.Marshal(map[string]any{
+	p := filepath.Join(projectRoot, paths.ProjectDataDir, paths.MetricsDir, dataCellsStagesJSONL)
+	return fileutil.AppendJSONLine(p, map[string]any{
 		"ts_rfc3339":            time.Now().UTC().Format(time.RFC3339Nano),
 		"spec_load_ns":          specLoad.Nanoseconds(),
 		"build_output_ns":       buildOutput.Nanoseconds(),
@@ -60,18 +55,6 @@ func appendDataCellsStagesJSONL(projectRoot string, specLoad, buildOutput, strea
 		"kind_filter":           kindFilter,
 		objects.FieldKeyCommand: "system data-cells",
 	})
-	if err != nil {
-		return err
-	}
-	f, err := fileutil.OpenFile(p, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, paths.FilePerm644)
-	if err != nil {
-		return err
-	}
-	defer func() { _ = f.Close() }()
-	if _, err := f.Write(append(line, '\n')); err != nil {
-		return err
-	}
-	return nil
 }
 
 func dataCellsDurationNSField(key string, d time.Duration) logging.Field {

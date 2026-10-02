@@ -306,8 +306,7 @@ func copySpecFilesToTest(testRoot, projectRoot string) error {
 
 // hasYAMLExtension checks if a filename has a .yaml or .yml extension
 func hasYAMLExtension(filename string) bool {
-	ext := filepath.Ext(filename)
-	return ext == ".yaml" || ext == ".yml"
+	return fileutil.IsYAMLPath(filename)
 }
 
 // CopySpecsToTestRoot copies object spec files from the current project root into

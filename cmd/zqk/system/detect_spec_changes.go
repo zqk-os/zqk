@@ -54,11 +54,8 @@ func NewDetectSpecChangesCmd() *cobra.Command {
 		Use: "detect-spec-changes",
 	})
 	cli.BindAsyncProgress(cmd, func(cmd *cobra.Command, args []string) error {
-		ctx := cli.GetContext(cmd)
-		logger := logging.GetLoggerFromProfile(systemProfileHuman)
-		if ctx != nil && ctx.Profile != emptyValue {
-			logger = logging.GetLoggerFromProfile(ctx.Profile)
-		}
+		ctx, logger := resolveCommandLogger(cmd, systemProfileHuman)
+		_ = ctx
 
 		// Determine specs directory
 		if specsDir == emptyValue {

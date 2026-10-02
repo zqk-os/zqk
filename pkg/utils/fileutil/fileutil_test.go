@@ -223,3 +223,39 @@ func TestWriteSecureJSONIndent(t *testing.T) {
 	}
 }
 
+func TestAppendJSONLine(t *testing.T) {
+	dir := t.TempDir()
+	p := filepath.Join(dir, "metrics", "log.jsonl")
+
+	if err := AppendJSONLine(p, map[string]int{"a": 1}); err != nil {
+		t.Fatalf("first AppendJSONLine failed: %v", err)
+	}
+	if err := AppendJSONLine(p, map[string]int{"b": 2}); err != nil {
+		t.Fatalf("second AppendJSONLine failed: %v", err)
+	}
+
+	data, err := ReadFile(p)
+	if err != nil {
+		t.Fatalf("ReadFile failed: %v", err)
+	}
+	expected := "{\"a\":1}\n{\"b\":2}\n"
+	if string(data) != expected {
+		t.Errorf("content got %q, want %q", string(data), expected)
+	}
+}
+
+func TestIsYAMLPath(t *testing.T) {
+	if !IsYAMLPath("foo.yaml") {
+		t.Errorf("expected true for foo.yaml")
+	}
+	if !IsYAMLPath("/path/to/bar.yml") {
+		t.Errorf("expected true for /path/to/bar.yml")
+	}
+	if IsYAMLPath("baz.json") {
+		t.Errorf("expected false for baz.json")
+	}
+	if IsYAMLPath("noext") {
+		t.Errorf("expected false for noext")
+	}
+}
+

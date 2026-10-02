@@ -50,14 +50,10 @@ func NewWhoamiCmd() *cobra.Command {
 }
 
 func runWhoami(cmd *cobra.Command) error {
-	ctx := cli.GetContext(cmd)
-	if ctx == nil {
-		return errfmt.Errorf("failed to get context")
+	ctx, logger, err := resolveContextAndLogger(cmd, systemProfileHuman)
+	if err != nil {
+		return err
 	}
-
-	// Get logger
-	profile := profileOrDefault(ctx.Profile, systemProfileHuman)
-	logger := logging.GetLoggerFromProfile(profile)
 
 	// Get project root
 	projectRoot, err := getProjectRootForWhoami(ctx)

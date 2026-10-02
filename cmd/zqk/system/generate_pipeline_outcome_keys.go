@@ -23,11 +23,7 @@ func NewGeneratePipelineOutcomeKeysCmd() *cobra.Command {
 }
 
 func runGeneratePipelineOutcomeKeys(cmd *cobra.Command, _ []string) error {
-	ctx := cli.GetContext(cmd)
-	logger := logging.GetLoggerFromProfile(systemProfileHuman)
-	if ctx != nil && ctx.Profile != emptyValue {
-		logger = logging.GetLoggerFromProfile(ctx.Profile)
-	}
+	ctx, logger := resolveCommandLogger(cmd, systemProfileHuman)
 
 	projectRoot := ""
 	if ctx != nil && ctx.ProjectRoot != emptyValue {

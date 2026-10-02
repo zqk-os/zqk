@@ -75,12 +75,7 @@ func parseSnapshotScenarioFlags(cmd *cobra.Command) *SnapshotScenarioFlags {
 
 // getProjectRootForSnapshot gets project root for snapshot command
 func getProjectRootForSnapshot(cliCtx *cli.Context) (string, error) {
-	projectRoot := cliCtx.ProjectRoot
-	projectRoot = ProjectRootOrResolve(projectRoot)
-	if projectRoot == emptyValue {
-		return "", errfmt.Errorf("project root not found")
-	}
-	return projectRoot, nil
+	return resolveContextProjectRoot(cliCtx)
 }
 
 // validateSnapshotInputs validates input flags

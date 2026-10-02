@@ -53,12 +53,7 @@ func parseUpdateSpecsFlags(cmd *cobra.Command) *UpdateSpecsFlags {
 
 // getProjectRoot gets the project root from context or finds it
 func getProjectRootForUpdateSpecs(ctx *cli.Context) (string, error) {
-	projectRoot := ctx.ProjectRoot
-	projectRoot = ProjectRootOrResolve(projectRoot)
-	if projectRoot == emptyValue {
-		return "", errfmt.Errorf("project root not found")
-	}
-	return projectRoot, nil
+	return resolveContextProjectRoot(ctx)
 }
 
 // handleFieldOperation handles field operation mode (early return)

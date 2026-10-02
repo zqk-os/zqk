@@ -79,7 +79,7 @@ func runMigrateLegacyToStream(cmd *cobra.Command, _ []string) error {
 			return errfmt.Errorf("unknown kind: %s", kind)
 		}
 
-		logger, _ := resolveCommandLogger(cmd)
+		_, logger := resolveCommandLogger(cmd, systemProfileHuman)
 
 		kindDir := datacell.CellCASPrimaryDir(projectRoot, dirName)
 		if _, err := fileutil.Stat(kindDir); err != nil {

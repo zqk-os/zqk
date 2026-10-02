@@ -60,11 +60,7 @@ func RunCleanupQuarantine(ctx *CleanupQuarantineContext) (removed int, errs []er
 		if err != nil {
 			return nil //nolint:nilerr // continue walking on error
 		}
-		if info.IsDir() {
-			return nil
-		}
-		ext := filepath.Ext(path)
-		if ext != ".yaml" && ext != ".yml" {
+		if info.IsDir() || !fileutil.IsYAMLPath(path) {
 			return nil
 		}
 		if info.ModTime().After(cutoff) {

@@ -100,11 +100,7 @@ func copyYAMLFiles(sourceDir, targetDir string) error {
 			}
 			return err
 		}
-		if info.IsDir() {
-			return nil
-		}
-		ext := filepath.Ext(path)
-		if ext != ".yaml" && ext != ".yml" {
+		if info.IsDir() || !fileutil.IsYAMLPath(path) {
 			return nil
 		}
 		rel, err := filepath.Rel(sourceDir, path)

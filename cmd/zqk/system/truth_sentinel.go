@@ -26,9 +26,6 @@ func NewTruthSentinelCmd() *cobra.Command {
 
 func runTruthSentinel(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-		var err error
-		_ = err
-
 		projectRoot := proc.ProjectRoot()
 		if projectRoot == "" {
 			return errors.New(truthSentinelErrProjectRoot)

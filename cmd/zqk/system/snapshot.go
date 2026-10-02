@@ -46,9 +46,6 @@ func runSnapshot(cmd *cobra.Command, args []string) error {
 			return errfmt.Errorf("--reason is required")
 		}
 
-		var err error
-		_ = err
-
 		projectRoot := proc.ProjectRoot()
 		timestamp := time.Now().UnixMilli()
 

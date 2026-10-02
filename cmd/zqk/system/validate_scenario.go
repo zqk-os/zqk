@@ -50,12 +50,10 @@ func NewValidateScenarioCmd() *cobra.Command {
 }
 
 func runValidateScenario(cmd *cobra.Command, filePath string) error {
-	ctx := cli.GetContext(cmd)
-	if ctx == nil {
-		return errfmt.Errorf("failed to get context")
+	_, logger, err := resolveContextAndLogger(cmd, systemProfileHuman)
+	if err != nil {
+		return err
 	}
-	profile := profileOrDefault(ctx.Profile, systemProfileHuman)
-	logger := logging.GetLoggerFromProfile(profile)
 
 	b, err := fileutil.ReadFile(filePath)
 	if err != nil {

@@ -17,6 +17,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/systemcheck/snapshot"
 
 	"github.com/zqk-os/zqk/pkg/objects"
 )
@@ -31,14 +32,9 @@ func validateSnapshotFile(snapshotPath string) error {
 
 // loadCompressedSnapshot loads and expands a compressed snapshot
 func loadCompressedSnapshot(snapshotPath string, logger logging.Logger) ([]map[string]any, error) {
-	cs, err := storage.ReadCompressedSnapshot(snapshotPath)
+	cs, expanded, err := snapshot.ReadAndExpandSnapshotWithHeader(snapshotPath)
 	if err != nil {
-		return nil, errfmt.Newf("failed to read compressed snapshot").Wrap(err)
-	}
-
-	expanded, err := cs.Expand()
-	if err != nil {
-		return nil, errfmt.Newf("failed to expand snapshot").Wrap(err)
+		return nil, err
 	}
 
 	logging.Fluent(logger).Info("Loaded compressed snapshot").
@@ -170,16 +166,22 @@ func ensureObjectFields(obj map[string]any, objID, objKind string) {
 	}
 }
 
+// initOriginalProjectStorage initializes context, storage, and security context for original project access
+func initOriginalProjectStorage(projectRoot string) (stdcontext.Context, storage.ObjectStorageProvider, *pkgctx.SecurityContext, error) {
+	ctx := pkgctx.NewSystemContext()
+	originalFactory, err := storage.NewStorageFactory(ctx, projectRoot)
+	if err != nil {
+		return nil, nil, nil, errfmt.Newf("failed to create storage factory for original project").Wrap(err)
+	}
+	return ctx, originalFactory.GetStorage(), pkgctx.NewSystemSecurityContext(), nil
+}
+
 // convertCompressedSnapshotToObjects converts compressed snapshot check results to objects
 func convertCompressedSnapshotToObjects(expanded []map[string]any, originalProjectRoot string, logger logging.Logger) ([]map[string]any, error) {
-	ctx := pkgctx.NewSystemContext()
-	originalFactory, err := storage.NewStorageFactory(ctx, originalProjectRoot)
+	ctx, originalStorage, secCtx, err := initOriginalProjectStorage(originalProjectRoot)
 	if err != nil {
-		return nil, errfmt.Newf("failed to create storage factory for original project").Wrap(err)
+		return nil, err
 	}
-
-	originalStorage := originalFactory.GetStorage()
-	secCtx := pkgctx.NewSystemSecurityContext()
 
 	snapshotObjects := make([]map[string]any, 0, len(expanded))
 	for i, resultMap := range expanded {
@@ -226,14 +228,10 @@ func convertJSONSnapshotToObjects(snapshot *CheckSnapshot, logger logging.Logger
 		return nil, errfmt.Errorf("snapshot metadata missing project_root - cannot restore objects")
 	}
 
-	ctx := pkgctx.NewSystemContext()
-	originalFactory, err := storage.NewStorageFactory(ctx, originalProjectRoot)
+	ctx, originalStorage, secCtx, err := initOriginalProjectStorage(originalProjectRoot)
 	if err != nil {
-		return nil, errfmt.Newf("failed to create storage factory for original project").Wrap(err)
+		return nil, err
 	}
-
-	originalStorage := originalFactory.GetStorage()
-	secCtx := pkgctx.NewSystemSecurityContext()
 
 	snapshotObjects := make([]map[string]any, 0, len(snapshot.Results))
 	for _, result := range snapshot.Results {
