@@ -43,9 +43,6 @@ func NewTemplateCmd() *cobra.Command {
 
 func runTemplate(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-		var err error
-		_ = err
-
 		kind, err := resolvePositional0Kind(cmd, proc, args, "")
 		if err != nil {
 			return cli.Guard(cmd).Err(err).Return()

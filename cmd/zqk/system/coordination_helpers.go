@@ -101,6 +101,8 @@ func emitAsyncCoordinationEvent(
 		builder = builder.WithBudget(bud)
 	}
 	builder.StartSimple(func() {
-		_ = coordinator.Emit(ctx, eventCtx) //nolint:errcheck // Async, best-effort
+		if emitErr := coordinator.Emit(ctx, eventCtx); emitErr != nil {
+			return
+		}
 	})
 }

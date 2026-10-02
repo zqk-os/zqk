@@ -11,7 +11,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
-	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // NewImportCmd creates the object import command
@@ -44,20 +43,12 @@ Examples:
 
 func runImport(cmd *cobra.Command, _ []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, _ []string, proc *cli.Processor) error {
-		var err error
-		_ = err
-
-		filePath, _ := cmd.Flags().GetString("file")
-		if filePath == emptyValue {
-			return cli.Guard(cmd).Require(false, "--file is required").Return()
-		}
-
-		data, err := fileutil.ReadFile(filePath)
+		filePath, data, err := readRequiredFileFlag(cmd)
 		if err != nil {
 			logging.FluentEvent(proc.Logger()).Error("Failed to read file", err).
 				File(filePath).
 				Log()
-			return cli.Guard(cmd).Err(err).Wrapf("failed to read file: %w").Return()
+			return err
 		}
 
 		formatStr, _ := cmd.Flags().GetString("input-format")

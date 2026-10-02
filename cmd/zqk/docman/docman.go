@@ -10,10 +10,52 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	_ "github.com/zqk-os/zqk/pkg/librarypack"
+	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 const emptyValue = ""
+
+type docmanEnv struct {
+	ctx             context.Context
+	profile         string
+	projectRoot     string
+	storageProvider storage.ObjectStorageProvider
+	logger          logging.Logger
+}
+
+func initDocmanEnv(cmd *cobra.Command) (*docmanEnv, error) {
+	cmdCtx, profile, projectRoot, storageProvider, err := resolveDocmanContext(cmd)
+	if err != nil {
+		return nil, err
+	}
+	return &docmanEnv{
+		ctx:             cmdCtx,
+		profile:         profile,
+		projectRoot:     projectRoot,
+		storageProvider: storageProvider,
+		logger:          logging.GetLoggerFromProfile(profile),
+	}, nil
+}
+
+func resolveSubtreesAndShipped(cmd *cobra.Command) ([]string, bool, error) {
+	var subtrees []string
+	var err error
+	if cmd.Flags().Lookup("subtrees") != nil {
+		subtrees, err = cmd.Flags().GetStringArray("subtrees")
+		if err != nil {
+			subtrees, err = cmd.Flags().GetStringSlice("subtrees")
+		}
+	}
+	if err != nil {
+		return nil, false, errfmt.Newf("failed to get subtrees flag").Wrap(err)
+	}
+	shippedOnly, err := cmd.Flags().GetBool("shipped-only")
+	if err != nil {
+		return nil, false, errfmt.Newf("failed to get shipped-only flag").Wrap(err)
+	}
+	return subtrees, shippedOnly, nil
+}
 
 func resolveDocmanContext(cmd *cobra.Command) (context.Context, string, string, storage.ObjectStorageProvider, error) {
 	cmdCtx := cmd.Context()

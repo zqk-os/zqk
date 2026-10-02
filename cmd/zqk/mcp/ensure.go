@@ -31,34 +31,28 @@ func runEnsure(cmd *cobra.Command, _ []string) error {
 			return err
 		}
 		target := resolveMCPDaemonTarget(proc, rawTCP)
-		tcpAddr := target.addr
-		port := target.port
-		projectRoot := target.projectRoot
-		pidFile := target.pidFile
-		logger := target.logger
-
-		binPath := resolveMCPDaemonBinPath(projectRoot)
+		binPath := resolveMCPDaemonBinPath(target.projectRoot)
 		// Always refresh IDE role symlinks (daemon + ide-adapter), even when
 		// the daemon is already up — rebuilds otherwise leave mcp.json's
 		// zqk-mcp-ide-adapter missing and IDE shows a red MCP connector.
-		if linkErr := mcppkg.EnsureMCPIDERoleSymlinks(projectRoot, binPath); linkErr != nil {
-			logging.Fluent(logger).Warn("mcp IDE role symlinks unavailable").
+		if linkErr := mcppkg.EnsureMCPIDERoleSymlinks(target.projectRoot, binPath); linkErr != nil {
+			logging.Fluent(target.logger).Warn("mcp IDE role symlinks unavailable").
 				WithError(linkErr).
 				String("bin", binPath).
 				Log()
 		}
 		// Cursor Customize (~/.cursor/mcp.json) + project .cursor/mcp.json.
 		// empty global mcpServers after UI move.
-		if instErr := mcppkg.AutoInstall(projectRoot, logger); instErr != nil {
-			logging.Fluent(logger).Warn("mcp.json AutoInstall incomplete").
+		if instErr := mcppkg.AutoInstall(target.projectRoot, target.logger); instErr != nil {
+			logging.Fluent(target.logger).Warn("mcp.json AutoInstall incomplete").
 				WithError(instErr).
 				Log()
 		}
 
-		if pid, ok := getDaemonPIDFromPort(port); ok {
-			_ = writePIDFile(pidFile, pid)
-			logging.Fluent(logger).Info("mcp-daemon already listening").
-				String("addr", tcpAddr).
+		if pid, ok := getDaemonPIDFromPort(target.port); ok {
+			_ = writePIDFile(target.pidFile, pid)
+			logging.Fluent(target.logger).Info("mcp-daemon already listening").
+				String("addr", target.addr).
 				Int("pid", pid).
 				Log()
 			return nil
@@ -66,19 +60,19 @@ func runEnsure(cmd *cobra.Command, _ []string) error {
 
 		// Prefer role symlink so ps shows zqk-mcp-daemon, not bare zqk.
 		daemonBin := binPath
-		if rolePath := mcppkg.MCPRoleBinPath(projectRoot, mcppkg.MCPRoleDaemon); fileutil.IsRegularFile(rolePath) {
+		if rolePath := mcppkg.MCPRoleBinPath(target.projectRoot, mcppkg.MCPRoleDaemon); fileutil.IsRegularFile(rolePath) {
 			daemonBin = rolePath
 		}
-		logFile := mcpDaemonLogPath(projectRoot, port)
+		logFile := mcpDaemonLogPath(target.projectRoot, target.port)
 		_ = fileutil.EnsureDir(filepath.Dir(logFile))
 
-		logging.Fluent(logger).Info("mcp-daemon starting").
+		logging.Fluent(target.logger).Info("mcp-daemon starting").
 			String("bin", daemonBin).
-			String("addr", tcpAddr).
+			String("addr", target.addr).
 			Log()
 
-		daemonCmd := execwrap.Command(daemonBin, "mcp", "daemon", "--tcp", tcpAddr, "--timeout", "0")
-		daemonCmd.Dir = projectRoot
+		daemonCmd := execwrap.Command(daemonBin, "mcp", "daemon", "--tcp", target.addr, "--timeout", "0")
+		daemonCmd.Dir = target.projectRoot
 		setDetach(daemonCmd)
 
 		logF, err := fileutil.OpenAppend(logFile)
@@ -91,23 +85,23 @@ func runEnsure(cmd *cobra.Command, _ []string) error {
 			return errfmt.Newf("failed to start daemon").Wrap(err)
 		}
 
-		_ = writePIDFile(pidFile, daemonCmd.Process.Pid)
-		logging.Fluent(logger).Info("mcp-daemon started").
+		_ = writePIDFile(target.pidFile, daemonCmd.Process.Pid)
+		logging.Fluent(target.logger).Info("mcp-daemon started").
 			Int("pid", daemonCmd.Process.Pid).
-			String("addr", tcpAddr).
+			String("addr", target.addr).
 			Log()
 
 		deadline := time.Now().Add(8 * time.Second)
 		for time.Now().Before(deadline) {
-			conn, dialErr := net.DialTimeout("tcp", tcpAddr, 300*time.Millisecond)
+			conn, dialErr := net.DialTimeout("tcp", target.addr, 300*time.Millisecond)
 			if dialErr == nil {
 				_ = conn.Close()
-				logging.Fluent(logger).Info("mcp-daemon listening").String("addr", tcpAddr).Log()
+				logging.Fluent(target.logger).Info("mcp-daemon listening").String("addr", target.addr).Log()
 				return nil
 			}
 			time.Sleep(150 * time.Millisecond)
 		}
 
-		return errfmt.Errorf("mcp-daemon: timed out waiting for listen on %s", tcpAddr)
+		return errfmt.Errorf("mcp-daemon: timed out waiting for listen on %s", target.addr)
 	})(cmd, nil)
 }

@@ -30,7 +30,7 @@ func NewSkipWindowCmd() *cobra.Command {
 	return parent
 }
 
-func runSkipWindowSet(cmd *cobra.Command, _ []string) error {
+func resolveSchedulerSkipWindowDir(cmd *cobra.Command) (string, error) {
 	projectRoot := cli.ResolveProjectRoot(".")
 	if projectRoot == emptyValue {
 		if ctx := cli.GetContext(cmd); ctx != nil && ctx.ProjectRoot != emptyValue {
@@ -38,7 +38,15 @@ func runSkipWindowSet(cmd *cobra.Command, _ []string) error {
 		}
 	}
 	if projectRoot == emptyValue {
-		return errfmt.Errorf("project root is required")
+		return "", errfmt.Errorf("project root is required")
+	}
+	return filepath.Join(projectRoot, paths.ProjectDataDir, paths.SchedulerDir), nil
+}
+
+func runSkipWindowSet(cmd *cobra.Command, _ []string) error {
+	schedDir, err := resolveSchedulerSkipWindowDir(cmd)
+	if err != nil {
+		return err
 	}
 	forStr, _ := cmd.Flags().GetString("for")
 	forStr = strings.TrimSpace(forStr)
@@ -77,7 +85,6 @@ func runSkipWindowSet(cmd *cobra.Command, _ []string) error {
 		return errfmt.Errorf("specify --match-all and/or --job-type / --trigger-type / --title-contains filters")
 	}
 
-	schedDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.SchedulerDir)
 	sw := &schedulerpkg.SchedulerSkipWindow{
 		Until:         until,
 		MatchAll:      matchAll,
@@ -105,16 +112,10 @@ func runSkipWindowSet(cmd *cobra.Command, _ []string) error {
 }
 
 func runSkipWindowClear(cmd *cobra.Command, _ []string) error {
-	projectRoot := cli.ResolveProjectRoot(".")
-	if projectRoot == emptyValue {
-		if ctx := cli.GetContext(cmd); ctx != nil && ctx.ProjectRoot != emptyValue {
-			projectRoot = ctx.ProjectRoot
-		}
+	schedDir, err := resolveSchedulerSkipWindowDir(cmd)
+	if err != nil {
+		return err
 	}
-	if projectRoot == emptyValue {
-		return errfmt.Errorf("project root is required")
-	}
-	schedDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.SchedulerDir)
 	if err := schedulerpkg.ClearSchedulerSkipWindow(schedDir); err != nil {
 		return err
 	}
@@ -125,16 +126,10 @@ func runSkipWindowClear(cmd *cobra.Command, _ []string) error {
 }
 
 func runSkipWindowStatus(cmd *cobra.Command, _ []string) error {
-	projectRoot := cli.ResolveProjectRoot(".")
-	if projectRoot == emptyValue {
-		if ctx := cli.GetContext(cmd); ctx != nil && ctx.ProjectRoot != emptyValue {
-			projectRoot = ctx.ProjectRoot
-		}
+	schedDir, err := resolveSchedulerSkipWindowDir(cmd)
+	if err != nil {
+		return err
 	}
-	if projectRoot == emptyValue {
-		return errfmt.Errorf("project root is required")
-	}
-	schedDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.SchedulerDir)
 	sw, _ := schedulerpkg.LoadSchedulerSkipWindow(schedDir, time.Now().UTC())
 	if sw == nil {
 		if err := cli.WriteOutput(cmd, []byte("no active skip_window (missing, expired, or no filters)\n")); err != nil {

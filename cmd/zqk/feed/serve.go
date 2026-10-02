@@ -1,10 +1,6 @@
 package feed
 
 import (
-	"os"
-	"os/signal"
-	"syscall"
-
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/agentfeed/httpapi"
@@ -46,8 +42,7 @@ func runFeedServe(cmd *cobra.Command, _ []string) error {
 			Bool("auth_token_set", token != "").
 			Log()
 
-		parent := cmd.Context()
-		ctx, stop := signal.NotifyContext(parent, os.Interrupt, syscall.SIGTERM)
+		ctx, stop := cli.CommandSignalContext(cmd)
 		defer stop()
 
 		if err := srv.ListenAndServe(ctx); err != nil {

@@ -55,6 +55,18 @@ func resolvePreCommitProjectRoot(cmd *cobra.Command) (string, error) {
 	return projectRoot, nil
 }
 
+func resolvePreCommitCategory(cmd *cobra.Command, usageDesc string) (string, string, error) {
+	projectRoot, err := resolvePreCommitProjectRoot(cmd)
+	if err != nil {
+		return "", "", err
+	}
+	category, _ := cmd.Flags().GetString("category")
+	if category == emptyValue {
+		return "", "", errfmt.Errorf("--category is required (%s)", usageDesc)
+	}
+	return projectRoot, category, nil
+}
+
 func outputPreCommitReportFile(cmd *cobra.Command, path, missingMsg, readErrDesc string) error {
 	data, err := fileutil.ReadFile(path)
 	if err != nil {

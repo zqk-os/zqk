@@ -52,15 +52,5 @@ func executeBulkGet(cmd *cobra.Command, ids []string, proc *cli.Processor) error
 		result.Results[i] = applyObjectViewProjection(viewName, item)
 	}
 
-	projectFields, perr := clipkg.FieldsFromCmd(cmd)
-	if perr != nil {
-		return cli.Guard(cmd).Err(perr).Return()
-	}
-	applyHybridProjectionToBulkResult(result, projectFields)
-
-	// Output results (format respects context precedence: system -> user -> project -> command)
-	format := string(proc.Format())
-	outputBulkResult(cmd, result, format, "get")
-
-	return nil
+	return projectAndOutputBulkResult(cmd, proc, result, "get")
 }

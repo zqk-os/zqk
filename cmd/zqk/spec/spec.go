@@ -3,9 +3,14 @@ package spec
 import (
 	"fmt"
 
+	"strings"
+
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 )
 
@@ -38,4 +43,27 @@ func NewSpecCmd() *cobra.Command {
 	specCmd.AddCommand(NewSpecFieldsCmd())
 
 	return specCmd
+}
+
+func resolveSpecAndFields(cmd *cobra.Command, proc *cli.Processor, arg string) (string, *objects.Spec, map[string]any, error) {
+	kind := strings.TrimSpace(arg)
+	kind = strings.TrimPrefix(kind, "SPEC-")
+	kind = strings.ToLower(kind)
+
+	specLoader := objects.NewSpecLoader(proc.ProjectRoot())
+	raw, _ := cmd.Flags().GetBool("raw")
+
+	spec, err := specLoader.LoadSpec(kind)
+	if err != nil {
+		return "", nil, nil, cli.Guard(cmd).Err(err).Wrapf("failed to load spec: %w").Return()
+	}
+	if spec == nil {
+		return "", nil, nil, cli.Guard(cmd).Err(errfmt.Errorf("spec not found for kind: %s", kind)).Return()
+	}
+
+	fieldsMap := spec.ResolvedFields
+	if raw || len(fieldsMap) == 0 {
+		fieldsMap = spec.Fields
+	}
+	return kind, spec, fieldsMap, nil
 }

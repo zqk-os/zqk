@@ -41,45 +41,39 @@ func runSupervise(cmd *cobra.Command, _ []string) error {
 		}
 
 		target := resolveMCPDaemonTarget(proc, rawTCP)
-		tcpAddr := target.addr
-		port := target.port
-		projectRoot := target.projectRoot
-		pidFile := target.pidFile
-		supPidFile := target.supPidFile
-		logger := target.logger
 
 		if isStatus {
-			return cli.FormatOutput(cmd, superviseStatusPayload(tcpAddr, port, supPidFile))
+			return cli.FormatOutput(cmd, superviseStatusPayload(target.addr, target.port, target.supPidFile))
 		}
 
 		if isStop {
-			if pid, ok := getSupervisePID(supPidFile); ok {
+			if pid, ok := getSupervisePID(target.supPidFile); ok {
 				killPIDBestEffort(pid)
-				_ = fileutil.Remove(supPidFile)
+				_ = fileutil.Remove(target.supPidFile)
 			}
-			if pid, ok := readPIDFile(pidFile); ok {
-				killPIDBestEffort(pid)
-			}
-			if pid, ok := getDaemonPIDFromPort(port); ok {
+			if pid, ok := readPIDFile(target.pidFile); ok {
 				killPIDBestEffort(pid)
 			}
-			logging.Fluent(logger).Info("mcp-supervise stopped").String("addr", tcpAddr).Log()
+			if pid, ok := getDaemonPIDFromPort(target.port); ok {
+				killPIDBestEffort(pid)
+			}
+			logging.Fluent(target.logger).Info("mcp-supervise stopped").String("addr", target.addr).Log()
 			return nil
 		}
 
-		logFile := mcpSuperviseLogPath(projectRoot)
+		logFile := mcpSuperviseLogPath(target.projectRoot)
 		_ = fileutil.EnsureDir(filepath.Dir(logFile))
-		exe := resolveMCPDaemonBinPath(projectRoot)
+		exe := resolveMCPDaemonBinPath(target.projectRoot)
 
 		// --loop must run before the "already running" check: the parent writes this
 		// child's PID to the supervise pidfile before the child enters the loop, so a
 		// premature check would self-exit as "already running".
 		// TRACK: mcp supervise Setsid child longevity
 		if isLoop {
-			_ = writePIDFile(supPidFile, os.Getpid())
+			_ = writePIDFile(target.supPidFile, os.Getpid())
 			for {
-				ensureCmd := execwrap.Command(exe, "mcp", "ensure", "--tcp", tcpAddr, "--timeout", "0")
-				ensureCmd.Dir = projectRoot
+				ensureCmd := execwrap.Command(exe, "mcp", "ensure", "--tcp", target.addr, "--timeout", "0")
+				ensureCmd.Dir = target.projectRoot
 				logF, err := fileutil.OpenAppend(logFile)
 				if err == nil {
 					ensureCmd.Stdout = logF
@@ -97,16 +91,16 @@ func runSupervise(cmd *cobra.Command, _ []string) error {
 			}
 		}
 
-		if pid, ok := getSupervisePID(supPidFile); ok {
-			logging.Fluent(logger).Info("mcp-supervise already running").Int("pid", pid).Log()
-			runEnsureOnce(projectRoot, tcpAddr)
+		if pid, ok := getSupervisePID(target.supPidFile); ok {
+			logging.Fluent(target.logger).Info("mcp-supervise already running").Int("pid", pid).Log()
+			runEnsureOnce(target.projectRoot, target.addr)
 			return nil
 		}
 
 		// --timeout 0: default CLI auto-timeout must not kill the Setsid child.
 		// TRACK: same class as mcp daemon spawn in ensure.go.
-		supCmd := execwrap.Command(exe, "mcp", "supervise", "--tcp", tcpAddr, "--loop", "--timeout", "0")
-		supCmd.Dir = projectRoot
+		supCmd := execwrap.Command(exe, "mcp", "supervise", "--tcp", target.addr, "--loop", "--timeout", "0")
+		supCmd.Dir = target.projectRoot
 		setDetach(supCmd)
 		if logF, err := fileutil.OpenAppend(logFile); err == nil {
 			supCmd.Stdout = logF
@@ -117,17 +111,17 @@ func runSupervise(cmd *cobra.Command, _ []string) error {
 			return errfmt.Newf("failed to start supervisor").Wrap(err)
 		}
 
-		logging.Fluent(logger).Info("mcp-supervise started").Int("pid", supCmd.Process.Pid).Log()
+		logging.Fluent(target.logger).Info("mcp-supervise started").Int("pid", supCmd.Process.Pid).Log()
 		// Persist the child pid immediately so --status is useful before the loop writes it.
-		_ = writePIDFile(supPidFile, supCmd.Process.Pid)
+		_ = writePIDFile(target.supPidFile, supCmd.Process.Pid)
 
 		select {
 		case <-proc.OperationContext().Done():
 			return proc.OperationContext().Err()
 		case <-time.After(300 * time.Millisecond):
 		}
-		runEnsureOnce(projectRoot, tcpAddr)
+		runEnsureOnce(target.projectRoot, target.addr)
 
-		return cli.FormatOutput(cmd, superviseStatusPayload(tcpAddr, port, supPidFile))
+		return cli.FormatOutput(cmd, superviseStatusPayload(target.addr, target.port, target.supPidFile))
 	})(cmd, nil)
 }

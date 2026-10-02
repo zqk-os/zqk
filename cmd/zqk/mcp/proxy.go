@@ -1,11 +1,8 @@
 package mcp
 
 import (
-	"os"
-	"os/signal"
-	"syscall"
-
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/mcp"
@@ -27,8 +24,7 @@ func runProxy(cmd *cobra.Command, _ []string) error {
 
 	proxy := mcp.NewProxyDaemon(addr, logger)
 
-	parent := cmd.Context()
-	ctx, stop := signal.NotifyContext(parent, os.Interrupt, syscall.SIGTERM)
+	ctx, stop := cli.CommandSignalContext(cmd)
 	defer stop()
 
 	return proxy.Start(ctx)

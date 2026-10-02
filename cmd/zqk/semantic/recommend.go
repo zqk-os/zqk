@@ -41,28 +41,12 @@ func NewRecommendCmd() *cobra.Command {
 }
 
 func runRecommend(cmd *cobra.Command, args []string) error {
-	ctx := cli.GetContext(cmd)
-	if ctx == nil {
-		return errfmt.Errorf("failed to get context")
+	projectRoot, err := resolveSemanticProjectRoot(cmd)
+	if err != nil {
+		return err
 	}
 
-	projectRoot := ctx.ProjectRoot
-	if projectRoot == emptyValue {
-		projectRoot = cli.ResolveProjectRoot(".")
-		if projectRoot == emptyValue {
-			return errfmt.Errorf("project root not found")
-		}
-	}
-
-	// Perform assessment
-	assessor := semantic.NewMaturityAssessor([]semantic.MaturityScanner{
-		&semantic.StructuredDataScanner{},
-		&semantic.SchemaScanner{},
-		&semantic.OntologyScanner{},
-		&semantic.SemanticRepositoryScanner{},
-	})
-
-	assessment, err := assessor.Assess(projectRoot)
+	assessment, err := runMaturityAssessment(projectRoot)
 	if err != nil {
 		return errfmt.Newf("recommendation failed").Wrap(err)
 	}
