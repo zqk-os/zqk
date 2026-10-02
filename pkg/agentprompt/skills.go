@@ -359,7 +359,7 @@ func (s *SkillEnforcement) GeneratePromptSectionOpts(maxInstrRunes int) string {
 }
 
 func truncateRunes(s string, max int) string {
-	if max <= 0 || s == "" {
+	if max <= 0 || s == "" || len(s) <= max {
 		return s
 	}
 	r := []rune(s)

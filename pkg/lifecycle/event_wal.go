@@ -75,6 +75,14 @@ type LifecycleEvent struct {
 	Scope       map[string]string `json:"scope,omitempty"`
 }
 
+// Timestamp returns e.Ts if non-zero, otherwise time.Now().
+func (e *LifecycleEvent) Timestamp() time.Time {
+	if e != nil && !e.Ts.IsZero() {
+		return e.Ts
+	}
+	return time.Now()
+}
+
 // scopeKey returns a stable string key for scope (for dedup and rule matching).
 func (e *LifecycleEvent) scopeKey() string {
 	if len(e.Scope) == 0 {

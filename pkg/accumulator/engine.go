@@ -147,13 +147,13 @@ func (e *Engine[T]) SaveToLiteFile() error {
 }
 
 // LoadFromLiteFile reads the materialized envelope from disk without accessing storage.
+// LoadEnvelopeFromLiteFile reads a lite JSON file and unmarshals it into an Envelope[T].
 // It supports dual-format unmarshaling:
 // 1. Standard Envelope[T] wrapper (schema_version, materialized_at, payload, etc.)
 // 2. Legacy flat JSON payload (where domain fields exist at the root level without "payload").
 // For flat files, it deserializes directly into T and synthesizes an Envelope[T] wrapper,
 // preserving the file's modification timestamp (or materialized_at if present).
-func (e *Engine[T]) LoadFromLiteFile() (*Envelope[T], error) {
-	targetPath := e.spec.StoragePath
+func LoadEnvelopeFromLiteFile[T any](targetPath, defaultSchemaVer string) (*Envelope[T], error) {
 	data, err := fileutil.ReadFile(targetPath)
 	if err != nil {
 		return nil, err
@@ -183,7 +183,7 @@ func (e *Engine[T]) LoadFromLiteFile() (*Envelope[T], error) {
 		_ = json.Unmarshal(rawVer, &schemaVer)
 	}
 	if schemaVer == "" {
-		schemaVer = e.spec.SchemaVersion
+		schemaVer = defaultSchemaVer
 	}
 
 	var matAt time.Time
@@ -203,6 +203,11 @@ func (e *Engine[T]) LoadFromLiteFile() (*Envelope[T], error) {
 		MaterializedAt: matAt,
 		Payload:        payload,
 	}, nil
+}
+
+// LoadFromLiteFile reads the materialized payload directly from disk via the accumulator Engine.
+func (e *Engine[T]) LoadFromLiteFile() (*Envelope[T], error) {
+	return LoadEnvelopeFromLiteFile[T](e.spec.StoragePath, e.spec.SchemaVersion)
 }
 
 // isQuiescentSince returns true if the lifecycle WAL exists and has not had any

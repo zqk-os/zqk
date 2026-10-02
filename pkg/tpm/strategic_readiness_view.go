@@ -610,10 +610,7 @@ func (v *StrategicReadinessView) ApplyLifecycleEvent(ev *lifecycle.LifecycleEven
 	v.mu.Lock()
 	defer v.mu.Unlock()
 
-	ts := ev.Ts
-	if ts.IsZero() {
-		ts = time.Now()
-	}
+	ts := ev.Timestamp()
 
 	switch ev.EventType {
 	case lifecycle.EventTypeCriterionSatisfied:
