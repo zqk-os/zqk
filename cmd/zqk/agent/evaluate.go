@@ -28,9 +28,7 @@ func NewEvaluateCmd() *cobra.Command {
 
 		adherence := len(violations) == 0
 
-		ctx := proc.OperationContext()
-		secCtx := proc.SecurityContext()
-		sp := proc.Storage()
+		ctx, secCtx, sp := proc.StorageTuple()
 
 		// Emit telemetry
 		evalEvent := map[string]any{

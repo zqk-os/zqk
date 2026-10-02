@@ -149,40 +149,11 @@ func startSchedulerInBackground(ctx *cli.Context, cmd *cobra.Command) error {
 	// NOTE: Do NOT use WireExecForIsolatedProject — it sets ZQK_TEST_ROOT / ZQK_TEST_BYPASS_AUTH
 	// which makes the child resolve test configuration instead of project configuration.
 	// The daemon is a production process that should inherit the parent's full environment.
-	execCmd.Dir = projectRoot
-	execCmd.Env = scrubDaemonInheritEnv(append(os.Environ(),
-		zqkenv.ProjectRoot().Name()+"="+projectRoot,
-		zqkenv.SchedulerDaemonMode().Name()+"=1",
-	))
-
-	// Stdin: detach from terminal.
-	// IMPORTANT: We must NOT close these /dev/null fds until the child process has fully
-	// started and written its PID file. On macOS, closing the parent's copy of an fd that
-	// was inherited by the child can invalidate the child's fd (they share the same file
-	// description entry in the kernel). If the child tries to write to stdout/stderr after
-	// the parent closes the fd, it receives SIGPIPE and is killed. We collect closers and
-	// run them after the child verification sleep below.
-	devNull, err := fileutil.Open(fileutil.DevNull)
+	cleanup, err := configureSchedulerDaemonExec(execCmd, projectRoot, "detached daemon")
 	if err != nil {
-		return errfmt.Errorf(schedulerErrOpenFmt, fileutil.DevNull, err)
-	}
-	execCmd.Stdin = devNull
-
-	closeDup, err := attachSchedulerDaemonStdioToDevNull(execCmd)
-	if err != nil {
-		_ = devNull.Close() //nolint:errcheck // best-effort cleanup on error path
 		return err
 	}
-
-	// Defer fd cleanup: runs AFTER the child verification sleep (line ~873+),
-	// giving the child time to detach its own stdio during initialization.
-	defer func() {
-		closeDup()
-		if err := devNull.Close(); err != nil {
-			logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-			schedulerpkg.SLog(logger).Debug("Failed to close devNull for detached daemon").WithError(err).Log()
-		}
-	}()
+	defer cleanup()
 
 	if runtime.GOOS != schedulerGOOSWindows {
 		execCmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true}
@@ -287,6 +258,22 @@ func StartSchedulerDaemonForRoot(projectRoot string) error {
 
 	// NOTE: Do NOT override Args[0] or use WireExecForIsolatedProject —
 	// see startSchedulerInBackground comment about brand prefix and test settings.
+	cleanup, err := configureSchedulerDaemonExec(execCmd, projectRoot, "during root transition")
+	if err != nil {
+		return err
+	}
+	defer cleanup()
+
+	if runtime.GOOS != schedulerGOOSWindows {
+		execCmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true}
+	}
+	if err := startDetachedSchedulerDaemonProcess(execCmd); err != nil {
+		return errfmt.Newf("failed to start scheduler for new root").Wrap(err)
+	}
+	return nil
+}
+
+func configureSchedulerDaemonExec(execCmd *exec.Cmd, projectRoot, contextLabel string) (func(), error) {
 	execCmd.Dir = projectRoot
 	execCmd.Env = scrubDaemonInheritEnv(append(os.Environ(),
 		zqkenv.ProjectRoot().Name()+"="+projectRoot,
@@ -295,27 +282,20 @@ func StartSchedulerDaemonForRoot(projectRoot string) error {
 
 	devNull, err := fileutil.Open(fileutil.DevNull)
 	if err != nil {
-		return errfmt.Errorf(schedulerErrOpenFmt, fileutil.DevNull, err)
+		return nil, errfmt.Errorf(schedulerErrOpenFmt, fileutil.DevNull, err)
 	}
 	execCmd.Stdin = devNull
 	closeDup, err := attachSchedulerDaemonStdioToDevNull(execCmd)
 	if err != nil {
 		_ = devNull.Close() //nolint:errcheck // best-effort cleanup on error path
-		return err
+		return nil, err
 	}
-	// Defer fd cleanup until after child process has started and detached its own stdio.
-	defer func() {
+	cleanup := func() {
 		closeDup()
 		if err := devNull.Close(); err != nil {
 			logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-			schedulerpkg.SLog(logger).Debug("Failed to close devNull during root transition").WithError(err).Log()
+			schedulerpkg.SLog(logger).Debug(fmt.Sprintf("Failed to close devNull %s", contextLabel)).WithError(err).Log()
 		}
-	}()
-	if runtime.GOOS != schedulerGOOSWindows {
-		execCmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true}
 	}
-	if err := startDetachedSchedulerDaemonProcess(execCmd); err != nil {
-		return errfmt.Newf("failed to start scheduler for new root").Wrap(err)
-	}
-	return nil
+	return cleanup, nil
 }

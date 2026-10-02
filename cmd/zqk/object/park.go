@@ -3,7 +3,6 @@ package object
 import (
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cliapp"
@@ -72,22 +71,11 @@ func runPark(cmd *cobra.Command, args []string) error {
 			return err
 		}
 
-		affectedKinds := make([]string, 0, len(plan.Members))
-		kindSet := make(map[string]bool, len(plan.Members))
-		addFlushKind := func(k string) {
-			if k == emptyValue || kindSet[k] {
-				return
-			}
-			kindSet[k] = true
-			affectedKinds = append(affectedKinds, k)
-		}
+		flushTracker := newFlushKindTracker(len(plan.Members))
 		parked := make([]map[string]any, 0, len(plan.Members))
 		skipped := make([]string, 0)
 		for _, m := range plan.Members {
-			addFlushKind(m.Kind)
-			if m.Kind == objects.KindBacklogItem {
-				addFlushKind(objects.KindPriorityPlan)
-			}
+			flushTracker.addWithBacklogCascade(m.Kind)
 			if m.Skip {
 				skipped = append(skipped, m.ID)
 				logging.FluentEvent(proc.Logger()).Info("Already parked at target").
@@ -104,19 +92,7 @@ func runPark(cmd *cobra.Command, args []string) error {
 			})
 		}
 
-		if len(affectedKinds) > 0 {
-			flushCtx, cancelFlush := storage.DurabilityFlushContext()
-			defer cancelFlush()
-			t0 := time.Now()
-			if err := storage.EnsureCLIObjectMutationVisibleForProvider(flushCtx, proc.Storage(), proc.ProjectRoot(), affectedKinds); err != nil {
-				logging.FluentEvent(proc.Logger()).Warn("park: durability flush after status write").
-					WithError(err).
-					String("kinds", strings.Join(affectedKinds, ",")).
-					Log()
-			}
-			logSlowCLIObjectMutationFlush(proc.Logger(), "park", "", affectedKinds, time.Since(t0), 0)
-			proc.TriggerCacheFreshnessCheck("park", affectedKinds)
-		}
+		flushObjectMutationVisibility(proc, "park", flushTracker.kinds())
 
 		return cli.FormatOutput(cmd, map[string]any{
 			"parked":                parked,

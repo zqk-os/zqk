@@ -8,11 +8,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
-	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/zqk-os/zqk/pkg/metrics"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // NewEDDCmd creates a command to get Effort Distribution Discrepancy
@@ -50,52 +46,13 @@ func NewEDDCmd() *cobra.Command {
 		},
 	})
 
-	helpBuilder.ApplyToCommand(cmd)
-	cli.BindAsyncProgress(cmd, runEDD)
-	cmd.Flags().Bool("include-commit-data", false, "Explicitly include Git commit data (auto-detected by default)")
-	cli.AddCommonFlags(cmd)
-
-	return cmd
+	return bindReportCommand(cmd, helpBuilder, runEDD)
 }
 
 func runEDD(cmd *cobra.Command, args []string) error {
-	ctx := cli.GetContext(cmd)
-	if ctx == nil {
-		return errfmt.Errorf("failed to get context")
-	}
-
-	projectRoot := ctx.ProjectRoot
-	if projectRoot == emptyValue {
-		projectRoot = cli.ResolveProjectRoot(".")
-		if projectRoot == emptyValue {
-			return errfmt.Errorf("project root not found")
-		}
-	}
-
-	// Get storage provider
-	storageFactory, err := storage.NewStorageFactory(cmd.Context(), projectRoot)
+	projectMetrics, err := calculateReportMetrics(cmd, "EDD")
 	if err != nil {
-		return errfmt.Newf("failed to initialize storage").Wrap(err)
-	}
-	storageProvider := storageFactory.GetStorage()
-
-	// Create security context
-	secCtx := pkgctx.NewSystemSecurityContext()
-
-	// Get include commit data flag
-	//nolint:errcheck // Flag get - error indicates flag not set, default used
-	includeCommitData, _ := cmd.Flags().GetBool("include-commit-data")
-
-	// Calculate metrics
-	projectMetrics, err := metrics.CalculateProjectMetrics(
-		pkgctx.NewSystemContext(),
-		storageProvider,
-		secCtx,
-		"default", // projectID - could be enhanced to accept as flag
-		includeCommitData,
-	)
-	if err != nil {
-		return errfmt.Newf("failed to calculate EDD").Wrap(err)
+		return err
 	}
 
 	result := map[string]any{

@@ -26,11 +26,7 @@ func NewInternalCreateCmd() *cobra.Command {
 		Args: cobra.ExactArgs(1),
 	}
 
-	// Apply help builder to command
-	helpBuilder.ApplyToCommand(cmd)
-
 	cli.BindAsyncProgress(cmd, runInternalCreate)
-	cli.AddCommonFlags(cmd)
 	cmd.Flags().String("file", "", "Path to YAML file containing object data (required)")
 	cmd.Flags().String("data", "", "Inline YAML data for the object")
 	cmd.Flags().Bool("dry-run", false, "Show what would be created without actually creating it")
@@ -38,7 +34,7 @@ func NewInternalCreateCmd() *cobra.Command {
 	ensureCmdAnnotations(cmd)
 	cmd.Annotations[AnnotationKindValidate] = KindValidatePositional0
 
-	return cmd
+	return cli.FinalizeCommand(cmd, helpBuilder)
 }
 
 func runInternalCreate(cmd *cobra.Command, args []string) error {

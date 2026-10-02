@@ -225,6 +225,8 @@ func superviseStatusPayload(tcpAddr, port, supPidFile string) map[string]any {
 // killPIDBestEffort signals Kill to a pid if the process can be found.
 func killPIDBestEffort(pid int) {
 	if p, err := os.FindProcess(pid); err == nil {
-		_ = p.Kill()
+		if killErr := p.Kill(); killErr != nil {
+			return
+		}
 	}
 }

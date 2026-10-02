@@ -24,33 +24,22 @@ func linkOrCopyYAML(sourcePath, targetPath string) error {
 func copyYAMLFilesFromProject(testRoot, projectRoot, relDir string) error {
 	sourceDir := filepath.Join(projectRoot, relDir)
 	targetDir := filepath.Join(testRoot, relDir)
-	if _, err := fileutil.Stat(sourceDir); fileutil.IsNotExist(err) {
-		return nil
+	return copyYAMLFiles(sourceDir, targetDir)
+}
+
+func copyPackSubdirYAML(testRoot, projectRoot, packSubdir, internalTargetBase string) {
+	packsDir := filepath.Join(projectRoot, "packs")
+	entries, err := fileutil.ReadDir(packsDir)
+	if err != nil {
+		return
 	}
-	return filepath.Walk(sourceDir, func(path string, info fileutil.FileInfo, err error) error {
-		if err != nil {
-			if fileutil.IsNotExist(err) {
-				return nil
-			}
-			return err
+	for _, entry := range entries {
+		if entry.IsDir() {
+			packDir := filepath.Join(packsDir, entry.Name(), packSubdir)
+			targetDir := filepath.Join(testRoot, internalTargetBase, entry.Name())
+			_ = copyYAMLFiles(packDir, targetDir)
 		}
-		if info.IsDir() {
-			return nil
-		}
-		ext := filepath.Ext(path)
-		if ext != ".yaml" && ext != ".yml" {
-			return nil
-		}
-		rel, err := filepath.Rel(sourceDir, path)
-		if err != nil {
-			return err
-		}
-		targetPath := filepath.Join(targetDir, rel)
-		if err := fileutil.EnsureDir(filepath.Dir(targetPath)); err != nil {
-			return err
-		}
-		return linkOrCopyYAML(path, targetPath)
-	})
+	}
 }
 
 // CopyObjectSpecsFromProject copies YAML object specs from projectRoot into testRoot
@@ -59,16 +48,7 @@ func CopyObjectSpecsFromProject(testRoot, projectRoot string) error {
 	if err := copyYAMLFilesFromProject(testRoot, projectRoot, paths.ProcessInternalObjectSpecsDir); err != nil {
 		return err
 	}
-	packsDir := filepath.Join(projectRoot, "packs")
-	if entries, err := fileutil.ReadDir(packsDir); err == nil {
-		for _, entry := range entries {
-			if entry.IsDir() {
-				packSpecsDir := filepath.Join(packsDir, entry.Name(), "specs")
-				targetDir := filepath.Join(testRoot, paths.ProcessInternalObjectSpecsDir, entry.Name())
-				_ = copyYAMLFiles(packSpecsDir, targetDir)
-			}
-		}
-	}
+	copyPackSubdirYAML(testRoot, projectRoot, "specs", paths.ProcessInternalObjectSpecsDir)
 	return nil
 }
 
@@ -79,16 +59,7 @@ func CopyLifecyclesFromProject(testRoot, projectRoot string) error {
 	if err := copyYAMLFilesFromProject(testRoot, projectRoot, paths.ProcessInternalLifecyclesDir); err != nil {
 		return err
 	}
-	packsDir := filepath.Join(projectRoot, "packs")
-	if entries, err := fileutil.ReadDir(packsDir); err == nil {
-		for _, entry := range entries {
-			if entry.IsDir() {
-				packLifecyclesDir := filepath.Join(packsDir, entry.Name(), "lifecycles")
-				targetDir := filepath.Join(testRoot, paths.ProcessInternalLifecyclesDir, entry.Name())
-				_ = copyYAMLFiles(packLifecyclesDir, targetDir)
-			}
-		}
-	}
+	copyPackSubdirYAML(testRoot, projectRoot, "lifecycles", paths.ProcessInternalLifecyclesDir)
 	return nil
 }
 

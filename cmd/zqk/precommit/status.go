@@ -22,16 +22,13 @@ func NewStatusCmd() *cobra.Command {
 }
 
 func runPreCommitStatus(cmd *cobra.Command, _ []string) error {
-	projectRoot, _ := cmd.Flags().GetString("project-root")
-	if projectRoot == emptyValue {
-		projectRoot = cli.ResolveProjectRoot(".")
-	}
-	if projectRoot == emptyValue {
-		return errfmt.Errorf("project root not found; run from repo or pass --project-root")
+	projectRoot, err := resolvePreCommitProjectRoot(cmd)
+	if err != nil {
+		return err
 	}
 
 	path := precommit.AggregatedPath(projectRoot)
-	_, err := fileutil.Stat(path)
+	_, err = fileutil.Stat(path)
 	if err != nil {
 		if fileutil.IsNotExist(err) {
 			return printStatusMissing(cmd, projectRoot)

@@ -92,7 +92,10 @@ func resolveStewardDaemon(proc *cli.Processor) (*steward.Daemon, string, error) 
 func newStewardDaemonCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewKernelStewardDaemonCommandBuilder()
 	cmd.RunE = cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-		intervalSec, _ := cmd.Flags().GetInt("interval")
+		intervalSec, err := cmd.Flags().GetInt("interval")
+		if err != nil {
+			intervalSec = 30
+		}
 		daemon, projectRoot, err := resolveStewardDaemon(proc)
 		if err != nil {
 			return err
@@ -102,8 +105,7 @@ func newStewardDaemonCmd() *cobra.Command {
 		if err != nil {
 			var alreadyRunning *singleton.ErrDaemonAlreadyRunning
 			if errors.As(err, &alreadyRunning) {
-				_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("Kernel steward daemon is already running for %s (PID: %d). Existing instance retained.\n", projectRoot, alreadyRunning.PID)))
-				return nil
+				return cli.WriteOutput(cmd, []byte(fmt.Sprintf("Kernel steward daemon is already running for %s (PID: %d). Existing instance retained.\n", projectRoot, alreadyRunning.PID)))
 			}
 			return err
 		}

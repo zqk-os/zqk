@@ -2,10 +2,15 @@ package precommit
 
 import (
 	"github.com/spf13/cobra"
+	cli "github.com/zqk-os/zqk/pkg/cliapp"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
+
+const emptyValue = ""
 
 // NewPreCommitCmd creates the pre-commit command group (aggregate, write-result, status).
 // Used by background jobs and the git hook; see docs/architecture/PRE_COMMIT_BACKGROUND_RESULTS.md.
@@ -37,4 +42,26 @@ func NewPreCommitCmd() *cobra.Command {
 	cmd.AddCommand(NewIntegrityReportCmd())
 
 	return cmd
+}
+
+func resolvePreCommitProjectRoot(cmd *cobra.Command) (string, error) {
+	projectRoot, _ := cmd.Flags().GetString("project-root")
+	if projectRoot == "" {
+		projectRoot = cli.ResolveProjectRoot(".")
+	}
+	if projectRoot == "" {
+		return "", errfmt.Errorf("project root not found; run from repo or pass --project-root")
+	}
+	return projectRoot, nil
+}
+
+func outputPreCommitReportFile(cmd *cobra.Command, path, missingMsg, readErrDesc string) error {
+	data, err := fileutil.ReadFile(path)
+	if err != nil {
+		if fileutil.IsNotExist(err) {
+			return cli.WriteOutput(cmd, []byte(missingMsg))
+		}
+		return errfmt.Newf("%s", readErrDesc).Wrap(err)
+	}
+	return cli.WriteOutput(cmd, data)
 }

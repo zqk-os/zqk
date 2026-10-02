@@ -129,7 +129,7 @@ func NewProcessor(cmd *cobra.Command) (*Processor, error) {
 		storageProvider = p.(storage.ObjectStorageProvider)
 	} else {
 		var err error
-		storageProvider, err = storage.GetGlobalStorageProviderCache().GetOrCreate(cmd.Context(), projectRoot)
+		storageProvider, err = storage.GetGlobalStorageProviderCache().GetOrCreate(stdcontext.Background(), projectRoot)
 		if err != nil {
 			return nil, errfmt.Newf("failed to get storage").Wrap(err)
 		}
@@ -844,6 +844,11 @@ func (p *Processor) Close() error {
 	ctx, cancel := stdcontext.WithTimeout(stdcontext.Background(), 5*time.Second)
 	defer cancel()
 	return filecas.DrainDarwinSyncQueueContext(ctx)
+}
+
+// StorageTuple returns the operation context, security context, and storage provider.
+func (p *Processor) StorageTuple() (stdcontext.Context, *pkgctx.SecurityContext, storage.ObjectStorageProvider) {
+	return p.OperationContext(), p.SecurityContext(), p.Storage()
 }
 
 // WithProcessor wraps a cobra RunE function to automatically initialize and inject a Processor.

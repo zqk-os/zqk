@@ -120,6 +120,14 @@ func FinalizeCommand(cmd *cobra.Command, help CommandHelpApplicator) *cobra.Comm
 	return cmd
 }
 
+// FinalizeBareCommand applies help without injecting default common flags.
+func FinalizeBareCommand(cmd *cobra.Command, help CommandHelpApplicator) *cobra.Command {
+	if help != nil {
+		help.ApplyToCommand(cmd)
+	}
+	return cmd
+}
+
 // Common flag names used for exclusion (must match AddCommonFlags).
 const (
 	FlagTimeout             = "timeout"
@@ -570,8 +578,8 @@ func CreateContextWithLoggingProfile(ctx context.Context, profile string) contex
 // ReadRequiredFileFlag reads the content of a file specified by a flag.
 // It returns an error if the flag is missing, empty, or the file cannot be read.
 func ReadRequiredFileFlag(cmd *cobra.Command, flagName string) ([]byte, error) {
-	filePath, _ := cmd.Flags().GetString(flagName)
-	if filePath == "" {
+	filePath, err := cmd.Flags().GetString(flagName)
+	if err != nil || filePath == "" {
 		return nil, errfmt.Errorf("--%s is required", flagName)
 	}
 	data, err := fileutil.ReadFile(filePath)

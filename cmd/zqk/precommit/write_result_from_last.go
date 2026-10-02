@@ -2,7 +2,6 @@ package precommit
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/precommit"
@@ -18,12 +17,9 @@ func NewWriteResultFromLastCmd() *cobra.Command {
 }
 
 func runWriteResultFromLast(cmd *cobra.Command, _ []string) error {
-	projectRoot, _ := cmd.Flags().GetString("project-root")
-	if projectRoot == emptyValue {
-		projectRoot = cli.ResolveProjectRoot(".")
-	}
-	if projectRoot == emptyValue {
-		return errfmt.Errorf("project root not found; run from repo or pass --project-root")
+	projectRoot, err := resolvePreCommitProjectRoot(cmd)
+	if err != nil {
+		return err
 	}
 	category, _ := cmd.Flags().GetString("category")
 	if category == emptyValue {

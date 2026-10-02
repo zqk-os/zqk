@@ -25,4 +25,5 @@ const (
 const (
 	quickPriorityP0 = "P0"
 	quickFormatJSON = "json"
+	emptyValue      = ""
 )

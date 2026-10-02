@@ -33,9 +33,7 @@ func runAgentNew(cmd *cobra.Command, personaName, description string) error {
 		return err
 	}
 
-	ctx := proc.OperationContext()
-	secCtx := proc.SecurityContext()
-	sp := proc.Storage()
+	ctx, secCtx, sp := proc.StorageTuple()
 
 	tx, err := sp.BeginTransaction(ctx)
 	if err != nil {

@@ -9,7 +9,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/zqk-os/zqk/pkg/federation"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
@@ -29,8 +28,7 @@ func runLease(cmd *cobra.Command, args []string) error {
 		duration, _ := time.ParseDuration(durationStr)
 
 		// Resolve local identity
-		idManager := federation.NewIdentityManager(proc.ProjectRoot())
-		kernelID, err := idManager.GetKernelID()
+		kernelID, err := resolveLocalKernelID(proc.ProjectRoot())
 		if err != nil {
 			return err
 		}

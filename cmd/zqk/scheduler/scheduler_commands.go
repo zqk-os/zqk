@@ -158,7 +158,7 @@ func NewIssuesCmd() *cobra.Command {
 	return issuesCmd
 }
 
-func runIssues(cmd *cobra.Command, args []string) error {
+func resolveSchedulerProjectRoot(cmd *cobra.Command) (string, error) {
 	projectRoot := cli.ResolveProjectRoot(".")
 	if projectRoot == emptyValue {
 		if ctx := cli.GetContext(cmd); ctx != nil && ctx.ProjectRoot != emptyValue {
@@ -166,7 +166,15 @@ func runIssues(cmd *cobra.Command, args []string) error {
 		}
 	}
 	if projectRoot == emptyValue {
-		return errfmt.Errorf("project root is required (run from project directory or set ZQK_PROJECT_ROOT)")
+		return "", errfmt.Errorf("project root is required (run from project directory or set ZQK_PROJECT_ROOT)")
+	}
+	return projectRoot, nil
+}
+
+func runIssues(cmd *cobra.Command, args []string) error {
+	projectRoot, err := resolveSchedulerProjectRoot(cmd)
+	if err != nil {
+		return err
 	}
 	payload, err := schedulerpkg.ReadIssues(projectRoot)
 	if err != nil {
@@ -202,14 +210,9 @@ func NewClearIssuesCmd() *cobra.Command {
 func runClearIssues(cmd *cobra.Command, args []string) error {
 	// Prefer CWD-based project root so "run from repo" always clears this repo's issues file.
 	// Context may have a different project_root from config (e.g. another scenario); clear-issues should act on where the user is.
-	projectRoot := cli.ResolveProjectRoot(".")
-	if projectRoot == emptyValue {
-		if ctx := cli.GetContext(cmd); ctx != nil && ctx.ProjectRoot != emptyValue {
-			projectRoot = ctx.ProjectRoot
-		}
-	}
-	if projectRoot == emptyValue {
-		return errfmt.Errorf("project root is required (run from project directory or set ZQK_PROJECT_ROOT)")
+	projectRoot, err := resolveSchedulerProjectRoot(cmd)
+	if err != nil {
+		return err
 	}
 	writtenPath, err := schedulerpkg.ClearIssues(projectRoot)
 	if err != nil {

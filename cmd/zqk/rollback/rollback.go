@@ -1,6 +1,7 @@
 package rollback
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"time"
@@ -16,6 +17,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/rollback"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 const emptyValue = ""
@@ -72,20 +74,28 @@ func newApplyCmd() *cobra.Command {
 	return cmd
 }
 
-func runApply(cmd *cobra.Command, args []string) error {
+func resolveRollbackStorageAndContext(cmd *cobra.Command) (string, storage.ObjectStorageProvider, context.Context, error) {
 	projectRoot := cli.ResolveProjectRoot(".")
 	if projectRoot == emptyValue {
-		return errfmt.Errorf("not a ZQK project (no project root found)")
+		return "", nil, nil, errfmt.Errorf("not a ZQK project (no project root found)")
 	}
-	pointID := args[0]
 	provider, err := cli.GetObjectStorageForCommand(cmd, projectRoot)
 	if err != nil {
-		return errfmt.Newf("storage").Wrap(err)
+		return "", nil, nil, errfmt.Newf("storage").Wrap(err)
 	}
 	ctx := cmd.Context()
 	if ctx == nil {
 		ctx = pkgctx.NewSystemContext()
 	}
+	return projectRoot, provider, ctx, nil
+}
+
+func runApply(cmd *cobra.Command, args []string) error {
+	projectRoot, provider, ctx, err := resolveRollbackStorageAndContext(cmd)
+	if err != nil {
+		return err
+	}
+	pointID := args[0]
 	if err := rollback.Apply(ctx, projectRoot, pointID, provider); err != nil {
 		if strings.Contains(err.Error(), "not found") {
 			return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("%v (if pruned, use: zqk rollback reconstruct --scope-id <kind:id:toStatus> --timestamp <RFC3339>)", err)))
@@ -106,10 +116,6 @@ func newReconstructCmd() *cobra.Command {
 }
 
 func runReconstruct(cmd *cobra.Command, _ []string) error {
-	projectRoot := cli.ResolveProjectRoot(".")
-	if projectRoot == emptyValue {
-		return errfmt.Errorf("not a ZQK project (no project root found)")
-	}
 	scopeType, _ := cmd.Flags().GetString("scope-type")
 	scopeID, _ := cmd.Flags().GetString("scope-id")
 	timestampStr, _ := cmd.Flags().GetString("timestamp")
@@ -120,13 +126,9 @@ func runReconstruct(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return errfmt.Newf("invalid --timestamp (use RFC3339)").Wrap(err)
 	}
-	provider, err := cli.GetObjectStorageForCommand(cmd, projectRoot)
+	projectRoot, provider, ctx, err := resolveRollbackStorageAndContext(cmd)
 	if err != nil {
-		return errfmt.Newf("storage").Wrap(err)
-	}
-	ctx := cmd.Context()
-	if ctx == nil {
-		ctx = pkgctx.NewSystemContext()
+		return err
 	}
 	refs := lifecycle.RecomputeRefsFromScope(ctx, scopeType, scopeID, provider)
 	if len(refs) == 0 {

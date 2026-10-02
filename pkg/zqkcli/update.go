@@ -33,18 +33,14 @@ func NewInternalUpdateCmd() *cobra.Command {
 		Args: cobra.ExactArgs(1),
 	}
 
-	// Apply help builder to command
-	helpBuilder.ApplyToCommand(cmd)
-
 	cli.BindAsyncProgress(cmd, runInternalUpdate)
-	cli.AddCommonFlags(cmd)
 	cmd.Flags().String("file", "", "Path to YAML file containing update data")
 	cmd.Flags().String("data", "", "Inline YAML data for updates")
 	cmd.Flags().StringArray("field", []string{}, "Update a field (field=value). Parses as JSON when valid, else literal string. Repeatable.")
 	cmd.Flags().Bool("auto-status", false, "Advance status to the next lifecycle-valid status for this object kind")
 	cmd.Flags().Bool("dry-run", false, "Show what would be updated without actually updating")
 
-	return cmd
+	return cli.FinalizeCommand(cmd, helpBuilder)
 }
 
 func runInternalUpdate(cmd *cobra.Command, args []string) error {

@@ -30,19 +30,14 @@ func NewFileLockMetricsCmd() *cobra.Command {
 		AddExample("Flush with custom time window", "%s system metrics file-lock flush --window 1h").
 		ExcludeCommonFlags()
 
-	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewSystemFileLockCommandBuilder(
-
-	// Apply help builder to command
-	), &cobra.Command{
+	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewSystemFileLockCommandBuilder(), &cobra.Command{
 		Use: "file-lock",
 	})
-
-	helpBuilder.ApplyToCommand(cmd)
 
 	cmd.AddCommand(NewFileLockMetricsViewCmd())
 	cmd.AddCommand(NewFileLockMetricsFlushCmd())
 
-	return cmd
+	return cli.FinalizeBareCommand(cmd, helpBuilder)
 }
 
 // NewFileLockMetricsViewCmd creates a command to view buffered metrics
@@ -80,12 +75,8 @@ func NewFileLockMetricsFlushCmd() *cobra.Command {
 		RunE: runFileLockMetricsFlush,
 	})
 
-	// Apply help builder to command
-	helpBuilder.ApplyToCommand(cmd)
-
 	cmd.Flags().String("window", "", "Time window for metrics (e.g., '1h', '6h', '24h'). Defaults to since last flush or 1 hour.")
-	cli.AddCommonFlags(cmd)
-	return cmd
+	return cli.FinalizeCommand(cmd, helpBuilder)
 }
 
 func runFileLockMetricsView(cmd *cobra.Command, args []string) error {
