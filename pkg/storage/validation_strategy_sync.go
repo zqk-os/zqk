@@ -27,42 +27,40 @@ func NewSyncValidationStrategy() *SyncValidationStrategy {
 	}
 }
 
-// ValidateMappings checks each mapping synchronously by verifying the hash file exists.
-// Returns only mappings where the corresponding hash file exists on disk.
-func (s *SyncValidationStrategy) ValidateMappings(kindDir string, mappings map[string]string, bucketKeys map[string]string) (validMappings map[string]string, validBucketKeys map[string]string, staleCount int) {
+func validateMappingsSynchronously(kindDir string, mappings map[string]string, bucketKeys map[string]string) (validMappings map[string]string, validBucketKeys map[string]string, staleCount int) {
 	if len(mappings) == 0 {
 		return mappings, bucketKeys, 0
 	}
 
-	// Pre-allocate with same capacity (most entries are usually valid)
 	validMappings = make(map[string]string, len(mappings))
 	if bucketKeys != nil {
 		validBucketKeys = make(map[string]string, len(bucketKeys))
 	}
 
 	for objectID, hash := range mappings {
-		// Determine file path: check bucket directory first if bucketKey exists
 		var bucketKey string
 		if bucketKeys != nil {
 			bucketKey = bucketKeys[objectID]
 		}
 
 		hashFile := buildHashFilePath(kindDir, hash, bucketKey)
-
-		// Check if file exists
 		if _, err := fileutil.Stat(hashFile); err == nil {
-			// File exists - keep this mapping
 			validMappings[objectID] = hash
 			if bucketKeys != nil && bucketKey != emptyValue {
 				validBucketKeys[objectID] = bucketKey
 			}
 		} else {
-			// File doesn't exist - this is a stale entry
 			staleCount++
 		}
 	}
 
 	return validMappings, validBucketKeys, staleCount
+}
+
+// ValidateMappings checks each mapping synchronously by verifying the hash file exists.
+// Returns only mappings where the corresponding hash file exists on disk.
+func (s *SyncValidationStrategy) ValidateMappings(kindDir string, mappings map[string]string, bucketKeys map[string]string) (validMappings map[string]string, validBucketKeys map[string]string, staleCount int) {
+	return validateMappingsSynchronously(kindDir, mappings, bucketKeys)
 }
 
 // Start is a no-op for sync strategy (no background operations).

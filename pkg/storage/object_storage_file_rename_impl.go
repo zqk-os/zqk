@@ -18,14 +18,9 @@ func (f *FileObjectStorage) Rename(ctx context.Context, secCtx *pkgctx.SecurityC
 		return errfmt.Errorf(ConstStreamRenameOperationsMustBePerformedThroughCli)
 	}
 
-	existing, err := f.Read(ctx, secCtx, oldID)
+	_, kind, err := readExistingKind(f, ctx, secCtx, oldID)
 	if err != nil {
 		return err
-	}
-
-	kind, ok := existing[objects.FieldKeyKind].(string)
-	if !ok {
-		return errfmt.Errorf(ConstStreamObjectMissingKindField2)
 	}
 
 	if newID == oldID {

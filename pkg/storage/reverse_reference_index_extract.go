@@ -19,8 +19,7 @@ func extractReferenceIDsFromObject(obj map[string]any) []string {
 	if obj == nil {
 		return nil
 	}
-	yamlParser := parser.NewYAMLParser()
-	refFields := yamlParser.ExtractReferenceFields(obj)
+	refFields := parser.NewYAMLParser().ExtractReferenceFields(obj)
 	// Attribution / keystore identity fields (not *_ref suffix) — TRACK
 	for _, fieldName := range []string{objects.FieldKeyCreatedBy, objects.FieldKeyUpdatedBy, objects.FieldKeyAccountID} {
 		if v, ok := obj[fieldName]; ok && v != nil {

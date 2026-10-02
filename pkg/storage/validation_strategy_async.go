@@ -187,29 +187,7 @@ func (s *AsyncCacheValidationStrategy) hashExistsInCache(cache *fileExistenceCac
 
 // validateSync performs synchronous validation as a fallback.
 func (s *AsyncCacheValidationStrategy) validateSync(kindDir string, mappings map[string]string, bucketKeys map[string]string) (validMappings map[string]string, validBucketKeys map[string]string, staleCount int) {
-	validMappings = make(map[string]string, len(mappings))
-	if bucketKeys != nil {
-		validBucketKeys = make(map[string]string, len(bucketKeys))
-	}
-
-	for objectID, hash := range mappings {
-		var bucketKey string
-		if bucketKeys != nil {
-			bucketKey = bucketKeys[objectID]
-		}
-
-		hashFile := buildHashFilePath(kindDir, hash, bucketKey)
-		if _, err := fileutil.Stat(hashFile); err == nil {
-			validMappings[objectID] = hash
-			if bucketKeys != nil && bucketKey != emptyValue {
-				validBucketKeys[objectID] = bucketKey
-			}
-		} else {
-			staleCount++
-		}
-	}
-
-	return validMappings, validBucketKeys, staleCount
+	return validateMappingsSynchronously(kindDir, mappings, bucketKeys)
 }
 
 // Start begins the background scanner goroutine.

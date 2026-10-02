@@ -2,12 +2,10 @@
 package storage
 
 import (
-	stdcontext "context"
 	"encoding/json"
 	"path/filepath"
 	"time"
 
-	"github.com/zqk-os/zqk/pkg/concurrency"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
@@ -24,12 +22,12 @@ func (c *HighVolumeEventCache) LoadCache(projectRoot string) (bool, error) {
 	cachePath := c.getCacheFilePath(projectRoot)
 	c.cacheDir = filepath.Dir(cachePath)
 
-	data, err := fileutil.ReadFile(cachePath)
-	if fileutil.IsNotExist(err) {
-		return false, nil
-	}
+	data, err := readOptionalCacheFile(cachePath)
 	if err != nil {
-		return false, errfmt.Newf(ConstMiscFailedToReadCacheFile).Wrap(err)
+		return false, err
+	}
+	if data == nil {
+		return false, nil
 	}
 
 	// Parse cache file (v1: entries; v2: buckets)
@@ -55,12 +53,7 @@ func (c *HighVolumeEventCache) LoadCache(projectRoot string) (bool, error) {
 		return false, nil
 	}
 
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	var err_swallow_16 = concurrency.WithLockTimeout(
-		&c.mu,
-		pkgctx.NewSystemContext(),
-		nil,
-		logging.NewLockLoggerAdapter(logger),
+	var err_swallow_16 = c.withWriteLock(
 		locknames.LockNameHighVolumeCacheLoad,
 		func() error {
 			when.When(func() bool { return version == "2.0" && len(cacheData.Buckets) > 0 }).Then(func() {
@@ -83,7 +76,7 @@ func (c *HighVolumeEventCache) LoadCache(projectRoot string) (bool, error) {
 		logging.LogSwallowedError(err_swallow_16)
 	}
 
-	StorageLog(logger).Debug(LogEventStorageHighVolumeCacheLoadedDebug).
+	StorageLog(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Debug(LogEventStorageHighVolumeCacheLoadedDebug).
 		EntryCount(len(c.cache)).
 		ProjectRoot(projectRoot).
 		Log()
@@ -152,24 +145,15 @@ func (c *HighVolumeEventCache) bucketsFromCache() highVolumeEventCacheV2Buckets 
 // Follows established pattern: minimize lock hold time, especially during I/O
 // Pattern: RLock to read count → I/O operations → Lock to prepare data → I/O operations
 func (c *HighVolumeEventCache) SaveCache(projectRoot string) error {
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	var entryCount int
-	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
-	defer cancel()
-	var err_swallow_17 = concurrency.WithRLockTimeout(
-		&c.mu,
-		ctx,
-		nil,
-		logging.NewLockLoggerAdapter(logger),
+	var err_swallow_17 = c.withReadLock(
 		locknames.LockNameHighVolumeCacheSaveGetCount,
 		func() error {
 			entryCount = len(c.cache)
 			return nil
 		},
 	)
-	if err_swallow_17 !=
-
-		nil {
+	if err_swallow_17 != nil {
 		logging.LogSwallowedError(err_swallow_17)
 	}
 
@@ -184,13 +168,7 @@ func (c *HighVolumeEventCache) SaveCache(projectRoot string) error {
 		Metadata *HighVolumeEventCacheMetadata `json:"metadata"`
 		Buckets  highVolumeEventCacheV2Buckets `json:"buckets"`
 	}
-	ctx2, cancel2 := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
-	defer cancel2()
-	var err_swallow_18 = concurrency.WithLockTimeout(
-		&c.mu,
-		ctx2,
-		nil,
-		logging.NewLockLoggerAdapter(logger),
+	var err_swallow_18 = c.withWriteLock(
 		locknames.LockNameHighVolumeCacheSavePrepare,
 		func() error {
 			when.When(func() bool { return c.metadata == nil }).Then(func() {
@@ -204,16 +182,13 @@ func (c *HighVolumeEventCache) SaveCache(projectRoot string) error {
 				c.metadata.Version = highVolumeEventCacheVersion
 				c.metadata.BuildTime = time.Now().UTC()
 				c.metadata.EntryCount = entryCount
-
 			}).Run()
 			cacheData.Metadata = c.metadata
 			cacheData.Buckets = c.bucketsFromCache()
 			return nil
 		},
 	)
-	if err_swallow_18 !=
-
-		nil {
+	if err_swallow_18 != nil {
 		logging.LogSwallowedError(err_swallow_18)
 	}
 

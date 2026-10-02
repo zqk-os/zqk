@@ -82,9 +82,8 @@ func GCOrphanedStreamSegmentsForKind(projectRoot, kind string) GCStreamSegmentRe
 
 	// Hold the stream kind mutex while deleting so concurrent appends cannot race against us
 	// (the write path holds this same mutex when appending to a segment file).
-	mu := streamMutexForKind(kind)
-	mu.Lock()
-	defer mu.Unlock()
+	streamMutexForKind(kind).Lock()
+	defer streamMutexForKind(kind).Unlock()
 
 	for _, e := range entries {
 		if e.IsDir() {

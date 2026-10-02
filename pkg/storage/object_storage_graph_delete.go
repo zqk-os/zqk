@@ -23,13 +23,9 @@ func (g *GraphObjectStorage) Delete(ctx context.Context, secCtx *pkgctx.Security
 	if !IsCLIOperation(ctx, secCtx) {
 		return errfmt.Errorf(ConstStreamDeleteOperationsMustBePerformedThroughCli)
 	}
-	existing, err := g.Read(ctx, secCtx, id)
+	_, kind, err := readExistingKind(g, ctx, secCtx, id)
 	if err != nil {
 		return err
-	}
-	kind, ok := existing[objects.FieldKeyKind].(string)
-	if !ok {
-		return errfmt.Errorf(ConstStreamObjectMissingKindField2)
 	}
 	return kernelcas.RunErase(ctx, nil, &kernelcas.Mutation{
 		Kind:       kind,
@@ -54,14 +50,9 @@ func (g *GraphObjectStorage) deleteImpl(ctx context.Context, secCtx *pkgctx.Secu
 	}
 
 	// Read existing object to get kind
-	existing, err := g.Read(ctx, secCtx, id)
+	_, kind, err := readExistingKind(g, ctx, secCtx, id)
 	if err != nil {
 		return err
-	}
-
-	kind, ok := existing[objects.FieldKeyKind].(string)
-	if !ok {
-		return errfmt.Errorf(ConstStreamObjectMissingKindField2)
 	}
 
 	// Check permission (requires explicit delete permission)

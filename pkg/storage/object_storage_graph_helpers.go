@@ -16,23 +16,24 @@ import (
 )
 
 // toLabel converts a snake_case kind to PascalCase label
-// e.g., "backlog_item" -> "BacklogItem"
-// Returns empty string if the kind contains invalid characters to prevent Cypher injection.
 func toLabel(kind string) string {
-	parts := strings.Split(kind, "_")
-	var labelParts []string
-	for _, part := range parts {
-		if part != emptyValue {
-			labelParts = append(labelParts, strings.ToUpper(part[:1])+strings.ToLower(part[1:]))
-		}
+	return provider.ToLabel(kind)
+}
+
+type objectReader interface {
+	Read(ctx context.Context, secCtx *pkgctx.SecurityContext, id string) (map[string]any, error)
+}
+
+func readExistingKind(reader objectReader, ctx context.Context, secCtx *pkgctx.SecurityContext, id string) (map[string]any, string, error) {
+	existing, err := reader.Read(ctx, secCtx, id)
+	if err != nil {
+		return nil, "", err
 	}
-	label := strings.Join(labelParts, "")
-	for _, r := range label {
-		if !(r >= 'a' && r <= 'z') && !(r >= 'A' && r <= 'Z') && !(r >= '0' && r <= '9') {
-			return "" // Reject unsafe label
-		}
+	kind, ok := existing[objects.FieldKeyKind].(string)
+	if !ok {
+		return nil, "", errfmt.Errorf(ConstStreamObjectMissingKindField2)
 	}
-	return label
+	return existing, kind, nil
 }
 
 // buildCypherCondition builds a Cypher condition for a filter operator

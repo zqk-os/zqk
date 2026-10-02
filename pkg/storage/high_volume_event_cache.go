@@ -1,6 +1,7 @@
 package storage
 
 import (
+	stdcontext "context"
 	"path/filepath"
 	"sort"
 	"sync"
@@ -16,6 +17,12 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage/locknames"
 )
+
+func timeoutContextWithLogger(timeout time.Duration) (stdcontext.Context, stdcontext.CancelFunc, logging.Logger) {
+	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), timeout)
+	return ctx, cancel, logger
+}
 
 const (
 	highVolumeEventCacheFile    = "high-volume-events-cache.json"
@@ -277,16 +284,39 @@ func (c *HighVolumeEventCache) removeEntryFromByTime(id string) {
 
 // Step 4: I/O operations WITHOUT lock (JSON marshaling and file write)
 
-// Get retrieves a cache entry by ID
-func (c *HighVolumeEventCache) Get(id string) (*HighVolumeEventCacheEntry, bool) {
+func (c *HighVolumeEventCache) withReadLock(lockName string, op func() error) error {
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	var entry *HighVolumeEventCacheEntry
-	var exists bool
-	var err_swallow_19 = concurrency.WithRLockTimeout(
+	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
+	defer cancel()
+	return concurrency.WithRLockTimeout(
 		&c.mu,
-		pkgctx.NewSystemContext(),
+		ctx,
 		nil,
 		logging.NewLockLoggerAdapter(logger),
+		lockName,
+		op,
+	)
+}
+
+func (c *HighVolumeEventCache) withWriteLock(lockName string, op func() error) error {
+	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+	ctx, cancel := stdcontext.WithTimeout(pkgctx.NewSystemContext(), 5*time.Second)
+	defer cancel()
+	return concurrency.WithLockTimeout(
+		&c.mu,
+		ctx,
+		nil,
+		logging.NewLockLoggerAdapter(logger),
+		lockName,
+		op,
+	)
+}
+
+// Get retrieves a cache entry by ID
+func (c *HighVolumeEventCache) Get(id string) (*HighVolumeEventCacheEntry, bool) {
+	var entry *HighVolumeEventCacheEntry
+	var exists bool
+	var err_swallow_19 = c.withReadLock(
 		locknames.LockNameHighVolumeCacheGet,
 		func() error {
 			var ok bool
@@ -296,22 +326,13 @@ func (c *HighVolumeEventCache) Get(id string) (*HighVolumeEventCacheEntry, bool)
 		},
 	)
 	if err_swallow_19 != nil {
-		logging.
-
-			// Set stores a cache entry. Uses incremental byTime update (insert in order) to avoid
-			// full rebuild on every create, which caused high allocation and GC pressure at 500k entries (SCHEDULER_MEMORY_AND_HANG_ANALYSIS).
-			LogSwallowedError(err_swallow_19)
+		logging.LogSwallowedError(err_swallow_19)
 	}
 	return entry, exists
 }
 
 func (c *HighVolumeEventCache) Set(entry *HighVolumeEventCacheEntry) {
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	var err_swallow_20 = concurrency.WithLockTimeout(
-		&c.mu,
-		pkgctx.NewSystemContext(),
-		nil,
-		logging.NewLockLoggerAdapter(logger),
+	var err_swallow_20 = c.withWriteLock(
 		locknames.LockNameHighVolumeCacheSet,
 		func() error {
 			if existing := c.cache[entry.ID]; existing != nil {
@@ -323,35 +344,21 @@ func (c *HighVolumeEventCache) Set(entry *HighVolumeEventCacheEntry) {
 			return nil
 		},
 	)
-	if err_swallow_20 !=
-
-		// Invalidate removes an entry from the cache. Uses incremental byTime update (remove one element)
-		// to avoid full rebuild on every delete.
-		nil {
+	if err_swallow_20 != nil {
 		logging.LogSwallowedError(err_swallow_20)
 	}
 }
 
 func (c *HighVolumeEventCache) Invalidate(id string) {
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	var err_swallow_21 = concurrency.WithLockTimeout(
-		&c.mu,
-		pkgctx.NewSystemContext(),
-		nil,
-		logging.NewLockLoggerAdapter(logger),
+	var err_swallow_21 = c.withWriteLock(
 		locknames.LockNameHighVolumeCacheInvalidate,
 		func() error {
 			delete(c.cache, id)
 			c.removeEntryFromByTime(id)
-
 			return nil
 		},
 	)
-	if err_swallow_21 !=
-
-		// InvalidateForProject clears the cache for the given project so IsPopulatedForProject(projectRoot) becomes false.
-		// Call after bulk deletes or when index/disk reconciliation may have changed counts, so next Count() uses index or triggers rebuild.
-		nil {
+	if err_swallow_21 != nil {
 		logging.LogSwallowedError(err_swallow_21)
 	}
 }
@@ -360,18 +367,14 @@ func (c *HighVolumeEventCache) InvalidateForProject(projectRoot string) {
 	if projectRoot == emptyValue {
 		return
 	}
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	var err_swallow_22 = concurrency.WithLockTimeout(
-		&c.mu,
-		pkgctx.NewSystemContext(),
-		nil,
-		logging.NewLockLoggerAdapter(logger),
+	var err_swallow_22 = c.withWriteLock(
 		locknames.LockNameHighVolumeCacheInvalidateProject,
 		func() error {
 			if c.metadata != nil && c.metadata.ProjectRoot == projectRoot {
 				c.cache = make(map[string]*HighVolumeEventCacheEntry)
 				c.byTime = make([]*HighVolumeEventCacheEntry, 0)
 				c.metadata = nil
+				logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 				StorageLog(logger).Debug(LogEventStorageHighVolumeCacheInvalidatedProjectDebug).
 					ProjectRoot(projectRoot).
 					Log()
@@ -379,11 +382,7 @@ func (c *HighVolumeEventCache) InvalidateForProject(projectRoot string) {
 			return nil
 		},
 	)
-	if err_swallow_22 !=
-
-		// QueryByTimeWindow returns event IDs within a time window (inclusive)
-		// Uses binary search for O(log n) performance
-		nil {
+	if err_swallow_22 != nil {
 		logging.LogSwallowedError(err_swallow_22)
 	}
 }

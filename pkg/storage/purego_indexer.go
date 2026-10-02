@@ -227,16 +227,10 @@ func (p *PureGoIndexer) GetNode(id string) (*IndexedNode, bool) {
 	return node, true
 }
 
-// GetNodesByKind returns all nodes for a specific kind in O(K) time.
-func (p *PureGoIndexer) GetNodesByKind(kind string) []*IndexedNode {
-	p.mu.RLock()
-	defer p.mu.RUnlock()
-
-	ids, ok := p.kindIndex[kind]
-	if !ok || len(ids) == 0 {
+func (p *PureGoIndexer) collectNodesFromIDSetLocked(ids map[string]struct{}) []*IndexedNode {
+	if len(ids) == 0 {
 		return nil
 	}
-
 	result := make([]*IndexedNode, 0, len(ids))
 	for id := range ids {
 		if node, exists := p.nodes[id]; exists {
@@ -246,23 +240,20 @@ func (p *PureGoIndexer) GetNodesByKind(kind string) []*IndexedNode {
 	return result
 }
 
+// GetNodesByKind returns all nodes for a specific kind in O(K) time.
+func (p *PureGoIndexer) GetNodesByKind(kind string) []*IndexedNode {
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+
+	return p.collectNodesFromIDSetLocked(p.kindIndex[kind])
+}
+
 // GetNodesByStatus returns all nodes matching a lifecycle status in O(S) time.
 func (p *PureGoIndexer) GetNodesByStatus(status string) []*IndexedNode {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 
-	ids, ok := p.statusIndex[status]
-	if !ok || len(ids) == 0 {
-		return nil
-	}
-
-	result := make([]*IndexedNode, 0, len(ids))
-	for id := range ids {
-		if node, exists := p.nodes[id]; exists {
-			result = append(result, node)
-		}
-	}
-	return result
+	return p.collectNodesFromIDSetLocked(p.statusIndex[status])
 }
 
 // GetOutEdges returns the target node IDs referenced by sourceID via relation in O(1) time.
