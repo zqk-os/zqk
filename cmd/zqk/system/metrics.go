@@ -268,11 +268,9 @@ func outputMetrics(cmd *cobra.Command, metrics []*clipkg.CommandMetrics, _ *metr
 }
 
 func outputMetricsSummary(cmd *cobra.Command, store clipkg.MetricsStore, _ []*clipkg.CommandMetrics, _ *metricsOptions) error {
-	analyzer := clipkg.NewMetricsAnalyzer(store)
-
-	analysis, err := analyzer.Analyze()
+	analyzer, analysis, err := analyzeCommandMetrics(store)
 	if err != nil {
-		return errfmt.Newf("failed to analyze metrics").Wrap(err)
+		return err
 	}
 
 	switch cli.GetFormat(cmd) {

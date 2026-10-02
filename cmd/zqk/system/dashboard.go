@@ -72,11 +72,8 @@ func displayDashboard(cmd *cobra.Command, proc *cli.Processor, ctx context.Conte
 	sp := proc.Storage()
 	secCtx := proc.SecurityContext()
 
-	cyan := color.New(color.FgCyan).SprintFunc()
-	green := color.New(color.FgGreen).SprintFunc()
-	yellow := color.New(color.FgYellow).SprintFunc()
-	red := color.New(color.FgRed).SprintFunc()
-	bold := color.New(color.Bold).SprintFunc()
+	colors := newConsoleColors()
+	cyan, green, yellow, red, bold := colors.Cyan, colors.Green, colors.Yellow, colors.Red, colors.Bold
 
 	var buf strings.Builder
 

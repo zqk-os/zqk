@@ -66,6 +66,17 @@ func buildCoordinationEventData(
 	}
 }
 
+// determineFailureSeverity determines event severity based on status and failure/total ratio.
+func determineFailureSeverity(status string, failedCount, totalCount int) string {
+	if status == eventStatusError || failedCount > 0 {
+		if totalCount > 0 && failedCount > totalCount/2 {
+			return severityHigh
+		}
+		return severityMedium
+	}
+	return severityLow
+}
+
 // createContextWithLoggingProfile delegates to the canonical cli.CreateContextWithLoggingProfile.
 func createContextWithLoggingProfile(ctx context.Context, profile string) context.Context {
 	return cli.CreateContextWithLoggingProfile(ctx, profile)
@@ -231,4 +242,44 @@ func emitStateChangeEventViaCoordinator(
 		taskDesc,
 	)
 }
+
+func buildWorkerLoggingAndMetrics(
+	operationType string,
+	status string,
+	counts ...coordination.LoggingField,
+) ([]coordination.LoggingField, map[string]any) {
+	loggingFields := make([]coordination.LoggingField, 0, len(counts)+2)
+	loggingFields = append(loggingFields, coordination.LoggingField{Key: eventKeyOperationType, Value: operationType})
+	loggingFields = append(loggingFields, counts...)
+	loggingFields = append(loggingFields, coordination.LoggingField{Key: eventKeyStatus, Value: status})
+
+	metricsData := make(map[string]any, len(counts)+2)
+	metricsData[eventKeyOperationType] = operationType
+	metricsData[eventKeyStatus] = status
+	for _, c := range counts {
+		metricsData[c.Key] = c.Value
+	}
+	return loggingFields, metricsData
+}
+
+func emitWorkerLifecycleCoordinationEvent(
+	ctx context.Context,
+	coordinator coordination.EventCoordinator,
+	operationID string,
+	eventType string,
+	operationType string,
+	status string,
+	auditMetadata map[string]any,
+	loggingFields []coordination.LoggingField,
+	metricsData map[string]any,
+	duration time.Duration,
+	emitOperational bool,
+	goroutineName string,
+	logDescription string,
+) {
+	eventData := buildCoordinationEventData(loggingFields, auditMetadata, metricsData, duration, nil)
+	eventCtx := buildEventContext(ctx, operationID, eventType, status, eventData, duration, nil, true, true, true, emitOperational)
+	emitAsyncCoordinationEvent(ctx, coordinator, goroutineName, logDescription, eventCtx)
+}
+
 

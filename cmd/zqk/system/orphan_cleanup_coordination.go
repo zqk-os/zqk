@@ -35,15 +35,7 @@ func emitOrphanCleanupEventViaCoordinator(
 	auditMetadata := make(map[string]any)
 	// Map operation type and status to valid audit event types
 	// Valid event types: orphan_cleanup_start, orphan_cleanup_complete, orphan_cleanup_error
-	var eventType string
-	if status == eventStatusError || failureCount > 0 {
-		eventType = "orphan_cleanup_error"
-	} else if status == eventStatusStart || operationType == "worker_started" {
-		eventType = "orphan_cleanup_start"
-	} else {
-		// Default to complete for batch operations and other statuses
-		eventType = "orphan_cleanup_complete"
-	}
+	eventType := resolveOrphanCleanupEventType(status, operationType, failureCount)
 	auditMetadata[eventKeyEventType] = eventType
 	auditMetadata[eventKeyOperation] = fmt.Sprintf("Orphan cleanup %s: %d files processed (%d succeeded, %d failed)", operationType, batchSize, successCount, failureCount)
 	auditMetadata[eventKeyBatchSize] = batchSize
@@ -65,41 +57,34 @@ func emitOrphanCleanupEventViaCoordinator(
 		}
 	}
 
-	// Determine severity
-	severity := severityLow
-	if status == eventStatusError || failureCount > 0 {
-		if failureCount > batchSize/2 {
-			severity = severityHigh
-		} else {
-			severity = severityMedium
-		}
-	}
-	auditMetadata[eventKeySeverity] = severity
+	auditMetadata[eventKeySeverity] = determineFailureSeverity(status, failureCount, batchSize)
 
-	// Build logging fields
-	loggingFields := []coordination.LoggingField{
-		{Key: eventKeyOperationType, Value: operationType},
-		{Key: eventKeyBatchSize, Value: batchSize},
-		{Key: eventKeySuccessCount, Value: successCount},
-		{Key: eventKeyFailureCount, Value: failureCount},
-		{Key: eventKeyStatus, Value: status},
-	}
-	// Build metrics data
-	metricsData := map[string]any{
-		eventKeyOperationType: operationType,
-		eventKeyBatchSize:     batchSize,
-		eventKeySuccessCount:  successCount,
-		eventKeyFailureCount:  failureCount,
-		eventKeyStatus:        status,
-	}
+	loggingFields, metricsData := buildWorkerLoggingAndMetrics(
+		operationType, status,
+		coordination.LoggingField{Key: eventKeyBatchSize, Value: batchSize},
+		coordination.LoggingField{Key: eventKeySuccessCount, Value: successCount},
+		coordination.LoggingField{Key: eventKeyFailureCount, Value: failureCount},
+	)
 	if len(failedFiles) > 0 {
 		metricsData[eventKeyFailedFileCount] = len(failedFiles)
 	}
 
-	eventData := buildCoordinationEventData(loggingFields, auditMetadata, metricsData, duration, nil)
-
-	// Create event context (enable audit, metrics, and logging; operational for lifecycle events)
 	emitOperational := operationType == "worker_started" || operationType == "worker_stopped"
-	eventCtx := buildEventContext(ctx, operationID, "orphan_cleanup", status, eventData, duration, nil, true, true, true, emitOperational)
-	emitAsyncCoordinationEvent(ctx, coordinator, "orphan_cleanup_event_emit", fmt.Sprintf("emitting orphan cleanup event: %s", operationType), eventCtx)
+	emitWorkerLifecycleCoordinationEvent(
+		ctx, coordinator, operationID, "orphan_cleanup", operationType, status,
+		auditMetadata, loggingFields, metricsData, duration, emitOperational,
+		"orphan_cleanup_event_emit", fmt.Sprintf("emitting orphan cleanup event: %s", operationType),
+	)
 }
+
+func resolveOrphanCleanupEventType(status, operationType string, failureCount int) string {
+	switch {
+	case status == eventStatusError || failureCount > 0:
+		return "orphan_cleanup_error"
+	case status == eventStatusStart || operationType == "worker_started":
+		return "orphan_cleanup_start"
+	default:
+		return "orphan_cleanup_complete"
+	}
+}
+

@@ -55,18 +55,9 @@ func runAuditReport(cmd *cobra.Command, args []string) error {
 		return errfmt.Errorf("project root not found")
 	}
 
-	store, err := openCommandMetricsStore(projectRoot)
+	analyzer, analysis, err := openAndAnalyzeCommandMetrics(projectRoot)
 	if err != nil {
 		return err
-	}
-
-	// Create analyzer
-	analyzer := clipkg.NewMetricsAnalyzer(store)
-
-	// Perform analysis
-	analysis, err := analyzer.Analyze()
-	if err != nil {
-		return errfmt.Newf("failed to analyze metrics").Wrap(err)
 	}
 
 	// Honor the --focus flag: it is accepted by the CLI contract, so the
@@ -81,29 +72,9 @@ func runAuditReport(cmd *cobra.Command, args []string) error {
 	format := cli.GetFormat(cmd)
 	formatStr := string(format)
 
-	// Generate report based on format
-	var output []byte
-	switch formatStr {
-	case "json":
-		jsonData, jsonErr := analyzer.GenerateReportJSON(analysis)
-		if jsonErr != nil {
-			return errfmt.Newf("failed to generate JSON report").Wrap(jsonErr)
-		}
-		output = jsonData
-	case "yaml":
-		yamlData, yamlErr := analyzer.GenerateReportYAML(analysis)
-		if yamlErr != nil {
-			return errfmt.Newf("failed to generate YAML report").Wrap(yamlErr)
-		}
-		output = yamlData
-	case "table":
-		// For table format, use markdown report (which is table-friendly)
-		report := analyzer.GenerateReport(analysis)
-		output = []byte(report)
-	default:
-		// Default to table (markdown report format)
-		report := analyzer.GenerateReport(analysis)
-		output = []byte(report)
+	output, err := generateFormattedAnalysisReport(analyzer, analysis, formatStr)
+	if err != nil {
+		return errfmt.Newf("failed to generate %s report", formatStr).Wrap(err)
 	}
 
 	// Output (use format flag from common flags, or default to stdout)

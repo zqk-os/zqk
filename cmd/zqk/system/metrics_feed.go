@@ -50,15 +50,9 @@ func runMetricsFeed(cmd *cobra.Command, args []string) error {
 	agentID, _ := cmd.Flags().GetString("agent-id")
 	notify, _ := cmd.Flags().GetBool("notify")
 
-	store, err := openCommandMetricsStore(projectRoot)
+	_, analysis, err := openAndAnalyzeCommandMetrics(projectRoot)
 	if err != nil {
 		return err
-	}
-
-	analyzer := clipkg.NewMetricsAnalyzer(store)
-	analysis, err := analyzer.Analyze()
-	if err != nil {
-		return errfmt.Newf("failed to analyze metrics").Wrap(err)
 	}
 
 	logClusters := whatsnext.ParseHumanLogClusters(projectRoot)

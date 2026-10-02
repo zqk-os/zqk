@@ -276,7 +276,6 @@ func runConvergenceSessionPersist(
 	debriefNotes string,
 	sessionThresholds map[string]any,
 ) (*persistSessionOutcome, error) {
-	_ = cliCtx
 	cpc, err := initCommandProcContext(cmd)
 	if err != nil {
 		return nil, err

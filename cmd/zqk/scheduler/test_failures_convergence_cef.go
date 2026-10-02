@@ -97,17 +97,15 @@ func runCEFDiamondConvergenceMeasure(
 	}
 }
 
-func persistCEFDiamondSession(cliCtx *cli.Context, cmd *cobra.Command, sessionID string, res *schedpkg.CEFDiamondMeasureResult) (*persistSessionOutcome, error) {
+func persistCEFDiamondSession(_ *cli.Context, cmd *cobra.Command, sessionID string, res *schedpkg.CEFDiamondMeasureResult) (*persistSessionOutcome, error) {
 	if res == nil || len(res.ObjectUpdateBody) == 0 {
 		return nil, errfmt.Errorf("persist-session: empty CEF object_update_body")
 	}
-	_ = cliCtx
 	cpc, err := initCommandProcContext(cmd)
 	if err != nil {
 		return nil, err
 	}
-	body := res.ObjectUpdateBody
-	if err := cpc.Proc.Storage().Update(cpc.Ctx, cpc.Sec, sessionID, body); err != nil {
+	if err := cpc.Proc.Storage().Update(cpc.Ctx, cpc.Sec, sessionID, res.ObjectUpdateBody); err != nil {
 		return nil, errfmt.Newf("persist-session CEF").Wrap(err)
 	}
 	return &persistSessionOutcome{Requested: true, Applied: true}, nil

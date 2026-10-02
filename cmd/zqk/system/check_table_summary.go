@@ -7,7 +7,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	pkgcli "github.com/zqk-os/zqk/pkg/cli"
@@ -97,11 +96,8 @@ func writeLayeredSummary(buf *strings.Builder, results []CheckResult, cmd *cobra
 		}
 	}
 
-	bold := color.New(color.Bold).SprintFunc()
-	cyan := color.New(color.FgCyan).SprintFunc()
-	green := color.New(color.FgGreen).SprintFunc()
-	yellow := color.New(color.FgYellow).SprintFunc()
-	dim := color.New(color.Faint).SprintFunc()
+	colors := newConsoleColors()
+	bold, cyan, green, yellow, dim := colors.Bold, colors.Cyan, colors.Green, colors.Yellow, colors.Dim
 
 	buf.WriteString(fmt.Sprintf("\n%s\n\n",
 		bold(cyan("=== System Check: High-Level Layered Summary ===")),
