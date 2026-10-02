@@ -21,13 +21,9 @@ func NewEmitContextEventCmd() *cobra.Command {
 }
 
 func runEmitContextEvent(cmd *cobra.Command, _ []string) error {
-	ctx := cli.GetContext(cmd)
-	if ctx == nil {
-		return errfmt.Errorf("failed to get context")
-	}
-	projectRoot := ProjectRootOrResolve(ctx.ProjectRoot)
-	if projectRoot == "" {
-		return errfmt.Errorf("project root not found")
+	projectRoot, err := resolveCommandProjectRoot(cmd)
+	if err != nil {
+		return err
 	}
 
 	eventType, _ := cmd.Flags().GetString(emitContextEventFlagEventType)

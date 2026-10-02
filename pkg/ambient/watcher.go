@@ -2,6 +2,7 @@ package ambient
 
 import (
 	"context"
+	"fmt"
 	"path/filepath"
 	"strings"
 	"time"
@@ -9,6 +10,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"gopkg.in/yaml.v3"
 
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objectidcache"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -415,4 +417,31 @@ func BindProcessYAMLInvalidator(hub EventHub, onActivity func()) {
 		}
 		return nil
 	})
+}
+
+// RunWatcherDaemon orchestrates the standard ambient watcher pipeline (event hub, artifact writer, coach heuristics, ingest service, fswatcher, and process YAML invalidator) until ctx is cancelled.
+func RunWatcherDaemon(ctx context.Context, projectRoot string, onActivity func()) error {
+	hub := NewEventHub()
+
+	_ = NewArtifactWriter(hub)
+	_ = NewCoachHeuristicsWithRoot(hub, projectRoot)
+
+	secCtx := pkgctx.NewSecurityContext(pkgctx.SystemAccountID, []string{"system"}, []string{"*"})
+	ingestService := NewAmbientIngestService(projectRoot, secCtx)
+	ingestService.BindToHub(hub)
+
+	watcher, err := NewFSWatcher(projectRoot, hub)
+	if err != nil {
+		return fmt.Errorf("failed to create fswatcher: %w", err)
+	}
+
+	BindProcessYAMLInvalidator(hub, onActivity)
+
+	if err := watcher.Start(ctx); err != nil {
+		return fmt.Errorf("failed to start fswatcher: %w", err)
+	}
+	defer func() { _ = watcher.Stop() }()
+
+	<-ctx.Done()
+	return nil
 }

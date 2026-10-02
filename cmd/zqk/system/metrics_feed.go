@@ -42,15 +42,9 @@ func NewMetricsFeedCmd() *cobra.Command {
 }
 
 func runMetricsFeed(cmd *cobra.Command, args []string) error {
-	ctx := cli.GetContext(cmd)
-	if ctx == nil {
-		return errfmt.Errorf("failed to get context")
-	}
-
-	projectRoot := ctx.ProjectRoot
-	projectRoot = ProjectRootOrResolve(projectRoot)
-	if projectRoot == emptyValue {
-		return errfmt.Errorf("project root not found")
+	projectRoot, err := resolveCommandProjectRoot(cmd)
+	if err != nil {
+		return err
 	}
 
 	agentID, _ := cmd.Flags().GetString("agent-id")

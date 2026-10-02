@@ -13,7 +13,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
-	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/tde"
 )
 
@@ -25,14 +24,9 @@ func NewInterruptInboxCmd() *cobra.Command {
 }
 
 func runInterruptInbox(cmd *cobra.Command, _ []string) error {
-	ctx := cli.GetContext(cmd)
-	if ctx == nil {
-		return errfmt.Errorf("failed to get context")
-	}
-	projectRoot := ctx.ProjectRoot
-	projectRoot = ProjectRootOrResolve(projectRoot)
-	if projectRoot == emptyValue {
-		return errfmt.Errorf("project root not found")
+	projectRoot, err := resolveCommandProjectRoot(cmd)
+	if err != nil {
+		return err
 	}
 
 	activeEnvelopes, err := tde.LoadActive(projectRoot)
