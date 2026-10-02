@@ -29,20 +29,7 @@ func SetupMCPCoordinatorIntegration(
 	projectRoot string,
 	storageProvider storage.ObjectStorageProvider,
 ) {
-	// Create MCP metrics router
-	mcpMetrics := server.GetMCPMetrics()
-	mcpRouter := mcp.CreateMCPMetricsRouter(mcpMetrics)
-
-	// Create adapter to match coordination.MetricsRouter interface
-	mcpMetricsRouter := &mcpMetricsRouterAdapter{mcpRouter: mcpRouter}
-
-	// Create coordinator with MCP metrics router
-	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
-		LoggingRouter:     &coordination.DefaultLoggingRouter{},
-		AuditRouter:       coordination.NewStorageAuditRouter(projectRoot, storageProvider),
-		MetricsRouter:     mcpMetricsRouter, // Use MCP metrics router adapter
-		OperationalRouter: &coordination.DefaultOperationalRouter{},
-	})
+	coordinator := CreateMCPCoordinatorWithRouters(projectRoot, storageProvider, server.GetMCPMetrics())
 
 	// Set coordinator on global coordinator (if not already set)
 	// This allows other parts of the system to use it

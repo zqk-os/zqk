@@ -11,7 +11,9 @@ import (
 	"time"
 
 	gonet "github.com/shirou/gopsutil/v3/net"
+	"github.com/spf13/cobra"
 
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/brand"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
@@ -45,6 +47,45 @@ func projectRootOrResolve(procProjectRoot string) string {
 		return procProjectRoot
 	}
 	return cli.ResolveProjectRoot(".")
+}
+
+func parseMCPCmdContext(cmd *cobra.Command) (string, logging.Logger, error) {
+	var flags clipkg.FlagBag
+	addr := resolveTCPFlag(flags.String(cmd, "tcp"))
+	if err := flags.Err(); err != nil {
+		return "", nil, err
+	}
+	cliCtx := cli.GetContext(cmd)
+	profile := ""
+	if cliCtx != nil {
+		profile = cliCtx.Profile
+	}
+	return addr, logging.GetLoggerFromProfile(profile), nil
+}
+
+type mcpDaemonTarget struct {
+	addr        string
+	port        string
+	projectRoot string
+	pidFile     string
+	logger      logging.Logger
+}
+
+func resolveMCPDaemonTarget(proc *cli.Processor, rawTCP string) mcpDaemonTarget {
+	addr := resolveTCPFlag(rawTCP)
+	port := tcpPort(addr)
+	root := projectRootOrResolve(proc.ProjectRoot())
+	profile := ""
+	if proc.Context() != nil {
+		profile = proc.Context().Profile
+	}
+	return mcpDaemonTarget{
+		addr:        addr,
+		port:        port,
+		projectRoot: root,
+		pidFile:     mcpDaemonPIDPath(root, port),
+		logger:      logging.GetLoggerFromProfile(profile),
+	}
 }
 
 func mcpDaemonPIDPath(projectRoot, port string) string {

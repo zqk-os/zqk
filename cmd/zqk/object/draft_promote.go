@@ -3,7 +3,6 @@ package object
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cliapp"
@@ -32,57 +31,23 @@ func NewDraftPromoteCmd() *cobra.Command {
 
 func runObjectDraftPromote(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-		dryRun, err := cmd.Flags().GetBool("dry-run")
+		flags, err := parseDraftPlaneCLIFlags(cmd)
 		if err != nil {
 			return err
 		}
-		all, err := cmd.Flags().GetBool("all")
-		if err != nil {
-			return err
-		}
-		kind, err := cmd.Flags().GetString("kind")
-		if err != nil {
-			return err
-		}
-		idPrefix, err := cmd.Flags().GetString("id-prefix")
-		if err != nil {
-			return err
-		}
-		status, err := cmd.Flags().GetString("status")
-		if err != nil {
-			return err
-		}
-		olderThanStr, err := cmd.Flags().GetString("older-than")
-		if err != nil {
-			return err
-		}
-		maxN, err := cmd.Flags().GetInt("max")
-		if err != nil {
-			return err
-		}
-		var olderThan time.Duration
-		if olderThanStr != "" {
-			olderThan, err = time.ParseDuration(olderThanStr)
-			if err != nil {
-				return fmt.Errorf("invalid --older-than %q: %w", olderThanStr, err)
-			}
-		}
-		matchOpts := storage.ObjectDraftPlaneMatchOptions{
-			Kind: kind, IDPrefix: idPrefix, Status: status,
-			OlderThan: olderThan, All: all, Max: maxN,
-		}
-		if !dryRun {
-			if gateErr := storage.RequireDraftPlaneApplyGate(matchOpts, "promote"); gateErr != nil {
+		dryRun := flags.dryRun
+		if !flags.dryRun {
+			if gateErr := storage.RequireDraftPlaneApplyGate(flags.matchOpts, "promote"); gateErr != nil {
 				return gateErr
 			}
 		}
-		matched, skipped, inv, matchErr := storage.MatchObjectDraftPlane(proc.ProjectRoot(), matchOpts)
+		matched, skipped, inv, matchErr := storage.MatchObjectDraftPlane(proc.ProjectRoot(), flags.matchOpts)
 		if matchErr != nil {
 			return matchErr
 		}
 
 		out := map[string]any{
-			"dry_run":               dryRun,
+			"dry_run":               flags.dryRun,
 			"matched":               len(matched),
 			objects.FieldKeySkipped: len(skipped),
 			"draft_root":            storage.ObjectDraftPlaneRoot(proc.ProjectRoot()),

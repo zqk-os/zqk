@@ -8,7 +8,6 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cliapp"
-	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
@@ -33,14 +32,11 @@ func NewCursorAdapterCmd() *cobra.Command {
 }
 
 func runIDEAdapter(cmd *cobra.Command, _ []string) error {
-	var flags clipkg.FlagBag
-	addr := resolveTCPFlag(flags.String(cmd, "tcp"))
-	if err := flags.Err(); err != nil {
+	addr, logger, err := parseMCPCmdContext(cmd)
+	if err != nil {
 		return err
 	}
 
-	cliCtx := cli.GetContext(cmd)
-	logger := logging.GetLoggerFromProfile(cliCtx.Profile)
 	projectRoot := cli.ResolveProjectRoot(".")
 
 	cfg := ideadapter.LoadConfig(projectRoot)
