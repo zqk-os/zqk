@@ -28,6 +28,12 @@ const emptyValue = ""
 // NewImportCmd creates the ontology import command from the generated builder
 func NewImportCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewOntologyImportCommandBuilder()
+	if cmd.Flags().Lookup("file") == nil {
+		cmd.Flags().String("file", "", "Path to ontology file to import")
+	}
+	if cmd.Flags().Lookup("input-format") == nil {
+		cmd.Flags().String("input-format", "", "Format of input file (rdf_owl, turtle, cypher, etc.)")
+	}
 	cli.BindAsyncProgress(cmd, runOntologyImport)
 	return cmd
 }
