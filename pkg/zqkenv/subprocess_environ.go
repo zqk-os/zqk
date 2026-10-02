@@ -147,3 +147,13 @@ func initGoEnv() {
 		}
 	})
 }
+
+// ScrubDaemonProcessEnv scrubs subprocess-only env that shells leak into daemons.
+// ZQK_PARENT_PID would start a parent-death watcher that os.Exit(0)s the daemon;
+// ZQK_MCP_ACCOUNT_ID on the server process pollutes in-process CLI. Mark ourselves
+// as parent-zqk so nested ExecuteContext skips the child idle watchdog.
+func ScrubDaemonProcessEnv() {
+	_ = ParentPID().Unset()
+	_ = MCPAccountID().Unset()
+	_ = IsParentZqk().Set("1")
+}

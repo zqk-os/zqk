@@ -20,6 +20,14 @@ func newSchedulerCoordinator() *coordination.Coordinator {
 	})
 }
 
+func initSchedulerCoordination(ctx context.Context, projectRoot, profile string) (context.Context, *coordination.Coordinator, bool) {
+	if projectRoot == emptyValue || projectRoot == "." {
+		return ctx, nil, false
+	}
+	ctx = createContextWithLoggingProfile(ctx, profile)
+	return ctx, newSchedulerCoordinator(), true
+}
+
 func emitCoordinatorEventAsync(ctx context.Context, coordinator *coordination.Coordinator, eventCtx *coordination.EventContext) {
 	bud := goroutinelabels.DefaultBudget()
 	activityBuilder := goroutinelabels.NewGoroutine("scheduler_event_emitter", "emitting scheduler activity query event")

@@ -13,7 +13,6 @@ import (
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
-	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -62,17 +61,9 @@ func NewHealthCheckCmd() *cobra.Command {
 }
 
 func runHealthCheck(cmd *cobra.Command, args []string) error {
-	ctx := cli.GetContext(cmd)
-	if ctx == nil {
-		return errfmt.Errorf("failed to get CLI context")
-	}
-
-	projectRoot := cli.ResolveProjectRoot(".")
-	if projectRoot == emptyValue {
-		projectRoot = ctx.ProjectRoot
-	}
-	if projectRoot == emptyValue {
-		return errfmt.Errorf("project root not found")
+	projectRoot, err := resolveCommandProjectRoot(cmd)
+	if err != nil {
+		return err
 	}
 
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))

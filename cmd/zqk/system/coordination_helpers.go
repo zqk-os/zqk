@@ -2,6 +2,7 @@ package system
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/cliapp"
@@ -160,3 +161,74 @@ func emitAsyncCoordinationEvent(
 		}
 	})
 }
+
+// emitSystemEventViaCoordinator dispatches a system coordination event with audit and metrics channels enabled.
+func emitSystemEventViaCoordinator(
+	ctx context.Context,
+	projectRoot string,
+	storageProvider storage.ObjectStorageProvider,
+	operationID string,
+	operationType string,
+	status string,
+	duration time.Duration,
+	err error,
+	loggingFields []coordination.LoggingField,
+	auditMetadata map[string]any,
+	metricsData map[string]any,
+	operational bool,
+	goroutineName string,
+	goroutineDesc string,
+) {
+	ctx, coordinator, ok := setupSystemCoordinator(ctx, projectRoot, storageProvider, systemProfileSystem, true)
+	if !ok {
+		return
+	}
+	eventData := buildCoordinationEventData(loggingFields, auditMetadata, metricsData, duration, err)
+	eventCtx := buildEventContext(ctx, operationID, operationType, status, eventData, duration, err, false, true, true, operational)
+	emitAsyncCoordinationEvent(ctx, coordinator, goroutineName, goroutineDesc, eventCtx)
+}
+
+// emitStateChangeEventViaCoordinator unifies emitting queue state change events across system queues.
+func emitStateChangeEventViaCoordinator(
+	ctx context.Context,
+	projectRoot string,
+	storageProvider storage.ObjectStorageProvider,
+	eventType string,
+	operationDesc string,
+	changeType string,
+	opIDPrefix string,
+	opType string,
+	taskName string,
+	taskDesc string,
+) {
+	auditMetadata := map[string]any{
+		eventKeyEventType:  eventType,
+		eventKeyOperation:   operationDesc,
+		eventKeyChangeType: changeType,
+		eventKeySeverity:   severityLow,
+	}
+	loggingFields := []coordination.LoggingField{
+		{Key: eventKeyChangeType, Value: changeType},
+	}
+	metricsData := map[string]any{
+		eventKeyChangeType: changeType,
+	}
+	operationID := fmt.Sprintf("%s_%s_%d", opIDPrefix, changeType, time.Now().UnixNano())
+	emitSystemEventViaCoordinator(
+		ctx,
+		projectRoot,
+		storageProvider,
+		operationID,
+		opType,
+		changeType,
+		0,
+		nil,
+		loggingFields,
+		auditMetadata,
+		metricsData,
+		false,
+		taskName,
+		taskDesc,
+	)
+}
+

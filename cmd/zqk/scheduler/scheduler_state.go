@@ -22,16 +22,9 @@ func NewStateCmd() *cobra.Command {
 }
 
 func runState(cmd *cobra.Command, _ []string) error {
-	ctx := cli.GetContext(cmd)
-	if ctx == nil {
-		return errfmt.Errorf("failed to get context")
-	}
-	projectRoot := cli.ResolveProjectRoot(".")
-	if projectRoot == emptyValue {
-		projectRoot = ctx.ProjectRoot
-	}
-	if projectRoot == emptyValue {
-		return errfmt.Errorf("project root is required")
+	projectRoot, err := resolveCommandProjectRoot(cmd)
+	if err != nil {
+		return err
 	}
 	migrate, _ := cmd.Flags().GetBool("migrate")
 	if migrate {
