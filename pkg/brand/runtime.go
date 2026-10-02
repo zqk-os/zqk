@@ -42,7 +42,8 @@ func init() {
 func defaultExecutableName() string {
 	if len(os.Args) > 0 && os.Args[0] != emptyBrandValue {
 		base := filepath.Base(os.Args[0])
-		if base == ZqkStableName || strings.HasPrefix(base, ZqkStablePrefix) {
+		if base == ZqkStableName || strings.HasPrefix(base, ZqkStablePrefix) ||
+			base == "zqk-pw" || base == "zqk-amb" || base == "zqk-sched" || base == "zqk-overseer" {
 			return defaultExecutableNameValue
 		}
 		// go test binaries are named <pkg>.test (and often live under go-build/).

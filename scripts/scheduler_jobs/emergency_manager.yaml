@@ -2,18 +2,21 @@
 # Create: zqk object create scheduler_job --internal --file scripts/scheduler_jobs/emergency_manager.yaml
 # Stash is OFF by default. To enable gated stash: update metadata.allow_stash=true
 id: SCH-emergency-manager
+kind: scheduler_job
 title: Emergency Manager
 description: |
-  Out-of-band CAP watchdog. Reads .zqk/state/cap_failure_tracker.json and recent
-  SCH-cap-orchestrator events. When CAP is unhealthy (consecutive failures >= 3 or
-  last success older than 45m), appends an agent chat alert and writes
-  .zqk/state/emergency_manager_last.json.
+  Out-of-band watchdog supervisor over SCH-cap-orchestrator.
+  Reads .zqk/state/cap_failure_tracker.json and recent SCH-cap-orchestrator events.
+  When the CAP loop is unhealthy (consecutive failures >= 3 or last success older than 45m),
+  appends an agent chat alert and writes .zqk/state/emergency_manager_last.json.
   Optional gated git stash (stash -u only; never clean -fd) requires metadata.allow_stash=true.
 job_type: emergency_manager
 trigger_type: timer
-schedule_expression: "0 */10 * * * *"
+schedule_expression: "*/10 * * * *"
 category: maintenance
 execution_mode: reusable
+priority: high
+log_level: default
 max_runtime_seconds: 120
 enabled: true
 status: active

@@ -6,7 +6,7 @@
 	<string>com.zqk.privileged-writer</string>
 	<key>ProgramArguments</key>
 	<array>
-		<string>__ZQK_PROJECT_ROOT__/.zqk/bin/zqk-stable</string>
+		<string>__ZQK_PROJECT_ROOT__/.zqk/bin/zqk-pw</string>
 		<string>object</string>
 		<string>daemon</string>
 	</array>

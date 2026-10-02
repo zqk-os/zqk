@@ -2,10 +2,12 @@ id: SCH-cap-night-duty
 kind: scheduler_job
 schema_version: "2.0.0"
 status: active
-title: CAP Night Duty
+title: CAP Night Duty (Fallback Integrity Wrapper)
 description: |
-  Overnight CAP integrity check and agent feeding loop. Runs zqk system check --fast
-  to ensure workspace integrity.
+  Lightweight fallback maintenance wrapper running 'zqk system check --fast' for off-hours
+  or degraded environments.
+  NOTE: Distinct from SCH-cap-orchestrator (which drives the full in-process CAP multi-agent loop).
+  Kept disabled by default; enable only if standalone shell-level integrity sweeps are desired.
 job_type: run_wrapper
 trigger_type: timer
 schedule_expression: "*/15 * * * *"

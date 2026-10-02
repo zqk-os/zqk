@@ -1,4 +1,22 @@
+id: SCH-log-rotation-daily
+kind: scheduler_job
+title: Periodic Log Rotation
+description: |
+  Daily rotation and compression of execution logs and audit trails in .zqk/logs/
+  to enforce disk bounds and retention hygiene.
 job_type: log_rotation
-frequency: "24h"
-command: "zqk system rotate-logs"
-description: "Daily rotation and cleanup of log files in .zqk/logs/"
+trigger_type: timer
+schedule_expression: "0 0 * * *"
+category: maintenance
+execution_mode: reusable
+priority: normal
+log_level: default
+max_runtime_seconds: 300
+enabled: true
+status: active
+created_by: ACC-SYSTEM
+updated_by: ACC-SYSTEM
+created_at: "2026-01-01T00:00:00Z"
+updated_at: "2026-01-01T00:00:00Z"
+namespace_id: zqk:kernel
+schema_version: "2.0.0"

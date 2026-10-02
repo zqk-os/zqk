@@ -20,5 +20,5 @@ command_args:
     set -e
     ROOT="${ZQK_PROJECT_ROOT:-.}"
     cd "$ROOT"
-    export AG_TRANSCRIPT_PATH=$(ls -t "$HOME/.gemini/antigravity-cli/brain"/*/.system_generated/logs/transcript.jsonl | head -n 1)
     exec ./bin/zqk agent chat-responder
+

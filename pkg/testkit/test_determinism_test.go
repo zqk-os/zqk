@@ -2,7 +2,6 @@ package testkit_test
 
 import (
 	"context"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -10,6 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -106,7 +106,7 @@ func TestTestDeterminism_PyramidDiscipline_NegativeBoundary(t *testing.T) {
 	// Negative boundary: verify binary/CLI commands reject invalid invocations cleanly
 	binPath := filepath.Join(repoRoot, "bin", "zqk")
 	if fileutil.Exists(binPath) {
-		cmd := exec.Command(binPath, "nonexistent-root-command-xyz")
+		cmd := testkit.ManagedCommand(t, t.Context(), binPath, "nonexistent-root-command-xyz")
 		out, err := cmd.CombinedOutput()
 		assert.Error(t, err, "CLI must reject invalid root commands")
 		assert.Contains(t, strings.ToLower(string(out)), "unknown command", "CLI must report unknown command diagnostic")

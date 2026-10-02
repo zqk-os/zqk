@@ -59,22 +59,21 @@ func NewPolicyInterruptsAckCmd() *cobra.Command {
 	return ackCmd
 }
 
-func runPolicyInterruptsList(cmd *cobra.Command, _ []string) error {
-	ctx := cli.GetContext(cmd)
-	if ctx == nil {
-		return errfmt.Errorf("failed to get context")
-	}
-	projectRoot := ctx.ProjectRoot
-	projectRoot = ProjectRootOrResolve(projectRoot)
-	if projectRoot == emptyValue {
-		return errfmt.Errorf("project root not found")
-	}
-
+func loadPendingCriticalInterrupts(projectRoot string) ([]policyinterrupt.InterruptRecord, error) {
 	acks, err := policyinterrupt.LoadAcksIncremental(projectRoot)
+	if err != nil {
+		return nil, err
+	}
+	return policyinterrupt.LoadCriticalUnacked(projectRoot, acks, 0)
+}
+
+func runPolicyInterruptsList(cmd *cobra.Command, _ []string) error {
+	projectRoot, err := resolveCommandProjectRoot(cmd)
 	if err != nil {
 		return err
 	}
-	interrupts, err := policyinterrupt.LoadCriticalUnacked(projectRoot, acks, 0)
+
+	interrupts, err := loadPendingCriticalInterrupts(projectRoot)
 	if err != nil {
 		return err
 	}
@@ -113,14 +112,9 @@ func runPolicyInterruptsList(cmd *cobra.Command, _ []string) error {
 }
 
 func runPolicyInterruptsAck(cmd *cobra.Command, _ []string) error {
-	ctx := cli.GetContext(cmd)
-	if ctx == nil {
-		return errfmt.Errorf("failed to get context")
-	}
-	projectRoot := ctx.ProjectRoot
-	projectRoot = ProjectRootOrResolve(projectRoot)
-	if projectRoot == emptyValue {
-		return errfmt.Errorf("project root not found")
+	projectRoot, err := resolveCommandProjectRoot(cmd)
+	if err != nil {
+		return err
 	}
 	ackAll, _ := cmd.Flags().GetBool("all")
 	prefix, _ := cmd.Flags().GetString("prefix")
@@ -158,11 +152,7 @@ func runPolicyInterruptsAck(cmd *cobra.Command, _ []string) error {
 		return cli.WriteOutput(cmd, []byte("Acknowledged.\n"))
 	}
 
-	acks, err := policyinterrupt.LoadAcksIncremental(projectRoot)
-	if err != nil {
-		return err
-	}
-	interrupts, err := policyinterrupt.LoadCriticalUnacked(projectRoot, acks, 0)
+	interrupts, err := loadPendingCriticalInterrupts(projectRoot)
 	if err != nil {
 		return err
 	}
@@ -235,14 +225,9 @@ func NewPolicyInterruptsEmitCmd() *cobra.Command {
 	cli.AddCommonFlags(emitCmd)
 
 	cli.BindAsyncProgress(emitCmd, func(cmd *cobra.Command, _ []string) error {
-		ctx := cli.GetContext(cmd)
-		if ctx == nil {
-			return errfmt.Errorf("failed to get context")
-		}
-		projectRoot := ctx.ProjectRoot
-		projectRoot = ProjectRootOrResolve(projectRoot)
-		if projectRoot == emptyValue {
-			return errfmt.Errorf("project root not found")
+		projectRoot, err := resolveCommandProjectRoot(cmd)
+		if err != nil {
+			return err
 		}
 		dk, _ := cmd.Flags().GetString("dedupe-key")
 		if dk == emptyValue {

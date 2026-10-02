@@ -3,7 +3,6 @@
 **Document ID:** `DOC-FAIL-CLOSED-ERROR-PROPAGATION-001`  
 **Status:** Approved / Enforced  
 **Technical Debt Reference:** `TDE-F-CQ-001`  
-**Priority Plan:** `PRI-SYNC-LOOP-ERROR-PROPAGATION`  
 
 ---
 

@@ -65,8 +65,6 @@ func TestOrphanVerbsRetirement_StaticFloor(t *testing.T) {
 // TestOrphanVerbsRetirement_OperationalProof verifies CRIT-1790814952688120000-6931bd7c.
 // Asserts that executing the approved ergonomics shortcuts with help flag executes cleanly.
 func TestOrphanVerbsRetirement_OperationalProof(t *testing.T) {
-	t.Parallel()
-
 	for _, shortcut := range approvedShortcuts {
 		rootCmd := app.NewRootCommand()
 		var outBuf, errBuf bytes.Buffer
@@ -83,8 +81,6 @@ func TestOrphanVerbsRetirement_OperationalProof(t *testing.T) {
 // TestOrphanVerbsRetirement_NegativeBoundary verifies CRIT-1790814952688119000-2c817e43.
 // Asserts that unrecognized commands fail closed with clear error messaging and do not panic.
 func TestOrphanVerbsRetirement_NegativeBoundary(t *testing.T) {
-	t.Parallel()
-
 	rootCmd := app.NewRootCommand()
 	var outBuf, errBuf bytes.Buffer
 	rootCmd.SetOut(&outBuf)
@@ -93,7 +89,10 @@ func TestOrphanVerbsRetirement_NegativeBoundary(t *testing.T) {
 
 	err := rootCmd.Execute()
 	assert.Error(t, err, "unrecognized root verb must return an error")
-	combined := errBuf.String() + outBuf.String() + err.Error()
+	combined := errBuf.String() + outBuf.String()
+	if err != nil {
+		combined += err.Error()
+	}
 	assert.True(t, strings.Contains(combined, "unknown command") || strings.Contains(combined, "unrecognized"),
 		"error message should indicate unknown command: %s", combined)
 }

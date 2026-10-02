@@ -11,8 +11,9 @@ schema_version: "2.0.0"
 id: SCH-dce-tick
 title: Data cell — operational envelope tick (stream profile)
 description: |
-  Structured log of the stream storage profile operational envelope (CompactSummary).
-  Category data_cell_envelope; extends later with per-profile actions.
+  Operational envelope supervisor for data cells: drains the steward enqueue log,
+  calculates storage profile envelopes across CAS entity/light file/stream storage,
+  and evaluates follow-up dispatch for resolved job types.
 job_type: data_cell_envelope_tick
 trigger_type: timer
 schedule_expression: "0 */6 * * *"
