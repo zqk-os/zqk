@@ -244,13 +244,10 @@ func inspectSingleObject(cmd *cobra.Command, kind, id string, fields []string, s
 
 	proj := buildSemanticProjection(ctx, sp, secCtx, rawObj, actualKind, fields)
 
-	if isStructured {
-		return cli.FormatOutput(cmd, proj)
+	lines, termWidth, done, err := initTerminalLines(cmd, proj, isStructured)
+	if done {
+		return err
 	}
-
-	// Human / ANSI TUI rendering
-	termWidth := getTerminalWidth()
-	var lines []string
 
 	statItems := []tds.StatItem{
 		{Label: "Kind", Value: proj.Kind},
@@ -330,9 +327,7 @@ func inspectSingleObject(cmd *cobra.Command, kind, id string, fields []string, s
 		}
 	}
 
-	panelOutput := tds.Panel("OBJECT INSPECTOR: "+proj.ID, lines, termWidth, tds.BorderRounded)
-	_, _ = fmt.Fprintln(cmd.OutOrStdout(), panelOutput)
-	return nil
+	return renderPanelOutput(cmd, "OBJECT INSPECTOR: "+proj.ID, lines, termWidth)
 }
 
 func inspectKindList(cmd *cobra.Command, kind string, fields, filters []string, sortBy string, sortAsc bool, groupBy string, sp storage.ObjectStorageProvider, ctx context.Context, secCtx *pkgctx.SecurityContext, storageCtx *storage.StorageContext, isStructured bool) error {
@@ -535,12 +530,10 @@ func runPolicyStudio(cmd *cobra.Command, kind string, sp storage.ObjectStoragePr
 		Evaluations: evals,
 	}
 
-	if isStructured {
-		return cli.FormatOutput(cmd, proj)
+	lines, termWidth, done, err := initTerminalLines(cmd, proj, isStructured)
+	if done {
+		return err
 	}
-
-	termWidth := getTerminalWidth()
-	var lines []string
 	lines = append(lines, fmt.Sprintf("Registered Schema Fields: %d fields available for DSL predicates", len(registeredFields)))
 	lines = append(lines, "")
 	lines = append(lines, "── Active Evaluation Rules ──")
@@ -564,9 +557,7 @@ func runPolicyStudio(cmd *cobra.Command, kind string, sp storage.ObjectStoragePr
 	lines = append(lines, "")
 	lines = append(lines, "Actions: [c] Edit Condition  [t] Test Expression  [s] Save Rule  [Esc] Close")
 
-	panelOutput := tds.Panel("LIVE POLICY RULE STUDIO: "+strings.ToUpper(kind), lines, termWidth, tds.BorderRounded)
-	_, _ = fmt.Fprintln(cmd.OutOrStdout(), panelOutput)
-	return nil
+	return renderPanelOutput(cmd, "LIVE POLICY RULE STUDIO: "+strings.ToUpper(kind), lines, termWidth)
 }
 
 func buildSemanticProjection(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, obj map[string]any, kind string, requestedFields []string) SemanticAgentProjection {
@@ -858,6 +849,19 @@ func getTerminalWidth() int {
 		return 120
 	}
 	return w
+}
+
+func initTerminalLines(cmd *cobra.Command, proj any, isStructured bool) (lines []string, termWidth int, done bool, err error) {
+	if isStructured {
+		return nil, 0, true, cli.FormatOutput(cmd, proj)
+	}
+	return nil, getTerminalWidth(), false, nil
+}
+
+func renderPanelOutput(cmd *cobra.Command, title string, lines []string, termWidth int) error {
+	panelOutput := tds.Panel(title, lines, termWidth, tds.BorderRounded)
+	_, _ = fmt.Fprintln(cmd.OutOrStdout(), panelOutput)
+	return nil
 }
 
 func matchesFilterExpr(obj map[string]any, filters []string) bool {

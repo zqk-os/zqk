@@ -14,7 +14,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/objects/koi"
 	"github.com/zqk-os/zqk/pkg/paths"
-	"github.com/zqk-os/zqk/pkg/process"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/validation"
 	"github.com/zqk-os/zqk/pkg/validation/qa"
@@ -39,40 +38,26 @@ func runPromote(cmd *cobra.Command, args []string) error {
 // promoteObjectIDs advances each id one lifecycle hop when preconditions pass.
 // Shared by `object promote` and `object draft promote`.
 func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) error {
-	tc, err := setupTransitionContext(cmd, proc, args)
-	if err != nil {
-		return err
-	}
+	return executeLifecycleTransitions(cmd, proc, args, "promote", "promotion", promoteTarget)
+}
 
+func promoteTarget(cmd *cobra.Command, proc *cli.Processor, tc *transitionContext, target *loadedLifecycleTarget) error {
 	ctx := tc.ctx
 	secCtx := tc.secCtx
 	lifecycleLoader := tc.env.lifecycleLoader
 	gv := tc.env.validator
 	flushTracker := tc.flushTracker
 
-	var errors []string
-	for _, idArg := range tc.args {
-		process.TouchMeaningfulActivity()
-		if ctx.Err() != nil {
-			errors = append(errors, fmt.Sprintf("%s: skipped due to context timeout: %v", idArg, ctx.Err()))
-			break
-		}
-		target, err := resolveAndLoadLifecycleTarget(ctx, secCtx, proc, lifecycleLoader, idArg)
-		if err != nil {
-			errors = append(errors, fmt.Sprintf("%s: %v", idArg, err))
-			continue
-		}
+	id := target.id
+	current := target.current
+	kind := target.kind
+	currentStatus := target.currentStatus
+	lifecycle := target.lifecycle
+	statuses := target.statuses
+	sortedStatuses := target.sortedStatuses
+	currentIdx := target.currentIdx
 
-		id := target.id
-		current := target.current
-		kind := target.kind
-		currentStatus := target.currentStatus
-		lifecycle := target.lifecycle
-		statuses := target.statuses
-		sortedStatuses := target.sortedStatuses
-		currentIdx := target.currentIdx
-
-		if currentIdx == -1 {
+	if currentIdx == -1 {
 			// Kernel repair: illegal/undefined status (e.g. legacy "proposed") cannot walk
 			// the graph. Recover onto an initial lifecycle status when validation allows.
 			var recoverOrder []string
@@ -142,9 +127,8 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 				recoverRejects = append(recoverRejects, fmt.Sprintf("%s: %s", candidate, formatCandidateValidationFailure(valErr, valResult)))
 			}
 			if recovered == "" {
-				errors = append(errors, fmt.Sprintf("%s (%s): current status '%s' is not defined in the lifecycle; recovery to initial failed (%s)",
-					id, kind, currentStatus, strings.Join(recoverRejects, "; ")))
-				continue
+				return fmt.Errorf("%s (%s): current status '%s' is not defined in the lifecycle; recovery to initial failed (%s)",
+					id, kind, currentStatus, strings.Join(recoverRejects, "; "))
 			}
 			updateMap := map[string]any{objects.FieldKeyStatus: recovered}
 			// Skip transition validation: source status is not in the lifecycle graph.
@@ -153,14 +137,13 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 				"promote recover undefined status to lifecycle initial",
 			)
 			promoteCtx = storage.WithCLIOperation(storage.WithSkipWriteBehind(promoteCtx))
-			if err = proc.Storage().Update(promoteCtx, secCtx, id, updateMap); err != nil {
-				errors = append(errors, fmt.Sprintf("%s: failed to recover status '%s' → '%s': %v", id, currentStatus, recovered, err))
-				continue
+			if err := proc.Storage().Update(promoteCtx, secCtx, id, updateMap); err != nil {
+				return fmt.Errorf("%s: failed to recover status '%s' → '%s': %v", id, currentStatus, recovered, err)
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "✓ Recovered %s from undefined '%s' to initial '%s'\n",
 				color.CyanString(id), color.YellowString(currentStatus), color.GreenString(recovered))
 			flushTracker.add(kind)
-			continue
+			return nil
 		}
 
 		// Prefer lifecycle transition-graph neighbors (one hop), not "any higher percent".
@@ -220,9 +203,7 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 
 		// Find next valid status (one hop). Keep rejection reasons so a stuck
 		// promote reports *why* candidates failed.
-		bestStatus := currentStatus
-		rejectionByStatus := make(map[string]string)
-		var rejectedOrder []string
+		probe := newCandidateProbeState(currentStatus)
 		for _, candidate := range probeOrder {
 			if candidate == currentStatus {
 				continue
@@ -293,29 +274,26 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 				blockingConfig := storage.GetGlobalBlockingCheckConfig()
 				blockingErrors := blockingConfig.GetBlockingValidationErrors(valResult.Errors, kind, "")
 				if len(blockingErrors) == 0 {
-					bestStatus = candidate
+					probe.bestStatus = candidate
 					break
 				}
-				rejectionByStatus[candidate] = formatValidationErrorList(blockingErrors)
-				rejectedOrder = append(rejectedOrder, candidate)
+				probe.recordRejection(candidate, formatValidationErrorList(blockingErrors))
 				continue
 			}
-			rejectionByStatus[candidate] = formatCandidateValidationFailure(valErr, valResult)
-			rejectedOrder = append(rejectedOrder, candidate)
+			probe.recordRejection(candidate, formatCandidateValidationFailure(valErr, valResult))
 		}
 
-		if bestStatus == currentStatus {
-			msg := formatStuckPromote(id, diag, rejectedOrder, rejectionByStatus)
-			errors = append(errors, msg)
-			continue
+		if probe.bestStatus == currentStatus {
+			msg := formatStuckPromote(id, diag, probe.rejectedOrder, probe.rejectionByStatus)
+			return fmt.Errorf("%s", msg)
 		}
+		bestStatus := probe.bestStatus
 
 		// Complete hop invokes AuditorGate.VerifyComplete for execution work units
 		if (kind == objects.KindBacklogItem || kind == objects.KindAgentTask) && objects.GetGlobalStatusChecker().IsWorkDone(kind, bestStatus) {
 			gate := qa.NewAuditorGateForProject(proc.Storage(), proc.ProjectRoot())
 			if err := gate.VerifyComplete(ctx, id); err != nil {
-				errors = append(errors, fmt.Sprintf("%s: qa_success verification failed for complete hop: %v", id, err))
-				continue
+				return fmt.Errorf("%s: qa_success verification failed for complete hop: %v", id, err)
 			}
 		}
 
@@ -332,12 +310,10 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 			}
 			hop, hopErr := zqklifecycle.PlanStageMembraneHop(promoteCtx, secCtx, proc.Storage(), lifecycleLoader, dependents, []string{id}, bestStatus)
 			if hopErr != nil {
-				errors = append(errors, fmt.Sprintf("%s: failed to plan archive promote: %v", id, hopErr))
-				continue
+				return fmt.Errorf("%s: failed to plan archive promote: %v", id, hopErr)
 			}
 			if err := zqklifecycle.ApplyStageMembraneHop(promoteCtx, secCtx, proc.Storage(), dependents, hop); err != nil {
-				errors = append(errors, fmt.Sprintf("%s: failed to apply archive promote burrito: %v", id, err))
-				continue
+				return fmt.Errorf("%s: failed to apply archive promote burrito: %v", id, err)
 			}
 			for _, m := range hop.Members {
 				flushTracker.add(m.Kind)
@@ -349,7 +325,7 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 					fmt.Fprintln(cmd.OutOrStdout(), cue)
 				}
 			}
-			continue
+			return nil
 		}
 
 		// Setup update map with the new status plus lifecycle clear side_effects.
@@ -361,10 +337,9 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 		}
 
 		// Persist the promotion
-		err = proc.Storage().Update(promoteCtx, secCtx, id, updateMap)
+		err := proc.Storage().Update(promoteCtx, secCtx, id, updateMap)
 		if err != nil {
-			errors = append(errors, fmt.Sprintf("%s: failed to apply promotion to '%s': %v", id, bestStatus, err))
-			continue
+			return fmt.Errorf("%s: failed to apply promotion to '%s': %v", id, bestStatus, err)
 		}
 
 		// Read back final object status in case lifecycle hooks (e.g. execution lock) advanced it.
@@ -384,16 +359,7 @@ func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) er
 			}
 		}
 		flushTracker.addWithBacklogCascade(kind)
-	}
-
-	// Write-behind drain + CAS listing-index flush for every kind we mutated.
-	flushObjectMutationVisibility(proc, "promote", flushTracker.kinds())
-
-	if len(errors) > 0 {
-		return fmt.Errorf("promotion completed with errors:\n%s", strings.Join(errors, "\n"))
-	}
-
-	return nil
+		return nil
 }
 
 // promoteStuckDiag captures why promote built an empty or failing probe list.

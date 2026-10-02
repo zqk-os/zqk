@@ -41,6 +41,10 @@ func RunCreateWithData(cmd *cobra.Command, kind string, objData map[string]any) 
 		objData[objects.FieldKeyKind] = kind
 	}
 	normalizeObjectData(objData, kind, proc)
+	return finalizeObjectCreation(cmd, proc, kind, objData, emptyValue)
+}
+
+func finalizeObjectCreation(cmd *cobra.Command, proc *cli.Processor, kind string, objData map[string]any, sourceFilePath string) error {
 	handled, err := prepareCreateAndDryRun(cmd, proc, kind, objData)
 	if err != nil {
 		return err
@@ -48,39 +52,58 @@ func RunCreateWithData(cmd *cobra.Command, kind string, objData map[string]any) 
 	if handled {
 		return nil
 	}
-	objID, _ := objData[objects.FieldKeyID].(string)
-	objKind, _ := objData[objects.FieldKeyKind].(string)
 	force, _ := cmd.Flags().GetBool("force")
 	promote, _ := cmd.Flags().GetBool("promote")
 	casDirect, _ := cmd.Flags().GetBool("cas")
-	// Sync create for interactive CLI latency (see create.go).
+	return executeObjectStorageCreate(cmd, proc, objData, kind, sourceFilePath, force, promote, casDirect)
+}
+
+func executeObjectStorageCreate(
+	cmd *cobra.Command,
+	proc *cli.Processor,
+	objData map[string]any,
+	kind, sourceFilePath string,
+	force, promote, casDirect bool,
+) error {
+	objID, _ := objData[objects.FieldKeyID].(string)
+	objKind, _ := objData[objects.FieldKeyKind].(string)
+
 	opCtx := pkgctx.WithCacheUpdate(proc.OperationContext(), objID, objKind, "")
 	opCtx = storage.WithCLIOperation(storage.WithSkipWriteBehind(opCtx))
 	if promote || casDirect {
 		opCtx = pkgctx.WithPromoteOnCreate(opCtx)
 	}
+
+	clipkg.EmitContextHUD(proc.OperationContext(), proc.SecurityContext(), objData, "creating", objID)
+
 	if err := proc.Storage().Create(opCtx, proc.SecurityContext(), objData); err != nil {
-		if (err == storage.ErrObjectExists || strings.Contains(err.Error(), "already exists")) && force && objID != emptyValue {
+		if (err == storage.ErrObjectExists || strings.Contains(err.Error(), "already exists")) && force {
+			if objID == emptyValue {
+				return cli.Guard(cmd).Require(false, "cannot use --force without object ID").Return()
+			}
 			updateCtx := pkgctx.WithCacheUpdate(proc.OperationContext(), objID, objKind, "")
 			if updateErr := proc.Storage().Update(updateCtx, proc.SecurityContext(), objID, objData); updateErr != nil {
-				return cli.Guard(cmd).Err(updateErr).Wrapf("failed to update with --force: %w").Return()
+				logging.FluentEvent(proc.Logger()).Error("Failed to update existing object with --force", updateErr).
+					ObjectID(objID).
+					Log()
+				return cli.Guard(cmd).Err(updateErr).Wrapf("failed to update existing object with --force: %w").Return()
 			}
 			logging.FluentEvent(proc.Logger()).Info("Updated existing object with --force").
 				ObjectID(objID).
 				Log()
 		} else {
+			logging.FluentEvent(proc.Logger()).Error("Failed to create object", err).
+				Kind(kind).
+				Log()
 			return cli.Guard(cmd).Err(err).Wrapf("failed to create object: %w").Return()
 		}
 	}
 
-	// Update object ID and kind from data (in case they were generated/normalized by storage)
 	if id, ok := objData[objects.FieldKeyID].(string); ok && id != emptyValue {
 		objID = id
 	}
-	if k, ok := objData[objects.FieldKeyKind].(string); ok && k != emptyValue {
-	}
 
-	return finalizeCLIObjectCreate(cmd, proc, objData, kind, objID, emptyValue)
+	return finalizeCLIObjectCreate(cmd, proc, objData, kind, objID, sourceFilePath)
 }
 
 // finalizeCLIObjectCreate proves membrane visibility after storage.Create and either

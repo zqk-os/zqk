@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	clitool "github.com/zqk-os/zqk/pkg/cli"
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/coordination"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
@@ -31,37 +31,6 @@ const (
 	commandEventKeyTargetKind = "target_kind"
 )
 
-// createContextWithLoggingProfile creates a context with LoggingContext embedded from profile string
-// This ensures coordinator logging events respect --context profile settings
-func createContextWithLoggingProfile(ctx context.Context, profile string) context.Context {
-	if ctx == nil {
-		ctx = pkgctx.NewSystemContext()
-	}
-
-	if profile == EmptyValue {
-		profile = profileHuman // Default
-	}
-
-	// Convert profile string to LoggingProfile enum
-	var loggingCtx *pkgctx.LoggingContext
-	switch profile {
-	case profileMCP:
-		loggingCtx = pkgctx.NewLoggingContext(pkgctx.ProfileMCP)
-	case profileSystem:
-		loggingCtx = pkgctx.NewSystemLoggingContext()
-	case profileAIAgent:
-		loggingCtx = pkgctx.NewLoggingContext(pkgctx.ProfileAIAgent)
-	case profileDebug:
-		loggingCtx = pkgctx.NewLoggingContext(pkgctx.ProfileDebug)
-	case profileHuman, "":
-		loggingCtx = pkgctx.NewHumanLoggingContext()
-	default:
-		loggingCtx = pkgctx.NewHumanLoggingContext()
-	}
-
-	return pkgctx.WithLoggingContext(ctx, loggingCtx)
-}
-
 // emitCommandExecutionEventViaCoordinator emits command execution events via the coordination system
 // This replaces direct CreateAuditEventWithBuilder calls for command execution audit events
 func emitCommandExecutionEventViaCoordinator(
@@ -79,16 +48,7 @@ func emitCommandExecutionEventViaCoordinator(
 		return
 	}
 
-	// Embed LoggingContext in context so coordinator logging respects --context profile
-	ctx = createContextWithLoggingProfile(ctx, profile)
-
-	coordinator := coordination.NewStorageCoordinator(projectRoot, storageProvider)
-
-	// Build audit metadata
-	auditMetadata := make(map[string]any)
-	for k, v := range metadata {
-		auditMetadata[k] = v
-	}
+	ctx, coordinator, auditMetadata := cli.InitAuditCoordination(ctx, projectRoot, storageProvider, profile, metadata)
 	auditMetadata[commandEventKeyType] = commandExecutionEventType
 	auditMetadata[commandEventKeyOperation] = operation
 	auditMetadata[commandEventKeySeverity] = severity
