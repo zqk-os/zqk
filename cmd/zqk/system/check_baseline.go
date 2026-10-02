@@ -42,9 +42,7 @@ type BaselineMetrics struct {
 
 // runCheckBaseline runs the synchronous check command and outputs baseline metrics
 func runCheckBaseline(cmd *cobra.Command, ctx *cli.Context, _ []string) error {
-	projectRoot := ctx.ProjectRoot
-	projectRoot = ProjectRootOrResolve(projectRoot)
-
+	projectRoot := ProjectRootOrResolve(ctx.ProjectRoot)
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 
 	// Check if we should include full results
@@ -177,49 +175,66 @@ func runCheckAllSynchronous(projectRoot string, cmd *cobra.Command, ctx *cli.Con
 	return allResults, nil
 }
 
-// collectBaselineMetrics collects metrics from check results
-func collectBaselineMetrics(results []CheckResult, duration time.Duration, includeResults bool) BaselineMetrics {
-	metrics := BaselineMetrics{
-		Timestamp:       time.Now(),
-		TotalResults:    len(results),
-		Duration:        duration,
+type checkResultsSummary struct {
+	TotalObjects    int
+	TotalIssues     int
+	ObjectsPerSec   float64
+	IssuesByTier    map[int]int
+	ObjectKinds     map[string]int
+	IssueCategories map[string]int
+}
+
+func summarizeCheckResults(results []CheckResult, duration time.Duration) checkResultsSummary {
+	summary := checkResultsSummary{
 		IssuesByTier:    make(map[int]int),
 		ObjectKinds:     make(map[string]int),
 		IssueCategories: make(map[string]int),
 	}
 
-	// Count unique objects
 	objectSet := make(map[string]bool)
 	for _, result := range results {
 		if result.ObjectID != emptyValue {
 			objectSet[result.ObjectID] = true
 		}
-		metrics.ObjectKinds[result.ObjectKind]++
+		summary.ObjectKinds[result.ObjectKind]++
 
-		// Count issues by tier and category
 		for _, issue := range result.Issues {
-			metrics.IssuesByTier[issue.Tier]++
-			metrics.TotalIssues++
+			summary.IssuesByTier[issue.Tier]++
+			summary.TotalIssues++
 			if issue.Category != emptyValue {
-				metrics.IssueCategories[issue.Category]++
+				summary.IssueCategories[issue.Category]++
 			}
 		}
 	}
 
-	metrics.TotalObjects = len(objectSet)
+	summary.TotalObjects = len(objectSet)
 	if duration > 0 {
-		metrics.ObjectsPerSec = float64(metrics.TotalObjects) / duration.Seconds()
+		summary.ObjectsPerSec = float64(summary.TotalObjects) / duration.Seconds()
 	}
+	return summary
+}
 
+// collectBaselineMetrics collects metrics from check results
+func collectBaselineMetrics(results []CheckResult, duration time.Duration, includeResults bool) BaselineMetrics {
+	summary := summarizeCheckResults(results, duration)
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
-	metrics.MemoryUsageMB = float64(m.Alloc) / 1024 / 1024
 
-	// Include full results if requested
+	metrics := BaselineMetrics{
+		Timestamp:       time.Now(),
+		TotalResults:    len(results),
+		Duration:        duration,
+		TotalObjects:    summary.TotalObjects,
+		TotalIssues:     summary.TotalIssues,
+		ObjectsPerSec:   summary.ObjectsPerSec,
+		MemoryUsageMB:   float64(m.Alloc) / 1024 / 1024,
+		IssuesByTier:    summary.IssuesByTier,
+		ObjectKinds:     summary.ObjectKinds,
+		IssueCategories: summary.IssueCategories,
+	}
 	if includeResults {
 		metrics.Results = results
 	}
-
 	return metrics
 }
 
@@ -285,13 +300,7 @@ func NewCheckBaselineCmd() *cobra.Command {
 	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewSystemCheckBaselineCommandBuilder(), &cobra.Command{
 		Use: "check-baseline",
 	})
-	cli.BindAsyncProgress(cmd, func(cmd *cobra.Command, args []string) error {
-		ctx, err := getSystemCliContext(cmd)
-		if err != nil {
-			return err
-		}
-		return runCheckBaseline(cmd, ctx, args)
-	})
+	bindSystemCliContextRunner(cmd, runCheckBaseline)
 
 	// Apply help builder to command
 	helpBuilder.ApplyToCommand(cmd)

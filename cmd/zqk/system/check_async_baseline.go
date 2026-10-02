@@ -71,9 +71,7 @@ type CorrectnessCheck struct {
 
 // runCheckAsyncBaseline runs the async validator and compares with baseline
 func runCheckAsyncBaseline(cmd *cobra.Command, ctx *cli.Context, _ []string) error {
-	projectRoot := ctx.ProjectRoot
-	projectRoot = ProjectRootOrResolve(projectRoot)
-
+	projectRoot := ProjectRootOrResolve(ctx.ProjectRoot)
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 
 	// Load baseline metrics
@@ -399,46 +397,23 @@ func convertValidationIssues(validationIssues []validation.ValidationIssue) []Is
 	return issues
 }
 
-// collectAsyncBaselineMetrics collects metrics from async validation results
 func collectAsyncBaselineMetrics(results []CheckResult, duration time.Duration, workers int, includeResults bool) AsyncBaselineMetrics {
+	summary := summarizeCheckResults(results, duration)
 	metrics := AsyncBaselineMetrics{
 		Timestamp:       time.Now(),
 		TotalResults:    len(results),
 		Duration:        duration,
 		Workers:         workers,
-		IssuesByTier:    make(map[int]int),
-		ObjectKinds:     make(map[string]int),
-		IssueCategories: make(map[string]int),
+		TotalObjects:    summary.TotalObjects,
+		TotalIssues:     summary.TotalIssues,
+		ObjectsPerSec:   summary.ObjectsPerSec,
+		IssuesByTier:    summary.IssuesByTier,
+		ObjectKinds:     summary.ObjectKinds,
+		IssueCategories: summary.IssueCategories,
 	}
-
-	// Count unique objects
-	objectSet := make(map[string]bool)
-	for _, result := range results {
-		if result.ObjectID != emptyValue {
-			objectSet[result.ObjectID] = true
-		}
-		metrics.ObjectKinds[result.ObjectKind]++
-
-		// Count issues by tier and category
-		for _, issue := range result.Issues {
-			metrics.IssuesByTier[issue.Tier]++
-			metrics.TotalIssues++
-			if issue.Category != emptyValue {
-				metrics.IssueCategories[issue.Category]++
-			}
-		}
-	}
-
-	metrics.TotalObjects = len(objectSet)
-	if duration > 0 {
-		metrics.ObjectsPerSec = float64(metrics.TotalObjects) / duration.Seconds()
-	}
-
-	// Include full results if requested
 	if includeResults {
 		metrics.Results = results
 	}
-
 	return metrics
 }
 
@@ -634,13 +609,7 @@ func NewCheckAsyncBaselineCmd() *cobra.Command {
 	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewSystemCheckAsyncBaselineCommandBuilder(), &cobra.Command{
 		Use: "check-async-baseline",
 	})
-	cli.BindAsyncProgress(cmd, func(cmd *cobra.Command, args []string) error {
-		ctx, err := getSystemCliContext(cmd)
-		if err != nil {
-			return err
-		}
-		return runCheckAsyncBaseline(cmd, ctx, args)
-	})
+	bindSystemCliContextRunner(cmd, runCheckAsyncBaseline)
 
 	// Apply help builder to command
 	helpBuilder.ApplyToCommand(cmd)

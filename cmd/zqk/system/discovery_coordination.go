@@ -62,6 +62,31 @@ func formatDiscoveryOpDesc(action string, targetKind string, kinds []string) str
 	return fmt.Sprintf("Object discovery %s for %d kinds", action, len(kinds))
 }
 
+func buildDiscoveryEventData(action, status, targetKind string, kinds []string, extraAudit map[string]any, extraLogging []coordination.LoggingField) *coordination.EventData {
+	auditMetadata := map[string]any{
+		eventKeyEventType:  eventTypeSystemConfigChange,
+		eventKeyOperation:  formatDiscoveryOpDesc(action, targetKind, kinds),
+		eventKeyTargetKind: "discovery",
+		"kinds_count":      len(kinds),
+		eventKeySeverity:   severityLow,
+	}
+	for k, v := range extraAudit {
+		auditMetadata[k] = v
+	}
+
+	loggingFields := []coordination.LoggingField{
+		{Key: "kinds_count", Value: len(kinds)},
+		{Key: eventKeyStatus, Value: status},
+	}
+	loggingFields = append(loggingFields, extraLogging...)
+	loggingFields = appendDiscoveryScope(targetKind, kinds, auditMetadata, loggingFields)
+
+	return &coordination.EventData{
+		LoggingFields: loggingFields,
+		AuditMetadata: auditMetadata,
+	}
+}
+
 // emitDiscoveryCancellationEventViaCoordinator emits discovery cancellation events via the coordination system
 // This tracks when object discovery operations are cancelled due to context cancellation
 func emitDiscoveryCancellationEventViaCoordinator(
@@ -140,30 +165,13 @@ func emitDiscoveryStartEventViaCoordinator(
 		return
 	}
 
-	// Build audit metadata
-	auditMetadata := make(map[string]any)
-	auditMetadata[eventKeyEventType] = eventTypeSystemConfigChange
-	auditMetadata[eventKeyOperation] = formatDiscoveryOpDesc("started", targetKind, kinds)
-	auditMetadata[eventKeyTargetKind] = "discovery"
-	auditMetadata["kinds_count"] = len(kinds)
-	auditMetadata["process_dir"] = processDir
-	auditMetadata[eventKeySeverity] = severityLow // Discovery start is routine
-
-	// Build logging fields
-	loggingFields := []coordination.LoggingField{
-		{Key: "kinds_count", Value: len(kinds)},
-		{Key: "process_dir", Value: processDir},
-		{Key: eventKeyStatus, Value: "started"},
-		{Key: "phase", Value: "discovery"},
-	}
-	loggingFields = appendDiscoveryScope(targetKind, kinds, auditMetadata, loggingFields)
-
-	// Create event data
-	eventData := &coordination.EventData{
-		LoggingFields: loggingFields,
-		AuditMetadata: auditMetadata,
-		MetricsData:   nil, // Discovery start events don't create metrics
-	}
+	eventData := buildDiscoveryEventData("started", "started", targetKind, kinds,
+		map[string]any{"process_dir": processDir},
+		[]coordination.LoggingField{
+			{Key: "process_dir", Value: processDir},
+			{Key: "phase", Value: "discovery"},
+		},
+	)
 
 	// Create event context with system_check operation type for unified coordination
 	// Use "start" status (not "started") so it maps to "operation.start" for subscribers
@@ -196,31 +204,16 @@ func emitDiscoveryCompletionEventViaCoordinator(
 		return
 	}
 
-	// Build audit metadata
-	auditMetadata := make(map[string]any)
-	auditMetadata[eventKeyEventType] = eventTypeSystemConfigChange
-	auditMetadata[eventKeyOperation] = formatDiscoveryOpDesc("completed", targetKind, kinds)
-	auditMetadata[eventKeyTargetKind] = "discovery"
-	auditMetadata["kinds_count"] = len(kinds)
-	auditMetadata["files_found"] = filesFound
-	auditMetadata[eventKeyDurationSeconds] = duration.Seconds()
-	auditMetadata[eventKeySeverity] = severityLow // Discovery completion is routine
-
-	// Build logging fields
-	loggingFields := []coordination.LoggingField{
-		{Key: "kinds_count", Value: len(kinds)},
-		{Key: "files_found", Value: filesFound},
-		{Key: eventKeyDurationSeconds, Value: duration.Seconds()},
-		{Key: eventKeyStatus, Value: "completed"},
-	}
-	loggingFields = appendDiscoveryScope(targetKind, kinds, auditMetadata, loggingFields)
-
-	// Create event data
-	eventData := &coordination.EventData{
-		LoggingFields: loggingFields,
-		AuditMetadata: auditMetadata,
-		MetricsData:   nil, // Discovery completion events don't create metrics
-	}
+	eventData := buildDiscoveryEventData("completed", "completed", targetKind, kinds,
+		map[string]any{
+			"files_found":           filesFound,
+			eventKeyDurationSeconds: duration.Seconds(),
+		},
+		[]coordination.LoggingField{
+			{Key: "files_found", Value: filesFound},
+			{Key: eventKeyDurationSeconds, Value: duration.Seconds()},
+		},
+	)
 
 	// Create operation ID
 	operationID := fmt.Sprintf("discovery_completed_%d", time.Now().Unix())
