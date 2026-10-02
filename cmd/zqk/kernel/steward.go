@@ -74,16 +74,28 @@ func (p *kernelPlanProvider) ListCandidatePlans(ctx context.Context) ([]steward.
 	return out, nil
 }
 
+func resolveStewardDaemon(proc *cli.Processor) (*steward.Daemon, string, error) {
+	projectRoot := proc.ProjectRoot()
+	if projectRoot == "" {
+		projectRoot = paths.ResolveProjectRoot(".")
+	}
+	if projectRoot == "" {
+		return nil, "", errfmt.Errorf("project root not found")
+	}
+
+	hygiene := &systemHygieneProvider{projectRoot: projectRoot}
+	plans := &kernelPlanProvider{sp: proc.Storage()}
+	monitor := steward.NewRunwayMonitor(steward.MinimumShovelReadyRunway)
+	return steward.NewDaemon(hygiene, plans, monitor), projectRoot, nil
+}
+
 func newStewardDaemonCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewKernelStewardDaemonCommandBuilder()
 	cmd.RunE = cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 		intervalSec, _ := cmd.Flags().GetInt("interval")
-		projectRoot := proc.ProjectRoot()
-		if projectRoot == "" {
-			projectRoot = paths.ResolveProjectRoot(".")
-		}
-		if projectRoot == "" {
-			return errfmt.Errorf("project root not found")
+		daemon, projectRoot, err := resolveStewardDaemon(proc)
+		if err != nil {
+			return err
 		}
 
 		releaseLock, err := singleton.Guard(projectRoot, "steward")
@@ -102,11 +114,6 @@ func newStewardDaemonCmd() *cobra.Command {
 			String("project_root", projectRoot).
 			Int("interval_seconds", intervalSec).
 			Log()
-
-		hygiene := &systemHygieneProvider{projectRoot: projectRoot}
-		plans := &kernelPlanProvider{sp: proc.Storage()}
-		monitor := steward.NewRunwayMonitor(steward.MinimumShovelReadyRunway)
-		daemon := steward.NewDaemon(hygiene, plans, monitor)
 
 		ctx, stop := signal.NotifyContext(cmd.Context(), os.Interrupt, syscall.SIGTERM)
 		defer stop()
@@ -146,18 +153,10 @@ func newStewardDaemonCmd() *cobra.Command {
 func newStewardSweepCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewKernelStewardSweepCommandBuilder()
 	cmd.RunE = cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-		projectRoot := proc.ProjectRoot()
-		if projectRoot == "" {
-			projectRoot = paths.ResolveProjectRoot(".")
+		daemon, _, err := resolveStewardDaemon(proc)
+		if err != nil {
+			return err
 		}
-		if projectRoot == "" {
-			return errfmt.Errorf("project root not found")
-		}
-
-		hygiene := &systemHygieneProvider{projectRoot: projectRoot}
-		plans := &kernelPlanProvider{sp: proc.Storage()}
-		monitor := steward.NewRunwayMonitor(steward.MinimumShovelReadyRunway)
-		daemon := steward.NewDaemon(hygiene, plans, monitor)
 
 		sweep, err := daemon.ExecuteSweep(cmd.Context())
 		if err != nil {

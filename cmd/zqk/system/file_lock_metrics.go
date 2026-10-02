@@ -61,11 +61,7 @@ func NewFileLockMetricsViewCmd() *cobra.Command {
 		RunE: runFileLockMetricsView,
 	})
 
-	// Apply help builder to command
-	helpBuilder.ApplyToCommand(cmd)
-
-	cli.AddCommonFlags(cmd)
-	return cmd
+	return cli.FinalizeCommand(cmd, helpBuilder)
 }
 
 // NewFileLockMetricsFlushCmd creates a command to flush metrics
