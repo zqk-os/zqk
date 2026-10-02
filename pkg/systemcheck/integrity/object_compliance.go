@@ -8,6 +8,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/walutil"
 )
 
 // ObjectComplianceSnapshot is the instance-validation health slice of kernel integrity.
@@ -256,15 +257,5 @@ func AppendObjectComplianceHistory(projectRoot string, entry ObjectComplianceHis
 		last.TotalIssues == entry.TotalIssues {
 		return nil
 	}
-	b, err := json.Marshal(entry)
-	if err != nil {
-		return err
-	}
-	f, err := fileutil.OpenFile(path, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, paths.FilePerm644)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	_, err = f.Write(append(b, '\n'))
-	return err
+	return walutil.AppendJSONLine(path, entry)
 }

@@ -5,6 +5,7 @@
 package lifecycle
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"path/filepath"
@@ -226,4 +227,59 @@ func (w *LifecycleEventWAL) Path() string {
 // CheckpointPath returns the checkpoint file path.
 func (w *LifecycleEventWAL) CheckpointPath() string {
 	return w.w.CheckpointPath()
+}
+
+// PollLifecycleWAL polls the lifecycle WAL from a cursor at regular intervals, invoking onEvent
+// for each new event and onBatchComplete when one or more events were processed in a cycle.
+// Loops until ctx is cancelled.
+func PollLifecycleWAL(
+	ctx context.Context,
+	projectRoot string,
+	pollInterval time.Duration,
+	onEvent func(ev *LifecycleEvent),
+	onBatchComplete func(),
+) {
+	wal, err := GetOrCreateLifecycleWAL(projectRoot)
+	if err != nil {
+		return
+	}
+
+	var cursor walutil.ReplayCursor
+	if pollInterval <= 0 {
+		pollInterval = 200 * time.Millisecond
+	}
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		default:
+		}
+
+		newEvents := 0
+		newCursor, err := wal.ReplayFromCursor(cursor, func(ev *LifecycleEvent) error {
+			if ev == nil {
+				return nil
+			}
+			newEvents++
+			if onEvent != nil {
+				onEvent(ev)
+			}
+			return nil
+		})
+
+		if err == nil {
+			cursor = newCursor
+		}
+
+		if newEvents > 0 && onBatchComplete != nil {
+			onBatchComplete()
+		}
+
+		select {
+		case <-ctx.Done():
+			return
+		case <-time.After(pollInterval):
+		}
+	}
 }

@@ -216,13 +216,17 @@ func resolvePriorityPlanForWhatsNext(ctx context.Context, sp storage.ObjectStora
 		}
 	}
 
-	// 5. If no plan has work, fall back to first candidate.
-	if bestPlan == nil || bestScore <= 0 {
-		bestPlan = candidates[0]
-	}
-
+	bestPlan = SelectBestCandidatePlan(bestPlan, bestScore, candidates)
 	pID, pSumm := summarizePriorityPlan(bestPlan)
 	return pID, pSumm, activePlans
+}
+
+// SelectBestCandidatePlan falls back to first candidate if bestPlan is nil or bestScore is non-positive.
+func SelectBestCandidatePlan(bestPlan map[string]any, bestScore int, candidates []map[string]any) map[string]any {
+	if (bestPlan == nil || bestScore <= 0) && len(candidates) > 0 {
+		return candidates[0]
+	}
+	return bestPlan
 }
 
 // planHasWork returns true if the plan has at least one open (non-terminal) linked BLI.

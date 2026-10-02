@@ -59,12 +59,10 @@ func NewInternalListCmd() *cobra.Command {
 }
 
 func runInternalList(cmd *cobra.Command, args []string) error {
-	proc, err := newInternalProcessor(cmd)
+	proc, projectRoot, err := newInternalProcessorWithRoot(cmd)
 	if err != nil {
 		return err
 	}
-
-	projectRoot := proc.ProjectRoot()
 
 	// Get appropriate storage provider (file or graph) - internal commands need graph support
 	storageProvider, err := getStorageProvider(projectRoot)

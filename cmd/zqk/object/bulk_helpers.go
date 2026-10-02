@@ -1,8 +1,6 @@
 package object
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
@@ -49,48 +47,7 @@ func setCacheCheckerForBatchCreation(_ *cli.Processor) {
 
 // outputBulkResult outputs bulk operation results using shared utility
 func outputBulkResult(cmd *cobra.Command, result *storagepkg.BulkResult, format, operation string) {
-	// Convert storage.BulkResult errors to clipkg.BulkErrorInfo
-	errors := make([]clipkg.BulkErrorInfo, len(result.Errors))
-	for i, err := range result.Errors {
-		errors[i] = clipkg.BulkErrorInfo{
-			ID:      err.ID,
-			Index:   err.Index,
-			Message: err.Message,
-		}
-	}
-
-	// Build structured data for format handlers
-	outputData := clipkg.BuildBulkResultData(
-		result.TotalCount,
-		result.SuccessCount,
-		result.FailureCount,
-		result.Results,
-		errors,
-		operation,
-	)
-
-	// Use FormatOutput for consistent formatting (respects --format flag)
-	if err := cli.FormatOutput(cmd, outputData); err != nil {
-		// Fallback to legacy output if FormatOutput fails
-		output, outputErr := clipkg.OutputBulkResult(
-			result.TotalCount,
-			result.SuccessCount,
-			result.FailureCount,
-			result.Results,
-			errors,
-			operation,
-			format,
-		)
-		if outputErr != nil {
-			// Last resort fallback
-			fallback := fmt.Sprintf("Bulk %s operation completed with errors (failed to format output: %v)\n", operation, outputErr)
-			//nolint:errcheck // Output errors are non-critical
-			_ = cli.WriteOutput(cmd, []byte(fallback))
-			return
-		}
-		//nolint:errcheck // Output errors are non-critical
-		_ = cli.WriteOutput(cmd, output)
-	}
+	cli.OutputBulkResult(cmd, result, format, operation)
 }
 
 func projectAndOutputBulkResult(cmd *cobra.Command, proc *cli.Processor, result *storagepkg.BulkResult, operation string) error {

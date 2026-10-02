@@ -61,70 +61,7 @@ func (dl *DataLoader) LoadData(cmd *cobra.Command, hint *LastDraftHint) (data ma
 		}
 	}
 
-	var loadedData map[string]any
-	if filePath != emptyValue {
-		loadedData, filePath, err = dl.LoadFromFile(filePath)
-	} else if dataStr != emptyValue {
-		loadedData, filePath, err = dl.LoadFromString(dataStr)
-	} else if len(fields) == 0 {
-		// Non-terminal stdin: read entire pipe/redir before considering last-draft pointer.
-		if !term.IsTerminal(fileutil.TermFdInt(os.Stdin)) {
-			// Structurally address CLI hangs on empty pipes (deadlocks from agent subprocess.PIPE).
-			ch := make(chan []byte, 1)
-			errCh := make(chan error, 1)
-			goroutinelabels.NewGoroutine("stdin_reader", "Read stdin data asynchronously").StartSimple(func() {
-				data, err := io.ReadAll(os.Stdin)
-				if err != nil {
-					errCh <- err
-				} else {
-					ch <- data
-				}
-			})
-
-			var stdinData []byte
-			var stdinErr error
-			select {
-			case stdinData = <-ch:
-			case stdinErr = <-errCh:
-			case <-time.After(2 * time.Second):
-				return nil, "", errfmt.Errorf("stdin read timeout: possible deadlock from empty pipe without args (use --file, --data, or close pipe)")
-			}
-
-			if stdinErr != nil {
-				return nil, "", errfmt.Newf("read stdin").Wrap(stdinErr)
-			}
-			if len(bytes.TrimSpace(stdinData)) > 0 {
-				loadedData = make(map[string]any)
-				if parseErr := yaml.Unmarshal(stdinData, &loadedData); parseErr != nil {
-					dl.logger.LogError("Failed to parse YAML from stdin", parseErr)
-					return nil, "", errfmt.Newf("failed to parse YAML from stdin").Wrap(parseErr)
-				}
-			} else {
-				// Empty pipe: try last-draft pointer
-				p, draftErr := dl.tryLastDraft(hint)
-				if draftErr != nil {
-					return nil, "", draftErr
-				}
-				if p != emptyValue {
-					loadedData, filePath, err = dl.LoadFromFile(p)
-				}
-			}
-		} else {
-			// Terminal: prefer last-draft pointer so `zqk object create <kind>` does not block on stdin.
-			p, draftErr := dl.tryLastDraft(hint)
-			if draftErr != nil {
-				return nil, "", draftErr
-			}
-			if p != emptyValue {
-				loadedData, filePath, err = dl.LoadFromFile(p)
-			} else {
-				loadedData, filePath, err = dl.LoadFromStdin()
-			}
-		}
-	} else {
-		loadedData = make(map[string]any)
-	}
-
+	loadedData, filePath, err := dl.resolveInitialData(filePath, dataStr, len(fields) > 0, hint)
 	if err != nil {
 		return nil, "", err
 	}
@@ -143,6 +80,84 @@ func (dl *DataLoader) LoadData(cmd *cobra.Command, hint *LastDraftHint) (data ma
 	}
 
 	return loadedData, filePath, nil
+}
+
+func (dl *DataLoader) resolveInitialData(filePath, dataStr string, hasFields bool, hint *LastDraftHint) (map[string]any, string, error) {
+	if filePath != emptyValue {
+		return dl.LoadFromFile(filePath)
+	}
+	if dataStr != emptyValue {
+		return dl.LoadFromString(dataStr)
+	}
+	if !hasFields {
+		return dl.loadFromStdinOrDraft(hint)
+	}
+	return make(map[string]any), "", nil
+}
+
+func (dl *DataLoader) loadFromStdinOrDraft(hint *LastDraftHint) (map[string]any, string, error) {
+	if !term.IsTerminal(fileutil.TermFdInt(os.Stdin)) {
+		return dl.loadFromPipedStdin(hint)
+	}
+	return dl.loadFromTerminalOrDraft(hint)
+}
+
+func (dl *DataLoader) loadFromDraftIfAvailable(hint *LastDraftHint) (map[string]any, string, error, bool) {
+	p, draftErr := dl.tryLastDraft(hint)
+	if draftErr != nil {
+		return nil, "", draftErr, true
+	}
+	if p != emptyValue {
+		data, path, err := dl.LoadFromFile(p)
+		return data, path, err, true
+	}
+	return nil, "", nil, false
+}
+
+func (dl *DataLoader) loadFromTerminalOrDraft(hint *LastDraftHint) (map[string]any, string, error) {
+	if data, path, err, handled := dl.loadFromDraftIfAvailable(hint); handled {
+		return data, path, err
+	}
+	return dl.LoadFromStdin()
+}
+
+func (dl *DataLoader) loadFromPipedStdin(hint *LastDraftHint) (map[string]any, string, error) {
+	ch := make(chan []byte, 1)
+	errCh := make(chan error, 1)
+	goroutinelabels.NewGoroutine("stdin_reader", "Read stdin data asynchronously").StartSimple(func() {
+		data, readErr := io.ReadAll(os.Stdin)
+		if readErr != nil {
+			errCh <- readErr
+		} else {
+			ch <- data
+		}
+	})
+
+	var stdinData []byte
+	var stdinErr error
+	select {
+	case stdinData = <-ch:
+	case stdinErr = <-errCh:
+	case <-time.After(2 * time.Second):
+		return nil, "", errfmt.Errorf("stdin read timeout: possible deadlock from empty pipe without args (use --file, --data, or close pipe)")
+	}
+
+	if stdinErr != nil {
+		return nil, "", errfmt.Newf("read stdin").Wrap(stdinErr)
+	}
+	if len(bytes.TrimSpace(stdinData)) > 0 {
+		loadedData := make(map[string]any)
+		if parseErr := yaml.Unmarshal(stdinData, &loadedData); parseErr != nil {
+			dl.logger.LogError("Failed to parse YAML from stdin", parseErr)
+			return nil, "", errfmt.Newf("failed to parse YAML from stdin").Wrap(parseErr)
+		}
+		return loadedData, "", nil
+	}
+
+	if data, path, err, handled := dl.loadFromDraftIfAvailable(hint); handled {
+		return data, path, err
+	}
+	return make(map[string]any), "", nil
 }
 
 func (dl *DataLoader) tryLastDraft(hint *LastDraftHint) (path string, err error) {
@@ -204,8 +219,8 @@ func (dl *DataLoader) LoadFromStdin() (data map[string]any, filePath string, err
 	dl.logger.LogDebug("Reading data from stdin")
 
 	// Prevent hang if stdin is a terminal and no data was piped
-	stat, _ := os.Stdin.Stat()
-	if (stat.Mode() & fileutil.ModeCharDevice) != 0 {
+	stat, err := os.Stdin.Stat()
+	if err == nil && (stat.Mode()&fileutil.ModeCharDevice) != 0 {
 		dl.logger.LogWarning("No data provided (stdin is terminal)")
 		return nil, "", errfmt.Errorf("no data provided (use --file, --data, or pipe from stdin)")
 	}

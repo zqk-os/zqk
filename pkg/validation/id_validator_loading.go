@@ -143,17 +143,21 @@ func (v *IDValidator) ReloadPatterns() error {
 // loadPatternsFromSpecs loads patterns from YAML spec files
 // Must be called with lock held
 //
-//nolint:unused // Called conditionally in LoadPatterns - may not be detected by static analysis
-func (v *IDValidator) loadPatternsFromSpecs() error {
-	patterns, err := v.loadPatternsFromSpecsUnlocked(v.specsDir)
+func (v *IDValidator) loadAndMergePatterns(loadFn func() (map[string]*IDPatternConfig, error)) error {
+	patterns, err := loadFn()
 	if err != nil {
 		return err
 	}
-	// Copy patterns to v.patterns (lock is held by caller)
 	for k, val := range patterns {
 		v.patterns[k] = val
 	}
 	return nil
+}
+
+func (v *IDValidator) loadPatternsFromSpecs() error {
+	return v.loadAndMergePatterns(func() (map[string]*IDPatternConfig, error) {
+		return v.loadPatternsFromSpecsUnlocked(v.specsDir)
+	})
 }
 
 // loadPatternsFromSpecsUnlocked loads patterns from YAML spec files without requiring lock
@@ -497,15 +501,9 @@ func (v *IDValidator) loadPatternsFromGraph(ctx context.Context) error {
 	if v.graphConn == nil {
 		return errfmt.Errorf("graph connection not available")
 	}
-	patterns, err := v.loadPatternsFromGraphUnlocked(ctx, v.graphConn)
-	if err != nil {
-		return err
-	}
-	// Copy patterns to v.patterns (lock is held by caller)
-	for k, val := range patterns {
-		v.patterns[k] = val
-	}
-	return nil
+	return v.loadAndMergePatterns(func() (map[string]*IDPatternConfig, error) {
+		return v.loadPatternsFromGraphUnlocked(ctx, v.graphConn)
+	})
 }
 
 // loadPatternsFromGraphUnlocked loads ID patterns from graph backend without requiring lock

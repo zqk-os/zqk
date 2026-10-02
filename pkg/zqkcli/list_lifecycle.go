@@ -107,15 +107,7 @@ func scanLifecycleDirectory(lifecyclesDir string, builtInOnly, internalOnly, all
 // listLifecycleDefinitionsForAll returns lifecycle definitions as QueryResult (for use in listAllInternalObjects)
 func listLifecycleDefinitionsForAll(cmd *cobra.Command, proc *cli.Processor, storageProvider storage.ObjectStorageProvider, projectRoot string, builtInOnly, internalOnly, allObjects bool) (*storage.QueryResult, error) {
 	_ = cmd // Reserved for future use (e.g., flag parsing)
-	secCtx := proc.SecurityContext()
-	storageCtx := proc.StorageContext()
-
-	filter := storage.ListFilter{
-		Kind:    internalKindLifecycle,
-		Filters: make(map[string]any),
-	}
-
-	result, err := storageProvider.List(proc.OperationContext(), secCtx, storageCtx, filter)
+	result, err := queryStorageInternalKind(proc, storageProvider, internalKindLifecycle)
 	if err == nil && len(result.Objects) > 0 {
 		filtered := filterStorageLifecycles(result.Objects, builtInOnly, internalOnly, allObjects)
 		result.Objects = filtered

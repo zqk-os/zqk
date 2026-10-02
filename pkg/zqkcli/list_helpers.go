@@ -222,3 +222,11 @@ func getStorageProvider(projectRoot string) (storage.ObjectStorageProvider, erro
 	// Use file-based storage
 	return storage.NewFileObjectStorage(projectRoot)
 }
+
+// queryStorageInternalKind queries storage for all objects of a given internal kind.
+func queryStorageInternalKind(proc *cli.Processor, sp storage.ObjectStorageProvider, kind string) (*storage.QueryResult, error) {
+	return sp.List(proc.OperationContext(), proc.SecurityContext(), proc.StorageContext(), storage.ListFilter{
+		Kind:    kind,
+		Filters: make(map[string]any),
+	})
+}

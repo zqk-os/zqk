@@ -95,12 +95,10 @@ Examples:
 
 //nolint:gocyclo // Function orchestrates count operations; complexity reduced via helper functions
 func runInternalCount(cmd *cobra.Command, args []string) error {
-	proc, err := newInternalProcessor(cmd)
+	proc, projectRoot, err := newInternalProcessorWithRoot(cmd)
 	if err != nil {
 		return err
 	}
-
-	projectRoot := proc.ProjectRoot()
 
 	var validatedKinds []string
 	if len(args) > 0 {
@@ -183,10 +181,7 @@ func countAllKinds(cmd *cobra.Command, proc *cli.Processor, storageProvider stor
 		Bool("all_objects", flags.AllObjects).
 		Log()
 
-	scopeNote := ""
-	if !flags.AllObjects {
-		scopeNote = paths.RewriteCanonicalCLIInvocations("internal/built-in only; run 'zqk object count' for total system object count")
-	}
+	scopeNote := internalCountScopeNote(flags.AllObjects)
 
 	useList := shouldUseListForCount(flags)
 	if !flags.AllObjects {
@@ -201,6 +196,13 @@ func countAllKinds(cmd *cobra.Command, proc *cli.Processor, storageProvider stor
 	return outputAllKindsCount(cmd, counts, string(format), scopeNote)
 }
 
+func internalCountScopeNote(allObjects bool) string {
+	if !allObjects {
+		return paths.RewriteCanonicalCLIInvocations("internal/built-in only; run 'zqk object count' for total system object count")
+	}
+	return ""
+}
+
 // countMultipleKinds counts objects for multiple specified kinds
 func countMultipleKinds(cmd *cobra.Command, proc *cli.Processor, storageProvider storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, storageCtx *pkgctx.StorageContext, kinds []string, flags *CountFlags) error {
 	format := proc.Format()
@@ -208,10 +210,7 @@ func countMultipleKinds(cmd *cobra.Command, proc *cli.Processor, storageProvider
 		Int("kind_count", len(kinds)).
 		Log()
 
-	scopeNote := ""
-	if !flags.AllObjects {
-		scopeNote = paths.RewriteCanonicalCLIInvocations("internal/built-in only; run 'zqk object count' for total system object count")
-	}
+	scopeNote := internalCountScopeNote(flags.AllObjects)
 
 	useList := shouldUseListForCount(flags)
 	counts, err := executeParallelKindCounts(proc.OperationContext(), proc, storageProvider, secCtx, storageCtx, kinds, flags, useList, true)

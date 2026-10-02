@@ -674,11 +674,7 @@ func resolvePriorityPlanForWhatsNext(ctx context.Context, sp workflowStorage, ex
 		}
 	}
 
-	// 5. If no plan has work, fall back to first candidate.
-	if bestPlan == nil || bestScore <= 0 {
-		bestPlan = candidates[0]
-	}
-
+	bestPlan = whatsnext.SelectBestCandidatePlan(bestPlan, bestScore, candidates)
 	pID, pSumm := summarizePriorityPlan(bestPlan)
 	return pID, pSumm, activePlans
 }

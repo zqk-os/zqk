@@ -275,3 +275,22 @@ func ExtractSeqFromAnyJSON(v any) int64 {
 	}
 	return ExtractSeqFromJSON(b)
 }
+
+// AppendJSONLine marshals v as JSON and appends it as a single line to the file at path.
+// It ensures that the parent directory exists.
+func AppendJSONLine(path string, v any) error {
+	if err := fileutil.MkdirAll(filepath.Dir(path), paths.DirPerm755); err != nil {
+		return err
+	}
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	f, err := fileutil.OpenFile(path, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, paths.FilePerm644)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	_, err = f.Write(append(b, '\n'))
+	return err
+}

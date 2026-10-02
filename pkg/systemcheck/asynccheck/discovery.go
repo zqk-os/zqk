@@ -16,6 +16,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/validation"
 	"github.com/zqk-os/zqk/pkg/when"
 )
 
@@ -67,15 +68,7 @@ func CalculateMaxConcurrentWorkers(numKinds int) int {
 
 // IsHexString reports whether s consists entirely of hexadecimal characters.
 func IsHexString(s string) bool {
-	if len(s) == 0 {
-		return false
-	}
-	for _, c := range s {
-		if (c < '0' || c > '9') && (c < 'a' || c > 'f') && (c < 'A' || c > 'F') {
-			return false
-		}
-	}
-	return true
+	return validation.IsHexString(s)
 }
 
 // ExtractObjectIDFromFile extracts object ID from file path or content (legacy system context).

@@ -51,14 +51,7 @@ func (v *IDValidator) ValidateID(id, kind string) (bool, error) {
 		return v.validateAccountID(id, config)
 	}
 
-	// Parse and validate namespace if present
-	actualID, err := v.parseAndValidateNamespace(id)
-	if err != nil {
-		return false, err
-	}
-
-	// Validate actual ID against config
-	return v.validateActualID(actualID, config)
+	return v.validateNamespacedActualID(id, config)
 }
 
 // validateAccountID validates account IDs with special handling
@@ -86,6 +79,10 @@ func (v *IDValidator) validateAccountID(id string, config *IDPatternConfig) (boo
 
 	// If neither prefix nor pattern matches, continue with namespace parsing for other formats
 	// (This allows account IDs to be validated as namespaced IDs if they don't match account format)
+	return v.validateNamespacedActualID(id, config)
+}
+
+func (v *IDValidator) validateNamespacedActualID(id string, config *IDPatternConfig) (bool, error) {
 	actualID, err := v.parseAndValidateNamespace(id)
 	if err != nil {
 		return false, err

@@ -91,32 +91,14 @@ func NewInternalBulkCreateCmd() *cobra.Command {
 }
 
 func runInternalBulkCreate(cmd *cobra.Command, args []string) error {
-	proc, err := newInternalProcessor(cmd)
+	proc, kind, err := resolveInternalKindAndProcessor(cmd, args)
 	if err != nil {
 		return err
 	}
 
-	kind, ok := kindCanonicalFromInternalPRERun(cmd)
-	if !ok {
-		var rerr error
-		kind, rerr = objkeys.ResolveAndValidateKindForProject(proc.ProjectRoot(), args[0])
-		if rerr != nil {
-			return rerr
-		}
-	}
-
-	filePath, err := cmd.Flags().GetString("file")
-	if err != nil || filePath == emptyValue {
-		return errfmt.Errorf("--file is required")
-	}
-
-	// Read file
-	data, err := fileutil.ReadFile(filePath)
+	_, data, err := readRequiredFileFlag(cmd, proc)
 	if err != nil {
-		logging.FluentEvent(proc.Logger()).Error("Failed to read file", err).
-			File(filePath).
-			Log()
-		return errfmt.Newf("failed to read file").Wrap(err)
+		return err
 	}
 
 	// Parse YAML array
@@ -227,18 +209,9 @@ func runInternalBulkUpdate(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	filePath, err := cmd.Flags().GetString("file")
-	if err != nil || filePath == emptyValue {
-		return errfmt.Errorf("--file is required")
-	}
-
-	// Read file
-	data, err := fileutil.ReadFile(filePath)
+	_, data, err := readRequiredFileFlag(cmd, proc)
 	if err != nil {
-		logging.FluentEvent(proc.Logger()).Error("Failed to read file", err).
-			File(filePath).
-			Log()
-		return errfmt.Newf("failed to read file").Wrap(err)
+		return err
 	}
 
 	// Parse YAML array
@@ -344,9 +317,7 @@ func NewInternalBulkGetCmd() *cobra.Command {
 	// Apply help builder to command
 	helpBuilder.ApplyToCommand(cmd)
 
-	cli.AddCommonFlags(cmd)
-	cmd.Flags().String("ids", "", "Comma-separated list of object IDs")
-	cmd.Flags().String("file", "", "Path to YAML file containing array of IDs")
+	addBulkIDFlags(cmd)
 
 	return cmd
 }
@@ -408,9 +379,7 @@ func NewInternalBulkDeleteCmd() *cobra.Command {
 	// Apply help builder to command
 	helpBuilder.ApplyToCommand(cmd)
 
-	cli.AddCommonFlags(cmd)
-	cmd.Flags().String("ids", "", "Comma-separated list of object IDs")
-	cmd.Flags().String("file", "", "Path to YAML file containing array of IDs")
+	addBulkIDFlags(cmd)
 	cmd.Flags().Bool("cascade", false, "Delete objects and all objects that reference them")
 	cmd.Flags().Bool("unlink-references", false, "Strip this ID from dependents' reference fields, then delete (does not delete dependent objects)")
 	cmd.Flags().Bool("dry-run", false, "Show what would be deleted without actually deleting")
@@ -468,46 +437,34 @@ func runInternalBulkDelete(cmd *cobra.Command, args []string) error {
 
 // outputBulkResult outputs bulk operation results using shared utility
 func outputBulkResult(cmd *cobra.Command, result *storage.BulkResult, format, operation string) {
-	// Convert storage.BulkResult errors to clipkg.BulkErrorInfo
-	errors := make([]clipkg.BulkErrorInfo, len(result.Errors))
-	for i, err := range result.Errors {
-		errors[i] = clipkg.BulkErrorInfo{
-			ID:      err.ID,
-			Index:   err.Index,
-			Message: err.Message,
-		}
-	}
+	cli.OutputBulkResult(cmd, result, format, operation)
+}
 
-	// Build structured data for format handlers
-	outputData := clipkg.BuildBulkResultData(
-		result.TotalCount,
-		result.SuccessCount,
-		result.FailureCount,
-		result.Results,
-		errors,
-		operation,
-	)
+func addBulkIDFlags(cmd *cobra.Command) {
+	cli.AddCommonFlags(cmd)
+	cmd.Flags().String("ids", "", "Comma-separated list of object IDs")
+	cmd.Flags().String("file", "", "Path to YAML file containing array of IDs")
+}
 
-	// Use FormatOutput for consistent formatting (respects --format flag)
-	if err := cli.FormatOutput(cmd, outputData); err != nil {
-		// Fallback to legacy output if FormatOutput fails
-		output, outputErr := clipkg.OutputBulkResult(
-			result.TotalCount,
-			result.SuccessCount,
-			result.FailureCount,
-			result.Results,
-			errors,
-			operation,
-			format,
-		)
-		if outputErr != nil {
-			// Last resort fallback
-			fallback := fmt.Sprintf("Bulk %s operation completed with errors (failed to format output: %v)\n", operation, outputErr)
-			//nolint:errcheck // Output errors are non-critical
-			_ = cli.WriteOutput(cmd, []byte(fallback))
-			return
-		}
-		//nolint:errcheck // Output errors are non-critical
-		_ = cli.WriteOutput(cmd, output)
+func requireFileFlag(cmd *cobra.Command) (string, error) {
+	filePath, err := cmd.Flags().GetString("file")
+	if err != nil || filePath == emptyValue {
+		return "", errfmt.Errorf("--file is required")
 	}
+	return filePath, nil
+}
+
+func readRequiredFileFlag(cmd *cobra.Command, proc *cli.Processor) (string, []byte, error) {
+	filePath, err := requireFileFlag(cmd)
+	if err != nil {
+		return "", nil, err
+	}
+	data, err := fileutil.ReadFile(filePath)
+	if err != nil {
+		logging.FluentEvent(proc.Logger()).Error("Failed to read file", err).
+			File(filePath).
+			Log()
+		return "", nil, errfmt.Newf("failed to read file").Wrap(err)
+	}
+	return filePath, data, nil
 }
