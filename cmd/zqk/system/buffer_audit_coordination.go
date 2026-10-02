@@ -18,10 +18,7 @@ func emitBufferedAuditEventViaCoordinator(
 	buffered *BufferedEvent,
 	profile string,
 ) {
-	ctx, coordinator, ok := setupSystemCoordinator(ctx, projectRoot, storageProvider, profile, false)
-	if !ok {
-		return
-	}
+	withSystemCoordinator(ctx, projectRoot, storageProvider, profile, false, func(ctx context.Context, coordinator *coordination.Coordinator) {
 
 	// Build audit metadata from buffered event
 	auditMetadata := make(map[string]any)
@@ -75,4 +72,5 @@ func emitBufferedAuditEventViaCoordinator(
 		WithChannels(false, true, false, false) // Only audit, no logging/metrics/operational
 
 	emitAsyncCoordinationEvent(ctx, coordinator, "buffer_audit_event_emitter", "emitting buffer audit event", eventCtx)
+	})
 }

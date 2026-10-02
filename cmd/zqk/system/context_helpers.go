@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
+	"runtime/pprof"
 	"strings"
 
 	"github.com/fatih/color"
@@ -350,6 +351,30 @@ func walkYAMLFiles(dir string, fn func(path string, info fileutil.FileInfo) erro
 		}
 		return nil
 	})
+}
+
+// writeGoroutineProfile writes a goroutine profile to file with the specified debug level (default 0).
+func writeGoroutineProfile(filename string, debugLevel ...int) error {
+	level := 0
+	if len(debugLevel) > 0 {
+		level = debugLevel[0]
+	}
+	f, err := fileutil.Create(filename)
+	if err != nil {
+		return errfmt.Newf("failed to create goroutine profile").Wrap(err)
+	}
+	defer f.Close()
+
+	profile := pprof.Lookup("goroutine")
+	if profile == nil {
+		return errfmt.Errorf("goroutine profile not available")
+	}
+
+	if err := profile.WriteTo(f, level); err != nil {
+		return errfmt.Newf("failed to write goroutine profile").Wrap(err)
+	}
+
+	return nil
 }
 
 

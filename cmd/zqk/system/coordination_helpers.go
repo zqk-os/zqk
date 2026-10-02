@@ -115,6 +115,22 @@ func setupSystemCoordinator(
 	return ctx, coordinator, true
 }
 
+// withSystemCoordinator executes fn with an initialized coordinator if the project root is valid.
+func withSystemCoordinator(
+	ctx context.Context,
+	projectRoot string,
+	storageProvider storage.ObjectStorageProvider,
+	profile string,
+	withMetrics bool,
+	fn func(ctx context.Context, coordinator *coordination.Coordinator),
+) {
+	ctx, coordinator, ok := setupSystemCoordinator(ctx, projectRoot, storageProvider, profile, withMetrics)
+	if !ok {
+		return
+	}
+	fn(ctx, coordinator)
+}
+
 // severityForStatusOrError returns severityHigh when status is error or err is non-nil, otherwise severityLow.
 func severityForStatusOrError(status string, err error) string {
 	if status == eventStatusError || err != nil {

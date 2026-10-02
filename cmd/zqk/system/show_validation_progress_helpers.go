@@ -15,19 +15,7 @@ func checkCacheForCompletion(vpc *ValidationProgressContext, queueEmpty bool, pr
 	if queueEmpty {
 		completedCopy := vpc.copyCompletedObjectIDs()
 		allStates := vpc.Validator.GetAllCachedStates()
-		cachedStateMap := make(map[string]bool, len(allStates))
-		for _, state := range allStates {
-			cachedStateMap[state.ObjectID] = true
-		}
-
-		cachedCount := 0
-		for objectID := range vpc.EnqueuedObjectIDs {
-			hasProgress := completedCopy[objectID]
-			if !hasProgress && cachedStateMap[objectID] {
-				cachedCount++
-			}
-		}
-		return cachedCount
+		return countCachedObjects(vpc, allStates, completedCopy)
 	}
 
 	// If queue not empty, only check once to avoid performance overhead
@@ -41,19 +29,7 @@ func checkCacheForCompletion(vpc *ValidationProgressContext, queueEmpty bool, pr
 
 	completedCopy := vpc.copyCompletedObjectIDs()
 	allStates := vpc.Validator.GetAllCachedStates()
-	cachedStateMap := make(map[string]bool, len(allStates))
-	for _, state := range allStates {
-		cachedStateMap[state.ObjectID] = true
-	}
-
-	cachedCount := 0
-	for objectID := range vpc.EnqueuedObjectIDs {
-		hasProgress := completedCopy[objectID]
-		if !hasProgress && cachedStateMap[objectID] {
-			cachedCount++
-		}
-	}
-
+	cachedCount := countCachedObjects(vpc, allStates, completedCopy)
 	vpc.CompletionCheckDone = true
 	return cachedCount
 }
@@ -124,3 +100,11 @@ func countCachedObjects(vpc *ValidationProgressContext, allStates []*validation.
 
 	return cachedCount
 }
+
+// snapshotProgressCounts atomically snapshots progress-received, completed, and failed counts.
+func (vpc *ValidationProgressContext) snapshotProgressCounts() (progressReceivedCount, completed, failed int) {
+	vpc.Mu.RLock()
+	defer vpc.Mu.RUnlock()
+	return len(vpc.CompletedObjectIDs), vpc.Completed, vpc.Failed
+}
+

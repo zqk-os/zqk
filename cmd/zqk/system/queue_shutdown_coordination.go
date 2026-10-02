@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/coordination"
-	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
@@ -78,14 +77,7 @@ func emitQueueShutdownEventViaCoordinator(
 	}
 
 	// Emit via coordinator (async, non-blocking)
-	bud := goroutinelabels.DefaultBudget()
-	builder := goroutinelabels.NewGoroutine("queue_shutdown_coordinator_event", fmt.Sprintf("emitting shutdown event for %s", queueName))
-	if bud != nil {
-		builder = builder.WithBudget(bud)
-	}
-	builder.StartSimple(func() {
-		_ = coordinator.Emit(ctx, eventCtx)
-	})
+	emitAsyncCoordinationEvent(ctx, coordinator, "queue_shutdown_coordinator_event", fmt.Sprintf("emitting shutdown event for %s", queueName), eventCtx)
 }
 
 // init wires up queue shutdown events with coordinator

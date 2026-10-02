@@ -23,36 +23,33 @@ func emitOperationExecutorEventViaCoordinator(
 	failedCount int,
 	duration time.Duration,
 ) {
-	ctx, coordinator, ok := setupSystemCoordinator(ctx, projectRoot, storageProvider, systemProfileSystem, true)
-	if !ok {
-		return
-	}
+	withSystemCoordinator(ctx, projectRoot, storageProvider, systemProfileSystem, true, func(ctx context.Context, coordinator *coordination.Coordinator) {
+		// Build audit metadata
+		auditMetadata := make(map[string]any)
+		auditMetadata[eventKeyEventType] = fmt.Sprintf("operation_executor_%s", operationType)
+		auditMetadata[eventKeyOperation] = fmt.Sprintf("Operation executor %s: %d workers, %d processed, %d failed", operationType, workerCount, processedCount, failedCount)
+		auditMetadata[eventKeyWorkerCount] = workerCount
+		auditMetadata[eventKeyProcessedCount] = processedCount
+		auditMetadata[eventKeyFailedCount] = failedCount
+		auditMetadata[eventKeyDurationSeconds] = duration.Seconds()
+		auditMetadata[eventKeyOperationType] = operationTypeOperationExecutor
+		auditMetadata[eventKeySource] = sourceBackgroundWorker
+		auditMetadata[eventKeySeverity] = determineFailureSeverity(status, failedCount, processedCount)
 
-	// Build audit metadata
-	auditMetadata := make(map[string]any)
-	auditMetadata[eventKeyEventType] = fmt.Sprintf("operation_executor_%s", operationType)
-	auditMetadata[eventKeyOperation] = fmt.Sprintf("Operation executor %s: %d workers, %d processed, %d failed", operationType, workerCount, processedCount, failedCount)
-	auditMetadata[eventKeyWorkerCount] = workerCount
-	auditMetadata[eventKeyProcessedCount] = processedCount
-	auditMetadata[eventKeyFailedCount] = failedCount
-	auditMetadata[eventKeyDurationSeconds] = duration.Seconds()
-	auditMetadata[eventKeyOperationType] = operationTypeOperationExecutor
-	auditMetadata[eventKeySource] = sourceBackgroundWorker
-	auditMetadata[eventKeySeverity] = determineFailureSeverity(status, failedCount, processedCount)
+		loggingFields, metricsData := buildWorkerLoggingAndMetrics(
+			operationType, status,
+			coordination.LoggingField{Key: eventKeyWorkerCount, Value: workerCount},
+			coordination.LoggingField{Key: eventKeyProcessedCount, Value: processedCount},
+			coordination.LoggingField{Key: eventKeyFailedCount, Value: failedCount},
+		)
 
-	loggingFields, metricsData := buildWorkerLoggingAndMetrics(
-		operationType, status,
-		coordination.LoggingField{Key: eventKeyWorkerCount, Value: workerCount},
-		coordination.LoggingField{Key: eventKeyProcessedCount, Value: processedCount},
-		coordination.LoggingField{Key: eventKeyFailedCount, Value: failedCount},
-	)
-
-	emitOperational := operationType == "worker_start" || operationType == "worker_shutdown" || operationType == "worker_idle_shutdown"
-	emitWorkerLifecycleCoordinationEvent(
-		ctx, coordinator, operationID, eventTypeOperationExecutor, operationType, status,
-		auditMetadata, loggingFields, metricsData, duration, emitOperational,
-		"operation_executor_event_emit", fmt.Sprintf("emitting operation executor event: %s", operationType),
-	)
+		emitOperational := operationType == "worker_start" || operationType == "worker_shutdown" || operationType == "worker_idle_shutdown"
+		emitWorkerLifecycleCoordinationEvent(
+			ctx, coordinator, operationID, eventTypeOperationExecutor, operationType, status,
+			auditMetadata, loggingFields, metricsData, duration, emitOperational,
+			"operation_executor_event_emit", fmt.Sprintf("emitting operation executor event: %s", operationType),
+		)
+	})
 }
 
 func init() {

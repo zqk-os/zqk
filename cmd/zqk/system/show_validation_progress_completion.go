@@ -350,11 +350,7 @@ func collectResultsForCompletion(vpc *ValidationProgressContext, failedCopy map[
 
 // checkCompletion checks if validation is complete
 func checkCompletion(vpc *ValidationProgressContext, queueSize int) (bool, error) {
-	vpc.Mu.RLock()
-	progressReceivedCount := len(vpc.CompletedObjectIDs)
-	currentCompleted := vpc.Completed
-	currentFailed := vpc.Failed
-	vpc.Mu.RUnlock()
+	progressReceivedCount, currentCompleted, currentFailed := vpc.snapshotProgressCounts()
 
 	queueEmpty := queueSize == 0
 	// CRITICAL: Always check cache when checking completion
@@ -585,19 +581,8 @@ func collectAndOutputFinalResults(vpc *ValidationProgressContext) (bool, error) 
 
 	// Count cached objects that were enqueued but didn't send progress
 	allStates := vpc.Validator.GetAllCachedStates()
-	cachedStateMap := make(map[string]bool, len(allStates))
-	for _, state := range allStates {
-		cachedStateMap[state.ObjectID] = true
-	}
-
 	completedCopy := vpc.copyCompletedObjectIDs()
-	cachedCount := 0
-	for objectID := range vpc.EnqueuedObjectIDs {
-		hasProgress := completedCopy[objectID]
-		if !hasProgress && cachedStateMap[objectID] {
-			cachedCount++
-		}
-	}
+	cachedCount := countCachedObjects(vpc, allStates, completedCopy)
 
 	actualValidatedCount := progressReceivedCount + cachedCount
 	vpc.Mu.RLock()
