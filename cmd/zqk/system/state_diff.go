@@ -15,6 +15,7 @@ import (
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/systemcheck/snapshot"
 )
 
 // NewStateDiffCmd creates the state-diff command
@@ -45,9 +46,7 @@ func NewStateDiffCmd() *cobra.Command {
 
 func runStateDiff(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-		ctx := proc.OperationContext()
-		secCtx := proc.SecurityContext()
-		projectRoot := proc.ProjectRoot()
+		ctx, secCtx, projectRoot := processorContexts(proc)
 
 		brief, _ := cmd.Flags().GetBool("brief")
 
@@ -57,13 +56,9 @@ func runStateDiff(cmd *cobra.Command, args []string) error {
 		}
 
 		cmd.Printf("Loading snapshot A: %s\n", pathA)
-		csA, err := storage.ReadCompressedSnapshot(pathA)
+		objsA, err := snapshot.ReadAndExpandSnapshot(pathA)
 		if err != nil {
 			return errfmt.Newf("failed to read snapshot A").Wrap(err)
-		}
-		objsA, err := csA.Expand()
-		if err != nil {
-			return errfmt.Newf("failed to expand snapshot A").Wrap(err)
 		}
 
 		var objsB []map[string]any
@@ -74,13 +69,9 @@ func runStateDiff(cmd *cobra.Command, args []string) error {
 				pathB = filepath.Join(projectRoot, pathB)
 			}
 			cmd.Printf("Loading snapshot B: %s\n", pathB)
-			csB, err := storage.ReadCompressedSnapshot(pathB)
+			objsB, err = snapshot.ReadAndExpandSnapshot(pathB)
 			if err != nil {
 				return errfmt.Newf("failed to read snapshot B").Wrap(err)
-			}
-			objsB, err = csB.Expand()
-			if err != nil {
-				return errfmt.Newf("failed to expand snapshot B").Wrap(err)
 			}
 		} else {
 			cmd.Printf("Extracting live system state for comparison...\n")

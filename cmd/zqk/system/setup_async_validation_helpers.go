@@ -48,10 +48,10 @@ type AsyncValidationContext struct {
 
 // initializeAsyncValidationContext sets up the async validation context
 func initializeAsyncValidationContext(cmd *cobra.Command, ctx *cli.Context, projectRoot string, metrics *validation.ValidationMetrics) *AsyncValidationContext {
-	specLoader := objects.GetGlobalSpecLoader()
-	lifecycleLoader := objects.GetGlobalLifecycleLoader()
-	validatorRegistry := validation.GetGlobalRegistry()
-	validator := validatorRegistry.Get("")
+	loaders := getGlobalValidationLoaders()
+	specLoader := loaders.SpecLoader
+	lifecycleLoader := loaders.LifecycleLoader
+	validator := loaders.Validator
 
 	hashRegistryPool := &directoryRegistryPool{} // sync.Map initialized automatically
 	hashRegistryCache := &HashRegistryCacheType{

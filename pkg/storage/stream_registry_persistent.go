@@ -83,40 +83,40 @@ type streamRegistrySnapshot struct {
 	lastRefresh time.Time
 }
 
-func mergeAppendIntoRegistryCacheLocked(projectRoot, kind, id, loc string) {
+func withStreamRegistryCacheLocked(projectRoot, kind string, fn func(snap *streamRegistrySnapshot)) {
 	key := streamRegistryCacheKey(projectRoot, kind)
 	snap, ok := streamRegistryCache[key]
 	if !ok || snap == nil {
 		return
 	}
 	snap.mu.Lock()
-	if snap.locations == nil {
-		snap.locations = make(map[string]string)
-	}
-	snap.locations[id] = loc
-	delete(snap.deleted, id)
-	snap.mu.Unlock()
+	defer snap.mu.Unlock()
+	fn(snap)
+}
+
+func mergeAppendIntoRegistryCacheLocked(projectRoot, kind, id, loc string) {
+	withStreamRegistryCacheLocked(projectRoot, kind, func(snap *streamRegistrySnapshot) {
+		if snap.locations == nil {
+			snap.locations = make(map[string]string)
+		}
+		snap.locations[id] = loc
+		delete(snap.deleted, id)
+	})
 }
 
 func mergeDeletedIntoRegistryCacheLocked(projectRoot, kind string, ids []string) {
-	key := streamRegistryCacheKey(projectRoot, kind)
-	snap, ok := streamRegistryCache[key]
-	if !ok || snap == nil {
-		return
-	}
-	snap.mu.Lock()
-	if snap.deleted == nil {
-		snap.deleted = make(map[string]bool)
-	}
-	for _, id := range ids {
-		if id == emptyValue {
-			continue
+	withStreamRegistryCacheLocked(projectRoot, kind, func(snap *streamRegistrySnapshot) {
+		if snap.deleted == nil {
+			snap.deleted = make(map[string]bool)
 		}
-		snap.deleted[id] = true
-		delete(snap.locations, id)
-	}
-	snap.mu.Unlock()
-
+		for _, id := range ids {
+			if id == emptyValue {
+				continue
+			}
+			snap.deleted[id] = true
+			delete(snap.locations, id)
+		}
+	})
 }
 
 func streamRegistryCacheKey(projectRoot, kind string) string {
@@ -191,24 +191,7 @@ func AddStreamDeletedID(projectRoot, kind, id string) error {
 	if projectRoot == emptyValue || kind == emptyValue || id == emptyValue {
 		return nil
 	}
-	stateDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.StateDir)
-	if err := fileutil.MkdirAll(stateDir, paths.DirPerm755); err != nil {
-		return errfmt.Newf(ConstStreamStreamDeletedMkdir).Wrap(err)
-	}
-	deletedPath := streamDeletedPath(projectRoot, kind)
-	streamRegistryMu.Lock()
-	defer streamRegistryMu.Unlock()
-	f, err := fileutil.OpenFile(deletedPath, fileutil.O_APPEND|fileutil.O_CREATE|fileutil.O_WRONLY, paths.FilePerm600)
-	if err != nil {
-		return errfmt.Newf(ConstStreamStreamDeletedOpen).Wrap(err)
-	}
-	_, err = f.Write(append([]byte(id), '\n'))
-	logging.LogSwallowedError(f.Close())
-	if err != nil {
-		return errfmt.Newf(ConstStreamStreamDeletedWrite).Wrap(err)
-	}
-	mergeDeletedIntoRegistryCacheLocked(projectRoot, kind, []string{id})
-	return nil
+	return BatchAddStreamDeletedIDs(projectRoot, kind, []string{id})
 }
 
 // BatchAddStreamDeletedIDs appends multiple IDs to the kind's stream-deleted set in one lock and one file open.

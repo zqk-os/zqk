@@ -12,6 +12,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/systemcheck/snapshot"
 )
 
 // VerificationStats tracks verification statistics
@@ -23,17 +24,7 @@ type VerificationStats struct {
 
 // readAndExpandSnapshot reads and expands a compressed snapshot
 func readAndExpandSnapshot(csnapFile string) ([]map[string]any, error) {
-	cs, err := storage.ReadCompressedSnapshot(csnapFile)
-	if err != nil {
-		return nil, errfmt.Newf("failed to read compressed snapshot").Wrap(err)
-	}
-
-	expanded, err := cs.Expand()
-	if err != nil {
-		return nil, errfmt.Newf("failed to expand snapshot").Wrap(err)
-	}
-
-	return expanded, nil
+	return snapshot.ReadAndExpandSnapshot(csnapFile)
 }
 
 // setupStorageForVerification sets up storage provider for verification
@@ -56,10 +47,7 @@ func setupStorageForVerification(cmd *cobra.Command) (storage.ObjectStorageProvi
 
 // calculateVerifyCount calculates how many objects to verify
 func calculateVerifyCount(totalObjects, maxObjects int) int {
-	if maxObjects > 0 && maxObjects < totalObjects {
-		return maxObjects
-	}
-	return totalObjects
+	return snapshot.CalculateVerifyCount(totalObjects, maxObjects)
 }
 
 // verifySingleObject verifies a single object

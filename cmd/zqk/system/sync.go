@@ -263,13 +263,21 @@ func generateBranchName(planID string) string {
 	return branchName
 }
 
-// ensureBranch ensures we're on the correct branch, creating it if needed
-func ensureBranch(projectRoot, expectedBranch string, logger *logging.EventLogger, dryRun bool) error {
+// gitCurrentBranch initializes GitFacade and returns the current branch name.
+func gitCurrentBranch(projectRoot string) (*gitpkg.Facade, string, error) {
 	gf := gitpkg.NewFacade(projectRoot)
-	// Get current branch
 	currentBranch, err := gf.CurrentBranch()
 	if err != nil {
-		return errfmt.Newf("failed to determine current branch").Wrap(err)
+		return nil, "", errfmt.Newf("failed to determine current branch").Wrap(err)
+	}
+	return gf, currentBranch, nil
+}
+
+// ensureBranch ensures we're on the correct branch, creating it if needed
+func ensureBranch(projectRoot, expectedBranch string, logger *logging.EventLogger, dryRun bool) error {
+	gf, currentBranch, err := gitCurrentBranch(projectRoot)
+	if err != nil {
+		return err
 	}
 
 	// If already on the correct branch, nothing to do
@@ -406,11 +414,9 @@ func gitCommit(cmd *cobra.Command, projectRoot, message string, logger *logging.
 }
 
 func gitPull(projectRoot string, verify bool, logger *logging.EventLogger, dryRun bool) error {
-	gf := gitpkg.NewFacade(projectRoot)
-	// Get current branch name
-	currentBranch, err := gf.CurrentBranch()
+	gf, currentBranch, err := gitCurrentBranch(projectRoot)
 	if err != nil {
-		return errfmt.Newf("failed to determine current branch").Wrap(err)
+		return err
 	}
 
 	if dryRun {
@@ -443,11 +449,9 @@ func gitPull(projectRoot string, verify bool, logger *logging.EventLogger, dryRu
 }
 
 func gitPush(cmd *cobra.Command, projectRoot string, verify bool, logger *logging.EventLogger, dryRun bool) error {
-	gf := gitpkg.NewFacade(projectRoot)
-	// Get current branch name
-	currentBranch, err := gf.CurrentBranch()
+	gf, currentBranch, err := gitCurrentBranch(projectRoot)
 	if err != nil {
-		return errfmt.Newf("failed to determine current branch").Wrap(err)
+		return err
 	}
 
 	if dryRun {

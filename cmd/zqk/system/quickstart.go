@@ -86,12 +86,7 @@ func NewQuickstartCmd() *cobra.Command {
 }
 
 func runQuickstart(cmd *cobra.Command, args []string) error {
-	ctx := cli.GetContext(cmd)
-	projectRoot := ""
-	if ctx != nil {
-		projectRoot = ctx.ProjectRoot
-	}
-	projectRoot = ProjectRootOrResolve(projectRoot)
+	projectRoot, _ := resolveCommandProjectRoot(cmd)
 
 	format, _ := cmd.Flags().GetString("format")
 	if format == "json" {

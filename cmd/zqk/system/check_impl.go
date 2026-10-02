@@ -220,10 +220,10 @@ func performBlockingCheck(blockingCtx *pkgctx.BlockingCheckContext) *pkgctx.Bloc
 	kinds := discoverObjectKinds(processDir)
 
 	// Use global loaders to share caches across sync and async validation
-	specLoader := objects.GetGlobalSpecLoader()
-	lifecycleLoader := objects.GetGlobalLifecycleLoader()
-	validatorRegistry := validation.GetGlobalRegistry()
-	validator := validatorRegistry.Get("")
+	loaders := getGlobalValidationLoaders()
+	specLoader := loaders.SpecLoader
+	lifecycleLoader := loaders.LifecycleLoader
+	validator := loaders.Validator
 
 	// Cache hash registries per kind
 	hashRegistryCache := &HashRegistryCacheType{
@@ -480,10 +480,10 @@ func CheckKindObjectsWithCache(ctx *cli.Context, stdCtx stdcontext.Context, cmd 
 func checkKindObjects(ctx *cli.Context, cmd *cobra.Command, kind string, ids []string) ([]CheckResult, error) {
 	// Spec/lifecycle loaders resolve under .zqk/specs — never pass project
 	// root as the loader directory (that looks for <root>/criteria_lifecycle.yaml).
-	specLoader := objects.GetGlobalSpecLoader()
-	lifecycleLoader := objects.GetGlobalLifecycleLoader()
-	validatorRegistry := validation.GetGlobalRegistry()
-	validator := validatorRegistry.Get("") // Default validator
+	loaders := getGlobalValidationLoaders()
+	specLoader := loaders.SpecLoader
+	lifecycleLoader := loaders.LifecycleLoader
+	validator := loaders.Validator
 	hashRegistryCache := &HashRegistryCacheType{
 		cache: make(map[string]storage.HashRegistryProvider),
 	}

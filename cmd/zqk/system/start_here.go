@@ -3,7 +3,6 @@ package system
 import (
 	"fmt"
 
-	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/brand"
@@ -22,9 +21,7 @@ func NewStartHereCmd() *cobra.Command {
 
 func runStartHere(cmd *cobra.Command, _ []string) error {
 	out := cli.CommandOutputWriter(cmd, pkgctx.NewSystemContext())
-	cyan := color.New(color.FgCyan).SprintFunc()
-	green := color.New(color.FgGreen).SprintFunc()
-	yellow := color.New(color.FgYellow).SprintFunc()
+	cyan, green, yellow := cli.StandardColorPrinters()
 	exe := brand.ExecutableName()
 
 	write := func(format string, args ...any) {

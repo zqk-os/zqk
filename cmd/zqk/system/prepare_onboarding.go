@@ -7,7 +7,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // PrepareOnboardingResult is the result of prepare-onboarding for --format json/yaml (BLI-806).
@@ -35,19 +34,13 @@ bundle (retention, audit aggregation, etc.) with --with-maintenance.`,
 }
 
 func runPrepareOnboarding(cmd *cobra.Command, _ []string) error {
-	ctx := cli.GetContext(cmd)
-	if ctx == nil {
-		return cli.Guard(cmd).Err(errfmt.Errorf("failed to get context")).Return()
+	ctx, logger, err := resolveContextAndLogger(cmd, string(pkgctx.ProfileSystem))
+	if err != nil {
+		return cli.Guard(cmd).Err(err).Return()
 	}
-	projectRoot := ctx.ProjectRoot
-	projectRoot = ProjectRootOrResolve(projectRoot)
+	projectRoot := ProjectRootOrResolve(ctx.ProjectRoot)
 	if projectRoot == emptyValue {
 		return cli.Guard(cmd).Err(errfmt.Errorf("project root not found; run from project dir or set ZQK_PROJECT_ROOT")).Return()
-	}
-
-	logger := logging.GetLoggerFromProfile(ctx.Profile)
-	if logger == nil {
-		logger = logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	}
 
 	if err := EnsureOnboardingRoadmapJobInProject(projectRoot, logger); err != nil {

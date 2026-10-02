@@ -124,11 +124,7 @@ func (p *DSIAStorageProvider) Read(ctx context.Context, secCtx *SecurityContext,
 		return nil, err
 	}
 
-	var obj map[string]any
-	if err := yaml.Unmarshal(data, &obj); err != nil {
-		return nil, err
-	}
-	return obj, nil
+	return ParseStreamBackedCurrentState(data)
 }
 
 func (p *DSIAStorageProvider) Update(ctx context.Context, secCtx *SecurityContext, id string, updates map[string]any) error {

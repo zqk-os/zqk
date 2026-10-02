@@ -5,7 +5,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
@@ -32,9 +31,7 @@ func runJoin(cmd *cobra.Command, args []string) error {
 		_ = err
 
 		logger := proc.Logger()
-		cyan := color.New(color.FgCyan).SprintFunc()
-		green := color.New(color.FgGreen).SprintFunc()
-		yellow := color.New(color.FgYellow).SprintFunc()
+		cyan, green, yellow := cli.StandardColorPrinters()
 
 		// 1. RESOLVE LOCAL IDENTITY
 		fmt.Fprintf(cmd.OutOrStdout(), "%s Initializing Sovereign Identity...\n", cyan("➤"))
