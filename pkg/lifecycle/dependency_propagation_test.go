@@ -826,3 +826,67 @@ func TestApplyDependencyRefEvent_LockedBLIDoesNotWalkMilestone(t *testing.T) {
 		t.Errorf("listener must not walk: milestone status = %v, want not_started", obj[objects.FieldKeyStatus])
 	}
 }
+
+func TestApplyDependencyRefEvent_EpicShockwaveFromPriorityPlan(t *testing.T) {
+	pool := testkit.PrepareGraphConnectionForTest(t)
+	realStorage := storage.NewPoolAwareGraphStorage(pool, t.TempDir())
+	ctx := pkgctx.NewSystemContext()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	epicID := fixtureID(t, "EPC")
+	planID := fixtureID(t, "PRI")
+
+	mustCreateCASVisible(t, realStorage, ctx, secCtx, map[string]any{
+		objects.FieldKeyID:          epicID,
+		objects.FieldKeyKind:        objects.KindEpic,
+		objects.FieldKeyStatus:      objects.ObjectStatusDraft,
+		objects.FieldKeyTitle:       "Thematic Container Epic",
+		objects.FieldKeyDescription: "Container grouping multiple plans under an overarching theme",
+	})
+	mustCreateCASVisible(t, realStorage, ctx, secCtx, map[string]any{
+		objects.FieldKeyID:          planID,
+		objects.FieldKeyKind:        objects.KindPriorityPlan,
+		objects.FieldKeyStatus:      objects.ObjectStatusInProgress,
+		objects.FieldKeyTitle:       "Sprint Cycle 1",
+		objects.FieldKeyDescription: "Plan covering sprint 1",
+		objects.FieldKeyEpicRef:     epicID,
+	})
+
+	applyDependencyRefEvent(ctx, logging.NewEventLogger(ctx), realStorage, DependencyRefEvent{
+		ProjectRoot: t.TempDir(),
+		EventID:     "test-epic-shockwave-" + epicID,
+		Version:     "2030-01-01T00:00:00.000000001Z",
+		TargetID:    epicID,
+		TriggerID:   planID,
+		TriggerKind: objects.KindPriorityPlan,
+		FromState:   objects.ObjectStatusPlanned,
+		ToState:     objects.ObjectStatusInProgress,
+	})
+
+	obj, err := realStorage.Read(ctx, secCtx, epicID)
+	if err != nil {
+		t.Fatalf("read epic: %v", err)
+	}
+	if obj[objects.FieldKeyStatus] != objects.ObjectStatusInProgress {
+		t.Errorf("epic status = %v, want in_progress", obj[objects.FieldKeyStatus])
+	}
+
+	// Now shockwave to completed
+	applyDependencyRefEvent(ctx, logging.NewEventLogger(ctx), realStorage, DependencyRefEvent{
+		ProjectRoot: t.TempDir(),
+		EventID:     "test-epic-shockwave-complete-" + epicID,
+		Version:     "2030-01-01T00:00:00.000000002Z",
+		TargetID:    epicID,
+		TriggerID:   planID,
+		TriggerKind: objects.KindPriorityPlan,
+		FromState:   objects.ObjectStatusInProgress,
+		ToState:     objects.ObjectStatusCompleted,
+	})
+
+	obj2, err := realStorage.Read(ctx, secCtx, epicID)
+	if err != nil {
+		t.Fatalf("read epic after complete: %v", err)
+	}
+	if obj2[objects.FieldKeyStatus] != objects.ObjectStatusCompleted {
+		t.Errorf("epic status = %v, want completed", obj2[objects.FieldKeyStatus])
+	}
+}

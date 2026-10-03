@@ -221,3 +221,146 @@ func TestObjectPromoteCommand(t *testing.T) {
 		t.Errorf("expected status 'planned', got '%v' (get output=%s)", got3[objects.FieldKeyStatus], string(getOut))
 	}
 }
+
+func TestObjectPromoteToMultiHop(t *testing.T) {
+	testEnv := SetupTestEnvironment(t)
+
+	fieldRegistry := objects.GetGlobalFieldRegistry()
+	if err := fieldRegistry.LoadFields(); err != nil {
+		t.Fatalf("failed to load field registry: %v", err)
+	}
+
+	bliFields, err := fieldRegistry.GetFieldsForKind("backlog_item")
+	if err != nil {
+		t.Fatalf("failed to get backlog_item fields: %v", err)
+	}
+
+	root := testEnv.GetTestRoot()
+	storage.SetCacheOperationHandler(func(*pkgctx.CacheContext) error { return nil })
+	fs, err := storage.NewFileObjectStorage(root)
+	if err != nil {
+		t.Fatalf("open storage: %v", err)
+	}
+	testkit.RegisterStorageTestCleanup(t, root, fs)
+
+	ctx := pkgctx.NewSystemContext()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	cliCtx := storage.WithCLIOperation(ctx)
+
+	reopen := func(t *testing.T) *storage.FileObjectStorage {
+		t.Helper()
+		if fs != nil {
+			storage.FlushAllOrFail(t, root)
+			_ = fs.Shutdown(ctx)
+		}
+		next, err := storage.NewFileObjectStorage(root)
+		if err != nil {
+			t.Fatalf("reopen storage: %v", err)
+		}
+		fs = next
+		return fs
+	}
+
+	dependencies := []struct {
+		object      map[string]any
+		leaveStatus string
+	}{
+		{
+			object: map[string]any{
+				objects.FieldKeyID:       "ACC-899",
+				objects.FieldKeyKind:     objects.KindAccount,
+				objects.FieldKeyTitle:    "Backlog owner fixture",
+				objects.FieldKeyUsername: "backlog-owner-fixture",
+				objects.FieldKeyStatus:   objects.ObjectStatusActive,
+			},
+			leaveStatus: objects.ObjectStatusActive,
+		},
+		{
+			object: map[string]any{
+				objects.FieldKeyID:       "CRIT-TEST-1",
+				objects.FieldKeyKind:     objects.KindCriteria,
+				objects.FieldKeyTitle:    "Backlog acceptance fixture",
+				objects.FieldKeyCategory: "acceptance",
+				objects.FieldKeyStatus:   objects.ObjectStatusAwaitingVerification,
+			},
+			leaveStatus: objects.ObjectStatusValidated,
+		},
+		{
+			object: map[string]any{
+				objects.FieldKeyID:     "PRI-TEST-PLAN",
+				objects.FieldKeyKind:   objects.KindPriorityPlan,
+				objects.FieldKeyTitle:  "Priority plan fixture",
+				objects.FieldKeyStatus: objects.ObjectStatusPlanning,
+			},
+			leaveStatus: objects.ObjectStatusActive,
+		},
+		{
+			object: map[string]any{
+				objects.FieldKeyID:     "MIL-11111",
+				objects.FieldKeyKind:   objects.KindMilestone,
+				objects.FieldKeyTitle:  "Milestone fixture",
+				objects.FieldKeyStatus: objects.ObjectStatusNotStarted,
+			},
+			leaveStatus: objects.ObjectStatusBlocked,
+		},
+		{
+			object: map[string]any{
+				objects.FieldKeyID:          "REQ-TEST-1",
+				objects.FieldKeyKind:        objects.KindRequirement,
+				objects.FieldKeyTitle:       "Promote fixture requirement",
+				objects.FieldKeyDescription: "Satisfies CRI-SHOVEL-READY requirement_refs",
+				objects.FieldKeyStatus:      objects.ObjectStatusActive,
+				objects.FieldKeyPriority:    "p1",
+			},
+			leaveStatus: objects.ObjectStatusActive,
+		},
+	}
+	for _, dependency := range dependencies {
+		storage.CreateCASVisible(t, fs, cliCtx, secCtx, dependency.object, dependency.leaveStatus)
+	}
+
+	bliID := "BLI-77777"
+	bliObj := createTestObject("backlog_item", bliID, bliFields, 0)
+	bliObj[objects.FieldKeyStatus] = "exploring"
+	bliObj[objects.FieldKeyProblemStatement] = "This is a valid problem statement of sufficient length."
+	bliObj[objects.FieldKeyAcceptanceConsiderations] = "Narrative only; gates are criteria_refs."
+	bliObj[objects.FieldKeyPriority] = "high"
+	bliObj[objects.FieldKeyPriorityPlanRef] = "PRI-TEST-PLAN"
+	bliObj[objects.FieldKeyMilestoneRefs] = []any{"MIL-11111"}
+	bliObj[objects.FieldKeyPriorityTier] = "P1"
+	bliObj[objects.FieldKeyOwnerRef] = "ACC-899"
+	bliObj[objects.FieldKeyCriteriaRefs] = []any{"CRIT-TEST-1"}
+	bliObj[objects.FieldKeyRequirementRefs] = []any{"REQ-TEST-1"}
+	bliObj[objects.FieldKeyStakeholderType] = "builder"
+	bliObj[objects.FieldKeyEstimatedEffort] = "3d"
+
+	storage.CreateCASVisible(t, fs, cliCtx, secCtx, bliObj, "exploring")
+
+	reopen(t)
+	_ = fs.Shutdown(ctx)
+	fs = nil
+	storage.FlushAllOrFail(t, root)
+	if err := storage.WaitForWALProcessing(root, 5*time.Second); err != nil {
+		t.Logf("Warning: WAL processing wait failed: %v", err)
+	}
+
+	// Promote directly to planned across multiple hops: exploring -> validated -> planned.
+	cmd := testEnv.CreateCLICommand("object", "promote", bliID, "--to", "planned", "--allow-degraded")
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("promote --to planned failed: %v, output=%s", err, string(out))
+	}
+
+	getCmd := testEnv.CreateCLICommand("object", "get", bliID, "--format", "json", "--allow-degraded")
+	getOut, err := getCmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("object get after promote failed: %v, output=%s", err, string(getOut))
+	}
+	var got map[string]any
+	if err := json.Unmarshal([]byte(stripJSONOutputForParse(string(getOut))), &got); err != nil {
+		t.Fatalf("parse object get json: %v, output=%s", err, string(getOut))
+	}
+	if got[objects.FieldKeyStatus] != "planned" {
+		t.Errorf("expected status 'planned', got '%v' (get output=%s)", got[objects.FieldKeyStatus], string(getOut))
+	}
+}

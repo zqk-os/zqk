@@ -11,6 +11,7 @@ import (
 // POL-AGENT-DRAFT-SWEEP-TPM-001
 func NewDraftSweepCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewObjectDraftSweepCommandBuilder()
+	cmd.Flags().Bool("force", false, "Force sweep in local developer workspaces without ACC account")
 	cli.BindAsyncProgress(cmd, runObjectDraftSweep)
 	return cmd
 }
@@ -26,8 +27,9 @@ func runObjectDraftSweep(cmd *cobra.Command, args []string) error {
 			return err
 		}
 		_ = agentID // optional audit/seat correlation only — auth is RBAC SecurityContext
+		force, _ := cmd.Flags().GetBool("force")
 		if !flags.dryRun {
-			if authErr := authorizeDraftSweepApply(proc.SecurityContext()); authErr != nil {
+			if authErr := authorizeDraftSweepApply(proc.SecurityContext(), force); authErr != nil {
 				return authErr
 			}
 		}

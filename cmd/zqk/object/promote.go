@@ -24,6 +24,7 @@ import (
 // NewPromoteCmd creates a new promote command
 func NewPromoteCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewObjectPromoteCommandBuilder()
+	cmd.Flags().String("to", "", "Target lifecycle status to advance through valid intermediate hops")
 	cli.BindAsyncProgress(cmd, runPromote)
 	return cmd
 }
@@ -35,10 +36,33 @@ func runPromote(cmd *cobra.Command, args []string) error {
 }
 
 // promoteObjectIDs advances each id one lifecycle hop when preconditions pass.
-// promoteObjectIDs advances each id one lifecycle hop when preconditions pass.
+// When --to <status> is specified, it advances across valid intermediate hops until reaching target status.
 // Shared by `object promote` and `object draft promote`.
 func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) error {
-	return executeLifecycleTransitions(cmd, proc, args, "promote", "promotion", promoteTarget)
+	toStatus, _ := cmd.Flags().GetString("to")
+	toStatus = strings.TrimSpace(strings.ToLower(toStatus))
+	if toStatus == "" {
+		return executeLifecycleTransitions(cmd, proc, args, "promote", "promotion", promoteTarget)
+	}
+
+	const maxHops = 8
+	for hop := 0; hop < maxHops; hop++ {
+		allReached := true
+		err := executeLifecycleTransitions(cmd, proc, args, "promote", "promotion", func(cmd *cobra.Command, proc *cli.Processor, tc *transitionContext, target *loadedLifecycleTarget) error {
+			if strings.EqualFold(target.currentStatus, toStatus) {
+				return nil
+			}
+			allReached = false
+			return promoteTarget(cmd, proc, tc, target)
+		})
+		if err != nil {
+			return err
+		}
+		if allReached {
+			return nil
+		}
+	}
+	return nil
 }
 
 func promoteTarget(cmd *cobra.Command, proc *cli.Processor, tc *transitionContext, target *loadedLifecycleTarget) error {

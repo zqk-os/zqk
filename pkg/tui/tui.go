@@ -130,21 +130,16 @@ func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp stora
 		case <-sigCh:
 			return nil
 		case rawKeys := <-keyCh:
+			prevTab := m.ActiveTab
 			if shouldExit := handleInput(m, rawKeys); shouldExit {
 				return nil
 			}
+			if m.ActiveTab != prevTab {
+				m.RefreshActiveTab(ctx, sp, sec)
+			}
 			renderScreen()
 		case <-refreshTicker.C:
-			m.RefreshMutations()
-			m.RefreshAuditEvents()
-			m.RefreshQA(ctx, sp, sec)
-			m.RefreshHealth()
-			if sp != nil && sec != nil {
-				m.RefreshSwarm(ctx, sp, sec)
-				m.RefreshPM(ctx, sp, sec)
-				m.RefreshMetrics(ctx, sp, sec)
-				m.RefreshScheduler(ctx, sp, sec)
-			}
+			m.RefreshActiveTab(ctx, sp, sec)
 			renderScreen()
 		}
 	}

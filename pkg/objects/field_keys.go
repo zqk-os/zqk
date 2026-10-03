@@ -262,6 +262,7 @@ const (
 	FieldKeyEntryPoint                      = "entry_point"
 	FieldKeyEnvironmentConfig               = "environment_config"
 	FieldKeyEnvironmentVariables            = "environment_variables"
+	FieldKeyEpicRef                         = "epic_ref"
 	FieldKeyEpicRefs                        = "epic_refs"
 	FieldKeyErrorEventCount                 = "error_event_count"
 	FieldKeyErrorRate                       = "error_rate"

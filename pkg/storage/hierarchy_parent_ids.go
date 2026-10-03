@@ -17,6 +17,8 @@ var hierarchyParentRefKeys = []string{
 	objects.FieldKeyMilestoneRefs,
 	objects.FieldKeyGoalRefs,
 	objects.FieldKeyBacklogItemRef,
+	objects.FieldKeyEpicRef,
+	objects.FieldKeyEpicRefs,
 }
 
 // HierarchyParentIDs returns unique parent object IDs for hierarchical occupancy
