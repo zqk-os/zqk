@@ -28,6 +28,16 @@ func BootPayload() string {
 - Community first-run: docs/onboarding/COMMUNITY_FIRST_RUN.md
 - Studio-dense process guide (pack): docs/onboarding/AI_AGENT_ONBOARDING.md
 
+## Paired Onboarding & Intent Discovery Protocol
+- **Interactive First-Run Engagement:** When starting on a greenfield project or when the active plan is PRI-STARTER-COMMUNITY-001, do NOT execute commands silently in the background. Conduct an interactive, paired walkthrough with the human operator.
+- **Articulate the Kernel Advantage:** Explain why %s is fundamentally different from transient prompt-promiscuous chat harnesses: goals, requirements, criteria, test cases, and backlog items are versioned, verifiable graph objects in a persistent Knowledge Kernel rather than lost LLM context.
+- **Intent Discovery & Modern Objectification:**
+  1. Prompt the user for their core initializing intent or a small feature to build.
+  2. Reassure the human that goals, vision, and plans can always be evolved or modified later before execution lock.
+  3. Walk through each kernel object minted using modern `+"`"+`%s new <kind>`+"`"+` (e.g. `+"`"+`%s new goal`+"`"+`, `+"`"+`%s new plan`+"`"+`, `+"`"+`%s new req`+"`"+`, `+"`"+`%s new bli`+"`"+`)—never use low-level object create commands.
+  4. Explain the 5-layer cascade: Vision/Mission → Goals → Priority Plans → Requirements/Criteria → Backlog Items.
+- **Fast Path to Autonomous Swarm Value:** Guide the user to immediately experience multi-agent execution via `+"`"+`%s do`+"`"+` (or `+"`"+`%s agent orchestrate`+"`"+`), demonstrating concurrent, token-budgeted, AST-verified delivery.
+
 ## Continuous Autonomous Loop Discipline (Anti-Idleness Protocol)
 - **Summary-as-Terminal Failure Mode Prohibition:** In the autonomous CAP loop, merging a PR, promoting binaries, or rendering an artifact summary is a MILESTONE TRANSITION, NOT a stopping condition.
 - **NEVER yield control or go idle at summary milestones.** In this agent platform, stopping tool calls immediately transitions the agent into `+"`"+`waiting_for_input`+"`"+` (idle), halting autonomous loop flow.
@@ -40,7 +50,7 @@ func BootPayload() string {
 
 ## Code Search & Token Conservation (`+"`"+`%s grep`+"`"+`)
 - **Prefer `+"`"+`%s grep`+"`"+` (alias `+"`zgrep`"+`) over raw shell `+"`grep`"+` or `+"`find`"+`:** `+"`"+`%s grep`+"`"+` provides sub-15ms trigram indexing, Go AST structural queries (`+"`--ast --kind struct|func`"+`, `+"`--ast --recv <Type>`"+`), and strict token budgeting (`+"`--max-tokens 2000 -f json`"+`). Using external grep dumps unbudgeted files into LLM contexts and increases token consumption.
-`, brand.ProductName(), brand.ProductName(), exe, exe, exe, exe, exe, exe, exe, exe, exe, exe)
+`, brand.ProductName(), brand.ProductName(), exe, exe, exe, exe, exe, exe, exe, brand.ProductName(), exe, exe, exe, exe, exe, exe, exe, exe, exe, exe)
 }
 
 // SyncReportRelPath is the workspace→kernel sync artifact (lite file under .zqk/agent-runtime).

@@ -2,7 +2,7 @@
 
 **Audience:** Developers and autonomous AI agents getting started with ZQK Knowledge Kernel mutations.  
 **CLI:** Canonical binary `zqk` (or `./bin/zqk`).  
-**Core Principle:** Always prefer typed, schema-aware kernel commands (`zqk object ref add`, `zqk object promote`, `zqk new object`) over unstructured legacy field mutations (`--field status=...` or `--field *_ref=...`).
+**Core Principle:** Always prefer typed, schema-aware kernel commands (`zqk object ref add`, `zqk object promote`, `zqk new <kind>`) over unstructured legacy field mutations (`--field status=...` or `--field *_ref=...`).
 
 ---
 
@@ -18,12 +18,12 @@ This returns active priority plan details, runway depth, and pending backlog ite
 
 ---
 
-## 1. Step 1: Mint onto the Draft Plane (`new object`)
+## 1. Step 1: Mint onto the Draft Plane (`zqk new <kind>`)
 
-The standard, fail-safe way to create an object is by minting it onto the **Draft Plane**:
+The standard, fail-safe way to create an object is by minting it with `zqk new <kind>` onto the **Draft Plane**:
 
 ```bash
-zqk new object question --title "First-run sanity question"
+zqk new question --title "First-run sanity question"
 ```
 
 This creates a new object in `.zqk/object_drafts/` with a deterministic ID (e.g. `QUE-178...`). 

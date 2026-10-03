@@ -64,7 +64,42 @@ func NewNewCmd() *cobra.Command {
 	root.AddCommand(newCommandSpecCmd())
 	root.AddCommand(newBundleCmd())
 	root.AddCommand(newSwarmCmd())
+
+	// First-class kind convenience commands: zqk new <kind> [--title "..."]
+	root.AddCommand(newKindConvenienceCmd(objects.KindGoal))
+	root.AddCommand(newKindConvenienceCmd(objects.KindVision, "vis"))
+	root.AddCommand(newKindConvenienceCmd(objects.KindMission, "mis"))
+	root.AddCommand(newKindConvenienceCmd(objects.KindRoadmap))
+	root.AddCommand(newKindConvenienceCmd(objects.KindWorkstream, "ws"))
+	root.AddCommand(newKindConvenienceCmd(objects.KindPriorityPlan, "plan", "pri"))
+	root.AddCommand(newKindConvenienceCmd(objects.KindRequirement, "req"))
+	root.AddCommand(newKindConvenienceCmd(objects.KindCriteria, "crit"))
+	root.AddCommand(newKindConvenienceCmd(objects.KindTestCase, "tc"))
+	root.AddCommand(newKindConvenienceCmd(objects.KindBacklogItem, "bli"))
+	root.AddCommand(newKindConvenienceCmd(objects.KindMilestone, "mil"))
+	root.AddCommand(newKindConvenienceCmd(objects.KindPolicy))
+	root.AddCommand(newKindConvenienceCmd(objects.KindQuestion, "que"))
+	root.AddCommand(newKindConvenienceCmd(objects.KindDecision, "dec"))
 	return root
+}
+
+func newKindConvenienceCmd(kind string, aliases ...string) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     kind,
+		Aliases: aliases,
+		Short:   fmt.Sprintf("Mint a %s object onto the draft plane", kind),
+	}
+	cli.BindAsyncProgress(cmd, func(c *cobra.Command, args []string) error {
+		return runNewObject(c, append([]string{kind}, args...))
+	})
+	cmd.Flags().StringP("title", "t", "", "Object title")
+	cmd.Flags().StringP("description", "d", "", "Object description")
+	cmd.Flags().StringP("content", "c", "", "Inline content/body for description")
+	cmd.Flags().String("file", "", "File to read title/description from")
+	cmd.Flags().Bool("promote", false, "Enqueue background object promote after mint")
+	cmd.Flags().Bool("cas", false, "Directly materialize the object into CAS storage")
+	cmd.Flags().Bool("skip-trace-pipeline", false, "Do not auto-run workflow gen-trace-pipeline")
+	return cmd
 }
 
 func runNewKindValidatePreRun(cmd *cobra.Command, args []string) error {

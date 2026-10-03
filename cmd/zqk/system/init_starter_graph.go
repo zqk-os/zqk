@@ -34,12 +34,12 @@ func seedStarterKernelGraph(projectRoot string, logger logging.Logger) error {
 kind: organization
 schema_version: 2.0.0
 namespace_id: zqk:kernel
-title: ZQK Open-Core Community
-organization_name: ZQK Open-Core Community
+title: Engineering Workspace
+organization_name: Engineering Workspace
 domain: custom
 spec_context_broker: org_broker
 spec_interpreter: org_interpreter
-description: "Public open-core kernel for strangers and agents. This organization owns the starter graph that init must materialize so first-run is not an empty Gantt."
+description: "Root organization for the project workspace, owning the initial strategic cascade and multi-agent execution lanes."
 status: active
 created_by: %s
 updated_by: %s
@@ -56,10 +56,10 @@ goal_refs:
 kind: mission
 schema_version: 2.0.0
 namespace_id: zqk:kernel
-title: Ship a kernel strangers can init and operate
-mission_statement: "Give every operator a local, content-addressed knowledge kernel they can initialize, query, and extend without reconstructing the Gantt matrix from tribal knowledge."
-problem_statement: "Init currently leaves organization, mission, vision, goal, and workstream empty. start-here then tells agents to list goals and create one with a title field. New users and agents cannot assemble the pipeline."
-description: "Community launch mission: a first-run kernel that already has the strategic spine and one traced requirement."
+title: Establish project foundation and user-guided intent cascade
+mission_statement: "Transform human intent into a structured, verifiable multi-agent engineering execution graph without manual prompt wrangling or context rot."
+problem_statement: "Raw AI agent sessions lack structured memory, clear architectural contracts, and deterministic done-gates. The initial onboarding establishes an explicit, verifiable knowledge kernel."
+description: "First-run mission: guide the user through capturing project intent, minting strategic kernel objects, and test-driving autonomous multi-agent orchestration."
 status: active
 created_by: %s
 updated_by: %s
@@ -78,9 +78,9 @@ workstream_refs:
 kind: vision
 schema_version: 2.0.0
 namespace_id: zqk:kernel
-title: First-run produces a complete executable graph
-narrative: "A stranger runs system init and immediately has organization, mission, vision, goal, workstream, priority_plan, and a requirement with criteria/tests/backlog — seated as the system account, not a test harness."
-description: "Desired end state for community first-run: whats-next has a real plan because the starter graph exists."
+title: Seamless vision-to-code execution powered by autonomous swarms
+narrative: "The user shares their project idea, the agent objectifies it into typed kernel nodes (Vision, Mission, Goal, Plan, Criteria, Tasks), and specialized autonomous agent swarms build and verify the features with mathematical certainty."
+description: "Desired end state: user intent is fully grounded in the kernel, and the first feature slice is autonomously executed by the swarm against deterministic done-gates."
 status: active
 mission_refs:
   - MIS-STARTER-COMMUNITY-001
@@ -99,9 +99,9 @@ goal_refs:
 kind: goal
 schema_version: 2.0.0
 namespace_id: zqk:kernel
-title: Community kernel is launch-ready for strangers and agents
-description: "Measurable outcome: zqk in this checkout lists a linked org/mission/vision/goal/workstream/priority_plan, live docs have doc_entry rows, archive copies are gone, and identity is the system account."
-metric: starter_graph objects at shovel-ready statuses
+title: "Onboard new user: guided setup for vision, mission, and strategic plan"
+description: "Prompt user for initial project intent, objectify into kernel strategic objects, scaffold execution spine, and test-drive MMOrch multi-agent execution. Users can always refine or evolve goals later before execution lock."
+metric: user intent objectified and first autonomous swarm slice completed
 target: "1"
 status: active
 created_by: %s
@@ -119,9 +119,9 @@ workstream_refs:
 kind: workstream
 schema_version: 2.0.0
 namespace_id: zqk:kernel
-title: Community launch and first-run kernel
-description: "Execution lane for community launch vetting: isolation, documentation graph, starter kernel objects, and installer/quickstart."
-entry_point: docs/onboarding/COMMUNITY_FIRST_RUN.md
+title: User Onboarding & Strategic Setup
+description: "Execution lane for user familiarization, intent discovery, strategic plan creation, and initial swarm orchestration walkthrough."
+entry_point: ZQK_GETTING_STARTED.md
 category: feature
 status: active
 owner_ref: %s
@@ -138,8 +138,8 @@ updated_at: %s
 kind: priority_plan
 schema_version: 2.0.0
 namespace_id: zqk:kernel
-title: Community launch testing and vetting
-description: "Execution column for proving the community kernel is launch-ready: isolation, starter graph, documentation vetting, and first-run smoke."
+title: User Familiarization, Strategic Setup & Initial Feature Swarm
+description: "Lead execution column guiding the user through intent discovery, kernel objectification, and the first autonomous swarm execution."
 status: active
 active_order: 0
 persona_refs:
@@ -162,8 +162,8 @@ updated_at: %s
 kind: requirement
 schema_version: 2.0.0
 namespace_id: zqk:kernel
-title: Community kernel must prove launch-ready testing and documentation vetting
-description: "The community checkout must be operable as its own kernel: objects resolve here, the starter graph is present, live architecture/best-practices/onboarding have doc_entry rows, and archive markdown is not shipped."
+title: Capture user intent, scaffold execution spine, and verify multi-agent orchestration
+description: "The system and paired agent must guide the user through setting up vision, mission, and goals, objectify their intent into kernel nodes, and guide them to run their first multi-agent swarm feature."
 priority: p0
 status: active
 workstream_refs:
@@ -186,8 +186,8 @@ kind: criteria
 schema_version: 2.0.0
 namespace_id: zqk:kernel
 category: functional
-title: Community kernel starter graph and documentation verified
-description: Verify that community repository possesses a complete starter graph with linked objects and valid whats-next execution plan.
+title: User intent objectified and initial MMOrch swarm execution verified
+description: Verify that the user's project intent is captured in kernel objects and that the autonomous agent loop (zqk do) has executed its first verified task.
 priority: critical
 validation_method: automated_test
 status: awaiting_verification
@@ -204,8 +204,8 @@ updated_at: %s
 kind: test_case
 schema_version: 2.0.0
 namespace_id: zqk:kernel
-title: Automated verification of community starter graph
-description: Verify that community repository possesses a complete starter graph with linked objects and valid whats-next execution plan.
+title: Automated verification of user onboarding and starter execution graph
+description: Verify that greenfield init seeds the user familiarization graph and whats-next resolves PRI-STARTER-COMMUNITY-001 as the active lead plan.
 category: Integration
 status: active
 priority: critical
@@ -229,8 +229,8 @@ updated_at: %s
 kind: milestone
 schema_version: 2.0.0
 namespace_id: zqk:kernel
-title: Community launch starter kernel verification
-description: Verify starter kernel graph and whats-next execution pipeline
+title: Initial project setup and first swarm execution
+description: Capture user vision, plan the first feature slice, and verify autonomous swarm delivery.
 status: in_progress
 estimated_effort: 1h
 goal_refs:
@@ -248,14 +248,14 @@ updated_at: %s
 		{
 			kind: objects.KindBacklogItem,
 			id:   "BLI-STARTER-COMMUNITY-001",
-			content: fmt.Sprintf(`id: BLI-STARTER-COMMUNITY-001
+			content: paths.RewriteCanonicalCLIInvocations(fmt.Sprintf(`id: BLI-STARTER-COMMUNITY-001
 kind: backlog_item
 schema_version: 2.0.0
 namespace_id: zqk:kernel
-title: Verify community kernel starter graph and first-run execution
-description: Execute initial verification of starter graph objects and confirm whats-next outputs an active priority plan.
-problem_statement: Greenfield repository lacks starter kernel graph and executable plan without manual object creation.
-acceptance_considerations: All starter objects exist and whats-next resolves PRI-STARTER-COMMUNITY-001.
+title: "Guided setup: capture initializing intent and objectify into kernel objects"
+description: "Prompt the user for core initializing intent or a small starter project. Convert that intent into Vision, Mission, Goal, and Priority Plan kernel objects using 'zqk new <kind>'. Reassure the user that goals and plans can be evolved later before execution lock. Then guide the user to test-drive multi-agent orchestration (MMOrch) via 'zqk do'."
+problem_statement: "Users need an interactive, paired walkthrough of ZQK's kernel objects rather than silent command execution, getting them to real swarm value quickly."
+acceptance_considerations: "User prompted for intent, initial objects minted with zqk new, and user guided to run zqk do."
 priority: critical
 priority_tier: P0
 status: planned
@@ -279,7 +279,7 @@ created_by: %s
 updated_by: %s
 created_at: %s
 updated_at: %s
-`, objects.ConstPersonaDefaultOperator, accID, accID, now, now),
+`, objects.ConstPersonaDefaultOperator, accID, accID, now, now)),
 		},
 	}
 
@@ -316,13 +316,13 @@ updated_at: %s
 				MaterializedAt: nowTime,
 				LeadPlan: &whatsnext.WhatsNextPriorityPlan{
 					ID:     "PRI-STARTER-COMMUNITY-001",
-					Title:  "Community launch testing and vetting",
+					Title:  "User Familiarization, Strategic Setup & Initial Feature Swarm",
 					Status: objects.ObjectStatusActive,
 				},
 				ActivePlans: []whatsnext.WhatsNextPriorityPlan{
 					{
 						ID:     "PRI-STARTER-COMMUNITY-001",
-						Title:  "Community launch testing and vetting",
+						Title:  "User Familiarization, Strategic Setup & Initial Feature Swarm",
 						Status: objects.ObjectStatusActive,
 					},
 				},

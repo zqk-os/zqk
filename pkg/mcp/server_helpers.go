@@ -13,6 +13,9 @@ import (
 
 // mapValues collects all values from a map into a slice
 func mapValues[K comparable, V any](m map[K]V) []V {
+	if len(m) == 0 {
+		return nil
+	}
 	return functional.MapValues(m)
 }
 

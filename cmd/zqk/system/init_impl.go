@@ -1167,13 +1167,14 @@ Inspect your workstreams, milestones, and real-time Gantt timeline:
 `+"```"+`
 Open [http://127.0.0.1:8080](http://127.0.0.1:8080) in your browser.
 
-### 2. Execute Shovel-Ready Work
-Autonomously discover, claim, and begin executing tasks:
+### 2. Paired Onboarding & Autonomous Execution
+Start a paired interactive session with your AI assistant:
+> *"You are paired with the ZQK Knowledge Kernel. Let's do a paired walkthrough to capture my project intent, objectify it into kernel objects with '%s new <kind>', and test-drive '%s do'."*
+
+Or claim and execute directly from your terminal:
 `+"```bash"+`
 %s do
 `+"```"+`
-Or prompt your AI assistant:
-> *"You are paired with the ZQK Knowledge Kernel. Run '%s do' to claim and implement work."*
 
 ### 3. In-Process Code Search & Token Conservation (`+"`"+`%s grep`+"`"+`)
 Search codebases with trigram indexing, Go AST structural queries, and token budgeting for LLMs:
@@ -1188,7 +1189,7 @@ Search codebases with trigram indexing, Go AST structural queries, and token bud
 ## AI Agent Seating & MCP Setup (Optional / Advanced)
 Your editor was automatically detected and configured during initialization. If you ever switch editors or add a new agent host, run `+"`"+`%s system agent-onboard`+"`"+` to detect and prime rules.
 
-- **Cursor**: Pre-configured! Automatically detects '.agents/AGENTS.md' and '.cursor/mcp.json'. Prompt Cursor Composer: *"You are paired with the ZQK Knowledge Kernel. Run '%s do' to claim and execute work."*
+- **Cursor**: Pre-configured! Automatically detects '.agents/AGENTS.md' and '.cursor/mcp.json'. Prompt Cursor Composer: *"You are paired with the ZQK Knowledge Kernel. Let's do a paired walkthrough to capture my project intent, objectify it into kernel objects with '%s new <kind>', and test-drive '%s do'."*
 - **Claude Desktop**: Auto-install the MCP server:
   `+"```bash"+`
   %s mcp install
@@ -1209,7 +1210,7 @@ Your editor was automatically detected and configured during initialization. If 
     `+"```"+`
 
 *Need full CLI help? Run `+"`"+`%s --help`+"`"+` or consult docs/INDEX.md.*
-`, prod, prod, prod, prod, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe)
+`, prod, prod, prod, prod, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe, exe)
 
 	return fileutil.WriteSecureFile(path, []byte(template))
 }

@@ -8,12 +8,14 @@ Initialization complete. Up and running in 2 commands:
 ```
 Inspect workstreams, milestones, and the real-time Gantt timeline at http://127.0.0.1:8080.
 
-### 2. Execute Shovel-Ready Work
+### 2. Paired Onboarding & Autonomous Execution
+Prompt your paired AI assistant:
+> *"You are paired with the ZQK Knowledge Kernel. Let's do a paired walkthrough to capture my project intent, objectify it into kernel objects with `zqk new <kind>`, and launch our first autonomous swarm execution."*
+
+Or execute shovel-ready work directly from your terminal:
 ```bash
 ./bin/zqk do
 ```
-Or prompt your paired AI assistant:
-> *"You are paired with the ZQK Knowledge Kernel. Run 'zqk do' to claim and implement work."*
 
 ---
 
