@@ -257,6 +257,19 @@ func (ll *LifecycleLoader) indexedYAML(dir string) map[string]string {
 }
 
 // LoadLifecycle loads a lifecycle definition for a given object kind
+func parseLifecycleFile(path string) (*Lifecycle, error) {
+	data, err := fileutil.ReadFile(path)
+	if err != nil {
+		return nil, errfmt.Errorf("failed to read lifecycle file %s: %w", path, err)
+	}
+	var lifecycle Lifecycle
+	if err := yaml.Unmarshal(data, &lifecycle); err != nil {
+		return nil, errfmt.Errorf("failed to parse lifecycle file %s: %w", path, err)
+	}
+	return &lifecycle, nil
+}
+
+// LoadLifecycle loads a lifecycle definition for a given object kind
 // If no specific lifecycle exists for the kind, falls back to base_object_lifecycle.yaml
 func (ll *LifecycleLoader) LoadLifecycle(kind string) (*Lifecycle, error) {
 	currentDir := ll.getLifecyclesDir()
@@ -267,23 +280,20 @@ func (ll *LifecycleLoader) LoadLifecycle(kind string) (*Lifecycle, error) {
 		stamp = stampmemo.Of(lifecyclePath)
 	}
 	return ll.cache.Load(kind, stamp, func() (*Lifecycle, error) {
-		data, err := fileutil.ReadFile(lifecyclePath)
+		lifecycle, err := parseLifecycleFile(lifecyclePath)
 		if err != nil {
-			return nil, errfmt.Errorf("failed to read lifecycle file %s: %w", lifecyclePath, err)
-		}
-		var lifecycle Lifecycle
-		if err := yaml.Unmarshal(data, &lifecycle); err != nil {
-			return nil, errfmt.Errorf("failed to parse lifecycle file %s: %w", lifecyclePath, err)
+			return nil, err
 		}
 		if lifecycle.Extends != emptyValue {
 			parentLifecycle, err := ll.loadLifecycleWithExtends(lifecycle.Extends, make(map[string]bool))
 			if err != nil {
 				return nil, errfmt.Errorf("failed to load parent lifecycle %s: %w", lifecycle.Extends, err)
 			}
-			lifecycle = ll.mergeLifecycles(parentLifecycle, &lifecycle)
+			merged := ll.mergeLifecycles(parentLifecycle, lifecycle)
+			lifecycle = &merged
 		}
 		lifecycle.Location = pathRefForFile(lifecyclePath)
-		return &lifecycle, nil
+		return lifecycle, nil
 	})
 }
 
@@ -322,17 +332,25 @@ func (ll *LifecycleLoader) InvalidateLifecycle(kind string) {
 	ll.cache.Delete(kind)
 }
 
+func (ll *LifecycleLoader) loadLifecycleStatusSet(kind string) (*Lifecycle, map[string]bool, error) {
+	lifecycle, err := ll.LoadLifecycle(kind)
+	if err != nil {
+		return nil, nil, err
+	}
+	validSet := make(map[string]bool, len(lifecycle.Statuses))
+	for _, s := range lifecycle.Statuses {
+		validSet[s.Value] = true
+	}
+	return lifecycle, validSet, nil
+}
+
 // IsValidStatus checks if a status is valid for the given kind.
 // Accepts common variants (e.g. "completed" -> "complete", "archive" -> "archived")
 // via ApplyAliasesForStatus so aliases are applied only when the preferred value is in this kind's lifecycle.
 func (ll *LifecycleLoader) IsValidStatus(kind, status string) (bool, error) {
-	lifecycle, err := ll.LoadLifecycle(kind)
+	lifecycle, validSet, err := ll.loadLifecycleStatusSet(kind)
 	if err != nil {
 		return false, err
-	}
-	validSet := make(map[string]bool)
-	for _, s := range lifecycle.Statuses {
-		validSet[s.Value] = true
 	}
 	canonical := ApplyAliasesForStatus(status, validSet)
 	for _, s := range lifecycle.Statuses {
@@ -404,13 +422,9 @@ func IsRepairParkStatus(status string) bool {
 // IsValidTransition checks if a transition from one state to another is valid.
 // Normalizes from/to with ApplyAliasesForStatus (kind-aware) before validation.
 func (ll *LifecycleLoader) IsValidTransition(kind, from, to string) (bool, error) {
-	lifecycle, err := ll.LoadLifecycle(kind)
+	lifecycle, validSet, err := ll.loadLifecycleStatusSet(kind)
 	if err != nil {
 		return false, err
-	}
-	validSet := make(map[string]bool)
-	for _, s := range lifecycle.Statuses {
-		validSet[s.Value] = true
 	}
 	fromCanonical := ApplyAliasesForStatus(from, validSet)
 	toCanonical := ApplyAliasesForStatus(to, validSet)
@@ -771,14 +785,9 @@ func (ll *LifecycleLoader) loadLifecycleWithExtends(lifecycleName string, visite
 	}
 
 	lifecyclePath := ll.findLifecyclePath(ll.getLifecyclesDir(), kind)
-	data, err := fileutil.ReadFile(lifecyclePath)
+	lifecycle, err := parseLifecycleFile(lifecyclePath)
 	if err != nil {
-		return nil, errfmt.Errorf("failed to read lifecycle file %s: %w", lifecyclePath, err)
-	}
-
-	var lifecycle Lifecycle
-	if err := yaml.Unmarshal(data, &lifecycle); err != nil {
-		return nil, errfmt.Errorf("failed to parse lifecycle file %s: %w", lifecyclePath, err)
+		return nil, err
 	}
 
 	// Recursively load parent if this lifecycle extends another
@@ -788,10 +797,11 @@ func (ll *LifecycleLoader) loadLifecycleWithExtends(lifecycleName string, visite
 			return nil, errfmt.Errorf("failed to load parent lifecycle %s: %w", lifecycle.Extends, err)
 		}
 		// Merge parent into child (child overrides parent)
-		lifecycle = ll.mergeLifecycles(parentLifecycle, &lifecycle)
+		merged := ll.mergeLifecycles(parentLifecycle, lifecycle)
+		lifecycle = &merged
 	}
 
-	return &lifecycle, nil
+	return lifecycle, nil
 }
 
 // mergeLifecycles merges a parent lifecycle into a child lifecycle

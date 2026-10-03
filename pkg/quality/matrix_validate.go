@@ -105,24 +105,13 @@ func validateMatrixFiles(csvPath, profilePath, sessionRefColumn string) (rowCoun
 	}
 	defer cr.Close()
 
-	r := cr.reader
-	header := cr.header
-	if sessionRefColumn != "" {
-		found := false
-		for _, h := range header {
-			if h == sessionRefColumn {
-				found = true
-				break
-			}
-		}
-		if !found {
-			errs = append(errs, fmt.Sprintf("csv header missing session_ref_column %q", sessionRefColumn))
-		}
+	if sessionRefColumn != "" && !cr.hasCol(sessionRefColumn) {
+		errs = append(errs, fmt.Sprintf("csv header missing session_ref_column %q", sessionRefColumn))
 	}
 
 	n := 0
 	for {
-		_, err := r.Read()
+		_, err := cr.reader.Read()
 		if err == io.EOF {
 			break
 		}

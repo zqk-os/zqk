@@ -76,13 +76,21 @@ func GenerateFieldHelp(kind string) (string, error) {
 	return help.String(), nil
 }
 
-// GenerateFieldList generates a simple list of field names for a kind
-// Useful for auto-completion or quick reference
-func GenerateFieldList(kind string, includeCommon bool) ([]string, error) {
+func getFieldsForKindFromRegistry(kind string) (*KindFields, error) {
 	registry := GetGlobalFieldRegistry()
 	kindFields, err := registry.GetFieldsForKind(kind)
 	if err != nil {
 		return nil, errfmt.Errorf("failed to get fields for kind %s: %w", kind, err)
+	}
+	return kindFields, nil
+}
+
+// GenerateFieldList generates a simple list of field names for a kind
+// Useful for auto-completion or quick reference
+func GenerateFieldList(kind string, includeCommon bool) ([]string, error) {
+	kindFields, err := getFieldsForKindFromRegistry(kind)
+	if err != nil {
+		return nil, err
 	}
 
 	var fields []string
@@ -133,32 +141,25 @@ func fieldsWithTrait(kindFields *KindFields, want string) []string {
 	return out
 }
 
+func generateFieldsForTrait(kind, trait string) ([]string, error) {
+	kindFields, err := getFieldsForKindFromRegistry(kind)
+	if err != nil {
+		return nil, err
+	}
+	return fieldsWithTrait(kindFields, trait), nil
+}
+
 // GenerateFilterableFields returns fields that can be used for filtering
 func GenerateFilterableFields(kind string) ([]string, error) {
-	registry := GetGlobalFieldRegistry()
-	kindFields, err := registry.GetFieldsForKind(kind)
-	if err != nil {
-		return nil, errfmt.Errorf("failed to get fields for kind %s: %w", kind, err)
-	}
-	return fieldsWithTrait(kindFields, "filterable"), nil
+	return generateFieldsForTrait(kind, "filterable")
 }
 
 // GenerateSortableFields returns fields that can be used for sorting
 func GenerateSortableFields(kind string) ([]string, error) {
-	registry := GetGlobalFieldRegistry()
-	kindFields, err := registry.GetFieldsForKind(kind)
-	if err != nil {
-		return nil, errfmt.Errorf("failed to get fields for kind %s: %w", kind, err)
-	}
-	return fieldsWithTrait(kindFields, "sortable"), nil
+	return generateFieldsForTrait(kind, "sortable")
 }
 
 // GenerateGroupableFields returns fields that can be used for grouping
 func GenerateGroupableFields(kind string) ([]string, error) {
-	registry := GetGlobalFieldRegistry()
-	kindFields, err := registry.GetFieldsForKind(kind)
-	if err != nil {
-		return nil, errfmt.Errorf("failed to get fields for kind %s: %w", kind, err)
-	}
-	return fieldsWithTrait(kindFields, "groupable"), nil
+	return generateFieldsForTrait(kind, "groupable")
 }

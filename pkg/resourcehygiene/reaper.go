@@ -82,6 +82,12 @@ func initReaperTarget(projectRoot string, threshold, defaultThreshold time.Durat
 	}
 }
 
+type reaperStats struct {
+	count          int
+	reclaimedBytes int64
+	reaped         []string
+}
+
 // ReapOrphanedTempFiles scans .zqk for abandoned .tmp.* and .pending.* files older than threshold,
 // safely removing them.
 func ReapOrphanedTempFiles(projectRoot string, threshold time.Duration, dryRun bool) (int, int64, []string, error) {
@@ -90,9 +96,7 @@ func ReapOrphanedTempFiles(projectRoot string, threshold time.Duration, dryRun b
 		return 0, 0, nil, nil
 	}
 
-	var count int
-	var reclaimedBytes int64
-	var reaped []string
+	var stats reaperStats
 
 	err := filepath.WalkDir(target.zqkDir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil || d.IsDir() {
@@ -107,13 +111,13 @@ func ReapOrphanedTempFiles(projectRoot string, threshold time.Duration, dryRun b
 			return nil
 		}
 		if info.ModTime().Before(target.cutoff) {
-			reclaimedBytes += info.Size()
-			count++
+			stats.reclaimedBytes += info.Size()
+			stats.count++
 			rel, relErr := filepath.Rel(projectRoot, path)
 			if relErr == nil {
-				reaped = append(reaped, rel)
+				stats.reaped = append(stats.reaped, rel)
 			} else {
-				reaped = append(reaped, path)
+				stats.reaped = append(stats.reaped, path)
 			}
 			if !dryRun {
 				_ = fileutil.Remove(path)
@@ -122,7 +126,7 @@ func ReapOrphanedTempFiles(projectRoot string, threshold time.Duration, dryRun b
 		return nil
 	})
 
-	return count, reclaimedBytes, reaped, err
+	return stats.count, stats.reclaimedBytes, stats.reaped, err
 }
 
 // ReapStaleLocks scans .zqk for .lock files older than threshold and reaps them
@@ -210,26 +214,21 @@ func isLogFile(path, name string) bool {
 
 // EnforceLogRetention prunes or truncates oversized/aged logs under .zqk/logs, .zqk/mcp/logs, and .zqk/scheduler.
 func EnforceLogRetention(projectRoot string, maxAge time.Duration, maxSizeBytes int64, dryRun bool) (int, int64, []string, error) {
-	if projectRoot == "" {
+	target := initReaperTarget(projectRoot, maxAge, 48*time.Hour)
+	if !target.valid {
 		return 0, 0, nil, nil
-	}
-	if maxAge <= 0 {
-		maxAge = 48 * time.Hour
 	}
 	if maxSizeBytes <= 0 {
 		maxSizeBytes = 10 * 1024 * 1024 // 10MB
 	}
 
 	logDirs := []string{
-		filepath.Join(projectRoot, paths.ProjectDataDir, paths.LogsDir),
-		filepath.Join(projectRoot, paths.ProjectDataDir, paths.MCPDir, paths.MCPLogsDir),
-		filepath.Join(projectRoot, paths.ProjectDataDir, paths.SchedulerDir),
+		filepath.Join(target.zqkDir, paths.LogsDir),
+		filepath.Join(target.zqkDir, paths.MCPDir, paths.MCPLogsDir),
+		filepath.Join(target.zqkDir, paths.SchedulerDir),
 	}
 
-	cutoff := time.Now().UTC().Add(-maxAge)
-	var count int
-	var reclaimedBytes int64
-	var reaped []string
+	var stats reaperStats
 
 	for _, dir := range logDirs {
 		if _, err := fileutil.Stat(dir); err != nil {
@@ -257,11 +256,11 @@ func EnforceLogRetention(projectRoot string, maxAge time.Duration, maxSizeBytes 
 			}
 
 			// Condition 1: Older than maxAge -> Delete
-			if info.ModTime().Before(cutoff) {
-				count++
-				reclaimedBytes += info.Size()
+			if info.ModTime().Before(target.cutoff) {
+				stats.count++
+				stats.reclaimedBytes += info.Size()
 				rel, _ := filepath.Rel(projectRoot, path)
-				reaped = append(reaped, rel+" (deleted: age)")
+				stats.reaped = append(stats.reaped, rel+" (deleted: age)")
 				if !dryRun {
 					_ = fileutil.Remove(path)
 				}
@@ -285,10 +284,10 @@ func EnforceLogRetention(projectRoot string, maxAge time.Duration, maxSizeBytes 
 						newContent := []byte(strings.Join(kept, "\n"))
 						freed := info.Size() - int64(len(newContent))
 						if freed > 0 {
-							count++
-							reclaimedBytes += freed
+							stats.count++
+							stats.reclaimedBytes += freed
 							rel, _ := filepath.Rel(projectRoot, path)
-							reaped = append(reaped, rel+" (truncated: size)")
+							stats.reaped = append(stats.reaped, rel+" (truncated: size)")
 							if !dryRun {
 								_ = fileutil.WriteFile(path, newContent, paths.FilePerm600)
 							}
@@ -301,7 +300,7 @@ func EnforceLogRetention(projectRoot string, maxAge time.Duration, maxSizeBytes 
 		})
 	}
 
-	return count, reclaimedBytes, reaped, nil
+	return stats.count, stats.reclaimedBytes, stats.reaped, nil
 }
 
 // ExecuteHygiene performs full resource hygiene according to opts.

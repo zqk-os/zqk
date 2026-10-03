@@ -15,13 +15,22 @@ import (
 	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 )
 
+func (c *ObjectIDCache) withRLockReady() (func(), bool) {
+	c.mu.RLock()
+	if c.byKind == nil {
+		c.mu.RUnlock()
+		return nil, false
+	}
+	return c.mu.RUnlock, true
+}
+
 // GetAll returns all cache entries (for duplicate ID detection).
 func (c *ObjectIDCache) GetAll() []*ObjectIDCacheEntry {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-	if c.byKind == nil {
+	unlock, ok := c.withRLockReady()
+	if !ok {
 		return nil
 	}
+	defer unlock()
 	var n int
 	for _, list := range c.byKind {
 		n += len(list)
@@ -37,11 +46,14 @@ func (c *ObjectIDCache) GetAll() []*ObjectIDCacheEntry {
 
 // GetEntriesByKind returns cache entries for the given kind (for cache-driven discovery).
 func (c *ObjectIDCache) GetEntriesByKind(kind string) []*ObjectIDCacheEntry {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-	if c.byKind == nil || kind == emptyValue {
+	if kind == emptyValue {
 		return nil
 	}
+	unlock, ok := c.withRLockReady()
+	if !ok {
+		return nil
+	}
+	defer unlock()
 	list := c.byKind[kind]
 	out := make([]*ObjectIDCacheEntry, 0, len(list))
 	for i := range list {
@@ -78,11 +90,11 @@ func (c *ObjectIDCache) EntriesForID(id string) []*ObjectIDCacheEntry {
 
 // GetKinds returns unique object kinds present in the cache (for cache-driven discovery).
 func (c *ObjectIDCache) GetKinds() []string {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-	if c.byKind == nil {
+	unlock, ok := c.withRLockReady()
+	if !ok {
 		return nil
 	}
+	defer unlock()
 	internalKinds := map[string]bool{objects.KindBaseMetric: true}
 	out := make([]string, 0, len(c.byKind))
 	for k := range c.byKind {
@@ -95,11 +107,11 @@ func (c *ObjectIDCache) GetKinds() []string {
 
 // CountByKind returns the number of cached object IDs per kind.
 func (c *ObjectIDCache) CountByKind() map[string]int {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-	if c.byKind == nil {
+	unlock, ok := c.withRLockReady()
+	if !ok {
 		return nil
 	}
+	defer unlock()
 	if len(c.countByKind) > 0 {
 		out := make(map[string]int, len(c.countByKind))
 		for k, n := range c.countByKind {
@@ -118,11 +130,10 @@ func (c *ObjectIDCache) CountByKind() map[string]int {
 // the next load or build. Call when cache is stale (e.g. count mismatch with storage) so
 // discovery uses storage until a rebuild completes.
 func (c *ObjectIDCache) ClearInMemoryCache(projectRoot string) {
-	projectRoot = resolveProjectRoot(projectRoot)
-	if projectRoot == emptyValue {
+	root, logger, ok := resolveProjectRootWithLogger(projectRoot)
+	if !ok {
 		return
 	}
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	_ = concurrency.WithLockTimeout(
 		&c.mu,
 		pkgctx.NewSystemContext(),
@@ -131,7 +142,7 @@ func (c *ObjectIDCache) ClearInMemoryCache(projectRoot string) {
 		LockNameObjectIDCacheClearInMemory,
 		func() error {
 			meta := c.metadata
-			if meta != nil && meta.ProjectRoot == projectRoot {
+			if meta != nil && meta.ProjectRoot == root {
 				c.byKind = make(map[string][]KindBucketEntry)
 				c.idToKind = make(map[string]string)
 				c.idToIndex = make(map[string]int)

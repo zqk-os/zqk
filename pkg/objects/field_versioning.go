@@ -247,36 +247,51 @@ func MarkFieldModified(fieldDef map[string]any, modifiedBy string, breakingChang
 	SetFieldVersionInfo(fieldDef, versionInfo)
 }
 
+func mutateFieldVersionInfo(fieldDef map[string]any, fn func(*FieldVersionInfo)) {
+	info := GetFieldVersionInfo(fieldDef)
+	fn(info)
+	SetFieldVersionInfo(fieldDef, info)
+}
+
+func mutateFieldLifecycle(fieldDef map[string]any, state FieldLifecycleState, author, replacedBy, reason string) {
+	mutateFieldVersionInfo(fieldDef, func(v *FieldVersionInfo) {
+		now := zqktime.NowRFC3339UTC()
+		v.State = state
+		v.ReplacedBy, v.ChangeReason = replacedBy, reason
+		switch state {
+		case FieldStateDeprecated:
+			v.DeprecatedAt, v.DeprecatedBy = now, author
+		case FieldStateArchived:
+			v.ArchivedAt, v.ArchivedBy = now, author
+		case FieldStateDeleted:
+			v.DeletedAt, v.DeletedBy = now, author
+		}
+	})
+}
+
 // MarkFieldDeprecated marks a field as deprecated
 func MarkFieldDeprecated(fieldDef map[string]any, deprecatedBy, replacedBy, reason string) {
-	versionInfo := GetFieldVersionInfo(fieldDef)
-	versionInfo.State = FieldStateDeprecated
-	versionInfo.DeprecatedAt = zqktime.NowRFC3339UTC()
-	versionInfo.DeprecatedBy = deprecatedBy
-	versionInfo.ReplacedBy = replacedBy
-	versionInfo.ChangeReason = reason
-	SetFieldVersionInfo(fieldDef, versionInfo)
+	mutateFieldLifecycle(fieldDef, FieldStateDeprecated, deprecatedBy, replacedBy, reason)
 }
 
 // MarkFieldArchived marks a field as archived
 func MarkFieldArchived(fieldDef map[string]any, archivedBy, reason string) {
-	versionInfo := GetFieldVersionInfo(fieldDef)
-	versionInfo.State = FieldStateArchived
-	versionInfo.ArchivedAt = zqktime.NowRFC3339UTC()
-	versionInfo.ArchivedBy = archivedBy
-	versionInfo.ChangeReason = reason
-	SetFieldVersionInfo(fieldDef, versionInfo)
+	mutateFieldLifecycle(fieldDef, FieldStateArchived, archivedBy, "", reason)
 }
 
 // MarkFieldDeleted marks a field as deleted
 func MarkFieldDeleted(fieldDef map[string]any, deletedBy, replacedBy, reason string) {
-	versionInfo := GetFieldVersionInfo(fieldDef)
-	versionInfo.State = FieldStateDeleted
-	versionInfo.DeletedAt = zqktime.NowRFC3339UTC()
-	versionInfo.DeletedBy = deletedBy
-	versionInfo.ReplacedBy = replacedBy
-	versionInfo.ChangeReason = reason
-	SetFieldVersionInfo(fieldDef, versionInfo)
+	mutateFieldLifecycle(fieldDef, FieldStateDeleted, deletedBy, replacedBy, reason)
+}
+
+func anySliceToStringSet(slice []any) map[string]bool {
+	set := make(map[string]bool, len(slice))
+	for _, v := range slice {
+		if str, ok := v.(string); ok {
+			set[str] = true
+		}
+	}
+	return set
 }
 
 // DetectBreakingChange compares two field definitions and detects if the change is breaking
@@ -309,26 +324,7 @@ func DetectBreakingChange(oldFieldDef, newFieldDef map[string]any) (bool, []stri
 	oldEnum, oldHasEnum := oldValidation[fieldSpecKeyEnum].([]any)
 	newEnum, newHasEnum := newValidation[fieldSpecKeyEnum].([]any)
 	if oldHasEnum && newHasEnum {
-		oldEnumSet := make(map[string]bool)
-		for _, v := range oldEnum {
-			if str, ok := v.(string); ok {
-				oldEnumSet[str] = true
-			}
-		}
-		for _, v := range newEnum {
-			if str, ok := v.(string); ok {
-				if !oldEnumSet[str] {
-					// New value added - not breaking
-				}
-			}
-		}
-		// Check for removed values
-		newEnumSet := make(map[string]bool)
-		for _, v := range newEnum {
-			if str, ok := v.(string); ok {
-				newEnumSet[str] = true
-			}
-		}
+		newEnumSet := anySliceToStringSet(newEnum)
 		for _, v := range oldEnum {
 			if str, ok := v.(string); ok {
 				if !newEnumSet[str] {

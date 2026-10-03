@@ -19,32 +19,37 @@ var (
 	extraSpecRoots []string
 )
 
+func withLockedRootList(dir string, fn func(clean string)) {
+	clean := filepath.Clean(dir)
+	specRootMu.Lock()
+	defer specRootMu.Unlock()
+	fn(clean)
+}
+
 func addCleanDirToRootList(list *[]string, dir string) {
 	if dir == "" {
 		return
 	}
-	clean := filepath.Clean(dir)
-	specRootMu.Lock()
-	defer specRootMu.Unlock()
-	for _, existing := range *list {
-		if existing == clean {
-			return
+	withLockedRootList(dir, func(clean string) {
+		for _, existing := range *list {
+			if existing == clean {
+				return
+			}
 		}
-	}
-	*list = append(*list, clean)
+		*list = append(*list, clean)
+	})
 }
 
 func removeCleanDirFromRootList(list *[]string, dir string) {
-	clean := filepath.Clean(dir)
-	specRootMu.Lock()
-	defer specRootMu.Unlock()
-	var kept []string
-	for _, existing := range *list {
-		if existing != clean {
-			kept = append(kept, existing)
+	withLockedRootList(dir, func(clean string) {
+		var kept []string
+		for _, existing := range *list {
+			if existing != clean {
+				kept = append(kept, existing)
+			}
 		}
-	}
-	*list = kept
+		*list = kept
+	})
 }
 
 func copyRootList(list []string) []string {
@@ -191,12 +196,19 @@ func isPathUnderDir(baseDir, target string) bool {
 	return err == nil && rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator))
 }
 
-func pathInExtraSpecRoot(absPath string) bool {
-	target, err := filepath.Abs(absPath)
+func cleanAbsPath(path string) (string, bool) {
+	target, err := filepath.Abs(path)
 	if err != nil {
+		return "", false
+	}
+	return filepath.Clean(target), true
+}
+
+func pathInExtraSpecRoot(absPath string) bool {
+	target, ok := cleanAbsPath(absPath)
+	if !ok {
 		return false
 	}
-	target = filepath.Clean(target)
 	repoRoot, _ := moduleRootForSpecs()
 	testRoot := zqkenv.TestRoot().Get()
 	for _, root := range ExtraSpecRoots() {

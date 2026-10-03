@@ -151,6 +151,10 @@ func UnionFieldNamesFromSpecIndex(idx *SpecIndex) []string {
 			}
 		}
 	}
+	return sortedStringSetKeys(set)
+}
+
+func sortedStringSetKeys(set map[string]struct{}) []string {
 	out := make([]string, 0, len(set))
 	for k := range set {
 		out = append(out, k)
@@ -196,12 +200,7 @@ func BuildUnionFieldKeyNames(specsDir string) ([]string, error) {
 			set[k] = struct{}{}
 		}
 	}
-	out := make([]string, 0, len(set))
-	for k := range set {
-		out = append(out, k)
-	}
-	sort.Strings(out)
-	return out, nil
+	return sortedStringSetKeys(set), nil
 }
 
 // GenerateFieldKeysGoSource returns formatted Go source for field_keys.go from the union of

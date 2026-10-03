@@ -30,6 +30,14 @@ import (
 
 const pipelineKindEnsureObjectIDCacheReady = "system.ensure_object_id_cache_ready"
 
+func resolveProjectRootWithLogger(projectRoot string) (string, logging.Logger, bool) {
+	root := resolveProjectRoot(projectRoot)
+	if root == emptyValue {
+		return emptyValue, nil, false
+	}
+	return root, logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem)), true
+}
+
 // ObjectIDCacheEntry represents a cached object ID with metadata
 type ObjectIDCacheEntry struct {
 	ID       string    `json:"id"`

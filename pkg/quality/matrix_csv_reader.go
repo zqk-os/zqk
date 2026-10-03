@@ -46,6 +46,61 @@ func (m *matrixCSVReader) Close() error {
 	return m.file.Close()
 }
 
+func (m *matrixCSVReader) hasCol(col string) bool {
+	if m == nil || m.colIdx == nil {
+		return false
+	}
+	_, ok := m.colIdx[strings.TrimSpace(col)]
+	return ok
+}
+
+func prepareSetUpdates(setPairs []string, valueMap map[string]string) (map[string]string, error) {
+	updates, err := parseSetFlags(setPairs)
+	if err != nil {
+		return nil, err
+	}
+	ApplyValueMapToUpdates(updates, valueMap)
+	return updates, nil
+}
+
+type matrixCSVUpdateContext struct {
+	cr       *matrixCSVReader
+	prof     *MatrixProfileYAML
+	doneVals map[string]struct{}
+	gates    map[string]struct{}
+}
+
+func openMatrixForUpdate(csvPath, profilePath string) (*matrixCSVUpdateContext, error) {
+	prof, doneVals, err := LoadMatrixProfileYAML(profilePath)
+	if err != nil {
+		return nil, err
+	}
+	cr, err := openMatrixCSV(csvPath)
+	if err != nil {
+		return nil, err
+	}
+	return &matrixCSVUpdateContext{
+		cr:       cr,
+		prof:     prof,
+		doneVals: doneVals,
+		gates:    gateColumnSet(prof),
+	}, nil
+}
+
+func commitMatrixCSVUpdate(csvPath string, writeOpts *MatrixWriteOpts, header []string, rows [][]string, dryRun bool) (string, bool, error) {
+	if dryRun {
+		return "", false, nil
+	}
+	bp, err := maybeBackupCSV(csvPath, writeOpts)
+	if err != nil {
+		return "", false, err
+	}
+	if err := writeCSVAtomic(csvPath, header, rows); err != nil {
+		return "", false, err
+	}
+	return bp, true, nil
+}
+
 func resolveAndLoadRegistry(projectRoot, registryRel string) (*MatrixRegistry, string, error) {
 	if registryRel == "" {
 		registryRel = filepath.Join(paths.DocsQualityDir, "matrix_registry.yaml")

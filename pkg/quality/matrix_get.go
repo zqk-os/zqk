@@ -106,9 +106,11 @@ func QueryMatrixCSV(csvPath, profilePath, matrixName string, filters map[string]
 	}
 	defer cr.Close()
 
-	r := cr.reader
-	header := cr.header
-	colIdx := cr.colIdx
+	var (
+		r      = cr.reader
+		header = cr.header
+		colIdx = cr.colIdx
+	)
 
 	filePathIdx := -1
 	if i, ok := colIdx[objects.FieldKeyFilePath]; ok {
