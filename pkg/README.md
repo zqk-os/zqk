@@ -84,6 +84,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [git](./git/) | `github.com/zqk-os/zqk/pkg/git` | 7+8 | 8 | - | ❌ - | Git operations wrapper, branch inspection, worktree management, and status reporting. |
 | [gitconstants](./gitconstants/) | `github.com/zqk-os/zqk/pkg/gitconstants` | 1+1 | 1 | - | ❌ - | Centralized Git command, subcommand, flag, and option constant definitions. |
 | [gitevidence](./gitevidence/) | `github.com/zqk-os/zqk/pkg/gitevidence` | 1+1 | 1 | - | ❌ - | Git commit evidence verification, trunk tip freshness, and branch validation gates. |
+| [gitplumbing](./gitplumbing/) | `github.com/zqk-os/zqk/pkg/gitplumbing` | 1+0 | 0 | - | ❌ - | Gitplumbing component and domain abstractions for ZQK Core. |
 | [goroutinelabels](./goroutinelabels/) | `github.com/zqk-os/zqk/pkg/goroutinelabels` | 5+4 | 4 | - | ✅ [README](./goroutinelabels/README.md) | The GoroutineBuilder provides a fluent API for creating goroutines with consistent patterns and best practices. It ensures all... |
 | [gotestparse](./gotestparse/) | `github.com/zqk-os/zqk/pkg/gotestparse` | 1+2 | 2 | - | ❌ - | Streaming parser and event normalizer for go test terminal output and JSON test events. |
 | [graph](./graph/) | `github.com/zqk-os/zqk/pkg/graph` | 4+4 | 4 | databook, memgraph, +4 more | ✅ [README](./graph/README.md) | This package implements the pluggable graph backend interface for the zqk knowledge kernel. |
@@ -153,7 +154,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [processing](./processing/) | `github.com/zqk-os/zqk/pkg/processing` | 2+3 | 3 | - | ❌ - | Processing component and domain abstractions for ZQK Core. |
 | [projecttemp](./projecttemp/) | `github.com/zqk-os/zqk/pkg/projecttemp` | 3+1 | 1 | - | ❌ - | Hosts isolated temp-project teardown helpers that must not import pkg/storage (storage imports pkg/validation and other consume... |
 | [qapack](./qapack/) | `github.com/zqk-os/zqk/pkg/qapack` | 1+0 | 0 | - | ❌ - | Quality assurance, test coverage, and verification pack. |
-| [quality](./quality/) | `github.com/zqk-os/zqk/pkg/quality` | 12+17 | 17 | - | ❌ - | Quality component and domain abstractions for ZQK Core. |
+| [quality](./quality/) | `github.com/zqk-os/zqk/pkg/quality` | 13+17 | 17 | - | ❌ - | Quality component and domain abstractions for ZQK Core. |
 | [quick](./quick/) | `github.com/zqk-os/zqk/pkg/quick` | 1+1 | 1 | - | ❌ - | Parsing and helpers for one-click creation of system objects from text or files. p |
 | [relay](./relay/) | `github.com/zqk-os/zqk/pkg/relay` | 2+2 | 2 | - | ❌ - | Message relay, inter-process communication, and agent event forwarding. |
 | [releasegate](./releasegate/) | `github.com/zqk-os/zqk/pkg/releasegate` | 2+3 | 3 | - | ❌ - | Verification gates and multi-platform compilation tests for release candidates. p |
@@ -331,6 +332,7 @@ pkg/
 ├── git/          # Git operations wrapper, branch inspection, worktree manageme
 ├── gitconstants/          # Centralized Git command, subcommand, flag, and option consta
 ├── gitevidence/          # Git commit evidence verification, trunk tip freshness, and b
+├── gitplumbing/          # Gitplumbing component and domain abstractions for ZQK Core.
 ├── goroutinelabels/          # The GoroutineBuilder provides a fluent API for creating goro
 ├── gotestparse/          # Streaming parser and event normalizer for go test terminal o
 ├── graph/          # This package implements the pluggable graph backend interfac
