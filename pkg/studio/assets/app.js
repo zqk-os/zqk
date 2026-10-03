@@ -722,17 +722,28 @@
           // Start time
           if (item.startedAt) {
             const d = Date.parse(item.startedAt);
-            if (!isNaN(d) && d < end) start = d;
+            if (!isNaN(d) && d <= end) start = d;
           }
           if (!start && item.startDate) {
             const d = Date.parse(item.startDate);
-            if (!isNaN(d) && d < end) start = d;
+            if (!isNaN(d) && d <= end) start = d;
           }
           if (!start && item.createdAt) {
             const d = Date.parse(item.createdAt);
-            if (!isNaN(d) && d < end) start = d;
+            if (!isNaN(d) && d <= end) start = d;
           }
           if (!start) start = end - durationMs;
+
+          // Invariant: Completed work start time cannot precede the object's creation time
+          if (item.createdAt) {
+            const created = Date.parse(item.createdAt);
+            if (!isNaN(created)) start = Math.max(start, created);
+          }
+
+          // Ensure a minimum visible block for items completed in the same timestamp/hour
+          if (start >= end) {
+            start = Math.max(0, end - Math.min(durationMs, 2 * 3600 * 1000));
+          }
         } else if (isActive) {
           // Active / In-progress / Pending verification: actively executing right now!
           if (item.startedAt) {
