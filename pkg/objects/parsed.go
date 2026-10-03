@@ -101,18 +101,7 @@ func ParseObject(obj map[string]any) (*ParsedObject, error) {
 	parsed.Questions = extractStringList(obj, FieldKeyQuestions)
 
 	// Cache common simple fields for quick access (but keep in Raw too)
-	if id, ok := obj[FieldKeyID].(string); ok {
-		parsed.ID = id
-	}
-	if kind, ok := obj[FieldKeyKind].(string); ok {
-		parsed.Kind = kind
-	}
-	if ns, ok := obj[FieldKeyNamespaceID].(string); ok {
-		parsed.NamespaceID = ns
-	}
-	if status, ok := obj[FieldKeyStatus].(string); ok {
-		parsed.Status = status
-	}
+	populateCoreIdentityFields(parsed, obj)
 	if title, ok := obj[FieldKeyTitle].(string); ok {
 		parsed.Title = title
 	}
@@ -400,12 +389,7 @@ func (p *ParsedObject) GetField(name string) (any, bool) {
 // ParseObjectMinimal parses only common metadata fields from a map, avoiding expensive
 // full-schema extraction and deep list conversion. Use for high-volume high-frequency
 // scans like retention cleanup and aggregation.
-func ParseObjectMinimal(obj map[string]any) *ParsedObject {
-	parsed := &ParsedObject{
-		Raw: obj,
-	}
-
-	// Extract only the fields needed for discovery, filtering, and basic lifecycle
+func populateCoreIdentityFields(parsed *ParsedObject, obj map[string]any) {
 	if id, ok := obj[FieldKeyID].(string); ok {
 		parsed.ID = id
 	}
@@ -418,6 +402,18 @@ func ParseObjectMinimal(obj map[string]any) *ParsedObject {
 	if status, ok := obj[FieldKeyStatus].(string); ok {
 		parsed.Status = status
 	}
+}
+
+// ParseObjectMinimal parses only common metadata fields from a map, avoiding expensive
+// full-schema extraction and deep list conversion. Use for high-volume high-frequency
+// scans like retention cleanup and aggregation.
+func ParseObjectMinimal(obj map[string]any) *ParsedObject {
+	parsed := &ParsedObject{
+		Raw: obj,
+	}
+
+	// Extract only the fields needed for discovery, filtering, and basic lifecycle
+	populateCoreIdentityFields(parsed, obj)
 	if createdAt, ok := obj[FieldKeyCreatedAt].(string); ok {
 		if t, err := time.Parse(time.RFC3339, createdAt); err == nil {
 			parsed.CreatedAt = t

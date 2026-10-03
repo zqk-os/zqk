@@ -1,9 +1,14 @@
 package metrics
 
 import (
+	"context"
+	"sort"
 	"time"
 
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // MetricObjectConfig configures how a metric object is created
@@ -113,4 +118,97 @@ func CreateBaseMetricObject(
 	}
 
 	return metricObj
+}
+
+// QueryAggregationObjects queries storage for objects matching the aggregation config filter.
+func QueryAggregationObjects(ctx context.Context, st storage.ObjectStorageProvider, config *AggregationConfig) ([]map[string]any, error) {
+	secCtx := pkgctx.NewSystemSecurityContext()
+	storageCtx := pkgctx.NewStorageContext()
+
+	filter := storage.ListFilter{
+		Kind:    config.ObjectKind,
+		Filters: config.Filters,
+		Limit:   0,
+	}
+
+	result, err := st.List(ctx, secCtx, storageCtx, filter)
+	if err != nil {
+		return nil, errfmt.Newf("failed to list objects").Wrap(err)
+	}
+	return result.Objects, nil
+}
+
+// BuildAggregationResult builds standard AggregationResult structure from config and aggregations.
+func BuildAggregationResult(config *AggregationConfig, metricID string, aggregations map[string]any, objectCount int) *AggregationResult {
+	return &AggregationResult{
+		MetricID:        metricID,
+		ObjectKind:      config.ObjectKind,
+		FieldName:       config.FieldName,
+		MetricType:      config.MetricType,
+		WindowStart:     config.WindowStart,
+		WindowEnd:       config.WindowEnd,
+		Aggregations:    aggregations,
+		ObjectCount:     objectCount,
+		CollectionCount: 1,
+	}
+}
+
+// CreateSyncMetricObject creates a metric object via factory with a 30s timeout.
+func CreateSyncMetricObject(
+	ctx context.Context,
+	st storage.ObjectStorageProvider,
+	config *AggregationConfig,
+	title string,
+	objConfig *MetricObjectConfig,
+	aggregations map[string]any,
+	objectCount int,
+) (string, error) {
+	factory := NewMetricFactory(st)
+	metricIDChan := make(chan string, 1)
+	errChan := make(chan error, 1)
+
+	factory.CreateMetricFromConfigAsync(
+		ctx,
+		config,
+		title,
+		objectCount,
+		objConfig,
+		aggregations,
+		func(metricID string, err error) {
+			if err != nil {
+				errChan <- err
+				return
+			}
+			metricIDChan <- metricID
+		},
+	)
+
+	select {
+	case id := <-metricIDChan:
+		return id, nil
+	case err := <-errChan:
+		return "", err
+	case <-time.After(30 * time.Second):
+		return "", errfmt.Errorf("metric creation timeout after 30s")
+	}
+}
+
+// TopNMap takes a map of string counts and returns the top N entries as a map.
+func TopNMap(counts map[string]int, n int) map[string]int {
+	type pair struct {
+		key   string
+		value int
+	}
+	pairs := make([]pair, 0, len(counts))
+	for k, v := range counts {
+		pairs = append(pairs, pair{key: k, value: v})
+	}
+	sort.Slice(pairs, func(i, j int) bool {
+		return pairs[i].value > pairs[j].value
+	})
+	topN := make(map[string]int)
+	for i := 0; i < n && i < len(pairs); i++ {
+		topN[pairs[i].key] = pairs[i].value
+	}
+	return topN
 }

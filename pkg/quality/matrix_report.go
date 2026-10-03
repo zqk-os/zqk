@@ -93,9 +93,11 @@ func SummarizeMatrixCSV(csvPath string, prof *MatrixProfileYAML, doneVals map[st
 	defer cr.Close()
 	cr.reader.ReuseRecord = true
 
-	r := cr.reader
-	header := cr.header
-	colIdx := cr.colIdx
+	var (
+		r      = cr.reader
+		header = cr.header
+		colIdx = cr.colIdx
+	)
 	gates := prof.Completion.GateColumns
 	for _, g := range gates {
 		if _, ok := colIdx[g]; !ok {

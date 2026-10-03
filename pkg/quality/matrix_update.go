@@ -240,30 +240,25 @@ func UpdateMatrixCSVByFilter(csvPath, profilePath, matrixName string, filters ma
 	if len(filters) == 0 {
 		return nil, errfmt.Errorf("at least one --filter column=value is required for bulk update")
 	}
-	updates, err := parseSetFlags(setPairs)
+	updates, err := prepareSetUpdates(setPairs, valueMap)
 	if err != nil {
 		return nil, err
 	}
-	ApplyValueMapToUpdates(updates, valueMap)
 	if len(updates) == 0 {
 		return nil, errfmt.Errorf("at least one --set column=value is required")
 	}
 
-	prof, doneVals, err := LoadMatrixProfileYAML(profilePath)
+	uCtx, err := openMatrixForUpdate(csvPath, profilePath)
 	if err != nil {
 		return nil, err
 	}
-	gates := gateColumnSet(prof)
+	defer uCtx.cr.Close()
 
-	cr, err := openMatrixCSV(csvPath)
-	if err != nil {
-		return nil, err
-	}
-	defer cr.Close()
-
-	r := cr.reader
-	header := cr.header
-	colIdx := cr.colIdx
+	r := uCtx.cr.reader
+	header := uCtx.cr.header
+	colIdx := uCtx.cr.colIdx
+	gates := uCtx.gates
+	doneVals := uCtx.doneVals
 	for col := range filters {
 		c := strings.TrimSpace(col)
 		if _, ok := colIdx[c]; !ok {
@@ -334,21 +329,12 @@ func UpdateMatrixCSVByFilter(csvPath, profilePath, matrixName string, filters ma
 		CvsIDs:          collectUniqueCvsIDs(colIdx, sessionRefCol, rows, matchIdx),
 	}
 
-	if dryRun {
-		return res, nil
-	}
-
-	bp, err := maybeBackupCSV(csvPath, writeOpts)
+	bp, wrote, err := commitMatrixCSVUpdate(csvPath, writeOpts, header, rows, dryRun)
 	if err != nil {
 		return nil, err
 	}
-	if bp != "" {
-		res.BackupPath = bp
-	}
-	if err := writeCSVAtomic(csvPath, header, rows); err != nil {
-		return nil, err
-	}
-	res.Wrote = true
+	res.BackupPath = bp
+	res.Wrote = wrote
 	return res, nil
 }
 
@@ -356,11 +342,10 @@ func UpdateMatrixCSVByFilter(csvPath, profilePath, matrixName string, filters ma
 // gate columns against doneVals, and atomically replaces the CSV file (unless dryRun).
 // valueMap: optional registry value_map (token -> canonical); applied to parsed --set values before validation.
 func UpdateMatrixCSVRow(csvPath, profilePath, matrixName, matchColumn, matchValue string, setPairs []string, valueMap map[string]string, dryRun bool, writeOpts *MatrixWriteOpts) (*MatrixUpdateResult, error) {
-	updates, err := parseSetFlags(setPairs)
+	updates, err := prepareSetUpdates(setPairs, valueMap)
 	if err != nil {
 		return nil, err
 	}
-	ApplyValueMapToUpdates(updates, valueMap)
 	matchColumn = strings.TrimSpace(matchColumn)
 	if matchColumn == "" {
 		return nil, errfmt.Errorf("match column is required")
@@ -370,21 +355,17 @@ func UpdateMatrixCSVRow(csvPath, profilePath, matrixName, matchColumn, matchValu
 		return nil, errfmt.Errorf("match value is required")
 	}
 
-	prof, doneVals, err := LoadMatrixProfileYAML(profilePath)
+	uCtx, err := openMatrixForUpdate(csvPath, profilePath)
 	if err != nil {
 		return nil, err
 	}
-	gates := gateColumnSet(prof)
+	defer uCtx.cr.Close()
 
-	cr, err := openMatrixCSV(csvPath)
-	if err != nil {
-		return nil, err
-	}
-	defer cr.Close()
-
-	r := cr.reader
-	header := cr.header
-	colIdx := cr.colIdx
+	r := uCtx.cr.reader
+	header := uCtx.cr.header
+	colIdx := uCtx.cr.colIdx
+	gates := uCtx.gates
+	doneVals := uCtx.doneVals
 	matchKey := strings.TrimSpace(matchColumn)
 	mi, ok := colIdx[matchKey]
 	if !ok {
@@ -467,21 +448,12 @@ func UpdateMatrixCSVRow(csvPath, profilePath, matrixName, matchColumn, matchValu
 		RowAfter:    matrixRowToMap(header, rows[found]),
 	}
 
-	if dryRun {
-		return res, nil
-	}
-
-	bp, err := maybeBackupCSV(csvPath, writeOpts)
+	bp, wrote, err := commitMatrixCSVUpdate(csvPath, writeOpts, header, rows, dryRun)
 	if err != nil {
 		return nil, err
 	}
-	if bp != "" {
-		res.BackupPath = bp
-	}
-	if err := writeCSVAtomic(csvPath, header, rows); err != nil {
-		return nil, err
-	}
-	res.Wrote = true
+	res.BackupPath = bp
+	res.Wrote = wrote
 	return res, nil
 }
 

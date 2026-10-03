@@ -32,80 +32,69 @@ func getOrCreateProjectCacheBgState(projectRoot string) *projectCacheBgState {
 	return s
 }
 
-func projectCacheBgIncObjectID(projectRoot string) {
+func projectCacheBgIncCounter(projectRoot string, inc func(*projectCacheBgState)) {
 	projectRoot = resolveProjectRoot(projectRoot)
 	if projectRoot == emptyValue {
 		return
 	}
 	s := getOrCreateProjectCacheBgState(projectRoot)
 	s.mu.Lock()
-	s.nObjectID++
+	inc(s)
 	s.mu.Unlock()
+}
+
+func projectCacheBgDecCounter(projectRoot string, dec func(*projectCacheBgState)) {
+	projectRoot = resolveProjectRoot(projectRoot)
+	if projectRoot == emptyValue {
+		return
+	}
+	v, ok := projectCacheBg.Load(projectRoot)
+	if !ok {
+		return
+	}
+	s := v.(*projectCacheBgState)
+	s.mu.Lock()
+	beforeIdle := s.nObjectID == 0 && s.nReverseRef == 0
+	dec(s)
+	afterIdle := s.nObjectID == 0 && s.nReverseRef == 0
+	becameIdle := !beforeIdle && afterIdle
+	if afterIdle {
+		s.cond.Broadcast()
+	}
+	s.mu.Unlock()
+	if becameIdle {
+		notifyCacheSidecarsIdle(projectRoot)
+	}
+}
+
+func projectCacheBgIncObjectID(projectRoot string) {
+	projectCacheBgIncCounter(projectRoot, func(s *projectCacheBgState) {
+		s.nObjectID++
+	})
 }
 
 func projectCacheBgDecObjectID(projectRoot string) {
-	projectRoot = resolveProjectRoot(projectRoot)
-	if projectRoot == emptyValue {
-		return
-	}
-	v, ok := projectCacheBg.Load(projectRoot)
-	if !ok {
-		return
-	}
-	s := v.(*projectCacheBgState)
-	s.mu.Lock()
-	beforeIdle := s.nObjectID == 0 && s.nReverseRef == 0
-	s.nObjectID--
-	if s.nObjectID < 0 {
-		s.nObjectID = 0
-	}
-	afterIdle := s.nObjectID == 0 && s.nReverseRef == 0
-	becameIdle := !beforeIdle && afterIdle
-	if afterIdle {
-		s.cond.Broadcast()
-	}
-	s.mu.Unlock()
-	if becameIdle {
-		notifyCacheSidecarsIdle(projectRoot)
-	}
+	projectCacheBgDecCounter(projectRoot, func(s *projectCacheBgState) {
+		s.nObjectID--
+		if s.nObjectID < 0 {
+			s.nObjectID = 0
+		}
+	})
 }
 
 func projectCacheBgIncReverseRef(projectRoot string) {
-	projectRoot = resolveProjectRoot(projectRoot)
-	if projectRoot == emptyValue {
-		return
-	}
-	s := getOrCreateProjectCacheBgState(projectRoot)
-	s.mu.Lock()
-	s.nReverseRef++
-	s.mu.Unlock()
+	projectCacheBgIncCounter(projectRoot, func(s *projectCacheBgState) {
+		s.nReverseRef++
+	})
 }
 
 func projectCacheBgDecReverseRef(projectRoot string) {
-	projectRoot = resolveProjectRoot(projectRoot)
-	if projectRoot == emptyValue {
-		return
-	}
-	v, ok := projectCacheBg.Load(projectRoot)
-	if !ok {
-		return
-	}
-	s := v.(*projectCacheBgState)
-	s.mu.Lock()
-	beforeIdle := s.nObjectID == 0 && s.nReverseRef == 0
-	s.nReverseRef--
-	if s.nReverseRef < 0 {
-		s.nReverseRef = 0
-	}
-	afterIdle := s.nObjectID == 0 && s.nReverseRef == 0
-	becameIdle := !beforeIdle && afterIdle
-	if afterIdle {
-		s.cond.Broadcast()
-	}
-	s.mu.Unlock()
-	if becameIdle {
-		notifyCacheSidecarsIdle(projectRoot)
-	}
+	projectCacheBgDecCounter(projectRoot, func(s *projectCacheBgState) {
+		s.nReverseRef--
+		if s.nReverseRef < 0 {
+			s.nReverseRef = 0
+		}
+	})
 }
 
 var (

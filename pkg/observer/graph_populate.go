@@ -117,6 +117,23 @@ type GraphWriter interface {
 }
 
 // Populate writes extracted entities and derived relationships to the graph (BLI-OBS-002).
+func collectFileAndPackageNodes(entities []Entity) (map[string]provider.Node, map[string]provider.Node) {
+	fileNodes := make(map[string]provider.Node)
+	packageNodes := make(map[string]provider.Node)
+	for _, e := range entities {
+		if _, ok := fileNodes[e.File]; !ok {
+			fileNodes[e.File] = SourceFileNode(e.File)
+		}
+		for _, imp := range e.Imports {
+			if _, ok := packageNodes[imp]; !ok {
+				packageNodes[imp] = PackageNode(imp)
+			}
+		}
+	}
+	return fileNodes, packageNodes
+}
+
+// Populate takes the output of ExtractDirectory (or any ExtractResult) and writes the graph.
 // It creates CodeEntity and SourceFile nodes and CONTAINS / METHOD_OF edges.
 // Versioning: pass extractID (e.g. run id or timestamp) to tag this batch; stored in node properties.
 func Populate(ctx context.Context, conn GraphWriter, result *ExtractResult, extractID string) (*PopulateResult, error) {
@@ -129,14 +146,8 @@ func Populate(ctx context.Context, conn GraphWriter, result *ExtractResult, extr
 	}
 
 	indices := buildEntityIndices(result.Entities)
-	typesByKey := indices.typesByKey
-	entitiesByName := indices.entitiesByName
-
-	// Ensure we have one file node per file and collect entity nodes + CONTAINS edges
-	fileNodes := make(map[string]provider.Node)
-	packageNodes := make(map[string]provider.Node)
+	fileNodes, packageNodes := collectFileAndPackageNodes(result.Entities)
 	nodes := make([]provider.Node, 0, len(result.Entities))
-
 	var edges []provider.Edge
 
 	for i := range result.Entities {
@@ -154,15 +165,6 @@ func Populate(ctx context.Context, conn GraphWriter, result *ExtractResult, extr
 		nodes = append(nodes, node)
 
 		fid := FileID(e.File)
-		if _, ok := fileNodes[e.File]; !ok {
-			fileNodes[e.File] = SourceFileNode(e.File)
-		}
-		for _, imp := range e.Imports {
-			if _, ok := packageNodes[imp]; !ok {
-				packageNodes[imp] = PackageNode(imp)
-			}
-		}
-
 		edges = append(edges, provider.Edge{
 			FromID:     fid,
 			ToID:       node.ID,
@@ -179,22 +181,20 @@ func Populate(ctx context.Context, conn GraphWriter, result *ExtractResult, extr
 			})
 		}
 
-		if e.Kind == "method" && e.Receiver != emptyValue {
-			if typ, ok := typesByKey[entityTypeKey(e.File, e.Receiver)]; ok {
-				edges = append(edges, provider.Edge{
-					FromID:     node.ID,
-					ToID:       EntityID(typ),
-					Type:       EdgeMethodOf,
-					Properties: map[string]any{},
-				})
-			}
+		if typ := indices.methodTarget(e); typ != nil {
+			edges = append(edges, provider.Edge{
+				FromID:     node.ID,
+				ToID:       EntityID(typ),
+				Type:       EdgeMethodOf,
+				Properties: map[string]any{},
+			})
 		}
 
 		for _, call := range e.Calls {
-			if targets, ok := entitiesByName[call]; ok && len(targets) > 0 {
+			if target := indices.firstTargetByName(call); target != nil {
 				edges = append(edges, provider.Edge{
 					FromID:     node.ID,
-					ToID:       EntityID(targets[0]),
+					ToID:       EntityID(target),
 					Type:       EdgeCalls,
 					Properties: map[string]any{},
 				})
@@ -202,10 +202,10 @@ func Populate(ctx context.Context, conn GraphWriter, result *ExtractResult, extr
 		}
 
 		for _, dep := range e.DependsOn {
-			if targets, ok := entitiesByName[dep]; ok && len(targets) > 0 {
+			if target := indices.firstTargetByName(dep); target != nil {
 				edges = append(edges, provider.Edge{
 					FromID:     node.ID,
-					ToID:       EntityID(targets[0]),
+					ToID:       EntityID(target),
 					Type:       EdgeDependsOn,
 					Properties: map[string]any{},
 				})
@@ -265,21 +265,7 @@ func PopulateBatch(ctx context.Context, conn interface {
 		return &PopulateResult{}, nil
 	}
 	indices := buildEntityIndices(result.Entities)
-	typesByKey := indices.typesByKey
-	entitiesByName := indices.entitiesByName
-
-	fileNodes := make(map[string]provider.Node)
-	packageNodes := make(map[string]provider.Node)
-	for _, e := range result.Entities {
-		if _, ok := fileNodes[e.File]; !ok {
-			fileNodes[e.File] = SourceFileNode(e.File)
-		}
-		for _, imp := range e.Imports {
-			if _, ok := packageNodes[imp]; !ok {
-				packageNodes[imp] = PackageNode(imp)
-			}
-		}
-	}
+	fileNodes, packageNodes := collectFileAndPackageNodes(result.Entities)
 	var ops []provider.Operation
 
 	// 1) Create package nodes
@@ -330,25 +316,23 @@ func PopulateBatch(ctx context.Context, conn interface {
 			edgesCreated++
 		}
 
-		if e.Kind == "method" && e.Receiver != emptyValue {
-			if typ, ok := typesByKey[entityTypeKey(e.File, e.Receiver)]; ok {
-				ops = append(ops, provider.Operation{
-					Type: "create_edge",
-					Data: provider.Edge{
-						FromID: EntityID(e), ToID: EntityID(typ), Type: EdgeMethodOf, Properties: map[string]any{},
-					},
-				})
-				edgesCreated++
-			}
+		if typ := indices.methodTarget(e); typ != nil {
+			ops = append(ops, provider.Operation{
+				Type: "create_edge",
+				Data: provider.Edge{
+					FromID: EntityID(e), ToID: EntityID(typ), Type: EdgeMethodOf, Properties: map[string]any{},
+				},
+			})
+			edgesCreated++
 		}
 
 		// CALLS
 		for _, call := range e.Calls {
-			if targets, ok := entitiesByName[call]; ok && len(targets) > 0 {
+			if target := indices.firstTargetByName(call); target != nil {
 				ops = append(ops, provider.Operation{
 					Type: "create_edge",
 					Data: provider.Edge{
-						FromID: EntityID(e), ToID: EntityID(targets[0]), Type: EdgeCalls, Properties: map[string]any{},
+						FromID: EntityID(e), ToID: EntityID(target), Type: EdgeCalls, Properties: map[string]any{},
 					},
 				})
 				edgesCreated++
@@ -357,11 +341,11 @@ func PopulateBatch(ctx context.Context, conn interface {
 
 		// DEPENDS_ON
 		for _, dep := range e.DependsOn {
-			if targets, ok := entitiesByName[dep]; ok && len(targets) > 0 {
+			if target := indices.firstTargetByName(dep); target != nil {
 				ops = append(ops, provider.Operation{
 					Type: "create_edge",
 					Data: provider.Edge{
-						FromID: EntityID(e), ToID: EntityID(targets[0]), Type: EdgeDependsOn, Properties: map[string]any{},
+						FromID: EntityID(e), ToID: EntityID(target), Type: EdgeDependsOn, Properties: map[string]any{},
 					},
 				})
 				edgesCreated++
@@ -461,6 +445,23 @@ func entityTypeKey(file, name string) string {
 type entityIndices struct {
 	typesByKey     map[string]*Entity
 	entitiesByName map[string][]*Entity
+}
+
+func (idx *entityIndices) methodTarget(e *Entity) *Entity {
+	if e.Kind == "method" && e.Receiver != emptyValue {
+		if typ, ok := idx.typesByKey[entityTypeKey(e.File, e.Receiver)]; ok {
+			return typ
+		}
+	}
+	return nil
+}
+
+func (idx *entityIndices) firstTargetByName(name string) *Entity {
+	targets := idx.entitiesByName[name]
+	if len(targets) > 0 {
+		return targets[0]
+	}
+	return nil
 }
 
 func buildEntityIndices(entities []Entity) entityIndices {

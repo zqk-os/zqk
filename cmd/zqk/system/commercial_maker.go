@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	"os"
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
 
@@ -23,9 +22,7 @@ func registerTDEScriptAction(actionName, logPrefix string) {
 		logging.FluentEvent(logger).Info(logPrefix).Script(script).Log()
 
 		cmd := execwrap.CommandContext(ctx, "bash", "-c", script)
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		return cmd.Run()
+		return execwrap.RunWithStandardStreams(cmd)
 	})
 }
 

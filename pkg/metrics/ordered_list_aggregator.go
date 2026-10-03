@@ -3,9 +3,7 @@ package metrics
 import (
 	"context"
 	"fmt"
-	"time"
 
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
@@ -30,20 +28,9 @@ func (a *OrderedListMetricAggregator) GetMetricType() string {
 
 // Aggregate collects and aggregates ordered list metric data
 func (a *OrderedListMetricAggregator) Aggregate(ctx context.Context, config *AggregationConfig) (*AggregationResult, error) {
-	secCtx := pkgctx.NewSystemSecurityContext()
-	storageCtx := pkgctx.NewStorageContext()
-
-	// Build filter
-	filter := storage.ListFilter{
-		Kind:    config.ObjectKind,
-		Filters: config.Filters,
-		Limit:   0,
-	}
-
-	// Query objects
-	result, err := a.storage.List(ctx, secCtx, storageCtx, filter)
+	rawObjects, err := QueryAggregationObjects(ctx, a.storage, config)
 	if err != nil {
-		return nil, errfmt.Newf("failed to list objects").Wrap(err)
+		return nil, err
 	}
 
 	// Collect sequences and analyze patterns
@@ -51,7 +38,7 @@ func (a *OrderedListMetricAggregator) Aggregate(ctx context.Context, config *Agg
 	objectCount := 0
 	transitionCounts := make(map[string]int) // "from->to" -> count
 
-	for _, obj := range result.Objects {
+	for _, obj := range rawObjects {
 		if !isInWindow(obj, config.WindowStart, config.WindowEnd) {
 			continue
 		}
@@ -115,17 +102,7 @@ func (a *OrderedListMetricAggregator) Aggregate(ctx context.Context, config *Agg
 		return nil, errfmt.Newf("failed to create metric object").Wrap(err)
 	}
 
-	return &AggregationResult{
-		MetricID:        metricID,
-		ObjectKind:      config.ObjectKind,
-		FieldName:       config.FieldName,
-		MetricType:      config.MetricType,
-		WindowStart:     config.WindowStart,
-		WindowEnd:       config.WindowEnd,
-		Aggregations:    aggregations,
-		ObjectCount:     objectCount,
-		CollectionCount: 1,
-	}, nil
+	return BuildAggregationResult(config, metricID, aggregations, objectCount), nil
 }
 
 // createMetricObject creates a base_metric object using the factory pattern (non-blocking)
@@ -146,40 +123,7 @@ func (a *OrderedListMetricAggregator) createMetricObject(
 		AdditionalTags: []string{MetricTypeOrderedList},
 	}
 
-	// Use factory for metric creation
-	factory := NewMetricFactory(a.storage)
-
-	// Create metric using factory (non-blocking async)
-	metricIDChan := make(chan string, 1)
-	errChan := make(chan error, 1)
-
-	factory.CreateMetricFromConfigAsync(
-		ctx,
-		config,
-		title,
-		objectCount,
-		objConfig,
-		aggregations,
-		func(metricID string, err error) {
-			if err != nil {
-				errChan <- err
-				return
-			}
-			metricIDChan <- metricID
-		},
-	)
-
-	// Wait for result with timeout
-	select {
-	case id := <-metricIDChan:
-		return id, nil
-	case err := <-errChan:
-		return "", err
-	case <-time.After(30 * time.Second):
-		return "", errfmt.Errorf("metric creation timeout after 30s")
-	case <-ctx.Done():
-		return "", ctx.Err()
-	}
+	return CreateSyncMetricObject(ctx, a.storage, config, title, objConfig, aggregations, objectCount)
 }
 
 // averageSequenceLength calculates average length of sequences

@@ -193,11 +193,10 @@ func (sl *SpecLoader) isExtraSpecPath(absPath string) bool {
 	if sl == nil {
 		return false
 	}
-	target, err := filepath.Abs(absPath)
-	if err != nil {
+	target, ok := cleanAbsPath(absPath)
+	if !ok {
 		return false
 	}
-	target = filepath.Clean(target)
 	for _, root := range sl.applicableExtraSpecRoots() {
 		if isPathUnderDir(filepath.Clean(root), target) {
 			return true

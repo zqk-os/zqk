@@ -3,6 +3,7 @@ package execwrap
 import (
 	"bytes"
 	"context"
+	"os"
 	"os/exec"
 )
 
@@ -21,4 +22,11 @@ func RunWithBuffers(cmd *exec.Cmd) (stdout, stderr string, err error) {
 	cmd.Stderr = &errBuf
 	err = cmd.Run()
 	return outBuf.String(), errBuf.String(), err
+}
+
+// RunWithStandardStreams connects os.Stdout and os.Stderr to cmd and executes it.
+func RunWithStandardStreams(cmd *exec.Cmd) error {
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
 }

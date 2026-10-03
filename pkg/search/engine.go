@@ -242,26 +242,14 @@ func (e *Engine) searchText(ctx context.Context, targetRoot string, opts SearchO
 		}
 	}
 
-	result := &SearchResult{
-		FilesSearched: len(files),
-	}
+	state := newSearchExecutionState(len(files), 128)
 
-	var matchesMu sync.Mutex
-	var totalMatches int32
-	var accumulatedTokens int32
-	var stopped int32
-
-	numWorkers := searchWorkerCount()
-	fileCh := make(chan string, 128)
-	var wg sync.WaitGroup
-
-
-	for w := 0; w < numWorkers; w++ {
-		wg.Add(1)
+	for w := 0; w < state.numWorkers; w++ {
+		state.wg.Add(1)
 		goroutinelabels.NewGoroutine("search_worker", "parallel trigram and text search").StartSimple(func() {
-			defer wg.Done()
-			for path := range fileCh {
-				if atomic.LoadInt32(&stopped) != 0 {
+			defer state.wg.Done()
+			for path := range state.fileCh {
+				if atomic.LoadInt32(&state.stopped) != 0 {
 					continue
 				}
 
@@ -290,41 +278,23 @@ func (e *Engine) searchText(ctx context.Context, targetRoot string, opts SearchO
 					continue
 				}
 
-				matchesMu.Lock()
+				state.matchesMu.Lock()
 				for _, m := range fileMatches {
 					if len(m.LineContent) > 500 {
 						m.LineContent = m.LineContent[:500] + " ... [truncated]"
 					}
-					mTokens := EstimateMatchTokens(m)
-					curTokens := atomic.LoadInt32(&accumulatedTokens)
-					curCount := atomic.LoadInt32(&totalMatches)
-
-					if opts.MaxTokens > 0 && int(curTokens)+mTokens > opts.MaxTokens {
-						result.Truncated = true
-						result.TruncateReason = "max_tokens"
-						atomic.StoreInt32(&stopped, 1)
+					if !state.appendMatch(m, opts) {
 						break
 					}
-
-					if opts.MaxMatches > 0 && int(curCount) >= opts.MaxMatches {
-						result.Truncated = true
-						result.TruncateReason = "max_matches"
-						atomic.StoreInt32(&stopped, 1)
-						break
-					}
-
-					atomic.AddInt32(&accumulatedTokens, int32(mTokens))
-					atomic.AddInt32(&totalMatches, 1)
-					result.Matches = append(result.Matches, m)
 				}
-				matchesMu.Unlock()
+				state.matchesMu.Unlock()
 			}
 		})
 	}
 
-	dispatchFilesAndWait(ctx, files, fileCh, &wg, &stopped, "search.wait")
-	finalizeSearchResult(result, atomic.LoadInt32(&accumulatedTokens), start)
-	return result, nil
+	dispatchFilesAndWait(ctx, files, state.fileCh, &state.wg, &state.stopped, "search.wait")
+	finalizeSearchResult(state.result, atomic.LoadInt32(&state.accumulatedTokens), start)
+	return state.result, nil
 }
 
 
@@ -334,26 +304,14 @@ func (e *Engine) searchAST(ctx context.Context, targetRoot string, opts SearchOp
 		return nil, err
 	}
 
-	result := &SearchResult{
-		FilesSearched: len(files),
-	}
+	state := newSearchExecutionState(len(files), 64)
 
-	var matchesMu sync.Mutex
-	var totalMatches int32
-	var accumulatedTokens int32
-	var stopped int32
-
-	numWorkers := searchWorkerCount()
-	fileCh := make(chan string, 64)
-	var wg sync.WaitGroup
-
-
-	for w := 0; w < numWorkers; w++ {
-		wg.Add(1)
+	for w := 0; w < state.numWorkers; w++ {
+		state.wg.Add(1)
 		goroutinelabels.NewGoroutine("search_ast_worker", "parallel AST symbol search").StartSimple(func() {
-			defer wg.Done()
-			for path := range fileCh {
-				if atomic.LoadInt32(&stopped) != 0 {
+			defer state.wg.Done()
+			for path := range state.fileCh {
+				if atomic.LoadInt32(&state.stopped) != 0 {
 					continue
 				}
 
@@ -385,42 +343,70 @@ func (e *Engine) searchAST(ctx context.Context, targetRoot string, opts SearchOp
 					continue
 				}
 
-				matchesMu.Lock()
+				state.matchesMu.Lock()
 				for _, m := range astMatches {
 					m.File = relPath
 					if len(m.LineContent) > 500 {
 						m.LineContent = m.LineContent[:500] + " ... [truncated]"
 					}
-					mTokens := EstimateMatchTokens(m)
-					curTokens := atomic.LoadInt32(&accumulatedTokens)
-					curCount := atomic.LoadInt32(&totalMatches)
-
-					if opts.MaxTokens > 0 && int(curTokens)+mTokens > opts.MaxTokens {
-						result.Truncated = true
-						result.TruncateReason = "max_tokens"
-						atomic.StoreInt32(&stopped, 1)
+					if !state.appendMatch(m, opts) {
 						break
 					}
-
-					if opts.MaxMatches > 0 && int(curCount) >= opts.MaxMatches {
-						result.Truncated = true
-						result.TruncateReason = "max_matches"
-						atomic.StoreInt32(&stopped, 1)
-						break
-					}
-
-					atomic.AddInt32(&accumulatedTokens, int32(mTokens))
-					atomic.AddInt32(&totalMatches, 1)
-					result.Matches = append(result.Matches, m)
 				}
-				matchesMu.Unlock()
+				state.matchesMu.Unlock()
 			}
 		})
 	}
 
-	dispatchFilesAndWait(ctx, files, fileCh, &wg, &stopped, "search_ast.wait")
-	finalizeSearchResult(result, atomic.LoadInt32(&accumulatedTokens), start)
-	return result, nil
+	dispatchFilesAndWait(ctx, files, state.fileCh, &state.wg, &state.stopped, "search_ast.wait")
+	finalizeSearchResult(state.result, atomic.LoadInt32(&state.accumulatedTokens), start)
+	return state.result, nil
+}
+
+type searchExecutionState struct {
+	result            *SearchResult
+	matchesMu         sync.Mutex
+	totalMatches      int32
+	accumulatedTokens int32
+	stopped           int32
+	numWorkers        int
+	fileCh            chan string
+	wg                sync.WaitGroup
+}
+
+func newSearchExecutionState(fileCount, chanBuf int) *searchExecutionState {
+	return &searchExecutionState{
+		result: &SearchResult{
+			FilesSearched: fileCount,
+		},
+		numWorkers: searchWorkerCount(),
+		fileCh:     make(chan string, chanBuf),
+	}
+}
+
+func (s *searchExecutionState) appendMatch(m Match, opts SearchOptions) bool {
+	mTokens := EstimateMatchTokens(m)
+	curTokens := atomic.LoadInt32(&s.accumulatedTokens)
+	curCount := atomic.LoadInt32(&s.totalMatches)
+
+	if opts.MaxTokens > 0 && int(curTokens)+mTokens > opts.MaxTokens {
+		s.result.Truncated = true
+		s.result.TruncateReason = "max_tokens"
+		atomic.StoreInt32(&s.stopped, 1)
+		return false
+	}
+
+	if opts.MaxMatches > 0 && int(curCount) >= opts.MaxMatches {
+		s.result.Truncated = true
+		s.result.TruncateReason = "max_matches"
+		atomic.StoreInt32(&s.stopped, 1)
+		return false
+	}
+
+	atomic.AddInt32(&s.accumulatedTokens, int32(mTokens))
+	atomic.AddInt32(&s.totalMatches, 1)
+	s.result.Matches = append(s.result.Matches, m)
+	return true
 }
 
 func searchWorkerCount() int {

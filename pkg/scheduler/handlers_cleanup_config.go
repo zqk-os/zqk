@@ -137,9 +137,7 @@ func (h *CleanupConfigHandler) runCLI(ctx context.Context, workDir string, param
 	}
 	cmd := execwrap.CommandContext(ctx, command, args...)
 	cmd.Dir = workDir
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
+	return execwrap.RunWithStandardStreams(cmd)
 }
 
 func (h *CleanupConfigHandler) runBuildTarget(ctx context.Context, workDir string, params map[string]any) error {

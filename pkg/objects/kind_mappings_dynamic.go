@@ -469,14 +469,18 @@ func (dkm *DynamicKindMapper) GetAllKinds() []string {
 	return kinds
 }
 
+func (dkm *DynamicKindMapper) resetCachesLocked() {
+	dkm.cache = make(map[string]string)
+	dkm.reverseCache = make(map[string]string)
+	dkm.initialized = false
+}
+
 // Reload clears the cache and reinitializes
 func (dkm *DynamicKindMapper) Reload() error {
 	err := concurrency.RunInLockWithLogger(
 		&dkm.mu, LockNameKindMapperReload, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 		func() error {
-			dkm.cache = make(map[string]string)
-			dkm.reverseCache = make(map[string]string)
-			dkm.initialized = false
+			dkm.resetCachesLocked()
 			return nil
 		},
 	)
@@ -500,9 +504,7 @@ func (dkm *DynamicKindMapper) SetDirectories(processDir, specsDir string) {
 			if specsDir != emptyValue {
 				dkm.specLoader = NewSpecLoader(specsDir)
 			}
-			dkm.cache = make(map[string]string)
-			dkm.reverseCache = make(map[string]string)
-			dkm.initialized = false
+			dkm.resetCachesLocked()
 			return nil
 		},
 	)

@@ -271,16 +271,15 @@ func TriggerBackgroundObjectIDCacheForceRebuild(projectRoot string) {
 }
 
 func triggerBackgroundObjectIDCacheBuild(projectRoot string, forceRebuild bool) {
-	projectRoot = resolveProjectRoot(projectRoot)
-	if projectRoot == emptyValue {
+	root, logger, ok := resolveProjectRootWithLogger(projectRoot)
+	if !ok {
 		return
 	}
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	bud := goroutinelabels.DefaultBudget()
 	// When no budget is set, StartWithContext always starts the goroutine — count before spawn so
 	// WaitProjectCacheBackgroundWork does not observe a false idle between schedule and fn body.
 	if bud == nil {
-		projectCacheBgIncObjectID(projectRoot)
+		projectCacheBgIncObjectID(root)
 	}
 	builder := goroutinelabels.NewGoroutine("object_id_cache_background_build", "building object ID cache in background")
 	if bud != nil {
@@ -288,12 +287,12 @@ func triggerBackgroundObjectIDCacheBuild(projectRoot string, forceRebuild bool) 
 	}
 	builder.StartWithContext(stdcontext.Background(), func(ctx stdcontext.Context) error {
 		if bud != nil {
-			projectCacheBgIncObjectID(projectRoot)
+			projectCacheBgIncObjectID(root)
 		}
-		defer projectCacheBgDecObjectID(projectRoot)
-		if err := EnsureObjectIDCacheReady(ctx, projectRoot, forceRebuild, nil, nil); err != nil {
+		defer projectCacheBgDecObjectID(root)
+		if err := EnsureObjectIDCacheReady(ctx, root, forceRebuild, nil, nil); err != nil {
 			logging.Fluent(logger).Debug("Background object ID cache build failed (non-blocking)").
-				ProjectRoot(projectRoot).
+				ProjectRoot(root).
 				WithError(err).
 				Log()
 			return nil // Don't propagate; this is best-effort
@@ -384,20 +383,19 @@ func ensureReverseReferenceIndexSync(projectRoot, processDir string, kinds []str
 // Call when object ID cache is loaded but reverse ref index is missing (e.g. first run after adding the feature).
 // Tries sync build first (with timeout) so the cache file exists before the process exits; falls back to background if sync fails or times out.
 func triggerBackgroundReverseReferenceIndexBuild(projectRoot string) {
-	projectRoot = resolveProjectRoot(projectRoot)
-	if projectRoot == emptyValue {
+	root, logger, ok := resolveProjectRootWithLogger(projectRoot)
+	if !ok {
 		return
 	}
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	if tryBuildAndSaveReverseReferenceIndexSync(projectRoot, reverseReferenceIndexDiscoveryTimeout) {
+	if tryBuildAndSaveReverseReferenceIndexSync(root, reverseReferenceIndexDiscoveryTimeout) {
 		logging.Fluent(logger).Debug("Reverse reference index built and saved synchronously").
-			ProjectRoot(projectRoot).
+			ProjectRoot(root).
 			Log()
 		return
 	}
 	bud := goroutinelabels.DefaultBudget()
 	if bud == nil {
-		projectCacheBgIncReverseRef(projectRoot)
+		projectCacheBgIncReverseRef(root)
 	}
 	builder := goroutinelabels.NewGoroutine("reverse_reference_index_background_build", "building reverse reference index in background")
 	if bud != nil {
@@ -405,11 +403,11 @@ func triggerBackgroundReverseReferenceIndexBuild(projectRoot string) {
 	}
 	builder.StartWithContext(stdcontext.Background(), func(ctx stdcontext.Context) error {
 		if bud != nil {
-			projectCacheBgIncReverseRef(projectRoot)
+			projectCacheBgIncReverseRef(root)
 		}
-		defer projectCacheBgDecReverseRef(projectRoot)
-		processDir := datacell.ProcessPrimaryDir(projectRoot)
-		kinds := discoverKindsForCache(ctx, projectRoot)
+		defer projectCacheBgDecReverseRef(root)
+		processDir := datacell.ProcessPrimaryDir(root)
+		kinds := discoverKindsForCache(ctx, root)
 		if kinds == nil {
 			if km := objects.GetGlobalKindMapper(); km != nil && km.EnsureReady(ctx) == nil {
 				kinds = km.GetAllKinds()

@@ -29,10 +29,7 @@ type LifecycleYAMLIssue struct {
 // that silently poisons bool flags). Display-line leftovers are still typed-valid.
 var smashedBoolFlagLine = regexp.MustCompile(`(?m)^\s+(?:origin|terminal|preliminary|archive|work_done|satisfied|system|manual|auto):\s+(?:true|false)[ \t]+\S`)
 
-// ParseLifecycleYAMLDir unmarshals every *.yaml in dir (including subdirectories) into Lifecycle and scans for
-// smashed bool-flag lines. Parse failures do not stop the walk; callers Warn then decide
-// whether to fail closed (tests / pre-commit) or continue (CLI init).
-func ParseLifecycleYAMLDir(dir string) ([]LifecycleYAMLIssue, error) {
+func walkYAMLDir(dir string, inspect func(path string, data []byte) error) ([]LifecycleYAMLIssue, error) {
 	var issues []LifecycleYAMLIssue
 	walkErr := filepath.WalkDir(dir, func(path string, d os.DirEntry, err error) error {
 		if err != nil {
@@ -46,52 +43,38 @@ func ParseLifecycleYAMLDir(dir string) ([]LifecycleYAMLIssue, error) {
 			issues = append(issues, LifecycleYAMLIssue{Path: path, Err: err})
 			return nil
 		}
-		if loc := smashedBoolFlagLine.FindIndex(data); loc != nil {
-			line := strings.TrimSpace(string(data[loc[0]:loc[1]]))
-			issues = append(issues, LifecycleYAMLIssue{
-				Path: path,
-				Err:  errfmt.Errorf("smashed bool flag (leftover bullet on same line): %s", line),
-			})
-			return nil
-		}
-		var lifecycle Lifecycle
-		if err := yaml.Unmarshal(data, &lifecycle); err != nil {
-			issues = append(issues, LifecycleYAMLIssue{Path: path, Err: err})
+		if inspectErr := inspect(path, data); inspectErr != nil {
+			issues = append(issues, LifecycleYAMLIssue{Path: path, Err: inspectErr})
 		}
 		return nil
 	})
 	if walkErr != nil {
-		return nil, errfmt.Errorf("read lifecycle dir %s: %w", dir, walkErr)
+		return nil, errfmt.Errorf("read yaml dir %s: %w", dir, walkErr)
 	}
 	return issues, nil
+}
+
+// ParseLifecycleYAMLDir unmarshals every *.yaml in dir (including subdirectories) into Lifecycle and scans for
+// smashed bool-flag lines. Parse failures do not stop the walk; callers Warn then decide
+// whether to fail closed (tests / pre-commit) or continue (CLI init).
+func ParseLifecycleYAMLDir(dir string) ([]LifecycleYAMLIssue, error) {
+	return walkYAMLDir(dir, func(path string, data []byte) error {
+		if loc := smashedBoolFlagLine.FindIndex(data); loc != nil {
+			line := strings.TrimSpace(string(data[loc[0]:loc[1]]))
+			return errfmt.Errorf("smashed bool flag (leftover bullet on same line): %s", line)
+		}
+		var lifecycle Lifecycle
+		return yaml.Unmarshal(data, &lifecycle)
+	})
 }
 
 // ParseConfigYAMLDir syntax-checks every *.yaml in dir (including subdirectories). Typed
 // per-schema validation stays with each config loader; this is the early smash/syntax net.
 func ParseConfigYAMLDir(dir string) ([]LifecycleYAMLIssue, error) {
-	var issues []LifecycleYAMLIssue
-	walkErr := filepath.WalkDir(dir, func(path string, d os.DirEntry, err error) error {
-		if err != nil {
-			return nil
-		}
-		if d == nil || d.IsDir() || filepath.Ext(d.Name()) != ".yaml" {
-			return nil
-		}
-		data, err := fileutil.ReadFile(path)
-		if err != nil {
-			issues = append(issues, LifecycleYAMLIssue{Path: path, Err: err})
-			return nil
-		}
+	return walkYAMLDir(dir, func(path string, data []byte) error {
 		var raw map[string]any
-		if err := yaml.Unmarshal(data, &raw); err != nil {
-			issues = append(issues, LifecycleYAMLIssue{Path: path, Err: err})
-		}
-		return nil
+		return yaml.Unmarshal(data, &raw)
 	})
-	if walkErr != nil {
-		return nil, errfmt.Errorf("read config dir %s: %w", dir, walkErr)
-	}
-	return issues, nil
 }
 
 // FormatLifecycleYAMLIssues joins file-level parse errors for EnsureReady / tests.

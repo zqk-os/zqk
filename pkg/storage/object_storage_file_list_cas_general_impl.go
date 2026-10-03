@@ -140,14 +140,10 @@ func (f *FileObjectStorage) listCASPathGeneral(ctx context.Context, secCtx *pkgc
 	sort.Strings(ids)
 
 	// Limit concurrent CAS list operations so N jobs don't create N*64 workers (see list_count_concurrency.go)
-	listCtx, releaseSlot, err := AcquireListCountContext(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer releaseSlot()
-
-	pool := newListIDWorkerPool(ids)
-	for w := 0; w < pool.numWorkers; w++ {
+	var parsedObjects []*objects.ParsedObject
+	_, err = WithListCountSlot(ctx, func(listCtx context.Context) (struct{}, error) {
+		pool := newListIDWorkerPool(ids)
+		for w := 0; w < pool.numWorkers; w++ {
 		pool.newWorker(ConstStreamFileStorageListCasRead, ConstStreamListCasWorker, w).StartSimple(func() {
 			for id := range pool.workCh {
 				select {
@@ -234,13 +230,15 @@ func (f *FileObjectStorage) listCASPathGeneral(ctx context.Context, secCtx *pkgc
 	}
 	pool.startCloser(ConstStreamFileStorageListCasResultsCloser, ConstStreamWaitingForListCasWorkersAndClosingResultsChannel)
 
-	parsedObjects := make([]*objects.ParsedObject, 0, len(ids))
+	parsedObjects = make([]*objects.ParsedObject, 0, len(ids))
 	for r := range pool.results {
 		if r.parsed != nil {
 			parsedObjects = append(parsedObjects, r.parsed)
 		}
 	}
-	if err := listCtx.Err(); err != nil {
+	return struct{}{}, listCtx.Err()
+	})
+	if err != nil {
 		return nil, err
 	}
 

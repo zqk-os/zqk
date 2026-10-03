@@ -194,17 +194,7 @@ func (gm *GoroutineManager) Start(config GoroutineConfig, fn func(ctx context.Co
 			// Use proper locking to access goroutines map
 			// Use context.Background() for lock acquisition to ensure it works even if
 			// gm.shutdownCtx is cancelled (e.g., when called from Shutdown())
-			var tracked *TrackedGoroutine
-			var exists bool
-			_ = concurrency.RunInRLockWithLogger(
-				&gm.mu, LockNameGoroutineManagerPostcleanupCheck, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
-				func() error {
-					var ok bool
-					tracked, ok = gm.goroutines[id]
-					exists = ok
-					return nil
-				},
-			)
+			tracked, exists := gm.lookupTracked(id)
 			if exists && tracked != nil {
 				var status GoroutineStatus
 				_ = concurrency.RunInRLock(&tracked.mu, func() error {
@@ -225,15 +215,22 @@ func (gm *GoroutineManager) Start(config GoroutineConfig, fn func(ctx context.Co
 	return id, ctx, nil
 }
 
-// Stop stops a specific goroutine by ID
-func (gm *GoroutineManager) Stop(id string) error {
+func (gm *GoroutineManager) lookupTracked(id string) (*TrackedGoroutine, bool) {
 	var tracked *TrackedGoroutine
 	var exists bool
-	_ = concurrency.RunInRLock(&gm.mu, func() error {
-		tracked, exists = gm.goroutines[id]
-		return nil
-	})
+	_ = concurrency.RunInRLockWithLogger(
+		&gm.mu, LockNameGoroutineManagerPostcleanupCheck, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
+		func() error {
+			tracked, exists = gm.goroutines[id]
+			return nil
+		},
+	)
+	return tracked, exists
+}
 
+// Stop stops a specific goroutine by ID
+func (gm *GoroutineManager) Stop(id string) error {
+	tracked, exists := gm.lookupTracked(id)
 	if !exists {
 		return errfmt.Errorf("goroutine %s not found", id)
 	}
@@ -362,24 +359,8 @@ func (gm *GoroutineManager) Shutdown() error {
 func (gm *GoroutineManager) stopGoroutine(id string, err error, onStop func(string, error)) {
 	now := time.Now()
 
-	var tracked *TrackedGoroutine
-	var exists bool
 	var alreadyStopped bool
-	// Use context.Background() for lock acquisition to ensure it works even if
-	// gm.shutdownCtx is cancelled (e.g., when called from Shutdown())
-	_ = concurrency.RunInLockWithLogger(
-		&gm.mu, LockNameGoroutineManagerStopGet, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
-		func() error {
-			var ok bool
-			tracked, ok = gm.goroutines[id]
-			exists = ok
-			if !exists {
-				return nil
-			}
-			return nil
-		},
-	)
-
+	tracked, exists := gm.lookupTracked(id)
 	if !exists {
 		return
 	}
@@ -520,12 +501,7 @@ func (gm *GoroutineManager) emitGoroutineEvent(id, eventType string, tracked *Tr
 
 // GetGoroutine returns information about a specific goroutine
 func (gm *GoroutineManager) GetGoroutine(id string) (*TrackedGoroutine, error) {
-	var tracked *TrackedGoroutine
-	var exists bool
-	_ = concurrency.RunInRLock(&gm.mu, func() error {
-		tracked, exists = gm.goroutines[id]
-		return nil
-	})
+	tracked, exists := gm.lookupTracked(id)
 	if !exists {
 		return nil, errfmt.Errorf("goroutine %s not found", id)
 	}
