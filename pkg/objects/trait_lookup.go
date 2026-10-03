@@ -19,6 +19,7 @@ func lookupTraitRegistry() *TraitRegistry {
 var (
 	lookupTraitRegistryShared *TraitRegistry
 	lookupTraitRegistryOnce   sync.Once
+	kindHasTraitCache         sync.Map
 )
 
 // KindHasTrait returns true if a kind has the given trait after inheritance,
@@ -28,6 +29,10 @@ func KindHasTrait(kind, trait string) (bool, error) {
 	if kind == emptyValue || trait == emptyValue {
 		return false, nil
 	}
+	cacheKey := kind + ":" + trait
+	if val, ok := kindHasTraitCache.Load(cacheKey); ok {
+		return val.(bool), nil
+	}
 	specLoader := GetGlobalSpecLoader()
 	spec, err := specLoader.LoadSpecWithInheritance(kind + ".yaml")
 	if err != nil {
@@ -35,6 +40,7 @@ func KindHasTrait(kind, trait string) (bool, error) {
 	}
 	for _, excluded := range spec.ExcludeTraits {
 		if excluded == trait {
+			kindHasTraitCache.Store(cacheKey, false)
 			return false, nil
 		}
 	}
@@ -44,9 +50,11 @@ func KindHasTrait(kind, trait string) (bool, error) {
 	}
 	for _, t := range expanded {
 		if t == trait {
+			kindHasTraitCache.Store(cacheKey, true)
 			return true, nil
 		}
 	}
+	kindHasTraitCache.Store(cacheKey, false)
 	return false, nil
 }
 

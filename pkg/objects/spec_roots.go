@@ -19,48 +19,59 @@ var (
 	extraSpecRoots []string
 )
 
-// AddSpecRoot records a directory whose YAML specs merge into the kernel spec index.
-// The same directory is recorded once.
-func AddSpecRoot(dir string) {
+func addCleanDirToRootList(list *[]string, dir string) {
 	if dir == "" {
 		return
 	}
 	clean := filepath.Clean(dir)
 	specRootMu.Lock()
 	defer specRootMu.Unlock()
-	for _, existing := range extraSpecRoots {
+	for _, existing := range *list {
 		if existing == clean {
 			return
 		}
 	}
-	extraSpecRoots = append(extraSpecRoots, clean)
+	*list = append(*list, clean)
+}
+
+func removeCleanDirFromRootList(list *[]string, dir string) {
+	clean := filepath.Clean(dir)
+	specRootMu.Lock()
+	defer specRootMu.Unlock()
+	var kept []string
+	for _, existing := range *list {
+		if existing != clean {
+			kept = append(kept, existing)
+		}
+	}
+	*list = kept
+}
+
+func copyRootList(list []string) []string {
+	specRootMu.Lock()
+	defer specRootMu.Unlock()
+	if len(list) == 0 {
+		return nil
+	}
+	out := make([]string, len(list))
+	copy(out, list)
+	return out
+}
+
+// AddSpecRoot records a directory whose YAML specs merge into the kernel spec index.
+// The same directory is recorded once.
+func AddSpecRoot(dir string) {
+	addCleanDirToRootList(&extraSpecRoots, dir)
 }
 
 // RemoveSpecRoot drops a directory added by AddSpecRoot. Tests use it to isolate a temp root.
 func RemoveSpecRoot(dir string) {
-	clean := filepath.Clean(dir)
-	specRootMu.Lock()
-	defer specRootMu.Unlock()
-	kept := extraSpecRoots[:0]
-	for _, existing := range extraSpecRoots {
-		if existing == clean {
-			continue
-		}
-		kept = append(kept, existing)
-	}
-	extraSpecRoots = append([]string(nil), kept...)
+	removeCleanDirFromRootList(&extraSpecRoots, dir)
 }
 
 // ExtraSpecRoots returns the registered pack spec directories.
 func ExtraSpecRoots() []string {
-	specRootMu.Lock()
-	defer specRootMu.Unlock()
-	if len(extraSpecRoots) == 0 {
-		return nil
-	}
-	out := make([]string, len(extraSpecRoots))
-	copy(out, extraSpecRoots)
-	return out
+	return copyRootList(extraSpecRoots)
 }
 
 // AddModuleSpecRoot registers rel under the kernel module root when that directory exists.
@@ -75,45 +86,17 @@ var extraLifecycleRoots []string
 // AddLifecycleRoot records a directory whose lifecycle YAML merges after the kernel tree.
 // The kernel file wins when the same kind exists in both trees.
 func AddLifecycleRoot(dir string) {
-	if dir == "" {
-		return
-	}
-	clean := filepath.Clean(dir)
-	specRootMu.Lock()
-	defer specRootMu.Unlock()
-	for _, existing := range extraLifecycleRoots {
-		if existing == clean {
-			return
-		}
-	}
-	extraLifecycleRoots = append(extraLifecycleRoots, clean)
+	addCleanDirToRootList(&extraLifecycleRoots, dir)
 }
 
 // RemoveLifecycleRoot drops a directory added by AddLifecycleRoot. Tests use it to isolate a temp root.
 func RemoveLifecycleRoot(dir string) {
-	clean := filepath.Clean(dir)
-	specRootMu.Lock()
-	defer specRootMu.Unlock()
-	kept := extraLifecycleRoots[:0]
-	for _, existing := range extraLifecycleRoots {
-		if existing == clean {
-			continue
-		}
-		kept = append(kept, existing)
-	}
-	extraLifecycleRoots = append([]string(nil), kept...)
+	removeCleanDirFromRootList(&extraLifecycleRoots, dir)
 }
 
 // ExtraLifecycleRoots returns the registered pack lifecycle directories.
 func ExtraLifecycleRoots() []string {
-	specRootMu.Lock()
-	defer specRootMu.Unlock()
-	if len(extraLifecycleRoots) == 0 {
-		return nil
-	}
-	out := make([]string, len(extraLifecycleRoots))
-	copy(out, extraLifecycleRoots)
-	return out
+	return copyRootList(extraLifecycleRoots)
 }
 
 // AddModuleLifecycleRoot registers rel under the kernel module root when that directory exists.
@@ -203,6 +186,11 @@ func FindRegisteredSpecFile(specsDir, kind string) (string, error) {
 	return "", errfmt.Errorf("object spec %s not found", kind)
 }
 
+func isPathUnderDir(baseDir, target string) bool {
+	rel, err := filepath.Rel(baseDir, target)
+	return err == nil && rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator))
+}
+
 func pathInExtraSpecRoot(absPath string) bool {
 	target, err := filepath.Abs(absPath)
 	if err != nil {
@@ -213,15 +201,13 @@ func pathInExtraSpecRoot(absPath string) bool {
 	testRoot := zqkenv.TestRoot().Get()
 	for _, root := range ExtraSpecRoots() {
 		cleanRoot := filepath.Clean(root)
-		rel, err := filepath.Rel(cleanRoot, target)
-		if err == nil && rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+		if isPathUnderDir(cleanRoot, target) {
 			return true
 		}
 		if repoRoot != "" && testRoot != "" {
 			if relToRepo, err := filepath.Rel(repoRoot, cleanRoot); err == nil && !strings.HasPrefix(relToRepo, "..") {
 				testEquiv := filepath.Join(testRoot, relToRepo)
-				rel, err := filepath.Rel(testEquiv, target)
-				if err == nil && rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+				if isPathUnderDir(testEquiv, target) {
 					return true
 				}
 			}

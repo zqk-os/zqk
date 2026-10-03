@@ -106,12 +106,16 @@ func ruleConfigFromObject(obj map[string]any) (RuleConfig, error) {
 	}, nil
 }
 
-func asStringField(obj map[string]any, key string) string {
+func decodeField(obj map[string]any, key string) (any, bool) {
 	v, ok := obj[key]
 	if !ok {
-		return emptyValue
+		return nil, false
 	}
-	v, ok = nildecode.DecodeNonNilPayload[any](v)
+	return nildecode.DecodeNonNilPayload[any](v)
+}
+
+func asStringField(obj map[string]any, key string) string {
+	v, ok := decodeField(obj, key)
 	if !ok {
 		return emptyValue
 	}
@@ -124,11 +128,7 @@ func asStringField(obj map[string]any, key string) string {
 }
 
 func asIntField(obj map[string]any, key string, def int) int {
-	v, ok := obj[key]
-	if !ok {
-		return def
-	}
-	v, ok = nildecode.DecodeNonNilPayload[any](v)
+	v, ok := decodeField(obj, key)
 	if !ok {
 		return def
 	}
@@ -145,17 +145,12 @@ func asIntField(obj map[string]any, key string, def int) int {
 }
 
 func asBoolField(obj map[string]any, key string, def bool) bool {
-	v, ok := obj[key]
+	v, ok := decodeField(obj, key)
 	if !ok {
 		return def
 	}
-	v, ok = nildecode.DecodeNonNilPayload[any](v)
-	if !ok {
-		return def
+	if b, ok := v.(bool); ok {
+		return b
 	}
-	b, ok := v.(bool)
-	if !ok {
-		return def
-	}
-	return b
+	return def
 }

@@ -9,7 +9,6 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
-	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // projectMatrixColumns narrows Header and each row to the listed columns (order preserved).
@@ -101,24 +100,15 @@ func FormatMatrixGetResultCSV(res *MatrixGetResult) ([]byte, error) {
 // limit: if > 0, stop after this many matching rows.
 // columns: if non-empty (after trim), output only those CSV columns in that order; filters still apply to full row data.
 func QueryMatrixCSV(csvPath, profilePath, matrixName string, filters map[string]string, globPattern string, goOnly bool, cvsID string, sessionRefCol string, limit int, columns []string) (*MatrixGetResult, error) {
-	f, err := fileutil.Open(csvPath)
+	cr, err := openMatrixCSV(csvPath)
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
+	defer cr.Close()
 
-	r := csv.NewReader(f)
-	header, err := r.Read()
-	if err != nil {
-		return nil, err
-	}
-	for i := range header {
-		header[i] = strings.TrimSpace(header[i])
-	}
-	colIdx := make(map[string]int, len(header))
-	for i, h := range header {
-		colIdx[h] = i
-	}
+	r := cr.reader
+	header := cr.header
+	colIdx := cr.colIdx
 
 	filePathIdx := -1
 	if i, ok := colIdx[objects.FieldKeyFilePath]; ok {

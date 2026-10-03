@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -145,3 +146,44 @@ func readServiceDirEntries(dir string) ([]os.DirEntry, error) {
 	}
 	return entries, nil
 }
+
+func initialServiceStatus(id string) ServiceStatus {
+	return ServiceStatus{
+		ID:    id,
+		State: StateStopped,
+	}
+}
+
+func readValidServiceDir(dir string) ([]os.DirEntry, error) {
+	entries, err := readServiceDirEntries(dir)
+	if err != nil || len(entries) == 0 {
+		return nil, err
+	}
+	return entries, nil
+}
+
+func initLegacyCleanup(dir string, legacyIDs []string) (map[string]struct{}, []os.DirEntry, error) {
+	entries, err := readValidServiceDir(dir)
+	if err != nil || entries == nil {
+		return nil, nil, err
+	}
+	targetSet := make(map[string]struct{}, len(legacyIDs))
+	for _, id := range legacyIDs {
+		targetSet[id] = struct{}{}
+	}
+	return targetSet, entries, nil
+}
+
+func checkUnitFilePresent(dir string, dirErr error, unitFileName string, isAvailable bool, id string) (ServiceStatus, bool, error) {
+	st := initialServiceStatus(id)
+	if dirErr != nil {
+		return st, false, dirErr
+	}
+	unitPath := filepath.Join(dir, unitFileName)
+	if _, err := os.Stat(unitPath); os.IsNotExist(err) || !isAvailable {
+		return st, false, nil
+	}
+	return st, true, nil
+}
+
+

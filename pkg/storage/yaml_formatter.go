@@ -13,11 +13,7 @@ func ReadYAMLMapFile(filePath string) (map[string]any, error) {
 	if err != nil {
 		return nil, err
 	}
-	var obj map[string]any
-	if err := yaml.Unmarshal(data, &obj); err != nil {
-		return nil, err
-	}
-	return obj, nil
+	return ParseStreamBackedCurrentState(data)
 }
 
 // FormatMultiLineYAML ensures multi-line strings are properly formatted in YAML

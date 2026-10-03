@@ -126,19 +126,9 @@ func (f *FileObjectStorage) listAuditEventsByIDs(ctx context.Context, cas *filec
 		return nil, nil
 	}
 	pool := newListIDWorkerPool(ids)
-	results := pool.results
-	workCh := pool.workCh
-	numWorkers := pool.numWorkers
-	listWg := &pool.wg
-	listBud := pool.budget
-	for w := 0; w < numWorkers; w++ {
-		casBuilder := goroutinelabels.NewGoroutine(ConstStreamFileStorageListAuditByIds, ConstStreamListAuditByIdsWorker).WithWaitGroup(listWg)
-		if w > 0 && listBud != nil {
-			casBuilder = casBuilder.WithBudget(listBud)
-		}
-		casBuilder.StartSimple(func() {
-
-			for id := range workCh {
+	for w := 0; w < pool.numWorkers; w++ {
+		pool.newWorker(ConstStreamFileStorageListAuditByIds, ConstStreamListAuditByIdsWorker, w).StartSimple(func() {
+			for id := range pool.workCh {
 				select {
 				case <-ctx.Done():
 					return
@@ -157,7 +147,7 @@ func (f *FileObjectStorage) listAuditEventsByIDs(ctx context.Context, cas *filec
 						if objID, ok := result.parsed.Raw[objects.FieldKeyID].(string); ok {
 							result.parsed.ID = objID
 						}
-						results <- result
+						pool.results <- result
 						continue
 					}
 				}
@@ -198,15 +188,13 @@ func (f *FileObjectStorage) listAuditEventsByIDs(ctx context.Context, cas *filec
 						result.parsed = &objects.ParsedObject{Raw: obj}
 					}
 				}
-				results <- result
+				pool.results <- result
 			}
 		})
 	}
-	closerBuilder := goroutinelabels.NewGoroutine(ConstStreamFileStorageListAuditByIdsCloser, ConstStreamWaitingForListAuditByIdsWorkers).
-		WithCleanup(func() { close(results) })
-	closerBuilder.StartSimple(func() { listWg.Wait() })
+	pool.startCloser(ConstStreamFileStorageListAuditByIdsCloser, ConstStreamWaitingForListAuditByIdsWorkers)
 	var parsedObjects []*objects.ParsedObject
-	for r := range results {
+	for r := range pool.results {
 		if r.parsed != nil {
 			parsedObjects = append(parsedObjects, r.parsed)
 		}

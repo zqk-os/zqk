@@ -488,10 +488,7 @@ func (h *RetentionToleranceHandler) enforceMaxCountBatchedList(
 	count, maxCount int,
 	allIDs []string,
 ) (int, error) {
-	filters := map[string]any{}
-	if len(protectStatuses) > 0 {
-		filters[objects.FieldKeyStatus] = map[string]any{"$nin": protectStatuses}
-	}
+	filters := buildStatusExclusionFilter(protectStatuses)
 	var totalDeleted int
 	interrupt := concurrency.NewInterruptChecker(concurrency.DefaultInterruptCheckFrequency)
 

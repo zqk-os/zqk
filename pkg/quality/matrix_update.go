@@ -255,24 +255,15 @@ func UpdateMatrixCSVByFilter(csvPath, profilePath, matrixName string, filters ma
 	}
 	gates := gateColumnSet(prof)
 
-	f, err := fileutil.Open(csvPath)
+	cr, err := openMatrixCSV(csvPath)
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
+	defer cr.Close()
 
-	r := csv.NewReader(f)
-	header, err := r.Read()
-	if err != nil {
-		return nil, err
-	}
-	for i := range header {
-		header[i] = strings.TrimSpace(header[i])
-	}
-	colIdx := make(map[string]int, len(header))
-	for i, h := range header {
-		colIdx[h] = i
-	}
+	r := cr.reader
+	header := cr.header
+	colIdx := cr.colIdx
 	for col := range filters {
 		c := strings.TrimSpace(col)
 		if _, ok := colIdx[c]; !ok {
@@ -385,21 +376,15 @@ func UpdateMatrixCSVRow(csvPath, profilePath, matrixName, matchColumn, matchValu
 	}
 	gates := gateColumnSet(prof)
 
-	f, err := fileutil.Open(csvPath)
+	cr, err := openMatrixCSV(csvPath)
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
+	defer cr.Close()
 
-	r := csv.NewReader(f)
-	header, err := r.Read()
-	if err != nil {
-		return nil, err
-	}
-	colIdx := make(map[string]int, len(header))
-	for i, h := range header {
-		colIdx[strings.TrimSpace(h)] = i
-	}
+	r := cr.reader
+	header := cr.header
+	colIdx := cr.colIdx
 	matchKey := strings.TrimSpace(matchColumn)
 	mi, ok := colIdx[matchKey]
 	if !ok {

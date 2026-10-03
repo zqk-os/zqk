@@ -99,6 +99,14 @@ type runWrapperRetryArgs struct {
 	testSummary          *map[string]any
 }
 
+func (a *runWrapperRetryArgs) syncOutputs(lastErr error, testFailures []string, testSummary map[string]any, terminalEntryWritten bool, testRootsToClean []string) {
+	*a.lastErr = lastErr
+	*a.testFailures = testFailures
+	*a.testSummary = testSummary
+	*a.terminalEntryWritten = terminalEntryWritten
+	*a.testRootsToClean = testRootsToClean
+}
+
 // runWrapperRecordSuccessfulAttempt writes completion events, notifications, and syncs retry state when the command exits 0.
 func (h *RunWrapperHandler) runWrapperRecordSuccessfulAttempt(
 	ctx context.Context,
@@ -235,11 +243,7 @@ func (h *RunWrapperHandler) runWrapperRecordSuccessfulAttempt(
 	if cancel != nil {
 		cancel()
 	}
-	*a.lastErr = lastErr
-	*a.testFailures = testFailures
-	*a.testSummary = testSummary
-	*a.terminalEntryWritten = terminalEntryWritten
-	*a.testRootsToClean = testRootsToClean
+	a.syncOutputs(lastErr, testFailures, testSummary, terminalEntryWritten, testRootsToClean)
 	return true
 }
 
@@ -553,9 +557,11 @@ func (h *RunWrapperHandler) runWrapperRetryAttempts(ctx context.Context, job *Sc
 	testRootsToClean := *a.testRootsToClean
 	currentProcess := a.currentProcess
 	scriptForExec := a.scriptForExec
-	var lastErr error
-	var testFailures []string
-	var testSummary map[string]any
+	var (
+		lastErr      error
+		testFailures []string
+		testSummary  map[string]any
+	)
 	terminalEntryWritten := *a.terminalEntryWritten
 
 	for attempt := 0; attempt <= retryCount; attempt++ {
@@ -983,11 +989,7 @@ func (h *RunWrapperHandler) runWrapperRetryAttempts(ctx context.Context, job *Sc
 			break
 		}
 	}
-	*a.lastErr = lastErr
-	*a.testFailures = testFailures
-	*a.testSummary = testSummary
-	*a.terminalEntryWritten = terminalEntryWritten
-	*a.testRootsToClean = testRootsToClean
+	a.syncOutputs(lastErr, testFailures, testSummary, terminalEntryWritten, testRootsToClean)
 	return false
 }
 

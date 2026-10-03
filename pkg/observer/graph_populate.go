@@ -128,26 +128,9 @@ func Populate(ctx context.Context, conn GraphWriter, result *ExtractResult, extr
 		return out, nil
 	}
 
-	// Index type-like entities by (file, name) for METHOD_OF edges
-	typeKey := func(file, name string) string { return file + ":" + name }
-	typesByKey := make(map[string]*Entity)
-
-	// Global name index for cross-file resolution (basic)
-	entitiesByName := make(map[string][]*Entity)
-
-	for i := range result.Entities {
-		e := &result.Entities[i]
-		switch e.Kind {
-		case "type", "struct", "interface":
-			typesByKey[typeKey(e.File, e.Name)] = e
-		}
-
-		entitiesByName[e.Name] = append(entitiesByName[e.Name], e)
-		if e.Receiver != emptyValue {
-			fullName := e.Receiver + "." + e.Name
-			entitiesByName[fullName] = append(entitiesByName[fullName], e)
-		}
-	}
+	indices := buildEntityIndices(result.Entities)
+	typesByKey := indices.typesByKey
+	entitiesByName := indices.entitiesByName
 
 	// Ensure we have one file node per file and collect entity nodes + CONTAINS edges
 	fileNodes := make(map[string]provider.Node)
@@ -197,7 +180,7 @@ func Populate(ctx context.Context, conn GraphWriter, result *ExtractResult, extr
 		}
 
 		if e.Kind == "method" && e.Receiver != emptyValue {
-			if typ, ok := typesByKey[typeKey(e.File, e.Receiver)]; ok {
+			if typ, ok := typesByKey[entityTypeKey(e.File, e.Receiver)]; ok {
 				edges = append(edges, provider.Edge{
 					FromID:     node.ID,
 					ToID:       EntityID(typ),
@@ -281,25 +264,9 @@ func PopulateBatch(ctx context.Context, conn interface {
 	if result == nil || conn == nil {
 		return &PopulateResult{}, nil
 	}
-	typeKey := func(file, name string) string { return file + ":" + name }
-	typesByKey := make(map[string]*Entity)
-
-	// Global name index for cross-file resolution (basic)
-	entitiesByName := make(map[string][]*Entity)
-
-	for i := range result.Entities {
-		e := &result.Entities[i]
-		switch e.Kind {
-		case "type", "struct", "interface":
-			typesByKey[typeKey(e.File, e.Name)] = e
-		}
-
-		entitiesByName[e.Name] = append(entitiesByName[e.Name], e)
-		if e.Receiver != emptyValue {
-			fullName := e.Receiver + "." + e.Name
-			entitiesByName[fullName] = append(entitiesByName[fullName], e)
-		}
-	}
+	indices := buildEntityIndices(result.Entities)
+	typesByKey := indices.typesByKey
+	entitiesByName := indices.entitiesByName
 
 	fileNodes := make(map[string]provider.Node)
 	packageNodes := make(map[string]provider.Node)
@@ -363,9 +330,8 @@ func PopulateBatch(ctx context.Context, conn interface {
 			edgesCreated++
 		}
 
-		// METHOD_OF
 		if e.Kind == "method" && e.Receiver != emptyValue {
-			if typ, ok := typesByKey[typeKey(e.File, e.Receiver)]; ok {
+			if typ, ok := typesByKey[entityTypeKey(e.File, e.Receiver)]; ok {
 				ops = append(ops, provider.Operation{
 					Type: "create_edge",
 					Data: provider.Edge{
@@ -486,4 +452,32 @@ func PopulateBatch(ctx context.Context, conn interface {
 	out.NodesCreated = len(packageNodes) + len(fileNodes) + len(result.Entities)
 	out.EdgesCreated = edgesCreated
 	return out, nil
+}
+
+func entityTypeKey(file, name string) string {
+	return file + ":" + name
+}
+
+type entityIndices struct {
+	typesByKey     map[string]*Entity
+	entitiesByName map[string][]*Entity
+}
+
+func buildEntityIndices(entities []Entity) entityIndices {
+	typesByKey := make(map[string]*Entity)
+	entitiesByName := make(map[string][]*Entity)
+	for i := range entities {
+		e := &entities[i]
+		switch e.Kind {
+		case "type", "struct", "interface":
+			typesByKey[entityTypeKey(e.File, e.Name)] = e
+		}
+
+		entitiesByName[e.Name] = append(entitiesByName[e.Name], e)
+		if e.Receiver != emptyValue {
+			fullName := e.Receiver + "." + e.Name
+			entitiesByName[fullName] = append(entitiesByName[fullName], e)
+		}
+	}
+	return entityIndices{typesByKey: typesByKey, entitiesByName: entitiesByName}
 }

@@ -1,7 +1,6 @@
 package quality
 
 import (
-	"encoding/csv"
 	"fmt"
 	"io"
 	"path/filepath"
@@ -87,22 +86,16 @@ type MatrixReportSummary struct {
 
 // SummarizeMatrixCSV walks the CSV and counts gate column states using the loaded profile.
 func SummarizeMatrixCSV(csvPath string, prof *MatrixProfileYAML, doneVals map[string]struct{}, goOnly bool, sessionRefCol string) (*MatrixReportSummary, error) {
-	f, err := fileutil.Open(csvPath)
+	cr, err := openMatrixCSV(csvPath)
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
+	defer cr.Close()
+	cr.reader.ReuseRecord = true
 
-	r := csv.NewReader(f)
-	r.ReuseRecord = true
-	header, err := r.Read()
-	if err != nil {
-		return nil, err
-	}
-	colIdx := map[string]int{}
-	for i, h := range header {
-		colIdx[strings.TrimSpace(h)] = i
-	}
+	r := cr.reader
+	header := cr.header
+	colIdx := cr.colIdx
 	gates := prof.Completion.GateColumns
 	for _, g := range gates {
 		if _, ok := colIdx[g]; !ok {

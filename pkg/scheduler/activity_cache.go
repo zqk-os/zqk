@@ -121,14 +121,19 @@ func (c *ActivityCache) getCacheFilePath(projectRoot string) string {
 	return filepath.Join(cacheDir, activityCacheFile)
 }
 
+func (c *ActivityCache) ensureCacheDir(projectRoot string) (string, error) {
+	cachePath := c.getCacheFilePath(projectRoot)
+	if err := fileutil.EnsureDir(filepath.Dir(cachePath)); err != nil {
+		return "", errfmt.Newf("failed to create cache directory").Wrap(err)
+	}
+	return cachePath, nil
+}
+
 // LoadCache loads the cache from disk
 func (c *ActivityCache) LoadCache(projectRoot string) error {
-	cachePath := c.getCacheFilePath(projectRoot)
-	cacheDir := filepath.Dir(cachePath)
-
-	// Ensure cache directory exists
-	if err := fileutil.MkdirAll(cacheDir, paths.DirPerm755); err != nil {
-		return errfmt.Newf("failed to create cache directory").Wrap(err)
+	cachePath, err := c.ensureCacheDir(projectRoot)
+	if err != nil {
+		return err
 	}
 
 	// Check if cache file exists
@@ -257,13 +262,11 @@ func (c *ActivityCache) SaveCache(projectRoot string) error {
 
 // doSaveCache performs the actual file I/O (called by writer goroutine)
 func (c *ActivityCache) doSaveCache(projectRoot string) error {
-	cachePath := c.getCacheFilePath(projectRoot)
-	cacheDir := filepath.Dir(cachePath)
-
-	// Ensure cache directory exists
-	if err := fileutil.MkdirAll(cacheDir, paths.DirPerm755); err != nil {
-		return errfmt.Newf("failed to create cache directory").Wrap(err)
+	cachePath, err := c.ensureCacheDir(projectRoot)
+	if err != nil {
+		return err
 	}
+
 
 	// Update metadata and prepare cache data
 	var cacheData struct {

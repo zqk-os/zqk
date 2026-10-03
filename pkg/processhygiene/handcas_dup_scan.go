@@ -151,16 +151,7 @@ func ScanAllObjects(objectList []map[string]any) []Finding {
 }
 
 func getAnyStringField(obj map[string]any, key string) string {
-	v, ok := obj[key]
-	if !ok {
-		return emptyValue
-	}
-	switch t := v.(type) {
-	case string:
-		return t
-	default:
-		return fmt.Sprint(t)
-	}
+	return asStringField(obj, key)
 }
 
 // sortFindings sorts findings in-place by rule ID then object ID for deterministic output.

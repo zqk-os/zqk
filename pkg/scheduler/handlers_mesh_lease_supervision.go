@@ -44,8 +44,7 @@ func NewMeshLeaseSupervisionHandler(sp storage.ObjectStorageProvider, projectRoo
 }
 
 func (h *MeshLeaseSupervisionHandler) Execute(ctx context.Context, job *ScheduledJob) error {
-	idManager := federation.NewIdentityManager(h.projectRoot)
-	kernelID, err := idManager.GetKernelID()
+	kernelID, err := federation.ResolveKernelID(h.projectRoot)
 	if err != nil {
 		return err
 	}

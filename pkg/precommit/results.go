@@ -100,11 +100,8 @@ func LastResultPath(projectRoot, category string) string {
 	return filepath.Join(CategoryDir(projectRoot), lastPrefix+category+jsonFileExt)
 }
 
-// ReadLastResult reads the staging file written by a check script (same shape as CategoryResult).
-// Used by write-result-from-last when the run was triggered with pre_commit origin.
-func ReadLastResult(projectRoot, category string) (CategoryResult, error) {
+func readCategoryResultFile(path string) (CategoryResult, error) {
 	var r CategoryResult
-	path := LastResultPath(projectRoot, category)
 	data, err := fileutil.ReadFile(path)
 	if err != nil {
 		return r, err
@@ -113,6 +110,12 @@ func ReadLastResult(projectRoot, category string) (CategoryResult, error) {
 		return r, err
 	}
 	return r, nil
+}
+
+// ReadLastResult reads the staging file written by a check script (same shape as CategoryResult).
+// Used by write-result-from-last when the run was triggered with pre_commit origin.
+func ReadLastResult(projectRoot, category string) (CategoryResult, error) {
+	return readCategoryResultFile(LastResultPath(projectRoot, category))
 }
 
 // LintOutputPath returns the path where the lint check writes full golangci-lint output for viewing.
@@ -154,16 +157,7 @@ func WriteCategory(projectRoot, category string, result CategoryResult) error {
 
 // ReadCategory reads a category result from projectRoot/.zqk/pre-commit/<category>.json
 func ReadCategory(projectRoot, category string) (CategoryResult, error) {
-	var r CategoryResult
-	path := CategoryPath(projectRoot, category)
-	data, err := fileutil.ReadFile(path)
-	if err != nil {
-		return r, err
-	}
-	if err := json.Unmarshal(data, &r); err != nil {
-		return r, err
-	}
-	return r, nil
+	return readCategoryResultFile(CategoryPath(projectRoot, category))
 }
 
 // Aggregate reads all category files in projectRoot/.zqk/pre-commit/*.json (excluding results.json),

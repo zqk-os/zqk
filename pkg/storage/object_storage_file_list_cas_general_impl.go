@@ -9,7 +9,6 @@ import (
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage/crud"
@@ -148,21 +147,9 @@ func (f *FileObjectStorage) listCASPathGeneral(ctx context.Context, secCtx *pkgc
 	defer releaseSlot()
 
 	pool := newListIDWorkerPool(ids)
-	results := pool.results
-	workCh := pool.workCh
-	numWorkers := pool.numWorkers
-	listWg := &pool.wg
-	listBud := pool.budget
-	var parsedObjects []*objects.ParsedObject
-	for w := 0; w < numWorkers; w++ {
-		casBuilder := goroutinelabels.NewGoroutine(ConstStreamFileStorageListCasRead, ConstStreamListCasWorker).WithWaitGroup(listWg)
-		// The first reader is an essential fallback. Optional parallel readers use the
-		// global budget, but exhausting it must not leave List without a worker.
-		if w > 0 && listBud != nil {
-			casBuilder = casBuilder.WithBudget(listBud)
-		}
-		casBuilder.StartSimple(func() {
-			for id := range workCh {
+	for w := 0; w < pool.numWorkers; w++ {
+		pool.newWorker(ConstStreamFileStorageListCasRead, ConstStreamListCasWorker, w).StartSimple(func() {
+			for id := range pool.workCh {
 				select {
 				case <-listCtx.Done():
 					return
@@ -186,7 +173,7 @@ func (f *FileObjectStorage) listCASPathGeneral(ctx context.Context, secCtx *pkgc
 						select {
 						case <-listCtx.Done():
 							return
-						case results <- result:
+						case pool.results <- result:
 						}
 						continue
 					}
@@ -240,20 +227,15 @@ func (f *FileObjectStorage) listCASPathGeneral(ctx context.Context, secCtx *pkgc
 				select {
 				case <-listCtx.Done():
 					return
-				case results <- result:
+				case pool.results <- result:
 				}
 			}
 		})
 	}
-	goroutinelabels.NewGoroutine(
-		ConstStreamFileStorageListCasResultsCloser,
-		ConstStreamWaitingForListCasWorkersAndClosingResultsChannel,
-	).WithCleanup(func() { close(results) }).StartSimple(func() {
-		listWg.Wait()
-	})
+	pool.startCloser(ConstStreamFileStorageListCasResultsCloser, ConstStreamWaitingForListCasWorkersAndClosingResultsChannel)
 
-	parsedObjects = make([]*objects.ParsedObject, 0, len(ids))
-	for r := range results {
+	parsedObjects := make([]*objects.ParsedObject, 0, len(ids))
+	for r := range pool.results {
 		if r.parsed != nil {
 			parsedObjects = append(parsedObjects, r.parsed)
 		}

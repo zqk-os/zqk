@@ -1,11 +1,8 @@
 package quality
 
 import (
-	"path/filepath"
 	"sort"
 	"strings"
-
-	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // MatrixListEntry is one row in a matrix list result.
@@ -27,17 +24,9 @@ type MatrixListResult struct {
 
 // ListMatricesFromRegistry loads the registry and returns sorted entries (by name).
 func ListMatricesFromRegistry(projectRoot, registryRel string) (*MatrixListResult, error) {
-	regRel := registryRel
-	if regRel == "" {
-		regRel = filepath.Join(paths.DocsQualityDir, "matrix_registry.yaml")
-	}
-	reg, err := LoadMatrixRegistry(projectRoot, regRel)
+	reg, absReg, err := resolveAndLoadRegistry(projectRoot, registryRel)
 	if err != nil {
 		return nil, err
-	}
-	absReg := regRel
-	if !filepath.IsAbs(absReg) {
-		absReg = filepath.Join(projectRoot, regRel)
 	}
 
 	names := make([]string, 0, len(reg.Matrices))
@@ -63,7 +52,7 @@ func ListMatricesFromRegistry(projectRoot, registryRel string) (*MatrixListResul
 	}
 
 	return &MatrixListResult{
-		RegistryPath: filepath.Clean(absReg),
+		RegistryPath: absReg,
 		DefaultName:  strings.TrimSpace(reg.DefaultName),
 		Matrices:     out,
 	}, nil

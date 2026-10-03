@@ -226,22 +226,10 @@ func (a *SystemdAdapter) Restart(ctx context.Context, id string) error {
 }
 
 func (a *SystemdAdapter) Status(ctx context.Context, id string) (ServiceStatus, error) {
-	st := ServiceStatus{
-		ID:    id,
-		State: StateStopped,
-	}
-
 	dir, err := a.getDir()
-	if err != nil {
+	st, shouldQuery, err := checkUnitFilePresent(dir, err, a.unitName(id), a.IsAvailable(), id)
+	if err != nil || !shouldQuery {
 		return st, err
-	}
-	unitFile := filepath.Join(dir, a.unitName(id))
-	if _, err := os.Stat(unitFile); os.IsNotExist(err) {
-		return st, nil
-	}
-
-	if !a.IsAvailable() {
-		return st, nil
 	}
 
 	out, err := a.runCmd(ctx, "systemctl", a.systemctlArgs("show", a.unitName(id), "--property=ActiveState,MainPID")...)
@@ -277,12 +265,12 @@ func (a *SystemdAdapter) CleanupLegacy(ctx context.Context, legacyIDs []string) 
 	if err != nil {
 		return nil, err
 	}
-	entries, err := readServiceDirEntries(dir)
-	if err != nil || len(entries) == 0 {
+	entries, err := readValidServiceDir(dir)
+	if err != nil || entries == nil {
 		return nil, err
 	}
 
-	targetSet := make(map[string]struct{}, len(legacyIDs))
+	targetSet := make(map[string]struct{}, len(legacyIDs)*2)
 	for _, id := range legacyIDs {
 		targetSet[a.unitName(id)] = struct{}{}
 		targetSet[id] = struct{}{}

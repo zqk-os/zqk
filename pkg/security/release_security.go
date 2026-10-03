@@ -292,13 +292,9 @@ func AuditStaticVulnerabilities(ctx context.Context, projectRoot, targetPkg stri
 	cmd := execwrap.CommandContext(ctx, binPath, targetPkg)
 	cmd.Dir = projectRoot
 
-	var outBuf, errBuf bytes.Buffer
-	cmd.Stdout = &outBuf
-	cmd.Stderr = &errBuf
-
-	runErr := cmd.Run()
+	stdout, stderr, runErr := execwrap.RunWithBuffers(cmd)
 	duration := time.Since(start)
-	combined := outBuf.String() + "\n" + errBuf.String()
+	combined := stdout + "\n" + stderr
 
 	res := &VulnAuditResult{
 		Executed: true,

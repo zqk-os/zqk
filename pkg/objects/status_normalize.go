@@ -33,13 +33,9 @@ func RegisterStatusAlias(alias, preferred string) {
 	})
 }
 
-// ApplyAliasesForStatus returns the preferred status when status is a registered
-// alias and preferred is in validTargets (kind's lifecycle statuses). Use this for
-// kind-aware normalization so "completed" maps to "complete" only for kinds that
-// have "complete", and is left as "completed" for kinds that use "completed".
-func ApplyAliasesForStatus(status string, validTargets map[string]bool) string {
+func lookupStatusAlias(status string) (string, bool) {
 	if status == emptyValue {
-		return status
+		return emptyValue, false
 	}
 	var preferred string
 	var ok bool
@@ -47,7 +43,15 @@ func ApplyAliasesForStatus(status string, validTargets map[string]bool) string {
 		preferred, ok = statusAliases[status]
 		return nil
 	})
-	if ok && validTargets[preferred] {
+	return preferred, ok
+}
+
+// ApplyAliasesForStatus returns the preferred status when status is a registered
+// alias and preferred is in validTargets (kind's lifecycle statuses). Use this for
+// kind-aware normalization so "completed" maps to "complete" only for kinds that
+// have "complete", and is left as "completed" for kinds that use "completed".
+func ApplyAliasesForStatus(status string, validTargets map[string]bool) string {
+	if preferred, ok := lookupStatusAlias(status); ok && validTargets[preferred] {
 		return preferred
 	}
 	return status
@@ -58,16 +62,7 @@ func ApplyAliasesForStatus(status string, validTargets map[string]bool) string {
 // the kind's status set) when the kind is known, so "completed" is not forced
 // to "complete" for kinds that use "completed" (e.g. audit_event).
 func NormalizeStatus(status string) string {
-	if status == emptyValue {
-		return status
-	}
-	var preferred string
-	var ok bool
-	_ = concurrency.RunInRLockWithLogger(&statusAliasesMu, LockNameStatusNormalizeLookup, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
-		preferred, ok = statusAliases[status]
-		return nil
-	})
-	if ok {
+	if preferred, ok := lookupStatusAlias(status); ok {
 		return preferred
 	}
 	return status

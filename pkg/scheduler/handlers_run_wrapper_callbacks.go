@@ -50,9 +50,7 @@ const (
 	callbackHTTPStatusMax  = 300
 )
 
-// executeCallback executes a callback hook (webhook, command, or event)
-// Callbacks are routed through the transceiver async router for queued, non-blocking execution
-func (h *RunWrapperHandler) executeCallback(ctx context.Context, job *ScheduledJob, callbackType string, payload map[string]any) {
+func resolveJobCallbackTarget(job *ScheduledJob, callbackType string, payload map[string]any) (string, string, map[string]any, bool) {
 	var callbackURL string
 	switch callbackType {
 	case callbackTypeCompletion:
@@ -62,14 +60,12 @@ func (h *RunWrapperHandler) executeCallback(ctx context.Context, job *ScheduledJ
 	case callbackTypeStatus:
 		callbackURL = job.CallbackOnStatus
 	default:
-		return
+		return "", "", nil, false
 	}
-
 	if callbackURL == emptyValue {
-		return
+		return "", "", nil, false
 	}
 
-	// Determine callback mechanism
 	cbType := job.CallbackType
 	if cbType == emptyValue {
 		when.When(func() bool {
@@ -77,7 +73,6 @@ func (h *RunWrapperHandler) executeCallback(ctx context.Context, job *ScheduledJ
 		}).Then(func() { cbType = callbackMechanismHook }).OrElse(func() { cbType = callbackMechanismCmd }).Run()
 	}
 
-	// Add job metadata to payload
 	if payload == nil {
 		payload = make(map[string]any)
 	}
@@ -87,6 +82,20 @@ func (h *RunWrapperHandler) executeCallback(ctx context.Context, job *ScheduledJ
 	payload[KeyTimestamp] = zqktime.NowRFC3339UTC()
 	payload[callbackURLField] = callbackURL
 	payload[callbackMechanismField] = cbType
+	if len(job.EnvironmentVariables) > 0 {
+		payload[objects.FieldKeyEnvironmentVariables] = job.EnvironmentVariables
+	}
+	return callbackURL, cbType, payload, true
+}
+
+// executeCallback executes a callback hook (webhook, command, or event)
+// Callbacks are routed through the transceiver async router for queued, non-blocking execution
+func (h *RunWrapperHandler) executeCallback(ctx context.Context, job *ScheduledJob, callbackType string, payload map[string]any) {
+	callbackURL, cbType, payload, ok := resolveJobCallbackTarget(job, callbackType, payload)
+	if !ok {
+		return
+	}
+
 
 	// Route callback through transceiver async router for queued, non-blocking execution
 	// This allows callbacks to be processed asynchronously and provides:
@@ -136,65 +145,7 @@ func (h *RunWrapperHandler) executeCallbackDirect(ctx context.Context, job *Sche
 
 // executeWebhookCallback executes an HTTP webhook callback
 func (h *RunWrapperHandler) executeWebhookCallback(ctx context.Context, url string, payload map[string]any) {
-	// Create timeout context for webhook (5 seconds max)
-	webhookCtx, cancel := context.WithTimeout(ctx, callbackTimeoutWebhook)
-	defer cancel()
-
-	// Marshal payload to JSON
-	jsonData, err := json.Marshal(payload)
-	if err != nil {
-		RunWrapperLog(h.logger).Warn(LogEventRunWrapperCallbackMarshalWebhookPayloadFailed).
-			WithFields(append([]logging.Field{logging.String(callbackFieldURL, url)}, logErrField(err)...)...).
-			Log()
-		return
-	}
-
-	// Create HTTP request
-	req, err := http.NewRequestWithContext(webhookCtx, webhookMethodPOST, url, bytes.NewBuffer(jsonData))
-	if err != nil {
-		RunWrapperLog(h.logger).Warn(LogEventRunWrapperCallbackCreateWebhookRequestFailed).
-			String(callbackFieldURL, url).
-			WithError(err).
-			Log()
-		return
-	}
-
-	req.Header.Set(httpHeaderContentType, contentTypeJSON)
-	req.Header.Set(httpHeaderUserAgent, schedulerUserAgent)
-
-	// Execute request
-	client := &http.Client{
-		Timeout: callbackTimeoutWebhook,
-	}
-	resp, err := client.Do(req)
-	if err != nil {
-		RunWrapperLog(h.logger).Warn(LogEventRunWrapperCallbackWebhookRequestFailed).
-			WithFields(append([]logging.Field{logging.String(callbackFieldURL, url)}, logErrField(err)...)...).
-			Log()
-		return
-	}
-	defer resp.Body.Close()
-
-	// Read response body (limit to 1KB to avoid memory issues)
-	body, errRead := io.ReadAll(io.LimitReader(resp.Body, callbackBodyReadLimit))
-	if errRead != nil {
-		RunWrapperLog(h.logger).Debug("Failed to read webhook response body").WithError(errRead).Log()
-	}
-
-	when.When(func() bool {
-		return resp.StatusCode >= callbackHTTPStatusMin && resp.StatusCode < callbackHTTPStatusMax
-	}).Then(func() {
-		RunWrapperLog(h.logger).Debug(LogEventRunWrapperCallbackWebhookSucceeded).
-			String(callbackFieldURL, url).
-			Int(callbackFieldStatus, resp.StatusCode).
-			Log()
-	}).OrElse(func() {
-		RunWrapperLog(h.logger).Warn(LogEventRunWrapperCallbackWebhookNon2xx).
-			String(callbackFieldURL, url).
-			Int(callbackFieldStatus, resp.StatusCode).
-			String(callbackFieldResponse, string(body)).
-			Log()
-	}).Run()
+	executeWebhookWithLogger(ctx, h.logger, url, payload)
 }
 
 // executeCommandCallback executes a command callback
@@ -262,43 +213,11 @@ func (h *RunWrapperHandler) executeEventCallback(_ context.Context, eventName st
 // so callbacks can chain (e.g. update job KINDS and trigger next kind).
 // logger and asyncRouter can be nil; if asyncRouter is nil, callback runs directly.
 func InvokeJobCallback(ctx context.Context, logger logging.Logger, asyncRouter *transceiver.AsyncRouter, job *ScheduledJob, callbackType string, payload map[string]any) {
-	var callbackURL string
-	switch callbackType {
-	case callbackTypeCompletion:
-		callbackURL = job.CallbackOnCompletion
-	case callbackTypeError:
-		callbackURL = job.CallbackOnError
-	case callbackTypeStatus:
-		callbackURL = job.CallbackOnStatus
-	default:
+	callbackURL, cbType, payload, ok := resolveJobCallbackTarget(job, callbackType, payload)
+	if !ok {
 		return
 	}
-	if callbackURL == emptyValue {
-		return
-	}
-	cbType := job.CallbackType
-	if cbType == emptyValue {
-		when.When(func() bool {
-			return strings.HasPrefix(callbackURL, webhookURLPrefixHTTP) || strings.HasPrefix(callbackURL, webhookURLPrefixHTTPS)
-		}).Then(func() {
-			cbType = callbackMechanismHook
-		}).OrElse(func() {
-			cbType = callbackMechanismCmd
-		}).Run()
-	}
-	if payload == nil {
-		payload = make(map[string]any)
-	}
-	payload[KeyJobID] = job.ID
-	payload[KeyJobType] = job.JobType
-	payload[KeyCategory] = job.Category
-	payload[KeyTimestamp] = zqktime.NowRFC3339UTC()
-	payload[callbackURLField] = callbackURL
-	payload[callbackMechanismField] = cbType
-	// Include env for retention sequential: callback can see KINDS just processed
-	if len(job.EnvironmentVariables) > 0 {
-		payload[objects.FieldKeyEnvironmentVariables] = job.EnvironmentVariables
-	}
+
 	// Command callbacks are completion evidence, not advisory messages. Execute
 	// them synchronously so a healthy async router cannot accept and then lose
 	// the callback before any consumer writes its artifact.

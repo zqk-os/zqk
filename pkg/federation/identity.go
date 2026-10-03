@@ -23,6 +23,11 @@ type IdentityManager struct {
 	projectRoot string
 }
 
+// ResolveKernelID returns the unique identifier for a project root's local kernel.
+func ResolveKernelID(projectRoot string) (string, error) {
+	return NewIdentityManager(projectRoot).GetKernelID()
+}
+
 // NewIdentityManager creates a new IdentityManager.
 func NewIdentityManager(projectRoot string) *IdentityManager {
 	return &IdentityManager{

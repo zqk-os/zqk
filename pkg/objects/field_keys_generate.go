@@ -251,8 +251,12 @@ const (
 	}
 
 	body.WriteString(")\n")
+	return FormatGeneratedGoSource([]byte(body.String()))
+}
 
-	out, err := format.Source([]byte(body.String()))
+// FormatGeneratedGoSource formats generated Go source code using standard go/format.
+func FormatGeneratedGoSource(source []byte) ([]byte, error) {
+	out, err := format.Source(source)
 	if err != nil {
 		return nil, errfmt.Errorf("format generated source: %w", err)
 	}
