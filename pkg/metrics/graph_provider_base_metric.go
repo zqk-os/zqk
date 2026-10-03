@@ -1,19 +1,15 @@
 package metrics
 
 import (
-	"context"
 	"fmt"
 	"time"
 
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
-	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/metricsrecording"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	"github.com/zqk-os/zqk/pkg/storage"
-	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 const maxGraphProviderMetricsJSONLen = 256 * 1024
@@ -40,11 +36,10 @@ func graphProviderMetricTitle(opCount, queryCount int, totalOps int64) string {
 
 // BuildGraphProviderMetricsBaseMetricInstance builds a base_metric from encoded graph provider JSON.
 func BuildGraphProviderMetricsBaseMetricInstance(metricID string, jsonPayload []byte, meta GraphProviderPersistMeta) (map[string]any, error) {
-	if metricID == emptyValue {
-		return nil, errfmt.Errorf("metric id is required")
+	start, end, err := FormatMetricWindow(metricID, meta.WindowStart, meta.WindowEnd)
+	if err != nil {
+		return nil, err
 	}
-	start := zqktime.FormatRFC3339UTC(meta.WindowStart)
-	end := zqktime.FormatRFC3339UTC(meta.WindowEnd)
 
 	tags := []string{
 		MetricTagSystem,
@@ -52,13 +47,7 @@ func BuildGraphProviderMetricsBaseMetricInstance(metricID string, jsonPayload []
 		"provider",
 	}
 
-	oc := int(meta.TotalOperations)
-	if oc < 0 {
-		oc = 0
-	}
-	if oc == 0 {
-		oc = meta.OperationKinds + meta.QueryKinds
-	}
+	oc := ComputeEffectiveObjectCount(meta.TotalOperations, meta.OperationKinds+meta.QueryKinds)
 
 	builder := instance_builders.NewForKind(objects.KindBaseMetric, objects.DefaultSchemaVersion)
 	builder.SetID(metricID).
@@ -107,16 +96,6 @@ func PersistGraphProviderMetricsJSONAsync(sp storage.ObjectStorageProvider, json
 				return
 			}
 
-			ctx, cancel := context.WithTimeout(pkgctx.NewSystemContext(), 60*time.Second)
-			defer cancel()
-			secCtx := pkgctx.NewSystemSecurityContext()
-			if createErr := sp.Create(ctx, secCtx, inst); createErr != nil {
-				if logger != nil {
-					logging.Fluent(logger).Warn("Failed to persist graph provider base_metric").
-						MetricID(metricID).
-						WithError(createErr).
-						Log()
-				}
-			}
+			PersistBaseMetricInstance(sp, inst, metricID, "graph provider base_metric", logger)
 		})
 }

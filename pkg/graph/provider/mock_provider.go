@@ -41,12 +41,8 @@ func (p *MockGraphProvider) CreatePool(ctx context.Context, config ConnectionCon
 
 // Connect creates a single MockConnection.
 func (p *MockGraphProvider) Connect(ctx context.Context, config ConnectionConfig) (GraphConnection, error) {
-	config.MaxConns = 1
-	pool, err := p.CreatePool(ctx, config)
-	if err != nil {
-		return nil, err
-	}
-	return pool.GetConnection(ctx)
+	conn, _, err := ConnectViaPool(ctx, config, p.CreatePool)
+	return conn, err
 }
 
 // SupportsFeature checks if the mock provider supports a feature.
@@ -207,6 +203,32 @@ func (s *MockStore) getPersistPath() string {
 	return filepath.Join(cacheDir, "mock_graph.json")
 }
 
+func (s *MockStore) applyNodeUpdates(id string, updates NodeUpdates, indexAccelerator bool) error {
+	node, ok := s.nodes[id]
+	if !ok {
+		return &GraphError{Code: ErrorCodeNodeNotFound, Message: fmt.Sprintf("node %s not found", id)}
+	}
+	if updates.Properties != nil {
+		if node.Properties == nil {
+			node.Properties = make(map[string]any)
+		}
+		for k, v := range updates.Properties {
+			node.Properties[k] = v
+		}
+	}
+	for _, k := range updates.RemoveProperties {
+		delete(node.Properties, k)
+	}
+	if len(updates.AddLabels) > 0 {
+		node.Labels = append(node.Labels, updates.AddLabels...)
+	}
+	if indexAccelerator && s.accelerator != nil {
+		s.accelerator.IndexNode(node)
+	}
+	s.saveToDisk()
+	return nil
+}
+
 func edgeKey(fromID, toID, edgeType string) string {
 	return fmt.Sprintf("%s|%s|%s", fromID, toID, edgeType)
 }
@@ -278,29 +300,7 @@ func (c *MockConnection) UpdateNode(ctx context.Context, id string, updates Node
 	return concurrency.RunInLockWithLogger(
 		&c.store.mu, "mock_store_write", logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 		func() error {
-			node, ok := c.store.nodes[id]
-			if !ok {
-				return &GraphError{Code: ErrorCodeNodeNotFound, Message: fmt.Sprintf("node %s not found", id)}
-			}
-			// Apply updates (simplified)
-			if updates.Properties != nil {
-				if node.Properties == nil {
-					node.Properties = make(map[string]any)
-				}
-				for k, v := range updates.Properties {
-					node.Properties[k] = v
-				}
-			}
-			for _, k := range updates.RemoveProperties {
-				delete(node.Properties, k)
-			}
-			if len(updates.AddLabels) > 0 {
-				node.Labels = append(node.Labels, updates.AddLabels...)
-			}
-
-			c.store.accelerator.IndexNode(node)
-			c.store.saveToDisk()
-			return nil
+			return c.store.applyNodeUpdates(id, updates, true)
 		},
 	)
 }
@@ -742,28 +742,7 @@ func (t *MockTransaction) UpdateNode(ctx context.Context, id string, updates Nod
 		return concurrency.RunInLockWithLogger(
 			&t.conn.store.mu, "mock_store_write", logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 			func() error {
-				node, ok := t.conn.store.nodes[id]
-				if !ok {
-					return &GraphError{Code: ErrorCodeNodeNotFound, Message: fmt.Sprintf("node %s not found", id)}
-				}
-				// Apply updates (simplified)
-				if updates.Properties != nil {
-					if node.Properties == nil {
-						node.Properties = make(map[string]any)
-					}
-					for k, v := range updates.Properties {
-						node.Properties[k] = v
-					}
-
-				}
-				for _, k := range updates.RemoveProperties {
-					delete(node.Properties, k)
-				}
-				if len(updates.AddLabels) > 0 {
-					node.Labels = append(node.Labels, updates.AddLabels...)
-				}
-				t.conn.store.saveToDisk()
-				return nil
+				return t.conn.store.applyNodeUpdates(id, updates, false)
 			},
 		)
 	})
@@ -866,6 +845,15 @@ func (t *MockTransaction) SupportsNestedTransactions() bool {
 	return false
 }
 
+func (t *MockTransaction) finish() error {
+	if t.isFinished {
+		return fmt.Errorf("transaction already finished")
+	}
+	t.isFinished = true
+	t.conn.ClearTransaction()
+	return nil
+}
+
 func (t *MockTransaction) Commit(ctx context.Context) error {
 	if t.isFinished {
 		return fmt.Errorf("transaction already finished")
@@ -875,18 +863,11 @@ func (t *MockTransaction) Commit(ctx context.Context) error {
 			return err
 		}
 	}
-	t.isFinished = true
-	t.conn.ClearTransaction()
-	return nil
+	return t.finish()
 }
 
 func (t *MockTransaction) Rollback(ctx context.Context) error {
-	if t.isFinished {
-		return fmt.Errorf("transaction already finished")
-	}
-	t.isFinished = true
-	t.conn.ClearTransaction()
-	return nil
+	return t.finish()
 }
 
 func (t *MockTransaction) IsCommitted() bool {

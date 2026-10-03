@@ -1,19 +1,15 @@
 package metrics
 
 import (
-	"context"
 	"fmt"
 	"time"
 
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
-	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/metricsrecording"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
 	"github.com/zqk-os/zqk/pkg/storage"
-	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 const maxCacheValidationMetricsJSONLen = 256 * 1024
@@ -31,11 +27,10 @@ func cacheValidationMetricTitle(asyncKinds, kindRows int, totalVal int64) string
 
 // BuildCacheValidationBaseMetricInstance builds a base_metric from encoded CAS cache metrics JSON.
 func BuildCacheValidationBaseMetricInstance(metricID string, jsonPayload []byte, meta storage.CacheMetricsEncodeMeta) (map[string]any, error) {
-	if metricID == emptyValue {
-		return nil, errfmt.Errorf("metric id is required")
+	start, end, err := FormatMetricWindow(metricID, meta.WindowStart, meta.WindowEnd)
+	if err != nil {
+		return nil, err
 	}
-	start := zqktime.FormatRFC3339UTC(meta.WindowStart)
-	end := zqktime.FormatRFC3339UTC(meta.WindowEnd)
 
 	tags := []string{
 		MetricTagSystem,
@@ -43,13 +38,7 @@ func BuildCacheValidationBaseMetricInstance(metricID string, jsonPayload []byte,
 		"cas_validation_cache",
 	}
 
-	oc := int(meta.TotalValidationsSum)
-	if oc < 0 {
-		oc = 0
-	}
-	if oc == 0 {
-		oc = meta.AsyncStrategyKinds + meta.KindValidationMetrics
-	}
+	oc := ComputeEffectiveObjectCount(meta.TotalValidationsSum, meta.AsyncStrategyKinds+meta.KindValidationMetrics)
 
 	builder := instance_builders.NewForKind(objects.KindBaseMetric, objects.DefaultSchemaVersion)
 	builder.SetID(metricID).
@@ -98,16 +87,6 @@ func PersistCacheValidationMetricsJSONAsync(sp storage.ObjectStorageProvider, js
 				return
 			}
 
-			ctx, cancel := context.WithTimeout(pkgctx.NewSystemContext(), 60*time.Second)
-			defer cancel()
-			secCtx := pkgctx.NewSystemSecurityContext()
-			if createErr := sp.Create(ctx, secCtx, inst); createErr != nil {
-				if logger != nil {
-					logging.Fluent(logger).Warn("Failed to persist CAS cache validation base_metric").
-						MetricID(metricID).
-						WithError(createErr).
-						Log()
-				}
-			}
+			PersistBaseMetricInstance(sp, inst, metricID, "CAS cache validation base_metric", logger)
 		})
 }

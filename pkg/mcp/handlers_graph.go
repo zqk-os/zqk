@@ -130,6 +130,21 @@ func HandleGraphTraversal(ctx context.Context, args map[string]any) (any, error)
 	}, nil
 }
 
+func getEnabledGraphManager() (*GraphConnectionManager, error) {
+	graphMgr := GetGraphConnectionManager()
+	if !graphMgr.IsEnabled() {
+		return nil, errfmt.Errorf("graph backend not enabled - set %s=true and configure connection settings", brand.EnvVar("GRAPH_ENABLED"))
+	}
+	return graphMgr, nil
+}
+
+func getFormatArg(args map[string]any) string {
+	if format, ok := args[objects.FieldKeyFormat].(string); ok && format != emptyValue {
+		return format
+	}
+	return "json"
+}
+
 // HandleResolveReferences handles the resolve_references tool call.
 // Resolves object references (e.g., "goal:GOAL-123", "milestone:MIL-456") to actual objects.
 //
@@ -193,16 +208,10 @@ func HandleResolveReferences(ctx context.Context, args map[string]any) (any, err
 	}
 
 	includeRelated, _ := args["include_related"].(bool)
-	format, ok := args[objects.FieldKeyFormat].(string)
-	if !ok || format == emptyValue {
-		format = "json"
-	}
-
-	// Get graph connection manager
-	graphMgr := GetGraphConnectionManager()
-
-	if !graphMgr.IsEnabled() {
-		return nil, errfmt.Errorf("graph backend not enabled - set %s=true and configure connection settings", brand.EnvVar("GRAPH_ENABLED"))
+	format := getFormatArg(args)
+	graphMgr, err := getEnabledGraphManager()
+	if err != nil {
+		return nil, err
 	}
 
 	// Extract depth and timeout parameters (optional)
@@ -272,16 +281,10 @@ func HandleStateAwareQuery(ctx context.Context, args map[string]any) (any, error
 	}
 
 	includeMetrics, _ := args["include_metrics"].(bool)
-	format, ok := args[objects.FieldKeyFormat].(string)
-	if !ok || format == emptyValue {
-		format = "json"
-	}
-
-	// Get graph connection manager
-	graphMgr := GetGraphConnectionManager()
-
-	if !graphMgr.IsEnabled() {
-		return nil, errfmt.Errorf("graph backend not enabled - set %s=true and configure connection settings", brand.EnvVar("GRAPH_ENABLED"))
+	format := getFormatArg(args)
+	graphMgr, err := getEnabledGraphManager()
+	if err != nil {
+		return nil, err
 	}
 
 	// Execute state-aware query via graph backend

@@ -3,8 +3,6 @@ package cli
 import (
 	"context"
 	"fmt"
-	"os"
-	"os/signal"
 	"sync"
 	"time"
 
@@ -111,9 +109,8 @@ func (h *TimeoutHook) wrapCommandWithResettableTimeout(ctx context.Context, comm
 	}()
 
 	// Set up signal handling for graceful shutdown
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, os.Interrupt)
-	defer signal.Stop(sigChan)
+	sigChan, stopSig := setupInterruptSignal()
+	defer stopSig()
 
 	// Channel to track execution result
 	errChan := make(chan error, 1)
@@ -204,68 +201,9 @@ done:
 	if cancel != nil {
 		cancel() // Ensure cancel is called on all paths
 	}
-	duration := time.Since(startTime)
 	endTime := time.Now()
-
-	// Record metrics with enhanced context
-	metric := &CommandMetric{
-		Command:        command,
-		NormalizedCmd:  normalizedCmd,
-		Duration:       duration,
-		StartTime:      startTime,
-		EndTime:        endTime,
-		Success:        execErr == nil && !timedOut,
-		ExitCode:       exitCode,
-		Error:          h.sanitizeError(execErr),
-		TimedOut:       timedOut,
-		Timestamp:      startTime,
-		Args:           h.sanitizeArgs(args),
-		Flags:          make(map[string]any),
-		ObjectsCreated: []string{},
-		ObjectsUpdated: []string{},
-		ObjectsDeleted: []string{},
-	}
-
-	// Add context information if provided
-	if cmdCtx != nil {
-		metric.PriorityPlan = cmdCtx.PriorityPlan
-		metric.Workstream = cmdCtx.Workstream
-		metric.Milestone = cmdCtx.Milestone
-		metric.ActorID = cmdCtx.ActorID
-		metric.ActorRoles = cmdCtx.ActorRoles
-		if cmdCtx.Flags != nil {
-			metric.Flags = cmdCtx.Flags
-		}
-	}
-
-	if h.metricsStore != nil {
-		// Record metrics asynchronously (fire-and-forget)
-		goroutinelabels.NewGoroutine("command_metrics_recorder", fmt.Sprintf("recording metrics for command: %s", normalizedCmd)).
-			StartSimple(func() {
-				config := h.getTimeoutConfig()
-				metricsCtx, cancel := context.WithTimeout(pkgctx.NewSystemContext(), config.MetricsRecordingTimeout)
-				defer cancel()
-
-				done := make(chan error, 1)
-				goroutinelabels.NewGoroutine("metrics_store_writer", fmt.Sprintf("writing metrics for: %s", normalizedCmd)).
-					StartSimple(func() {
-						done <- h.metricsStore.RecordCommandExecution(metric)
-					})
-
-				select {
-				case err := <-done:
-					if err != nil {
-						h.logger.LogWarning("Failed to record command metrics",
-							logging.Error(err),
-							logging.String("command", normalizedCmd))
-					}
-				case <-metricsCtx.Done():
-					h.logger.LogWarning("Metrics recording timed out (non-blocking)",
-						logging.String("command", normalizedCmd),
-						logging.String("timeout", "5s"))
-				}
-			})
-	}
+	metric := h.buildCommandMetric(command, normalizedCmd, args, cmdCtx, startTime, endTime, execErr, timedOut, exitCode)
+	h.recordMetricsAsync(metric, normalizedCmd)
 
 	return execErr
 }

@@ -8,6 +8,18 @@ import (
 	"github.com/zqk-os/zqk/pkg/reports"
 )
 
+func executeReportCommand(server *Server, reportCmd string, args map[string]any) (any, error) {
+	format := "json"
+	if f, ok := args[objects.FieldKeyFormat].(string); ok && f != "" {
+		format = f
+	}
+	cmdArgs := map[string]any{
+		"_command_path":        GetCommandPath(reportCmd),
+		objects.FieldKeyFormat: format,
+	}
+	return ExecuteCLICommandViaMCP(cmdArgs, pkgctx.NewSecurityContext("system", []string{"admin"}, []string{"*"}), server.GetProjectRoot())
+}
+
 // RegisterReportTools registers report generation tools with the MCP server
 func RegisterReportTools(server *Server) {
 	// PCS report
@@ -17,15 +29,7 @@ func RegisterReportTools(server *Server) {
 	).
 		AddJSONYAMLFormatProperty().
 		Register(server, func(ctx context.Context, args map[string]any) (any, error) {
-			cmdArgs := map[string]any{
-				"_command_path": GetCommandPath("reports pcs"),
-			}
-			if format, ok := args[objects.FieldKeyFormat].(string); ok && format != "" {
-				cmdArgs[objects.FieldKeyFormat] = format
-			} else {
-				cmdArgs[objects.FieldKeyFormat] = "json"
-			}
-			return ExecuteCLICommandViaMCP(cmdArgs, pkgctx.NewSecurityContext("system", []string{"admin"}, []string{"*"}), server.GetProjectRoot())
+			return executeReportCommand(server, "reports pcs", args)
 		})
 
 	// EDD report
@@ -35,15 +39,7 @@ func RegisterReportTools(server *Server) {
 	).
 		AddJSONYAMLFormatProperty().
 		Register(server, func(ctx context.Context, args map[string]any) (any, error) {
-			cmdArgs := map[string]any{
-				"_command_path": GetCommandPath("reports edd"),
-			}
-			if format, ok := args[objects.FieldKeyFormat].(string); ok && format != "" {
-				cmdArgs[objects.FieldKeyFormat] = format
-			} else {
-				cmdArgs[objects.FieldKeyFormat] = "json"
-			}
-			return ExecuteCLICommandViaMCP(cmdArgs, pkgctx.NewSecurityContext("system", []string{"admin"}, []string{"*"}), server.GetProjectRoot())
+			return executeReportCommand(server, "reports edd", args)
 		})
 
 	// Blockers report
@@ -53,15 +49,7 @@ func RegisterReportTools(server *Server) {
 	).
 		AddJSONYAMLFormatProperty().
 		Register(server, func(ctx context.Context, args map[string]any) (any, error) {
-			cmdArgs := map[string]any{
-				"_command_path": GetCommandPath("reports blockers"),
-			}
-			if format, ok := args[objects.FieldKeyFormat].(string); ok && format != "" {
-				cmdArgs[objects.FieldKeyFormat] = format
-			} else {
-				cmdArgs[objects.FieldKeyFormat] = "json"
-			}
-			return ExecuteCLICommandViaMCP(cmdArgs, pkgctx.NewSecurityContext("system", []string{"admin"}, []string{"*"}), server.GetProjectRoot())
+			return executeReportCommand(server, "reports blockers", args)
 		})
 
 	// Maturation report

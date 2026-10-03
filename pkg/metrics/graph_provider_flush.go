@@ -3,26 +3,19 @@ package metrics
 import (
 	"time"
 
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
-
 	"github.com/zqk-os/zqk/pkg/graph/provider"
 	"github.com/zqk-os/zqk/pkg/logging"
-	"github.com/zqk-os/zqk/pkg/metricsrecording"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // FlushGraphProviderMetricsToStorage encodes the global graph provider metrics snapshot
 // and persists it asynchronously as a base_metric (metricsrecording-gated, best-effort).
 func FlushGraphProviderMetricsToStorage(sp storage.ObjectStorageProvider, logger logging.Logger) {
-	if sp == nil {
+	log, ok := ShouldFlushMetrics(sp, logger)
+	if !ok {
 		return
 	}
-	if !metricsrecording.Enabled() {
-		return
-	}
-	if logger == nil {
-		logger = logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-	}
+	logger = log
 	c := provider.GetGlobalGraphProviderMetricsCollector()
 	snap := c.GetMetrics()
 	data, err := provider.EncodeMetricsSnapshotForPersistence(snap)

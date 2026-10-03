@@ -88,18 +88,25 @@ func (i *memoryInbox) ListPending() []TDEEnvelope {
 	return pending
 }
 
+func (i *memoryInbox) getPendingEnvelopeLocked(id string) (*TDEEnvelope, error) {
+	env, ok := i.envelopes[id]
+	if !ok {
+		return nil, ErrEnvelopeNotFound
+	}
+	if env.Status != StatusPending {
+		return nil, ErrNotPending
+	}
+	return env, nil
+}
+
 func (i *memoryInbox) Approve(id string) error {
 	i.mu.Lock()
 	defer i.mu.Unlock()
 
-	env, ok := i.envelopes[id]
-	if !ok {
-		return ErrEnvelopeNotFound
+	env, err := i.getPendingEnvelopeLocked(id)
+	if err != nil {
+		return err
 	}
-	if env.Status != StatusPending {
-		return ErrNotPending
-	}
-
 	env.Status = StatusApproved
 	return nil
 }
@@ -108,14 +115,10 @@ func (i *memoryInbox) Reject(id string, reason string) error {
 	i.mu.Lock()
 	defer i.mu.Unlock()
 
-	env, ok := i.envelopes[id]
-	if !ok {
-		return ErrEnvelopeNotFound
+	env, err := i.getPendingEnvelopeLocked(id)
+	if err != nil {
+		return err
 	}
-	if env.Status != StatusPending {
-		return ErrNotPending
-	}
-
 	env.Status = StatusRejected
 	env.RejectReason = reason
 	return nil

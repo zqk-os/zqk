@@ -184,34 +184,26 @@ func (e *LifecycleEnumerator) ValidateTransition(objectKind, fromStatus, toStatu
 	return false, fmt.Sprintf("Invalid transition from '%s' to '%s' for object kind '%s'", fromStatus, toStatus, objectKind)
 }
 
-// GetValidTransitionsFrom returns all valid transitions from a given status
-func (e *LifecycleEnumerator) GetValidTransitionsFrom(objectKind, fromStatus string) []TransitionSummary {
+func (e *LifecycleEnumerator) filterTransitions(objectKind string, match func(TransitionSummary) bool) []TransitionSummary {
 	summary, exists := e.GetLifecycleSummary(objectKind)
 	if !exists {
 		return nil
 	}
-
 	var valid []TransitionSummary
 	for _, trans := range summary.Transitions {
-		if trans.From == fromStatus {
+		if match(trans) {
 			valid = append(valid, trans)
 		}
 	}
 	return valid
 }
 
+// GetValidTransitionsFrom returns all valid transitions from a given status
+func (e *LifecycleEnumerator) GetValidTransitionsFrom(objectKind, fromStatus string) []TransitionSummary {
+	return e.filterTransitions(objectKind, func(t TransitionSummary) bool { return t.From == fromStatus })
+}
+
 // GetValidTransitionsTo returns all valid transitions to a given status
 func (e *LifecycleEnumerator) GetValidTransitionsTo(objectKind, toStatus string) []TransitionSummary {
-	summary, exists := e.GetLifecycleSummary(objectKind)
-	if !exists {
-		return nil
-	}
-
-	var valid []TransitionSummary
-	for _, trans := range summary.Transitions {
-		if trans.To == toStatus {
-			valid = append(valid, trans)
-		}
-	}
-	return valid
+	return e.filterTransitions(objectKind, func(t TransitionSummary) bool { return t.To == toStatus })
 }

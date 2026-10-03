@@ -130,27 +130,25 @@ func (c *Client) readLoop(ctx context.Context) {
 	}
 }
 
-// Initialize performs the MCP protocol handshake.
-func (c *Client) Initialize(ctx context.Context, params InitializeParams) (*InitializeResult, error) {
+func (c *Client) registerPendingRequest() (int, chan JSONRPCResponse) {
 	c.mu.Lock()
+	defer c.mu.Unlock()
 	c.requestID++
 	id := c.requestID
 	ch := make(chan JSONRPCResponse, 1)
 	c.pending[id] = ch
+	return id, ch
+}
+
+func (c *Client) removePendingRequest(id int) {
+	c.mu.Lock()
+	delete(c.pending, id)
 	c.mu.Unlock()
+}
 
-	paramsBytes, _ := json.Marshal(params)
-
-	req := JSONRPCRequest{
-		JSONRPC: "2.0",
-		ID:      id,
-		Method:  "initialize",
-		Params:  json.RawMessage(paramsBytes),
-	}
-
-	reqBytes, _ := json.Marshal(req)
+func (c *Client) sendRawMessage(ctx context.Context, label, desc string, reqBytes []byte) error {
 	errCh := make(chan error, 1)
-	goroutinelabels.NewGoroutine("mcp_client_initialize", "sending initialize request to MCP server").StartSimple(func() {
+	goroutinelabels.NewGoroutine(label, desc).StartSimple(func() {
 		c.writeMu.Lock()
 		defer c.writeMu.Unlock()
 		errCh <- c.transport.WriteMessage(c.out, reqBytes, c.format)
@@ -158,24 +156,32 @@ func (c *Client) Initialize(ctx context.Context, params InitializeParams) (*Init
 
 	select {
 	case <-ctx.Done():
-		c.mu.Lock()
-		delete(c.pending, id)
-		c.mu.Unlock()
-		return nil, ctx.Err()
+		return ctx.Err()
 	case err := <-errCh:
 		if err != nil {
-			c.mu.Lock()
-			delete(c.pending, id)
-			c.mu.Unlock()
-			return nil, errfmt.Newf("write message").Wrap(err)
+			return errfmt.Newf("write message").Wrap(err)
 		}
+		return nil
+	}
+}
+
+func (c *Client) sendRequest(ctx context.Context, label, desc string, id int, reqBytes []byte) error {
+	if err := c.sendRawMessage(ctx, label, desc, reqBytes); err != nil {
+		c.removePendingRequest(id)
+		return err
+	}
+	return nil
+}
+
+func (c *Client) waitResponse(ctx context.Context, id int, ch <-chan JSONRPCResponse, timeout time.Duration) (*JSONRPCResponse, error) {
+	var timeoutChan <-chan time.Time
+	if timeout > 0 {
+		timeoutChan = time.After(timeout)
 	}
 
 	select {
 	case <-ctx.Done():
-		c.mu.Lock()
-		delete(c.pending, id)
-		c.mu.Unlock()
+		c.removePendingRequest(id)
 		return nil, ctx.Err()
 	case resp, ok := <-ch:
 		if !ok {
@@ -187,13 +193,41 @@ func (c *Client) Initialize(ctx context.Context, params InitializeParams) (*Init
 		if resp.Error != nil {
 			return nil, errfmt.Errorf("mcp error: %s (code: %d)", resp.Error.Message, resp.Error.Code)
 		}
-		var result InitializeResult
-		resultBytes, _ := json.Marshal(resp.Result)
-		if err := json.Unmarshal(resultBytes, &result); err != nil {
-			return nil, errfmt.Newf("unmarshal init result").Wrap(err)
-		}
-		return &result, nil
+		return &resp, nil
+	case <-timeoutChan:
+		c.removePendingRequest(id)
+		return nil, errfmt.Errorf("timeout waiting for MCP response")
 	}
+}
+
+// Initialize performs the MCP protocol handshake.
+func (c *Client) Initialize(ctx context.Context, params InitializeParams) (*InitializeResult, error) {
+	id, ch := c.registerPendingRequest()
+
+	paramsBytes, _ := json.Marshal(params)
+	req := JSONRPCRequest{
+		JSONRPC: "2.0",
+		ID:      id,
+		Method:  "initialize",
+		Params:  json.RawMessage(paramsBytes),
+	}
+
+	reqBytes, _ := json.Marshal(req)
+	if err := c.sendRequest(ctx, "mcp_client_initialize", "sending initialize request to MCP server", id, reqBytes); err != nil {
+		return nil, err
+	}
+
+	resp, err := c.waitResponse(ctx, id, ch, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	var result InitializeResult
+	resultBytes, _ := json.Marshal(resp.Result)
+	if err := json.Unmarshal(resultBytes, &result); err != nil {
+		return nil, errfmt.Newf("unmarshal init result").Wrap(err)
+	}
+	return &result, nil
 }
 
 // Initialized sends the notifications/initialized message to the server, which is required
@@ -209,35 +243,14 @@ func (c *Client) Initialized(ctx context.Context) error {
 		return errfmt.Newf("marshal notification").Wrap(err)
 	}
 
-	errCh := make(chan error, 1)
-	goroutinelabels.NewGoroutine("mcp_client_initialized_notification", "sending initialized notification to MCP server").StartSimple(func() {
-		c.writeMu.Lock()
-		defer c.writeMu.Unlock()
-		errCh <- c.transport.WriteMessage(c.out, reqBytes, c.format)
-	})
-
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	case err := <-errCh:
-		if err != nil {
-			return errfmt.Newf("write message").Wrap(err)
-		}
-	}
-
-	return nil
+	return c.sendRawMessage(ctx, "mcp_client_initialized_notification", "sending initialized notification to MCP server", reqBytes)
 }
 
 // CallTool synchronously executes a tool via the MCP protocol.
 func (c *Client) CallTool(ctx context.Context, name string, args map[string]any) (json.RawMessage, error) {
 	start := time.Now()
 
-	c.mu.Lock()
-	c.requestID++
-	id := c.requestID
-	ch := make(chan JSONRPCResponse, 1)
-	c.pending[id] = ch
-	c.mu.Unlock()
+	id, ch := c.registerPendingRequest()
 
 	params := struct {
 		Name      string         `json:"name"`
@@ -257,99 +270,59 @@ func (c *Client) CallTool(ctx context.Context, name string, args map[string]any)
 
 	reqBytes, err := json.Marshal(req)
 	if err != nil {
+		c.removePendingRequest(id)
 		return nil, errfmt.Newf("marshal request").Wrap(err)
 	}
 
-	errCh := make(chan error, 1)
-	goroutinelabels.NewGoroutine("mcp_client_call_tool", "sending call_tool request to MCP server").StartSimple(func() {
-		c.writeMu.Lock()
-		defer c.writeMu.Unlock()
-		errCh <- c.transport.WriteMessage(c.out, reqBytes, c.format)
-	})
-
-	select {
-	case <-ctx.Done():
-		c.mu.Lock()
-		delete(c.pending, id)
-		c.mu.Unlock()
-		return nil, ctx.Err()
-	case err := <-errCh:
-		if err != nil {
-			c.mu.Lock()
-			delete(c.pending, id)
-			c.mu.Unlock()
-			return nil, errfmt.Newf("write message").Wrap(err)
-		}
+	if err := c.sendRequest(ctx, "mcp_client_call_tool", "sending call_tool request to MCP server", id, reqBytes); err != nil {
+		return nil, err
 	}
 
-	select {
-	case <-ctx.Done():
-		c.mu.Lock()
-		delete(c.pending, id)
-		c.mu.Unlock()
-		return nil, ctx.Err()
-	case resp, ok := <-ch:
-		duration := time.Since(start)
-		if c.tracker != nil {
-			c.tracker.RecordIPCLatency(ctx, "mcp_call_tool", duration)
-		}
+	resp, err := c.waitResponse(ctx, id, ch, mcpResponseTimeout())
+	if err != nil {
+		return nil, err
+	}
 
-		if !ok {
-			if ctx.Err() != nil {
-				return nil, ctx.Err()
-			}
-			return nil, errfmt.Errorf("mcp connection closed")
-		}
-		if resp.Error != nil {
-			return nil, errfmt.Errorf("mcp error: %s (code: %d)", resp.Error.Message, resp.Error.Code)
-		}
+	duration := time.Since(start)
+	if c.tracker != nil {
+		c.tracker.RecordIPCLatency(ctx, "mcp_call_tool", duration)
+	}
 
-		// The MCP protocol returns tool execution results wrapped in a standard schema
-		// Unpack it for the caller.
-		var toolResult ToolCallResult
-		resultBytes, err := json.Marshal(resp.Result)
-		if err != nil {
-			return nil, errfmt.Newf("marshal raw result").Wrap(err)
-		}
-		if err := json.Unmarshal(resultBytes, &toolResult); err != nil {
-			return nil, errfmt.Newf("unmarshal tool result").Wrap(err)
-		}
+	// The MCP protocol returns tool execution results wrapped in a standard schema
+	// Unpack it for the caller.
+	var toolResult ToolCallResult
+	resultBytes, err := json.Marshal(resp.Result)
+	if err != nil {
+		return nil, errfmt.Newf("marshal raw result").Wrap(err)
+	}
+	if err := json.Unmarshal(resultBytes, &toolResult); err != nil {
+		return nil, errfmt.Newf("unmarshal tool result").Wrap(err)
+	}
 
-		if toolResult.IsError {
-			var errMsg string
-			for _, content := range toolResult.Content {
-				if content.Type == "text" {
-					errMsg += content.Text + "\n"
-				}
-			}
-			return nil, errfmt.Errorf("tool execution failed: %s", errMsg)
-		}
-
-		// Concatenate text content as the raw message payload
-		var resultText string
+	if toolResult.IsError {
+		var errMsg string
 		for _, content := range toolResult.Content {
 			if content.Type == "text" {
-				resultText += content.Text
+				errMsg += content.Text + "\n"
 			}
 		}
-
-		return json.RawMessage(resultText), nil
-	case <-time.After(mcpResponseTimeout()):
-		c.mu.Lock()
-		delete(c.pending, id)
-		c.mu.Unlock()
-		return nil, errfmt.Errorf("timeout waiting for MCP response")
+		return nil, errfmt.Errorf("tool execution failed: %s", errMsg)
 	}
+
+	// Concatenate text content as the raw message payload
+	var resultText string
+	for _, content := range toolResult.Content {
+		if content.Type == "text" {
+			resultText += content.Text
+		}
+	}
+
+	return json.RawMessage(resultText), nil
 }
 
 // ListTools retrieves the list of tools available from the MCP server.
 func (c *Client) ListTools(ctx context.Context) (*ToolsListResult, error) {
-	c.mu.Lock()
-	c.requestID++
-	id := c.requestID
-	ch := make(chan JSONRPCResponse, 1)
-	c.pending[id] = ch
-	c.mu.Unlock()
+	id, ch := c.registerPendingRequest()
 
 	req := JSONRPCRequest{
 		JSONRPC: "2.0",
@@ -359,64 +332,29 @@ func (c *Client) ListTools(ctx context.Context) (*ToolsListResult, error) {
 
 	reqBytes, err := json.Marshal(req)
 	if err != nil {
+		c.removePendingRequest(id)
 		return nil, errfmt.Newf("marshal request").Wrap(err)
 	}
 
-	errCh := make(chan error, 1)
-	goroutinelabels.NewGoroutine("mcp_client_list_tools", "sending list_tools request to MCP server").StartSimple(func() {
-		c.writeMu.Lock()
-		defer c.writeMu.Unlock()
-		errCh <- c.transport.WriteMessage(c.out, reqBytes, c.format)
-	})
-
-	select {
-	case <-ctx.Done():
-		c.mu.Lock()
-		delete(c.pending, id)
-		c.mu.Unlock()
-		return nil, ctx.Err()
-	case err := <-errCh:
-		if err != nil {
-			c.mu.Lock()
-			delete(c.pending, id)
-			c.mu.Unlock()
-			return nil, errfmt.Newf("write message").Wrap(err)
-		}
+	if err := c.sendRequest(ctx, "mcp_client_list_tools", "sending list_tools request to MCP server", id, reqBytes); err != nil {
+		return nil, err
 	}
 
-	select {
-	case <-ctx.Done():
-		c.mu.Lock()
-		delete(c.pending, id)
-		c.mu.Unlock()
-		return nil, ctx.Err()
-	case resp, ok := <-ch:
-		if !ok {
-			if ctx.Err() != nil {
-				return nil, ctx.Err()
-			}
-			return nil, errfmt.Errorf("mcp connection closed")
-		}
-		if resp.Error != nil {
-			return nil, errfmt.Errorf("mcp error: %s (code: %d)", resp.Error.Message, resp.Error.Code)
-		}
-
-		var result ToolsListResult
-		resultBytes, err := json.Marshal(resp.Result)
-		if err != nil {
-			return nil, errfmt.Newf("marshal raw result").Wrap(err)
-		}
-		if err := json.Unmarshal(resultBytes, &result); err != nil {
-			return nil, errfmt.Newf("unmarshal tools list result").Wrap(err)
-		}
-
-		return &result, nil
-	case <-time.After(mcpResponseTimeout()):
-		c.mu.Lock()
-		delete(c.pending, id)
-		c.mu.Unlock()
-		return nil, errfmt.Errorf("timeout waiting for MCP response")
+	resp, err := c.waitResponse(ctx, id, ch, mcpResponseTimeout())
+	if err != nil {
+		return nil, err
 	}
+
+	var result ToolsListResult
+	resultBytes, err := json.Marshal(resp.Result)
+	if err != nil {
+		return nil, errfmt.Newf("marshal raw result").Wrap(err)
+	}
+	if err := json.Unmarshal(resultBytes, &result); err != nil {
+		return nil, errfmt.Newf("unmarshal tools list result").Wrap(err)
+	}
+
+	return &result, nil
 }
 
 func (c *Client) logToSandbox(format string, args ...any) {

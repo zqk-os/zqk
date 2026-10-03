@@ -162,12 +162,7 @@ func RunWithAsyncProgress(
 		profile = string(pkgctx.ProfileHuman)
 	}
 	operationID := fmt.Sprintf("%s_%d", operationType, time.Now().UnixNano())
-	ec := coordination.GetCoordinator()
-	var coord *coordination.Coordinator
-	if c, ok := ec.(*coordination.Coordinator); ok {
-		coord = c
-	}
-	helper := coordination.NewProgressHelper(coord, projectRoot, operationID, operationType, profile)
+	helper := coordination.NewCoordinatorProgressHelper(projectRoot, operationID, operationType, profile)
 
 	// Shared state so heartbeat can report latest stage/message
 	var state progressState

@@ -106,16 +106,12 @@ func (c *memgraphConnection) BeginNestedTransaction(ctx context.Context, parent 
 	return tx, nil
 }
 
-// Commit commits the transaction
-func (tx *memgraphTransaction) Commit(ctx context.Context) error {
+func (tx *memgraphTransaction) inspectState(lockName string) (explicitTx neo4j.ExplicitTransaction, alreadyCommitted, alreadyRolledBack bool, err error) {
 	if tx.conn == nil {
-		return errfmt.Errorf("transaction connection is nil")
+		return nil, false, false, errfmt.Errorf("transaction connection is nil")
 	}
-
-	var alreadyCommitted, alreadyRolledBack bool
-	var explicitTx neo4j.ExplicitTransaction
-	err := concurrency.RunInLockWithLogger(
-		&tx.mu, LockNameMemgraphTxCommitCheck, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
+	err = concurrency.RunInLockWithLogger(
+		&tx.mu, lockName, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 		func() error {
 			alreadyCommitted = tx.committed
 			alreadyRolledBack = tx.rolledBack
@@ -123,17 +119,36 @@ func (tx *memgraphTransaction) Commit(ctx context.Context) error {
 			return nil
 		},
 	)
+	return
+}
+
+func (tx *memgraphTransaction) finalizeState(lockName string, markCommitted bool) error {
+	defer tx.conn.ClearTransaction()
+	return concurrency.RunInLockWithLogger(
+		&tx.mu, lockName, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
+		func() error {
+			if markCommitted {
+				tx.committed = true
+			} else {
+				tx.rolledBack = true
+			}
+			return nil
+		},
+	)
+}
+
+// Commit commits the transaction
+func (tx *memgraphTransaction) Commit(ctx context.Context) error {
+	explicitTx, alreadyCommitted, alreadyRolledBack, err := tx.inspectState(LockNameMemgraphTxCommitCheck)
 	if err != nil {
 		return err
 	}
-
 	if alreadyCommitted {
 		return errfmt.Errorf("transaction already committed")
 	}
 	if alreadyRolledBack {
 		return errfmt.Errorf("transaction already rolled back")
 	}
-
 	if explicitTx == nil {
 		return errfmt.Errorf("transaction not initialized")
 	}
@@ -141,70 +156,27 @@ func (tx *memgraphTransaction) Commit(ctx context.Context) error {
 	// Commit the Bolt transaction (I/O outside lock)
 	commitErr := explicitTx.Commit(ctx)
 	if commitErr != nil {
-		// Update state with lock
-		_ = concurrency.RunInLockWithLogger(
-			&tx.mu, LockNameMemgraphTxCommitFailed, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
-			func() error {
-				tx.rolledBack = true
-				return nil
-			},
-		)
-		tx.conn.ClearTransaction()
+		_ = tx.finalizeState(LockNameMemgraphTxCommitFailed, false)
 		return errfmt.Newf("failed to commit transaction").Wrap(commitErr)
 	}
 
-	// Update state with lock
-	err = concurrency.RunInLockWithLogger(
-		&tx.mu, LockNameMemgraphTxCommitSuccess, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
-		func() error {
-			tx.committed = true
-			return nil
-		},
-	)
-	if err != nil {
-		return err
-	}
-	tx.conn.ClearTransaction()
-	return nil
+	return tx.finalizeState(LockNameMemgraphTxCommitSuccess, true)
 }
 
 // Rollback rolls back the transaction
 func (tx *memgraphTransaction) Rollback(ctx context.Context) error {
-	if tx.conn == nil {
-		return errfmt.Errorf("transaction connection is nil")
-	}
-
-	var alreadyCommitted, alreadyRolledBack bool
-	var explicitTx neo4j.ExplicitTransaction
-	err := concurrency.RunInLockWithLogger(
-		&tx.mu, LockNameMemgraphTxRollbackCheck, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
-		func() error {
-			alreadyCommitted = tx.committed
-			alreadyRolledBack = tx.rolledBack
-			explicitTx = tx.explicitTx
-			return nil
-		},
-	)
+	explicitTx, alreadyCommitted, alreadyRolledBack, err := tx.inspectState(LockNameMemgraphTxRollbackCheck)
 	if err != nil {
 		return err
 	}
-
 	if alreadyCommitted {
 		return errfmt.Errorf("transaction already committed")
 	}
 	if alreadyRolledBack {
 		return nil // Already rolled back
 	}
-
 	if explicitTx == nil {
-		_ = concurrency.RunInLockWithLogger(
-			&tx.mu, LockNameMemgraphTxRollbackNoTx, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
-			func() error {
-				tx.rolledBack = true
-				return nil
-			},
-		)
-		tx.conn.ClearTransaction()
+		_ = tx.finalizeState(LockNameMemgraphTxRollbackNoTx, false)
 		return nil
 	}
 
@@ -214,19 +186,7 @@ func (tx *memgraphTransaction) Rollback(ctx context.Context) error {
 		return errfmt.Newf("failed to rollback transaction").Wrap(rollbackErr)
 	}
 
-	// Update state with lock
-	err = concurrency.RunInLockWithLogger(
-		&tx.mu, LockNameMemgraphTxRollbackSuccess, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
-		func() error {
-			tx.rolledBack = true
-			return nil
-		},
-	)
-	if err != nil {
-		return err
-	}
-	tx.conn.ClearTransaction()
-	return nil
+	return tx.finalizeState(LockNameMemgraphTxRollbackSuccess, false)
 }
 
 // SupportsNestedTransactions returns whether nested transactions are supported
@@ -245,30 +205,26 @@ func (tx *memgraphTransaction) GetParent() provider.GraphTransaction {
 	return tx.parent
 }
 
-// IsCommitted returns whether the transaction has been committed
-func (tx *memgraphTransaction) IsCommitted() bool {
-	var committed bool
+func (tx *memgraphTransaction) readStateBool(lockName string, getter func() bool) bool {
+	var val bool
 	_ = concurrency.RunInLockWithLogger(
-		&tx.mu, LockNameMemgraphTxIsCommitted, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
+		&tx.mu, lockName, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 		func() error {
-			committed = tx.committed
+			val = getter()
 			return nil
 		},
 	)
-	return committed
+	return val
+}
+
+// IsCommitted returns whether the transaction has been committed
+func (tx *memgraphTransaction) IsCommitted() bool {
+	return tx.readStateBool(LockNameMemgraphTxIsCommitted, func() bool { return tx.committed })
 }
 
 // IsRolledBack returns whether the transaction has been rolled back
 func (tx *memgraphTransaction) IsRolledBack() bool {
-	var rolledBack bool
-	_ = concurrency.RunInLockWithLogger(
-		&tx.mu, LockNameMemgraphTxIsRolledBack, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
-		func() error {
-			rolledBack = tx.rolledBack
-			return nil
-		},
-	)
-	return rolledBack
+	return tx.readStateBool(LockNameMemgraphTxIsRolledBack, func() bool { return tx.rolledBack })
 }
 
 // Transaction operations - execute within the managed transaction
@@ -306,45 +262,31 @@ func (tx *memgraphTransaction) CreateNode(ctx context.Context, node provider.Nod
 	return err
 }
 
+func (tx *memgraphTransaction) collectCypher(ctx context.Context, query string, params map[string]any) ([]*neo4j.Record, error) {
+	result, err := tx.explicitTx.Run(ctx, query, params)
+	if err != nil {
+		return nil, err
+	}
+	return result.Collect(ctx)
+}
+
 func (tx *memgraphTransaction) GetNode(ctx context.Context, id string, labels []string) (*provider.Node, error) {
 	if tx.explicitTx == nil {
 		return nil, errfmt.Errorf("transaction not initialized")
 	}
 
-	// Build label filter
-	labelFilter := ""
-	if len(labels) > 0 {
-		labelFilter = ":" + labels[0]
-		for i := 1; i < len(labels); i++ {
-			labelFilter += ":" + labels[i]
-		}
-	}
-
+	labelFilter := buildLabelFilter(labels)
 	query := safeCypher("MATCH (n%s {id: $id}) RETURN n", labelFilter)
 	params := map[string]any{
 		objects.FieldKeyID: id,
 	}
 
-	result, err := tx.explicitTx.Run(ctx, query, params)
+	records, err := tx.collectCypher(ctx, query, params)
 	if err != nil {
 		return nil, err
 	}
 
-	records, err := result.Collect(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(records) == 0 {
-		return nil, nil // Node not found
-	}
-
-	nodeValue, ok := records[0].Values[0].(neo4j.Node)
-	if !ok {
-		return nil, errfmt.Errorf("unexpected node format in response")
-	}
-
-	return convertNeo4jNode(nodeValue), nil
+	return parseSingleNode(records)
 }
 
 func (tx *memgraphTransaction) UpdateNode(ctx context.Context, id string, updates provider.NodeUpdates) error {
@@ -438,40 +380,12 @@ func (tx *memgraphTransaction) GetEdge(ctx context.Context, fromID, toID, edgeTy
 		"toID":   toID,
 	}
 
-	result, err := tx.explicitTx.Run(ctx, query, params)
+	records, err := tx.collectCypher(ctx, query, params)
 	if err != nil {
 		return nil, err
 	}
 
-	records, err := result.Collect(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(records) == 0 {
-		return nil, nil // Edge not found
-	}
-
-	record := records[0]
-	relValue, ok := record.Values[0].(neo4j.Relationship)
-	if !ok {
-		return nil, errfmt.Errorf("unexpected edge format in response")
-	}
-
-	recordFromID := fromID
-	recordToID := toID
-	if len(record.Values) > 1 {
-		if f, ok := record.Values[1].(string); ok {
-			recordFromID = f
-		}
-	}
-	if len(record.Values) > 2 {
-		if t, ok := record.Values[2].(string); ok {
-			recordToID = t
-		}
-	}
-
-	return convertNeo4jRelationship(relValue, recordFromID, recordToID), nil
+	return parseSingleEdge(records, fromID, toID)
 }
 
 func (tx *memgraphTransaction) UpdateEdge(ctx context.Context, fromID, toID, edgeType string, updates provider.EdgeUpdates) error {
@@ -531,12 +445,7 @@ func (tx *memgraphTransaction) ExecuteQuery(ctx context.Context, query provider.
 		return nil, errfmt.Errorf("unsupported query language: %s", query.Language)
 	}
 
-	result, err := tx.explicitTx.Run(ctx, query.Query, query.Params)
-	if err != nil {
-		return nil, err
-	}
-
-	records, err := result.Collect(ctx)
+	records, err := tx.collectCypher(ctx, query.Query, query.Params)
 	if err != nil {
 		return nil, err
 	}

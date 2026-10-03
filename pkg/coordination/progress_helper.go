@@ -67,6 +67,20 @@ func NewProgressHelper(
 	}
 }
 
+// NewCoordinatorProgressHelper creates a progress helper using the global coordinator if available.
+func NewCoordinatorProgressHelper(
+	projectRoot string,
+	operationID string,
+	operationType string,
+	profile string,
+) *ProgressHelper {
+	var coord *Coordinator
+	if c, ok := GetCoordinator().(*Coordinator); ok {
+		coord = c
+	}
+	return NewProgressHelper(coord, projectRoot, operationID, operationType, profile)
+}
+
 // EmitProgress emits a progress update event
 // This routes progress updates to logging, metrics, and operational channels
 // Audit events are only emitted for progress-summary checkpoints (configurable thresholds)
@@ -194,25 +208,26 @@ func (h *ProgressHelper) EmitProgressSummary(
 	return h.EmitProgress(ctx, progress, total, fmt.Sprintf("Progress summary: %s - %s", threshold, message), fields, true)
 }
 
-func (h *ProgressHelper) buildStatusAuditMetadata(op, severity, oldStatus, newStatus string, fields map[string]any) map[string]any {
-	m := make(map[string]any, len(fields)+6)
-	m[keyEventType] = auditEventTypeSystemConfigChange
+func (h *ProgressHelper) newStatusMap(op, oldStatus, newStatus string, extraCap int, fields map[string]any) map[string]any {
+	m := make(map[string]any, len(fields)+extraCap)
 	m[keyOperation] = op
-	m[keySeverity] = severity
-	m[keyTargetKind] = h.operationType
 	m[keyOldStatus] = oldStatus
 	m[keyNewStatus] = newStatus
 	maps.Copy(m, fields)
 	return m
 }
 
+func (h *ProgressHelper) buildStatusAuditMetadata(op, severity, oldStatus, newStatus string, fields map[string]any) map[string]any {
+	m := h.newStatusMap(op, oldStatus, newStatus, 6, fields)
+	m[keyEventType] = auditEventTypeSystemConfigChange
+	m[keySeverity] = severity
+	m[keyTargetKind] = h.operationType
+	return m
+}
+
 func (h *ProgressHelper) buildStatusMetricsData(eventType, oldStatus, newStatus string, fields map[string]any) map[string]any {
-	m := make(map[string]any, len(fields)+4)
-	m[keyOperation] = h.operationType
+	m := h.newStatusMap(h.operationType, oldStatus, newStatus, 4, fields)
 	m[keyEventType] = eventType
-	m[keyOldStatus] = oldStatus
-	m[keyNewStatus] = newStatus
-	maps.Copy(m, fields)
 	return m
 }
 

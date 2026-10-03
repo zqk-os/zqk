@@ -15,33 +15,32 @@ import (
 	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 )
 
-func (c *ObjectIDCache) withRLockReady() (func(), bool) {
+func withReadReady[T any](c *ObjectIDCache, fn func() T) T {
+	var zero T
 	c.mu.RLock()
 	if c.byKind == nil {
 		c.mu.RUnlock()
-		return nil, false
+		return zero
 	}
-	return c.mu.RUnlock, true
+	defer c.mu.RUnlock()
+	return fn()
 }
 
 // GetAll returns all cache entries (for duplicate ID detection).
 func (c *ObjectIDCache) GetAll() []*ObjectIDCacheEntry {
-	unlock, ok := c.withRLockReady()
-	if !ok {
-		return nil
-	}
-	defer unlock()
-	var n int
-	for _, list := range c.byKind {
-		n += len(list)
-	}
-	entries := make([]*ObjectIDCacheEntry, 0, n)
-	for kind, list := range c.byKind {
-		for i := range list {
-			entries = append(entries, c.entryFromBucket(kind, &list[i]))
+	return withReadReady(c, func() []*ObjectIDCacheEntry {
+		var n int
+		for _, list := range c.byKind {
+			n += len(list)
 		}
-	}
-	return entries
+		entries := make([]*ObjectIDCacheEntry, 0, n)
+		for kind, list := range c.byKind {
+			for i := range list {
+				entries = append(entries, c.entryFromBucket(kind, &list[i]))
+			}
+		}
+		return entries
+	})
 }
 
 // GetEntriesByKind returns cache entries for the given kind (for cache-driven discovery).
@@ -49,17 +48,14 @@ func (c *ObjectIDCache) GetEntriesByKind(kind string) []*ObjectIDCacheEntry {
 	if kind == emptyValue {
 		return nil
 	}
-	unlock, ok := c.withRLockReady()
-	if !ok {
-		return nil
-	}
-	defer unlock()
-	list := c.byKind[kind]
-	out := make([]*ObjectIDCacheEntry, 0, len(list))
-	for i := range list {
-		out = append(out, c.entryFromBucket(kind, &list[i]))
-	}
-	return out
+	return withReadReady(c, func() []*ObjectIDCacheEntry {
+		list := c.byKind[kind]
+		out := make([]*ObjectIDCacheEntry, 0, len(list))
+		for i := range list {
+			out = append(out, c.entryFromBucket(kind, &list[i]))
+		}
+		return out
+	})
 }
 
 // EntriesForID returns all cache entries for an object ID within its kind bucket.
@@ -90,40 +86,34 @@ func (c *ObjectIDCache) EntriesForID(id string) []*ObjectIDCacheEntry {
 
 // GetKinds returns unique object kinds present in the cache (for cache-driven discovery).
 func (c *ObjectIDCache) GetKinds() []string {
-	unlock, ok := c.withRLockReady()
-	if !ok {
-		return nil
-	}
-	defer unlock()
-	internalKinds := map[string]bool{objects.KindBaseMetric: true}
-	out := make([]string, 0, len(c.byKind))
-	for k := range c.byKind {
-		if k != emptyValue && !internalKinds[k] {
-			out = append(out, k)
+	return withReadReady(c, func() []string {
+		internalKinds := map[string]bool{objects.KindBaseMetric: true}
+		out := make([]string, 0, len(c.byKind))
+		for k := range c.byKind {
+			if k != emptyValue && !internalKinds[k] {
+				out = append(out, k)
+			}
 		}
-	}
-	return out
+		return out
+	})
 }
 
 // CountByKind returns the number of cached object IDs per kind.
 func (c *ObjectIDCache) CountByKind() map[string]int {
-	unlock, ok := c.withRLockReady()
-	if !ok {
-		return nil
-	}
-	defer unlock()
-	if len(c.countByKind) > 0 {
-		out := make(map[string]int, len(c.countByKind))
-		for k, n := range c.countByKind {
-			out[k] = n
+	return withReadReady(c, func() map[string]int {
+		if len(c.countByKind) > 0 {
+			out := make(map[string]int, len(c.countByKind))
+			for k, n := range c.countByKind {
+				out[k] = n
+			}
+			return out
+		}
+		out := make(map[string]int, len(c.byKind))
+		for k, list := range c.byKind {
+			out[k] = len(list)
 		}
 		return out
-	}
-	out := make(map[string]int, len(c.byKind))
-	for k, list := range c.byKind {
-		out[k] = len(list)
-	}
-	return out
+	})
 }
 
 // ClearInMemoryCache clears the in-memory cache so IsPopulatedForProject returns false until

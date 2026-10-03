@@ -59,6 +59,43 @@ func buildLabelFilter(labels []string) string {
 	return b.String()
 }
 
+// matchNodeByID constructs a MATCH clause and parameter map for a node by ID and labels, respecting context namespace.
+func matchNodeByID(ctx context.Context, id string, labels []string) (string, map[string]any) {
+	labelFilter := buildLabelFilter(labels)
+	query := safeCypher("MATCH (n%s {id: $id})", labelFilter)
+	params := map[string]any{
+		objects.FieldKeyID: id,
+	}
+	if ns := getNamespaceFromContext(ctx); ns != "" {
+		query = safeCypher("MATCH (n%s {id: $id, namespace_id: $namespace_id})", labelFilter)
+		params[objects.FieldKeyNamespaceID] = ns
+	}
+	return query, params
+}
+
+// matchEdge constructs a MATCH clause and parameter map for an edge between two node IDs.
+func matchEdge(fromID, toID, edgeType string) (string, map[string]any) {
+	fromLabel := nodeLabelFromID(fromID)
+	toLabel := nodeLabelFromID(toID)
+	query := safeCypher("MATCH (a%s {id: $fromID})-[r:%s]->(b%s {id: $toID})", fromLabel, edgeType, toLabel)
+	params := map[string]any{
+		memgraphParamFromID: fromID,
+		memgraphParamToID:   toID,
+	}
+	return query, params
+}
+
+// applyLimitOffset appends LIMIT and SKIP clauses if specified in filter pagination.
+func applyLimitOffset(query string, limit, offset int) string {
+	if limit > 0 {
+		query += safeCypher(memgraphQueryLimitFmt, limit)
+	}
+	if offset > 0 {
+		query += safeCypher(memgraphQuerySkipFmt, offset)
+	}
+	return query
+}
+
 // Reset implements ConnectionWrapper.Reset
 // BaseConnection.Reset() is called automatically, but we can add provider-specific reset logic here
 func (c *memgraphConnection) Reset() {
@@ -189,17 +226,7 @@ func (c *memgraphConnection) GetNode(ctx context.Context, id string, labels []st
 		return nil, errors.New(memgraphErrBoltClientNotInitialized)
 	}
 
-	// Build label filter
-	labelFilter := buildLabelFilter(labels)
-
-	query := safeCypher("MATCH (n%s {id: $id})", labelFilter)
-	params := map[string]any{
-		objects.FieldKeyID: id,
-	}
-	if ns := getNamespaceFromContext(ctx); ns != "" {
-		query = safeCypher("MATCH (n%s {id: $id, namespace_id: $namespace_id})", labelFilter)
-		params[objects.FieldKeyNamespaceID] = ns
-	}
+	query, params := matchNodeByID(ctx, id, labels)
 	query += " RETURN n"
 
 	records, err := c.executeBoltQuery(ctx, query, params)
@@ -207,19 +234,7 @@ func (c *memgraphConnection) GetNode(ctx context.Context, id string, labels []st
 		return nil, err
 	}
 
-	// Parse response
-	if len(records) == 0 {
-		return nil, nil // Node not found
-	}
-
-	// Extract node from first record
-	record := records[0]
-	nodeValue, ok := record.Values[0].(neo4j.Node)
-	if !ok {
-		return nil, errfmt.Errorf("unexpected node format in response")
-	}
-
-	return convertNeo4jNode(nodeValue), nil
+	return parseSingleNode(records)
 }
 
 // UpdateNode updates a node's properties and labels
@@ -276,17 +291,7 @@ func (c *memgraphConnection) DeleteNode(ctx context.Context, id string, labels [
 		return errors.New(memgraphErrBoltClientNotInitialized)
 	}
 
-	// Build label filter
-	labelFilter := buildLabelFilter(labels)
-
-	query := safeCypher("MATCH (n%s {id: $id})", labelFilter)
-	params := map[string]any{
-		objects.FieldKeyID: id,
-	}
-	if ns := getNamespaceFromContext(ctx); ns != "" {
-		query = safeCypher("MATCH (n%s {id: $id, namespace_id: $namespace_id})", labelFilter)
-		params[objects.FieldKeyNamespaceID] = ns
-	}
+	query, params := matchNodeByID(ctx, id, labels)
 	query += " DETACH DELETE n"
 
 	_, err := c.executeBoltQuery(ctx, query, params)
@@ -323,12 +328,7 @@ func (c *memgraphConnection) ListNodes(ctx context.Context, filter provider.Node
 	query += memgraphQueryReturnN
 
 	// Add limit and offset
-	if filter.Limit > 0 {
-		query += safeCypher(memgraphQueryLimitFmt, filter.Limit)
-	}
-	if filter.Offset > 0 {
-		query += safeCypher(memgraphQuerySkipFmt, filter.Offset)
-	}
+	query = applyLimitOffset(query, filter.Limit, filter.Offset)
 
 	records, err := c.executeBoltQuery(ctx, query, params)
 	if err != nil {
@@ -377,45 +377,15 @@ func (c *memgraphConnection) GetEdge(ctx context.Context, fromID, toID, edgeType
 		return nil, errors.New(memgraphErrBoltClientNotInitialized)
 	}
 
-	fromLabel := nodeLabelFromID(fromID)
-	toLabel := nodeLabelFromID(toID)
-	query := safeCypher("MATCH (a%s {id: $fromID})-[r:%s]->(b%s {id: $toID}) RETURN r, a.id AS fromID, b.id AS toID", fromLabel, edgeType, toLabel)
-	params := map[string]any{
-		memgraphParamFromID: fromID,
-		memgraphParamToID:   toID,
-	}
+	query, params := matchEdge(fromID, toID, edgeType)
+	query += " RETURN r, a.id AS fromID, b.id AS toID"
 
 	records, err := c.executeBoltQuery(ctx, query, params)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(records) == 0 {
-		return nil, nil // Edge not found
-	}
-
-	// Extract edge from first record
-	record := records[0]
-	relValue, ok := record.Values[0].(neo4j.Relationship)
-	if !ok {
-		return nil, errfmt.Errorf("unexpected edge format in response")
-	}
-
-	// Get from/to IDs from record
-	recordFromID := fromID
-	recordToID := toID
-	if len(record.Values) > 1 {
-		if f, ok := record.Values[1].(string); ok {
-			recordFromID = f
-		}
-	}
-	if len(record.Values) > 2 {
-		if t, ok := record.Values[2].(string); ok {
-			recordToID = t
-		}
-	}
-
-	return convertNeo4jRelationship(relValue, recordFromID, recordToID), nil
+	return parseSingleEdge(records, fromID, toID)
 }
 
 // UpdateEdge updates an edge's properties
@@ -424,13 +394,7 @@ func (c *memgraphConnection) UpdateEdge(ctx context.Context, fromID, toID, edgeT
 		return errors.New(memgraphErrBoltClientNotInitialized)
 	}
 
-	fromLabel := nodeLabelFromID(fromID)
-	toLabel := nodeLabelFromID(toID)
-	query := safeCypher("MATCH (a%s {id: $fromID})-[r:%s]->(b%s {id: $toID})", fromLabel, edgeType, toLabel)
-	params := map[string]any{
-		memgraphParamFromID: fromID,
-		memgraphParamToID:   toID,
-	}
+	query, params := matchEdge(fromID, toID, edgeType)
 
 	// Update properties
 	if len(updates.Properties) > 0 {
@@ -460,13 +424,8 @@ func (c *memgraphConnection) DeleteEdge(ctx context.Context, fromID, toID, edgeT
 		return errors.New(memgraphErrBoltClientNotInitialized)
 	}
 
-	fromLabel := nodeLabelFromID(fromID)
-	toLabel := nodeLabelFromID(toID)
-	query := safeCypher("MATCH (a%s {id: $fromID})-[r:%s]->(b%s {id: $toID}) DELETE r", fromLabel, edgeType, toLabel)
-	params := map[string]any{
-		memgraphParamFromID: fromID,
-		memgraphParamToID:   toID,
-	}
+	query, params := matchEdge(fromID, toID, edgeType)
+	query += " DELETE r"
 
 	_, err := c.executeBoltQuery(ctx, query, params)
 	return err
@@ -516,12 +475,7 @@ func (c *memgraphConnection) ListEdges(ctx context.Context, filter provider.Edge
 	query += " RETURN a.id AS fromID, b.id AS toID, type(r) AS type, r AS properties"
 
 	// Add limit and offset
-	if filter.Limit > 0 {
-		query += safeCypher(memgraphQueryLimitFmt, filter.Limit)
-	}
-	if filter.Offset > 0 {
-		query += safeCypher(memgraphQuerySkipFmt, filter.Offset)
-	}
+	query = applyLimitOffset(query, filter.Limit, filter.Offset)
 
 	records, err := c.executeBoltQuery(ctx, query, params)
 	if err != nil {
