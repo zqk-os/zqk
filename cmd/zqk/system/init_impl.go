@@ -400,22 +400,9 @@ func runGreenfieldInit(projectRoot, projectName, template string, force bool, lo
 		// Don't fail init if bootstrap extraction fails - user can fix manually
 	}
 
-	// Persist bundled object_spec rows from .zqk/specs/objects.
-	if _, err := migration.EnsureBundledObjectSpecsMigrated(context.Background(), projectRoot, logger); err != nil {
-		logging.Fluent(logger).Warn("Bundled object_spec migration did not complete").
-			WithError(err).
-			String("note", paths.RewriteCanonicalCLIInvocations("Run from repo after fixing storage, or use zqk spec list (file fallback)")).
-			Log()
-	}
-
-	// Register shipped documentation in doc_entry graph (architecture, best-practices, onboarding).
-	// Skips archive trees and docs/launch.
-	if err := registerShippedDocsHelper(projectRoot, logger); err != nil {
+	if err := seedBundledSpecsAndDocs(projectRoot, logger, progress); err != nil {
 		return err
 	}
-
-	progress.Step(3, 7, "Seeding starter kernel graph (goals, plans, milestones)...")
-	seedInitialSystemAndKernelGraph(projectRoot, logger)
 
 	// Create project YAML SSOT at config/zqk.yaml
 	if err := writeProjectConfigFiles(projectDataDir, projectName, template, force); err != nil {
@@ -534,20 +521,9 @@ func runLegacyInit(projectRoot, projectName, template string, force bool, logger
 				Log()
 		}
 	}
-	if _, err := migration.EnsureBundledObjectSpecsMigrated(context.Background(), projectRoot, logger); err != nil {
-		logging.Fluent(logger).Warn("Bundled object_spec migration did not complete").
-			WithError(err).
-			String("note", paths.RewriteCanonicalCLIInvocations("Run from repo after fixing storage, or use zqk spec list (file fallback)")).
-			Log()
-	}
-
-	// Register shipped documentation in doc_entry graph (architecture, best-practices, onboarding).
-	if err := registerShippedDocsHelper(projectRoot, logger); err != nil {
+	if err := seedBundledSpecsAndDocs(projectRoot, logger, progress); err != nil {
 		return err
 	}
-
-	progress.Step(3, 7, "Seeding starter kernel graph (goals, plans, milestones)...")
-	seedInitialSystemAndKernelGraph(projectRoot, logger)
 
 	// Write root isolation and kernel config files
 	if err := writeRootIsolationFiles(projectRoot, force, logger); err != nil {
@@ -1290,4 +1266,21 @@ func isIgnoredInitEntry(projectRoot string, entry fileutil.DirEntry) bool {
 		}
 	}
 	return false
+}
+
+func seedBundledSpecsAndDocs(projectRoot string, logger logging.Logger, progress *initProgress) error {
+	if _, err := migration.EnsureBundledObjectSpecsMigrated(context.Background(), projectRoot, logger); err != nil {
+		logging.Fluent(logger).Warn("Bundled object_spec migration did not complete").
+			WithError(err).
+			String("note", paths.RewriteCanonicalCLIInvocations("Run from repo after fixing storage, or use zqk spec list (file fallback)")).
+			Log()
+	}
+
+	if err := registerShippedDocsHelper(projectRoot, logger); err != nil {
+		return err
+	}
+
+	progress.Step(3, 7, "Seeding starter kernel graph (goals, plans, milestones)...")
+	seedInitialSystemAndKernelGraph(projectRoot, logger)
+	return nil
 }

@@ -384,20 +384,17 @@ func runCheckAsyncWithFollow(cmd *cobra.Command, args []string, timeout time.Dur
 	if cmd != nil {
 		fmt.Fprintf(cmd.ErrOrStderr(), "System check starting...\n")
 	}
-	ctx, err := resolveSystemCliContextWithFallback(cmd)
+	setup, err := prepareAsyncCheckCoordination(cmd, resolveSystemCliContextWithFallback)
 	if err != nil {
 		return err
 	}
+	defer setup.cleanup()
 
-	// Generate operation ID before starting
-	operationID := fmt.Sprintf("check_%d", time.Now().UnixNano())
-
-	// Get project root and storage provider for coordination
-	projectRoot := ProjectRootOrResolve(ctx.ProjectRoot)
-	storageProvider, cleanup := initCheckCoordinationStorage(projectRoot)
-	defer cleanup()
-
-	profile := profileOrDefault(ctx.Profile, systemProfileHuman)
+	operationID := setup.operationID
+	projectRoot := setup.projectRoot
+	storageProvider := setup.storageProvider
+	profile := setup.profile
+	ctx := setup.cliCtx
 
 	// Subscribe to coordinator events BEFORE starting background work to avoid missing early events
 	coordinator := coordination.GetCoordinator()

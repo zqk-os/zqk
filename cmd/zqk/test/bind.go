@@ -87,9 +87,7 @@ func executeExplicitBinding(
 	}
 
 	ui := cli.StandardUIPalette()
-	green := ui.Green
-	cyan := ui.Cyan
-	bold := ui.Bold
+	bold, cyan, green := ui.Bold, ui.Cyan, ui.Green
 
 	// 1. Bind requirement or backlog item to test case
 	if reqID != "" {
@@ -170,21 +168,7 @@ func displayBindingAssistant(
 	dim := color.New(color.Faint).SprintFunc()
 
 	// Load available requirements and goals for matching (filter out completed/archived, project needed fields)
-	activeStatusFilter := map[string]any{
-		objects.FieldKeyStatus: map[string]any{"$nin": []any{objects.ObjectStatusComplete, objects.ObjectStatusArchived}},
-	}
-	reqFields := []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyGoalRefs}
-	goalFields := []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus}
-	reqList, _ := sp.List(ctx, secCtx, nil, storage.ListFilter{
-		Kind:    objects.KindRequirement,
-		Filters: activeStatusFilter,
-		Fields:  reqFields,
-	})
-	goalList, _ := sp.List(ctx, secCtx, nil, storage.ListFilter{
-		Kind:    objects.KindGoal,
-		Filters: activeStatusFilter,
-		Fields:  goalFields,
-	})
+	reqList, goalList := listActiveRequirementsAndGoals(ctx, sp, secCtx)
 
 	var brokenTCs []*TestCaseModel
 	for _, tcID := range state.TestCaseOrder {
@@ -274,30 +258,11 @@ func executeAutoBinding(
 	dryRun bool,
 	cmd *cobra.Command,
 ) error {
+	sp, secCtx, projectRoot := proc.Storage(), proc.SecurityContext(), proc.ProjectRoot()
+	reqList, goalList := listActiveRequirementsAndGoals(ctx, sp, secCtx)
+
 	ui := cli.StandardUIPalette()
-	green := ui.Green
-	cyan := ui.Cyan
-	bold := ui.Bold
-
-	sp := proc.Storage()
-	secCtx := proc.SecurityContext()
-	projectRoot := proc.ProjectRoot()
-
-	activeStatusFilter := map[string]any{
-		objects.FieldKeyStatus: map[string]any{"$nin": []any{objects.ObjectStatusComplete, objects.ObjectStatusArchived}},
-	}
-	reqFields := []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyGoalRefs}
-	goalFields := []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus}
-	reqList, _ := sp.List(ctx, secCtx, nil, storage.ListFilter{
-		Kind:    objects.KindRequirement,
-		Filters: activeStatusFilter,
-		Fields:  reqFields,
-	})
-	goalList, _ := sp.List(ctx, secCtx, nil, storage.ListFilter{
-		Kind:    objects.KindGoal,
-		Filters: activeStatusFilter,
-		Fields:  goalFields,
-	})
+	bold, cyan, green := ui.Bold, ui.Cyan, ui.Green
 
 	boundCount := 0
 
@@ -472,3 +437,24 @@ func cleanLegacyFields(obj map[string]any) {
 		}
 	}
 }
+
+func listActiveRequirementsAndGoals(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext) (*storage.QueryResult, *storage.QueryResult) {
+	activeStatusFilter := map[string]any{
+		objects.FieldKeyStatus: map[string]any{"$nin": []any{objects.ObjectStatusComplete, objects.ObjectStatusArchived}},
+	}
+	reqFields := []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyGoalRefs}
+	goalFields := []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus}
+	reqList, _ := sp.List(ctx, secCtx, nil, storage.ListFilter{
+		Kind:    objects.KindRequirement,
+		Filters: activeStatusFilter,
+		Fields:  reqFields,
+	})
+	goalList, _ := sp.List(ctx, secCtx, nil, storage.ListFilter{
+		Kind:    objects.KindGoal,
+		Filters: activeStatusFilter,
+		Fields:  goalFields,
+	})
+	return reqList, goalList
+}
+
+

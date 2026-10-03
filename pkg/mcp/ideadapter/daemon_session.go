@@ -120,9 +120,7 @@ func (s *daemonSession) reconnect() error {
 	s.writer = bufio.NewWriter(conn)
 	s.xport = mcp.NewDefaultTransport()
 	s.closing.Store(false)
-	s.alive.Store(true)
-	s.initialized.Store(false)
-	s.subscribed.Store(false)
+	s.resetSessionFlags(true)
 	s.mu.Unlock()
 
 	goroutinelabels.NewGoroutine("mcp_ide_adapter", "daemon session read loop").
@@ -138,6 +136,12 @@ func (s *daemonSession) reconnect() error {
 	return nil
 }
 
+func (s *daemonSession) resetSessionFlags(alive bool) {
+	s.alive.Store(alive)
+	s.initialized.Store(false)
+	s.subscribed.Store(false)
+}
+
 func (s *daemonSession) closeConn() {
 	s.closing.Store(true)
 	s.mu.Lock()
@@ -146,9 +150,7 @@ func (s *daemonSession) closeConn() {
 	s.conn = nil
 	s.reader = nil
 	s.writer = nil
-	s.alive.Store(false)
-	s.initialized.Store(false)
-	s.subscribed.Store(false)
+	s.resetSessionFlags(false)
 	s.mu.Unlock()
 	if conn != nil {
 		_ = conn.Close()

@@ -1,8 +1,13 @@
 package llm
 
 import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"net/http"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/specbuilder"
 )
 
@@ -39,3 +44,26 @@ func newLLMAPIClient(name, baseURL string, timeout time.Duration) specbuilder.AP
 	}
 	return apiClient
 }
+
+func createJSONPostRequest(ctx context.Context, url string, payload any) (*http.Request, error) {
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return nil, errfmt.Newf("failed to marshal payload").Wrap(err)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(body))
+	if err != nil {
+		return nil, errfmt.Newf("failed to create request").Wrap(err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+	return req, nil
+}
+
+func executeHTTPRequest(client specbuilder.APIClient, req *http.Request) (*http.Response, error) {
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, errfmt.Newf("request failed").Wrap(err)
+	}
+	return resp, nil
+}
+

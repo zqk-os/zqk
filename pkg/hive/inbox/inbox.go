@@ -99,7 +99,7 @@ func (i *memoryInbox) getPendingEnvelopeLocked(id string) (*TDEEnvelope, error) 
 	return env, nil
 }
 
-func (i *memoryInbox) Approve(id string) error {
+func (i *memoryInbox) updatePendingEnvelopeStatus(id string, updateFn func(*TDEEnvelope)) error {
 	i.mu.Lock()
 	defer i.mu.Unlock()
 
@@ -107,19 +107,20 @@ func (i *memoryInbox) Approve(id string) error {
 	if err != nil {
 		return err
 	}
-	env.Status = StatusApproved
+	updateFn(env)
 	return nil
+}
+
+func (i *memoryInbox) Approve(id string) error {
+	return i.updatePendingEnvelopeStatus(id, func(env *TDEEnvelope) {
+		env.Status = StatusApproved
+	})
 }
 
 func (i *memoryInbox) Reject(id string, reason string) error {
-	i.mu.Lock()
-	defer i.mu.Unlock()
-
-	env, err := i.getPendingEnvelopeLocked(id)
-	if err != nil {
-		return err
-	}
-	env.Status = StatusRejected
-	env.RejectReason = reason
-	return nil
+	return i.updatePendingEnvelopeStatus(id, func(env *TDEEnvelope) {
+		env.Status = StatusRejected
+		env.RejectReason = reason
+	})
 }
+

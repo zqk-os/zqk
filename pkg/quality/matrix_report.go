@@ -90,23 +90,18 @@ func SummarizeMatrixCSV(csvPath string, prof *MatrixProfileYAML, doneVals map[st
 	if err != nil {
 		return nil, err
 	}
-	defer cr.Close()
 	cr.reader.ReuseRecord = true
+	defer cr.Close()
 
-	var (
-		r      = cr.reader
-		header = cr.header
-		colIdx = cr.colIdx
-	)
 	gates := prof.Completion.GateColumns
 	for _, g := range gates {
-		if _, ok := colIdx[g]; !ok {
+		if _, ok := cr.colIdx[g]; !ok {
 			return nil, errfmt.Errorf("csv missing gate column %q", g)
 		}
 	}
 	filePathIdx := -1
 	for _, name := range []string{"file_path", "bundle_label"} {
-		if i, ok := colIdx[name]; ok {
+		if i, ok := cr.colIdx[name]; ok {
 			filePathIdx = i
 			break
 		}
@@ -125,14 +120,14 @@ func SummarizeMatrixCSV(csvPath string, prof *MatrixProfileYAML, doneVals map[st
 	fullyDone := 0
 
 	for {
-		rec, err := r.Read()
+		rec, err := cr.reader.Read()
 		if err == io.EOF {
 			break
 		}
 		if err != nil {
 			return nil, err
 		}
-		if len(rec) < len(header) {
+		if len(rec) < len(cr.header) {
 			continue
 		}
 		if goOnly && filePathIdx >= 0 {
@@ -146,7 +141,7 @@ func SummarizeMatrixCSV(csvPath string, prof *MatrixProfileYAML, doneVals map[st
 		rowAllDone := true
 		for _, g := range gates {
 			raw := ""
-			if j := colIdx[g]; j < len(rec) {
+			if j := cr.colIdx[g]; j < len(rec) {
 				raw = strings.TrimSpace(rec[j])
 			}
 			v := strings.ToLower(raw)

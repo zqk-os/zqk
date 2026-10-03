@@ -64,12 +64,19 @@ func (u *Updater) Run(ctx context.Context) error {
 	}
 }
 
-func (u *Updater) apply(ctx context.Context, req TransitionRequest) error {
-	provider, ok := u.getStorage(u.projectRoot)
-	if !ok {
-		return nil
+func resolveStorageProvider(getStorage StorageProvider, projectRoot string) (storage.ObjectStorageProvider, bool) {
+	if projectRoot == emptyValue || getStorage == nil {
+		return nil, false
 	}
-	provider, ok = nildecode.DecodeNonNilPayload[storage.ObjectStorageProvider](provider)
+	provider, ok := getStorage(projectRoot)
+	if !ok {
+		return nil, false
+	}
+	return nildecode.DecodeNonNilPayload[storage.ObjectStorageProvider](provider)
+}
+
+func (u *Updater) apply(ctx context.Context, req TransitionRequest) error {
+	provider, ok := resolveStorageProvider(u.getStorage, u.projectRoot)
 	if !ok {
 		return nil
 	}

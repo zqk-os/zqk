@@ -15,7 +15,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/zqk-os/zqk/pkg/cliapp"
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/fitness"
 	"github.com/zqk-os/zqk/pkg/logging"
@@ -244,13 +243,7 @@ func autoFixIssues(
 
 // createStorageProviderForAutoFix creates a storage provider for auto-fix operations
 func createStorageProviderForAutoFix(ctx *cli.Context) storage.ObjectStorageProvider {
-	projectRoot := ProjectRootOrResolve(ctx.ProjectRoot)
-	stdctx := pkgctx.NewSystemContext()
-	storageFactory, err := storage.NewStorageFactory(stdctx, projectRoot)
-	if err != nil || storageFactory == nil {
-		return nil
-	}
-	return storageFactory.GetStorage()
+	return getStorageProviderForCache(ProjectRootOrResolve(ctx.ProjectRoot))
 }
 
 // logSkippedIssue logs when an issue is skipped during auto-fix

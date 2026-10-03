@@ -411,13 +411,9 @@ func (c *OpenAIClient) GenerateIntent(ctx context.Context, code string) (string,
 }
 
 func (c *OpenAIClient) GenerateCompletion(ctx context.Context, prompt string, system string) (string, error) {
-	if c.shouldMock() {
-		return `["ZQK Observer Tip: APIKey missing, cannot generate dynamic tips."]`, nil
-	}
-
-	sanitizedPrompt, err := SanitizeUntrustedText(prompt)
-	if err != nil {
-		return "", errfmt.Newf("sanitizing prompt").Wrap(err)
+	sanitizedPrompt, isMock, err := SanitizeOrMockPrompt(c.shouldMock(), prompt)
+	if isMock || err != nil {
+		return sanitizedPrompt, err
 	}
 
 	messages := []map[string]string{}
@@ -601,43 +597,50 @@ func (c *OpenAIClient) DescribeScene(ctx context.Context, frames [][]byte) (stri
 	return c.doUserChatCompletion(ctx, content, 500)
 }
 
-func (c *OpenAIClient) SemanticCompare(ctx context.Context, observedDescription string, expectedNarrative string) (float64, error) {
-	embObserved, err := c.GenerateEmbedding(ctx, observedDescription)
+// GenerateComparisonEmbeddings generates embeddings for observed and expected texts and verifies equal dimensions.
+func GenerateComparisonEmbeddings(ctx context.Context, embedFn func(context.Context, string) ([]float32, error), observed, expected string) ([]float32, []float32, error) {
+	embObserved, err := embedFn(ctx, observed)
 	if err != nil {
-		return 0, errfmt.Newf("failed to generate embedding for observed description").Wrap(err)
+		return nil, nil, errfmt.Newf("failed to generate embedding for observed description").Wrap(err)
 	}
 
-	embExpected, err := c.GenerateEmbedding(ctx, expectedNarrative)
+	embExpected, err := embedFn(ctx, expected)
 	if err != nil {
-		return 0, errfmt.Newf("failed to generate embedding for expected narrative").Wrap(err)
+		return nil, nil, errfmt.Newf("failed to generate embedding for expected narrative").Wrap(err)
 	}
 
 	if len(embObserved) != len(embExpected) {
-		return 0, errfmt.Errorf("embedding lengths do not match: %d vs %d", len(embObserved), len(embExpected))
+		return nil, nil, errfmt.Errorf("embedding lengths do not match: %d vs %d", len(embObserved), len(embExpected))
+	}
+	return embObserved, embExpected, nil
+}
+
+func SanitizeOrMockPrompt(shouldMock bool, prompt string) (string, bool, error) {
+	if shouldMock {
+		return `["ZQK Observer Tip: APIKey missing, cannot generate dynamic tips."]`, true, nil
+	}
+	sanitized, err := SanitizeUntrustedText(prompt)
+	if err != nil {
+		return "", false, errfmt.Newf("sanitizing prompt").Wrap(err)
+	}
+	return sanitized, false, nil
+}
+
+func CompareEmbeddings(ctx context.Context, embedFn func(context.Context, string) ([]float32, error), observedDescription, expectedNarrative string) (float64, error) {
+	embObserved, embExpected, err := GenerateComparisonEmbeddings(ctx, embedFn, observedDescription, expectedNarrative)
+	if err != nil {
+		return 0, err
 	}
 
 	var dotProduct float64
-	var normA float64
-	var normB float64
-
 	for i := range embObserved {
-		valA := float64(embObserved[i])
-		valB := float64(embExpected[i])
-		dotProduct += valA * valB
-		normA += valA * valA
-		normB += valB * valB
+		dotProduct += float64(embObserved[i]) * float64(embExpected[i])
 	}
-
-	if normA == 0 || normB == 0 {
-		return 0, nil // Handle zero vector case gracefully
-	}
-
-	// Not doing math.Sqrt to avoid importing math just for this, since embeddings are usually unit normalized,
-	// but we'll approximate/cast if needed, or we can just import math.
-	// Actually, wait, let's just use a simple dot product if normalized, or import math for safety.
-	// Since we can't easily add math without re-parsing, let's assume OpenAI embeddings are normalized (normA ≈ 1, normB ≈ 1).
-	// To be safe, we'll just return dotProduct directly.
 	return dotProduct, nil
+}
+
+func (c *OpenAIClient) SemanticCompare(ctx context.Context, observedDescription string, expectedNarrative string) (float64, error) {
+	return CompareEmbeddings(ctx, c.GenerateEmbedding, observedDescription, expectedNarrative)
 }
 
 //nolint:unparam

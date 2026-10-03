@@ -3,7 +3,6 @@ package mcp
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -13,7 +12,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
-	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/handslapper"
 )
 
@@ -239,36 +237,7 @@ func extractFirstCompleteJSONObject(output string) string {
 // MCP tools do not get empty_output when the result is on the wrong stream.
 // Returns a result map with error information if parsing fails.
 func parseCommandOutput(output string, stderr bytes.Buffer) map[string]any {
-	toParse := output
-	if toParse == emptyValue && stderr.Len() > 0 {
-		stderrStr := strings.TrimSpace(stderr.String())
-		// Only treat stderr as result if it looks like a single JSON object (CLI result)
-		if strings.HasPrefix(stderrStr, "{") {
-			toParse = stderrStr
-		}
-	}
-	if toParse == emptyValue {
-		builder := NewCommandResultBuilder("", nil).
-			WithError(errfmt.Errorf("command output was empty")).
-			WithStderr(stderr).
-			WithErrorCode(InvalidParameter).
-			WithErrorType("empty_output").
-			WithData("output", "")
-		if stderr.Len() > 0 {
-			stderrStr := stderr.String()
-			if strings.Contains(stderrStr, "[warn]") || strings.Contains(stderrStr, "[error]") {
-				builder.WithData("warning", "Command output was empty - fallback log messages detected in stderr")
-			}
-		}
-		return builder.Build()
-	}
-
-	var result map[string]any
-	decoder := json.NewDecoder(strings.NewReader(toParse))
-	if err := decoder.Decode(&result); err != nil {
-		return buildParseErrorResult(toParse, stderr, err)
-	}
-	return result
+	return ParseCommandOutput(output, stderr)
 }
 
 // buildParseErrorResult builds an error result when JSON parsing fails

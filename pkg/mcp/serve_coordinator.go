@@ -277,12 +277,7 @@ func (sc *ServeCoordinator) endConnectionOnly(reason string, writer *bufio.Write
 	return true
 }
 
-// handleIdleTimeout handles idle timeout during read
-func (sc *ServeCoordinator) handleIdleTimeout(serverCtx context.Context, writer *bufio.Writer, trace bool, traceWriter io.Writer, contextStr string) error {
-	sc.timeoutShutdownsTotal.Add(1)
-	timeoutDuration := sc.getTimeoutDuration()
-	reason := fmt.Sprintf("idle timeout %s (configured: %s): %s", contextStr, timeoutDuration, serverCtx.Err().Error())
-
+func (sc *ServeCoordinator) shutdownIdleSession(reason string, writer *bufio.Writer) (bool, error) {
 	sc.server.traceLogf("[MCP_INFO] Shutdown triggered: %s", reason)
 
 	MarkSessionDisconnected(sc.server)
@@ -293,7 +288,25 @@ func (sc *ServeCoordinator) handleIdleTimeout(serverCtx context.Context, writer 
 	})
 
 	if sc.endConnectionOnly(reason, writer) {
-		return io.EOF
+		return true, io.EOF
+	}
+	return false, nil
+}
+
+func (sc *ServeCoordinator) finalizeShutdown(reason string, writer *bufio.Writer) error {
+	_ = writer.Flush()
+	sc.server.shutdownSequence(reason)
+	return nil
+}
+
+// handleIdleTimeout handles idle timeout during read
+func (sc *ServeCoordinator) handleIdleTimeout(serverCtx context.Context, writer *bufio.Writer, trace bool, traceWriter io.Writer, contextStr string) error {
+	sc.timeoutShutdownsTotal.Add(1)
+	timeoutDuration := sc.getTimeoutDuration()
+	reason := fmt.Sprintf("idle timeout %s (configured: %s): %s", contextStr, timeoutDuration, serverCtx.Err().Error())
+
+	if handled, err := sc.shutdownIdleSession(reason, writer); handled {
+		return err
 	}
 
 	// Send notification to client
@@ -319,9 +332,7 @@ func (sc *ServeCoordinator) handleIdleTimeout(serverCtx context.Context, writer 
 			})
 	}
 
-	_ = writer.Flush()
-	sc.server.shutdownSequence(reason)
-	return nil // Clean exit
+	return sc.finalizeShutdown(reason, writer)
 }
 
 // handleClientDisconnect handles client disconnect (EOF)
@@ -415,17 +426,8 @@ func (sc *ServeCoordinator) handleTimeout(serverCtx context.Context, writer *buf
 	timeoutDuration := sc.getTimeoutDuration()
 	reason := fmt.Sprintf("idle timeout in serve loop (configured: %s): %s", timeoutDuration, timeoutErr.Error())
 
-	sc.server.traceLogf("[MCP_INFO] Shutdown triggered: %s", reason)
-
-	MarkSessionDisconnected(sc.server)
-
-	eventCtx := sc.server.getClientEventContext()
-	eventCtx.RecordEvent("disconnect", map[string]any{
-		objects.FieldKeyReason: "idle_timeout",
-	})
-
-	if sc.endConnectionOnly(reason, writer) {
-		return io.EOF
+	if handled, err := sc.shutdownIdleSession(reason, writer); handled {
+		return err
 	}
 
 	_ = sc.server.SendLogInfo("MCP server graceful shutdown: idle timeout", //nolint:errcheck
@@ -452,9 +454,7 @@ func (sc *ServeCoordinator) handleTimeout(serverCtx context.Context, writer *buf
 			})
 	}
 
-	_ = writer.Flush()
-	sc.server.shutdownSequence(reason)
-	return nil // Clean exit
+	return sc.finalizeShutdown(reason, writer)
 }
 
 // handleExplicitShutdown handles explicit shutdown request

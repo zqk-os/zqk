@@ -77,3 +77,15 @@ type ZQLProgram struct {
 	Type       string      `json:"type"` // "Program"
 	Statements []Statement `json:"statements"`
 }
+
+// ApplyDryRunIsolation sets IsolationDryRun on all StmtBeginTransaction statements in the program.
+func (p *ZQLProgram) ApplyDryRunIsolation() {
+	if p == nil {
+		return
+	}
+	for i := range p.Statements {
+		if p.Statements[i].NodeType == StmtBeginTransaction {
+			p.Statements[i].IsolationLevel = IsolationDryRun
+		}
+	}
+}

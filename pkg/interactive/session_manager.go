@@ -93,9 +93,7 @@ func (ism *InteractiveSessionManager) GetSession(sessionID string) (*Interactive
 	_ = concurrency.RunInRLockWithLogger(
 		&ism.mu, LockNameSessionManagerGet, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 		func() error {
-			var ok bool
-			session, ok = ism.sessions[sessionID]
-			exists = ok
+			session, exists = ism.sessions[sessionID]
 			timeout = ism.timeout
 			return nil
 		},
@@ -115,32 +113,7 @@ func (ism *InteractiveSessionManager) GetSession(sessionID string) (*Interactive
 
 // UpdateSession updates an existing session
 func (ism *InteractiveSessionManager) UpdateSession(sessionID string, loopState *LoopState) error {
-	var session *InteractiveSessionState
-	var exists bool
-	var timeout time.Duration
-	err := concurrency.RunInLockWithLogger(
-		&ism.mu, LockNameSessionManagerUpdate, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
-		func() error {
-			var ok bool
-			session, ok = ism.sessions[sessionID]
-			exists = ok
-			timeout = ism.timeout
-			if !exists {
-				return errfmt.Errorf("session not found: %s", sessionID)
-			}
-
-			// Check if session has expired
-			if time.Since(session.LastUpdatedAt) > timeout {
-				delete(ism.sessions, sessionID)
-				return errfmt.Errorf("session expired: %s", sessionID)
-			}
-
-			session.LoopState = loopState
-			session.LastUpdatedAt = time.Now()
-			return nil
-		},
-	)
-	return err
+	return ism.UpdateSessionWithBuilder(sessionID, loopState, nil, "")
 }
 
 // UpdateSessionWithBuilder updates an existing session with builder (if provided)

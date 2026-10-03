@@ -208,11 +208,11 @@ func HandleResolveReferences(ctx context.Context, args map[string]any) (any, err
 	}
 
 	includeRelated, _ := args["include_related"].(bool)
-	format := getFormatArg(args)
 	graphMgr, err := getEnabledGraphManager()
 	if err != nil {
 		return nil, err
 	}
+	format := getFormatArg(args)
 
 	// Extract depth and timeout parameters (optional)
 	maxDepth := DefaultGraphMaxDepth // Default: only direct relationships

@@ -204,15 +204,15 @@ func (sr *SamplerRegistry) GetSampler(objectKind, fieldName, metricType string) 
 func (sr *SamplerRegistry) GetOrCreateSampler(objectKind, fieldName, metricType string) (*Sampler, error) {
 	key := sr.getSamplerKey(objectKind, fieldName, metricType)
 
-	var sampler *Sampler
-	var exists bool
-	var atCap bool
+	var (
+		sampler *Sampler
+		exists  bool
+		atCap   bool
+	)
 	_ = concurrency.RunInLockWithLogger(
 		&sr.mu, LockNameSamplerRegistryGetOrCreateCheck, sr.lockLog,
 		func() error {
-			var ok bool
-			sampler, ok = sr.samplers[key]
-			exists = ok
+			sampler, exists = sr.samplers[key]
 			atCap = sr.distinctSamplerCountLocked() >= maxSamplers
 			return nil
 		},
@@ -370,16 +370,15 @@ func (sr *SamplerRegistry) GetOrCreatePipelineSampleSampler() (*Sampler, error) 
 func (sr *SamplerRegistry) UnregisterSampler(objectKind, fieldName, metricType string) error {
 	key := sr.getSamplerKey(objectKind, fieldName, metricType)
 
-	var sampler *Sampler
-	var exists bool
-	var refsLeft int
+	var (
+		sampler  *Sampler
+		exists   bool
+		refsLeft int
+	)
 	_ = concurrency.RunInLockWithLogger(
 		&sr.mu, LockNameSamplerRegistryUnregisterCopy, sr.lockLog,
 		func() error {
-			var ok bool
-			sampler, ok = sr.samplers[key]
-			exists = ok
-			if exists {
+			if sampler, exists = sr.samplers[key]; exists {
 				delete(sr.samplers, key)
 				delete(sr.configs, key)
 				if sampler != nil {

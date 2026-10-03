@@ -39,42 +39,45 @@ func (r *Registry) GetByParts(objectKind, pipelineKind, intent string) (*Definit
 	return r.Get(CompositionKey{ObjectKind: objectKind, PipelineKind: pipelineKind, Intent: intent})
 }
 
-// Len returns the number of definitions.
-func (r *Registry) Len() int {
+func (r *Registry) withRLock(fn func()) {
 	if r == nil {
-		return 0
+		return
 	}
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-	return len(r.byKey)
+	fn()
+}
+
+// Len returns the number of definitions.
+func (r *Registry) Len() int {
+	var count int
+	r.withRLock(func() {
+		count = len(r.byKey)
+	})
+	return count
 }
 
 // All returns a snapshot of all definitions.
 func (r *Registry) All() []*Definition {
-	if r == nil {
-		return nil
-	}
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	out := make([]*Definition, 0, len(r.byKey))
-	for _, d := range r.byKey {
-		out = append(out, d)
-	}
+	var out []*Definition
+	r.withRLock(func() {
+		out = make([]*Definition, 0, len(r.byKey))
+		for _, d := range r.byKey {
+			out = append(out, d)
+		}
+	})
 	return out
 }
 
 // CoverageCount returns how many definitions exist for objectKind (any intent).
 func (r *Registry) CoverageCount(objectKind string) int {
-	if r == nil {
-		return 0
-	}
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	n := 0
-	for _, d := range r.byKey {
-		if d.Key.ObjectKind == objectKind {
-			n++
+	var n int
+	r.withRLock(func() {
+		for _, d := range r.byKey {
+			if d.Key.ObjectKind == objectKind {
+				n++
+			}
 		}
-	}
+	})
 	return n
 }

@@ -97,7 +97,7 @@ func scopeMapToKey(m map[string]string) string {
 	if len(m) == 0 {
 		return emptyValue
 	}
-	keys := make([]string, 0, len(m))
+	var keys []string
 	for k := range m {
 		keys = append(keys, k)
 	}

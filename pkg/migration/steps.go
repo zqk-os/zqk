@@ -476,14 +476,7 @@ func (e *Executor) executeCreateObjectsStep(ctx context.Context, _ *Spec, step *
 		created++
 	}
 
-	result.Output[mstepKeyCreated] = created
-	result.Output[objfield.FieldKeySkipped] = skipped
-	result.Output[mstepKeyErrors] = errors
-	result.Metadata[mstepKeyCreated] = created
-	result.Metadata[objfield.FieldKeySkipped] = skipped
-	result.Metadata[mstepKeyErrors] = errors
-	result.Success = errors == 0
-
+	result.recordCountStats(mstepKeyCreated, created, skipped, errors)
 	return result
 }
 
@@ -633,12 +626,7 @@ func (e *Executor) executeReadObjectsStep(ctx context.Context, step *Step, stepO
 	}
 
 	result.Output[mstepKeyItems] = objects
-	result.Output[mstepKeyCount] = len(objects)
-	result.Output[mstepKeyErrors] = errors
-	result.Metadata[mstepKeyCount] = len(objects)
-	result.Metadata[mstepKeyErrors] = errors
-	result.Success = errors == 0
-
+	result.recordStats(mstepKeyCount, len(objects), errors)
 	return result
 }
 
@@ -794,13 +782,7 @@ func (e *Executor) executeDeleteObjectsStep(ctx context.Context, step *Step, ste
 		deleted++
 	}
 
-	result.Output[mstepKeyDeleted] = deleted
-	result.Output[objfield.FieldKeySkipped] = skipped
-	result.Output[mstepKeyErrors] = errors
-	result.Metadata[mstepKeyDeleted] = deleted
-	result.Metadata[objfield.FieldKeySkipped] = skipped
-	result.Metadata[mstepKeyErrors] = errors
-	result.Success = errors == 0
+	result.recordCountStats(mstepKeyDeleted, deleted, skipped, errors)
 	if errors > 0 {
 		// Include the last error if available
 		result.Error = errfmt.Errorf("failed to delete %d object(s); last error: %v", errors, result.Error)
@@ -890,4 +872,18 @@ func (e *Executor) executeCommandStep(ctx context.Context, step *Step, _ map[str
 		result.Error = errfmt.Errorf("command exited with code %d: %s", exitCode, strings.TrimSpace(string(stdout)))
 	}
 	return result
+}
+
+func (r *StepResult) recordStats(primaryKey string, primaryVal any, errors int) {
+	r.Output[primaryKey] = primaryVal
+	r.Output[mstepKeyErrors] = errors
+	r.Metadata[primaryKey] = primaryVal
+	r.Metadata[mstepKeyErrors] = errors
+	r.Success = errors == 0
+}
+
+func (r *StepResult) recordCountStats(primaryKey string, primaryVal any, skipped, errors int) {
+	r.recordStats(primaryKey, primaryVal, errors)
+	r.Output[objfield.FieldKeySkipped] = skipped
+	r.Metadata[objfield.FieldKeySkipped] = skipped
 }

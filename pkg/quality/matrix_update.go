@@ -2,7 +2,6 @@ package quality
 
 import (
 	"encoding/csv"
-	"io"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -254,38 +253,19 @@ func UpdateMatrixCSVByFilter(csvPath, profilePath, matrixName string, filters ma
 	}
 	defer uCtx.cr.Close()
 
-	r := uCtx.cr.reader
-	header := uCtx.cr.header
-	colIdx := uCtx.cr.colIdx
-	gates := uCtx.gates
-	doneVals := uCtx.doneVals
-	for col := range filters {
-		c := strings.TrimSpace(col)
-		if _, ok := colIdx[c]; !ok {
-			return nil, errfmt.Errorf("unknown filter column %q (not in csv header)", c)
-		}
+	if err := uCtx.validateHeaderColumns(filters); err != nil {
+		return nil, err
 	}
-	for col := range updates {
-		c := strings.TrimSpace(col)
-		if _, ok := colIdx[c]; !ok {
-			return nil, errfmt.Errorf("unknown column %q (not in csv header)", c)
-		}
+	if err := uCtx.validateHeaderColumns(updates); err != nil {
+		return nil, err
 	}
 
-	var rows [][]string
-	for {
-		rec, err := r.Read()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return nil, err
-		}
-		for len(rec) < len(header) {
-			rec = append(rec, "")
-		}
-		rows = append(rows, rec)
+	rows, err := uCtx.readAllRows()
+	if err != nil {
+		return nil, err
 	}
+	header := uCtx.cr.header
+	colIdx := uCtx.cr.colIdx
 
 	var matchIdx []int
 	for i, rec := range rows {
@@ -301,7 +281,7 @@ func UpdateMatrixCSVByFilter(csvPath, profilePath, matrixName string, filters ma
 	}
 
 	for _, fi := range matchIdx {
-		newRow, err := applyUpdatesToRow(rows[fi], colIdx, len(header), updates, gates, doneVals)
+		newRow, err := applyUpdatesToRow(rows[fi], colIdx, len(header), updates, uCtx.gates, uCtx.doneVals)
 		if err != nil {
 			return nil, err
 		}
@@ -329,12 +309,9 @@ func UpdateMatrixCSVByFilter(csvPath, profilePath, matrixName string, filters ma
 		CvsIDs:          collectUniqueCvsIDs(colIdx, sessionRefCol, rows, matchIdx),
 	}
 
-	bp, wrote, err := commitMatrixCSVUpdate(csvPath, writeOpts, header, rows, dryRun)
-	if err != nil {
+	if res.BackupPath, res.Wrote, err = uCtx.commit(csvPath, writeOpts, rows, dryRun); err != nil {
 		return nil, err
 	}
-	res.BackupPath = bp
-	res.Wrote = wrote
 	return res, nil
 }
 
@@ -359,26 +336,24 @@ func UpdateMatrixCSVRow(csvPath, profilePath, matrixName, matchColumn, matchValu
 	if err != nil {
 		return nil, err
 	}
+	header := uCtx.cr.header
 	defer uCtx.cr.Close()
 
-	r := uCtx.cr.reader
-	header := uCtx.cr.header
+	if err := uCtx.validateHeaderColumns(updates); err != nil {
+		return nil, err
+	}
 	colIdx := uCtx.cr.colIdx
-	gates := uCtx.gates
-	doneVals := uCtx.doneVals
 	matchKey := strings.TrimSpace(matchColumn)
 	mi, ok := colIdx[matchKey]
 	if !ok {
 		return nil, errfmt.Errorf("csv missing match column %q", matchKey)
 	}
-	for col := range updates {
-		c := strings.TrimSpace(col)
-		if _, ok := colIdx[c]; !ok {
-			return nil, errfmt.Errorf("unknown column %q (not in csv header)", c)
-		}
+
+	rows, err := uCtx.readAllRows()
+	if err != nil {
+		return nil, err
 	}
 
-	var rows [][]string
 	var matchNorm string
 	if matchKey == "file_path" {
 		matchNorm = normalizePathMatch(matchValue)
@@ -387,18 +362,7 @@ func UpdateMatrixCSVRow(csvPath, profilePath, matrixName, matchColumn, matchValu
 	}
 
 	found := -1
-	rowNum := 0
-	for {
-		rec, err := r.Read()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return nil, err
-		}
-		for len(rec) < len(header) {
-			rec = append(rec, "")
-		}
+	for rowNum, rec := range rows {
 		cell := ""
 		if mi < len(rec) {
 			cell = strings.TrimSpace(rec[mi])
@@ -412,8 +376,6 @@ func UpdateMatrixCSVRow(csvPath, profilePath, matrixName, matchColumn, matchValu
 		if cellNorm == matchNorm {
 			found = rowNum
 		}
-		rows = append(rows, rec)
-		rowNum++
 	}
 	if found < 0 {
 		return nil, errfmt.Errorf("no row with %s=%q", matchKey, matchValue)
@@ -429,7 +391,7 @@ func UpdateMatrixCSVRow(csvPath, profilePath, matrixName, matchColumn, matchValu
 		}
 	}
 
-	newRow, err := applyUpdatesToRow(row, colIdx, len(header), updates, gates, doneVals)
+	newRow, err := applyUpdatesToRow(row, colIdx, len(header), updates, uCtx.gates, uCtx.doneVals)
 	if err != nil {
 		return nil, err
 	}
@@ -448,12 +410,9 @@ func UpdateMatrixCSVRow(csvPath, profilePath, matrixName, matchColumn, matchValu
 		RowAfter:    matrixRowToMap(header, rows[found]),
 	}
 
-	bp, wrote, err := commitMatrixCSVUpdate(csvPath, writeOpts, header, rows, dryRun)
-	if err != nil {
+	if res.BackupPath, res.Wrote, err = uCtx.commit(csvPath, writeOpts, rows, dryRun); err != nil {
 		return nil, err
 	}
-	res.BackupPath = bp
-	res.Wrote = wrote
 	return res, nil
 }
 

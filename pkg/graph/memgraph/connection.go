@@ -96,6 +96,23 @@ func applyLimitOffset(query string, limit, offset int) string {
 	return query
 }
 
+// appendCypherWhere appends WHERE clause and joins multiple conditions with AND.
+func appendCypherWhere(query string, whereClauses []string) string {
+	if len(whereClauses) == 0 {
+		return query
+	}
+	return query + memgraphQueryWhere + strings.Join(whereClauses, memgraphQueryAnd)
+}
+
+func (c *memgraphConnection) queryRecords(ctx context.Context, query string, params map[string]any, limit, offset int) ([]*neo4j.Record, error) {
+	if limit > 0 || offset > 0 {
+		query = applyLimitOffset(query, limit, offset)
+	}
+	return c.executeBoltQuery(ctx, query, params)
+}
+
+
+
 // Reset implements ConnectionWrapper.Reset
 // BaseConnection.Reset() is called automatically, but we can add provider-specific reset logic here
 func (c *memgraphConnection) Reset() {
@@ -169,13 +186,7 @@ func (c *memgraphConnection) CreateNode(ctx context.Context, node provider.Node)
 	}
 
 	// Build Cypher query
-	labels := ""
-	for i, label := range node.Labels {
-		if i > 0 {
-			labels += ":"
-		}
-		labels += label
-	}
+	labels := strings.Join(node.Labels, ":")
 
 	// Build properties map
 	props := map[string]any{
@@ -318,19 +329,11 @@ func (c *memgraphConnection) ListNodes(ctx context.Context, filter provider.Node
 		params[paramKey] = value
 	}
 
-	if len(whereClauses) > 0 {
-		query += memgraphQueryWhere + whereClauses[0]
-		for i := 1; i < len(whereClauses); i++ {
-			query += memgraphQueryAnd + whereClauses[i]
-		}
-	}
+	query = appendCypherWhere(query, whereClauses)
 
 	query += memgraphQueryReturnN
 
-	// Add limit and offset
-	query = applyLimitOffset(query, filter.Limit, filter.Offset)
-
-	records, err := c.executeBoltQuery(ctx, query, params)
+	records, err := c.queryRecords(ctx, query, params, filter.Limit, filter.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -465,19 +468,11 @@ func (c *memgraphConnection) ListEdges(ctx context.Context, filter provider.Edge
 		params[paramKey] = value
 	}
 
-	if len(whereClauses) > 0 {
-		query += memgraphQueryWhere + whereClauses[0]
-		for i := 1; i < len(whereClauses); i++ {
-			query += memgraphQueryAnd + whereClauses[i]
-		}
-	}
+	query = appendCypherWhere(query, whereClauses)
 
 	query += " RETURN a.id AS fromID, b.id AS toID, type(r) AS type, r AS properties"
 
-	// Add limit and offset
-	query = applyLimitOffset(query, filter.Limit, filter.Offset)
-
-	records, err := c.executeBoltQuery(ctx, query, params)
+	records, err := c.queryRecords(ctx, query, params, filter.Limit, filter.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -596,12 +591,7 @@ func (c *memgraphConnection) ExecuteVectorQuery(ctx context.Context, query provi
 			params[paramKey] = value
 		}
 
-		if len(whereClauses) > 0 {
-			cypherQuery += memgraphQueryWhere + whereClauses[0]
-			for i := 1; i < len(whereClauses); i++ {
-				cypherQuery += memgraphQueryAnd + whereClauses[i]
-			}
-		}
+		cypherQuery = appendCypherWhere(cypherQuery, whereClauses)
 
 		cypherQuery += " RETURN n, vector.similarity(n.embedding, $vector) AS similarity"
 
@@ -732,12 +722,7 @@ func (c *memgraphConnection) ExecuteTraversal(ctx context.Context, traversal pro
 			whereClauses = append(whereClauses, safeCypher("end.`%s` = $%s", key, paramKey))
 			params[paramKey] = value
 		}
-		if len(whereClauses) > 0 {
-			query += " WHERE " + whereClauses[0]
-			for i := 1; i < len(whereClauses); i++ {
-				query += " AND " + whereClauses[i]
-			}
-		}
+		query = appendCypherWhere(query, whereClauses)
 	}
 
 	records, err := c.executeBoltQuery(ctx, query, params)

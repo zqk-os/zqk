@@ -124,16 +124,7 @@ func ParseCommandOutput(output string, stderr bytes.Buffer) map[string]any {
 	var result map[string]any
 	decoder := json.NewDecoder(strings.NewReader(toParse))
 	if err := decoder.Decode(&result); err != nil {
-		// JSON parsing failed - return error information
-		builder := NewCommandResultBuilder("", nil).
-			WithError(err).
-			WithStderr(stderr).
-			WithErrorCode(InvalidParameter).
-			WithErrorType("parse_error").
-			WithData("parse_error", err.Error()).
-			WithData("output", toParse).
-			WithData("note", "JSON parsing failed - check command output format")
-		return builder.Build()
+		return buildParseErrorResult(toParse, stderr, err)
 	}
 
 	return result

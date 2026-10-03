@@ -186,18 +186,23 @@ func (f *Facade) AddToIndex(ctx context.Context, indexFile string, relPath strin
 	return nil
 }
 
-// WriteTree writes the current index (or custom GIT_INDEX_FILE) to a git tree object.
-func (f *Facade) WriteTree(ctx context.Context, indexFile string) (string, error) {
-	cmd := execwrap.CommandContext(ctx, gitCommandName, "write-tree")
+func (f *Facade) runGitIndexCmd(ctx context.Context, op string, indexFile string, args ...string) (string, error) {
+	cmd := execwrap.CommandContext(ctx, gitCommandName, args...)
 	cmd.Dir = f.repoPath
 	if indexFile != "" {
 		cmd.Env = append(os.Environ(), "GIT_INDEX_FILE="+indexFile)
 	}
 	out, err := cmd.CombinedOutput()
+	trimmed := strings.TrimSpace(string(out))
 	if err != nil {
-		return "", errfmt.Errorf("git write-tree (%s): %w", strings.TrimSpace(string(out)), err)
+		return "", errfmt.Errorf("git %s (%s): %w", op, trimmed, err)
 	}
-	return strings.TrimSpace(string(out)), nil
+	return trimmed, nil
+}
+
+// WriteTree writes the current index (or custom GIT_INDEX_FILE) to a git tree object.
+func (f *Facade) WriteTree(ctx context.Context, indexFile string) (string, error) {
+	return f.runGitIndexCmd(ctx, "write-tree", indexFile, "write-tree")
 }
 
 // CommitTree creates a commit object pointing to a tree with optional parents and message.
@@ -207,16 +212,7 @@ func (f *Facade) CommitTree(ctx context.Context, treeHash string, parentHash str
 		commitArgs = append(commitArgs, "-p", parentHash)
 	}
 	commitArgs = append(commitArgs, "-m", message)
-	cmd := execwrap.CommandContext(ctx, gitCommandName, commitArgs...)
-	cmd.Dir = f.repoPath
-	if indexFile != "" {
-		cmd.Env = append(os.Environ(), "GIT_INDEX_FILE="+indexFile)
-	}
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		return "", errfmt.Errorf("git commit-tree (%s): %w", strings.TrimSpace(string(out)), err)
-	}
-	return strings.TrimSpace(string(out)), nil
+	return f.runGitIndexCmd(ctx, "commit-tree", indexFile, commitArgs...)
 }
 
 // UpdateRef updates a git ref to point to a target commit hash.
@@ -277,15 +273,17 @@ func (f *Facade) ForEachRef(ctx context.Context, format string, pattern string) 
 	if err != nil {
 		return nil, errfmt.Errorf("git for-each-ref (%s): %w", strings.TrimSpace(string(out)), err)
 	}
-	lines := strings.Split(strings.TrimSpace(string(out)), "\n")
+	return splitNonEmptyLines(string(out)), nil
+}
+
+func splitNonEmptyLines(s string) []string {
 	var result []string
-	for _, l := range lines {
-		l = strings.TrimSpace(l)
-		if l != "" {
-			result = append(result, l)
+	for _, l := range strings.Split(strings.TrimSpace(s), "\n") {
+		if trimmed := strings.TrimSpace(l); trimmed != "" {
+			result = append(result, trimmed)
 		}
 	}
-	return result, nil
+	return result
 }
 
 // FindCommitHashesByGrep searches commit history for commits matching the given grep patterns.
