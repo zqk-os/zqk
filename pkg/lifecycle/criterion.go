@@ -17,19 +17,9 @@ import (
 // matched anything read back from storage. isBacklogItemTerminalStatus answers the same question
 // from the lifecycle role.
 
-// StorageProvider is the same as in updater: returns storage for a project root.
-type StorageProviderForCriterion func(projectRoot string) (storage.ObjectStorageProvider, bool)
+// StorageProviderForCriterion is an alias for StorageProvider for backwards compatibility.
+type StorageProviderForCriterion = StorageProvider
 
-func resolveStorageProvider(projectRoot string, getStorage StorageProviderForCriterion) (storage.ObjectStorageProvider, bool) {
-	if projectRoot == emptyValue || getStorage == nil {
-		return nil, false
-	}
-	provider, ok := getStorage(projectRoot)
-	if !ok {
-		return nil, false
-	}
-	return nildecode.DecodeNonNilPayload[storage.ObjectStorageProvider](provider)
-}
 
 func appendAndSyncCriterionSatisfied(projectRoot, criterion string, scope map[string]string) {
 	wal, err := GetOrCreateLifecycleWAL(projectRoot)
@@ -86,7 +76,7 @@ func areAllLinkedCriteriaSatisfied(ctx context.Context, provider storage.ObjectS
 }
 
 func forEachObjectContainingCriterion(ctx context.Context, projectRoot, criterionID, kind string, getStorage StorageProviderForCriterion, fn func(id string)) {
-	provider, ok := resolveStorageProvider(projectRoot, getStorage)
+	provider, ok := resolveStorageProvider(getStorage, projectRoot)
 	if !ok || criterionID == emptyValue {
 		return
 	}
@@ -118,7 +108,7 @@ func readObjectForCriterion(
 	if objectID == emptyValue {
 		return nil, nil, false
 	}
-	provider, ok := resolveStorageProvider(projectRoot, getStorage)
+	provider, ok := resolveStorageProvider(getStorage, projectRoot)
 	if !ok {
 		return nil, nil, false
 	}
@@ -314,7 +304,7 @@ func TryEmitForTestCasesContainingCriterion(ctx context.Context, projectRoot, cr
 	if criterionID == emptyValue {
 		return
 	}
-	provider, ok := resolveStorageProvider(projectRoot, getStorage)
+	provider, ok := resolveStorageProvider(getStorage, projectRoot)
 	if !ok {
 		return
 	}

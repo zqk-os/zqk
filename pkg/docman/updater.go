@@ -26,13 +26,12 @@ const (
 func (r *Registry) UpdateExistingEntries(ctx context.Context, profile string) (int, error) {
 	logger := logging.GetLoggerFromProfile(profile)
 	secCtx := pkgctx.NewSystemSecurityContext()
-	storageCtx := pkgctx.NewStorageContext()
 
 	// List all doc_entry objects
 	filter := storage.ListFilter{
 		Kind: kindDocEntry,
 	}
-	results, err := r.storageProvider.List(ctx, secCtx, storageCtx, filter)
+	results, err := r.storageProvider.List(ctx, secCtx, pkgctx.NewStorageContext(), filter)
 	if err != nil {
 		return 0, errfmt.Errorf(errListDocEntriesFmt, err)
 	}

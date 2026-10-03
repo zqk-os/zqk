@@ -15,7 +15,6 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/coordination"
 	"github.com/zqk-os/zqk/pkg/logging"
-	"github.com/zqk-os/zqk/pkg/nildecode"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/validation"
@@ -125,11 +124,7 @@ func (s *DependencyPropagationSubscriber) HandleEvent(event *coordination.Operat
 	if eventID == emptyValue {
 		eventID = dependencyEventID(targetID, triggerID, fromState, toState, version)
 	}
-	provider, ok := s.getStorage(projectRoot)
-	if !ok {
-		return nil
-	}
-	provider, ok = nildecode.DecodeNonNilPayload[storage.ObjectStorageProvider](provider)
+	provider, ok := resolveStorageProvider(s.getStorage, projectRoot)
 	if !ok {
 		return nil
 	}
@@ -269,14 +264,22 @@ func applyPriorityPlanDependencyRef(ctx context.Context, logger *logging.EventLo
 	commitPriorityPlanShockwave(ctx, logger, provider, secCtx, ev, currentStatus, updates)
 }
 
-func statusReactiveUpdates(kind, currentStatus, triggerKind, fromState, toState string) (map[string]any, bool) {
-	_ = fromState
+func loadGlobalLifecycle(kind string) *objects.Lifecycle {
 	loader := objects.GetGlobalLifecycleLoader()
 	if loader == nil {
-		return nil, false
+		return nil
 	}
 	lc, err := loader.LoadLifecycle(kind)
 	if err != nil || lc == nil {
+		return nil
+	}
+	return lc
+}
+
+func statusReactiveUpdates(kind, currentStatus, triggerKind, fromState, toState string) (map[string]any, bool) {
+	_ = fromState
+	lc := loadGlobalLifecycle(kind)
+	if lc == nil {
 		return nil, false
 	}
 	return shockwaveUpdatesFromTransitions(lc.Transitions, currentStatus, triggerKind, toState)
@@ -556,12 +559,8 @@ func applyOpenCountableLastChild(
 // autoCompleteUpdates finds an auto lifecycle hop from currentStatus to a terminal
 // status that is not an on_dependent_status listener (those run via status_reactive).
 func autoCompleteUpdates(kind, currentStatus string) (map[string]any, bool) {
-	loader := objects.GetGlobalLifecycleLoader()
-	if loader == nil {
-		return nil, false
-	}
-	lc, err := loader.LoadLifecycle(kind)
-	if err != nil || lc == nil {
+	lc := loadGlobalLifecycle(kind)
+	if lc == nil {
 		return nil, false
 	}
 	currentStatus = strings.TrimSpace(currentStatus)
@@ -885,9 +884,9 @@ func releaseDependencyEvent(ev DependencyRefEvent) {
 	if ev.EventID == emptyValue || ev.Version == emptyValue {
 		return
 	}
-	key := ev.TargetID + "\x00" + ev.TriggerID
 	dependencyEventStamps.Lock()
 	defer dependencyEventStamps.Unlock()
+	key := ev.TargetID + "\x00" + ev.TriggerID
 	if current, ok := dependencyEventStamps.latest[key]; ok && current.eventID == ev.EventID {
 		delete(dependencyEventStamps.latest, key)
 	}
@@ -1026,10 +1025,7 @@ func EmitDependencyRefEvents(projectRoot, kind, id, fromState, toState string, o
 		return
 	}
 
-	kindFromObj, _ := objectData[objects.FieldKeyKind].(string)
-	if kindFromObj == emptyValue {
-		kindFromObj = kind
-	}
+	kindFromObj := resolveObjectKind(objectData, kind)
 	targetIDs := dependencyRefTargetIDs(id, objectData)
 	ctx := pkgctx.NewSystemContext()
 	version := zqktime.NowRFC3339NanoUTC()
@@ -1058,10 +1054,7 @@ func ApplyDependencyRefEvents(ctx context.Context, logger *logging.EventLogger, 
 		return
 	}
 	version := zqktime.NowRFC3339NanoUTC()
-	kindFromObj, _ := objectData[objects.FieldKeyKind].(string)
-	if kindFromObj == emptyValue {
-		kindFromObj = kind
-	}
+	kindFromObj := resolveObjectKind(objectData, kind)
 	targetIDs := dependencyRefTargetIDs(id, objectData)
 	for _, targetID := range targetIDs {
 		field, role := dependencyHopMeta(kindFromObj, targetID, objectData)
@@ -1138,3 +1131,11 @@ func emitDependencyRefEvent(coord coordination.EventCoordinator, ctx context.Con
 	}
 	_ = coord.Emit(ctx, eventCtx) //nolint:errcheck // best-effort
 }
+
+func resolveObjectKind(objectData map[string]any, defaultKind string) string {
+	if k, ok := objectData[objects.FieldKeyKind].(string); ok && k != emptyValue {
+		return k
+	}
+	return defaultKind
+}
+

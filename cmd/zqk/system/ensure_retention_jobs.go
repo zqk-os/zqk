@@ -103,12 +103,11 @@ func EnsureRetentionJobsInProject(projectRoot string, logger logging.Logger, pre
 }
 
 func runEnsureRetentionJobs(cmd *cobra.Command, _ []string) error {
+	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	projectRoot, err := resolveCommandProjectRoot(cmd)
 	if err != nil {
 		return err
 	}
-
-	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	result, err := ensureRetentionJobsCore(projectRoot, logger, cmd.Context(), nil)
 	if err != nil {
 		return err

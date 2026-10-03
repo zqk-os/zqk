@@ -513,11 +513,12 @@ func (h *TimeoutHook) WrapCommandWithContext(ctx context.Context, command string
 	runWithExecCtx := func() error { return fn(runCtx) }
 	timedOut, exitCode, execErr := h.executeCommandWithTimeout(execCtx, timeout, normalizedCmd, command, runWithExecCtx)
 
-	endTime := time.Now()
+	h.recordExecutionMetric(command, normalizedCmd, args, cmdCtx, startTime, execErr, timedOut, exitCode)
+	return execErr
+}
 
-	// Build and record metrics
+func (h *TimeoutHook) recordExecutionMetric(command, normalizedCmd string, args []string, cmdCtx *CommandContext, startTime time.Time, execErr error, timedOut bool, exitCode int) {
+	endTime := time.Now()
 	metric := h.buildCommandMetric(command, normalizedCmd, args, cmdCtx, startTime, endTime, execErr, timedOut, exitCode)
 	h.recordMetricsAsync(metric, normalizedCmd)
-
-	return execErr
 }

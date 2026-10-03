@@ -84,15 +84,11 @@ func runMutate(cmd *cobra.Command, args []string) error {
 
 	// If dry-run requested, force dry_run isolation
 	if dryRun {
-		for i := range program.Statements {
-			if program.Statements[i].NodeType == mutation.StmtBeginTransaction {
-				program.Statements[i].IsolationLevel = mutation.IsolationDryRun
-			}
-		}
+		program.ApplyDryRunIsolation()
 	}
 
-	engine := mutation.NewTransactionEngine()
-	executor := mutation.NewZQLExecutor(engine)
+	executor := mutation.NewZQLExecutor(nil)
+	engine := executor.Engine()
 
 	var proc *cli.Processor
 	if p, procErr := cli.NewProcessor(cmd); procErr == nil && p.Storage() != nil {

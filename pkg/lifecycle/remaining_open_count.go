@@ -68,6 +68,15 @@ func coerceNonNegInt(v any) (int, bool) {
 	}
 }
 
+func readContainerObject(ctx context.Context, provider storage.ObjectStorageProvider, containerID string) (map[string]any, *pkgctx.SecurityContext, error) {
+	secCtx := pkgctx.NewSystemSecurityContext()
+	obj, err := provider.Read(ctx, secCtx, containerID)
+	if err != nil || obj == nil {
+		return nil, nil, err
+	}
+	return obj, secCtx, nil
+}
+
 func ensureRemainingOpenCount(ctx context.Context, provider storage.ObjectStorageProvider, containerID string, n int) error {
 	if provider == nil || containerID == emptyValue {
 		return nil
@@ -75,9 +84,8 @@ func ensureRemainingOpenCount(ctx context.Context, provider storage.ObjectStorag
 	if n < 0 {
 		n = 0
 	}
-	secCtx := pkgctx.NewSystemSecurityContext()
-	obj, err := provider.Read(ctx, secCtx, containerID)
-	if err != nil || obj == nil {
+	obj, secCtx, err := readContainerObject(ctx, provider, containerID)
+	if err != nil {
 		return err
 	}
 	if cur, ok := remainingOpenCountFrom(obj); ok && cur == n {
@@ -192,9 +200,8 @@ func SeedRemainingOpenCountFromMembers(ctx context.Context, provider storage.Obj
 	if provider == nil || containerID == emptyValue {
 		return nil
 	}
-	secCtx := pkgctx.NewSystemSecurityContext()
-	obj, err := provider.Read(ctx, secCtx, containerID)
-	if err != nil || obj == nil {
+	obj, secCtx, err := readContainerObject(ctx, provider, containerID)
+	if err != nil {
 		return err
 	}
 	if !force {

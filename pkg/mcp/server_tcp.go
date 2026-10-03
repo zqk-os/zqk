@@ -105,16 +105,8 @@ func (s *Server) handleTCPConnection(conn net.Conn) {
 		SetupHandlers().
 		Build()
 
-	defer lifecycle.Cleanup()
-
-	// Create message processor
-	processor := NewMessageProcessor(s, lifecycle.GetHandler(), lifecycle.GetTransport())
-
-	// Create serve coordinator
-	coordinator := NewServeCoordinator(s, processor, lifecycle)
-
 	// Run main serve loop for this specific connection
-	err := coordinator.ServeLoop()
+	err := s.RunServeLoop(lifecycle)
 	if err != nil && !isBrokenPipeError(err) {
 		if s.getTraceWriter() != nil {
 			s.traceLogf("[MCP_ERROR] TCP connection serve error: %v", err)

@@ -260,10 +260,10 @@ func buildCacheInParallel(ctx *CacheBuildContext, kinds []string) error {
 	queueSize := min(len(jobs), 256)
 	poolCtx := context.Background()
 	pool := goroutinelabels.NewPool(goroutinelabels.DefaultBudget(), "cache_build_worker", "building object ID cache", numWorkers, queueSize)
+	var wg sync.WaitGroup
 	results := make(chan error, len(jobs))
 	pool.Start(poolCtx)
 	defer pool.Stop()
-	var wg sync.WaitGroup
 	for _, job := range jobs {
 		wg.Add(1)
 		err := pool.Submit(poolCtx, func(taskCtx context.Context) error {

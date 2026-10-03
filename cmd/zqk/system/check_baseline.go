@@ -289,8 +289,7 @@ func NewCheckBaselineCmd() *cobra.Command {
 	helpBuilder.ApplyToCommand(cmd)
 
 	cmd.Flags().String("baseline-output", "", "Output file for baseline metrics (JSON format)")
-	addIncludeResultsFlag(cmd)
-
 	cli.AddCommonFlags(cmd)
+	addIncludeResultsFlag(cmd)
 	return cmd
 }

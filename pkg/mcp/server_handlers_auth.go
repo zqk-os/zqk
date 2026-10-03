@@ -299,8 +299,7 @@ func (s *Server) validateUsernamePassword(_ context.Context, username, password,
 		return "", nil, nil, errfmt.Errorf("invalid username or password")
 	}
 
-	roles = extractRolesFromAccount(accountObj)
-	permissions = extractPermissionsFromAccount(accountObj)
+	roles, permissions = extractRolesAndPermissions(accountObj)
 	return accountID, roles, permissions, nil
 }
 
@@ -351,16 +350,10 @@ func (s *Server) validateKeystoreKey(_ context.Context, keyID, projectRoot strin
 		}
 	}
 
-	// Load account object to get roles and permissions
-	accountObj, err := s.loadAccountObject(accountID, projectRoot)
+	roles, permissions, err = s.loadAccountRolesAndPermissions(accountID, projectRoot)
 	if err != nil {
-		return "", nil, nil, errfmt.Newf("failed to load account").Wrap(err)
+		return "", nil, nil, err
 	}
-
-	// Extract roles and permissions from account object
-	roles = extractRolesFromAccount(accountObj)
-	permissions = extractPermissionsFromAccount(accountObj)
-
 	return accountID, roles, permissions, nil
 }
 
@@ -515,12 +508,10 @@ func (s *Server) validatePersonalAccessToken(_ context.Context, pat, projectRoot
 			return "", nil, nil, errfmt.Errorf("personal access token has no associated account")
 		}
 
-		accountObj, err := s.loadAccountObject(accountID, projectRoot)
+		roles, permissions, err = s.loadAccountRolesAndPermissions(accountID, projectRoot)
 		if err != nil {
-			return "", nil, nil, errfmt.Newf("failed to load account").Wrap(err)
+			return "", nil, nil, err
 		}
-		roles = extractRolesFromAccount(accountObj)
-		permissions = extractPermissionsFromAccount(accountObj)
 		return accountID, roles, permissions, nil
 	}
 
@@ -578,6 +569,19 @@ func extractRolesFromAccount(account map[string]any) []string {
 // Kept for backward compatibility with existing code.
 func extractPermissionsFromAccount(account map[string]any) []string {
 	return ExtractPermissionsFromAccount(account)
+}
+
+func extractRolesAndPermissions(account map[string]any) ([]string, []string) {
+	return extractRolesFromAccount(account), extractPermissionsFromAccount(account)
+}
+
+func (s *Server) loadAccountRolesAndPermissions(accountID, projectRoot string) ([]string, []string, error) {
+	accountObj, err := s.loadAccountObject(accountID, projectRoot)
+	if err != nil {
+		return nil, nil, errfmt.Newf("failed to load account").Wrap(err)
+	}
+	roles, permissions := extractRolesAndPermissions(accountObj)
+	return roles, permissions, nil
 }
 
 // loadEnabledAuthStrategies loads enabled authentication strategies from auth_strategy objects

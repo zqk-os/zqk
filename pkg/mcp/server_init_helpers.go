@@ -383,6 +383,33 @@ func (s *Server) eliciteAuthentication(ctx context.Context, clientID string, cli
 	return s.eliciteCredentials(ctx, clientID, clientInfo, initParams)
 }
 
+func (s *Server) prepareAuthSession(ctx context.Context, clientID string, initParams InitializeParams) string {
+	sessionID, sessionErr := s.createAuthenticationSession(ctx, clientID, initParams.ClientInfo.Name, "")
+	if sessionErr != nil {
+		logger := logging.GetLoggerFromProfile(DefaultLoggingProfile)
+		logging.Fluent(logger).Warn("Failed to create authentication session").
+			WithError(sessionErr).
+			EmitComponent("mcp_server").
+			String("client_id", clientID).
+			Log()
+	}
+	if sessionID != emptyValue && !isHumanClient(initParams.ClientInfo.Name, clientID) {
+		observer.NotifyAgentConnection(ctx, observer.AgentConnectionInfo{
+			ClientID:   clientID,
+			ClientName: initParams.ClientInfo.Name,
+			Version:    initParams.ClientInfo.Version,
+		})
+	}
+	return sessionID
+}
+
+func (s *Server) attachSessionToElicitationData(sessionID string, elicitationData map[string]any) {
+	if sessionID != emptyValue {
+		elicitationData[clientInfoSessionID] = sessionID
+		elicitationData["authentication_required"] = true
+	}
+}
+
 // eliciteAccountID creates an elicitation error for account ID
 func (s *Server) eliciteAccountID(ctx context.Context, clientID string, clientInfo map[string]any, initParams InitializeParams) (map[string]any, string, error) {
 	availableAccountIDs := make([]any, 0)
@@ -396,25 +423,7 @@ func (s *Server) eliciteAccountID(ctx context.Context, clientID string, clientIn
 		}
 	}
 
-	sessionID, sessionErr := s.createAuthenticationSession(ctx, clientID, initParams.ClientInfo.Name, "")
-	if sessionErr != nil {
-		// Always log authentication session failures - these are important operational issues
-		// that administrators should be aware of, regardless of trace configuration
-		logger := logging.GetLoggerFromProfile(DefaultLoggingProfile)
-		logging.Fluent(logger).Warn("Failed to create authentication session").
-			WithError(sessionErr).
-			EmitComponent("mcp_server").
-			String("client_id", clientID).
-			Log()
-	}
-	// Notify observer of unregistered agent connection so it can create account/assign roles (BLI-OBS-003)
-	if sessionID != emptyValue && !isHumanClient(initParams.ClientInfo.Name, clientID) {
-		observer.NotifyAgentConnection(ctx, observer.AgentConnectionInfo{
-			ClientID:   clientID,
-			ClientName: initParams.ClientInfo.Name,
-			Version:    initParams.ClientInfo.Version,
-		})
-	}
+	sessionID := s.prepareAuthSession(ctx, clientID, initParams)
 
 	message := "Account ID is required. Please provide your account_id to access the system."
 	if len(availableAccountIDs) > 0 {
@@ -457,35 +466,14 @@ func (s *Server) eliciteAccountID(ctx context.Context, clientID string, clientIn
 		"require_account_id": true,
 		"available_accounts": availableAccountIDs,
 	}
-	if sessionID != emptyValue {
-		elicitationData[clientInfoSessionID] = sessionID
-		elicitationData["authentication_required"] = true
-	}
+	s.attachSessionToElicitationData(sessionID, elicitationData)
 
 	return nil, "", NewElicitationErrorWithData(message, elicitationParams, elicitationData)
 }
 
 // eliciteCredentials creates an elicitation error for credentials
 func (s *Server) eliciteCredentials(ctx context.Context, clientID string, clientInfo map[string]any, initParams InitializeParams) (map[string]any, string, error) {
-	sessionID, sessionErr := s.createAuthenticationSession(ctx, clientID, initParams.ClientInfo.Name, "")
-	if sessionErr != nil {
-		// Always log authentication session failures - these are important operational issues
-		// that administrators should be aware of, regardless of trace configuration
-		logger := logging.GetLoggerFromProfile(DefaultLoggingProfile)
-		logging.Fluent(logger).Warn("Failed to create authentication session").
-			WithError(sessionErr).
-			EmitComponent("mcp_server").
-			String("client_id", clientID).
-			Log()
-	}
-	// Notify observer of unregistered agent connection (BLI-OBS-003)
-	if sessionID != emptyValue && !isHumanClient(initParams.ClientInfo.Name, clientID) {
-		observer.NotifyAgentConnection(ctx, observer.AgentConnectionInfo{
-			ClientID:   clientID,
-			ClientName: initParams.ClientInfo.Name,
-			Version:    initParams.ClientInfo.Version,
-		})
-	}
+	sessionID := s.prepareAuthSession(ctx, clientID, initParams)
 
 	message := "Authentication required. Please provide your credentials to access the system."
 	if sessionID != emptyValue {
@@ -528,10 +516,7 @@ func (s *Server) eliciteCredentials(ctx context.Context, clientID string, client
 	}
 
 	elicitationData := map[string]any{}
-	if sessionID != emptyValue {
-		elicitationData[clientInfoSessionID] = sessionID
-		elicitationData["authentication_required"] = true
-	}
+	s.attachSessionToElicitationData(sessionID, elicitationData)
 
 	return nil, "", NewElicitationErrorWithData(message, elicitationParams, elicitationData)
 }
@@ -716,6 +701,29 @@ func (s *Server) configureClientCapabilities(initParams InitializeParams) {
 	}
 }
 
+func (s *Server) registerCoreBuiltinTools(secCtx *pkgctx.SecurityContext) {
+	RegisterGraphTools(s)
+	RegisterEchoTool(s)
+	RegisterCommonTools(s)
+	RegisterInteractiveTools(s)
+	RegisterWorkflowTools(s, secCtx)
+	RegisterMetricsTools(s)
+	RegisterReportTools(s)
+	RegisterAgentExecutionTools(s)
+	RegisterObserverTools(s)
+	RegisterChatInjectTool(s)
+	RegisterIdeBridgeTool(s)
+}
+
+func (s *Server) shouldBootstrapCLITools() bool {
+	shouldRegister := true
+	if s.config != nil && s.config.MCPServer.RegisterCLITools != nil {
+		shouldRegister = *s.config.MCPServer.RegisterCLITools
+	}
+	aliasMode := s.config != nil && s.config.MCPServer.Tools.AliasMode != nil && *s.config.MCPServer.Tools.AliasMode
+	return s.rootCommand != nil && shouldRegister && !aliasMode
+}
+
 // registerToolsAndResources registers all tools and resources for the server
 func (s *Server) registerToolsAndResources(secCtx *pkgctx.SecurityContext) {
 	// Build permission cache asynchronously
@@ -733,18 +741,8 @@ func (s *Server) registerToolsAndResources(secCtx *pkgctx.SecurityContext) {
 	beforeCount := s.getToolCount()
 	s.traceLogf("[MCP_DEBUG] registerToolsAndResources: starting with %d tools", beforeCount)
 
-	RegisterGraphTools(s)
-	RegisterEchoTool(s)
-	RegisterCommonTools(s)
-	RegisterInteractiveTools(s)
-	RegisterWorkflowTools(s, secCtx)
-	RegisterMetricsTools(s)
-	RegisterReportTools(s)
+	s.registerCoreBuiltinTools(secCtx)
 	RegisterOnboardingPrompts(s)
-	RegisterAgentExecutionTools(s)
-	RegisterObserverTools(s)
-	RegisterChatInjectTool(s)
-	RegisterIdeBridgeTool(s)
 
 	// Log tool count after registration for debugging
 	afterCount := s.getToolCount()
@@ -793,12 +791,7 @@ func (s *Server) registerToolsAndResources(secCtx *pkgctx.SecurityContext) {
 	})
 
 	// Bootstrap CLI tools in parallel if enabled (and not in alias_mode: alias mode exposes only built-in tools)
-	shouldRegisterCLITools := true
-	if s.config != nil && s.config.MCPServer.RegisterCLITools != nil {
-		shouldRegisterCLITools = *s.config.MCPServer.RegisterCLITools
-	}
-	aliasMode := s.config != nil && s.config.MCPServer.Tools.AliasMode != nil && *s.config.MCPServer.Tools.AliasMode
-	if s.rootCommand != nil && shouldRegisterCLITools && !aliasMode {
+	if s.shouldBootstrapCLITools() {
 		executor.Execute(func() error {
 			if err := s.BootstrapCLITools(); err != nil {
 				if s.getTraceWriter() != nil {
@@ -888,24 +881,9 @@ func (s *Server) registerToolsAndResources(secCtx *pkgctx.SecurityContext) {
 // registerToolsOnly registers built-in tools, optionally CLI-discovered tools, and applies
 // tools allowlist. Used by ListExposedTools for discovery (no resources, no permission cache).
 func (s *Server) registerToolsOnly(secCtx *pkgctx.SecurityContext) {
-	RegisterGraphTools(s)
-	RegisterEchoTool(s)
-	RegisterCommonTools(s)
-	RegisterInteractiveTools(s)
-	RegisterWorkflowTools(s, secCtx)
-	RegisterMetricsTools(s)
-	RegisterReportTools(s)
-	RegisterAgentExecutionTools(s)
-	RegisterObserverTools(s)
-	RegisterChatInjectTool(s)
-	RegisterIdeBridgeTool(s)
+	s.registerCoreBuiltinTools(secCtx)
 
-	shouldRegisterCLITools := true
-	if s.config != nil && s.config.MCPServer.RegisterCLITools != nil {
-		shouldRegisterCLITools = *s.config.MCPServer.RegisterCLITools
-	}
-	aliasMode := s.config != nil && s.config.MCPServer.Tools.AliasMode != nil && *s.config.MCPServer.Tools.AliasMode
-	if s.rootCommand != nil && shouldRegisterCLITools && !aliasMode {
+	if s.shouldBootstrapCLITools() {
 		if err := s.BootstrapCLITools(); err != nil {
 			// Don't fail discovery; tool list will be built-in only
 			if s.getTraceWriter() != nil {

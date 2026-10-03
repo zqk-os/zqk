@@ -1,7 +1,6 @@
 package llm
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -156,24 +155,17 @@ func (c *GeminiClient) GenerateStructuredCompletionWithOptions(ctx context.Conte
 		}
 	}
 
-	body, err := json.Marshal(payload)
+	req, err := createJSONPostRequest(ctx, url, payload)
 	if err != nil {
-		return StructuredCompletionResponse{}, errfmt.Newf("failed to marshal payload").Wrap(err)
+		return StructuredCompletionResponse{}, err
 	}
-
-	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(body))
-	if err != nil {
-		return StructuredCompletionResponse{}, errfmt.Newf("failed to create request").Wrap(err)
-	}
-	req.Header.Set("Content-Type", "application/json")
 	if c.config.APIKey != "" {
 		req.Header.Set("x-goog-api-key", c.config.APIKey)
 	}
 
-	resp, err := c.httpClient.Do(req)
-
+	resp, err := c.executeStructuredRequest(req)
 	if err != nil {
-		return StructuredCompletionResponse{}, errfmt.Newf("request failed").Wrap(err)
+		return StructuredCompletionResponse{}, err
 	}
 	defer resp.Body.Close()
 
@@ -253,4 +245,8 @@ func geminiFunctionCallingConfig(opts StructuredCompletionOptions) map[string]an
 		cfg["allowedFunctionNames"] = []string{fn}
 	}
 	return cfg
+}
+
+func (c *GeminiClient) executeStructuredRequest(req *http.Request) (*http.Response, error) {
+	return executeHTTPRequest(c.httpClient, req)
 }

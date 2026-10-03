@@ -113,13 +113,9 @@ func (c *GeminiClient) GenerateIntent(ctx context.Context, code string) (string,
 }
 
 func (c *GeminiClient) GenerateCompletion(ctx context.Context, prompt string, system string) (string, error) {
-	if c.shouldMock() {
-		return `["ZQK Observer Tip: APIKey missing, cannot generate dynamic tips."]`, nil
-	}
-
-	sanitizedPrompt, err := SanitizeUntrustedText(prompt)
-	if err != nil {
-		return "", errfmt.Newf("sanitizing prompt").Wrap(err)
+	sanitizedPrompt, isMock, err := SanitizeOrMockPrompt(c.shouldMock(), prompt)
+	if isMock || err != nil {
+		return sanitizedPrompt, err
 	}
 
 	payload := map[string]any{
@@ -243,20 +239,5 @@ func (c *GeminiClient) DescribeScene(ctx context.Context, frames [][]byte) (stri
 }
 
 func (c *GeminiClient) SemanticCompare(ctx context.Context, observedDescription string, expectedNarrative string) (float64, error) {
-	embObserved, err := c.GenerateEmbedding(ctx, observedDescription)
-	if err != nil {
-		return 0, errfmt.Newf("failed to generate embedding for observed description").Wrap(err)
-	}
-	embExpected, err := c.GenerateEmbedding(ctx, expectedNarrative)
-	if err != nil {
-		return 0, errfmt.Newf("failed to generate embedding for expected narrative").Wrap(err)
-	}
-	if len(embObserved) != len(embExpected) {
-		return 0, errfmt.Errorf("embedding lengths do not match: %d vs %d", len(embObserved), len(embExpected))
-	}
-	var dotProduct float64
-	for i := range embObserved {
-		dotProduct += float64(embObserved[i]) * float64(embExpected[i])
-	}
-	return dotProduct, nil
+	return CompareEmbeddings(ctx, c.GenerateEmbedding, observedDescription, expectedNarrative)
 }

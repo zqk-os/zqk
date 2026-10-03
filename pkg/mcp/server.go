@@ -553,6 +553,14 @@ func (s *Server) ensureServerInitialized() {
 	})
 }
 
+// RunServeLoop runs the main message processor and serve coordinator loop for a lifecycle.
+func (s *Server) RunServeLoop(lifecycle *ServerLifecycleBuilder) error {
+	defer lifecycle.Cleanup()
+	processor := NewMessageProcessor(s, lifecycle.GetHandler(), lifecycle.GetTransport())
+	coordinator := NewServeCoordinator(s, processor, lifecycle)
+	return coordinator.ServeLoop()
+}
+
 // Serve starts the MCP server and handles requests from stdin
 // The server will gracefully shutdown if the context is cancelled (e.g., due to idle timeout)
 func (s *Server) Serve() error {
@@ -564,16 +572,7 @@ func (s *Server) Serve() error {
 		SetupHandlers().
 		Build()
 
-	defer lifecycle.Cleanup()
-
-	// Create message processor
-	processor := NewMessageProcessor(s, lifecycle.GetHandler(), lifecycle.GetTransport())
-
-	// Create serve coordinator
-	coordinator := NewServeCoordinator(s, processor, lifecycle)
-
-	// Run main serve loop
-	return coordinator.ServeLoop()
+	return s.RunServeLoop(lifecycle)
 }
 
 // IsShutdownRequested returns whether a shutdown has been requested on the server

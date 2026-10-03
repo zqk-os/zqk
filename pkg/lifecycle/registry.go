@@ -40,44 +40,39 @@ func GetOrCreateLifecycleWAL(projectRoot string) (*LifecycleEventWAL, error) {
 	return w, nil
 }
 
-// AppendStatusTransition appends a status_transition event to the lifecycle WAL for projectRoot.
-// No-op if projectRoot is empty or WAL cannot be created (e.g. one-shot CLI without .zqk).
-func AppendStatusTransition(projectRoot, kind, id, fromStatus, toStatus string) {
+func appendLifecycleEvent(projectRoot string, ev *LifecycleEvent) {
 	if projectRoot == emptyValue {
 		return
 	}
 	wal, err := GetOrCreateLifecycleWAL(projectRoot)
 	if err != nil {
 		return
-	}
-	ev := &LifecycleEvent{
-		EventType:  EventTypeStatusTransition,
-		Kind:       kind,
-		ID:         id,
-		FromStatus: fromStatus,
-		ToStatus:   toStatus,
 	}
 	_ = wal.Append(ev)
 	_ = wal.Sync()
 }
 
+// AppendStatusTransition appends a status_transition event to the lifecycle WAL for projectRoot.
+// No-op if projectRoot is empty or WAL cannot be created (e.g. one-shot CLI without .zqk).
+func AppendStatusTransition(projectRoot, kind, id, fromStatus, toStatus string) {
+	appendLifecycleEvent(projectRoot, &LifecycleEvent{
+		EventType:  EventTypeStatusTransition,
+		Kind:       kind,
+		ID:         id,
+		FromStatus: fromStatus,
+		ToStatus:   toStatus,
+	})
+}
+
 // AppendReferenceLinked appends a reference_linked event to the lifecycle WAL for projectRoot.
 func AppendReferenceLinked(projectRoot, sourceKind, sourceID, targetKind, targetID, fieldName string) {
-	if projectRoot == emptyValue {
-		return
-	}
-	wal, err := GetOrCreateLifecycleWAL(projectRoot)
-	if err != nil {
-		return
-	}
-	ev := &LifecycleEvent{
+	appendLifecycleEvent(projectRoot, &LifecycleEvent{
 		EventType:  EventTypeReferenceLinked,
 		Kind:       sourceKind,
 		ID:         sourceID,
 		TargetKind: targetKind,
 		TargetID:   targetID,
 		FieldName:  fieldName,
-	}
-	_ = wal.Append(ev)
-	_ = wal.Sync()
+	})
 }
+

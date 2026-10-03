@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
@@ -111,13 +110,7 @@ func (a *StatusHistoryMetricAggregator) Aggregate(ctx context.Context, config *A
 		aggregations["avg_history_length"] = averageSequenceLength(statusHistories)
 	}
 
-	// Create base_metric object
-	metricID, err := a.createMetricObject(ctx, config, aggregations, objectCount)
-	if err != nil {
-		return nil, errfmt.Newf("failed to create metric object").Wrap(err)
-	}
-
-	return BuildAggregationResult(config, metricID, aggregations, objectCount), nil
+	return FinishAggregation(ctx, config, aggregations, objectCount, a.createMetricObject)
 }
 
 // createMetricObject creates a base_metric object using the factory pattern (non-blocking)

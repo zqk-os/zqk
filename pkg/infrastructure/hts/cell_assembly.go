@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/zqk-os/zqk/pkg/infrastructure/crypto"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -49,13 +50,7 @@ func Assemble(ctx context.Context, cellID string, items []map[string]any) (*Data
 		cell.Manifest[id] = hash
 	}
 
-	// Calculate Root Hash (Simple Merkle-style sort and hash)
-	sort.Strings(hashes)
-	combined := ""
-	for _, h := range hashes {
-		combined += h
-	}
-	cell.RootHash = fmt.Sprintf("%x", sha256.Sum256([]byte(combined)))
+	cell.RootHash = computeMerkleRootHash(hashes)
 
 	cell.Metadata["cell_id"] = cellID
 	cell.Metadata[objects.FieldKeyObjectCount] = len(items)
@@ -95,12 +90,7 @@ func (c *DataCell) Verify() error {
 		hashes = append(hashes, fmt.Sprintf("%x", sha256.Sum256(data)))
 	}
 
-	sort.Strings(hashes)
-	combined := ""
-	for _, h := range hashes {
-		combined += h
-	}
-	calculatedRoot := fmt.Sprintf("%x", sha256.Sum256([]byte(combined)))
+	calculatedRoot := computeMerkleRootHash(hashes)
 
 	if calculatedRoot != c.RootHash {
 		return fmt.Errorf("integrity violation: calculated root %s does not match cell root %s", calculatedRoot, c.RootHash)
@@ -119,3 +109,13 @@ func (c *DataCell) Verify() error {
 
 	return nil
 }
+
+func computeMerkleRootHash(hashes []string) string {
+	sort.Strings(hashes)
+	var sb strings.Builder
+	for _, h := range hashes {
+		sb.WriteString(h)
+	}
+	return fmt.Sprintf("%x", sha256.Sum256([]byte(sb.String())))
+}
+

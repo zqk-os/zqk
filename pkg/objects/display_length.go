@@ -18,21 +18,7 @@ func GetDisplayLength(spec *Spec, fieldName string, defaultLen int) int {
 		return defaultLen
 	}
 
-	validation, ok := fieldMap["validation"].(map[string]any)
-	if !ok {
-		return defaultLen
-	}
-	switch v := validation["display_length"].(type) {
-	case int:
-		return v
-	case
-
-		// Try float64 (YAML numbers can be parsed as float64)
-		float64:
-		return int(v)
-	}
-
-	return defaultLen
+	return GetDisplayLengthFromFieldDef(fieldMap, defaultLen)
 }
 
 // GetDisplayLengthFromFieldDef gets display_length from a field definition map directly

@@ -149,10 +149,9 @@ func runAutoFixProcessPending(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	initCtx := &pkgctx.CliInitializationContext{ProjectRoot: projectRoot}
-	ctx, err := cli.GetContextFromCommand(cmd, initCtx)
+	ctx, err := getAutofixCLIContext(cmd, projectRoot)
 	if err != nil {
-		return errfmt.Newf("failed to get context").Wrap(err)
+		return err
 	}
 	logger := logging.GetLoggerFromProfile(ctx.Profile)
 	logging.Fluent(logger).Info("Processing pending autofix batches").
@@ -563,10 +562,9 @@ func runAutoFixBatch(cmd *cobra.Command, args []string) error {
 		return errfmt.Errorf("--project-root is required")
 	}
 
-	initCtx := &pkgctx.CliInitializationContext{ProjectRoot: projectRoot}
-	ctx, err := cli.GetContextFromCommand(cmd, initCtx)
+	ctx, err := getAutofixCLIContext(cmd, projectRoot)
 	if err != nil {
-		return errfmt.Newf("failed to get context").Wrap(err)
+		return err
 	}
 
 	chunkSize, _ := cmd.Flags().GetInt("chunk-size")
@@ -1232,3 +1230,13 @@ func renameBatchFileAfterProcessing(batchFile string, isSuccess bool) error {
 
 	return nil
 }
+
+func getAutofixCLIContext(cmd *cobra.Command, projectRoot string) (*cli.Context, error) {
+	initCtx := &pkgctx.CliInitializationContext{ProjectRoot: projectRoot}
+	ctx, err := cli.GetContextFromCommand(cmd, initCtx)
+	if err != nil {
+		return nil, errfmt.Newf("failed to get context").Wrap(err)
+	}
+	return ctx, nil
+}
+

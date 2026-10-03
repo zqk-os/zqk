@@ -82,15 +82,10 @@ func HandleMutateZQL(ctx context.Context, s *Server, args map[string]any) (any, 
 	}
 
 	if dryRun {
-		for i := range program.Statements {
-			if program.Statements[i].NodeType == mutation.StmtBeginTransaction {
-				program.Statements[i].IsolationLevel = mutation.IsolationDryRun
-			}
-		}
+		program.ApplyDryRunIsolation()
 	}
 
-	engine := mutation.NewTransactionEngine()
-	executor := mutation.NewZQLExecutor(engine)
+	executor := mutation.NewZQLExecutor(nil)
 
 	receipt, err := executor.Execute(ctx, program)
 	if err != nil {

@@ -243,11 +243,11 @@ func performBlockingCheck(blockingCtx *pkgctx.BlockingCheckContext) *pkgctx.Bloc
 	kindResults := make(chan kindBlockingResult, len(toCheck))
 	maxConcurrency := min(8, len(toCheck))
 	queueSize := min(len(toCheck), 256)
+	var wg sync.WaitGroup
 	poolCtx := stdcontext.Background() // Background: request-or-shutdown derived
 	pool := goroutinelabels.NewPool(goroutinelabels.DefaultBudget(), "blocking_check_kind", "blocking check per kind", maxConcurrency, queueSize)
 	pool.Start(poolCtx)
 	defer pool.Stop()
-	var wg sync.WaitGroup
 	for _, kind := range toCheck {
 		k := kind
 		wg.Add(1)
@@ -424,12 +424,11 @@ func CheckKindObjectsWithCache(ctx *cli.Context, stdCtx stdcontext.Context, cmd 
 		queueSize = 1024
 	}
 
+	var wg sync.WaitGroup
 	poolCtx := stdcontext.Background() // Background: request-or-shutdown derived
 	pool := goroutinelabels.NewPool(goroutinelabels.DefaultBudget(), "check_files", "check files parallel", maxConcurrency, queueSize)
 	pool.Start(poolCtx)
 	defer pool.Stop()
-
-	var wg sync.WaitGroup
 	for _, file := range files {
 		if !shouldProcessFileForCheck(file, checkCtx.IDs, checkCtx.Logger) {
 			continue

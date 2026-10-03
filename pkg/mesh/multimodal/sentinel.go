@@ -40,9 +40,7 @@ type VideoSentinel struct {
 	client LLMClient
 }
 
-// InterceptVideoGeneration is the core hook invoked during video render cycles.
-func (s *VideoSentinel) InterceptVideoGeneration(ctx context.Context, jobID string, script string, frameData []byte) error {
-	isValid, _, err := s.client.AnalyzeVideo(ctx, script, frameData)
+func checkInterceptionResult(isValid bool, err error) error {
 	if err != nil {
 		return err
 	}
@@ -50,6 +48,12 @@ func (s *VideoSentinel) InterceptVideoGeneration(ctx context.Context, jobID stri
 		return context.Canceled
 	}
 	return nil
+}
+
+// InterceptVideoGeneration is the core hook invoked during video render cycles.
+func (s *VideoSentinel) InterceptVideoGeneration(ctx context.Context, jobID string, script string, frameData []byte) error {
+	isValid, _, err := s.client.AnalyzeVideo(ctx, script, frameData)
+	return checkInterceptionResult(isValid, err)
 }
 
 // AudioSentinel handles audio-specific interception.
@@ -60,13 +64,7 @@ type AudioSentinel struct {
 // InterceptAudioGeneration intercepts audio render cycles to verify logic/truthfulness against the script.
 func (s *AudioSentinel) InterceptAudioGeneration(ctx context.Context, jobID string, script string, audioData []byte) error {
 	isValid, _, err := s.client.AnalyzeAudio(ctx, script, audioData)
-	if err != nil {
-		return err
-	}
-	if !isValid {
-		return context.Canceled
-	}
-	return nil
+	return checkInterceptionResult(isValid, err)
 }
 
 // SentinelManager consolidates the functionality of all sentinels.

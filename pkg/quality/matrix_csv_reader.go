@@ -2,10 +2,12 @@ package quality
 
 import (
 	"encoding/csv"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -85,6 +87,39 @@ func openMatrixForUpdate(csvPath, profilePath string) (*matrixCSVUpdateContext, 
 		doneVals: doneVals,
 		gates:    gateColumnSet(prof),
 	}, nil
+}
+
+func (u *matrixCSVUpdateContext) validateHeaderColumns(cols map[string]string) error {
+	for col := range cols {
+		c := strings.TrimSpace(col)
+		if _, ok := u.cr.colIdx[c]; !ok {
+			return errfmt.Errorf("unknown column %q (not in csv header)", c)
+		}
+	}
+	return nil
+}
+
+func (u *matrixCSVUpdateContext) readAllRows() ([][]string, error) {
+	var rows [][]string
+	headerLen := len(u.cr.header)
+	for {
+		rec, err := u.cr.reader.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		for len(rec) < headerLen {
+			rec = append(rec, "")
+		}
+		rows = append(rows, rec)
+	}
+	return rows, nil
+}
+
+func (u *matrixCSVUpdateContext) commit(csvPath string, writeOpts *MatrixWriteOpts, rows [][]string, dryRun bool) (string, bool, error) {
+	return commitMatrixCSVUpdate(csvPath, writeOpts, u.cr.header, rows, dryRun)
 }
 
 func commitMatrixCSVUpdate(csvPath string, writeOpts *MatrixWriteOpts, header []string, rows [][]string, dryRun bool) (string, bool, error) {

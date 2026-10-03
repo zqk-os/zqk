@@ -209,32 +209,28 @@ func (m *MemoryAdjacencyEngine) RemoveEdge(ctx context.Context, source, target d
 	return nil
 }
 
+func cloneEdges(edgeMap map[string][]Edge, key string) []Edge {
+	edges, exists := edgeMap[key]
+	if !exists {
+		return []Edge{}
+	}
+	result := make([]Edge, len(edges))
+	copy(result, edges)
+	return result
+}
+
 // GetOutbound returns all outbound edges originating from source.
 func (m *MemoryAdjacencyEngine) GetOutbound(ctx context.Context, source dna.URN) ([]Edge, error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
-
-	edges, exists := m.outbound[source.String()]
-	if !exists {
-		return []Edge{}, nil
-	}
-	result := make([]Edge, len(edges))
-	copy(result, edges)
-	return result, nil
+	return cloneEdges(m.outbound, source.String()), nil
 }
 
 // GetInbound returns all inbound edges targeting target.
 func (m *MemoryAdjacencyEngine) GetInbound(ctx context.Context, target dna.URN) ([]Edge, error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
-
-	edges, exists := m.inbound[target.String()]
-	if !exists {
-		return []Edge{}, nil
-	}
-	result := make([]Edge, len(edges))
-	copy(result, edges)
-	return result, nil
+	return cloneEdges(m.inbound, target.String()), nil
 }
 
 // DetectCycles returns all simple directed cycles found in the graph.

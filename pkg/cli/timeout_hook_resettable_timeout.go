@@ -108,15 +108,15 @@ func (h *TimeoutHook) wrapCommandWithResettableTimeout(ctx context.Context, comm
 		setServerContext(context.Background())
 	}()
 
-	// Set up signal handling for graceful shutdown
+	errChan := make(chan error, 1)
 	sigChan, stopSig := setupInterruptSignal()
 	defer stopSig()
 
-	// Channel to track execution result
-	errChan := make(chan error, 1)
-	var timedOut bool
-	var exitCode int
-	var execErr error
+	var (
+		timedOut bool
+		exitCode int
+		execErr  error
+	)
 
 	// Execute command in goroutine
 	goroutinelabels.NewGoroutine("command_executor", fmt.Sprintf("executing command: %s", normalizedCmd)).
@@ -201,9 +201,6 @@ done:
 	if cancel != nil {
 		cancel() // Ensure cancel is called on all paths
 	}
-	endTime := time.Now()
-	metric := h.buildCommandMetric(command, normalizedCmd, args, cmdCtx, startTime, endTime, execErr, timedOut, exitCode)
-	h.recordMetricsAsync(metric, normalizedCmd)
-
+	h.recordExecutionMetric(command, normalizedCmd, args, cmdCtx, startTime, execErr, timedOut, exitCode)
 	return execErr
 }

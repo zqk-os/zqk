@@ -227,6 +227,15 @@ func ShouldFlushMetrics(sp storage.ObjectStorageProvider, logger logging.Logger)
 	return logger, true
 }
 
+// FlushMetricsIfReady invokes flushFn with an active logger if storage provider and recording status allow.
+func FlushMetricsIfReady(sp storage.ObjectStorageProvider, logger logging.Logger, flushFn func(logging.Logger)) {
+	log, ok := ShouldFlushMetrics(sp, logger)
+	if !ok {
+		return
+	}
+	flushFn(log)
+}
+
 // PersistBaseMetricInstance persists a base_metric instance to storage provider with a 60-second timeout.
 func PersistBaseMetricInstance(sp storage.ObjectStorageProvider, inst map[string]any, metricID, desc string, logger logging.Logger) {
 	ctx, cancel := context.WithTimeout(pkgctx.NewSystemContext(), 60*time.Second)
@@ -260,4 +269,19 @@ func ComputeEffectiveObjectCount(total int64, fallback int) int {
 		return fallback
 	}
 	return oc
+}
+
+// FinishAggregation creates the metric object and builds the final AggregationResult.
+func FinishAggregation(
+	ctx context.Context,
+	config *AggregationConfig,
+	aggregations map[string]any,
+	objectCount int,
+	createMetric func(context.Context, *AggregationConfig, map[string]any, int) (string, error),
+) (*AggregationResult, error) {
+	metricID, err := createMetric(ctx, config, aggregations, objectCount)
+	if err != nil {
+		return nil, errfmt.Newf("failed to create metric object").Wrap(err)
+	}
+	return BuildAggregationResult(config, metricID, aggregations, objectCount), nil
 }

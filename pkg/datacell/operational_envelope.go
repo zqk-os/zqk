@@ -434,11 +434,7 @@ func AllOperationalEnvelopeDiscoveryTokens() []string {
 // EnvelopeTickKindOverrideSummaries returns one-line per-(kind,profile) summaries for entries in
 // [kindOperationalEnvelopeOverrides], sorted by kind then profile — for scheduler tick logging.
 func EnvelopeTickKindOverrideSummaries() []string {
-	var kinds []string
-	for k := range kindOperationalEnvelopeOverrides {
-		kinds = append(kinds, k)
-	}
-	sort.Strings(kinds)
+	kinds := sortedMapKeys(kindOperationalEnvelopeOverrides)
 	out := make([]string, 0, len(kinds)*2)
 	profiles := []StorageProfile{ProfileCASEntity, ProfileLightFile, ProfileStream}
 	for _, kind := range kinds {
@@ -522,11 +518,7 @@ func (s OperationalEnvelopeSummary) CompactSummary() string {
 // entries in [kindOperationalEnvelopeAugments], sorted by kind then profile — for scheduler
 // data_cell_envelope_tick logging.
 func EnvelopeTickKindAugmentSummaries() []string {
-	var kinds []string
-	for k := range kindOperationalEnvelopeAugments {
-		kinds = append(kinds, k)
-	}
-	sort.Strings(kinds)
+	kinds := sortedMapKeys(kindOperationalEnvelopeAugments)
 	out := make([]string, 0, len(kinds)*2)
 	profiles := []StorageProfile{ProfileCASEntity, ProfileLightFile, ProfileStream}
 	for _, kind := range kinds {
@@ -542,3 +534,13 @@ func EnvelopeTickKindAugmentSummaries() []string {
 	}
 	return out
 }
+
+func sortedMapKeys[V any](m map[string]V) []string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	return keys
+}
+

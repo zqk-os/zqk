@@ -72,6 +72,11 @@ func (e *ZQLExecutor) WithObjectResolver(resolver ExistingObjectResolver) *ZQLEx
 	return e
 }
 
+// Engine returns the underlying transaction engine.
+func (e *ZQLExecutor) Engine() *TransactionEngine {
+	return e.engine
+}
+
 // Execute evaluates a ZQLProgram atomically.
 func (e *ZQLExecutor) Execute(ctx context.Context, program *ZQLProgram) (*ZQLExecutionReceipt, error) {
 	if program == nil {

@@ -2,6 +2,7 @@ package memgraph
 
 import (
 	"context"
+	"strings"
 	"sync"
 
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
@@ -236,13 +237,7 @@ func (tx *memgraphTransaction) CreateNode(ctx context.Context, node provider.Nod
 	}
 
 	// Build Cypher query
-	labels := ""
-	for i, label := range node.Labels {
-		if i > 0 {
-			labels += ":"
-		}
-		labels += label
-	}
+	labels := strings.Join(node.Labels, ":")
 
 	// Build properties map
 	props := map[string]any{

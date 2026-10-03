@@ -196,9 +196,7 @@ func (s *Sampler) Sample(event map[string]any) (bool, error) {
 	_ = concurrency.RunInLockWithLogger(
 		&s.mu, LockNameSamplerGetOrCreateBatch, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 		func() error {
-			var ok bool
-			batch, ok = s.batches[batchKey]
-			exists = ok
+			batch, exists = s.batches[batchKey]
 			if !exists {
 				batch = &SamplerBatch{
 					ObjectID:  batchKey,
@@ -294,10 +292,7 @@ func (s *Sampler) flushBatch(batchKey string) error {
 	_ = concurrency.RunInLockWithLogger(
 		&s.mu, LockNameSamplerFlushBatchGet, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 		func() error {
-			var ok bool
-			batch, ok = s.batches[batchKey]
-			exists = ok
-			if exists {
+			if batch, exists = s.batches[batchKey]; exists {
 				delete(s.batches, batchKey)
 			}
 			return nil
