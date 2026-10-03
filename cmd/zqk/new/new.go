@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"gopkg.in/yaml.v3"
@@ -71,6 +72,7 @@ func NewNewCmd() *cobra.Command {
 	root.AddCommand(newKindConvenienceCmd(objects.KindMission, "mis"))
 	root.AddCommand(newKindConvenienceCmd(objects.KindRoadmap))
 	root.AddCommand(newKindConvenienceCmd(objects.KindWorkstream, "ws"))
+	root.AddCommand(newKindConvenienceCmd(objects.KindEpic))
 	root.AddCommand(newKindConvenienceCmd(objects.KindPriorityPlan, "plan", "pri"))
 	root.AddCommand(newKindConvenienceCmd(objects.KindRequirement, "req"))
 	root.AddCommand(newKindConvenienceCmd(objects.KindCriteria, "crit"))
@@ -175,9 +177,11 @@ func runNewObject(cmd *cobra.Command, args []string) (err error) {
 
 	if shouldAutoTracePipeline(cmd, kind) {
 		if pipeErr := workflow.ApplyGeneratedTracePipelineFromCmd(cmd, id); pipeErr != nil {
-			return errfmt.Newf("minted %s but trace pipeline failed; promote will fail closed without criteria_refs", id).Wrap(pipeErr)
+			return errfmt.Newf("minted %s but trace pipeline failed; promote will fail closed without traceability links", id).Wrap(pipeErr)
 		}
 	}
+
+	emitJITGuidanceTip(cmd, kind)
 
 	wantPromote, _ := cmd.Flags().GetBool("promote")
 	if !wantPromote {
@@ -199,6 +203,31 @@ func runNewObject(cmd *cobra.Command, args []string) (err error) {
 		JobID(jobID).
 		Log()
 	return nil
+}
+
+func emitJITGuidanceTip(cmd *cobra.Command, kind string) {
+	format := cli.GetFormat(cmd)
+	if format == cli.FormatJSON || format == cli.FormatYAML || format == cli.FormatJSONRPC || format == cli.FormatStream {
+		return
+	}
+	var tip string
+	switch kind {
+	case objects.KindGoal:
+		tip = "💡 Shift-Left Tip: Goals represent strategic compass themes and decompose into 3–5 requirements (requirement_refs). Goals do NOT declare criteria_refs directly."
+	case objects.KindRequirement:
+		tip = "💡 Shift-Left Tip: Requirements define feature contracts and require >= 3 criteria (criteria_refs: static invariant, operational proof, negative boundary) and 1 test_case (TST) verifying the criteria bundle."
+	case objects.KindTestCase:
+		tip = "💡 Shift-Left Tip: Test cases verify the criteria bundle for 1 requirement (1:1 feature contract verification)."
+	case objects.KindBacklogItem:
+		tip = "💡 Shift-Left Tip: Backlog items are atomic units of effort satisfying 1–3 criteria. Decompose work across 2–5 BLIs per plan to avoid scope-stacking."
+	case objects.KindPriorityPlan:
+		tip = "💡 Shift-Left Tip: Priority plans bound exactly 1 cycle of work (sprint/kanban batch, 2–5 BLIs). Plans scope-lock upon entering in_progress to prevent drift."
+	case objects.KindEpic:
+		tip = "💡 Shift-Left Tip: Epics group multiple priority plans under a unifying theme. Permissive by default (plans can be added in progress unless execution_locked=true)."
+	}
+	if tip != "" {
+		fmt.Fprintln(cmd.ErrOrStderr(), color.CyanString(tip))
+	}
 }
 
 // shouldAutoTracePipeline is the mint-time fail-closed for REQ/GOAL/MIL.

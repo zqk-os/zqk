@@ -10,6 +10,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -419,7 +420,22 @@ func formatByteSize(b int64) string {
 	return fmt.Sprintf("%.2f %cB", float64(b)/float64(div), "KMGTPE"[exp])
 }
 
+var (
+	hygieneCacheMu      sync.RWMutex
+	cachedHygieneStats  TSDBHygieneStats
+	cachedHygieneAt     time.Time
+	cachedHygieneRoot   string
+)
+
 func readHygieneStats(projectRoot string, telem *TSDBTelemetry) {
+	hygieneCacheMu.RLock()
+	if cachedHygieneRoot == projectRoot && time.Since(cachedHygieneAt) < 30*time.Second && cachedHygieneStats.TotalStorageFiles > 0 {
+		telem.HygieneStats = cachedHygieneStats
+		hygieneCacheMu.RUnlock()
+		return
+	}
+	hygieneCacheMu.RUnlock()
+
 	ioTel, err := resourcehygiene.InspectIOResources(context.Background(), projectRoot)
 	if err != nil || ioTel == nil {
 		return
@@ -462,6 +478,12 @@ func readHygieneStats(projectRoot string, telem *TSDBTelemetry) {
 		DraftObjectsCount:   draftsCount,
 		Status:              status,
 	}
+
+	hygieneCacheMu.Lock()
+	cachedHygieneStats = telem.HygieneStats
+	cachedHygieneAt = time.Now()
+	cachedHygieneRoot = projectRoot
+	hygieneCacheMu.Unlock()
 }
 
 type commandMetricsPayload struct {

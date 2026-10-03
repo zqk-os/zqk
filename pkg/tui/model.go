@@ -449,6 +449,37 @@ func (m *UIModel) ProfileSpacingBonus() int {
 	}
 }
 
+// RefreshActiveTab refreshes only the data required by the currently active tab.
+// This prevents thrashing storage and filesystem telemetry on inactive tabs.
+func (m *UIModel) RefreshActiveTab(ctx context.Context, sp storage.ObjectStorageProvider, sec *pkgctx.SecurityContext) {
+	switch m.ActiveTab {
+	case TabState:
+		m.RefreshMutations()
+	case TabAudit:
+		m.RefreshAuditEvents()
+	case TabSwarm:
+		if sp != nil && sec != nil {
+			m.RefreshSwarm(ctx, sp, sec)
+		}
+	case TabPM:
+		if sp != nil && sec != nil {
+			m.RefreshPM(ctx, sp, sec)
+		}
+	case TabMetrics:
+		if sp != nil && sec != nil {
+			m.RefreshMetrics(ctx, sp, sec)
+		}
+	case TabScheduler:
+		if sp != nil && sec != nil {
+			m.RefreshScheduler(ctx, sp, sec)
+		}
+	case TabQA:
+		m.RefreshQA(ctx, sp, sec)
+	case TabHealth:
+		m.RefreshHealth()
+	}
+}
+
 // RefreshMutations re-reads recent state events from the non-audit streams.
 func (m *UIModel) RefreshMutations() {
 	if m.ProjectRoot == "" {

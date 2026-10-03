@@ -42,3 +42,16 @@ func TestAuthorizeDraftSweepApply_nilDenied(t *testing.T) {
 		t.Fatalf("want nil deny, got %v", err)
 	}
 }
+
+func TestAuthorizeDraftSweepApply_forceBypassesLocalWorkspace(t *testing.T) {
+	if err := authorizeDraftSweepApply(nil, true); err != nil {
+		t.Fatalf("expected nil error with force=true for nil secCtx, got %v", err)
+	}
+	if err := authorizeDraftSweepApply(pkgctx.NewSystemSecurityContext(), true); err != nil {
+		t.Fatalf("expected nil error with force=true for system secCtx, got %v", err)
+	}
+	secDoer := pkgctx.NewSecurityContext("ACC-doer", []string{"coder_agent"}, []string{"read:*"})
+	if err := authorizeDraftSweepApply(secDoer, true); err != nil {
+		t.Fatalf("expected nil error with force=true for unprivileged doer, got %v", err)
+	}
+}

@@ -622,3 +622,14 @@ func TestRunNewCommandSpec_CustomFlagsAndExamples(t *testing.T) {
 		t.Errorf("unexpected example: %v", ex0)
 	}
 }
+
+func TestNewEpicConvenienceCmd(t *testing.T) {
+	root := NewNewCmd()
+	cmd, _, err := root.Find([]string{"epic"})
+	if err != nil || cmd == nil {
+		t.Fatalf("expected 'epic' command to be found under 'new': err=%v, cmd=%v", err, cmd)
+	}
+	if cmd.Name() != "epic" {
+		t.Fatalf("expected command name 'epic', got %s", cmd.Name())
+	}
+}

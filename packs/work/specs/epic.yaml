@@ -11,6 +11,7 @@ traits:
   - base_object_traits
   - completable
   - manipulatable
+  - status_reactive
 fields:
   enclave_scope:
     access:
@@ -181,5 +182,32 @@ fields:
       - field_mutable_group
       - field_reference_group
     type: list
+    validation:
+      required: false
+  execution_locked:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: owner/planner.
+      automation_hooks: manual scope lock for epic enclave.
+      cardinality: one
+      criticality: configuration
+      default: false
+      dependencies: none.
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: When true, seals the epic against adding new priority plans. Default is false (permissive).
+      security: non-sensitive
+      system_usage:
+        - scope_lock
+        - planning
+      validation: boolean.
+    field_profile_code: EPC-007
+    permissions: rwx
+    semantic_type: flag
+    traits:
+      - field_mutable_group
+    type: bool
     validation:
       required: false

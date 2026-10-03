@@ -88,11 +88,32 @@ transitions:
     class_vs_specialty: class-agnostic
     shockwave:
       mode: propagate
-  - from: planned
+  - from: draft
     to: in_progress
-    description: Begin active execution of epic components.
+    description: Begin active execution of epic components when first linked priority plan starts from draft.
     manual: true
     auto: true
+    on_dependent_status:
+      kind: priority_plan
+      to:
+        - in_progress
+        - testing
+    catalyst: Standard progression
+    postconditions:
+      - role is execution_locked
+    class_vs_specialty: class-agnostic
+    shockwave:
+      mode: propagate
+  - from: planned
+    to: in_progress
+    description: Begin active execution of epic components when first linked priority plan starts.
+    manual: true
+    auto: true
+    on_dependent_status:
+      kind: priority_plan
+      to:
+        - in_progress
+        - testing
     catalyst: Standard progression
     postconditions:
       - role is execution_locked
@@ -126,6 +147,11 @@ transitions:
     description: Auto-complete or manually complete epic once child components reach completion.
     manual: true
     auto: true
+    on_dependent_status:
+      kind: priority_plan
+      to:
+        - complete
+        - completed
     catalyst: Standard progression
     postconditions:
       - role is terminal
