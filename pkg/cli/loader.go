@@ -2,7 +2,6 @@ package cli
 
 import (
 	"maps"
-	"path/filepath"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -50,24 +49,29 @@ func (pl *ProfileLoader) LoadProfile(name string) (*Profile, error) {
 	})
 }
 
-// loadProfileRecursive recursively loads profile and resolves inheritance
-func (pl *ProfileLoader) loadProfileRecursive(name string, visited map[string]bool) (*Profile, error) {
-	// Check for circular inheritance
+func (pl *ProfileLoader) readProfileData(name string, visited map[string]bool) (string, []byte, error) {
 	if visited[name] {
-		return nil, errfmt.Errorf("circular inheritance detected: %s", name)
+		return "", nil, errfmt.Errorf("circular inheritance detected: %s", name)
 	}
 	visited[name] = true
 
-	// Resolve profile file path
 	profilePath := pl.resolveProfilePath(name)
 	if profilePath == emptyValue {
-		return nil, errfmt.Errorf("CLI profile not found: %s", name)
+		return "", nil, errfmt.Errorf("CLI profile not found: %s", name)
 	}
 
-	// Load the profile file
 	data, err := fileutil.ReadFile(profilePath)
 	if err != nil {
-		return nil, errfmt.Errorf("failed to read CLI profile file %s: %w", profilePath, err)
+		return "", nil, errfmt.Errorf("failed to read CLI profile file %s: %w", profilePath, err)
+	}
+	return profilePath, data, nil
+}
+
+// loadProfileRecursive recursively loads profile and resolves inheritance
+func (pl *ProfileLoader) loadProfileRecursive(name string, visited map[string]bool) (*Profile, error) {
+	profilePath, data, err := pl.readProfileData(name, visited)
+	if err != nil {
+		return nil, err
 	}
 
 	var profile Profile
@@ -131,25 +135,7 @@ func (pl *ProfileLoader) loadProfileRecursive(name string, visited map[string]bo
 
 // resolveProfilePath finds the profile file path
 func (pl *ProfileLoader) resolveProfilePath(name string) string {
-	// Try different file name formats
-	possibleBaseNames := []string{
-		name,
-		strings.ReplaceAll(name, "-", "_"),
-		strings.ReplaceAll(name, "_", "-"),
-	}
-	possibleNames := make([]string, 0, len(possibleBaseNames))
-	for _, baseName := range possibleBaseNames {
-		possibleNames = append(possibleNames, baseName+paths.YAMLExtension)
-	}
-
-	for _, fileName := range possibleNames {
-		profilePath := filepath.Join(pl.profilesDir, fileName)
-		if info, err := fileutil.Stat(profilePath); err == nil && !info.IsDir() {
-			return profilePath
-		}
-	}
-
-	return ""
+	return paths.ResolveYAMLVariant(pl.profilesDir, name)
 }
 
 // findCLIProfilesDir attempts to find the CLI profiles directory

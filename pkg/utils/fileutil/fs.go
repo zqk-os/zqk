@@ -57,6 +57,14 @@ func writeOpenFlags() int {
 
 func IsNotExist(err error) bool { return os.IsNotExist(err) }
 
+// IgnoreNotExist returns nil if err indicates the file does not exist, otherwise err.
+func IgnoreNotExist(err error) error {
+	if err == nil || os.IsNotExist(err) {
+		return nil
+	}
+	return err
+}
+
 func IsExist(err error) bool { return os.IsExist(err) }
 
 func IsPermission(err error) bool { return os.IsPermission(err) }

@@ -2,6 +2,7 @@ package paths
 
 import (
 	"io/fs"
+	"os"
 	"path/filepath"
 	"strings"
 )
@@ -47,4 +48,20 @@ func IndexYAMLNames(dir string) map[string]string {
 		return nil
 	})
 	return idx
+}
+
+// ResolveYAMLVariant looks for a YAML file matching name or hyphen/underscore variants in dir.
+func ResolveYAMLVariant(dir, name string) string {
+	possibleNames := []string{
+		name + YAMLExtension,
+		strings.ReplaceAll(name, "-", "_") + YAMLExtension,
+		strings.ReplaceAll(name, "_", "-") + YAMLExtension,
+	}
+	for _, fileName := range possibleNames {
+		p := filepath.Join(dir, fileName)
+		if info, err := os.Stat(p); err == nil && !info.IsDir() {
+			return p
+		}
+	}
+	return ""
 }

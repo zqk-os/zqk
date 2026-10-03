@@ -433,3 +433,18 @@ func (e *GraphError) IsRetryable() bool {
 func (e *GraphError) IsNodeNotFound() bool {
 	return e.Code == ErrorCodeNodeNotFound
 }
+
+// ConnectViaPool is a shared helper to connect to a provider by creating a single-connection pool.
+func ConnectViaPool(ctx context.Context, config ConnectionConfig, createPool func(context.Context, ConnectionConfig) (ConnectionPool, error)) (GraphConnection, ConnectionPool, error) {
+	config.MaxConns = 1
+	pool, err := createPool(ctx, config)
+	if err != nil {
+		return nil, nil, err
+	}
+	conn, err := pool.GetConnection(ctx)
+	if err != nil {
+		pool.Close()
+		return nil, nil, err
+	}
+	return conn, pool, nil
+}

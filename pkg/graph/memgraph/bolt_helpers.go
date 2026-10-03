@@ -122,3 +122,40 @@ func convertNeo4jRelationship(rel neo4j.Relationship, fromID, toID string) *prov
 
 	return edge
 }
+
+// parseSingleNode extracts a provider.Node from query records, returning (nil, nil) if empty.
+func parseSingleNode(records []*neo4j.Record) (*provider.Node, error) {
+	if len(records) == 0 {
+		return nil, nil
+	}
+	nodeValue, ok := records[0].Values[0].(neo4j.Node)
+	if !ok {
+		return nil, errfmt.Errorf("unexpected node format in response")
+	}
+	return convertNeo4jNode(nodeValue), nil
+}
+
+// parseSingleEdge extracts a provider.Edge from query records, returning (nil, nil) if empty.
+func parseSingleEdge(records []*neo4j.Record, fromID, toID string) (*provider.Edge, error) {
+	if len(records) == 0 {
+		return nil, nil
+	}
+	record := records[0]
+	relValue, ok := record.Values[0].(neo4j.Relationship)
+	if !ok {
+		return nil, errfmt.Errorf("unexpected edge format in response")
+	}
+	recordFromID := fromID
+	recordToID := toID
+	if len(record.Values) > 1 {
+		if f, ok := record.Values[1].(string); ok {
+			recordFromID = f
+		}
+	}
+	if len(record.Values) > 2 {
+		if t, ok := record.Values[2].(string); ok {
+			recordToID = t
+		}
+	}
+	return convertNeo4jRelationship(relValue, recordFromID, recordToID), nil
+}

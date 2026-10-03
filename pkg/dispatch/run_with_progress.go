@@ -93,13 +93,8 @@ func runWithProgress(
 	if item.Profile == emptyProgressValue {
 		item.Profile = string(pkgctx.ProfileHuman)
 	}
-	ec := coordination.GetCoordinator()
-	var coord *coordination.Coordinator
-	if c, ok := ec.(*coordination.Coordinator); ok {
-		coord = c
-	}
-	helper := coordination.NewProgressHelper(
-		coord, item.ProjectRoot, item.OperationID, item.OperationType, item.Profile,
+	helper := coordination.NewCoordinatorProgressHelper(
+		item.ProjectRoot, item.OperationID, item.OperationType, item.Profile,
 	)
 
 	var state progressState

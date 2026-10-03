@@ -38,6 +38,10 @@ type scenarioBuilderPayload struct {
 	skipped             int
 }
 
+func (p *scenarioBuilderPayload) emit(status, message string, fields map[string]any) {
+	p.sb.emitCoordinatorEvent(p.ctx, ScenarioBuilderProfileName, status, message, fields)
+}
+
 // BuildFromDataFileViaPipeline implements the pipeline pattern for building from a data file.
 func (sb *ScenarioBuilder) BuildFromDataFileViaPipeline(ctx context.Context) error {
 	var logger logging.Logger
@@ -316,9 +320,8 @@ func stageScenarioCreateObjects(stageCtx *pipeline.Context, p any) (any, error) 
 func stageScenarioFinalize(stageCtx *pipeline.Context, p any) (any, error) {
 	payload := p.(*scenarioBuilderPayload)
 	sb := payload.sb
-	ctx := payload.ctx
 
-	sb.emitCoordinatorEvent(ctx, ScenarioBuilderProfileName, scenarioBuilderStatusProgress,
+	payload.emit(scenarioBuilderStatusProgress,
 		"Waiting for all validations to complete before clearing cache checker",
 		map[string]any{
 			"total_objects":         len(sb.dataFileObjects),
@@ -329,36 +332,36 @@ func stageScenarioFinalize(stageCtx *pipeline.Context, p any) (any, error) {
 
 	withLock(&payload.validationCounterMu, func() {
 		if payload.validationCounter != 0 {
-			sb.emitCoordinatorEvent(ctx, ScenarioBuilderProfileName, scenarioBuilderStatusWarning,
+			payload.emit(scenarioBuilderStatusWarning,
 				fmt.Sprintf("Validation counter is %d (expected 0)", payload.validationCounter),
 				map[string]any{"validation_counter": payload.validationCounter})
 		}
 	})
 
-	sb.emitCoordinatorEvent(ctx, ScenarioBuilderProfileName, scenarioBuilderStatusProgress,
+	payload.emit(scenarioBuilderStatusProgress,
 		"Clearing cache checker after all objects created and all validations complete",
 		map[string]any{"total_objects": len(sb.dataFileObjects), "created": payload.created, objects.FieldKeySkipped: payload.skipped})
 	storagepkg.SetCacheChecker(nil)
 
-	sb.emitCoordinatorEvent(ctx, ScenarioBuilderProfileName, scenarioBuilderStatusProgress,
+	payload.emit(scenarioBuilderStatusProgress,
 		fmt.Sprintf("Created %d objects (%d skipped)", payload.created, payload.skipped),
 		map[string]any{"created": payload.created, objects.FieldKeySkipped: payload.skipped, "total": len(sb.dataFileObjects)})
 
 	totalGenerated := 0
 	for kind, count := range sb.generated {
 		totalGenerated += count
-		sb.emitCoordinatorEvent(ctx, ScenarioBuilderProfileName, scenarioBuilderStatusProgress,
+		payload.emit(scenarioBuilderStatusProgress,
 			fmt.Sprintf("Created %d %s objects", count, kind),
 			map[string]any{objects.FieldKeyKind: kind, "count": count})
 	}
 
-	sb.emitCoordinatorEvent(ctx, ScenarioBuilderProfileName, scenarioBuilderStatusComplete,
+	payload.emit(scenarioBuilderStatusComplete,
 		fmt.Sprintf("Scenario build complete: %d total objects across %d kinds", totalGenerated, len(sb.generated)),
 		map[string]any{"total_objects": totalGenerated, "total_kinds": len(sb.generated)})
 
 	objectIDCache := system.GetGlobalObjectIDCache()
 	if err := objectIDCache.SaveCache(sb.config.TargetDir); err != nil {
-		sb.emitCoordinatorEvent(ctx, ScenarioBuilderProfileName, scenarioBuilderStatusWarning,
+		payload.emit(scenarioBuilderStatusWarning,
 			"Failed to save object ID cache after scenario build",
 			map[string]any{
 				"project_root": sb.config.TargetDir,

@@ -210,12 +210,18 @@ func (h *TimeoutHook) handleDaemonCommandTimeout(ctx context.Context, command, n
 	return false, nil
 }
 
+// setupInterruptSignal creates a channel for SIGINT and returns a cleanup function.
+func setupInterruptSignal() (<-chan os.Signal, func()) {
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt)
+	return sigChan, func() { signal.Stop(sigChan) }
+}
+
 // executeCommandWithTimeout executes a command with timeout and signal handling
 func (h *TimeoutHook) executeCommandWithTimeout(timeoutCtx context.Context, timeout time.Duration, normalizedCmd, command string, fn func() error) (timedOut bool, exitCode int, execErr error) {
 	// Set up signal handling for graceful shutdown
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, os.Interrupt)
-	defer signal.Stop(sigChan)
+	sigChan, stopSig := setupInterruptSignal()
+	defer stopSig()
 
 	// Channel to track execution result
 	errChan := make(chan error, 1)

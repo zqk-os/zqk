@@ -1,6 +1,7 @@
 package mcp
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -61,26 +62,28 @@ func (g *RoleAwarePromptGenerator) roleGuidanceDepsMissing() bool {
 	return g.guidanceGenerator == nil || g.secCtx == nil
 }
 
-// GenerateWelcomeMessage generates a role-specific welcome message.
-// Returns fallback content when role objects are unavailable (no panic).
-func (g *RoleAwarePromptGenerator) GenerateWelcomeMessage() (baseMessage, quickStart string) {
+func (g *RoleAwarePromptGenerator) loadRoleGuidance() (context.Context, *pkgctx.SecurityContext, *RoleGuidance) {
 	if g.roleGuidanceDepsMissing() {
-		return WelcomeMessageBase, WelcomeMessageQuickStartFallback
+		return nil, nil, nil
 	}
-
 	ctx := pkgctx.NewSystemContext()
 	secCtx := &pkgctx.SecurityContext{
 		Roles: g.roles,
 	}
-
 	guidance, err := g.guidanceGenerator.GenerateRoleGuidance(ctx, secCtx, g.role)
 	if err != nil || guidance == nil {
-		return WelcomeMessageBase, WelcomeMessageQuickStartFallback
+		return nil, nil, nil
 	}
-	if guidance.WelcomeMessage == emptyValue || guidance.WelcomeQuickStart == emptyValue {
-		return WelcomeMessageBase, WelcomeMessageQuickStartFallback
-	}
+	return ctx, secCtx, guidance
+}
 
+// GenerateWelcomeMessage generates a role-specific welcome message.
+// Returns fallback content when role objects are unavailable (no panic).
+func (g *RoleAwarePromptGenerator) GenerateWelcomeMessage() (baseMessage, quickStart string) {
+	_, _, guidance := g.loadRoleGuidance()
+	if guidance == nil || guidance.WelcomeMessage == emptyValue || guidance.WelcomeQuickStart == emptyValue {
+		return WelcomeMessageBase, WelcomeMessageQuickStartFallback
+	}
 	return guidance.WelcomeMessage, guidance.WelcomeQuickStart
 }
 
@@ -276,22 +279,10 @@ func (g *RoleAwarePromptGenerator) generateRoleSpecificGuidance() string {
 // loadAndFormatRoleGuidance loads and formats role guidance from role objects
 // Returns empty string if loading fails (caller should fail hard)
 func (g *RoleAwarePromptGenerator) loadAndFormatRoleGuidance() string {
-	if g.roleGuidanceDepsMissing() {
+	ctx, secCtx, guidance := g.loadRoleGuidance()
+	if guidance == nil {
 		return emptyValue // Caller will fail hard
 	}
-
-	ctx := pkgctx.NewSystemContext()
-	secCtx := &pkgctx.SecurityContext{
-		Roles: g.roles,
-	}
-
-	// Load guidance for primary role
-	guidance, err := g.guidanceGenerator.GenerateRoleGuidance(ctx, secCtx, g.role)
-	if err != nil || guidance == nil {
-		return emptyValue // Caller will fail hard
-	}
-
-	// Format and return role object-based guidance
 	return g.guidanceGenerator.FormatRoleGuidance(ctx, secCtx, guidance)
 }
 
@@ -389,17 +380,8 @@ func (g *RoleAwarePromptGenerator) GenerateMyRolePrompt() string {
 
 	parts = append(parts, "## Your Permissions\n\n", permissionsText)
 
-	if g.roleGuidanceDepsMissing() {
-		return strings.Join(parts, "")
-	}
-
-	ctx := pkgctx.NewSystemContext()
-	secCtx := &pkgctx.SecurityContext{
-		Roles: g.roles,
-	}
-
-	guidance, err := g.guidanceGenerator.GenerateRoleGuidance(ctx, secCtx, g.role)
-	if err != nil || guidance == nil {
+	ctx, secCtx, guidance := g.loadRoleGuidance()
+	if guidance == nil {
 		return strings.Join(parts, "")
 	}
 
@@ -442,18 +424,8 @@ func (g *RoleAwarePromptGenerator) generateAvailableOperationsText(guidance *Rol
 
 // Returns empty string if role objects are not available (caller should fail hard)
 func (g *RoleAwarePromptGenerator) generatePermissionsFromRoleObjects() string {
-	if g.roleGuidanceDepsMissing() {
-		return emptyValue // Caller will fail hard
-	}
-
-	ctx := pkgctx.NewSystemContext()
-	secCtx := &pkgctx.SecurityContext{
-		Roles: g.roles,
-	}
-
-	// Load guidance for primary role
-	guidance, err := g.guidanceGenerator.GenerateRoleGuidance(ctx, secCtx, g.role)
-	if err != nil || guidance == nil {
+	_, _, guidance := g.loadRoleGuidance()
+	if guidance == nil {
 		return emptyValue // Caller will fail hard
 	}
 

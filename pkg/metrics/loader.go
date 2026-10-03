@@ -2,7 +2,6 @@ package metrics
 
 import (
 	"maps"
-	"path/filepath"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -117,21 +116,7 @@ func (pl *ProfileLoader) loadProfileRecursive(name string, visited map[string]bo
 
 // resolveProfilePath finds the profile file path
 func (pl *ProfileLoader) resolveProfilePath(name string) string {
-	// Try different file name formats
-	possibleNames := []string{
-		name + paths.YAMLExtension,
-		strings.ReplaceAll(name, "-", "_") + paths.YAMLExtension,
-		strings.ReplaceAll(name, "_", "-") + paths.YAMLExtension,
-	}
-
-	for _, fileName := range possibleNames {
-		profilePath := filepath.Join(pl.profilesDir, fileName)
-		if info, err := fileutil.Stat(profilePath); err == nil && !info.IsDir() {
-			return profilePath
-		}
-	}
-
-	return ""
+	return paths.ResolveYAMLVariant(pl.profilesDir, name)
 }
 
 // findMetricsProfilesDir attempts to find the metrics profiles directory

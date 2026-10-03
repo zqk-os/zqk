@@ -7,21 +7,13 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 
 	"github.com/zqk-os/zqk/pkg/concurrency"
+	"github.com/zqk-os/zqk/pkg/functional"
 	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 // mapValues collects all values from a map into a slice
-// This is a DRY helper to avoid repeating the common pattern of iterating
-// over a map and appending values to a slice
 func mapValues[K comparable, V any](m map[K]V) []V {
-	if len(m) == 0 {
-		return nil
-	}
-	values := make([]V, 0, len(m))
-	for _, v := range m {
-		values = append(values, v)
-	}
-	return values
+	return functional.MapValues(m)
 }
 
 // mapValuesDeref collects all values from a map of pointers into a slice of dereferenced values

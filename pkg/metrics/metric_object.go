@@ -7,8 +7,11 @@ import (
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/metricsrecording"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 // MetricObjectConfig configures how a metric object is created
@@ -211,4 +214,50 @@ func TopNMap(counts map[string]int, n int) map[string]int {
 		topN[pairs[i].key] = pairs[i].value
 	}
 	return topN
+}
+
+// ShouldFlushMetrics validates storage provider and recording status, returning active logger or false.
+func ShouldFlushMetrics(sp storage.ObjectStorageProvider, logger logging.Logger) (logging.Logger, bool) {
+	if sp == nil || !metricsrecording.Enabled() {
+		return nil, false
+	}
+	if logger == nil {
+		logger = logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+	}
+	return logger, true
+}
+
+// PersistBaseMetricInstance persists a base_metric instance to storage provider with a 60-second timeout.
+func PersistBaseMetricInstance(sp storage.ObjectStorageProvider, inst map[string]any, metricID, desc string, logger logging.Logger) {
+	ctx, cancel := context.WithTimeout(pkgctx.NewSystemContext(), 60*time.Second)
+	defer cancel()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	if createErr := sp.Create(ctx, secCtx, inst); createErr != nil {
+		if logger != nil {
+			logging.Fluent(logger).Warn("Failed to persist " + desc).
+				MetricID(metricID).
+				WithError(createErr).
+				Log()
+		}
+	}
+}
+
+// FormatMetricWindow formats start and end times to RFC3339 UTC strings, returning error if metricID is empty.
+func FormatMetricWindow(metricID string, start, end time.Time) (string, string, error) {
+	if metricID == emptyValue {
+		return "", "", errfmt.Errorf("metric id is required")
+	}
+	return zqktime.FormatRFC3339UTC(start), zqktime.FormatRFC3339UTC(end), nil
+}
+
+// ComputeEffectiveObjectCount ensures non-negative object count with fallback when zero.
+func ComputeEffectiveObjectCount(total int64, fallback int) int {
+	oc := int(total)
+	if oc < 0 {
+		return 0
+	}
+	if oc == 0 {
+		return fallback
+	}
+	return oc
 }

@@ -207,41 +207,50 @@ func (c *Coordinator) emitOperationalEvent(ctx context.Context, eventCtx *EventC
 	_ = c.operationalRouter.Emit(ctx, operationalEvent, subscribers) //nolint:errcheck // Async, best-effort
 }
 
+func (c *Coordinator) mutateState(fn func(old *coordinatorState) *coordinatorState) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	oldState := c.state.Load()
+	if newState := fn(oldState); newState != nil {
+		c.state.Store(newState)
+	}
+}
+
 // Subscribe adds a subscriber for operational events
 func (c *Coordinator) Subscribe(subscriber OperationalEventSubscriber) string {
 	if subscriber == nil {
 		return ""
 	}
 
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	oldState := c.state.Load()
-	newState := &coordinatorState{
-		subscribers: make(map[string]OperationalEventSubscriber, len(oldState.subscribers)+1),
-		typeIndex:   make(map[string][]string, len(oldState.typeIndex)),
-	}
-
-	for k, v := range oldState.subscribers {
-		newState.subscribers[k] = v
-	}
-	for k, v := range oldState.typeIndex {
-		newSlice := make([]string, len(v))
-		copy(newSlice, v)
-		newState.typeIndex[k] = newSlice
-	}
-
 	subscriberID := subscriber.ID()
-	newState.subscribers[subscriberID] = subscriber
-
 	eventTypes := subscriber.EventTypes()
-	if len(eventTypes) > 0 {
-		for _, eventType := range eventTypes {
-			newState.typeIndex[eventType] = append(newState.typeIndex[eventType], subscriberID)
-		}
-	}
 
-	c.state.Store(newState)
+	c.mutateState(func(oldState *coordinatorState) *coordinatorState {
+		newState := &coordinatorState{
+			subscribers: make(map[string]OperationalEventSubscriber, len(oldState.subscribers)+1),
+			typeIndex:   make(map[string][]string, len(oldState.typeIndex)),
+		}
+
+		for k, v := range oldState.subscribers {
+			newState.subscribers[k] = v
+		}
+		for k, v := range oldState.typeIndex {
+			newSlice := make([]string, len(v))
+			copy(newSlice, v)
+			newState.typeIndex[k] = newSlice
+		}
+
+		newState.subscribers[subscriberID] = subscriber
+
+		if len(eventTypes) > 0 {
+			for _, eventType := range eventTypes {
+				newState.typeIndex[eventType] = append(newState.typeIndex[eventType], subscriberID)
+			}
+		}
+
+		return newState
+	})
 
 	return subscriberID
 }
@@ -253,38 +262,36 @@ func (c *Coordinator) hasSubscribers() bool {
 
 // Unsubscribe removes a subscriber
 func (c *Coordinator) Unsubscribe(subscriberID string) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	oldState := c.state.Load()
-	if _, exists := oldState.subscribers[subscriberID]; !exists {
-		return
-	}
-
-	newState := &coordinatorState{
-		subscribers: make(map[string]OperationalEventSubscriber, len(oldState.subscribers)-1),
-		typeIndex:   make(map[string][]string, len(oldState.typeIndex)),
-	}
-
-	for k, v := range oldState.subscribers {
-		if k != subscriberID {
-			newState.subscribers[k] = v
+	c.mutateState(func(oldState *coordinatorState) *coordinatorState {
+		if _, exists := oldState.subscribers[subscriberID]; !exists {
+			return nil
 		}
-	}
 
-	for k, v := range oldState.typeIndex {
-		var newSlice []string
-		for _, id := range v {
-			if id != subscriberID {
-				newSlice = append(newSlice, id)
+		newState := &coordinatorState{
+			subscribers: make(map[string]OperationalEventSubscriber, len(oldState.subscribers)-1),
+			typeIndex:   make(map[string][]string, len(oldState.typeIndex)),
+		}
+
+		for k, v := range oldState.subscribers {
+			if k != subscriberID {
+				newState.subscribers[k] = v
 			}
 		}
-		if len(newSlice) > 0 {
-			newState.typeIndex[k] = newSlice
-		}
-	}
 
-	c.state.Store(newState)
+		for k, v := range oldState.typeIndex {
+			var newSlice []string
+			for _, id := range v {
+				if id != subscriberID {
+					newSlice = append(newSlice, id)
+				}
+			}
+			if len(newSlice) > 0 {
+				newState.typeIndex[k] = newSlice
+			}
+		}
+
+		return newState
+	})
 }
 
 // DefaultLoggingRouter is the default implementation of LoggingRouter

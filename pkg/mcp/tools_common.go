@@ -166,7 +166,11 @@ func HandleObjectList(ctx context.Context, server *Server, args map[string]any) 
 	if format, ok := args[objects.FieldKeyFormat].(string); ok && format != emptyValue {
 		cmdArgs[objects.FieldKeyFormat] = format
 	}
-	execCtx, cancel := workflowExecContext(ctx, server, objectListTimeout)
+	return execCLIWithTimeout(ctx, server, objectListTimeout, cmdArgs)
+}
+
+func execCLIWithTimeout(ctx context.Context, server *Server, timeout time.Duration, cmdArgs map[string]any) (any, error) {
+	execCtx, cancel := workflowExecContext(ctx, server, timeout)
 	defer cancel()
 	return server.executeCLICommandWithContext(execCtx, cmdArgs)
 }
@@ -204,9 +208,7 @@ func HandleObjectGet(ctx context.Context, server *Server, args map[string]any) (
 	if fields, ok := args[mcpToolArgKeyFields].([]any); ok && len(fields) > 0 {
 		cmdArgs[mcpToolArgKeyFields] = fields
 	}
-	execCtx, cancel := workflowExecContext(ctx, server, 60*time.Second)
-	defer cancel()
-	return server.executeCLICommandWithContext(execCtx, cmdArgs)
+	return execCLIWithTimeout(ctx, server, 60*time.Second, cmdArgs)
 }
 
 // HandleObjectCount handles the object_count built-in tool
@@ -223,9 +225,7 @@ func HandleObjectCount(ctx context.Context, server *Server, args map[string]any)
 	if format, ok := args[objects.FieldKeyFormat].(string); ok && format != emptyValue {
 		cmdArgs[objects.FieldKeyFormat] = format
 	}
-	execCtx, cancel := workflowExecContext(ctx, server, 60*time.Second)
-	defer cancel()
-	return server.executeCLICommandWithContext(execCtx, cmdArgs)
+	return execCLIWithTimeout(ctx, server, 60*time.Second, cmdArgs)
 }
 
 // HandleSystemStatus handles the system_status built-in tool
@@ -236,9 +236,7 @@ func HandleSystemStatus(ctx context.Context, server *Server, args map[string]any
 	if format, ok := args[objects.FieldKeyFormat].(string); ok && format != emptyValue {
 		cmdArgs[objects.FieldKeyFormat] = format
 	}
-	execCtx, cancel := workflowExecContext(ctx, server, 60*time.Second)
-	defer cancel()
-	return server.executeCLICommandWithContext(execCtx, cmdArgs)
+	return execCLIWithTimeout(ctx, server, 60*time.Second, cmdArgs)
 }
 
 // HandleSystemCheck handles the system_check built-in tool
@@ -264,7 +262,5 @@ func HandleSystemCheck(ctx context.Context, server *Server, args map[string]any)
 	if format, ok := args[objects.FieldKeyFormat].(string); ok && format != emptyValue {
 		cmdArgs[objects.FieldKeyFormat] = format
 	}
-	execCtx, cancel := workflowExecContext(ctx, server, 60*time.Second)
-	defer cancel()
-	return server.executeCLICommandWithContext(execCtx, cmdArgs)
+	return execCLIWithTimeout(ctx, server, 60*time.Second, cmdArgs)
 }

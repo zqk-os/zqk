@@ -177,54 +177,52 @@ func runWorkItemSafely(w poolWork) {
 
 // Submit enqueues a task to be run by a pool worker. It is non-blocking if the queue has capacity;
 // otherwise it blocks until the context is cancelled or space is available.
+func (p *Pool) withSubmissionContext(fn func(runCtx context.Context) error) error {
+	p.submitMu.RLock()
+	defer p.submitMu.RUnlock()
+
+	p.mu.RLock()
+	runCtx := p.runCtx
+	stopped := p.stopped
+	p.mu.RUnlock()
+	if stopped || runCtx == nil {
+		return context.Canceled
+	}
+	return fn(runCtx)
+}
+
 // If the pool is stopped or the context is cancelled, Submit returns the context error.
 func (p *Pool) Submit(ctx context.Context, fn func(context.Context) error) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	p.submitMu.RLock()
-	defer p.submitMu.RUnlock()
-
-	p.mu.RLock()
-	runCtx := p.runCtx
-	stopped := p.stopped
-	p.mu.RUnlock()
-	if stopped || runCtx == nil {
-		return context.Canceled
-	}
-	w := poolWork{ctx: ctx, fn: fn}
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	case <-runCtx.Done():
-		return runCtx.Err()
-	case p.work <- w:
-		return nil
-	}
+	return p.withSubmissionContext(func(runCtx context.Context) error {
+		w := poolWork{ctx: ctx, fn: fn}
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-runCtx.Done():
+			return runCtx.Err()
+		case p.work <- w:
+			return nil
+		}
+	})
 }
 
 // SubmitNonBlocking enqueues a task if the queue has capacity and returns immediately.
 // Returns ErrPoolFull if the work channel is full or the pool is stopped.
 func (p *Pool) SubmitNonBlocking(ctx context.Context, fn func(context.Context) error) error {
-	p.submitMu.RLock()
-	defer p.submitMu.RUnlock()
-
-	p.mu.RLock()
-	runCtx := p.runCtx
-	stopped := p.stopped
-	p.mu.RUnlock()
-	if stopped || runCtx == nil {
-		return context.Canceled
-	}
-	w := poolWork{ctx: ctx, fn: fn}
-	select {
-	case <-runCtx.Done():
-		return runCtx.Err()
-	case p.work <- w:
-		return nil
-	default:
-		return ErrPoolFull
-	}
+	return p.withSubmissionContext(func(runCtx context.Context) error {
+		w := poolWork{ctx: ctx, fn: fn}
+		select {
+		case <-runCtx.Done():
+			return runCtx.Err()
+		case p.work <- w:
+			return nil
+		default:
+			return ErrPoolFull
+		}
+	})
 }
 
 // ErrPoolFull is returned when SubmitNonBlocking cannot enqueue because the pool is full.

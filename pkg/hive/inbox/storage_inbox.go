@@ -89,7 +89,7 @@ func (s *StorageInbox) ListPending() []TDEEnvelope {
 	return envelopes
 }
 
-func (s *StorageInbox) Approve(id string) error {
+func (s *StorageInbox) updatePendingEnvelope(id string, updates map[string]any, action string) error {
 	ctx := context.Background()
 
 	obj, err := s.provider.Read(ctx, s.secCtx, id)
@@ -102,40 +102,24 @@ func (s *StorageInbox) Approve(id string) error {
 		return ErrNotPending
 	}
 
-	updates := map[string]any{
-		objects.FieldKeyStatus: string(StatusApproved),
-	}
-
 	if err := s.provider.Update(ctx, s.secCtx, id, updates); err != nil {
-		return fmt.Errorf("failed to approve envelope: %w", err)
+		return fmt.Errorf("failed to %s envelope: %w", action, err)
 	}
 
 	return nil
 }
 
+func (s *StorageInbox) Approve(id string) error {
+	return s.updatePendingEnvelope(id, map[string]any{
+		objects.FieldKeyStatus: string(StatusApproved),
+	}, "approve")
+}
+
 func (s *StorageInbox) Reject(id string, reason string) error {
-	ctx := context.Background()
-
-	obj, err := s.provider.Read(ctx, s.secCtx, id)
-	if err != nil {
-		return ErrEnvelopeNotFound
-	}
-
-	status, _ := obj[objects.FieldKeyStatus].(string)
-	if status != string(StatusPending) {
-		return ErrNotPending
-	}
-
-	updates := map[string]any{
+	return s.updatePendingEnvelope(id, map[string]any{
 		objects.FieldKeyStatus:       string(StatusRejected),
 		objects.FieldKeyRejectReason: reason,
-	}
-
-	if err := s.provider.Update(ctx, s.secCtx, id, updates); err != nil {
-		return fmt.Errorf("failed to reject envelope: %w", err)
-	}
-
-	return nil
+	}, "reject")
 }
 
 func (s *StorageInbox) mapToEnvelope(obj map[string]any) TDEEnvelope {

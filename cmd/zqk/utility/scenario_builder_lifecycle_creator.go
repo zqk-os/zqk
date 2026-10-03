@@ -32,9 +32,7 @@ func (sb *ScenarioBuilder) createLifecycleObjects(ctx context.Context) error {
 		return errfmt.Newf("failed to read lifecycles directory").Wrap(err)
 	}
 
-	created := 0
-	skipped := 0
-	errors := 0
+	var created, skipped, errors int
 
 	for _, entry := range entries {
 		if entry.IsDir() {
@@ -241,12 +239,7 @@ func lifecycleToObjectMap(lifecycle *objects.Lifecycle, objectType, version stri
 	}
 
 	// Build the object
-	obj, err := builder.Build()
-	if err != nil {
-		return nil, errfmt.Newf("failed to build lifecycle object").Wrap(err)
-	}
-
-	return obj, nil
+	return builder.Build()
 }
 
 // getObjectTypeAbbreviationForLifecycle converts object_type to abbreviation for lifecycle IDs

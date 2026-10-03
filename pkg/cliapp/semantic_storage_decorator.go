@@ -70,6 +70,14 @@ func (d *SemanticStorageDecorator) Read(ctx context.Context, secCtx *pkgctx.Secu
 	return obj, nil
 }
 
+func (d *SemanticStorageDecorator) filterResult(ctx context.Context, secCtx *pkgctx.SecurityContext, res *storage.QueryResult, err error) (*storage.QueryResult, error) {
+	if err != nil {
+		return nil, err
+	}
+	d.filterSemanticObjects(ctx, secCtx, res)
+	return res, nil
+}
+
 func (d *SemanticStorageDecorator) List(ctx context.Context, secCtx *pkgctx.SecurityContext, storageCtx *pkgctx.StorageContext, filter storage.ListFilter) (*storage.QueryResult, error) {
 	// If a specific kind is requested and it's not allowed, fast-fail
 	if filter.Kind != "" && !d.isKindAllowed(ctx, secCtx, filter.Kind) {
@@ -77,22 +85,12 @@ func (d *SemanticStorageDecorator) List(ctx context.Context, secCtx *pkgctx.Secu
 	}
 
 	res, err := d.ObjectStorageProvider.List(ctx, secCtx, storageCtx, filter)
-	if err != nil {
-		return nil, err
-	}
-
-	d.filterSemanticObjects(ctx, secCtx, res)
-	return res, nil
+	return d.filterResult(ctx, secCtx, res, err)
 }
 
 func (d *SemanticStorageDecorator) Query(ctx context.Context, secCtx *pkgctx.SecurityContext, storageCtx *pkgctx.StorageContext, query storage.Query) (*storage.QueryResult, error) {
 	res, err := d.ObjectStorageProvider.Query(ctx, secCtx, storageCtx, query)
-	if err != nil {
-		return nil, err
-	}
-
-	d.filterSemanticObjects(ctx, secCtx, res)
-	return res, nil
+	return d.filterResult(ctx, secCtx, res, err)
 }
 
 func (d *SemanticStorageDecorator) filterSemanticObjects(ctx context.Context, secCtx *pkgctx.SecurityContext, res *storage.QueryResult) {

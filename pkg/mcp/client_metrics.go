@@ -110,11 +110,8 @@ func NewClientMetricsStore(filePath string, shutdownCtx context.Context) (*Clien
 	}
 
 	// Load existing metrics
-	if err := store.Load(); err != nil {
-		// If file doesn't exist, that's okay - start fresh
-		if !fileutil.IsNotExist(err) {
-			return nil, errfmt.Newf("failed to load metrics").Wrap(err)
-		}
+	if err := fileutil.IgnoreNotExist(store.Load()); err != nil {
+		return nil, errfmt.Newf("failed to load metrics").Wrap(err)
 	}
 
 	return store, nil

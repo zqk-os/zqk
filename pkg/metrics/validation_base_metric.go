@@ -1,11 +1,9 @@
 package metrics
 
 import (
-	"context"
 	"fmt"
 	"time"
 
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
@@ -143,16 +141,6 @@ func PersistAsyncValidationMetricsToStorageAsync(
 				return
 			}
 
-			ctx, cancel := context.WithTimeout(pkgctx.NewSystemContext(), 60*time.Second)
-			defer cancel()
-			secCtx := pkgctx.NewSystemSecurityContext()
-			if createErr := sp.Create(ctx, secCtx, instance); createErr != nil {
-				if logger != nil {
-					logging.Fluent(logger).Warn("Failed to persist async validation base_metric").
-						MetricID(metricID).
-						WithError(createErr).
-						Log()
-				}
-			}
+			PersistBaseMetricInstance(sp, instance, metricID, "async validation base_metric", logger)
 		})
 }

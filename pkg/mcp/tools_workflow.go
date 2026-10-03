@@ -178,6 +178,23 @@ func workflowExecContext(ctx context.Context, server *Server, timeout time.Durat
 	return context.WithTimeout(base, timeout)
 }
 
+func workflowFormat(args map[string]any) string {
+	if f, ok := args[objects.FieldKeyFormat].(string); ok && f != emptyValue {
+		return f
+	}
+	return workflowFormatJSON
+}
+
+func executeWorkflowCLI(ctx context.Context, server *Server, cliArgs map[string]any, errMsg string) (any, error) {
+	execCtx, cancel := workflowExecContext(ctx, server, workflowObjectListTimeout)
+	defer cancel()
+	result, err := server.executeCLICommandWithContext(execCtx, cliArgs)
+	if err != nil {
+		return nil, errfmt.Newf(errMsg).Wrap(err)
+	}
+	return result, nil
+}
+
 // HandleGetCurrentPriorityPlan handles the get_current_priority_plan built-in tool.
 // Resolves the same Gantt lead as `zqk workflow whats-next` (not lowest active_order).
 func HandleGetCurrentPriorityPlan(ctx context.Context, server *Server, _ map[string]any) (any, error) {
@@ -188,11 +205,9 @@ func HandleGetCurrentPriorityPlan(ctx context.Context, server *Server, _ map[str
 		objects.FieldKeyFormat: workflowFormatJSON,
 	}
 
-	execCtx, cancel := workflowExecContext(ctx, server, workflowObjectListTimeout)
-	defer cancel()
-	result, err := server.executeCLICommandWithContext(execCtx, cliArgs)
+	result, err := executeWorkflowCLI(ctx, server, cliArgs, "failed to get current priority plan")
 	if err != nil {
-		return nil, errfmt.Newf("failed to get current priority plan").Wrap(err)
+		return nil, err
 	}
 
 	priorityPlan, found, err := extractWhatsNextLeadPlan(result)
@@ -225,35 +240,21 @@ func HandleGetPriorityPlanItems(ctx context.Context, server *Server, args map[st
 		)
 	}
 
-	// Get format (default to json)
-	format := workflowFormatJSON
-	if f, ok := args[objects.FieldKeyFormat].(string); ok && f != emptyValue {
-		format = f
-	}
-
 	// Use CLI command with brand prefix. Omit "kind" — it's already in the path (object list backlog_item).
 	cliArgs := map[string]any{
 		workflowKeyCmdPath:     GetCommandPath(workflowCmdListBacklog),
 		workflowKeyFilter:      []string{fmt.Sprintf("priority_plan_ref=%s", priorityPlanID)},
 		workflowKeySortBy:      workflowSortPriority,
 		workflowKeySortAsc:     true,
-		objects.FieldKeyFormat: format,
+		objects.FieldKeyFormat: workflowFormat(args),
 	}
 
-	execCtx, cancel := workflowExecContext(ctx, server, workflowObjectListTimeout)
-	defer cancel()
-	return server.executeCLICommandWithContext(execCtx, cliArgs)
+	return executeWorkflowCLI(ctx, server, cliArgs, "failed to get priority plan items")
 }
 
 // HandleGetCurrentBacklogItem handles the get_current_backlog_item built-in tool
 func HandleGetCurrentBacklogItem(ctx context.Context, server *Server, args map[string]any) (any, error) {
 	ctx = EnsureContext(ctx)
-	// Get format (default to json)
-	format := workflowFormatJSON
-	if f, ok := args[objects.FieldKeyFormat].(string); ok && f != emptyValue {
-		format = f
-	}
-
 	// Use CLI command with brand prefix. Omit "kind" — it's already in the path (object list backlog_item).
 	cliArgs := map[string]any{
 		workflowKeyCmdPath:     GetCommandPath(workflowCmdListBacklog),
@@ -261,14 +262,12 @@ func HandleGetCurrentBacklogItem(ctx context.Context, server *Server, args map[s
 		workflowKeySortBy:      workflowSortPriority,
 		workflowKeySortAsc:     true,
 		workflowKeyLimit:       1,
-		objects.FieldKeyFormat: format,
+		objects.FieldKeyFormat: workflowFormat(args),
 	}
 
-	execCtx, cancel := workflowExecContext(ctx, server, workflowObjectListTimeout)
-	defer cancel()
-	result, err := server.executeCLICommandWithContext(execCtx, cliArgs)
+	result, err := executeWorkflowCLI(ctx, server, cliArgs, "failed to get current backlog item")
 	if err != nil {
-		return nil, errfmt.Newf("failed to get current backlog item").Wrap(err)
+		return nil, err
 	}
 
 	// Extract the first item from the result
@@ -287,11 +286,7 @@ func HandleGetCurrentBacklogItem(ctx context.Context, server *Server, args map[s
 // cannot hang; each CLI call is further limited by getNextBacklogItemPerCallTimeout.
 func HandleGetNextBacklogItem(ctx context.Context, server *Server, args map[string]any) (any, error) {
 	ctx = EnsureContext(ctx)
-	// Get format (default to json)
-	format := workflowFormatJSON
-	if f, ok := args[objects.FieldKeyFormat].(string); ok && f != emptyValue {
-		format = f
-	}
+	format := workflowFormat(args)
 
 	// Cap total time for this tool so we never run 20s+20s (planned then exploring).
 	totalCtx, totalCancel := context.WithTimeout(ctx, getNextBacklogItemTotalTimeout)

@@ -60,17 +60,8 @@ func (p *MemGraphProvider) CreatePool(ctx context.Context, config provider.Conne
 //
 //nolint:gocritic // ConnectionConfig matches provider interface; keep value semantics
 func (p *MemGraphProvider) Connect(ctx context.Context, config provider.ConnectionConfig) (provider.GraphConnection, error) {
-	// Create a single-connection pool
-	config.MaxConns = 1
-	pool, err := p.CreatePool(ctx, config)
+	conn, pool, err := provider.ConnectViaPool(ctx, config, p.CreatePool)
 	if err != nil {
-		return nil, err
-	}
-
-	// Get the single connection
-	conn, err := pool.GetConnection(ctx)
-	if err != nil {
-		pool.Close() //nolint:gosec
 		return nil, err
 	}
 

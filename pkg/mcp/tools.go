@@ -125,65 +125,37 @@ func RegisterGraphTools(server *Server) {
 	)
 }
 
+func registerCoreToolsAndResources(server *Server) {
+	RegisterGraphTools(server)
+	RegisterEchoTool(server)
+	RegisterChatInjectTool(server)
+	RegisterIdeBridgeTool(server)
+	RegisterCommonTools(server)
+	RegisterAgentExecutionTools(server)
+	RegisterObserverTools(server)
+	RegisterInteractiveTools(server)
+	RegisterProjectContextTool(server)
+	RegisterMetricsTools(server)
+	RegisterDeclarativeTools(server)
+	RegisterOnboardingPrompts(server)
+	RegisterExternalTools(server)
+	RegisterCriticalResources(server)
+	DiscoverAdditionalResources(server)
+}
+
 // RegisterAllTools registers all available tools (graph and metrics)
 // Note: Metrics tools are now bootstrapped automatically from context
 // during server initialization, not manually registered here
 func RegisterAllTools(server *Server) {
-	RegisterGraphTools(server)
-	RegisterEchoTool(server)            // Test tool for MCP communication validation
-	RegisterChatInjectTool(server)      // Chat integration tool
-	RegisterIdeBridgeTool(server)       // IDE bridge control bus (zqk-ide-bridge extension)
-	RegisterCommonTools(server)         // Common CLI commands as built-in tools (always available)
-	RegisterAgentExecutionTools(server) // Quantum Sandbox tool for determinisitic evaluation
-	RegisterObserverTools(server)       // Live Go AST search (do not persist a census)
-	RegisterVerificationTools(server)   // Reusable async trigger for verification
-	RegisterInteractiveTools(server)    // Interactive object creation tools
-	RegisterProjectContextTool(server)  // P0-3: Project context onboarding tool
-	RegisterMetricsTools(server)        // Metrics tools for observability
-	RegisterDeclarativeTools(server)    // Declarative ZPARQL query and ZQL mutate engines
-
-	// Register all onboarding prompts
-	RegisterOnboardingPrompts(server)
-
-	RegisterExternalTools(server) // Tools for handling massive blobs and external transit
-
-	// Register critical resources (lifecycles, workflows, system health)
-	// Resources are registered dynamically - only if files exist
-	RegisterCriticalResources(server)
-
-	// Discover additional resources dynamically from docs directory
-	// This allows new documentation to be automatically available
-	DiscoverAdditionalResources(server)
+	registerCoreToolsAndResources(server)
+	RegisterVerificationTools(server)
 }
 
 // RegisterAllToolsWithSecurityContext registers all available tools with security context
 // This allows role-based filtering of workflow tools
 func RegisterAllToolsWithSecurityContext(server *Server, secCtx *pkgctx.SecurityContext) {
-	RegisterGraphTools(server)
-	RegisterDeclarativeTools(server)      // Declarative ZPARQL query and ZQL mutate engines
-	RegisterEchoTool(server)              // Test tool for MCP communication validation
-	RegisterChatInjectTool(server)        // Chat integration tool
-	RegisterIdeBridgeTool(server)         // IDE bridge control bus (zqk-ide-bridge extension)
-	RegisterCommonTools(server)           // Common CLI commands as built-in tools (always available)
-	RegisterAgentExecutionTools(server)   // Quantum Sandbox tool for determinisitic evaluation
-	RegisterObserverTools(server)         // Live Go AST search (do not persist a census)
-	RegisterInteractiveTools(server)      // Interactive object creation tools
-	RegisterWorkflowTools(server, secCtx) // Workflow-aware tools (role-based)
-	RegisterProjectContextTool(server)    // P0-3: Project context onboarding tool
-	RegisterMetricsTools(server)          // Metrics tools for observability
-
-	// Register all onboarding prompts
-	RegisterOnboardingPrompts(server)
-
-	RegisterExternalTools(server) // Tools for handling massive blobs and external transit
-
-	// Register critical resources (lifecycles, workflows, system health)
-	// Resources are registered dynamically - only if files exist
-	RegisterCriticalResources(server)
-
-	// Discover additional resources dynamically from docs directory
-	// This allows new documentation to be automatically available
-	DiscoverAdditionalResources(server)
+	registerCoreToolsAndResources(server)
+	RegisterWorkflowTools(server, secCtx)
 }
 
 // RegisterDeclarativeTools registers declarative ZPARQL query and ZQL mutation tools.
