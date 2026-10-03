@@ -32,71 +32,78 @@ func healthMissingStreakFilePath(projectRoot string) string {
 	return filepath.Join(projectRoot, paths.ProjectDataDir, paths.SchedulerDir, convergenceHealthMissingStreakFile)
 }
 
-func resetHealthMissingStreakForJob(projectRoot, jobID string) {
-	if projectRoot == "" || jobID == "" {
+func loadHealthMissingStreakMap(p string) map[string]int {
+	b, err := fileutil.ReadFile(p)
+	if err != nil || len(b) == 0 {
+		return map[string]int{}
+	}
+	var m map[string]int
+	if err := json.Unmarshal(b, &m); err != nil || m == nil {
+		return map[string]int{}
+	}
+	return m
+}
+
+func withHealthMissingStreakMap(projectRoot string, fn func(p string, m map[string]int)) {
+	if projectRoot == "" {
 		return
 	}
 	healthMissingStreakMu.Lock()
 	defer healthMissingStreakMu.Unlock()
 	p := healthMissingStreakFilePath(projectRoot)
-	b, err := fileutil.ReadFile(p)
-	if err != nil || len(b) == 0 {
+	m := loadHealthMissingStreakMap(p)
+	fn(p, m)
+}
+
+func resetHealthMissingStreakForJob(projectRoot, jobID string) {
+	if jobID == "" {
 		return
 	}
-	var m map[string]int
-	if json.Unmarshal(b, &m) != nil || m == nil {
-		return
-	}
-	if _, ok := m[jobID]; !ok {
-		return
-	}
-	delete(m, jobID)
-	if len(m) == 0 {
-		if err := fileutil.Remove(p); err != nil && !fileutil.IsNotExist(err) {
-			logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-			SLog(logger).Debug("Failed to remove empty health missing streak file").WithError(err).Log()
+	withHealthMissingStreakMap(projectRoot, func(p string, m map[string]int) {
+		if _, ok := m[jobID]; !ok {
+			return
 		}
-		return
-	}
-	out, err := json.MarshalIndent(m, "", "  ")
-	if err != nil {
-		return
-	}
-	if err := fileutil.WriteSecureFile(p, out); err != nil {
-		logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-		SLog(logger).Debug("Failed to update health missing streak file").WithError(err).Log()
-	}
+		delete(m, jobID)
+		if len(m) == 0 {
+			if err := fileutil.Remove(p); err != nil && !fileutil.IsNotExist(err) {
+				logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+				SLog(logger).Debug("Failed to remove empty health missing streak file").WithError(err).Log()
+			}
+			return
+		}
+		out, err := json.MarshalIndent(m, "", "  ")
+		if err != nil {
+			return
+		}
+		if err := fileutil.WriteSecureFile(p, out); err != nil {
+			logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+			SLog(logger).Debug("Failed to update health missing streak file").WithError(err).Log()
+		}
+	})
 }
 
 // bumpHealthMissingSkipStreak increments the per-job streak and returns the new value.
 func bumpHealthMissingSkipStreak(projectRoot, jobID string) int {
-	healthMissingStreakMu.Lock()
-	defer healthMissingStreakMu.Unlock()
-	p := healthMissingStreakFilePath(projectRoot)
-	m := map[string]int{}
-	if b, err := fileutil.ReadFile(p); err == nil && len(b) > 0 {
-		if err := json.Unmarshal(b, &m); err != nil {
-			logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-			SLog(logger).Debug("Failed to unmarshal existing health missing streak file").WithError(err).Log()
+	if jobID == "" {
+		return 0
+	}
+	var n int
+	withHealthMissingStreakMap(projectRoot, func(p string, m map[string]int) {
+		m[jobID]++
+		n = m[jobID]
+		b, err := json.MarshalIndent(m, "", "  ")
+		if err != nil {
+			return
 		}
-	}
-	if m == nil {
-		m = map[string]int{}
-	}
-	m[jobID]++
-	n := m[jobID]
-	b, err := json.MarshalIndent(m, "", "  ")
-	if err != nil {
-		return n
-	}
-	if err := fileutil.EnsureDir(filepath.Dir(p)); err != nil {
-		logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-		SLog(logger).Debug("Failed to create directory for health missing streak file").WithError(err).Log()
-	}
-	if err := fileutil.WriteSecureFile(p, b); err != nil {
-		logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-		SLog(logger).Debug("Failed to write updated health missing streak file").WithError(err).Log()
-	}
+		if err := fileutil.EnsureDir(filepath.Dir(p)); err != nil {
+			logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+			SLog(logger).Debug("Failed to create directory for health missing streak file").WithError(err).Log()
+		}
+		if err := fileutil.WriteSecureFile(p, b); err != nil {
+			logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+			SLog(logger).Debug("Failed to write updated health missing streak file").WithError(err).Log()
+		}
+	})
 	return n
 }
 

@@ -33,8 +33,7 @@ func NewCapacityScalingHandler(sp storage.ObjectStorageProvider, projectRoot str
 // Execute performs the capacity scaling logic.
 func (h *CapacityScalingHandler) Execute(ctx context.Context, job *ScheduledJob) error {
 	// 1. Resolve local identity
-	idManager := federation.NewIdentityManager(h.projectRoot)
-	kernelID, err := idManager.GetKernelID()
+	kernelID, err := federation.ResolveKernelID(h.projectRoot)
 	if err != nil {
 		return err
 	}

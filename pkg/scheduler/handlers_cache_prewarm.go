@@ -91,11 +91,14 @@ func tierTimeoutFromJob(ctx context.Context, defaultTimeout, buffer time.Duratio
 	return t
 }
 
+func newTierContext(ctx context.Context, defaultTimeout, buffer time.Duration) (context.Context, context.CancelFunc) {
+	return context.WithTimeout(ctx, tierTimeoutFromJob(ctx, defaultTimeout, buffer))
+}
+
 // runSequentialTier runs a single task with a tier-scoped context so the tier cannot consume
 // the whole job timeout. Used for Tier 1 (base cache). Logs and continues on error (best-effort).
 func (h *CachePrewarmHandler) runSequentialTier(ctx context.Context, jobID string, tierName string, defaultTimeout, buffer time.Duration, fn func(context.Context) error) {
-	timeout := tierTimeoutFromJob(ctx, defaultTimeout, buffer)
-	tierCtx, cancel := context.WithTimeout(ctx, timeout)
+	tierCtx, cancel := newTierContext(ctx, defaultTimeout, buffer)
 	defer cancel()
 	if err := fn(tierCtx); err != nil {
 		CachePrewarmLog(h.logger).Warn(LogEventCachePrewarmTierTaskFailed).
@@ -110,9 +113,9 @@ func (h *CachePrewarmHandler) runSequentialTier(ctx context.Context, jobID strin
 // never blocks forever (see SCHEDULER_OVERLOAD_AND_TIMEOUT.md). Add Tier 4+ by adding another
 // runParallelTier call with the same pattern.
 func (h *CachePrewarmHandler) runParallelTier(ctx context.Context, jobID string, tierNum int, tierName string, defaultTimeout, buffer time.Duration, tasks []tierTask) {
-	timeout := tierTimeoutFromJob(ctx, defaultTimeout, buffer)
-	tierCtx, cancel := context.WithTimeout(ctx, timeout)
+	tierCtx, cancel := newTierContext(ctx, defaultTimeout, buffer)
 	defer cancel()
+
 
 	var wg sync.WaitGroup
 	for _, task := range tasks {

@@ -62,23 +62,39 @@ var (
 )
 
 // ReapOrphanedTempFiles traverses .zqk looking for temp files older than threshold,
-// safely removing them.
-func ReapOrphanedTempFiles(projectRoot string, threshold time.Duration, dryRun bool) (int, int64, []string, error) {
+type reaperTarget struct {
+	zqkDir string
+	cutoff time.Time
+	valid  bool
+}
+
+func initReaperTarget(projectRoot string, threshold, defaultThreshold time.Duration) reaperTarget {
 	if projectRoot == "" {
-		return 0, 0, nil, nil
+		return reaperTarget{}
 	}
 	if threshold <= 0 {
-		threshold = DefaultTempOrphanAge
+		threshold = defaultThreshold
 	}
+	return reaperTarget{
+		zqkDir: filepath.Join(projectRoot, paths.ProjectDataDir),
+		cutoff: time.Now().UTC().Add(-threshold),
+		valid:  true,
+	}
+}
 
-	zqkDir := filepath.Join(projectRoot, paths.ProjectDataDir)
-	cutoff := time.Now().UTC().Add(-threshold)
+// ReapOrphanedTempFiles scans .zqk for abandoned .tmp.* and .pending.* files older than threshold,
+// safely removing them.
+func ReapOrphanedTempFiles(projectRoot string, threshold time.Duration, dryRun bool) (int, int64, []string, error) {
+	target := initReaperTarget(projectRoot, threshold, DefaultTempOrphanAge)
+	if !target.valid {
+		return 0, 0, nil, nil
+	}
 
 	var count int
 	var reclaimedBytes int64
 	var reaped []string
 
-	err := filepath.WalkDir(zqkDir, func(path string, d fs.DirEntry, err error) error {
+	err := filepath.WalkDir(target.zqkDir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil || d.IsDir() {
 			return nil
 		}
@@ -90,7 +106,7 @@ func ReapOrphanedTempFiles(projectRoot string, threshold time.Duration, dryRun b
 		if errStat != nil {
 			return nil
 		}
-		if info.ModTime().Before(cutoff) {
+		if info.ModTime().Before(target.cutoff) {
 			reclaimedBytes += info.Size()
 			count++
 			rel, relErr := filepath.Rel(projectRoot, path)
@@ -112,20 +128,15 @@ func ReapOrphanedTempFiles(projectRoot string, threshold time.Duration, dryRun b
 // ReapStaleLocks scans .zqk for .lock files older than threshold and reaps them
 // only if no active process holds an exclusive flock.
 func ReapStaleLocks(projectRoot string, threshold time.Duration, dryRun bool) (int, []string, error) {
-	if projectRoot == "" {
+	target := initReaperTarget(projectRoot, threshold, DefaultLockStaleAge)
+	if !target.valid {
 		return 0, nil, nil
 	}
-	if threshold <= 0 {
-		threshold = DefaultLockStaleAge
-	}
-
-	zqkDir := filepath.Join(projectRoot, paths.ProjectDataDir)
-	cutoff := time.Now().UTC().Add(-threshold)
 
 	var count int
 	var reaped []string
 
-	err := filepath.WalkDir(zqkDir, func(path string, d fs.DirEntry, err error) error {
+	err := filepath.WalkDir(target.zqkDir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil || d.IsDir() {
 			return nil
 		}
@@ -139,7 +150,7 @@ func ReapStaleLocks(projectRoot string, threshold time.Duration, dryRun bool) (i
 		if errStat != nil {
 			return nil
 		}
-		if !info.ModTime().Before(cutoff) {
+		if !info.ModTime().Before(target.cutoff) {
 			return nil
 		}
 

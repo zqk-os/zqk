@@ -90,49 +90,33 @@ func (idx *SpecIndex) GetKindSummary(kind string) (SpecKindSummary, bool) {
 	return ks, ok
 }
 
-// GetGroupableFields returns all groupable fields for a kind.
-func (idx *SpecIndex) GetGroupableFields(kind string) []SpecFieldSummary {
+func (idx *SpecIndex) filterKindFields(kind string, predicate func(f SpecFieldSummary) bool) []SpecFieldSummary {
 	ks, ok := idx.GetKindSummary(kind)
 	if !ok {
 		return nil
 	}
 	out := make([]SpecFieldSummary, 0, len(ks.Fields))
 	for _, f := range ks.Fields {
-		if f.Groupable {
+		if predicate(f) {
 			out = append(out, f)
 		}
 	}
 	return out
+}
+
+// GetGroupableFields returns all groupable fields for a kind.
+func (idx *SpecIndex) GetGroupableFields(kind string) []SpecFieldSummary {
+	return idx.filterKindFields(kind, func(f SpecFieldSummary) bool { return f.Groupable })
 }
 
 // GetFilterableFields returns all filterable fields for a kind.
 func (idx *SpecIndex) GetFilterableFields(kind string) []SpecFieldSummary {
-	ks, ok := idx.GetKindSummary(kind)
-	if !ok {
-		return nil
-	}
-	out := make([]SpecFieldSummary, 0, len(ks.Fields))
-	for _, f := range ks.Fields {
-		if f.Filterable {
-			out = append(out, f)
-		}
-	}
-	return out
+	return idx.filterKindFields(kind, func(f SpecFieldSummary) bool { return f.Filterable })
 }
 
 // GetSortableFields returns all sortable fields for a kind.
 func (idx *SpecIndex) GetSortableFields(kind string) []SpecFieldSummary {
-	ks, ok := idx.GetKindSummary(kind)
-	if !ok {
-		return nil
-	}
-	out := make([]SpecFieldSummary, 0, len(ks.Fields))
-	for _, f := range ks.Fields {
-		if f.Sortable {
-			out = append(out, f)
-		}
-	}
-	return out
+	return idx.filterKindFields(kind, func(f SpecFieldSummary) bool { return f.Sortable })
 }
 
 // BuildSpecIndexFromSpecsDir builds a SpecIndex by loading all specs under specsDir

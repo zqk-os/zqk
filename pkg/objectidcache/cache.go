@@ -507,8 +507,7 @@ func (c *ObjectIDCache) SaveCache(projectRoot string) error {
 	saveStart := time.Now()
 	var entryCount int
 	cachePath := c.getCacheFilePath(projectRoot)
-	cacheDir := filepath.Dir(cachePath)
-	if err := fileutil.MkdirAll(cacheDir, paths.DirPerm755); err != nil {
+	if err := fileutil.EnsureDir(filepath.Dir(cachePath)); err != nil {
 		return errfmt.Newf("failed to create cache directory").Wrap(err)
 	}
 

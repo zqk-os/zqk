@@ -28,15 +28,8 @@ func (h *RetentionToleranceHandler) cleanupOldObjects(
 	protectStatuses []string,
 	batchSize, maxBatches, bulkDeleteWorkers int,
 ) int {
-	if batchSize <= 0 {
-		batchSize = defaultRetentionToleranceBatchSize
-	}
-	switch {
-	case maxBatches == -1:
-		maxBatches = retentionToleranceUnlimitedMaxBatches
-	case maxBatches <= 0:
-		maxBatches = defaultRetentionToleranceMaxBatches
-	}
+	batchSize, maxBatches = normalizeRetentionBatchLimits(batchSize, maxBatches)
+
 	cutoffStr := cutoff.Format(time.RFC3339)
 	// Fast path: high volume cache avoids full List() and Stream Registry parsing overheads.
 	if storagepkg.IsHighVolumeKindForCache(kind) {
@@ -156,12 +149,8 @@ func (h *RetentionToleranceHandler) cleanupOldObjectsSlowPath(
 	batchSize, maxBatches, bulkDeleteWorkers int,
 	cutoffStr string,
 ) int {
-	filters := map[string]any{
-		objects.FieldKeyCreatedAt: map[string]any{"$lt": cutoffStr},
-	}
-	if len(protectStatuses) > 0 {
-		filters[objects.FieldKeyStatus] = map[string]any{"$nin": protectStatuses}
-	}
+	filters := buildStatusExclusionFilter(protectStatuses)
+	filters[objects.FieldKeyCreatedAt] = map[string]any{"$lt": cutoffStr}
 	var totalDeleted int
 	interrupt := concurrency.NewInterruptChecker(concurrency.DefaultInterruptCheckFrequency)
 

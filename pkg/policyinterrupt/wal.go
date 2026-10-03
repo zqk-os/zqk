@@ -307,29 +307,41 @@ func AppendAck(projectRoot string, rec AckRecord) error {
 	return w.Sync()
 }
 
-// LoadLatestCriticalUnacked returns the most recent critical, ack_required interrupt that is not acked.
-func LoadLatestCriticalUnacked(projectRoot string, acks map[string]AckState) (*InterruptRecord, error) {
+func isCriticalUnackedEligible(rec *InterruptRecord, acks map[string]AckState, now time.Time) bool {
+	if rec.Profile == emptyValue {
+		rec.Profile = defaultPolicyProfile
+	}
+	if rec.Severity != SeverityCritical || !rec.AckRequired || rec.DedupeKey == emptyValue {
+		return false
+	}
+	if rec.ExpiresAtRFC3339 != emptyValue {
+		if t, e := time.Parse(time.RFC3339, rec.ExpiresAtRFC3339); e == nil && now.After(t) {
+			return false
+		}
+	}
+	if _, ok := acks[ackKey(rec.Profile, rec.DedupeKey)]; ok {
+		return false
+	}
+	return true
+}
+
+func replayPolicyInterruptWAL(projectRoot string, fn func(rec *InterruptRecord, now time.Time) error) error {
 	iw, err := newWAL[InterruptRecord](projectRoot, policyInterruptWALFileName)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer iw.Close()
-
-	var latest *InterruptRecord
 	now := time.Now().UTC()
-	err = ReplayFrom[InterruptRecord](iw.Path(), 0, parseInterrupt, func(rec *InterruptRecord) error {
-		if rec.Profile == emptyValue {
-			rec.Profile = defaultPolicyProfile
-		}
-		if rec.Severity != SeverityCritical || !rec.AckRequired || rec.DedupeKey == emptyValue {
-			return nil
-		}
-		if rec.ExpiresAtRFC3339 != emptyValue {
-			if t, e := time.Parse(time.RFC3339, rec.ExpiresAtRFC3339); e == nil && now.After(t) {
-				return nil
-			}
-		}
-		if _, ok := acks[ackKey(rec.Profile, rec.DedupeKey)]; ok {
+	return ReplayFrom[InterruptRecord](iw.Path(), 0, parseInterrupt, func(rec *InterruptRecord) error {
+		return fn(rec, now)
+	})
+}
+
+// LoadLatestCriticalUnacked returns the most recent critical, ack_required interrupt that is not acked.
+func LoadLatestCriticalUnacked(projectRoot string, acks map[string]AckState) (*InterruptRecord, error) {
+	var latest *InterruptRecord
+	err := replayPolicyInterruptWAL(projectRoot, func(rec *InterruptRecord, now time.Time) error {
+		if !isCriticalUnackedEligible(rec, acks, now) {
 			return nil
 		}
 		if latest == nil || rec.Seq > latest.Seq {
@@ -347,27 +359,9 @@ func LoadLatestCriticalUnacked(projectRoot string, acks map[string]AckState) (*I
 // LoadCriticalUnacked returns critical, ack-required interrupts that are not yet acknowledged.
 // Results are sorted by sequence descending (most recent first). If limit > 0, returns up to limit items.
 func LoadCriticalUnacked(projectRoot string, acks map[string]AckState, limit int) ([]InterruptRecord, error) {
-	iw, err := newWAL[InterruptRecord](projectRoot, policyInterruptWALFileName)
-	if err != nil {
-		return nil, err
-	}
-	defer iw.Close()
-
-	now := time.Now().UTC()
 	out := make([]InterruptRecord, 0, 16)
-	err = ReplayFrom[InterruptRecord](iw.Path(), 0, parseInterrupt, func(rec *InterruptRecord) error {
-		if rec.Profile == emptyValue {
-			rec.Profile = defaultPolicyProfile
-		}
-		if rec.Severity != SeverityCritical || !rec.AckRequired || rec.DedupeKey == emptyValue {
-			return nil
-		}
-		if rec.ExpiresAtRFC3339 != emptyValue {
-			if t, e := time.Parse(time.RFC3339, rec.ExpiresAtRFC3339); e == nil && now.After(t) {
-				return nil
-			}
-		}
-		if _, ok := acks[ackKey(rec.Profile, rec.DedupeKey)]; ok {
+	err := replayPolicyInterruptWAL(projectRoot, func(rec *InterruptRecord, now time.Time) error {
+		if !isCriticalUnackedEligible(rec, acks, now) {
 			return nil
 		}
 		out = append(out, *rec)

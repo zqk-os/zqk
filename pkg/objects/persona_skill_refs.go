@@ -4,21 +4,18 @@ import (
 	"strings"
 )
 
-// CollectPersonaASKRefs returns ASK-* ids linked on a persona via canonical
-// agent_skill_refs and/or related_object_refs (CRI-PERSONA-SKILL-BOUND dual-read).
-// TRACK: follow-up in kernel backlog
-func CollectPersonaASKRefs(persona map[string]any) []string {
+func collectPrefixedPersonaRefs(persona map[string]any, prefix, primaryKey string) []string {
 	if persona == nil {
 		return nil
 	}
 	seen := map[string]struct{}{}
 	var out []string
-	appendASK := func(id string) {
+	appendRef := func(id string) {
 		id = strings.TrimSpace(id)
 		if id == "" {
 			return
 		}
-		if !strings.HasPrefix(strings.ToUpper(id), "ASK-") {
+		if !strings.HasPrefix(strings.ToUpper(id), prefix) {
 			return
 		}
 		if _, ok := seen[id]; ok {
@@ -27,13 +24,20 @@ func CollectPersonaASKRefs(persona map[string]any) []string {
 		seen[id] = struct{}{}
 		out = append(out, id)
 	}
-	for _, id := range stringListField(persona, FieldKeyAgentSkillRefs) {
-		appendASK(id)
+	for _, id := range stringListField(persona, primaryKey) {
+		appendRef(id)
 	}
 	for _, id := range stringListField(persona, FieldKeyRelatedObjectRefs) {
-		appendASK(id)
+		appendRef(id)
 	}
 	return out
+}
+
+// CollectPersonaASKRefs returns ASK-* ids linked on a persona via canonical
+// agent_skill_refs and/or related_object_refs (CRI-PERSONA-SKILL-BOUND dual-read).
+// TRACK: follow-up in kernel backlog
+func CollectPersonaASKRefs(persona map[string]any) []string {
+	return collectPrefixedPersonaRefs(persona, "ASK-", FieldKeyAgentSkillRefs)
 }
 
 func stringListField(obj map[string]any, key string) []string {

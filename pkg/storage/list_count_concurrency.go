@@ -168,3 +168,17 @@ func newListIDWorkerPool(ids []string) listIDWorkerPool {
 		budget:     goroutinelabels.DefaultBudget(),
 	}
 }
+
+func (p *listIDWorkerPool) newWorker(streamTag, descTag string, workerIdx int) *goroutinelabels.GoroutineBuilder {
+	b := goroutinelabels.NewGoroutine(streamTag, descTag).WithWaitGroup(&p.wg)
+	if workerIdx > 0 && p.budget != nil {
+		b = b.WithBudget(p.budget)
+	}
+	return b
+}
+
+func (p *listIDWorkerPool) startCloser(streamTag, descTag string) {
+	goroutinelabels.NewGoroutine(streamTag, descTag).
+		WithCleanup(func() { close(p.results) }).
+		StartSimple(func() { p.wg.Wait() })
+}

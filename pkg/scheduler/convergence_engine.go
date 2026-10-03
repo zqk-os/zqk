@@ -101,18 +101,25 @@ func (s *Scheduler) EvaluateActiveConvergenceSessions(ctx context.Context) {
 	s.evaluateActiveConvergenceSessions(ctx)
 }
 
-func (s *Scheduler) evaluateActiveConvergenceSessions(ctx context.Context) {
+func (s *Scheduler) prepareConvergenceStorage(ctx context.Context, warnMsg string) (*ConvergenceStorageAdapter, []map[string]any) {
 	if s.storage == nil {
-		return
+		return nil, nil
 	}
-
-	// 1. Query for convergence_session objects
 	engineStorage := &ConvergenceStorageAdapter{storage: s.storage}
 	sessions, err := engineStorage.ListConvergenceSessions(ctx)
 	if err != nil {
-		SchedulerDaemonLog(s.logger).Warn("convergence_engine: failed to list sessions").WithError(err).Log()
+		SchedulerDaemonLog(s.logger).Warn(warnMsg).WithError(err).Log()
+		return nil, nil
+	}
+	return engineStorage, sessions
+}
+
+func (s *Scheduler) evaluateActiveConvergenceSessions(ctx context.Context) {
+	engineStorage, sessions := s.prepareConvergenceStorage(ctx, "convergence_engine: failed to list sessions")
+	if engineStorage == nil {
 		return
 	}
+
 
 	for _, session := range sessions {
 		if err := ctx.Err(); err != nil {
@@ -149,13 +156,13 @@ func (s *Scheduler) evaluateActiveConvergenceSessions(ctx context.Context) {
 		var buf bytes.Buffer
 		cmd.SetStdout(&buf)
 		cmd.SetStderr(&buf)
-		err = cmd.Run()
+		runErr := cmd.Run()
 		out := buf.Bytes()
 
-		if err != nil {
+		if runErr != nil {
 			SchedulerDaemonLog(s.logger).Warn("convergence_engine: evaluation failed").
 				String("session_id", id).
-				WithError(err).
+				WithError(runErr).
 				String("output", truncateOrchestrateOutputPreview(string(out), 2000)).
 				Log()
 		} else {
@@ -230,16 +237,11 @@ func (s *Scheduler) EvaluateStaleConvergenceSessions(ctx context.Context) {
 }
 
 func (s *Scheduler) evaluateStaleConvergenceSessions(ctx context.Context) {
-	if s.storage == nil {
+	engineStorage, sessions := s.prepareConvergenceStorage(ctx, "convergence_engine: failed to list sessions for stale evaluation")
+	if engineStorage == nil {
 		return
 	}
 
-	engineStorage := &ConvergenceStorageAdapter{storage: s.storage}
-	sessions, err := engineStorage.ListConvergenceSessions(ctx)
-	if err != nil {
-		SchedulerDaemonLog(s.logger).Warn("convergence_engine: failed to list sessions for stale evaluation").WithError(err).Log()
-		return
-	}
 
 	now := time.Now()
 	for _, session := range sessions {

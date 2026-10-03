@@ -1,14 +1,12 @@
 package quality
 
 import (
-	"encoding/csv"
 	"fmt"
 	"io"
 	"path/filepath"
 	"sort"
 	"strings"
 
-	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -45,19 +43,11 @@ func (r *MatrixValidateResult) AllOK() bool {
 // ValidateMatrixRegistry checks CSV + profile for one named matrix or all matrices.
 // name empty means validate every matrix in the registry (sorted by name).
 func ValidateMatrixRegistry(projectRoot, name, registryRel string) (*MatrixValidateResult, error) {
-	regRel := registryRel
-	if regRel == "" {
-		regRel = filepath.Join(paths.DocsQualityDir, "matrix_registry.yaml")
-	}
-	reg, err := LoadMatrixRegistry(projectRoot, regRel)
+	reg, absReg, err := resolveAndLoadRegistry(projectRoot, registryRel)
 	if err != nil {
 		return nil, err
 	}
-	absReg := regRel
-	if !filepath.IsAbs(absReg) {
-		absReg = filepath.Join(projectRoot, regRel)
-	}
-	out := &MatrixValidateResult{RegistryPath: filepath.Clean(absReg)}
+	out := &MatrixValidateResult{RegistryPath: absReg}
 
 	names := make([]string, 0, len(reg.Matrices))
 	if strings.TrimSpace(name) != "" {
@@ -109,20 +99,14 @@ func validateMatrixFiles(csvPath, profilePath, sessionRefColumn string) (rowCoun
 		errs = append(errs, fmt.Sprintf("profile: %v", err))
 	}
 
-	f, err := fileutil.Open(csvPath)
+	cr, err := openMatrixCSV(csvPath)
 	if err != nil {
-		return 0, append(errs, fmt.Sprintf("csv open: %v", err))
+		return 0, append(errs, fmt.Sprintf("csv: %v", err))
 	}
-	defer f.Close()
+	defer cr.Close()
 
-	r := csv.NewReader(f)
-	header, err := r.Read()
-	if err != nil {
-		return 0, append(errs, fmt.Sprintf("csv header: %v", err))
-	}
-	for i := range header {
-		header[i] = strings.TrimSpace(header[i])
-	}
+	r := cr.reader
+	header := cr.header
 	if sessionRefColumn != "" {
 		found := false
 		for _, h := range header {

@@ -199,8 +199,7 @@ func (sl *SpecLoader) isExtraSpecPath(absPath string) bool {
 	}
 	target = filepath.Clean(target)
 	for _, root := range sl.applicableExtraSpecRoots() {
-		rel, err := filepath.Rel(filepath.Clean(root), target)
-		if err == nil && rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+		if isPathUnderDir(filepath.Clean(root), target) {
 			return true
 		}
 	}

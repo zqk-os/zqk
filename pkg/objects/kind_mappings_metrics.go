@@ -73,9 +73,8 @@ func (m *KindMappingsMetrics) RecordBackendConfigMerge() {
 	atomic.AddInt64(&m.BackendConfigMerges, 1)
 }
 
-// RecordDirectoryLookup records a GetDirectoryFromKind call
-func (m *KindMappingsMetrics) RecordDirectoryLookup(cacheHit, usedInference bool) {
-	atomic.AddInt64(&m.DirectoryLookups, 1)
+func (m *KindMappingsMetrics) recordLookupDetails(counter *int64, cacheHit, usedInference bool) {
+	atomic.AddInt64(counter, 1)
 	if cacheHit {
 		atomic.AddInt64(&m.CacheHits, 1)
 	} else {
@@ -86,17 +85,14 @@ func (m *KindMappingsMetrics) RecordDirectoryLookup(cacheHit, usedInference bool
 	}
 }
 
+// RecordDirectoryLookup records a GetDirectoryFromKind call
+func (m *KindMappingsMetrics) RecordDirectoryLookup(cacheHit, usedInference bool) {
+	m.recordLookupDetails(&m.DirectoryLookups, cacheHit, usedInference)
+}
+
 // RecordKindLookup records a GetKindFromDirectory call
 func (m *KindMappingsMetrics) RecordKindLookup(cacheHit, usedInference bool) {
-	atomic.AddInt64(&m.KindLookups, 1)
-	if cacheHit {
-		atomic.AddInt64(&m.CacheHits, 1)
-	} else {
-		atomic.AddInt64(&m.CacheMisses, 1)
-	}
-	if usedInference {
-		atomic.AddInt64(&m.InferenceRuleHits, 1)
-	}
+	m.recordLookupDetails(&m.KindLookups, cacheHit, usedInference)
 }
 
 // RecordInitialization records an initialization operation

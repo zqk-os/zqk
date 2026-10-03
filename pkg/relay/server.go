@@ -150,39 +150,44 @@ func (s *RelayServer) IsBlocked(subID string) bool {
 	return exists
 }
 
-// Allow checks if the client ID has not exceeded the rate limit (5 req/sec).
-func (s *RelayServer) Allow(clientID string) bool {
+func (s *RelayServer) withRateLock(fn func(now time.Time)) {
 	s.rateMu.Lock()
 	defer s.rateMu.Unlock()
+	fn(time.Now())
+}
 
-	now := time.Now()
-	rl, exists := s.limiters[clientID]
-	if !exists {
-		s.limiters[clientID] = &rateLimit{
-			tokens:     MaxRateLimitTokens - 1,
-			lastRefill: now,
+// Allow checks if the client ID has not exceeded the rate limit (5 req/sec).
+func (s *RelayServer) Allow(clientID string) bool {
+	var allowed bool
+	s.withRateLock(func(now time.Time) {
+		rl, exists := s.limiters[clientID]
+		if !exists {
+			s.limiters[clientID] = &rateLimit{
+				tokens:     MaxRateLimitTokens - 1,
+				lastRefill: now,
+			}
+			allowed = true
+			return
 		}
-		return true
-	}
 
-	elapsed := now.Sub(rl.lastRefill).Seconds()
-	tokensToAdd := int(elapsed * RateLimitRefillSec)
-	if tokensToAdd > 0 {
-		rl.tokens += tokensToAdd
-		if rl.tokens > MaxRateLimitTokens {
-			rl.tokens = MaxRateLimitTokens
+		elapsed := now.Sub(rl.lastRefill).Seconds()
+		tokensToAdd := int(elapsed * RateLimitRefillSec)
+		if tokensToAdd > 0 {
+			rl.tokens += tokensToAdd
+			if rl.tokens > MaxRateLimitTokens {
+				rl.tokens = MaxRateLimitTokens
+			}
+			// Adjust lastRefill based on exactly how many tokens we added in time
+			addedDuration := time.Duration((float64(tokensToAdd) / RateLimitRefillSec) * float64(time.Second))
+			rl.lastRefill = rl.lastRefill.Add(addedDuration)
 		}
-		// Adjust lastRefill based on exactly how many tokens we added in time
-		addedDuration := time.Duration((float64(tokensToAdd) / RateLimitRefillSec) * float64(time.Second))
-		rl.lastRefill = rl.lastRefill.Add(addedDuration)
-	}
 
-	if rl.tokens > 0 {
-		rl.tokens--
-		return true
-	}
-
-	return false
+		if rl.tokens > 0 {
+			rl.tokens--
+			allowed = true
+		}
+	})
+	return allowed
 }
 
 // BufferPayload temporarily buffers a payload for a disconnected client.
@@ -268,13 +273,11 @@ func (s *RelayServer) cleanupBuffers() {
 }
 
 func (s *RelayServer) cleanupLimiters() {
-	s.rateMu.Lock()
-	defer s.rateMu.Unlock()
-
-	now := time.Now()
-	for clientID, rl := range s.limiters {
-		if now.Sub(rl.lastRefill) > time.Minute {
-			delete(s.limiters, clientID)
+	s.withRateLock(func(now time.Time) {
+		for clientID, rl := range s.limiters {
+			if now.Sub(rl.lastRefill) > time.Minute {
+				delete(s.limiters, clientID)
+			}
 		}
-	}
+	})
 }

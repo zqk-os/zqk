@@ -561,15 +561,7 @@ func (h *RetentionToleranceHandler) archiveOldObjects(
 			Log()
 		return 0
 	}
-	if batchSize <= 0 {
-		batchSize = defaultRetentionToleranceBatchSize
-	}
-	switch {
-	case maxBatches == -1:
-		maxBatches = retentionToleranceUnlimitedMaxBatches
-	case maxBatches <= 0:
-		maxBatches = defaultRetentionToleranceMaxBatches
-	}
+	batchSize, maxBatches = normalizeRetentionBatchLimits(batchSize, maxBatches)
 
 	cutoffStr := cutoff.Format(time.RFC3339)
 	filters := map[string]any{
@@ -741,3 +733,25 @@ func (h *RetentionToleranceHandler) archiveListedObjects(
 	storagepkg.InvalidateListCacheForKind(kind)
 	return archived + bulkResult.SuccessCount
 }
+
+func normalizeRetentionBatchLimits(batchSize, maxBatches int) (int, int) {
+	if batchSize <= 0 {
+		batchSize = defaultRetentionToleranceBatchSize
+	}
+	switch {
+	case maxBatches == -1:
+		maxBatches = retentionToleranceUnlimitedMaxBatches
+	case maxBatches <= 0:
+		maxBatches = defaultRetentionToleranceMaxBatches
+	}
+	return batchSize, maxBatches
+}
+
+func buildStatusExclusionFilter(protectStatuses []string) map[string]any {
+	filters := map[string]any{}
+	if len(protectStatuses) > 0 {
+		filters[objects.FieldKeyStatus] = map[string]any{"$nin": protectStatuses}
+	}
+	return filters
+}
+

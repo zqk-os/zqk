@@ -227,8 +227,16 @@ func parseQuotedDouble(line []byte) (string, bool) {
 		}
 		escaped = false
 	}
-	if closeIdx == -1 {
+	val, ok := validateQuotedValue(line, closeIdx)
+	if !ok || bytes.IndexByte(val, '\\') != -1 {
 		return "", false
+	}
+	return string(val), true
+}
+
+func validateQuotedValue(line []byte, closeIdx int) ([]byte, bool) {
+	if closeIdx == -1 {
+		return nil, false
 	}
 	val := line[1:closeIdx]
 	rest := bytes.TrimSpace(line[closeIdx+1:])
@@ -236,12 +244,9 @@ func parseQuotedDouble(line []byte) (string, bool) {
 		rest = bytes.TrimSpace(rest[1:])
 	}
 	if len(rest) > 0 && rest[0] != '#' {
-		return "", false
+		return nil, false
 	}
-	if bytes.IndexByte(val, '\\') != -1 {
-		return "", false
-	}
-	return string(val), true
+	return val, true
 }
 
 func parseQuotedSingle(line []byte) (string, bool) {
@@ -255,15 +260,8 @@ func parseQuotedSingle(line []byte) (string, bool) {
 			break
 		}
 	}
-	if closeIdx == -1 {
-		return "", false
-	}
-	val := line[1:closeIdx]
-	rest := bytes.TrimSpace(line[closeIdx+1:])
-	if len(rest) > 0 && rest[0] == ',' {
-		rest = bytes.TrimSpace(rest[1:])
-	}
-	if len(rest) > 0 && rest[0] != '#' {
+	val, ok := validateQuotedValue(line, closeIdx)
+	if !ok {
 		return "", false
 	}
 	return string(val), true

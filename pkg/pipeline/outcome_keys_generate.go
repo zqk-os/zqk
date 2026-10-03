@@ -2,7 +2,6 @@ package pipeline
 
 import (
 	"fmt"
-	"go/format"
 	"sort"
 	"strings"
 
@@ -100,10 +99,5 @@ const (
 		fmt.Fprintf(&body, "\tOutcomeKey%s = %q\n", suffix, name)
 	}
 	body.WriteString(")\n")
-
-	out, err := format.Source([]byte(body.String()))
-	if err != nil {
-		return nil, errfmt.Errorf("format generated source: %w", err)
-	}
-	return out, nil
+	return objects.FormatGeneratedGoSource([]byte(body.String()))
 }

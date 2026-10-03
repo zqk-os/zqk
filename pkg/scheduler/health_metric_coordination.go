@@ -48,7 +48,10 @@ func createContextWithLoggingProfile(ctx context.Context, profile string) contex
 // emitSchedulerHealthMetricViaCoordinator emits scheduler health metric events via the coordination system
 // This provides unified event routing for scheduler health monitoring (audit, logging, operational)
 // Note: The actual metric object is created via storage.Create() in recordHealthMetric
-// This function provides observability through the coordinator system
+func hasValidProjectRoot(projectRoot string) bool {
+	return projectRoot != emptyValue && projectRoot != "."
+}
+
 func emitSchedulerHealthMetricViaCoordinator(
 	ctx context.Context,
 	projectRoot string,
@@ -61,8 +64,7 @@ func emitSchedulerHealthMetricViaCoordinator(
 	source string,
 	profile string, // CLI context profile for logging format (optional, defaults to "system")
 ) {
-	if projectRoot == emptyValue || projectRoot == "." {
-		// Best effort - skip if no project root
+	if !hasValidProjectRoot(projectRoot) {
 		return
 	}
 

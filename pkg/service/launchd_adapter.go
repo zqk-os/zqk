@@ -239,22 +239,10 @@ func (a *LaunchdAdapter) Restart(ctx context.Context, id string) error {
 }
 
 func (a *LaunchdAdapter) Status(ctx context.Context, id string) (ServiceStatus, error) {
-	st := ServiceStatus{
-		ID:    id,
-		State: StateStopped,
-	}
-
 	dir, err := a.getDir()
-	if err != nil {
+	st, shouldQuery, err := checkUnitFilePresent(dir, err, id+".plist", a.IsAvailable(), id)
+	if err != nil || !shouldQuery {
 		return st, err
-	}
-	plistPath := filepath.Join(dir, id+".plist")
-	if _, err := os.Stat(plistPath); os.IsNotExist(err) {
-		return st, nil
-	}
-
-	if !a.IsAvailable() {
-		return st, nil
 	}
 
 	out, err := a.runCmd(ctx, "launchctl", "list")
@@ -281,14 +269,9 @@ func (a *LaunchdAdapter) CleanupLegacy(ctx context.Context, legacyIDs []string) 
 	if err != nil {
 		return nil, err
 	}
-	entries, err := readServiceDirEntries(dir)
-	if err != nil || len(entries) == 0 {
+	targetSet, entries, err := initLegacyCleanup(dir, legacyIDs)
+	if err != nil || entries == nil {
 		return nil, err
-	}
-
-	targetSet := make(map[string]struct{}, len(legacyIDs))
-	for _, id := range legacyIDs {
-		targetSet[id] = struct{}{}
 	}
 
 	var cleaned []string
