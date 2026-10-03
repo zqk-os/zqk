@@ -73,6 +73,9 @@ func selectStoredMCPSpec(
 }
 
 func logMCPSpecStorageSelection(server *Server, name string, selection MCPSpecStorageSelection) {
+	if selection.State == MCPSpecStorageMissing {
+		return
+	}
 	if server != nil {
 		server.traceLogf(
 			"[MCP_SPEC] name=%s state=%s reason=%v",

@@ -32,7 +32,7 @@ Get started in 3 commands:
 2. Execute Shovel-Ready Work:
    $ %s do
    ➜ Discovers active priorities, claims the next backlog item, and executes.
-   ➜ Or prompt your AI agent: "Run '%s do' to claim and implement work."
+   ➜ Or prompt your AI agent: "Let's do a paired walkthrough to capture intent, objectify with '%s new <kind>', and run '%s do'."
 
 3. In-Process Code Search & Token Conservation:
    $ %s grep <query> (alias: %s zgrep)
@@ -40,7 +40,7 @@ Get started in 3 commands:
 
 (Optional: run '%s system agent-onboard' if adding a new AI editor or agent host)
 Docs & Guides: docs/INDEX.md
-`, projectRoot, exe, exe, exe, exe, exe, exe)
+`, projectRoot, exe, exe, exe, exe, exe, exe, exe)
 	}
 
 	initFlag := ""

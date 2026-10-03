@@ -20,15 +20,15 @@ This path uses the **`question`** kind as a small object.
 ## 1. Create
 
 ```bash
+./bin/zqk new question --title "First-run sanity question"
+```
+
+Or draft from a YAML template:
+
+```bash
 ./bin/zqk object template question --include-optional=false -o /tmp/zqk-first-question.yaml
 # edit required fields, then:
 ./bin/zqk object create question --file /tmp/zqk-first-question.yaml
-```
-
-Or:
-
-```bash
-./bin/zqk new object question --title "First-run sanity question"
 ```
 
 ## 2. Get / update
