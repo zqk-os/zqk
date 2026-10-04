@@ -29,6 +29,7 @@ Welcome to the canonical documentation for **ZQK Core**, the Cellular Knowledge 
 | **[CLI Command Taxonomy](./architecture/CLI_COMMAND_TAXONOMY_STANDARDS.md)** | Canonical taxonomy standards, verb-noun structures, and AST verification rules. |
 | **[Tiered Storage Lifecycle](./architecture/TIERED_STORAGE_AND_ARCHIVAL_LIFECYCLE.md)** | Storage compaction, subtree flattening, and historical capsule archival. |
 | **[Tray Cryptographic Security](./architecture/TRAY_COMMAND_CRYPTOGRAPHIC_SECURITY.md)** | HMAC envelopes, payload attestation, and secure indirect command execution. |
+| **[Polyglot AST Search Roadmap](./architecture/POLYGLOT_AST_SEARCH_ROADMAP.md)** | In-process Tree-sitter architecture, cross-language symbol taxonomy, and token budgeting for `zqk grep`. |
 | **[Pack Composition Root](../PACK-COMPOSITION.md)** | Architecture, manifests, and CLI tool generation contracts. |
 
 ---

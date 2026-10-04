@@ -3,6 +3,7 @@ package system
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -285,6 +286,27 @@ func createConfigFile(configPath, projectName, template string, force bool) erro
 	return fileutil.WriteFile(configPath, []byte(buildProjectConfigContent(projectName, template)), paths.FilePerm644) //nolint:gosec // Config - 0600 acceptable
 }
 
+var defaultRequiredGitignorePatterns = []string{
+	paths.ProjectDataDir + "/cache/",
+	paths.ProjectDataDir + "/state/",
+	paths.ProjectDataDir + "/logs/",
+	paths.ProjectDataDir + "/scheduler/",
+	paths.ProjectDataDir + "/wal/",
+	paths.ProjectDataDir + "/metrics/",
+	paths.ProjectDataDir + "/credentials",
+	paths.ProjectDataDir + "/streams/",
+	paths.ProjectDataDir + "/tmp/",
+	paths.ProjectDataDir + "/lock/",
+	paths.ProjectDataDir + "/sessions/",
+	"*.lock",
+	paths.ProjectDataDir + "/worktrees/",
+	paths.ProjectDataDir + "/**/*.lock",
+	paths.ProjectDataDir + "/system-state/cas-indices/",
+	paths.ProjectDataDir + "/system-state/snapshots/",
+	"!" + paths.ProjectDataDir + "/system-state/README.md",
+	paths.ConfigDir + "/zqk-local.yaml",
+}
+
 func updateGitignore(gitignorePath string) error {
 	// Read existing .gitignore
 	content, err := fileutil.ReadFile(gitignorePath)
@@ -293,18 +315,35 @@ func updateGitignore(gitignorePath string) error {
 	}
 
 	gitignoreContent := string(content)
-
-	// Check if project data directory is already in .gitignore
-	projectDataDirPattern := paths.ProjectDataDir + "/"
-	if containsInGitignore(gitignoreContent, projectDataDirPattern) {
-		return nil // Already present
+	lines := strings.Split(gitignoreContent, "\n")
+	existing := make(map[string]bool, len(lines)*2)
+	for _, l := range lines {
+		trimmed := strings.TrimSpace(l)
+		if trimmed != "" {
+			existing[trimmed] = true
+			existing[strings.TrimPrefix(trimmed, "/")] = true
+		}
 	}
 
-	// Append project data directory to .gitignore
+	var missing []string
+	for _, pat := range defaultRequiredGitignorePatterns {
+		cleanPat := strings.TrimPrefix(pat, "/")
+		if !existing[pat] && !existing[cleanPat] && !existing["/"+cleanPat] {
+			missing = append(missing, pat)
+		}
+	}
+
+	if len(missing) == 0 {
+		return nil
+	}
+
 	if gitignoreContent != emptyValue && !endsWithNewline(gitignoreContent) {
 		gitignoreContent += "\n"
 	}
-	gitignoreContent += fmt.Sprintf("\n# ZQK state and cache\n%s/cache/\n%s/state/\n", paths.ProjectDataDir, paths.ProjectDataDir)
+	gitignoreContent += "\n# ZQK Runtime & Ephemeral Data\n"
+	for _, m := range missing {
+		gitignoreContent += m + "\n"
+	}
 
 	return fileutil.WriteFile(gitignorePath, []byte(gitignoreContent), paths.FilePerm644) //nolint:gosec // Gitignore files - 0600 is acceptable
 }

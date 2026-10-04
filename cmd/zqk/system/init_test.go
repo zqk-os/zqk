@@ -820,3 +820,61 @@ func TestInit_RegistersShippedDocs_Legacy(t *testing.T) {
 		}
 	}
 }
+
+func TestUpdateGitignore(t *testing.T) {
+	tmpDir := t.TempDir()
+	gitignorePath := filepath.Join(tmpDir, ".gitignore")
+
+	// Case 1: Fresh .gitignore
+	if err := updateGitignore(gitignorePath); err != nil {
+		t.Fatalf("updateGitignore failed on fresh file: %v", err)
+	}
+
+	contentBytes, err := fileutil.ReadFile(gitignorePath)
+	if err != nil {
+		t.Fatalf("failed to read .gitignore: %v", err)
+	}
+	content := string(contentBytes)
+	if !strings.Contains(content, ".zqk/state/") {
+		t.Errorf("expected .zqk/state/ in fresh .gitignore, got:\n%s", content)
+	}
+	if !strings.Contains(content, ".zqk/cache/") {
+		t.Errorf("expected .zqk/cache/ in fresh .gitignore, got:\n%s", content)
+	}
+
+	// Case 2: Partial .gitignore (e.g. only .zqk/cache/)
+	partialDir := t.TempDir()
+	partialGitignore := filepath.Join(partialDir, ".gitignore")
+	initialContent := "# Existing ignore\nnode_modules/\n.zqk/cache/\n"
+	if err := fileutil.WriteFile(partialGitignore, []byte(initialContent), 0644); err != nil {
+		t.Fatalf("failed to write partial gitignore: %v", err)
+	}
+
+	if err := updateGitignore(partialGitignore); err != nil {
+		t.Fatalf("updateGitignore failed on partial file: %v", err)
+	}
+
+	partialBytes, err := fileutil.ReadFile(partialGitignore)
+	if err != nil {
+		t.Fatalf("failed to read partial .gitignore: %v", err)
+	}
+	partialStr := string(partialBytes)
+	if !strings.Contains(partialStr, ".zqk/state/") {
+		t.Errorf("expected .zqk/state/ to be appended to partial .gitignore, got:\n%s", partialStr)
+	}
+	// Verify .zqk/cache/ was not duplicated
+	if strings.Count(partialStr, ".zqk/cache/") != 1 {
+		t.Errorf("expected .zqk/cache/ to appear exactly once, got count %d:\n%s", strings.Count(partialStr, ".zqk/cache/"), partialStr)
+	}
+
+	// Case 3: Complete .gitignore - idempotent no-op
+	beforeRun := partialStr
+	if err := updateGitignore(partialGitignore); err != nil {
+		t.Fatalf("updateGitignore failed on second run: %v", err)
+	}
+	afterBytes, _ := fileutil.ReadFile(partialGitignore)
+	if string(afterBytes) != beforeRun {
+		t.Errorf("expected idempotent updateGitignore, content changed:\nBefore:\n%s\nAfter:\n%s", beforeRun, string(afterBytes))
+	}
+}
+

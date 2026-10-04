@@ -32,6 +32,7 @@ The architecture is built on four core pillars:
 - **[CLI Command Taxonomy & Standards](./CLI_COMMAND_TAXONOMY_STANDARDS.md)**: Unified CLI taxonomy, argument validation, and automated spec verification.
 - **[Tiered Storage & Capsule Archival](./TIERED_STORAGE_AND_ARCHIVAL_LIFECYCLE.md)**: 4-tier lifecycle (Hot → Warm → Cold → Abyss) and immutable Semantic Capsules.
 - **[Tray Cryptographic Security](./TRAY_COMMAND_CRYPTOGRAPHIC_SECURITY.md)**: P-256 ECDSA mutual handshake and HMAC-SHA256 authentication for privileged operations.
+- **[Polyglot AST Code Search Roadmap](./POLYGLOT_AST_SEARCH_ROADMAP.md)**: In-process Tree-sitter architecture, cross-language symbol taxonomy, and token budgeting for `zqk grep`.
 
 ---
 

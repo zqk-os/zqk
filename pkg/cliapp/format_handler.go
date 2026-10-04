@@ -4,8 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"html"
 	"io"
 	"math"
+	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -657,6 +660,302 @@ func InitializeDefaultHandlers() {
 	RegisterFormatHandler(FormatJSONRPC, NewJSONRPCFormatHandler(nil))
 	RegisterFormatHandler(FormatStream, NewJSONRPCFormatHandler(nil))
 	RegisterFormatHandler(FormatSemanticLink, &SemanticLinkFormatHandler{})
+	RegisterFormatHandler(FormatRaw, &RawFormatHandler{})
+	RegisterFormatHandler(FormatMarkdown, &MarkdownFormatHandler{})
+	RegisterFormatHandler(FormatHTML, &HTMLFormatHandler{})
+}
+
+// RawFormatHandler handles unescaped plain text / prose output
+type RawFormatHandler struct{}
+
+func (h *RawFormatHandler) Format(data any) ([]byte, error) {
+	str := toRawProse(unwrapData(data))
+	return []byte(str), nil
+}
+
+func (h *RawFormatHandler) IsStreaming() bool { return false }
+func (h *RawFormatHandler) Stream(ctx context.Context, data any, writer io.Writer) error {
+	b, err := h.Format(data)
+	if err != nil {
+		return err
+	}
+	_, err = writer.Write(b)
+	return err
+}
+func (h *RawFormatHandler) Validate(data any) error { return nil }
+
+// MarkdownFormatHandler handles formatted markdown output
+type MarkdownFormatHandler struct{}
+
+func (h *MarkdownFormatHandler) Format(data any) ([]byte, error) {
+	str := toMarkdownProse(unwrapData(data))
+	return []byte(str), nil
+}
+
+func (h *MarkdownFormatHandler) IsStreaming() bool { return false }
+func (h *MarkdownFormatHandler) Stream(ctx context.Context, data any, writer io.Writer) error {
+	b, err := h.Format(data)
+	if err != nil {
+		return err
+	}
+	_, err = writer.Write(b)
+	return err
+}
+func (h *MarkdownFormatHandler) Validate(data any) error { return nil }
+
+// HTMLFormatHandler handles rendered HTML output
+type HTMLFormatHandler struct{}
+
+func (h *HTMLFormatHandler) Format(data any) ([]byte, error) {
+	md := toMarkdownProse(unwrapData(data))
+	return []byte(renderMarkdownToHTML(md)), nil
+}
+
+func (h *HTMLFormatHandler) IsStreaming() bool { return false }
+func (h *HTMLFormatHandler) Stream(ctx context.Context, data any, writer io.Writer) error {
+	b, err := h.Format(data)
+	if err != nil {
+		return err
+	}
+	_, err = writer.Write(b)
+	return err
+}
+func (h *HTMLFormatHandler) Validate(data any) error { return nil }
+
+func toRawProse(data any) string {
+	switch v := data.(type) {
+	case string:
+		return unescapeProseString(v)
+	case []any:
+		var sb strings.Builder
+		for i, item := range v {
+			if i > 0 {
+				sb.WriteString("\n\n---\n\n")
+			}
+			sb.WriteString(toRawProse(item))
+		}
+		return sb.String()
+	case map[string]any:
+		// Check for common body/content keys
+		for _, key := range []string{"body", "content", "description", "statement", "prompt_body", "text", "summary"} {
+			if val, ok := v[key].(string); ok {
+				return unescapeProseString(val)
+			}
+		}
+		var sb strings.Builder
+		if title, ok := v["title"].(string); ok {
+			sb.WriteString(unescapeProseString(title))
+			sb.WriteString("\n\n")
+		}
+		if subtitle, ok := v["subtitle"].(string); ok {
+			sb.WriteString(unescapeProseString(subtitle))
+			sb.WriteString("\n\n")
+		}
+		for k, val := range v {
+			if k == "title" || k == "subtitle" {
+				continue
+			}
+			sb.WriteString(fmt.Sprintf("[%s]\n%s\n\n", k, toRawProse(val)))
+		}
+		return strings.TrimSpace(sb.String()) + "\n"
+	default:
+		return fmt.Sprintf("%v\n", v)
+	}
+}
+
+func toMarkdownProse(data any) string {
+	switch v := data.(type) {
+	case string:
+		return unescapeProseString(v)
+	case []any:
+		var sb strings.Builder
+		for i, item := range v {
+			if i > 0 {
+				sb.WriteString("\n\n---\n\n")
+			}
+			sb.WriteString(toMarkdownProse(item))
+		}
+		return sb.String()
+	case map[string]any:
+		var sb strings.Builder
+		if title, ok := v["title"].(string); ok {
+			sb.WriteString("# ")
+			sb.WriteString(unescapeProseString(title))
+			sb.WriteString("\n\n")
+		}
+		if subtitle, ok := v["subtitle"].(string); ok {
+			sb.WriteString("*")
+			sb.WriteString(unescapeProseString(subtitle))
+			sb.WriteString("*\n\n")
+		}
+		if body, ok := v["body"].(string); ok {
+			sb.WriteString(unescapeProseString(body))
+			sb.WriteString("\n")
+			return sb.String()
+		}
+		if desc, ok := v["description"].(string); ok {
+			sb.WriteString(unescapeProseString(desc))
+			sb.WriteString("\n")
+			return sb.String()
+		}
+		if stmt, ok := v["statement"].(string); ok {
+			sb.WriteString(unescapeProseString(stmt))
+			sb.WriteString("\n")
+			return sb.String()
+		}
+		if pbody, ok := v["prompt_body"].(string); ok {
+			sb.WriteString(unescapeProseString(pbody))
+			sb.WriteString("\n")
+			return sb.String()
+		}
+		for k, val := range v {
+			if k == "title" || k == "subtitle" {
+				continue
+			}
+			sb.WriteString(fmt.Sprintf("## %s\n\n%s\n\n", strings.Title(k), toMarkdownProse(val)))
+		}
+		return sb.String()
+	default:
+		return fmt.Sprintf("%v\n", v)
+	}
+}
+
+// unescapeProseString replaces literal escape sequences (\n, \", \t, \uXXXX) with actual characters
+func unescapeProseString(s string) string {
+	if strings.Contains(s, `\n`) {
+		s = strings.ReplaceAll(s, `\r\n`, "\n")
+		s = strings.ReplaceAll(s, `\n`, "\n")
+	}
+	if strings.Contains(s, `\t`) {
+		s = strings.ReplaceAll(s, `\t`, "\t")
+	}
+	if strings.Contains(s, `\"`) {
+		s = strings.ReplaceAll(s, `\"`, `"`)
+	}
+
+	re := regexp.MustCompile(`\\+u([0-9a-fA-F]{4})`)
+	s = re.ReplaceAllStringFunc(s, func(match string) string {
+		sub := re.FindStringSubmatch(match)
+		if len(sub) == 2 {
+			if r, err := strconv.ParseInt(sub[1], 16, 32); err == nil {
+				return string(rune(r))
+			}
+		}
+		return match
+	})
+
+	return s
+}
+
+// renderMarkdownToHTML renders common markdown structures into clean HTML
+func renderMarkdownToHTML(md string) string {
+	lines := strings.Split(md, "\n")
+	var out []string
+	var codeLines []string
+	inCodeBlock := false
+	inList := false
+
+	for _, line := range lines {
+		trimmed := strings.TrimSpace(line)
+
+		// Code block fence
+		if strings.HasPrefix(trimmed, "```") {
+			if inCodeBlock {
+				out = append(out, "<pre><code>"+html.EscapeString(strings.Join(codeLines, "\n"))+"</code></pre>")
+				codeLines = nil
+				inCodeBlock = false
+			} else {
+				if inList {
+					out = append(out, "</ul>")
+					inList = false
+				}
+				codeLines = nil
+				inCodeBlock = true
+			}
+			continue
+		}
+
+		if inCodeBlock {
+			codeLines = append(codeLines, line)
+			continue
+		}
+
+		// Horizontal rule
+		if trimmed == "---" || trimmed == "***" || trimmed == "___" {
+			if inList {
+				out = append(out, "</ul>")
+				inList = false
+			}
+			out = append(out, "<hr />")
+			continue
+		}
+
+		// Unordered list item
+		if strings.HasPrefix(trimmed, "* ") || strings.HasPrefix(trimmed, "- ") {
+			if !inList {
+				out = append(out, "<ul>")
+				inList = true
+			}
+			itemText := strings.TrimSpace(trimmed[2:])
+			out = append(out, fmt.Sprintf("  <li>%s</li>", formatInlineProse(itemText)))
+			continue
+		} else if inList && trimmed == "" {
+			out = append(out, "</ul>")
+			inList = false
+			continue
+		}
+
+		// Headings
+		if strings.HasPrefix(line, "# ") {
+			out = append(out, fmt.Sprintf("<h1>%s</h1>", formatInlineProse(line[2:])))
+			continue
+		} else if strings.HasPrefix(line, "## ") {
+			out = append(out, fmt.Sprintf("<h2>%s</h2>", formatInlineProse(line[3:])))
+			continue
+		} else if strings.HasPrefix(line, "### ") {
+			out = append(out, fmt.Sprintf("<h3>%s</h3>", formatInlineProse(line[4:])))
+			continue
+		} else if strings.HasPrefix(line, "#### ") {
+			out = append(out, fmt.Sprintf("<h4>%s</h4>", formatInlineProse(line[5:])))
+			continue
+		}
+
+		// Blockquote
+		if strings.HasPrefix(trimmed, "> ") {
+			out = append(out, fmt.Sprintf("<blockquote>%s</blockquote>", formatInlineProse(trimmed[2:])))
+			continue
+		}
+
+		// Paragraph
+		if trimmed != "" {
+			out = append(out, fmt.Sprintf("<p>%s</p>", formatInlineProse(trimmed)))
+		}
+	}
+
+	if inList {
+		out = append(out, "</ul>")
+	}
+	if inCodeBlock {
+		out = append(out, "<pre><code>"+html.EscapeString(strings.Join(codeLines, "\n"))+"</code></pre>")
+	}
+
+	return strings.Join(out, "\n") + "\n"
+}
+
+func formatInlineProse(s string) string {
+	reBold := regexp.MustCompile(`\*\*(.*?)\*\*`)
+	s = reBold.ReplaceAllString(s, "<strong>$1</strong>")
+
+	reItalic := regexp.MustCompile(`\*([^*]+)\*`)
+	s = reItalic.ReplaceAllString(s, "<em>$1</em>")
+
+	reCode := regexp.MustCompile("`([^`]+)`")
+	s = reCode.ReplaceAllString(s, "<code>$1</code>")
+
+	reLink := regexp.MustCompile(`\[(.*?)\]\((.*?)\)`)
+	s = reLink.ReplaceAllString(s, `<a href="$2">$1</a>`)
+
+	return s
 }
 
 // init automatically initializes default format handlers on package load
