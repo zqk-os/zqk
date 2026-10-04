@@ -290,11 +290,13 @@
 ./cli_specs/scheduler/list_command.yaml
 ./cli_specs/scheduler/print_ide_paste_applescript_command.yaml
 ./cli_specs/scheduler/record_cvs_orchestrate_run_command.yaml
+./cli_specs/scheduler/restart_command.yaml
 ./cli_specs/scheduler/service/
 ./cli_specs/scheduler/service/gc_command.yaml
 ./cli_specs/scheduler/service/install_command.yaml
 ./cli_specs/scheduler/service/list_command.yaml
 ./cli_specs/scheduler/service/rebind_command.yaml
+./cli_specs/scheduler/service/restart_command.yaml
 ./cli_specs/scheduler/service/start_command.yaml
 ./cli_specs/scheduler/service/status_command.yaml
 ./cli_specs/scheduler/service/stop_command.yaml
@@ -348,6 +350,7 @@
 ./cli_specs/service/install_command.yaml
 ./cli_specs/service/list_command.yaml
 ./cli_specs/service/rebind_command.yaml
+./cli_specs/service/restart_command.yaml
 ./cli_specs/service/start_command.yaml
 ./cli_specs/service/status_command.yaml
 ./cli_specs/service/stop_command.yaml
@@ -468,6 +471,7 @@
 ./cli_specs/system/reports/quick_command.yaml
 ./cli_specs/system/reports_command.yaml
 ./cli_specs/system/resource_hygiene_command.yaml
+./cli_specs/system/restart_command.yaml
 ./cli_specs/system/retention_tolerance_command.yaml
 ./cli_specs/system/seal_skill_command.yaml
 ./cli_specs/system/seed_default_agent_seating_command.yaml
