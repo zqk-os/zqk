@@ -2,13 +2,15 @@ package system
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
-	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func renderQuickstartGuide(projectRoot string) string {
@@ -18,6 +20,7 @@ func renderQuickstartGuide(projectRoot string) string {
 		isInit = paths.IsValidProjectRoot(projectRoot)
 	}
 
+	docsLine := docsGuideLine(projectRoot)
 	if isInit {
 		return fmt.Sprintf(`🚀 ZQK Quickstart
 
@@ -39,8 +42,8 @@ Get started in 3 commands:
    ➜ Sub-15ms AST and trigram search with strict token budgeting for AI agents.
 
 (Optional: run '%s system agent-onboard' if adding a new AI editor or agent host)
-Docs & Guides: docs/INDEX.md
-`, projectRoot, exe, exe, exe, exe, exe, exe, exe)
+%s
+`, projectRoot, exe, exe, exe, exe, exe, exe, exe, docsLine)
 	}
 
 	initFlag := ""
@@ -69,8 +72,18 @@ Get started in 4 commands:
    $ %s grep <query> (alias: %s zgrep)
    ➜ Sub-15ms AST and trigram search with strict token budgeting.
 
-Docs & Guides: docs/INDEX.md
-`, exe, initFlag, exe, exe, exe, exe)
+%s
+`, exe, initFlag, exe, exe, exe, exe, docsLine)
+}
+
+func docsGuideLine(projectRoot string) string {
+	if projectRoot != "" && fileutil.Exists(filepath.Join(projectRoot, "docs", "INDEX.md")) {
+		return "Docs & Guides: docs/INDEX.md"
+	}
+	if projectRoot != "" && fileutil.Exists(filepath.Join(projectRoot, "ZQK_GETTING_STARTED.md")) {
+		return "Getting Started: ZQK_GETTING_STARTED.md (Online docs: https://docs.zqk.dev)"
+	}
+	return "Docs & Guides: https://docs.zqk.dev"
 }
 
 // NewQuickstartCmd returns the 'zqk quickstart' command which provides a zero-friction

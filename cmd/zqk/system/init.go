@@ -96,10 +96,16 @@ func NewInitCmd() *cobra.Command {
 
 // Helper functions are defined here and shared with init_impl.go
 
-func createProjectDataDir(projectDataDir string, _ bool) error {
+func createProjectDataDir(projectDataDir string, force bool) error {
 	// Create project data directory (typically .zqk)
 	if err := fileutil.MkdirAll(projectDataDir, paths.DirPerm755); err != nil {
 		return err
+	}
+
+	if force {
+		// Clean stale runtime socket and PID files on forced init
+		runDir := filepath.Join(projectDataDir, paths.RunSubdir)
+		_ = fileutil.RemoveAll(runDir)
 	}
 
 	// Create subdirectories: canonical .zqk layout (logs, metrics, cache, scheduler, wal) with clear separation.

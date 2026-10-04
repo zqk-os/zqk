@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -124,9 +126,25 @@ func (p *initProgress) Done() {
 func (p *initProgress) Summary(projectRoot string) {
 	p.withInteractiveLock(func() {
 		fmt.Fprintf(p.out, "\n✅ %s Kernel initialized successfully in %s\n\n", brand.ProductName(), projectRoot)
-		fmt.Fprintln(p.out, "Get started in 2 commands:")
-		fmt.Fprintf(p.out, "  1. Launch Visual Web Studio (timeline & DAG):\n     $ %s ui -w  (http://127.0.0.1:8080)\n\n", brand.ExecutableName())
-		fmt.Fprintf(p.out, "  2. Execute shovel-ready work:\n     $ %s do\n\n", brand.ExecutableName())
-		fmt.Fprintln(p.out, "Docs & Architecture: docs/INDEX.md")
+		fmt.Fprintln(p.out, "🚀 Next Step: Hand off to your AI Assistant")
+		fmt.Fprintln(p.out, "   Copy and paste this prompt into your AI coding assistant (Cursor, Claude, Windsurf, Cline, Gemini):")
+		fmt.Fprintln(p.out)
+		fmt.Fprintf(p.out, "   \"You are the primary %s coordinating agent for this project (%s).\n", brand.ProductName(), projectRoot)
+		fmt.Fprintf(p.out, "    Equip the %s expert skill and TPM persona, and help me configure\n", brand.ProductName())
+		fmt.Fprintf(p.out, "    the %s system for our greenfield project.\"\n\n", brand.ProductName())
+		fmt.Fprintln(p.out, "--------------------------------------------------------------------------------")
+		fmt.Fprintln(p.out, "Optional Controls:")
+		fmt.Fprintf(p.out, "  • Launch Visual Web Studio:  $ %s ui -w  (http://127.0.0.1:8080)\n", brand.ExecutableName())
+		fmt.Fprintf(p.out, "  • Execute Autonomously:       $ %s do\n", brand.ExecutableName())
+
+		docsIndexPath := filepath.Join(projectRoot, "docs", "INDEX.md")
+		gettingStartedPath := filepath.Join(projectRoot, "ZQK_GETTING_STARTED.md")
+		if _, err := os.Stat(docsIndexPath); err == nil {
+			fmt.Fprintln(p.out, "  • Docs & Architecture:       docs/INDEX.md")
+		} else if _, err := os.Stat(gettingStartedPath); err == nil {
+			fmt.Fprintln(p.out, "  • Getting Started Guide:     ZQK_GETTING_STARTED.md")
+		} else {
+			fmt.Fprintln(p.out, "  • Online Documentation:      https://docs.zqk.dev")
+		}
 	})
 }

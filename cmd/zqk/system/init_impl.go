@@ -13,9 +13,10 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/zqk-os/zqk/cmd/zqk/ambient"
+	"github.com/zqk-os/zqk/pkg/agentonboard"
+	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	clicontext "github.com/zqk-os/zqk/pkg/cliapp/context"
-	"github.com/zqk-os/zqk/pkg/brand"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/docman"
@@ -268,6 +269,16 @@ func runInit(cmd *cobra.Command, projectName, template string, force bool, snaps
 	// Inject Agent Boot Protocol rules for frictionless onboarding
 	if err := injectAgentBootProtocol(projectRoot, legacy, logger); err != nil {
 		logging.Fluent(logger).Warn("Failed to inject agent boot protocol").WithError(err).Log()
+	}
+
+	// Automatically run agent onboarding to detect editor/agent environment, prime directives, and sync workspace
+	if _, err := agentonboard.Run(agentonboard.Options{
+		ProjectRoot: projectRoot,
+		Logger:      logger,
+		Seat:        SeedDefaultAgentSeatingPack,
+		SessionOK:   true,
+	}); err != nil {
+		logging.Fluent(logger).Warn("Automatic agent onboarding pass encountered non-fatal issues").WithError(err).Log()
 	}
 
 	// Ensure Git pre-commit hooks are installed
