@@ -841,6 +841,9 @@ func TestUpdateGitignore(t *testing.T) {
 	if !strings.Contains(content, ".zqk/cache/") {
 		t.Errorf("expected .zqk/cache/ in fresh .gitignore, got:\n%s", content)
 	}
+	if !strings.Contains(content, ".zqk/agent-runtime/*") {
+		t.Errorf("expected .zqk/agent-runtime/* in fresh .gitignore, got:\n%s", content)
+	}
 
 	// Case 2: Partial .gitignore (e.g. only .zqk/cache/)
 	partialDir := t.TempDir()
