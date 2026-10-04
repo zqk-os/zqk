@@ -133,6 +133,7 @@ func NewSystemCmd() *cobra.Command {
 	systemCmd.AddCommand(NewStatusCmd())
 	systemCmd.AddCommand(NewShutdownCmd())
 	systemCmd.AddCommand(NewStartCmd())
+	systemCmd.AddCommand(NewRestartCmd())
 	systemCmd.AddCommand(NewWhoamiCmd())
 	systemCmd.AddCommand(NewValidateCmd())
 	systemCmd.AddCommand(NewValidateCommandSpecsCmd())

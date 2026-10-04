@@ -93,6 +93,11 @@ func runInit(cmd *cobra.Command, projectName, template string, force bool, snaps
 		mode = InitModeGreenfield
 	}
 
+	if force {
+		_ = ambient.StopDaemon(projectRoot)
+		_ = hostservice.UninstallRoot(projectRoot)
+	}
+
 	var out io.Writer = os.Stdout
 	isInteractive := true
 	if cmd != nil {

@@ -285,6 +285,20 @@ func EnsureSymlink(linkPath, targetPath string) (string, error) {
 	}
 
 	if err := Symlink(symlinkTarget, linkPath); err != nil {
+		if hardErr := os.Link(absTarget, linkPath); hardErr == nil {
+			absLink, lErr := filepath.Abs(linkPath)
+			if lErr != nil {
+				return linkPath, nil
+			}
+			return absLink, nil
+		}
+		if copyErr := CopyExecutableFile(absTarget, linkPath); copyErr == nil {
+			absLink, lErr := filepath.Abs(linkPath)
+			if lErr != nil {
+				return linkPath, nil
+			}
+			return absLink, nil
+		}
 		return "", err
 	}
 	absLink, err := filepath.Abs(linkPath)

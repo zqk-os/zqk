@@ -232,9 +232,11 @@ func InstallToIDE(ideName, configPath, execPath, projectRoot string, logger logg
 					WithError(linkErr).
 					Path(target).
 					Log()
+				command = target
+			} else {
+				// Interpolated paths: Cursor Customize + clones must not bake machine abs paths.
+				command = "${workspaceFolder}/bin/" + MCPRoleProcessName(MCPRoleIDEAdapter)
 			}
-			// Interpolated paths: Cursor Customize + clones must not bake machine abs paths.
-			command = "${workspaceFolder}/bin/" + MCPRoleProcessName(MCPRoleIDEAdapter)
 			cwd = "${workspaceFolder}"
 			env = map[string]string{
 				zqkenv.ProjectRoot().Name():   "${workspaceFolder}",

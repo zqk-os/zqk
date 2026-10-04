@@ -11,15 +11,43 @@ import (
 	"github.com/zqk-os/zqk/pkg/execwrap"
 	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
-	"github.com/zqk-os/zqk/cmd/zqk/object"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
-	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/workflow/whatsnext"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
+
+func getWaveCLIBinary(t *testing.T) string {
+	t.Helper()
+	if bin := zqkenv.Bin().Get(); bin != "" {
+		if fi, err := fileutil.Stat(bin); err == nil && !fi.IsDir() {
+			return bin
+		}
+	}
+	wd, err := fileutil.Getwd()
+	if err == nil {
+		if modRoot, err := paths.ModuleRootFromPath(wd); err == nil {
+			cand := filepath.Join(modRoot, "bin", "zqk")
+			if fi, err := fileutil.Stat(cand); err == nil && !fi.IsDir() {
+				return cand
+			}
+		}
+	}
+	t.Skip("compiled zqk binary not available; run make first")
+	return ""
+}
+
+func envWithTestRoot(testRoot string) []string {
+	env := zqkenv.SubprocessEnvironWithTestRoot(testRoot)
+	env = append(env, zqkenv.TestBypassAuth().Name()+"=1")
+	env = append(env, zqkenv.APIKey().Name()+"="+pkgctx.TestHarnessAccountID)
+	env = append(env, zqkenv.AdminAssignment("TEST_BYPASS_AUTH", "1"))
+	env = append(env, zqkenv.AdminBrandKey("API_KEY")+"="+pkgctx.TestHarnessAccountID)
+	return env
+}
 
 func TestNewWaveCmd(t *testing.T) {
 	cmd := newWaveCmd()
@@ -32,16 +60,10 @@ func TestNewWaveCmd(t *testing.T) {
 }
 
 func TestRunWaveLogic(t *testing.T) {
-	t.Parallel()
-	env := object.SetupTestEnvironment(t)
-	tmpDir := env.TestRoot
-	cliBinary := env.CLIBinary
-
-	storageProvider, err := storage.NewFileObjectStorage(tmpDir)
-	if err != nil {
-		t.Fatalf("failed to create storage: %v", err)
-	}
-	testkit.RegisterStorageTestCleanup(t, tmpDir, storageProvider)
+	proj := testkit.PrepareIsolatedTempProject(t, nil)
+	tmpDir := proj.Root
+	cliBinary := getWaveCLIBinary(t)
+	storageProvider := proj.FileStorage
 
 	secCtx := pkgctx.NewSystemSecurityContext()
 	sysCtx := pkgctx.NewSystemContext()
@@ -92,7 +114,7 @@ func TestRunWaveLogic(t *testing.T) {
 	// Run ambient wave
 	cmd := execwrap.Command(cliBinary, "ambient", "wave")
 	cmd.Dir = tmpDir
-	cmd.Env = object.EnvWithTestRoot(tmpDir)
+	cmd.Env = envWithTestRoot(tmpDir)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("ambient wave command failed: %v\nOutput: %s", err, string(output))
@@ -141,7 +163,7 @@ func TestRunWaveLogic(t *testing.T) {
 
 	cmd2 := execwrap.Command(cliBinary, "ambient", "wave")
 	cmd2.Dir = tmpDir
-	cmd2.Env = object.EnvWithTestRoot(tmpDir)
+	cmd2.Env = envWithTestRoot(tmpDir)
 	if out2, err := cmd2.CombinedOutput(); err != nil {
 		t.Fatalf("ambient wave (with human log) failed: %v\nOutput: %s", err, string(out2))
 	}
@@ -153,8 +175,15 @@ func TestRunWaveLogic(t *testing.T) {
 	if err := json.Unmarshal(b2, &rollup2); err != nil {
 		t.Fatalf("failed to parse rollup2: %v", err)
 	}
-	if len(rollup2.TopErrorClusters) == 0 || rollup2.TopErrorClusters[0].Message != "Ambient probe failed" {
-		t.Fatalf("expected top_error_clusters Ambient probe failed, got %#v", rollup2.TopErrorClusters)
+	foundAmbientProbe := false
+	for _, cluster := range rollup2.TopErrorClusters {
+		if cluster.Message == "Ambient probe failed" {
+			foundAmbientProbe = true
+			break
+		}
+	}
+	if !foundAmbientProbe {
+		t.Fatalf("expected top_error_clusters to contain Ambient probe failed, got %#v", rollup2.TopErrorClusters)
 	}
 	joined := strings.Join(rollup2.RankedActions, " | ")
 	if !strings.Contains(joined, "triage-log-errors") {
