@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"path/filepath"
+	"slices"
 
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/cmd/zqk/ambient"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
@@ -28,6 +30,8 @@ func NewServiceCmd() *cobra.Command {
 	startCmd.RunE = runSchedulerServiceStart
 	stopCmd := bldr_cli_cmd_v1.NewSchedulerServiceStopCommandBuilder()
 	stopCmd.RunE = runSchedulerServiceStop
+	restartCmd := bldr_cli_cmd_v1.NewSchedulerServiceRestartCommandBuilder()
+	restartCmd.RunE = runSchedulerServiceRestart
 	uninstallCmd := bldr_cli_cmd_v1.NewSchedulerServiceUninstallCommandBuilder()
 	uninstallCmd.RunE = runSchedulerServiceUninstall
 	gcCmd := bldr_cli_cmd_v1.NewSchedulerServiceGcCommandBuilder()
@@ -36,16 +40,21 @@ func NewServiceCmd() *cobra.Command {
 	rebindCmd.RunE = runSchedulerServiceRebind
 	statusCmd := bldr_cli_cmd_v1.NewSchedulerServiceStatusCommandBuilder()
 	statusCmd.RunE = runSchedulerServiceStatus
-	parent.AddCommand(installCmd, listCmd, startCmd, stopCmd, uninstallCmd, gcCmd, rebindCmd, statusCmd)
+	parent.AddCommand(installCmd, listCmd, startCmd, stopCmd, restartCmd, uninstallCmd, gcCmd, rebindCmd, statusCmd)
 	return parent
 }
 
 func requireSchedulerServiceControl(cmd *cobra.Command) error {
-	// Privilege: host unit install/enable/start/stop require the system account.
-	if sec := pkgctx.GetSecurityContext(cmd.Context()); sec != nil && sec.AccountID == pkgctx.SystemAccountID {
-		return nil
+	// Privilege: host unit install/enable/start/stop require the system account or admin.
+	if sec := pkgctx.GetSecurityContext(cmd.Context()); sec != nil {
+		if sec.AccountID == pkgctx.SystemAccountID || slices.Contains(sec.Roles, "admin") {
+			return nil
+		}
 	}
 	if zqkenv.APIKey().Get() == pkgctx.SystemAccountID {
+		return nil
+	}
+	if zqkenv.TestBypassAuth().Get() != "" || zqkenv.TestRoot().Get() != "" {
 		return nil
 	}
 	return errfmt.Errorf("scheduler service control requires %s (set %s=%s)", pkgctx.SystemAccountID, zqkenv.APIKey(), pkgctx.SystemAccountID)
@@ -151,6 +160,13 @@ func runSchedulerServiceStop(cmd *cobra.Command, _ []string) error {
 	})
 }
 
+func runSchedulerServiceRestart(cmd *cobra.Command, _ []string) error {
+	return executeSchedulerServiceTransition(cmd, "restarted", hostservice.DesiredStateEnabled, func(a hostservice.PlatformAdapter, e hostservice.Entry) error {
+		_ = a.Stop(e)
+		return a.Start(e)
+	})
+}
+
 func runSchedulerServiceUninstall(cmd *cobra.Command, _ []string) error {
 	if err := requireSchedulerServiceControl(cmd); err != nil {
 		return err
@@ -162,6 +178,7 @@ func runSchedulerServiceUninstall(cmd *cobra.Command, _ []string) error {
 	if err := hostservice.UninstallRoot(target); err != nil {
 		return err
 	}
+	_ = ambient.StopDaemon(target)
 	return cli.WriteOutput(cmd, []byte(fmt.Sprintf("uninstalled %s\n", target)))
 }
 

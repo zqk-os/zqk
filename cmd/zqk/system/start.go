@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/cmd/zqk/ambient"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
@@ -65,6 +66,15 @@ func NewStartCmd() *cobra.Command {
 					Log()
 			} else {
 				logging.FluentEvent(logger).Info("Scheduler daemon started.").Log()
+			}
+
+			logging.FluentEvent(logger).Info("Starting ambient filesystem daemon...").String("root", absRoot).Log()
+			if err := ambient.EnsureDaemon(absRoot, logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))); err != nil {
+				logging.FluentEvent(logger).Warn("Could not start ambient daemon").
+					String("error", err.Error()).
+					Log()
+			} else {
+				logging.FluentEvent(logger).Info("Ambient daemon started.").Log()
 			}
 
 			logging.FluentEvent(logger).Info("System start complete.").Log()

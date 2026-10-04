@@ -1,0 +1,18 @@
+$schema: "../schemas/command_spec.schema.json"
+name: "restart"
+short: "Restart all ZQK daemons cleanly"
+description: |
+  Restarts the scheduler service, ambient daemon, and background daemons.
+
+help:
+  examples:
+    - comment: "Restart the entire system"
+      command: "%s system restart"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+common_flags: false
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false

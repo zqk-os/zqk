@@ -13,13 +13,15 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/zqk-os/zqk/cmd/zqk/ambient"
+	"github.com/zqk-os/zqk/pkg/agentonboard"
+	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	clicontext "github.com/zqk-os/zqk/pkg/cliapp/context"
-	"github.com/zqk-os/zqk/pkg/brand"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/docman"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/mcp"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -90,6 +92,11 @@ func runInit(cmd *cobra.Command, projectName, template string, force bool, snaps
 		mode = InitModeLegacy
 	default:
 		mode = InitModeGreenfield
+	}
+
+	if force {
+		_ = ambient.StopDaemon(projectRoot)
+		_ = hostservice.UninstallRoot(projectRoot)
 	}
 
 	var out io.Writer = os.Stdout
@@ -270,6 +277,16 @@ func runInit(cmd *cobra.Command, projectName, template string, force bool, snaps
 		logging.Fluent(logger).Warn("Failed to inject agent boot protocol").WithError(err).Log()
 	}
 
+	// Automatically run agent onboarding to detect editor/agent environment, prime directives, and sync workspace
+	if _, err := agentonboard.Run(agentonboard.Options{
+		ProjectRoot: projectRoot,
+		Logger:      logger,
+		Seat:        SeedDefaultAgentSeatingPack,
+		SessionOK:   true,
+	}); err != nil {
+		logging.Fluent(logger).Warn("Automatic agent onboarding pass encountered non-fatal issues").WithError(err).Log()
+	}
+
 	// Ensure Git pre-commit hooks are installed
 	if err := EnsureGitHooks(projectRoot, logger); err != nil {
 		logging.Fluent(logger).Warn("Failed to ensure git pre-commit hook on init").WithError(err).Log()
@@ -419,14 +436,27 @@ func runGreenfieldInit(projectRoot, projectName, template string, force bool, lo
 		logging.Fluent(logger).Warn("Failed to write root isolation files").WithError(err).Log()
 	}
 
-	// Update .gitignore if .git exists
-	if _, err := fileutil.Stat(filepath.Join(projectRoot, ".git")); err == nil {
-		gitignorePath := filepath.Join(projectRoot, ".gitignore")
-		if err := updateGitignore(gitignorePath); err != nil {
-			logging.Fluent(logger).Warn("Failed to update .gitignore").
+	// In greenfield mode, initialize git repository if not already present
+	gitDir := filepath.Join(projectRoot, ".git")
+	if _, err := fileutil.Stat(gitDir); fileutil.IsNotExist(err) {
+		cmd := execwrap.Command("git", "init")
+		cmd.Dir = projectRoot
+		if out, err := cmd.CombinedOutput(); err != nil {
+			logging.Fluent(logger).Warn("Failed to initialize git repository on greenfield init").
 				WithError(err).
+				String("output", string(out)).
 				Log()
+		} else {
+			logging.Fluent(logger).Info("Initialized git repository").Log()
 		}
+	}
+
+	// Always ensure .gitignore contains canonical ignore patterns
+	gitignorePath := filepath.Join(projectRoot, ".gitignore")
+	if err := updateGitignore(gitignorePath); err != nil {
+		logging.Fluent(logger).Warn("Failed to update .gitignore").
+			WithError(err).
+			Log()
 	}
 
 	logging.Fluent(logger).Info("Greenfield project initialized successfully").
@@ -525,12 +555,13 @@ func runLegacyInit(projectRoot, projectName, template string, force bool, logger
 		return err
 	}
 
-	// Write root isolation and kernel config files
-	if err := writeRootIsolationFiles(projectRoot, force, logger); err != nil {
-		logging.Fluent(logger).Warn("Failed to write root isolation files").WithError(err).Log()
+	// Always ensure .gitignore contains canonical ignore patterns
+	gitignorePath := filepath.Join(projectRoot, ".gitignore")
+	if err := updateGitignore(gitignorePath); err != nil {
+		logging.Fluent(logger).Warn("Failed to update .gitignore").
+			WithError(err).
+			Log()
 	}
-
-	// Discovery wizard runs when --discover is set (see runInit); use "zqk system check --auto-fix" to register hashes for discovered objects.
 
 	logging.Fluent(logger).Info("Legacy project initialized successfully").
 		String(initLogFieldProject, projectName).

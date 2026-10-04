@@ -1,0 +1,40 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "restart"
+short: "Restart the scheduler daemon"
+description: |
+  Restart the running scheduler daemon.
+  
+  This gracefully stops the scheduler and starts a new instance.
+
+help:
+  examples:
+    - comment: "Restart scheduler daemon"
+      command: "%s scheduler restart"
+    - comment: "Force restart scheduler daemon"
+      command: "%s scheduler restart --force"
+  exclude_flags:
+    - "format"
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "timeout"
+    - "columns"
+
+run_e: "runRestart"
+async: true
+common_flags: true
+
+flags:
+  - name: "wait"
+    type: "bool"
+    default: true
+    description: "Wait for the daemon process to exit before starting"
+  - name: "max-wait"
+    type: "duration"
+    default: "30s"
+    description: "Max time to wait for exit during restart"
+  - name: "force"
+    type: "bool"
+    default: false
+    description: "Force kill the daemon (SIGKILL) if graceful stop is stuck"

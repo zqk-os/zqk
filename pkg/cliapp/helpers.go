@@ -53,6 +53,9 @@ var supportedOutputFormats = []OutputFormat{
 	FormatStream,
 	FormatAgentPrompt,
 	FormatSemanticLink,
+	FormatRaw,
+	FormatMarkdown,
+	FormatHTML,
 }
 
 func supportedOutputFormatsHelpText() string {
@@ -76,6 +79,9 @@ const (
 	FormatStream       OutputFormat = "stream"       // Alias for json-rpc
 	FormatAgentPrompt  OutputFormat = "agent-prompt" // Scheduler convergence measure --format agent-prompt: markdown for agent chat
 	FormatSemanticLink OutputFormat = "semantic-link"
+	FormatRaw          OutputFormat = "raw"  // Clean unescaped text/prose
+	FormatMarkdown     OutputFormat = "md"   // Clean formatted markdown
+	FormatHTML         OutputFormat = "html" // Rendered HTML
 )
 
 // AddCommonFlags adds common flags to a command.

@@ -189,3 +189,88 @@ func TestFormatOutput_JSONRPCErrorUnifiedStructure(t *testing.T) {
 		t.Errorf("expected error message 'sample rpc error', got %v", errObj["message"])
 	}
 }
+
+func TestFormatOutput_RawEmitsUnescapedProse(t *testing.T) {
+	t.Parallel()
+	h := GetFormatHandler(FormatRaw)
+	if h == nil {
+		t.Fatal("raw handler nil")
+	}
+
+	payload := map[string]any{
+		"title": "Launch Post",
+		"body":  "Line 1\\nLine 2\\tindent\\\"quoted\\\"\\u2014emdash",
+	}
+
+	out, err := h.Format(payload)
+	if err != nil {
+		t.Fatalf("format raw: %v", err)
+	}
+
+	str := string(out)
+	if !strings.Contains(str, "Line 1\nLine 2") {
+		t.Errorf("expected unescaped newline, got:\n%s", str)
+	}
+	if !strings.Contains(str, "Line 2\tindent\"quoted\"—emdash") {
+		t.Errorf("expected unescaped quotes, tabs, and em-dash, got:\n%s", str)
+	}
+}
+
+func TestFormatOutput_MarkdownEmitsCleanHeadings(t *testing.T) {
+	t.Parallel()
+	h := GetFormatHandler(FormatMarkdown)
+	if h == nil {
+		t.Fatal("markdown handler nil")
+	}
+
+	payload := map[string]any{
+		"title":    "Autonomous Agents",
+		"subtitle": "Why an OS is required",
+		"body":     "Paragraph content with **bold** text.",
+	}
+
+	out, err := h.Format(payload)
+	if err != nil {
+		t.Fatalf("format markdown: %v", err)
+	}
+
+	str := string(out)
+	if !strings.HasPrefix(str, "# Autonomous Agents") {
+		t.Errorf("expected # header, got:\n%s", str)
+	}
+	if !strings.Contains(str, "*Why an OS is required*") {
+		t.Errorf("expected italic subtitle, got:\n%s", str)
+	}
+	if !strings.Contains(str, "Paragraph content with **bold** text.") {
+		t.Errorf("expected body, got:\n%s", str)
+	}
+}
+
+func TestFormatOutput_HTMLEmitsCleanTags(t *testing.T) {
+	t.Parallel()
+	h := GetFormatHandler(FormatHTML)
+	if h == nil {
+		t.Fatal("html handler nil")
+	}
+
+	payload := map[string]any{
+		"title": "Header Title",
+		"body":  "Paragraph with **bold** and `code`.",
+	}
+
+	out, err := h.Format(payload)
+	if err != nil {
+		t.Fatalf("format html: %v", err)
+	}
+
+	str := string(out)
+	if !strings.Contains(str, "<h1>Header Title</h1>") {
+		t.Errorf("expected <h1> tag, got:\n%s", str)
+	}
+	if !strings.Contains(str, "<strong>bold</strong>") {
+		t.Errorf("expected <strong> tag, got:\n%s", str)
+	}
+	if !strings.Contains(str, "<code>code</code>") {
+		t.Errorf("expected <code> tag, got:\n%s", str)
+	}
+}

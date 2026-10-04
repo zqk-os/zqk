@@ -14,6 +14,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
 	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
+	"github.com/zqk-os/zqk/pkg/scheduler/hostservice"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/strutil"
 )
@@ -54,6 +55,15 @@ func stopScheduler(ctx *cli.Context, cmd *cobra.Command) error {
 	}
 
 	return runSchedulerControlWithTimeoutDur("scheduler stop", wall, func() error {
+		projectRoot := resolveSchedulerCLIProjectRoot(ctx)
+		if projectRoot != emptyValue {
+			if entry, err := hostservice.ResolveEntry(projectRoot); err == nil && entry.UnitLabel != "" {
+				adapter := hostservice.NewAdapter()
+				_ = adapter.Stop(entry)
+				_, _ = hostservice.SetEntryDesiredState(entry.RootID, hostservice.DesiredStateDisabled)
+			}
+		}
+
 		status, err := getSchedulerStatus(ctx)
 		if err != nil {
 			return err
@@ -67,7 +77,6 @@ func stopScheduler(ctx *cli.Context, cmd *cobra.Command) error {
 				}
 			}
 			// Still write no-auto-restart so ensure-scheduler-running.sh (cron) does not restart until user runs start
-			projectRoot := resolveSchedulerCLIProjectRoot(ctx)
 			if projectRoot != emptyValue {
 				if err := schedulerpkg.WriteNoAutoRestartFile(projectRoot); err != nil {
 					schedulerpkg.SLog(logger).Debug("Failed to write no-auto-restart file during idempotent stop").WithError(err).Log()
@@ -76,7 +85,6 @@ func stopScheduler(ctx *cli.Context, cmd *cobra.Command) error {
 			return nil
 		}
 
-		projectRoot := resolveSchedulerCLIProjectRoot(ctx)
 		profile, err := validateSchedulerProjectRootAndBrand(ctx, projectRoot)
 		if err != nil {
 			return err

@@ -215,10 +215,10 @@ docs/process/
 !.zqk-state/snapshots/
 !.zqk-state/snapshots/**/*.csnap
 
-.zqk/agent-runtime/ambient_context.json*
-.zqk/agent-runtime/agent_git_identity.env
-.zqk/agent-runtime/escalation.json
-.zqk/agent-runtime/agent_workspace_sync.json
+.zqk/agent-runtime/*
+!.zqk/agent-runtime/*.example
+!.zqk/agent-runtime/agent_chat_channel.json
+!.zqk/agent-runtime/agent_idle_store.json
 .zqk/agent_packs/
 .zqk/ides/
 # Cursor stdio MCP spawn env (API key + session); never commit.

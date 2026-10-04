@@ -1,0 +1,19 @@
+$schema: "../../schemas/command_spec.schema.json"
+
+name: "restart"
+short: "Restart a registered scheduler host unit"
+flags:
+  - name: "root"
+    type: "string"
+    default: ""
+    description: "Root id or project path"
+help:
+  examples:
+    - comment: "Restart by path"
+      command: "%s scheduler service restart --root ."
+  exclude_flags: ["format", "output", "verbose", "quiet", "timeout", "columns"]
+run_e: "runSchedulerServiceRestart"
+common_flags: false
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false

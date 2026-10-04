@@ -152,6 +152,11 @@ payload:
     - "docs/process/**"
     - ".zqk/keystore/**"
     - ".zqk/state/**"
+    - ".zqk/credentials"
+    - ".zqk/agent-runtime/agent_workspace_sync.json"
+    - ".zqk/agent-runtime/agent_git_identity.env"
+    - ".zqk/agent-runtime/escalation.json"
+    - ".zqk/agent-runtime/ambient_context.json*"
     - "config/zqk-local.yaml"
     - "*.pem"
     - "*.key"
@@ -203,6 +208,22 @@ payload:
         - "scripts/open-core/rewrite-community-module-path.sh"
         - "scripts/open-core/check-public-release-payload.sh"
         - "config/gates.yaml"
+    - id: "developer_personal_identity"
+      pattern: '(?i)lanceettl'
+      message: "personal developer identity/handle (lanceettl) remains in tracked repo files"
+      scope: ["**"]
+      exemptions:
+        - "config/gates.yaml"
+        - "pkg/vet/*"
+    - id: "hardcoded_user_home_path"
+      pattern: '(/Users/|/home/)[a-zA-Z0-9_-]+/'
+      message: "hardcoded environment-specific user home path remains in tracked repo files"
+      scope: [".agent/**", ".agents/**", "config/**", "scripts/**", "cmd/**", "pkg/**"]
+      exemptions:
+        - "*_test.go"
+        - "pkg/telemetry/anonymizer.go"
+        - "config/gates.yaml"
+        - "pkg/vet/*"
     - id: "studio_technical_debt"
       pattern: 'TDE-[0-9]{15,}-[0-9a-fA-F]{8}'
       message: "studio technical_debt instance id remains in scripts or specs"

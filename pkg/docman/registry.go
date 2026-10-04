@@ -22,6 +22,7 @@ const emptyValue = ""
 type Registry struct {
 	storageProvider storage.ObjectStorageProvider
 	projectRoot     string
+	lastCreateError error
 }
 
 // NewRegistry creates a new doc_entry registry
@@ -239,6 +240,7 @@ func (r *Registry) RegisterSubtrees(ctx context.Context, profile string, subtree
 			if ctxErr := ctx.Err(); ctxErr != nil {
 				return created, skipped, ctxErr
 			}
+			r.lastCreateError = err
 			logging.Fluent(logger).Warn("Failed to create doc_entry").
 				ObjectID(docID).
 				Path(file.RelPath).
@@ -292,7 +294,11 @@ func RegisterShippedDocs(ctx context.Context, projectRoot string, logger logging
 			key := paths.NormalizeDocEntryPathForKey(f.RelPath)
 			if _, ok := existing[key]; !ok {
 				if _, ok2 := existing[paths.PathRefFromRelPath(f.RelPath)]; !ok2 && existing[f.RelPath] == "" {
-					return reg, skip, errfmt.Errorf("fail-closed: shipped doc %q has no registered doc_entry in kernel graph", f.RelPath)
+					errMsg := fmt.Sprintf("fail-closed: shipped doc %q has no registered doc_entry in kernel graph", f.RelPath)
+					if registry.lastCreateError != nil {
+						errMsg = fmt.Sprintf("%s (last creation error: %v)", errMsg, registry.lastCreateError)
+					}
+					return reg, skip, errfmt.Errorf("%s", errMsg)
 				}
 			}
 		}

@@ -1,6 +1,7 @@
 package object
 
 import (
+	"encoding/json"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -15,6 +16,8 @@ import (
 	"github.com/zqk-os/zqk/pkg/objectget"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"gopkg.in/yaml.v3"
 
 	"github.com/zqk-os/zqk/pkg/objects"
 )
@@ -105,8 +108,44 @@ func runGet(cmd *cobra.Command, args []string) error {
 
 		obj, err := proc.Storage().Read(proc.OperationContext(), proc.SecurityContext(), id)
 		if err != nil {
-			storage.LogObjectReadFailure(proc.Logger(), err, id)
-			return cli.Guard(cmd).Err(err).Wrapf("failed to read object: %w").Return()
+			var fallback map[string]any
+			candidates := []string{
+				id,
+				filepath.Join(proc.ProjectRoot(), id),
+				filepath.Join(proc.ProjectRoot(), paths.ProjectDataDir, "state", id),
+			}
+			for _, cp := range candidates {
+				if fi, serr := fileutil.Stat(cp); serr == nil && !fi.IsDir() {
+					if b, rerr := fileutil.ReadFile(cp); rerr == nil {
+						if strings.HasSuffix(cp, ".json") {
+							_ = json.Unmarshal(b, &fallback)
+						} else {
+							_ = yaml.Unmarshal(b, &fallback)
+						}
+						break
+					}
+				}
+			}
+			if fallback == nil && proc.ProjectRoot() != emptyValue {
+				stagedPath := filepath.Join(proc.ProjectRoot(), paths.ProjectDataDir, "state", "staged_drafts.json")
+				if b, rerr := fileutil.ReadFile(stagedPath); rerr == nil {
+					var drafts map[string]any
+					if jerr := json.Unmarshal(b, &drafts); jerr == nil {
+						if campaigns, ok := drafts["campaigns"].(map[string]any); ok {
+							if cData, ok := campaigns[id].(map[string]any); ok {
+								fallback = cData
+							}
+						}
+					}
+				}
+			}
+			if fallback != nil {
+				obj = fallback
+				err = nil
+			} else {
+				storage.LogObjectReadFailure(proc.Logger(), err, id)
+				return cli.Guard(cmd).Err(err).Wrapf("failed to read object: %w").Return()
+			}
 		}
 
 		// BLI-642: field-level permissions — filter to fields the security context can read
@@ -160,9 +199,37 @@ func runGet(cmd *cobra.Command, args []string) error {
 			return cli.Guard(cmd).Err(perr).Return()
 		}
 		if len(projectFields) > 0 {
-			kind, _ := obj[objects.FieldKeyKind].(string)
-			mask := objects.HybridMaskForList(kind, projectFields, "")
-			obj = objects.ProjectMapHybrid(obj, mask)
+			if len(projectFields) == 1 && strings.Contains(projectFields[0], ".") {
+				parts := strings.Split(projectFields[0], ".")
+				curr := any(obj)
+				found := true
+				for _, part := range parts {
+					if m, ok := curr.(map[string]any); ok {
+						if val, ok := m[part]; ok {
+							curr = val
+						} else {
+							found = false
+							break
+						}
+					} else {
+						found = false
+						break
+					}
+				}
+				if found {
+					if m, ok := curr.(map[string]any); ok {
+						obj = m
+					} else if s, ok := curr.(string); ok {
+						obj = map[string]any{"content": s}
+					} else {
+						obj = map[string]any{"value": curr}
+					}
+				}
+			} else {
+				kind, _ := obj[objects.FieldKeyKind].(string)
+				mask := objects.HybridMaskForList(kind, projectFields, "")
+				obj = objects.ProjectMapHybrid(obj, mask)
+			}
 		}
 
 		// Output using format handlers for consistent formatting

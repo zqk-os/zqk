@@ -473,6 +473,18 @@ func NewSchedulerServiceStopCommandBuilder() *cobra.Command {
 	})
 }
 
+// NewSchedulerServiceRestartCommandBuilder creates a new scheduler_restart command
+func NewSchedulerServiceRestartCommandBuilder() *cobra.Command {
+	return buildSchedulerCommand(SchedulerCommandConfig{
+		Use:      "restart",
+		Short:    "Restart a registered scheduler host unit",
+		Examples: []string{"Restart by path", "%s scheduler service restart --root ."},
+		Flags: func(builder *clipkg.CommandBuilder) {
+			builder.AddStringFlag("root", "", "", "Root id or project path")
+		},
+	})
+}
+
 // NewSchedulerServiceUninstallCommandBuilder creates a new scheduler_uninstall command
 func NewSchedulerServiceUninstallCommandBuilder() *cobra.Command {
 	return buildSchedulerCommand(SchedulerCommandConfig{
@@ -601,6 +613,24 @@ func NewSchedulerStopCommandBuilder() *cobra.Command {
 			builder.AddBoolFlag("wait", "", false, "Wait for the daemon process to exit")
 			builder.AddDurationFlag("max-wait", "", "3m", "Max time to wait for exit when --wait is set (matches daemon clean-shutdown budget)")
 			builder.AddBoolFlag("force", "", false, "Force kill the daemon (SIGKILL). Use when graceful stop is stuck.")
+		},
+	})
+}
+
+// NewSchedulerRestartCommandBuilder creates a new scheduler_restart command
+func NewSchedulerRestartCommandBuilder() *cobra.Command {
+	return buildSchedulerCommand(SchedulerCommandConfig{
+		Use:   "restart",
+		Short: "Restart the scheduler daemon",
+		Description: []string{"Restart the running scheduler daemon.",
+			"",
+			"This gracefully stops the scheduler and starts a new instance."},
+		Examples: []string{"Restart scheduler daemon", "%s scheduler restart",
+			"Force restart scheduler daemon", "%s scheduler restart --force"},
+		Flags: func(builder *clipkg.CommandBuilder) {
+			builder.AddBoolFlag("wait", "", true, "Wait for the daemon process to exit before starting")
+			builder.AddDurationFlag("max-wait", "", "30s", "Max time to wait for exit during restart")
+			builder.AddBoolFlag("force", "", false, "Force kill the daemon (SIGKILL) if graceful stop is stuck.")
 		},
 	})
 }

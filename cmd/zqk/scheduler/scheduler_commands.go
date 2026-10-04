@@ -11,6 +11,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	_ "github.com/zqk-os/zqk/pkg/mcp"
 	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
+	"github.com/zqk-os/zqk/pkg/scheduler/hostservice"
 )
 
 // NewSchedulerCmd creates the scheduler command
@@ -20,6 +21,7 @@ func NewSchedulerCmd() *cobra.Command {
 
 	schedulerCmd.AddCommand(NewStartCmd())
 	schedulerCmd.AddCommand(NewStopCmd())
+	schedulerCmd.AddCommand(NewRestartCmd())
 	schedulerCmd.AddCommand(NewStatusCmd())
 	schedulerCmd.AddCommand(NewTriggerCmd())
 	schedulerCmd.AddCommand(NewListCmd())
@@ -63,6 +65,16 @@ func NewStopCmd() *cobra.Command {
 	cli.AddCommonFlags(stopCmd)
 
 	return stopCmd
+}
+
+// NewRestartCmd creates the restart command
+func NewRestartCmd() *cobra.Command {
+	restartCmd := bldr_cli_cmd_v1.NewSchedulerRestartCommandBuilder()
+	cli.RequireSchedulerCheck(restartCmd, false)
+	cli.BindAsyncProgress(restartCmd, runRestart)
+	cli.AddCommonFlags(restartCmd)
+
+	return restartCmd
 }
 
 // NewStatusCmd creates the status command
@@ -129,6 +141,37 @@ func runStop(cmd *cobra.Command, args []string) error {
 		return errfmt.Errorf("failed to get context")
 	}
 	return stopScheduler(ctx, cmd)
+}
+
+func runRestart(cmd *cobra.Command, args []string) error {
+	ctx := cli.GetContext(cmd)
+	if ctx == nil {
+		return errfmt.Errorf("failed to get context")
+	}
+	projectRoot, err := resolveSchedulerProjectRoot(cmd)
+	if err != nil {
+		return err
+	}
+
+	// 1. If host service is registered, use host service restart
+	if entry, err := hostservice.ResolveEntry(projectRoot); err == nil && entry.UnitLabel != "" {
+		adapter := hostservice.NewAdapter()
+		_ = adapter.Stop(entry)
+		if err := adapter.Start(entry); err != nil {
+			return errfmt.Newf("failed to restart scheduler host service").Wrap(err)
+		}
+		_, _ = hostservice.SetEntryDesiredState(entry.RootID, hostservice.DesiredStateEnabled)
+		return cli.WriteOutput(cmd, []byte(fmt.Sprintf("Restarted scheduler host service: %s\n", entry.UnitLabel)))
+	}
+
+	// 2. Otherwise stop standalone daemon, then start
+	if err := stopScheduler(ctx, cmd); err != nil {
+		force, _ := cmd.Flags().GetBool("force")
+		if !force {
+			return err
+		}
+	}
+	return startSchedulerInBackground(ctx, cmd)
 }
 
 func runStatus(cmd *cobra.Command, args []string) error {

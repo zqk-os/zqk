@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -234,3 +235,52 @@ func TestPrivilegedWriter_ProjectRootAffinityMismatch(t *testing.T) {
 		t.Fatalf("expected success with matching affinity, got: %v", err)
 	}
 }
+
+func TestPrivilegedWriter_StaleDeadSocketUnlinkedAndAllowsLocalWrite(t *testing.T) {
+	t.Setenv(zqkenv.TestRoot().Name(), "")
+	t.Setenv(zqkenv.IsDaemon().Name(), "")
+	t.Setenv(zqkenv.TestAllowCASFallthrough().Name(), "")
+	t.Setenv(zqkenv.PrivilegedWriterSocket().Name(), "")
+
+	// Use /tmp to stay well under macOS 104-character UNIX socket path limit
+	projectRoot, err := os.MkdirTemp("/tmp", "pw_stale_*")
+	if err != nil {
+		t.Fatalf("failed to create temp dir: %v", err)
+	}
+	defer fileutil.RemoveAll(projectRoot)
+
+	socketPath := ProjectScopedPrivilegedWriterSocketPath(projectRoot)
+	if err := fileutil.MkdirAll(filepath.Dir(socketPath), 0755); err != nil {
+		t.Fatalf("failed to create run dir: %v", err)
+	}
+
+	// Create a dummy dead socket file (listener closed with unlink-on-close disabled)
+	l, err := net.Listen("unix", socketPath)
+	if err != nil {
+		t.Fatalf("failed to create dummy socket: %v", err)
+	}
+	if ul, ok := l.(*net.UnixListener); ok {
+		ul.SetUnlinkOnClose(false)
+	}
+	_ = l.Close() // Socket file remains on disk, but nobody is listening
+
+	if !fileutil.Exists(socketPath) {
+		t.Fatalf("expected dead socket file to exist on disk at %s", socketPath)
+	}
+
+	// In Mode A standalone, privilegedWriterSocketExists should detect the dead socket,
+	// clean it up, and return false so local writes are allowed.
+	exists := privilegedWriterSocketExists(projectRoot)
+	if exists {
+		t.Fatal("expected privilegedWriterSocketExists to return false for dead socket")
+	}
+
+	if fileutil.Exists(socketPath) {
+		t.Fatal("expected stale dead socket file to be unlinked")
+	}
+
+	if !privilegedWriterLocalWriteAllowed(projectRoot) {
+		t.Fatal("expected local write to be allowed in Mode A after dead socket cleanup")
+	}
+}
+

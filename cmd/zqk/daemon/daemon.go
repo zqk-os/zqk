@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/cmd/zqk/ambient"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/daemon/overseer"
@@ -17,6 +18,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/scheduler/hostservice"
 )
 
 // NewDaemonCmd creates the root daemon command for process group supervision.
@@ -458,12 +460,34 @@ func newServiceInstallCmd() *cobra.Command {
 func newServiceUninstallCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewDaemonServiceUninstallCommandBuilder()
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		projectRoot := resolveProjectRoot(cmd)
+
+		// 1. Stop all project daemons (ambient, scheduler host unit) so nothing is left behind
+		if projectRoot != "" {
+			_ = ambient.StopDaemon(projectRoot)
+			_ = hostservice.UninstallRoot(projectRoot)
+		}
+
+		// 2. Stop overseer process group if active
+		if _, client := getDaemonClient(cmd); client != nil {
+			ctx, cancel := context.WithTimeout(cmd.Context(), 3*time.Second)
+			_, _ = sendOverseerAction(ctx, client, "shutdown", "")
+			cancel()
+		}
+
+		// 3. Uninstall overseer LaunchAgent
 		if err := overseer.UninstallOverseerLaunchAgent(); err != nil {
 			return err
 		}
+
+		// 4. Clean up any legacy LaunchAgents / units
+		cleaned, _ := overseer.CleanLegacyLaunchAgents()
+
 		return cli.FormatOutput(cmd, map[string]any{
 			objects.FieldKeyStatus: objects.ObjectStatusUninstalled,
 			"label":                overseer.OverseerLaunchAgentLabel,
+			"project_root":         projectRoot,
+			"cleaned_legacy_units": cleaned,
 		})
 	}
 	return cmd

@@ -5,8 +5,11 @@ import (
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 
 	"context"
+	"net"
+	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -47,6 +50,10 @@ func DefaultPrivilegedWriterSocketPath(projectRoots ...string) string {
 
 func isGlobalTempSocket(path string) bool {
 	clean := filepath.Clean(path)
+	// Project-scoped sockets under .zqk/run are scoped to a workspace and never global temp sockets.
+	if strings.Contains(clean, filepath.Join(paths.ProjectDataDir, "run")) {
+		return false
+	}
 	tempDir := filepath.Clean(fileutil.TempDir())
 	return strings.HasPrefix(clean, tempDir) ||
 		strings.HasPrefix(clean, "/tmp") ||
@@ -69,8 +76,26 @@ func privilegedWriterSocketExists(projectRoots ...string) bool {
 			return false
 		}
 	}
-	_, err := fileutil.Stat(path)
-	return err == nil
+	info, err := fileutil.Stat(path)
+	if err != nil {
+		return false
+	}
+	// If a socket file exists, check whether a daemon process is actually listening.
+	// In Mode A / standalone, a dead socket left on disk after daemon termination or crash
+	// must not permanently block local operations.
+	if info.Mode()&os.ModeSocket != 0 || strings.HasSuffix(path, socketFileExtension) {
+		conn, dialErr := net.DialTimeout("unix", path, 50*time.Millisecond)
+		if dialErr != nil {
+			// Socket file exists on disk but no daemon is listening.
+			// If it's a project-scoped socket and not an explicit env override, clean it up.
+			if strings.TrimSpace(zqkenv.PrivilegedWriterSocket().Get()) == "" {
+				_ = fileutil.Remove(path)
+			}
+			return false
+		}
+		_ = conn.Close()
+	}
+	return true
 }
 
 // privilegedWriterLocalWriteAllowed reports whether CAS may write locally when the
