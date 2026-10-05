@@ -161,16 +161,22 @@ install_binary() {
   local checksums_path="${TMPDIR}/checksums.txt"
 
   local base_url="https://github.com/${REPO}/releases/download/${ver}"
-  if curl -sSLf "${base_url}/${archive}" -o "${archive_path}" 2>/dev/null && \
-     curl -sSLf "${base_url}/checksums.txt" -o "${checksums_path}" 2>/dev/null; then
-    curl -sSLf "${base_url}/checksums.txt.sig" -o "${checksums_path}.sig" 2>/dev/null || true
-    curl -sSLf "${base_url}/checksums.txt.pem" -o "${checksums_path}.pem" 2>/dev/null || true
-    : # downloaded from public release URL
-  elif curl -sSLf "${base_url}/${comm_archive}" -o "${archive_path}" 2>/dev/null && \
-     curl -sSLf "${base_url}/checksums.txt" -o "${checksums_path}" 2>/dev/null; then
-    curl -sSLf "${base_url}/checksums.txt.sig" -o "${checksums_path}.sig" 2>/dev/null || true
-    curl -sSLf "${base_url}/checksums.txt.pem" -o "${checksums_path}.pem" 2>/dev/null || true
-    : # downloaded community-prefixed archive from public release URL
+  local downloaded=0
+  for arch_cand in "${archive}" "${comm_archive}"; do
+    if curl -sSLf "${base_url}/${arch_cand}" -o "${archive_path}" 2>/dev/null; then
+      downloaded=1
+      break
+    fi
+  done
+
+  if [ "$downloaded" -eq 1 ]; then
+    for sums_cand in "checksums.txt" "zqk_${ver_num}_checksums.txt" "zqk-community_${ver_num}_checksums.txt"; do
+      if curl -sSLf "${base_url}/${sums_cand}" -o "${checksums_path}" 2>/dev/null; then
+        curl -sSLf "${base_url}/${sums_cand}.sig" -o "${checksums_path}.sig" 2>/dev/null || true
+        curl -sSLf "${base_url}/${sums_cand}.pem" -o "${checksums_path}.pem" 2>/dev/null || true
+        break
+      fi
+    done
   elif [ -n "$GITHUB_TOKEN" ] || command -v gh >/dev/null 2>&1; then
     if ! _download_private "$ver" "$archive" "${archive_path}"; then
       if ! _download_private "$ver" "$comm_archive" "${archive_path}"; then
@@ -178,12 +184,19 @@ install_binary() {
         exit 1
       fi
     fi
-    _download_private "$ver" "checksums.txt" "${checksums_path}" || {
+    local sums_downloaded=0
+    for sums_cand in "checksums.txt" "zqk_${ver_num}_checksums.txt" "zqk-community_${ver_num}_checksums.txt"; do
+      if _download_private "$ver" "${sums_cand}" "${checksums_path}"; then
+        _download_private "$ver" "${sums_cand}.sig" "${checksums_path}.sig" || true
+        _download_private "$ver" "${sums_cand}.pem" "${checksums_path}.pem" || true
+        sums_downloaded=1
+        break
+      fi
+    done
+    if [ "$sums_downloaded" -eq 0 ]; then
       echo "Checksums file not found in release ${ver}" >&2
       exit 1
-    }
-    _download_private "$ver" "checksums.txt.sig" "${checksums_path}.sig" || true
-    _download_private "$ver" "checksums.txt.pem" "${checksums_path}.pem" || true
+    fi
   else
     echo "Binary release not found for ${ver}. Try ZQK_INSTALL_METHOD=source or set GITHUB_TOKEN." >&2
     exit 1
