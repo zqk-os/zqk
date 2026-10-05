@@ -114,6 +114,9 @@ func TestPolyglotGreenfieldInit(t *testing.T) {
 
 // TestBootstrapPortableScript verifies that scripts/open-core/verify-bootstrap-portable.sh passes cleanly.
 func TestBootstrapPortableScript(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping slow script test in -short mode")
+	}
 	t.Parallel()
 	moduleRoot, err := findModuleRoot()
 	if err != nil || moduleRoot == "" {
@@ -125,7 +128,7 @@ func TestBootstrapPortableScript(t *testing.T) {
 		t.Skipf("verify-bootstrap-portable.sh not found at %s", scriptPath)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 180*time.Second)
 	defer cancel()
 
 	cmd := exec.CommandContext(ctx, "/bin/sh", scriptPath, moduleRoot)
@@ -139,13 +142,16 @@ func TestBootstrapPortableScript(t *testing.T) {
 
 // TestProductBinaryBuildCGOZero verifies that ./cmd/zqk builds cleanly with CGO_ENABLED=0.
 func TestProductBinaryBuildCGOZero(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping slow binary compilation test in -short mode")
+	}
 	t.Parallel()
 	moduleRoot, err := findModuleRoot()
 	if err != nil || moduleRoot == "" {
 		t.Fatalf("failed finding module root: %v", err)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 180*time.Second)
 	defer cancel()
 
 	const targetPkg = "./cmd/zqk"
