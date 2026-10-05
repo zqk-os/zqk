@@ -67,7 +67,6 @@ The everyday command family covers core day-to-day interactions with the Knowled
 - `zqk system`: System operations (health, validation, and maintenance)
 - `zqk test`: Execute verification tests linked to test cases and criteria
 - `zqk ui`: Interactive full-screen terminal mission control
-- `zqk use`: Switch active context profile, project, or persona
 - `zqk validate`: Validation and verification commands
 - `zqk version`: Print version, commit, and build timestamp
 - `zqk workflow`: Manage and execute autonomous engineering workflows and lifecycle pipelines

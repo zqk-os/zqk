@@ -48,11 +48,12 @@ func TestLoadKindNamesFromSpecsDir_EdgeCases(t *testing.T) {
 		t.Errorf("expected error when no valid ontologies found")
 	}
 
+	validRoot := t.TempDir()
 	// Now add valid .yml and .yaml files
-	_ = fileutil.WriteFile(filepath.Join(root, "item1.yaml"), []byte("ontology: custom_kind_one\n"), paths.FilePerm600)
-	_ = fileutil.WriteFile(filepath.Join(root, "item2.yml"), []byte("ontology: custom_kind_two\n"), paths.FilePerm600)
+	_ = fileutil.WriteFile(filepath.Join(validRoot, "item1.yaml"), []byte("ontology: custom_kind_one\n"), paths.FilePerm600)
+	_ = fileutil.WriteFile(filepath.Join(validRoot, "item2.yml"), []byte("ontology: custom_kind_two\n"), paths.FilePerm600)
 
-	kinds, err := LoadKindNamesFromSpecsDir(root)
+	kinds, err := LoadKindNamesFromSpecsDir(validRoot)
 	if err != nil {
 		t.Fatalf("LoadKindNamesFromSpecsDir failed: %v", err)
 	}

@@ -319,7 +319,8 @@ func TestConcurrentUpdatesPreventOverwrite(t *testing.T) {
 					"expected_updated_at": initialUpdatedAt, // All use same initial value
 				}
 
-				err := fos.Update(ctx, secCtx, objID, updates)
+				syncCtx := storage.WithSkipWriteBehind(ctx)
+				err := fos.Update(syncCtx, secCtx, objID, updates)
 				if err != nil {
 					// Version conflict is expected for most concurrent updates
 					if errors.Is(err, storage.ErrVersionConflict) {
@@ -352,7 +353,7 @@ func TestConcurrentUpdatesPreventOverwrite(t *testing.T) {
 	t.Logf("Concurrent update test: %d succeeded, %d failed (expected: 1-9 succeed, 1-9 fail)", successCount, 10-successCount)
 
 	// Verify test mode was set
-	testMode := config.TestingMode().Safe()
+	testMode := config.TestingMode().Safe() || zqkenv.TestMode().Get() == "true"
 	t.Logf("TestingMode=%v", testMode)
 
 	// At least one update should succeed
