@@ -10,7 +10,7 @@ import (
 )
 
 // TestStorageExtended_Wave6_ParseCache tests yaml_parse_cache.go
-func TestStorageExtended_Wave6_ParseCache(t *testing.T) {
+func TestStorageExtended_ParseCache(t *testing.T) {
 	// 1. NewParseCache with small limit to trigger eviction
 	cache := storagepkg.NewParseCache(2)
 	if cache == nil {
@@ -74,7 +74,7 @@ func TestStorageExtended_Wave6_ParseCache(t *testing.T) {
 }
 
 // TestStorageExtended_Wave6_WaitGroupObserver tests waitgroup_observer.go
-func TestStorageExtended_Wave6_WaitGroupObserver(t *testing.T) {
+func TestStorageExtended_WaitGroupObserver(t *testing.T) {
 	ctx := context.Background()
 	obs := storagepkg.NewLoggingWaitGroupObserver(ctx)
 
@@ -130,8 +130,8 @@ func TestStorageExtended_Wave6_WaitGroupObserver(t *testing.T) {
 	}
 }
 
-// TestStorageExtended_Wave6_WALFacade tests wal_facade.go functions
-func TestStorageExtended_Wave6_WALFacade(t *testing.T) {
+// TestStorageExtended_WALFacade_Basics tests wal_facade.go functions
+func TestStorageExtended_WALFacade_Basics(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Write and Read applied sequence

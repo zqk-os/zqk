@@ -14,7 +14,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/metricsrecording"
 )
 
-func TestStorageExtended_Wave15_AuditMetrics(t *testing.T) {
+func TestStorageExtended_AuditMetrics(t *testing.T) {
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()
 
@@ -115,7 +115,7 @@ func TestStorageExtended_Wave15_AuditMetrics(t *testing.T) {
 	})
 }
 
-func TestStorageExtended_Wave15_AuditEventBufferLifecycle(t *testing.T) {
+func TestStorageExtended_AuditEventBufferLifecycle(t *testing.T) {
 	ctx := context.Background()
 	tempDir, err := os.MkdirTemp("", "audit_buffer_test_*")
 	require.NoError(t, err)
@@ -178,7 +178,7 @@ func TestStorageExtended_Wave15_AuditEventBufferLifecycle(t *testing.T) {
 	})
 }
 
-func TestStorageExtended_Wave15_AuditEventsOps(t *testing.T) {
+func TestStorageExtended_AuditEventsOps(t *testing.T) {
 	secCtx := pkgctx.NewSystemSecurityContext()
 
 	t.Run("CreateCacheRefreshAuditEvent", func(t *testing.T) {

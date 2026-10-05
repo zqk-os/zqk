@@ -15,7 +15,7 @@ import (
 	goyaml "gopkg.in/yaml.v3"
 )
 
-func TestExtended_JobStateRegistry_StateAndEachYAML_Wave48(t *testing.T) {
+func TestExtended_JobStateRegistry_StateAndEachYAML(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 
@@ -84,7 +84,7 @@ func TestExtended_JobStateRegistry_StateAndEachYAML_Wave48(t *testing.T) {
 	t.Logf("MigrateUnbucketedJobStateDirs collision moved: %d", moved)
 }
 
-func TestExtended_HighVolumeFastPathRetention_Wave48(t *testing.T) {
+func TestExtended_HighVolumeFastPathRetention(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
@@ -130,7 +130,7 @@ func TestExtended_HighVolumeFastPathRetention_Wave48(t *testing.T) {
 	t.Logf("enforceMaxCount with HV cache deleted: %d", delMaxCount)
 }
 
-func TestExtended_CapOrchestrator_Stages_Wave48(t *testing.T) {
+func TestExtended_CapOrchestrator_Stages(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)

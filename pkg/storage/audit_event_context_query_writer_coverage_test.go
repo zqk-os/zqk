@@ -16,7 +16,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/storage/audit"
 )
 
-func TestStorageExtended_Wave16_AuditEventContext(t *testing.T) {
+func TestStorageExtended_AuditEventContext(t *testing.T) {
 	assert.False(t, IsCreatingAuditEvent())
 
 	done := BeginAuditEventCreation()
@@ -26,7 +26,7 @@ func TestStorageExtended_Wave16_AuditEventContext(t *testing.T) {
 	assert.False(t, IsCreatingAuditEvent())
 }
 
-func TestStorageExtended_Wave16_AuditObjectQuery(t *testing.T) {
+func TestStorageExtended_AuditObjectQuery(t *testing.T) {
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()
 
@@ -200,7 +200,7 @@ func (m *mockStorageWave8CustomErr) BulkDelete(ctx context.Context, secCtx *pkgc
 	return m.bulkDeleteResult, nil
 }
 
-func TestStorageExtended_Wave16_AuditWriter(t *testing.T) {
+func TestStorageExtended_AuditWriter(t *testing.T) {
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()
 	testRoot, fos, _ := SetupTestingFactoryCompleteTestEnvironmentForTest(t)
@@ -222,7 +222,7 @@ func TestStorageExtended_Wave16_AuditWriter(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestStorageExtended_Wave16_AuditIDGenerator(t *testing.T) {
+func TestStorageExtended_AuditIDGenerator(t *testing.T) {
 	ctx := context.Background()
 	testRoot, fos, _ := SetupTestingFactoryCompleteTestEnvironmentForTest(t)
 	auditDir := filepath.Join(testRoot, paths.ProjectDataDir, "audit")
@@ -249,7 +249,7 @@ func TestStorageExtended_Wave16_AuditIDGenerator(t *testing.T) {
 	_ = testRoot
 }
 
-func TestStorageExtended_Wave16_BucketingHelpers(t *testing.T) {
+func TestStorageExtended_BucketingHelpers(t *testing.T) {
 	t.Run("sanitizeCategory", func(t *testing.T) {
 		assert.Equal(t, "user_profile", sanitizeCategory("user<profile>"))
 		assert.Equal(t, "user_name", sanitizeCategory("  user:name  "))
@@ -281,7 +281,7 @@ func TestStorageExtended_Wave16_BucketingHelpers(t *testing.T) {
 	})
 }
 
-func TestStorageExtended_Wave16_AuditStreamMigrate(t *testing.T) {
+func TestStorageExtended_AuditStreamMigrate(t *testing.T) {
 	t.Run("copyFile", func(t *testing.T) {
 		tempDir, err := os.MkdirTemp("", "copy_file_test_*")
 		require.NoError(t, err)

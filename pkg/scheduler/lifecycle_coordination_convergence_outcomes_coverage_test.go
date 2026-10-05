@@ -11,7 +11,7 @@ import (
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
-func TestExtended_LifecycleCoordination_DeepHelpers_Wave59(t *testing.T) {
+func TestExtended_LifecycleCoordination_DeepHelpers(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 
@@ -107,7 +107,7 @@ func TestExtended_LifecycleCoordination_DeepHelpers_Wave59(t *testing.T) {
 	sched.recordHealthMetric(ctx, time.Now().UTC(), 1, 0, 0, 0, 100*time.Millisecond, 10, 5, 1024, 2048)
 }
 
-func TestExtended_CapDispatch_Continuation_Wave59(t *testing.T) {
+func TestExtended_CapDispatch_Continuation(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 
@@ -138,7 +138,7 @@ func TestExtended_CapDispatch_Continuation_Wave59(t *testing.T) {
 	_ = h.resumePendingVerificationTasks(context.Background(), "zqk", "PRI-1")
 }
 
-func TestExtended_ConvergenceTestBundle_OutcomesAndSnapshots_Wave59(t *testing.T) {
+func TestExtended_ConvergenceTestBundle_OutcomesAndSnapshots(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 

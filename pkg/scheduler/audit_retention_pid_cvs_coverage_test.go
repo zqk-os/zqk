@@ -383,7 +383,7 @@ func TestExtended_NotificationsAndDurationFormat(t *testing.T) {
 	}
 }
 
-func TestExtended_CVSPipelineTickSyncWave3(t *testing.T) {
+func TestExtended_CVSPipelineTickSync_Lifecycle(t *testing.T) {
 	sp := storagepkg.NewNoopObjectStorage()
 	ctx := context.Background()
 

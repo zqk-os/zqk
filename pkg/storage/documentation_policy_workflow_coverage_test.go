@@ -13,7 +13,7 @@ import (
 )
 
 // TestStorageExtended_Wave1_DocumentationPolicy tests all branches in documentation_policy_validator.go
-func TestStorageExtended_Wave1_DocumentationPolicy(t *testing.T) {
+func TestStorageExtended_DocumentationPolicy(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// Set up mock tree with various doc files and READMEs
@@ -146,8 +146,8 @@ func (m *mockStorageProvider) Read(_ context.Context, _ *pkgctx.SecurityContext,
 	return nil, os.ErrNotExist
 }
 
-// TestStorageExtended_Wave1_WorkflowConstraintValidator tests workflow_constraint_validator.go
-func TestStorageExtended_Wave1_WorkflowConstraintValidator(t *testing.T) {
+// TestStorageExtended_WorkflowConstraintValidator_Base tests workflow_constraint_validator.go
+func TestStorageExtended_WorkflowConstraintValidator_Base(t *testing.T) {
 	mock := &mockStorageProvider{
 		data: make(map[string]map[string]any),
 	}

@@ -112,7 +112,7 @@ func (m *inMemoryGraphConnWave13) ExecuteQuery(ctx context.Context, query provid
 	return &provider.QueryResult{Rows: []map[string]any{}}, nil
 }
 
-func TestStorageExtended_Wave13_HashRegistryGraph(t *testing.T) {
+func TestStorageExtended_HashRegistryGraph(t *testing.T) {
 	conn := newInMemoryGraphConnWave13()
 
 	t.Run("NewGraphHashRegistry_and_CRUD_In_Memory", func(t *testing.T) {
@@ -269,7 +269,7 @@ func (m *mockQueueShutdownHandlerWave13) IsCritical() bool {
 	return m.critical
 }
 
-func TestStorageExtended_Wave13_CASFacadeExports(t *testing.T) {
+func TestStorageExtended_CASFacadeExports(t *testing.T) {
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()
 

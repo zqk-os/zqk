@@ -17,7 +17,7 @@ import (
 )
 
 // TestStorageExtended_Wave2_SemanticSnapshot tests all paths in semantic_snapshot.go
-func TestStorageExtended_Wave2_SemanticSnapshot(t *testing.T) {
+func TestStorageExtended_SemanticSnapshot(t *testing.T) {
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 
 	// 1. Error when library is nil
@@ -148,7 +148,7 @@ func TestStorageExtended_Wave2_SemanticSnapshot(t *testing.T) {
 }
 
 // TestStorageExtended_Wave2_DarwinCASVisibilityWait tests darwin_cas_visibility_wait.go
-func TestStorageExtended_Wave2_DarwinCASVisibilityWait(t *testing.T) {
+func TestStorageExtended_DarwinCASVisibilityWait(t *testing.T) {
 	tmpDir := t.TempDir()
 	ctx := context.Background()
 

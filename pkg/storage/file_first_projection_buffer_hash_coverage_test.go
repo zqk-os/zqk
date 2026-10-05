@@ -14,7 +14,7 @@ import (
 )
 
 // TestStorageExtended_Wave9_FileFirstProjectionStorage tests object_storage_file_projection.go
-func TestStorageExtended_Wave9_FileFirstProjectionStorage(t *testing.T) {
+func TestStorageExtended_FileFirstProjectionStorage(t *testing.T) {
 	tmpDir := t.TempDir()
 	storagepkg.SetupTestRootLikeSetupTestEnvironmentForExportTest(t, tmpDir)
 
@@ -135,7 +135,7 @@ func TestStorageExtended_Wave9_FileFirstProjectionStorage(t *testing.T) {
 }
 
 // TestStorageExtended_Wave9_ObjectWriteBuffer tests object_write_buffer.go
-func TestStorageExtended_Wave9_ObjectWriteBuffer(t *testing.T) {
+func TestStorageExtended_ObjectWriteBuffer(t *testing.T) {
 	buf := storagepkg.NewObjectWriteBuffer()
 	require.NotNil(t, buf)
 
@@ -222,7 +222,7 @@ func TestStorageExtended_Wave9_ObjectWriteBuffer(t *testing.T) {
 }
 
 // TestStorageExtended_Wave9_HashMismatchFixStrategy tests hash_mismatch_fix_strategy.go
-func TestStorageExtended_Wave9_HashMismatchFixStrategy(t *testing.T) {
+func TestStorageExtended_HashMismatchFixStrategy(t *testing.T) {
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	tmpDir := t.TempDir()
 	storagepkg.SetupTestRootLikeSetupTestEnvironmentForExportTest(t, tmpDir)

@@ -149,7 +149,7 @@ func (m *mockStorageProviderWave8) Rename(ctx context.Context, secCtx *pkgctx.Se
 }
 
 // TestStorageExtended_Wave8_RoutingObjectStorage tests routing_storage.go
-func TestStorageExtended_Wave8_RoutingObjectStorage(t *testing.T) {
+func TestStorageExtended_RoutingObjectStorage(t *testing.T) {
 	mockStorage := newMockStorageProviderWave8()
 	factory := storagepkg.NewStorageFactoryForTesting(mockStorage)
 	require.NotNil(t, factory)
@@ -307,7 +307,7 @@ func TestStorageExtended_Wave8_RoutingObjectStorage(t *testing.T) {
 }
 
 // TestStorageExtended_Wave8_BucketingStrategies tests bucketing_strategy.go, bucketing_strategy_chrono.go, bucketing_strategy_defaults.go
-func TestStorageExtended_Wave8_BucketingStrategies(t *testing.T) {
+func TestStorageExtended_BucketingStrategies(t *testing.T) {
 	// 1. ChronoBucketStrategy with different granularities
 	t.Run("ChronoBucketStrategy", func(t *testing.T) {
 		parseRFC3339 := func(s string) (time.Time, error) {
@@ -537,7 +537,7 @@ func TestStorageExtended_Wave8_BucketingStrategies(t *testing.T) {
 }
 
 // TestStorageExtended_Wave8_SnapshotProxy tests snapshot_proxy.go and snapshot_operation_queue.go
-func TestStorageExtended_Wave8_SnapshotProxy(t *testing.T) {
+func TestStorageExtended_SnapshotProxy(t *testing.T) {
 	mockUnderlying := newMockStorageProviderWave8()
 	queue := storagepkg.NewSnapshotOperationQueue(50)
 	proxy := storagepkg.NewProxyStorage(mockUnderlying, queue)

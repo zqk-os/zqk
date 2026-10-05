@@ -12,7 +12,7 @@ import (
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
-func TestExtended_JobTriggerQueue_Wave55(t *testing.T) {
+func TestExtended_JobTriggerQueue_MeshLease(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 
@@ -176,7 +176,7 @@ func TestExtended_JobTriggerQueue_Wave55(t *testing.T) {
 	}
 }
 
-func TestExtended_MeshLeaseAndRunWrapper_Helpers_Wave55(t *testing.T) {
+func TestExtended_MeshLeaseAndRunWrapper_Helpers(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 

@@ -13,7 +13,7 @@ import (
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
-func TestExtended_RetentionMaxCount_Wave54(t *testing.T) {
+func TestExtended_RetentionMaxCount_Enforcement(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 
@@ -79,7 +79,7 @@ func TestExtended_RetentionMaxCount_Wave54(t *testing.T) {
 	}
 }
 
-func TestExtended_CapOrchestrator_Helpers_Wave54(t *testing.T) {
+func TestExtended_CapOrchestrator_Helpers(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 
@@ -261,7 +261,7 @@ func TestExtended_CapOrchestrator_Helpers_Wave54(t *testing.T) {
 	_ = h.autoRecoverPlanTasks(ctx, "PLAN-1")
 }
 
-func TestExtended_JobExecution_Deep_Wave54(t *testing.T) {
+func TestExtended_JobExecution_Deep(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 

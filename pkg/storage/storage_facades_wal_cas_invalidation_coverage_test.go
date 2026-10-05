@@ -17,7 +17,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
-func TestStorageExtended_Wave25_YAMLFormatter(t *testing.T) {
+func TestStorageExtended_YAMLFormatter(t *testing.T) {
 	t.Run("FormatMultiLineYAML", func(t *testing.T) {
 		input := map[string]any{
 			"simple":    "single line string",
@@ -52,7 +52,7 @@ func TestStorageExtended_Wave25_YAMLFormatter(t *testing.T) {
 	})
 }
 
-func TestStorageExtended_Wave25_VerificationOutcomeAuthority(t *testing.T) {
+func TestStorageExtended_VerificationOutcomeAuthority(t *testing.T) {
 	t.Run("isCriteriaVerificationOutcomeStatus", func(t *testing.T) {
 		assert.False(t, isCriteriaVerificationOutcomeStatus(""))
 		assert.True(t, isCriteriaVerificationOutcomeStatus(objects.ObjectStatusValidated))
@@ -125,7 +125,7 @@ func TestStorageExtended_Wave25_VerificationOutcomeAuthority(t *testing.T) {
 	})
 }
 
-func TestStorageExtended_Wave25_YAMLParseCache(t *testing.T) {
+func TestStorageExtended_YAMLParseCache(t *testing.T) {
 	cache := NewParseCache(10)
 	require.NotNil(t, cache)
 
@@ -177,7 +177,7 @@ func TestStorageExtended_Wave25_YAMLParseCache(t *testing.T) {
 	})
 }
 
-func TestStorageExtended_Wave25_Invalidation(t *testing.T) {
+func TestStorageExtended_Invalidation(t *testing.T) {
 	bus := NewInvalidationShockwaveBus()
 	require.NotNil(t, bus)
 
@@ -229,7 +229,7 @@ func TestStorageExtended_Wave25_Invalidation(t *testing.T) {
 	assert.NoError(t, lSub.HandleMutation(ctx, MutationEvent{Kind: ""}))
 }
 
-func TestStorageExtended_Wave25_ObjectDraftPlane(t *testing.T) {
+func TestStorageExtended_ObjectDraftPlane(t *testing.T) {
 	tmpDir, err := os.MkdirTemp("", "draft_plane_test_*")
 	require.NoError(t, err)
 	defer os.RemoveAll(tmpDir)
@@ -266,7 +266,7 @@ func TestStorageExtended_Wave25_ObjectDraftPlane(t *testing.T) {
 	assert.ErrorIs(t, err, ErrObjectNotFound)
 }
 
-func TestStorageExtended_Wave25_Cleanup(t *testing.T) {
+func TestStorageExtended_Cleanup(t *testing.T) {
 	tmpDir, err := os.MkdirTemp("", "cleanup_test_*")
 	require.NoError(t, err)
 	defer os.RemoveAll(tmpDir)
@@ -288,7 +288,7 @@ func TestStorageExtended_Wave25_Cleanup(t *testing.T) {
 	assert.False(t, isEmptyBucketDir(tmpDir))
 }
 
-func TestStorageExtended_Wave25_BucketingStrategyStorage(t *testing.T) {
+func TestStorageExtended_BucketingStrategyStorage_Lifecycle(t *testing.T) {
 	tmpDir, err := os.MkdirTemp("", "bucket_strat_test_*")
 	require.NoError(t, err)
 	defer os.RemoveAll(tmpDir)
@@ -312,7 +312,7 @@ func TestStorageExtended_Wave25_BucketingStrategyStorage(t *testing.T) {
 	assert.Equal(t, "graph", graphStorage.GetBackendType())
 }
 
-func TestStorageExtended_Wave25_WaitGroup(t *testing.T) {
+func TestStorageExtended_WaitGroup(t *testing.T) {
 	mgr := NewWaitGroupManager()
 	require.NotNil(t, mgr)
 
@@ -395,7 +395,7 @@ func TestStorageExtended_Wave25_WaitGroup(t *testing.T) {
 	mgr.EnableLoggingObserver(context.Background())
 }
 
-func TestStorageExtended_Wave25_ValidationStrategy(t *testing.T) {
+func TestStorageExtended_ValidationStrategy(t *testing.T) {
 	syncStrat := NewSyncValidationStrategy()
 	require.NotNil(t, syncStrat)
 	assert.Equal(t, "sync", syncStrat.Name())
@@ -434,7 +434,7 @@ func TestStorageExtended_Wave25_ValidationStrategy(t *testing.T) {
 	registerAsyncValidationShutdownHandler()
 }
 
-func TestStorageExtended_Wave25_WorkEnvelopeBackfill(t *testing.T) {
+func TestStorageExtended_WorkEnvelopeBackfill(t *testing.T) {
 	t.Run("effortAwareKindNames", func(t *testing.T) {
 		kinds := effortAwareKindNames()
 		assert.NotNil(t, kinds)
@@ -446,7 +446,7 @@ func TestStorageExtended_Wave25_WorkEnvelopeBackfill(t *testing.T) {
 	})
 }
 
-func TestStorageExtended_Wave25_WorkflowConstraintValidator(t *testing.T) {
+func TestStorageExtended_WorkflowConstraintValidator_Advanced(t *testing.T) {
 	validator := NewWorkflowConstraintValidator(nil)
 	require.NotNil(t, validator)
 
@@ -500,7 +500,7 @@ func TestStorageExtended_Wave25_WorkflowConstraintValidator(t *testing.T) {
 	assert.Error(t, validator.validateConstraintsForRoles(context.Background(), secCtxGuest, constraints, "task", "create"))
 }
 
-func TestStorageExtended_Wave25_WALFacade(t *testing.T) {
+func TestStorageExtended_WALFacade_Operations(t *testing.T) {
 	tmpDir, err := os.MkdirTemp("", "wal_facade_test_*")
 	require.NoError(t, err)
 	defer os.RemoveAll(tmpDir)
@@ -558,7 +558,7 @@ func TestStorageExtended_Wave25_WALFacade(t *testing.T) {
 	_ = WaitForWALProcessingEventDriven(tmpDir, 10*time.Millisecond)
 }
 
-func TestStorageExtended_Wave25_FileCASImpl(t *testing.T) {
+func TestStorageExtended_FileCASImpl(t *testing.T) {
 	tmpDir, err := os.MkdirTemp("", "file_cas_impl_test_*")
 	require.NoError(t, err)
 	defer os.RemoveAll(tmpDir)

@@ -13,7 +13,7 @@ import (
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
-func TestExtended_CachePrewarm_TiersAndInference_Wave57(t *testing.T) {
+func TestExtended_CachePrewarm_TiersAndInference(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 
@@ -85,7 +85,7 @@ func TestExtended_CachePrewarm_TiersAndInference_Wave57(t *testing.T) {
 	})
 }
 
-func TestExtended_RunWrapper_RetryHelpers_Wave57(t *testing.T) {
+func TestExtended_RunWrapper_RetryHelpers(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 
@@ -152,7 +152,7 @@ func TestExtended_RunWrapper_RetryHelpers_Wave57(t *testing.T) {
 	rwh.emitBundleProgress(ctx, &ScheduledJob{ID: TestBundleJobIDPrefix + "sample"}, "started")
 }
 
-func TestExtended_Notifications_FormattingAndDisplay_Wave57(t *testing.T) {
+func TestExtended_Notifications_TierFormattingAndDisplay(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 

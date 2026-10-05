@@ -16,7 +16,7 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-func TestExtended_RetentionCleanupAndTolerance_Wave35(t *testing.T) {
+func TestExtended_RetentionCleanupAndTolerance(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 

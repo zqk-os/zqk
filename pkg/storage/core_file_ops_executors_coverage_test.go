@@ -13,7 +13,7 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-func TestStorageExtended_Wave21_CoreFileOps_and_Executors(t *testing.T) {
+func TestStorageExtended_CoreFileOps_and_Executors(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("FileObjectStorage_WriteBuffer_Direct_Apply", func(t *testing.T) {

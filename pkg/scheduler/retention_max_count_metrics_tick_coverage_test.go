@@ -11,7 +11,7 @@ import (
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
-func TestExtended_RetentionMaxCount_Wave40(t *testing.T) {
+func TestExtended_RetentionMaxCount_Pruning(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 
@@ -71,7 +71,7 @@ func TestExtended_RetentionMaxCount_Wave40(t *testing.T) {
 	t.Logf("enforceMaxCountViaHVWithProtect: %d, done=%v", delHVProt, doneProt)
 }
 
-func TestExtended_MetricsCleanupAndConvergenceTick_Wave40(t *testing.T) {
+func TestExtended_MetricsCleanupAndConvergenceTick(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 

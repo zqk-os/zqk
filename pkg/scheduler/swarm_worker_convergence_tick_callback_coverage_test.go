@@ -13,7 +13,7 @@ import (
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
-func TestExtended_SwarmWorker_Wave49(t *testing.T) {
+func TestExtended_SwarmWorker(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
@@ -58,7 +58,7 @@ func TestExtended_SwarmWorker_Wave49(t *testing.T) {
 	sched.pollAndSpawnSwarmTasks(ctx)
 }
 
-func TestExtended_ConvergenceSessionTick_Helpers_Wave49(t *testing.T) {
+func TestExtended_ConvergenceSessionTick_Helpers(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
@@ -128,7 +128,7 @@ func TestExtended_ConvergenceSessionTick_Helpers_Wave49(t *testing.T) {
 	h.maybeRunOrchestrateRollupAfterTick(ctx, job, "CVS-tick-1")
 }
 
-func TestExtended_CallbackListener_HTTPRoutes_Wave49(t *testing.T) {
+func TestExtended_CallbackListener_HTTPRoutes(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)

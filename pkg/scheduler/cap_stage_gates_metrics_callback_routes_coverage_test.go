@@ -13,7 +13,7 @@ import (
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
-func TestExtended_CapStageGates_Wave60(t *testing.T) {
+func TestExtended_CapStageGates_Transitions(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 
@@ -132,7 +132,7 @@ func TestExtended_CapStageGates_Wave60(t *testing.T) {
 	}
 }
 
-func TestExtended_MetricsCleanupHandlers_Wave60(t *testing.T) {
+func TestExtended_MetricsCleanupHandlers_Registration(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 
@@ -166,7 +166,7 @@ func TestExtended_MetricsCleanupHandlers_Wave60(t *testing.T) {
 	_ = gmHandler.Execute(ctx, job)
 }
 
-func TestExtended_CallbackListener_RoutesAndActivity_Wave60(t *testing.T) {
+func TestExtended_CallbackListener_RoutesAndActivity(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 

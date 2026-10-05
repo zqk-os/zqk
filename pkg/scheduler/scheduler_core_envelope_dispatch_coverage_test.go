@@ -11,7 +11,7 @@ import (
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
-func TestExtended_Scheduler_CoreMethods_Wave62(t *testing.T) {
+func TestExtended_Scheduler_CoreMethods(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 
@@ -114,7 +114,7 @@ func TestExtended_Scheduler_CoreMethods_Wave62(t *testing.T) {
 	}
 }
 
-func TestExtended_EnvelopeTickDispatch_Helpers_Wave62(t *testing.T) {
+func TestExtended_EnvelopeTickDispatch_Helpers(t *testing.T) {
 	// 1. envelopeTickDispatchJobTypeAllowed & HardDeny
 	if envelopeTickDispatchHardDeny("scheduler_self_destruct") != false {
 		t.Logf("hard deny check complete")

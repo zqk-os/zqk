@@ -13,7 +13,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/workflow/whatsnext"
 )
 
-func TestExtended_CapDispatch_Helpers_Wave58(t *testing.T) {
+func TestExtended_CapDispatch_Helpers(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 
@@ -90,7 +90,7 @@ func TestExtended_CapDispatch_Helpers_Wave58(t *testing.T) {
 	}
 }
 
-func TestExtended_Hourglass_Deep_Wave58(t *testing.T) {
+func TestExtended_Hourglass_Deep(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 

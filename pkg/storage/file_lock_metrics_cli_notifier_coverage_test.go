@@ -67,7 +67,7 @@ func (m *mockSchedulerWave11) TriggerJobByLifecycle(ctx context.Context, kind, f
 }
 
 // TestStorageExtended_Wave11_FileLockMetricsAsync tests file_lock_metrics_async.go
-func TestStorageExtended_Wave11_FileLockMetricsAsync(t *testing.T) {
+func TestStorageExtended_FileLockMetricsAsync(t *testing.T) {
 	mockStorage := newMockStorageProviderWave8()
 	collector := storagepkg.NewFileLockMetricsAsyncCollector(mockStorage)
 	require.NotNil(t, collector)
@@ -118,7 +118,7 @@ func TestStorageExtended_Wave11_FileLockMetricsAsync(t *testing.T) {
 }
 
 // TestStorageExtended_Wave11_SchedulerIntegration tests scheduler_integration.go
-func TestStorageExtended_Wave11_SchedulerIntegration(t *testing.T) {
+func TestStorageExtended_SchedulerIntegration(t *testing.T) {
 	mockStorage := newMockStorageProviderWave8()
 	mockSched := &mockSchedulerWave11{}
 
@@ -171,7 +171,7 @@ func TestStorageExtended_Wave11_SchedulerIntegration(t *testing.T) {
 }
 
 // TestStorageExtended_Wave11_CLINotifier tests cli_notifier.go
-func TestStorageExtended_Wave11_CLINotifier(t *testing.T) {
+func TestStorageExtended_CLINotifier(t *testing.T) {
 	// Event emitter required
 	_, err := storagepkg.NewCLINotifier(false, false, nil)
 	assert.Error(t, err)
