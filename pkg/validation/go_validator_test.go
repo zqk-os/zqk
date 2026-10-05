@@ -772,3 +772,23 @@ func TestGoValidator_validateUnknownFields_AllowsCompositionFields(t *testing.T)
 		t.Fatalf("expected 1 error for bad_extra_field, got %d", len(errs))
 	}
 }
+
+func TestEscapeSingleQuotes(t *testing.T) {
+	t.Parallel()
+	cases := []struct {
+		input    string
+		expected string
+	}{
+		{"normal", "normal"},
+		{"it's", `it\'s`},
+		{"nested'quote'here", `nested\'quote\'here`},
+		{`slash\quote'`, `slash\\quote\'`},
+		{"no_quotes_123", "no_quotes_123"},
+	}
+	for _, tc := range cases {
+		actual := escapeSingleQuotes(tc.input)
+		if actual != tc.expected {
+			t.Errorf("escapeSingleQuotes(%q) = %q, want %q", tc.input, actual, tc.expected)
+		}
+	}
+}

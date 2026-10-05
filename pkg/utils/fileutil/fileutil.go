@@ -137,8 +137,9 @@ func EnsureDir(path string) error {
 // Exists reports whether path exists (file or directory).
 func Exists(path string) bool {
 	t0 := nowIfMetricsEnabled()
-	_, err := os.Stat(path)
-	recordIOOp(OpExists, path, 0, t0, err)
+	cleanPath := filepath.Clean(path)
+	_, err := os.Stat(cleanPath)
+	recordIOOp(OpExists, cleanPath, 0, t0, err)
 	return err == nil
 }
 

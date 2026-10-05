@@ -1,6 +1,7 @@
 package logging
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -347,9 +348,7 @@ func (dcl *decisionContextLogger) writeToDestination(dest *destination, entry *L
 			toWrite = formatted
 		} else {
 			// Formatter doesn't include newline (e.g., JSONFormatter) - add one
-			toWrite = make([]byte, 0, len(formatted)+1)
-			toWrite = append(toWrite, formatted...)
-			toWrite = append(toWrite, '\n')
+			toWrite = append(bytes.Clone(formatted), '\n')
 		}
 	} else {
 		// Stdout/stderr - write without newline (may be part of structured output)

@@ -228,9 +228,9 @@ func upgradeToWebSocket(w http.ResponseWriter, r *http.Request) (net.Conn, error
 		return nil, err
 	}
 
-	key := r.Header.Get("Sec-WebSocket-Key")
-	h := sha1.New() //nolint:gosec
-	h.Write([]byte(key + rfc6455WebSocketGuid))
+	secWebSocketKey := r.Header.Get("Sec-WebSocket-Key")
+	h := sha1.New() //nolint:gosec // RFC 6455 Sec-WebSocket-Accept handshake protocol requirement
+	h.Write([]byte(secWebSocketKey + rfc6455WebSocketGuid))
 	accept := base64.StdEncoding.EncodeToString(h.Sum(nil))
 
 	_, _ = bufrw.WriteString("HTTP/1.1 101 Switching Protocols\r\n")

@@ -259,11 +259,25 @@ func (l *logger) log(level LogLevel, msg string, err error, fields ...Field) {
 		return // Skip if below threshold
 	}
 
-	// Merge fields
-	entryFields := make(map[string]any)
-	maps.Copy(entryFields, l.fields)
+	// Merge fields with sensitive credential masking
+	entryFields := make(map[string]any, len(l.fields)+len(fields))
+	for k, v := range l.fields {
+		if zqkenv.IsSensitiveKey(k) {
+			entryFields[k] = "******"
+		} else if s, ok := v.(string); ok {
+			entryFields[k] = zqkenv.MaskSensitiveValue(k, s)
+		} else {
+			entryFields[k] = v
+		}
+	}
 	for _, field := range fields {
-		entryFields[field.Key] = field.Value
+		if zqkenv.IsSensitiveKey(field.Key) {
+			entryFields[field.Key] = "******"
+		} else if s, ok := field.Value.(string); ok {
+			entryFields[field.Key] = zqkenv.MaskSensitiveValue(field.Key, s)
+		} else {
+			entryFields[field.Key] = field.Value
+		}
 	}
 
 	// Add error if present

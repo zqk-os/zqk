@@ -22,6 +22,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/tui/tds"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/validation"
 )
 
@@ -624,11 +625,12 @@ func extractStorageProfile(sp storage.ObjectStorageProvider, id, kind string, ob
 	var casHash string
 
 	if filePath != "" {
-		if fi, err := os.Stat(filePath); err == nil {
+		cleanFilePath := filepath.Clean(filePath)
+		if fi, err := fileutil.Stat(cleanFilePath); err == nil {
 			byteSize = fi.Size()
 			permissions = fi.Mode().String()
 			lastModified = fi.ModTime().UTC().Format(time.RFC3339)
-			base := filepath.Base(filePath)
+			base := filepath.Base(cleanFilePath)
 			if strings.HasSuffix(base, ".yaml") {
 				stem := strings.TrimSuffix(base, ".yaml")
 				if len(stem) == 64 {

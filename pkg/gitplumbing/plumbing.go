@@ -221,6 +221,10 @@ func (p *PlumbingEngine) Restore(ctx context.Context, refName string, targetDir 
 			return errfmt.Errorf("tar read: %w", err)
 		}
 
+		if strings.Contains(header.Name, "..") {
+			return errfmt.Errorf("tar entry contains traversal '..': %s", header.Name)
+		}
+
 		name := strings.TrimPrefix(header.Name, relStorageDir)
 		name = strings.TrimPrefix(name, "/")
 		if name == "" {
@@ -228,6 +232,11 @@ func (p *PlumbingEngine) Restore(ctx context.Context, refName string, targetDir 
 		}
 
 		destPath := filepath.Join(targetDir, name)
+		cleanTarget := filepath.Clean(targetDir)
+		cleanDest := filepath.Clean(destPath)
+		if !strings.HasPrefix(cleanDest, cleanTarget+string(filepath.Separator)) && cleanDest != cleanTarget {
+			return errfmt.Errorf("tar entry path escapes target directory: %s", header.Name)
+		}
 		switch header.Typeflag {
 		case tar.TypeDir:
 			if err := os.MkdirAll(destPath, paths.DirPerm755); err != nil {

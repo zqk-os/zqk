@@ -25,8 +25,7 @@ func extractCommandPath(args map[string]any) (string, error) {
 // Separates positional arguments from flags and orders them correctly
 func buildCommandArguments(commandPath string, args map[string]any, server *Server) []string {
 	parts := strings.Fields(commandPath)
-	cmdArgs := make([]string, 0, len(parts)+len(args))
-	cmdArgs = append(cmdArgs, parts...)
+	cmdArgs := append([]string(nil), parts...)
 
 	// Extract positional arguments and flags separately
 	positionalArgs := ExtractPositionalArguments(args, server)
@@ -35,7 +34,7 @@ func buildCommandArguments(commandPath string, args map[string]any, server *Serv
 	// Insert positional args after command parts but before flags
 	flagStartIndex := findFlagStartIndex(cmdArgs)
 	if len(positionalArgs) > 0 {
-		newArgs := make([]string, 0, len(cmdArgs)+len(positionalArgs))
+		var newArgs []string
 		newArgs = append(newArgs, cmdArgs[:flagStartIndex]...)
 		newArgs = append(newArgs, positionalArgs...)
 		newArgs = append(newArgs, cmdArgs[flagStartIndex:]...)

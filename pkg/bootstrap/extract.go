@@ -80,6 +80,10 @@ func ExtractGzipTar(data []byte, projectRoot string, logger logging.Logger, forc
 			return errfmt.Newf("failed to read archive").Wrap(err)
 		}
 
+		if strings.Contains(hdr.Name, "..") {
+			return errfmt.Errorf("archive entry contains invalid path traversal '..': %s", hdr.Name)
+		}
+
 		name := filepath.Clean(hdr.Name)
 		// Skip macOS AppleDouble / resource-fork sidecar files (._*) that may be bundled if the
 		// archive was built from a tree that contained them; they are not valid YAML/spec payloads.

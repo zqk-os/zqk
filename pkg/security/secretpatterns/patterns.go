@@ -32,7 +32,7 @@ var (
 	GitHubFineGrainedPATRegex = regexp.MustCompile(`\bgithub_pat_[a-zA-Z0-9_]{82}\b`)
 	PrivateKeyRegex           = regexp.MustCompile(`-----BEGIN (?:[A-Z0-9_-]+ )*PRIVATE KEY-----`)
 	SlackTokenRegex           = regexp.MustCompile(`\bxox[baprs]-[0-9]{12}-[0-9]{12}-[a-zA-Z0-9]{24}\b`)
-	SlackWebhookRegex         = regexp.MustCompile(`https://hooks\.slack\.com/services/T[0-9a-zA-Z]+/B[0-9a-zA-Z]+/[0-9a-zA-Z]+`)
+	SlackWebhookRegex         = regexp.MustCompile(`\bhttps://hooks\.slack\.com/services/T[0-9a-zA-Z]+/B[0-9a-zA-Z]+/[0-9a-zA-Z]+\b`)
 )
 
 // Definitions holds the ordered list of canonical secret pattern definitions.
@@ -97,7 +97,7 @@ var CombinedRegex = regexp.MustCompile(`(` +
 	`\bAKIA[0-9A-Z]{16}\b|` +
 	`-----BEGIN (?:[A-Z0-9_-]+ )*PRIVATE KEY-----|` +
 	`\bxox[baprs]-[0-9]{12}-[0-9]{12}-[a-zA-Z0-9]{24}\b|` +
-	`https://hooks\.slack\.com/services/T[0-9a-zA-Z]+/B[0-9a-zA-Z]+/[0-9a-zA-Z]+` +
+	`\bhttps://hooks\.slack\.com/services/T[0-9a-zA-Z]+/B[0-9a-zA-Z]+/[0-9a-zA-Z]+\b` +
 	`)`)
 
 // AllRegexes returns an ordered slice of all individual compiled regular expressions.

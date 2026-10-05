@@ -185,7 +185,7 @@ func finalizeCLIObjectCreate(cmd *cobra.Command, proc *cli.Processor, objData ma
 			Kind(kind).
 			ObjectID(objID).
 			Log()
-		fmt.Fprintln(cmd.ErrOrStderr(), color.YellowString(paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("Warning: Object '%s' is readable, but CAS index refresh lagged (%v). If another process cannot get it yet, run: zqk system sync-cas-index --file <hash.yaml>", objID, flushErr))))
+		fmt.Fprintln(cmd.ErrOrStderr(), color.YellowString(paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("Warning: Object %q is readable, but CAS index refresh lagged (%v). If another process cannot get it yet, run: zqk system sync-cas-index --file <hash.yaml>", objID, flushErr))))
 	}
 
 	proc.TriggerCacheFreshnessCheck("create", []string{kind})

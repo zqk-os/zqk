@@ -1,6 +1,7 @@
 package validation
 
 import (
+	"bytes"
 	"context"
 	"crypto/sha256"
 	"encoding/json"
@@ -721,7 +722,7 @@ func (gv *GoValidator) validateLifecycleState(ctx context.Context, kind, status,
 	if !valid {
 		errors = append(errors, ValidationError{
 			Field:   objects.FieldKeyStatus,
-			Message: fmt.Sprintf("Invalid lifecycle status '%s' for kind '%s'", status, kind),
+			Message: fmt.Sprintf("Invalid lifecycle status '%s' for kind '%s'", escapeSingleQuotes(status), escapeSingleQuotes(kind)),
 			Rule:    validationRuleLifecycle(),
 		})
 		return errors, warnings
@@ -750,7 +751,7 @@ func (gv *GoValidator) validateLifecycleState(ctx context.Context, kind, status,
 			if !validTransition {
 				errors = append(errors, ValidationError{
 					Field:   objects.FieldKeyStatus,
-					Message: fmt.Sprintf("Invalid lifecycle transition from '%s' to '%s' for kind '%s'", currentState, status, kind),
+					Message: fmt.Sprintf("Invalid lifecycle transition from '%s' to '%s' for kind '%s'", escapeSingleQuotes(currentState), escapeSingleQuotes(status), escapeSingleQuotes(kind)),
 					Rule:    validationRuleLifecycle(),
 				})
 				return errors, warnings
@@ -1473,12 +1474,20 @@ func (gv *GoValidator) isDraftPlaneOnly(targetID string, options *ValidationOpti
 			// Found on draft plane. Check if CAS index has it.
 			idxPath := filepath.Join(projectRoot, paths.ProcessInternalDir, "indexes", "cas_id_mappings", e.Name()+".json")
 			if data, readErr := fileutil.ReadFile(idxPath); readErr == nil {
-				if strings.Contains(string(data), `"`+targetID+`"`) {
-					return false // Materialized in CAS
+				if targetIDJSON, err := json.Marshal(targetID); err == nil && len(targetIDJSON) > 0 {
+					if bytes.Contains(data, targetIDJSON) {
+						return false // Materialized in CAS
+					}
 				}
 			}
 			return true // Exists on draft plane and NOT in CAS
 		}
 	}
 	return false
+}
+
+// escapeSingleQuotes backslash-escapes backslashes and single quotes to prevent quote breakout in formatted messages.
+func escapeSingleQuotes(s string) string {
+	s = strings.ReplaceAll(s, `\`, `\\`)
+	return strings.ReplaceAll(s, "'", `\'`)
 }

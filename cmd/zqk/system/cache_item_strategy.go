@@ -72,9 +72,7 @@ func (r *CacheItemStrategyRegistry) RegisterStrategy(strategy CacheItemStrategy)
 	defer r.mu.Unlock()
 
 	current := r.strategies.Load().([]CacheItemStrategy)
-	newStrategies := make([]CacheItemStrategy, len(current)+1)
-	copy(newStrategies, current)
-	newStrategies[len(current)] = strategy
+	newStrategies := append(append([]CacheItemStrategy(nil), current...), strategy)
 	r.strategies.Store(newStrategies)
 }
 

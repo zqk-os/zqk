@@ -1,6 +1,7 @@
 package logging
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -454,9 +455,7 @@ func (rl *routerLogger) log(level LogLevel, msg string, err error, fields ...Fie
 				toWrite = formatted
 			} else {
 				// Formatter doesn't include newline (e.g., JSONFormatter) - add one
-				toWrite = make([]byte, 0, len(formatted)+1)
-				toWrite = append(toWrite, formatted...)
-				toWrite = append(toWrite, '\n')
+				toWrite = append(bytes.Clone(formatted), '\n')
 			}
 
 			// Use timeout wrapper for writeMu to prevent deadlocks

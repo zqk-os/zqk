@@ -688,7 +688,7 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 							// vendor queue labeled "Gemini". Default BLI/ATK tier is tier_2_simple.
 							// align model_tier enum (tier_1_complex vs tier_1_routine) in specs.
 							if !nativeSwarmEligible(modelTier) {
-								_ = cli.WriteOutput(state.cmd, []byte(fmt.Sprintf("ℹ️  Queued '%s' for primary claim (skipped native swarm for %s)\n", taskID, modelTier)))
+								_ = cli.WriteOutput(state.cmd, []byte(fmt.Sprintf("ℹ️  Queued %q for primary claim (skipped native swarm for %s)\n", taskID, modelTier)))
 								// Wake host/project primary orchestrator so work is not stranded.
 								msg := fmt.Sprintf("Orchestrate queued ATK %s (%s) — consider agent execute or claim. title=%s", taskID, modelTier, titleStr)
 								if _, werr := primaryorch.WakePrimary(workerCtx, state.proc.ProjectRoot(), primaryorch.WakeRequest{

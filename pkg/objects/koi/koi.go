@@ -11,6 +11,7 @@ package koi
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -223,6 +224,9 @@ func GetIntOr(m map[string]any, key string, fallback int) int {
 		return fallback
 	}
 	if i, ok := getInt64(v); ok {
+		if i < int64(math.MinInt) || i > int64(math.MaxInt) {
+			return fallback
+		}
 		return int(i)
 	}
 	return fallback
