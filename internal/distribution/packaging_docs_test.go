@@ -21,7 +21,7 @@ func TestCommunityDocumentationHonesty(t *testing.T) {
 	firstRunContent := string(firstRunBytes)
 
 	requiredFirstRunTerms := []string{
-		"no Homebrew formula and no public GitHub release",
+		"brew tap zqk-os/tap",
 		"zqk system init",
 		"zqk grep",
 	}
@@ -40,7 +40,7 @@ func TestCommunityDocumentationHonesty(t *testing.T) {
 	readmeContent := string(readmeBytes)
 
 	requiredReadmeTerms := []string{
-		"no brew formula and no public GitHub release",
+		"brew tap zqk-os/tap",
 		"github.com/zqk-os/zqk",
 		"zqk grep",
 		"Polyglot",

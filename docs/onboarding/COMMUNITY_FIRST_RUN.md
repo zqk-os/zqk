@@ -6,9 +6,17 @@
 
 ## Install
 
-There is **no Homebrew formula and no public GitHub release** yet.
+### Homebrew (macOS & Linux)
+```bash
+brew tap zqk-os/tap
+brew install zqk
+```
 
-**Build from Source:**
+### GitHub Release Binaries
+Pre-compiled release archives and OpenVEX attestations are available at:
+https://github.com/zqk-os/zqk/releases/latest
+
+### Build from Source
 ```bash
 make                 # → ./bin/zqk  (or ./bin/<brand.executable_name>)
 ./bin/zqk --version
