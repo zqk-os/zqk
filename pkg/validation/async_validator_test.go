@@ -220,7 +220,7 @@ func TestAsyncValidator_EnqueueBatch_DedupesByObjectID(t *testing.T) {
 	t.Parallel()
 	testRoot := registerZQKTestRootForTest(t)
 
-	validator := NewAsyncValidator(pkgctx.NewSystemContext(), testRoot, 1, 1*time.Second)
+	validator := NewAsyncValidator(pkgctx.NewSystemContext(), testRoot, 0, 1*time.Second)
 	defer func() { _ = validator.Stop() }() //nolint:errcheck
 
 	// Batch with duplicate ObjectIDs (same ID, different paths - e.g. from discovery)
