@@ -3,7 +3,6 @@ package scheduler
 import (
 	"context"
 	"fmt"
-	"os"
 	"testing"
 	"time"
 
@@ -15,18 +14,13 @@ import (
 
 func TestExtended_AuditAggregationSession_DeepPhases(t *testing.T) {
 	ctx := context.Background()
-	tmpDir, err := os.MkdirTemp("", "test-audit-session-deep-*")
-	if err != nil {
-		t.Fatalf("failed to create temp dir: %v", err)
-	}
+	tmpDir := t.TempDir()
 	sp, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	if err != nil {
-		_ = os.RemoveAll(tmpDir)
 		t.Fatalf("failed to create storage: %v", err)
 	}
 	defer func() {
 		_ = sp.Shutdown(context.Background())
-		_ = os.RemoveAll(tmpDir)
 	}()
 
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))

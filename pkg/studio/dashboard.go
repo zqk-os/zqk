@@ -2,6 +2,7 @@ package studio
 
 import (
 	_ "embed"
+	"os"
 	"path/filepath"
 	"strings"
 

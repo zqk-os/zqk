@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // CheckPayload verifies required files, forbidden files, sensitive files, and pattern leaks.
@@ -46,7 +47,7 @@ func CheckPayload(root string, cfg *GatesConfig) ([]Finding, error) {
 	if reqMod == "" {
 		reqMod = "github.com/zqk-os/zqk"
 	}
-	goModBytes, err := os.ReadFile(filepath.Join(root, "go.mod"))
+	goModBytes, err := fileutil.ReadFile(filepath.Join(root, "go.mod"))
 	if err == nil {
 		if !strings.Contains(string(goModBytes), "module "+reqMod) {
 			findings = append(findings, Finding{
