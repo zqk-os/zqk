@@ -1422,6 +1422,27 @@ func TestCommandTracker_ComprehensiveExtended(t *testing.T) {
 	}
 }
 
+type stubMetricsStore struct {
+	metrics map[string]*CommandMetrics
+}
+
+func (s *stubMetricsStore) RecordCommandExecution(metric *CommandMetric) error {
+	return nil
+}
+
+func (s *stubMetricsStore) GetCommandMetrics(command string) (*CommandMetrics, error) {
+	if s.metrics != nil {
+		if cm, ok := s.metrics[command]; ok {
+			return cm, nil
+		}
+	}
+	return nil, nil
+}
+
+func (s *stubMetricsStore) GetAllMetrics() (map[string]*CommandMetrics, error) {
+	return s.metrics, nil
+}
+
 func TestTimeoutHook_TimeoutCalculation_Extended(t *testing.T) {
 	hook := NewTimeoutHook()
 	hook.SetMaxTimeout(10 * time.Minute)
@@ -1439,17 +1460,23 @@ func TestTimeoutHook_TimeoutCalculation_Extended(t *testing.T) {
 		t.Errorf("expected positive duration for mcp serve, got %v", mcpD)
 	}
 
-	// With metrics store
-	tempDir := t.TempDir()
-	store, _ := NewFileMetricsStore(filepath.Join(tempDir, "metrics.json"))
-	_ = store.RecordCommandExecution(&CommandMetric{Command: "zqk fast-cmd", Duration: 2 * time.Second, Success: true})
+	// With in-memory metrics store (no background file flushes or temp dirs)
+	store := &stubMetricsStore{
+		metrics: map[string]*CommandMetrics{
+			"zqk fast-cmd": {
+				Command:          "zqk fast-cmd",
+				NormalizedCmd:    "zqk fast-cmd",
+				AvgDuration:      2 * time.Second,
+				BaselineDuration: 2 * time.Second,
+			},
+		},
+	}
 	hook.SetMetricsStore(store)
 
 	fastD := hook.getTimeoutForCommand("zqk fast-cmd", nil)
 	if fastD <= 0 {
 		t.Errorf("expected calculated duration, got %v", fastD)
 	}
-	store.WaitForFlushes()
 }
 
 func TestMetricsAnalyzer_AnalyzeComprehensive(t *testing.T) {

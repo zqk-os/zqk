@@ -2,7 +2,7 @@ package cli
 
 import (
 	"fmt"
-	"os"
+	"io"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -28,7 +28,7 @@ agent_tasks:
 		return id, nil
 	}
 
-	err := ProcessQuickBundle(bundleContent, mockCreator, os.Stdout, nil)
+	err := ProcessQuickBundle(bundleContent, mockCreator, io.Discard, nil)
 	if err != nil {
 		t.Fatalf("ProcessQuickBundle failed: %v", err)
 	}
