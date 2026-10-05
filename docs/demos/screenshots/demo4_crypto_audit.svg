@@ -105,7 +105,7 @@
       <tspan x="0" y="1376">{</tspan>
       <tspan x="0" y="1396">  &quot;@context&quot;: &quot;https://openvex.dev/ns/v0.2.0&quot;,</tspan>
       <tspan x="0" y="1416">  &quot;@id&quot;: &quot;https://openvex.dev/docs/public/vex/zqk-0.1.0&quot;,</tspan>
-      <tspan x="0" y="1436">  &quot;author&quot;: &quot;Zen Quantum Kernel Security Response Team &lt;security@zqk-os.org&gt;&quot;,</tspan>
+      <tspan x="0" y="1436">  &quot;author&quot;: &quot;Zen Quantum Kernel Security Response Team &lt;support@zqkos.com&gt;&quot;,</tspan>
       <tspan x="0" y="1456">  &quot;role&quot;: &quot;Project Maintainer&quot;,</tspan>
       <tspan x="0" y="1476">  &quot;timestamp&quot;: &quot;2026-09-29T02:38:30Z&quot;,</tspan>
       <tspan x="0" y="1496">  &quot;version&quot;: 1,</tspan>
