@@ -27,6 +27,7 @@ type commandSpecCoverageSummary struct {
 func NewValidateCommandSpecsCmd() *cobra.Command {
 	command := bldr_cli_cmd_v1.NewSystemValidateCommandSpecsCommandBuilder()
 	command.RunE = runValidateCommandSpecs
+	cli.RequireSession(command, false)
 	return command
 }
 
