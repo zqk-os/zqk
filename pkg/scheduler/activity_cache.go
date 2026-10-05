@@ -237,13 +237,12 @@ func (c *ActivityCache) SaveCache(projectRoot string) error {
 	// Start writer goroutine on first save (once)
 	c.writerOnce.Do(func() {
 		b := goroutinelabels.DefaultBudget()
-		writerBuilder := goroutinelabels.NewGoroutine("activity_cache_writer", "writing activity cache to disk")
+		writerBuilder := goroutinelabels.NewGoroutine("activity_cache_writer", "writing activity cache to disk").
+			WithWaitGroup(&c.writerWg)
 		if b != nil {
 			writerBuilder = writerBuilder.WithBudget(b)
 		}
-		c.writerWg.Add(1)
 		writerBuilder.StartWithContext(c.writerCtx, func(ctx context.Context) error {
-			defer c.writerWg.Done()
 			logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 			for {
 				select {
