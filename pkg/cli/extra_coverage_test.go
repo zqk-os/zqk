@@ -1449,6 +1449,7 @@ func TestTimeoutHook_TimeoutCalculation_Extended(t *testing.T) {
 	if fastD <= 0 {
 		t.Errorf("expected calculated duration, got %v", fastD)
 	}
+	store.WaitForFlushes()
 }
 
 func TestMetricsAnalyzer_AnalyzeComprehensive(t *testing.T) {
