@@ -36,7 +36,7 @@ func (m *mockMeshTransport) ExecuteTool(ctx context.Context, endpoint, tool stri
 }
 
 // TestStorageExtended_Wave4_HighVolumeEventCache tests high_volume_event_cache_build.go
-func TestStorageExtended_Wave4_HighVolumeEventCache(t *testing.T) {
+func TestStorageExtended_HighVolumeEventCache(t *testing.T) {
 	tmpDir := t.TempDir()
 	fos, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	if err != nil {
@@ -64,8 +64,8 @@ func TestStorageExtended_Wave4_HighVolumeEventCache(t *testing.T) {
 	}
 }
 
-// TestStorageExtended_Wave4_BucketingStrategyStorage tests bucketing_strategy_storage.go
-func TestStorageExtended_Wave4_BucketingStrategyStorage(t *testing.T) {
+// TestStorageExtended_BucketingStrategyStorage_Partitioning tests bucketing_strategy_storage.go
+func TestStorageExtended_BucketingStrategyStorage_Partitioning(t *testing.T) {
 	tmpDir := t.TempDir()
 	fos, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	if err != nil {
@@ -143,7 +143,7 @@ func TestStorageExtended_Wave4_BucketingStrategyStorage(t *testing.T) {
 }
 
 // TestStorageExtended_Wave4_MeshObjectStorage tests object_storage_mesh.go
-func TestStorageExtended_Wave4_MeshObjectStorage(t *testing.T) {
+func TestStorageExtended_MeshObjectStorage(t *testing.T) {
 	tmpDir := t.TempDir()
 	fos, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	if err != nil {

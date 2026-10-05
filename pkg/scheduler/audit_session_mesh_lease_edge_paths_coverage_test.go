@@ -12,7 +12,7 @@ import (
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
-func TestExtended_AuditAggregationSession_DeepPhases_Wave51(t *testing.T) {
+func TestExtended_AuditAggregationSession_MeshLeaseEdgePhases(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
@@ -86,7 +86,7 @@ func TestExtended_AuditAggregationSession_DeepPhases_Wave51(t *testing.T) {
 	sess.finalize(dummyResult)
 }
 
-func TestExtended_MeshLeaseSupervision_SubprocessErrors_Wave51(t *testing.T) {
+func TestExtended_MeshLeaseSupervision_SubprocessErrors(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
@@ -131,7 +131,7 @@ func TestExtended_MeshLeaseSupervision_SubprocessErrors_Wave51(t *testing.T) {
 	}
 }
 
-func TestExtended_RunWrapper_Execution_EdgePaths_Wave51(t *testing.T) {
+func TestExtended_RunWrapper_Execution_EdgePaths(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)

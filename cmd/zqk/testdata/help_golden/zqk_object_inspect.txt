@@ -31,7 +31,7 @@ Aliases:
 Flags:
       --fields stringArray   Keys to include per object (repeat or comma-separated); omit for full rows
       --filter stringArray   Initial filter expressions (field=value, field!=value)
-  -f, --format string        Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+  -f, --format string        Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
       --id string            Specific object identifier to inspect immediately in modal detail
       --kind string          Initial object kind to inspect (e.g. backlog_item, requirement, test_case, policy)
   -o, --output string        Write output to file

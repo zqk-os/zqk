@@ -13,7 +13,7 @@ Usage:
 Flags:
       --apply-trigger                 Run glossary, instance-builder, and path-cache trigger steps
       --dry-run                       Validate and report the origination plan without writing materialized artifacts (default true)
-  -f, --format string                 Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+  -f, --format string                 Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
       --materialize-field-keys        Regenerate pkg/objects/field_keys.go from the current spec plane
       --ontology string               Object kind stem under .zqk/specs/objects
   -o, --output string                 Write output to file

@@ -60,7 +60,7 @@ func (m *mockQueueHandler) IsCritical() bool {
 	return m.isCritical
 }
 
-func TestStorageExtended_Wave24_QueueShutdownCoordinator(t *testing.T) {
+func TestStorageExtended_QueueShutdownCoordinator(t *testing.T) {
 	ctx := context.Background()
 
 	// 1. Config and global coordinator
@@ -131,7 +131,7 @@ func TestStorageExtended_Wave24_QueueShutdownCoordinator(t *testing.T) {
 	assert.Nil(t, getQueueShutdownEventCallback())
 }
 
-func TestStorageExtended_Wave24_FileListCollection(t *testing.T) {
+func TestStorageExtended_FileListCollection(t *testing.T) {
 	ctx := context.Background()
 	testRoot, fos, _ := SetupTestingFactoryCompleteTestEnvironmentForTest(t)
 

@@ -120,7 +120,6 @@ func (s *Scheduler) evaluateActiveConvergenceSessions(ctx context.Context) {
 		return
 	}
 
-
 	for _, session := range sessions {
 		if err := ctx.Err(); err != nil {
 			return
@@ -241,7 +240,6 @@ func (s *Scheduler) evaluateStaleConvergenceSessions(ctx context.Context) {
 	if engineStorage == nil {
 		return
 	}
-
 
 	now := time.Now()
 	for _, session := range sessions {

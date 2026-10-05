@@ -178,4 +178,7 @@ All behavior can be steered via standard environment variables:
 | Variable | Description | Default |
 | :--- | :--- | :--- |
 | `ZQK_PROJECT_ROOT` | Absolute path to the seated Knowledge Kernel project root directory. | Current working directory or parent traversal. |
+| `ZQK_CONTEXT_PROFILE` | Active execution context profile (`developer`, `agent`, `ci`, `human`). | `developer` |
 | `ZQK_LOG_LEVEL` | Minimum log severity level (`debug`, `info`, `warn`, `error`). | `info` |
+| `ZQK_TIMEOUT` | Global execution timeout duration for commands and sub-processes. | `30s` |
+| `ZQK_ALLOW_DEGRADED` | Allow execution to proceed in degraded health or partially degraded network state. | `false` |

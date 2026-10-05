@@ -13,7 +13,7 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-func TestExtended_EventsAggregation_Wave50(t *testing.T) {
+func TestExtended_EventsAggregation(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 
@@ -62,7 +62,7 @@ func TestExtended_EventsAggregation_Wave50(t *testing.T) {
 	SetGlobalTSDBProvider(nil)
 }
 
-func TestExtended_EmergencyManager_Wave50(t *testing.T) {
+func TestExtended_EmergencyManager(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
@@ -112,7 +112,7 @@ func TestExtended_EmergencyManager_Wave50(t *testing.T) {
 	_ = h.Execute(ctx, job)
 }
 
-func TestExtended_ConvergenceTerminalAndLedger_Wave50(t *testing.T) {
+func TestExtended_ConvergenceTerminalAndLedger(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)

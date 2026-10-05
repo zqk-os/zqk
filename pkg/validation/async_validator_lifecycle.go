@@ -153,10 +153,10 @@ func (av *AsyncValidator) Stop() error {
 			LockNameAsyncValidatorStopInit,
 			lockLoggerSystem(),
 			func() error {
-				// A validator that never started has nothing to drain. Running the
-				// stop pipeline anyway cancels and closes channels the caller did
+				// A validator that never started and has no active workers has nothing to drain.
+				// Running the stop pipeline anyway cancels and closes channels the caller did
 				// not open a session for.
-				if !av.running {
+				if !av.running && av.activeWorkers.Load() == 0 {
 					return nil
 				}
 				wasRunning = true

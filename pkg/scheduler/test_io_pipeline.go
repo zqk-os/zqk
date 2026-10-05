@@ -17,4 +17,3 @@ func RunTestIOViaPipeline(ctx context.Context, h *TestIOHandler, job *ScheduledJ
 	}
 	return RunScheduledJobPipeline(ctx, h.logger, pipelineKindTestIO, job, h.executeTestIOCore)
 }
-

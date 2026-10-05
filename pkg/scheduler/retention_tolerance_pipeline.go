@@ -20,4 +20,3 @@ func RunRetentionToleranceViaPipeline(ctx context.Context, h *RetentionTolerance
 	ctx = storagepkg.WithCLIOperation(ctx)
 	return RunScheduledJobPipeline(ctx, h.logger, pipelineKindRetentionTolerance, job, h.executeRetentionToleranceCore)
 }
-

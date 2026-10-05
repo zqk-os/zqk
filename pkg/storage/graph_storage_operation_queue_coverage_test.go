@@ -39,7 +39,7 @@ func (p *mockConnectionPoolWave20) Stats() provider.PoolStats {
 	return provider.PoolStats{Active: 1, MaxSize: 5}
 }
 
-func TestStorageExtended_Wave20_GraphStorage_and_Pool(t *testing.T) {
+func TestStorageExtended_GraphStorage_and_Pool(t *testing.T) {
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()
 
@@ -165,7 +165,7 @@ func TestStorageExtended_Wave20_GraphStorage_and_Pool(t *testing.T) {
 	})
 }
 
-func TestStorageExtended_Wave20_OperationQueue_and_CacheManager(t *testing.T) {
+func TestStorageExtended_OperationQueue_and_CacheManager(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("OperationQueue_Enqueue_and_GetStatus", func(t *testing.T) {

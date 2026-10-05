@@ -14,7 +14,7 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-func TestExtended_AuditAggregationSession_Cleanups_Wave45(t *testing.T) {
+func TestExtended_AuditAggregationSession_Cleanups(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
@@ -87,7 +87,7 @@ func TestExtended_AuditAggregationSession_Cleanups_Wave45(t *testing.T) {
 	cancelledSess.runProactiveCleanup()
 }
 
-func TestExtended_RunWrapper_ExecutionAndRetries_Wave45(t *testing.T) {
+func TestExtended_RunWrapper_ExecutionAndRetries(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
@@ -146,7 +146,7 @@ func TestExtended_RunWrapper_ExecutionAndRetries_Wave45(t *testing.T) {
 	h.emitBundleProgress(ctx, job, "phase_start")
 }
 
-func TestExtended_PIDFile_Comprehensive_Wave45(t *testing.T) {
+func TestExtended_PIDFile_Comprehensive(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 
@@ -185,7 +185,7 @@ func TestExtended_PIDFile_Comprehensive_Wave45(t *testing.T) {
 	_ = RemovePIDFile(tmpDir)
 }
 
-func TestExtended_EnvelopeTickDispatch_Wave45(t *testing.T) {
+func TestExtended_EnvelopeTickDispatch_RetryPID(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)

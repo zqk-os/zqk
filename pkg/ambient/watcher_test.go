@@ -60,6 +60,17 @@ func TestFSWatcher_FiltersNoise(t *testing.T) {
 		t.Fatal("timeout waiting for valid file event")
 	}
 
+	drainEvents := func() {
+		for {
+			select {
+			case <-received:
+			case <-time.After(50 * time.Millisecond):
+				return
+			}
+		}
+	}
+	drainEvents()
+
 	// Action 2: Write to ignored directory
 	ignoredFile := filepath.Join(gitDir, "HEAD")
 	_ = fileutil.WriteSecureFile(ignoredFile, []byte("ref: refs/heads/main"))
@@ -72,6 +83,8 @@ func TestFSWatcher_FiltersNoise(t *testing.T) {
 	case <-time.After(500 * time.Millisecond):
 		// Success: timeout means the event was properly filtered
 	}
+
+	drainEvents()
 
 	// Action 3: Write to internal .zqk directory (must never trigger ambient event feedback loop)
 	zqkDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.ProcessSubdir, "audit")
@@ -86,6 +99,8 @@ func TestFSWatcher_FiltersNoise(t *testing.T) {
 	case <-time.After(500 * time.Millisecond):
 		// Success: timeout means the .zqk event was properly filtered
 	}
+
+	drainEvents()
 
 	// Action 4: Write to internal .zqk-state directory
 	zqkStateDir := filepath.Join(tmpDir, paths.ProjectStateDir)

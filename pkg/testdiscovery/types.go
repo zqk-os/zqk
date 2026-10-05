@@ -101,4 +101,3 @@ func extractCommentMetadata(comment string) (crit, req, tags []string) {
 	}
 	return crit, req, tags
 }
-

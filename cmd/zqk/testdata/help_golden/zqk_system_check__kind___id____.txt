@@ -70,7 +70,7 @@ Flags:
       --dispatch-to string           Dispatch health violations/issues as inbox items to the specified agent/role (e.g. 'QA-Engineer', 'Security-Engineer', 'technical-program-manager', or 'auto')
       --fast                         Partial check: skip reference integrity only. Not an authoritative health verdict. Combined with --auto-fix/--force, --fast is dropped
       --force                        Force fix hash mismatches (requires explicit confirmation, creates audit event)
-  -f, --format string                Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+  -f, --format string                Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
       --goroutine-profile string     Write goroutine profile to file (for hang/deadlock analysis)
       --ids-from-file string         Read object IDs from file (one per line, # ignored) and validate only those objects (fast re-check after fixes)
       --ignore-scheduler-down        Ignore scheduler down warning/lockdown

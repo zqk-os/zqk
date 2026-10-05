@@ -16,7 +16,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/workflow/whatsnext"
 )
 
-func TestExtended_ContextRefresh_Wave47(t *testing.T) {
+func TestExtended_ContextRefresh(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
@@ -80,7 +80,7 @@ func TestExtended_ContextRefresh_Wave47(t *testing.T) {
 	_ = h.updateSchedule(ctx, secCtx, "CRS-test-1", map[string]any{"status": "completed"})
 }
 
-func TestExtended_MetricsCleanupHandlers_Wave47(t *testing.T) {
+func TestExtended_MetricsCleanupHandlers_Lifecycle(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
@@ -146,7 +146,7 @@ func TestExtended_MetricsCleanupHandlers_Wave47(t *testing.T) {
 	_ = gmHandler.Execute(ctx, jobGM)
 }
 
-func TestExtended_RunWrapperCallbacks_Wave47(t *testing.T) {
+func TestExtended_RunWrapperCallbacks_ContextRefresh(t *testing.T) {
 	ctx := context.Background()
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 
@@ -177,7 +177,7 @@ func TestExtended_RunWrapperCallbacks_Wave47(t *testing.T) {
 	InvokeJobCallback(ctx, logger, nil, job, "on_error", payload)
 }
 
-func TestExtended_CapDispatchAndJobExecution_Wave47(t *testing.T) {
+func TestExtended_CapDispatchAndJobExecution(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)

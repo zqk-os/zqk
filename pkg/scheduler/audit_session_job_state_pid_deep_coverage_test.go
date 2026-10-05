@@ -11,7 +11,7 @@ import (
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
-func TestExtended_AuditAggregationSession_UncoveredPhases_Wave56(t *testing.T) {
+func TestExtended_AuditAggregationSession_UncoveredPhases(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
@@ -77,7 +77,7 @@ func TestExtended_AuditAggregationSession_UncoveredPhases_Wave56(t *testing.T) {
 	sess.runRetentionSecondPass()
 }
 
-func TestExtended_JobStateRegistry_DeferAndRetention_Wave56(t *testing.T) {
+func TestExtended_JobStateRegistry_DeferAndRetention(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 
@@ -145,7 +145,7 @@ func TestExtended_JobStateRegistry_DeferAndRetention_Wave56(t *testing.T) {
 	}
 }
 
-func TestExtended_PIDFile_Deep_Wave56(t *testing.T) {
+func TestExtended_PIDFile_Deep(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 

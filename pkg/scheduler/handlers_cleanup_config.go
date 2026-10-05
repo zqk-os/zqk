@@ -354,4 +354,3 @@ func (h *CleanupConfigHandler) runReapOrphanedProcesses(workDir string, params m
 	}
 	return nil
 }
-

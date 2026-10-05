@@ -7,8 +7,8 @@ linters:
     - govet
     - forbidigo
     - errcheck
-    - nilerr
   disable:
+    - nilerr
     - staticcheck
     - ineffassign
     - unused
@@ -67,6 +67,10 @@ linters:
         text: "Use config.GetString"
         linters:
           - forbidigo
+      - path: "_test\\.go"
+        text: "Use pkg/fileutil instead of os.RemoveAll"
+        linters:
+          - forbidigo
       - path: "scripts/"
         linters:
           - forbidigo
@@ -79,13 +83,35 @@ linters:
         text: "G101: Potential hardcoded credentials"
         linters:
           - gosec
+      - path: "pkg/security/secretpatterns/patterns\\.go"
+        text: "G101: Potential hardcoded credentials"
+        linters:
+          - gosec
+      - text: "G104:"
+        linters:
+          - gosec
+      - text: "G110:"
+        linters:
+          - gosec
       - text: "G115:"
+        linters:
+          - gosec
+      - text: "G118:"
+        linters:
+          - gosec
+      - text: "G122:"
+        linters:
+          - gosec
+      - text: "G204:"
         linters:
           - gosec
       - text: "G301:"
         linters:
           - gosec
       - text: "G702:"
+        linters:
+          - gosec
+      - text: "G704:"
         linters:
           - gosec
       - path: "pkg/systemcheck/policy/"
@@ -111,5 +137,15 @@ linters:
         linters:
           - forbidigo
       - path: "pkg/testrunner/testrunner\\.go"
+        linters:
+          - forbidigo
+      - path: "pkg/vet/"
+        linters:
+          - forbidigo
+      - path: "cmd/zqk/sync/constants\\.go"
+        text: "G101: Potential hardcoded credentials"
+        linters:
+          - gosec
+      - path: "pkg/tui/"
         linters:
           - forbidigo

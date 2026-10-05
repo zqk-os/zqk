@@ -107,4 +107,3 @@ func (vpc *ValidationProgressContext) snapshotProgressCounts() (progressReceived
 	defer vpc.Mu.RUnlock()
 	return len(vpc.CompletedObjectIDs), vpc.Completed, vpc.Failed
 }
-

@@ -144,99 +144,99 @@ func (f *FileObjectStorage) listCASPathGeneral(ctx context.Context, secCtx *pkgc
 	_, err = WithListCountSlot(ctx, func(listCtx context.Context) (struct{}, error) {
 		pool := newListIDWorkerPool(ids)
 		for w := 0; w < pool.numWorkers; w++ {
-		pool.newWorker(ConstStreamFileStorageListCasRead, ConstStreamListCasWorker, w).StartSimple(func() {
-			for id := range pool.workCh {
-				select {
-				case <-listCtx.Done():
-					return
-				default:
-				}
-				var result casParseResult
-				var obj map[string]any
-				var parsed *objects.ParsedObject
-				var hash string
+			pool.newWorker(ConstStreamFileStorageListCasRead, ConstStreamListCasWorker, w).StartSimple(func() {
+				for id := range pool.workCh {
+					select {
+					case <-listCtx.Done():
+						return
+					default:
+					}
+					var result casParseResult
+					var obj map[string]any
+					var parsed *objects.ParsedObject
+					var hash string
 
-				// Get hash for cache lookup
-				hash, _ = cas.GetHashForID(id)
-				if hash != "" {
-					if cached, ok := GetGlobalParseCache().Get(hash); ok {
-						result.parsed = cached.Clone()
-						result.parsed.Raw = f.MaterializeCasYAMLMapAfterLoad(f.projectRoot, filter.Kind, id, result.parsed.Raw)
-						if objID, ok := result.parsed.Raw[objects.FieldKeyID].(string); ok {
-							result.parsed.ID = objID
+					// Get hash for cache lookup
+					hash, _ = cas.GetHashForID(id)
+					if hash != "" {
+						if cached, ok := GetGlobalParseCache().Get(hash); ok {
+							result.parsed = cached.Clone()
+							result.parsed.Raw = f.MaterializeCasYAMLMapAfterLoad(f.projectRoot, filter.Kind, id, result.parsed.Raw)
+							if objID, ok := result.parsed.Raw[objects.FieldKeyID].(string); ok {
+								result.parsed.ID = objID
+							}
+							// Don't send on results after context cancelled
+							select {
+							case <-listCtx.Done():
+								return
+							case pool.results <- result:
+							}
+							continue
 						}
-						// Don't send on results after context cancelled
-						select {
-						case <-listCtx.Done():
-							return
-						case pool.results <- result:
-						}
-						continue
 					}
-				}
 
-				data, err := cas.Read(id)
-				if err == nil {
-					var _err_83764173 = yaml.Unmarshal(data, &obj)
-					if _err_83764173 != nil {
-						logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgSwallowedError, _err_83764173).Log()
-					}
-				} else if errors.Is(err, ErrObjectNotFound) || strings.Contains(err.Error(), "not found") {
-					filePath := ""
-					if idToPath != nil {
-						filePath = idToPath[id]
-					}
-					if filePath == emptyValue {
-						var _err_83764428 error
-						filePath, _err_83764428 = f.getObjectFilePath(id, filter.Kind)
-						if _err_83764428 != nil {
-							logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgSwallowedError, _err_83764428).Log()
+					data, err := cas.Read(id)
+					if err == nil {
+						var _err_83764173 = yaml.Unmarshal(data, &obj)
+						if _err_83764173 != nil {
+							logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgSwallowedError, _err_83764173).Log()
+						}
+					} else if errors.Is(err, ErrObjectNotFound) || strings.Contains(err.Error(), "not found") {
+						filePath := ""
+						if idToPath != nil {
+							filePath = idToPath[id]
+						}
+						if filePath == emptyValue {
+							var _err_83764428 error
+							filePath, _err_83764428 = f.getObjectFilePath(id, filter.Kind)
+							if _err_83764428 != nil {
+								logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgSwallowedError, _err_83764428).Log()
+							}
+						}
+						// Skip draft-plane paths in List (CAS index is the list source;
+						// cache entries for drafts are not listable). Get follows cache.
+						if filePath != emptyValue && !IsObjectDraftPlanePath(f.projectRoot, filePath) {
+							var _err_83764528 error
+							obj, _err_83764528 = f.readObjectFileFast(filePath)
+							if _err_83764528 != nil {
+								logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgSwallowedError, _err_83764528).Log()
+							}
 						}
 					}
-					// Skip draft-plane paths in List (CAS index is the list source;
-					// cache entries for drafts are not listable). Get follows cache.
-					if filePath != emptyValue && !IsObjectDraftPlanePath(f.projectRoot, filePath) {
-						var _err_83764528 error
-						obj, _err_83764528 = f.readObjectFileFast(filePath)
-						if _err_83764528 != nil {
-							logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgSwallowedError, _err_83764528).Log()
+					if obj != nil {
+						obj = f.MaterializeCasYAMLMapAfterLoad(f.projectRoot, filter.Kind, id, obj)
+						var _err_83764611 error
+						parsed, _err_83764611 = objects.ParseObject(obj)
+						if _err_83764611 != nil {
+							logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgSwallowedError, _err_83764611).Log()
 						}
+						when.When(func() bool { return parsed != nil }).Then(func() {
+							result.parsed = parsed
+							if hash != "" {
+								GetGlobalParseCache().Put(hash, parsed)
+							}
+						}).OrElse(func() {
+							result.parsed = &objects.ParsedObject{Raw: obj}
+						}).Run()
+					}
+					// Don't send on results after context cancelled (closer may have closed channel)
+					select {
+					case <-listCtx.Done():
+						return
+					case pool.results <- result:
 					}
 				}
-				if obj != nil {
-					obj = f.MaterializeCasYAMLMapAfterLoad(f.projectRoot, filter.Kind, id, obj)
-					var _err_83764611 error
-					parsed, _err_83764611 = objects.ParseObject(obj)
-					if _err_83764611 != nil {
-						logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgSwallowedError, _err_83764611).Log()
-					}
-					when.When(func() bool { return parsed != nil }).Then(func() {
-						result.parsed = parsed
-						if hash != "" {
-							GetGlobalParseCache().Put(hash, parsed)
-						}
-					}).OrElse(func() {
-						result.parsed = &objects.ParsedObject{Raw: obj}
-					}).Run()
-				}
-				// Don't send on results after context cancelled (closer may have closed channel)
-				select {
-				case <-listCtx.Done():
-					return
-				case pool.results <- result:
-				}
-			}
-		})
-	}
-	pool.startCloser(ConstStreamFileStorageListCasResultsCloser, ConstStreamWaitingForListCasWorkersAndClosingResultsChannel)
-
-	parsedObjects = make([]*objects.ParsedObject, 0, len(ids))
-	for r := range pool.results {
-		if r.parsed != nil {
-			parsedObjects = append(parsedObjects, r.parsed)
+			})
 		}
-	}
-	return struct{}{}, listCtx.Err()
+		pool.startCloser(ConstStreamFileStorageListCasResultsCloser, ConstStreamWaitingForListCasWorkersAndClosingResultsChannel)
+
+		parsedObjects = make([]*objects.ParsedObject, 0, len(ids))
+		for r := range pool.results {
+			if r.parsed != nil {
+				parsedObjects = append(parsedObjects, r.parsed)
+			}
+		}
+		return struct{}{}, listCtx.Err()
 	})
 	if err != nil {
 		return nil, err

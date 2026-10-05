@@ -87,7 +87,7 @@ func (m *mockStorageWave12) Delete(ctx context.Context, secCtx *pkgctx.SecurityC
 	return nil
 }
 
-func TestStorageExtended_Wave12_MetricsFramework(t *testing.T) {
+func TestStorageExtended_MetricsFramework(t *testing.T) {
 	t.Run("BaseMetricsCollector_SuccessAndReset", func(t *testing.T) {
 		mockStorage := &mockStorageWave12{}
 		var resetCalled bool
@@ -307,7 +307,7 @@ func (m *mockConflictResolverWave12) ResolveConflict(ctx context.Context, op *Op
 	return m.strategy, m.err
 }
 
-func TestStorageExtended_Wave12_OperationExecutor(t *testing.T) {
+func TestStorageExtended_OperationExecutor(t *testing.T) {
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()
 

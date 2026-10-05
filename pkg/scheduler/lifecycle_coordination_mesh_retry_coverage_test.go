@@ -112,7 +112,7 @@ func TestExtended_LifecycleCoordinationAndPID_DeepCoverage(t *testing.T) {
 	_ = ResolveProjectRootFromCWD()
 }
 
-func TestExtended_MeshLeaseSupervision_Wave38(t *testing.T) {
+func TestExtended_MeshLeaseSupervision_Retry(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 
@@ -180,7 +180,7 @@ func TestExtended_MeshLeaseSupervision_Wave38(t *testing.T) {
 	}
 }
 
-func TestExtended_RunWrapperRetry_Wave38(t *testing.T) {
+func TestExtended_RunWrapperRetry_MeshCoordination(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 

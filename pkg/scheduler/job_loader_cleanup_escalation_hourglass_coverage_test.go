@@ -15,7 +15,7 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-func TestExtended_JobLoader_Wave52(t *testing.T) {
+func TestExtended_JobLoader_EscalationCleanup(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
@@ -67,7 +67,7 @@ func TestExtended_JobLoader_Wave52(t *testing.T) {
 	jl.RefreshEnvironmentVariablesFromRaw(job, rawJob)
 }
 
-func TestExtended_CleanupConfig_InternalHandlers_Wave52(t *testing.T) {
+func TestExtended_CleanupConfig_InternalHandlers(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 
@@ -106,7 +106,7 @@ func TestExtended_CleanupConfig_InternalHandlers_Wave52(t *testing.T) {
 	_ = h.runEnforceLogRetention(tmpDir, map[string]any{"retention": "1s"})
 }
 
-func TestExtended_EscalationProviders_Wave52(t *testing.T) {
+func TestExtended_EscalationProviders(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
@@ -171,7 +171,7 @@ func TestExtended_EscalationProviders_Wave52(t *testing.T) {
 	_ = chain.Evaluate(ctx, 2, notice)
 }
 
-func TestExtended_Hourglass_Wave52(t *testing.T) {
+func TestExtended_Hourglass_JobLoaderCleanup(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)

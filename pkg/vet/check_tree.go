@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // CheckTreePolice inspects the repo tree for forbidden paths, files, archive leaks, and script references.
@@ -200,7 +201,7 @@ func CheckTreePolice(root string, cfg *GatesConfig) ([]Finding, error) {
 				}
 
 				// Scan file content for placeholder strings
-				contentBytes, err := os.ReadFile(path)
+				contentBytes, err := fileutil.ReadFile(path)
 				if err != nil {
 					return nil
 				}

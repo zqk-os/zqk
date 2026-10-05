@@ -37,15 +37,15 @@ func EmitAsyncRouterEventViaCoordinator(
 	coordinator := newCoordinatorForProject(projectRoot, storageProviderTyped)
 
 	auditMetadata := map[string]any{
-		objects.FieldKeyEventType:       fmt.Sprintf("async_router_%s", eventType),
-		objects.FieldKeyOperation:       fmt.Sprintf("Async router %s: %d workers, %d processed, %d failed", eventType, workerCount, processedCount, failedCount),
-		"worker_id":                     workerID,
-		"worker_count":                  workerCount,
-		"processed_count":               processedCount,
-		"failed_count":                  failedCount,
-		"duration_seconds":              duration.Seconds(),
-		"operation_type":                OperationTypeAsyncRouter,
-		"source":                        SourceBackgroundWorker,
+		objects.FieldKeyEventType: fmt.Sprintf("async_router_%s", eventType),
+		objects.FieldKeyOperation: fmt.Sprintf("Async router %s: %d workers, %d processed, %d failed", eventType, workerCount, processedCount, failedCount),
+		"worker_id":               workerID,
+		"worker_count":            workerCount,
+		"processed_count":         processedCount,
+		"failed_count":            failedCount,
+		"duration_seconds":        duration.Seconds(),
+		"operation_type":          OperationTypeAsyncRouter,
+		"source":                  SourceBackgroundWorker,
 	}
 
 	severity := SeverityLow

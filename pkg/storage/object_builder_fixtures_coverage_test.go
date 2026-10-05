@@ -9,7 +9,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/validation"
 )
 
-func TestStorageExtended_Wave14_TestObjectBuilder(t *testing.T) {
+func TestStorageExtended_TestObjectBuilder(t *testing.T) {
 	t.Run("populateRequiredFieldsFromConfig", func(t *testing.T) {
 		// Non-existent kind -> early return
 		objBogus := make(map[string]any)
@@ -183,7 +183,7 @@ func TestStorageExtended_Wave14_TestObjectBuilder(t *testing.T) {
 	})
 }
 
-func TestStorageExtended_Wave14_TestObjectBuilderValues(t *testing.T) {
+func TestStorageExtended_TestObjectBuilderValues(t *testing.T) {
 	t.Run("generateStringTestValue", func(t *testing.T) {
 		// Pattern constraint
 		valPattern := generateStringTestValue("custom_code", nil, map[string]any{

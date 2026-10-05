@@ -88,7 +88,7 @@ Flags:
       --file string                  Path to YAML file containing update data
       --filter stringArray           Filter by field (format: field=value or field:value, can be used multiple times). Only applies when using --all
       --force                        Force update even if object doesn't exist (create instead of fail)
-  -f, --format string                Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+  -f, --format string                Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
       --ids string                   Comma-separated list of object IDs (same as positional multi-ID / comma lists)
       --ignore-scheduler-down        Ignore scheduler down warning/lockdown
       --kind string                  Object kind (required when using --all)

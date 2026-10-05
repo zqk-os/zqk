@@ -124,7 +124,6 @@ func findMetricsProfilesDir() string {
 	return paths.FirstExistingFromCwd(paths.MetricsProfilesDir)
 }
 
-
 // ClearCache clears the profile cache
 func (pl *ProfileLoader) ClearCache() {
 	pl.cache.Reset()

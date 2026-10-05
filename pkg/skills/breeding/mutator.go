@@ -3,7 +3,6 @@ package breeding
 import (
 	"context"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -11,8 +10,8 @@ import (
 	"github.com/zqk-os/zqk/pkg/llm"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
-
 
 // LLMSkillMutator implements MutationProvider by prompting an LLM client
 // to refactor and optimize underperforming skill instructions or Go code based on feedback.
@@ -28,7 +27,7 @@ func NewLLMSkillMutator(client llm.Client) *LLMSkillMutator {
 // MutateSkill reads the skill file at originalFilePath, generates an improved version
 // guided by feedback, writes the mutated skill to a new file, and returns the new file path.
 func (m *LLMSkillMutator) MutateSkill(ctx context.Context, originalFilePath string, feedback []string) (string, error) {
-	contentBytes, err := os.ReadFile(originalFilePath)
+	contentBytes, err := fileutil.ReadFile(originalFilePath)
 	if err != nil {
 		return "", fmt.Errorf("read original skill %s: %w", originalFilePath, err)
 	}
@@ -72,11 +71,9 @@ func (m *LLMSkillMutator) MutateSkill(ctx context.Context, originalFilePath stri
 		)
 	}
 
-	if err := os.WriteFile(newPath, []byte(mutatedContent), paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(newPath, []byte(mutatedContent), paths.FilePerm644); err != nil {
 		return "", fmt.Errorf("write mutated skill %s: %w", newPath, err)
 	}
-
-
 
 	return newPath, nil
 }

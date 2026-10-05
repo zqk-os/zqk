@@ -7,10 +7,10 @@ import (
 
 // CheckDiff represents the difference between two check outputs.
 type CheckDiff struct {
-	BaselineCount int                          `json:"baseline_count"`
-	ExpandedCount int                          `json:"expanded_count"`
-	Added         []systemcheck.CheckResult    `json:"added"`
-	Removed       []systemcheck.CheckResult    `json:"removed"`
+	BaselineCount int                           `json:"baseline_count"`
+	ExpandedCount int                           `json:"expanded_count"`
+	Added         []systemcheck.CheckResult     `json:"added"`
+	Removed       []systemcheck.CheckResult     `json:"removed"`
 	Modified      []systemcheck.CheckResultDiff `json:"modified"`
 }
 

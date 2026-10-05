@@ -481,4 +481,3 @@ func setupIsolatedCommandEnv(cmd *exec.Cmd, tmpDir string, baseEnv []string, ext
 		cmd.Env = append(cmd.Env, extraEnv...)
 	}
 }
-

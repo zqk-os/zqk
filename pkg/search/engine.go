@@ -297,7 +297,6 @@ func (e *Engine) searchText(ctx context.Context, targetRoot string, opts SearchO
 	return state.result, nil
 }
 
-
 func (e *Engine) searchAST(ctx context.Context, targetRoot string, opts SearchOptions, start time.Time) (*SearchResult, error) {
 	files, err := CollectFiles(targetRoot, opts)
 	if err != nil {
@@ -455,4 +454,3 @@ func finalizeSearchResult(result *SearchResult, accumulatedTokens int32, start t
 	result.Duration = time.Since(start)
 	result.DurationMs = float64(result.Duration.Microseconds()) / 1000.0
 }
-

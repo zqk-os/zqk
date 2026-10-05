@@ -4,10 +4,11 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
-	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // CheckPathsAndPerms scans Go source files for hardcoded paths and magic permission numbers.
@@ -30,7 +31,7 @@ func CheckPathsAndPerms(root string, cfg *GatesConfig) ([]Finding, error) {
 		}
 
 		abs := filepath.Join(root, rel)
-		src, err := os.ReadFile(abs)
+		src, err := fileutil.ReadFile(abs)
 		if err != nil || isGeneratedCode(src) {
 			continue
 		}

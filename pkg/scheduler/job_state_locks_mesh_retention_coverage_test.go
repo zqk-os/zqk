@@ -16,7 +16,7 @@ import (
 	goyaml "gopkg.in/yaml.v3"
 )
 
-func TestExtended_JobStateRegistry_MigrationsAndLocks_Wave44(t *testing.T) {
+func TestExtended_JobStateRegistry_MigrationsAndLocks(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 
@@ -119,7 +119,7 @@ func TestExtended_JobStateRegistry_MigrationsAndLocks_Wave44(t *testing.T) {
 	_ = reg.writeStateHintsFile()
 }
 
-func TestExtended_MeshLeaseSupervision_Wave44(t *testing.T) {
+func TestExtended_MeshLeaseSupervision_Acquisition(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
@@ -193,7 +193,7 @@ func TestExtended_MeshLeaseSupervision_Wave44(t *testing.T) {
 	_ = handler.Execute(ctx, job)
 }
 
-func TestExtended_RetentionToleranceAndMaxCount_Wave44(t *testing.T) {
+func TestExtended_RetentionToleranceAndMaxCount(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)

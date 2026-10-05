@@ -52,7 +52,7 @@ Flags:
       --dry-run                 Show what would be done without actually doing it
       --fields stringArray      Top-level keys for each successful delete entry in formatted output (when stored).
       --file string             Path to YAML file containing array of IDs
-  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
       --ids string              Comma-separated list of object IDs
       --ignore-scheduler-down   Ignore scheduler down warning/lockdown
   -o, --output string           Write output to file

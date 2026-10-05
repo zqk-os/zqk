@@ -271,7 +271,6 @@ func (s *Scheduler) healthMonitor(ctx context.Context) {
 	}
 }
 
-
 // checkAndRecoverMissedJobs checks for missed job triggers and recovers them
 // Returns: (missedCount, recoveredCount)
 // checkAndRecoverMissedJobs checks for missed job triggers and attempts recovery
@@ -568,7 +567,6 @@ func ParseCronSchedule(expr string) (cron.Schedule, error) {
 func (s *Scheduler) parseCronSchedule(expr string) (cron.Schedule, error) {
 	return ParseCronSchedule(expr)
 }
-
 
 // recoverMissedJob attempts to recover a missed job by submitting to the bounded pool (same as cron/event/lifecycle).
 func (s *Scheduler) recoverMissedJob(job *ScheduledJob) {

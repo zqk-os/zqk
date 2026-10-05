@@ -12,12 +12,13 @@ Usage:
 
 Flags:
       --columns string          Override column widths for table output (format: field:width)
-  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
       --ids string              Comma-separated list of object IDs (same as positional multi-ID / comma lists)
       --ignore-scheduler-down   Ignore scheduler down warning/lockdown
   -o, --output string           Write output to file
   -q, --quiet                   Suppress non-essential output
       --timeout duration        Timeout for command execution (0 = auto-calculate)
+      --to string               Target lifecycle status to advance through valid intermediate hops
   -v, --verbose                 Verbose output
 
 Global Flags:

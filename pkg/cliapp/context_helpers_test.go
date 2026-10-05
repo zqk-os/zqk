@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	clicontext "github.com/zqk-os/zqk/pkg/cliapp/context"
 	pkgcli "github.com/zqk-os/zqk/pkg/cli"
+	clicontext "github.com/zqk-os/zqk/pkg/cliapp/context"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/paths"
 )

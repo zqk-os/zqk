@@ -16,9 +16,9 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/zqk-os/zqk/cmd/zqk/agent"
-	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/agentdelivery"
 	"github.com/zqk-os/zqk/pkg/agentprompt"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/infrastructure/crypto"

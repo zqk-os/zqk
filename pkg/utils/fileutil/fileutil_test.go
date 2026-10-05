@@ -258,4 +258,3 @@ func TestIsYAMLPath(t *testing.T) {
 		t.Errorf("expected false for noext")
 	}
 }
-

@@ -50,6 +50,7 @@ type ActivityCache struct {
 	writerOnce   sync.Once
 	writerCtx    context.Context
 	writerCancel context.CancelFunc
+	writerWg     sync.WaitGroup
 }
 
 type saveRequest struct {
@@ -96,6 +97,7 @@ func (c *ActivityCache) Stop() {
 	if c.writerCancel != nil {
 		c.writerCancel()
 	}
+	c.writerWg.Wait()
 }
 
 // NewActivityCache creates a new activity cache
@@ -228,10 +230,15 @@ func (c *ActivityCache) LoadCache(projectRoot string) error {
 // SaveCache saves the cache to disk asynchronously via a single writer goroutine.
 // Non-blocking: sends save request to channel; writer does I/O sequentially to avoid thread explosion.
 func (c *ActivityCache) SaveCache(projectRoot string) error {
+	if c.writerCtx.Err() != nil {
+		return nil
+	}
+
 	// Start writer goroutine on first save (once)
 	c.writerOnce.Do(func() {
 		b := goroutinelabels.DefaultBudget()
-		writerBuilder := goroutinelabels.NewGoroutine("activity_cache_writer", "writing activity cache to disk")
+		writerBuilder := goroutinelabels.NewGoroutine("activity_cache_writer", "writing activity cache to disk").
+			WithWaitGroup(&c.writerWg)
 		if b != nil {
 			writerBuilder = writerBuilder.WithBudget(b)
 		}
@@ -266,7 +273,6 @@ func (c *ActivityCache) doSaveCache(projectRoot string) error {
 	if err != nil {
 		return err
 	}
-
 
 	// Update metadata and prepare cache data
 	var cacheData struct {

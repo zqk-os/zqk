@@ -127,8 +127,6 @@ func emitCheckProgressEventViaCoordinator(
 		eventCtx = eventCtx.WithChannels(true, false, false, true)
 	}
 
-
-
 	bud := goroutinelabels.DefaultBudget()
 	builder := goroutinelabels.NewGoroutine("check_progress_event_emit", fmt.Sprintf("emitting check progress event: %s", eventType))
 	if bud != nil {

@@ -7,10 +7,10 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/zqk-os/zqk/pkg/cliapp"
 	syncpkg "github.com/zqk-os/zqk/pkg/adapters/sync"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	bldr "github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 )
 
@@ -154,4 +154,3 @@ func executeSyncOperation(cmd *cobra.Command, proc *cli.Processor, params syncEx
 	fmt.Fprintf(cmd.OutOrStdout(), params.completeFmt, params.target, params.direction)
 	return nil
 }
-

@@ -28,6 +28,7 @@ func TestWarmCASIndexesFromCache_Isolated(t *testing.T) {
 		maxDuration  = 5 * time.Second
 	)
 	tempDir := t.TempDir()
+	testkit.RegisterTempProjectTeardown(t, tempDir, nil)
 	projectRoot, err := setupSystemTestEnvironmentRoot(t, tempDir)
 	if err != nil {
 		t.Fatalf("SetupTestEnvironment: %v", err)

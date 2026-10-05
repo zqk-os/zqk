@@ -129,7 +129,7 @@ func flushObjectMutationVisibility(proc *cli.Processor, op string, affectedKinds
 	}
 	duration, err := executeDurabilityFlush(proc, affectedKinds)
 	if err != nil {
-		logging.FluentEvent(proc.Logger()).Warn(op + ": durability flush after status write").
+		logging.FluentEvent(proc.Logger()).Warn(op+": durability flush after status write").
 			WithError(err).
 			String("kinds", strings.Join(affectedKinds, ",")).
 			Log()
@@ -283,4 +283,3 @@ func (s *candidateProbeState) recordRejection(candidate, reason string) {
 	s.rejectionByStatus[candidate] = reason
 	s.rejectedOrder = append(s.rejectedOrder, candidate)
 }
-

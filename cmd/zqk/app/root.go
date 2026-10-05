@@ -24,10 +24,10 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 
-	"github.com/zqk-os/zqk/pkg/cliapp"
-	clicontext "github.com/zqk-os/zqk/pkg/cliapp/context"
 	"github.com/zqk-os/zqk/pkg/brand"
 	clitool "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
+	clicontext "github.com/zqk-os/zqk/pkg/cliapp/context"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/coordination"
 	"github.com/zqk-os/zqk/pkg/diagnostics"

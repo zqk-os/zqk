@@ -4,12 +4,17 @@ resetting counters.
 This collects all accumulated metrics, creates a metric object, and resets the counters
 for the next collection period.
 
+Flags:
+    --window <string>
+      Time window for metrics (e.g., '1h', '6h', '24h'). Defaults to since last
+      flush or 1 hour.
+
 Usage:
   zqk system metrics file-lock flush [flags]
 
 Flags:
       --columns string          Override column widths for table output (format: field:width)
-  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
       --ignore-scheduler-down   Ignore scheduler down warning/lockdown
   -o, --output string           Write output to file
   -q, --quiet                   Suppress non-essential output

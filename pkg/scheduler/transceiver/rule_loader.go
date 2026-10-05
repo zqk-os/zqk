@@ -185,7 +185,6 @@ func findRoutingRulesDir() string {
 	return paths.FirstExistingFromCwd(filepath.Join(paths.ProcessInternalDir, "routing_rules"))
 }
 
-
 // LoadDefaultRules returns default routing rules (can be used as fallback)
 func LoadDefaultRules() []RoutingRule {
 	// Return empty rules by default - let users configure their own

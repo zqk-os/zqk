@@ -11,7 +11,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
-func TestStorageExtended_Wave22_ChangeJournalAggregationMetric(t *testing.T) {
+func TestStorageExtended_ChangeJournalAggregationMetric(t *testing.T) {
 	ctx := context.Background()
 	_, fos, secCtx := SetupTestingFactoryCompleteTestEnvironmentForTest(t)
 	svc := NewChangeJournalAggregationService(fos)
@@ -93,7 +93,7 @@ func TestStorageExtended_Wave22_ChangeJournalAggregationMetric(t *testing.T) {
 	assert.Equal(t, 0, cleanedDel)
 }
 
-func TestStorageExtended_Wave22_AggregateChangeJournalEntries(t *testing.T) {
+func TestStorageExtended_AggregateChangeJournalEntries(t *testing.T) {
 	ctx := context.Background()
 	_, fos, secCtx := SetupTestingFactoryCompleteTestEnvironmentForTest(t)
 	svc := NewChangeJournalAggregationServiceWithBatchSize(fos, 10)
@@ -116,7 +116,7 @@ func TestStorageExtended_Wave22_AggregateChangeJournalEntries(t *testing.T) {
 	assert.Equal(t, int64(0), aggregated)
 }
 
-func TestStorageExtended_Wave22_MergeAndCompress(t *testing.T) {
+func TestStorageExtended_MergeAndCompress(t *testing.T) {
 	svc := NewChangeJournalAggregationServiceWithBatchSize(nil, 0)
 	assert.Equal(t, DefaultBatchSize, svc.batchSize)
 

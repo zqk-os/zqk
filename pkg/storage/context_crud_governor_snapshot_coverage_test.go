@@ -16,7 +16,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
-func TestStorageExtended_Wave18_ContextAndCRUDFacade(t *testing.T) {
+func TestStorageExtended_ContextAndCRUDFacade(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("DeleteUnlinkContext", func(t *testing.T) {
@@ -88,7 +88,7 @@ func TestStorageExtended_Wave18_ContextAndCRUDFacade(t *testing.T) {
 	})
 }
 
-func TestStorageExtended_Wave18_CriteriaHelpers_and_FileLock(t *testing.T) {
+func TestStorageExtended_CriteriaHelpers_and_FileLock(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("NewCriteriaLookupFunc", func(t *testing.T) {
@@ -122,7 +122,7 @@ func TestStorageExtended_Wave18_CriteriaHelpers_and_FileLock(t *testing.T) {
 	})
 }
 
-func TestStorageExtended_Wave18_Governor_and_GraphIndexes(t *testing.T) {
+func TestStorageExtended_Governor_and_GraphIndexes(t *testing.T) {
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()
 
@@ -169,7 +169,7 @@ func (m *mockPoolProviderWave18) GetPool() provider.ConnectionPool {
 	return m.pool
 }
 
-func TestStorageExtended_Wave18_BatchingAndCompressedSnapshot(t *testing.T) {
+func TestStorageExtended_BatchingAndCompressedSnapshot(t *testing.T) {
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()
 

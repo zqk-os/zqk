@@ -58,84 +58,84 @@ func (g *SecretsGate) Run(ctx context.Context, opts RunOptions) (*Result, error)
 	return runWithResolvedRoot(opts, func(root string) (*Result, error) {
 		var violations []string
 
-	if len(opts.Files) > 0 {
-		for _, f := range opts.Files {
-			select {
-			case <-ctx.Done():
-				return nil, ctx.Err()
-			default:
-			}
-
-			fullPath := f
-			if !filepath.IsAbs(fullPath) {
-				fullPath = filepath.Join(root, f)
-			}
-
-			if isSecretScannerExemptTestFixture(fullPath) {
-				continue
-			}
-
-			v, err := scanFileForSecrets(fullPath, root)
-			if err != nil {
-				continue
-			}
-			violations = append(violations, v...)
-		}
-	} else {
-		err := filepath.WalkDir(root, func(path string, d os.DirEntry, walkErr error) error {
-			if walkErr != nil {
-				return nil
-			}
-
-			select {
-			case <-ctx.Done():
-				return ctx.Err()
-			default:
-			}
-
-			if d.IsDir() {
-				name := d.Name()
-				if excludedDirNames[name] || strings.HasPrefix(name, ".zqk-") {
-					return filepath.SkipDir
+		if len(opts.Files) > 0 {
+			for _, f := range opts.Files {
+				select {
+				case <-ctx.Done():
+					return nil, ctx.Err()
+				default:
 				}
-				return nil
-			}
 
-			ext := strings.ToLower(filepath.Ext(path))
-			if binaryExts[ext] {
-				return nil
-			}
+				fullPath := f
+				if !filepath.IsAbs(fullPath) {
+					fullPath = filepath.Join(root, f)
+				}
 
-			if isSecretScannerExemptTestFixture(path) {
-				return nil
-			}
+				if isSecretScannerExemptTestFixture(fullPath) {
+					continue
+				}
 
-			v, scanErr := scanFileForSecrets(path, root)
-			if scanErr == nil && len(v) > 0 {
+				v, err := scanFileForSecrets(fullPath, root)
+				if err != nil {
+					continue
+				}
 				violations = append(violations, v...)
 			}
-			return nil
-		})
+		} else {
+			err := filepath.WalkDir(root, func(path string, d os.DirEntry, walkErr error) error {
+				if walkErr != nil {
+					return nil
+				}
 
-		if err != nil && err != context.Canceled {
-			return nil, fmt.Errorf("failed during secret scan walk: %w", err)
+				select {
+				case <-ctx.Done():
+					return ctx.Err()
+				default:
+				}
+
+				if d.IsDir() {
+					name := d.Name()
+					if excludedDirNames[name] || strings.HasPrefix(name, ".zqk-") {
+						return filepath.SkipDir
+					}
+					return nil
+				}
+
+				ext := strings.ToLower(filepath.Ext(path))
+				if binaryExts[ext] {
+					return nil
+				}
+
+				if isSecretScannerExemptTestFixture(path) {
+					return nil
+				}
+
+				v, scanErr := scanFileForSecrets(path, root)
+				if scanErr == nil && len(v) > 0 {
+					violations = append(violations, v...)
+				}
+				return nil
+			})
+
+			if err != nil && err != context.Canceled {
+				return nil, fmt.Errorf("failed during secret scan walk: %w", err)
+			}
 		}
-	}
 
-	if len(violations) > 0 {
+		if len(violations) > 0 {
+			return &Result{
+				GateName:   g.Name(),
+				Passed:     false,
+				Message:    fmt.Sprintf("Secret scanner detected %d credential leak(s)", len(violations)),
+				Violations: violations,
+			}, nil
+		}
+
 		return &Result{
-			GateName:   g.Name(),
-			Passed:     false,
-			Message:    fmt.Sprintf("Secret scanner detected %d credential leak(s)", len(violations)),
-			Violations: violations,
+			GateName: g.Name(),
+			Passed:   true,
+			Message:  "Zero secrets or credential leaks detected",
 		}, nil
-	}
-
-	return &Result{
-		GateName: g.Name(),
-		Passed:   true,
-		Message:  "Zero secrets or credential leaks detected",
-	}, nil
 	})
 }
 

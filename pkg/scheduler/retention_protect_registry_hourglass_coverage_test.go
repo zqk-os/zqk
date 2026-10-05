@@ -24,8 +24,6 @@ func TestExtended_RetentionCleanup_SlowPathAndProtectStatuses(t *testing.T) {
 	}
 	registerFileStorageTestTeardown(t, tmpDir, sp)
 
-
-
 	secCtx := pkgctx.NewSystemSecurityContext()
 	storageCtx := pkgctx.NewStorageContext()
 
@@ -160,7 +158,6 @@ func TestExtended_Hourglass_EscalationsAndSweeps(t *testing.T) {
 		t.Fatalf("failed to create storage: %v", err)
 	}
 	registerFileStorageTestTeardown(t, tmpDir, sp)
-
 
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	secCtx := pkgctx.NewSystemSecurityContext()

@@ -12,7 +12,7 @@ import (
 )
 
 // TestStorageExtended_Wave3_Move tests object_storage_file_move_impl.go
-func TestStorageExtended_Wave3_Move(t *testing.T) {
+func TestStorageExtended_Move(t *testing.T) {
 	tmpDir := t.TempDir()
 	fos, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	if err != nil {
@@ -94,7 +94,7 @@ func TestStorageExtended_Wave3_Move(t *testing.T) {
 }
 
 // TestStorageExtended_Wave3_Rename tests object_storage_file_rename_impl.go
-func TestStorageExtended_Wave3_Rename(t *testing.T) {
+func TestStorageExtended_Rename(t *testing.T) {
 	tmpDir := t.TempDir()
 	fos, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	if err != nil {
@@ -180,7 +180,7 @@ func TestStorageExtended_Wave3_Rename(t *testing.T) {
 }
 
 // TestStorageExtended_Wave3_UpdateNonCAS tests updateNonCASPathNormal and updateNonCASPathIDChange
-func TestStorageExtended_Wave3_UpdateNonCAS(t *testing.T) {
+func TestStorageExtended_UpdateNonCAS(t *testing.T) {
 	tmpDir := t.TempDir()
 	fos, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	if err != nil {

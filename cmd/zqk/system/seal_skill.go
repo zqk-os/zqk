@@ -7,8 +7,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -16,7 +16,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/safepath"
 	"github.com/zqk-os/zqk/pkg/skill"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
-
 )
 
 // NewSealSkillCmd wires seal-skill from the command-spec builder.

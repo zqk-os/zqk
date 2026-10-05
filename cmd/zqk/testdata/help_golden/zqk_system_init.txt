@@ -77,7 +77,7 @@ Flags:
       --columns string            Override column widths for table output (format: field:width)
       --discover                  Run the interactive Project Discovery Wizard to capture strategic context, stakeholders, and important dates. If --legacy is provided, it will instead scan and report existing objects.
       --force                     Overwrite existing files
-  -f, --format string             Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+  -f, --format string             Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
       --from-snapshot string      Initialize from snapshot file (.csnap or .json)
       --ignore-scheduler-down     Ignore scheduler down warning/lockdown
       --import-ontology string    Import an external ontology during initialization (requires --advanced)

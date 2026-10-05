@@ -17,4 +17,3 @@ func RunContextRefreshViaPipeline(ctx context.Context, h *ContextRefreshHandler,
 	}
 	return RunScheduledJobPipeline(ctx, h.logger, pipelineKindContextRefresh, job, h.executeContextRefreshCore)
 }
-

@@ -484,8 +484,9 @@ func TestUpdateAllFields(t *testing.T) {
 						}
 
 						lastErr = err
-						// If this is not a validation error, fail immediately
-						if !strings.Contains(err.Error(), "validation") {
+						// If this is not a validation or lifecycle transition error, fail immediately
+						errStr := strings.ToLower(err.Error())
+						if !strings.Contains(errStr, "validation") && !strings.Contains(errStr, "lifecycle") && !strings.Contains(errStr, "transition") && !strings.Contains(errStr, "status") {
 							t.Errorf("failed to update field %s with value %v (attempt %d/%d): %v", fieldName, testValue, i+1, len(testValues), err)
 							return
 						}

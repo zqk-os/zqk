@@ -12,7 +12,7 @@ import (
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
-func TestExtended_ConvergenceTestBundle_Wave43(t *testing.T) {
+func TestExtended_ConvergenceTestBundle_StageGates(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 
@@ -85,7 +85,7 @@ func TestExtended_ConvergenceTestBundle_Wave43(t *testing.T) {
 	_, _, _ = readTestBundleHealthJSONLFullScan(tmpDir, 10)
 }
 
-func TestExtended_CapStageGates_Wave43(t *testing.T) {
+func TestExtended_CapStageGates_Verification(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 
@@ -165,7 +165,7 @@ func TestExtended_CapStageGates_Wave43(t *testing.T) {
 	handler.maybeWakeOnStageHold("cap_stage_review", "test hold reason")
 }
 
-func TestExtended_SchedulerInternalHelpers_Wave43(t *testing.T) {
+func TestExtended_SchedulerInternalHelpers(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 

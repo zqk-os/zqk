@@ -43,7 +43,8 @@ func LoadKindNamesFromSpecsDir(specsDir string) (map[string]struct{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	out, loadErr := kindNameSets.Load(specsDir, stampmemo.OfAll(files...), func() (map[string]struct{}, error) {
+	stamp := stampmemo.OfAll(append([]string{specsDir}, files...)...)
+	out, loadErr := kindNameSets.Load(specsDir, stamp, func() (map[string]struct{}, error) {
 		return readKindNames(files, specsDir)
 	})
 	if loadErr != nil {

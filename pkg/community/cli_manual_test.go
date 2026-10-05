@@ -56,7 +56,7 @@ func TestCLIManual_FunctionalAcceptance(t *testing.T) {
 		"zqk grep",
 		"zqk test",
 		"zqk auth",
-		"zqk use",
+		"zqk do",
 		"zqk validate",
 		"zqk version",
 		// Integrations

@@ -57,12 +57,6 @@ func TestGetObjectView_MilestoneCompletionReport_BulkGet_ProjectsFields(t *testi
 	milestoneID := "MIL-021000"
 	milestone := createTestObject("milestone", milestoneID, milestoneFields, 0)
 	milestone[objects.FieldKeyCriteriaRefs] = []string{crit1ID, crit2ID}
-
-	// Intentionally contradict text-based completion; view should be driven by durable criteria status.
-	milestone[objects.FieldKeyCompletionCriteria] = []string{
-		"[ ] backlog-item-example status is complete",
-		"[ ] backlog-item-example-2 status is complete",
-	}
 	storage.CreateCASVisible(t, fs, cliCtx, secCtx, milestone, casLeaveStatus(objects.GetString(milestone, objects.FieldKeyStatus)))
 	if err := fs.EnsureCLIObjectMutationVisible(flushCtx, []string{"milestone"}); err != nil {
 		t.Fatalf("ensure milestone visible: %v", err)

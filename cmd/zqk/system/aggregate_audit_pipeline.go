@@ -74,19 +74,19 @@ func RunAggregateAuditViaPipeline(cmd *cobra.Command, _ []string) error {
 
 	baseCtx, bldr := initAggregationPipelineBuilder(cmd, pipelineKindAggregateAudit)
 	pl := bldr.AddStage("INGEST", func(pctx *pipeline.Context, _ any) (any, error) {
-			if pctx.Outcome == nil {
-				pctx.Outcome = make(map[string]any)
-			}
-			aggCtx, err := initializeAggregateAuditContext(cmd)
-			if err != nil {
-				return nil, err
-			}
-			payload := &aggregateAuditPipelinePayload{aggCtx: aggCtx}
-			pctx.Outcome[objects.FieldKeyWindowStart] = aggCtx.WindowStart.Format(time.RFC3339)
-			pctx.Outcome[objects.FieldKeyWindowEnd] = aggCtx.WindowEnd.Format(time.RFC3339)
-			pctx.Outcome[aggAuditOutcomeKeyIngestInitialized] = true
-			return payload, nil
-		}).
+		if pctx.Outcome == nil {
+			pctx.Outcome = make(map[string]any)
+		}
+		aggCtx, err := initializeAggregateAuditContext(cmd)
+		if err != nil {
+			return nil, err
+		}
+		payload := &aggregateAuditPipelinePayload{aggCtx: aggCtx}
+		pctx.Outcome[objects.FieldKeyWindowStart] = aggCtx.WindowStart.Format(time.RFC3339)
+		pctx.Outcome[objects.FieldKeyWindowEnd] = aggCtx.WindowEnd.Format(time.RFC3339)
+		pctx.Outcome[aggAuditOutcomeKeyIngestInitialized] = true
+		return payload, nil
+	}).
 		AddStage("NORMALIZE", func(pctx *pipeline.Context, payload any) (any, error) {
 			in, ok := aggregateAuditPayloadFrom(payload, true)
 			if !ok {

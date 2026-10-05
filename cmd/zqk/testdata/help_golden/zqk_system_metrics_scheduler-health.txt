@@ -8,6 +8,9 @@ Scheduler health metrics track:
   - Cron scheduler restarts
   - Health check duration
 
+Available Subcommands:
+  test             Create a dummy scheduler health metric for inspection
+
   Create a test health metric for inspection
   zqk system metrics scheduler-health test
   View existing health metrics

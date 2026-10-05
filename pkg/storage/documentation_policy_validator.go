@@ -353,4 +353,3 @@ func walkMarkdownFiles(projectRoot string, exclusions []string, visit func(path,
 		return visit(path, relPath)
 	})
 }
-

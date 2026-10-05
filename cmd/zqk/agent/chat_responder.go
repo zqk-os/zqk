@@ -10,9 +10,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/adapters/antigravity"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/llm"
@@ -37,7 +37,6 @@ func runChatResponder(cmd *cobra.Command, args []string, proc *cli.Processor) er
 		_ = cli.WriteOutput(cmd, []byte("No active Antigravity transcript found; skipping chat responder.\n"))
 		return nil
 	}
-
 
 	convID := "DEFAULT"
 	if root, err := antigravity.ConversationRootFromTranscript(transcriptPath); err == nil {

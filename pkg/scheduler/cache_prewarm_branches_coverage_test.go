@@ -3,7 +3,6 @@ package scheduler
 import (
 	"context"
 	"errors"
-	"os"
 	"testing"
 	"time"
 
@@ -22,18 +21,13 @@ func (m *mockValidationScanner) EnqueueAll(ctx context.Context, projectRoot stri
 }
 
 func TestExtended_CachePrewarm_DeepBranches(t *testing.T) {
-	tmpDir, err := os.MkdirTemp("", "test-cp-deep-*")
-	if err != nil {
-		t.Fatalf("temp dir failed: %v", err)
-	}
+	tmpDir := t.TempDir()
 	sp, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	if err != nil {
-		_ = os.RemoveAll(tmpDir)
 		t.Fatalf("storage failed: %v", err)
 	}
 	defer func() {
 		_ = sp.Shutdown(context.Background())
-		_ = os.RemoveAll(tmpDir)
 	}()
 
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))

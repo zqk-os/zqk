@@ -12,7 +12,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/workflow/whatsnext"
 )
 
-func TestExtended_NotificationsAndEnvelope_Wave42(t *testing.T) {
+func TestExtended_NotificationsAndEnvelope(t *testing.T) {
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	ndIface := NewNotificationDisplay(logger)
 	nd := ndIface.(*NotificationDisplay)
@@ -107,7 +107,7 @@ func TestExtended_NotificationsAndEnvelope_Wave42(t *testing.T) {
 	}
 }
 
-func TestExtended_CapDispatchAndRunWrapperExecution_Wave42(t *testing.T) {
+func TestExtended_CapDispatchAndRunWrapperExecution(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 

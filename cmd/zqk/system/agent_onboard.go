@@ -8,9 +8,9 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/cmd/zqk/ambient"
-	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/agentonboard"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -189,4 +189,3 @@ func renderAgentOnboardSummary(cmd *cobra.Command, res *agentonboard.Result) {
 
 	_ = cli.WriteOutput(cmd, []byte(buf.String()))
 }
-

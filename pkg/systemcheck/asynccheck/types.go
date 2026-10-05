@@ -9,12 +9,12 @@ import (
 )
 
 const (
-	ProgressStageLoading         = "loading"
-	ProgressEventTypeCompleted   = "completed"
-	ProgressEventTypeTimeout     = "timeout"
-	ProgressEventTypeStuck       = "stuck"
-	ProgressEventTypeSummary     = "progress_summary"
-	ProgressEventTypeProgress    = "progress"
+	ProgressStageLoading       = "loading"
+	ProgressEventTypeCompleted = "completed"
+	ProgressEventTypeTimeout   = "timeout"
+	ProgressEventTypeStuck     = "stuck"
+	ProgressEventTypeSummary   = "progress_summary"
+	ProgressEventTypeProgress  = "progress"
 
 	SeverityLow      = "low"
 	SeverityMedium   = "medium"
@@ -30,16 +30,16 @@ const (
 
 // ProgressStats holds current snapshot metrics for async check execution.
 type ProgressStats struct {
-	TotalTasks      int           `json:"total_tasks"`
-	CompletedTasks  int           `json:"completed_tasks"`
-	FailedTasks     int           `json:"failed_tasks"`
-	QueueSize       int           `json:"queue_size"`
-	PercentComplete float64       `json:"percent_complete"`
-	Phase           string        `json:"phase"`
-	ActiveWorkers   int           `json:"active_workers"`
-	ActiveGoroutines int          `json:"active_goroutines"`
-	Elapsed         time.Duration `json:"elapsed"`
-	RatePerSecond   float64       `json:"rate_per_second"`
+	TotalTasks       int           `json:"total_tasks"`
+	CompletedTasks   int           `json:"completed_tasks"`
+	FailedTasks      int           `json:"failed_tasks"`
+	QueueSize        int           `json:"queue_size"`
+	PercentComplete  float64       `json:"percent_complete"`
+	Phase            string        `json:"phase"`
+	ActiveWorkers    int           `json:"active_workers"`
+	ActiveGoroutines int           `json:"active_goroutines"`
+	Elapsed          time.Duration `json:"elapsed"`
+	RatePerSecond    float64       `json:"rate_per_second"`
 }
 
 // EngineOptions configures the decoupled async system check runner.

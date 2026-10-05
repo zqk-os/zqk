@@ -13,7 +13,7 @@ import (
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
-func TestExtended_RetentionTolerance_ArchiveDeep_Wave63(t *testing.T) {
+func TestExtended_RetentionTolerance_ArchiveDeep(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 
@@ -59,7 +59,7 @@ func TestExtended_RetentionTolerance_ArchiveDeep_Wave63(t *testing.T) {
 	}
 }
 
-func TestExtended_JobStateRegistry_CleanupAndMigrate_Wave63(t *testing.T) {
+func TestExtended_JobStateRegistry_CleanupAndMigrate(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 
@@ -91,7 +91,7 @@ func TestExtended_JobStateRegistry_CleanupAndMigrate_Wave63(t *testing.T) {
 	t.Logf("moved unbucketed dirs: %d", moved)
 }
 
-func TestExtended_CapOrchestrator_WakeAndTopBLIs_Wave63(t *testing.T) {
+func TestExtended_CapOrchestrator_WakeAndTopBLIs(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 

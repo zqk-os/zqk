@@ -15,4 +15,3 @@ func RunWatchdogEvaluationViaPipeline(ctx context.Context, h *WatchdogEvaluation
 	}
 	return RunScheduledJobPipeline(ctx, h.logger, pipelineKindWatchdogEvaluation, job, h.executeWatchdogEvaluationCore)
 }
-

@@ -96,7 +96,6 @@ func (h *RunWrapperHandler) executeCallback(ctx context.Context, job *ScheduledJ
 		return
 	}
 
-
 	// Route callback through transceiver async router for queued, non-blocking execution
 	// This allows callbacks to be processed asynchronously and provides:
 	// - Queuing for load handling

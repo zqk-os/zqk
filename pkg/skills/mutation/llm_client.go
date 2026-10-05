@@ -92,4 +92,3 @@ func (c *SkillSynthesisClient) GenerateDocs(ctx context.Context, code string) (s
 
 	return strings.TrimSpace(result), nil
 }
-

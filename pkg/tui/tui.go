@@ -53,7 +53,7 @@ func RunTUI(ctx context.Context, projectRoot string, initialTab string, sp stora
 			m.RefreshMetrics(ctx, sp, sec)
 			m.RefreshScheduler(ctx, sp, sec)
 		}
-		fmt.Print(Render(m))
+		fmt.Print(Render(m)) //nolint:forbidigo // TUI renders to terminal stdout
 		return nil
 	}
 

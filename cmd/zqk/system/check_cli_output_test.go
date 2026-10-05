@@ -13,6 +13,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 // TestCheckCommand_JSONLOutput tests the full check command with JSONL output
@@ -21,6 +22,7 @@ func TestCheckCommand_JSONLOutput(t *testing.T) {
 	t.Parallel()
 	// Create a temporary directory for test data
 	tmpDir := t.TempDir()
+	testkit.RegisterTempProjectTeardown(t, tmpDir, nil)
 	projectRoot := tmpDir
 
 	// Set up minimal project structure
@@ -158,6 +160,7 @@ func TestCheckCommand_JSONLOutput(t *testing.T) {
 func TestCheckCommand_JSONLOutput_FileCreation(t *testing.T) {
 	t.Parallel()
 	tmpDir := t.TempDir()
+	testkit.RegisterTempProjectTeardown(t, tmpDir, nil)
 	outputPath := filepath.Join(tmpDir, "test-output.jsonl")
 
 	// Minimal project root so check runs in empty dir and exits quickly (avoids timeout on full repo)

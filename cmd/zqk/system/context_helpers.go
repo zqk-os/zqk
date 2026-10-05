@@ -612,9 +612,9 @@ type CheckSharedResources struct {
 func initCheckSharedResources() *CheckSharedResources {
 	specLoader, lifecycleLoader, validator := unpackGlobalValidationLoaders()
 	return &CheckSharedResources{
-		SpecLoader:        specLoader,
-		LifecycleLoader:   lifecycleLoader,
-		Validator:         validator,
+		SpecLoader:      specLoader,
+		LifecycleLoader: lifecycleLoader,
+		Validator:       validator,
 		HashRegistryCache: &HashRegistryCacheType{
 			cache: make(map[string]storage.HashRegistryProvider),
 		},
@@ -654,6 +654,3 @@ func requireProjectRoot(proc *cli.Processor) (string, error) {
 func createSystemStorageProvider(ctx context.Context, projectRoot string) (storage.ObjectStorageProvider, error) {
 	return cli.NewStorageProviderFromFactory(ctx, projectRoot)
 }
-
-
-

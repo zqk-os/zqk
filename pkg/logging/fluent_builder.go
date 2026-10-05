@@ -1243,10 +1243,16 @@ func (e *fluentEntry) WithFields(fields ...Field) *fluentEntry {
 
 // Log emits the built entry.
 func (e *fluentEntry) Log() {
-	// CRIT-CEF-FLUENT-LEVEL-REQUIRED-001: Enforce explicit level requirement
-	// CRIT-CEF-FLUENT-LEVEL-REQUIRED-001: Enforce explicit level requirement
+	if e == nil {
+		return
+	}
 	defer e.release()
+	if e.logger == nil {
+		return
+	}
 
+	// CRIT-CEF-FLUENT-LEVEL-REQUIRED-001: Enforce explicit level requirement
+	// CRIT-CEF-FLUENT-LEVEL-REQUIRED-001: Enforce explicit level requirement
 	switch e.level {
 	case "error":
 		e.logger.Error(e.msg, e.err, e.fields...)

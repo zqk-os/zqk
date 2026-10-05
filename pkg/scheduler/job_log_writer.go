@@ -28,7 +28,6 @@ func appendTestBundleJSONL(path, jobID string, entry map[string]any) {
 	_ = fileutil.AppendJSONLine(path, entry)
 }
 
-
 // AppendTestBundleEvent appends one JSONL event to the shared test-bundles/events.jsonl.
 // Caller must ensure entry contains "job_id" so consumers can attribute events. Best-effort; errors are ignored.
 func AppendTestBundleEvent(projectRoot, jobID string, entry map[string]any) {

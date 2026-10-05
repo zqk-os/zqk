@@ -12,7 +12,6 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-
 // handleLoadDataFile handles loading objects from a YAML data file
 func handleLoadDataFile(cmd any, builder *ScenarioBuilder, flags *ScenarioBuilderFlags) error {
 	// Resolve data file path (may be relative to project root or current directory)
@@ -38,7 +37,6 @@ func handleLoadDataFile(cmd any, builder *ScenarioBuilder, flags *ScenarioBuilde
 			}
 		}
 	}
-
 
 	// Emit start event
 	builder.emitCoordinatorEvent(pkgctx.NewSystemContext(), ScenarioBuilderProfileName, scenarioBuilderStatusProgress,

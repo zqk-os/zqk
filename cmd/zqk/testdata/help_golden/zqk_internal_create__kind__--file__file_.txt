@@ -3,6 +3,14 @@ Create an internal object with admin privileges.
 This command allows creating objects that may be internal or built-in instances,
 including object specifications, lifecycles, templates, and other system objects.
 
+Flags:
+    --data <string>
+      Inline YAML data for the object
+    --dry-run
+      Show what would be created without actually creating it
+    --file <string>
+      Path to YAML file containing object data (required)
+
   Create an object specification
   zqk internal create object_spec --file my_spec.yaml
   Create an internal lifecycle definition
@@ -18,7 +26,7 @@ Flags:
       --data string             Inline YAML data for the object
       --dry-run                 Show what would be created without actually creating it
       --file string             Path to YAML file containing object data (required)
-  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
       --ignore-scheduler-down   Ignore scheduler down warning/lockdown
   -o, --output string           Write output to file
   -q, --quiet                   Suppress non-essential output

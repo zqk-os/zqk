@@ -7,6 +7,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -101,6 +102,9 @@ exit 1
 
 func TestCapOrchestratorHandler_Execute(t *testing.T) {
 	tempDir := t.TempDir()
+	t.Cleanup(func() {
+		whatsnext.WaitForReconcile(2 * time.Second)
+	})
 
 	// Create a mock zqk binary
 	mockZqk := filepath.Join(tempDir, "zqk")

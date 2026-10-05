@@ -38,7 +38,7 @@ func (m *mockPrivilegedWriter) RenameObject(ctx context.Context, oldID, newID, k
 	return nil
 }
 
-func TestStorageExtended_Wave19_TransactionsAndAdapters(t *testing.T) {
+func TestStorageExtended_TransactionsAndAdapters(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("FileSystemAdapter_Lifecycle_and_Operations", func(t *testing.T) {
@@ -185,11 +185,13 @@ func TestStorageExtended_Wave19_TransactionsAndAdapters(t *testing.T) {
 	})
 }
 
-func TestStorageExtended_Wave19_HashRegistryAndQueueShutdown(t *testing.T) {
+func TestStorageExtended_HashRegistryAndQueueShutdown(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("HashRegistryManager_ShutdownHandler", func(t *testing.T) {
-		manager := GetGlobalHashRegistryManager()
+		manager := &HashRegistryManager{
+			registries: make(map[string]*HashRegistry),
+		}
 		require.NotNil(t, manager)
 
 		assert.Equal(t, ConstMiscHashRegistryManager, manager.GetName())
@@ -275,7 +277,7 @@ func TestStorageExtended_Wave19_HashRegistryAndQueueShutdown(t *testing.T) {
 	})
 }
 
-func TestStorageExtended_Wave19_IPCServerAndWriter(t *testing.T) {
+func TestStorageExtended_IPCServerAndWriter(t *testing.T) {
 	ctx := context.Background()
 	// macOS UNIX socket path length must be < 104 characters
 	socketPath := filepath.Join(os.TempDir(), "pw_test.sock")
@@ -317,7 +319,7 @@ func TestStorageExtended_Wave19_IPCServerAndWriter(t *testing.T) {
 	assert.Contains(t, mockWriter.deletes, "OBJ-2")
 }
 
-func TestStorageExtended_Wave19_StorageFileMethods_and_ChangeJournal(t *testing.T) {
+func TestStorageExtended_StorageFileMethods_and_ChangeJournal(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("FileObjectStorage_Helpers", func(t *testing.T) {

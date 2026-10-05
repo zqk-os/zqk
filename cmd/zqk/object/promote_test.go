@@ -85,10 +85,12 @@ func TestObjectPromoteCommand(t *testing.T) {
 		t.Errorf("expected status 'exploring', got '%v'", got1[objects.FieldKeyStatus])
 	}
 
-	bliObj[objects.FieldKeyProblemStatement] = "This is a valid problem statement of sufficient length."
-	bliObj[objects.FieldKeyAcceptanceConsiderations] = "Narrative only; gates are criteria_refs."
-	bliObj[objects.FieldKeyPriority] = "high"
-	if err := fs.Update(cliCtx, secCtx, bliID, bliObj); err != nil {
+	updatePayload := map[string]any{
+		objects.FieldKeyProblemStatement:         "This is a valid problem statement of sufficient length.",
+		objects.FieldKeyAcceptanceConsiderations: "Narrative only; gates are criteria_refs.",
+		objects.FieldKeyPriority:                 "high",
+	}
+	if err := fs.Update(cliCtx, secCtx, bliID, updatePayload); err != nil {
 		t.Fatalf("update: %v", err)
 	}
 	_ = fs.EnsureCLIObjectMutationVisible(flushCtx, []string{"backlog_item"})

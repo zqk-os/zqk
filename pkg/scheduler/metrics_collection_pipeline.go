@@ -17,4 +17,3 @@ func RunMetricsCollectionViaPipeline(ctx context.Context, h *FileLockMetricsColl
 	}
 	return RunScheduledJobPipeline(ctx, h.logger, pipelineKindMetricsCollection, job, h.executeMetricsCollectionCore)
 }
-

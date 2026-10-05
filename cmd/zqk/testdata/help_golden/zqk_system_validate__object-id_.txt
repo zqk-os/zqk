@@ -24,7 +24,7 @@ Flags:
       --all                     Validate all objects
       --columns string          Override column widths for table output (format: field:width)
       --fix                     Attempt to fix validation errors
-  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
       --ignore-scheduler-down   Ignore scheduler down warning/lockdown
       --kind string             Validate objects of specific kind
   -o, --output string           Write output to file

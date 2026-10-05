@@ -17,7 +17,7 @@ Usage:
 Flags:
       --apply              Write completed_at stamps (implies dry-run=false)
       --dry-run            Report only; do not write (default true)
-  -f, --format string      Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+  -f, --format string      Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
       --limit int          Max objects to consider (0 = unlimited)
   -o, --output string      Write output to file
   -q, --quiet              Suppress non-essential output

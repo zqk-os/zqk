@@ -11,7 +11,7 @@ import (
 )
 
 // TestStorageExtended_Wave5_AuditAggregation tests audit_aggregation_aggregate.go, query.go, and helpers.go
-func TestStorageExtended_Wave5_AuditAggregation(t *testing.T) {
+func TestStorageExtended_AuditAggregation(t *testing.T) {
 	tmpDir := t.TempDir()
 	fos, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	if err != nil {

@@ -14,7 +14,7 @@ Flags:
       --columns string          Override column widths for table output (format: field:width)
       --dry-run                 Show what would be done without updating the index
       --file string             Path to the hash-addressed YAML file (e.g. .zqk/process/backlog_items/<hash>.yaml)
-  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
       --ignore-scheduler-down   Ignore scheduler down warning/lockdown
   -o, --output string           Write output to file
   -q, --quiet                   Suppress non-essential output

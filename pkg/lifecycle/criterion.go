@@ -20,7 +20,6 @@ import (
 // StorageProviderForCriterion is an alias for StorageProvider for backwards compatibility.
 type StorageProviderForCriterion = StorageProvider
 
-
 func appendAndSyncCriterionSatisfied(projectRoot, criterion string, scope map[string]string) {
 	wal, err := GetOrCreateLifecycleWAL(projectRoot)
 	if err != nil {

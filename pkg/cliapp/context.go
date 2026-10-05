@@ -138,9 +138,9 @@ func ResolveCommandProjectRoot(cmd *cobra.Command) (string, error) {
 	if ctx == nil {
 		return "", errfmt.Errorf("failed to get context")
 	}
-	projectRoot := ResolveProjectRoot(".")
+	projectRoot := ctx.ProjectRoot
 	if projectRoot == emptyValue {
-		projectRoot = ctx.ProjectRoot
+		projectRoot = ResolveProjectRoot(".")
 	}
 	if projectRoot == emptyValue {
 		return "", errfmt.Errorf("project root not found")

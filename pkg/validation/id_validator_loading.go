@@ -142,7 +142,6 @@ func (v *IDValidator) ReloadPatterns() error {
 
 // loadPatternsFromSpecs loads patterns from YAML spec files
 // Must be called with lock held
-//
 func (v *IDValidator) loadAndMergePatterns(loadFn func() (map[string]*IDPatternConfig, error)) error {
 	patterns, err := loadFn()
 	if err != nil {

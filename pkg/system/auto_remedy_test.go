@@ -177,12 +177,12 @@ func TestAutoRemedy_ApplyKillProcess(t *testing.T) {
 
 	plans := []system.RemedyPlan{
 		{
-			ID:          "REMEDY-ORPHAN-PROC-PID-9999",
-			Title:       "Terminate Orphaned Process",
-			ActionType:  system.ActionKillProcess,
-			Target:      "PID 9999: zqk",
-			Confidence:  1.0,
-			AutoApply:   true,
+			ID:         "REMEDY-ORPHAN-PROC-PID-9999",
+			Title:      "Terminate Orphaned Process",
+			ActionType: system.ActionKillProcess,
+			Target:     "PID 9999: zqk",
+			Confidence: 1.0,
+			AutoApply:  true,
 		},
 	}
 
@@ -194,4 +194,3 @@ func TestAutoRemedy_ApplyKillProcess(t *testing.T) {
 		t.Errorf("expected 1 applied remedy, got %d", report.TotalApplied)
 	}
 }
-

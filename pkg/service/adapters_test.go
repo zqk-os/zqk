@@ -2,7 +2,6 @@ package service_test
 
 import (
 	"context"
-	"os"
 	"path/filepath"
 	"runtime"
 	"testing"
@@ -41,9 +40,7 @@ func TestLaunchdAdapter_PlistGeneration(t *testing.T) {
 }
 
 func TestLaunchdAdapter_FileOperations(t *testing.T) {
-	tempDir, err := os.MkdirTemp("", "launchd-test-*")
-	require.NoError(t, err)
-	defer os.RemoveAll(tempDir)
+	tempDir := t.TempDir()
 
 	adapter := service.NewLaunchdAdapter()
 	adapter.BaseDir = tempDir
@@ -57,7 +54,7 @@ func TestLaunchdAdapter_FileOperations(t *testing.T) {
 	}
 
 	// Install creates plist file
-	err = adapter.Install(ctx, spec)
+	err := adapter.Install(ctx, spec)
 	require.NoError(t, err)
 
 	plistFile := filepath.Join(tempDir, spec.ID+".plist")
@@ -99,9 +96,7 @@ func TestSystemdAdapter_UnitGeneration(t *testing.T) {
 }
 
 func TestSystemdAdapter_FileOperations(t *testing.T) {
-	tempDir, err := os.MkdirTemp("", "systemd-test-*")
-	require.NoError(t, err)
-	defer os.RemoveAll(tempDir)
+	tempDir := t.TempDir()
 
 	adapter := service.NewSystemdAdapter(true)
 	adapter.UnitDir = tempDir
@@ -114,7 +109,7 @@ func TestSystemdAdapter_FileOperations(t *testing.T) {
 		Executable: "/bin/true",
 	}
 
-	err = adapter.Install(ctx, spec)
+	err := adapter.Install(ctx, spec)
 	require.NoError(t, err)
 
 	unitFile := filepath.Join(tempDir, "example-systemd-test.service")

@@ -102,12 +102,12 @@ func EmitCheckProgressEventViaCoordinator(
 	auditMetadata := buildProgressAuditMetadata(eventType, progress, totalTasks, completed, failed, queueSize, percent)
 
 	metricsData := map[string]any{
-		"progress":                 progress,
-		"total_tasks":              totalTasks,
+		"progress":                      progress,
+		"total_tasks":                   totalTasks,
 		objects.FieldKeyPercentComplete: percent,
-		"completed":                completed,
-		objects.FieldKeyFailed:     failed,
-		"queue_size":               queueSize,
+		"completed":                     completed,
+		objects.FieldKeyFailed:          failed,
+		"queue_size":                    queueSize,
 	}
 
 	status := objects.ObjectStatusSuccess

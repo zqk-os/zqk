@@ -102,7 +102,7 @@ func TestRecommendedNext_AllBranches(t *testing.T) {
 
 	// !readyBundles fallback
 	lineNotReady := BuildRecommendedNextAction(RollupStatusPartial, nil, tb, false)
-	if !strings.Contains(lineNotReady, "Wait for bundle health to satisfy ready_for_session_completion") {
+	if !strings.Contains(lineNotReady, "Wait for test_case evidence to satisfy ready_for_session_completion") {
 		t.Errorf("unexpected line: %s", lineNotReady)
 	}
 

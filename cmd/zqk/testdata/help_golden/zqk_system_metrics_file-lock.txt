@@ -3,6 +3,10 @@ Manage file lock metrics that are accumulated in memory.
 File lock metrics track lock acquisition times, contention rates, wait times, and system busyness.
 Metrics are accumulated in memory and can be collected/flushed to create metric objects.
 
+Available Subcommands:
+  flush            Flush buffered metrics to create a metric object
+  view             View current buffered file lock metrics
+
   View current buffered metrics
   zqk system metrics file-lock view
   Flush metrics to create a metric object

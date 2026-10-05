@@ -16,7 +16,7 @@ Flags:
       --continue-on-error       Continue importing other objects even if one fails
       --dry-run                 Validate without writing
       --file string             Path to YAML or JSON file to import
-  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
       --ignore-scheduler-down   Ignore scheduler down warning/lockdown
       --input-format string     Input format (yaml, json)
       --mode string             Import mode (create_only, upsert) (default "create_only")

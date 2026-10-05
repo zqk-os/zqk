@@ -10,7 +10,7 @@ import (
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
-func TestExtended_LifecycleCoordination_Deep_Wave46(t *testing.T) {
+func TestExtended_LifecycleCoordination_SlowRetention(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
@@ -137,7 +137,7 @@ func TestExtended_LifecycleCoordination_Deep_Wave46(t *testing.T) {
 	sched.autoCompleteMilestonesForBacklogItem(ctx, bliObj)
 }
 
-func TestExtended_RetentionCleanup_SlowPath_Wave46(t *testing.T) {
+func TestExtended_RetentionCleanup_SlowPath(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)

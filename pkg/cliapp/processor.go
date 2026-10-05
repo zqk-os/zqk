@@ -10,8 +10,8 @@ import (
 	"testing"
 
 	"github.com/spf13/cobra"
-	clictx "github.com/zqk-os/zqk/pkg/cliapp/context"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	clictx "github.com/zqk-os/zqk/pkg/cliapp/context"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"

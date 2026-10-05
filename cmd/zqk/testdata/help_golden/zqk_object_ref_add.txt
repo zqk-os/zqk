@@ -28,7 +28,7 @@ Flags:
       --columns string          Override column widths for table output (format: field:width)
       --field string            Explicit reference field name on source object (e.g. priority_plan_ref, related_object_refs)
       --force                   Force reference addition (alias for override)
-  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
       --ignore-scheduler-down   Ignore scheduler down warning/lockdown
   -o, --output string           Write output to file
       --override                Override scope-lock on sealed (active/in-progress) priority plans

@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // SystemdAdapter implements ServiceAdapter using Linux systemd (user or system mode).
@@ -157,7 +158,7 @@ func (a *SystemdAdapter) Install(ctx context.Context, spec ServiceSpec) error {
 
 	unitFile := filepath.Join(dir, a.unitName(spec.ID))
 	content := a.UnitContent(spec)
-	if err := os.WriteFile(unitFile, []byte(content), paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(unitFile, []byte(content), paths.FilePerm644); err != nil {
 		return fmt.Errorf("write systemd unit %s: %w", unitFile, err)
 	}
 

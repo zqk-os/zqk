@@ -8,6 +8,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // CheckTestSubprocessHygiene scans Go test source files (*_test.go) for unmanaged exec.Command
@@ -37,7 +39,7 @@ func CheckTestSubprocessHygiene(root string, cfg *GatesConfig) ([]Finding, error
 			}
 
 			rel, _ := filepath.Rel(root, path)
-			src, readErr := os.ReadFile(path)
+			src, readErr := fileutil.ReadFile(path)
 			if readErr != nil {
 				return nil
 			}

@@ -10,7 +10,7 @@ import (
 )
 
 // TestStorageExtended_Wave7_NoopObjectStorage tests object_storage_noop.go
-func TestStorageExtended_Wave7_NoopObjectStorage(t *testing.T) {
+func TestStorageExtended_NoopObjectStorage(t *testing.T) {
 	noop := storagepkg.NewNoopObjectStorage()
 	ctx := context.Background()
 	secCtx := &pkgctx.SecurityContext{}
@@ -84,7 +84,7 @@ func TestStorageExtended_Wave7_NoopObjectStorage(t *testing.T) {
 }
 
 // TestStorageExtended_Wave7_LazyGraphStorage tests lazy_graph_storage.go
-func TestStorageExtended_Wave7_LazyGraphStorage(t *testing.T) {
+func TestStorageExtended_LazyGraphStorage(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
 	secCtx := &pkgctx.SecurityContext{}
@@ -127,7 +127,7 @@ func TestStorageExtended_Wave7_LazyGraphStorage(t *testing.T) {
 }
 
 // TestStorageExtended_Wave7_TransactionalStorageWrapper tests transactional_storage_wrapper.go
-func TestStorageExtended_Wave7_TransactionalStorageWrapper(t *testing.T) {
+func TestStorageExtended_TransactionalStorageWrapper(t *testing.T) {
 	tmpDir := t.TempDir()
 	fos, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	if err != nil {

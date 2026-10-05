@@ -30,15 +30,18 @@ type entry[T any] struct {
 func (e *entry[T]) load(stamp Stamp, loadFn func() (T, error)) (T, error) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
-	if e.loaded && e.stamp == stamp {
-		return e.val, e.err
+	if e.loaded && e.stamp == stamp && e.err == nil {
+		return e.val, nil
 	}
 	val, err := loadFn()
+	if err != nil {
+		return val, err
+	}
 	e.loaded = true
 	e.stamp = stamp
 	e.val = val
-	e.err = err
-	return val, err
+	e.err = nil
+	return val, nil
 }
 
 // Table memos T by a stable string key. A stamp change updates that entry in

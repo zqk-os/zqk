@@ -15,6 +15,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/storage/locknames"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/when"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func (f *FileObjectStorage) updateNonCASPathNormal(ctx context.Context, secCtx *pkgctx.SecurityContext, kind, id, oldFilePath string, existing, updates, previousStateForJournal map[string]any, oldState, newState string, effectiveUpdates map[string]any, expectedUpdatedAt string) error {
@@ -27,7 +28,7 @@ func (f *FileObjectStorage) updateNonCASPathNormal(ctx context.Context, secCtx *
 		// In test mode, serialize the critical section (re-check + write) to ensure
 		// only one update can succeed at a time, making optimistic locking tests more reliable
 		// The mutex must cover BOTH the re-check AND the write operation
-		if config.TestingMode().OrDefault(false) {
+		if config.TestingMode().OrDefault(false) || zqkenv.TestMode().Get() == "true" {
 			err := concurrency.RunInLockWithLogger(&testModeUpdateMutex, locknames.LockNameTestModeUpdateSerialize, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
 				// Re-read object to get latest updated_at right before writing (inside mutex)
 				latest, err := f.readObjectFileNoCache(oldFilePath)

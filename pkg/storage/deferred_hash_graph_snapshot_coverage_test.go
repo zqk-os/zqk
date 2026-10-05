@@ -16,7 +16,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
-func TestStorageExtended_Wave23_DeferredHashManager(t *testing.T) {
+func TestStorageExtended_DeferredHashManager(t *testing.T) {
 	ctx := context.Background()
 	testRoot, fos, _ := SetupTestingFactoryCompleteTestEnvironmentForTest(t)
 
@@ -86,7 +86,7 @@ func TestStorageExtended_Wave23_DeferredHashManager(t *testing.T) {
 	assert.NotNil(t, globalDHM)
 }
 
-func TestStorageExtended_Wave23_ChangeJournalReconstruction(t *testing.T) {
+func TestStorageExtended_ChangeJournalReconstruction(t *testing.T) {
 	ctx := context.Background()
 	_, fos, _ := SetupTestingFactoryCompleteTestEnvironmentForTest(t)
 
@@ -230,7 +230,7 @@ func (m *mockGraphConnWave23) GetPool(ctx context.Context) (provider.ConnectionP
 	return &mockConnectionPoolWave20{conn: m}, nil
 }
 
-func TestStorageExtended_Wave23_GraphStorage_Delete_and_Snapshot(t *testing.T) {
+func TestStorageExtended_GraphStorage_Delete_and_Snapshot(t *testing.T) {
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()
 

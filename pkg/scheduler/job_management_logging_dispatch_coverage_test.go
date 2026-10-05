@@ -80,7 +80,7 @@ func TestJobManagement_LoggingAndDispatch(t *testing.T) {
 	}
 }
 
-func TestExtended_SwarmWorker_Deep_Wave61(t *testing.T) {
+func TestExtended_SwarmWorker_Deep(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 

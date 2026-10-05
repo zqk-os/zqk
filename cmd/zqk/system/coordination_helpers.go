@@ -241,7 +241,7 @@ func emitStateChangeEventViaCoordinator(
 ) {
 	auditMetadata := map[string]any{
 		eventKeyEventType:  eventType,
-		eventKeyOperation:   operationDesc,
+		eventKeyOperation:  operationDesc,
 		eventKeyChangeType: changeType,
 		eventKeySeverity:   severityLow,
 	}
@@ -308,5 +308,3 @@ func emitWorkerLifecycleCoordinationEvent(
 	eventCtx := buildEventContext(ctx, operationID, eventType, status, eventData, duration, nil, true, true, true, emitOperational)
 	emitAsyncCoordinationEvent(ctx, coordinator, goroutineName, logDescription, eventCtx)
 }
-
-

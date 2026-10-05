@@ -86,7 +86,6 @@ func WireExecForIsolatedProject(cmd *exec.Cmd, projectRoot string) {
 	WireExecForIsolatedProjectWithExtras(cmd, projectRoot)
 }
 
-
 // SubprocessEnvironWithTestRootAndExtras is like [SubprocessEnvironWithTestRoot] but merges
 // extra KEY=value pairs, replacing any prior environment entry with the same key.
 func SubprocessEnvironWithTestRootAndExtras(testRoot string, extras ...string) []string {

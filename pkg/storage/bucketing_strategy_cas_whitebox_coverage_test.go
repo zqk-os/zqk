@@ -11,7 +11,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
-func TestStorageExtended_Wave17_BucketingStrategyDefaultsAndLoader(t *testing.T) {
+func TestStorageExtended_BucketingStrategyDefaultsAndLoader(t *testing.T) {
 	ctx := context.Background()
 	testRoot, _, _ := SetupTestingFactoryCompleteTestEnvironmentForTest(t)
 
@@ -61,7 +61,7 @@ func (m *mockStorageWave17) List(ctx context.Context, secCtx *pkgctx.SecurityCon
 	return &QueryResult{Objects: []map[string]any{}}, nil
 }
 
-func TestStorageExtended_Wave17_GraphBucketStrategyStorage(t *testing.T) {
+func TestStorageExtended_GraphBucketStrategyStorage(t *testing.T) {
 	ctx := context.Background()
 
 	mock := &mockStorageWave17{}
@@ -107,7 +107,7 @@ func TestStorageExtended_Wave17_GraphBucketStrategyStorage(t *testing.T) {
 	})
 }
 
-func TestStorageExtended_Wave17_Builtin_and_AsyncBulkDelete(t *testing.T) {
+func TestStorageExtended_Builtin_and_AsyncBulkDelete(t *testing.T) {
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()
 
@@ -169,7 +169,7 @@ func TestStorageExtended_Wave17_Builtin_and_AsyncBulkDelete(t *testing.T) {
 	})
 }
 
-func TestStorageExtended_Wave17_DependencyGraph_and_CASWhitebox(t *testing.T) {
+func TestStorageExtended_DependencyGraph_and_CASWhitebox(t *testing.T) {
 	t.Run("DependencyGraph_AddDependency", func(t *testing.T) {
 		g := NewDependencyGraph()
 		require.NotNil(t, g)
@@ -200,7 +200,7 @@ func TestStorageExtended_Wave17_DependencyGraph_and_CASWhitebox(t *testing.T) {
 	})
 }
 
-func TestStorageExtended_Wave17_ChangeJournalShutdownHandler(t *testing.T) {
+func TestStorageExtended_ChangeJournalShutdownHandler(t *testing.T) {
 	ctx := context.Background()
 	handler := &ChangeJournalShutdownHandler{}
 

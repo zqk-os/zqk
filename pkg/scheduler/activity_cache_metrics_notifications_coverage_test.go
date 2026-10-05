@@ -11,9 +11,8 @@ import (
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
-func TestExtended_ActivityCache_Wave53(t *testing.T) {
+func TestExtended_ActivityCache_PersistenceAndLifecycle(t *testing.T) {
 	tmpDir := t.TempDir()
-	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 
 	if !activityCacheableJobID("SCH-job-1") || activityCacheableJobID(string(make([]byte, 300))) {
 		t.Errorf("unexpected activityCacheableJobID")
@@ -60,9 +59,10 @@ func TestExtended_ActivityCache_Wave53(t *testing.T) {
 	}
 
 	_ = GetGlobalActivityCache()
+	ac.Stop()
 }
 
-func TestExtended_MetricsCollector_Deep_Wave53(t *testing.T) {
+func TestExtended_MetricsCollector_Deep(t *testing.T) {
 	_ = DefaultSchedulerMetricsConfig()
 	_ = DisabledSchedulerMetricsConfig()
 
@@ -102,7 +102,7 @@ func TestExtended_MetricsCollector_Deep_Wave53(t *testing.T) {
 	}
 }
 
-func TestExtended_NotificationsAndStages_Wave53(t *testing.T) {
+func TestExtended_NotificationsAndStages(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)

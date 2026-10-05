@@ -12,7 +12,7 @@ import (
 )
 
 // TestStorageExtended_Wave10_HybridObjectStorage tests object_storage_hybrid.go, object_storage_hybrid_bulk.go, object_storage_hybrid_tx.go
-func TestStorageExtended_Wave10_HybridObjectStorage(t *testing.T) {
+func TestStorageExtended_HybridObjectStorage(t *testing.T) {
 	primary := newMockStorageProviderWave8()
 	secondary := newMockStorageProviderWave8()
 

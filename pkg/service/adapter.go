@@ -185,5 +185,3 @@ func checkUnitFilePresent(dir string, dirErr error, unitFileName string, isAvail
 	}
 	return st, true, nil
 }
-
-

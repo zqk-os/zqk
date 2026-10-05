@@ -323,6 +323,17 @@ func testKindCRUD(t *testing.T, storage *FileObjectStorage, ctx context.Context,
 			objects.FieldKeyCriteriaRefs:  []string{"CRIT-999"},
 		}
 		EnsureCASVisibleRef(t, storage, cliCtx, secCtx, reqObj, "active")
+	case objects.KindPersona:
+		skillID := "ASK-999"
+		skillObj := map[string]any{
+			objects.FieldKeyID:            skillID,
+			objects.FieldKeyKind:          objects.KindAgentSkill,
+			objects.FieldKeyTitle:         "Test Agent Skill",
+			objects.FieldKeyDescription:   "Substantive description for test agent skill.",
+			objects.FieldKeyStatus:        objects.ObjectStatusImplemented,
+			objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+		}
+		EnsureCASVisibleRef(t, storage, cliCtx, secCtx, skillObj, objects.ObjectStatusImplemented)
 	default:
 		// No special setup needed for other kinds
 	}
@@ -894,6 +905,11 @@ func createTestObjectForCRUD(kind, id string, kindFields *objects.KindFields, in
 		}
 		if instance[objects.FieldKeyDescription] == nil || instance[objects.FieldKeyDescription] == "" {
 			instance[objects.FieldKeyDescription] = "Substantive description for test workstream."
+		}
+	}
+	if kind == "persona" {
+		if instance["agent_skill_refs"] == nil {
+			instance["agent_skill_refs"] = []string{"ASK-999"}
 		}
 	}
 	return instance

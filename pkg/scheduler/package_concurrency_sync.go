@@ -6,9 +6,9 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/circuitbreaker"
 
-	"github.com/zqk-os/zqk/pkg/testpackageconcurrency"
 	"github.com/zqk-os/zqk/pkg/nildecode"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/testpackageconcurrency"
 )
 
 // syncPackageConcurrencyLimits merges scan output (.zqk/test-bundles/package_concurrency_limits.json),

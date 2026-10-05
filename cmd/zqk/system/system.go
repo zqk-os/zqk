@@ -8,8 +8,8 @@ import (
 	"github.com/zqk-os/zqk/pkg/brand"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
-	"github.com/zqk-os/zqk/pkg/zqkenv"
 	"github.com/zqk-os/zqk/pkg/zqkdev"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // NewSystemCmd creates a new system command group
