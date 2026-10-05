@@ -331,7 +331,8 @@ test_mapping*.go
 bli_*.yaml
 errors.yaml
 panics.yaml
-mcp.yaml
+/mcp.yaml
+!pkg/cli/profiles/mcp.yaml
 /out.json
 /output.txt
 /temp.json

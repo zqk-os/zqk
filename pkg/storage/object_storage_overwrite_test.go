@@ -372,6 +372,10 @@ func TestConcurrentUpdatesPreventOverwrite(t *testing.T) {
 	}
 
 	// Verify final state is consistent
+	flushCtx, cancelFlush := storage.DurabilityFlushContext()
+	defer cancelFlush()
+	_ = fos.EnsureCLIObjectMutationVisible(flushCtx, []string{"backlog_item"})
+
 	final, err := fos.Read(ctx, secCtx, objID)
 	if err != nil {
 		t.Fatalf("failed to read final object: %v", err)
