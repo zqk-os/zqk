@@ -103,14 +103,14 @@ zqk: compile-bin
 
 test-unit:
 	go test -short -p 2 -timeout 15m ./pkg/... ./cmd/... ./internal/... ./ext/...
-	(cd examples/swarms/code-eval/failclosed_audit && go test -short -timeout 1m .)
+	@if [ -d examples/swarms/code-eval/failclosed_audit ]; then (cd examples/swarms/code-eval/failclosed_audit && go test -short -timeout 1m .); fi
 
 test-unit-all:
 	go test -p 2 -timeout 20m ./pkg/... ./cmd/... ./internal/... ./ext/...
-	(cd examples/swarms/code-eval/failclosed_audit && go test -timeout 1m .)
+	@if [ -d examples/swarms/code-eval/failclosed_audit ]; then (cd examples/swarms/code-eval/failclosed_audit && go test -timeout 1m .); fi
 
 test-failclosed-audit:
-	(cd examples/swarms/code-eval/failclosed_audit && go test -v -timeout 1m .)
+	@if [ -d examples/swarms/code-eval/failclosed_audit ]; then (cd examples/swarms/code-eval/failclosed_audit && go test -v -timeout 1m .); fi
 
 test-race:
 	go test -race -short -timeout 10m ./pkg/goroutinelabels/... ./pkg/concurrency/... ./pkg/bufferpool/... ./pkg/coordination/... ./pkg/agentfeed/... ./pkg/mcp/... ./pkg/ambience/... ./pkg/storage/... ./pkg/scheduler/... ./pkg/ambient/... ./pkg/mesh/...

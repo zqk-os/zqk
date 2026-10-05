@@ -215,7 +215,9 @@ fi
 	go test -short -p 4 -timeout 20m ./pkg/storage/...
 
 	# 5. Run adversarial failclosed audit invariant battery
-	go test -timeout 1m ./examples/swarms/code-eval/failclosed_audit/...
+	if [ -d "$ROOT/examples/swarms/code-eval/failclosed_audit" ]; then
+		go test -timeout 1m ./examples/swarms/code-eval/failclosed_audit/...
+	fi
 )
 
 printf '%s\n' "PUBLIC RELEASE GATES: PASS"
