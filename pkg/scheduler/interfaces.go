@@ -258,7 +258,6 @@ type SchedulerInterface interface {
 	CleanStaleLocks(threshold time.Duration) (int, error)
 }
 
-
 // PolicyEngineInterface defines the policy engine operations.
 type PolicyEngineInterface interface {
 	Evaluate(jobID string, job *ScheduledJob) (*ExecutionDecision, error)

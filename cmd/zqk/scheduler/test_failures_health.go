@@ -101,4 +101,3 @@ func resolveHealthSignalMessage(recentCount, good, bad int) string {
 		return "needs attention (failures/timeouts dominate this window).\n"
 	}
 }
-

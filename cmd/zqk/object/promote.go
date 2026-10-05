@@ -7,8 +7,8 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
-	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	zqklifecycle "github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -82,177 +82,25 @@ func promoteTarget(cmd *cobra.Command, proc *cli.Processor, tc *transitionContex
 	currentIdx := target.currentIdx
 
 	if currentIdx == -1 {
-			// Kernel repair: illegal/undefined status (e.g. legacy "proposed") cannot walk
-			// the graph. Recover onto an initial lifecycle status when validation allows.
-			var recoverOrder []string
-			for _, st := range lifecycle.Statuses {
-				if st.Origin || st.Preliminary {
-					recoverOrder = append(recoverOrder, st.Value)
-				}
-			}
-			if len(recoverOrder) == 0 && len(sortedStatuses) > 0 {
-				recoverOrder = append(recoverOrder, sortedStatuses[0].value)
-			}
-			recovered := ""
-			var recoverRejects []string
-			for _, candidate := range recoverOrder {
-				candidateObj := make(map[string]any)
-				for k, v := range current {
-					candidateObj[k] = v
-				}
-				koi.SetStatus(candidateObj, candidate)
-				if _, ok := candidateObj[objects.FieldKeyCreatedAt]; !ok || candidateObj[objects.FieldKeyCreatedAt] == nil || candidateObj[objects.FieldKeyCreatedAt] == "" {
-					now := zqktime.NowRFC3339UTC()
-					actor := objects.DefaultSystemAccountID
-					if secCtx != nil && secCtx.AccountID != "" {
-						actor = pkgctx.ActorIDForAttribution(secCtx.AccountID)
-					}
-					candidateObj[objects.FieldKeyCreatedAt] = now
-					if _, ok := candidateObj[objects.FieldKeyCreatedBy]; !ok || candidateObj[objects.FieldKeyCreatedBy] == nil || candidateObj[objects.FieldKeyCreatedBy] == "" {
-						candidateObj[objects.FieldKeyCreatedBy] = actor
-					}
-					if _, ok := candidateObj[objects.FieldKeyUpdatedAt]; !ok || candidateObj[objects.FieldKeyUpdatedAt] == nil || candidateObj[objects.FieldKeyUpdatedAt] == "" {
-						candidateObj[objects.FieldKeyUpdatedAt] = now
-					}
-					if _, ok := candidateObj[objects.FieldKeyUpdatedBy]; !ok || candidateObj[objects.FieldKeyUpdatedBy] == nil || candidateObj[objects.FieldKeyUpdatedBy] == "" {
-						candidateObj[objects.FieldKeyUpdatedBy] = actor
-					}
-				}
-				// Validate as if already at candidate (no edge from the illegal status).
-				valOptions := &validation.ValidationOptions{
-					CurrentState:          candidate,
-					ValidateLifecycle:     true,
-					ValidateSemanticTypes: true,
-				}
-				valOptions.ObjectLookup = func(targetID string) (map[string]any, error) {
-					return proc.Storage().Read(ctx, secCtx, targetID)
-				}
-				valOptions.ObjectStatusLookup = func(targetID string) (string, error) {
-					obj, err := valOptions.ObjectLookup(targetID)
-					if err != nil {
-						return "", err
-					}
-					return koi.Status(obj), nil
-				}
-				valOptions.DependentsLookup = func(targetID string) []string {
-					return storage.DependentsForID(ctx, proc.Storage(), targetID)
-				}
-				valResult, valErr := gv.Validate(ctx, candidateObj, kind, valOptions)
-				if valErr == nil && valResult != nil && valResult.IsValid {
-					blockingConfig := storage.GetGlobalBlockingCheckConfig()
-					blockingErrors := blockingConfig.GetBlockingValidationErrors(valResult.Errors, kind, "")
-					if len(blockingErrors) == 0 {
-						recovered = candidate
-						break
-					}
-					recoverRejects = append(recoverRejects, fmt.Sprintf("%s: %s", candidate, formatValidationErrorList(blockingErrors)))
-					continue
-				}
-				recoverRejects = append(recoverRejects, fmt.Sprintf("%s: %s", candidate, formatCandidateValidationFailure(valErr, valResult)))
-			}
-			if recovered == "" {
-				return fmt.Errorf("%s (%s): current status '%s' is not defined in the lifecycle; recovery to initial failed (%s)",
-					id, kind, currentStatus, strings.Join(recoverRejects, "; "))
-			}
-			updateMap := map[string]any{objects.FieldKeyStatus: recovered}
-			// Skip transition validation: source status is not in the lifecycle graph.
-			promoteCtx := pkgctx.WithLifecycleBreakGlass(
-				pkgctx.WithCacheUpdate(ctx, id, kind, ""),
-				"promote recover undefined status to lifecycle initial",
-			)
-			promoteCtx = storage.WithCLIOperation(storage.WithSkipWriteBehind(promoteCtx))
-			if err := proc.Storage().Update(promoteCtx, secCtx, id, updateMap); err != nil {
-				return fmt.Errorf("%s: failed to recover status '%s' → '%s': %v", id, currentStatus, recovered, err)
-			}
-			fmt.Fprintf(cmd.OutOrStdout(), "✓ Recovered %s from undefined '%s' to initial '%s'\n",
-				color.CyanString(id), color.YellowString(currentStatus), color.GreenString(recovered))
-			flushTracker.add(kind)
-			return nil
-		}
-
-		// Prefer lifecycle transition-graph neighbors (one hop), not "any higher percent".
-		// Percent-only probing can jump priority_plan active→complete when mid-lifecycle
-		// statuses share "calculated" (75).
-		neighborSet := promoteTransitionTargets(lifecycle, currentStatus)
-		currentPercent := objects.LifecycleProgressPercent(currentStatus, lifecycle.PercentComplete)
-		diag := promoteStuckDiag{
-			Kind:                   kind,
-			CurrentStatus:          currentStatus,
-			CurrentPercent:         currentPercent,
-			MissingPercentDefaults: len(lifecycle.PercentComplete.DefaultByStatus) == 0,
-		}
-		for _, swp := range sortedStatuses {
-			if _, ok := neighborSet[swp.value]; ok {
-				diag.GraphNeighbors = append(diag.GraphNeighbors, swp.value)
+		// Kernel repair: illegal/undefined status (e.g. legacy "proposed") cannot walk
+		// the graph. Recover onto an initial lifecycle status when validation allows.
+		var recoverOrder []string
+		for _, st := range lifecycle.Statuses {
+			if st.Origin || st.Preliminary {
+				recoverOrder = append(recoverOrder, st.Value)
 			}
 		}
-		var probeOrder []string
-		if len(neighborSet) > 0 {
-			diag.UsedTransitionGraph = true
-			for _, swp := range sortedStatuses {
-				if _, ok := neighborSet[swp.value]; !ok {
-					continue
-				}
-				archiveHop := promoteAllowsArchiveHop(currentStatus, swp.value)
-				if isNonProgressLifecycleProbeCandidate(swp.value, lifecycleStatusByValue(lifecycle, swp.value)) && !archiveHop {
-					diag.SkippedNonProgress = append(diag.SkippedNonProgress, swp.value)
-					continue
-				}
-				// Promote is forward-only: skip lateral/recovery edges (e.g. * → draft)
-				// whose percent_complete is not greater than the current status.
-				// complete→archived is equal-percent by design; allow that hop explicitly.
-				if swp.percent <= currentPercent && !isSuccessLifecycleTerminal(swp.value) && !archiveHop {
-					diag.SkippedByPercent = append(diag.SkippedByPercent, fmt.Sprintf(
-						"%s (percent_complete %.0f <= current %.0f)", swp.value, swp.percent, currentPercent))
-					continue
-				}
-				probeOrder = append(probeOrder, swp.value)
-			}
-		} else {
-			// No declared edges: fall back to forward percent order (legacy).
-			for i := currentIdx + 1; i < len(statuses); i++ {
-				cand := statuses[i]
-				if isNonProgressLifecycleProbeCandidate(cand, lifecycleStatusByValue(lifecycle, cand)) &&
-					!promoteAllowsArchiveHop(currentStatus, cand) {
-					diag.SkippedNonProgress = append(diag.SkippedNonProgress, cand)
-					continue
-				}
-				probeOrder = append(probeOrder, cand)
-			}
+		if len(recoverOrder) == 0 && len(sortedStatuses) > 0 {
+			recoverOrder = append(recoverOrder, sortedStatuses[0].value)
 		}
-		// Do not skip planned→in_progress (or any execution hop) to complete just
-		// because the nearer hop failed validation (e.g. PRI still grooming).
-		probeOrder = promoteForwardProbeOrder(currentStatus, probeOrder)
-		diag.ProbeOrder = append([]string(nil), probeOrder...)
-
-		// Find next valid status (one hop). Keep rejection reasons so a stuck
-		// promote reports *why* candidates failed.
-		probe := newCandidateProbeState(currentStatus)
-		for _, candidate := range probeOrder {
-			if candidate == currentStatus {
-				continue
-			}
-			if isNonProgressLifecycleProbeCandidate(candidate, lifecycleStatusByValue(lifecycle, candidate)) &&
-				!promoteAllowsArchiveHop(currentStatus, candidate) {
-				diag.SkippedNonProgress = append(diag.SkippedNonProgress, candidate)
-				continue
-			}
-
-			// Create a copy of the object and set the candidate status
+		recovered := ""
+		var recoverRejects []string
+		for _, candidate := range recoverOrder {
 			candidateObj := make(map[string]any)
 			for k, v := range current {
 				candidateObj[k] = v
 			}
 			koi.SetStatus(candidateObj, candidate)
-			// Apply YAML side_effects.clear before composed_integrity (e.g. drop
-			// active_order on priority_plan → complete). Probe used to copy status
-			// only, so promote active→complete failed while active_order was set.
-			for _, field := range objects.TransitionClearFields(lifecycle, currentStatus, candidate) {
-				delete(candidateObj, field)
-			}
-			// If candidate is crossing out of draft plane (or current lacked membrane timestamps),
-			// supply provisional timestamps and actor identity so validation does not reject
-			// an object for fields that will be stamped upon crossing the CAS membrane.
 			if _, ok := candidateObj[objects.FieldKeyCreatedAt]; !ok || candidateObj[objects.FieldKeyCreatedAt] == nil || candidateObj[objects.FieldKeyCreatedAt] == "" {
 				now := zqktime.NowRFC3339UTC()
 				actor := objects.DefaultSystemAccountID
@@ -270,10 +118,9 @@ func promoteTarget(cmd *cobra.Command, proc *cli.Processor, tc *transitionContex
 					candidateObj[objects.FieldKeyUpdatedBy] = actor
 				}
 			}
-
-			// Set up validation options
+			// Validate as if already at candidate (no edge from the illegal status).
 			valOptions := &validation.ValidationOptions{
-				CurrentState:          currentStatus,
+				CurrentState:          candidate,
 				ValidateLifecycle:     true,
 				ValidateSemanticTypes: true,
 			}
@@ -290,100 +137,253 @@ func promoteTarget(cmd *cobra.Command, proc *cli.Processor, tc *transitionContex
 			valOptions.DependentsLookup = func(targetID string) []string {
 				return storage.DependentsForID(ctx, proc.Storage(), targetID)
 			}
-
-			// Validate in-memory
 			valResult, valErr := gv.Validate(ctx, candidateObj, kind, valOptions)
 			if valErr == nil && valResult != nil && valResult.IsValid {
-				// We must also check blocking errors per validation tier
 				blockingConfig := storage.GetGlobalBlockingCheckConfig()
 				blockingErrors := blockingConfig.GetBlockingValidationErrors(valResult.Errors, kind, "")
 				if len(blockingErrors) == 0 {
-					probe.bestStatus = candidate
+					recovered = candidate
 					break
 				}
-				probe.recordRejection(candidate, formatValidationErrorList(blockingErrors))
+				recoverRejects = append(recoverRejects, fmt.Sprintf("%s: %s", candidate, formatValidationErrorList(blockingErrors)))
 				continue
 			}
-			probe.recordRejection(candidate, formatCandidateValidationFailure(valErr, valResult))
+			recoverRejects = append(recoverRejects, fmt.Sprintf("%s: %s", candidate, formatCandidateValidationFailure(valErr, valResult)))
 		}
-
-		if probe.bestStatus == currentStatus {
-			msg := formatStuckPromote(id, diag, probe.rejectedOrder, probe.rejectionByStatus)
-			return fmt.Errorf("%s", msg)
+		if recovered == "" {
+			return fmt.Errorf("%s (%s): current status '%s' is not defined in the lifecycle; recovery to initial failed (%s)",
+				id, kind, currentStatus, strings.Join(recoverRejects, "; "))
 		}
-		bestStatus := probe.bestStatus
-
-		// Complete hop invokes AuditorGate.VerifyComplete for execution work units
-		if (kind == objects.KindBacklogItem || kind == objects.KindAgentTask) && objects.GetGlobalStatusChecker().IsWorkDone(kind, bestStatus) {
-			gate := qa.NewAuditorGateForProject(proc.Storage(), proc.ProjectRoot())
-			if err := gate.VerifyComplete(ctx, id); err != nil {
-				return fmt.Errorf("%s: qa_success verification failed for complete hop: %v", id, err)
-			}
-		}
-
-		finalStatus := bestStatus
-		promoteCtx := pkgctx.WithCacheUpdate(ctx, id, kind, "")
+		updateMap := map[string]any{objects.FieldKeyStatus: recovered}
+		// Skip transition validation: source status is not in the lifecycle graph.
+		promoteCtx := pkgctx.WithLifecycleBreakGlass(
+			pkgctx.WithCacheUpdate(ctx, id, kind, ""),
+			"promote recover undefined status to lifecycle initial",
+		)
 		promoteCtx = storage.WithCLIOperation(storage.WithSkipWriteBehind(promoteCtx))
+		if err := proc.Storage().Update(promoteCtx, secCtx, id, updateMap); err != nil {
+			return fmt.Errorf("%s: failed to recover status '%s' → '%s': %v", id, currentStatus, recovered, err)
+		}
+		fmt.Fprintf(cmd.OutOrStdout(), "✓ Recovered %s from undefined '%s' to initial '%s'\n",
+			color.CyanString(id), color.YellowString(currentStatus), color.GreenString(recovered))
+		flushTracker.add(kind)
+		return nil
+	}
 
-		// Archive is a promote hop that owns the prune/cluster membrane burrito
-		// (children ride the parent; any member failure fails the hop).
-		// TRACK: retention plan-promote archive; stage_membrane prune fail-closed.
-		if bestStatus == objects.ObjectStatusArchived {
-			dependents := func(seed string) []string {
-				return storage.DependentsForID(promoteCtx, proc.Storage(), seed)
+	// Prefer lifecycle transition-graph neighbors (one hop), not "any higher percent".
+	// Percent-only probing can jump priority_plan active→complete when mid-lifecycle
+	// statuses share "calculated" (75).
+	neighborSet := promoteTransitionTargets(lifecycle, currentStatus)
+	currentPercent := objects.LifecycleProgressPercent(currentStatus, lifecycle.PercentComplete)
+	diag := promoteStuckDiag{
+		Kind:                   kind,
+		CurrentStatus:          currentStatus,
+		CurrentPercent:         currentPercent,
+		MissingPercentDefaults: len(lifecycle.PercentComplete.DefaultByStatus) == 0,
+	}
+	for _, swp := range sortedStatuses {
+		if _, ok := neighborSet[swp.value]; ok {
+			diag.GraphNeighbors = append(diag.GraphNeighbors, swp.value)
+		}
+	}
+	var probeOrder []string
+	if len(neighborSet) > 0 {
+		diag.UsedTransitionGraph = true
+		for _, swp := range sortedStatuses {
+			if _, ok := neighborSet[swp.value]; !ok {
+				continue
 			}
-			hop, hopErr := zqklifecycle.PlanStageMembraneHop(promoteCtx, secCtx, proc.Storage(), lifecycleLoader, dependents, []string{id}, bestStatus)
-			if hopErr != nil {
-				return fmt.Errorf("%s: failed to plan archive promote: %v", id, hopErr)
+			archiveHop := promoteAllowsArchiveHop(currentStatus, swp.value)
+			if isNonProgressLifecycleProbeCandidate(swp.value, lifecycleStatusByValue(lifecycle, swp.value)) && !archiveHop {
+				diag.SkippedNonProgress = append(diag.SkippedNonProgress, swp.value)
+				continue
 			}
-			if err := zqklifecycle.ApplyStageMembraneHop(promoteCtx, secCtx, proc.Storage(), dependents, hop); err != nil {
-				return fmt.Errorf("%s: failed to apply archive promote burrito: %v", id, err)
+			// Promote is forward-only: skip lateral/recovery edges (e.g. * → draft)
+			// whose percent_complete is not greater than the current status.
+			// complete→archived is equal-percent by design; allow that hop explicitly.
+			if swp.percent <= currentPercent && !isSuccessLifecycleTerminal(swp.value) && !archiveHop {
+				diag.SkippedByPercent = append(diag.SkippedByPercent, fmt.Sprintf(
+					"%s (percent_complete %.0f <= current %.0f)", swp.value, swp.percent, currentPercent))
+				continue
 			}
-			for _, m := range hop.Members {
-				flushTracker.add(m.Kind)
+			probeOrder = append(probeOrder, swp.value)
+		}
+	} else {
+		// No declared edges: fall back to forward percent order (legacy).
+		for i := currentIdx + 1; i < len(statuses); i++ {
+			cand := statuses[i]
+			if isNonProgressLifecycleProbeCandidate(cand, lifecycleStatusByValue(lifecycle, cand)) &&
+				!promoteAllowsArchiveHop(currentStatus, cand) {
+				diag.SkippedNonProgress = append(diag.SkippedNonProgress, cand)
+				continue
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "✓ Promoted %s from '%s' to '%s' (membrane %d members)\n",
-				color.CyanString(id), color.YellowString(currentStatus), color.GreenString(finalStatus), len(hop.AppliedMembers()))
-			if hook, ok := promoteCueHooks[kind]; ok {
-				if cue := hook(ctx, proc.Storage(), secCtx, id, current, finalStatus); cue != "" {
-					fmt.Fprintln(cmd.OutOrStdout(), cue)
-				}
-			}
-			return nil
+			probeOrder = append(probeOrder, cand)
+		}
+	}
+	// Do not skip planned→in_progress (or any execution hop) to complete just
+	// because the nearer hop failed validation (e.g. PRI still grooming).
+	probeOrder = promoteForwardProbeOrder(currentStatus, probeOrder)
+	diag.ProbeOrder = append([]string(nil), probeOrder...)
+
+	// Find next valid status (one hop). Keep rejection reasons so a stuck
+	// promote reports *why* candidates failed.
+	probe := newCandidateProbeState(currentStatus)
+	for _, candidate := range probeOrder {
+		if candidate == currentStatus {
+			continue
+		}
+		if isNonProgressLifecycleProbeCandidate(candidate, lifecycleStatusByValue(lifecycle, candidate)) &&
+			!promoteAllowsArchiveHop(currentStatus, candidate) {
+			diag.SkippedNonProgress = append(diag.SkippedNonProgress, candidate)
+			continue
 		}
 
-		// Setup update map with the new status plus lifecycle clear side_effects.
-		updateMap := map[string]any{
-			objects.FieldKeyStatus: bestStatus,
+		// Create a copy of the object and set the candidate status
+		candidateObj := make(map[string]any)
+		for k, v := range current {
+			candidateObj[k] = v
 		}
-		for _, field := range objects.TransitionClearFields(lifecycle, currentStatus, bestStatus) {
-			updateMap[field] = storage.FieldUnset
+		koi.SetStatus(candidateObj, candidate)
+		// Apply YAML side_effects.clear before composed_integrity (e.g. drop
+		// active_order on priority_plan → complete). Probe used to copy status
+		// only, so promote active→complete failed while active_order was set.
+		for _, field := range objects.TransitionClearFields(lifecycle, currentStatus, candidate) {
+			delete(candidateObj, field)
 		}
-
-		// Persist the promotion
-		err := proc.Storage().Update(promoteCtx, secCtx, id, updateMap)
-		if err != nil {
-			return fmt.Errorf("%s: failed to apply promotion to '%s': %v", id, bestStatus, err)
-		}
-
-		// Read back final object status in case lifecycle hooks (e.g. execution lock) advanced it.
-		if updatedObj, err := proc.Storage().Read(promoteCtx, secCtx, id); err == nil && updatedObj != nil {
-			if st := koi.Status(updatedObj); st != "" {
-				finalStatus = st
+		// If candidate is crossing out of draft plane (or current lacked membrane timestamps),
+		// supply provisional timestamps and actor identity so validation does not reject
+		// an object for fields that will be stamped upon crossing the CAS membrane.
+		if _, ok := candidateObj[objects.FieldKeyCreatedAt]; !ok || candidateObj[objects.FieldKeyCreatedAt] == nil || candidateObj[objects.FieldKeyCreatedAt] == "" {
+			now := zqktime.NowRFC3339UTC()
+			actor := objects.DefaultSystemAccountID
+			if secCtx != nil && secCtx.AccountID != "" {
+				actor = pkgctx.ActorIDForAttribution(secCtx.AccountID)
+			}
+			candidateObj[objects.FieldKeyCreatedAt] = now
+			if _, ok := candidateObj[objects.FieldKeyCreatedBy]; !ok || candidateObj[objects.FieldKeyCreatedBy] == nil || candidateObj[objects.FieldKeyCreatedBy] == "" {
+				candidateObj[objects.FieldKeyCreatedBy] = actor
+			}
+			if _, ok := candidateObj[objects.FieldKeyUpdatedAt]; !ok || candidateObj[objects.FieldKeyUpdatedAt] == nil || candidateObj[objects.FieldKeyUpdatedAt] == "" {
+				candidateObj[objects.FieldKeyUpdatedAt] = now
+			}
+			if _, ok := candidateObj[objects.FieldKeyUpdatedBy]; !ok || candidateObj[objects.FieldKeyUpdatedBy] == nil || candidateObj[objects.FieldKeyUpdatedBy] == "" {
+				candidateObj[objects.FieldKeyUpdatedBy] = actor
 			}
 		}
-		// Sweep / unlink any preliminary draft file now that the object is promoted across the CAS membrane.
-		if isPrelim, _ := objects.GetGlobalLifecycleLoader().IsPreliminaryStatusForKind(kind, finalStatus); !isPrelim {
-			_ = storage.DeleteObjectDraftFile(proc.ProjectRoot(), kind, id)
+
+		// Set up validation options
+		valOptions := &validation.ValidationOptions{
+			CurrentState:          currentStatus,
+			ValidateLifecycle:     true,
+			ValidateSemanticTypes: true,
 		}
-		fmt.Fprintf(cmd.OutOrStdout(), "✓ Promoted %s from '%s' to '%s'\n", color.CyanString(id), color.YellowString(currentStatus), color.GreenString(finalStatus))
+		valOptions.ObjectLookup = func(targetID string) (map[string]any, error) {
+			return proc.Storage().Read(ctx, secCtx, targetID)
+		}
+		valOptions.ObjectStatusLookup = func(targetID string) (string, error) {
+			obj, err := valOptions.ObjectLookup(targetID)
+			if err != nil {
+				return "", err
+			}
+			return koi.Status(obj), nil
+		}
+		valOptions.DependentsLookup = func(targetID string) []string {
+			return storage.DependentsForID(ctx, proc.Storage(), targetID)
+		}
+
+		// Validate in-memory
+		valResult, valErr := gv.Validate(ctx, candidateObj, kind, valOptions)
+		if valErr == nil && valResult != nil && valResult.IsValid {
+			// We must also check blocking errors per validation tier
+			blockingConfig := storage.GetGlobalBlockingCheckConfig()
+			blockingErrors := blockingConfig.GetBlockingValidationErrors(valResult.Errors, kind, "")
+			if len(blockingErrors) == 0 {
+				probe.bestStatus = candidate
+				break
+			}
+			probe.recordRejection(candidate, formatValidationErrorList(blockingErrors))
+			continue
+		}
+		probe.recordRejection(candidate, formatCandidateValidationFailure(valErr, valResult))
+	}
+
+	if probe.bestStatus == currentStatus {
+		msg := formatStuckPromote(id, diag, probe.rejectedOrder, probe.rejectionByStatus)
+		return fmt.Errorf("%s", msg)
+	}
+	bestStatus := probe.bestStatus
+
+	// Complete hop invokes AuditorGate.VerifyComplete for execution work units
+	if (kind == objects.KindBacklogItem || kind == objects.KindAgentTask) && objects.GetGlobalStatusChecker().IsWorkDone(kind, bestStatus) {
+		gate := qa.NewAuditorGateForProject(proc.Storage(), proc.ProjectRoot())
+		if err := gate.VerifyComplete(ctx, id); err != nil {
+			return fmt.Errorf("%s: qa_success verification failed for complete hop: %v", id, err)
+		}
+	}
+
+	finalStatus := bestStatus
+	promoteCtx := pkgctx.WithCacheUpdate(ctx, id, kind, "")
+	promoteCtx = storage.WithCLIOperation(storage.WithSkipWriteBehind(promoteCtx))
+
+	// Archive is a promote hop that owns the prune/cluster membrane burrito
+	// (children ride the parent; any member failure fails the hop).
+	// TRACK: retention plan-promote archive; stage_membrane prune fail-closed.
+	if bestStatus == objects.ObjectStatusArchived {
+		dependents := func(seed string) []string {
+			return storage.DependentsForID(promoteCtx, proc.Storage(), seed)
+		}
+		hop, hopErr := zqklifecycle.PlanStageMembraneHop(promoteCtx, secCtx, proc.Storage(), lifecycleLoader, dependents, []string{id}, bestStatus)
+		if hopErr != nil {
+			return fmt.Errorf("%s: failed to plan archive promote: %v", id, hopErr)
+		}
+		if err := zqklifecycle.ApplyStageMembraneHop(promoteCtx, secCtx, proc.Storage(), dependents, hop); err != nil {
+			return fmt.Errorf("%s: failed to apply archive promote burrito: %v", id, err)
+		}
+		for _, m := range hop.Members {
+			flushTracker.add(m.Kind)
+		}
+		fmt.Fprintf(cmd.OutOrStdout(), "✓ Promoted %s from '%s' to '%s' (membrane %d members)\n",
+			color.CyanString(id), color.YellowString(currentStatus), color.GreenString(finalStatus), len(hop.AppliedMembers()))
 		if hook, ok := promoteCueHooks[kind]; ok {
 			if cue := hook(ctx, proc.Storage(), secCtx, id, current, finalStatus); cue != "" {
 				fmt.Fprintln(cmd.OutOrStdout(), cue)
 			}
 		}
-		flushTracker.addWithBacklogCascade(kind)
 		return nil
+	}
+
+	// Setup update map with the new status plus lifecycle clear side_effects.
+	updateMap := map[string]any{
+		objects.FieldKeyStatus: bestStatus,
+	}
+	for _, field := range objects.TransitionClearFields(lifecycle, currentStatus, bestStatus) {
+		updateMap[field] = storage.FieldUnset
+	}
+
+	// Persist the promotion
+	err := proc.Storage().Update(promoteCtx, secCtx, id, updateMap)
+	if err != nil {
+		return fmt.Errorf("%s: failed to apply promotion to '%s': %v", id, bestStatus, err)
+	}
+
+	// Read back final object status in case lifecycle hooks (e.g. execution lock) advanced it.
+	if updatedObj, err := proc.Storage().Read(promoteCtx, secCtx, id); err == nil && updatedObj != nil {
+		if st := koi.Status(updatedObj); st != "" {
+			finalStatus = st
+		}
+	}
+	// Sweep / unlink any preliminary draft file now that the object is promoted across the CAS membrane.
+	if isPrelim, _ := objects.GetGlobalLifecycleLoader().IsPreliminaryStatusForKind(kind, finalStatus); !isPrelim {
+		_ = storage.DeleteObjectDraftFile(proc.ProjectRoot(), kind, id)
+	}
+	fmt.Fprintf(cmd.OutOrStdout(), "✓ Promoted %s from '%s' to '%s'\n", color.CyanString(id), color.YellowString(currentStatus), color.GreenString(finalStatus))
+	if hook, ok := promoteCueHooks[kind]; ok {
+		if cue := hook(ctx, proc.Storage(), secCtx, id, current, finalStatus); cue != "" {
+			fmt.Fprintln(cmd.OutOrStdout(), cue)
+		}
+	}
+	flushTracker.addWithBacklogCascade(kind)
+	return nil
 }
 
 // promoteStuckDiag captures why promote built an empty or failing probe list.

@@ -215,4 +215,3 @@ func LoadCheckSnapshot(snapshotFile string) (*systemcheck.CheckSnapshot, error) 
 
 	return &snapshot, nil
 }
-

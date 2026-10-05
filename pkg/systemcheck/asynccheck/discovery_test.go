@@ -134,11 +134,11 @@ func TestShouldUseCachedState(t *testing.T) {
 	}
 
 	state := &validation.ValidationState{
-		ObjectID:       "GOAL-1",
-		ObjectKind:     "goal",
-		FilePath:       filePath,
-		LastValidated:  time.Now().Add(1 * time.Minute),
-		Issues:         nil,
+		ObjectID:      "GOAL-1",
+		ObjectKind:    "goal",
+		FilePath:      filePath,
+		LastValidated: time.Now().Add(1 * time.Minute),
+		Issues:        nil,
 	}
 
 	if !ShouldUseCachedState("GOAL-1", filePath, state, false) {
@@ -147,11 +147,11 @@ func TestShouldUseCachedState(t *testing.T) {
 
 	// Integrity issue invalidates
 	stateWithIntegrity := &validation.ValidationState{
-		ObjectID:       "GOAL-1",
-		ObjectKind:     "goal",
-		FilePath:       filePath,
-		LastValidated:  time.Now().Add(1 * time.Minute),
-		Issues:         []validation.ValidationIssue{{Category: "integrity"}},
+		ObjectID:      "GOAL-1",
+		ObjectKind:    "goal",
+		FilePath:      filePath,
+		LastValidated: time.Now().Add(1 * time.Minute),
+		Issues:        []validation.ValidationIssue{{Category: "integrity"}},
 	}
 	if ShouldUseCachedState("GOAL-1", filePath, stateWithIntegrity, false) {
 		t.Errorf("expected integrity issue to invalidate cache hit")
@@ -215,4 +215,3 @@ func TestScanObjectFilesWithContext_CancelledContext(t *testing.T) {
 		t.Fatalf("expected error from cancelled context, got nil")
 	}
 }
-

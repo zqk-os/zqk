@@ -364,7 +364,6 @@ type queryFlagAdder interface {
 	AddIntFlag(name, shorthand string, defaultValue int, description string) *CommandBuilder
 }
 
-
 func addStandardQueryFlags(b queryFlagAdder) {
 	b.AddStringArrayFlag(crudFlagFilter, "", crudHelpFilter)
 	b.AddStringFlag(crudFlagSortBy, "", "", crudHelpSortBy)

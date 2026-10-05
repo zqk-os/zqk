@@ -75,4 +75,3 @@ func AppendReferenceLinked(projectRoot, sourceKind, sourceID, targetKind, target
 		FieldName:  fieldName,
 	})
 }
-

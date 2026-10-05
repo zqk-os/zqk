@@ -421,10 +421,10 @@ func formatByteSize(b int64) string {
 }
 
 var (
-	hygieneCacheMu      sync.RWMutex
-	cachedHygieneStats  TSDBHygieneStats
-	cachedHygieneAt     time.Time
-	cachedHygieneRoot   string
+	hygieneCacheMu     sync.RWMutex
+	cachedHygieneStats TSDBHygieneStats
+	cachedHygieneAt    time.Time
+	cachedHygieneRoot  string
 )
 
 func readHygieneStats(projectRoot string, telem *TSDBTelemetry) {

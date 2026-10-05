@@ -20,4 +20,3 @@ func RunSchedulerJobRetentionViaPipeline(ctx context.Context, h *SchedulerJobRet
 	ctx = storagepkg.WithCLIOperation(ctx)
 	return RunScheduledJobPipeline(ctx, h.logger, pipelineKindSchedulerJobRetention, job, h.executeSchedulerJobRetentionCore)
 }
-

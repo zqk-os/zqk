@@ -57,9 +57,7 @@ const (
 )
 
 // Message strings composition roots still alias.
-const (
-)
+const ()
 
 // Extracted field and log strings composition roots still alias.
-const (
-)
+const ()

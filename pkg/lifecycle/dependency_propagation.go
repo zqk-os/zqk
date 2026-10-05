@@ -1138,4 +1138,3 @@ func resolveObjectKind(objectData map[string]any, defaultKind string) string {
 	}
 	return defaultKind
 }
-

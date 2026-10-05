@@ -880,4 +880,3 @@ func TestUpdateGitignore(t *testing.T) {
 		t.Errorf("expected idempotent updateGitignore, content changed:\nBefore:\n%s\nAfter:\n%s", beforeRun, string(afterBytes))
 	}
 }
-

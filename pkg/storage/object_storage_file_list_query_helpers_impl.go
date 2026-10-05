@@ -152,126 +152,126 @@ func (f *FileObjectStorage) countWithFilters(ctx context.Context, kindDir string
 		}
 		count := 0
 		maxWorkers := getListReadWorkers()
-	results := make(chan bool, maxWorkers*2)
-	workCh := make(chan string, len(filePaths))
-	numWorkers := maxWorkers
-	if len(filePaths) < numWorkers {
-		numWorkers = len(filePaths)
-	}
-	if numWorkers == 0 {
-		return 0, nil
-	}
-
-	for _, p := range filePaths {
-		select {
-		case <-listCtx.Done():
-			return 0, listCtx.Err()
-		case workCh <- p:
+		results := make(chan bool, maxWorkers*2)
+		workCh := make(chan string, len(filePaths))
+		numWorkers := maxWorkers
+		if len(filePaths) < numWorkers {
+			numWorkers = len(filePaths)
 		}
-	}
-	close(workCh)
-
-	var countWg sync.WaitGroup
-	countWg.Add(numWorkers)
-	countBud := goroutinelabels.DefaultBudget()
-	var processedFiles int64
-	progressFn := pkgctx.GetValidationProgress(listCtx)
-	lastProgressTime := time.Now()
-	var progressMu sync.Mutex
-	totalFiles := len(filePaths)
-
-	for w := 0; w < numWorkers; w++ {
-		countWorkerBuilder := goroutinelabels.NewGoroutine(ConstStreamFileStorageCountFile, ConstStreamCountFilterWorker)
-		if countBud != nil {
-			countWorkerBuilder = countWorkerBuilder.WithBudget(countBud)
+		if numWorkers == 0 {
+			return 0, nil
 		}
-		countWorkerBuilder.StartSimple(func() {
-			defer countWg.Done()
-			for filePath := range workCh {
-				select {
-				case <-listCtx.Done():
-					return
-				default:
-				}
 
-				curProcessed := atomic.AddInt64(&processedFiles, 1)
-				if curProcessed%100 == 0 {
-					process.TouchMeaningfulActivity()
-				}
-				if progressFn != nil && (curProcessed%250 == 0 || curProcessed == 1) {
-					progressMu.Lock()
-					if curProcessed == 1 || time.Since(lastProgressTime) >= 1*time.Second {
-						lastProgressTime = time.Now()
-						progressFn("storage.count", fmt.Sprintf("Filtering %s objects (%d/%d evaluated)...", filter.Kind, curProcessed, totalFiles))
-					}
-					progressMu.Unlock()
-				}
+		for _, p := range filePaths {
+			select {
+			case <-listCtx.Done():
+				return 0, listCtx.Err()
+			case workCh <- p:
+			}
+		}
+		close(workCh)
 
-				if IsObjectDraftPlanePath(f.projectRoot, filePath) {
+		var countWg sync.WaitGroup
+		countWg.Add(numWorkers)
+		countBud := goroutinelabels.DefaultBudget()
+		var processedFiles int64
+		progressFn := pkgctx.GetValidationProgress(listCtx)
+		lastProgressTime := time.Now()
+		var progressMu sync.Mutex
+		totalFiles := len(filePaths)
+
+		for w := 0; w < numWorkers; w++ {
+			countWorkerBuilder := goroutinelabels.NewGoroutine(ConstStreamFileStorageCountFile, ConstStreamCountFilterWorker)
+			if countBud != nil {
+				countWorkerBuilder = countWorkerBuilder.WithBudget(countBud)
+			}
+			countWorkerBuilder.StartSimple(func() {
+				defer countWg.Done()
+				for filePath := range workCh {
 					select {
 					case <-listCtx.Done():
 						return
-					case results <- false:
+					default:
 					}
-					continue
-				}
-				obj, err := f.readObjectFile(listCtx, filePath)
-				if err != nil {
+
+					curProcessed := atomic.AddInt64(&processedFiles, 1)
+					if curProcessed%100 == 0 {
+						process.TouchMeaningfulActivity()
+					}
+					if progressFn != nil && (curProcessed%250 == 0 || curProcessed == 1) {
+						progressMu.Lock()
+						if curProcessed == 1 || time.Since(lastProgressTime) >= 1*time.Second {
+							lastProgressTime = time.Now()
+							progressFn("storage.count", fmt.Sprintf("Filtering %s objects (%d/%d evaluated)...", filter.Kind, curProcessed, totalFiles))
+						}
+						progressMu.Unlock()
+					}
+
+					if IsObjectDraftPlanePath(f.projectRoot, filePath) {
+						select {
+						case <-listCtx.Done():
+							return
+						case results <- false:
+						}
+						continue
+					}
+					obj, err := f.readObjectFile(listCtx, filePath)
+					if err != nil {
+						select {
+						case <-listCtx.Done():
+							return
+						case results <- false:
+						}
+						continue
+					}
+					idVal, _ := obj[objects.FieldKeyID].(string)
+					obj = f.MaterializeCasYAMLMapAfterLoad(f.projectRoot, filter.Kind, idVal, obj)
+					parsed, err := objects.ParseObject(obj)
+					if err != nil {
+						parsed = &objects.ParsedObject{Raw: obj}
+					}
+					matches := f.matchesFiltersParsed(parsed, filter.Filters)
+					// Don't send after context cancelled (closer may have closed channel)
 					select {
 					case <-listCtx.Done():
 						return
-					case results <- false:
+					case results <- matches:
 					}
-					continue
 				}
-				idVal, _ := obj[objects.FieldKeyID].(string)
-				obj = f.MaterializeCasYAMLMapAfterLoad(f.projectRoot, filter.Kind, idVal, obj)
-				parsed, err := objects.ParseObject(obj)
-				if err != nil {
-					parsed = &objects.ParsedObject{Raw: obj}
-				}
-				matches := f.matchesFiltersParsed(parsed, filter.Filters)
-				// Don't send after context cancelled (closer may have closed channel)
-				select {
-				case <-listCtx.Done():
-					return
-				case results <- matches:
-				}
+			})
+		}
+
+		countCloserBud := goroutinelabels.DefaultBudget()
+		var closeOnce sync.Once
+		closeResults := func() { closeOnce.Do(func() { close(results) }) }
+		wgDone := make(chan struct{})
+		goroutinelabels.NewGoroutine(ConstStreamFileStorageCountWaiter, ConstStreamWaitingForCountWorkers).StartSimple(func() {
+			countWg.Wait()
+			close(wgDone)
+		})
+		countCloserBuilder := goroutinelabels.NewGoroutine(ConstStreamFileStorageCountResultsCloser, ConstStreamWaitingForCountWorkersAndClosingResultsChannel).
+			WithCleanup(closeResults)
+		if countCloserBud != nil {
+			countCloserBuilder = countCloserBuilder.WithBudget(countCloserBud)
+		}
+		countCloserBuilder.StartSimple(func() {
+			select {
+			case <-listCtx.Done():
+				closeResults()
+			case <-wgDone:
+				closeResults()
 			}
 		})
-	}
 
-	countCloserBud := goroutinelabels.DefaultBudget()
-	var closeOnce sync.Once
-	closeResults := func() { closeOnce.Do(func() { close(results) }) }
-	wgDone := make(chan struct{})
-	goroutinelabels.NewGoroutine(ConstStreamFileStorageCountWaiter, ConstStreamWaitingForCountWorkers).StartSimple(func() {
-		countWg.Wait()
-		close(wgDone)
-	})
-	countCloserBuilder := goroutinelabels.NewGoroutine(ConstStreamFileStorageCountResultsCloser, ConstStreamWaitingForCountWorkersAndClosingResultsChannel).
-		WithCleanup(closeResults)
-	if countCloserBud != nil {
-		countCloserBuilder = countCloserBuilder.WithBudget(countCloserBud)
-	}
-	countCloserBuilder.StartSimple(func() {
-		select {
-		case <-listCtx.Done():
-			closeResults()
-		case <-wgDone:
-			closeResults()
+		for match := range results {
+			if match {
+				count++
+			}
 		}
-	})
-
-	for match := range results {
-		if match {
-			count++
+		if err := listCtx.Err(); err != nil {
+			return 0, err
 		}
-	}
-	if err := listCtx.Err(); err != nil {
-		return 0, err
-	}
-	return count, nil
+		return count, nil
 	})
 }
 

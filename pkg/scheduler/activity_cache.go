@@ -267,7 +267,6 @@ func (c *ActivityCache) doSaveCache(projectRoot string) error {
 		return err
 	}
 
-
 	// Update metadata and prepare cache data
 	var cacheData struct {
 		Metadata *ActivityCacheMetadata         `json:"metadata"`

@@ -164,4 +164,3 @@ func StringEndsWith(actualValue, filterValue any) bool {
 	a, b, ok := toStrings(actualValue, filterValue)
 	return ok && strings.HasSuffix(a, b)
 }
-

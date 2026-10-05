@@ -1026,4 +1026,3 @@ func (s *GraphRPC) TxGetParent(args *TxGetParentArgs, reply *TxGetParentReply) e
 		return nil
 	})
 }
-

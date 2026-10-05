@@ -3,9 +3,9 @@ package system
 import (
 	"fmt"
 
-	"github.com/zqk-os/zqk/pkg/cliapp"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -71,101 +71,101 @@ func runAuditMilestones(cmd *cobra.Command, fix bool, defaultMilestoneID string)
 			return errfmt.Newf("list backlog_item").Wrap(err)
 		}
 
-	var unlinked []map[string]any
-	var linked int
+		var unlinked []map[string]any
+		var linked int
 
-	for _, obj := range listResult.Objects {
-		hasMilestone := false
+		for _, obj := range listResult.Objects {
+			hasMilestone := false
 
-		if refsRaw, ok := obj[objects.FieldKeyMilestoneRefs]; ok && refsRaw != nil {
-			if refs, ok := refsRaw.([]any); ok && len(refs) > 0 {
-				hasMilestone = true
-			} else if refsStr, ok := refsRaw.([]string); ok && len(refsStr) > 0 {
-				hasMilestone = true
-			}
-		}
-
-		if !hasMilestone {
-			unlinked = append(unlinked, obj)
-		} else {
-			linked++
-		}
-	}
-
-	total := len(listResult.Objects)
-	unlinkedCount := len(unlinked)
-
-	var fixedCount int
-	if fix && unlinkedCount > 0 {
-		for _, obj := range unlinked {
-			id, ok := obj[objects.FieldKeyID].(string)
-			if !ok {
-				continue
+			if refsRaw, ok := obj[objects.FieldKeyMilestoneRefs]; ok && refsRaw != nil {
+				if refs, ok := refsRaw.([]any); ok && len(refs) > 0 {
+					hasMilestone = true
+				} else if refsStr, ok := refsRaw.([]string); ok && len(refsStr) > 0 {
+					hasMilestone = true
+				}
 			}
 
-			// Add the default milestone
-			updates := map[string]any{
-				objects.FieldKeyMilestoneRefs: []string{defaultMilestoneID},
-			}
-
-			errUpdate := sess.Update(cmd.Context(), id, updates)
-			if errUpdate != nil {
-				logging.Fluent(logging.GetLoggerFromProfile(sess.Ctx.Profile)).Error("failed to fix milestone association", errUpdate).Log()
+			if !hasMilestone {
+				unlinked = append(unlinked, obj)
 			} else {
-				fixedCount++
+				linked++
 			}
 		}
-	}
 
-	result := map[string]any{
-		"total_backlog_items": total,
-		"linked_items":        linked,
-		"unlinked_items":      unlinkedCount,
-	}
+		total := len(listResult.Objects)
+		unlinkedCount := len(unlinked)
 
-	if fix {
-		result["fixed_items"] = fixedCount
-	} else if unlinkedCount > 0 {
-		// Output up to 20 unlinked items
-		limit := unlinkedCount
-		if limit > 20 {
-			limit = 20
+		var fixedCount int
+		if fix && unlinkedCount > 0 {
+			for _, obj := range unlinked {
+				id, ok := obj[objects.FieldKeyID].(string)
+				if !ok {
+					continue
+				}
+
+				// Add the default milestone
+				updates := map[string]any{
+					objects.FieldKeyMilestoneRefs: []string{defaultMilestoneID},
+				}
+
+				errUpdate := sess.Update(cmd.Context(), id, updates)
+				if errUpdate != nil {
+					logging.Fluent(logging.GetLoggerFromProfile(sess.Ctx.Profile)).Error("failed to fix milestone association", errUpdate).Log()
+				} else {
+					fixedCount++
+				}
+			}
 		}
-		result["unlinked_sample"] = unlinked[:limit]
-	}
 
-	switch cli.GetFormat(cmd) {
-	case cli.FormatJSON, cli.FormatJSONL, cli.FormatYAML:
-		if err := cli.FormatOutput(cmd, result); err != nil {
-			logging.Fluent(logging.GetLoggerFromProfile(sess.Ctx.Profile)).Error("audit-milestones format output", err).Log()
-			return err
+		result := map[string]any{
+			"total_backlog_items": total,
+			"linked_items":        linked,
+			"unlinked_items":      unlinkedCount,
 		}
-		return nil
-	default:
-		// Default human readable output
-		_ = cli.WriteOutput(cmd, []byte("Milestone Association Audit\n"))
-		_ = cli.WriteOutput(cmd, []byte("===========================\n"))
-		_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("Total Backlog Items: %d\n", total)))
-		_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("Linked Items:        %d\n", linked)))
-		_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("Unlinked Items:      %d\n", unlinkedCount)))
+
 		if fix {
-			_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("Fixed Items:         %d\n", fixedCount)))
+			result["fixed_items"] = fixedCount
 		} else if unlinkedCount > 0 {
-			_ = cli.WriteOutput(cmd, []byte("\nUnlinked Sample:\n"))
+			// Output up to 20 unlinked items
 			limit := unlinkedCount
 			if limit > 20 {
 				limit = 20
 			}
-			for i := 0; i < limit; i++ {
-				id, _ := unlinked[i][objects.FieldKeyID].(string)
-				title, _ := unlinked[i][objects.FieldKeyTitle].(string)
-				_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("  - %s: %s\n", id, title)))
-			}
-			if unlinkedCount > 20 {
-				_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("  ... and %d more\n", unlinkedCount-20)))
-			}
+			result["unlinked_sample"] = unlinked[:limit]
 		}
-		return nil
-	}
+
+		switch cli.GetFormat(cmd) {
+		case cli.FormatJSON, cli.FormatJSONL, cli.FormatYAML:
+			if err := cli.FormatOutput(cmd, result); err != nil {
+				logging.Fluent(logging.GetLoggerFromProfile(sess.Ctx.Profile)).Error("audit-milestones format output", err).Log()
+				return err
+			}
+			return nil
+		default:
+			// Default human readable output
+			_ = cli.WriteOutput(cmd, []byte("Milestone Association Audit\n"))
+			_ = cli.WriteOutput(cmd, []byte("===========================\n"))
+			_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("Total Backlog Items: %d\n", total)))
+			_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("Linked Items:        %d\n", linked)))
+			_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("Unlinked Items:      %d\n", unlinkedCount)))
+			if fix {
+				_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("Fixed Items:         %d\n", fixedCount)))
+			} else if unlinkedCount > 0 {
+				_ = cli.WriteOutput(cmd, []byte("\nUnlinked Sample:\n"))
+				limit := unlinkedCount
+				if limit > 20 {
+					limit = 20
+				}
+				for i := 0; i < limit; i++ {
+					id, _ := unlinked[i][objects.FieldKeyID].(string)
+					title, _ := unlinked[i][objects.FieldKeyTitle].(string)
+					_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("  - %s: %s\n", id, title)))
+				}
+				if unlinkedCount > 20 {
+					_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("  ... and %d more\n", unlinkedCount-20)))
+				}
+			}
+			return nil
+		}
 	})
 }

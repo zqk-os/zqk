@@ -17,4 +17,3 @@ func RunObjectValidationViaPipeline(ctx context.Context, h *ObjectValidationHand
 	}
 	return RunScheduledJobPipeline(ctx, h.logger, pipelineKindObjectValidation, job, h.executeObjectValidationCore)
 }
-

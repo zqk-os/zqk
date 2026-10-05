@@ -56,20 +56,20 @@ func TestAutoFixRuleLoader_DisabledAndMismatchedRules(t *testing.T) {
 		rules: []map[string]any{
 			{
 				"applies_to_kind":      "backlog_item",
-				"condition_category":  "validation",
+				"condition_category":   "validation",
 				"fix_command_template": "zqk object repair {object_id}",
-				"priority":            50,
-				"enabled":             false, // disabled
+				"priority":             50,
+				"enabled":              false, // disabled
 			},
 			{
 				"applies_to_kind":            "backlog_item",
-				"condition_category":        "validation",
-				"condition_tier":            2,
-				"condition_rule":            "R2",
+				"condition_category":         "validation",
+				"condition_tier":             2,
+				"condition_rule":             "R2",
 				"condition_message_contains": "specific error",
 				"fix_command_template":       "zqk system check {object_id} --auto-fix",
-				"priority":                  20,
-				"enabled":                   true,
+				"priority":                   20,
+				"enabled":                    true,
 			},
 		},
 	}

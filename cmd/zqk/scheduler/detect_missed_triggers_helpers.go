@@ -8,8 +8,6 @@ import (
 	schedpkg "github.com/zqk-os/zqk/pkg/scheduler"
 )
 
-
-
 // buildLastCompletionsMap builds a map of last completion times by job ID
 func buildLastCompletionsMap(activityEvents []jobActivityEvent) map[string]time.Time {
 	lastCompletions := make(map[string]time.Time)
@@ -103,7 +101,6 @@ func formatDurationShort(d time.Duration) string {
 func parseCronSchedule(scheduleExpr string) (cron.Schedule, error) {
 	return schedpkg.ParseCronSchedule(scheduleExpr)
 }
-
 
 // maxCronSlotsPerJob caps how many expected fire times we enumerate (safety bound for tight schedules).
 const maxCronSlotsPerJob = 4096

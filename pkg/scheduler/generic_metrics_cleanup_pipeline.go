@@ -20,4 +20,3 @@ func RunGenericMetricsCleanupViaPipeline(ctx context.Context, h *GenericMetricsC
 	ctx = storagepkg.WithCLIOperation(ctx)
 	return RunScheduledJobPipeline(ctx, h.logger, pipelineKindGenericMetricsCleanup, job, h.executeGenericMetricsCleanupCore)
 }
-

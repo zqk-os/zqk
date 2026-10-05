@@ -43,4 +43,3 @@ func TestCommandSpecParity(t *testing.T) {
 			len(coverage.SpecsWithoutCommands), coverage.SpecsWithoutCommands)
 	}
 }
-

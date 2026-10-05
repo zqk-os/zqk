@@ -56,10 +56,6 @@ func getActiveGoroutines() int64 {
 	return validation.GetActiveGoroutines()
 }
 
-
-
-
-
 // runCheckAsync runs system check with async validation
 func runCheckAsync(cmd *cobra.Command, args []string) error {
 	ctx, err := resolveSystemCliContextWithFallback(cmd)
@@ -501,8 +497,6 @@ func showValidationProgressWithMetrics(cmd *cobra.Command, ctx *cli.Context, val
 		}
 	}
 }
-
-
 
 // discoverObjectsParallel discovers objects in parallel across all kinds
 // Returns a channel that streams discovered files as they're found (for concurrent validation)
@@ -996,7 +990,6 @@ func scanObjectFiles(dir, kind string) ([]scannedFile, error) {
 func scanObjectFilesWithContext(ctx stdcontext.Context, dir, kind string, logger logging.Logger, storageProvider storage.ObjectStorageProvider) ([]scannedFile, error) {
 	return asynccheck.ScanObjectFilesWithContext(ctx, dir, kind, logger, storageProvider)
 }
-
 
 // scannedFile represents a scanned object file (aliased to asynccheck.ScannedFile)
 type scannedFile = asynccheck.ScannedFile

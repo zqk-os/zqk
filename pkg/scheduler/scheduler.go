@@ -13,7 +13,6 @@ import (
 	"sync"
 	"time"
 
-
 	"github.com/robfig/cron/v3"
 	"github.com/zqk-os/zqk/pkg/ambience"
 	"github.com/zqk-os/zqk/pkg/ambient"
@@ -698,7 +697,6 @@ func (s *Scheduler) Start(ctx context.Context) error {
 		}
 	}
 
-
 	// Contract-change shockwave: demote shovel_ready|execution_locked that fail new invariants.
 	// TRACK: follow-up in kernel backlog
 	if s.projectRoot != emptyValue && s.storage != nil {
@@ -990,4 +988,3 @@ func (s *Scheduler) CleanStaleLocks(threshold time.Duration) (int, error) {
 	}
 	return totalCleaned, nil
 }
-

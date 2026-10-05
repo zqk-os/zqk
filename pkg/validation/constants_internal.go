@@ -49,5 +49,4 @@ const (
 )
 
 // Message and fixture strings composition roots still alias.
-const (
-)
+const ()

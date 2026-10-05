@@ -50,7 +50,6 @@ func (p NotificationPriority) IsAtLeast(min NotificationPriority) bool {
 	return p.Level() >= min.Level()
 }
 
-
 const (
 	notificationEventCompleted    = "completed"
 	notificationEventFailed       = "failed"
@@ -98,7 +97,6 @@ func (nd *NotificationDisplay) Display(notif *JobNotification) {
 		nd.displayDesktopNotification(notif)
 	}
 }
-
 
 // logNotification logs the notification to the structured logger
 // DisplayTerminalNotification displays a notification in the terminal
@@ -221,7 +219,6 @@ func (nd *NotificationDisplay) displayDesktopNotification(notif *JobNotification
 		return
 	}
 
-
 	var cmd *exec.Cmd
 	title := notif.Title
 	body := notif.Message
@@ -265,9 +262,11 @@ func (nd *NotificationDisplay) displayDesktopNotification(notif *JobNotification
 	// Execute notification command (best effort - don't fail if it doesn't work)
 	if err := cmd.Run(); err != nil {
 		// Silently ignore - desktop notifications are optional
-		SchedulerNotificationsLog(nd.logger).Debug(LogEventSchedulerNotificationsDesktopDisplayFailed).
-			WithFields(append([]logging.Field{logging.String("os", runtime.GOOS)}, logErrField(err)...)...).
-			Log()
+		if nd != nil && nd.logger != nil {
+			SchedulerNotificationsLog(nd.logger).Debug(LogEventSchedulerNotificationsDesktopDisplayFailed).
+				WithFields(append([]logging.Field{logging.String("os", runtime.GOOS)}, logErrField(err)...)...).
+				Log()
+		}
 	}
 }
 

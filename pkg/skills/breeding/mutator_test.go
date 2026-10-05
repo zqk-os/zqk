@@ -10,13 +10,11 @@ import (
 	"github.com/zqk-os/zqk/pkg/llm"
 )
 
-
 type mockLLMClient struct {
 	llm.Client
 	response string
 	err      error
 }
-
 
 func (m *mockLLMClient) GenerateCompletion(ctx context.Context, prompt string, system string) (string, error) {
 	return m.response, m.err

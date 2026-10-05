@@ -7,8 +7,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/zqk-os/zqk/pkg/cliapp"
 	bldr_cli_cmd_v1 "github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 

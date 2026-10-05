@@ -123,4 +123,3 @@ func (i *memoryInbox) Reject(id string, reason string) error {
 		env.RejectReason = reason
 	})
 }
-

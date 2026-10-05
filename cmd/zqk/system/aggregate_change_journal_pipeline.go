@@ -53,49 +53,49 @@ func RunAggregateChangeJournalViaPipeline(cmd *cobra.Command, _ []string) error 
 
 	baseCtx, bldr := initAggregationPipelineBuilder(cmd, pipelineKindAggregateChangeJournal)
 	pl := bldr.AddStage("INGEST", func(pctx *pipeline.Context, _ any) (any, error) {
-			out := &aggregateChangeJournalPipelinePayload{cmd: cmd}
+		out := &aggregateChangeJournalPipelinePayload{cmd: cmd}
 
-			ctx := cli.GetContext(cmd)
-			if ctx == nil {
-				return nil, errfmt.Errorf("aggregate-change-journal: failed to get context")
-			}
-			out.ctx = ctx
+		ctx := cli.GetContext(cmd)
+		if ctx == nil {
+			return nil, errfmt.Errorf("aggregate-change-journal: failed to get context")
+		}
+		out.ctx = ctx
 
-			projectRoot := ProjectRootOrResolve(ctx.ProjectRoot)
-			if projectRoot == emptyValue {
-				return nil, errfmt.Errorf("aggregate-change-journal: project root not found")
-			}
-			var storageProvider storage.ObjectStorageProvider
-			var err error
-			if cmd != nil {
-				storageProvider, err = getStorageProvider(cmd, projectRoot)
-			} else {
-				storageProvider, err = getStorageProvider(nil, projectRoot)
-			}
-			if err != nil {
-				return nil, errfmt.Newf("aggregate-change-journal: failed to initialize storage").Wrap(err)
-			}
+		projectRoot := ProjectRootOrResolve(ctx.ProjectRoot)
+		if projectRoot == emptyValue {
+			return nil, errfmt.Errorf("aggregate-change-journal: project root not found")
+		}
+		var storageProvider storage.ObjectStorageProvider
+		var err error
+		if cmd != nil {
+			storageProvider, err = getStorageProvider(cmd, projectRoot)
+		} else {
+			storageProvider, err = getStorageProvider(nil, projectRoot)
+		}
+		if err != nil {
+			return nil, errfmt.Newf("aggregate-change-journal: failed to initialize storage").Wrap(err)
+		}
 
-			out.service = storage.NewChangeJournalAggregationService(storageProvider)
+		out.service = storage.NewChangeJournalAggregationService(storageProvider)
 
-			windowStart, windowEnd, err := parseTimeWindow(cmd)
-			if err != nil {
-				return nil, errfmt.Newf("aggregate-change-journal: failed to parse time window").Wrap(err)
-			}
-			out.windowStart = windowStart
-			out.windowEnd = windowEnd
+		windowStart, windowEnd, err := parseTimeWindow(cmd)
+		if err != nil {
+			return nil, errfmt.Newf("aggregate-change-journal: failed to parse time window").Wrap(err)
+		}
+		out.windowStart = windowStart
+		out.windowEnd = windowEnd
 
-			profile := systemProfileSystem
-			if ctx.Profile != emptyValue {
-				profile = ctx.Profile
-			}
-			out.logger = logging.GetLoggerFromProfile(profile)
+		profile := systemProfileSystem
+		if ctx.Profile != emptyValue {
+			profile = ctx.Profile
+		}
+		out.logger = logging.GetLoggerFromProfile(profile)
 
-			out.secCtx = pkgctx.NewSystemSecurityContext()
-			out.storageCtx = pkgctx.NewStorageContext()
+		out.secCtx = pkgctx.NewSystemSecurityContext()
+		out.storageCtx = pkgctx.NewStorageContext()
 
-			return out, nil
-		}).
+		return out, nil
+	}).
 		AddStage("NORMALIZE", func(pctx *pipeline.Context, payload any) (any, error) {
 			in, ok := nildecode.DecodeNonNilPayload[*aggregateChangeJournalPipelinePayload](payload)
 			if !ok {

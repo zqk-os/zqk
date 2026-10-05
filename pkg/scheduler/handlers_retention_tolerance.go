@@ -754,4 +754,3 @@ func buildStatusExclusionFilter(protectStatuses []string) map[string]any {
 	}
 	return filters
 }
-

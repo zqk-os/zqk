@@ -17,4 +17,3 @@ func RunLifecycleCheckViaPipeline(ctx context.Context, h *LifecycleCheckHandler,
 	}
 	return RunScheduledJobPipeline(ctx, h.logger, pipelineKindLifecycleCheck, job, h.executeLifecycleCheckCore)
 }
-

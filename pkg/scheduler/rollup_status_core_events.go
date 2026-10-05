@@ -9,7 +9,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-
 // rollupStatusCoreEventsMu serializes appends to rollup_status_core.jsonl (convergence CLI rollup runs).
 var rollupStatusCoreEventsMu sync.Mutex
 
@@ -38,4 +37,3 @@ func AppendRollupStatusCoreEvent(projectRoot, convergenceSessionID string, rollu
 	defer rollupStatusCoreEventsMu.Unlock()
 	_ = fileutil.AppendJSONLine(path, entry)
 }
-

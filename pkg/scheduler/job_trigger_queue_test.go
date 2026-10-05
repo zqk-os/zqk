@@ -743,4 +743,3 @@ func TestJobTriggerQueue_GetTriggerQueueMutex(t *testing.T) {
 	}
 	wg.Wait()
 }
-

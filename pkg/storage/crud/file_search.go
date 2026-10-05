@@ -14,7 +14,6 @@ import (
 )
 
 // Search performs full-text search across objects (file backend)
-//
 func SearchObjects(ctx context.Context, secCtx *pkgctx.SecurityContext, storageCtx *pkgctx.StorageContext, query SearchQuery, listFn func(context.Context, *pkgctx.SecurityContext, *pkgctx.StorageContext, ListFilter) (*QueryResult, error), permFn func(*pkgctx.SecurityContext, string, string) error) (*SearchResult, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err

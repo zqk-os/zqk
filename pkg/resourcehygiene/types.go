@@ -20,12 +20,12 @@ type IOResourceTelemetry struct {
 	VolumeTotalBytes     uint64                      `json:"volume_total_bytes"`
 	VolumeAvailableBytes uint64                      `json:"volume_available_bytes"`
 	ZqkChildren          map[string]ChildFolderUsage `json:"zqk_children,omitempty"`
-	StaleLocksCount       int                         `json:"stale_locks_count"`
-	OrphanedTempCount     int                         `json:"orphaned_temp_count"`
-	OrphanedProcessCount  int                         `json:"orphaned_process_count"`
-	StaleLockPaths        []string                    `json:"stale_lock_paths,omitempty"`
-	OrphanedTempPaths     []string                    `json:"orphaned_temp_paths,omitempty"`
-	OrphanedProcesses     []string                    `json:"orphaned_processes,omitempty"`
+	StaleLocksCount      int                         `json:"stale_locks_count"`
+	OrphanedTempCount    int                         `json:"orphaned_temp_count"`
+	OrphanedProcessCount int                         `json:"orphaned_process_count"`
+	StaleLockPaths       []string                    `json:"stale_lock_paths,omitempty"`
+	OrphanedTempPaths    []string                    `json:"orphaned_temp_paths,omitempty"`
+	OrphanedProcesses    []string                    `json:"orphaned_processes,omitempty"`
 }
 
 // HygieneOptions configures automated cleanup execution.

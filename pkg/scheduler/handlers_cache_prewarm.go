@@ -116,7 +116,6 @@ func (h *CachePrewarmHandler) runParallelTier(ctx context.Context, jobID string,
 	tierCtx, cancel := newTierContext(ctx, defaultTimeout, buffer)
 	defer cancel()
 
-
 	var wg sync.WaitGroup
 	for _, task := range tasks {
 		t := task

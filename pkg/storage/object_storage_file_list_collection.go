@@ -312,15 +312,15 @@ func (f *FileObjectStorage) collectFilePathsUsingStrategy(ctx context.Context, _
 
 		// For time-based strategies with timeRange, filter by bucket
 		if timeRange != nil {
-				// Extract bucket key from path to check if it's in range
-				// The path structure is: kindDir/bucketKey/file.yaml
-				relPath, err := filepath.Rel(kindDir, filepath.Dir(path))
-				if err == nil && relPath != "." {
-					// Check if this bucket is in the time range
-					// For chrono strategies, bucket key is a date string
-					if !f.isBucketInTimeRange(relPath, timeRange) {
-						return nil // Skip files outside time range
-					}
+			// Extract bucket key from path to check if it's in range
+			// The path structure is: kindDir/bucketKey/file.yaml
+			relPath, err := filepath.Rel(kindDir, filepath.Dir(path))
+			if err == nil && relPath != "." {
+				// Check if this bucket is in the time range
+				// For chrono strategies, bucket key is a date string
+				if !f.isBucketInTimeRange(relPath, timeRange) {
+					return nil // Skip files outside time range
+				}
 			}
 		}
 

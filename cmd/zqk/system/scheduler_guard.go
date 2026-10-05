@@ -21,10 +21,10 @@ const (
 )
 
 var (
-	schedulerRunningForRoot            = schedulerpkg.IsSchedulerRunningForRoot
-	schedulerRunningChecker            = schedulerRunningForRoot
+	schedulerRunningForRoot             = schedulerpkg.IsSchedulerRunningForRoot
+	schedulerRunningChecker             = schedulerRunningForRoot
 	resolveProjectRootForSchedulerGuard = cli.ResolveProjectRoot
-	evaluateSchedulerGuard             = schedulerpkg.EvaluateSchedulerGuard
+	evaluateSchedulerGuard              = schedulerpkg.EvaluateSchedulerGuard
 )
 
 func requirementForSystemCommand(name string) schedulerCommandRequirement {

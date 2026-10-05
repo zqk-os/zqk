@@ -293,4 +293,3 @@ func TestScheduler_CleanStaleLocks(t *testing.T) {
 		t.Fatalf("expected lock file to be removed, got err: %v", err)
 	}
 }
-

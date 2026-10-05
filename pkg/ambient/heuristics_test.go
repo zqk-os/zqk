@@ -145,4 +145,3 @@ func TestCoachHeuristics_CommandTimeout(t *testing.T) {
 		t.Errorf("Expected command_timeout telemetry event to be published")
 	}
 }
-

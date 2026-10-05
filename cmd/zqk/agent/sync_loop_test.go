@@ -314,4 +314,3 @@ func TestApplyStateMutation_ErrorPropagation(t *testing.T) {
 		t.Fatal("expected error from applyStateMutation with non-existent object, got nil")
 	}
 }
-

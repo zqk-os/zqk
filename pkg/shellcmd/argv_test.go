@@ -98,4 +98,3 @@ func TestResolveShell(t *testing.T) {
 		t.Errorf("ResolveShell(windows, comspec) = (%s, %s), want (C:\\Windows\\System32\\cmd.exe, %s)", path, flag, ShellFlagCWindows)
 	}
 }
-

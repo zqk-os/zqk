@@ -17,4 +17,3 @@ func RunCleanupConfigViaPipeline(ctx context.Context, h *CleanupConfigHandler, j
 	}
 	return RunScheduledJobPipeline(ctx, h.logger, pipelineKindCleanupConfig, job, h.executeCleanupConfigCore)
 }
-

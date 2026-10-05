@@ -441,4 +441,3 @@ func ReapOrphanedProcesses(projectRoot string, dryRun bool) (int, []string, erro
 
 	return count, reaped, nil
 }
-

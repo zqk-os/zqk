@@ -488,6 +488,3 @@ func TestReverseReferenceIndex_SaveCache_LockContention_PropagatesError(t *testi
 		t.Errorf("expected error to mention 'lock timeout', got: %v", err)
 	}
 }
-
-
-

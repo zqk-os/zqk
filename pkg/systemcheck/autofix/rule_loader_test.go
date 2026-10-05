@@ -36,20 +36,20 @@ func TestAutoFixRuleLoader_GetFixCommand(t *testing.T) {
 		rules: []map[string]any{
 			{
 				"applies_to_kind":            "backlog_item",
-				"condition_category":        "validation",
-				"condition_tier":            1,
-				"condition_rule":            "CRI-SHOVEL-READY",
+				"condition_category":         "validation",
+				"condition_tier":             1,
+				"condition_rule":             "CRI-SHOVEL-READY",
 				"condition_message_contains": "missing persona",
 				"fix_command_template":       "zqk object update {object_id} --field persona=PER-COMMUNITY",
-				"priority":                  10,
-				"enabled":                   true,
+				"priority":                   10,
+				"enabled":                    true,
 			},
 			{
 				"applies_to_kind":      "backlog_item",
-				"condition_category":  "validation",
+				"condition_category":   "validation",
 				"fix_command_template": "zqk object repair {object_id}",
-				"priority":            50,
-				"enabled":             true,
+				"priority":             50,
+				"enabled":              true,
 			},
 		},
 	}

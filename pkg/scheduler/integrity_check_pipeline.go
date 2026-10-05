@@ -17,4 +17,3 @@ func RunIntegrityCheckViaPipeline(ctx context.Context, h *IntegrityCheckHandler,
 	}
 	return RunScheduledJobPipeline(ctx, h.logger, pipelineKindIntegrityCheck, job, h.executeIntegrityCheckCore)
 }
-

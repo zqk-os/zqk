@@ -61,21 +61,18 @@ func TestFluentUnlevelledPanics(t *testing.T) {
 	var buf bytes.Buffer
 	logger := NewLogger(&buf, InfoLevel, NewTextFormatter(pkgctx.NewSystemContext()))
 
-	defer func() {
-		if r := recover(); r == nil {
-			t.Errorf("expected panic for unlevelled log entry")
-		} else {
-			errStr, ok := r.(string)
-			if !ok || !strings.Contains(errStr, "unlevelled log entry") {
-				t.Errorf("expected unlevelled log entry panic, got: %v", r)
-			}
-		}
-	}()
-
-	// Intentionally missing a level
+	// Intentionally missing a level - per TDE-F-CQ-005, do not crash daemons; fallback to Info with log_warning field
 	e := &fluentEntry{
 		logger: logger,
-		msg:    "this should panic",
+		msg:    "unlevelled message",
 	}
 	e.Log()
+
+	out := buf.String()
+	if !strings.Contains(out, "unlevelled message") {
+		t.Fatalf("expected log output to contain message, got: %s", out)
+	}
+	if !strings.Contains(out, "unlevelled_entry_defaulted_to_info") {
+		t.Fatalf("expected log output to contain unlevelled warning field, got: %s", out)
+	}
 }

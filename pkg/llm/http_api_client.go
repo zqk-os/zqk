@@ -66,4 +66,3 @@ func executeHTTPRequest(client specbuilder.APIClient, req *http.Request) (*http.
 	}
 	return resp, nil
 }
-

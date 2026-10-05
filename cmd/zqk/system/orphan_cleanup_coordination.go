@@ -84,4 +84,3 @@ func resolveOrphanCleanupEventType(status, operationType string, failureCount in
 		return "orphan_cleanup_complete"
 	}
 }
-

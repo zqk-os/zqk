@@ -143,7 +143,6 @@ func findCLIProfilesDir() string {
 	return paths.FirstExistingFromCwd(paths.CLIProfilesDir)
 }
 
-
 // ClearCache clears the profile cache
 func (pl *ProfileLoader) ClearCache() {
 	pl.cache.Reset()

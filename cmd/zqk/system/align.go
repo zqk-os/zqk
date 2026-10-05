@@ -3,9 +3,9 @@ package system
 import (
 	"fmt"
 
-	"github.com/zqk-os/zqk/pkg/cliapp"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -96,92 +96,92 @@ func runAlign(cmd *cobra.Command, gapsOnly bool, goalID string, scoreOnly bool, 
 				SortBy:  "id",
 				SortAsc: true,
 			})
-		goalIDs = make(map[string]bool)
-		for _, obj := range goalList.Objects {
-			if id, ok := obj[objects.FieldKeyID].(string); ok {
-				goalIDs[id] = true
+			goalIDs = make(map[string]bool)
+			for _, obj := range goalList.Objects {
+				if id, ok := obj[objects.FieldKeyID].(string); ok {
+					goalIDs[id] = true
+				}
 			}
 		}
-	}
 
-	// Classify backlog items: with goal refs vs without (gaps)
-	var withGoals, withoutGoals []map[string]any
-	for _, obj := range listResult.Objects {
-		refs := GoalRefsFromObject(obj)
-		if goalID != emptyValue {
-			if refs[goalID] {
+		// Classify backlog items: with goal refs vs without (gaps)
+		var withGoals, withoutGoals []map[string]any
+		for _, obj := range listResult.Objects {
+			refs := GoalRefsFromObject(obj)
+			if goalID != emptyValue {
+				if refs[goalID] {
+					withGoals = append(withGoals, obj)
+				}
+				continue
+			}
+			if len(refs) == 0 {
+				withoutGoals = append(withoutGoals, obj)
+			} else {
 				withGoals = append(withGoals, obj)
 			}
-			continue
 		}
-		if len(refs) == 0 {
-			withoutGoals = append(withoutGoals, obj)
+
+		total := len(listResult.Objects)
+		withCount := len(withGoals)
+		var gapCount int
+		if goalID != emptyValue {
+			gapCount = total - withCount // items not aligned to this goal
 		} else {
-			withGoals = append(withGoals, obj)
+			gapCount = len(withoutGoals)
 		}
-	}
+		var coveragePct float64
+		if total > 0 {
+			coveragePct = 100 * float64(withCount) / float64(total)
+		}
+		// BLI-781: alignment score 0-100 (currently goal-work coverage; extensible to stakeholder/policy/context)
+		alignmentScore := RoundTwo(coveragePct)
 
-	total := len(listResult.Objects)
-	withCount := len(withGoals)
-	var gapCount int
-	if goalID != emptyValue {
-		gapCount = total - withCount // items not aligned to this goal
-	} else {
-		gapCount = len(withoutGoals)
-	}
-	var coveragePct float64
-	if total > 0 {
-		coveragePct = 100 * float64(withCount) / float64(total)
-	}
-	// BLI-781: alignment score 0-100 (currently goal-work coverage; extensible to stakeholder/policy/context)
-	alignmentScore := RoundTwo(coveragePct)
-
-	result := map[string]any{
-		"alignment": map[string]any{
-			"goal_work": map[string]any{
-				"total_work_items":    total,
-				"items_with_goals":    withCount,
-				"items_without_goals": gapCount,
-				"goal_coverage_pct":   RoundTwo(coveragePct),
+		result := map[string]any{
+			"alignment": map[string]any{
+				"goal_work": map[string]any{
+					"total_work_items":    total,
+					"items_with_goals":    withCount,
+					"items_without_goals": gapCount,
+					"goal_coverage_pct":   RoundTwo(coveragePct),
+				},
+				"alignment_score": alignmentScore,
 			},
 			"alignment_score": alignmentScore,
-		},
-		"alignment_score": alignmentScore,
-		"goals_count":     len(goalIDs),
-	}
+			"goals_count":     len(goalIDs),
+		}
 
-	if goalID != emptyValue {
-		result["goal_filter"] = goalID
-		result["aligned_items"] = withGoals
-	}
-	if gapsOnly {
 		if goalID != emptyValue {
-			result["gaps"] = nil // when filtering by goal, "gaps" are implicit (aligned_items vs all)
-		} else {
-			result["gaps"] = withoutGoals
+			result["goal_filter"] = goalID
+			result["aligned_items"] = withGoals
 		}
-	} else if goalID == emptyValue {
-		result["gaps_sample"] = TruncateGaps(withoutGoals, 20)
-	}
-
-	if scoreOnly {
-		// Output only the numeric score for scripting/dashboards
-		return cli.WriteOutput(cmd, []byte(fmt.Sprintf("%.1f\n", alignmentScore)))
-	}
-
-	if dashboard {
-		return OutputAlignDashboard(cmd, result, alignmentScore, total, withCount, gapCount, len(goalIDs))
-	}
-
-	switch cli.GetFormat(cmd) {
-	case cli.FormatJSON, cli.FormatJSONL, cli.FormatYAML:
-		if err := cli.FormatOutput(cmd, result); err != nil {
-			logging.Fluent(logging.GetLoggerFromProfile(sess.Ctx.Profile)).Error("align format output", err).Log()
-			return err
+		if gapsOnly {
+			if goalID != emptyValue {
+				result["gaps"] = nil // when filtering by goal, "gaps" are implicit (aligned_items vs all)
+			} else {
+				result["gaps"] = withoutGoals
+			}
+		} else if goalID == emptyValue {
+			result["gaps_sample"] = TruncateGaps(withoutGoals, 20)
 		}
-		return nil
-	default:
-		return OutputAlignTable(cmd, result, gapsOnly, goalID)
-	}
+
+		if scoreOnly {
+			// Output only the numeric score for scripting/dashboards
+			return cli.WriteOutput(cmd, []byte(fmt.Sprintf("%.1f\n", alignmentScore)))
+		}
+
+		if dashboard {
+			return OutputAlignDashboard(cmd, result, alignmentScore, total, withCount, gapCount, len(goalIDs))
+		}
+
+		switch cli.GetFormat(cmd) {
+		case cli.FormatJSON, cli.FormatJSONL, cli.FormatYAML:
+			if err := cli.FormatOutput(cmd, result); err != nil {
+				logging.Fluent(logging.GetLoggerFromProfile(sess.Ctx.Profile)).Error("align format output", err).Log()
+				return err
+			}
+			return nil
+		default:
+			return OutputAlignTable(cmd, result, gapsOnly, goalID)
+		}
 	})
 }

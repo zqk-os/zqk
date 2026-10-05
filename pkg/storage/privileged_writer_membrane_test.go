@@ -283,4 +283,3 @@ func TestPrivilegedWriter_StaleDeadSocketUnlinkedAndAllowsLocalWrite(t *testing.
 		t.Fatal("expected local write to be allowed in Mode A after dead socket cleanup")
 	}
 }
-

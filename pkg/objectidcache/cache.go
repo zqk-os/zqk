@@ -495,15 +495,15 @@ func (c *ObjectIDCache) withRLockTimeout(lockName string, fn func() error) error
 func (c *ObjectIDCache) kindNamesForReverseReferenceScan() []string {
 	var kinds []string
 	_ = c.withRLockTimeout(LockNameObjectIDCacheKindNamesForReverseRef, func() error {
-			if len(c.byKind) == 0 {
-				return nil
-			}
-			kinds = make([]string, 0, len(c.byKind))
-			for k := range c.byKind {
-				kinds = append(kinds, k)
-			}
+		if len(c.byKind) == 0 {
 			return nil
-		},
+		}
+		kinds = make([]string, 0, len(c.byKind))
+		for k := range c.byKind {
+			kinds = append(kinds, k)
+		}
+		return nil
+	},
 	)
 	return kinds
 }

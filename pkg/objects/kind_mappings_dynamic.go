@@ -535,4 +535,3 @@ func findProcessDir() string {
 
 	return paths.FirstExistingFromCwd(paths.ProcessInternalDir)
 }
-

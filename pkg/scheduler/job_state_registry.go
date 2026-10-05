@@ -517,7 +517,6 @@ func (r *JobStateRegistry) GetExecutionState(jobID string) (*JobExecutionState, 
 		}
 	}
 
-
 	return nil, nil
 }
 
@@ -713,7 +712,6 @@ func (r *JobStateRegistry) DeferExecution(jobID, reason string, deferUntil *time
 				break
 			}
 		}
-
 
 		if target == nil {
 			return nil

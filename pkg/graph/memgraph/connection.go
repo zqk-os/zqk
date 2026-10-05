@@ -111,8 +111,6 @@ func (c *memgraphConnection) queryRecords(ctx context.Context, query string, par
 	return c.executeBoltQuery(ctx, query, params)
 }
 
-
-
 // Reset implements ConnectionWrapper.Reset
 // BaseConnection.Reset() is called automatically, but we can add provider-specific reset logic here
 func (c *memgraphConnection) Reset() {

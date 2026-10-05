@@ -24,7 +24,6 @@ type AutoFixContext struct {
 	HashMismatches   []HashMismatchInfo // Collect hash mismatches for batch processing
 }
 
-
 // initializeAutoFixContext sets up the auto-fix context
 func initializeAutoFixContext(ctx *cli.Context, cmd *cobra.Command, obj *parser.ParsedObject, filePath, kind string, hashRegistryCache *HashRegistryCacheType, objectIDCache *ObjectIDCache) *AutoFixContext {
 	logger := logging.GetLoggerFromProfile(ctx.Profile)

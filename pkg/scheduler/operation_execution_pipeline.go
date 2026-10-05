@@ -17,4 +17,3 @@ func RunOperationExecutionViaPipeline(ctx context.Context, h *OperationExecution
 	}
 	return RunScheduledJobPipeline(ctx, h.logger, pipelineKindOperationExecution, job, h.executeOperationExecutionCore)
 }
-

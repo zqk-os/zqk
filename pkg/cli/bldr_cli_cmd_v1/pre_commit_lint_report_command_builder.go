@@ -2,8 +2,8 @@ package bldr_cli_cmd_v1
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/zqk-os/zqk/pkg/cliapp"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 )
 
 // NewPreCommitLintReportCommandBuilder creates a new pre_commit_lint_report command

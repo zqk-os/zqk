@@ -131,20 +131,20 @@ func dispatchPeerWake(
 			mcpSubscribersProbed = probe.SubscribersProbed
 			mcpSubscribers = probe.SubscriberCount
 			if probe.PublishErr == nil {
-				logging.Fluent(logger).Info("feed " + opName + " MCP daemon IPC wake delivered").
+				logging.Fluent(logger).Info("feed "+opName+" MCP daemon IPC wake delivered").
 					String("event_id", res.EventID).
 					Log()
 			} else {
-				logging.Fluent(logger).Warn("feed " + opName + " MCP daemon IPC publish failed; continuing with wake script").
+				logging.Fluent(logger).Warn("feed "+opName+" MCP daemon IPC publish failed; continuing with wake script").
 					String("error", probe.PublishErr.Error()).
 					Log()
 			}
 			if probe.QueryErr != nil {
-				logging.Fluent(logger).Warn("feed " + opName + " MCP subscriber count query failed").
+				logging.Fluent(logger).Warn("feed "+opName+" MCP subscriber count query failed").
 					String("error", probe.QueryErr.Error()).
 					Log()
 			} else if probe.SubscribersProbed {
-				logging.Fluent(logger).Info("feed " + opName + " MCP subscriber count").
+				logging.Fluent(logger).Info("feed "+opName+" MCP subscriber count").
 					Int("subscriber_count", probe.SubscriberCount).
 					Log()
 			}
@@ -164,14 +164,14 @@ func dispatchPeerWake(
 		wakePtr = &wake
 		if unrepaired, reason, detail := agentfeed.IsUnrepairedWake(wake); unrepaired {
 			_ = agentfeed.AlertUnrepairedWake(res.EventID, detail, reason)
-			logging.Fluent(logger).Warn("feed " + opName + " peer wake unrepaired (event still appended; human alerted)").
+			logging.Fluent(logger).Warn("feed "+opName+" peer wake unrepaired (event still appended; human alerted)").
 				String("reason", string(reason)).
 				String("detail", detail).
 				String("transport", wake.Transport).
 				Path(wake.Script).
 				Log()
 		} else if wake.Attempted {
-			logging.Fluent(logger).Info("feed " + opName + " peer wake attempted").
+			logging.Fluent(logger).Info("feed "+opName+" peer wake attempted").
 				Path(wake.Script).
 				String("transport", wake.Transport).
 				String("delivery_receipt", fmt.Sprintf("%v", wake.DeliveryReceipt)).
@@ -179,7 +179,7 @@ func dispatchPeerWake(
 				Log()
 		}
 	} else if zqkenv.IsCommunityEdition && !noWake && agentfeed.ShouldWakePeer(res.DeliveryMode) {
-		logging.Fluent(logger).Info("feed " + opName + ": community edition skips Studio mesh wake membrane").
+		logging.Fluent(logger).Info("feed "+opName+": community edition skips Studio mesh wake membrane").
 			String("delivery_mode", res.DeliveryMode).
 			Log()
 	}
@@ -285,4 +285,3 @@ func parsePersonaEventFlags(cmd *cobra.Command, flags *clipkg.FlagBag) (personaE
 	}
 	return p, nil
 }
-

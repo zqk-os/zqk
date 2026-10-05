@@ -10,7 +10,6 @@ import (
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
-
 const pipelineKindAggregationMetricsCleanup = "aggregation_metrics_cleanup"
 
 // RunAggregationMetricsCleanupViaPipeline runs aggregation metrics cleanup through the pipeline (INGEST → NORMALIZE → FINALIZE).
@@ -21,4 +20,3 @@ func RunAggregationMetricsCleanupViaPipeline(ctx context.Context, h *Aggregation
 	ctx = storagepkg.WithCLIOperation(ctx)
 	return RunScheduledJobPipeline(ctx, h.logger, pipelineKindAggregationMetricsCleanup, job, h.executeAggregationMetricsCleanupCore)
 }
-

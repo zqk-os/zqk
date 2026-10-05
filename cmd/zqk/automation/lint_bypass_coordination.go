@@ -108,7 +108,6 @@ func emitLintBypassAuditEventViaCoordinator(
 		})
 }
 
-
 // minInt returns the minimum of two integers
 func minInt(a, b int) int {
 	if a < b {

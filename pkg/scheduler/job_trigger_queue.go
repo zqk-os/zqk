@@ -196,7 +196,6 @@ func (q *JobTriggerQueue) withLockedQueue(fn func(requests []JobTriggerRequest) 
 	})
 }
 
-
 // EnqueueLifecycleTrigger adds a lifecycle trigger request to the queue.
 func (q *JobTriggerQueue) EnqueueLifecycleTrigger(kind, fromState, toState string, objectData map[string]any) error {
 	err := q.withLockedQueue(func(requests []JobTriggerRequest) ([]JobTriggerRequest, error) {
@@ -535,7 +534,6 @@ func (q *JobTriggerQueue) HasPendingTriggerWithOrigin(jobID, triggerOrigin strin
 	})
 	return found, err
 }
-
 
 // writeQueue writes the trigger queue to disk
 func (q *JobTriggerQueue) writeQueue(requests []JobTriggerRequest) error {

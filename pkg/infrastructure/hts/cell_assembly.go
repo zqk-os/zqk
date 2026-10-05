@@ -118,4 +118,3 @@ func computeMerkleRootHash(hashes []string) string {
 	}
 	return fmt.Sprintf("%x", sha256.Sum256([]byte(sb.String())))
 }
-

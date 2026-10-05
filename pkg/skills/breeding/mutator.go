@@ -13,7 +13,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 )
 
-
 // LLMSkillMutator implements MutationProvider by prompting an LLM client
 // to refactor and optimize underperforming skill instructions or Go code based on feedback.
 type LLMSkillMutator struct {
@@ -75,8 +74,6 @@ func (m *LLMSkillMutator) MutateSkill(ctx context.Context, originalFilePath stri
 	if err := os.WriteFile(newPath, []byte(mutatedContent), paths.FilePerm644); err != nil {
 		return "", fmt.Errorf("write mutated skill %s: %w", newPath, err)
 	}
-
-
 
 	return newPath, nil
 }
