@@ -47,7 +47,7 @@ Flags:
       --columns string          Override column widths for table output (format: field:width)
       --dry-run                 Show what would be done without actually doing it
       --file string             Path to YAML file containing an array of IDs
-  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
       --ids string              Comma-separated list of object IDs
       --ignore-scheduler-down   Ignore scheduler down warning/lockdown
   -o, --output string           Write output to file

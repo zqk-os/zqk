@@ -10,6 +10,19 @@ The update data can be provided via:
   - --field: Update a single field (format: field=value, can be used multiple times)
   - --auto-status: Advance to the next lifecycle-valid status (trait-gated)
 
+Flags:
+    --auto-status
+      Advance status to the next lifecycle-valid status for this object kind
+    --data <string>
+      Inline YAML data for updates
+    --dry-run
+      Show what would be updated without actually updating
+    --field <stringArray> (default: [])
+      Update a field (field=value). Parses as JSON when valid, else literal
+      string. Repeatable.
+    --file <string>
+      Path to YAML file containing update data
+
   Update a built-in component type
   zqk internal update COMP-TYPE-001 --field title="Updated Title"
   Update from file
@@ -29,7 +42,7 @@ Flags:
       --dry-run                 Show what would be updated without actually updating
       --field stringArray       Update a field (field=value). Parses as JSON when valid, else literal string. Repeatable.
       --file string             Path to YAML file containing update data
-  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
       --ignore-scheduler-down   Ignore scheduler down warning/lockdown
   -o, --output string           Write output to file
   -q, --quiet                   Suppress non-essential output

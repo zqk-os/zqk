@@ -26,7 +26,7 @@ Usage:
 Flags:
       --columns string          Override column widths for table output (format: field:width)
       --dashboard               Show comprehensive alignment dashboard (score, goal coverage, and metrics)
-  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
       --gaps                    Show only items without goal alignment
       --goal string             Filter by goal ID (e.g. GOAL-001); show only work aligned to this goal
       --ignore-scheduler-down   Ignore scheduler down warning/lockdown

@@ -16,7 +16,7 @@ Flags:
       --count                   Only return the count of matching objects (no object details)
       --fields stringArray      Keys to include per object (repeat or comma-separated); omit for full rows. Sort/group columns merge automatically. Put -h/--help before --fields so a value like '-h' is not parsed as a flag.
       --filter stringArray      Filter by field (format: field=value or field:value, can be used multiple times)
-  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
       --group-by string         Field to group results by
       --group-limit int         Maximum items per group when using --group-by (0 = no limit)
       --ignore-scheduler-down   Ignore scheduler down warning/lockdown

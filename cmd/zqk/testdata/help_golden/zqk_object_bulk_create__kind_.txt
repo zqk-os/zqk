@@ -37,7 +37,7 @@ Flags:
       --fields stringArray      Top-level keys per successful object in output (hybrid projection; post-create).
       --file string             Path to YAML file containing array of objects (required)
       --force                   Force mode: update existing objects instead of failing if they already exist
-  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
       --ignore-scheduler-down   Ignore scheduler down warning/lockdown
   -o, --output string           Write output to file
   -q, --quiet                   Suppress non-essential output

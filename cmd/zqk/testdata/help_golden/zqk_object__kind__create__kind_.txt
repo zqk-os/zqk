@@ -43,7 +43,7 @@ Flags:
       --field stringArray       Field to set in the format key=value (can be specified multiple times)
       --file string             Path to YAML file containing object data
       --force                   Force overwrite existing object (update instead of fail if object already exists)
-  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
       --ignore-scheduler-down   Ignore scheduler down warning/lockdown
   -i, --interactive             Launch interactive wizard to create object
       --keep-file               Keep temporary scratch file after creation (files matching tmp-*.yaml are removed by default)

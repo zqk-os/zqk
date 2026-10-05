@@ -27,7 +27,8 @@ Flags:
       --agent-id string     Optional seat id for audit/correlation only; authorization is RBAC on the authenticated account
       --all                 Required to apply deletes across the matched set (fail closed without this or --max+filters)
       --dry-run             List matching drafts without deleting (default true)
-  -f, --format string       Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+      --force               Force sweep in local developer workspaces without ACC account
+  -f, --format string       Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
       --id-prefix string    Only ids with this prefix
       --kind string         Limit to one object kind directory under object_drafts
       --max int             Optional cap on deletions / would-delete listings

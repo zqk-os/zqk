@@ -63,6 +63,7 @@ Available Commands:
   recover-cas                    Recover CAS objects with missing files
   repair-cas-corruption          Repair CAS filename/content hash mismatches (Tier-1 integrity blockers)
   resource-hygiene               Inspect and enforce I/O resource hygiene, file retention, stale lock reaping, and temp artifact cleanup
+  restart                        Restart all ZQK daemons cleanly
   retention-tolerance            Run retention tolerance (archive and cleanup by age and max_count)
   seal-skill                     Generate or verify the cryptographic seal for a skill pack
   seed-default-agent-seating     Idempotent seed of PER-DEFAULT-* personas and feed correspondence skill

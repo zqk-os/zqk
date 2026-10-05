@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/zqk-os/zqk/cmd/zqk/object"
 	"github.com/zqk-os/zqk/pkg/accumulator"
@@ -35,9 +36,11 @@ func TestNewDaemonCmd(t *testing.T) {
 func TestDaemon_AccumulatorSupervision(t *testing.T) {
 	tempDir := t.TempDir()
 	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 
 	subs := accumulator.StartAllSubscribers(ctx, tempDir)
 	// Even in unit test context, start subscribers must execute safely
 	_ = subs
+
+	cancel()
+	time.Sleep(100 * time.Millisecond)
 }

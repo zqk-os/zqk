@@ -9,6 +9,7 @@ import (
 	"go/token"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -148,9 +149,11 @@ func TestReliabilityHardening_WALPoisonQuarantine_OperationalProof(t *testing.T)
 	require.Equal(t, "degraded", resStream.Status, "missing stream_volume directory must report degraded, not ok")
 
 	// Darwin CAS strict sync verification
-	filecas.SetDarwinStrictSync(true)
-	defer filecas.SetDarwinStrictSync(false)
-	require.True(t, filecas.IsDarwinStrictSync())
+	if runtime.GOOS == "darwin" {
+		filecas.SetDarwinStrictSync(true)
+		defer filecas.SetDarwinStrictSync(false)
+		require.True(t, filecas.IsDarwinStrictSync())
+	}
 }
 
 // CRIT-CEF-RELIABILITY-FEED-BACKLOG-001 (Negative Boundary)

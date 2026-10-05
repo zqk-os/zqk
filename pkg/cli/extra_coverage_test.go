@@ -1665,8 +1665,18 @@ func TestOverrideFriction_Comprehensive(t *testing.T) {
 	stop := pulseMeaningfulActivityWhileWaiting()
 	stop()
 
-	// Check 2: Reason code too short
+	// Check 1: CI environment block
+	t.Setenv("CI", "true")
 	err := EnforceOverrideFriction(cmd, ctx, nil, nil, "OBJ-1", "backlog_item", "too short")
+	if err == nil || !strings.Contains(err.Error(), "manual overrides are completely blocked in CI environments") {
+		t.Errorf("expected CI block error, got: %v", err)
+	}
+
+	// Unset CI for remaining checks
+	t.Setenv("CI", "")
+
+	// Check 2: Reason code too short
+	err = EnforceOverrideFriction(cmd, ctx, nil, nil, "OBJ-1", "backlog_item", "too short")
 	if err == nil || !strings.Contains(err.Error(), "--reason-code must be a descriptive justification") {
 		t.Errorf("expected reason code length error, got: %v", err)
 	}

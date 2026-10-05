@@ -28,7 +28,7 @@ Flags:
       --batch-size int            Max objects per batch (0 = use default or BATCH_SIZE env; use 5000+ for aggressive one-off)
       --bulk-delete-workers int   Parallel delete workers (0 = use default or BULK_DELETE_WORKERS env; max 64)
       --columns string            Override column widths for table output (format: field:width)
-  -f, --format string             Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+  -f, --format string             Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
       --ignore-scheduler-down     Ignore scheduler down warning/lockdown
       --kind stringArray          Specific kind(s) to process (can be repeated)
       --max-batches int           Max batches per kind per phase (0 = default or MAX_BATCHES env; -1 = unlimited batches for this run)

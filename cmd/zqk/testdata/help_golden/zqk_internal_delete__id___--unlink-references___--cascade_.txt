@@ -8,6 +8,15 @@ Use --unlink-references to remove this ID from dependents' reference fields, the
 Use --cascade to delete the object and all its dependents recursively.
 Do not combine --unlink-references with --cascade.
 
+Flags:
+    --cascade
+      Delete object and all objects that reference it
+    --dry-run
+      Show what would be deleted without actually deleting it
+    --unlink-references
+      Strip this ID from dependents' reference fields, then delete (does not
+      delete dependent objects)
+
   Delete a built-in object (dangerous!)
   zqk internal delete COMP-TYPE-001
   Delete with cascade (deletes object and all dependents)
@@ -22,7 +31,7 @@ Flags:
       --cascade                 Delete object and all objects that reference it
       --columns string          Override column widths for table output (format: field:width)
       --dry-run                 Show what would be deleted without actually deleting it
-  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
       --ignore-scheduler-down   Ignore scheduler down warning/lockdown
   -o, --output string           Write output to file
   -q, --quiet                   Suppress non-essential output

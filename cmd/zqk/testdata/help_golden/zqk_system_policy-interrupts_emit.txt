@@ -7,7 +7,7 @@ Flags:
       --ack-required            Require acknowledgement (default true)
       --columns string          Override column widths for table output (format: field:width)
       --dedupe-key string       Dedupe key (required)
-  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
       --ignore-scheduler-down   Ignore scheduler down warning/lockdown
       --message string          Message
   -o, --output string           Write output to file

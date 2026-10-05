@@ -21,7 +21,7 @@ Flags:
       --detect-only        Only scan workspace markers; skip seat/prime/smoke writes
       --dry-run            Plan stages without seating or writing files
       --force              Overwrite existing vendor directive files (default skips to avoid clobbering)
-  -f, --format string      Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+  -f, --format string      Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
       --headless           Force Vector B path: prime AGENTS.md only (skip IDE rule forests unless --all-vendors)
   -o, --output string      Write output to file
   -q, --quiet              Suppress non-essential output

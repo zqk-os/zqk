@@ -32,7 +32,7 @@ Flags:
       --columns string          Override column widths for table output (format: field:width)
       --fields stringArray      Top-level keys per successful object in output (repeat or comma-separated); same hybrid projection as object get.
       --file string             Path to YAML file containing array of IDs
-  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
       --ids string              Comma-separated list of object IDs
       --ignore-scheduler-down   Ignore scheduler down warning/lockdown
       --link-hydration string   Reference overlay per object: none, lazy, default, or eager (same semantics as object get; default is none/raw).

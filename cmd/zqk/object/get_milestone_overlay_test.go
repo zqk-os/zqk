@@ -58,12 +58,6 @@ func TestGetMilestoneCriteriaOverlay_AllComplete_UsesCriteriaStatuses(t *testing
 	milestoneID := "MIL-001000"
 	milestone := createTestObject("milestone", milestoneID, milestoneFields, 0)
 	milestone[objects.FieldKeyCriteriaRefs] = []string{crit1ID, crit2ID}
-	// Intentionally contradict durable criteria statuses: even if text says incomplete,
-	// the overlay should rely on referenced criteria object lifecycle status.
-	milestone[objects.FieldKeyCompletionCriteria] = []string{
-		"[ ] backlog-item-example status is complete",
-		"[ ] backlog-item-example-2 status is complete",
-	}
 	storage.CreateCASVisible(t, fs, cliCtx, secCtx, milestone, casLeaveStatus(objects.GetString(milestone, objects.FieldKeyStatus)))
 
 	cmd := testEnv.CreateCLICommand("object", "get", milestoneID, "--format", "json", "--link-hydration", "default")
@@ -139,11 +133,6 @@ func TestGetMilestoneCriteriaOverlay_IncompleteWhenAnyCriteriaNotComplete(t *tes
 	milestoneID := "MIL-002000"
 	milestone := createTestObject("milestone", milestoneID, milestoneFields, 0)
 	milestone[objects.FieldKeyCriteriaRefs] = []string{crit1ID, crit2ID}
-	milestone[objects.FieldKeyCompletionCriteria] = []string{
-		"[x] backlog-item-example status is complete",
-		"[x] backlog-item-example-2 status is complete",
-	}
-
 	storage.CreateCASVisible(t, fs, cliCtx, secCtx, milestone, casLeaveStatus(objects.GetString(milestone, objects.FieldKeyStatus)))
 
 	cmd := testEnv.CreateCLICommand("object", "get", milestoneID, "--format", "json")

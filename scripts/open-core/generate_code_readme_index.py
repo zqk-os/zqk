@@ -109,6 +109,7 @@ PACKAGE_FALLBACK_DESCRIPTIONS: Dict[str, str] = {
     "lifecycle": "Kernel object lifecycle state machine, phase transitions, and validation rules.",
     "llm": "LLM client abstractions, prompt completion handlers, and model provider routing.",
     "loader": "Component loader pattern with atomic state management and configurable timeouts.",
+    "localci": "Local CI runner simulation, fast-fail checks, and pre-push verification.",
     "logging": "Structured logging framework with leveled output, file rotation, and contextual metadata.",
     "maintenance": "Scheduled maintenance tasks, garbage collection, and database compaction.",
     "mcp": "Model Context Protocol (MCP) server implementation, tool registration, and IDE adapters.",
@@ -129,6 +130,7 @@ PACKAGE_FALLBACK_DESCRIPTIONS: Dict[str, str] = {
     "objectget": "Object retrieval, lazy loading, dereferencing, and relationship expansion.",
     "objects": "Kernel object graph repository, schema registration, and persistence adapters.",
     "observability": "Telemetry, distributed tracing spans, and operational visibility.",
+    "observer": "Event observation, AST entity extraction, and state tracking across system components.",
     "ontology": "Ontological relationship validation, semantic modeling, and hierarchy graphs.",
     "opencore": "Open core boundary enforcement, feature segregation, and open-source distribution.",
     "orgpack": "Organizational hierarchy and team structure pack.",
@@ -267,7 +269,7 @@ def extract_go_doc_comment(pkg_dir: str) -> str:
             
         m = re.search(r"(?:/\*[\s\S]*?\*/|(?://[^\n]*\n)+)\s*package\s+([a-zA-Z0-9_]+)", content)
         if m:
-            raw_comment = content[:m.start(0) + len(m.group(0)) - len(m.group(1)) - 7].strip()
+            raw_comment = m.group(0).rsplit("package", 1)[0].strip()
             lines = []
             for line in raw_comment.splitlines():
                 line = line.strip()
@@ -450,7 +452,7 @@ def generate_readme_index(repo_root: str, target_sub: str = "pkg") -> str:
     lines.append("Import packages using their canonical import path:")
     lines.append("")
     lines.append("```go")
-    example_pkg = "cli" if is_internal else "agentfeed"
+    example_pkg = "codegen" if is_internal else "agentfeed"
     lines.append(f'import "{import_prefix}/{example_pkg}"')
     lines.append("```")
     lines.append("")

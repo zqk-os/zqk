@@ -7,6 +7,32 @@ Use --all to show all objects including regular public ones.
 
 If no kind is specified, lists all internal/built-in objects across all kinds.
 
+Flags:
+    --all
+      Show all objects (including regular public objects)
+    --built-in
+      Filter for built-in instances only
+    --count
+      Only return the count
+    --filter <stringArray> (default: [])
+      Filter by field (field=value or field:value, multiple allowed)
+    --group-by <string>
+      Field to group results by
+    --group-limit <int> (default: 0)
+      Max items per group when using --group-by (0 = no limit)
+    --ids-only
+      Show only object IDs (one per line)
+    --internal
+      Filter for internal objects (visibility: internal) only
+    --limit <int> (default: 0)
+      Pagination limit (0 = no limit)
+    --offset <int> (default: 0)
+      Pagination offset
+    --sort-asc (default: true)
+      Sort ascending (default true)
+    --sort-by <string>
+      Field to sort by
+
   List all built-in and internal objects (across all kinds)
   zqk internal list
   List only built-in objects (across all kinds)

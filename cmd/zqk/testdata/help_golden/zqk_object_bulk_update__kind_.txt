@@ -51,7 +51,7 @@ Flags:
       --file string             YAML file: array of {id, updates: {field: value}}. Mutually exclusive with --filter/--set. Requires kind as first argument when set.
       --filter stringArray      Filter objects to update (e.g., --filter status=planned). Can be repeated.
       --force                   Force mode: skip 'not found' errors (treat missing objects as success)
-  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
       --ignore-scheduler-down   Ignore scheduler down warning/lockdown
       --keep-file               Keep the source file after update (default: temp files like tmp-*.yaml are removed automatically)
       --kind string             Optional kind when not specified as the first argument or inferred from filter

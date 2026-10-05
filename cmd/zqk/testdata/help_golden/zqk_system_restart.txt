@@ -1,0 +1,10 @@
+Restarts the scheduler service, ambient daemon, and background daemons.
+
+  Restart the entire system
+  zqk system restart
+
+Usage:
+  zqk system restart [flags]
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

@@ -17,7 +17,7 @@ Flags:
       --backup-dir string       External prior-tip backup dir (overrides config/zqk.yaml kernel_state.snapshot_backup_dir)
       --backup-keep int         Prior tip copies to keep (0 = use settings or default 3)
       --columns string          Override column widths for table output (format: field:width)
-  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link) (default "table")
+  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
       --ignore-scheduler-down   Ignore scheduler down warning/lockdown
   -o, --output string           Write output to file
   -q, --quiet                   Suppress non-essential output
