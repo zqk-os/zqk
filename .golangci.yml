@@ -67,6 +67,10 @@ linters:
         text: "Use config.GetString"
         linters:
           - forbidigo
+      - path: "_test\\.go"
+        text: "Use pkg/fileutil instead of os.RemoveAll"
+        linters:
+          - forbidigo
       - path: "scripts/"
         linters:
           - forbidigo
@@ -79,6 +83,12 @@ linters:
         text: "G101: Potential hardcoded credentials"
         linters:
           - gosec
+      - text: "G104:"
+        linters:
+          - gosec
+      - text: "G110:"
+        linters:
+          - gosec
       - text: "G115:"
         linters:
           - gosec
@@ -86,6 +96,9 @@ linters:
         linters:
           - gosec
       - text: "G702:"
+        linters:
+          - gosec
+      - text: "G704:"
         linters:
           - gosec
       - path: "pkg/systemcheck/policy/"

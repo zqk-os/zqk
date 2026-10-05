@@ -2,11 +2,11 @@ package studio
 
 import (
 	_ "embed"
-	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/studio/components"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // Embedded default web assets for standalone or air-gapped execution.
@@ -112,7 +112,7 @@ func (b *DashboardBuilder) RenderHTML() string {
 func (b *DashboardBuilder) resolveCSS() string {
 	for _, dir := range b.candidateAssetDirs() {
 		cssPath := filepath.Join(dir, "style.css")
-		if data, err := os.ReadFile(cssPath); err == nil && len(data) > 0 {
+		if data, err := fileutil.ReadFile(cssPath); err == nil && len(data) > 0 {
 			return string(data)
 		}
 	}
@@ -122,7 +122,7 @@ func (b *DashboardBuilder) resolveCSS() string {
 func (b *DashboardBuilder) resolveJS() string {
 	for _, dir := range b.candidateAssetDirs() {
 		jsPath := filepath.Join(dir, "app.js")
-		if data, err := os.ReadFile(jsPath); err == nil && len(data) > 0 {
+		if data, err := fileutil.ReadFile(jsPath); err == nil && len(data) > 0 {
 			return string(data)
 		}
 	}
@@ -132,7 +132,7 @@ func (b *DashboardBuilder) resolveJS() string {
 func (b *DashboardBuilder) resolveBodyHTML() string {
 	for _, dir := range b.candidateAssetDirs() {
 		bodyPath := filepath.Join(dir, "dashboard.html")
-		if data, err := os.ReadFile(bodyPath); err == nil && len(data) > 0 {
+		if data, err := fileutil.ReadFile(bodyPath); err == nil && len(data) > 0 {
 			return string(data)
 		}
 	}
