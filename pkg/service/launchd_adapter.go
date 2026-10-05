@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -137,7 +138,7 @@ func (a *LaunchdAdapter) Install(ctx context.Context, spec ServiceSpec) error {
 
 	plistPath := filepath.Join(dir, spec.ID+".plist")
 	content := a.PlistContent(spec)
-	if err := os.WriteFile(plistPath, []byte(content), paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(plistPath, []byte(content), paths.FilePerm644); err != nil {
 		return fmt.Errorf("write plist %s: %w", plistPath, err)
 	}
 

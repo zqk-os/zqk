@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestInstanceBuilderOutput_siblingOfToolDir(t *testing.T) {
@@ -147,7 +148,7 @@ func TestGenerateInstanceBuilderFromSpec_writesSiblingWithoutRegistry(t *testing
 func TestGeneratedSiblingCompiles(t *testing.T) {
 	root := moduleRoot(t)
 	packRoot := filepath.Join(root, "packs", "workgen_sibling")
-	t.Cleanup(func() { _ = os.RemoveAll(packRoot) })
+	t.Cleanup(func() { _ = fileutil.RemoveAll(packRoot) })
 	specPath := filepath.Join(packRoot, "widget.yaml")
 	if err := os.MkdirAll(packRoot, 0o755); err != nil {
 		t.Fatal(err)

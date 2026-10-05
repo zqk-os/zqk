@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"gopkg.in/yaml.v3"
 )
 
@@ -166,7 +167,7 @@ var specEntryRe = regexp.MustCompile(`^( *)([A-Za-z0-9_\-]+):\s*(.*)$`)
 // AuditSpecFile loads a YAML object-spec file and audits it for redundant or
 // duplicated field declarations.
 func AuditSpecFile(path string) (*RedundancyReport, error) {
-	data, err := os.ReadFile(path)
+	data, err := fileutil.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("%s %s: %w", errReadSpecKey, path, err)
 	}

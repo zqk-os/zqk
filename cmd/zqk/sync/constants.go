@@ -8,8 +8,8 @@ const (
 	FlagTeam      = "team"
 	FlagAPIKey    = "api-key"
 
-	EnvGitHubToken  = "GITHUB_TOKEN"
-	EnvLinearAPIKey = "LINEAR_API_KEY"
+	EnvGitHubToken  = "GITHUB_TOKEN"   //nolint:gosec // Environment variable name, not credential
+	EnvLinearAPIKey = "LINEAR_API_KEY" //nolint:gosec // Environment variable name, not credential
 
 	ErrStorageUnavailable = "storage unavailable"
 

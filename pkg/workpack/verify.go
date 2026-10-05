@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 var (
@@ -66,7 +67,7 @@ func moduleRoot() (string, error) {
 		return "", fmt.Errorf("work pack module root: %w", err)
 	}
 	for {
-		data, readErr := os.ReadFile(filepath.Join(dir, "go.mod"))
+		data, readErr := fileutil.ReadFile(filepath.Join(dir, "go.mod"))
 		if readErr == nil {
 			line, _, _ := strings.Cut(string(data), "\n")
 			if strings.TrimSpace(line) == "module github.com/zqk-os/zqk" {

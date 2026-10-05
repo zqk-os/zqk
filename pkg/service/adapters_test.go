@@ -41,9 +41,7 @@ func TestLaunchdAdapter_PlistGeneration(t *testing.T) {
 }
 
 func TestLaunchdAdapter_FileOperations(t *testing.T) {
-	tempDir, err := os.MkdirTemp("", "launchd-test-*")
-	require.NoError(t, err)
-	defer os.RemoveAll(tempDir)
+	tempDir := t.TempDir()
 
 	adapter := service.NewLaunchdAdapter()
 	adapter.BaseDir = tempDir
@@ -99,9 +97,7 @@ func TestSystemdAdapter_UnitGeneration(t *testing.T) {
 }
 
 func TestSystemdAdapter_FileOperations(t *testing.T) {
-	tempDir, err := os.MkdirTemp("", "systemd-test-*")
-	require.NoError(t, err)
-	defer os.RemoveAll(tempDir)
+	tempDir := t.TempDir()
 
 	adapter := service.NewSystemdAdapter(true)
 	adapter.UnitDir = tempDir

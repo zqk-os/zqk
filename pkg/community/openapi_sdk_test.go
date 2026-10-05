@@ -198,11 +198,15 @@ paths:
 // Verifies verify mode, Go AST parsing conformance, and packaging compatibility.
 func TestOpenAPIClientSDK_IntegrationAndConformance(t *testing.T) {
 	repoRoot := findRepoRootForSDK(t)
+	scriptPath := filepath.Join(repoRoot, "scripts", "generate-openapi-clients.sh")
+	if _, err := os.Stat(scriptPath); os.IsNotExist(err) {
+		t.Skip("skipping test: scripts/generate-openapi-clients.sh not present in open-core community distribution")
+	}
 	tmpDir := t.TempDir()
 	outDir := filepath.Join(tmpDir, "sdk")
 
 	// Generate SDK
-	cmd := testkit.ManagedCommand(t, t.Context(), "bash", filepath.Join(repoRoot, "scripts", "generate-openapi-clients.sh"), outDir)
+	cmd := testkit.ManagedCommand(t, t.Context(), "bash", scriptPath, outDir)
 	cmd.Dir = repoRoot
 	if out, err := cmd.CombinedOutput(); err != nil {
 		t.Fatalf("generate-openapi-clients.sh failed: %v\nOutput:\n%s", err, string(out))
